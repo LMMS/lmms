@@ -84,10 +84,18 @@ SampleTCO::SampleTCO( Track * _track ) :
 	//care about TCO position
 	connect( this, SIGNAL( positionChanged() ), this, SLOT( updateTrackTcos() ) );
 
+
+	BBTrackContainer * BBTC = dynamic_cast<BBTrackContainer*>( getTrack()->trackContainer() );
+	if(BBTC)
+	{
+		::BBTrack * bb_track = BBTrack::findBBTrack( BBTC->currentBB() );
+		connect( bb_track, SIGNAL( trackContentObjectAdded( TrackContentObject *) ), this, SLOT( updateBBTcos() ) );
+	}
 	switch( getTrack()->trackContainer()->type() )
 	{
 		case TrackContainer::BBContainer:
 			setAutoResize( true );
+			updateBBTcos();
 			break;
 
 		case TrackContainer::SongContainer:
@@ -133,6 +141,7 @@ const QString & SampleTCO::sampleFile() const
 
 
 
+
 void SampleTCO::setSampleBuffer( SampleBuffer* sb )
 {
 	sharedObject::unref( m_sampleBuffer );
@@ -141,6 +150,7 @@ void SampleTCO::setSampleBuffer( SampleBuffer* sb )
 
 	emit sampleChanged();
 }
+
 
 
 
@@ -182,6 +192,26 @@ void SampleTCO::updateTrackTcos()
 	{
 		sampletrack->updateTcos();
 	}
+}
+
+
+
+
+void SampleTCO::updateBBTcos()
+{
+	BBTrackContainer * BBTC = dynamic_cast<BBTrackContainer*>( getTrack()->trackContainer() );
+	if(BBTC)
+	{
+		::BBTrack * bb_track = BBTrack::findBBTrack( BBTC->currentBB() );
+		for( auto i = 0; i < bb_track->numOfTCOs(); ++i )
+		{
+			connect( bb_track->getTCO( i ), SIGNAL( muteToggled() ), this, SLOT( playbackPositionChanged() ) );
+			connect( bb_track->getTCO( i ), SIGNAL( destroyedTCO() ), this, SLOT( playbackPositionChanged() ) );
+			connect( bb_track->getTCO( i ), SIGNAL( lengthChanged() ), this, SLOT( playbackPositionChanged() ) );
+			connect( bb_track->getTCO( i ), SIGNAL( positionChanged() ), this, SLOT( playbackPositionChanged() ) );
+		}
+	}
+
 }
 
 bool SampleTCO::isPlaying() const

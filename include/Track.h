@@ -159,6 +159,7 @@ signals:
 	void lengthChanged();
 	void positionChanged();
 	void destroyedTCO();
+	void muteToggled() ;
 
 
 private:

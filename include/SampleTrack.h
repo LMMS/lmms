@@ -74,7 +74,7 @@ public slots:
 	void toggleRecord();
 	void playbackPositionChanged();
 	void updateTrackTcos();
-
+	void updateBBTcos();
 
 private:
 	SampleBuffer* m_sampleBuffer;
