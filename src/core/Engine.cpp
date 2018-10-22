@@ -23,6 +23,10 @@
  */
 
 
+#include <QUrl>
+#include <QtDebug>
+#include "../core/spa/SpaInstrument.h"
+#include "SpaOscModel.h"
 #include "Engine.h"
 #include "BBTrackContainer.h"
 #include "ConfigManager.h"
@@ -112,5 +116,56 @@ void LmmsCore::updateFramesPerTick()
 	s_framesPerTick = s_mixer->processingSampleRate() * 60.0f * 4 /
 				DefaultTicksPerTact / s_song->getTempo();
 }
+
+
+
+
+AutomatableModel *LmmsCore::getAutomatableModel(const QString& val, bool hasOsc)
+{
+	AutomatableModel* mod = nullptr;
+
+	if(hasOsc)
+	{
+		QUrl url(val);
+		if(!url.isValid())
+		{
+			printf("Could not find a port in %s => "
+			       "can not make connection\n", val.toUtf8().data());
+		}
+		else
+		{
+			// qDebug() << val;
+			const QMap<int, class SpaInstrument*>& insmap = Engine::getSpaInstruments();
+			auto itr = insmap.find(url.port());
+			if(itr == insmap.end())
+			{
+				puts("DnD from an instrument which is not in LMMS... ignoring");
+				// TODO: MessageBox?
+			}
+			else
+			{
+				/* TODO: name */
+				AutomatableModel* spamod = SpaOscModelFactory(itr.value(), url.path()).res;
+				//SpaOscModel* spamod = new SpaOscModel(itr.value(), url.path().toUtf8().data());
+				if(spamod)
+				{
+					itr.value()->connectedModels.insert(url.path(), spamod);
+					mod = spamod;
+				}
+				else {
+					qDebug() << "LMMS: Could not create model from OSC port (received \"" << val << "\")";
+				}
+			}
+		}
+	}
+	else
+	{
+		mod = dynamic_cast<AutomatableModel *>(
+			projectJournal()->
+			journallingObject( val.toInt() ) );
+	}
+	return mod;
+}
+
 
 LmmsCore * LmmsCore::s_instanceOfMe = NULL;

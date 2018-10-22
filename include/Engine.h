@@ -116,6 +116,8 @@ public:
 		return s_instanceOfMe;
 	}
 
+	static class AutomatableModel*
+	getAutomatableModel(const QString &val, bool hasOsc);
 signals:
 	void initProgress(const QString &msg);
 

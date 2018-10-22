@@ -119,48 +119,8 @@ void AutomationTrackView::dropEvent( QDropEvent * _de )
 	if( type == "automatable_model" )
 	{
 
-		AutomatableModel * mod = nullptr;
-
-		if(_de->mimeData()->hasFormat( "application/x-osc-stringpair"))
-		{
-			QUrl url(val);
-			if(!url.isValid())
-			{
-				printf("Could not find a port in %s => "
-				       "can not make connection\n", val.toUtf8().data());
-			}
-			else
-			{
-				// qDebug() << val;
-				const QMap<int, class SpaInstrument*>& insmap = Engine::getSpaInstruments();
-				auto itr = insmap.find(url.port());
-				if(itr == insmap.end())
-				{
-					puts("DnD from an instrument which is not in LMMS... ignoring");
-					// TODO: MessageBox?
-				}
-				else
-				{
-					/* TODO: name */
-					AutomatableModel* spamod = SpaOscModelFactory(itr.value(), url.path()).res;
-					//SpaOscModel* spamod = new SpaOscModel(itr.value(), url.path().toUtf8().data());
-					if(spamod)
-					{
-						itr.value()->connectedModels.insert(url.path(), spamod);
-						mod = spamod;
-					}
-					else {
-						qDebug() << "LMMS: Could not create model from OSC port (received \"" << val << "\")";
-					}
-				}
-			}
-		}
-		else
-		{
-			mod = dynamic_cast<AutomatableModel *>(
-				Engine::projectJournal()->
-				journallingObject( val.toInt() ) );
-		}
+		AutomatableModel * mod = Engine::getAutomatableModel(val,
+			_de->mimeData()->hasFormat( "application/x-osc-stringpair"));
 
 		if( mod )
 		{
