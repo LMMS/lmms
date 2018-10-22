@@ -35,12 +35,14 @@
 #include "ControllerView.h"
 
 #include "CaptionMenu.h"
+#include "ControllerConnection.h"
 #include "ControllerDialog.h"
 #include "gui_templates.h"
 #include "embed.h"
 #include "GuiApplication.h"
 #include "LedCheckbox.h"
 #include "MainWindow.h"
+#include "StringPairDrag.h"
 #include "ToolTip.h"
 
 
@@ -92,6 +94,7 @@ ControllerView::ControllerView( Controller * _model, QWidget * _parent ) :
 	m_subWindow->hide();
 
 	setModel( _model );
+	setAcceptDrops( true );
 }
 
 
@@ -155,6 +158,31 @@ void ControllerView::renameController()
 		}
 		m_nameLabel->setText( new_name );
 	}
+}
+
+void ControllerView::dragEnterEvent( QDragEnterEvent * dee )
+{
+	StringPairDrag::processDragEnterEvent( dee, "automatable_model" );
+}
+
+void ControllerView::dropEvent(QDropEvent *de)
+{
+	QString type = StringPairDrag::decodeKey( de );
+	QString val = StringPairDrag::decodeValue( de );
+	// qDebug() << "DROP: type/val:" << type << ", " << val;
+
+	if( type == "automatable_model" )
+	{
+		AutomatableModel * mod = Engine::getAutomatableModel( val,
+			de->mimeData()->hasFormat( "application/x-osc-stringpair") );
+
+		mod->setControllerConnection( new ControllerConnection( getController() ) );
+
+		// tell the source app that the drop did succeed
+		de->acceptProposedAction();
+	}
+
+	update();
 }
 
 

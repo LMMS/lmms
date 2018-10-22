@@ -23,6 +23,7 @@
  */
 #include "AutomationPatternView.h"
 
+#include <QDebug>
 #include <QMouseEvent>
 #include <QPainter>
 #include <QMenu>
@@ -434,10 +435,10 @@ void AutomationPatternView::dropEvent( QDropEvent * _de )
 	QString val = StringPairDrag::decodeValue( _de );
 	if( type == "automatable_model" )
 	{
-		AutomatableModel * mod = dynamic_cast<AutomatableModel *>(
-				Engine::projectJournal()->
-					journallingObject( val.toInt() ) );
-		if( mod != NULL )
+		AutomatableModel * mod = Engine::getAutomatableModel( val,
+			_de->mimeData()->hasFormat( "application/x-osc-stringpair") );
+
+		if( mod )
 		{
 			bool added = m_pat->addObject( mod );
 			if ( !added )
@@ -456,6 +457,8 @@ void AutomationPatternView::dropEvent( QDropEvent * _de )
 		{
 			gui->automationEditor()->setCurrentPattern( m_pat );
 		}
+
+		_de->acceptProposedAction();
 	}
 	else
 	{
