@@ -297,7 +297,6 @@ void SampleBuffer::update( bool _keep_settings )
 		else
 		{
 			fprintf( stderr, "%s\n", message.toUtf8().constData() );
-			exit( EXIT_FAILURE );
 		}
 	}
 }
