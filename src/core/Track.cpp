@@ -2063,8 +2063,9 @@ void Track::saveSettings( QDomDocument & doc, QDomElement & element )
 	}
 	element.setAttribute( "type", type() );
 	element.setAttribute( "name", name() );
-	element.setAttribute( "muted", isMuted() );
-	element.setAttribute( "solo", isSolo() );
+	m_mutedModel.saveSettings( doc, element, "muted" );
+	m_soloModel.saveSettings( doc, element, "solo" );
+
 	if( m_height >= MINIMAL_TRACK_HEIGHT )
 	{
 		element.setAttribute( "height", m_height );
@@ -2116,8 +2117,8 @@ void Track::loadSettings( const QDomElement & element )
 	setName( element.hasAttribute( "name" ) ? element.attribute( "name" ) :
 			element.firstChild().toElement().attribute( "name" ) );
 
-	setMuted( element.attribute( "muted" ).toInt() );
-	setSolo( element.attribute( "solo" ).toInt() );
+	m_mutedModel.loadSettings( element, "muted" );
+	m_soloModel.loadSettings( element, "solo" );
 
 	if( m_simpleSerializingMode )
 	{
@@ -2150,8 +2151,9 @@ void Track::loadSettings( const QDomElement & element )
 			{
 				loadTrackSpecificSettings( node.toElement() );
 			}
-			else if(
-			!node.toElement().attribute( "metadata" ).toInt() )
+			else if( node.nodeName() != "muted"
+			&& node.nodeName() != "solo"
+			&& !node.toElement().attribute( "metadata" ).toInt() )
 			{
 				TrackContentObject * tco = createTCO(
 								MidiTime( 0 ) );
