@@ -202,9 +202,9 @@ public:
 		return m_recording;
 	}
 	
-	inline void setLoopRenderCount( int count )
+	inline void setLoopRenderCount(int count)
 	{
-		if( count < 1 )
+		if (count < 1)
 			m_loopRenderCount = 1;
 		else
 			m_loopRenderCount = count;
