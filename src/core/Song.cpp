@@ -87,8 +87,8 @@ Song::Song() :
 	m_loopPattern( false ),
 	m_elapsedTicks( 0 ),
 	m_elapsedTacts( 0 ),
-	m_loopRenderCount ( 1 ),
-	m_loopRenderRemaining( 1 )
+	m_loopRenderCount(1),
+	m_loopRenderRemaining(1)
 {
 	for(int i = 0; i < Mode_Count; ++i) m_elapsedMilliSeconds[i] = 0;
 	connect( &m_tempoModel, SIGNAL( dataChanged() ),
@@ -332,7 +332,7 @@ void Song::processNextBuffer()
 			}
 			m_playPos[m_playMode].setTicks( ticks );
 
-			if( checkLoop || m_loopRenderRemaining > 1 )
+			if (checkLoop || m_loopRenderRemaining > 1)
 			{
 				m_vstSyncController.startCycle(
 					tl->loopBegin().getTicks(), tl->loopEnd().getTicks() );
@@ -342,7 +342,7 @@ void Song::processNextBuffer()
 				// beginning of the range
 				if( m_playPos[m_playMode] >= tl->loopEnd() )
 				{
-					if( m_loopRenderRemaining > 1 ) 
+					if (m_loopRenderRemaining > 1) 
 						m_loopRenderRemaining--;
 					ticks = tl->loopBegin().getTicks();
 					m_playPos[m_playMode].setTicks( ticks );
@@ -491,22 +491,23 @@ int Song::getExportProgress() const
 {
 	MidiTime pos = m_playPos[m_playMode];
     
-	if ( pos >= m_exportSongEnd )
+	if (pos >= m_exportSongEnd)
 	{
 		return 100;
 	}
-	else if ( pos <= m_exportSongBegin )
+	else if (pos <= m_exportSongBegin)
 	{
 		return 0;
 	}
-	else if ( pos >= m_exportLoopEnd )
+	else if (pos >= m_exportLoopEnd)
 	{
-		pos = (m_exportLoopBegin-m_exportSongBegin) + (m_exportLoopEnd - m_exportLoopBegin)*m_loopRenderCount + (pos - m_exportLoopEnd);
+		pos = (m_exportLoopBegin-m_exportSongBegin) + (m_exportLoopEnd - m_exportLoopBegin) *
+			m_loopRenderCount + (pos - m_exportLoopEnd);
 	}
 	else if ( pos >= m_exportLoopBegin )
 	{
-		pos = (m_exportLoopBegin-m_exportSongBegin) + ((m_exportLoopEnd - m_exportLoopBegin)*(m_loopRenderCount - m_loopRenderRemaining)) 
-			+ (pos - m_exportLoopBegin);
+		pos = (m_exportLoopBegin-m_exportSongBegin) + ((m_exportLoopEnd - m_exportLoopBegin) *
+			(m_loopRenderCount - m_loopRenderRemaining)) + (pos - m_exportLoopBegin);
 	}
 	else
 	{
@@ -736,7 +737,7 @@ void Song::stop()
 void Song::startExport()
 {
 	stop();
-	if( m_renderBetweenMarkers )
+	if (m_renderBetweenMarkers)
 	{
 		m_exportSongBegin = m_exportLoopBegin = m_playPos[Mode_PlaySong].m_timeLine->loopBegin();
 		m_exportSongEnd = m_exportLoopEnd = m_playPos[Mode_PlaySong].m_timeLine->loopEnd();
@@ -748,12 +749,12 @@ void Song::startExport()
 		m_exportSongEnd = MidiTime(m_length, 0);
         
 		// Handle potentially ridiculous loop points gracefully.
-		if ( m_loopRenderCount > 1 && m_playPos[Mode_PlaySong].m_timeLine->loopEnd() > m_exportSongEnd ) 
+		if (m_loopRenderCount > 1 && m_playPos[Mode_PlaySong].m_timeLine->loopEnd() > m_exportSongEnd) 
 		{
 			m_exportSongEnd = m_playPos[Mode_PlaySong].m_timeLine->loopEnd();
 		}
 
-		if ( !m_exportLoop ) 
+		if (!m_exportLoop) 
 			m_exportSongEnd += MidiTime(1,0);
         
 		m_exportSongBegin = MidiTime(0,0);
@@ -767,8 +768,8 @@ void Song::startExport()
 		m_playPos[Mode_PlaySong].setTicks( 0 );
 	}
 
-	m_exportEffectiveLength = (m_exportLoopBegin - m_exportSongBegin) + (m_exportLoopEnd - m_exportLoopBegin) * m_loopRenderCount +
-		(m_exportSongEnd - m_exportLoopEnd);
+	m_exportEffectiveLength = (m_exportLoopBegin - m_exportSongBegin) + (m_exportLoopEnd - m_exportLoopBegin) 
+		* m_loopRenderCount + (m_exportSongEnd - m_exportLoopEnd);
 	m_loopRenderRemaining = m_loopRenderCount;
 
 	playSong();
