@@ -40,6 +40,7 @@
 #include "InstrumentPlayHandle.h"
 #include "InstrumentTrack.h"
 #include "gui_templates.h"
+#include "Song.h"
 #include "StringPairDrag.h"
 #include "RemoteZynAddSubFx.h"
 #include "LocalZynAddSubFx.h"
@@ -324,7 +325,7 @@ QString ZynAddSubFxInstrument::nodeName() const
 
 void ZynAddSubFxInstrument::play( sampleFrame * _buf )
 {
-	if (!m_pluginMutex.tryLock()) {return;}
+	if (!m_pluginMutex.tryLock(Engine::getSong()->isExporting() ? -1 : 0)) {return;}
 	if( m_remotePlugin )
 	{
 		m_remotePlugin->process( NULL, _buf );

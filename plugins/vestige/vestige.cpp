@@ -51,6 +51,7 @@
 #include "GuiApplication.h"
 #include "PixmapButton.h"
 #include "SampleBuffer.h"
+#include "Song.h"
 #include "StringPairDrag.h"
 #include "TextFloat.h"
 #include "ToolTip.h"
@@ -365,7 +366,7 @@ void vestigeInstrument::loadFile( const QString & _file )
 
 void vestigeInstrument::play( sampleFrame * _buf )
 {
-	if (!m_pluginMutex.tryLock()) {return;}
+	if (!m_pluginMutex.tryLock(Engine::getSong()->isExporting() ? -1 : 0)) {return;}
 
 	const fpp_t frames = Engine::mixer()->framesPerPeriod();
 
