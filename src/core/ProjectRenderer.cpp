@@ -146,7 +146,7 @@ void ProjectRenderer::startProcessing()
 		// make slots connected to sampleRateChanged()-signals being
 		// called immediately
 		Engine::mixer()->setAudioDevice( m_fileDev,
-						m_qualitySettings, false );
+						m_qualitySettings, false, false );
 
 		start(
 #ifndef LMMS_BUILD_WIN32
@@ -184,6 +184,9 @@ void ProjectRenderer::run()
 	tick_t startTick = exportEndpoints.first.getTicks();
 	tick_t endTick = exportEndpoints.second.getTicks();
 	tick_t lengthTicks = endTick - startTick;
+
+	// Now start processing
+	Engine::mixer()->startProcessing(false);
 
 	// Continually track and emit progress percentage to listeners
 	while( exportPos.getTicks() < endTick &&
