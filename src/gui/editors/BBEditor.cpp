@@ -250,7 +250,25 @@ void BBTrackContainerView::dropEvent(QDropEvent* de)
 		DataFile dataFile( value.toUtf8() );
 		Track * t = Track::create( dataFile.content().firstChild().toElement(), model() );
 
-		t->deleteTCOs();
+		// Ensure BB TCOs exist
+		bool hasValidBBTCOs = false;
+		if (t->getTCOs().size() == m_bbtc->numOfBBs())
+		{
+			hasValidBBTCOs = true;
+			for (int i = 0; i < t->getTCOs().size(); ++i)
+			{
+				if (t->getTCOs()[i]->startPosition() != MidiTime(i, 0))
+				{
+					hasValidBBTCOs = false;
+					break;
+				}
+			}
+		}
+		if (!hasValidBBTCOs)
+		{
+			t->deleteTCOs();
+			t->createTCOsForBB(m_bbtc->numOfBBs() - 1);
+		}
 		m_bbtc->updateAfterTrackAdd();
 
 		de->accept();

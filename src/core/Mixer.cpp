@@ -577,7 +577,8 @@ void Mixer::changeQuality( const struct qualitySettings & _qs )
 
 
 
-void Mixer::setAudioDevice( AudioDevice * _dev )
+void Mixer::setAudioDevice( AudioDevice * _dev,
+			    bool startNow )
 {
 	stopProcessing();
 
@@ -594,7 +595,7 @@ void Mixer::setAudioDevice( AudioDevice * _dev )
 
 	emit sampleRateChanged();
 
-	startProcessing();
+	if (startNow) {startProcessing();}
 }
 
 
@@ -602,7 +603,8 @@ void Mixer::setAudioDevice( AudioDevice * _dev )
 
 void Mixer::setAudioDevice( AudioDevice * _dev,
 				const struct qualitySettings & _qs,
-				bool _needs_fifo )
+				bool _needs_fifo,
+				bool startNow )
 {
 	// don't delete the audio-device
 	stopProcessing();
@@ -623,7 +625,7 @@ void Mixer::setAudioDevice( AudioDevice * _dev,
 	emit qualitySettingsChanged();
 	emit sampleRateChanged();
 
-	startProcessing( _needs_fifo );
+	if (startNow) {startProcessing( _needs_fifo );}
 }
 
 

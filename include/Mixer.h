@@ -171,10 +171,11 @@ public:
 		return m_audioDevStartFailed;
 	}
 
-	void setAudioDevice( AudioDevice * _dev );
+	void setAudioDevice( AudioDevice * _dev , bool startNow );
 	void setAudioDevice( AudioDevice * _dev,
 				const struct qualitySettings & _qs,
-							bool _needs_fifo );
+				bool _needs_fifo,
+				bool startNow );
 	void storeAudioDevice();
 	void restoreAudioDevice();
 	inline AudioDevice * audioDev()

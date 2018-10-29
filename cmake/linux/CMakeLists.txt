@@ -1,5 +1,4 @@
-INSTALL(FILES lmms.svg                  DESTINATION "${DATA_DIR}/icons/hicolor/scalable/apps")
-INSTALL(FILES project.svg               DESTINATION "${DATA_DIR}/icons/hicolor/scalable/mimetypes/" RENAME "application-x-lmms-project.svg")
+INSTALL(DIRECTORY icons/                DESTINATION "${DATA_DIR}/icons/hicolor")
 INSTALL(FILES lmms.desktop              DESTINATION "${DATA_DIR}/applications")
 INSTALL(FILES lmms.xml                  DESTINATION "${DATA_DIR}/mime/packages")
 

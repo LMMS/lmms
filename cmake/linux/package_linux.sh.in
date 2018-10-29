@@ -102,7 +102,7 @@ cat >"${APPDIR}usr/bin/lmms" <<EOL
 #!/usr/bin/env bash
 DIR="\$( cd "\$( dirname "\${BASH_SOURCE[0]}" )" && pwd )"
 if which carla > /dev/null 2>&1; then
-   CARLAPATH="$(which carla)"
+   CARLAPATH="\$(which carla)"
    CARLAPREFIX="\${CARLAPATH%/bin*}"
    echo "Carla appears to be installed on this system at \$CARLAPREFIX/lib[64]/carla so we'll use it."
    export LD_LIBRARY_PATH=\$CARLAPREFIX/lib/carla:\$CARLAPREFIX/lib64/carla:\$LD_LIBRARY_PATH

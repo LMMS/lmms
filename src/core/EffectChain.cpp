@@ -53,7 +53,7 @@ EffectChain::~EffectChain()
 
 void EffectChain::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
-	_this.setAttribute( "enabled", m_enabledModel.value() );
+	m_enabledModel.saveSettings( _doc, _this, "enabled" );
 	_this.setAttribute( "numofeffects", m_effects.count() );
 
 	for( Effect* effect : m_effects)
@@ -80,7 +80,7 @@ void EffectChain::loadSettings( const QDomElement & _this )
 
 	// TODO This method should probably also lock the mixer
 
-	m_enabledModel.setValue( _this.attribute( "enabled" ).toInt() );
+	m_enabledModel.loadSettings( _this, "enabled" );
 
 	const int plugin_cnt = _this.attribute( "numofeffects" ).toInt();
 
