@@ -41,6 +41,10 @@ public:
 		m_displayName( _display_name ),
 		m_defaultConstructed( _default_constructed )
 	{
+#if QT_VERSION < 0x050000
+		connect( this, SIGNAL( dataChanged() ), this,
+			SLOT( thisDataChanged() ), Qt::DirectConnection );
+#endif
 	}
 
 	virtual ~Model()
@@ -85,6 +89,19 @@ signals:
 	// emitted if properties of the model (e.g. ranges) have changed
 	void propertiesChanged();
 
+#if QT_VERSION < 0x050000
+	// emitted along with dataChanged(), but with this model as an argument
+	// workaround for when QObject::sender() and Qt5 are unavailable
+	void dataChanged( Model * );
+
+private slots:
+	void thisDataChanged()
+	{
+		emit dataChanged( this );
+	}
+
+signals:
+#endif
 } ;
 
 
