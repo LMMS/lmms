@@ -206,6 +206,7 @@ void SpaInstrument::loadSettings( const QDomElement & _this )
 			for(QDomElement portnode = elem.firstChildElement();
 				!portnode.isNull();
 				portnode = portnode.nextSiblingElement())
+			if(portnode.nodeName() != "connection")
 			{
 				QString name = portnode.nodeName();
 				if(name == "automatablemodel")

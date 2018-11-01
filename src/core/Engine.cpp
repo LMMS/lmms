@@ -144,16 +144,24 @@ AutomatableModel *LmmsCore::getAutomatableModel(const QString& val, bool hasOsc)
 			}
 			else
 			{
-				/* TODO: name */
-				AutomatableModel* spamod = SpaOscModelFactory(itr.value(), url.path()).res;
-				//SpaOscModel* spamod = new SpaOscModel(itr.value(), url.path().toUtf8().data());
-				if(spamod)
+				QMap<QString, AutomatableModel*>& connectedModels
+					= itr.value()->connectedModels;
+				auto itr2 = connectedModels.find(url.path());
+				if(itr2 != connectedModels.end())
 				{
-					itr.value()->connectedModels.insert(url.path(), spamod);
-					mod = spamod;
+					return *itr2;
 				}
-				else {
-					qDebug() << "LMMS: Could not create model from OSC port (received \"" << val << "\")";
+				else
+				{
+					AutomatableModel* spamod = SpaOscModelFactory(itr.value(), url.path()).res;
+					if(spamod)
+					{
+						itr.value()->connectedModels.insert(url.path(), spamod);
+						mod = spamod;
+					}
+					else {
+						qDebug() << "LMMS: Could not create model from OSC port (received \"" << val << "\")";
+					}
 				}
 			}
 		}

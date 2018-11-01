@@ -63,6 +63,8 @@ public slots:
 
 protected:
 	virtual void closeEvent( QCloseEvent * _ce );
+	virtual void dragEnterEvent( QDragEnterEvent *dee );
+	virtual void dropEvent( QDropEvent * de );
 
 private slots:
 	void addController();
