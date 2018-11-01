@@ -190,7 +190,7 @@ void PluginFactory::discoverPlugins()
 
 				const char** xpm = descriptor->xpm_load();
 				assert(xpm);
-				QString xpmKey= "spa-plugin:" +
+				QString xpmKey = "spa-plugin:" +
 					QString::fromStdString(unique_name);
 
 				// spa (simple plugin API) plugin
