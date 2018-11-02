@@ -48,22 +48,22 @@
 #include "embed.h"
 #include "gui_templates.h"
 
-SpaInstrument::SpaInstrument(InstrumentTrack *_instrumentTrack,
-	const char *libraryName, const Descriptor *plugin_descriptor) :
-	Instrument(_instrumentTrack, plugin_descriptor),
-	ports(Engine::mixer()->framesPerPeriod()), m_hasGUI(false),
-	libraryName(libraryName)
+SpaInstrument::SpaInstrument(InstrumentTrack *instrumentTrackArg,
+	const char *libraryName, const Descriptor *pluginDescriptor) :
+	Instrument(instrumentTrackArg, pluginDescriptor),
+	m_ports(Engine::mixer()->framesPerPeriod()), m_hasGUI(false),
+	m_libraryName(libraryName)
 {
 	for (int i = 0; i < NumKeys; ++i)
 		m_runningNotes[i] = 0;
 
 	initPlugin();
 
-	if (plugin)
+	if (m_plugin)
 	{
 		// now we need a play-handle which cares for calling play()
 		InstrumentPlayHandle *iph =
-			new InstrumentPlayHandle(this, _instrumentTrack);
+			new InstrumentPlayHandle(this, instrumentTrackArg);
 		Engine::mixer()->addPlayHandle(iph);
 
 		connect(Engine::mixer(), SIGNAL(sampleRateChanged()), this,
@@ -84,22 +84,22 @@ SpaInstrument::~SpaInstrument()
 
 // not yet working
 #ifndef SPA_INSTRUMENT_USE_MIDI
-void SpaInstrument::playNote(NotePlayHandle *_n, sampleFrame *)
+void SpaInstrument::playNote(NotePlayHandle *nph, sampleFrame *)
 {
 	// no idea what that means
-	if (_n->isMasterNote() || (_n->hasParent() && _n->isReleased()))
+	if (nph->isMasterNote() || (nph->hasParent() && nph->isReleased()))
 	{
 		return;
 	}
 
-	const f_cnt_t tfp = _n->totalFramesPlayed();
+	const f_cnt_t tfp = nph->totalFramesPlayed();
 
 	const float LOG440 = 2.643452676f;
 
 	int midiNote = (int)floor(
-		12.0 * (log2(_n->unpitchedFrequency()) - LOG440) - 4.0);
+		12.0 * (log2(nph->unpitchedFrequency()) - LOG440) - 4.0);
 
-	qDebug() << "midiNote: " << midiNote << ", r? " << _n->isReleased();
+	qDebug() << "midiNote: " << midiNote << ", r? " << nph->isReleased();
 	// out of range?
 	if (midiNote <= 0 || midiNote >= 128)
 	{
@@ -112,23 +112,23 @@ void SpaInstrument::playNote(NotePlayHandle *_n, sampleFrame *)
 			instrumentTrack()->midiPort()->baseVelocity();
 		plugin->send_osc("/noteOn", "iii", 0, midiNote, baseVelocity);
 	}
-	else if (_n->isReleased() &&
-		!_n->instrumentTrack()
+	else if (nph->isReleased() &&
+		!nph->instrumentTrack()
 			 ->isSustainPedalPressed()) // note is released during
 						    // this period
 	{
 		plugin->send_osc("/noteOff", "ii", 0, midiNote);
 	}
-	else if (_n->framesLeft() <= 0)
+	else if (nph->framesLeft() <= 0)
 	{
 		plugin->send_osc("/noteOff", "ii", 0, midiNote);
 	}
 }
 #endif
 
-void SpaInstrument::saveSettings(QDomDocument &_doc, QDomElement &_this)
+void SpaInstrument::saveSettings(QDomDocument &doc, QDomElement &that)
 {
-	if (!descriptor->save_has())
+	if (!m_descriptor->save_has())
 		return;
 
 	QTemporaryFile tf;
@@ -137,44 +137,44 @@ void SpaInstrument::saveSettings(QDomDocument &_doc, QDomElement &_this)
 		const std::string fn =
 			QSTR_TO_STDSTR(QDir::toNativeSeparators(tf.fileName()));
 		m_pluginMutex.lock();
-		plugin->save(fn.c_str(), ++save_ticket);
+		m_plugin->save(fn.c_str(), ++m_saveTicket);
 		m_pluginMutex.unlock();
 
-		while (!plugin->save_check(fn.c_str(), save_ticket))
+		while (!m_plugin->save_check(fn.c_str(), m_saveTicket))
 			QThread::msleep(1);
 
-		QDomCDATASection cdata = _doc.createCDATASection(
+		QDomCDATASection cdata = doc.createCDATASection(
 			QString::fromUtf8(tf.readAll()));
-		_this.appendChild(cdata);
+		that.appendChild(cdata);
 	}
 	tf.remove();
 
-	if (connectedModels.size())
+	if (m_connectedModels.size())
 	{
-		QDomElement newNode = _doc.createElement("connected-models");
+		QDomElement newNode = doc.createElement("connected-models");
 		QMap<QString, AutomatableModel *>::const_iterator i =
-			connectedModels.constBegin();
-		while (i != connectedModels.constEnd())
+			m_connectedModels.constBegin();
+		while (i != m_connectedModels.constEnd())
 		{
-			i.value()->saveSettings(_doc, newNode, i.key());
+			i.value()->saveSettings(doc, newNode, i.key());
 			++i;
 		}
 
-		_this.appendChild(newNode);
+		that.appendChild(newNode);
 	}
 }
 
-void SpaInstrument::loadSettings(const QDomElement &_this)
+void SpaInstrument::loadSettings(const QDomElement &that)
 {
-	if (!descriptor->load_has())
+	if (!m_descriptor->load_has())
 		return;
 
-	if (!_this.hasChildNodes())
+	if (!that.hasChildNodes())
 	{
 		return;
 	}
 
-	for (QDomNode node = _this.firstChild(); !node.isNull();
+	for (QDomNode node = that.firstChild(); !node.isNull();
 		node = node.nextSibling())
 	{
 		QDomCDATASection cdata = node.toCDATASection();
@@ -206,66 +206,66 @@ void SpaInstrument::loadSettings(const QDomElement &_this)
 							"nodename");
 					using fact = SpaOscModelFactory;
 					AutomatableModel *m =
-						fact(this, name).res;
+						fact(this, name).m_res;
 					m->loadSettings(elem, name);
-					connectedModels[name] = m;
+					m_connectedModels[name] = m;
 				}
 		}
 	}
 }
 
-void SpaInstrument::loadFileInternal(const QString &_file)
+void SpaInstrument::loadFileInternal(const QString &file)
 {
-	const QByteArray fn = _file.toUtf8();
+	const QByteArray fn = file.toUtf8();
 	m_pluginMutex.lock();
-	plugin->load(fn.data(), ++save_ticket);
-	while (!plugin->load_check(fn.data(), save_ticket))
+	m_plugin->load(fn.data(), ++m_saveTicket);
+	while (!m_plugin->load_check(fn.data(), m_saveTicket))
 		QThread::msleep(1);
 	m_pluginMutex.unlock();
 }
 
-void SpaInstrument::loadFile(const QString &_file)
+void SpaInstrument::loadFile(const QString &file)
 {
-	loadFileInternal(_file);
-	instrumentTrack()->setName(QFileInfo(_file).baseName().replace(
+	loadFileInternal(file);
+	instrumentTrack()->setName(QFileInfo(file).baseName().replace(
 		QRegExp("^[0-9]{4}-"), QString()));
 	emit settingsChanged();
 }
 
 QString SpaInstrument::nodeName() const { return Plugin::descriptor()->name; }
 
-void SpaInstrument::play(sampleFrame *_buf)
+void SpaInstrument::play(sampleFrame *buf)
 {
-	if (plugin)
+	if (m_plugin)
 	{
 		m_pluginMutex.lock();
-		ports.samplecount = ports.buffersize;
-		plugin->run();
+		m_ports.samplecount = m_ports.buffersize;
+		m_plugin->run();
 		m_pluginMutex.unlock();
-		for (std::size_t f = 0; f < ports.buffersize; ++f)
+		for (std::size_t f = 0; f < m_ports.buffersize; ++f)
 		{
-			_buf[f][0] = ports.l_processed[f];
-			_buf[f][1] = ports.r_processed[f];
+			buf[f][0] = m_ports.m_lProcessed[f];
+			buf[f][1] = m_ports.m_rProcessed[f];
 		}
 	}
 	instrumentTrack()->processAudioBuffer(
-		_buf, Engine::mixer()->framesPerPeriod(), nullptr);
+		buf, Engine::mixer()->framesPerPeriod(), nullptr);
 }
 
 void SpaInstrument::reloadPlugin()
 {
 	// refresh ports that are only read on restore
-	ports.samplerate = Engine::mixer()->processingSampleRate();
-	ports.buffersize = Engine::mixer()->framesPerPeriod();
+	m_ports.samplerate = Engine::mixer()->processingSampleRate();
+	m_ports.buffersize = Engine::mixer()->framesPerPeriod();
 
-	if (descriptor->restore_has())
+	if (m_descriptor->restore_has())
 	{
 		// use the offered restore function
 		m_pluginMutex.lock();
-		plugin->restore(++restore_ticket);
+		m_plugin->restore(++m_restoreTicket);
 		m_pluginMutex.unlock();
 
-		while (!plugin->restore_check(restore_ticket))
+		while (!m_plugin->restore_check(m_restoreTicket))
 			QThread::msleep(1);
 	}
 	else
@@ -291,20 +291,20 @@ void SpaInstrument::updatePitchRange()
 
 void SpaInstrument::shutdownPlugin()
 {
-	plugin->deactivate();
+	m_plugin->deactivate();
 
-	delete plugin;
-	plugin = nullptr;
-	delete descriptor;
-	descriptor = nullptr;
+	delete m_plugin;
+	m_plugin = nullptr;
+	delete m_descriptor;
+	m_descriptor = nullptr;
 
 	m_pluginMutex.lock();
-	if (lib)
+	if (m_lib)
 	{
 #ifdef SPA_INSTRUMENT_USE_QLIBRARY
-		lib->unload();
-		delete lib;
-		lib = nullptr;
+		m_lib->unload();
+		delete m_lib;
+		m_lib = nullptr;
 #else
 		dlclose(lib);
 		lib = nullptr;
@@ -313,35 +313,35 @@ void SpaInstrument::shutdownPlugin()
 	m_pluginMutex.unlock();
 }
 
-struct lmms_visitor final : public virtual spa::audio::visitor
+struct lmmsVisitor final : public virtual spa::audio::visitor
 {
-	SpaInstrument::lmms_ports *ports;
+	SpaInstrument::lmmsPorts *ports;
 
 	void visit(spa::audio::in &p) override
 	{
 		qDebug() << "in, c: " << +p.channel;
 		p.set_ref((p.channel == spa::audio::stereo::left)
-				? ports->l_unprocessed.data()
-				: ports->r_unprocessed.data());
+				? ports->m_lUnprocessed.data()
+				: ports->m_rUnprocessed.data());
 	}
 	void visit(spa::audio::out &p) override
 	{
 		qDebug() << "out, c: %d\n" << +p.channel;
 		p.set_ref((p.channel == spa::audio::stereo::left)
-				? ports->l_processed.data()
-				: ports->r_processed.data());
+				? ports->m_lProcessed.data()
+				: ports->m_rProcessed.data());
 	}
 	void visit(spa::audio::stereo::in &p) override
 	{
 		qDebug() << "in, stereo";
-		p.left = ports->l_unprocessed.data();
-		p.right = ports->r_unprocessed.data();
+		p.left = ports->m_lUnprocessed.data();
+		p.right = ports->m_rUnprocessed.data();
 	}
 	void visit(spa::audio::stereo::out &p) override
 	{
 		qDebug() << "out, stereo";
-		p.left = ports->l_processed.data();
-		p.right = ports->r_processed.data();
+		p.left = ports->m_lProcessed.data();
+		p.right = ports->m_rProcessed.data();
 	}
 	void visit(spa::audio::buffersize &p) override
 	{
@@ -361,8 +361,8 @@ struct lmms_visitor final : public virtual spa::audio::visitor
 	void visit(spa::port_ref<const float> &p) override
 	{
 		qDebug() << "unknown control port";
-		ports->unknown_controls.push_back(.0f);
-		p.set_ref(&ports->unknown_controls.back());
+		ports->m_unknownControls.push_back(.0f);
+		p.set_ref(&ports->m_unknownControls.back());
 	}
 	void visit(spa::audio::osc_ringbuffer_in &p) override
 	{
@@ -386,39 +386,40 @@ bool SpaInstrument::initPlugin()
 {
 	m_pluginMutex.lock();
 
-	spa::descriptor_loader_t spa_descriptor_loader;
+	spa::descriptor_loader_t spaDescriptorLoader;
 #ifdef SPA_INSTRUMENT_USE_QLIBRARY
-	lib = new QLibrary(libraryName);
-	lib->load();
+	m_lib = new QLibrary(m_libraryName);
+	m_lib->load();
 
-	if (!lib->isLoaded())
-		qDebug() << "Warning: Could not load library " << libraryName
-			 << ": " << lib->errorString();
+	if (!m_lib->isLoaded())
+		qDebug() << "Warning: Could not load library " << m_libraryName
+			 << ": " << m_lib->errorString();
 
-	spa_descriptor_loader =
-		(spa::descriptor_loader_t)lib->resolve(spa::descriptor_name);
+	spaDescriptorLoader =
+		(spa::descriptor_loader_t)m_lib->resolve(spa::descriptor_name);
 #else
 	lib = dlopen(libraryName.toAscii().data(), RTLD_LAZY | RTLD_LOCAL);
 	if (!lib)
 		qDebug() << "Warning: Could not load library " << libraryName
 			 << ": " << dlerror();
 
-	*(void **)(&spa_descriptor_loader) = dlsym(lib, spa::descriptor_name);
+	*(void **)(&spaDescriptorLoader) = dlsym(lib, spa::descriptor_name);
 #endif
 
-	if (!spa_descriptor_loader)
+	if (!spaDescriptorLoader)
 		qDebug() << "Warning: Could not resolve \"osc_descriptor\" in "
-			 << libraryName;
+			 << m_libraryName;
 
-	if (spa_descriptor_loader)
+	if (spaDescriptorLoader)
 	{
-		descriptor =
-			(*spa_descriptor_loader)(0 /* = plugin number, TODO */);
-		if (descriptor)
+		m_descriptor =
+			(*spaDescriptorLoader)(0 /* = plugin number, TODO */);
+		if (m_descriptor)
+		{
 			try
 			{
-				spa::assert_versions_match(*descriptor);
-				plugin = descriptor->instantiate();
+				spa::assert_versions_match(*m_descriptor);
+				m_plugin = m_descriptor->instantiate();
 				// TODO: unite error handling in the ctor
 			}
 			catch (spa::version_mismatch &mismatch)
@@ -435,23 +436,24 @@ bool SpaInstrument::initPlugin()
 					<< mismatch.least_version.major() << "."
 					<< mismatch.least_version.minor() << "."
 					<< mismatch.least_version.patch();
-				descriptor = nullptr;
+				m_descriptor = nullptr;
 			}
+		}
 	}
 	m_pluginMutex.unlock();
 
-	ports.samplerate = Engine::mixer()->processingSampleRate();
-	spa::simple_vec<spa::simple_str> port_names = descriptor->port_names();
-	for (const spa::simple_str &portname : port_names)
+	m_ports.samplerate = Engine::mixer()->processingSampleRate();
+	spa::simple_vec<spa::simple_str> portNames = m_descriptor->port_names();
+	for (const spa::simple_str &portname : portNames)
 	{
 		try
 		{
 			// qDebug() << "portname: " << portname.data();
 			spa::port_ref_base &port_ref =
-				plugin->port(portname.data());
+				m_plugin->port(portname.data());
 
-			lmms_visitor v;
-			v.ports = &ports;
+			lmmsVisitor v;
+			v.ports = &m_ports;
 			port_ref.accept(v);
 		}
 		catch (spa::port_not_found &e)
@@ -463,16 +465,16 @@ bool SpaInstrument::initPlugin()
 			else
 				qWarning() << "plugin specifies invalid port, "
 					      "but does not provide it";
-			plugin = nullptr; // TODO: free plugin, handle etc...
+			m_plugin = nullptr; // TODO: free plugin, handle etc...
 			return false;
 		}
 	}
 
 	// all initial ports are already set, we can do
 	// initialization of buffers etc.
-	plugin->init();
+	m_plugin->init();
 
-	plugin->activate();
+	m_plugin->activate();
 
 	// checks not yet implemented:
 	//	spa::host_utils::check_ports(descriptor, plugin);
@@ -532,14 +534,14 @@ bool SpaInstrument::handleMidiEvent(
 }
 #endif
 
-PluginView *SpaInstrument::instantiateView(QWidget *_parent)
+PluginView *SpaInstrument::instantiateView(QWidget *parent)
 {
-	return new SpaView(this, _parent);
+	return new SpaView(this, parent);
 }
 
 void SpaInstrument::writeOsc(const char *dest, const char *args, va_list va)
 {
-	ports.rb->write(dest, args, va);
+	m_ports.rb->write(dest, args, va);
 }
 
 void SpaInstrument::writeOsc(const char *dest, const char *args, ...)
@@ -582,10 +584,10 @@ SpaView::SpaView(Instrument *_instrument, QWidget *_parent) :
 SpaView::~SpaView()
 {
 	SpaInstrument *model = castModel<SpaInstrument>();
-	if (model && model->descriptor->ui_ext() && model->m_hasGUI)
+	if (model && model->m_descriptor->ui_ext() && model->m_hasGUI)
 	{
 		qDebug() << "shutting down UI...";
-		model->plugin->ui_ext_show(false);
+		model->m_plugin->ui_ext_show(false);
 	}
 }
 
@@ -630,11 +632,11 @@ void SpaView::modelChanged()
 void SpaView::toggleUI()
 {
 	SpaInstrument *model = castModel<SpaInstrument>();
-	if (model->descriptor->ui_ext() &&
+	if (model->m_descriptor->ui_ext() &&
 		model->m_hasGUI != m_toggleUIButton->isChecked())
 	{
 		model->m_hasGUI = m_toggleUIButton->isChecked();
-		model->plugin->ui_ext_show(model->m_hasGUI);
+		model->m_plugin->ui_ext_show(model->m_hasGUI);
 		ControllerConnection::finalizeConnections();
 	}
 }
@@ -645,9 +647,9 @@ void SpaView::reloadPlugin()
 	model->reloadPlugin();
 }
 
-SpaInstrument::lmms_ports::lmms_ports(int buffersize) :
-	buffersize(buffersize), l_unprocessed(buffersize),
-	r_unprocessed(buffersize), l_processed(buffersize),
-	r_processed(buffersize)
+SpaInstrument::lmmsPorts::lmmsPorts(int bufferSize) :
+	buffersize(bufferSize), m_lUnprocessed(bufferSize),
+	m_rUnprocessed(bufferSize), m_lProcessed(bufferSize),
+	m_rProcessed(bufferSize)
 {
 }

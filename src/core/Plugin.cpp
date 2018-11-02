@@ -111,24 +111,24 @@ Plugin * Plugin::instantiate( const QString& pluginName, Model * parent,
 	}
 
 	Plugin* inst;
-	spa::descriptor_loader_t spa_loader;
+	spa::descriptor_loader_t spaLoader;
 	InstantiationHook instantiationHook;
-	if( (instantiationHook = ( InstantiationHook ) pi.library->resolve( "lmms_plugin_main" )) )
+	if ((instantiationHook = ( InstantiationHook ) pi.library->resolve( "lmms_plugin_main" )))
 	{
 		inst = instantiationHook( parent, data );
 	}
-	else if( (spa_loader = (spa::descriptor_loader_t) pi.library->resolve( spa::descriptor_name )) )
+	else if ((spaLoader = (spa::descriptor_loader_t) pi.library->resolve( spa::descriptor_name )))
 	{
 		// instantiate a SPA Instrument
 		// it will load and contain the SPA plugin
 		// and transfer LMMS events to SPA function calls
-		SpaInstrument* spa_inst = new SpaInstrument(
+		SpaInstrument* spaInst = new SpaInstrument(
 			static_cast<InstrumentTrack *>( data ),
 			pi.file.absoluteFilePath().toUtf8().data(),
 			pi.descriptor);
-		unsigned port = spa_inst->plugin->net_port();
-		Engine::getSpaInstruments().insert(port, spa_inst);
-		inst = spa_inst;
+		unsigned port = spaInst->m_plugin->net_port();
+		Engine::getSpaInstruments().insert(port, spaInst);
+		inst = spaInst;
 	}
 	else
 	{

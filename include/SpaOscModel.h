@@ -30,14 +30,14 @@
 template <class Base> class SpaOscModel : public Base
 {
 protected:
-	class SpaInstrument *inst_ref;
-	QByteArray dest;
+	class SpaInstrument *m_instRef;
+	QByteArray m_dest;
 
 	using Base::Base;
-	void init(class SpaInstrument *_inst_ref, const QString _dest)
+	void init(class SpaInstrument *instRef, const QString dest)
 	{
-		inst_ref = _inst_ref;
-		dest = _dest.toUtf8();
+		m_instRef = instRef;
+		m_dest = dest.toUtf8();
 	}
 };
 
@@ -49,7 +49,7 @@ private slots:
 
 public:
 	BoolOscModel(
-		class SpaInstrument *inst_ref, const QString dest, bool val);
+		class SpaInstrument *instRef, const QString dest, bool val);
 };
 
 class IntOscModel : public SpaOscModel<IntModel>
@@ -59,7 +59,7 @@ private slots:
 	void sendOsc();
 
 public:
-	IntOscModel(class SpaInstrument *inst_ref, const QString dest, int min,
+	IntOscModel(class SpaInstrument *instRef, const QString dest, int min,
 		int max, int val);
 };
 
@@ -70,14 +70,14 @@ private slots:
 	void sendOsc();
 
 public:
-	FloatOscModel(class SpaInstrument *inst_ref, const QString dest,
+	FloatOscModel(class SpaInstrument *instRef, const QString dest,
 		float min, float max, float val);
 };
 
 struct SpaOscModelFactory
 {
-	AutomatableModel *res;
-	SpaOscModelFactory(class SpaInstrument *inst_ref, const QString &dest);
+	AutomatableModel *m_res;
+	SpaOscModelFactory(class SpaInstrument *instRef, const QString &dest);
 };
 
 #endif // SPAOSCMODEL_H

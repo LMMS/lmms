@@ -52,12 +52,12 @@ public:
 
 	static const char * mimeType()
 	{
-		return( "application/x-lmms-stringpair" );
+		return "application/x-lmms-stringpair";
 	}
 
 	static const char * mimeTypeOsc()
 	{
-		return( "application/x-osc-stringpair" );
+		return "application/x-osc-stringpair";
 	}
 
 } ;

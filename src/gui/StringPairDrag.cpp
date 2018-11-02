@@ -85,14 +85,14 @@ bool StringPairDrag::processDragEnterEvent( QDragEnterEvent * _dee,
 				? "none"
 				: _dee->mimeData()->formats().front().
 					toUtf8().data());
-		return( false );
+		return false;
 	}
 	QString txt = _dee->mimeData()->data( mimeType() );
 	if( _allowed_keys.split( ',' ).contains( txt.section( ':', 0, 0 ) ) )
 	{
 		_dee->acceptProposedAction();
 		puts("will accept DnD");
-		return( true );
+		return true;
 	}
 	else {
 		QString txtOsc = _dee->mimeData()->data( mimeTypeOsc() );
@@ -100,13 +100,13 @@ bool StringPairDrag::processDragEnterEvent( QDragEnterEvent * _dee,
 		{
 			_dee->acceptProposedAction();
 			puts("will accept OSC DnD");
-			return( true );
+			return true;
 		}
 		else
 			printf("will reject: cannot drop \"%s\" or \"%s\" here\n", txt.toUtf8().data(), txtOsc.toUtf8().data());
 	}
 	_dee->ignore();
-	return( false );
+	return false;
 }
 
 
@@ -115,8 +115,8 @@ bool StringPairDrag::processDragEnterEvent( QDragEnterEvent * _dee,
 QString StringPairDrag::decodeMimeKey( const QMimeData * mimeData )
 {
 	bool hasMt = (mimeData->hasFormat(mimeType()));
-	return( QString::fromUtf8( mimeData->data(
-		hasMt ? mimeType() : mimeTypeOsc() ) ).section( ':', 0, 0 ) );
+	return	QString::fromUtf8( mimeData->data(
+		hasMt ? mimeType() : mimeTypeOsc() ) ).section( ':', 0, 0 );
 }
 
 
@@ -127,8 +127,8 @@ QString StringPairDrag::decodeMimeValue( const QMimeData * mimeData )
 	const char* myMimeType = (mimeData->hasFormat(mimeType()))
 			? mimeType()
 			: mimeTypeOsc();
-	return( QString::fromUtf8( mimeData->data( myMimeType ) ).
-		section( ':', 1, -1 ) );
+	return	QString::fromUtf8( mimeData->data( myMimeType ) ).
+		section( ':', 1, -1 );
 }
 
 

@@ -123,6 +123,9 @@ signals:
 
 
 private:
+	static class AutomatableModel*
+	getAutomatableOscModel(const QString& val, const QUrl& url);
+
 	// small helper function which sets the pointer to NULL before actually deleting
 	// the object it refers to
 	template<class T>

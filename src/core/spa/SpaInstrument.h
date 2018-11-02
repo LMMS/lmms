@@ -57,22 +57,22 @@ class SpaInstrument : public Instrument
 {
 	Q_OBJECT
 public:
-	SpaInstrument(InstrumentTrack *_instrument_track,
-		const char *libraryName, const Descriptor *plugin_descriptor);
+	SpaInstrument(InstrumentTrack *instrumentTrackArg,
+		const char *m_libraryName, const Descriptor *pluginDescriptor);
 	virtual ~SpaInstrument();
 
 #ifdef SPA_INSTRUMENT_USE_MIDI
 	virtual bool handleMidiEvent(const MidiEvent &event,
 		const MidiTime &time = MidiTime(), f_cnt_t offset = 0);
 #else
-	virtual void playNote(NotePlayHandle *_n, sampleFrame *);
+	virtual void playNote(NotePlayHandle *nph, sampleFrame *);
 #endif
-	virtual void play(sampleFrame *_working_buffer);
+	virtual void play(sampleFrame *buf);
 
-	virtual void saveSettings(QDomDocument &_doc, QDomElement &_parent);
-	virtual void loadSettings(const QDomElement &_this);
+	virtual void saveSettings(QDomDocument &doc, QDomElement &that);
+	virtual void loadSettings(const QDomElement &that);
 
-	virtual void loadFile(const QString &_file);
+	virtual void loadFile(const QString &file);
 
 	virtual QString nodeName() const;
 
@@ -85,37 +85,37 @@ public:
 #endif
 	}
 
-	virtual PluginView *instantiateView(QWidget *_parent);
+	virtual PluginView *instantiateView(QWidget *parent);
 
-	void setLibraryName(const QString &name) { libraryName = name; }
+	void setLibraryName(const QString &name) { m_libraryName = name; }
 
 	void writeOsc(const char *dest, const char *args, va_list va);
 	void writeOsc(const char *dest, const char *args, ...);
 
-	const spa::descriptor *descriptor = nullptr;
-	spa::plugin *plugin = nullptr;
+	const spa::descriptor *m_descriptor = nullptr;
+	spa::plugin *m_plugin = nullptr;
 
-	QMap<QString, AutomatableModel *> connectedModels;
-	uint64_t load_ticket = 0, save_ticket = 0, restore_ticket = 0;
+	QMap<QString, AutomatableModel *> m_connectedModels;
+	uint64_t m_loadTicket = 0, m_saveTicket = 0, m_restoreTicket = 0;
 
 private slots:
 	void reloadPlugin();
 	void updatePitchRange();
 
 private:
-	struct lmms_ports
+	struct lmmsPorts
 	{
 		unsigned samplecount;
 		unsigned buffersize;
 		long samplerate; // TODO: use const?
-		std::vector<float> l_unprocessed, r_unprocessed, l_processed,
-			r_processed;
-		std::vector<float> unknown_controls;
-		lmms_ports(int buffersize);
+		std::vector<float> m_lUnprocessed, m_rUnprocessed, m_lProcessed,
+			m_rProcessed;
+		std::vector<float> m_unknownControls;
+		lmmsPorts(int bufferSize);
 		std::unique_ptr<spa::audio::osc_ringbuffer> rb;
-	} ports;
+	} m_ports;
 
-	friend struct lmms_visitor;
+	friend struct lmmsVisitor;
 
 #ifdef SPA_INSTRUMENT_USE_MIDI
 	QMutex m_pluginMutex;
@@ -130,16 +130,16 @@ private:
 
 	friend class SpaView;
 
-	bool loaded;
+	bool m_loaded;
 #ifdef SPA_INSTRUMENT_USE_QLIBRARY
-	class QLibrary *lib = nullptr;
+	class QLibrary *m_lib = nullptr;
 #else
-	void *lib = nullptr; //!< dlopen() handle
+	void *m_lib = nullptr; //!< dlopen() handle
 #endif
-	QString libraryName;
+	QString m_libraryName;
 
 	//! load a file in the plugin, but don't do anything in LMMS
-	void loadFileInternal(const QString &_file);
+	void loadFileInternal(const QString &file);
 signals:
 	void settingsChanged();
 };

@@ -184,14 +184,14 @@ void PluginFactory::discoverPlugins()
 			spa::descriptor* descriptor = (*spaDescriptorLoader)(0 /* = plugin number, TODO */);
 			if(descriptor)
 			{
-				std::string unique_name =
+				std::string uniqueName =
 					spa::unique_name(*descriptor);
-				m_garbage.push_back(unique_name);
+				m_garbage.push_back(uniqueName);
 
 				const char** xpm = descriptor->xpm_load();
 				assert(xpm);
 				QString xpmKey = "spa-plugin:" +
-					QString::fromStdString(unique_name);
+					QString::fromStdString(uniqueName);
 
 				// spa (simple plugin API) plugin
 				pluginDescriptor = new Plugin::Descriptor {
@@ -218,7 +218,7 @@ void PluginFactory::discoverPlugins()
 			info.descriptor = pluginDescriptor;
 			pluginInfos << info;
 
-			if(info.descriptor->supportedFileTypes)
+			if (info.descriptor->supportedFileTypes)
 			for (const QString& ext : QString(info.descriptor->supportedFileTypes).split(','))
 			{
 				m_pluginByExt.insert(ext, info);

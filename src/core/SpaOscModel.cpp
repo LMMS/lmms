@@ -31,72 +31,77 @@
 
 struct SpaOscModelFactoryVisitor : public spa::audio::visitor
 {
-	class SpaInstrument *inst_ref;
-	const QString *dest;
-	AutomatableModel *res = nullptr;
+	class SpaInstrument *m_instRef;
+	const QString *m_dest;
+	AutomatableModel *m_res = nullptr;
 
 	template <class ModelType, class T> void make(T min, T max, T val)
 	{
-		res = new ModelType(inst_ref, *dest, min, max, val);
+		m_res = new ModelType(m_instRef, *m_dest, min, max, val);
 	}
 
-	template <class T> using c_in = spa::audio::control_in<T>;
-	virtual void visit(c_in<float> &in)
+	template <class T> using CtlIn = spa::audio::control_in<T>;
+	virtual void visit(CtlIn<float> &in)
 	{
 		make<FloatOscModel>(in.min, in.max, in.def);
 	}
-	virtual void visit(c_in<double> &in)
+	virtual void visit(CtlIn<double> &in)
 	{
 		make<FloatOscModel>(in.min, in.max, in.def);
 	}
-	virtual void visit(c_in<int> &in)
+	virtual void visit(CtlIn<int> &in)
 	{
 		make<IntOscModel>(in.min, in.max, in.def);
 	}
-	virtual void visit(c_in<bool> &in)
+	virtual void visit(CtlIn<bool> &in)
 	{
-		res = new BoolOscModel(inst_ref, *dest, in.def);
+		m_res = new BoolOscModel(m_instRef, *m_dest, in.def);
 	}
 };
 
 SpaOscModelFactory::SpaOscModelFactory(
-	SpaInstrument *inst_ref, const QString &dest)
+	SpaInstrument *instRef, const QString &dest)
 {
 	SpaOscModelFactoryVisitor vis;
-	vis.inst_ref = inst_ref;
-	vis.dest = &dest;
-	spa::port_ref_base &base = inst_ref->plugin->port(dest.toUtf8().data());
+	vis.m_instRef = instRef;
+	vis.m_dest = &dest;
+	spa::port_ref_base &base = instRef->m_plugin->port(dest.toUtf8().data());
 	base.accept(vis);
-	res = vis.res;
+	m_res = vis.m_res;
 }
 
 void BoolOscModel::sendOsc()
 {
-	inst_ref->writeOsc(dest.data(), value() ? "T" : "F");
+	m_instRef->writeOsc(m_dest.data(), value() ? "T" : "F");
 }
-void IntOscModel::sendOsc() { inst_ref->writeOsc(dest.data(), "i", value()); }
-void FloatOscModel::sendOsc() { inst_ref->writeOsc(dest.data(), "f", value()); }
+void IntOscModel::sendOsc()
+{
+	m_instRef->writeOsc(m_dest.data(), "i", value());
+}
+void FloatOscModel::sendOsc()
+{
+	m_instRef->writeOsc(m_dest.data(), "f", value());
+}
 
-BoolOscModel::BoolOscModel(
-	SpaInstrument *inst_ref, const QString dest, bool val) :
+BoolOscModel::BoolOscModel(SpaInstrument *instRef, const QString dest, bool val) :
 	SpaOscModel<BoolModel>(val, nullptr, dest, false)
 {
 	qDebug() << "LMMS: receiving bool model: val = " << val;
-	init(inst_ref, dest);
+	init(instRef, dest);
 	QObject::connect(this, SIGNAL(dataChanged()), this, SLOT(sendOsc()));
 }
 
-IntOscModel::IntOscModel(SpaInstrument *inst_ref, const QString dest, int min,
+IntOscModel::IntOscModel(SpaInstrument *instRef, const QString dest, int min,
 	int max, int val) :
 	SpaOscModel<IntModel>(val, min, max, nullptr, dest, false)
 {
 	qDebug() << "LMMS: receiving int model: (val, min, max) = (" << val
 		 << ", " << min << ", " << max << ")";
-	init(inst_ref, dest);
+	init(instRef, dest);
 	QObject::connect(this, SIGNAL(dataChanged()), this, SLOT(sendOsc()));
 }
 
-FloatOscModel::FloatOscModel(SpaInstrument *inst_ref, const QString dest,
+FloatOscModel::FloatOscModel(SpaInstrument *instRef, const QString dest,
 	float min, float max, float val) :
 	SpaOscModel<FloatModel>(val, min, max, 0.1f, nullptr, dest, false)
 /* TODO: get step from plugin (we currently need a plugin where this
@@ -104,6 +109,6 @@ FloatOscModel::FloatOscModel(SpaInstrument *inst_ref, const QString dest,
 {
 	qDebug() << "LMMS: receiving float model: (val, min, max) = (" << val
 		 << ", " << min << ", " << max << ")";
-	init(inst_ref, dest);
+	init(instRef, dest);
 	QObject::connect(this, SIGNAL(dataChanged()), this, SLOT(sendOsc()));
 }
