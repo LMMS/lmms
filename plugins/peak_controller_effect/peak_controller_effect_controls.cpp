@@ -53,6 +53,7 @@ PeakControllerEffectControls( PeakControllerEffect * _eff ) :
 void PeakControllerEffectControls::loadSettings( const QDomElement & _this )
 {
 	m_baseModel.loadSettings( _this, "base" );
+	m_effect->m_lastSample = m_baseModel.value(); //Set initial Peak Controller output to Base
 	m_amountModel.loadSettings( _this, "amount" );
 	m_muteModel.loadSettings( _this, "mute" );
 
