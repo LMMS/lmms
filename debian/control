@@ -33,7 +33,7 @@ Build-Depends:
  qtbase5-private-dev,
  qttools5-dev,
  wine32-tools [i386]
-Standards-Version: 3.9.8
+Standards-Version: 4.2.1.4
 Homepage: http://lmms.io/
 Vcs-Browser: https://salsa.debian.org/debian-edu-pkg-team/lmms.git
 

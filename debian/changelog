@@ -1,6 +1,7 @@
 lmms (1.2.0~rc7.1) unstable; urgency=low
 
   * Upstream integration.
+  * Drop Debian menu entry (policy 9.6).
 
  -- Javier Serrano Polo <javier@jasp.net>  Sat, 03 Nov 2018 02:43:42 +0100
 
