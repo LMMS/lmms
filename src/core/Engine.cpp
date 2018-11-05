@@ -25,8 +25,7 @@
 
 #include <QUrl>
 #include <QtDebug>
-#include "../core/spa/SpaInstrument.h"
-#include "SpaOscModel.h"
+
 #include "Engine.h"
 #include "BBTrackContainer.h"
 #include "ConfigManager.h"
@@ -37,6 +36,11 @@
 #include "ProjectJournal.h"
 #include "Song.h"
 #include "BandLimitedWave.h"
+#include "lmmsconfig.h"
+#ifdef LMMS_HAVE_SPA
+	#include "../core/spa/SpaInstrument.h"
+	#include "SpaOscModel.h"
+#endif
 
 float LmmsCore::s_framesPerTick;
 Mixer* LmmsCore::s_mixer = NULL;
@@ -120,15 +124,16 @@ void LmmsCore::updateFramesPerTick()
 
 
 
+#ifdef LMMS_HAVE_SPA
 AutomatableModel *LmmsCore::getAutomatableOscModel(const QString& val,
 	const QUrl& url)
 {
 	AutomatableModel* mod = nullptr;
 
 	// qDebug() << val;
-	const QMap<int, class SpaInstrument*>& insMap = getSpaInstruments();
-	auto itr = insMap.find(url.port());
-	if(itr == insMap.end())
+	const QMap<int, class SpaInstrument*>& spaMap = getSpaInstruments();
+	auto itr = spaMap.find(url.port());
+	if(itr == spaMap.end())
 	{
 		puts(	"DnD from an instrument which is not "
 			"in LMMS... ignoring");
@@ -162,6 +167,7 @@ AutomatableModel *LmmsCore::getAutomatableOscModel(const QString& val,
 
 	return mod;
 }
+#endif
 
 
 
@@ -169,6 +175,7 @@ AutomatableModel *LmmsCore::getAutomatableOscModel(const QString& val,
 AutomatableModel *LmmsCore::getAutomatableModel(const QString& val, bool hasOsc)
 {
 	AutomatableModel* mod = nullptr;
+#ifdef LMMS_HAVE_SPA
 	if(hasOsc)
 	{
 		QUrl url(val);
@@ -184,6 +191,9 @@ AutomatableModel *LmmsCore::getAutomatableModel(const QString& val, bool hasOsc)
 		}
 	}
 	else
+#else
+	(void)hasOsc;
+#endif
 	{
 		mod = dynamic_cast<AutomatableModel *>(
 			projectJournal()->

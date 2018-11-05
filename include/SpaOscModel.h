@@ -25,6 +25,10 @@
 #ifndef SPAOSCMODEL_H
 #define SPAOSCMODEL_H
 
+#include "lmmsconfig.h"
+
+#ifdef LMMS_HAVE_SPA
+
 #include "AutomatableModel.h"
 
 template <class Base> class SpaOscModel : public Base
@@ -79,5 +83,7 @@ struct SpaOscModelFactory
 	AutomatableModel *m_res;
 	SpaOscModelFactory(class SpaInstrument *instRef, const QString &dest);
 };
+
+#endif // LMMS_HAVE_SPA
 
 #endif // SPAOSCMODEL_H

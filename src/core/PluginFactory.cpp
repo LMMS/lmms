@@ -28,7 +28,10 @@
 #include <QtCore/QDebug>
 #include <QtCore/QDir>
 #include <QtCore/QLibrary>
-#include <spa/spa.h>
+#include "lmmsconfig.h"
+#ifdef LMMS_HAVE_SPA
+	#include <spa/spa.h>
+#endif
 
 #include "ConfigManager.h"
 #include "Plugin.h"
@@ -153,8 +156,9 @@ void PluginFactory::discoverPlugins()
 	for (const QFileInfo& file : files)
 	{
 		auto library = std::make_shared<QLibrary>(file.absoluteFilePath());
+#ifdef LMMS_HAVE_SPA
 		spa::descriptor_loader_t spaDescriptorLoader;
-
+#endif
 		if (! library->load()) {
 			m_errors[file.baseName()] = library->errorString();
 			qWarning("%s", library->errorString().toLocal8Bit().data());
@@ -180,6 +184,7 @@ void PluginFactory::discoverPlugins()
 				continue;
 			}
 		}
+#ifdef LMMS_HAVE_SPA
 		else if ((spaDescriptorLoader = (spa::descriptor_loader_t) library->resolve(spa::descriptor_name))) {
 			spa::descriptor* descriptor = (*spaDescriptorLoader)(0 /* = plugin number, TODO */);
 			if(descriptor)
@@ -189,26 +194,35 @@ void PluginFactory::discoverPlugins()
 				m_garbage.push_back(uniqueName);
 
 				const char** xpm = descriptor->xpm_load();
-				assert(xpm);
-				QString xpmKey = "spa-plugin:" +
-					QString::fromStdString(uniqueName);
+				if(xpm)
+				{
+					QString xpmKey = "spa-plugin:" +
+						QString::fromStdString(uniqueName);
 
-				// spa (simple plugin API) plugin
-				pluginDescriptor = new Plugin::Descriptor {
-					m_garbage.back().c_str(),
-					descriptor->name(),
-					descriptor->description_line(),
-					descriptor->authors(),
-					(int)descriptor->version_major() << 24 |
-						(descriptor->version_minor() & 0xff) << 16 |
-						(descriptor->version_patch() & 0xffff),
-					Plugin::Instrument, // TODO... could also be an effect
-					new PixmapLoader(QString("xpm:"
-						+ xpmKey), xpm),
-					descriptor->save_formats()
-				};
+					// spa (simple plugin API) plugin
+					pluginDescriptor = new Plugin::Descriptor {
+						m_garbage.back().c_str(),
+						descriptor->name(),
+						descriptor->description_line(),
+						descriptor->authors(),
+						(int)descriptor->version_major() << 24 |
+							(descriptor->version_minor() & 0xff) << 16 |
+							(descriptor->version_patch() & 0xffff),
+						Plugin::Instrument, // TODO... could also be an effect
+						new PixmapLoader(QString("xpm:"
+							+ xpmKey), xpm),
+						descriptor->save_formats()
+					};
+				}
+				else
+				{
+					// TODO: use a default image
+					qDebug() << "Ignoring plugin " << uniqueName.c_str()
+						<< ", as it does not provide an xpm image";
+				}
 			}
 		}
+#endif
 
 		if(pluginDescriptor)
 		{

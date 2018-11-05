@@ -1,5 +1,5 @@
 /*
- * spainstrument.h - implementation of SPA interface
+ * SpaInstrument.h - implementation of SPA interface
  *
  * Copyright (c) 2018-2018 Johannes Lorenz <j.git$$$lorenz-ho.me, $$$=@>
  *
@@ -24,6 +24,10 @@
 
 #ifndef SpaInstrument_H
 #define SpaInstrument_H
+
+#include "lmmsconfig.h"
+
+#ifdef LMMS_HAVE_SPA
 
 #include <QMap>
 #include <QString>
@@ -165,5 +169,7 @@ private slots:
 	void toggleUI();
 	void reloadPlugin();
 };
+
+#endif // LMMS_HAVE_SPA
 
 #endif // SpaInstrument_H

@@ -26,9 +26,13 @@
 #include <QtCore/QDir>
 #include <QtCore/QLibrary>
 #include <QMessageBox>
-#include <spa/spa.h>
 
-#include "../core/spa/SpaInstrument.h"
+// comment separator to prevent clang's header sorting
+#include "lmmsconfig.h"
+
+#ifdef LMMS_HAVE_SPA
+	#include <spa/spa.h>
+#endif
 
 #include "Plugin.h"
 #include "embed.h"
@@ -37,6 +41,9 @@
 #include "DummyPlugin.h"
 #include "AutomatableModel.h"
 #include "Song.h"
+#ifdef LMMS_HAVE_SPA
+	#include "../core/spa/SpaInstrument.h"
+#endif
 
 
 static PixmapLoader dummyLoader;
@@ -111,12 +118,15 @@ Plugin * Plugin::instantiate( const QString& pluginName, Model * parent,
 	}
 
 	Plugin* inst;
+#ifdef LMMS_HAVE_SPA
 	spa::descriptor_loader_t spaLoader;
+#endif
 	InstantiationHook instantiationHook;
 	if ((instantiationHook = ( InstantiationHook ) pi.library->resolve( "lmms_plugin_main" )))
 	{
 		inst = instantiationHook( parent, data );
 	}
+#ifdef LMMS_HAVE_SPA
 	else if ((spaLoader = (spa::descriptor_loader_t) pi.library->resolve( spa::descriptor_name )))
 	{
 		// instantiate a SPA Instrument
@@ -130,6 +140,7 @@ Plugin * Plugin::instantiate( const QString& pluginName, Model * parent,
 		Engine::getSpaInstruments().insert(port, spaInst);
 		inst = spaInst;
 	}
+#endif
 	else
 	{
 		if( gui )

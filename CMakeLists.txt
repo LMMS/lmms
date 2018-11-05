@@ -52,6 +52,7 @@ OPTION(WANT_CALF	"Include CALF LADSPA plugins" ON)
 OPTION(WANT_CAPS	"Include C* Audio Plugin Suite (LADSPA plugins)" ON)
 OPTION(WANT_CARLA	"Include Carla plugin" ON)
 OPTION(WANT_CMT		"Include Computer Music Toolkit LADSPA plugins" ON)
+OPTION(WANT_SPA		"Include SPA plugins" ON)
 OPTION(WANT_JACK	"Include JACK (Jack Audio Connection Kit) support" ON)
 OPTION(WANT_WEAKJACK	"Loosely link JACK libraries" ON)
 OPTION(WANT_MP3LAME	"Include MP3/Lame support" ON)
@@ -210,6 +211,25 @@ IF(WANT_TAP)
 ELSE(WANT_TAP)
 	SET(STATUS_TAP "not built as requested")
 ENDIF(WANT_TAP)
+
+
+IF(WANT_SPA)
+	IF(PKG_CONFIG_FOUND)
+		PKG_CHECK_MODULES(LIBSPA spa)
+		IF(${LIBSPA_FOUND})
+			INCLUDE_DIRECTORIES(${LIBSPA_INCLUDE_DIRS})
+			LINK_DIRECTORIES(${LIBSPA_LIBRARY_DIRS})
+			SET(LMMS_HAVE_SPA TRUE)
+			SET(STATUS_SPA "OK")
+		ELSE()
+			SET(STATUS_SPA "not found, install it or set PKG_CONFIG_PATH appropriately")
+		ENDIF()
+	ELSE()
+		SET(STATUS_SPA "not found, requires pkg-config")
+	ENDIF()
+ELSE(WANT_SPA)
+	SET(STATUS_SPA "not built as requested")
+ENDIF(WANT_SPA)
 
 
 # check for CARLA
@@ -685,6 +705,7 @@ MESSAGE(
 "* CMT LADSPA plugins          : ${STATUS_CMT}\n"
 "* TAP LADSPA plugins          : ${STATUS_TAP}\n"
 "* SWH LADSPA plugins          : ${STATUS_SWH}\n"
+"* SPA plugin API              : ${STATUS_SPA}\n"
 "* GIG player                  : ${STATUS_GIG}\n"
 )
 

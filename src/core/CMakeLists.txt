@@ -1,6 +1,8 @@
-add_subdirectory(spa)
+IF(LMMS_HAVE_SPA)
+	SET(SPA_SRCS core/spa/SpaInstrument.cpp core/SpaOscModel.cpp)
+ENDIF(LMMS_HAVE_SPA)
 
-set(LMMS_SRCS
+SET(LMMS_SRCS
 	${LMMS_SRCS}
 	core/AutomatableModel.cpp
 	core/AutomationPattern.cpp
@@ -63,7 +65,6 @@ set(LMMS_SRCS
 	core/SampleRecordHandle.cpp
 	core/SerializingObject.cpp
 	core/Song.cpp
-	core/SpaOscModel.cpp
 	core/TempoSyncKnobModel.cpp
 	core/ToolPlugin.cpp
 	core/Track.cpp

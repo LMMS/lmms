@@ -34,8 +34,6 @@
 #include "StringPairDrag.h"
 #include "TrackContainerView.h"
 #include "TrackLabelButton.h"
-#include "../core/spa/SpaInstrument.h"
-#include "SpaOscModel.h"
 
 AutomationTrack::AutomationTrack( TrackContainer* tc, bool _hidden ) :
 	Track( _hidden ? HiddenAutomationTrack : Track::AutomationTrack, tc )
