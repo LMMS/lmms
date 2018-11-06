@@ -38,7 +38,7 @@
 #include "BandLimitedWave.h"
 #include "lmmsconfig.h"
 #ifdef LMMS_HAVE_SPA
-	#include "../core/spa/SpaInstrument.h"
+	#include "../core/SpaInstrument.h"
 	#include "SpaOscModel.h"
 #endif
 

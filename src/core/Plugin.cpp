@@ -42,7 +42,7 @@
 #include "AutomatableModel.h"
 #include "Song.h"
 #ifdef LMMS_HAVE_SPA
-	#include "../core/spa/SpaInstrument.h"
+	#include "../core/SpaInstrument.h"
 #endif
 
 

@@ -27,7 +27,7 @@
 #include <QDebug>
 #include <spa/audio.h>
 
-#include "spa/SpaInstrument.h"
+#include "SpaInstrument.h"
 
 struct SpaOscModelFactoryVisitor : public spa::audio::visitor
 {
