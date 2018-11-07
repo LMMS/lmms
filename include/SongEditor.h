@@ -155,6 +155,7 @@ public:
 
 protected:
 	virtual void resizeEvent( QResizeEvent * event );
+	virtual void changeEvent( QEvent * );
 
 protected slots:
 	void play();

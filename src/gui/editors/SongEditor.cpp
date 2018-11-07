@@ -723,6 +723,16 @@ void SongEditorWindow::resizeEvent(QResizeEvent *event)
 }
 
 
+void SongEditorWindow::changeEvent(QEvent *event)
+{
+	QWidget::changeEvent(event);
+	if (event->type() == QEvent::WindowStateChange)
+	{
+		m_editor->realignTracks();
+	}
+}
+
+
 void SongEditorWindow::play()
 {
 	emit playTriggered();
