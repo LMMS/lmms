@@ -1936,7 +1936,9 @@ DWORD WINAPI RemoteVstPlugin::processingThread( LPVOID _param )
 	RemotePluginClient::message m;
 	while( ( m = _this->receiveMessage() ).id != IdQuit )
         {
-		if( m.id == IdStartProcessing || m.id == IdMidiEvent )
+		if( m.id == IdStartProcessing
+			|| m.id == IdMidiEvent
+			|| m.id == IdVstSetParameter )
 		{
 			_this->processMessage( m );
 		}
