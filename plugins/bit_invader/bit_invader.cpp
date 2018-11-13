@@ -144,6 +144,8 @@ bitInvader::bitInvader( InstrumentTrack * _instrument_track ) :
 	m_interpolation( false, this ),
 	m_normalize( false, this )
 {
+		
+	lengthChanged();
 
 	m_graph.setWaveToSine();
 
