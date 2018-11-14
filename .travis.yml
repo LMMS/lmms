@@ -6,6 +6,7 @@ cache:
     directories:
         - apt_mingw_cache
         - $HOME/.ccache
+        - $HOME/pbuilder-bases
 matrix:
     include:
         - env: TARGET_OS=win32
@@ -19,21 +20,20 @@ matrix:
         - os: osx
           osx_image: xcode8.2
           env: QT5=True
+        - env: TARGET_OS=debian-sid
 before_install:
    - . ${TRAVIS_BUILD_DIR}/.travis/${TRAVIS_OS_NAME}.${TARGET_OS}.before_install.sh
 install:
     - . ${TRAVIS_BUILD_DIR}/.travis/${TRAVIS_OS_NAME}.${TARGET_OS}.install.sh
 before_script:
-    - mkdir build && cd build
     - export CMAKE_FLAGS="-DWANT_QT5=$QT5 -DUSE_WERROR=ON -DCMAKE_BUILD_TYPE=RelWithDebInfo"
     - if [ -z "$TRAVIS_TAG" ]; then export CMAKE_FLAGS="$CMAKE_FLAGS -DUSE_CCACHE=ON"; fi
 script:
     - . ${TRAVIS_BUILD_DIR}/.travis/${TRAVIS_OS_NAME}.${TARGET_OS}.script.sh
-    - make -j4
-    - if [[ $TARGET_OS != win* ]]; then make tests && ./tests/tests; fi;
 after_script:
     - ccache -s
-before_deploy: make package
+before_deploy:
+    - if [ "$TRAVIS_OS" != debian-sid ]; then make package; fi
 deploy:
     provider: releases
     api_key:
