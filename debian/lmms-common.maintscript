@@ -1,0 +1,1 @@
+dir_to_symlink /usr/share/lmms/presets/ZynAddSubFX ../../zynaddsubfx/banks 1.1.3-2~
