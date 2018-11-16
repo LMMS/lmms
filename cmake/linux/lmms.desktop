@@ -3,10 +3,10 @@ Name=LMMS
 GenericName=Music production suite
 GenericName[ca]=Programari de producció musical
 GenericName[de]=Software zur Musik-Produktion
-GenericName[fr]=Ensemble pour la production musicale
+GenericName[fr]=Suite de production musicale
 Comment=Music sequencer and synthesizer
 Comment[ca]=Producció fàcil de música per a tothom!
-Comment[fr]=Production facile de musique pour tout le monde !
+Comment[fr]=Séquenceur et synthétiseur de musique
 Icon=lmms
 Exec=env QT_X11_NO_NATIVE_MENUBAR=1 QT_AUTO_SCREEN_SCALE_FACTOR=1 lmms %f
 Terminal=false
