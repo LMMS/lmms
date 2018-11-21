@@ -66,6 +66,7 @@ Plugin::Descriptor PLUGIN_EXPORT gigplayer_plugin_descriptor =
 	"Garrett Wilson <g/at/floft/dot/net>",
 	0x0100,
 	Plugin::Instrument,
+	Plugin::Embedded,
 	new PluginPixmapLoader( "logo" ),
 	"gig",
 	NULL

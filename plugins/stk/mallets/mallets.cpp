@@ -55,6 +55,7 @@ Plugin::Descriptor PLUGIN_EXPORT malletsstk_plugin_descriptor =
 	"Danny McRae <khjklujn/at/users.sf.net>",
 	0x0100,
 	Plugin::Instrument,
+	Plugin::Embedded,
 	new PluginPixmapLoader( "logo" ),
 	NULL,
 	NULL
