@@ -63,9 +63,7 @@ SampleBuffer::SampleBuffer() :
 	m_frequency( BaseFreq ),
 	m_sampleRate( mixerSampleRate () )
 {
-	beginBufferChange (false);
-	doneBufferChange (false, /* shouldLock */
-					  m_sampleRate);
+	m_loopEndFrame = m_endFrame = internalFrames();
 }
 
 
@@ -1144,54 +1142,50 @@ SampleBuffer::handleState::~handleState()
 	src_delete( m_resamplingData );
 }
 
-void SampleBuffer::beginBufferChange(bool shouldLock, bool shouldLockMixer)
+SampleBuffer::DataChangeHelper::DataChangeHelper(SampleBuffer* buffer,
+							sample_rate_t desiredSampleRate,
+							LockType lockType,
+							bool syncWithMixer) :
+	m_buffer(buffer),
+	m_desiredSampleRate(desiredSampleRate),
+	m_successful(true),
+	m_bufferLocked(false),
+	m_syncedWithMixer(false)
 {
-	if (shouldLockMixer) {
-		Engine::mixer ()->requestChangeInModel ();
+	switch (lockType)
+	{
+	case LockNow:
+		m_buffer->m_varLock.lockForWrite();
+		m_bufferLocked = true;
+		break;
+	case TryLock:
+		m_successful = m_bufferLocked = m_buffer->m_varLock.tryLockForWrite();
+		break;
+	case NoLock:
+		break;
 	}
-
-	if (shouldLock) {
-		m_varLock.lockForWrite ();
+	if (m_successful && syncWithMixer)
+	{
+		Engine::mixer()->requestChangeInModel();
+		m_syncedWithMixer = true;
 	}
 }
 
-bool SampleBuffer::tryBeginBufferChange(bool shouldLock, bool shouldLockMixer) {
-	bool result = true;
+void SampleBuffer::DataChangeHelper::finish()
+{
+	if (!m_successful) return;
+	m_buffer->setSampleRate(m_desiredSampleRate);
 
-	if (shouldLockMixer) {
-		Engine::mixer ()->requestChangeInModel ();
-	}
+	m_buffer->m_loopStartFrame = m_buffer->m_startFrame = 0;
+	m_buffer->m_loopEndFrame = m_buffer->m_endFrame = m_buffer->internalFrames();
+	if (m_bufferLocked) {m_buffer->m_varLock.unlock();}
 
-	if (shouldLock) {
-		result = m_varLock.tryLockForWrite();
+	if (m_syncedWithMixer) {Engine::mixer()->doneChangeInModel();}
 
-		if (!result && shouldLockMixer)
-			Engine::mixer ()->doneChangeInModel();
-	}
-
-	return result;
+	emit m_buffer->sampleUpdated();
 }
 
-void SampleBuffer::doneBufferChange(bool shouldUnlock,
-									sample_rate_t bufferSampleRate,
-									bool shouldUnlockMixer) {
-
-	setSampleRate (bufferSampleRate);
-
-	m_loopStartFrame = m_startFrame = 0;
-	m_loopEndFrame = m_endFrame = internalFrames();
-	if (shouldUnlock) {
-		m_varLock.unlock ();
-	}
-
-	if (shouldUnlockMixer) {
-		Engine::mixer ()->doneChangeInModel ();
-	}
-
-	emit sampleUpdated();
-}
-
-bool SampleBuffer::tryAddData(const SampleBuffer::DataVector &vector, sample_rate_t sampleRate, bool shouldLockMixer) {
+bool SampleBuffer::tryAddData(const SampleBuffer::DataVector &vector, sample_rate_t sampleRate, bool syncWithMixer) {
 	DataVector newVector;
 
 	if (sampleRate != m_sampleRate) {
@@ -1202,24 +1196,22 @@ bool SampleBuffer::tryAddData(const SampleBuffer::DataVector &vector, sample_rat
 	}
 
 	// First of all, don't let anyone read.
-	if (! tryBeginBufferChange (true, shouldLockMixer))
-		return false;
+	DataChangeHelper helper(this, m_sampleRate, DataChangeHelper::TryLock, syncWithMixer);
+	if (!helper.isSuccessful()) return false;
+
+	if (newVector.empty())
 	{
-		if (newVector.empty())
-			internalAddData(vector,
-							sampleRate);
-		else
-			internalAddData(newVector,
-							sampleRate);
+		internalAddData(vector, sampleRate);
 	}
-	doneBufferChange (true, /* lock */
-					  this->sampleRate(),
-					  shouldLockMixer);
+	else
+	{
+		internalAddData(newVector, sampleRate);
+	}
 
 	return true;
 }
 
-void SampleBuffer::addData(const SampleBuffer::DataVector &vector, sample_rate_t sampleRate, bool shouldLockMixer) {
+void SampleBuffer::addData(const SampleBuffer::DataVector &vector, sample_rate_t sampleRate, bool syncWithMixer) {
 	DataVector newVector;
 
 	if (sampleRate != m_sampleRate) {
@@ -1230,49 +1222,32 @@ void SampleBuffer::addData(const SampleBuffer::DataVector &vector, sample_rate_t
 	}
 
 	// First of all, don't let anyone read.
-	beginBufferChange (true, shouldLockMixer);
+	DataChangeHelper helper(this, m_sampleRate, DataChangeHelper::LockNow, syncWithMixer);
+
+	if (newVector.empty())
 	{
-		if (newVector.empty())
-			internalAddData(vector,
-							sampleRate);
-		else
-			internalAddData(newVector,
-							sampleRate);
+		internalAddData(vector, sampleRate);
 	}
-	doneBufferChange (true, /* lock */
-					  this->sampleRate(),
-					  shouldLockMixer);
+	else
+	{
+		internalAddData(newVector, sampleRate);
+	}
 }
 
-void SampleBuffer::resetData(DataVector &&newData, sample_rate_t dataSampleRate, bool shouldLockMixer) {
-	beginBufferChange (true, shouldLockMixer);
-	{
-		internalResetData(std::move(newData), dataSampleRate);
-	}
-	doneBufferChange (true, /* lock */
-					  dataSampleRate,
-					  shouldLockMixer);
+void SampleBuffer::resetData(DataVector &&newData, sample_rate_t dataSampleRate, bool syncWithMixer) {
+	DataChangeHelper helper(this, m_sampleRate, DataChangeHelper::LockNow, syncWithMixer);
+	internalResetData(std::move(newData), dataSampleRate);
 }
 
-bool SampleBuffer::tryResetData(SampleBuffer::DataVector &&newData, sample_rate_t dataSampleRate, bool shouldLockMixer) {
-	if (! tryBeginBufferChange (true, shouldLockMixer))
-		return false;
-	{
-		internalResetData(std::move(newData), dataSampleRate);
-	}
-	doneBufferChange (true, /* lock */
-					  dataSampleRate,
-					  shouldLockMixer);
+bool SampleBuffer::tryResetData(SampleBuffer::DataVector &&newData, sample_rate_t dataSampleRate, bool syncWithMixer) {
+	DataChangeHelper helper(this, m_sampleRate, DataChangeHelper::TryLock, syncWithMixer);
+	if (!helper.isSuccessful()) return false;
 
+	internalResetData(std::move(newData), dataSampleRate);
 	return true;
 }
 
-void SampleBuffer::reverse(bool shouldLockMixer) {
-	beginBufferChange (true, shouldLockMixer);
-	{
-		std::reverse(m_data.begin (), m_data.end ());
-	}
-	doneBufferChange (true, /* should(Un)Lock? yes! */
-					  sampleRate (), /* we have not made any change in the sample rate. */
-					  shouldLockMixer);
+void SampleBuffer::reverse(bool syncWithMixer) {
+	DataChangeHelper helper(this, m_sampleRate, DataChangeHelper::LockNow, syncWithMixer);
+	std::reverse(m_data.begin(), m_data.end());
 }
