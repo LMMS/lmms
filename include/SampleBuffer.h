@@ -265,44 +265,44 @@ public:
 	 * @brief Try to add data to the buffer,
 	 * @param begin	Beginning of an InputIterator.
 	 * @param end	End of an InputIterator.
-	 * @param shouldLockMixer	Should we call requestChangeInModel?
+	 * @param syncWithMixer	Should we call requestChangeInModel?
 	 * @return
 	 */
-	bool tryAddData(const DataVector &vector, sample_rate_t sampleRate, bool shouldLockMixer=true);
+	bool tryAddData(const DataVector &vector, sample_rate_t sampleRate, bool syncWithMixer=true);
 
 	/**
 	 * @brief Add data to the buffer,
 	 * @param begin	Beginning of an InputIterator.
 	 * @param end	End of an InputIterator.
-	 * @param shouldLockMixer	Should we call requestChangeInModel?
+	 * @param syncWithMixer	Should we call requestChangeInModel?
 	 * @return
 	 */
-	void addData(const DataVector &vector, sample_rate_t sampleRate, bool shouldLockMixer=true);
+	void addData(const DataVector &vector, sample_rate_t sampleRate, bool syncWithMixer=true);
 
 	/**
 	 * @brief Reset the class and initialize it with @a newData.
 	 * @param newData	mm, that's the new data.
 	 * @param dataSampleRate	Sample rate for @a newData.
-	 * @param shouldLockMixer	Should we call requestChangeInModel?
+	 * @param syncWithMixer	Should we call requestChangeInModel?
 	 */
-	void resetData(DataVector &&newData, sample_rate_t dataSampleRate, bool shouldLockMixer=true);
+	void resetData(DataVector &&newData, sample_rate_t dataSampleRate, bool syncWithMixer=true);
 
 	/**
 	 * @brief A non-blocking version of resetData.
 	 * @param newData	mm, that's the new data.
 	 * @param dataSampleRate	Sample rate for @a newData.
-	 * @param shouldLockMixer	Should we call requestChangeInModel?
+	 * @param syncWithMixer	Should we call requestChangeInModel?
 	 * @return
 	 */
-	bool tryResetData(DataVector &&newData, sample_rate_t dataSampleRate, bool shouldLockMixer=true);
+	bool tryResetData(DataVector &&newData, sample_rate_t dataSampleRate, bool syncWithMixer=true);
 
 	/**
 	 * @brief Just reverse the current buffer.
-	 * @param shouldLockMixer	Should we call requestChangeInModel?
+	 * @param syncWithMixer	Should we call requestChangeInModel?
 	 *
 	 * This function simply calls `std::reverse` on m_data.
 	 */
-	void reverse(bool shouldLockMixer=true);
+	void reverse(bool syncWithMixer=true);
 
 	void loadFromBase64(const QString & _data , sample_rate_t sampleRate);
 
@@ -383,22 +383,24 @@ protected:
 	static DataVector resampleData(const DataVector &inputData, sample_rate_t inputSampleRate, sample_rate_t requiredSampleRate);
 
 	/**
-	 * @brief Do the actions necessary before changing m_data.
-	 * @param shouldLock	Is anyone else might be using m_data?
+	 * @brief A helper class used when changes to m_data is needed
 	 */
-	void beginBufferChange (bool shouldLock, bool shouldLockMixer=true);
+	class DataChangeHelper
+	{
+	public:
+		enum LockType {NoLock, TryLock, LockNow};
+		DataChangeHelper(SampleBuffer* buffer, sample_rate_t desiredSampleRate, LockType lockType, bool syncWithMixer = true);
+		bool isSuccessful() {return m_successful;}
+		void finish();
+		~DataChangeHelper() {finish();}
+	private:
+		SampleBuffer* m_buffer;
+		sample_rate_t m_desiredSampleRate;
+		bool m_successful;
+		bool m_bufferLocked;
+		bool m_syncedWithMixer;
+	};
 
-	bool tryBeginBufferChange(bool shouldLock, bool shouldLockMixer=true);
-
-	/**
-	 * @brief Do some actions necessary after changing m_data.
-	 * @param shouldUnlock	The same value you've used on @a beginBufferChange.
-	 * @param shouldKeepSettings	Should we keep playback settings?
-	 * @param bufferSampleRate		The new m_data's sample rate.
-	 */
-	void doneBufferChange (bool shouldUnlock,
-						   sample_rate_t bufferSampleRate,
-						   bool shouldUnlockMixer=true);
 signals:
 	void sampleUpdated();
 
