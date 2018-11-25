@@ -3,10 +3,12 @@
 ADVAPI32.dll
 dwmapi.dll
 GDI32.dll
+IMM32.dll
 KERNEL32.dll
 MPR.DLL
 msvcrt.dll
 ole32.dll
+OLEAUT32.dll
 OPENGL32.DLL
 SHELL32.dll
 USER32.dll

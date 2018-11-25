@@ -76,7 +76,13 @@ if(CMAKE_CROSSCOMPILING)
 	# GetPrerequisites supports using an override function called gp_resolved_file_type_override, but it's not suited
 	# for our purpose because it's only called by gp_resolved_file_type *after* trying to resolve the file.
 	function(gp_resolved_file_type original_file file exepath dirs type_var)
-		if(IGNORE_LIBS AND ${file} IN_LIST IGNORE_LIBS)
+		set(file_find "${file}")
+		if(_IGNORE_CASE)
+			# On case-insensitive systems, convert to upper characters to respect it
+			string(TOUPPER "${file_find}" file_find)
+		endif()
+		SET(IGNORE_LIBS ${_IGNORE_LIBS} CACHE INTERNAL "Ignored library names" FORCE)
+		if(IGNORE_LIBS AND ${file_find} IN_LIST IGNORE_LIBS)
 			set(${type_var} system PARENT_SCOPE)
 		else()
 			#_gp_resolved_file_type(${ARGV})
@@ -86,7 +92,7 @@ if(CMAKE_CROSSCOMPILING)
 endif()
 
 function(INSTALL_DEPENDENCIES)
-	cmake_parse_arguments("" "INCLUDE_SYSTEM" "GP_TOOL;DESTINATION;IGNORE_LIBS_FILE" "FILES;LIB_DIRS;SEARCH_PATHS;IGNORE_LIBS" ${ARGN})
+	cmake_parse_arguments("" "INCLUDE_SYSTEM;IGNORE_CASE" "GP_TOOL;DESTINATION;IGNORE_LIBS_FILE" "FILES;LIB_DIRS;SEARCH_PATHS;IGNORE_LIBS" ${ARGN})
 
 	# Make paths absolute
 	make_absolute(_DESTINATION)
@@ -102,7 +108,11 @@ function(INSTALL_DEPENDENCIES)
 
 	if(_IGNORE_LIBS_FILE)
 		READ_LIST_FILE("${_IGNORE_LIBS_FILE}" _IGNORE_LIBS)
-		SET(IGNORE_LIBS ${_IGNORE_LIBS} CACHE INTERNAL "Ignored library names")
+		if(_IGNORE_CASE)
+			# On case-insensitive systems, convert to upper characters to respect it
+			string(TOUPPER "${_IGNORE_LIBS}" _IGNORE_LIBS)
+		endif()
+		SET(IGNORE_LIBS ${_IGNORE_LIBS} CACHE INTERNAL "Ignored library names" FORCE)
 	endif()
 
 	if(_GP_TOOL)
@@ -152,6 +162,11 @@ function(FIND_PREREQUISITES target RESULT_VAR exclude_system recurse
 
 	foreach(prereq ${_prereqs})
 		get_filename_component(prereq_name "${prereq}" NAME)
+		if(_IGNORE_CASE)
+			# Windows is case insensitive.
+			# Use upper characters to respect it.
+			string(TOUPPER "${prereq_name}" prereq_name)
+		endif()
 		if("${prereq_name}" IN_LIST IGNORE_LIBS)
 			continue()
 		endif()

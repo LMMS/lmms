@@ -87,8 +87,11 @@ IF(LMMS_BUILD_WIN32 OR LMMS_INSTALL_DEPENDENCIES)
 		FILE(DOWNLOAD "https://raw.githubusercontent.com/AppImage/AppImages/master/excludelist"
 			"${CMAKE_BINARY_DIR}/excludelist")
 		SET(additional_args INCLUDE_SYSTEM IGNORE_LIBS_FILE ${CMAKE_BINARY_DIR}/excludelist)
-	ELSEIF(LMMS_BUILD_WIN32 AND CMAKE_CROSSCOMPILING)
-		SET(additional_args IGNORE_LIBS_FILE ${CMAKE_CURRENT_LIST_DIR}/excludelist-win GP_TOOL objdump)
+	ELSEIF(LMMS_BUILD_WIN32)
+		SET(additional_args IGNORE_CASE IGNORE_LIBS_FILE ${CMAKE_CURRENT_LIST_DIR}/excludelist-win)
+		IF(CMAKE_CROSSCOMPILING)
+		SET(additional_args "${additional_args}" GP_TOOL objdump)
+		ENDIF()
 	ENDIF()
 
 	IF(LMMS_BUILD_WIN32)
