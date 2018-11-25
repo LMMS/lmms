@@ -395,8 +395,8 @@ private:
 	// host to plugin synchronisation data structure
 	struct in
 	{
-		float lastppqPos;
-		float m_Timestamp;
+		double lastppqPos;
+		double m_Timestamp;
 		int32_t m_lastFlags;
 	} ;
 
@@ -1605,10 +1605,20 @@ intptr_t RemoteVstPlugin::hostCallback( AEffect * _effect, int32_t _opcode,
 			}
 			else if( __plugin->m_vstSyncData->isPlaying )
 			{
-				__plugin->m_in->lastppqPos += (
-							__plugin->m_vstSyncData->hasSHM ?
-							__plugin->m_vstSyncData->m_bpm :
-							__plugin->m_bpm ) / (float)10340;
+				if( __plugin->m_vstSyncData->hasSHM )
+				{
+					__plugin->m_in->lastppqPos +=
+						__plugin->m_vstSyncData->m_bpm / 60.0
+						* __plugin->m_vstSyncData->m_bufferSize
+						/ __plugin->m_vstSyncData->m_sampleRate;
+				}
+				else
+				{
+					__plugin->m_in->lastppqPos +=
+						__plugin->m_bpm / 60.0
+						* __plugin->bufferSize()
+						/ __plugin->sampleRate();
+				}
 				_timeInfo.ppqPos = __plugin->m_in->lastppqPos;
 			}
 //			_timeInfo.ppqPos = __plugin->m_vstSyncData->ppqPos;

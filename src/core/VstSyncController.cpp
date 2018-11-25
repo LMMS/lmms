@@ -136,12 +136,12 @@ VstSyncController::~VstSyncController()
 
 
 
-void VstSyncController::setAbsolutePosition( int ticks )
+void VstSyncController::setAbsolutePosition( double ticks )
 {
 #ifdef VST_SNC_LATENCY
-	m_syncData->ppqPos = ( ( ticks + 0 ) / (float)48 ) - m_syncData->m_latency;
+	m_syncData->ppqPos = ( ( ticks + 0 ) / 48.0 ) - m_syncData->m_latency;
 #else
-	m_syncData->ppqPos = ( ( ticks + 0 ) / (float)48 );
+	m_syncData->ppqPos = ( ( ticks + 0 ) / 48.0 );
 #endif
 }
 

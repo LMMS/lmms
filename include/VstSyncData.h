@@ -42,7 +42,7 @@
 struct VstSyncData
 {
 	bool isPlaying;
-	float ppqPos;
+	double ppqPos;
 	int timeSigNumer;
 	int timeSigDenom;
 	bool isCycle;
