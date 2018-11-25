@@ -109,6 +109,9 @@ public:
 	void createUI( QWidget *parent ) override
 	{
 		Q_UNUSED(parent);
+		if ( !hasEditor() ) {
+			return;
+		}
 		if ( embedMethod() != "none" ) {
 			m_pluginSubWindow.reset(new vstSubWin( gui->mainWindow()->workspace() ));
 			VstPlugin::createUI( m_pluginSubWindow.get() );
