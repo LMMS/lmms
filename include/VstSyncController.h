@@ -39,7 +39,7 @@ public:
 	VstSyncController();
 	~VstSyncController();
 
-	void setAbsolutePosition( int ticks );
+	void setAbsolutePosition( double ticks );
 
 	void setPlaybackState( bool enabled )
 	{
@@ -77,7 +77,7 @@ private:
 	struct VstSyncData
 	{
 		bool isPlaying;
-		float ppqPos;
+		double ppqPos;
 		int timeSigNumer;
 		int timeSigDenom;
 		bool isCycle;
