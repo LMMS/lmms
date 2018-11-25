@@ -265,8 +265,6 @@ void Song::processNextBuffer()
 			m_playPos[m_playMode].setTicks(
 						tl->loopBegin().getTicks() );
 
-			m_vstSyncController.setAbsolutePosition(
-						tl->loopBegin().getTicks() );
 			m_vstSyncController.setPlaybackJumped( true );
 
 			emit updateSampleTracks();
@@ -292,8 +290,6 @@ void Song::processNextBuffer()
 		{
 			int ticks = m_playPos[m_playMode].getTicks() + 
 				( int )( currentFrame / framesPerTick );
-
-			m_vstSyncController.setAbsolutePosition( ticks );
 
 			// did we play a whole tact?
 			if( ticks >= MidiTime::ticksPerTact() )
@@ -332,7 +328,6 @@ void Song::processNextBuffer()
 					m_elapsedMilliSeconds = 
 						( ticks * 60 * 1000 / 48 ) / getTempo();
 
-					m_vstSyncController.setAbsolutePosition( ticks );
 					m_vstSyncController.setPlaybackJumped( true );
 				}
 			}
@@ -354,7 +349,6 @@ void Song::processNextBuffer()
 					m_elapsedMilliSeconds =
 						( ticks * 60 * 1000 / 48 ) / getTempo();
 
-					m_vstSyncController.setAbsolutePosition( ticks );
 					m_vstSyncController.setPlaybackJumped( true );
 
 					emit updateSampleTracks();
@@ -367,6 +361,16 @@ void Song::processNextBuffer()
 
 			currentFrame = fmodf( currentFrame, framesPerTick );
 			m_playPos[m_playMode].setCurrentFrame( currentFrame );
+		}
+
+		if( framesPlayed == 0 )
+		{
+			// update VST sync position after we've corrected frame/
+			// tick count but before actually playing any frames
+			m_vstSyncController.setAbsolutePosition(
+				m_playPos[m_playMode].getTicks()
+				+ m_playPos[m_playMode].currentFrame()
+				/ (double) framesPerTick );
 		}
 
 		f_cnt_t framesToPlay = 
@@ -716,7 +720,10 @@ void Song::stop()
 	m_playPos[m_playMode].setCurrentFrame( 0 );
 
 	m_vstSyncController.setPlaybackState( m_exporting );
-	m_vstSyncController.setAbsolutePosition( m_playPos[m_playMode].getTicks() );
+	m_vstSyncController.setAbsolutePosition(
+		m_playPos[m_playMode].getTicks()
+		+ m_playPos[m_playMode].currentFrame()
+		/ (double) Engine::framesPerTick() );
 
 	// remove all note-play-handles that are active
 	Engine::mixer()->clear();
