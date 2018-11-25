@@ -63,6 +63,7 @@
 #define USE_WS_PREFIX
 #include <windows.h>
 
+#include <algorithm>
 #include <vector>
 #include <queue>
 #include <string>
@@ -899,6 +900,14 @@ void RemoteVstPlugin::process( const sampleFrame * _in, sampleFrame * _out )
 #define MIDI_EVENT_BUFFER_COUNT		1024
 		static char eventsBuffer[sizeof( VstEvents ) + sizeof( VstMidiEvent * ) * MIDI_EVENT_BUFFER_COUNT];
 		static VstMidiEvent vme[MIDI_EVENT_BUFFER_COUNT];
+
+		// first sort events chronologically, since some plugins
+		// (e.g. Sinnah) can hang if they're out of order
+		std::stable_sort( m_midiEvents.begin(), m_midiEvents.end(),
+				[]( const VstMidiEvent &a, const VstMidiEvent &b )
+				{
+					return a.deltaFrames < b.deltaFrames;
+				} );
 
 		VstEvents* events = (VstEvents *) eventsBuffer;
 		events->reserved = 0;
