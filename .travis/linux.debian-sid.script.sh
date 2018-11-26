@@ -5,6 +5,11 @@ BASETGZ="$HOME/pbuilder-bases/debian-sid-amd64.tgz"
 MIRROR=http://cdn-fastly.deb.debian.org/debian
 KEYRING=/usr/share/keyrings/debian-archive-keyring.gpg
 
+if [ -z "$TRAVIS_TAG" ]
+then
+	sudo echo CCACHEDIR=/var/cache/pbuilder/ccache >> /etc/pbuilderrc
+fi
+
 if [ ! -e "$BASETGZ.stamp" ]
 then
 	mkdir -p "$HOME/pbuilder-bases"
