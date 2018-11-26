@@ -122,7 +122,7 @@ function(INSTALL_DEPENDENCIES)
 	set(prereqs "")
 	foreach(file ${_FILES})
 		get_filename_component(file_name "${file}" NAME)
-		message(STATUS "Finding prerequisites of ${file_name}")
+		message("-- Finding prerequisites of ${file_name}")
 		find_prerequisites("${file}" _prereqs
 			${EXCLUDE_SYSTEM} # exclude system files
 			1 # recurse
