@@ -7,7 +7,8 @@ KEYRING=/usr/share/keyrings/debian-archive-keyring.gpg
 
 if [ -z "$TRAVIS_TAG" ]
 then
-	sudo echo CCACHEDIR=/var/cache/pbuilder/ccache >> /etc/pbuilderrc
+	sudo \
+	sh -c "echo CCACHEDIR=/var/cache/pbuilder/ccache >> /etc/pbuilderrc"
 fi
 
 if [ ! -e "$BASETGZ.stamp" ]
