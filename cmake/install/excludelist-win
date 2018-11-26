@@ -1,6 +1,8 @@
 # List of DLLs considered to be system libraries.
 # This is needed when cross-compiling for Windows.
 ADVAPI32.dll
+COMCTL32.dll
+comdlg32.dll
 dwmapi.dll
 GDI32.dll
 IMM32.dll
