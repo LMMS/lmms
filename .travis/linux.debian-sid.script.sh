@@ -27,4 +27,4 @@ fi
 DIR="$PWD"
 cd ..
 dpkg-source -b "$DIR"
-env -i sudo pbuilder --build --basetgz "$BASETGZ" *.dsc
+env -i sudo pbuilder --build --debbuildopts "--jobs=auto" --basetgz "$BASETGZ" *.dsc
