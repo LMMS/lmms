@@ -7,7 +7,6 @@ cache:
         - apt_mingw_cache
         - $HOME/.ccache
         - $HOME/pbuilder-bases
-        - /var/cache/pbuilder/ccache
 matrix:
     include:
         - env: TARGET_OS=win32
