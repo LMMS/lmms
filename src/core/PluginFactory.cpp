@@ -36,6 +36,9 @@
 #include "ConfigManager.h"
 #include "Plugin.h"
 #include "embed.h"
+#ifdef LMMS_HAVE_SPA
+	#include "SpaPluginBase.h"
+#endif
 
 #ifdef LMMS_BUILD_WIN32
 	QStringList nameFilters("*.dll");
@@ -194,32 +197,30 @@ void PluginFactory::discoverPlugins()
 				m_garbage.push_back(uniqueName);
 
 				const char** xpm = descriptor->xpm_load();
-				if(xpm)
-				{
-					QString xpmKey = "spa-plugin:" +
-						QString::fromStdString(uniqueName);
 
-					// spa (simple plugin API) plugin
-					pluginDescriptor = new Plugin::Descriptor {
-						m_garbage.back().c_str(),
-						descriptor->name(),
-						descriptor->description_line(),
-						descriptor->authors(),
-						(int)descriptor->version_major() << 24 |
-							(descriptor->version_minor() & 0xff) << 16 |
-							(descriptor->version_patch() & 0xffff),
-						Plugin::Instrument, // TODO... could also be an effect
-						new PixmapLoader(QString("xpm:"
-							+ xpmKey), xpm),
-						descriptor->save_formats()
-					};
-				}
-				else
-				{
-					// TODO: use a default image
-					qDebug() << "Ignoring plugin " << uniqueName.c_str()
-						<< ", as it does not provide an xpm image";
-				}
+				QString xpmKey = "spa-plugin:" +
+					QString::fromStdString(uniqueName);
+
+				PixmapLoader* pixmapLoader =
+					xpm
+					? new PixmapLoader(QString("xpm:"
+						+ xpmKey), xpm)
+					: new PixmapLoader("plugins");
+
+				// spa (simple plugin API) plugin
+				pluginDescriptor = new Plugin::Descriptor {
+					m_garbage.back().c_str(),
+					descriptor->name(),
+					descriptor->description_line(),
+					descriptor->authors(),
+					(int)descriptor->version_major() << 24 |
+						(descriptor->version_minor() & 0xff) << 16 |
+						(descriptor->version_patch() & 0xffff),
+					SpaPluginBase::getPluginType(descriptor),
+					pixmapLoader,
+					descriptor->save_formats(),
+					nullptr
+				};
 			}
 		}
 #endif

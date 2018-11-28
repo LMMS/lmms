@@ -1,5 +1,6 @@
 IF(LMMS_HAVE_SPA)
-	SET(SPA_SRCS core/SpaInstrument.cpp core/SpaOscModel.cpp)
+	SET(SPA_SRCS core/SpaOscModel.cpp core/SpaControlBase.cpp core/SpaPluginBase.cpp
+	core/SpaInstrument.cpp)
 ENDIF(LMMS_HAVE_SPA)
 
 SET(LMMS_SRCS

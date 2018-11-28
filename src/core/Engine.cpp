@@ -38,7 +38,7 @@
 #include "BandLimitedWave.h"
 #include "lmmsconfig.h"
 #ifdef LMMS_HAVE_SPA
-	#include "../core/SpaInstrument.h"
+	#include "SpaPluginBase.h"
 	#include "SpaOscModel.h"
 #endif
 
@@ -49,7 +49,7 @@ BBTrackContainer * LmmsCore::s_bbTrackContainer = NULL;
 Song * LmmsCore::s_song = NULL;
 ProjectJournal * LmmsCore::s_projectJournal = NULL;
 Ladspa2LMMS * LmmsCore::s_ladspaManager = NULL;
-QMap<int, class SpaInstrument*> LmmsCore::s_spaInstruments;
+QMap<int, class SpaPluginBase*> LmmsCore::s_spaPlugins;
 DummyTrackContainer * LmmsCore::s_dummyTC = NULL;
 
 
@@ -131,38 +131,17 @@ AutomatableModel *LmmsCore::getAutomatableOscModel(const QString& val,
 	AutomatableModel* mod = nullptr;
 
 	// qDebug() << val;
-	const QMap<int, class SpaInstrument*>& spaMap = getSpaInstruments();
+	const QMap<int, class SpaPluginBase*>& spaMap = getSpaPlugins();
 	auto itr = spaMap.find(url.port());
 	if(itr == spaMap.end())
 	{
-		puts(	"DnD from an instrument which is not "
+		puts(	"DnD from a plugin which is not "
 			"in LMMS... ignoring");
 		// TODO: MessageBox?
 	}
 	else
 	{
-		QMap<QString, AutomatableModel*>& connectedModels
-			= itr.value()->m_connectedModels;
-		auto itr2 = connectedModels.find(url.path());
-		if(itr2 != connectedModels.end())
-		{
-			mod = *itr2;
-		}
-		else
-		{
-			AutomatableModel* spaMod = SpaOscModelFactory(itr.value(),
-							url.path()).m_res;
-			if(spaMod)
-			{
-				itr.value()->m_connectedModels.insert(
-					url.path(), spaMod);
-				mod = spaMod;
-			}
-			else {
-				qDebug() <<	"LMMS: Could not create model from "
-						"OSC port (received \"" << val << "\")";
-			}
-		}
+		mod = itr.value()->modelAtPort(val);
 	}
 
 	return mod;

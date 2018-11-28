@@ -42,7 +42,8 @@
 #include "AutomatableModel.h"
 #include "Song.h"
 #ifdef LMMS_HAVE_SPA
-	#include "../core/SpaInstrument.h"
+//	#include "SpaEffect.h"
+	#include "SpaInstrument.h"
 #endif
 
 
@@ -129,16 +130,44 @@ Plugin * Plugin::instantiate( const QString& pluginName, Model * parent,
 #ifdef LMMS_HAVE_SPA
 	else if ((spaLoader = (spa::descriptor_loader_t) pi.library->resolve( spa::descriptor_name )))
 	{
-		// instantiate a SPA Instrument
-		// it will load and contain the SPA plugin
-		// and transfer LMMS events to SPA function calls
-		SpaInstrument* spaInst = new SpaInstrument(
-			static_cast<InstrumentTrack *>( data ),
-			pi.file.absoluteFilePath().toUtf8().data(),
-			pi.descriptor);
-		unsigned port = spaInst->m_plugin->net_port();
-		Engine::getSpaInstruments().insert(port, spaInst);
-		inst = spaInst;
+		SpaPluginBase* spaPlug = nullptr;
+		switch(pi.descriptor->type)
+		{
+		case Plugin::Instrument:
+		{
+			// instantiate a SPA Instrument
+			// it will load and contain the SPA plugin
+			// and transfer LMMS events to SPA function calls
+			SpaInstrument* spaInst = new SpaInstrument(
+				static_cast<InstrumentTrack *>( data ),
+				pi.file.absoluteFilePath().toUtf8().data(),
+				pi.descriptor);
+			spaPlug = spaInst;
+			inst = spaInst;
+			break;
+		}
+/*		case Plugin::Effect:
+		{
+			SpaEffect* spaEff = new SpaEffect(
+				pi.file.absoluteFilePath().toUtf8().data(),
+				pi.descriptor, parent);
+			spaPlug = spaEff;
+			inst = spaEff;
+			break;
+		}*/
+		default:
+			// maybe print message?
+			qDebug() << "Spa plugin is neither instrument, "
+				"nor effect. Ignoring...";
+			inst = nullptr;
+			break;
+		}
+		if(spaPlug)
+		{
+			unsigned port = spaPlug->netPort();
+			if(port)
+				Engine::getSpaPlugins().insert(port, spaPlug);
+		}
 	}
 #endif
 	else

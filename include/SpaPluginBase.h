@@ -1,8 +1,7 @@
 /*
- * EffectControlDialog.h - base-class for effect-dialogs for displaying and
- *                         editing control port values
+ * SpaPluginBase.h - implementation of SPA interface
  *
- * Copyright (c) 2006-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2018-2018 Johannes Lorenz <j.git$$$lorenz-ho.me, $$$=@>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -23,31 +22,40 @@
  *
  */
 
-#ifndef EFFECT_CONTROL_DIALOG_H
-#define EFFECT_CONTROL_DIALOG_H
+#ifndef SPA_PLUGIN_BASE_H
+#define SPA_PLUGIN_BASE_H
 
-#include <QWidget>
+#include "lmmsconfig.h"
 
-#include "ModelView.h"
+#ifdef LMMS_HAVE_SPA
 
-class EffectControls;
+#include <cstdarg>
 
+#include "Plugin.h"
 
-class LMMS_EXPORT EffectControlDialog : public QWidget, public ModelView
+namespace spa
 {
-	Q_OBJECT
+class descriptor;
+}
+
+// interface that defines common functions, which are called by the LMMS core
+class SpaPluginBase
+{
 public:
-	EffectControlDialog( EffectControls * _controls );
-	virtual ~EffectControlDialog();
+	virtual ~SpaPluginBase();
 
-signals:
-	void closed();
+	virtual void writeOsc(
+		const char *dest, const char *args, va_list va) = 0;
+	virtual void writeOsc(const char *dest, const char *args, ...) = 0;
 
-protected:
-	virtual void closeEvent( QCloseEvent * _ce );
+	virtual class AutomatableModel *modelAtPort(
+		const class QString &dest) = 0;
 
-	EffectControls * m_effectControls;
+	virtual unsigned netPort() const = 0;
 
-} ;
+	static Plugin::PluginTypes getPluginType(spa::descriptor *desc);
+};
 
-#endif
+#endif // LMMS_HAVE_SPA
+
+#endif // SPA_PLUGIN_BASE_H
