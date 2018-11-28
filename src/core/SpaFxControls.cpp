@@ -1,0 +1,78 @@
+/*
+ * SpaControls.cpp - controls for amplifier effect
+ *
+ * Copyright (c) 2018-2018 Johannes Lorenz <j.git$$$lorenz-ho.me, $$$=@>
+ *
+ * This file is part of LMMS - https://lmms.io
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public
+ * License along with this program (see COPYING); if not, write to the
+ * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ * Boston, MA 02110-1301 USA.
+ *
+ */
+
+#include "SpaFxControls.h"
+
+#include <QDomElement>
+
+#include "Engine.h"
+#include "SpaEffect.h"
+#include "SpaFxControlDialog.h"
+
+SpaFxControls::SpaFxControls(const char *libraryName, class SpaEffect *effect) :
+	EffectControls(effect), SpaControlBase(libraryName), m_effect(effect)
+{
+	if (m_plugin)
+	{
+		connect(Engine::mixer(), SIGNAL(sampleRateChanged()), this,
+			SLOT(reloadPlugin()));
+	}
+}
+
+SpaPluginBase &SpaFxControls::getPluginBase() { return *m_effect; }
+
+DataFile::Types SpaFxControls::settingsType()
+{
+	return DataFile::EffectSettings;
+}
+
+void SpaFxControls::setNameFromFile(const QString &name)
+{
+	effect()->setDisplayName(name);
+}
+
+void SpaFxControls::changeControl() // TODO: what is that?
+{
+	//	engine::getSong()->setModified();
+}
+
+void SpaFxControls::saveSettings(QDomDocument &doc, QDomElement &that)
+{
+	SpaControlBase::saveSettings(doc, that);
+}
+
+void SpaFxControls::loadSettings(const QDomElement &that)
+{
+	SpaControlBase::loadSettings(that);
+}
+
+int SpaFxControls::controlCount()
+{
+	return SpaControlBase::m_ports.m_otherPorts.size();
+}
+
+EffectControlDialog *SpaFxControls::createView()
+{
+	return new SpaFxControlDialog(this);
+}

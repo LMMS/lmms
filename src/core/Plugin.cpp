@@ -42,7 +42,7 @@
 #include "AutomatableModel.h"
 #include "Song.h"
 #ifdef LMMS_HAVE_SPA
-//	#include "SpaEffect.h"
+	#include "SpaEffect.h"
 	#include "SpaInstrument.h"
 #endif
 
@@ -146,7 +146,7 @@ Plugin * Plugin::instantiate( const QString& pluginName, Model * parent,
 			inst = spaInst;
 			break;
 		}
-/*		case Plugin::Effect:
+		case Plugin::Effect:
 		{
 			SpaEffect* spaEff = new SpaEffect(
 				pi.file.absoluteFilePath().toUtf8().data(),
@@ -154,7 +154,7 @@ Plugin * Plugin::instantiate( const QString& pluginName, Model * parent,
 			spaPlug = spaEff;
 			inst = spaEff;
 			break;
-		}*/
+		}
 		default:
 			// maybe print message?
 			qDebug() << "Spa plugin is neither instrument, "

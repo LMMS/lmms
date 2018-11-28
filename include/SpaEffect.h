@@ -1,0 +1,72 @@
+﻿/*
+ * SpaEffect.h - implementation of SPA interface
+ *
+ * Copyright (c) 2018-2018 Johannes Lorenz <j.git$$$lorenz-ho.me, $$$=@>
+ *
+ * This file is part of LMMS - https://lmms.io
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public
+ * License along with this program (see COPYING); if not, write to the
+ * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ * Boston, MA 02110-1301 USA.
+ *
+ */
+
+#ifndef SPA_EFFECT_H
+#define SPA_EFFECT_H
+
+#include "lmmsconfig.h"
+
+#ifdef LMMS_HAVE_SPA
+
+#include <QString>
+
+// general LMMS includes
+#include "Effect.h"
+
+// LMMS includes for spa
+#include "SpaPluginBase.h"
+#include "SpaFxControls.h"
+
+class QPushButton;
+
+class SpaEffect : public Effect, public SpaPluginBase
+{
+	Q_OBJECT
+
+public:
+	SpaEffect(const char *m_libraryName,
+		const Descriptor *desc, Model* parent);
+	~SpaEffect() override;
+
+	bool processAudioBuffer( sampleFrame* buf, const fpp_t frames ) override;
+
+	EffectControls* controls() override { return &m_controls; }
+
+	SpaFxControls* spaControls() { return &m_controls; }
+	const SpaFxControls* spaControls() const { return &m_controls; }
+
+	void writeOsc(const char *dest, const char *args, va_list va) override;
+	void writeOsc(const char *dest, const char *args, ...) override;
+	unsigned netPort() const override;
+	class AutomatableModel* modelAtPort(const QString& dest) override;
+
+private:	
+	SpaFxControls m_controls;
+
+	friend class SpaFxControls;
+};
+
+#endif // LMMS_HAVE_SPA
+
+#endif // SPA_EFFECT_H
