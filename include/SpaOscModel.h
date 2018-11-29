@@ -74,7 +74,7 @@ private slots:
 
 public:
 	FloatOscModel(class SpaPluginBase *plugRef, const QString dest,
-		float min, float max, float val);
+		float min, float max, float step, float val);
 };
 
 #endif // LMMS_HAVE_SPA

@@ -518,21 +518,24 @@ struct SpaOscModelFactory : public spa::audio::visitor
 public:
 	AutomatableModel *m_res = nullptr;
 
-	template <class ModelType, class T> void make(T min, T max, T val)
+	template <class ModelType, class ...MoreArgs>
+	void make(MoreArgs... args)
 	{
-		m_res = new ModelType(m_plugRef, m_dest, min, max, val);
+		m_res = new ModelType(m_plugRef, m_dest, args...);
 	}
 
 	template <class T> using CtlIn = spa::audio::control_in<T>;
 	virtual void visit(CtlIn<float> &in)
 	{
-		make<FloatOscModel>(in.min, in.max, in.def);
+		make<FloatOscModel>(in.min, in.max, in.def, in.step);
 	}
 	virtual void visit(CtlIn<double> &in)
 	{
 		// LMMS has no double models, cast it all away
 		make<FloatOscModel>(static_cast<float>(in.min),
-			static_cast<float>(in.max), static_cast<float>(in.def));
+			static_cast<float>(in.max),
+			static_cast<float>(in.def),
+			static_cast<float>(in.step));
 	}
 	virtual void visit(CtlIn<int> &in)
 	{
@@ -540,7 +543,7 @@ public:
 	}
 	virtual void visit(CtlIn<bool> &in)
 	{
-		m_res = new BoolOscModel(m_plugRef, m_dest, in.def);
+		make<BoolOscModel>(in.def);
 	}
 
 	SpaOscModelFactory(SpaControlBase *ctrlBase, const QString &dest) :

@@ -60,10 +60,9 @@ IntOscModel::IntOscModel(SpaPluginBase *plugRef, const QString dest, int min,
 }
 
 FloatOscModel::FloatOscModel(SpaPluginBase *plugRef, const QString dest,
-	float min, float max, float val) :
-	SpaOscModel<FloatModel>(val, min, max, 0.1f, nullptr, dest, false)
-/* TODO: get step from plugin (we currently need a plugin where this
-	can be tested) */
+	float min, float max, float step, float val) :
+	// Ctor for FloatModel (see using clause in SpaOscModel)
+	SpaOscModel<FloatModel>(val, min, max, step, nullptr, dest, false)
 {
 	qDebug() << "LMMS: receiving float model: (val, min, max) = (" << val
 		 << ", " << min << ", " << max << ")";
