@@ -128,6 +128,29 @@ sf2Instrument::sf2Instrument( InstrumentTrack * _instrument_track ) :
 	// everytime we load a new soundfont.
 	m_synth = new_fluid_synth( m_settings );
 
+#if FLUIDSYNTH_VERSION_MAJOR >= 2
+	// Get the default values from the setting
+	double settingVal;
+
+	fluid_settings_getnum_default(m_settings, "synth.reverb.room-size", &settingVal);
+	m_reverbRoomSize.setInitValue(settingVal);
+	fluid_settings_getnum_default(m_settings, "synth.reverb.damping", &settingVal);
+	m_reverbDamping.setInitValue(settingVal);
+	fluid_settings_getnum_default(m_settings, "synth.reverb.width", &settingVal);
+	m_reverbWidth.setInitValue(settingVal);
+	fluid_settings_getnum_default(m_settings, "synth.reverb.level", &settingVal);
+	m_reverbLevel.setInitValue(settingVal);
+
+	fluid_settings_getnum_default(m_settings, "synth.chorus.nr", &settingVal);
+	m_chorusNum.setInitValue(settingVal);
+	fluid_settings_getnum_default(m_settings, "synth.chorus.level", &settingVal);
+	m_chorusLevel.setInitValue(settingVal);
+	fluid_settings_getnum_default(m_settings, "synth.chorus.speed", &settingVal);
+	m_chorusSpeed.setInitValue(settingVal);
+	fluid_settings_getnum_default(m_settings, "synth.chorus.depth", &settingVal);
+	m_chorusDepth.setInitValue(settingVal);
+#endif
+
 	loadFile( ConfigManager::inst()->defaultSoundfont() );
 
 	updateSampleRate();
@@ -393,7 +416,6 @@ QString sf2Instrument::getCurrentPatchName()
 	int iBankSelected = m_bankNum.value();
 	int iProgSelected = m_patchNum.value();
 
-	fluid_preset_t preset;
 	// For all soundfonts (in reversed stack order) fill the available programs...
 	int cSoundFonts = ::fluid_synth_sfcount( m_synth );
 	for( int i = 0; i < cSoundFonts; i++ )
@@ -404,21 +426,26 @@ QString sf2Instrument::getCurrentPatchName()
 #ifdef CONFIG_FLUID_BANK_OFFSET
 			int iBankOffset =
 				fluid_synth_get_bank_offset(
-						m_synth, pSoundFont->id );
+						m_synth, fluid_sfont_get_id(pSoundFont) );
 #endif
-			pSoundFont->iteration_start( pSoundFont );
-			while( pSoundFont->iteration_next( pSoundFont,
-								&preset ) )
+			fluid_sfont_iteration_start( pSoundFont );
+#if FLUIDSYNTH_VERSION_MAJOR < 2
+			fluid_preset_t preset;
+			fluid_preset_t *pCurPreset = &preset;
+#else
+			fluid_preset_t *pCurPreset;
+#endif
+			while ((pCurPreset = fluid_sfont_iteration_next_wrapper(pSoundFont, pCurPreset)))
 			{
-				int iBank = preset.get_banknum( &preset );
+				int iBank = fluid_preset_get_banknum( pCurPreset );
 #ifdef CONFIG_FLUID_BANK_OFFSET
 				iBank += iBankOffset;
 #endif
-				int iProg = preset.get_num( &preset );
+				int iProg = fluid_preset_get_num( pCurPreset );
 				if( iBank == iBankSelected && iProg ==
 								iProgSelected )
 				{
-					return preset.get_name( &preset );
+					return fluid_preset_get_name( pCurPreset );
 				}
 			}
 		}

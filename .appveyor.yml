@@ -16,7 +16,7 @@ build_script:
   - cd build
   - ps: $env:CMAKE_PLATFORM="$(if ($env:PLATFORM -eq 'x64') { 'x64' } else { '' })"
   - ps: $env:QT_SUFFIX="$(if ($env:PLATFORM -eq 'x64') { '_64' } else { '' })"
-  - cmake -DUSE_COMPILE_CACHE=ON -DCACHE_TOOL=%APPVEYOR_BUILD_FOLDER%/clcache.4.1.0/clcache-4.1.0/clcache.exe -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_PREFIX_PATH=c:/Qt/5.9.5/msvc2015%QT_SUFFIX%;c:/tools/vcpkg/installed/%PLATFORM%-windows -DCMAKE_GENERATOR_PLATFORM="%CMAKE_PLATFORM%" ..
+  - cmake -DUSE_COMPILE_CACHE=ON -DCACHE_TOOL=%APPVEYOR_BUILD_FOLDER%/clcache.4.1.0/clcache-4.1.0/clcache.exe -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_PREFIX_PATH=c:/Qt/5.9/msvc2015%QT_SUFFIX%;c:/tools/vcpkg/installed/%PLATFORM%-windows -DCMAKE_GENERATOR_PLATFORM="%CMAKE_PLATFORM%" ..
   - cmake --build . -- /maxcpucount:4
   - cmake --build . --target tests
 cache:

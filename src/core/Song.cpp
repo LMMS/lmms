@@ -346,9 +346,7 @@ void Song::processNextBuffer()
 
 					m_vstSyncController.setAbsolutePosition( ticks );
 					m_vstSyncController.setPlaybackJumped( true );
-				}
-				else if( m_playPos[m_playMode] == tl->loopEnd() - 1 )
-				{
+
 					emit updateSampleTracks();
 				}
 			}

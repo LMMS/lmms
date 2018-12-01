@@ -95,10 +95,13 @@ tact_t BBTrackContainer::lengthOfBB( int _bb ) const
 	MidiTime max_length = MidiTime::ticksPerTact();
 
 	const TrackList & tl = tracks();
-	for( TrackList::const_iterator it = tl.begin(); it != tl.end(); ++it )
+	for (Track* t : tl)
 	{
-		max_length = qMax( max_length,
-					( *it )->getTCO( _bb )->length() );
+		// Don't create TCOs here if not exist
+		if (_bb < t->numOfTCOs())
+		{
+			max_length = qMax(max_length, t->getTCO( _bb )->length());
+		}
 	}
 
 	return max_length.nextFullTact();
