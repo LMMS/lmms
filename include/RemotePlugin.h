@@ -755,9 +755,15 @@ public:
 	}
 
 
-	void quit()
+	void stop()
 	{
 		m_quit = true;
+		quit();
+	}
+
+	void reset()
+	{
+		m_quit = false;
 	}
 
 private:
@@ -863,6 +869,9 @@ private:
 
 	QProcess m_process;
 	ProcessWatcher m_watcher;
+
+	QString m_exec;
+	QStringList m_args;
 
 	QMutex m_commMutex;
 	bool m_splitChannels;

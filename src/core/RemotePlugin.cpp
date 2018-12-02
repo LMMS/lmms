@@ -54,7 +54,10 @@ ProcessWatcher::ProcessWatcher( RemotePlugin * _p ) :
 
 void ProcessWatcher::run()
 {
-	while( !m_quit && m_plugin->isRunning() )
+	m_plugin->m_process.start( m_plugin->m_exec, m_plugin->m_args );
+	exec();
+	m_plugin->m_process.moveToThread( m_plugin->thread() );
+	while( !m_quit && m_plugin->messagesLeft() )
 	{
 		msleep( 200 );
 	}
@@ -120,6 +123,11 @@ RemotePlugin::RemotePlugin() :
 		qWarning( "Unable to start the server." );
 	}
 #endif
+	connect( &m_process, SIGNAL( finished( int, QProcess::ExitStatus ) ),
+		this, SLOT( processFinished( int, QProcess::ExitStatus ) ),
+		Qt::DirectConnection );
+	connect( &m_process, SIGNAL( finished( int, QProcess::ExitStatus ) ),
+		&m_watcher, SLOT( quit() ), Qt::DirectConnection );
 }
 
 
@@ -127,7 +135,7 @@ RemotePlugin::RemotePlugin() :
 
 RemotePlugin::~RemotePlugin()
 {
-	m_watcher.quit();
+	m_watcher.stop();
 	m_watcher.wait();
 
 	if( m_failed == false )
@@ -200,6 +208,11 @@ bool RemotePlugin::init(const QString &pluginExecutable,
 		return failed();
 	}
 
+	// ensure the watcher is ready in case we're running again
+	// (e.g. 32-bit VST plugins on Windows)
+	m_watcher.wait();
+	m_watcher.reset();
+
 	QStringList args;
 #ifdef SYNC_WITH_SHM_FIFO
 	// swap in and out for bidirectional communication
@@ -212,14 +225,14 @@ bool RemotePlugin::init(const QString &pluginExecutable,
 #ifndef DEBUG_REMOTE_PLUGIN
 	m_process.setProcessChannelMode( QProcess::ForwardedChannels );
 	m_process.setWorkingDirectory( QCoreApplication::applicationDirPath() );
-	m_process.start( exec, args );
+	m_exec = exec;
+	m_args = args;
+	// we start the process on the watcher thread to work around QTBUG-8819
+	m_process.moveToThread( &m_watcher );
 	m_watcher.start( QThread::LowestPriority );
 #else
 	qDebug() << exec << args;
 #endif
-
-	connect( &m_process, SIGNAL( finished( int, QProcess::ExitStatus ) ),
-		this, SLOT( processFinished( int, QProcess::ExitStatus ) ) );
 
 #ifndef SYNC_WITH_SHM_FIFO
 	struct pollfd pollin;
