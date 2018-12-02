@@ -62,6 +62,7 @@ Plugin::Descriptor PLUGIN_EXPORT zynaddsubfx_plugin_descriptor =
 	"Tobias Doerffel <tobydox/at/users.sf.net>",
 	0x0100,
 	Plugin::Instrument,
+	Plugin::Embedded,
 	new PluginPixmapLoader( "logo" ),
 	"xiz",
 	NULL,
