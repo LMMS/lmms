@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+mkdir build
+cd build
 
 if [ $QT5 ]; then
         # Workaround; No FindQt5.cmake module exists
@@ -6,3 +8,7 @@ if [ $QT5 ]; then
 fi
 
 cmake $CMAKE_FLAGS -DUSE_WERROR=OFF ..
+
+make -j4
+make tests
+./tests/tests

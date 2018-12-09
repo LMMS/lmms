@@ -28,7 +28,7 @@ export CXXFLAGS ?= $(shell dpkg-buildflags --get CXXFLAGS) -DNDEBUG \
 	-Wno-error=format-truncation
 
 %:
-	dh $@ --buildsystem cmake
+	dh $@ --buildsystem cmake --parallel
 
 override_dh_auto_configure:
 	dh_auto_configure -- -DCMAKE_INSTALL_LIBDIR=lib/$(DEB_HOST_MULTIARCH) $(CMAKE_OPTS)
