@@ -5,9 +5,3 @@ usr/lib/*/lmms/ladspa/c[b-z]*
 usr/lib/*/lmms/ladspa/[d-z]*
 usr/lib/*/lmms/lib*
 usr/lib/*/lmms/RemoteZynAddSubFx
-usr/share/man/*
-usr/share/applications/*
-data/application-x-lmms-project.svg	usr/share/icons/hicolor/64x64/mimetypes
-
-data/lmms.png usr/share/icons/hicolor/512x512/apps
-data/lmms.png usr/share/pixmaps
