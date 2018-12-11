@@ -1,7 +1,9 @@
 #!/bin/sh
 set -e
 
-BASETGZ="$HOME/pbuilder-bases/debian-sid-amd64.tgz"
+: ${TARGET_ARCH:=amd64}
+
+BASETGZ="$HOME/pbuilder-bases/debian-sid-$TARGET_ARCH.tgz"
 MIRROR=http://cdn-fastly.deb.debian.org/debian
 KEYRING=/usr/share/keyrings/debian-archive-keyring.gpg
 
@@ -15,7 +17,7 @@ if [ ! -e "$BASETGZ.stamp" ]
 then
 	mkdir -p "$HOME/pbuilder-bases"
 	sudo pbuilder --create --basetgz "$BASETGZ" --mirror $MIRROR \
-		--distribution sid --architecture amd64 \
+		--distribution sid --architecture $TARGET_ARCH \
 		--debootstrapopts --variant=buildd \
 		--debootstrapopts --keyring=$KEYRING \
 		--debootstrapopts --include=perl

@@ -21,6 +21,7 @@ matrix:
           osx_image: xcode8.2
           env: QT5=True
         - env: TARGET_OS=debian-sid
+        - env: TARGET_OS=debian-sid TARGET_ARCH=i386
 before_install:
    - . ${TRAVIS_BUILD_DIR}/.travis/${TRAVIS_OS_NAME}.${TARGET_OS}.before_install.sh
 install:
