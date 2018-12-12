@@ -203,7 +203,7 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 	const int HeaderSize = 30;
 	int labelNumber = 0;
 
-	auto addLedCheckBox = [&misc_tw, &labelNumber, this](
+	auto addLedCheckBox = [&XDelta, &YDelta, &misc_tw, &labelNumber, this](
 		const char* ledText,
 		bool initialState,
 		const char* toggledSlot
