@@ -13,6 +13,11 @@ then
 	sh -c "echo CCACHEDIR=$HOME/.ccache >> /etc/pbuilderrc"
 fi
 
+if [ "$CC" = clang ]
+then
+	sudo sh -c "echo EXTRAPACKAGES=clang >> /etc/pbuilderrc"
+fi
+
 if [ ! -e "$BASETGZ.stamp" ]
 then
 	mkdir -p "$HOME/pbuilder-bases"
@@ -29,4 +34,5 @@ fi
 DIR="$PWD"
 cd ..
 dpkg-source -b "$DIR"
-env -i sudo pbuilder --build --debbuildopts "--jobs=auto" --basetgz "$BASETGZ" ./*.dsc
+env -i CC="$CC" CXX="$CXX" sudo pbuilder --build --debbuildopts "--jobs=auto" \
+	--basetgz "$BASETGZ" ./*.dsc

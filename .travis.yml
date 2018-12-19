@@ -22,6 +22,8 @@ matrix:
           env: QT5=True
         - env: TARGET_OS=debian-sid
         - env: TARGET_OS=debian-sid TARGET_ARCH=i386
+        - compiler: clang
+          env: TARGET_OS=debian-sid
 before_install:
    - . ${TRAVIS_BUILD_DIR}/.travis/${TRAVIS_OS_NAME}.${TARGET_OS}.before_install.sh
 install:
