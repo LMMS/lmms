@@ -69,6 +69,7 @@
 
 #include "lmmsversion.h"
 
+
 #if !defined(LMMS_BUILD_WIN32) && !defined(LMMS_BUILD_APPLE) && !defined(LMMS_BUILD_HAIKU)
 //Work around an issue on KDE5 as per https://bugs.kde.org/show_bug.cgi?id=337491#c21
 void disableAutoKeyAccelerators(QWidget* mainWindow)
@@ -94,8 +95,40 @@ MainWindow::MainWindow() :
 	m_autoSaveTimer( this ),
 	m_viewMenu( NULL ),
 	m_metronomeToggle( 0 ),
-	m_session( Normal )
+	m_session( Normal ),
+	m_sdlTimer( this )
 {
+#ifdef LMMS_HAVE_SDL
+	//if( SDL_Init( SDL_INIT_JOYSTICK ) < 0 ) {
+	//	qCritical( "Couldn't initialize SDL Joystick: %s\n", SDL_GetError() );
+	//	return;
+	//}
+
+SDL_InitSubSystem(SDL_INIT_JOYSTICK);
+
+// Check for joystick
+if (SDL_NumJoysticks() > 0) {
+    // Open joystick
+    m_joystick = SDL_JoystickOpen(0);
+    if (m_joystick) {
+        printf("Opened Gamepad 0\n");
+        printf("Name: %s\n", SDL_JoystickNameForIndex(0));
+        printf("Number of Axes: %d\n", SDL_JoystickNumAxes(m_joystick));
+        printf("Number of Buttons: %d\n", SDL_JoystickNumButtons(m_joystick));
+        printf("Number of Balls: %d\n", SDL_JoystickNumBalls(m_joystick));
+
+        //this->m_sdlTimer = QTimer(this);
+		connect(&m_sdlTimer, SIGNAL(timeout()), this, SLOT(updateSDL()));
+		m_sdlTimer.start(1000/30);
+    } else {
+        printf("Couldn't open gamepad 0\n");
+    }
+} else {
+    printf("No gamepads are attached\n");	
+}
+
+#endif
+
 #if !defined(LMMS_BUILD_WIN32) && !defined(LMMS_BUILD_APPLE) && !defined(LMMS_BUILD_HAIKU)
 	disableAutoKeyAccelerators(this);
 #endif
@@ -1510,6 +1543,17 @@ void MainWindow::browseHelp()
 }
 
 
+#ifdef LMMS_HAVE_SDL
+	void MainWindow::updateSDL() {
+		SDL_Event event;
+		SDL_PollEvent(&event);
+		auto x = SDL_JoystickGetAxis(m_joystick, 0);
+		auto y = SDL_JoystickGetAxis(m_joystick, 1);
+		auto z = SDL_JoystickGetAxis(m_joystick, 2);
+        printf("x: %i\n", x);
+        printf("y: %i\n", y);
+	}
+#endif
 
 
 void MainWindow::autoSave()

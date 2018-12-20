@@ -43,6 +43,16 @@ class PluginView;
 class ToolButton;
 
 
+#ifdef LMMS_HAVE_SDL
+#ifdef LMMS_HAVE_SDL2
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_joystick.h>
+#else
+#include <SDL/SDL.h>
+#include <SDL/SDL_joystick.h>
+#endif
+#endif
+
 class MainWindow : public QMainWindow
 {
 	Q_OBJECT
@@ -173,6 +183,11 @@ public slots:
 
 	void autoSave();
 
+#ifdef LMMS_HAVE_SDL
+	void updateSDL();
+#endif
+
+
 private slots:
 	void onExportProjectMidi();
 
@@ -237,6 +252,11 @@ private:
 	ToolButton * m_metronomeToggle;
 
 	SessionState m_session;
+
+#ifdef LMMS_HAVE_SDL
+	SDL_Joystick *m_joystick;
+	QTimer m_sdlTimer;
+#endif
 
 private slots:
 	void browseHelp();
