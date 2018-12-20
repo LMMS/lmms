@@ -74,9 +74,9 @@ IF("${PLUGIN_LIST}" STREQUAL "")
 		stereo_enhancer
 		stereo_matrix
 		stk
-		vestige
-		vst_base
-		VstEffect
+		#vestige
+		#vst_base
+		#VstEffect
 		watsyn
 		waveshaper
 		vibed
