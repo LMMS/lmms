@@ -45,6 +45,7 @@ SubWindow::SubWindow( QWidget *parent, Qt::WindowFlags windowFlags ) :
 	// initialize the tracked geometry to whatever Qt thinks the normal geometry currently is.
 	// this should always work, since QMdiSubWindows will not start as maximized
 	m_trackedNormalGeom = normalGeometry();
+	setStyleSheet("background: rgba(0,0,0,50%); color:purple");
 
 	// inits the colors
 	m_activeColor = Qt::SolidPattern;

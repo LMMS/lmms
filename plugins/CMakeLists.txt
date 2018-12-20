@@ -67,7 +67,7 @@ IF("${PLUGIN_LIST}" STREQUAL "")
 		FreeBoy
 		patman
 		peak_controller_effect
-		GigPlayer
+		#GigPlayer
 		ReverbSC
 		sf2_player
 		sfxr
@@ -76,9 +76,9 @@ IF("${PLUGIN_LIST}" STREQUAL "")
 		stereo_enhancer
 		stereo_matrix
 		stk
-		vst_base
-		vestige
-		VstEffect
+		#vst_base
+		#vestige
+		#VstEffect
 		watsyn
 		waveshaper
 		vibed

@@ -106,6 +106,11 @@ MainWindow::MainWindow() :
 	vbox->setSpacing( 0 );
 	vbox->setMargin( 0 );
 
+	setAttribute(Qt::WA_NoSystemBackground, true);
+	setAttribute(Qt::WA_TranslucentBackground);
+	main_widget->setAutoFillBackground(true);
+	main_widget->setStyleSheet("background: rgba(0,0,0,5%); color:purple");
+
 	QWidget * w = new QWidget( main_widget );
 	QHBoxLayout * hbox = new QHBoxLayout( w );
 	hbox->setSpacing( 0 );
