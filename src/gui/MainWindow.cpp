@@ -201,6 +201,8 @@ MainWindow::MainWindow() :
 
 	hbox->addWidget( sideBar );
 	hbox->addWidget( splitter );
+	sideBar->setAutoFillBackground(true);
+	sideBar->setStyleSheet("background: rgba(0,0,0,50%); color:purple");
 
 
 	// create global-toolbar at the top of our window
@@ -208,6 +210,8 @@ MainWindow::MainWindow() :
 	m_toolBar->setObjectName( "mainToolbar" );
 	m_toolBar->setFixedHeight( 64 );
 	m_toolBar->move( 0, 0 );
+	m_toolBar->setAutoFillBackground(true);
+	m_toolBar->setStyleSheet("background: rgba(0,0,0,50%); color:purple");
 
 	// add layout for organizing quite complex toolbar-layouting
 	m_toolBarLayout = new QGridLayout( m_toolBar/*, 2, 1*/ );

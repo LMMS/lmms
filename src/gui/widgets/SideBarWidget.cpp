@@ -39,6 +39,9 @@ SideBarWidget::SideBarWidget( const QString & _title, const QPixmap & _icon,
 	m_layout = new QVBoxLayout( m_contents );
 	m_layout->setSpacing( 5 );
 	m_layout->setMargin( 0 );
+	m_contents->setAutoFillBackground(true);
+	m_contents->setStyleSheet("background: rgba(0,0,0,50%); color:purple");
+
 }
 
 
