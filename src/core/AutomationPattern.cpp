@@ -791,7 +791,7 @@ void AutomationPattern::resolveAllIDs()
 						{
 							// FIXME: Remove this block once the automation system gets fixed
 							// This is a temporary fix for https://github.com/LMMS/lmms/issues/3781
-							o = Engine::projectJournal()->journallingObject( *k + ( 1 << 23 ) );
+							o = Engine::projectJournal()->journallingObject(ProjectJournal::idFromSave(*k));
 							if( o && dynamic_cast<AutomatableModel *>( o ) )
 							{
 								a->addObject( dynamic_cast<AutomatableModel *>( o ), false );
