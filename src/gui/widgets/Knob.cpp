@@ -532,6 +532,32 @@ void Knob::contextMenuEvent( QContextMenuEvent * )
 		model()->isScaleLogarithmic() ? tr( "Set linear" ) : tr( "Set logarithmic" ),
 		this, SLOT( toggleScale() ) );
 	contextMenu.addSeparator();
+
+	contextMenu.addAction( QPixmap(),
+		"gamepad:axis:1",
+		[this](bool){ this->enableGamepad(0);} 
+	);
+	contextMenu.addAction( QPixmap(),
+		"gamepad:axis:2",
+		[this](bool){ this->enableGamepad(1);} 
+	);
+	contextMenu.addAction( QPixmap(),
+		"gamepad:axis:3",
+		[this](bool){ this->enableGamepad(2);} 
+	);
+	contextMenu.addAction( QPixmap(),
+		"gamepad:axis:4",
+		[this](bool){ this->enableGamepad(3);} 
+	);
+	contextMenu.addAction( QPixmap(),
+		"gamepad:axis:5",
+		[this](bool){ this->enableGamepad(4);} 
+	);
+	contextMenu.addAction( QPixmap(),
+		"gamepad:axis:6",
+		[this](bool){ this->enableGamepad(5);} 
+	);
+
 	contextMenu.exec( QCursor::pos() );
 }
 
@@ -846,3 +872,9 @@ void Knob::doConnections()
 						this, SLOT( update() ) );
 	}
 }
+
+#ifdef LMMS_HAVE_SDL
+// the linker will complain if this is not defined after being declared
+// note this can not be initialized in Knob.h
+std::vector<std::tuple<Knob*, int>> Knob::gamepadKnobs;
+#endif

@@ -66,6 +66,7 @@
 #include "ToolButton.h"
 #include "ToolPlugin.h"
 #include "VersionedSaveDialog.h"
+#include "Knob.h"
 
 #include "lmmsversion.h"
 
@@ -116,6 +117,8 @@ if (SDL_NumJoysticks() > 0) {
         printf("Number of Axes: %d\n", SDL_JoystickNumAxes(m_joystick));
         printf("Number of Buttons: %d\n", SDL_JoystickNumButtons(m_joystick));
         printf("Number of Balls: %d\n", SDL_JoystickNumBalls(m_joystick));
+
+        Knob::resetGamepads();
 
         //this->m_sdlTimer = QTimer(this);
 		connect(&m_sdlTimer, SIGNAL(timeout()), this, SLOT(updateSDL()));
@@ -298,6 +301,13 @@ MainWindow::~MainWindow()
 	delete gui->automationEditor();
 	delete gui->pianoRoll();
 	delete gui->songEditor();
+
+#ifdef LMMS_HAVE_SDL
+	m_sdlTimer.stop();
+	if (m_joystick) SDL_JoystickClose(m_joystick);
+	SDL_Quit(); //segfaults?
+#endif
+
 	// destroy engine which will do further cleanups etc.
 	Engine::destroy();
 }
@@ -1547,11 +1557,15 @@ void MainWindow::browseHelp()
 	void MainWindow::updateSDL() {
 		SDL_Event event;
 		SDL_PollEvent(&event);
-		auto x = SDL_JoystickGetAxis(m_joystick, 0);
-		auto y = SDL_JoystickGetAxis(m_joystick, 1);
-		auto z = SDL_JoystickGetAxis(m_joystick, 2);
-        printf("x: %i\n", x);
-        printf("y: %i\n", y);
+		double x1 = ((double)SDL_JoystickGetAxis(m_joystick, 0)) / 32768.0;
+		double y1 = ((double)SDL_JoystickGetAxis(m_joystick, 1)) / 32768.0;
+		double z1 = (((double)SDL_JoystickGetAxis(m_joystick, 2)) / 32768.0) + 1.0;
+		double x2 = ((double)SDL_JoystickGetAxis(m_joystick, 3)) / 32768.0;
+		double y2 = ((double)SDL_JoystickGetAxis(m_joystick, 4)) / 32768.0;
+		double z2 = (((double)SDL_JoystickGetAxis(m_joystick, 5)) / 32768.0) + 1.0;
+        //printf("x: %.3f\n", x);
+        //printf("y: %.3f\n", y);
+        Knob::updateGamepad( x1,y1,z1, x2,y2,z2 );
 	}
 #endif
 
