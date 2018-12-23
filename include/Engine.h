@@ -28,6 +28,7 @@
 
 #include <QtCore/QString>
 #include <QtCore/QObject>
+#include <QtScript/QScriptEngine>
 
 
 #include "lmms_export.h"
@@ -110,6 +111,10 @@ public:
 		}
 		return s_instanceOfMe;
 	}
+
+	// note: on fedora installs with: dnf install qt5-qtscript-devel
+	static QScriptEngine scriptEngine;
+	static void scriptEval(std::string script);
 
 signals:
 	void initProgress(const QString &msg);

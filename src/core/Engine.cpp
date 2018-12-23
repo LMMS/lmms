@@ -33,6 +33,7 @@
 #include "ProjectJournal.h"
 #include "Song.h"
 #include "BandLimitedWave.h"
+#include <QtScript/QScriptEngine>
 
 float LmmsCore::s_framesPerTick;
 Mixer* LmmsCore::s_mixer = NULL;
@@ -42,7 +43,11 @@ Song * LmmsCore::s_song = NULL;
 ProjectJournal * LmmsCore::s_projectJournal = NULL;
 Ladspa2LMMS * LmmsCore::s_ladspaManager = NULL;
 DummyTrackContainer * LmmsCore::s_dummyTC = NULL;
+QScriptEngine LmmsCore::scriptEngine;
 
+void LmmsCore::scriptEval( std::string script) {
+	QScriptValue res = LmmsCore::scriptEngine.evaluate(QString(script.c_str()));
+}
 
 
 
