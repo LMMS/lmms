@@ -306,6 +306,8 @@ int main( int argc, char * * argv )
 			new QCoreApplication( argc, argv ) :
 					new MainApplication( argc, argv );
 
+	Engine::scriptEnable();
+
 	Mixer::qualitySettings qs( Mixer::qualitySettings::Mode_HighQuality );
 	OutputSettings os( 44100, OutputSettings::BitRateSettings(160, false), OutputSettings::Depth_16Bit, OutputSettings::StereoMode_JointStereo );
 	ProjectRenderer::ExportFileFormats eff = ProjectRenderer::WaveFile;
@@ -623,6 +625,21 @@ int main( int argc, char * * argv )
 			}
 
 			configFile = QString::fromLocal8Bit( argv[i] );
+		}
+		else if( arg == "--script" || arg == "script") {
+			++i;
+			printf("running script: %s", argv[i]);
+			QString fileName = argv[i];
+			QFile scriptFile(fileName);
+			if (!scriptFile.open(QIODevice::ReadOnly)) {
+				printf("error reading file: %s", argv[i]);
+			} else {
+				QTextStream stream(&scriptFile);
+				QString contents = stream.readAll();
+				scriptFile.close();
+				printf("running script: %s", argv[i]);
+				Engine::scriptEval(contents, fileName);
+			}
 		}
 		else
 		{
