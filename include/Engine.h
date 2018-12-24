@@ -115,6 +115,7 @@ public:
 	// note: on fedora installs with: dnf install qt5-qtscript-devel
 	static QScriptEngine* scriptEngine;
 	static void scriptEnable();
+	static QScriptValue scriptPrint(QScriptContext *context, QScriptEngine *engine);
 	static void scriptEval(std::string script, std::string fileName="");
 	static void scriptEval(QString script, QString fileName="");
 

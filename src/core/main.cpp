@@ -156,6 +156,8 @@ void printHelp()
 		"  -c, --config <configfile>      Get the configuration from <configfile>\n"
 		"  -h, --help                     Show this usage information and exit.\n"
 		"  -v, --version                  Show version information and exit.\n"
+		"  --script                       Load and run script file\n"
+		"  --eval                         Directly evalute script code from command line\n"
 		"\nOptions if no action is given:\n"
 		"      --geometry <geometry>      Specify the size and position of\n"
 		"          the main window\n"
@@ -628,18 +630,22 @@ int main( int argc, char * * argv )
 		}
 		else if( arg == "--script" || arg == "script") {
 			++i;
-			printf("running script: %s", argv[i]);
+			printf("loading script: %s\n", argv[i]);
 			QString fileName = argv[i];
 			QFile scriptFile(fileName);
 			if (!scriptFile.open(QIODevice::ReadOnly)) {
-				printf("error reading file: %s", argv[i]);
+				printf("error reading file: %s\n", argv[i]);
 			} else {
 				QTextStream stream(&scriptFile);
 				QString contents = stream.readAll();
 				scriptFile.close();
-				printf("running script: %s", argv[i]);
 				Engine::scriptEval(contents, fileName);
 			}
+		}
+		else if( arg == "--eval" || arg == "eval") {
+			++i;
+			printf("eval script: %s\n", argv[i]);
+			Engine::scriptEval( QString(argv[i]) );
 		}
 		else
 		{

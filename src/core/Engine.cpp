@@ -49,6 +49,12 @@ QScriptEngine* LmmsCore::scriptEngine = NULL;
 
 void LmmsCore::scriptEnable() {
 	LmmsCore::scriptEngine = new QScriptEngine();
+	QScriptValue fun = LmmsCore::scriptEngine->newFunction(LmmsCore::scriptPrint);
+	LmmsCore::scriptEngine->globalObject().setProperty("print", fun);
+
+	LmmsCore *engine = inst();  // the singleton instance of LmmsCore
+	QScriptValue ewrapper = LmmsCore::scriptEngine->newQObject(engine);
+	LmmsCore::scriptEngine->globalObject().setProperty("lmms", ewrapper);
 }
 
 void LmmsCore::scriptEval( std::string script, std::string fileName) {
@@ -61,8 +67,13 @@ void LmmsCore::scriptEval( QString script, QString fileName) {
 		//std::cout << "uncaught exception at line" << line << ":" << result.toString() << std::endl;
 		std::cout << "uncaught exception at line" << line << ":" << result.toString().toUtf8().constData() << std::endl;
 	} else {
-		std::cout << result.toString().toUtf8().constData() << std::endl;		
+		std::cout << "script result: " << result.toString().toUtf8().constData() << std::endl;		
 	}
+}
+QScriptValue LmmsCore::scriptPrint(QScriptContext *context, QScriptEngine *engine) {
+	QScriptValue txt = context->argument(0);
+	std::cout << txt.toString().toUtf8().constData() << std::endl;		
+	return txt;
 }
 
 
