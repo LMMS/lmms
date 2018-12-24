@@ -33,6 +33,7 @@
 #include "ProjectJournal.h"
 #include "Song.h"
 #include "BandLimitedWave.h"
+#include <iostream>
 
 
 float LmmsCore::s_framesPerTick;
@@ -54,7 +55,14 @@ void LmmsCore::scriptEval( std::string script, std::string fileName) {
 	LmmsCore::scriptEval(QString(script.c_str()), QString(fileName.c_str()));
 }
 void LmmsCore::scriptEval( QString script, QString fileName) {
-	QScriptValue res = LmmsCore::scriptEngine->evaluate(script, fileName);
+	QScriptValue result = LmmsCore::scriptEngine->evaluate(script, fileName);
+	if (LmmsCore::scriptEngine->hasUncaughtException()) {
+		int line = LmmsCore::scriptEngine->uncaughtExceptionLineNumber();
+		//std::cout << "uncaught exception at line" << line << ":" << result.toString() << std::endl;
+		std::cout << "uncaught exception at line" << line << ":" << result.toString().toUtf8().constData() << std::endl;
+	} else {
+		std::cout << result.toString().toUtf8().constData() << std::endl;		
+	}
 }
 
 
