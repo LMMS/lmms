@@ -69,7 +69,11 @@ class MixerWorkerThread;
 class LMMS_EXPORT Mixer : public QObject
 {
 	Q_OBJECT
+	Q_PROPERTY(float gain MEMBER m_masterGain)
+
 public:
+	Mixer() {}
+	~Mixer();
 	struct qualitySettings
 	{
 		enum Mode
@@ -98,6 +102,7 @@ public:
 		Interpolation interpolation;
 		Oversampling oversampling;
 
+		qualitySettings(){}
 		qualitySettings( Mode _m )
 		{
 			switch( _m )
@@ -349,7 +354,7 @@ private:
 
 
 	Mixer( bool renderOnly );
-	virtual ~Mixer();
+	//virtual ~Mixer();  // not qml compatible, why was this destructor made virtual in the first place?
 
 	void startProcessing( bool _needs_fifo = true );
 	void stopProcessing();
@@ -437,5 +442,6 @@ private:
 
 } ;
 
+Q_DECLARE_METATYPE( Mixer* )
 
 #endif

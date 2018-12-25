@@ -34,7 +34,8 @@
 #include "Song.h"
 #include "BandLimitedWave.h"
 #include <iostream>
-
+#include <QtCore/QTimer>
+#include <QtQml/QQmlEngine>
 
 float LmmsCore::s_framesPerTick;
 Mixer* LmmsCore::s_mixer = NULL;
@@ -47,14 +48,78 @@ DummyTrackContainer * LmmsCore::s_dummyTC = NULL;
 //QScriptEngine LmmsCore::scriptEngine; //QScriptEngine: Must construct a Q(Core)Application before a QScriptEngine
 QScriptEngine* LmmsCore::scriptEngine = NULL;
 
+/* lmms-core wrapper public slots
+Mixer* LmmsCoreScriptWrapper::getMixer() {
+	return LmmsCore::mixer();
+}
+
+FxMixer* LmmsCoreScriptWrapper::getFXMixer() {
+	return LmmsCore::fxMixer();
+}
+
+Song* LmmsCoreScriptWrapper::getSong() {
+	return LmmsCore::getSong();
+}
+
+BBTrackContainer* LmmsCoreScriptWrapper::getBBTrackContainer() {
+	return LmmsCore::getBBTrackContainer();
+}
+
+ProjectJournal* LmmsCoreScriptWrapper::getProjectJournal(){
+	return LmmsCore::projectJournal();
+}
+
+Ladspa2LMMS* LmmsCoreScriptWrapper::getLADSPAManager(){
+	return LmmsCore::getLADSPAManager();
+}
+*/
+
+template <typename T> void addType(QScriptEngine* engine) {
+	auto constructor = engine->newFunction([](QScriptContext*, QScriptEngine* engine){
+		return engine->newQObject(new T());
+	});
+	auto value = engine->newQMetaObject(&T::staticMetaObject, constructor);
+	engine->globalObject().setProperty(T::staticMetaObject.className(), value);
+}
+
 void LmmsCore::scriptEnable() {
+	qmlRegisterType<Mixer>("lmms.core", 1,0, "Mixer");
+
 	LmmsCore::scriptEngine = new QScriptEngine();
+	addType<QTimer>(LmmsCore::scriptEngine);
+
 	QScriptValue fun = LmmsCore::scriptEngine->newFunction(LmmsCore::scriptPrint);
 	LmmsCore::scriptEngine->globalObject().setProperty("print", fun);
 
 	LmmsCore *engine = inst();  // the singleton instance of LmmsCore
+	//auto engine = new LmmsCoreScriptWrapper();
 	QScriptValue ewrapper = LmmsCore::scriptEngine->newQObject(engine);
 	LmmsCore::scriptEngine->globalObject().setProperty("lmms", ewrapper);
+
+	LmmsCore::scriptEngine->evaluate(R"HEADER(
+	function dir(object) {
+		var names = [];
+		for (s in object) {
+			names.push(s);
+		}
+		names.sort();
+		return names;
+	}
+	function setTimeout(fn, ms) {
+		var timer = new QTimer();
+		timer.interval = ms;
+		timer.singleShot = true;
+		var conn = timer.timeout.connect(fn);
+		timer.start();
+	}
+	function setInterval(fn, ms) {
+		var timer = new QTimer();
+		timer.interval = ms;
+		timer.singleShot = false;
+		var conn = timer.timeout.connect(fn);
+		timer.start();
+	}
+	)HEADER");
 }
 
 void LmmsCore::scriptEval( std::string script, std::string fileName) {

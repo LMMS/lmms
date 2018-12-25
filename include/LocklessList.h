@@ -39,6 +39,8 @@ public:
 		Element * next;
 	} ;
 
+	LocklessList() {}  // default constructor is required by qml
+
 	LocklessList( size_t size ) :
 		m_first(nullptr),
 		m_allocator(new LocklessAllocatorT<Element>(size))
