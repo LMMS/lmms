@@ -259,7 +259,9 @@ int main( int argc, char * * argv )
 	bool allowRoot = false;
 	bool renderLoop = false;
 	bool renderTracks = false;
-	QString fileToLoad, fileToImport, renderOut, profilerOutputFile, configFile;
+	QString fileToLoad, fileToImport, renderOut, profilerOutputFile, configFile, scriptToRun, scriptName, scriptToEval;
+	bool doScriptRun = false;
+	bool doScriptEval = false;
 
 	// first of two command-line parsing stages
 	for( int i = 1; i < argc; ++i )
@@ -631,21 +633,22 @@ int main( int argc, char * * argv )
 		else if( arg == "--script" || arg == "script") {
 			++i;
 			printf("loading script: %s\n", argv[i]);
-			QString fileName = argv[i];
-			QFile scriptFile(fileName);
+			scriptName = argv[i];
+			QFile scriptFile(scriptName);
 			if (!scriptFile.open(QIODevice::ReadOnly)) {
 				printf("error reading file: %s\n", argv[i]);
 			} else {
 				QTextStream stream(&scriptFile);
-				QString contents = stream.readAll();
+				scriptToRun = stream.readAll();
 				scriptFile.close();
-				Engine::scriptEval(contents, fileName);
+				doScriptRun = true;
 			}
 		}
 		else if( arg == "--eval" || arg == "eval") {
 			++i;
 			printf("eval script: %s\n", argv[i]);
-			Engine::scriptEval( QString(argv[i]) );
+			scriptToEval = QString(argv[i]);
+			doScriptEval = true;
 		}
 		else
 		{
@@ -937,6 +940,13 @@ int main( int argc, char * * argv )
 		{
 			gui->mainWindow()->autoSaveTimerReset();
 		}
+	}
+
+	if (doScriptRun) {
+		Engine::scriptEval(scriptToRun, scriptName);
+	}
+	if (doScriptEval) {
+		Engine::scriptEval(scriptToEval);
 	}
 
 	const int ret = app->exec();
