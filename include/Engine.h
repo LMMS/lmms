@@ -58,13 +58,9 @@ class LMMS_EXPORT LmmsCore : public QObject
 {
 	Q_OBJECT
 	Q_PROPERTY(Mixer* mixer MEMBER s_mixer)
-	/*  TODO
-	static FxMixer * s_fxMixer;
-	static Song * s_song;
-	static BBTrackContainer * s_bbTrackContainer;
-	static ProjectJournal * s_projectJournal;
-	static Ladspa2LMMS * s_ladspaManager;
-	*/
+	Q_PROPERTY(FxMixer* fxMixer MEMBER s_fxMixer)
+	Q_PROPERTY(Song* song MEMBER s_song)
+	Q_PROPERTY(BBTrackContainer* bbTrackContainer MEMBER s_bbTrackContainer)
 
 public:
 	static void init( bool renderOnly );
@@ -125,6 +121,7 @@ public:
 	static QScriptEngine* scriptEngine;
 	static void scriptEnable();
 	static QScriptValue scriptPrint(QScriptContext *context, QScriptEngine *engine);
+	static QScriptValue generateRandom(QScriptContext *context, QScriptEngine *engine);
 	static void scriptEval(std::string script, std::string fileName="");
 	static void scriptEval(QString script, QString fileName="");
 
@@ -160,17 +157,5 @@ private:
 
 	friend class GuiApplication;
 };
-/*
-class LMMS_EXPORT LmmsCoreScriptWrapper : public QObject {
-	Q_OBJECT
-	public slots:
-		// core wrapper
-		Mixer* getMixer();
-		FxMixer* getFXMixer();
-		Song* getSong();
-		BBTrackContainer* getBBTrackContainer();
-		ProjectJournal* getProjectJournal;
-		Ladspa2LMMS* getLADSPAManager;
-};
-*/
+
 #endif

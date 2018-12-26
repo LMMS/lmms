@@ -35,6 +35,7 @@
 #include "BandLimitedWave.h"
 #include <iostream>
 #include <QtCore/QTimer>
+#include <QtCore/QRandomGenerator>
 #include <QtQml/QQmlEngine>
 
 float LmmsCore::s_framesPerTick;
@@ -45,34 +46,7 @@ Song * LmmsCore::s_song = NULL;
 ProjectJournal * LmmsCore::s_projectJournal = NULL;
 Ladspa2LMMS * LmmsCore::s_ladspaManager = NULL;
 DummyTrackContainer * LmmsCore::s_dummyTC = NULL;
-//QScriptEngine LmmsCore::scriptEngine; //QScriptEngine: Must construct a Q(Core)Application before a QScriptEngine
 QScriptEngine* LmmsCore::scriptEngine = NULL;
-
-/* lmms-core wrapper public slots
-Mixer* LmmsCoreScriptWrapper::getMixer() {
-	return LmmsCore::mixer();
-}
-
-FxMixer* LmmsCoreScriptWrapper::getFXMixer() {
-	return LmmsCore::fxMixer();
-}
-
-Song* LmmsCoreScriptWrapper::getSong() {
-	return LmmsCore::getSong();
-}
-
-BBTrackContainer* LmmsCoreScriptWrapper::getBBTrackContainer() {
-	return LmmsCore::getBBTrackContainer();
-}
-
-ProjectJournal* LmmsCoreScriptWrapper::getProjectJournal(){
-	return LmmsCore::projectJournal();
-}
-
-Ladspa2LMMS* LmmsCoreScriptWrapper::getLADSPAManager(){
-	return LmmsCore::getLADSPAManager();
-}
-*/
 
 template <typename T> void addType(QScriptEngine* engine) {
 	auto constructor = engine->newFunction([](QScriptContext*, QScriptEngine* engine){
@@ -84,12 +58,17 @@ template <typename T> void addType(QScriptEngine* engine) {
 
 void LmmsCore::scriptEnable() {
 	qmlRegisterType<Mixer>("lmms.core", 1,0, "Mixer");
+	qmlRegisterType<Song>("lmms.core", 1,0, "Song");
+	qmlRegisterType<BBTrackContainer>("lmms.core", 1,0, "BBTrackContainer");
 
 	LmmsCore::scriptEngine = new QScriptEngine();
 	addType<QTimer>(LmmsCore::scriptEngine);
 
 	QScriptValue fun = LmmsCore::scriptEngine->newFunction(LmmsCore::scriptPrint);
 	LmmsCore::scriptEngine->globalObject().setProperty("print", fun);
+
+	QScriptValue fun2 = LmmsCore::scriptEngine->newFunction(LmmsCore::generateRandom);
+	LmmsCore::scriptEngine->globalObject().setProperty("random", fun2);
 
 	LmmsCore *engine = inst();  // the singleton instance of LmmsCore
 	//auto engine = new LmmsCoreScriptWrapper();
@@ -139,6 +118,10 @@ QScriptValue LmmsCore::scriptPrint(QScriptContext *context, QScriptEngine *engin
 	QScriptValue txt = context->argument(0);
 	std::cout << txt.toString().toUtf8().constData() << std::endl;		
 	return txt;
+}
+QScriptValue LmmsCore::generateRandom(QScriptContext *context, QScriptEngine *engine) {
+	QScriptValue r(engine, QRandomGenerator::global()->generateDouble());
+	return r;
 }
 
 

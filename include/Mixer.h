@@ -69,7 +69,8 @@ class MixerWorkerThread;
 class LMMS_EXPORT Mixer : public QObject
 {
 	Q_OBJECT
-	Q_PROPERTY(float gain MEMBER m_masterGain)
+	Q_PROPERTY(float masterGain MEMBER m_masterGain)
+	//Q_PROPERTY(float gain READ masterGain WRITE setMasterGain)
 
 public:
 	Mixer() {}

@@ -311,6 +311,11 @@ public:
 
 	inline void setLoadOnLauch(bool value) { m_loadOnLaunch = value; }
 
+	Song();
+	Song( const Song & );
+	~Song();
+
+
 public slots:
 	void playSong();
 	void record();
@@ -349,11 +354,6 @@ private slots:
 
 
 private:
-	Song();
-	Song( const Song & );
-	virtual ~Song();
-
-
 	inline tact_t currentTact() const
 	{
 		return m_playPos[m_playMode].getTact();
