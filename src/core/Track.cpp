@@ -95,7 +95,6 @@ TextFloat * TrackContentObjectView::s_textFloat = NULL;
 TrackContentObject::TrackContentObject( Track * track ) :
 	Model( track ),
 	m_track( track ),
-	m_name( QString::null ),
 	m_startPosition(),
 	m_length(),
 	m_mutedModel( false, this, tr( "Mute" ) ),
@@ -791,12 +790,7 @@ void TrackContentObjectView::mousePressEvent( QMouseEvent * me )
 			QString hint = m_action == Move || m_action == MoveSelection
 						? tr( "Press <%1> and drag to make a copy." )
 						: tr( "Press <%1> for free resizing." );
-			m_hint = TextFloat::displayMessage( tr( "Hint" ), hint.arg(
-								#ifdef LMMS_BUILD_APPLE
-								"⌘"),
-								#else
-								"Ctrl"),
-								#endif
+			m_hint = TextFloat::displayMessage( tr( "Hint" ), hint.arg(UI_CTRL_KEY),
 					embed::getIconPixmap( "hint" ), 0 );
 		}
 	}
@@ -875,7 +869,7 @@ void TrackContentObjectView::mouseMoveEvent( QMouseEvent * me )
 			DataFile dataFile = createTCODataFiles( tcoViews );
 
 			// TODO -- thumbnail for all selected
-			QPixmap thumbnail = QPixmap::grabWidget( this ).scaled(
+			QPixmap thumbnail = grab().scaled(
 				128, 128,
 				Qt::KeepAspectRatio,
 				Qt::SmoothTransformation );
@@ -1093,12 +1087,7 @@ void TrackContentObjectView::contextMenuEvent( QContextMenuEvent * cme )
 					tr( "Paste" ), m_tco, SLOT( paste() ) );
 	contextMenu.addSeparator();
 	contextMenu.addAction( embed::getIconPixmap( "muted" ),
-				tr( "Mute/unmute (<%1> + middle click)" ).arg(
-					#ifdef LMMS_BUILD_APPLE
-					"⌘"),
-					#else
-					"Ctrl"),
-					#endif
+				tr( "Mute/unmute (<%1> + middle click)" ).arg(UI_CTRL_KEY),
 						m_tco, SLOT( toggleMute() ) );
 	constructContextMenu( &contextMenu );
 
@@ -1252,7 +1241,7 @@ void TrackContentWidget::addTCOView( TrackContentObjectView * tcov )
  */
 void TrackContentWidget::removeTCOView( TrackContentObjectView * tcov )
 {
-	tcoViewVector::iterator it = qFind( m_tcoViews.begin(),
+	tcoViewVector::iterator it = std::find( m_tcoViews.begin(),
 						m_tcoViews.end(),
 						tcov );
 	if( it != m_tcoViews.end() )
@@ -1734,12 +1723,7 @@ TrackOperationsWidget::TrackOperationsWidget( TrackView * parent ) :
 	m_trackView( parent )          /*!< The parent track view */
 {
 	ToolTip::add( this, tr( "Press <%1> while clicking on move-grip "
-				"to begin a new drag'n'drop action." ).arg(
-					#ifdef LMMS_BUILD_APPLE
-					"⌘") );
-					#else
-					"Ctrl") );
-					#endif
+				"to begin a new drag'n'drop action." ).arg(UI_CTRL_KEY) );
 
 	QMenu * toMenu = new QMenu( this );
 	toMenu->setFont( pointSize<9>( toMenu->font() ) );
@@ -1823,8 +1807,7 @@ void TrackOperationsWidget::mousePressEvent( QMouseEvent * me )
 		m_trackView->getTrack()->saveState( dataFile, dataFile.content() );
 		new StringPairDrag( QString( "track_%1" ).arg(
 					m_trackView->getTrack()->type() ),
-			dataFile.toString(), QPixmap::grabWidget(
-				m_trackView->getTrackSettingsWidget() ),
+			dataFile.toString(), m_trackView->getTrackSettingsWidget()->grab(),
 									this );
 	}
 	else if( me->button() == Qt::LeftButton )
@@ -1896,6 +1879,7 @@ void TrackOperationsWidget::cloneTrack()
 void TrackOperationsWidget::clearTrack()
 {
 	Track * t = m_trackView->getTrack();
+	t->addJournalCheckPoint();
 	t->lock();
 	t->deleteTCOs();
 	t->unlock();
@@ -2141,8 +2125,9 @@ void Track::saveSettings( QDomDocument & doc, QDomElement & element )
 	}
 	element.setAttribute( "type", type() );
 	element.setAttribute( "name", name() );
-	element.setAttribute( "muted", isMuted() );
-	element.setAttribute( "solo", isSolo() );
+	m_mutedModel.saveSettings( doc, element, "muted" );
+	m_soloModel.saveSettings( doc, element, "solo" );
+
 	if( m_height >= MINIMAL_TRACK_HEIGHT )
 	{
 		element.setAttribute( "trackheight", m_height );
@@ -2194,8 +2179,8 @@ void Track::loadSettings( const QDomElement & element )
 	setName( element.hasAttribute( "name" ) ? element.attribute( "name" ) :
 			element.firstChild().toElement().attribute( "name" ) );
 
-	setMuted( element.attribute( "muted" ).toInt() );
-	setSolo( element.attribute( "solo" ).toInt() );
+	m_mutedModel.loadSettings( element, "muted" );
+	m_soloModel.loadSettings( element, "solo" );
 
 	if( m_simpleSerializingMode )
 	{
@@ -2228,8 +2213,9 @@ void Track::loadSettings( const QDomElement & element )
 			{
 				loadTrackSpecificSettings( node.toElement() );
 			}
-			else if(
-			!node.toElement().attribute( "metadata" ).toInt() )
+			else if( node.nodeName() != "muted"
+			&& node.nodeName() != "solo"
+			&& !node.toElement().attribute( "metadata" ).toInt() )
 			{
 				TrackContentObject * tco = createTCO(
 								MidiTime( 0 ) );
@@ -2273,7 +2259,7 @@ TrackContentObject * Track::addTCO( TrackContentObject * tco )
  */
 void Track::removeTCO( TrackContentObject * tco )
 {
-	tcoVector::iterator it = qFind( m_trackContentObjects.begin(),
+	tcoVector::iterator it = std::find( m_trackContentObjects.begin(),
 					m_trackContentObjects.end(),
 					tco );
 	if( it != m_trackContentObjects.end() )
@@ -2345,7 +2331,7 @@ TrackContentObject * Track::getTCO( int tcoNum )
 int Track::getTCONum( const TrackContentObject * tco )
 {
 //	for( int i = 0; i < getTrackContentWidget()->numOfTCOs(); ++i )
-	tcoVector::iterator it = qFind( m_trackContentObjects.begin(),
+	tcoVector::iterator it = std::find( m_trackContentObjects.begin(),
 					m_trackContentObjects.end(),
 					tco );
 	if( it != m_trackContentObjects.end() )

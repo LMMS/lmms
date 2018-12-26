@@ -74,11 +74,7 @@ PatchesDialog::PatchesDialog( QWidget * pParent, Qt::WindowFlags wflags )
 	// Soundfonts list view...
 	QHeaderView * pHeader = m_progListView->header();
 	pHeader->setDefaultAlignment( Qt::AlignLeft );
-#if QT_VERSION >= 0x050000
 	pHeader->setSectionsMovable( false );
-#else
-	pHeader->setMovable( false );
-#endif
 	pHeader->setStretchLastSection( true );
 
 	m_progListView->resizeColumnToContents( 0 );	// Prog.

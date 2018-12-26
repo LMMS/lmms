@@ -41,7 +41,7 @@
 #include "Mixer.h"
 
 #include "embed.h"
-
+#include "plugin_export.h"
 
 extern "C"
 {
@@ -618,7 +618,7 @@ malletsSynth::malletsSynth( const StkFloat _pitch,
 	try
 	{
 		Stk::setSampleRate( _sample_rate );
-		Stk::setRawwavePath( QDir( s_stkDir ).absolutePath().toLatin1().constData() );
+		Stk::setRawwavePath( QDir( s_stkDir ).absolutePath().toLocal8Bit().constData() );
 #ifndef LMMS_DEBUG
 		Stk::showWarnings( false );
 #endif
@@ -667,7 +667,7 @@ malletsSynth::malletsSynth( const StkFloat _pitch,
 	try
 	{
 		Stk::setSampleRate( _sample_rate );
-		Stk::setRawwavePath( QDir( s_stkDir ).absolutePath().toLatin1().constData() );
+		Stk::setRawwavePath( QDir( s_stkDir ).absolutePath().toLocal8Bit().constData() );
 #ifndef LMMS_DEBUG
 		Stk::showWarnings( false );
 #endif
@@ -714,7 +714,7 @@ malletsSynth::malletsSynth( const StkFloat _pitch,
 	try
 	{
 		Stk::setSampleRate( _sample_rate );
-		Stk::setRawwavePath( QDir( s_stkDir ).absolutePath().toLatin1().constData() );
+		Stk::setRawwavePath( QDir( s_stkDir ).absolutePath().toLocal8Bit().constData() );
 #ifndef LMMS_DEBUG
 		Stk::showWarnings( false );
 #endif
@@ -752,7 +752,7 @@ extern "C"
 {
 
 // necessary for getting instance out of shared lib
-Plugin * PLUGIN_EXPORT lmms_plugin_main( Model *, void * _data )
+PLUGIN_EXPORT Plugin * lmms_plugin_main( Model *, void * _data )
 {
 	return new malletsInstrument( static_cast<InstrumentTrack *>( _data ) );
 }

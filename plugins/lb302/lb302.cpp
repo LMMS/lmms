@@ -46,7 +46,7 @@
 #include "BandLimitedWave.h"
 
 #include "embed.h"
-
+#include "plugin_export.h"
 
 // Envelope Recalculation period
 #define ENVINC 64
@@ -434,11 +434,7 @@ QString lb302Synth::nodeName() const
 // OBSOLETE. Break apart once we get Q_OBJECT to work. >:[
 void lb302Synth::recalcFilter()
 {
-#if QT_VERSION >= 0x050000
 	vcf.load()->recalc();
-#else
-	vcf->recalc();
-#endif
 
 	// THIS IS OLD 3pole/24dB code, I may reintegrate it.  Don't need it
 	// right now.   Should be toggled by LB_24_RES_TRICK at the moment.
@@ -464,11 +460,7 @@ int lb302Synth::process(sampleFrame *outbuf, const int size)
 	float samp;
 
 	// Hold on to the current VCF, and use it throughout this period
-#if QT_VERSION >= 0x050000
 	lb302Filter *filter = vcf.loadAcquire();
-#else
-	lb302Filter *filter = vcf;
-#endif
 
 	if( release_frame == 0 || ! m_playingNote ) 
 	{
@@ -692,11 +684,7 @@ void lb302Synth::initNote( lb302Note *n)
 
 	if(n->dead ==0){
 		// Swap next two blocks??
-#if QT_VERSION >= 0x050000
 		vcf.load()->playNote();
-#else
-		vcf->playNote();
-#endif
 		// Ensure envelope is recalculated
 		vcf_envpos = ENVINC;
 

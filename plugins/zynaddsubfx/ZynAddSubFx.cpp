@@ -40,6 +40,7 @@
 #include "InstrumentPlayHandle.h"
 #include "InstrumentTrack.h"
 #include "gui_templates.h"
+#include "Song.h"
 #include "StringPairDrag.h"
 #include "RemoteZynAddSubFx.h"
 #include "LocalZynAddSubFx.h"
@@ -47,8 +48,7 @@
 #include "ControllerConnection.h"
 
 #include "embed.h"
-
-
+#include "plugin_export.h"
 
 extern "C"
 {
@@ -240,7 +240,6 @@ void ZynAddSubFxInstrument::loadSettings( const QDomElement & _this )
 	doc.appendChild( doc.importNode( data, true ) );
 
 	QTemporaryFile tf;
-	tf.setAutoRemove( false );
 	if( tf.open() )
 	{
 		QByteArray a = doc.toString( 0 ).toUtf8();
@@ -326,7 +325,7 @@ QString ZynAddSubFxInstrument::nodeName() const
 
 void ZynAddSubFxInstrument::play( sampleFrame * _buf )
 {
-	m_pluginMutex.lock();
+	if (!m_pluginMutex.tryLock(Engine::getSong()->isExporting() ? -1 : 0)) {return;}
 	if( m_remotePlugin )
 	{
 		m_remotePlugin->process( NULL, _buf );
@@ -642,8 +641,6 @@ void ZynAddSubFxView::toggleUI()
 			connect( model->m_remotePlugin, SIGNAL( clickedCloseButton() ),
 						m_toggleUIButton, SLOT( toggle() ) );
 		}
-
-		ControllerConnection::finalizeConnections();
 	}
 }
 

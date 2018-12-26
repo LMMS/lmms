@@ -33,12 +33,14 @@
 #include <QWidget>
 
 #include "JournallingObject.h"
-#include "communication.h"
+#include "RemotePlugin.h"
+
+#include "vstbase_export.h"
 
 class vstSubWin;
 
 
-class PLUGIN_EXPORT VstPlugin : public RemotePlugin, public JournallingObject
+class VSTBASE_EXPORT VstPlugin : public RemotePlugin, public JournallingObject
 {
 	Q_OBJECT
 public:
@@ -54,8 +56,10 @@ public:
 		return m_pluginWindowID != 0;
 	}
 
-	void hideEditor();
-	void toggleEditor();
+	/// Same as pluginWidget(), but can be overwritten in sub-classes to modify
+	/// behavior the UI. This is used in VstInstrumentPlugin to wrap the VST UI
+	/// in a QMdiSubWindow
+	virtual QWidget* editor();
 
 	inline const QString & name() const
 	{
@@ -93,7 +97,7 @@ public:
 	void setParameterDump( const QMap<QString, QString> & _pdump );
 
 
-	QWidget * pluginWidget( bool _top_widget = true );
+	QWidget * pluginWidget();
 
 	virtual void loadSettings( const QDomElement & _this );
 	virtual void saveSettings( QDomDocument & _doc, QDomElement & _this );
@@ -103,9 +107,8 @@ public:
 		return "vstplugin";
 	}
 
-	void toggleUI() override;
 
-	void createUI( QWidget *parent, bool isEffect );
+	virtual void createUI(QWidget *parent);
 	bool eventFilter(QObject *obj, QEvent *event);
 
 	QString embedMethod() const;
@@ -123,6 +126,7 @@ public slots:
 
 	void showUI() override;
 	void hideUI() override;
+	void toggleUI() override;
 
 	void handleClientEmbed();
 
@@ -130,14 +134,13 @@ private:
 	void loadChunk( const QByteArray & _chunk );
 	QByteArray saveChunk();
 
+	void toggleEditorVisibility(int visible = -1);
+
 	QString m_plugin;
 	QPointer<QWidget> m_pluginWidget;
-	QPointer<vstSubWin> m_pluginSubWindow;
 	int m_pluginWindowID;
 	QSize m_pluginGeometry;
 	const QString m_embedMethod;
-
-	bool m_badDllFormat;
 
 	QString m_name;
 	int m_version;

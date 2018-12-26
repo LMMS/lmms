@@ -80,7 +80,7 @@ Esteban Viveros</translation>
     </message>
     <message>
         <source>LEFT</source>
-        <translation>ESQUERDA</translation>
+        <translation>LEFT</translation>
     </message>
     <message>
         <source>Left gain:</source>
@@ -88,7 +88,7 @@ Esteban Viveros</translation>
     </message>
     <message>
         <source>RIGHT</source>
-        <translation>DIREITA</translation>
+        <translation>RIGHT</translation>
     </message>
     <message>
         <source>Right gain:</source>
@@ -705,11 +705,11 @@ Esteban Viveros</translation>
     <name>BitcrushControlDialog</name>
     <message>
         <source>IN</source>
-        <translation>DENTRO</translation>
+        <translation>IN</translation>
     </message>
     <message>
         <source>OUT</source>
-        <translation>FORA</translation>
+        <translation>OUT</translation>
     </message>
     <message>
         <source>GAIN</source>
@@ -3099,7 +3099,7 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     </message>
     <message>
         <source>VELOCITY</source>
-        <translation>INTENSIDADE</translation>
+        <translation>VELOCITY</translation>
     </message>
     <message>
         <source>ENABLE MIDI OUTPUT</source>
@@ -7936,7 +7936,7 @@ Por favor certifique-se que você tem permissões de leitura para o arquivo e pa
     </message>
     <message>
         <source>RELEASE</source>
-        <translation>LANÇAMENTO</translation>
+        <translation>RELEASE</translation>
     </message>
     <message>
         <source>Peak release time:</source>

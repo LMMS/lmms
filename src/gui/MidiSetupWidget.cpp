@@ -39,8 +39,8 @@ MidiSetupWidget::MidiSetupWidget(const QString & caption, const QString & config
 	m_configSection(configSection),
 	m_device(nullptr)
 {
-	// Supply devName=QString::Null() (distinct from QString(""))
-	// to indicate that there is no editable device field.
+	// Supply devName=QString() (distinct from QString(""))
+	// to indicate that there is no editable device field
 	if (!devName.isNull())
 	{
 		m_device = new QLineEdit(devName, this);

@@ -36,7 +36,7 @@ class PeakControllerEffect;
 typedef QVector<PeakControllerEffect *> PeakControllerEffectVector;
 
 
-class EXPORT PeakController : public Controller
+class LMMS_EXPORT PeakController : public Controller
 {
 	Q_OBJECT
 public:

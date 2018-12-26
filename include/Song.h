@@ -48,7 +48,7 @@ const bpm_t MaxTempo = 999;
 const tick_t MaxSongLength = 9999 * DefaultTicksPerTact;
 
 
-class EXPORT Song : public TrackContainer
+class LMMS_EXPORT Song : public TrackContainer
 {
 	Q_OBJECT
 	mapPropertyFromModel( int,getTempo,setTempo,m_tempoModel );
@@ -87,10 +87,19 @@ public:
 		{
 			return m_currentFrame;
 		}
+		inline void setJumped( const bool jumped )
+		{
+			m_jumped = jumped;
+		}
+		inline bool jumped() const
+		{
+			return m_jumped;
+		}
 		TimeLineWidget * m_timeLine;
 
 	private:
 		float m_currentFrame;
+		bool m_jumped;
 
 	} ;
 

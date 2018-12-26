@@ -496,7 +496,7 @@ QString InstrumentTrack::instrumentName() const
 	{
 		return m_instrument->displayName();
 	}
-	return QString::null;
+	return QString();
 }
 
 
@@ -1611,8 +1611,6 @@ void InstrumentTrackWindow::saveSettingsBtnClicked()
 		!sfd.selectedFiles().isEmpty() &&
 		!sfd.selectedFiles().first().isEmpty() )
 	{
-		DataFile::LocaleHelper localeHelper( DataFile::LocaleHelper::ModeSave );
-
 		DataFile dataFile( DataFile::InstrumentTrackSettings );
 		m_track->setSimpleSerializing();
 		m_track->saveSettings( dataFile, dataFile.content() );

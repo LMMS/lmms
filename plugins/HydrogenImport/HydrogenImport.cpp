@@ -19,6 +19,8 @@
 #include "BBTrackContainer.h"
 #include "Instrument.h"
 
+#include "plugin_export.h"
+
 #define MAX_LAYERS 4
 extern "C"
 {

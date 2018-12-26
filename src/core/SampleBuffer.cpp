@@ -175,11 +175,6 @@ void SampleBuffer::update( bool _keep_settings )
 	else if( !m_audioFile.isEmpty() )
 	{
 		QString file = tryToMakeAbsolute( m_audioFile );
-#ifdef LMMS_BUILD_WIN32
-		char * f = qstrdup( file.toLocal8Bit().constData() );
-#else
-		char * f = qstrdup( file.toUtf8().constData() );
-#endif
 		int_sample_t * buf = NULL;
 		sample_t * fbuf = NULL;
 		ch_cnt_t channels = DEFAULT_CHANNELS;
@@ -193,10 +188,13 @@ void SampleBuffer::update( bool _keep_settings )
 		}
 		else
 		{
+			// Use QFile to handle unicode file names on Windows
+			QFile f(file);
+			f.open(QIODevice::ReadOnly);
 			SNDFILE * snd_file;
 			SF_INFO sf_info;
 			sf_info.format = 0;
-			if( ( snd_file = sf_open( f, SFM_READ, &sf_info ) ) != NULL )
+			if( ( snd_file = sf_open_fd( f.handle(), SFM_READ, &sf_info, false ) ) != NULL )
 			{
 				f_cnt_t frames = sf_info.frames;
 				int rate = sf_info.samplerate;
@@ -206,6 +204,7 @@ void SampleBuffer::update( bool _keep_settings )
 				}
 				sf_close( snd_file );
 			}
+			f.close();
 		}
 
 		if( !fileLoadError )
@@ -216,28 +215,26 @@ void SampleBuffer::update( bool _keep_settings )
 			// decoder first if filename extension matches "ogg"
 			if( m_frames == 0 && fileInfo.suffix() == "ogg" )
 			{
-				m_frames = decodeSampleOGGVorbis( f, buf, channels, samplerate );
+				m_frames = decodeSampleOGGVorbis( file, buf, channels, samplerate );
 			}
 #endif
 			if( m_frames == 0 )
 			{
-				m_frames = decodeSampleSF( f, fbuf, channels,
+				m_frames = decodeSampleSF( file, fbuf, channels,
 									samplerate );
 			}
 #ifdef LMMS_HAVE_OGGVORBIS
 			if( m_frames == 0 )
 			{
-				m_frames = decodeSampleOGGVorbis( f, buf, channels,
+				m_frames = decodeSampleOGGVorbis( file, buf, channels,
 									samplerate );
 			}
 #endif
 			if( m_frames == 0 )
 			{
-				m_frames = decodeSampleDS( f, buf, channels,
+				m_frames = decodeSampleDS( file, buf, channels,
 									samplerate );
 			}
-
-			delete[] f;
 		}
 
 		if ( m_frames == 0 || fileLoadError )  // if still no frames, bail
@@ -288,7 +285,6 @@ void SampleBuffer::update( bool _keep_settings )
 		else
 		{
 			fprintf( stderr, "%s\n", message.toUtf8().constData() );
-			exit( EXIT_FAILURE );
 		}
 	}
 }
@@ -393,7 +389,7 @@ void SampleBuffer::normalizeSampleRate( const sample_rate_t _src_sr,
 
 
 
-f_cnt_t SampleBuffer::decodeSampleSF( const char * _f,
+f_cnt_t SampleBuffer::decodeSampleSF(QString _f,
 					sample_t * & _buf,
 					ch_cnt_t & _channels,
 					sample_rate_t & _samplerate )
@@ -404,7 +400,11 @@ f_cnt_t SampleBuffer::decodeSampleSF( const char * _f,
 	f_cnt_t frames = 0;
 	bool sf_rr = false;
 
-	if( ( snd_file = sf_open( _f, SFM_READ, &sf_info ) ) != NULL )
+
+	// Use QFile to handle unicode file names on Windows
+	QFile f(_f);
+	f.open(QIODevice::ReadOnly);
+	if( ( snd_file = sf_open_fd( f.handle(), SFM_READ, &sf_info, false ) ) != NULL )
 	{
 		frames = sf_info.frames;
 
@@ -430,6 +430,8 @@ f_cnt_t SampleBuffer::decodeSampleSF( const char * _f,
 				"sample %s: %s", _f, sf_strerror( NULL ) );
 #endif
 	}
+	f.close();
+
 	//write down either directly or convert i->f depending on file type
 
 	if ( frames > 0 && _buf != NULL )
@@ -495,7 +497,7 @@ long qfileTellCallback( void * _udata )
 
 
 
-f_cnt_t SampleBuffer::decodeSampleOGGVorbis( const char * _f,
+f_cnt_t SampleBuffer::decodeSampleOGGVorbis( QString _f,
 						int_sample_t * & _buf,
 						ch_cnt_t & _channels,
 						sample_rate_t & _samplerate )
@@ -591,7 +593,7 @@ f_cnt_t SampleBuffer::decodeSampleOGGVorbis( const char * _f,
 
 
 
-f_cnt_t SampleBuffer::decodeSampleDS( const char * _f,
+f_cnt_t SampleBuffer::decodeSampleDS( QString _f,
 						int_sample_t * & _buf,
 						ch_cnt_t & _channels,
 						sample_rate_t & _samplerate )
@@ -1009,12 +1011,12 @@ QString SampleBuffer::openAudioFile() const
 	{
 		if( ofd.selectedFiles().isEmpty() )
 		{
-			return QString::null;
+			return QString();
 		}
 		return tryToMakeRelative( ofd.selectedFiles()[0] );
 	}
 
-	return QString::null;
+	return QString();
 }
 
 

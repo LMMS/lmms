@@ -131,7 +131,7 @@ FxMixerView::FxMixerView() :
 	ml->addWidget( channelArea, 1, Qt::AlignTop );
 
 	// show the add new effect channel button
-	QPushButton * newChannelBtn = new QPushButton( embed::getIconPixmap( "new_channel" ), QString::null, this );
+	QPushButton * newChannelBtn = new QPushButton( embed::getIconPixmap( "new_channel" ), QString(), this );
 	newChannelBtn->setObjectName( "newChannelBtn" );
 	newChannelBtn->setFixedSize( fxLineSize );
 	connect( newChannelBtn, SIGNAL( clicked() ), this, SLOT( addNewChannel() ) );
@@ -590,7 +590,7 @@ void FxMixerView::updateFaders()
 	{
 		const float opl = m_fxChannelViews[i]->m_fader->getPeak_L();
 		const float opr = m_fxChannelViews[i]->m_fader->getPeak_R();
-		const float fall_off = 1.2;
+		const float fallOff = 1.07;
 		if( m->effectChannel(i)->m_peakLeft > opl )
 		{
 			m_fxChannelViews[i]->m_fader->setPeak_L( m->effectChannel(i)->m_peakLeft );
@@ -598,7 +598,7 @@ void FxMixerView::updateFaders()
 		}
 		else
 		{
-			m_fxChannelViews[i]->m_fader->setPeak_L( opl/fall_off );
+			m_fxChannelViews[i]->m_fader->setPeak_L( opl/fallOff );
 		}
 
 		if( m->effectChannel(i)->m_peakRight > opr )
@@ -608,7 +608,7 @@ void FxMixerView::updateFaders()
 		}
 		else
 		{
-			m_fxChannelViews[i]->m_fader->setPeak_R( opr/fall_off );
+			m_fxChannelViews[i]->m_fader->setPeak_R( opr/fallOff );
 		}
 	}
 }

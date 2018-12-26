@@ -129,13 +129,13 @@ public:
 
 	void update( void );
 
-	inline QString fullName( QString path = QString::null )
+	inline QString fullName( QString path = QString() )
 	{
-		if( path == QString::null )
+		if( path.isEmpty() )
 		{
 			path = m_directories[0];
 		}
-		if( path != QString::null )
+		if( ! path.isEmpty() )
 		{
 			path += QDir::separator();
 		}

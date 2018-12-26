@@ -27,11 +27,7 @@
 #include <QDir>
 #include <QMessageBox>
 #include <QApplication>
-#if QT_VERSION >= 0x050000
 #include <QStandardPaths>
-#else
-#include <QDesktopServices>
-#endif
 #include <QtCore/QTextStream>
 
 #include "ConfigManager.h"
@@ -56,11 +52,7 @@ ConfigManager * ConfigManager::s_instanceOfMe = NULL;
 
 
 ConfigManager::ConfigManager() :
-	#if QT_VERSION >= 0x050000
 	m_workingDir(QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation) + "/lmms/"),
-	#else
-	m_workingDir(QDesktopServices::storageLocation(QDesktopServices::DocumentsLocation) + "/lmms/"),
-	#endif
 	m_dataDir("data:/"),
 	m_vstDir(m_workingDir + "vst/"),
 	m_sf2Dir(m_workingDir + SF2_PATH),
@@ -212,13 +204,8 @@ QStringList ConfigManager::availabeVstEmbedMethods()
 	methods.append("win32");
 #endif
 #ifdef LMMS_BUILD_LINUX
-#if QT_VERSION >= 0x050000
 	if (static_cast<QGuiApplication*>(QApplication::instance())->
 		platformName() == "xcb")
-#else
-	if (qgetenv("QT_QPA_PLATFORM").isNull()
-		|| qgetenv("QT_QPA_PLATFORM") == "xcb")
-#endif
 	{
 		methods.append("xembed");
 	}

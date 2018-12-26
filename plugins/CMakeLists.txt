@@ -1,5 +1,5 @@
-SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
-SET(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
+SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}")
+SET(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}")
 SET(CMAKE_DEBUG_POSTFIX "")
 
 # Enable C++11
@@ -11,6 +11,7 @@ ENDIF()
 
 INCLUDE_DIRECTORIES(
 	${SAMPLERATE_INCLUDE_DIRS}
+	"${CMAKE_BINARY_DIR}/src"
 )
 
 SET(PLUGIN_LIST "" CACHE STRING "List of plug-ins to build")
@@ -75,8 +76,8 @@ IF("${PLUGIN_LIST}" STREQUAL "")
 		stereo_enhancer
 		stereo_matrix
 		stk
-		vestige
 		vst_base
+		vestige
 		VstEffect
 		watsyn
 		waveshaper
@@ -90,15 +91,8 @@ ENDIF("${PLUGIN_LIST}" STREQUAL "")
 IF(MSVC)
 	SET(MSVC_INCOMPATIBLE_PLUGINS
 		LadspaEffect
-		monstro
-		organic
-		ReverbSC
 		sid
-		vestige
-		vibed
-		vst_base
-		VstEffect
-		Xpressive
+		#VstEffect
 		zynaddsubfx
 	)
 	message(WARNING "Compiling with MSVC. The following plugins are not available: ${MSVC_INCOMPATIBLE_PLUGINS}")

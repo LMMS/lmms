@@ -26,8 +26,11 @@
 #include <QDomDocument>
 #include <QDir>
 #include <QApplication>
+#include <QFile>
 #include <QMessageBox>
 #include <QProgressDialog>
+
+#include <sstream>
 
 #include "MidiImport.h"
 #include "TrackContainer.h"
@@ -41,8 +44,10 @@
 #include "MainWindow.h"
 #include "MidiTime.h"
 #include "debug.h"
-#include "embed.h"
 #include "Song.h"
+
+#include "embed.h"
+#include "plugin_export.h"
 
 #include "portsmf/allegro.h"
 
@@ -102,7 +107,7 @@ bool MidiImport::tryImport( TrackContainer* tc )
 	{
 		QMessageBox::information( gui->mainWindow(),
 			tr( "Setup incomplete" ),
-			tr( "You do not have set up a default soundfont in "
+			tr( "You have not set up a default soundfont in "
 				"the settings dialog (Edit->Settings). "
 				"Therefore no sound will be played back after "
 				"importing this MIDI file. You should download "
@@ -279,8 +284,6 @@ public:
 
 bool MidiImport::readSMF( TrackContainer* tc )
 {
-	QString filename = file().fileName();
-	closeFile();
 
 	const int preTrackSteps = 2;
 	QProgressDialog pd( TrackContainer::tr( "Importing MIDI-file..." ),
@@ -291,7 +294,11 @@ bool MidiImport::readSMF( TrackContainer* tc )
 
 	pd.setValue( 0 );
 
-	Alg_seq_ptr seq = new Alg_seq(filename.toLocal8Bit(), true);
+	std::stringstream stream;
+	QByteArray arr = readAllData();
+	stream.str(std::string(arr.constData(), arr.size()));
+
+	Alg_seq_ptr seq = new Alg_seq(stream, true);
 	seq->convert_to_beats();
 
 	pd.setMaximum( seq->tracks()  + preTrackSteps );

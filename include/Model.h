@@ -28,14 +28,14 @@
 #include <QtCore/QString>
 #include <QtCore/QObject>
 
-#include "export.h"
+#include "lmms_export.h"
 
 
-class EXPORT Model : public QObject
+class LMMS_EXPORT Model : public QObject
 {
 	Q_OBJECT
 public:
-	Model( Model * _parent, QString _display_name = QString::null,
+	Model( Model * _parent, QString _display_name = QString(),
 					bool _default_constructed = false ) :
 		QObject( _parent ),
 		m_displayName( _display_name ),

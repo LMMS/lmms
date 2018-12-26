@@ -37,7 +37,7 @@ class InstrumentTrack;
 class TrackContainerView;
 
 
-class EXPORT TrackContainer : public Model, public JournallingObject
+class LMMS_EXPORT TrackContainer : public Model, public JournallingObject
 {
 	Q_OBJECT
 public:

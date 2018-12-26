@@ -27,7 +27,7 @@
 
 #include <QtCore/QString>
 
-#include "export.h"
+#include "lmms_export.h"
 
 
 class QDomDocument;
@@ -36,7 +36,7 @@ class QDomElement;
 class SerializingObjectHook;
 
 
-class EXPORT SerializingObject
+class LMMS_EXPORT SerializingObject
 {
 public:
 	SerializingObject();

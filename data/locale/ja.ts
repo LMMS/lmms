@@ -3377,7 +3377,7 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     </message>
     <message>
         <source>PAN</source>
-        <translation>パニング</translation>
+        <translation>PAN</translation>
     </message>
     <message>
         <source>MIDI</source>
@@ -6142,7 +6142,7 @@ Reason: &quot;%2&quot;</source>
     </message>
     <message>
         <source>PAN</source>
-        <translation>パニング</translation>
+        <translation>PAN</translation>
     </message>
 </context>
 <context>

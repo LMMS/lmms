@@ -73,13 +73,16 @@ SampleTCO::SampleTCO( Track * _track ) :
 		connect( timeLine, SIGNAL( positionMarkerMoved() ), this, SLOT( playbackPositionChanged() ) );
 	}
 	//playbutton clicked or space key / on Export Song set isPlaying to false
-	connect( Engine::getSong(), SIGNAL( playbackStateChanged() ), this, SLOT( playbackPositionChanged() ) );
+	connect( Engine::getSong(), SIGNAL( playbackStateChanged() ),
+			this, SLOT( playbackPositionChanged() ), Qt::DirectConnection );
 	//care about loops
-	connect( Engine::getSong(), SIGNAL( updateSampleTracks() ), this, SLOT( playbackPositionChanged() ) );
+	connect( Engine::getSong(), SIGNAL( updateSampleTracks() ),
+			this, SLOT( playbackPositionChanged() ), Qt::DirectConnection );
 	//care about mute TCOs
 	connect( this, SIGNAL( dataChanged() ), this, SLOT( playbackPositionChanged() ) );
 	//care about mute track
-	connect( getTrack()->getMutedModel(), SIGNAL( dataChanged() ),this, SLOT( playbackPositionChanged() ) );
+	connect( getTrack()->getMutedModel(), SIGNAL( dataChanged() ),
+			this, SLOT( playbackPositionChanged() ), Qt::DirectConnection );
 	//care about TCO position
 	connect( this, SIGNAL( positionChanged() ), this, SLOT( updateTrackTcos() ) );
 
@@ -338,12 +341,7 @@ void SampleTCOView::contextMenuEvent( QContextMenuEvent * _cme )
 					tr( "Paste" ), m_tco, SLOT( paste() ) );
 	contextMenu.addSeparator();
 	contextMenu.addAction( embed::getIconPixmap( "muted" ),
-				tr( "Mute/unmute (<%1> + middle click)" ).arg(
-					#ifdef LMMS_BUILD_APPLE
-					"⌘"),
-					#else
-					"Ctrl"),
-					#endif
+				tr( "Mute/unmute (<%1> + middle click)" ).arg(UI_CTRL_KEY),
 						m_tco, SLOT( toggleMute() ) );
 	/*contextMenu.addAction( embed::getIconPixmap( "record" ),
 				tr( "Set/clear record" ),
@@ -764,15 +762,12 @@ SampleTrackView::SampleTrackView( SampleTrack * _t, TrackContainerView* tcv ) :
 	m_volumeKnob->setVolumeKnob( true );
 	m_volumeKnob->setModel( &_t->m_volumeModel );
 	m_volumeKnob->setHintText( tr( "Channel volume:" ), "%" );
-	if( ConfigManager::inst()->value( "ui",
-					  "compacttrackbuttons" ).toInt() )
-	{
-		m_volumeKnob->move( DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT-2*24, 2 );
-	}
-	else
-	{
-		m_volumeKnob->move( DEFAULT_SETTINGS_WIDGET_WIDTH-2*24, 2 );
-	}
+
+	int settingsWidgetWidth = ConfigManager::inst()->
+					value( "ui", "compacttrackbuttons" ).toInt()
+				? DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT
+				: DEFAULT_SETTINGS_WIDGET_WIDTH;
+	m_volumeKnob->move( settingsWidgetWidth - 2 * 24, 2 );
 	m_volumeKnob->setLabel( tr( "VOL" ) );
 	m_volumeKnob->show();
 
@@ -780,7 +775,7 @@ SampleTrackView::SampleTrackView( SampleTrack * _t, TrackContainerView* tcv ) :
 							tr( "Panning" ) );
 	m_panningKnob->setModel( &_t->m_panningModel );
 	m_panningKnob->setHintText( tr( "Panning:" ), "%" );
-	m_panningKnob->move( DEFAULT_SETTINGS_WIDGET_WIDTH-24, 2 );
+	m_panningKnob->move( settingsWidgetWidth - 24, 2 );
 	m_panningKnob->setLabel( tr( "PAN" ) );
 	m_panningKnob->show();
 

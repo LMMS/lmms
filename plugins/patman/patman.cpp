@@ -44,7 +44,7 @@
 
 #include "embed.h"
 
-
+#include "plugin_export.h"
 
 
 extern "C"
@@ -78,7 +78,6 @@ PLUGIN_EXPORT Plugin * lmms_plugin_main( Model *, void * _data )
 
 patmanInstrument::patmanInstrument( InstrumentTrack * _instrument_track ) :
 	Instrument( _instrument_track, &patman_plugin_descriptor ),
-	m_patchFile( QString::null ),
 	m_loopedModel( true, this ),
 	m_tunedModel( true, this )
 {
@@ -182,7 +181,7 @@ void patmanInstrument::setFile( const QString & _patch_file, bool _rename )
 {
 	if( _patch_file.size() <= 0 )
 	{
-		m_patchFile = QString::null;
+		m_patchFile = QString();
 		return;
 	}
 

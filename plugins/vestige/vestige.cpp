@@ -22,7 +22,13 @@
  *
  */
 
+#include <QtCore/QtGlobal>
+
+#include "VstPlugin.h"
+
 #include "vestige.h"
+
+#include <memory>
 
 #include <QDropEvent>
 #include <QMessageBox>
@@ -39,16 +45,18 @@
 #include "gui_templates.h"
 #include "InstrumentPlayHandle.h"
 #include "InstrumentTrack.h"
-#include "VstPlugin.h"
+#include "LocaleHelper.h"
 #include "MainWindow.h"
 #include "Mixer.h"
 #include "GuiApplication.h"
 #include "PixmapButton.h"
 #include "SampleBuffer.h"
+#include "Song.h"
 #include "StringPairDrag.h"
 #include "TextFloat.h"
 #include "ToolTip.h"
 #include "FileDialog.h"
+
 
 #include "embed.h"
 
@@ -57,7 +65,7 @@
 extern "C"
 {
 
-Plugin::Descriptor PLUGIN_EXPORT vestige_plugin_descriptor =
+Plugin::Descriptor Q_DECL_EXPORT  vestige_plugin_descriptor =
 {
 	STRINGIFY( PLUGIN_NAME ),
 	"VeSTige",
@@ -72,6 +80,59 @@ Plugin::Descriptor PLUGIN_EXPORT vestige_plugin_descriptor =
 } ;
 
 }
+
+
+class vstSubWin : public QMdiSubWindow
+{
+public:
+	vstSubWin( QWidget * _parent ) :
+		QMdiSubWindow( _parent )
+	{
+		setAttribute( Qt::WA_DeleteOnClose, false );
+		setWindowFlags( Qt::WindowCloseButtonHint );
+	}
+
+	virtual ~vstSubWin()
+	{
+	}
+
+	virtual void closeEvent( QCloseEvent * e )
+	{
+		// ignore close-events - for some reason otherwise the VST GUI
+		// remains hidden when re-opening
+		hide();
+		e->ignore();
+	}
+};
+
+
+class VstInstrumentPlugin : public VstPlugin
+{
+public:
+	using VstPlugin::VstPlugin;
+
+	void createUI( QWidget *parent ) override
+	{
+		Q_UNUSED(parent);
+		if ( embedMethod() != "none" ) {
+			m_pluginSubWindow.reset(new vstSubWin( gui->mainWindow()->workspace() ));
+			VstPlugin::createUI( m_pluginSubWindow.get() );
+			m_pluginSubWindow->setWidget(pluginWidget());
+		} else {
+			VstPlugin::createUI( nullptr );
+		}
+	}
+
+	/// Overwrite editor() to return the sub window instead of the embed widget
+	/// itself. This makes toggleUI() and related functions toggle the
+	/// sub window's visibility.
+	QWidget* editor() override
+	{
+		return m_pluginSubWindow.get();
+	}
+private:
+	unique_ptr<QMdiSubWindow> m_pluginSubWindow;
+};
 
 
 QPixmap * VestigeInstrumentView::s_artwork = NULL;
@@ -128,6 +189,12 @@ void vestigeInstrument::loadSettings( const QDomElement & _this )
 	{
 		m_plugin->loadSettings( _this );
 
+		if ( _this.attribute( "guivisible" ).toInt() ) {
+			m_plugin->showUI();
+		} else {
+			m_plugin->hideUI();
+		}
+
 		const QMap<QString, QString> & dump = m_plugin->parameterDump();
 		paramCount = dump.size();
 		char paramStr[35];
@@ -143,8 +210,8 @@ void vestigeInstrument::loadSettings( const QDomElement & _this )
 
 			if( !( knobFModel[ i ]->isAutomated() || knobFModel[ i ]->controllerConnection() ) )
 			{
-				knobFModel[ i ]->setValue( ( s_dumpValues.at( 2 )).toFloat() );
-				knobFModel[ i ]->setInitValue( ( s_dumpValues.at( 2 )).toFloat() );
+				knobFModel[ i ]->setValue(LocaleHelper::toFloat(s_dumpValues.at(2)));
+				knobFModel[ i ]->setInitValue(LocaleHelper::toFloat(s_dumpValues.at(2)));
 			}
 
 			connect( knobFModel[i], SIGNAL( dataChanged() ), this, SLOT( setParameter() ) );
@@ -268,7 +335,7 @@ void vestigeInstrument::loadFile( const QString & _file )
 	}
 
 	m_pluginMutex.lock();
-	m_plugin = new VstPlugin( m_pluginDLL );
+	m_plugin = new VstInstrumentPlugin( m_pluginDLL );
 	if( m_plugin->failed() )
 	{
 		m_pluginMutex.unlock();
@@ -279,6 +346,7 @@ void vestigeInstrument::loadFile( const QString & _file )
 		return;
 	}
 
+	m_plugin->createUI(nullptr);
 	m_plugin->showUI();
 
 	if( set_ch_name )
@@ -298,14 +366,12 @@ void vestigeInstrument::loadFile( const QString & _file )
 
 void vestigeInstrument::play( sampleFrame * _buf )
 {
-	m_pluginMutex.lock();
+	if (!m_pluginMutex.tryLock(Engine::getSong()->isExporting() ? -1 : 0)) {return;}
 
 	const fpp_t frames = Engine::mixer()->framesPerPeriod();
 
 	if( m_plugin == NULL )
 	{
-		BufferManager::clear( _buf, frames );
-
 		m_pluginMutex.unlock();
 		return;
 	}
@@ -550,7 +616,7 @@ void VestigeInstrumentView::updateMenu( void )
      		QMenu * to_menu = m_selPresetButton->menu();
     		to_menu->clear();
 
-    		QAction *presetActions[list1.size()];
+			QVector<QAction*> presetActions(list1.size());
 
      		for (int i = 0; i < list1.size(); i++) {
 			presetActions[i] = new QAction(this);
@@ -900,7 +966,7 @@ manageVestigeInstrumentView::manageVestigeInstrumentView( Instrument * _instrume
 		if( !hasKnobModel )
 		{
 			sprintf( paramStr, "%d", i);
-			m_vi->knobFModel[ i ] = new FloatModel( (s_dumpValues.at( 2 )).toFloat(),
+			m_vi->knobFModel[ i ] = new FloatModel( LocaleHelper::toFloat(s_dumpValues.at(2)),
 				0.0f, 1.0f, 0.01f, castModel<vestigeInstrument>(), tr( paramStr ) );
 		}
 		connect( m_vi->knobFModel[i], SIGNAL( dataChanged() ), this, SLOT( setParameter() ) );
@@ -961,7 +1027,7 @@ void manageVestigeInstrumentView::syncPlugin( void )
 		{
 			sprintf( paramStr, "param%d", i );
     			s_dumpValues = dump[ paramStr ].split( ":" );
-			f_value = ( s_dumpValues.at( 2 ) ).toFloat();
+			f_value = LocaleHelper::toFloat(s_dumpValues.at(2));
 			m_vi->knobFModel[ i ]->setAutomatedValue( f_value );
 			m_vi->knobFModel[ i ]->setInitValue( f_value );
 		}
@@ -1101,7 +1167,7 @@ extern "C"
 {
 
 // necessary for getting instance out of shared lib
-PLUGIN_EXPORT Plugin * lmms_plugin_main( Model *, void * _data )
+Q_DECL_EXPORT Plugin * lmms_plugin_main( Model *, void * _data )
 {
 	return new vestigeInstrument( static_cast<InstrumentTrack *>( _data ) );
 }

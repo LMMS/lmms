@@ -78,16 +78,34 @@ private:
 	static void sdlAudioCallback( void * _udata, Uint8 * _buf, int _len );
 	void sdlAudioCallback( Uint8 * _buf, int _len );
 
+#ifdef LMMS_HAVE_SDL2
+	static void sdlInputAudioCallback( void * _udata, Uint8 * _buf, int _len );
+	void sdlInputAudioCallback( Uint8 * _buf, int _len );
+#endif
+
 	SDL_AudioSpec m_audioHandle;
 
 	surroundSampleFrame * m_outBuf;
+
+#ifdef LMMS_HAVE_SDL2
+	size_t m_currentBufferFramePos;
+	size_t m_currentBufferFramesCount;
+#else
 	Uint8 * m_convertedBuf;
 	int m_convertedBufPos;
 	int m_convertedBufSize;
+	bool m_outConvertEndian;
+#endif
 
-	bool m_convertEndian;
 
 	bool m_stopped;
+
+#ifdef LMMS_HAVE_SDL2
+	SDL_AudioDeviceID m_outputDevice;
+
+	SDL_AudioSpec m_inputAudioHandle;
+	SDL_AudioDeviceID m_inputDevice;
+#endif
 
 } ;
 

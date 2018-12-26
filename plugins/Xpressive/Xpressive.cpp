@@ -48,6 +48,8 @@
 
 #include "ExprSynth.h"
 
+#include "plugin_export.h"
+
 extern "C" {
 
 Plugin::Descriptor PLUGIN_EXPORT xpressive_plugin_descriptor = { STRINGIFY(
@@ -805,8 +807,6 @@ void XpressiveView::usrWaveClicked() {
 	Engine::getSong()->setModified();
 }
 
-XpressiveHelpView* XpressiveHelpView::s_instance=0;
-
 QString XpressiveHelpView::s_helpText=
 "<b>O1, O2</b> - Two output waves. Panning is controled by PN1 and PN2.<br>"
 "<b>W1, W2, W3</b> - Wave samples evaluated by expression. In these samples, t variable ranges [0,1).<br>"
@@ -874,15 +874,10 @@ void XpressiveView::helpClicked() {
 
 }
 
-__attribute__((destructor)) static void module_destroy()
-{
-	XpressiveHelpView::finalize();
-}
-
 extern "C" {
 
 // necessary for getting instance out of shared lib
-Plugin * PLUGIN_EXPORT lmms_plugin_main(Model *, void * _data) {
+PLUGIN_EXPORT Plugin * lmms_plugin_main(Model *, void * _data) {
 	return (new Xpressive(static_cast<InstrumentTrack *>(_data)));
 }
 
