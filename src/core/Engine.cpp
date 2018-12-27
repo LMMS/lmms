@@ -29,6 +29,7 @@
 #include "FxMixer.h"
 #include "Ladspa2LMMS.h"
 #include "Mixer.h"
+#include "Plugin.h"
 #include "PresetPreviewPlayHandle.h"
 #include "ProjectJournal.h"
 #include "Song.h"
@@ -118,7 +119,7 @@ void LmmsCore::updateFramesPerTick()
 
 void LmmsCore::setDndPluginKey(void *newKey)
 {
-	assert(static_cast<Plugin::Descriptor::SubPluginFeatures::Key*>(newKey));
+	Q_ASSERT(static_cast<Plugin::Descriptor::SubPluginFeatures::Key*>(newKey));
 	s_dndPluginKey = newKey;
 }
 
