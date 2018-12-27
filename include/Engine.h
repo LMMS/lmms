@@ -111,6 +111,9 @@ public:
 		return s_instanceOfMe;
 	}
 
+	static void setDndPluginKey(void* newKey);
+	static void* pickDndPluginKey();
+
 signals:
 	void initProgress(const QString &msg);
 
@@ -137,6 +140,7 @@ private:
 	static DummyTrackContainer * s_dummyTC;
 
 	static Ladspa2LMMS * s_ladspaManager;
+	static void* s_dndPluginKey;
 
 	// even though most methods are static, an instance is needed for Qt slots/signals
 	static LmmsCore * s_instanceOfMe;

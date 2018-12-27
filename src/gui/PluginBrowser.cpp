@@ -31,6 +31,7 @@
 #include <QStyleOption>
 
 #include "embed.h"
+#include "Engine.h"
 #include "templates.h"
 #include "gui_templates.h"
 #include "StringPairDrag.h"
@@ -85,9 +86,30 @@ PluginDescList::PluginDescList(QWidget *parent) :
 				return qstricmp( d1->displayName, d2->displayName ) < 0 ? true : false;
 			}
 	);
-	for (const Plugin::Descriptor* desc : descs)
+
+	typedef Plugin::Descriptor::SubPluginFeatures::KeyList PluginKeyList;
+	typedef Plugin::Descriptor::SubPluginFeatures::Key PluginKey;
+	PluginKeyList subPluginKeys, pluginKeys;
+
+	for (const Plugin::Descriptor* desc: descs)
 	{
-		PluginDescWidget* p = new PluginDescWidget( *desc, this );
+		if( desc->subPluginFeatures )
+		{
+			desc->subPluginFeatures->listSubPluginKeys(
+							desc,
+							subPluginKeys );
+		}
+		else
+		{
+			pluginKeys << PluginKey( desc, desc->name );
+		}
+	}
+
+	pluginKeys += subPluginKeys;
+
+	for (const PluginKey& key : pluginKeys)
+	{
+		PluginDescWidget* p = new PluginDescWidget( key, this );
 		p->show();
 		layout->addWidget(p);
 	}
@@ -99,23 +121,23 @@ PluginDescList::PluginDescList(QWidget *parent) :
 
 
 
-PluginDescWidget::PluginDescWidget( const Plugin::Descriptor & _pd,
+PluginDescWidget::PluginDescWidget(const PluginKey &_pk,
 							QWidget * _parent ) :
 	QWidget( _parent ),
-	m_pluginDescriptor( _pd ),
-	m_logo( _pd.logo->pixmap() ),
+	m_pluginKey( _pk ),
+	m_logo( _pk.logo()->pixmap() ),
 	m_mouseOver( false )
 {
 	setFixedHeight( DEFAULT_HEIGHT );
 	setMouseTracking( true );
 	setCursor( Qt::PointingHandCursor );
-	setToolTip(_pd.description);
+	setToolTip(_pk.description());
 }
 
 
 
 
-void PluginDescWidget::paintEvent( QPaintEvent * e )
+void PluginDescWidget::paintEvent( QPaintEvent * )
 {
 
 	QPainter p( this );
@@ -140,8 +162,7 @@ void PluginDescWidget::paintEvent( QPaintEvent * e )
 	}
 
 	p.setFont( f );
-	p.drawText( 10 + logo_size.width(), 15,
-					m_pluginDescriptor.displayName );
+	p.drawText( 10 + logo_size.width(), 15, m_pluginKey.displayName());
 }
 
 
@@ -171,8 +192,9 @@ void PluginDescWidget::mousePressEvent( QMouseEvent * _me )
 {
 	if( _me->button() == Qt::LeftButton )
 	{
-		new StringPairDrag( "instrument", m_pluginDescriptor.name,
-								m_logo, this );
+		Engine::setDndPluginKey(&m_pluginKey);
+		new StringPairDrag("instrument",
+			QString::fromUtf8(m_pluginKey.desc->name), m_logo, this);
 		leaveEvent( _me );
 	}
 }

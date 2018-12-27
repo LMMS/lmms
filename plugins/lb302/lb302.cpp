@@ -1029,11 +1029,11 @@ extern "C"
 {
 
 // necessary for getting instance out of shared lib
-PLUGIN_EXPORT Plugin * lmms_plugin_main( Model *, void * _data )
+PLUGIN_EXPORT Plugin * lmms_plugin_main( Model * m, void * )
 {
 
 	return( new lb302Synth(
-	        static_cast<InstrumentTrack *>( _data ) ) );
+		static_cast<InstrumentTrack *>( m ) ) );
 }
 
 
