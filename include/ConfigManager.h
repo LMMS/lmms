@@ -140,6 +140,13 @@ public:
 	}
 #endif
 
+#ifdef LMMS_HAVE_STK
+	const QString & stkDir() const
+	{
+		return m_stkDir;
+	}
+#endif
+
 	const QString & gigDir() const
 	{
 		return m_gigDir;
@@ -235,6 +242,7 @@ public:
 	void setLADSPADir(const QString & ladspaDir);
 	void setSF2Dir(const QString & sf2Dir);
 	void setSF2File(const QString & sf2File);
+	void setSTKDir(const QString & stkDir);
 	void setGIGDir(const QString & gigDir);
 	void setThemeDir(const QString & themeDir);
 	void setBackgroundPicFile(const QString & backgroundPicFile);
@@ -263,6 +271,9 @@ private:
 	QString m_sf2Dir;
 #ifdef LMMS_HAVE_FLUIDSYNTH
 	QString m_sf2File;
+#endif
+#ifdef LMMS_HAVE_STK
+	QString m_stkDir;
 #endif
 	QString m_gigDir;
 	QString m_themeDir;
