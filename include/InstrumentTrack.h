@@ -69,6 +69,7 @@ class LMMS_EXPORT InstrumentTrack : public Track, public MidiEventProcessor
 	MM_OPERATORS
 	mapPropertyFromModel(int,getVolume,setVolume,m_volumeModel);
 public:
+	InstrumentTrack(){};
 	InstrumentTrack( TrackContainer* tc );
 	virtual ~InstrumentTrack();
 

@@ -35,6 +35,8 @@ class LMMS_EXPORT Model : public QObject
 {
 	Q_OBJECT
 public:
+	//explicit Model(QWidget *parent = Q_NULLPTR);
+	Model(){};
 	Model( Model * _parent, QString _display_name = QString(),
 					bool _default_constructed = false ) :
 		QObject( _parent ),

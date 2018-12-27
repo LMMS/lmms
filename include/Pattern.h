@@ -49,13 +49,21 @@ class SampleBuffer;
 class LMMS_EXPORT Pattern : public TrackContentObject
 {
 	Q_OBJECT
+public slots:
+	inline int getNumNotes() {
+		return m_notes.length();
+	}
+	inline NoteScriptWrapper* getNote(int index) {
+		return new NoteScriptWrapper(m_notes[index]);
+	}
+
 public:
 	enum PatternTypes
 	{
 		BeatPattern,
 		MelodyPattern
 	} ;
-
+	Pattern(){};
 	Pattern( InstrumentTrack* instrumentTrack );
 	Pattern( const Pattern& other );
 	virtual ~Pattern();

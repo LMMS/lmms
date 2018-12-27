@@ -26,6 +26,7 @@
 #ifndef NOTE_H
 #define NOTE_H
 
+#include <QtCore/QObject>
 #include <QtCore/QVector>
 
 #include "volume.h"
@@ -75,7 +76,6 @@ const int NumKeys = NumOctaves * KeysPerOctave;
 const int DefaultKey = DefaultOctave*KeysPerOctave + Key_A;
 
 const float MaxDetuning = 4 * 12.0f;
-
 
 
 class LMMS_EXPORT Note : public SerializingObject
@@ -240,6 +240,23 @@ private:
 
 
 typedef QVector<Note *> NoteVector;
+
+class LMMS_EXPORT NoteScriptWrapper : public QObject {
+	Q_OBJECT
+	public:
+		NoteScriptWrapper(){};
+		NoteScriptWrapper(Note* note) : m_note(note) {};
+	public slots:
+		inline int getKey() {
+			return this->m_note->key();
+		};
+		inline void setKey(int key) {
+			this->m_note->setKey(key);
+		};
+	private:
+		Note* m_note;
+
+};
 
 
 #endif

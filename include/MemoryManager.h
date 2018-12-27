@@ -64,7 +64,11 @@ struct MmAllocator
 	typedef std::vector<T, MmAllocator<T> > vector;
 };
 
+// the MM_OPERATORS macro causes problems with QML qmlRegisterType on a subclass, disabled by default
 
+#ifndef USE_MM_OPERATORS
+#define MM_OPERATORS 
+#else
 #define MM_OPERATORS								\
 public: 											\
 static void * operator new ( size_t size )		\
@@ -83,6 +87,7 @@ static void operator delete[] ( void * ptr )	\
 {													\
 	MemoryManager::free( ptr );					\
 }
+#endif
 
 // for use in cases where overriding new/delete isn't a possibility
 #define MM_ALLOC( type, count ) reinterpret_cast<type*>( MemoryManager::alloc( sizeof( type ) * count ) )

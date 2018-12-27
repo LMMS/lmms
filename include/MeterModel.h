@@ -34,6 +34,7 @@ class MeterModel : public Model
 	mapPropertyFromModel(int,getNumerator,setNumerator,m_numeratorModel);
 	mapPropertyFromModel(int,getDenominator,setDenominator,m_denominatorModel);
 public:
+	MeterModel(){};
 	MeterModel( Model * _parent );
 	~MeterModel();
 

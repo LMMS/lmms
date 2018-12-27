@@ -33,6 +33,11 @@
 #include "ProjectJournal.h"
 #include "Song.h"
 #include "BandLimitedWave.h"
+
+#include "Note.h"
+#include "BBTrack.h"
+#include "InstrumentTrack.h"
+#include "Pattern.h"
 #include <iostream>
 #include <QtCore/QTimer>
 #include <QtCore/QRandomGenerator>
@@ -60,6 +65,10 @@ void LmmsCore::scriptEnable() {
 	qmlRegisterType<Mixer>("lmms.core", 1,0, "Mixer");
 	qmlRegisterType<Song>("lmms.core", 1,0, "Song");
 	qmlRegisterType<BBTrackContainer>("lmms.core", 1,0, "BBTrackContainer");
+	qmlRegisterType<BBTrack>("lmms.core", 1,0, "BBTrack");
+	qmlRegisterType<InstrumentTrack>("lmms.core", 1,0, "InstrumentTrack");
+	qmlRegisterType<Pattern>("lmms.core", 1,0, "Pattern");
+	qmlRegisterType<NoteScriptWrapper>("lmms.core", 1,0, "Note");
 
 	LmmsCore::scriptEngine = new QScriptEngine();
 	addType<QTimer>(LmmsCore::scriptEngine);

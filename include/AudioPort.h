@@ -32,8 +32,8 @@
 
 #include "MemoryManager.h"
 #include "PlayHandle.h"
-
-class EffectChain;
+#include "EffectChain.h"
+//class EffectChain;
 class FloatModel;
 class BoolModel;
 
@@ -41,6 +41,7 @@ class AudioPort : public ThreadableJob
 {
 	MM_OPERATORS
 public:
+	AudioPort(){};
 	AudioPort( const QString & _name, bool _has_effect_chain = true,
 		FloatModel * volumeModel = NULL, FloatModel * panningModel = NULL,
 		BoolModel * mutedModel = NULL );

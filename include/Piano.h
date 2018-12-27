@@ -39,7 +39,7 @@ public:
 		WhiteKey,
 		BlackKey
 	} ;
-
+	Piano(){};
 	Piano( InstrumentTrack* track );
 
 	void setKeyState( int key, bool state );

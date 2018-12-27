@@ -53,7 +53,7 @@ class TrackContainer;
 class TrackContainerView;
 class TrackContentWidget;
 class TrackView;
-
+class Pattern;
 
 const int DEFAULT_SETTINGS_WIDGET_WIDTH = 224;
 const int TRACK_OP_WIDTH = 78;
@@ -80,6 +80,7 @@ class TrackContentObject : public Model, public JournallingObject
 	mapPropertyFromModel(bool,isMuted,setMuted,m_mutedModel);
 	mapPropertyFromModel(bool,isSolo,setSolo,m_soloModel);
 public:
+	TrackContentObject(){};
 	TrackContentObject( Track * track );
 	virtual ~TrackContentObject();
 
@@ -483,7 +484,7 @@ public:
 		HiddenAutomationTrack,
 		NumTrackTypes
 	} ;
-
+	Track() {};
 	Track( TrackTypes type, TrackContainer * tc );
 	virtual ~Track();
 
@@ -523,9 +524,7 @@ public:
 	TrackContentObject * addTCO( TrackContentObject * tco );
 	void removeTCO( TrackContentObject * tco );
 	// -------------------------------------------------------
-	void deleteTCOs();
 
-	int numOfTCOs();
 	TrackContentObject * getTCO( int tcoNum );
 	int getTCONum(const TrackContentObject* tco );
 
@@ -598,6 +597,14 @@ public slots:
 	}
 
 	void toggleSolo();
+
+	// scripting helpers
+	void deleteTCOs();
+	int numOfTCOs();
+
+	inline Pattern* getPattern(int index) {
+		return (Pattern*)m_trackContentObjects[index];
+	}
 
 
 private:

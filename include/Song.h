@@ -40,7 +40,8 @@
 class AutomationTrack;
 class Pattern;
 class TimeLineWidget;
-
+class BBTrack;
+class InstrumentTrack;
 
 const bpm_t MinTempo = 10;
 const bpm_t DefaultTempo = 140;
@@ -334,6 +335,18 @@ public slots:
 	void clearProject();
 
 	void addBBTrack();
+
+	inline int getNumTracks() {
+		//TrackList tl = Engine::getSong()->tracks();
+		return this->tracks().length();
+	}
+	inline BBTrack* getBBTrack(int index) {
+		//TrackList tl = Engine::getSong()->tracks();
+		return (BBTrack*)this->tracks()[index];
+	}
+	inline InstrumentTrack* getInstrumentTrack(int index) {
+		return (InstrumentTrack*)this->tracks()[index];
+	}
 
 
 private slots:

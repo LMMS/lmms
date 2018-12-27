@@ -129,6 +129,7 @@ class LMMS_EXPORT BBTrack : public Track
 {
 	Q_OBJECT
 public:
+	BBTrack(){};
 	BBTrack( TrackContainer* tc );
 	virtual ~BBTrack();
 
