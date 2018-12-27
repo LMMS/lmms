@@ -220,7 +220,6 @@ Plugin * Plugin::instantiate(const QString& pluginName, Model * parent,
 		}
 		return new DummyPlugin();
 	}
-	qDebug() << "Using PluginInfo for " << pluginName;
 
 	Plugin* inst;
 	InstantiationHook instantiationHook;

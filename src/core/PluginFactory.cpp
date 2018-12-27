@@ -182,7 +182,7 @@ void PluginFactory::discoverPlugins()
 		}
 		else
 		{
-			qDebug() << "Ignoring" << file << "(no lmms_plugin_main())";
+			//qDebug() << "Ignoring" << file.absoluteFilePath() << "(no lmms_plugin_main())";
 		}
 
 		if(pluginDescriptor)
@@ -193,9 +193,6 @@ void PluginFactory::discoverPlugins()
 			info.descriptor = pluginDescriptor;
 			pluginInfos << info;
 
-			qDebug() << "Add" << info.file << "with type"
-				<< info.descriptor->type;
-
 			auto addSupportedFileTypes =
 				[this](const char* supportedFileTypes,
 					const PluginInfo& info,
@@ -204,7 +201,7 @@ void PluginFactory::discoverPlugins()
 				if(supportedFileTypes)
 				for (const QString& ext : QString(supportedFileTypes).split(','))
 				{
-					qDebug() << "Plugin " << info.name() << "supports" << ext;
+					//qDebug() << "Plugin " << info.name() << "supports" << ext;
 					PluginInfoAndKey infoAndKey;
 					infoAndKey.info = info;
 					infoAndKey.key = key
