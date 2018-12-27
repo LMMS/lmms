@@ -50,11 +50,27 @@ class LMMS_EXPORT Pattern : public TrackContentObject
 {
 	Q_OBJECT
 public slots:
+	inline NoteScriptWrapper* newNote(int pos=0, int length=1, int key=64) {
+		Note note;
+		note.setPos(MidiTime(pos));
+		note.setLength(MidiTime(length));
+		note.setKey(key);
+		return new NoteScriptWrapper( this->addNote(note) );
+	}
 	inline int getNumNotes() {
 		return m_notes.length();
 	}
+
+	// gets by MIDI time step
+	inline NoteScriptWrapper* getNoteAtStep(int step=0) {
+		return new NoteScriptWrapper( this->noteAtStep(step) );
+	}
+	// gets by index
 	inline NoteScriptWrapper* getNote(int index) {
 		return new NoteScriptWrapper(m_notes[index]);
+	}
+	inline NoteScriptWrapper* setNote(NoteScriptWrapper* wrapper) {
+		return new NoteScriptWrapper( this->addNote(*wrapper->getPointer()) );  // need to wrap the return again, or is it the same pointer to Note?
 	}
 
 public:

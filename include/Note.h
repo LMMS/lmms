@@ -246,6 +246,7 @@ class LMMS_EXPORT NoteScriptWrapper : public QObject {
 	public:
 		NoteScriptWrapper(){};
 		NoteScriptWrapper(Note* note) : m_note(note) {};
+		inline Note* getPointer() { return this->m_note; }
 	public slots:
 		inline int getKey() {
 			return this->m_note->key();
