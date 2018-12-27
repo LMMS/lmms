@@ -25,6 +25,7 @@
 #include "carla.h"
 
 #include "embed.h"
+#include "InstrumentTrack.h"
 
 extern "C"
 {
