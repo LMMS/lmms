@@ -44,6 +44,16 @@ LadspaSubPluginFeatures::LadspaSubPluginFeatures( Plugin::PluginTypes _type ) :
 
 
 
+const char *LadspaSubPluginFeatures::displayName(const Plugin::Descriptor::SubPluginFeatures::Key &k) const
+{
+	const ladspa_key_t & lkey = subPluginKeyToLadspaKey(&k);
+	Ladspa2LMMS * lm = Engine::getLADSPAManager();
+	return lm->getName(lkey).toUtf8().data();
+}
+
+
+
+
 void LadspaSubPluginFeatures::fillDescriptionWidget( QWidget * _parent,
 													const Key * _key  ) const
 {

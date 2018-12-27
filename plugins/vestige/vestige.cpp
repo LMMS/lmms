@@ -1167,9 +1167,9 @@ extern "C"
 {
 
 // necessary for getting instance out of shared lib
-Q_DECL_EXPORT Plugin * lmms_plugin_main( Model *, void * _data )
+Q_DECL_EXPORT Plugin * lmms_plugin_main( Model *m, void * )
 {
-	return new vestigeInstrument( static_cast<InstrumentTrack *>( _data ) );
+	return new vestigeInstrument( static_cast<InstrumentTrack *>( m ) );
 }
 
 
