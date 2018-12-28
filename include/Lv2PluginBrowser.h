@@ -121,7 +121,7 @@ private:
 	void initPixmaps( void );
 
 	static QPixmap * s_Lv2PluginPixmap;
-	const QString & plugin_uri;
+	QString plugin_uri;
 } ;
 
 

@@ -195,7 +195,7 @@ void Lv2PluginBrowser::addItems()
         lilv_plugins_get(plugins, it);
 
       const char * uri =
-        lilv_node_as_string (lilv_plugin_get_name (p));
+	lilv_node_as_string (lilv_plugin_get_uri (p));
 			m_treeWidget->addTopLevelItem (
                 new Lv2PluginItem (QString::fromUtf8(uri)));
     }
@@ -328,7 +328,7 @@ void Lv2PluginBrowserTreeWidget::handlePlugin( Lv2PluginItem * f, InstrumentTrac
 	Instrument * i = it->instrument();
 	if( i == NULL )
 	{
-		i = it->loadInstrument(f->get_uri());
+		i = it->loadInstrument(f->get_uri(), Plugin::Lv2);
 	}
 
 	Engine::mixer()->doneChangeInModel();

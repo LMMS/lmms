@@ -36,6 +36,7 @@
 #include "Piano.h"
 #include "PianoView.h"
 #include "Pitch.h"
+#include "Plugin.h"
 #include "Track.h"
 
 
@@ -146,7 +147,8 @@ public:
 
 
 	// load instrument whose name matches given one
-	Instrument * loadInstrument( const QString & _instrument_id );
+	Instrument * loadInstrument(const QString & _instrument_id ,
+				Plugin::PluginProtocol proto = Plugin::Embedded);
 
 	AudioPort * audioPort()
 	{

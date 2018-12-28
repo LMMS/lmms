@@ -838,13 +838,13 @@ void InstrumentTrack::setPreviewMode( const bool value )
 
 
 
-Instrument * InstrumentTrack::loadInstrument( const QString & _instrument_id )
+Instrument * InstrumentTrack::loadInstrument( const QString & _instrument_id, Plugin::PluginProtocol proto )
 {
 	silenceAllNotes( true );
 
 	lock();
 	delete m_instrument;
-	m_instrument = Instrument::instantiate( _instrument_id, this );
+	m_instrument = Instrument::instantiate( _instrument_id, this, proto );
 	unlock();
 	setName( m_instrument->displayName() );
 
