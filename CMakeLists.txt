@@ -157,6 +157,7 @@ SET(QT_LIBRARIES
 	Qt5::Xml
 	Qt5::Script
 	Qt5::Qml
+	qx11embedcontainer
 )
 
 IF(LMMS_BUILD_LINUX)

@@ -29,8 +29,7 @@
 #include <QtCore/QString>
 #include <QtCore/QObject>
 #include <QtScript/QScriptEngine>
-
-
+#include "SubprocessWrapper.h"
 #include "lmms_export.h"
 
 class BBTrackContainer;
@@ -61,6 +60,15 @@ class LMMS_EXPORT LmmsCore : public QObject
 	Q_PROPERTY(FxMixer* fxMixer MEMBER s_fxMixer)
 	Q_PROPERTY(Song* song MEMBER s_song)
 	Q_PROPERTY(BBTrackContainer* bbTrackContainer MEMBER s_bbTrackContainer)
+
+static std::vector<SubprocessWrapper*> s_processes;
+public slots:
+	inline SubprocessWrapper* newProcess(QString exe, QStringList args, int width=320, int height=240) {
+		auto p = new SubprocessWrapper(exe,args, width, height);
+		s_processes.push_back( p );
+		return p;
+	}
+
 
 public:
 	static void init( bool renderOnly );
@@ -149,7 +157,6 @@ private:
 	static BBTrackContainer * s_bbTrackContainer;
 	static ProjectJournal * s_projectJournal;
 	static DummyTrackContainer * s_dummyTC;
-
 	static Ladspa2LMMS * s_ladspaManager;
 
 	// even though most methods are static, an instance is needed for Qt slots/signals

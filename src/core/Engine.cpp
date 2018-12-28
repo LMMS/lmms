@@ -52,6 +52,7 @@ ProjectJournal * LmmsCore::s_projectJournal = NULL;
 Ladspa2LMMS * LmmsCore::s_ladspaManager = NULL;
 DummyTrackContainer * LmmsCore::s_dummyTC = NULL;
 QScriptEngine* LmmsCore::scriptEngine = NULL;
+std::vector<SubprocessWrapper*> LmmsCore::s_processes = {};
 
 template <typename T> void addType(QScriptEngine* engine) {
 	auto constructor = engine->newFunction([](QScriptContext*, QScriptEngine* engine){
@@ -69,6 +70,7 @@ void LmmsCore::scriptEnable() {
 	qmlRegisterType<InstrumentTrack>("lmms.core", 1,0, "InstrumentTrack");
 	qmlRegisterType<Pattern>("lmms.core", 1,0, "Pattern");
 	qmlRegisterType<NoteScriptWrapper>("lmms.core", 1,0, "Note");
+	qmlRegisterType<SubprocessWrapper>("lmms.core", 1,0, "Subprocess");
 
 	LmmsCore::scriptEngine = new QScriptEngine();
 	addType<QTimer>(LmmsCore::scriptEngine);

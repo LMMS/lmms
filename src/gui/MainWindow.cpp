@@ -145,7 +145,7 @@ if (SDL_NumJoysticks() > 0) {
 	setAttribute(Qt::WA_NoSystemBackground, true);
 	setAttribute(Qt::WA_TranslucentBackground);
 	main_widget->setAutoFillBackground(true);
-	main_widget->setStyleSheet("background: rgba(0,0,0,5%); color:purple");
+	main_widget->setStyleSheet("background: rgba(0,0,0,25%); color:purple");
 
 	QWidget * w = new QWidget( main_widget );
 	QHBoxLayout * hbox = new QHBoxLayout( w );
