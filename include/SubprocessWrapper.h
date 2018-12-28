@@ -11,10 +11,19 @@
 
 class SubprocessWrapper : public QObject {
 	Q_OBJECT
+	Q_PROPERTY(QProcess* subprocess MEMBER subprocess)
 	QProcess* subprocess;
 #ifdef __linux__
 	QX11EmbedContainer* embedContainer;
 	int xid;
+	public slots:
+		inline void embedClient(int windowID) {
+			//connect(embedContainer, SIGNAL(clientIsEmbedded()), this, SLOT(handleClientEmbed()));
+			this->embedContainer->embedClient( windowID );
+		};
+		inline int getWindowID() {
+			return this->xid;
+		}
 #endif
 
 	public:
@@ -26,8 +35,6 @@ class SubprocessWrapper : public QObject {
 			gui->mainWindow()->workspace()->addSubWindow(embedContainer);
 			embedContainer->show();  // this also sets the xid
 			this->xid = embedContainer->winId();
-			//connect(embedContainer, SIGNAL(clientIsEmbedded()), this, SLOT(handleClientEmbed()));
-			//embedContainer->embedClient( m_pluginWindowID );
 			this->subprocess = new QProcess( embedContainer );
 			args << QString::number(xid);
 			subprocess->start(exe, args);

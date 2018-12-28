@@ -238,7 +238,7 @@ if (SDL_NumJoysticks() > 0) {
 	hbox->addWidget( sideBar );
 	hbox->addWidget( splitter );
 	sideBar->setAutoFillBackground(true);
-	sideBar->setStyleSheet("background: rgba(0,0,0,50%); color:purple");
+	sideBar->setStyleSheet("background: rgba(64,64,64,60%); color:purple");
 
 
 	// create global-toolbar at the top of our window
@@ -247,7 +247,7 @@ if (SDL_NumJoysticks() > 0) {
 	m_toolBar->setFixedHeight( 64 );
 	m_toolBar->move( 0, 0 );
 	m_toolBar->setAutoFillBackground(true);
-	m_toolBar->setStyleSheet("background: rgba(0,0,0,50%); color:purple");
+	m_toolBar->setStyleSheet("background: rgba(64,64,64,80%); color:purple");
 
 	// add layout for organizing quite complex toolbar-layouting
 	m_toolBarLayout = new QGridLayout( m_toolBar/*, 2, 1*/ );
@@ -632,7 +632,7 @@ void MainWindow::finalize()
 
 	gui->automationEditor()->parentWidget()->hide();
 	gui->getBBEditor()->parentWidget()->move( 610, 5 );
-	gui->getBBEditor()->parentWidget()->hide();
+	//gui->getBBEditor()->parentWidget()->hide();  // do not hide BBEditor by default
 	gui->pianoRoll()->parentWidget()->move(5, 5);
 	gui->pianoRoll()->parentWidget()->hide();
 	gui->songEditor()->parentWidget()->move(5, 5);
@@ -645,7 +645,22 @@ void MainWindow::finalize()
 	}
 }
 
+void MainWindow::enableScriptTools() {
+	// simple scripting editor, called after other widgets have initialized
+	m_scriptEditor = new QPlainTextEdit(this);
+	m_scriptEditor->setStyleSheet("background: black; color:green");
+	m_scriptDebug = new QPlainTextEdit(this);
+	m_scriptDebug->setStyleSheet("background: grey; color:black");
+	m_scriptRunButton = new QPushButton("run", this);
+	connect(m_scriptRunButton, SIGNAL (released()), this, SLOT (onRunScript()));
+	this->addWidgetToToolBar( m_scriptEditor );
+	this->addWidgetToToolBar( m_scriptRunButton );
+	this->addWidgetToToolBar( m_scriptDebug );
+}
 
+void MainWindow::onRunScript() {
+	Engine::scriptEval( this->getScript() );
+}
 
 
 int MainWindow::addWidgetToToolBar( QWidget * _w, int _row, int _col )
@@ -1563,9 +1578,8 @@ void MainWindow::browseHelp()
 		double x2 = ((double)SDL_JoystickGetAxis(m_joystick, 3)) / 32768.0;
 		double y2 = ((double)SDL_JoystickGetAxis(m_joystick, 4)) / 32768.0;
 		double z2 = (((double)SDL_JoystickGetAxis(m_joystick, 5)) / 32768.0) + 1.0;
-        //printf("x: %.3f\n", x);
-        //printf("y: %.3f\n", y);
         Knob::updateGamepad( x1,y1,z1, x2,y2,z2 );
+        Engine::updateGamepad( x1,y1,z1, x2,y2,z2 );
 	}
 #endif
 

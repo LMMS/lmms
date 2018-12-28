@@ -310,8 +310,6 @@ int main( int argc, char * * argv )
 			new QCoreApplication( argc, argv ) :
 					new MainApplication( argc, argv );
 
-	Engine::scriptEnable();
-
 	Mixer::qualitySettings qs( Mixer::qualitySettings::Mode_HighQuality );
 	OutputSettings os( 44100, OutputSettings::BitRateSettings(160, false), OutputSettings::Depth_16Bit, OutputSettings::StereoMode_JointStereo );
 	ProjectRenderer::ExportFileFormats eff = ProjectRenderer::WaveFile;
@@ -941,6 +939,8 @@ int main( int argc, char * * argv )
 			gui->mainWindow()->autoSaveTimerReset();
 		}
 	}
+
+	Engine::scriptEnable();
 
 	if (doScriptRun) {
 		Engine::scriptEval(scriptToRun, scriptName);

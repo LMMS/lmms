@@ -28,6 +28,8 @@
 #include <QtCore/QBasicTimer>
 #include <QtCore/QTimer>
 #include <QtCore/QList>
+#include <QPushButton>
+#include <QPlainTextEdit>
 #include <QMainWindow>
 
 #include "ConfigManager.h"
@@ -153,6 +155,18 @@ public:
 	static void saveWidgetState( QWidget * _w, QDomElement & _de );
 	static void restoreWidgetState( QWidget * _w, const QDomElement & _de );
 
+	inline QString getScript() {
+		return m_scriptEditor->toPlainText();
+	}
+	inline void setScript(QString txt) {
+		m_scriptEditor->setPlainText(txt);
+	}
+	inline void setScriptDebug(QString txt) {
+		m_scriptDebug->setPlainText(txt);
+	}
+	void enableScriptTools();
+
+
 public slots:
 	void resetWindowTitle();
 
@@ -190,6 +204,7 @@ public slots:
 
 private slots:
 	void onExportProjectMidi();
+	void onRunScript();
 
 protected:
 	virtual void closeEvent( QCloseEvent * _ce );
@@ -248,10 +263,13 @@ private:
 	friend class GuiApplication;
 
 	QMenu * m_viewMenu;
-
 	ToolButton * m_metronomeToggle;
-
 	SessionState m_session;
+
+	QPlainTextEdit* m_scriptEditor;
+	QPlainTextEdit* m_scriptDebug;
+	QPushButton* m_scriptRunButton;
+
 
 #ifdef LMMS_HAVE_SDL
 	SDL_Joystick *m_joystick;

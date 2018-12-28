@@ -53,6 +53,7 @@ Ladspa2LMMS * LmmsCore::s_ladspaManager = NULL;
 DummyTrackContainer * LmmsCore::s_dummyTC = NULL;
 QScriptEngine* LmmsCore::scriptEngine = NULL;
 std::vector<SubprocessWrapper*> LmmsCore::s_processes = {};
+double LmmsCore::s_gamepad_state[6] = {0.0};
 
 template <typename T> void addType(QScriptEngine* engine) {
 	auto constructor = engine->newFunction([](QScriptContext*, QScriptEngine* engine){
@@ -71,6 +72,8 @@ void LmmsCore::scriptEnable() {
 	qmlRegisterType<Pattern>("lmms.core", 1,0, "Pattern");
 	qmlRegisterType<NoteScriptWrapper>("lmms.core", 1,0, "Note");
 	qmlRegisterType<SubprocessWrapper>("lmms.core", 1,0, "Subprocess");
+
+	gui->mainWindow()->enableScriptTools();
 
 	LmmsCore::scriptEngine = new QScriptEngine();
 	addType<QTimer>(LmmsCore::scriptEngine);
@@ -127,7 +130,8 @@ void LmmsCore::scriptEval( QString script, QString fileName) {
 }
 QScriptValue LmmsCore::scriptPrint(QScriptContext *context, QScriptEngine *engine) {
 	QScriptValue txt = context->argument(0);
-	std::cout << txt.toString().toUtf8().constData() << std::endl;		
+	std::cout << txt.toString().toUtf8().constData() << std::endl;
+	gui->mainWindow()->setScriptDebug( txt.toString() );
 	return txt;
 }
 QScriptValue LmmsCore::generateRandom(QScriptContext *context, QScriptEngine *engine) {
