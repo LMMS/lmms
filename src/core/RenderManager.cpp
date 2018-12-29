@@ -130,7 +130,7 @@ void RenderManager::renderTracks()
 		Track* tk = (*it);
 		Track::TrackTypes type = tk->type();
 
-		// Don't mute automation tracks
+		// Don't render automation tracks
 		if ( tk->isMuted() == false &&
 				( type == Track::InstrumentTrack || type == Track::SampleTrack ) )
 		{
@@ -144,6 +144,7 @@ void RenderManager::renderTracks()
 		Track* tk = (*it);
 		Track::TrackTypes type = tk->type();
 
+		// Don't render automation tracks
 		if ( tk->isMuted() == false &&
 				( type == Track::InstrumentTrack || type == Track::SampleTrack ) )
 		{
