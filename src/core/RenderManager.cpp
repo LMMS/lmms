@@ -142,7 +142,10 @@ void RenderManager::renderTracks()
 	for( auto it = t2.begin(); it != t2.end(); ++it )
 	{
 		Track* tk = (*it);
-		if ( tk->isMuted() == false )
+		Track::TrackTypes type = tk->type();
+
+		if ( tk->isMuted() == false &&
+				( type == Track::InstrumentTrack || type == Track::SampleTrack ) )
 		{
 			m_unmuted.push_back(tk);
 		}
