@@ -78,6 +78,7 @@ private slots:
 	void setSF2Dir( const QString & _sfd );
 	void setArtworkDir( const QString & _ad );
 	void setLADSPADir( const QString & _ld );
+	void setSPADir(const QString& ld);
 	void setSTKDir( const QString & _sd );
 	void setDefaultSoundfont( const QString & _sf );
 	void setBackgroundArtwork( const QString & _ba );
@@ -107,6 +108,7 @@ private slots:
 	void openSF2Dir();
 	void openArtworkDir();
 	void openLADSPADir();
+	void openSPADir();
 	void openSTKDir();
 	void openDefaultSoundfont();
 	void openBackgroundArtwork();
@@ -147,6 +149,7 @@ private:
 	QLineEdit * m_vdLineEdit;
 	QLineEdit * m_adLineEdit;
 	QLineEdit * m_ladLineEdit;
+	QLineEdit * m_spaLineEdit;
 	QLineEdit * m_gigLineEdit;
 	QLineEdit * m_sf2LineEdit;
 #ifdef LMMS_HAVE_FLUIDSYNTH
@@ -161,6 +164,7 @@ private:
 	QString m_vstDir;
 	QString m_artworkDir;
 	QString m_ladDir;
+	QString m_spaDir;
 	QString m_gigDir;
 	QString m_sf2Dir;
 #ifdef LMMS_HAVE_FLUIDSYNTH

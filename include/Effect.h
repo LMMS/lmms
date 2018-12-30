@@ -148,11 +148,6 @@ public:
 		m_noRun = _state;
 	}
 
-	inline const Descriptor::SubPluginFeatures::Key & key() const
-	{
-		return m_key;
-	}
-
 	EffectChain * effectChain() const
 	{
 		return m_parent;
@@ -200,8 +195,6 @@ private:
 					sample_rate_t _src_sr,
 					sampleFrame * _dst_buf, sample_rate_t _dst_sr,
 					const f_cnt_t _frames );
-
-	Descriptor::SubPluginFeatures::Key m_key;
 
 	ch_cnt_t m_processors;
 

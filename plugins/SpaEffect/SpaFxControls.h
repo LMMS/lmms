@@ -40,7 +40,7 @@ class SpaFxControls : public EffectControls, public SpaControlBase
 	void setNameFromFile(const QString &name) override;
 
 public:
-	SpaFxControls(const char *libraryName, class SpaEffect *effect);
+	SpaFxControls(class SpaEffect *effect, const QString &uniqueName);
 	~SpaFxControls() override {}
 
 	class SpaPluginBase &getPluginBase() override;

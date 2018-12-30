@@ -22,6 +22,7 @@
  *
  */
 
+#include <QtGlobal>
 #include <QtCore/QDebug>
 #include <QtCore/QDir>
 #include <QtCore/QLibrary>
@@ -30,10 +31,6 @@
 // comment separator to prevent clang's header sorting
 #include "lmmsconfig.h"
 
-#ifdef LMMS_HAVE_SPA
-	#include <spa/spa.h>
-#endif
-
 #include "Plugin.h"
 #include "embed.h"
 #include "Engine.h"
@@ -41,10 +38,6 @@
 #include "DummyPlugin.h"
 #include "AutomatableModel.h"
 #include "Song.h"
-#ifdef LMMS_HAVE_SPA
-	#include "SpaEffect.h"
-	#include "SpaInstrument.h"
-#endif
 
 
 static PixmapLoader dummyLoader;
@@ -64,10 +57,12 @@ static Plugin::Descriptor dummyPluginDescriptor =
 
 
 
-Plugin::Plugin( const Descriptor * descriptor, Model * parent ) :
-	Model( parent ),
+Plugin::Plugin(const Descriptor * descriptor, Model * parent, const
+		Descriptor::SubPluginFeatures::Key* key) :
+	Model(parent),
 	JournallingObject(),
-	m_descriptor( descriptor )
+	m_descriptor(descriptor),
+	m_key(key ? *key : Descriptor::SubPluginFeatures::Key(m_descriptor))
 {
 	if( m_descriptor == NULL )
 	{
@@ -80,6 +75,87 @@ Plugin::Plugin( const Descriptor * descriptor, Model * parent ) :
 
 Plugin::~Plugin()
 {
+}
+
+
+
+
+template<class T>
+T use_this_or(T this_param, T or_param)
+{
+	return this_param ? this_param : or_param;
+}
+
+
+
+
+QString Plugin::displayName() const
+{
+	return Model::displayName().isEmpty() // currently always empty
+		? (m_descriptor->subPluginFeatures && m_key.isValid())
+			// get from sub plugin
+			? m_key.displayName()
+			// get from plugin
+			: m_descriptor->displayName
+		: Model::displayName();
+}
+
+
+
+
+const PixmapLoader* Plugin::logo() const
+{
+	return (m_descriptor->subPluginFeatures && m_key.isValid())
+		? m_key.logo()
+		: m_descriptor->logo;
+}
+
+
+
+
+const char *Plugin::Descriptor::SubPluginFeatures::Key::additionalFileExtensions() const
+{
+	Q_ASSERT(isValid());
+	return desc->subPluginFeatures
+		// get from sub plugin
+		? desc->subPluginFeatures->additionalFileExtensions(*this)
+		// get from plugin
+		: nullptr;
+}
+
+
+
+
+const char* Plugin::Descriptor::SubPluginFeatures::Key::displayName() const
+{
+	Q_ASSERT(isValid());
+	return desc->subPluginFeatures
+		// get from sub plugin
+		? use_this_or(desc->subPluginFeatures->displayName(*this), desc->displayName)
+		// get from plugin
+		: desc->displayName;
+}
+
+
+
+
+const PixmapLoader* Plugin::Descriptor::SubPluginFeatures::Key::logo() const
+{
+	Q_ASSERT(isValid());
+	return desc->subPluginFeatures
+		? use_this_or(desc->subPluginFeatures->logo(*this), desc->logo)
+		: desc->logo;
+}
+
+
+
+
+const char *Plugin::Descriptor::SubPluginFeatures::Key::description() const
+{
+	Q_ASSERT(isValid());
+	return desc->subPluginFeatures
+		? use_this_or(desc->subPluginFeatures->description(*this), desc->description)
+		: desc->description;
 }
 
 
@@ -101,10 +177,37 @@ AutomatableModel * Plugin::childModel( const QString & )
 
 
 #include "PluginFactory.h"
-Plugin * Plugin::instantiate( const QString& pluginName, Model * parent,
-								void * data )
+Plugin * Plugin::instantiateWithKey(const QString& pluginName, Model * parent,
+				const Descriptor::SubPluginFeatures::Key *key,
+				bool keyFromDnd)
+{
+	if(keyFromDnd)
+		Q_ASSERT(!key);
+	const Descriptor::SubPluginFeatures::Key *keyPtr = keyFromDnd
+		? static_cast<Plugin::Descriptor::SubPluginFeatures::Key*>(Engine::pickDndPluginKey())
+		: key;
+	const PluginFactory::PluginInfo& pi = pluginFactory->pluginInfo(pluginName.toUtf8());
+	if(keyPtr)
+	{
+		// descriptor is not yet set when loading - set it now
+		Descriptor::SubPluginFeatures::Key keyCopy = *keyPtr;
+		keyCopy.desc = pi.descriptor;
+		return Plugin::instantiate(pluginName, parent, &keyCopy);
+	}
+	else
+		return Plugin::instantiate(pluginName, parent,
+			// the keys are never touched anywhere
+			const_cast<Descriptor::SubPluginFeatures::Key *>(keyPtr));
+}
+
+
+
+
+Plugin * Plugin::instantiate(const QString& pluginName, Model * parent,
+								void *data)
 {
 	const PluginFactory::PluginInfo& pi = pluginFactory->pluginInfo(pluginName.toUtf8());
+
 	if( pi.isNull() )
 	{
 		if( gui )
@@ -119,57 +222,18 @@ Plugin * Plugin::instantiate( const QString& pluginName, Model * parent,
 	}
 
 	Plugin* inst;
-#ifdef LMMS_HAVE_SPA
-	spa::descriptor_loader_t spaLoader;
-#endif
 	InstantiationHook instantiationHook;
 	if ((instantiationHook = ( InstantiationHook ) pi.library->resolve( "lmms_plugin_main" )))
 	{
-		inst = instantiationHook( parent, data );
-	}
-#ifdef LMMS_HAVE_SPA
-	else if ((spaLoader = (spa::descriptor_loader_t) pi.library->resolve( spa::descriptor_name )))
-	{
-		SpaPluginBase* spaPlug = nullptr;
-		switch(pi.descriptor->type)
+		inst = instantiationHook(parent, data);
+
+		if(inst)
 		{
-		case Plugin::Instrument:
-		{
-			// instantiate a SPA Instrument
-			// it will load and contain the SPA plugin
-			// and transfer LMMS events to SPA function calls
-			SpaInstrument* spaInst = new SpaInstrument(
-				static_cast<InstrumentTrack *>( data ),
-				pi.file.absoluteFilePath().toUtf8().data(),
-				pi.descriptor);
-			spaPlug = spaInst;
-			inst = spaInst;
-			break;
-		}
-		case Plugin::Effect:
-		{
-			SpaEffect* spaEff = new SpaEffect(
-				pi.file.absoluteFilePath().toUtf8().data(),
-				pi.descriptor, parent);
-			spaPlug = spaEff;
-			inst = spaEff;
-			break;
-		}
-		default:
-			// maybe print message?
-			qDebug() << "Spa plugin is neither instrument, "
-				"nor effect. Ignoring...";
-			inst = nullptr;
-			break;
-		}
-		if(spaPlug)
-		{
-			unsigned port = spaPlug->netPort();
+			unsigned port = inst->netPort();
 			if(port)
-				Engine::getSpaPlugins().insert(port, spaPlug);
+				Engine::addPluginByPort(port, inst);
 		}
 	}
-#endif
 	else
 	{
 		if( gui )
@@ -241,6 +305,5 @@ QDomElement Plugin::Descriptor::SubPluginFeatures::Key::saveXML(
 	}
 	return e;
 }
-
 
 

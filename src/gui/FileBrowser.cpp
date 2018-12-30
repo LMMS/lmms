@@ -180,7 +180,7 @@ void FileBrowser::reloadTree( void )
 
 void FileBrowser::expandItems( QTreeWidgetItem * item )
 {
-    int numChildren = item ? item->childCount() : m_fileBrowserTreeWidget->topLevelItemCount();
+	int numChildren = item ? item->childCount() : m_fileBrowserTreeWidget->topLevelItemCount();
 	for( int i = 0; i < numChildren; ++i )
 	{
 		QTreeWidgetItem * it = item ? item->child( i ) : m_fileBrowserTreeWidget->topLevelItem(i);
@@ -241,7 +241,7 @@ void FileBrowser::addItems(const QString & path )
 					Directory *dd = new Directory( cur_file, path,
 												   m_filter );
 					m_fileBrowserTreeWidget->insertTopLevelItem( i,dd );
-					dd->update();
+					dd->update(); // add files to the directory
 					orphan = false;
 					break;
 				}
@@ -406,7 +406,7 @@ void FileBrowserTreeWidget::mousePressEvent(QMouseEvent * me )
 			delete tf;
 		}
 		else if( ( f->extension() == "xiz" || f->extension() == "xmz" || f->extension() == "sf2" || f->extension() == "sf3" || f->extension() == "gig" || f->extension() == "pat" ) &&
-			! pluginFactory->pluginSupportingExtension(f->extension()).isNull() )
+			! pluginFactory->pluginSupportingExtension(f->extension()).info.isNull() )
 		{
 			m_previewPlayHandle = new PresetPreviewPlayHandle( f->fullName(), f->handling() == FileItem::LoadByPlugin );
 		}
@@ -549,8 +549,9 @@ void FileBrowserTreeWidget::handleFile(FileItem * f, InstrumentTrack * it )
 			if( i == NULL ||
 				!i->descriptor()->supportsFileType( e ) )
 			{
-				i = it->loadInstrument(
-					pluginFactory->pluginSupportingExtension(e).name() );
+				PluginFactory::PluginInfoAndKey piakn =
+					pluginFactory->pluginSupportingExtension(e);
+				i = it->loadInstrument(piakn.info.name(), &piakn.key);
 			}
 			i->loadFile( f->fullName() );
 			break;

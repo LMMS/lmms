@@ -36,9 +36,8 @@
 Effect::Effect( const Plugin::Descriptor * _desc,
 			Model * _parent,
 			const Descriptor::SubPluginFeatures::Key * _key ) :
-	Plugin( _desc, _parent ),
+	Plugin( _desc, _parent, _key ),
 	m_parent( NULL ),
-	m_key( _key ? *_key : Descriptor::SubPluginFeatures::Key()  ),
 	m_processors( 1 ),
 	m_okay( true ),
 	m_noRun( false ),
@@ -117,7 +116,7 @@ Effect * Effect::instantiate( const QString& pluginName,
 				Model * _parent,
 				Descriptor::SubPluginFeatures::Key * _key )
 {
-	Plugin * p = Plugin::instantiate( pluginName, _parent, _key );
+	Plugin * p = Plugin::instantiateWithKey( pluginName, _parent, _key );
 	// check whether instantiated plugin is an effect
 	if( dynamic_cast<Effect *>( p ) != NULL )
 	{

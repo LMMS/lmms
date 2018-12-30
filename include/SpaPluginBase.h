@@ -31,29 +31,16 @@
 
 #include <cstdarg>
 
-#include "Plugin.h"
-
-namespace spa
-{
-class descriptor;
-}
-
-// interface that defines common functions, which are called by the LMMS core
+// interface that defines common functions, which are called by the SpaOscModel
 class SpaPluginBase
 {
 public:
 	virtual ~SpaPluginBase();
 
+	// TODO: can be removed?? only used from SpaOscModel
 	virtual void writeOsc(
 		const char *dest, const char *args, va_list va) = 0;
 	virtual void writeOsc(const char *dest, const char *args, ...) = 0;
-
-	virtual class AutomatableModel *modelAtPort(
-		const class QString &dest) = 0;
-
-	virtual unsigned netPort() const = 0;
-
-	static Plugin::PluginTypes getPluginType(spa::descriptor *desc);
 };
 
 #endif // LMMS_HAVE_SPA
