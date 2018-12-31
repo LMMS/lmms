@@ -648,6 +648,7 @@ void MainWindow::finalize()
 void MainWindow::enableScriptTools() {
 	// simple scripting editor, called after other widgets have initialized
 	m_scriptEditor = new QPlainTextEdit(this);
+	m_scriptEditor->setFixedWidth(500);
 	m_scriptEditor->setStyleSheet("background: black; color:green");
 	m_scriptDebug = new QPlainTextEdit(this);
 	m_scriptDebug->setStyleSheet("background: grey; color:black");

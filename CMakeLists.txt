@@ -157,11 +157,11 @@ SET(QT_LIBRARIES
 	Qt5::Xml
 	Qt5::Script
 	Qt5::Qml
-	qx11embedcontainer
 )
 
 IF(LMMS_BUILD_LINUX)
     FIND_PACKAGE(Qt5 COMPONENTS X11Extras REQUIRED)
+    LIST(APPEND QT_LIBRARIES qx11embedcontainer)
     LIST(APPEND QT_LIBRARIES Qt5::X11Extras)
 ENDIF()
 

@@ -943,9 +943,11 @@ int main( int argc, char * * argv )
 	Engine::scriptEnable();
 
 	if (doScriptRun) {
+		Engine::inst()->setScript(scriptToRun);
 		Engine::scriptEval(scriptToRun, scriptName);
 	}
 	if (doScriptEval) {
+		Engine::inst()->setScript(scriptToEval);
 		Engine::scriptEval(scriptToEval);
 	}
 
