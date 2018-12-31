@@ -135,7 +135,7 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 	m_displayWaveform(ConfigManager::inst()->value( "ui",
 						   "displaywaveform").toInt() ),
 	m_disableAutoQuit(ConfigManager::inst()->value( "ui",
-						   "disableautoquit").toInt() ),
+						   "disableautoquit", "1" ).toInt() ),
 	m_vstEmbedMethod( ConfigManager::inst()->vstEmbedMethod() )
 {
 	setWindowIcon( embed::getIconPixmap( "setup_general" ) );
