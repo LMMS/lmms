@@ -163,7 +163,6 @@ void SpaSubPluginFeatures::listSubPluginKeys(
 						const Plugin::Descriptor * _desc, KeyList & _kl ) const
 {
 	SpaManager* spaMgr = Engine::getSPAManager();
-	qDebug() << "listing sub plugin keys...";
 	for(const std::pair<const std::string, SpaManager::SpaInfo>& pr : *spaMgr)
 	{
 		if(pr.second.m_type == m_type)
@@ -176,7 +175,7 @@ void SpaSubPluginFeatures::listSubPluginKeys(
 			QString uniqueName = spa::unique_name(spaDes).c_str();
 
 			_kl.push_back(KeyType(_desc, spaDes.name(), atm));
-			qDebug() << "Found SPA sub plugin key of type" << m_type << ":" << _kl.back().name;
+			//qDebug() << "Found SPA sub plugin key of type" << m_type << ":" << _kl.back().name;
 		}
 	}
 }
