@@ -36,6 +36,7 @@
 #endif
 
 #include <cassert>
+#include <spa/spa.h>
 #include <spa/audio.h>
 
 #include "../include/RemotePlugin.h" // QSTR_TO_STDSTR
@@ -43,15 +44,21 @@
 #include "ControllerConnection.h"
 #include "Mixer.h"
 #include "SpaControlBase.h"
+#include "SpaManager.h"
 #include "SpaOscModel.h"
 #include "StringPairDrag.h" // DnD
 #include "embed.h"
 #include "gui_templates.h"
 
-SpaControlBase::SpaControlBase(const char *libraryName) :
-	m_ports(Engine::mixer()->framesPerPeriod()), m_hasGUI(false),
-	m_libraryName(libraryName)
+SpaControlBase::SpaControlBase(const QString& uniqueName) :
+	m_spaDescriptor(Engine::getSPAManager()->getDescriptor(uniqueName)),
+	m_ports(Engine::mixer()->framesPerPeriod()), m_hasGUI(false)
 {
+	if(!m_spaDescriptor)
+	{
+		qDebug() << ":-( ! No descriptor found for" << uniqueName;
+	}
+
 	initPlugin();
 }
 
@@ -73,7 +80,7 @@ void SpaControlBase::saveSettings(QDomDocument &doc, QDomElement &that)
 
 			while (!m_plugin->save_check(fn.c_str(), m_saveTicket)) {
 				QThread::msleep(1);
-}
+			}
 
 			QDomCDATASection cdata = doc.createCDATASection(
 				QString::fromUtf8(tf.readAll()));
@@ -216,7 +223,7 @@ void SpaControlBase::reloadPlugin()
 
 void SpaControlBase::copyModelsToPorts()
 {
-	for (LmmsPorts::TypedPorts &tp : m_ports.m_otherPorts)
+	for (LmmsPorts::TypedPorts &tp : m_ports.m_userPorts)
 	{
 		switch (tp.m_type)
 		{
@@ -240,11 +247,10 @@ void SpaControlBase::shutdownPlugin()
 {
 	m_plugin->deactivate();
 
-	delete m_plugin;
+	m_spaDescriptor->delete_plugin(m_plugin);
 	m_plugin = nullptr;
-	delete m_spaDescriptor;
-	m_spaDescriptor = nullptr;
 
+#if 0
 	m_pluginMutex.lock();
 	if (m_lib)
 	{
@@ -258,11 +264,7 @@ void SpaControlBase::shutdownPlugin()
 #endif
 	}
 	m_pluginMutex.unlock();
-}
-
-QString SpaControlBase::nodeName() const
-{
-	return QString::fromStdString(spa::unique_name(*m_spaDescriptor));
+#endif
 }
 
 struct LmmsVisitor final : public virtual spa::audio::visitor
@@ -339,9 +341,9 @@ struct LmmsVisitor final : public virtual spa::audio::visitor
 	void visit(spa::audio::control_in<float> &p) override
 	{
 		qDebug() << "other control port (float)";
-		m_ports->m_otherPorts.emplace_back('f');
+		m_ports->m_userPorts.emplace_back('f');
 		SpaControlBase::LmmsPorts::TypedPorts &bck =
-			m_ports->m_otherPorts.back();
+			m_ports->m_userPorts.back();
 		setupPort(p, bck.m_val.m_f, bck.m_connectedModel.m_floatModel,
 			p.min, p.max, p.step);
 
@@ -356,18 +358,18 @@ struct LmmsVisitor final : public virtual spa::audio::visitor
 	void visit(spa::audio::control_in<int> &p) override
 	{
 		qDebug() << "other control port (int)";
-		m_ports->m_otherPorts.emplace_back('i');
+		m_ports->m_userPorts.emplace_back('i');
 		SpaControlBase::LmmsPorts::TypedPorts &bck =
-			m_ports->m_otherPorts.back();
+			m_ports->m_userPorts.back();
 		setupPort(p, bck.m_val.m_i, bck.m_connectedModel.m_intModel,
 			p.min, p.max);
 	}
 	void visit(spa::audio::control_in<bool> &p) override
 	{
 		qDebug() << "other control port (bool)";
-		m_ports->m_otherPorts.emplace_back('b');
+		m_ports->m_userPorts.emplace_back('b');
 		SpaControlBase::LmmsPorts::TypedPorts &bck =
-			m_ports->m_otherPorts.back();
+			m_ports->m_userPorts.back();
 		setupPort(p, bck.m_val.m_b, bck.m_connectedModel.m_boolModel);
 	}
 
@@ -376,7 +378,8 @@ struct LmmsVisitor final : public virtual spa::audio::visitor
 		qDebug() << "ringbuffer input";
 		if (m_ports->rb) {
 			throw std::runtime_error("can not handle 2 OSC ports");
-		} else
+		}
+		else
 		{
 			m_ports->rb.reset(
 				new spa::audio::osc_ringbuffer(p.get_size()));
@@ -392,64 +395,37 @@ struct LmmsVisitor final : public virtual spa::audio::visitor
 bool SpaControlBase::initPlugin()
 {
 	m_pluginMutex.lock();
-
-	spa::descriptor_loader_t spaDescriptorLoader;
-#ifdef SPA_PLUGIN_USE_QLIBRARY
-	m_lib = new QLibrary(m_libraryName);
-	m_lib->load();
-
-	if (!m_lib->isLoaded()) {
-		qDebug() << "Warning: Could not load library " << m_libraryName
-			 << ": " << m_lib->errorString();
-}
-
-	spaDescriptorLoader = reinterpret_cast<spa::descriptor_loader_t>(
-		m_lib->resolve(spa::descriptor_name));
-#else
-	lib = dlopen(libraryName.toAscii().data(), RTLD_LAZY | RTLD_LOCAL);
-	if (!lib)
-		qDebug() << "Warning: Could not load library " << libraryName
-			 << ": " << dlerror();
-
-	*(void **)(&spaDescriptorLoader) = dlsym(lib, spa::descriptor_name);
-#endif
-
-	if (!spaDescriptorLoader) {
-		qDebug() << "Warning: Could not resolve \"osc_descriptor\" in "
-			 << m_libraryName;
-}
-
-	if (spaDescriptorLoader)
+	if (!m_spaDescriptor)
 	{
-		m_spaDescriptor =
-			(*spaDescriptorLoader)(0 /* = plugin number, TODO */);
-		if (m_spaDescriptor)
-		{
-			try
-			{
-				spa::assert_versions_match(*m_spaDescriptor);
-				m_plugin = m_spaDescriptor->instantiate();
-				// TODO: unite error handling in the ctor
-			}
-			catch (spa::version_mismatch &mismatch)
-			{
-				qCritical()
-					<< "Version mismatch loading plugin: "
-					<< mismatch.what();
-				// TODO: make an operator<<
-				qCritical()
-					<< "Got: " << mismatch.version.major()
-					<< "." << mismatch.version.minor()
-					<< "." << mismatch.version.patch()
-					<< ", expect at least "
-					<< mismatch.least_version.major() << "."
-					<< mismatch.least_version.minor() << "."
-					<< mismatch.least_version.patch();
-				m_spaDescriptor = nullptr;
-			}
-		}
+		m_pluginMutex.unlock();
+		return false;
 	}
-	m_pluginMutex.unlock();
+	else
+	{
+		try
+		{
+			spa::assert_versions_match(*m_spaDescriptor);
+			m_plugin = m_spaDescriptor->instantiate();
+			// TODO: unite error handling in the ctor
+		}
+		catch (spa::version_mismatch &mismatch)
+		{
+			qCritical()
+				<< "Version mismatch loading plugin: "
+				<< mismatch.what();
+			// TODO: make an operator<<
+			qCritical()
+				<< "Got: " << mismatch.version.major()
+				<< "." << mismatch.version.minor()
+				<< "." << mismatch.version.patch()
+				<< ", expect at least "
+				<< mismatch.least_version.major() << "."
+				<< mismatch.least_version.minor() << "."
+				<< mismatch.least_version.patch();
+			m_spaDescriptor = nullptr;
+		}
+		m_pluginMutex.unlock();
+	}
 
 	m_ports.samplerate = Engine::mixer()->processingSampleRate();
 	spa::simple_vec<spa::simple_str> portNames =
@@ -477,7 +453,7 @@ bool SpaControlBase::initPlugin()
 			} else {
 				qWarning() << "plugin specifies invalid port, "
 					      "but does not provide it";
-}
+			}
 			m_plugin = nullptr; // TODO: free plugin, handle etc...
 			return false;
 		}

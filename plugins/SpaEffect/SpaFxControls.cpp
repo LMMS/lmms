@@ -30,8 +30,10 @@
 #include "SpaEffect.h"
 #include "SpaFxControlDialog.h"
 
-SpaFxControls::SpaFxControls(const char *libraryName, class SpaEffect *effect) :
-	EffectControls(effect), SpaControlBase(libraryName), m_effect(effect)
+SpaFxControls::SpaFxControls(class SpaEffect *effect, const QString& uniqueName) :
+	EffectControls(effect),
+	SpaControlBase(uniqueName),
+	m_effect(effect)
 {
 	if (m_plugin)
 	{
@@ -69,7 +71,7 @@ void SpaFxControls::loadSettings(const QDomElement &that)
 
 int SpaFxControls::controlCount()
 {
-	return SpaControlBase::m_ports.m_otherPorts.size();
+	return static_cast<int>(SpaControlBase::m_ports.m_userPorts.size());
 }
 
 EffectControlDialog *SpaFxControls::createView()

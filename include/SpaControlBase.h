@@ -35,9 +35,6 @@
 #include <memory>
 #include <vector>
 
-// whether to use QLibrary vs dlopen()
-#define SPA_PLUGIN_USE_QLIBRARY
-
 // general LMMS includes
 #include "DataFile.h"
 #include "Plugin.h"
@@ -49,7 +46,7 @@
 class SpaControlBase
 {
 public:
-	SpaControlBase(const char *m_libraryName);
+	SpaControlBase(const QString &uniqueName);
 	virtual ~SpaControlBase();
 
 	void saveSettings(QDomDocument &doc, QDomElement &that);
@@ -108,7 +105,7 @@ public:
 		};
 
 		//! these are forwarded to the user in the LMMS-internal GUI
-		std::vector<TypedPorts> m_otherPorts;
+		std::vector<TypedPorts> m_userPorts;
 		LmmsPorts(int bufferSize);
 		std::unique_ptr<spa::audio::osc_ringbuffer> rb;
 	} m_ports;
@@ -129,13 +126,7 @@ protected:
 	bool m_hasGUI;
 	bool m_loaded;
 
-#ifdef SPA_PLUGIN_USE_QLIBRARY
-	class QLibrary *m_lib = nullptr;
-#else
-	void *m_lib = nullptr; //!< dlopen() handle
-#endif
-	QString m_libraryName;
-	QString nodeName() const;
+	QString nodeName() const { return "spacontrols"; }
 
 private:
 	//! load a file in the plugin, but don't do anything in LMMS

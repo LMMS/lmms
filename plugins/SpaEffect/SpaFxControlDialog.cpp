@@ -78,7 +78,7 @@ SpaFxControlDialog::SpaFxControlDialog(SpaFxControls *controls) :
 	const int rowNum = 6; // just some guess for what might look good
 	int wdgNum = 0;
 	for (SpaControlBase::LmmsPorts::TypedPorts &ports :
-		controls->m_ports.m_otherPorts)
+		controls->m_ports.m_userPorts)
 	{
 		QWidget *wdg;
 		switch (ports.m_type)

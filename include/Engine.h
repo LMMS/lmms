@@ -91,10 +91,12 @@ public:
 		return s_ladspaManager;
 	}
 
-	static class QMap<int, class SpaPluginBase*>& getSpaPlugins()
+	static class SpaManager * getSPAManager()
 	{
-		return s_spaPlugins;
+		return s_spaManager;
 	}
+
+	static void addPluginByPort(unsigned port, class Plugin* plug);
 
 	static DummyTrackContainer * dummyTrackContainer()
 	{
@@ -117,14 +119,17 @@ public:
 	}
 
 	static class AutomatableModel*
-	getAutomatableModel(const QString &val, bool hasOsc);
+	getAutomatableModel(const QString &val, bool hasPort);
+	static void setDndPluginKey(void* newKey);
+	static void* pickDndPluginKey();
+
 signals:
 	void initProgress(const QString &msg);
 
 
 private:
 	static class AutomatableModel*
-	getAutomatableOscModel(const QString& val, const QUrl& url);
+	getAutomatableModelAtPort(const QString& val, const QUrl& url);
 
 	// small helper function which sets the pointer to NULL before actually deleting
 	// the object it refers to
@@ -147,7 +152,9 @@ private:
 	static DummyTrackContainer * s_dummyTC;
 
 	static Ladspa2LMMS * s_ladspaManager;
-	static QMap<int, class SpaPluginBase*> s_spaPlugins;
+	static class SpaManager* s_spaManager;
+	static QMap<unsigned, class Plugin*> s_pluginsByPort;
+	static void* s_dndPluginKey;
 
 	// even though most methods are static, an instance is needed for Qt slots/signals
 	static LmmsCore * s_instanceOfMe;

@@ -35,10 +35,27 @@
 #include "InstrumentPlayHandle.h"
 #include "InstrumentTrack.h"
 #include "Mixer.h"
-#include "SpaInstrument.h"
+#include "SpaSubPluginFeatures.h"
 #include "StringPairDrag.h" // DnD
-#include "embed.h"
 #include "gui_templates.h"
+#include "embed.h"
+#include "plugin_export.h"
+
+#include "SpaInstrument.h"
+
+Plugin::Descriptor PLUGIN_EXPORT spainstrument_plugin_descriptor =
+{
+	STRINGIFY(PLUGIN_NAME),
+	"SPA",
+	QT_TRANSLATE_NOOP("SpaInstrument",
+		"plugin for using arbitrary SPA instruments inside LMMS."),
+	"Johannes Lorenz <j.git$$$lorenz-ho.me, $$$=@>",
+	0x0100,
+	Plugin::Instrument,
+	new PluginPixmapLoader("logo"),
+	nullptr,
+	new SpaSubPluginFeatures(Plugin::Instrument)
+};
 
 DataFile::Types SpaInstrument::settingsType()
 {
@@ -51,14 +68,14 @@ void SpaInstrument::setNameFromFile(const QString &name)
 }
 
 SpaInstrument::SpaInstrument(InstrumentTrack *instrumentTrackArg,
-	const char *libraryName, const Descriptor *pluginDescriptor) :
-	Instrument(instrumentTrackArg, pluginDescriptor),
-	SpaControlBase(libraryName)
+	Descriptor::SubPluginFeatures::Key *key) :
+	Instrument(instrumentTrackArg, &spainstrument_plugin_descriptor, key),
+	SpaControlBase(key->attributes["plugin"])
 {
 #ifdef SPA_INSTRUMENT_USE_MIDI
 	for (int i = 0; i < NumKeys; ++i) {
 		m_runningNotes[i] = 0;
-}
+	}
 #endif
 	if (m_plugin)
 	{
@@ -201,7 +218,7 @@ bool SpaInstrument::handleMidiEvent(
 				writeOsc("/noteOff", "ii", 0, event.key());
 				m_pluginMutex.unlock();
 			}
-}
+		}
 		break;
 		/*              case MidiPitchBend:
 				m_master->SetController( event.channel(),
@@ -262,7 +279,7 @@ SpaInsView::SpaInsView(Instrument *_instrument, QWidget *_parent) :
 		SLOT(toggleUI()));
 	m_toggleUIButton->setWhatsThis(
 		tr("Click here to show or hide the graphical user interface "
-		   "(GUI) of Osc."));
+		   "(GUI) of SPA."));
 
 	m_reloadPluginButton = new QPushButton(tr("Reload Plugin"), this);
 
@@ -295,7 +312,7 @@ void SpaInsView::dragEnterEvent(QDragEnterEvent *_dee)
 			_dee->mimeData()->data(StringPairDrag::mimeType());
 		if (txt.section(':', 0, 0) == "pluginpresetfile") {
 			reaction = &QDragEnterEvent::acceptProposedAction;
-}
+		}
 	}
 
 	(_dee->*reaction)();
@@ -307,7 +324,7 @@ void SpaInsView::dropEvent(QDropEvent *_de)
 	const QString value = StringPairDrag::decodeValue(_de);
 	if (type == "pluginpresetfile")
 	{
-		((SpaControlBase*)castModel<SpaInstrument>())->loadFile(value);
+		castModel<SpaInstrument>()->loadFile(value);
 		_de->accept();
 		return;
 	}
@@ -342,3 +359,18 @@ void SpaInsView::reloadPlugin()
 	model->reloadPlugin();
 }
 
+
+
+
+extern "C"
+{
+
+// necessary for getting instance out of shared lib
+PLUGIN_EXPORT Plugin *lmms_plugin_main(Model *_parent, void *_data)
+{
+	using KeyType = Plugin::Descriptor::SubPluginFeatures::Key;
+	return new SpaInstrument(static_cast<InstrumentTrack*>(_parent),
+		static_cast<KeyType*>(_data ));
+}
+
+}

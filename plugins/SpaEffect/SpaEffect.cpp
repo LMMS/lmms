@@ -22,18 +22,36 @@
  *
  */
 
+#include <QDebug>
 #include <spa/spa.h>
 
 #include "AutomatableModel.h"
 #include "SpaFxControlDialog.h"
+#include "SpaSubPluginFeatures.h"
+#include "embed.h"
+#include "plugin_export.h"
 
 #include "SpaEffect.h"
 
-SpaEffect::SpaEffect(const char *libraryName,
-	const Plugin::Descriptor * desc, Model* parent) :
-	Effect(desc, parent, nullptr),
-	m_controls(libraryName, this)
+Plugin::Descriptor PLUGIN_EXPORT spaeffect_plugin_descriptor =
 {
+	STRINGIFY(PLUGIN_NAME),
+	"SPA",
+	QT_TRANSLATE_NOOP("SpaEffect",
+		"plugin for using arbitrary SPA-effects inside LMMS."),
+	"Johannes Lorenz <j.git$$$lorenz-ho.me, $$$=@>",
+	0x0100,
+	Plugin::Effect,
+	new PluginPixmapLoader("logo"),
+	nullptr,
+	new SpaSubPluginFeatures(Plugin::Effect)
+};
+
+SpaEffect::SpaEffect(Model* parent, const Descriptor::SubPluginFeatures::Key *key) :
+	Effect(&spaeffect_plugin_descriptor, parent, key),
+	m_controls(this, key->attributes["plugin"])
+{
+	qDebug() << "Constructing SPA effect";
 }
 
 SpaEffect::~SpaEffect()
@@ -93,3 +111,17 @@ AutomatableModel *SpaEffect::modelAtPort(const QString &dest)
 	return spaControls()->modelAtPort(dest);
 }
 
+
+
+
+extern "C"
+{
+
+// necessary for getting instance out of shared lib
+PLUGIN_EXPORT Plugin *lmms_plugin_main(Model *_parent, void *_data)
+{
+	using KeyType = Plugin::Descriptor::SubPluginFeatures::Key;
+	return new SpaEffect(_parent, static_cast<const KeyType*>(_data));
+}
+
+}

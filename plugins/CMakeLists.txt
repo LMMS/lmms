@@ -72,6 +72,8 @@ IF("${PLUGIN_LIST}" STREQUAL "")
 		sf2_player
 		sfxr
 		sid
+		SpaEffect
+		SpaInstrument
 		SpectrumAnalyzer
 		stereo_enhancer
 		stereo_matrix

@@ -1,5 +1,5 @@
 /*
- * LadspaSubPluginFeatures.cpp - derivation from
+ * SpaSubPluginFeatures.cpp - derivation from
  *                               Plugin::Descriptor::SubPluginFeatures for
  *                               hosting LADSPA-plugins
  *
@@ -25,18 +25,30 @@
  *
  */
 
+#include <QApplication>
+#include <QDebug>
+#include <QDir>
 #include <QHBoxLayout>
 #include <QLabel>
+#include <QLibrary>
+#include <spa/spa.h>
 
-#include "LadspaSubPluginFeatures.h"
+#include "SpaManager.h"
+#include "SpaSubPluginFeatures.h"
 #include "AudioDevice.h"
+#include "ConfigManager.h"
 #include "Engine.h"
-#include "Ladspa2LMMS.h"
-#include "LadspaBase.h"
 #include "Mixer.h"
+#include "embed.h"
+#include "PluginFactory.h"
 
 
-LadspaSubPluginFeatures::LadspaSubPluginFeatures( Plugin::PluginTypes _type ) :
+spa::descriptor *SpaSubPluginFeatures::spaDescriptor(const Plugin::Descriptor::SubPluginFeatures::Key &k)
+{
+	return Engine::getSPAManager()->getDescriptor(k.attributes["plugin"]);
+}
+
+SpaSubPluginFeatures::SpaSubPluginFeatures( Plugin::PluginTypes _type ) :
 	SubPluginFeatures( _type )
 {
 }
@@ -44,19 +56,13 @@ LadspaSubPluginFeatures::LadspaSubPluginFeatures( Plugin::PluginTypes _type ) :
 
 
 
-const char *LadspaSubPluginFeatures::displayName(const Plugin::Descriptor::SubPluginFeatures::Key &k) const
+void SpaSubPluginFeatures::fillDescriptionWidget( QWidget * _parent,
+						const Key * _key ) const
 {
-	const ladspa_key_t & lkey = subPluginKeyToLadspaKey(&k);
-	Ladspa2LMMS * lm = Engine::getLADSPAManager();
-	return lm->getName(lkey).toUtf8().data();
-}
-
-
-
-
-void LadspaSubPluginFeatures::fillDescriptionWidget( QWidget * _parent,
-													const Key * _key  ) const
-{
+	QLabel * label = new QLabel( _parent );
+	label->setText( QWidget::tr( "Name: " ) + "SPA (TODO)" );
+	(void)_key;
+#if 0
 	const ladspa_key_t & lkey = subPluginKeyToLadspaKey( _key );
 	Ladspa2LMMS * lm = Engine::getLADSPAManager();
 
@@ -121,43 +127,55 @@ void LadspaSubPluginFeatures::fillDescriptionWidget( QWidget * _parent,
 	QLabel * channelsOut = new QLabel( _parent );
 	channelsOut->setText( QWidget::tr( "Channels Out: " ) +
 		QString::number( lm->getDescription( lkey )->outputChannels ) );	
+#endif
 }
 
+const char *SpaSubPluginFeatures::additionalFileExtensions(const Plugin::Descriptor::SubPluginFeatures::Key &k) const
+{
+	return spaDescriptor(k)->save_formats();
+}
 
+const char *SpaSubPluginFeatures::displayName(const Plugin::Descriptor::SubPluginFeatures::Key &k) const
+{
+	return spaDescriptor(k)->name();
+}
 
+const char *SpaSubPluginFeatures::description(const Plugin::Descriptor::SubPluginFeatures::Key &k) const
+{
+	return spaDescriptor(k)->description_line();
+}
 
-void LadspaSubPluginFeatures::listSubPluginKeys(
+const PixmapLoader *SpaSubPluginFeatures::logo(const Plugin::Descriptor::SubPluginFeatures::Key &k) const
+{
+	spa::descriptor* spaDes = spaDescriptor(k);
+
+	const char** xpm = spaDes->xpm_load();
+	QString uniqueName = spa::unique_name(*spaDes).c_str();
+
+	QString xpmKey = "spa-plugin:" + uniqueName;
+
+	return xpm
+		? new PixmapLoader(QString("xpm:" + xpmKey), xpm)
+		: new PixmapLoader("plugins");
+}
+
+void SpaSubPluginFeatures::listSubPluginKeys(
 						const Plugin::Descriptor * _desc, KeyList & _kl ) const
 {
-	Ladspa2LMMS * lm = Engine::getLADSPAManager();
-
-	l_sortable_plugin_t plugins;
-	switch( m_type )
+	SpaManager* spaMgr = Engine::getSPAManager();
+	for(const std::pair<const std::string, SpaManager::SpaInfo>& pr : *spaMgr)
 	{
-		case Plugin::Instrument:
-			plugins = lm->getInstruments();
-			break;
-		case Plugin::Effect:
-			plugins = lm->getValidEffects();
-			//plugins += lm->getInvalidEffects();
-			break;
-		case Plugin::Tool:
-			plugins = lm->getAnalysisTools();
-			break;
-		case Plugin::Other:
-			plugins = lm->getOthers();
-			break;
-		default:
-			break;
-	}
-
-	for( l_sortable_plugin_t::const_iterator it = plugins.begin();
-						it != plugins.end(); ++it )
-	{
-		if( lm->getDescription( ( *it ).second )->inputChannels <= 
-				  Engine::mixer()->audioDev()->channels() )
+		if(pr.second.m_type == m_type)
 		{
-			_kl.push_back( ladspaKeyToSubPluginKey( _desc, ( *it ).first, ( *it ).second ) );
+			using KeyType = Plugin::Descriptor::SubPluginFeatures::Key;
+			KeyType::AttributeMap atm;
+			atm["file"] = pr.second.m_path; // TODO: remove path, remove so/dll
+			atm["plugin"] = QString::fromUtf8(pr.first.c_str());
+			const spa::descriptor& spaDes = *pr.second.m_descriptor;
+			QString uniqueName = spa::unique_name(spaDes).c_str();
+
+			_kl.push_back(KeyType(_desc, spaDes.name(), atm));
+			//qDebug() << "Found SPA sub plugin key of type" << m_type << ":" << _kl.back().name;
 		}
 	}
 }
@@ -165,7 +183,7 @@ void LadspaSubPluginFeatures::listSubPluginKeys(
 
 
 
-ladspa_key_t LadspaSubPluginFeatures::subPluginKeyToLadspaKey(
+/*ladspa_key_t SpaSubPluginFeatures::subPluginKeyToLadspaKey(
 							const Key * _key )
 {
 	QString file = _key->attributes["file"];
@@ -177,5 +195,5 @@ ladspa_key_t LadspaSubPluginFeatures::subPluginKeyToLadspaKey(
 						".so"
 #endif
 					, _key->attributes["plugin"] ) );
-}
+}*/
 

@@ -59,7 +59,7 @@ class SpaInstrument : public Instrument,
 
 public:
 	SpaInstrument(InstrumentTrack *instrumentTrackArg,
-		const char *m_libraryName, const Descriptor *pluginDescriptor);
+		 Descriptor::SubPluginFeatures::Key* key);
 	~SpaInstrument() override;
 
 	void saveSettings(QDomDocument &doc, QDomElement &that) override;

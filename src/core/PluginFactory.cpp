@@ -29,16 +29,10 @@
 #include <QtCore/QDir>
 #include <QtCore/QLibrary>
 #include "lmmsconfig.h"
-#ifdef LMMS_HAVE_SPA
-	#include <spa/spa.h>
-#endif
 
 #include "ConfigManager.h"
 #include "Plugin.h"
 #include "embed.h"
-#ifdef LMMS_HAVE_SPA
-	#include "SpaPluginBase.h"
-#endif
 
 #ifdef LMMS_BUILD_WIN32
 	QStringList nameFilters("*.dll");
@@ -54,6 +48,16 @@ qint64 qHash(const QFileInfo& fi)
 std::unique_ptr<PluginFactory> PluginFactory::s_instance;
 
 PluginFactory::PluginFactory()
+{
+	setupSearchPaths();
+	discoverPlugins();
+}
+
+PluginFactory::~PluginFactory()
+{
+}
+
+void PluginFactory::setupSearchPaths()
 {
 	// Adds a search path relative to the main executable if the path exists.
 	auto addRelativeIfExists = [](const QString & path) {
@@ -85,12 +89,6 @@ PluginFactory::PluginFactory()
 		QDir::addSearchPath("plugins", env_path);
 
 	QDir::addSearchPath("plugins", ConfigManager::inst()->workingDir() + "plugins");
-
-	discoverPlugins();
-}
-
-PluginFactory::~PluginFactory()
-{
 }
 
 PluginFactory* PluginFactory::instance()
@@ -116,9 +114,9 @@ const PluginFactory::PluginInfoList& PluginFactory::pluginInfos() const
 	return m_pluginInfos;
 }
 
-const PluginFactory::PluginInfo PluginFactory::pluginSupportingExtension(const QString& ext)
+const PluginFactory::PluginInfoAndKey PluginFactory::pluginSupportingExtension(const QString& ext)
 {
-	return m_pluginByExt.value(ext, PluginInfo());
+	return m_pluginByExt.value(ext, PluginInfoAndKey());
 }
 
 const PluginFactory::PluginInfo PluginFactory::pluginInfo(const char* name) const
@@ -159,9 +157,6 @@ void PluginFactory::discoverPlugins()
 	for (const QFileInfo& file : files)
 	{
 		auto library = std::make_shared<QLibrary>(file.absoluteFilePath());
-#ifdef LMMS_HAVE_SPA
-		spa::descriptor_loader_t spaDescriptorLoader;
-#endif
 		if (! library->load()) {
 			m_errors[file.baseName()] = library->errorString();
 			qWarning("%s", library->errorString().toLocal8Bit().data());
@@ -171,8 +166,6 @@ void PluginFactory::discoverPlugins()
 		Plugin::Descriptor* pluginDescriptor = nullptr;
 		if (library->resolve("lmms_plugin_main"))
 		{
-			// LMMS plugin
-
 			QString descriptorName = file.baseName() + "_plugin_descriptor";
 			if( descriptorName.left(3) == "lib" )
 			{
@@ -187,43 +180,10 @@ void PluginFactory::discoverPlugins()
 				continue;
 			}
 		}
-#ifdef LMMS_HAVE_SPA
-		else if ((spaDescriptorLoader = (spa::descriptor_loader_t) library->resolve(spa::descriptor_name))) {
-			spa::descriptor* descriptor = (*spaDescriptorLoader)(0 /* = plugin number, TODO */);
-			if(descriptor)
-			{
-				std::string uniqueName =
-					spa::unique_name(*descriptor);
-				m_garbage.push_back(uniqueName);
-
-				const char** xpm = descriptor->xpm_load();
-
-				QString xpmKey = "spa-plugin:" +
-					QString::fromStdString(uniqueName);
-
-				PixmapLoader* pixmapLoader =
-					xpm
-					? new PixmapLoader(QString("xpm:"
-						+ xpmKey), xpm)
-					: new PixmapLoader("plugins");
-
-				// spa (simple plugin API) plugin
-				pluginDescriptor = new Plugin::Descriptor {
-					m_garbage.back().c_str(),
-					descriptor->name(),
-					descriptor->description_line(),
-					descriptor->authors(),
-					(int)descriptor->version_major() << 24 |
-						(descriptor->version_minor() & 0xff) << 16 |
-						(descriptor->version_patch() & 0xffff),
-					SpaPluginBase::getPluginType(descriptor),
-					pixmapLoader,
-					descriptor->save_formats(),
-					nullptr
-				};
-			}
+		else
+		{
+			//qDebug() << "Ignoring" << file.absoluteFilePath() << "(no lmms_plugin_main())";
 		}
-#endif
 
 		if(pluginDescriptor)
 		{
@@ -233,10 +193,39 @@ void PluginFactory::discoverPlugins()
 			info.descriptor = pluginDescriptor;
 			pluginInfos << info;
 
-			if (info.descriptor->supportedFileTypes)
-			for (const QString& ext : QString(info.descriptor->supportedFileTypes).split(','))
+			auto addSupportedFileTypes =
+				[this](const char* supportedFileTypes,
+					const PluginInfo& info,
+					const Plugin::Descriptor::SubPluginFeatures::Key* key = nullptr)
 			{
-				m_pluginByExt.insert(ext, info);
+				if(supportedFileTypes)
+				for (const QString& ext : QString(supportedFileTypes).split(','))
+				{
+					//qDebug() << "Plugin " << info.name() << "supports" << ext;
+					PluginInfoAndKey infoAndKey;
+					infoAndKey.info = info;
+					infoAndKey.key = key
+						? *key
+						: Plugin::Descriptor::SubPluginFeatures::Key();
+					m_pluginByExt.insert(ext, infoAndKey);
+				}
+			};
+
+			if (info.descriptor->supportedFileTypes)
+				addSupportedFileTypes(info.descriptor->supportedFileTypes, info);
+
+			if (info.descriptor->subPluginFeatures)
+			{
+				Plugin::Descriptor::SubPluginFeatures::KeyList
+					subPluginKeys;
+				info.descriptor->subPluginFeatures->listSubPluginKeys(
+					info.descriptor,
+					subPluginKeys);
+				for(const Plugin::Descriptor::SubPluginFeatures::Key& key
+					: subPluginKeys)
+				{
+					addSupportedFileTypes(key.additionalFileExtensions(), info, &key);
+				}
 			}
 
 			descriptors.insert(info.descriptor->type, info.descriptor);
@@ -253,3 +242,4 @@ const QString PluginFactory::PluginInfo::name() const
 {
 	return descriptor ? descriptor->name : QString();
 }
+

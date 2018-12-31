@@ -176,6 +176,12 @@ public:
 		return m_ladDir;
 	}
 
+	const QString & spaDir() const
+	{
+		return m_spaDir;
+	}
+
+
 	const QString recoveryFile() const
 	{
 		return m_workingDir + "recover.mmp";
@@ -235,6 +241,7 @@ public:
 	void setVSTDir( const QString & _vd );
 	void setArtworkDir( const QString & _ad );
 	void setLADSPADir( const QString & _fd );
+	void setSPADir(const QString & sd);
 	void setVersion( const QString & _cv );
 	void setSTKDir( const QString & _fd );
 	void setDefaultSoundfont( const QString & _sf );
@@ -265,6 +272,7 @@ private:
 	QString m_artworkDir;
 	QString m_vstDir;
 	QString m_ladDir;
+	QString m_spaDir;
 	QString m_gigDir;
 	QString m_sf2Dir;
 	QString m_version;

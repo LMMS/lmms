@@ -254,6 +254,11 @@ void ConfigManager::setLADSPADir( const QString & _fd )
 	m_ladDir = _fd;
 }
 
+void ConfigManager::setSPADir(const QString &sd)
+{
+	m_spaDir = sd;
+}
+
 
 
 

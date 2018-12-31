@@ -45,8 +45,7 @@ class SpaEffect : public Effect, public SpaPluginBase
 	Q_OBJECT
 
 public:
-	SpaEffect(const char *m_libraryName,
-		const Descriptor *desc, Model* parent);
+	SpaEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* _key);
 	~SpaEffect() override;
 
 	bool processAudioBuffer( sampleFrame* buf, const fpp_t frames ) override;

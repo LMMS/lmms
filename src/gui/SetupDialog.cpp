@@ -106,6 +106,7 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 	m_vstDir( QDir::toNativeSeparators( ConfigManager::inst()->vstDir() ) ),
 	m_artworkDir( QDir::toNativeSeparators( ConfigManager::inst()->artworkDir() ) ),
 	m_ladDir( QDir::toNativeSeparators( ConfigManager::inst()->ladspaDir() ) ),
+	m_spaDir(QDir::toNativeSeparators(ConfigManager::inst()->spaDir())),
 	m_gigDir( QDir::toNativeSeparators( ConfigManager::inst()->gigDir() ) ),
 	m_sf2Dir( QDir::toNativeSeparators( ConfigManager::inst()->sf2Dir() ) ),
 #ifdef LMMS_HAVE_FLUIDSYNTH
@@ -399,6 +400,11 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 		SLOT(setLADSPADir(const QString &)),
 		SLOT(openLADSPADir()),
 		m_ladLineEdit, paths,
+		"add_folder");
+	addPathEntry("SPA plugin directories", m_spaDir,
+		SLOT(setSPADir(const QString &)),
+		SLOT(openSPADir()),
+		m_spaLineEdit, paths,
 		"add_folder");
 #ifdef LMMS_HAVE_STK
 	addPathEntry("STK rawwave directory", m_stkDir,
@@ -848,6 +854,7 @@ void SetupDialog::accept()
 	ConfigManager::inst()->setSF2Dir(QDir::fromNativeSeparators(m_sf2Dir));
 	ConfigManager::inst()->setArtworkDir(QDir::fromNativeSeparators(m_artworkDir));
 	ConfigManager::inst()->setLADSPADir(QDir::fromNativeSeparators(m_ladDir));
+	ConfigManager::inst()->setSPADir(QDir::fromNativeSeparators(m_spaDir));
 #ifdef LMMS_HAVE_FLUIDSYNTH
 	ConfigManager::inst()->setDefaultSoundfont( m_defaultSoundfont );
 #endif
@@ -1169,6 +1176,28 @@ void SetupDialog::openLADSPADir()
 
 
 
+
+void SetupDialog::openSPADir()
+{
+	QString newDir = FileDialog::getExistingDirectory( this,
+				tr( "Choose SPA plugin directory" ),
+							m_spaDir );
+	if( ! newDir.isEmpty() )
+	{
+		if( m_spaLineEdit->text() == "" )
+		{
+			m_spaLineEdit->setText( newDir );
+		}
+		else
+		{
+			m_spaLineEdit->setText( m_spaLineEdit->text() + "," +
+								newDir );
+		}
+	}
+}
+
+
+
 void SetupDialog::openSTKDir()
 {
 #ifdef LMMS_HAVE_STK
@@ -1237,6 +1266,14 @@ void SetupDialog::openBackgroundArtwork()
 void SetupDialog::setLADSPADir( const QString & _fd )
 {
 	m_ladDir = _fd;
+}
+
+
+
+
+void SetupDialog::setSPADir(const QString &ld)
+{
+	m_spaDir = ld;
 }
 
 

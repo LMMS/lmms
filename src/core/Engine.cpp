@@ -32,15 +32,12 @@
 #include "FxMixer.h"
 #include "Ladspa2LMMS.h"
 #include "Mixer.h"
+#include "Plugin.h"
 #include "PresetPreviewPlayHandle.h"
 #include "ProjectJournal.h"
 #include "Song.h"
+#include "SpaManager.h"
 #include "BandLimitedWave.h"
-#include "lmmsconfig.h"
-#ifdef LMMS_HAVE_SPA
-	#include "SpaPluginBase.h"
-	#include "SpaOscModel.h"
-#endif
 
 float LmmsCore::s_framesPerTick;
 Mixer* LmmsCore::s_mixer = NULL;
@@ -49,7 +46,9 @@ BBTrackContainer * LmmsCore::s_bbTrackContainer = NULL;
 Song * LmmsCore::s_song = NULL;
 ProjectJournal * LmmsCore::s_projectJournal = NULL;
 Ladspa2LMMS * LmmsCore::s_ladspaManager = NULL;
-QMap<int, class SpaPluginBase*> LmmsCore::s_spaPlugins;
+SpaManager * LmmsCore::s_spaManager = nullptr;
+void* LmmsCore::s_dndPluginKey = nullptr;
+QMap<unsigned, class Plugin*> LmmsCore::s_pluginsByPort;
 DummyTrackContainer * LmmsCore::s_dummyTC = NULL;
 
 
@@ -71,6 +70,7 @@ void LmmsCore::init( bool renderOnly )
 	s_bbTrackContainer = new BBTrackContainer;
 
 	s_ladspaManager = new Ladspa2LMMS;
+	s_spaManager = new SpaManager;
 
 	s_projectJournal->setJournalling( true );
 
@@ -103,6 +103,7 @@ void LmmsCore::destroy()
 	deleteHelper( &s_mixer );
 
 	deleteHelper( &s_ladspaManager );
+	deleteHelper( &s_spaManager );
 
 	//delete ConfigManager::inst();
 	deleteHelper( &s_projectJournal );
@@ -124,16 +125,14 @@ void LmmsCore::updateFramesPerTick()
 
 
 
-#ifdef LMMS_HAVE_SPA
-AutomatableModel *LmmsCore::getAutomatableOscModel(const QString& val,
+AutomatableModel *LmmsCore::getAutomatableModelAtPort(const QString& val,
 	const QUrl& url)
 {
 	AutomatableModel* mod = nullptr;
 
 	// qDebug() << val;
-	const QMap<int, class SpaPluginBase*>& spaMap = getSpaPlugins();
-	auto itr = spaMap.find(url.port());
-	if(itr == spaMap.end())
+	auto itr = s_pluginsByPort.find(static_cast<unsigned>(url.port()));
+	if(itr == s_pluginsByPort.end())
 	{
 		puts(	"DnD from a plugin which is not "
 			"in LMMS... ignoring");
@@ -146,16 +145,14 @@ AutomatableModel *LmmsCore::getAutomatableOscModel(const QString& val,
 
 	return mod;
 }
-#endif
 
 
 
 
-AutomatableModel *LmmsCore::getAutomatableModel(const QString& val, bool hasOsc)
+AutomatableModel *LmmsCore::getAutomatableModel(const QString& val, bool hasPort)
 {
 	AutomatableModel* mod = nullptr;
-#ifdef LMMS_HAVE_SPA
-	if(hasOsc)
+	if(hasPort)
 	{
 		QUrl url(val);
 		if(!url.isValid())
@@ -166,13 +163,10 @@ AutomatableModel *LmmsCore::getAutomatableModel(const QString& val, bool hasOsc)
 		}
 		else
 		{
-			mod = getAutomatableOscModel(val, url);
+			mod = getAutomatableModelAtPort(val, url);
 		}
 	}
 	else
-#else
-	(void)hasOsc;
-#endif
 	{
 		mod = dynamic_cast<AutomatableModel *>(
 			projectJournal()->
@@ -180,6 +174,33 @@ AutomatableModel *LmmsCore::getAutomatableModel(const QString& val, bool hasOsc)
 	}
 	return mod;
 }
+
+
+
+
+void LmmsCore::setDndPluginKey(void *newKey)
+{
+	Q_ASSERT(static_cast<Plugin::Descriptor::SubPluginFeatures::Key*>(newKey));
+	s_dndPluginKey = newKey;
+}
+
+
+
+
+void *LmmsCore::pickDndPluginKey()
+{
+	return s_dndPluginKey;
+}
+
+
+
+
+void LmmsCore::addPluginByPort(unsigned port, Plugin *plug)
+{
+	s_pluginsByPort.insert(port, plug);
+}
+
+
 
 
 LmmsCore * LmmsCore::s_instanceOfMe = NULL;
