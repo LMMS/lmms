@@ -22,14 +22,14 @@
  *
  */
 
+#include "SpaInstrument.h"
+
 #include <QDebug>
 #include <QDir>
 #include <QGridLayout>
 #include <QTemporaryFile>
-
 #include <spa/audio.h>
 
-#include "../include/RemotePlugin.h" // QSTR_TO_STDSTR
 #include "AutomatableModel.h"
 #include "ControllerConnection.h"
 #include "InstrumentPlayHandle.h"
@@ -40,8 +40,6 @@
 #include "gui_templates.h"
 #include "embed.h"
 #include "plugin_export.h"
-
-#include "SpaInstrument.h"
 
 Plugin::Descriptor PLUGIN_EXPORT spainstrument_plugin_descriptor =
 {

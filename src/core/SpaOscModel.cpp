@@ -24,6 +24,8 @@
 
 #include "SpaOscModel.h"
 
+#ifdef LMMS_HAVE_SPA
+
 #include <QDebug>
 
 #include "SpaControlBase.h"
@@ -69,3 +71,5 @@ FloatOscModel::FloatOscModel(SpaControlBase *plugRef, const QString dest,
 	init(plugRef, dest);
 	QObject::connect(this, SIGNAL(dataChanged()), this, SLOT(sendOsc()));
 }
+
+#endif // LMMS_HAVE_SPA

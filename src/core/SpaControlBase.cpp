@@ -22,6 +22,10 @@
  *
  */
 
+#include "SpaControlBase.h"
+
+#ifdef LMMS_HAVE_SPA
+
 #include <QDebug>
 #include <QDir>
 #include <QGridLayout>
@@ -43,7 +47,6 @@
 #include "AutomatableModel.h"
 #include "ControllerConnection.h"
 #include "Mixer.h"
-#include "SpaControlBase.h"
 #include "SpaManager.h"
 #include "SpaOscModel.h"
 #include "StringPairDrag.h" // DnD
@@ -558,3 +561,5 @@ SpaControlBase::LmmsPorts::LmmsPorts(int bufferSize) :
 	m_rProcessed(castToUnsigned<std::size_t>(bufferSize))
 {
 }
+
+#endif // LMMS_HAVE_SPA

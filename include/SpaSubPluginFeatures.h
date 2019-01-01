@@ -27,6 +27,10 @@
 #ifndef SPA_SUBPLUGIN_FEATURES_H
 #define SPA_SUBPLUGIN_FEATURES_H
 
+#include "lmmsconfig.h"
+
+#ifdef LMMS_HAVE_SPA
+
 #include <spa/spa_fwd.h>
 
 #include "Plugin.h"
@@ -50,5 +54,7 @@ public:
 	void listSubPluginKeys(
 		const Plugin::Descriptor *_desc, KeyList &_kl) const override;
 };
+
+#endif // LMMS_HAVE_SPA
 
 #endif

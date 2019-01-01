@@ -25,10 +25,6 @@
 #ifndef SPA_FX_CONTROLS_H
 #define SPA_FX_CONTROLS_H
 
-#include "lmmsconfig.h"
-
-#ifdef LMMS_HAVE_SPA
-
 #include "EffectControls.h"
 #include "SpaControlBase.h"
 
@@ -65,5 +61,4 @@ private:
 	friend class SpaEffect;
 };
 
-#endif
 #endif

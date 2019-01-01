@@ -22,6 +22,8 @@
  *
  */
 
+#include "SpaEffect.h"
+
 #include <QDebug>
 #include <spa/spa.h>
 
@@ -30,8 +32,6 @@
 #include "SpaSubPluginFeatures.h"
 #include "embed.h"
 #include "plugin_export.h"
-
-#include "SpaEffect.h"
 
 Plugin::Descriptor PLUGIN_EXPORT spaeffect_plugin_descriptor =
 {

@@ -46,7 +46,9 @@ BBTrackContainer * LmmsCore::s_bbTrackContainer = NULL;
 Song * LmmsCore::s_song = NULL;
 ProjectJournal * LmmsCore::s_projectJournal = NULL;
 Ladspa2LMMS * LmmsCore::s_ladspaManager = NULL;
+#ifdef LMMS_HAVE_SPA
 SpaManager * LmmsCore::s_spaManager = nullptr;
+#endif
 void* LmmsCore::s_dndPluginKey = nullptr;
 QMap<unsigned, class Plugin*> LmmsCore::s_pluginsByPort;
 DummyTrackContainer * LmmsCore::s_dummyTC = NULL;
@@ -70,8 +72,9 @@ void LmmsCore::init( bool renderOnly )
 	s_bbTrackContainer = new BBTrackContainer;
 
 	s_ladspaManager = new Ladspa2LMMS;
+#ifdef LMMS_HAVE_SPA
 	s_spaManager = new SpaManager;
-
+#endif
 	s_projectJournal->setJournalling( true );
 
 	emit engine->initProgress(tr("Opening audio and midi devices"));
@@ -103,7 +106,9 @@ void LmmsCore::destroy()
 	deleteHelper( &s_mixer );
 
 	deleteHelper( &s_ladspaManager );
+#ifdef LMMS_HAVE_SPA
 	deleteHelper( &s_spaManager );
+#endif
 
 	//delete ConfigManager::inst();
 	deleteHelper( &s_projectJournal );

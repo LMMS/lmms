@@ -30,6 +30,7 @@
 #include <QtCore/QObject>
 
 
+#include "lmmsconfig.h"
 #include "lmms_export.h"
 
 class BBTrackContainer;
@@ -91,10 +92,12 @@ public:
 		return s_ladspaManager;
 	}
 
+#ifdef LMMS_HAVE_SPA
 	static class SpaManager * getSPAManager()
 	{
 		return s_spaManager;
 	}
+#endif
 
 	static void addPluginByPort(unsigned port, class Plugin* plug);
 
@@ -152,7 +155,9 @@ private:
 	static DummyTrackContainer * s_dummyTC;
 
 	static Ladspa2LMMS * s_ladspaManager;
+#ifdef LMMS_HAVE_SPA
 	static class SpaManager* s_spaManager;
+#endif
 	static QMap<unsigned, class Plugin*> s_pluginsByPort;
 	static void* s_dndPluginKey;
 

@@ -25,10 +25,6 @@
 #ifndef SPA_INSTRUMENT_H
 #define SPA_INSTRUMENT_H
 
-#include "lmmsconfig.h"
-
-#ifdef LMMS_HAVE_SPA
-
 #include <QMap>
 #include <QString>
 #include <memory>
@@ -116,7 +112,5 @@ private slots:
 	void toggleUI();
 	void reloadPlugin();
 };
-
-#endif // LMMS_HAVE_SPA
 
 #endif // SPA_INSTRUMENT_H

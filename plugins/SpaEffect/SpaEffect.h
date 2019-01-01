@@ -25,10 +25,6 @@
 #ifndef SPA_EFFECT_H
 #define SPA_EFFECT_H
 
-#include "lmmsconfig.h"
-
-#ifdef LMMS_HAVE_SPA
-
 #include <QString>
 
 #include "Effect.h"
@@ -59,5 +55,3 @@ private:
 };
 
 #endif // LMMS_HAVE_SPA
-
-#endif // SPA_EFFECT_H

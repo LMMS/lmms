@@ -25,6 +25,10 @@
 #ifndef SPAMANAGER_H
 #define SPAMANAGER_H
 
+#include "lmmsconfig.h"
+
+#ifdef LMMS_HAVE_SPA
+
 #include <map>
 #include <spa/spa_fwd.h>
 
@@ -80,5 +84,7 @@ public:
 private:
 	std::map<std::string, SpaInfo> m_spaInfoMap;
 };
+
+#endif // LMMS_HAVE_SPA
 
 #endif // SPAMANAGER_H

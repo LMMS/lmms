@@ -24,6 +24,8 @@
 
 #include "SpaManager.h"
 
+#ifdef LMMS_HAVE_SPA
+
 #include <QDebug>
 #include <QDir>
 #include <QLibrary>
@@ -212,3 +214,5 @@ void SpaManager::SpaInfo::cleanup()
 	m_descriptor->delete_self();
 	delete m_lib;
 }
+
+#endif // LMMS_HAVE_SPA

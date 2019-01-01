@@ -25,10 +25,6 @@
 #ifndef SPA_FX_CONTROL_DIALOG_H
 #define SPA_FX_CONTROL_DIALOG_H
 
-#include "lmmsconfig.h"
-
-#ifdef LMMS_HAVE_SPA
-
 #include "EffectControlDialog.h"
 
 class SpaFxControlDialog : public EffectControlDialog
@@ -50,5 +46,4 @@ private slots:
 	void reloadPlugin();
 };
 
-#endif
 #endif
