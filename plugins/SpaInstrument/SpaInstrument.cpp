@@ -240,19 +240,6 @@ PluginView *SpaInstrument::instantiateView(QWidget *parent)
 	return new SpaInsView(this, parent);
 }
 
-void SpaInstrument::writeOsc(const char *dest, const char *args, va_list va)
-{
-	writeOscInternal(dest, args, va);
-}
-
-void SpaInstrument::writeOsc(const char *dest, const char *args, ...)
-{
-	va_list va;
-	va_start(va, args);
-	writeOsc(dest, args, va);
-	va_end(va);
-}
-
 unsigned SpaInstrument::netPort() const
 {
 	return m_plugin->net_port();

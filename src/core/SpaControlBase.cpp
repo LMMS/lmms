@@ -452,23 +452,23 @@ bool SpaControlBase::initPlugin()
 	return true;
 }
 
-void SpaControlBase::writeOscInternal(
+void SpaControlBase::writeOsc(
 	const char *dest, const char *args, va_list va)
 {
 	m_ports.rb->write(dest, args, va);
 }
 
-void SpaControlBase::writeOscInternal(const char *dest, const char *args, ...)
+void SpaControlBase::writeOsc(const char *dest, const char *args, ...)
 {
 	va_list va;
 	va_start(va, args);
-	writeOscInternal(dest, args, va);
+	writeOsc(dest, args, va);
 	va_end(va);
 }
 
 struct SpaOscModelFactory : public spa::audio::visitor
 {
-	SpaPluginBase *m_plugRef;
+	SpaControlBase *m_plugRef;
 	const QString m_dest;
 
 public:
@@ -503,7 +503,7 @@ public:
 	}
 
 	SpaOscModelFactory(SpaControlBase *ctrlBase, const QString &dest) :
-		m_plugRef(&ctrlBase->getPluginBase()), m_dest(dest)
+		m_plugRef(ctrlBase), m_dest(dest)
 	{
 	}
 };

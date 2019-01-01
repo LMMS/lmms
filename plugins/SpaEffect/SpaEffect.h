@@ -31,16 +31,10 @@
 
 #include <QString>
 
-// general LMMS includes
 #include "Effect.h"
-
-// LMMS includes for spa
-#include "SpaPluginBase.h"
 #include "SpaFxControls.h"
 
-class QPushButton;
-
-class SpaEffect : public Effect, public SpaPluginBase
+class SpaEffect : public Effect
 {
 	Q_OBJECT
 
@@ -55,8 +49,6 @@ public:
 	SpaFxControls* spaControls() { return &m_controls; }
 	const SpaFxControls* spaControls() const { return &m_controls; }
 
-	void writeOsc(const char *dest, const char *args, va_list va) override;
-	void writeOsc(const char *dest, const char *args, ...) override;
 	unsigned netPort() const override;
 	class AutomatableModel* modelAtPort(const QString& dest) override;
 

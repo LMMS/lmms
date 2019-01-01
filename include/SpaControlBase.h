@@ -52,6 +52,9 @@ public:
 	void saveSettings(QDomDocument &doc, QDomElement &that);
 	void loadSettings(const QDomElement &that);
 
+	void writeOsc(const char *dest, const char *args, va_list va);
+	void writeOsc(const char *dest, const char *args, ...);
+
 	void loadFile(const QString &file);
 
 	const spa::descriptor *m_spaDescriptor = nullptr;
@@ -60,13 +63,8 @@ public:
 	QMap<QString, AutomatableModel *> m_connectedModels;
 	uint64_t m_loadTicket = 0, m_saveTicket = 0, m_restoreTicket = 0;
 
-	virtual class SpaPluginBase &getPluginBase() = 0;
-
 protected:
 	void reloadPlugin();
-
-	void writeOscInternal(const char *dest, const char *args, va_list va);
-	void writeOscInternal(const char *dest, const char *args, ...);
 
 	class AutomatableModel *modelAtPort(const QString &dest);
 

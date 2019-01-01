@@ -26,7 +26,7 @@
 
 #include <QDebug>
 
-#include "SpaPluginBase.h"
+#include "SpaControlBase.h"
 
 void BoolOscModel::sendOsc()
 {
@@ -41,7 +41,7 @@ void FloatOscModel::sendOsc()
 	m_plugRef->writeOsc(m_dest.data(), "f", value());
 }
 
-BoolOscModel::BoolOscModel(SpaPluginBase *plugRef, const QString dest, bool val) :
+BoolOscModel::BoolOscModel(SpaControlBase *plugRef, const QString dest, bool val) :
 	SpaOscModel<BoolModel>(val, nullptr, dest, false)
 {
 	qDebug() << "LMMS: receiving bool model: val = " << val;
@@ -49,7 +49,7 @@ BoolOscModel::BoolOscModel(SpaPluginBase *plugRef, const QString dest, bool val)
 	QObject::connect(this, SIGNAL(dataChanged()), this, SLOT(sendOsc()));
 }
 
-IntOscModel::IntOscModel(SpaPluginBase *plugRef, const QString dest, int min,
+IntOscModel::IntOscModel(SpaControlBase *plugRef, const QString dest, int min,
 	int max, int val) :
 	SpaOscModel<IntModel>(val, min, max, nullptr, dest, false)
 {
@@ -59,7 +59,7 @@ IntOscModel::IntOscModel(SpaPluginBase *plugRef, const QString dest, int min,
 	QObject::connect(this, SIGNAL(dataChanged()), this, SLOT(sendOsc()));
 }
 
-FloatOscModel::FloatOscModel(SpaPluginBase *plugRef, const QString dest,
+FloatOscModel::FloatOscModel(SpaControlBase *plugRef, const QString dest,
 	float min, float max, float step, float val) :
 	// Ctor for FloatModel (see using clause in SpaOscModel)
 	SpaOscModel<FloatModel>(val, min, max, step, nullptr, dest, false)

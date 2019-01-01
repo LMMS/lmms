@@ -33,14 +33,10 @@
 #include <QString>
 #include <memory>
 
-// general LMMS includes
 #include "Instrument.h"
 #include "InstrumentView.h"
 #include "Note.h"
-
-// LMMS includes for spa
 #include "SpaControlBase.h"
-#include "SpaPluginBase.h"
 
 // whether to use MIDI vs playHandle
 // currently only MIDI works
@@ -48,14 +44,12 @@
 
 class QPushButton;
 
-class SpaInstrument : public Instrument,
-	public SpaControlBase, public SpaPluginBase
+class SpaInstrument : public Instrument, public SpaControlBase
 {
 	Q_OBJECT
 
 	DataFile::Types settingsType() override;
 	void setNameFromFile(const QString &name) override;
-	SpaPluginBase& getPluginBase() override { return *this; }
 
 public:
 	SpaInstrument(InstrumentTrack *instrumentTrackArg,
@@ -86,8 +80,6 @@ public:
 
 	PluginView *instantiateView(QWidget *parent) override;
 
-	void writeOsc(const char *dest, const char *args, va_list va) override;
-	void writeOsc(const char *dest, const char *args, ...) override;
 	unsigned netPort() const override;
 	class AutomatableModel* modelAtPort(const QString& dest) override;
 

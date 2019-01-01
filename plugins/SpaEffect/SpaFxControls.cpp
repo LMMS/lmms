@@ -42,8 +42,6 @@ SpaFxControls::SpaFxControls(class SpaEffect *effect, const QString& uniqueName)
 	}
 }
 
-SpaPluginBase &SpaFxControls::getPluginBase() { return *m_effect; }
-
 DataFile::Types SpaFxControls::settingsType()
 {
 	return DataFile::EffectSettings;

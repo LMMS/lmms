@@ -88,19 +88,6 @@ bool SpaEffect::processAudioBuffer(sampleFrame *buf, const fpp_t frames)
 	return isRunning();
 }
 
-void SpaEffect::writeOsc(const char *dest, const char *args, va_list va)
-{
-	spaControls()->writeOscInternal(dest, args, va);
-}
-
-void SpaEffect::writeOsc(const char *dest, const char *args, ...)
-{
-	va_list va;
-	va_start(va, args);
-	writeOsc(dest, args, va);
-	va_end(va);
-}
-
 unsigned SpaEffect::netPort() const
 {
 	return spaControls()->m_plugin->net_port();
