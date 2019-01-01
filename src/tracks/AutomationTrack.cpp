@@ -24,7 +24,6 @@
  *
  */
 
-#include <QDebug>
 #include <QMap>
 #include "AutomationTrack.h"
 #include "AutomationPattern.h"
@@ -34,6 +33,7 @@
 #include "StringPairDrag.h"
 #include "TrackContainerView.h"
 #include "TrackLabelButton.h"
+
 
 AutomationTrack::AutomationTrack( TrackContainer* tc, bool _hidden ) :
 	Track( _hidden ? HiddenAutomationTrack : Track::AutomationTrack, tc )

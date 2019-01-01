@@ -25,6 +25,7 @@
  */
 
 
+#include <QDebug>
 #include <QMimeData>
 #include <QDragEnterEvent>
 
@@ -70,18 +71,16 @@ StringPairDrag::~StringPairDrag()
 }
 
 
-// TODO: clean up debug output
+
 
 bool StringPairDrag::processDragEnterEvent( QDragEnterEvent * _dee,
 						const QString & _allowed_keys )
 {
-	printf("StringPairDrag: %d %d\n",
-	       _dee->pos().x(), _dee->pos().y());
 	if( !_dee->mimeData()->hasFormat( mimeType() ) &&
 		!_dee->mimeData()->hasFormat( mimeTypeOsc() ) )
 	{
-		printf("will reject: bad mimetype: %s\n",
-			_dee->mimeData()->formats().empty()
+		qDebug() << "will reject: bad mimetype:"
+			<< (_dee->mimeData()->formats().empty()
 				? "none"
 				: _dee->mimeData()->formats().front().
 					toUtf8().data());
@@ -91,7 +90,7 @@ bool StringPairDrag::processDragEnterEvent( QDragEnterEvent * _dee,
 	if( _allowed_keys.split( ',' ).contains( txt.section( ':', 0, 0 ) ) )
 	{
 		_dee->acceptProposedAction();
-		puts("will accept DnD");
+		qDebug() << "will accept DnD";
 		return true;
 	}
 	else {
@@ -99,11 +98,12 @@ bool StringPairDrag::processDragEnterEvent( QDragEnterEvent * _dee,
 		if( _allowed_keys.split( ',' ).contains( txtOsc.section( ':', 0, 0 ) ) )
 		{
 			_dee->acceptProposedAction();
-			puts("will accept OSC DnD");
+			qDebug() << "will accept OSC DnD";
 			return true;
 		}
 		else
-			printf("will reject: cannot drop \"%s\" or \"%s\" here\n", txt.toUtf8().data(), txtOsc.toUtf8().data());
+			qDebug() << "will reject DnD: cannot drop"
+				<< txt << "or" << txtOsc <<  "here";
 	}
 	_dee->ignore();
 	return false;

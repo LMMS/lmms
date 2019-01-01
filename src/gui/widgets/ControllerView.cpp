@@ -160,10 +160,16 @@ void ControllerView::renameController()
 	}
 }
 
+
+
+
 void ControllerView::dragEnterEvent( QDragEnterEvent * dee )
 {
 	StringPairDrag::processDragEnterEvent( dee, "automatable_model" );
 }
+
+
+
 
 void ControllerView::dropEvent(QDropEvent *de)
 {
@@ -184,6 +190,8 @@ void ControllerView::dropEvent(QDropEvent *de)
 
 	update();
 }
+
+
 
 
 void ControllerView::mouseDoubleClickEvent( QMouseEvent * event )

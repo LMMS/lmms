@@ -1,8 +1,4 @@
-IF(LMMS_HAVE_SPA)
-	SET(SPA_SRCS core/SpaOscModel.cpp core/SpaControlBase.cpp core/SpaSubPluginFeatures.cpp core/SpaManager.cpp)
-ENDIF(LMMS_HAVE_SPA)
-
-SET(LMMS_SRCS
+set(LMMS_SRCS
 	${LMMS_SRCS}
 	core/AutomatableModel.cpp
 	core/AutomationPattern.cpp
@@ -65,6 +61,10 @@ SET(LMMS_SRCS
 	core/SampleRecordHandle.cpp
 	core/SerializingObject.cpp
 	core/Song.cpp
+	core/SpaControlBase.cpp
+	core/SpaManager.cpp
+	core/SpaOscModel.cpp
+	core/SpaSubPluginFeatures.cpp
 	core/TempoSyncKnobModel.cpp
 	core/ToolPlugin.cpp
 	core/Track.cpp
@@ -101,8 +101,5 @@ SET(LMMS_SRCS
 	core/midi/MidiTime.cpp
 	core/midi/MidiWinMM.cpp
 
-	${SPA_SRCS}
-
 	PARENT_SCOPE
 )
-

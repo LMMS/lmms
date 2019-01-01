@@ -218,10 +218,16 @@ void ControllerRackView::closeEvent( QCloseEvent * _ce )
 	_ce->ignore();
 }
 
+
+
+
 void ControllerRackView::dragEnterEvent( QDragEnterEvent *dee )
 {
 	StringPairDrag::processDragEnterEvent( dee, "automatable_model" );
 }
+
+
+
 
 void ControllerRackView::dropEvent( QDropEvent *de )
 {

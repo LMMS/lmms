@@ -1198,6 +1198,7 @@ void SetupDialog::openSPADir()
 
 
 
+
 void SetupDialog::openSTKDir()
 {
 #ifdef LMMS_HAVE_STK

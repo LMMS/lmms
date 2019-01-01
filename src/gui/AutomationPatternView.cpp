@@ -23,7 +23,6 @@
  */
 #include "AutomationPatternView.h"
 
-#include <QDebug>
 #include <QMouseEvent>
 #include <QPainter>
 #include <QMenu>

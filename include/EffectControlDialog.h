@@ -40,8 +40,10 @@ public:
 	EffectControlDialog( EffectControls * _controls );
 	virtual ~EffectControlDialog();
 
+
 signals:
 	void closed();
+
 
 protected:
 	virtual void closeEvent( QCloseEvent * _ce );

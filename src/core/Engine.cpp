@@ -24,7 +24,6 @@
 
 
 #include <QUrl>
-#include <QtDebug>
 
 #include "Engine.h"
 #include "BBTrackContainer.h"

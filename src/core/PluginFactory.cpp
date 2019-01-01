@@ -242,4 +242,3 @@ const QString PluginFactory::PluginInfo::name() const
 {
 	return descriptor ? descriptor->name : QString();
 }
-

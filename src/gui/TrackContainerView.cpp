@@ -517,7 +517,7 @@ void TrackContainerView::scrollArea::wheelEvent( QWheelEvent * _we )
 
 
 
-InstrumentLoaderThread::InstrumentLoaderThread(QObject *parent, InstrumentTrack *it, QString name) :
+InstrumentLoaderThread::InstrumentLoaderThread( QObject *parent, InstrumentTrack *it, QString name ) :
 	QThread( parent ),
 	m_it( it ),
 	m_name( name )
