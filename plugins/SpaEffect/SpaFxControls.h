@@ -1,7 +1,7 @@
 /*
  * SpaControls.h - controls for bassboosterx -effect
  *
- * Copyright (c) 2018-2018 Johannes Lorenz <j.git$$$lorenz-ho.me, $$$=@>
+ * Copyright (c) 2018-2019 Johannes Lorenz <j.git$$$lorenz-ho.me, $$$=@>
  *
  * This file is part of LMMS - https://lmms.io
  *

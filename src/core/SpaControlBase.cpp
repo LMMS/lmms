@@ -1,7 +1,7 @@
 /*
  * SpaControlBase.cpp - base class for spa instruments, effects, etc
  *
- * Copyright (c) 2018-2018 Johannes Lorenz <j.git$$$lorenz-ho.me, $$$=@>
+ * Copyright (c) 2018-2019 Johannes Lorenz <j.git$$$lorenz-ho.me, $$$=@>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -249,22 +249,6 @@ void SpaControlBase::shutdownPlugin()
 
 	m_spaDescriptor->delete_plugin(m_plugin);
 	m_plugin = nullptr;
-
-#if 0
-	m_pluginMutex.lock();
-	if (m_lib)
-	{
-#ifdef SPA_PLUGIN_USE_QLIBRARY
-		m_lib->unload();
-		delete m_lib;
-		m_lib = nullptr;
-#else
-		dlclose(lib);
-		lib = nullptr;
-#endif
-	}
-	m_pluginMutex.unlock();
-#endif
 }
 
 struct LmmsVisitor final : public virtual spa::audio::visitor
@@ -318,15 +302,11 @@ struct LmmsVisitor final : public virtual spa::audio::visitor
 	}
 
 	template <class BaseType, class ModelClass, class... ModelCtorArgs>
-	void setupPort(/*char letter,*/
+	void setupPort(
 		spa::audio::control_in<BaseType> &port, BaseType &portData,
 		ModelClass *&connectedModel,
 		const ModelCtorArgs &... modelCtorArgs)
 	{
-		//		m_ports->m_otherPorts.emplace_back(letter);
-		//		SpaControlBase::LmmsPorts::TypedPorts& bck =
-		//m_ports->m_otherPorts.back();
-
 		portData = port.def;
 		port.set_ref(&portData);
 		connectedModel = new ModelClass(static_cast<BaseType>(port),

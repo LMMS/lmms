@@ -1,7 +1,7 @@
 /*
- * spainstrument.cpp - implementation of SPA interface
+ * SpaEffect.cpp - implementation of SPA effect
  *
- * Copyright (c) 2018-2018 Johannes Lorenz <j.git$$$lorenz-ho.me, $$$=@>
+ * Copyright (c) 2018-2019 Johannes Lorenz <j.git$$$lorenz-ho.me, $$$=@>
  *
  * This file is part of LMMS - https://lmms.io
  *

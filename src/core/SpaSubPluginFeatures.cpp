@@ -1,7 +1,7 @@
 /*
  * SpaSubPluginFeatures.cpp - derivation from
- *                               Plugin::Descriptor::SubPluginFeatures for
- *                               hosting LADSPA-plugins
+ *                            Plugin::Descriptor::SubPluginFeatures for
+ *                            hosting SPA plugins
  *
  * Copyright (c) 2006-2007 Danny McRae <khjklujn/at/users.sourceforge.net>
  * Copyright (c) 2006-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
@@ -25,6 +25,8 @@
  *
  */
 
+#include "SpaSubPluginFeatures.h"
+
 #include <QApplication>
 #include <QDebug>
 #include <QDir>
@@ -33,167 +35,149 @@
 #include <QLibrary>
 #include <spa/spa.h>
 
-#include "SpaManager.h"
-#include "SpaSubPluginFeatures.h"
 #include "AudioDevice.h"
 #include "ConfigManager.h"
 #include "Engine.h"
 #include "Mixer.h"
-#include "embed.h"
 #include "PluginFactory.h"
+#include "SpaManager.h"
+#include "embed.h"
 
-
-spa::descriptor *SpaSubPluginFeatures::spaDescriptor(const Plugin::Descriptor::SubPluginFeatures::Key &k)
+spa::descriptor *SpaSubPluginFeatures::spaDescriptor(
+	const Plugin::Descriptor::SubPluginFeatures::Key &k)
 {
 	return Engine::getSPAManager()->getDescriptor(k.attributes["plugin"]);
 }
 
-SpaSubPluginFeatures::SpaSubPluginFeatures( Plugin::PluginTypes _type ) :
-	SubPluginFeatures( _type )
+SpaSubPluginFeatures::SpaSubPluginFeatures(Plugin::PluginTypes _type) :
+	SubPluginFeatures(_type)
 {
 }
 
-
-
-
-void SpaSubPluginFeatures::fillDescriptionWidget( QWidget * _parent,
-						const Key * _key ) const
+void SpaSubPluginFeatures::fillDescriptionWidget(
+	QWidget *_parent, const Key *k) const
 {
-	QLabel * label = new QLabel( _parent );
-	label->setText( QWidget::tr( "Name: " ) + "SPA (TODO)" );
-	(void)_key;
-#if 0
-	const ladspa_key_t & lkey = subPluginKeyToLadspaKey( _key );
-	Ladspa2LMMS * lm = Engine::getLADSPAManager();
+	spa::descriptor *spaDes = spaDescriptor(*k);
 
-	QLabel * label = new QLabel( _parent );
-	label->setText( QWidget::tr( "Name: " ) + lm->getName( lkey ) );
+	QLabel *label = new QLabel(_parent);
+	label->setText(QWidget::tr("Name: ") + spaDes->name());
 
-	QLabel* fileInfo = new QLabel( _parent );
-	fileInfo->setText( QWidget::tr( "File: %1" ).arg( lkey.first ) );
+	QLabel *label2 = new QLabel(_parent);
+	label2->setText(spaDes->organizations()
+			? QWidget::tr((strchr(spaDes->organizations(), ',')
+					? "Organizations: "
+					: "Organization: ")) +
+				spaDes->organizations()
+			: QWidget::tr("Organization: ") + "<none specified>");
 
-	QWidget * maker = new QWidget( _parent );
-	QHBoxLayout * l = new QHBoxLayout( maker );
-	l->setMargin( 0 );
-	l->setSpacing( 0 );
+	QWidget *maker = new QWidget(_parent);
+	QHBoxLayout *l = new QHBoxLayout(maker);
+	l->setMargin(0);
+	l->setSpacing(0);
 
-	QLabel * maker_label = new QLabel( maker );
-	maker_label->setText( QWidget::tr( "Maker: " ) );
-	maker_label->setAlignment( Qt::AlignTop );
-	QLabel * maker_content = new QLabel( maker );
-	maker_content->setText( lm->getMaker( lkey ) );
-	maker_content->setWordWrap( true );
-	l->addWidget( maker_label );
-	l->addWidget( maker_content, 1 );
+	QLabel *maker_label = new QLabel(maker);
+	maker_label->setText(QWidget::tr("Maker: "));
+	maker_label->setAlignment(Qt::AlignTop);
 
-	QWidget * copyright = new QWidget( _parent );
-	l = new QHBoxLayout( copyright );
-	l->setMargin( 0 );
-	l->setSpacing( 0 );
+	QLabel *maker_content = new QLabel(maker);
+	maker_content->setText(spaDes->authors());
+	maker_content->setWordWrap(true);
 
-	copyright->setMinimumWidth( _parent->minimumWidth() );
-	QLabel * copyright_label = new QLabel( copyright );
-	copyright_label->setText( QWidget::tr( "Copyright: " ) );
-	copyright_label->setAlignment( Qt::AlignTop );
+	l->addWidget(maker_label);
+	l->addWidget(maker_content, 1);
 
-	QLabel * copyright_content = new QLabel( copyright );
-	copyright_content->setText( lm->getCopyright( lkey ) );
-	copyright_content->setWordWrap( true );
-	l->addWidget( copyright_label );
-	l->addWidget( copyright_content, 1 );
+	QWidget *copyright = new QWidget(_parent);
+	l = new QHBoxLayout(copyright);
+	l->setMargin(0);
+	l->setSpacing(0);
+	copyright->setMinimumWidth(_parent->minimumWidth());
 
-	QLabel * requiresRealTime = new QLabel( _parent );
-	requiresRealTime->setText( QWidget::tr( "Requires Real Time: " ) +
-					( lm->hasRealTimeDependency( lkey ) ?
-							QWidget::tr( "Yes" ) :
-							QWidget::tr( "No" ) ) );
+	QLabel *copyright_label = new QLabel(copyright);
+	copyright_label->setText(QWidget::tr("Copyright: "));
+	copyright_label->setAlignment(Qt::AlignTop);
 
-	QLabel * realTimeCapable = new QLabel( _parent );
-	realTimeCapable->setText( QWidget::tr( "Real Time Capable: " ) +
-					( lm->isRealTimeCapable( lkey ) ?
-							QWidget::tr( "Yes" ) :
-							QWidget::tr( "No" ) ) );
+	using license_type = spa::descriptor::license_type;
+	QLabel *copyright_content = new QLabel(copyright);
+	copyright_content->setText(spaDes->license() == license_type::gpl_3_0
+			? "GPL v3.0"
+			: spaDes->license() == license_type::gpl_2_0
+				? "GPL v2.0"
+				: spaDes->license() == license_type::lgpl_3_0
+					? "LGPL v3.0"
+					: spaDes->license() ==
+							license_type::lgpl_2_1
+						? "LGPL v2.1"
+						: "<see package or source>");
+	copyright_content->setWordWrap(true);
+	l->addWidget(copyright_label);
+	l->addWidget(copyright_content, 1);
 
-	QLabel * inplaceBroken = new QLabel( _parent );
-	inplaceBroken->setText( QWidget::tr( "In Place Broken: " ) +
-					( lm->isInplaceBroken( lkey ) ?
-							QWidget::tr( "Yes" ) :
-							QWidget::tr( "No" ) ) );
-	
-	QLabel * channelsIn = new QLabel( _parent );
-	channelsIn->setText( QWidget::tr( "Channels In: " ) +
-		QString::number( lm->getDescription( lkey )->inputChannels ) );
+	QLabel *requiresRealTime = new QLabel(_parent);
+	requiresRealTime->setText(QWidget::tr("Requires Real Time: ") +
+		(spaDes->properties.realtime_dependency ? QWidget::tr("Yes")
+							: QWidget::tr("No")));
 
-	QLabel * channelsOut = new QLabel( _parent );
-	channelsOut->setText( QWidget::tr( "Channels Out: " ) +
-		QString::number( lm->getDescription( lkey )->outputChannels ) );	
-#endif
+	QLabel *realTimeCapable = new QLabel(_parent);
+	realTimeCapable->setText(QWidget::tr("Real Time Capable: ") +
+		(spaDes->properties.hard_rt_capable ? QWidget::tr("Yes")
+							: QWidget::tr("No")));
+
+	// possibly TODO: version, project, plugin type, number of channels
 }
 
-const char *SpaSubPluginFeatures::additionalFileExtensions(const Plugin::Descriptor::SubPluginFeatures::Key &k) const
+const char *SpaSubPluginFeatures::additionalFileExtensions(
+	const Plugin::Descriptor::SubPluginFeatures::Key &k) const
 {
 	return spaDescriptor(k)->save_formats();
 }
 
-const char *SpaSubPluginFeatures::displayName(const Plugin::Descriptor::SubPluginFeatures::Key &k) const
+const char *SpaSubPluginFeatures::displayName(
+	const Plugin::Descriptor::SubPluginFeatures::Key &k) const
 {
 	return spaDescriptor(k)->name();
 }
 
-const char *SpaSubPluginFeatures::description(const Plugin::Descriptor::SubPluginFeatures::Key &k) const
+const char *SpaSubPluginFeatures::description(
+	const Plugin::Descriptor::SubPluginFeatures::Key &k) const
 {
 	return spaDescriptor(k)->description_line();
 }
 
-const PixmapLoader *SpaSubPluginFeatures::logo(const Plugin::Descriptor::SubPluginFeatures::Key &k) const
+const PixmapLoader *SpaSubPluginFeatures::logo(
+	const Plugin::Descriptor::SubPluginFeatures::Key &k) const
 {
-	spa::descriptor* spaDes = spaDescriptor(k);
+	spa::descriptor *spaDes = spaDescriptor(k);
 
-	const char** xpm = spaDes->xpm_load();
+	const char **xpm = spaDes->xpm_load();
 	QString uniqueName = spa::unique_name(*spaDes).c_str();
 
 	QString xpmKey = "spa-plugin:" + uniqueName;
 
-	return xpm
-		? new PixmapLoader(QString("xpm:" + xpmKey), xpm)
-		: new PixmapLoader("plugins");
+	return xpm ? new PixmapLoader(QString("xpm:" + xpmKey), xpm)
+		   : new PixmapLoader("plugins");
 }
 
 void SpaSubPluginFeatures::listSubPluginKeys(
-						const Plugin::Descriptor * _desc, KeyList & _kl ) const
+	const Plugin::Descriptor *_desc, KeyList &_kl) const
 {
-	SpaManager* spaMgr = Engine::getSPAManager();
-	for(const std::pair<const std::string, SpaManager::SpaInfo>& pr : *spaMgr)
+	SpaManager *spaMgr = Engine::getSPAManager();
+	for (const std::pair<const std::string, SpaManager::SpaInfo> &pr :
+		*spaMgr)
 	{
-		if(pr.second.m_type == m_type)
+		if (pr.second.m_type == m_type)
 		{
-			using KeyType = Plugin::Descriptor::SubPluginFeatures::Key;
+			using KeyType =
+				Plugin::Descriptor::SubPluginFeatures::Key;
 			KeyType::AttributeMap atm;
-			atm["file"] = pr.second.m_path; // TODO: remove path, remove so/dll
+			atm["file"] = pr.second.m_path; // TODO: remove path,
+							// remove so/dll
 			atm["plugin"] = QString::fromUtf8(pr.first.c_str());
-			const spa::descriptor& spaDes = *pr.second.m_descriptor;
+			const spa::descriptor &spaDes = *pr.second.m_descriptor;
 			QString uniqueName = spa::unique_name(spaDes).c_str();
 
 			_kl.push_back(KeyType(_desc, spaDes.name(), atm));
-			//qDebug() << "Found SPA sub plugin key of type" << m_type << ":" << _kl.back().name;
+			// qDebug() << "Found SPA sub plugin key of type" <<
+			// m_type << ":" << _kl.back().name;
 		}
 	}
 }
-
-
-
-
-/*ladspa_key_t SpaSubPluginFeatures::subPluginKeyToLadspaKey(
-							const Key * _key )
-{
-	QString file = _key->attributes["file"];
-	return( ladspa_key_t( file.remove( QRegExp( "\\.so$" ) ).
-				remove( QRegExp( "\\.dll$" ) ) +
-#ifdef LMMS_BUILD_WIN32
-						".dll"
-#else
-						".so"
-#endif
-					, _key->attributes["plugin"] ) );
-}*/
-

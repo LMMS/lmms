@@ -1,7 +1,7 @@
 /*
  * SpaManager.cpp - Implementation of SpaManager class
  *
- * Copyright (c) 2018-2018 Johannes Lorenz <j.git$$$lorenz-ho.me, $$$=@>
+ * Copyright (c) 2018-2019 Johannes Lorenz <j.git$$$lorenz-ho.me, $$$=@>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -22,16 +22,17 @@
  *
  */
 
+#include "SpaManager.h"
+
 #include <QDebug>
 #include <QDir>
 #include <QLibrary>
-#include <spa/spa.h>
 #include <spa/audio.h>
+#include <spa/spa.h>
 
 #include "ConfigManager.h"
 #include "Plugin.h"
 #include "PluginFactory.h"
-#include "SpaManager.h"
 
 SpaManager::SpaManager()
 {
@@ -41,45 +42,54 @@ SpaManager::SpaManager()
 	PluginFactory::setupSearchPaths();
 
 	// TODO: "LADSPA"
-	QStringList spaDirectories = QString( getenv( "SPA_PATH" ) ).
-								split( LADSPA_PATH_SEPERATOR );
-	spaDirectories += ConfigManager::inst()->spaDir().split( ',' );
+	QStringList spaDirectories =
+		QString(getenv("SPA_PATH")).split(LADSPA_PATH_SEPERATOR);
+	spaDirectories += ConfigManager::inst()->spaDir().split(',');
 
-	spaDirectories.push_back( "plugins:spa" );
-/*
-	// nothing official yet:
-#ifndef LMMS_BUILD_WIN32
-	spaDirectories.push_back( qApp->applicationDirPath() + '/' + LIB_DIR + "spa" );
-	spaDirectories.push_back( "/usr/lib/spa" );
-	spaDirectories.push_back( "/usr/lib64/spa" );
-	spaDirectories.push_back( "/usr/local/lib/spa" );
-	spaDirectories.push_back( "/usr/local/lib64/spa" );
-	spaDirectories.push_back( "/Library/Audio/Plug-Ins/SPA" );
-#endif*/
+	spaDirectories.push_back("plugins:spa");
+	/*
+		// nothing official yet:
+	#ifndef LMMS_BUILD_WIN32
+		spaDirectories.push_back( qApp->applicationDirPath() + '/' +
+	LIB_DIR + "spa" ); spaDirectories.push_back( "/usr/lib/spa" );
+		spaDirectories.push_back( "/usr/lib64/spa" );
+		spaDirectories.push_back( "/usr/local/lib/spa" );
+		spaDirectories.push_back( "/usr/local/lib64/spa" );
+		spaDirectories.push_back( "/Library/Audio/Plug-Ins/SPA" );
+	#endif*/
 
-	auto addSinglePlugin = [this](const QString& absolutePath)
-	{
+	auto addSinglePlugin = [this](const QString &absolutePath) {
 		SpaInfo info;
 		info.m_lib = new QLibrary(absolutePath);
 		spa::descriptor_loader_t spaDescriptorLoader;
 
-		if(info.m_lib->load())
+		if (info.m_lib->load())
 		{
-			spaDescriptorLoader = reinterpret_cast<spa::descriptor_loader_t>(
-				info.m_lib->resolve(spa::descriptor_name));
+			spaDescriptorLoader =
+				reinterpret_cast<spa::descriptor_loader_t>(
+					info.m_lib->resolve(
+						spa::descriptor_name));
 
-			if(spaDescriptorLoader)
+			if (spaDescriptorLoader)
 			{
-				info.m_descriptor =
-					(*spaDescriptorLoader)(0 /* = plugin number, TODO */);
-				if(info.m_descriptor)
+				info.m_descriptor = (*spaDescriptorLoader)(
+					0 /* = plugin number, TODO */);
+				if (info.m_descriptor)
 				{
-					info.m_type = getPluginType(info.m_descriptor);
-					if(info.m_type != Plugin::PluginTypes::Undefined)
+					info.m_type = computePluginType(
+						info.m_descriptor);
+					if (info.m_type !=
+						Plugin::PluginTypes::Undefined)
 					{
-						qDebug() << "SpaManager: Adding " << spa::unique_name(*info.m_descriptor).c_str();
+						qDebug()
+							<< "SpaManager: Adding "
+							<< spa::unique_name(
+								*info.m_descriptor)
+								.c_str();
 						info.m_path = absolutePath;
-						m_spaInfoMap[spa::unique_name(*info.m_descriptor)] = std::move(info);
+						m_spaInfoMap[spa::unique_name(
+							*info.m_descriptor)] =
+							std::move(info);
 					}
 				}
 			}
@@ -92,26 +102,25 @@ SpaManager::SpaManager()
 		{
 			qWarning() << info.m_lib->errorString();
 		}
-
 	};
 
-	for( QStringList::iterator it = spaDirectories.begin();
-					it != spaDirectories.end(); ++it )
+	for (QStringList::iterator it = spaDirectories.begin();
+		it != spaDirectories.end(); ++it)
 	{
-		QDir directory( ( *it ) );
+		QDir directory((*it));
 		QFileInfoList list = directory.entryInfoList();
-		for( QFileInfoList::iterator file = list.begin();
-						file != list.end(); ++file )
+		for (QFileInfoList::iterator file = list.begin();
+			file != list.end(); ++file)
 		{
-			const QFileInfo & f = *file;
-			if( f.isFile() &&
-				 f.fileName().right( 3 ).toLower() ==
+			const QFileInfo &f = *file;
+			if (f.isFile() &&
+				f.fileName().right(3).toLower() ==
 #ifdef LMMS_BUILD_WIN32
-													"dll"
+					"dll"
 #else
-													".so"
+					".so"
 #endif
-								)
+			)
 			{
 				addSinglePlugin(f.absoluteFilePath());
 			}
@@ -121,13 +130,13 @@ SpaManager::SpaManager()
 
 SpaManager::~SpaManager()
 {
-	for(std::pair<const std::string, SpaInfo>& pr : m_spaInfoMap)
+	for (std::pair<const std::string, SpaInfo> &pr : m_spaInfoMap)
 	{
 		pr.second.cleanup();
 	}
 }
 
-Plugin::PluginTypes SpaManager::getPluginType(spa::descriptor *desc)
+Plugin::PluginTypes SpaManager::computePluginType(spa::descriptor *desc)
 {
 	spa::plugin *plug = desc->instantiate();
 
@@ -187,7 +196,7 @@ Plugin::PluginTypes SpaManager::getPluginType(spa::descriptor *desc)
 	return res;
 }
 
-spa::descriptor *SpaManager::getDescriptor(const std::string& uniqueName)
+spa::descriptor *SpaManager::getDescriptor(const std::string &uniqueName)
 {
 	auto itr = m_spaInfoMap.find(uniqueName);
 	return itr == m_spaInfoMap.end() ? nullptr : itr->second.m_descriptor;
@@ -198,8 +207,8 @@ spa::descriptor *SpaManager::getDescriptor(const QString uniqueName)
 	return getDescriptor(std::string(uniqueName.toUtf8()));
 }
 
-
 void SpaManager::SpaInfo::cleanup()
 {
-	m_descriptor->delete_self(); delete m_lib;
+	m_descriptor->delete_self();
+	delete m_lib;
 }

@@ -3,7 +3,7 @@
  *                          Plugin::Descriptor::SubPluginFeatures for
  *                          hosting SPA plugins
  *
- * Copyright (c) 2018-2018 Johannes Lorenz <j.git$$$lorenz-ho.me, $$$=@>
+ * Copyright (c) 2018-2019 Johannes Lorenz <j.git$$$lorenz-ho.me, $$$=@>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -29,27 +29,26 @@
 
 #include <spa/spa_fwd.h>
 
-#include "LadspaManager.h"
 #include "Plugin.h"
-
 
 class SpaSubPluginFeatures : public Plugin::Descriptor::SubPluginFeatures
 {
 private:
-	static spa::descriptor* spaDescriptor(const Key& k);
+	static spa::descriptor *spaDescriptor(const Key &k);
+
 public:
-	SpaSubPluginFeatures( Plugin::PluginTypes _type );
+	SpaSubPluginFeatures(Plugin::PluginTypes _type);
 
-	virtual void fillDescriptionWidget( QWidget * _parent,
-						const Key * _key ) const override;
+	virtual void fillDescriptionWidget(
+		QWidget *_parent, const Key *k) const override;
 
-	const char* additionalFileExtensions(const Key& k) const override;
-	const char* displayName(const Key& k) const override;
-	const char* description(const Key& k) const override;
-	const PixmapLoader* logo(const Key& k) const override;
+	const char *additionalFileExtensions(const Key &k) const override;
+	const char *displayName(const Key &k) const override;
+	const char *description(const Key &k) const override;
+	const PixmapLoader *logo(const Key &k) const override;
 
-	void listSubPluginKeys( const Plugin::Descriptor * _desc,
-						KeyList & _kl ) const override;
-} ;
+	void listSubPluginKeys(
+		const Plugin::Descriptor *_desc, KeyList &_kl) const override;
+};
 
 #endif
