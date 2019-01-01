@@ -28,9 +28,11 @@
 
 #include <QtCore/QString>
 #include <QtCore/QObject>
-
-
-#include "export.h"
+#include <QtScript/QScriptEngine>
+#include "SubprocessWrapper.h"
+#include "GuiApplication.h"
+#include "MainWindow.h"
+//#include "lmms_export.h"
 
 class BBTrackContainer;
 class DummyTrackContainer;
@@ -53,9 +55,40 @@ class Ladspa2LMMS;
 class LmmsCore;
 typedef LmmsCore Engine;
 
-class EXPORT LmmsCore : public QObject
+class LmmsCore : public QObject
 {
 	Q_OBJECT
+	//Q_PROPERTY(Mixer* mixer MEMBER s_mixer)
+	//Q_PROPERTY(FxMixer* fxMixer MEMBER s_fxMixer)
+	//Q_PROPERTY(Song* song MEMBER s_song)
+	//Q_PROPERTY(BBTrackContainer* bbTrackContainer MEMBER s_bbTrackContainer)
+
+static std::vector<SubprocessWrapper*> s_processes;
+public slots:
+	inline SubprocessWrapper* newProcess(QString exe, QStringList args, bool capture=false, int width=320, int height=240) {
+		//auto parent = new QWidget(); // seems to also break mplayer with native xembed support
+		//auto sw = new SubprocessWrapper(exe,args, capture, parent, width, height);
+		auto sw = new SubprocessWrapper(exe,args, capture, NULL, width, height);
+		s_processes.push_back( sw );
+		return sw;
+	}
+	inline QMdiArea* getWorkspace() {
+		return gui->mainWindow()->workspace();
+	}
+	inline QWidget* getToolBar() {
+		return gui->mainWindow()->toolBar();
+	}
+	inline QString getScript() {
+		return gui->mainWindow()->getScript();
+	}
+	inline void setScript(QString txt) {
+		gui->mainWindow()->setScript(txt);
+	}
+	inline double gamepadAxis(int index) {
+		return LmmsCore::s_gamepad_state[index];
+	}
+
+
 public:
 	static void init( bool renderOnly );
 	static void destroy();
@@ -111,6 +144,22 @@ public:
 		return s_instanceOfMe;
 	}
 
+	// note: on fedora installs with: dnf install qt5-qtscript-devel
+	static QScriptEngine* scriptEngine;
+	static void scriptEnable();
+	static QScriptValue scriptPrint(QScriptContext *context, QScriptEngine *engine);
+	static QScriptValue generateRandom(QScriptContext *context, QScriptEngine *engine);
+	static void scriptEval(std::string script, std::string fileName="");
+	static void scriptEval(QString script, QString fileName="");
+	static inline void updateGamepad(double x1,double y1,double z1,  double x2,double y2,double z2) {
+		LmmsCore::s_gamepad_state[0] = x1;
+		LmmsCore::s_gamepad_state[1] = y1;
+		LmmsCore::s_gamepad_state[2] = z1;
+		LmmsCore::s_gamepad_state[3] = x2;
+		LmmsCore::s_gamepad_state[4] = y2;
+		LmmsCore::s_gamepad_state[5] = z2;
+	}
+
 signals:
 	void initProgress(const QString &msg);
 
@@ -135,15 +184,12 @@ private:
 	static BBTrackContainer * s_bbTrackContainer;
 	static ProjectJournal * s_projectJournal;
 	static DummyTrackContainer * s_dummyTC;
-
 	static Ladspa2LMMS * s_ladspaManager;
 
+	static double s_gamepad_state[6];
 	// even though most methods are static, an instance is needed for Qt slots/signals
 	static LmmsCore * s_instanceOfMe;
-
 	friend class GuiApplication;
 };
 
-
 #endif
-

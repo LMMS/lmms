@@ -30,6 +30,8 @@
 #include <QtCore/QList>
 #include <QMainWindow>
 #include <QThread>
+#include <QPushButton>
+#include <QPlainTextEdit>
 
 #include "ConfigManager.h"
 #include "SubWindow.h"
@@ -43,6 +45,16 @@ class ConfigManager;
 class PluginView;
 class ToolButton;
 
+
+#ifdef LMMS_HAVE_SDL
+#ifdef LMMS_HAVE_SDL2
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_joystick.h>
+#else
+#include <SDL/SDL.h>
+#include <SDL/SDL_joystick.h>
+#endif
+#endif
 
 class MainWindow : public QMainWindow
 {
@@ -144,6 +156,18 @@ public:
 	static void saveWidgetState( QWidget * _w, QDomElement & _de );
 	static void restoreWidgetState( QWidget * _w, const QDomElement & _de );
 
+	inline QString getScript() {
+		return m_scriptEditor->toPlainText();
+	}
+	inline void setScript(QString txt) {
+		m_scriptEditor->setPlainText(txt);
+	}
+	inline void setScriptDebug(QString txt) {
+		m_scriptDebug->setPlainText(txt);
+	}
+	void enableScriptTools();
+
+
 public slots:
 	void resetWindowTitle();
 
@@ -174,6 +198,10 @@ public slots:
 	void redo();
 
 	void autoSave();
+
+#ifdef LMMS_HAVE_SDL
+	void updateSDL();
+#endif
 
 protected:
 	virtual void closeEvent( QCloseEvent * _ce );
@@ -232,6 +260,16 @@ private:
 
 	SessionState m_session;
 
+	QPlainTextEdit* m_scriptEditor;
+	QPlainTextEdit* m_scriptDebug;
+	QPushButton* m_scriptRunButton;
+
+
+#ifdef LMMS_HAVE_SDL
+	SDL_Joystick *m_joystick;
+	QTimer m_sdlTimer;
+#endif
+
 private slots:
 	void browseHelp();
 	void fillTemplatesMenu();
@@ -241,6 +279,7 @@ private slots:
 	void updateViewMenu( void );
 	void updateConfig( QAction * _who );
 	void onToggleMetronome();
+	void onRunScript();
 
 
 signals:

@@ -67,7 +67,7 @@ OPTION(WANT_TAP		"Include Tom's Audio Processing LADSPA plugins" ON)
 OPTION(WANT_VST		"Include VST support" OFF)
 OPTION(WANT_VST_NOWINE	"Include partial VST support (without wine)" OFF)
 OPTION(WANT_WINMM	"Include WinMM MIDI support" OFF)
-OPTION(WANT_QT5		"Build with Qt5" ON)
+OPTION(WANT_QT5		"Build with Qt5" OFF)
 
 
 IF(LMMS_BUILD_APPLE)
@@ -171,9 +171,23 @@ ELSE()
 	SET(QT5 FALSE)
 
 	# check for Qt4
-	SET(QT_MIN_VERSION "4.6.0" COMPONENTS QtCore QtGui QtXml)
+	SET(QT_MIN_VERSION "4.6.0" COMPONENTS QtCore QtGui QtXml QtScript)
 	FIND_PACKAGE(Qt4 REQUIRED)
+	#SET(QT_LIBRARIES
+	#	Qt4::QtScript
+	#)
+
+	IF(LMMS_BUILD_LINUX)
+		find_package(X11 REQUIRED)
+		#LIST(APPEND QT_LIBRARIES Qt4::QtScript Qt4::QtDeclarative ${X11_LIBRARIES})
+		MESSAGE("${QT_LIBRARIES}")
+	ENDIF()
+
+
 	SET(QT_USE_QTXML 1)
+	SET(QT_USE_QTSCRIPT 1)
+	SET(QT_USE_QTDECLARATIVE 1)
+
 	IF(WIN32)
 		SET(QT_TRANSLATIONS_DIR "${MINGW_PREFIX}/share/qt4/translations/")
 	ENDIF(WIN32)

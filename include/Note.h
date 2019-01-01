@@ -27,6 +27,7 @@
 #define NOTE_H
 
 #include <QtCore/QVector>
+#include <QtCore/QObject>
 
 #include "volume.h"
 #include "panning.h"
@@ -238,8 +239,28 @@ private:
 	DetuningHelper * m_detuning;
 };
 
-
 typedef QVector<Note *> NoteVector;
 
+
+class NoteScriptWrapper : public QObject {
+	Q_OBJECT
+	public:
+		NoteScriptWrapper(){};
+		NoteScriptWrapper(Note* note) : m_note(note) {};
+		inline Note* getPointer() { return this->m_note; }
+	public slots:
+		inline int getKey() {
+			return this->m_note->key();
+		};
+		inline void setKey(int key) {
+			this->m_note->setKey(key);
+		};
+	private:
+		Note* m_note;
+
+};
+
+///usr/include/QtCore/qsemaphore.h:51:1: error: expected constructor, destructor, or type conversion before ‘typedef’ QT_MODULE(Core)
+//Q_DECLARE_METATYPE( NoteScriptWrapper* )
 
 #endif

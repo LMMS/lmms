@@ -252,6 +252,39 @@ MainWindow::~MainWindow()
 }
 
 
+void MainWindow::enableScriptTools() {
+	// simple scripting editor, called after other widgets have initialized
+	m_scriptEditor = new QPlainTextEdit(this);
+	m_scriptEditor->setFixedWidth(500);
+	m_scriptEditor->setStyleSheet("background: black; color:green");
+	m_scriptDebug = new QPlainTextEdit(this);
+	m_scriptDebug->setStyleSheet("background: grey; color:black");
+	m_scriptRunButton = new QPushButton("run", this);
+	connect(m_scriptRunButton, SIGNAL (released()), this, SLOT (onRunScript()));
+	this->addWidgetToToolBar( m_scriptEditor );
+	this->addWidgetToToolBar( m_scriptRunButton );
+	this->addWidgetToToolBar( m_scriptDebug );
+}
+
+void MainWindow::onRunScript() {
+	Engine::scriptEval( this->getScript() );
+}
+
+#ifdef LMMS_HAVE_SDL
+	void MainWindow::updateSDL() {
+		SDL_Event event;
+		SDL_PollEvent(&event);
+		double x1 = ((double)SDL_JoystickGetAxis(m_joystick, 0)) / 32768.0;
+		double y1 = ((double)SDL_JoystickGetAxis(m_joystick, 1)) / 32768.0;
+		double z1 = (((double)SDL_JoystickGetAxis(m_joystick, 2)) / 32768.0) + 1.0;
+		double x2 = ((double)SDL_JoystickGetAxis(m_joystick, 3)) / 32768.0;
+		double y2 = ((double)SDL_JoystickGetAxis(m_joystick, 4)) / 32768.0;
+		double z2 = (((double)SDL_JoystickGetAxis(m_joystick, 5)) / 32768.0) + 1.0;
+        Knob::updateGamepad( x1,y1,z1, x2,y2,z2 );
+        Engine::updateGamepad( x1,y1,z1, x2,y2,z2 );
+	}
+#endif
+
 
 
 void MainWindow::finalize()

@@ -34,6 +34,16 @@
 #include "Song.h"
 #include "BandLimitedWave.h"
 
+#include "Note.h"
+#include "BBTrack.h"
+#include "InstrumentTrack.h"
+#include "Pattern.h"
+#include <iostream>
+#include <QtCore/QTimer>
+//#include <QtCore/QRandomGenerator>
+//#include <QtQml/QQmlEngine>
+#include <QtDeclarative/QtDeclarative>
+
 float LmmsCore::s_framesPerTick;
 Mixer* LmmsCore::s_mixer = NULL;
 FxMixer * LmmsCore::s_fxMixer = NULL;
@@ -42,7 +52,94 @@ Song * LmmsCore::s_song = NULL;
 ProjectJournal * LmmsCore::s_projectJournal = NULL;
 Ladspa2LMMS * LmmsCore::s_ladspaManager = NULL;
 DummyTrackContainer * LmmsCore::s_dummyTC = NULL;
+QScriptEngine* LmmsCore::scriptEngine = NULL;
+std::vector<SubprocessWrapper*> LmmsCore::s_processes = {};
+double LmmsCore::s_gamepad_state[6] = {0.0};
 
+template <typename T> void addType(QScriptEngine* engine) {
+	auto constructor = engine->newFunction([](QScriptContext*, QScriptEngine* engine){
+		return engine->newQObject(new T());
+	});
+	auto value = engine->newQMetaObject(&T::staticMetaObject, constructor);
+	engine->globalObject().setProperty(T::staticMetaObject.className(), value);
+}
+
+void LmmsCore::scriptEnable() {
+	//qmlRegisterType<Mixer>("lmms.core", 1,0, "Mixer");
+	//qmlRegisterType<Song>("lmms.core", 1,0, "Song");
+	//qmlRegisterType<BBTrackContainer>("lmms.core", 1,0, "BBTrackContainer");
+	//qmlRegisterType<BBTrack>("lmms.core", 1,0, "BBTrack");
+	//qmlRegisterType<InstrumentTrack>("lmms.core", 1,0, "InstrumentTrack");
+	//qmlRegisterType<Pattern>("lmms.core", 1,0, "Pattern");
+	qmlRegisterType<NoteScriptWrapper>("lmms.core", 1,0, "Note");
+	qmlRegisterType<SubprocessWrapper>("lmms.core", 1,0, "Subprocess");
+
+	gui->mainWindow()->enableScriptTools();
+
+	LmmsCore::scriptEngine = new QScriptEngine();
+	addType<QTimer>(LmmsCore::scriptEngine);
+
+	QScriptValue fun = LmmsCore::scriptEngine->newFunction(LmmsCore::scriptPrint);
+	LmmsCore::scriptEngine->globalObject().setProperty("print", fun);
+
+	QScriptValue fun2 = LmmsCore::scriptEngine->newFunction(LmmsCore::generateRandom);
+	LmmsCore::scriptEngine->globalObject().setProperty("random", fun2);
+
+	LmmsCore *engine = inst();  // the singleton instance of LmmsCore
+	//auto engine = new LmmsCoreScriptWrapper();
+	QScriptValue ewrapper = LmmsCore::scriptEngine->newQObject(engine);
+	LmmsCore::scriptEngine->globalObject().setProperty("lmms", ewrapper);
+
+	LmmsCore::scriptEngine->evaluate(R"HEADER(
+	function dir(object) {
+		var names = [];
+		for (s in object) {
+			names.push(s);
+		}
+		names.sort();
+		return names;
+	}
+	function setTimeout(fn, ms) {
+		var timer = new QTimer();
+		timer.interval = ms;
+		timer.singleShot = true;
+		var conn = timer.timeout.connect(fn);
+		timer.start();
+	}
+	function setInterval(fn, ms) {
+		var timer = new QTimer();
+		timer.interval = ms;
+		timer.singleShot = false;
+		var conn = timer.timeout.connect(fn);
+		timer.start();
+	}
+	)HEADER");
+}
+
+void LmmsCore::scriptEval( std::string script, std::string fileName) {
+	LmmsCore::scriptEval(QString(script.c_str()), QString(fileName.c_str()));
+}
+void LmmsCore::scriptEval( QString script, QString fileName) {
+	QScriptValue result = LmmsCore::scriptEngine->evaluate(script, fileName);
+	if (LmmsCore::scriptEngine->hasUncaughtException()) {
+		int line = LmmsCore::scriptEngine->uncaughtExceptionLineNumber();
+		//std::cout << "uncaught exception at line" << line << ":" << result.toString() << std::endl;
+		std::cout << "uncaught exception at line" << line << ":" << result.toString().toUtf8().constData() << std::endl;
+	} else {
+		std::cout << "script result: " << result.toString().toUtf8().constData() << std::endl;		
+	}
+}
+QScriptValue LmmsCore::scriptPrint(QScriptContext *context, QScriptEngine *engine) {
+	QScriptValue txt = context->argument(0);
+	std::cout << txt.toString().toUtf8().constData() << std::endl;
+	gui->mainWindow()->setScriptDebug( txt.toString() );
+	return txt;
+}
+QScriptValue LmmsCore::generateRandom(QScriptContext *context, QScriptEngine *engine) {
+	//QScriptValue r(engine, QRandomGenerator::global()->generateDouble());
+	QScriptValue r(engine, 0.3333);  //TODO
+	return r;
+}
 
 
 

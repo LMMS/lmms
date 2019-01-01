@@ -518,7 +518,7 @@ float Knob::getValue( const QPoint & _p )
 
 
 
-
+/*
 void Knob::contextMenuEvent( QContextMenuEvent * )
 {
 	// for the case, the user clicked right while pressing left mouse-
@@ -535,7 +535,53 @@ void Knob::contextMenuEvent( QContextMenuEvent * )
 	contextMenu.addSeparator();
 	contextMenu.addHelpAction();
 	contextMenu.exec( QCursor::pos() );
+}*/
+
+void Knob::contextMenuEvent( QContextMenuEvent * )
+{
+	// for the case, the user clicked right while pressing left mouse-
+	// button, the context-menu appears while mouse-cursor is still hidden
+	// and it isn't shown again until user does something which causes
+	// an QApplication::restoreOverrideCursor()-call...
+	mouseReleaseEvent( NULL );
+
+	CaptionMenu contextMenu( model()->displayName(), this );
+	addDefaultActions( &contextMenu );
+	contextMenu.addAction( QPixmap(),
+		model()->isScaleLogarithmic() ? tr( "Set linear" ) : tr( "Set logarithmic" ),
+		this, SLOT( toggleScale() ) );
+	contextMenu.addSeparator();
+
+/*
+TODO
+	contextMenu.addAction( QPixmap(),
+		"gamepad:axis:1",
+		[this](bool){ this->enableGamepad(0);} 
+	);
+	contextMenu.addAction( QPixmap(),
+		"gamepad:axis:2",
+		[this](bool){ this->enableGamepad(1);} 
+	);
+	contextMenu.addAction( QPixmap(),
+		"gamepad:axis:3",
+		[this](bool){ this->enableGamepad(2);} 
+	);
+	contextMenu.addAction( QPixmap(),
+		"gamepad:axis:4",
+		[this](bool){ this->enableGamepad(3);} 
+	);
+	contextMenu.addAction( QPixmap(),
+		"gamepad:axis:5",
+		[this](bool){ this->enableGamepad(4);} 
+	);
+	contextMenu.addAction( QPixmap(),
+		"gamepad:axis:6",
+		[this](bool){ this->enableGamepad(5);} 
+	);
+*/
+	contextMenu.exec( QCursor::pos() );
 }
+
 
 
 void Knob::toggleScale()
@@ -857,3 +903,9 @@ void Knob::displayHelp()
 	QWhatsThis::showText( mapToGlobal( rect().bottomRight() ),
 								whatsThis() );
 }
+
+#ifdef LMMS_HAVE_SDL
+// the linker will complain if this is not defined after being declared
+// note this can not be initialized in Knob.h
+std::vector<std::tuple<Knob*, int>> Knob::gamepadKnobs;
+#endif
