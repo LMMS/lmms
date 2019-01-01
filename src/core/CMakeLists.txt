@@ -4,6 +4,7 @@ ENDIF()
 	
 set(LMMS_SRCS
 	${LMMS_SRCS}
+	core/SubprocessWrapper.cpp
 	core/AutomatableModel.cpp
 	core/AutomationPattern.cpp
 	core/BandLimitedWave.cpp
