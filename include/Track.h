@@ -76,10 +76,11 @@ const int TCO_BORDER_WIDTH = 2;
 class TrackContentObject : public Model, public JournallingObject
 {
 	Q_OBJECT
-	MM_OPERATORS
+	//MM_OPERATORS
 	mapPropertyFromModel(bool,isMuted,setMuted,m_mutedModel);
 	mapPropertyFromModel(bool,isSolo,setSolo,m_soloModel);
 public:
+	TrackContentObject(){};
 	TrackContentObject( Track * track );
 	virtual ~TrackContentObject();
 
@@ -455,7 +456,8 @@ signals:
 class EXPORT Track : public Model, public JournallingObject
 {
 	Q_OBJECT
-	MM_OPERATORS
+	///usr/include/QtDeclarative/qdeclarativeprivate.h:96:37: error: no matching function for call to ‘QDeclarativePrivate::QDeclarativeElement<Pattern>::operator new(sizetype, void*&)’void createInto(void *memory) { new (memory) QDeclarativeElement<T>; }
+	//MM_OPERATORS
 	mapPropertyFromModel(bool,isMuted,setMuted,m_mutedModel);
 	mapPropertyFromModel(bool,isSolo,setSolo,m_soloModel);
 public:
@@ -472,7 +474,7 @@ public:
 		HiddenAutomationTrack,
 		NumTrackTypes
 	} ;
-
+	Track(){};
 	Track( TrackTypes type, TrackContainer * tc );
 	virtual ~Track();
 

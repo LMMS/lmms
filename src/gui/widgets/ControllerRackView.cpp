@@ -31,6 +31,7 @@
 #include <QMdiArea>
 #include <QMessageBox>
 
+#include "Engine.h"
 #include "Song.h"
 #include "embed.h"
 #include "GuiApplication.h"

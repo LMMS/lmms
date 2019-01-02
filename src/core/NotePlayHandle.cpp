@@ -23,6 +23,7 @@
  *
  */
 
+#include "Engine.h"
 #include "NotePlayHandle.h"
 #include "BasicFilters.h"
 #include "DetuningHelper.h"

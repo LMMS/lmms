@@ -42,6 +42,7 @@
 
 #include <math.h>
 
+#include "Engine.h"
 #include "AutomationEditor.h"
 #include "ActionGroup.h"
 #include "ConfigManager.h"

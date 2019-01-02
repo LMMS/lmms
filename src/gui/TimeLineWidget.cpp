@@ -30,8 +30,7 @@
 #include <QMouseEvent>
 #include <QPainter>
 #include <QToolBar>
-
-
+#include "Engine.h"
 #include "TimeLineWidget.h"
 #include "embed.h"
 #include "NStateButton.h"

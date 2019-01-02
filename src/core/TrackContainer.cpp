@@ -28,7 +28,7 @@
 #include <QProgressDialog>
 #include <QDomElement>
 #include <QWriteLocker>
-
+#include "Engine.h"
 #include "AutomationPattern.h"
 #include "AutomationTrack.h"
 #include "BBTrack.h"

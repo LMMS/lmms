@@ -40,6 +40,7 @@
 class AutomationTrack;
 class Pattern;
 class TimeLineWidget;
+class BBTrack;
 
 
 const bpm_t MinTempo = 10;
@@ -239,11 +240,7 @@ public:
 		return m_loadingProject;
 	}
 
-	void loadingCancelled()
-	{
-		m_isCancelled = true;
-		Engine::mixer()->clearNewPlayHandles();
-	}
+	void loadingCancelled();
 
 	bool isCancelled()
 	{
@@ -280,6 +277,9 @@ public:
 		return m_timeSigModel;
 	}
 
+	Song();
+	~Song();
+
 
 public slots:
 	void playSong();
@@ -306,6 +306,19 @@ public slots:
 	void addBBTrack();
 
 
+	inline int getNumTracks() {
+		//TrackList tl = Engine::getSong()->tracks();
+		return this->tracks().size();
+	}
+	inline BBTrack* getBBTrack(int index) {
+		//TrackList tl = Engine::getSong()->tracks();
+		return (BBTrack*)this->tracks()[index];
+	}
+	inline InstrumentTrack* getInstrumentTrack(int index) {
+		return (InstrumentTrack*)this->tracks()[index];
+	}
+
+
 private slots:
 	void insertBar();
 	void removeBar();
@@ -324,10 +337,7 @@ private slots:
 
 
 private:
-	Song();
 	Song( const Song & );
-	virtual ~Song();
-
 
 	inline tact_t currentTact() const
 	{
@@ -339,11 +349,7 @@ private:
 		return m_playPos[m_playMode].getTicks();
 	}
 	
-	inline f_cnt_t currentFrame() const
-	{
-		return m_playPos[m_playMode].getTicks() * Engine::framesPerTick() + 
-			m_playPos[m_playMode].currentFrame();
-	}
+	f_cnt_t currentFrame() const;
 	
 	void setPlayPos( tick_t ticks, PlayModes playMode );
 
@@ -415,5 +421,6 @@ signals:
 
 } ;
 
+Q_DECLARE_METATYPE( Song* )
 
 #endif

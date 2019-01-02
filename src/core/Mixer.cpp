@@ -23,7 +23,7 @@
  */
 
 #include "Mixer.h"
-
+#include "Engine.h"
 #include "denormals.h"
 
 #include "lmmsconfig.h"

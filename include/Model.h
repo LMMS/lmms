@@ -35,6 +35,7 @@ class EXPORT Model : public QObject
 {
 	Q_OBJECT
 public:
+	Model(){};
 	Model( Model * _parent, QString _display_name = QString::null,
 					bool _default_constructed = false ) :
 		QObject( _parent ),

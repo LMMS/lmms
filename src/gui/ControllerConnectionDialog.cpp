@@ -28,7 +28,7 @@
 #include <QPushButton>
 #include <QScrollArea>
 #include <QMessageBox>
-
+#include "Engine.h"
 #include "ControllerConnectionDialog.h"
 #include "ControllerConnection.h"
 #include "MidiController.h"

@@ -23,7 +23,7 @@
  *
  */
 #include "Pattern.h"
-
+#include "Engine.h"
 #include <QTimer>
 #include <QMenu>
 #include <QMouseEvent>

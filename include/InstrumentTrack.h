@@ -61,14 +61,21 @@ class TabWidget;
 class TrackLabelButton;
 class LedCheckBox;
 class QLabel;
-
+class Pattern;
 
 class EXPORT InstrumentTrack : public Track, public MidiEventProcessor
 {
 	Q_OBJECT
-	MM_OPERATORS
+	//MM_OPERATORS
 	mapPropertyFromModel(int,getVolume,setVolume,m_volumeModel);
+
+public slots:
+	Pattern* newPattern() {
+		return (Pattern*)this->createTCO( MidiTime(0) );
+	};
+
 public:
+	InstrumentTrack(){};
 	InstrumentTrack( TrackContainer* tc );
 	virtual ~InstrumentTrack();
 

@@ -28,7 +28,7 @@
 #include <QString>
 #include <QPair>
 #include <QVector>
-
+#include "Engine.h"
 #include "MidiEvent.h"
 #include "ImportFilter.h"
 

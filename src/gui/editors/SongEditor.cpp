@@ -23,6 +23,7 @@
  */
 
 #include "SongEditor.h"
+#include "Engine.h"
 
 #include <QTimeLine>
 #include <QAction>

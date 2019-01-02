@@ -25,7 +25,7 @@
 
 #include <QDomElement>
 #include <QObject>
-
+#include "Engine.h"
 #include "Song.h"
 #include "Mixer.h"
 #include "MidiClient.h"

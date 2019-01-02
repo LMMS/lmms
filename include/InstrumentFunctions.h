@@ -48,6 +48,7 @@ private:
 	typedef int8_t ChordSemiTones [MAX_CHORD_POLYPHONY];
 
 public:
+	InstrumentFunctionNoteStacking(){};
 	InstrumentFunctionNoteStacking( Model * _parent );
 	virtual ~InstrumentFunctionNoteStacking();
 
@@ -169,7 +170,7 @@ public:
 		ArpDirRandom,
 		NumArpDirections
 	} ;
-
+	InstrumentFunctionArpeggio(){};
 	InstrumentFunctionArpeggio( Model * _parent );
 	virtual ~InstrumentFunctionArpeggio();
 

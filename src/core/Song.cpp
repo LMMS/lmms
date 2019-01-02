@@ -32,6 +32,7 @@
 
 #include <functional>
 
+#include "Engine.h"
 #include "AutomationTrack.h"
 #include "AutomationEditor.h"
 #include "BBEditor.h"
@@ -95,6 +96,9 @@ Song::Song() :
 	m_elapsedTicks( 0 ),
 	m_elapsedTacts( 0 )
 {
+
+	this->setObjectName("Song");
+
 	connect( &m_tempoModel, SIGNAL( dataChanged() ),
 						this, SLOT( setTempo() ) );
 	connect( &m_tempoModel, SIGNAL( dataUnchanged() ),
@@ -125,6 +129,15 @@ Song::~Song()
 }
 
 
+void Song::loadingCancelled() {
+	m_isCancelled = true;
+	Engine::mixer()->clearNewPlayHandles();
+}
+
+f_cnt_t Song::currentFrame() const {
+	return m_playPos[m_playMode].getTicks() * Engine::framesPerTick() + 
+		m_playPos[m_playMode].currentFrame();
+}
 
 
 void Song::masterVolumeChanged()

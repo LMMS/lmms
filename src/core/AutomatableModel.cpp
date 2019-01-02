@@ -23,7 +23,7 @@
  */
 
 #include "AutomatableModel.h"
-
+#include "Engine.h"
 #include "lmms_math.h"
 
 #include "AutomationPattern.h"

@@ -34,6 +34,7 @@
 #define __USE_XOPEN
 #endif
 
+#include "Engine.h"
 #include "lmms_math.h"
 #include "Knob.h"
 #include "CaptionMenu.h"

@@ -37,6 +37,7 @@ class InstrumentSoundShaping : public Model, public JournallingObject
 {
 	Q_OBJECT
 public:
+	InstrumentSoundShaping(){};
 	InstrumentSoundShaping( InstrumentTrack * _instrument_track );
 	virtual ~InstrumentSoundShaping();
 

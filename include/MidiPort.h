@@ -67,7 +67,7 @@ public:
 		Duplex		// both directions
 	} ;
 	typedef Modes Mode;
-
+	MidiPort(){};
 	MidiPort( const QString& name,
 			MidiClient* client,
 			MidiEventProcessor* eventProcessor,

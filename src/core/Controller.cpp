@@ -28,7 +28,7 @@
 #include <QObject>
 #include <QVector>
 
-
+#include "Engine.h"
 #include "Song.h"
 #include "Mixer.h"
 #include "ControllerConnection.h"

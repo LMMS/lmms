@@ -30,7 +30,7 @@
 #include <QLayout>
 #include <QMdiArea>
 #include <QWheelEvent>
-
+#include "Engine.h"
 #include "TrackContainer.h"
 #include "BBTrack.h"
 #include "MainWindow.h"

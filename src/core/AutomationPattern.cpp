@@ -24,8 +24,8 @@
  *
  */
 
+#include "Engine.h"
 #include "AutomationPattern.h"
-
 #include "AutomationPatternView.h"
 #include "AutomationTrack.h"
 #include "LocaleHelper.h"

@@ -24,6 +24,7 @@
 
 #include <QDomElement>
 
+#include "Engine.h"
 #include "BufferManager.h"
 #include "FxMixer.h"
 #include "Mixer.h"

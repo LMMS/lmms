@@ -66,11 +66,11 @@ template <typename T> void addType(QScriptEngine* engine) {
 
 void LmmsCore::scriptEnable() {
 	//qmlRegisterType<Mixer>("lmms.core", 1,0, "Mixer");
-	//qmlRegisterType<Song>("lmms.core", 1,0, "Song");
+	qmlRegisterType<Song>("lmms.core", 1,0, "Song");
 	//qmlRegisterType<BBTrackContainer>("lmms.core", 1,0, "BBTrackContainer");
-	//qmlRegisterType<BBTrack>("lmms.core", 1,0, "BBTrack");
-	//qmlRegisterType<InstrumentTrack>("lmms.core", 1,0, "InstrumentTrack");
-	//qmlRegisterType<Pattern>("lmms.core", 1,0, "Pattern");
+	qmlRegisterType<BBTrack>("lmms.core", 1,0, "BBTrack");
+	qmlRegisterType<InstrumentTrack>("lmms.core", 1,0, "InstrumentTrack");
+	qmlRegisterType<Pattern>("lmms.core", 1,0, "Pattern");
 	qmlRegisterType<NoteScriptWrapper>("lmms.core", 1,0, "Note");
 	qmlRegisterType<SubprocessWrapper>("lmms.core", 1,0, "SubprocessWrapper");
 
@@ -88,7 +88,6 @@ void LmmsCore::scriptEnable() {
 	LmmsCore::scriptEngine->globalObject().setProperty("random", fun2);
 
 	LmmsCore *engine = inst();  // the singleton instance of LmmsCore
-	//auto engine = new LmmsCoreScriptWrapper();
 	QScriptValue ewrapper = LmmsCore::scriptEngine->newQObject(engine);
 	LmmsCore::scriptEngine->globalObject().setProperty("lmms", ewrapper);
 
@@ -148,6 +147,7 @@ QScriptValue LmmsCore::generateRandom(QScriptContext *context, QScriptEngine *en
 void LmmsCore::init( bool renderOnly )
 {
 	LmmsCore *engine = inst();
+	engine->setObjectName("LmmsCore");
 
 	emit engine->initProgress(tr("Generating wavetables"));
 	// generate (load from file) bandlimited wavetables

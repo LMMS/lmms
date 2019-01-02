@@ -23,7 +23,7 @@
  */
 
 #include "BBEditor.h"
-
+#include "Engine.h"
 #include <QAction>
 #include <QKeyEvent>
 #include <QLayout>

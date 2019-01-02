@@ -23,7 +23,7 @@
  *
  */
 #include "SampleTrack.h"
-
+#include "Engine.h"
 #include <QDropEvent>
 #include <QMenu>
 #include <QLayout>

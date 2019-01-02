@@ -27,7 +27,7 @@
 #ifndef CONTROLLER_H
 #define CONTROLLER_H
 
-#include "Engine.h"
+//#include "Engine.h"  // can not include Engine.h here because Engine.h must include Song.h in Qt4Script
 #include "Model.h"
 #include "JournallingObject.h"
 #include "templates.h"

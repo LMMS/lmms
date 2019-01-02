@@ -33,13 +33,14 @@
 #include "GuiApplication.h"
 #include "MainWindow.h"
 //#include "lmms_export.h"
+#include "Song.h"
 
 class BBTrackContainer;
 class DummyTrackContainer;
 class FxMixer;
 class ProjectJournal;
 class Mixer;
-class Song;
+//class Song;
 class Ladspa2LMMS;
 
 
@@ -60,10 +61,18 @@ class LmmsCore : public QObject
 	Q_OBJECT
 	//Q_PROPERTY(Mixer* mixer MEMBER s_mixer)
 	//Q_PROPERTY(FxMixer* fxMixer MEMBER s_fxMixer)
-	//Q_PROPERTY(Song* song MEMBER s_song)
+	//Q_PROPERTY(Song* song READ getSong)  // not Qt4 QtScript compatible
+	Q_PROPERTY(QScriptValue song READ __getSong__)
 	//Q_PROPERTY(BBTrackContainer* bbTrackContainer MEMBER s_bbTrackContainer)
 
-static std::vector<SubprocessWrapper*> s_processes;
+	static std::vector<SubprocessWrapper*> s_processes;
+
+	// QScriptValue property getter wrappers were not required in Qt5 QtScript
+	// Here in Qt4 we must directly call newQObject to wrap the property.
+	QScriptValue __getSong__() {
+		return this->scriptEngine->newQObject((QObject*)getSong());
+	}
+
 public slots:
 	inline SubprocessWrapper* newProcess(QString exe, QStringList args, bool capture=false, int width=320, int height=240) {
 		//auto parent = new QWidget(); // seems to also break mplayer with native xembed support
