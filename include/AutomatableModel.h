@@ -283,6 +283,8 @@ protected:
 
 
 private:
+	static bool mustQuoteName(const QString &name);
+
 	virtual void saveSettings( QDomDocument& doc, QDomElement& element )
 	{
 		saveSettings( doc, element, "value" );
