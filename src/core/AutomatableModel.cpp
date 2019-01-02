@@ -89,16 +89,23 @@ bool AutomatableModel::isAutomated() const
 }
 
 
+
+bool AutomatableModel::mustQuoteName(const QString& name)
+{
+	QRegExp reg("^[A-Za-z0-9._-]+$");
+	return !reg.exactMatch(name);
+}
+
 void AutomatableModel::saveSettings( QDomDocument& doc, QDomElement& element, const QString& name )
 {
+	bool mustQuote = mustQuoteName(name);
+
 	if( isAutomated() || m_scaleType != Linear )
 	{
 		// automation needs tuple of data (name, id, value)
 		// scale type also needs an extra value
 		// => it must be appended as a node
 
-		QRegExp reg("^[A-Za-z0-9._-]+$");
-		bool mustQuote = !reg.exactMatch(name);
 		QDomElement me = doc.createElement( mustQuote ? QString("automatablemodel") : name );
 		me.setAttribute( "id", ProjectJournal::idToSave( id() ) );
 		me.setAttribute( "value", m_value );
@@ -110,8 +117,18 @@ void AutomatableModel::saveSettings( QDomDocument& doc, QDomElement& element, co
 	}
 	else
 	{
-		// non automation, linear scale (default), can be saved as attribute
-		element.setAttribute( name, m_value );
+		if(mustQuote)
+		{
+			QDomElement me = doc.createElement( "automatablemodel" );
+			me.setAttribute( "nodename", name );
+			me.setAttribute( "value", m_value );
+			element.appendChild( me );
+		}
+		else
+		{
+			// non automation, linear scale (default), can be saved as attribute
+			element.setAttribute( name, m_value );
+		}
 	}
 
 	if( m_controllerConnection && m_controllerConnection->getController()->type()
@@ -131,7 +148,13 @@ void AutomatableModel::saveSettings( QDomDocument& doc, QDomElement& element, co
 			element.appendChild( controllerElement );
 		}
 
-		QDomElement element = doc.createElement( name );
+		bool mustQuote = mustQuoteName(name);
+		QString elementName = mustQuote ? "controllerconnection"
+						: name;
+
+		QDomElement element = doc.createElement( elementName );
+		if(mustQuote)
+			element.setAttribute( "nodename", name );
 		m_controllerConnection->saveSettings( doc, element );
 
 		controllerElement.appendChild( element );
@@ -170,6 +193,17 @@ void AutomatableModel::loadSettings( const QDomElement& element, const QString& 
 	if( connectionNode.isElement() )
 	{
 		QDomNode thisConnection = connectionNode.toElement().namedItem( name );
+		if( !thisConnection.isElement() )
+		{
+			thisConnection = connectionNode.toElement().namedItem( "controllerconnection" );
+			QDomElement tcElement = thisConnection.toElement();
+			// sanity check
+			if( tcElement.isNull() || tcElement.attribute( "nodename" ) != name )
+			{
+				// no, that wasn't it, act as if we never found one
+				thisConnection.clear();
+			}
+		}
 		if( thisConnection.isElement() )
 		{
 			setControllerConnection( new ControllerConnection( (Controller*)NULL ) );
