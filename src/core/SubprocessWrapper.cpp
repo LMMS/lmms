@@ -254,52 +254,56 @@ static unsigned long list_windows(xlib::Display *disp, unsigned long match_pid) 
 
 #endif
 
+void SubprocessWrapper::embedClient(unsigned long windowID) {
 #ifdef __linux__
-		void SubprocessWrapper::embedClient(unsigned long windowID) {
-			connect(embedContainer, SIGNAL(clientIsEmbedded()), this, SLOT(handleClientEmbed()));
-			this->embedContainer->embedClient( windowID );
-		};
-		unsigned long SubprocessWrapper::getWindowID() {
-			return this->xid;
-		}
-		void SubprocessWrapper::handleClientEmbed() {
-			//lock();
-			//sendMessage( IdShowUI );
-			//unlock();
-			std::cout << "XEMBED DONE?" << std::endl;
-		}
-		void SubprocessWrapper::captureWindow(){
-			connect(embedContainer, SIGNAL(clientIsEmbedded()), this, SLOT(handleClientEmbed()));
-			this->pid = this->subprocess->pid();
-			std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-			xlib::Display *disp;
-			if (! (disp = XOpenDisplay(NULL))) { return; }
-			auto xxid = list_windows( disp, this->pid );
-			std::cout << "got XID of window " << xxid << std::endl;
-			if (xxid) {
-				this->embedContainer->embedClient( xxid );
-				//XUnmapWindow(disp, xxid);
-				//QWindow* vw = QWindow::fromWinId(xxid);
-				//vw->setFlags(Qt::FramelessWindowHint);
-				//https://stackoverflow.com/questions/45061803/cannot-get-qwindowfromwinid-to-work-properly
-				//vw->show();
-				//vw->hide();
-				//vw->setAttribute(Qt::WA_NativeWindow);
-				//auto container = QWidget::createWindowContainer(vw);
-				//gui->mainWindow()->workspace()->addSubWindow(container);
-				//vw->show();
-			} else {
-				std::this_thread::sleep_for(std::chrono::milliseconds(2000));
-				xxid = list_windows( disp, this->pid );
-				std::cout << "(second try) got XID of window " << xxid << std::endl;
-				if (xxid) {
-					this->embedContainer->embedClient( xxid );
-				} else {
-					std::cout << "ERROR: can not get XID of window" << std::endl;
-				}
-			}
-		}
+	connect(embedContainer, SIGNAL(clientIsEmbedded()), this, SLOT(handleClientEmbed()));
+	this->embedContainer->embedClient( windowID );
 #endif
+};
+
+unsigned long SubprocessWrapper::getWindowID() {
+	return this->xid;
+}
+void SubprocessWrapper::handleClientEmbed() {
+	//lock();
+	//sendMessage( IdShowUI );
+	//unlock();
+	std::cout << "XEMBED DONE?" << std::endl;
+}
+
+void SubprocessWrapper::captureWindow(){
+#ifdef __linux__
+	connect(embedContainer, SIGNAL(clientIsEmbedded()), this, SLOT(handleClientEmbed()));
+	this->pid = this->subprocess->pid();
+	std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+	xlib::Display *disp;
+	if (! (disp = XOpenDisplay(NULL))) { return; }
+	auto xxid = list_windows( disp, this->pid );
+	std::cout << "got XID of window " << xxid << std::endl;
+	if (xxid) {
+		this->embedContainer->embedClient( xxid );
+		//XUnmapWindow(disp, xxid);
+		//QWindow* vw = QWindow::fromWinId(xxid);
+		//vw->setFlags(Qt::FramelessWindowHint);
+		//https://stackoverflow.com/questions/45061803/cannot-get-qwindowfromwinid-to-work-properly
+		//vw->show();
+		//vw->hide();
+		//vw->setAttribute(Qt::WA_NativeWindow);
+		//auto container = QWidget::createWindowContainer(vw);
+		//gui->mainWindow()->workspace()->addSubWindow(container);
+		//vw->show();
+	} else {
+		std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+		xxid = list_windows( disp, this->pid );
+		std::cout << "(second try) got XID of window " << xxid << std::endl;
+		if (xxid) {
+			this->embedContainer->embedClient( xxid );
+		} else {
+			std::cout << "ERROR: can not get XID of window" << std::endl;
+		}
+	}
+#endif
+}
 
 SubprocessWrapper::SubprocessWrapper(QString exe, QStringList args, bool capture, QWidget* parent, int width, int height) {
 
@@ -315,10 +319,8 @@ SubprocessWrapper::SubprocessWrapper(QString exe, QStringList args, bool capture
 	this->xid = embedContainer->winId();
 	this->subprocess = new QProcess( embedContainer );
 	if (capture) {
-		//std::cout << "SubprocessWrapper starting window capture..." << std::endl;
-		//connect(this->subprocess, SIGNAL(started()), this, SLOT(captureWindow()));
-		//connect(this->subprocess, SIGNAL(started()), this, SIGNAL(captureWindow()));  // TODO fix runtime slot connect failure
-		//captureWindow();
+		std::cout << "SubprocessWrapper starting window capture..." << std::endl;
+		connect(subprocess, SIGNAL(started()), this, SLOT(captureWindow()));
 	} else {
 		// assume in this case that the last arg is the xid, 
 		// and the sub-application is able to embed itself into the given xid. 
@@ -326,10 +328,6 @@ SubprocessWrapper::SubprocessWrapper(QString exe, QStringList args, bool capture
 	}
 	subprocess->start(exe, args);
 
-	if (capture) {  // workaround for runtime slot failure
-		std::cout << "SubprocessWrapper starting window capture..." << std::endl;
-		captureWindow();
-	}
 #else
 
 	this->subprocess = new QProcess();
@@ -338,5 +336,3 @@ SubprocessWrapper::SubprocessWrapper(QString exe, QStringList args, bool capture
 #endif
 };
 
-//Q_DECLARE_METATYPE(SubprocessWrapper)
-Q_DECLARE_METATYPE( SubprocessWrapper* )

@@ -72,7 +72,9 @@ void LmmsCore::scriptEnable() {
 	//qmlRegisterType<InstrumentTrack>("lmms.core", 1,0, "InstrumentTrack");
 	//qmlRegisterType<Pattern>("lmms.core", 1,0, "Pattern");
 	qmlRegisterType<NoteScriptWrapper>("lmms.core", 1,0, "Note");
-	qmlRegisterType<SubprocessWrapper>("lmms.core", 1,0, "Subprocess");
+	qmlRegisterType<SubprocessWrapper>("lmms.core", 1,0, "SubprocessWrapper");
+
+	//qRegisterMetaType<SubprocessWrapper>("SubprocessWrapper");
 
 	gui->mainWindow()->enableScriptTools();
 
