@@ -19,7 +19,7 @@ SET(CMAKE_RC_COMPILER           ${MINGW_TOOL_PREFIX}windres)
 
 # Mingw tools
 SET(STRIP                       ${MINGW_TOOL_PREFIX}strip)
-SET(PKG_CONFIG_EXECUTABLE       ${MINGW_TOOL_PREFIX}pkg-config)
+SET(ENV{PKG_CONFIG}             ${MINGW_TOOL_PREFIX}pkg-config)
 
 # For 32-bit vst support	
 IF(WIN64)
@@ -45,7 +45,7 @@ IF(NOT DEFINED ENV{MINGW_DEBUG_INFO})
 	MESSAGE("* CMAKE_C_COMPILER                     : ${CMAKE_C_COMPILER}")
 	MESSAGE("* CMAKE_CXX_COMPILER                   : ${CMAKE_CXX_COMPILER}")
 	MESSAGE("* CMAKE_RC_COMPILER                    : ${CMAKE_RC_COMPILER}")
-	MESSAGE("* PKG_CONFIG_EXECUTABLE                : ${PKG_CONFIG_EXECUTABLE}")
+	MESSAGE("* ENV{PKG_CONFIG}                      : $ENV{PKG_CONFIG}")
 	MESSAGE("* MINGW_TOOL_PREFIX32                  : ${MINGW_TOOL_PREFIX32}")
 	MESSAGE("* CMAKE_C_COMPILER32                   : ${CMAKE_C_COMPILER32}")
 	MESSAGE("* CMAKE_CXX_COMPILER32                 : ${CMAKE_CXX_COMPILER32}")

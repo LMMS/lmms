@@ -28,6 +28,8 @@ shared:
       name: Initialize
       command: |
         mkdir -p /tmp/artifacts
+        # Workaround for failing submodule fetching
+        git config --global --unset url."ssh://git@github.com".insteadOf || true
 
   # Commmon environment variables
   common_environment: &common_environment
@@ -54,6 +56,9 @@ jobs:
             ../cmake/build_win32.sh
             make lmms
             make
+      - run:
+          name: Build tests
+          command: cd build && make tests
       - *ccache_stats
       - *save_cache
   mingw64:
@@ -71,6 +76,9 @@ jobs:
             mkdir build && cd build
             ../cmake/build_win64.sh
             make
+      - run:
+          name: Build tests
+          command: cd build && make tests
       - *ccache_stats
       - *save_cache
   linux.gcc:
