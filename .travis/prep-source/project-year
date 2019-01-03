@@ -1,0 +1,9 @@
+#!/bin/sh
+set -e
+
+grep -Eq "^SET\(PROJECT_YEAR +[0-9]+\)" CMakeLists.txt
+
+YEAR=$(date +%Y)
+sed -E "s/^SET\(PROJECT_YEAR +[0-9]+\)/SET(PROJECT_YEAR $YEAR)/" \
+	CMakeLists.txt > CMakeLists.txt.new
+mv CMakeLists.txt.new CMakeLists.txt

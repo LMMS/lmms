@@ -20,6 +20,7 @@ INCLUDE(FindPkgConfig)
 
 STRING(TOUPPER          "${CMAKE_PROJECT_NAME}" PROJECT_NAME_UCASE)
 
+# Updated in Travis CI builds
 SET(PROJECT_YEAR 2018)
 
 SET(PROJECT_AUTHOR      "LMMS Developers")
