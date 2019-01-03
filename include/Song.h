@@ -29,7 +29,7 @@
 
 #include <QtCore/QSharedMemory>
 #include <QtCore/QVector>
-
+#include <QtScript/QScriptEngine>
 #include "TrackContainer.h"
 #include "Controller.h"
 #include "MeterModel.h"
@@ -310,6 +310,7 @@ public slots:
 		//TrackList tl = Engine::getSong()->tracks();
 		return this->tracks().size();
 	}
+	/*QT5 QtScript and newer
 	inline BBTrack* getBBTrack(int index) {
 		//TrackList tl = Engine::getSong()->tracks();
 		return (BBTrack*)this->tracks()[index];
@@ -317,7 +318,11 @@ public slots:
 	inline InstrumentTrack* getInstrumentTrack(int index) {
 		return (InstrumentTrack*)this->tracks()[index];
 	}
+	*/
 
+	// Qt4 compatible wrappers
+	QScriptValue getBBTrack(int index);
+	QScriptValue getInstrumentTrack(int index);
 
 private slots:
 	void insertBar();

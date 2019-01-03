@@ -516,7 +516,6 @@ public:
 	// -------------------------------------------------------
 	void deleteTCOs();
 
-	int numOfTCOs();
 	TrackContentObject * getTCO( int tcoNum );
 	int getTCONum(const TrackContentObject* tco );
 
@@ -582,6 +581,8 @@ public:
 	BoolModel* getMutedModel();
 
 public slots:
+	int numOfTCOs();
+
 	virtual void setName( const QString & newName )
 	{
 		m_name = newName;

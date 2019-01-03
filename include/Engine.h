@@ -26,6 +26,7 @@
 #ifndef ENGINE_H
 #define ENGINE_H
 
+#include <random>
 #include <QtCore/QString>
 #include <QtCore/QObject>
 #include <QtScript/QScriptEngine>
@@ -99,6 +100,7 @@ public slots:
 
 
 public:
+	LmmsCore();
 	static void init( bool renderOnly );
 	static void destroy();
 
@@ -195,7 +197,12 @@ private:
 	static DummyTrackContainer * s_dummyTC;
 	static Ladspa2LMMS * s_ladspaManager;
 
+	// Mersenne Twister 19937 (64 bits)
+	std::mt19937_64 m_rng;
+	std::uniform_real_distribution<double> m_uniform;
+
 	static double s_gamepad_state[6];
+
 	// even though most methods are static, an instance is needed for Qt slots/signals
 	static LmmsCore * s_instanceOfMe;
 	friend class GuiApplication;

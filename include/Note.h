@@ -28,7 +28,7 @@
 
 #include <QtCore/QVector>
 #include <QtCore/QObject>
-
+#include <QMetaType>
 #include "volume.h"
 #include "panning.h"
 #include "MidiTime.h"
@@ -245,8 +245,8 @@ typedef QVector<Note *> NoteVector;
 class NoteScriptWrapper : public QObject {
 	Q_OBJECT
 	public:
-		NoteScriptWrapper(){};
-		NoteScriptWrapper(Note* note) : m_note(note) {};
+		NoteScriptWrapper(){setObjectName("Note");};
+		NoteScriptWrapper(Note* note) : m_note(note) {setObjectName("Note");};
 		inline Note* getPointer() { return this->m_note; }
 	public slots:
 		inline int getKey() {
@@ -260,7 +260,6 @@ class NoteScriptWrapper : public QObject {
 
 };
 
-///usr/include/QtCore/qsemaphore.h:51:1: error: expected constructor, destructor, or type conversion before ‘typedef’ QT_MODULE(Core)
-//Q_DECLARE_METATYPE( NoteScriptWrapper* )
+Q_DECLARE_METATYPE( NoteScriptWrapper* )
 
 #endif

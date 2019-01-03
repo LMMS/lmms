@@ -56,6 +56,7 @@ Pattern::Pattern( InstrumentTrack * _instrument_track ) :
 	m_patternType( BeatPattern ),
 	m_steps( MidiTime::stepsPerTact() )
 {
+	setObjectName("Pattern");
 	setName( _instrument_track->name() );
 	if( _instrument_track->trackContainer()
 					== Engine::getBBTrackContainer() )
@@ -109,6 +110,31 @@ Pattern::~Pattern()
 	m_notes.clear();
 }
 
+// QtScript helpers
+QScriptValue Pattern::newNote(int pos, int length, int key) {
+	Note note;
+	note.setPos(MidiTime(pos));
+	note.setLength(MidiTime(length));
+	note.setKey(key);
+	return Engine::inst()->scriptEngine->newQObject((QObject*)
+		(new NoteScriptWrapper( this->addNote(note) )));
+}
+
+// gets by MIDI time step
+QScriptValue Pattern::getNoteAtStep(int step) {
+	return Engine::inst()->scriptEngine->newQObject((QObject*)
+		(new NoteScriptWrapper( this->noteAtStep(step) )));
+}
+// gets by index
+QScriptValue Pattern::getNote(int index) {
+	return Engine::inst()->scriptEngine->newQObject((QObject*)
+		(new NoteScriptWrapper(m_notes[index])));
+}
+QScriptValue Pattern::setNote(NoteScriptWrapper* wrapper) {
+	 // need to wrap the return again, or is it the same pointer to Note?
+	return Engine::inst()->scriptEngine->newQObject((QObject*)
+		(new NoteScriptWrapper( this->addNote(*wrapper->getPointer()) )));
+}
 
 
 

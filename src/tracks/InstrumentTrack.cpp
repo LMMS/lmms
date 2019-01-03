@@ -35,7 +35,7 @@
 #include <QMessageBox>
 #include <QMdiSubWindow>
 #include <QPainter>
-
+#include "Engine.h"
 #include "FileDialog.h"
 #include "InstrumentTrack.h"
 #include "AutomationPattern.h"
@@ -123,7 +123,7 @@ InstrumentTrack::InstrumentTrack( TrackContainer* tc ) :
 		m_runningMidiNotes[i] = 0;
 	}
 
-
+	setObjectName("InstrumentTrack");
 	setName( tr( "Default preset" ) );
 
 	connect( &m_baseNoteModel, SIGNAL( dataChanged() ),
@@ -857,6 +857,16 @@ Instrument * InstrumentTrack::loadInstrument( const QString & _plugin_name )
 }
 
 
+QScriptValue InstrumentTrack::newPattern() {
+	return Engine::inst()->scriptEngine->newQObject((QObject*)
+		((Pattern*)this->createTCO( MidiTime(0) )));
+};
+
+QScriptValue InstrumentTrack::getPattern(int index) {
+	return Engine::inst()->scriptEngine->newQObject((QObject*)
+		//((Pattern*)getTCOs()[index]));
+		((Pattern*)this->getTCO(index)));
+}
 
 
 

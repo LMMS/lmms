@@ -25,7 +25,8 @@
 
 #ifndef INSTRUMENT_TRACK_H
 #define INSTRUMENT_TRACK_H
-
+#include <QtScript/QScriptEngine>
+#include <QMetaType>
 #include "AudioPort.h"
 #include "GroupBox.h"
 #include "InstrumentFunctions.h"
@@ -70,9 +71,9 @@ class EXPORT InstrumentTrack : public Track, public MidiEventProcessor
 	mapPropertyFromModel(int,getVolume,setVolume,m_volumeModel);
 
 public slots:
-	Pattern* newPattern() {
-		return (Pattern*)this->createTCO( MidiTime(0) );
-	};
+	int numOfPatterns() { return numOfTCOs(); }
+	QScriptValue newPattern();
+	QScriptValue getPattern(int index);
 
 public:
 	InstrumentTrack(){};
@@ -285,6 +286,7 @@ private:
 
 } ;
 
+Q_DECLARE_METATYPE( InstrumentTrack* )
 
 
 

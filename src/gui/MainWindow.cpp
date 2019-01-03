@@ -236,6 +236,8 @@ MainWindow::MainWindow() :
 
 MainWindow::~MainWindow()
 {
+	Engine::scriptEngine->abortEvaluation();
+
 	for( PluginView *view : m_tools )
 	{
 		delete view->model();

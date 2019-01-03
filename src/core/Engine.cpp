@@ -22,7 +22,7 @@
  *
  */
 
-
+#include <ctime>
 #include "Engine.h"
 #include "BBTrackContainer.h"
 #include "ConfigManager.h"
@@ -55,6 +55,14 @@ DummyTrackContainer * LmmsCore::s_dummyTC = NULL;
 QScriptEngine* LmmsCore::scriptEngine = NULL;
 std::vector<SubprocessWrapper*> LmmsCore::s_processes = {};
 double LmmsCore::s_gamepad_state[6] = {0.0};
+
+
+LmmsCore::LmmsCore() :m_rng(std::time(0)) {
+	// Then we create a distribution. We'll start with a uniform distribution in the
+	// default [0, 1) range:
+	this->m_uniform = std::uniform_real_distribution<double>();
+}
+
 
 template <typename T> void addType(QScriptEngine* engine) {
 	auto constructor = engine->newFunction([](QScriptContext*, QScriptEngine* engine){
@@ -138,7 +146,7 @@ QScriptValue LmmsCore::scriptPrint(QScriptContext *context, QScriptEngine *engin
 }
 QScriptValue LmmsCore::generateRandom(QScriptContext *context, QScriptEngine *engine) {
 	//QScriptValue r(engine, QRandomGenerator::global()->generateDouble());
-	QScriptValue r(engine, 0.3333);  //TODO
+	QScriptValue r(engine, inst()->m_uniform(inst()->m_rng));
 	return r;
 }
 
@@ -179,6 +187,7 @@ void LmmsCore::init( bool renderOnly )
 
 void LmmsCore::destroy()
 {
+	scriptEngine->abortEvaluation();
 	s_projectJournal->stopAllJournalling();
 	s_mixer->stopProcessing();
 

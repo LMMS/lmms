@@ -1594,5 +1594,14 @@ QString Song::errorSummary()
 }
 
 
+QScriptValue Song::getBBTrack(int index) {
+	//TrackList tl = Engine::getSong()->tracks();
+	return Engine::inst()->scriptEngine->newQObject((QObject*)
+		((BBTrack*)this->tracks()[index]));
+}
+QScriptValue Song::getInstrumentTrack(int index) {
+	return Engine::inst()->scriptEngine->newQObject((QObject*)
+		((InstrumentTrack*)this->tracks()[index]));
+}
 
 
