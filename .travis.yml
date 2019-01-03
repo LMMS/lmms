@@ -2,6 +2,8 @@ language: cpp
 compiler: gcc
 dist: trusty
 sudo: required
+git:
+    depth: false
 cache:
     directories:
         - apt_mingw_cache

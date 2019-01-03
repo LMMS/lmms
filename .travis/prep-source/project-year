@@ -1,9 +1,18 @@
 #!/bin/sh
 set -e
 
-grep -Eq "^SET\(PROJECT_YEAR +[0-9]+\)" CMakeLists.txt
+grep -q "^SET(PROJECT_YEAR " CMakeLists.txt
 
-YEAR=$(date +%Y)
-sed -E "s/^SET\(PROJECT_YEAR +[0-9]+\)/SET(PROJECT_YEAR $YEAR)/" \
-	CMakeLists.txt > CMakeLists.txt.new
+YEAR=$(date -u +%Y)
+while true
+do
+	if [ "$(git log -n 1 --since=$YEAR-01-01T00:00:00Z)" ]
+	then
+		break
+	fi
+	YEAR=$((YEAR - 1))
+done
+
+sed "/^SET(PROJECT_YEAR / c SET(PROJECT_YEAR $YEAR)" CMakeLists.txt \
+	> CMakeLists.txt.new
 mv CMakeLists.txt.new CMakeLists.txt
