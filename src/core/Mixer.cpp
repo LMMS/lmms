@@ -22,6 +22,8 @@
  *
  */
 
+#include <iostream>
+
 #include "Mixer.h"
 #include "Engine.h"
 #include "denormals.h"
@@ -246,6 +248,7 @@ void Mixer::stopProcessing()
 
 	if( m_fifoWriter != NULL )
 	{
+		std::cout << "Mixer::stopProcessing fifoWriter" << std::endl;
 		m_fifoWriter->finish();
 		m_fifoWriter->wait();
 		m_audioDev->stopProcessing();
@@ -254,6 +257,7 @@ void Mixer::stopProcessing()
 	}
 	else
 	{
+		std::cout << "Mixer::stopProcessing audioDev" << std::endl;
 		m_audioDev->stopProcessing();
 	}
 }

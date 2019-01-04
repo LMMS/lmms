@@ -345,7 +345,8 @@ private:
 	Mixer( bool renderOnly );
 	virtual ~Mixer();
 
-	void startProcessing( bool _needs_fifo = true );
+	//void startProcessing( bool _needs_fifo = true );  // fails to shutdown correctly
+	void startProcessing( bool _needs_fifo = false );
 	void stopProcessing();
 
 

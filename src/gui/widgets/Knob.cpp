@@ -29,6 +29,7 @@
 #include <QMouseEvent>
 #include <QPainter>
 #include <QWhatsThis>
+#include <QWidgetAction>
 
 #ifndef __USE_XOPEN
 #define __USE_XOPEN
@@ -553,6 +554,30 @@ void Knob::contextMenuEvent( QContextMenuEvent * )
 		this, SLOT( toggleScale() ) );
 	contextMenu.addSeparator();
 
+	QLabel* label = new QLabel(QString::fromUtf8(u8"🕹 Gamepad"), this);
+	label->setAlignment(Qt::AlignCenter);
+	QWidgetAction* qwa = new QWidgetAction(this);
+	qwa->setDefaultWidget(label);
+	contextMenu.addAction(qwa);
+
+	QSignalMapper* enableMapper  = new QSignalMapper(this);
+	QSignalMapper* disableMapper = new QSignalMapper(this);
+
+	for (int i=0; i<6; i++) {
+		if (this->isGamepadConnected(i)){
+			auto act = contextMenu.addAction(QString("axis: ") + QString::number(i) + QString(" ") + QString::fromUtf8(u8"✗"));
+			connect(act, SIGNAL(triggered()), disableMapper, SLOT(map()));
+			disableMapper->setMapping(act, i);
+		} else {
+			auto act = contextMenu.addAction(QString("axis: ") + QString::number(i) + QString(" ") + QString::fromUtf8(u8"🔌"));
+			connect(act, SIGNAL(triggered()), enableMapper, SLOT(map()));
+			enableMapper->setMapping(act, i);
+		}
+	}
+
+	connect(enableMapper, SIGNAL(mapped(int)), this, SLOT(enableGamepad(int)));
+	connect(disableMapper, SIGNAL(mapped(int)), this, SLOT(disableGamepad(int)));
+
 /*
 TODO
 	contextMenu.addAction( QPixmap(),
@@ -896,17 +921,10 @@ void Knob::doConnections()
 	}
 }
 
-
-
-
 void Knob::displayHelp()
 {
 	QWhatsThis::showText( mapToGlobal( rect().bottomRight() ),
 								whatsThis() );
 }
 
-#ifdef LMMS_HAVE_SDL
-// the linker will complain if this is not defined after being declared
-// note this can not be initialized in Knob.h
 std::vector<std::tuple<Knob*, int>> Knob::gamepadKnobs;
-#endif

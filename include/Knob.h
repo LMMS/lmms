@@ -116,8 +116,6 @@ public:
 	QColor textColor() const;
 	void setTextColor( const QColor & c );
 
-
-#ifdef LMMS_HAVE_SDL
 	// note: gamepadKnobs is initialized at the bottom of Knob.cpp
 	static std::vector<std::tuple<Knob*, int>> gamepadKnobs;
 
@@ -125,35 +123,63 @@ public:
 		Knob::gamepadKnobs.clear();
 	}
 
-	inline void enableGamepad(int axis) {
+	static void updateGamepad(double x1, double y1, double z1, double x2, double y2, double z2) {
+		for (std::tuple<Knob*,int> config : Knob::gamepadKnobs) {
+			Knob* knob = std::get<0>(config);
+			int axis = std::get<1>(config);
+			switch (axis) {
+				case 0: knob->setValue(x1); break;
+				case 1: knob->setValue(y1); break;
+				case 2: knob->setValue(z1); break;
+				case 3: knob->setValue(x2); break;
+				case 4: knob->setValue(y2); break;
+				case 5: knob->setValue(z2); break;
+				default: break;
+			}
+		}
+	}
+
+public slots:
+	void disableGamepad(int axis) {
+		int index = -1;
+		bool do_remove = false;
+		for (std::tuple<Knob*,int> config : Knob::gamepadKnobs) {
+			index++;
+			Knob* knob = std::get<0>(config);
+			if (knob != this) continue;
+			int ax = std::get<1>(config);
+			if (ax == axis) {
+				do_remove = true;
+				break;
+			}
+		}
+		if (do_remove) {
+			Knob::gamepadKnobs.erase( Knob::gamepadKnobs.begin()+index );
+		}
+	}
+
+
+	void enableGamepad(int axis) {
 		Knob::gamepadKnobs.push_back(std::make_tuple(this,axis) );
 		update();
 	}
 
-	inline void setValue(double v) {
+	void setValue(double v) {
 		// note some plugin sliders seem to be in range from 0-1
 		if (this->isVolumeKnob()) this->model()->setValue( ((float)v*100.0)+100.0 );
 		else this->model()->setValue( (float)v*100.0 );
 		emit this->sliderMoved( this->model()->value() );
 	}
 
-	inline static void updateGamepad(double x1, double y1, double z1, double x2, double y2, double z2) {
-        for (std::tuple<Knob*,int> config : Knob::gamepadKnobs) {
-        	Knob* knob = std::get<0>(config);
-        	int axis = std::get<1>(config);
-        	switch (axis) {
-        		case 0: knob->setValue(x1); break;
-        		case 1: knob->setValue(y1); break;
-        		case 2: knob->setValue(z1); break;
-        		case 3: knob->setValue(x2); break;
-        		case 4: knob->setValue(y2); break;
-        		case 5: knob->setValue(z2); break;
-        		default: break;
-        	}
-        }
+	bool isGamepadConnected(int axis) {
+		for (std::tuple<Knob*,int> config : Knob::gamepadKnobs) {
+			Knob* knob = std::get<0>(config);
+			if (knob != this) continue;
+			int ax = std::get<1>(config);
+			if (ax == axis) return true;
+		}
+		return false;
 	}
-
-#endif
 
 signals:
 	void sliderPressed();

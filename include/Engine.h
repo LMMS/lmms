@@ -30,6 +30,8 @@
 #include <QtCore/QString>
 #include <QtCore/QObject>
 #include <QtScript/QScriptEngine>
+#include <QtCore/QTimer>
+
 #include "SubprocessWrapper.h"
 #include "GuiApplication.h"
 #include "MainWindow.h"
@@ -98,6 +100,7 @@ public slots:
 		return LmmsCore::s_gamepad_state[index];
 	}
 
+	void updateSDL();
 
 public:
 	LmmsCore();
@@ -162,7 +165,7 @@ public:
 	static QScriptValue generateRandom(QScriptContext *context, QScriptEngine *engine);
 	static void scriptEval(std::string script, std::string fileName="");
 	static void scriptEval(QString script, QString fileName="");
-	static inline void updateGamepad(double x1,double y1,double z1,  double x2,double y2,double z2) {
+	static void updateGamepad(double x1,double y1,double z1,  double x2,double y2,double z2) {
 		LmmsCore::s_gamepad_state[0] = x1;
 		LmmsCore::s_gamepad_state[1] = y1;
 		LmmsCore::s_gamepad_state[2] = z1;
@@ -170,6 +173,7 @@ public:
 		LmmsCore::s_gamepad_state[4] = y2;
 		LmmsCore::s_gamepad_state[5] = z2;
 	}
+	static void shutdownSDL();
 
 signals:
 	void initProgress(const QString &msg);
@@ -202,6 +206,9 @@ private:
 	std::uniform_real_distribution<double> m_uniform;
 
 	static double s_gamepad_state[6];
+
+	//SDL_Joystick *m_joystick; moved to a private global in Engine.cpp (so we do not have to include SDL2 here)
+	QTimer* m_sdlTimer;
 
 	// even though most methods are static, an instance is needed for Qt slots/signals
 	static LmmsCore * s_instanceOfMe;

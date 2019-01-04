@@ -33,7 +33,7 @@
 #include "ProjectJournal.h"
 #include "Song.h"
 #include "BandLimitedWave.h"
-
+#include "Knob.h"
 #include "Note.h"
 #include "BBTrack.h"
 #include "InstrumentTrack.h"
@@ -43,6 +43,13 @@
 //#include <QtCore/QRandomGenerator>
 //#include <QtQml/QQmlEngine>
 #include <QtDeclarative/QtDeclarative>
+
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_joystick.h>
+#include <SDL2/SDL_hints.h>
+
+static SDL_Joystick* m_joystick = NULL;
+
 
 float LmmsCore::s_framesPerTick;
 Mixer* LmmsCore::s_mixer = NULL;
@@ -58,9 +65,50 @@ double LmmsCore::s_gamepad_state[6] = {0.0};
 
 
 LmmsCore::LmmsCore() :m_rng(std::time(0)) {
-	// Then we create a distribution. We'll start with a uniform distribution in the
-	// default [0, 1) range:
+	// default range 0.0 - 1.0
 	this->m_uniform = std::uniform_real_distribution<double>();
+
+	SDL_SetHint(SDL_HINT_JOYSTICK_ALLOW_BACKGROUND_EVENTS,"1");  // required in SDL2 when initialized before display
+	SDL_InitSubSystem(SDL_INIT_JOYSTICK);
+
+	// Check for joystick
+	if (SDL_NumJoysticks() > 0) {
+		// Open joystick
+		m_joystick = SDL_JoystickOpen(0);
+		if (m_joystick) {
+			printf("Opened Gamepad 0\n");
+			printf("Name: %s\n", SDL_JoystickNameForIndex(0));  // SDL2
+			printf("Number of Axes: %d\n", SDL_JoystickNumAxes(m_joystick));
+			printf("Number of Buttons: %d\n", SDL_JoystickNumButtons(m_joystick));
+			printf("Number of Balls: %d\n", SDL_JoystickNumBalls(m_joystick));
+			printf("Number of Hats: %d\n", SDL_JoystickNumHats(m_joystick));
+
+			Knob::resetGamepads();
+
+			this->m_sdlTimer = new QTimer(this);
+			connect(m_sdlTimer, SIGNAL(timeout()), this, SLOT(updateSDL()));
+			m_sdlTimer->start(1000/30);
+		} else {
+			printf("Couldn't open gamepad 0\n");
+		}
+	} else {
+		printf("No gamepads are attached\n");	
+	}
+
+}
+
+
+void LmmsCore::updateSDL() {
+	SDL_Event event;
+	SDL_PollEvent(&event);
+	double x1 = ((double)SDL_JoystickGetAxis(m_joystick, 0)) / 32768.0;
+	double y1 = ((double)SDL_JoystickGetAxis(m_joystick, 1)) / 32768.0;
+	double z1 = (((double)SDL_JoystickGetAxis(m_joystick, 2)) / 32768.0) + 1.0;
+	double x2 = ((double)SDL_JoystickGetAxis(m_joystick, 3)) / 32768.0;
+	double y2 = ((double)SDL_JoystickGetAxis(m_joystick, 4)) / 32768.0;
+	double z2 = (((double)SDL_JoystickGetAxis(m_joystick, 5)) / 32768.0) + 1.0;
+	Knob::updateGamepad( x1,y1,z1, x2,y2,z2 );
+	Engine::updateGamepad( x1,y1,z1, x2,y2,z2 );
 }
 
 
@@ -182,19 +230,28 @@ void LmmsCore::init( bool renderOnly )
 	s_mixer->startProcessing();
 }
 
-
+void LmmsCore::shutdownSDL() {
+	std::cout << "shutdown SDL..." << std::endl;
+	inst()->m_sdlTimer->stop();
+	if (m_joystick) SDL_JoystickClose(m_joystick);
+	SDL_Quit();
+	std::cout << "shutdown SDL OK" << std::endl;
+}
 
 
 void LmmsCore::destroy()
 {
+	std::cout << "LmmsCore::destroy..." << std::endl;
 	scriptEngine->abortEvaluation();
+	std::cout << "scriptEngine halted" << std::endl;
 	s_projectJournal->stopAllJournalling();
+	std::cout << "ProjectJournal halted" << std::endl;
 	s_mixer->stopProcessing();
-
+	std::cout << "Mixer halted" << std::endl;
 	PresetPreviewPlayHandle::cleanup();
-
+	std::cout << "PresetPreviewPlayHandle cleanup OK" << std::endl;
 	s_song->clearProject();
-
+	std::cout << "song cleared OK" << std::endl;
 	deleteHelper( &s_bbTrackContainer );
 	deleteHelper( &s_dummyTC );
 
@@ -207,8 +264,10 @@ void LmmsCore::destroy()
 	deleteHelper( &s_projectJournal );
 
 	deleteHelper( &s_song );
-
+	std::cout << "free memory OK" << std::endl;
 	delete ConfigManager::inst();
+	std::cout << "LmmsCore::destroy OK" << std::endl;
+
 }
 
 

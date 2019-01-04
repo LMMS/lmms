@@ -236,6 +236,7 @@ MainWindow::MainWindow() :
 
 MainWindow::~MainWindow()
 {
+	Engine::shutdownSDL();
 	Engine::scriptEngine->abortEvaluation();
 
 	for( PluginView *view : m_tools )
@@ -271,22 +272,6 @@ void MainWindow::enableScriptTools() {
 void MainWindow::onRunScript() {
 	Engine::scriptEval( this->getScript() );
 }
-
-#ifdef LMMS_HAVE_SDL
-	void MainWindow::updateSDL() {
-		SDL_Event event;
-		SDL_PollEvent(&event);
-		double x1 = ((double)SDL_JoystickGetAxis(m_joystick, 0)) / 32768.0;
-		double y1 = ((double)SDL_JoystickGetAxis(m_joystick, 1)) / 32768.0;
-		double z1 = (((double)SDL_JoystickGetAxis(m_joystick, 2)) / 32768.0) + 1.0;
-		double x2 = ((double)SDL_JoystickGetAxis(m_joystick, 3)) / 32768.0;
-		double y2 = ((double)SDL_JoystickGetAxis(m_joystick, 4)) / 32768.0;
-		double z2 = (((double)SDL_JoystickGetAxis(m_joystick, 5)) / 32768.0) + 1.0;
-        Knob::updateGamepad( x1,y1,z1, x2,y2,z2 );
-        Engine::updateGamepad( x1,y1,z1, x2,y2,z2 );
-	}
-#endif
-
 
 
 void MainWindow::finalize()
