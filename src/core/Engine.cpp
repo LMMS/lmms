@@ -62,6 +62,7 @@ DummyTrackContainer * LmmsCore::s_dummyTC = NULL;
 QScriptEngine* LmmsCore::scriptEngine = NULL;
 std::vector<SubprocessWrapper*> LmmsCore::s_processes = {};
 double LmmsCore::s_gamepad_state[6] = {0.0};
+bool LmmsCore::s_gamepad_buttons[11] = {false};
 
 
 LmmsCore::LmmsCore() :m_rng(std::time(0)) {
@@ -109,6 +110,29 @@ void LmmsCore::updateSDL() {
 	double z2 = (((double)SDL_JoystickGetAxis(m_joystick, 5)) / 32768.0) + 1.0;
 	Knob::updateGamepad( x1,y1,z1, x2,y2,z2 );
 	Engine::updateGamepad( x1,y1,z1, x2,y2,z2 );
+	for (int i=0; i<11; i++) {
+		if (SDL_JoystickGetButton(m_joystick, i)) {
+			if (! Engine::s_gamepad_buttons[i]) {
+				Engine::s_gamepad_buttons[i] = true;
+				emit gamepadButtonPressed(i);
+			}
+		} else {
+			if (Engine::s_gamepad_buttons[i]) {
+				Engine::s_gamepad_buttons[i] = false;
+				emit gamepadButtonReleased(i);
+			}
+		}
+	}
+	// because we are in a QTimer and not polling inside a while loop here, below has serious lag
+	// the explicit Get functions above always respond in real time.
+	//switch(event.type) {
+	//	case SDL_JOYBUTTONDOWN:
+	//		std::cout << "DOWN:" << event.jbutton.button << std::endl;
+	//		break;
+	//	case SDL_JOYBUTTONUP:
+	//		std::cout << "UP:" << event.jbutton.button << std::endl;
+	//		break;
+	//}
 }
 
 

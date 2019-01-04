@@ -158,7 +158,6 @@ public:
 		return s_instanceOfMe;
 	}
 
-	// note: on fedora installs with: dnf install qt5-qtscript-devel
 	static QScriptEngine* scriptEngine;
 	static void scriptEnable();
 	static QScriptValue scriptPrint(QScriptContext *context, QScriptEngine *engine);
@@ -177,6 +176,8 @@ public:
 
 signals:
 	void initProgress(const QString &msg);
+	void gamepadButtonPressed(int i);
+	void gamepadButtonReleased(int i);
 
 
 private:
@@ -206,6 +207,7 @@ private:
 	std::uniform_real_distribution<double> m_uniform;
 
 	static double s_gamepad_state[6];
+	static bool   s_gamepad_buttons[11];
 
 	//SDL_Joystick *m_joystick; moved to a private global in Engine.cpp (so we do not have to include SDL2 here)
 	QTimer* m_sdlTimer;
