@@ -79,13 +79,14 @@ AudioJack::~AudioJack()
 	}
 #endif
 
-	if( m_client != NULL )
+	if( m_client != nullptr )
 	{
 		if( m_active )
 		{
 			jack_deactivate( m_client );
 		}
 		jack_client_close( m_client );
+		m_client = nullptr;
 	}
 
 	delete[] m_tempOutBufs;
