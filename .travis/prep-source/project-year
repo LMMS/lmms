@@ -13,6 +13,6 @@ do
 	YEAR=$((YEAR - 1))
 done
 
-sed "/^SET(PROJECT_YEAR / c SET(PROJECT_YEAR $YEAR)" CMakeLists.txt \
-	> CMakeLists.txt.new
+sed "/^SET(PROJECT_YEAR / c \\
+SET(PROJECT_YEAR $YEAR)" CMakeLists.txt > CMakeLists.txt.new
 mv CMakeLists.txt.new CMakeLists.txt
