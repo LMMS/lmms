@@ -96,8 +96,12 @@ MainWindow::MainWindow() :
 	disableAutoKeyAccelerators(this);
 #endif
 	setAttribute( Qt::WA_DeleteOnClose );
-
+	setAttribute(Qt::WA_TranslucentBackground);
 	QWidget * main_widget = new QWidget( this );
+
+	main_widget->setAutoFillBackground(true);
+	main_widget->setStyleSheet("background: rgba(20,20,20,50%);");
+
 	QVBoxLayout * vbox = new QVBoxLayout( main_widget );
 	vbox->setSpacing( 0 );
 	vbox->setMargin( 0 );
@@ -199,6 +203,8 @@ MainWindow::MainWindow() :
 	m_toolBar->setObjectName( "mainToolbar" );
 	m_toolBar->setFixedHeight( 64 );
 	m_toolBar->move( 0, 0 );
+	m_toolBar->setAutoFillBackground(true);
+	m_toolBar->setStyleSheet("background: rgba(30,30,30,80%); color:black");
 
 	// add layout for organizing quite complex toolbar-layouting
 	m_toolBarLayout = new QGridLayout( m_toolBar/*, 2, 1*/ );

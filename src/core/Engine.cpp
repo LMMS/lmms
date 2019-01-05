@@ -132,6 +132,12 @@ void LmmsCore::updateSDL() {
 	//	case SDL_JOYBUTTONUP:
 	//		std::cout << "UP:" << event.jbutton.button << std::endl;
 	//		break;
+	//	case SDL_KEYDOWN:
+	//		std::cout << "KEYDOWN:" << event.key.keysym.scancode << std::endl;
+	//		//std::cout << "unicode:" << event.key.keysym.unicode << std::endl;
+	//		std::cout << "mod:" << event.key.keysym.mod << std::endl;
+	//		std::cout << "name:" << event.key.keysym.sym << std::endl;
+	//		break;
 	//}
 }
 

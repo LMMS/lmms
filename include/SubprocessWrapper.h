@@ -11,12 +11,15 @@
 #include <QX11EmbedContainer>
 #endif
 
+class SubWindow;
+
 class SubprocessWrapper : public QObject {
 	Q_OBJECT
 	Q_PROPERTY(QProcess* subprocess READ getProcess)
 	QProcess* subprocess;
-	unsigned long xid;
 	unsigned long pid;
+	unsigned long xid;
+	unsigned long client_xid;
 #ifdef __linux__
 	QX11EmbedContainer* embedContainer;
 #endif
@@ -28,7 +31,7 @@ class SubprocessWrapper : public QObject {
 
 	public:
 		SubprocessWrapper(){};
-		SubprocessWrapper(QString exe, QStringList args, bool capture=false, QWidget* parent=NULL, int width=800, int height=600);
+		SubprocessWrapper(QString exe, QStringList args, bool capture=false, SubWindow* parent=NULL, int width=800, int height=600);
 		inline QProcess* getProcess() { return this->subprocess; }
 };
 

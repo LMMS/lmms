@@ -36,12 +36,13 @@
 
 SubWindow::SubWindow( QWidget *parent, Qt::WindowFlags windowFlags ) :
 	QMdiSubWindow( parent, windowFlags ),
-	m_buttonSize( 17, 17 ),
-	m_titleBarHeight( 24 )
+	m_buttonSize( 28, 28 ),
+	m_titleBarHeight( 32 )
 {
 	// initialize the tracked geometry to whatever Qt thinks the normal geometry currently is.
 	// this should always work, since QMdiSubWindows will not start as maximized
 	m_trackedNormalGeom = normalGeometry();
+	setStyleSheet("background: rgba(64,64,64,50%)");
 
 	// inits the colors
 	m_activeColor = Qt::SolidPattern;

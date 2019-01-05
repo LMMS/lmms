@@ -265,10 +265,8 @@ unsigned long SubprocessWrapper::getWindowID() {
 	return this->xid;
 }
 void SubprocessWrapper::handleClientEmbed() {
-	//lock();
-	//sendMessage( IdShowUI );
-	//unlock();
-	std::cout << "XEMBED DONE?" << std::endl;
+	std::cout << "XEMBED DONE" << std::endl;
+	this->embedContainer->show();  // note: REQUIRED window must be shown after xembed
 }
 
 void SubprocessWrapper::captureWindow(){
@@ -278,26 +276,16 @@ void SubprocessWrapper::captureWindow(){
 	std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 	xlib::Display *disp;
 	if (! (disp = XOpenDisplay(NULL))) { return; }
-	auto xxid = list_windows( disp, this->pid );
-	std::cout << "got XID of window " << xxid << std::endl;
-	if (xxid) {
-		this->embedContainer->embedClient( xxid );
-		//XUnmapWindow(disp, xxid);
-		//QWindow* vw = QWindow::fromWinId(xxid);
-		//vw->setFlags(Qt::FramelessWindowHint);
-		//https://stackoverflow.com/questions/45061803/cannot-get-qwindowfromwinid-to-work-properly
-		//vw->show();
-		//vw->hide();
-		//vw->setAttribute(Qt::WA_NativeWindow);
-		//auto container = QWidget::createWindowContainer(vw);
-		//gui->mainWindow()->workspace()->addSubWindow(container);
-		//vw->show();
+	this->client_xid = list_windows( disp, this->pid );
+	std::cout << "got XID of window " << client_xid << std::endl;
+	if (client_xid) {
+		this->embedContainer->embedClient( client_xid );
 	} else {
 		std::this_thread::sleep_for(std::chrono::milliseconds(2000));
-		xxid = list_windows( disp, this->pid );
-		std::cout << "(second try) got XID of window " << xxid << std::endl;
-		if (xxid) {
-			this->embedContainer->embedClient( xxid );
+		client_xid = list_windows( disp, this->pid );
+		std::cout << "(second try) got XID of window " << client_xid << std::endl;
+		if (client_xid) {
+			this->embedContainer->embedClient( client_xid );
 		} else {
 			std::cout << "ERROR: can not get XID of window" << std::endl;
 		}
@@ -305,16 +293,20 @@ void SubprocessWrapper::captureWindow(){
 #endif
 }
 
-SubprocessWrapper::SubprocessWrapper(QString exe, QStringList args, bool capture, QWidget* parent, int width, int height) {
+SubprocessWrapper::SubprocessWrapper(QString exe, QStringList args, bool capture, SubWindow* parent, int width, int height) {
 
 #ifdef __linux__
-	// a parent widget also breaks mplayer
-	if (parent) {
-		parent->setAttribute(Qt::WA_NativeWindow);
-	}
 	embedContainer = new QX11EmbedContainer(parent);
 	embedContainer->setMinimumSize(width, height);
-	gui->mainWindow()->workspace()->addSubWindow(embedContainer);
+	if (parent) {
+		//parent->setAttribute(Qt::WA_NativeWindow);
+		parent->setWidget(embedContainer);
+		gui->mainWindow()->workspace()->addSubWindow(parent);
+		//NOT REQUIRED HERE//parent->show();
+	} else {
+		gui->mainWindow()->workspace()->addSubWindow(embedContainer);
+	}
+
 	embedContainer->show();  // this also sets the xid
 	this->xid = embedContainer->winId();
 	this->subprocess = new QProcess( embedContainer );

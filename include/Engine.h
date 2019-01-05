@@ -78,9 +78,9 @@ class LmmsCore : public QObject
 
 public slots:
 	inline SubprocessWrapper* newProcess(QString exe, QStringList args, bool capture=false, int width=320, int height=240) {
-		//auto parent = new QWidget(); // seems to also break mplayer with native xembed support
-		//auto sw = new SubprocessWrapper(exe,args, capture, parent, width, height);
-		auto sw = new SubprocessWrapper(exe,args, capture, NULL, width, height);
+		auto parent = new SubWindow(gui->mainWindow()); // seems to also break mplayer with native xembed support?
+		auto sw = new SubprocessWrapper(exe,args, capture, parent, width, height);
+		//auto sw = new SubprocessWrapper(exe,args, capture, NULL, width, height);
 		s_processes.push_back( sw );
 		return sw;
 	}
