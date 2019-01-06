@@ -213,7 +213,7 @@ MainWindow::MainWindow() :
 	vbox->addWidget( w );
 	setCentralWidget( main_widget );
 
-	m_updateTimer.start( 1000 / 20, this );  // 20 fps
+	m_updateTimer.start( 1000 / 60, this );  // 60 fps
 
 	if( ConfigManager::inst()->value( "ui", "enableautosave" ).toInt() )
 	{
@@ -266,7 +266,7 @@ MainWindow::~MainWindow()
 void MainWindow::finalize()
 {
 	resetWindowTitle();
-	setWindowIcon( embed::getIconPixmap( "icon" ) );
+	setWindowIcon( embed::getIconPixmap( "icon_small" ) );
 
 
 	// project-popup-menu
@@ -414,7 +414,7 @@ void MainWindow::finalize()
 #if !(defined(LMMS_BUILD_APPLE) && (QT_VERSION < 0x050600))
 	help_menu->addSeparator();
 #endif
-	help_menu->addAction( embed::getIconPixmap( "icon" ), tr( "About" ),
+	help_menu->addAction( embed::getIconPixmap( "icon_small" ), tr( "About" ),
 				  this, SLOT( aboutLMMS() ) );
 
 	// create tool-buttons
@@ -555,7 +555,9 @@ void MainWindow::finalize()
 	}
 	// look whether mixer failed to start the audio device selected by the
 	// user and is using AudioDummy as a fallback
-	else if( Engine::mixer()->audioDevStartFailed() )
+	// or the audio device is set to invalid one
+	else if( Engine::mixer()->audioDevStartFailed() || !Mixer::isAudioDevNameValid(
+		ConfigManager::inst()->value( "mixer", "audiodev" ) ) )
 	{
 		// if so, offer the audio settings section of the setup dialog
 		SetupDialog sd( SetupDialog::AudioSettings );
@@ -767,7 +769,10 @@ void MainWindow::restoreWidgetState( QWidget * _w, const QDomElement & _de )
 		// first restore the window, as attempting to resize a maximized window causes graphics glitching
 		_w->setWindowState( _w->windowState() & ~(Qt::WindowMaximized | Qt::WindowMinimized) );
 
-		_w->resize( r.size() );
+		// Check isEmpty() to work around corrupt project files with empty size
+		if ( ! r.size().isEmpty() ) {
+			_w->resize( r.size() );
+		}
 		_w->move( r.topLeft() );
 
 		// set the window to its correct minimized/maximized/restored state

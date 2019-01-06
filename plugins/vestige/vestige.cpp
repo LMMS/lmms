@@ -45,12 +45,13 @@
 #include "gui_templates.h"
 #include "InstrumentPlayHandle.h"
 #include "InstrumentTrack.h"
-
+#include "LocaleHelper.h"
 #include "MainWindow.h"
 #include "Mixer.h"
 #include "GuiApplication.h"
 #include "PixmapButton.h"
 #include "SampleBuffer.h"
+#include "Song.h"
 #include "StringPairDrag.h"
 #include "TextFloat.h"
 #include "ToolTip.h"
@@ -209,8 +210,8 @@ void vestigeInstrument::loadSettings( const QDomElement & _this )
 
 			if( !( knobFModel[ i ]->isAutomated() || knobFModel[ i ]->controllerConnection() ) )
 			{
-				knobFModel[ i ]->setValue( ( s_dumpValues.at( 2 )).toFloat() );
-				knobFModel[ i ]->setInitValue( ( s_dumpValues.at( 2 )).toFloat() );
+				knobFModel[ i ]->setValue(LocaleHelper::toFloat(s_dumpValues.at(2)));
+				knobFModel[ i ]->setInitValue(LocaleHelper::toFloat(s_dumpValues.at(2)));
 			}
 
 			connect( knobFModel[i], SIGNAL( dataChanged() ), this, SLOT( setParameter() ) );
@@ -365,7 +366,7 @@ void vestigeInstrument::loadFile( const QString & _file )
 
 void vestigeInstrument::play( sampleFrame * _buf )
 {
-	if (!m_pluginMutex.tryLock()) {return;}
+	if (!m_pluginMutex.tryLock(Engine::getSong()->isExporting() ? -1 : 0)) {return;}
 
 	const fpp_t frames = Engine::mixer()->framesPerPeriod();
 
@@ -965,7 +966,7 @@ manageVestigeInstrumentView::manageVestigeInstrumentView( Instrument * _instrume
 		if( !hasKnobModel )
 		{
 			sprintf( paramStr, "%d", i);
-			m_vi->knobFModel[ i ] = new FloatModel( (s_dumpValues.at( 2 )).toFloat(),
+			m_vi->knobFModel[ i ] = new FloatModel( LocaleHelper::toFloat(s_dumpValues.at(2)),
 				0.0f, 1.0f, 0.01f, castModel<vestigeInstrument>(), tr( paramStr ) );
 		}
 		connect( m_vi->knobFModel[i], SIGNAL( dataChanged() ), this, SLOT( setParameter() ) );
@@ -1026,7 +1027,7 @@ void manageVestigeInstrumentView::syncPlugin( void )
 		{
 			sprintf( paramStr, "param%d", i );
     			s_dumpValues = dump[ paramStr ].split( ":" );
-			f_value = ( s_dumpValues.at( 2 ) ).toFloat();
+			f_value = LocaleHelper::toFloat(s_dumpValues.at(2));
 			m_vi->knobFModel[ i ]->setAutomatedValue( f_value );
 			m_vi->knobFModel[ i ]->setInitValue( f_value );
 		}

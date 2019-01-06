@@ -139,7 +139,6 @@ void patchesDialog::setup ( fluid_synth_t * pSynth, int iChan,
 	m_iChan  = iChan;
 
 
-	fluid_preset_t preset;
 	QTreeWidgetItem *pBankItem = NULL;
 	// For all soundfonts (in reversed stack order) fill the available banks...
 	int cSoundFonts = ::fluid_synth_sfcount(m_pSynth);
@@ -147,11 +146,17 @@ void patchesDialog::setup ( fluid_synth_t * pSynth, int iChan,
 		fluid_sfont_t *pSoundFont = ::fluid_synth_get_sfont(m_pSynth, i);
 		if (pSoundFont) {
 #ifdef CONFIG_FLUID_BANK_OFFSET
-			int iBankOffset = ::fluid_synth_get_bank_offset(m_pSynth, pSoundFont->id);
+			int iBankOffset = ::fluid_synth_get_bank_offset(m_pSynth, fluid_sfont_get_id(pSoundFont));
 #endif
-			pSoundFont->iteration_start(pSoundFont);
-			while (pSoundFont->iteration_next(pSoundFont, &preset)) {
-				int iBank = preset.get_banknum(&preset);
+			fluid_sfont_iteration_start(pSoundFont);
+#if FLUIDSYNTH_VERSION_MAJOR < 2
+			fluid_preset_t preset;
+			fluid_preset_t *pCurPreset = &preset;
+#else
+			fluid_preset_t *pCurPreset;
+#endif
+			while ((pCurPreset = fluid_sfont_iteration_next_wrapper(pSoundFont, pCurPreset))) {
+				int iBank = fluid_preset_get_banknum(pCurPreset);
 #ifdef CONFIG_FLUID_BANK_OFFSET
 				iBank += iBankOffset;
 #endif
@@ -169,9 +174,9 @@ void patchesDialog::setup ( fluid_synth_t * pSynth, int iChan,
 	m_iBank = 0;
 	fluid_preset_t *pPreset = ::fluid_synth_get_channel_preset(m_pSynth, m_iChan);
 	if (pPreset) {
-		m_iBank = pPreset->get_banknum(pPreset);
+		m_iBank = fluid_preset_get_banknum(pPreset);
 #ifdef CONFIG_FLUID_BANK_OFFSET
-		m_iBank += ::fluid_synth_get_bank_offset(m_pSynth, (pPreset->sfont)->id);
+		m_iBank += ::fluid_synth_get_bank_offset(m_pSynth, fluid_sfont_get_id(fluid_preset_get_sfont(sfont)));
 #endif
 	}
 
@@ -182,7 +187,7 @@ void patchesDialog::setup ( fluid_synth_t * pSynth, int iChan,
 
 	// Set the selected program.
 	if (pPreset)
-		m_iProg = pPreset->get_num(pPreset);
+		m_iProg = fluid_preset_get_num(pPreset);
 	QTreeWidgetItem *pProgItem = findProgItem(m_iProg);
 	m_progListView->setCurrentItem(pProgItem);
 	m_progListView->scrollToItem(pProgItem);
@@ -308,7 +313,6 @@ void patchesDialog::bankChanged (void)
 	// Clear up the program listview.
 	m_progListView->setSortingEnabled(false);
 	m_progListView->clear();
-	fluid_preset_t preset;
 	QTreeWidgetItem *pProgItem = NULL;
 	// For all soundfonts (in reversed stack order) fill the available programs...
 	int cSoundFonts = ::fluid_synth_sfcount(m_pSynth);
@@ -316,23 +320,29 @@ void patchesDialog::bankChanged (void)
 		fluid_sfont_t *pSoundFont = ::fluid_synth_get_sfont(m_pSynth, i);
 		if (pSoundFont) {
 #ifdef CONFIG_FLUID_BANK_OFFSET
-			int iBankOffset = ::fluid_synth_get_bank_offset(m_pSynth, pSoundFont->id);
+			int iBankOffset = ::fluid_synth_get_bank_offset(m_pSynth, fluid_sfont_get_id(pSoundFont));
 #endif
-			pSoundFont->iteration_start(pSoundFont);
-			while (pSoundFont->iteration_next(pSoundFont, &preset)) {
-				int iBank = preset.get_banknum(&preset);
+			fluid_sfont_iteration_start(pSoundFont);
+#if FLUIDSYNTH_VERSION_MAJOR < 2
+			fluid_preset_t preset;
+			fluid_preset_t *pCurPreset = &preset;
+#else
+			fluid_preset_t *pCurPreset;
+#endif
+			while ((pCurPreset = fluid_sfont_iteration_next_wrapper(pSoundFont, pCurPreset))) {
+				int iBank = fluid_preset_get_banknum(pCurPreset);
 #ifdef CONFIG_FLUID_BANK_OFFSET
 				iBank += iBankOffset;
 #endif
-				int iProg = preset.get_num(&preset);
+				int iProg = fluid_preset_get_num(pCurPreset);
 				if (iBank == iBankSelected && !findProgItem(iProg)) {
 					pProgItem = new patchItem(m_progListView, pProgItem);
 					if (pProgItem) {
 						pProgItem->setText(0, QString::number(iProg));
-						pProgItem->setText(1, preset.get_name(&preset));
-						//pProgItem->setText(2, QString::number(pSoundFont->id));
+						pProgItem->setText(1, fluid_preset_get_name(pCurPreset));
+						//pProgItem->setText(2, QString::number(fluid_sfont_get_id(pSoundFont)));
 						//pProgItem->setText(3, QFileInfo(
-						//	pSoundFont->get_name(pSoundFont)).baseName());
+						//	fluid_sfont_get_name(pSoundFont).baseName());
 					}
 				}
 			}

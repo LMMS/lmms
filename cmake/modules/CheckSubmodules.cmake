@@ -18,7 +18,7 @@
 # For details see the accompanying COPYING-CMAKE-SCRIPTS file.
 
 # Files which confirm a successful clone
-SET(VALID_CRUMBS "CMakeLists.txt;Makefile;Makefile.in;Makefile.am;configure.ac;configure.py;autogen.sh;.gitignore")
+SET(VALID_CRUMBS "CMakeLists.txt;Makefile;Makefile.in;Makefile.am;configure.ac;configure.py;autogen.sh;.gitignore;LICENSE;Home.md")
 
 # Try and use the specified shallow clone on submodules, if supported
 SET(DEPTH_VALUE 100)

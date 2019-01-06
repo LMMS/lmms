@@ -364,6 +364,7 @@ void TimeLineWidget::mouseMoveEvent( QMouseEvent* event )
 				Engine::getSong()->setToTime(t, Song::Mode_None);
 			}
 			m_pos.setCurrentFrame( 0 );
+			m_pos.setJumped( true );
 			updatePosition();
 			positionMarkerMoved();
 			break;

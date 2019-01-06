@@ -28,6 +28,7 @@
 
 #include "AutomationPattern.h"
 #include "ControllerConnection.h"
+#include "LocaleHelper.h"
 #include "Mixer.h"
 #include "ProjectJournal.h"
 
@@ -88,23 +89,46 @@ bool AutomatableModel::isAutomated() const
 }
 
 
+
+bool AutomatableModel::mustQuoteName(const QString& name)
+{
+	QRegExp reg("^[A-Za-z0-9._-]+$");
+	return !reg.exactMatch(name);
+}
+
 void AutomatableModel::saveSettings( QDomDocument& doc, QDomElement& element, const QString& name )
 {
+	bool mustQuote = mustQuoteName(name);
+
 	if( isAutomated() || m_scaleType != Linear )
 	{
 		// automation needs tuple of data (name, id, value)
 		// scale type also needs an extra value
 		// => it must be appended as a node
-		QDomElement me = doc.createElement( name );
+
+		QDomElement me = doc.createElement( mustQuote ? QString("automatablemodel") : name );
 		me.setAttribute( "id", ProjectJournal::idToSave( id() ) );
 		me.setAttribute( "value", m_value );
 		me.setAttribute( "scale_type", m_scaleType == Logarithmic ? "log" : "linear" );
+		if(mustQuote) {
+			me.setAttribute( "nodename", name );
+		}
 		element.appendChild( me );
 	}
 	else
 	{
-		// non automation, linear scale (default), can be saved as attribute
-		element.setAttribute( name, m_value );
+		if(mustQuote)
+		{
+			QDomElement me = doc.createElement( "automatablemodel" );
+			me.setAttribute( "nodename", name );
+			me.setAttribute( "value", m_value );
+			element.appendChild( me );
+		}
+		else
+		{
+			// non automation, linear scale (default), can be saved as attribute
+			element.setAttribute( name, m_value );
+		}
 	}
 
 	if( m_controllerConnection && m_controllerConnection->getController()->type()
@@ -124,7 +148,13 @@ void AutomatableModel::saveSettings( QDomDocument& doc, QDomElement& element, co
 			element.appendChild( controllerElement );
 		}
 
-		QDomElement element = doc.createElement( name );
+		bool mustQuote = mustQuoteName(name);
+		QString elementName = mustQuote ? "controllerconnection"
+						: name;
+
+		QDomElement element = doc.createElement( elementName );
+		if(mustQuote)
+			element.setAttribute( "nodename", name );
 		m_controllerConnection->saveSettings( doc, element );
 
 		controllerElement.appendChild( element );
@@ -163,6 +193,17 @@ void AutomatableModel::loadSettings( const QDomElement& element, const QString& 
 	if( connectionNode.isElement() )
 	{
 		QDomNode thisConnection = connectionNode.toElement().namedItem( name );
+		if( !thisConnection.isElement() )
+		{
+			thisConnection = connectionNode.toElement().namedItem( "controllerconnection" );
+			QDomElement tcElement = thisConnection.toElement();
+			// sanity check
+			if( tcElement.isNull() || tcElement.attribute( "nodename" ) != name )
+			{
+				// no, that wasn't it, act as if we never found one
+				thisConnection.clear();
+			}
+		}
 		if( thisConnection.isElement() )
 		{
 			setControllerConnection( new ControllerConnection( (Controller*)NULL ) );
@@ -176,22 +217,48 @@ void AutomatableModel::loadSettings( const QDomElement& element, const QString& 
 	//   <port00 value="4.41" id="4249278"/>
 	// </ladspacontrols>
 	// element => there is automation data, or scaletype information
-	node = element.namedItem( name );
+
+	node = element.namedItem( name ); // maybe we have luck?
+
+	// either: no node with name "name" found
+	//  => look for nodes with attribute name="nodename"
+	// or: element with namedItem() "name" was found, but it's real nodename
+	// is given as attribute and does not match
+	//  => look for the right node
+	if(node.isNull() ||
+		( node.isElement() &&
+		node.toElement().hasAttribute("nodename") &&
+		node.toElement().attribute("nodename") != name))
+	{
+		for(QDomElement othernode = element.firstChildElement();
+			!othernode.isNull();
+			othernode = othernode.nextSiblingElement())
+		{
+			if((!othernode.hasAttribute("nodename") &&
+				othernode.nodeName() == name) ||
+				othernode.attribute("nodename") == name)
+			{
+				node = othernode;
+				break;
+			}
+		}
+	}
 	if( node.isElement() )
 	{
-			changeID( node.toElement().attribute( "id" ).toInt() );
-			setValue( node.toElement().attribute( "value" ).toFloat() );
-			if( node.toElement().hasAttribute( "scale_type" ) )
+		QDomElement nodeElement = node.toElement();
+		changeID( nodeElement.attribute( "id" ).toInt() );
+		setValue( LocaleHelper::toFloat( nodeElement.attribute( "value" ) ) );
+		if( nodeElement.hasAttribute( "scale_type" ) )
+		{
+			if( nodeElement.attribute( "scale_type" ) == "linear" )
 			{
-				if( node.toElement().attribute( "scale_type" ) == "linear" )
-				{
-					setScaleType( Linear );
-				}
-				else if( node.toElement().attribute( "scale_type" ) == "log" )
-				{
-					setScaleType( Logarithmic );
-				}
+				setScaleType( Linear );
 			}
+			else if( nodeElement.attribute( "scale_type" ) == "log" )
+			{
+				setScaleType( Logarithmic );
+			}
+		}
 	}
 	else
 	{
@@ -201,7 +268,7 @@ void AutomatableModel::loadSettings( const QDomElement& element, const QString& 
 		if( element.hasAttribute( name ) )
 			// attribute => read the element's value from the attribute list
 		{
-			setInitValue( element.attribute( name ).toFloat() );
+			setInitValue( LocaleHelper::toFloat( element.attribute( name ) ) );
 		}
 		else
 		{

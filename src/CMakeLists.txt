@@ -116,12 +116,15 @@ TARGET_INCLUDE_DIRECTORIES(lmms
 	PUBLIC ${CMAKE_CURRENT_BINARY_DIR}
 )
 
-# GENERATE_EXPORT_HEADER doesn't do this automatically for OBJECT libraries
+# CMake doesn't define target_EXPORTS for OBJECT libraries.
+# See the documentation of DEFINE_SYMBOL for details.
+# Also add LMMS_STATIC_DEFINE for targets linking against it.
 TARGET_COMPILE_DEFINITIONS(lmmsobjs
 	PRIVATE -Dlmmsobjs_EXPORTS
+	INTERFACE -DLMMS_STATIC_DEFINE
 )
 TARGET_COMPILE_DEFINITIONS(lmms
-	PRIVATE -Dlmmsobjs_EXPORTS
+	PRIVATE $<TARGET_PROPERTY:lmmsobjs,INTERFACE_COMPILE_DEFINITIONS>
 )
 
 # Set Visual Studio startup project to lmms
@@ -196,7 +199,7 @@ IF(NOT MSVC)
 			# ENABLE_EXPORTS property has no effect in some MSYS2 configurations.
 			# Add the linker flag manually to create liblmms.dll.a import library
 			SET_PROPERTY(TARGET lmms
-				APPEND_STRING PROPERTY LINK_FLAGS -Wl,--out-implib,liblmms.dll.a
+				APPEND_STRING PROPERTY LINK_FLAGS " -Wl,--out-implib,liblmms.dll.a"
 			)
 		ENDIF()
 

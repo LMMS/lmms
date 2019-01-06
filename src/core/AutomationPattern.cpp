@@ -28,6 +28,7 @@
 
 #include "AutomationPatternView.h"
 #include "AutomationTrack.h"
+#include "LocaleHelper.h"
 #include "Note.h"
 #include "ProjectJournal.h"
 #include "BBTrackContainer.h"
@@ -144,11 +145,11 @@ void AutomationPattern::setProgressionType(
 void AutomationPattern::setTension( QString _new_tension )
 {
 	bool ok;
-	float nt = _new_tension.toFloat( & ok );
+	float nt = LocaleHelper::toFloat(_new_tension, & ok);
 
 	if( ok && nt > -0.01 && nt < 1.01 )
 	{
-		m_tension = _new_tension.toFloat();
+		m_tension = nt;
 	}
 }
 
@@ -585,7 +586,7 @@ void AutomationPattern::loadSettings( const QDomElement & _this )
 		if( element.tagName() == "time" )
 		{
 			m_timeMap[element.attribute( "pos" ).toInt()]
-				= element.attribute( "value" ).toFloat();
+				= LocaleHelper::toFloat(element.attribute("value"));
 		}
 		else if( element.tagName() == "object" )
 		{

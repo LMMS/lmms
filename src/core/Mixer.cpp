@@ -534,10 +534,10 @@ void Mixer::clearInternal()
 
 
 
-void Mixer::getPeakValues( sampleFrame * _ab, const f_cnt_t _frames, float & peakLeft, float & peakRight ) const
+Mixer::StereoSample Mixer::getPeakValues(sampleFrame * _ab, const f_cnt_t _frames) const
 {
-	peakLeft = 0.0f;
-	peakRight = 0.0f;
+	sample_t peakLeft = 0.0f;
+	sample_t peakRight = 0.0f;
 
 	for( f_cnt_t f = 0; f < _frames; ++f )
 	{
@@ -553,6 +553,8 @@ void Mixer::getPeakValues( sampleFrame * _ab, const f_cnt_t _frames, float & pea
 			peakRight = absRight;
 		}
 	}
+
+	return StereoSample(peakLeft, peakRight);
 }
 
 
@@ -575,7 +577,8 @@ void Mixer::changeQuality( const struct qualitySettings & _qs )
 
 
 
-void Mixer::setAudioDevice( AudioDevice * _dev )
+void Mixer::setAudioDevice( AudioDevice * _dev,
+			    bool startNow )
 {
 	stopProcessing();
 
@@ -592,7 +595,7 @@ void Mixer::setAudioDevice( AudioDevice * _dev )
 
 	emit sampleRateChanged();
 
-	startProcessing();
+	if (startNow) {startProcessing();}
 }
 
 
@@ -600,7 +603,8 @@ void Mixer::setAudioDevice( AudioDevice * _dev )
 
 void Mixer::setAudioDevice( AudioDevice * _dev,
 				const struct qualitySettings & _qs,
-				bool _needs_fifo )
+				bool _needs_fifo,
+				bool startNow )
 {
 	// don't delete the audio-device
 	stopProcessing();
@@ -621,7 +625,7 @@ void Mixer::setAudioDevice( AudioDevice * _dev,
 	emit qualitySettingsChanged();
 	emit sampleRateChanged();
 
-	startProcessing( _needs_fifo );
+	if (startNow) {startProcessing( _needs_fifo );}
 }
 
 
@@ -829,14 +833,138 @@ void Mixer::runChangesInModel()
 	}
 }
 
+bool Mixer::isAudioDevNameValid(QString name)
+{
+#ifdef LMMS_HAVE_SDL
+	if (name == AudioSdl::name())
+	{
+		return true;
+	}
+#endif
 
 
+#ifdef LMMS_HAVE_ALSA
+	if (name == AudioAlsa::name())
+	{
+		return true;
+	}
+#endif
+
+
+#ifdef LMMS_HAVE_PULSEAUDIO
+	if (name == AudioPulseAudio::name())
+	{
+		return true;
+	}
+#endif
+
+
+#ifdef LMMS_HAVE_OSS
+	if (name == AudioOss::name())
+	{
+		return true;
+	}
+#endif
+
+#ifdef LMMS_HAVE_SNDIO
+	if (name == AudioSndio::name())
+	{
+		return true;
+	}
+#endif
+
+#ifdef LMMS_HAVE_JACK
+	if (name == AudioJack::name())
+	{
+		return true;
+	}
+#endif
+
+
+#ifdef LMMS_HAVE_PORTAUDIO
+	if (name == AudioPortAudio::name())
+	{
+		return true;
+	}
+#endif
+
+
+#ifdef LMMS_HAVE_SOUNDIO
+	if (name == AudioSoundIo::name())
+	{
+		return true;
+	}
+#endif
+
+	if (name == AudioDummy::name())
+	{
+		return true;
+	}
+
+	return false;
+}
+
+bool Mixer::isMidiDevNameValid(QString name)
+{
+#ifdef LMMS_HAVE_ALSA
+	if (name == MidiAlsaSeq::name() || name == MidiAlsaRaw::name())
+	{
+		return true;
+	}
+#endif
+
+#ifdef LMMS_HAVE_JACK
+	if (name == MidiJack::name())
+	{
+		return true;
+	}
+#endif
+
+#ifdef LMMS_HAVE_OSS
+	if (name == MidiOss::name())
+	{
+		return true;
+	}
+#endif
+
+#ifdef LMMS_HAVE_SNDIO
+	if (name == MidiSndio::name())
+	{
+		return true;
+	}
+#endif
+
+#ifdef LMMS_BUILD_WIN32
+	if (name == MidiWinMM::name())
+	{
+		return true;
+	}
+#endif
+
+#ifdef LMMS_BUILD_APPLE
+    if (name == MidiApple::name())
+    {
+		return true;
+    }
+#endif
+
+    if (name == MidiDummy::name())
+    {
+		return true;
+    }
+
+	return false;
+}
 
 AudioDevice * Mixer::tryAudioDevices()
 {
 	bool success_ful = false;
 	AudioDevice * dev = NULL;
 	QString dev_name = ConfigManager::inst()->value( "mixer", "audiodev" );
+	if( !isAudioDevNameValid( dev_name ) )
+	{
+		dev_name = "";
+	}
 
 	m_audioDevStartFailed = false;
 
@@ -980,6 +1108,10 @@ MidiClient * Mixer::tryMidiClients()
 {
 	QString client_name = ConfigManager::inst()->value( "mixer",
 								"mididev" );
+	if( !isMidiDevNameValid( client_name ) )
+	{
+		client_name = "";
+	}
 
 #ifdef LMMS_HAVE_ALSA
 	if( client_name == MidiAlsaSeq::name() || client_name == "" )

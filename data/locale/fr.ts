@@ -703,11 +703,11 @@ Si vous êtes intéressé par la traduction de LMMS dans une nouvelle langue ou 
     <name>BitcrushControlDialog</name>
     <message>
         <source>IN</source>
-        <translation>ENTRÉE</translation>
+        <translation>IN</translation>
     </message>
     <message>
         <source>OUT</source>
-        <translation>SORTIE</translation>
+        <translation>OUT</translation>
     </message>
     <message>
         <source>GAIN</source>
@@ -2252,7 +2252,7 @@ Veuillez vous assurez que vous avez les droits d&apos;écriture sur le fichier e
     </message>
     <message>
         <source>DELAY</source>
-        <translation>DE RETARD</translation>
+        <translation>DELAY</translation>
     </message>
     <message>
         <source>RATE</source>

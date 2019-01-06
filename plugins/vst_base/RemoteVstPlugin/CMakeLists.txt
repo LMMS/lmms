@@ -26,9 +26,11 @@ FOREACH( OUTPUTCONFIG ${CMAKE_CONFIGURATION_TYPES} )
 ENDFOREACH()
 
 set(EXE_NAME RemoteVstPlugin${BITNESS})
-add_executable(${EXE_NAME}
+add_executable(${EXE_NAME} WIN32
 	../RemoteVstPlugin.cpp
 )
+
+target_link_libraries(${EXE_NAME} ole32)
 
 target_include_directories(${EXE_NAME}
 	PRIVATE 
@@ -36,6 +38,15 @@ target_include_directories(${EXE_NAME}
 		"${LMMS_SOURCE_DIR}/include"
 		"${LMMS_BINARY_DIR}"
 )
+
+# Workaround for missing WinMain
+if(MSVC)
+	set_property(TARGET ${EXE_NAME}
+	APPEND
+	PROPERTY LINK_FLAGS "/entry:mainCRTStartup"
+)
+endif()
+
 
 if(WIN32)
 	find_package(Qt5Core REQUIRED)

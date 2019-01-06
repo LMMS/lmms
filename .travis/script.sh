@@ -24,12 +24,10 @@ else
 	"$TRAVIS_BUILD_DIR/.travis/$TRAVIS_OS_NAME.$TARGET_OS.script.sh"
 
 	make -j4
+	make tests
 
 	if [[ $TARGET_OS != win* ]]; then
-
-		make tests
 		tests/tests
-
 	fi
 
 	# Package and upload non-tagged builds

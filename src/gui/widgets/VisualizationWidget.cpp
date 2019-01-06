@@ -43,7 +43,10 @@ VisualizationWidget::VisualizationWidget( const QPixmap & _bg, QWidget * _p,
 	QWidget( _p ),
 	s_background( _bg ),
 	m_points( new QPointF[Engine::mixer()->framesPerPeriod()] ),
-	m_active( false )
+	m_active( false ),
+	m_normalColor(71, 253, 133),
+	m_warningColor(255, 192, 64),
+	m_clippingColor(255, 64, 64)
 {
 	setFixedSize( s_background.width(), s_background.height() );
 	setAttribute( Qt::WA_OpaquePaintEvent, true );
@@ -109,6 +112,35 @@ void VisualizationWidget::setActive( bool _active )
 }
 
 
+QColor const & VisualizationWidget::normalColor() const
+{
+	return m_normalColor;
+}
+
+void VisualizationWidget::setNormalColor(QColor const & normalColor)
+{
+	m_normalColor = normalColor;
+}
+
+QColor const & VisualizationWidget::warningColor() const
+{
+	return m_warningColor;
+}
+
+void VisualizationWidget::setWarningColor(QColor const & warningColor)
+{
+	m_warningColor = warningColor;
+}
+
+QColor const & VisualizationWidget::clippingColor() const
+{
+	return m_clippingColor;
+}
+
+void VisualizationWidget::setClippingColor(QColor const & clippingColor)
+{
+	m_clippingColor = clippingColor;
+}
 
 
 void VisualizationWidget::paintEvent( QPaintEvent * )
@@ -122,49 +154,32 @@ void VisualizationWidget::paintEvent( QPaintEvent * )
 		Mixer const * mixer = Engine::mixer();
 
 		float master_output = mixer->masterGain();
-		int w = width()-4;
-		const float half_h = -( height() - 6 ) / 3.0 * master_output - 1;
-		int x_base = 2;
-		const float y_base = height()/2 - 0.5f;
-
-//		p.setClipRect( 2, 2, w, height()-4 );
-
 
 		const fpp_t frames = mixer->framesPerPeriod();
-		float peakLeft;
-		float peakRight;
-		mixer->getPeakValues( m_buffer, frames, peakLeft, peakRight );
-		const float max_level = qMax<float>( peakLeft, peakRight );
+		Mixer::StereoSample peakValues = mixer->getPeakValues(m_buffer, frames);
+		const float max_level = qMax<float>( peakValues.left, peakValues.right );
 
-		// and set color according to that...
-		if( max_level * master_output < 0.9 )
-		{
-			p.setPen( QColor( 71, 253, 133 ) );
-		}
-		else if( max_level * master_output < 1.0 )
-		{
-			p.setPen( QColor( 255, 192, 64 ) );
-		}
-		else
-		{
-			p.setPen( QColor( 255, 64, 64 ) );
-		}
+		// Set the color of the line according to the maximum level
+		float const maxLevelWithAppliedMasterGain = max_level * master_output;
+		p.setPen(QPen(determineLineColor(maxLevelWithAppliedMasterGain), 0.7));
 
-		p.setPen( QPen( p.pen().color(), 0.7 ) );
-
-		const float xd = (float) w / frames;
 		p.setRenderHint( QPainter::Antialiasing );
 
 		// now draw all that stuff
+		int w = width() - 4;
+		const qreal xd = static_cast<qreal>(w) / frames;
+		const qreal half_h = -( height() - 6 ) / 3.0 * static_cast<qreal>(master_output) - 1;
+		int x_base = 2;
+		const qreal y_base = height() / 2 - 0.5;
+
 		for( ch_cnt_t ch = 0; ch < DEFAULT_CHANNELS; ++ch )
 		{
 			for( int frame = 0; frame < frames; ++frame )
 			{
+				sample_t const clippedSample = Mixer::clip(m_buffer[frame][ch]);
 				m_points[frame] = QPointF(
-					x_base + (float) frame * xd,
-					y_base + ( Mixer::clip(
-						m_buffer[frame][ch] ) *
-								half_h ) );
+					x_base + static_cast<qreal>(frame) * xd,
+					y_base + ( static_cast<qreal>(clippedSample) * half_h ) );
 			}
 			p.drawPolyline( m_points, frames );
 		}
@@ -189,7 +204,21 @@ void VisualizationWidget::mousePressEvent( QMouseEvent * _me )
 }
 
 
-
+QColor const & VisualizationWidget::determineLineColor(float level) const
+{
+	if( level < 0.9f )
+	{
+		return normalColor();
+	}
+	else if( level < 1.0f )
+	{
+		return warningColor();
+	}
+	else
+	{
+		return clippingColor();
+	}
+}
 
 
 

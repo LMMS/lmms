@@ -15,3 +15,6 @@ if(DOXYGEN_FOUND)
 		COMMENT "Generating API documentation with Doxygen"
 		SOURCES Doxyfile.in)
 endif(DOXYGEN_FOUND)
+
+ADD_SUBDIRECTORY(bash-completion)
+

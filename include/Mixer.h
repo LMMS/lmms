@@ -171,10 +171,11 @@ public:
 		return m_audioDevStartFailed;
 	}
 
-	void setAudioDevice( AudioDevice * _dev );
+	void setAudioDevice( AudioDevice * _dev , bool startNow );
 	void setAudioDevice( AudioDevice * _dev,
 				const struct qualitySettings & _qs,
-							bool _needs_fifo );
+				bool _needs_fifo,
+				bool startNow );
 	void storeAudioDevice();
 	void restoreAudioDevice();
 	inline AudioDevice * audioDev()
@@ -273,7 +274,13 @@ public:
 	}
 
 
-	void getPeakValues( sampleFrame * _ab, const f_cnt_t _frames, float & peakLeft, float & peakRight ) const;
+	struct StereoSample
+	{
+		StereoSample(sample_t _left, sample_t _right) : left(_left), right(_right) {}
+		sample_t left;
+		sample_t right;
+	};
+	StereoSample getPeakValues(sampleFrame * _ab, const f_cnt_t _frames) const;
 
 
 	bool criticalXRuns() const;
@@ -307,6 +314,9 @@ public:
 
 	void requestChangeInModel();
 	void doneChangeInModel();
+
+	static bool isAudioDevNameValid(QString name);
+	static bool isMidiDevNameValid(QString name);
 
 
 signals:
