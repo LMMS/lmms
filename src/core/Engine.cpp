@@ -142,12 +142,14 @@ void LmmsCore::updateSDL() {
 }
 
 
-template <typename T> void addType(QScriptEngine* engine) {
+
+template <typename T> void addType(QScriptEngine* engine, QString classname) {
 	auto constructor = engine->newFunction([](QScriptContext*, QScriptEngine* engine){
 		return engine->newQObject(new T());
 	});
 	auto value = engine->newQMetaObject(&T::staticMetaObject, constructor);
-	engine->globalObject().setProperty(T::staticMetaObject.className(), value);
+	//engine->globalObject().setProperty(T::staticMetaObject.className(), value);
+	engine->globalObject().setProperty(classname, value);
 }
 
 void LmmsCore::scriptEnable() {
@@ -165,7 +167,13 @@ void LmmsCore::scriptEnable() {
 	gui->mainWindow()->enableScriptTools();
 
 	LmmsCore::scriptEngine = new QScriptEngine();
-	addType<QTimer>(LmmsCore::scriptEngine);
+	addType<QTimer>(LmmsCore::scriptEngine, "QTimer");
+	addType<QsWidget>(LmmsCore::scriptEngine, "QWidget");
+	addType<QsHBoxLayout>(LmmsCore::scriptEngine, "QHBoxLayout");
+	addType<QsVBoxLayout>(LmmsCore::scriptEngine, "QVBoxLayout");
+	addType<QLabel>(LmmsCore::scriptEngine, "QLabel");
+	addType<QPushButton>(LmmsCore::scriptEngine, "QPushButton");
+	addType<QLineEdit>(LmmsCore::scriptEngine, "QLineEdit");
 
 	QScriptValue fun = LmmsCore::scriptEngine->newFunction(LmmsCore::scriptPrint);
 	LmmsCore::scriptEngine->globalObject().setProperty("print", fun);

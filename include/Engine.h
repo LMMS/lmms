@@ -31,6 +31,8 @@
 #include <QtCore/QObject>
 #include <QtScript/QScriptEngine>
 #include <QtCore/QTimer>
+#include <QVBoxLayout>
+#include <QHBoxLayout>
 
 #include "SubprocessWrapper.h"
 #include "GuiApplication.h"
@@ -46,6 +48,30 @@ class Mixer;
 //class Song;
 class Ladspa2LMMS;
 
+
+class QsWidget : public QWidget {
+	Q_OBJECT
+	public slots:
+		void setLayout(QLayout * layout) {
+			QWidget::setLayout(layout);
+		}
+};
+
+class QsHBoxLayout : public QHBoxLayout {
+	Q_OBJECT
+	public slots:
+		void addWidget(QWidget * layout) {
+			QHBoxLayout::addWidget(layout);
+		}
+};
+
+class QsVBoxLayout : public QVBoxLayout {
+	Q_OBJECT
+	public slots:
+		void addWidget(QWidget * layout) {
+			QVBoxLayout::addWidget(layout);
+		}
+};
 
 // Note: This class is called 'LmmsCore' instead of 'Engine' because of naming
 // conflicts caused by ZynAddSubFX. See https://github.com/LMMS/lmms/issues/2269
