@@ -179,7 +179,7 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 	bufsize_tw->setFixedHeight( 80 );
 
 	m_bufSizeSlider = new QSlider( Qt::Horizontal, bufsize_tw );
-	m_bufSizeSlider->setRange( 1, 512 );
+	m_bufSizeSlider->setRange( 1, 128 );
 	m_bufSizeSlider->setTickPosition( QSlider::TicksBelow );
 	m_bufSizeSlider->setPageStep( 8 );
 	m_bufSizeSlider->setTickInterval( 8 );
