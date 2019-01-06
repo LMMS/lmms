@@ -7,7 +7,8 @@ DEB_HOST_MULTIARCH ?= $(shell dpkg-architecture -qDEB_HOST_MULTIARCH)
 DEB_HOST_ARCH      ?= $(shell dpkg-architecture -qDEB_HOST_ARCH)
 DEB_HOST_ARCH_OS   ?= $(shell dpkg-architecture -qDEB_HOST_ARCH_OS)
 
-CMAKE_OPTS= -DCONTRIBUTORS=$(CURDIR)/doc/CONTRIBUTORS -DWANT_QT5=1
+CMAKE_OPTS= -DCONTRIBUTORS=$(CURDIR)/doc/CONTRIBUTORS -DFORCE_VERSION=internal \
+	-DWANT_QT5=1
 ifneq ($(DEB_HOST_ARCH_OS),linux)
 CMAKE_OPTS+= -DWANT_ALSA=0
 endif
