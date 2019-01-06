@@ -91,8 +91,11 @@ class LmmsCore : public QObject
 	//Q_PROPERTY(Mixer* mixer MEMBER s_mixer)
 	//Q_PROPERTY(FxMixer* fxMixer MEMBER s_fxMixer)
 	//Q_PROPERTY(Song* song READ getSong)  // not Qt4 QtScript compatible
-	Q_PROPERTY(QScriptValue song READ __getSong__)
 	//Q_PROPERTY(BBTrackContainer* bbTrackContainer MEMBER s_bbTrackContainer)
+	Q_PROPERTY(QScriptValue song READ __getSong__)
+	Q_PROPERTY(QScriptValue toolbar READ __getToolBar__)
+	Q_PROPERTY(QScriptValue workspace READ __getWorkspace__)
+	Q_PROPERTY(QScriptValue mainwindow READ __getMainWindow__)
 
 	static std::vector<SubprocessWrapper*> s_processes;
 
@@ -100,6 +103,15 @@ class LmmsCore : public QObject
 	// Here in Qt4 we must directly call newQObject to wrap the property.
 	QScriptValue __getSong__() {
 		return this->scriptEngine->newQObject((QObject*)getSong());
+	}
+	QScriptValue __getToolBar__() {
+		return this->scriptEngine->newQObject((QObject*)getToolBar());
+	}
+	QScriptValue __getWorkspace__() {
+		return this->scriptEngine->newQObject((QObject*)getWorkspace());
+	}
+	QScriptValue __getMainWindow__() {
+		return this->scriptEngine->newQObject((QObject*)gui->mainWindow());
 	}
 
 public slots:

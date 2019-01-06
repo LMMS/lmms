@@ -48,6 +48,11 @@ class EXPORT SubWindow : public QMdiSubWindow
 	Q_PROPERTY( QColor textShadowColor READ textShadowColor WRITE setTextShadowColor )
 	Q_PROPERTY( QColor borderColor READ borderColor WRITE setBorderColor )
 
+public slots:
+	//void addWidget(QWidget * w) {
+	//	QMdiSubWindow::addWidget(w);
+	//}
+
 public:
 	SubWindow( QWidget *parent = NULL, Qt::WindowFlags windowFlags = 0 );
 	// same as QWidet::normalGeometry, but works properly under X11 (see https://bugreports.qt.io/browse/QTBUG-256)

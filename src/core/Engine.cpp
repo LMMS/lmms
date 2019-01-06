@@ -161,6 +161,7 @@ void LmmsCore::scriptEnable() {
 	qmlRegisterType<Pattern>("lmms.core", 1,0, "Pattern");
 	qmlRegisterType<NoteScriptWrapper>("lmms.core", 1,0, "Note");
 	qmlRegisterType<SubprocessWrapper>("lmms.core", 1,0, "SubprocessWrapper");
+	qmlRegisterType<SubWindow>("lmms.core", 1,0, "SubWindow");
 
 	//qRegisterMetaType<SubprocessWrapper>("SubprocessWrapper");
 
@@ -174,6 +175,7 @@ void LmmsCore::scriptEnable() {
 	addType<QLabel>(LmmsCore::scriptEngine, "QLabel");
 	addType<QPushButton>(LmmsCore::scriptEngine, "QPushButton");
 	addType<QLineEdit>(LmmsCore::scriptEngine, "QLineEdit");
+	addType<SubWindow>(LmmsCore::scriptEngine, "QSubWindow");
 
 	QScriptValue fun = LmmsCore::scriptEngine->newFunction(LmmsCore::scriptPrint);
 	LmmsCore::scriptEngine->globalObject().setProperty("print", fun);

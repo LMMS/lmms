@@ -100,7 +100,7 @@ MainWindow::MainWindow() :
 	QWidget * main_widget = new QWidget( this );
 
 	main_widget->setAutoFillBackground(true);
-	main_widget->setStyleSheet("background: rgba(20,20,20,50%);");
+	main_widget->setStyleSheet("background: rgba(20,20,20,50%); color:grey");
 
 	QVBoxLayout * vbox = new QVBoxLayout( main_widget );
 	vbox->setSpacing( 0 );
@@ -204,7 +204,7 @@ MainWindow::MainWindow() :
 	m_toolBar->setFixedHeight( 64 );
 	m_toolBar->move( 0, 0 );
 	m_toolBar->setAutoFillBackground(true);
-	m_toolBar->setStyleSheet("background: rgba(30,30,30,80%); color:black");
+	m_toolBar->setStyleSheet("background: rgba(30,30,30,80%); color:green");
 
 	// add layout for organizing quite complex toolbar-layouting
 	m_toolBarLayout = new QGridLayout( m_toolBar/*, 2, 1*/ );
@@ -251,7 +251,7 @@ MainWindow::~MainWindow()
 		delete view;
 	}
 	// TODO: Close tools
-	// dependencies are such that the editors must be destroyed BEFORE Song is deletect in Engine::destroy
+	// dependencies are such that the editors must be destroyed BEFORE Song is deleted in Engine::destroy
 	//   see issue #2015 on github
 	delete gui->automationEditor();
 	delete gui->pianoRoll();
@@ -689,6 +689,10 @@ SubWindow* MainWindow::addWindowedWidget(QWidget *w, Qt::WindowFlags windowFlags
 	m_workspace->addSubWindow(win);
 	return win;
 }
+void MainWindow::addSubWindow(SubWindow *win) {
+	m_workspace->addSubWindow(win);	
+}
+
 
 
 void MainWindow::resetWindowTitle()
