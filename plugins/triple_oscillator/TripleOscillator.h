@@ -43,7 +43,6 @@ const int NUM_OF_OSCILLATORS = 3;
 
 class OscillatorObject : public Model
 {
-	MM_OPERATORS
 	Q_OBJECT
 public:
 	OscillatorObject( Model * _parent, int _idx );
@@ -124,7 +123,6 @@ private:
 
 	struct oscPtr
 	{
-		MM_OPERATORS
 		Oscillator * oscLeft;
 		Oscillator * oscRight;
 	} ;
@@ -152,7 +150,6 @@ private:
 
 	struct OscillatorKnobs
 	{
-		MM_OPERATORS
 		OscillatorKnobs( Knob * v,
 					Knob * p,
 					Knob * c,

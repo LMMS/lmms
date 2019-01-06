@@ -28,8 +28,6 @@
 #include <QtCore/QString>
 #include <QtCore/QMutex>
 #include <QtCore/QMutexLocker>
-
-#include "MemoryManager.h"
 #include "PlayHandle.h"
 
 class EffectChain;
@@ -38,7 +36,6 @@ class BoolModel;
 
 class AudioPort : public ThreadableJob
 {
-	MM_OPERATORS
 public:
 	AudioPort(){};
 	AudioPort( const QString & _name, bool _has_effect_chain = true,

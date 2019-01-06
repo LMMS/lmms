@@ -42,14 +42,12 @@
 #include "templates.h"
 #include "lmms_constants.h"
 #include "interpolation.h"
-#include "MemoryManager.h"
 
 template<ch_cnt_t CHANNELS> class BasicFilters;
 
 template<ch_cnt_t CHANNELS>
 class LinkwitzRiley
 {
-	MM_OPERATORS
 public:
 	LinkwitzRiley( float sampleRate )
 	{
@@ -144,7 +142,6 @@ typedef LinkwitzRiley<2> StereoLinkwitzRiley;
 template<ch_cnt_t CHANNELS>
 class BiQuad
 {
-	MM_OPERATORS
 public:
 	BiQuad() 
 	{
@@ -187,7 +184,6 @@ typedef BiQuad<2> StereoBiQuad;
 template<ch_cnt_t CHANNELS>
 class OnePole
 {
-	MM_OPERATORS
 public:
 	OnePole()
 	{
@@ -221,7 +217,6 @@ typedef OnePole<2> StereoOnePole;
 template<ch_cnt_t CHANNELS>
 class BasicFilters
 {
-	MM_OPERATORS
 public:
 	enum FilterTypes
 	{

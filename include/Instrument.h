@@ -29,7 +29,6 @@
 #include <QString>
 #include "export.h"
 #include "lmms_basics.h"
-#include "MemoryManager.h"
 #include "MidiTime.h"
 #include "Plugin.h"
 
@@ -43,7 +42,6 @@ class Track;
 
 class EXPORT Instrument : public Plugin
 {
-	MM_OPERATORS
 public:
 	enum Flag
 	{

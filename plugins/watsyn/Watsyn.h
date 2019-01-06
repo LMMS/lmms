@@ -35,7 +35,6 @@
 #include "NotePlayHandle.h"
 #include "PixmapButton.h"
 #include <samplerate.h>
-#include "MemoryManager.h"
 
 
 #define makeknob( name, x, y, hint, unit, oname ) 		\
@@ -81,7 +80,6 @@ class WatsynInstrument;
 
 class WatsynObject
 {
-	MM_OPERATORS
 public:
 	WatsynObject( 	float * _A1wave, float * _A2wave,
 					float * _B1wave, float * _B2wave,

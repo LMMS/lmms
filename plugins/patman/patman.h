@@ -30,7 +30,6 @@
 #include "InstrumentView.h"
 #include "SampleBuffer.h"
 #include "AutomatableModel.h"
-#include "MemoryManager.h"
 
 class PixmapButton;
 
@@ -79,7 +78,6 @@ public slots:
 private:
 	typedef struct
 	{
-		MM_OPERATORS
 		SampleBuffer::handleState* state;
 		bool tuned;
 		SampleBuffer* sample;

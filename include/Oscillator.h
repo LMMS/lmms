@@ -41,7 +41,6 @@ class IntModel;
 
 class EXPORT Oscillator
 {
-	MM_OPERATORS
 public:
 	enum WaveShapes
 	{

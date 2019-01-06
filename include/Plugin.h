@@ -31,11 +31,8 @@
 
 #include "JournallingObject.h"
 #include "Model.h"
-#include "MemoryManager.h"
-
 
 class QWidget;
-
 class PixmapLoader;
 class PluginView;
 class AutomatableModel;
@@ -43,7 +40,6 @@ class AutomatableModel;
 
 class EXPORT Plugin : public Model, public JournallingObject
 {
-	MM_OPERATORS
 	Q_OBJECT
 public:
 	enum PluginTypes

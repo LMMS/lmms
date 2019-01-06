@@ -41,7 +41,6 @@ class PixmapButton;
 class voiceObject : public Model
 {
 	Q_OBJECT
-	MM_OPERATORS
 public:
 	enum WaveForm {
 		SquareWave = 0,

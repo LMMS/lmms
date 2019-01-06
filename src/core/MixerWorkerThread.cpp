@@ -160,7 +160,6 @@ void MixerWorkerThread::startAndWaitForJobs()
 
 void MixerWorkerThread::run()
 {
-	MemoryManager::ThreadGuard mmThreadGuard; Q_UNUSED(mmThreadGuard);
 	disable_denormals();
 
 	QMutex m;

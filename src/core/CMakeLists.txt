@@ -37,7 +37,6 @@ set(LMMS_SRCS
 	core/LfoController.cpp
 	core/LocklessAllocator.cpp
 	core/MemoryHelper.cpp
-	core/MemoryManager.cpp
 	core/MeterModel.cpp
 	core/Mixer.cpp
 	core/MixerProfiler.cpp

@@ -37,7 +37,6 @@
 #include "LcdSpinBox.h"
 #include "LedCheckbox.h"
 #include "fluidsynthshims.h"
-#include "MemoryManager.h"
 
 class sf2InstrumentView;
 class sf2Font;
@@ -174,7 +173,6 @@ signals:
 // A soundfont in our font-map
 class sf2Font
 {
-	MM_OPERATORS
 public:
 	sf2Font( fluid_sfont_t * f ) :
 		fluidFont( f ),

@@ -30,13 +30,11 @@
 #include <QDomDocument>
 
 #include "export.h"
-#include "MemoryManager.h"
 
 class QTextStream;
 
 class EXPORT DataFile : public QDomDocument
 {
-	MM_OPERATORS
 public:
 	enum Types
 	{

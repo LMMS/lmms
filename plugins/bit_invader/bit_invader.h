@@ -33,14 +33,12 @@
 #include "Knob.h"
 #include "PixmapButton.h"
 #include "LedCheckbox.h"
-#include "MemoryManager.h"
 
 class oscillator;
 class bitInvaderView;
 
 class bSynth
 {
-	MM_OPERATORS
 public:
 	bSynth( float * sample, int length, NotePlayHandle * _nph,
 			bool _interpolation, float factor, 

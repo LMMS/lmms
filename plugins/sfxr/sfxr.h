@@ -34,7 +34,6 @@
 #include "Graph.h"
 #include "PixmapButton.h"
 #include "LedCheckbox.h"
-#include "MemoryManager.h"
 
 
 enum SfxrWaves
@@ -70,7 +69,6 @@ class sfxrInstrument;
 
 class SfxrSynth
 {
-	MM_OPERATORS
 public:
 	SfxrSynth( const sfxrInstrument * s );
 	virtual ~SfxrSynth();

@@ -30,7 +30,6 @@
 #include "Note.h"
 #include "PlayHandle.h"
 #include "Track.h"
-#include "MemoryManager.h"
 
 class QReadWriteLock;
 class InstrumentTrack;
@@ -43,7 +42,6 @@ typedef QList<const NotePlayHandle *> ConstNotePlayHandleList;
 
 class EXPORT NotePlayHandle : public PlayHandle, public Note
 {
-	MM_OPERATORS
 public:
 	void * m_pluginData;
 	BasicFilters<> * m_filter;
@@ -265,7 +263,6 @@ public:
 private:
 	class BaseDetuning
 	{
-		MM_OPERATORS
 	public:
 		BaseDetuning( DetuningHelper* detuning );
 
@@ -332,7 +329,6 @@ const int NPH_CACHE_INCREMENT = 16;
 
 class NotePlayHandleManager
 {
-	MM_OPERATORS
 public:
 	static void init();
 	static NotePlayHandle * acquire( InstrumentTrack* instrumentTrack,

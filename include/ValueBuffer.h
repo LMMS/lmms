@@ -28,12 +28,10 @@
 
 #include <vector>
 
-#include "MemoryManager.h"
 #include "export.h"
 
 class EXPORT ValueBuffer : public std::vector<float>
 {
-	MM_OPERATORS
 public:
 	ValueBuffer();
 	ValueBuffer(int length);

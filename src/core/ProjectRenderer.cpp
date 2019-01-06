@@ -160,17 +160,6 @@ void ProjectRenderer::startProcessing()
 
 void ProjectRenderer::run()
 {
-	MemoryManager::ThreadGuard mmThreadGuard; Q_UNUSED(mmThreadGuard);
-#if 0
-#ifdef LMMS_BUILD_LINUX
-#ifdef LMMS_HAVE_SCHED_H
-	cpu_set_t mask;
-	CPU_ZERO( &mask );
-	CPU_SET( 0, &mask );
-	sched_setaffinity( 0, sizeof( mask ), &mask );
-#endif
-#endif
-#endif
 
 	Engine::getSong()->startExport();
 	Engine::getSong()->updateLength();
