@@ -677,14 +677,19 @@ void PatternView::constructContextMenu( QMenu * _cm )
 	connect( a, SIGNAL( triggered( bool ) ),
 					this, SLOT( openInPianoRoll() ) );
 
-	if( gui->pianoRoll()->currentPattern() && gui->pianoRoll()->currentPattern() != m_pat ){
+	if( gui->pianoRoll()->currentPattern() &&
+			gui->pianoRoll()->currentPattern() != m_pat &&
+			not m_pat->empty() )
+	{
 		QAction * b = new QAction( embed::getIconPixmap( "ghost_note" ),
 						tr( "Set as ghost in piano-roll" ), _cm );
 		_cm->insertAction( _cm->actions()[1], b );
 		connect( b, SIGNAL( triggered( bool ) ),
 						this, SLOT( setGhostInPianoRoll() ) );
 		_cm->insertSeparator( _cm->actions()[2] );
-	} else {
+	}
+	else
+	{
 		_cm->insertSeparator( _cm->actions()[1] );
 	}
 
