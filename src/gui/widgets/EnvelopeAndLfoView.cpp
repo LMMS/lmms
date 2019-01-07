@@ -493,7 +493,7 @@ void EnvelopeAndLfoView::paintEvent( QPaintEvent * )
 
 	int LFO_GRAPH_W = s_lfoGraph->width() - 6;	// substract border
 	int LFO_GRAPH_H = s_lfoGraph->height() - 6;	// substract border
-	int graph_x_base = LFO_GRAPH_X + 3;
+	int graph_x_base = LFO_GRAPH_X + 2;
 	int graph_y_base = LFO_GRAPH_Y + 3 + LFO_GRAPH_H / 2;
 
 	const float frames_for_graph = SECS_PER_LFO_OSCILLATION *
