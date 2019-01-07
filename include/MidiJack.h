@@ -52,7 +52,8 @@ class MidiJack : public QThread, public MidiClientRaw
 public:
 	MidiJack();
 	virtual ~MidiJack();
-
+	void removeJackAudio();
+	
 	jack_client_t* jackClient();
 
 	static QString probeDevice();

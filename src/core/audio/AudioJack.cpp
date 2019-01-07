@@ -78,7 +78,9 @@ AudioJack::~AudioJack()
 		unregisterPort( m_portMap.begin().key() );
 	}
 #endif
-
+	if(m_midiClient) {
+		m_midiClient->removeJackAudio();
+	}
 	if( m_client != nullptr )
 	{
 		if( m_active )
@@ -86,7 +88,6 @@ AudioJack::~AudioJack()
 			jack_deactivate( m_client );
 		}
 		jack_client_close( m_client );
-		m_client = nullptr;
 	}
 
 	delete[] m_tempOutBufs;
@@ -132,6 +133,10 @@ AudioJack* AudioJack::addMidiClient(MidiJack *midiClient)
 	m_midiClient = midiClient;
 
 	return this;
+}
+
+void AudioJack::removeMidiClient() {
+	m_midiClient = nullptr;
 }
 
 bool AudioJack::initJackClient()

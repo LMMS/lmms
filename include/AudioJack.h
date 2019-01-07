@@ -57,6 +57,7 @@ public:
 	// the jack callback is handled here, we call the midi client so that it can read
 	// it's midi data during the callback
 	AudioJack * addMidiClient(MidiJack *midiClient);
+	void removeMidiClient();
 	jack_client_t * jackClient() {return m_client;};
 
 	inline static QString name()
