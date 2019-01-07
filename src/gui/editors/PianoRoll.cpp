@@ -610,6 +610,7 @@ void PianoRoll::setGhostPattern( Pattern* newPattern )
 	{
 		// make sure to always get informed about the pattern being destroyed
 		connect( m_ghostPattern, SIGNAL( destroyedPattern( Pattern* ) ), this, SLOT( clearGhostPattern() ) );
+		emit ghostPatternSet( true );
 	}
 }
 
@@ -617,6 +618,7 @@ void PianoRoll::setGhostPattern( Pattern* newPattern )
 void PianoRoll::clearGhostPattern()
 {
 	setGhostPattern( nullptr );
+	emit ghostPatternSet( false );
 	update();
 }
 
@@ -4316,7 +4318,9 @@ PianoRollWindow::PianoRollWindow() :
 	m_clearGhostButton = new QPushButton( m_toolBar );
 	m_clearGhostButton->setIcon( embed::getIconPixmap( "clear_ghost_note" ) );
 	m_clearGhostButton->setToolTip( tr( "Clear ghost notes" ) );
+	m_clearGhostButton->setEnabled( false );
 	connect( m_clearGhostButton, SIGNAL( clicked() ), m_editor, SLOT( clearGhostPattern() ) );
+	connect( m_editor, SIGNAL( ghostPatternSet( bool ) ), this, SLOT( ghostPatternSet( bool ) ) );
 
 	zoomAndNotesToolBar->addWidget( zoom_lbl );
 	zoomAndNotesToolBar->addWidget( m_zoomingComboBox );
@@ -4488,6 +4492,14 @@ void PianoRollWindow::patternRenamed()
 	{
 		setWindowTitle( tr( "Piano-Roll - no pattern" ) );
 	}
+}
+
+
+
+
+void PianoRollWindow::ghostPatternSet( bool state )
+{
+	m_clearGhostButton->setEnabled( state );
 }
 
 

@@ -224,6 +224,7 @@ protected slots:
 
 signals:
 	void currentPatternChanged();
+	void ghostPatternSet(bool);
 	void semiToneMarkerMenuScaleSetEnabled(bool);
 	void semiToneMarkerMenuChordSetEnabled(bool);
 
@@ -466,6 +467,7 @@ signals:
 
 private slots:
 	void patternRenamed();
+	void ghostPatternSet( bool state );
 
 private:
 	void focusInEvent(QFocusEvent * event);
