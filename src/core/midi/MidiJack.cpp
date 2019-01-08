@@ -155,7 +155,7 @@ jack_client_t* MidiJack::jackClient()
 {
 	if( m_jackAudio == NULL )
 		return m_jackClient;
-	
+
 	return m_jackAudio->jackClient();
 }
 
