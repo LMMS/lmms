@@ -180,11 +180,6 @@ void NotePlayHandle::setVolume( volume_t _volume )
 void NotePlayHandle::setPanning( panning_t panning )
 {
 	Note::setPanning( panning );
-
-	MidiEvent event( MidiMetaEvent, midiChannel(), midiKey(), panningToMidi( panning ) );
-	event.setMetaEvent( MidiNotePanning );
-
-	m_instrumentTrack->processOutEvent( event );
 }
 
 
