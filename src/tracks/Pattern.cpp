@@ -649,7 +649,6 @@ void PatternView::setGhostInPianoRoll()
 
 
 
-
 void PatternView::resetName()
 {
 	m_pat->setName( m_pat->m_instrumentTrack->name() );
