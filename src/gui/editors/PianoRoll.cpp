@@ -3072,7 +3072,7 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 		QPolygonF editHandles;
 
 		// -- Begin ghost pattern
-		if( m_ghostPattern != nullptr )
+		if( m_ghostPattern != nullptr && m_ghostPattern != m_pattern )
 		{
 			for( const Note *note : m_ghostPattern->notes() )
 			{
@@ -4376,7 +4376,6 @@ void PianoRollWindow::setGhostPattern( Pattern* pattern )
 
 void PianoRollWindow::setCurrentPattern( Pattern* pattern )
 {
-	m_editor->clearGhostPattern();
 	m_editor->setCurrentPattern( pattern );
 
 	if ( pattern )
