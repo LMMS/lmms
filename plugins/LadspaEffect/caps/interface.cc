@@ -29,7 +29,9 @@
 	(2541 - 2580 donated to artemio@kdemail.net)
 */
 
-#include <sys/time.h>
+#ifdef _MSC_VER
+#include <windows.h>
+#endif
 
 #include "basics.h"
 
@@ -68,8 +70,9 @@ seed()
 }*/
 
 extern "C" {
-
+#ifndef _MSC_VER
 __attribute__ ((constructor)) 
+#endif
 void caps_so_init()
 {
 	DescriptorStub ** d = descriptors;
@@ -125,7 +128,9 @@ void caps_so_init()
 	//seed();
 }
 
-__attribute__ ((destructor)) 
+#ifndef _MSC_VER
+__attribute__ ((destructor))
+#endif
 void caps_so_fini()
 {
 	for (ulong i = 0; i < N; ++i)
@@ -142,4 +147,21 @@ ladspa_descriptor (unsigned long i)
 	return 0;
 }
 
+#ifdef _MSC_VER
+BOOL APIENTRY DllMain(HMODULE hModule,
+	DWORD  ul_reason_for_call,
+	LPVOID lpReserved)
+{
+	switch (ul_reason_for_call)
+	{
+	case DLL_PROCESS_ATTACH:
+		caps_so_init();
+		break;
+	case DLL_PROCESS_DETACH:
+		caps_so_fini();
+		break;
+	}
+	return TRUE;
+}
+#endif
 }; /* extern "C" */
