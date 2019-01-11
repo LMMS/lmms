@@ -26,6 +26,14 @@
 #define LADSPA_VERSION_MAJOR 1
 #define LADSPA_VERSION_MINOR 1
 
+#ifndef LADSPA_EXPORT
+#ifdef _MSC_VER
+#define LADSPA_MODULE __declspec(dllexport)
+#else
+#define LADSPA_MODULE 
+#endif
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -585,7 +593,8 @@ typedef struct _LADSPA_Descriptor {
    upwards. Out of range indexes must result in this function
    returning NULL, so the plugin count can be determined by checking
    for the least index that results in NULL being returned. */
-
+ 
+LADSPA_MODULE
 const LADSPA_Descriptor * ladspa_descriptor(unsigned long Index);
 
 /* Datatype corresponding to the ladspa_descriptor() function. */

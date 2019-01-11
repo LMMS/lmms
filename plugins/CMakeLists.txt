@@ -90,7 +90,6 @@ ENDIF("${PLUGIN_LIST}" STREQUAL "")
 
 IF(MSVC)
 	SET(MSVC_INCOMPATIBLE_PLUGINS
-		LadspaEffect
 		sid
 		#VstEffect
 		zynaddsubfx
