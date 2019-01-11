@@ -71,6 +71,8 @@ OPTION(WANT_QT5		"Build with Qt5" OFF)
 
 
 IF(LMMS_BUILD_APPLE)
+	# Fix linking on 10.14+. See issue #4762 on github
+	LINK_DIRECTORIES(/usr/local/lib)
 	SET(WANT_ALSA OFF)
 	SET(WANT_PULSEAUDIO OFF)
 	SET(WANT_VST OFF)
