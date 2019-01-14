@@ -7203,7 +7203,7 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
     <message>
         <source>Vst Plugin Preset (*.fxp *.fxb)</source>
-        <translation>Предустановка VST плагина (*.fxp, *.fxb)</translation>
+        <translation>Предустановка VST плагина (*.fxp *.fxb)</translation>
     </message>
     <message>
         <source>: default</source>
