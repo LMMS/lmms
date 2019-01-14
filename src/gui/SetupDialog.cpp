@@ -127,7 +127,7 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 	m_compactTrackButtons( ConfigManager::inst()->value( "ui",
 					"compacttrackbuttons" ).toInt() ),
 	m_syncVSTPlugins( ConfigManager::inst()->value( "ui",
-							"syncvstplugins" ).toInt() ),
+							"syncvstplugins", "1" ).toInt() ),
 	m_animateAFP(ConfigManager::inst()->value( "ui",
 						   "animateafp", "1" ).toInt() ),
 	m_printNoteLabels(ConfigManager::inst()->value( "ui",
