@@ -165,9 +165,9 @@ public:
 
 				// helper functions to retrieve data that is
 				// not part of the key, but mapped via desc->subPluginFeatures
-				const char* additionalFileExtensions() const;
-				const char* displayName() const;
-				const char* description() const;
+				QString additionalFileExtensions() const;
+				QString displayName() const;
+				QString description() const;
 				const PixmapLoader* logo() const;
 			} ;
 
@@ -200,19 +200,19 @@ public:
 			// The defaults are sane, i.e. redirect to sub plugins
 			// supererior descriptor
 
-			virtual const char* additionalFileExtensions(const Key&) const
+			virtual QString additionalFileExtensions(const Key&) const
 			{
 				return nullptr;
 			}
 
-			virtual const char* displayName(const Key& k) const
+			virtual QString displayName(const Key& k) const
 			{
 				return k.isValid()
 					? k.desc->displayName
 					: k.name.toUtf8().data();
 			}
 
-			virtual const char* description(const Key& k) const
+			virtual QString description(const Key& k) const
 			{
 				return k.isValid() ? k.desc->description : "";
 			}
