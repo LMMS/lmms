@@ -89,6 +89,14 @@ T use_this_or(T this_param, T or_param)
 
 
 
+QString use_this_or(QString this_param, QString or_param)
+{
+	return this_param.isNull() ? or_param : this_param;
+}
+
+
+
+
 QString Plugin::displayName() const
 {
 	return Model::displayName().isEmpty() // currently always empty
@@ -113,7 +121,7 @@ const PixmapLoader* Plugin::logo() const
 
 
 
-const char *Plugin::Descriptor::SubPluginFeatures::Key::additionalFileExtensions() const
+QString Plugin::Descriptor::SubPluginFeatures::Key::additionalFileExtensions() const
 {
 	Q_ASSERT(isValid());
 	return desc->subPluginFeatures
@@ -126,12 +134,13 @@ const char *Plugin::Descriptor::SubPluginFeatures::Key::additionalFileExtensions
 
 
 
-const char* Plugin::Descriptor::SubPluginFeatures::Key::displayName() const
+QString Plugin::Descriptor::SubPluginFeatures::Key::displayName() const
 {
 	Q_ASSERT(isValid());
 	return desc->subPluginFeatures
 		// get from sub plugin
-		? use_this_or(desc->subPluginFeatures->displayName(*this), desc->displayName)
+		? use_this_or(desc->subPluginFeatures->displayName(*this),
+			QString::fromUtf8(desc->displayName))
 		// get from plugin
 		: desc->displayName;
 }
@@ -150,11 +159,12 @@ const PixmapLoader* Plugin::Descriptor::SubPluginFeatures::Key::logo() const
 
 
 
-const char *Plugin::Descriptor::SubPluginFeatures::Key::description() const
+QString Plugin::Descriptor::SubPluginFeatures::Key::description() const
 {
 	Q_ASSERT(isValid());
 	return desc->subPluginFeatures
-		? use_this_or(desc->subPluginFeatures->description(*this), desc->description)
+		? use_this_or(desc->subPluginFeatures->description(*this),
+			QString::fromUtf8(desc->description))
 		: desc->description;
 }
 

@@ -37,7 +37,7 @@ class LadspaSubPluginFeatures : public Plugin::Descriptor::SubPluginFeatures
 public:
 	LadspaSubPluginFeatures( Plugin::PluginTypes _type );
 
-	const char* displayName(const Key& k) const override;
+	QString displayName(const Key& k) const override;
 	void fillDescriptionWidget( QWidget * _parent,
 												const Key * _key ) const override;
 
