@@ -45,6 +45,7 @@
 
 class SpaControlBase
 {
+	friend class SpaViewBase;
 public:
 	SpaControlBase(const QString &uniqueName);
 	virtual ~SpaControlBase();

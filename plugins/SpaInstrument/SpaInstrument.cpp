@@ -26,7 +26,6 @@
 
 #include <QDebug>
 #include <QDir>
-#include <QGridLayout>
 #include <QTemporaryFile>
 #include <spa/audio.h>
 
@@ -248,33 +247,16 @@ AutomatableModel *SpaInstrument::modelAtPort(const QString &dest)
 	return SpaControlBase::modelAtPort(dest);
 }
 
-SpaInsView::SpaInsView(Instrument *_instrument, QWidget *_parent) :
-	InstrumentView(_instrument, _parent)
+SpaInsView::SpaInsView(SpaInstrument *_instrument, QWidget *_parent) :
+	InstrumentView(_instrument, _parent),
+	SpaViewBase(this, _instrument, SLOT(reloadPlugin()))
 {
 	setAutoFillBackground(true);
-
-	QGridLayout *l = new QGridLayout(this);
-
-	m_toggleUIButton = new QPushButton(tr("Show GUI"), this);
-	m_toggleUIButton->setCheckable(true);
-	m_toggleUIButton->setChecked(false);
-	m_toggleUIButton->setIcon(embed::getIconPixmap("zoom"));
-	m_toggleUIButton->setFont(pointSize<8>(m_toggleUIButton->font()));
-	connect(m_toggleUIButton, SIGNAL(toggled(bool)), this,
-		SLOT(toggleUI()));
-	m_toggleUIButton->setWhatsThis(
-		tr("Click here to show or hide the graphical user interface "
-		   "(GUI) of SPA."));
-
-	m_reloadPluginButton = new QPushButton(tr("Reload Plugin"), this);
-
-	connect(m_reloadPluginButton, SIGNAL(toggled(bool)), this,
-		SLOT(reloadPlugin()));
-
-	l->addWidget(m_toggleUIButton, 0, 0);
-	l->addWidget(m_reloadPluginButton, 0, 1);
-
-	setAcceptDrops(true);
+	connect(m_reloadPluginButton, SIGNAL(toggled(bool)),
+		this, SLOT(reloadPlugin()));
+	if(m_toggleUIButton)
+		connect(m_toggleUIButton, SIGNAL(toggled(bool)),
+			this, SLOT(toggleUI()));
 }
 
 SpaInsView::~SpaInsView()
@@ -318,12 +300,7 @@ void SpaInsView::dropEvent(QDropEvent *_de)
 
 void SpaInsView::modelChanged()
 {
-	SpaInstrument *m = castModel<SpaInstrument>();
-
-	/*	// set models for controller knobs
-		m_portamento->setModel( &m->m_portamentoModel ); */
-
-	m_toggleUIButton->setChecked(m->m_hasGUI);
+	SpaViewBase::modelChanged(castModel<SpaInstrument>());
 }
 
 void SpaInsView::toggleUI()

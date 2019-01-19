@@ -1,5 +1,5 @@
 /*
- * SpaControlDialog.h - control dialog for amplifier effect
+ * SpaViewBase.h - base class for SPA plugin views
  *
  * Copyright (c) 2018-2019 Johannes Lorenz <j.git$$$lorenz-ho.me, $$$=@>
  *
@@ -22,13 +22,30 @@
  *
  */
 
-#ifndef SPA_FX_CONTROL_DIALOG_H
-#define SPA_FX_CONTROL_DIALOG_H
+#ifndef SPAVIEWBASE_H
+#define SPAVIEWBASE_H
 
-#include "EffectControlDialog.h"
-#include "SpaViewBase.h"
+#include "lmmsconfig.h"
 
-class SpaFxControlDialog : public EffectControlDialog, public SpaViewBase
+#ifdef LMMS_HAVE_SPA
+
+class SpaControlBase;
+
+class SpaViewBase
+{
+protected:
+	class QPushButton *m_toggleUIButton = nullptr;
+	class QPushButton *m_reloadPluginButton;
+
+	// to be called by virtuals
+	void modelChanged(SpaControlBase* ctrlBase);
+	void connectSlots(const char* toggleUiSlot);
+	SpaViewBase(class QWidget *meAsWidget, SpaControlBase* ctrlBase,
+		const char *reloadPluginSlot);
+};
+
+#if 0
+class SpaFxControlDialog : public EffectControlDialog
 {
 	Q_OBJECT
 
@@ -44,4 +61,26 @@ private slots:
 	void reloadPlugin();
 };
 
+
+class SpaInsView : public InstrumentView
+{
+	Q_OBJECT
+public:
+	SpaInsView(Instrument *_instrument, QWidget *_parent);
+	virtual ~SpaInsView();
+
+protected:
+	virtual void dragEnterEvent(QDragEnterEvent *_dee);
+	virtual void dropEvent(QDropEvent *_de);
+
+
+private slots:
+	void toggleUI();
+	void reloadPlugin();
+};
+
 #endif
+
+#endif // LMMS_HAVE_SPA
+
+#endif // SPAVIEWBASE_H

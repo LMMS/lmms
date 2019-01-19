@@ -33,6 +33,7 @@
 #include "InstrumentView.h"
 #include "Note.h"
 #include "SpaControlBase.h"
+#include "SpaViewBase.h"
 
 // whether to use MIDI vs playHandle
 // currently only MIDI works
@@ -91,11 +92,11 @@ private:
 	QString nodeName() const override;
 };
 
-class SpaInsView : public InstrumentView
+class SpaInsView : public InstrumentView, public SpaViewBase
 {
 	Q_OBJECT
 public:
-	SpaInsView(Instrument *_instrument, QWidget *_parent);
+	SpaInsView(SpaInstrument *_instrument, QWidget *_parent);
 	virtual ~SpaInsView();
 
 protected:
@@ -104,9 +105,6 @@ protected:
 
 private:
 	void modelChanged();
-
-	QPushButton *m_toggleUIButton;
-	QPushButton *m_reloadPluginButton;
 
 private slots:
 	void toggleUI();

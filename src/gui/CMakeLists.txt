@@ -28,6 +28,7 @@ SET(LMMS_SRCS
 	gui/PluginBrowser.cpp
 	gui/RowTableView.cpp
 	gui/SetupDialog.cpp
+	gui/SpaViewBase.cpp
 	gui/StringPairDrag.cpp
 	gui/SubWindow.cpp
 	gui/TimeLineWidget.cpp

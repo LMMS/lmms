@@ -25,12 +25,7 @@
 #include "SpaFxControlDialog.h"
 
 #include <QDebug>
-#include <QDragEnterEvent>
-#include <QGridLayout>
-#include <QGroupBox>
 #include <QMimeData>
-#include <QPushButton>
-#include <QVBoxLayout>
 #include <spa/audio.h>
 
 #include "Knob.h"
@@ -46,81 +41,14 @@ SpaFxControls *SpaFxControlDialog::spaControls()
 }
 
 SpaFxControlDialog::SpaFxControlDialog(SpaFxControls *controls) :
-	EffectControlDialog(controls)
+	EffectControlDialog(controls),
+	SpaViewBase(this, controls, SLOT(reloadPlugin()))
 {
-	QGridLayout *grid = new QGridLayout(this);
-
-	m_reloadPluginButton = new QPushButton(tr("Reload Plugin"), this);
-	grid->addWidget(m_reloadPluginButton, 0, 0, 1, 3);
-
-	connect(m_reloadPluginButton, SIGNAL(toggled(bool)), this,
-		SLOT(reloadPlugin()));
-
-	if (spaControls()->m_spaDescriptor->ui_ext())
-	{
-		m_toggleUIButton = new QPushButton(tr("Show GUI"), this);
-		m_toggleUIButton->setCheckable(true);
-		m_toggleUIButton->setChecked(false);
-		m_toggleUIButton->setIcon(embed::getIconPixmap("zoom"));
-		m_toggleUIButton->setFont(
-			pointSize<8>(m_toggleUIButton->font()));
-		connect(m_toggleUIButton, SIGNAL(toggled(bool)), this,
-			SLOT(toggleUI()));
-		m_toggleUIButton->setWhatsThis(
-			tr("Click here to show or hide the graphical user "
-			   "interface "
-			   "(GUI) of Osc."));
-		grid->addWidget(m_toggleUIButton, 0, 3, 1, 3);
-	}
-
-	//	setAcceptDrops(true); // TODO?
-
-	const int rowNum = 6; // just some guess for what might look good
-	int wdgNum = 0;
-	for (SpaControlBase::LmmsPorts::TypedPorts &ports :
-		controls->m_ports.m_userPorts)
-	{
-		QWidget *wdg;
-		switch (ports.m_type)
-		{
-		case 'f':
-		{
-			Knob *k = new Knob(this);
-			k->setModel(ports.m_connectedModel.m_floatModel);
-			wdg = k;
-			break;
-		}
-		case 'i':
-		{
-			Knob *k = new Knob(this);
-			k->setModel(ports.m_connectedModel.m_intModel);
-			wdg = k;
-			break;
-		}
-		case 'b':
-		{
-			LedCheckBox *l = new LedCheckBox(this);
-			l->setModel(ports.m_connectedModel.m_boolModel);
-			wdg = l;
-			break;
-		}
-		default:
-			wdg = nullptr;
-			break;
-		}
-
-		if (wdg)
-		{
-			// start in row one, add widgets cell by cell
-			grid->addWidget(
-				wdg, 1 + wdgNum / rowNum, wdgNum % rowNum);
-			++wdgNum;
-		}
-		else
-		{
-			qDebug() << "this should never happen...";
-		}
-	}
+	connect(m_reloadPluginButton, SIGNAL(toggled(bool)),
+		this, SLOT(reloadPlugin()));
+	if(m_toggleUIButton)
+		connect(m_toggleUIButton, SIGNAL(toggled(bool)),
+			this, SLOT(toggleUI()));
 }
 
 /*
@@ -140,10 +68,7 @@ spaControls()->m_hasGUI)
 
 void SpaFxControlDialog::modelChanged()
 {
-	/*	// set models for controller knobs
-		m_portamento->setModel( &m->m_portamentoModel ); */
-
-	m_toggleUIButton->setChecked(spaControls()->m_hasGUI);
+	SpaViewBase::modelChanged(spaControls());
 }
 
 void SpaFxControlDialog::toggleUI()
