@@ -249,7 +249,7 @@ AutomatableModel *SpaInstrument::modelAtPort(const QString &dest)
 
 SpaInsView::SpaInsView(SpaInstrument *_instrument, QWidget *_parent) :
 	InstrumentView(_instrument, _parent),
-	SpaViewBase(this, _instrument, SLOT(reloadPlugin()))
+	SpaViewBase(this, _instrument)
 {
 	setAutoFillBackground(true);
 	connect(m_reloadPluginButton, SIGNAL(toggled(bool)),

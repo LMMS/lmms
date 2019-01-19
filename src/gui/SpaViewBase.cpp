@@ -34,17 +34,17 @@
 #include "Knob.h"
 #include "embed.h"
 #include "gui_templates.h"
+#include "LcdSpinBox.h"
 #include "LedCheckbox.h"
 #include "SpaControlBase.h"
 
-SpaViewBase::SpaViewBase(QWidget* meAsWidget, SpaControlBase *ctrlBase,
-			const char* reloadPluginSlot)
+SpaViewBase::SpaViewBase(QWidget* meAsWidget, SpaControlBase *ctrlBase)
 {
-	QGridLayout *grid = new QGridLayout(meAsWidget);
+	m_grid = new QGridLayout(meAsWidget);
 
 	m_reloadPluginButton = new QPushButton(QObject::tr("Reload Plugin"),
 		meAsWidget);
-	grid->addWidget(m_reloadPluginButton, 0, 0, 1, 3);
+	m_grid->addWidget(m_reloadPluginButton, 0, 0, 1, 3);
 
 	if (ctrlBase->m_spaDescriptor->ui_ext())
 	{
@@ -58,50 +58,55 @@ SpaViewBase::SpaViewBase(QWidget* meAsWidget, SpaControlBase *ctrlBase,
 		m_toggleUIButton->setWhatsThis(
 			QObject::tr("Click here to show or hide the "
 				"graphical user interface (GUI) of SPA."));
-		grid->addWidget(m_toggleUIButton, 0, 3, 1, 3);
+		m_grid->addWidget(m_toggleUIButton, 0, 3, 1, 3);
 	}
 
-	//	setAcceptDrops(true); // TODO?
+	meAsWidget->setAcceptDrops(true);
 
-	const int rowNum = 6; // just some guess for what might look good
 	int wdgNum = 0;
 	for (SpaControlBase::LmmsPorts::TypedPorts &ports :
 		ctrlBase->m_ports.m_userPorts)
 	{
-		QWidget *wdg;
+		QWidget* wdg;
+		AutomatableModelView* modelView;
 		switch (ports.m_type)
 		{
-		case 'f':
-		{
-			Knob *k = new Knob(meAsWidget);
-			k->setModel(ports.m_connectedModel.m_floatModel);
-			wdg = k;
-			break;
-		}
-		case 'i':
-		{
-			Knob *k = new Knob(meAsWidget);
-			k->setModel(ports.m_connectedModel.m_intModel);
-			wdg = k;
-			break;
-		}
-		case 'b':
-		{
-			LedCheckBox *l = new LedCheckBox(meAsWidget);
-			l->setModel(ports.m_connectedModel.m_boolModel);
-			wdg = l;
-			break;
-		}
-		default:
-			wdg = nullptr;
-			break;
+			case 'f':
+			{
+				Knob* k = new Knob(meAsWidget);
+				wdg = k;
+				modelView = k;
+				break;
+			}
+			case 'i':
+			{
+				LcdSpinBox *l = new LcdSpinBox(3/*log(range)*/,
+					meAsWidget);
+				wdg = l;
+				modelView = l;
+				break;
+			}
+			case 'b':
+			{
+				LedCheckBox *l = new LedCheckBox(meAsWidget);
+				wdg = l;
+				modelView = l;
+				break;
+			}
+			default:
+				wdg = nullptr;
+				modelView = nullptr;
+				break;
 		}
 
-		if (wdg)
+		if (wdg && modelView)
 		{
 			// start in row one, add widgets cell by cell
-			grid->addWidget(
-				wdg, 1 + wdgNum / rowNum, wdgNum % rowNum);
+			m_modelViews.push_back(modelView);
+			m_grid->addWidget(
+				wdg,
+				m_firstModelRow + wdgNum / m_rowNum,
+					wdgNum % m_rowNum);
 			++wdgNum;
 		}
 		else
@@ -114,9 +119,28 @@ SpaViewBase::SpaViewBase(QWidget* meAsWidget, SpaControlBase *ctrlBase,
 void SpaViewBase::modelChanged(SpaControlBase *ctrlBase)
 {
 	// reconnect models
+	QVector<AutomatableModelView*>::Iterator itr = m_modelViews.begin();
+	for (SpaControlBase::LmmsPorts::TypedPorts &ports :
+		ctrlBase->m_ports.m_userPorts)
+	{
+		switch (ports.m_type)
+		{
+			case 'f':
+				(*itr)->setModel(ports.m_connectedModel.m_floatModel);
+				break;
+			case 'i':
+				(*itr)->setModel(ports.m_connectedModel.m_intModel);
+				break;
+			case 'b':
+				(*itr)->setModel(ports.m_connectedModel.m_boolModel);
+				break;
+		}
+		++itr;
+	}
 
 	// move non-model values to widgets
-	m_toggleUIButton->setChecked(ctrlBase->m_hasGUI);
+	if(m_toggleUIButton)
+		m_toggleUIButton->setChecked(ctrlBase->m_hasGUI);
 }
 
 #endif // LMMS_HAVE_SPA

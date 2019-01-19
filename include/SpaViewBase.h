@@ -25,6 +25,7 @@
 #ifndef SPAVIEWBASE_H
 #define SPAVIEWBASE_H
 
+#include <QVector>
 #include "lmmsconfig.h"
 
 #ifdef LMMS_HAVE_SPA
@@ -33,6 +34,11 @@ class SpaControlBase;
 
 class SpaViewBase
 {
+	class QGridLayout *m_grid;
+	const int m_firstModelRow = 1; // row 0 is for buttons
+	const int m_rowNum = 6; // just some guess for what might look good
+
+	QVector<class AutomatableModelView*> m_modelViews;
 protected:
 	class QPushButton *m_toggleUIButton = nullptr;
 	class QPushButton *m_reloadPluginButton;
@@ -40,8 +46,7 @@ protected:
 	// to be called by virtuals
 	void modelChanged(SpaControlBase* ctrlBase);
 	void connectSlots(const char* toggleUiSlot);
-	SpaViewBase(class QWidget *meAsWidget, SpaControlBase* ctrlBase,
-		const char *reloadPluginSlot);
+	SpaViewBase(class QWidget *meAsWidget, SpaControlBase* ctrlBase);
 };
 
 #if 0

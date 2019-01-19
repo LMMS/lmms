@@ -42,13 +42,16 @@ SpaFxControls *SpaFxControlDialog::spaControls()
 
 SpaFxControlDialog::SpaFxControlDialog(SpaFxControls *controls) :
 	EffectControlDialog(controls),
-	SpaViewBase(this, controls, SLOT(reloadPlugin()))
+	SpaViewBase(this, controls)
 {
 	connect(m_reloadPluginButton, SIGNAL(toggled(bool)),
 		this, SLOT(reloadPlugin()));
 	if(m_toggleUIButton)
 		connect(m_toggleUIButton, SIGNAL(toggled(bool)),
 			this, SLOT(toggleUI()));
+	// for Effects, modelChanged only goes to the top EffectView
+	// we need to call it manually
+	modelChanged();
 }
 
 /*
