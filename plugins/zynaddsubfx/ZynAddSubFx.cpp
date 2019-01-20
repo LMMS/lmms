@@ -192,10 +192,12 @@ void ZynAddSubFxInstrument::saveSettings( QDomDocument & _doc,
 		m_pluginMutex.lock();
 		if( m_remotePlugin )
 		{
-			m_remotePlugin->lock();
-			m_remotePlugin->sendMessage( RemotePlugin::message( IdSaveSettingsToFile ).addString( fn ) );
-			m_remotePlugin->waitForMessage( IdSaveSettingsToFile );
-			m_remotePlugin->unlock();
+			if(m_remotePlugin->try_lock())
+			{
+				m_remotePlugin->sendMessage( RemotePlugin::message( IdSaveSettingsToFile ).addString( fn ) );
+				m_remotePlugin->waitForMessage( IdSaveSettingsToFile );
+				m_remotePlugin->unlock();
+			}
 		}
 		else
 		{
@@ -250,10 +252,12 @@ void ZynAddSubFxInstrument::loadSettings( const QDomElement & _this )
 		m_pluginMutex.lock();
 		if( m_remotePlugin )
 		{
-			m_remotePlugin->lock();
-			m_remotePlugin->sendMessage( RemotePlugin::message( IdLoadSettingsFromFile ).addString( fn ) );
-			m_remotePlugin->waitForMessage( IdLoadSettingsFromFile );
-			m_remotePlugin->unlock();
+			if(m_remotePlugin->try_lock())
+			{
+				m_remotePlugin->sendMessage( RemotePlugin::message( IdLoadSettingsFromFile ).addString( fn ) );
+				m_remotePlugin->waitForMessage( IdLoadSettingsFromFile );
+				m_remotePlugin->unlock();
+			}
 		}
 		else
 		{
@@ -293,10 +297,12 @@ void ZynAddSubFxInstrument::loadFile( const QString & _file )
 	const std::string fn = QSTR_TO_STDSTR( _file );
 	if( m_remotePlugin )
 	{
-		m_remotePlugin->lock();
-		m_remotePlugin->sendMessage( RemotePlugin::message( IdLoadPresetFile ).addString( fn ) );
-		m_remotePlugin->waitForMessage( IdLoadPresetFile );
-		m_remotePlugin->unlock();
+		if(m_remotePlugin->try_lock())
+		{
+			m_remotePlugin->sendMessage( RemotePlugin::message( IdLoadPresetFile ).addString( fn ) );
+			m_remotePlugin->waitForMessage( IdLoadPresetFile );
+			m_remotePlugin->unlock();
+		}
 	}
 	else
 	{
@@ -432,29 +438,31 @@ void ZynAddSubFxInstrument::initPlugin()
 	if( m_hasGUI )
 	{
 		m_remotePlugin = new ZynAddSubFxRemotePlugin();
-		m_remotePlugin->lock();
-		m_remotePlugin->waitForInitDone( false );
+		if(m_remotePlugin->try_lock())
+		{
+			m_remotePlugin->waitForInitDone( false );
 
-		m_remotePlugin->sendMessage(
-			RemotePlugin::message( IdZasfLmmsWorkingDirectory ).
-				addString(
-					QSTR_TO_STDSTR(
-						QString( ConfigManager::inst()->workingDir() ) ) ) );
-		m_remotePlugin->sendMessage(
-			RemotePlugin::message( IdZasfPresetDirectory ).
-				addString(
-					QSTR_TO_STDSTR(
-						QDir( ConfigManager::inst()->factoryPresetsDir() +
-								"/ZynAddSubFX" ).absolutePath() ) ) );
+			m_remotePlugin->sendMessage(
+				RemotePlugin::message( IdZasfLmmsWorkingDirectory ).
+					addString(
+						QSTR_TO_STDSTR(
+							QString( ConfigManager::inst()->workingDir() ) ) ) );
+			m_remotePlugin->sendMessage(
+				RemotePlugin::message( IdZasfPresetDirectory ).
+					addString(
+						QSTR_TO_STDSTR(
+							QDir( ConfigManager::inst()->factoryPresetsDir() +
+									"/ZynAddSubFX" ).absolutePath() ) ) );
 
-		m_remotePlugin->updateSampleRate( Engine::mixer()->processingSampleRate() );
+			m_remotePlugin->updateSampleRate( Engine::mixer()->processingSampleRate() );
 
-		// temporary workaround until the VST synchronization feature gets stripped out of the RemotePluginClient class
-		// causing not to send buffer size information requests
-		m_remotePlugin->sendMessage( RemotePlugin::message( IdBufferSizeInformation ).addInt( Engine::mixer()->framesPerPeriod() ) );
+			// temporary workaround until the VST synchronization feature gets stripped out of the RemotePluginClient class
+			// causing not to send buffer size information requests
+			m_remotePlugin->sendMessage( RemotePlugin::message( IdBufferSizeInformation ).addInt( Engine::mixer()->framesPerPeriod() ) );
 
-		m_remotePlugin->showUI();
-		m_remotePlugin->unlock();
+			m_remotePlugin->showUI();
+			m_remotePlugin->unlock();
+		}
 	}
 	else
 	{

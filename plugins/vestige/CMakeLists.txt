@@ -10,5 +10,12 @@ IF(LMMS_SUPPORT_VST)
    ENDIF()
    BUILD_PLUGIN(vestige vestige.cpp vestige.h MOCFILES vestige.h EMBEDDED_RESOURCES "${CMAKE_CURRENT_SOURCE_DIR}/*.png")
    TARGET_LINK_LIBRARIES(vestige vstbase)
+   
+   IF(NOT HAS_STD_MUTEX)
+      target_include_directories(vestige PRIVATE
+                "${PROJECT_SOURCE_DIR}/src/3rdparty/mingw-std-threads")
+      target_compile_definitions(vestige PRIVATE
+                -DUSE_MINGW_THREADS_REPLACEMENT)
+   ENDIF()
 ENDIF(LMMS_SUPPORT_VST)
 

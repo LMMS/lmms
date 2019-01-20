@@ -12,6 +12,11 @@ ENDIF()
 
 BUILD_PLUGIN(vsteffect VstEffect.cpp VstEffectControls.cpp VstEffectControlDialog.cpp VstSubPluginFeatures.cpp VstEffect.h VstEffectControls.h VstEffectControlDialog.h VstSubPluginFeatures.h MOCFILES VstEffectControlDialog.h VstEffectControls.h EMBEDDED_RESOURCES *.png)
 TARGET_LINK_LIBRARIES(vsteffect vstbase)
-
+IF(NOT HAS_STD_MUTEX)
+	target_include_directories(vsteffect PRIVATE
+	    "${PROJECT_SOURCE_DIR}/src/3rdparty/mingw-std-threads")
+	target_compile_definitions(vsteffect PRIVATE
+	    -DUSE_MINGW_THREADS_REPLACEMENT)
+ENDIF()
 ENDIF(LMMS_SUPPORT_VST)
 

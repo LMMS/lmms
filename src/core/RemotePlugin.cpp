@@ -79,9 +79,9 @@ RemotePlugin::RemotePlugin() :
 #else
 	RemotePluginBase(),
 #endif
+	m_disconnected(false),
 	m_failed( true ),
 	m_watcher( this ),
-	m_commMutex( QMutex::Recursive ),
 	m_splitChannels( false ),
 #ifdef USE_QT_SHMEM
 	m_shmObj(),
@@ -140,16 +140,18 @@ RemotePlugin::~RemotePlugin()
 	{
 		if( isRunning() )
 		{
-			lock();
-			sendMessage( IdQuit );
-
-			m_process.waitForFinished( 1000 );
-			if( m_process.state() != QProcess::NotRunning )
+			if (try_lock())
 			{
-				m_process.terminate();
-				m_process.kill();
+				sendMessage(IdQuit);
+
+				m_process.waitForFinished(1000);
+				if (m_process.state() != QProcess::NotRunning)
+				{
+					m_process.terminate();
+					m_process.kill();
+				}
+				unlock();
 			}
-			unlock();
 		}
 
 #ifndef USE_QT_SHMEM
@@ -173,90 +175,91 @@ RemotePlugin::~RemotePlugin()
 bool RemotePlugin::init(const QString &pluginExecutable,
 							bool waitForInitDoneMsg , QStringList extraArgs)
 {
-	lock();
-	if( m_failed )
+	if (try_lock())
 	{
+		if (m_failed)
+		{
 #ifdef SYNC_WITH_SHM_FIFO
-		reset( new shmFifo(), new shmFifo() );
+			reset(new shmFifo(), new shmFifo());
 #endif
-		m_failed = false;
-	}
-	QString exec = QFileInfo(QDir("plugins:"), pluginExecutable).absoluteFilePath();
+			m_failed = false;
+		}
+		QString exec = QFileInfo(QDir("plugins:"), pluginExecutable).absoluteFilePath();
 #ifdef LMMS_BUILD_APPLE
-	// search current directory first
-	QString curDir = QCoreApplication::applicationDirPath() + "/" + pluginExecutable;
-	if( QFile( curDir ).exists() )
-	{
-		exec = curDir;
-	}
+		// search current directory first
+		QString curDir = QCoreApplication::applicationDirPath() + "/" + pluginExecutable;
+		if (QFile(curDir).exists())
+		{
+			exec = curDir;
+		}
 #endif
 #ifdef LMMS_BUILD_WIN32
-	if( ! exec.endsWith( ".exe", Qt::CaseInsensitive ) )
-	{
-		exec += ".exe";
-	}
+		if (!exec.endsWith(".exe", Qt::CaseInsensitive))
+		{
+			exec += ".exe";
+		}
 #endif
 
-	if( ! QFile( exec ).exists() )
-	{
-		qWarning( "Remote plugin '%s' not found.",
-						exec.toUtf8().constData() );
-		m_failed = true;
-		invalidate();
-		unlock();
-		return failed();
-	}
+		if (!QFile(exec).exists())
+		{
+			qWarning("Remote plugin '%s' not found.",
+				exec.toUtf8().constData());
+			m_failed = true;
+			invalidate();
+			unlock();
+			return failed();
+		}
 
-	QStringList args;
+		QStringList args;
 #ifdef SYNC_WITH_SHM_FIFO
-	// swap in and out for bidirectional communication
-	args << QString::number( out()->shmKey() );
-	args << QString::number( in()->shmKey() );
+		// swap in and out for bidirectional communication
+		args << QString::number(out()->shmKey());
+		args << QString::number(in()->shmKey());
 #else
-	args << m_socketFile;
+		args << m_socketFile;
 #endif
-	args << extraArgs;
+		args << extraArgs;
 #ifndef DEBUG_REMOTE_PLUGIN
-	m_process.setProcessChannelMode( QProcess::ForwardedChannels );
-	m_process.setWorkingDirectory( QCoreApplication::applicationDirPath() );
-	m_process.start( exec, args );
-	m_watcher.start( QThread::LowestPriority );
+		m_process.setProcessChannelMode(QProcess::ForwardedChannels);
+		m_process.setWorkingDirectory(QCoreApplication::applicationDirPath());
+		m_process.start(exec, args);
+		m_watcher.start(QThread::LowestPriority);
 #else
-	qDebug() << exec << args;
+		qDebug() << exec << args;
 #endif
 
 #ifndef SYNC_WITH_SHM_FIFO
-	struct pollfd pollin;
-	pollin.fd = m_server;
-	pollin.events = POLLIN;
+		struct pollfd pollin;
+		pollin.fd = m_server;
+		pollin.events = POLLIN;
 
-	switch ( poll( &pollin, 1, 30000 ) )
-	{
+		switch (poll(&pollin, 1, 30000))
+		{
 		case -1:
-			qWarning( "Unexpected poll error." );
+			qWarning("Unexpected poll error.");
 			break;
 
 		case 0:
-			qWarning( "Remote plugin did not connect." );
+			qWarning("Remote plugin did not connect.");
 			break;
 
 		default:
-			m_socket = accept( m_server, NULL, NULL );
-			if ( m_socket == -1 )
+			m_socket = accept(m_server, NULL, NULL);
+			if (m_socket == -1)
 			{
-				qWarning( "Unexpected socket error." );
+				qWarning("Unexpected socket error.");
 			}
-	}
+		}
 #endif
 
-	resizeSharedProcessingMemory();
+		resizeSharedProcessingMemory();
 
-	if( waitForInitDoneMsg )
-	{
-		waitForInitDone();
+		if (waitForInitDoneMsg)
+		{
+			waitForInitDone();
+		}
+		unlock();
 	}
-	unlock();
-
 	return failed();
 }
 
@@ -285,9 +288,11 @@ bool RemotePlugin::process( const sampleFrame * _in_buf,
 		// in a later stage of this procedure
 		if( m_shmSize == 0 )
 		{
-			lock();
-			fetchAndProcessAllMessages();
-			unlock();
+			if (try_lock())
+			{
+				fetchAndProcessAllMessages();
+				unlock();
+			}
 		}
 		if( _out_buf != NULL )
 		{
@@ -330,18 +335,19 @@ bool RemotePlugin::process( const sampleFrame * _in_buf,
 		}
 	}
 
-	lock();
-	sendMessage( IdStartProcessing );
-
-	if( m_failed || _out_buf == NULL || m_outputCount == 0 )
+	if (try_lock())
 	{
+		sendMessage(IdStartProcessing);
+
+		if (m_failed || _out_buf == NULL || m_outputCount == 0)
+		{
+			unlock();
+			return false;
+		}
+
+		waitForMessage(IdProcessingDone);
 		unlock();
-		return false;
 	}
-
-	waitForMessage( IdProcessingDone );
-	unlock();
-
 	const ch_cnt_t outputs = qMin<ch_cnt_t>( m_outputCount,
 							DEFAULT_CHANNELS );
 	if( m_splitChannels )
@@ -392,23 +398,29 @@ void RemotePlugin::processMidiEvent( const MidiEvent & _e,
 	m.addInt( _e.param( 0 ) );
 	m.addInt( _e.param( 1 ) );
 	m.addInt( _offset );
-	lock();
-	sendMessage( m );
-	unlock();
+	if (try_lock())
+	{
+		sendMessage(m);
+		unlock();
+	}
 }
 
 void RemotePlugin::showUI()
 {
-	lock();
-	sendMessage( IdShowUI );
-	unlock();
+	if (try_lock())
+	{
+		sendMessage(IdShowUI);
+		unlock();
+	}
 }
 
 void RemotePlugin::hideUI()
 {
-	lock();
-	sendMessage( IdHideUI );
-	unlock();
+	if (try_lock())
+	{
+		sendMessage(IdHideUI);
+		unlock();
+	}
 }
 
 
@@ -480,11 +492,12 @@ void RemotePlugin::processErrored( QProcess::ProcessError err )
 
 bool RemotePlugin::processMessage( const message & _m )
 {
-	lock();
-	message reply_message( _m.id );
-	bool reply = false;
-	switch( _m.id )
+	if (try_lock())
 	{
+		message reply_message(_m.id);
+		bool reply = false;
+		switch (_m.id)
+		{
 		case IdUndefined:
 			unlock();
 			return false;
@@ -495,45 +508,45 @@ bool RemotePlugin::processMessage( const message & _m )
 
 		case IdSampleRateInformation:
 			reply = true;
-			reply_message.addInt( Engine::mixer()->processingSampleRate() );
+			reply_message.addInt(Engine::mixer()->processingSampleRate());
 			break;
 
 		case IdBufferSizeInformation:
 			reply = true;
-			reply_message.addInt( Engine::mixer()->framesPerPeriod() );
+			reply_message.addInt(Engine::mixer()->framesPerPeriod());
 			break;
 
 		case IdChangeInputCount:
-			m_inputCount = _m.getInt( 0 );
+			m_inputCount = _m.getInt(0);
 			resizeSharedProcessingMemory();
 			break;
 
 		case IdChangeOutputCount:
-			m_outputCount = _m.getInt( 0 );
+			m_outputCount = _m.getInt(0);
 			resizeSharedProcessingMemory();
 			break;
 
 		case IdChangeInputOutputCount:
-			m_inputCount = _m.getInt( 0 );
-			m_outputCount = _m.getInt( 1 );
+			m_inputCount = _m.getInt(0);
+			m_outputCount = _m.getInt(1);
 			resizeSharedProcessingMemory();
 			break;
 
 		case IdDebugMessage:
-			fprintf( stderr, "RemotePlugin::DebugMessage: %s",
-						_m.getString( 0 ).c_str() );
+			fprintf(stderr, "RemotePlugin::DebugMessage: %s",
+				_m.getString(0).c_str());
 			break;
 
 		case IdProcessingDone:
 		case IdQuit:
 		default:
 			break;
+		}
+		if (reply)
+		{
+			sendMessage(reply_message);
+		}
+		unlock();
 	}
-	if( reply )
-	{
-		sendMessage( reply_message );
-	}
-	unlock();
-
 	return true;
 }

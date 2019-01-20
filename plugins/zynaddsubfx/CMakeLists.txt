@@ -147,6 +147,13 @@ BUILD_PLUGIN(zynaddsubfx ZynAddSubFx.cpp ZynAddSubFx.h MOCFILES ZynAddSubFx.h EM
 TARGET_LINK_LIBRARIES(zynaddsubfx -lZynAddSubFxCore)
 ADD_DEPENDENCIES(zynaddsubfx ZynAddSubFxCore)
 
+IF(NOT HAS_STD_MUTEX)
+        target_include_directories(zynaddsubfx PRIVATE
+                "${PROJECT_SOURCE_DIR}/src/3rdparty/mingw-std-threads")
+        target_compile_definitions(zynaddsubfx PRIVATE
+                -DUSE_MINGW_THREADS_REPLACEMENT)
+ENDIF()
+
 IF(WIN32)
 	SET(WINRC "${CMAKE_CURRENT_BINARY_DIR}/zynaddsubfxrc.obj")
 	ADD_CUSTOM_COMMAND(OUTPUT "${WINRC}"

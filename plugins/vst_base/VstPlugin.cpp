@@ -152,7 +152,7 @@ VstPlugin::VstPlugin( const QString & _plugin ) :
 		tryLoad( "RemoteVstPlugin64" );
 		break;
 	case PE::MachineType::i386:
-		tryLoad( "RemoteVstPlugin32" );
+		tryLoad( "32/RemoteVstPlugin32" );
 		break;
 	default:
 		m_failed = true;
@@ -193,11 +193,11 @@ void VstPlugin::tryLoad( const QString &remoteVstPluginExecutable )
 		return;
 	}
 
-	lock();
-
-	VstHostLanguages hlang = LanguageEnglish;
-	switch( QLocale::system().language() )
+	if (try_lock())
 	{
+		VstHostLanguages hlang = LanguageEnglish;
+		switch (QLocale::system().language())
+		{
 		case QLocale::French: hlang = LanguageFrench; break;
 		case QLocale::German: hlang = LanguageGerman; break;
 		case QLocale::Italian: hlang = LanguageItalian; break;
@@ -205,13 +205,14 @@ void VstPlugin::tryLoad( const QString &remoteVstPluginExecutable )
 		case QLocale::Korean: hlang = LanguageKorean; break;
 		case QLocale::Spanish: hlang = LanguageSpanish; break;
 		default: break;
+		}
+		sendMessage(message(IdVstSetLanguage).addInt(hlang));
+		sendMessage(message(IdVstLoadPlugin).addString(QSTR_TO_STDSTR(m_plugin)));
+
+		waitForInitDone();
+
+		unlock();
 	}
-	sendMessage( message( IdVstSetLanguage ).addInt( hlang ) );
-	sendMessage( message( IdVstLoadPlugin ).addString( QSTR_TO_STDSTR( m_plugin ) ) );
-
-	waitForInitDone();
-
-	unlock();
 }
 
 
@@ -305,9 +306,11 @@ void VstPlugin::toggleUI()
 
 void VstPlugin::setTempo( bpm_t _bpm )
 {
-	lock();
-	sendMessage( message( IdVstSetTempo ).addInt( _bpm ) );
-	unlock();
+	if (try_lock())
+	{
+		sendMessage(message(IdVstSetTempo).addInt(_bpm));
+		unlock();
+	}
 }
 
 
@@ -315,11 +318,13 @@ void VstPlugin::setTempo( bpm_t _bpm )
 
 void VstPlugin::updateSampleRate()
 {
-	lock();
-	sendMessage( message( IdSampleRateInformation ).
-			addInt( Engine::mixer()->processingSampleRate() ) );
-	waitForMessage( IdInformationUpdated, true );
-	unlock();
+	if (try_lock())
+	{
+		sendMessage(message(IdSampleRateInformation).
+			addInt(Engine::mixer()->processingSampleRate()));
+		waitForMessage(IdInformationUpdated, true);
+		unlock();
+	}
 }
 
 
@@ -327,11 +332,12 @@ void VstPlugin::updateSampleRate()
 
 int VstPlugin::currentProgram()
 {
-	lock();
-	sendMessage( message( IdVstCurrentProgram ) );
-	waitForMessage( IdVstCurrentProgram, true );
-	unlock();
-
+	if (try_lock())
+	{
+		sendMessage(message(IdVstCurrentProgram));
+		waitForMessage(IdVstCurrentProgram, true);
+		unlock();
+	}
 	return m_currentProgram;
 }
 
@@ -339,11 +345,12 @@ int VstPlugin::currentProgram()
 
 const QMap<QString, QString> & VstPlugin::parameterDump()
 {
-	lock();
-	sendMessage( IdVstGetParameterDump );
-	waitForMessage( IdVstParameterDump, true );
-	unlock();
-
+	if (try_lock())
+	{
+		sendMessage(IdVstGetParameterDump);
+		waitForMessage(IdVstParameterDump, true);
+		unlock();
+	}
 	return m_parameterDump;
 }
 
@@ -367,9 +374,11 @@ void VstPlugin::setParameterDump( const QMap<QString, QString> & _pdump )
 		m.addString( item.shortLabel );
 		m.addFloat( item.value );
 	}
-	lock();
-	sendMessage( m );
-	unlock();
+	if (try_lock())
+	{
+		sendMessage(m);
+		unlock();
+	}
 }
 
 QWidget *VstPlugin::pluginWidget()
@@ -391,9 +400,9 @@ bool VstPlugin::processMessage( const message & _m )
 #ifdef LMMS_BUILD_WIN32
 			// We're changing the owner, not the parent,
 			// so this is legal despite MSDN's warning
-			SetWindowLongPtr( (HWND)(intptr_t) m_pluginWindowID,
-					GWLP_HWNDPARENT,
-					(LONG_PTR) gui->mainWindow()->winId() );
+			//SetWindowLongPtr( (HWND)(intptr_t) m_pluginWindowID,
+			//		GWLP_HWNDPARENT,
+			//		(LONG_PTR) gui->mainWindow()->winId() );
 #endif
 
 #ifdef LMMS_BUILD_LINUX
@@ -483,14 +492,16 @@ void VstPlugin::openPreset( )
 	if( ofd.exec () == QDialog::Accepted &&
 					!ofd.selectedFiles().isEmpty() )
 	{
-		lock();
-		sendMessage( message( IdLoadPresetFile ).
-			addString(
-				QSTR_TO_STDSTR(
-					QDir::toNativeSeparators( ofd.selectedFiles()[0] ) ) )
+		if (try_lock())
+		{
+			sendMessage(message(IdLoadPresetFile).
+				addString(
+					QSTR_TO_STDSTR(
+						QDir::toNativeSeparators(ofd.selectedFiles()[0])))
 			);
-		waitForMessage( IdLoadPresetFile, true );
-		unlock();
+			waitForMessage(IdLoadPresetFile, true);
+			unlock();
+		}
 	}
 }
 
@@ -499,10 +510,12 @@ void VstPlugin::openPreset( )
 
 void VstPlugin::setProgram( int index )
 {
-	lock();
-	sendMessage( message( IdVstSetProgram ).addInt( index ) );
-	waitForMessage( IdVstSetProgram, true );
-	unlock();
+	if (try_lock())
+	{
+		sendMessage(message(IdVstSetProgram).addInt(index));
+		waitForMessage(IdVstSetProgram, true);
+		unlock();
+	}
 }
 
 
@@ -510,10 +523,12 @@ void VstPlugin::setProgram( int index )
 
 void VstPlugin::rotateProgram( int offset )
 {
-	lock();
-	sendMessage( message( IdVstRotateProgram ).addInt( offset ) );
-	waitForMessage( IdVstRotateProgram, true );
-	unlock();
+	if (try_lock())
+	{
+		sendMessage(message(IdVstRotateProgram).addInt(offset));
+		waitForMessage(IdVstRotateProgram, true);
+		unlock();
+	}
 }
 
 
@@ -521,10 +536,12 @@ void VstPlugin::rotateProgram( int offset )
 
 void VstPlugin::loadProgramNames()
 {
-	lock();
-	sendMessage( message( IdVstProgramNames ) );
-	waitForMessage( IdVstProgramNames, true );
-	unlock();
+	if (try_lock())
+	{
+		sendMessage(message(IdVstProgramNames));
+		waitForMessage(IdVstProgramNames, true);
+		unlock();
+	}
 }
 
 
@@ -554,14 +571,16 @@ void VstPlugin::savePreset( )
 		if ((fns.toUpper().indexOf(tr(".FXP")) == -1) && (fns.toUpper().indexOf(tr(".FXB")) == -1))
 			fns = fns + tr(".fxb");
 		else fns = fns.left(fns.length() - 4) + (fns.right( 4 )).toLower();
-		lock();
-		sendMessage( message( IdSavePresetFile ).
-			addString(
-				QSTR_TO_STDSTR(
-					QDir::toNativeSeparators( fns ) ) )
+		if (try_lock())
+		{
+			sendMessage(message(IdSavePresetFile).
+				addString(
+					QSTR_TO_STDSTR(
+						QDir::toNativeSeparators(fns)))
 			);
-		waitForMessage( IdSavePresetFile, true );
-		unlock();
+			waitForMessage(IdSavePresetFile, true);
+			unlock();
+		}
 	}
 }
 
@@ -570,19 +589,23 @@ void VstPlugin::savePreset( )
 
 void VstPlugin::setParam( int i, float f )
 {
-	lock();
-	sendMessage( message( IdVstSetParameter ).addInt( i ).addFloat( f ) );
-	//waitForMessage( IdVstSetParameter, true );
-	unlock();
+	if (try_lock())
+	{
+		sendMessage(message(IdVstSetParameter).addInt(i).addFloat(f));
+		//waitForMessage( IdVstSetParameter, true );
+		unlock();
+	}
 }
 
 
 
 void VstPlugin::idleUpdate()
 {
-	lock();
-	sendMessage( message( IdVstIdleUpdate ) );
-	unlock();
+	if (try_lock())
+	{
+		sendMessage(message(IdVstIdleUpdate));
+		unlock();
+	}
 }
 
 void VstPlugin::showUI()
@@ -615,12 +638,12 @@ void VstPlugin::hideUI()
 // X11Embed only
 void VstPlugin::handleClientEmbed()
 {
-	lock();
-	sendMessage( IdShowUI );
-	unlock();
+	if (try_lock())
+	{
+		sendMessage(IdShowUI);
+		unlock();
+	}
 }
-
-
 
 void VstPlugin::loadChunk( const QByteArray & _chunk )
 {
@@ -630,14 +653,16 @@ void VstPlugin::loadChunk( const QByteArray & _chunk )
 		tf.write( _chunk );
 		tf.flush();
 
-		lock();
-		sendMessage( message( IdLoadSettingsFromFile ).
+		if (try_lock())
+		{
+			sendMessage(message(IdLoadSettingsFromFile).
 				addString(
 					QSTR_TO_STDSTR(
-						QDir::toNativeSeparators( tf.fileName() ) ) ).
-				addInt( _chunk.size() ) );
-		waitForMessage( IdLoadSettingsFromFile, true );
-		unlock();
+						QDir::toNativeSeparators(tf.fileName()))).
+				addInt(_chunk.size()));
+			waitForMessage(IdLoadSettingsFromFile, true);
+			unlock();
+		}
 	}
 }
 
@@ -650,14 +675,16 @@ QByteArray VstPlugin::saveChunk()
 	QTemporaryFile tf;
 	if( tf.open() )
 	{
-		lock();
-		sendMessage( message( IdSaveSettingsToFile ).
+		if (try_lock())
+		{
+			sendMessage(message(IdSaveSettingsToFile).
 				addString(
 					QSTR_TO_STDSTR(
-						QDir::toNativeSeparators( tf.fileName() ) ) ) );
-		waitForMessage( IdSaveSettingsToFile, true );
-		unlock();
-		a = tf.readAll();
+						QDir::toNativeSeparators(tf.fileName()))));
+			waitForMessage(IdSaveSettingsToFile, true);
+			unlock();
+			a = tf.readAll();
+		}
 	}
 
 	return a;

@@ -49,7 +49,6 @@
 #include <QtCore/QSystemSemaphore>
 #endif
 
-
 #ifdef LMMS_HAVE_SYS_SHM_H
 #include <sys/shm.h>
 
@@ -92,6 +91,13 @@ typedef int32_t key_t;
 #include <QtCore/QMutex>
 #include <QtCore/QProcess>
 #include <QtCore/QThread>
+
+#ifdef USE_MINGW_THREADS_REPLACEMENT
+#	include <mingw.mutex.h>
+#else
+#	include <mutex>
+#	include <chrono>
+#endif
 
 #ifndef SYNC_WITH_SHM_FIFO
 #include <poll.h>
@@ -649,7 +655,7 @@ protected:
 	}
 #endif
 
-	inline void invalidate()
+	virtual void invalidate()
 	{
 #ifdef SYNC_WITH_SHM_FIFO
 		m_in->invalidate();
@@ -805,27 +811,34 @@ public:
 
 	void updateSampleRate( sample_rate_t _sr )
 	{
-		lock();
-		sendMessage( message( IdSampleRateInformation ).addInt( _sr ) );
-		waitForMessage( IdInformationUpdated, true );
-		unlock();
+		if (try_lock())
+		{
+			sendMessage(message(IdSampleRateInformation).addInt(_sr));
+			waitForMessage(IdInformationUpdated, true);
+			unlock();
+		}
 	}
 
 
 	virtual void toggleUI()
 	{
-		lock();
-		sendMessage( IdToggleUI );
-		unlock();
+		if (try_lock())
+		{
+			sendMessage(IdToggleUI);
+			unlock();
+		}
 	}
 
 	int isUIVisible()
 	{
-		lock();
-		sendMessage( IdIsUIVisible );
-		unlock();
-		message m = waitForMessage( IdIsUIVisible );
-		return m.id != IdIsUIVisible ? -1 : m.getInt() ? 1 : 0;
+		if (try_lock()) {
+			sendMessage(IdIsUIVisible);
+			unlock();
+			message m = waitForMessage(IdIsUIVisible);
+			return m.id != IdIsUIVisible ? -1 : m.getInt() ? 1 : 0;
+		}
+
+		return 0;
 	}
 
 	inline bool failed() const
@@ -833,9 +846,21 @@ public:
 		return m_failed;
 	}
 
-	inline void lock()
+	inline bool try_lock()
 	{
-		m_commMutex.lock();
+		if (!m_disconnected)
+		{
+			if (!m_commMutex.try_lock_for(std::chrono::milliseconds(1000)))
+			{
+				m_failed = true;
+				m_disconnected = true;
+				invalidate();
+				return false;
+			}
+			return true;
+		}
+		else
+			return false;
 	}
 
 	inline void unlock()
@@ -848,6 +873,13 @@ public slots:
 	virtual void hideUI();
 
 protected:
+	virtual void invalidate() override
+	{
+		m_watcher.quit();
+		m_process.kill();
+		RemotePluginBase::invalidate();
+	}
+
 	inline void setSplittedChannels( bool _on )
 	{
 		m_splitChannels = _on;
@@ -857,12 +889,12 @@ protected:
 	bool m_failed;
 private:
 	void resizeSharedProcessingMemory();
-
+	bool m_disconnected;
 
 	QProcess m_process;
 	ProcessWatcher m_watcher;
 
-	QMutex m_commMutex;
+	std::recursive_timed_mutex m_commMutex;
 	bool m_splitChannels;
 #ifdef USE_QT_SHMEM
 	QSharedMemory m_shmObj;

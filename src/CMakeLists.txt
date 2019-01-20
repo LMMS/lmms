@@ -103,6 +103,13 @@ ADD_LIBRARY(lmmsobjs OBJECT
 	${LMMS_RCC_OUT}
 )
 
+if(NOT HAS_STD_MUTEX)
+	target_include_directories(lmmsobjs PRIVATE
+		"${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/mingw-std-threads")
+	target_compile_definitions(lmmsobjs PRIVATE
+		-DUSE_MINGW_THREADS_REPLACEMENT)
+endif()
+
 GENERATE_EXPORT_HEADER(lmmsobjs
 	BASE_NAME lmms
 )

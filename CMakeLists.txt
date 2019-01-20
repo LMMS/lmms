@@ -483,6 +483,17 @@ ENDIF(WANT_DEBUG_FPE)
 # check for libsamplerate
 FIND_PACKAGE(Samplerate 0.1.8 MODULE REQUIRED)
 
+#check for presence of mutex
+SET(CMAKE_REQUIRED_FLAGS "-std=c++11")
+
+CHECK_CXX_SOURCE_COMPILES("
+#include <mutex>
+int main(int argc, const char* argv[]) {
+	std::mutex m;
+	return 0;
+}
+" HAS_STD_MUTEX)
+
 # set compiler flags
 IF(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
 	SET(WERROR_FLAGS "-Wall -Werror=unused-function -Wno-sign-compare -Wno-strict-overflow")
