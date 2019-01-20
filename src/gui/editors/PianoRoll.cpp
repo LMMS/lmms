@@ -952,6 +952,7 @@ void PianoRoll::shiftSemiTone( int amount ) // shift notes by amount semitones
 {
 	if (!hasValidPattern()) {return;}
 
+	m_pattern->addJournalCheckPoint();
 	bool useAllNotes = ! isSelection();
 	for( Note *note : m_pattern->notes() )
 	{
@@ -978,6 +979,7 @@ void PianoRoll::shiftPos( int amount ) //shift notes pos by amount
 {
 	if (!hasValidPattern()) {return;}
 
+	m_pattern->addJournalCheckPoint();
 	bool useAllNotes = ! isSelection();
 
 	bool first = true;
