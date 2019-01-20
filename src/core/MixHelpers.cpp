@@ -79,12 +79,23 @@ bool sanitize( sampleFrame * src, int frames )
 		{
 			if( isinff( src[f][c] ) || isnanf( src[f][c] ) )
 			{
-				src[f][c] = 0.0f;
+				#ifdef LMMS_DEBUG
+					printf("Bad data, clearing buffer. frame: ");
+					printf("%d: value %f\n", f, src[f][c]);
+				#endif
+				for( int f = 0; f < frames; ++f )
+				{
+					for( int c = 0; c < 2; ++c )
+					{
+						src[f][c] = 0.0f;
+					}
+				}
 				found = true;
+				return found;
 			}
 			else
 			{
-				src[f][c] = qBound( -4.0f, src[f][c], 4.0f );
+				src[f][c] = qBound( -10.0f, src[f][c], 10.0f );
 			}
 		}
 	}
