@@ -198,11 +198,8 @@ void addSanitizedMultipliedByBuffer( sampleFrame* dst, const sampleFrame* src, f
 {
 	if ( !useNaNHandler() )
 	{
-		for( int f = 0; f < frames; ++f )
-		{
-			dst[f][0] += src[f][0] * coeffSrc * coeffSrcBuf->values()[f];
-			dst[f][1] += src[f][1] * coeffSrc * coeffSrcBuf->values()[f];
-		}
+		addMultipliedByBuffer( dst, src, coeffSrc, coeffSrcBuf,
+								frames );
 		return;
 	}
 
@@ -217,11 +214,8 @@ void addSanitizedMultipliedByBuffers( sampleFrame* dst, const sampleFrame* src, 
 {
 	if ( !useNaNHandler() )
 	{
-		for( int f = 0; f < frames; ++f )
-		{
-			dst[f][0] += src[f][0] * coeffSrcBuf1->values()[f] * coeffSrcBuf2->values()[f];
-			dst[f][1] += src[f][1] * coeffSrcBuf1->values()[f] * coeffSrcBuf2->values()[f];
-		}
+		addMultipliedByBuffers( dst, src, coeffSrcBuf1, coeffSrcBuf2,
+								frames );
 		return;
 	}
 
@@ -240,31 +234,25 @@ void addSanitizedMultipliedByBuffers( sampleFrame* dst, const sampleFrame* src, 
 
 struct AddSanitizedMultipliedOp
 {
-	AddSanitizedMultipliedOp( float coeff ) :
-		m_coeff( coeff ),
-		m_useNaNHandler( useNaNHandler() )
-	{
-	}
+	AddSanitizedMultipliedOp( float coeff ) : m_coeff( coeff ) { }
 
 	void operator()( sampleFrame& dst, const sampleFrame& src ) const
 	{
-		if( !m_useNaNHandler )
-		{
-			dst[0] += src[0] * m_coeff;
-			dst[1] += src[1] * m_coeff;
-			return;
-		}
-
 		dst[0] += ( isinff( src[0] ) || isnanf( src[0] ) ) ? 0.0f : src[0] * m_coeff;
 		dst[1] += ( isinff( src[1] ) || isnanf( src[1] ) ) ? 0.0f : src[1] * m_coeff;
 	}
 
 	const float m_coeff;
-	const bool m_useNaNHandler;
 };
 
 void addSanitizedMultiplied( sampleFrame* dst, const sampleFrame* src, float coeffSrc, int frames )
 {
+	if ( !useNaNHandler() )
+	{
+		addMultiplied( dst, src, coeffSrc, frames );
+		return;
+	}
+
 	run<>( dst, src, frames, AddSanitizedMultipliedOp(coeffSrc) );
 }
 
