@@ -27,6 +27,9 @@
 #include "ValueBuffer.h"
 
 
+static bool s_NaNHandler;
+
+
 namespace MixHelpers
 {
 
@@ -68,10 +71,24 @@ bool isSilent( const sampleFrame* src, int frames )
 	return true;
 }
 
+bool useNaNHandler()
+{
+	return s_NaNHandler;
+}
+
+void setNaNHandler( bool use )
+{
+	s_NaNHandler = use;
+}
 
 /*! \brief Function for sanitizing a buffer of infs/nans - returns true if those are found */
 bool sanitize( sampleFrame * src, int frames )
 {
+	if( !useNaNHandler() )
+	{
+		return false;
+	}
+
 	bool found = false;
 	for( int f = 0; f < frames; ++f )
 	{
@@ -179,6 +196,16 @@ void addMultipliedByBuffers( sampleFrame* dst, const sampleFrame* src, ValueBuff
 
 void addSanitizedMultipliedByBuffer( sampleFrame* dst, const sampleFrame* src, float coeffSrc, ValueBuffer * coeffSrcBuf, int frames )
 {
+	if ( !useNaNHandler() )
+	{
+		for( int f = 0; f < frames; ++f )
+		{
+			dst[f][0] += src[f][0] * coeffSrc * coeffSrcBuf->values()[f];
+			dst[f][1] += src[f][1] * coeffSrc * coeffSrcBuf->values()[f];
+		}
+		return;
+	}
+
 	for( int f = 0; f < frames; ++f )
 	{
 		dst[f][0] += ( isinff( src[f][0] ) || isnanf( src[f][0] ) ) ? 0.0f : src[f][0] * coeffSrc * coeffSrcBuf->values()[f];
@@ -188,6 +215,16 @@ void addSanitizedMultipliedByBuffer( sampleFrame* dst, const sampleFrame* src, f
 
 void addSanitizedMultipliedByBuffers( sampleFrame* dst, const sampleFrame* src, ValueBuffer * coeffSrcBuf1, ValueBuffer * coeffSrcBuf2, int frames )
 {
+	if ( !useNaNHandler() )
+	{
+		for( int f = 0; f < frames; ++f )
+		{
+			dst[f][0] += src[f][0] * coeffSrcBuf1->values()[f] * coeffSrcBuf2->values()[f];
+			dst[f][1] += src[f][1] * coeffSrcBuf1->values()[f] * coeffSrcBuf2->values()[f];
+		}
+		return;
+	}
+
 	for( int f = 0; f < frames; ++f )
 	{
 		dst[f][0] += ( isinff( src[f][0] ) || isnanf( src[f][0] ) )
@@ -203,15 +240,27 @@ void addSanitizedMultipliedByBuffers( sampleFrame* dst, const sampleFrame* src, 
 
 struct AddSanitizedMultipliedOp
 {
-	AddSanitizedMultipliedOp( float coeff ) : m_coeff( coeff ) { }
+	AddSanitizedMultipliedOp( float coeff ) :
+		m_coeff( coeff ),
+		m_useNaNHandler( useNaNHandler() )
+	{
+	}
 
 	void operator()( sampleFrame& dst, const sampleFrame& src ) const
 	{
+		if( !m_useNaNHandler )
+		{
+			dst[0] += src[0] * m_coeff;
+			dst[1] += src[1] * m_coeff;
+			return;
+		}
+
 		dst[0] += ( isinff( src[0] ) || isnanf( src[0] ) ) ? 0.0f : src[0] * m_coeff;
 		dst[1] += ( isinff( src[1] ) || isnanf( src[1] ) ) ? 0.0f : src[1] * m_coeff;
 	}
 
 	const float m_coeff;
+	const bool m_useNaNHandler;
 };
 
 void addSanitizedMultiplied( sampleFrame* dst, const sampleFrame* src, float coeffSrc, int frames )
