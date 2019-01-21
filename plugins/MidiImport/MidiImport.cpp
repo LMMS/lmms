@@ -426,7 +426,7 @@ bool MidiImport::readSMF( TrackContainer* tc )
 				Note n( (ticks < 1 ? 1 : ticks ),
 						noteEvt->get_start_time() * ticksPerBeat,
 						noteEvt->get_identifier() - 12,
-						noteEvt->get_loud());
+						noteEvt->get_loud() * (200.f / 127.f)); // Map from MIDI velocity to LMMS volume
 				ch->addNote( n );
 				
 			}
