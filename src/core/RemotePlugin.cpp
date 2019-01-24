@@ -79,8 +79,8 @@ RemotePlugin::RemotePlugin() :
 #else
 	RemotePluginBase(),
 #endif
-	m_disconnected(false),
 	m_failed( true ),
+	m_disconnected( false ),
 	m_watcher( this ),
 	m_splitChannels( false ),
 #ifdef USE_QT_SHMEM
