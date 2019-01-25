@@ -13,7 +13,7 @@ if(PKG_CONFIG_FOUND)
 	pkg_check_modules(FLUIDSYNTH_PKG libfluidsynth >= 1.0.7)
 endif(PKG_CONFIG_FOUND)
 
-find_file(FLUIDSYNTH_INCLUDE_DIR 
+find_path(FLUIDSYNTH_INCLUDE_DIR 
 	NAMES fluidsynth.h
 	PATHS FLUIDSYNTH_PKG_INCLUDE_DIRS)
 find_library(FLUIDSYNTH_LIBRARY
