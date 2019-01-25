@@ -182,6 +182,8 @@ PianoRoll::PianoRoll() :
 	m_lineColor( 0, 0, 0 ),
 	m_noteModeColor( 0, 0, 0 ),
 	m_noteColor( 0, 0, 0 ),
+	m_ghostNoteColor( 0, 0, 0 ),
+	m_ghostNoteTextColor( 0, 0, 0 ),
 	m_barColor( 0, 0, 0 ),
 	m_selectedNoteColor( 0, 0, 0 ),
 	m_textColor( 0, 0, 0 ),
@@ -189,7 +191,9 @@ PianoRoll::PianoRoll() :
 	m_textShadow( 0, 0, 0 ),
 	m_markedSemitoneColor( 0, 0, 0 ),
 	m_noteOpacity( 255 ),
+	m_ghostNoteOpacity( 255 ),
 	m_noteBorders( true ),
+	m_ghostNoteBorders( true ),
 	m_backgroundShade( 0, 0, 0 )
 {
 	// gui names of edit modes
@@ -599,6 +603,26 @@ PianoRoll::~PianoRoll()
 }
 
 
+void PianoRoll::setGhostPattern( Pattern* newPattern )
+{
+	m_ghostPattern = newPattern;
+	if( newPattern != nullptr )
+	{
+		// make sure to always get informed about the pattern being destroyed
+		connect( m_ghostPattern, SIGNAL( destroyedPattern( Pattern* ) ), this, SLOT( clearGhostPattern() ) );
+		emit ghostPatternSet( true );
+	}
+}
+
+
+void PianoRoll::clearGhostPattern()
+{
+	setGhostPattern( nullptr );
+	emit ghostPatternSet( false );
+	update();
+}
+
+
 void PianoRoll::setCurrentPattern( Pattern* newPattern )
 {
 	if( hasValidPattern() )
@@ -801,12 +825,35 @@ bool PianoRoll::noteBorders() const
 void PianoRoll::setNoteBorders( const bool b )
 { m_noteBorders = b; }
 
+QColor PianoRoll::ghostNoteColor() const
+{ return m_ghostNoteColor; }
+
+void PianoRoll::setGhostNoteColor( const QColor & c )
+{ m_ghostNoteColor = c; }
+
+QColor PianoRoll::ghostNoteTextColor() const
+{ return m_ghostNoteTextColor; }
+
+void PianoRoll::setGhostNoteTextColor( const QColor & c )
+{ m_ghostNoteTextColor = c; }
+
+int PianoRoll::ghostNoteOpacity() const
+{ return m_ghostNoteOpacity; }
+
+void PianoRoll::setGhostNoteOpacity( const int i )
+{ m_ghostNoteOpacity = i; }
+
+bool PianoRoll::ghostNoteBorders() const
+{ return m_ghostNoteBorders; }
+
+void PianoRoll::setGhostNoteBorders( const bool b )
+{ m_ghostNoteBorders = b; }
+
 QColor PianoRoll::backgroundShade() const
 { return m_backgroundShade; }
 
 void PianoRoll::setBackgroundShade( const QColor & c )
 { m_backgroundShade = c; }
-
 
 
 
@@ -3024,6 +3071,50 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 
 		QPolygonF editHandles;
 
+		// -- Begin ghost pattern
+		if( m_ghostPattern != nullptr && m_ghostPattern != m_pattern )
+		{
+			for( const Note *note : m_ghostPattern->notes() )
+			{
+				int len_ticks = note->length();
+
+				if( len_ticks == 0 )
+				{
+					continue;
+				}
+				else if( len_ticks < 0 )
+				{
+					len_ticks = 4;
+				}
+				const int key = note->key() - m_startKey + 1;
+
+				int pos_ticks = note->pos();
+
+				int note_width = len_ticks * m_ppt / MidiTime::ticksPerTact();
+				const int x = ( pos_ticks - m_currentPosition ) *
+						m_ppt / MidiTime::ticksPerTact();
+				// skip this note if not in visible area at all
+				if( !( x + note_width >= 0 && x <= width() - WHITE_KEY_WIDTH ) )
+				{
+					continue;
+				}
+
+				// is the note in visible area?
+				if( key > 0 && key <= visible_keys )
+				{
+
+					// we've done and checked all, let's draw the
+					// note
+					drawNoteRect( p, x + WHITE_KEY_WIDTH,
+							y_base - key * KEY_LINE_HEIGHT,
+									note_width, note, ghostNoteColor(), ghostNoteTextColor(), selectedNoteColor(),
+									ghostNoteOpacity(), ghostNoteBorders(), drawNoteNames );
+				}
+
+			}
+		}
+		// -- End ghost pattern
+
 		for( const Note *note : m_pattern->notes() )
 		{
 			int len_ticks = note->length();
@@ -3269,7 +3360,7 @@ void PianoRoll::wheelEvent(QWheelEvent * we )
 		}
 		if( nv.size() > 0 )
 		{
-			const int step = we->delta() > 0 ? 1.0 : -1.0;
+			const int step = we->delta() > 0 ? 1 : -1;
 			if( m_noteEditMode == NoteEditVolume )
 			{
 				for ( Note * n : nv )
@@ -4221,8 +4312,15 @@ PianoRollWindow::PianoRollWindow() :
 	m_chordComboBox = new ComboBox( m_toolBar );
 	m_chordComboBox->setModel( &m_editor->m_chordModel );
 	m_chordComboBox->setFixedSize( 105, 22 );
-	m_chordComboBox->setToolTip( tr( "Chord") );
+	m_chordComboBox->setToolTip( tr( "Chord" ) );
 
+	// -- Clear ghost pattern button
+	m_clearGhostButton = new QPushButton( m_toolBar );
+	m_clearGhostButton->setIcon( embed::getIconPixmap( "clear_ghost_note" ) );
+	m_clearGhostButton->setToolTip( tr( "Clear ghost notes" ) );
+	m_clearGhostButton->setEnabled( false );
+	connect( m_clearGhostButton, SIGNAL( clicked() ), m_editor, SLOT( clearGhostPattern() ) );
+	connect( m_editor, SIGNAL( ghostPatternSet( bool ) ), this, SLOT( ghostPatternSet( bool ) ) );
 
 	zoomAndNotesToolBar->addWidget( zoom_lbl );
 	zoomAndNotesToolBar->addWidget( m_zoomingComboBox );
@@ -4243,6 +4341,9 @@ PianoRollWindow::PianoRollWindow() :
 	zoomAndNotesToolBar->addWidget( chord_lbl );
 	zoomAndNotesToolBar->addWidget( m_chordComboBox );
 
+	zoomAndNotesToolBar->addSeparator();
+	zoomAndNotesToolBar->addWidget( m_clearGhostButton );
+
 	// setup our actual window
 	setFocusPolicy( Qt::StrongFocus );
 	setFocus();
@@ -4260,6 +4361,14 @@ PianoRollWindow::PianoRollWindow() :
 const Pattern* PianoRollWindow::currentPattern() const
 {
 	return m_editor->currentPattern();
+}
+
+
+
+
+void PianoRollWindow::setGhostPattern( Pattern* pattern )
+{
+	m_editor->setGhostPattern( pattern );
 }
 
 
@@ -4382,6 +4491,14 @@ void PianoRollWindow::patternRenamed()
 	{
 		setWindowTitle( tr( "Piano-Roll - no pattern" ) );
 	}
+}
+
+
+
+
+void PianoRollWindow::ghostPatternSet( bool state )
+{
+	m_clearGhostButton->setEnabled( state );
 }
 
 
