@@ -27,6 +27,9 @@
 #include "ValueBuffer.h"
 
 
+static bool s_NaNHandler;
+
+
 namespace MixHelpers
 {
 
@@ -68,10 +71,24 @@ bool isSilent( const sampleFrame* src, int frames )
 	return true;
 }
 
+bool useNaNHandler()
+{
+	return s_NaNHandler;
+}
+
+void setNaNHandler( bool use )
+{
+	s_NaNHandler = use;
+}
 
 /*! \brief Function for sanitizing a buffer of infs/nans - returns true if those are found */
 bool sanitize( sampleFrame * src, int frames )
 {
+	if( !useNaNHandler() )
+	{
+		return false;
+	}
+
 	bool found = false;
 	for( int f = 0; f < frames; ++f )
 	{
@@ -179,6 +196,13 @@ void addMultipliedByBuffers( sampleFrame* dst, const sampleFrame* src, ValueBuff
 
 void addSanitizedMultipliedByBuffer( sampleFrame* dst, const sampleFrame* src, float coeffSrc, ValueBuffer * coeffSrcBuf, int frames )
 {
+	if ( !useNaNHandler() )
+	{
+		addMultipliedByBuffer( dst, src, coeffSrc, coeffSrcBuf,
+								frames );
+		return;
+	}
+
 	for( int f = 0; f < frames; ++f )
 	{
 		dst[f][0] += ( isinff( src[f][0] ) || isnanf( src[f][0] ) ) ? 0.0f : src[f][0] * coeffSrc * coeffSrcBuf->values()[f];
@@ -188,6 +212,13 @@ void addSanitizedMultipliedByBuffer( sampleFrame* dst, const sampleFrame* src, f
 
 void addSanitizedMultipliedByBuffers( sampleFrame* dst, const sampleFrame* src, ValueBuffer * coeffSrcBuf1, ValueBuffer * coeffSrcBuf2, int frames )
 {
+	if ( !useNaNHandler() )
+	{
+		addMultipliedByBuffers( dst, src, coeffSrcBuf1, coeffSrcBuf2,
+								frames );
+		return;
+	}
+
 	for( int f = 0; f < frames; ++f )
 	{
 		dst[f][0] += ( isinff( src[f][0] ) || isnanf( src[f][0] ) )
@@ -216,6 +247,12 @@ struct AddSanitizedMultipliedOp
 
 void addSanitizedMultiplied( sampleFrame* dst, const sampleFrame* src, float coeffSrc, int frames )
 {
+	if ( !useNaNHandler() )
+	{
+		addMultiplied( dst, src, coeffSrc, frames );
+		return;
+	}
+
 	run<>( dst, src, frames, AddSanitizedMultipliedOp(coeffSrc) );
 }
 

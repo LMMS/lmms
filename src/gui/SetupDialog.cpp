@@ -99,6 +99,8 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 							"disablebackup" ).toInt() ),
 	m_openLastProject( ConfigManager::inst()->value( "app",
 							"openlastproject" ).toInt() ),
+	m_NaNHandler( ConfigManager::inst()->value( "app",
+							"nanhandler", "1" ).toInt() ),
 	m_hqAudioDev( ConfigManager::inst()->value( "mixer",
 							"hqaudio" ).toInt() ),
 	m_lang( ConfigManager::inst()->value( "app",
@@ -333,6 +335,15 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 				this, SLOT( toggleOpenLastProject( bool ) ) );
 
 	misc_tw->setFixedHeight( YDelta*labelNumber + HeaderSize );
+
+	// Advanced setting, hidden for now
+	if( false )
+	{
+		LedCheckBox * useNaNHandler = new LedCheckBox(
+				tr( "Use built-in NaN handler" ),
+								misc_tw );
+		useNaNHandler->setChecked( m_NaNHandler );
+	}
 
 	TabWidget* embed_tw = new TabWidget( tr( "PLUGIN EMBEDDING" ), general);
 	embed_tw->setFixedHeight( 48 );
@@ -1055,6 +1066,8 @@ void SetupDialog::accept()
 					QString::number( !m_disableBackup ) );
 	ConfigManager::inst()->setValue( "app", "openlastproject",
 					QString::number( m_openLastProject ) );
+	ConfigManager::inst()->setValue( "app", "nanhandler",
+					QString::number( m_NaNHandler ) );
 	ConfigManager::inst()->setValue( "mixer", "hqaudio",
 					QString::number( m_hqAudioDev ) );
 	ConfigManager::inst()->setValue( "ui", "smoothscroll",
