@@ -1155,7 +1155,7 @@ void PianoRoll::keyPressEvent(QKeyEvent* ke)
 		{
 			ke->accept();
 			update();
-			return; 
+			return;
 		}
 	}
 
@@ -3669,7 +3669,7 @@ bool PianoRoll::toggleStepRecording()
 	{
 		m_stepRecorder.stop();
 	}
-	else 
+	else
 	{
 		if(hasValidPattern())
 		{
@@ -4653,7 +4653,7 @@ void PianoRollWindow::updateStepRecordingIcon()
 	{
 		m_toggleStepRecordingAction->setIcon(embed::getIconPixmap("record_step_on"));
 	}
-	else 
+	else
 	{
 		m_toggleStepRecordingAction->setIcon(embed::getIconPixmap("record_step_off"));
 	}

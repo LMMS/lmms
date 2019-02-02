@@ -51,7 +51,7 @@ protected slots:
 	virtual void play() {}
 	virtual void record() {}
 	virtual void recordAccompany() {}
-	virtual void toggleStepRecording() {}	
+	virtual void toggleStepRecording() {}
 	virtual void stop() {}
 
 private slots:
@@ -74,7 +74,7 @@ protected:
 	QAction* m_playAction;
 	QAction* m_recordAction;
 	QAction* m_recordAccompanyAction;
-	QAction* m_toggleStepRecordingAction;	
+	QAction* m_toggleStepRecordingAction;
 	QAction* m_stopAction;
 };
 
