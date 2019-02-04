@@ -678,7 +678,7 @@ void PatternView::constructContextMenu( QMenu * _cm )
 
 	if( gui->pianoRoll()->currentPattern() &&
 			gui->pianoRoll()->currentPattern() != m_pat &&
-			not m_pat->empty() )
+			!m_pat->empty() )
 	{
 		QAction * b = new QAction( embed::getIconPixmap( "ghost_note" ),
 						tr( "Set as ghost in piano-roll" ), _cm );
