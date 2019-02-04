@@ -3663,6 +3663,9 @@ void PianoRoll::recordAccompany()
 	}
 }
 
+
+
+
 bool PianoRoll::toggleStepRecording()
 {
 	if(m_stepRecorder.isRecording())
@@ -3673,12 +3676,23 @@ bool PianoRoll::toggleStepRecording()
 	{
 		if(hasValidPattern())
 		{
-			m_stepRecorder.start(Engine::getSong()->getPlayPos(Song::Mode_PlayPattern), newNoteLen());
+			if(Engine::getSong()->isPlaying())
+			{
+				m_stepRecorder.start(0, newNoteLen());
+			}
+			else
+			{
+				m_stepRecorder.start(
+					Engine::getSong()->getPlayPos(
+						Song::Mode_PlayPattern), newNoteLen());
+			}
 		}
 	}
 
 	return m_stepRecorder.isRecording();;
 }
+
+
 
 
 void PianoRoll::stop()
