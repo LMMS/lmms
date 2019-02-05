@@ -5,7 +5,7 @@ PACKAGES="cmake pkgconfig fftw libogg libvorbis lame libsndfile libsamplerate ja
 if [ $QT5 ]; then
 	PACKAGES="$PACKAGES qt5"
 else
-	PACKAGES="$PACKAGES cartr/qt4/qt"
+	PACKAGES="$PACKAGES cartr/qt4/qt@4"
 fi
 
 brew install $PACKAGES ccache
