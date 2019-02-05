@@ -92,6 +92,7 @@ public:
 
 	void setCurrentPattern( Pattern* newPattern );
 	void setGhostPattern( Pattern* newPattern );
+	void loadGhostNotes( const QDomElement & de );
 
 	inline void stopRecording()
 	{
@@ -325,7 +326,13 @@ private:
 	static const QVector<double> m_zoomLevels;
 
 	Pattern* m_pattern;
-	Pattern* m_ghostPattern;
+	NoteVector m_ghostNotes;
+
+	inline const NoteVector & ghostNotes() const
+	{
+		return m_ghostNotes;
+	}
+
 	QScrollBar * m_leftRightScroll;
 	QScrollBar * m_topBottomScroll;
 

@@ -452,6 +452,7 @@ void PianoRoll::reset()
 {
 	m_lastNoteVolume = DefaultVolume;
 	m_lastNotePanning = DefaultPanning;
+	clearGhostPattern();
 }
 
 void PianoRoll::showTextFloat(const QString &text, const QPoint &pos, int timeout)
@@ -605,11 +606,33 @@ PianoRoll::~PianoRoll()
 
 void PianoRoll::setGhostPattern( Pattern* newPattern )
 {
-	m_ghostPattern = newPattern;
+	// Expects a pointer to a pattern or nullptr.
+	m_ghostNotes.clear();
 	if( newPattern != nullptr )
 	{
-		// make sure to always get informed about the pattern being destroyed
-		connect( m_ghostPattern, SIGNAL( destroyedPattern( Pattern* ) ), this, SLOT( clearGhostPattern() ) );
+		for( Note *note : newPattern->notes() )
+		{
+			Note * new_note = new Note( note->length(), note->pos(), note->key() );
+			m_ghostNotes.push_back( new_note );
+		}
+		emit ghostPatternSet( true );
+	}
+}
+
+
+void PianoRoll::loadGhostNotes( const QDomElement & de )
+{
+	// Load ghost notes from DOM element.
+	if( de.isElement() )
+	{
+		QDomNode node = de.firstChild();
+		while( !node.isNull() )
+		{
+			Note * n = new Note;
+			n->restoreState( node.toElement() );
+			m_ghostNotes.push_back( n );
+			node = node.nextSibling();
+		}
 		emit ghostPatternSet( true );
 	}
 }
@@ -3072,9 +3095,9 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 		QPolygonF editHandles;
 
 		// -- Begin ghost pattern
-		if( m_ghostPattern != nullptr && m_ghostPattern != m_pattern )
+		if( !m_ghostNotes.empty() )
 		{
-			for( const Note *note : m_ghostPattern->notes() )
+			for( const Note *note : m_ghostNotes )
 			{
 				int len_ticks = note->length();
 
@@ -4459,6 +4482,21 @@ void PianoRollWindow::reset()
 
 void PianoRollWindow::saveSettings( QDomDocument & doc, QDomElement & de )
 {
+	if( !m_editor->ghostNotes().empty() )
+	{
+		QDomElement ghostNotesRoot = doc.createElement( "ghostnotes" );
+		for( Note *note : m_editor->ghostNotes() )
+		{
+			QDomElement ghostNoteNode = doc.createElement( "ghostnote" );
+			ghostNoteNode.setAttribute( "len", note->length() );
+			ghostNoteNode.setAttribute( "key", note->key() );
+			ghostNoteNode.setAttribute( "pos", note->pos() );
+
+			ghostNotesRoot.appendChild(ghostNoteNode);
+		}
+		de.appendChild( ghostNotesRoot );
+	}
+
 	MainWindow::saveWidgetState( this, de );
 }
 
@@ -4467,6 +4505,8 @@ void PianoRollWindow::saveSettings( QDomDocument & doc, QDomElement & de )
 
 void PianoRollWindow::loadSettings( const QDomElement & de )
 {
+	m_editor->loadGhostNotes( de.firstChildElement("ghostnotes") );
+
 	MainWindow::restoreWidgetState( this, de );
 }
 
