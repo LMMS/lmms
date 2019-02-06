@@ -4,10 +4,14 @@ PACKAGES="cmake pkgconfig fftw libogg libvorbis lame libsndfile libsamplerate ja
 
 if [ $QT5 ]; then
 	PACKAGES="$PACKAGES qt5"
-else
-	PACKAGES="$PACKAGES cartr/qt4/qt-legacy-formula"
 fi
 
 brew install $PACKAGES ccache
+
+if [ -z "$QT5" ]; then
+	brew tap cartr/qt4
+	brew tap-pin cartr/qt4
+	brew install qt@4
+fi
 
 sudo npm install -g appdmg
