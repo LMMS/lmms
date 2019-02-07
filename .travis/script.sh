@@ -9,6 +9,7 @@ if [ "$TYPE" = 'style' ]; then
 	# shellcheck disable=SC2185
 	# shellcheck disable=SC2046
 	shellcheck $(find -O3 . -maxdepth 3 -type f -name '*.sh' -o -name "*.sh.in")
+	shellcheck doc/bash-completion/lmms
 
 else
 
