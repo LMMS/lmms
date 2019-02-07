@@ -152,7 +152,7 @@ VstPlugin::VstPlugin( const QString & _plugin ) :
 		tryLoad( "RemoteVstPlugin64" );
 		break;
 	case PE::MachineType::i386:
-		tryLoad( "32/RemoteVstPlugin32" );
+		tryLoad( "RemoteVstPlugin32" );
 		break;
 	default:
 		m_failed = true;
