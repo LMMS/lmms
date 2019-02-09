@@ -194,6 +194,10 @@ void fileCheck( QString &file )
 
 int main( int argc, char * * argv )
 {
+	// default environment
+	if( setenv( "QT_X11_NO_NATIVE_MENUBAR", "1", 0 ) )
+		fprintf( stderr, "Error setting default environment.\n" );
+
 	// initialize memory managers
 	NotePlayHandleManager::init();
 
