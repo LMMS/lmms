@@ -194,7 +194,7 @@ void fileCheck( QString &file )
 
 int main( int argc, char * * argv )
 {
-#ifdef LMMS_BUILD_LINUX
+#if defined( LMMS_BUILD_LINUX ) && QT_VERSION < 0x050000
 	if( setenv( "QT_X11_NO_NATIVE_MENUBAR", "1", 0 ) )
 		fprintf( stderr, "Error setting default environment.\n" );
 #endif
