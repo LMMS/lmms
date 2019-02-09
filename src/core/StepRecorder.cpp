@@ -278,7 +278,7 @@ void StepRecorder::setCurrentPattern( Pattern* newPattern )
 
 void StepRecorder::removeNotesReleasedForTooLong()
 {
-	int nextTimout = INT_MAX;
+	int nextTimout = std::numeric_limits<int>::max();
 	bool notesRemoved = false;
 
 	QMutableVectorIterator<StepNote*> itr(m_curStepNotes);
@@ -307,7 +307,7 @@ void StepRecorder::removeNotesReleasedForTooLong()
 		m_pianoRoll.update();
 	}
 
-	if(nextTimout != INT_MAX)
+	if(nextTimout != std::numeric_limits<int>::max())
 	{
 		m_updateReleasedTimer.start(nextTimout);
 	}
