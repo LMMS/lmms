@@ -302,8 +302,11 @@ void SubWindow::adjustTitleBar()
 
 void SubWindow::resizeEvent( QResizeEvent * event )
 {
-	adjustTitleBar();
+	// When the parent QMdiArea gets resized, maximized subwindows also gets resized, if any.
+	// In that case, we should call QMdiSubWindow::resizeEvent first
+	// to ensure we get the correct window state.
 	QMdiSubWindow::resizeEvent( event );
+	adjustTitleBar();
 
 	// if the window was resized and ISN'T minimized/maximized/fullscreen,
 	// then save the current size
