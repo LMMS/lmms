@@ -194,11 +194,6 @@ void fileCheck( QString &file )
 
 int main( int argc, char * * argv )
 {
-#if defined( LMMS_BUILD_LINUX ) && QT_VERSION < 0x050000
-	if( setenv( "QT_X11_NO_NATIVE_MENUBAR", "1", 0 ) )
-		fprintf( stderr, "Error setting default environment.\n" );
-#endif
-
 	// initialize memory managers
 	NotePlayHandleManager::init();
 
@@ -256,6 +251,9 @@ int main( int argc, char * * argv )
 		printf( "LMMS cannot be run as root.\nUse \"--allowroot\" to override.\n\n" );
 		return EXIT_FAILURE;
 	}	
+#endif
+#if defined( LMMS_BUILD_LINUX ) && QT_VERSION < 0x050000
+	QCoreApplication::setAttribute( Qt::AA_DontUseNativeMenuBar );
 #endif
 #if QT_VERSION >= QT_VERSION_CHECK(5, 6, 0)
 	QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
