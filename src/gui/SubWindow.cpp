@@ -148,23 +148,6 @@ void SubWindow::elideText( QLabel *label, QString text )
 
 
 
-bool SubWindow::isMaximized()
-{
-#ifdef LMMS_BUILD_APPLE
-	// check if subwindow size is identical to the MdiArea size, accounting for scrollbars
-	int hScrollBarHeight = mdiArea()->horizontalScrollBar()->isVisible() ? mdiArea()->horizontalScrollBar()->size().height() : 0;
-	int vScrollBarWidth = mdiArea()->verticalScrollBar()->isVisible() ? mdiArea()->verticalScrollBar()->size().width() : 0;
-	QSize areaSize( this->mdiArea()->size().width() - vScrollBarWidth, this->mdiArea()->size().height() - hScrollBarHeight );
-
-	return areaSize == this->size();
-#else
-	return QMdiSubWindow::isMaximized();
-#endif
-}
-
-
-
-
 QRect SubWindow::getTrueNormalGeometry() const
 {
 	return m_trackedNormalGeom;
