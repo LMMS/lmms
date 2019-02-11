@@ -10,7 +10,7 @@
 # Try pkgconfig
 find_package(PkgConfig QUIET)
 if(PKG_CONFIG_FOUND)
-	pkg_check_modules(FLUIDSYNTH_PKG libfluidsynth >= 1.0.7)
+	pkg_check_modules(FLUIDSYNTH_PKG libfluidsynth>=1.0.7)
 endif(PKG_CONFIG_FOUND)
 
 find_path(FLUIDSYNTH_INCLUDE_DIR 
