@@ -148,23 +148,6 @@ void SubWindow::elideText( QLabel *label, QString text )
 
 
 
-bool SubWindow::isMaximized()
-{
-#ifdef LMMS_BUILD_APPLE
-	// check if subwindow size is identical to the MdiArea size, accounting for scrollbars
-	int hScrollBarHeight = mdiArea()->horizontalScrollBar()->isVisible() ? mdiArea()->horizontalScrollBar()->size().height() : 0;
-	int vScrollBarWidth = mdiArea()->verticalScrollBar()->isVisible() ? mdiArea()->verticalScrollBar()->size().width() : 0;
-	QSize areaSize( this->mdiArea()->size().width() - vScrollBarWidth, this->mdiArea()->size().height() - hScrollBarHeight );
-
-	return areaSize == this->size();
-#else
-	return QMdiSubWindow::isMaximized();
-#endif
-}
-
-
-
-
 QRect SubWindow::getTrueNormalGeometry() const
 {
 	return m_trackedNormalGeom;
@@ -302,8 +285,11 @@ void SubWindow::adjustTitleBar()
 
 void SubWindow::resizeEvent( QResizeEvent * event )
 {
-	adjustTitleBar();
+	// When the parent QMdiArea gets resized, maximized subwindows also gets resized, if any.
+	// In that case, we should call QMdiSubWindow::resizeEvent first
+	// to ensure we get the correct window state.
 	QMdiSubWindow::resizeEvent( event );
+	adjustTitleBar();
 
 	// if the window was resized and ISN'T minimized/maximized/fullscreen,
 	// then save the current size
