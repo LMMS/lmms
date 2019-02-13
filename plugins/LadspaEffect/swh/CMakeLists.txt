@@ -2,7 +2,10 @@
 FILE(WRITE ladspa/config.h "")
 INCLUDE(FindPerl)
 
-#TODO: should we do something when perl isn't found? IF(PERL_FOUND) ...
+IF(NOT PERL_FOUND)
+	MESSAGE(WARNING "Perl not found. Can't compile swh LADSPA modules")
+	RETURN()
+ENDIF()
 
 # Precompiler PIC Macro
 IF(LMMS_BUILD_WIN32)
