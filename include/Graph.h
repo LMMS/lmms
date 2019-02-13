@@ -165,6 +165,7 @@ public slots:
 	void normalize();
 	void invert();
 	void shiftPhase( int _deg );
+	void clearInvisible();
 
 signals:
 	void lengthChanged();
