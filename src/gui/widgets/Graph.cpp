@@ -711,6 +711,7 @@ void graphModel::shiftPhase( int _deg )
 	emit samplesChanged( 0, length()-1 );
 }
 
+// Clear visible graph
 void graphModel::clear()
 {
 	const int graph_length = length();
@@ -719,7 +720,14 @@ void graphModel::clear()
 	emit samplesChanged( 0, graph_length - 1 );
 }
 
-
+// Clear entire graph, including samples outside of graph range
+void graphModel::clearAll()
+{
+	const int full_graph_length = m_samples.size();
+	for( int i = 0; i < full_graph_length; i++ )
+		m_samples[i] = 0;
+	emit samplesChanged( 0, full_graph_length - 1 );
+}
 
 void graphModel::drawSampleAt( int x, float val )
 {
@@ -733,7 +741,6 @@ void graphModel::drawSampleAt( int x, float val )
 	// change sample shape
 	m_samples[x] = val;
 }
-
 
 
 
