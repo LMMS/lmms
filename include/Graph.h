@@ -169,6 +169,7 @@ public slots:
 	void invert();
 	void shiftPhase( int _deg );
 	void clear();
+	void clearAll();
 
 signals:
 	void lengthChanged();
