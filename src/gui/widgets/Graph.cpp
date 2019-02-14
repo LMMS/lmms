@@ -720,13 +720,14 @@ void graphModel::clear()
 	emit samplesChanged( 0, graph_length - 1 );
 }
 
-// Clear entire graph, including samples outside of graph range
-void graphModel::clearAll()
+// Clear any part of the graph that isn't displayed
+void graphModel::clearInvisible()
 {
+	const int graph_length = length();
 	const int full_graph_length = m_samples.size();
-	for( int i = 0; i < full_graph_length; i++ )
+	for( int i = graph_length; i < full_graph_length; i++ )
 		m_samples[i] = 0;
-	emit samplesChanged( 0, full_graph_length - 1 );
+	emit samplesChanged( graph_length, full_graph_length - 1 );
 }
 
 void graphModel::drawSampleAt( int x, float val )
