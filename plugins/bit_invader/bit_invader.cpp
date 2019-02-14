@@ -474,7 +474,7 @@ void bitInvaderView::modelChanged()
 
 void bitInvaderView::sinWaveClicked()
 {
-	m_graph->model()->clearAll();
+	m_graph->model()->clearInvisible();
 	m_graph->model()->setWaveToSine();
 	Engine::getSong()->setModified();
 }
@@ -484,7 +484,7 @@ void bitInvaderView::sinWaveClicked()
 
 void bitInvaderView::triangleWaveClicked()
 {
-	m_graph->model()->clearAll();
+	m_graph->model()->clearInvisible();
 	m_graph->model()->setWaveToTriangle();
 	Engine::getSong()->setModified();
 }
@@ -494,7 +494,7 @@ void bitInvaderView::triangleWaveClicked()
 
 void bitInvaderView::sawWaveClicked()
 {
-	m_graph->model()->clearAll();
+	m_graph->model()->clearInvisible();
 	m_graph->model()->setWaveToSaw();
 	Engine::getSong()->setModified();
 }
@@ -504,7 +504,7 @@ void bitInvaderView::sawWaveClicked()
 
 void bitInvaderView::sqrWaveClicked()
 {
-	m_graph->model()->clearAll();
+	m_graph->model()->clearInvisible();
 	m_graph->model()->setWaveToSquare();
 	Engine::getSong()->setModified();
 }
@@ -514,7 +514,7 @@ void bitInvaderView::sqrWaveClicked()
 
 void bitInvaderView::noiseWaveClicked()
 {
-	m_graph->model()->clearAll();
+	m_graph->model()->clearInvisible();
 	m_graph->model()->setWaveToNoise();
 	Engine::getSong()->setModified();
 }
@@ -524,24 +524,11 @@ void bitInvaderView::noiseWaveClicked()
 
 void bitInvaderView::usrWaveClicked()
 {
-	//Clone all samples, remove them, load user waveform, and if no
-	//waveform was loaded then replace the samples with what was there before.
-	const int graphLength = m_graph->model()->length();
-	const float * shape = m_graph->model()->samples();
-	float m_samples_copy[graphLength];
-	for( int i = 0; i < graphLength; ++i )
-	{
-		m_samples_copy[i] = shape[i];
-	}
-	m_graph->model()->clearAll();
 	QString fileName = m_graph->model()->setWaveToUser();
 	ToolTip::add( m_usrWaveBtn, fileName );
-	if( fileName.isEmpty() )
+	if( !fileName.isEmpty() )
 	{
-		for( int i = 0; i < graphLength; ++i )
-		{
-			m_graph->model()->setSampleAt( i, m_samples_copy[i] );
-		}
+		m_graph->model()->clearInvisible();
 	}
 	Engine::getSong()->setModified();
 }
