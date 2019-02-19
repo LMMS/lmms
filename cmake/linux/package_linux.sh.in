@@ -175,10 +175,16 @@ rm -f "${APPDIR}/usr/lib/libwine.so.1"
 # Use system-provided carla
 rm -f "${APPDIR}usr/lib/"libcarla*.so
 
-# Move jack out of LD_LIBRARY_PATH
+# Remove bundled jack in LD_LIBRARY_PATH if exists
 if [ -e "${APPDIR}/usr/lib/libjack.so.0" ]; then
+   rm "${APPDIR}/usr/lib/libjack.so.0"
+fi
+
+# Bundle jack out of LD_LIBRARY_PATH
+JACK_LIB=$(ldd "${APPDIR}/usr/bin/lmms" | sed -n 's/\tlibjack\.so\.0 => \(.\+\) (0x[0-9a-f]\+)/\1/p')
+if [ -e "$JACK_LIB" ]; then
    mkdir -p "${APPDIR}usr/lib/lmms/optional/"
-   mv "${APPDIR}/usr/lib/libjack.so.0" "${APPDIR}usr/lib/lmms/optional/"
+   cp "$JACK_LIB" "${APPDIR}usr/lib/lmms/optional/"
 fi
 
 # Point the AppRun to the shim launcher
