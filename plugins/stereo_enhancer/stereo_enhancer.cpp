@@ -95,8 +95,8 @@ bool stereoEnhancerEffect::processAudioBuffer( sampleFrame * _buf,
 		return( false );
 	}
 
-	const float d = dryLevel();
-	const float w = wetLevel();
+	const float d [2] = {dryLevelL(),dryLevelR()};
+	const float w [2] = {wetLevelL(),wetLevelR()};
 
 	for( fpp_t f = 0; f < _frames; ++f )
 	{
@@ -122,8 +122,8 @@ bool stereoEnhancerEffect::processAudioBuffer( sampleFrame * _buf,
 
 		m_seFX.nextSample( s[0], s[1] );
 
-		_buf[f][0] = d * _buf[f][0] + w * s[0];
-		_buf[f][1] = d * _buf[f][1] + w * s[1];
+		_buf[f][0] = d[0] * _buf[f][0] + w[0] * s[0];
+		_buf[f][1] = d[1] * _buf[f][1] + w[1] * s[1];
 		out_sum += _buf[f][0]*_buf[f][0] + _buf[f][1]*_buf[f][1];
 
 		// Update currFrame

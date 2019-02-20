@@ -62,21 +62,28 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 
 	m_wetDry = new Knob( knobBright_26, this );
 	m_wetDry->setLabel( tr( "W/D" ) );
-	m_wetDry->move( 27, 5 );
+	m_wetDry->move( 25, 5 );
 	m_wetDry->setEnabled( isEnabled );
 	m_wetDry->setHintText( tr( "Wet Level:" ), "" );
 
 
+	m_pan = new Knob( knobBright_26, this );
+	m_pan->setLabel( tr( "PAN" ) );
+	m_pan->move( 56, 5 );
+	m_pan->setEnabled( isEnabled );
+	m_pan->setHintText( tr( "Panning:" ), "%" );
+
+
 	m_autoQuit = new TempoSyncKnob( knobBright_26, this );
 	m_autoQuit->setLabel( tr( "DECAY" ) );
-	m_autoQuit->move( 60, 5 );
+	m_autoQuit->move( 85, 5 );
 	m_autoQuit->setEnabled( isEnabled );
 	m_autoQuit->setHintText( tr( "Time:" ), "ms" );
 
 
 	m_gate = new Knob( knobBright_26, this );
 	m_gate->setLabel( tr( "GATE" ) );
-	m_gate->move( 93, 5 );
+	m_gate->move( 118, 5 );
 	m_gate->setEnabled( isEnabled );
 	m_gate->setHintText( tr( "Gate:" ), "" );
 
@@ -89,7 +96,7 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 									this );
 		QFont f = ctls_btn->font();
 		ctls_btn->setFont( pointSize<8>( f ) );
-		ctls_btn->setGeometry( 140, 14, 50, 20 );
+		ctls_btn->setGeometry( 152, 14, 50, 20 );
 		connect( ctls_btn, SIGNAL( clicked() ),
 					this, SLOT( editControls() ) );
 
@@ -227,6 +234,7 @@ void EffectView::modelChanged()
 {
 	m_bypass->setModel( &effect()->m_enabledModel );
 	m_wetDry->setModel( &effect()->m_wetDryModel );
+	m_pan->setModel( &effect()->m_panModel );
 	m_autoQuit->setModel( &effect()->m_autoQuitModel );
 	m_gate->setModel( &effect()->m_gateModel );
 }

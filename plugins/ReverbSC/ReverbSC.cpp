@@ -79,8 +79,8 @@ bool ReverbSCEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames )
 	}
 
 	double outSum = 0.0;
-	const float d = dryLevel();
-	const float w = wetLevel();
+	const float d [2] = {dryLevelL(),dryLevelR()};
+	const float w [2] = {wetLevelL(),wetLevelR()};
 
 	SPFLOAT tmpL, tmpR;
 	SPFLOAT dcblkL, dcblkR;
@@ -115,8 +115,8 @@ bool ReverbSCEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames )
 		sp_revsc_compute(sp, revsc, &s[0], &s[1], &tmpL, &tmpR);
 		sp_dcblock_compute(sp, dcblk[0], &tmpL, &dcblkL);
 		sp_dcblock_compute(sp, dcblk[1], &tmpR, &dcblkR);
-		buf[f][0] = d * buf[f][0] + w * dcblkL * outGain;
-		buf[f][1] = d * buf[f][1] + w * dcblkR * outGain;
+		buf[f][0] = d[0] * buf[f][0] + w[0] * dcblkL * outGain;
+		buf[f][1] = d[1] * buf[f][1] + w[1] * dcblkR * outGain;
 
 		outSum += buf[f][0]*buf[f][0] + buf[f][1]*buf[f][1];
 	}

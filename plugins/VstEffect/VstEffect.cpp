@@ -88,7 +88,8 @@ bool VstEffect::processAudioBuffer( sampleFrame * _buf, const fpp_t _frames )
 
 	if( m_plugin )
 	{
-		const float d = dryLevel();
+		const float d [2] = {dryLevelL(),dryLevelR()};
+		const float w [2] = {wetLevelL(),wetLevelR()};
 #ifdef __GNUC__
 		sampleFrame buf[_frames];
 #else
@@ -102,11 +103,10 @@ bool VstEffect::processAudioBuffer( sampleFrame * _buf, const fpp_t _frames )
 		}
 
 		double out_sum = 0.0;
-		const float w = wetLevel();
 		for( fpp_t f = 0; f < _frames; ++f )
 		{
-			_buf[f][0] = w*buf[f][0] + d*_buf[f][0];
-			_buf[f][1] = w*buf[f][1] + d*_buf[f][1];
+			_buf[f][0] = w[0]*buf[f][0] + d[0]*_buf[f][0];
+			_buf[f][1] = w[1]*buf[f][1] + d[1]*_buf[f][1];
 		}
 		for( fpp_t f = 0; f < _frames; ++f )
 		{

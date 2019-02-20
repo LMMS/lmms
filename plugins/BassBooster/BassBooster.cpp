@@ -87,8 +87,8 @@ bool BassBoosterEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames
 	const ValueBuffer *gainBuffer = m_bbControls.m_gainModel.valueBuffer();
 
 	double outSum = 0.0;
-	const float d = dryLevel();
-	const float w = wetLevel();
+	const float d [2] = {dryLevelL(),dryLevelR()};
+	const float w [2] = {wetLevelL(),wetLevelR()};
 
 	for( fpp_t f = 0; f < frames; ++f )
 	{
@@ -105,8 +105,8 @@ bool BassBoosterEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames
 		sample_t s[2] = { buf[f][0], buf[f][1] };
 		m_bbFX.nextSample( s[0], s[1] );
 
-		buf[f][0] = d * buf[f][0] + w * s[0];
-		buf[f][1] = d * buf[f][1] + w * s[1];
+		buf[f][0] = d[0] * buf[f][0] + w[0] * s[0];
+		buf[f][1] = d[1] * buf[f][1] + w[1] * s[1];
 	}
 
 	checkGate( outSum / frames );

@@ -82,6 +82,7 @@ private:
 	QPixmap m_bg;
 	LedCheckBox * m_bypass;
 	Knob * m_wetDry;
+	Knob * m_pan;
 	TempoSyncKnob * m_autoQuit;
 	Knob * m_gate;
 	QMdiSubWindow * m_subWindow;
