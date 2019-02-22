@@ -61,8 +61,6 @@ sync_version() {
 
 	sed "1 s/@VERSION@/$VERSION/" -i debian/changelog
 	echo Set Debian version to $VERSION
-# temporary
-head debian/changelog
 }
 
 sync_version
