@@ -13,4 +13,4 @@ make -j4
 make tests
 ./tests/tests
 
-make package
+sudo make package
