@@ -12,3 +12,5 @@ cmake $CMAKE_FLAGS -DUSE_WERROR=OFF ..
 make -j4
 make tests
 ./tests/tests
+
+make package
