@@ -321,7 +321,7 @@ void SongEditor::keyPressEvent( QKeyEvent * ke )
 	}
 	else if(/* _ke->modifiers() & Qt::ShiftModifier &&*/
 			gui->mainWindow()->isShiftPressed() == true &&
-						ke->key() == Qt::Key_Delete )
+						( ke->key() == Qt::Key_Delete || ke->key() == Qt::Key_Backspace ) )
 	{
 		m_song->removeBar();
 	}
