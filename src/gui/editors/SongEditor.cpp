@@ -315,7 +315,7 @@ void SongEditor::keyPressEvent( QKeyEvent * ke )
 {
 	if( /*_ke->modifiers() & Qt::ShiftModifier*/
 		gui->mainWindow()->isShiftPressed() == true &&
-						ke->key() == Qt::Key_Insert )
+						( ke->key() == Qt::Key_Insert || ke->key() == Qt::Key_Enter || ke->key() == Qt::Key_Return ) )
 	{
 		m_song->insertBar();
 	}
