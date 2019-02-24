@@ -100,6 +100,8 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 							"disablebackup" ).toInt() ),
 	m_openLastProject( ConfigManager::inst()->value( "app",
 							"openlastproject" ).toInt() ),
+	m_NaNHandler( ConfigManager::inst()->value( "app",
+							"nanhandler", "1" ).toInt() ),
 	m_hqAudioDev( ConfigManager::inst()->value( "mixer",
 							"hqaudio" ).toInt() ),
 	m_lang( ConfigManager::inst()->value( "app",
@@ -128,7 +130,7 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 	m_compactTrackButtons( ConfigManager::inst()->value( "ui",
 					"compacttrackbuttons" ).toInt() ),
 	m_syncVSTPlugins( ConfigManager::inst()->value( "ui",
-							"syncvstplugins" ).toInt() ),
+							"syncvstplugins", "1" ).toInt() ),
 	m_animateAFP(ConfigManager::inst()->value( "ui",
 						   "animateafp", "1" ).toInt() ),
 	m_printNoteLabels(ConfigManager::inst()->value( "ui",
@@ -136,7 +138,7 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 	m_displayWaveform(ConfigManager::inst()->value( "ui",
 						   "displaywaveform").toInt() ),
 	m_disableAutoQuit(ConfigManager::inst()->value( "ui",
-						   "disableautoquit").toInt() ),
+						   "disableautoquit", "1" ).toInt() ),
 	m_vstEmbedMethod( ConfigManager::inst()->vstEmbedMethod() )
 {
 	setWindowIcon( embed::getIconPixmap( "setup_general" ) );
@@ -246,6 +248,15 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 		m_openLastProject, SLOT(toggleOpenLastProject(bool)));
 
 	misc_tw->setFixedHeight( YDelta*labelNumber + HeaderSize );
+
+	// Advanced setting, hidden for now
+	if( false )
+	{
+		LedCheckBox * useNaNHandler = new LedCheckBox(
+				tr( "Use built-in NaN handler" ),
+								misc_tw );
+		useNaNHandler->setChecked( m_NaNHandler );
+	}
 
 	TabWidget* embed_tw = new TabWidget( tr( "PLUGIN EMBEDDING" ), general);
 	embed_tw->setFixedHeight( 48 );
@@ -815,6 +826,8 @@ void SetupDialog::accept()
 					QString::number( !m_disableBackup ) );
 	ConfigManager::inst()->setValue( "app", "openlastproject",
 					QString::number( m_openLastProject ) );
+	ConfigManager::inst()->setValue( "app", "nanhandler",
+					QString::number( m_NaNHandler ) );
 	ConfigManager::inst()->setValue( "mixer", "hqaudio",
 					QString::number( m_hqAudioDev ) );
 	ConfigManager::inst()->setValue( "ui", "smoothscroll",

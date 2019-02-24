@@ -77,6 +77,7 @@ public:
 	}
 
 	static jo_id_t idToSave( jo_id_t id );
+	static jo_id_t idFromSave( jo_id_t id );
 
 	void clearJournal();
 	void stopAllJournalling();

@@ -42,14 +42,7 @@ public:
 
 	virtual void play( sampleFrame * _working_buffer )
 	{
-		// if the instrument is midi-based, we can safely render right away
-		if( m_instrument->flags() & Instrument::IsMidiBased )
-		{
-			m_instrument->play( _working_buffer );
-			return;
-		}
-		
-		// if not, we need to ensure that all our nph's have been processed first
+		// ensure that all our nph's have been processed first
 		ConstNotePlayHandleList nphv = NotePlayHandle::nphsOfInstrumentTrack( m_instrument->instrumentTrack(), true );
 		
 		bool nphsLeft;

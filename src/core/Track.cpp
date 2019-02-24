@@ -909,10 +909,18 @@ void TrackContentObjectView::mouseMoveEvent( QMouseEvent * me )
 	else if( m_action == MoveSelection )
 	{
 		const int dx = me->x() - m_initialMousePos.x();
+		const bool snap = !(me->modifiers() & Qt::ControlModifier) &&
+					me->button() == Qt::NoButton;
 		QVector<selectableObject *> so =
 			m_trackView->trackContainerView()->selectedObjects();
 		QVector<TrackContentObject *> tcos;
-		MidiTime smallest_pos, t;
+		int smallestPos = 0;
+		MidiTime dtick = MidiTime( static_cast<int>( dx *
+					MidiTime::ticksPerTact() / ppt ) );
+		if( snap )
+		{
+			dtick = dtick.toNearestTact();
+		}
 		// find out smallest position of all selected objects for not
 		// moving an object before zero
 		for( QVector<selectableObject *>::iterator it = so.begin();
@@ -926,23 +934,18 @@ void TrackContentObjectView::mouseMoveEvent( QMouseEvent * me )
 			}
 			TrackContentObject * tco = tcov->m_tco;
 			tcos.push_back( tco );
-			smallest_pos = qMin<int>( smallest_pos,
-					(int)tco->startPosition() +
-				static_cast<int>( dx *
-					MidiTime::ticksPerTact() / ppt ) );
+			smallestPos = qMin<int>( smallestPos,
+					(int)tco->startPosition() + dtick );
+		}
+		dtick -= smallestPos;
+		if( snap )
+		{
+			dtick = dtick.toAbsoluteTact(); // round toward 0
 		}
 		for( QVector<TrackContentObject *>::iterator it = tcos.begin();
 							it != tcos.end(); ++it )
 		{
-			t = ( *it )->startPosition() +
-				static_cast<int>( dx *MidiTime::ticksPerTact() /
-					 ppt )-smallest_pos;
-			if( ! ( me->modifiers() & Qt::ControlModifier )
-					   && me->button() == Qt::NoButton )
-			{
-				t = t.toNearestTact();
-			}
-			( *it )->movePosition( t );
+			( *it )->movePosition( ( *it )->startPosition() + dtick );
 		}
 	}
 	else if( m_action == Resize || m_action == ResizeLeft )
