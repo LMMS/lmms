@@ -7,10 +7,11 @@ if [ $QT5 ]; then
 	source /opt/qt59/bin/qt59-env.sh
 fi
 
-cmake -DUSE_WERROR=ON $CMAKE_FLAGS ..
+cmake -DCMAKE_INSTALL_PREFIX=../target/ -DUSE_WERROR=ON $CMAKE_FLAGS ..
 
 make -j4
 make tests
 ./tests/tests
 
-sudo make package
+make install
+make appimage

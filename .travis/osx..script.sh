@@ -7,11 +7,11 @@ if [ $QT5 ]; then
         export CMAKE_PREFIX_PATH="$(brew --prefix qt5)"
 fi
 
-cmake $CMAKE_FLAGS -DUSE_WERROR=OFF ..
+cmake -DCMAKE_INSTALL_PREFIX=../target/ $CMAKE_FLAGS -DUSE_WERROR=OFF ..
 
 make -j4
 make tests
 ./tests/tests
 
-# TODO
-#sudo make package
+make install
+make dmg
