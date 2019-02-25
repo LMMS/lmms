@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -e
 
-CACHE_DIR=$TRAVIS_BUILD_DIR/apt_mingw_cache/$1
+CACHE_DIR=$HOME/apt_mingw_cache/$1
 mkdir -p $CACHE_DIR
 
 pushd $CACHE_DIR
