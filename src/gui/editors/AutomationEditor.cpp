@@ -404,6 +404,7 @@ void AutomationEditor::keyPressEvent(QKeyEvent * ke )
 			}
 			break;
 
+		case Qt::Key_Backspace:
 		case Qt::Key_Delete:
 			deleteSelectedValues();
 			ke->accept();

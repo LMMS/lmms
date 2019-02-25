@@ -1184,6 +1184,7 @@ void PianoRoll::keyPressEvent(QKeyEvent* ke )
 			clearSelectedNotes();
 			break;
 
+		case Qt::Key_Backspace:
 		case Qt::Key_Delete:
 			deleteSelectedNotes();
 			ke->accept();
