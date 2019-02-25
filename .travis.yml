@@ -35,8 +35,6 @@ script:
     - . ${TRAVIS_BUILD_DIR}/.travis/${TRAVIS_OS_NAME}.${TARGET_OS}.script.sh
 after_script:
     - ccache -s
-before_deploy:
-    - if [ "$TARGET_OS" != debian-sid ]; then make package; fi
 deploy:
     provider: releases
     api_key:
