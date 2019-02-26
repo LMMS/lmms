@@ -186,12 +186,13 @@ void vestigeInstrument::loadSettings( const QDomElement & _this )
 	if( m_plugin != NULL )
 	{
 		m_plugin->loadSettings( _this );
-
-		if ( _this.attribute( "guivisible" ).toInt() ) {
-			m_plugin->showUI();
-		} else {
-			m_plugin->hideUI();
-		}
+		//SPEK Attempted to never show VSTs on load by skipping this, no dice
+		//if ( _this.attribute( "guivisible" ).toInt() ) {
+			//SPEK Attempted to never show VSTs on load by skipping this, no dice
+			//m_plugin->showUI();
+		//} else {
+		//	m_plugin->hideUI();
+		//}
 
 		const QMap<QString, QString> & dump = m_plugin->parameterDump();
 		paramCount = dump.size();
@@ -328,13 +329,14 @@ void vestigeInstrument::loadFile( const QString & _file )
 	}
 	m_pluginDLL = SampleBuffer::tryToMakeRelative( _file );
 	TextFloat * tf = NULL;
-	if( gui )
-	{
-		tf = TextFloat::displayMessage(
-				tr( "Loading plugin" ),
-				tr( "Please wait while loading VST-plugin..." ),
-				PLUGIN_NAME::getIconPixmap( "logo", 24, 24 ), 0 );
-	}
+	// SPEK
+	//if( gui ) // && NotLoading
+	// {
+	// 	tf = TextFloat::displayMessage(
+	// 			tr( "Loading plugin" ),
+	// 			tr( "Please wait while loading VST-plugin..." ),
+	// 			PLUGIN_NAME::getIconPixmap( "logo", 24, 24 ), 0 );
+	// }
 
 	m_pluginMutex.lock();
 	m_plugin = new VstInstrumentPlugin( m_pluginDLL );
@@ -347,9 +349,10 @@ void vestigeInstrument::loadFile( const QString & _file )
 		m_pluginDLL = "";
 		return;
 	}
-
-	m_plugin->createUI(nullptr);
-	m_plugin->showUI();
+	//SPEK
+	//m_plugin->createUI(nullptr);
+	//SPEK If this is skipped on project load, VST UIs won't flash onscreen during loading
+	//m_plugin->showUI();
 
 	if( set_ch_name )
 	{
@@ -358,7 +361,8 @@ void vestigeInstrument::loadFile( const QString & _file )
 
 	m_pluginMutex.unlock();
 
-	emit dataChanged();
+	//SPEK what if we skip this until loading is done?
+	//emit dataChanged();
 
 	delete tf;
 }
@@ -1214,7 +1218,3 @@ Plugin * PLUGIN_EXPORT lmms_plugin_main( Model *, void * _data )
 
 
 }
-
-
-
-
