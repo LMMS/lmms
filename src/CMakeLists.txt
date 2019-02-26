@@ -308,17 +308,14 @@ ELSE(NOT MSVC)
 					"${VCPKG_ROOT}/bin/zlib1.dll"
 					"${VCPKG_ROOT}/bin/jpeg62.dll"
 					"${VCPKG_ROOT}/bin/libpng16.dll"
-					"${VCPKG_ROOT}/bin/gthread-2.dll"
-					"${VCPKG_ROOT}/bin/glib-2.dll"
 					"${VCPKG_ROOT}/bin/harfbuzz.dll"
 					"${VCPKG_ROOT}/bin/pcre2-16.dll"
 					"${VCPKG_ROOT}/bin/double-conversion.dll"
 					"${VCPKG_ROOT}/bin/freetype.dll"
-					"${VCPKG_ROOT}/bin/libbz2.dll"
+					"${VCPKG_ROOT}/bin/bz2.dll"
 					"${VCPKG_ROOT}/bin/pcre.dll"
 					"${VCPKG_ROOT}/bin/libiconv.dll"
 					"${VCPKG_ROOT}/bin/libcharset.dll"
-					"${VCPKG_ROOT}/bin/libintl.dll"
 				DESTINATION .)
 		
 		INSTALL(FILES
