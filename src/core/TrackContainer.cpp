@@ -101,7 +101,7 @@ void TrackContainer::loadSettings( const QDomElement & _this )
 			pd->show();
 		}
 	}
-	//SPEK Don't force LMMS to foreground while loading
+	//Don't force LMMS to foreground while loading
 	pd->setAttribute(Qt::WA_ShowWithoutActivating);
 
 	QDomNode node = _this.firstChild();
