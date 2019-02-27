@@ -23,6 +23,9 @@
  */
 
 #include "MixHelpers.h"
+
+#include <cstdio>
+
 #include "lmms_math.h"
 #include "ValueBuffer.h"
 
