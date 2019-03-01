@@ -341,7 +341,7 @@ public:
 		}
 	}
 
-	bool canPasteSelection( MidiTime tcoPos, const QMimeData * mimeData );
+	bool canPasteSelection( MidiTime tcoPos, const QDropEvent *de );
 	bool pasteSelection( MidiTime tcoPos, QDropEvent * de );
 
 	MidiTime endPosition( const MidiTime & posStart );
