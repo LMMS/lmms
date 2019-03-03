@@ -76,10 +76,10 @@ private slots:
 private:
 	struct VstSyncData
 	{
-		bool isPlaying;
 		double ppqPos;
 		int timeSigNumer;
 		int timeSigDenom;
+		bool isPlaying;
 		bool isCycle;
 		bool hasSHM;
 		float cycleStart;
