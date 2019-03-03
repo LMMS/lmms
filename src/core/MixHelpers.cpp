@@ -26,6 +26,8 @@
 #include "lmms_math.h"
 #include "ValueBuffer.h"
 
+#include <cstdio>
+
 
 static bool s_NaNHandler;
 
