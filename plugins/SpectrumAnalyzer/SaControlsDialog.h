@@ -1,7 +1,8 @@
 /*
- * SpectrumAnalyzerControlDialog.h - view for spectrum analyzer
+ * SaControlsDialog.h - declatation of SaControlsDialog class.
  *
- * Copyright (c) 2008-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2014 David French <dave/dot/french3/at/googlemail/dot/com>
+ * Copyright (c) 2019 Martin Pavelek <he29/dot/HS/at/gmail/dot/com>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -22,32 +23,26 @@
  *
  */
 
-#ifndef _SPECTRUM_ANALYZER_CONTROL_DIALOG_H
-#define _SPECTRUM_ANALYZER_CONTROL_DIALOG_H
+#ifndef SACONTROLSDIALOG_H
+#define SACONTROLSDIALOG_H
+
+#include <QLabel>
+#include <QPushButton>
 
 #include "EffectControlDialog.h"
 
+class BoolModel;
+class SaControls;
 
-class SpectrumAnalyzerControls;
-
-
-class SpectrumAnalyzerControlDialog : public EffectControlDialog
+class SaControlsDialog : public EffectControlDialog
 {
 	Q_OBJECT
 public:
-	SpectrumAnalyzerControlDialog( SpectrumAnalyzerControls* controls );
-	virtual ~SpectrumAnalyzerControlDialog()
-	{
-	}
+	SaControlsDialog(SaControls * controls);
+	virtual ~SaControlsDialog() {}
 
 private:
-	virtual void paintEvent( QPaintEvent* event );
+	SaControls * m_controls;
+};
 
-	SpectrumAnalyzerControls* m_controls;
-
-	QPixmap m_logXAxis;
-	QPixmap m_logYAxis;
-
-} ;
-
-#endif
+#endif // SACONTROLSDIALOG_H
