@@ -300,6 +300,7 @@ int main( int argc, char * * argv )
 	bool allowRoot = false;
 	bool renderLoop = false;
 	bool renderTracks = false;
+	bool disconnectMidiControllers = false;
 	QString fileToLoad, fileToImport, renderOut, profilerOutputFile, configFile;
 
 	// first of two command-line parsing stages
@@ -673,6 +674,10 @@ int main( int argc, char * * argv )
 
 			configFile = QString::fromLocal8Bit( argv[i] );
 		}
+		else if( arg == "--disconnect-midi-controllers" )
+		{
+			disconnectMidiControllers = true;
+		}
 		else
 		{
 			if( argv[i][0] == '-' )
@@ -922,6 +927,7 @@ int main( int argc, char * * argv )
 			}
 			else
 			{
+				Engine::getSong()->setDisconnectMidiControllersOnLoad( disconnectMidiControllers );
 				Engine::getSong()->loadProject( fileToLoad );
 			}
 		}
