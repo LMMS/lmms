@@ -127,6 +127,8 @@ void printHelp()
 		"      --allowroot                Bypass root user startup check (use with\n"
 		"          caution).\n"
 		"  -c, --config <configfile>      Get the configuration from <configfile>\n"
+		"      --disconnect-midi-controllers\n"
+		"                                 Disconnect all MIDI inputs and controllers.\n"
 		"  -h, --help                     Show this usage information and exit.\n"
 		"  -v, --version                  Show version information and exit.\n"
 		"\nOptions if no action is given:\n"
