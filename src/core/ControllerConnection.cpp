@@ -198,9 +198,19 @@ void ControllerConnection::saveSettings( QDomDocument & _doc, QDomElement & _thi
 void ControllerConnection::loadSettings( const QDomElement & _this )
 {
 	QDomNode node = _this.firstChild();
+
+	bool disconnectMidiControllers = Engine::getSong()->getDisconnectMidiControllersOnLoad();
+
 	if( !node.isNull() )
 	{
-		setController( Controller::create( node.toElement(), Engine::getSong() ) );
+		if ( disconnectMidiControllers )
+		{
+			deleteConnection();
+		}
+		else
+		{
+			setController( Controller::create( node.toElement(), Engine::getSong() ) );
+		}
 	}
 	else
 	{
