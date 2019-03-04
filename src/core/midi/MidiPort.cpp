@@ -235,7 +235,9 @@ void MidiPort::loadSettings( const QDomElement& thisElement )
 
 	// restore connections
 
-	if( isInputEnabled() )
+	bool disconnectMidiControllers = Engine::getSong()->getDisconnectMidiControllersOnLoad();
+
+	if( isInputEnabled() && !disconnectMidiControllers )
 	{
 		QStringList rp = thisElement.attribute( "inports" ).split( ',' );
 		for( Map::ConstIterator it = m_readablePorts.begin(); it != m_readablePorts.end(); ++it )
