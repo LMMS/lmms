@@ -265,6 +265,16 @@ public:
 		return false;
 	}
 
+	inline void setDisconnectMidiControllersOnLoad( bool val )
+	{
+		m_disconnectMidiControllersOnLoad = val;
+	}
+
+	inline bool getDisconnectMidiControllersOnLoad()
+	{
+		return m_disconnectMidiControllersOnLoad;
+	}
+
 	void addController( Controller * c );
 	void removeController( Controller * c );
 	
@@ -377,6 +387,8 @@ private:
 	volatile bool m_renderBetweenMarkers;
 	volatile bool m_playing;
 	volatile bool m_paused;
+
+	bool m_disconnectMidiControllersOnLoad;
 
 	bool m_loadingProject;
 	bool m_isCancelled;
