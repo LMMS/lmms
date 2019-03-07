@@ -524,8 +524,9 @@ void ConfigManager::loadConfigFile( const QString & configFile )
 		cfg_file.close();
 	}
 
-
+	// Plugins are searched recursively, blacklist problematic locations
 	if( m_vstDir.isEmpty() || m_vstDir == QDir::separator() || m_vstDir == "/" ||
+			m_vstDir == ensureTrailingSlash( QDir::homePath() ) ||
 			!QDir( m_vstDir ).exists() )
 	{
 #ifdef LMMS_BUILD_WIN32
