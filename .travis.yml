@@ -21,6 +21,8 @@ matrix:
           osx_image: xcode8.2
           env: QT5=True
         - env: TARGET_OS=debian-sid TARGET_DEPLOY=True
+          git:
+              depth: false
         - env: TARGET_OS=debian-sid TARGET_ARCH=i386
         - compiler: clang
           env: TARGET_OS=debian-sid
