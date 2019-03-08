@@ -53,7 +53,8 @@ Plugin::Descriptor PLUGIN_EXPORT analyzer_plugin_descriptor =
 
 Analyzer::Analyzer(Model *parent, const Plugin::Descriptor::SubPluginFeatures::Key *key) :
 	Effect(&analyzer_plugin_descriptor, parent, key),
-	m_saControls(this)
+	m_controls(this),
+	m_processor(&m_controls)
 {
 }
 
@@ -65,25 +66,19 @@ Analyzer::~Analyzer()
 
 bool Analyzer::processAudioBuffer(sampleFrame *buf, const fpp_t frames)
 {
-	// extract control values
-	bool mode_stereo = m_saControls.m_stereo.value();
-	bool mode_waterfall = m_saControls.m_waterfall.value();
-	bool mode_log_x = m_saControls.m_log_x.value();
-	bool mode_log_y = m_saControls.m_log_y.value();
-
 	if (!isEnabled() || !isRunning ()) {
 		return false;
 	}
 
-	m_saControls.m_inProgress = true;
+	m_controls.m_inProgress = true;
 
-	if (m_saControls.isViewVisible()) {
-		m_saControls.m_fftBands.analyse(buf, frames, mode_stereo);
+	if (m_controls.isViewVisible()) {
+		m_processor.analyse(buf, frames);
 	} else {
-		m_saControls.m_fftBands.clear();
+		m_processor.clear();
 	}
 
-	m_saControls.m_inProgress = false;
+	m_controls.m_inProgress = false;
 	return isRunning();
 }
 

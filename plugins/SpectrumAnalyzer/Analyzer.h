@@ -25,10 +25,11 @@
 #ifndef ANALYZER_H
 #define ANALYZER_H
 
-#include "BasicFilters.h"
 #include "Effect.h"
-#include "SaControls.h"
 #include "lmms_math.h"
+
+#include "SaControls.h"
+#include "SaSpectrumView.h"
 
 class Analyzer : public Effect
 {
@@ -37,11 +38,13 @@ public:
 	virtual ~Analyzer();
 	virtual bool processAudioBuffer(sampleFrame * buf, const fpp_t frames);
 	virtual EffectControls * controls()	{
-		return &m_saControls;
+		return &m_controls;
 	}
+	SaProcessor * getProcessor() {return &m_processor;}
 
 private:
-	SaControls m_saControls;
+	SaControls m_controls;
+	SaProcessor m_processor;
 };
 
 #endif // ANALYZER_H

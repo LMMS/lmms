@@ -26,60 +26,25 @@
 
 #include <QPainter>
 #include <QWidget>
+#include <QString>
+#include <vector>
+#include <utility>
+#include <string>
+#include <algorithm>
+
+#include "SaControls.h"
+#include "SaProcessor.h"
 
 #include "fft_helpers.h"
 #include "lmms_basics.h"
 #include "lmms_math.h"
 
 
-const int MAX_BANDS = 2048;
-class SaProcessor
-{
-public:
-	SaProcessor();
-	virtual ~SaProcessor();
-
-	float m_bands_l[MAX_BANDS];
-	float m_bands_r[MAX_BANDS];
-	bool getInProgress();
-	void clear();
-
-	void analyse(sampleFrame *buf, const fpp_t frames, bool stereo);
-
-	float getEnergyL() const;
-	float getEnergyR() const;
-	int getSampleRate() const;
-	bool getActive() const;
-	bool getStereo() const;
-
-	void setActive(bool active);
-
-private:
-	fftwf_plan m_fftPlan_l;
-	fftwf_plan m_fftPlan_r;
-	float m_buffer_l[FFT_BUFFER_SIZE*2];
-	float m_buffer_r[FFT_BUFFER_SIZE*2];
-	fftwf_complex * m_spectrum_l;
-	fftwf_complex * m_spectrum_r;
-	float m_absSpectrum_l[FFT_BUFFER_SIZE+1];
-	float m_absSpectrum_r[FFT_BUFFER_SIZE+1];
-
-	int m_framesFilledUp;
-	float m_energy_l;
-	float m_energy_r;
-	int m_sampleRate;
-	bool m_active;
-	bool m_mode_stereo;
-	bool m_inProgress;
-	float m_fftWindow[FFT_BUFFER_SIZE];
-};
-
-
 class SaSpectrumView : public QWidget
 {
 	Q_OBJECT
 public:
-	explicit SaSpectrumView(SaProcessor *b, QWidget *_parent = 0);
+	explicit SaSpectrumView(SaControls *controls, SaProcessor *processor, QWidget *_parent = 0);
 	virtual ~SaSpectrumView(){}
 
 	QColor getColor() const;
@@ -87,6 +52,8 @@ public:
 	float freqToXPixel(float freq, int w);
 	float gainToYPixel(float gain, int h, float pixelPerUnitHeight);
 
+	std::vector<std::pair<int, std::string>> makeLogTics(int low, int high);
+	std::vector<std::pair<int, std::string>> makeLinearTics(int low, int high);
 
 protected:
 	virtual void paintEvent(QPaintEvent *event);
@@ -95,16 +62,23 @@ private slots:
 	void periodicalUpdate();
 
 private:
-	QColor m_color_l;
-	QColor m_color_r;
-	QColor m_color_mono;
+	SaControls *m_controls;
 	SaProcessor *m_processor;
-	QPainterPath m_path_l;
-	QPainterPath m_path_r;
+
+	QColor m_colorL;
+	QColor m_colorR;
+	QColor m_colorMono;
+	QColor m_colorBG;
+	QColor m_colorGrid;
+	QColor m_colorLabels;
+
+	QPainterPath m_pathL;
+	QPainterPath m_pathR;
+
+	std::vector<std::pair<int, std::string>> m_logTics;
+	std::vector<std::pair<int, std::string>> m_linearTics;
+
 	float m_decaySum;
-	float m_pixelsPerUnitWidth;
-	float m_scale;
-	int m_skipBands;
 	bool m_periodicalUpdate;
 	QList<float> m_bandHeight;
 

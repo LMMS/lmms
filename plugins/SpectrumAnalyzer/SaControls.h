@@ -27,10 +27,13 @@
 #define SACONTROLS_H
 
 #include "EffectControls.h"
-#include "SaSpectrumView.h"
 
 
 class Analyzer;
+
+// FIXME: move this somewhere appropriate
+const int MAX_BANDS = 2048;
+const int LOWEST_FREQ = 10;		// arbitrary low frequency limit for log. scale (>0)
 
 class SaControls : public EffectControls
 {
@@ -42,7 +45,6 @@ public:
 	}
 
 	virtual void saveSettings (QDomDocument& doc, QDomElement& parent);
-
 	virtual void loadSettings (const QDomElement &_this);
 
 	inline virtual QString nodeName() const
@@ -52,26 +54,26 @@ public:
 
 	virtual int controlCount()
 	{
-		return 5;
+		return 7;
 	}
 
 	virtual EffectControlDialog* createView();
 
-	SaProcessor m_fftBands;
-
 	bool m_inProgress;
-	bool visible();
 
 private:
 	Analyzer *m_effect;
 
-	BoolModel m_stereo;
-	BoolModel m_smooth;
-	BoolModel m_waterfall;
-	BoolModel m_log_x;
-	BoolModel m_log_y;
+	BoolModel m_stereoModel;
+	BoolModel m_smoothModel;
+	BoolModel m_waterfallModel;
+	BoolModel m_logXModel;
+	BoolModel m_logYModel;
+	BoolModel m_peakHoldModel;
+	BoolModel m_refFreezeModel;
 
 	friend class SaControlsDialog;
-	friend class Analyzer;
+	friend class SaSpectrumView;
+	friend class SaProcessor;
 };
 #endif // SACONTROLS_H

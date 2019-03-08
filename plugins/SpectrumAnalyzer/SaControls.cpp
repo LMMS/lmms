@@ -35,36 +35,41 @@ SaControls::SaControls(Analyzer *effect) :
 	EffectControls(effect),
 	m_effect(effect),
 
-	m_stereo(true, this, tr("Display stereo channels separately")),
-	m_smooth(false, this, tr("Smooth graph decay")),
-	m_waterfall(false, this, tr("Display waterfall diagram")),
-	m_log_x(true, this, tr("Logarithmic X axis scale")),
-	m_log_y(false, this, tr("Logarithmic Y axis scale" ))
+	m_stereoModel(true, this, tr("Display stereo channels separately")),
+	m_smoothModel(false, this, tr("Smooth graph decay")),
+	m_waterfallModel(false, this, tr("Display waterfall diagram")),
+	m_logXModel(true, this, tr("Logarithmic X axis scale")),
+	m_logYModel(true, this, tr("Logarithmic Y axis scale")),
+	m_peakHoldModel(false, this, tr("Keep the peak values displayed")),
+	m_refFreezeModel(false, this, tr("Freeze current input as a reference")),
+
+	m_inProgress(false)
 {
-	m_inProgress = false;
 }
 
 
 void SaControls::loadSettings(const QDomElement &_this)
 {
-	m_stereo.loadSettings(_this, "Stereo");
-	m_smooth.loadSettings(_this, "Smooth");
-	m_waterfall.loadSettings(_this, "Waterfall");
-	m_log_x.loadSettings(_this, "LogX");
-	m_log_y.loadSettings(_this, "LogY");
+	m_stereoModel.loadSettings(_this, "Stereo");
+	m_smoothModel.loadSettings(_this, "Smooth");
+	m_waterfallModel.loadSettings(_this, "Waterfall");
+	m_logXModel.loadSettings(_this, "LogX");
+	m_logYModel.loadSettings(_this, "LogY");
+	m_peakHoldModel.loadSettings(_this, "PeakHold");
 }
 
 EffectControlDialog* SaControls::createView()
 {
-	return new SaControlsDialog(this);
+	return new SaControlsDialog(this, m_effect->getProcessor());
 }
 
 
 void SaControls::saveSettings(QDomDocument &doc, QDomElement &parent)
 {
-	m_stereo.saveSettings(doc, parent, "Stereo");
-	m_smooth.saveSettings(doc, parent, "Smooth");
-	m_waterfall.saveSettings(doc, parent, "Waterfall");
-	m_log_x.saveSettings(doc, parent, "LogX");
-	m_log_y.saveSettings(doc, parent, "LogY");
+	m_stereoModel.saveSettings(doc, parent, "Stereo");
+	m_smoothModel.saveSettings(doc, parent, "Smooth");
+	m_waterfallModel.saveSettings(doc, parent, "Waterfall");
+	m_logXModel.saveSettings(doc, parent, "LogX");
+	m_logYModel.saveSettings(doc, parent, "LogY");
+	m_peakHoldModel.saveSettings(doc, parent, "PeakHold");
 }

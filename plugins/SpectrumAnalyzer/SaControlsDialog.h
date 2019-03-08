@@ -30,6 +30,8 @@
 #include <QPushButton>
 
 #include "EffectControlDialog.h"
+#include "SaSpectrumView.h"
+
 
 class BoolModel;
 class SaControls;
@@ -38,8 +40,10 @@ class SaControlsDialog : public EffectControlDialog
 {
 	Q_OBJECT
 public:
-	SaControlsDialog(SaControls * controls);
+	SaControlsDialog(SaControls *controls, SaProcessor *processor);
 	virtual ~SaControlsDialog() {}
+
+	virtual bool isResizable() const {return true;}
 
 private:
 	SaControls * m_controls;
