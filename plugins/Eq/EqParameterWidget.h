@@ -91,5 +91,6 @@ private:
 private slots:
 	void updateModels();
 	void updateHandle();
+	void updateOversample();
 };
 #endif // EQPARAMETERWIDGET_H
