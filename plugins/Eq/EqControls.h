@@ -56,6 +56,11 @@ public:
 
 	virtual EffectControlDialog* createView();
 
+	virtual BoolModel * getOversampleModel()
+	{
+		return &m_oversampleModel;
+	}
+
 	float m_inPeakL;
 	float m_inPeakR;
 	float m_outPeakL;
@@ -126,7 +131,10 @@ private:
 	BoolModel m_analyseInModel;
 	BoolModel m_analyseOutModel;
 
+	BoolModel m_oversampleModel;
+
 	friend class EqControlsDialog;
 	friend class EqEffect;
+	friend class EqCurve;
 };
 #endif // EQCONTROLS_H
