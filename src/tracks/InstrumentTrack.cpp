@@ -673,7 +673,7 @@ bool InstrumentTrack::play( const MidiTime & _start, const fpp_t _frames,
 
 		if( cur_start > 0 )
 		{
-			// skip notes which are posated before start-tact
+			// skip notes which are posated before start-bar
 			while( nit != notes.end() && ( *nit )->pos() < cur_start )
 			{
 				++nit;

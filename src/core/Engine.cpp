@@ -109,7 +109,7 @@ void LmmsCore::destroy()
 void LmmsCore::updateFramesPerTick()
 {
 	s_framesPerTick = s_mixer->processingSampleRate() * 60.0f * 4 /
-				DefaultTicksPerTact / s_song->getTempo();
+				DefaultTicksPerBar / s_song->getTempo();
 }
 
 LmmsCore * LmmsCore::s_instanceOfMe = NULL;

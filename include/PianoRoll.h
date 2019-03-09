@@ -380,7 +380,7 @@ private:
 
 	int m_oldNotesEditHeight;
 	int m_notesEditHeight;
-	int m_ppt;  // pixels per tact
+	int m_ppb;  // pixels per bar
 	int m_totalKeysToScroll;
 
 	// remember these values to use them

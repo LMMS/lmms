@@ -48,8 +48,8 @@ public:
 		return "bbtrackcontainer";
 	}
 
-	tact_t lengthOfBB( int _bb ) const;
-	inline tact_t lengthOfCurrentBB()
+	bar_t lengthOfBB( int _bb ) const;
+	inline bar_t lengthOfCurrentBB()
 	{
 		return lengthOfBB( currentBB() );
 	}
