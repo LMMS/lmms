@@ -208,6 +208,14 @@ EqControlsDialog::EqControlsDialog( EqControls *controls ) :
 	hpBtnGrp->addButton( hp24Button );
 	hpBtnGrp->addButton( hp48Button );
 	hpBtnGrp->setModel( &m_controls->m_hpTypeModel,false);
+
+	//Oversample
+	PixmapButton * oversampleButton = new PixmapButton( this, NULL );
+	oversampleButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "oversampleon" ) );
+	oversampleButton->setInactiveGraphic(  PLUGIN_NAME::getIconPixmap( "oversampleoff" ) );
+	oversampleButton->setCheckable(true);
+	oversampleButton->setModel( &controls->m_oversampleModel );
+	oversampleButton->move( 102, 243 );
 }
 
 
