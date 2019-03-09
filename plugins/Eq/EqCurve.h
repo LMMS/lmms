@@ -78,6 +78,7 @@ public:
 	void setlp12();
 	void setlp24();
 	void setlp48();
+	bool oversample = false;
 
 signals:
 	void positionChanged();
