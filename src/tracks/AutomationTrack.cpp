@@ -121,9 +121,9 @@ void AutomationTrackView::dropEvent( QDropEvent * _de )
 							currentPosition() +
 				( _de->pos().x() -
 					getTrackContentWidget()->x() ) *
-						MidiTime::ticksPerTact() /
-		static_cast<int>( trackContainerView()->pixelsPerTact() ) )
-				.toAbsoluteTact();
+						MidiTime::ticksPerBar() /
+		static_cast<int>( trackContainerView()->pixelsPerBar() ) )
+				.toAbsoluteBar();
 
 			if( pos.getTicks() < 0 )
 			{

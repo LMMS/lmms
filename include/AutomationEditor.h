@@ -176,8 +176,8 @@ private:
 	static const int TOP_MARGIN = 16;
 
 	static const int DEFAULT_Y_DELTA = 6;
-	static const int DEFAULT_STEPS_PER_TACT = 16;
-	static const int DEFAULT_PPT = 12 * DEFAULT_STEPS_PER_TACT;
+	static const int DEFAULT_STEPS_PER_BAR = 16;
+	static const int DEFAULT_PPB = 12 * DEFAULT_STEPS_PER_BAR;
 
 	static const int VALUES_WIDTH = 64;
 
@@ -230,7 +230,7 @@ private:
 	float m_drawLastLevel;
 	tick_t m_drawLastTick;
 
-	int m_ppt;
+	int m_ppb;
 	int m_y_delta;
 	bool m_y_auto;
 
