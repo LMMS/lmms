@@ -2565,6 +2565,9 @@ void AutomationEditorWindow::dropEvent( QDropEvent *_de )
 
 void AutomationEditorWindow::dragEnterEvent( QDragEnterEvent *_dee )
 {
+	if (! m_editor->validPattern() ) {
+		return;
+	}
 	StringPairDrag::processDragEnterEvent( _dee, "automatable_model" );
 }
 
