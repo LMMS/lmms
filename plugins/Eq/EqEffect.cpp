@@ -71,7 +71,9 @@ EqEffect::~EqEffect()
 
 bool EqEffect::processAudioBuffer( sampleFrame *buf, const fpp_t frames )
 {
-	const int sampleRate = Engine::mixer()->processingSampleRate();
+	const bool oversample = m_eqControls.m_oversampleModel.value();
+
+	const int sampleRate = Engine::mixer()->processingSampleRate() * ( oversample + 1 );
 
 	//wet/dry controls
 	const float dry = dryLevel();
@@ -184,80 +186,89 @@ bool EqEffect::processAudioBuffer( sampleFrame *buf, const fpp_t frames )
 		//wet dry buffer
 		dryS[0] = buf[f][0];
 		dryS[1] = buf[f][1];
-		if( hpActive )
-		{
-			buf[f][0] = m_hp12.update( buf[f][0], 0, periodProgress );
-			buf[f][1] = m_hp12.update( buf[f][1], 1, periodProgress );
 
-			if( hp24Active || hp48Active )
+		for( int i = 0; i < 1 + oversample; ++i )// Run twice if oversampling
+		{
+			if( i )// Reset the buffer to its dry state when this is run multiple times due to oversampling
 			{
-				buf[f][0] = m_hp24.update( buf[f][0], 0, periodProgress );
-				buf[f][1] = m_hp24.update( buf[f][1], 1, periodProgress );
+				buf[f][0] = dryS[0];
+				buf[f][1] = dryS[1];
+			}
+			if( hpActive )
+			{
+				buf[f][0] = m_hp12.update( buf[f][0], 0, periodProgress );
+				buf[f][1] = m_hp12.update( buf[f][1], 1, periodProgress );
+
+				if( hp24Active || hp48Active )
+				{
+					buf[f][0] = m_hp24.update( buf[f][0], 0, periodProgress );
+					buf[f][1] = m_hp24.update( buf[f][1], 1, periodProgress );
+				}
+
+				if( hp48Active )
+				{
+					buf[f][0] = m_hp480.update( buf[f][0], 0, periodProgress );
+					buf[f][1] = m_hp480.update( buf[f][1], 1, periodProgress );
+
+					buf[f][0] = m_hp481.update( buf[f][0], 0, periodProgress );
+					buf[f][1] = m_hp481.update( buf[f][1], 1, periodProgress );
+				}
 			}
 
-			if( hp48Active )
+			if( lowShelfActive )
 			{
-				buf[f][0] = m_hp480.update( buf[f][0], 0, periodProgress );
-				buf[f][1] = m_hp480.update( buf[f][1], 1, periodProgress );
-
-				buf[f][0] = m_hp481.update( buf[f][0], 0, periodProgress );
-				buf[f][1] = m_hp481.update( buf[f][1], 1, periodProgress );
-			}
-		}
-
-		if( lowShelfActive )
-		{
-			buf[f][0] = m_lowShelf.update( buf[f][0], 0, periodProgress );
-			buf[f][1] = m_lowShelf.update( buf[f][1], 1, periodProgress );
-		}
-
-		if( para1Active )
-		{
-			buf[f][0] = m_para1.update( buf[f][0], 0, periodProgress );
-			buf[f][1] = m_para1.update( buf[f][1], 1, periodProgress );
-		}
-
-		if( para2Active )
-		{
-			buf[f][0] = m_para2.update( buf[f][0], 0, periodProgress );
-			buf[f][1] = m_para2.update( buf[f][1], 1, periodProgress );
-		}
-
-		if( para3Active )
-		{
-			buf[f][0] = m_para3.update( buf[f][0], 0, periodProgress );
-			buf[f][1] = m_para3.update( buf[f][1], 1, periodProgress );
-		}
-
-		if( para4Active )
-		{
-			buf[f][0] = m_para4.update( buf[f][0], 0, periodProgress );
-			buf[f][1] = m_para4.update( buf[f][1], 1, periodProgress );
-		}
-
-		if( highShelfActive )
-		{
-			buf[f][0] = m_highShelf.update( buf[f][0], 0, periodProgress );
-			buf[f][1] = m_highShelf.update( buf[f][1], 1, periodProgress );
-		}
-
-		if( lpActive ){
-			buf[f][0] = m_lp12.update( buf[f][0], 0, periodProgress );
-			buf[f][1] = m_lp12.update( buf[f][1], 1, periodProgress );
-
-			if( lp24Active || lp48Active )
-			{
-				buf[f][0] = m_lp24.update( buf[f][0], 0, periodProgress );
-				buf[f][1] = m_lp24.update( buf[f][1], 1, periodProgress );
+				buf[f][0] = m_lowShelf.update( buf[f][0], 0, periodProgress );
+				buf[f][1] = m_lowShelf.update( buf[f][1], 1, periodProgress );
 			}
 
-			if( lp48Active )
+			if( para1Active )
 			{
-				buf[f][0] = m_lp480.update( buf[f][0], 0, periodProgress );
-				buf[f][1] = m_lp480.update( buf[f][1], 1, periodProgress );
+				buf[f][0] = m_para1.update( buf[f][0], 0, periodProgress );
+				buf[f][1] = m_para1.update( buf[f][1], 1, periodProgress );
+			}
 
-				buf[f][0] = m_lp481.update( buf[f][0], 0, periodProgress );
-				buf[f][1] = m_lp481.update( buf[f][1], 1, periodProgress );
+			if( para2Active )
+			{
+				buf[f][0] = m_para2.update( buf[f][0], 0, periodProgress );
+				buf[f][1] = m_para2.update( buf[f][1], 1, periodProgress );
+			}
+
+			if( para3Active )
+			{
+				buf[f][0] = m_para3.update( buf[f][0], 0, periodProgress );
+				buf[f][1] = m_para3.update( buf[f][1], 1, periodProgress );
+			}
+
+			if( para4Active )
+			{
+				buf[f][0] = m_para4.update( buf[f][0], 0, periodProgress );
+				buf[f][1] = m_para4.update( buf[f][1], 1, periodProgress );
+			}
+
+			if( highShelfActive )
+			{
+				buf[f][0] = m_highShelf.update( buf[f][0], 0, periodProgress );
+				buf[f][1] = m_highShelf.update( buf[f][1], 1, periodProgress );
+			}
+
+			if( lpActive ){
+				buf[f][0] = m_lp12.update( buf[f][0], 0, periodProgress );
+				buf[f][1] = m_lp12.update( buf[f][1], 1, periodProgress );
+
+				if( lp24Active || lp48Active )
+				{
+					buf[f][0] = m_lp24.update( buf[f][0], 0, periodProgress );
+					buf[f][1] = m_lp24.update( buf[f][1], 1, periodProgress );
+				}
+
+				if( lp48Active )
+				{
+					buf[f][0] = m_lp480.update( buf[f][0], 0, periodProgress );
+					buf[f][1] = m_lp480.update( buf[f][1], 1, periodProgress );
+
+					buf[f][0] = m_lp481.update( buf[f][0], 0, periodProgress );
+					buf[f][1] = m_lp481.update( buf[f][1], 1, periodProgress );
+				}
 			}
 		}
 
