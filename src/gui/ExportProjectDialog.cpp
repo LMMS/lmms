@@ -128,6 +128,7 @@ void ExportProjectDialog::accept()
 
 void ExportProjectDialog::closeEvent( QCloseEvent * _ce )
 {
+	Engine::getSong()->setLoopRenderCount(1);
 	if( m_renderManager ) {
 		m_renderManager->abortProcessing();
 	}
@@ -187,6 +188,7 @@ void ExportProjectDialog::startExport()
 
 	Engine::getSong()->setExportLoop( exportLoopCB->isChecked() );
 	Engine::getSong()->setRenderBetweenMarkers( renderMarkersCB->isChecked() );
+	Engine::getSong()->setLoopRenderCount(loopCountSB->value());
 
 	connect( m_renderManager.get(), SIGNAL( progressChanged( int ) ),
 			progressBar, SLOT( setValue( int ) ) );

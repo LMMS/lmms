@@ -654,7 +654,7 @@ ComboBoxModel *SongEditor::zoomingModel() const
 
 
 SongEditorWindow::SongEditorWindow(Song* song) :
-	Editor(Engine::mixer()->audioDev()->supportsCapture()),
+	Editor(Engine::mixer()->audioDev()->supportsCapture(), false),
 	m_editor(new SongEditor(song)),
 	m_crtlAction( NULL )
 {
@@ -743,6 +743,16 @@ QSize SongEditorWindow::sizeHint() const
 void SongEditorWindow::resizeEvent(QResizeEvent *event)
 {
 	emit resized();
+}
+
+
+void SongEditorWindow::changeEvent(QEvent *event)
+{
+	QWidget::changeEvent(event);
+	if (event->type() == QEvent::WindowStateChange)
+	{
+		m_editor->realignTracks();
+	}
 }
 
 

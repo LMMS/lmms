@@ -27,6 +27,10 @@
 #include "AudioPortAudio.h"
 
 #ifndef LMMS_HAVE_PORTAUDIO
+void AudioPortAudioSetupUtil::updateBackends()
+{
+}
+
 void AudioPortAudioSetupUtil::updateDevices()
 {
 }
@@ -328,6 +332,28 @@ int AudioPortAudio::_process_callback(
 
 
 
+
+void AudioPortAudioSetupUtil::updateBackends()
+{
+	PaError err = Pa_Initialize();
+	if( err != paNoError ) {
+		printf( "Couldn't initialize PortAudio: %s\n", Pa_GetErrorText( err ) );
+		return;
+	}
+
+	const PaHostApiInfo * hi;
+	for( int i = 0; i < Pa_GetHostApiCount(); ++i )
+	{
+		hi = Pa_GetHostApiInfo( i );
+		m_backendModel.addItem( hi->name );
+	}
+
+	Pa_Terminate();
+}
+
+
+
+
 void AudioPortAudioSetupUtil::updateDevices()
 {
 	PaError err = Pa_Initialize();
@@ -409,37 +435,6 @@ AudioPortAudio::setupWidget::setupWidget( QWidget * _parent ) :
 	m_channels->setLabel( tr( "CHANNELS" ) );
 	m_channels->move( 308, 20 );*/
 
-	// Setup models
-	PaError err = Pa_Initialize();
-	if( err != paNoError ) {
-		printf( "Couldn't initialize PortAudio: %s\n", Pa_GetErrorText( err ) );
-		return;
-	}
-	
-	// todo: setup backend model
-	const PaHostApiInfo * hi;
-	for( int i = 0; i < Pa_GetHostApiCount(); ++i )
-	{
-		hi = Pa_GetHostApiInfo( i );
-		m_setupUtil.m_backendModel.addItem( hi->name );
-	}
-
-	Pa_Terminate();
-
-
-	const QString& backend = ConfigManager::inst()->value( "audioportaudio",
-		"backend" );
-	const QString& device = ConfigManager::inst()->value( "audioportaudio",
-		"device" );
-	
-	int i = qMax( 0, m_setupUtil.m_backendModel.findText( backend ) );
-	m_setupUtil.m_backendModel.setValue( i );
-	
-	m_setupUtil.updateDevices();
-	
-	i = qMax( 0, m_setupUtil.m_deviceModel.findText( device ) );
-	m_setupUtil.m_deviceModel.setValue( i );
-
 	connect( &m_setupUtil.m_backendModel, SIGNAL( dataChanged() ),
 			&m_setupUtil, SLOT( updateDevices() ) );
 			
@@ -475,6 +470,33 @@ void AudioPortAudio::setupWidget::saveSettings()
 /*	ConfigManager::inst()->setValue( "audioportaudio", "channels",
 				QString::number( m_channels->value<int>() ) );*/
 
+}
+
+
+
+
+void AudioPortAudio::setupWidget::show()
+{
+	if( m_setupUtil.m_backendModel.size() == 0 )
+	{
+		// populate the backend model the first time we are shown
+		m_setupUtil.updateBackends();
+
+		const QString& backend = ConfigManager::inst()->value(
+			"audioportaudio", "backend" );
+		const QString& device = ConfigManager::inst()->value(
+			"audioportaudio", "device" );
+		
+		int i = qMax( 0, m_setupUtil.m_backendModel.findText( backend ) );
+		m_setupUtil.m_backendModel.setValue( i );
+		
+		m_setupUtil.updateDevices();
+		
+		i = qMax( 0, m_setupUtil.m_deviceModel.findText( device ) );
+		m_setupUtil.m_deviceModel.setValue( i );
+	}
+
+	AudioDeviceSetupWidget::show();
 }
 
 
