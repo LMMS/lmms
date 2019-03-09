@@ -74,6 +74,11 @@ EqParameterWidget::EqParameterWidget( QWidget *parent, EqControls * controls ) :
 		// if the data of handle position has changed update the models
 		QObject::connect( m_handleList->at( i ) ,SIGNAL( positionChanged() ), this ,SLOT( updateModels() ) );
 	}
+
+	QObject::connect( controls->getOversampleModel(), SIGNAL( dataChanged() ), this , SLOT ( updateOversample() ) );
+	QObject::connect( controls->getOversampleModel(), SIGNAL( dataChanged() ), this , SLOT ( updateHandle() ) );
+
+	updateOversample();// Update GUI curve to display oversampling when project is loaded
 }
 
 
@@ -223,6 +228,16 @@ void EqParameterWidget::updateModels()
 		}
 	}
 	m_eqcurve->update();
+}
+
+
+void EqParameterWidget::updateOversample()
+{
+	//m_eqcurve->oversample = m_controls->getOversampleModel()->value();
+	for ( int i = 0; i < bandCount(); i++ )
+	{
+		m_handleList->at(i)->oversample = m_controls->getOversampleModel()->value();
+	}
 }
 
 
