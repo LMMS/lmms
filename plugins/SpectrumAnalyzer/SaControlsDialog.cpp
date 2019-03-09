@@ -44,16 +44,7 @@ SaControlsDialog::SaControlsDialog(SaControls *controls, SaProcessor *processor)
 	EffectControlDialog(controls),
 	m_controls(controls)
 {
-	setAutoFillBackground(true);
-//	setMinimumSize(500, 250);
-//	setMaximumSize(600, 500);
-
-	setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
-
-
 	QVBoxLayout * master_layout = new QVBoxLayout;		// master
-	master_layout->setSizeConstraint(QLayout::SetNoConstraint);
-
 	QHBoxLayout * config_layout = new QHBoxLayout;		// to hold 3 "form" columns
 	QFormLayout * config_column1 = new QFormLayout;
 	QFormLayout * config_column2 = new QFormLayout;
@@ -65,6 +56,7 @@ SaControlsDialog::SaControlsDialog(SaControls *controls, SaProcessor *processor)
 	config_layout->addLayout(config_column1);
 	config_layout->addLayout(config_column2);
 	config_layout->addLayout(config_column3);
+	config_layout->addStretch();
 
 	// add control buttons
 	LedCheckBox * stereoButton = new LedCheckBox(this);
@@ -94,21 +86,18 @@ SaControlsDialog::SaControlsDialog(SaControls *controls, SaProcessor *processor)
 	LedCheckBox * logYButton = new LedCheckBox(this);
 	logYButton->setCheckable(true);
 	logYButton->setModel(&controls->m_logYModel);
-	QLabel * logYLabel = new QLabel("Log. intensity", this);
+	QLabel * logYLabel = new QLabel("Log. amplitude (dB)", this);
 	config_column2->addRow(logYButton, logYLabel);
 
 	// add spectrum display
 	SaSpectrumView * spectrum = new SaSpectrumView(controls, processor, this);
-	spectrum->setColors(QColor(51, 148, 204, 160), QColor(8, 108, 166, 100), QColor(166, 66, 8, 100));
+	spectrum->setColors(QColor(51, 148, 204, 204), QColor(51, 148, 204, 135), QColor(204, 107, 51, 135));
 
 	display_splitter->addWidget(spectrum);
 
-	QLabel * placeholderLabel = new QLabel("placeholder / test", this);
-	display_splitter->addWidget(placeholderLabel);
+//	SaWaterfall * waterfall = new SaWaterfall(controls, processor, this);
+//	display_splitter->addWidget(waterfall);
 
 	setLayout(master_layout);
-
-	// make control connections
-	
 }
 

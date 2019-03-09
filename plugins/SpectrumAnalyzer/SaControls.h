@@ -33,7 +33,8 @@ class Analyzer;
 
 // FIXME: move this somewhere appropriate
 const int MAX_BANDS = 2048;
-const int LOWEST_FREQ = 10;		// arbitrary low frequency limit for log. scale (>0)
+const int LOWEST_FREQ = 10;		// arbitrary low frequency limit for log. scale (Hz, >0)
+const int LOWEST_AMP = -5;		// arbitrary low amplitude limit for log. scale (10*dB)
 
 class SaControls : public EffectControls
 {

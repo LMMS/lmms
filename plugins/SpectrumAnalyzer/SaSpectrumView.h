@@ -49,11 +49,13 @@ public:
 
 	QColor getColor() const;
 	void setColors(const QColor &mono, const QColor &left, const QColor &right);
-	float freqToXPixel(float freq, int w);
-	float gainToYPixel(float gain, int h, float pixelPerUnitHeight);
+	float freqToXPixel(float frequency, int width);
+	float ampToYPixel(float amplitude, int height);
 
 	std::vector<std::pair<int, std::string>> makeLogTics(int low, int high);
 	std::vector<std::pair<int, std::string>> makeLinearTics(int low, int high);
+	std::vector<std::pair<float, std::string>> makeDBTics(int low, int high);
+	std::vector<std::pair<float, std::string>> makeAmpTics(int low, int high);
 
 protected:
 	virtual void paintEvent(QPaintEvent *event);
@@ -75,8 +77,10 @@ private:
 	QPainterPath m_pathL;
 	QPainterPath m_pathR;
 
-	std::vector<std::pair<int, std::string>> m_logTics;
-	std::vector<std::pair<int, std::string>> m_linearTics;
+	std::vector<std::pair<int, std::string>> m_logFreqTics;		// 10-20-50... Hz
+	std::vector<std::pair<int, std::string>> m_linearFreqTics;	// 2k-4k-6k... Hz
+	std::vector<std::pair<float, std::string>> m_logAmpTics;	// dB
+	std::vector<std::pair<float, std::string>> m_linearAmpTics;	// 0..1
 
 	float m_decaySum;
 	bool m_periodicalUpdate;
