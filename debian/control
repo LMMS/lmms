@@ -1,0 +1,118 @@
+Source: lmms
+Section: sound
+Priority: optional
+Maintainer: Debian Edu Packaging Team <debian-edu-pkg-team@lists.alioth.debian.org>
+Uploaders:
+ Petter Reinholdtsen <pere@debian.org>,
+ Israel Dahl <israeldahl@gmail.com>,
+ Javier Serrano Polo <javier@jasp.net>,
+Build-Depends:
+ cmake,
+ debhelper (>= 9.0.0),
+ fluid,
+ ladspa-sdk,
+ libasound2-dev [linux-any],
+ libfftw3-dev,
+ libfltk1.3-dev,
+ libfluidsynth-dev,
+ libgig-dev,
+ libjack-jackd2-dev,
+ libmp3lame-dev,
+ libpulse-dev,
+ libqt5x11extras5-dev,
+ libsamplerate0-dev,
+ libsdl1.2-dev,
+ libsndfile1-dev,
+ libsndio-dev,
+ libsoundio-dev,
+ libstk0-dev,
+ libvorbis-dev,
+ libxcb-keysyms1-dev,
+ libxcb-util0-dev,
+ portaudio19-dev,
+ qtbase5-private-dev,
+ qttools5-dev,
+ wine32-tools [i386]
+Standards-Version: 4.2.1.4
+Homepage: http://lmms.io/
+Vcs-Browser: https://salsa.debian.org/debian-edu-pkg-team/lmms.git
+
+Package: lmms-bin
+Architecture: any
+Depends: lmms-common (>= ${source:Version}), ${shlibs:Depends}, ${misc:Depends},
+ stk
+Recommends: calf-ladspa, tap-plugins, caps,
+ lmms-vst-server:i386 (>= ${source:Version})
+Suggests: fil-plugins, mcp-plugins, omins, freepats, fluid-soundfont-gm,
+ ladspa-plugin
+Replaces: lmms-common (<< 1.0.0-1)
+Breaks: lmms-common (<< 1.0.0-1)
+Multi-Arch: allowed
+Description: Linux Multimedia Studio - minimal installation
+ LMMS aims to be a free alternative to popular (but commercial and closed-
+ source) programs like FruityLoops, Cubase and Logic giving you the ability of
+ producing music with your computer by creating cool loops, synthesizing and
+ mixing sounds, arranging samples, having more fun with your MIDI-keyboard
+ and much more...
+ .
+ LMMS combines the features of a tracker-/sequencer-program (pattern-/channel-/
+ sample-/song-/effect-management) and those of powerful synthesizers and
+ samplers in a modern, user-friendly and easy to use graphical user-interface.
+ .
+ This package provides the minimal installation.
+
+Package: lmms
+Architecture: any
+Depends: calf-ladspa, lmms-bin, ${misc:Depends}
+Description: Linux Multimedia Studio
+ LMMS aims to be a free alternative to popular (but commercial and closed-
+ source) programs like FruityLoops, Cubase and Logic giving you the ability of
+ producing music with your computer by creating cool loops, synthesizing and
+ mixing sounds, arranging samples, having more fun with your MIDI-keyboard
+ and much more...
+ .
+ LMMS combines the features of a tracker-/sequencer-program (pattern-/channel-/
+ sample-/song-/effect-management) and those of powerful synthesizers and
+ samplers in a modern, user-friendly and easy to use graphical user-interface.
+ .
+ This package provides the recommended installation.
+
+Package: lmms-common
+Architecture: all
+Depends: zynaddsubfx-data, ${shlibs:Depends}, ${misc:Depends}
+Pre-Depends: ${misc:Pre-Depends}
+Description: Linux Multimedia Studio - common files
+ LMMS aims to be a free alternative to popular (but commercial and closed-
+ source) programs like FruityLoops, Cubase and Logic giving you the ability of
+ producing music with your computer by creating cool loops, synthesizing and
+ mixing sounds, arranging samples, having more fun with your MIDI-keyboard
+ and much more...
+ .
+ LMMS combines the features of a tracker-/sequencer-program (pattern-/channel-/
+ sample-/song-/effect-management) and those of powerful synthesizers and
+ samplers in a modern, user-friendly and easy to use graphical user-interface.
+ .
+ This package contains the platform independent files such as samples, presets
+ and some example projects.
+
+Package: lmms-vst-server
+Architecture: i386
+# Order matters to avoid wine64
+Depends: wine32, wine, ${shlibs:Depends}, ${misc:Depends}
+Recommends: lmms-bin:any
+Description: Linux Multimedia Studio - VST server
+ This package contains a helper application that loads VST plugins.
+
+Package: calf-ladspa
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Replaces: calf-plugins (<< 0.0.19)
+Provides: ladspa-plugin
+Description: Linux Multimedia Studio - Calf LADSPA plugins
+ Calf is a pack of audio plugins - effects and instruments. The goal is to
+ create a set of plugins using decent algorithms and parameter settings,
+ available in a form which is compatible with as many open source applications
+ as possible.
+ .
+ These plugins are distributed as part of Linux Multimedia Studio, but may be
+ used by other applications.

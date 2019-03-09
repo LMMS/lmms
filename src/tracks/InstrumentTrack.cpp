@@ -126,10 +126,14 @@ InstrumentTrack::InstrumentTrack( TrackContainer* tc ) :
 
 	setName( tr( "Default preset" ) );
 
-	connect( &m_baseNoteModel, SIGNAL( dataChanged() ), this, SLOT( updateBaseNote() ) );
-	connect( &m_pitchModel, SIGNAL( dataChanged() ), this, SLOT( updatePitch() ) );
-	connect( &m_pitchRangeModel, SIGNAL( dataChanged() ), this, SLOT( updatePitchRange() ) );
-	connect( &m_effectChannelModel, SIGNAL( dataChanged() ), this, SLOT( updateEffectChannel() ) );
+	connect( &m_baseNoteModel, SIGNAL( dataChanged() ),
+			this, SLOT( updateBaseNote() ), Qt::DirectConnection );
+	connect( &m_pitchModel, SIGNAL( dataChanged() ),
+			this, SLOT( updatePitch() ), Qt::DirectConnection );
+	connect( &m_pitchRangeModel, SIGNAL( dataChanged() ),
+			this, SLOT( updatePitchRange() ), Qt::DirectConnection );
+	connect( &m_effectChannelModel, SIGNAL( dataChanged() ),
+			this, SLOT( updateEffectChannel() ), Qt::DirectConnection );
 }
 
 

@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 # lmms(1) completion                                       -*- shell-script -*-
 # use shellcheck: "shellcheck -e bash <filename>"
 
