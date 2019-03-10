@@ -142,7 +142,7 @@ fi
 
 # Move executables so linuxdeployqt can find them
 ZYNLIB="${APPDIR}usr/lib/lmms/RemoteZynAddSubFx"
-VSTLIB32="${APPDIR}usr/lib/lmms/RemoteVstPlugin32.exe.so"
+VSTLIB32="${APPDIR}usr/lib/lmms/32/RemoteVstPlugin32.exe.so"
 VSTLIB64="${APPDIR}usr/lib/lmms/RemoteVstPlugin64.exe.so"
 
 ZYNBIN="${APPDIR}usr/bin/RemoteZynAddSubFx"
