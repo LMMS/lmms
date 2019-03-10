@@ -115,7 +115,28 @@ public:
 		if ( embedMethod() != "none" ) {
 			m_pluginSubWindow.reset(new vstSubWin( gui->mainWindow()->workspace() ));
 			VstPlugin::createUI( m_pluginSubWindow.get() );
-			m_pluginSubWindow->setWidget(pluginWidget());
+
+			QWidget* pWidget = pluginWidget();
+			//WA_ShowWithoutActivating is apparently not implemented for any
+			//platform in Qt 5. In Qt 4 setting this attribute led to passing
+			//SW_SHOWNOACTIVATE to ShowWindow()
+			//The window flag Qt::WindowDoesNotAcceptFocus should be equivalent
+			//to WA_ShowWithoutActivating
+			pWidget->setAttribute(Qt::WA_ShowWithoutActivating);
+			pWidget->setAttribute(Qt::WA_X11DoNotAcceptFocus);
+			pWidget->setWindowFlags(Qt::WindowDoesNotAcceptFocus);
+			pWidget->setWindowFlags(Qt::WindowStaysOnBottomHint);
+			pWidget->setFocusPolicy(Qt::NoFocus);
+			pWidget->setWindowState(Qt::WindowMinimized);
+
+			m_pluginSubWindow->setAttribute(Qt::WA_ShowWithoutActivating);
+			m_pluginSubWindow->setAttribute(Qt::WA_X11DoNotAcceptFocus);
+			m_pluginSubWindow->setWindowFlags(Qt::WindowDoesNotAcceptFocus);
+			m_pluginSubWindow->setWindowFlags(Qt::WindowStaysOnBottomHint);
+			m_pluginSubWindow->setFocusPolicy(Qt::NoFocus);
+			m_pluginSubWindow->setWindowState(Qt::WindowMinimized);
+
+			m_pluginSubWindow->setWidget(pWidget);
 		} else {
 			VstPlugin::createUI( nullptr );
 		}
@@ -186,13 +207,12 @@ void vestigeInstrument::loadSettings( const QDomElement & _this )
 	if( m_plugin != NULL )
 	{
 		m_plugin->loadSettings( _this );
-		//SPEK Attempted to never show VSTs on load by skipping this, no dice
-		//if ( _this.attribute( "guivisible" ).toInt() ) {
-			//SPEK Attempted to never show VSTs on load by skipping this, no dice
-			//m_plugin->showUI();
-		//} else {
-		//	m_plugin->hideUI();
-		//}
+		//Attempted to never show VSTs on load by skipping this, no dice
+		if ( _this.attribute( "guivisible" ).toInt() ) {
+			m_plugin->showUI();
+		} else {
+			m_plugin->hideUI();
+		}
 
 		const QMap<QString, QString> & dump = m_plugin->parameterDump();
 		paramCount = dump.size();
@@ -329,14 +349,13 @@ void vestigeInstrument::loadFile( const QString & _file )
 	}
 	m_pluginDLL = SampleBuffer::tryToMakeRelative( _file );
 	TextFloat * tf = NULL;
-	// SPEK
-	//if( gui ) // && NotLoading
-	// {
-	// 	tf = TextFloat::displayMessage(
-	// 			tr( "Loading plugin" ),
-	// 			tr( "Please wait while loading VST-plugin..." ),
-	// 			PLUGIN_NAME::getIconPixmap( "logo", 24, 24 ), 0 );
-	// }
+	if( gui ) // This doesn't seem to affect focus
+	{
+	 	tf = TextFloat::displayMessage(
+	 			tr( "Loading plugin" ),
+	 			tr( "Please wait while loading VST-plugin..." ),
+	 			PLUGIN_NAME::getIconPixmap( "logo", 24, 24 ), 0 );
+	}
 
 	m_pluginMutex.lock();
 	m_plugin = new VstInstrumentPlugin( m_pluginDLL );
@@ -349,10 +368,9 @@ void vestigeInstrument::loadFile( const QString & _file )
 		m_pluginDLL = "";
 		return;
 	}
-	//SPEK
-	//m_plugin->createUI(nullptr);
-	//SPEK If this is skipped on project load, VST UIs won't flash onscreen during loading
-	//m_plugin->showUI();
+	m_plugin->createUI(nullptr);
+	//If this is skipped on project load, VST UIs won't flash onscreen during loading
+	m_plugin->showUI();
 
 	if( set_ch_name )
 	{
@@ -361,8 +379,8 @@ void vestigeInstrument::loadFile( const QString & _file )
 
 	m_pluginMutex.unlock();
 
-	//SPEK what if we skip this until loading is done?
-	//emit dataChanged();
+	//This steals window focus but doesn't pop LMMS to foreground
+	emit dataChanged();
 
 	delete tf;
 }

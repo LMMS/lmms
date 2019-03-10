@@ -97,12 +97,8 @@ void TrackContainer::loadSettings( const QDomElement & _this )
 						Engine::getSong()->getLoadingTrackCount(),
 						gui->mainWindow() );
 			pd->setWindowModality( Qt::ApplicationModal );
-			//SPEK Don't force LMMS to foreground while loading
-			pd->setAttribute( Qt::WA_ShowWithoutActivating );
 			pd->setWindowTitle( tr( "Please wait..." ) );
-			//SPEK More loading stuff
-			//pd->show();
-			if (!pd->isVisible()) { pd->show(); }
+			pd->show();
 		}
 	}
 
@@ -136,7 +132,7 @@ void TrackContainer::loadSettings( const QDomElement & _this )
 						node.firstChild().toElement().attribute( "name" );
 			if( pd != NULL )
 			{
-				pd->setLabelText( tr("SPEK Loading Track %1 (%2/Total %3)").arg( trackName ).
+				pd->setLabelText( tr("Loading Track %1 (%2/Total %3)").arg( trackName ).
 						  arg( pd->value() + 1 ).arg( Engine::getSong()->getLoadingTrackCount() ) );
 			}
 			Track::create( node.toElement(), this );
@@ -152,9 +148,6 @@ void TrackContainer::loadSettings( const QDomElement & _this )
 			pd = NULL;
 		}
 	}
-
-	//SPEK moved here from vestige
-	emit dataChanged();
 }
 
 
