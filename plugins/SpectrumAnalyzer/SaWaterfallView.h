@@ -67,8 +67,5 @@ private:
 	std::vector<std::pair<float, std::string>> m_timeTics;	// 0..n (s)
 
 	bool m_periodicalUpdate;
-	QList<float> m_bandHeight;
-
-	float bandToFreq(int index);
 };
 #endif // SAWATERFALLVIEW_H

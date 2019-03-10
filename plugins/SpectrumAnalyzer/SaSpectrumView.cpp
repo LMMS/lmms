@@ -22,12 +22,14 @@
 */
 
 #include "SaSpectrumView.h"
-#include "SaProcessor.h"
+
+#include <cmath>
 
 #include "Engine.h"
 #include "GuiApplication.h"
 #include "MainWindow.h"
 #include "Mixer.h"
+#include "SaProcessor.h"
 
 SaSpectrumView::SaSpectrumView(SaControls *controls, SaProcessor *processor, QWidget *_parent) :
 	QWidget(_parent),
@@ -42,7 +44,8 @@ SaSpectrumView::SaSpectrumView(SaControls *controls, SaProcessor *processor, QWi
 	connect(gui->mainWindow(), SIGNAL(periodicUpdate()), this, SLOT(periodicalUpdate()));
 
 	for (int i = 0; i < MAX_BANDS; i++) {
-		m_bandHeight.append(0);				// FIXME: co ta promenna dela?
+		m_bandHeightL.append(0);
+		m_bandHeightR.append(0);
 	}
 
 	m_logFreqTics = makeLogTics(LOWEST_FREQ, 20000);
@@ -54,8 +57,8 @@ SaSpectrumView::SaSpectrumView(SaControls *controls, SaProcessor *processor, QWi
 
 void SaSpectrumView::paintEvent(QPaintEvent *event)
 {
-	const float energyL = m_processor->getEnergyL();
-	const float energyR = m_processor->getEnergyR();
+	const float energyL = isnan(m_processor->getEnergyL()) ? 0 : m_processor->getEnergyL();
+	const float energyR = isnan(m_processor->getEnergyR()) ? 0 : m_processor->getEnergyR();
 	const bool stereo = m_controls->m_stereoModel.value();
 	const int displayBottom = height() -20;
 	const int displayLeft = 20;
@@ -145,6 +148,7 @@ void SaSpectrumView::paintEvent(QPaintEvent *event)
 		
 			float peak;
 			float *bands = m_processor->m_bandsL;
+			QList<float> *m_bandHeight = &m_bandHeightL;
 			float energy = energyL;
 			QPainterPath m_path;
 		
@@ -156,14 +160,14 @@ void SaSpectrumView::paintEvent(QPaintEvent *event)
 
 					peak = *bands / energy;
 
-					if (peak > m_bandHeight[x]) {
-						m_bandHeight[x] = peak;
+					if (peak > (*m_bandHeight)[x]) {
+						(*m_bandHeight)[x] = peak;
 					} else {
-						m_bandHeight[x] = m_bandHeight[x] / fallOff;
+						(*m_bandHeight)[x] = (*m_bandHeight)[x] / fallOff;
 					}
 		
-					m_path.lineTo(displayLeft + freqToXPixel(bandToFreq(x), displayWidth), ampToYPixel(m_bandHeight[x], displayBottom));
-					m_decaySum += m_bandHeight[x];
+					m_path.lineTo(displayLeft + freqToXPixel(bandToFreq(x), displayWidth), ampToYPixel((*m_bandHeight)[x], displayBottom));
+					m_decaySum += (*m_bandHeight)[x];
 				}
 		
 				m_path.lineTo(displayRight, displayBottom);
@@ -174,6 +178,7 @@ void SaSpectrumView::paintEvent(QPaintEvent *event)
 					m_pathL = m_path;
 					if (stereo) {
 						bands = m_processor->m_bandsR;
+						m_bandHeight = &m_bandHeightR;
 						energy = energyR;
 					} else {
 						break;

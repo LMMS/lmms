@@ -40,13 +40,7 @@ SaWaterfallView::SaWaterfallView(SaControls *controls, SaProcessor *processor, Q
 
 	connect(gui->mainWindow(), SIGNAL(periodicUpdate()), this, SLOT(periodicalUpdate()));
 
-
-	for (int i = 0; i < MAX_BANDS; i++) {
-		m_bandHeight.append(0);				// FIXME: co ta promenna dela?
-	}
-
 	m_timeTics = makeTimeTics(0, 1);
-
 }
 
 
@@ -79,6 +73,8 @@ void SaWaterfallView::paintEvent(QPaintEvent *event)
 
 	// draw waterfallView only if enabled and ... if there is any new signal?			FIXME
 		// stop after signal disappears, or just roll-off with zeros and _then_ stop?
+		// also, make sure the history buffer is not being updated while drawing (possibly cause of the flicker?
+			// maybe use simple double buffering?
 
 	if (m_controls->m_waterfallModel.value() == true) {
 
@@ -95,12 +91,6 @@ void SaWaterfallView::paintEvent(QPaintEvent *event)
 	painter.setPen(QPen(m_controls->m_colorGrid, 2, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
 	painter.drawRoundedRect(displayLeft, 1, displayWidth, displayBottom, 2.0, 2.0);
 
-}
-
-
-float SaWaterfallView::bandToFreq(int index)
-{
-	return index * m_processor->getSampleRate() / (MAX_BANDS * 2);
 }
 
 

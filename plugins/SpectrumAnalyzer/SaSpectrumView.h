@@ -82,7 +82,9 @@ private:
 
 	float m_decaySum;
 	bool m_periodicalUpdate;
-	QList<float> m_bandHeight;
+
+	QList<float> m_bandHeightL;
+	QList<float> m_bandHeightR;
 
 	float bandToFreq(int index);
 };
