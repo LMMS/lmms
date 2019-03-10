@@ -1,6 +1,5 @@
-/* SaSpectrumView.h - declaration of SaSpectrumView class.
+/* SaWaterfallView.h - declaration of SaWaterfallView class.
 *
-* Copyright (c) 2014 David French <dave/dot/french3/at/googlemail/dot/com>
 * Copyright (c) 2019 Martin Pavelek <he29/dot/HS/at/gmail/dot/com>
 *
 * This file is part of LMMS - https://lmms.io
@@ -21,12 +20,14 @@
 * Boston, MA 02110-1301 USA.
 *
 */
-#ifndef SASPECTRUMVIEW_H
-#define SASPECTRUMVIEW_H
+#ifndef SAWATERFALLVIEW_H
+#define SAWATERFALLVIEW_H
 
 #include <QPainter>
 #include <QWidget>
 #include <QString>
+#include <QImage>
+
 #include <vector>
 #include <utility>
 #include <string>
@@ -40,20 +41,16 @@
 #include "lmms_math.h"
 
 
-class SaSpectrumView : public QWidget
+class SaWaterfallView : public QWidget
 {
 	Q_OBJECT
 public:
-	explicit SaSpectrumView(SaControls *controls, SaProcessor *processor, QWidget *_parent = 0);
-	virtual ~SaSpectrumView(){}
+	explicit SaWaterfallView(SaControls *controls, SaProcessor *processor, QWidget *_parent = 0);
+	virtual ~SaWaterfallView(){}
 
-	float freqToXPixel(float frequency, int width);
-	float ampToYPixel(float amplitude, int height);
+	float timeToYPixel(float time, int height);
 
-	std::vector<std::pair<int, std::string>> makeLogTics(int low, int high);
-	std::vector<std::pair<int, std::string>> makeLinearTics(int low, int high);
-	std::vector<std::pair<float, std::string>> makeDBTics(int low, int high);
-	std::vector<std::pair<float, std::string>> makeAmpTics(int low, int high);
+	std::vector<std::pair<float, std::string>> makeTimeTics(int low, int high);
 
 protected:
 	virtual void paintEvent(QPaintEvent *event);
@@ -65,25 +62,13 @@ private:
 	SaControls *m_controls;
 	SaProcessor *m_processor;
 
-	QColor m_colorL;
-	QColor m_colorR;
-	QColor m_colorMono;
-	QColor m_colorBG;
-	QColor m_colorGrid;
-	QColor m_colorLabels;
+	QImage m_graph;
 
-	QPainterPath m_pathL;
-	QPainterPath m_pathR;
+	std::vector<std::pair<float, std::string>> m_timeTics;	// 0..n (s)
 
-	std::vector<std::pair<int, std::string>> m_logFreqTics;		// 10-20-50... Hz
-	std::vector<std::pair<int, std::string>> m_linearFreqTics;	// 2k-4k-6k... Hz
-	std::vector<std::pair<float, std::string>> m_logAmpTics;	// dB
-	std::vector<std::pair<float, std::string>> m_linearAmpTics;	// 0..1
-
-	float m_decaySum;
 	bool m_periodicalUpdate;
 	QList<float> m_bandHeight;
 
 	float bandToFreq(int index);
 };
-#endif // SASPECTRUMVIEW_H
+#endif // SAWATERFALLVIEW_H

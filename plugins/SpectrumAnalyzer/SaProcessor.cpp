@@ -22,6 +22,10 @@
 */
 
 #include "SaProcessor.h"
+
+#include <cmath>
+#include <iostream>
+
 #include "lmms_math.h"
 
 SaProcessor::SaProcessor(SaControls *controls) :
@@ -53,6 +57,8 @@ SaProcessor::SaProcessor(SaControls *controls) :
 							- a3 * cos(6 * F_PI * i / (float)FFT_BUFFER_SIZE - 1));
 	}
 	clear();
+
+	m_history.resize(WATERFALL_WIDTH * WATERFALL_HEIGHT * sizeof qRgb(0,0,0), 0);
 }
 
 
@@ -71,8 +77,9 @@ void SaProcessor::analyse(sampleFrame *buf, const fpp_t frames)
 	if (m_active)
 	{
 		const bool stereo = m_controls->m_stereoModel.value();
-		m_inProgress = true;
 		const int FFT_BUFFER_SIZE = 2048;
+
+		m_inProgress = true;
 		fpp_t f = 0;
 
 		if (frames > FFT_BUFFER_SIZE)
@@ -135,6 +142,31 @@ void SaProcessor::analyse(sampleFrame *buf, const fpp_t frames)
 			memset(m_bandsR, 0, sizeof(m_bandsR));
 			m_energyR = 0;
 		}
+
+
+		// move waterfall one line down and add newest result
+		QRgb *pixel = (QRgb *)m_history.data();
+
+		std::copy(	pixel,
+					pixel + WATERFALL_WIDTH * WATERFALL_HEIGHT - WATERFALL_WIDTH,
+					pixel + WATERFALL_WIDTH);
+
+		for (int i = 0; i < WATERFALL_WIDTH && i < FFT_BUFFER_SIZE; i++){
+			float ampL = isnan(m_energyL) ? 0 : powf(m_bandsL[i] / m_energyL, 0.45);
+			float ampR = isnan(m_energyR) ? 0 : powf(m_bandsR[i] / m_energyR, 0.45);
+
+			if (stereo) {
+				pixel[i] = qRgb(m_controls->m_colorL.red() * ampL + m_controls->m_colorR.red() * ampR,
+								m_controls->m_colorL.green() * ampL + m_controls->m_colorR.green() * ampR,
+								m_controls->m_colorL.blue() * ampL + m_controls->m_colorR.blue() * ampR);
+			} else {
+				pixel[i] = qRgb(m_controls->m_colorMono.lighter().red() * ampL,
+								m_controls->m_colorMono.lighter().green() * ampL,
+								m_controls->m_colorMono.lighter().blue() * ampL);
+			}
+		}
+
+std::cout << "energyL " << (int)m_energyL << "energyR " << (int)m_energyR << std::endl;
 
 		m_framesFilledUp = 0;
 		m_inProgress = false;

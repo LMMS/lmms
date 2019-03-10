@@ -30,6 +30,7 @@
 
 #include "SaControls.h"
 #include "SaSpectrumView.h"
+#include "SaWaterfallView.h"
 
 class Analyzer : public Effect
 {

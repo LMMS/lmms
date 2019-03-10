@@ -38,66 +38,80 @@
 
 #include "SaControls.h"
 #include "SaSpectrumView.h"
+#include "SaWaterfallView.h"
 
 
 SaControlsDialog::SaControlsDialog(SaControls *controls, SaProcessor *processor) :
 	EffectControlDialog(controls),
 	m_controls(controls)
 {
-	QVBoxLayout * master_layout = new QVBoxLayout;		// master
-	QHBoxLayout * config_layout = new QHBoxLayout;		// to hold 3 "form" columns
-	QFormLayout * config_column1 = new QFormLayout;
-	QFormLayout * config_column2 = new QFormLayout;
-	QFormLayout * config_column3 = new QFormLayout;
-	QSplitter * display_splitter = new QSplitter(Qt::Vertical);	// to hold spectrum display and waterfall
-
-	master_layout->addLayout(config_layout);
+	// top level layout and 
+	QBoxLayout * master_layout = new QHBoxLayout;
+	QSplitter * display_splitter = new QSplitter(Qt::Vertical);
 	master_layout->addWidget(display_splitter);
-	config_layout->addLayout(config_column1);
-	config_layout->addLayout(config_column2);
-	config_layout->addLayout(config_column3);
-	config_layout->addStretch();
+	window()->setLayout(master_layout);
 
-	// add control buttons
-	LedCheckBox * stereoButton = new LedCheckBox(this);
-	stereoButton->setCheckable(true);
-	stereoButton->setModel(&controls->m_stereoModel);
-	QLabel * stereoLabel = new QLabel("Stereo display", this);
-	config_column1->addRow(stereoButton, stereoLabel);
+	// config section
+	QWidget * config_widget = new QWidget;				// wrapper for QSplitter
+	QGridLayout * config_layout = new QGridLayout;
+	config_widget->setLayout(config_layout);
 
-	LedCheckBox * smoothButton = new LedCheckBox(this);
+	// populate config layout
+	// display
+	QLabel * displayLabel = new QLabel("Display", this);
+	displayLabel->setStyleSheet("font-weight: bold");
+	config_layout->addWidget(displayLabel, 0, 0);
+
+	LedCheckBox * waterfallButton = new LedCheckBox("Waterfall diagram", this);
+//	waterfallButton->setCheckable(true);
+	waterfallButton->setModel(&controls->m_waterfallModel);
+	config_layout->addWidget(waterfallButton, 1, 0);
+
+	LedCheckBox * smoothButton = new LedCheckBox("Smooth decay", this);
 	smoothButton->setCheckable(true);
 	smoothButton->setModel(&controls->m_smoothModel);
-	QLabel * smoothLabel = new QLabel("Smooth decay", this);
-	config_column2->addRow(smoothButton, smoothLabel);
+	config_layout->addWidget(smoothButton, 2, 0);
 
-	LedCheckBox * waterfallButton = new LedCheckBox(this);
-	waterfallButton->setCheckable(true);
-	waterfallButton->setModel(&controls->m_waterfallModel);
-	QLabel * waterfallLabel = new QLabel("Waterfall graph", this);
-	config_column3->addRow(waterfallButton, waterfallLabel);
-
-	LedCheckBox * logXButton = new LedCheckBox(this);
+	LedCheckBox * logXButton = new LedCheckBox("Log. frequency", this);
 	logXButton->setCheckable(true);
 	logXButton->setModel(&controls->m_logXModel);
-	QLabel * logXLabel = new QLabel("Log. frequency", this);
-	config_column1->addRow(logXButton, logXLabel);
+	config_layout->addWidget(logXButton, 3, 0);
 
-	LedCheckBox * logYButton = new LedCheckBox(this);
+	LedCheckBox * logYButton = new LedCheckBox("Log. amplitude", this);
 	logYButton->setCheckable(true);
 	logYButton->setModel(&controls->m_logYModel);
-	QLabel * logYLabel = new QLabel("Log. amplitude (dB)", this);
-	config_column2->addRow(logYButton, logYLabel);
+	config_layout->addWidget(logYButton, 4, 0);
 
-	// add spectrum display
+	// channels
+	QLabel * channelsLabel = new QLabel("Channel", this);
+	channelsLabel->setStyleSheet("font-weight: bold");
+	config_layout->addWidget(channelsLabel, 0, 1);
+
+	LedCheckBox * stereoButton = new LedCheckBox("Stereo", this);
+	stereoButton->setCheckable(true);
+	stereoButton->setModel(&controls->m_stereoModel);
+	config_layout->addWidget(stereoButton, 1, 1);
+
+
+	// FFT
+	QLabel * fftLabel = new QLabel("FFT", this);
+	fftLabel->setStyleSheet("font-weight: bold");
+	config_layout->addWidget(fftLabel, 0, 2);
+
+//	QComboBox * blocksizeCombo = new QComboBox("", this);
+//	QComboBox * windowCombo = new QComboBox("", this);
+
+
+	// create spectrum displays
 	SaSpectrumView * spectrum = new SaSpectrumView(controls, processor, this);
-	spectrum->setColors(QColor(51, 148, 204, 204), QColor(51, 148, 204, 135), QColor(204, 107, 51, 135));
+	SaWaterfallView * waterfall = new SaWaterfallView(controls, processor, this);
 
+	// add everything to top-level splitter
+	display_splitter->addWidget(config_widget);
 	display_splitter->addWidget(spectrum);
+	display_splitter->addWidget(waterfall);
 
-//	SaWaterfall * waterfall = new SaWaterfall(controls, processor, this);
-//	display_splitter->addWidget(waterfall);
-
-	setLayout(master_layout);
+	window()->setBaseSize(500,500);
+	window()->resize(500,500);
 }
 

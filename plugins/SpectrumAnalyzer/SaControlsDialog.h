@@ -27,7 +27,6 @@
 #define SACONTROLSDIALOG_H
 
 #include <QLabel>
-#include <QPushButton>
 
 #include "EffectControlDialog.h"
 #include "SaSpectrumView.h"

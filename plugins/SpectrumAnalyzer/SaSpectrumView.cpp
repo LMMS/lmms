@@ -41,13 +41,6 @@ SaSpectrumView::SaSpectrumView(SaControls *controls, SaProcessor *processor, QWi
 
 	connect(gui->mainWindow(), SIGNAL(periodicUpdate()), this, SLOT(periodicalUpdate()));
 
-	m_colorMono = QColor(255, 255, 255, 255);	// (set in SaControlsDialog)
-	m_colorL = QColor(255, 255, 255, 255);
-	m_colorR = QColor(255, 255, 255, 255);
-	m_colorBG = QColor(7, 7, 7, 255);			// 20 % gray
-	m_colorGrid = QColor(30, 34, 38, 255);		// 40 % gray (slightly cold / blue)
-	m_colorLabels = QColor(192, 202, 212, 255);	// 90 % gray (slightly cold / blue)
-
 	for (int i = 0; i < MAX_BANDS; i++) {
 		m_bandHeight.append(0);				// FIXME: co ta promenna dela?
 	}
@@ -79,7 +72,7 @@ void SaSpectrumView::paintEvent(QPaintEvent *event)
 	painter.setRenderHint(QPainter::Antialiasing, false);
 
 	// always draw the background
-	painter.fillRect(displayLeft, 1, displayWidth, displayBottom, m_colorBG);
+	painter.fillRect(displayLeft, 1, displayWidth, displayBottom, m_controls->m_colorBG);
 
 	// select logarithmic or linear frequency grid and draw it
 	if (m_controls->m_logXModel.value()) {
@@ -88,13 +81,13 @@ void SaSpectrumView::paintEvent(QPaintEvent *event)
 		freqTics = &m_linearFreqTics;
 	}
 
-	painter.setPen(QPen(m_colorGrid, 1, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
+	painter.setPen(QPen(m_controls->m_colorGrid, 1, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
 	for (auto & line: *freqTics){
 		painter.drawLine(	displayLeft + freqToXPixel(line.first, displayWidth), 2,
 							displayLeft + freqToXPixel(line.first, displayWidth), displayBottom);
 	}
 
-	painter.setPen(QPen(m_colorLabels, 1, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
+	painter.setPen(QPen(m_controls->m_colorLabels, 1, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
 	for (auto & line: *freqTics) {
 		pos = displayLeft + freqToXPixel(line.first, displayWidth);
 		// make an exception if the first or last label is too close to edge
@@ -114,36 +107,36 @@ void SaSpectrumView::paintEvent(QPaintEvent *event)
 		ampTics = &m_linearAmpTics;
 	}
 
-	painter.setPen(QPen(m_colorGrid, 1, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
+	painter.setPen(QPen(m_controls->m_colorGrid, 1, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
 	for (auto & line: *ampTics){
 		painter.drawLine(	displayLeft + 1, ampToYPixel(line.first, displayBottom),
 							displayRight - 1, ampToYPixel(line.first, displayBottom));
 	}
 
-	painter.setPen(QPen(m_colorLabels, 1, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
+	painter.setPen(QPen(m_controls->m_colorLabels, 1, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
 	for (auto & line: *ampTics) {
 		pos = ampToYPixel(line.first, displayBottom);
 		// make an exception if the top or bottom label is too close to edge
 		if (line == ampTics->back() && pos < 8) {
-			if (stereo) painter.setPen(QPen(m_colorL.lighter(), 1, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
+			if (stereo) {painter.setPen(QPen(m_controls->m_colorL.lighter(), 1, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));}
 			painter.drawText(2, 0, 16, 16, Qt::AlignRight | Qt::AlignTop, QString(line.second.c_str()));
-			if (stereo) painter.setPen(QPen(m_colorR.lighter(), 1, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
+			if (stereo) {painter.setPen(QPen(m_controls->m_colorR.lighter(), 1, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));}
 			painter.drawText(displayRight + 2, 0, 16, 16, Qt::AlignLeft | Qt::AlignTop, QString(line.second.c_str()));
 		} else if (line == ampTics->front() && pos > displayBottom - 16) {
-			if (stereo) painter.setPen(QPen(m_colorL.lighter(), 1, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
+			if (stereo) {painter.setPen(QPen(m_controls->m_colorL.lighter(), 1, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));}
 			painter.drawText(2, displayBottom - 16, 16, 16, Qt::AlignRight | Qt::AlignBottom, QString(line.second.c_str()));
-			if (stereo) painter.setPen(QPen(m_colorR.lighter(), 1, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
+			if (stereo) {painter.setPen(QPen(m_controls->m_colorR.lighter(), 1, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));}
 			painter.drawText(displayRight + 2, displayBottom - 16, 16, 16, Qt::AlignLeft | Qt::AlignBottom, QString(line.second.c_str()));
 		} else {
-			if (stereo) painter.setPen(QPen(m_colorL.lighter(), 1, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
+			if (stereo) {painter.setPen(QPen(m_controls->m_colorL.lighter(), 1, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));}
 			painter.drawText(2, pos - 8, 16, 16, Qt::AlignRight | Qt::AlignVCenter, QString(line.second.c_str()));
-			if (stereo) painter.setPen(QPen(m_colorR.lighter(), 1, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
+			if (stereo) {painter.setPen(QPen(m_controls->m_colorR.lighter(), 1, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));}
 			painter.drawText(displayRight + 2, pos - 8, 16, 16, Qt::AlignLeft | Qt::AlignVCenter, QString(line.second.c_str()));
 		}
 	}
 
 	// draw the graph only if there is any input or smooth decay residue
-	if (energyL > 0 || energyR > 0 || m_decaySum > 0) {		
+	if (energyL > 0 || energyR > 0 || m_decaySum > 0) {
 
 		// update paths with new data if needed
 		if (!m_processor->getInProgress() && m_periodicalUpdate == true) {
@@ -193,31 +186,17 @@ void SaSpectrumView::paintEvent(QPaintEvent *event)
 	
 		// draw stored paths
 		if (stereo) {
-			painter.fillPath(m_pathR, QBrush(m_colorR));
-			painter.fillPath(m_pathL, QBrush(m_colorL));
+			painter.fillPath(m_pathR, QBrush(m_controls->m_colorR));
+			painter.fillPath(m_pathL, QBrush(m_controls->m_colorL));
 		} else {
-			painter.fillPath(m_pathL, QBrush(m_colorMono));
+			painter.fillPath(m_pathL, QBrush(m_controls->m_colorMono));
 		}
 	}
 
 	// always draw the outline
-	painter.setPen(QPen(m_colorGrid, 1.5, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
+	painter.setPen(QPen(m_controls->m_colorGrid, 2, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
 	painter.drawRoundedRect(displayLeft, 1, displayWidth, displayBottom, 2.0, 2.0);
 
-}
-
-
-QColor SaSpectrumView::getColor() const
-{
-	return m_colorMono;
-}
-
-
-void SaSpectrumView::setColors(const QColor &mono, const QColor &left, const QColor &right)
-{
-	m_colorMono = mono;
-	m_colorL = left;
-	m_colorR = right;
 }
 
 

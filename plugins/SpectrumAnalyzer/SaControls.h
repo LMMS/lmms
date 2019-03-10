@@ -26,6 +26,8 @@
 #ifndef SACONTROLS_H
 #define SACONTROLS_H
 
+#include <QPainter>
+
 #include "EffectControls.h"
 
 
@@ -35,6 +37,8 @@ class Analyzer;
 const int MAX_BANDS = 2048;
 const int LOWEST_FREQ = 10;		// arbitrary low frequency limit for log. scale (Hz, >0)
 const int LOWEST_AMP = -5;		// arbitrary low amplitude limit for log. scale (10*dB)
+const int WATERFALL_WIDTH = 512;	// memory size for spectrum history / spectrogram / waterfall
+const int WATERFALL_HEIGHT = 256;
 
 class SaControls : public EffectControls
 {
@@ -73,8 +77,16 @@ private:
 	BoolModel m_peakHoldModel;
 	BoolModel m_refFreezeModel;
 
+	QColor	m_colorL;
+	QColor	m_colorR;
+	QColor	m_colorMono;
+	QColor	m_colorBG;
+	QColor	m_colorGrid;
+	QColor	m_colorLabels;
+
 	friend class SaControlsDialog;
 	friend class SaSpectrumView;
+	friend class SaWaterfallView;
 	friend class SaProcessor;
 };
 #endif // SACONTROLS_H

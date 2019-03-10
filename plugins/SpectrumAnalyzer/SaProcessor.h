@@ -25,6 +25,8 @@
 #ifndef SAPROCESSOR_H
 #define SAPROCESSOR_H
 
+#include <QImage>
+
 #include "SaControls.h"
 
 #include "fft_helpers.h"
@@ -69,6 +71,10 @@ private:
 	bool m_mode_stereo;
 	bool m_inProgress;
 	float m_fftWindow[FFT_BUFFER_SIZE];
+
+	std::vector<uchar> m_history;
+
+	friend class SaWaterfallView;
 };
 #endif // SAPROCESSOR_H
 
