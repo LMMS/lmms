@@ -45,7 +45,8 @@ Architecture: any
 Depends: lmms-common (>= ${source:Version}), ${shlibs:Depends}, ${misc:Depends},
  stk
 Recommends: tap-plugins, caps,
- lmms-vst-server:i386 (>= ${source:Version})
+ lmms-vst-server:i386 (>= ${source:Version}),
+ lmms-vst-server:amd64 (>= ${source:Version})
 Suggests: fil-plugins, mcp-plugins, omins, freepats, fluid-soundfont-gm,
  ladspa-plugin
 Replaces: lmms-common (<< 1.0.0-1)
@@ -99,9 +100,8 @@ Description: Linux Multimedia Studio - common files
  and some example projects.
 
 Package: lmms-vst-server
-Architecture: i386
-# Order matters to avoid wine64
-Depends: wine32, wine, ${shlibs:Depends}, ${misc:Depends}
+Architecture: amd64 i386
+Depends: wine64 [amd64] | wine64-development [amd64] | wine32 [i386] | wine32-development [i386], ${shlibs:Depends}, ${misc:Depends}
 Recommends: lmms-bin:any
 Description: Linux Multimedia Studio - VST server
  This package contains a helper application that loads VST plugins.

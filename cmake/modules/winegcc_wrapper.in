@@ -45,6 +45,9 @@ fi
 # by FindWine.cmake
 extra_args="-I@WINE_INCLUDE_DIR@ -I@WINE_INCLUDE_DIR@/wine/windows"
 
+# Apply manually specified flags
+extra_args="$extra_args @WINE_CXX_FLAGS@"
+
 # Apply -m32 library fix if necessary
 if [ "$win32" = true ] && [ "$no_link" != true ]; then
 	extra_args="$extra_args @WINE_32_FLAGS@"
