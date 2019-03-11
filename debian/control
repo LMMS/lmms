@@ -17,6 +17,7 @@ Build-Depends:
  libfluidsynth-dev,
  libgig-dev,
  libjack-jackd2-dev,
+ liblist-moreutils-perl,
  libmp3lame-dev,
  libpulse-dev,
  libqt5x11extras5-dev,
@@ -29,10 +30,12 @@ Build-Depends:
  libvorbis-dev,
  libxcb-keysyms1-dev,
  libxcb-util0-dev,
+ libxml-perl,
+ libxml2-utils,
  portaudio19-dev,
  qtbase5-private-dev,
  qttools5-dev,
- wine32-tools [i386]
+ wine64-tools [amd64] | wine32-tools [i386]
 Standards-Version: 4.2.1.4
 Homepage: http://lmms.io/
 Vcs-Browser: https://salsa.debian.org/debian-edu-pkg-team/lmms.git
