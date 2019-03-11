@@ -291,6 +291,7 @@ void ZynAddSubFxInstrument::loadSettings( const QDomElement & _this )
 
 		emit settingsChanged();
 	}
+	emit instrumentTrack()->pitchModel()->dataChanged();
 }
 
 
