@@ -58,6 +58,12 @@ ELSEIF(LMMS_BUILD_WIN64 AND MSVC)
 
 ELSEIF(LMMS_BUILD_LINUX)
 	# Use winegcc
+	INCLUDE(CheckWineGcc)
+	CheckWineGcc(32 "${WINEGCC}" WINEGCC_WORKING)
+	IF(NOT WINEGCC_WORKING)
+		MESSAGE(WARNING "winegcc fails to complie 32-bit binaries, please make sure you have 32-bit GCC libraries")
+		RETURN()
+	ENDIF()
 	ExternalProject_Add(RemoteVstPlugin32
 		"${EXTERNALPROJECT_ARGS}"
 		CMAKE_ARGS
