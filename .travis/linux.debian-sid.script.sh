@@ -21,14 +21,11 @@ fi
 if [ ! -e "$BASETGZ.stamp" ]
 then
 	mkdir -p "$HOME/pbuilder-bases"
-	# debootstrap fails to resolve dependencies which are virtual packages
-	# e.g. perl-openssl-abi-1.1 provided by perl-openssl-defaults, needed for building SWH
-	# See also: https://bugs.launchpad.net/ubuntu/+source/debootstrap/+bug/86536
 	sudo pbuilder --create --basetgz "$BASETGZ" --mirror $MIRROR \
 		--distribution sid --architecture $TARGET_ARCH \
 		--debootstrapopts --variant=buildd \
 		--debootstrapopts --keyring=$KEYRING \
-		--debootstrapopts --include=perl,libxml2-utils,libxml-perl,liblist-moreutils-perl,perl-openssl-defaults
+		--debootstrapopts --include=perl
 	touch "$BASETGZ.stamp"
 else
 	sudo pbuilder --update --basetgz "$BASETGZ"
