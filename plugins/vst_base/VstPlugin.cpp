@@ -149,10 +149,10 @@ VstPlugin::VstPlugin( const QString & _plugin ) :
 	switch(machineType)
 	{
 	case PE::MachineType::amd64:
-		tryLoad( "RemoteVstPlugin64" );
+		tryLoad( REMOTE_VST_PLUGIN_FILEPATH_64 ); // Default: RemoteVstPlugin64
 		break;
 	case PE::MachineType::i386:
-		tryLoad( "32/RemoteVstPlugin32" );
+		tryLoad( REMOTE_VST_PLUGIN_FILEPATH_32 ); // Default: 32/RemoteVstPlugin32
 		break;
 	default:
 		m_failed = true;
