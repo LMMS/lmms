@@ -1,7 +1,4 @@
 usr/bin/lmms
-usr/lib/*/lmms/ladspa/[a-b]*
-usr/lib/*/lmms/ladspa/caps.so
-usr/lib/*/lmms/ladspa/c[b-z]*
-usr/lib/*/lmms/ladspa/[d-z]*
+usr/lib/*/lmms/ladspa/*
 usr/lib/*/lmms/lib*
 usr/lib/*/lmms/RemoteZynAddSubFx
