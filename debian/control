@@ -44,7 +44,7 @@ Package: lmms-bin
 Architecture: any
 Depends: lmms-common (>= ${source:Version}), ${shlibs:Depends}, ${misc:Depends},
  stk
-Recommends: calf-ladspa, tap-plugins, caps,
+Recommends: tap-plugins, caps,
  lmms-vst-server:i386 (>= ${source:Version})
 Suggests: fil-plugins, mcp-plugins, omins, freepats, fluid-soundfont-gm,
  ladspa-plugin
@@ -66,7 +66,7 @@ Description: Linux Multimedia Studio - minimal installation
 
 Package: lmms
 Architecture: any
-Depends: calf-ladspa, lmms-bin, ${misc:Depends}
+Depends: lmms-bin, ${misc:Depends}
 Description: Linux Multimedia Studio
  LMMS aims to be a free alternative to popular (but commercial and closed-
  source) programs like FruityLoops, Cubase and Logic giving you the ability of
@@ -105,17 +105,3 @@ Depends: wine32, wine, ${shlibs:Depends}, ${misc:Depends}
 Recommends: lmms-bin:any
 Description: Linux Multimedia Studio - VST server
  This package contains a helper application that loads VST plugins.
-
-Package: calf-ladspa
-Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}
-Replaces: calf-plugins (<< 0.0.19)
-Provides: ladspa-plugin
-Description: Linux Multimedia Studio - Calf LADSPA plugins
- Calf is a pack of audio plugins - effects and instruments. The goal is to
- create a set of plugins using decent algorithms and parameter settings,
- available in a form which is compatible with as many open source applications
- as possible.
- .
- These plugins are distributed as part of Linux Multimedia Studio, but may be
- used by other applications.
