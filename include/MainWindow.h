@@ -163,7 +163,7 @@ public slots:
 	void toggleBBEditorWin( bool forceShow = false );
 	void toggleSongEditorWin();
 	void toggleProjectNotesWin();
-	void toggleFxMixerWin();
+	void toggleMixerWin();
 	void togglePianoRollWin();
 	void toggleControllerRack();
 

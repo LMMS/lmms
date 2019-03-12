@@ -2219,7 +2219,7 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     </message>
 </context>
 <context>
-    <name>FxMixer</name>
+    <name>Mixer</name>
     <message>
         <source>Master</source>
         <translation>Master</translation>
@@ -2230,7 +2230,7 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     </message>
 </context>
 <context>
-    <name>FxMixerView</name>
+    <name>MixerView</name>
     <message>
         <source>Mixer</source>
         <translation>Mixer</translation>

@@ -47,7 +47,7 @@
 #include "Engine.h"
 #include "FileBrowser.h"
 #include "FileDialog.h"
-#include "FxMixerView.h"
+#include "MixerView.h"
 #include "GuiApplication.h"
 #include "PianoRoll.h"
 #include "PluginBrowser.h"
@@ -542,7 +542,7 @@ void MainWindow::finalize()
 	ToolButton * fx_mixer_window = new ToolButton(
 					embed::getIconPixmap( "fx_mixer" ),
 					tr( "Show/hide FX Mixer" ) + " (F9)",
-					this, SLOT( toggleFxMixerWin() ),
+					this, SLOT( toggleMixerWin() ),
 					m_toolBar );
 	fx_mixer_window->setShortcut( Qt::Key_F9 );
 	fx_mixer_window->setWhatsThis(
@@ -757,7 +757,7 @@ void MainWindow::clearKeyModifiers()
 
 void MainWindow::saveWidgetState( QWidget * _w, QDomElement & _de )
 {
-	// If our widget is the main content of a window (e.g. piano roll, FxMixer, etc), 
+	// If our widget is the main content of a window (e.g. piano roll, Mixer, etc), 
 	// we really care about the position of the *window* - not the position of the widget within its window
 	if( _w->parentWidget() != NULL &&
 			_w->parentWidget()->inherits( "QMdiSubWindow" ) )
@@ -794,7 +794,7 @@ void MainWindow::restoreWidgetState( QWidget * _w, const QDomElement & _de )
 			qMax( _w->minimumHeight(), _de.attribute( "height" ).toInt() ) );
 	if( _de.hasAttribute( "visible" ) && !r.isNull() )
 	{
-		// If our widget is the main content of a window (e.g. piano roll, FxMixer, etc), 
+		// If our widget is the main content of a window (e.g. piano roll, Mixer, etc), 
 		// we really care about the position of the *window* - not the position of the widget within its window
 		if ( _w->parentWidget() != NULL &&
 			_w->parentWidget()->inherits( "QMdiSubWindow" ) )
@@ -1190,7 +1190,7 @@ void MainWindow::toggleAutomationEditorWin()
 
 
 
-void MainWindow::toggleFxMixerWin()
+void MainWindow::toggleMixerWin()
 {
 	toggleWindow( gui->fxMixerView() );
 }
@@ -1221,7 +1221,7 @@ void MainWindow::updateViewMenu()
 		);
 	m_viewMenu->addAction(embed::getIconPixmap( "fx_mixer" ),
 			      tr( "FX Mixer" ) + " (F9)",
-			      this, SLOT( toggleFxMixerWin() )
+			      this, SLOT( toggleMixerWin() )
 		);
 	m_viewMenu->addAction(embed::getIconPixmap( "project_notes" ),
 			      tr( "Project Notes" ) +	" (F10)",

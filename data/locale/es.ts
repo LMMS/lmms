@@ -2240,7 +2240,7 @@ Puedes quitar y mover los canales FX a través del menú contextual. Accede a es
     </message>
 </context>
 <context>
-    <name>FxMixer</name>
+    <name>Mixer</name>
     <message>
         <source>Master</source>
         <translation>Maestro</translation>
@@ -2251,7 +2251,7 @@ Puedes quitar y mover los canales FX a través del menú contextual. Accede a es
     </message>
 </context>
 <context>
-    <name>FxMixerView</name>
+    <name>MixerView</name>
     <message>
         <source>Mixer</source>
         <translation>Mezcladora FX</translation>

@@ -33,7 +33,7 @@
 #include "BBEditor.h"
 #include "ConfigManager.h"
 #include "ControllerRackView.h"
-#include "FxMixerView.h"
+#include "MixerView.h"
 #include "MainWindow.h"
 #include "PianoRoll.h"
 #include "ProjectNotes.h"
@@ -123,7 +123,7 @@ GuiApplication::GuiApplication()
 	connect(m_songEditor, SIGNAL(destroyed(QObject*)), this, SLOT(childDestroyed(QObject*)));
 
 	displayInitProgress(tr("Preparing mixer"));
-	m_fxMixerView = new FxMixerView;
+	m_fxMixerView = new MixerView;
 	connect(m_fxMixerView, SIGNAL(destroyed(QObject*)), this, SLOT(childDestroyed(QObject*)));
 
 	displayInitProgress(tr("Preparing controller rack"));

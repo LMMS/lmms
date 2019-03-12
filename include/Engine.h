@@ -34,7 +34,7 @@
 
 class BBTrackContainer;
 class DummyTrackContainer;
-class FxMixer;
+class Mixer;
 class ProjectJournal;
 class Mixer;
 class Song;
@@ -66,7 +66,7 @@ public:
 		return s_mixer;
 	}
 
-	static FxMixer * fxMixer()
+	static Mixer * fxMixer()
 	{
 		return s_fxMixer;
 	}
@@ -130,7 +130,7 @@ private:
 
 	// core
 	static Mixer *s_mixer;
-	static FxMixer * s_fxMixer;
+	static Mixer * s_fxMixer;
 	static Song * s_song;
 	static BBTrackContainer * s_bbTrackContainer;
 	static ProjectJournal * s_projectJournal;

@@ -29,7 +29,7 @@
 #include "lmmsconfig.h"
 
 #include "AudioPort.h"
-#include "FxMixer.h"
+#include "Mixer.h"
 #include "MixerWorkerThread.h"
 #include "Song.h"
 #include "EnvelopeAndLfoParameters.h"
@@ -420,7 +420,7 @@ const surroundSampleFrame * Mixer::renderNextBuffer()
 	BufferManager::clear( m_writeBuf, m_framesPerPeriod );
 
 	// prepare master mix (clear internal buffers etc.)
-	FxMixer * fxMixer = Engine::fxMixer();
+	Mixer * fxMixer = Engine::fxMixer();
 	fxMixer->prepareMasterMix();
 
 	// create play-handles for new notes, samples etc.

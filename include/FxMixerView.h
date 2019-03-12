@@ -1,5 +1,5 @@
 /*
- * FxMixerView.h - effect-mixer-view for LMMS
+ * MixerView.h - effect-mixer-view for LMMS
  *
  * Copyright (c) 2008-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
@@ -41,7 +41,7 @@
 class QButtonGroup;
 class FxLine;
 
-class EXPORT FxMixerView : public QWidget, public ModelView,
+class EXPORT MixerView : public QWidget, public ModelView,
 					public SerializingObjectHook
 {
 	Q_OBJECT
@@ -49,7 +49,7 @@ public:
 	class FxChannelView
 	{
 	public:
-		FxChannelView(QWidget * _parent, FxMixerView * _mv, int _chIndex );
+		FxChannelView(QWidget * _parent, MixerView * _mv, int _chIndex );
 
 		void setChannelIndex( int index );
 
@@ -61,8 +61,8 @@ public:
 	};
 
 
-	FxMixerView();
-	virtual ~FxMixerView();
+	MixerView();
+	virtual ~MixerView();
 
 	virtual void keyPressEvent(QKeyEvent * e);
 

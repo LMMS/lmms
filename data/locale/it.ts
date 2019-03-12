@@ -2242,7 +2242,7 @@ Puoi rimuovere e muovere i canali con il menù contestuale, cliccando con il tas
     </message>
 </context>
 <context>
-    <name>FxMixer</name>
+    <name>Mixer</name>
     <message>
         <source>Master</source>
         <translation>Master</translation>
@@ -2253,14 +2253,14 @@ Puoi rimuovere e muovere i canali con il menù contestuale, cliccando con il tas
     </message>
 </context>
 <context>
-    <name>FxMixerView</name>
+    <name>MixerView</name>
     <message>
         <source>Mixer</source>
         <translation>Mixer FX</translation>
     </message>
 </context>
 <context>
-    <name>FxMixerView::FxChannelView</name>
+    <name>MixerView::FxChannelView</name>
     <message>
         <source>FX Fader %1</source>
         <translation>Volume FX %1</translation>

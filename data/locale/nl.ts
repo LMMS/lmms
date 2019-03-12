@@ -2254,7 +2254,7 @@ U kunt FX-kanalen verwijderen en verplaatsen in het contextmenu, dat toegankelij
     </message>
 </context>
 <context>
-    <name>FxMixer</name>
+    <name>Mixer</name>
     <message>
         <source>Master</source>
         <translation>Master</translation>
@@ -2265,7 +2265,7 @@ U kunt FX-kanalen verwijderen en verplaatsen in het contextmenu, dat toegankelij
     </message>
 </context>
 <context>
-    <name>FxMixerView</name>
+    <name>MixerView</name>
     <message>
         <source>Mixer</source>
         <translation>Mixer</translation>

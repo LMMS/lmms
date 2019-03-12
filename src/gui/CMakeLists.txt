@@ -13,7 +13,7 @@ SET(LMMS_SRCS
 	gui/embed.cpp
 	gui/ExportProjectDialog.cpp
 	gui/FileBrowser.cpp
-	gui/FxMixerView.cpp
+	gui/MixerView.cpp
 	gui/GuiApplication.cpp
 	gui/InstrumentView.cpp
 	gui/LfoControllerDialog.cpp

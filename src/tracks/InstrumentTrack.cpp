@@ -47,8 +47,8 @@
 #include "EffectRackView.h"
 #include "embed.h"
 #include "FileBrowser.h"
-#include "FxMixer.h"
-#include "FxMixerView.h"
+#include "Mixer.h"
+#include "MixerView.h"
 #include "GuiApplication.h"
 #include "InstrumentSoundShapingView.h"
 #include "FadeButton.h"
@@ -1266,7 +1266,7 @@ class fxLineLcdSpinBox : public LcdSpinBox
 			gui->fxMixerView()->parentWidget()->show();
 			gui->fxMixerView()->show();// show fxMixer window
 			gui->fxMixerView()->setFocus();// set focus to fxMixer window
-			//engine::getFxMixerView()->raise();
+			//engine::getMixerView()->raise();
 		}
 
 		virtual void contextMenuEvent( QContextMenuEvent* event )

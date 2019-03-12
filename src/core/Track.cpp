@@ -57,7 +57,7 @@
 #include "embed.h"
 #include "Engine.h"
 #include "GuiApplication.h"
-#include "FxMixerView.h"
+#include "MixerView.h"
 #include "gui_templates.h"
 #include "MainWindow.h"
 #include "Mixer.h"

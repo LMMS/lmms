@@ -29,7 +29,7 @@
 #include <QWhatsThis>
 
 #include "CaptionMenu.h"
-#include "FxMixer.h"
+#include "Mixer.h"
 #include "gui_templates.h"
 #include "GuiApplication.h"
 #include "Song.h"
@@ -39,7 +39,7 @@ const int FxLine::FxLineHeight = 287;
 QPixmap * FxLine::s_sendBgArrow = NULL;
 QPixmap * FxLine::s_receiveBgArrow = NULL;
 
-FxLine::FxLine( QWidget * _parent, FxMixerView * _mv, int _channelIndex ) :
+FxLine::FxLine( QWidget * _parent, MixerView * _mv, int _channelIndex ) :
 	QWidget( _parent ),
 	m_mv( _mv ),
 	m_channelIndex( _channelIndex ),
@@ -283,7 +283,7 @@ void FxLine::renameFinished()
 
 void FxLine::removeChannel()
 {
-	FxMixerView * mix = gui->fxMixerView();
+	MixerView * mix = gui->fxMixerView();
 	mix->deleteChannel( m_channelIndex );
 }
 
@@ -292,7 +292,7 @@ void FxLine::removeChannel()
 
 void FxLine::removeUnusedChannels()
 {
-	FxMixerView * mix = gui->fxMixerView();
+	MixerView * mix = gui->fxMixerView();
 	mix->deleteUnusedChannels();
 }
 
@@ -301,7 +301,7 @@ void FxLine::removeUnusedChannels()
 
 void FxLine::moveChannelLeft()
 {
-	FxMixerView * mix = gui->fxMixerView();
+	MixerView * mix = gui->fxMixerView();
 	mix->moveChannelLeft( m_channelIndex );
 }
 
@@ -310,7 +310,7 @@ void FxLine::moveChannelLeft()
 
 void FxLine::moveChannelRight()
 {
-	FxMixerView * mix = gui->fxMixerView();
+	MixerView * mix = gui->fxMixerView();
 	mix->moveChannelRight( m_channelIndex );
 }
 

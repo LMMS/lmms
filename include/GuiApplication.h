@@ -34,7 +34,7 @@ class QLabel;
 class AutomationEditorWindow;
 class BBEditor;
 class ControllerRackView;
-class FxMixerView;
+class MixerView;
 class MainWindow;
 class PianoRollWindow;
 class ProjectNotes;
@@ -50,7 +50,7 @@ public:
 	static GuiApplication* instance();
 
 	MainWindow* mainWindow() { return m_mainWindow; }
-	FxMixerView* fxMixerView() { return m_fxMixerView; }
+	MixerView* fxMixerView() { return m_fxMixerView; }
 	SongEditorWindow* songEditor() { return m_songEditor; }
 	BBEditor* getBBEditor() { return m_bbEditor; }
 	PianoRollWindow* pianoRoll() { return m_pianoRoll; }
@@ -68,7 +68,7 @@ private:
 	static GuiApplication* s_instance;
 
 	MainWindow* m_mainWindow;
-	FxMixerView* m_fxMixerView;
+	MixerView* m_fxMixerView;
 	SongEditorWindow* m_songEditor;
 	AutomationEditorWindow* m_automationEditor;
 	BBEditor* m_bbEditor;

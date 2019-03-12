@@ -25,7 +25,7 @@
 #include "AudioPort.h"
 #include "AudioDevice.h"
 #include "EffectChain.h"
-#include "FxMixer.h"
+#include "Mixer.h"
 #include "Engine.h"
 #include "Mixer.h"
 #include "MixHelpers.h"

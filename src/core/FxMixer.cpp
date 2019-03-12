@@ -1,5 +1,5 @@
 /*
- * FxMixer.cpp - effect mixer for LMMS
+ * Mixer.cpp - effect mixer for LMMS
  *
  * Copyright (c) 2008-2011 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
@@ -25,7 +25,7 @@
 #include <QDomElement>
 
 #include "BufferManager.h"
-#include "FxMixer.h"
+#include "Mixer.h"
 #include "Mixer.h"
 #include "MixerWorkerThread.h"
 #include "MixHelpers.h"
@@ -187,7 +187,7 @@ void FxChannel::doProcessing()
 
 
 
-FxMixer::FxMixer() :
+Mixer::Mixer() :
 	Model( NULL ),
 	JournallingObject(),
 	m_fxChannels()
@@ -199,7 +199,7 @@ FxMixer::FxMixer() :
 
 
 
-FxMixer::~FxMixer()
+Mixer::~Mixer()
 {
 	while( ! m_fxRoutes.isEmpty() )
 	{
@@ -215,7 +215,7 @@ FxMixer::~FxMixer()
 
 
 
-int FxMixer::createChannel()
+int Mixer::createChannel()
 {
 	const int index = m_fxChannels.size();
 	// create new channel
@@ -227,7 +227,7 @@ int FxMixer::createChannel()
 	return index;
 }
 
-void FxMixer::activateSolo()
+void Mixer::activateSolo()
 {
 	for (int i = 1; i < m_fxChannels.size(); ++i)
 	{
@@ -236,7 +236,7 @@ void FxMixer::activateSolo()
 	}
 }
 
-void FxMixer::deactivateSolo()
+void Mixer::deactivateSolo()
 {
 	for (int i = 1; i < m_fxChannels.size(); ++i)
 	{
@@ -244,7 +244,7 @@ void FxMixer::deactivateSolo()
 	}
 }
 
-void FxMixer::toggledSolo()
+void Mixer::toggledSolo()
 {
 	int soloedChan = -1;
 	bool resetSolo = m_lastSoloed != -1;
@@ -279,7 +279,7 @@ void FxMixer::toggledSolo()
 
 
 
-void FxMixer::deleteChannel( int index )
+void Mixer::deleteChannel( int index )
 {
 	// channel deletion is performed between mixer rounds
 	Engine::mixer()->requestChangeInModel();
@@ -348,7 +348,7 @@ void FxMixer::deleteChannel( int index )
 
 
 
-void FxMixer::moveChannelLeft( int index )
+void Mixer::moveChannelLeft( int index )
 {
 	// can't move master or first channel
 	if( index <= 1 || index >= m_fxChannels.size() )
@@ -394,14 +394,14 @@ void FxMixer::moveChannelLeft( int index )
 
 
 
-void FxMixer::moveChannelRight( int index )
+void Mixer::moveChannelRight( int index )
 {
 	moveChannelLeft( index + 1 );
 }
 
 
 
-FxRoute * FxMixer::createChannelSend( fx_ch_t fromChannel, fx_ch_t toChannel,
+FxRoute * Mixer::createChannelSend( fx_ch_t fromChannel, fx_ch_t toChannel,
 								float amount )
 {
 //	qDebug( "requested: %d to %d", fromChannel, toChannel );
@@ -424,7 +424,7 @@ FxRoute * FxMixer::createChannelSend( fx_ch_t fromChannel, fx_ch_t toChannel,
 }
 
 
-FxRoute * FxMixer::createRoute( FxChannel * from, FxChannel * to, float amount )
+FxRoute * Mixer::createRoute( FxChannel * from, FxChannel * to, float amount )
 {
 	if( from == to )
 	{
@@ -448,7 +448,7 @@ FxRoute * FxMixer::createRoute( FxChannel * from, FxChannel * to, float amount )
 
 
 // delete the connection made by createChannelSend
-void FxMixer::deleteChannelSend( fx_ch_t fromChannel, fx_ch_t toChannel )
+void Mixer::deleteChannelSend( fx_ch_t fromChannel, fx_ch_t toChannel )
 {
 	// delete the send
 	FxChannel * from = m_fxChannels[fromChannel];
@@ -466,7 +466,7 @@ void FxMixer::deleteChannelSend( fx_ch_t fromChannel, fx_ch_t toChannel )
 }
 
 
-void FxMixer::deleteChannelSend( FxRoute * route )
+void Mixer::deleteChannelSend( FxRoute * route )
 {
 	Engine::mixer()->requestChangeInModel();
 	// remove us from from's sends
@@ -480,7 +480,7 @@ void FxMixer::deleteChannelSend( FxRoute * route )
 }
 
 
-bool FxMixer::isInfiniteLoop( fx_ch_t sendFrom, fx_ch_t sendTo )
+bool Mixer::isInfiniteLoop( fx_ch_t sendFrom, fx_ch_t sendTo )
 {
 	if( sendFrom == sendTo ) return true;
 	FxChannel * from = m_fxChannels[sendFrom];
@@ -490,7 +490,7 @@ bool FxMixer::isInfiniteLoop( fx_ch_t sendFrom, fx_ch_t sendTo )
 }
 
 
-bool FxMixer::checkInfiniteLoop( FxChannel * from, FxChannel * to )
+bool Mixer::checkInfiniteLoop( FxChannel * from, FxChannel * to )
 {
 	// can't send master to anything
 	if( from == m_fxChannels[0] )
@@ -519,7 +519,7 @@ bool FxMixer::checkInfiniteLoop( FxChannel * from, FxChannel * to )
 
 
 // how much does fromChannel send its output to the input of toChannel?
-FloatModel * FxMixer::channelSendModel( fx_ch_t fromChannel, fx_ch_t toChannel )
+FloatModel * Mixer::channelSendModel( fx_ch_t fromChannel, fx_ch_t toChannel )
 {
 	if( fromChannel == toChannel )
 	{
@@ -541,7 +541,7 @@ FloatModel * FxMixer::channelSendModel( fx_ch_t fromChannel, fx_ch_t toChannel )
 
 
 
-void FxMixer::mixToChannel( const sampleFrame * _buf, fx_ch_t _ch )
+void Mixer::mixToChannel( const sampleFrame * _buf, fx_ch_t _ch )
 {
 	if( m_fxChannels[_ch]->m_muteModel.value() == false )
 	{
@@ -555,7 +555,7 @@ void FxMixer::mixToChannel( const sampleFrame * _buf, fx_ch_t _ch )
 
 
 
-void FxMixer::prepareMasterMix()
+void Mixer::prepareMasterMix()
 {
 	BufferManager::clear( m_fxChannels[0]->m_buffer,
 					Engine::mixer()->framesPerPeriod() );
@@ -563,7 +563,7 @@ void FxMixer::prepareMasterMix()
 
 
 
-void FxMixer::masterMix( sampleFrame * _buf )
+void Mixer::masterMix( sampleFrame * _buf )
 {
 	const int fpp = Engine::mixer()->framesPerPeriod();
 
@@ -643,7 +643,7 @@ void FxMixer::masterMix( sampleFrame * _buf )
 
 
 
-void FxMixer::clear()
+void Mixer::clear()
 {
 	while( m_fxChannels.size() > 1 )
 	{
@@ -655,7 +655,7 @@ void FxMixer::clear()
 
 
 
-void FxMixer::clearChannel(fx_ch_t index)
+void Mixer::clearChannel(fx_ch_t index)
 {
 	FxChannel * ch = m_fxChannels[index];
 	ch->m_fxChain.clear();
@@ -687,7 +687,7 @@ void FxMixer::clearChannel(fx_ch_t index)
 	}
 }
 
-void FxMixer::saveSettings( QDomDocument & _doc, QDomElement & _this )
+void Mixer::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
 	// save channels
 	for( int i = 0; i < m_fxChannels.size(); ++i )
@@ -717,7 +717,7 @@ void FxMixer::saveSettings( QDomDocument & _doc, QDomElement & _this )
 }
 
 // make sure we have at least num channels
-void FxMixer::allocateChannelsTo(int num)
+void Mixer::allocateChannelsTo(int num)
 {
 	while( num > m_fxChannels.size() - 1 )
 	{
@@ -729,7 +729,7 @@ void FxMixer::allocateChannelsTo(int num)
 }
 
 
-void FxMixer::loadSettings( const QDomElement & _this )
+void Mixer::loadSettings( const QDomElement & _this )
 {
 	clear();
 	QDomNode node = _this.firstChild();
@@ -775,7 +775,7 @@ void FxMixer::loadSettings( const QDomElement & _this )
 }
 
 
-void FxMixer::validateChannelName( int index, int oldIndex )
+void Mixer::validateChannelName( int index, int oldIndex )
 {
 	if( m_fxChannels[index]->m_name == tr( "FX %1" ).arg( oldIndex ) )
 	{

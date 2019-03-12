@@ -2239,7 +2239,7 @@ Sie können FX Kanäle im Kontextmenü entfernen und verschieben, welches durch 
     </message>
 </context>
 <context>
-    <name>FxMixer</name>
+    <name>Mixer</name>
     <message>
         <source>Master</source>
         <translation>Master</translation>
@@ -2250,7 +2250,7 @@ Sie können FX Kanäle im Kontextmenü entfernen und verschieben, welches durch 
     </message>
 </context>
 <context>
-    <name>FxMixerView</name>
+    <name>MixerView</name>
     <message>
         <source>Mixer</source>
         <translation>Mixer</translation>

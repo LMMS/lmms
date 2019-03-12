@@ -43,8 +43,8 @@
 #include "embed.h"
 #include "EnvelopeAndLfoParameters.h"
 #include "ExportProjectDialog.h"
-#include "FxMixer.h"
-#include "FxMixerView.h"
+#include "Mixer.h"
+#include "MixerView.h"
 #include "GuiApplication.h"
 #include "ImportFilter.h"
 #include "ExportFilter.h"
@@ -1069,7 +1069,7 @@ void Song::loadProject( const QString & fileName )
 		Engine::fxMixer()->restoreState( node.toElement() );
 		if( gui )
 		{
-			// refresh FxMixerView
+			// refresh MixerView
 			gui->fxMixerView()->refreshDisplay();
 		}
 	}

@@ -1,5 +1,5 @@
 /*
- * FxMixer.h - effect-mixer for LMMS
+ * Mixer.h - effect-mixer for LMMS
  *
  * Copyright (c) 2008-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
@@ -120,12 +120,12 @@ class FxRoute : public QObject
 };
 
 
-class EXPORT FxMixer : public Model, public JournallingObject
+class EXPORT Mixer : public Model, public JournallingObject
 {
 	Q_OBJECT
 public:
-	FxMixer();
-	virtual ~FxMixer();
+	Mixer();
+	virtual ~Mixer();
 
 	void mixToChannel( const sampleFrame * _buf, fx_ch_t _ch );
 

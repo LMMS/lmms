@@ -2803,64 +2803,64 @@ Anda dapat menghapus dan memindahkan saluran FX dalam menu konteks, yang diakses
     </message>
 </context>
 <context>
-    <name>FxMixer</name>
+    <name>Mixer</name>
     <message>
-        <location filename="../../src/core/FxMixer.cpp" line="665"/>
+        <location filename="../../src/core/Mixer.cpp" line="665"/>
         <source>Master</source>
         <translation>Master</translation>
     </message>
     <message>
-        <location filename="../../src/core/FxMixer.cpp" line="665"/>
-        <location filename="../../src/core/FxMixer.cpp" line="780"/>
-        <location filename="../../src/core/FxMixer.cpp" line="782"/>
+        <location filename="../../src/core/Mixer.cpp" line="665"/>
+        <location filename="../../src/core/Mixer.cpp" line="780"/>
+        <location filename="../../src/core/Mixer.cpp" line="782"/>
         <source>FX %1</source>
         <translation>FX %1</translation>
     </message>
     <message>
-        <location filename="../../src/core/FxMixer.cpp" line="666"/>
+        <location filename="../../src/core/Mixer.cpp" line="666"/>
         <source>Volume</source>
         <translation>Volume</translation>
     </message>
     <message>
-        <location filename="../../src/core/FxMixer.cpp" line="667"/>
+        <location filename="../../src/core/Mixer.cpp" line="667"/>
         <source>Mute</source>
         <translation>Bisu</translation>
     </message>
     <message>
-        <location filename="../../src/core/FxMixer.cpp" line="668"/>
+        <location filename="../../src/core/Mixer.cpp" line="668"/>
         <source>Solo</source>
         <translation>Solo</translation>
     </message>
 </context>
 <context>
-    <name>FxMixerView</name>
+    <name>MixerView</name>
     <message>
-        <location filename="../../src/gui/FxMixerView.cpp" line="68"/>
+        <location filename="../../src/gui/MixerView.cpp" line="68"/>
         <source>Mixer</source>
         <translation>Mixer</translation>
     </message>
     <message>
-        <location filename="../../src/gui/FxMixerView.cpp" line="281"/>
+        <location filename="../../src/gui/MixerView.cpp" line="281"/>
         <source>FX Fader %1</source>
         <translation>FX Pemudar %1</translation>
     </message>
     <message>
-        <location filename="../../src/gui/FxMixerView.cpp" line="290"/>
+        <location filename="../../src/gui/MixerView.cpp" line="290"/>
         <source>Mute</source>
         <translation>Bisu</translation>
     </message>
     <message>
-        <location filename="../../src/gui/FxMixerView.cpp" line="298"/>
+        <location filename="../../src/gui/MixerView.cpp" line="298"/>
         <source>Mute this FX channel</source>
         <translation>Bisukan saluran FX ini</translation>
     </message>
     <message>
-        <location filename="../../src/gui/FxMixerView.cpp" line="300"/>
+        <location filename="../../src/gui/MixerView.cpp" line="300"/>
         <source>Solo</source>
         <translation>Solo</translation>
     </message>
     <message>
-        <location filename="../../src/gui/FxMixerView.cpp" line="310"/>
+        <location filename="../../src/gui/MixerView.cpp" line="310"/>
         <source>Solo FX channel</source>
         <translation>Saluran FX Solo</translation>
     </message>
@@ -2868,8 +2868,8 @@ Anda dapat menghapus dan memindahkan saluran FX dalam menu konteks, yang diakses
 <context>
     <name>FxRoute</name>
     <message>
-        <location filename="../../src/core/FxMixer.cpp" line="41"/>
-        <location filename="../../src/core/FxMixer.cpp" line="56"/>
+        <location filename="../../src/core/Mixer.cpp" line="41"/>
+        <location filename="../../src/core/Mixer.cpp" line="56"/>
         <source>Amount to send from channel %1 to channel %2</source>
         <translation>Jumlah untuk kirim dari saluran %1 ke saluran %2</translation>
     </message>
