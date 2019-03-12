@@ -3781,11 +3781,11 @@ Please make sure you have write-access to the file and try again.</source>
         <translation>Показати / сховати вікно редактора автоматизації. З його допомогою ви можете легко редагувати динаміку обраних величин.</translation>
     </message>
     <message>
-        <source>FX Mixer</source>
+        <source>Mixer</source>
         <translation>Мікшер Ефектів</translation>
     </message>
     <message>
-        <source>Click here to show or hide the FX Mixer. The FX Mixer is a very powerful tool for managing effects for your song. You can insert effects into different effect-channels.</source>
+        <source>Click here to show or hide the Mixer. The Mixer is a very powerful tool for managing effects for your song. You can insert effects into different effect-channels.</source>
         <translation>Сховати / показати мікшер ефектів. Він є потужним інструментом для управління ефектами. Ви можете вставляти ефекти в різні канали.</translation>
     </message>
     <message>
@@ -3987,7 +3987,7 @@ Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
         <translation>Показати/сховати редактор автоматизації</translation>
     </message>
     <message>
-        <source>Show/hide FX Mixer</source>
+        <source>Show/hide Mixer</source>
         <translation>Показати/сховати мікшер ЕФ</translation>
     </message>
     <message>

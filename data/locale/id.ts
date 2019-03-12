@@ -4907,13 +4907,13 @@ Please make sure you have write permission to the file and the directory contain
     </message>
     <message>
         <location filename="../../src/gui/MainWindow.cpp" line="544"/>
-        <source>Show/hide FX Mixer</source>
-        <translation>Tampilkan/sembunyikan FX Mixer</translation>
+        <source>Show/hide Mixer</source>
+        <translation>Tampilkan/sembunyikan Mixer</translation>
     </message>
     <message>
         <location filename="../../src/gui/MainWindow.cpp" line="549"/>
-        <source>Click here to show or hide the FX Mixer. The FX Mixer is a very powerful tool for managing effects for your song. You can insert effects into different effect-channels.</source>
-        <translation>Klik disini untuk menampilkan atau menyembunyikan FX Mixer. FX Mixer adalah alat yang sangat ampuh untuk mengelola efek untuk lagu Anda. Anda bisa memasukkan efek ke saluran efek yang berbeda.</translation>
+        <source>Click here to show or hide the Mixer. The Mixer is a very powerful tool for managing effects for your song. You can insert effects into different effect-channels.</source>
+        <translation>Klik disini untuk menampilkan atau menyembunyikan Mixer. Mixer adalah alat yang sangat ampuh untuk mengelola efek untuk lagu Anda. Anda bisa memasukkan efek ke saluran efek yang berbeda.</translation>
     </message>
     <message>
         <location filename="../../src/gui/MainWindow.cpp" line="556"/>
@@ -5039,8 +5039,8 @@ Silakan kunjungi http://lmms.sf.net/wiki untuk dokumentasi LMMS.</translation>
     </message>
     <message>
         <location filename="../../src/gui/MainWindow.cpp" line="1223"/>
-        <source>FX Mixer</source>
-        <translation>FX Mixer</translation>
+        <source>Mixer</source>
+        <translation>Mixer</translation>
     </message>
     <message>
         <location filename="../../src/gui/MainWindow.cpp" line="1227"/>

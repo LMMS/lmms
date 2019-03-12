@@ -3779,11 +3779,11 @@ Por favor asegúrate de tener los permisos necesarios e inténtalo de nuevo.</tr
         <translation>Haz click aquí para mostrar u ocultar el Editor de Automatización. Con la ayuda del Editor de Automatización puedes editar valores dinámicos fácilmente.</translation>
     </message>
     <message>
-        <source>FX Mixer</source>
+        <source>Mixer</source>
         <translation>Mezcladora FX</translation>
     </message>
     <message>
-        <source>Click here to show or hide the FX Mixer. The FX Mixer is a very powerful tool for managing effects for your song. You can insert effects into different effect-channels.</source>
+        <source>Click here to show or hide the Mixer. The Mixer is a very powerful tool for managing effects for your song. You can insert effects into different effect-channels.</source>
         <translation>Haz click aquí para mostrar u ocultar la Mezcladora FX. La Mezcladora FX es una herramienta muy poderosa para administrar los efectos en tu canción. Puedes insertar efectos en diferentes canales.</translation>
     </message>
     <message>
@@ -3985,7 +3985,7 @@ Por favor visita http://lmms.sf.net/wiki para obtener documentación acerca de L
         <translation>Mostrar/ocultar Editor de Automatización</translation>
     </message>
     <message>
-        <source>Show/hide FX Mixer</source>
+        <source>Show/hide Mixer</source>
         <translation>Mostrar/ocultar Mezcladora FX</translation>
     </message>
     <message>

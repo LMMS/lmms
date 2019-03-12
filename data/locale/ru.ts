@@ -3783,11 +3783,11 @@ Please make sure you have write-access to the file and try again.</source>
         <translation>Показать/скрыть окно редактора автоматизации. С его помощью вы можете легко редактироватьдинамику выбранных величин.</translation>
     </message>
     <message>
-        <source>FX Mixer</source>
+        <source>Mixer</source>
         <translation>Показать/скрыть микшер ЭФ</translation>
     </message>
     <message>
-        <source>Click here to show or hide the FX Mixer. The FX Mixer is a very powerful tool for managing effects for your song. You can insert effects into different effect-channels.</source>
+        <source>Click here to show or hide the Mixer. The Mixer is a very powerful tool for managing effects for your song. You can insert effects into different effect-channels.</source>
         <translation>Скрыть/показать микшер ЭФфектов. Он является мощным инструментом для управления эффектами. Вы можете вставлять эффекты в различные каналы.</translation>
     </message>
     <message>
@@ -3990,7 +3990,7 @@ Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
         <translation>Показать/скрыть редактор автоматизации</translation>
     </message>
     <message>
-        <source>Show/hide FX Mixer</source>
+        <source>Show/hide Mixer</source>
         <translation>Показать/скрыть микшер ЭФ</translation>
     </message>
     <message>

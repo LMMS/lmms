@@ -3760,11 +3760,11 @@ Ujistěte se prosím, že máte k souboru právo zápisu a zkuste to znovu.</tra
         <translation>Klikněte sem, pokud chcete ukázat nebo schovat Automatizační editor. S pomocí Automatizačního editoru můžete jednoduchým způsobem editovat dynamické hodnoty.</translation>
     </message>
     <message>
-        <source>FX Mixer</source>
+        <source>Mixer</source>
         <translation>FX mixážní panel</translation>
     </message>
     <message>
-        <source>Click here to show or hide the FX Mixer. The FX Mixer is a very powerful tool for managing effects for your song. You can insert effects into different effect-channels.</source>
+        <source>Click here to show or hide the Mixer. The Mixer is a very powerful tool for managing effects for your song. You can insert effects into different effect-channels.</source>
         <translation>Klikněte sem, pokud chcete ukázat nebo skrýt FX mixážní panel. FX mixážní panel je velmi silný nástroj pro správu efektů ve vaší skladbě. Efekty můžete vkládat do různých efektových kanálů.</translation>
     </message>
     <message>
@@ -3966,7 +3966,7 @@ Navštivte prosím stránku s dokumentací k LMMS na adrese http://lmms.sf.net/w
         <translation>Zobrazit/skrýt editor automatizace</translation>
     </message>
     <message>
-        <source>Show/hide FX Mixer</source>
+        <source>Show/hide Mixer</source>
         <translation>Zobrazit/skrýt FX mixážní panel</translation>
     </message>
     <message>

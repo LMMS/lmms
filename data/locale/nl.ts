@@ -3783,11 +3783,11 @@ Dubbelklikken om een bestand te selecteren.</translation>
         <translation>Klik hier om de automatisering-editor weer te geven of te verbergen. Met behulp van de automatisering-editor kunt u dynamische waardes op een eenvoudige manier bewerken.</translation>
     </message>
     <message>
-        <source>FX Mixer</source>
+        <source>Mixer</source>
         <translation>Mixer</translation>
     </message>
     <message>
-        <source>Click here to show or hide the FX Mixer. The FX Mixer is a very powerful tool for managing effects for your song. You can insert effects into different effect-channels.</source>
+        <source>Click here to show or hide the Mixer. The Mixer is a very powerful tool for managing effects for your song. You can insert effects into different effect-channels.</source>
         <translation>Klik hier om de Mixer weer te geven of te verbergen. De Mixer is een krachtige tool voor het beheren van effecten voor uw song. U kunt effecten invoegen in verschillende effect-kanalen.</translation>
     </message>
     <message>
@@ -3989,7 +3989,7 @@ Bezoek http://lmms.sf.net/wiki voor documentatie over LMMS.</translation>
         <translation>Automatisering-editor weergeven/verbergen</translation>
     </message>
     <message>
-        <source>Show/hide FX Mixer</source>
+        <source>Show/hide Mixer</source>
         <translation>Mixer weergeven/verbergen</translation>
     </message>
     <message>

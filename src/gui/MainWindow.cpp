@@ -541,13 +541,13 @@ void MainWindow::finalize()
 
 	ToolButton * fx_mixer_window = new ToolButton(
 					embed::getIconPixmap( "fx_mixer" ),
-					tr( "Show/hide FX Mixer" ) + " (F9)",
+					tr( "Show/hide Mixer" ) + " (F9)",
 					this, SLOT( toggleMixerWin() ),
 					m_toolBar );
 	fx_mixer_window->setShortcut( Qt::Key_F9 );
 	fx_mixer_window->setWhatsThis(
 		tr( "Click here to show or hide the "
-			"FX Mixer. The FX Mixer is a very powerful tool "
+			"Mixer. The Mixer is a very powerful tool "
 			"for managing effects for your song. You can insert "
 			"effects into different effect-channels." ) );
 
@@ -1220,7 +1220,7 @@ void MainWindow::updateViewMenu()
 			      SLOT( toggleAutomationEditorWin())
 		);
 	m_viewMenu->addAction(embed::getIconPixmap( "fx_mixer" ),
-			      tr( "FX Mixer" ) + " (F9)",
+			      tr( "Mixer" ) + " (F9)",
 			      this, SLOT( toggleMixerWin() )
 		);
 	m_viewMenu->addAction(embed::getIconPixmap( "project_notes" ),

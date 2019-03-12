@@ -3775,11 +3775,11 @@ Upewnij się, że masz prawo zapisu do tego pliku i spróbuj ponownie.</translat
         <translation>Kliknij tutaj aby pokazać lub ukryć Edytor Automatyki. Za jego pomocą możesz w prosty sposób modyfikować dynamiczne wartości wszelkich regulatorów.</translation>
     </message>
     <message>
-        <source>FX Mixer</source>
+        <source>Mixer</source>
         <translation>Pokaż/ukryj Mikser Efektów</translation>
     </message>
     <message>
-        <source>Click here to show or hide the FX Mixer. The FX Mixer is a very powerful tool for managing effects for your song. You can insert effects into different effect-channels.</source>
+        <source>Click here to show or hide the Mixer. The Mixer is a very powerful tool for managing effects for your song. You can insert effects into different effect-channels.</source>
         <translation>Kliknij tutaj aby pokazać lub ukryć Mikser Efektów. Mikser Efektów jest potężnym narzędziem wspomagającym zarządzanie efektami i ścieżkami w Twojej produkcji. Możesz wstawiać wtyczki efektowe na różne kanały dodatkowo wzbogacając brzmienie utworu.</translation>
     </message>
     <message>
@@ -3981,7 +3981,7 @@ Odwiedź witrynę http://lmms.sf.net/wiki for documentation on LMMS.</translatio
         <translation type="unfinished"/>
     </message>
     <message>
-        <source>Show/hide FX Mixer</source>
+        <source>Show/hide Mixer</source>
         <translation type="unfinished"/>
     </message>
     <message>

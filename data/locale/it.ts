@@ -3784,11 +3784,11 @@ Assicurati di avere i permessi in scrittura per il file e riprova.</translation>
         <translation>Questo pulsante mostra o nasconde l&apos;editor dell&apos;automazione. Con l&apos;aiuto dell&apos;editor dell&apos;automazione è possibile rendere dinamici alcuni valori in modo semplice.</translation>
     </message>
     <message>
-        <source>FX Mixer</source>
+        <source>Mixer</source>
         <translation>Mostra/nascondi il mixer degli effetti</translation>
     </message>
     <message>
-        <source>Click here to show or hide the FX Mixer. The FX Mixer is a very powerful tool for managing effects for your song. You can insert effects into different effect-channels.</source>
+        <source>Click here to show or hide the Mixer. The Mixer is a very powerful tool for managing effects for your song. You can insert effects into different effect-channels.</source>
         <translation>Questo pulsante mostra o nasconde il mixer degli effetti. Il mixer degli effetti è uno strumento molto potente per gestire gli effetti della canzone. È possibile inserire effetti in più canali.</translation>
     </message>
     <message>
@@ -3990,7 +3990,7 @@ Visitare http://lmms.sf.net/wiki  per la documentazione di LMMS.</translation>
         <translation>Mostra/nascondi l&apos;Editor dell&apos;automazione</translation>
     </message>
     <message>
-        <source>Show/hide FX Mixer</source>
+        <source>Show/hide Mixer</source>
         <translation>Mostra/nascondi il mixer degli effetti</translation>
     </message>
     <message>

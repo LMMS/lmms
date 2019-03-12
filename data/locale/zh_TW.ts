@@ -3767,11 +3767,11 @@ Please make sure you have write-access to the file and try again.</source>
         <translation>點擊這裏顯示或隱藏自動控制編輯器。在自動控制編輯器的幫助下, 你可以很簡單地控制動態數值。</translation>
     </message>
     <message>
-        <source>FX Mixer</source>
+        <source>Mixer</source>
         <translation>顯示/隱藏混音器</translation>
     </message>
     <message>
-        <source>Click here to show or hide the FX Mixer. The FX Mixer is a very powerful tool for managing effects for your song. You can insert effects into different effect-channels.</source>
+        <source>Click here to show or hide the Mixer. The Mixer is a very powerful tool for managing effects for your song. You can insert effects into different effect-channels.</source>
         <translation>點擊這裏顯示或隱藏 FX 混音器。FX 混音器是管理你歌曲中不同音效的強大工具。你可以向不同的通道添加不同的效果。</translation>
     </message>
     <message>
@@ -3973,7 +3973,7 @@ Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
         <translation>顯示/隱藏自動控制編輯器</translation>
     </message>
     <message>
-        <source>Show/hide FX Mixer</source>
+        <source>Show/hide Mixer</source>
         <translation>顯示/隱藏混音器</translation>
     </message>
     <message>

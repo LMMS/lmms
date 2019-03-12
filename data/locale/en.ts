@@ -4898,12 +4898,12 @@ Please make sure you have write permission to the file and the directory contain
     </message>
     <message>
         <location filename="../../src/gui/MainWindow.cpp" line="544"/>
-        <source>Show/hide FX Mixer</source>
+        <source>Show/hide Mixer</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../src/gui/MainWindow.cpp" line="549"/>
-        <source>Click here to show or hide the FX Mixer. The FX Mixer is a very powerful tool for managing effects for your song. You can insert effects into different effect-channels.</source>
+        <source>Click here to show or hide the Mixer. The Mixer is a very powerful tool for managing effects for your song. You can insert effects into different effect-channels.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5029,7 +5029,7 @@ Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
     </message>
     <message>
         <location filename="../../src/gui/MainWindow.cpp" line="1223"/>
-        <source>FX Mixer</source>
+        <source>Mixer</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
