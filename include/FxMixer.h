@@ -164,11 +164,11 @@ public:
 	// toChannel. NULL if there is no send.
 	FloatModel * channelSendModel(fx_ch_t fromChannel, fx_ch_t toChannel);
 
-	// add a new channel to the Fx Mixer.
+	// add a new channel to the mixer.
 	// returns the index of the channel that was just added
 	int createChannel();
 
-	// delete a channel from the FX mixer.
+	// delete a channel from the mixer.
 	void deleteChannel(int index);
 
 	// delete all the mixer channels except master and remove all effects

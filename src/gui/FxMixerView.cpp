@@ -178,7 +178,7 @@ MixerView::~MixerView()
 
 int MixerView::addNewChannel()
 {
-	// add new fx mixer channel and redraw the form.
+	// add new mixer channel and redraw the form.
 	Mixer * mix = Engine::mixer();
 
 	int newChannelIndex = mix->createChannel();
