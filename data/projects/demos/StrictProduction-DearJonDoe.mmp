@@ -673,11 +673,11 @@
         <time pos="384" value="-846"/>
       </automationpattern>
     </track>
-    <fxmixer maximized="0" height="332" visible="1" minimized="0" x="9" y="530" width="530">
+    <mixer maximized="0" height="332" visible="1" minimized="0" x="9" y="530" width="530">
       <fxchannel muted="0" num="0" name="Master" volume="0.31" soloed="0">
         <fxchain enabled="0" numofeffects="0"/>
       </fxchannel>
-    </fxmixer>
+    </mixer>
     <ControllerRackView maximized="0" height="300" visible="0" minimized="0" x="955" y="413" width="400"/>
     <pianoroll maximized="0" height="480" visible="0" minimized="0" x="37" y="69" width="640"/>
     <automationeditor maximized="0" height="400" visible="0" minimized="0" x="1" y="1" width="640"/>

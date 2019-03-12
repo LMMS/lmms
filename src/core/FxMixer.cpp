@@ -439,7 +439,7 @@ FxRoute * Mixer::createRoute( FxChannel * from, FxChannel * to, float amount )
 	// add us to to's receives
 	to->m_receives.append( route );
 
-	// add us to fxmixer's list
+	// add us to mixer's list
 	Engine::fxMixer()->m_fxRoutes.append( route );
 	Engine::mixer()->doneChangeInModel();
 
@@ -473,7 +473,7 @@ void Mixer::deleteChannelSend( FxRoute * route )
 	route->sender()->m_sends.remove( route->sender()->m_sends.indexOf( route ) );
 	// remove us from to's receives
 	route->receiver()->m_receives.remove( route->receiver()->m_receives.indexOf( route ) );
-	// remove us from fxmixer's list
+	// remove us from mixer's list
 	Engine::fxMixer()->m_fxRoutes.remove( Engine::fxMixer()->m_fxRoutes.indexOf( route ) );
 	delete route;
 	Engine::mixer()->doneChangeInModel();

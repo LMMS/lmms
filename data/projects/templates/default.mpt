@@ -70,11 +70,11 @@
         <object id="5865711"/>
       </automationpattern>
     </track>
-    <fxmixer width="543" x="5" y="310" maximized="0" height="335" visible="1" minimized="0">
+    <mixer width="543" x="5" y="310" maximized="0" height="335" visible="1" minimized="0">
       <fxchannel num="0" muted="0" volume="1" name="Master" soloed="0">
         <fxchain numofeffects="0" enabled="0"/>
       </fxchannel>
-    </fxmixer>
+    </mixer>
     <ControllerRackView width="350" x="680" y="310" maximized="0" height="200" visible="1" minimized="0"/>
     <pianoroll width="640" x="5" y="5" maximized="0" height="480" visible="0" minimized="0"/>
     <automationeditor width="640" x="-36" y="0" maximized="0" height="400" visible="0" minimized="0"/>

@@ -232,7 +232,7 @@
       <automationpattern prog="0" mute="0" name="Master volume" pos="0" tens="1" len="192"/>
       <automationpattern prog="0" mute="0" name="Master pitch" pos="0" tens="1" len="192"/>
     </track>
-    <fxmixer visible="1" width="561" height="332" x="10" y="314" maximized="0" minimized="0">
+    <mixer visible="1" width="561" height="332" x="10" y="314" maximized="0" minimized="0">
       <fxchannel num="0" muted="0" volume="1" name="Master" soloed="0">
         <fxchain numofeffects="0" enabled="0"/>
       </fxchannel>
@@ -240,7 +240,7 @@
         <fxchain numofeffects="0" enabled="0"/>
         <send amount="1" channel="0"/>
       </fxchannel>
-    </fxmixer>
+    </mixer>
     <ControllerRackView visible="1" width="258" height="142" x="608" y="307" maximized="0" minimized="0"/>
     <pianoroll visible="0" width="640" height="480" x="1" y="200" maximized="0" minimized="0"/>
     <automationeditor visible="0" width="640" height="400" x="56" y="255" maximized="0" minimized="0"/>

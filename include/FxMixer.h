@@ -137,7 +137,7 @@ public:
 
 	virtual QString nodeName() const
 	{
-		return "fxmixer";
+		return "mixer";
 	}
 
 	FxChannel * effectChannel( int _ch )
