@@ -1192,7 +1192,7 @@ void MainWindow::toggleAutomationEditorWin()
 
 void MainWindow::toggleMixerWin()
 {
-	toggleWindow( gui->fxMixerView() );
+	toggleWindow( gui->mixerView() );
 }
 
 

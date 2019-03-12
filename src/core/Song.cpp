@@ -870,15 +870,15 @@ void Song::clearProject()
 	{
 		gui->songEditor()->m_editor->clearAllTracks();
 	}
-	if( gui && gui->fxMixerView() )
+	if( gui && gui->mixerView() )
 	{
-		gui->fxMixerView()->clear();
+		gui->mixerView()->clear();
 	}
 	QCoreApplication::sendPostedEvents();
 	Engine::getBBTrackContainer()->clearAllTracks();
 	clearAllTracks();
 
-	Engine::fxMixer()->clear();
+	Engine::mixer()->clear();
 
 	if( gui && gui->automationEditor() )
 	{
@@ -1063,14 +1063,14 @@ void Song::loadProject( const QString & fileName )
 	PeakController::initGetControllerBySetting();
 
 	// Load mixer first to be able to set the correct range for FX channels
-	node = dataFile.content().firstChildElement( Engine::fxMixer()->nodeName() );
+	node = dataFile.content().firstChildElement( Engine::mixer()->nodeName() );
 	if( !node.isNull() )
 	{
-		Engine::fxMixer()->restoreState( node.toElement() );
+		Engine::mixer()->restoreState( node.toElement() );
 		if( gui )
 		{
 			// refresh MixerView
-			gui->fxMixerView()->refreshDisplay();
+			gui->mixerView()->refreshDisplay();
 		}
 	}
 
@@ -1204,7 +1204,7 @@ bool Song::saveProjectFile( const QString & filename )
 	saveState( dataFile, dataFile.content() );
 
 	m_globalAutomationTrack->saveState( dataFile, dataFile.content() );
-	Engine::fxMixer()->saveState( dataFile, dataFile.content() );
+	Engine::mixer()->saveState( dataFile, dataFile.content() );
 	if( gui )
 	{
 		gui->getControllerRackView()->saveState( dataFile, dataFile.content() );

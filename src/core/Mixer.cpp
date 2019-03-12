@@ -420,8 +420,8 @@ const surroundSampleFrame * Mixer::renderNextBuffer()
 	BufferManager::clear( m_writeBuf, m_framesPerPeriod );
 
 	// prepare master mix (clear internal buffers etc.)
-	Mixer * fxMixer = Engine::fxMixer();
-	fxMixer->prepareMasterMix();
+	Mixer * mixer = Engine::mixer();
+	mixer->prepareMasterMix();
 
 	// create play-handles for new notes, samples etc.
 	song->processNextBuffer();
@@ -471,7 +471,7 @@ const surroundSampleFrame * Mixer::renderNextBuffer()
 
 
 	// STAGE 3: do master mix in FX mixer
-	fxMixer->masterMix( m_writeBuf );
+	mixer->masterMix( m_writeBuf );
 
 
 	emit nextAudioBuffer( m_readBuf );

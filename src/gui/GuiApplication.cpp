@@ -123,8 +123,8 @@ GuiApplication::GuiApplication()
 	connect(m_songEditor, SIGNAL(destroyed(QObject*)), this, SLOT(childDestroyed(QObject*)));
 
 	displayInitProgress(tr("Preparing mixer"));
-	m_fxMixerView = new MixerView;
-	connect(m_fxMixerView, SIGNAL(destroyed(QObject*)), this, SLOT(childDestroyed(QObject*)));
+	m_mixerView = new MixerView;
+	connect(m_mixerView, SIGNAL(destroyed(QObject*)), this, SLOT(childDestroyed(QObject*)));
 
 	displayInitProgress(tr("Preparing controller rack"));
 	m_controllerRackView = new ControllerRackView;
@@ -171,15 +171,15 @@ void GuiApplication::displayInitProgress(const QString &msg)
 
 void GuiApplication::childDestroyed(QObject *obj)
 {
-	// when any object that can be reached via gui->mainWindow(), gui->fxMixerView(), etc
+	// when any object that can be reached via gui->mainWindow(), gui->mixerView(), etc
 	//   is destroyed, ensure that their accessor functions will return null instead of a garbage pointer.
 	if (obj == m_mainWindow)
 	{
 		m_mainWindow = nullptr;
 	}
-	else if (obj == m_fxMixerView)
+	else if (obj == m_mixerView)
 	{
-		m_fxMixerView = nullptr;
+		m_mixerView = nullptr;
 	}
 	else if (obj == m_songEditor)
 	{

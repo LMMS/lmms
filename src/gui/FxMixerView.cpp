@@ -55,7 +55,7 @@ MixerView::MixerView() :
 	ModelView( NULL, this ),
 	SerializingObjectHook()
 {
-	Mixer * m = Engine::fxMixer();
+	Mixer * m = Engine::mixer();
 	m->setHook( this );
 
 	//QPalette pal = palette();
@@ -179,7 +179,7 @@ MixerView::~MixerView()
 int MixerView::addNewChannel()
 {
 	// add new fx mixer channel and redraw the form.
-	Mixer * mix = Engine::fxMixer();
+	Mixer * mix = Engine::mixer();
 
 	int newChannelIndex = mix->createChannel();
 	m_fxChannelViews.push_back(new FxChannelView(m_channelAreaWidget, this,
@@ -212,7 +212,7 @@ void MixerView::refreshDisplay()
 	m_channelAreaWidget->adjustSize();
 
 	// re-add the views
-	m_fxChannelViews.resize(Engine::fxMixer()->numChannels());
+	m_fxChannelViews.resize(Engine::mixer()->numChannels());
 	for( int i = 1; i < m_fxChannelViews.size(); ++i )
 	{
 		m_fxChannelViews[i] = new FxChannelView(m_channelAreaWidget, this, i);
@@ -275,7 +275,7 @@ MixerView::FxChannelView::FxChannelView(QWidget * _parent, MixerView * _mv,
 {
 	m_fxLine = new FxLine(_parent, _mv, channelIndex);
 
-	FxChannel *fxChannel = Engine::fxMixer()->effectChannel(channelIndex);
+	FxChannel *fxChannel = Engine::mixer()->effectChannel(channelIndex);
 
 	m_fader = new Fader( &fxChannel->m_volumeModel,
 					tr( "FX Fader %1" ).arg( channelIndex ), m_fxLine );
@@ -317,7 +317,7 @@ MixerView::FxChannelView::FxChannelView(QWidget * _parent, MixerView * _mv,
 
 void MixerView::FxChannelView::setChannelIndex( int index )
 {
-	FxChannel* fxChannel = Engine::fxMixer()->effectChannel( index );
+	FxChannel* fxChannel = Engine::mixer()->effectChannel( index );
 
 	m_fader->setModel( &fxChannel->m_volumeModel );
 	m_muteBtn->setModel( &fxChannel->m_muteModel );
@@ -328,7 +328,7 @@ void MixerView::FxChannelView::setChannelIndex( int index )
 
 void MixerView::toggledSolo()
 {
-	Engine::fxMixer()->toggledSolo();
+	Engine::mixer()->toggledSolo();
 }
 
 
@@ -349,12 +349,12 @@ void MixerView::setCurrentFxLine( FxLine * _line )
 
 void MixerView::updateFxLine(int index)
 {
-	Mixer * mix = Engine::fxMixer();
+	Mixer * mix = Engine::mixer();
 
 	// does current channel send to this channel?
 	int selIndex = m_currentFxLine->channelIndex();
 	FxLine * thisLine = m_fxChannelViews[index]->m_fxLine;
-	thisLine->setToolTip( Engine::fxMixer()->effectChannel( index )->m_name );
+	thisLine->setToolTip( Engine::mixer()->effectChannel( index )->m_name );
 
 	FloatModel * sendModel = mix->channelSendModel(selIndex, index);
 	if( sendModel == NULL )
@@ -386,10 +386,10 @@ void MixerView::deleteChannel(int index)
 
 	// in case the deleted channel is soloed or the remaining
 	// channels will be left in a muted state
-	Engine::fxMixer()->clearChannel(index);
+	Engine::mixer()->clearChannel(index);
 
 	// delete the real channel
-	Engine::fxMixer()->deleteChannel(index);
+	Engine::mixer()->deleteChannel(index);
 
 	// delete the view
 	chLayout->removeWidget(m_fxChannelViews[index]->m_fxLine);
@@ -449,7 +449,7 @@ void MixerView::deleteUnusedChannels()
 				}
 			}
 		}
-		FxChannel * ch = Engine::fxMixer()->effectChannel( i );
+		FxChannel * ch = Engine::mixer()->effectChannel( i );
 		// delete channel if no references found
 		if( empty && ch->m_receives.isEmpty() )
 		{
@@ -465,7 +465,7 @@ void MixerView::moveChannelLeft(int index, int focusIndex)
 	// can't move master or first channel left or last channel right
 	if( index <= 1 || index >= m_fxChannelViews.size() ) return;
 
-	Mixer *m = Engine::fxMixer();
+	Mixer *m = Engine::mixer();
 
 	// Move instruments channels
 	m->moveChannelLeft( index );
@@ -561,7 +561,7 @@ void MixerView::setCurrentFxLine( int _line )
 
 void MixerView::clear()
 {
-	Engine::fxMixer()->clear();
+	Engine::mixer()->clear();
 
 	refreshDisplay();
 }
@@ -571,7 +571,7 @@ void MixerView::clear()
 
 void MixerView::updateFaders()
 {
-	Mixer * m = Engine::fxMixer();
+	Mixer * m = Engine::mixer();
 
 	// apply master gain
 	m->effectChannel(0)->m_peakLeft *= Engine::mixer()->masterGain();

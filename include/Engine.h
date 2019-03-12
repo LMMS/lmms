@@ -66,9 +66,9 @@ public:
 		return s_mixer;
 	}
 
-	static Mixer * fxMixer()
+	static Mixer * mixer()
 	{
-		return s_fxMixer;
+		return s_mixer;
 	}
 
 	static Song * getSong()
@@ -130,7 +130,7 @@ private:
 
 	// core
 	static Mixer *s_mixer;
-	static Mixer * s_fxMixer;
+	static Mixer * s_mixer;
 	static Song * s_song;
 	static BBTrackContainer * s_bbTrackContainer;
 	static ProjectJournal * s_projectJournal;

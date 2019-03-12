@@ -115,7 +115,7 @@ InstrumentTrack::InstrumentTrack( TrackContainer* tc ) :
 	m_panningModel.setCenterValue( DefaultPanning );
 	m_baseNoteModel.setInitValue( DefaultKey );
 
-	m_effectChannelModel.setRange( 0, Engine::fxMixer()->numChannels()-1, 1);
+	m_effectChannelModel.setRange( 0, Engine::mixer()->numChannels()-1, 1);
 
 	for( int i = 0; i < NumKeys; ++i )
 	{
@@ -762,7 +762,7 @@ void InstrumentTrack::loadTrackSpecificSettings( const QDomElement & thisElement
 	m_panningModel.loadSettings( thisElement, "pan" );
 	m_pitchRangeModel.loadSettings( thisElement, "pitchrange" );
 	m_pitchModel.loadSettings( thisElement, "pitch" );
-	m_effectChannelModel.setRange( 0, Engine::fxMixer()->numChannels()-1 );
+	m_effectChannelModel.setRange( 0, Engine::mixer()->numChannels()-1 );
 	if ( !m_previewMode )
 	{
 		m_effectChannelModel.loadSettings( thisElement, "fxch" );
@@ -1007,9 +1007,9 @@ InstrumentTrackWindow * InstrumentTrackView::topLevelInstrumentTrackWindow()
 /*! \brief Create and assign a new FX Channel for this track */
 void InstrumentTrackView::createFxLine()
 {
-	int channelIndex = gui->fxMixerView()->addNewChannel();
+	int channelIndex = gui->mixerView()->addNewChannel();
 
-	Engine::fxMixer()->effectChannel( channelIndex )->m_name = getTrack()->name();
+	Engine::mixer()->effectChannel( channelIndex )->m_name = getTrack()->name();
 
 	assignFxLine(channelIndex);
 }
@@ -1022,7 +1022,7 @@ void InstrumentTrackView::assignFxLine(int channelIndex)
 {
 	model()->effectChannelModel()->setValue( channelIndex );
 
-	gui->fxMixerView()->setCurrentFxLine( channelIndex );
+	gui->mixerView()->setCurrentFxLine( channelIndex );
 }
 
 
@@ -1215,7 +1215,7 @@ QMenu * InstrumentTrackView::createFxMenu(QString title, QString newFxLabel)
 {
 	int channelIndex = model()->effectChannelModel()->value();
 
-	FxChannel *fxChannel = Engine::fxMixer()->effectChannel( channelIndex );
+	FxChannel *fxChannel = Engine::mixer()->effectChannel( channelIndex );
 
 	// If title allows interpolation, pass channel index and name
 	if ( title.contains( "%2" ) )
@@ -1230,9 +1230,9 @@ QMenu * InstrumentTrackView::createFxMenu(QString title, QString newFxLabel)
 	fxMenu->addAction( newFxLabel, this, SLOT( createFxLine() ) );
 	fxMenu->addSeparator();
 
-	for (int i = 0; i < Engine::fxMixer()->numChannels(); ++i)
+	for (int i = 0; i < Engine::mixer()->numChannels(); ++i)
 	{
-		FxChannel * currentChannel = Engine::fxMixer()->effectChannel( i );
+		FxChannel * currentChannel = Engine::mixer()->effectChannel( i );
 
 		if ( currentChannel != fxChannel )
 		{
@@ -1261,11 +1261,11 @@ class fxLineLcdSpinBox : public LcdSpinBox
 	protected:
 		virtual void mouseDoubleClickEvent ( QMouseEvent * _me )
 		{
-			gui->fxMixerView()->setCurrentFxLine( model()->value() );
+			gui->mixerView()->setCurrentFxLine( model()->value() );
 
-			gui->fxMixerView()->parentWidget()->show();
-			gui->fxMixerView()->show();// show fxMixer window
-			gui->fxMixerView()->setFocus();// set focus to fxMixer window
+			gui->mixerView()->parentWidget()->show();
+			gui->mixerView()->show();// show mixer window
+			gui->mixerView()->setFocus();// set focus to mixer window
 			//engine::getMixerView()->raise();
 		}
 

@@ -92,7 +92,7 @@ FxLine::FxLine( QWidget * _parent, MixerView * _mv, int _channelIndex ) :
 	"You can remove and move FX channels in the context menu, which is accessed "
 	"by right-clicking the FX channel.\n" ) );
 
-	QString name = Engine::fxMixer()->effectChannel( m_channelIndex )->m_name;
+	QString name = Engine::mixer()->effectChannel( m_channelIndex )->m_name;
 	setToolTip( name );
 
 	m_renameLineEdit = new QLineEdit();
@@ -143,7 +143,7 @@ void FxLine::setChannelIndex( int index )
 
 void FxLine::drawFxLine( QPainter* p, const FxLine *fxLine, bool isActive, bool sendToThis, bool receiveFromThis )
 {
-	QString name = Engine::fxMixer()->effectChannel( m_channelIndex )->m_name;
+	QString name = Engine::mixer()->effectChannel( m_channelIndex )->m_name;
 	QString elidedName = elideName( name );
 	if( !m_inRename && m_renameLineEdit->text() != elidedName )
 	{
@@ -190,8 +190,8 @@ QString FxLine::elideName( const QString & name )
 
 void FxLine::paintEvent( QPaintEvent * )
 {
-	bool sendToThis = Engine::fxMixer()->channelSendModel( m_mv->currentFxLine()->m_channelIndex, m_channelIndex ) != NULL;
-	bool receiveFromThis = Engine::fxMixer()->channelSendModel( m_channelIndex, m_mv->currentFxLine()->m_channelIndex ) != NULL;
+	bool sendToThis = Engine::mixer()->channelSendModel( m_mv->currentFxLine()->m_channelIndex, m_channelIndex ) != NULL;
+	bool receiveFromThis = Engine::mixer()->channelSendModel( m_channelIndex, m_mv->currentFxLine()->m_channelIndex ) != NULL;
 	QPainter painter;
 	painter.begin( this );
 	drawFxLine( &painter, this, m_mv->currentFxLine() == this, sendToThis, receiveFromThis );
@@ -219,7 +219,7 @@ void FxLine::mouseDoubleClickEvent( QMouseEvent * )
 
 void FxLine::contextMenuEvent( QContextMenuEvent * )
 {
-	QPointer<CaptionMenu> contextMenu = new CaptionMenu( Engine::fxMixer()->effectChannel( m_channelIndex )->m_name, this );
+	QPointer<CaptionMenu> contextMenu = new CaptionMenu( Engine::mixer()->effectChannel( m_channelIndex )->m_name, this );
 	if( m_channelIndex != 0 ) // no move-options in master 
 	{
 		contextMenu->addAction( tr( "Move &left" ),	this, SLOT( moveChannelLeft() ) );
@@ -250,7 +250,7 @@ void FxLine::renameChannel()
 	m_renameLineEdit->setReadOnly( false );
 	m_lcd->hide();
 	m_renameLineEdit->setFixedWidth( 135 );
-	m_renameLineEdit->setText( Engine::fxMixer()->effectChannel( m_channelIndex )->m_name );
+	m_renameLineEdit->setText( Engine::mixer()->effectChannel( m_channelIndex )->m_name );
 	m_view->setFocus();
 	m_renameLineEdit->selectAll();
 	m_renameLineEdit->setFocus();
@@ -268,13 +268,13 @@ void FxLine::renameFinished()
 	m_lcd->show();
 	QString newName = m_renameLineEdit->text();
 	setFocus();
-	if( !newName.isEmpty() && Engine::fxMixer()->effectChannel( m_channelIndex )->m_name != newName )
+	if( !newName.isEmpty() && Engine::mixer()->effectChannel( m_channelIndex )->m_name != newName )
 	{
-		Engine::fxMixer()->effectChannel( m_channelIndex )->m_name = newName;
+		Engine::mixer()->effectChannel( m_channelIndex )->m_name = newName;
 		m_renameLineEdit->setText( elideName( newName ) );
 		Engine::getSong()->setModified();
 	}
-	QString name = Engine::fxMixer()->effectChannel( m_channelIndex )->m_name;
+	QString name = Engine::mixer()->effectChannel( m_channelIndex )->m_name;
 	setToolTip( name );
 }
 
@@ -283,7 +283,7 @@ void FxLine::renameFinished()
 
 void FxLine::removeChannel()
 {
-	MixerView * mix = gui->fxMixerView();
+	MixerView * mix = gui->mixerView();
 	mix->deleteChannel( m_channelIndex );
 }
 
@@ -292,7 +292,7 @@ void FxLine::removeChannel()
 
 void FxLine::removeUnusedChannels()
 {
-	MixerView * mix = gui->fxMixerView();
+	MixerView * mix = gui->mixerView();
 	mix->deleteUnusedChannels();
 }
 
@@ -301,7 +301,7 @@ void FxLine::removeUnusedChannels()
 
 void FxLine::moveChannelLeft()
 {
-	MixerView * mix = gui->fxMixerView();
+	MixerView * mix = gui->mixerView();
 	mix->moveChannelLeft( m_channelIndex );
 }
 
@@ -310,7 +310,7 @@ void FxLine::moveChannelLeft()
 
 void FxLine::moveChannelRight()
 {
-	MixerView * mix = gui->fxMixerView();
+	MixerView * mix = gui->mixerView();
 	mix->moveChannelRight( m_channelIndex );
 }
 
