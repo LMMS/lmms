@@ -310,8 +310,8 @@ TrackContentObjectView::~TrackContentObjectView()
 
 /*! \brief Update a TrackContentObjectView
  *
- *  TCO's get drawn only when needed, 
- *  and when a TCO is updated, 
+ *  TCO's get drawn only when needed,
+ *  and when a TCO is updated,
  *  it needs to be redrawn.
  *
  */
@@ -497,7 +497,7 @@ void TrackContentObjectView::dragEnterEvent( QDragEnterEvent * dee )
 {
 	TrackContentWidget * tcw = getTrackView()->getTrackContentWidget();
 	MidiTime tcoPos = MidiTime( m_tco->startPosition().getTact(), 0 );
-	if( tcw->canPasteSelection( tcoPos, dee->mimeData() ) == false )
+	if( tcw->canPasteSelection( tcoPos, dee ) == false )
 	{
 		dee->ignore();
 	}
@@ -602,9 +602,12 @@ DataFile TrackContentObjectView::createTCODataFiles(
 			it != tcoViews.end(); ++it )
 	{
 		// Insert into the dom under the "tcos" element
-		int trackIndex = tc->tracks().indexOf( ( *it )->m_trackView->getTrack() );
+		Track* tcoTrack = ( *it )->m_trackView->getTrack();
+		int trackIndex = tc->tracks().indexOf( tcoTrack );
 		QDomElement tcoElement = dataFile.createElement( "tco" );
 		tcoElement.setAttribute( "trackIndex", trackIndex );
+		tcoElement.setAttribute( "trackType", tcoTrack->type() );
+		tcoElement.setAttribute( "trackName", tcoTrack->name() );
 		( *it )->m_tco->saveState( dataFile, tcoElement );
 		tcoParent.appendChild( tcoElement );
 	}
@@ -621,6 +624,7 @@ DataFile TrackContentObjectView::createTCODataFiles(
 	QDomElement metadata = dataFile.createElement( "copyMetadata" );
 	// initialTrackIndex is the index of the track that was touched
 	metadata.setAttribute( "initialTrackIndex", initialTrackIndex );
+	metadata.setAttribute( "trackContainerId", tc->id() );
 	// grabbedTCOPos is the pos of the tact containing the TCO we grabbed
 	metadata.setAttribute( "grabbedTCOPos", m_tco->startPosition() );
 
@@ -674,7 +678,7 @@ void TrackContentObjectView::mousePressEvent( QMouseEvent * me )
 			}
 		}
 	}
-	else if( me->button() == Qt::LeftButton && 
+	else if( me->button() == Qt::LeftButton &&
 			 me->modifiers() & Qt::ControlModifier )
 	{
 		// start drag-action
@@ -1119,7 +1123,7 @@ void TrackContentWidget::updateBackground()
 
 	// draw lines
 	// vertical lines
-	pmp.setPen( QPen( gridColor(), 1 ) );	
+	pmp.setPen( QPen( gridColor(), 1 ) );
 	for( float x = 0; x < w * 2; x += ppt )
 	{
 		pmp.drawLine( QLineF( x, 0.0, x, h ) );
@@ -1130,9 +1134,9 @@ void TrackContentWidget::updateBackground()
 	{
 		pmp.drawLine( QLineF( x, 0.0, x, h ) );
 	}
-	
+
 	// horizontal line
-	pmp.setPen( QPen( gridColor(), 1 ) );	
+	pmp.setPen( QPen( gridColor(), 1 ) );
 	pmp.drawLine( 0, h-1, w*2, h-1 );
 
 	pmp.end();
@@ -1315,8 +1319,8 @@ MidiTime TrackContentWidget::getPosition( int mouseX )
  */
 void TrackContentWidget::dragEnterEvent( QDragEnterEvent * dee )
 {
-	MidiTime tcoPos = MidiTime( getPosition( dee->pos().x() ).getTact(), 0 );
-	if( canPasteSelection( tcoPos, dee->mimeData() ) == false )
+	MidiTime tcoPos = getPosition( dee->pos().x() );
+	if( canPasteSelection( tcoPos, dee ) == false )
 	{
 		dee->ignore();
 	}
@@ -1335,8 +1339,10 @@ void TrackContentWidget::dragEnterEvent( QDragEnterEvent * dee )
  * \param tcoPos the position of the TCO slot being pasted on
  * \param de the DropEvent generated
  */
-bool TrackContentWidget::canPasteSelection( MidiTime tcoPos, const QMimeData * mimeData )
+bool TrackContentWidget::canPasteSelection( MidiTime tcoPos, const QDropEvent* de )
 {
+	const QMimeData * mimeData = de->mimeData();
+
 	Track * t = getTrack();
 	QString type = StringPairDrag::decodeMimeKey( mimeData );
 	QString value = StringPairDrag::decodeMimeValue( mimeData );
@@ -1366,7 +1372,9 @@ bool TrackContentWidget::canPasteSelection( MidiTime tcoPos, const QMimeData * m
 	const int currentTrackIndex = tracks.indexOf( t );
 
 	// Don't paste if we're on the same tact
-	if( tcoPos == grabbedTCOTact && currentTrackIndex == initialTrackIndex )
+	auto sourceTrackContainerId = metadata.attributeNode( "trackContainerId" ).value().toUInt();
+	if( de->source() && sourceTrackContainerId == t->trackContainer()->id() &&
+			tcoPos == grabbedTCOTact && currentTrackIndex == initialTrackIndex )
 	{
 		return false;
 	}
@@ -1389,9 +1397,9 @@ bool TrackContentWidget::canPasteSelection( MidiTime tcoPos, const QMimeData * m
 		}
 
 		// Track must be of the same type
-		Track * startTrack = tracks.at( trackIndex );
+		auto startTrackType = tcoElement.attributeNode("trackType").value().toInt();
 		Track * endTrack = tracks.at( finalTrackIndex );
-		if( startTrack->type() != endTrack->type() )
+		if( startTrackType != endTrack->type() )
 		{
 			return false;
 		}
@@ -1407,7 +1415,7 @@ bool TrackContentWidget::canPasteSelection( MidiTime tcoPos, const QMimeData * m
  */
 bool TrackContentWidget::pasteSelection( MidiTime tcoPos, QDropEvent * de )
 {
-	if( canPasteSelection( tcoPos, de->mimeData() ) == false )
+	if( canPasteSelection( tcoPos, de ) == false )
 	{
 		return false;
 	}
@@ -1478,7 +1486,8 @@ bool TrackContentWidget::pasteSelection( MidiTime tcoPos, QDropEvent * de )
 			tco->selectViewOnCreate( true );
 		}
 		//check tco name, if the same as source track name dont copy
-		if( tco->name() == tracks[trackIndex]->name() )
+		QString sourceTrackName = outerTCOElement.attributeNode( "trackName" ).value();
+		if( tco->name() == sourceTrackName )
 		{
 			tco->setName( "" );
 		}
@@ -1853,7 +1862,7 @@ void TrackOperationsWidget::updateMenu()
 	toMenu->addAction( embed::getIconPixmap( "cancel", 16, 16 ),
 						tr( "Remove this track" ),
 						this, SLOT( removeTrack() ) );
-	
+
 	if( ! m_trackView->trackContainerView()->fixedTCOs() )
 	{
 		toMenu->addAction( tr( "Clear this track" ), this, SLOT( clearTrack() ) );
@@ -2778,12 +2787,12 @@ void TrackView::mouseMoveEvent( QMouseEvent * me )
 	else if( m_action == MoveTrack )
 	{
 		// look which track-widget the mouse-cursor is over
-		const int yPos = 
+		const int yPos =
 			m_trackContainerView->contentWidget()->mapFromGlobal( me->globalPos() ).y();
 		const TrackView * trackAtY = m_trackContainerView->trackViewAt( yPos );
 
-// debug code
-//			qDebug( "y position %d", yPos );
+		// debug code
+		//	qDebug( "y position %d", yPos );
 
 		// a track-widget not equal to ourself?
 		if( trackAtY != NULL && trackAtY != this )

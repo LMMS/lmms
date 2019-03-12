@@ -181,7 +181,13 @@ vestigeInstrument::~vestigeInstrument()
 
 void vestigeInstrument::loadSettings( const QDomElement & _this )
 {
-	loadFile( _this.attribute( "plugin" ) );
+	QString plugin = _this.attribute( "plugin" );
+	if( plugin.isEmpty() )
+	{
+		return;
+	}
+
+	loadFile( plugin );
 	m_pluginMutex.lock();
 	if( m_plugin != NULL )
 	{
