@@ -1,5 +1,5 @@
 /*
- * Fader.h - fader-widget used in FX-mixer - partly taken from Hydrogen
+ * Fader.h - fader-widget used in Mixer - partly taken from Hydrogen
  *
  * Copyright (c) 2008-2012 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 

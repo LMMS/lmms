@@ -2260,7 +2260,7 @@ Vous pouvez supprimer et déplacer les canaux d&apos;effets dans le menu context
 <context>
     <name>FxMixerView</name>
     <message>
-        <source>FX-Mixer</source>
+        <source>Mixer</source>
         <translation>Mélangeur d&apos;effets</translation>
     </message>
     <message>

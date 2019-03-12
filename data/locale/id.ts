@@ -2836,8 +2836,8 @@ Anda dapat menghapus dan memindahkan saluran FX dalam menu konteks, yang diakses
     <name>FxMixerView</name>
     <message>
         <location filename="../../src/gui/FxMixerView.cpp" line="68"/>
-        <source>FX-Mixer</source>
-        <translation>FX-Mixer</translation>
+        <source>Mixer</source>
+        <translation>Mixer</translation>
     </message>
     <message>
         <location filename="../../src/gui/FxMixerView.cpp" line="281"/>

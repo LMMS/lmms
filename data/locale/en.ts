@@ -2830,7 +2830,7 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     <name>FxMixerView</name>
     <message>
         <location filename="../../src/gui/FxMixerView.cpp" line="68"/>
-        <source>FX-Mixer</source>
+        <source>Mixer</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

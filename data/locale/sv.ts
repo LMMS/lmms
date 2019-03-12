@@ -2232,8 +2232,8 @@ You can remove and move FX channels in the context menu, which is accessed by ri
 <context>
     <name>FxMixerView</name>
     <message>
-        <source>FX-Mixer</source>
-        <translation>FX-Mixer</translation>
+        <source>Mixer</source>
+        <translation>Mixer</translation>
     </message>
     <message>
         <source>FX Fader %1</source>
