@@ -2113,11 +2113,10 @@ void AutomationEditor::zoomingXChanged()
 void AutomationEditor::zoomingYChanged()
 {
 	const QString & zfac = m_zoomingYModel.currentText();
-	m_y_auto = zfac == "Auto";
+	m_y_auto = zfac == "1X";
 	if( !m_y_auto )
 	{
-		m_y_delta = zfac.left( zfac.length() - 1 ).toInt()
-							* DEFAULT_Y_DELTA / 100;
+		m_y_delta = ( 25 << m_zoomingYModel.value() ) * DEFAULT_Y_DELTA / 100;
 	}
 #ifdef LMMS_DEBUG
 	assert( m_y_delta > 0 );
@@ -2424,12 +2423,11 @@ AutomationEditorWindow::AutomationEditorWindow() :
 	m_zoomingYComboBox = new ComboBox( zoomToolBar );
 	m_zoomingYComboBox->setFixedSize( 80, 22 );
 
-	m_editor->m_zoomingYModel.addItem( "Auto" );
 	for( int i = 0; i < 7; ++i )
 	{
-		m_editor->m_zoomingYModel.addItem( QString::number( 25 << i ) + "%" );
+		m_editor->m_zoomingYModel.addItem( QString::number( 1 << i ) + "X" );
 	}
-	m_editor->m_zoomingYModel.setValue( m_editor->m_zoomingYModel.findText( "Auto" ) );
+	m_editor->m_zoomingYModel.setValue( m_editor->m_zoomingYModel.findText( "1X" ) );
 
 	m_zoomingYComboBox->setModel( &m_editor->m_zoomingYModel );
 
