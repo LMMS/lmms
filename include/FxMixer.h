@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef FX_MIXER_H
-#define FX_MIXER_H
+#ifndef MIXER_H
+#define MIXER_H
 
 #include "Model.h"
 #include "EffectChain.h"
