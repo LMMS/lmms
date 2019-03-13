@@ -2351,7 +2351,7 @@ Puoi rimuovere e muovere i canali con il menù contestuale, cliccando con il tas
 <context>
     <name>FxMixerView</name>
     <message>
-        <source>FX-Mixer</source>
+        <source>Mixer</source>
         <translation>Mixer FX</translation>
     </message>
     <message>

@@ -2965,7 +2965,7 @@ Please make sure you have write permission to the file and the directory contain
     <name>FxMixerView</name>
     <message>
         <location filename="../../src/gui/FxMixerView.cpp" line="68"/>
-        <source>FX-Mixer</source>
+        <source>Mixer</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

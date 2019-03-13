@@ -2351,8 +2351,8 @@ Sie können FX Kanäle im Kontextmenü entfernen und verschieben, welches durch 
 <context>
     <name>FxMixerView</name>
     <message>
-        <source>FX-Mixer</source>
-        <translation>FX-Mixer</translation>
+        <source>Mixer</source>
+        <translation>Mixer</translation>
     </message>
     <message>
         <source>FX Fader %1</source>
@@ -3872,11 +3872,11 @@ Doppelklicken Sie, um eine Datei auszuwählen.</translation>
     </message>
     <message>
         <source>FX Mixer</source>
-        <translation>Zeige/verstecke FX-Mixer</translation>
+        <translation>Zeige/verstecke Mixer</translation>
     </message>
     <message>
         <source>Click here to show or hide the FX Mixer. The FX Mixer is a very powerful tool for managing effects for your song. You can insert effects into different effect-channels.</source>
-        <translation>Hier klicken, um den FX-Mixer zu zeigen oder verstecken. Der FX-Mixer ist ein leistungsfähiges Werkzeug, um Effekte für Ihren Song zu verwalten. Sie können verschiedene Effekte in unterschiedliche Effekt-Kanäle einfügen.</translation>
+        <translation>Hier klicken, um den Mixer zu zeigen oder verstecken. Der Mixer ist ein leistungsfähiges Werkzeug, um Effekte für Ihren Song zu verwalten. Sie können verschiedene Effekte in unterschiedliche Effekt-Kanäle einfügen.</translation>
     </message>
     <message>
         <source>Project Notes</source>

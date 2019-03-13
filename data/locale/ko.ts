@@ -2340,7 +2340,7 @@ FX 채널을 오른쪽 클릭하여 나오는 컨텍스트 메뉴에서 채널�
 <context>
     <name>FxMixerView</name>
     <message>
-        <source>FX-Mixer</source>
+        <source>Mixer</source>
         <translation>FX-믹서</translation>
     </message>
     <message>

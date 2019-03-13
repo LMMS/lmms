@@ -2098,7 +2098,7 @@ You can remove and move FX channels in the context menu, which is accessed by ri
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>FX-Mixer</source>
+        <source>Mixer</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

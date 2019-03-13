@@ -2356,8 +2356,8 @@ Możesz usunąć i przenieść kanały FX w menu kontekstowym, które jest dost�
 <context>
     <name>FxMixerView</name>
     <message>
-        <source>FX-Mixer</source>
-        <translation>FX-Mixer</translation>
+        <source>Mixer</source>
+        <translation>Mixer</translation>
     </message>
     <message>
         <source>FX Fader %1</source>

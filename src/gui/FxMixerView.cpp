@@ -66,7 +66,7 @@ FxMixerView::FxMixerView() :
 	setAutoFillBackground( true );
 	setSizePolicy( QSizePolicy::Preferred, QSizePolicy::Fixed );
 
-	setWindowTitle( tr( "FX-Mixer" ) );
+	setWindowTitle( tr( "Mixer" ) );
 	setWindowIcon( embed::getIconPixmap( "fx_mixer" ) );
 
 	// main-layout

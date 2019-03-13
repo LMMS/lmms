@@ -2354,7 +2354,7 @@ Efektové kanály můžete odstranit nebo přesunout v kontextové nabídce, kte
 <context>
     <name>FxMixerView</name>
     <message>
-        <source>FX-Mixer</source>
+        <source>Mixer</source>
         <translation>Efektový mixážní panel</translation>
     </message>
     <message>

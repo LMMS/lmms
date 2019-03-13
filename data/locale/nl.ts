@@ -2358,8 +2358,8 @@ U kunt FX-kanalen verwijderen en verplaatsen in het contextmenu, dat toegankelij
 <context>
     <name>FxMixerView</name>
     <message>
-        <source>FX-Mixer</source>
-        <translation>FX-mixer</translation>
+        <source>Mixer</source>
+        <translation>Mixer</translation>
     </message>
     <message>
         <source>FX Fader %1</source>
@@ -3879,11 +3879,11 @@ Dubbelklikken om een bestand te selecteren.</translation>
     </message>
     <message>
         <source>FX Mixer</source>
-        <translation>FX-mixer</translation>
+        <translation>Mixer</translation>
     </message>
     <message>
         <source>Click here to show or hide the FX Mixer. The FX Mixer is a very powerful tool for managing effects for your song. You can insert effects into different effect-channels.</source>
-        <translation>Klik hier om de FX-mixer weer te geven of te verbergen. De FX-mixer is een krachtige tool voor het beheren van effecten voor uw song. U kunt effecten invoegen in verschillende effect-kanalen.</translation>
+        <translation>Klik hier om de Mixer weer te geven of te verbergen. De Mixer is een krachtige tool voor het beheren van effecten voor uw song. U kunt effecten invoegen in verschillende effect-kanalen.</translation>
     </message>
     <message>
         <source>Project Notes</source>
@@ -4077,7 +4077,7 @@ Bezoek http://lmms.sf.net/wiki voor documentatie over LMMS.</translation>
     </message>
     <message>
         <source>Show/hide FX Mixer</source>
-        <translation>FX-mixer weergeven/verbergen</translation>
+        <translation>Mixer weergeven/verbergen</translation>
     </message>
     <message>
         <source>Show/hide project notes</source>

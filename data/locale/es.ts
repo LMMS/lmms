@@ -2352,7 +2352,7 @@ Puedes quitar y mover los canales FX a través del menú contextual. Accede a es
 <context>
     <name>FxMixerView</name>
     <message>
-        <source>FX-Mixer</source>
+        <source>Mixer</source>
         <translation>Mezcladora FX</translation>
     </message>
     <message>

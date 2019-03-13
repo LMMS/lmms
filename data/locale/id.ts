@@ -2339,8 +2339,8 @@ Anda dapat menghapus dan memindahkan saluran FX dalam menu konteks, yang diakses
 <context>
     <name>FxMixerView</name>
     <message>
-        <source>FX-Mixer</source>
-        <translation>FX-Mixer</translation>
+        <source>Mixer</source>
+        <translation>Mixer</translation>
     </message>
     <message>
         <source>FX Fader %1</source>

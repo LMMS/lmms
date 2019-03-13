@@ -2352,7 +2352,7 @@ You can remove and move FX channels in the context menu, which is accessed by ri
 <context>
     <name>FxMixerView</name>
     <message>
-        <source>FX-Mixer</source>
+        <source>Mixer</source>
         <translation>Мікшер Ефектів</translation>
     </message>
     <message>
