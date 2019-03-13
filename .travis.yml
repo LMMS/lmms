@@ -24,8 +24,12 @@ matrix:
           git:
               depth: false
         - env: TARGET_OS=debian-sid TARGET_ARCH=i386
+          git:
+              depth: false
         - compiler: clang
           env: TARGET_OS=debian-sid
+          git:
+              depth: false
 before_install:
    - . ${TRAVIS_BUILD_DIR}/.travis/${TRAVIS_OS_NAME}.${TARGET_OS}.before_install.sh
 install:
