@@ -3861,12 +3861,12 @@ Double click to pick a file.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <source>FX Mixer</source>
-        <translation>FX Mixer</translation>
+        <source>Mixer</source>
+        <translation>Mixer</translation>
     </message>
     <message>
-        <source>Click here to show or hide the FX Mixer. The FX Mixer is a very powerful tool for managing effects for your song. You can insert effects into different effect-channels.</source>
-        <translation>Klik disini untuk menampilkan atau menyembunyikan FX Mixer. FX Mixer adalah alat yang sangat ampuh untuk mengelola efek untuk lagu Anda. Anda bisa memasukkan efek ke saluran efek yang berbeda.</translation>
+        <source>Click here to show or hide the Mixer. The Mixer is a very powerful tool for managing effects for your song. You can insert effects into different effect-channels.</source>
+        <translation>Klik disini untuk menampilkan atau menyembunyikan Mixer. Mixer adalah alat yang sangat ampuh untuk mengelola efek untuk lagu Anda. Anda bisa memasukkan efek ke saluran efek yang berbeda.</translation>
     </message>
     <message>
         <source>Project Notes</source>
@@ -4059,8 +4059,8 @@ Silakan kunjungi http://lmms.sf.net/wiki untuk dokumentasi LMMS.</translation>
         <translation>Tampilkan/sembunyikan Editor Otomasi</translation>
     </message>
     <message>
-        <source>Show/hide FX Mixer</source>
-        <translation>Tampilkan/sembunyikan FX Mixer</translation>
+        <source>Show/hide Mixer</source>
+        <translation>Tampilkan/sembunyikan Mixer</translation>
     </message>
     <message>
         <source>Show/hide project notes</source>

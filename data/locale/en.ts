@@ -4897,7 +4897,7 @@ Please make sure you have write permission to the file and the directory contain
     <message>
         <location filename="../../src/gui/MainWindow.cpp" line="518"/>
         <location filename="../../src/gui/MainWindow.cpp" line="1181"/>
-        <source>FX Mixer</source>
+        <source>Mixer</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

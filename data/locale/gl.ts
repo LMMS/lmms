@@ -3770,11 +3770,11 @@ Please make sure you have write-access to the file and try again.</source>
         <translation>Prema aquí para mostrar ou agochar o Editor de automatización. Coa axuda do Editor de automatización pódense editar os valores dinámicos facilmente.</translation>
     </message>
     <message>
-        <source>FX Mixer</source>
+        <source>Mixer</source>
         <translation>Mostrar/Agochar os Mesturador de efectos especiais</translation>
     </message>
     <message>
-        <source>Click here to show or hide the FX Mixer. The FX Mixer is a very powerful tool for managing effects for your song. You can insert effects into different effect-channels.</source>
+        <source>Click here to show or hide the Mixer. The Mixer is a very powerful tool for managing effects for your song. You can insert effects into different effect-channels.</source>
         <translation>Prema aquí para mostrar ou agochar o Mesturador de efectos especiais. O Mesturador de efectos especiais é unha ferramenta potente para xestionar os efectos das cancións. Pódense inserir efectos nas diferentes canles de efectos.</translation>
     </message>
     <message>
@@ -3976,7 +3976,7 @@ Visitehttp://lmms.sf.net/wiki para documentación sobre o LMMS.</translation>
         <translation type="unfinished"/>
     </message>
     <message>
-        <source>Show/hide FX Mixer</source>
+        <source>Show/hide Mixer</source>
         <translation type="unfinished"/>
     </message>
     <message>

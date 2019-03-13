@@ -515,7 +515,7 @@ void MainWindow::finalize()
 
 	ToolButton * fx_mixer_window = new ToolButton(
 					embed::getIconPixmap( "fx_mixer" ),
-					tr( "FX Mixer" ) + " (F9)",
+					tr( "Mixer" ) + " (F9)",
 					this, SLOT( toggleFxMixerWin() ),
 					m_toolBar );
 	fx_mixer_window->setShortcut( Qt::Key_F9 );
@@ -1178,7 +1178,7 @@ void MainWindow::updateViewMenu()
 			      SLOT( toggleAutomationEditorWin())
 		);
 	m_viewMenu->addAction(embed::getIconPixmap( "fx_mixer" ),
-			      tr( "FX Mixer" ) + " (F9)",
+			      tr( "Mixer" ) + " (F9)",
 			      this, SLOT( toggleFxMixerWin() )
 		);
 	m_viewMenu->addAction(embed::getIconPixmap( "controller" ),

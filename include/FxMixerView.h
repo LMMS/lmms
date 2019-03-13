@@ -102,7 +102,7 @@ public:
 
 	void renameChannel(int index);
 
-	// make sure the display syncs up with the fx mixer.
+	// make sure the display syncs up with the mixer.
 	// useful for loading projects
 	void refreshDisplay();
 

@@ -3874,11 +3874,11 @@ Poklepejte pro výběr souboru.</translation>
         <translation>Klepněte sem, pokud chcete ukázat nebo skrýt Editor automatizace. S pomocí Editoru automatizace můžete jednoduchým způsobem upravovat proměnlivý průběh hodnot.</translation>
     </message>
     <message>
-        <source>FX Mixer</source>
+        <source>Mixer</source>
         <translation>Efektový mixážní panel</translation>
     </message>
     <message>
-        <source>Click here to show or hide the FX Mixer. The FX Mixer is a very powerful tool for managing effects for your song. You can insert effects into different effect-channels.</source>
+        <source>Click here to show or hide the Mixer. The Mixer is a very powerful tool for managing effects for your song. You can insert effects into different effect-channels.</source>
         <translation>Klepněte sem, pokud chcete ukázat nebo skrýt efektový (FX) mixážní panel. Efektový mixážní panel je velmi výkonný nástroj pro správu efektů ve vaší skladbě. Efekty můžete vkládat do různých efektových kanálů.</translation>
     </message>
     <message>
@@ -4072,7 +4072,7 @@ Navštivte prosím stránku s dokumentací k LMMS na adrese http://lmms.sf.net/w
         <translation>Zobrazit/Skrýt Editor automatizace</translation>
     </message>
     <message>
-        <source>Show/hide FX Mixer</source>
+        <source>Show/hide Mixer</source>
         <translation>Zobrazit/Skrýt efektový mixážní panel</translation>
     </message>
     <message>

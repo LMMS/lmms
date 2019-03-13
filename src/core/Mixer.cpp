@@ -470,7 +470,7 @@ const surroundSampleFrame * Mixer::renderNextBuffer()
 	MixerWorkerThread::startAndWaitForJobs();
 
 
-	// STAGE 3: do master mix in FX mixer
+	// STAGE 3: do master mix in mixer
 	fxMixer->masterMix( m_writeBuf );
 
 

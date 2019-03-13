@@ -3871,11 +3871,11 @@ Doppelklicken Sie, um eine Datei auszuwählen.</translation>
         <translation>Hier klicken, um den Automation-Editor zu zeigen oder verstecken. Mit Hilfe des Automation-Editors können Sie Automation-Patterns auf einfache Art und Weise bearbeiten.</translation>
     </message>
     <message>
-        <source>FX Mixer</source>
+        <source>Mixer</source>
         <translation>Zeige/verstecke Mixer</translation>
     </message>
     <message>
-        <source>Click here to show or hide the FX Mixer. The FX Mixer is a very powerful tool for managing effects for your song. You can insert effects into different effect-channels.</source>
+        <source>Click here to show or hide the Mixer. The Mixer is a very powerful tool for managing effects for your song. You can insert effects into different effect-channels.</source>
         <translation>Hier klicken, um den Mixer zu zeigen oder verstecken. Der Mixer ist ein leistungsfähiges Werkzeug, um Effekte für Ihren Song zu verwalten. Sie können verschiedene Effekte in unterschiedliche Effekt-Kanäle einfügen.</translation>
     </message>
     <message>
@@ -4069,8 +4069,8 @@ Bitte besuchen Sie http://lmms.sf.net/wiki für Dokumentationen über LMMS.</tra
         <translation>Zeige/Verstecke Automations Editor</translation>
     </message>
     <message>
-        <source>Show/hide FX Mixer</source>
-        <translation>Zeige/Verstecke FX Mixer</translation>
+        <source>Show/hide Mixer</source>
+        <translation>Zeige/Verstecke Mixer</translation>
     </message>
     <message>
         <source>Show/hide project notes</source>

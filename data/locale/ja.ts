@@ -3854,11 +3854,11 @@ Double click to pick a file.</source>
         <translation>ここをクリックしてオートメーション エディターの表示/非表示を切り替えます。オートメーション エディターで動的な値を簡単に編集できます。</translation>
     </message>
     <message>
-        <source>FX Mixer</source>
+        <source>Mixer</source>
         <translation>エフェクトミキサー</translation>
     </message>
     <message>
-        <source>Click here to show or hide the FX Mixer. The FX Mixer is a very powerful tool for managing effects for your song. You can insert effects into different effect-channels.</source>
+        <source>Click here to show or hide the Mixer. The Mixer is a very powerful tool for managing effects for your song. You can insert effects into different effect-channels.</source>
         <translation>ここをクリックしてエフェクトミキサーの表示/非表示を切り替えます。エフェクトミキサーは曲のエフェクトを管理する強力なツールです。エフェクトを異なったエフェクトチャンネルに挿入することができます。</translation>
     </message>
     <message>
@@ -4052,7 +4052,7 @@ Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
         <translation>オートメーション エディター の表示/非表示</translation>
     </message>
     <message>
-        <source>Show/hide FX Mixer</source>
+        <source>Show/hide Mixer</source>
         <translation>エフェクトミキサーの表示/非表示</translation>
     </message>
     <message>

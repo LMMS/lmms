@@ -3860,11 +3860,11 @@ Double click to pick a file.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <source>FX Mixer</source>
+        <source>Mixer</source>
         <translation>FX 믹서</translation>
     </message>
     <message>
-        <source>Click here to show or hide the FX Mixer. The FX Mixer is a very powerful tool for managing effects for your song. You can insert effects into different effect-channels.</source>
+        <source>Click here to show or hide the Mixer. The Mixer is a very powerful tool for managing effects for your song. You can insert effects into different effect-channels.</source>
         <translation type="unfinished"/>
     </message>
     <message>
@@ -4057,7 +4057,7 @@ Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
         <translation>오토메이션 편집기 보이기/숨기기</translation>
     </message>
     <message>
-        <source>Show/hide FX Mixer</source>
+        <source>Show/hide Mixer</source>
         <translation>FX 믹서 보이기/숨기기</translation>
     </message>
     <message>
