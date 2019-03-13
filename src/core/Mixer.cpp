@@ -74,8 +74,8 @@ Mixer::Mixer( bool renderOnly ) :
 	m_framesPerPeriod( DEFAULT_BUFFER_SIZE ),
 	m_inputBufferRead( 0 ),
 	m_inputBufferWrite( 1 ),
-	m_readBuf( NULL ),
-	m_writeBuf( NULL ),
+	m_outputBufferRead( NULL ),
+	m_outputBufferWrite( NULL ),
 	m_workers(),
 	m_numWorkers( QThread::idealThreadCount()-1 ),
 	m_newPlayHandles( PlayHandle::MaxNumber ),
@@ -136,16 +136,14 @@ Mixer::Mixer( bool renderOnly ) :
 	// now that framesPerPeriod is fixed initialize global BufferManager
 	BufferManager::init( m_framesPerPeriod );
 
-	//TODO: three buffers? Not two?
-	for( int i = 0; i < 3; i++ )
-	{
-		m_readBuf = (surroundSampleFrame*)
-			MemoryHelper::alignedMalloc( m_framesPerPeriod *
-						sizeof( surroundSampleFrame ) );
+	int outputBufferSize = m_framesPerPeriod * sizeof( surroundSampleFrame );
+	m_outputBufferRead =
+		( surroundSampleFrame* )MemoryHelper::alignedMalloc( outputBufferSize );
+	m_outputBufferWrite = 
+		( surroundSampleFrame* )MemoryHelper::alignedMalloc( outputBufferSize );
 
-		BufferManager::clear( m_readBuf, m_framesPerPeriod );
-		m_bufferPool.push_back( m_readBuf );
-	}
+	BufferManager::clear( m_outputBufferRead, m_framesPerPeriod );
+	BufferManager::clear( m_outputBufferWrite, m_framesPerPeriod );
 
 	for( int i = 0; i < m_numWorkers+1; ++i )
 	{
@@ -156,10 +154,6 @@ Mixer::Mixer( bool renderOnly ) :
 		}
 		m_workers.push_back( wt );
 	}
-
-	m_poolDepth = 2;
-	m_readBuffer = 0;
-	m_writeBuffer = 1;
 }
 
 
@@ -190,10 +184,8 @@ Mixer::~Mixer()
 	delete m_midiClient;
 	delete m_audioDev;
 
-	for( int i = 0; i < 3; i++ )
-	{
-		MemoryHelper::alignedFree( m_bufferPool[i] );
-	}
+	MemoryHelper::alignedFree( m_outputBufferRead );
+	MemoryHelper::alignedFree( m_outputBufferWrite );
 
 	for( int i = 0; i < 2; ++i )
 	{
@@ -430,10 +422,10 @@ const surroundSampleFrame * Mixer::renderNextBuffer()
 
 
 	// STAGE 3: do master mix in FX mixer
-	fxMixer->masterMix( m_writeBuf );
+	fxMixer->masterMix( m_outputBufferWrite );
 
 
-	emit nextAudioBuffer( m_readBuf );
+	emit nextAudioBuffer( m_outputBufferRead );
 
 	runChangesInModel();
 
@@ -446,7 +438,7 @@ const surroundSampleFrame * Mixer::renderNextBuffer()
 
 	m_profiler.finishPeriod( processingSampleRate(), m_framesPerPeriod );
 
-	return m_readBuf;
+	return m_outputBufferRead;
 }
 
 
@@ -454,22 +446,17 @@ const surroundSampleFrame * Mixer::renderNextBuffer()
 
 void Mixer::swapBuffers()
 {
-	// swap buffer
 	m_inputBufferWrite = ( m_inputBufferWrite + 1 ) % 2;
 	m_inputBufferRead =  ( m_inputBufferRead + 1 ) % 2;
 
-	// clear new write buffer
 	m_inputBufferFrames[ m_inputBufferWrite ] = 0;
 
-	// rotate buffers
-	m_writeBuffer = ( m_writeBuffer + 1 ) % m_poolDepth;
-	m_readBuffer = ( m_readBuffer + 1 ) % m_poolDepth;
-
-	m_writeBuf = m_bufferPool[m_writeBuffer];
-	m_readBuf = m_bufferPool[m_readBuffer];
+	surroundSampleFrame * outputBufferTemp = m_outputBufferRead;
+	m_outputBufferWrite = outputBufferTemp;
+	m_outputBufferRead = outputBufferTemp;
 
 	// clear last audio-buffer
-	BufferManager::clear( m_writeBuf, m_framesPerPeriod );
+	BufferManager::clear( m_outputBufferWrite, m_framesPerPeriod );
 }
 
 

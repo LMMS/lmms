@@ -385,13 +385,8 @@ private:
 	int m_inputBufferRead;
 	int m_inputBufferWrite;
 
-	surroundSampleFrame * m_readBuf;
-	surroundSampleFrame * m_writeBuf;
-
-	QVector<surroundSampleFrame *> m_bufferPool;
-	int m_readBuffer;
-	int m_writeBuffer;
-	int m_poolDepth;
+	surroundSampleFrame * m_outputBufferRead;
+	surroundSampleFrame * m_outputBufferWrite;
 
 	// worker thread stuff
 	QVector<MixerWorkerThread *> m_workers;
