@@ -136,6 +136,7 @@ Mixer::Mixer( bool renderOnly ) :
 	// now that framesPerPeriod is fixed initialize global BufferManager
 	BufferManager::init( m_framesPerPeriod );
 
+	//TODO: three buffers? Not two?
 	for( int i = 0; i < 3; i++ )
 	{
 		m_readBuf = (surroundSampleFrame*)
@@ -345,13 +346,6 @@ const surroundSampleFrame * Mixer::renderNextBuffer()
 
 	s_renderingThread = true;
 
-	// swap buffer
-	m_inputBufferWrite = ( m_inputBufferWrite + 1 ) % 2;
-	m_inputBufferRead =  ( m_inputBufferRead + 1 ) % 2;
-
-	// clear new write buffer
-	m_inputBufferFrames[ m_inputBufferWrite ] = 0;
-
 	if( m_clearSignal )
 	{
 		m_clearSignal = false;
@@ -380,15 +374,7 @@ const surroundSampleFrame * Mixer::renderNextBuffer()
 		it_rem = m_playHandlesToRemove.erase( it_rem );
 	}
 
-	// rotate buffers
-	m_writeBuffer = ( m_writeBuffer + 1 ) % m_poolDepth;
-	m_readBuffer = ( m_readBuffer + 1 ) % m_poolDepth;
-
-	m_writeBuf = m_bufferPool[m_writeBuffer];
-	m_readBuf = m_bufferPool[m_readBuffer];
-
-	// clear last audio-buffer
-	BufferManager::clear( m_writeBuf, m_framesPerPeriod );
+	swapBuffers();
 
 	// prepare master mix (clear internal buffers etc.)
 	FxMixer * fxMixer = Engine::fxMixer();
@@ -461,6 +447,29 @@ const surroundSampleFrame * Mixer::renderNextBuffer()
 	m_profiler.finishPeriod( processingSampleRate(), m_framesPerPeriod );
 
 	return m_readBuf;
+}
+
+
+
+
+void Mixer::swapBuffers()
+{
+	// swap buffer
+	m_inputBufferWrite = ( m_inputBufferWrite + 1 ) % 2;
+	m_inputBufferRead =  ( m_inputBufferRead + 1 ) % 2;
+
+	// clear new write buffer
+	m_inputBufferFrames[ m_inputBufferWrite ] = 0;
+
+	// rotate buffers
+	m_writeBuffer = ( m_writeBuffer + 1 ) % m_poolDepth;
+	m_readBuffer = ( m_readBuffer + 1 ) % m_poolDepth;
+
+	m_writeBuf = m_bufferPool[m_writeBuffer];
+	m_readBuf = m_bufferPool[m_readBuffer];
+
+	// clear last audio-buffer
+	BufferManager::clear( m_writeBuf, m_framesPerPeriod );
 }
 
 

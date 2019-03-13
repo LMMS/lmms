@@ -363,6 +363,8 @@ private:
 
 	const surroundSampleFrame * renderNextBuffer();
 
+	void swapBuffers();
+
 	void handleMetronome();
 
 	void clearInternal();
