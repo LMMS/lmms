@@ -677,6 +677,30 @@ void Mixer::removeAudioPort( AudioPort * _port )
 }
 
 
+
+
+void Mixer::changeTempo( bpm_t tempo )
+{
+	requestChangeInModel();
+
+	for( PlayHandleList::Iterator it = m_playHandles.begin();
+						it != m_playHandles.end(); ++it )
+	{
+		NotePlayHandle * nph = dynamic_cast<NotePlayHandle *>( *it );
+		if( nph && !nph->isReleased() )
+		{
+			nph->lock();
+			nph->resize( tempo );
+			nph->unlock();
+		}
+	}
+
+	doneChangeInModel();
+}
+
+
+
+
 bool Mixer::addPlayHandle( PlayHandle* handle )
 {
 	if( criticalXRuns() == false )
@@ -694,6 +718,8 @@ bool Mixer::addPlayHandle( PlayHandle* handle )
 
 	return false;
 }
+
+
 
 
 void Mixer::removePlayHandle( PlayHandle * _ph )
