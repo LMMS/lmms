@@ -72,6 +72,7 @@ int precomputeWindow(float *window, int length, WINDOWS type)
 	// https://en.wikipedia.org/wiki/Window_function#AList_of_window_functions
 	switch (type)
 	{
+		default:
 		case RECTANGULAR:
 			for (i = 0; i < length; i++) {window[i] = 1.0;}
 			break;
@@ -80,23 +81,29 @@ int precomputeWindow(float *window, int length, WINDOWS type)
 			a1 = 0.48829;
 			a2 = 0.14128;
 			a3 = 0.01168;
-			for (i = 0; i < length; i++)
-			{
-				window[i] =	(a0 - a1 * cos(2 * F_PI * i / ((float)length - 1))
-								+ a2 * cos(4 * F_PI * i / ((float)length - 1))
-								- a3 * cos(6 * F_PI * i / ((float)length - 1)));
-			}
 			break;
-
-		case HAMMING: a1 = 0.54; break;
+		case HAMMING:
+			a0 = 0.54;
+			a1 = 1.0 - a0;
+			a2 = 0;
+			a3 = 0;
+			break;
 		case HANNING:
-		default: a1 = 0.5; break;
+			a0 = 0.5;
+			a1 = 1.0 - a0;
+			a2 = 0;
+			a3 = 0;
+			break;
 	}
 
-	for ( i=0; i < length; i++)
+	// common computation for cosine-sum based windows
+	for (i = 0; i < length; i++)
 	{
-		window[i] = (a1 + (1 - a1) * cos(2 * F_PI * i / ((float)length - 1.0)));
+		window[i] =	(a0 - a1 * cos(2 * F_PI * i / ((float)length - 1.0))
+						+ a2 * cos(4 * F_PI * i / ((float)length - 1.0))
+						- a3 * cos(6 * F_PI * i / ((float)length - 1.0)));
 	}
+
 
 	return 0;
 }
