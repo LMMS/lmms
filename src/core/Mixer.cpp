@@ -448,14 +448,9 @@ void Mixer::swapBuffers()
 {
 	m_inputBufferWrite = ( m_inputBufferWrite + 1 ) % 2;
 	m_inputBufferRead =  ( m_inputBufferRead + 1 ) % 2;
-
 	m_inputBufferFrames[ m_inputBufferWrite ] = 0;
 
-	surroundSampleFrame * outputBufferTemp = m_outputBufferRead;
-	m_outputBufferWrite = outputBufferTemp;
-	m_outputBufferRead = outputBufferTemp;
-
-	// clear last audio-buffer
+	std::swap( m_outputBufferRead, m_outputBufferWrite );
 	BufferManager::clear( m_outputBufferWrite, m_framesPerPeriod );
 }
 
