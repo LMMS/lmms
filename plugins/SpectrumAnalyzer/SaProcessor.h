@@ -36,8 +36,6 @@ public:
 	SaProcessor(SaControls *controls);
 	virtual ~SaProcessor();
 
-	float m_bandsL[MAX_BANDS];
-	float m_bandsR[MAX_BANDS];
 	bool getInProgress();
 	void clear();
 
@@ -50,6 +48,7 @@ public:
 
 	void setActive(bool active);
 
+
 private:
 	SaControls *m_controls;
 
@@ -61,10 +60,14 @@ private:
 	fftwf_complex * m_spectrumR;
 	float m_absSpectrumL[FFT_BUFFER_SIZE+1];
 	float m_absSpectrumR[FFT_BUFFER_SIZE+1];
-
-	int m_framesFilledUp;
+	float m_bandsL[MAX_BANDS];
+	float m_bandsR[MAX_BANDS];
 	float m_energyL;
 	float m_energyR;
+	float m_normBandsL[MAX_BANDS];
+	float m_normBandsR[MAX_BANDS];
+
+	int m_framesFilledUp;
 	int m_sampleRate;
 	bool m_active;
 	bool m_mode_stereo;
@@ -73,6 +76,7 @@ private:
 
 	std::vector<uchar> m_history;
 
+	friend class SaSpectrumView;
 	friend class SaWaterfallView;
 };
 #endif // SAPROCESSOR_H

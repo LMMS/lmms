@@ -24,6 +24,7 @@
 #include "SaSpectrumView.h"
 
 #include <cmath>
+#include <iostream>
 
 #include "Engine.h"
 #include "GuiApplication.h"
@@ -35,7 +36,8 @@ SaSpectrumView::SaSpectrumView(SaControls *controls, SaProcessor *processor, QWi
 	QWidget(_parent),
 	m_controls(controls),
 	m_processor(processor),
-	m_periodicalUpdate(false)
+	m_periodicalUpdate(false),
+	m_freezeRequest(false)
 {
 	setMinimumSize(400, 200);
 
@@ -46,6 +48,8 @@ SaSpectrumView::SaSpectrumView(SaControls *controls, SaProcessor *processor, QWi
 	for (int i = 0; i < MAX_BANDS; i++) {
 		m_bandHeightL.append(0);
 		m_bandHeightR.append(0);
+		m_bandPeakL.append(0);
+		m_bandPeakR.append(0);
 	}
 
 	m_logFreqTics = makeLogTics(LOWEST_FREQ, 20000);
@@ -57,16 +61,19 @@ SaSpectrumView::SaSpectrumView(SaControls *controls, SaProcessor *processor, QWi
 
 void SaSpectrumView::paintEvent(QPaintEvent *event)
 {
+	const int HIGHEST_FREQ = m_processor->getSampleRate() / 2;
+	const float smoothFactor = 0.15;
+
 	const float energyL = isnan(m_processor->getEnergyL()) ? 0 : m_processor->getEnergyL();
 	const float energyR = isnan(m_processor->getEnergyR()) ? 0 : m_processor->getEnergyR();
 	const bool stereo = m_controls->m_stereoModel.value();
+	const bool freeze = m_freezeRequest;
+
 	const int displayBottom = height() -20;
 	const int displayLeft = 20;
 	const int displayRight = width() -20;
 	const int displayWidth = displayRight - displayLeft;
 
-	const int HIGHEST_FREQ = m_processor->getSampleRate() / 2;
-	const float fallOff = 1.2;
 	float pos = 0;
 	std::vector<std::pair<int, std::string>> * freqTics = NULL;
 	std::vector<std::pair<float, std::string>> * ampTics = NULL;
@@ -142,13 +149,13 @@ void SaSpectrumView::paintEvent(QPaintEvent *event)
 	if (energyL > 0 || energyR > 0 || m_decaySum > 0) {
 
 		// update paths with new data if needed
-		if (!m_processor->getInProgress() && m_periodicalUpdate == true) {
+		if (!m_processor->getInProgress() && m_periodicalUpdate == true && !m_controls->m_pauseModel.value()) {
 			m_periodicalUpdate = false;
 			m_decaySum = 0;
 		
-			float peak;
-			float *bands = m_processor->m_bandsL;
+			float *band = m_processor->m_normBandsL;
 			QList<float> *m_bandHeight = &m_bandHeightL;
+			QList<float> *m_bandPeak = &m_bandPeakL;
 			float energy = energyL;
 			QPainterPath m_path;
 		
@@ -156,20 +163,30 @@ void SaSpectrumView::paintEvent(QPaintEvent *event)
 				m_path = QPainterPath();
 				m_path.moveTo(displayLeft, displayBottom);
 		
-				for (int x = 0; x < MAX_BANDS; x++, bands++) {
-
-					peak = *bands / energy;
-
-					if (peak > (*m_bandHeight)[x]) {
-						(*m_bandHeight)[x] = peak;
+				for (int x = 0; x < MAX_BANDS; x++) {
+					// direct display
+					if (m_controls->m_smoothModel.value() && (*m_bandHeight)[x] > band[x]) {
+						(*m_bandHeight)[x] = band[x] * smoothFactor + (*m_bandHeight)[x] * (1 - smoothFactor);
+//						(*m_bandHeight)[x] = (*m_bandHeight)[x] / 1.2;
 					} else {
-						(*m_bandHeight)[x] = (*m_bandHeight)[x] / fallOff;
+						(*m_bandHeight)[x] = band[x];
 					}
 		
-					m_path.lineTo(displayLeft + freqToXPixel(bandToFreq(x), displayWidth), ampToYPixel((*m_bandHeight)[x], displayBottom));
+					m_path.lineTo(	freqToXPixel(bandToFreq(x), displayWidth) + displayLeft,
+									ampToYPixel((*m_bandHeight)[x], displayBottom));
 					m_decaySum += (*m_bandHeight)[x];
+
+					// peak-hold and reference freeze (using the same curve
+					// to save resources and keep screen clean and readable)
+					if (m_controls->m_refFreezeModel.value() && freeze) {
+						(*m_bandPeak)[x] = band[x]; 
+					} else if (m_controls->m_peakHoldModel.value()) {
+						if (band[x] > (*m_bandPeak)[x]) {
+							(*m_bandPeak)[x] = band[x];
+						}
+					}
 				}
-		
+
 				m_path.lineTo(displayRight, displayBottom);
 				m_path.closeSubpath();
 		
@@ -177,8 +194,9 @@ void SaSpectrumView::paintEvent(QPaintEvent *event)
 				if (i == 0) {
 					m_pathL = m_path;
 					if (stereo) {
-						bands = m_processor->m_bandsR;
+						band = m_processor->m_normBandsR;
 						m_bandHeight = &m_bandHeightR;
+						m_bandPeak = &m_bandPeakR;
 						energy = energyR;
 					} else {
 						break;
@@ -187,6 +205,7 @@ void SaSpectrumView::paintEvent(QPaintEvent *event)
 					m_pathR = m_path;
 				}
 			}
+			if (freeze) {m_freezeRequest = false;}
 		}
 	
 		// draw stored paths

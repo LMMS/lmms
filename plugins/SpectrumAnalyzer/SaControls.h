@@ -76,6 +76,7 @@ private:
 	BoolModel m_logXModel;
 	BoolModel m_logYModel;
 	BoolModel m_peakHoldModel;
+	BoolModel m_pauseModel;
 	BoolModel m_refFreezeModel;
 
 	ComboBoxModel m_blockSizeModel;

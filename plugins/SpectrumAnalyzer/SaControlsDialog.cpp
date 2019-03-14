@@ -65,11 +65,11 @@ SaControlsDialog::SaControlsDialog(SaControls *controls, SaProcessor *processor)
 	config_layout->addWidget(displayLabel, 0, 0);
 
 	LedCheckBox * waterfallButton = new LedCheckBox("Waterfall diagram", this);
-//	waterfallButton->setCheckable(true);
+	waterfallButton->setCheckable(true);
 	waterfallButton->setModel(&controls->m_waterfallModel);
 	config_layout->addWidget(waterfallButton, 1, 0);
 
-	LedCheckBox * smoothButton = new LedCheckBox("Smooth decay", this);
+	LedCheckBox * smoothButton = new LedCheckBox("Averaging", this);
 	smoothButton->setCheckable(true);
 	smoothButton->setModel(&controls->m_smoothModel);
 	config_layout->addWidget(smoothButton, 2, 0);
@@ -83,6 +83,20 @@ SaControlsDialog::SaControlsDialog(SaControls *controls, SaProcessor *processor)
 	logYButton->setCheckable(true);
 	logYButton->setModel(&controls->m_logYModel);
 	config_layout->addWidget(logYButton, 4, 0);
+
+	LedCheckBox * peakHoldButton = new LedCheckBox("Peak hold", this);
+	peakHoldButton->setCheckable(true);
+	peakHoldButton->setModel(&controls->m_peakHoldModel);
+	config_layout->addWidget(peakHoldButton, 5, 0);
+
+	LedCheckBox * pauseButton = new LedCheckBox("Pause", this);
+	pauseButton->setCheckable(true);
+	pauseButton->setModel(&controls->m_pauseModel);
+	config_layout->addWidget(pauseButton, 6, 0);
+
+	LedCheckBox * refFreezeButton = new LedCheckBox("Reference freeze", this, "", LedCheckBox::Red);
+	refFreezeButton->setModel(&controls->m_refFreezeModel);
+	config_layout->addWidget(refFreezeButton, 7, 0);
 
 	// channels
 	QLabel * channelsLabel = new QLabel("Channel", this);

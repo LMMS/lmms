@@ -47,9 +47,16 @@ enum WINDOWS
  */
 float LMMS_EXPORT maximum( float * _abs_spectrum, unsigned int _spec_size );		// NOTE: used
 
+/* Normalizes the abs_spectrum array of absolute values to a 0..1 range
+ * based on supplied energy and stores it in the norm_spectrum array.
+ *
+ *	returns -1 on error
+*/
+int LMMS_EXPORT normalize(float *abs_spectrum, float energy, float *norm_spectrum, unsigned int block_size);
+
 /* Precompute a window function for later real-time use.
  *
- *    returns -1 on error
+ *	returns -1 on error
  */
 int LMMS_EXPORT precomputeWindow(float * window, int length, WINDOWS type);
 

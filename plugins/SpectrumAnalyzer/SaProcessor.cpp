@@ -24,7 +24,6 @@
 #include "SaProcessor.h"
 
 #include <cmath>
-#include <iostream>
 
 #include "lmms_math.h"
 
@@ -43,14 +42,8 @@ SaProcessor::SaProcessor(SaControls *controls) :
 	m_fftPlanL = fftwf_plan_dft_r2c_1d(FFT_BUFFER_SIZE * 2, m_bufferL, m_spectrumL, FFTW_MEASURE);
 	m_fftPlanR = fftwf_plan_dft_r2c_1d(FFT_BUFFER_SIZE * 2, m_bufferR, m_spectrumR, FFTW_MEASURE);
 
-	// initialize Blackman-Harris window, constants taken from
-	// https://en.wikipedia.org/wiki/Window_function#AList_of_window_functions
-	const float a0 = 0.35875;
-	const float a1 = 0.48829;
-	const float a2 = 0.14128;
-	const float a3 = 0.01168;
-
-	precomputeWindow(m_fftWindow, FFT_BUFFER_SIZE, BLACKMAN_HARRIS);
+//	precomputeWindow(m_fftWindow, FFT_BUFFER_SIZE, BLACKMAN_HARRIS);
+	precomputeWindow(m_fftWindow, FFT_BUFFER_SIZE, RECTANGULAR);
 	clear();
 
 	m_history.resize(WATERFALL_WIDTH * WATERFALL_HEIGHT * sizeof qRgb(0,0,0), 0);
@@ -69,7 +62,7 @@ SaProcessor::~SaProcessor()
 void SaProcessor::analyse(sampleFrame *buf, const fpp_t frames)
 {
 	// only analyse if the view is visible
-	if (m_active)
+	if (m_active && !m_controls->m_pauseModel.value())
 	{
 		const bool stereo = m_controls->m_stereoModel.value();
 		const int FFT_BUFFER_SIZE = 2048;
@@ -123,6 +116,7 @@ void SaProcessor::analyse(sampleFrame *buf, const fpp_t frames)
 					  (int)(LOWEST_FREQ * (FFT_BUFFER_SIZE + 1) / (float)(m_sampleRate / 2)),
 					  (int)(HIGHEST_FREQ * (FFT_BUFFER_SIZE + 1) / (float)(m_sampleRate / 2)));
 		m_energyL = maximum(m_bandsL, MAX_BANDS) / maximum(m_bufferL, FFT_BUFFER_SIZE);
+		normalize(m_bandsL, m_energyL, m_normBandsL, MAX_BANDS);
 
 		// repeat analysis for right channel only if stereo processing is enabled
 		if (stereo) {
@@ -133,8 +127,10 @@ void SaProcessor::analyse(sampleFrame *buf, const fpp_t frames)
 						  (int)(LOWEST_FREQ * (FFT_BUFFER_SIZE + 1) / (float)(m_sampleRate / 2)),
 						  (int)(HIGHEST_FREQ * (FFT_BUFFER_SIZE + 1) / (float)(m_sampleRate / 2)));
 			m_energyR = maximum(m_bandsR, MAX_BANDS) / maximum(m_bufferR, FFT_BUFFER_SIZE);
+			normalize(m_bandsR, m_energyR, m_normBandsR, MAX_BANDS);
 		} else {
 			memset(m_bandsR, 0, sizeof(m_bandsR));
+			memset(m_bandsR, 0, sizeof(m_normBandsR));
 			m_energyR = 0;
 		}
 
@@ -146,9 +142,11 @@ void SaProcessor::analyse(sampleFrame *buf, const fpp_t frames)
 					pixel + WATERFALL_WIDTH * WATERFALL_HEIGHT - WATERFALL_WIDTH,
 					pixel + WATERFALL_WIDTH);
 
-		for (int i = 0; i < WATERFALL_WIDTH && i < FFT_BUFFER_SIZE; i++){
-			float ampL = isnan(m_energyL) ? 0 : powf(m_bandsL[i] / m_energyL, 0.45);
-			float ampR = isnan(m_energyR) ? 0 : powf(m_bandsR[i] / m_energyR, 0.45);
+		for (int i = 0; i < WATERFALL_WIDTH && i < FFT_BUFFER_SIZE; i++){	//FIXME full range
+			// apply gamma correction to make small values more visible
+			// (should be around 0.42 to 0.45 for sRGB displays)
+			float ampL = powf(m_normBandsL[i], 0.42);
+			float ampR = powf(m_normBandsR[i], 0.42);
 
 			if (stereo) {
 				pixel[i] = qRgb(m_controls->m_colorL.red() * ampL + m_controls->m_colorR.red() * ampR,
@@ -160,8 +158,6 @@ void SaProcessor::analyse(sampleFrame *buf, const fpp_t frames)
 								m_controls->m_colorMono.lighter().blue() * ampL);
 			}
 		}
-
-std::cout << "energyL " << (int)m_energyL << "energyR " << (int)m_energyR << std::endl;
 
 		m_framesFilledUp = 0;
 		m_inProgress = false;
@@ -212,5 +208,7 @@ void SaProcessor::clear()
 	memset(m_bufferR, 0, sizeof(m_bufferR));
 	memset(m_bandsL, 0, sizeof(m_bandsL));
 	memset(m_bandsR, 0, sizeof(m_bandsR));
+	memset(m_normBandsL, 0, sizeof(m_normBandsL));
+	memset(m_normBandsR, 0, sizeof(m_normBandsR));
 }
 

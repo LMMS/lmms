@@ -53,6 +53,32 @@ float maximum(float *abs_spectrum, unsigned int spec_size)
 }
 
 
+/* Normalizes the array of absolute values to a 0..1 range
+
+   returns -1 on error
+*/
+int normalize(float *abs_spectrum, float energy, float *norm_spectrum, unsigned int block_size)
+{
+	int i;
+
+	if (abs_spectrum == NULL || norm_spectrum == NULL || block_size <= 0) {
+		return -1;
+	}
+
+	if (std::isnan(energy)) {
+		for (i = 0; i < block_size; i++) {
+			norm_spectrum[i] = 0.0;
+		}
+	} else {
+		for (i = 0; i < block_size; i++) {
+			norm_spectrum[i] = abs_spectrum[i] / energy;
+		}
+	}
+
+	return 0;
+}
+
+
 /* Precompute a window function for later real-time use.
  *
  *    returns -1 on error
@@ -75,7 +101,7 @@ int precomputeWindow(float *window, int length, WINDOWS type)
 		default:
 		case RECTANGULAR:
 			for (i = 0; i < length; i++) {window[i] = 1.0;}
-			break;
+			return 0;
 		case BLACKMAN_HARRIS:	
 			a0 = 0.35875;
 			a1 = 0.48829;
