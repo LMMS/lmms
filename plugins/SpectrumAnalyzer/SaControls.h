@@ -28,6 +28,7 @@
 
 #include <QPainter>
 
+#include "ComboBoxModel.h"
 #include "EffectControls.h"
 
 
@@ -76,6 +77,9 @@ private:
 	BoolModel m_logYModel;
 	BoolModel m_peakHoldModel;
 	BoolModel m_refFreezeModel;
+
+	ComboBoxModel m_blockSizeModel;
+	ComboBoxModel m_windowModel;
 
 	QColor	m_colorL;
 	QColor	m_colorR;

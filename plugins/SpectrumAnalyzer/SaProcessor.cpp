@@ -50,12 +50,7 @@ SaProcessor::SaProcessor(SaControls *controls) :
 	const float a2 = 0.14128;
 	const float a3 = 0.01168;
 
-	for (int i = 0; i < FFT_BUFFER_SIZE; i++)
-	{
-		m_fftWindow[i] = (a0 - a1 * cosf(2 * F_PI * i / (float)FFT_BUFFER_SIZE - 1)
-							+ a2 * cosf(4 * F_PI * i / (float)FFT_BUFFER_SIZE - 1)
-							- a3 * cos(6 * F_PI * i / (float)FFT_BUFFER_SIZE - 1));
-	}
+	precomputeWindow(m_fftWindow, FFT_BUFFER_SIZE, BLACKMAN_HARRIS);
 	clear();
 
 	m_history.resize(WATERFALL_WIDTH * WATERFALL_HEIGHT * sizeof qRgb(0,0,0), 0);

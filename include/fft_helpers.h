@@ -34,23 +34,24 @@ const int FFT_BUFFER_SIZE = 2048;
 
 enum WINDOWS
 {
-        KAISER=1,
-        RECTANGLE,
+        RECTANGULAR = 0,
+		BLACKMAN_HARRIS,
+        HAMMING,
         HANNING,
-        HAMMING
+		KAISER
 };
 
 /* returns biggest value from abs_spectrum[spec_size] array
  *
  *    returns -1 on error
  */
-float LMMS_EXPORT maximum( float * _abs_spectrum, unsigned int _spec_size );
+float LMMS_EXPORT maximum( float * _abs_spectrum, unsigned int _spec_size );		// NOTE: used
 
-/* apply hanning or hamming window to channel
+/* Precompute a window function for later real-time use.
  *
  *    returns -1 on error
  */
-int LMMS_EXPORT hanming( float * _timebuffer, int _length, WINDOWS _type );
+int LMMS_EXPORT precomputeWindow(float * window, int length, WINDOWS type);
 
 /* compute absolute values of complex_buffer, save to absspec_buffer
  * take care that - compl_len is not bigger than complex_buffer!
@@ -58,7 +59,7 @@ int LMMS_EXPORT hanming( float * _timebuffer, int _length, WINDOWS _type );
  *
  *    returns 0 on success, else -1
  */
-int LMMS_EXPORT absspec( fftwf_complex * _complex_buffer, float * _absspec_buffer,
+int LMMS_EXPORT absspec( fftwf_complex * _complex_buffer, float * _absspec_buffer,	// NOTE: used
 							int _compl_length );
 
 /* build fewer subbands from many absolute spectrum values
@@ -67,11 +68,11 @@ int LMMS_EXPORT absspec( fftwf_complex * _complex_buffer, float * _absspec_buffe
  *
  *    returns 0 on success, else -1
  */
-int LMMS_EXPORT compressbands( float * _absspec_buffer, float * _compressedband,
+int LMMS_EXPORT compressbands( float * _absspec_buffer, float * _compressedband,	// NOTE: used
 			int _num_old, int _num_new, int _bottom, int _top );
 
 
-int LMMS_EXPORT calc13octaveband31( float * _absspec_buffer, float * _subbands,
+int LMMS_EXPORT calc13octaveband31( float * _absspec_buffer, float * _subbands,		// NOTE: unused
 				int _num_spec, float _max_frequency );
 
 /* compute power of finite time sequence
@@ -79,6 +80,6 @@ int LMMS_EXPORT calc13octaveband31( float * _absspec_buffer, float * _subbands,
  *
  *    returns power on success, else -1
  */
-float LMMS_EXPORT signalpower(float *timesignal, int num_values);
+float LMMS_EXPORT signalpower(float *timesignal, int num_values);					// NOTE: unused
 
 #endif

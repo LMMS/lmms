@@ -27,9 +27,8 @@
 
 #include <QImage>
 
-#include "SaControls.h"
-
 #include "fft_helpers.h"
+#include "SaControls.h"
 
 class SaProcessor
 {

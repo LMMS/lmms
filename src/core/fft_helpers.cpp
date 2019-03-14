@@ -53,27 +53,49 @@ float maximum(float *abs_spectrum, unsigned int spec_size)
 }
 
 
-/* apply hanning or hamming window to channel
-
-	returns -1 on error */
-int hanming(float *timebuffer, int length, WINDOWS type)
+/* Precompute a window function for later real-time use.
+ *
+ *    returns -1 on error
+ */
+int precomputeWindow(float *window, int length, WINDOWS type)
 {
 	int i;
-	float alpha;
 
-	if ( (timebuffer==NULL)||(length<=0) )
-		return -1;
+	float a0;
+	float a1;
+	float a2;
+	float a3;
 
+	if (window == NULL || length <= 0) {return -1;}
+
+	// constants taken from
+	// https://en.wikipedia.org/wiki/Window_function#AList_of_window_functions
 	switch (type)
 	{
-		case HAMMING: alpha=0.54; break;
+		case RECTANGULAR:
+			for (i = 0; i < length; i++) {window[i] = 1.0;}
+			break;
+		case BLACKMAN_HARRIS:	
+			a0 = 0.35875;
+			a1 = 0.48829;
+			a2 = 0.14128;
+			a3 = 0.01168;
+			for (i = 0; i < length; i++)
+			{
+				window[i] =	(a0 - a1 * cos(2 * F_PI * i / ((float)length - 1))
+								+ a2 * cos(4 * F_PI * i / ((float)length - 1))
+								- a3 * cos(6 * F_PI * i / ((float)length - 1)));
+			}
+			break;
+
+		case HAMMING: a1 = 0.54; break;
 		case HANNING:
-		default: alpha=0.5; break;
+		default: a1 = 0.5; break;
 	}
 
-	for ( i=0; i<length; i++ )
+	for ( i=0; i < length; i++)
 	{
-		timebuffer[i]=timebuffer[i]*(alpha+(1-alpha)*cos(2*F_PI*i/((float)length-1.0)));
+		window[i] = (a1 + (1 - a1) * cos(2 * F_PI * i / ((float)length - 1.0)));
 	}
 
 	return 0;
