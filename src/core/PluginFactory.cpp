@@ -180,10 +180,6 @@ void PluginFactory::discoverPlugins()
 				continue;
 			}
 		}
-		else
-		{
-			//qDebug() << "Ignoring" << file.absoluteFilePath() << "(no lmms_plugin_main())";
-		}
 
 		if(pluginDescriptor)
 		{
@@ -199,15 +195,18 @@ void PluginFactory::discoverPlugins()
 					const Plugin::Descriptor::SubPluginFeatures::Key* key = nullptr)
 			{
 				if(!supportedFileTypes.isNull())
-				for (const QString& ext : supportedFileTypes.split(','))
 				{
-					//qDebug() << "Plugin " << info.name() << "supports" << ext;
-					PluginInfoAndKey infoAndKey;
-					infoAndKey.info = info;
-					infoAndKey.key = key
-						? *key
-						: Plugin::Descriptor::SubPluginFeatures::Key();
-					m_pluginByExt.insert(ext, infoAndKey);
+					for (const QString& ext : supportedFileTypes.split(','))
+					{
+						//qDebug() << "Plugin " << info.name()
+						//	<< "supports" << ext;
+						PluginInfoAndKey infoAndKey;
+						infoAndKey.info = info;
+						infoAndKey.key = key
+							? *key
+							: Plugin::Descriptor::SubPluginFeatures::Key();
+						m_pluginByExt.insert(ext, infoAndKey);
+					}
 				}
 			};
 
