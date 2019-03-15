@@ -202,19 +202,19 @@ public:
 
 			virtual QString additionalFileExtensions(const Key&) const
 			{
-				return nullptr;
+				return QString();
 			}
 
 			virtual QString displayName(const Key& k) const
 			{
 				return k.isValid()
 					? k.desc->displayName
-					: k.name.toUtf8().data();
+					: k.name;
 			}
 
 			virtual QString description(const Key& k) const
 			{
-				return k.isValid() ? k.desc->description : "";
+				return k.isValid() ? k.desc->description : QString();
 			}
 
 			virtual const PixmapLoader* logo(const Key& k) const
