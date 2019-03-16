@@ -49,6 +49,7 @@ SET(LMMS_SRCS
 	gui/widgets/ComboBox.cpp
 	gui/widgets/ControllerRackView.cpp
 	gui/widgets/ControllerView.cpp
+	gui/widgets/Controls.cpp
 	gui/widgets/CPULoadWidget.cpp
 	gui/widgets/EffectRackView.cpp
 	gui/widgets/EffectView.cpp
