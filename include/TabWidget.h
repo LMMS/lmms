@@ -36,7 +36,10 @@ class TabWidget : public QWidget
 {
 	Q_OBJECT
 public:
-	TabWidget( const QString & _caption, QWidget * _parent, bool usePixmap = false );
+	//! @param resizable If true, the widget resizes to fit the size of all tabs
+	//!   If false, all child widget will be cut down to the TabWidget's size
+	TabWidget( const QString & _caption, QWidget * _parent,
+				bool usePixmap = false, bool resizable = false );
 	virtual ~TabWidget() = default;
 
 	void addTab( QWidget * w, const QString & name, const char *pixmap = NULL, int idx = -1 );
@@ -74,7 +77,7 @@ protected:
 	virtual void paintEvent( QPaintEvent * _pe );
 	virtual void resizeEvent( QResizeEvent * _re );
 	virtual void wheelEvent( QWheelEvent * _we );
-
+	virtual QSize minimumSizeHint() const;
 
 private:
 	struct widgetDesc
@@ -88,6 +91,7 @@ private:
 
 	widgetStack m_widgets;
 
+	bool	m_resizable;
 	int 	m_activeTab;
 	QString m_caption;      // Tab caption, used as the tooltip text on icon tabs
 	quint8 	m_tabbarHeight; // The height of the tab bar

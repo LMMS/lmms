@@ -34,8 +34,10 @@
 #include "gui_templates.h"
 #include "embed.h"
 
-TabWidget::TabWidget( const QString & caption, QWidget * parent, bool usePixmap ) :
+TabWidget::TabWidget(const QString & caption, QWidget * parent, bool usePixmap,
+					 bool resizable) :
 	QWidget( parent ),
+	m_resizable( resizable ),
 	m_activeTab( 0 ),
 	m_caption( caption ),
 	m_usePixmap( usePixmap ),
@@ -81,7 +83,9 @@ void TabWidget::addTab( QWidget * w, const QString & name, const char *pixmap, i
 	m_widgets[idx] = d;
 
 	// Position tab's window
-	w->setFixedSize( width() - 4, height() - m_tabbarHeight );
+	if(!m_resizable) {
+		w->setFixedSize( width() - 4, height() - m_tabbarHeight );
+	}
 	w->move( 2, m_tabbarHeight - 1 );
 	w->hide();
 
@@ -189,13 +193,15 @@ void TabWidget::mousePressEvent( QMouseEvent * me )
 
 void TabWidget::resizeEvent( QResizeEvent * )
 {
-	for( widgetStack::iterator it = m_widgets.begin();
-						it != m_widgets.end(); ++it )
+	if(!m_resizable)
 	{
-		( *it ).w->setFixedSize( width() - 4, height() - m_tabbarHeight );
+		for( widgetStack::iterator it = m_widgets.begin();
+							it != m_widgets.end(); ++it )
+		{
+			( *it ).w->setFixedSize( width() - 4, height() - m_tabbarHeight );
+		}
 	}
 }
-
 
 
 
@@ -299,6 +305,31 @@ void TabWidget::wheelEvent( QWheelEvent * we )
 	}
 	setActiveTab( tab );
 }
+
+
+
+
+// Let parent widgets know how much space this tab widget needs
+QSize TabWidget::minimumSizeHint() const
+{
+	if(m_resizable)
+	{
+		int maxWidth = 0, maxHeight = 0;
+		for( widgetStack::const_iterator it = m_widgets.begin();
+							it != m_widgets.end(); ++it )
+		{
+			maxWidth = std::max(maxWidth, it->w->width());
+			maxHeight = std::max(maxHeight, it->w->height());
+		}
+		return QSize(maxWidth + 4, maxHeight + m_tabbarHeight);
+	}
+	else {
+		return QWidget::minimumSizeHint();
+	}
+}
+
+
+
 
 // Return the color to be used to draw a TabWidget's title text (if any)
 QColor TabWidget::tabTitleText() const
