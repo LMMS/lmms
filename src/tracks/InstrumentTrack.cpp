@@ -1650,6 +1650,8 @@ void InstrumentTrackWindow::updateInstrumentView()
 
 		modelChanged(); 		// Get the instrument window to refresh
 		m_track->dataChanged(); // Get the text on the trackButton to change
+
+		m_pianoView->setVisible(m_track->m_instrument->hasNoteInput());
 	}
 }
 
@@ -1704,7 +1706,9 @@ void InstrumentTrackWindow::closeEvent( QCloseEvent* event )
 
 void InstrumentTrackWindow::focusInEvent( QFocusEvent* )
 {
-	m_pianoView->setFocus();
+	if(m_pianoView->isVisible()) {
+		m_pianoView->setFocus();
+	}
 }
 
 
@@ -1836,6 +1840,9 @@ void InstrumentTrackWindow::viewInstrumentInDirection(int d)
 
 		// scroll the SongEditor/BB-editor to make sure the new trackview label is visible
 		bringToFront->trackContainerView()->scrollToTrackView(bringToFront);
+
+		// get the instrument window to refresh
+		modelChanged();
 	}
 	bringToFront->getInstrumentTrackWindow()->setFocus();
 }
