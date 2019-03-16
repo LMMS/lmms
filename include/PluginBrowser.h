@@ -60,7 +60,8 @@ class PluginDescWidget : public QWidget
 {
 	Q_OBJECT
 public:
-	PluginDescWidget( const Plugin::Descriptor & _pd, QWidget * _parent );
+	typedef Plugin::Descriptor::SubPluginFeatures::Key PluginKey;
+	PluginDescWidget( const PluginKey & _pk, QWidget * _parent );
 
 
 protected:
@@ -72,7 +73,7 @@ protected:
 private:
 	constexpr static int DEFAULT_HEIGHT{24};
 
-	const Plugin::Descriptor & m_pluginDescriptor;
+	PluginKey m_pluginKey;
 	QPixmap m_logo;
 
 	bool m_mouseOver;
