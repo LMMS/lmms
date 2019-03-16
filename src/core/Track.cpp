@@ -138,7 +138,7 @@ TrackContentObject::~TrackContentObject()
  *
  * \param _pos The new position of the track content object.
  */
-void TrackContentObject::movePosition( const MidiTime & pos )
+void TrackContentObject::movePosition( const TimePos & pos )
 {
 	if( m_startPosition != pos )
 	{
@@ -160,7 +160,7 @@ void TrackContentObject::movePosition( const MidiTime & pos )
  *
  * \param _length The new length of the track content object.
  */
-void TrackContentObject::changeLength( const MidiTime & length )
+void TrackContentObject::changeLength( const TimePos & length )
 {
 	m_length = length;
 	Engine::getSong()->updateLength();
@@ -200,7 +200,7 @@ void TrackContentObject::paste()
 {
 	if( Clipboard::getContent( nodeName() ) != NULL )
 	{
-		const MidiTime pos = startPosition();
+		const TimePos pos = startPosition();
 		restoreState( *( Clipboard::getContent( nodeName() ) ) );
 		movePosition( pos );
 	}
@@ -228,7 +228,7 @@ void TrackContentObject::toggleMute()
 
 
 
-MidiTime TrackContentObject::startTimeOffset() const
+TimePos TrackContentObject::startTimeOffset() const
 {
 	return m_startTimeOffset;
 }
@@ -236,7 +236,7 @@ MidiTime TrackContentObject::startTimeOffset() const
 
 
 
-void TrackContentObject::setStartTimeOffset( const MidiTime &startTimeOffset )
+void TrackContentObject::setStartTimeOffset( const TimePos &startTimeOffset )
 {
 	m_startTimeOffset = startTimeOffset;
 }
@@ -487,7 +487,7 @@ void TrackContentObjectView::updateLength()
 	{
 		setFixedWidth(
 		static_cast<int>( m_tco->length() * pixelsPerTact() /
-					MidiTime::ticksPerTact() ) + 1 /*+
+					TimePos::ticksPerTact() ) + 1 /*+
 						TCO_BORDER_WIDTH * 2-1*/ );
 	}
 	m_trackView->trackContainerView()->update();
@@ -524,7 +524,7 @@ void TrackContentObjectView::updatePosition()
 void TrackContentObjectView::dragEnterEvent( QDragEnterEvent * dee )
 {
 	TrackContentWidget * tcw = getTrackView()->getTrackContentWidget();
-	MidiTime tcoPos = MidiTime( m_tco->startPosition().getTact(), 0 );
+	TimePos tcoPos = TimePos( m_tco->startPosition().getTact(), 0 );
 	if( tcw->canPasteSelection( tcoPos, dee->mimeData() ) == false )
 	{
 		dee->ignore();
@@ -563,7 +563,7 @@ void TrackContentObjectView::dropEvent( QDropEvent * de )
 	if( m_trackView->trackContainerView()->allowRubberband() == true )
 	{
 		TrackContentWidget * tcw = getTrackView()->getTrackContentWidget();
-		MidiTime tcoPos = MidiTime( m_tco->startPosition().getTact(), 0 );
+		TimePos tcoPos = TimePos( m_tco->startPosition().getTact(), 0 );
 		if( tcw->pasteSelection( tcoPos, de ) == true )
 		{
 			de->accept();
@@ -581,7 +581,7 @@ void TrackContentObjectView::dropEvent( QDropEvent * de )
 
 	// Copy state into existing tco
 	DataFile dataFile( value.toUtf8() );
-	MidiTime pos = m_tco->startPosition();
+	TimePos pos = m_tco->startPosition();
 	QDomElement tcos = dataFile.content().firstChildElement( "tcos" );
 	m_tco->restoreState( tcos.firstChildElement().firstChildElement() );
 	m_tco->movePosition( pos );
@@ -764,7 +764,7 @@ void TrackContentObjectView::mousePressEvent( QMouseEvent * me )
 					s_textFloat->setText( QString( "%1:%2" ).
 						arg( m_tco->startPosition().getTact() + 1 ).
 						arg( m_tco->startPosition().getTicks() %
-								MidiTime::ticksPerTact() ) );
+								TimePos::ticksPerTact() ) );
 				}
 				else if( m_action == Resize || m_action == ResizeLeft )
 				{
@@ -772,13 +772,13 @@ void TrackContentObjectView::mousePressEvent( QMouseEvent * me )
 					s_textFloat->setText( tr( "%1:%2 (%3:%4 to %5:%6)" ).
 							arg( m_tco->length().getTact() ).
 							arg( m_tco->length().getTicks() %
-									MidiTime::ticksPerTact() ).
+									TimePos::ticksPerTact() ).
 							arg( m_tco->startPosition().getTact() + 1 ).
 							arg( m_tco->startPosition().getTicks() %
-									MidiTime::ticksPerTact() ).
+									TimePos::ticksPerTact() ).
 							arg( m_tco->endPosition().getTact() + 1 ).
 							arg( m_tco->endPosition().getTicks() %
-									MidiTime::ticksPerTact() ) );
+									TimePos::ticksPerTact() ) );
 				}
 				// s_textFloat->reparent( this );
 				// setup text-float as if TCO was already moved/resized
@@ -889,9 +889,9 @@ void TrackContentObjectView::mouseMoveEvent( QMouseEvent * me )
 	if( m_action == Move )
 	{
 		const int x = mapToParent( me->pos() ).x() - m_initialMousePos.x();
-		MidiTime t = qMax( 0, (int)
+		TimePos t = qMax( 0, (int)
 			m_trackView->trackContainerView()->currentPosition()+
-				static_cast<int>( x * MidiTime::ticksPerTact() /
+				static_cast<int>( x * TimePos::ticksPerTact() /
 									ppt ) );
 		if( ! ( me->modifiers() & Qt::ControlModifier )
 		   && me->button() == Qt::NoButton )
@@ -903,7 +903,7 @@ void TrackContentObjectView::mouseMoveEvent( QMouseEvent * me )
 		s_textFloat->setText( QString( "%1:%2" ).
 				arg( m_tco->startPosition().getTact() + 1 ).
 				arg( m_tco->startPosition().getTicks() %
-						MidiTime::ticksPerTact() ) );
+						TimePos::ticksPerTact() ) );
 		s_textFloat->moveGlobal( this, QPoint( width() + 2, height() + 2 ) );
 	}
 	else if( m_action == MoveSelection )
@@ -915,8 +915,8 @@ void TrackContentObjectView::mouseMoveEvent( QMouseEvent * me )
 			m_trackView->trackContainerView()->selectedObjects();
 		QVector<TrackContentObject *> tcos;
 		int smallestPos = 0;
-		MidiTime dtick = MidiTime( static_cast<int>( dx *
-					MidiTime::ticksPerTact() / ppt ) );
+		TimePos dtick = TimePos( static_cast<int>( dx *
+					TimePos::ticksPerTact() / ppt ) );
 		if( snap )
 		{
 			dtick = dtick.toNearestTact();
@@ -952,10 +952,10 @@ void TrackContentObjectView::mouseMoveEvent( QMouseEvent * me )
 	{
 		if( m_action == Resize )
 		{
-			MidiTime t = qMax( MidiTime::ticksPerTact() / 16, static_cast<int>( me->x() * MidiTime::ticksPerTact() / ppt ) );
+			TimePos t = qMax( TimePos::ticksPerTact() / 16, static_cast<int>( me->x() * TimePos::ticksPerTact() / ppt ) );
 			if( ! ( me->modifiers() & Qt::ControlModifier ) && me->button() == Qt::NoButton )
 			{
-				t = qMax<int>( MidiTime::ticksPerTact(), t.toNearestTact() );
+				t = qMax<int>( TimePos::ticksPerTact(), t.toNearestTact() );
 			}
 			m_tco->changeLength( t );
 		}
@@ -966,17 +966,17 @@ void TrackContentObjectView::mouseMoveEvent( QMouseEvent * me )
 			{
 				const int x = mapToParent( me->pos() ).x() - m_initialMousePos.x();
 
-				MidiTime t = qMax( 0, (int)
+				TimePos t = qMax( 0, (int)
 								   m_trackView->trackContainerView()->currentPosition()+
-								   static_cast<int>( x * MidiTime::ticksPerTact() /
+								   static_cast<int>( x * TimePos::ticksPerTact() /
 													 ppt ) );
 				if( ! ( me->modifiers() & Qt::ControlModifier )
 						&& me->button() == Qt::NoButton )
 				{
 					t = t.toNearestTact();
 				}
-				MidiTime oldPos = m_tco->startPosition();
-				if( m_tco->length() + ( oldPos - t ) >= MidiTime::ticksPerTact() )
+				TimePos oldPos = m_tco->startPosition();
+				if( m_tco->length() + ( oldPos - t ) >= TimePos::ticksPerTact() )
 				{
 					m_tco->movePosition( t );
 					m_trackView->getTrackContentWidget()->changePosition();
@@ -988,13 +988,13 @@ void TrackContentObjectView::mouseMoveEvent( QMouseEvent * me )
 		s_textFloat->setText( tr( "%1:%2 (%3:%4 to %5:%6)" ).
 				arg( m_tco->length().getTact() ).
 				arg( m_tco->length().getTicks() %
-						MidiTime::ticksPerTact() ).
+						TimePos::ticksPerTact() ).
 				arg( m_tco->startPosition().getTact() + 1 ).
 				arg( m_tco->startPosition().getTicks() %
-						MidiTime::ticksPerTact() ).
+						TimePos::ticksPerTact() ).
 				arg( m_tco->endPosition().getTact() + 1 ).
 				arg( m_tco->endPosition().getTicks() %
-						MidiTime::ticksPerTact() ) );
+						TimePos::ticksPerTact() ) );
 		s_textFloat->moveGlobal( this, QPoint( width() + 2, height() + 2) );
 	}
 	else
@@ -1150,8 +1150,8 @@ TrackContentWidget::TrackContentWidget( TrackView * parent ) :
 	setAcceptDrops( true );
 
 	connect( parent->trackContainerView(),
-			SIGNAL( positionChanged( const MidiTime & ) ),
-			this, SLOT( changePosition( const MidiTime & ) ) );
+			SIGNAL( positionChanged( const TimePos & ) ),
+			this, SLOT( changePosition( const TimePos & ) ) );
 
 	setStyle( QApplication::style() );
 
@@ -1280,7 +1280,7 @@ void TrackContentWidget::update()
  *
  * \param newPos The MIDI time to move to.
  */
-void TrackContentWidget::changePosition( const MidiTime & newPos )
+void TrackContentWidget::changePosition( const TimePos & newPos )
 {
 	if( m_trackView->trackContainerView() == gui->getBBEditor()->trackContainerView() )
 	{
@@ -1317,7 +1317,7 @@ void TrackContentWidget::changePosition( const MidiTime & newPos )
 		return;
 	}
 
-	MidiTime pos = newPos;
+	TimePos pos = newPos;
 	if( pos < 0 )
 	{
 		pos = m_trackView->trackContainerView()->currentPosition();
@@ -1343,7 +1343,7 @@ void TrackContentWidget::changePosition( const MidiTime & newPos )
 			( ts <= begin && te >= end ) )
 		{
 			tcov->move( static_cast<int>( ( ts - begin ) * ppt /
-						MidiTime::ticksPerTact() ),
+						TimePos::ticksPerTact() ),
 								tcov->y() );
 			if( !tcov->isVisible() )
 			{
@@ -1368,12 +1368,12 @@ void TrackContentWidget::changePosition( const MidiTime & newPos )
  *
  * \param mouseX the mouse's current X position in pixels.
  */
-MidiTime TrackContentWidget::getPosition( int mouseX )
+TimePos TrackContentWidget::getPosition( int mouseX )
 {
 	TrackContainerView * tv = m_trackView->trackContainerView();
-	return MidiTime( tv->currentPosition() +
+	return TimePos( tv->currentPosition() +
 					 mouseX *
-					 MidiTime::ticksPerTact() /
+					 TimePos::ticksPerTact() /
 					 static_cast<int>( tv->pixelsPerTact() ) );
 }
 
@@ -1386,7 +1386,7 @@ MidiTime TrackContentWidget::getPosition( int mouseX )
  */
 void TrackContentWidget::dragEnterEvent( QDragEnterEvent * dee )
 {
-	MidiTime tcoPos = MidiTime( getPosition( dee->pos().x() ).getTact(), 0 );
+	TimePos tcoPos = TimePos( getPosition( dee->pos().x() ).getTact(), 0 );
 	if( canPasteSelection( tcoPos, dee->mimeData() ) == false )
 	{
 		dee->ignore();
@@ -1406,7 +1406,7 @@ void TrackContentWidget::dragEnterEvent( QDragEnterEvent * dee )
  * \param tcoPos the position of the TCO slot being pasted on
  * \param de the DropEvent generated
  */
-bool TrackContentWidget::canPasteSelection( MidiTime tcoPos, const QMimeData * mimeData )
+bool TrackContentWidget::canPasteSelection( TimePos tcoPos, const QMimeData * mimeData )
 {
 	Track * t = getTrack();
 	QString type = StringPairDrag::decodeMimeKey( mimeData );
@@ -1425,8 +1425,8 @@ bool TrackContentWidget::canPasteSelection( MidiTime tcoPos, const QMimeData * m
 	// Extract the metadata and which TCO was grabbed
 	QDomElement metadata = dataFile.content().firstChildElement( "copyMetadata" );
 	QDomAttr tcoPosAttr = metadata.attributeNode( "grabbedTCOPos" );
-	MidiTime grabbedTCOPos = tcoPosAttr.value().toInt();
-	MidiTime grabbedTCOTact = MidiTime( grabbedTCOPos.getTact(), 0 );
+	TimePos grabbedTCOPos = tcoPosAttr.value().toInt();
+	TimePos grabbedTCOTact = TimePos( grabbedTCOPos.getTact(), 0 );
 
 	// Extract the track index that was originally clicked
 	QDomAttr tiAttr = metadata.attributeNode( "initialTrackIndex" );
@@ -1476,7 +1476,7 @@ bool TrackContentWidget::canPasteSelection( MidiTime tcoPos, const QMimeData * m
  * \param tcoPos the position of the TCO slot being pasted on
  * \param de the DropEvent generated
  */
-bool TrackContentWidget::pasteSelection( MidiTime tcoPos, QDropEvent * de )
+bool TrackContentWidget::pasteSelection( TimePos tcoPos, QDropEvent * de )
 {
 	if( canPasteSelection( tcoPos, de->mimeData() ) == false )
 	{
@@ -1500,8 +1500,8 @@ bool TrackContentWidget::pasteSelection( MidiTime tcoPos, QDropEvent * de )
 	QDomAttr tiAttr = metadata.attributeNode( "initialTrackIndex" );
 	int initialTrackIndex = tiAttr.value().toInt();
 	QDomAttr tcoPosAttr = metadata.attributeNode( "grabbedTCOPos" );
-	MidiTime grabbedTCOPos = tcoPosAttr.value().toInt();
-	MidiTime grabbedTCOTact = MidiTime( grabbedTCOPos.getTact(), 0 );
+	TimePos grabbedTCOPos = tcoPosAttr.value().toInt();
+	TimePos grabbedTCOTact = TimePos( grabbedTCOPos.getTact(), 0 );
 
 	// Snap the mouse position to the beginning of the dropped tact, in ticks
 	const TrackContainer::TrackList tracks = getTrack()->trackContainer()->tracks();
@@ -1533,11 +1533,11 @@ bool TrackContentWidget::pasteSelection( MidiTime tcoPos, QDropEvent * de )
 
 		// Compute the final position by moving the tco's pos by
 		// the number of tacts between the first TCO and the mouse drop TCO
-		MidiTime oldPos = tcoElement.attributeNode( "pos" ).value().toInt();
-		MidiTime offset = oldPos - MidiTime( oldPos.getTact(), 0 );
-		MidiTime oldTact = MidiTime( oldPos.getTact(), 0 );
-		MidiTime delta = offset + ( oldTact - grabbedTCOTact );
-		MidiTime pos = tcoPos + delta;
+		TimePos oldPos = tcoElement.attributeNode( "pos" ).value().toInt();
+		TimePos offset = oldPos - TimePos( oldPos.getTact(), 0 );
+		TimePos oldTact = TimePos( oldPos.getTact(), 0 );
+		TimePos delta = offset + ( oldTact - grabbedTCOTact );
+		TimePos pos = tcoPos + delta;
 
 		TrackContentObject * tco = t->createTCO( pos );
 		tco->restoreState( tcoElement );
@@ -1566,7 +1566,7 @@ bool TrackContentWidget::pasteSelection( MidiTime tcoPos, QDropEvent * de )
  */
 void TrackContentWidget::dropEvent( QDropEvent * de )
 {
-	MidiTime tcoPos = MidiTime( getPosition( de->pos().x() ).getTact(), 0 );
+	TimePos tcoPos = TimePos( getPosition( de->pos().x() ).getTact(), 0 );
 	if( pasteSelection( tcoPos, de ) == true )
 	{
 		de->accept();
@@ -1599,8 +1599,8 @@ void TrackContentWidget::mousePressEvent( QMouseEvent * me )
 			so.at( i )->setSelected( false);
 		}
 		getTrack()->addJournalCheckPoint();
-		const MidiTime pos = getPosition( me->x() ).getTact() *
-						MidiTime::ticksPerTact();
+		const TimePos pos = getPosition( me->x() ).getTact() *
+						TimePos::ticksPerTact();
 		TrackContentObject * tco = getTrack()->createTCO( pos );
 
 		tco->saveJournallingState( false );
@@ -1663,11 +1663,11 @@ Track * TrackContentWidget::getTrack()
  *
  * \param posStart the starting position of the Widget (from getPosition())
  */
-MidiTime TrackContentWidget::endPosition( const MidiTime & posStart )
+TimePos TrackContentWidget::endPosition( const TimePos & posStart )
 {
 	const float ppt = m_trackView->trackContainerView()->pixelsPerTact();
 	const int w = width();
-	return posStart + static_cast<int>( w * MidiTime::ticksPerTact() / ppt );
+	return posStart + static_cast<int>( w * TimePos::ticksPerTact() / ppt );
 }
 
 
@@ -2223,7 +2223,7 @@ void Track::loadSettings( const QDomElement & element )
 			&& !node.toElement().attribute( "metadata" ).toInt() )
 			{
 				TrackContentObject * tco = createTCO(
-								MidiTime( 0 ) );
+								TimePos( 0 ) );
 				tco->restoreState( node.toElement() );
 				saveJournallingState( false );
 				restoreJournallingState();
@@ -2321,7 +2321,7 @@ TrackContentObject * Track::getTCO( int tcoNum )
 	}
 	printf( "called Track::getTCO( %d ), "
 			"but TCO %d doesn't exist\n", tcoNum, tcoNum );
-	return createTCO( tcoNum * MidiTime::ticksPerTact() );
+	return createTCO( tcoNum * TimePos::ticksPerTact() );
 
 }
 
@@ -2365,8 +2365,8 @@ int Track::getTCONum( const TrackContentObject * tco )
  *  \param start The MIDI start time of the range.
  *  \param end   The MIDI endi time of the range.
  */
-void Track::getTCOsInRange( tcoVector & tcoV, const MidiTime & start,
-							const MidiTime & end )
+void Track::getTCOsInRange( tcoVector & tcoV, const TimePos & start,
+							const TimePos & end )
 {
 	for( TrackContentObject* tco : m_trackContentObjects )
 	{
@@ -2398,7 +2398,7 @@ void Track::swapPositionOfTCOs( int tcoNum1, int tcoNum2 )
 	qSwap( m_trackContentObjects[tcoNum1],
 					m_trackContentObjects[tcoNum2] );
 
-	const MidiTime pos = m_trackContentObjects[tcoNum1]->startPosition();
+	const TimePos pos = m_trackContentObjects[tcoNum1]->startPosition();
 
 	m_trackContentObjects[tcoNum1]->movePosition(
 			m_trackContentObjects[tcoNum2]->startPosition() );
@@ -2412,10 +2412,10 @@ void Track::createTCOsForBB( int bb )
 {
 	while( numOfTCOs() < bb + 1 )
 	{
-		MidiTime position = MidiTime( numOfTCOs(), 0 );
+		TimePos position = TimePos( numOfTCOs(), 0 );
 		TrackContentObject * tco = createTCO( position );
 		tco->movePosition( position );
-		tco->changeLength( MidiTime( 1, 0 ) );
+		tco->changeLength( TimePos( 1, 0 ) );
 	}
 }
 
@@ -2429,7 +2429,7 @@ void Track::createTCOsForBB( int bb )
  *    in ascending order by TCO time, once we hit a TCO that was earlier
  *    than the insert time, we could fall out of the loop early.
  */
-void Track::insertTact( const MidiTime & pos )
+void Track::insertTact( const TimePos & pos )
 {
 	// we'll increase the position of every TCO, positioned behind pos, by
 	// one tact
@@ -2439,7 +2439,7 @@ void Track::insertTact( const MidiTime & pos )
 		if( ( *it )->startPosition() >= pos )
 		{
 			( *it )->movePosition( (*it)->startPosition() +
-						MidiTime::ticksPerTact() );
+						TimePos::ticksPerTact() );
 		}
 	}
 }
@@ -2451,7 +2451,7 @@ void Track::insertTact( const MidiTime & pos )
  *
  *  \param pos The time at which we want to remove the bar.
  */
-void Track::removeTact( const MidiTime & pos )
+void Track::removeTact( const TimePos & pos )
 {
 	// we'll decrease the position of every TCO, positioned behind pos, by
 	// one tact
@@ -2461,7 +2461,7 @@ void Track::removeTact( const MidiTime & pos )
 		if( ( *it )->startPosition() >= pos )
 		{
 			( *it )->movePosition( qMax( ( *it )->startPosition() -
-						MidiTime::ticksPerTact(), 0 ) );
+						TimePos::ticksPerTact(), 0 ) );
 		}
 	}
 }
@@ -2495,7 +2495,7 @@ tact_t Track::length() const
 		}
 	}
 
-	return last / MidiTime::ticksPerTact();
+	return last / TimePos::ticksPerTact();
 }
 
 

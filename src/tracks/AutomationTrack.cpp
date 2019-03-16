@@ -40,7 +40,7 @@ AutomationTrack::AutomationTrack( TrackContainer* tc, bool _hidden ) :
 	setName( tr( "Automation track" ) );
 }
 
-bool AutomationTrack::play( const MidiTime & time_start, const fpp_t _frames,
+bool AutomationTrack::play( const TimePos & time_start, const fpp_t _frames,
 							const f_cnt_t _frame_base, int _tco_num )
 {
 	return false;
@@ -57,7 +57,7 @@ TrackView * AutomationTrack::createView( TrackContainerView* tcv )
 
 
 
-TrackContentObject * AutomationTrack::createTCO( const MidiTime & )
+TrackContentObject * AutomationTrack::createTCO( const TimePos & )
 {
 	return new AutomationPattern( this );
 }
@@ -117,11 +117,11 @@ void AutomationTrackView::dropEvent( QDropEvent * _de )
 					journallingObject( val.toInt() ) );
 		if( mod != NULL )
 		{
-			MidiTime pos = MidiTime( trackContainerView()->
+			TimePos pos = TimePos( trackContainerView()->
 							currentPosition() +
 				( _de->pos().x() -
 					getTrackContentWidget()->x() ) *
-						MidiTime::ticksPerTact() /
+						TimePos::ticksPerTact() /
 		static_cast<int>( trackContainerView()->pixelsPerTact() ) )
 				.toAbsoluteTact();
 

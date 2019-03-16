@@ -120,7 +120,7 @@ SampleTCO::~SampleTCO()
 
 
 
-void SampleTCO::changeLength( const MidiTime & _length )
+void SampleTCO::changeLength( const TimePos & _length )
 {
 	float nom = Engine::getSong()->getTimeSigModel().getNumerator();
 	float den = Engine::getSong()->getTimeSigModel().getDenominator();
@@ -217,7 +217,7 @@ void SampleTCO::updateLength()
 
 
 
-MidiTime SampleTCO::sampleLength() const
+TimePos SampleTCO::sampleLength() const
 {
 	return (int)( m_sampleBuffer->frames() / Engine::framesPerTick() );
 }
@@ -586,7 +586,7 @@ SampleTrack::~SampleTrack()
 
 
 
-bool SampleTrack::play( const MidiTime & _start, const fpp_t _frames,
+bool SampleTrack::play( const TimePos & _start, const fpp_t _frames,
 					const f_cnt_t _offset, int _tco_num )
 {
 	m_audioPort.effects()->startRunning();
@@ -683,7 +683,7 @@ TrackView * SampleTrack::createView( TrackContainerView* tcv )
 
 
 
-TrackContentObject * SampleTrack::createTCO( const MidiTime & )
+TrackContentObject * SampleTrack::createTCO( const TimePos & )
 {
 	return new SampleTCO( this );
 }

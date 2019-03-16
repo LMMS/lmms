@@ -63,6 +63,7 @@ set(LMMS_SRCS
 	core/Song.cpp
 	core/TempoSyncKnobModel.cpp
 	core/ToolPlugin.cpp
+	core/TimePos.cpp
 	core/Track.cpp
 	core/TrackContainer.cpp
 	core/ValueBuffer.cpp
@@ -95,7 +96,6 @@ set(LMMS_SRCS
 	core/midi/MidiSndio.cpp
 	core/midi/MidiApple.cpp
 	core/midi/MidiPort.cpp
-	core/midi/MidiTime.cpp
 	core/midi/MidiWinMM.cpp
 
 	PARENT_SCOPE

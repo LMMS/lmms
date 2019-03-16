@@ -57,7 +57,7 @@ public:
 		return( m_scrollArea );
 	}
 
-	inline const MidiTime & currentPosition() const
+	inline const TimePos & currentPosition() const
 	{
 		return( m_currentPosition );
 	}
@@ -151,7 +151,7 @@ protected:
 	virtual void mouseReleaseEvent( QMouseEvent * _me );
 	virtual void resizeEvent( QResizeEvent * );
 
-	MidiTime m_currentPosition;
+	TimePos m_currentPosition;
 
 
 private:
@@ -190,7 +190,7 @@ private:
 
 
 signals:
-	void positionChanged( const MidiTime & _pos );
+	void positionChanged( const TimePos & _pos );
 
 
 } ;

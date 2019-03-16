@@ -1,5 +1,5 @@
 /*
- * MidiTime.h - declaration of class MidiTime which provides data type for
+ * TimePos.h - declaration of class TimePos which provides data type for
  *              position- and length-variables
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net
@@ -24,8 +24,8 @@
  */
 
 
-#ifndef MIDI_TIME_H
-#define MIDI_TIME_H
+#ifndef TIME_POS_H
+#define TIME_POS_H
 
 #include <QtGlobal>
 
@@ -57,17 +57,17 @@ private:
 };
 
 
-class LMMS_EXPORT MidiTime
+class LMMS_EXPORT TimePos
 {
 public:
-	MidiTime( const tact_t tact, const tick_t ticks );
-	MidiTime( const tick_t ticks = 0 );
+	TimePos( const tact_t tact, const tick_t ticks );
+	TimePos( const tick_t ticks = 0 );
 
-	MidiTime toNearestTact() const;
-	MidiTime toAbsoluteTact() const;
+	TimePos toNearestTact() const;
+	TimePos toAbsoluteTact() const;
 
-	MidiTime& operator+=( const MidiTime& time );
-	MidiTime& operator-=( const MidiTime& time );
+	TimePos& operator+=( const TimePos& time );
+	TimePos& operator-=( const TimePos& time );
 
 	// return the tact, rounded down and 0-based
 	tact_t getTact() const;
@@ -92,12 +92,12 @@ public:
 
 	double getTimeInMilliseconds(bpm_t beatsPerMinute) const;
 
-	static MidiTime fromFrames( const f_cnt_t frames, const float framesPerTick );
+	static TimePos fromFrames( const f_cnt_t frames, const float framesPerTick );
 	static tick_t ticksPerTact();
 	static tick_t ticksPerTact( const TimeSig &sig );
 	static int stepsPerTact();
 	static void setTicksPerTact( tick_t tpt );
-	static MidiTime stepPosition( int step );
+	static TimePos stepPosition( int step );
 	static double ticksToMilliseconds(tick_t ticks, bpm_t beatsPerMinute);
 	static double ticksToMilliseconds(double ticks, bpm_t beatsPerMinute);
 

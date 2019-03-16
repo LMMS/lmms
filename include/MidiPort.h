@@ -31,7 +31,6 @@
 #include <QtCore/QMap>
 
 #include "Midi.h"
-#include "MidiTime.h"
 #include "AutomatableModel.h"
 
 
@@ -39,6 +38,7 @@ class MidiClient;
 class MidiEvent;
 class MidiEventProcessor;
 class MidiPortMenu;
+class TimePos;
 
 
 // class for abstraction of MIDI-port
@@ -99,8 +99,8 @@ public:
 		return outputChannel() - 1;
 	}
 
-	void processInEvent( const MidiEvent& event, const MidiTime& time = MidiTime() );
-	void processOutEvent( const MidiEvent& event, const MidiTime& time = MidiTime() );
+	void processInEvent( const MidiEvent& event, const TimePos& time = TimePos() );
+	void processOutEvent( const MidiEvent& event, const TimePos& time = TimePos() );
 
 
 	virtual void saveSettings( QDomDocument& doc, QDomElement& thisElement );

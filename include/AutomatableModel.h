@@ -30,7 +30,7 @@
 
 #include "JournallingObject.h"
 #include "Model.h"
-#include "MidiTime.h"
+#include "TimePos.h"
 #include "ValueBuffer.h"
 #include "MemoryManager.h"
 
@@ -244,7 +244,7 @@ public:
 		return false;
 	}
 
-	float globalAutomationValueAt( const MidiTime& time );
+	float globalAutomationValueAt( const TimePos& time );
 
 	void setStrictStepSize( const bool b )
 	{

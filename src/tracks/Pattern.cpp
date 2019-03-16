@@ -56,7 +56,7 @@ Pattern::Pattern( InstrumentTrack * _instrument_track ) :
 	TrackContentObject( _instrument_track ),
 	m_instrumentTrack( _instrument_track ),
 	m_patternType( BeatPattern ),
-	m_steps( MidiTime::stepsPerTact() )
+	m_steps( TimePos::stepsPerTact() )
 {
 	setName( _instrument_track->name() );
 	if( _instrument_track->trackContainer()
@@ -161,7 +161,7 @@ void Pattern::updateLength()
 		return;
 	}
 
-	tick_t max_length = MidiTime::ticksPerTact();
+	tick_t max_length = TimePos::ticksPerTact();
 
 	for( NoteVector::ConstIterator it = m_notes.begin();
 						it != m_notes.end(); ++it )
@@ -172,17 +172,17 @@ void Pattern::updateLength()
 							( *it )->endPos() );
 		}
 	}
-	changeLength( MidiTime( max_length ).nextFullTact() *
-						MidiTime::ticksPerTact() );
+	changeLength( TimePos( max_length ).nextFullTact() *
+						TimePos::ticksPerTact() );
 	updateBBTrack();
 }
 
 
 
 
-MidiTime Pattern::beatPatternLength() const
+TimePos Pattern::beatPatternLength() const
 {
-	tick_t max_length = MidiTime::ticksPerTact();
+	tick_t max_length = TimePos::ticksPerTact();
 
 	for( NoteVector::ConstIterator it = m_notes.begin();
 						it != m_notes.end(); ++it )
@@ -194,13 +194,13 @@ MidiTime Pattern::beatPatternLength() const
 		}
 	}
 
-	if( m_steps != MidiTime::stepsPerTact() )
+	if( m_steps != TimePos::stepsPerTact() )
 	{
-		max_length = m_steps * MidiTime::ticksPerTact() /
-						MidiTime::stepsPerTact();
+		max_length = m_steps * TimePos::ticksPerTact() /
+						TimePos::stepsPerTact();
 	}
 
-	return MidiTime( max_length ).nextFullTact() * MidiTime::ticksPerTact();
+	return TimePos( max_length ).nextFullTact() * TimePos::ticksPerTact();
 }
 
 
@@ -259,7 +259,7 @@ Note * Pattern::noteAtStep( int _step )
 	for( NoteVector::Iterator it = m_notes.begin(); it != m_notes.end();
 									++it )
 	{
-		if( ( *it )->pos() == MidiTime::stepPosition( _step )
+		if( ( *it )->pos() == TimePos::stepPosition( _step )
 						&& ( *it )->length() < 0 )
 		{
 			return *it;
@@ -298,8 +298,8 @@ void Pattern::clearNotes()
 
 Note * Pattern::addStepNote( int step )
 {
-	return addNote( Note( MidiTime( -DefaultTicksPerTact ),
-				MidiTime::stepPosition( step ) ), false );
+	return addNote( Note( TimePos( -DefaultTicksPerTact ),
+				TimePos::stepPosition( step ) ), false );
 }
 
 
@@ -417,7 +417,7 @@ void Pattern::loadSettings( const QDomElement & _this )
 	m_steps = _this.attribute( "steps" ).toInt();
 	if( m_steps == 0 )
 	{
-		m_steps = MidiTime::stepsPerTact();
+		m_steps = TimePos::stepsPerTact();
 	}
 
 	checkType();
@@ -466,7 +466,7 @@ void Pattern::clear()
 
 void Pattern::addSteps()
 {
-	m_steps += MidiTime::stepsPerTact();
+	m_steps += TimePos::stepsPerTact();
 	updateLength();
 	emit dataChanged();
 }
@@ -497,7 +497,7 @@ void Pattern::cloneSteps()
 
 void Pattern::removeSteps()
 {
-	int n = MidiTime::stepsPerTact();
+	int n = TimePos::stepsPerTact();
 	if( n < m_steps )
 	{
 		for( int i = m_steps - n; i < m_steps; ++i )
@@ -555,19 +555,19 @@ bool Pattern::empty()
 
 void Pattern::changeTimeSignature()
 {
-	MidiTime last_pos = MidiTime::ticksPerTact() - 1;
+	TimePos last_pos = TimePos::ticksPerTact() - 1;
 	for( NoteVector::ConstIterator cit = m_notes.begin();
 						cit != m_notes.end(); ++cit )
 	{
 		if( ( *cit )->length() < 0 && ( *cit )->pos() > last_pos )
 		{
-			last_pos = ( *cit )->pos()+MidiTime::ticksPerTact() /
-						MidiTime::stepsPerTact();
+			last_pos = ( *cit )->pos()+TimePos::ticksPerTact() /
+						TimePos::stepsPerTact();
 		}
 	}
-	last_pos = last_pos.nextFullTact() * MidiTime::ticksPerTact();
-	m_steps = qMax<tick_t>( MidiTime::stepsPerTact(),
-				last_pos.getTact() * MidiTime::stepsPerTact() );
+	last_pos = last_pos.nextFullTact() * TimePos::ticksPerTact();
+	m_steps = qMax<tick_t>( TimePos::stepsPerTact(),
+				last_pos.getTact() * TimePos::stepsPerTact() );
 	updateLength();
 }
 
@@ -909,7 +909,7 @@ void PatternView::paintEvent( QPaintEvent * )
 
 	// Length of one tact/beat in the [0,1] x [0,1] coordinate system
 	const float tactLength = 1. / m_pat->length().getTact();
-	const float tickLength = tactLength / MidiTime::ticksPerTact();
+	const float tickLength = tactLength / TimePos::ticksPerTact();
 
 	const int x_base = TCO_BORDER_WIDTH;
 

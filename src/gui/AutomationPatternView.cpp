@@ -290,7 +290,7 @@ void AutomationPatternView::paintEvent( QPaintEvent * )
 
 	const float y_scale = max - min;
 	const float h = ( height() - 2 * TCO_BORDER_WIDTH ) / y_scale;
-	const float ppTick  = ppt / MidiTime::ticksPerTact();
+	const float ppTick  = ppt / TimePos::ticksPerTact();
 
 	p.translate( 0.0f, max * height() / y_scale - TCO_BORDER_WIDTH );
 	p.scale( 1.0f, -h );

@@ -1,5 +1,5 @@
 /*
- * MidiTime.cpp - Class that encapsulates the position of a note/event in terms of
+ * TimePos.cpp - Class that encapsulates the position of a note/event in terms of
  *   its bar, beat and tick.
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net
@@ -23,7 +23,7 @@
  *
  */
 
-#include "MidiTime.h"
+#include "TimePos.h"
 
 #include "MeterModel.h"
 
@@ -53,17 +53,17 @@ int TimeSig::denominator() const
 
 
 
-MidiTime::MidiTime( const tact_t tact, const tick_t ticks ) :
+TimePos::TimePos( const tact_t tact, const tick_t ticks ) :
 	m_ticks( tact * s_ticksPerTact + ticks )
 {
 }
 
-MidiTime::MidiTime( const tick_t ticks ) :
+TimePos::TimePos( const tick_t ticks ) :
 	m_ticks( ticks )
 {
 }
 
-MidiTime MidiTime::toNearestTact() const
+TimePos TimePos::toNearestTact() const
 {
 	if( m_ticks % s_ticksPerTact >= s_ticksPerTact/2 )
 	{
@@ -73,80 +73,80 @@ MidiTime MidiTime::toNearestTact() const
 }
 
 
-MidiTime MidiTime::toAbsoluteTact() const
+TimePos TimePos::toAbsoluteTact() const
 {
 	return getTact() * s_ticksPerTact;
 }
 
 
-MidiTime& MidiTime::operator+=( const MidiTime& time )
+TimePos& TimePos::operator+=( const TimePos& time )
 {
 	m_ticks += time.m_ticks;
 	return *this;
 }
 
 
-MidiTime& MidiTime::operator-=( const MidiTime& time )
+TimePos& TimePos::operator-=( const TimePos& time )
 {
 	m_ticks -= time.m_ticks;
 	return *this;
 }
 
 
-tact_t MidiTime::getTact() const
+tact_t TimePos::getTact() const
 {
 	return m_ticks / s_ticksPerTact;
 }
 
 
-tact_t MidiTime::nextFullTact() const
+tact_t TimePos::nextFullTact() const
 {
 	return (m_ticks + (s_ticksPerTact-1)) / s_ticksPerTact;
 }
 
 
-void MidiTime::setTicks( tick_t ticks )
+void TimePos::setTicks( tick_t ticks )
 {
 	m_ticks = ticks;
 }
 
 
-tick_t MidiTime::getTicks() const
+tick_t TimePos::getTicks() const
 {
 	return m_ticks;
 }
 
 
-MidiTime::operator int() const
+TimePos::operator int() const
 {
 	return m_ticks;
 }
 
 
-tick_t MidiTime::ticksPerBeat( const TimeSig &sig ) const
+tick_t TimePos::ticksPerBeat( const TimeSig &sig ) const
 {
 	// (number of ticks per bar) divided by (number of beats per bar)
 	return ticksPerTact(sig) / sig.numerator();
 }
 
 
-tick_t MidiTime::getTickWithinBar( const TimeSig &sig ) const
+tick_t TimePos::getTickWithinBar( const TimeSig &sig ) const
 {
 	return m_ticks % ticksPerTact(sig);
 }
 
-tick_t MidiTime::getBeatWithinBar( const TimeSig &sig ) const
+tick_t TimePos::getBeatWithinBar( const TimeSig &sig ) const
 {
 	return getTickWithinBar(sig) / ticksPerBeat(sig);
 }
 
-tick_t MidiTime::getTickWithinBeat( const TimeSig &sig ) const
+tick_t TimePos::getTickWithinBeat( const TimeSig &sig ) const
 {
 	return getTickWithinBar(sig) % ticksPerBeat(sig);
 }
 
 
-f_cnt_t MidiTime::frames( const float framesPerTick ) const
+f_cnt_t TimePos::frames( const float framesPerTick ) const
 {
 	if( m_ticks >= 0 )
 	{
@@ -155,53 +155,53 @@ f_cnt_t MidiTime::frames( const float framesPerTick ) const
 	return 0;
 }
 
-double MidiTime::getTimeInMilliseconds(bpm_t beatsPerMinute) const
+double TimePos::getTimeInMilliseconds(bpm_t beatsPerMinute) const
 {
 	return ticksToMilliseconds(getTicks(), beatsPerMinute);
 }
 
-MidiTime MidiTime::fromFrames( const f_cnt_t frames, const float framesPerTick )
+TimePos TimePos::fromFrames( const f_cnt_t frames, const float framesPerTick )
 {
-	return MidiTime( static_cast<int>( frames / framesPerTick ) );
+	return TimePos( static_cast<int>( frames / framesPerTick ) );
 }
 
 
-tick_t MidiTime::ticksPerTact()
+tick_t TimePos::ticksPerTact()
 {
 	return s_ticksPerTact;
 }
 
 
-tick_t MidiTime::ticksPerTact( const TimeSig &sig )
+tick_t TimePos::ticksPerTact( const TimeSig &sig )
 {
 	return DefaultTicksPerTact * sig.numerator() / sig.denominator();
 }
 
 
-int MidiTime::stepsPerTact()
+int TimePos::stepsPerTact()
 {
 	int steps = ticksPerTact() / DefaultBeatsPerTact;
 	return qMax( 1, steps );
 }
 
 
-void MidiTime::setTicksPerTact( tick_t tpt )
+void TimePos::setTicksPerTact( tick_t tpt )
 {
 	s_ticksPerTact = tpt;
 }
 
 
-MidiTime MidiTime::stepPosition( int step )
+TimePos TimePos::stepPosition( int step )
 {
 	return step * ticksPerTact() / stepsPerTact();
 }
 
-double MidiTime::ticksToMilliseconds(tick_t ticks, bpm_t beatsPerMinute)
+double TimePos::ticksToMilliseconds(tick_t ticks, bpm_t beatsPerMinute)
 {
-	return MidiTime::ticksToMilliseconds(static_cast<double>(ticks), beatsPerMinute);
+	return TimePos::ticksToMilliseconds(static_cast<double>(ticks), beatsPerMinute);
 }
 
-double MidiTime::ticksToMilliseconds(double ticks, bpm_t beatsPerMinute)
+double TimePos::ticksToMilliseconds(double ticks, bpm_t beatsPerMinute)
 {
 	// 60 * 1000 / 48 = 1250
 	return ( ticks * 1250 ) / beatsPerMinute;

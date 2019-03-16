@@ -81,7 +81,7 @@ public slots:
 	void setEditModeDraw();
 	void setEditModeSelect();
 
-	void updatePosition( const MidiTime & t );
+	void updatePosition( const TimePos & t );
 	void updatePositionLine();
 	void selectAllTcos( bool select );
 

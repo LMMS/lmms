@@ -685,7 +685,7 @@ void AutomatableModel::reset()
 
 
 
-float AutomatableModel::globalAutomationValueAt( const MidiTime& time )
+float AutomatableModel::globalAutomationValueAt( const TimePos& time )
 {
 	// get patterns that connect to this model
 	QVector<AutomationPattern *> patterns = AutomationPattern::patternsForModel( this );

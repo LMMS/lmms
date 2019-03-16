@@ -70,11 +70,11 @@ public:
 	bool hasErrors();
 	QString errorSummary();
 
-	class PlayPos : public MidiTime
+	class PlayPos : public TimePos
 	{
 	public:
 		PlayPos( const int abs = 0 ) :
-			MidiTime( abs ),
+			TimePos( abs ),
 			m_timeLine( NULL ),
 			m_currentFrame( 0.0f )
 		{
@@ -120,13 +120,13 @@ public:
 		return m_elapsedMilliSeconds[playMode];
 	}
 
-	inline void setToTime(MidiTime const & midiTime)
+	inline void setToTime(TimePos const & midiTime)
 	{
 		m_elapsedMilliSeconds[m_playMode] = midiTime.getTimeInMilliseconds(getTempo());
 		m_playPos[m_playMode].setTicks(midiTime.getTicks());
 	}
 
-	inline void setToTime(MidiTime const & midiTime, PlayModes playMode)
+	inline void setToTime(TimePos const & midiTime, PlayModes playMode)
 	{
 		m_elapsedMilliSeconds[playMode] = midiTime.getTimeInMilliseconds(getTempo());
 		m_playPos[playMode].setTicks(midiTime.getTicks());
@@ -134,13 +134,13 @@ public:
 
 	inline void setToTimeByTicks(tick_t ticks)
 	{
-		m_elapsedMilliSeconds[m_playMode] = MidiTime::ticksToMilliseconds(ticks, getTempo());
+		m_elapsedMilliSeconds[m_playMode] = TimePos::ticksToMilliseconds(ticks, getTempo());
 		m_playPos[m_playMode].setTicks(ticks);
 	}
 
 	inline void setToTimeByTicks(tick_t ticks, PlayModes playMode)
 	{
-		m_elapsedMilliSeconds[playMode] = MidiTime::ticksToMilliseconds(ticks, getTempo());
+		m_elapsedMilliSeconds[playMode] = TimePos::ticksToMilliseconds(ticks, getTempo());
 		m_playPos[playMode].setTicks(ticks);
 	}
 
@@ -151,7 +151,7 @@ public:
 
 	inline int ticksPerTact() const
 	{
-		return MidiTime::ticksPerTact(m_timeSigModel);
+		return TimePos::ticksPerTact(m_timeSigModel);
 	}
 
 	// Returns the beat position inside the bar, 0-based
@@ -258,7 +258,7 @@ public:
 	}
 
 	//TODO: Add Q_DECL_OVERRIDE when Qt4 is dropped
-	AutomatedValueMap automatedValuesAt(MidiTime time, int tcoNum = -1) const;
+	AutomatedValueMap automatedValuesAt(TimePos time, int tcoNum = -1) const;
 
 	// file management
 	void createNewProject();
@@ -389,7 +389,7 @@ private:
 
 	void removeAllControllers();
 
-	void processAutomations(const TrackList& tracks, MidiTime timeStart, fpp_t frames);
+	void processAutomations(const TrackList& tracks, TimePos timeStart, fpp_t frames);
 
 	void setModified(bool value);
 
@@ -439,11 +439,11 @@ private:
     
 	int m_loopRenderCount;
 	int m_loopRenderRemaining;
-	MidiTime m_exportSongBegin;
-	MidiTime m_exportLoopBegin;
-	MidiTime m_exportLoopEnd;
-	MidiTime m_exportSongEnd;
-	MidiTime m_exportEffectiveLength;
+	TimePos m_exportSongBegin;
+	TimePos m_exportLoopBegin;
+	TimePos m_exportLoopEnd;
+	TimePos m_exportSongEnd;
+	TimePos m_exportEffectiveLength;
 
 	friend class LmmsCore;
 	friend class SongEditor;

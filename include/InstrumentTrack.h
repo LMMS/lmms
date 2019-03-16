@@ -79,8 +79,8 @@ public:
 
 	MidiEvent applyMasterKey( const MidiEvent& event );
 
-	virtual void processInEvent( const MidiEvent& event, const MidiTime& time = MidiTime(), f_cnt_t offset = 0 );
-	virtual void processOutEvent( const MidiEvent& event, const MidiTime& time = MidiTime(), f_cnt_t offset = 0 );
+	virtual void processInEvent( const MidiEvent& event, const TimePos& time = TimePos(), f_cnt_t offset = 0 );
+	virtual void processOutEvent( const MidiEvent& event, const TimePos& time = TimePos(), f_cnt_t offset = 0 );
 	// silence all running notes played by this track
 	void silenceAllNotes( bool removeIPH = false );
 
@@ -129,13 +129,13 @@ public:
 	}
 
 	// play everything in given frame-range - creates note-play-handles
-	virtual bool play( const MidiTime & _start, const fpp_t _frames,
+	virtual bool play( const TimePos & _start, const fpp_t _frames,
 						const f_cnt_t _frame_base, int _tco_num = -1 );
 	// create new view for me
 	virtual TrackView * createView( TrackContainerView* tcv );
 
 	// create new track-content-object = pattern
-	virtual TrackContentObject * createTCO( const MidiTime & _pos );
+	virtual TrackContentObject * createTCO( const TimePos & _pos );
 
 
 	// called by track

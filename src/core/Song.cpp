@@ -55,7 +55,7 @@
 #include "PeakController.h"
 
 
-tick_t MidiTime::s_ticksPerTact = DefaultTicksPerTact;
+tick_t TimePos::s_ticksPerTact = DefaultTicksPerTact;
 
 
 
@@ -162,7 +162,7 @@ void Song::setTempo()
 
 void Song::setTimeSignature()
 {
-	MidiTime::setTicksPerTact( ticksPerTact() );
+	TimePos::setTicksPerTact( ticksPerTact() );
 	emit timeSignatureChanged( m_oldTicksPerTact, ticksPerTact() );
 	emit dataChanged();
 	m_oldTicksPerTact = ticksPerTact();
@@ -287,7 +287,7 @@ void Song::processNextBuffer()
 				( int )( currentFrame / framesPerTick );
 
 			// did we play a whole tact?
-			if( ticks >= MidiTime::ticksPerTact() )
+			if( ticks >= TimePos::ticksPerTact() )
 			{
 				// per default we just continue playing even if
 				// there's no more stuff to play
@@ -317,7 +317,7 @@ void Song::processNextBuffer()
 				{
 					// then start from beginning and keep
 					// offset
-					ticks %= ( maxTact * MidiTime::ticksPerTact() );
+					ticks %= ( maxTact * TimePos::ticksPerTact() );
 
 					// wrap milli second counter
 					setToTimeByTicks(ticks);
@@ -406,14 +406,14 @@ void Song::processNextBuffer()
 		framesPlayed += framesToPlay;
 		m_playPos[m_playMode].setCurrentFrame( framesToPlay +
 								currentFrame );
-		m_elapsedMilliSeconds[m_playMode] += MidiTime::ticksToMilliseconds(framesToPlay / framesPerTick, getTempo());
+		m_elapsedMilliSeconds[m_playMode] += TimePos::ticksToMilliseconds(framesToPlay / framesPerTick, getTempo());
 		m_elapsedTacts = m_playPos[Mode_PlaySong].getTact();
 		m_elapsedTicks = ( m_playPos[Mode_PlaySong].getTicks() % ticksPerTact() ) / 48;
 	}
 }
 
 
-void Song::processAutomations(const TrackList &tracklist, MidiTime timeStart, fpp_t)
+void Song::processAutomations(const TrackList &tracklist, TimePos timeStart, fpp_t)
 {
 	AutomatedValueMap values;
 
@@ -455,7 +455,7 @@ void Song::processAutomations(const TrackList &tracklist, MidiTime timeStart, fp
 	for (TrackContentObject* tco : tcos)
 	{
 		auto p = dynamic_cast<AutomationPattern *>(tco);
-		MidiTime relTime = timeStart - p->startPosition();
+		TimePos relTime = timeStart - p->startPosition();
 		if (p->isRecording() && relTime >= 0 && relTime < p->length())
 		{
 			const AutomatableModel* recordedModel = p->firstObject();
@@ -491,7 +491,7 @@ bool Song::isExportDone() const
 
 int Song::getExportProgress() const
 {
-	MidiTime pos = m_playPos[m_playMode];
+	TimePos pos = m_playPos[m_playMode];
     
 	if (pos >= m_exportSongEnd)
 	{
@@ -637,7 +637,7 @@ void Song::setPlayPos( tick_t ticks, PlayModes playMode )
 {
 	tick_t ticksFromPlayMode = m_playPos[playMode].getTicks();
 	m_elapsedTicks += ticksFromPlayMode - ticks;
-	m_elapsedMilliSeconds[playMode] += MidiTime::ticksToMilliseconds( ticks - ticksFromPlayMode, getTempo() );
+	m_elapsedMilliSeconds[playMode] += TimePos::ticksToMilliseconds( ticks - ticksFromPlayMode, getTempo() );
 	m_playPos[playMode].setTicks( ticks );
 	m_playPos[playMode].setCurrentFrame( 0.0f );
 	m_playPos[playMode].setJumped( true );
@@ -751,7 +751,7 @@ void Song::startExport()
 	}
 	else
 	{
-		m_exportSongEnd = MidiTime(m_length, 0);
+		m_exportSongEnd = TimePos(m_length, 0);
         
 		// Handle potentially ridiculous loop points gracefully.
 		if (m_loopRenderCount > 1 && m_playPos[Mode_PlaySong].m_timeLine->loopEnd() > m_exportSongEnd) 
@@ -760,15 +760,15 @@ void Song::startExport()
 		}
 
 		if (!m_exportLoop) 
-			m_exportSongEnd += MidiTime(1,0);
+			m_exportSongEnd += TimePos(1,0);
         
-		m_exportSongBegin = MidiTime(0,0);
+		m_exportSongBegin = TimePos(0,0);
 		m_exportLoopBegin = m_playPos[Mode_PlaySong].m_timeLine->loopBegin() < m_exportSongEnd && 
 			m_playPos[Mode_PlaySong].m_timeLine->loopEnd() <= m_exportSongEnd ?
-			m_playPos[Mode_PlaySong].m_timeLine->loopBegin() : MidiTime(0,0);
+			m_playPos[Mode_PlaySong].m_timeLine->loopBegin() : TimePos(0,0);
 		m_exportLoopEnd = m_playPos[Mode_PlaySong].m_timeLine->loopBegin() < m_exportSongEnd && 
 			m_playPos[Mode_PlaySong].m_timeLine->loopEnd() <= m_exportSongEnd ?
-			m_playPos[Mode_PlaySong].m_timeLine->loopEnd() : MidiTime(0,0);
+			m_playPos[Mode_PlaySong].m_timeLine->loopEnd() : TimePos(0,0);
 
 		m_playPos[Mode_PlaySong].setTicks( 0 );
 	}
@@ -866,7 +866,7 @@ AutomationPattern * Song::tempoAutomationPattern()
 }
 
 
-AutomatedValueMap Song::automatedValuesAt(MidiTime time, int tcoNum) const
+AutomatedValueMap Song::automatedValuesAt(TimePos time, int tcoNum) const
 {
 	return TrackContainer::automatedValuesFromTracks(TrackList{m_globalAutomationTrack} << tracks(), time, tcoNum);
 }
