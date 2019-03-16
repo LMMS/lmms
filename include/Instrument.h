@@ -64,6 +64,8 @@ public:
 	// functions that can/should be re-implemented:
 	// --------------------------------------------------------------------
 
+	virtual bool hasNoteInput() const { return true; }
+
 	// if the plugin doesn't play each note, it can create an instrument-
 	// play-handle and re-implement this method, so that it mixes its
 	// output buffer only once per mixer-period
