@@ -213,9 +213,9 @@ void Mixer::initDevices()
 
 
 
-void Mixer::startProcessing( bool _needs_fifo )
+void Mixer::startProcessing( bool needsFifo )
 {
-	if( _needs_fifo )
+	if( needsFifo )
 	{
 		m_fifoWriter = new fifoWriter( this, m_fifo );
 		m_fifoWriter->start( QThread::HighPriority );
@@ -546,15 +546,15 @@ void Mixer::clearInternal()
 
 
 
-Mixer::StereoSample Mixer::getPeakValues(sampleFrame * _ab, const f_cnt_t _frames) const
+Mixer::StereoSample Mixer::getPeakValues(sampleFrame * ab, const f_cnt_t frames) const
 {
 	sample_t peakLeft = 0.0f;
 	sample_t peakRight = 0.0f;
 
-	for( f_cnt_t f = 0; f < _frames; ++f )
+	for( f_cnt_t f = 0; f < frames; ++f )
 	{
-		float const absLeft = qAbs( _ab[f][0] );
-		float const absRight = qAbs( _ab[f][1] );
+		float const absLeft = qAbs( ab[f][0] );
+		float const absRight = qAbs( ab[f][1] );
 		if (absLeft > peakLeft)
 		{
 			peakLeft = absLeft;
@@ -572,12 +572,12 @@ Mixer::StereoSample Mixer::getPeakValues(sampleFrame * _ab, const f_cnt_t _frame
 
 
 
-void Mixer::changeQuality( const struct qualitySettings & _qs )
+void Mixer::changeQuality( const struct qualitySettings & qs )
 {
 	// don't delete the audio-device
 	stopProcessing();
 
-	m_qualitySettings = _qs;
+	m_qualitySettings = qs;
 	m_audioDev->applyQualitySettings();
 
 	emit sampleRateChanged();
@@ -619,14 +619,14 @@ void Mixer::setAudioDevice(AudioDevice * _dev,
 {
 	stopProcessing();
 
-	m_qualitySettings = _qs;
+	m_qualitySettings = qs;
 
 	doSetAudioDevice( _dev );
 
 	emit qualitySettingsChanged();
 	emit sampleRateChanged();
 
-	if (startNow) {startProcessing( _needs_fifo );}
+	if (startNow) {startProcessing( needsFifo );}
 }
 
 
@@ -661,12 +661,12 @@ void Mixer::restoreAudioDevice()
 
 
 
-void Mixer::removeAudioPort( AudioPort * _port )
+void Mixer::removeAudioPort( AudioPort * port )
 {
 	requestChangeInModel();
 	QVector<AudioPort *>::Iterator it = std::find( m_audioPorts.begin(),
 							m_audioPorts.end(),
-							_port );
+							port );
 	if( it != m_audioPorts.end() )
 	{
 		m_audioPorts.erase( it );
@@ -720,22 +720,21 @@ bool Mixer::addPlayHandle( PlayHandle* handle )
 
 
 
-void Mixer::removePlayHandle( PlayHandle * _ph )
+void Mixer::removePlayHandle( PlayHandle * ph )
 {
 	requestChangeInModel();
 	// check thread affinity as we must not delete play-handles
 	// which were created in a thread different than mixer thread
-	if( _ph->affinityMatters() &&
-				_ph->affinity() == QThread::currentThread() )
+	if( ph->affinityMatters() && ph->affinity() == QThread::currentThread() )
 	{
-		_ph->audioPort()->removePlayHandle( _ph );
+		ph->audioPort()->removePlayHandle( ph );
 		bool removedFromList = false;
 		// Check m_newPlayHandles first because doing it the other way around
 		// creates a race condition
 		for( LocklessListElement * e = m_newPlayHandles.first(),
 				* ePrev = NULL; e; ePrev = e, e = e->next )
 		{
-			if( e->value == _ph )
+			if( e->value == ph )
 			{
 				if( ePrev )
 				{
@@ -752,7 +751,7 @@ void Mixer::removePlayHandle( PlayHandle * _ph )
 		}
 		// Now check m_playHandles
 		PlayHandleList::Iterator it = std::find( m_playHandles.begin(),
-					m_playHandles.end(), _ph );
+					m_playHandles.end(), ph );
 		if( it != m_playHandles.end() )
 		{
 			m_playHandles.erase( it );
@@ -763,16 +762,16 @@ void Mixer::removePlayHandle( PlayHandle * _ph )
 		// (See tobydox's 2008 commit 4583e48)
 		if ( removedFromList )
 		{
-			if( _ph->type() == PlayHandle::TypeNotePlayHandle )
+			if( ph->type() == PlayHandle::TypeNotePlayHandle )
 			{
-				NotePlayHandleManager::release( (NotePlayHandle*) _ph );
+				NotePlayHandleManager::release( (NotePlayHandle*) ph );
 			}
-			else delete _ph;
+			else delete ph;
 		}
 	}
 	else
 	{
-		m_playHandlesToRemove.push_back( _ph );
+		m_playHandlesToRemove.push_back( ph );
 	}
 	doneChangeInModel();
 }
@@ -780,13 +779,13 @@ void Mixer::removePlayHandle( PlayHandle * _ph )
 
 
 
-void Mixer::removePlayHandlesOfTypes( Track * _track, const quint8 types )
+void Mixer::removePlayHandlesOfTypes( Track * track, const quint8 types )
 {
 	requestChangeInModel();
 	PlayHandleList::Iterator it = m_playHandles.begin();
 	while( it != m_playHandles.end() )
 	{
-		if( ( *it )->isFromTrack( _track ) && ( ( *it )->type() & types ) )
+		if( ( *it )->isFromTrack( track ) && ( ( *it )->type() & types ) )
 		{
 			( *it )->audioPort()->removePlayHandle( ( *it ) );
 			if( ( *it )->type() == PlayHandle::TypeNotePlayHandle )
@@ -818,7 +817,7 @@ void Mixer::requestChangeInModel()
 
 	m_doChangesMutex.lock();
 	m_waitChangesMutex.lock();
-	if ( m_isProcessing && !m_waitingForWrite && !m_changesSignal )
+	if( m_isProcessing && !m_waitingForWrite && !m_changesSignal )
 	{
 		m_changesSignal = true;
 		m_changesRequestCondition.wait( &m_waitChangesMutex );
