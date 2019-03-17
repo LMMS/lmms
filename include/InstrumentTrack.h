@@ -52,6 +52,7 @@ class InstrumentTrackWindow;
 class InstrumentMidiIOView;
 class InstrumentMiscView;
 class Knob;
+class FxLineLcdSpinBox;
 class LcdSpinBox;
 class LeftRightNav;
 class midiPortMenu;
@@ -440,7 +441,7 @@ private:
 	QLabel * m_pitchLabel;
 	LcdSpinBox* m_pitchRangeSpinBox;
 	QLabel * m_pitchRangeLabel;
-	LcdSpinBox * m_effectChannelNumber;
+	FxLineLcdSpinBox * m_effectChannelNumber;
 
 
 

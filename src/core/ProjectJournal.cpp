@@ -164,6 +164,11 @@ jo_id_t ProjectJournal::idToSave( jo_id_t id )
 	return id & ~EO_ID_MSB;
 }
 
+jo_id_t ProjectJournal::idFromSave( jo_id_t id )
+{
+	return id | EO_ID_MSB;
+}
+
 
 
 

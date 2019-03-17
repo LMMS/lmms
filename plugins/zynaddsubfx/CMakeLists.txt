@@ -163,6 +163,10 @@ SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 ADD_EXECUTABLE(RemoteZynAddSubFx RemoteZynAddSubFx.cpp "${WINRC}")
 INSTALL(TARGETS RemoteZynAddSubFx RUNTIME DESTINATION "${PLUGIN_DIR}")
 
+IF(LMMS_BUILD_WIN32)
+	SET_TARGET_PROPERTIES(RemoteZynAddSubFx PROPERTIES LINK_FLAGS "${LINK_FLAGS} -mwindows")
+ENDIF(LMMS_BUILD_WIN32)
+
 # Remove useless dependencies from FLTK. Use fltk-config to avoid static library
 # in older environments
 SET(FLTK_FILTERED_LDFLAGS ${FLTK_LIBRARIES})
