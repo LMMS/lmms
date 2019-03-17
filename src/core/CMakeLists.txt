@@ -52,6 +52,7 @@ set(LMMS_SRCS
 	core/Plugin.cpp
 	core/PluginIssue.cpp
 	core/PluginFactory.cpp
+	core/PluginIssue.cpp
 	core/PresetPreviewPlayHandle.cpp
 	core/ProjectJournal.cpp
 	core/ProjectRenderer.cpp
@@ -87,6 +88,12 @@ set(LMMS_SRCS
 	core/audio/AudioPulseAudio.cpp
 	core/audio/AudioSampleRecorder.cpp
 	core/audio/AudioSdl.cpp
+
+	core/lv2/Lv2ControlBase.cpp
+	core/lv2/Lv2Ports.cpp
+	core/lv2/Lv2Proc.cpp
+	core/lv2/Lv2Manager.cpp
+	core/lv2/Lv2SubPluginFeatures.cpp
 
 	core/midi/MidiAlsaRaw.cpp
 	core/midi/MidiAlsaSeq.cpp

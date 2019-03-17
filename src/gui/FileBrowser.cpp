@@ -405,7 +405,11 @@ void FileBrowserTreeWidget::mousePressEvent(QMouseEvent * me )
 			m_previewPlayHandle = s;
 			delete tf;
 		}
-		else if( ( f->extension ()== "xiz" || f->extension() == "sf2" || f->extension() == "sf3" || f->extension() == "gig" || f->extension() == "pat" ) &&
+		else if( ( f->extension ()== "xiz" || f->extension() == "sf2" || f->extension() == "sf3" || f->extension() == "gig" || f->extension() == "pat"
+#ifdef LMMS_HAVE_LV2
+			|| f->extension() == "lv2"
+#endif
+			) &&
 			! pluginFactory->pluginSupportingExtension(f->extension()).info.isNull() )
 		{
 			m_previewPlayHandle = new PresetPreviewPlayHandle( f->fullName(), f->handling() == FileItem::LoadByPlugin );
@@ -982,6 +986,11 @@ void FileItem::determineFileType( void )
 	else if( ext == "dll" )
 	{
 		m_type = VstPluginFile;
+		m_handling = LoadByPlugin;
+	}
+	else if( ext == "lv2" )
+	{
+		m_type = PresetFile;
 		m_handling = LoadByPlugin;
 	}
 	else

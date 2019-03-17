@@ -1,0 +1,199 @@
+/*
+ * Lv2SubPluginFeatures.cpp - derivation from
+ *                            Plugin::Descriptor::SubPluginFeatures for
+ *                            hosting LV2 plugins
+ *
+ * Copyright (c) 2006-2007 Danny McRae <khjklujn/at/users.sourceforge.net>
+ * Copyright (c) 2006-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ *
+ * This file is part of LMMS - https://lmms.io
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public
+ * License along with this program (see COPYING); if not, write to the
+ * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ * Boston, MA 02110-1301 USA.
+ *
+ */
+
+#include "Lv2SubPluginFeatures.h"
+
+#include <QApplication>
+#include <QDebug>
+#include <QDir>
+#include <QHBoxLayout>
+#include <QLabel>
+#include <QLibrary>
+#include <lv2.h>
+
+#include "AudioDevice.h"
+#include "ConfigManager.h"
+#include "Engine.h"
+#include "Mixer.h"
+#include "PluginFactory.h"
+#include "Lv2Manager.h"
+#include "embed.h"
+
+
+const LilvPlugin *Lv2SubPluginFeatures::getPlugin(
+	const Plugin::Descriptor::SubPluginFeatures::Key &k)
+{
+	const LilvPlugin* result = Engine::getLv2Manager()->
+		getPlugin(k.attributes["uri"]);
+	assert(result);
+	return result;
+}
+
+
+
+
+Lv2SubPluginFeatures::Lv2SubPluginFeatures(Plugin::PluginTypes _type) :
+	SubPluginFeatures(_type)
+{
+}
+
+
+
+
+void Lv2SubPluginFeatures::fillDescriptionWidget(
+	QWidget *_parent, const Key *k) const
+{
+	const LilvPlugin *plug = getPlugin(*k);
+
+	QLabel *label = new QLabel(_parent);
+	label->setText(QWidget::tr("Name: ") +
+		lilv_node_as_string(lilv_plugin_get_name(plug)));
+
+	QLabel *label2 = new QLabel(_parent);
+	label2->setText(QWidget::tr("URI: ") +
+		lilv_node_as_uri(lilv_plugin_get_uri(plug)));
+
+	QWidget *maker = new QWidget(_parent);
+	QHBoxLayout *l = new QHBoxLayout(maker);
+	l->setMargin(0);
+	l->setSpacing(0);
+
+	QLabel *maker_label = new QLabel(maker);
+	maker_label->setText(QWidget::tr("Maker: "));
+	maker_label->setAlignment(Qt::AlignTop);
+
+	QLabel *maker_content = new QLabel(maker);
+	maker_content->setText(
+		lilv_node_as_string(lilv_plugin_get_author_name(plug)));
+	maker_content->setWordWrap(true);
+
+	l->addWidget(maker_label);
+	l->addWidget(maker_content, 1);
+
+	QWidget *copyright = new QWidget(_parent);
+	l = new QHBoxLayout(copyright);
+	l->setMargin(0);
+	l->setSpacing(0);
+	copyright->setMinimumWidth(_parent->minimumWidth());
+
+	QLabel *copyright_label = new QLabel(copyright);
+	copyright_label->setText(QWidget::tr("Copyright: "));
+	copyright_label->setAlignment(Qt::AlignTop);
+
+	QLabel *copyright_content = new QLabel(copyright);
+	copyright_content->setText("<unknown>");
+	copyright_content->setWordWrap(true);
+	l->addWidget(copyright_label);
+	l->addWidget(copyright_content, 1);
+
+	const LilvNodes* extensions = lilv_plugin_get_extension_data(plug);
+	(void)extensions;
+
+/*	QLabel *requiresRealTime = new QLabel(_parent);
+	requiresRealTime->setText(QWidget::tr("Requires Real Time: ") +
+		(
+
+		 ->properties.realtime_dependency ? QWidget::tr("Yes")
+							: QWidget::tr("No")));
+
+	QLabel *realTimeCapable = new QLabel(_parent);
+	realTimeCapable->setText(QWidget::tr("Real Time Capable: ") +
+		(plug->properties.hard_rt_capable ? QWidget::tr("Yes")
+							: QWidget::tr("No")));*/
+
+	// possibly TODO: version, project, plugin type, number of channels
+}
+
+
+
+
+QString Lv2SubPluginFeatures::additionalFileExtensions(
+	const Plugin::Descriptor::SubPluginFeatures::Key &k) const
+{
+	(void)k;
+	// lv2 only loads .lv2 files
+	// maybe add conversions later, e.g. for loading xmz
+	return nullptr;
+}
+
+
+
+
+QString Lv2SubPluginFeatures::displayName(
+	const Plugin::Descriptor::SubPluginFeatures::Key &k) const
+{
+	return lilv_node_as_string(lilv_plugin_get_name(getPlugin(k)));
+}
+
+
+
+
+QString Lv2SubPluginFeatures::description(
+	const Plugin::Descriptor::SubPluginFeatures::Key &k) const
+{
+	(void)k;
+	return "description not implemented yet"; // TODO
+}
+
+
+
+
+const PixmapLoader *Lv2SubPluginFeatures::logo(
+	const Plugin::Descriptor::SubPluginFeatures::Key &k) const
+{
+	(void)k; // TODO
+	return nullptr;
+}
+
+
+
+
+void Lv2SubPluginFeatures::listSubPluginKeys(
+	const Plugin::Descriptor *_desc, KeyList &_kl) const
+{
+	Lv2Manager *lv2Mgr = Engine::getLv2Manager();
+	for (const std::pair<const std::string, Lv2Manager::Lv2Info> &pr :
+		*lv2Mgr)
+	{
+		if (pr.second.type() == m_type && pr.second.isValid())
+		{
+			using KeyType =
+				Plugin::Descriptor::SubPluginFeatures::Key;
+			KeyType::AttributeMap atm;
+			atm["uri"] = QString::fromUtf8(pr.first.c_str());
+			const LilvPlugin* plug = pr.second.plugin();
+
+
+			_kl.push_back(KeyType(_desc,
+				lilv_node_as_string(lilv_plugin_get_name(plug)),
+				atm));
+			//qDebug() << "Found LV2 sub plugin key of type" <<
+			//	m_type << ":" << pr.first.c_str();
+		}
+	}
+}
+

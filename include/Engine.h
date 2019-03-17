@@ -30,6 +30,7 @@
 #include <QtCore/QObject>
 
 
+#include "lmmsconfig.h"
 #include "lmms_export.h"
 
 class BBTrackContainer;
@@ -86,6 +87,13 @@ public:
 		return s_projectJournal;
 	}
 
+#ifdef LMMS_HAVE_LV2
+	static class Lv2Manager * getLv2Manager()
+	{
+		return s_lv2Manager;
+	}
+#endif
+
 	static Ladspa2LMMS * getLADSPAManager()
 	{
 		return s_ladspaManager;
@@ -139,6 +147,9 @@ private:
 	static ProjectJournal * s_projectJournal;
 	static DummyTrackContainer * s_dummyTC;
 
+#ifdef LMMS_HAVE_LV2
+	static class Lv2Manager* s_lv2Manager;
+#endif
 	static Ladspa2LMMS * s_ladspaManager;
 	static void* s_dndPluginKey;
 

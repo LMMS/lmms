@@ -56,6 +56,8 @@ IF("${PLUGIN_LIST}" STREQUAL "")
 		HydrogenImport
 		ladspa_browser
 		LadspaEffect
+		Lv2Effect
+		Lv2Instrument
 		lb302
 		MidiImport
 		MidiExport

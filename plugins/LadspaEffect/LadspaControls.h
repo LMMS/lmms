@@ -71,6 +71,7 @@ private:
 	ch_cnt_t m_controlCount;
 	bool m_noLink;
 	BoolModel m_stereoLinkModel;
+	//! control vector for each processor
 	QVector<control_list_t> m_controls;
 
 

@@ -166,6 +166,9 @@ bool DataFile::validate( QString extension )
 				( extension == "xiz" && ! pluginFactory->pluginSupportingExtension(extension).isNull()) ||
 				extension == "sf2" || extension == "sf3" || extension == "pat" || extension == "mid" ||
 				extension == "dll"
+#ifdef LMMS_HAVE_LV2
+				|| extension == "lv2"
+#endif
 				) )
 		{
 			return true;

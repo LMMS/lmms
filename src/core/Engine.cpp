@@ -28,6 +28,7 @@
 #include "ConfigManager.h"
 #include "FxMixer.h"
 #include "Ladspa2LMMS.h"
+#include "Lv2Manager.h"
 #include "Mixer.h"
 #include "Plugin.h"
 #include "PresetPreviewPlayHandle.h"
@@ -41,6 +42,9 @@ FxMixer * LmmsCore::s_fxMixer = NULL;
 BBTrackContainer * LmmsCore::s_bbTrackContainer = NULL;
 Song * LmmsCore::s_song = NULL;
 ProjectJournal * LmmsCore::s_projectJournal = NULL;
+#ifdef LMMS_HAVE_LV2
+Lv2Manager * LmmsCore::s_lv2Manager = nullptr;
+#endif
 Ladspa2LMMS * LmmsCore::s_ladspaManager = NULL;
 void* LmmsCore::s_dndPluginKey = nullptr;
 DummyTrackContainer * LmmsCore::s_dummyTC = NULL;
@@ -63,6 +67,10 @@ void LmmsCore::init( bool renderOnly )
 	s_fxMixer = new FxMixer;
 	s_bbTrackContainer = new BBTrackContainer;
 
+#ifdef LMMS_HAVE_LV2
+	s_lv2Manager = new Lv2Manager;
+	s_lv2Manager->initPlugins();
+#endif
 	s_ladspaManager = new Ladspa2LMMS;
 
 	s_projectJournal->setJournalling( true );
@@ -95,6 +103,9 @@ void LmmsCore::destroy()
 	deleteHelper( &s_fxMixer );
 	deleteHelper( &s_mixer );
 
+#ifdef LMMS_HAVE_LV2
+	deleteHelper( &s_lv2Manager );
+#endif
 	deleteHelper( &s_ladspaManager );
 
 	//delete ConfigManager::inst();
