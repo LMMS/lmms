@@ -1472,6 +1472,17 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 	m_tabWidget->addTab( m_midiView, tr( "MIDI" ), "midi_tab", 4 );
 	m_tabWidget->addTab( m_miscView, tr( "Miscellaneous" ), "misc_tab", 5 );
 
+	//! adjust size of any child widget of the main tab
+	//! required to keep the old look when using a variable sized tab widget
+	auto adjustSize = [](QWidget *w) {
+		w->setMinimumSize(INSTRUMENT_WIDTH, INSTRUMENT_HEIGHT + GRAPHIC_TAB_HEIGHT);
+	};
+	adjustSize(m_ssView);
+	adjustSize(instrumentFunctions);
+	adjustSize(m_effectView);
+	adjustSize(m_midiView);
+	adjustSize(m_miscView);
+
 	// setup piano-widget
 	m_pianoView = new PianoView( this );
 	m_pianoView->setMinimumHeight( PIANO_HEIGHT );
