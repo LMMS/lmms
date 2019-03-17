@@ -26,6 +26,8 @@
 
 #ifdef LMMS_HAVE_LV2
 
+#include <QtGlobal>
+
 #include "AutomatableModel.h"
 #include "Engine.h"
 #include "Lv2Manager.h"
@@ -282,7 +284,7 @@ void Lv2ControlBase::reloadPlugin()
 	// refresh ports that are only read on restore
 	m_ports.samplerate = Engine::mixer()->processingSampleRate();
 	int16_t fpp = Engine::mixer()->framesPerPeriod();
-	assert(fpp >= 0);
+	Q_ASSERT(fpp >= 0);
 	m_ports.buffersize = static_cast<unsigned>(fpp);
 
 	if (m_lv2Plugin->restore_has())

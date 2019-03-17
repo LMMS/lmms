@@ -33,6 +33,7 @@
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QLibrary>
+#include <QtGlobal>
 #include <lv2.h>
 
 #include "AudioDevice.h"
@@ -49,7 +50,7 @@ const LilvPlugin *Lv2SubPluginFeatures::getPlugin(
 {
 	const LilvPlugin* result = Engine::getLv2Manager()->
 		getPlugin(k.attributes["uri"]);
-	assert(result);
+	Q_ASSERT(result);
 	return result;
 }
 
