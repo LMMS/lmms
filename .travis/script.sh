@@ -13,9 +13,6 @@ if [ "$TYPE" = 'style' ]; then
 
 else
 
-	mkdir -p build
-	cd build
-
 	export CMAKE_FLAGS="-DCMAKE_BUILD_TYPE=RelWithDebInfo"
 
 	if [ -z "$TRAVIS_TAG" ]; then
@@ -24,25 +21,21 @@ else
 
 	"$TRAVIS_BUILD_DIR/.travis/$TRAVIS_OS_NAME.$TARGET_OS.script.sh"
 
-	make -j4
-	make tests
-
-	if [[ $TARGET_OS != win* ]]; then
-		tests/tests
-	fi
-
 	# Package and upload non-tagged builds
 	if [ ! -z "$TRAVIS_TAG" ]; then
 		# Skip, handled by travis deploy instead
 		exit 0
 	elif [[ $TARGET_OS == win* ]]; then
+		cd build
 		make -j4 package
 		PACKAGE="$(ls lmms-*win*.exe)"
 	elif [[ $TRAVIS_OS_NAME == osx ]]; then
+		cd build
 		make -j4 install > /dev/null
 		make dmg
 		PACKAGE="$(ls lmms-*.dmg)"
-	else
+	elif [[ $TARGET_OS != debian-sid ]]; then
+		cd build
 		make -j4 install > /dev/null
 		make appimage
 		PACKAGE="$(ls lmms-*.AppImage)"

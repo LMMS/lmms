@@ -39,7 +39,7 @@ public:
 	VstSyncController();
 	~VstSyncController();
 
-	void setAbsolutePosition( int ticks );
+	void setAbsolutePosition( double ticks );
 
 	void setPlaybackState( bool enabled )
 	{

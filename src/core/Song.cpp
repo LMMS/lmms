@@ -260,8 +260,6 @@ void Song::processNextBuffer()
 			m_playPos[m_playMode].setTicks(
 						tl->loopBegin().getTicks() );
 
-			m_vstSyncController.setAbsolutePosition(
-						tl->loopBegin().getTicks() );
 			m_vstSyncController.setPlaybackJumped( true );
 
 			emit updateSampleTracks();
@@ -287,8 +285,6 @@ void Song::processNextBuffer()
 		{
 			int ticks = m_playPos[m_playMode].getTicks() +
 				( int )( currentFrame / framesPerTick );
-
-			m_vstSyncController.setAbsolutePosition( ticks );
 
 			// did we play a whole tact?
 			if( ticks >= MidiTime::ticksPerTact() )
@@ -326,7 +322,6 @@ void Song::processNextBuffer()
 					// wrap milli second counter
 					setToTimeByTicks(ticks);
 
-					m_vstSyncController.setAbsolutePosition( ticks );
 					m_vstSyncController.setPlaybackJumped( true );
 				}
 			}
@@ -348,7 +343,6 @@ void Song::processNextBuffer()
 					m_playPos[m_playMode].setTicks( ticks );
 					setToTime(tl->loopBegin());
 
-					m_vstSyncController.setAbsolutePosition( ticks );
 					m_vstSyncController.setPlaybackJumped( true );
 
 					emit updateSampleTracks();
@@ -363,7 +357,17 @@ void Song::processNextBuffer()
 			m_playPos[m_playMode].setCurrentFrame( currentFrame );
 		}
 
-		f_cnt_t framesToPlay =
+		if( framesPlayed == 0 )
+		{
+			// update VST sync position after we've corrected frame/
+			// tick count but before actually playing any frames
+			m_vstSyncController.setAbsolutePosition(
+				m_playPos[m_playMode].getTicks()
+				+ m_playPos[m_playMode].currentFrame()
+				/ (double) framesPerTick );
+		}
+
+		f_cnt_t framesToPlay = 
 			Engine::mixer()->framesPerPeriod() - framesPlayed;
 
 		f_cnt_t framesLeft = ( f_cnt_t )framesPerTick -
@@ -718,7 +722,10 @@ void Song::stop()
 	m_playPos[m_playMode].setCurrentFrame( 0 );
 
 	m_vstSyncController.setPlaybackState( m_exporting );
-	m_vstSyncController.setAbsolutePosition( m_playPos[m_playMode].getTicks() );
+	m_vstSyncController.setAbsolutePosition(
+		m_playPos[m_playMode].getTicks()
+		+ m_playPos[m_playMode].currentFrame()
+		/ (double) Engine::framesPerTick() );
 
 	// remove all note-play-handles that are active
 	Engine::mixer()->clear();

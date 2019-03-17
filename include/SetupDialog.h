@@ -138,6 +138,7 @@ private:
 	bool m_MMPZ;
 	bool m_disableBackup;
 	bool m_openLastProject;
+	bool m_NaNHandler;
 	bool m_hqAudioDev;
 	QString m_lang;
 	QStringList m_languages;
