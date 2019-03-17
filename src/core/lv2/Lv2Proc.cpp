@@ -436,8 +436,8 @@ void Lv2Proc::createPorts()
 		{
 			if(!audio.isSideChain())
 			{
-				StereoPortRef* portRef;
 				StereoPortRef dummy;
+				StereoPortRef* portRef = &dummy;
 				switch(audio.m_flow)
 				{
 					case Lv2Ports::Flow::Input:
@@ -447,7 +447,6 @@ void Lv2Proc::createPorts()
 						portRef = &proc->m_outPorts;
 						break;
 					case Lv2Ports::Flow::Unknown:
-						portRef = &dummy;
 						break;
 				}
 				// in Lv2, leftPort is defined to be the first port
