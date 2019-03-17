@@ -103,9 +103,6 @@ bool Lv2Manager::isSubclassOf(const LilvPluginClass* clvss, const char* uriStr)
 	const LilvPluginClass* gen = lilv_plugin_classes_get_by_uri(allClasses,
 					uri(uriStr).get());
 
-	// lv2:Generator is what can be generating an LMMS instrument track
-	// lv2:Instrument is lv:Generator with MIDI/piano input
-	// => LMMS "Instrument" corresponds to lv2:Generator
 	auto clssEq = [](const LilvPluginClass* pc1,
 		const LilvPluginClass* pc2) -> bool
 	{

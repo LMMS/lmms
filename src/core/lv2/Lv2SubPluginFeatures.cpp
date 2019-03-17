@@ -27,6 +27,8 @@
 
 #include "Lv2SubPluginFeatures.h"
 
+#ifdef LMMS_HAVE_LV2
+
 #include <QApplication>
 #include <QDebug>
 #include <QDir>
@@ -114,18 +116,6 @@ void Lv2SubPluginFeatures::fillDescriptionWidget(
 	const LilvNodes* extensions = lilv_plugin_get_extension_data(plug);
 	(void)extensions;
 
-/*	QLabel *requiresRealTime = new QLabel(_parent);
-	requiresRealTime->setText(QWidget::tr("Requires Real Time: ") +
-		(
-
-		 ->properties.realtime_dependency ? QWidget::tr("Yes")
-							: QWidget::tr("No")));
-
-	QLabel *realTimeCapable = new QLabel(_parent);
-	realTimeCapable->setText(QWidget::tr("Real Time Capable: ") +
-		(plug->properties.hard_rt_capable ? QWidget::tr("Yes")
-							: QWidget::tr("No")));*/
-
 	// possibly TODO: version, project, plugin type, number of channels
 }
 
@@ -197,4 +187,6 @@ void Lv2SubPluginFeatures::listSubPluginKeys(
 		}
 	}
 }
+
+#endif // LMMS_HAVE_LV2
 

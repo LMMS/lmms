@@ -144,57 +144,11 @@ void Lv2Instrument::loadFile(const QString &file)
 bool Lv2Instrument::handleMidiEvent(
 	const MidiEvent &event, const MidiTime &time, f_cnt_t offset)
 {
+	// this function can be called from GUI threads while the plugin is running,
+	// so this requires caching, e.g. in ringbuffers
 	(void)time;
 	(void)offset;
-#ifdef TODO
-	switch (event.type())
-	{
-	// the old zynaddsubfx plugin always uses channel 0
-	case MidiNoteOn:
-		if (event.velocity() > 0)
-		{
-			if (event.key() <= 0 || event.key() >= 128)
-			{
-				break;
-			}
-			if (m_runningNotes[event.key()] > 0)
-			{
-				m_pluginMutex.lock();
-				writeOsc("/noteOff", "ii", 0, event.key());
-				m_pluginMutex.unlock();
-			}
-			++m_runningNotes[event.key()];
-			m_pluginMutex.lock();
-			writeOsc("/noteOn", "iii", 0, event.key(),
-				event.velocity());
-			m_pluginMutex.unlock();
-		}
-		break;
-	case MidiNoteOff:
-		if (event.key() > 0 && event.key() < 128) {
-			if (--m_runningNotes[event.key()] <= 0)
-			{
-				m_pluginMutex.lock();
-				writeOsc("/noteOff", "ii", 0, event.key());
-				m_pluginMutex.unlock();
-			}
-		}
-		break;
-		/*              case MidiPitchBend:
-				m_master->SetController( event.channel(),
-		   C_pitchwheel, event.pitchBend()-8192 ); break; case
-		   MidiControlChange: m_master->SetController( event.channel(),
-					midiIn.getcontroller(
-		   event.controllerNumber() ), event.controllerValue() );
-				break;*/
-	default:
-		break;
-	}
-#else
 	(void)event;
-#endif
-	// those can be called from GUI threads while the plugin is running,
-	// so this requires caching, e.g. in ringbuffers
 	return true;
 }
 #endif
@@ -206,45 +160,6 @@ bool Lv2Instrument::handleMidiEvent(
 #ifndef LV2_INSTRUMENT_USE_MIDI
 void Lv2Instrument::playNote(NotePlayHandle *nph, sampleFrame *)
 {
-	// no idea what that means
-	if (nph->isMasterNote() || (nph->hasParent() && nph->isReleased()))
-	{
-		return;
-	}
-
-	const f_cnt_t tfp = nph->totalFramesPlayed();
-
-	const float LOG440 = 2.643452676f;
-
-	int midiNote = (int)floor(
-		12.0 * (log2(nph->unpitchedFrequency()) - LOG440) - 4.0);
-
-	qDebug() << "midiNote: " << midiNote << ", r? " << nph->isReleased();
-	// out of range?
-	if (midiNote <= 0 || midiNote >= 128)
-	{
-		return;
-	}
-
-	if (tfp == 0)
-	{
-		const int baseVelocity =
-			instrumentTrack()->midiPort()->baseVelocity();
-		m_plugin->send_osc("/noteOn", "iii", 0, midiNote, baseVelocity);
-	}
-	else if (nph->isReleased() &&
-		!nph->instrumentTrack()
-			 ->isSustainPedalPressed()) // note is released during
-						    // this period
-	{
-		m_plugin->send_osc("/noteOff", "ii", 0, midiNote);
-	}
-	else if (nph->framesLeft() <= 0)
-	{
-		m_plugin->send_osc("/noteOff", "ii", 0, midiNote);
-	}
-	// those can be called from GUI threads while the plugin is running,
-	// so this requires caching, e.g. in ringbuffers
 }
 #endif
 
@@ -253,16 +168,14 @@ void Lv2Instrument::playNote(NotePlayHandle *nph, sampleFrame *)
 
 void Lv2Instrument::play(sampleFrame *buf)
 {
-	//if (m_plugin)
-	{
-		copyModelsFromLmms();
+	copyModelsFromLmms();
 
-		fpp_t fpp = Engine::mixer()->framesPerPeriod();
+	fpp_t fpp = Engine::mixer()->framesPerPeriod();
 
-		run(static_cast<unsigned>(fpp));
+	run(static_cast<unsigned>(fpp));
 
-		copyBuffersToLmms(buf, fpp);
-	}
+	copyBuffersToLmms(buf, fpp);
+
 	instrumentTrack()->processAudioBuffer(
 		buf, Engine::mixer()->framesPerPeriod(), nullptr);
 }
@@ -351,16 +264,7 @@ Lv2InsView::Lv2InsView(Lv2Instrument *_instrument, QWidget *_parent) :
 
 
 
-Lv2InsView::~Lv2InsView()
-{
-	Lv2Instrument *model = castModel<Lv2Instrument>();
-	if (model && /* DISABLES CODE */ (false)
-		/* TODO: check if plugin has UI extension */ && model->hasGui())
-	{
-		qDebug() << "shutting down UI...";
-		// TODO: tell plugin to hide the UI
-	}
-}
+Lv2InsView::~Lv2InsView() {}
 
 
 
@@ -411,15 +315,6 @@ void Lv2InsView::reloadPlugin()
 
 void Lv2InsView::toggleUI()
 {
-	Lv2Instrument *model = castModel<Lv2Instrument>();
-	if (/* DISABLES CODE */ (false)
-		/* TODO: check if plugin has the UI extension */ &&
-		model->hasGui() != m_toggleUIButton->isChecked())
-	{
-		model->setHasGui(m_toggleUIButton->isChecked());
-		// TODO: show the UI
-		ControllerConnection::finalizeConnections();
-	}
 }
 
 

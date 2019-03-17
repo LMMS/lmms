@@ -149,46 +149,9 @@ void Lv2ControlBase::run(unsigned frames) {
 
 void Lv2ControlBase::saveSettings(QDomDocument &doc, QDomElement &that)
 {
-#ifdef TODO
-	// save internal data?
-	if (m_lv2Plugin->save_has())
-	{
-		QTemporaryFile tf;
-		if (tf.open())
-		{
-			const std::string fn = QSTR_TO_STDSTR(
-						QDir::toNativeSeparators(tf.fileName()));
-			m_plugin->save(fn.c_str(), ++m_saveTicket);
-
-			while (!m_plugin->save_check(fn.c_str(), m_saveTicket)) {
-				QThread::msleep(1);
-			}
-
-			QDomCDATASection cdata = doc.createCDATASection(
-				QString::fromUtf8(tf.readAll()));
-			that.appendChild(cdata);
-		}
-		tf.remove();
-	}
-
-	// save connected models
-	if (m_connectedModels.size())
-	{
-		QDomElement newNode = doc.createElement("connected-models");
-		QMap<QString, AutomatableModel *>::const_iterator i =
-			m_connectedModels.constBegin();
-		while (i != m_connectedModels.constEnd())
-		{
-			i.value()->saveSettings(doc, newNode, i.key());
-			++i;
-		}
-
-		that.appendChild(newNode);
-	}
-#else
+	// TODO
 	(void)doc;
 	(void)that;
-#endif
 }
 
 
@@ -196,69 +159,7 @@ void Lv2ControlBase::saveSettings(QDomDocument &doc, QDomElement &that)
 
 void Lv2ControlBase::loadSettings(const QDomElement &that)
 {
-#ifdef TODO
-	if (!that.hasChildNodes())
-	{
-		return;
-	}
-
-	for (QDomNode node = that.firstChild(); !node.isNull();
-		node = node.nextSibling())
-	{
-		QDomCDATASection cdata = node.toCDATASection();
-		QDomElement elem;
-		// load internal state?
-		if (!cdata.isNull() && m_lv2Plugin->load_has())
-		{
-			QTemporaryFile tf;
-			tf.setAutoRemove(false);
-			if (tf.open())
-			{
-				tf.write(cdata.data().toUtf8());
-				tf.flush();
-				loadFileInternal(tf.fileName());
-			}
-		}
-		// load connected models?
-		else if (node.nodeName() == "connected-models" &&
-			!(elem = node.toElement()).isNull())
-		{
-			QDomNamedNodeMap attrs = elem.attributes();
-
-			auto do_load = [&](const QString &name,
-						   QDomElement elem) {
-				AutomatableModel *m = modelAtPort(name);
-				// this will automatically
-				// load any "connection" node:
-				m->loadSettings(elem, name);
-				m_connectedModels[name] = m;
-			};
-
-			for (int i = 0; i < attrs.count(); ++i)
-			{
-				QDomAttr attribute = attrs.item(i).toAttr();
-				do_load(attribute.name(), elem);
-			}
-
-			for (QDomElement portnode = elem.firstChildElement();
-				!portnode.isNull();
-				portnode = portnode.nextSiblingElement())
-			{
-				if (portnode.nodeName() != "connection")
-				{
-					QString name = portnode.nodeName();
-					if (name == "automatablemodel") {
-						name = portnode.attribute(
-							"nodename");
-					}
-					do_load(name, elem);
-				}
-			}
-		}
-	}
-#else
 	(void)that;
-#endif
 }
 
 
@@ -266,13 +167,7 @@ void Lv2ControlBase::loadSettings(const QDomElement &that)
 
 void Lv2ControlBase::loadFile(const QString &file)
 {
-#ifdef TODO
-	loadFileInternal(file);
-	setNameFromFile(QFileInfo(file).baseName().replace(
-		QRegExp("^[0-9]{4}-"), QString()));
-#else
 	(void)file;
-#endif
 }
 
 
@@ -280,37 +175,7 @@ void Lv2ControlBase::loadFile(const QString &file)
 
 void Lv2ControlBase::reloadPlugin()
 {
-#ifdef TODO
-	// refresh ports that are only read on restore
-	m_ports.samplerate = Engine::mixer()->processingSampleRate();
-	int16_t fpp = Engine::mixer()->framesPerPeriod();
-	Q_ASSERT(fpp >= 0);
-	m_ports.buffersize = static_cast<unsigned>(fpp);
-
-	if (m_lv2Plugin->restore_has())
-	{
-		// use the offered restore function
-		m_plugin->restore(++m_restoreTicket);
-
-		while (!m_plugin->restore_check(m_restoreTicket)) {
-			QThread::msleep(1);
-		}
-	}
-	else
-	{
-		// save state of current plugin instance
-		DataFile m(spe());
-
-		saveSettings(m, m.content());
-
-		shutdownPlugin();
-		// init plugin (will create a new instance)
-		initPlugin();
-
-		// and load the settings again
-		loadSettings(m.content());
-	}
-#endif
+	// TODO
 }
 
 

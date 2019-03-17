@@ -66,24 +66,6 @@ Lv2FxControlDialog::Lv2FxControlDialog(Lv2FxControls *controls) :
 
 
 
-/*
-// TODO: common UI class..., as this must be usable for instruments, too
-Lv2ControlDialog::~Lv2ControlDialog()
-{
-	Lv2Effect *model = castModel<Lv2Effect>();
-
-	if (model && lv2Controls()->m_lv2Descriptor->ui_ext() &&
-lv2Controls()->m_hasGUI)
-	{
-		qDebug() << "shutting down UI...";
-		model->m_plugin->ui_ext_show(false);
-	}
-}
-*/
-
-
-
-
 void Lv2FxControlDialog::reloadPlugin() { lv2Controls()->reloadPlugin(); }
 
 
@@ -91,17 +73,10 @@ void Lv2FxControlDialog::reloadPlugin() { lv2Controls()->reloadPlugin(); }
 
 void Lv2FxControlDialog::toggleUI()
 {
-#if 0
-	Lv2Effect *model = castModel<Lv2Effect>();
-	if (model->m_lv2Descriptor->ui_ext() &&
-		model->m_hasGUI != m_toggleUIButton->isChecked())
-	{
-		model->m_hasGUI = m_toggleUIButton->isChecked();
-		model->m_plugin->ui_ext_show(model->m_hasGUI);
-		ControllerConnection::finalizeConnections();
-	}
-#endif
 }
+
+
+
 
 void Lv2FxControlDialog::toggleHelp(bool visible)
 {

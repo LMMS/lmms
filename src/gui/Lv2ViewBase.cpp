@@ -202,7 +202,9 @@ Lv2ViewBase::Lv2ViewBase(QWidget* meAsWidget, Lv2ControlBase *ctrlBase)
 
 
 
-Lv2ViewBase::~Lv2ViewBase() {}
+Lv2ViewBase::~Lv2ViewBase() {
+	// TODO: hide UI if required
+}
 
 
 

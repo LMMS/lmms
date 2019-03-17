@@ -236,31 +236,7 @@ AutomatableModel *Lv2Proc::modelAtPort(const QString &uri)
 	}
 	else
 	{
-#if 0
-		AutomatableModel *lv2Mod;
-		{
-			Lv2OscModelFactory vis(this, url.path());
-			lv2::port_ref_base &base =
-				m_plugin->port(url.path().toUtf8().data());
-			base.accept(vis);
-			lv2Mod = vis.m_res;
-		}
-
-		if (lv2Mod)
-		{
-			m_connectedModels.insert(url.path(), lv2Mod);
-			mod = lv2Mod;
-		}
-		else
-		{
-#endif
-			qDebug() << "LMMS: Could not create model from "
-				 << "OSC port (received port\"" << uri
-				 << "\", path \"" << uri << "\")";
-			mod = nullptr;
-#if 0
-		}
-#endif
+		mod = nullptr;
 	}
 	return mod;
 }
@@ -304,15 +280,7 @@ void Lv2Proc::shutdownPlugin()
 
 void Lv2Proc::loadFileInternal(const QString &file)
 {
-#ifdef TODO
-	const QByteArray fn = file.toUtf8();
-	m_plugin->load(fn.data(), ++m_saveTicket);
-	while (!m_plugin->load_check(fn.data(), m_saveTicket)) {
-		QThread::msleep(1);
-	}
-#else
 	(void)file;
-#endif
 }
 
 
