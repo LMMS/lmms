@@ -90,10 +90,12 @@ AutomatableModel * Plugin::childModel( const QString & )
 
 
 #include "PluginFactory.h"
-Plugin * Plugin::instantiate( const QString& pluginName, Model * parent,
-								void * data )
+Plugin * Plugin::instantiate(const QString& pluginName, Model * parent,
+								void *data)
 {
 	const PluginFactory::PluginInfo& pi = pluginFactory->pluginInfo(pluginName.toUtf8());
+
+	Plugin* inst;
 	if( pi.isNull() )
 	{
 		if( gui )
@@ -104,23 +106,31 @@ Plugin * Plugin::instantiate( const QString& pluginName, Model * parent,
 						arg( pluginName ).arg( pluginFactory->errorString(pluginName) ),
 				QMessageBox::Ok | QMessageBox::Default );
 		}
-		return new DummyPlugin();
+		inst = new DummyPlugin();
 	}
-
-	InstantiationHook instantiationHook = ( InstantiationHook ) pi.library->resolve( "lmms_plugin_main" );
-	if( instantiationHook == NULL )
+	else
 	{
-		if( gui )
+		InstantiationHook instantiationHook;
+		if ((instantiationHook = ( InstantiationHook ) pi.library->resolve( "lmms_plugin_main" )))
 		{
-			QMessageBox::information( NULL,
-				tr( "Error while loading plugin" ),
-				tr( "Failed to load plugin \"%1\"!").arg( pluginName ),
-				QMessageBox::Ok | QMessageBox::Default );
+			inst = instantiationHook(parent, data);
+			if(!inst) {
+				inst = new DummyPlugin();
+			}
 		}
-		return new DummyPlugin();
+		else
+		{
+			if( gui )
+			{
+				QMessageBox::information( NULL,
+					tr( "Error while loading plugin" ),
+					tr( "Failed to load plugin \"%1\"!").arg( pluginName ),
+					QMessageBox::Ok | QMessageBox::Default );
+			}
+			inst = new DummyPlugin();
+		}
 	}
 
-	Plugin * inst = instantiationHook( parent, data );
 	return inst;
 }
 
