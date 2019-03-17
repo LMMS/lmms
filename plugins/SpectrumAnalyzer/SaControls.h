@@ -35,10 +35,8 @@
 class Analyzer;
 
 // FIXME: move this somewhere appropriate
-const int MAX_BANDS = 2048;
 const int LOWEST_FREQ = 10;		// arbitrary low frequency limit for log. scale (Hz, >0)
 const int LOWEST_AMP = -5;		// arbitrary low amplitude limit for log. scale (10*dB)
-const int WATERFALL_WIDTH = 512;	// memory size for spectrum history / spectrogram / waterfall
 const int WATERFALL_HEIGHT = 256;
 
 class SaControls : public EffectControls
@@ -68,6 +66,7 @@ public:
 	bool m_inProgress;
 
 private:
+
 	Analyzer *m_effect;
 
 	BoolModel m_stereoModel;

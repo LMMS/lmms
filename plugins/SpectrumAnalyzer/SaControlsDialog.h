@@ -46,6 +46,9 @@ public:
 
 private:
 	SaControls * m_controls;
+	SaProcessor * m_processor;
+
+	void blockSizeChanged(int new_size);
 };
 
 #endif // SACONTROLSDIALOG_H

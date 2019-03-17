@@ -79,3 +79,4 @@ void SaControls::saveSettings(QDomDocument &doc, QDomElement &parent)
 	m_logYModel.saveSettings(doc, parent, "LogY");
 	m_peakHoldModel.saveSettings(doc, parent, "PeakHold");
 }
+

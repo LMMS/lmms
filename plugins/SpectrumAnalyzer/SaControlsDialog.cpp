@@ -23,7 +23,6 @@
  *
  */
 
-
 #include "SaControlsDialog.h"
 
 #include <QGridLayout>
@@ -40,12 +39,14 @@
 
 #include "SaControls.h"
 #include "SaSpectrumView.h"
+#include "SaProcessor.h"
 #include "SaWaterfallView.h"
 
 
 SaControlsDialog::SaControlsDialog(SaControls *controls, SaProcessor *processor) :
 	EffectControlDialog(controls),
-	m_controls(controls)
+	m_controls(controls),
+	m_processor(processor)
 {
 	// top level layout and 
 	QBoxLayout * master_layout = new QHBoxLayout;
@@ -114,29 +115,40 @@ SaControlsDialog::SaControlsDialog(SaControls *controls, SaProcessor *processor)
 	fftLabel->setStyleSheet("font-weight: bold");
 	config_layout->addWidget(fftLabel, 0, 2);
 
-	ComboBox * blocksizeCombo = new ComboBox(this, "FFT Block Size");
-	controls->m_blockSizeModel.addItem("256 (Fast, low-res)");
-	controls->m_blockSizeModel.addItem("512");
-	controls->m_blockSizeModel.addItem("1024");
-	controls->m_blockSizeModel.addItem("2048 (Default)");
-	controls->m_blockSizeModel.addItem("4096");
-	controls->m_blockSizeModel.addItem("8192");
-	controls->m_blockSizeModel.addItem("16384 (Slow, high-res)");
-	controls->m_blockSizeModel.setValue(controls->m_blockSizeModel.findText("2048 (Default)"));
-//	connect(&m_blocksizeModel, SIGNAL(dataChanged()), /*sa processor FFT blocksize updated*/this, SLOT( zoomingChanged() ) );
+	QLabel * blockSizeLabel = new QLabel(tr("Block size"), this);
+	blockSizeLabel->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+	config_layout->addWidget(blockSizeLabel, 1, 2);
+
+	ComboBox * blocksizeCombo = new ComboBox(this, tr("FFT Block Size"));
+	blocksizeCombo->setMinimumSize(64, 22);
 	blocksizeCombo->setModel(&controls->m_blockSizeModel);
-	config_layout->addWidget(blocksizeCombo, 1, 2);
+	for (int i = 0; i < FFT_BLOCK_SIZES.size(); i++){
+		if (i == 0){
+			controls->m_blockSizeModel.addItem((std::to_string(i) + " ").c_str() + tr("(Fast, low-res.)"));
+		} else if (i == FFT_BLOCK_SIZES.size() - 1){
+			controls->m_blockSizeModel.addItem((std::to_string(i) + " ").c_str() + tr("(Slow, high-res.)"));
+		} else {
+			controls->m_blockSizeModel.addItem(std::to_string(i).c_str());
+		}
+	}
+	controls->m_blockSizeModel.setValue(controls->m_blockSizeModel.findText("2048"));
+	config_layout->addWidget(blocksizeCombo, 1, 3);
 
 	// FFT window -- keep the same order as in the fft_helpers.h WINDOWS enum!
-	ComboBox * windowCombo = new ComboBox(this, "FFT Window");
-	controls->m_windowModel.addItem("Rectangular (Off)");
-	controls->m_windowModel.addItem("Blackman-Harris (Default)");
-	controls->m_windowModel.addItem("Hamming");
-	controls->m_windowModel.addItem("Hanning");
-	controls->m_windowModel.addItem("Kaiser");
-	//
+	QLabel * windowLabel = new QLabel(tr("Window"), this);
+	windowLabel->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+	config_layout->addWidget(windowLabel, 2, 2);
+
+	ComboBox * windowCombo = new ComboBox(this, tr("FFT Window"));
+	windowCombo->setMinimumSize(64, 22);
 	windowCombo->setModel(&controls->m_windowModel);
-	config_layout->addWidget(windowCombo, 2, 2);
+	controls->m_windowModel.addItem(tr("Rectangular (Off)"));
+	controls->m_windowModel.addItem(tr("Blackman-Harris (Default)"));
+	controls->m_windowModel.addItem(tr("Hamming"));
+	controls->m_windowModel.addItem(tr("Hanning"));
+	controls->m_windowModel.addItem(tr("Kaiser"));
+	controls->m_windowModel.setValue(controls->m_windowModel.findText(tr("Blackman-Harris (Default)")));
+	config_layout->addWidget(windowCombo, 2, 3);
 
 	// create spectrum displays
 	SaSpectrumView * spectrum = new SaSpectrumView(controls, processor, this);

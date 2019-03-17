@@ -34,22 +34,23 @@
 */
 float maximum(float *abs_spectrum, unsigned int spec_size)
 {
-	float maxi=0;
+	float maxi = 0;
 	unsigned int i;
 
-	if ( abs_spectrum==NULL )
-		return -1;
+	if (abs_spectrum == NULL) {return -1;}
 
-	if (spec_size<=0)
-		return -1;
+	if (spec_size <= 0) {return -1;}
 
-	for ( i=0; i<spec_size; i++ )
-	{
-		if ( abs_spectrum[i]>maxi )
-			maxi=abs_spectrum[i];
+	for (i = 0; i < spec_size; i++) {
+		if (abs_spectrum[i] > maxi) {maxi = abs_spectrum[i];}
 	}
 
 	return maxi;
+}
+
+float maximum(std::vector<float> &abs_spectrum)
+{
+	return maximum(abs_spectrum.data(), abs_spectrum.size());
 }
 
 
@@ -78,12 +79,18 @@ int normalize(float *abs_spectrum, float energy, float *norm_spectrum, unsigned 
 	return 0;
 }
 
+int normalize(std::vector<float> &abs_spectrum, float energy, std::vector<float> &norm_spectrum)
+{
+	if (abs_spectrum.size() != norm_spectrum.size()) {return -1;}
+
+	return normalize(abs_spectrum.data(), energy, norm_spectrum.data(), abs_spectrum.size());
+}
 
 /* Precompute a window function for later real-time use.
  *
  *    returns -1 on error
  */
-int precomputeWindow(float *window, int length, WINDOWS type)
+int precomputeWindow(float *window, int length, FFT_WINDOWS type)
 {
 	int i;
 

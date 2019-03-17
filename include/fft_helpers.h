@@ -28,11 +28,13 @@
 
 #include "lmms_export.h"
 
+#include <vector>
 #include <fftw3.h>
 
-const int FFT_BUFFER_SIZE = 2048;
+const int FFT_BUFFER_SIZE = 2048;	// deprecated, used by Eq plugin
+const std::vector<int> FFT_BLOCK_SIZES = {256, 512, 1024, 2048, 4096, 8192, 16384};	// allowed block sizes
 
-enum WINDOWS
+enum FFT_WINDOWS
 {
         RECTANGULAR = 0,
 		BLACKMAN_HARRIS,
@@ -45,7 +47,8 @@ enum WINDOWS
  *
  *    returns -1 on error
  */
-float LMMS_EXPORT maximum( float * _abs_spectrum, unsigned int _spec_size );		// NOTE: used
+float LMMS_EXPORT maximum(float *abs_spectrum, unsigned int spec_size);
+float LMMS_EXPORT maximum(std::vector<float> &abs_spectrum);
 
 /* Normalizes the abs_spectrum array of absolute values to a 0..1 range
  * based on supplied energy and stores it in the norm_spectrum array.
@@ -53,12 +56,14 @@ float LMMS_EXPORT maximum( float * _abs_spectrum, unsigned int _spec_size );		//
  *	returns -1 on error
 */
 int LMMS_EXPORT normalize(float *abs_spectrum, float energy, float *norm_spectrum, unsigned int block_size);
+int LMMS_EXPORT normalize(std::vector<float> &abs_spectrum, float energy, std::vector<float> &norm_spectrum);
+
 
 /* Precompute a window function for later real-time use.
  *
  *	returns -1 on error
  */
-int LMMS_EXPORT precomputeWindow(float * window, int length, WINDOWS type);
+int LMMS_EXPORT precomputeWindow(float *window, int length, FFT_WINDOWS type);
 
 /* compute absolute values of complex_buffer, save to absspec_buffer
  * take care that - compl_len is not bigger than complex_buffer!
@@ -66,8 +71,8 @@ int LMMS_EXPORT precomputeWindow(float * window, int length, WINDOWS type);
  *
  *    returns 0 on success, else -1
  */
-int LMMS_EXPORT absspec( fftwf_complex * _complex_buffer, float * _absspec_buffer,	// NOTE: used
-							int _compl_length );
+int LMMS_EXPORT absspec(fftwf_complex *complex_buffer, float *absspec_buffer,
+						int compl_length);
 
 /* build fewer subbands from many absolute spectrum values
  * take care that - compressedbands[] array num_new elements long

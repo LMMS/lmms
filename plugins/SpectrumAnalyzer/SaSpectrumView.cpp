@@ -45,7 +45,7 @@ SaSpectrumView::SaSpectrumView(SaControls *controls, SaProcessor *processor, QWi
 
 	connect(gui->mainWindow(), SIGNAL(periodicUpdate()), this, SLOT(periodicalUpdate()));
 
-	for (int i = 0; i < MAX_BANDS; i++) {
+	for (int i = 0; i < m_processor->binCount(); i++) {
 		m_bandHeightL.append(0);
 		m_bandHeightR.append(0);
 		m_bandPeakL.append(0);
@@ -61,7 +61,6 @@ SaSpectrumView::SaSpectrumView(SaControls *controls, SaProcessor *processor, QWi
 
 void SaSpectrumView::paintEvent(QPaintEvent *event)
 {
-	const int HIGHEST_FREQ = m_processor->getSampleRate() / 2;
 	const float smoothFactor = 0.15;
 
 	const float energyL = isnan(m_processor->getEnergyL()) ? 0 : m_processor->getEnergyL();
@@ -153,17 +152,16 @@ void SaSpectrumView::paintEvent(QPaintEvent *event)
 			m_periodicalUpdate = false;
 			m_decaySum = 0;
 		
-			float *band = m_processor->m_normBandsL;
+			float *band = m_processor->m_normSpectrumL.data();
 			QList<float> *m_bandHeight = &m_bandHeightL;
 			QList<float> *m_bandPeak = &m_bandPeakL;
-			float energy = energyL;
 			QPainterPath m_path;
 		
 			for (int i = 0; i <= 1; i++){
 				m_path = QPainterPath();
 				m_path.moveTo(displayLeft, displayBottom);
 		
-				for (int x = 0; x < MAX_BANDS; x++) {
+				for (int x = 0; x < m_processor->binCount(); x++) {
 					// direct display
 					if (m_controls->m_smoothModel.value() && (*m_bandHeight)[x] > band[x]) {
 						(*m_bandHeight)[x] = band[x] * smoothFactor + (*m_bandHeight)[x] * (1 - smoothFactor);
@@ -194,10 +192,9 @@ void SaSpectrumView::paintEvent(QPaintEvent *event)
 				if (i == 0) {
 					m_pathL = m_path;
 					if (stereo) {
-						band = m_processor->m_normBandsR;
+						band = m_processor->m_normSpectrumR.data();
 						m_bandHeight = &m_bandHeightR;
 						m_bandPeak = &m_bandPeakR;
-						energy = energyR;
 					} else {
 						break;
 					}
@@ -226,7 +223,7 @@ void SaSpectrumView::paintEvent(QPaintEvent *event)
 
 float SaSpectrumView::bandToFreq(int index)
 {
-	return index * m_processor->getSampleRate() / (MAX_BANDS * 2);
+	return index * m_processor->getSampleRate() / (m_processor->binCount() * 2);
 }
 
 

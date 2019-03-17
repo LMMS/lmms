@@ -25,6 +25,7 @@
 #ifndef SAPROCESSOR_H
 #define SAPROCESSOR_H
 
+#include <vector>
 #include <QImage>
 
 #include "fft_helpers.h"
@@ -48,33 +49,36 @@ public:
 
 	void setActive(bool active);
 
+	void reallocateBuffers(int new_size_index);
 
 private:
 	SaControls *m_controls;
 
-	fftwf_plan m_fftPlanL;
-	fftwf_plan m_fftPlanR;
-	float m_bufferL[FFT_BUFFER_SIZE*2];
-	float m_bufferR[FFT_BUFFER_SIZE*2];
-	fftwf_complex * m_spectrumL;
-	fftwf_complex * m_spectrumR;
-	float m_absSpectrumL[FFT_BUFFER_SIZE+1];
-	float m_absSpectrumR[FFT_BUFFER_SIZE+1];
-	float m_bandsL[MAX_BANDS];
-	float m_bandsR[MAX_BANDS];
-	float m_energyL;
-	float m_energyR;
-	float m_normBandsL[MAX_BANDS];
-	float m_normBandsR[MAX_BANDS];
+	int m_blockSizeIndex;	// index to FFT_BLOCK_SIZES[] in fft_helpers.h
+	int m_blockSize;		// size of FFT input block
+	int m_sampleRate;
+
+	int binCount(){return m_blockSize / 2 + 1;}	// number of output frequency bins
 
 	int m_framesFilledUp;
-	int m_sampleRate;
-	bool m_active;
-	bool m_mode_stereo;
-	bool m_inProgress;
-	float m_fftWindow[FFT_BUFFER_SIZE];
+	std::vector<float> m_fftWindow;
+	std::vector<float> m_bufferL;
+	std::vector<float> m_bufferR;
+	fftwf_plan m_fftPlanL;
+	fftwf_plan m_fftPlanR;
+	fftwf_complex * m_spectrumL;
+	fftwf_complex * m_spectrumR;
+	std::vector<float> m_absSpectrumL;
+	std::vector<float> m_absSpectrumR;
+	std::vector<float> m_normSpectrumL;
+	std::vector<float> m_normSpectrumR;
+	float m_energyL;
+	float m_energyR;
 
 	std::vector<uchar> m_history;
+
+	bool m_active;
+	bool m_inProgress;
 
 	friend class SaSpectrumView;
 	friend class SaWaterfallView;

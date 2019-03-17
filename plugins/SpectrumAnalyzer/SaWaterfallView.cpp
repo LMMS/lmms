@@ -82,7 +82,7 @@ void SaWaterfallView::paintEvent(QPaintEvent *event)
 		if (!m_processor->getInProgress() && m_periodicalUpdate == true) {
 			m_periodicalUpdate = false;
 
-			painter.drawImage(displayLeft, 1, QImage(m_processor->m_history.data(), WATERFALL_WIDTH, WATERFALL_HEIGHT, QImage::Format_RGB32).scaled(displayWidth, displayBottom - 2, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
+			painter.drawImage(displayLeft, 1, QImage(m_processor->m_history.data(), m_processor->binCount(), WATERFALL_HEIGHT, QImage::Format_RGB32).scaled(displayWidth, displayBottom - 2, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
 		}
 	
 	}

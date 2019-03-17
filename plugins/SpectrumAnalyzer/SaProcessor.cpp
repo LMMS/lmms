@@ -24,6 +24,7 @@
 #include "SaProcessor.h"
 
 #include <cmath>
+#include <iostream>	//FIXME DEBUG
 
 #include "lmms_math.h"
 
@@ -33,20 +34,29 @@ SaProcessor::SaProcessor(SaControls *controls) :
 	m_energyL(0),
 	m_energyR(0),
 	m_sampleRate(Engine::mixer()->processingSampleRate()),
-	m_active(true),
-	m_mode_stereo(true)
+	m_active(false),
+	m_blockSizeIndex(3),
+	m_blockSize(FFT_BLOCK_SIZES[3]),
+	m_inProgress(false)
 {
-	m_inProgress = false;
-	m_spectrumL = (fftwf_complex *) fftwf_malloc((FFT_BUFFER_SIZE + 1) * sizeof(fftwf_complex));
-	m_spectrumR = (fftwf_complex *) fftwf_malloc((FFT_BUFFER_SIZE + 1) * sizeof(fftwf_complex));
-	m_fftPlanL = fftwf_plan_dft_r2c_1d(FFT_BUFFER_SIZE * 2, m_bufferL, m_spectrumL, FFTW_MEASURE);
-	m_fftPlanR = fftwf_plan_dft_r2c_1d(FFT_BUFFER_SIZE * 2, m_bufferR, m_spectrumR, FFTW_MEASURE);
+	m_fftWindow.resize(m_blockSize, 0);
+	precomputeWindow(m_fftWindow.data(), m_blockSize, BLACKMAN_HARRIS);
 
-//	precomputeWindow(m_fftWindow, FFT_BUFFER_SIZE, BLACKMAN_HARRIS);
-	precomputeWindow(m_fftWindow, FFT_BUFFER_SIZE, RECTANGULAR);
+	m_bufferL.resize(m_blockSize, 0);
+	m_bufferR.resize(m_blockSize, 0);
+	m_spectrumL = (fftwf_complex *) fftwf_malloc(binCount() * sizeof(fftwf_complex));
+	m_spectrumR = (fftwf_complex *) fftwf_malloc(binCount() * sizeof(fftwf_complex));
+	m_fftPlanL = fftwf_plan_dft_r2c_1d(m_blockSize, m_bufferL.data(), m_spectrumL, FFTW_MEASURE);
+	m_fftPlanR = fftwf_plan_dft_r2c_1d(m_blockSize, m_bufferR.data(), m_spectrumR, FFTW_MEASURE);
+
+	m_absSpectrumL.resize(binCount(), 0);
+	m_absSpectrumR.resize(binCount(), 0);
+	m_normSpectrumL.resize(binCount(), 0);
+	m_normSpectrumR.resize(binCount(), 0);
+
+	m_history.resize(binCount() * WATERFALL_HEIGHT * sizeof qRgb(0,0,0), 0);
+
 	clear();
-
-	m_history.resize(WATERFALL_WIDTH * WATERFALL_HEIGHT * sizeof qRgb(0,0,0), 0);
 }
 
 
@@ -59,109 +69,95 @@ SaProcessor::~SaProcessor()
 }
 
 
-void SaProcessor::analyse(sampleFrame *buf, const fpp_t frames)
+void SaProcessor::analyse(sampleFrame *in_buffer, const fpp_t frame_count)
 {
-	// only analyse if the view is visible
+	// only analyse if the view is visible and not paused
 	if (m_active && !m_controls->m_pauseModel.value())
 	{
-		const bool stereo = m_controls->m_stereoModel.value();
-		const int FFT_BUFFER_SIZE = 2048;
-
 		m_inProgress = true;
-		fpp_t f = 0;
+		const bool stereo = m_controls->m_stereoModel.value();
 
-		if (frames > FFT_BUFFER_SIZE)
-		{
+		// check if FFT buffers need to be reallocated while it is safe to do so
+		if (m_blockSizeIndex != m_controls->m_blockSizeModel.value()){
+			reallocateBuffers(m_controls->m_blockSizeModel.value());
+		}
+
+		// process data
+		fpp_t frame = 0;
+		while (frame < frame_count){
+			// fill sample buffers
+			for (; frame < frame_count && m_framesFilledUp < m_blockSize; frame++, m_framesFilledUp++)
+			{
+				if (stereo) {	//FIXME: predelat na case (dat do SaControls) a pridat MonoRMS
+					m_bufferL[m_framesFilledUp] = in_buffer[frame][0];
+					m_bufferR[m_framesFilledUp] = in_buffer[frame][1];
+				} else {
+					m_bufferL[m_framesFilledUp] = (in_buffer[frame][0] + in_buffer[frame][1]) * 0.5;
+					m_bufferR[m_framesFilledUp] = (in_buffer[frame][0] + in_buffer[frame][1]) * 0.5;
+				}
+			}
+	
+			// run analysis if buffers contain enough data
+			if (m_framesFilledUp < m_blockSize) {
+				m_inProgress = false;
+				return;
+			}
+	
+			// update sample rate
+			m_sampleRate = Engine::mixer()->processingSampleRate();
+	
+			// apply FFT window
+			for (int i = 0; i < m_blockSize; i++) {
+				m_bufferL[i] = m_bufferL[i] * m_fftWindow[i];
+				m_bufferR[i] = m_bufferR[i] * m_fftWindow[i];
+			}
+	
+			// analyse spectrum of the left channel
+			fftwf_execute(m_fftPlanL);
+			absspec(m_spectrumL, m_absSpectrumL.data(), binCount());
+			m_energyL = maximum(m_absSpectrumL) / maximum(m_bufferL);
+			normalize(m_absSpectrumL, m_energyL, m_normSpectrumL);
+	
+			// repeat analysis for right channel only if stereo processing is enabled
+			if (stereo) {
+				fftwf_execute(m_fftPlanR);
+				absspec(m_spectrumR, m_absSpectrumR.data(), binCount());
+				m_energyR = maximum(m_absSpectrumR) / maximum(m_bufferR);
+				normalize(m_absSpectrumR, m_energyR, m_normSpectrumR);
+			} else {
+				memset(m_absSpectrumR.data(), 0, sizeof(m_absSpectrumR.data()));
+				memset(m_normSpectrumR.data(), 0, sizeof(m_normSpectrumR.data()));
+				m_energyR = 0;
+			}
+	
+			// move waterfall history one line down and add newest result on top
+			QRgb *pixel = (QRgb *)m_history.data();
+			std::copy(	pixel,
+						pixel + binCount() * WATERFALL_HEIGHT - binCount(),
+						pixel + binCount());
+	
+			for (int i = 0; i < binCount(); i++) {
+				// apply gamma correction to make small values more visible
+				// (should be around 0.42 to 0.45 for sRGB displays)
+				float ampL = powf(m_normSpectrumL[i], 0.42);
+				float ampR = powf(m_normSpectrumR[i], 0.42);
+	
+				if (stereo) {
+					pixel[i] = qRgb(m_controls->m_colorL.red() * ampL + m_controls->m_colorR.red() * ampR,
+									m_controls->m_colorL.green() * ampL + m_controls->m_colorR.green() * ampR,
+									m_controls->m_colorL.blue() * ampL + m_controls->m_colorR.blue() * ampR);
+				} else {
+					pixel[i] = qRgb(m_controls->m_colorMono.lighter().red() * ampL,
+									m_controls->m_colorMono.lighter().green() * ampL,
+									m_controls->m_colorMono.lighter().blue() * ampL);
+				}
+			}
+
+
 			m_framesFilledUp = 0;
-			f = frames - FFT_BUFFER_SIZE;
 		}
 
-		// fill sample buffers
-		for (; f < frames; f++)
-		{
-			if (stereo) {
-				m_bufferL[m_framesFilledUp] = buf[f][0];
-				m_bufferR[m_framesFilledUp] = buf[f][1];
-				m_framesFilledUp++;
-			} else {
-				m_bufferL[m_framesFilledUp] = (buf[f][0] + buf[f][1]) * 0.5;
-				m_bufferR[m_framesFilledUp] = (buf[f][0] + buf[f][1]) * 0.5;
-				m_framesFilledUp++;
-			}
-		}
-
-		// analysis can be executed only if buffers contain enough data
-		if (m_framesFilledUp < FFT_BUFFER_SIZE)
-		{
-			m_inProgress = false;
-			return;
-		}
-
-		// update sample rate
-		m_sampleRate = Engine::mixer()->processingSampleRate();
-		const int HIGHEST_FREQ = m_sampleRate / 2;
-
-		// apply FFT window
-		for (int i = 0; i < FFT_BUFFER_SIZE; i++)
-		{
-			m_bufferL[i] = m_bufferL[i] * m_fftWindow[i];
-			m_bufferR[i] = m_bufferR[i] * m_fftWindow[i];
-		}
-
-		// analyse spectrum of the left channel
-		fftwf_execute(m_fftPlanL);
-		absspec(m_spectrumL, m_absSpectrumL, FFT_BUFFER_SIZE + 1);
-		compressbands(m_absSpectrumL, m_bandsL, FFT_BUFFER_SIZE + 1,
-					  MAX_BANDS,
-					  (int)(LOWEST_FREQ * (FFT_BUFFER_SIZE + 1) / (float)(m_sampleRate / 2)),
-					  (int)(HIGHEST_FREQ * (FFT_BUFFER_SIZE + 1) / (float)(m_sampleRate / 2)));
-		m_energyL = maximum(m_bandsL, MAX_BANDS) / maximum(m_bufferL, FFT_BUFFER_SIZE);
-		normalize(m_bandsL, m_energyL, m_normBandsL, MAX_BANDS);
-
-		// repeat analysis for right channel only if stereo processing is enabled
-		if (stereo) {
-			fftwf_execute(m_fftPlanR);
-			absspec(m_spectrumR, m_absSpectrumR, FFT_BUFFER_SIZE + 1);
-			compressbands(m_absSpectrumR, m_bandsR, FFT_BUFFER_SIZE + 1,
-						  MAX_BANDS,
-						  (int)(LOWEST_FREQ * (FFT_BUFFER_SIZE + 1) / (float)(m_sampleRate / 2)),
-						  (int)(HIGHEST_FREQ * (FFT_BUFFER_SIZE + 1) / (float)(m_sampleRate / 2)));
-			m_energyR = maximum(m_bandsR, MAX_BANDS) / maximum(m_bufferR, FFT_BUFFER_SIZE);
-			normalize(m_bandsR, m_energyR, m_normBandsR, MAX_BANDS);
-		} else {
-			memset(m_bandsR, 0, sizeof(m_bandsR));
-			memset(m_bandsR, 0, sizeof(m_normBandsR));
-			m_energyR = 0;
-		}
-
-
-		// move waterfall one line down and add newest result
-		QRgb *pixel = (QRgb *)m_history.data();
-
-		std::copy(	pixel,
-					pixel + WATERFALL_WIDTH * WATERFALL_HEIGHT - WATERFALL_WIDTH,
-					pixel + WATERFALL_WIDTH);
-
-		for (int i = 0; i < WATERFALL_WIDTH && i < FFT_BUFFER_SIZE; i++){	//FIXME full range
-			// apply gamma correction to make small values more visible
-			// (should be around 0.42 to 0.45 for sRGB displays)
-			float ampL = powf(m_normBandsL[i], 0.42);
-			float ampR = powf(m_normBandsR[i], 0.42);
-
-			if (stereo) {
-				pixel[i] = qRgb(m_controls->m_colorL.red() * ampL + m_controls->m_colorR.red() * ampR,
-								m_controls->m_colorL.green() * ampL + m_controls->m_colorR.green() * ampR,
-								m_controls->m_colorL.blue() * ampL + m_controls->m_colorR.blue() * ampR);
-			} else {
-				pixel[i] = qRgb(m_controls->m_colorMono.lighter().red() * ampL,
-								m_controls->m_colorMono.lighter().green() * ampL,
-								m_controls->m_colorMono.lighter().blue() * ampL);
-			}
-		}
-
-		m_framesFilledUp = 0;
 		m_inProgress = false;
-		m_active = false;
 	}
 }
 
@@ -199,16 +195,72 @@ bool SaProcessor::getInProgress()
 }
 
 
+void SaProcessor::reallocateBuffers(int new_size_index)
+{
+	int new_size;
+
+	if (new_size_index == m_blockSizeIndex || new_size_index < 0) {return;}
+
+	if (new_size_index < FFT_BLOCK_SIZES.size()){
+		new_size = FFT_BLOCK_SIZES[new_size_index];
+	} else {
+		new_size = FFT_BLOCK_SIZES.back();
+	}
+
+	int new_bins = new_size / 2;
+
+	// in case new size is smaller, reduce reported size immediately
+	// to prevent SaSpectrumView from reading disappearing memory
+	if (new_size < m_blockSize) {
+		m_blockSize = new_size;
+	}
+
+	clear();
+
+	// destroy old FFT plan and free the result buffer
+	fftwf_destroy_plan(m_fftPlanL);
+	fftwf_destroy_plan(m_fftPlanR);
+	fftwf_free(m_spectrumL);
+	fftwf_free(m_spectrumR);
+
+	// allocate new space and create new plan
+	m_bufferL.resize(new_size);
+	m_bufferR.resize(new_size);
+	m_spectrumL = (fftwf_complex *) fftwf_malloc(new_bins * sizeof(fftwf_complex));
+	m_spectrumR = (fftwf_complex *) fftwf_malloc(new_bins * sizeof(fftwf_complex));
+	m_fftPlanL = fftwf_plan_dft_r2c_1d(new_size, m_bufferL.data(), m_spectrumL, FFTW_MEASURE);
+	m_fftPlanR = fftwf_plan_dft_r2c_1d(new_size, m_bufferR.data(), m_spectrumR, FFTW_MEASURE);
+
+	m_absSpectrumL.resize(binCount(), 0);
+	m_absSpectrumR.resize(binCount(), 0);
+	m_normSpectrumL.resize(binCount(), 0);
+	m_normSpectrumR.resize(binCount(), 0);
+
+	m_history.resize(new_bins * WATERFALL_HEIGHT * sizeof qRgb(0,0,0), 0);
+
+	precomputeWindow(m_fftWindow.data(), new_size, (FFT_WINDOWS) m_controls->m_windowModel.value());
+
+	// in case new size is larger (or remains the same), update reported size
+	// last to prevent SaSpectrumView from reading memory that's not ready yet
+	if (new_size >= m_blockSize) {
+		m_blockSize = new_size;
+	}
+
+	clear();
+}
+
+
 void SaProcessor::clear()
 {
 	m_framesFilledUp = 0;
 	m_energyL = 0;
 	m_energyR = 0;
-	memset(m_bufferL, 0, sizeof(m_bufferL));
-	memset(m_bufferR, 0, sizeof(m_bufferR));
-	memset(m_bandsL, 0, sizeof(m_bandsL));
-	memset(m_bandsR, 0, sizeof(m_bandsR));
-	memset(m_normBandsL, 0, sizeof(m_normBandsL));
-	memset(m_normBandsR, 0, sizeof(m_normBandsR));
+	memset(m_bufferL.data(), 0, sizeof(m_bufferL.data()));
+	memset(m_bufferR.data(), 0, sizeof(m_bufferR.data()));
+	memset(m_absSpectrumL.data(), 0, sizeof(m_absSpectrumL.data()));
+	memset(m_absSpectrumR.data(), 0, sizeof(m_absSpectrumR.data()));
+	memset(m_normSpectrumL.data(), 0, sizeof(m_normSpectrumL.data()));
+	memset(m_normSpectrumR.data(), 0, sizeof(m_normSpectrumR.data()));
+	std::cout << "cleared " << sizeof(m_normSpectrumR.data()) << " bins" << std::endl;
 }
 
