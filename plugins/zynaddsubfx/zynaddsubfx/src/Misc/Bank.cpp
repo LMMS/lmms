@@ -260,7 +260,7 @@ int Bank::newbank(string newbankdirname)
     normalizedirsuffix(bankdir);
 
 // FIXME: Zyn should automatically handle creation of parent directory
-#ifdef LMMS_BUILD_WIN32
+#ifdef WIN32
 	if(mkdir(bankdir.c_str()) < 0)) return -1;
 #else
 	if(mkdir(bankdir.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH)) return -1;
