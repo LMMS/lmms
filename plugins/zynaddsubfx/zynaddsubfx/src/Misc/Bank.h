@@ -99,6 +99,13 @@ class Bank
         std::string dirname;
 
         void scanrootdir(std::string rootdir); //scans a root dir for banks
+
+        /** Expends ~ prefix in dirname, if any */
+        void expanddirname(std::string &dirname);
+
+        /** Ensure that the directory name is suffixed by a
+         * directory separator */
+        void normalizedirsuffix(std::string &dirname) const;
 };
 
 #endif
