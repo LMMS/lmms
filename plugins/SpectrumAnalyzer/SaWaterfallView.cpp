@@ -21,8 +21,10 @@
 */
 
 #include "SaWaterfallView.h"
-#include "SaProcessor.h"
 
+#include <mutex>
+
+#include "SaProcessor.h"
 #include "Engine.h"
 #include "GuiApplication.h"
 #include "MainWindow.h"
@@ -32,20 +34,23 @@ SaWaterfallView::SaWaterfallView(SaControls *controls, SaProcessor *processor, Q
 	QWidget(_parent),
 	m_controls(controls),
 	m_processor(processor),
-	m_periodicalUpdate(false)
+	m_periodicUpdate(false)
 {
 	setMinimumSize(400, 200);
 
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
-	connect(gui->mainWindow(), SIGNAL(periodicUpdate()), this, SLOT(periodicalUpdate()));
+	connect(gui->mainWindow(), SIGNAL(periodicUpdate()), this, SLOT(periodicUpdate()));
 
 	m_timeTics = makeTimeTics(0, 1);
 }
 
-
 void SaWaterfallView::paintEvent(QPaintEvent *event)
 {
+	#ifdef DEBUG
+		int start_time = std::chrono::high_resolution_clock::now().time_since_epoch().count();
+	#endif
+
 	const int displayBottom = height();
 	const int displayLeft = 20;
 	const int displayRight = width() -20;
@@ -73,24 +78,32 @@ void SaWaterfallView::paintEvent(QPaintEvent *event)
 
 	// draw waterfallView only if enabled and ... if there is any new signal?			FIXME
 		// stop after signal disappears, or just roll-off with zeros and _then_ stop?
-		// also, make sure the history buffer is not being updated while drawing (possibly cause of the flicker?
-			// maybe use simple double buffering?
 
+	// refresh image with new data if needed
 	if (m_controls->m_waterfallModel.value() == true) {
-
-		// refresh image with new data if needed
-		if (!m_processor->getInProgress() && m_periodicalUpdate == true) {
-			m_periodicalUpdate = false;
-
-			painter.drawImage(displayLeft, 1, QImage(m_processor->m_history.data(), m_processor->binCount(), WATERFALL_HEIGHT, QImage::Format_RGB32).scaled(displayWidth, displayBottom - 2, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
-		}
-	
+		m_processor->m_dataAccess.lock();
+		painter.drawImage(	displayLeft,
+							1,
+							QImage(	m_processor->m_history.data(),
+									m_processor->binCount(),
+									WATERFALL_HEIGHT,
+									QImage::Format_RGB32
+									).scaled(	displayWidth,
+												displayBottom - 2,
+												Qt::IgnoreAspectRatio,
+												Qt::SmoothTransformation));
+		m_processor->m_dataAccess.unlock();
 	}
 
 	// always draw the outline
 	painter.setPen(QPen(m_controls->m_colorGrid, 2, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
 	painter.drawRoundedRect(displayLeft, 1, displayWidth, displayBottom, 2.0, 2.0);
 
+	#ifdef DEBUG
+		start_time = std::chrono::high_resolution_clock::now().time_since_epoch().count() - start_time;
+		painter.setPen(QPen(m_controls->m_colorLabels, 1, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
+		painter.drawText(displayRight -100, 10, 100, 16, Qt::AlignLeft, QString(std::string("Max FPS: " + std::to_string(1000000000.0 / start_time)).c_str()));
+	#endif
 }
 
 
@@ -116,9 +129,9 @@ std::vector<std::pair<float, std::string>> SaWaterfallView::makeTimeTics(int low
 }
 
 
-void SaWaterfallView::periodicalUpdate()
+void SaWaterfallView::periodicUpdate()
 {
-	m_periodicalUpdate = true;
+	m_periodicUpdate = true;
 	m_processor->setActive(isVisible());
 	update();
 }

@@ -23,29 +23,31 @@
 
 #include "SaProcessor.h"
 
+#include <algorithm>
 #include <cmath>
-#include <iostream>	//FIXME DEBUG
+#ifdef DEBUG
+	#include <iostream>
+#endif
 
 #include "lmms_math.h"
 
 SaProcessor::SaProcessor(SaControls *controls) :
 	m_controls(controls),
-	m_framesFilledUp(0),
-	m_energyL(0),
-	m_energyR(0),
+	m_blockSizeIndex(4),
+	m_blockSize(FFT_BLOCK_SIZES[4]),
 	m_sampleRate(Engine::mixer()->processingSampleRate()),
+	m_windowType(BLACKMAN_HARRIS),
+	m_framesFilledUp(0),
 	m_active(false),
-	m_blockSizeIndex(3),
-	m_blockSize(FFT_BLOCK_SIZES[3]),
 	m_inProgress(false)
 {
-	m_fftWindow.resize(m_blockSize, 0);
-	precomputeWindow(m_fftWindow.data(), m_blockSize, BLACKMAN_HARRIS);
+	m_fftWindow.resize(m_blockSize, 1.0);
+	precomputeWindow(m_fftWindow.data(), m_blockSize, (FFT_WINDOWS) m_windowType);
 
 	m_bufferL.resize(m_blockSize, 0);
 	m_bufferR.resize(m_blockSize, 0);
-	m_spectrumL = (fftwf_complex *) fftwf_malloc(binCount() * sizeof(fftwf_complex));
-	m_spectrumR = (fftwf_complex *) fftwf_malloc(binCount() * sizeof(fftwf_complex));
+	m_spectrumL = (fftwf_complex *) fftwf_malloc(binCount() * sizeof (fftwf_complex));
+	m_spectrumR = (fftwf_complex *) fftwf_malloc(binCount() * sizeof (fftwf_complex));
 	m_fftPlanL = fftwf_plan_dft_r2c_1d(m_blockSize, m_bufferL.data(), m_spectrumL, FFTW_MEASURE);
 	m_fftPlanR = fftwf_plan_dft_r2c_1d(m_blockSize, m_bufferR.data(), m_spectrumR, FFTW_MEASURE);
 
@@ -71,6 +73,9 @@ SaProcessor::~SaProcessor()
 
 void SaProcessor::analyse(sampleFrame *in_buffer, const fpp_t frame_count)
 {
+	#ifdef DEBUG
+		int start_time = std::chrono::high_resolution_clock::now().time_since_epoch().count();
+	#endif
 	// only analyse if the view is visible and not paused
 	if (m_active && !m_controls->m_pauseModel.value())
 	{
@@ -80,6 +85,10 @@ void SaProcessor::analyse(sampleFrame *in_buffer, const fpp_t frame_count)
 		// check if FFT buffers need to be reallocated while it is safe to do so
 		if (m_blockSizeIndex != m_controls->m_blockSizeModel.value()){
 			reallocateBuffers(m_controls->m_blockSizeModel.value());
+		}
+		if (m_windowType != m_controls->m_windowModel.value()) {
+			precomputeWindow(m_fftWindow.data(), m_blockSize, (FFT_WINDOWS) m_controls->m_windowModel.value());
+			m_windowType = m_controls->m_windowModel.value();
 		}
 
 		// process data
@@ -112,22 +121,22 @@ void SaProcessor::analyse(sampleFrame *in_buffer, const fpp_t frame_count)
 				m_bufferR[i] = m_bufferR[i] * m_fftWindow[i];
 			}
 	
+			// lock data shared with SaSpectrumView and SaWaterfallView
+			m_dataAccess.lock();
+
 			// analyse spectrum of the left channel
 			fftwf_execute(m_fftPlanL);
 			absspec(m_spectrumL, m_absSpectrumL.data(), binCount());
-			m_energyL = maximum(m_absSpectrumL) / maximum(m_bufferL);
-			normalize(m_absSpectrumL, m_energyL, m_normSpectrumL);
+			normalize(m_absSpectrumL, m_normSpectrumL);
 	
 			// repeat analysis for right channel only if stereo processing is enabled
 			if (stereo) {
 				fftwf_execute(m_fftPlanR);
 				absspec(m_spectrumR, m_absSpectrumR.data(), binCount());
-				m_energyR = maximum(m_absSpectrumR) / maximum(m_bufferR);
-				normalize(m_absSpectrumR, m_energyR, m_normSpectrumR);
+				normalize(m_absSpectrumR, m_normSpectrumR);
 			} else {
-				memset(m_absSpectrumR.data(), 0, sizeof(m_absSpectrumR.data()));
-				memset(m_normSpectrumR.data(), 0, sizeof(m_normSpectrumR.data()));
-				m_energyR = 0;
+				std::fill(m_absSpectrumR.begin(), m_absSpectrumR.end(), 0);
+				std::fill(m_normSpectrumR.begin(), m_normSpectrumR.end(), 0);
 			}
 	
 			// move waterfall history one line down and add newest result on top
@@ -153,25 +162,18 @@ void SaProcessor::analyse(sampleFrame *in_buffer, const fpp_t frame_count)
 				}
 			}
 
+			m_dataAccess.unlock();
 
+			#ifdef DEBUG
+				start_time = std::chrono::high_resolution_clock::now().time_since_epoch().count() - start_time;
+				std::cout << "Processed " << m_framesFilledUp << " samples in " << start_time / 1000000.0 << " ms" << std::endl;
+			#endif
 			m_framesFilledUp = 0;
 		}
 
 		m_inProgress = false;
 	}
 }
-
-
-float SaProcessor::getEnergyL() const
-{
-	return m_energyL;
-}
-
-float SaProcessor::getEnergyR() const
-{
-	return m_energyR;
-}
-
 
 int SaProcessor::getSampleRate() const
 {
@@ -198,7 +200,12 @@ bool SaProcessor::getInProgress()
 void SaProcessor::reallocateBuffers(int new_size_index)
 {
 	int new_size;
+	int new_bins;
 
+	// lock data shared with SaSpectrumView and SaWaterfallView
+	m_dataAccess.lock();
+
+	// get new block size and bin count based on selected index
 	if (new_size_index == m_blockSizeIndex || new_size_index < 0) {return;}
 
 	if (new_size_index < FFT_BLOCK_SIZES.size()){
@@ -207,15 +214,7 @@ void SaProcessor::reallocateBuffers(int new_size_index)
 		new_size = FFT_BLOCK_SIZES.back();
 	}
 
-	int new_bins = new_size / 2;
-
-	// in case new size is smaller, reduce reported size immediately
-	// to prevent SaSpectrumView from reading disappearing memory
-	if (new_size < m_blockSize) {
-		m_blockSize = new_size;
-	}
-
-	clear();
+	new_bins = new_size / 2 +1;
 
 	// destroy old FFT plan and free the result buffer
 	fftwf_destroy_plan(m_fftPlanL);
@@ -224,43 +223,43 @@ void SaProcessor::reallocateBuffers(int new_size_index)
 	fftwf_free(m_spectrumR);
 
 	// allocate new space and create new plan
-	m_bufferL.resize(new_size);
-	m_bufferR.resize(new_size);
-	m_spectrumL = (fftwf_complex *) fftwf_malloc(new_bins * sizeof(fftwf_complex));
-	m_spectrumR = (fftwf_complex *) fftwf_malloc(new_bins * sizeof(fftwf_complex));
+	m_fftWindow.resize(new_size, 1.0);
+	precomputeWindow(m_fftWindow.data(), new_size, (FFT_WINDOWS) m_controls->m_windowModel.value());
+	m_bufferL.resize(new_size, 0);
+	m_bufferR.resize(new_size, 0);
+	m_spectrumL = (fftwf_complex *) fftwf_malloc(new_bins * sizeof (fftwf_complex));
+	m_spectrumR = (fftwf_complex *) fftwf_malloc(new_bins * sizeof (fftwf_complex));
 	m_fftPlanL = fftwf_plan_dft_r2c_1d(new_size, m_bufferL.data(), m_spectrumL, FFTW_MEASURE);
 	m_fftPlanR = fftwf_plan_dft_r2c_1d(new_size, m_bufferR.data(), m_spectrumR, FFTW_MEASURE);
 
-	m_absSpectrumL.resize(binCount(), 0);
-	m_absSpectrumR.resize(binCount(), 0);
-	m_normSpectrumL.resize(binCount(), 0);
-	m_normSpectrumR.resize(binCount(), 0);
+	if (m_fftPlanL == NULL || m_fftPlanR == NULL)
+		std::cerr << "Failed to create new FFT plan!" << std::endl;
+
+	m_absSpectrumL.resize(new_bins, 0);
+	m_absSpectrumR.resize(new_bins, 0);
+	m_normSpectrumL.resize(new_bins, 0);
+	m_normSpectrumR.resize(new_bins, 0);
 
 	m_history.resize(new_bins * WATERFALL_HEIGHT * sizeof qRgb(0,0,0), 0);
 
-	precomputeWindow(m_fftWindow.data(), new_size, (FFT_WINDOWS) m_controls->m_windowModel.value());
-
-	// in case new size is larger (or remains the same), update reported size
-	// last to prevent SaSpectrumView from reading memory that's not ready yet
-	if (new_size >= m_blockSize) {
-		m_blockSize = new_size;
-	}
+	m_blockSize = new_size;
+	m_blockSizeIndex = new_size_index;
 
 	clear();
+	m_dataAccess.unlock();
+
 }
 
 
 void SaProcessor::clear()
 {
 	m_framesFilledUp = 0;
-	m_energyL = 0;
-	m_energyR = 0;
-	memset(m_bufferL.data(), 0, sizeof(m_bufferL.data()));
-	memset(m_bufferR.data(), 0, sizeof(m_bufferR.data()));
-	memset(m_absSpectrumL.data(), 0, sizeof(m_absSpectrumL.data()));
-	memset(m_absSpectrumR.data(), 0, sizeof(m_absSpectrumR.data()));
-	memset(m_normSpectrumL.data(), 0, sizeof(m_normSpectrumL.data()));
-	memset(m_normSpectrumR.data(), 0, sizeof(m_normSpectrumR.data()));
-	std::cout << "cleared " << sizeof(m_normSpectrumR.data()) << " bins" << std::endl;
+	std::fill(m_bufferL.begin(), m_bufferL.end(), 0);
+	std::fill(m_bufferR.begin(), m_bufferR.end(), 0);
+	std::fill(m_absSpectrumL.begin(), m_absSpectrumL.end(), 0);
+	std::fill(m_absSpectrumR.begin(), m_absSpectrumR.end(), 0);
+	std::fill(m_normSpectrumL.begin(), m_normSpectrumL.end(), 0);
+	std::fill(m_normSpectrumR.begin(), m_normSpectrumR.end(), 0);
+	std::fill(m_history.begin(), m_history.end(), 0);
 }
 

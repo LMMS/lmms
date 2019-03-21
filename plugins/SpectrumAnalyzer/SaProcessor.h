@@ -25,6 +25,7 @@
 #ifndef SAPROCESSOR_H
 #define SAPROCESSOR_H
 
+#include <mutex>
 #include <vector>
 #include <QImage>
 
@@ -42,8 +43,6 @@ public:
 
 	void analyse(sampleFrame *buf, const fpp_t frames);
 
-	float getEnergyL() const;
-	float getEnergyR() const;
 	int getSampleRate() const;
 	bool getActive() const;
 
@@ -51,16 +50,19 @@ public:
 
 	void reallocateBuffers(int new_size_index);
 
+	std::mutex m_dataAccess;
+
 private:
 	SaControls *m_controls;
 
-	int m_blockSizeIndex;	// index to FFT_BLOCK_SIZES[] in fft_helpers.h
-	int m_blockSize;		// size of FFT input block
-	int m_sampleRate;
+	unsigned int m_blockSizeIndex;	// index to FFT_BLOCK_SIZES[] in fft_helpers.h
+	unsigned int m_blockSize;		// size of FFT input block
+	unsigned int m_sampleRate;
+	unsigned int m_windowType;
 
-	int binCount(){return m_blockSize / 2 + 1;}	// number of output frequency bins
+	unsigned int binCount(){return m_blockSize / 2 + 1;}	// number of output frequency bins
 
-	int m_framesFilledUp;
+	unsigned int m_framesFilledUp;
 	std::vector<float> m_fftWindow;
 	std::vector<float> m_bufferL;
 	std::vector<float> m_bufferR;
@@ -72,8 +74,6 @@ private:
 	std::vector<float> m_absSpectrumR;
 	std::vector<float> m_normSpectrumL;
 	std::vector<float> m_normSpectrumR;
-	float m_energyL;
-	float m_energyR;
 
 	std::vector<uchar> m_history;
 

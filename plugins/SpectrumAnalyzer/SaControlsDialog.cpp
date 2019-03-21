@@ -124,11 +124,11 @@ SaControlsDialog::SaControlsDialog(SaControls *controls, SaProcessor *processor)
 	blocksizeCombo->setModel(&controls->m_blockSizeModel);
 	for (int i = 0; i < FFT_BLOCK_SIZES.size(); i++){
 		if (i == 0){
-			controls->m_blockSizeModel.addItem((std::to_string(i) + " ").c_str() + tr("(Fast, low-res.)"));
+			controls->m_blockSizeModel.addItem((std::to_string(FFT_BLOCK_SIZES[i]) + " ").c_str() + tr("(Fast, low-res.)"));
 		} else if (i == FFT_BLOCK_SIZES.size() - 1){
-			controls->m_blockSizeModel.addItem((std::to_string(i) + " ").c_str() + tr("(Slow, high-res.)"));
+			controls->m_blockSizeModel.addItem((std::to_string(FFT_BLOCK_SIZES[i]) + " ").c_str() + tr("(Slow, high-res.)"));
 		} else {
-			controls->m_blockSizeModel.addItem(std::to_string(i).c_str());
+			controls->m_blockSizeModel.addItem(std::to_string(FFT_BLOCK_SIZES[i]).c_str());
 		}
 	}
 	controls->m_blockSizeModel.setValue(controls->m_blockSizeModel.findText("2048"));
@@ -146,7 +146,6 @@ SaControlsDialog::SaControlsDialog(SaControls *controls, SaProcessor *processor)
 	controls->m_windowModel.addItem(tr("Blackman-Harris (Default)"));
 	controls->m_windowModel.addItem(tr("Hamming"));
 	controls->m_windowModel.addItem(tr("Hanning"));
-	controls->m_windowModel.addItem(tr("Kaiser"));
 	controls->m_windowModel.setValue(controls->m_windowModel.findText(tr("Blackman-Harris (Default)")));
 	config_layout->addWidget(windowCombo, 2, 3);
 

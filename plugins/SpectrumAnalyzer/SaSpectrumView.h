@@ -24,13 +24,12 @@
 #ifndef SASPECTRUMVIEW_H
 #define SASPECTRUMVIEW_H
 
+#include <algorithm>
+#include <string>
+#include <utility>
 #include <QPainter>
 #include <QWidget>
 #include <QString>
-#include <vector>
-#include <utility>
-#include <string>
-#include <algorithm>
 
 #include "SaControls.h"
 #include "SaProcessor.h"
@@ -47,8 +46,6 @@ public:
 	explicit SaSpectrumView(SaControls *controls, SaProcessor *processor, QWidget *_parent = 0);
 	virtual ~SaSpectrumView(){}
 
-	float freqToXPixel(float frequency, int width);
-	float ampToYPixel(float amplitude, int height);
 
 	std::vector<std::pair<int, std::string>> makeLogTics(int low, int high);
 	std::vector<std::pair<int, std::string>> makeLinearTics(int low, int high);
@@ -59,7 +56,7 @@ protected:
 	virtual void paintEvent(QPaintEvent *event);
 
 private slots:
-	void periodicalUpdate();
+	void periodicUpdate();
 
 private:
 	SaControls *m_controls;
@@ -80,15 +77,17 @@ private:
 	std::vector<std::pair<float, std::string>> m_logAmpTics;	// dB
 	std::vector<std::pair<float, std::string>> m_linearAmpTics;	// 0..1
 
+	std::vector<float> m_bandHeightL;
+	std::vector<float> m_bandHeightR;
+	std::vector<float> m_bandPeakL;
+	std::vector<float> m_bandPeakR;
+
 	float m_decaySum;
-	bool m_periodicalUpdate;
+	bool m_periodicUpdate;
 	bool m_freezeRequest;
 
-	QList<float> m_bandHeightL;
-	QList<float> m_bandHeightR;
-	QList<float> m_bandPeakL;
-	QList<float> m_bandPeakR;
-
+	float freqToXPixel(float frequency, int width);
+	float ampToYPixel(float amplitude, int height);
 	float bandToFreq(int index);
 };
 #endif // SASPECTRUMVIEW_H

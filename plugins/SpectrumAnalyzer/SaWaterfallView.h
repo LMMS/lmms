@@ -56,7 +56,7 @@ protected:
 	virtual void paintEvent(QPaintEvent *event);
 
 private slots:
-	void periodicalUpdate();
+	void periodicUpdate();
 
 private:
 	SaControls *m_controls;
@@ -66,6 +66,6 @@ private:
 
 	std::vector<std::pair<float, std::string>> m_timeTics;	// 0..n (s)
 
-	bool m_periodicalUpdate;
+	bool m_periodicUpdate;
 };
 #endif // SAWATERFALLVIEW_H

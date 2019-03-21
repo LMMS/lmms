@@ -54,45 +54,55 @@ float maximum(std::vector<float> &abs_spectrum)
 }
 
 
-/* Normalizes the array of absolute values to a 0..1 range
+/* Normalize the array of absolute values to a 0..1 range
 
-   returns -1 on error
+	returns -1 on error
+	returns maximum
 */
-int normalize(float *abs_spectrum, float energy, float *norm_spectrum, unsigned int block_size)
+int normalize(float *abs_spectrum, float *norm_spectrum, unsigned int bin_count)
 {
 	int i;
 
-	if (abs_spectrum == NULL || norm_spectrum == NULL || block_size <= 0) {
+	if (abs_spectrum == NULL || norm_spectrum == NULL || bin_count == 0) {
 		return -1;
 	}
 
-	if (std::isnan(energy)) {
-		for (i = 0; i < block_size; i++) {
-			norm_spectrum[i] = 0.0;
-		}
-	} else {
-		for (i = 0; i < block_size; i++) {
-			norm_spectrum[i] = abs_spectrum[i] / energy;
-		}
+	for (i = 0; i < bin_count; i++) {
+		norm_spectrum[i] = abs_spectrum[i] / bin_count;
 	}
 
 	return 0;
 }
 
-int normalize(std::vector<float> &abs_spectrum, float energy, std::vector<float> &norm_spectrum)
+int normalize(std::vector<float> &abs_spectrum, std::vector<float> &norm_spectrum)
 {
 	if (abs_spectrum.size() != norm_spectrum.size()) {return -1;}
 
-	return normalize(abs_spectrum.data(), energy, norm_spectrum.data(), abs_spectrum.size());
+	return normalize(abs_spectrum.data(), norm_spectrum.data(), abs_spectrum.size());
 }
+
+
+/* Check if the spectrum contains any non-zero value.
+ *
+ *	returns 1 if spectrum contains any non-zero value
+ *	returns 0 otherwise
+ */
+int notEmpty(std::vector<float> &spectrum) {
+	for (int i = 0; i < spectrum.size(); i++) {
+		if (spectrum[i] != 0) {return 1;}
+	}
+	return 0;
+}
+
 
 /* Precompute a window function for later real-time use.
  *
  *    returns -1 on error
  */
-int precomputeWindow(float *window, int length, FFT_WINDOWS type)
+int precomputeWindow(float *window, int length, FFT_WINDOWS type, bool normalized)
 {
 	int i;
+	float gain = 0;
 
 	float a0;
 	float a1;
@@ -108,6 +118,7 @@ int precomputeWindow(float *window, int length, FFT_WINDOWS type)
 		default:
 		case RECTANGULAR:
 			for (i = 0; i < length; i++) {window[i] = 1.0;}
+			gain = 1;
 			return 0;
 		case BLACKMAN_HARRIS:	
 			a0 = 0.35875;
@@ -135,8 +146,15 @@ int precomputeWindow(float *window, int length, FFT_WINDOWS type)
 		window[i] =	(a0 - a1 * cos(2 * F_PI * i / ((float)length - 1.0))
 						+ a2 * cos(4 * F_PI * i / ((float)length - 1.0))
 						- a3 * cos(6 * F_PI * i / ((float)length - 1.0)));
+		gain += window[i];
 	}
 
+	// amplitude correction
+	gain /= (float) length;
+	for (i = 0; i < length; i++)
+	{
+		window[i] /= gain;
+	}
 
 	return 0;
 }

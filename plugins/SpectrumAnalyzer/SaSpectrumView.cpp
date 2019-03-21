@@ -25,6 +25,7 @@
 
 #include <cmath>
 #include <iostream>
+#include <mutex>
 
 #include "Engine.h"
 #include "GuiApplication.h"
@@ -36,21 +37,19 @@ SaSpectrumView::SaSpectrumView(SaControls *controls, SaProcessor *processor, QWi
 	QWidget(_parent),
 	m_controls(controls),
 	m_processor(processor),
-	m_periodicalUpdate(false),
+	m_periodicUpdate(false),
 	m_freezeRequest(false)
 {
 	setMinimumSize(400, 200);
 
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
-	connect(gui->mainWindow(), SIGNAL(periodicUpdate()), this, SLOT(periodicalUpdate()));
+	connect(gui->mainWindow(), SIGNAL(periodicUpdate()), this, SLOT(periodicUpdate()));
 
-	for (int i = 0; i < m_processor->binCount(); i++) {
-		m_bandHeightL.append(0);
-		m_bandHeightR.append(0);
-		m_bandPeakL.append(0);
-		m_bandPeakR.append(0);
-	}
+	m_bandHeightL.resize(m_processor->binCount(), 0);
+	m_bandHeightR.resize(m_processor->binCount(), 0);
+	m_bandPeakL.resize(m_processor->binCount(), 0);
+	m_bandPeakR.resize(m_processor->binCount(), 0);
 
 	m_logFreqTics = makeLogTics(LOWEST_FREQ, 20000);
 	m_linearFreqTics = makeLinearTics(0, 20000);
@@ -61,10 +60,13 @@ SaSpectrumView::SaSpectrumView(SaControls *controls, SaProcessor *processor, QWi
 
 void SaSpectrumView::paintEvent(QPaintEvent *event)
 {
+	#ifdef DEBUG
+		int start_time = std::chrono::high_resolution_clock::now().time_since_epoch().count();
+		int line_time, draw_time;
+	#endif
+
 	const float smoothFactor = 0.15;
 
-	const float energyL = isnan(m_processor->getEnergyL()) ? 0 : m_processor->getEnergyL();
-	const float energyR = isnan(m_processor->getEnergyR()) ? 0 : m_processor->getEnergyR();
 	const bool stereo = m_controls->m_stereoModel.value();
 	const bool freeze = m_freezeRequest;
 
@@ -78,7 +80,7 @@ void SaSpectrumView::paintEvent(QPaintEvent *event)
 	std::vector<std::pair<float, std::string>> * ampTics = NULL;
 
 	QPainter painter(this);
-	painter.setRenderHint(QPainter::Antialiasing, false);
+	painter.setRenderHint(QPainter::Antialiasing, true);
 
 	// always draw the background
 	painter.fillRect(displayLeft, 1, displayWidth, displayBottom, m_controls->m_colorBG);
@@ -144,55 +146,79 @@ void SaSpectrumView::paintEvent(QPaintEvent *event)
 		}
 	}
 
-	// draw the graph only if there is any input or smooth decay residue
-	if (energyL > 0 || energyR > 0 || m_decaySum > 0) {
+	// draw the graph only if there is any input or smooth decay / averaging residue
+	m_processor->m_dataAccess.lock();
+	if (m_decaySum > 0 || notEmpty(m_processor->m_normSpectrumL) || notEmpty(m_processor->m_normSpectrumR)) {
 
 		// update paths with new data if needed
-		if (!m_processor->getInProgress() && m_periodicalUpdate == true && !m_controls->m_pauseModel.value()) {
-			m_periodicalUpdate = false;
+		if (!m_processor->getInProgress() && m_periodicUpdate == true && !m_controls->m_pauseModel.value()) {
+
+			if (m_processor->binCount() != m_bandHeightL.size()) {
+				m_bandHeightL.clear();
+				m_bandHeightR.clear();
+				m_bandPeakL.clear();
+				m_bandPeakR.clear();
+				m_bandHeightL.resize(m_processor->binCount(), 0);
+				m_bandHeightR.resize(m_processor->binCount(), 0);
+				m_bandPeakL.resize(m_processor->binCount(), 0);
+				m_bandPeakR.resize(m_processor->binCount(), 0);
+			}
+
+			m_periodicUpdate = false;
 			m_decaySum = 0;
 		
-			float *band = m_processor->m_normSpectrumL.data();
-			QList<float> *m_bandHeight = &m_bandHeightL;
-			QList<float> *m_bandPeak = &m_bandPeakL;
+			float *bands = m_processor->m_normSpectrumL.data();
+			std::vector<float> *m_bandHeight = &m_bandHeightL;
+			std::vector<float> *m_bandPeak = &m_bandPeakL;
 			QPainterPath m_path;
-		
+
+			#ifdef DEBUG
+				line_time = std::chrono::high_resolution_clock::now().time_since_epoch().count();
+			#endif
+
 			for (int i = 0; i <= 1; i++){
 				m_path = QPainterPath();
 				m_path.moveTo(displayLeft, displayBottom);
-		
+
+				// the first band is stretched to the left edge to prevent
+				// creating a misleading slope leading to zero (at log. scale)
+				m_path.lineTo(	displayLeft,
+								ampToYPixel((*m_bandHeight)[0], displayBottom));
+
 				for (int x = 0; x < m_processor->binCount(); x++) {
 					// direct display
-					if (m_controls->m_smoothModel.value() && (*m_bandHeight)[x] > band[x]) {
-						(*m_bandHeight)[x] = band[x] * smoothFactor + (*m_bandHeight)[x] * (1 - smoothFactor);
+					if (m_controls->m_smoothModel.value()) {
+						(*m_bandHeight)[x] = bands[x] * smoothFactor + (*m_bandHeight)[x] * (1 - smoothFactor);
 //						(*m_bandHeight)[x] = (*m_bandHeight)[x] / 1.2;
 					} else {
-						(*m_bandHeight)[x] = band[x];
+						(*m_bandHeight)[x] = bands[x];
 					}
-		
-					m_path.lineTo(	freqToXPixel(bandToFreq(x), displayWidth) + displayLeft,
-									ampToYPixel((*m_bandHeight)[x], displayBottom));
-					m_decaySum += (*m_bandHeight)[x];
+
+					if (freqToXPixel(bandToFreq(x), displayWidth) >= 0) {
+						m_path.lineTo(	freqToXPixel(bandToFreq(x), displayWidth) + displayLeft,
+										ampToYPixel((*m_bandHeight)[x], displayBottom));
+						m_decaySum += (*m_bandHeight)[x];
+					}
 
 					// peak-hold and reference freeze (using the same curve
 					// to save resources and keep screen clean and readable)
 					if (m_controls->m_refFreezeModel.value() && freeze) {
-						(*m_bandPeak)[x] = band[x]; 
+						(*m_bandPeak)[x] = bands[x];
 					} else if (m_controls->m_peakHoldModel.value()) {
-						if (band[x] > (*m_bandPeak)[x]) {
-							(*m_bandPeak)[x] = band[x];
+						if (bands[x] > (*m_bandPeak)[x]) {
+							(*m_bandPeak)[x] = bands[x];
 						}
 					}
 				}
 
 				m_path.lineTo(displayRight, displayBottom);
 				m_path.closeSubpath();
-		
+
 				// go for second iteration only if stereo processing is enabled
 				if (i == 0) {
 					m_pathL = m_path;
 					if (stereo) {
-						band = m_processor->m_normSpectrumR.data();
+						bands = m_processor->m_normSpectrumR.data();
 						m_bandHeight = &m_bandHeightR;
 						m_bandPeak = &m_bandPeakR;
 					} else {
@@ -202,22 +228,44 @@ void SaSpectrumView::paintEvent(QPaintEvent *event)
 					m_pathR = m_path;
 				}
 			}
+
+			#ifdef DEBUG
+				line_time = std::chrono::high_resolution_clock::now().time_since_epoch().count() - line_time;
+			#endif
+
 			if (freeze) {m_freezeRequest = false;}
 		}
-	
+
+		m_processor->m_dataAccess.unlock();
+
 		// draw stored paths
+		#ifdef DEBUG
+			draw_time = std::chrono::high_resolution_clock::now().time_since_epoch().count();
+		#endif
 		if (stereo) {
 			painter.fillPath(m_pathR, QBrush(m_controls->m_colorR));
 			painter.fillPath(m_pathL, QBrush(m_controls->m_colorL));
 		} else {
 			painter.fillPath(m_pathL, QBrush(m_controls->m_colorMono));
 		}
+		#ifdef DEBUG
+			draw_time = std::chrono::high_resolution_clock::now().time_since_epoch().count() - draw_time;
+		#endif
+	} else {
+		m_processor->m_dataAccess.unlock();
 	}
 
 	// always draw the outline
 	painter.setPen(QPen(m_controls->m_colorGrid, 2, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
 	painter.drawRoundedRect(displayLeft, 1, displayWidth, displayBottom, 2.0, 2.0);
 
+	#ifdef DEBUG
+		start_time = std::chrono::high_resolution_clock::now().time_since_epoch().count() - start_time;
+		painter.setPen(QPen(m_controls->m_colorLabels, 1, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
+		painter.drawText(displayRight -100, 10, 100, 16, Qt::AlignLeft, QString(std::string("Max FPS: " + std::to_string(1000000000.0 / start_time)).c_str()));
+		painter.drawText(displayRight -100, 30, 100, 16, Qt::AlignLeft, QString(std::string("Lines ms: " + std::to_string(line_time / 1000000.0)).c_str()));
+		painter.drawText(displayRight -100, 50, 100, 16, Qt::AlignLeft, QString(std::string("Draw ms: " + std::to_string(draw_time / 1000000.0)).c_str()));
+	#endif
 }
 
 
@@ -344,9 +392,9 @@ std::vector<std::pair<float, std::string>> SaSpectrumView::makeAmpTics(int low, 
 	return result;
 }
 
-void SaSpectrumView::periodicalUpdate()
+void SaSpectrumView::periodicUpdate()
 {
-	m_periodicalUpdate = true;
+	m_periodicUpdate = true;				//FIXME: visibilitu by mel processor hodnotit i pro waterfall
 	m_processor->setActive(isVisible());
 	update();
 }

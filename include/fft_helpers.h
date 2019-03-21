@@ -50,20 +50,29 @@ enum FFT_WINDOWS
 float LMMS_EXPORT maximum(float *abs_spectrum, unsigned int spec_size);
 float LMMS_EXPORT maximum(std::vector<float> &abs_spectrum);
 
-/* Normalizes the abs_spectrum array of absolute values to a 0..1 range
+/* Normalize the abs_spectrum array of absolute values to a 0..1 range
  * based on supplied energy and stores it in the norm_spectrum array.
  *
  *	returns -1 on error
-*/
-int LMMS_EXPORT normalize(float *abs_spectrum, float energy, float *norm_spectrum, unsigned int block_size);
-int LMMS_EXPORT normalize(std::vector<float> &abs_spectrum, float energy, std::vector<float> &norm_spectrum);
+ */
+int LMMS_EXPORT normalize(float *abs_spectrum, float *norm_spectrum, unsigned int bin_count);
+int LMMS_EXPORT normalize(std::vector<float> &abs_spectrum, std::vector<float> &norm_spectrum);
+
+
+/* Check if the spectrum contains any non-zero value.
+ *
+ *	returns 1 if spectrum contains any non-zero value
+ *	returns 0 otherwise
+ */
+int LMMS_EXPORT notEmpty(std::vector<float> &spectrum);
 
 
 /* Precompute a window function for later real-time use.
+ * Set normalized to false if you don't want to apply amplitude correction.
  *
  *	returns -1 on error
  */
-int LMMS_EXPORT precomputeWindow(float *window, int length, FFT_WINDOWS type);
+int LMMS_EXPORT precomputeWindow(float *window, int length, FFT_WINDOWS type, bool normalized = true);
 
 /* compute absolute values of complex_buffer, save to absspec_buffer
  * take care that - compl_len is not bigger than complex_buffer!
