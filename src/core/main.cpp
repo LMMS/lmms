@@ -105,6 +105,21 @@ static inline QString baseName( const QString & file )
 }
 
 
+#ifdef LMMS_BUILD_WIN32
+// Workaround for old MinGW
+#ifdef __MINGW32__
+extern "C" _CRTIMP errno_t __cdecl freopen_s(FILE** _File,
+	const char *_Filename, const char *_Mode, FILE *_Stream);
+#endif
+
+// For qInstallMessageHandler
+void consoleMessageHandler(QtMsgType type,
+	const QMessageLogContext &context, const QString &msg)
+{
+    QByteArray localMsg = msg.toLocal8Bit();
+    fprintf(stderr, "%s\n", localMsg.constData());
+}
+#endif
 
 
 inline void loadTranslation( const QString & tname,
@@ -241,6 +256,33 @@ int main( int argc, char * * argv )
 	// Install the trap handler
 	// register signal SIGFPE and signal handler
 	signal(SIGFPE, signalHandler);
+#endif
+
+#ifdef LMMS_BUILD_WIN32
+	// Don't touch redirected streams here
+	// GetStdHandle should be called before AttachConsole
+	HANDLE hStdIn = GetStdHandle(STD_INPUT_HANDLE);
+	HANDLE hStdOut = GetStdHandle(STD_OUTPUT_HANDLE);
+	HANDLE hStdErr = GetStdHandle(STD_ERROR_HANDLE);
+	FILE *fIn, *fOut, *fErr;
+	// Enable console output if available
+	if (AttachConsole(ATTACH_PARENT_PROCESS))
+	{
+		if (!hStdIn)
+		{
+			freopen_s(&fIn, "CONIN$", "r", stdin);
+		}
+		if (!hStdOut)
+		{
+			freopen_s(&fOut, "CONOUT$", "w", stdout);
+		}
+		if (!hStdErr)
+		{
+			freopen_s(&fErr, "CONOUT$", "w", stderr);
+		}
+	}
+	// Make Qt's debug message handlers work
+	qInstallMessageHandler(consoleMessageHandler);
 #endif
 
 	// initialize memory managers
@@ -929,6 +971,16 @@ int main( int argc, char * * argv )
 	{
 		printf( "\n" );
 	}
+
+#ifdef LMMS_BUILD_WIN32
+	// Cleanup console
+	HWND hConsole = GetConsoleWindow();
+	if (hConsole)
+	{
+		SendMessage(hConsole, WM_CHAR, (WPARAM)VK_RETURN, (LPARAM)0);
+		FreeConsole();
+	}
+#endif
 
 	return ret;
 }
