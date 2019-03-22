@@ -92,7 +92,6 @@ private:
 	bool m_hasFocus;
 
 	static void elideText( QLabel *label, QString text );
-	bool isMaximized();
 	void adjustTitleBar();
 
 private slots:

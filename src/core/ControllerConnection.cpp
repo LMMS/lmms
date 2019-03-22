@@ -117,7 +117,7 @@ void ControllerConnection::setController( Controller * _controller )
 	{
 		_controller->addConnection( this );
 		QObject::connect( _controller, SIGNAL( valueChanged() ),
-				this, SIGNAL( valueChanged() ) );
+				this, SIGNAL( valueChanged() ), Qt::DirectConnection );
 	}
 
 	m_ownsController =
