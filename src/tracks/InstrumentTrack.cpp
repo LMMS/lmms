@@ -740,7 +740,10 @@ void InstrumentTrack::saveTrackSpecificSettings( QDomDocument& doc, QDomElement 
 	{
 		QDomElement i = doc.createElement( "instrument" );
 		i.setAttribute( "name", m_instrument->descriptor()->name );
-		m_instrument->saveState( doc, i );
+		QDomElement ins = m_instrument->saveState( doc, i );
+		if(m_instrument->key().isValid()) {
+			ins.appendChild( m_instrument->key().saveXML( doc ) );
+		}
 		thisElement.appendChild( i );
 	}
 	m_soundShaping.saveState( doc, thisElement );
@@ -801,9 +804,13 @@ void InstrumentTrack::loadTrackSpecificSettings( const QDomElement & thisElement
 			}
 			else if( node.nodeName() == "instrument" )
 			{
+				typedef Plugin::Descriptor::SubPluginFeatures::Key PluginKey;
+				PluginKey key( node.toElement().elementsByTagName( "key" ).item( 0 ).toElement() );
+
 				delete m_instrument;
 				m_instrument = NULL;
-				m_instrument = Instrument::instantiate( node.toElement().attribute( "name" ), this );
+				m_instrument = Instrument::instantiate(
+					node.toElement().attribute( "name" ), this, &key);
 				m_instrument->restoreState( node.firstChildElement() );
 
 				emit instrumentChanged();
@@ -817,7 +824,8 @@ void InstrumentTrack::loadTrackSpecificSettings( const QDomElement & thisElement
 			{
 				delete m_instrument;
 				m_instrument = NULL;
-				m_instrument = Instrument::instantiate( node.nodeName(), this );
+				m_instrument = Instrument::instantiate(
+					node.nodeName(), this, nullptr, true);
 				if( m_instrument->nodeName() == node.nodeName() )
 				{
 					m_instrument->restoreState( node.toElement() );
@@ -842,15 +850,20 @@ void InstrumentTrack::setPreviewMode( const bool value )
 
 
 
-Instrument * InstrumentTrack::loadInstrument( const QString & _plugin_name )
+Instrument * InstrumentTrack::loadInstrument(const QString & _plugin_name,
+	const Plugin::Descriptor::SubPluginFeatures::Key *key, bool keyFromDnd)
 {
+	if(keyFromDnd)
+		Q_ASSERT(!key);
+
 	silenceAllNotes( true );
 
 	lock();
 	delete m_instrument;
-	m_instrument = Instrument::instantiate( _plugin_name, this );
+	m_instrument = Instrument::instantiate(_plugin_name, this,
+					key, keyFromDnd);
 	unlock();
-	setName( m_instrument->displayName() );
+	setName(m_instrument->displayName());
 
 	emit instrumentChanged();
 
@@ -1697,7 +1710,7 @@ void InstrumentTrackWindow::dropEvent( QDropEvent* event )
 
 	if( type == "instrument" )
 	{
-		m_track->loadInstrument( value );
+		m_track->loadInstrument( value, nullptr, true /* DnD */ );
 
 		Engine::getSong()->setModified();
 
@@ -1723,7 +1736,9 @@ void InstrumentTrackWindow::dropEvent( QDropEvent* event )
 
 		if( !i->descriptor()->supportsFileType( ext ) )
 		{
-			i = m_track->loadInstrument( pluginFactory->pluginSupportingExtension(ext).name() );
+			PluginFactory::PluginInfoAndKey piakn =
+				pluginFactory->pluginSupportingExtension(ext);
+			i = m_track->loadInstrument(piakn.info.name(), &piakn.key);
 		}
 
 		i->loadFile( value );
