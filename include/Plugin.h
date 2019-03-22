@@ -207,9 +207,7 @@ public:
 
 			virtual QString displayName(const Key& k) const
 			{
-				return k.isValid()
-					? k.desc->displayName
-					: k.name;
+				return k.isValid() ? k.name : QString();
 			}
 
 			virtual QString description(const Key& k) const
