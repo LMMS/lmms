@@ -63,6 +63,7 @@ NotePlayHandle::NotePlayHandle( InstrumentTrack* instrumentTrack,
 	m_subNotes(),
 	m_released( false ),
 	m_releaseStarted( false ),
+	m_hasMidiNote( false ),
 	m_hasParent( parent != NULL  ),
 	m_parent( parent ),
 	m_hadChildren( false ),
@@ -104,17 +105,6 @@ NotePlayHandle::NotePlayHandle( InstrumentTrack* instrumentTrack,
 	if( m_origin == OriginMidiInput )
 	{
 		m_instrumentTrack->midiNoteOn( *this );
-	}
-
-	if( hasParent() || ! m_instrumentTrack->isArpeggioEnabled() )
-	{
-		const int baseVelocity = m_instrumentTrack->midiPort()->baseVelocity();
-
-		// send MidiNoteOn event
-		m_instrumentTrack->processOutEvent(
-			MidiEvent( MidiNoteOn, midiChannel(), midiKey(), midiVelocity( baseVelocity ) ),
-			MidiTime::fromFrames( offset(), Engine::framesPerTick() ),
-			offset() );
 	}
 
 	if( m_instrumentTrack->instrument()->flags() & Instrument::IsSingleStreamed )
@@ -208,6 +198,21 @@ void NotePlayHandle::play( sampleFrame * _working_buffer )
 	}
 
 	lock();
+
+	if( m_totalFramesPlayed == 0
+		&& ( hasParent() || ! m_instrumentTrack->isArpeggioEnabled() ) )
+	{
+		m_hasMidiNote = true;
+
+		const int baseVelocity = m_instrumentTrack->midiPort()->baseVelocity();
+
+		// send MidiNoteOn event
+		m_instrumentTrack->processOutEvent(
+			MidiEvent( MidiNoteOn, midiChannel(), midiKey(), midiVelocity( baseVelocity ) ),
+			MidiTime::fromFrames( offset(), Engine::framesPerTick() ),
+			offset() );
+	}
+
 	if( m_frequencyNeedsUpdate )
 	{
 		updateFrequency();
@@ -360,8 +365,10 @@ void NotePlayHandle::noteOff( const f_cnt_t _s )
 	m_framesBeforeRelease = _s;
 	m_releaseFramesToDo = qMax<f_cnt_t>( 0, actualReleaseFramesToDo() );
 
-	if( hasParent() || ! m_instrumentTrack->isArpeggioEnabled() )
+	if( m_hasMidiNote )
 	{
+		m_hasMidiNote = false;
+
 		// send MidiNoteOff event
 		m_instrumentTrack->processOutEvent(
 				MidiEvent( MidiNoteOff, midiChannel(), midiKey(), 0 ),
