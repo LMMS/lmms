@@ -125,19 +125,19 @@ void SpaSubPluginFeatures::fillDescriptionWidget(
 	// possibly TODO: version, project, plugin type, number of channels
 }
 
-const char *SpaSubPluginFeatures::additionalFileExtensions(
+QString SpaSubPluginFeatures::additionalFileExtensions(
 	const Plugin::Descriptor::SubPluginFeatures::Key &k) const
 {
 	return spaDescriptor(k)->save_formats();
 }
 
-const char *SpaSubPluginFeatures::displayName(
+QString SpaSubPluginFeatures::displayName(
 	const Plugin::Descriptor::SubPluginFeatures::Key &k) const
 {
 	return spaDescriptor(k)->name();
 }
 
-const char *SpaSubPluginFeatures::description(
+QString SpaSubPluginFeatures::description(
 	const Plugin::Descriptor::SubPluginFeatures::Key &k) const
 {
 	return spaDescriptor(k)->description_line();

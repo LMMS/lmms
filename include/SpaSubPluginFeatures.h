@@ -46,9 +46,9 @@ public:
 	virtual void fillDescriptionWidget(
 		QWidget *_parent, const Key *k) const override;
 
-	const char *additionalFileExtensions(const Key &k) const override;
-	const char *displayName(const Key &k) const override;
-	const char *description(const Key &k) const override;
+	QString additionalFileExtensions(const Key &k) const override;
+	QString displayName(const Key &k) const override;
+	QString description(const Key &k) const override;
 	const PixmapLoader *logo(const Key &k) const override;
 
 	void listSubPluginKeys(

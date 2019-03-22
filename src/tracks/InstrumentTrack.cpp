@@ -1759,7 +1759,7 @@ void InstrumentTrackWindow::dropEvent( QDropEvent* event )
 
 		bool convert = value == "spainstrument" &&
 			dndKey &&
-			!strcmp(dndKey->displayName(), "ZynAddSubFX") &&
+			(dndKey->displayName() == "ZynAddSubFX") &&
 			!strcmp(oldIns->descriptor()->name, "zynaddsubfx");
 
 		DataFile savedSettings(DataFile::SongProject);
