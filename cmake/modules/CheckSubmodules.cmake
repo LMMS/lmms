@@ -27,6 +27,12 @@ SET(DEPTH_VALUE 100)
 SET(MAX_ATTEMPTS 2)
 
 MESSAGE("\nValidating submodules...")
+IF(NOT EXISTS "${CMAKE_SOURCE_DIR}/.gitmodules")
+	MESSAGE("Skipping the check because .gitmodules not detected."
+		"Please make sure you have all submodules in the source tree!"
+	)
+	RETURN()
+ENDIF()
 FILE(READ "${CMAKE_SOURCE_DIR}/.gitmodules" SUBMODULE_DATA)
 
 # Force English locale

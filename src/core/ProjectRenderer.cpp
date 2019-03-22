@@ -185,25 +185,17 @@ void ProjectRenderer::run()
 	// Skip first empty buffer.
 	Engine::mixer()->nextBuffer();
 
-	const Song::PlayPos & exportPos = Engine::getSong()->getPlayPos(
-							Song::Mode_PlaySong );
 	m_progress = 0;
-	std::pair<MidiTime, MidiTime> exportEndpoints = Engine::getSong()->getExportEndpoints();
-	tick_t startTick = exportEndpoints.first.getTicks();
-	tick_t endTick = exportEndpoints.second.getTicks();
-	tick_t lengthTicks = endTick - startTick;
 
 	// Now start processing
 	Engine::mixer()->startProcessing(false);
 
 	// Continually track and emit progress percentage to listeners.
-	while( exportPos.getTicks() < endTick &&
-				Engine::getSong()->isExporting() == true
-							&& !m_abort )
+	while (!Engine::getSong()->isExportDone() && !m_abort)
 	{
 		m_fileDev->processNextBuffer();
-		const int nprog = lengthTicks == 0 ? 100 : (exportPos.getTicks()-startTick) * 100 / lengthTicks;
-		if( m_progress != nprog )
+		const int nprog = Engine::getSong()->getExportProgress();
+		if (m_progress != nprog)
 		{
 			m_progress = nprog;
 			emit progressChanged( m_progress );

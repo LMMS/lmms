@@ -34,6 +34,7 @@ class AudioPortAudioSetupUtil : public QObject
 {
 	Q_OBJECT
 public slots:
+	void updateBackends();
 	void updateDevices();
 	void updateChannels();
 
@@ -87,6 +88,7 @@ public:
 		virtual ~setupWidget();
 
 		virtual void saveSettings();
+		virtual void show();
 
 	private:
 		ComboBox * m_backend;
