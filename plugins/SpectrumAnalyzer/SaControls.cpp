@@ -45,7 +45,7 @@ SaControls::SaControls(Analyzer *effect) :
 
 	m_inProgress(false)
 {
-	m_colorL = QColor(51, 148, 204, 204);
+	m_colorL = QColor(51, 148, 204, 135);
 	m_colorR = QColor(204, 107, 51, 135);
 	m_colorMono = QColor(51, 148, 204, 204);
 	m_colorBG = QColor(7, 7, 7, 255);			// 20 % gray

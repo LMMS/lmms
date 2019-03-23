@@ -144,21 +144,49 @@ void SaProcessor::analyse(sampleFrame *in_buffer, const fpp_t frame_count)
 			std::copy(	pixel,
 						pixel + binCount() * WATERFALL_HEIGHT - binCount(),
 						pixel + binCount());
+			memset(pixel, 0, binCount() * sizeof (QRgb));
 	
+			int target;
+			float accL = 0;
+			float accR = 0;
+
 			for (int i = 0; i < binCount(); i++) {
-				// apply gamma correction to make small values more visible
-				// (should be around 0.42 to 0.45 for sRGB displays)
-				float ampL = powf(m_normSpectrumL[i], 0.42);
-				float ampR = powf(m_normSpectrumR[i], 0.42);
-	
-				if (stereo) {
-					pixel[i] = qRgb(m_controls->m_colorL.red() * ampL + m_controls->m_colorR.red() * ampR,
-									m_controls->m_colorL.green() * ampL + m_controls->m_colorR.green() * ampR,
-									m_controls->m_colorL.blue() * ampL + m_controls->m_colorR.blue() * ampR);
+				if (m_controls->m_logXModel.value()) {
+					// Logarithmic
+					float band_start = freqToXPixel(binToFreq(i) - binBandwidth() / 2.0, binCount() -1);
+					float band_end = freqToXPixel(binToFreq(i + 1) - binBandwidth() / 2.0, binCount() -1);
+
+					if (band_end - band_start > 1.0) {
+						// draw all pixels covered by this band
+						for (target = band_start; target < band_end; target++) {
+							if (target >= 0 && target < binCount()) {
+								pixel[target] = makePixel(m_normSpectrumL[i], m_normSpectrumR[i]);
+							}
+						}
+						accL = (band_end - (int)band_end) * m_normSpectrumL[i];
+						accR = (band_end - (int)band_end) * m_normSpectrumR[i];
+					} else {
+						// sub-pixel drawing; add contribution of current band
+						target = band_start;
+						if ((int)band_start == (int)band_end) {
+							accL += (band_end - band_start) * m_normSpectrumL[i];
+							accR += (band_end - band_start) * m_normSpectrumR[i];
+						} else {
+							// make sure contribution is split correctly on pixel boundary
+							accL += ((int)band_end - band_start) * m_normSpectrumL[i];
+							accR += ((int)band_end - band_start) * m_normSpectrumR[i];
+
+							if (target >= 0 && target < binCount()) {
+								pixel[target] = makePixel(accL, accR);
+							}
+							// save remaining portion of the band for the following band / pixel
+							accL = (band_end - (int)band_end) * m_normSpectrumL[i];
+							accR = (band_end - (int)band_end) * m_normSpectrumR[i];
+						}
+					}
 				} else {
-					pixel[i] = qRgb(m_controls->m_colorMono.lighter().red() * ampL,
-									m_controls->m_colorMono.lighter().green() * ampL,
-									m_controls->m_colorMono.lighter().blue() * ampL);
+					// Linear: simple 1:1 assignment
+					pixel[i] = makePixel(m_normSpectrumL[i], m_normSpectrumR[i]);
 				}
 			}
 
@@ -174,6 +202,63 @@ void SaProcessor::analyse(sampleFrame *in_buffer, const fpp_t frame_count)
 		m_inProgress = false;
 	}
 }
+
+
+QRgb SaProcessor::makePixel(float left, float right) {
+	// apply gamma correction to make small values more visible
+	// (should be around 0.42 to 0.45 for sRGB displays)
+	if (m_controls->m_stereoModel.value()) {
+		float ampL = powf(left, 0.42);
+		float ampR = powf(right, 0.42);
+		return qRgb(m_controls->m_colorL.red() * ampL + m_controls->m_colorR.red() * ampR,
+					m_controls->m_colorL.green() * ampL + m_controls->m_colorR.green() * ampR,
+					m_controls->m_colorL.blue() * ampL + m_controls->m_colorR.blue() * ampR);
+	} else {
+		float ampL = powf(left, 0.42);
+		return qRgb(m_controls->m_colorMono.lighter().red() * ampL,
+					m_controls->m_colorMono.lighter().green() * ampL,
+					m_controls->m_colorMono.lighter().blue() * ampL);
+	}
+}
+
+float SaProcessor::binToFreq(int index)
+{
+	return (index * getSampleRate() / 2.0) / binCount();
+}
+
+float SaProcessor::binBandwidth()
+{
+	return (getSampleRate() / 2.0) / binCount();
+}
+
+float SaProcessor::freqToXPixel(float freq, int width)
+{
+	if (m_controls->m_logXModel.value()) {
+		if (freq <= 1) {return 0;}
+		float min = log10f(LOWEST_FREQ);
+		float max = log10f(getSampleRate() / 2);
+		float range = max - min;
+		return (log10f(freq) - min) / range * width;
+	} else {
+		float range = getSampleRate() / 2;
+		return freq / range * width;
+	}
+}
+
+
+float SaProcessor::ampToYPixel(float amplitude, int height)
+{
+	if (m_controls->m_logYModel.value()){
+		if (log10f(amplitude) < LOWEST_AMP){
+			return height;
+		} else {
+			return height * log10f(amplitude) / LOWEST_AMP;
+		}
+	} else {
+		return height - height * amplitude;
+	}
+}
+
 
 int SaProcessor::getSampleRate() const
 {

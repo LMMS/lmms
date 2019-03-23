@@ -37,7 +37,16 @@ class Analyzer;
 // FIXME: move this somewhere appropriate
 const int LOWEST_FREQ = 10;		// arbitrary low frequency limit for log. scale (Hz, >0)
 const int LOWEST_AMP = -5;		// arbitrary low amplitude limit for log. scale (10*dB)
+const int RANGE_AUDIBLE_START = 20;
+const int RANGE_AUDIBLE_END = 20000;
+const int RANGE_BASS_START = 20;
+const int RANGE_BASS_END = 300;
+const int RANGE_MID_START = 200;
+const int RANGE_MID_SEND = 5000;
+const int RANGE_HIGH_START = 4000;
+const int RANGE_HIGH_END = 20000;
 const int WATERFALL_HEIGHT = 256;
+
 #define DEBUG 1
 
 class SaControls : public EffectControls

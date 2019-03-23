@@ -88,6 +88,6 @@ private:
 
 	float freqToXPixel(float frequency, int width);
 	float ampToYPixel(float amplitude, int height);
-	float bandToFreq(int index);
+	float binToFreq(int index);
 };
 #endif // SASPECTRUMVIEW_H

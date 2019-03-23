@@ -50,6 +50,11 @@ public:
 
 	void reallocateBuffers(int new_size_index);
 
+	float freqToXPixel(float frequency, int width);
+	float ampToYPixel(float amplitude, int height);
+	float binToFreq(int index);
+	float binBandwidth();
+
 	std::mutex m_dataAccess;
 
 private:
@@ -79,6 +84,8 @@ private:
 
 	bool m_active;
 	bool m_inProgress;
+
+	QRgb makePixel(float left, float right);
 
 	friend class SaSpectrumView;
 	friend class SaWaterfallView;

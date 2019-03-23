@@ -194,8 +194,8 @@ void SaSpectrumView::paintEvent(QPaintEvent *event)
 						(*m_bandHeight)[x] = bands[x];
 					}
 
-					if (freqToXPixel(bandToFreq(x), displayWidth) >= 0) {
-						m_path.lineTo(	freqToXPixel(bandToFreq(x), displayWidth) + displayLeft,
+					if (freqToXPixel(binToFreq(x), displayWidth) >= 0) {
+						m_path.lineTo(	freqToXPixel(binToFreq(x), displayWidth) + displayLeft,
 										ampToYPixel((*m_bandHeight)[x], displayBottom));
 						m_decaySum += (*m_bandHeight)[x];
 					}
@@ -269,39 +269,21 @@ void SaSpectrumView::paintEvent(QPaintEvent *event)
 }
 
 
-float SaSpectrumView::bandToFreq(int index)
+float SaSpectrumView::binToFreq(int index)
 {
-	return index * m_processor->getSampleRate() / (m_processor->binCount() * 2);
+	return m_processor->binToFreq(index);
 }
 
 
 float SaSpectrumView::freqToXPixel(float freq, int width)
 {
-	if (m_controls->m_logXModel.value()){
-		float min = log10f(LOWEST_FREQ);
-		float max = log10f(m_processor->getSampleRate() / 2);
-		float range = max - min;
-		return (log10f(freq) - min) / range * width;
-	} else {
-		float min = LOWEST_FREQ;
-		float max = m_processor->getSampleRate() / 2;
-		float range = max - min;
-		return (freq - min) / range * width;
-	}
+	return m_processor->freqToXPixel(freq, width);
 }
 
 
 float SaSpectrumView::ampToYPixel(float amplitude, int height)
 {
-	if (m_controls->m_logYModel.value()){
-		if (log10f(amplitude) < LOWEST_AMP){
-			return height;
-		} else {
-			return height * log10f(amplitude) / LOWEST_AMP;
-		}
-	} else {
-		return height - height * amplitude;
-	}
+	return m_processor->ampToYPixel(amplitude, height);
 }
 
 
