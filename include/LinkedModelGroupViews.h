@@ -42,10 +42,14 @@
 class LinkedModelGroupViewBase : public QGroupBox
 {
 public:
-	//! @param colNum numbers of columns for the controls
-	//!   (link LEDs not counted)
-	LinkedModelGroupViewBase(QWidget *parent, bool isLinking,
-		int colNum, int curProc, int nProc, const QString &name = QString());
+	/**
+		@param colNum numbers of columns for the controls
+			(link LEDs not counted)
+		@param name Name for the group, like "Left" or "Group 1",
+			automatically set if not given
+	*/
+	LinkedModelGroupViewBase(QWidget *parent, class LinkedModelGroup* model,
+		int colNum, const QString &name = QString());
 	~LinkedModelGroupViewBase();
 
 	//! Reconnect models if model changed
@@ -71,7 +75,6 @@ private:
 class LinkedModelGroupsViewBase
 {
 protected:
-	//! @param pluginWidget A child class which inherits QWidget
 	LinkedModelGroupsViewBase(class LinkedModelGroups *ctrlBase);
 	~LinkedModelGroupsViewBase() = default;
 
