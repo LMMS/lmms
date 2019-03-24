@@ -51,10 +51,12 @@ SaSpectrumView::SaSpectrumView(SaControls *controls, SaProcessor *processor, QWi
 	m_bandPeakL.resize(m_processor->binCount(), 0);
 	m_bandPeakR.resize(m_processor->binCount(), 0);
 
-	m_logFreqTics = makeLogTics(LOWEST_FREQ, 20000);
-	m_linearFreqTics = makeLinearTics(0, 20000);
-	m_logAmpTics = makeDBTics(-50, 0);
+	m_logFreqTics = makeLogTics(m_processor->getFreqRangeMin(), m_processor->getFreqRangeMax());
+	m_linearFreqTics = makeLinearTics(m_processor->getFreqRangeMin(), m_processor->getFreqRangeMax());
+	m_logAmpTics = makeDBTics(10 * LOWEST_LOG_AMP, 0);
 	m_linearAmpTics = makeAmpTics(0, 1);
+
+	m_cursor = QPoint(0, 0);
 }
 
 
@@ -255,6 +257,17 @@ void SaSpectrumView::paintEvent(QPaintEvent *event)
 		m_processor->m_dataAccess.unlock();
 	}
 
+	// draw cursor if it is non-zero
+	if (!m_cursor.isNull()) {
+		painter.setPen(QPen(m_controls->m_colorGrid.lighter(), 1, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
+		painter.drawLine(m_cursor.x(), 1, m_cursor.x(), displayBottom);
+		painter.drawLine(1, m_cursor.y(), displayRight, m_cursor.y());
+		painter.setPen(QPen(m_controls->m_colorLabels, 1, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
+		painter.drawText(displayRight -100, 10, 100, 16, Qt::AlignLeft, "Cursor:");
+		painter.drawText(displayRight -100, 30, 100, 16, Qt::AlignLeft, QString(std::string(std::to_string(m_processor->xPixelToFreq(m_cursor.x() - displayLeft, displayWidth)) + " Hz").c_str()));
+		painter.drawText(displayRight -100, 50, 100, 16, Qt::AlignLeft, QString(std::string(std::to_string(10.0) + " dB").c_str()));
+	}
+
 	// always draw the outline
 	painter.setPen(QPen(m_controls->m_colorGrid, 2, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
 	painter.drawRoundedRect(displayLeft, 1, displayWidth, displayBottom, 2.0, 2.0);
@@ -262,9 +275,9 @@ void SaSpectrumView::paintEvent(QPaintEvent *event)
 	#ifdef DEBUG
 		start_time = std::chrono::high_resolution_clock::now().time_since_epoch().count() - start_time;
 		painter.setPen(QPen(m_controls->m_colorLabels, 1, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
-		painter.drawText(displayRight -100, 10, 100, 16, Qt::AlignLeft, QString(std::string("Max FPS: " + std::to_string(1000000000.0 / start_time)).c_str()));
-		painter.drawText(displayRight -100, 30, 100, 16, Qt::AlignLeft, QString(std::string("Lines ms: " + std::to_string(line_time / 1000000.0)).c_str()));
-		painter.drawText(displayRight -100, 50, 100, 16, Qt::AlignLeft, QString(std::string("Draw ms: " + std::to_string(draw_time / 1000000.0)).c_str()));
+		painter.drawText(displayRight -100, 70, 100, 16, Qt::AlignLeft, QString(std::string("Max FPS: " + std::to_string(1000000000.0 / start_time)).c_str()));
+		painter.drawText(displayRight -100, 90, 100, 16, Qt::AlignLeft, QString(std::string("Lines ms: " + std::to_string(line_time / 1000000.0)).c_str()));
+		painter.drawText(displayRight -100, 110, 100, 16, Qt::AlignLeft, QString(std::string("Draw ms: " + std::to_string(draw_time / 1000000.0)).c_str()));
 	#endif
 }
 
@@ -278,6 +291,12 @@ float SaSpectrumView::binToFreq(int index)
 float SaSpectrumView::freqToXPixel(float freq, int width)
 {
 	return m_processor->freqToXPixel(freq, width);
+}
+
+
+float SaSpectrumView::xPixelToFreq(float x, int width)
+{
+	return m_processor->xPixelToFreq(x, width);
 }
 
 
@@ -374,9 +393,16 @@ std::vector<std::pair<float, std::string>> SaSpectrumView::makeAmpTics(int low, 
 	return result;
 }
 
+
 void SaSpectrumView::periodicUpdate()
 {
 	m_periodicUpdate = true;				//FIXME: visibilitu by mel processor hodnotit i pro waterfall
 	m_processor->setActive(isVisible());
 	update();
+}
+
+
+void SaSpectrumView::mouseMoveEvent(QMouseEvent *event)
+{
+	m_cursor = event->pos();
 }

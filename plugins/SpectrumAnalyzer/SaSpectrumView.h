@@ -27,9 +27,10 @@
 #include <algorithm>
 #include <string>
 #include <utility>
+#include <QMouseEvent>
 #include <QPainter>
-#include <QWidget>
 #include <QString>
+#include <QWidget>
 
 #include "SaControls.h"
 #include "SaProcessor.h"
@@ -54,6 +55,7 @@ public:
 
 protected:
 	virtual void paintEvent(QPaintEvent *event);
+	virtual void mouseMoveEvent(QMouseEvent *event);
 
 private slots:
 	void periodicUpdate();
@@ -86,7 +88,10 @@ private:
 	bool m_periodicUpdate;
 	bool m_freezeRequest;
 
+	QPoint m_cursor;
+
 	float freqToXPixel(float frequency, int width);
+	float xPixelToFreq(float x, int width);
 	float ampToYPixel(float amplitude, int height);
 	float binToFreq(int index);
 };

@@ -31,23 +31,34 @@
 #include "ComboBoxModel.h"
 #include "EffectControls.h"
 
+#define DEBUG 1
+
 
 class Analyzer;
 
 // FIXME: move this somewhere appropriate
-const int LOWEST_FREQ = 10;		// arbitrary low frequency limit for log. scale (Hz, >0)
-const int LOWEST_AMP = -5;		// arbitrary low amplitude limit for log. scale (10*dB)
-const int RANGE_AUDIBLE_START = 20;
-const int RANGE_AUDIBLE_END = 20000;
-const int RANGE_BASS_START = 20;
-const int RANGE_BASS_END = 300;
-const int RANGE_MID_START = 200;
-const int RANGE_MID_SEND = 5000;
-const int RANGE_HIGH_START = 4000;
-const int RANGE_HIGH_END = 20000;
+const int LOWEST_LOG_FREQ = 10;	// arbitrary low frequency limit for log. scale (Hz, >1)
+const int LOWEST_LOG_AMP = -5;	// arbitrary low amplitude limit for log. scale (10*dB)
+
 const int WATERFALL_HEIGHT = 256;
 
-#define DEBUG 1
+enum FREQUENCY_RANGES
+{
+	FRANGE_FULL = 0,
+	FRANGE_AUDIBLE,
+	FRANGE_BASS,
+	FRANGE_MIDS,
+	FRANGE_HIGH
+};
+
+const int FRANGE_AUDIBLE_START = 20;
+const int FRANGE_AUDIBLE_END = 20000;
+const int FRANGE_BASS_START = 20;
+const int FRANGE_BASS_END = 300;
+const int FRANGE_MIDS_START = 200;
+const int FRANGE_MIDS_END = 5000;
+const int FRANGE_HIGH_START = 4000;
+const int FRANGE_HIGH_END = 20000;
 
 class SaControls : public EffectControls
 {
@@ -82,14 +93,18 @@ private:
 	BoolModel m_stereoModel;
 	BoolModel m_smoothModel;
 	BoolModel m_waterfallModel;
+
 	BoolModel m_logXModel;
 	BoolModel m_logYModel;
+
 	BoolModel m_peakHoldModel;
 	BoolModel m_pauseModel;
 	BoolModel m_refFreezeModel;
 
 	ComboBoxModel m_blockSizeModel;
 	ComboBoxModel m_windowModel;
+	ComboBoxModel m_freqRangeModel;
+	ComboBoxModel m_ampRangeModel;
 
 	QColor	m_colorL;
 	QColor	m_colorR;

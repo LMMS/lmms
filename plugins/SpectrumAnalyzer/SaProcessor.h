@@ -51,9 +51,13 @@ public:
 	void reallocateBuffers(int new_size_index);
 
 	float freqToXPixel(float frequency, int width);
+	float xPixelToFreq(float x, int width);
 	float ampToYPixel(float amplitude, int height);
 	float binToFreq(int index);
 	float binBandwidth();
+
+	float getFreqRangeMin();
+	float getFreqRangeMax();
 
 	std::mutex m_dataAccess;
 

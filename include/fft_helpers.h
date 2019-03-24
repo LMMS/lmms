@@ -39,8 +39,7 @@ enum FFT_WINDOWS
         RECTANGULAR = 0,
 		BLACKMAN_HARRIS,
         HAMMING,
-        HANNING,
-		KAISER
+        HANNING
 };
 
 /* returns biggest value from abs_spectrum[spec_size] array

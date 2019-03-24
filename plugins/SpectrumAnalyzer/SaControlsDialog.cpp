@@ -61,46 +61,36 @@ SaControlsDialog::SaControlsDialog(SaControls *controls, SaProcessor *processor)
 
 	// populate config layout
 	// display
-	QLabel * displayLabel = new QLabel("Display", this);
+	QLabel * displayLabel = new QLabel(tr("Display"), this);
 	displayLabel->setStyleSheet("font-weight: bold");
 	config_layout->addWidget(displayLabel, 0, 0);
 
-	LedCheckBox * waterfallButton = new LedCheckBox("Waterfall diagram", this);
+	LedCheckBox * waterfallButton = new LedCheckBox(tr("Waterfall diagram"), this);
 	waterfallButton->setCheckable(true);
 	waterfallButton->setModel(&controls->m_waterfallModel);
 	config_layout->addWidget(waterfallButton, 1, 0);
 
-	LedCheckBox * smoothButton = new LedCheckBox("Averaging", this);
+	LedCheckBox * smoothButton = new LedCheckBox(tr("Averaging"), this);
 	smoothButton->setCheckable(true);
 	smoothButton->setModel(&controls->m_smoothModel);
 	config_layout->addWidget(smoothButton, 2, 0);
 
-	LedCheckBox * logXButton = new LedCheckBox("Log. frequency", this);
-	logXButton->setCheckable(true);
-	logXButton->setModel(&controls->m_logXModel);
-	config_layout->addWidget(logXButton, 3, 0);
-
-	LedCheckBox * logYButton = new LedCheckBox("Log. amplitude", this);
-	logYButton->setCheckable(true);
-	logYButton->setModel(&controls->m_logYModel);
-	config_layout->addWidget(logYButton, 4, 0);
-
-	LedCheckBox * peakHoldButton = new LedCheckBox("Peak hold", this);
+	LedCheckBox * peakHoldButton = new LedCheckBox(tr("Peak hold"), this);
 	peakHoldButton->setCheckable(true);
 	peakHoldButton->setModel(&controls->m_peakHoldModel);
 	config_layout->addWidget(peakHoldButton, 5, 0);
 
-	LedCheckBox * pauseButton = new LedCheckBox("Pause", this);
+	LedCheckBox * pauseButton = new LedCheckBox(tr("Pause"), this);
 	pauseButton->setCheckable(true);
 	pauseButton->setModel(&controls->m_pauseModel);
 	config_layout->addWidget(pauseButton, 6, 0);
 
-	LedCheckBox * refFreezeButton = new LedCheckBox("Reference freeze", this, "", LedCheckBox::Red);
+	LedCheckBox * refFreezeButton = new LedCheckBox(tr("Reference freeze"), this, "", LedCheckBox::Red);
 	refFreezeButton->setModel(&controls->m_refFreezeModel);
 	config_layout->addWidget(refFreezeButton, 7, 0);
 
 	// channels
-	QLabel * channelsLabel = new QLabel("Channel", this);
+	QLabel * channelsLabel = new QLabel(tr("Channel"), this);
 	channelsLabel->setStyleSheet("font-weight: bold");
 	config_layout->addWidget(channelsLabel, 0, 1);
 
@@ -109,9 +99,40 @@ SaControlsDialog::SaControlsDialog(SaControls *controls, SaProcessor *processor)
 	stereoButton->setModel(&controls->m_stereoModel);
 	config_layout->addWidget(stereoButton, 1, 1);
 
+	// range
+	QLabel * rangeLabel = new QLabel(tr("Range"), this);
+	rangeLabel->setStyleSheet("font-weight: bold");
+	config_layout->addWidget(rangeLabel, 2, 1);
+
+	ComboBox * freqRangeCombo = new ComboBox(this, tr("Frequency range"));
+	freqRangeCombo->setFixedSize(64, 22);
+	freqRangeCombo->setModel(&controls->m_freqRangeModel);
+	controls->m_freqRangeModel.addItem(tr("Full (auto)"));
+	controls->m_freqRangeModel.addItem(tr("Audible"));
+	controls->m_freqRangeModel.addItem(tr("Bass"));
+	controls->m_freqRangeModel.addItem(tr("Mids"));
+	controls->m_freqRangeModel.addItem(tr("High"));
+	config_layout->addWidget(freqRangeCombo, 3, 1);
+
+	ComboBox * ampRangeCombo = new ComboBox(this, tr("Amplitude range"));
+	ampRangeCombo->setFixedSize(64, 22);
+	ampRangeCombo->setModel(&controls->m_ampRangeModel);
+	controls->m_ampRangeModel.addItem(tr("test 0"));
+	controls->m_ampRangeModel.addItem(tr("test 1"));
+	config_layout->addWidget(ampRangeCombo, 4, 1);
+
+	LedCheckBox * logXButton = new LedCheckBox(tr("Log. frequency"), this);
+	logXButton->setCheckable(true);
+	logXButton->setModel(&controls->m_logXModel);
+	config_layout->addWidget(logXButton, 5, 1);
+
+	LedCheckBox * logYButton = new LedCheckBox(tr("Log. amplitude"), this);
+	logYButton->setCheckable(true);
+	logYButton->setModel(&controls->m_logYModel);
+	config_layout->addWidget(logYButton, 6, 1);
 
 	// FFT
-	QLabel * fftLabel = new QLabel("FFT", this);
+	QLabel * fftLabel = new QLabel(tr("FFT"), this);
 	fftLabel->setStyleSheet("font-weight: bold");
 	config_layout->addWidget(fftLabel, 0, 2);
 
@@ -120,7 +141,7 @@ SaControlsDialog::SaControlsDialog(SaControls *controls, SaProcessor *processor)
 	config_layout->addWidget(blockSizeLabel, 1, 2);
 
 	ComboBox * blocksizeCombo = new ComboBox(this, tr("FFT Block Size"));
-	blocksizeCombo->setMinimumSize(64, 22);
+	blocksizeCombo->setFixedSize(64, 22);
 	blocksizeCombo->setModel(&controls->m_blockSizeModel);
 	for (int i = 0; i < FFT_BLOCK_SIZES.size(); i++){
 		if (i == 0){
@@ -140,7 +161,7 @@ SaControlsDialog::SaControlsDialog(SaControls *controls, SaProcessor *processor)
 	config_layout->addWidget(windowLabel, 2, 2);
 
 	ComboBox * windowCombo = new ComboBox(this, tr("FFT Window"));
-	windowCombo->setMinimumSize(64, 22);
+	windowCombo->setFixedSize(64, 22);
 	windowCombo->setModel(&controls->m_windowModel);
 	controls->m_windowModel.addItem(tr("Rectangular (Off)"));
 	controls->m_windowModel.addItem(tr("Blackman-Harris (Default)"));

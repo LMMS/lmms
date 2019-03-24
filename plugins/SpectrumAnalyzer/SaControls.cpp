@@ -45,8 +45,8 @@ SaControls::SaControls(Analyzer *effect) :
 
 	m_inProgress(false)
 {
-	m_colorL = QColor(51, 148, 204, 135);
-	m_colorR = QColor(204, 107, 51, 135);
+	m_colorL = QColor(51, 148, 204, 135);		// Make sure the sum of L and R
+	m_colorR = QColor(204, 107, 51, 135);		// stays lower or equal to 255.
 	m_colorMono = QColor(51, 148, 204, 204);
 	m_colorBG = QColor(7, 7, 7, 255);			// 20 % gray
 	m_colorGrid = QColor(30, 34, 38, 255);		// 40 % gray (slightly cold / blue)
