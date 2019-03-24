@@ -38,24 +38,24 @@ public:
 	SaProcessor(SaControls *controls);
 	virtual ~SaProcessor();
 
+	bool getActive() const;
 	bool getInProgress();
 	void clear();
 
 	void analyse(sampleFrame *buf, const fpp_t frames);
 
-	int getSampleRate() const;
-	bool getActive() const;
-
 	void setActive(bool active);
-
 	void reallocateBuffers(int new_size_index);
+
+	float binToFreq(int index);
+	float binBandwidth();
 
 	float freqToXPixel(float frequency, int width);
 	float xPixelToFreq(float x, int width);
 	float ampToYPixel(float amplitude, int height);
-	float binToFreq(int index);
-	float binBandwidth();
+	float yPixelToAmp(float y, int height);
 
+	int getSampleRate() const;
 	float getFreqRangeMin();
 	float getFreqRangeMax();
 

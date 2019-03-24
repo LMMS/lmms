@@ -264,9 +264,9 @@ float SaProcessor::freqToXPixel(float freq, int width)
 {
 	if (m_controls->m_logXModel.value()) {
 		if (freq <= 1) {return 0;}
-		float min = log10f(getFreqRangeMin());
-		float range = log10f(getFreqRangeMax()) - min;
-		return (log10f(freq) - min) / range * width;
+		float min = log10(getFreqRangeMin());
+		float range = log10(getFreqRangeMax()) - min;
+		return (log10(freq) - min) / range * width;
 	} else {
 		float min = getFreqRangeMin();
 		float range = getFreqRangeMax() - min;
@@ -278,15 +278,14 @@ float SaProcessor::freqToXPixel(float freq, int width)
 float SaProcessor::xPixelToFreq(float x, int width)
 {
 	if (m_controls->m_logXModel.value()) {
-		if (x <= 1) {return 0;}
-		float min = log10f(getFreqRangeMin());
-		float max = log10f(getFreqRangeMax());
+		float min = log10(getFreqRangeMin());
+		float max = log10(getFreqRangeMax());
 		float range = max - min;
-		return (log10f(x) - min) / range * width;		//fixme
+		return pow(10, min + x / width * range);
 	} else {
 		float min = getFreqRangeMin();
 		float range = getFreqRangeMax() - min;
-		return min + (x / width * range);
+		return min + x / width * range;
 	}
 }
 
@@ -294,13 +293,23 @@ float SaProcessor::xPixelToFreq(float x, int width)
 float SaProcessor::ampToYPixel(float amplitude, int height)
 {
 	if (m_controls->m_logYModel.value()){
-		if (log10f(amplitude) < LOWEST_LOG_AMP){
+		if (log10(amplitude) < LOWEST_LOG_AMP){
 			return height;
 		} else {
-			return height * log10f(amplitude) / LOWEST_LOG_AMP;
+			return height * log10(amplitude) / LOWEST_LOG_AMP;
 		}
 	} else {
 		return height - height * amplitude;
+	}
+}
+
+
+float SaProcessor::yPixelToAmp(float y, int height)
+{
+	if (m_controls->m_logYModel.value()){
+		return 10 * LOWEST_LOG_AMP * (y / height);
+	} else {
+		return 1 - y / height;
 	}
 }
 

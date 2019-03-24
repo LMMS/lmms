@@ -72,6 +72,7 @@ void SaSpectrumView::paintEvent(QPaintEvent *event)
 	const bool stereo = m_controls->m_stereoModel.value();
 	const bool freeze = m_freezeRequest;
 
+	const int displayTop = 1;
 	const int displayBottom = height() -20;
 	const int displayLeft = 20;
 	const int displayRight = width() -20;
@@ -258,14 +259,21 @@ void SaSpectrumView::paintEvent(QPaintEvent *event)
 	}
 
 	// draw cursor if it is non-zero
-	if (!m_cursor.isNull()) {
+	if (m_cursor.x() > 0 && m_cursor.y() > 0 && m_cursor.x() < width() && m_cursor.y() < height()) {
 		painter.setPen(QPen(m_controls->m_colorGrid.lighter(), 1, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
-		painter.drawLine(m_cursor.x(), 1, m_cursor.x(), displayBottom);
-		painter.drawLine(1, m_cursor.y(), displayRight, m_cursor.y());
-		painter.setPen(QPen(m_controls->m_colorLabels, 1, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
-		painter.drawText(displayRight -100, 10, 100, 16, Qt::AlignLeft, "Cursor:");
-		painter.drawText(displayRight -100, 30, 100, 16, Qt::AlignLeft, QString(std::string(std::to_string(m_processor->xPixelToFreq(m_cursor.x() - displayLeft, displayWidth)) + " Hz").c_str()));
-		painter.drawText(displayRight -100, 50, 100, 16, Qt::AlignLeft, QString(std::string(std::to_string(10.0) + " dB").c_str()));
+		painter.drawLine(m_cursor.x(), displayTop, m_cursor.x(), displayBottom);
+		painter.drawLine(displayLeft, m_cursor.y(), displayRight, m_cursor.y());
+		painter.setPen(QPen(m_controls->m_colorLabels.darker(), 1, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
+		painter.drawText(displayRight -60, 5, 100, 16, Qt::AlignLeft, "Cursor");
+		QString tmps;
+		tmps = QString(std::string(std::to_string((int)m_processor->xPixelToFreq(m_cursor.x() - displayLeft, displayWidth)) + " Hz").c_str());
+		painter.drawText(displayRight -60, 18, 100, 16, Qt::AlignLeft, tmps);
+		if (m_controls->m_logYModel.value()) {
+			tmps = QString(std::string(std::to_string(m_processor->yPixelToAmp(m_cursor.y(), displayBottom)).substr(0, 5) + " dB").c_str());
+		} else {
+			tmps = QString(std::string(std::to_string(m_processor->yPixelToAmp(m_cursor.y(), displayBottom))).substr(0, 4).c_str());
+		}
+		painter.drawText(displayRight -60, 30, 100, 16, Qt::AlignLeft, tmps);
 	}
 
 	// always draw the outline

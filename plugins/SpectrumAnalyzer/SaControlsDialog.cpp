@@ -105,7 +105,8 @@ SaControlsDialog::SaControlsDialog(SaControls *controls, SaProcessor *processor)
 	config_layout->addWidget(rangeLabel, 2, 1);
 
 	ComboBox * freqRangeCombo = new ComboBox(this, tr("Frequency range"));
-	freqRangeCombo->setFixedSize(64, 22);
+	freqRangeCombo->setMinimumSize(80, 22);
+	freqRangeCombo->setMaximumSize(200, 22);
 	freqRangeCombo->setModel(&controls->m_freqRangeModel);
 	controls->m_freqRangeModel.addItem(tr("Full (auto)"));
 	controls->m_freqRangeModel.addItem(tr("Audible"));
@@ -115,7 +116,8 @@ SaControlsDialog::SaControlsDialog(SaControls *controls, SaProcessor *processor)
 	config_layout->addWidget(freqRangeCombo, 3, 1);
 
 	ComboBox * ampRangeCombo = new ComboBox(this, tr("Amplitude range"));
-	ampRangeCombo->setFixedSize(64, 22);
+	ampRangeCombo->setMinimumSize(80, 22);
+	ampRangeCombo->setMaximumSize(200, 22);
 	ampRangeCombo->setModel(&controls->m_ampRangeModel);
 	controls->m_ampRangeModel.addItem(tr("test 0"));
 	controls->m_ampRangeModel.addItem(tr("test 1"));
@@ -141,7 +143,8 @@ SaControlsDialog::SaControlsDialog(SaControls *controls, SaProcessor *processor)
 	config_layout->addWidget(blockSizeLabel, 1, 2);
 
 	ComboBox * blocksizeCombo = new ComboBox(this, tr("FFT Block Size"));
-	blocksizeCombo->setFixedSize(64, 22);
+	blocksizeCombo->setMinimumSize(80, 22);
+	blocksizeCombo->setMaximumSize(200, 22);
 	blocksizeCombo->setModel(&controls->m_blockSizeModel);
 	for (int i = 0; i < FFT_BLOCK_SIZES.size(); i++){
 		if (i == 0){
@@ -161,7 +164,8 @@ SaControlsDialog::SaControlsDialog(SaControls *controls, SaProcessor *processor)
 	config_layout->addWidget(windowLabel, 2, 2);
 
 	ComboBox * windowCombo = new ComboBox(this, tr("FFT Window"));
-	windowCombo->setFixedSize(64, 22);
+	windowCombo->setMinimumSize(80, 22);
+	windowCombo->setMaximumSize(200, 22);
 	windowCombo->setModel(&controls->m_windowModel);
 	controls->m_windowModel.addItem(tr("Rectangular (Off)"));
 	controls->m_windowModel.addItem(tr("Blackman-Harris (Default)"));
