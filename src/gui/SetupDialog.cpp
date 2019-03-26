@@ -1075,12 +1075,7 @@ void SetupDialog::toggleOneInstrumentTrackWindow( bool _enabled )
 
 void SetupDialog::vstEmbedMethodChanged()
 {
-#if QT_VERSION >= 0x050000
 	m_vstEmbedMethod = m_vstEmbedComboBox->currentData().toString();
-#else
-	m_vstEmbedMethod = m_vstEmbedComboBox->itemData(
-			m_vstEmbedComboBox->currentIndex()).toString();
-#endif
 	m_vstAlwaysOnTopCheckBox->setVisible( m_vstEmbedMethod == "none" );
 }
 
