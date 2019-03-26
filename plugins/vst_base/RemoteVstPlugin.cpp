@@ -791,10 +791,6 @@ void RemoteVstPlugin::initEditor()
 						SWP_NOMOVE | SWP_NOZORDER );
 	pluginDispatch( effEditTop );
 
-	if (! EMBED) {
-		showEditor();
-	}
-
 #ifdef LMMS_BUILD_LINUX
 	m_windowID = (intptr_t) GetProp( m_window, "__wine_x11_whole_window" );
 #else

@@ -45,11 +45,11 @@ EqAnalyser::EqAnalyser() :
 	const float a2 = 0.14128;
 	const float a3 = 0.01168;
 
-	for(int i = 0; i < FFT_BUFFER_SIZE; i++)
+	for (int i = 0; i < FFT_BUFFER_SIZE; i++)
 	{
-		m_fftWindow[i] = ( a0 - a1 * cosf( 2 * F_PI * i / (float)FFT_BUFFER_SIZE - 1 )
-									  + a2 * cosf( 4 * F_PI * i / (float)FFT_BUFFER_SIZE-1)
-									  - a3 * cos( 6 * F_PI * i / (float)FFT_BUFFER_SIZE - 1.0 ));
+		m_fftWindow[i] = (a0 - a1 * cos(2 * F_PI * i / ((float)FFT_BUFFER_SIZE - 1.0))
+								+ a2 * cos(4 * F_PI * i / ((float)FFT_BUFFER_SIZE - 1.0))
+								- a3 * cos(6 * F_PI * i / ((float)FFT_BUFFER_SIZE - 1.0)));
 	}
 	clear();
 }
