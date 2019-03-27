@@ -570,9 +570,9 @@ void TrackContentObjectView::dropEvent( QDropEvent * de )
  */
 void TrackContentObjectView::leaveEvent( QEvent * e )
 {
-	while( QApplication::overrideCursor() != NULL )
+	if( cursor().shape() != Qt::BitmapCursor )
 	{
-		QApplication::restoreOverrideCursor();
+		setCursor( QCursor( embed::getIconPixmap( "hand" ), 3, 3 ) );
 	}
 	if( e != NULL )
 	{
@@ -707,8 +707,7 @@ void TrackContentObjectView::mousePressEvent( QMouseEvent * me )
 		if( me->x() < width() - RESIZE_GRIP_WIDTH )
 		{
 			m_action = Move;
-			QCursor c( Qt::SizeAllCursor );
-			QApplication::setOverrideCursor( c );
+			setCursor( Qt::SizeAllCursor );
 			delete m_hint;
 			m_hint = TextFloat::displayMessage( tr( "Hint" ),
 					tr( "Press <%1> and drag to make "
@@ -729,8 +728,7 @@ void TrackContentObjectView::mousePressEvent( QMouseEvent * me )
 		else if( !m_tco->getAutoResize() )
 		{
 			m_action = Resize;
-			QCursor c( Qt::SizeHorCursor );
-			QApplication::setOverrideCursor( c );
+			setCursor( Qt::SizeHorCursor );
 			delete m_hint;
 			m_hint = TextFloat::displayMessage( tr( "Hint" ),
 					tr( "Press <%1> for free "
@@ -932,17 +930,7 @@ void TrackContentObjectView::mouseMoveEvent( QMouseEvent * me )
 	{
 		if( me->x() > width() - RESIZE_GRIP_WIDTH && !me->buttons() && !m_tco->getAutoResize() )
 		{
-			if( QApplication::overrideCursor() != NULL &&
-				QApplication::overrideCursor()->shape() !=
-							Qt::SizeHorCursor )
-			{
-				while( QApplication::overrideCursor() != NULL )
-				{
-					QApplication::restoreOverrideCursor();
-				}
-			}
-			QCursor c( Qt::SizeHorCursor );
-			QApplication::setOverrideCursor( c );
+			setCursor( Qt::SizeHorCursor );
 		}
 		else
 		{
