@@ -440,7 +440,7 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 #endif
 	addPathEntry("Themes directory", m_artworkDir,
 		SLOT(setArtworkDir(const QString &)),
-		SLOT(openArtwortDir()),
+		SLOT(openArtworkDir()),
 		m_adLineEdit, pathSelectors);
 	pathSelectorLayout->addStretch();
 	addPathEntry("Background artwork", m_backgroundArtwork,
