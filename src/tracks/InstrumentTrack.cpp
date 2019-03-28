@@ -1471,17 +1471,11 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 	m_tabWidget->addTab( m_effectView, tr( "Effects" ), "fx_tab", 3 );
 	m_tabWidget->addTab( m_midiView, tr( "MIDI" ), "midi_tab", 4 );
 	m_tabWidget->addTab( m_miscView, tr( "Miscellaneous" ), "misc_tab", 5 );
-
-	//! adjust size of any child widget of the main tab
-	//! required to keep the old look when using a variable sized tab widget
-	auto adjustSize = [](QWidget *w) {
-		w->setMinimumSize(INSTRUMENT_WIDTH, INSTRUMENT_HEIGHT + GRAPHIC_TAB_HEIGHT);
-	};
-	adjustSize(m_ssView);
-	adjustSize(instrumentFunctions);
-	adjustSize(m_effectView);
-	adjustSize(m_midiView);
-	adjustSize(m_miscView);
+	adjustTabSize(m_ssView);
+	adjustTabSize(instrumentFunctions);
+	adjustTabSize(m_effectView);
+	adjustTabSize(m_midiView);
+	adjustTabSize(m_miscView);
 
 	// setup piano-widget
 	m_pianoView = new PianoView( this );
@@ -1497,7 +1491,7 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 
 	resize( sizeHint() );
 
-	QMdiSubWindow * subWin = gui->mainWindow()->addWindowedWidget( this );
+	QMdiSubWindow* subWin = gui->mainWindow()->addWindowedWidget( this );
 	Qt::WindowFlags flags = subWin->windowFlags();
 	flags |= Qt::MSWindowsFixedSizeDialogHint;
 	flags &= ~Qt::WindowMaximizeButtonHint;
@@ -1659,6 +1653,8 @@ void InstrumentTrackWindow::updateInstrumentView()
 
 		modelChanged(); 		// Get the instrument window to refresh
 		m_track->dataChanged(); // Get the text on the trackButton to change
+
+		adjustTabSize(m_instrumentView);
 	}
 }
 
@@ -1846,6 +1842,7 @@ void InstrumentTrackWindow::viewInstrumentInDirection(int d)
 		// scroll the SongEditor/BB-editor to make sure the new trackview label is visible
 		bringToFront->trackContainerView()->scrollToTrackView(bringToFront);
 	}
+	Q_ASSERT(bringToFront);
 	bringToFront->getInstrumentTrackWindow()->setFocus();
 }
 
@@ -1856,6 +1853,11 @@ void InstrumentTrackWindow::viewNextInstrument()
 void InstrumentTrackWindow::viewPrevInstrument()
 {
 	viewInstrumentInDirection(-1);
+}
+
+void InstrumentTrackWindow::adjustTabSize(QWidget *w)
+{
+	w->setMinimumSize(INSTRUMENT_WIDTH - 4, INSTRUMENT_HEIGHT - 4);
 }
 
 #include "InstrumentTrack.moc"
