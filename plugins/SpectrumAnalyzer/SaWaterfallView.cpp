@@ -30,6 +30,10 @@
 #include "MainWindow.h"
 #include "Mixer.h"
 
+
+#include <iostream>
+
+
 SaWaterfallView::SaWaterfallView(SaControls *controls, SaProcessor *processor, QWidget *_parent) :
 	QWidget(_parent),
 	m_controls(controls),
@@ -42,7 +46,8 @@ SaWaterfallView::SaWaterfallView(SaControls *controls, SaProcessor *processor, Q
 
 	connect(gui->mainWindow(), SIGNAL(periodicUpdate()), this, SLOT(periodicUpdate()));
 
-	m_timeTics = makeTimeTics(0, 1);
+	m_timeTics = makeTimeTics();
+	m_oldTimePerLine = (float)m_processor->m_blockSize / m_processor->getSampleRate();
 }
 
 void SaWaterfallView::paintEvent(QPaintEvent *event)
@@ -59,6 +64,12 @@ void SaWaterfallView::paintEvent(QPaintEvent *event)
 
 	QPainter painter(this);
 	painter.setRenderHint(QPainter::Antialiasing, true);
+
+	// check if time tics need to be rebuilt
+	if ((float)m_processor->m_blockSize / m_processor->getSampleRate() != m_oldTimePerLine) {
+		m_timeTics = makeTimeTics();
+		m_oldTimePerLine = (float)m_processor->m_blockSize / m_processor->getSampleRate();
+	}
 
 	painter.setPen(QPen(m_controls->m_colorLabels, 1, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
 	for (auto & line: m_timeTics) {
@@ -107,21 +118,24 @@ void SaWaterfallView::paintEvent(QPaintEvent *event)
 }
 
 
-float SaWaterfallView::timeToYPixel(float time, int height)
-{
-	return height * time;
+float SaWaterfallView::timeToYPixel(float time, int height) {
+	return ((float)height / WATERFALL_HEIGHT) * (time / ((float)m_processor->m_blockSize / m_processor->getSampleRate()));
 }
 
 
-std::vector<std::pair<float, std::string>> SaWaterfallView::makeTimeTics(int low, int high)
-{
+std::vector<std::pair<float, std::string>> SaWaterfallView::makeTimeTics() {
 	std::vector<std::pair<float, std::string>> result;
 	float i;
+	float limit = WATERFALL_HEIGHT * ((float)m_processor->m_blockSize / m_processor->getSampleRate());
+	float increment = std::round(10 * limit / 7) / 10;
 
-	// generate 0.2 linear amplitude increments
-	for (i = 0; i <= high; i += 0.1){
-		if (i >= low){
-			result.push_back(std::pair<float, std::string>(i, std::to_string(i).substr(0, 3)));
+std::cout << "newTics: bsize: " << m_processor->m_blockSize << " sarate: " << m_processor->getSampleRate() << " limit " << limit << std::endl; 
+	// generate linear time increments
+	for (i = 0; i <= limit; i += increment) {
+		if (i < 10) {
+			result.push_back(std::pair<float, std::string>(std::round(i * 10) / 10, std::to_string(std::round(i * 10) / 10).substr(0, 3)));
+		} else {
+			result.push_back(std::pair<float, std::string>(std::round(i), std::to_string(std::round(i)).substr(0, 2)));
 		}
 	}
 
@@ -129,8 +143,7 @@ std::vector<std::pair<float, std::string>> SaWaterfallView::makeTimeTics(int low
 }
 
 
-void SaWaterfallView::periodicUpdate()
-{
+void SaWaterfallView::periodicUpdate() {
 	m_periodicUpdate = true;
 	m_processor->setActive(isVisible());
 	update();

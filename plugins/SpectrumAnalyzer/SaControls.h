@@ -60,31 +60,37 @@ const int FRANGE_MIDS_END = 5000;
 const int FRANGE_HIGH_START = 4000;
 const int FRANGE_HIGH_END = 20000;
 
+enum AMPLITUDE_RANGES
+{
+	ARANGE_EXTENDED = 0,
+	ARANGE_STANDARD,
+	ARANGE_LOUD,
+	ARANGE_SILENT
+};
+
+const int ARANGE_EXTENDED_START = -80;
+const int ARANGE_EXTENDED_END = 10;
+const int ARANGE_STANDARD_START = -50;
+const int ARANGE_STANDARD_END = 0;
+const int ARANGE_LOUD_START = -30;
+const int ARANGE_LOUD_END = 5;
+const int ARANGE_SILENT_START = -60;
+const int ARANGE_SILENT_END = -20;
+
 class SaControls : public EffectControls
 {
 	Q_OBJECT
 public:
 	explicit SaControls(Analyzer* effect);
-	virtual ~SaControls()
-	{
-	}
+	virtual ~SaControls() {}
 
 	virtual void saveSettings (QDomDocument& doc, QDomElement& parent);
 	virtual void loadSettings (const QDomElement &_this);
 
-	inline virtual QString nodeName() const
-	{
-		return "Analyzer";
-	}
-
-	virtual int controlCount()
-	{
-		return 7;
-	}
+	inline virtual QString nodeName() const	{return "Analyzer";}
+	virtual int controlCount() {return 7;}
 
 	virtual EffectControlDialog* createView();
-
-	bool m_inProgress;
 
 private:
 
@@ -112,6 +118,8 @@ private:
 	QColor	m_colorBG;
 	QColor	m_colorGrid;
 	QColor	m_colorLabels;
+
+	bool m_inProgress;
 
 	friend class SaControlsDialog;
 	friend class SaSpectrumView;

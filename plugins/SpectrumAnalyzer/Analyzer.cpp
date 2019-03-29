@@ -59,18 +59,14 @@ Analyzer::Analyzer(Model *parent, const Plugin::Descriptor::SubPluginFeatures::K
 }
 
 
-Analyzer::~Analyzer()
-{
+Analyzer::~Analyzer() {
 }
 
 
-bool Analyzer::processAudioBuffer(sampleFrame *buf, const fpp_t frames)
-{
+bool Analyzer::processAudioBuffer(sampleFrame *buf, const fpp_t frames) {
 	if (!isEnabled() || !isRunning ()) {
 		return false;
 	}
-
-	m_controls.m_inProgress = true;
 
 	if (m_controls.isViewVisible()) {
 		m_processor.analyse(buf, frames);
@@ -78,7 +74,6 @@ bool Analyzer::processAudioBuffer(sampleFrame *buf, const fpp_t frames)
 		m_processor.clear();
 	}
 
-	m_controls.m_inProgress = false;
 	return isRunning();
 }
 
@@ -87,8 +82,7 @@ extern "C"
 {
 
 //needed for getting plugin out of shared lib
-PLUGIN_EXPORT Plugin * lmms_plugin_main(Model* parent, void* data)
-{
+PLUGIN_EXPORT Plugin * lmms_plugin_main(Model* parent, void* data) {
 	return new Analyzer(parent, static_cast<const Plugin::Descriptor::SubPluginFeatures::Key *>(data));
 }
 

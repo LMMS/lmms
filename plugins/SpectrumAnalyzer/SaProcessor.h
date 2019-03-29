@@ -45,7 +45,8 @@ public:
 	void analyse(sampleFrame *buf, const fpp_t frames);
 
 	void setActive(bool active);
-	void reallocateBuffers(int new_size_index);
+	void reallocateBuffers();
+	void rebuildWindow();
 
 	float binToFreq(int index);
 	float binBandwidth();
@@ -56,15 +57,16 @@ public:
 	float yPixelToAmp(float y, int height);
 
 	int getSampleRate() const;
-	float getFreqRangeMin();
+	float getFreqRangeMin(bool linear = false);
 	float getFreqRangeMax();
+	float getAmpRangeMin();
+	float getAmpRangeMax();
 
 	std::mutex m_dataAccess;
 
 private:
 	SaControls *m_controls;
 
-	unsigned int m_blockSizeIndex;	// index to FFT_BLOCK_SIZES[] in fft_helpers.h
 	unsigned int m_blockSize;		// size of FFT input block
 	unsigned int m_sampleRate;
 	unsigned int m_windowType;
@@ -88,6 +90,7 @@ private:
 
 	bool m_active;
 	bool m_inProgress;
+	bool m_destroyed;
 
 	QRgb makePixel(float left, float right);
 

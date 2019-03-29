@@ -49,63 +49,63 @@ SaControlsDialog::SaControlsDialog(SaControls *controls, SaProcessor *processor)
 	m_processor(processor)
 {
 	// top level layout and 
-	QBoxLayout * master_layout = new QHBoxLayout;
-	QSplitter * display_splitter = new QSplitter(Qt::Vertical);
+	QBoxLayout *master_layout = new QHBoxLayout;
+	QSplitter *display_splitter = new QSplitter(Qt::Vertical);
 	master_layout->addWidget(display_splitter);
 	window()->setLayout(master_layout);
 
 	// config section
-	QWidget * config_widget = new QWidget;				// wrapper for QSplitter
-	QGridLayout * config_layout = new QGridLayout;
+	QWidget *config_widget = new QWidget;				// wrapper for QSplitter
+	QGridLayout *config_layout = new QGridLayout;
 	config_widget->setLayout(config_layout);
 
 	// populate config layout
 	// display
-	QLabel * displayLabel = new QLabel(tr("Display"), this);
+	QLabel *displayLabel = new QLabel(tr("Display"), this);
 	displayLabel->setStyleSheet("font-weight: bold");
 	config_layout->addWidget(displayLabel, 0, 0);
 
-	LedCheckBox * waterfallButton = new LedCheckBox(tr("Waterfall diagram"), this);
+	LedCheckBox *waterfallButton = new LedCheckBox(tr("Waterfall diagram"), this);
 	waterfallButton->setCheckable(true);
 	waterfallButton->setModel(&controls->m_waterfallModel);
 	config_layout->addWidget(waterfallButton, 1, 0);
 
-	LedCheckBox * smoothButton = new LedCheckBox(tr("Averaging"), this);
+	LedCheckBox *smoothButton = new LedCheckBox(tr("Averaging"), this);
 	smoothButton->setCheckable(true);
 	smoothButton->setModel(&controls->m_smoothModel);
 	config_layout->addWidget(smoothButton, 2, 0);
 
-	LedCheckBox * peakHoldButton = new LedCheckBox(tr("Peak hold"), this);
+	LedCheckBox *peakHoldButton = new LedCheckBox(tr("Peak hold"), this);
 	peakHoldButton->setCheckable(true);
 	peakHoldButton->setModel(&controls->m_peakHoldModel);
 	config_layout->addWidget(peakHoldButton, 5, 0);
 
-	LedCheckBox * pauseButton = new LedCheckBox(tr("Pause"), this);
+	LedCheckBox *pauseButton = new LedCheckBox(tr("Pause"), this);
 	pauseButton->setCheckable(true);
 	pauseButton->setModel(&controls->m_pauseModel);
 	config_layout->addWidget(pauseButton, 6, 0);
 
-	LedCheckBox * refFreezeButton = new LedCheckBox(tr("Reference freeze"), this, "", LedCheckBox::Red);
+	LedCheckBox *refFreezeButton = new LedCheckBox(tr("Reference freeze"), this, "", LedCheckBox::Red);
 	refFreezeButton->setModel(&controls->m_refFreezeModel);
 	config_layout->addWidget(refFreezeButton, 7, 0);
 
 	// channels
-	QLabel * channelsLabel = new QLabel(tr("Channel"), this);
+	QLabel *channelsLabel = new QLabel(tr("Channel"), this);
 	channelsLabel->setStyleSheet("font-weight: bold");
 	config_layout->addWidget(channelsLabel, 0, 1);
 
-	LedCheckBox * stereoButton = new LedCheckBox("Stereo", this);
+	LedCheckBox *stereoButton = new LedCheckBox("Stereo", this);
 	stereoButton->setCheckable(true);
 	stereoButton->setModel(&controls->m_stereoModel);
 	config_layout->addWidget(stereoButton, 1, 1);
 
 	// range
-	QLabel * rangeLabel = new QLabel(tr("Range"), this);
+	QLabel *rangeLabel = new QLabel(tr("Range"), this);
 	rangeLabel->setStyleSheet("font-weight: bold");
 	config_layout->addWidget(rangeLabel, 2, 1);
 
-	ComboBox * freqRangeCombo = new ComboBox(this, tr("Frequency range"));
-	freqRangeCombo->setMinimumSize(80, 22);
+	ComboBox *freqRangeCombo = new ComboBox(this, tr("Frequency range"));
+	freqRangeCombo->setMinimumSize(100, 22);
 	freqRangeCombo->setMaximumSize(200, 22);
 	freqRangeCombo->setModel(&controls->m_freqRangeModel);
 	controls->m_freqRangeModel.addItem(tr("Full (auto)"));
@@ -115,37 +115,40 @@ SaControlsDialog::SaControlsDialog(SaControls *controls, SaProcessor *processor)
 	controls->m_freqRangeModel.addItem(tr("High"));
 	config_layout->addWidget(freqRangeCombo, 3, 1);
 
-	ComboBox * ampRangeCombo = new ComboBox(this, tr("Amplitude range"));
-	ampRangeCombo->setMinimumSize(80, 22);
+	ComboBox *ampRangeCombo = new ComboBox(this, tr("Amplitude range"));
+	ampRangeCombo->setMinimumSize(100, 22);
 	ampRangeCombo->setMaximumSize(200, 22);
 	ampRangeCombo->setModel(&controls->m_ampRangeModel);
-	controls->m_ampRangeModel.addItem(tr("test 0"));
-	controls->m_ampRangeModel.addItem(tr("test 1"));
+	controls->m_ampRangeModel.addItem(tr("Extended"));
+	controls->m_ampRangeModel.addItem(tr("Standard"));
+	controls->m_ampRangeModel.addItem(tr("Loud focus"));
+	controls->m_ampRangeModel.addItem(tr("Silent focus"));
+	controls->m_ampRangeModel.setValue(controls->m_ampRangeModel.findText(tr("Standard")));
 	config_layout->addWidget(ampRangeCombo, 4, 1);
 
-	LedCheckBox * logXButton = new LedCheckBox(tr("Log. frequency"), this);
+	LedCheckBox *logXButton = new LedCheckBox(tr("Log. frequency"), this);
 	logXButton->setCheckable(true);
 	logXButton->setModel(&controls->m_logXModel);
 	config_layout->addWidget(logXButton, 5, 1);
 
-	LedCheckBox * logYButton = new LedCheckBox(tr("Log. amplitude"), this);
+	LedCheckBox *logYButton = new LedCheckBox(tr("Log. amplitude"), this);
 	logYButton->setCheckable(true);
 	logYButton->setModel(&controls->m_logYModel);
 	config_layout->addWidget(logYButton, 6, 1);
 
 	// FFT
-	QLabel * fftLabel = new QLabel(tr("FFT"), this);
+	QLabel *fftLabel = new QLabel(tr("FFT"), this);
 	fftLabel->setStyleSheet("font-weight: bold");
 	config_layout->addWidget(fftLabel, 0, 2);
 
-	QLabel * blockSizeLabel = new QLabel(tr("Block size"), this);
+	QLabel *blockSizeLabel = new QLabel(tr("Block size"), this);
 	blockSizeLabel->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
 	config_layout->addWidget(blockSizeLabel, 1, 2);
 
-	ComboBox * blocksizeCombo = new ComboBox(this, tr("FFT Block Size"));
-	blocksizeCombo->setMinimumSize(80, 22);
-	blocksizeCombo->setMaximumSize(200, 22);
-	blocksizeCombo->setModel(&controls->m_blockSizeModel);
+	ComboBox *blockSizeCombo = new ComboBox(this, tr("FFT Block Size"));
+	blockSizeCombo->setMinimumSize(100, 22);
+	blockSizeCombo->setMaximumSize(200, 22);
+	blockSizeCombo->setModel(&controls->m_blockSizeModel);
 	for (int i = 0; i < FFT_BLOCK_SIZES.size(); i++){
 		if (i == 0){
 			controls->m_blockSizeModel.addItem((std::to_string(FFT_BLOCK_SIZES[i]) + " ").c_str() + tr("(Fast, low-res.)"));
@@ -156,15 +159,17 @@ SaControlsDialog::SaControlsDialog(SaControls *controls, SaProcessor *processor)
 		}
 	}
 	controls->m_blockSizeModel.setValue(controls->m_blockSizeModel.findText("2048"));
-	config_layout->addWidget(blocksizeCombo, 1, 3);
+	config_layout->addWidget(blockSizeCombo, 1, 3);
+	processor->reallocateBuffers();
+	connect(&controls->m_blockSizeModel, &ComboBoxModel::dataChanged, [=] {processor->reallocateBuffers();});
 
 	// FFT window -- keep the same order as in the fft_helpers.h WINDOWS enum!
-	QLabel * windowLabel = new QLabel(tr("Window"), this);
+	QLabel *windowLabel = new QLabel(tr("Window"), this);
 	windowLabel->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
 	config_layout->addWidget(windowLabel, 2, 2);
 
-	ComboBox * windowCombo = new ComboBox(this, tr("FFT Window"));
-	windowCombo->setMinimumSize(80, 22);
+	ComboBox *windowCombo = new ComboBox(this, tr("FFT Window"));
+	windowCombo->setMinimumSize(100, 22);
 	windowCombo->setMaximumSize(200, 22);
 	windowCombo->setModel(&controls->m_windowModel);
 	controls->m_windowModel.addItem(tr("Rectangular (Off)"));
@@ -173,10 +178,12 @@ SaControlsDialog::SaControlsDialog(SaControls *controls, SaProcessor *processor)
 	controls->m_windowModel.addItem(tr("Hanning"));
 	controls->m_windowModel.setValue(controls->m_windowModel.findText(tr("Blackman-Harris (Default)")));
 	config_layout->addWidget(windowCombo, 2, 3);
+	processor->rebuildWindow();
+	connect(&controls->m_windowModel, &ComboBoxModel::dataChanged, [=] {processor->rebuildWindow();});
 
 	// create spectrum displays
-	SaSpectrumView * spectrum = new SaSpectrumView(controls, processor, this);
-	SaWaterfallView * waterfall = new SaWaterfallView(controls, processor, this);
+	SaSpectrumView *spectrum = new SaSpectrumView(controls, processor, this);
+	SaWaterfallView *waterfall = new SaWaterfallView(controls, processor, this);
 
 	// add everything to top-level splitter
 	display_splitter->addWidget(config_widget);

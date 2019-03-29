@@ -50,7 +50,7 @@ public:
 
 	float timeToYPixel(float time, int height);
 
-	std::vector<std::pair<float, std::string>> makeTimeTics(int low, int high);
+	std::vector<std::pair<float, std::string>> makeTimeTics();
 
 protected:
 	virtual void paintEvent(QPaintEvent *event);
@@ -66,6 +66,7 @@ private:
 
 	std::vector<std::pair<float, std::string>> m_timeTics;	// 0..n (s)
 
+	float m_oldTimePerLine;
 	bool m_periodicUpdate;
 };
 #endif // SAWATERFALLVIEW_H

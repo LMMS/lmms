@@ -56,6 +56,7 @@ public:
 protected:
 	virtual void paintEvent(QPaintEvent *event);
 	virtual void mouseMoveEvent(QMouseEvent *event);
+	virtual void mousePressEvent(QMouseEvent *event);
 
 private slots:
 	void periodicUpdate();
@@ -79,16 +80,18 @@ private:
 	std::vector<std::pair<float, std::string>> m_logAmpTics;	// dB
 	std::vector<std::pair<float, std::string>> m_linearAmpTics;	// 0..1
 
-	std::vector<float> m_bandHeightL;
-	std::vector<float> m_bandHeightR;
-	std::vector<float> m_bandPeakL;
-	std::vector<float> m_bandPeakR;
+	std::vector<float> m_binHeightL;
+	std::vector<float> m_binHeightR;
+	std::vector<float> m_binPeakL;
+	std::vector<float> m_binPeakR;
 
 	float m_decaySum;
 	bool m_periodicUpdate;
 	bool m_freezeRequest;
 
 	QPoint m_cursor;
+	int m_freqRangeIndex;
+	int m_ampRangeIndex;
 
 	float freqToXPixel(float frequency, int width);
 	float xPixelToFreq(float x, int width);

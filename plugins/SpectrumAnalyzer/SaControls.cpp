@@ -41,9 +41,7 @@ SaControls::SaControls(Analyzer *effect) :
 	m_logXModel(true, this, tr("Logarithmic X axis scale")),
 	m_logYModel(true, this, tr("Logarithmic Y axis scale")),
 	m_peakHoldModel(false, this, tr("Keep the peak values displayed")),
-	m_refFreezeModel(false, this, tr("Freeze current input as a reference")),
-
-	m_inProgress(false)
+	m_refFreezeModel(false, this, tr("Freeze current input as a reference"))
 {
 	m_colorL = QColor(51, 148, 204, 135);		// Make sure the sum of L and R
 	m_colorR = QColor(204, 107, 51, 135);		// stays lower or equal to 255.
