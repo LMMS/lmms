@@ -405,6 +405,7 @@ void AutomationEditor::keyPressEvent(QKeyEvent * ke )
 			}
 			break;
 
+		case Qt::Key_Backspace:
 		case Qt::Key_Delete:
 			deleteSelectedValues();
 			ke->accept();
@@ -2487,6 +2488,9 @@ void AutomationEditorWindow::dropEvent( QDropEvent *_de )
 
 void AutomationEditorWindow::dragEnterEvent( QDragEnterEvent *_dee )
 {
+	if (! m_editor->validPattern() ) {
+		return;
+	}
 	StringPairDrag::processDragEnterEvent( _dee, "automatable_model" );
 }
 

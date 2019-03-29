@@ -1122,9 +1122,9 @@ extern "C"
 {
 
 // necessary for getting instance out of shared lib
-PLUGIN_EXPORT Plugin * lmms_plugin_main( Model*, void* data )
+PLUGIN_EXPORT Plugin * lmms_plugin_main( Model* m, void* )
 {
-	return new sfxrInstrument( static_cast<InstrumentTrack *>( data ) );
+	return new sfxrInstrument( static_cast<InstrumentTrack *>( m ) );
 }
 
 

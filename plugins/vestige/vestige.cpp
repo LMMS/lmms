@@ -186,7 +186,13 @@ vestigeInstrument::~vestigeInstrument()
 
 void vestigeInstrument::loadSettings( const QDomElement & _this )
 {
-	loadFile( _this.attribute( "plugin" ) );
+	QString plugin = _this.attribute( "plugin" );
+	if( plugin.isEmpty() )
+	{
+		return;
+	}
+
+	loadFile( plugin );
 	m_pluginMutex.lock();
 	if( m_plugin != NULL )
 	{
@@ -217,13 +223,8 @@ void vestigeInstrument::loadSettings( const QDomElement & _this )
 				knobFModel[ i ]->setInitValue(LocaleHelper::toFloat(s_dumpValues.at(2)));
 			}
 
-#if QT_VERSION < 0x050000
-			connect( knobFModel[i], SIGNAL( dataChanged( Model * ) ),
-				this, SLOT( setParameter( Model * ) ), Qt::DirectConnection );
-#else
 			connect( knobFModel[i], &FloatModel::dataChanged, this,
 				[this, i]() { setParameter( knobFModel[i] ); }, Qt::DirectConnection);
-#endif
 		}
 	}
 	m_pluginMutex.unlock();
@@ -978,13 +979,8 @@ manageVestigeInstrumentView::manageVestigeInstrumentView( Instrument * _instrume
 		}
 
 		FloatModel * model = m_vi->knobFModel[i];
-#if QT_VERSION < 0x050000
-		connect( model, SIGNAL( dataChanged( Model * ) ), this,
-			SLOT( setParameter( Model * ) ), Qt::DirectConnection );
-#else
 		connect( model, &FloatModel::dataChanged, this,
 			[this, model]() { setParameter( model ); }, Qt::DirectConnection);
-#endif
 		vstKnobs[i] ->setModel( model );
 	}
 
@@ -1180,9 +1176,9 @@ extern "C"
 {
 
 // necessary for getting instance out of shared lib
-Q_DECL_EXPORT Plugin * lmms_plugin_main( Model *, void * _data )
+Q_DECL_EXPORT Plugin * lmms_plugin_main( Model *m, void * )
 {
-	return new vestigeInstrument( static_cast<InstrumentTrack *>( _data ) );
+	return new vestigeInstrument( static_cast<InstrumentTrack *>( m ) );
 }
 
 

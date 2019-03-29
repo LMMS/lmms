@@ -76,6 +76,7 @@ OPTION(WANT_DEBUG_FPE	"Debug floating point exceptions" OFF)
 IF(LMMS_BUILD_APPLE)
 	# Fix linking on 10.14+. See issue #4762 on github
 	LINK_DIRECTORIES(/usr/local/lib)
+	SET(WANT_SOUNDIO OFF)
 	SET(WANT_ALSA OFF)
 	SET(WANT_PULSEAUDIO OFF)
 	SET(WANT_VST OFF)
