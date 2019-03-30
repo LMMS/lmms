@@ -74,16 +74,18 @@ private:
 
 	QPainterPath m_pathL;
 	QPainterPath m_pathR;
+	QPainterPath m_pathPeakL;
+	QPainterPath m_pathPeakR;
 
 	std::vector<std::pair<int, std::string>> m_logFreqTics;		// 10-20-50... Hz
 	std::vector<std::pair<int, std::string>> m_linearFreqTics;	// 2k-4k-6k... Hz
 	std::vector<std::pair<float, std::string>> m_logAmpTics;	// dB
 	std::vector<std::pair<float, std::string>> m_linearAmpTics;	// 0..1
 
-	std::vector<float> m_binHeightL;
-	std::vector<float> m_binHeightR;
-	std::vector<float> m_binPeakL;
-	std::vector<float> m_binPeakR;
+	std::vector<float> m_displayBufferL;
+	std::vector<float> m_displayBufferR;
+	std::vector<float> m_peakBufferL;
+	std::vector<float> m_peakBufferR;
 
 	float m_decaySum;
 	bool m_periodicUpdate;
@@ -93,9 +95,21 @@ private:
 	int m_freqRangeIndex;
 	int m_ampRangeIndex;
 
+	void refreshPaths(bool freeze_update);
+	QPainterPath makePath(std::vector<float> &displayBuffer, float resolution);
+	void drawGrid(QPainter &painter);
+	void drawCursor(QPainter &painter);
 	float freqToXPixel(float frequency, int width);
 	float xPixelToFreq(float x, int width);
 	float ampToYPixel(float amplitude, int height);
 	float binToFreq(int index);
+
+	const float m_smoothFactor = 0.15;
+	const float m_peakFallFactor = 0.992;
+	int m_displayTop;
+	int m_displayBottom;
+	int m_displayLeft;
+	int m_displayRight;
+	int m_displayWidth;
 };
 #endif // SASPECTRUMVIEW_H
