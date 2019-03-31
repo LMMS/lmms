@@ -1,25 +1,28 @@
 /* SaSpectrumView.cpp - implementation of SaSpectrumView class.
-*
-* Copyright (c) 2014-2017, David French <dave/dot/french3/at/googlemail/dot/com>
-* Copyright (c) 2019 Martin Pavelek <he29/dot/HS/at/gmail/dot/com>
-*
-* This file is part of LMMS - https://lmms.io
-* This program is free software; you can redistribute it and/or
-* modify it under the terms of the GNU General Public
-* License as published by the Free Software Foundation; either
-* version 2 of the License, or (at your option) any later version.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	See the GNU
-* General Public License for more details.
-*
-* You should have received a copy of the GNU General Public
-* License along with this program (see COPYING); if not, write to the
-* Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
-* Boston, MA 02110-1301 USA.
-*
-*/
+ *
+ * Copyright (c) 2019 Martin Pavelek <he29/dot/HS/at/gmail/dot/com>
+ *
+ * Based partially on Eq plugin code,
+ * Copyright (c) 2014-2017, David French <dave/dot/french3/at/googlemail/dot/com>
+ *
+ * This file is part of LMMS - https://lmms.io
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public
+ * License along with this program (see COPYING); if not, write to the
+ * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ * Boston, MA 02110-1301 USA.
+ *
+ */
 
 #include "SaSpectrumView.h"
 
@@ -38,10 +41,10 @@ SaSpectrumView::SaSpectrumView(SaControls *controls, SaProcessor *processor, QWi
 	m_controls(controls),
 	m_processor(processor),
 	m_periodicUpdate(false),
-	m_freezeRequest(false)
+	m_freezeRequest(false),
+	m_frozen(false)
 {
 	setMinimumSize(400, 200);
-
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
 	connect(gui->mainWindow(), SIGNAL(periodicUpdate()), this, SLOT(periodicUpdate()));
@@ -63,14 +66,12 @@ SaSpectrumView::SaSpectrumView(SaControls *controls, SaProcessor *processor, QWi
 
 
 void SaSpectrumView::paintEvent(QPaintEvent *event) {
-	#ifdef DEBUG
+	#ifdef SA_DEBUG
 		int start_time = std::chrono::high_resolution_clock::now().time_since_epoch().count();
 		int line_time = 0, draw_time = 0;
 	#endif
 
 	// 0) constants and init stuff
-	const bool freeze = m_freezeRequest;
-
 	m_displayTop = 1;
 	m_displayBottom = height() -20;
 	m_displayLeft = 20;
@@ -90,35 +91,38 @@ void SaSpectrumView::paintEvent(QPaintEvent *event) {
 		m_linearAmpTics = makeAmpTics(m_processor->getAmpRangeMin(), m_processor->getAmpRangeMax());
 	}
 
+	if (!m_frozen && m_controls->m_refFreezeModel.value()) {
+		m_freezeRequest = true;
+	} else if (!m_controls->m_refFreezeModel.value()) {
+		m_frozen = false;
+	}
+
 	QPainter painter(this);
 	painter.setRenderHint(QPainter::Antialiasing, true);
 
-
 	// 1) background, grid and labels
 	drawGrid(painter);
-
 
 	// 2) Spectrum display
 	// draw the graph only if there is any input or smooth decay / averaging residue
 	m_processor->m_dataAccess.lock();
 	if (m_decaySum > 0 || notEmpty(m_processor->m_normSpectrumL) || notEmpty(m_processor->m_normSpectrumR)) {
 		// update paths with new data if needed
-		if (!m_processor->getInProgress() && m_periodicUpdate == true) {
-			#ifdef DEBUG
+		if (m_periodicUpdate == true) {
+			#ifdef SA_DEBUG
 				line_time = std::chrono::high_resolution_clock::now().time_since_epoch().count();
 			#endif
-			refreshPaths(freeze);
-			#ifdef DEBUG
+			refreshPaths();
+			#ifdef SA_DEBUG
 				line_time = std::chrono::high_resolution_clock::now().time_since_epoch().count() - line_time;
 			#endif
 
-			if (freeze) {m_freezeRequest = false;}
+			m_periodicUpdate = false;
 		}
-
 		m_processor->m_dataAccess.unlock();
 
 		// draw stored paths
-		#ifdef DEBUG
+		#ifdef SA_DEBUG
 			draw_time = std::chrono::high_resolution_clock::now().time_since_epoch().count();
 		#endif
 		if (m_controls->m_stereoModel.value()) {
@@ -128,15 +132,17 @@ void SaSpectrumView::paintEvent(QPaintEvent *event) {
 			painter.fillPath(m_pathL, QBrush(m_controls->m_colorMono));
 		}
 		if (m_controls->m_peakHoldModel.value() || m_controls->m_refFreezeModel.value()) {
-			painter.setPen(QPen(m_controls->m_colorR, 1, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
-			painter.drawPath(m_pathPeakR);
-			painter.setPen(QPen(m_controls->m_colorL, 1, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
-			painter.drawPath(m_pathPeakL);
-		} else {
-			painter.setPen(QPen(m_controls->m_colorL, 1, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
-			painter.drawPath(m_pathPeakL);
+			if (m_controls->m_stereoModel.value()) {
+				painter.setPen(QPen(m_controls->m_colorR, 1, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
+				painter.drawPath(m_pathPeakR);
+				painter.setPen(QPen(m_controls->m_colorL, 1, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
+				painter.drawPath(m_pathPeakL);
+			} else {
+				painter.setPen(QPen(m_controls->m_colorL, 1, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
+				painter.drawPath(m_pathPeakL);
+			}
 		}
-		#ifdef DEBUG
+		#ifdef SA_DEBUG
 			draw_time = std::chrono::high_resolution_clock::now().time_since_epoch().count() - draw_time;
 		#endif
 	} else {
@@ -153,7 +159,7 @@ void SaSpectrumView::paintEvent(QPaintEvent *event) {
 	painter.drawRoundedRect(m_displayLeft, 1, m_displayWidth, m_displayBottom, 2.0, 2.0);
 
 	// display measurement results
-	#ifdef DEBUG
+	#ifdef SA_DEBUG
 		start_time = std::chrono::high_resolution_clock::now().time_since_epoch().count() - start_time;
 		painter.setPen(QPen(m_controls->m_colorLabels, 1, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
 		painter.drawText(m_displayRight -100, 70, 100, 16, Qt::AlignLeft,
@@ -166,7 +172,7 @@ void SaSpectrumView::paintEvent(QPaintEvent *event) {
 }
 
 
-void SaSpectrumView::refreshPaths(bool freeze_update = false) {
+void SaSpectrumView::refreshPaths() {
 	// check if bin count changed and reallocate display buffers if needed
 	if (m_processor->binCount() != m_displayBufferL.size()) {
 		m_displayBufferL.clear();
@@ -179,7 +185,6 @@ void SaSpectrumView::refreshPaths(bool freeze_update = false) {
 		m_peakBufferR.resize(m_processor->binCount(), 0);
 	}
 
-	m_periodicUpdate = false;		//FIXME wtf does it do?
 	m_decaySum = 0;
 
 	float *bins = m_processor->m_normSpectrumL.data();
@@ -199,14 +204,16 @@ void SaSpectrumView::refreshPaths(bool freeze_update = false) {
 			}
 			// peak-hold and reference freeze (using the same curve
 			// to save draw time and to keep screen clean and readable)
-			if (m_controls->m_refFreezeModel.value() && freeze_update) {
-				peakBuffer[n] = bins[n];
+			if (m_controls->m_refFreezeModel.value() && m_freezeRequest) {
+				peakBuffer[n] = displayBuffer[n];
 			} else if (m_controls->m_peakHoldModel.value() && !m_controls->m_pauseModel.value()) {
 				if (bins[n] > peakBuffer[n]) {
 					peakBuffer[n] = bins[n];
-				} else {
+				} else if (!m_controls->m_refFreezeModel.value()) {
 					peakBuffer[n] = peakBuffer[n] * m_peakFallFactor;
 				}
+			} else if (!m_controls->m_refFreezeModel.value() && !m_controls->m_peakHoldModel.value()) {
+				peakBuffer[n] = 0;
 			}
 			// take note if there was actually anything to display
 			m_decaySum += displayBuffer[n] + peakBuffer[n];
@@ -219,6 +226,11 @@ void SaSpectrumView::refreshPaths(bool freeze_update = false) {
 		} else {
 			break;
 		}
+	}
+
+	if (m_controls->m_refFreezeModel.value() && m_freezeRequest) {
+		m_freezeRequest = false;
+		m_frozen = true;
 	}
 
 	// use updated display buffers to prepare new paths for QPainter
@@ -246,11 +258,10 @@ QPainterPath SaSpectrumView::makePath(std::vector<float> &displayBuffer, float r
 	// creating a misleading slope leading to zero (at log. scale)
 	path.lineTo(m_displayLeft, ampToYPixel(displayBuffer[0], m_displayBottom));
 
-	// display is flipped, large values are closer to zero, init to high number
-	float acc = 0xffffffff;
-	float first_x = -1;
-
 	// translate bins to path points
+	// display is flipped, y values grow towards zero
+	float max = m_displayBottom;
+	float first_x = -1;
 	for (int n = 0; n < m_processor->binCount(); n++) {
 		float x = freqToXPixel(binToFreq(n), m_displayWidth);
 		float x1 = freqToXPixel(binToFreq(n + 1), m_displayWidth);
@@ -262,11 +273,11 @@ QPainterPath SaSpectrumView::makePath(std::vector<float> &displayBuffer, float r
 			// per logical pixel. As opposed to limiting the bin count, this
 			// allows high resolution display if user resizes the analyzer.
 			// Accumulate bins that share the pixel and use the highest:
-			acc = y < acc ? y : acc;
+			max = y < max ? y : max;
 			if ((int)(x * pixel_limit) != (int)(x1 * pixel_limit)) {
 				x = (x + first_x) / 2;
-				path.lineTo(x + m_displayLeft, acc + m_displayTop);
-				acc = 0xffffffff;
+				path.lineTo(x + m_displayLeft, max + m_displayTop);
+				max = m_displayBottom;
 				first_x = x1;
 			}
 		} else {
@@ -401,17 +412,17 @@ std::vector<std::pair<int, std::string>> SaSpectrumView::makeLogTics(int low, in
 	int b[] = {14, 30, 70};
 
 	// generate 1-2-5 (+ optional 3-7-14) series
-	for (i = 1; i <= high; i *= 10){
+	for (i = 1; i <= high; i *= 10) {
 		for (j = 0; j < 3; j++) {
-			if (i * a[j] >= low && i * a[j] <= high){
-				if (i * a[j] < 1000){
+			if (i * a[j] >= low && i * a[j] <= high) {
+				if (i * a[j] < 1000) {
 					result.push_back(std::pair<int, std::string>(i * a[j], std::to_string(i * a[j])));
 				} else {
 					result.push_back(std::pair<int, std::string>(i * a[j], std::to_string(i * a[j] / 1000) + "k"));
 				}
 			}
-			if ((log10(high) - log10(low) < 2) && (i * b[j] >= low && i * b[j] <= high)){
-				if (i * b[j] < 1500){
+			if ((log10(high) - log10(low) < 2) && (i * b[j] >= low && i * b[j] <= high)) {
+				if (i * b[j] < 1500) {
 					result.push_back(std::pair<int, std::string>(i * b[j], std::to_string(i * b[j])));
 				} else {
 					result.push_back(std::pair<int, std::string>(i * b[j], std::to_string(i * b[j] / 1000) + "k"));
@@ -419,7 +430,6 @@ std::vector<std::pair<int, std::string>> SaSpectrumView::makeLogTics(int low, in
 			}
 		}
 	}
-
 	return result;
 }
 
@@ -434,16 +444,15 @@ std::vector<std::pair<int, std::string>> SaSpectrumView::makeLinearTics(int low,
 	else {increment = 2000;}
 
 	// generate 2k-4k-6k series
-	for (i = 0; i <= high; i += increment){
+	for (i = 0; i <= high; i += increment) {
 		if (i >= low){
-			if (i < 1000){
+			if (i < 1000) {
 				result.push_back(std::pair<int, std::string>(i, std::to_string(i)));
 			} else {
 				result.push_back(std::pair<int, std::string>(i, std::to_string(i/1000) + "k"));
 			}
 		}
 	}
-
 	return result;
 }
 
@@ -451,9 +460,15 @@ std::vector<std::pair<int, std::string>> SaSpectrumView::makeLinearTics(int low,
 std::vector<std::pair<float, std::string>> SaSpectrumView::makeDBTics(int low, int high) {
 	std::vector<std::pair<float, std::string>> result;
 	float i;
+	float increment;
 
-	// generate 10 dB increments
-	for (i = 0.00000001; 10 * log10(i) <= high; i *= 10){
+	if (high - low < 45) {
+		increment = pow(10, 0.6);	// 6dB
+	} else {
+		increment = 10;				// 10dB
+	}
+	// generate n dB increments, start checking at -90
+	for (i = 0.000000001; 10 * log10(i) <= high; i *= increment){
 		if (10 * log10(i) >= low){
 			result.push_back(std::pair<float, std::string>(i, std::to_string((int)std::round(10 * log10(i)))));
 		}

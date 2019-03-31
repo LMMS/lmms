@@ -1,25 +1,27 @@
 /* SaProcessor.cpp - implementation of SaProcessor class.
-*
-* Copyright (c) 2014-2017, David French <dave/dot/french3/at/googlemail/dot/com>
-* Copyright (c) 2019 Martin Pavelek <he29/dot/HS/at/gmail/dot/com>
-*
-* This file is part of LMMS - https://lmms.io
-* This program is free software; you can redistribute it and/or
-* modify it under the terms of the GNU General Public
-* License as published by the Free Software Foundation; either
-* version 2 of the License, or (at your option) any later version.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	See the GNU
-* General Public License for more details.
-*
-* You should have received a copy of the GNU General Public
-* License along with this program (see COPYING); if not, write to the
-* Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
-* Boston, MA 02110-1301 USA.
-*
-*/
+ *
+ * Copyright (c) 2019 Martin Pavelek <he29/dot/HS/at/gmail/dot/com>
+ *
+ * Based partially on Eq plugin code,
+ * Copyright (c) 2014-2017, David French <dave/dot/french3/at/googlemail/dot/com>
+ *
+ * This file is part of LMMS - https://lmms.io
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public
+ * License along with this program (see COPYING); if not, write to the
+ * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ * Boston, MA 02110-1301 USA.
+ *
+ */
 
 #include "SaProcessor.h"
 
@@ -36,7 +38,6 @@ SaProcessor::SaProcessor(SaControls *controls) :
 	m_windowType(BLACKMAN_HARRIS),
 	m_framesFilledUp(0),
 	m_active(false),
-	m_inProgress(false),
 	m_destroyed(false)
 {
 	m_fftWindow.resize(m_blockSize, 1.0);
@@ -76,15 +77,13 @@ SaProcessor::~SaProcessor()
 }
 
 
-void SaProcessor::analyse(sampleFrame *in_buffer, const fpp_t frame_count)
-{
-	#ifdef DEBUG
+void SaProcessor::analyse(sampleFrame *in_buffer, const fpp_t frame_count) {
+	#ifdef SA_DEBUG
 		int start_time = std::chrono::high_resolution_clock::now().time_since_epoch().count();
 	#endif
-	// only analyse if the view is visible and not paused
+	// only analyse if any view is visible and not paused
 	if (m_active && !m_controls->m_pauseModel.value())
 	{
-		m_inProgress = true;
 		const bool stereo = m_controls->m_stereoModel.value();
 
 		// process data
@@ -93,7 +92,7 @@ void SaProcessor::analyse(sampleFrame *in_buffer, const fpp_t frame_count)
 			// fill sample buffers
 			for (; frame < frame_count && m_framesFilledUp < m_blockSize; frame++, m_framesFilledUp++)
 			{
-				if (stereo) {	//FIXME: predelat na case (dat do SaControls) a pridat MonoRMS
+				if (stereo) {
 					m_bufferL[m_framesFilledUp] = in_buffer[frame][0];
 					m_bufferR[m_framesFilledUp] = in_buffer[frame][1];
 				} else {
@@ -104,7 +103,6 @@ void SaProcessor::analyse(sampleFrame *in_buffer, const fpp_t frame_count)
 	
 			// run analysis if buffers contain enough data
 			if (m_framesFilledUp < m_blockSize) {
-				m_inProgress = false;
 				return;
 			}
 	
@@ -191,14 +189,12 @@ void SaProcessor::analyse(sampleFrame *in_buffer, const fpp_t frame_count)
 
 			m_dataAccess.unlock();
 
-			#ifdef DEBUG
+			#ifdef SA_DEBUG
 				start_time = std::chrono::high_resolution_clock::now().time_since_epoch().count() - start_time;
 				std::cout << "Processed " << m_framesFilledUp << " samples in " << start_time / 1000000.0 << " ms" << std::endl;
 			#endif
 			m_framesFilledUp = 0;
 		}
-
-		m_inProgress = false;
 	}
 }
 
@@ -233,11 +229,6 @@ bool SaProcessor::getActive() const {
 
 void SaProcessor::setActive(bool active) {
 	m_active = active;
-}
-
-
-bool SaProcessor::getInProgress() {
-	return m_inProgress;
 }
 
 
@@ -318,7 +309,6 @@ void SaProcessor::clear() {
 // --------------------------------------
 // Frequency conversion helpers
 //
-
 float SaProcessor::binToFreq(int index) {
 	return (index * getSampleRate() / 2.0) / binCount();
 }
@@ -384,7 +374,6 @@ float SaProcessor::xPixelToFreq(float x, int width) {
 // --------------------------------------
 // Amplitude conversion helpers
 //
-
 float SaProcessor::ampToYPixel(float amplitude, int height) {
 	if (m_controls->m_logYModel.value()){
 		if (10 * log10(amplitude) < getAmpRangeMin()){
@@ -418,10 +407,10 @@ float SaProcessor::yPixelToAmp(float y, int height) {
 float SaProcessor::getAmpRangeMin() {
 	switch (m_controls->m_ampRangeModel.value()) {
 		case ARANGE_EXTENDED: return ARANGE_EXTENDED_START;
-		case ARANGE_LOUD: return ARANGE_LOUD_START;
-		case ARANGE_SILENT: return ARANGE_SILENT_START;
+		case ARANGE_AUDIBLE: return ARANGE_AUDIBLE_START;
+		case ARANGE_NOISE: return ARANGE_NOISE_START;
 		default:
-		case ARANGE_STANDARD: return ARANGE_STANDARD_START;
+		case ARANGE_DEFAULT: return ARANGE_DEFAULT_START;
 	}
 }
 
@@ -429,10 +418,10 @@ float SaProcessor::getAmpRangeMin() {
 float SaProcessor::getAmpRangeMax() {
 	switch (m_controls->m_ampRangeModel.value()) {
 		case ARANGE_EXTENDED: return ARANGE_EXTENDED_END;
-		case ARANGE_LOUD: return ARANGE_LOUD_END;
-		case ARANGE_SILENT: return ARANGE_SILENT_END;
+		case ARANGE_AUDIBLE: return ARANGE_AUDIBLE_END;
+		case ARANGE_NOISE: return ARANGE_NOISE_END;
 		default:
-		case ARANGE_STANDARD: return ARANGE_STANDARD_END;
+		case ARANGE_DEFAULT: return ARANGE_DEFAULT_END;
 	}
 }
 

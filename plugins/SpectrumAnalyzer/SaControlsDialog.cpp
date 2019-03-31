@@ -129,12 +129,6 @@ SaControlsDialog::SaControlsDialog(SaControls *controls, SaProcessor *processor)
 	freqRangeCombo->setMinimumSize(100, 22);
 	freqRangeCombo->setMaximumSize(200, 22);
 	freqRangeCombo->setModel(&controls->m_freqRangeModel);
-	controls->m_freqRangeModel.addItem(tr("Full (auto)"));
-	controls->m_freqRangeModel.addItem(tr("Audible"));
-	controls->m_freqRangeModel.addItem(tr("Bass"));
-	controls->m_freqRangeModel.addItem(tr("Mids"));
-	controls->m_freqRangeModel.addItem(tr("High"));
-	if (!controls->m_loaded) {controls->m_freqRangeModel.setValue(controls->m_freqRangeModel.findText(tr("Full (auto)")));}
 	config_layout->addWidget(freqRangeCombo, 0, 3, 2, 1);
 
 	PixmapButton *logYButton = new PixmapButton(this, tr("Log. amplitude"));
@@ -152,11 +146,6 @@ SaControlsDialog::SaControlsDialog(SaControls *controls, SaProcessor *processor)
 	ampRangeCombo->setMinimumSize(100, 22);
 	ampRangeCombo->setMaximumSize(200, 22);
 	ampRangeCombo->setModel(&controls->m_ampRangeModel);
-	controls->m_ampRangeModel.addItem(tr("Extended"));
-	controls->m_ampRangeModel.addItem(tr("Standard"));
-	controls->m_ampRangeModel.addItem(tr("Loud focus"));
-	controls->m_ampRangeModel.addItem(tr("Silent focus"));
-	if (!controls->m_loaded) {controls->m_ampRangeModel.setValue(controls->m_ampRangeModel.findText(tr("Standard")));}
 	config_layout->addWidget(ampRangeCombo, 2, 3, 2, 1);
 
 
@@ -171,16 +160,6 @@ SaControlsDialog::SaControlsDialog(SaControls *controls, SaProcessor *processor)
 	blockSizeCombo->setMinimumSize(100, 22);
 	blockSizeCombo->setMaximumSize(200, 22);
 	blockSizeCombo->setModel(&controls->m_blockSizeModel);
-	for (int i = 0; i < FFT_BLOCK_SIZES.size(); i++){
-		if (i == 0){
-			controls->m_blockSizeModel.addItem((std::to_string(FFT_BLOCK_SIZES[i]) + " ").c_str() + tr("(Fast, low-res.)"));
-		} else if (i == FFT_BLOCK_SIZES.size() - 1){
-			controls->m_blockSizeModel.addItem((std::to_string(FFT_BLOCK_SIZES[i]) + " ").c_str() + tr("(Slow, high-res.)"));
-		} else {
-			controls->m_blockSizeModel.addItem(std::to_string(FFT_BLOCK_SIZES[i]).c_str());
-		}
-	}
-	if (!controls->m_loaded) {controls->m_blockSizeModel.setValue(controls->m_blockSizeModel.findText("2048"));}
 	config_layout->addWidget(blockSizeCombo, 0, 5, 2, 1);
 	processor->reallocateBuffers();
 	connect(&controls->m_blockSizeModel, &ComboBoxModel::dataChanged, [=] {processor->reallocateBuffers();});
@@ -196,11 +175,6 @@ SaControlsDialog::SaControlsDialog(SaControls *controls, SaProcessor *processor)
 	windowCombo->setMinimumSize(100, 22);
 	windowCombo->setMaximumSize(200, 22);
 	windowCombo->setModel(&controls->m_windowModel);
-	controls->m_windowModel.addItem(tr("Rectangular (Off)"));
-	controls->m_windowModel.addItem(tr("Blackman-Harris (Default)"));
-	controls->m_windowModel.addItem(tr("Hamming"));
-	controls->m_windowModel.addItem(tr("Hanning"));
-	if (!controls->m_loaded) {controls->m_windowModel.setValue(controls->m_windowModel.findText(tr("Blackman-Harris (Default)")));}
 	config_layout->addWidget(windowCombo, 2, 5, 2, 1);
 	processor->rebuildWindow();
 	connect(&controls->m_windowModel, &ComboBoxModel::dataChanged, [=] {processor->rebuildWindow();});

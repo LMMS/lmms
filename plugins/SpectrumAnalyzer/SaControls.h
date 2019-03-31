@@ -1,7 +1,6 @@
 /*
  * SaControls.h - declaration of SaControls class.
  *
- * Copyright (c) 2014 David French <dave/dot/french3/at/googlemail/dot/com>
  * Copyright (c) 2019 Martin Pavelek <he29/dot/HS/at/gmail/dot/com>
  *
  * This file is part of LMMS - https://lmms.io
@@ -31,16 +30,11 @@
 #include "ComboBoxModel.h"
 #include "EffectControls.h"
 
-//#define DEBUG 1
+//#define DEBUG 1		// define DEBUG to enable performance measurements
 
-
-class Analyzer;
-
-// FIXME: move this somewhere appropriate
-const int LOWEST_LOG_FREQ = 10;	// arbitrary low frequency limit for log. scale (Hz, >1)
-const int LOWEST_LOG_AMP = -5;	// arbitrary low amplitude limit for log. scale (10*dB)
-
-const int WATERFALL_HEIGHT = 256;
+// define shared parameters, limits, ranges etc.
+const int LOWEST_LOG_FREQ = 10;		// arbitrary low frequency limit for log. scale (Hz, >1)
+const int WATERFALL_HEIGHT = 200;	// number of lines displayed by the real-time spectrogram
 
 enum FREQUENCY_RANGES {
 	FRANGE_FULL = 0,
@@ -61,19 +55,22 @@ const int FRANGE_HIGH_END = 20000;
 
 enum AMPLITUDE_RANGES {
 	ARANGE_EXTENDED = 0,
-	ARANGE_STANDARD,
-	ARANGE_LOUD,
-	ARANGE_SILENT
+	ARANGE_DEFAULT,
+	ARANGE_AUDIBLE,
+	ARANGE_NOISE
 };
 
 const int ARANGE_EXTENDED_START = -80;
-const int ARANGE_EXTENDED_END = 10;
-const int ARANGE_STANDARD_START = -50;
-const int ARANGE_STANDARD_END = 0;
-const int ARANGE_LOUD_START = -30;
-const int ARANGE_LOUD_END = 5;
-const int ARANGE_SILENT_START = -60;
-const int ARANGE_SILENT_END = -20;
+const int ARANGE_EXTENDED_END = 20;
+const int ARANGE_DEFAULT_START = -30;
+const int ARANGE_DEFAULT_END = 6;
+const int ARANGE_AUDIBLE_START = -50;
+const int ARANGE_AUDIBLE_END = 10;
+const int ARANGE_NOISE_START = -60;
+const int ARANGE_NOISE_END = -20;
+
+
+class Analyzer;
 
 class SaControls : public EffectControls {
 	Q_OBJECT
@@ -81,13 +78,13 @@ public:
 	explicit SaControls(Analyzer* effect);
 	virtual ~SaControls() {}
 
+	virtual EffectControlDialog* createView();
+
 	virtual void saveSettings (QDomDocument& doc, QDomElement& parent);
 	virtual void loadSettings (const QDomElement &_this);
 
-	inline virtual QString nodeName() const	{return "Analyzer";}
-	virtual int controlCount() {return 7;}
-
-	virtual EffectControlDialog* createView();
+	virtual QString nodeName() const {return "Analyzer";}
+	virtual int controlCount() {return 12;}
 
 private:
 	Analyzer *m_effect;
@@ -114,9 +111,6 @@ private:
 	QColor	m_colorBG;
 	QColor	m_colorGrid;
 	QColor	m_colorLabels;
-
-	bool m_loaded;
-	bool m_inProgress;
 
 	friend class SaControlsDialog;
 	friend class SaSpectrumView;

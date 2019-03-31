@@ -1,7 +1,6 @@
 /*
  * SaControls.cpp - definition of SaControls class.
  *
- * Copyright (c) 2014 David French <dave/dot/french3/at/googlemail/dot/com>
  * Copyright (c) 2019 Martin Pavelek <he29/dot/HS/at/gmail/dot/com>
  *
  * This file is part of LMMS - https://lmms.io
@@ -49,16 +48,49 @@ SaControls::SaControls(Analyzer *effect) :
 	m_freqRangeModel(this, tr("Frequency range")),
 	m_ampRangeModel(this, tr("Amplitude range")),
 	m_blockSizeModel(this, tr("FFT block size")),
-	m_windowModel(this, tr("FFT window type")),
-
-	m_loaded(false)
+	m_windowModel(this, tr("FFT window type"))
 {
+	m_freqRangeModel.addItem(tr("Full (auto)"));
+	m_freqRangeModel.addItem(tr("Audible"));
+	m_freqRangeModel.addItem(tr("Bass"));
+	m_freqRangeModel.addItem(tr("Mids"));
+	m_freqRangeModel.addItem(tr("High"));
+	m_freqRangeModel.setValue(m_freqRangeModel.findText(tr("Full (auto)")));
+
+	m_ampRangeModel.addItem(tr("Extended"));
+	m_ampRangeModel.addItem(tr("Default"));
+	m_ampRangeModel.addItem(tr("Audible"));
+	m_ampRangeModel.addItem(tr("Noise"));
+	m_ampRangeModel.setValue(m_ampRangeModel.findText(tr("Default")));
+
+	for (int i = 0; i < FFT_BLOCK_SIZES.size(); i++){
+		if (i == 0){
+			m_blockSizeModel.addItem((std::to_string(FFT_BLOCK_SIZES[i]) + " ").c_str() + tr("(Fast, low-res.)"));
+		} else if (i == FFT_BLOCK_SIZES.size() - 1){
+			m_blockSizeModel.addItem((std::to_string(FFT_BLOCK_SIZES[i]) + " ").c_str() + tr("(Slow, high-res.)"));
+		} else {
+			m_blockSizeModel.addItem(std::to_string(FFT_BLOCK_SIZES[i]).c_str());
+		}
+	}
+	m_blockSizeModel.setValue(m_blockSizeModel.findText("2048"));
+
+	m_windowModel.addItem(tr("Rectangular (Off)"));
+	m_windowModel.addItem(tr("Blackman-Harris (Default)"));
+	m_windowModel.addItem(tr("Hamming"));
+	m_windowModel.addItem(tr("Hanning"));
+	m_windowModel.setValue(m_windowModel.findText(tr("Blackman-Harris (Default)")));
+
 	m_colorL = QColor(51, 148, 204, 135);		// Make sure the sum of L and R
 	m_colorR = QColor(204, 107, 51, 135);		// stays lower or equal to 255.
 	m_colorMono = QColor(51, 148, 204, 204);
 	m_colorBG = QColor(7, 7, 7, 255);			// 20 % gray
 	m_colorGrid = QColor(30, 34, 38, 255);		// 40 % gray (slightly cold / blue)
 	m_colorLabels = QColor(192, 202, 212, 255);	// 90 % gray (slightly cold / blue)
+}
+
+
+EffectControlDialog* SaControls::createView() {
+	return new SaControlsDialog(this, m_effect->getProcessor());
 }
 
 
@@ -73,12 +105,6 @@ void SaControls::loadSettings(const QDomElement &_this) {
 	m_ampRangeModel.loadSettings(_this, "RangeY");
 	m_blockSizeModel.loadSettings(_this, "BlockSize");
 	m_windowModel.loadSettings(_this, "WindowType");
-	m_loaded = true;
-}
-
-
-EffectControlDialog* SaControls::createView() {
-	return new SaControlsDialog(this, m_effect->getProcessor());
 }
 
 
