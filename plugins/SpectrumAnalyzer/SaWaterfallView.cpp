@@ -24,14 +24,11 @@
 
 #include <mutex>
 
-#include "SaProcessor.h"
 #include "Engine.h"
 #include "GuiApplication.h"
 #include "MainWindow.h"
 #include "Mixer.h"
-
-
-#include <iostream>
+#include "SaProcessor.h"
 
 
 SaWaterfallView::SaWaterfallView(SaControls *controls, SaProcessor *processor, QWidget *_parent) :
@@ -129,7 +126,6 @@ std::vector<std::pair<float, std::string>> SaWaterfallView::makeTimeTics() {
 	float limit = WATERFALL_HEIGHT * ((float)m_processor->m_blockSize / m_processor->getSampleRate());
 	float increment = std::round(10 * limit / 7) / 10;
 
-std::cout << "newTics: bsize: " << m_processor->m_blockSize << " sarate: " << m_processor->getSampleRate() << " limit " << limit << std::endl; 
 	// generate linear time increments
 	for (i = 0; i <= limit; i += increment) {
 		if (i < 10) {

@@ -31,7 +31,7 @@
 #include "ComboBoxModel.h"
 #include "EffectControls.h"
 
-#define DEBUG 1
+//#define DEBUG 1
 
 
 class Analyzer;
@@ -42,8 +42,7 @@ const int LOWEST_LOG_AMP = -5;	// arbitrary low amplitude limit for log. scale (
 
 const int WATERFALL_HEIGHT = 256;
 
-enum FREQUENCY_RANGES
-{
+enum FREQUENCY_RANGES {
 	FRANGE_FULL = 0,
 	FRANGE_AUDIBLE,
 	FRANGE_BASS,
@@ -60,8 +59,7 @@ const int FRANGE_MIDS_END = 5000;
 const int FRANGE_HIGH_START = 4000;
 const int FRANGE_HIGH_END = 20000;
 
-enum AMPLITUDE_RANGES
-{
+enum AMPLITUDE_RANGES {
 	ARANGE_EXTENDED = 0,
 	ARANGE_STANDARD,
 	ARANGE_LOUD,
@@ -77,8 +75,7 @@ const int ARANGE_LOUD_END = 5;
 const int ARANGE_SILENT_START = -60;
 const int ARANGE_SILENT_END = -20;
 
-class SaControls : public EffectControls
-{
+class SaControls : public EffectControls {
 	Q_OBJECT
 public:
 	explicit SaControls(Analyzer* effect);
@@ -93,24 +90,23 @@ public:
 	virtual EffectControlDialog* createView();
 
 private:
-
 	Analyzer *m_effect;
 
-	BoolModel m_stereoModel;
-	BoolModel m_smoothModel;
+	BoolModel m_pauseModel;
+	BoolModel m_refFreezeModel;
+
 	BoolModel m_waterfallModel;
+	BoolModel m_smoothModel;
+	BoolModel m_stereoModel;
+	BoolModel m_peakHoldModel;
 
 	BoolModel m_logXModel;
 	BoolModel m_logYModel;
 
-	BoolModel m_peakHoldModel;
-	BoolModel m_pauseModel;
-	BoolModel m_refFreezeModel;
-
-	ComboBoxModel m_blockSizeModel;
-	ComboBoxModel m_windowModel;
 	ComboBoxModel m_freqRangeModel;
 	ComboBoxModel m_ampRangeModel;
+	ComboBoxModel m_blockSizeModel;
+	ComboBoxModel m_windowModel;
 
 	QColor	m_colorL;
 	QColor	m_colorR;
@@ -119,6 +115,7 @@ private:
 	QColor	m_colorGrid;
 	QColor	m_colorLabels;
 
+	bool m_loaded;
 	bool m_inProgress;
 
 	friend class SaControlsDialog;

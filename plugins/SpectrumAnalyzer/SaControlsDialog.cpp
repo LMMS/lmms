@@ -36,6 +36,7 @@
 #include "embed.h"
 #include "Engine.h"
 #include "LedCheckbox.h"
+#include "PixmapButton.h"
 
 #include "SaControls.h"
 #include "SaSpectrumView.h"
@@ -60,49 +61,69 @@ SaControlsDialog::SaControlsDialog(SaControls *controls, SaProcessor *processor)
 	config_widget->setLayout(config_layout);
 
 	// populate config layout
-	// display
-	QLabel *displayLabel = new QLabel(tr("Display"), this);
-	displayLabel->setStyleSheet("font-weight: bold");
-	config_layout->addWidget(displayLabel, 0, 0);
+	float iconSize = 22.0 * window()->devicePixelRatio();
 
-	LedCheckBox *waterfallButton = new LedCheckBox(tr("Waterfall diagram"), this);
+	// pause and freeze
+	PixmapButton *pauseButton = new PixmapButton(this, tr("Pause"));
+	QPixmap *pauseOnPixmap = new QPixmap(PLUGIN_NAME::getIconPixmap("play").scaled(1.2 * iconSize, 1.2 * iconSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
+	QPixmap *pauseOffPixmap = new QPixmap(PLUGIN_NAME::getIconPixmap("pause").scaled(1.2 * iconSize, 1.2 * iconSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
+	pauseOnPixmap->setDevicePixelRatio(window()->devicePixelRatio());
+	pauseOffPixmap->setDevicePixelRatio(window()->devicePixelRatio());
+	pauseButton->setActiveGraphic(*pauseOnPixmap);
+	pauseButton->setInactiveGraphic(*pauseOffPixmap);
+	pauseButton->setCheckable(true);
+	pauseButton->setModel(&controls->m_pauseModel);
+	config_layout->addWidget(pauseButton, 0, 0, 2, 1);
+
+	PixmapButton *refFreezeButton = new PixmapButton(this, tr("Reference freeze"));
+	QPixmap *freezeOnPixmap = new QPixmap(PLUGIN_NAME::getIconPixmap("freeze").scaled(1.2 * iconSize, 1.2 * iconSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
+	QPixmap *freezeOffPixmap = new QPixmap(PLUGIN_NAME::getIconPixmap("freeze_off").scaled(1.2 * iconSize, 1.2 * iconSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
+	freezeOnPixmap->setDevicePixelRatio(window()->devicePixelRatio());
+	freezeOffPixmap->setDevicePixelRatio(window()->devicePixelRatio());
+	refFreezeButton->setActiveGraphic(*freezeOnPixmap);
+	refFreezeButton->setInactiveGraphic(*freezeOffPixmap);
+	refFreezeButton->setCheckable(true);
+	refFreezeButton->setModel(&controls->m_refFreezeModel);
+	config_layout->addWidget(refFreezeButton, 2, 0, 2, 1);
+
+
+	// display
+	LedCheckBox *waterfallButton = new LedCheckBox(tr("Waterfall"), this);
 	waterfallButton->setCheckable(true);
+	waterfallButton->setMinimumSize(70, 12);
 	waterfallButton->setModel(&controls->m_waterfallModel);
-	config_layout->addWidget(waterfallButton, 1, 0);
+	config_layout->addWidget(waterfallButton, 0, 1);
 
 	LedCheckBox *smoothButton = new LedCheckBox(tr("Averaging"), this);
 	smoothButton->setCheckable(true);
+	smoothButton->setMinimumSize(70, 12);
 	smoothButton->setModel(&controls->m_smoothModel);
-	config_layout->addWidget(smoothButton, 2, 0);
-
-	LedCheckBox *peakHoldButton = new LedCheckBox(tr("Peak hold"), this);
-	peakHoldButton->setCheckable(true);
-	peakHoldButton->setModel(&controls->m_peakHoldModel);
-	config_layout->addWidget(peakHoldButton, 5, 0);
-
-	LedCheckBox *pauseButton = new LedCheckBox(tr("Pause"), this);
-	pauseButton->setCheckable(true);
-	pauseButton->setModel(&controls->m_pauseModel);
-	config_layout->addWidget(pauseButton, 6, 0);
-
-	LedCheckBox *refFreezeButton = new LedCheckBox(tr("Reference freeze"), this, "", LedCheckBox::Red);
-	refFreezeButton->setModel(&controls->m_refFreezeModel);
-	config_layout->addWidget(refFreezeButton, 7, 0);
-
-	// channels
-	QLabel *channelsLabel = new QLabel(tr("Channel"), this);
-	channelsLabel->setStyleSheet("font-weight: bold");
-	config_layout->addWidget(channelsLabel, 0, 1);
+	config_layout->addWidget(smoothButton, 1, 1);
 
 	LedCheckBox *stereoButton = new LedCheckBox("Stereo", this);
 	stereoButton->setCheckable(true);
+	stereoButton->setMinimumSize(70, 12);
 	stereoButton->setModel(&controls->m_stereoModel);
-	config_layout->addWidget(stereoButton, 1, 1);
+	config_layout->addWidget(stereoButton, 2, 1);
 
-	// range
-	QLabel *rangeLabel = new QLabel(tr("Range"), this);
-	rangeLabel->setStyleSheet("font-weight: bold");
-	config_layout->addWidget(rangeLabel, 2, 1);
+	LedCheckBox *peakHoldButton = new LedCheckBox(tr("Peak hold"), this);
+	peakHoldButton->setCheckable(true);
+	peakHoldButton->setMinimumSize(70, 12);
+	peakHoldButton->setModel(&controls->m_peakHoldModel);
+	config_layout->addWidget(peakHoldButton, 3, 1);
+
+
+	// ranges
+	PixmapButton *logXButton = new PixmapButton(this, tr("Log. frequency"));
+	QPixmap *logXOnPixmap = new QPixmap(PLUGIN_NAME::getIconPixmap("x_log").scaled(iconSize, iconSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
+	QPixmap *logXOffPixmap = new QPixmap(PLUGIN_NAME::getIconPixmap("x_linear").scaled(iconSize, iconSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
+	logXOnPixmap->setDevicePixelRatio(window()->devicePixelRatio());
+	logXOffPixmap->setDevicePixelRatio(window()->devicePixelRatio());
+	logXButton->setActiveGraphic(*logXOnPixmap);
+	logXButton->setInactiveGraphic(*logXOffPixmap);
+	logXButton->setCheckable(true);
+	logXButton->setModel(&controls->m_logXModel);
+	config_layout->addWidget(logXButton, 0, 2, 2, 1, Qt::AlignRight);
 
 	ComboBox *freqRangeCombo = new ComboBox(this, tr("Frequency range"));
 	freqRangeCombo->setMinimumSize(100, 22);
@@ -113,7 +134,19 @@ SaControlsDialog::SaControlsDialog(SaControls *controls, SaProcessor *processor)
 	controls->m_freqRangeModel.addItem(tr("Bass"));
 	controls->m_freqRangeModel.addItem(tr("Mids"));
 	controls->m_freqRangeModel.addItem(tr("High"));
-	config_layout->addWidget(freqRangeCombo, 3, 1);
+	if (!controls->m_loaded) {controls->m_freqRangeModel.setValue(controls->m_freqRangeModel.findText(tr("Full (auto)")));}
+	config_layout->addWidget(freqRangeCombo, 0, 3, 2, 1);
+
+	PixmapButton *logYButton = new PixmapButton(this, tr("Log. amplitude"));
+	QPixmap *logYOnPixmap = new QPixmap(PLUGIN_NAME::getIconPixmap("y_log").scaled(iconSize, iconSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
+	QPixmap *logYOffPixmap = new QPixmap(PLUGIN_NAME::getIconPixmap("y_linear").scaled(iconSize, iconSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
+	logYOnPixmap->setDevicePixelRatio(window()->devicePixelRatio());
+	logYOffPixmap->setDevicePixelRatio(window()->devicePixelRatio());
+	logYButton->setActiveGraphic(*logYOnPixmap);
+	logYButton->setInactiveGraphic(*logYOffPixmap);
+	logYButton->setCheckable(true);
+	logYButton->setModel(&controls->m_logYModel);
+	config_layout->addWidget(logYButton, 2, 2, 2, 1, Qt::AlignRight);
 
 	ComboBox *ampRangeCombo = new ComboBox(this, tr("Amplitude range"));
 	ampRangeCombo->setMinimumSize(100, 22);
@@ -123,27 +156,16 @@ SaControlsDialog::SaControlsDialog(SaControls *controls, SaProcessor *processor)
 	controls->m_ampRangeModel.addItem(tr("Standard"));
 	controls->m_ampRangeModel.addItem(tr("Loud focus"));
 	controls->m_ampRangeModel.addItem(tr("Silent focus"));
-	controls->m_ampRangeModel.setValue(controls->m_ampRangeModel.findText(tr("Standard")));
-	config_layout->addWidget(ampRangeCombo, 4, 1);
+	if (!controls->m_loaded) {controls->m_ampRangeModel.setValue(controls->m_ampRangeModel.findText(tr("Standard")));}
+	config_layout->addWidget(ampRangeCombo, 2, 3, 2, 1);
 
-	LedCheckBox *logXButton = new LedCheckBox(tr("Log. frequency"), this);
-	logXButton->setCheckable(true);
-	logXButton->setModel(&controls->m_logXModel);
-	config_layout->addWidget(logXButton, 5, 1);
 
-	LedCheckBox *logYButton = new LedCheckBox(tr("Log. amplitude"), this);
-	logYButton->setCheckable(true);
-	logYButton->setModel(&controls->m_logYModel);
-	config_layout->addWidget(logYButton, 6, 1);
-
-	// FFT
-	QLabel *fftLabel = new QLabel(tr("FFT"), this);
-	fftLabel->setStyleSheet("font-weight: bold");
-	config_layout->addWidget(fftLabel, 0, 2);
-
-	QLabel *blockSizeLabel = new QLabel(tr("Block size"), this);
-	blockSizeLabel->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
-	config_layout->addWidget(blockSizeLabel, 1, 2);
+	// FFT block size
+	QLabel *blockSizeLabel = new QLabel("", this);
+	QPixmap *blockSizeIcon = new QPixmap(PLUGIN_NAME::getIconPixmap("block_size"));
+	blockSizeIcon->setDevicePixelRatio(window()->devicePixelRatio());
+	blockSizeLabel->setPixmap(blockSizeIcon->scaled(iconSize, iconSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
+	config_layout->addWidget(blockSizeLabel, 0, 4, 2, 1, Qt::AlignRight);
 
 	ComboBox *blockSizeCombo = new ComboBox(this, tr("FFT Block Size"));
 	blockSizeCombo->setMinimumSize(100, 22);
@@ -158,15 +180,17 @@ SaControlsDialog::SaControlsDialog(SaControls *controls, SaProcessor *processor)
 			controls->m_blockSizeModel.addItem(std::to_string(FFT_BLOCK_SIZES[i]).c_str());
 		}
 	}
-	controls->m_blockSizeModel.setValue(controls->m_blockSizeModel.findText("2048"));
-	config_layout->addWidget(blockSizeCombo, 1, 3);
+	if (!controls->m_loaded) {controls->m_blockSizeModel.setValue(controls->m_blockSizeModel.findText("2048"));}
+	config_layout->addWidget(blockSizeCombo, 0, 5, 2, 1);
 	processor->reallocateBuffers();
 	connect(&controls->m_blockSizeModel, &ComboBoxModel::dataChanged, [=] {processor->reallocateBuffers();});
 
 	// FFT window -- keep the same order as in the fft_helpers.h WINDOWS enum!
-	QLabel *windowLabel = new QLabel(tr("Window"), this);
-	windowLabel->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
-	config_layout->addWidget(windowLabel, 2, 2);
+	QLabel *windowLabel = new QLabel("", this);
+	QPixmap *windowIcon = new QPixmap(PLUGIN_NAME::getIconPixmap("window"));
+	windowIcon->setDevicePixelRatio(window()->devicePixelRatio());
+	windowLabel->setPixmap(windowIcon->scaled(iconSize, iconSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
+	config_layout->addWidget(windowLabel, 2, 4, 2, 1, Qt::AlignRight);
 
 	ComboBox *windowCombo = new ComboBox(this, tr("FFT Window"));
 	windowCombo->setMinimumSize(100, 22);
@@ -176,10 +200,11 @@ SaControlsDialog::SaControlsDialog(SaControls *controls, SaProcessor *processor)
 	controls->m_windowModel.addItem(tr("Blackman-Harris (Default)"));
 	controls->m_windowModel.addItem(tr("Hamming"));
 	controls->m_windowModel.addItem(tr("Hanning"));
-	controls->m_windowModel.setValue(controls->m_windowModel.findText(tr("Blackman-Harris (Default)")));
-	config_layout->addWidget(windowCombo, 2, 3);
+	if (!controls->m_loaded) {controls->m_windowModel.setValue(controls->m_windowModel.findText(tr("Blackman-Harris (Default)")));}
+	config_layout->addWidget(windowCombo, 2, 5, 2, 1);
 	processor->rebuildWindow();
 	connect(&controls->m_windowModel, &ComboBoxModel::dataChanged, [=] {processor->rebuildWindow();});
+
 
 	// create spectrum displays
 	SaSpectrumView *spectrum = new SaSpectrumView(controls, processor, this);
@@ -189,6 +214,9 @@ SaControlsDialog::SaControlsDialog(SaControls *controls, SaProcessor *processor)
 	display_splitter->addWidget(config_widget);
 	display_splitter->addWidget(spectrum);
 	display_splitter->addWidget(waterfall);
+
+//	windowLabel->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+//	blockSizeLabel->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
 
 	window()->setBaseSize(500,500);
 	window()->resize(500,500);

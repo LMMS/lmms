@@ -24,7 +24,6 @@
 #include "SaSpectrumView.h"
 
 #include <cmath>
-#include <iostream>
 #include <mutex>
 
 #include "Engine.h"
@@ -32,6 +31,7 @@
 #include "MainWindow.h"
 #include "Mixer.h"
 #include "SaProcessor.h"
+
 
 SaSpectrumView::SaSpectrumView(SaControls *controls, SaProcessor *processor, QWidget *_parent) :
 	QWidget(_parent),
@@ -62,8 +62,7 @@ SaSpectrumView::SaSpectrumView(SaControls *controls, SaProcessor *processor, QWi
 }
 
 
-void SaSpectrumView::paintEvent(QPaintEvent *event)
-{
+void SaSpectrumView::paintEvent(QPaintEvent *event) {
 	#ifdef DEBUG
 		int start_time = std::chrono::high_resolution_clock::now().time_since_epoch().count();
 		int line_time = 0, draw_time = 0;
@@ -265,8 +264,6 @@ QPainterPath SaSpectrumView::makePath(std::vector<float> &displayBuffer, float r
 			// Accumulate bins that share the pixel and use the highest:
 			acc = y < acc ? y : acc;
 			if ((int)(x * pixel_limit) != (int)(x1 * pixel_limit)) {
-				if ((x + first_x) / 2 < 0) {std::cout << x << " " << x1 << " " << first_x<<std::endl;}
-				if (x1 < 0) {std::cout << x << " " << x1 <<std::endl;}
 				x = (x + first_x) / 2;
 				path.lineTo(x + m_displayLeft, acc + m_displayTop);
 				acc = 0xffffffff;

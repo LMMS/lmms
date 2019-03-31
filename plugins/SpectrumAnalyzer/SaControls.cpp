@@ -35,13 +35,23 @@ SaControls::SaControls(Analyzer *effect) :
 	EffectControls(effect),
 	m_effect(effect),
 
-	m_stereoModel(true, this, tr("Display stereo channels separately")),
-	m_smoothModel(false, this, tr("Smooth graph decay")),
-	m_waterfallModel(false, this, tr("Display waterfall diagram")),
-	m_logXModel(true, this, tr("Logarithmic X axis scale")),
-	m_logYModel(true, this, tr("Logarithmic Y axis scale")),
-	m_peakHoldModel(false, this, tr("Keep the peak values displayed")),
-	m_refFreezeModel(false, this, tr("Freeze current input as a reference"))
+	m_pauseModel(false, this, tr("Pause data acquisition")),
+	m_refFreezeModel(false, this, tr("Freeze current input as a reference")),
+
+	m_waterfallModel(false, this, tr("Display real-time spectrogram")),
+	m_smoothModel(false, this, tr("Enable exponential moving average")),
+	m_stereoModel(false, this, tr("Display stereo channels separately")),
+	m_peakHoldModel(false, this, tr("Display envelope of peak values")),
+
+	m_logXModel(true, this, tr("Logarithmic frequency scale")),
+	m_logYModel(true, this, tr("Logarithmic amplitude scale")),
+
+	m_freqRangeModel(this, tr("Frequency range")),
+	m_ampRangeModel(this, tr("Amplitude range")),
+	m_blockSizeModel(this, tr("FFT block size")),
+	m_windowModel(this, tr("FFT window type")),
+
+	m_loaded(false)
 {
 	m_colorL = QColor(51, 148, 204, 135);		// Make sure the sum of L and R
 	m_colorR = QColor(204, 107, 51, 135);		// stays lower or equal to 255.
@@ -52,29 +62,35 @@ SaControls::SaControls(Analyzer *effect) :
 }
 
 
-void SaControls::loadSettings(const QDomElement &_this)
-{
-	m_stereoModel.loadSettings(_this, "Stereo");
-	m_smoothModel.loadSettings(_this, "Smooth");
+void SaControls::loadSettings(const QDomElement &_this) {
 	m_waterfallModel.loadSettings(_this, "Waterfall");
+	m_smoothModel.loadSettings(_this, "Smooth");
+	m_stereoModel.loadSettings(_this, "Stereo");
+	m_peakHoldModel.loadSettings(_this, "PeakHold");
 	m_logXModel.loadSettings(_this, "LogX");
 	m_logYModel.loadSettings(_this, "LogY");
-	m_peakHoldModel.loadSettings(_this, "PeakHold");
+	m_freqRangeModel.loadSettings(_this, "RangeX");
+	m_ampRangeModel.loadSettings(_this, "RangeY");
+	m_blockSizeModel.loadSettings(_this, "BlockSize");
+	m_windowModel.loadSettings(_this, "WindowType");
+	m_loaded = true;
 }
 
-EffectControlDialog* SaControls::createView()
-{
+
+EffectControlDialog* SaControls::createView() {
 	return new SaControlsDialog(this, m_effect->getProcessor());
 }
 
 
-void SaControls::saveSettings(QDomDocument &doc, QDomElement &parent)
-{
-	m_stereoModel.saveSettings(doc, parent, "Stereo");
-	m_smoothModel.saveSettings(doc, parent, "Smooth");
+void SaControls::saveSettings(QDomDocument &doc, QDomElement &parent) {
 	m_waterfallModel.saveSettings(doc, parent, "Waterfall");
+	m_smoothModel.saveSettings(doc, parent, "Smooth");
+	m_stereoModel.saveSettings(doc, parent, "Stereo");
+	m_peakHoldModel.saveSettings(doc, parent, "PeakHold");
 	m_logXModel.saveSettings(doc, parent, "LogX");
 	m_logYModel.saveSettings(doc, parent, "LogY");
-	m_peakHoldModel.saveSettings(doc, parent, "PeakHold");
+	m_freqRangeModel.saveSettings(doc, parent, "RangeX");
+	m_ampRangeModel.saveSettings(doc, parent, "RangeY");
+	m_blockSizeModel.saveSettings(doc, parent, "BlockSize");
+	m_windowModel.saveSettings(doc, parent, "WindowType");
 }
-

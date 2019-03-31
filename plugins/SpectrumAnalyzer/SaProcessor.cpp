@@ -25,9 +25,7 @@
 
 #include <algorithm>
 #include <cmath>
-#ifdef DEBUG
-	#include <iostream>
-#endif
+#include <iostream>
 
 #include "lmms_math.h"
 
@@ -51,9 +49,6 @@ SaProcessor::SaProcessor(SaControls *controls) :
 	m_fftPlanL = fftwf_plan_dft_r2c_1d(m_blockSize, m_bufferL.data(), m_spectrumL, FFTW_MEASURE);
 	m_fftPlanR = fftwf_plan_dft_r2c_1d(m_blockSize, m_bufferR.data(), m_spectrumR, FFTW_MEASURE);
 
-	std::cout << "Initial plan " << m_fftPlanL << std::endl;
-	std::cout << "Initial plan " << m_fftPlanR << std::endl;
-
 	m_absSpectrumL.resize(binCount(), 0);
 	m_absSpectrumR.resize(binCount(), 0);
 	m_normSpectrumL.resize(binCount(), 0);
@@ -69,8 +64,6 @@ SaProcessor::~SaProcessor()
 {
 	m_destroyed = true;
 
-	std::cout << "Destructor plan " << m_fftPlanL << std::endl;
-	std::cout << "Destructor plan " << m_fftPlanR << std::endl;
 	if (m_fftPlanL != NULL) {fftwf_destroy_plan(m_fftPlanL);}
 	if (m_fftPlanR != NULL) {fftwf_destroy_plan(m_fftPlanR);}
 	if (m_spectrumL != NULL) {fftwf_free(m_spectrumL);}
@@ -268,9 +261,6 @@ void SaProcessor::reallocateBuffers() {
 	// lock data shared with SaSpectrumView and SaWaterfallView
 	m_dataAccess.lock();
 
-	std::cout << "Destroy plan " << m_fftPlanL << std::endl;
-	std::cout << "Destroy plan " << m_fftPlanR << std::endl;
-
 	// destroy old FFT plan and free the result buffer
 	if (m_fftPlanL != NULL) {fftwf_destroy_plan(m_fftPlanL);}
 	if (m_fftPlanR != NULL) {fftwf_destroy_plan(m_fftPlanR);}
@@ -286,9 +276,6 @@ void SaProcessor::reallocateBuffers() {
 	m_spectrumR = (fftwf_complex *) fftwf_malloc(new_bins * sizeof (fftwf_complex));
 	m_fftPlanL = fftwf_plan_dft_r2c_1d(new_size, m_bufferL.data(), m_spectrumL, FFTW_MEASURE);
 	m_fftPlanR = fftwf_plan_dft_r2c_1d(new_size, m_bufferR.data(), m_spectrumR, FFTW_MEASURE);
-
-	std::cout << "Created plan " << m_fftPlanL << std::endl;
-	std::cout << "Created plan " << m_fftPlanR << std::endl;
 
 	if (m_fftPlanL == NULL || m_fftPlanR == NULL) {
 		std::cerr << "Failed to create new FFT plan!" << std::endl;
