@@ -96,6 +96,7 @@ set(LMMS_SRCS
 	core/lv2/Lv2Proc.cpp
 	core/lv2/Lv2Manager.cpp
 	core/lv2/Lv2SubPluginFeatures.cpp
+	core/lv2/Lv2UridMap.cpp
 
 	core/midi/MidiAlsaRaw.cpp
 	core/midi/MidiAlsaSeq.cpp

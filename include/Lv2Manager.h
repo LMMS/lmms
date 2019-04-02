@@ -33,6 +33,7 @@
 #include <lilv/lilv.h>
 
 #include "Lv2Basics.h"
+#include "Lv2UridMap.h"
 #include "Plugin.h"
 
 
@@ -114,10 +115,13 @@ public:
 	Iterator begin() { return m_lv2InfoMap.begin(); }
 	Iterator end() { return m_lv2InfoMap.end(); }
 
+	UridMap& uridMap() { return m_uridMap; }
+
 private:
 	bool m_debug; //!< if set, debug output will be printed
 	LilvWorld* m_world;
 	Lv2InfoMap m_lv2InfoMap;
+	UridMap m_uridMap;
 	bool isSubclassOf(const LilvPluginClass *clvss, const char *uriStr);
 };
 

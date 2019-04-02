@@ -74,8 +74,11 @@ Plugin::PluginTypes Lv2Proc::check(const LilvPlugin *plugin,
 	AutoLilvNodes reqFeats(lilv_plugin_get_required_features(plugin));
 	LILV_FOREACH (nodes, itr, reqFeats.get())
 	{
-		issues.emplace_back(featureNotSupported,
-			lilv_node_as_string(lilv_nodes_get(reqFeats.get(), itr)));
+		const char* featName = lilv_node_as_string(
+								lilv_nodes_get(reqFeats.get(), itr));
+		if(		strcmp(featName, LV2_URID__map)
+			&&	strcmp(featName, LV2_URID__unmap))
+			issues.emplace_back(featureNotSupported, featName);
 	}
 
 	if (printIssues && issues.size())
@@ -240,11 +243,15 @@ AutomatableModel *Lv2Proc::modelAtPort(const QString &uri)
 
 void Lv2Proc::initPlugin()
 {
+	Lv2Manager* man = Engine::getLv2Manager();
+	m_features.push_back(new LV2_Feature { LV2_URID__map, man->uridMap().mapFeature() });
+	m_features.push_back(new LV2_Feature { LV2_URID__unmap, man->uridMap().unmapFeature() });
+	m_features.push_back(nullptr);
 	createPorts();
 
 	m_instance = lilv_plugin_instantiate(m_plugin,
 		Engine::mixer()->processingSampleRate(),
-		nullptr);
+		m_features.data());
 
 	if (m_instance)
 	{
@@ -271,6 +278,8 @@ void Lv2Proc::shutdownPlugin()
 	lilv_instance_deactivate(m_instance);
 	lilv_instance_free(m_instance);
 	m_instance = nullptr;
+
+	for(LV2_Feature* feat : m_features) { delete feat; }
 }
 
 
