@@ -163,6 +163,7 @@ bool FileBrowser::filterItems( const QString & filter, QTreeWidgetItem * item )
 
 void FileBrowser::reloadTree( void )
 {
+	QList<QString> expandedDirs = m_fileBrowserTreeWidget->expandedDirs();
 	const QString text = m_filterEdit->text();
 	m_filterEdit->clear();
 	m_fileBrowserTreeWidget->clear();
@@ -171,17 +172,17 @@ void FileBrowser::reloadTree( void )
 	{
 		addItems( *it );
 	}
-	expandItems();
+	expandItems(NULL, expandedDirs);
 	m_filterEdit->setText( text );
 	filterItems( text );
 }
 
 
 
-void FileBrowser::expandItems( QTreeWidgetItem * item )
+void FileBrowser::expandItems( QTreeWidgetItem * item, QList<QString> expandedDirs )
 {
 	int numChildren = item ? item->childCount() : m_fileBrowserTreeWidget->topLevelItemCount();
-	for( int i = 0; i < numChildren; ++i )
+	for (int i = 0; i < numChildren; ++i)
 	{
 		QTreeWidgetItem * it = item ? item->child( i ) : m_fileBrowserTreeWidget->topLevelItem(i);
 		if ( m_recurse )
@@ -189,14 +190,15 @@ void FileBrowser::expandItems( QTreeWidgetItem * item )
 			it->setExpanded( true );
 		}
 		Directory *d = dynamic_cast<Directory *> ( it );
-		if( d )
+		if (d)
 		{
 			d->update();
-			d->setExpanded( false );
+			bool expand = expandedDirs.contains( d->fullName() );
+			d->setExpanded( expand );
 		}
-		if( m_recurse && it->childCount() )
+		if (m_recurse && it->childCount())
 		{
-			expandItems(it);
+			expandItems(it, expandedDirs);
 		}
 	}
 }
@@ -324,6 +326,30 @@ FileBrowserTreeWidget::FileBrowserTreeWidget(QWidget * parent ) :
 	connect( this, SIGNAL( itemExpanded( QTreeWidgetItem * ) ),
 				SLOT( updateDirectory( QTreeWidgetItem * ) ) );
 
+}
+
+QList<QString> FileBrowserTreeWidget::expandedDirs( QTreeWidgetItem * item ) const
+{
+	int numChildren = item ? item->childCount() : topLevelItemCount();
+	QList<QString> dirs;
+	for (int i = 0; i < numChildren; ++i)
+	{
+		QTreeWidgetItem * it  = item ? item->child(i) : topLevelItem(i);
+
+		// Add expanded top level directories.
+		if (it->isExpanded() && (it->type() == TypeDirectoryItem))
+		{
+			Directory *d = static_cast<Directory *> ( it );
+			dirs.append( d->fullName() );
+		}
+
+		// Add expanded child directories (recurse).
+		if (it->childCount())
+		{
+			dirs.append( expandedDirs( it ) );
+		}
+	}
+	return dirs;
 }
 
 void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent * e )
