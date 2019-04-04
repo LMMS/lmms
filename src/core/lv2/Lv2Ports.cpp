@@ -131,10 +131,11 @@ std::vector<PluginIssue> Meta::get(const LilvPlugin *plugin,
 
 	m_def = .0f; m_min = .0f; m_max = .0f;
 
-	if (isA(LV2_CORE__ControlPort)) {
+	if (isA(LV2_CORE__ControlPort))
+	{
 		m_type = Type::Control;
 
-		if(m_flow == Flow::Input)
+		if (m_flow == Flow::Input)
 		{
 			bool isToggle = m_vis == Vis::Toggled;
 
@@ -145,7 +146,8 @@ std::vector<PluginIssue> Meta::get(const LilvPlugin *plugin,
 
 			auto takeRangeValue = [&](LilvNode* node,
 				float& storeHere, PluginIssueType it) {
-				if(node) {
+				if(node)
+				{
 					storeHere = lilv_node_as_float(node);
 				}
 				else {
@@ -155,12 +157,12 @@ std::vector<PluginIssue> Meta::get(const LilvPlugin *plugin,
 			};
 
 			takeRangeValue(defN, m_def, portHasNoDef);
-			if(!isToggle)
+			if (!isToggle)
 			{
 				takeRangeValue(minN, m_min, portHasNoMin);
 				takeRangeValue(maxN, m_max, portHasNoMax);
 
-				if(m_max - m_min > 15.0f)
+				if (m_max - m_min > 15.0f)
 				{
 					// range too large for spinbox visualisation, use knobs
 					// e.g. 0...15 would be OK

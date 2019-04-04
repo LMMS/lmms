@@ -49,13 +49,13 @@ Plugin::PluginTypes Lv2ControlBase::check(const LilvPlugin *plugin,
 Lv2ControlBase::Lv2ControlBase(Model* that, const QString &uri) :
 	m_plugin(Engine::getLv2Manager()->getPlugin(uri))
 {
-	if(m_plugin)
+	if (m_plugin)
 	{
 		int channelsLeft = DEFAULT_CHANNELS; // LMMS plugins are stereo
 		while (channelsLeft > 0)
 		{
 			Lv2Proc* newOne = new Lv2Proc(m_plugin, that);
-			if(newOne->isValid())
+			if (newOne->isValid())
 			{
 				channelsLeft -= std::max(
 					1 + static_cast<bool>(newOne->inPorts().m_right),
@@ -70,10 +70,10 @@ Lv2ControlBase::Lv2ControlBase(Model* that, const QString &uri) :
 				channelsLeft = 0;
 			}
 		}
-		if(m_valid)
+		if (m_valid)
 		{
 			m_channelsPerProc = DEFAULT_CHANNELS / m_procs.size();
-			if(m_procs.size() > 1)
+			if (m_procs.size() > 1)
 			{
 				m_procs[0]->makeLinkingProc();
 				createMultiChannelLinkModel();
@@ -97,7 +97,7 @@ Lv2ControlBase::Lv2ControlBase(Model* that, const QString &uri) :
 
 Lv2ControlBase::~Lv2ControlBase()
 {
-	for(Lv2Proc* c : m_procs) { delete c; }
+	for (Lv2Proc* c : m_procs) { delete c; }
 }
 
 
@@ -112,7 +112,7 @@ LinkedModelGroup *Lv2ControlBase::getGroup(std::size_t idx)
 
 
 void Lv2ControlBase::copyModelsFromLmms() {
-	for(Lv2Proc* c : m_procs) { c->copyModelsFromCore(); }
+	for (Lv2Proc* c : m_procs) { c->copyModelsFromCore(); }
 }
 
 
@@ -120,7 +120,7 @@ void Lv2ControlBase::copyModelsFromLmms() {
 
 void Lv2ControlBase::copyBuffersFromLmms(const sampleFrame *buf, fpp_t frames) {
 	unsigned offset = 0;
-	for(Lv2Proc* c : m_procs) {
+	for (Lv2Proc* c : m_procs) {
 		c->copyBuffersFromCore(buf, offset, m_channelsPerProc, frames);
 		offset += m_channelsPerProc;
 	}
@@ -131,7 +131,7 @@ void Lv2ControlBase::copyBuffersFromLmms(const sampleFrame *buf, fpp_t frames) {
 
 void Lv2ControlBase::copyBuffersToLmms(sampleFrame *buf, fpp_t frames) const {
 	unsigned offset = 0;
-	for(const Lv2Proc* c : m_procs) {
+	for (const Lv2Proc* c : m_procs) {
 		c->copyBuffersToCore(buf, offset, m_channelsPerProc, frames);
 		offset += m_channelsPerProc;
 	}
@@ -141,7 +141,7 @@ void Lv2ControlBase::copyBuffersToLmms(sampleFrame *buf, fpp_t frames) const {
 
 
 void Lv2ControlBase::run(unsigned frames) {
-	for(Lv2Proc* c : m_procs) { c->run(frames); }
+	for (Lv2Proc* c : m_procs) { c->run(frames); }
 }
 
 
@@ -183,7 +183,7 @@ void Lv2ControlBase::reloadPlugin()
 
 std::size_t Lv2ControlBase::controlCount() const {
 	std::size_t res = 0;
-	for(const Lv2Proc* c : m_procs)
+	for (const Lv2Proc* c : m_procs)
 		res += c->controlCount();
 	return res;
 }

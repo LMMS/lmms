@@ -73,7 +73,7 @@ Lv2Instrument::Lv2Instrument(InstrumentTrack *instrumentTrackArg,
 	Instrument(instrumentTrackArg, &lv2instrument_plugin_descriptor, key),
 	Lv2ControlBase(this, key->attributes["uri"])
 {
-	if(Lv2ControlBase::isValid())
+	if (Lv2ControlBase::isValid())
 	{
 #ifdef LV2_INSTRUMENT_USE_MIDI
 		for (int i = 0; i < NumKeys; ++i) {
@@ -84,7 +84,7 @@ Lv2Instrument::Lv2Instrument(InstrumentTrack *instrumentTrackArg,
 			this, SLOT(updatePitchRange()));
 		connect(Engine::mixer(), SIGNAL(sampleRateChanged()),
 			this, SLOT(reloadPlugin()));
-		if(multiChannelLinkModel()) {
+		if (multiChannelLinkModel()) {
 			connect(multiChannelLinkModel(), SIGNAL(dataChanged()),
 				this, SLOT(updateLinkStatesFromGlobal()));
 			connect(getGroup(0), SIGNAL(linkStateChanged(int, bool)),
@@ -247,15 +247,15 @@ Lv2InsView::Lv2InsView(Lv2Instrument *_instrument, QWidget *_parent) :
 	Lv2ViewBase(this, _instrument)
 {
 	setAutoFillBackground(true);
-	if(m_reloadPluginButton) {
+	if (m_reloadPluginButton) {
 		connect(m_reloadPluginButton, SIGNAL(toggled(bool)),
 			this, SLOT(reloadPlugin()));
 	}
-	if(m_toggleUIButton) {
+	if (m_toggleUIButton) {
 		connect(m_toggleUIButton, SIGNAL(toggled(bool)),
 			this, SLOT(toggleUI()));
 	}
-	if(m_helpButton) {
+	if (m_helpButton) {
 		connect(m_helpButton, SIGNAL(toggled(bool)),
 			this, SLOT(toggleHelp(bool)));
 	}
@@ -346,7 +346,7 @@ PLUGIN_EXPORT Plugin *lmms_plugin_main(Model *_parent, void *_data)
 	Lv2Instrument* ins = new Lv2Instrument(
 							static_cast<InstrumentTrack*>(_parent),
 							static_cast<KeyType*>(_data ));
-	if(!ins->isValid())
+	if (!ins->isValid())
 		ins = nullptr;
 	return ins;
 }

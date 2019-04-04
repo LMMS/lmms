@@ -46,15 +46,15 @@ Lv2FxControlDialog::Lv2FxControlDialog(Lv2FxControls *controls) :
 	EffectControlDialog(controls),
 	Lv2ViewBase(this, controls)
 {
-	if(m_reloadPluginButton) {
+	if (m_reloadPluginButton) {
 		connect(m_reloadPluginButton, SIGNAL(toggled(bool)),
 			this, SLOT(reloadPlugin()));
 	}
-	if(m_toggleUIButton) {
+	if (m_toggleUIButton) {
 		connect(m_toggleUIButton, SIGNAL(toggled(bool)),
 			this, SLOT(toggleUI()));
 	}
-	if(m_helpButton) {
+	if (m_helpButton) {
 		connect(m_helpButton, SIGNAL(toggled(bool)),
 			this, SLOT(toggleHelp(bool)));
 	}

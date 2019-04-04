@@ -103,7 +103,7 @@ Lv2ViewProc::Lv2ViewProc(QWidget* parent, Lv2Proc* ctrlBase,
 		setup.par = this;
 		port->accept(setup);
 
-		if(setup.control)
+		if (setup.control)
 		{
 			addControl(setup.control);
 		}
@@ -133,7 +133,8 @@ Lv2ViewBase::Lv2ViewBase(QWidget* meAsWidget, Lv2ControlBase *ctrlBase)
 
 	QHBoxLayout* btnBox = new QHBoxLayout();
 	grid->addLayout(btnBox, Rows::ButtonRow, 0, 1, m_colNum);
-	if(/* DISABLES CODE */ (false)) {
+	if(/* DISABLES CODE */ (false))
+	{
 		m_reloadPluginButton = new QPushButton(QObject::tr("Reload Plugin"),
 			meAsWidget);
 		btnBox->addWidget(m_reloadPluginButton, 0);
@@ -195,7 +196,7 @@ Lv2ViewBase::Lv2ViewBase(QWidget* meAsWidget, Lv2ControlBase *ctrlBase)
 	}
 
 	LedCheckBox* led = globalLinkLed();
-	if(led)
+	if (led)
 		grid->addWidget(led, Rows::LinkChannelsRow, 0, 1, m_colNum);
 }
 
@@ -211,9 +212,9 @@ Lv2ViewBase::~Lv2ViewBase() {
 
 void Lv2ViewBase::toggleHelp(bool visible)
 {
-	if( m_helpWindow )
+	if ( m_helpWindow )
 	{
-		if( visible )
+		if ( visible )
 		{
 			m_helpWindow->show();
 			m_helpWindow->raise();
@@ -231,7 +232,7 @@ void Lv2ViewBase::toggleHelp(bool visible)
 void Lv2ViewBase::modelChanged(Lv2ControlBase *ctrlBase)
 {
 	// reconnect models
-	if(m_toggleUIButton)
+	if (m_toggleUIButton)
 	{
 		m_toggleUIButton->setChecked(ctrlBase->hasGui());
 	}
