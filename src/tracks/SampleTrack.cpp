@@ -151,7 +151,7 @@ void SampleTCO::setSampleFile( const QString & _sf )
 		float den = Engine::getSong()->getTimeSigModel().getDenominator();
 		length = DefaultTicksPerTact * ( nom / den );
 	}
-	else //Otherwise set it to the samples length
+	else //Otherwise set it to the sample's length
 	{
 		m_sampleBuffer->setAudioFile( _sf );
 		length = (int) ( m_sampleBuffer->frames() / Engine::framesPerTick() ) ;
