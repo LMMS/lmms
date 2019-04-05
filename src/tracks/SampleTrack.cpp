@@ -118,10 +118,7 @@ SampleTCO::~SampleTCO()
 
 void SampleTCO::changeLength( const MidiTime & _length )
 {
-	float nom = Engine::getSong()->getTimeSigModel().getNumerator();
-	float den = Engine::getSong()->getTimeSigModel().getDenominator();
-	int ticksPerTact = DefaultTicksPerTact * ( nom / den );
-	TrackContentObject::changeLength( qMax( static_cast<int>( _length ), ticksPerTact ) );
+	TrackContentObject::changeLength( qMax( static_cast<int>( _length ), 1 ) );
 }
 
 
@@ -147,8 +144,19 @@ void SampleTCO::setSampleBuffer( SampleBuffer* sb )
 
 void SampleTCO::setSampleFile( const QString & _sf )
 {
-	m_sampleBuffer->setAudioFile( _sf );
-	changeLength( (int) ( m_sampleBuffer->frames() / Engine::framesPerTick() ) );
+	int length;
+	if (_sf == "") //When creating an empty sample pattern make it a bar long
+	{
+		float nom = Engine::getSong()->getTimeSigModel().getNumerator();
+		float den = Engine::getSong()->getTimeSigModel().getDenominator();
+		length = DefaultTicksPerTact * ( nom / den );
+	}
+	else //Otherwise set it to the samples length
+	{
+		m_sampleBuffer->setAudioFile( _sf );
+		length = (int) ( m_sampleBuffer->frames() / Engine::framesPerTick() ) ;
+	}
+	changeLength(length);
 
 	emit sampleChanged();
 	emit playbackPositionChanged();
@@ -462,7 +470,7 @@ void SampleTCOView::paintEvent( QPaintEvent * pe )
 
 	setNeedsUpdate( false );
 
-	m_paintPixmap = m_paintPixmap.isNull() == true || m_paintPixmap.size() != size() 
+	m_paintPixmap = m_paintPixmap.isNull() == true || m_paintPixmap.size() != size()
 		? QPixmap( size() ) : m_paintPixmap;
 
 	QPainter p( &m_paintPixmap );
@@ -472,7 +480,7 @@ void SampleTCOView::paintEvent( QPaintEvent * pe )
 	bool muted = m_tco->getTrack()->isMuted() || m_tco->isMuted();
 
 	// state: selected, muted, normal
-	c = isSelected() ? selectedColor() : ( muted ? mutedBackgroundColor() 
+	c = isSelected() ? selectedColor() : ( muted ? mutedBackgroundColor()
 		: painter.background().color() );
 
 	lingrad.setColorAt( 1, c.darker( 300 ) );
@@ -511,7 +519,7 @@ void SampleTCOView::paintEvent( QPaintEvent * pe )
 
 	// inner border
 	p.setPen( c.lighter( 160 ) );
-	p.drawRect( 1, 1, rect().right() - TCO_BORDER_WIDTH, 
+	p.drawRect( 1, 1, rect().right() - TCO_BORDER_WIDTH,
 		rect().bottom() - TCO_BORDER_WIDTH );
 
 	// outer border
@@ -527,7 +535,7 @@ void SampleTCOView::paintEvent( QPaintEvent * pe )
 			embed::getIconPixmap( "muted", size, size ) );
 	}
 
-	// recording sample tracks is not possible at the moment 
+	// recording sample tracks is not possible at the moment
 
 	/* if( m_tco->isRecord() )
 	{
