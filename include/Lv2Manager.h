@@ -128,19 +128,9 @@ public:
 	{
 		std::map<std::string, Lv2Info>::iterator m_itr;
 	public:
-		bool operator!=(const Iterator &other)
-		{
-			return m_itr != other.m_itr;
-		}
-		Iterator &operator++()
-		{
-			++m_itr;
-			return *this;
-		}
-		std::pair<const std::string, Lv2Info> &operator*()
-		{
-			return *m_itr;
-		}
+		bool operator!=(const Iterator &other) { return m_itr != other.m_itr; }
+		Iterator &operator++() { ++m_itr; return *this; }
+		std::pair<const std::string, Lv2Info> &operator*() { return *m_itr; }
 		Iterator(std::map<std::string, Lv2Info>::iterator itr) :
 			m_itr(itr) {}
 	};

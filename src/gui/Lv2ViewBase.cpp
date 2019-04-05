@@ -103,10 +103,7 @@ Lv2ViewProc::Lv2ViewProc(QWidget* parent, Lv2Proc* ctrlBase,
 		setup.par = this;
 		port->accept(setup);
 
-		if (setup.control)
-		{
-			addControl(setup.control);
-		}
+		if (setup.control) { addControl(setup.control); }
 	}
 }
 
@@ -214,15 +211,8 @@ void Lv2ViewBase::toggleHelp(bool visible)
 {
 	if ( m_helpWindow )
 	{
-		if ( visible )
-		{
-			m_helpWindow->show();
-			m_helpWindow->raise();
-		}
-		else
-		{
-			m_helpWindow->hide();
-		}
+		if ( visible ) { m_helpWindow->show(); m_helpWindow->raise(); }
+		else { m_helpWindow->hide(); }
 	}
 }
 

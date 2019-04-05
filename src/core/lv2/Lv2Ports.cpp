@@ -119,12 +119,9 @@ std::vector<PluginIssue> Meta::get(const LilvPlugin *plugin,
 		? Vis::Toggled
 		: Vis::None;
 
-	if (isA(LV2_CORE__InputPort)) {
-		m_flow = Flow::Input;
-	}
-	else if (isA(LV2_CORE__OutputPort)) {
-		m_flow = Flow::Output;
-	} else {
+	if (isA(LV2_CORE__InputPort)) { m_flow = Flow::Input; }
+	else if (isA(LV2_CORE__OutputPort)) { m_flow = Flow::Output; }
+	else {
 		m_flow = Flow::Unknown;
 		issue(unknownPortFlow, portName);
 	}
@@ -145,14 +142,10 @@ std::vector<PluginIssue> Meta::get(const LilvPlugin *plugin,
 					isToggle ? nullptr : &maxN);
 
 			auto takeRangeValue = [&](LilvNode* node,
-				float& storeHere, PluginIssueType it) {
-				if(node)
-				{
-					storeHere = lilv_node_as_float(node);
-				}
-				else {
-					issue(it, portName);
-				}
+				float& storeHere, PluginIssueType it)
+			{
+				if(node) { storeHere = lilv_node_as_float(node); }
+				else { issue(it, portName); }
 				lilv_node_free(node);
 			};
 
@@ -171,15 +164,12 @@ std::vector<PluginIssue> Meta::get(const LilvPlugin *plugin,
 			}
 		}
 	}
-	else if (isA(LV2_CORE__AudioPort)) {
-		m_type = Type::Audio;
-	} else if (isA(LV2_CORE__CVPort)) {
+	else if (isA(LV2_CORE__AudioPort)) { m_type = Type::Audio; }
+	else if (isA(LV2_CORE__CVPort)) {
 		issue(badPortType, "cvPort");
 		m_type = Type::Cv;
 	} else {
-		if (m_optional) {
-			m_used = false;
-		}
+		if (m_optional) { m_used = false; }
 		else {
 			issue(PluginIssueType::unknownPortType, portName);
 			m_type = Type::Unknown;

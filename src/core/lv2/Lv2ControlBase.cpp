@@ -183,8 +183,7 @@ void Lv2ControlBase::reloadPlugin()
 
 std::size_t Lv2ControlBase::controlCount() const {
 	std::size_t res = 0;
-	for (const Lv2Proc* c : m_procs)
-		res += c->controlCount();
+	for (const Lv2Proc* c : m_procs) { res += c->controlCount(); }
 	return res;
 }
 

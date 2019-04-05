@@ -168,10 +168,7 @@ void Lv2Proc::copyModelsFromCore()
 		}
 	} copy;
 
-	for (Lv2Ports::PortBase* port : m_ports)
-	{
-		port->accept(copy);
-	}
+	for (Lv2Ports::PortBase* port : m_ports) { port->accept(copy); }
 }
 
 
@@ -230,14 +227,8 @@ AutomatableModel *Lv2Proc::modelAtPort(const QString &uri)
 	// unused currently
 	AutomatableModel *mod;
 	auto itr = m_connectedModels.find(uri.toUtf8().data());
-	if (itr != m_connectedModels.end())
-	{
-		mod = itr->second;
-	}
-	else
-	{
-		mod = nullptr;
-	}
+	if (itr != m_connectedModels.end()) { mod = itr->second; }
+	else { mod = nullptr; }
 	return mod;
 }
 
@@ -418,11 +409,8 @@ void Lv2Proc::createPorts()
 						break;
 				}
 				// in Lv2, leftPort is defined to be the first port
-				if(!portRef->m_left) {
-					portRef->m_left = &audio;
-				} else if(!portRef->m_right) {
-					portRef->m_right = &audio;
-				}
+				if(!portRef->m_left) { portRef->m_left = &audio; }
+				else if(!portRef->m_right) { portRef->m_right = &audio; }
 			}
 		}
 	};

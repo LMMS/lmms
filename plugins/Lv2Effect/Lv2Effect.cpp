@@ -71,15 +71,11 @@ Lv2Effect::~Lv2Effect()
 
 bool Lv2Effect::processAudioBuffer(sampleFrame *buf, const fpp_t frames)
 {
-	if (!isEnabled() || !isRunning())
-	{
-		return false;
-	}
+	if (!isEnabled() || !isRunning()) { return false; }
 
 	Lv2FxControls& ctrl = m_controls;
 
 	ctrl.copyBuffersFromLmms(buf, frames);
-
 	m_controls.copyModelsFromLmms();
 
 //	m_pluginMutex.lock();
@@ -102,8 +98,7 @@ PLUGIN_EXPORT Plugin *lmms_plugin_main(Model *_parent, void *_data)
 {
 	using KeyType = Plugin::Descriptor::SubPluginFeatures::Key;
 	Lv2Effect* eff = new Lv2Effect(_parent, static_cast<const KeyType*>(_data));
-	if (!eff->isValid())
-		eff = nullptr;
+	if (!eff->isValid()) { eff = nullptr; }
 	return eff;
 }
 

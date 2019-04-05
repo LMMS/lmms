@@ -76,9 +76,7 @@ Lv2Instrument::Lv2Instrument(InstrumentTrack *instrumentTrackArg,
 	if (Lv2ControlBase::isValid())
 	{
 #ifdef LV2_INSTRUMENT_USE_MIDI
-		for (int i = 0; i < NumKeys; ++i) {
-			m_runningNotes[i] = 0;
-		}
+		for (int i = 0; i < NumKeys; ++i) { m_runningNotes[i] = 0; }
 #endif
 		connect(instrumentTrack()->pitchRangeModel(), SIGNAL(dataChanged()),
 			this, SLOT(updatePitchRange()));
@@ -346,8 +344,7 @@ PLUGIN_EXPORT Plugin *lmms_plugin_main(Model *_parent, void *_data)
 	Lv2Instrument* ins = new Lv2Instrument(
 							static_cast<InstrumentTrack*>(_parent),
 							static_cast<KeyType*>(_data ));
-	if (!ins->isValid())
-		ins = nullptr;
+	if (!ins->isValid()) { ins = nullptr; }
 	return ins;
 }
 
