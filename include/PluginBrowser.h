@@ -31,6 +31,10 @@
 #include "SideBarWidget.h"
 #include "Plugin.h"
 
+class QLineEdit;
+class QTreeWidget;
+class QTreeWidgetItem;
+
 
 class PluginBrowser : public SideBarWidget
 {
@@ -39,18 +43,18 @@ public:
 	PluginBrowser( QWidget * _parent );
 	virtual ~PluginBrowser() = default;
 
+private slots:
+	void onFilterChanged( const QString & filter );
+
 private:
+	void addPlugins();
+	void updateRootVisibility( int index );
+	void updateRootVisibilities();
+
 	QWidget * m_view;
-};
-
-
-
-
-class PluginDescList : public QWidget
-{
-	Q_OBJECT
-public:
-	PluginDescList(QWidget* parent);
+	QTreeWidget * m_descTree;
+	QTreeWidgetItem * m_lmmsRoot;
+	QTreeWidgetItem * m_lv2Root;
 };
 
 
@@ -62,6 +66,7 @@ class PluginDescWidget : public QWidget
 public:
 	typedef Plugin::Descriptor::SubPluginFeatures::Key PluginKey;
 	PluginDescWidget( const PluginKey & _pk, QWidget * _parent );
+	QString name() const;
 
 
 protected:
