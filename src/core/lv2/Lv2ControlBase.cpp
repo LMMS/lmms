@@ -80,7 +80,7 @@ Lv2ControlBase::Lv2ControlBase(Model* that, const QString &uri) :
 			}
 
 			// initially link all controls
-			for(int i = 0; i < static_cast<int>(m_procs[0]->controlCount());
+			for (int i = 0; i < static_cast<int>(m_procs[0]->controlCount());
 				++i) {
 				linkPort(i, true);
 			}

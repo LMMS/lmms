@@ -41,7 +41,7 @@ struct AutoLilvNode
 	AutoLilvNode(LilvNode* n) : n(n) {}
 	AutoLilvNode(const AutoLilvNode& other) = delete;
 	AutoLilvNode(AutoLilvNode&& other) { n = other.n; other.n = nullptr; }
-	~AutoLilvNode() { if(n) { lilv_node_free(n); } }
+	~AutoLilvNode() { if (n) { lilv_node_free(n); } }
 	const LilvNode* get() const { return n; }
 };
 

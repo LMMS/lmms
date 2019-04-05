@@ -130,7 +130,7 @@ Lv2ViewBase::Lv2ViewBase(QWidget* meAsWidget, Lv2ControlBase *ctrlBase)
 
 	QHBoxLayout* btnBox = new QHBoxLayout();
 	grid->addLayout(btnBox, Rows::ButtonRow, 0, 1, m_colNum);
-	if(/* DISABLES CODE */ (false))
+	if (/* DISABLES CODE */ (false))
 	{
 		m_reloadPluginButton = new QPushButton(QObject::tr("Reload Plugin"),
 			meAsWidget);

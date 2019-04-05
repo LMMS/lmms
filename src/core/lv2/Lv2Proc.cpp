@@ -245,7 +245,7 @@ void Lv2Proc::initPlugin()
 
 	if (m_instance)
 	{
-		for(unsigned portNum = 0; portNum < m_ports.size(); ++portNum)
+		for (unsigned portNum = 0; portNum < m_ports.size(); ++portNum)
 			connectPort(portNum);
 		lilv_instance_activate(m_instance);
 	}
@@ -378,7 +378,7 @@ void Lv2Proc::createPorts()
 
 		void visit(Lv2Ports::Control& ctrl) override
 		{
-			if(ctrl.m_flow == Lv2Ports::Flow::Input)
+			if (ctrl.m_flow == Lv2Ports::Flow::Input)
 			{
 				AutomatableModel* amo = ctrl.m_connectedModel.get();
 				proc->m_connectedModels.emplace(
@@ -409,8 +409,8 @@ void Lv2Proc::createPorts()
 						break;
 				}
 				// in Lv2, leftPort is defined to be the first port
-				if(!portRef->m_left) { portRef->m_left = &audio; }
-				else if(!portRef->m_right) { portRef->m_right = &audio; }
+				if (!portRef->m_left) { portRef->m_left = &audio; }
+				else if (!portRef->m_right) { portRef->m_right = &audio; }
 			}
 		}
 	};

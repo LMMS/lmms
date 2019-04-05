@@ -144,7 +144,7 @@ std::vector<PluginIssue> Meta::get(const LilvPlugin *plugin,
 			auto takeRangeValue = [&](LilvNode* node,
 				float& storeHere, PluginIssueType it)
 			{
-				if(node) { storeHere = lilv_node_as_float(node); }
+				if (node) { storeHere = lilv_node_as_float(node); }
 				else { issue(it, portName); }
 				lilv_node_free(node);
 			};
