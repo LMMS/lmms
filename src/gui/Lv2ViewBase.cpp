@@ -62,7 +62,7 @@ Lv2ViewProc::Lv2ViewProc(QWidget* parent, Lv2Proc* ctrlBase,
 		ControlBase* control = nullptr; // output
 		void visit(Lv2Ports::Control& port) override
 		{
-			if(port.m_flow == Lv2Ports::Flow::Input)
+			if (port.m_flow == Lv2Ports::Flow::Input)
 			{
 				using PortVis = Lv2Ports::Vis;
 

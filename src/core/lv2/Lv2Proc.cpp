@@ -45,41 +45,41 @@ Plugin::PluginTypes Lv2Proc::check(const LilvPlugin *plugin,
 	enum { checkIn, checkOut, checkMax };
 	unsigned audioChannels[checkMax] = { 0, 0 }; // input and output count
 
-	for(unsigned portNum = 0; portNum < maxPorts; ++portNum)
+	for (unsigned portNum = 0; portNum < maxPorts; ++portNum)
 	{
 		Lv2Ports::Meta meta;
 		// does all port checks:
 		std::vector<PluginIssue> tmp = meta.get(plugin, portNum);
 		std::move(tmp.begin(), tmp.end(), std::back_inserter(issues));
 
-		if(meta.m_type == Lv2Ports::Type::Audio &&
+		if (meta.m_type == Lv2Ports::Type::Audio &&
 			!portIsSideChain(plugin,
 							lilv_plugin_get_port_by_index(plugin, portNum)))
 			++audioChannels[meta.m_flow == Lv2Ports::Flow::Output];
 	}
 
-	if(audioChannels[checkIn] > 2)
+	if (audioChannels[checkIn] > 2)
 		issues.emplace_back(tooManyInputChannels,
 			std::to_string(audioChannels[0]));
-	if(audioChannels[checkOut] == 0)
+	if (audioChannels[checkOut] == 0)
 		issues.emplace_back(noOutputChannel);
-	else if(audioChannels[checkOut] > 2)
+	else if (audioChannels[checkOut] > 2)
 		issues.emplace_back(tooManyOutputChannels,
 			std::to_string(audioChannels[1]));
 
 	const LilvNodes* reqFeats = lilv_plugin_get_required_features(plugin);
-	LILV_FOREACH(nodes, itr, reqFeats)
+	LILV_FOREACH (nodes, itr, reqFeats)
 	{
 		issues.emplace_back(featureNotSupported,
 			lilv_node_as_string(lilv_nodes_get(reqFeats, itr)));
 	}
 
-	if(printIssues && issues.size())
+	if (printIssues && issues.size())
 	{
 		qDebug() << "Lv2 plugin " <<
 			lilv_node_as_string(lilv_plugin_get_name(plugin))
 			<< " can not be loaded:";
-		for(const PluginIssue& iss : issues) { qDebug() << "  - " << iss; }
+		for (const PluginIssue& iss : issues) { qDebug() << "  - " << iss; }
 	}
 
 	return (audioChannels[1] > 2 || audioChannels[0] > 2)
@@ -96,7 +96,7 @@ Lv2Proc::Lv2Proc(const LilvPlugin *plugin, Model* parent) :
 	LinkedModelGroup(parent),
 	m_plugin(plugin)
 {
-	if(m_plugin)
+	if (m_plugin)
 	{
 		initPlugin();
 	}
@@ -118,7 +118,7 @@ Lv2Proc::~Lv2Proc() { shutdownPlugin(); }
 void Lv2Proc::dumpPorts()
 {
 	std::size_t num = 0;
-	for(const Lv2Ports::PortBase* port: m_ports)
+	for (const Lv2Ports::PortBase* port: m_ports)
 	{
 		(void)port;
 		dumpPort(num++);
@@ -147,7 +147,7 @@ void Lv2Proc::copyModelsFromCore()
 	{
 		void visit(Lv2Ports::Control& ctrl) override
 		{
-			if(ctrl.m_flow == Lv2Ports::Flow::Input)
+			if (ctrl.m_flow == Lv2Ports::Flow::Input)
 			{
 				FloatFromModel ffm;
 				ffm.m_scalePointMap = &ctrl.m_scalePointMap;
@@ -157,7 +157,7 @@ void Lv2Proc::copyModelsFromCore()
 		}
 		void visit(Lv2Ports::Cv& cv) override
 		{
-			if(cv.m_flow == Lv2Ports::Flow::Input)
+			if (cv.m_flow == Lv2Ports::Flow::Input)
 			{
 				FloatFromModel ffm;
 				ffm.m_scalePointMap = &cv.m_scalePointMap;
@@ -179,13 +179,13 @@ void Lv2Proc::copyBuffersFromCore(const sampleFrame *buf,
 									fpp_t frames)
 {
 	inPorts().m_left->copyBuffersFromCore(buf, offset, frames);
-	if(num > 1)
+	if (num > 1)
 	{
 		// if the caller requests to take input from two channels, but we only
 		// have one input channel... take medium of left and right for
 		// mono input
 		// (this happens if we have two outputs and only one input)
-		if(inPorts().m_right)
+		if (inPorts().m_right)
 			inPorts().m_right->copyBuffersFromCore(buf, offset + 1, frames);
 		else
 			inPorts().m_left->addBuffersFromCore(buf, offset + 1, frames);
@@ -200,7 +200,7 @@ void Lv2Proc::copyBuffersToCore(sampleFrame* buf,
 								fpp_t frames) const
 {
 	outPorts().m_left->copyBuffersToCore(buf, offset + 0, frames);
-	if(num > 1)
+	if (num > 1)
 	{
 		// if the caller requests to copy into two channels, but we only have
 		// one output channel, duplicate our output
@@ -243,7 +243,7 @@ void Lv2Proc::initPlugin()
 		Engine::mixer()->processingSampleRate(),
 		nullptr);
 
-	if(m_instance)
+	if (m_instance)
 	{
 		for(unsigned portNum = 0; portNum < m_ports.size(); ++portNum)
 			connectPort(portNum);
@@ -290,12 +290,12 @@ void Lv2Proc::createPort(unsigned portNum)
 	if (meta.m_type == Lv2Ports::Type::Control)
 	{
 		Lv2Ports::Control* ctrl = new Lv2Ports::Control;
-		if(meta.m_flow == Lv2Ports::Flow::Input)
+		if (meta.m_flow == Lv2Ports::Flow::Input)
 		{
 			LilvNode* node = lilv_port_get_name(m_plugin, lilvPort);
 			QString dispName = lilv_node_as_string(node);
 			lilv_node_free(node);
-			switch(meta.m_vis)
+			switch (meta.m_vis)
 			{
 				case Lv2Ports::Vis::None:
 				{
@@ -393,11 +393,11 @@ void Lv2Proc::createPorts()
 
 		void visit(Lv2Ports::Audio& audio) override
 		{
-			if(!audio.isSideChain())
+			if (!audio.isSideChain())
 			{
 				StereoPortRef dummy;
 				StereoPortRef* portRef = &dummy;
-				switch(audio.m_flow)
+				switch (audio.m_flow)
 				{
 					case Lv2Ports::Flow::Input:
 						portRef = &proc->m_inPorts;
@@ -418,7 +418,7 @@ void Lv2Proc::createPorts()
 	unsigned maxPorts = lilv_plugin_get_num_ports(m_plugin);
 	m_ports.resize(maxPorts);
 
-	for(unsigned portNum = 0; portNum < maxPorts; ++portNum)
+	for (unsigned portNum = 0; portNum < maxPorts; ++portNum)
 	{
 		createPort(portNum);
 		RegisterPort registerPort;
@@ -465,7 +465,7 @@ void Lv2Proc::connectPort(unsigned num)
 
 void Lv2Proc::destroyPorts()
 {
-	for(Lv2Ports::PortBase* p: m_ports) { delete p; }
+	for (Lv2Ports::PortBase* p: m_ports) { delete p; }
 }
 
 
@@ -478,7 +478,7 @@ void Lv2Proc::dumpPort(std::size_t num)
 		void visit(const Lv2Ports::Control& ctrl) override {
 			qDebug() << "  control port";
 			// output ports may be uninitialized yet, only print inputs
-			if(ctrl.m_flow == Lv2Ports::Flow::Input)
+			if (ctrl.m_flow == Lv2Ports::Flow::Input)
 			{
 				qDebug() << "    value:" << ctrl.m_val;
 			}
@@ -497,7 +497,7 @@ void Lv2Proc::dumpPort(std::size_t num)
 	qDebug() << "  flow: " << Lv2Ports::toStr(port.m_flow);
 	qDebug() << "  type: " << Lv2Ports::toStr(port.m_type);
 	qDebug() << "  visualization: " << Lv2Ports::toStr(port.m_vis);
-	if(port.m_type == Lv2Ports::Type::Control || port.m_type == Lv2Ports::Type::Cv)
+	if (port.m_type == Lv2Ports::Type::Control || port.m_type == Lv2Ports::Type::Cv)
 	{
 		qDebug() << "  default:" << port.m_def;
 		qDebug() << "  min:" << port.m_min;
