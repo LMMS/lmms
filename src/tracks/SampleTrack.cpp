@@ -154,7 +154,7 @@ void SampleTCO::setSampleFile( const QString & _sf )
 	else
 	{	//Otherwise set it to the sample's length
 		m_sampleBuffer->setAudioFile( _sf );
-		length = (int) ( m_sampleBuffer->frames() / Engine::framesPerTick() ) ;
+		length = sampleLength();
 	}
 	changeLength(length);
 
