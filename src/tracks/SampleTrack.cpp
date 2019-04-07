@@ -152,7 +152,7 @@ void SampleTCO::setSampleFile( const QString & _sf )
 		length = DefaultTicksPerTact * ( nom / den );
 	}
 	else
-	{	//Otherwise set it to the samples length
+	{	//Otherwise set it to the sample's length
 		m_sampleBuffer->setAudioFile( _sf );
 		length = (int) ( m_sampleBuffer->frames() / Engine::framesPerTick() ) ;
 	}
