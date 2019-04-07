@@ -27,21 +27,19 @@
 
 #include "Effect.h"
 #include "lmms_math.h"
-
 #include "SaControls.h"
-#include "SaSpectrumView.h"
-#include "SaWaterfallView.h"
+#include "SaProcessor.h"
 
-class Analyzer : public Effect
-{
+
+// Top level class; feeds data to the data processor.
+class Analyzer : public Effect {
 public:
-	Analyzer(Model * parent, const Descriptor::SubPluginFeatures::Key * key);
-	virtual ~Analyzer();
-	virtual bool processAudioBuffer(sampleFrame * buf, const fpp_t frames);
-	virtual EffectControls * controls()	{
-		return &m_controls;
-	}
-	SaProcessor * getProcessor() {return &m_processor;}
+	Analyzer(Model *parent, const Descriptor::SubPluginFeatures::Key *key);
+	virtual ~Analyzer() {};
+
+	virtual bool processAudioBuffer(sampleFrame *buffer, const fpp_t frame_count);
+	virtual EffectControls *controls()	{return &m_controls;}
+	SaProcessor *getProcessor() {return &m_processor;}
 
 private:
 	SaControls m_controls;

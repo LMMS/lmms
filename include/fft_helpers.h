@@ -54,8 +54,8 @@ float LMMS_EXPORT maximum(std::vector<float> &abs_spectrum);
  *
  *	returns -1 on error
  */
-int LMMS_EXPORT normalize(float *abs_spectrum, float *norm_spectrum, unsigned int bin_count);
-int LMMS_EXPORT normalize(std::vector<float> &abs_spectrum, std::vector<float> &norm_spectrum);
+int LMMS_EXPORT normalize(float *abs_spectrum, float *norm_spectrum, unsigned int bin_count, unsigned int block_size);
+int LMMS_EXPORT normalize(std::vector<float> &abs_spectrum, std::vector<float> &norm_spectrum, unsigned int block_size);
 
 
 /* Check if the spectrum contains any non-zero value.

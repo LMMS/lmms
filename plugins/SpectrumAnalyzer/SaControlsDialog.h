@@ -1,7 +1,6 @@
 /*
  * SaControlsDialog.h - declatation of SaControlsDialog class.
  *
- * Copyright (c) 2014 David French <dave/dot/french3/at/googlemail/dot/com>
  * Copyright (c) 2019 Martin Pavelek <he29/dot/HS/at/gmail/dot/com>
  *
  * This file is part of LMMS - https://lmms.io
@@ -26,29 +25,32 @@
 #ifndef SACONTROLSDIALOG_H
 #define SACONTROLSDIALOG_H
 
-#include <QLabel>
-
 #include "EffectControlDialog.h"
+#include "SaControls.h"
 #include "SaSpectrumView.h"
+#include "SaProcessor.h"
+#include "SaWaterfallView.h"
 
 
-class BoolModel;
-class SaControls;
-
-class SaControlsDialog : public EffectControlDialog
-{
+// Top-level widget holding the configuration GUI and spectrum displays
+class SaControlsDialog : public EffectControlDialog {
 	Q_OBJECT
 public:
 	SaControlsDialog(SaControls *controls, SaProcessor *processor);
 	virtual ~SaControlsDialog() {}
 
 	virtual bool isResizable() const {return true;}
+	virtual QSize sizeHint() const;
 
 private:
-	SaControls * m_controls;
-	SaProcessor * m_processor;
+	SaControls *m_controls;
+	SaProcessor *m_processor;
 
-	void blockSizeChanged(int new_size);
+	// Pointers to created widgets are needed to keep track of sizeHint() changes.
+	// Config widget is constructed dynamically and has just a fixed height instead.
+	const int m_configHeight = 70;
+	SaSpectrumView *m_spectrum;
+	SaWaterfallView *m_waterfall;
 };
 
 #endif // SACONTROLSDIALOG_H

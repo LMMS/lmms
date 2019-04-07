@@ -34,6 +34,7 @@
 #include "fft_helpers.h"
 #include "SaControls.h"
 
+
 class SaProcessor {
 public:
 	SaProcessor(SaControls *controls);
@@ -43,6 +44,8 @@ public:
 
 	void setActive(bool active);
 	bool getActive() const;
+
+	void setWaterfallActive(bool active);
 
 	void reallocateBuffers();
 	void rebuildWindow();
@@ -68,11 +71,13 @@ public:
 private:
 	SaControls *m_controls;
 
-	unsigned int m_blockSize;		// size of FFT input block
+	const unsigned int m_zeroPadFactor = 2;	// use n-steps bigger FFT for given block
+	unsigned int m_inBlockSize;				// size of input data block
+	unsigned int m_fftBlockSize;			// size of padded block for FFT processing
 	unsigned int m_sampleRate;
 	unsigned int m_windowType;
 
-	unsigned int binCount() {return m_blockSize / 2 + 1;}	// number of output frequency bins
+	unsigned int binCount() {return m_fftBlockSize / 2 + 1;}	// number of output frequency bins
 
 	unsigned int m_framesFilledUp;
 	std::vector<float> m_fftWindow;
@@ -88,8 +93,11 @@ private:
 	std::vector<float> m_normSpectrumR;
 
 	std::vector<uchar> m_history;
+	const int m_waterfallHeight = 200;	// number of lines held for display by the real-time spectrogram
+										// Note: high values will make it harder to see transients.
 
 	bool m_active;
+	bool m_waterfallActive;
 	bool m_destroyed;
 
 	QRgb makePixel(float left, float right);

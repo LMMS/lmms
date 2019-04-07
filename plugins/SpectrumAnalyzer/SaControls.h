@@ -29,12 +29,13 @@
 
 #include "ComboBoxModel.h"
 #include "EffectControls.h"
+#include "SubWindow.h"
 
-//#define DEBUG 1		// define DEBUG to enable performance measurements
+//#define SA_DEBUG 1		// define SA_DEBUG to enable performance measurements
 
-// define shared parameters, limits, ranges etc.
-const int LOWEST_LOG_FREQ = 10;		// arbitrary low frequency limit for log. scale (Hz, >1)
-const int WATERFALL_HEIGHT = 200;	// number of lines displayed by the real-time spectrogram
+// Frequency ranges (in Hz).
+// Full range is defined by LOWEST_LOG_FREQ and current sample rate.
+const int LOWEST_LOG_FREQ = 10;		// arbitrary low limit for log. scale, >1
 
 enum FREQUENCY_RANGES {
 	FRANGE_FULL = 0,
@@ -53,6 +54,10 @@ const int FRANGE_MIDS_END = 5000;
 const int FRANGE_HIGH_START = 4000;
 const int FRANGE_HIGH_END = 20000;
 
+// Amplitude ranges.
+// Reference: sine wave from -1.0 to 1.0 = 0 dB.
+// I.e. if master volume is 100 %, positive values signify clipping.
+// Doubling or halving the amplitude produces 3 dB difference.
 enum AMPLITUDE_RANGES {
 	ARANGE_EXTENDED = 0,
 	ARANGE_DEFAULT,
@@ -62,8 +67,8 @@ enum AMPLITUDE_RANGES {
 
 const int ARANGE_EXTENDED_START = -80;
 const int ARANGE_EXTENDED_END = 20;
-const int ARANGE_DEFAULT_START = -30;
-const int ARANGE_DEFAULT_END = 6;
+const int ARANGE_DEFAULT_START = -36;
+const int ARANGE_DEFAULT_END = 0;
 const int ARANGE_AUDIBLE_START = -50;
 const int ARANGE_AUDIBLE_END = 10;
 const int ARANGE_NOISE_START = -60;
@@ -72,6 +77,7 @@ const int ARANGE_NOISE_END = -20;
 
 class Analyzer;
 
+// Holds all the configuration values
 class SaControls : public EffectControls {
 	Q_OBJECT
 public:
@@ -88,6 +94,7 @@ public:
 
 private:
 	Analyzer *m_effect;
+	EffectControlDialog *m_controlsDialog;
 
 	BoolModel m_pauseModel;
 	BoolModel m_refFreezeModel;

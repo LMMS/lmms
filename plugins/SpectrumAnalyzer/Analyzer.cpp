@@ -1,8 +1,10 @@
 /*
  * Analyzer.cpp - definition of Analyzer class.
  *
- * Copyright (c) 2014 David French <dave/dot/french3/at/googlemail/dot/com>
  * Copyright (c) 2019 Martin Pavelek <he29/dot/HS/at/gmail/dot/com>
+ *
+ * Based partially on Eq plugin code,
+ * Copyright (c) 2014-2017, David French <dave/dot/french3/at/googlemail/dot/com>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -25,29 +27,23 @@
 
 #include "Analyzer.h"
 
-#include "Engine.h"
-#include "interpolation.h"
-#include "lmms_math.h"
-
 #include "embed.h"
 #include "plugin_export.h"
 
-extern "C"
-{
 
-Plugin::Descriptor PLUGIN_EXPORT analyzer_plugin_descriptor =
-{
-	STRINGIFY(PLUGIN_NAME),
-	"Spectrum Analyzer",
-	QT_TRANSLATE_NOOP("pluginBrowser", "A graphical spectrum analyzer based on EQ plugin code by David French."),
-	"Martin Pavelek <he29/dot/HS/at/gmail/dot/com>",
-	0x0100,
-	Plugin::Effect,
-	new PluginPixmapLoader("logo"),
-	NULL,
-	NULL
-};
-
+extern "C" {
+	Plugin::Descriptor PLUGIN_EXPORT analyzer_plugin_descriptor =
+	{
+		STRINGIFY(PLUGIN_NAME),
+		"Spectrum Analyzer",
+		QT_TRANSLATE_NOOP("pluginBrowser", "A graphical spectrum analyzer."),
+		"Martin Pavelek <he29/dot/HS/at/gmail/dot/com>",
+		0x0100,
+		Plugin::Effect,
+		new PluginPixmapLoader("logo"),
+		NULL,
+		NULL
+	};
 }
 
 
@@ -59,31 +55,20 @@ Analyzer::Analyzer(Model *parent, const Plugin::Descriptor::SubPluginFeatures::K
 }
 
 
-Analyzer::~Analyzer() {
-}
-
-
-bool Analyzer::processAudioBuffer(sampleFrame *buf, const fpp_t frames) {
+bool Analyzer::processAudioBuffer(sampleFrame *buffer, const fpp_t frame_count) {
 	if (!isEnabled() || !isRunning ()) {
 		return false;
 	}
-
 	if (m_controls.isViewVisible()) {
-		m_processor.analyse(buf, frames);
-	} else {
-		m_processor.clear();
+		m_processor.analyse(buffer, frame_count);
 	}
-
 	return isRunning();
 }
 
 
-extern "C"
-{
-
-//needed for getting plugin out of shared lib
-PLUGIN_EXPORT Plugin * lmms_plugin_main(Model* parent, void* data) {
-	return new Analyzer(parent, static_cast<const Plugin::Descriptor::SubPluginFeatures::Key *>(data));
-}
-
+extern "C" {
+	// needed for getting plugin out of shared lib
+	PLUGIN_EXPORT Plugin *lmms_plugin_main(Model *parent, void *data) {
+		return new Analyzer(parent, static_cast<const Plugin::Descriptor::SubPluginFeatures::Key *>(data));
+	}
 }

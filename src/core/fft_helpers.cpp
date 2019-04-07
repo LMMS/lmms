@@ -54,31 +54,32 @@ float maximum(std::vector<float> &abs_spectrum)
 }
 
 
-/* Normalize the array of absolute values to a 0..1 range
+/* Normalize the array of absolute values to a 0..1 range.
+	Block size refers to block size before zero padding.
 
 	returns -1 on error
 	returns maximum
 */
-int normalize(float *abs_spectrum, float *norm_spectrum, unsigned int bin_count)
+int normalize(float *abs_spectrum, float *norm_spectrum, unsigned int bin_count, unsigned int block_size)
 {
 	int i;
 
-	if (abs_spectrum == NULL || norm_spectrum == NULL || bin_count == 0) {
+	if (abs_spectrum == NULL || norm_spectrum == NULL || bin_count == 0 || block_size == 0) {
 		return -1;
 	}
 
 	for (i = 0; i < bin_count; i++) {
-		norm_spectrum[i] = abs_spectrum[i] / bin_count;
+		norm_spectrum[i] = abs_spectrum[i] / block_size;
 	}
 
 	return 0;
 }
 
-int normalize(std::vector<float> &abs_spectrum, std::vector<float> &norm_spectrum)
+int normalize(std::vector<float> &abs_spectrum, std::vector<float> &norm_spectrum, unsigned int block_size)
 {
 	if (abs_spectrum.size() != norm_spectrum.size()) {return -1;}
 
-	return normalize(abs_spectrum.data(), norm_spectrum.data(), abs_spectrum.size());
+	return normalize(abs_spectrum.data(), norm_spectrum.data(), abs_spectrum.size(), block_size);
 }
 
 

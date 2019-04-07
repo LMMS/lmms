@@ -23,37 +23,36 @@
 #ifndef SAWATERFALLVIEW_H
 #define SAWATERFALLVIEW_H
 
+#include <algorithm>
+#include <string>
+#include <utility>
+#include <vector>
 #include <QPainter>
 #include <QWidget>
 #include <QString>
 #include <QImage>
 
-#include <vector>
-#include <utility>
-#include <string>
-#include <algorithm>
-
-#include "SaControls.h"
-#include "SaProcessor.h"
-
 #include "fft_helpers.h"
 #include "lmms_basics.h"
 #include "lmms_math.h"
+#include "SaControls.h"
+#include "SaProcessor.h"
 
 
-class SaWaterfallView : public QWidget
-{
+// Widget that displays a spectrum waterfall (spectrograph) and time labels.
+class SaWaterfallView : public QWidget {
 	Q_OBJECT
 public:
 	explicit SaWaterfallView(SaControls *controls, SaProcessor *processor, QWidget *_parent = 0);
-	virtual ~SaWaterfallView(){}
+	virtual ~SaWaterfallView() {}
 
-	float timeToYPixel(float time, int height);
+	virtual QSize sizeHint() const {return QSize(400, 350);}
 
-	std::vector<std::pair<float, std::string>> makeTimeTics();
+	void updateVisibility();
 
 protected:
 	virtual void paintEvent(QPaintEvent *event);
+	virtual void showEvent(QShowEvent *event) {};
 
 private slots:
 	void periodicUpdate();
@@ -62,11 +61,10 @@ private:
 	SaControls *m_controls;
 	SaProcessor *m_processor;
 
-	QImage m_graph;
-
-	std::vector<std::pair<float, std::string>> m_timeTics;	// 0..n (s)
-
+	// Methods and data used to make time labels
 	float m_oldTimePerLine;
-	bool m_periodicUpdate;
+	float timeToYPixel(float time, int height);
+	std::vector<std::pair<float, std::string>> makeTimeTics();
+	std::vector<std::pair<float, std::string>> m_timeTics;	// 0..n (s)
 };
 #endif // SAWATERFALLVIEW_H

@@ -34,6 +34,7 @@ SaControls::SaControls(Analyzer *effect) :
 	EffectControls(effect),
 	m_effect(effect),
 
+	// initialize bool and combo box models
 	m_pauseModel(false, this, tr("Pause data acquisition")),
 	m_refFreezeModel(false, this, tr("Freeze current input as a reference")),
 
@@ -50,6 +51,8 @@ SaControls::SaControls(Analyzer *effect) :
 	m_blockSizeModel(this, tr("FFT block size")),
 	m_windowModel(this, tr("FFT window type"))
 {
+	// Frequency and amplitude ranges; order must match
+	// FREQUENCY_RANGES and AMPLITUDE_RANGES defined in SaControls.h
 	m_freqRangeModel.addItem(tr("Full (auto)"));
 	m_freqRangeModel.addItem(tr("Audible"));
 	m_freqRangeModel.addItem(tr("Bass"));
@@ -63,34 +66,46 @@ SaControls::SaControls(Analyzer *effect) :
 	m_ampRangeModel.addItem(tr("Noise"));
 	m_ampRangeModel.setValue(m_ampRangeModel.findText(tr("Default")));
 
-	for (int i = 0; i < FFT_BLOCK_SIZES.size(); i++){
+	// FFT block size labels are generated automatically, based on
+	// FFT_BLOCK_SIZES vector defined in fft_helpers.h
+	for (int i = 0; i < FFT_BLOCK_SIZES.size(); i++) {
 		if (i == 0){
-			m_blockSizeModel.addItem((std::to_string(FFT_BLOCK_SIZES[i]) + " ").c_str() + tr("(Fast, low-res.)"));
+			m_blockSizeModel.addItem((std::to_string(FFT_BLOCK_SIZES[i]) + " ").c_str() + tr("(High time res.)"));
 		} else if (i == FFT_BLOCK_SIZES.size() - 1){
-			m_blockSizeModel.addItem((std::to_string(FFT_BLOCK_SIZES[i]) + " ").c_str() + tr("(Slow, high-res.)"));
+			m_blockSizeModel.addItem((std::to_string(FFT_BLOCK_SIZES[i]) + " ").c_str() + tr("(High freq. res.)"));
 		} else {
 			m_blockSizeModel.addItem(std::to_string(FFT_BLOCK_SIZES[i]).c_str());
 		}
 	}
 	m_blockSizeModel.setValue(m_blockSizeModel.findText("2048"));
 
+	// Window type order must match FFT_WINDOWS defined in fft_helpers.h
 	m_windowModel.addItem(tr("Rectangular (Off)"));
 	m_windowModel.addItem(tr("Blackman-Harris (Default)"));
 	m_windowModel.addItem(tr("Hamming"));
 	m_windowModel.addItem(tr("Hanning"));
 	m_windowModel.setValue(m_windowModel.findText(tr("Blackman-Harris (Default)")));
 
-	m_colorL = QColor(51, 148, 204, 135);		// Make sure the sum of L and R
-	m_colorR = QColor(204, 107, 51, 135);		// stays lower or equal to 255.
+	// Colors
+	// Background color is defined by Qt / theme.
+	// Make sure the sum of colors for L and R channel stays lower or equal
+	// to 255. Otherwise the Waterfall pixels may overflow back to 0 even when
+	// the input signal isn't clipping (over 1.0).
+	m_colorL = QColor(51, 148, 204, 135);
+	m_colorR = QColor(204, 107, 51, 135);
 	m_colorMono = QColor(51, 148, 204, 204);
-	m_colorBG = QColor(7, 7, 7, 255);			// 20 % gray
-	m_colorGrid = QColor(30, 34, 38, 255);		// 40 % gray (slightly cold / blue)
-	m_colorLabels = QColor(192, 202, 212, 255);	// 90 % gray (slightly cold / blue)
+	m_colorBG = QColor(7, 7, 7, 255);			// ~20 % gray (after gamma correction)
+	m_colorGrid = QColor(30, 34, 38, 255);		// ~40 % gray (slightly cold / blue)
+	m_colorLabels = QColor(192, 202, 212, 255);	// ~90 % gray (slightly cold / blue)
 }
 
 
 EffectControlDialog* SaControls::createView() {
-	return new SaControlsDialog(this, m_effect->getProcessor());
+	// Display of GUI elements is handled by SaControlDialog widget.
+	// Also keeps SaControls (this) and SaProcessor pointers for other classes.
+	m_controlsDialog = new SaControlsDialog(this, m_effect->getProcessor());
+
+	return m_controlsDialog;
 }
 
 

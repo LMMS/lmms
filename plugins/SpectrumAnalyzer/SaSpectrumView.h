@@ -42,16 +42,14 @@
 #include "SaProcessor.h"
 
 
+// Widget that displays a spectrum curve and frequency / amplitude grid
 class SaSpectrumView : public QWidget {
 	Q_OBJECT
 public:
 	explicit SaSpectrumView(SaControls *controls, SaProcessor *processor, QWidget *_parent = 0);
 	virtual ~SaSpectrumView(){}
 
-	std::vector<std::pair<int, std::string>> makeLogTics(int low, int high);
-	std::vector<std::pair<int, std::string>> makeLinearTics(int low, int high);
-	std::vector<std::pair<float, std::string>> makeDBTics(int low, int high);
-	std::vector<std::pair<float, std::string>> makeAmpTics(int low, int high);
+	virtual QSize sizeHint() const {return QSize(400, 200);}
 
 protected:
 	virtual void paintEvent(QPaintEvent *event);
@@ -65,51 +63,61 @@ private:
 	SaControls *m_controls;
 	SaProcessor *m_processor;
 
-	bool m_periodicUpdate;
+	bool m_periodicUpdate;		// Qt indicates that window content should be updated
 
-	QColor m_colorL;
-	QColor m_colorR;
-	QColor m_colorMono;
-	QColor m_colorBG;
-	QColor m_colorGrid;
-	QColor m_colorLabels;
-
-	QPainterPath m_pathL;
-	QPainterPath m_pathR;
-	QPainterPath m_pathPeakL;
-	QPainterPath m_pathPeakR;
-
+	// grid labels (position, label) and methods to generate them
 	std::vector<std::pair<int, std::string>> m_logFreqTics;		// 10-20-50... Hz
 	std::vector<std::pair<int, std::string>> m_linearFreqTics;	// 2k-4k-6k... Hz
 	std::vector<std::pair<float, std::string>> m_logAmpTics;	// dB
 	std::vector<std::pair<float, std::string>> m_linearAmpTics;	// 0..1
+	std::vector<std::pair<int, std::string>> makeLogFreqTics(int low, int high);
+	std::vector<std::pair<int, std::string>> makeLinearFreqTics(int low, int high);
+	std::vector<std::pair<float, std::string>> makeLogAmpTics(int low, int high);
+	std::vector<std::pair<float, std::string>> makeLinearAmpTics(int low, int high);
 
+	// currently selected ranges (see SaConfig.h for enum definitions)
+	int m_freqRangeIndex;
+	int m_ampRangeIndex;
+
+	// draw the grid and all labels based on selected ranges
+	void drawGrid(QPainter &painter);
+
+	// local buffers for frequency bin values
+	// (mainly needed for averaging and to remember last peak value)
 	std::vector<float> m_displayBufferL;
 	std::vector<float> m_displayBufferR;
 	std::vector<float> m_peakBufferL;
 	std::vector<float> m_peakBufferR;
 
-	float m_decaySum;
-	bool m_freezeRequest;
-	bool m_frozen;
-
-	QPoint m_cursor;
-	int m_freqRangeIndex;
-	int m_ampRangeIndex;
-
+	// final paths to be drawn by QPainter and methods to build them
+	QPainterPath m_pathL;
+	QPainterPath m_pathR;
+	QPainterPath m_pathPeakL;
+	QPainterPath m_pathPeakR;
 	void refreshPaths();
 	QPainterPath makePath(std::vector<float> &displayBuffer, float resolution);
-	void drawGrid(QPainter &painter);
+
+	float m_decaySum;		// indicates if there is anything left to draw
+	bool m_freezeRequest;	// new reference should be acquired
+	bool m_frozen;			// a reference is currently stored in the peakBuffer
+
+	const float m_smoothFactor = 0.15;		// alpha for exponential smoothing
+	const float m_peakFallFactor = 0.992;	// multiplier for gradual decay
+
+	// refresh data and draw the spectrum
+	void drawSpectrum(QPainter &painter);
+
+	// current cursor location and a method to draw it
+	QPoint m_cursor;
 	void drawCursor(QPainter &painter);
 
-	float freqToXPixel(float frequency, int width);
-	float xPixelToFreq(float x, int width);
-	float ampToYPixel(float amplitude, int height);
+	// wrappers for most used SaProcessor conversion helpers
+	// (to make local code more readable)
 	float binToFreq(int index);
+	float freqToXPixel(float frequency, int width);
+	float ampToYPixel(float amplitude, int height);
 
-	const float m_smoothFactor = 0.15;
-	const float m_peakFallFactor = 0.992;
-
+	// current boundaries for drawing
 	int m_displayTop;
 	int m_displayBottom;
 	int m_displayLeft;
@@ -117,3 +125,4 @@ private:
 	int m_displayWidth;
 };
 #endif // SASPECTRUMVIEW_H
+
