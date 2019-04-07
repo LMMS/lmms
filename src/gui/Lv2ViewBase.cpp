@@ -174,6 +174,7 @@ Lv2ViewBase::Lv2ViewBase(QWidget* meAsWidget, Lv2ControlBase *ctrlBase)
 		m_helpWindow = gui->mainWindow()->addWindowedWidget(infoLabel);
 		m_helpWindow->setSizePolicy(QSizePolicy::Minimum,
 									QSizePolicy::Expanding);
+		m_helpWindow->setAttribute(Qt::WA_DeleteOnClose, false);
 		m_helpWindow->hide();
 
 		break;
