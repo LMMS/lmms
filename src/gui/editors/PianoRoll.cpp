@@ -3523,7 +3523,7 @@ void PianoRoll::finishRecordNote(const Note & n )
 						it->getPanning() );
 				n1.quantizeLength( quantization() );
 
-				//ADDED CODE
+				//Get selected chordModel
 				const InstrumentFunctionNoteStacking::Chord & chord = InstrumentFunctionNoteStacking::ChordTable::getInstance()
 						.getChordByName( m_chordModel.currentText() );
 
@@ -3538,7 +3538,6 @@ void PianoRoll::finishRecordNote(const Note & n )
 							m_pattern->addNote( new_note );
 						}
 					}
-					//END ADDED CODE
 
 				m_pattern->addNote( n1 );
 				update();
