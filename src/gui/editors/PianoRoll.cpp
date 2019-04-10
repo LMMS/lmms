@@ -3522,6 +3522,24 @@ void PianoRoll::finishRecordNote(const Note & n )
 						it->key(), it->getVolume(),
 						it->getPanning() );
 				n1.quantizeLength( quantization() );
+
+				//ADDED CODE
+				const InstrumentFunctionNoteStacking::Chord & chord = InstrumentFunctionNoteStacking::ChordTable::getInstance()
+						.getChordByName( m_chordModel.currentText() );
+
+					if( ! chord.isEmpty() )
+					{
+						// if a chord is selected, create following notes in chord mode
+						for( int i = 1; i < chord.size(); i++ )
+						{
+							Note new_note( n.length(), it->pos(), it->key() + chord[i] );
+							new_note.setPanning( it->getPanning() );
+							new_note.setVolume( it->getVolume() );
+							m_pattern->addNote( new_note );
+						}
+					}
+					//END ADDED CODE
+
 				m_pattern->addNote( n1 );
 				update();
 				m_recordingNotes.erase( it );
