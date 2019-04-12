@@ -211,9 +211,9 @@ void ControllerConnection::loadSettings( const QDomElement & _this )
 			m_controllerId = -1;
 		}
 
-		if (!Engine::getSong()->isLoadingProject()
+		if ( !Engine::getSong()->isLoadingProject()
 			&& m_controllerId != -1
-			&& m_controllerId < Engine::getSong()->controllers().size())
+			&& m_controllerId < Engine::getSong()->controllers().size() )
 		{
 			setController( Engine::getSong()->
 				controllers().at( m_controllerId ) );
