@@ -37,8 +37,6 @@
 
 #include "Track.h"
 
-#include <QDebug>
-
 #include <assert.h>
 
 #include <QLayout>
