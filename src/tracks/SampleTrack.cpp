@@ -61,7 +61,7 @@ SampleTCO::SampleTCO( Track * _track ) :
 	// we need to receive bpm-change-events, because then we have to
 	// change length of this TCO
 	connect( Engine::getSong(), SIGNAL( tempoChanged( bpm_t ) ),
-					this, SLOT( updateLength() ) );
+					this, SLOT( updateLength() ), Qt::DirectConnection );
 	connect( Engine::getSong(), SIGNAL( timeSignatureChanged( int,int ) ),
 					this, SLOT( updateLength() ) );
 

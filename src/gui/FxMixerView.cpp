@@ -306,7 +306,7 @@ FxMixerView::FxChannelView::FxChannelView(QWidget * _parent, FxMixerView * _mv,
 	m_soloBtn->setCheckable( true );
 	m_soloBtn->move( 9,  m_fader->y()-21);
 	connect(&fxChannel->m_soloModel, SIGNAL( dataChanged() ),
-			_mv, SLOT ( toggledSolo() ) );
+			_mv, SLOT ( toggledSolo() ), Qt::DirectConnection );
 	ToolTip::add( m_soloBtn, tr( "Solo FX channel" ) );
 
 	// Create EffectRack for the channel

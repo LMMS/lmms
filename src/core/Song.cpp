@@ -96,18 +96,18 @@ Song::Song() :
 	m_elapsedTacts( 0 )
 {
 	connect( &m_tempoModel, SIGNAL( dataChanged() ),
-						this, SLOT( setTempo() ) );
+			this, SLOT( setTempo() ), Qt::DirectConnection );
 	connect( &m_tempoModel, SIGNAL( dataUnchanged() ),
-						this, SLOT( setTempo() ) );
+			this, SLOT( setTempo() ), Qt::DirectConnection );
 	connect( &m_timeSigModel, SIGNAL( dataChanged() ),
-					this, SLOT( setTimeSignature() ) );
+			this, SLOT( setTimeSignature() ), Qt::DirectConnection );
 
 
 	connect( Engine::mixer(), SIGNAL( sampleRateChanged() ), this,
 						SLOT( updateFramesPerTick() ) );
 
 	connect( &m_masterVolumeModel, SIGNAL( dataChanged() ),
-			this, SLOT( masterVolumeChanged() ) );
+			this, SLOT( masterVolumeChanged() ), Qt::DirectConnection );
 /*	connect( &m_masterPitchModel, SIGNAL( dataChanged() ),
 			this, SLOT( masterPitchChanged() ) );*/
 
