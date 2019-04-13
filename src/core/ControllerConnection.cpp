@@ -205,15 +205,13 @@ void ControllerConnection::loadSettings( const QDomElement & _this )
 	else
 	{
 		m_controllerId = _this.attribute( "id", "-1" ).toInt();
-		if( m_controllerId < 0 )
+		if( m_controllerId < 0 || m_controllerId >= Engine::getSong()->controllers().size() )
 		{
 			qWarning( "controller index invalid\n" );
 			m_controllerId = -1;
 		}
 
-		if ( !Engine::getSong()->isLoadingProject()
-			&& m_controllerId != -1
-			&& m_controllerId < Engine::getSong()->controllers().size() )
+		if ( !Engine::getSong()->isLoadingProject() && m_controllerId != -1 )
 		{
 			setController( Engine::getSong()->
 				controllers().at( m_controllerId ) );
