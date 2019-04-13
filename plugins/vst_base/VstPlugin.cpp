@@ -329,7 +329,9 @@ bool VstPlugin::processMessage( const message & _m )
 
 	case IdVstPluginWindowID:
 		m_pluginWindowID = _m.getInt();
-		if( m_embedMethod == "none" )
+		if( m_embedMethod == "none"
+			&& ConfigManager::inst()->value(
+				"ui", "vstalwaysontop" ).toInt() )
 		{
 #ifdef LMMS_BUILD_WIN32
 			// We're changing the owner, not the parent,

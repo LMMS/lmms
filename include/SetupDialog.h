@@ -126,6 +126,9 @@ private slots:
 	void toggleDisplayWaveform( bool en );
 	void toggleDisableAutoquit( bool en );
 
+	void vstEmbedMethodChanged();
+	void toggleVSTAlwaysOnTop( bool en );
+
 	void setLanguage( int lang );
 
 
@@ -207,6 +210,8 @@ private:
 
 	QComboBox* m_vstEmbedComboBox;
 	QString m_vstEmbedMethod;
+	LedCheckBox * m_vstAlwaysOnTopCheckBox;
+	bool m_vstAlwaysOnTop;
 } ;
 
 
