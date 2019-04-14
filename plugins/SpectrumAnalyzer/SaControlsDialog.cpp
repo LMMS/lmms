@@ -40,22 +40,20 @@
 #include "SaProcessor.h"
 
 
-#include <iostream>
-
-
+// The entire GUI layout is built here.
 SaControlsDialog::SaControlsDialog(SaControls *controls, SaProcessor *processor) :
 	EffectControlDialog(controls),
 	m_controls(controls),
 	m_processor(processor)
 {
-	// Top level layout is handled by QSplitter widget
+	// Top level placement of sections is handled by QSplitter widget.
 	QHBoxLayout *master_layout = new QHBoxLayout;
 	QSplitter *display_splitter = new QSplitter(Qt::Vertical);
 	master_layout->addWidget(display_splitter);
+	master_layout->setContentsMargins(2, 6, 2, 8);
 	setLayout(master_layout);
 
-
-	// QSplitter top: config section
+	// QSplitter top: configuration section
 	QWidget *config_widget = new QWidget;
 	QGridLayout *config_layout = new QGridLayout;
 	config_widget->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
@@ -63,10 +61,10 @@ SaControlsDialog::SaControlsDialog(SaControls *controls, SaProcessor *processor)
 	config_widget->setLayout(config_layout);
 	display_splitter->addWidget(config_widget);
 
-	// Precompute target pixmap size based on on monitor DPI.
+	// Pre-compute target pixmap size based on on monitor DPI.
 	// Using setDevicePixelRatio() on pixmap allows the SVG image to be razor
 	// sharp on High-DPI screens, but the desired size must be manually
-	// enlarged. No idea how to make Qt do it in a more reasonabe way.
+	// enlarged. No idea how to make Qt do it in a more reasonable way.
 	float iconSize = 22.0 * devicePixelRatio();
 	float buttonSize = 1.2 * iconSize;
 
@@ -93,7 +91,7 @@ SaControlsDialog::SaControlsDialog(SaControls *controls, SaProcessor *processor)
 	refFreezeButton->setModel(&controls->m_refFreezeModel);
 	config_layout->addWidget(refFreezeButton, 2, 0, 2, 1);
 
-	// display config switches
+	// misc configuration switches
 	LedCheckBox *waterfallButton = new LedCheckBox(tr("Waterfall"), this);
 	waterfallButton->setCheckable(true);
 	waterfallButton->setMinimumSize(70, 12);
@@ -118,8 +116,8 @@ SaControlsDialog::SaControlsDialog(SaControls *controls, SaProcessor *processor)
 	peakHoldButton->setModel(&controls->m_peakHoldModel);
 	config_layout->addWidget(peakHoldButton, 3, 1);
 
-	// frequency range
-	PixmapButton *logXButton = new PixmapButton(this, tr("Log. frequency"));
+	// frequency: linear / log. switch and range selector
+	PixmapButton *logXButton = new PixmapButton(this, tr("Logarithmic frequency"));
 	QPixmap *logXOnPixmap = new QPixmap(PLUGIN_NAME::getIconPixmap("x_log").scaled(iconSize, iconSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
 	QPixmap *logXOffPixmap = new QPixmap(PLUGIN_NAME::getIconPixmap("x_linear").scaled(iconSize, iconSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
 	logXOnPixmap->setDevicePixelRatio(devicePixelRatio());
@@ -136,8 +134,8 @@ SaControlsDialog::SaControlsDialog(SaControls *controls, SaProcessor *processor)
 	freqRangeCombo->setModel(&controls->m_freqRangeModel);
 	config_layout->addWidget(freqRangeCombo, 0, 3, 2, 1);
 
-	// amplitude range
-	PixmapButton *logYButton = new PixmapButton(this, tr("Log. amplitude"));
+	// amplitude: linear / log switch and range selector
+	PixmapButton *logYButton = new PixmapButton(this, tr("Logarithmic amplitude"));
 	QPixmap *logYOnPixmap = new QPixmap(PLUGIN_NAME::getIconPixmap("y_log").scaled(iconSize, iconSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
 	QPixmap *logYOffPixmap = new QPixmap(PLUGIN_NAME::getIconPixmap("y_linear").scaled(iconSize, iconSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
 	logYOnPixmap->setDevicePixelRatio(devicePixelRatio());
@@ -154,7 +152,7 @@ SaControlsDialog::SaControlsDialog(SaControls *controls, SaProcessor *processor)
 	ampRangeCombo->setModel(&controls->m_ampRangeModel);
 	config_layout->addWidget(ampRangeCombo, 2, 3, 2, 1);
 
-	// FFT: block size
+	// FFT: block size: icon and selector
 	QLabel *blockSizeLabel = new QLabel("", this);
 	QPixmap *blockSizeIcon = new QPixmap(PLUGIN_NAME::getIconPixmap("block_size"));
 	blockSizeIcon->setDevicePixelRatio(devicePixelRatio());
@@ -169,7 +167,7 @@ SaControlsDialog::SaControlsDialog(SaControls *controls, SaProcessor *processor)
 	processor->reallocateBuffers();
 	connect(&controls->m_blockSizeModel, &ComboBoxModel::dataChanged, [=] {processor->reallocateBuffers();});
 
-	// FFT: window type
+	// FFT: window type: icon and selector
 	QLabel *windowLabel = new QLabel("", this);
 	QPixmap *windowIcon = new QPixmap(PLUGIN_NAME::getIconPixmap("window"));
 	windowIcon->setDevicePixelRatio(devicePixelRatio());
@@ -187,19 +185,20 @@ SaControlsDialog::SaControlsDialog(SaControls *controls, SaProcessor *processor)
 
 	// QSplitter middle and bottom: spectrum display widgets
 	m_spectrum = new SaSpectrumView(controls, processor, this);
-	m_waterfall = new SaWaterfallView(controls, processor, this);
-	m_waterfall->setVisible(m_controls->m_waterfallModel.value());
 	display_splitter->addWidget(m_spectrum);
+
+	m_waterfall = new SaWaterfallView(controls, processor, this);
 	display_splitter->addWidget(m_waterfall);
+	m_waterfall->setVisible(m_controls->m_waterfallModel.value());
 	connect(&controls->m_waterfallModel, &BoolModel::dataChanged, [=] {m_waterfall->updateVisibility();});
 }
 
 
-// Report the best widget size.
+// Suggest the best current widget size.
 QSize SaControlsDialog::sizeHint() const {
 	// Best width is determined by spectrum display sizeHint.
 	// Best height depends on whether waterfall is visible and
-	// consists of heiights of the config section, spectrum, waterfall
+	// consists of heights of the config section, spectrum, waterfall
 	// and some reserve for margins.
 	if (m_waterfall->isVisible()) {
 		return QSize(m_spectrum->sizeHint().width(),
@@ -209,3 +208,4 @@ QSize SaControlsDialog::sizeHint() const {
 					 m_configHeight + m_spectrum->sizeHint().height() + 50);
 	}
 }
+

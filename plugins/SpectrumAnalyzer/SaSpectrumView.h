@@ -27,17 +27,12 @@
 #ifndef SASPECTRUMVIEW_H
 #define SASPECTRUMVIEW_H
 
-#include <algorithm>
 #include <string>
 #include <utility>
 #include <QMouseEvent>
 #include <QPainter>
-#include <QString>
 #include <QWidget>
 
-#include "fft_helpers.h"
-#include "lmms_basics.h"
-#include "lmms_math.h"
 #include "SaControls.h"
 #include "SaProcessor.h"
 
@@ -47,7 +42,7 @@ class SaSpectrumView : public QWidget {
 	Q_OBJECT
 public:
 	explicit SaSpectrumView(SaControls *controls, SaProcessor *processor, QWidget *_parent = 0);
-	virtual ~SaSpectrumView(){}
+	virtual ~SaSpectrumView() {}
 
 	virtual QSize sizeHint() const {return QSize(400, 200);}
 
@@ -55,6 +50,7 @@ protected:
 	virtual void paintEvent(QPaintEvent *event);
 	virtual void mouseMoveEvent(QMouseEvent *event);
 	virtual void mousePressEvent(QMouseEvent *event);
+	virtual void resizeEvent(QResizeEvent *event);
 
 private slots:
 	void periodicUpdate();
@@ -63,13 +59,12 @@ private:
 	SaControls *m_controls;
 	SaProcessor *m_processor;
 
-	bool m_periodicUpdate;		// Qt indicates that window content should be updated
-
 	// grid labels (position, label) and methods to generate them
 	std::vector<std::pair<int, std::string>> m_logFreqTics;		// 10-20-50... Hz
 	std::vector<std::pair<int, std::string>> m_linearFreqTics;	// 2k-4k-6k... Hz
 	std::vector<std::pair<float, std::string>> m_logAmpTics;	// dB
 	std::vector<std::pair<float, std::string>> m_linearAmpTics;	// 0..1
+
 	std::vector<std::pair<int, std::string>> makeLogFreqTics(int low, int high);
 	std::vector<std::pair<int, std::string>> makeLinearFreqTics(int low, int high);
 	std::vector<std::pair<float, std::string>> makeLogAmpTics(int low, int high);
@@ -82,12 +77,13 @@ private:
 	// draw the grid and all labels based on selected ranges
 	void drawGrid(QPainter &painter);
 
-	// local buffers for frequency bin values
-	// (mainly needed for averaging and to remember last peak value)
+	// local buffers for frequency bin values and a method to update them
+	// (mainly needed for averaging and to keep track of peak values)
 	std::vector<float> m_displayBufferL;
 	std::vector<float> m_displayBufferR;
 	std::vector<float> m_peakBufferL;
 	std::vector<float> m_peakBufferR;
+	void updateBuffers(float *spectrum, float *displayBuffer, float *peakBuffer);
 
 	// final paths to be drawn by QPainter and methods to build them
 	QPainterPath m_pathL;
@@ -97,14 +93,15 @@ private:
 	void refreshPaths();
 	QPainterPath makePath(std::vector<float> &displayBuffer, float resolution);
 
+	// helper variables for path drawing
 	float m_decaySum;		// indicates if there is anything left to draw
 	bool m_freezeRequest;	// new reference should be acquired
 	bool m_frozen;			// a reference is currently stored in the peakBuffer
 
 	const float m_smoothFactor = 0.15;		// alpha for exponential smoothing
-	const float m_peakFallFactor = 0.992;	// multiplier for gradual decay
+	const float m_peakDecayFactor = 0.992;	// multiplier for gradual peak decay
 
-	// refresh data and draw the spectrum
+	// top level: refresh buffers, make paths and draw the spectrum
 	void drawSpectrum(QPainter &painter);
 
 	// current cursor location and a method to draw it

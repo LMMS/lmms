@@ -29,9 +29,8 @@
 
 #include "ComboBoxModel.h"
 #include "EffectControls.h"
-#include "SubWindow.h"
 
-//#define SA_DEBUG 1		// define SA_DEBUG to enable performance measurements
+//#define SA_DEBUG 1	// define SA_DEBUG to enable performance measurements
 
 // Frequency ranges (in Hz).
 // Full range is defined by LOWEST_LOG_FREQ and current sample rate.
@@ -67,7 +66,7 @@ enum AMPLITUDE_RANGES {
 
 const int ARANGE_EXTENDED_START = -80;
 const int ARANGE_EXTENDED_END = 20;
-const int ARANGE_DEFAULT_START = -36;
+const int ARANGE_DEFAULT_START = -30;
 const int ARANGE_DEFAULT_END = 0;
 const int ARANGE_AUDIBLE_START = -50;
 const int ARANGE_AUDIBLE_END = 10;

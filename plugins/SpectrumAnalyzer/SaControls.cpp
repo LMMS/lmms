@@ -26,15 +26,15 @@
 
 #include <QtXml/QDomElement>
 
-#include "SaControlsDialog.h"
 #include "Analyzer.h"
+#include "SaControlsDialog.h"
 
 
 SaControls::SaControls(Analyzer *effect) :
 	EffectControls(effect),
 	m_effect(effect),
 
-	// initialize bool and combo box models
+	// initialize bool models and set default values
 	m_pauseModel(false, this, tr("Pause data acquisition")),
 	m_refFreezeModel(false, this, tr("Freeze current input as a reference")),
 
@@ -46,6 +46,7 @@ SaControls::SaControls(Analyzer *effect) :
 	m_logXModel(true, this, tr("Logarithmic frequency scale")),
 	m_logYModel(true, this, tr("Logarithmic amplitude scale")),
 
+	// default values of combo boxes are set after they are populated
 	m_freqRangeModel(this, tr("Frequency range")),
 	m_ampRangeModel(this, tr("Amplitude range")),
 	m_blockSizeModel(this, tr("FFT block size")),
@@ -100,9 +101,8 @@ SaControls::SaControls(Analyzer *effect) :
 }
 
 
+// Create the SaControlDialog widget which handles display of GUI elements.
 EffectControlDialog* SaControls::createView() {
-	// Display of GUI elements is handled by SaControlDialog widget.
-	// Also keeps SaControls (this) and SaProcessor pointers for other classes.
 	m_controlsDialog = new SaControlsDialog(this, m_effect->getProcessor());
 
 	return m_controlsDialog;

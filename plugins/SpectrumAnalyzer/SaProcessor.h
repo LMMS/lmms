@@ -35,22 +35,25 @@
 #include "SaControls.h"
 
 
+// Receives audio data, runs FFT analysis and stores the result.
 class SaProcessor {
 public:
 	SaProcessor(SaControls *controls);
 	virtual ~SaProcessor();
 
-	void analyse(sampleFrame *buf, const fpp_t frames);
+	void analyse(sampleFrame *in_buffer, const fpp_t frame_count);
 
-	void setActive(bool active);
-	bool getActive() const;
-
+	// inform processor if any processing is actually required
+	void setSpectrumActive(bool active);
 	void setWaterfallActive(bool active);
 
+	// configuration is taken from models in SaControls; some changes require
+	// an exlicit update request (reallocation and window rebuild)
 	void reallocateBuffers();
 	void rebuildWindow();
 	void clear();
 
+	// information about results and unit conversion helpers
 	float binToFreq(int index);
 	float binBandwidth();
 
@@ -63,44 +66,51 @@ public:
 	int getSampleRate() const;
 	float getFreqRangeMin(bool linear = false);
 	float getFreqRangeMax();
-	float getAmpRangeMin();
+	float getAmpRangeMin(bool linear = false);
 	float getAmpRangeMax();
 
+	// data access lock must be acquired by any friendly class that touches
+	// the results, mainly to prevent unexpected mid-way reallocation
 	std::mutex m_dataAccess;
 
 private:
 	SaControls *m_controls;
 
+	// currently valid configuration
 	const unsigned int m_zeroPadFactor = 2;	// use n-steps bigger FFT for given block
 	unsigned int m_inBlockSize;				// size of input data block
 	unsigned int m_fftBlockSize;			// size of padded block for FFT processing
 	unsigned int m_sampleRate;
-	unsigned int m_windowType;
 
-	unsigned int binCount() {return m_fftBlockSize / 2 + 1;}	// number of output frequency bins
+	unsigned int binCount() {return m_fftBlockSize / 2 + 1;}
 
+	// data buffers (roughly in the order of processing, from input to output)
 	unsigned int m_framesFilledUp;
-	std::vector<float> m_fftWindow;
 	std::vector<float> m_bufferL;
 	std::vector<float> m_bufferR;
+	std::vector<float> m_fftWindow;
 	fftwf_plan m_fftPlanL;
 	fftwf_plan m_fftPlanR;
-	fftwf_complex * m_spectrumL;
-	fftwf_complex * m_spectrumR;
+	fftwf_complex *m_spectrumL;
+	fftwf_complex *m_spectrumR;
 	std::vector<float> m_absSpectrumL;
 	std::vector<float> m_absSpectrumR;
 	std::vector<float> m_normSpectrumL;
 	std::vector<float> m_normSpectrumR;
 
+	// spectrum history for waterfall: new normSpectrum lines are added on top
 	std::vector<uchar> m_history;
-	const int m_waterfallHeight = 200;	// number of lines held for display by the real-time spectrogram
-										// Note: high values will make it harder to see transients.
+	const int m_waterfallHeight = 200;	// Number of stored lines.
+										// Note: high values may make it harder to see transients.
 
-	bool m_active;
+	// book keeping
+	bool m_spectrumActive;
 	bool m_waterfallActive;
 	bool m_destroyed;
+	bool m_reallocating;
 
-	QRgb makePixel(float left, float right);
+	// merge L and R channels and apply gamma correction to make a spectrogram pixel
+	QRgb makePixel(float left, float right, float gamma_correction = 0.42);
 
 	friend class SaSpectrumView;
 	friend class SaWaterfallView;

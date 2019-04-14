@@ -31,18 +31,21 @@
 
 #include "lmms_math.h"
 
+
+
 SaProcessor::SaProcessor(SaControls *controls) :
 	m_controls(controls),
 	m_inBlockSize(FFT_BLOCK_SIZES[0]),
 	m_fftBlockSize(FFT_BLOCK_SIZES[0]),
 	m_sampleRate(Engine::mixer()->processingSampleRate()),
-	m_windowType(BLACKMAN_HARRIS),
 	m_framesFilledUp(0),
-	m_active(false),
-	m_destroyed(false)
+	m_spectrumActive(false),
+	m_waterfallActive(false),
+	m_destroyed(false),
+	m_reallocating(false)
 {
 	m_fftWindow.resize(m_inBlockSize, 1.0);
-	precomputeWindow(m_fftWindow.data(), m_inBlockSize, (FFT_WINDOWS) m_windowType);
+	precomputeWindow(m_fftWindow.data(), m_inBlockSize, BLACKMAN_HARRIS);
 
 	m_bufferL.resize(m_fftBlockSize, 0);
 	m_bufferR.resize(m_fftBlockSize, 0);
@@ -62,8 +65,8 @@ SaProcessor::SaProcessor(SaControls *controls) :
 }
 
 
-SaProcessor::~SaProcessor()
-{
+SaProcessor::~SaProcessor() {
+	// take a note that destructor was called; see reallocateBuffers()
 	m_destroyed = true;
 
 	if (m_fftPlanL != NULL) {fftwf_destroy_plan(m_fftPlanL);}
@@ -78,35 +81,34 @@ SaProcessor::~SaProcessor()
 }
 
 
+// Load a batch of data from LMMS; run FFT analysis if buffer is full enough.
 void SaProcessor::analyse(sampleFrame *in_buffer, const fpp_t frame_count) {
 	#ifdef SA_DEBUG
 		int start_time = std::chrono::high_resolution_clock::now().time_since_epoch().count();
 	#endif
-	// only analyse if any view is visible and not paused
-	if ((m_active || m_waterfallActive) && !m_controls->m_pauseModel.value())
-	{
+	// only take in data if any view is visible and not paused
+	if ((m_spectrumActive || m_waterfallActive) && !m_controls->m_pauseModel.value()) {
 		const bool stereo = m_controls->m_stereoModel.value();
-
-		// process data
-		fpp_t frame = 0;
-		while (frame < frame_count){
+		fpp_t in_frame = 0;
+		while (in_frame < frame_count) {
 			// fill sample buffers
-			for (; frame < frame_count && m_framesFilledUp < m_inBlockSize; frame++, m_framesFilledUp++)
-			{
+			for (; in_frame < frame_count && m_framesFilledUp < m_inBlockSize; in_frame++, m_framesFilledUp++) {
 				if (stereo) {
-					m_bufferL[m_framesFilledUp] = in_buffer[frame][0];
-					m_bufferR[m_framesFilledUp] = in_buffer[frame][1];
+					m_bufferL[m_framesFilledUp] = in_buffer[in_frame][0];
+					m_bufferR[m_framesFilledUp] = in_buffer[in_frame][1];
 				} else {
-					m_bufferL[m_framesFilledUp] = (in_buffer[frame][0] + in_buffer[frame][1]) * 0.5;
-					m_bufferR[m_framesFilledUp] = (in_buffer[frame][0] + in_buffer[frame][1]) * 0.5;
+					m_bufferL[m_framesFilledUp] = (in_buffer[in_frame][0] + in_buffer[in_frame][1]) * 0.5;
+					m_bufferR[m_framesFilledUp] = (in_buffer[in_frame][0] + in_buffer[in_frame][1]) * 0.5;
 				}
 			}
 	
-			// run analysis if buffers contain enough data
-			if (m_framesFilledUp < m_inBlockSize) {
+			// Run analysis only if buffers contain enough data.
+			// Also, to prevent audio interruption and a momentary GUI freeze,
+			// skip analysis is buffers are being reallocated.
+			if (m_framesFilledUp < m_inBlockSize || m_reallocating) {
 				return;
 			}
-	
+
 			// update sample rate
 			m_sampleRate = Engine::mixer()->processingSampleRate();
 	
@@ -119,55 +121,62 @@ void SaProcessor::analyse(sampleFrame *in_buffer, const fpp_t frame_count) {
 			// lock data shared with SaSpectrumView and SaWaterfallView
 			m_dataAccess.lock();
 
-			// analyse spectrum of the left channel
+			// Run FFT on left channel, convert the result to absolute magnitude
+			// spectrum and normalize it.
 			fftwf_execute(m_fftPlanL);
 			absspec(m_spectrumL, m_absSpectrumL.data(), binCount());
 			normalize(m_absSpectrumL, m_normSpectrumL, m_inBlockSize);
 	
-			// repeat analysis for right channel only if stereo processing is enabled
+			// repeat analysis for right channel if stereo processing is enabled
 			if (stereo) {
 				fftwf_execute(m_fftPlanR);
 				absspec(m_spectrumR, m_absSpectrumR.data(), binCount());
 				normalize(m_absSpectrumR, m_normSpectrumR, m_inBlockSize);
-			} else {
-				std::fill(m_absSpectrumR.begin(), m_absSpectrumR.end(), 0);
-				std::fill(m_normSpectrumR.begin(), m_normSpectrumR.end(), 0);
 			}
 	
-			// move waterfall history one line down and add newest result on top
 			if (m_waterfallActive) {
+				// move waterfall history one line down and clear the top line
 				QRgb *pixel = (QRgb *)m_history.data();
-				std::copy(	pixel,
-							pixel + binCount() * m_waterfallHeight - binCount(),
-							pixel + binCount());
+				std::copy(pixel,
+						  pixel + binCount() * m_waterfallHeight - binCount(),
+						  pixel + binCount());
 				memset(pixel, 0, binCount() * sizeof (QRgb));
-		
-				int target;
-				float accL = 0;
+
+				// add newest result on top
+				int target;		// pixel being constructed
+				float accL = 0;	// accumulators for merging multiple bins
 				float accR = 0;
 	
 				for (int i = 0; i < binCount(); i++) {
+					// Every frequency bin spans a frequency range that must be
+					// partially or fully mapped to a pixel. Any inconsistency
+					// may be seen in the spectrogram as dark or white lines --
+					// play white noise to confirm your change did not break it.
 					float band_start = freqToXPixel(binToFreq(i) - binBandwidth() / 2.0, binCount() -1);
 					float band_end = freqToXPixel(binToFreq(i + 1) - binBandwidth() / 2.0, binCount() -1);
 					if (m_controls->m_logXModel.value()) {
-						// Logarithmic
+						// Logarithmic scale
 						if (band_end - band_start > 1.0) {
-							// draw all pixels covered by this band
+							// band spans multiple pixels: draw all pixels it covers
 							for (target = band_start; target < band_end; target++) {
 								if (target >= 0 && target < binCount()) {
 									pixel[target] = makePixel(m_normSpectrumL[i], m_normSpectrumR[i]);
 								}
 							}
+							// save remaining portion of the band for the following band / pixel
+							// (in case the next band uses sub-pixel drawing)
 							accL = (band_end - (int)band_end) * m_normSpectrumL[i];
 							accR = (band_end - (int)band_end) * m_normSpectrumR[i];
 						} else {
 							// sub-pixel drawing; add contribution of current band
 							target = band_start;
 							if ((int)band_start == (int)band_end) {
+								// band ends within current target pixel, accumulate
 								accL += (band_end - band_start) * m_normSpectrumL[i];
 								accR += (band_end - band_start) * m_normSpectrumR[i];
 							} else {
-								// make sure contribution is split correctly on pixel boundary
+								// Band ends in the next pixel -- finalize the current pixel.
+								// Make sure contribution is split correctly on pixel boundary.
 								accL += ((int)band_end - band_start) * m_normSpectrumL[i];
 								accR += ((int)band_end - band_start) * m_normSpectrumR[i];
 	
@@ -189,30 +198,36 @@ void SaProcessor::analyse(sampleFrame *in_buffer, const fpp_t frame_count) {
 					}
 				}
 			}
-
-			m_dataAccess.unlock();
-
 			#ifdef SA_DEBUG
+				// report FFT processing speed
 				start_time = std::chrono::high_resolution_clock::now().time_since_epoch().count() - start_time;
 				std::cout << "Processed " << m_framesFilledUp << " samples in " << start_time / 1000000.0 << " ms" << std::endl;
 			#endif
+
+			// clean up before checking for more data from input buffer
 			m_framesFilledUp = 0;
+			m_dataAccess.unlock();
 		}
 	}
 }
 
 
-QRgb SaProcessor::makePixel(float left, float right) {
-	// apply gamma correction to make small values more visible
-	// (should be around 0.42 to 0.45 for sRGB displays)
+// Produce a spectrogram pixel from normalized spectrum data.
+// Values over 1.0 will cause the color components to overflow: this is left
+// intentionally untreated as it clearly indicates which frequency is clipping.
+// Gamma correction is applied to make small values more visible and to make
+// a linear gradient actually appear roughly linear. The correction should be
+// around 0.42 to 0.45 for sRGB displays.
+QRgb SaProcessor::makePixel(float left, float right, float gamma_correction) {
 	if (m_controls->m_stereoModel.value()) {
-		float ampL = powf(left, 0.42);
-		float ampR = powf(right, 0.42);
+		float ampL = pow(left, gamma_correction);
+		float ampR = pow(right, gamma_correction);
 		return qRgb(m_controls->m_colorL.red() * ampL + m_controls->m_colorR.red() * ampR,
 					m_controls->m_colorL.green() * ampL + m_controls->m_colorR.green() * ampR,
 					m_controls->m_colorL.blue() * ampL + m_controls->m_colorR.blue() * ampR);
 	} else {
-		float ampL = powf(left, 0.42);
+		float ampL = pow(left, gamma_correction);
+		// make mono color brighter to compensate for the fact it is not summed
 		return qRgb(m_controls->m_colorMono.lighter().red() * ampL,
 					m_controls->m_colorMono.lighter().green() * ampL,
 					m_controls->m_colorMono.lighter().blue() * ampL);
@@ -220,33 +235,33 @@ QRgb SaProcessor::makePixel(float left, float right) {
 }
 
 
+// Get sample rate value that is valid for currently stored results.
 int SaProcessor::getSampleRate() const {
 	return m_sampleRate;
 }
 
 
-bool SaProcessor::getActive() const {
-	return m_active;
+// Inform the processor whether any display widgets actually need it.
+void SaProcessor::setSpectrumActive(bool active) {
+	m_spectrumActive = active;
 }
-
-
-void SaProcessor::setActive(bool active) {
-	m_active = active;
-}
-
 
 void SaProcessor::setWaterfallActive(bool active) {
 	m_waterfallActive = active;
 }
 
 
+// Reallocate data buffers according to newly set block size.
 void SaProcessor::reallocateBuffers() {
+	// The SaProcessor destructor is called before SaControlsDialog destructor.
+	// This causes problems, sice ComboBoxModel emits dataChanged() as it is
+	// destroyed, triggering reallocation in processor that is already gone --
+	// a good recipe for segfault. This check explicitly prevents it.
 	if (m_destroyed) {return;}
 
+	int new_size_index = m_controls->m_blockSizeModel.value();
 	int new_in_size, new_fft_size;
 	int new_bins;
-
-	int new_size_index = m_controls->m_blockSizeModel.value();
 
 	// get new block sizes and bin count based on selected index
 	if (new_size_index < FFT_BLOCK_SIZES.size()){
@@ -262,7 +277,11 @@ void SaProcessor::reallocateBuffers() {
 
 	new_bins = new_fft_size / 2 +1;
 
-	// lock data shared with SaSpectrumView and SaWaterfallView
+	// Lock data shared with SaSpectrumView and SaWaterfallView.
+	// The m_reallocating is here to tell analyse() to avoid asking for the
+	// lock, since wfft3 can take a while to find the fastest FFT algorithm
+	// for given machine, which would produce interruption in the audio stream.
+	m_reallocating = true;
 	m_dataAccess.lock();
 
 	// destroy old FFT plan and free the result buffer
@@ -271,7 +290,7 @@ void SaProcessor::reallocateBuffers() {
 	if (m_spectrumL != NULL) {fftwf_free(m_spectrumL);}
 	if (m_spectrumR != NULL) {fftwf_free(m_spectrumR);}
 
-	// allocate new space and create new plan
+	// allocate new space, create new plan and resize containers
 	m_fftWindow.resize(new_in_size, 1.0);
 	precomputeWindow(m_fftWindow.data(), new_in_size, (FFT_WINDOWS) m_controls->m_windowModel.value());
 	m_bufferL.resize(new_fft_size, 0);
@@ -291,20 +310,24 @@ void SaProcessor::reallocateBuffers() {
 
 	m_history.resize(new_bins * m_waterfallHeight * sizeof qRgb(0,0,0), 0);
 
+	// done; publish new sizes and clean up
 	m_inBlockSize = new_in_size;
 	m_fftBlockSize = new_fft_size;
 
 	m_dataAccess.unlock();
+	m_reallocating = false;
 	clear();
 }
 
 
-// Call function from fft_helpers to make a new window based on currently set controls.
+// Precompute a new FFT window based on currently selected type.
 void SaProcessor::rebuildWindow() {
+	// don't touch anything if destructor was called (see reallocateBuffers())
 	if (m_destroyed) {return;}
+
+	// computation is done in fft_helpers
 	m_dataAccess.lock();
 	precomputeWindow(m_fftWindow.data(), m_inBlockSize, (FFT_WINDOWS) m_controls->m_windowModel.value());
-	m_windowType = m_controls->m_windowModel.value();
 	m_dataAccess.unlock();
 }
 
@@ -345,7 +368,7 @@ float SaProcessor::getFreqRangeMin(bool linear) {
 		case FRANGE_MIDS: return FRANGE_MIDS_START;
 		case FRANGE_HIGH: return FRANGE_HIGH_START;
 		default:
-		case FRANGE_FULL: return !linear ? LOWEST_LOG_FREQ : 0;
+		case FRANGE_FULL: return linear ? 0 : LOWEST_LOG_FREQ;
 	}
 }
 
@@ -362,6 +385,7 @@ float SaProcessor::getFreqRangeMax() {
 }
 
 
+// Map frequency to pixel x position on a display of given width.
 float SaProcessor::freqToXPixel(float freq, int width) {
 	if (m_controls->m_logXModel.value()) {
 		if (freq <= 1) {return 0;}
@@ -376,6 +400,7 @@ float SaProcessor::freqToXPixel(float freq, int width) {
 }
 
 
+// Map pixel x position on display of given width back to frequency.
 float SaProcessor::xPixelToFreq(float x, int width) {
 	if (m_controls->m_logXModel.value()) {
 		float min = log10(getFreqRangeMin());
@@ -393,37 +418,9 @@ float SaProcessor::xPixelToFreq(float x, int width) {
 // --------------------------------------
 // Amplitude conversion helpers
 //
-float SaProcessor::ampToYPixel(float amplitude, int height) {
-	if (m_controls->m_logYModel.value()){
-		if (10 * log10(amplitude) < getAmpRangeMin()){
-			return height;
-		} else {
-			float max = getAmpRangeMax();
-			float range = getAmpRangeMin() - max;
-			return (10 * log10(amplitude) - max) / range * height;
-		}
-	} else {
-		float max = pow(10, getAmpRangeMax() / 10);
-		float range = pow(10, getAmpRangeMin() / 10) - max;
-		return (amplitude - max) / range * height;
-	}
-}
-
-
-float SaProcessor::yPixelToAmp(float y, int height) {
-	if (m_controls->m_logYModel.value()){
-		float max = getAmpRangeMax();
-		float range = getAmpRangeMin() - max;
-		return max + range * (y / height);
-	} else {
-		float max = pow(10, getAmpRangeMax() / 10);
-		float range = pow(10, getAmpRangeMin() / 10) - max;
-		return max + range * (y / height);
-	}
-}
-
-
-float SaProcessor::getAmpRangeMin() {
+float SaProcessor::getAmpRangeMin(bool linear) {
+	// return very low limit to make sure zero gets included at linear grid
+	if (linear) {return -900;}
 	switch (m_controls->m_ampRangeModel.value()) {
 		case ARANGE_EXTENDED: return ARANGE_EXTENDED_START;
 		case ARANGE_AUDIBLE: return ARANGE_AUDIBLE_START;
@@ -441,6 +438,38 @@ float SaProcessor::getAmpRangeMax() {
 		case ARANGE_NOISE: return ARANGE_NOISE_END;
 		default:
 		case ARANGE_DEFAULT: return ARANGE_DEFAULT_END;
+	}
+}
+
+
+// Map amplitude to pixel y position on a display of given height.
+float SaProcessor::ampToYPixel(float amplitude, int height) {
+	if (m_controls->m_logYModel.value()){
+		if (10 * log10(amplitude) < getAmpRangeMin()){
+			return height;
+		} else {
+			float max = getAmpRangeMax();
+			float range = getAmpRangeMin() - max;
+			return (10 * log10(amplitude) - max) / range * height;
+		}
+	} else {
+		float max = pow(10, getAmpRangeMax() / 10);
+		float range = pow(10, getAmpRangeMin() / 10) - max;
+		return (amplitude - max) / range * height;
+	}
+}
+
+
+// Map pixel y position on display of given height back to amplitude.
+float SaProcessor::yPixelToAmp(float y, int height) {
+	if (m_controls->m_logYModel.value()){
+		float max = getAmpRangeMax();
+		float range = getAmpRangeMin() - max;
+		return max + range * (y / height);
+	} else {
+		float max = pow(10, getAmpRangeMax() / 10);
+		float range = pow(10, getAmpRangeMin() / 10) - max;
+		return max + range * (y / height);
 	}
 }
 

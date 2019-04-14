@@ -22,9 +22,13 @@
 
 #include "SaWaterfallView.h"
 
+#include <algorithm>
+#include <cmath>
 #include <mutex>
+#include <QImage>
+#include <QPainter>
 #include <QSplitter>
-#include <QWidget>
+#include <QString>
 
 #include "EffectControlDialog.h"
 #include "GuiApplication.h"
@@ -47,20 +51,23 @@ SaWaterfallView::SaWaterfallView(SaControls *controls, SaProcessor *processor, Q
 }
 
 
-// Compose and draw all the content; periodically called by Qt.
+// Compose and draw all the content; called by Qt.
 // Not as performance sensitive as SaSpectrumView, most of the processing is
 // done directly in SaProcessor.
 void SaWaterfallView::paintEvent(QPaintEvent *event) {
-
 	#ifdef SA_DEBUG
 		int start_time = std::chrono::high_resolution_clock::now().time_since_epoch().count();
 	#endif
 
-	const int displayBottom = height();
-	const int displayLeft = 20;
-	const int displayRight = width() -20;
+	// all drawing done here, local variables are sufficient for the boundary
+	const int displayTop = 1;
+	const int displayBottom = height() -2;
+	const int displayLeft = 26;
+	const int displayRight = width() -26;
 	const int displayWidth = displayRight - displayLeft;
-	float pos = 0;
+	float label_width = 20;
+	float label_height = 16;
+	float margin = 2;
 
 	QPainter painter(this);
 	painter.setRenderHint(QPainter::Antialiasing, true);
@@ -71,61 +78,57 @@ void SaWaterfallView::paintEvent(QPaintEvent *event) {
 		m_oldTimePerLine = (float)m_processor->m_inBlockSize / m_processor->getSampleRate();
 	}
 
+	// print time labels
+	float pos = 0;
 	painter.setPen(QPen(m_controls->m_colorLabels, 1, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
 	for (auto & line: m_timeTics) {
 		pos = timeToYPixel(line.first, displayBottom);
-		// make an exception if the top or bottom label is too close to edge
-		if (line == m_timeTics.front() && pos < 8) {
-			painter.drawText(2, 0, 16, 16,
-							 Qt::AlignRight | Qt::AlignTop,
+		// align first and last label to the edge if needed, otherwise center them
+		if (line == m_timeTics.front() && pos < label_height / 2) {
+			painter.drawText(displayLeft - label_width - margin, displayTop,
+							 label_width, label_height, Qt::AlignRight | Qt::AlignTop | Qt::TextDontClip,
 							 QString(line.second.c_str()));
-			painter.drawText(displayRight + 2, 0, 16, 16,
-							 Qt::AlignLeft | Qt::AlignTop,
+			painter.drawText(displayRight + margin, displayTop,
+							 label_width, label_height, Qt::AlignLeft | Qt::AlignTop | Qt::TextDontClip,
 							 QString(line.second.c_str()));
-		} else if (line == m_timeTics.back() && pos > displayBottom - 16) {
-			painter.drawText(2, displayBottom - 16, 16, 16,
-							 Qt::AlignRight | Qt::AlignBottom,
+		} else if (line == m_timeTics.back() && pos > displayBottom - label_height) {
+			painter.drawText(displayLeft - label_width - margin, displayBottom - label_height,
+							 label_width, label_height, Qt::AlignRight | Qt::AlignBottom | Qt::TextDontClip,
 							 QString(line.second.c_str()));
-			painter.drawText(displayRight + 2, displayBottom - 16, 16, 16,
-							 Qt::AlignLeft | Qt::AlignBottom,
+			painter.drawText(displayRight + margin, displayBottom - label_height,
+							 label_width, label_height, Qt::AlignLeft | Qt::AlignBottom | Qt::TextDontClip,
 							 QString(line.second.c_str()));
 		} else {
-			painter.drawText(2, pos - 8, 16, 16,
-							 Qt::AlignRight | Qt::AlignVCenter,
+			painter.drawText(displayLeft - label_width - margin, pos - label_height / 2,
+							 label_width, label_height, Qt::AlignRight | Qt::AlignVCenter | Qt::TextDontClip,
 							 QString(line.second.c_str()));
-			painter.drawText(displayRight + 2, pos - 8, 16, 16,
-							 Qt::AlignLeft | Qt::AlignVCenter,
+			painter.drawText(displayRight + margin, pos - label_height / 2,
+							 label_width, label_height, Qt::AlignLeft | Qt::AlignVCenter | Qt::TextDontClip,
 							 QString(line.second.c_str()));
 		}
 	}
 
-	// refresh image with new data if needed
-	if (m_controls->m_waterfallModel.value() == true) {
-		m_processor->m_dataAccess.lock();
-		painter.drawImage(displayLeft, 1,
-						  QImage(m_processor->m_history.data(),
-								 m_processor->binCount(),
-								 m_processor->m_waterfallHeight,
-								 QImage::Format_RGB32
-								 ).scaled(displayWidth,
-										  displayBottom - 2,
-										  Qt::IgnoreAspectRatio,
-										  Qt::SmoothTransformation));
-		m_processor->m_dataAccess.unlock();
-	}
+	// draw the spectrogram precomputed in SaProcessor
+	m_processor->m_dataAccess.lock();
+	painter.drawImage(displayLeft, displayTop,					// top left corner coordinates
+					  QImage(m_processor->m_history.data(),		// raw pixel data to display
+							 m_processor->binCount(),			// width = number of frequency bins
+							 m_processor->m_waterfallHeight,	// height = number of history lines
+							 QImage::Format_RGB32
+							 ).scaled(displayWidth,				// scale to fit view..
+									  displayBottom,
+									  Qt::IgnoreAspectRatio,
+									  Qt::SmoothTransformation));
+	m_processor->m_dataAccess.unlock();
 
 	// always draw the outline
-	painter.setPen(QPen(m_controls->m_colorGrid, 2,
-						Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
-	painter.drawRoundedRect(displayLeft, 1,
-							displayWidth, displayBottom,
-							2.0, 2.0);
+	painter.setPen(QPen(m_controls->m_colorGrid, 2, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
+	painter.drawRoundedRect(displayLeft, displayTop, displayWidth, displayBottom, 2.0, 2.0);
 
-	// dislplay maximum FPS
 	#ifdef SA_DEBUG
+		// display what FPS would be achieved if waterfall ran in a loop
 		start_time = std::chrono::high_resolution_clock::now().time_since_epoch().count() - start_time;
-		painter.setPen(QPen(m_controls->m_colorLabels, 1,
-							Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
+		painter.setPen(QPen(m_controls->m_colorLabels, 1, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
 		painter.drawText(displayRight -100, 10, 100, 16, Qt::AlignLeft,
 						 QString(std::string("Max FPS: " + std::to_string(1000000000.0 / start_time)).c_str()));
 	#endif
@@ -167,16 +170,16 @@ std::vector<std::pair<float, std::string>> SaWaterfallView::makeTimeTics() {
 
 
 // Periodically trigger repaint and check if the widget is visible.
-// If it is not, the processor can stop processing.
+// If it is not, stop drawing and inform the processor.
 void SaWaterfallView::periodicUpdate() {
 	m_processor->setWaterfallActive(isVisible());
-	update();
+	if (isVisible()) {update();}
 }
 
 
 // Adjust window size and widget visibility when waterfall is enabled or disabbled.
 void SaWaterfallView::updateVisibility() {
-	// get container of the control dialog to be resized it if needed
+	// get container of the control dialog to be resized if needed
 	QWidget *subWindow = m_controls->m_controlsDialog->parentWidget();
 
 	if (m_controls->m_waterfallModel.value()) {

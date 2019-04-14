@@ -1,45 +1,39 @@
 /* SaWaterfallView.h - declaration of SaWaterfallView class.
-*
-* Copyright (c) 2019 Martin Pavelek <he29/dot/HS/at/gmail/dot/com>
-*
-* This file is part of LMMS - https://lmms.io
-*
-* This program is free software; you can redistribute it and/or
-* modify it under the terms of the GNU General Public
-* License as published by the Free Software Foundation; either
-* version 2 of the License, or (at your option) any later version.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-* General Public License for more details.
-*
-* You should have received a copy of the GNU General Public
-* License along with this program (see COPYING); if not, write to the
-* Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
-* Boston, MA 02110-1301 USA.
-*
-*/
+ *
+ * Copyright (c) 2019 Martin Pavelek <he29/dot/HS/at/gmail/dot/com>
+ *
+ * This file is part of LMMS - https://lmms.io
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public
+ * License along with this program (see COPYING); if not, write to the
+ * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ * Boston, MA 02110-1301 USA.
+ *
+ */
 #ifndef SAWATERFALLVIEW_H
 #define SAWATERFALLVIEW_H
 
-#include <algorithm>
 #include <string>
 #include <utility>
 #include <vector>
 #include <QPainter>
 #include <QWidget>
-#include <QString>
-#include <QImage>
 
-#include "fft_helpers.h"
-#include "lmms_basics.h"
-#include "lmms_math.h"
 #include "SaControls.h"
 #include "SaProcessor.h"
 
 
-// Widget that displays a spectrum waterfall (spectrograph) and time labels.
+// Widget that displays a spectrum waterfall (spectrogram) and time labels.
 class SaWaterfallView : public QWidget {
 	Q_OBJECT
 public:
@@ -48,11 +42,11 @@ public:
 
 	virtual QSize sizeHint() const {return QSize(400, 350);}
 
+	// Check if waterfall should be displayed and adjust window size if needed.
 	void updateVisibility();
 
 protected:
 	virtual void paintEvent(QPaintEvent *event);
-	virtual void showEvent(QShowEvent *event) {};
 
 private slots:
 	void periodicUpdate();

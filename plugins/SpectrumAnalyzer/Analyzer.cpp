@@ -55,6 +55,8 @@ Analyzer::Analyzer(Model *parent, const Plugin::Descriptor::SubPluginFeatures::K
 }
 
 
+// Take audio data and pass them to the spectrum processor.
+// Skip processing if the controls dialog isn't visible, it would only waste CPU cycles.
 bool Analyzer::processAudioBuffer(sampleFrame *buffer, const fpp_t frame_count) {
 	if (!isEnabled() || !isRunning ()) {
 		return false;
