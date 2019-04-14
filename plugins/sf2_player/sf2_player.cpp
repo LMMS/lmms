@@ -1121,7 +1121,7 @@ void sf2InstrumentView::showFileDialog()
 	}
 	else
 	{
-		ofd.setDirectory( ConfigManager::inst()->sf2Dir() );
+		ofd.setDirectory( ConfigManager::inst()->userSf2Dir() );
 	}
 
 	m_fileDialogButton->setEnabled( false );
