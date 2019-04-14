@@ -61,6 +61,7 @@ static void JackMidiShutdown(void *arg)
 
 MidiJack::MidiJack() :
 	MidiClientRaw(),
+	m_jackClient( nullptr ),
 	m_input_port( NULL ),
 	m_output_port( NULL ),
 	m_quit( false )

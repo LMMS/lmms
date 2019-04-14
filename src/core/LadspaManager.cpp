@@ -40,7 +40,7 @@
 LadspaManager::LadspaManager()
 {
 	// Make sure plugin search paths are set up
-	PluginFactory::instance();
+	PluginFactory::setupSearchPaths();
 
 	QStringList ladspaDirectories = QString( getenv( "LADSPA_PATH" ) ).
 								split( LADSPA_PATH_SEPERATOR );

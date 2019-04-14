@@ -57,7 +57,7 @@ void InstrumentView::setModel( Model * _model, bool )
 	if( dynamic_cast<Instrument *>( _model ) != NULL )
 	{
 		ModelView::setModel( _model );
-		instrumentTrackWindow()->setWindowIcon( model()->descriptor()->logo->pixmap() );
+		instrumentTrackWindow()->setWindowIcon( model()->logo()->pixmap() );
 		connect( model(), SIGNAL( destroyed( QObject * ) ), this, SLOT( close() ) );
 	}
 }

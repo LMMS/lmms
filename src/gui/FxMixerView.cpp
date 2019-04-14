@@ -47,6 +47,7 @@
 #include "Mixer.h"
 #include "gui_templates.h"
 #include "InstrumentTrack.h"
+#include "SampleTrack.h"
 #include "Song.h"
 #include "BBTrackContainer.h"
 
@@ -249,6 +250,12 @@ void FxMixerView::updateMaxChannelSelector()
 			{
 				InstrumentTrack * inst = (InstrumentTrack *) trackList[i];
 				inst->effectChannelModel()->setRange(0,
+					m_fxChannelViews.size()-1,1);
+			}
+			else if( trackList[i]->type() == Track::SampleTrack )
+			{
+				SampleTrack * strk = (SampleTrack *) trackList[i];
+				strk->effectChannelModel()->setRange(0,
 					m_fxChannelViews.size()-1,1);
 			}
 		}

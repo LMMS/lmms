@@ -5,11 +5,11 @@ ENDIF()
 INCLUDE(BuildPlugin)
 INCLUDE(ExternalProject)
 
-ADD_SUBDIRECTORY(vstbase)
+# These variables are not meant to be used normally, except packaging
+SET(REMOTE_VST_PLUGIN_FILEPATH_32 "32/RemoteVstPlugin32" CACHE STRING "Relative file path to RemoteVstPlugin32")
+SET(REMOTE_VST_PLUGIN_FILEPATH_64 "RemoteVstPlugin64" CACHE STRING "Relative file path to RemoteVstPlugin64")
 
-IF(LMMS_BUILD_LINUX AND WANT_VST_NOWINE)
-	RETURN()
-ENDIF()
+ADD_SUBDIRECTORY(vstbase)
 
 SET(LMMS_BINARY_DIR ${CMAKE_BINARY_DIR})
 SET(LMMS_SOURCE_DIR ${CMAKE_SOURCE_DIR})
@@ -29,6 +29,10 @@ SET(EXTERNALPROJECT_CMAKE_ARGS
 )
 
 # build 32 bit version of RemoteVstPlugin
-INCLUDE("${CMAKE_CURRENT_LIST_DIR}/RemoteVstPlugin32.cmake")
+IF(WANT_VST_32)
+	INCLUDE("${CMAKE_CURRENT_LIST_DIR}/RemoteVstPlugin32.cmake")
+ENDIF()
 # build 64 bit version of RemoteVstPlugin
-INCLUDE("${CMAKE_CURRENT_LIST_DIR}/RemoteVstPlugin64.cmake")
+IF(WANT_VST_64)
+	INCLUDE("${CMAKE_CURRENT_LIST_DIR}/RemoteVstPlugin64.cmake")
+ENDIF()

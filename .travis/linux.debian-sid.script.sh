@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 set -e
 
 : "${TARGET_ARCH:=amd64}"
@@ -21,18 +21,49 @@ fi
 if [ ! -e "$BASETGZ.stamp" ]
 then
 	mkdir -p "$HOME/pbuilder-bases"
-	# debootstrap fails to resolve dependencies which are virtual packages
-	# e.g. perl-openssl-abi-1.1 provided by perl-openssl-defaults, needed for building SWH
-	# See also: https://bugs.launchpad.net/ubuntu/+source/debootstrap/+bug/86536
 	sudo pbuilder --create --basetgz "$BASETGZ" --mirror $MIRROR \
 		--distribution sid --architecture $TARGET_ARCH \
 		--debootstrapopts --variant=buildd \
 		--debootstrapopts --keyring=$KEYRING \
-		--debootstrapopts --include=perl,libxml2-utils,libxml-perl,liblist-moreutils-perl,perl-openssl-defaults
+		--debootstrapopts --include=perl
 	touch "$BASETGZ.stamp"
 else
 	sudo pbuilder --update --basetgz "$BASETGZ"
 fi
+
+sync_version() {
+	local VERSION
+	local MMR
+	local STAGE
+	local EXTRA
+
+	VERSION=$(git describe --tags --match v[0-9].[0-9].[0-9]*)
+	VERSION=${VERSION#v}
+	MMR=${VERSION%%-*}
+	case $VERSION in
+	*-*-*-*)
+		VERSION=${VERSION%-*}
+		STAGE=${VERSION#*-}
+		STAGE=${STAGE%-*}
+		EXTRA=${VERSION##*-}
+		VERSION=$MMR~$STAGE.$EXTRA
+		;;
+	*-*-*)
+		VERSION=${VERSION%-*}
+		EXTRA=${VERSION##*-}
+		VERSION=$MMR.$EXTRA
+		;;
+	*-*)
+		STAGE=${VERSION#*-}
+		VERSION=$MMR~$STAGE
+		;;
+	esac
+
+	sed "1 s/@VERSION@/$VERSION/" -i debian/changelog
+	echo "Set Debian version to $VERSION"
+}
+
+sync_version
 
 DIR="$PWD"
 cd ..

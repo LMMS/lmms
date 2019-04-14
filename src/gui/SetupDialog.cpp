@@ -139,7 +139,9 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 						   "displaywaveform").toInt() ),
 	m_disableAutoQuit(ConfigManager::inst()->value( "ui",
 						   "disableautoquit", "1" ).toInt() ),
-	m_vstEmbedMethod( ConfigManager::inst()->vstEmbedMethod() )
+	m_vstEmbedMethod( ConfigManager::inst()->vstEmbedMethod() ),
+	m_vstAlwaysOnTop( ConfigManager::inst()->value( "ui",
+						   "vstalwaysontop" ).toInt() )
 {
 	setWindowIcon( embed::getIconPixmap( "setup_general" ) );
 	setWindowTitle( tr( "Setup LMMS" ) );
@@ -259,7 +261,7 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 	}
 
 	TabWidget* embed_tw = new TabWidget( tr( "PLUGIN EMBEDDING" ), general);
-	embed_tw->setFixedHeight( 48 );
+	embed_tw->setFixedHeight( 66 );
 	m_vstEmbedComboBox = new QComboBox( embed_tw );
 	m_vstEmbedComboBox->move( XDelta, YDelta );
 
@@ -278,6 +280,17 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 		m_vstEmbedComboBox->addItem( tr( "Embed using XEmbed protocol" ), "xembed" );
 	}
 	m_vstEmbedComboBox->setCurrentIndex( m_vstEmbedComboBox->findData( m_vstEmbedMethod ) );
+	connect( m_vstEmbedComboBox, SIGNAL( currentIndexChanged( int ) ),
+				this, SLOT( vstEmbedMethodChanged() ) );
+
+	m_vstAlwaysOnTopCheckBox = new LedCheckBox(
+				tr( "Keep plugin windows on top when not embedded" ),
+								embed_tw );
+	m_vstAlwaysOnTopCheckBox->move( 20, 44 );
+	m_vstAlwaysOnTopCheckBox->setChecked( m_vstAlwaysOnTop );
+	m_vstAlwaysOnTopCheckBox->setVisible( m_vstEmbedMethod == "none" );
+	connect( m_vstAlwaysOnTopCheckBox, SIGNAL( toggled( bool ) ),
+				this, SLOT( toggleVSTAlwaysOnTop( bool ) ) );
 
 	TabWidget * lang_tw = new TabWidget( tr( "LANGUAGE" ), general );
 	lang_tw->setFixedHeight( 48 );
@@ -427,7 +440,7 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 #endif
 	addPathEntry("Themes directory", m_artworkDir,
 		SLOT(setArtworkDir(const QString &)),
-		SLOT(openArtwortDir()),
+		SLOT(openArtworkDir()),
 		m_adLineEdit, pathSelectors);
 	pathSelectorLayout->addStretch();
 	addPathEntry("Background artwork", m_backgroundArtwork,
@@ -854,7 +867,9 @@ void SetupDialog::accept()
 					QString::number( m_disableAutoQuit ) );
 	ConfigManager::inst()->setValue( "app", "language", m_lang );
 	ConfigManager::inst()->setValue( "ui", "vstembedmethod",
-					m_vstEmbedComboBox->currentData().toString() );
+					m_vstEmbedMethod );
+	ConfigManager::inst()->setValue( "ui", "vstalwaysontop",
+					QString::number( m_vstAlwaysOnTop ) );
 
 
 	ConfigManager::inst()->setWorkingDir(QDir::fromNativeSeparators(m_workingDir));
@@ -1056,6 +1071,20 @@ void SetupDialog::toggleOneInstrumentTrackWindow( bool _enabled )
 {
 	m_oneInstrumentTrackWindow = _enabled;
 }
+
+
+void SetupDialog::vstEmbedMethodChanged()
+{
+	m_vstEmbedMethod = m_vstEmbedComboBox->currentData().toString();
+	m_vstAlwaysOnTopCheckBox->setVisible( m_vstEmbedMethod == "none" );
+}
+
+
+void SetupDialog::toggleVSTAlwaysOnTop( bool en )
+{
+	m_vstAlwaysOnTop = en;
+}
+
 
 void SetupDialog::setLanguage( int lang )
 {
