@@ -145,7 +145,7 @@ void SampleTCO::setSampleBuffer( SampleBuffer* sb )
 void SampleTCO::setSampleFile( const QString & _sf )
 {
 	int length;
-	if (_sf == "")
+	if ( _sf.isEmpty() )
 	{	//When creating an empty sample pattern make it a bar long
 		float nom = Engine::getSong()->getTimeSigModel().getNumerator();
 		float den = Engine::getSong()->getTimeSigModel().getDenominator();
@@ -449,7 +449,7 @@ void SampleTCOView::mouseDoubleClickEvent( QMouseEvent * )
 {
 	QString af = m_tco->m_sampleBuffer->openAudioFile();
 
-	if( af == "" ) {} //Don't do anything if no file is loaded
+	if ( af.isEmpty() ) {} //Don't do anything if no file is loaded
 	else if ( af == m_tco->m_sampleBuffer->audioFile() )
 	{	//Instead of reloading the existing file, just reset the size
 		int length = (int) ( m_tco->m_sampleBuffer->frames() / Engine::framesPerTick() );
