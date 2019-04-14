@@ -106,7 +106,7 @@ SampleTCO::SampleTCO( Track * _track ) :
 SampleTCO::~SampleTCO()
 {
 	SampleTrack * sampletrack = dynamic_cast<SampleTrack*>( getTrack() );
-	if( sampletrack)
+	if ( sampletrack )
 	{
 		sampletrack->updateTcos();
 	}
