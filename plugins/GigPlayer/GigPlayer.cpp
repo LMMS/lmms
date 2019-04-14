@@ -1074,7 +1074,7 @@ void GigInstrumentView::showFileDialog()
 	}
 	else
 	{
-		ofd.setDirectory( ConfigManager::inst()->gigDir() );
+		ofd.setDirectory( ConfigManager::inst()->userGigDir() );
 	}
 
 	m_fileDialogButton->setEnabled( false );
