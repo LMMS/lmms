@@ -27,6 +27,7 @@
 #include <QDir>
 #include <QDomDocument>
 #include <QTemporaryFile>
+#include <QtGlobal>
 #include <QDropEvent>
 #include <QGridLayout>
 #include <QPushButton>
@@ -290,6 +291,7 @@ void ZynAddSubFxInstrument::loadSettings( const QDomElement & _this )
 
 		emit settingsChanged();
 	}
+	emit instrumentTrack()->pitchModel()->dataChanged();
 }
 
 
@@ -659,10 +661,9 @@ extern "C"
 {
 
 // necessary for getting instance out of shared lib
-PLUGIN_EXPORT Plugin * lmms_plugin_main( Model *, void * _data )
+PLUGIN_EXPORT Plugin * lmms_plugin_main(Model * m, void *)
 {
-
-	return new ZynAddSubFxInstrument( static_cast<InstrumentTrack *>( _data ) );
+	return new ZynAddSubFxInstrument(static_cast<InstrumentTrack *>(m));
 }
 
 

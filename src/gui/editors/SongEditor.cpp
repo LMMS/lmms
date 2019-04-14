@@ -304,12 +304,12 @@ void SongEditor::setEditModeSelect()
 void SongEditor::keyPressEvent( QKeyEvent * ke )
 {
 	if( ke->modifiers() & Qt::ShiftModifier &&
-						ke->key() == Qt::Key_Insert )
+						( ke->key() == Qt::Key_Insert || ke->key() == Qt::Key_Enter || ke->key() == Qt::Key_Return ) )
 	{
 		m_song->insertBar();
 	}
 	else if( ke->modifiers() & Qt::ShiftModifier &&
-						ke->key() == Qt::Key_Delete )
+						( ke->key() == Qt::Key_Delete || ke->key() == Qt::Key_Backspace ) )
 	{
 		m_song->removeBar();
 	}

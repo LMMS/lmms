@@ -1,7 +1,7 @@
 /*
- * carlapatchbay.cpp - Carla for LMMS (Patchbay)
+ * FxLineLcdSpinBox.h - a specialization of LcdSpnBox for setting FX channels
  *
- * Copyright (C) 2014-2018 Filipe Coelho <falktx@falktx.com>
+ * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -22,31 +22,32 @@
  *
  */
 
-#include "carla.h"
+#ifndef FX_LINE_LCD_SPIN_BOX_H
+#define FX_LINE_LCD_SPIN_BOX_H
 
-#include "embed.h"
-#include "InstrumentTrack.h"
+#include "LcdSpinBox.h"
 
-extern "C"
+class TrackView;
+
+
+class FxLineLcdSpinBox : public LcdSpinBox
 {
+	Q_OBJECT
+public:
+	FxLineLcdSpinBox(int numDigits, QWidget * parent, const QString& name, TrackView * tv = NULL) :
+		LcdSpinBox(numDigits, parent, name), m_tv(tv)
+	{}
+	virtual ~FxLineLcdSpinBox() {}
 
-Plugin::Descriptor PLUGIN_EXPORT carlapatchbay_plugin_descriptor =
-{
-    STRINGIFY( PLUGIN_NAME ),
-    "Carla Patchbay",
-    QT_TRANSLATE_NOOP( "pluginBrowser",
-                       "Carla Patchbay Instrument" ),
-    "falkTX <falktx/at/falktx.com>",
-    CARLA_VERSION_HEX,
-    Plugin::Instrument,
-    new PluginPixmapLoader( "logo" ),
-    NULL,
-    NULL
-} ;
+	void setTrackView(TrackView * tv);
 
-PLUGIN_EXPORT Plugin* lmms_plugin_main(Model* m, void*)
-{
-    return new CarlaInstrument(static_cast<InstrumentTrack*>(m), &carlapatchbay_plugin_descriptor, true);
-}
+protected:
+	virtual void mouseDoubleClickEvent(QMouseEvent* event);
+	virtual void contextMenuEvent(QContextMenuEvent* event);
 
-}
+private:
+	TrackView * m_tv;
+
+};
+
+#endif

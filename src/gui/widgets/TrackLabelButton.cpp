@@ -195,9 +195,15 @@ void TrackLabelButton::paintEvent( QPaintEvent * _pe )
 		InstrumentTrack * it =
 			dynamic_cast<InstrumentTrack *>( m_trackView->getTrack() );
 		const PixmapLoader * pl;
+		auto get_logo = [](InstrumentTrack* it) -> const PixmapLoader*
+		{
+			return it->instrument()->key().isValid()
+				? it->instrument()->key().logo()
+				: it->instrument()->descriptor()->logo;
+		};
 		if( it && it->instrument() &&
 			it->instrument()->descriptor() &&
-			( pl = it->instrument()->descriptor()->logo ) )
+			( pl = get_logo(it) ) )
 		{
 			if( pl->pixmapName() != m_iconName )
 			{
