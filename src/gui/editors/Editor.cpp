@@ -32,6 +32,7 @@
 #include <QAction>
 #include <QMdiArea>
 #include <QShortcut>
+#include <QCloseEvent>
 
 
 void Editor::setPauseIcon(bool displayPauseIcon)
@@ -121,8 +122,18 @@ QAction *Editor::playAction() const
 	return m_playAction;
 }
 
-
-
+void Editor::closeEvent( QCloseEvent * _ce )
+{
+	if( parentWidget() )
+	{
+		parentWidget()->hide();
+	}
+	else
+	{
+		hide();
+	}
+	_ce->ignore();
+ }
 
 DropToolBar::DropToolBar(QWidget* parent) : QToolBar(parent)
 {
@@ -138,3 +149,6 @@ void DropToolBar::dropEvent(QDropEvent* event)
 {
 	dropped(event);
 }
+
+
+

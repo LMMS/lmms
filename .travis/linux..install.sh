@@ -22,4 +22,4 @@ sudo apt-get install -y $PACKAGES
 sudo add-apt-repository -y ppa:kxstudio-debian/libs
 sudo add-apt-repository -y ppa:kxstudio-debian/apps
 sudo apt-get update
-sudo apt-get install -y carla-git
+sudo apt-get install -y carla
