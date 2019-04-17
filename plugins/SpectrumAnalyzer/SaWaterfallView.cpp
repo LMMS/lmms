@@ -24,8 +24,8 @@
 
 #include <algorithm>
 #include <cmath>
-#include <mutex>
 #include <QImage>
+#include <QMutexLocker>
 #include <QPainter>
 #include <QSplitter>
 #include <QString>
@@ -85,17 +85,17 @@ void SaWaterfallView::paintEvent(QPaintEvent *event) {
 		pos = timeToYPixel(line.first, displayBottom);
 		// align first and last label to the edge if needed, otherwise center them
 		if (line == m_timeTics.front() && pos < label_height / 2) {
-			painter.drawText(displayLeft - label_width - margin, displayTop,
+			painter.drawText(displayLeft - label_width - margin, displayTop - 1,
 							 label_width, label_height, Qt::AlignRight | Qt::AlignTop | Qt::TextDontClip,
 							 QString(line.second.c_str()));
-			painter.drawText(displayRight + margin, displayTop,
+			painter.drawText(displayRight + margin, displayTop - 1,
 							 label_width, label_height, Qt::AlignLeft | Qt::AlignTop | Qt::TextDontClip,
 							 QString(line.second.c_str()));
-		} else if (line == m_timeTics.back() && pos > displayBottom - label_height) {
+		} else if (line == m_timeTics.back() && pos > displayBottom - label_height + 2) {
 			painter.drawText(displayLeft - label_width - margin, displayBottom - label_height,
 							 label_width, label_height, Qt::AlignRight | Qt::AlignBottom | Qt::TextDontClip,
 							 QString(line.second.c_str()));
-			painter.drawText(displayRight + margin, displayBottom - label_height,
+			painter.drawText(displayRight + margin, displayBottom - label_height + 2,
 							 label_width, label_height, Qt::AlignLeft | Qt::AlignBottom | Qt::TextDontClip,
 							 QString(line.second.c_str()));
 		} else {
@@ -109,7 +109,7 @@ void SaWaterfallView::paintEvent(QPaintEvent *event) {
 	}
 
 	// draw the spectrogram precomputed in SaProcessor
-	m_processor->m_dataAccess.lock();
+	QMutexLocker lock(&m_processor->m_dataAccess);
 	painter.drawImage(displayLeft, displayTop,					// top left corner coordinates
 					  QImage(m_processor->m_history.data(),		// raw pixel data to display
 							 m_processor->binCount(),			// width = number of frequency bins
@@ -119,7 +119,7 @@ void SaWaterfallView::paintEvent(QPaintEvent *event) {
 									  displayBottom,
 									  Qt::IgnoreAspectRatio,
 									  Qt::SmoothTransformation));
-	m_processor->m_dataAccess.unlock();
+	lock.unlock();
 
 	// always draw the outline
 	painter.setPen(QPen(m_controls->m_colorGrid, 2, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
@@ -184,9 +184,9 @@ void SaWaterfallView::updateVisibility() {
 
 	if (m_controls->m_waterfallModel.value()) {
 		// clear old data before showing the waterfall
-		m_processor->m_dataAccess.lock();
+		QMutexLocker lock(&m_processor->m_dataAccess);
 		std::fill(m_processor->m_history.begin(), m_processor->m_history.end(), 0);
-		m_processor->m_dataAccess.unlock();
+		lock.unlock();
 
 		setVisible(true);
 

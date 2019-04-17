@@ -27,8 +27,8 @@
 #ifndef SAPROCESSOR_H
 #define SAPROCESSOR_H
 
-#include <mutex>
 #include <QImage>
+#include <QMutex>
 #include <vector>
 
 #include "fft_helpers.h"
@@ -71,7 +71,7 @@ public:
 
 	// data access lock must be acquired by any friendly class that touches
 	// the results, mainly to prevent unexpected mid-way reallocation
-	std::mutex m_dataAccess;
+	QMutex m_dataAccess;
 
 private:
 	SaControls *m_controls;

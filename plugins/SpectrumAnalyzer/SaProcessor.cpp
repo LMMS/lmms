@@ -28,9 +28,9 @@
 #include <algorithm>
 #include <cmath>
 #include <iostream>
+#include <QMutexLocker>
 
 #include "lmms_math.h"
-
 
 
 SaProcessor::SaProcessor(SaControls *controls) :
@@ -119,7 +119,7 @@ void SaProcessor::analyse(sampleFrame *in_buffer, const fpp_t frame_count) {
 			}
 	
 			// lock data shared with SaSpectrumView and SaWaterfallView
-			m_dataAccess.lock();
+			QMutexLocker lock(&m_dataAccess);
 
 			// Run FFT on left channel, convert the result to absolute magnitude
 			// spectrum and normalize it.
@@ -206,7 +206,6 @@ void SaProcessor::analyse(sampleFrame *in_buffer, const fpp_t frame_count) {
 
 			// clean up before checking for more data from input buffer
 			m_framesFilledUp = 0;
-			m_dataAccess.unlock();
 		}
 	}
 }
@@ -282,7 +281,7 @@ void SaProcessor::reallocateBuffers() {
 	// lock, since wfft3 can take a while to find the fastest FFT algorithm
 	// for given machine, which would produce interruption in the audio stream.
 	m_reallocating = true;
-	m_dataAccess.lock();
+	QMutexLocker lock(&m_dataAccess);
 
 	// destroy old FFT plan and free the result buffer
 	if (m_fftPlanL != NULL) {fftwf_destroy_plan(m_fftPlanL);}
@@ -314,7 +313,7 @@ void SaProcessor::reallocateBuffers() {
 	m_inBlockSize = new_in_size;
 	m_fftBlockSize = new_fft_size;
 
-	m_dataAccess.unlock();
+	lock.unlock();
 	m_reallocating = false;
 	clear();
 }
@@ -326,16 +325,15 @@ void SaProcessor::rebuildWindow() {
 	if (m_destroyed) {return;}
 
 	// computation is done in fft_helpers
-	m_dataAccess.lock();
+	QMutexLocker lock(&m_dataAccess);
 	precomputeWindow(m_fftWindow.data(), m_inBlockSize, (FFT_WINDOWS) m_controls->m_windowModel.value());
-	m_dataAccess.unlock();
 }
 
 
 // Clear all data buffers and replace contents with zeros.
 // Note: may take a few milliseconds, do not call in a loop!
 void SaProcessor::clear() {
-	m_dataAccess.lock();
+	QMutexLocker lock(&m_dataAccess);
 	m_framesFilledUp = 0;
 	std::fill(m_bufferL.begin(), m_bufferL.end(), 0);
 	std::fill(m_bufferR.begin(), m_bufferR.end(), 0);
@@ -344,7 +342,6 @@ void SaProcessor::clear() {
 	std::fill(m_normSpectrumL.begin(), m_normSpectrumL.end(), 0);
 	std::fill(m_normSpectrumR.begin(), m_normSpectrumR.end(), 0);
 	std::fill(m_history.begin(), m_history.end(), 0);
-	m_dataAccess.unlock();
 }
 
 

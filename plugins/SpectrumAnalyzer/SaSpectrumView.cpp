@@ -28,7 +28,7 @@
 
 #include <algorithm>
 #include <cmath>
-#include <mutex>
+#include <QMutexLocker>
 #include <QString>
 
 #include "GuiApplication.h"
@@ -40,7 +40,6 @@
 	#include <iostream>
 #endif
 
-	#include <iostream>
 
 SaSpectrumView::SaSpectrumView(SaControls *controls, SaProcessor *processor, QWidget *_parent) :
 	QWidget(_parent),
@@ -144,9 +143,9 @@ void SaSpectrumView::drawSpectrum(QPainter &painter) {
 	#endif
 
 	// draw the graph only if there is any input, averaging residue or peaks
-	m_processor->m_dataAccess.lock();
+	QMutexLocker lock(&m_processor->m_dataAccess);
 	if (m_decaySum > 0 || notEmpty(m_processor->m_normSpectrumL) || notEmpty(m_processor->m_normSpectrumR)) {
-		m_processor->m_dataAccess.unlock();
+		lock.unlock();
 		#ifdef SA_DEBUG
 			path_time = std::chrono::high_resolution_clock::now().time_since_epoch().count();
 		#endif
@@ -183,7 +182,7 @@ void SaSpectrumView::drawSpectrum(QPainter &painter) {
 			draw_time = std::chrono::high_resolution_clock::now().time_since_epoch().count() - draw_time;
 		#endif
 	} else {
-		m_processor->m_dataAccess.unlock();
+		lock.unlock();
 	}
 
 	#ifdef SA_DEBUG
@@ -201,7 +200,7 @@ void SaSpectrumView::drawSpectrum(QPainter &painter) {
 void SaSpectrumView::refreshPaths() {
 	// Lock is required for the entire function, mainly to prevent block size
 	// changes from causing reallocation of data structures mid-way.
-	m_processor->m_dataAccess.lock();
+	QMutexLocker lock(&m_processor->m_dataAccess);
 
 	// check if bin count changed and reallocate display buffers accordingly
 	if (m_processor->binCount() != m_displayBufferL.size()) {
@@ -251,8 +250,6 @@ void SaSpectrumView::refreshPaths() {
 	#ifdef SA_DEBUG
 		make_time = std::chrono::high_resolution_clock::now().time_since_epoch().count() - make_time;
 	#endif
-
-	m_processor->m_dataAccess.unlock();
 
 	#ifdef SA_DEBUG
 		// print measurement results
