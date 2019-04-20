@@ -321,7 +321,10 @@ QSize TabWidget::minimumSizeHint() const
 			maxWidth = std::max(maxWidth, it->w->width());
 			maxHeight = std::max(maxHeight, it->w->height());
 		}
-		return QSize(maxWidth + 4, maxHeight + m_tabbarHeight);
+		// "-1" :
+		// in "addTab", under "Position tab's window", the widget is
+		// moved up by 1 pixel
+		return QSize(maxWidth + 4, maxHeight + m_tabbarHeight - 1);
 	}
 	else {
 		return QWidget::minimumSizeHint();
