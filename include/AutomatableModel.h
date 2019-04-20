@@ -60,6 +60,11 @@
 				modelname.setValue( (float) val );				\
 			}
 
+// use this to make subclasses visitable
+#define MODEL_IS_VISITABLE \
+	void accept(ModelVisitor& v) override { v.visit(*this); } \
+	void accept(ConstModelVisitor& v) const override { v.visit(*this); }
+
 
 
 class ControllerConnection;
@@ -85,10 +90,6 @@ public:
 	// Implement those by using the MODEL_IS_VISITABLE macro
 	virtual void accept(ModelVisitor& v) = 0;
 	virtual void accept(ConstModelVisitor& v) const = 0;
-	// use this to make subclasses visitable
-#define MODEL_IS_VISITABLE \
-	void accept(ModelVisitor& v) override { v.visit(*this); } \
-	void accept(ConstModelVisitor& v) const override { v.visit(*this); }
 
 public:
 	//! Return this class casted to Target, or nullptr if impossible
