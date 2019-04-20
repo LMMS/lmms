@@ -290,7 +290,7 @@ void TabWidget::wheelEvent( QWheelEvent * we )
 	if( we->y() > m_tabheight )
 	{
 		return;
-  }
+	}
 
 	we->accept();
 	int dir = ( we->delta() < 0 ) ? 1 : -1;
