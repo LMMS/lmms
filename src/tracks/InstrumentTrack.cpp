@@ -1298,7 +1298,7 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 				this, SLOT( textChanged( const QString & ) ) );
 
 	m_nameLineEdit->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred));
-	nameAndChangeTrackLayout->addWidget(m_nameLineEdit);
+	nameAndChangeTrackLayout->addWidget(m_nameLineEdit, 1);
 
 
 	// set up left/right arrows for changing instrument
@@ -1410,8 +1410,11 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 	generalSettingsLayout->addLayout( basicControlsLayout );
 
 
-	m_tabWidget = new TabWidget( "", this, true );
-	m_tabWidget->setFixedHeight( INSTRUMENT_HEIGHT + GRAPHIC_TAB_HEIGHT - 4 );
+	m_tabWidget = new TabWidget( "", this, true, true );
+	// "-1" :
+	// in "TabWidget::addTab", under "Position tab's window", the widget is
+	// moved up by 1 pixel
+	m_tabWidget->setMinimumHeight( INSTRUMENT_HEIGHT + GRAPHIC_TAB_HEIGHT - 4 - 1 );
 
 
 	// create tab-widgets
@@ -1443,24 +1446,27 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 	m_tabWidget->addTab( m_effectView, tr( "Effects" ), "fx_tab", 3 );
 	m_tabWidget->addTab( m_midiView, tr( "MIDI" ), "midi_tab", 4 );
 	m_tabWidget->addTab( m_miscView, tr( "Miscellaneous" ), "misc_tab", 5 );
+	adjustTabSize(m_ssView);
+	adjustTabSize(instrumentFunctions);
+	adjustTabSize(m_effectView);
+	adjustTabSize(m_midiView);
+	adjustTabSize(m_miscView);
 
 	// setup piano-widget
 	m_pianoView = new PianoView( this );
-	m_pianoView->setFixedSize( INSTRUMENT_WIDTH, PIANO_HEIGHT );
+	m_pianoView->setMinimumHeight( PIANO_HEIGHT );
+	m_pianoView->setMaximumHeight( PIANO_HEIGHT );
 
 	vlayout->addWidget( generalSettingsWidget );
-	vlayout->addWidget( m_tabWidget );
+	vlayout->addWidget( m_tabWidget, 1 );
 	vlayout->addWidget( m_pianoView );
-
-
 	setModel( _itv->model() );
 
 	updateInstrumentView();
 
-	setFixedWidth( INSTRUMENT_WIDTH );
 	resize( sizeHint() );
 
-	QMdiSubWindow * subWin = gui->mainWindow()->addWindowedWidget( this );
+	QMdiSubWindow* subWin = gui->mainWindow()->addWindowedWidget( this );
 	Qt::WindowFlags flags = subWin->windowFlags();
 	flags |= Qt::MSWindowsFixedSizeDialogHint;
 	flags &= ~Qt::WindowMaximizeButtonHint;
@@ -1473,7 +1479,7 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 	systemMenu->actions().at( 4 )->setVisible( false ); // Maximize
 
 	subWin->setWindowIcon( embed::getIconPixmap( "instrument_track" ) );
-	subWin->setFixedSize( subWin->size() );
+	subWin->setMinimumSize( subWin->size() );
 	subWin->hide();
 }
 
@@ -1624,6 +1630,7 @@ void InstrumentTrackWindow::updateInstrumentView()
 		modelChanged(); 		// Get the instrument window to refresh
 		m_track->dataChanged(); // Get the text on the trackButton to change
 
+		adjustTabSize(m_instrumentView);
 		m_pianoView->setVisible(m_track->m_instrument->hasNoteInput());
 	}
 }
@@ -1819,6 +1826,7 @@ void InstrumentTrackWindow::viewInstrumentInDirection(int d)
 		// get the instrument window to refresh
 		modelChanged();
 	}
+	Q_ASSERT(bringToFront);
 	bringToFront->getInstrumentTrackWindow()->setFocus();
 }
 
@@ -1829,6 +1837,14 @@ void InstrumentTrackWindow::viewNextInstrument()
 void InstrumentTrackWindow::viewPrevInstrument()
 {
 	viewInstrumentInDirection(-1);
+}
+
+void InstrumentTrackWindow::adjustTabSize(QWidget *w)
+{
+	// "-1" :
+	// in "TabWidget::addTab", under "Position tab's window", the widget is
+	// moved up by 1 pixel
+	w->setMinimumSize(INSTRUMENT_WIDTH - 4, INSTRUMENT_HEIGHT - 4 - 1);
 }
 
 #include "InstrumentTrack.moc"
