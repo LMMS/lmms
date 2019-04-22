@@ -84,6 +84,15 @@ bool Lv2Effect::processAudioBuffer(sampleFrame *buf, const fpp_t frames)
 
 	ctrl.copyBuffersToLmms(buf, frames);
 
+	double outSum = .0;
+	for(fpp_t f = 0; f < frames; ++f)
+	{
+		double l = static_cast<double>(buf[f][0]);
+		double r = static_cast<double>(buf[f][1]);
+		outSum += l*l + r*r;
+	}
+	checkGate(outSum);
+
 	return isRunning();
 }
 
