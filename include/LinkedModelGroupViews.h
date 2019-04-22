@@ -26,6 +26,8 @@
 #define LINKEDMODELGROUPVIEWS_H
 
 
+#include <memory>
+#include <vector>
 #include <QGroupBox>
 
 
@@ -59,8 +61,8 @@ private:
 	int m_colNum; //!< column number in surrounding grid in Lv2ViewBase
 	bool m_isLinking;
 	class QGridLayout* m_grid;
-	QVector<class ControlBase*> m_controls;
-	QVector<class LedCheckBox*> m_leds;
+	std::vector<std::unique_ptr<class ControlBase>> m_controls;
+	std::vector<std::unique_ptr<class LedCheckBox>> m_leds;
 };
 
 
@@ -71,19 +73,22 @@ class LinkedModelGroupsViewBase
 protected:
 	//! @param pluginWidget A child class which inherits QWidget
 	LinkedModelGroupsViewBase(class LinkedModelGroups *ctrlBase);
-	~LinkedModelGroupsViewBase();
+	~LinkedModelGroupsViewBase() = default;
 
 	//! Reconnect models if model changed; to be called by child virtuals
 	void modelChanged(class LinkedModelGroups* ctrlBase);
 
 	//! Access to the global multi channel link LED
-	LedCheckBox* globalLinkLed() { return m_multiChannelLink; }
+	LedCheckBox* globalLinkLed() { return m_multiChannelLink.get(); }
 
 private:
 	//! The base class must return the adressed group view
 	virtual LinkedModelGroupViewBase* getGroupView(std::size_t idx) = 0;
 
-	class LedCheckBox *m_multiChannelLink = nullptr;
+	// Implement deletion in the CPP file:
+	struct MultiChannelLinkDeleter { void operator()(LedCheckBox* l); };
+	std::unique_ptr<class LedCheckBox, MultiChannelLinkDeleter>
+		m_multiChannelLink = nullptr;
 };
 
 
