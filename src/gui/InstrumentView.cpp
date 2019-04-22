@@ -34,7 +34,6 @@ InstrumentView::InstrumentView( Instrument * _Instrument, QWidget * _parent ) :
 	PluginView( _Instrument, _parent )
 {
 	setModel( _Instrument );
-	setFixedSize( 250, 250 );
 	setAttribute( Qt::WA_DeleteOnClose, true );
 }
 
