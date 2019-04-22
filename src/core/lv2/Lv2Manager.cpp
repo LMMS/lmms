@@ -26,12 +26,11 @@
 
 #ifdef LMMS_HAVE_LV2
 
+#include <lilv/lilv.h>
+#include <lv2.h>
 #include <QDebug>
 #include <QDir>
 #include <QLibrary>
-#include <lv2.h>
-
-#include <lilv/lilv.h>
 
 #include "ConfigManager.h"
 #include "Plugin.h"
@@ -53,6 +52,15 @@ Lv2Manager::Lv2Manager()
 
 Lv2Manager::~Lv2Manager()
 {
+	lilv_world_free(m_world);
+}
+
+
+
+
+AutoLilvNode Lv2Manager::uri(const char *uriStr)
+{
+	return AutoLilvNode(lilv_new_uri(m_world, uriStr));
 }
 
 
@@ -100,7 +108,7 @@ bool Lv2Manager::isSubclassOf(const LilvPluginClass* clvss, const char* uriStr)
 {
 	const LilvPluginClasses* allClasses = lilv_world_get_plugin_classes(m_world);
 	const LilvPluginClass* root = lilv_world_get_plugin_class(m_world);
-	const LilvPluginClass* gen = lilv_plugin_classes_get_by_uri(allClasses,
+	const LilvPluginClass* search = lilv_plugin_classes_get_by_uri(allClasses,
 					uri(uriStr).get());
 
 	auto clssEq = [](const LilvPluginClass* pc1,
@@ -110,13 +118,13 @@ bool Lv2Manager::isSubclassOf(const LilvPluginClass* clvss, const char* uriStr)
 			lilv_plugin_class_get_uri(pc1),
 			lilv_plugin_class_get_uri(pc2));
 	};
-	bool isGen = false;
+	bool isFound = false;
 	for (;
-		clssEq(clvss, root) && (isGen = clssEq(clvss, gen));
+		!(isFound = clssEq(clvss, search)) && !clssEq(clvss, root);
 		clvss = lilv_plugin_classes_get_by_uri(allClasses,
 			lilv_plugin_class_get_parent_uri(clvss))
 	) ;
-	return isGen;
+	return isFound;
 }
 
 

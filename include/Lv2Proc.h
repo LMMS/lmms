@@ -82,8 +82,8 @@ public:
 	const StereoPortRef& inPorts() const { return m_inPorts; }
 	StereoPortRef& outPorts() { return m_outPorts; }
 	const StereoPortRef& outPorts() const { return m_outPorts; }
-	std::vector<Lv2Ports::PortBase*>& getPorts() { return m_ports; }
-	const std::vector<Lv2Ports::PortBase*>& getPorts() const { return m_ports; }
+	std::vector<std::unique_ptr<Lv2Ports::PortBase>>& getPorts() { return m_ports; }
+	const std::vector<std::unique_ptr<Lv2Ports::PortBase>>& getPorts() const { return m_ports; }
 
 	//! Debug function to print ports to stdout
 	void dumpPorts();
@@ -127,7 +127,7 @@ private:
 	const LilvPlugin* m_plugin;
 	LilvInstance* m_instance;
 
-	std::vector<Lv2Ports::PortBase*> m_ports;
+	std::vector<std::unique_ptr<Lv2Ports::PortBase>> m_ports;
 	StereoPortRef m_inPorts, m_outPorts;
 	std::size_t m_controlCount = 0;
 
@@ -142,8 +142,6 @@ private:
 	void createPort(unsigned portNum);
 	//! connect m_ports[portNum] with Lv2
 	void connectPort(unsigned num);
-	//! clean up all ports
-	void destroyPorts();
 
 	void dumpPort(std::size_t num);
 

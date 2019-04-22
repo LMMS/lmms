@@ -43,6 +43,7 @@
 #include "Engine.h"
 #include "Mixer.h"
 #include "PluginFactory.h"
+#include "Lv2Basics.h"
 #include "Lv2Manager.h"
 #include "embed.h"
 
@@ -54,6 +55,14 @@ const LilvPlugin *Lv2SubPluginFeatures::getPlugin(
 		getPlugin(k.attributes["uri"]);
 	Q_ASSERT(result);
 	return result;
+}
+
+
+
+
+QString Lv2SubPluginFeatures::pluginName(const LilvPlugin *plug)
+{
+	return qStringFromPluginNode(plug, lilv_plugin_get_name);
 }
 
 
@@ -73,8 +82,7 @@ void Lv2SubPluginFeatures::fillDescriptionWidget(
 	const LilvPlugin *plug = getPlugin(*k);
 
 	QLabel *label = new QLabel(_parent);
-	label->setText(QWidget::tr("Name: ") +
-		lilv_node_as_string(lilv_plugin_get_name(plug)));
+	label->setText(QWidget::tr("Name: ") + pluginName(plug));
 
 	QLabel *label2 = new QLabel(_parent);
 	label2->setText(QWidget::tr("URI: ") +
@@ -91,7 +99,7 @@ void Lv2SubPluginFeatures::fillDescriptionWidget(
 
 	QLabel *maker_content = new QLabel(maker);
 	maker_content->setText(
-		lilv_node_as_string(lilv_plugin_get_author_name(plug)));
+		qStringFromPluginNode(plug, lilv_plugin_get_author_name));
 	maker_content->setWordWrap(true);
 
 	l->addWidget(maker_label);
@@ -113,9 +121,8 @@ void Lv2SubPluginFeatures::fillDescriptionWidget(
 	l->addWidget(copyright_label);
 	l->addWidget(copyright_content, 1);
 
-	const LilvNodes* extensions = lilv_plugin_get_extension_data(plug);
+	AutoLilvNodes extensions(lilv_plugin_get_extension_data(plug));
 	(void)extensions;
-
 	// possibly TODO: version, project, plugin type, number of channels
 }
 
@@ -128,7 +135,7 @@ QString Lv2SubPluginFeatures::additionalFileExtensions(
 	(void)k;
 	// lv2 only loads .lv2 files
 	// maybe add conversions later, e.g. for loading xmz
-	return nullptr;
+	return QString();
 }
 
 
@@ -137,7 +144,7 @@ QString Lv2SubPluginFeatures::additionalFileExtensions(
 QString Lv2SubPluginFeatures::displayName(
 	const Plugin::Descriptor::SubPluginFeatures::Key &k) const
 {
-	return lilv_node_as_string(lilv_plugin_get_name(getPlugin(k)));
+	return pluginName(getPlugin(k));
 }
 
 
@@ -147,7 +154,7 @@ QString Lv2SubPluginFeatures::description(
 	const Plugin::Descriptor::SubPluginFeatures::Key &k) const
 {
 	(void)k;
-	return "description not implemented yet"; // TODO
+	return QString::fromUtf8("description not implemented yet"); // TODO
 }
 
 
@@ -178,10 +185,7 @@ void Lv2SubPluginFeatures::listSubPluginKeys(
 			atm["uri"] = QString::fromUtf8(pr.first.c_str());
 			const LilvPlugin* plug = pr.second.plugin();
 
-
-			_kl.push_back(KeyType(_desc,
-				lilv_node_as_string(lilv_plugin_get_name(plug)),
-				atm));
+			_kl.push_back(KeyType(_desc, pluginName(plug), atm));
 			//qDebug() << "Found LV2 sub plugin key of type" <<
 			//	m_type << ":" << pr.first.c_str();
 		}

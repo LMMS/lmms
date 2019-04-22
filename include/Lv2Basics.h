@@ -32,19 +32,34 @@
 #ifdef LMMS_HAVE_LV2
 
 #include <lilv/lilv.h>
+#include <memory>
+#include <QString>
 
-
-//! a simple RAII class for lilv nodes that shall be freed
-struct AutoLilvNode
+struct LilvNodeDeleter
 {
-	LilvNode* n;
-	AutoLilvNode(LilvNode* n) : n(n) {}
-	AutoLilvNode(const AutoLilvNode& other) = delete;
-	AutoLilvNode(AutoLilvNode&& other) { n = other.n; other.n = nullptr; }
-	~AutoLilvNode() { if (n) { lilv_node_free(n); } }
-	const LilvNode* get() const { return n; }
+	void operator()(LilvNode* n) { lilv_node_free(n); }
 };
 
+struct LilvNodesDeleter
+{
+	void operator()(LilvNodes* n) { lilv_nodes_free(n); }
+};
+
+using AutoLilvNode = std::unique_ptr<LilvNode, LilvNodeDeleter>;
+using AutoLilvNodes = std::unique_ptr<LilvNodes, LilvNodesDeleter>;
+
+/**
+	Return QString from a plugin's node, everything will be freed automatically
+	@param plug The plugin where the node is
+	@param getFun The function to return the node from the plugin
+	@param convFunc convFunc The plugin to return a char pointer from that node;
+	  this is usually lilv_node_as_string or lilv_node_as_uri
+*/
+QString qStringFromPluginNode(const LilvPlugin* plug,
+		LilvNode * (*getFunc)(const LilvPlugin*));
+
+//! Return port name as QString, everything will be freed automatically
+QString qStringFromPortName(const LilvPlugin* plug, const LilvPort* port);
 
 #endif // LMMS_HAVE_LV2
 #endif // LV2BASICS_H

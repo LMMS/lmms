@@ -56,10 +56,10 @@ Lv2ViewProc::Lv2ViewProc(QWidget* parent, Lv2Proc* ctrlBase,
 {
 	class SetupWidget : public Lv2Ports::Visitor
 	{
-		AutoLilvNode commentUri = uri(LILV_NS_RDFS "comment");
 	public:
-		QWidget* par; // input
-		ControlBase* control = nullptr; // output
+		QWidget* m_par; // input
+		const AutoLilvNode* m_commentUri; // input
+		ControlBase* m_control = nullptr; // output
 		void visit(Lv2Ports::Control& port) override
 		{
 			if (port.m_flow == Lv2Ports::Flow::Input)
@@ -69,27 +69,27 @@ Lv2ViewProc::Lv2ViewProc(QWidget* parent, Lv2Proc* ctrlBase,
 				switch (port.m_vis)
 				{
 					case PortVis::None:
-						control = new KnobControl(par);
+						m_control = new KnobControl(m_par);
 						break;
 					case PortVis::Integer:
-						control = new LcdControl((port.m_max <= 9.0f) ? 1 : 2,
-													par);
+						m_control = new LcdControl((port.m_max <= 9.0f) ? 1 : 2,
+													m_par);
 						break;
 					case PortVis::Enumeration:
-						control = new ComboControl(par);
+						m_control = new ComboControl(m_par);
 						break;
 					case PortVis::Toggled:
-						control = new CheckControl(par);
+						m_control = new CheckControl(m_par);
 						break;
 				}
-				control->setText(port.name());
+				m_control->setText(port.name());
 
 				LilvNodes* props = lilv_port_get_value(
-					port.m_plugin, port.m_port, commentUri.get());
+					port.m_plugin, port.m_port, m_commentUri->get());
 				LILV_FOREACH(nodes, itr, props)
 				{
 					const LilvNode* nod = lilv_nodes_get(props, itr);
-					control->topWidget()->setToolTip(lilv_node_as_string(nod));
+					m_control->topWidget()->setToolTip(lilv_node_as_string(nod));
 					break;
 				}
 				lilv_nodes_free(props);
@@ -97,13 +97,15 @@ Lv2ViewProc::Lv2ViewProc(QWidget* parent, Lv2Proc* ctrlBase,
 		}
 	};
 
-	for (Lv2Ports::PortBase* port : ctrlBase->getPorts())
+	AutoLilvNode commentUri = uri(LILV_NS_RDFS "comment");
+	for (std::unique_ptr<Lv2Ports::PortBase>& port : ctrlBase->getPorts())
 	{
 		SetupWidget setup;
-		setup.par = this;
+		setup.m_par = this;
+		setup.m_commentUri = &commentUri;
 		port->accept(setup);
 
-		if (setup.control) { addControl(setup.control); }
+		if (setup.m_control) { addControl(setup.m_control); }
 	}
 }
 
@@ -187,7 +189,7 @@ Lv2ViewBase::Lv2ViewBase(QWidget* meAsWidget, Lv2ControlBase *ctrlBase)
 	for (int i = 0; i < nProcs; ++i)
 	{
 		Lv2ViewProc* vpr = new Lv2ViewProc(meAsWidget,
-			ctrlBase->controls()[static_cast<std::size_t>(i)],
+			ctrlBase->controls()[static_cast<std::size_t>(i)].get(),
 			colsEach, i, nProcs);
 		grid->addWidget(vpr, Rows::ProcRow, i);
 		m_procViews.push_back(vpr);

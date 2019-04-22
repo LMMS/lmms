@@ -85,19 +85,17 @@ std::vector<PluginIssue> Meta::get(const LilvPlugin *plugin,
 										unsigned int portNum)
 {
 	std::vector<PluginIssue> portIssues;
-	auto issue = [&portIssues](PluginIssueType i, const char* msg = "") {
-		portIssues.emplace_back(i, msg); };
+	auto issue = [&portIssues](PluginIssueType i, std::string msg = "") {
+		portIssues.emplace_back(i, std::move(msg)); };
 
 	Lv2Manager* man = Engine::getLv2Manager();
-	AutoLilvNode connectionOptional = man->uri(LV2_CORE__connectionOptional);
 
 	const LilvPort* lilvPort = lilv_plugin_get_port_by_index(plugin, portNum);
 
 	auto portFunc = [&plugin, &lilvPort, &man](
 		bool (*fptr)(const LilvPlugin*, const LilvPort*, const LilvNode*),
 		const char* str) {
-		bool res = fptr(plugin, lilvPort, man->uri(str).get());
-		return res;
+		return fptr(plugin, lilvPort, man->uri(str).get());
 	};
 
 	auto hasProperty = [&portFunc](const char* str) {
@@ -105,11 +103,13 @@ std::vector<PluginIssue> Meta::get(const LilvPlugin *plugin,
 	auto isA = [&portFunc](const char* str) {
 		return portFunc(lilv_port_is_a, str); };
 
+	std::string portName;
+	{
+		AutoLilvNode nameNode(lilv_port_get_name(plugin, lilvPort));
+		portName = lilv_node_as_string(nameNode.get());
+	}
 
-	const char* portName = lilv_node_as_string(lilv_port_get_name(plugin, lilvPort));
-
-	m_optional = lilv_port_has_property(plugin, lilvPort,
-										connectionOptional.get());
+	m_optional = hasProperty(LV2_CORE__connectionOptional);
 
 	m_vis = hasProperty(LV2_CORE__integer)
 		? Vis::Integer // WARNING: this may still be changed below
@@ -184,7 +184,7 @@ std::vector<PluginIssue> Meta::get(const LilvPlugin *plugin,
 
 QString PortBase::name() const
 {
-	AutoLilvNode node = lilv_port_get_name(m_plugin, m_port);
+	AutoLilvNode node(lilv_port_get_name(m_plugin, m_port));
 	QString res = lilv_node_as_string(node.get());
 	return res;
 }

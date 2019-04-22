@@ -45,9 +45,9 @@ Lv2FxControls::Lv2FxControls(class Lv2Effect *effect, const QString& uri) :
 			SLOT(reloadPlugin()));
 		if(multiChannelLinkModel()) {
 			connect(multiChannelLinkModel(), SIGNAL(dataChanged()),
-				this, SLOT(updateLinkStatesFromGlobal()));
+				this, SLOT(updateLinkStatesFromGlobal()), Qt::DirectConnection);
 			connect(getGroup(0), SIGNAL(linkStateChanged(int, bool)),
-					this, SLOT(linkPort(int, bool)));
+					this, SLOT(linkPort(int, bool)), Qt::DirectConnection);
 		}
 	}
 }

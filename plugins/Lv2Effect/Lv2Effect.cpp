@@ -98,7 +98,7 @@ PLUGIN_EXPORT Plugin *lmms_plugin_main(Model *_parent, void *_data)
 {
 	using KeyType = Plugin::Descriptor::SubPluginFeatures::Key;
 	Lv2Effect* eff = new Lv2Effect(_parent, static_cast<const KeyType*>(_data));
-	if (!eff->isValid()) { eff = nullptr; }
+	if (!eff->isValid()) { delete eff; eff = nullptr; }
 	return eff;
 }
 

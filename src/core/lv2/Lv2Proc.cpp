@@ -42,8 +42,8 @@ Plugin::PluginTypes Lv2Proc::check(const LilvPlugin *plugin,
 	std::vector<PluginIssue>& issues, bool printIssues)
 {
 	unsigned maxPorts = lilv_plugin_get_num_ports(plugin);
-	enum { checkIn, checkOut, checkMax };
-	unsigned audioChannels[checkMax] = { 0, 0 }; // input and output count
+	enum { inCount, outCount, maxCount };
+	unsigned audioChannels[maxCount] = { 0, 0 }; // input and output count
 
 	for (unsigned portNum = 0; portNum < maxPorts; ++portNum)
 	{
@@ -55,36 +55,39 @@ Plugin::PluginTypes Lv2Proc::check(const LilvPlugin *plugin,
 		if (meta.m_type == Lv2Ports::Type::Audio &&
 			!portIsSideChain(plugin,
 							lilv_plugin_get_port_by_index(plugin, portNum)))
-			++audioChannels[meta.m_flow == Lv2Ports::Flow::Output];
+			++audioChannels[meta.m_flow == Lv2Ports::Flow::Output
+				? outCount : inCount];
 	}
 
-	if (audioChannels[checkIn] > 2)
+	if (audioChannels[inCount] > 2)
 		issues.emplace_back(tooManyInputChannels,
-			std::to_string(audioChannels[0]));
-	if (audioChannels[checkOut] == 0)
+			std::to_string(audioChannels[inCount]));
+	if (audioChannels[outCount] == 0)
 		issues.emplace_back(noOutputChannel);
-	else if (audioChannels[checkOut] > 2)
+	else if (audioChannels[outCount] > 2)
 		issues.emplace_back(tooManyOutputChannels,
-			std::to_string(audioChannels[1]));
+			std::to_string(audioChannels[outCount]));
 
-	const LilvNodes* reqFeats = lilv_plugin_get_required_features(plugin);
-	LILV_FOREACH (nodes, itr, reqFeats)
+	AutoLilvNodes reqFeats(lilv_plugin_get_required_features(plugin));
+	LILV_FOREACH (nodes, itr, reqFeats.get())
 	{
 		issues.emplace_back(featureNotSupported,
-			lilv_node_as_string(lilv_nodes_get(reqFeats, itr)));
+			lilv_node_as_string(lilv_nodes_get(reqFeats.get(), itr)));
 	}
 
 	if (printIssues && issues.size())
 	{
-		qDebug() << "Lv2 plugin " <<
-			lilv_node_as_string(lilv_plugin_get_name(plugin))
-			<< " can not be loaded:";
+		qDebug() << "Lv2 plugin"
+			<< qStringFromPluginNode(plugin, lilv_plugin_get_name)
+			<< "(URI:"
+			<< lilv_node_as_uri(lilv_plugin_get_uri(plugin))
+			<< ") can not be loaded:";
 		for (const PluginIssue& iss : issues) { qDebug() << "  - " << iss; }
 	}
 
-	return (audioChannels[1] > 2 || audioChannels[0] > 2)
+	return (audioChannels[inCount] > 2 || audioChannels[outCount] > 2)
 		? Plugin::Undefined
-		: audioChannels[0]
+		: (audioChannels[inCount] > 0)
 			? Plugin::Effect
 			: Plugin::Instrument;
 }
@@ -118,7 +121,7 @@ Lv2Proc::~Lv2Proc() { shutdownPlugin(); }
 void Lv2Proc::dumpPorts()
 {
 	std::size_t num = 0;
-	for (const Lv2Ports::PortBase* port: m_ports)
+	for (const std::unique_ptr<Lv2Ports::PortBase>& port: m_ports)
 	{
 		(void)port;
 		dumpPort(num++);
@@ -168,7 +171,8 @@ void Lv2Proc::copyModelsFromCore()
 		}
 	} copy;
 
-	for (Lv2Ports::PortBase* port : m_ports) { port->accept(copy); }
+	for (const std::unique_ptr<Lv2Ports::PortBase>& port : m_ports) {
+		port->accept(copy); }
 }
 
 
@@ -216,7 +220,7 @@ void Lv2Proc::copyBuffersToCore(sampleFrame* buf,
 
 void Lv2Proc::run(unsigned frames)
 {
-	lilv_instance_run(m_instance, static_cast<unsigned>(frames));
+	lilv_instance_run(m_instance, frames);
 }
 
 
@@ -252,7 +256,10 @@ void Lv2Proc::initPlugin()
 	else
 	{
 		qCritical() << "Failed to create an instance of"
-			<< lilv_node_as_string(lilv_plugin_get_name(m_plugin));
+			<< qStringFromPluginNode(m_plugin, lilv_plugin_get_name)
+			<< "(URI:"
+			<< lilv_node_as_uri(lilv_plugin_get_uri(m_plugin))
+			<< ")";
 		m_valid = false;
 	}
 }
@@ -263,6 +270,7 @@ void Lv2Proc::initPlugin()
 void Lv2Proc::shutdownPlugin()
 {
 	lilv_instance_deactivate(m_instance);
+	lilv_instance_free(m_instance);
 	m_instance = nullptr;
 }
 
@@ -279,22 +287,19 @@ void Lv2Proc::loadFileInternal(const QString &file)
 
 void Lv2Proc::createPort(unsigned portNum)
 {
-	Lv2Ports::PortBase*& port = m_ports[portNum];
-
 	Lv2Ports::Meta meta;
 	meta.get(m_plugin, portNum);
 
 	const LilvPort* lilvPort = lilv_plugin_get_port_by_index(m_plugin,
 								portNum);
-
+	Lv2Ports::PortBase* port;
 	if (meta.m_type == Lv2Ports::Type::Control)
 	{
 		Lv2Ports::Control* ctrl = new Lv2Ports::Control;
 		if (meta.m_flow == Lv2Ports::Flow::Input)
 		{
-			LilvNode* node = lilv_port_get_name(m_plugin, lilvPort);
-			QString dispName = lilv_node_as_string(node);
-			lilv_node_free(node);
+			AutoLilvNode node(lilv_port_get_name(m_plugin, lilvPort));
+			QString dispName = lilv_node_as_string(node.get());
 			switch (meta.m_vis)
 			{
 				case Lv2Ports::Vis::None:
@@ -324,7 +329,7 @@ void Lv2Proc::createPort(unsigned portNum)
 					ComboBoxModel* comboModel
 						= new ComboBoxModel(
 							nullptr, dispName);
-					const LilvScalePoints* sps =
+					LilvScalePoints* sps =
 						lilv_port_get_scale_points(m_plugin, lilvPort);
 					LILV_FOREACH(scale_points, i, sps)
 					{
@@ -335,6 +340,7 @@ void Lv2Proc::createPort(unsigned portNum)
 							lilv_node_as_string(
 								lilv_scale_point_get_label(sp)));
 					}
+					lilv_scale_points_free(sps);
 					ctrl->m_connectedModel.reset(comboModel);
 					break;
 				}
@@ -360,9 +366,14 @@ void Lv2Proc::createPort(unsigned portNum)
 		port = new Lv2Ports::Unknown;
 	}
 
-	*dynamic_cast<Lv2Ports::Meta*>(port) = meta;
+	// `meta` is of class `Lv2Ports::Meta` and `port` is of a child class
+	// we can now assign the `Lv2Ports::Meta` part of meta to ports, leaving
+	// the additional members of `port` unchanged
+	*static_cast<Lv2Ports::Meta*>(port) = meta;
 	port->m_port = lilvPort;
 	port->m_plugin = m_plugin;
+
+	m_ports[portNum].reset(port);
 }
 
 
@@ -374,20 +385,20 @@ void Lv2Proc::createPorts()
 	// i.e. link their data or count them
 	struct RegisterPort : public Lv2Ports::Visitor
 	{
-		Lv2Proc* proc;
+		Lv2Proc* m_proc;
 
 		void visit(Lv2Ports::Control& ctrl) override
 		{
 			if (ctrl.m_flow == Lv2Ports::Flow::Input)
 			{
 				AutomatableModel* amo = ctrl.m_connectedModel.get();
-				proc->m_connectedModels.emplace(
+				m_proc->m_connectedModels.emplace(
 					lilv_node_as_string(lilv_port_get_symbol(
-										proc->m_plugin, ctrl.m_port)),
+										m_proc->m_plugin, ctrl.m_port)),
 					amo);
-				proc->addModel(amo);
+				m_proc->addModel(amo);
 
-				++proc->m_controlCount;
+				++m_proc->m_controlCount;
 			}
 		}
 
@@ -400,10 +411,10 @@ void Lv2Proc::createPorts()
 				switch (audio.m_flow)
 				{
 					case Lv2Ports::Flow::Input:
-						portRef = &proc->m_inPorts;
+						portRef = &m_proc->m_inPorts;
 						break;
 					case Lv2Ports::Flow::Output:
-						portRef = &proc->m_outPorts;
+						portRef = &m_proc->m_outPorts;
 						break;
 					case Lv2Ports::Flow::Unknown:
 						break;
@@ -422,7 +433,7 @@ void Lv2Proc::createPorts()
 	{
 		createPort(portNum);
 		RegisterPort registerPort;
-		registerPort.proc = this;
+		registerPort.m_proc = this;
 		m_ports[portNum]->accept(registerPort);
 	}
 
@@ -463,14 +474,6 @@ void Lv2Proc::connectPort(unsigned num)
 
 
 
-void Lv2Proc::destroyPorts()
-{
-	for (Lv2Ports::PortBase* p: m_ports) { delete p; }
-}
-
-
-
-
 void Lv2Proc::dumpPort(std::size_t num)
 {
 	struct DumpPortDetail : public Lv2Ports::ConstVisitor
@@ -493,7 +496,7 @@ void Lv2Proc::dumpPort(std::size_t num)
 	const Lv2Ports::PortBase& port = *m_ports[num];
 	qDebug().nospace() << "port " << num << ":";
 	qDebug() << "  name:"
-		<< lilv_node_as_string(lilv_port_get_name(m_plugin, port.m_port));
+		<< qStringFromPortName(m_plugin, port.m_port);
 	qDebug() << "  flow: " << Lv2Ports::toStr(port.m_flow);
 	qDebug() << "  type: " << Lv2Ports::toStr(port.m_type);
 	qDebug() << "  visualization: " << Lv2Ports::toStr(port.m_vis);

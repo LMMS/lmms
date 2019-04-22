@@ -54,14 +54,14 @@ Lv2ControlBase::Lv2ControlBase(Model* that, const QString &uri) :
 		int channelsLeft = DEFAULT_CHANNELS; // LMMS plugins are stereo
 		while (channelsLeft > 0)
 		{
-			Lv2Proc* newOne = new Lv2Proc(m_plugin, that);
+			std::unique_ptr<Lv2Proc> newOne(new Lv2Proc(m_plugin, that));
 			if (newOne->isValid())
 			{
 				channelsLeft -= std::max(
 					1 + static_cast<bool>(newOne->inPorts().m_right),
 					1 + static_cast<bool>(newOne->outPorts().m_right));
 				Q_ASSERT(channelsLeft >= 0);
-				m_procs.push_back(newOne);
+				m_procs.push_back(std::move(newOne));
 			}
 			else
 			{
@@ -95,24 +95,21 @@ Lv2ControlBase::Lv2ControlBase(Model* that, const QString &uri) :
 
 
 
-Lv2ControlBase::~Lv2ControlBase()
-{
-	for (Lv2Proc* c : m_procs) { delete c; }
-}
+Lv2ControlBase::~Lv2ControlBase() {}
 
 
 
 
 LinkedModelGroup *Lv2ControlBase::getGroup(std::size_t idx)
 {
-	return (m_procs.size() > idx) ? m_procs[idx] : nullptr;
+	return (m_procs.size() > idx) ? m_procs[idx].get() : nullptr;
 }
 
 
 
 
 void Lv2ControlBase::copyModelsFromLmms() {
-	for (Lv2Proc* c : m_procs) { c->copyModelsFromCore(); }
+	for (std::unique_ptr<Lv2Proc>& c : m_procs) { c->copyModelsFromCore(); }
 }
 
 
@@ -120,7 +117,7 @@ void Lv2ControlBase::copyModelsFromLmms() {
 
 void Lv2ControlBase::copyBuffersFromLmms(const sampleFrame *buf, fpp_t frames) {
 	unsigned offset = 0;
-	for (Lv2Proc* c : m_procs) {
+	for (std::unique_ptr<Lv2Proc>& c : m_procs) {
 		c->copyBuffersFromCore(buf, offset, m_channelsPerProc, frames);
 		offset += m_channelsPerProc;
 	}
@@ -131,7 +128,7 @@ void Lv2ControlBase::copyBuffersFromLmms(const sampleFrame *buf, fpp_t frames) {
 
 void Lv2ControlBase::copyBuffersToLmms(sampleFrame *buf, fpp_t frames) const {
 	unsigned offset = 0;
-	for (const Lv2Proc* c : m_procs) {
+	for (const std::unique_ptr<Lv2Proc>& c : m_procs) {
 		c->copyBuffersToCore(buf, offset, m_channelsPerProc, frames);
 		offset += m_channelsPerProc;
 	}
@@ -141,7 +138,7 @@ void Lv2ControlBase::copyBuffersToLmms(sampleFrame *buf, fpp_t frames) const {
 
 
 void Lv2ControlBase::run(unsigned frames) {
-	for (Lv2Proc* c : m_procs) { c->run(frames); }
+	for (std::unique_ptr<Lv2Proc>& c : m_procs) { c->run(frames); }
 }
 
 
@@ -183,7 +180,7 @@ void Lv2ControlBase::reloadPlugin()
 
 std::size_t Lv2ControlBase::controlCount() const {
 	std::size_t res = 0;
-	for (const Lv2Proc* c : m_procs) { res += c->controlCount(); }
+	for (const std::unique_ptr<Lv2Proc>& c : m_procs) { res += c->controlCount(); }
 	return res;
 }
 

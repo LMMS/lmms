@@ -42,7 +42,7 @@
 	explanation:
 		"x = {y z}" means class "x" consists of classes "y" and "z"
 			(and probably other classes not mentioned)
-		"x = {y*}" me}ns class "x" references/uses class "y"
+		"x = {y*}" means class "x" references/uses class "y"
 
 	core:
 		Lv2Proc =			{LilvInstance}
@@ -50,10 +50,10 @@
 		Lv2Manager =		{LilvPlugin*, LilvPlugin* ...}
 							(creates Lv2ControlBase, Lv2ControlBase...)
 
-		Lv2FxControls =		{LilvControlBase}
+		Lv2FxControls =		{Lv2ControlBase}
 		Lv2Effect =			{Effect + Lv2FxControls}
 							(takes Lv2SubPluginFeatures in ctor)
-		Lv2Instrument =		{Instrument + LilvControlBase}
+		Lv2Instrument =		{Instrument + Lv2ControlBase}
 							(takes Lv2SubPluginFeatures in ctor)
 
 	gui:
@@ -82,10 +82,7 @@ public:
 	~Lv2Manager();
 
 
-	AutoLilvNode uri(const char* uriStr)
-	{
-		return AutoLilvNode(lilv_new_uri(m_world, uriStr));
-	}
+	AutoLilvNode uri(const char* uriStr);
 
 	//! Class representing info for one plugin
 	struct Lv2Info
@@ -97,44 +94,25 @@ public:
 		Lv2Info(const LilvPlugin* plug, Plugin::PluginTypes type, bool valid) :
 			m_plugin(plug), m_type(type), m_valid(valid) {}
 		Lv2Info(const Lv2Info &) = delete;
-		Lv2Info(Lv2Info&& other) :
-			m_plugin(other.m_plugin),
-			m_type(std::move(other.m_type)),
-			m_valid(std::move(other.m_valid))
-		{
-		}
-		Lv2Info& operator=(Lv2Info&& other)
-		{
-			m_plugin = other.m_plugin;
-			m_type = std::move(other.m_type);
-			m_valid = std::move(other.m_valid);
-			return *this;
-		}
-		bool isValid() const { return m_valid; }
-		Plugin::PluginTypes type() const { return m_type; }
+		Lv2Info(Lv2Info&& other) = default;
+		Lv2Info& operator=(Lv2Info&& other) = default;
+
 		const LilvPlugin* plugin() const { return m_plugin; }
+		Plugin::PluginTypes type() const { return m_type; }
+		bool isValid() const { return m_valid; }
+
 	private:
 		const LilvPlugin* m_plugin;
 		Plugin::PluginTypes m_type;
 		bool m_valid = false;
 	};
 
-	//! Return a descriptor with @p uniqueName or nullptr if none exists
-	//! @param uniqueName The lv2::unique_name of the plugin
+	//! Return descriptor with URI @p uri or nullptr if none exists
 	const LilvPlugin *getPlugin(const std::string &uri);
+	//! Return descriptor with URI @p uri or nullptr if none exists
 	const LilvPlugin *getPlugin(const QString uri);
 
-	class Iterator
-	{
-		std::map<std::string, Lv2Info>::iterator m_itr;
-	public:
-		bool operator!=(const Iterator &other) { return m_itr != other.m_itr; }
-		Iterator &operator++() { ++m_itr; return *this; }
-		std::pair<const std::string, Lv2Info> &operator*() { return *m_itr; }
-		Iterator(std::map<std::string, Lv2Info>::iterator itr) :
-			m_itr(itr) {}
-	};
-
+	using Iterator = std::map<std::string, Lv2Info>::iterator;
 	Iterator begin() { return Iterator(m_lv2InfoMap.begin()); }
 	Iterator end() { return Iterator(m_lv2InfoMap.end()); }
 

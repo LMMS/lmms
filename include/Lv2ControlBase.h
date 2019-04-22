@@ -77,13 +77,14 @@ public:
 
 	bool hasGui() const { return m_hasGUI; }
 	void setHasGui(bool val) { m_hasGUI = val; }
-	std::vector<Lv2Proc*>& controls() { return m_procs; }
+	std::vector<std::unique_ptr<Lv2Proc>>& controls() { return m_procs; }
 
 protected:
 	/*
 		ctor/dtor
 	 */
-	//! @param parent the class inheriting this class
+	//! @param that the class inheriting this class and inheriting Model;
+	//!   this is the same pointer as this, but a different type
 	//! @param uri the Lv2 URI telling this class what plugin to construct
 	Lv2ControlBase(Model *that, const QString& uri);
 	virtual ~Lv2ControlBase() override;
@@ -131,7 +132,7 @@ private:
 	//! Independent processors
 	//! If this is a mono effect, the vector will have size 2 in order to
 	//! fulfill LMMS' requirement of having stereo input and output
-	std::vector<Lv2Proc*> m_procs;
+	std::vector<std::unique_ptr<Lv2Proc>> m_procs;
 
 	bool m_valid = true;
 	bool m_hasGUI = false;

@@ -79,14 +79,14 @@ Lv2Instrument::Lv2Instrument(InstrumentTrack *instrumentTrackArg,
 		for (int i = 0; i < NumKeys; ++i) { m_runningNotes[i] = 0; }
 #endif
 		connect(instrumentTrack()->pitchRangeModel(), SIGNAL(dataChanged()),
-			this, SLOT(updatePitchRange()));
+			this, SLOT(updatePitchRange()), Qt::DirectConnection);
 		connect(Engine::mixer(), SIGNAL(sampleRateChanged()),
 			this, SLOT(reloadPlugin()));
 		if (multiChannelLinkModel()) {
 			connect(multiChannelLinkModel(), SIGNAL(dataChanged()),
-				this, SLOT(updateLinkStatesFromGlobal()));
+				this, SLOT(updateLinkStatesFromGlobal()), Qt::DirectConnection);
 			connect(getGroup(0), SIGNAL(linkStateChanged(int, bool)),
-					this, SLOT(linkPort(int, bool)));
+					this, SLOT(linkPort(int, bool)), Qt::DirectConnection);
 		}
 
 		// now we need a play-handle which cares for calling play()
@@ -174,8 +174,7 @@ void Lv2Instrument::play(sampleFrame *buf)
 
 	copyBuffersToLmms(buf, fpp);
 
-	instrumentTrack()->processAudioBuffer(
-		buf, Engine::mixer()->framesPerPeriod(), nullptr);
+	instrumentTrack()->processAudioBuffer(buf, fpp, nullptr);
 }
 
 
@@ -344,7 +343,7 @@ PLUGIN_EXPORT Plugin *lmms_plugin_main(Model *_parent, void *_data)
 	Lv2Instrument* ins = new Lv2Instrument(
 							static_cast<InstrumentTrack*>(_parent),
 							static_cast<KeyType*>(_data ));
-	if (!ins->isValid()) { ins = nullptr; }
+	if (!ins->isValid()) { delete ins; ins = nullptr; }
 	return ins;
 }
 
