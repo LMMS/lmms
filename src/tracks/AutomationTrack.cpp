@@ -24,10 +24,12 @@
  *
  */
 
+#include "AutomationEditor.h"
 #include "AutomationTrack.h"
 #include "AutomationPattern.h"
 #include "Engine.h"
 #include "embed.h"
+#include "GuiApplication.h"
 #include "ProjectJournal.h"
 #include "StringPairDrag.h"
 #include "TrackContainerView.h"
@@ -94,6 +96,8 @@ AutomationTrackView::AutomationTrackView( AutomationTrack * _at, TrackContainerV
 						getTrackSettingsWidget() );
 	tlb->setIcon( embed::getIconPixmap( "automation_track" ) );
 	tlb->move( 3, 1 );
+	connect( tlb, SIGNAL( clicked( bool ) ),
+			this, SLOT( clickedTrackLabel() ) );
 	tlb->show();
 	setModel( _at );
 }
@@ -138,6 +142,13 @@ void AutomationTrackView::dropEvent( QDropEvent * _de )
 	}
 
 	update();
+}
+
+
+void AutomationTrackView::clickedTrackLabel()
+{
+	gui->automationEditor()->show();
+	gui->automationEditor()->setFocus( Qt::ActiveWindowFocusReason );
 }
 
 

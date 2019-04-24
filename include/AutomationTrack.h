@@ -61,12 +61,16 @@ private:
 
 class AutomationTrackView : public TrackView
 {
+	Q_OBJECT
 public:
 	AutomationTrackView( AutomationTrack* at, TrackContainerView* tcv );
 	virtual ~AutomationTrackView() = default;
 
 	virtual void dragEnterEvent( QDragEnterEvent * _dee );
 	virtual void dropEvent( QDropEvent * _de );
+
+public slots:
+	void clickedTrackLabel();
 
 } ;
 
