@@ -1294,6 +1294,7 @@ void PianoRoll::leaveEvent(QEvent * e )
 
 	QWidget::leaveEvent( e );
 	s_textFloat->hide();
+	this->update(); // cleaning inner mouse-related graphics
 }
 
 
@@ -3160,7 +3161,7 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 		case ModeSelect: cursor = s_toolSelect; break;
 		case ModeEditDetuning: cursor = s_toolOpen; break;
 	}
-	if( cursor != NULL )
+	if( cursor != NULL && mapFromGlobal( QCursor::pos() ).y() > PR_TOP_MARGIN )
 	{
 		p.drawPixmap( mapFromGlobal( QCursor::pos() ) + QPoint( 8, 8 ),
 								*cursor );
