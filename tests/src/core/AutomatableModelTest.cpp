@@ -1,5 +1,5 @@
 /*
- * ModelVisitor.cpp - visitors for automatable models
+ * AutomatableModelTest.cpp
  *
  * Copyright (c) 2019-2019 Johannes Lorenz <j.git$$$lorenz-ho.me, $$$=@>
  *
@@ -22,20 +22,32 @@
  *
  */
 
-#include "ModelVisitor.h"
+#include "QTestSuite.h"
 
 #include "AutomatableModel.h"
 #include "ComboBoxModel.h"
 
-void ModelVisitor::visit(BoolModel &m) { up(m); }
-void ModelVisitor::visit(IntModel &m) { up(m); }
-void ModelVisitor::visit(FloatModel &m) { up(m); }
-void ModelVisitor::visit(ComboBoxModel &m) { up<IntModel>(m); }
+class AutomatableModelTest : QTestSuite
+{
+	Q_OBJECT
 
-void ConstModelVisitor::visit(const BoolModel &m) { up(m); }
-void ConstModelVisitor::visit(const IntModel &m) { up(m); }
-void ConstModelVisitor::visit(const FloatModel &m) { up(m); }
-void ConstModelVisitor::visit(const ComboBoxModel &m) { up<IntModel>(m); }
+private slots:
+	void CastTests()
+	{
+		ComboBoxModel comboModel;
+		AutomatableModel* amPtr = &comboModel;
+		QCOMPARE(nullptr, amPtr->dynamicCast<FloatModel>());
+		QVERIFY(nullptr != amPtr->dynamicCast<AutomatableModel>());
+		QVERIFY(nullptr != amPtr->dynamicCast<IntModel>());
+		QVERIFY(nullptr != amPtr->dynamicCast<ComboBoxModel>());
 
-ModelVisitor::~ModelVisitor() {}
-ConstModelVisitor::~ConstModelVisitor() {}
+		IntModel intModel;
+		IntModel* imPtr = &intModel;
+		QCOMPARE(nullptr, imPtr->dynamicCast<FloatModel>());
+		QVERIFY(nullptr != imPtr->dynamicCast<AutomatableModel>());
+		QVERIFY(nullptr != imPtr->dynamicCast<IntModel>());
+		QCOMPARE(nullptr, imPtr->dynamicCast<ComboBoxModel>());
+	}
+} AutomatableModelTests;
+
+#include "AutomatableModelTest.moc"

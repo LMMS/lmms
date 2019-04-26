@@ -25,6 +25,7 @@
 #ifndef MODELVISITOR_H
 #define MODELVISITOR_H
 
+class AutomatableModel;
 class BoolModel;
 class IntModel;
 class FloatModel;
@@ -32,21 +33,28 @@ class ComboBoxModel;
 
 class ModelVisitor
 {
+	template<class ParentType = AutomatableModel, class ModelType>
+	void up(ModelType& m) { visit(static_cast<ParentType&>(m)); }
 public:
-	virtual void visit(BoolModel& ) {}
-	virtual void visit(IntModel& ) {}
-	virtual void visit(FloatModel& ) {}
-	virtual void visit(ComboBoxModel& ) {}
+	virtual void visit(AutomatableModel& ) {}
+	virtual void visit(BoolModel& m);
+	virtual void visit(IntModel& );
+	virtual void visit(FloatModel& );
+	virtual void visit(ComboBoxModel& );
 	virtual ~ModelVisitor();
 };
 
 class ConstModelVisitor
 {
+	template<class ParentType = AutomatableModel, class ModelType>
+	void up(const ModelType& m) {
+		visit(static_cast<const ParentType&>(m)); }
 public:
-	virtual void visit(const BoolModel& ) {}
-	virtual void visit(const IntModel& ) {}
-	virtual void visit(const FloatModel& ) {}
-	virtual void visit(const ComboBoxModel& ) {}
+	virtual void visit(const AutomatableModel& ) {}
+	virtual void visit(const BoolModel& m);
+	virtual void visit(const IntModel& m);
+	virtual void visit(const FloatModel& m);
+	virtual void visit(const ComboBoxModel& m);
 	virtual ~ConstModelVisitor();
 };
 
