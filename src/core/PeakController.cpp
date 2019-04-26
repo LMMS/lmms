@@ -53,8 +53,10 @@ PeakController::PeakController( Model * _parent,
 			this, SLOT( handleDestroyedEffect( ) ) );
 	}
 	connect( Engine::mixer(), SIGNAL( sampleRateChanged() ), this, SLOT( updateCoeffs() ) );
-	connect( m_peakEffect->attackModel(), SIGNAL( dataChanged() ), this, SLOT( updateCoeffs() ) );
-	connect( m_peakEffect->decayModel(), SIGNAL( dataChanged() ), this, SLOT( updateCoeffs() ) );
+	connect( m_peakEffect->attackModel(), SIGNAL( dataChanged() ),
+			this, SLOT( updateCoeffs() ), Qt::DirectConnection );
+	connect( m_peakEffect->decayModel(), SIGNAL( dataChanged() ),
+			this, SLOT( updateCoeffs() ), Qt::DirectConnection );
 	m_coeffNeedsUpdate = true;
 }
 
