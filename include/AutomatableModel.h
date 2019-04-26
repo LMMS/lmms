@@ -92,18 +92,25 @@ public:
 	virtual void accept(ConstModelVisitor& v) const = 0;
 
 public:
-	//! Return this class casted to Target, or nullptr if impossible
+	/**
+	   @brief Return this class casted to Target
+	   @test AutomatableModelTest.cpp
+	   @param doThrow throw an assertion if the cast fails, instead of
+	     returning a nullptr
+	   @return the casted class if Target is the exact or a base class of
+	     *this, nullptr otherwise
+	*/
 	template<class Target>
-	Target* dcast(bool doThrow = false)
+	Target* dynamicCast(bool doThrow = false)
 	{
 		DCastVisitor<Target> vis; accept(vis);
 		if(doThrow && !vis.result) Q_ASSERT(false);
 		return vis.result;
 	}
 
-	//! Return this class casted to const Target, or nullptr if impossible
+	//! const overload, see overloaded function
 	template<class Target>
-	const Target* dcast(bool doThrow = false) const
+	const Target* dynamicCast(bool doThrow = false) const
 	{
 		ConstDCastVisitor<Target> vis; accept(vis);
 		if(doThrow && !vis.result) Q_ASSERT(false);
@@ -312,6 +319,7 @@ protected:
 
 
 private:
+	// dynamicCast implementation
 	template<class Target>
 	struct DCastVisitor : public ModelVisitor
 	{
@@ -319,6 +327,7 @@ private:
 		void visit(Target& tar) { result = &tar; }
 	};
 
+	// dynamicCast implementation
 	template<class Target>
 	struct ConstDCastVisitor : public ConstModelVisitor
 	{
