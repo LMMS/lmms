@@ -148,10 +148,14 @@ const PixmapLoader *SpaSubPluginFeatures::logo(
 {
 	spa::descriptor *spaDes = spaDescriptor(k);
 
-	const char **xpm = spaDes->xpm_load();
-	QString uniqueName = spa::unique_name(*spaDes).c_str();
-
-	QString xpmKey = "spa-plugin:" + uniqueName;
+	const char **xpm = nullptr;
+	QString xpmKey;
+	if(spaDes)
+	{
+		xpm = spaDes->xpm_load();
+		QString uniqueName = spa::unique_name(*spaDes).c_str();
+		xpmKey = "spa-plugin:" + uniqueName;
+	}
 
 	return xpm ? new PixmapLoader(QString("xpm:" + xpmKey), xpm)
 		   : new PixmapLoader("plugins");

@@ -239,9 +239,12 @@ Plugin * Plugin::instantiate(const QString& pluginName, Model * parent,
 
 		if(inst)
 		{
-			unsigned port = inst->netPort();
-			if(port)
+			unsigned port;
+			for (std::size_t chan = 0;
+				(port = inst->netPort(chan)); ++chan)
+			{
 				Engine::addPluginByPort(port, inst);
+			}
 		}
 	}
 	else

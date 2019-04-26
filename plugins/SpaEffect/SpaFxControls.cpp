@@ -32,19 +32,22 @@
 
 SpaFxControls::SpaFxControls(class SpaEffect *effect, const QString& uniqueName) :
 	EffectControls(effect),
-	SpaControlBase(uniqueName),
+	SpaControlBase(static_cast<EffectControls*>(this), uniqueName,
+		DataFile::Type::EffectSettings),
 	m_effect(effect)
 {
-	if (m_plugin)
+	if (isValid())
 	{
 		connect(Engine::mixer(), SIGNAL(sampleRateChanged()), this,
 			SLOT(reloadPlugin()));
-	}
-}
 
-DataFile::Types SpaFxControls::settingsType()
-{
-	return DataFile::EffectSettings;
+		if(multiChannelLinkModel()) {
+			connect(multiChannelLinkModel(), SIGNAL(dataChanged()),
+				this, SLOT(updateLinkStatesFromGlobal()));
+			connect(getGroup(0), SIGNAL(linkStateChanged(int, bool)),
+					this, SLOT(linkPort(int, bool)));
+		}
+	}
 }
 
 void SpaFxControls::setNameFromFile(const QString &name)
@@ -69,7 +72,9 @@ void SpaFxControls::loadSettings(const QDomElement &that)
 
 int SpaFxControls::controlCount()
 {
-	return static_cast<int>(SpaControlBase::m_ports.m_userPorts.size());
+	std::size_t res = 0;
+	for (const std::unique_ptr<SpaProc>& c : m_procs) { res += c->controlCount(); }
+	return static_cast<int>(res);
 }
 
 EffectControlDialog *SpaFxControls::createView()

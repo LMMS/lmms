@@ -67,30 +67,23 @@ bool SpaEffect::processAudioBuffer(sampleFrame *buf, const fpp_t frames)
 
 	SpaFxControls& ctrl = m_controls;
 
-	for (std::size_t f = 0; f < ctrl.m_ports.buffersize; ++f)
-	{
-		ctrl.m_ports.m_lUnprocessed[f] = buf[f][0];
-		ctrl.m_ports.m_rUnprocessed[f] = buf[f][1];
-	}
-
-	m_controls.copyModelsToPorts();
+	ctrl.copyBuffersFromLmms(buf, frames);
+	ctrl.copyModelsFromLmms();
 
 //	m_pluginMutex.lock();
-	ctrl.m_ports.samplecount = static_cast<unsigned>(frames);
-	ctrl.m_plugin->run();
+	ctrl.run(static_cast<unsigned>(frames));
 //	m_pluginMutex.unlock();
-	for (std::size_t f = 0; f < ctrl.m_ports.buffersize; ++f)
-	{
-		buf[f][0] = ctrl.m_ports.m_lProcessed[f];
-		buf[f][1] = ctrl.m_ports.m_rProcessed[f];
-	}
+
+	ctrl.copyBuffersToLmms(buf, frames);
+
+	// TODO: check gate
 
 	return isRunning();
 }
 
-unsigned SpaEffect::netPort() const
+unsigned SpaEffect::netPort(std::size_t chan) const
 {
-	return spaControls()->m_plugin->net_port();
+	return spaControls()->m_procs[chan]->netPort();
 }
 
 AutomatableModel *SpaEffect::modelAtPort(const QString &dest)

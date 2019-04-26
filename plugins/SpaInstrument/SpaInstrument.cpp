@@ -54,10 +54,10 @@ Plugin::Descriptor PLUGIN_EXPORT spainstrument_plugin_descriptor =
 	new SpaSubPluginFeatures(Plugin::Instrument)
 };
 
-DataFile::Types SpaInstrument::settingsType()
+/*DataFile::Types SpaInstrument::settingsType()
 {
 	return DataFile::InstrumentTrackSettings;
-}
+}*/
 
 void SpaInstrument::setNameFromFile(const QString &name)
 {
@@ -67,14 +67,15 @@ void SpaInstrument::setNameFromFile(const QString &name)
 SpaInstrument::SpaInstrument(InstrumentTrack *instrumentTrackArg,
 	Descriptor::SubPluginFeatures::Key *key) :
 	Instrument(instrumentTrackArg, &spainstrument_plugin_descriptor, key),
-	SpaControlBase(key->attributes["plugin"])
+	SpaControlBase(this, key->attributes["plugin"],
+		DataFile::Type::InstrumentTrackSettings)
 {
 #ifdef SPA_INSTRUMENT_USE_MIDI
 	for (int i = 0; i < NumKeys; ++i) {
 		m_runningNotes[i] = 0;
 	}
 #endif
-	if (m_plugin)
+	if (isValid())
 	{
 		connect(instrumentTrack()->pitchRangeModel(), SIGNAL(dataChanged()),
 			this, SLOT(updatePitchRange()));
@@ -85,6 +86,13 @@ SpaInstrument::SpaInstrument(InstrumentTrack *instrumentTrackArg,
 		InstrumentPlayHandle *iph =
 			new InstrumentPlayHandle(this, instrumentTrackArg);
 		Engine::mixer()->addPlayHandle(iph);
+
+		if(multiChannelLinkModel()) {
+			connect(multiChannelLinkModel(), SIGNAL(dataChanged()),
+				this, SLOT(updateLinkStatesFromGlobal()));
+			connect(getGroup(0), SIGNAL(linkStateChanged(int, bool)),
+					this, SLOT(linkPort(int, bool)));
+		}
 	}
 }
 
@@ -150,21 +158,16 @@ void SpaInstrument::playNote(NotePlayHandle *nph, sampleFrame *)
 #endif
 
 void SpaInstrument::play(sampleFrame *buf)
-{
-	if (m_plugin)
-	{
-		m_pluginMutex.lock();
-		m_ports.samplecount = m_ports.buffersize;
-		m_plugin->run();
-		m_pluginMutex.unlock();
-		for (std::size_t f = 0; f < m_ports.buffersize; ++f)
-		{
-			buf[f][0] = m_ports.m_lProcessed[f];
-			buf[f][1] = m_ports.m_rProcessed[f];
-		}
-	}
-	instrumentTrack()->processAudioBuffer(
-		buf, Engine::mixer()->framesPerPeriod(), nullptr);
+{	
+	copyModelsFromLmms();
+
+	fpp_t fpp = Engine::mixer()->framesPerPeriod();
+
+	run(static_cast<unsigned>(fpp));
+
+	copyBuffersToLmms(buf, fpp);
+
+	instrumentTrack()->processAudioBuffer(buf, fpp, nullptr);
 }
 
 void SpaInstrument::updatePitchRange()
@@ -196,24 +199,23 @@ bool SpaInstrument::handleMidiEvent(
 			}
 			if (m_runningNotes[event.key()] > 0)
 			{
-				m_pluginMutex.lock();
-				writeOsc("/noteOff", "ii", 0, event.key());
-				m_pluginMutex.unlock();
+//				m_pluginMutex.lock();
+				writeOscToAll("/noteOff", "ii", 0, event.key());
+//				m_pluginMutex.unlock();
 			}
 			++m_runningNotes[event.key()];
-			m_pluginMutex.lock();
-			writeOsc("/noteOn", "iii", 0, event.key(),
-				event.velocity());
-			m_pluginMutex.unlock();
+//			m_pluginMutex.lock();
+			writeOscToAll("/noteOn", "iii", 0, event.key(), event.velocity());
+//			m_pluginMutex.unlock();
 		}
 		break;
 	case MidiNoteOff:
 		if (event.key() > 0 && event.key() < 128) {
 			if (--m_runningNotes[event.key()] <= 0)
 			{
-				m_pluginMutex.lock();
-				writeOsc("/noteOff", "ii", 0, event.key());
-				m_pluginMutex.unlock();
+//				m_pluginMutex.lock();
+				writeOscToAll("/noteOff", "ii", 0, event.key());
+//				m_pluginMutex.unlock();
 			}
 		}
 		break;
@@ -237,9 +239,9 @@ PluginView *SpaInstrument::instantiateView(QWidget *parent)
 	return new SpaInsView(this, parent);
 }
 
-unsigned SpaInstrument::netPort() const
+unsigned SpaInstrument::netPort(std::size_t chan) const
 {
-	return m_plugin->net_port();
+	return chan < m_procs.size() ? m_procs[chan]->netPort() : 0;
 }
 
 AutomatableModel *SpaInstrument::modelAtPort(const QString &dest)
@@ -265,7 +267,7 @@ SpaInsView::~SpaInsView()
 	if (model && model->m_spaDescriptor->ui_ext() && model->m_hasGUI)
 	{
 		qDebug() << "shutting down UI...";
-		model->m_plugin->ui_ext_show(false);
+		model->uiExtShow(false);
 	}
 }
 
@@ -310,7 +312,7 @@ void SpaInsView::toggleUI()
 		model->m_hasGUI != m_toggleUIButton->isChecked())
 	{
 		model->m_hasGUI = m_toggleUIButton->isChecked();
-		model->m_plugin->ui_ext_show(model->m_hasGUI);
+		model->uiExtShow(model->m_hasGUI);
 		ControllerConnection::finalizeConnections();
 	}
 }

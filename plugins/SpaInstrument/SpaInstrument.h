@@ -45,7 +45,6 @@ class SpaInstrument : public Instrument, public SpaControlBase
 {
 	Q_OBJECT
 
-	DataFile::Types settingsType() override;
 	void setNameFromFile(const QString &name) override;
 
 public:
@@ -77,7 +76,7 @@ public:
 
 	PluginView *instantiateView(QWidget *parent) override;
 
-	unsigned netPort() const override;
+	unsigned netPort(std::size_t) const override;
 	class AutomatableModel* modelAtPort(const QString& dest) override;
 
 private slots:

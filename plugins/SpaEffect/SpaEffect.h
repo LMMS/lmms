@@ -45,7 +45,7 @@ public:
 	SpaFxControls* spaControls() { return &m_controls; }
 	const SpaFxControls* spaControls() const { return &m_controls; }
 
-	unsigned netPort() const override;
+	unsigned netPort(std::size_t chan) const override;
 	class AutomatableModel* modelAtPort(const QString& dest) override;
 
 private:	

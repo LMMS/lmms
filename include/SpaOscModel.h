@@ -34,11 +34,11 @@
 template <class Base> class SpaOscModel : public Base
 {
 protected:
-	class SpaControlBase *m_plugRef;
+	class SpaProc *m_plugRef;
 	QByteArray m_dest;
 
 	using Base::Base;
-	void init(class SpaControlBase *plugRef, const QString dest)
+	void init(class SpaProc *plugRef, const QString dest)
 	{
 		m_plugRef = plugRef;
 		m_dest = dest.toUtf8();
@@ -52,7 +52,7 @@ private slots:
 	void sendOsc();
 
 public:
-	BoolOscModel(SpaControlBase *plugRef, const QString dest, bool val);
+	BoolOscModel(SpaProc *plugRef, const QString dest, bool val);
 };
 
 class IntOscModel : public SpaOscModel<IntModel>
@@ -62,7 +62,7 @@ private slots:
 	void sendOsc();
 
 public:
-	IntOscModel(class SpaControlBase *plugRef, const QString dest, int min,
+	IntOscModel(class SpaProc *plugRef, const QString dest, int min,
 		int max, int val);
 };
 
@@ -73,7 +73,7 @@ private slots:
 	void sendOsc();
 
 public:
-	FloatOscModel(class SpaControlBase *plugRef, const QString dest,
+	FloatOscModel(class SpaProc *plugRef, const QString dest,
 		float min, float max, float step, float val);
 };
 
