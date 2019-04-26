@@ -36,7 +36,8 @@ LadspaControls::LadspaControls( LadspaEffect * _eff ) :
 {
 
 	connect( &m_stereoLinkModel, SIGNAL( dataChanged() ),
-				this, SLOT( updateLinkStatesFromGlobal() ) );
+				this, SLOT( updateLinkStatesFromGlobal() ),
+				Qt::DirectConnection );
 
 	multi_proc_t controls = m_effect->getPortControls();
 	m_controlCount = controls.count();
@@ -59,7 +60,8 @@ LadspaControls::LadspaControls( LadspaEffect * _eff ) :
 				if( linked_control )
 				{
 					connect( (*it)->control, SIGNAL( linkChanged( int, bool ) ),
-								this, SLOT( linkPort( int, bool ) ) );
+								this, SLOT( linkPort( int, bool ) ),
+								Qt::DirectConnection );
 				}
 			}
 		}
