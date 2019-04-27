@@ -1452,7 +1452,10 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 
 
 	m_tabWidget = new TabWidget( "", this, true, true );
-	m_tabWidget->setMinimumHeight( INSTRUMENT_HEIGHT + GRAPHIC_TAB_HEIGHT - 4 );
+	// "-1" :
+	// in "TabWidget::addTab", under "Position tab's window", the widget is
+	// moved up by 1 pixel
+	m_tabWidget->setMinimumHeight( INSTRUMENT_HEIGHT + GRAPHIC_TAB_HEIGHT - 4 - 1 );
 
 
 	// create tab-widgets
@@ -1878,7 +1881,10 @@ void InstrumentTrackWindow::viewPrevInstrument()
 
 void InstrumentTrackWindow::adjustTabSize(QWidget *w)
 {
-	w->setMinimumSize(INSTRUMENT_WIDTH - 4, INSTRUMENT_HEIGHT - 4);
+	// "-1" :
+	// in "TabWidget::addTab", under "Position tab's window", the widget is
+	// moved up by 1 pixel
+	w->setMinimumSize(INSTRUMENT_WIDTH - 4, INSTRUMENT_HEIGHT - 4 - 1);
 }
 
 #include "InstrumentTrack.moc"
