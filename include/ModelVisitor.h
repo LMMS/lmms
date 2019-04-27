@@ -30,6 +30,7 @@ class BoolModel;
 class IntModel;
 class FloatModel;
 class ComboBoxModel;
+class TempoSyncKnobModel;
 
 class ModelVisitor
 {
@@ -38,9 +39,10 @@ class ModelVisitor
 public:
 	virtual void visit(AutomatableModel& ) {}
 	virtual void visit(BoolModel& m);
-	virtual void visit(IntModel& );
-	virtual void visit(FloatModel& );
-	virtual void visit(ComboBoxModel& );
+	virtual void visit(IntModel& m);
+	virtual void visit(FloatModel& m);
+	virtual void visit(ComboBoxModel& m);
+	virtual void visit(TempoSyncKnobModel& m);
 	virtual ~ModelVisitor();
 };
 
@@ -55,6 +57,7 @@ public:
 	virtual void visit(const IntModel& m);
 	virtual void visit(const FloatModel& m);
 	virtual void visit(const ComboBoxModel& m);
+	virtual void visit(const TempoSyncKnobModel& m);
 	virtual ~ConstModelVisitor();
 };
 

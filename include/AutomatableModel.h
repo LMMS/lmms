@@ -104,7 +104,7 @@ public:
 	Target* dynamicCast(bool doThrow = false)
 	{
 		DCastVisitor<Target> vis; accept(vis);
-		if(doThrow && !vis.result) Q_ASSERT(false);
+		if (doThrow && !vis.result) { Q_ASSERT(false); }
 		return vis.result;
 	}
 
@@ -113,7 +113,7 @@ public:
 	const Target* dynamicCast(bool doThrow = false) const
 	{
 		ConstDCastVisitor<Target> vis; accept(vis);
-		if(doThrow && !vis.result) Q_ASSERT(false);
+		if (doThrow && !vis.result) { Q_ASSERT(false); }
 		return vis.result;
 	}
 
