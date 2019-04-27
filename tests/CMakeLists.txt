@@ -14,6 +14,7 @@ ADD_EXECUTABLE(tests
 	QTestSuite
 	$<TARGET_OBJECTS:lmmsobjs>
 
+	src/core/AutomatableModelTest.cpp
 	src/core/ProjectVersionTest.cpp
 	src/core/RelativePathsTest.cpp
 
