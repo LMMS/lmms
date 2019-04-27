@@ -121,7 +121,7 @@ private:
 	class:
 
 	\code
-		if(multiChannelLinkModel()) {
+		if (multiChannelLinkModel()) {
 			connect(multiChannelLinkModel(), SIGNAL(dataChanged()),
 				this, SLOT(updateLinkStatesFromGlobal()));
 			connect(getGroup(0), SIGNAL(linkStateChanged(int, bool)),

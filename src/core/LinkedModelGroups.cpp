@@ -38,7 +38,7 @@
 
 void LinkedModelGroup::makeLinkingProc()
 {
-	for(std::size_t i = 0; i < m_models.size(); ++i)
+	for (std::size_t i = 0; i < m_models.size(); ++i)
 	{
 		BoolModel* bmo = new BoolModel(true, this, tr("Link channels"));
 		m_linkEnabled.push_back(bmo);
@@ -51,7 +51,7 @@ void LinkedModelGroup::makeLinkingProc()
 
 void LinkedModelGroup::linkAllModels(bool state)
 {
-	for(BoolModel* bmo : m_linkEnabled) { bmo->setValue(state); }
+	for (BoolModel* bmo : m_linkEnabled) { bmo->setValue(state); }
 }
 
 
@@ -85,9 +85,9 @@ void LinkedModelGroup::linkStateChangedSlot()
 	BoolModel* bmo = qobject_cast<BoolModel*>(sender);
 	Q_ASSERT(bmo);
 	int modelNo = -1, count = 0;
-	for(BoolModel* bmo2 : m_linkEnabled)
+	for (BoolModel* bmo2 : m_linkEnabled)
 	{
-		if(bmo2 == bmo) { modelNo = count; }
+		if (bmo2 == bmo) { modelNo = count; }
 		++count;
 	}
 	Q_ASSERT(modelNo >= 0);
@@ -127,16 +127,16 @@ void LinkedModelGroups::linkPort(int port, bool state)
 	LinkedModelGroup* first = getGroup(0);
 	LinkedModelGroup* cur;
 
-	if(state)
+	if (state)
 	{
-		for(std::size_t i = 1; (cur=getGroup(i)); ++i)
+		for (std::size_t i = 1; (cur=getGroup(i)); ++i)
 		{
 			first->linkControls(cur, port);
 		}
 	}
 	else
 	{
-		for(std::size_t i = 1; (cur=getGroup(i)); ++i)
+		for (std::size_t i = 1; (cur=getGroup(i)); ++i)
 		{
 			first->unlinkControls(cur, port);
 		}
@@ -155,11 +155,11 @@ void LinkedModelGroups::linkPort(int port, bool state)
 void LinkedModelGroups::updateLinkStatesFromGlobal()
 {
 	LinkedModelGroup* first = getGroup(0);
-	if(m_multiChannelLinkModel->value())
+	if (m_multiChannelLinkModel->value())
 	{
 		first->linkAllModels(true);
 	}
-	else if( !m_noLink )
+	else if (!m_noLink)
 	{
 		first->linkAllModels(false);
 	}
