@@ -62,7 +62,7 @@ public:
 	/*
 		ctor/dtor
 	*/
-	Lv2Proc(const LilvPlugin* plugin, Model *parent);
+	Lv2Proc(const LilvPlugin* plugin, Model *parent, int curProc);
 	virtual ~Lv2Proc();
 	//! Must be checked after ctor or reload
 	bool isValid() const { return m_valid; }

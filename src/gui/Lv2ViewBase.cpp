@@ -50,9 +50,8 @@
 
 
 Lv2ViewProc::Lv2ViewProc(QWidget* parent, Lv2Proc* ctrlBase,
-	int colNum, int curProc, int nProc, const QString& name) :
-	LinkedModelGroupViewBase (parent, ctrlBase->isLinking(), colNum,
-								curProc, nProc, name)
+	int colNum, int nProc, const QString& name) :
+	LinkedModelGroupViewBase (parent, ctrlBase, colNum, nProc, name)
 {
 	class SetupWidget : public Lv2Ports::Visitor
 	{
@@ -190,7 +189,7 @@ Lv2ViewBase::Lv2ViewBase(QWidget* meAsWidget, Lv2ControlBase *ctrlBase)
 	{
 		Lv2ViewProc* vpr = new Lv2ViewProc(meAsWidget,
 			ctrlBase->controls()[static_cast<std::size_t>(i)].get(),
-			colsEach, i, nProcs);
+			colsEach, nProcs);
 		grid->addWidget(vpr, Rows::ProcRow, i);
 		m_procViews.push_back(vpr);
 	}

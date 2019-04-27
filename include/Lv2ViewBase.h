@@ -47,7 +47,7 @@ public:
 	//! @param colNum numbers of columns for the controls
 	//!   (link LEDs not counted)
 	Lv2ViewProc(QWidget *parent, Lv2Proc *ctrlBase,
-		int colNum, int curProc, int nProc, const QString &name = QString());
+		int colNum, int nProc, const QString &name = QString());
 	~Lv2ViewProc();
 
 private:

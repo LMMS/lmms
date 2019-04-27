@@ -37,14 +37,15 @@
 
 
 LinkedModelGroupViewBase::LinkedModelGroupViewBase(QWidget* parent,
-	bool isLinking, int colNum, int curProc, int nProc, const QString& name) :
+	LinkedModelGroup *model, int colNum, int nProc, const QString& name) :
 	QGroupBox(parent),
 	m_colNum(colNum),
-	m_isLinking(isLinking),
+	m_isLinking(model->isLinking()),
 	m_grid(new QGridLayout(this))
 {
+	int curProc = model->curProc();
 	QString chanName;
-	if(name.isNull())
+	if (name.isNull())
 	{
 		switch(nProc)
 		{
@@ -57,11 +58,9 @@ LinkedModelGroupViewBase::LinkedModelGroupViewBase(QWidget* parent,
 				break;
 		}
 	}
-	else {
-		chanName = name;
-	}
+	else { chanName = name; }
 
-	if(!chanName.isNull()) { setTitle(chanName); }
+	if (!chanName.isNull()) { setTitle(chanName); }
 }
 
 
@@ -79,10 +78,7 @@ void LinkedModelGroupViewBase::modelChanged(LinkedModelGroup *group)
 	std::vector<AutomatableModel*> models = group->models();
 	Q_ASSERT(m_controls.size() == models.size());
 
-	for(AutomatableModel* mdl : models)
-	{
-		(*itr++)->setModel(mdl);
-	}
+	for (AutomatableModel* mdl : models) { (*itr++)->setModel(mdl); }
 
 	std::size_t count = 0;
 	for (std::unique_ptr<LedCheckBox>& led : m_leds)
@@ -98,12 +94,13 @@ void LinkedModelGroupViewBase::addControl(ControlBase* ctrl)
 {
 	int colNum2 = m_colNum * (1 + m_isLinking);
 	int wdgNum = static_cast<int>(m_controls.size() * (1 + m_isLinking));
-	if(ctrl)
+	if (ctrl)
 	{
 		int x = wdgNum%colNum2, y = wdgNum/colNum2;
 
 		// start in row one, add widgets cell by cell
-		if(m_isLinking) {
+		if (m_isLinking)
+		{
 			LedCheckBox* cb = new LedCheckBox(qobject_cast<QWidget*>(
 				ctrl->topWidget()->parent()));
 			m_grid->addWidget(cb, y, x);
@@ -126,12 +123,12 @@ void LinkedModelGroupViewBase::addControl(ControlBase* ctrl)
 void LinkedModelGroupViewBase::makeAllGridCellsEqualSized()
 {
 	int rowHeight = 0, colWidth = 0;
-	for(int row = 0; row < m_grid->rowCount(); ++row)
+	for (int row = 0; row < m_grid->rowCount(); ++row)
 	{
-		for(int col = 0; col < m_grid->columnCount(); ++col)
+		for (int col = 0; col < m_grid->columnCount(); ++col)
 		{
 			QLayoutItem* layout;
-			if((layout = m_grid->itemAtPosition(row, col)))
+			if ((layout = m_grid->itemAtPosition(row, col)))
 			{
 				rowHeight = qMax(rowHeight, layout->geometry().height());
 				colWidth = qMax(colWidth, layout->geometry().width());
@@ -139,12 +136,12 @@ void LinkedModelGroupViewBase::makeAllGridCellsEqualSized()
 		}
 	}
 
-	for(int row = 0; row < m_grid->rowCount(); ++row)
+	for (int row = 0; row < m_grid->rowCount(); ++row)
 	{
 		m_grid->setRowMinimumHeight(row, rowHeight);
 	}
 
-	for(int col = 0; col < m_grid->columnCount(); ++col)
+	for (int col = 0; col < m_grid->columnCount(); ++col)
 	{
 		m_grid->setColumnMinimumWidth(col, colWidth);
 	}
@@ -159,7 +156,7 @@ void LinkedModelGroupViewBase::makeAllGridCellsEqualSized()
 LinkedModelGroupsViewBase::LinkedModelGroupsViewBase(
 	LinkedModelGroups *ctrlBase)
 {
-	if(ctrlBase->multiChannelLinkModel())
+	if (ctrlBase->multiChannelLinkModel())
 	{
 		m_multiChannelLink.reset(new LedCheckBox(QObject::tr("Link Channels"),
 												nullptr));
@@ -171,12 +168,12 @@ LinkedModelGroupsViewBase::LinkedModelGroupsViewBase(
 
 void LinkedModelGroupsViewBase::modelChanged(LinkedModelGroups *groups)
 {
-	if(groups->multiChannelLinkModel())
+	if (groups->multiChannelLinkModel())
 	{
 		m_multiChannelLink->setModel(groups->multiChannelLinkModel());
 	}
 
-	for(std::size_t i = 0; getGroupView(i) && groups->getGroup(i); ++i)
+	for (std::size_t i = 0; getGroupView(i) && groups->getGroup(i); ++i)
 	{
 		getGroupView(i)->modelChanged(groups->getGroup(i));
 	}
@@ -185,6 +182,7 @@ void LinkedModelGroupsViewBase::modelChanged(LinkedModelGroups *groups)
 
 
 
-void LinkedModelGroupsViewBase::MultiChannelLinkDeleter::operator()(LedCheckBox *l) { delete l; }
+void LinkedModelGroupsViewBase::MultiChannelLinkDeleter::
+	operator()(LedCheckBox *l) { delete l; }
 
 
