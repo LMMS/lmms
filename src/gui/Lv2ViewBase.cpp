@@ -130,7 +130,6 @@ Lv2ViewBase::Lv2ViewBase(QWidget* meAsWidget, Lv2ControlBase *ctrlBase)
 	QGridLayout* grid = new QGridLayout(meAsWidget);
 
 	QHBoxLayout* btnBox = new QHBoxLayout();
-	grid->addLayout(btnBox, Rows::ButtonRow, 0, 1, m_colNum);
 	if (/* DISABLES CODE */ (false))
 	{
 		m_reloadPluginButton = new QPushButton(QObject::tr("Reload Plugin"),
@@ -182,6 +181,11 @@ Lv2ViewBase::Lv2ViewBase(QWidget* meAsWidget, Lv2ControlBase *ctrlBase)
 	}
 	lilv_nodes_free(props);
 
+	if(m_reloadPluginButton || m_toggleUIButton || m_helpButton)
+	{
+		grid->addLayout(btnBox, Rows::ButtonRow, 0, 1, m_colNum);
+	}
+
 	int nProcs = static_cast<int>(ctrlBase->controls().size());
 	Q_ASSERT(m_colNum % nProcs == 0);
 	int colsEach = m_colNum / nProcs;
@@ -196,7 +200,9 @@ Lv2ViewBase::Lv2ViewBase(QWidget* meAsWidget, Lv2ControlBase *ctrlBase)
 
 	LedCheckBox* led = globalLinkLed();
 	if (led)
+	{
 		grid->addWidget(led, Rows::LinkChannelsRow, 0, 1, m_colNum);
+	}
 }
 
 
