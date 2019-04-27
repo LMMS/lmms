@@ -49,7 +49,7 @@ public:
 			automatically set if not given
 	*/
 	LinkedModelGroupViewBase(QWidget *parent, class LinkedModelGroup* model,
-		int colNum, const QString &name = QString());
+		int colNum, int nProc, const QString &name = QString());
 	~LinkedModelGroupViewBase();
 
 	//! Reconnect models if model changed

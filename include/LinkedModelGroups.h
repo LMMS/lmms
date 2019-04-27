@@ -57,8 +57,8 @@ public:
 	//! @param parent model of the LinkedModelGroups class
 	//! @param curProc number of this processor, counted from 0
 	//! @param nProc total number of processors
-	LinkedModelGroup(Model* parent, int curProc, int nProc) :
-		Model(parent), m_curProc(curProc), m_nProc(nProc) {}
+	LinkedModelGroup(Model* parent, int curProc) :
+		Model(parent), m_curProc(curProc) {}
 	//! After all models have been added, make this processor the one which
 	//! will contain link models associated with its controls
 	void makeLinkingProc();
@@ -87,7 +87,6 @@ public:
 	/*
 		General
 	 */
-	int nProc() const { return m_nProc; }
 	int curProc() const { return m_curProc; }
 
 protected:

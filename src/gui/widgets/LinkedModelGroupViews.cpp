@@ -37,13 +37,12 @@
 
 
 LinkedModelGroupViewBase::LinkedModelGroupViewBase(QWidget* parent,
-	LinkedModelGroup *model, int colNum, const QString& name) :
+	LinkedModelGroup *model, int colNum, int nProc, const QString& name) :
 	QGroupBox(parent),
 	m_colNum(colNum),
 	m_isLinking(model->isLinking()),
 	m_grid(new QGridLayout(this))
 {
-	int nProc = model->nProc();
 	int curProc = model->curProc();
 	QString chanName;
 	if (name.isNull())
