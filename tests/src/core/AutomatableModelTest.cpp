@@ -38,17 +38,17 @@ private slots:
 	{
 		ComboBoxModel comboModel;
 		AutomatableModel* amPtr = &comboModel;
-		QCOMPARE(nullptr, amPtr->dynamicCast<FloatModel>()); // not a parent class
+		QVERIFY(nullptr == amPtr->dynamicCast<FloatModel>()); // not a parent class
 		QCOMPARE(&comboModel, amPtr->dynamicCast<AutomatableModel>()); // parent class
 		QCOMPARE(&comboModel, amPtr->dynamicCast<IntModel>()); // parent class
 		QCOMPARE(&comboModel, amPtr->dynamicCast<ComboBoxModel>()); // same class
 
 		IntModel intModel;
 		IntModel* imPtr = &intModel;
-		QCOMPARE(nullptr, imPtr->dynamicCast<FloatModel>()); // not a parent class
+		QVERIFY(nullptr == imPtr->dynamicCast<FloatModel>()); // not a parent class
 		QCOMPARE(&intModel, imPtr->dynamicCast<AutomatableModel>()); // parent class
 		QCOMPARE(&intModel, imPtr->dynamicCast<IntModel>()); // same class
-		QCOMPARE(nullptr, imPtr->dynamicCast<ComboBoxModel>()); // child class
+		QVERIFY(nullptr == imPtr->dynamicCast<ComboBoxModel>()); // child class
 	}
 } AutomatableModelTests;
 
