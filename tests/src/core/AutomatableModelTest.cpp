@@ -32,21 +32,23 @@ class AutomatableModelTest : QTestSuite
 	Q_OBJECT
 
 private slots:
+	//! Test that upcast and exact casts work,
+	//! but no downcast or any other casts
 	void CastTests()
 	{
 		ComboBoxModel comboModel;
 		AutomatableModel* amPtr = &comboModel;
-		QCOMPARE(nullptr, amPtr->dynamicCast<FloatModel>());
-		QVERIFY(nullptr != amPtr->dynamicCast<AutomatableModel>());
-		QVERIFY(nullptr != amPtr->dynamicCast<IntModel>());
-		QVERIFY(nullptr != amPtr->dynamicCast<ComboBoxModel>());
+		QCOMPARE(nullptr, amPtr->dynamicCast<FloatModel>()); // not a parent class
+		QCOMPARE(&comboModel, amPtr->dynamicCast<AutomatableModel>()); // parent class
+		QCOMPARE(&comboModel, amPtr->dynamicCast<IntModel>()); // parent class
+		QCOMPARE(&comboModel, amPtr->dynamicCast<ComboBoxModel>()); // same class
 
 		IntModel intModel;
 		IntModel* imPtr = &intModel;
-		QCOMPARE(nullptr, imPtr->dynamicCast<FloatModel>());
-		QVERIFY(nullptr != imPtr->dynamicCast<AutomatableModel>());
-		QVERIFY(nullptr != imPtr->dynamicCast<IntModel>());
-		QCOMPARE(nullptr, imPtr->dynamicCast<ComboBoxModel>());
+		QCOMPARE(nullptr, imPtr->dynamicCast<FloatModel>()); // not a parent class
+		QCOMPARE(&intModel, imPtr->dynamicCast<AutomatableModel>()); // parent class
+		QCOMPARE(&intModel, imPtr->dynamicCast<IntModel>()); // same class
+		QCOMPARE(nullptr, imPtr->dynamicCast<ComboBoxModel>()); // child class
 	}
 } AutomatableModelTests;
 
