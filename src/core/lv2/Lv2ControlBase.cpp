@@ -110,6 +110,14 @@ LinkedModelGroup *Lv2ControlBase::getGroup(std::size_t idx)
 
 
 
+const LinkedModelGroup *Lv2ControlBase::getGroup(std::size_t idx) const
+{
+	return (m_procs.size() > idx) ? m_procs[idx].get() : nullptr;
+}
+
+
+
+
 void Lv2ControlBase::copyModelsFromLmms() {
 	for (std::unique_ptr<Lv2Proc>& c : m_procs) { c->copyModelsFromCore(); }
 }
