@@ -110,7 +110,7 @@ public:
 		misc
 	 */
 	class AutomatableModel *modelAtPort(const QString &uri); // unused currently
-	std::size_t controlCount() const { return m_controlCount; }
+	std::size_t controlCount() const { return LinkedModelGroup::models().size(); }
 
 protected:
 	/*
@@ -129,7 +129,6 @@ private:
 
 	std::vector<std::unique_ptr<Lv2Ports::PortBase>> m_ports;
 	StereoPortRef m_inPorts, m_outPorts;
-	std::size_t m_controlCount = 0;
 
 	//! models for the controls, sorted by port symbols
 	std::map<std::string, AutomatableModel *> m_connectedModels;

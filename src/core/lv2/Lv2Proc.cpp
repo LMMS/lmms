@@ -397,8 +397,6 @@ void Lv2Proc::createPorts()
 										m_proc->m_plugin, ctrl.m_port)),
 					amo);
 				m_proc->addModel(amo);
-
-				++m_proc->m_controlCount;
 			}
 		}
 
