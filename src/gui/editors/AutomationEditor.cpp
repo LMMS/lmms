@@ -1510,7 +1510,6 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 		case SELECT: cursor = s_toolSelect; break;
 		case MOVE: cursor = s_toolMove; break;
 	}
-	// TODO RON copy all if, replace the top left etc
 	QPoint mousePosition = mapFromGlobal( QCursor::pos() );
 	if( cursor != NULL && mousePosition.y() > TOP_MARGIN + SCROLLBAR_SIZE)
 	{
