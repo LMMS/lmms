@@ -82,7 +82,11 @@ public:
 	*/
 	class BoolModel* linkEnabledModel(std::size_t id) {
 		return m_linkEnabled[id]; }
-	std::vector<class AutomatableModel*> models() { return m_models; }
+	const class BoolModel* linkEnabledModel(std::size_t id) const {
+		return m_linkEnabled[id]; }
+	std::vector<class AutomatableModel*>& models() { return m_models; }
+	const std::vector<class AutomatableModel*>& models() const {
+		return m_models; }
 
 	/*
 		General
@@ -155,6 +159,8 @@ public:
 	//! Derived classes must return the group with index @p idx,
 	//! or nullptr if @p is out of range
 	virtual LinkedModelGroup* getGroup(std::size_t idx) = 0;
+	//! @see getGroup
+	virtual const LinkedModelGroup* getGroup(std::size_t idx) const = 0;
 
 private:
 	//! Model for the "global" linking
