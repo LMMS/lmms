@@ -883,6 +883,9 @@ void PianoRoll::drawDetuningInfo( QPainter & _p, const Note * _n, int _x,
 {
 	int middle_y = _y + KEY_LINE_HEIGHT / 2;
 	_p.setPen( noteColor() );
+	_p.setClipRect(WHITE_KEY_WIDTH, PR_TOP_MARGIN,
+		width() - WHITE_KEY_WIDTH,
+		keyAreaBottom() - PR_TOP_MARGIN);
 
 	int old_x = 0;
 	int old_y = 0;
@@ -3076,6 +3079,10 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 					y_base - key * KEY_LINE_HEIGHT );
 			}
 		}
+
+		p.setClipRect(WHITE_KEY_WIDTH, PR_TOP_MARGIN,
+			width() - WHITE_KEY_WIDTH,
+			height() - PR_TOP_MARGIN - PR_TOP_MARGIN);
 
 		p.setPen( QPen( noteColor(), NOTE_EDIT_LINE_WIDTH + 2 ) );
 		p.drawPoints( editHandles );
