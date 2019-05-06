@@ -76,6 +76,7 @@ else
 	# to support systems without fuse
 	# Also, we need to set LD_LIBRARY_PATH, but linuxdepoyqt's AppRun unsets it
 	# See https://github.com/probonopd/linuxdeployqt/pull/370/
+	"$LINUXDEPLOYQT" --appimage-extract > /dev/null 2>&1
 	LINUXDEPLOYQT="squashfs-root/usr/bin/linuxdeployqt"
 	success "Extracted $APPIMAGETOOL"
 fi
