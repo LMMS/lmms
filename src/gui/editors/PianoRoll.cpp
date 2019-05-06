@@ -3077,12 +3077,12 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 				drawDetuningInfo( p, note,
 					x + WHITE_KEY_WIDTH,
 					y_base - key * KEY_LINE_HEIGHT );
+				p.setClipRect(WHITE_KEY_WIDTH, PR_TOP_MARGIN,
+					width() - WHITE_KEY_WIDTH,
+					height() - PR_TOP_MARGIN);
 			}
 		}
 
-		p.setClipRect(WHITE_KEY_WIDTH, PR_TOP_MARGIN,
-			width() - WHITE_KEY_WIDTH,
-			height() - PR_TOP_MARGIN - PR_TOP_MARGIN);
 
 		p.setPen( QPen( noteColor(), NOTE_EDIT_LINE_WIDTH + 2 ) );
 		p.drawPoints( editHandles );
