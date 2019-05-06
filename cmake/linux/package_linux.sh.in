@@ -70,6 +70,9 @@ elif ! find "$LINUXDEPLOYQT" -mtime -$DAYSOLD 2>/dev/null|grep -q "." > /dev/nul
 	touch "$LINUXDEPLOYQT"
 	success "Downloaded $LINUXDEPLOYQT"
 	"$LINUXDEPLOYQT" --appimage-extract > /dev/null 2>&1
+	# We need to set LD_LIBRARY_PATH, but linuxdepoyqt's AppRun unsets it
+	# See https://github.com/probonopd/linuxdeployqt/pull/370/
+	LINUXDEPLOYQT="squashfs-root/usr/bin/linuxdeployqt"
 	success "Extracted $APPIMAGETOOL"
 else
 	skipped "$LINUXDEPLOYQT is less than $DAYSOLD days old"
