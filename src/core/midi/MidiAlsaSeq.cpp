@@ -100,7 +100,7 @@ MidiAlsaSeq::MidiAlsaSeq() :
 	snd_seq_start_queue( m_seqHandle, m_queueID, NULL );
 	changeQueueTempo( Engine::getSong()->getTempo() );
 	connect( Engine::getSong(), SIGNAL( tempoChanged( bpm_t ) ),
-			this, SLOT( changeQueueTempo( bpm_t ) ) );
+			this, SLOT( changeQueueTempo( bpm_t ) ), Qt::DirectConnection );
 
 	// initial list-update
 	updatePortList();

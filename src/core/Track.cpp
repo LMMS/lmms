@@ -328,8 +328,8 @@ TrackContentObjectView::~TrackContentObjectView()
 
 /*! \brief Update a TrackContentObjectView
  *
- *  TCO's get drawn only when needed, 
- *  and when a TCO is updated, 
+ *  TCO's get drawn only when needed,
+ *  and when a TCO is updated,
  *  it needs to be redrawn.
  *
  */
@@ -598,9 +598,9 @@ void TrackContentObjectView::dropEvent( QDropEvent * de )
  */
 void TrackContentObjectView::leaveEvent( QEvent * e )
 {
-	while( QApplication::overrideCursor() != NULL )
+	if( cursor().shape() != Qt::BitmapCursor )
 	{
-		QApplication::restoreOverrideCursor();
+		setCursor( QCursor( embed::getIconPixmap( "hand" ), 3, 3 ) );
 	}
 	if( e != NULL )
 	{
@@ -746,20 +746,17 @@ void TrackContentObjectView::mousePressEvent( QMouseEvent * me )
 						&& !m_tco->getAutoResize() )
 				{
 					m_action = ResizeLeft;
-					QCursor c( Qt::SizeHorCursor );
-					QApplication::setOverrideCursor( c );
+					setCursor( Qt::SizeHorCursor );
 				}
 				else if( me->x() < width() - RESIZE_GRIP_WIDTH )
 				{
 					m_action = Move;
-					QCursor c( Qt::SizeAllCursor );
-					QApplication::setOverrideCursor( c );
+					setCursor( Qt::SizeAllCursor );
 				}
 				else if( !m_tco->getAutoResize() )
 				{
 					m_action = Resize;
-					QCursor c( Qt::SizeHorCursor );
-					QApplication::setOverrideCursor( c );
+					setCursor( Qt::SizeHorCursor );
 				}
 
 				if( m_action == Move )
@@ -1007,17 +1004,7 @@ void TrackContentObjectView::mouseMoveEvent( QMouseEvent * me )
 		if( ( me->x() > width() - RESIZE_GRIP_WIDTH && !me->buttons() && !m_tco->getAutoResize() )
 		||  ( me->x() < RESIZE_GRIP_WIDTH && !me->buttons() && sTco && !m_tco->getAutoResize() ) )
 		{
-			if( QApplication::overrideCursor() != NULL &&
-				QApplication::overrideCursor()->shape() !=
-							Qt::SizeHorCursor )
-			{
-				while( QApplication::overrideCursor() != NULL )
-				{
-					QApplication::restoreOverrideCursor();
-				}
-			}
-			QCursor c( Qt::SizeHorCursor );
-			QApplication::setOverrideCursor( c );
+			setCursor( Qt::SizeHorCursor );
 		}
 		else
 		{
@@ -1194,7 +1181,7 @@ void TrackContentWidget::updateBackground()
 
 	// draw lines
 	// vertical lines
-	pmp.setPen( QPen( gridColor(), 1 ) );	
+	pmp.setPen( QPen( gridColor(), 1 ) );
 	for( float x = 0; x < w * 2; x += ppt )
 	{
 		pmp.drawLine( QLineF( x, 0.0, x, h ) );
@@ -1205,9 +1192,9 @@ void TrackContentWidget::updateBackground()
 	{
 		pmp.drawLine( QLineF( x, 0.0, x, h ) );
 	}
-	
+
 	// horizontal line
-	pmp.setPen( QPen( gridColor(), 1 ) );	
+	pmp.setPen( QPen( gridColor(), 1 ) );
 	pmp.drawLine( 0, h-1, w*2, h-1 );
 
 	pmp.end();
@@ -1390,7 +1377,7 @@ MidiTime TrackContentWidget::getPosition( int mouseX )
  */
 void TrackContentWidget::dragEnterEvent( QDragEnterEvent * dee )
 {
-	MidiTime tcoPos = MidiTime( getPosition( dee->pos().x() ).getTact(), 0 );
+	MidiTime tcoPos = getPosition( dee->pos().x() );
 	if( canPasteSelection( tcoPos, dee ) == false )
 	{
 		dee->ignore();
@@ -1928,7 +1915,7 @@ void TrackOperationsWidget::updateMenu()
 	toMenu->addAction( embed::getIconPixmap( "cancel", 16, 16 ),
 						tr( "Remove this track" ),
 						this, SLOT( removeTrack() ) );
-	
+
 	if( ! m_trackView->trackContainerView()->fixedTCOs() )
 	{
 		toMenu->addAction( tr( "Clear this track" ), this, SLOT( clearTrack() ) );
@@ -2624,7 +2611,7 @@ TrackView::TrackView( Track * track, TrackContainerView * tcv ) :
 			&m_trackContentWidget, SLOT( update() ) );
 
 	connect( &m_track->m_soloModel, SIGNAL( dataChanged() ),
-			m_track, SLOT( toggleSolo() ) );
+			m_track, SLOT( toggleSolo() ), Qt::DirectConnection );
 	// create views for already existing TCOs
 	for( Track::tcoVector::iterator it =
 					m_track->m_trackContentObjects.begin();
@@ -2871,12 +2858,12 @@ void TrackView::mouseMoveEvent( QMouseEvent * me )
 	else if( m_action == MoveTrack )
 	{
 		// look which track-widget the mouse-cursor is over
-		const int yPos = 
+		const int yPos =
 			m_trackContainerView->contentWidget()->mapFromGlobal( me->globalPos() ).y();
 		const TrackView * trackAtY = m_trackContainerView->trackViewAt( yPos );
 
-// debug code
-//			qDebug( "y position %d", yPos );
+		// debug code
+		//	qDebug( "y position %d", yPos );
 
 		// a track-widget not equal to ourself?
 		if( trackAtY != NULL && trackAtY != this )
