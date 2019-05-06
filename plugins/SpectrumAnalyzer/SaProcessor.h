@@ -110,7 +110,7 @@ private:
 	bool m_reallocating;
 
 	// merge L and R channels and apply gamma correction to make a spectrogram pixel
-	QRgb makePixel(float left, float right, float gamma_correction = 0.42);
+	QRgb makePixel(float left, float right, float gamma_correction = 0.30);
 
 	friend class SaSpectrumView;
 	friend class SaWaterfallView;

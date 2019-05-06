@@ -216,7 +216,7 @@ void SaProcessor::analyse(sampleFrame *in_buffer, const fpp_t frame_count) {
 // intentionally untreated as it clearly indicates which frequency is clipping.
 // Gamma correction is applied to make small values more visible and to make
 // a linear gradient actually appear roughly linear. The correction should be
-// around 0.42 to 0.45 for sRGB displays.
+// around 0.42 to 0.45 for sRGB displays (or lower for bigger visibility boost).
 QRgb SaProcessor::makePixel(float left, float right, float gamma_correction) {
 	if (m_controls->m_stereoModel.value()) {
 		float ampL = pow(left, gamma_correction);
