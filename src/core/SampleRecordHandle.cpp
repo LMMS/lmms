@@ -54,15 +54,12 @@ SampleRecordHandle::~SampleRecordHandle()
 		// force-write it into the buffer.
 
 		if (m_framesRecorded == 0) {
-			m_tco->sampleBuffer ()->resetAudioFile();
 			m_tco->sampleBuffer ()->resetData (std::move (m_currentBuffer),
-											   Engine::mixer ()->inputSampleRate (),
-											   false);
+											   Engine::mixer ()->inputSampleRate ());
 			m_tco->setStartTimeOffset (m_startRecordTimeOffset);
 		} else {
 			m_tco->sampleBuffer ()->addData(m_currentBuffer,
-											Engine::mixer ()->inputSampleRate (),
-											false);
+											Engine::mixer ()->inputSampleRate ());
 		}
 	}
 
@@ -88,30 +85,22 @@ void SampleRecordHandle::play( sampleFrame * /*_working_buffer*/ )
 
 	writeBuffer( recbuf, frames );
 
-	bool dataWrittenIntoSampleBuffer = true;
-
-	// Try to add data to the buffer.
-	// If we could not do that. We'll do that next time.
+	// Add data to the buffer.
 	if (m_framesRecorded == 0) {
 		// Make sure we don't have the previous data.
-		m_tco->sampleBuffer ()->resetAudioFile();
-		dataWrittenIntoSampleBuffer = m_tco->sampleBuffer ()->tryResetData (std::move (m_currentBuffer),
-													   Engine::mixer ()->inputSampleRate (),
-													   false);
+		m_tco->sampleBuffer ()->resetData(std::move (m_currentBuffer),
+													 Engine::mixer ()->inputSampleRate ());
 		m_tco->setStartTimeOffset (m_startRecordTimeOffset);
 	} else {
 		if (! m_currentBuffer.empty ()) {
-			dataWrittenIntoSampleBuffer = m_tco->sampleBuffer ()->tryAddData(m_currentBuffer,
-														Engine::mixer ()->inputSampleRate (),
-														false);
+			m_tco->sampleBuffer ()->addData(m_currentBuffer,
+											Engine::mixer ()->inputSampleRate ());
 		}
 	}
 
-	if (dataWrittenIntoSampleBuffer) {
-		m_framesRecorded += frames;
-		m_timeRecorded = m_framesRecorded / Engine::framesPerTick (Engine::mixer ()->inputSampleRate ());
-		m_currentBuffer.clear();
-	}
+	m_framesRecorded += frames;
+	m_timeRecorded = m_framesRecorded / Engine::framesPerTick (Engine::mixer ()->inputSampleRate ());
+	m_currentBuffer.clear();
 }
 
 
