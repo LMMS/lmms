@@ -255,7 +255,7 @@ void SampleTCO::loadSettings( const QDomElement & _this )
 		// Should not be happening after 1.3.
 		if (_this.hasAttribute ("data") && _this.attribute ("data") != QString()) {
 			qWarning("Using default sampleRate. That could lead to invalid values1");
-			m_sampleBuffer->loadFromBase64 (_this.attribute ("data"),
+			*m_sampleBuffer = SampleBuffer(_this.attribute ("data"),
 											Engine::mixer ()->baseSampleRate ());
 		} else {
 			m_sampleBuffer->restoreState (_this.firstChildElement (m_sampleBuffer->nodeName ()));

@@ -241,7 +241,7 @@ void audioFileProcessor::loadSettings( const QDomElement & _this )
 	}
 	else if( _this.attribute( "sampledata" ) != "" )
 	{
-		m_sampleBuffer.loadFromBase64( _this.attribute( "srcdata" ) ,
+		m_sampleBuffer = SampleBuffer( _this.attribute( "srcdata" ) ,
 									   Engine::mixer ()->baseSampleRate ());
 		qWarning("Using default sampleRate. That could lead to invalid values");
 	} else {
@@ -346,7 +346,7 @@ void audioFileProcessor::reverseModelChanged( void )
 	if (m_reverseModel.value () != m_isCurrentlyReversed) {
 		m_isCurrentlyReversed = m_reverseModel.value ();
 
-		m_sampleBuffer.reverse (true);
+		m_sampleBuffer.reverse ();
 	}
 
 	m_nextPlayStartPoint = m_sampleBuffer.startFrame();

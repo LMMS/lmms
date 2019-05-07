@@ -589,13 +589,11 @@ QString graphModel::setWaveToUser()
 	QString fileName = sampleBuffer->openAndSetWaveformFile();
 	if( fileName.isEmpty() == false )
 	{
-		sampleBuffer->dataReadLock();
 		for( int i = 0; i < length(); i++ )
 		{
 			m_samples[i] = sampleBuffer->userWaveSample(
 					i / static_cast<float>( length() ) );
 		}
-		sampleBuffer->dataUnlock();
 	}
 
 	emit samplesChanged( 0, length() - 1 );
