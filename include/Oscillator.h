@@ -35,6 +35,7 @@
 
 #include "SampleBuffer.h"
 #include "lmms_constants.h"
+#include "lmms_math.h"
 
 class IntModel;
 
