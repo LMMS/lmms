@@ -149,6 +149,12 @@ static_assert (sizeof(surroundSampleFrame) == sizeof(sample_t) * SURROUND_CHANNE
 #define STRINGIFY(s) STR(s)
 #define STR(PN)	#PN
 
+enum LoopMode {
+	LoopOff = 0,
+	LoopOn,
+	LoopPingPong
+};
+
 // Abstract away GUI CTRL key (linux/windows) vs ⌘ (apple)
 #ifdef LMMS_BUILD_APPLE
 # define UI_CTRL_KEY "⌘"
