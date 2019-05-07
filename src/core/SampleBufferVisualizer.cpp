@@ -158,13 +158,11 @@ bool SampleBufferVisualizer::appendTact(const SampleBuffer &sampleBuffer,
 	// Generate the actual visualization.
 	auto fromFrame = MidiTime(m_cachedTime + offsetFromTact).frames (m_framesPerTact);
 
-	if (! sampleBuffer.tryDataReadLock())
-		return false;
 	auto poly = sampleBuffer.visualizeToPoly (currentPaintInTact,
 											  QRect(),
 											  fromFrame,
 											  fromFrame + totalTime.frames(m_framesPerTact));
-	sampleBuffer.dataUnlock ();
+
 
 	m_currentPixmap.totalTime += totalTime;
 
