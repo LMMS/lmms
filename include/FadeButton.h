@@ -55,7 +55,7 @@ protected:
 
 
 private:
-	QTime m_activateStateTimer;
+	QTime m_stateTimer;
 
 	QColor m_normalColor;
 	QColor m_activatedColor;
