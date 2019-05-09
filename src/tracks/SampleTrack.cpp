@@ -38,6 +38,7 @@
 #include "embed.h"
 #include "ToolTip.h"
 #include "BBTrack.h"
+#include "BBTrackContainer.h"
 #include "SamplePlayHandle.h"
 #include "SampleRecordHandle.h"
 #include "SongEditor.h"
@@ -48,6 +49,7 @@
 #include "Mixer.h"
 #include "EffectRackView.h"
 #include "TrackLabelButton.h"
+
 
 SampleTCO::SampleTCO( Track * _track ) :
 	TrackContentObject( _track ),
@@ -85,10 +87,18 @@ SampleTCO::SampleTCO( Track * _track ) :
 	//care about TCO position
 	connect( this, SIGNAL( positionChanged() ), this, SLOT( updateTrackTcos() ) );
 
+
+	BBTrackContainer * BBTC = dynamic_cast<BBTrackContainer*>( getTrack()->trackContainer() );
+	if(BBTC)
+	{
+		::BBTrack * bb_track = BBTrack::findBBTrack( BBTC->currentBB() );
+		connect( bb_track, SIGNAL( trackContentObjectAdded( TrackContentObject *) ), this, SLOT( updateBBTcos() ) );
+	}
 	switch( getTrack()->trackContainer()->type() )
 	{
 		case TrackContainer::BBContainer:
 			setAutoResize( true );
+			updateBBTcos();
 			break;
 
 		case TrackContainer::SongContainer:
@@ -131,6 +141,7 @@ const QString & SampleTCO::sampleFile() const
 
 
 
+
 void SampleTCO::setSampleBuffer( SampleBuffer* sb )
 {
 	sharedObject::unref( m_sampleBuffer );
@@ -139,6 +150,7 @@ void SampleTCO::setSampleBuffer( SampleBuffer* sb )
 
 	emit sampleChanged();
 }
+
 
 
 
@@ -191,6 +203,26 @@ void SampleTCO::updateTrackTcos()
 	{
 		sampletrack->updateTcos();
 	}
+}
+
+
+
+
+void SampleTCO::updateBBTcos()
+{
+	BBTrackContainer * BBTC = dynamic_cast<BBTrackContainer*>( getTrack()->trackContainer() );
+	if(BBTC)
+	{
+		::BBTrack * bb_track = BBTrack::findBBTrack( BBTC->currentBB() );
+		for( auto i = 0; i < bb_track->numOfTCOs(); ++i )
+		{
+			connect( bb_track->getTCO( i ), SIGNAL( muteToggled() ), this, SLOT( playbackPositionChanged() ) );
+			connect( bb_track->getTCO( i ), SIGNAL( destroyedTCO() ), this, SLOT( playbackPositionChanged() ) );
+			connect( bb_track->getTCO( i ), SIGNAL( lengthChanged() ), this, SLOT( playbackPositionChanged() ) );
+			connect( bb_track->getTCO( i ), SIGNAL( positionChanged() ), this, SLOT( playbackPositionChanged() ) );
+		}
+	}
+
 }
 
 bool SampleTCO::isPlaying() const
@@ -590,57 +622,118 @@ SampleTrack::~SampleTrack()
 
 
 
-bool SampleTrack::play( const MidiTime & _start, const fpp_t _frames,
-					const f_cnt_t _offset, int _tco_num )
+bool SampleTrack::play( const MidiTime & _start, const fpp_t /*_frames*/,
+						const f_cnt_t _offset, int _tco_num )
 {
 	m_audioPort.effects()->startRunning();
-	bool played_a_note = false;	// will be return variable
+
+	//will be return variable
+	bool played_a_note = false;
 
 	tcoVector tcos;
-	::BBTrack * bb_track = NULL;
+
+	::BBTrack * bb_track = nullptr;
+	MidiTime bbEndPos = 0;
+
+	/********************************************************************
+	* In this whole block we find our BB Track TCO in the Songeditor
+	* and so we can calculate the length of it.
+	* If _tco_num is equal or bigger than 0, we know we have a
+	* Sampletrack within a BB-Container
+	********************************************************************/
+
 	if( _tco_num >= 0 )
 	{
-		if( _start != 0 )
+		//repeat playing when end of BB-Container is reached
+		tick_t lengthOfBB = Engine::getBBTrackContainer()->lengthOfBB( _tco_num ) * MidiTime::ticksPerTact();
+		if( _start % lengthOfBB == 0 )
 		{
-			return false;
+			updateTcos();
 		}
-		tcos.push_back( getTCO( _tco_num ) );
-		if (trackContainer() == (TrackContainer*)Engine::getBBTrackContainer())
+
+		//the BB-Track in Songeditor
+		bb_track = BBTrack::findBBTrack( _tco_num );
+		//Vector of BB Tcos in Songeditor. It will be filled later
+		tcoVector bbtcos;
+		//Do we play in BB-Editor or in Songeditor?
+		if( Engine::getSong()->playMode() != Song::Mode_PlayBB )
 		{
-			bb_track = BBTrack::findBBTrack( _tco_num );
-		}
-	}
-	else
-	{
-		for( int i = 0; i < numOfTCOs(); ++i )
-		{
-			TrackContentObject * tco = getTCO( i );
-			SampleTCO * sTco = dynamic_cast<SampleTCO*>( tco );
-			float framesPerTick = Engine::framesPerTick();
-			if( _start >= sTco->startPosition() && _start < sTco->endPosition() )
+			MidiTime currentSongPos = Engine::getSong()->getPlayPos( Song::Mode_PlaySong ).getTicks();
+			bb_track->getTCOsInRange( bbtcos, currentSongPos, currentSongPos );
+			//take care of overlapping BB-TCOs
+			if( bbtcos.size() != m_NumOfOverlappingBB )
 			{
-				if( sTco->isPlaying() == false )
+				m_NumOfOverlappingBB = bbtcos.size();
+				updateTcos();
+			}
+			//play the TCO which comes at last
+			auto startpos = 0;
+			for( const auto it : bbtcos )
+			{
+				if( !it->isMuted() && it->startPosition() > startpos )
 				{
-					f_cnt_t sampleStart = framesPerTick * ( _start - sTco->startPosition() );
-					f_cnt_t tcoFrameLength = framesPerTick * ( sTco->endPosition() - sTco->startPosition() );
-					f_cnt_t sampleBufferLength = sTco->sampleBuffer()->frames();
-					//if the Tco smaller than the sample length we play only until Tco end
-					//else we play the sample to the end but nothing more
-					f_cnt_t samplePlayLength = tcoFrameLength > sampleBufferLength ? sampleBufferLength : tcoFrameLength;
-					//we only play within the sampleBuffer limits
-					if( sampleStart < sampleBufferLength )
-					{
-						sTco->setSampleStartFrame( sampleStart );
-						sTco->setSamplePlayLength( samplePlayLength );
-						tcos.push_back( sTco );
-						sTco->setIsPlaying( true );
-					}
+					startpos = it->startPosition();
+					//how many times the bb is looped?
+					int loopCountBB = ( currentSongPos - startpos ) / lengthOfBB;
+					bbEndPos = it->length() - loopCountBB * lengthOfBB;
 				}
 			}
-			else
+		}
+	}
+
+	/********************************************************************
+	 * Now we iterate over all TCOs in the Sampletrack
+	 * If the sampletrack is within a BB-Container we have only one TCO
+	 * *****************************************************************/
+
+	for( int i = 0; i < numOfTCOs(); ++i )
+	{
+		TrackContentObject * tco = getTCO( i );
+		SampleTCO * sTco = dynamic_cast<SampleTCO*>( tco );
+		float framesPerTick = Engine::framesPerTick();
+		MidiTime TcoEndposition = sTco->endPosition();
+
+		//if we play a BBTCO but not from the BBEditor,
+		//we set the endposition to the length of the BBTCO in the SongEditor
+		if( bbEndPos > 0)
+		{
+			TcoEndposition = bbEndPos;
+		}
+
+		//We want to play the sample if the Songposition is within our TCO
+		if( _start >= sTco->startPosition() && _start <= TcoEndposition )
+		{
+			//Play the sample only if it's not playing, yet
+			if( sTco->isPlaying() == false )
+			{
+				f_cnt_t sampleStart = framesPerTick * ( _start - sTco->startPosition() );
+				f_cnt_t tcoFrameLength = framesPerTick * ( TcoEndposition - sTco->startPosition() );
+				f_cnt_t sampleBufferLength = sTco->sampleBuffer()->frames();
+
+				//if the Tco is smaller than the sample length, we play only until Tco end
+				//else we play the sample to the end but nothing more
+				f_cnt_t samplePlayLength = tcoFrameLength > sampleBufferLength ? sampleBufferLength : tcoFrameLength;
+				//we only play within the sampleBuffer limits
+				if( sampleStart < sampleBufferLength )
+				{
+					sTco->setSampleStartFrame( sampleStart );
+					sTco->setSamplePlayLength( samplePlayLength );
+					tcos.push_back( sTco );
+					sTco->setIsPlaying( true );
+				}
+			}
+
+			//we have to setIsPlaying(false) at the end of a BB Track (Songeditor-)TCO.
+			//unfortunately this play()function is only called if the Songposition
+			//is within the BBTrack TCO.
+			if(bbEndPos > 0 && _start + 1 == TcoEndposition )
 			{
 				sTco->setIsPlaying( false );
 			}
+		}
+		else
+		{
+			sTco->setIsPlaying( false );
 		}
 	}
 

@@ -221,6 +221,7 @@ void TrackContentObject::toggleMute()
 {
 	m_mutedModel.setValue( !m_mutedModel.value() );
 	emit dataChanged();
+	emit muteToggled();
 }
 
 

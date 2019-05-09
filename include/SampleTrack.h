@@ -74,7 +74,7 @@ public slots:
 	void toggleRecord();
 	void playbackPositionChanged();
 	void updateTrackTcos();
-
+	void updateBBTcos();
 
 private:
 	SampleBuffer* m_sampleBuffer;
@@ -159,6 +159,7 @@ private:
 	FloatModel m_volumeModel;
 	FloatModel m_panningModel;
 	AudioPort m_audioPort;
+	int m_NumOfOverlappingBB;
 
 
 
