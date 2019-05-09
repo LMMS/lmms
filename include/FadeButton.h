@@ -44,6 +44,7 @@ public:
 
 public slots:
 	void activate();
+	void noteEnd();
 
 
 protected:
@@ -55,6 +56,7 @@ private:
 	QTime m_stateTimer;
 	QColor m_normalColor;
 	QColor m_activatedColor;
+	int activeNotes;
 
 	void signalUpdate();
 
@@ -62,4 +64,3 @@ private:
 
 
 #endif
-

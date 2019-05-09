@@ -2,7 +2,7 @@
  * FadeButton.cpp - implementation of fade-button
  *
  * Copyright (c) 2005-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -21,7 +21,7 @@
  * Boston, MA 02110-1301 USA.
  *
  */
- 
+
 
 #include <QTimer>
 #include <QApplication>
@@ -45,6 +45,7 @@ FadeButton::FadeButton( const QColor & _normal_color,
 	setAttribute( Qt::WA_OpaquePaintEvent, true );
 	setCursor( QCursor( embed::getIconPixmap( "hand" ), 3, 3 ) );
 	setFocusPolicy( Qt::NoFocus );
+        activeNotes = 0;
 }
 
 
@@ -65,7 +66,26 @@ void FadeButton::setActiveColor( const QColor & activated_color )
 void FadeButton::activate()
 {
 	m_stateTimer.restart();
+        activeNotes++;
 	signalUpdate();
+}
+
+
+
+
+void FadeButton::noteEnd()
+{
+        if(activeNotes <= 0)
+        {
+                qWarning("noteEnd() triggered without a corresponding activate()!");
+                activeNotes = 0;
+        }
+        else
+        {
+                activeNotes--;
+        }
+
+        signalUpdate();
 }
 
 
@@ -118,10 +138,3 @@ void FadeButton::signalUpdate()
 {
 	QApplication::postEvent( this, new updateEvent() );
 }
-
-
-
-
-
-
-
