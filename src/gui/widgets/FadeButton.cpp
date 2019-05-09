@@ -81,7 +81,7 @@ void FadeButton::noteEnd()
 	if(activeNotes <= 0)
 	{
 	        qWarning("noteEnd() triggered without a corresponding activate()!");
-	        activeNotes = 0;
+		activeNotes = 0;
 	}
 	else
 	{
