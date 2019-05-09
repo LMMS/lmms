@@ -519,7 +519,7 @@ NesInstrument::NesInstrument( InstrumentTrack * instrumentTrack ) :
 	m_ch3Volume( 15.f, 0.f, 15.f, 1.f, this, tr( "Channel 3 Volume" ) ),
 
 	//channel 4
-	m_ch4Enabled( true, this ),
+	m_ch4Enabled( false, this ),
 	m_ch4Volume( 15.f, 0.f, 15.f, 1.f, this, tr( "Channel 4 Volume" ) ),
 	
 	m_ch4EnvEnabled( false, this ),
