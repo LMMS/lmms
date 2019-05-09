@@ -37,8 +37,8 @@ const float FadeDuration = 300;
 
 FadeButton::FadeButton( const QColor & _normal_color,
 			const QColor & _activated_color,
-                        const QColor & _hold_color,
-                        QWidget * _parent ) :
+			const QColor & _hold_color,
+			QWidget * _parent ) :
 	QAbstractButton( _parent ),
 	m_stateTimer(),
 	m_normalColor( _normal_color ),
