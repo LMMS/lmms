@@ -35,8 +35,10 @@ class FadeButton : public QAbstractButton
 {
 	Q_OBJECT
 public:
-	FadeButton( const QColor & _normal_color, const QColor &
-					_activated_color, QWidget * _parent );
+	FadeButton( const QColor & _normal_color,
+		const QColor & _activated_color,
+		const QColor & _hold_color,
+		QWidget * _parent );
 
 	virtual ~FadeButton();
 	void setActiveColor( const QColor & activated_color );
@@ -53,9 +55,12 @@ protected:
 
 
 private:
-	QTime m_stateTimer;
+	QTime m_activateStateTimer;
+	QTime m_holdStateTimer;
+
 	QColor m_normalColor;
 	QColor m_activatedColor;
+	QColor m_holdColor;
 	int activeNotes;
 
 	void signalUpdate();

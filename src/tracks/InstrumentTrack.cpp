@@ -969,6 +969,8 @@ InstrumentTrackView::InstrumentTrackView( InstrumentTrack * _it, TrackContainerV
 							QPalette::Background),
 						QApplication::palette().color( QPalette::Active,
 							QPalette::BrightText ),
+						QApplication::palette().color( QPalette::Active,
+							QPalette::BrightText).darker(),
 						getTrackSettingsWidget() );
 	m_activityIndicator->setGeometry(
 					 widgetWidth-2*24-11, 2, 8, 28 );

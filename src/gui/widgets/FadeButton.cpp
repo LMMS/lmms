@@ -36,11 +36,15 @@ const float FadeDuration = 300;
 
 
 FadeButton::FadeButton( const QColor & _normal_color,
-			const QColor & _activated_color, QWidget * _parent ) :
+			const QColor & _activated_color,
+                        const QColor & _hold_color,
+                        QWidget * _parent ) :
 	QAbstractButton( _parent ),
-	m_stateTimer(),
+	m_activateStateTimer(),
+        m_holdStateTimer(),
 	m_normalColor( _normal_color ),
-	m_activatedColor( _activated_color )
+	m_activatedColor( _activated_color ),
+        m_holdColor( _hold_color )
 {
 	setAttribute( Qt::WA_OpaquePaintEvent, true );
 	setCursor( QCursor( embed::getIconPixmap( "hand" ), 3, 3 ) );
@@ -65,8 +69,10 @@ void FadeButton::setActiveColor( const QColor & activated_color )
 
 void FadeButton::activate()
 {
-	m_stateTimer.restart();
+	m_activateStateTimer.restart();
         activeNotes++;
+
+        qWarning("active notes now %d", activeNotes);
 	signalUpdate();
 }
 
@@ -85,6 +91,9 @@ void FadeButton::noteEnd()
                 activeNotes--;
         }
 
+        if(activeNotes <= 0)
+                m_holdStateTimer.restart();
+
         signalUpdate();
 }
 
@@ -102,21 +111,35 @@ void FadeButton::customEvent( QEvent * )
 void FadeButton::paintEvent( QPaintEvent * _pe )
 {
 	QColor col = m_normalColor;
-	if( ! m_stateTimer.isNull() && m_stateTimer.elapsed() < FadeDuration )
+
+	if( ! m_activateStateTimer.isNull() && m_activateStateTimer.elapsed() < FadeDuration )
 	{
-		const float state = 1 - m_stateTimer.elapsed() / FadeDuration;
-		const int r = (int)( m_normalColor.red() *
+                // The first part of the fade, when a note is triggered.
+		const float state = 1 - m_activateStateTimer.elapsed() / FadeDuration;
+		const int r = (int)( m_holdColor.red() *
 					( 1.0f - state ) +
 			m_activatedColor.red() * state );
-		const int g = (int)( m_normalColor.green() *
+		const int g = (int)( m_holdColor.green() *
 					( 1.0f - state ) +
 			m_activatedColor.green() * state );
-		const int b = (int)( m_normalColor.blue() *
+		const int b = (int)( m_holdColor.blue() *
 					( 1.0f - state ) +
 			m_activatedColor.blue() * state );
 		col.setRgb( r, g, b );
 		QTimer::singleShot( 20, this, SLOT( update() ) );
 	}
+        else if( ! m_activateStateTimer.isNull()
+                && m_activateStateTimer.elapsed() >= FadeDuration
+                && activeNotes > 0)
+        {
+                // The fade is done, but at least one note is still held.
+                col = m_holdColor;
+        }
+        else
+        {
+                // No fade, no notes. Reset to default color.
+                col = m_normalColor;
+        }
 
 	QPainter p( this );
 	p.fillRect( rect(), col );
