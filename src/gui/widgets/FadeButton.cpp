@@ -41,7 +41,6 @@ FadeButton::FadeButton( const QColor & _normal_color,
                         QWidget * _parent ) :
 	QAbstractButton( _parent ),
 	m_activateStateTimer(),
-        m_holdStateTimer(),
 	m_normalColor( _normal_color ),
 	m_activatedColor( _activated_color ),
         m_holdColor( _hold_color )
@@ -90,9 +89,6 @@ void FadeButton::noteEnd()
         {
                 activeNotes--;
         }
-
-        if(activeNotes <= 0)
-                m_holdStateTimer.restart();
 
         signalUpdate();
 }
