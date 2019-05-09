@@ -69,7 +69,7 @@ void FadeButton::setActiveColor( const QColor & activated_color )
 void FadeButton::activate()
 {
 	m_stateTimer.restart();
-        activeNotes++;
+	activeNotes++;
 	signalUpdate();
 }
 
@@ -78,17 +78,17 @@ void FadeButton::activate()
 
 void FadeButton::noteEnd()
 {
-        if(activeNotes <= 0)
-        {
-                qWarning("noteEnd() triggered without a corresponding activate()!");
-                activeNotes = 0;
-        }
-        else
-        {
-                activeNotes--;
-        }
+	if(activeNotes <= 0)
+	{
+	        qWarning("noteEnd() triggered without a corresponding activate()!");
+	        activeNotes = 0;
+	}
+	else
+	{
+	        activeNotes--;
+	}
 
-        signalUpdate();
+	signalUpdate();
 }
 
 
@@ -108,7 +108,7 @@ void FadeButton::paintEvent( QPaintEvent * _pe )
 
 	if( ! m_stateTimer.isNull() && m_stateTimer.elapsed() < FadeDuration )
 	{
-                // The first part of the fade, when a note is triggered.
+		// The first part of the fade, when a note is triggered.
 		const float state = 1 - m_stateTimer.elapsed() / FadeDuration;
 		const int r = (int)( m_holdColor.red() *
 					( 1.0f - state ) +
@@ -122,18 +122,18 @@ void FadeButton::paintEvent( QPaintEvent * _pe )
 		col.setRgb( r, g, b );
 		QTimer::singleShot( 20, this, SLOT( update() ) );
 	}
-        else if( ! m_stateTimer.isNull()
-                && m_stateTimer.elapsed() >= FadeDuration
-                && activeNotes > 0)
-        {
-                // The fade is done, but at least one note is still held.
-                col = m_holdColor;
-        }
-        else
-        {
-                // No fade, no notes. Reset to default color.
-                col = m_normalColor;
-        }
+	else if( ! m_stateTimer.isNull()
+		&& m_stateTimer.elapsed() >= FadeDuration
+		&& activeNotes > 0)
+	{
+		// The fade is done, but at least one note is still held.
+		col = m_holdColor;
+	}
+	else
+	{
+		// No fade, no notes. Reset to default color.
+		col = m_normalColor;
+	}
 
 	QPainter p( this );
 	p.fillRect( rect(), col );
