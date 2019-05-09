@@ -70,8 +70,6 @@ void FadeButton::activate()
 {
 	m_activateStateTimer.restart();
         activeNotes++;
-
-        qWarning("active notes now %d", activeNotes);
 	signalUpdate();
 }
 
