@@ -38,6 +38,7 @@
 #include "InstrumentTrack.h"
 #include "LocaleHelper.h"
 
+#include "plugin_export.h"
 
 extern "C"
 {
@@ -274,7 +275,8 @@ void MidiExport::writePattern(MidiNoteVector &pat, QDomNode n,
 		// TODO interpret pan="0" fxch="0" pitchrange="1"
 		MidiNote mnote;
 		mnote.pitch = qMax(0, qMin(127, note.attribute("key", "0").toInt() + base_pitch));
-		mnote.volume = qMin(qRound(base_volume * LocaleHelper::toDouble(note.attribute("vol", "100"))), 127);
+		 // Map from LMMS volume to MIDI velocity
+		mnote.volume = qMin(qRound(base_volume * LocaleHelper::toDouble(note.attribute("vol", "100")) * (127.0 / 200.0)), 127);
 		mnote.time = base_time + note.attribute("pos", "0").toInt();
 		mnote.duration = note.attribute("len", "0").toInt();
 		pat.push_back(mnote);
@@ -348,7 +350,7 @@ extern "C"
 {
 
 // necessary for getting instance out of shared lib
-Plugin * PLUGIN_EXPORT lmms_plugin_main( Model *, void * _data )
+PLUGIN_EXPORT Plugin * lmms_plugin_main( Model *, void * _data )
 {
 	return new MidiExport();
 }

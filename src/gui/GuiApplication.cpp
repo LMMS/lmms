@@ -40,6 +40,7 @@
 #include "SongEditor.h"
 
 #include <QApplication>
+#include <QDir>
 #include <QtGlobal>
 #include <QMessageBox>
 #include <QSplashScreen>
@@ -54,11 +55,6 @@ GuiApplication* GuiApplication::instance()
 
 GuiApplication::GuiApplication()
 {
-	// enable HiDPI scaling before showing anything (Qt 5.6+ only)
-	#if (QT_VERSION >= QT_VERSION_CHECK(5, 6, 0))
-		QApplication::setAttribute(Qt::AA_EnableHighDpiScaling, true);
-	#endif
-	
 	// prompt the user to create the LMMS working directory (e.g. ~/Documents/lmms) if it doesn't exist
 	if ( !ConfigManager::inst()->hasWorkingDir() &&
 		QMessageBox::question( NULL,
@@ -71,6 +67,10 @@ GuiApplication::GuiApplication()
 		ConfigManager::inst()->createWorkingDir();
 	}
 	// Init style and palette
+	QDir::addSearchPath("artwork", ConfigManager::inst()->artworkDir());
+	QDir::addSearchPath("artwork", ConfigManager::inst()->defaultArtworkDir());
+	QDir::addSearchPath("artwork", ":/artwork");
+
 	LmmsStyle* lmmsstyle = new LmmsStyle();
 	QApplication::setStyle(lmmsstyle);
 

@@ -384,8 +384,9 @@ void TrackContainerView::dropEvent( QDropEvent * _de )
 		InstrumentTrack * it = dynamic_cast<InstrumentTrack *>(
 				Track::create( Track::InstrumentTrack,
 								m_tc ) );
-		Instrument * i = it->loadInstrument(
-			pluginFactory->pluginSupportingExtension(FileItem::extension(value)).name());
+		PluginFactory::PluginInfoAndKey piakn =
+			pluginFactory->pluginSupportingExtension(FileItem::extension(value));
+		Instrument * i = it->loadInstrument(piakn.info.name(), &piakn.key);
 		i->loadFile( value );
 		//it->toggledInstrumentTrackButton( true );
 		_de->accept();
@@ -473,6 +474,11 @@ void TrackContainerView::resizeEvent( QResizeEvent * _re )
 	QWidget::resizeEvent( _re );
 }
 
+RubberBand *TrackContainerView::rubberBand() const
+{
+    return m_rubberBand;
+}
+
 
 
 
@@ -524,7 +530,8 @@ InstrumentLoaderThread::InstrumentLoaderThread( QObject *parent, InstrumentTrack
 
 void InstrumentLoaderThread::run()
 {
-	Instrument *i = m_it->loadInstrument( m_name );
+	Instrument *i = m_it->loadInstrument(m_name, nullptr,
+				true /*always DnD*/);
 	QObject *parent = i->parent();
 	i->setParent( 0 );
 	i->moveToThread( m_containerThread );

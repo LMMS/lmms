@@ -79,6 +79,10 @@ public:
 
 	static const int FxLineHeight;
 
+	void renameChannel();
+
+	bool eventFilter (QObject *dist, QEvent *event);
+
 private:
 	void drawFxLine( QPainter* p, const FxLine *fxLine, bool isActive, bool sendToThis, bool receiveFromThis );
 	QString elideName( const QString & name );
@@ -98,13 +102,11 @@ private:
 	QGraphicsView * m_view;
 
 private slots:
-	void renameChannel();
 	void renameFinished();
 	void removeChannel();
 	void removeUnusedChannels();
 	void moveChannelLeft();
 	void moveChannelRight();
-	void displayHelp();
 };
 
 

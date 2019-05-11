@@ -45,8 +45,8 @@
 #include "ToolTip.h"
 #include "BandLimitedWave.h"
 
-#include "embed.cpp"
-
+#include "embed.h"
+#include "plugin_export.h"
 
 // Envelope Recalculation period
 #define ENVINC 64
@@ -284,8 +284,12 @@ lb302Synth::lb302Synth( InstrumentTrack * _instrumentTrack ) :
 	slideToggle( false, this, tr( "Slide" ) ),
 	accentToggle( false, this, tr( "Accent" ) ),
 	deadToggle( false, this, tr( "Dead" ) ),
-	db24Toggle( false, this, tr( "24dB/oct Filter" ) )
-
+	db24Toggle( false, this, tr( "24dB/oct Filter" ) ),
+	vca_attack(1.0 - 0.96406088),
+	vca_decay(0.99897516),
+	vca_a0(0.5),
+	vca_a(0.),
+	vca_mode(never_played)
 {
 
 	connect( Engine::mixer(), SIGNAL( sampleRateChanged( ) ),
@@ -327,19 +331,7 @@ lb302Synth::lb302Synth( InstrumentTrack * _instrumentTrack ) :
 
 	vcf_envpos = ENVINC;
 
-	// Start VCA on an attack.
-	vca_mode = 3;
-	vca_a = 0;
-
-	//vca_attack = 1.0 - 0.94406088;
-	vca_attack = 1.0 - 0.96406088;
-	vca_decay = 0.99897516;
-
 	vco_shape = BL_SAWTOOTH;
-
-	// Experimenting with a0 between original (0.5) and 1.0
-	vca_a0 = 0.5;
-	vca_mode = 3;
 
 	vcfs[0] = new lb302FilterIIR2(&fs);
 	vcfs[1] = new lb302Filter3Pole(&fs);
@@ -442,11 +434,7 @@ QString lb302Synth::nodeName() const
 // OBSOLETE. Break apart once we get Q_OBJECT to work. >:[
 void lb302Synth::recalcFilter()
 {
-#if QT_VERSION >= 0x050000
 	vcf.load()->recalc();
-#else
-	vcf->recalc();
-#endif
 
 	// THIS IS OLD 3pole/24dB code, I may reintegrate it.  Don't need it
 	// right now.   Should be toggled by LB_24_RES_TRICK at the moment.
@@ -472,15 +460,11 @@ int lb302Synth::process(sampleFrame *outbuf, const int size)
 	float samp;
 
 	// Hold on to the current VCF, and use it throughout this period
-#if QT_VERSION >= 0x050000
 	lb302Filter *filter = vcf.loadAcquire();
-#else
-	lb302Filter *filter = vcf;
-#endif
 
 	if( release_frame == 0 || ! m_playingNote ) 
 	{
-		vca_mode = 1;
+		vca_mode = decay;
 	}
 
 	if( new_freq ) 
@@ -504,7 +488,7 @@ int lb302Synth::process(sampleFrame *outbuf, const int size)
 		// start decay if we're past release
 		if( i >= release_frame )
 		{
-			vca_mode = 1;
+			vca_mode = decay;
 		}
 
 		// update vcf
@@ -644,18 +628,18 @@ int lb302Synth::process(sampleFrame *outbuf, const int size)
 		}
 
 		// Handle Envelope
-		if(vca_mode==0) {
+		if(vca_mode==attack) {
 			vca_a+=(vca_a0-vca_a)*vca_attack;
 			if(sample_cnt>=0.5*Engine::mixer()->processingSampleRate())
-				vca_mode = 2;
+				vca_mode = idle;
 		}
-		else if(vca_mode == 1) {
+		else if(vca_mode == decay) {
 			vca_a *= vca_decay;
 
 			// the following line actually speeds up processing
 			if(vca_a < (1/65536.0)) {
 				vca_a = 0;
-				vca_mode = 3;
+				vca_mode = never_played;
 			}
 		}
 
@@ -677,15 +661,15 @@ void lb302Synth::initNote( lb302Note *n)
 
 	// Always reset vca on non-dead notes, and
 	// Only reset vca on decaying(decayed) and never-played
-	if(n->dead == 0 || (vca_mode==1 || vca_mode==3)) {
+	if(n->dead == 0 || (vca_mode == decay || vca_mode == never_played)) {
 		//printf("    good\n");
 		sample_cnt = 0;
-		vca_mode = 0;
+		vca_mode = attack;
 		// LB303:
 		//vca_a = 0;
 	}
 	else {
-		vca_mode = 2;
+		vca_mode = idle;
 	}
 
 	initSlide();
@@ -700,11 +684,7 @@ void lb302Synth::initNote( lb302Note *n)
 
 	if(n->dead ==0){
 		// Swap next two blocks??
-#if QT_VERSION >= 0x050000
 		vcf.load()->playNote();
-#else
-		vcf->playNote();
-#endif
 		// Ensure envelope is recalculated
 		vcf_envpos = ENVINC;
 
@@ -858,9 +838,9 @@ lb302SynthView::lb302SynthView( Instrument * _instrument, QWidget * _parent ) :
 	m_deadToggle->move( 10, 200 );
 
 	m_db24Toggle = new LedCheckBox( "", this );
-	m_db24Toggle->setWhatsThis(
-			tr( "303-es-que, 24dB/octave, 3 pole filter" ) );
 	m_db24Toggle->move( 10, 150);
+	ToolTip::add( m_db24Toggle,
+			tr( "303-es-que, 24dB/octave, 3 pole filter" ) );
 
 
 	m_slideDecKnob = new Knob( knobBright_26, this );
@@ -1049,11 +1029,11 @@ extern "C"
 {
 
 // necessary for getting instance out of shared lib
-Plugin * PLUGIN_EXPORT lmms_plugin_main( Model *, void * _data )
+PLUGIN_EXPORT Plugin * lmms_plugin_main( Model * m, void * )
 {
 
 	return( new lb302Synth(
-	        static_cast<InstrumentTrack *>( _data ) ) );
+		static_cast<InstrumentTrack *>( m ) ) );
 }
 
 

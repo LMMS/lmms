@@ -66,7 +66,7 @@ const Octaves BaseOctave = DefaultOctave;
 class MixerWorkerThread;
 
 
-class EXPORT Mixer : public QObject
+class LMMS_EXPORT Mixer : public QObject
 {
 	Q_OBJECT
 public:
@@ -274,7 +274,13 @@ public:
 	}
 
 
-	void getPeakValues( sampleFrame * _ab, const f_cnt_t _frames, float & peakLeft, float & peakRight ) const;
+	struct StereoSample
+	{
+		StereoSample(sample_t _left, sample_t _right) : left(_left), right(_right) {}
+		sample_t left;
+		sample_t right;
+	};
+	StereoSample getPeakValues(sampleFrame * _ab, const f_cnt_t _frames) const;
 
 
 	bool criticalXRuns() const;

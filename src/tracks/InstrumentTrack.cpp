@@ -47,6 +47,7 @@
 #include "EffectRackView.h"
 #include "embed.h"
 #include "FileBrowser.h"
+#include "FxLineLcdSpinBox.h"
 #include "FxMixer.h"
 #include "FxMixerView.h"
 #include "GuiApplication.h"
@@ -104,7 +105,7 @@ InstrumentTrack::InstrumentTrack( TrackContainer* tc ) :
 	m_pitchModel( 0, MinPitchDefault, MaxPitchDefault, 1, this, tr( "Pitch" ) ),
 	m_pitchRangeModel( 1, 1, 60, this, tr( "Pitch range" ) ),
 	m_effectChannelModel( 0, 0, 0, this, tr( "FX channel" ) ),
-	m_useMasterPitchModel( true, this, tr( "Master Pitch") ),
+	m_useMasterPitchModel( true, this, tr( "Master pitch") ),
 	m_instrument( NULL ),
 	m_soundShaping( this ),
 	m_arpeggio( this ),
@@ -500,7 +501,7 @@ QString InstrumentTrack::instrumentName() const
 	{
 		return m_instrument->displayName();
 	}
-	return QString::null;
+	return QString();
 }
 
 
@@ -739,7 +740,10 @@ void InstrumentTrack::saveTrackSpecificSettings( QDomDocument& doc, QDomElement 
 	{
 		QDomElement i = doc.createElement( "instrument" );
 		i.setAttribute( "name", m_instrument->descriptor()->name );
-		m_instrument->saveState( doc, i );
+		QDomElement ins = m_instrument->saveState( doc, i );
+		if(m_instrument->key().isValid()) {
+			ins.appendChild( m_instrument->key().saveXML( doc ) );
+		}
 		thisElement.appendChild( i );
 	}
 	m_soundShaping.saveState( doc, thisElement );
@@ -800,9 +804,13 @@ void InstrumentTrack::loadTrackSpecificSettings( const QDomElement & thisElement
 			}
 			else if( node.nodeName() == "instrument" )
 			{
+				typedef Plugin::Descriptor::SubPluginFeatures::Key PluginKey;
+				PluginKey key( node.toElement().elementsByTagName( "key" ).item( 0 ).toElement() );
+
 				delete m_instrument;
 				m_instrument = NULL;
-				m_instrument = Instrument::instantiate( node.toElement().attribute( "name" ), this );
+				m_instrument = Instrument::instantiate(
+					node.toElement().attribute( "name" ), this, &key);
 				m_instrument->restoreState( node.firstChildElement() );
 
 				emit instrumentChanged();
@@ -816,7 +824,8 @@ void InstrumentTrack::loadTrackSpecificSettings( const QDomElement & thisElement
 			{
 				delete m_instrument;
 				m_instrument = NULL;
-				m_instrument = Instrument::instantiate( node.nodeName(), this );
+				m_instrument = Instrument::instantiate(
+					node.nodeName(), this, nullptr, true);
 				if( m_instrument->nodeName() == node.nodeName() )
 				{
 					m_instrument->restoreState( node.toElement() );
@@ -841,15 +850,20 @@ void InstrumentTrack::setPreviewMode( const bool value )
 
 
 
-Instrument * InstrumentTrack::loadInstrument( const QString & _plugin_name )
+Instrument * InstrumentTrack::loadInstrument(const QString & _plugin_name,
+	const Plugin::Descriptor::SubPluginFeatures::Key *key, bool keyFromDnd)
 {
+	if(keyFromDnd)
+		Q_ASSERT(!key);
+
 	silenceAllNotes( true );
 
 	lock();
 	delete m_instrument;
-	m_instrument = Instrument::instantiate( _plugin_name, this );
+	m_instrument = Instrument::instantiate(_plugin_name, this,
+					key, keyFromDnd);
 	unlock();
-	setName( m_instrument->displayName() );
+	setName(m_instrument->displayName());
 
 	emit instrumentChanged();
 
@@ -907,7 +921,6 @@ InstrumentTrackView::InstrumentTrackView( InstrumentTrack * _it, TrackContainerV
 	m_volumeKnob->move( widgetWidth-2*24, 2 );
 	m_volumeKnob->setLabel( tr( "VOL" ) );
 	m_volumeKnob->show();
-	m_volumeKnob->setWhatsThis( tr( volume_help ) );
 
 	m_panningKnob = new Knob( knobSmall_17, getTrackSettingsWidget(),
 							tr( "Panning" ) );
@@ -1250,52 +1263,6 @@ QMenu * InstrumentTrackView::createFxMenu(QString title, QString newFxLabel)
 
 
 
-class fxLineLcdSpinBox : public LcdSpinBox
-{
-        Q_OBJECT
-	public:
-		fxLineLcdSpinBox( int _num_digits, QWidget * _parent,
-				const QString & _name ) :
-			LcdSpinBox( _num_digits, _parent, _name ) {}
-
-	protected:
-		virtual void mouseDoubleClickEvent ( QMouseEvent * _me )
-		{
-			gui->fxMixerView()->setCurrentFxLine( model()->value() );
-
-			gui->fxMixerView()->parentWidget()->show();
-			gui->fxMixerView()->show();// show fxMixer window
-			gui->fxMixerView()->setFocus();// set focus to fxMixer window
-			//engine::getFxMixerView()->raise();
-		}
-
-		virtual void contextMenuEvent( QContextMenuEvent* event )
-		{
-			// for the case, the user clicked right while pressing left mouse-
-			// button, the context-menu appears while mouse-cursor is still hidden
-			// and it isn't shown again until user does something which causes
-			// an QApplication::restoreOverrideCursor()-call...
-			mouseReleaseEvent( NULL );
-
-			QPointer<CaptionMenu> contextMenu = new CaptionMenu( model()->displayName(), this );
-
-			// This condition is here just as a safety check, fxLineLcdSpinBox is aways
-			// created inside a TabWidget inside an InstrumentTrackWindow
-			if ( InstrumentTrackWindow* window = dynamic_cast<InstrumentTrackWindow*>( (QWidget *)this->parent()->parent() ) )
-			{
-				QMenu *fxMenu = window->instrumentTrackView()->createFxMenu( tr( "Assign to:" ), tr( "New FX Channel" ) );
-				contextMenu->addMenu( fxMenu );
-
-				contextMenu->addSeparator();
-			}
-			addDefaultActions( contextMenu );
-			contextMenu->exec( QCursor::pos() );
-		}
-
-};
-
-
-
 // #### ITW:
 InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 	QWidget(),
@@ -1331,7 +1298,7 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 				this, SLOT( textChanged( const QString & ) ) );
 
 	m_nameLineEdit->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred));
-	nameAndChangeTrackLayout->addWidget(m_nameLineEdit);
+	nameAndChangeTrackLayout->addWidget(m_nameLineEdit, 1);
 
 
 	// set up left/right arrows for changing instrument
@@ -1340,8 +1307,6 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 						SLOT( viewPrevInstrument() ) );
 	connect( m_leftRightNav, SIGNAL( onNavRight() ), this,
 						SLOT( viewNextInstrument() ) );
-	m_leftRightNav->setWhatsThis(
-		tr( "Use these controls to view and edit the next/previous track in the song editor." ) );
 	// m_leftRightNav->setShortcuts();
 	nameAndChangeTrackLayout->addWidget(m_leftRightNav);
 
@@ -1360,10 +1325,9 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 	Qt::Alignment widgetAlignment = Qt::AlignHCenter | Qt::AlignCenter;
 
 	// set up volume knob
-	m_volumeKnob = new Knob( knobBright_26, NULL, tr( "Instrument volume" ) );
+	m_volumeKnob = new Knob( knobBright_26, NULL, tr( "Volume" ) );
 	m_volumeKnob->setVolumeKnob( true );
 	m_volumeKnob->setHintText( tr( "Volume:" ), "%" );
-	m_volumeKnob->setWhatsThis( tr( volume_help ) );
 
 	basicControlsLayout->addWidget( m_volumeKnob, 0, 0 );
 	basicControlsLayout->setAlignment( m_volumeKnob, widgetAlignment );
@@ -1419,7 +1383,7 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 
 
 	// setup spinbox for selecting FX-channel
-	m_effectChannelNumber = new fxLineLcdSpinBox( 2, NULL, tr( "FX channel" ) );
+	m_effectChannelNumber = new FxLineLcdSpinBox( 2, NULL, tr( "FX channel" ), m_itv );
 
 	basicControlsLayout->addWidget( m_effectChannelNumber, 0, 6 );
 	basicControlsLayout->setAlignment( m_effectChannelNumber, widgetAlignment );
@@ -1435,9 +1399,6 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 	connect( saveSettingsBtn, SIGNAL( clicked() ), this, SLOT( saveSettingsBtnClicked() ) );
 
 	ToolTip::add( saveSettingsBtn, tr( "Save current instrument track settings in a preset file" ) );
-	saveSettingsBtn->setWhatsThis(
-		tr( "Click here, if you want to save current instrument track settings in a preset file. "
-			"Later you can load this preset by double-clicking it in the preset-browser." ) );
 
 	basicControlsLayout->addWidget( saveSettingsBtn, 0, 7 );
 
@@ -1449,8 +1410,11 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 	generalSettingsLayout->addLayout( basicControlsLayout );
 
 
-	m_tabWidget = new TabWidget( "", this, true );
-	m_tabWidget->setFixedHeight( INSTRUMENT_HEIGHT + GRAPHIC_TAB_HEIGHT - 4 );
+	m_tabWidget = new TabWidget( "", this, true, true );
+	// "-1" :
+	// in "TabWidget::addTab", under "Position tab's window", the widget is
+	// moved up by 1 pixel
+	m_tabWidget->setMinimumHeight( INSTRUMENT_HEIGHT + GRAPHIC_TAB_HEIGHT - 4 - 1 );
 
 
 	// create tab-widgets
@@ -1480,26 +1444,29 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 	m_tabWidget->addTab( m_ssView, tr( "Envelope, filter & LFO" ), "env_lfo_tab", 1 );
 	m_tabWidget->addTab( instrumentFunctions, tr( "Chord stacking & arpeggio" ), "func_tab", 2 );
 	m_tabWidget->addTab( m_effectView, tr( "Effects" ), "fx_tab", 3 );
-	m_tabWidget->addTab( m_midiView, tr( "MIDI settings" ), "midi_tab", 4 );
+	m_tabWidget->addTab( m_midiView, tr( "MIDI" ), "midi_tab", 4 );
 	m_tabWidget->addTab( m_miscView, tr( "Miscellaneous" ), "misc_tab", 5 );
+	adjustTabSize(m_ssView);
+	adjustTabSize(instrumentFunctions);
+	adjustTabSize(m_effectView);
+	adjustTabSize(m_midiView);
+	adjustTabSize(m_miscView);
 
 	// setup piano-widget
 	m_pianoView = new PianoView( this );
-	m_pianoView->setFixedSize( INSTRUMENT_WIDTH, PIANO_HEIGHT );
+	m_pianoView->setMinimumHeight( PIANO_HEIGHT );
+	m_pianoView->setMaximumHeight( PIANO_HEIGHT );
 
 	vlayout->addWidget( generalSettingsWidget );
-	vlayout->addWidget( m_tabWidget );
+	vlayout->addWidget( m_tabWidget, 1 );
 	vlayout->addWidget( m_pianoView );
-
-
 	setModel( _itv->model() );
 
 	updateInstrumentView();
 
-	setFixedWidth( INSTRUMENT_WIDTH );
 	resize( sizeHint() );
 
-	QMdiSubWindow * subWin = gui->mainWindow()->addWindowedWidget( this );
+	QMdiSubWindow* subWin = gui->mainWindow()->addWindowedWidget( this );
 	Qt::WindowFlags flags = subWin->windowFlags();
 	flags |= Qt::MSWindowsFixedSizeDialogHint;
 	flags &= ~Qt::WindowMaximizeButtonHint;
@@ -1512,7 +1479,7 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 	systemMenu->actions().at( 4 )->setVisible( false ); // Maximize
 
 	subWin->setWindowIcon( embed::getIconPixmap( "instrument_track" ) );
-	subWin->setFixedSize( subWin->size() );
+	subWin->setMinimumSize( subWin->size() );
 	subWin->hide();
 }
 
@@ -1543,6 +1510,7 @@ void InstrumentTrackWindow::setInstrumentTrackView( InstrumentTrackView* view )
 	}
 
 	m_itv = view;
+	m_effectChannelNumber->setTrackView(m_itv);
 }
 
 
@@ -1661,6 +1629,9 @@ void InstrumentTrackWindow::updateInstrumentView()
 
 		modelChanged(); 		// Get the instrument window to refresh
 		m_track->dataChanged(); // Get the text on the trackButton to change
+
+		adjustTabSize(m_instrumentView);
+		m_pianoView->setVisible(m_track->m_instrument->hasNoteInput());
 	}
 }
 
@@ -1715,7 +1686,9 @@ void InstrumentTrackWindow::closeEvent( QCloseEvent* event )
 
 void InstrumentTrackWindow::focusInEvent( QFocusEvent* )
 {
-	m_pianoView->setFocus();
+	if(m_pianoView->isVisible()) {
+		m_pianoView->setFocus();
+	}
 }
 
 
@@ -1744,7 +1717,7 @@ void InstrumentTrackWindow::dropEvent( QDropEvent* event )
 
 	if( type == "instrument" )
 	{
-		m_track->loadInstrument( value );
+		m_track->loadInstrument( value, nullptr, true /* DnD */ );
 
 		Engine::getSong()->setModified();
 
@@ -1770,7 +1743,9 @@ void InstrumentTrackWindow::dropEvent( QDropEvent* event )
 
 		if( !i->descriptor()->supportsFileType( ext ) )
 		{
-			i = m_track->loadInstrument( pluginFactory->pluginSupportingExtension(ext).name() );
+			PluginFactory::PluginInfoAndKey piakn =
+				pluginFactory->pluginSupportingExtension(ext);
+			i = m_track->loadInstrument(piakn.info.name(), &piakn.key);
 		}
 
 		i->loadFile( value );
@@ -1847,7 +1822,11 @@ void InstrumentTrackWindow::viewInstrumentInDirection(int d)
 
 		// scroll the SongEditor/BB-editor to make sure the new trackview label is visible
 		bringToFront->trackContainerView()->scrollToTrackView(bringToFront);
+
+		// get the instrument window to refresh
+		modelChanged();
 	}
+	Q_ASSERT(bringToFront);
 	bringToFront->getInstrumentTrackWindow()->setFocus();
 }
 
@@ -1858,6 +1837,14 @@ void InstrumentTrackWindow::viewNextInstrument()
 void InstrumentTrackWindow::viewPrevInstrument()
 {
 	viewInstrumentInDirection(-1);
+}
+
+void InstrumentTrackWindow::adjustTabSize(QWidget *w)
+{
+	// "-1" :
+	// in "TabWidget::addTab", under "Position tab's window", the widget is
+	// moved up by 1 pixel
+	w->setMinimumSize(INSTRUMENT_WIDTH - 4, INSTRUMENT_HEIGHT - 4 - 1);
 }
 
 #include "InstrumentTrack.moc"

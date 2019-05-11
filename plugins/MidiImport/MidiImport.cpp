@@ -44,8 +44,10 @@
 #include "MainWindow.h"
 #include "MidiTime.h"
 #include "debug.h"
-#include "embed.h"
 #include "Song.h"
+
+#include "embed.h"
+#include "plugin_export.h"
 
 #include "portsmf/allegro.h"
 
@@ -105,7 +107,7 @@ bool MidiImport::tryImport( TrackContainer* tc )
 	{
 		QMessageBox::information( gui->mainWindow(),
 			tr( "Setup incomplete" ),
-			tr( "You do not have set up a default soundfont in "
+			tr( "You have not set up a default soundfont in "
 				"the settings dialog (Edit->Settings). "
 				"Therefore no sound will be played back after "
 				"importing this MIDI file. You should download "
@@ -426,7 +428,7 @@ bool MidiImport::readSMF( TrackContainer* tc )
 				Note n( (ticks < 1 ? 1 : ticks ),
 						noteEvt->get_start_time() * ticksPerBeat,
 						noteEvt->get_identifier() - 12,
-						noteEvt->get_loud());
+						noteEvt->get_loud() * (200.f / 127.f)); // Map from MIDI velocity to LMMS volume
 				ch->addNote( n );
 				
 			}
@@ -616,7 +618,7 @@ extern "C"
 {
 
 // necessary for getting instance out of shared lib
-Plugin * PLUGIN_EXPORT lmms_plugin_main( Model *, void * _data )
+PLUGIN_EXPORT Plugin * lmms_plugin_main( Model *, void * _data )
 {
 	return new MidiImport( QString::fromUtf8(
 									static_cast<const char *>( _data ) ) );

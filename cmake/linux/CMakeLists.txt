@@ -14,5 +14,6 @@ ADD_CUSTOM_TARGET(removeappimage
 ADD_CUSTOM_TARGET(appimage 
 	COMMAND chmod +x "${CMAKE_BINARY_DIR}/package_linux.sh"
 	COMMAND "${CMAKE_BINARY_DIR}/package_linux.sh"
-	COMMENT "Generating AppImage")
+	COMMENT "Generating AppImage"
+	WORKING_DIRECTORY "${CMAKE_BINARY_DIR}")
 ADD_DEPENDENCIES(appimage removeappimage)

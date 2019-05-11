@@ -70,7 +70,6 @@ private slots:
 	// general settings widget
 	void setBufferSize( int _value );
 	void resetBufSize();
-	void displayBufSizeHelp();
 
 	// path settings widget
 	void setWorkingDir( const QString & _wd );
@@ -86,15 +85,12 @@ private slots:
 	// performance settings widget
 	void setAutoSaveInterval( int time );
 	void resetAutoSave();
-	void displaySaveIntervalHelp();
 
 	// audio settings widget
 	void audioInterfaceChanged( const QString & _driver );
-	void displayAudioHelp();
 
 	// MIDI settings widget
 	void midiInterfaceChanged( const QString & _driver );
-	void displayMIDIHelp();
 
 
 	void toggleToolTips( bool _enabled );
@@ -126,6 +122,9 @@ private slots:
 	void toggleDisplayWaveform( bool en );
 	void toggleDisableAutoquit( bool en );
 
+	void vstEmbedMethodChanged();
+	void toggleVSTAlwaysOnTop( bool en );
+
 	void setLanguage( int lang );
 
 
@@ -142,6 +141,7 @@ private:
 	bool m_MMPZ;
 	bool m_disableBackup;
 	bool m_openLastProject;
+	bool m_NaNHandler;
 	bool m_hqAudioDev;
 	QString m_lang;
 	QStringList m_languages;
@@ -206,6 +206,8 @@ private:
 
 	QComboBox* m_vstEmbedComboBox;
 	QString m_vstEmbedMethod;
+	LedCheckBox * m_vstAlwaysOnTopCheckBox;
+	bool m_vstAlwaysOnTop;
 } ;
 
 

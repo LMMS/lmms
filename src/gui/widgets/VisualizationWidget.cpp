@@ -58,8 +58,7 @@ VisualizationWidget::VisualizationWidget( const QPixmap & _bg, QWidget * _p,
 	BufferManager::clear( m_buffer, frames );
 
 
-	ToolTip::add( this, tr( "click to enable/disable visualization of "
-							"master-output" ) );
+	ToolTip::add( this, tr( "Oscilloscope" ) );
 }
 
 
@@ -157,10 +156,8 @@ void VisualizationWidget::paintEvent( QPaintEvent * )
 		float master_output = mixer->masterGain();
 
 		const fpp_t frames = mixer->framesPerPeriod();
-		float peakLeft;
-		float peakRight;
-		mixer->getPeakValues( m_buffer, frames, peakLeft, peakRight );
-		const float max_level = qMax<float>( peakLeft, peakRight );
+		Mixer::StereoSample peakValues = mixer->getPeakValues(m_buffer, frames);
+		const float max_level = qMax<float>( peakValues.left, peakValues.right );
 
 		// Set the color of the line according to the maximum level
 		float const maxLevelWithAppliedMasterGain = max_level * master_output;

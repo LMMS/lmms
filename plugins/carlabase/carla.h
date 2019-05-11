@@ -26,7 +26,9 @@
 #define CARLA_H
 
 #include <QtCore/QMutex>
+#include "plugin_export.h"
 
+#include "CarlaNative.h"
 #define REAL_BUILD // FIXME this shouldn't be needed
 #if CARLA_VERSION_HEX >= 0x010911
     #include "CarlaNativePlugin.h"

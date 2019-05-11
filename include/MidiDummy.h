@@ -46,12 +46,12 @@ public:
 
 	inline static QString probeDevice()
 	{
-		return QString::Null(); // no midi device name
+		return QString(); // no midi device name
 	}
 
 	inline static QString configSection()
 	{
-		return QString::Null(); // no configuration settings
+		return QString(); // no configuration settings
 	}
 
 

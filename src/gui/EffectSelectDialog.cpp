@@ -27,6 +27,7 @@
 #include "ui_EffectSelectDialog.h"
 
 #include "gui_templates.h"
+#include "DummyEffect.h"
 #include "embed.h"
 #include "PluginFactory.h"
 
@@ -53,11 +54,6 @@ EffectSelectDialog::EffectSelectDialog( QWidget * _parent ) :
 		if( desc->subPluginFeatures )
 		{
 			desc->subPluginFeatures->listSubPluginKeys(
-				// as iterators are always stated to be not
-				// equal with pointers, we dereference the
-				// iterator and take the address of the item,
-				// so we're on the safe side and the compiler
-				// likely will reduce that to just "it"
 							desc,
 							subPluginEffectKeys );
 		}
@@ -79,14 +75,14 @@ EffectSelectDialog::EffectSelectDialog( QWidget * _parent ) :
 	{
 		QString name;
 		QString type;
-		if( ( *it ).desc->subPluginFeatures )
+		if( it->desc->subPluginFeatures )
 		{
-			name = ( *it ).name;
-			type = ( *it ).desc->displayName;
+			name = it->displayName();
+			type = it->desc->displayName;
 		}
 		else
 		{
-			name = ( *it ).desc->displayName;
+			name = it->desc->displayName;
 			type = "LMMS";
 		}
 		m_sourceModel.setItem( row, 0, new QStandardItem( name ) );
@@ -120,21 +116,15 @@ EffectSelectDialog::EffectSelectDialog( QWidget * _parent ) :
 	connect( ui->buttonBox, SIGNAL( accepted() ),
 				this, SLOT( acceptSelection() ) );
 
-#if QT_VERSION >= 0x050000
-#define setResizeMode setSectionResizeMode
 	ui->filterEdit->setClearButtonEnabled( true );
-#endif
-	ui->pluginList->verticalHeader()->setResizeMode(
+	ui->pluginList->verticalHeader()->setSectionResizeMode(
 						QHeaderView::ResizeToContents );
 	ui->pluginList->verticalHeader()->hide();
-	ui->pluginList->horizontalHeader()->setResizeMode( 0,
+	ui->pluginList->horizontalHeader()->setSectionResizeMode( 0,
 							QHeaderView::Stretch );
-	ui->pluginList->horizontalHeader()->setResizeMode( 1,
+	ui->pluginList->horizontalHeader()->setSectionResizeMode( 1,
 						QHeaderView::ResizeToContents );
 	ui->pluginList->sortByColumn( 0, Qt::AscendingOrder );
-#if QT_VERSION >= 0x050000
-#undef setResizeMode
-#endif
 
 	updateSelection();
 	show();
@@ -153,12 +143,17 @@ EffectSelectDialog::~EffectSelectDialog()
 
 Effect * EffectSelectDialog::instantiateSelectedPlugin( EffectChain * _parent )
 {
-	if( !m_currentSelection.name.isEmpty() && m_currentSelection.desc )
+	Effect* result = nullptr;
+	if(!m_currentSelection.name.isEmpty() && m_currentSelection.desc)
 	{
-		return Effect::instantiate( m_currentSelection.desc->name,
-										_parent, &m_currentSelection );
+		result = Effect::instantiate(m_currentSelection.desc->name,
+										_parent, &m_currentSelection);
 	}
-	return NULL;
+	if(!result)
+	{
+		result = new DummyEffect(_parent, QDomElement());
+	}
+	return result;
 }
 
 
@@ -190,62 +185,63 @@ void EffectSelectDialog::rowChanged( const QModelIndex & _idx,
 	{
 		m_currentSelection = m_effectKeys[m_model.mapToSource( _idx ).row()];
 	}
-    if( m_currentSelection.desc )
+	if( m_currentSelection.desc )
 	{
 		m_descriptionWidget = new QWidget;
 
-        QHBoxLayout *hbox = new QHBoxLayout( m_descriptionWidget );
+		QHBoxLayout *hbox = new QHBoxLayout( m_descriptionWidget );
 
-        Plugin::Descriptor const & descriptor = *( m_currentSelection.desc );
+		Plugin::Descriptor const & descriptor = *( m_currentSelection.desc );
 
-        if ( descriptor.logo )
-        {
-            QLabel *logoLabel = new QLabel( m_descriptionWidget );
-            logoLabel->setPixmap( descriptor.logo->pixmap() );
-            logoLabel->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+		const PixmapLoader* pixLoa = m_currentSelection.logo();
+		if (pixLoa)
+		{
+			QLabel *logoLabel = new QLabel( m_descriptionWidget );
+			logoLabel->setPixmap(pixLoa->pixmap());
+			logoLabel->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
 
-            hbox->addWidget( logoLabel );
-            hbox->setAlignment( logoLabel, Qt::AlignTop);
-        }
+			hbox->addWidget( logoLabel );
+			hbox->setAlignment( logoLabel, Qt::AlignTop);
+		}
 
-        QWidget *textualInfoWidget = new QWidget( m_descriptionWidget );
+		QWidget *textualInfoWidget = new QWidget( m_descriptionWidget );
 
-        hbox->addWidget(textualInfoWidget);
+		hbox->addWidget(textualInfoWidget);
 
-        QVBoxLayout * textWidgetLayout = new QVBoxLayout( textualInfoWidget);
-        textWidgetLayout->setMargin( 4 );
-        textWidgetLayout->setSpacing( 0 );
+		QVBoxLayout * textWidgetLayout = new QVBoxLayout( textualInfoWidget);
+		textWidgetLayout->setMargin( 4 );
+		textWidgetLayout->setSpacing( 0 );
 
-        if ( m_currentSelection.desc->subPluginFeatures )
-        {
-            QWidget *subWidget = new QWidget(textualInfoWidget);
-            QVBoxLayout * subLayout = new QVBoxLayout( subWidget );
-            subLayout->setMargin( 4 );
-            subLayout->setSpacing( 0 );
-            m_currentSelection.desc->subPluginFeatures->
-                fillDescriptionWidget( subWidget, &m_currentSelection );
-            for( QWidget * w : subWidget->findChildren<QWidget *>() )
-            {
-                if( w->parent() == subWidget )
-                {
-                    subLayout->addWidget( w );
-                }
-            }
+		if ( m_currentSelection.desc->subPluginFeatures )
+		{
+			QWidget *subWidget = new QWidget(textualInfoWidget);
+			QVBoxLayout * subLayout = new QVBoxLayout( subWidget );
+			subLayout->setMargin( 4 );
+			subLayout->setSpacing( 0 );
+			m_currentSelection.desc->subPluginFeatures->
+			fillDescriptionWidget( subWidget, &m_currentSelection );
+			for( QWidget * w : subWidget->findChildren<QWidget *>() )
+			{
+				if( w->parent() == subWidget )
+				{
+					subLayout->addWidget( w );
+				}
+			}
 
-            textWidgetLayout->addWidget(subWidget);
-        }
-        else
-        {
-            QLabel *label = new QLabel(m_descriptionWidget);
-            QString labelText = "<p><b>" + tr("Name") + ":</b> " + QString::fromUtf8(descriptor.displayName) + "</p>";
-            labelText += "<p><b>" + tr("Description") + ":</b> " + qApp->translate( "pluginBrowser", descriptor.description ) + "</p>";
-            labelText += "<p><b>" + tr("Author") + ":</b> " + QString::fromUtf8(descriptor.author) + "</p>";
+			textWidgetLayout->addWidget(subWidget);
+		}
+		else
+		{
+			QLabel *label = new QLabel(m_descriptionWidget);
+			QString labelText = "<p><b>" + tr("Name") + ":</b> " + QString::fromUtf8(descriptor.displayName) + "</p>";
+			labelText += "<p><b>" + tr("Description") + ":</b> " + qApp->translate( "pluginBrowser", descriptor.description ) + "</p>";
+			labelText += "<p><b>" + tr("Author") + ":</b> " + QString::fromUtf8(descriptor.author) + "</p>";
 
-            label->setText(labelText);
-            textWidgetLayout->addWidget(label);
-        }
+			label->setText(labelText);
+			textWidgetLayout->addWidget(label);
+		}
 
-        ui->scrollArea->setWidget( m_descriptionWidget );
+		ui->scrollArea->setWidget( m_descriptionWidget );
 		m_descriptionWidget->show();
 	}
 }

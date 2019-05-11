@@ -70,7 +70,6 @@ private:
 } ;
 
 
-typedef BoolModel groupBoxModel;
 
 
 #endif

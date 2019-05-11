@@ -47,6 +47,7 @@
 #include "Mixer.h"
 #include "gui_templates.h"
 #include "InstrumentTrack.h"
+#include "SampleTrack.h"
 #include "Song.h"
 #include "BBTrackContainer.h"
 
@@ -131,7 +132,7 @@ FxMixerView::FxMixerView() :
 	ml->addWidget( channelArea, 1, Qt::AlignTop );
 
 	// show the add new effect channel button
-	QPushButton * newChannelBtn = new QPushButton( embed::getIconPixmap( "new_channel" ), QString::null, this );
+	QPushButton * newChannelBtn = new QPushButton( embed::getIconPixmap( "new_channel" ), QString(), this );
 	newChannelBtn->setObjectName( "newChannelBtn" );
 	newChannelBtn->setFixedSize( fxLineSize );
 	connect( newChannelBtn, SIGNAL( clicked() ), this, SLOT( addNewChannel() ) );
@@ -251,6 +252,12 @@ void FxMixerView::updateMaxChannelSelector()
 				inst->effectChannelModel()->setRange(0,
 					m_fxChannelViews.size()-1,1);
 			}
+			else if( trackList[i]->type() == Track::SampleTrack )
+			{
+				SampleTrack * strk = (SampleTrack *) trackList[i];
+				strk->effectChannelModel()->setRange(0,
+					m_fxChannelViews.size()-1,1);
+			}
 		}
 	}
 }
@@ -306,7 +313,7 @@ FxMixerView::FxChannelView::FxChannelView(QWidget * _parent, FxMixerView * _mv,
 	m_soloBtn->setCheckable( true );
 	m_soloBtn->move( 9,  m_fader->y()-21);
 	connect(&fxChannel->m_soloModel, SIGNAL( dataChanged() ),
-			_mv, SLOT ( toggledSolo() ) );
+			_mv, SLOT ( toggledSolo() ), Qt::DirectConnection );
 	ToolTip::add( m_soloBtn, tr( "Solo FX channel" ) );
 
 	// Create EffectRack for the channel
@@ -493,6 +500,12 @@ void FxMixerView::moveChannelRight(int index)
 }
 
 
+void FxMixerView::renameChannel(int index)
+{
+	m_fxChannelViews[index]->m_fxLine->renameChannel();
+}
+
+
 
 void FxMixerView::keyPressEvent(QKeyEvent * e)
 {
@@ -528,6 +541,11 @@ void FxMixerView::keyPressEvent(QKeyEvent * e)
 			{
 				addNewChannel();
 			}
+			break;
+		case Qt::Key_Enter:
+		case Qt::Key_Return:
+		case Qt::Key_F2:
+			renameChannel( m_currentFxLine->channelIndex() );
 			break;
 	}
 }

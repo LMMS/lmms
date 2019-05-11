@@ -34,12 +34,12 @@
 class automatableButtonGroup;
 
 
-class EXPORT AutomatableButton : public QPushButton, public BoolModelView
+class LMMS_EXPORT AutomatableButton : public QPushButton, public BoolModelView
 {
 	Q_OBJECT
 public:
 	AutomatableButton( QWidget * _parent, const QString & _name
-			= QString::null );
+			= QString() );
 	virtual ~AutomatableButton();
 
 	inline void setCheckable( bool _on )
@@ -79,12 +79,12 @@ private:
 
 
 
-class EXPORT automatableButtonGroup : public QWidget, public IntModelView
+class LMMS_EXPORT automatableButtonGroup : public QWidget, public IntModelView
 {
 	Q_OBJECT
 public:
 	automatableButtonGroup( QWidget * _parent, const QString & _name
-			= QString::null );
+			= QString() );
 	virtual ~automatableButtonGroup();
 
 	void addButton( AutomatableButton * _btn );

@@ -40,16 +40,6 @@ AutomationTrack::AutomationTrack( TrackContainer* tc, bool _hidden ) :
 	setName( tr( "Automation track" ) );
 }
 
-
-
-
-AutomationTrack::~AutomationTrack()
-{
-}
-
-
-
-
 bool AutomationTrack::play( const MidiTime & time_start, const fpp_t _frames,
 							const f_cnt_t _frame_base, int _tco_num )
 {
@@ -107,16 +97,6 @@ AutomationTrackView::AutomationTrackView( AutomationTrack * _at, TrackContainerV
 	tlb->show();
 	setModel( _at );
 }
-
-
-
-
-AutomationTrackView::~AutomationTrackView()
-{
-}
-
-
-
 
 void AutomationTrackView::dragEnterEvent( QDragEnterEvent * _dee )
 {

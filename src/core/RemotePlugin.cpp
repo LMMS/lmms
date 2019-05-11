@@ -33,6 +33,7 @@
 #include "Mixer.h"
 #include "Engine.h"
 
+#include <QDebug>
 #include <QDir>
 
 #ifndef SYNC_WITH_SHM_FIFO
@@ -65,6 +66,7 @@ void ProcessWatcher::run()
 	{
 		fprintf( stderr,
 				"remote plugin died! invalidating now.\n" );
+
 		m_plugin->invalidate();
 	}
 }
@@ -81,7 +83,6 @@ RemotePlugin::RemotePlugin() :
 	RemotePluginBase(),
 #endif
 	m_failed( true ),
-	m_process(),
 	m_watcher( this ),
 	m_commMutex( QMutex::Recursive ),
 	m_splitChannels( false ),
@@ -123,8 +124,12 @@ RemotePlugin::RemotePlugin() :
 		qWarning( "Unable to start the server." );
 	}
 #endif
+
 	connect( &m_process, SIGNAL( finished( int, QProcess::ExitStatus ) ),
 		this, SLOT( processFinished( int, QProcess::ExitStatus ) ),
+		Qt::DirectConnection );
+	connect( &m_process, SIGNAL( errorOccurred( QProcess::ProcessError ) ),
+			 this, SLOT( processErrored( QProcess::ProcessError ) ),
 		Qt::DirectConnection );
 	connect( &m_process, SIGNAL( finished( int, QProcess::ExitStatus ) ),
 		&m_watcher, SLOT( quit() ), Qt::DirectConnection );
@@ -204,6 +209,7 @@ bool RemotePlugin::init(const QString &pluginExecutable,
 		qWarning( "Remote plugin '%s' not found.",
 						exec.toUtf8().constData() );
 		m_failed = true;
+		invalidate();
 		unlock();
 		return failed();
 	}
@@ -466,9 +472,22 @@ void RemotePlugin::resizeSharedProcessingMemory()
 void RemotePlugin::processFinished( int exitCode,
 					QProcess::ExitStatus exitStatus )
 {
+	if ( exitStatus == QProcess::CrashExit )
+	{
+		qCritical() << "Remote plugin crashed";
+	}
+	else if ( exitCode )
+	{
+		qCritical() << "Remote plugin exit code: " << exitCode;
+	}
 #ifndef SYNC_WITH_SHM_FIFO
 	invalidate();
 #endif
+}
+
+void RemotePlugin::processErrored( QProcess::ProcessError err )
+{
+	qCritical() << "Process error: " << err;
 }
 
 

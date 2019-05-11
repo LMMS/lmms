@@ -28,7 +28,7 @@
 #define EXPORT_PROJECT_DIALOG_H
 
 #include <QDialog>
-#include <vector>
+#include <memory>
 #include "ui_export_project.h"
 
 #include "ProjectRenderer.h"
@@ -39,8 +39,6 @@ class ExportProjectDialog : public QDialog, public Ui::ExportProjectDialog
 	Q_OBJECT
 public:
 	ExportProjectDialog( const QString & _file_name, QWidget * _parent, bool multi_export );
-	virtual ~ExportProjectDialog();
-
 
 protected:
 	virtual void reject( void );
@@ -62,7 +60,7 @@ private:
 	bool m_multiExport;
 
 	ProjectRenderer::ExportFileFormats m_ft;
-	RenderManager* m_renderManager;
+	std::unique_ptr<RenderManager> m_renderManager;
 } ;
 
 #endif

@@ -36,7 +36,6 @@
 #include "LcdSpinBox.h"
 #include "MidiClient.h"
 #include "Mixer.h"
-#include "ToolTip.h"
 #include "InstrumentTrack.h"
 #include "LedCheckbox.h"
 
@@ -146,7 +145,7 @@ InstrumentMidiIOView::InstrumentMidiIOView( QWidget* parent ) :
 	baseVelocityLayout->setContentsMargins( 8, 18, 8, 8 );
 	baseVelocityLayout->setSpacing( 6 );
 
-	QLabel* baseVelocityHelp = new QLabel( tr( "Specify the velocity normalization base for MIDI-based instruments at 100% note velocity" ) );
+	QLabel* baseVelocityHelp = new QLabel( tr( "Specify the velocity normalization base for MIDI-based instruments at 100% note velocity." ) );
 	baseVelocityHelp->setWordWrap( true );
     baseVelocityHelp->setFont( pointSize<8>( baseVelocityHelp->font() ) );
 
@@ -213,7 +212,7 @@ InstrumentMiscView::InstrumentMiscView(InstrumentTrack *it, QWidget *parent) :
 	layout->addWidget( m_pitchGroupBox );
 	QHBoxLayout* masterPitchLayout = new QHBoxLayout( m_pitchGroupBox );
 	masterPitchLayout->setContentsMargins( 8, 18, 8, 8 );
-	QLabel *tlabel = new QLabel(tr( "Enables the use of Master Pitch" ) );
+	QLabel *tlabel = new QLabel(tr( "Enables the use of master pitch" ) );
 	m_pitchGroupBox->setModel( &it->m_useMasterPitchModel );
 	masterPitchLayout->addWidget( tlabel );
 	layout->addStretch();

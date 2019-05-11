@@ -41,7 +41,9 @@
 #include "Song.h"
 #include "interpolation.h"
 
-#include "embed.cpp"
+#include "embed.h"
+
+#include "plugin_export.h"
 
 extern "C"
 {
@@ -138,7 +140,7 @@ sample_t bSynth::nextStringSample()
 
 bitInvader::bitInvader( InstrumentTrack * _instrument_track ) :
 	Instrument( _instrument_track, &bitinvader_plugin_descriptor ),
-	m_sampleLength( 128, 4, 200, 1, this, tr( "Samplelength" ) ),
+	m_sampleLength( 128, 4, 200, 1, this, tr( "Sample length" ) ),
 	m_graph( -1.0f, 1.0f, 128, this ),
 	m_interpolation( false, this ),
 	m_normalize( false, this )
@@ -336,7 +338,7 @@ bitInvaderView::bitInvaderView( Instrument * _instrument,
 	
 	m_sampleLengthKnob = new Knob( knobDark_28, this );
 	m_sampleLengthKnob->move( 6, 201 );
-	m_sampleLengthKnob->setHintText( tr( "Sample Length" ), "" );
+	m_sampleLengthKnob->setHintText( tr( "Sample length" ), "" );
 
 	m_graph = new Graph( this, Graph::NearestStyle, 204, 134 );
 	m_graph->move(23,59);	// 55,120 - 2px border
@@ -361,7 +363,7 @@ bitInvaderView::bitInvaderView( Instrument * _instrument,
 	m_sinWaveBtn->setInactiveGraphic( embed::getIconPixmap(
 						"sin_wave_inactive" ) );
 	ToolTip::add( m_sinWaveBtn,
-			tr( "Click for a sine-wave." ) );
+			tr( "Sine wave" ) );
 
 	m_triangleWaveBtn = new PixmapButton( this, tr( "Triangle wave" ) );
 	m_triangleWaveBtn->move( 131 + 14, 205 );
@@ -370,7 +372,7 @@ bitInvaderView::bitInvaderView( Instrument * _instrument,
 	m_triangleWaveBtn->setInactiveGraphic(
 		embed::getIconPixmap( "triangle_wave_inactive" ) );
 	ToolTip::add( m_triangleWaveBtn,
-			tr( "Click here for a triangle-wave." ) );
+			tr( "Triangle wave" ) );
 
 	m_sawWaveBtn = new PixmapButton( this, tr( "Saw wave" ) );
 	m_sawWaveBtn->move( 131 + 14*2, 205  );
@@ -379,7 +381,7 @@ bitInvaderView::bitInvaderView( Instrument * _instrument,
 	m_sawWaveBtn->setInactiveGraphic( embed::getIconPixmap(
 						"saw_wave_inactive" ) );
 	ToolTip::add( m_sawWaveBtn,
-			tr( "Click here for a saw-wave." ) );
+			tr( "Saw wave" ) );
 
 	m_sqrWaveBtn = new PixmapButton( this, tr( "Square wave" ) );
 	m_sqrWaveBtn->move( 131 + 14*3, 205 );
@@ -388,35 +390,35 @@ bitInvaderView::bitInvaderView( Instrument * _instrument,
 	m_sqrWaveBtn->setInactiveGraphic( embed::getIconPixmap(
 					"square_wave_inactive" ) );
 	ToolTip::add( m_sqrWaveBtn,
-			tr( "Click here for a square-wave." ) );
+			tr( "Square wave" ) );
 
 	m_whiteNoiseWaveBtn = new PixmapButton( this,
-					tr( "White noise wave" ) );
+					tr( "White noise" ) );
 	m_whiteNoiseWaveBtn->move( 131 + 14*4, 205 );
 	m_whiteNoiseWaveBtn->setActiveGraphic(
 		embed::getIconPixmap( "white_noise_wave_active" ) );
 	m_whiteNoiseWaveBtn->setInactiveGraphic(
 		embed::getIconPixmap( "white_noise_wave_inactive" ) );
 	ToolTip::add( m_whiteNoiseWaveBtn,
-			tr( "Click here for white-noise." ) );
+			tr( "White noise" ) );
 
-	m_usrWaveBtn = new PixmapButton( this, tr( "User defined wave" ) );
+	m_usrWaveBtn = new PixmapButton( this, tr( "User-defined wave" ) );
 	m_usrWaveBtn->move( 131 + 14*5, 205 );
 	m_usrWaveBtn->setActiveGraphic( embed::getIconPixmap(
 						"usr_wave_active" ) );
 	m_usrWaveBtn->setInactiveGraphic( embed::getIconPixmap(
 						"usr_wave_inactive" ) );
 	ToolTip::add( m_usrWaveBtn,
-			tr( "Click here for a user-defined shape." ) );
+			tr( "User-defined wave" ) );
 
-	m_smoothBtn = new PixmapButton( this, tr( "Smooth" ) );
+	m_smoothBtn = new PixmapButton( this, tr( "Smooth waveform" ) );
 	m_smoothBtn->move( 131 + 14*6, 205 );
 	m_smoothBtn->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
 						"smooth_active" ) );
 	m_smoothBtn->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
 						"smooth_inactive" ) );
 	ToolTip::add( m_smoothBtn,
-			tr( "Click here to smooth waveform." ) );
+			tr( "Smooth waveform" ) );
 
 
 	m_interpolationToggle = new LedCheckBox( "Interpolation", this,
@@ -472,6 +474,7 @@ void bitInvaderView::modelChanged()
 
 void bitInvaderView::sinWaveClicked()
 {
+	m_graph->model()->clearInvisible();
 	m_graph->model()->setWaveToSine();
 	Engine::getSong()->setModified();
 }
@@ -481,6 +484,7 @@ void bitInvaderView::sinWaveClicked()
 
 void bitInvaderView::triangleWaveClicked()
 {
+	m_graph->model()->clearInvisible();
 	m_graph->model()->setWaveToTriangle();
 	Engine::getSong()->setModified();
 }
@@ -490,6 +494,7 @@ void bitInvaderView::triangleWaveClicked()
 
 void bitInvaderView::sawWaveClicked()
 {
+	m_graph->model()->clearInvisible();
 	m_graph->model()->setWaveToSaw();
 	Engine::getSong()->setModified();
 }
@@ -499,6 +504,7 @@ void bitInvaderView::sawWaveClicked()
 
 void bitInvaderView::sqrWaveClicked()
 {
+	m_graph->model()->clearInvisible();
 	m_graph->model()->setWaveToSquare();
 	Engine::getSong()->setModified();
 }
@@ -508,6 +514,7 @@ void bitInvaderView::sqrWaveClicked()
 
 void bitInvaderView::noiseWaveClicked()
 {
+	m_graph->model()->clearInvisible();
 	m_graph->model()->setWaveToNoise();
 	Engine::getSong()->setModified();
 }
@@ -518,35 +525,12 @@ void bitInvaderView::noiseWaveClicked()
 void bitInvaderView::usrWaveClicked()
 {
 	QString fileName = m_graph->model()->setWaveToUser();
-	ToolTip::add( m_usrWaveBtn, fileName );
-	Engine::getSong()->setModified();
-	/*
-	m_graph->model()->setWaveToNoise();
-	Engine::getSong()->setModified();
-	// zero sample_shape
-	for (int i = 0; i < sample_length; i++)
+	if (!fileName.isEmpty())
 	{
-		sample_shape[i] = 0;
+		ToolTip::add(m_usrWaveBtn, fileName);
+		m_graph->model()->clearInvisible();
+		Engine::getSong()->setModified();
 	}
-
-	// load user shape
-	sampleBuffer buffer;
-	QString af = buffer.openAudioFile();
-	if ( af != "" )
-	{
-		buffer.setAudioFile( af );
-		
-		// copy buffer data
-		sample_length = min( sample_length, static_cast<int>(
-							buffer.frames() ) );
-		for ( int i = 0; i < sample_length; i++ )
-		{
-			sample_shape[i] = (float)*buffer.data()[i];
-		}
-	}
-
-	sampleChanged();
-	*/
 }
 
 
@@ -582,9 +566,9 @@ extern "C"
 {
 
 // necessary for getting instance out of shared lib
-Plugin * PLUGIN_EXPORT lmms_plugin_main( Model *, void * _data )
+PLUGIN_EXPORT Plugin * lmms_plugin_main( Model *m, void * )
 {
-	return( new bitInvader( static_cast<InstrumentTrack *>( _data ) ) );
+	return( new bitInvader( static_cast<InstrumentTrack *>( m ) ) );
 }
 
 

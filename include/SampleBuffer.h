@@ -31,7 +31,7 @@
 
 #include <samplerate.h>
 
-#include "export.h"
+#include "lmms_export.h"
 #include "interpolation.h"
 #include "lmms_basics.h"
 #include "lmms_math.h"
@@ -48,7 +48,7 @@ class QRect;
 // may need to be higher - conversely, to optimize, some may work with lower values
 const f_cnt_t MARGIN[] = { 64, 64, 64, 4, 4 };
 
-class EXPORT SampleBuffer : public QObject, public sharedObject
+class LMMS_EXPORT SampleBuffer : public QObject, public sharedObject
 {
 	Q_OBJECT
 	MM_OPERATORS
@@ -58,7 +58,7 @@ public:
 		LoopOn,
 		LoopPingPong
 	};
-	class EXPORT handleState
+	class LMMS_EXPORT handleState
 	{
 		MM_OPERATORS
 	public:
@@ -103,12 +103,12 @@ public:
 	} ;
 
 
+	SampleBuffer();
 	// constructor which either loads sample _audio_file or decodes
 	// base64-data out of string
-	SampleBuffer( const QString & _audio_file = QString(),
-						bool _is_base64_data = false );
+	SampleBuffer( const QString & _audio_file, bool _is_base64_data = false );
 	SampleBuffer( const sampleFrame * _data, const f_cnt_t _frames );
-	SampleBuffer( const f_cnt_t _frames );
+	explicit SampleBuffer( const f_cnt_t _frames );
 
 	virtual ~SampleBuffer();
 

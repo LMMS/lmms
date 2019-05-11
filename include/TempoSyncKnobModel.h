@@ -30,9 +30,10 @@
 
 class QAction;
 
-class EXPORT TempoSyncKnobModel : public FloatModel
+class LMMS_EXPORT TempoSyncKnobModel : public FloatModel
 {
 	Q_OBJECT
+	MODEL_IS_VISITABLE
 public:
 	enum TempoSyncMode
 	{

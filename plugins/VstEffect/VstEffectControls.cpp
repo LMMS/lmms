@@ -90,13 +90,8 @@ void VstEffectControls::loadSettings( const QDomElement & _this )
 				knobFModel[ i ]->setInitValue(LocaleHelper::toFloat(s_dumpValues.at(2)));
 			}
 
-#if QT_VERSION < 0x050000
-			connect( knobFModel[i], SIGNAL( dataChanged( Model * ) ),
-				this, SLOT( setParameter( Model * ) ), Qt::DirectConnection );
-#else
 			connect( knobFModel[i], &FloatModel::dataChanged, this,
 				[this, i]() { setParameter( knobFModel[i] ); }, Qt::DirectConnection);
-#endif
 		}
 
 	}
@@ -214,18 +209,16 @@ void VstEffectControls::updateMenu( void )
      		QMenu * to_menu = m_selPresetButton->menu();
     		to_menu->clear();
 
-    		QAction *presetActions[list1.size()];
-
      		for (int i = 0; i < list1.size(); i++) {
-			presetActions[i] = new QAction(this);
-			connect(presetActions[i], SIGNAL(triggered()), this, SLOT(selPreset()));
+			QAction* presetAction = new QAction(this);
+			connect(presetAction, SIGNAL(triggered()), this, SLOT(selPreset()));
 
-        		presetActions[i]->setText(QString("%1. %2").arg(QString::number(i+1), list1.at(i)));
-        		presetActions[i]->setData(i);
+        		presetAction->setText(QString("%1. %2").arg(QString::number(i+1), list1.at(i)));
+        		presetAction->setData(i);
 			if (i == lastPosInMenu) {
-        			presetActions[i]->setIcon(embed::getIconPixmap( "sample_file", 16, 16 ));
-			} else  presetActions[i]->setIcon(embed::getIconPixmap( "edit_copy", 16, 16 ));
-			to_menu->addAction( presetActions[i] );
+        			presetAction->setIcon(embed::getIconPixmap( "sample_file", 16, 16 ));
+			} else  presetAction->setIcon(embed::getIconPixmap( "edit_copy", 16, 16 ));
+			to_menu->addAction( presetAction );
      		}
 
 	}
@@ -329,19 +322,15 @@ manageVSTEffectView::manageVSTEffectView( VstEffect * _eff, VstEffectControls * 
 	l->setVerticalSpacing( 10 );
 	l->setHorizontalSpacing( 23 );
 
-	m_syncButton = new QPushButton( tr( "VST Sync" ), widget );
+	m_syncButton = new QPushButton( tr( "VST sync" ), widget );
 	connect( m_syncButton, SIGNAL( clicked() ), this,
 							SLOT( syncPlugin() ) );
-	m_syncButton->setWhatsThis(
-		tr( "Click here if you want to synchronize all parameters with VST plugin." ) );
 
 	l->addWidget( m_syncButton, 0, 0, 1, 2, Qt::AlignLeft );
 
 	m_displayAutomatedOnly = new QPushButton( tr( "Automated" ), widget );
 	connect( m_displayAutomatedOnly, SIGNAL( clicked() ), this,
 							SLOT( displayAutomatedOnly() ) );
-	m_displayAutomatedOnly->setWhatsThis(
-		tr( "Click here if you want to display automated parameters only." ) );
 
 	l->addWidget( m_displayAutomatedOnly, 0, 1, 1, 2, Qt::AlignLeft );
 
@@ -349,8 +338,6 @@ manageVSTEffectView::manageVSTEffectView( VstEffect * _eff, VstEffectControls * 
 	m_closeButton = new QPushButton( tr( "    Close    " ), widget );
 	connect( m_closeButton, SIGNAL( clicked() ), this,
 							SLOT( closeWindow() ) );
-	m_closeButton->setWhatsThis(
-		tr( "Close VST effect knob-controller window." ) );
 
 	l->addWidget( m_closeButton, 0, 2, 1, 7, Qt::AlignLeft );
 
@@ -391,13 +378,8 @@ manageVSTEffectView::manageVSTEffectView( VstEffect * _eff, VstEffectControls * 
 		}
 
 		FloatModel * model = m_vi->knobFModel[i];
-#if QT_VERSION < 0x050000
-		connect( model, SIGNAL( dataChanged( Model * ) ), this,
-			SLOT( setParameter( Model * ) ), Qt::DirectConnection );
-#else
 		connect( model, &FloatModel::dataChanged, this,
 			[this, model]() { setParameter( model ); }, Qt::DirectConnection);
-#endif
 		vstKnobs[ i ] ->setModel( model );
 	}
 

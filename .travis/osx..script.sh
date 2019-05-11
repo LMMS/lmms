@@ -1,13 +1,15 @@
 #!/usr/bin/env bash
+set -e
+
 mkdir build
 cd build
 
-if [ $QT5 ]; then
-        # Workaround; No FindQt5.cmake module exists
-        export CMAKE_PREFIX_PATH="$(brew --prefix qt5)"
-fi
+# Workaround; No FindQt5.cmake module exists
+CMAKE_PREFIX_PATH="$(brew --prefix qt5)"
+export CMAKE_PREFIX_PATH
 
-cmake $CMAKE_FLAGS -DUSE_WERROR=OFF ..
+# shellcheck disable=SC2086
+cmake -DUSE_WERROR=OFF -DCMAKE_INSTALL_PREFIX=../target $CMAKE_FLAGS ..
 
 make -j4
 make tests

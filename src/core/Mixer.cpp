@@ -64,7 +64,7 @@
 typedef LocklessList<PlayHandle *>::Element LocklessListElement;
 
 
-static __thread bool s_renderingThread;
+static thread_local bool s_renderingThread;
 
 
 
@@ -186,8 +186,8 @@ Mixer::~Mixer()
 	}
 	delete m_fifo;
 
-	delete m_audioDev;
 	delete m_midiClient;
+	delete m_audioDev;
 
 	for( int i = 0; i < 3; i++ )
 	{
@@ -393,7 +393,7 @@ const surroundSampleFrame * Mixer::renderNextBuffer()
 	ConstPlayHandleList::Iterator it_rem = m_playHandlesToRemove.begin();
 	while( it_rem != m_playHandlesToRemove.end() )
 	{
-		PlayHandleList::Iterator it = qFind( m_playHandles.begin(), m_playHandles.end(), *it_rem );
+		PlayHandleList::Iterator it = std::find( m_playHandles.begin(), m_playHandles.end(), *it_rem );
 
 		if( it != m_playHandles.end() )
 		{
@@ -534,10 +534,10 @@ void Mixer::clearInternal()
 
 
 
-void Mixer::getPeakValues( sampleFrame * _ab, const f_cnt_t _frames, float & peakLeft, float & peakRight ) const
+Mixer::StereoSample Mixer::getPeakValues(sampleFrame * _ab, const f_cnt_t _frames) const
 {
-	peakLeft = 0.0f;
-	peakRight = 0.0f;
+	sample_t peakLeft = 0.0f;
+	sample_t peakRight = 0.0f;
 
 	for( f_cnt_t f = 0; f < _frames; ++f )
 	{
@@ -553,6 +553,8 @@ void Mixer::getPeakValues( sampleFrame * _ab, const f_cnt_t _frames, float & pea
 			peakRight = absRight;
 		}
 	}
+
+	return StereoSample(peakLeft, peakRight);
 }
 
 
@@ -661,7 +663,7 @@ void Mixer::restoreAudioDevice()
 void Mixer::removeAudioPort( AudioPort * _port )
 {
 	requestChangeInModel();
-	QVector<AudioPort *>::Iterator it = qFind( m_audioPorts.begin(),
+	QVector<AudioPort *>::Iterator it = std::find( m_audioPorts.begin(),
 							m_audioPorts.end(),
 							_port );
 	if( it != m_audioPorts.end() )
@@ -722,7 +724,7 @@ void Mixer::removePlayHandle( PlayHandle * _ph )
 			}
 		}
 		// Now check m_playHandles
-		PlayHandleList::Iterator it = qFind( m_playHandles.begin(),
+		PlayHandleList::Iterator it = std::find( m_playHandles.begin(),
 					m_playHandles.end(), _ph );
 		if( it != m_playHandles.end() )
 		{
@@ -1220,6 +1222,7 @@ Mixer::fifoWriter::fifoWriter( Mixer* mixer, fifo * _fifo ) :
 	m_fifo( _fifo ),
 	m_writing( true )
 {
+	setObjectName("Mixer::fifoWriter");
 }
 
 

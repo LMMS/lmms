@@ -29,9 +29,9 @@
 #include <QtCore/QMap>
 #include <QWidget>
 
-#include "export.h"
+#include "lmms_export.h"
 
-class EXPORT LcdWidget : public QWidget
+class LMMS_EXPORT LcdWidget : public QWidget
 {
 	Q_OBJECT
 	
@@ -40,9 +40,9 @@ class EXPORT LcdWidget : public QWidget
 	Q_PROPERTY( QColor textShadowColor READ textShadowColor WRITE setTextShadowColor )
 	
 public:
-	LcdWidget( QWidget* parent, const QString& name = QString::null );
-	LcdWidget( int numDigits, QWidget* parent, const QString& name = QString::null );
-	LcdWidget( int numDigits, const QString& style, QWidget* parent, const QString& name = QString::null );
+	LcdWidget( QWidget* parent, const QString& name = QString() );
+	LcdWidget( int numDigits, QWidget* parent, const QString& name = QString() );
+	LcdWidget( int numDigits, const QString& style, QWidget* parent, const QString& name = QString() );
 
 	virtual ~LcdWidget();
 

@@ -29,12 +29,12 @@
 
 #include <QDomDocument>
 
-#include "export.h"
+#include "lmms_export.h"
 #include "MemoryManager.h"
 
 class QTextStream;
 
-class EXPORT DataFile : public QDomDocument
+class LMMS_EXPORT DataFile : public QDomDocument
 {
 	MM_OPERATORS
 public:
@@ -108,13 +108,14 @@ private:
 	void upgrade_1_1_91();
 	void upgrade_1_2_0_rc3();
 	void upgrade_1_2_0_rc2_42();
+	void upgrade_1_3_0();
 
 	void upgrade();
 
 	void loadData( const QByteArray & _data, const QString & _sourceFile );
 
 
-	struct EXPORT typeDescStruct
+	struct LMMS_EXPORT typeDescStruct
 	{
 		Type m_type;
 		QString m_name;

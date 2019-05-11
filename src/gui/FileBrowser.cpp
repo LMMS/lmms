@@ -73,33 +73,34 @@ FileBrowser::FileBrowser(const QString & directories, const QString & filter,
 	m_recurse( recurse )
 {
 	setWindowTitle( tr( "Browser" ) );
-	m_l = new FileBrowserTreeWidget( contentParent() );
-	addContentWidget( m_l );
 
-	QWidget * ops = new QWidget( contentParent() );
-	ops->setFixedHeight( 24 );
+	QWidget * searchWidget = new QWidget( contentParent() );
+	searchWidget->setFixedHeight( 24 );
 
-	QHBoxLayout * opl = new QHBoxLayout( ops );
-	opl->setMargin( 0 );
-	opl->setSpacing( 0 );
+	QHBoxLayout * searchWidgetLayout = new QHBoxLayout( searchWidget );
+	searchWidgetLayout->setMargin( 0 );
+	searchWidgetLayout->setSpacing( 0 );
 
-	m_filterEdit = new QLineEdit( ops );
-#if QT_VERSION >= 0x050000
+	m_filterEdit = new QLineEdit( searchWidget );
+	m_filterEdit->setPlaceholderText( tr("Search") );
 	m_filterEdit->setClearButtonEnabled( true );
-#endif
 	connect( m_filterEdit, SIGNAL( textEdited( const QString & ) ),
 			this, SLOT( filterItems( const QString & ) ) );
 
 	QPushButton * reload_btn = new QPushButton(
 				embed::getIconPixmap( "reload" ),
-						QString::null, ops );
+						QString(), searchWidget );
+	reload_btn->setToolTip( tr( "Refresh list" ) );
 	connect( reload_btn, SIGNAL( clicked() ), this, SLOT( reloadTree() ) );
 
-	opl->addWidget( m_filterEdit );
-	opl->addSpacing( 5 );
-	opl->addWidget( reload_btn );
+	searchWidgetLayout->addWidget( m_filterEdit );
+	searchWidgetLayout->addSpacing( 5 );
+	searchWidgetLayout->addWidget( reload_btn );
 
-	addContentWidget( ops );
+	addContentWidget( searchWidget );
+
+	m_fileBrowserTreeWidget = new FileBrowserTreeWidget( contentParent() );
+	addContentWidget( m_fileBrowserTreeWidget );
 
 	// Whenever the FileBrowser has focus, Ctrl+F should direct focus to its filter box.
 	QShortcut *filterFocusShortcut = new QShortcut( QKeySequence( QKeySequence::Find ), this, SLOT(giveFocusToFilter()) );
@@ -109,25 +110,15 @@ FileBrowser::FileBrowser(const QString & directories, const QString & filter,
 	show();
 }
 
-
-
-
-FileBrowser::~FileBrowser()
-{
-}
-
-
-
-
 bool FileBrowser::filterItems( const QString & filter, QTreeWidgetItem * item )
 {
 	// call with item=NULL to filter the entire tree
 	bool anyMatched = false;
 
-	int numChildren = item ? item->childCount() : m_l->topLevelItemCount();
+	int numChildren = item ? item->childCount() : m_fileBrowserTreeWidget->topLevelItemCount();
 	for( int i = 0; i < numChildren; ++i )
 	{
-		QTreeWidgetItem * it = item ? item->child( i ) : m_l->topLevelItem(i);
+		QTreeWidgetItem * it = item ? item->child( i ) : m_fileBrowserTreeWidget->topLevelItem(i);
 
 		// is directory?
 		if( it->childCount() )
@@ -138,7 +129,7 @@ bool FileBrowser::filterItems( const QString & filter, QTreeWidgetItem * item )
 			{
 				// yes, then show everything below
 				it->setHidden( false );
-				filterItems( QString::null, it );
+				filterItems( QString(), it );
 				anyMatched = true;
 			}
 			else
@@ -172,40 +163,42 @@ bool FileBrowser::filterItems( const QString & filter, QTreeWidgetItem * item )
 
 void FileBrowser::reloadTree( void )
 {
+	QList<QString> expandedDirs = m_fileBrowserTreeWidget->expandedDirs();
 	const QString text = m_filterEdit->text();
 	m_filterEdit->clear();
-	m_l->clear();
+	m_fileBrowserTreeWidget->clear();
 	QStringList paths = m_directories.split( '*' );
 	for( QStringList::iterator it = paths.begin(); it != paths.end(); ++it )
 	{
 		addItems( *it );
 	}
-	expandItems();
+	expandItems(NULL, expandedDirs);
 	m_filterEdit->setText( text );
 	filterItems( text );
 }
 
 
 
-void FileBrowser::expandItems( QTreeWidgetItem * item )
+void FileBrowser::expandItems( QTreeWidgetItem * item, QList<QString> expandedDirs )
 {
-    int numChildren = item ? item->childCount() : m_l->topLevelItemCount();
-	for( int i = 0; i < numChildren; ++i )
+	int numChildren = item ? item->childCount() : m_fileBrowserTreeWidget->topLevelItemCount();
+	for (int i = 0; i < numChildren; ++i)
 	{
-		QTreeWidgetItem * it = item ? item->child( i ) : m_l->topLevelItem(i);
+		QTreeWidgetItem * it = item ? item->child( i ) : m_fileBrowserTreeWidget->topLevelItem(i);
 		if ( m_recurse )
 		{
 			it->setExpanded( true );
 		}
 		Directory *d = dynamic_cast<Directory *> ( it );
-		if( d )
+		if (d)
 		{
 			d->update();
-			d->setExpanded( false );
+			bool expand = expandedDirs.contains( d->fullName() );
+			d->setExpanded( expand );
 		}
-		if( m_recurse && it->childCount() )
+		if (m_recurse && it->childCount())
 		{
-			expandItems(it);
+			expandItems(it, expandedDirs);
 		}
 	}
 }
@@ -228,7 +221,7 @@ void FileBrowser::addItems(const QString & path )
 {
 	if( m_dirsAsItems )
 	{
-		m_l->addTopLevelItem( new Directory( path, QString::null, m_filter ) );
+		m_fileBrowserTreeWidget->addTopLevelItem( new Directory( path, QString(), m_filter ) );
 		return;
 	}
 
@@ -241,16 +234,16 @@ void FileBrowser::addItems(const QString & path )
 		if( cur_file[0] != '.' )
 		{
 			bool orphan = true;
-			for( int i = 0; i < m_l->topLevelItemCount(); ++i )
+			for( int i = 0; i < m_fileBrowserTreeWidget->topLevelItemCount(); ++i )
 			{
 				Directory * d = dynamic_cast<Directory *>(
-						m_l->topLevelItem( i ) );
+						m_fileBrowserTreeWidget->topLevelItem( i ) );
 				if( d == NULL || cur_file < d->text( 0 ) )
 				{
 					Directory *dd = new Directory( cur_file, path,
 												   m_filter );
-					m_l->insertTopLevelItem( i,dd );
-					dd->update();
+					m_fileBrowserTreeWidget->insertTopLevelItem( i,dd );
+					dd->update(); // add files to the directory
 					orphan = false;
 					break;
 				}
@@ -267,7 +260,7 @@ void FileBrowser::addItems(const QString & path )
 				Directory *d = new Directory( cur_file,
 											  path, m_filter );
 				d->update();
-				m_l->addTopLevelItem( d );
+				m_fileBrowserTreeWidget->addTopLevelItem( d );
 			}
 		}
 	}
@@ -281,13 +274,13 @@ void FileBrowser::addItems(const QString & path )
 		{
 			// TODO: don't insert instead of removing, order changed
 			// remove existing file-items
-			QList<QTreeWidgetItem *> existing = m_l->findItems(
+			QList<QTreeWidgetItem *> existing = m_fileBrowserTreeWidget->findItems(
 					cur_file, Qt::MatchFixedString );
 			if( !existing.empty() )
 			{
 				delete existing.front();
 			}
-			(void) new FileItem( m_l, cur_file, path );
+			(void) new FileItem( m_fileBrowserTreeWidget, cur_file, path );
 		}
 	}
 }
@@ -335,15 +328,29 @@ FileBrowserTreeWidget::FileBrowserTreeWidget(QWidget * parent ) :
 
 }
 
-
-
-
-FileBrowserTreeWidget::~FileBrowserTreeWidget()
+QList<QString> FileBrowserTreeWidget::expandedDirs( QTreeWidgetItem * item ) const
 {
+	int numChildren = item ? item->childCount() : topLevelItemCount();
+	QList<QString> dirs;
+	for (int i = 0; i < numChildren; ++i)
+	{
+		QTreeWidgetItem * it  = item ? item->child(i) : topLevelItem(i);
+
+		// Add expanded top level directories.
+		if (it->isExpanded() && (it->type() == TypeDirectoryItem))
+		{
+			Directory *d = static_cast<Directory *> ( it );
+			dirs.append( d->fullName() );
+		}
+
+		// Add expanded child directories (recurse).
+		if (it->childCount())
+		{
+			dirs.append( expandedDirs( it ) );
+		}
+	}
+	return dirs;
 }
-
-
-
 
 void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent * e )
 {
@@ -424,8 +431,8 @@ void FileBrowserTreeWidget::mousePressEvent(QMouseEvent * me )
 			m_previewPlayHandle = s;
 			delete tf;
 		}
-		else if( ( f->extension ()== "xiz" || f->extension() == "sf2" || f->extension() == "gig" || f->extension() == "pat" ) &&
-			! pluginFactory->pluginSupportingExtension(f->extension()).isNull() )
+		else if( ( f->extension ()== "xiz" || f->extension() == "sf2" || f->extension() == "sf3" || f->extension() == "gig" || f->extension() == "pat" ) &&
+			! pluginFactory->pluginSupportingExtension(f->extension()).info.isNull() )
 		{
 			m_previewPlayHandle = new PresetPreviewPlayHandle( f->fullName(), f->handling() == FileItem::LoadByPlugin );
 		}
@@ -568,8 +575,9 @@ void FileBrowserTreeWidget::handleFile(FileItem * f, InstrumentTrack * it )
 			if( i == NULL ||
 				!i->descriptor()->supportsFileType( e ) )
 			{
-				i = it->loadInstrument(
-					pluginFactory->pluginSupportingExtension(e).name() );
+				PluginFactory::PluginInfoAndKey piakn =
+					pluginFactory->pluginSupportingExtension(e);
+				i = it->loadInstrument(piakn.info.name(), &piakn.key);
 			}
 			i->loadFile( f->fullName() );
 			break;
@@ -984,7 +992,7 @@ void FileItem::determineFileType( void )
 		m_type = PresetFile;
 		m_handling = LoadByPlugin;
 	}
-	else if( ext == "sf2" )
+	else if( ext == "sf2" || ext == "sf3" )
 	{
 		m_type = SoundFontFile;
 	}

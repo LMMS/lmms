@@ -8772,7 +8772,7 @@ Facendo duplo clic sobre calquera dos engadidos mostra información sobre os por
     </message>
 </context>
 <context>
-    <name>papuInstrument</name>
+    <name>FreeBoyInstrument</name>
     <message>
         <source>Sweep time</source>
         <translation>Tempo da varredura</translation>
@@ -8867,7 +8867,7 @@ Facendo duplo clic sobre calquera dos engadidos mostra información sobre os por
     </message>
 </context>
 <context>
-    <name>papuInstrumentView</name>
+    <name>FreeBoyInstrumentView</name>
     <message>
         <source>Sweep Time:</source>
         <translation>Tempo da varredura:</translation>

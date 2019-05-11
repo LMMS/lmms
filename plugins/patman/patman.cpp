@@ -29,6 +29,7 @@
 #include <QPainter>
 #include <QDomElement>
 
+#include "ConfigManager.h"
 #include "endian_handling.h"
 #include "Engine.h"
 #include "gui_templates.h"
@@ -41,9 +42,9 @@
 #include "FileDialog.h"
 #include "ConfigManager.h"
 
-#include "embed.cpp"
+#include "embed.h"
 
-
+#include "plugin_export.h"
 
 
 extern "C"
@@ -65,9 +66,9 @@ Plugin::Descriptor PLUGIN_EXPORT patman_plugin_descriptor =
 
 
 // necessary for getting instance out of shared lib
-Plugin * PLUGIN_EXPORT lmms_plugin_main( Model *, void * _data )
+PLUGIN_EXPORT Plugin * lmms_plugin_main( Model *m, void * )
 {
-	return new patmanInstrument( static_cast<InstrumentTrack *>( _data ) );
+	return new patmanInstrument( static_cast<InstrumentTrack *>( m ) );
 }
 
 }
@@ -77,7 +78,6 @@ Plugin * PLUGIN_EXPORT lmms_plugin_main( Model *, void * _data )
 
 patmanInstrument::patmanInstrument( InstrumentTrack * _instrument_track ) :
 	Instrument( _instrument_track, &patman_plugin_descriptor ),
-	m_patchFile( QString::null ),
 	m_loopedModel( true, this ),
 	m_tunedModel( true, this )
 {
@@ -181,7 +181,7 @@ void patmanInstrument::setFile( const QString & _patch_file, bool _rename )
 {
 	if( _patch_file.size() <= 0 )
 	{
-		m_patchFile = QString::null;
+		m_patchFile = QString();
 		return;
 	}
 
@@ -463,11 +463,7 @@ PatmanView::PatmanView( Instrument * _instrument, QWidget * _parent ) :
 							"select_file" ) );
 	connect( m_openFileButton, SIGNAL( clicked() ),
 				this, SLOT( openFile() ) );
-	ToolTip::add( m_openFileButton, tr( "Open other patch" ) );
-
-	m_openFileButton->setWhatsThis(
-		tr( "Click here to open another patch-file. Loop and Tune "
-			"settings are not reset." ) );
+	ToolTip::add( m_openFileButton, tr( "Open patch" ) );
 
 	m_loopButton = new PixmapButton( this, tr( "Loop" ) );
 	m_loopButton->setObjectName("loopButton");
@@ -478,10 +474,6 @@ PatmanView::PatmanView( Instrument * _instrument, QWidget * _parent ) :
 	m_loopButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
 								"loop_off" ) );
 	ToolTip::add( m_loopButton, tr( "Loop mode" ) );
-	m_loopButton->setWhatsThis(
-		tr( "Here you can toggle the Loop mode. If enabled, PatMan "
-			"will use the loop information available in the "
-			"file." ) );
 
 	m_tuneButton = new PixmapButton( this, tr( "Tune" ) );
 	m_tuneButton->setObjectName("tuneButton");
@@ -492,10 +484,6 @@ PatmanView::PatmanView( Instrument * _instrument, QWidget * _parent ) :
 	m_tuneButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
 								"tune_off" ) );
 	ToolTip::add( m_tuneButton, tr( "Tune mode" ) );
-	m_tuneButton->setWhatsThis(
-		tr( "Here you can toggle the Tune mode. If enabled, PatMan "
-			"will tune the sample to match the note's "
-			"frequency." ) );
 
 	m_displayFilename = tr( "No file selected" );
 

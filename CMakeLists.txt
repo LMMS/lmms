@@ -1,4 +1,4 @@
-CMAKE_MINIMUM_REQUIRED(VERSION 2.8.7)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.3)
 
 PROJECT(lmms)
 
@@ -8,19 +8,22 @@ IF(COMMAND CMAKE_POLICY)
 	CMAKE_POLICY(SET CMP0005 NEW)
 	CMAKE_POLICY(SET CMP0003 NEW)
 	IF (CMAKE_MAJOR_VERSION GREATER 2)
-		CMAKE_POLICY(SET CMP0026 OLD)
+		CMAKE_POLICY(SET CMP0026 NEW)
 		CMAKE_POLICY(SET CMP0045 NEW)
 		CMAKE_POLICY(SET CMP0050 OLD)
 	ENDIF()
+	CMAKE_POLICY(SET CMP0020 NEW)
 ENDIF(COMMAND CMAKE_POLICY)
 
+INCLUDE(CheckSubmodules)
 INCLUDE(AddFileDependencies)
 INCLUDE(CheckIncludeFiles)
 INCLUDE(FindPkgConfig)
+INCLUDE(GenerateExportHeader)
 
 STRING(TOUPPER          "${CMAKE_PROJECT_NAME}" PROJECT_NAME_UCASE)
 
-SET(PROJECT_YEAR 2018)
+SET(PROJECT_YEAR 2019)
 
 SET(PROJECT_AUTHOR      "LMMS Developers")
 SET(PROJECT_URL         "https://lmms.io")
@@ -30,7 +33,7 @@ SET(PROJECT_COPYRIGHT   "2008-${PROJECT_YEAR} ${PROJECT_AUTHOR}")
 SET(VERSION_MAJOR       "1")
 SET(VERSION_MINOR       "2")
 SET(VERSION_RELEASE     "0")
-SET(VERSION_STAGE       "rc7")
+SET(VERSION_STAGE       "rc8")
 SET(VERSION_BUILD       "0")
 SET(VERSION             "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_RELEASE}")
 IF(VERSION_STAGE)
@@ -43,7 +46,6 @@ ENDIF()
 # Override version information for non-base builds
 INCLUDE(VersionInfo)
 INCLUDE(DetectMachine)
-
 
 OPTION(WANT_ALSA	"Include ALSA (Advanced Linux Sound Architecture) support" ON)
 OPTION(WANT_CALF	"Include CALF LADSPA plugins" ON)
@@ -65,12 +67,16 @@ OPTION(WANT_STK		"Include Stk (Synthesis Toolkit) support" ON)
 OPTION(WANT_SWH		"Include Steve Harris's LADSPA plugins" ON)
 OPTION(WANT_TAP		"Include Tom's Audio Processing LADSPA plugins" ON)
 OPTION(WANT_VST		"Include VST support" ON)
-OPTION(WANT_VST_NOWINE	"Include partial VST support (without wine)" OFF)
+OPTION(WANT_VST_32	"Include 32-bit VST support" ON)
+OPTION(WANT_VST_64	"Include 64-bit VST support" ON)
 OPTION(WANT_WINMM	"Include WinMM MIDI support" OFF)
-OPTION(WANT_QT5		"Build with Qt5" OFF)
+OPTION(WANT_DEBUG_FPE	"Debug floating point exceptions" OFF)
 
 
 IF(LMMS_BUILD_APPLE)
+	# Fix linking on 10.14+. See issue #4762 on github
+	LINK_DIRECTORIES(/usr/local/lib)
+	SET(WANT_SOUNDIO OFF)
 	SET(WANT_ALSA OFF)
 	SET(WANT_PULSEAUDIO OFF)
 	SET(WANT_VST OFF)
@@ -86,7 +92,6 @@ IF(LMMS_BUILD_WIN32)
 	SET(WANT_ALSA OFF)
 	SET(WANT_JACK OFF)
 	SET(WANT_PULSEAUDIO OFF)
-	SET(WANT_PORTAUDIO OFF)
 	SET(WANT_SNDIO OFF)
 	SET(WANT_SOUNDIO OFF)
 	SET(WANT_WINMM ON)
@@ -94,7 +99,6 @@ IF(LMMS_BUILD_WIN32)
 	SET(STATUS_ALSA "<not supported on this platform>")
 	SET(STATUS_JACK "<not supported on this platform>")
 	SET(STATUS_PULSEAUDIO "<not supported on this platform>")
-	SET(STATUS_PORTAUDIO "<disabled on this platform>")
 	SET(STATUS_SOUNDIO "<disabled in this release>")
 	SET(STATUS_WINMM "OK")
 	SET(STATUS_APPLEMIDI "<not supported on this platform>")
@@ -112,6 +116,7 @@ IF(LMMS_BUILD_MSYS AND CMAKE_BUILD_TYPE STREQUAL "Debug")
 	SET(STATUS_STK "not built as requested")
 ENDIF()
 
+SET(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 CHECK_INCLUDE_FILES(stdint.h LMMS_HAVE_STDINT_H)
 CHECK_INCLUDE_FILES(stdlib.h LMMS_HAVE_STDLIB_H)
@@ -122,6 +127,7 @@ CHECK_INCLUDE_FILES(sys/types.h LMMS_HAVE_SYS_TYPES_H)
 CHECK_INCLUDE_FILES(sys/ipc.h LMMS_HAVE_SYS_IPC_H)
 CHECK_INCLUDE_FILES(sys/shm.h LMMS_HAVE_SYS_SHM_H)
 CHECK_INCLUDE_FILES(sys/time.h LMMS_HAVE_SYS_TIME_H)
+CHECK_INCLUDE_FILES(sys/times.h LMMS_HAVE_SYS_TIMES_H)
 CHECK_INCLUDE_FILES(sched.h LMMS_HAVE_SCHED_H)
 CHECK_INCLUDE_FILES(sys/soundcard.h LMMS_HAVE_SYS_SOUNDCARD_H)
 CHECK_INCLUDE_FILES(soundcard.h LMMS_HAVE_SOUNDCARD_H)
@@ -134,64 +140,43 @@ CHECK_INCLUDE_FILES(locale.h LMMS_HAVE_LOCALE_H)
 
 LIST(APPEND CMAKE_PREFIX_PATH "${CMAKE_INSTALL_PREFIX}")
 
-IF(WANT_QT5)
-	SET(QT5 TRUE)
+FIND_PACKAGE(Qt5 COMPONENTS Core Gui Widgets Xml REQUIRED)
+FIND_PACKAGE(Qt5 COMPONENTS LinguistTools QUIET)
 
-	FIND_PACKAGE(Qt5Core REQUIRED)
-	FIND_PACKAGE(Qt5Gui REQUIRED)
-	FIND_PACKAGE(Qt5LinguistTools)
-	FIND_PACKAGE(Qt5Widgets REQUIRED)
-	FIND_PACKAGE(Qt5Xml REQUIRED)
+INCLUDE_DIRECTORIES(
+	${Qt5Core_INCLUDE_DIRS}
+	${Qt5Gui_INCLUDE_DIRS}
+	${Qt5Widgets_INCLUDE_DIRS}
+	${Qt5Xml_INCLUDE_DIRS}
+)
 
-	INCLUDE_DIRECTORIES(
-		${Qt5Core_INCLUDE_DIRS}
-		${Qt5Gui_INCLUDE_DIRS}
-		${Qt5Widgets_INCLUDE_DIRS}
-		${Qt5Xml_INCLUDE_DIRS}
-	)
+SET(QT_LIBRARIES
+	Qt5::Core
+	Qt5::Gui
+	Qt5::Widgets
+	Qt5::Xml
+)
 
-	SET(QT_LIBRARIES
-		Qt5::Core
-		Qt5::Gui
-		Qt5::Widgets
-		Qt5::Xml
-	)
-
-	IF(LMMS_BUILD_LINUX)
-		FIND_PACKAGE(Qt5X11Extras REQUIRED)
-		LIST(APPEND QT_LIBRARIES Qt5::X11Extras)
-	ENDIF()
-
-	# Resolve Qt5::qmake to full path for use in packaging scripts
-	GET_TARGET_PROPERTY(QT_QMAKE_EXECUTABLE "${Qt5Core_QMAKE_EXECUTABLE}" IMPORTED_LOCATION)
-
-	FIND_PACKAGE(Qt5Test)
-	SET(QT_QTTEST_LIBRARY Qt5::Test)
-ELSE()
-	SET(QT5 FALSE)
-
-	# check for Qt4
-	SET(QT_MIN_VERSION "4.6.0" COMPONENTS QtCore QtGui QtXml)
-	FIND_PACKAGE(Qt4 REQUIRED)
-	SET(QT_USE_QTXML 1)
-	IF(WIN32)
-		SET(QT_TRANSLATIONS_DIR "${MINGW_PREFIX}/share/qt4/translations/")
-	ENDIF(WIN32)
-	IF(EXISTS "${QT_TRANSLATIONS_DIR}")
-		MESSAGE("-- Found Qt translations in ${QT_TRANSLATIONS_DIR}")
-		ADD_DEFINITIONS(-D'QT_TRANSLATIONS_DIR="${QT_TRANSLATIONS_DIR}"')
-	ENDIF()
-	IF(NOT WIN32)
-		STRING(REPLACE "-DQT_DLL" "" QT_DEFINITIONS "${QT_DEFINITIONS}")
-	ENDIF()
-	INCLUDE("${QT_USE_FILE}")
+IF(LMMS_BUILD_LINUX AND WANT_VST)
+    FIND_PACKAGE(Qt5 COMPONENTS X11Extras REQUIRED)
+    LIST(APPEND QT_LIBRARIES Qt5::X11Extras)
 ENDIF()
 
+# Resolve Qt5::qmake to full path for use in packaging scripts
+GET_TARGET_PROPERTY(QT_QMAKE_EXECUTABLE "${Qt5Core_QMAKE_EXECUTABLE}" IMPORTED_LOCATION)
+
+FIND_PACKAGE(Qt5Test)
+SET(QT_QTTEST_LIBRARY Qt5::Test)
+
 # check for libsndfile
-PKG_CHECK_MODULES(SNDFILE REQUIRED sndfile>=1.0.11)
+FIND_PACKAGE(SndFile REQUIRED)
 IF(NOT SNDFILE_FOUND)
-	MESSAGE(FATAL_ERROR "LMMS requires libsndfile1 and libsndfile1-dev >= 1.0.11 - please install, remove CMakeCache.txt and try again!")
-ENDIF(NOT SNDFILE_FOUND)
+	MESSAGE(FATAL_ERROR "LMMS requires libsndfile1 and libsndfile1-dev >= 1.0.18 - please install, remove CMakeCache.txt and try again!")
+ENDIF()
+# check if we can use SF_SET_COMPRESSION_LEVEL
+IF(NOT SNDFILE_VERSION VERSION_LESS 1.0.26)
+	SET(LMMS_HAVE_SF_COMPLEVEL TRUE)
+ENDIF()
 
 IF(WANT_CALF)
 	SET(LMMS_HAVE_CALF TRUE)
@@ -245,26 +230,42 @@ IF(WANT_CARLA)
 ENDIF(WANT_CARLA)
 
 
-# check for SDL
+# check for SDL2
 IF(WANT_SDL)
+	SET(SDL2_BUILDING_LIBRARY TRUE)
+	FIND_PACKAGE(SDL2)
+	IF(SDL2_FOUND)
+		SET(LMMS_HAVE_SDL TRUE)
+		SET(LMMS_HAVE_SDL2 TRUE)
+		SET(STATUS_SDL "OK, using SDL2")
+		SET(SDL_INCLUDE_DIR "")
+		SET(SDL_LIBRARY "")
+	ELSE()
+		SET(SDL2_INCLUDE_DIR "")
+		SET(SDL2_LIBRARY "")
+	ENDIF()
+ENDIF()
+
+# fallback to SDL1
+IF(WANT_SDL AND NOT LMMS_HAVE_SDL2)
+	# Fallback to SDL1.2
 	SET(SDL_BUILDING_LIBRARY TRUE)
 	FIND_PACKAGE(SDL)
 	IF(SDL_FOUND)
 		SET(LMMS_HAVE_SDL TRUE)
-		SET(STATUS_SDL "OK")
-	ELSE(SDL_FOUND)
-		SET(STATUS_SDL "not found, please install libsdl1.2-dev (or similar) "
-			"if you require SDL support")
-	ENDIF(SDL_FOUND)
-ENDIF(WANT_SDL)
-IF(NOT LMMS_HAVE_SDL)
-	SET(SDL_INCLUDE_DIR "")
-ELSE(NOT LMMS_HAVE_SDL)
-	IF(NOT SDL_INCLUDE_DIR)
-		SET(SDL_INCLUDE_DIR "${CMAKE_FIND_ROOT_PATH}/include")
-	ENDIF(NOT SDL_INCLUDE_DIR)
-ENDIF(NOT LMMS_HAVE_SDL)
+		SET(STATUS_SDL "OK, using SDL1.2")
+		# fix mingw since 53abd65
+		IF(NOT SDL_INCLUDE_DIR)
+			SET(SDL_INCLUDE_DIR "${CMAKE_FIND_ROOT_PATH}/include")
+		ENDIF()
 
+	ELSE()
+		SET(STATUS_SDL "not found, please install libsdl2-dev (or similar) "
+			"if you require SDL support")
+		SET(SDL_INCLUDE_DIR "")
+		SET(SDL_LIBRARY "")
+	ENDIF()
+ENDIF()
 
 # check for Stk
 IF(WANT_STK)
@@ -296,13 +297,13 @@ ENDIF(WANT_PORTAUDIO)
 IF(WANT_SOUNDIO)
   FIND_PACKAGE(SoundIo)
   IF(SOUNDIO_FOUND)
-    SET(LMMS_HAVE_SOUNDIO TRUE)
-    SET(STATUS_SOUNDIO "OK")
-    INCLUDE_DIRECTORIES("${SOUNDIO_INCLUDE_DIR}")
+	SET(LMMS_HAVE_SOUNDIO TRUE)
+	SET(STATUS_SOUNDIO "OK")
+	INCLUDE_DIRECTORIES("${SOUNDIO_INCLUDE_DIR}")
   ELSE(SOUNDIO_FOUND)
-    SET(SOUNDIO_INCLUDE_DIR "")
-    SET(STATUS_SOUNDIO "not found, please install libsoundio if you require libsoundio support")
-    SET(SOUNDIO_LIBRARY "")
+	SET(SOUNDIO_INCLUDE_DIR "")
+	SET(STATUS_SOUNDIO "not found, please install libsoundio if you require libsoundio support")
+	SET(SOUNDIO_LIBRARY "")
   ENDIF(SOUNDIO_FOUND)
 ENDIF(WANT_SOUNDIO)
 
@@ -383,8 +384,8 @@ IF(WANT_JACK)
 	IF(JACK_FOUND)
 		IF(WANT_WEAKJACK)
 			SET(LMMS_HAVE_WEAKJACK TRUE)
+			SET(WEAKJACK_INCLUDE_DIRS ${CMAKE_SOURCE_DIR}/src/3rdparty/weakjack/weakjack)
 			SET(STATUS_JACK "OK (weak linking enabled)")
-			SET(JACK_INCLUDE_DIRS "")
 			# use dlsym instead
 			SET(JACK_LIBRARIES ${CMAKE_DL_LIBS})
 		ELSE()
@@ -392,19 +393,22 @@ IF(WANT_JACK)
 		ENDIF()
 		SET(LMMS_HAVE_JACK TRUE)
 	ELSE(JACK_FOUND)
+		SET(JACK_INCLUDE_DIRS "")
 		SET(STATUS_JACK "not found, please install libjack0.100.0-dev (or similar) "
 			"if you require JACK support")
 	ENDIF(JACK_FOUND)
 ENDIF(WANT_JACK)
 
-
 # check for FFTW3F-library
-PKG_CHECK_MODULES(FFTW3F REQUIRED fftw3f>=3.0.0)
-
+FIND_PACKAGE(FFTW COMPONENTS fftw3f REQUIRED)
 
 # check for FLTK
 FIND_PACKAGE(FLTK)
-
+IF(FLTK_FOUND)
+	SET(STATUS_ZYN "OK")
+ELSE()
+	SET(STATUS_ZYN "not found, please install fltk")
+ENDIF()
 
 # check for Fluidsynth
 IF(WANT_SF2)
@@ -434,6 +438,7 @@ IF(LMMS_BUILD_LINUX OR LMMS_BUILD_APPLE OR LMMS_BUILD_OPENBSD)
 	FIND_PACKAGE(Threads)
 ENDIF(LMMS_BUILD_LINUX OR LMMS_BUILD_APPLE OR LMMS_BUILD_OPENBSD)
 
+# check for sndio (roaraudio won't work yet)
 IF(WANT_SNDIO)
 	FIND_PACKAGE(Sndio)
 	IF(SNDIO_FOUND)
@@ -466,32 +471,52 @@ IF(LMMS_BUILD_WIN32)
 	SET(STATUS_VST "OK")
 ENDIF(LMMS_BUILD_WIN32)
 
+IF(WANT_DEBUG_FPE)
+	IF(LMMS_BUILD_LINUX OR LMMS_BUILD_APPLE)
+		SET(LMMS_DEBUG_FPE TRUE)
+		SET (STATUS_DEBUG_FPE "Enabled")
+	ELSE()
+		SET (STATUS_DEBUG_FPE "Wanted but disabled due to unsupported platform")
+	ENDIF()
+ELSE()
+	SET (STATUS_DEBUG_FPE "Disabled")
+ENDIF(WANT_DEBUG_FPE)
 
 # check for libsamplerate
-PKG_CHECK_MODULES(SAMPLERATE REQUIRED samplerate>=0.1.8)
+FIND_PACKAGE(Samplerate 0.1.8 MODULE REQUIRED)
 
 # set compiler flags
-SET(WERROR_FLAGS "-Wall -Werror=unused-function -Wno-sign-compare -Wno-strict-overflow")
-OPTION(USE_WERROR "Add -werror to the build flags. Stops the build on warnings" OFF)
-IF(${USE_WERROR})
-   SET(WERROR_FLAGS "${WERROR_FLAGS} -Werror")
+IF(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+	SET(WERROR_FLAGS "-Wall -Werror=unused-function -Wno-sign-compare -Wno-strict-overflow")
+	OPTION(USE_WERROR "Add -werror to the build flags. Stops the build on warnings" OFF)
+	IF(${USE_WERROR})
+		SET(WERROR_FLAGS "${WERROR_FLAGS} -Werror")
+	ENDIF()
+
+	# Due to a regression in gcc-4.8.X, we need to disable array-bounds check
+	IF (CMAKE_COMPILER_IS_GNUCXX AND ((CMAKE_CXX_COMPILER_VERSION VERSION_EQUAL "4.8.0") OR (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER "4.8.0") OR LMMS_BUILD_WIN32))
+		SET(WERROR_FLAGS "${WERROR_FLAGS} -Wno-array-bounds")
+	ENDIF()
+ELSEIF(MSVC)
+	# Remove any existing /W flags
+	STRING(REGEX REPLACE "/W[0-4]" "" CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})
+	SET(WERROR_FLAGS "/W2")
+	IF(${USE_WERROR})
+		SET(WERROR_FLAGS "${WERROR_FLAGS} /WX")
+	ENDIF()
 ENDIF()
 
-# Due to a regression in gcc-4.8.X, we need to disable array-bounds check
-IF (CMAKE_COMPILER_IS_GNUCXX AND ((CMAKE_CXX_COMPILER_VERSION VERSION_EQUAL "4.8.0") OR (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER "4.8.0") OR LMMS_BUILD_WIN32))
-   SET(WERROR_FLAGS "${WERROR_FLAGS} -Wno-array-bounds")
-ENDIF()
 
 IF(NOT CMAKE_BUILD_TYPE)
 	message(STATUS "Setting build type to 'Release' as none was specified.")
 	set(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build." FORCE)
 	# Set the possible values of build type for cmake-gui
 	SET_PROPERTY(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release"
-  		"MinSizeRel" "RelWithDebInfo")
+		"MinSizeRel" "RelWithDebInfo")
 ENDIF()
 
 SET(CMAKE_C_FLAGS "${WERROR_FLAGS} ${CMAKE_C_FLAGS}")
-SET(CMAKE_CXX_FLAGS "-fno-exceptions ${WERROR_FLAGS} ${CMAKE_CXX_FLAGS}")
+SET(CMAKE_CXX_FLAGS "${WERROR_FLAGS} ${CMAKE_CXX_FLAGS}")
 SET(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -DLMMS_DEBUG")
 SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DLMMS_DEBUG")
 
@@ -518,38 +543,19 @@ IF(GIT_FOUND AND NOT CONTRIBUTORS)
 		TIMEOUT 1)
 ENDIF()
 
-# embedded resources stuff
-IF(WIN32 OR WIN64)
-	# compile buildtools native
-	SET(BIN2RES_CPP "${CMAKE_SOURCE_DIR}/buildtools/bin2res.cpp")
-	SET(BIN2RES "${CMAKE_BINARY_DIR}/bin2res")
-	ADD_CUSTOM_TARGET(bin2res COMMAND g++ "\"${BIN2RES_CPP}\"" -o "\"${BIN2RES}\"" DEPENDS "${BIN2RES_CPP}")
-ELSE(WIN32 OR WIN64)
-	ADD_EXECUTABLE(bin2res buildtools/bin2res.cpp)
-	GET_TARGET_PROPERTY(BIN2RES bin2res LOCATION)
-ENDIF(WIN32 OR WIN64)
-
 # we somehow have to make LMMS-binary depend on MOC-files
 ADD_FILE_DEPENDENCIES("${CMAKE_BINARY_DIR}/lmmsconfig.h")
 
-IF(WIN32)
-	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-attributes")
-ELSE(WIN32)
-	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -DPIC")
-ENDIF(WIN32)
+IF(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+	IF(WIN32)
+		SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-attributes")
+	ELSE(WIN32)
+		SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -DPIC")
+	ENDIF(WIN32)
+ENDIF()
 
 # use ccache
-OPTION(USE_CCACHE "Use ccache for compilation" OFF)
-IF(USE_CCACHE)
-    FIND_PROGRAM(CCACHE ccache)
-    IF (CCACHE)
-        MESSAGE(STATUS "Using ccache found in PATH")
-        SET_PROPERTY(GLOBAL PROPERTY RULE_LAUNCH_COMPILE ${CCACHE})
-        SET_PROPERTY(GLOBAL PROPERTY RULE_LAUNCH_LINK ${CCACHE})
-    ELSE()
-        MESSAGE(WARNING "USE_CCACHE enabled, but no ccache found")
-    ENDIF()
-ENDIF()
+include(CompileCache)
 
 # make sub-directories
 ADD_SUBDIRECTORY(cmake)
@@ -615,6 +621,15 @@ ADD_CUSTOM_TARGET(dist
 			COMMAND tar cjf lmms-${VERSION}-src.tar.bz2 "${TMP}"
 			COMMAND rm -rf "${TMP}")
 
+
+#
+# add uninstall-target
+#
+ADD_CUSTOM_TARGET(uninstall
+	COMMAND ${CMAKE_COMMAND} -DCMAKE_INSTALL_PREFIX="${CMAKE_INSTALL_PREFIX}" -P "${CMAKE_CURRENT_SOURCE_DIR}/cmake/uninstall.cmake"
+)
+
+
 #
 # display configuration information
 #
@@ -653,6 +668,7 @@ MESSAGE(
 "Supported file formats for project export\n"
 "-----------------------------------------\n"
 "* WAVE                        : OK\n"
+"* FLAC                        : OK\n"
 "* OGG/VORBIS                  : ${STATUS_OGGVORBIS}\n"
 "* MP3/Lame                    : ${STATUS_MP3LAME}\n"
 )
@@ -660,6 +676,7 @@ MESSAGE(
 MESSAGE(
 "Optional plugins\n"
 "----------------\n"
+"* ZynAddSubFX instrument      : ${STATUS_ZYN}\n"
 "* Carla Patchbay & Rack       : ${STATUS_CARLA}\n"
 "* SoundFont2 player           : ${STATUS_FLUIDSYNTH}\n"
 "* Stk Mallets                 : ${STATUS_STK}\n"
@@ -674,6 +691,12 @@ MESSAGE(
 )
 
 MESSAGE(
+"Developer options\n"
+"-----------------------------------------\n"
+"* Debug FP exceptions         : ${STATUS_DEBUG_FPE}\n"
+)
+
+MESSAGE(
 "\n"
 "-----------------------------------------------------------------\n"
 "IMPORTANT:\n"
@@ -682,4 +705,5 @@ MESSAGE(
 "-----------------------------------------------------------------\n"
 "\n\n")
 
+SET(CMAKE_INSTALL_SYSTEM_RUNTIME_DESTINATION "${BIN_DIR}")
 INCLUDE(InstallRequiredSystemLibraries)

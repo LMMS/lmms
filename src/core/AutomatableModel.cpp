@@ -32,16 +32,14 @@
 #include "Mixer.h"
 #include "ProjectJournal.h"
 
-float AutomatableModel::s_copiedValue = 0;
 long AutomatableModel::s_periodCounter = 0;
 
 
 
-AutomatableModel::AutomatableModel( DataType type,
+AutomatableModel::AutomatableModel(
 						const float val, const float min, const float max, const float step,
 						Model* parent, const QString & displayName, bool defaultConstructed ) :
 	Model( parent, displayName, defaultConstructed ),
-	m_dataType( type ),
 	m_scaleType( Linear ),
 	m_minValue( min ),
 	m_maxValue( max ),
@@ -51,7 +49,6 @@ AutomatableModel::AutomatableModel( DataType type,
 	m_valueChanged( false ),
 	m_setValueDepth( 0 ),
 	m_hasStrictStepSize( false ),
-	m_hasLinkedModels( false ),
 	m_controllerConnection( NULL ),
 	m_valueBuffer( static_cast<int>( Engine::mixer()->framesPerPeriod() ) ),
 	m_lastUpdatedPeriod( -1 ),
@@ -92,23 +89,46 @@ bool AutomatableModel::isAutomated() const
 }
 
 
+
+bool AutomatableModel::mustQuoteName(const QString& name)
+{
+	QRegExp reg("^[A-Za-z0-9._-]+$");
+	return !reg.exactMatch(name);
+}
+
 void AutomatableModel::saveSettings( QDomDocument& doc, QDomElement& element, const QString& name )
 {
+	bool mustQuote = mustQuoteName(name);
+
 	if( isAutomated() || m_scaleType != Linear )
 	{
 		// automation needs tuple of data (name, id, value)
 		// scale type also needs an extra value
 		// => it must be appended as a node
-		QDomElement me = doc.createElement( name );
+
+		QDomElement me = doc.createElement( mustQuote ? QString("automatablemodel") : name );
 		me.setAttribute( "id", ProjectJournal::idToSave( id() ) );
 		me.setAttribute( "value", m_value );
 		me.setAttribute( "scale_type", m_scaleType == Logarithmic ? "log" : "linear" );
+		if(mustQuote) {
+			me.setAttribute( "nodename", name );
+		}
 		element.appendChild( me );
 	}
 	else
 	{
-		// non automation, linear scale (default), can be saved as attribute
-		element.setAttribute( name, m_value );
+		if(mustQuote)
+		{
+			QDomElement me = doc.createElement( "automatablemodel" );
+			me.setAttribute( "nodename", name );
+			me.setAttribute( "value", m_value );
+			element.appendChild( me );
+		}
+		else
+		{
+			// non automation, linear scale (default), can be saved as attribute
+			element.setAttribute( name, m_value );
+		}
 	}
 
 	if( m_controllerConnection && m_controllerConnection->getController()->type()
@@ -128,7 +148,13 @@ void AutomatableModel::saveSettings( QDomDocument& doc, QDomElement& element, co
 			element.appendChild( controllerElement );
 		}
 
-		QDomElement element = doc.createElement( name );
+		bool mustQuote = mustQuoteName(name);
+		QString elementName = mustQuote ? "controllerconnection"
+						: name;
+
+		QDomElement element = doc.createElement( elementName );
+		if(mustQuote)
+			element.setAttribute( "nodename", name );
 		m_controllerConnection->saveSettings( doc, element );
 
 		controllerElement.appendChild( element );
@@ -167,6 +193,17 @@ void AutomatableModel::loadSettings( const QDomElement& element, const QString& 
 	if( connectionNode.isElement() )
 	{
 		QDomNode thisConnection = connectionNode.toElement().namedItem( name );
+		if( !thisConnection.isElement() )
+		{
+			thisConnection = connectionNode.toElement().namedItem( "controllerconnection" );
+			QDomElement tcElement = thisConnection.toElement();
+			// sanity check
+			if( tcElement.isNull() || tcElement.attribute( "nodename" ) != name )
+			{
+				// no, that wasn't it, act as if we never found one
+				thisConnection.clear();
+			}
+		}
 		if( thisConnection.isElement() )
 		{
 			setControllerConnection( new ControllerConnection( (Controller*)NULL ) );
@@ -180,22 +217,48 @@ void AutomatableModel::loadSettings( const QDomElement& element, const QString& 
 	//   <port00 value="4.41" id="4249278"/>
 	// </ladspacontrols>
 	// element => there is automation data, or scaletype information
-	node = element.namedItem( name );
+
+	node = element.namedItem( name ); // maybe we have luck?
+
+	// either: no node with name "name" found
+	//  => look for nodes with attribute name="nodename"
+	// or: element with namedItem() "name" was found, but it's real nodename
+	// is given as attribute and does not match
+	//  => look for the right node
+	if(node.isNull() ||
+		( node.isElement() &&
+		node.toElement().hasAttribute("nodename") &&
+		node.toElement().attribute("nodename") != name))
+	{
+		for(QDomElement othernode = element.firstChildElement();
+			!othernode.isNull();
+			othernode = othernode.nextSiblingElement())
+		{
+			if((!othernode.hasAttribute("nodename") &&
+				othernode.nodeName() == name) ||
+				othernode.attribute("nodename") == name)
+			{
+				node = othernode;
+				break;
+			}
+		}
+	}
 	if( node.isElement() )
 	{
-			changeID( node.toElement().attribute( "id" ).toInt() );
-			setValue( LocaleHelper::toFloat( node.toElement().attribute( "value" ) ) );
-			if( node.toElement().hasAttribute( "scale_type" ) )
+		QDomElement nodeElement = node.toElement();
+		changeID( nodeElement.attribute( "id" ).toInt() );
+		setValue( LocaleHelper::toFloat( nodeElement.attribute( "value" ) ) );
+		if( nodeElement.hasAttribute( "scale_type" ) )
+		{
+			if( nodeElement.attribute( "scale_type" ) == "linear" )
 			{
-				if( node.toElement().attribute( "scale_type" ) == "linear" )
-				{
-					setScaleType( Linear );
-				}
-				else if( node.toElement().attribute( "scale_type" ) == "log" )
-				{
-					setScaleType( Logarithmic );
-				}
+				setScaleType( Linear );
 			}
+			else if( nodeElement.attribute( "scale_type" ) == "log" )
+			{
+				setScaleType( Logarithmic );
+			}
+		}
 	}
 	else
 	{
@@ -271,19 +334,6 @@ float AutomatableModel::inverseScaledValue( float value ) const
 	return m_scaleType == Linear
 		? value
 		: ::linearToLogScale( minValue<float>(), maxValue<float>(), value );
-}
-
-
-
-QString AutomatableModel::displayValue( const float val ) const
-{
-	switch( m_dataType )
-	{
-		case Float: return QString::number( castValue<float>( scaledValue( val ) ) );
-		case Integer: return QString::number( castValue<int>( scaledValue( val ) ) );
-		case Bool: return QString::number( castValue<bool>( scaledValue( val ) ) );
-	}
-	return "0";
 }
 
 
@@ -413,7 +463,6 @@ void AutomatableModel::linkModel( AutomatableModel* model )
 	if( !m_linkedModels.contains( model ) && model != this )
 	{
 		m_linkedModels.push_back( model );
-		m_hasLinkedModels = true;
 
 		if( !model->hasLinkedModels() )
 		{
@@ -428,12 +477,11 @@ void AutomatableModel::linkModel( AutomatableModel* model )
 
 void AutomatableModel::unlinkModel( AutomatableModel* model )
 {
-	AutoModelVector::Iterator it = qFind( m_linkedModels.begin(), m_linkedModels.end(), model );
+	AutoModelVector::Iterator it = std::find( m_linkedModels.begin(), m_linkedModels.end(), model );
 	if( it != m_linkedModels.end() )
 	{
 		m_linkedModels.erase( it );
 	}
-	m_hasLinkedModels = !m_linkedModels.isEmpty();
 }
 
 
@@ -465,8 +513,6 @@ void AutomatableModel::unlinkAllModels()
 	{
 		unlinkModels( this, model );
 	}
-
-	m_hasLinkedModels = false;
 }
 
 
@@ -570,7 +616,7 @@ ValueBuffer * AutomatableModel::valueBuffer()
 		}
 	}
 	AutomatableModel* lm = NULL;
-	if( m_hasLinkedModels )
+	if( hasLinkedModels() )
 	{
 		lm = m_linkedModels.first();
 	}
@@ -636,21 +682,6 @@ void AutomatableModel::reset()
 	setValue( initValue<float>() );
 }
 
-
-
-
-void AutomatableModel::copyValue()
-{
-	s_copiedValue = value<float>();
-}
-
-
-
-
-void AutomatableModel::pasteValue()
-{
-	setValue( copiedValue() );
-}
 
 
 
@@ -732,3 +763,19 @@ int FloatModel::getDigitCount() const
 	return digits;
 }
 
+
+
+QString FloatModel::displayValue( const float val ) const
+{
+	return QString::number( castValue<float>( scaledValue( val ) ) );
+}
+
+QString IntModel::displayValue( const float val ) const
+{
+	return QString::number( castValue<int>( scaledValue( val ) ) );
+}
+
+QString BoolModel::displayValue( const float val ) const
+{
+	return QString::number( castValue<bool>( scaledValue( val ) ) );
+}

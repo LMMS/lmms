@@ -37,6 +37,11 @@
 #define powf pow
 #endif
 
+#ifdef _MSC_VER
+//not #if LMMS_BUILD_WIN32 because we have strncasecmp in mingw
+#define strcasecmp _stricmp
+#endif
+
 
 using namespace std;
 
@@ -119,7 +124,10 @@ void DrumSynth::GetEnv(int env, const char *sec, const char *key, QString ini)
   char en[256], s[8];
   int i=0, o=0, ep=0;
   GetPrivateProfileString(sec, key, "0,0 100,0", en, sizeof(en), ini);
-  en[255]=0; //be safe!
+
+  //be safe!
+  en[255]=0;
+  s[0]=0;
 
   while(en[i]!=0)
   {

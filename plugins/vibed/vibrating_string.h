@@ -121,7 +121,7 @@ private:
 		float r;
 		float offset;
 		
-		if( not _state )
+		if( ! _state )
 		{
 			for( int i = 0; i < _pick; i++ )
 			{
@@ -183,7 +183,7 @@ private:
 	* iteration. */
 	inline void toBridgeUpdate( delayLine * _dl, sample_t _insamp )
 	{
-		register sample_t * ptr = _dl->pointer;
+		sample_t * ptr = _dl->pointer;
 		*ptr = _insamp * m_stringLoss;
 		++ptr;
 		if( ptr > _dl->end )
@@ -202,7 +202,7 @@ private:
 	inline void fromBridgeUpdate( delayLine * _dl, 
 							sample_t _insamp )
 	{
-		register sample_t * ptr = _dl->pointer;
+		sample_t * ptr = _dl->pointer;
 		--ptr;
 		if( ptr < _dl->data )
 		{
