@@ -41,6 +41,7 @@ FadeButton::FadeButton( const QColor & _normal_color,
 			QWidget * _parent ) :
 	QAbstractButton( _parent ),
 	m_stateTimer(),
+	m_releaseTimer(),
 	m_normalColor( _normal_color ),
 	m_activatedColor( _activated_color ),
 	m_holdColor( _hold_color )
@@ -88,6 +89,11 @@ void FadeButton::noteEnd()
 		activeNotes--;
 	}
 
+	if (activeNotes == 0)
+	{
+		m_releaseTimer.restart();
+	}
+
 	signalUpdate();
 }
 
@@ -122,16 +128,31 @@ void FadeButton::paintEvent( QPaintEvent * _pe )
 		col.setRgb( r, g, b );
 		QTimer::singleShot( 20, this, SLOT( update() ) );
 	}
-	else if( ! m_stateTimer.isNull()
+	else if ( ! m_stateTimer.isNull()
 		&& m_stateTimer.elapsed() >= FadeDuration
 		&& activeNotes > 0)
 	{
 		// The fade is done, but at least one note is still held.
 		col = m_holdColor;
 	}
-	else
+	else if ( ! m_releaseTimer.isNull() && m_releaseTimer.elapsed() < FadeDuration )
 	{
 		// No fade, no notes. Reset to default color.
+		const float state = 1 - m_releaseTimer.elapsed() / FadeDuration;
+		const int r = (int)( m_normalColor.red() *
+					( 1.0f - state ) +
+			m_holdColor.red() * state );
+		const int g = (int)( m_normalColor.green() *
+					( 1.0f - state ) +
+			m_holdColor.green() * state );
+		const int b = (int)( m_normalColor.blue() *
+					( 1.0f - state ) +
+			m_holdColor.blue() * state );
+		col.setRgb( r, g, b );
+		QTimer::singleShot( 20, this, SLOT( update() ) );
+	}
+	else
+	{
 		col = m_normalColor;
 	}
 
