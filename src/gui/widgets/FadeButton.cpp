@@ -137,7 +137,7 @@ void FadeButton::paintEvent( QPaintEvent * _pe )
 	}
 	else if ( ! m_releaseTimer.isNull() && m_releaseTimer.elapsed() < FadeDuration )
 	{
-		// No fade, no notes. Reset to default color.
+		// Last note just ended. Fade to default color.
 		const float state = 1 - m_releaseTimer.elapsed() / FadeDuration;
 		const int r = (int)( m_normalColor.red() *
 					( 1.0f - state ) +
@@ -153,6 +153,7 @@ void FadeButton::paintEvent( QPaintEvent * _pe )
 	}
 	else
 	{
+		// No fade, no notes. Set to default color.
 		col = m_normalColor;
 	}
 
