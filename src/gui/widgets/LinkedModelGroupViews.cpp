@@ -173,7 +173,7 @@ void LinkedModelGroupsViewBase::modelChanged(LinkedModelGroups *groups)
 		m_multiChannelLink->setModel(groups->multiChannelLinkModel());
 	}
 
-	for (std::size_t i = 0; getGroupView(i) && groups->getGroup(i); ++i)
+	for (std::size_t i = 0; groups->getGroup(i) && getGroupView(i); ++i)
 	{
 		getGroupView(i)->modelChanged(groups->getGroup(i));
 	}
