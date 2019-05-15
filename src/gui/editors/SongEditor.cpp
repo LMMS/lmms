@@ -32,6 +32,7 @@
 #include <QMdiArea>
 #include <QMdiSubWindow>
 #include <QPainter>
+#include <QDebug>
 
 #include "AutomatableSlider.h"
 #include "ComboBox.h"
@@ -76,11 +77,13 @@ SongEditor::SongEditor( Song * song ) :
 	TrackContainerView( song ),
 	m_song( song ),
 	m_zoomingModel(new ComboBoxModel()),
+	m_snappingModel(new ComboBoxModel()),
 	m_scrollBack( false ),
 	m_smoothScroll( ConfigManager::inst()->value( "ui", "smoothscroll" ).toInt() ),
 	m_mode(DrawMode)
 {
 	m_zoomingModel->setParent(this);
+	m_snappingModel->setParent(this);
 	// create time-line
 	m_widgetWidthTotal = ConfigManager::inst()->value( "ui",
 							"compacttrackbuttons" ).toInt()==1 ?
@@ -230,7 +233,7 @@ SongEditor::SongEditor( Song * song ) :
 	connect( m_song, SIGNAL( lengthChanged( int ) ),
 			this, SLOT( updateScrollBar( int ) ) );
 
-	// Set up zooming model
+	//Set up zooming model
 	for( float const & zoomLevel : m_zoomLevels )
 	{
 		m_zoomingModel->addItem( QString( "%1\%" ).arg( zoomLevel * 100 ) );
@@ -239,6 +242,20 @@ SongEditor::SongEditor( Song * song ) :
 			m_zoomingModel->findText( "100%" ) );
 	connect( m_zoomingModel, SIGNAL( dataChanged() ),
 					this, SLOT( zoomingChanged() ) );
+
+	//Set up snapping model, 2^i
+	for ( int i = 3; i >= -4; i-- ){
+		if ( i > 0 ){
+			m_snappingModel->addItem( QString( "%1 Bars").arg( 1 << i ) );
+		}
+		else if ( i == 0 ){
+			m_snappingModel->addItem( "1 Bar" );
+		}
+		else {
+			m_snappingModel->addItem( QString( "1/%1 Bar" ).arg( 1 << (-i) ) );
+		}
+	}
+	m_snappingModel->setInitValue( m_snappingModel->findText( "1 Bar" ) );
 
 	setFocusPolicy( Qt::StrongFocus );
 	setFocus();
@@ -261,7 +278,15 @@ void SongEditor::loadSettings( const QDomElement& element )
 	MainWindow::restoreWidgetState(parentWidget(), element);
 }
 
-
+float SongEditor::getSnapSize() const{
+	int val = -m_snappingModel->value() + 3;
+	if ( val >= 0 ){
+		return 1 << val;
+	}
+	else {
+		return 1.0 / ( 1 << abs(val) );
+	}
+}
 
 
 void SongEditor::setHighQuality( bool hq )
@@ -718,7 +743,7 @@ SongEditorWindow::SongEditorWindow(Song* song) :
 	QLabel * zoom_lbl = new QLabel( m_toolBar );
 	zoom_lbl->setPixmap( embed::getIconPixmap( "zoom" ) );
 
-	// setup zooming-stuff
+	//Set up zooming-stuff
 	m_zoomingComboBox = new ComboBox( m_toolBar );
 	m_zoomingComboBox->setFixedSize( 80, 22 );
 	m_zoomingComboBox->move( 580, 4 );
@@ -727,6 +752,15 @@ SongEditorWindow::SongEditorWindow(Song* song) :
 
 	zoomToolBar->addWidget( zoom_lbl );
 	zoomToolBar->addWidget( m_zoomingComboBox );
+
+	//Set up quantization/snapping selector
+	m_snappingComboBox = new ComboBox( m_toolBar );
+	m_snappingComboBox->setFixedSize( 80, 22 );
+	//m_snappingComboBox->move( 580 + 80 + 100, 4 );
+	m_snappingComboBox->setModel(m_editor->m_snappingModel);
+	m_snappingComboBox->setToolTip(tr("Clip snapping"));
+
+	zoomToolBar->addWidget( m_snappingComboBox );
 
 	connect(song, SIGNAL(projectLoaded()), this, SLOT(adjustUiAfterProjectLoad()));
 	connect(this, SIGNAL(resized()), m_editor, SLOT(updatePositionLine()));

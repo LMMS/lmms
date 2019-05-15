@@ -73,6 +73,7 @@ public:
 	void loadSettings( const QDomElement& element );
 
 	ComboBoxModel *zoomingModel() const;
+	float getSnapSize() const;
 
 public slots:
 	void scrolled( int new_pos );
@@ -130,6 +131,7 @@ private:
 	positionLine * m_positionLine;
 
 	ComboBoxModel* m_zoomingModel;
+	ComboBoxModel* m_snappingModel;
 
 	static const QVector<double> m_zoomLevels;
 
@@ -188,6 +190,7 @@ private:
 	QAction* m_crtlAction;
 
 	ComboBox * m_zoomingComboBox;
+	ComboBox * m_snappingComboBox;
 };
 
 #endif

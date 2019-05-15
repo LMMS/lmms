@@ -897,7 +897,7 @@ void TrackContentObjectView::mouseMoveEvent( QMouseEvent * me )
 		if( ! ( me->modifiers() & Qt::ControlModifier )
 		   && me->button() == Qt::NoButton )
 		{
-			t = t.toNearestTact();
+			t = t.quantize( gui->songEditor()->m_editor->getSnapSize() );
 		}
 		m_tco->movePosition( t );
 		m_trackView->getTrackContentWidget()->changePosition();
@@ -920,7 +920,7 @@ void TrackContentObjectView::mouseMoveEvent( QMouseEvent * me )
 					MidiTime::ticksPerTact() / ppt ) );
 		if( snap )
 		{
-			dtick = dtick.toNearestTact();
+			dtick = dtick.quantize( gui->songEditor()->m_editor->getSnapSize() );
 		}
 		// find out smallest position of all selected objects for not
 		// moving an object before zero
@@ -956,7 +956,7 @@ void TrackContentObjectView::mouseMoveEvent( QMouseEvent * me )
 			MidiTime t = qMax( MidiTime::ticksPerTact() / 16, static_cast<int>( me->x() * MidiTime::ticksPerTact() / ppt ) );
 			if( ! ( me->modifiers() & Qt::ControlModifier ) && me->button() == Qt::NoButton )
 			{
-				t = qMax<int>( MidiTime::ticksPerTact(), t.toNearestTact() );
+				t = qMax<int>( MidiTime::ticksPerTact(), t.quantize( gui->songEditor()->m_editor->getSnapSize() ) );
 			}
 			m_tco->changeLength( t );
 		}
@@ -974,7 +974,7 @@ void TrackContentObjectView::mouseMoveEvent( QMouseEvent * me )
 				if( ! ( me->modifiers() & Qt::ControlModifier )
 						&& me->button() == Qt::NoButton )
 				{
-					t = t.toNearestTact();
+					t = t.quantize( gui->songEditor()->m_editor->getSnapSize() );
 				}
 				MidiTime oldPos = m_tco->startPosition();
 				if( m_tco->length() + ( oldPos - t ) >= MidiTime::ticksPerTact() )
