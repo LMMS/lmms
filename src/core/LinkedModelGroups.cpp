@@ -61,7 +61,8 @@ void LinkedModelGroup::linkControls(LinkedModelGroup *other, int id)
 {
 	Q_ASSERT(id >= 0);
 	std::size_t id2 = static_cast<std::size_t>(id);
-	AutomatableModel::linkModels(m_models[id2], other->m_models[id2]);
+	AutomatableModel::linkModels(
+		m_models[id2].m_model, other->m_models[id2].m_model);
 }
 
 
@@ -72,7 +73,7 @@ void LinkedModelGroup::unlinkControls(LinkedModelGroup *other, int id)
 	Q_ASSERT(id >= 0);
 	std::size_t id2 = static_cast<std::size_t>(id);
 	AutomatableModel::unlinkModels(
-		m_models[id2], other->m_models[id2]);
+		m_models[id2].m_model, other->m_models[id2].m_model);
 }
 
 
@@ -98,7 +99,7 @@ void LinkedModelGroup::linkStateChangedSlot()
 
 
 void LinkedModelGroup::addModel(AutomatableModel *model) {
-	m_models.push_back(model); }
+	m_models.emplace_back(model); }
 
 
 

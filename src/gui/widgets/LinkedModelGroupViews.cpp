@@ -78,11 +78,12 @@ LinkedModelGroupViewBase::~LinkedModelGroupViewBase() {}
 void LinkedModelGroupViewBase::modelChanged(LinkedModelGroup *group)
 {
 	// reconnect models
+	using ModelInfo = LinkedModelGroup::ModelInfo;
 	std::vector<std::unique_ptr<ControlBase>>::iterator itr = m_controls.begin();
-	std::vector<AutomatableModel*> models = group->models();
+	std::vector<ModelInfo> models = group->models();
 	Q_ASSERT(m_controls.size() == models.size());
 
-	for (AutomatableModel* mdl : models) { (*itr++)->setModel(mdl); }
+	for (const ModelInfo& mdl : models) { (*itr++)->setModel(mdl.m_model); }
 
 	std::size_t count = 0;
 	for (std::unique_ptr<LedCheckBox>& led : m_leds)

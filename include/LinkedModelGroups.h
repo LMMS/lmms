@@ -1,4 +1,4 @@
-﻿/*
+/*
  * LinkedModelGroups.h - base classes for groups of linkable models
  *
  * Copyright (c) 2019-2019 Johannes Lorenz <j.git$$$lorenz-ho.me, $$$=@>
@@ -80,13 +80,22 @@ public:
 	/*
 		Models
 	*/
+	struct ModelInfo
+	{
+		class AutomatableModel* m_model;
+		// if you want to hide widgets, or prevent models from being saved,
+		// add bools here
+		ModelInfo(class AutomatableModel* m) : m_model(m)
+		{
+		}
+	};
+
 	class BoolModel* linkEnabledModel(std::size_t id) {
 		return m_linkEnabled[id]; }
 	const class BoolModel* linkEnabledModel(std::size_t id) const {
 		return m_linkEnabled[id]; }
-	std::vector<class AutomatableModel*>& models() { return m_models; }
-	const std::vector<class AutomatableModel*>& models() const {
-		return m_models; }
+	std::vector<ModelInfo>& models() { return m_models; }
+	const std::vector<ModelInfo>& models() const { return m_models; }
 
 	/*
 		General
@@ -105,7 +114,7 @@ private:
 	//! models for the per-control link-enabled models
 	std::vector<class BoolModel*> m_linkEnabled;
 	//! models for the controls; the vector defines indices for the controls
-	std::vector<class AutomatableModel*> m_models;
+	std::vector<ModelInfo> m_models;
 
 	int m_curProc, m_nProc;
 };
