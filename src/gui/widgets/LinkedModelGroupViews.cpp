@@ -43,24 +43,28 @@ LinkedModelGroupViewBase::LinkedModelGroupViewBase(QWidget* parent,
 	m_isLinking(model->isLinking()),
 	m_grid(new QGridLayout(this))
 {
-	int curProc = model->curProc();
-	QString chanName;
-	if (name.isNull())
+	if(model->models().size())
 	{
-		switch(nProc)
+		int curProc = model->curProc();
+		QString chanName;
+		if (name.isNull())
 		{
-			case 1: break; // don't display any channel name
-			case 2:
-				chanName = QObject::tr(curProc ? "Right" : "Left");
-				break;
-			default:
-				chanName = QObject::tr("Channel ") + QString::number(curProc + 1);
-				break;
+			switch(nProc)
+			{
+				case 1: break; // don't display any channel name
+				case 2:
+					chanName = QObject::tr(curProc ? "Right" : "Left");
+					break;
+				default:
+					chanName = QObject::tr("Channel ") + QString::number(curProc + 1);
+					break;
+			}
 		}
-	}
-	else { chanName = name; }
+		else { chanName = name; }
 
-	if (!chanName.isNull()) { setTitle(chanName); }
+		if (!chanName.isNull()) { setTitle(chanName); }
+	}
+	else { setHidden(true); }
 }
 
 
