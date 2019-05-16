@@ -1399,7 +1399,7 @@ void TrackContentWidget::dragEnterEvent( QDragEnterEvent * dee )
  */
 bool TrackContentWidget::canPasteSelection( MidiTime tcoPos, const QDropEvent* de )
 {
-	tcoPos = MidiTime(tcoPos.getTact(), 0);
+	//tcoPos = MidiTime(tcoPos.getTact(), 0);
 	const QMimeData * mimeData = de->mimeData();
 
 	Track * t = getTrack();
