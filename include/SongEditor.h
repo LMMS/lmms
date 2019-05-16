@@ -81,6 +81,7 @@ public slots:
 	void setEditMode( EditMode mode );
 	void setEditModeDraw();
 	void setEditModeSelect();
+	void toggleAdaptiveSnap();
 
 	void updatePosition( const MidiTime & t );
 	void updatePositionLine();
@@ -132,6 +133,7 @@ private:
 
 	ComboBoxModel* m_zoomingModel;
 	ComboBoxModel* m_snappingModel;
+	bool m_adaptiveSnap;
 
 	static const QVector<double> m_zoomLevels;
 
@@ -183,6 +185,7 @@ private:
 	QAction* m_addBBTrackAction;
 	QAction* m_addSampleTrackAction;
 	QAction* m_addAutomationTrackAction;
+	QAction* m_setAdaptiveSnapAction;
 
 	ActionGroup * m_editModeGroup;
 	QAction* m_drawModeAction;
