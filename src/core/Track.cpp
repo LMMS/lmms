@@ -1532,7 +1532,7 @@ bool TrackContentWidget::pasteSelection( MidiTime tcoPos, QDropEvent * de )
 		Track * t = tracks.at( finalTrackIndex );
 
 		// The new position is the old position plus the offset.
-		MidiTime pos = tcoElement.attributeNode( "pos" ).value().toInt() + snappedOffset;
+		MidiTime pos = tcoElement.attributeNode( "pos" ).value().toInt() + offset;
 
 		TrackContentObject * tco = t->createTCO( pos );
 		tco->restoreState( tcoElement );
