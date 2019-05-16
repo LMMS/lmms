@@ -524,7 +524,7 @@ void TrackContentObjectView::updatePosition()
 void TrackContentObjectView::dragEnterEvent( QDragEnterEvent * dee )
 {
 	TrackContentWidget * tcw = getTrackView()->getTrackContentWidget();
-	MidiTime tcoPos = MidiTime( m_tco->startPosition().getTact(), 0 );
+	MidiTime tcoPos = MidiTime( m_tco->startPosition() );
 	if( tcw->canPasteSelection( tcoPos, dee ) == false )
 	{
 		dee->ignore();
@@ -563,7 +563,7 @@ void TrackContentObjectView::dropEvent( QDropEvent * de )
 	if( m_trackView->trackContainerView()->allowRubberband() == true )
 	{
 		TrackContentWidget * tcw = getTrackView()->getTrackContentWidget();
-		MidiTime tcoPos = MidiTime( m_tco->startPosition().getTact(), 0 );
+		MidiTime tcoPos = MidiTime( m_tco->startPosition() );
 		if( tcw->pasteSelection( tcoPos, de ) == true )
 		{
 			de->accept();
@@ -1399,6 +1399,7 @@ void TrackContentWidget::dragEnterEvent( QDragEnterEvent * dee )
  */
 bool TrackContentWidget::canPasteSelection( MidiTime tcoPos, const QDropEvent* de )
 {
+	tcoPos = MidiTime(tcoPos.getTact(), 0);
 	const QMimeData * mimeData = de->mimeData();
 
 	Track * t = getTrack();
@@ -1517,6 +1518,10 @@ bool TrackContentWidget::pasteSelection( MidiTime tcoPos, QDropEvent * de )
 	// TODO -- Need to draw the hovericon either way, or ghost the TCOs
 	// onto their final position.
 
+	// All patterns should be offset the same amount as the grabbed pattern
+	// The offset is quantized (rather than the positions) to preserve fine adjustments
+	int offset = MidiTime(tcoPos - grabbedTCOPos).quantize(gui->songEditor()->m_editor->getSnapSize());
+
 	for( int i = 0; i<tcoNodes.length(); i++ )
 	{
 		QDomElement outerTCOElement = tcoNodes.item( i ).toElement();
@@ -1526,13 +1531,8 @@ bool TrackContentWidget::pasteSelection( MidiTime tcoPos, QDropEvent * de )
 		int finalTrackIndex = trackIndex + ( currentTrackIndex - initialTrackIndex );
 		Track * t = tracks.at( finalTrackIndex );
 
-		// Compute the final position by moving the tco's pos by
-		// the number of tacts between the first TCO and the mouse drop TCO
-		MidiTime oldPos = tcoElement.attributeNode( "pos" ).value().toInt();
-		MidiTime offset = oldPos - MidiTime( oldPos.getTact(), 0 );
-		MidiTime oldTact = MidiTime( oldPos.getTact(), 0 );
-		MidiTime delta = offset + ( oldTact - grabbedTCOTact );
-		MidiTime pos = tcoPos + delta;
+		// The new position is the old position plus the offset.
+		MidiTime pos = tcoElement.attributeNode( "pos" ).value().toInt() + snappedOffset;
 
 		TrackContentObject * tco = t->createTCO( pos );
 		tco->restoreState( tcoElement );
@@ -1562,7 +1562,7 @@ bool TrackContentWidget::pasteSelection( MidiTime tcoPos, QDropEvent * de )
  */
 void TrackContentWidget::dropEvent( QDropEvent * de )
 {
-	MidiTime tcoPos = MidiTime( getPosition( de->pos().x() ).getTact(), 0 );
+	MidiTime tcoPos = MidiTime( getPosition( de->pos().x() ) );
 	if( pasteSelection( tcoPos, de ) == true )
 	{
 		de->accept();
