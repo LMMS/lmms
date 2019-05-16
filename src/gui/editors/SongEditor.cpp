@@ -78,6 +78,7 @@ SongEditor::SongEditor( Song * song ) :
 	m_song( song ),
 	m_zoomingModel(new ComboBoxModel()),
 	m_snappingModel(new ComboBoxModel()),
+	m_adaptiveSnap( true ),
 	m_scrollBack( false ),
 	m_smoothScroll( ConfigManager::inst()->value( "ui", "smoothscroll" ).toInt() ),
 	m_mode(DrawMode)
@@ -280,11 +281,15 @@ void SongEditor::loadSettings( const QDomElement& element )
 
 float SongEditor::getSnapSize() const{
 	int val = -m_snappingModel->value() + 3;
+	if (m_adaptiveSnap){
+		val = val - m_zoomingModel->value() + 3;
+	}
+
 	if ( val >= 0 ){
 		return 1 << val;
 	}
 	else {
-		return 1.0 / ( 1 << abs(val) );
+		return 1.0 / ( 1 << -val );
 	}
 }
 
@@ -321,6 +326,11 @@ void SongEditor::setEditModeDraw()
 void SongEditor::setEditModeSelect()
 {
 	setEditMode(SelectMode);
+}
+
+void SongEditor::toggleAdaptiveSnap()
+{
+	m_adaptiveSnap = !m_adaptiveSnap;
 }
 
 
@@ -763,8 +773,16 @@ SongEditorWindow::SongEditorWindow(Song* song) :
 	m_snappingComboBox->setModel(m_editor->m_snappingModel);
 	m_snappingComboBox->setToolTip(tr("Clip snapping"));
 
+	m_setAdaptiveSnapAction = new QAction(embed::getIconPixmap("add_automation"),
+											 tr("Enable adaptive snap"), this);
+	m_setAdaptiveSnapAction->setCheckable(true);
+	m_setAdaptiveSnapAction->setChecked(true);
+
+	connect(m_setAdaptiveSnapAction, SIGNAL(triggered()), m_editor, SLOT(toggleAdaptiveSnap()));
+
 	snapToolBar->addWidget( snap_lbl );
 	snapToolBar->addWidget( m_snappingComboBox );
+	snapToolBar->addAction( m_setAdaptiveSnapAction );
 
 	connect(song, SIGNAL(projectLoaded()), this, SLOT(adjustUiAfterProjectLoad()));
 	connect(this, SIGNAL(resized()), m_editor, SLOT(updatePositionLine()));
