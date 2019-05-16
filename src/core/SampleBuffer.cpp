@@ -73,7 +73,7 @@ SampleBuffer::SampleBuffer( const QString & _audio_file,
 	m_amplification( 1.0f ),
 	m_reversed( false ),
 	m_frequency( BaseFreq ),
-	m_sampleRate( Engine::mixer()->baseSampleRate() )
+	m_sampleRate( Engine::mixer()->processingSampleRate() )
 {
 	if( _is_base64_data == true )
 	{
@@ -99,7 +99,7 @@ SampleBuffer::SampleBuffer( const sampleFrame * _data, const f_cnt_t _frames ) :
 	m_amplification( 1.0f ),
 	m_reversed( false ),
 	m_frequency( BaseFreq ),
-	m_sampleRate( Engine::mixer()->baseSampleRate() )
+	m_sampleRate( Engine::mixer()->processingSampleRate() )
 {
 	if( _frames > 0 )
 	{
@@ -127,7 +127,7 @@ SampleBuffer::SampleBuffer( const f_cnt_t _frames ) :
 	m_amplification( 1.0f ),
 	m_reversed( false ),
 	m_frequency( BaseFreq ),
-	m_sampleRate( Engine::mixer()->baseSampleRate() )
+	m_sampleRate( Engine::mixer()->processingSampleRate() )
 {
 	if( _frames > 0 )
 	{
@@ -190,7 +190,7 @@ void SampleBuffer::update( bool _keep_settings )
 		int_sample_t * buf = NULL;
 		sample_t * fbuf = NULL;
 		ch_cnt_t channels = DEFAULT_CHANNELS;
-		sample_rate_t samplerate = Engine::mixer()->baseSampleRate();
+		sample_rate_t samplerate = Engine::mixer()->processingSampleRate();
 		m_frames = 0;
 
 		const QFileInfo fileInfo( file );
@@ -378,10 +378,10 @@ void SampleBuffer::normalizeSampleRate( const sample_rate_t _src_sr,
 							bool _keep_settings )
 {
 	// do samplerate-conversion to our default-samplerate
-	if( _src_sr != Engine::mixer()->baseSampleRate() )
+	if( _src_sr != Engine::mixer()->processingSampleRate() )
 	{
 		SampleBuffer * resampled = resample( _src_sr,
-					Engine::mixer()->baseSampleRate() );
+					Engine::mixer()->processingSampleRate() );
 		MM_FREE( m_data );
 		m_frames = resampled->frames();
 		m_data = MM_ALLOC( sampleFrame, m_frames );
