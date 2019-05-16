@@ -62,8 +62,10 @@ KnobControl::~KnobControl() {}
 
 void ComboControl::setText(const QString &text) { m_label->setText(text); }
 
-void ComboControl::setModel(AutomatableModel *model) {
-	m_combo->setModel(model->dynamicCast<ComboBoxModel>(true)); }
+void ComboControl::setModel(AutomatableModel *model)
+{
+	m_combo->setModel(model->dynamicCast<ComboBoxModel>(true));
+}
 
 ComboBoxModel *ComboControl::model() { return m_combo->model(); }
 
@@ -88,8 +90,10 @@ void CheckControl::setText(const QString &text) { m_label->setText(text); }
 
 QWidget *CheckControl::topWidget() { return m_widget; }
 
-void CheckControl::setModel(AutomatableModel *model) {
-	m_checkBox->setModel(model->dynamicCast<BoolModel>(true)); }
+void CheckControl::setModel(AutomatableModel *model)
+{
+	m_checkBox->setModel(model->dynamicCast<BoolModel>(true));
+}
 
 BoolModel *CheckControl::model() { return m_checkBox->model(); }
 
@@ -112,8 +116,10 @@ void LcdControl::setText(const QString &text) { m_lcd->setLabel(text); }
 
 QWidget *LcdControl::topWidget() { return m_lcd; }
 
-void LcdControl::setModel(AutomatableModel *model) {
-	m_lcd->setModel(model->dynamicCast<IntModel>(true)); }
+void LcdControl::setModel(AutomatableModel *model)
+{
+	m_lcd->setModel(model->dynamicCast<IntModel>(true));
+}
 
 IntModel *LcdControl::model() { return m_lcd->model(); }
 

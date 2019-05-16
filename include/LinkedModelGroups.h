@@ -88,10 +88,14 @@ public:
 			: m_name(name), m_model(model) {}
 	};
 
-	class BoolModel* linkEnabledModel(std::size_t id) {
-		return m_linkEnabled[id]; }
-	const class BoolModel* linkEnabledModel(std::size_t id) const {
-		return m_linkEnabled[id]; }
+	class BoolModel* linkEnabledModel(std::size_t id)
+	{
+		return m_linkEnabled[id];
+	}
+	const class BoolModel* linkEnabledModel(std::size_t id) const
+	{
+		return m_linkEnabled[id];
+	}
 	std::vector<ModelInfo>& models() { return m_models; }
 	const std::vector<ModelInfo>& models() const { return m_models; }
 
@@ -139,7 +143,8 @@ private:
 	class:
 
 	\code
-		if (multiChannelLinkModel()) {
+		if (multiChannelLinkModel())
+		{
 			connect(multiChannelLinkModel(), SIGNAL(dataChanged()),
 				this, SLOT(updateLinkStatesFromGlobal()));
 			connect(getGroup(0), SIGNAL(linkStateChanged(int, bool)),

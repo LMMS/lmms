@@ -43,13 +43,13 @@ LinkedModelGroupViewBase::LinkedModelGroupViewBase(QWidget* parent,
 	m_isLinking(model->isLinking()),
 	m_grid(new QGridLayout(this))
 {
-	if(model->models().size())
+	if (model->models().size())
 	{
 		int curProc = model->curProc();
 		QString chanName;
 		if (name.isNull())
 		{
-			switch(nProc)
+			switch (nProc)
 			{
 				case 1: break; // don't display any channel name
 				case 2:
