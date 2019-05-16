@@ -82,12 +82,10 @@ public:
 	*/
 	struct ModelInfo
 	{
+		QString m_name;
 		class AutomatableModel* m_model;
-		// if you want to hide widgets, or prevent models from being saved,
-		// add bools here
-		ModelInfo(class AutomatableModel* m) : m_model(m)
-		{
-		}
+		ModelInfo(const QString& name, AutomatableModel* model)
+			: m_name(name), m_model(model) {}
 	};
 
 	class BoolModel* linkEnabledModel(std::size_t id) {
@@ -98,13 +96,21 @@ public:
 	const std::vector<ModelInfo>& models() const { return m_models; }
 
 	/*
+		Load/Save
+	*/
+	void saveValues(class QDomDocument& doc, class QDomElement& that);
+	void saveLinksEnabled(QDomDocument &doc, QDomElement &that);
+	void loadValues(const class QDomElement& that);
+	void loadLinksEnabled(const class QDomElement &that);
+
+	/*
 		General
-	 */
+	*/
 	int curProc() const { return m_curProc; }
 
 protected:
 	//! Register a further model
-	void addModel(class AutomatableModel* model);
+	void addModel(class AutomatableModel* model, const QString& name);
 
 private slots:
 	//! Callback called after any of the per-control link-enabled models switch
@@ -165,6 +171,15 @@ public:
 	//! Callback for the global linking LED
 	void updateLinkStatesFromGlobal();
 
+	/*
+		Load/Save
+	*/
+	void saveSettings(class QDomDocument& doc, class QDomElement& that);
+	void loadSettings(const class QDomElement& that);
+
+	/*
+		General
+	*/
 	//! Derived classes must return the group with index @p idx,
 	//! or nullptr if @p is out of range
 	virtual LinkedModelGroup* getGroup(std::size_t idx) = 0;
