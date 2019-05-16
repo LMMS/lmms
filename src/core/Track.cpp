@@ -1399,7 +1399,6 @@ void TrackContentWidget::dragEnterEvent( QDragEnterEvent * dee )
  */
 bool TrackContentWidget::canPasteSelection( MidiTime tcoPos, const QDropEvent* de )
 {
-	//tcoPos = MidiTime(tcoPos.getTact(), 0);
 	const QMimeData * mimeData = de->mimeData();
 
 	Track * t = getTrack();
@@ -1497,7 +1496,6 @@ bool TrackContentWidget::pasteSelection( MidiTime tcoPos, QDropEvent * de )
 	int initialTrackIndex = tiAttr.value().toInt();
 	QDomAttr tcoPosAttr = metadata.attributeNode( "grabbedTCOPos" );
 	MidiTime grabbedTCOPos = tcoPosAttr.value().toInt();
-	MidiTime grabbedTCOTact = MidiTime( grabbedTCOPos.getTact(), 0 );
 
 	// Snap the mouse position to the beginning of the dropped tact, in ticks
 	const TrackContainer::TrackList tracks = getTrack()->trackContainer()->tracks();
