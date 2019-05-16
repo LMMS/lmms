@@ -753,14 +753,18 @@ SongEditorWindow::SongEditorWindow(Song* song) :
 	zoomToolBar->addWidget( zoom_lbl );
 	zoomToolBar->addWidget( m_zoomingComboBox );
 
+	DropToolBar *snapToolBar = addDropToolBarToTop(tr("Snap controls"));
+	QLabel * snap_lbl = new QLabel( m_toolBar );
+	snap_lbl->setPixmap( embed::getIconPixmap( "quantize" ) );
+
 	//Set up quantization/snapping selector
 	m_snappingComboBox = new ComboBox( m_toolBar );
 	m_snappingComboBox->setFixedSize( 80, 22 );
-	//m_snappingComboBox->move( 580 + 80 + 100, 4 );
 	m_snappingComboBox->setModel(m_editor->m_snappingModel);
 	m_snappingComboBox->setToolTip(tr("Clip snapping"));
 
-	zoomToolBar->addWidget( m_snappingComboBox );
+	snapToolBar->addWidget( snap_lbl );
+	snapToolBar->addWidget( m_snappingComboBox );
 
 	connect(song, SIGNAL(projectLoaded()), this, SLOT(adjustUiAfterProjectLoad()));
 	connect(this, SIGNAL(resized()), m_editor, SLOT(updatePositionLine()));
