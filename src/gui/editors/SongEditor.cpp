@@ -794,7 +794,7 @@ SongEditorWindow::SongEditorWindow(Song* song) :
 
 QSize SongEditorWindow::sizeHint() const
 {
-	return {600, 300};
+	return {640, 300};
 }
 
 
