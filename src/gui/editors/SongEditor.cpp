@@ -280,10 +280,13 @@ void SongEditor::loadSettings( const QDomElement& element )
 }
 
 float SongEditor::getSnapSize() const{
+	// 1 Bar is the third value in the snapping dropdown
 	int val = -m_snappingModel->value() + 3;
+	// If adaptive snap is on, we snap to finer values when zoomed in
 	if (m_adaptiveSnap){
 		val = val - m_zoomingModel->value() + 3;
 	}
+	val = max(val, -6); // -6 gives 1/64th bar snapping. Lower values cause crashing.
 
 	if ( val >= 0 ){
 		return 1 << val;
@@ -782,6 +785,7 @@ SongEditorWindow::SongEditorWindow(Song* song) :
 
 	snapToolBar->addWidget( snap_lbl );
 	snapToolBar->addWidget( m_snappingComboBox );
+	snapToolBar->addSeparator();
 	snapToolBar->addAction( m_setAdaptiveSnapAction );
 
 	connect(song, SIGNAL(projectLoaded()), this, SLOT(adjustUiAfterProjectLoad()));
