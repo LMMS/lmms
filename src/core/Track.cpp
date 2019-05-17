@@ -900,7 +900,8 @@ void TrackContentObjectView::mouseMoveEvent( QMouseEvent * me )
 			offset = offset.quantize( gui->songEditor()->m_editor->getSnapSize() );
 		}
 
-		m_tco->movePosition( m_tco->startPosition() + offset );
+		MidiTime newPos = max(0, m_tco->startPosition() + offset);
+		m_tco->movePosition( newPos );
 		m_trackView->getTrackContentWidget()->changePosition();
 		s_textFloat->setText( QString( "%1:%2" ).
 				arg( m_tco->startPosition().getTact() + 1 ).
