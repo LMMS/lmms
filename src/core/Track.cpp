@@ -889,17 +889,18 @@ void TrackContentObjectView::mouseMoveEvent( QMouseEvent * me )
 	const float ppt = m_trackView->trackContainerView()->pixelsPerTact();
 	if( m_action == Move )
 	{
-		const int x = mapToParent( me->pos() ).x() - m_initialMousePos.x();
-		MidiTime t = qMax( 0, (int)
-			m_trackView->trackContainerView()->currentPosition()+
-				static_cast<int>( x * MidiTime::ticksPerTact() /
-									ppt ) );
+		const int mousePixPos = mapToParent( me->pos() ).x();
+		MidiTime mousePos = static_cast<int>( mousePixPos * MidiTime::ticksPerTact() / ppt );
+		MidiTime mouseStart = static_cast<int>( mapToParent(m_initialMousePos).x() * MidiTime::ticksPerTact() / ppt );
+		MidiTime offset = mousePos - mouseStart;
+
 		if( ! ( me->modifiers() & Qt::ControlModifier )
 		   && me->button() == Qt::NoButton )
 		{
-			t = t.quantize( gui->songEditor()->m_editor->getSnapSize() );
+			offset = offset.quantize( gui->songEditor()->m_editor->getSnapSize() );
 		}
-		m_tco->movePosition( t );
+
+		m_tco->movePosition( m_tco->startPosition() + offset );
 		m_trackView->getTrackContentWidget()->changePosition();
 		s_textFloat->setText( QString( "%1:%2" ).
 				arg( m_tco->startPosition().getTact() + 1 ).
@@ -1531,6 +1532,9 @@ bool TrackContentWidget::pasteSelection( MidiTime tcoPos, QDropEvent * de )
 
 		// The new position is the old position plus the offset.
 		MidiTime pos = tcoElement.attributeNode( "pos" ).value().toInt() + offset;
+		// If we land on ourselves, offset by one snap
+		MidiTime shift = MidiTime::ticksPerTact() * gui->songEditor()->m_editor->getSnapSize();
+		if (offset == 0) { pos += shift; }
 
 		TrackContentObject * tco = t->createTCO( pos );
 		tco->restoreState( tcoElement );
