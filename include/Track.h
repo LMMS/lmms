@@ -236,7 +236,7 @@ public:
 	// access needsUpdate member variable
 	bool needsUpdate();
 	void setNeedsUpdate( bool b );
-	
+
 public slots:
 	virtual bool close();
 	void cut();
@@ -564,13 +564,13 @@ public:
 
 	using Model::dataChanged;
 
-	inline int getHeight() 
+	inline int getHeight()
 	{
 		return m_height >= MINIMAL_TRACK_HEIGHT
-			? m_height 
+			? m_height
 			: DEFAULT_TRACK_HEIGHT;
 	}
-	inline void setHeight( int height ) 
+	inline void setHeight( int height )
 	{
 		m_height = height;
 	}

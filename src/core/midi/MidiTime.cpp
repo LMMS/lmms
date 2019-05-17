@@ -65,7 +65,6 @@ MidiTime::MidiTime( const tick_t ticks ) :
 
 MidiTime MidiTime::quantize(float bars) const
 {
-	//float bars = 0.5;
 	//The intervals we should snap to, our new position should be a factor of this
 	int interval = s_ticksPerTact * bars;
 	//The lower position we could snap to
