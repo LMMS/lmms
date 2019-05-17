@@ -266,6 +266,9 @@ private:
 	void testPlayNote( Note * n );
 	void testPlayKey( int _key, int _vol, int _pan );
 	void pauseTestNotes(bool pause = true );
+	void playChordNotes(int key, int velocity=-1);
+	void pauseChordNotes(int key);
+
 
 	QList<int> getAllOctavesForKey( int keyToMirror ) const;
 
