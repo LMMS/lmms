@@ -297,6 +297,7 @@ private:
 	Actions m_action;
 	QPoint m_initialMousePos;
 	QPoint m_initialMouseGlobalPos;
+	MidiTime m_initialTCOPos;
 
 	TextFloat * m_hint;
 
@@ -311,10 +312,11 @@ private:
 	bool m_gradient;
 
  	bool m_needsUpdate;
-	inline void setInitialMousePos( QPoint pos )
+	inline void setInitialPos( QPoint pos )
 	{
 		m_initialMousePos = pos;
 		m_initialMouseGlobalPos = mapToGlobal( pos );
+		m_initialTCOPos = m_tco->startPosition();
 	}
 
 	bool mouseMovedDistance( QMouseEvent * me, int distance );

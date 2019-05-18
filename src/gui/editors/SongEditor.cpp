@@ -78,7 +78,8 @@ SongEditor::SongEditor( Song * song ) :
 	m_song( song ),
 	m_zoomingModel(new ComboBoxModel()),
 	m_snappingModel(new ComboBoxModel()),
-	m_adaptiveSnap( true ),
+	m_proportionalSnap( true ),
+	m_snapType( ShiftMode ),
 	m_scrollBack( false ),
 	m_smoothScroll( ConfigManager::inst()->value( "ui", "smoothscroll" ).toInt() ),
 	m_mode(DrawMode)
@@ -282,8 +283,8 @@ void SongEditor::loadSettings( const QDomElement& element )
 float SongEditor::getSnapSize() const{
 	// 1 Bar is the third value in the snapping dropdown
 	int val = -m_snappingModel->value() + 3;
-	// If adaptive snap is on, we snap to finer values when zoomed in
-	if (m_adaptiveSnap){
+	// If proportional snap is on, we snap to finer values when zoomed in
+	if (m_proportionalSnap){
 		val = val - m_zoomingModel->value() + 3;
 	}
 	val = max(val, -6); // -6 gives 1/64th bar snapping. Lower values cause crashing.
@@ -331,9 +332,14 @@ void SongEditor::setEditModeSelect()
 	setEditMode(SelectMode);
 }
 
-void SongEditor::toggleAdaptiveSnap()
+void SongEditor::toggleProportionalSnap()
 {
-	m_adaptiveSnap = !m_adaptiveSnap;
+	m_proportionalSnap = !m_proportionalSnap;
+}
+
+void SongEditor::setSnapMode( int state )
+{
+	m_snapType = static_cast<SnapType>( state );
 }
 
 
@@ -776,17 +782,27 @@ SongEditorWindow::SongEditorWindow(Song* song) :
 	m_snappingComboBox->setModel(m_editor->m_snappingModel);
 	m_snappingComboBox->setToolTip(tr("Clip snapping"));
 
-	m_setAdaptiveSnapAction = new QAction(embed::getIconPixmap("add_automation"),
-											 tr("Enable adaptive snap"), this);
-	m_setAdaptiveSnapAction->setCheckable(true);
-	m_setAdaptiveSnapAction->setChecked(true);
+	m_setProportionalSnapAction = new QAction(embed::getIconPixmap("add_automation"),
+											 tr("Toggle roportional snap on/off"), this);
+	m_setProportionalSnapAction->setCheckable(true);
+	m_setProportionalSnapAction->setChecked(true);
+	connect(m_setProportionalSnapAction, SIGNAL(triggered()), m_editor, SLOT(toggleProportionalSnap()));
 
-	connect(m_setAdaptiveSnapAction, SIGNAL(triggered()), m_editor, SLOT(toggleAdaptiveSnap()));
+	NStateButton * m_snapTypeButton = new NStateButton( m_toolBar );
+	m_snapTypeButton->addState( embed::getIconPixmap( "back_to_start" ),
+				tr( "Shift mode" ) );
+	m_snapTypeButton->addState( embed::getIconPixmap( "back_to_zero" ),
+				tr( "Snap mode" ) );
+	m_snapTypeButton->addState( embed::getIconPixmap( "keep_stop_position" ),
+				tr( "Snap & shift mode" ) );
+	connect( m_snapTypeButton, SIGNAL( changedState( int ) ), m_editor,
+				SLOT( setSnapMode( int ) ) );
 
 	snapToolBar->addWidget( snap_lbl );
 	snapToolBar->addWidget( m_snappingComboBox );
 	snapToolBar->addSeparator();
-	snapToolBar->addAction( m_setAdaptiveSnapAction );
+	snapToolBar->addAction( m_setProportionalSnapAction );
+	snapToolBar->addWidget( m_snapTypeButton );
 
 	connect(song, SIGNAL(projectLoaded()), this, SLOT(adjustUiAfterProjectLoad()));
 	connect(this, SIGNAL(resized()), m_editor, SLOT(updatePositionLine()));
@@ -794,7 +810,7 @@ SongEditorWindow::SongEditorWindow(Song* song) :
 
 QSize SongEditorWindow::sizeHint() const
 {
-	return {640, 300};
+	return {660, 300};
 }
 
 
