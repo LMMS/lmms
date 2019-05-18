@@ -267,6 +267,7 @@ TrackContentObjectView::TrackContentObjectView( TrackContentObject * tco,
 	m_action( NoAction ),
 	m_initialMousePos( QPoint( 0, 0 ) ),
 	m_initialMouseGlobalPos( QPoint( 0, 0 ) ),
+	m_initialTCOPos( MidiTime(0) ),
 	m_hint( NULL ),
 	m_mutedColor( 0, 0, 0 ),
 	m_mutedBackgroundColor( 0, 0, 0 ),
@@ -711,7 +712,7 @@ void TrackContentObjectView::paintTextLabel(QString const & text, QPainter & pai
  */
 void TrackContentObjectView::mousePressEvent( QMouseEvent * me )
 {
-	setInitialMousePos( me->pos() );
+	setInitialPos( me->pos() );
 	if( !fixedTCOs() && me->button() == Qt::LeftButton )
 	{
 		if( me->modifiers() & Qt::ControlModifier )
@@ -739,7 +740,7 @@ void TrackContentObjectView::mousePressEvent( QMouseEvent * me )
 				// move or resize
 				m_tco->setJournalling( false );
 
-				setInitialMousePos( me->pos() );
+				setInitialPos( me->pos() );
 
 				SampleTCO * sTco = dynamic_cast<SampleTCO*>( m_tco );
 				if( me->x() < RESIZE_GRIP_WIDTH && sTco
@@ -889,23 +890,33 @@ void TrackContentObjectView::mouseMoveEvent( QMouseEvent * me )
 	const float ppt = m_trackView->trackContainerView()->pixelsPerTact();
 	if( m_action == Move )
 	{
-		const int mousePixPos = mapToParent( me->pos() ).x();
-		MidiTime mousePos = static_cast<int>( mousePixPos * MidiTime::ticksPerTact() / ppt );
-		MidiTime mouseStart = static_cast<int>( mapToParent(m_initialMousePos).x() * MidiTime::ticksPerTact() / ppt );
-		MidiTime offset = mousePos - mouseStart;
-
+		const int pixPos = mapToParent(me->pos()).x() - m_initialMousePos.x();
+		MidiTime newPos = pixPos * MidiTime::ticksPerTact() / ppt;
+		MidiTime offset = newPos - m_initialTCOPos;
+		// If ctrl isn't held, we need to quantize
 		if( ! ( me->modifiers() & Qt::ControlModifier )
 		   && me->button() == Qt::NoButton )
 		{
-			offset = offset.quantize( gui->songEditor()->m_editor->getSnapSize() );
+			MidiTime snapPos = newPos.quantize( gui->songEditor()->m_editor->getSnapSize() );
+			MidiTime shiftPos = m_initialTCOPos + offset.quantize( gui->songEditor()->m_editor->getSnapSize() );
+			switch ( gui->songEditor()->m_editor->snapType() ){
+				case SongEditor::SnapMode : newPos = snapPos; break;
+				case SongEditor::ShiftMode: newPos = shiftPos; break;
+				default:
+					if ( abs(newPos - snapPos) < abs(newPos - shiftPos) ){
+						newPos = snapPos;
+					}
+					else {
+						newPos = shiftPos;
+					}
+			}
 		}
-
-		MidiTime newPos = max(0, m_tco->startPosition() + offset);
+		newPos = max(0, static_cast<int>(newPos)); // Don't go left of bar zero
 		m_tco->movePosition( newPos );
 		m_trackView->getTrackContentWidget()->changePosition();
 		s_textFloat->setText( QString( "%1:%2" ).
-				arg( m_tco->startPosition().getTact() + 1 ).
-				arg( m_tco->startPosition().getTicks() %
+				arg( newPos.getTact() + 1 ).
+				arg( newPos.getTicks() %
 						MidiTime::ticksPerTact() ) );
 		s_textFloat->moveGlobal( this, QPoint( width() + 2, height() + 2 ) );
 	}

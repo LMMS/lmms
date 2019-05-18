@@ -32,6 +32,7 @@
 #include "ActionGroup.h"
 #include "Editor.h"
 #include "TrackContainerView.h"
+#include "NStateButton.h"
 
 class QLabel;
 class QScrollBar;
@@ -66,6 +67,13 @@ public:
 		SelectMode
 	};
 
+	enum SnapType
+	{
+		ShiftMode,
+		SnapMode,
+		BothMode
+	};
+
 	SongEditor( Song * song );
 	~SongEditor();
 
@@ -74,6 +82,10 @@ public:
 
 	ComboBoxModel *zoomingModel() const;
 	float getSnapSize() const;
+	SnapType snapType() const
+	{
+		return m_snapType;
+	}
 
 public slots:
 	void scrolled( int new_pos );
@@ -81,7 +93,8 @@ public slots:
 	void setEditMode( EditMode mode );
 	void setEditModeDraw();
 	void setEditModeSelect();
-	void toggleAdaptiveSnap();
+	void toggleProportionalSnap();
+	void setSnapMode( int );
 
 	void updatePosition( const MidiTime & t );
 	void updatePositionLine();
@@ -132,8 +145,11 @@ private:
 	positionLine * m_positionLine;
 
 	ComboBoxModel* m_zoomingModel;
+
 	ComboBoxModel* m_snappingModel;
-	bool m_adaptiveSnap;
+	bool m_proportionalSnap;
+
+	SnapType m_snapType;
 
 	static const QVector<double> m_zoomLevels;
 
@@ -185,7 +201,8 @@ private:
 	QAction* m_addBBTrackAction;
 	QAction* m_addSampleTrackAction;
 	QAction* m_addAutomationTrackAction;
-	QAction* m_setAdaptiveSnapAction;
+	QAction* m_setProportionalSnapAction;
+	NStateButton* m_snapTypeButton;
 
 	ActionGroup * m_editModeGroup;
 	QAction* m_drawModeAction;
