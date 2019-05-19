@@ -43,24 +43,28 @@ LinkedModelGroupViewBase::LinkedModelGroupViewBase(QWidget* parent,
 	m_isLinking(model->isLinking()),
 	m_grid(new QGridLayout(this))
 {
-	int curProc = model->curProc();
-	QString chanName;
-	if (name.isNull())
+	if (model->models().size())
 	{
-		switch(nProc)
+		int curProc = model->curProc();
+		QString chanName;
+		if (name.isNull())
 		{
-			case 1: break; // don't display any channel name
-			case 2:
-				chanName = QObject::tr(curProc ? "Right" : "Left");
-				break;
-			default:
-				chanName = QObject::tr("Channel ") + QString::number(curProc + 1);
-				break;
+			switch (nProc)
+			{
+				case 1: break; // don't display any channel name
+				case 2:
+					chanName = QObject::tr(curProc ? "Right" : "Left");
+					break;
+				default:
+					chanName = QObject::tr("Channel ") + QString::number(curProc + 1);
+					break;
+			}
 		}
-	}
-	else { chanName = name; }
+		else { chanName = name; }
 
-	if (!chanName.isNull()) { setTitle(chanName); }
+		if (!chanName.isNull()) { setTitle(chanName); }
+	}
+	else { setHidden(true); }
 }
 
 
@@ -74,11 +78,12 @@ LinkedModelGroupViewBase::~LinkedModelGroupViewBase() {}
 void LinkedModelGroupViewBase::modelChanged(LinkedModelGroup *group)
 {
 	// reconnect models
+	using ModelInfo = LinkedModelGroup::ModelInfo;
 	std::vector<std::unique_ptr<ControlBase>>::iterator itr = m_controls.begin();
-	std::vector<AutomatableModel*> models = group->models();
+	std::vector<ModelInfo> models = group->models();
 	Q_ASSERT(m_controls.size() == models.size());
 
-	for (AutomatableModel* mdl : models) { (*itr++)->setModel(mdl); }
+	for (const ModelInfo& mdl : models) { (*itr++)->setModel(mdl.m_model); }
 
 	std::size_t count = 0;
 	for (std::unique_ptr<LedCheckBox>& led : m_leds)
@@ -173,7 +178,7 @@ void LinkedModelGroupsViewBase::modelChanged(LinkedModelGroups *groups)
 		m_multiChannelLink->setModel(groups->multiChannelLinkModel());
 	}
 
-	for (std::size_t i = 0; getGroupView(i) && groups->getGroup(i); ++i)
+	for (std::size_t i = 0; groups->getGroup(i) && getGroupView(i); ++i)
 	{
 		getGroupView(i)->modelChanged(groups->getGroup(i));
 	}
