@@ -80,7 +80,9 @@ SongEditor::SongEditor( Song * song ) :
 	m_zoomingModel(new ComboBoxModel()),
 	m_scrollBack( false ),
 	m_smoothScroll( ConfigManager::inst()->value( "ui", "smoothscroll" ).toInt() ),
-	m_mode(DrawMode)
+	m_mode(DrawMode),
+	m_origin(),
+	m_mousePos()
 {
 	m_zoomingModel->setParent(this);
 	// create time-line
@@ -239,6 +241,8 @@ SongEditor::SongEditor( Song * song ) :
 					this, SLOT( scrolled( int ) ) );
 	connect( m_song, SIGNAL( lengthChanged( int ) ),
 			this, SLOT( updateScrollBar( int ) ) );
+	connect( m_leftRightScroll, SIGNAL(valueChanged(int)),this, SLOT(updateRubberband()));
+	connect( contentWidget()->verticalScrollBar(), SIGNAL(valueChanged(int)),this, SLOT(updateRubberband()));
 
 	// Set up zooming model
 	for( float const & zoomLevel : m_zoomLevels )
@@ -288,6 +292,21 @@ void SongEditor::scrolled( int new_pos )
 {
 	update();
 	emit positionChanged( m_currentPosition = MidiTime( new_pos, 0 ) );
+}
+
+
+
+
+void SongEditor::updateRubberband()
+{
+	if( rubberBandActive() == true )
+	{
+		int hs = m_leftRightScroll->value() * m_leftRightScroll->pageStep();
+		int vs = contentWidget()->verticalScrollBar()->value();
+		rubberBand()->setGeometry( QRect( QPoint(m_origin.x()-hs, m_origin.y()-vs),
+								   contentWidget()->mapFromParent(QPoint(m_mousePos.x(), m_mousePos.y()))
+								  ).normalized());
+	}
 }
 
 
@@ -404,7 +423,34 @@ void SongEditor::closeEvent( QCloseEvent * ce )
 		hide();
 	}
 	ce->ignore();
- }
+}
+
+void SongEditor::mousePressEvent(QMouseEvent *_me)
+{
+	if( allowRubberband() == true )
+	{
+		m_origin = contentWidget()->mapFromParent( QPoint(_me->pos().x()+m_leftRightScroll->value() ,
+												_me->pos().y()+contentWidget()->verticalScrollBar()->value()));
+		rubberBand()->setEnabled( true );
+		rubberBand()->setGeometry( QRect( m_origin, QSize() ) );
+		rubberBand()->show();
+	}
+	QWidget::mousePressEvent( _me );
+}
+
+void SongEditor::mouseMoveEvent(QMouseEvent *_me)
+{
+	m_mousePos = _me->pos();
+	updateRubberband();
+	QWidget::mouseMoveEvent( _me );
+}
+
+void SongEditor::mouseReleaseEvent(QMouseEvent *_me)
+{
+	rubberBand()->hide();
+	rubberBand()->setEnabled( false );
+	QWidget::mouseReleaseEvent( _me );
+}
 
 
 

@@ -145,12 +145,12 @@ public slots:
 	/// Removes the rubber band from display when finished with.
 	void stopRubberBand();
 
+	RubberBand *rubberBand() const;
+
 protected:
 	static const int DEFAULT_PIXELS_PER_TACT = 16;
 
-	virtual void mousePressEvent( QMouseEvent * _me );
-	virtual void mouseMoveEvent( QMouseEvent * _me );
-	virtual void mouseReleaseEvent( QMouseEvent * _me );
+
 	virtual void resizeEvent( QResizeEvent * );
 
 	MidiTime m_currentPosition;
@@ -187,7 +187,7 @@ private:
 	float m_ppt;
 
 	RubberBand * m_rubberBand;
-	QPoint m_origin;
+
 
 
 signals:

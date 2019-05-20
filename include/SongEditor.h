@@ -75,6 +75,7 @@ public:
 
 public slots:
 	void scrolled( int new_pos );
+	void updateRubberband();
 
 	void setEditMode( EditMode mode );
 	void setEditModeDraw();
@@ -85,6 +86,9 @@ public slots:
 
 protected:
 	virtual void closeEvent( QCloseEvent * ce );
+	virtual void mousePressEvent( QMouseEvent * _me );
+	virtual void mouseMoveEvent( QMouseEvent * _me );
+	virtual void mouseReleaseEvent( QMouseEvent * _me );
 
 private slots:
 	void setHighQuality( bool );
@@ -135,6 +139,8 @@ private:
 	bool m_smoothScroll;
 
 	EditMode m_mode;
+	QPoint m_origin;
+	QPoint m_mousePos;
 
 	friend class SongEditorWindow;
 
