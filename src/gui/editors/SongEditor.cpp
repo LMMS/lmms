@@ -51,6 +51,7 @@
 #include "TimeDisplayWidget.h"
 #include "AudioDevice.h"
 #include "PianoRoll.h"
+#include "Track.h"
 
 
 
@@ -301,8 +302,8 @@ void SongEditor::updateRubberband()
 {
 	if( rubberBandActive() == true )
 	{
-		int hs = m_leftRightScroll->value() * m_leftRightScroll->pageStep();
-		int vs = contentWidget()->verticalScrollBar()->value();
+		int hs = (m_leftRightScroll->value() - m_scrollPos.x() ) * pixelsPerTact();
+		int vs = contentWidget()->verticalScrollBar()->value() - m_scrollPos.y() ;
 		rubberBand()->setGeometry( QRect( QPoint(m_origin.x()-hs, m_origin.y()-vs),
 								   contentWidget()->mapFromParent(QPoint(m_mousePos.x(), m_mousePos.y()))
 								  ).normalized());
@@ -429,8 +430,10 @@ void SongEditor::mousePressEvent(QMouseEvent *_me)
 {
 	if( allowRubberband() == true )
 	{
-		m_origin = contentWidget()->mapFromParent( QPoint(_me->pos().x()+m_leftRightScroll->value() ,
-												_me->pos().y()+contentWidget()->verticalScrollBar()->value()));
+		m_scrollPos = QPoint( m_leftRightScroll->value(), contentWidget()->verticalScrollBar()->value() );
+		m_origin = contentWidget()->mapFromParent( QPoint(_me->pos().x(),
+												_me->pos().y()));
+
 		rubberBand()->setEnabled( true );
 		rubberBand()->setGeometry( QRect( m_origin, QSize() ) );
 		rubberBand()->show();

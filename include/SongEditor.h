@@ -140,6 +140,7 @@ private:
 
 	EditMode m_mode;
 	QPoint m_origin;
+	QPoint m_scrollPos;
 	QPoint m_mousePos;
 
 	friend class SongEditorWindow;
