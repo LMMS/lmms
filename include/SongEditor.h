@@ -132,7 +132,6 @@ private:
 	positionLine * m_positionLine;
 
 	ComboBoxModel* m_zoomingModel;
-
 	ComboBoxModel* m_snappingModel;
 	bool m_proportionalSnap;
 

@@ -914,7 +914,7 @@ void TrackContentObjectView::mouseMoveEvent( QMouseEvent * me )
 			newPos = m_initialTCOPos + offset.quantize( gui->songEditor()->m_editor->getSnapSize() );
 		}
 
-		newPos = max(0, static_cast<int>(newPos)); // Don't go left of bar zero
+		newPos = max( 0, newPos.getTicks() ); // Don't go left of bar zero
 		m_tco->movePosition( newPos );
 		m_trackView->getTrackContentWidget()->changePosition();
 		s_textFloat->setText( QString( "%1:%2" ).
@@ -960,6 +960,7 @@ void TrackContentObjectView::mouseMoveEvent( QMouseEvent * me )
 			int index = std::distance( so.begin(), it );
 			leftmost = min (leftmost, m_initialOffsets[index].getTicks() );
 		}
+		// Make sure the leftmost clip doesn't get moved to a negative position
 		if ( newPos.getTicks() + leftmost < 0 ) { newPos = -leftmost; }
 
 		for( QVector<TrackContentObject *>::iterator it = tcos.begin();
@@ -975,10 +976,23 @@ void TrackContentObjectView::mouseMoveEvent( QMouseEvent * me )
 		if( m_action == Resize )
 		{
 			MidiTime t = qMax( MidiTime::ticksPerTact() / 16, static_cast<int>( me->x() * MidiTime::ticksPerTact() / ppt ) );
-			if( ! ( me->modifiers() & Qt::ControlModifier ) && me->button() == Qt::NoButton )
-			{
-				t = qMax<int>( MidiTime::ticksPerTact(), t.quantize( gui->songEditor()->m_editor->getSnapSize() ) );
+			// If the user is holding alt, or pressed ctrl after beginning the drag, don't quantize
+			if (    me->button() != Qt::NoButton
+				|| (me->modifiers() & Qt::ControlModifier)
+				|| (me->modifiers() & Qt::AltModifier)
+			) {}
+			else if ( me->modifiers() & Qt::ShiftModifier )
+			{	// If shift is held, quantize position
+				MidiTime endPos = m_tco->startPosition() + t;
+				endPos = endPos.quantize( gui->songEditor()->m_editor->getSnapSize() );
+				t = qMax<int>( 1, endPos - m_tco->startPosition() );
 			}
+			else
+			{	// Otherwise, quantize resize amount
+				float snapSize = gui->songEditor()->m_editor->getSnapSize();
+				t = qMax<int>( MidiTime::ticksPerTact() * snapSize , t.quantize( snapSize ) );
+			}
+
 			m_tco->changeLength( t );
 		}
 		else
@@ -992,13 +1006,23 @@ void TrackContentObjectView::mouseMoveEvent( QMouseEvent * me )
 								   m_trackView->trackContainerView()->currentPosition()+
 								   static_cast<int>( x * MidiTime::ticksPerTact() /
 													 ppt ) );
-				if( ! ( me->modifiers() & Qt::ControlModifier )
-						&& me->button() == Qt::NoButton )
+				if(    me->button() != Qt::NoButton
+				   || (me->modifiers() & Qt::ControlModifier)
+				   || (me->modifiers() & Qt::AltModifier)
+				) {}
+				else if( me->modifiers() & Qt::ShiftModifier )
 				{
 					t = t.quantize( gui->songEditor()->m_editor->getSnapSize() );
 				}
+				else
+				{
+					MidiTime offset = t - m_tco->startPosition();
+					offset = offset.quantize( gui->songEditor()->m_editor->getSnapSize() );
+					t = m_tco->startPosition() + offset;
+				}
+				float snapSize = gui->songEditor()->m_editor->getSnapSize();
 				MidiTime oldPos = m_tco->startPosition();
-				if( m_tco->length() + ( oldPos - t ) >= MidiTime::ticksPerTact() )
+				if( m_tco->length() + ( oldPos - t ) >= MidiTime::ticksPerTact() * snapSize )
 				{
 					m_tco->movePosition( t );
 					m_trackView->getTrackContentWidget()->changePosition();
@@ -1137,8 +1161,7 @@ void TrackContentObjectView::setInitialOffsets()
 		{
 			continue;
 		}
-		TrackContentObject * tco = tcov->m_tco;
-		offsets.push_back( tco->startPosition() - m_initialTCOPos );
+		offsets.push_back( tcov->m_tco->startPosition() - m_initialTCOPos );
 	}
 
 	m_initialOffsets = offsets;
