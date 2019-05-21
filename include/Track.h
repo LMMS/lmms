@@ -298,6 +298,7 @@ private:
 	QPoint m_initialMousePos;
 	QPoint m_initialMouseGlobalPos;
 	MidiTime m_initialTCOPos;
+	QVector<MidiTime> m_initialOffsets;
 
 	TextFloat * m_hint;
 
@@ -318,6 +319,7 @@ private:
 		m_initialMouseGlobalPos = mapToGlobal( pos );
 		m_initialTCOPos = m_tco->startPosition();
 	}
+	void setInitialOffsets();
 
 	bool mouseMovedDistance( QMouseEvent * me, int distance );
 
