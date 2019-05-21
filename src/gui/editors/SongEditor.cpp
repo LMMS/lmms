@@ -23,7 +23,7 @@
  */
 
 #include "SongEditor.h"
-
+#include <QDebug>
 #include <QTimeLine>
 #include <QAction>
 #include <QKeyEvent>
@@ -303,8 +303,12 @@ void SongEditor::updateRubberband()
 	if( rubberBandActive() == true )
 	{
 		int hs = (m_leftRightScroll->value() - m_scrollPos.x() ) * pixelsPerTact();
-		int vs = contentWidget()->verticalScrollBar()->value() - m_scrollPos.y() ;
-		rubberBand()->setGeometry( QRect( QPoint(m_origin.x()-hs, m_origin.y()-vs),
+		int vs = contentWidget()->verticalScrollBar()->value() - m_scrollPos.y();
+		QPoint origin = QPoint(m_origin.x()-hs, m_origin.y()-vs);
+		qDebug() << origin;
+		if(m_origin.x() - hs < (DEFAULT_SETTINGS_WIDGET_WIDTH + TRACK_OP_WIDTH))
+			origin = QPoint( (DEFAULT_SETTINGS_WIDGET_WIDTH + TRACK_OP_WIDTH), m_origin.y()-vs);
+		rubberBand()->setGeometry( QRect( origin,
 								   contentWidget()->mapFromParent(QPoint(m_mousePos.x(), m_mousePos.y()))
 								  ).normalized());
 	}
