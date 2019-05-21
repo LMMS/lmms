@@ -79,7 +79,6 @@ SongEditor::SongEditor( Song * song ) :
 	m_zoomingModel(new ComboBoxModel()),
 	m_snappingModel(new ComboBoxModel()),
 	m_proportionalSnap( true ),
-	m_snapType( ShiftMode ),
 	m_scrollBack( false ),
 	m_smoothScroll( ConfigManager::inst()->value( "ui", "smoothscroll" ).toInt() ),
 	m_mode(DrawMode)
@@ -335,11 +334,6 @@ void SongEditor::setEditModeSelect()
 void SongEditor::toggleProportionalSnap()
 {
 	m_proportionalSnap = !m_proportionalSnap;
-}
-
-void SongEditor::setSnapMode( int state )
-{
-	m_snapType = static_cast<SnapType>( state );
 }
 
 
@@ -788,21 +782,10 @@ SongEditorWindow::SongEditorWindow(Song* song) :
 	m_setProportionalSnapAction->setChecked(true);
 	connect(m_setProportionalSnapAction, SIGNAL(triggered()), m_editor, SLOT(toggleProportionalSnap()));
 
-	NStateButton * m_snapTypeButton = new NStateButton( m_toolBar );
-	m_snapTypeButton->addState( embed::getIconPixmap( "back_to_start" ),
-				tr( "Shift mode" ) );
-	m_snapTypeButton->addState( embed::getIconPixmap( "back_to_zero" ),
-				tr( "Snap mode" ) );
-	m_snapTypeButton->addState( embed::getIconPixmap( "keep_stop_position" ),
-				tr( "Snap & shift mode" ) );
-	connect( m_snapTypeButton, SIGNAL( changedState( int ) ), m_editor,
-				SLOT( setSnapMode( int ) ) );
-
 	snapToolBar->addWidget( snap_lbl );
 	snapToolBar->addWidget( m_snappingComboBox );
 	snapToolBar->addSeparator();
 	snapToolBar->addAction( m_setProportionalSnapAction );
-	snapToolBar->addWidget( m_snapTypeButton );
 
 	connect(song, SIGNAL(projectLoaded()), this, SLOT(adjustUiAfterProjectLoad()));
 	connect(this, SIGNAL(resized()), m_editor, SLOT(updatePositionLine()));
@@ -810,7 +793,7 @@ SongEditorWindow::SongEditorWindow(Song* song) :
 
 QSize SongEditorWindow::sizeHint() const
 {
-	return {660, 300};
+	return {640, 300};
 }
 
 

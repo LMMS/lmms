@@ -44,6 +44,7 @@
 #include <QMouseEvent>
 #include <QPainter>
 #include <QStyleOption>
+#include <QDebug>
 
 
 #include "AutomationPattern.h"
@@ -268,6 +269,7 @@ TrackContentObjectView::TrackContentObjectView( TrackContentObject * tco,
 	m_initialMousePos( QPoint( 0, 0 ) ),
 	m_initialMouseGlobalPos( QPoint( 0, 0 ) ),
 	m_initialTCOPos( MidiTime(0) ),
+	m_initialOffsets( QVector<MidiTime>() ),
 	m_hint( NULL ),
 	m_mutedColor( 0, 0, 0 ),
 	m_mutedBackgroundColor( 0, 0, 0 ),
@@ -713,6 +715,7 @@ void TrackContentObjectView::paintTextLabel(QString const & text, QPainter & pai
 void TrackContentObjectView::mousePressEvent( QMouseEvent * me )
 {
 	setInitialPos( me->pos() );
+	setInitialOffsets();
 	if( !fixedTCOs() && me->button() == Qt::LeftButton )
 	{
 		if( me->modifiers() & Qt::ControlModifier )
@@ -726,7 +729,9 @@ void TrackContentObjectView::mousePressEvent( QMouseEvent * me )
 				m_action = ToggleSelected;
 			}
 		}
-		else if( !me->modifiers() )
+		else if( !me->modifiers()
+			|| (me->modifiers() & Qt::AltModifier)
+			|| (me->modifiers() & Qt::ShiftModifier) )
 		{
 			if( isSelected() )
 			{
@@ -741,6 +746,7 @@ void TrackContentObjectView::mousePressEvent( QMouseEvent * me )
 				m_tco->setJournalling( false );
 
 				setInitialPos( me->pos() );
+				setInitialOffsets();
 
 				SampleTCO * sTco = dynamic_cast<SampleTCO*>( m_tco );
 				if( me->x() < RESIZE_GRIP_WIDTH && sTco
@@ -890,27 +896,24 @@ void TrackContentObjectView::mouseMoveEvent( QMouseEvent * me )
 	const float ppt = m_trackView->trackContainerView()->pixelsPerTact();
 	if( m_action == Move )
 	{
-		const int pixPos = mapToParent(me->pos()).x() - m_initialMousePos.x();
-		MidiTime newPos = pixPos * MidiTime::ticksPerTact() / ppt;
+		// The pixel position of the mouse, adjusted for where the clip was grabbed
+		const int mousePos = mapToParent(me->pos()).x() - m_initialMousePos.x();
+		MidiTime newPos = mousePos * MidiTime::ticksPerTact() / ppt;
 		MidiTime offset = newPos - m_initialTCOPos;
-		// If ctrl isn't held, we need to quantize
-		if( ! ( me->modifiers() & Qt::ControlModifier )
-		   && me->button() == Qt::NoButton )
-		{
-			MidiTime snapPos = newPos.quantize( gui->songEditor()->m_editor->getSnapSize() );
-			MidiTime shiftPos = m_initialTCOPos + offset.quantize( gui->songEditor()->m_editor->getSnapSize() );
-			switch ( gui->songEditor()->m_editor->snapType() ){
-				case SongEditor::SnapMode : newPos = snapPos; break;
-				case SongEditor::ShiftMode: newPos = shiftPos; break;
-				default:
-					if ( abs(newPos - snapPos) < abs(newPos - shiftPos) ){
-						newPos = snapPos;
-					}
-					else {
-						newPos = shiftPos;
-					}
-			}
+		// If the user is holding alt, or pressed ctrl after beginning the drag, don't quantize
+		if (    me->button() != Qt::NoButton
+			|| (me->modifiers() & Qt::ControlModifier)
+			|| (me->modifiers() & Qt::AltModifier)
+		) {}
+		else if ( me->modifiers() & Qt::ShiftModifier )
+		{	// If shift is held, quantize position (Default in 1.2.0 and earlier)
+			newPos = newPos.quantize( gui->songEditor()->m_editor->getSnapSize() );
 		}
+		else
+		{	// Otherwise, quantize moved distance (preserves user offsets)
+			newPos = m_initialTCOPos + offset.quantize( gui->songEditor()->m_editor->getSnapSize() );
+		}
+
 		newPos = max(0, static_cast<int>(newPos)); // Don't go left of bar zero
 		m_tco->movePosition( newPos );
 		m_trackView->getTrackContentWidget()->changePosition();
@@ -922,44 +925,49 @@ void TrackContentObjectView::mouseMoveEvent( QMouseEvent * me )
 	}
 	else if( m_action == MoveSelection )
 	{
-		const int dx = me->x() - m_initialMousePos.x();
-		const bool snap = !(me->modifiers() & Qt::ControlModifier) &&
-					me->button() == Qt::NoButton;
+		// 1: Find the position we want to move the grabbed TCO to
+		// The pixel position of the mouse, adjusted for where the clip was grabbed
+		const int mousePos = mapToParent(me->pos()).x() - m_initialMousePos.x();
+		MidiTime newPos = mousePos * MidiTime::ticksPerTact() / ppt;
+		MidiTime offset = newPos - m_initialTCOPos;
+		// If the user is holding alt, or pressed ctrl after beginning the drag, don't quantize
+		if (    me->button() != Qt::NoButton
+			|| (me->modifiers() & Qt::ControlModifier)
+			|| (me->modifiers() & Qt::AltModifier)
+		) {}
+		else if ( me->modifiers() & Qt::ShiftModifier )
+		{	// If shift is held, quantize position (Default in 1.2.0 and earlier)
+			newPos = newPos.quantize( gui->songEditor()->m_editor->getSnapSize() );
+		}
+		else
+		{	// Otherwise, quantize moved distance (preserves user offsets)
+			newPos = m_initialTCOPos + offset.quantize( gui->songEditor()->m_editor->getSnapSize() );
+		}
+
+		// 2: Handle moving the other selected TCOs the same distance
 		QVector<selectableObject *> so =
 			m_trackView->trackContainerView()->selectedObjects();
-		QVector<TrackContentObject *> tcos;
-		int smallestPos = 0;
-		MidiTime dtick = MidiTime( static_cast<int>( dx *
-					MidiTime::ticksPerTact() / ppt ) );
-		if( snap )
-		{
-			dtick = dtick.quantize( gui->songEditor()->m_editor->getSnapSize() );
-		}
-		// find out smallest position of all selected objects for not
-		// moving an object before zero
+		QVector<TrackContentObject *> tcos; // List of selected clips
+		int leftmost = 0; // Leftmost clip's offset from grabbed clip
+		// Populate tcos, find leftmost
 		for( QVector<selectableObject *>::iterator it = so.begin();
 							it != so.end(); ++it )
 		{
 			TrackContentObjectView * tcov =
 				dynamic_cast<TrackContentObjectView *>( *it );
-			if( tcov == NULL )
-			{
-				continue;
-			}
-			TrackContentObject * tco = tcov->m_tco;
-			tcos.push_back( tco );
-			smallestPos = qMin<int>( smallestPos,
-					(int)tco->startPosition() + dtick );
+			if( tcov == NULL ) { continue; }
+			tcos.push_back( tcov->m_tco );
+			int index = std::distance( so.begin(), it );
+			leftmost = min (leftmost, m_initialOffsets[index].getTicks() );
 		}
-		dtick -= smallestPos;
-		if( snap )
-		{
-			dtick = dtick.toAbsoluteTact(); // round toward 0
-		}
+		if ( newPos.getTicks() + leftmost < 0 ) { newPos = -leftmost; }
+
 		for( QVector<TrackContentObject *>::iterator it = tcos.begin();
 							it != tcos.end(); ++it )
 		{
-			( *it )->movePosition( ( *it )->startPosition() + dtick );
+			int index = std::distance( tcos.begin(), it );
+			//( *it )->movePosition( ( *it )->startPosition() + dtick );
+			( *it )->movePosition( newPos + m_initialOffsets[index] );
 		}
 	}
 	else if( m_action == Resize || m_action == ResizeLeft )
@@ -1116,7 +1124,25 @@ float TrackContentObjectView::pixelsPerTact()
 
 
 
+void TrackContentObjectView::setInitialOffsets()
+{
+	QVector<selectableObject *> so = m_trackView->trackContainerView()->selectedObjects();
+	QVector<MidiTime> offsets;
+	for( QVector<selectableObject *>::iterator it = so.begin();
+						it != so.end(); ++it )
+	{
+		TrackContentObjectView * tcov =
+			dynamic_cast<TrackContentObjectView *>( *it );
+		if( tcov == NULL )
+		{
+			continue;
+		}
+		TrackContentObject * tco = tcov->m_tco;
+		offsets.push_back( tco->startPosition() - m_initialTCOPos );
+	}
 
+	m_initialOffsets = offsets;
+}
 /*! \brief Detect whether the mouse moved more than n pixels on screen.
  *
  * \param _me The QMouseEvent.
