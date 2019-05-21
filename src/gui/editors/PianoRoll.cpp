@@ -1894,7 +1894,7 @@ void PianoRoll::testPlayKey( int key, int velocity, int pan )
 	// turn off old key
 	pianoModel->handleKeyRelease( m_lastKey );
 	// if a chord was set, stop the chords notes as well
-	pauseChordNotes(key);
+	pauseChordNotes(m_lastKey);
 
 	// remember which one we're playing
 	m_lastKey = key;
@@ -2032,14 +2032,15 @@ void PianoRoll::mouseReleaseEvent( QMouseEvent * me )
 			{
 				m_pattern->instrumentTrack()->pianoModel()->
 						handleKeyRelease( note->key() );
-				note->setIsPlaying( false );
 				pauseChordNotes(note->key());
+				note->setIsPlaying( false );
 			}
 		}
 
 		// stop playing keys that we let go of
 		m_pattern->instrumentTrack()->pianoModel()->
 						handleKeyRelease( m_lastKey );
+		pauseChordNotes(m_lastKey);
 	}
 
 	m_currentNote = NULL;
