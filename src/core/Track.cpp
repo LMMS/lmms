@@ -269,6 +269,7 @@ TrackContentObjectView::TrackContentObjectView( TrackContentObject * tco,
 	m_initialMousePos( QPoint( 0, 0 ) ),
 	m_initialMouseGlobalPos( QPoint( 0, 0 ) ),
 	m_initialTCOPos( MidiTime(0) ),
+	m_initialTCOEnd( MidiTime(0) ),
 	m_initialOffsets( QVector<MidiTime>() ),
 	m_hint( NULL ),
 	m_mutedColor( 0, 0, 0 ),
@@ -967,7 +968,6 @@ void TrackContentObjectView::mouseMoveEvent( QMouseEvent * me )
 							it != tcos.end(); ++it )
 		{
 			int index = std::distance( tcos.begin(), it );
-			//( *it )->movePosition( ( *it )->startPosition() + dtick );
 			( *it )->movePosition( newPos + m_initialOffsets[index] );
 		}
 	}
@@ -975,25 +975,34 @@ void TrackContentObjectView::mouseMoveEvent( QMouseEvent * me )
 	{
 		if( m_action == Resize )
 		{
-			MidiTime t = qMax( MidiTime::ticksPerTact() / 16, static_cast<int>( me->x() * MidiTime::ticksPerTact() / ppt ) );
+			MidiTime l = qMax( MidiTime::ticksPerTact() / 16, static_cast<int>( me->x() * MidiTime::ticksPerTact() / ppt ) );
+			float snapSize = gui->songEditor()->m_editor->getSnapSize();
+			MidiTime minLength = MidiTime( MidiTime::ticksPerTact() / 16 );
+
 			// If the user is holding alt, or pressed ctrl after beginning the drag, don't quantize
 			if (    me->button() != Qt::NoButton
 				|| (me->modifiers() & Qt::ControlModifier)
-				|| (me->modifiers() & Qt::AltModifier)
-			) {}
+				|| (me->modifiers() & Qt::AltModifier)    )
+			{
+				minLength = MidiTime( 1 );
+			}
 			else if ( me->modifiers() & Qt::ShiftModifier )
-			{	// If shift is held, quantize position
-				MidiTime endPos = m_tco->startPosition() + t;
-				endPos = endPos.quantize( gui->songEditor()->m_editor->getSnapSize() );
-				t = qMax<int>( 1, endPos - m_tco->startPosition() );
+			{	// If shift is held, quantize clip's end position
+				MidiTime end = MidiTime( m_initialTCOPos + l ).quantize( snapSize );
+				MidiTime min = m_initialTCOPos.quantize( snapSize );
+				if ( min < m_initialTCOPos )
+				{ min += MidiTime( MidiTime::ticksPerTact() * snapSize ); }
+				l = qMax<int>(min - m_initialTCOPos, end - m_initialTCOPos);
 			}
 			else
-			{	// Otherwise, quantize resize amount
-				float snapSize = gui->songEditor()->m_editor->getSnapSize();
-				t = qMax<int>( MidiTime::ticksPerTact() * snapSize , t.quantize( snapSize ) );
+			{	// Otherwise, resize in fixed increments
+				MidiTime initialLength = m_initialTCOEnd - m_initialTCOPos;
+				MidiTime offset = MidiTime( l - initialLength ).quantize( snapSize );
+				MidiTime min = MidiTime( initialLength % (int)(MidiTime::ticksPerTact() * snapSize) );
+				l = qMax<int>( min, initialLength + offset);
 			}
-
-			m_tco->changeLength( t );
+			l = qMax<int>( minLength, l );
+			m_tco->changeLength( l );
 		}
 		else
 		{
@@ -1006,23 +1015,33 @@ void TrackContentObjectView::mouseMoveEvent( QMouseEvent * me )
 								   m_trackView->trackContainerView()->currentPosition()+
 								   static_cast<int>( x * MidiTime::ticksPerTact() /
 													 ppt ) );
+				float snapSize = gui->songEditor()->m_editor->getSnapSize();
+				MidiTime minLength = MidiTime( MidiTime::ticksPerTact() / 16 );
+
+				// If the user is holding alt, or pressed ctrl after beginning the drag, don't quantize
 				if(    me->button() != Qt::NoButton
 				   || (me->modifiers() & Qt::ControlModifier)
-				   || (me->modifiers() & Qt::AltModifier)
-				) {}
-				else if( me->modifiers() & Qt::ShiftModifier )
+				   || (me->modifiers() & Qt::AltModifier)    )
 				{
-					t = t.quantize( gui->songEditor()->m_editor->getSnapSize() );
+					minLength = MidiTime( 1 );
+				}
+				else if( me->modifiers() & Qt::ShiftModifier )
+				{	// If shift is held, quantize clip's start position
+					MidiTime max = m_initialTCOEnd.quantize( snapSize );
+					if ( max > m_initialTCOEnd )
+					{ max -= MidiTime( 1, 0 ) * snapSize; }
+					t = qMin<int>( max, t.quantize( snapSize ) );
 				}
 				else
-				{
-					MidiTime offset = t - m_tco->startPosition();
-					offset = offset.quantize( gui->songEditor()->m_editor->getSnapSize() );
-					t = m_tco->startPosition() + offset;
+				{	// Otherwise, resize in fixed increments
+					MidiTime initialLength = m_initialTCOEnd - m_initialTCOPos;
+					MidiTime minLength = MidiTime( initialLength % (int)(MidiTime::ticksPerTact() * snapSize) );
+					MidiTime offset = MidiTime(t - m_initialTCOPos).quantize( snapSize );
+					t = qMin<int>( m_initialTCOEnd - minLength, m_initialTCOPos + offset );
 				}
-				float snapSize = gui->songEditor()->m_editor->getSnapSize();
+
 				MidiTime oldPos = m_tco->startPosition();
-				if( m_tco->length() + ( oldPos - t ) >= MidiTime::ticksPerTact() * snapSize )
+				if( m_tco->length() + ( oldPos - t ) >= minLength )
 				{
 					m_tco->movePosition( t );
 					m_trackView->getTrackContentWidget()->changePosition();
@@ -1136,7 +1155,6 @@ void TrackContentObjectView::contextMenuEvent( QContextMenuEvent * cme )
 
 
 
-
 /*! \brief How many pixels a tact (bar) takes for this trackContentObjectView.
  *
  * \return the number of pixels per tact (bar).
@@ -1147,7 +1165,7 @@ float TrackContentObjectView::pixelsPerTact()
 }
 
 
-
+/*! \brief Save the offsets between all selected tracks and a clicked track */
 void TrackContentObjectView::setInitialOffsets()
 {
 	QVector<selectableObject *> so = m_trackView->trackContainerView()->selectedObjects();
@@ -1166,6 +1184,10 @@ void TrackContentObjectView::setInitialOffsets()
 
 	m_initialOffsets = offsets;
 }
+
+
+
+
 /*! \brief Detect whether the mouse moved more than n pixels on screen.
  *
  * \param _me The QMouseEvent.
