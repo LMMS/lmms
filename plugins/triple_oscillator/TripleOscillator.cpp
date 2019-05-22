@@ -89,6 +89,7 @@ OscillatorObject::OscillatorObject( Model * _parent, int _idx ) :
 				tr( "Modulation type %1" ).arg( _idx+1 ) ),
 
 	m_sampleBuffer( new SampleBuffer ),
+	m_sampleBufferInfo(m_sampleBuffer->createUpdatingValue(this)),
 	m_volumeLeft( 0.0f ),
 	m_volumeRight( 0.0f ),
 	m_detuningLeft( 0.0f ),
@@ -254,7 +255,7 @@ void TripleOscillator::saveSettings( QDomDocument & _doc, QDomElement & _this )
 		m_osc[i]->m_modulationAlgoModel.saveSettings( _doc, _this,
 					"modalgo" + QString::number( i+1 ) );
 		_this.setAttribute( "userwavefile" + is,
-					m_osc[i]->m_sampleBuffer->audioFile() );
+					m_osc[i]->m_sampleBufferInfo->audioFile );
 	}
 }
 

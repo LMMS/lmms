@@ -57,6 +57,7 @@
 SampleTCO::SampleTCO( Track * _track ) :
 	TrackContentObject( _track ),
 	m_sampleBuffer( new SampleBuffer ),
+	m_sampleBufferInfo(m_sampleBuffer->createUpdatingValue(this)),
 	m_isPlaying( false )
 {
 	saveJournallingState( false );
@@ -109,6 +110,9 @@ void SampleTCO::changeLength( const MidiTime & _length )
 }
 
 
+const QString &SampleTCO::sampleFile() const {
+	return m_sampleBufferInfo->audioFile;
+}
 
 
 const QString & SampleTCO::sampleFile() const
@@ -193,11 +197,8 @@ MidiTime SampleTCO::sampleLength() const
 }
 
 
-
-
-void SampleTCO::setSampleStartFrame(f_cnt_t startFrame)
-{
-	m_sampleBuffer->setStartFrame( startFrame );
+MidiTime SampleTCO::sampleLength() const {
+	return (int) (m_sampleBufferInfo->frames / Engine::framesPerTick(m_sampleBufferInfo->sampleRate));
 }
 
 
@@ -301,8 +302,8 @@ void SampleTCOView::updateSample()
 	update();
 	// set tooltip to filename so that user can see what sample this
 	// sample-tco contains
-	ToolTip::add( this, ( m_tco->m_sampleBuffer->audioFile() != "" ) ?
-					m_tco->m_sampleBuffer->audioFile() :
+	ToolTip::add( this, ( m_tco->m_sampleBufferInfo->audioFile != "" ) ?
+					m_tco->m_sampleBufferInfo->audioFile :
 					tr( "Double-click to open sample" ) );
 	setNeedsUpdate (true);
 }
@@ -417,15 +418,7 @@ void SampleTCOView::mouseReleaseEvent(QMouseEvent *_me)
 void SampleTCOView::mouseDoubleClickEvent( QMouseEvent * )
 {
 	QString af = m_tco->m_sampleBuffer->openAudioFile();
-
-	if ( af.isEmpty() ) {} //Don't do anything if no file is loaded
-	else if ( af == m_tco->m_sampleBuffer->audioFile() )
-	{	//Instead of reloading the existing file, just reset the size
-		int length = (int) ( m_tco->m_sampleBuffer->frames() / Engine::framesPerTick() );
-		m_tco->changeLength(length);
-	}
-	else
-	{	//Otherwise load the new file as ususal
+	if(af != "" && af != m_tco->m_sampleBufferInfo->audioFile) {
 		m_tco->setSampleFile( af );
 		Engine::getSong()->setModified();
 	}
@@ -617,23 +610,28 @@ bool SampleTrack::play( const MidiTime & _start, const fpp_t _frames,
 				if( sTco->isPlaying() == false && (_start >= (sTco->startPosition() + sTco->startTimeOffset())
 												   || sTco->isRecord ()) )
 				{
-					auto bufferFramesPerTick = Engine::framesPerTick (sTco->sampleBuffer ()->sampleRate ());
-					f_cnt_t sampleStart = bufferFramesPerTick * ( _start - sTco->startPosition() - sTco->startTimeOffset() );
+					auto sampleBufferInfo = sTco->sampleBuffer()->createInfo();
 
-					f_cnt_t tcoFrameLength = bufferFramesPerTick * ( sTco->endPosition() - sTco->startPosition() - sTco->startTimeOffset() );
+					auto bufferFramesPerTick = Engine::framesPerTick(sampleBufferInfo.sampleRate);
+					f_cnt_t sampleStart =
+							bufferFramesPerTick * (_start - sTco->startPosition() - sTco->startTimeOffset());
 
-					f_cnt_t sampleBufferLength = sTco->sampleBuffer()->frames();
+					f_cnt_t tcoFrameLength = bufferFramesPerTick *
+											 (sTco->endPosition() - sTco->startPosition() - sTco->startTimeOffset());
+
+					f_cnt_t sampleBufferLength = sampleBufferInfo.frames;
 					//if the Tco smaller than the sample length we play only until Tco end
 					//else we play the sample to the end but nothing more
-					f_cnt_t samplePlayLength = tcoFrameLength > sampleBufferLength ? sampleBufferLength : tcoFrameLength;
+					f_cnt_t samplePlayLength =
+							tcoFrameLength > sampleBufferLength ? sampleBufferLength : tcoFrameLength;
 					//we only play within the sampleBuffer limits
 					// anyway, "play" (record) this TCO if is recording.
-					if( sampleStart < sampleBufferLength || sTco->isRecord ())
-					{
-						sTco->setSampleStartFrame( sampleStart );
-						sTco->setSamplePlayLength( samplePlayLength );
-						tcos.push_back( sTco );
-						sTco->setIsPlaying( true );
+					if (sampleStart < sampleBufferLength || sTco->isRecord()) {
+						auto sampleBuffer = sTco->sampleBuffer();
+						sampleBuffer->setStartFrame(sampleStart).waitForFinished();
+						sampleBuffer->setEndFrame(samplePlayLength).waitForFinished();
+						tcos.push_back(sTco);
+						sTco->setIsPlaying(true);
 					}
 				}
 			}
@@ -769,6 +767,7 @@ void SampleTrack::beforeRecordOn(MidiTime time)
 		}
 
 		if (! isRecordTCOExist) {
+			// TODO: instead of this strange thing, move this code to SampleTrack::play.
 			Engine::mixer()->requestChangeInModel();
 
 			auto fallbackRecordTCO = static_cast<SampleTCO*>(createTCO (0));
@@ -777,8 +776,7 @@ void SampleTrack::beforeRecordOn(MidiTime time)
 			fallbackRecordTCO->movePosition (time);
 //			fallbackRecordTCO->setSamplePlayLength (Engine::framesPerTick());
 			fallbackRecordTCO->changeLength (1);
-			fallbackRecordTCO->setSampleStartFrame (0);
-			fallbackRecordTCO->setSamplePlayLength (Engine::framesPerTick());
+			fallbackRecordTCO->sampleBuffer()->setEndFrame (Engine::framesPerTick());
 			fallbackRecordTCO->setIsPlaying (false);
 
 			fallbackRecordTCO->setAutoResize (true);

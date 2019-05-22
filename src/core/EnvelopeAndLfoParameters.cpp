@@ -118,7 +118,8 @@ EnvelopeAndLfoParameters::EnvelopeAndLfoParameters(
 	m_controlEnvAmountModel( false, this, tr( "Modulate env amount" ) ),
 	m_lfoFrame( 0 ),
 	m_lfoAmountIsZero( false ),
-	m_lfoShapeData( NULL )
+	m_lfoShapeData( NULL ),
+	m_userWaveInfo(m_userWave.createUpdatingValue(this))
 {
 	m_amountModel.setCenterValue( 0 );
 	m_lfoAmountModel.setCenterValue( 0 );
@@ -354,7 +355,7 @@ void EnvelopeAndLfoParameters::saveSettings( QDomDocument & _doc,
 	m_lfoAmountModel.saveSettings( _doc, _parent, "lamt" );
 	m_x100Model.saveSettings( _doc, _parent, "x100" );
 	m_controlEnvAmountModel.saveSettings( _doc, _parent, "ctlenvamt" );
-	_parent.setAttribute( "userwavefile", m_userWave.audioFile() );
+	_parent.setAttribute( "userwavefile", m_userWaveInfo->audioFile );
 }
 
 
