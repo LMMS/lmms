@@ -59,10 +59,7 @@ class SampleBufferVisualizer
 public:
 	SampleBufferVisualizer();
 
-	enum class Operation {
-		Clear,
-		Append
-	};
+	using Operation=SampleBuffer::UpdateType;
 
 	/**
 	 * @brief Update the cache before drawing it.
