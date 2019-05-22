@@ -66,6 +66,8 @@ private:
 							   sampleFrame *outputBuffer,
 							   const f_cnt_t _frames);
 
+	void addOrCreateBuffer();
+
 
 	virtual void writeBuffer( const sampleFrame * _ab,
 						const f_cnt_t _frames );
@@ -78,6 +80,7 @@ private:
 	MidiTime m_timeRecorded;
 
 	SampleBuffer::DataVector m_currentBuffer;
+	QFuture<void> m_lastAsyncWork;
 
 	Track * m_track;
 	BBTrack * m_bbTrack;

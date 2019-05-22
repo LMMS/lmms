@@ -48,19 +48,23 @@ SampleRecordHandle::SampleRecordHandle(SampleTCO* tco , MidiTime startRecordTime
 
 
 SampleRecordHandle::~SampleRecordHandle()
-{
+{	
+	// No problem to block here.
+	// this is not a renderer thread anymore
+	// so it will not cause a deadlock
+	// with requestChangesInModel.
+
+	// Wait for the current async rendering job
+	// to finish.
+	m_lastAsyncWork.waitForFinished();
+
 	if (! m_currentBuffer.empty()) {
 		// We have data that has not been written into the buffer.
 		// force-write it into the buffer.
 
-		if (m_framesRecorded == 0) {
-			m_tco->sampleBuffer ()->resetData (std::move (m_currentBuffer),
-											   Engine::mixer ()->inputSampleRate ());
-			m_tco->setStartTimeOffset (m_startRecordTimeOffset);
-		} else {
-			m_tco->sampleBuffer ()->addData(m_currentBuffer,
-											Engine::mixer ()->inputSampleRate ());
-		}
+		// Add a new rendering job and wait for it to finish.
+		addOrCreateBuffer();
+		m_lastAsyncWork.waitForFinished();
 	}
 
 	m_tco->updateLength ();
@@ -86,17 +90,8 @@ void SampleRecordHandle::play( sampleFrame * /*_working_buffer*/ )
 	writeBuffer( recbuf, frames );
 
 	// Add data to the buffer.
-	if (m_framesRecorded == 0) {
-		// Make sure we don't have the previous data.
-		m_tco->sampleBuffer ()->resetData(std::move (m_currentBuffer),
-													 Engine::mixer ()->inputSampleRate ());
-		m_tco->setStartTimeOffset (m_startRecordTimeOffset);
-	} else {
-		if (! m_currentBuffer.empty ()) {
-			m_tco->sampleBuffer ()->addData(m_currentBuffer,
-											Engine::mixer ()->inputSampleRate ());
-		}
-	}
+	if (m_lastAsyncWork.isFinished())
+		addOrCreateBuffer();
 
 	m_framesRecorded += frames;
 	m_timeRecorded = m_framesRecorded / Engine::framesPerTick (Engine::mixer ()->inputSampleRate ());
@@ -160,6 +155,25 @@ void SampleRecordHandle::copyBufferFromStereo(const sampleFrame *inputBuffer,
 			outputBuffer[frame][chnl] = inputBuffer[frame][chnl];
 		}
 	}
+}
+
+void SampleRecordHandle::addOrCreateBuffer() {
+	auto sampleBuffer = m_tco->sampleBuffer ();
+	auto currentBufferCopy = m_currentBuffer;
+	m_lastAsyncWork = runAsync(std::bind([this, currentBufferCopy, sampleBuffer] () mutable{
+		if (m_framesRecorded == 0) {
+			// Make sure we don't have the previous data.
+			sampleBuffer->resetData(std::move (currentBufferCopy),
+														 Engine::mixer ()->inputSampleRate ());
+			m_tco->setStartTimeOffset (m_startRecordTimeOffset);
+		} else {
+			if (! currentBufferCopy.empty ()) {
+				sampleBuffer->addData(currentBufferCopy,
+												Engine::mixer ()->inputSampleRate ());
+			}
+		}
+	}));
+
 }
 
 
