@@ -18,6 +18,8 @@ ADD_EXECUTABLE(tests
 	src/core/ProjectVersionTest.cpp
 	src/core/RelativePathsTest.cpp
 
+	src/core/UpdatingValueTest.cpp
+
 	src/tracks/AutomationTrackTest.cpp
 )
 TARGET_COMPILE_DEFINITIONS(tests
