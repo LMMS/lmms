@@ -2211,9 +2211,10 @@ void Track::loadSettings( const QDomElement & element )
  *
  *  \param tco The TrackContentObject to attach to this track.
  */
-TrackContentObject * Track::addTCO( TrackContentObject * tco )
-{
-	m_trackContentObjects.push_back( tco );
+TrackContentObject *Track::addTCO(TrackContentObject *tco) {
+	auto guard = Engine::mixer()->requestChangesGuard();
+
+	m_trackContentObjects.push_back(tco);
 
 	emit trackContentObjectAdded( tco );
 
@@ -2227,16 +2228,15 @@ TrackContentObject * Track::addTCO( TrackContentObject * tco )
  *
  *  \param tco The TrackContentObject to remove from this track.
  */
-void Track::removeTCO( TrackContentObject * tco )
-{
-	tcoVector::iterator it = std::find( m_trackContentObjects.begin(),
-					m_trackContentObjects.end(),
-					tco );
-	if( it != m_trackContentObjects.end() )
-	{
-		m_trackContentObjects.erase( it );
-		if( Engine::getSong() )
-		{
+void Track::removeTCO(TrackContentObject *tco) {
+	auto guard = Engine::mixer()->requestChangesGuard();
+
+	tcoVector::iterator it = std::find(m_trackContentObjects.begin(),
+									   m_trackContentObjects.end(),
+									   tco);
+	if (it != m_trackContentObjects.end()) {
+		m_trackContentObjects.erase(it);
+		if (Engine::getSong()) {
 			Engine::getSong()->updateLength();
 			Engine::getSong()->setModified();
 		}
@@ -2245,10 +2245,9 @@ void Track::removeTCO( TrackContentObject * tco )
 
 
 /*! \brief Remove all TCOs from this track */
-void Track::deleteTCOs()
-{
-	while( ! m_trackContentObjects.isEmpty() )
-	{
+void Track::deleteTCOs() {
+	auto guard = Engine::mixer()->requestChangesGuard();
+	while (!m_trackContentObjects.isEmpty()) {
 		delete m_trackContentObjects.first();
 	}
 }
@@ -2519,6 +2518,11 @@ void Track::toggleSolo()
 BoolModel *Track::getMutedModel()
 {
 	return &m_mutedModel;
+}
+
+TrackContentObject *Track::createTCO(const MidiTime &pos) {
+	auto guard = Engine::mixer()->requestChangesGuard();
+	return unsafeCreateTCO(pos);
 }
 
 
