@@ -513,7 +513,9 @@ public:
 
 
 	virtual TrackView * createView( TrackContainerView * view ) = 0;
-	virtual TrackContentObject * createTCO( const MidiTime & pos ) = 0;
+	virtual TrackContentObject * unsafeCreateTCO( const MidiTime & pos ) = 0;
+
+	TrackContentObject * createTCO(const MidiTime &pos);
 
 	virtual void saveTrackSpecificSettings( QDomDocument & doc,
 						QDomElement & parent ) = 0;
