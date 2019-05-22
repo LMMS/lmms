@@ -70,6 +70,7 @@ public:
 
 
 	bool isPlaying() const;
+
 	void setIsPlaying(bool isPlaying);
 
 	/**
@@ -84,7 +85,8 @@ public slots:
 
 
 private slots:
-	void onSampleBufferChanged ();
+
+	void onSampleBufferChanged(int updateType);
 
 private:
 	std::shared_ptr<SampleBuffer> m_sampleBuffer;
@@ -92,11 +94,17 @@ private:
 	BoolModel m_recordModel;
 	bool m_isPlaying;
 
+	using Watcher=QFutureWatcher<SampleBuffer::SampleBufferInfo>;
+
+	Watcher m_loadingWatcher;
+
 	friend class SampleTCOView;
 
 
+	void onFileLoadingFinished();
+
 signals:
-	void sampleChanged();
+	void sampleChanged(int updateType);
 
 } ;
 
@@ -111,8 +119,8 @@ public:
 	virtual ~SampleTCOView() = default;
 
 public slots:
-	void updateSample();
 
+	void updateSample(int updateType);
 
 
 protected:
@@ -128,10 +136,14 @@ protected:
 private:
 	SampleTCO * m_tco;
 
-	SampleBufferVisualizer m_sampleBufferVisualizer;
-} ;
+	std::shared_ptr<QMutex> m_sampleBufferVisualizerMutex = std::make_shared<QMutex>();
+	std::shared_ptr<SampleBufferVisualizer> m_sampleBufferVisualizer = std::make_shared<SampleBufferVisualizer>();
 
+	using Watcher=QFutureWatcher<void>;
+	Watcher m_visualizationWatcher;
 
+	void updateVisualizer(QPen p, SampleBufferVisualizer::Operation operation);
+};
 
 
 class SampleTrack : public Track
@@ -194,11 +206,10 @@ private:
 	AudioPort m_audioPort;
 
 
-
 	friend class SampleTrackView;
 	friend class SampleTrackWindow;
 
-} ;
+};
 
 
 
@@ -316,7 +327,7 @@ private:
 
 	EffectRackView * m_effectRack;
 
-} ;
+};
 
 
 #endif
