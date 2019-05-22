@@ -78,16 +78,23 @@ public slots:
 
 
 private:
-	typedef struct
-	{
+	struct handle_data {
 		MM_OPERATORS
+
+		handle_data(std::shared_ptr<SampleBuffer> &&buffer, QObject *parent)
+			: sample{std::move(buffer)},
+			  sampleInfo(sample->createUpdatingValue(parent))
+		{
+		}
+
 		SampleBuffer::handleState* state;
 		bool tuned;
 		std::shared_ptr<SampleBuffer> sample;
-	} handle_data;
+		SampleBuffer::InfoUpdatingValue sampleInfo;
+	};
 
 	QString m_patchFile;
-	QVector<std::shared_ptr<SampleBuffer>> m_patchSamples;
+	std::vector<std::pair<std::shared_ptr<SampleBuffer>, SampleBuffer::InfoUpdatingValue>> m_patchSamples;
 	BoolModel m_loopedModel;
 	BoolModel m_tunedModel;
 

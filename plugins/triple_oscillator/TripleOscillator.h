@@ -61,6 +61,7 @@ private:
 	IntModel m_waveShapeModel;
 	IntModel m_modulationAlgoModel;
 	SampleBuffer* m_sampleBuffer;
+	SampleBuffer::InfoUpdatingValue m_sampleBufferInfo;
 
 	float m_volumeLeft;
 	float m_volumeRight;

@@ -31,12 +31,6 @@
 #include <QPainter>
 #include <QDomElement>
 #include <QDebug>
-
-
-#define OV_EXCLUDE_STATIC_CALLBACKS
-#ifdef LMMS_HAVE_OGGVORBIS
-#endif
-
 #include "base64.h"
 #include "ConfigManager.h"
 #include "DrumSynth.h"
@@ -50,7 +44,7 @@
 SampleBuffer::SampleBuffer(const QString &_audio_file, bool ignoreError)
 		: SampleBuffer{internal::SampleBufferFileHelper::Load(_audio_file, ignoreError)}
 {
-	m_maybeFileName = _audio_file;
+	m_playInfo->setMaybeAudioFile(_audio_file);
 }
 
 
@@ -82,9 +76,10 @@ void SampleBuffer::saveSettings(QDomDocument &doc, QDomElement &_this) {
 		_this.setAttribute("data", toBase64(string));
 	}
 
-	_this.setAttribute("sampleRate", sampleRate());
-	_this.setAttribute("amplification", amplification());
-	_this.setAttribute("frequency", frequency());
+	auto data = guardedData();
+	_this.setAttribute("sampleRate", data->getSampleRate());
+	_this.setAttribute("amplification", data->getAmplification());
+	_this.setAttribute("frequency", data->getFrequency());
 }
 
 void SampleBuffer::loadSettings(const QDomElement &_this) {
@@ -97,15 +92,15 @@ void SampleBuffer::loadSettings(const QDomElement &_this) {
 	}
 
 	if (_this.hasAttribute("data")) {
-		m_data = internal::SampleBufferData::loadFromBase64(_this.attribute("data"), loadingSampleRate);
+		*m_data = internal::SampleBufferData::loadFromBase64(_this.attribute("data"), loadingSampleRate);
 	}
 
 	if (_this.hasAttribute("amplification")) {
-		m_data.setAmplification(_this.attribute("amplification").toFloat());
+		m_data->setAmplification(_this.attribute("amplification").toFloat());
 	}
 
 	if (_this.hasAttribute("frequency")) {
-		m_data.setFrequency(_this.attribute("frequency").toFloat());
+		m_data->setFrequency(_this.attribute("frequency").toFloat());
 	}
 }
 
@@ -113,10 +108,10 @@ bool SampleBuffer::play(sampleFrame *_ab, handleState *_state,
 						const fpp_t _frames,
 						const float _freq,
 						const LoopMode _loopmode) {
-	f_cnt_t startFrame = m_playInfo.getStartFrame();
-	f_cnt_t endFrame = m_playInfo.getEndFrame();
-	f_cnt_t loopStartFrame = m_playInfo.getLoopStartFrame();
-	f_cnt_t loopEndFrame = m_playInfo.getLoopEndFrame();
+	f_cnt_t startFrame = m_playInfo->getStartFrame();
+	f_cnt_t endFrame = m_playInfo->getEndFrame();
+	f_cnt_t loopStartFrame = m_playInfo->getLoopStartFrame();
+	f_cnt_t loopEndFrame = m_playInfo->getLoopEndFrame();
 
 	if (endFrame == 0 || _frames == 0) {
 		return false;
@@ -125,8 +120,8 @@ bool SampleBuffer::play(sampleFrame *_ab, handleState *_state,
 	// variable for determining if we should currently be playing backwards in a ping-pong loop
 	bool is_backwards = _state->isBackwards();
 
-	const double freq_factor = (double) _freq / (double) m_data.getFrequency() *
-							   double(m_data.getSampleRate()) / double(Engine::mixer()->processingSampleRate());
+	const double freq_factor = (double) _freq / (double) m_data->getFrequency() *
+							   double(m_data->getSampleRate()) / double(Engine::mixer()->processingSampleRate());
 
 	// calculate how many frames we have in requested pitch
 	const auto total_frames_for_current_pitch = static_cast<f_cnt_t>((endFrame - startFrame) /
@@ -161,8 +156,8 @@ bool SampleBuffer::play(sampleFrame *_ab, handleState *_state,
 		SRC_DATA src_data;
 		// Generate output
 		src_data.data_in =
-				libSampleRateSrc(m_data.getSampleFragment(play_frame, fragment_size, _loopmode, &tmp, &is_backwards,
-														  loopStartFrame, loopEndFrame, endFrame))->data();
+				libSampleRateSrc(m_data->getSampleFragment(play_frame, fragment_size, _loopmode, &tmp, &is_backwards,
+														   loopStartFrame, loopEndFrame, endFrame))->data();
 		src_data.data_out = _ab->data();
 		src_data.input_frames = fragment_size;
 		src_data.output_frames = _frames;
@@ -185,10 +180,9 @@ bool SampleBuffer::play(sampleFrame *_ab, handleState *_state,
 		// as is into pitched-copy-buffer
 
 		// Generate output
-		// TODO: make a new function: fillSampleFragment for this case.
 		memcpy(_ab,
-			   m_data.getSampleFragment(play_frame, _frames, _loopmode, &tmp, &is_backwards,
-										loopStartFrame, loopEndFrame, endFrame),
+			   m_data->getSampleFragment(play_frame, _frames, _loopmode, &tmp, &is_backwards,
+										 loopStartFrame, loopEndFrame, endFrame),
 			   _frames * BYTES_PER_FRAME);
 		usedFrames = _frames;
 	}
@@ -224,10 +218,9 @@ bool SampleBuffer::play(sampleFrame *_ab, handleState *_state,
 	_state->setBackwards(is_backwards);
 	_state->setFrameIndex(play_frame);
 
-	// TODO: move that to another function.
 	for (fpp_t i = 0; i < _frames; ++i) {
-		_ab[i][0] *= m_playInfo.getAmplification();
-		_ab[i][1] *= m_playInfo.getAmplification();
+		_ab[i][0] *= m_data->getAmplification();
+		_ab[i][1] *= m_data->getAmplification();
 	}
 
 	return true;
@@ -311,17 +304,17 @@ std::pair<QPolygonF, QPolygonF> SampleBuffer::visualizeToPoly(const QRect &_dr, 
 }
 
 
-QString SampleBuffer::openAudioFile() const {
+QString SampleBuffer::openAudioFile(const QString &currentAudioFile) {
 	FileDialog ofd(NULL, tr("Open audio file"));
 
 	QString dir;
-	if (!m_maybeFileName.isEmpty()) {
-		QString f = m_maybeFileName;
+	if (!currentAudioFile.isEmpty()) {
+		QString f = currentAudioFile;
 		if (QFileInfo(f).isRelative()) {
 			f = ConfigManager::inst()->userSamplesDir() + f;
 			if (QFileInfo(f).exists() == false) {
 				f = ConfigManager::inst()->factorySamplesDir() +
-					m_maybeFileName;
+					currentAudioFile;
 			}
 		}
 		dir = QFileInfo(f).absolutePath();
@@ -350,9 +343,9 @@ QString SampleBuffer::openAudioFile() const {
 		//<< tr( "MOD-Files (*.mod)" )
 			;
 	ofd.setNameFilters(types);
-	if (!m_maybeFileName.isEmpty()) {
+	if (!currentAudioFile.isEmpty()) {
 		// select previously opened file
-		ofd.selectFile(QFileInfo(m_maybeFileName).fileName());
+		ofd.selectFile(QFileInfo(currentAudioFile).fileName());
 	}
 
 	if (ofd.exec() == QDialog::Accepted) {
@@ -366,8 +359,8 @@ QString SampleBuffer::openAudioFile() const {
 }
 
 
-QString SampleBuffer::openAndSetAudioFile() {
-	QString fileName = this->openAudioFile();
+QString SampleBuffer::openAndSetAudioFile(const QString &currentAudioFile) {
+	QString fileName = this->openAudioFile(currentAudioFile);
 
 	if (!fileName.isEmpty()) {
 		this->setAudioFile(fileName);
@@ -377,33 +370,32 @@ QString SampleBuffer::openAndSetAudioFile() {
 }
 
 
-QString SampleBuffer::openAndSetWaveformFile() {
-	if (m_maybeFileName.isEmpty()) {
-		m_maybeFileName = ConfigManager::inst()->factorySamplesDir() + "waveforms/10saw.flac";
+QString SampleBuffer::openAndSetWaveformFile(QString currentAudioFile) {
+	if (currentAudioFile.isEmpty()) {
+		currentAudioFile = ConfigManager::inst()->factorySamplesDir() + "waveforms/10saw.flac";
 	}
 
-	QString fileName = this->openAudioFile();
+	QString fileName = this->openAudioFile(currentAudioFile);
 
 	if (!fileName.isEmpty()) {
 		this->setAudioFile(fileName);
-	} else {
-		m_maybeFileName = "";
 	}
 
 	return fileName;
 }
 
 sample_t SampleBuffer::userWaveSample(const float _sample) const {
-	f_cnt_t dataFrames = frames();
+	auto data = guardedData();
+	f_cnt_t dataFrames = data->frames();
 	if (dataFrames == 0)
 		return 0;
 
-	auto data = guardedData();
 	const float frame = _sample * dataFrames;
 	f_cnt_t f1 = static_cast<f_cnt_t>( frame ) % dataFrames;
 	if (f1 < 0) {
-			f1 += dataFrames;
-		}
+		f1 += dataFrames;
+	}
+
 	return linearInterpolate(data->data()[f1][0], data->data()[(f1 + 1) % dataFrames][0], fraction(frame));
 }
 
@@ -417,27 +409,16 @@ QString &SampleBuffer::toBase64(QString &_dst) const {
 	return _dst;
 }
 
-void SampleBuffer::setStartFrame(const f_cnt_t _s) {
-	guardedPlayInfo()->setStartFrame(_s);
+QFuture<void> SampleBuffer::setAmplification(float _a) {
+	return runAsyncToSetData([_a](GuardedData &data) {
+		data->setAmplification(_a);
+	});
 }
 
-
-void SampleBuffer::setEndFrame(const f_cnt_t _e) {
-	guardedPlayInfo()->setEndFrame(_e);
-}
-
-
-void SampleBuffer::setAmplification(float _a) {
-	guardedData()->setAmplification(_a);
-
-	emit sampleUpdated();
-}
-
-void SampleBuffer::setFrequency(float frequency)
-{
-	guardedData()->setFrequency(frequency);
-
-	emit sampleUpdated();
+QFuture<void> SampleBuffer::setFrequency(float frequency) {
+	return runAsyncToSetData([frequency](GuardedData &data) {
+		data->setFrequency(frequency);
+	});
 }
 
 QString SampleBuffer::tryToMakeRelative(const QString &file) {
@@ -509,16 +490,17 @@ SampleBuffer::DataChangeHelper::DataChangeHelper(SampleBuffer *buffer) :
 }
 
 SampleBuffer::DataChangeHelper::~DataChangeHelper() {
-	m_buffer->m_playInfo = internal::SampleBufferPlayInfo(m_buffer->m_data.frames());
+	*m_buffer->m_playInfo = internal::SampleBufferPlayInfo(m_buffer->m_data->frames());
 
-	emit m_buffer->sampleUpdated();
+	m_buffer->m_infoChangeNotifier->onValueUpdated(m_buffer->createInfo());
+	emit m_buffer->sampleUpdated(m_updateType);
 }
 
 void SampleBuffer::addData(const SampleBuffer::DataVector &vector, sample_rate_t sampleRate) {
 	// First of all, don't let anyone read.
-	DataChangeHelper helper(this);
+	DataChangeHelper helper(this, UpdateType::Append);
 
-	m_data.addData(vector, sampleRate);
+	m_data->addData(vector, sampleRate);
 }
 
 void SampleBuffer::resetData(DataVector &&newData, sample_rate_t dataSampleRate) {

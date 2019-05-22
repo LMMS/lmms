@@ -104,6 +104,8 @@ set(LMMS_SRCS
 	core/samplebuffer/SampleBufferData.cpp
 	core/samplebuffer/SampleBufferFileHelper.cpp
 
+	core/MemoryUtils.cpp
+
 
 	PARENT_SCOPE
 )

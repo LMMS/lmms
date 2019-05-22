@@ -93,6 +93,7 @@ private:
 	typedef SampleBuffer::handleState handleState;
 
 	SampleBuffer m_sampleBuffer;
+	SampleBuffer::InfoUpdatingValue m_sampleBufferInfo;
 
 	FloatModel m_ampModel;
 	FloatModel m_startPointModel;
@@ -167,6 +168,8 @@ private:
 class AudioFileProcessorWaveView : public QWidget
 {
 	Q_OBJECT
+
+
 protected:
 	virtual void enterEvent( QEvent * _e );
 	virtual void leaveEvent( QEvent * _e );
@@ -250,6 +253,7 @@ private:
 
 	audioFileProcessor *m_audioFileProcessor;
 	SampleBuffer& m_sampleBuffer;
+	SampleBuffer::InfoUpdatingValue &m_sampleBufferInfo;
 	QPixmap m_graph;
 	f_cnt_t m_from;
 	f_cnt_t m_to;
@@ -270,7 +274,8 @@ private:
 	bool m_animation;
 
 public:
-	AudioFileProcessorWaveView( QWidget * _parent, int _w, int _h, SampleBuffer& buf, audioFileProcessor *fileProcessor);
+	AudioFileProcessorWaveView(QWidget *_parent, int _w, int _h, SampleBuffer &buf,
+							   SampleBuffer::InfoUpdatingValue &sampleBufferInfo, audioFileProcessor *fileProcessor);
 	void setKnobs(knob *_start, knob *_end, knob *_loop );
 
 
