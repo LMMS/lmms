@@ -260,47 +260,51 @@ void SampleBuffer::visualize(QPainter &_p, const QRect &_dr,
 
 std::pair<QPolygonF, QPolygonF> SampleBuffer::visualizeToPoly(const QRect &_dr, const QRect &_clip,
 															  f_cnt_t _from_frame, f_cnt_t _to_frame) const {
-	if (m_data.frames() == 0) return {};
-
-	const bool focus_on_range = _from_frame < _to_frame;
-	if (_to_frame > m_data.frames())
-		_to_frame = m_data.frames();
-
 	const int w = _dr.width();
 	const int h = _dr.height();
-
+	const bool focus_on_range = _from_frame < _to_frame;
 	int y_space = (h / 2);
 
-	const int nb_frames = focus_on_range ? _to_frame - _from_frame : m_data.frames();
-	if (nb_frames == 0) return {};
+	/* Don't visualize while rendering / doing after-rendering changes. */
+	return Engine::mixer()->runWhileNotRendering([=]() -> std::pair<QPolygonF, QPolygonF> {
+		if (m_data->frames() == 0) return {};
 
-	const int fpp = tLimit<int>(nb_frames / w, 1, 20);
+		auto to_frame = _to_frame;
+		if (to_frame > m_data->frames())
+			to_frame = m_data->frames();
 
-	bool shouldAddAdditionalPoint = (nb_frames % fpp) != 0;
-	int pointsCount = (nb_frames / fpp) + (shouldAddAdditionalPoint ? 1 : 0);
-	auto l = QPolygonF(pointsCount);
-	auto r = QPolygonF(pointsCount);
 
-	int n = 0;
-	const int xb = _dr.x();
-	const int first = focus_on_range ? _from_frame : 0;
-	const int last = focus_on_range ? _to_frame : m_data.frames();
+		const int nb_frames = focus_on_range ? to_frame - _from_frame : m_data->frames();
+		if (nb_frames == 0) return {};
 
-	int zeroPoint = _dr.y() + y_space;
-	if (h % 2 != 0)
-		zeroPoint += 1;
-	for (int frame = first; frame < last; frame += fpp) {
-		double x = (xb + (frame - first) * double(w) / nb_frames);
+		const int fpp = tLimit<int>(nb_frames / w, 1, 20);
 
-		l[n] = QPointF(x,
-					   (zeroPoint + (m_data.data()[frame][0] * y_space)));
-		r[n] = QPointF(x,
-					   (zeroPoint + (m_data.data()[frame][1] * y_space)));
+		bool shouldAddAdditionalPoint = (nb_frames % fpp) != 0;
+		int pointsCount = (nb_frames / fpp) + (shouldAddAdditionalPoint ? 1 : 0);
+		auto l = QPolygonF(pointsCount);
+		auto r = QPolygonF(pointsCount);
 
-		++n;
-	}
+		int n = 0;
+		const int xb = _dr.x();
+		const int first = focus_on_range ? _from_frame : 0;
+		const int last = focus_on_range ? to_frame : m_data->frames();
 
-	return {std::move(l), std::move(r)};
+		int zeroPoint = _dr.y() + y_space;
+		if (h % 2 != 0)
+			zeroPoint += 1;
+		for (int frame = first; frame < last; frame += fpp) {
+			double x = (xb + (frame - first) * double(w) / nb_frames);
+
+			l[n] = QPointF(x,
+						   (zeroPoint + (m_data->data()[frame][0] * y_space)));
+			r[n] = QPointF(x,
+						   (zeroPoint + (m_data->data()[frame][1] * y_space)));
+
+			++n;
+		}
+
+		return {std::move(l), std::move(r)};
+	});
 }
 
 
@@ -484,8 +488,8 @@ SampleBuffer::handleState::~handleState() {
 	src_delete(m_resamplingData);
 }
 
-SampleBuffer::DataChangeHelper::DataChangeHelper(SampleBuffer *buffer) :
-		m_buffer(buffer)
+SampleBuffer::DataChangeHelper::DataChangeHelper(SampleBuffer *buffer, SampleBuffer::UpdateType updateType)
+		:m_buffer{buffer}, m_updateType{updateType}
 {
 }
 
@@ -504,13 +508,13 @@ void SampleBuffer::addData(const SampleBuffer::DataVector &vector, sample_rate_t
 }
 
 void SampleBuffer::resetData(DataVector &&newData, sample_rate_t dataSampleRate) {
-	DataChangeHelper helper(this);
-	m_data.resetData(std::move(newData), dataSampleRate);
+	DataChangeHelper helper(this, UpdateType::Clear);
+	m_data->resetData(std::move(newData), dataSampleRate);
 }
 
 void SampleBuffer::reverse() {
-	DataChangeHelper helper(this);
-	m_data.reverse();
+	DataChangeHelper helper(this, UpdateType::Clear);
+	m_data->reverse();
 }
 
 void SampleBuffer::setAudioFile(const QString &audioFile, bool ignoreError)
@@ -524,10 +528,10 @@ SampleBuffer::SampleBuffer()
 }
 
 SampleBuffer::SampleBuffer(internal::SampleBufferData &&data)
-	: m_data{std::move(data)},
-	  m_playInfo(m_data.frames())
+		: m_data{std::make_shared<internal::SampleBufferData>(std::move(data))},
+		  m_playInfo(std::make_shared<internal::SampleBufferPlayInfo>(m_data->frames()))
 {
-	emit sampleUpdated();
+	emit sampleUpdated(UpdateType::Clear);
 }
 
 SampleBuffer::SampleBuffer(const QString &base64Data, sample_rate_t sample_rate)
