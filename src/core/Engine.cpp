@@ -90,8 +90,7 @@ void LmmsCore::destroy()
 	deleteHelper( &s_bbTrackContainer );
 	deleteHelper( &s_dummyTC );
 
-	deleteHelper( &s_fxMixer );
-	deleteHelper( &s_mixer );
+	deleteHelper(&s_fxMixer);
 
 	deleteHelper( &s_ladspaManager );
 
@@ -101,6 +100,8 @@ void LmmsCore::destroy()
 	deleteHelper( &s_song );
 
 	delete ConfigManager::inst();
+
+	deleteHelper(&s_mixer);
 }
 
 float LmmsCore::framesPerTick(sample_rate_t sample_rate)  {
