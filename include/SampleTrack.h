@@ -54,15 +54,13 @@ public:
 		return "sampletco";
 	}
 
-	const std::shared_ptr<SampleBuffer> sampleBuffer()
-	{
+	std::shared_ptr<SampleBuffer> sampleBuffer() {
 		return m_sampleBuffer;
 	}
 
 	MidiTime sampleLength() const;
-	void setSampleStartFrame( f_cnt_t startFrame );
-	void setSamplePlayLength( f_cnt_t length );
-	virtual TrackContentObjectView * createView( TrackView * _tv );
+
+	virtual TrackContentObjectView *createView(TrackView *_tv);
 
 
 	bool isPlaying() const;
@@ -84,6 +82,7 @@ private slots:
 
 private:
 	std::shared_ptr<SampleBuffer> m_sampleBuffer;
+	SampleBuffer::InfoUpdatingValue m_sampleBufferInfo;
 	BoolModel m_recordModel;
 	bool m_isPlaying;
 

@@ -77,6 +77,7 @@ protected:
 
 private:
 	SampleBuffer * m_userDefSampleBuffer;
+	SampleBuffer::InfoUpdatingValue m_userDefSampleBufferInfo;
 
 protected slots:
 	void updatePhase();

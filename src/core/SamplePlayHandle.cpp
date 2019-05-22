@@ -35,6 +35,7 @@
 SamplePlayHandle::SamplePlayHandle(const std::shared_ptr<SampleBuffer> &sampleBuffer, bool ownAudioPort) :
 	PlayHandle( TypeSamplePlayHandle ),
 	m_sampleBuffer( sampleBuffer ),
+	m_sampleBufferInfo(m_sampleBuffer->createInfo()),
 	m_doneMayReturnTrue( true ),
 	m_frame( 0 ),
 	m_ownAudioPort( ownAudioPort ),
@@ -139,8 +140,8 @@ bool SamplePlayHandle::isFromTrack( const Track * _track ) const
 
 f_cnt_t SamplePlayHandle::totalFrames() const
 {
-	f_cnt_t total_frames = ( m_sampleBuffer->endFrame() - m_sampleBuffer->startFrame() );
-	qreal processingToSampleRateRatio = static_cast<qreal>(Engine::mixer()->processingSampleRate()) / static_cast<qreal>(m_sampleBuffer->sampleRate ());
+	f_cnt_t total_frames = ( m_sampleBufferInfo.endFrame - m_sampleBufferInfo.startFrame );
+	qreal processingToSampleRateRatio = static_cast<qreal>(Engine::mixer()->processingSampleRate()) / static_cast<qreal>(m_sampleBufferInfo.sampleRate);
 
 	return static_cast<f_cnt_t>(total_frames * processingToSampleRateRatio);
 }
