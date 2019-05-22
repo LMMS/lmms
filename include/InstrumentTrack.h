@@ -136,7 +136,7 @@ public:
 	TrackView * createView( TrackContainerView* tcv ) override;
 
 	// create new track-content-object = pattern
-	TrackContentObject * createTCO( const MidiTime & _pos ) override;
+	TrackContentObject * unsafeCreateTCO( const MidiTime & _pos ) override ;
 
 
 	// called by track

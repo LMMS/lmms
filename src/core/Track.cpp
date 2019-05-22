@@ -2657,6 +2657,11 @@ BoolModel *Track::getMutedModel()
 	return &m_mutedModel;
 }
 
+TrackContentObject *Track::createTCO(const MidiTime &pos) {
+	auto guard = Engine::mixer()->requestChangesGuard();
+	return unsafeCreateTCO(pos);
+}
+
 
 
 

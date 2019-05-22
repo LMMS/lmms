@@ -708,10 +708,7 @@ TrackView * SampleTrack::createView( TrackContainerView* tcv )
 }
 
 
-
-
-TrackContentObject * SampleTrack::createTCO(const MidiTime & pos)
-{
+TrackContentObject *SampleTrack::unsafeCreateTCO(const MidiTime &pos) {
 	SampleTCO * sTco = new SampleTCO(this);
 	sTco->movePosition(pos);
 	return sTco;
