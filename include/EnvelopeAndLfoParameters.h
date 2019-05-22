@@ -163,6 +163,7 @@ private:
 	sample_t m_random;
 	bool m_bad_lfoShapeData;
 	SampleBuffer m_userWave;
+	SampleBuffer::InfoUpdatingValue m_userWaveInfo;
 
 	enum LfoShapes
 	{

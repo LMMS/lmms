@@ -136,7 +136,7 @@ public:
 	virtual TrackView * createView( TrackContainerView* tcv );
 
 	// create new track-content-object = pattern
-	virtual TrackContentObject * createTCO( const MidiTime & _pos );
+	virtual TrackContentObject * unsafeCreateTCO(const MidiTime &_pos) override ;
 
 
 	// called by track

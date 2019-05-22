@@ -474,7 +474,7 @@ TrackView * BBTrack::createView( TrackContainerView* tcv )
 
 
 
-TrackContentObject * BBTrack::createTCO( const MidiTime & _pos )
+TrackContentObject * BBTrack::unsafeCreateTCO(const MidiTime &_pos)
 {
 	BBTCO * bbtco = new BBTCO( this );
 	if( s_lastTCOColor )

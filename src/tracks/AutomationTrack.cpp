@@ -58,7 +58,7 @@ TrackView * AutomationTrack::createView( TrackContainerView* tcv )
 
 
 
-TrackContentObject * AutomationTrack::createTCO( const MidiTime & )
+TrackContentObject * AutomationTrack::unsafeCreateTCO( const MidiTime & )
 {
 	return new AutomationPattern( this );
 }
