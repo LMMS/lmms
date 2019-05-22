@@ -360,14 +360,11 @@ public:
 		return RequestChangesGuard{this};
 	}
 
-
-	/**
-	 * Sets the current thread as a rendering thread,
-	 * it means that call to requestChangeInModel will
-	 * be ignored in order to avoid a dead lock.
-	 */
-	static void setCurrentThreadAsRendering();
-
+	template<class Callable, class ReturnT=decltype(std::declval<Callable>()())>
+	ReturnT runWhileNotRendering(Callable &&callable) {
+		auto guard = this->requestChangesGuard();
+		return callable();
+	}
 
 	static bool isAudioDevNameValid(QString name);
 	static bool isMidiDevNameValid(QString name);
