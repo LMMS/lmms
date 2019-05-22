@@ -135,7 +135,7 @@ public:
 	virtual bool play( const MidiTime & _start, const fpp_t _frames,
 						const f_cnt_t _frame_base, int _tco_num = -1 );
 	virtual TrackView * createView( TrackContainerView* tcv );
-	virtual TrackContentObject * createTCO( const MidiTime & _pos );
+	virtual TrackContentObject * unsafeCreateTCO(const MidiTime &_pos);
 
 	virtual void saveTrackSpecificSettings( QDomDocument & _doc,
 							QDomElement & _parent );
