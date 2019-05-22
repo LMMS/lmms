@@ -58,12 +58,23 @@ namespace internal {
 			m_amplification = amplification;
 		}
 
+		const QString &getMaybeAudioFile() const
+		{
+			return m_maybeAudioFile;
+		}
+
+		void setMaybeAudioFile(const QString &maybeAudioFile)
+		{
+			m_maybeAudioFile = maybeAudioFile;
+		}
+
 	private:
 		f_cnt_t m_startFrame = 0;
 		f_cnt_t m_endFrame = 0;
 		f_cnt_t m_loopStartFrame = 0;
 		f_cnt_t m_loopEndFrame = 0;
 		float m_amplification = 1.0f;
+		QString m_maybeAudioFile;
 	};
 }
 
