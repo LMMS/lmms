@@ -162,6 +162,8 @@ void SampleRecordHandle::addOrCreateBuffer() {
 	auto currentBufferCopy = m_currentBuffer;
 	m_lastAsyncWork = runAsync(std::bind([this, currentBufferCopy, sampleBuffer] () mutable{
 		if (m_framesRecorded == 0) {
+			// Protect m_tco->setStartTimeOffset;
+			auto guard = Engine::mixer()->requestChangesGuard();
 			// Make sure we don't have the previous data.
 			sampleBuffer->resetData(std::move (currentBufferCopy),
 														 Engine::mixer ()->inputSampleRate ());
@@ -169,7 +171,7 @@ void SampleRecordHandle::addOrCreateBuffer() {
 		} else {
 			if (! currentBufferCopy.empty ()) {
 				sampleBuffer->addData(currentBufferCopy,
-												Engine::mixer ()->inputSampleRate ());
+										Engine::mixer ()->inputSampleRate ());
 			}
 		}
 	}));
