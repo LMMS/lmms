@@ -630,8 +630,8 @@ bool SampleTrack::play( const MidiTime & _start, const fpp_t _frames,
 					// anyway, "play" (record) this TCO if is recording.
 					if (sampleStart < sampleBufferLength || sTco->isRecord()) {
 						auto sampleBuffer = sTco->sampleBuffer();
-						sampleBuffer->setStartFrame(sampleStart).waitForFinished();
-						sampleBuffer->setEndFrame(samplePlayLength).waitForFinished();
+						sampleBuffer->setStartFrame<LaunchType::Sync>(sampleStart);;
+						sampleBuffer->setEndFrame<LaunchType::Sync>(samplePlayLength);
 						tcos.push_back(sTco);
 						sTco->setIsPlaying(true);
 					}
