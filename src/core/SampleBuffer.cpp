@@ -413,18 +413,6 @@ QString &SampleBuffer::toBase64(QString &_dst) const {
 	return _dst;
 }
 
-QFuture<void> SampleBuffer::setAmplification(float _a) {
-	return runAsyncToSetData([_a](GuardedData &data) {
-		data->setAmplification(_a);
-	});
-}
-
-QFuture<void> SampleBuffer::setFrequency(float frequency) {
-	return runAsyncToSetData([frequency](GuardedData &data) {
-		data->setFrequency(frequency);
-	});
-}
-
 QString SampleBuffer::tryToMakeRelative(const QString &file) {
 	if (QFileInfo(file).isRelative() == false) {
 		// Normalize the path
