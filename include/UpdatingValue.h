@@ -4,9 +4,10 @@
 #include <QObject>
 
 #include "MemoryUtils.h"
+#include "lmms_export.h"
 
 namespace internal {
-	class SignalArgument {
+	class LMMS_EXPORT SignalArgument {
 	protected:
 		virtual ~SignalArgument() {}
 	};
@@ -16,7 +17,7 @@ Q_DECLARE_METATYPE(std::shared_ptr<internal::SignalArgument>);
 
 
 namespace internal {
-	class UpdatingValueNotifier_Untyped : public QObject {
+	class LMMS_EXPORT UpdatingValueNotifier_Untyped : public QObject {
 	Q_OBJECT
 
 	signals:
@@ -28,7 +29,7 @@ namespace internal {
 		void rawOnValueUpdated(std::shared_ptr<internal::SignalArgument> value);
 	};
 
-	class UpdatingValue_Untyped : public QObject {
+	class LMMS_EXPORT UpdatingValue_Untyped : public QObject {
 	Q_OBJECT
 
 	protected:
@@ -51,7 +52,7 @@ namespace internal {
 	};
 
 	template<class T>
-	class UpdatingValueImpl : public internal::UpdatingValue_Untyped {
+	class LMMS_EXPORT UpdatingValueImpl : public internal::UpdatingValue_Untyped {
 	public:
 		/**
 		 * @brief Sender of updates for this UpdatingValue.
@@ -113,7 +114,7 @@ namespace internal {
   we'll get notified when we have any change in the value.
   */
 template<class T>
-class UpdatingValue {
+class LMMS_EXPORT UpdatingValue {
 	typedef internal::UpdatingValueImpl<T> Impl;
 
 public:

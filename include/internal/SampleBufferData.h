@@ -7,13 +7,14 @@
 #include "Engine.h"
 #include "MemoryManager.h"
 #include "lmms_basics.h"
+#include "lmms_export.h"
 
 namespace internal {
 	inline sample_rate_t mixerSampleRate() {
 		return Engine::mixer()->processingSampleRate();
 	}
 
-	class SampleBufferData {
+	class LMMS_EXPORT SampleBufferData {
 	public:
 		typedef std::vector<sampleFrame, MmAllocator<sampleFrame>> DataVector;
 
@@ -82,25 +83,28 @@ namespace internal {
 		DataVector m_data;
 		float m_frequency = BaseFreq;
 		float m_amplification = 1.0f;
-		sample_rate_t m_sampleRate = internal::GetMixerSampleRate();
+		sample_rate_t m_sampleRate = internal::mixerSampleRate();
 	public:
 		float getFrequency() const {
-			return 0;
+			return m_frequency;
 		}
 
 		sample_rate_t getSampleRate() const {
 			return m_sampleRate;
 		}
 
-		void setFrequency(float frequency) {
+		void setFrequency(float frequency)
+		{
 			m_frequency = frequency;
 		}
 
-		float getAmplification() const {
+		float getAmplification() const
+		{
 			return m_amplification;
 		}
 
-		void setAmplification(float amplification) {
+		void setAmplification(float amplification)
+		{
 			m_amplification = amplification;
 		}
 	};

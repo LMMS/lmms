@@ -60,20 +60,11 @@ internal::SampleBufferData::resampleData(const SampleBufferData::DataVector &inp
 	return outputData;
 }
 
-float internal::SampleBufferData::getAmplification() const
-{
-	return m_amplification;
-}
 
-void internal::SampleBufferData::setAmplification(float amplification)
-{
-	m_amplification = amplification;
-}
 
-void internal::SampleBufferData::setFrequency(float frequency)
-{
-	m_frequency = frequency;
-}
+
+
+
 
 const
 sampleFrame *internal::SampleBufferData::getSampleFragment(f_cnt_t _index,
@@ -157,10 +148,6 @@ sampleFrame *internal::SampleBufferData::getSampleFragment(f_cnt_t _index,
 	return *_tmp;
 }
 
-float internal::SampleBufferData::getFrequency() const {
-	return m_frequency;
-}
 
-sample_rate_t internal::SampleBufferData::getSampleRate() const {
-	return m_sampleRate;
-}
+
+

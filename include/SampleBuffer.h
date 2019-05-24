@@ -55,7 +55,7 @@ MM_OPERATORS
 	typedef std::shared_ptr<internal::SampleBufferPlayInfo> SharedPlayInfo;
 
 	template<class VarType, class PtrType=std::shared_ptr<VarType>>
-	class _MixerGuardedSharedPtr {
+	class LMMS_EXPORT _MixerGuardedSharedPtr {
 	public:
 		explicit _MixerGuardedSharedPtr(PtrType ptr)
 				: m_ptr(std::move(ptr)) {
@@ -98,7 +98,7 @@ MM_OPERATORS
 		return GuardedConstData(m_data);
 	}
 
-	struct SampleBufferInfo {
+	struct LMMS_EXPORT SampleBufferInfo {
 		SampleBufferInfo() = default;
 
 		SampleBufferInfo(GuardedPlayInfo &playInfo, GuardedData &data)
