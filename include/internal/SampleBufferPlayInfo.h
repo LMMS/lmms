@@ -6,9 +6,10 @@
 #define LMMS_SAMPLEBUFFERPLAYINFO_H
 
 #include "Mixer.h"
+#include "lmms_export.h"
 
 namespace internal {
-	class SampleBufferPlayInfo {
+	class LMMS_EXPORT SampleBufferPlayInfo {
 	public:
 		explicit SampleBufferPlayInfo(f_cnt_t frames)
 				: m_endFrame{frames}, m_loopEndFrame{frames} {
