@@ -256,7 +256,7 @@ internal::SampleBufferData
 internal::SampleBufferFileHelper::Load(internal::SampleBufferFileHelper::FileName fileName, bool ignoreError) {
 	fileName = tryToMakeRelative(fileName);
 
-	sample_rate_t sampleRate = GetMixerSampleRate();
+	sample_rate_t sampleRate = mixerSampleRate();
 	if (fileName == "")
 		return {{}, sampleRate};
 
@@ -293,7 +293,7 @@ internal::SampleBufferFileHelper::Load(internal::SampleBufferFileHelper::FileNam
 			}
 		}
 
-		return {{}, GetMixerSampleRate()};
+		return {{}, mixerSampleRate()};
 	} else {
 		return {std::move(fileData), sampleRate};
 	}
