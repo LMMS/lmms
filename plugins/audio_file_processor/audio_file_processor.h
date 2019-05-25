@@ -116,6 +116,11 @@ private:
 	 */
 	bool m_isCurrentlyReversed = false;
 
+	/**
+	 * @brief Are we in the middle of loadSettings?
+	 */
+	bool m_isLoadingSettings = false;
+
 	friend class AudioFileProcessorView;
 
 } ;
