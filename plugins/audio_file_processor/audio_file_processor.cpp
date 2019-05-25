@@ -211,7 +211,7 @@ void audioFileProcessor::deleteNotePluginData( NotePlayHandle * _n )
 void audioFileProcessor::saveSettings( QDomDocument & _doc,
 							QDomElement & _this )
 {
-	m_sampleBuffer.saveState (_doc, _this);
+	m_sampleBuffer.saveSettings (_doc, _this);
 	m_reverseModel.saveSettings( _doc, _this, "reversed" );
 	m_loopModel.saveSettings( _doc, _this, "looped" );
 	m_ampModel.saveSettings( _doc, _this, "amp" );
@@ -228,6 +228,8 @@ void audioFileProcessor::saveSettings( QDomDocument & _doc,
 
 void audioFileProcessor::loadSettings( const QDomElement & _this )
 {
+	m_isLoadingSettings = true;
+
 	if( _this.attribute( "src" ) != "" )
 	{
 		setAudioFile( _this.attribute( "src" ), false );
@@ -242,11 +244,11 @@ void audioFileProcessor::loadSettings( const QDomElement & _this )
 	}
 	else if( _this.attribute( "sampledata" ) != "" )
 	{
-		m_sampleBuffer = SampleBuffer( _this.attribute( "srcdata" ) ,
+		m_sampleBuffer = SampleBuffer( _this.attribute( "sampledata" ) ,
 									   Engine::mixer ()->baseSampleRate ());
 		qWarning("Using default sampleRate. That could lead to invalid values");
 	} else {
-		m_sampleBuffer.restoreState (_this.firstChildElement (m_sampleBuffer.nodeName ()));
+		m_sampleBuffer.loadSettings (_this);
 	}
 
 	m_loopModel.loadSettings( _this, "looped" );
@@ -280,6 +282,8 @@ void audioFileProcessor::loadSettings( const QDomElement & _this )
 	}
 
 	pointChanged();
+
+	m_isLoadingSettings = false;
 }
 
 
@@ -344,7 +348,8 @@ void audioFileProcessor::setAudioFile( const QString & _audio_file,
 
 void audioFileProcessor::reverseModelChanged( void )
 {
-	if (m_reverseModel.value () != m_isCurrentlyReversed) {
+	// Don't consider loading as a value change.
+	if (!m_isLoadingSettings && m_reverseModel.value () != m_isCurrentlyReversed) {
 		m_isCurrentlyReversed = m_reverseModel.value ();
 
 		m_sampleBuffer.reverse ();
