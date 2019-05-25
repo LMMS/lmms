@@ -324,7 +324,7 @@ private:
 	void setInitialOffsets();
 
 	bool mouseMovedDistance( QMouseEvent * me, int distance );
-
+	MidiTime draggedTCOPos( QMouseEvent * me );
 } ;
 
 
