@@ -897,27 +897,7 @@ void TrackContentObjectView::mouseMoveEvent( QMouseEvent * me )
 	const float ppt = m_trackView->trackContainerView()->pixelsPerTact();
 	if( m_action == Move )
 	{
-		// The pixel position of the mouse, adjusted for where the clip was grabbed
-		const int mousePos = mapToParent(me->pos()).x() - m_initialMousePos.x();
-		MidiTime newPos = mousePos * MidiTime::ticksPerTact() / ppt;
-		MidiTime offset = newPos - m_initialTCOPos;
-		// If the user is holding alt, or pressed ctrl after beginning the drag, don't quantize
-		if (    me->button() != Qt::NoButton
-			|| (me->modifiers() & Qt::ControlModifier)
-			|| (me->modifiers() & Qt::AltModifier)    )
-		{
-			// We want to preserve this adjusted offset,
-			// even if the user switches to snapping
-			setInitialPos( m_initialMousePos );
-		}
-		else if ( me->modifiers() & Qt::ShiftModifier )
-		{	// If shift is held, quantize position (Default in 1.2.0 and earlier)
-			newPos = newPos.quantize( gui->songEditor()->m_editor->getSnapSize() );
-		}
-		else
-		{	// Otherwise, quantize moved distance (preserves user offsets)
-			newPos = m_initialTCOPos + offset.quantize( gui->songEditor()->m_editor->getSnapSize() );
-		}
+		MidiTime newPos = draggedTCOPos( me );
 
 		newPos = max( 0, newPos.getTicks() ); // Don't go left of bar zero
 		m_tco->movePosition( newPos );
@@ -931,27 +911,7 @@ void TrackContentObjectView::mouseMoveEvent( QMouseEvent * me )
 	else if( m_action == MoveSelection )
 	{
 		// 1: Find the position we want to move the grabbed TCO to
-		// The pixel position of the mouse, adjusted for where the clip was grabbed
-		const int mousePos = mapToParent(me->pos()).x() - m_initialMousePos.x();
-		MidiTime newPos = mousePos * MidiTime::ticksPerTact() / ppt;
-		MidiTime offset = newPos - m_initialTCOPos;
-		// If the user is holding alt, or pressed ctrl after beginning the drag, don't quantize
-		if (    me->button() != Qt::NoButton
-			|| (me->modifiers() & Qt::ControlModifier)
-			|| (me->modifiers() & Qt::AltModifier)    )
-		{
-			// We want to preserve this adjusted offset,
-			// even if the user switches to snapping
-			setInitialPos( m_initialMousePos );
-		}
-		else if ( me->modifiers() & Qt::ShiftModifier )
-		{	// If shift is held, quantize position (Default in 1.2.0 and earlier)
-			newPos = newPos.quantize( gui->songEditor()->m_editor->getSnapSize() );
-		}
-		else
-		{	// Otherwise, quantize moved distance (preserves user offsets)
-			newPos = m_initialTCOPos + offset.quantize( gui->songEditor()->m_editor->getSnapSize() );
-		}
+		MidiTime newPos = draggedTCOPos( me );
 
 		// 2: Handle moving the other selected TCOs the same distance
 		QVector<selectableObject *> so =
@@ -1216,6 +1176,41 @@ bool TrackContentObjectView::mouseMovedDistance( QMouseEvent * me, int distance 
 	QPoint dPos = mapToGlobal( me->pos() ) - m_initialMouseGlobalPos;
 	const int pixelsMoved = dPos.manhattanLength();
 	return ( pixelsMoved > distance || pixelsMoved < -distance );
+}
+
+
+
+/*! \bried Calculate the new position of a dragged TCO from a mouse event
+ *
+ *
+ * \param me The QMouseEvent
+ */
+MidiTime TrackContentObjectView::draggedTCOPos( QMouseEvent * me )
+{
+	//Pixels per tact
+	const float ppt = m_trackView->trackContainerView()->pixelsPerTact();
+	// The pixel position of the mouse, adjusted for where the clip was grabbed
+	const int mousePos = mapToParent(me->pos()).x() - m_initialMousePos.x();
+	MidiTime newPos = mousePos * MidiTime::ticksPerTact() / ppt;
+	MidiTime offset = newPos - m_initialTCOPos;
+	// If the user is holding alt, or pressed ctrl after beginning the drag, don't quantize
+	if (    me->button() != Qt::NoButton
+		|| (me->modifiers() & Qt::ControlModifier)
+		|| (me->modifiers() & Qt::AltModifier)    )
+	{
+		// We want to preserve this adjusted offset,
+		// even if the user switches to snapping
+		setInitialPos( m_initialMousePos );
+	}
+	else if ( me->modifiers() & Qt::ShiftModifier )
+	{	// If shift is held, quantize position (Default in 1.2.0 and earlier)
+		newPos = newPos.quantize( gui->songEditor()->m_editor->getSnapSize() );
+	}
+	else
+	{	// Otherwise, quantize moved distance (preserves user offsets)
+		newPos = m_initialTCOPos + offset.quantize( gui->songEditor()->m_editor->getSnapSize() );
+	}
+	return newPos;
 }
 
 
