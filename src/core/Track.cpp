@@ -904,8 +904,12 @@ void TrackContentObjectView::mouseMoveEvent( QMouseEvent * me )
 		// If the user is holding alt, or pressed ctrl after beginning the drag, don't quantize
 		if (    me->button() != Qt::NoButton
 			|| (me->modifiers() & Qt::ControlModifier)
-			|| (me->modifiers() & Qt::AltModifier)
-		) {}
+			|| (me->modifiers() & Qt::AltModifier)    )
+		{
+			// We want to preserve this adjusted offset,
+			// even if the user switches to snapping
+			setInitialPos( m_initialMousePos );
+		}
 		else if ( me->modifiers() & Qt::ShiftModifier )
 		{	// If shift is held, quantize position (Default in 1.2.0 and earlier)
 			newPos = newPos.quantize( gui->songEditor()->m_editor->getSnapSize() );
@@ -934,8 +938,12 @@ void TrackContentObjectView::mouseMoveEvent( QMouseEvent * me )
 		// If the user is holding alt, or pressed ctrl after beginning the drag, don't quantize
 		if (    me->button() != Qt::NoButton
 			|| (me->modifiers() & Qt::ControlModifier)
-			|| (me->modifiers() & Qt::AltModifier)
-		) {}
+			|| (me->modifiers() & Qt::AltModifier)    )
+		{
+			// We want to preserve this adjusted offset,
+			// even if the user switches to snapping
+			setInitialPos( m_initialMousePos );
+		}
 		else if ( me->modifiers() & Qt::ShiftModifier )
 		{	// If shift is held, quantize position (Default in 1.2.0 and earlier)
 			newPos = newPos.quantize( gui->songEditor()->m_editor->getSnapSize() );
@@ -977,6 +985,7 @@ void TrackContentObjectView::mouseMoveEvent( QMouseEvent * me )
 		{
 			MidiTime l = qMax( MidiTime::ticksPerTact() / 16, static_cast<int>( me->x() * MidiTime::ticksPerTact() / ppt ) );
 			float snapSize = gui->songEditor()->m_editor->getSnapSize();
+			//When snapping, avoid making the new TCO tiny
 			MidiTime minLength = MidiTime( MidiTime::ticksPerTact() / 16 );
 
 			// If the user is holding alt, or pressed ctrl after beginning the drag, don't quantize
@@ -984,7 +993,11 @@ void TrackContentObjectView::mouseMoveEvent( QMouseEvent * me )
 				|| (me->modifiers() & Qt::ControlModifier)
 				|| (me->modifiers() & Qt::AltModifier)    )
 			{
+				//If the user manually makes the TCO tiny, we ĺet them
 				minLength = MidiTime( 1 );
+				// We want to preserve this adjusted offset,
+				// even if the user switches to snapping
+				setInitialPos( m_initialMousePos );
 			}
 			else if ( me->modifiers() & Qt::ShiftModifier )
 			{	// If shift is held, quantize clip's end position
@@ -1016,6 +1029,7 @@ void TrackContentObjectView::mouseMoveEvent( QMouseEvent * me )
 								   static_cast<int>( x * MidiTime::ticksPerTact() /
 													 ppt ) );
 				float snapSize = gui->songEditor()->m_editor->getSnapSize();
+				//When snapping, avoid making the new TCO tiny
 				MidiTime minLength = MidiTime( MidiTime::ticksPerTact() / 16 );
 
 				// If the user is holding alt, or pressed ctrl after beginning the drag, don't quantize
@@ -1023,7 +1037,11 @@ void TrackContentObjectView::mouseMoveEvent( QMouseEvent * me )
 				   || (me->modifiers() & Qt::ControlModifier)
 				   || (me->modifiers() & Qt::AltModifier)    )
 				{
+					//If the user manually makes the TCO tiny, we ĺet them
 					minLength = MidiTime( 1 );
+					// We want to preserve this adjusted offset,
+					// even if the user switches to snapping
+					setInitialPos( m_initialMousePos );
 				}
 				else if( me->modifiers() & Qt::ShiftModifier )
 				{	// If shift is held, quantize clip's start position
