@@ -126,7 +126,7 @@ private:
 	//! models for the controls; the vector defines indices for the controls
 	std::vector<ModelInfo> m_models;
 
-	int m_curProc, m_nProc;
+	int m_curProc;
 };
 
 
