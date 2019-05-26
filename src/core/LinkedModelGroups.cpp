@@ -237,7 +237,10 @@ void LinkedModelGroups::saveSettings(QDomDocument& doc, QDomElement& that)
 {
 	if (getGroup(0))
 	{
-		m_multiChannelLinkModel->saveSettings(doc, that, "link");
+		if (m_multiChannelLinkModel)
+		{
+			m_multiChannelLinkModel->saveSettings(doc, that, "link");
+		}
 
 		{
 			QDomElement links = doc.createElement("links");
@@ -274,7 +277,10 @@ void LinkedModelGroups::loadSettings(const QDomElement& that)
 	QDomElement models = that.firstChildElement("models");
 	if (!models.isNull() && getGroup(0))
 	{
-		m_multiChannelLinkModel->loadSettings(that, "link");
+		if (m_multiChannelLinkModel)
+		{
+			m_multiChannelLinkModel->loadSettings(that, "link");
+		}
 
 		{
 			QDomElement links = that.firstChildElement("links");
