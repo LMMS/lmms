@@ -156,9 +156,9 @@ void Lv2ControlBase::run(unsigned frames) {
 
 void Lv2ControlBase::saveSettings(QDomDocument &doc, QDomElement &that)
 {
-	// TODO
-	(void)doc;
-	(void)that;
+	LinkedModelGroups::saveSettings(doc, that);
+	
+	// TODO: save state if supported by plugin
 }
 
 
@@ -166,7 +166,9 @@ void Lv2ControlBase::saveSettings(QDomDocument &doc, QDomElement &that)
 
 void Lv2ControlBase::loadSettings(const QDomElement &that)
 {
-	(void)that;
+	LinkedModelGroups::loadSettings(that);
+	
+	// TODO: load state if supported by plugin
 }
 
 
