@@ -192,6 +192,14 @@ QString PortBase::name() const
 
 
 
+QString PortBase::uri() const
+{
+	return lilv_node_as_string(lilv_port_get_symbol(m_plugin, m_port));
+}
+
+
+
+
 Audio::Audio(std::size_t bufferSize, bool isSidechain)
 	: m_buffer(bufferSize), m_sidechain(isSidechain)
 {

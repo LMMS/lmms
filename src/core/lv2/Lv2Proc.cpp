@@ -396,7 +396,7 @@ void Lv2Proc::createPorts()
 					lilv_node_as_string(lilv_port_get_symbol(
 										m_proc->m_plugin, ctrl.m_port)),
 					amo);
-				m_proc->addModel(amo);
+				m_proc->addModel(amo, ctrl.uri());
 			}
 		}
 

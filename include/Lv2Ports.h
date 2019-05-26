@@ -121,6 +121,7 @@ struct PortBase : public Meta
 	virtual void accept(ConstVisitor& v) const = 0;
 
 	QString name() const;
+	QString uri() const;
 
 	virtual ~PortBase();
 };
