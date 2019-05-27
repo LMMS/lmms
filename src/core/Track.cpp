@@ -1180,7 +1180,7 @@ bool TrackContentObjectView::mouseMovedDistance( QMouseEvent * me, int distance 
 
 
 
-/*! \bried Calculate the new position of a dragged TCO from a mouse event
+/*! \brief Calculate the new position of a dragged TCO from a mouse event
  *
  *
  * \param me The QMouseEvent
