@@ -777,7 +777,7 @@ SongEditorWindow::SongEditorWindow(Song* song) :
 	m_snappingComboBox->setToolTip(tr("Clip snapping"));
 
 	m_setProportionalSnapAction = new QAction(embed::getIconPixmap("add_automation"),
-											 tr("Toggle roportional snap on/off"), this);
+											 tr("Toggle proportional snap on/off"), this);
 	m_setProportionalSnapAction->setCheckable(true);
 	m_setProportionalSnapAction->setChecked(true);
 	connect(m_setProportionalSnapAction, SIGNAL(triggered()), m_editor, SLOT(toggleProportionalSnap()));
