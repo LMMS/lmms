@@ -232,6 +232,7 @@ SongEditor::SongEditor( Song * song ) :
 
 	static_cast<QVBoxLayout *>( layout() )->insertWidget( 0, m_timeLine );
 
+//	m_leftRightScroll = contentWidget()->horizontalScrollBar();
 	m_leftRightScroll = new QScrollBar( Qt::Horizontal, this );
 	m_leftRightScroll->setMinimum( 0 );
 	m_leftRightScroll->setMaximum( 0 );
@@ -244,6 +245,7 @@ SongEditor::SongEditor( Song * song ) :
 			this, SLOT( updateScrollBar( int ) ) );
 	connect( m_leftRightScroll, SIGNAL(valueChanged(int)),this, SLOT(updateRubberband()));
 	connect( contentWidget()->verticalScrollBar(), SIGNAL(valueChanged(int)),this, SLOT(updateRubberband()));
+
 
 	// Set up zooming model
 	for( float const & zoomLevel : m_zoomLevels )
@@ -300,14 +302,18 @@ void SongEditor::scrolled( int new_pos )
 
 void SongEditor::updateRubberband()
 {
-	if( rubberBandActive() == true )
+	if(rubberBandActive())
 	{
-		int hs = (m_leftRightScroll->value() - m_scrollPos.x() ) * pixelsPerTact();
+		int widgetTotal = ConfigManager::inst()->value("ui", "compacttrackbuttons" ).toInt()==1
+				? DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT + TRACK_OP_WIDTH_COMPACT
+				: DEFAULT_SETTINGS_WIDGET_WIDTH + TRACK_OP_WIDTH;
+
+		int hs = (m_leftRightScroll->value() - m_scrollPos.x()) * pixelsPerTact();
 		int vs = contentWidget()->verticalScrollBar()->value() - m_scrollPos.y();
-		QPoint origin = QPoint(m_origin.x()-hs, m_origin.y()-vs);
-		qDebug() << origin;
-		if(m_origin.x() - hs < (DEFAULT_SETTINGS_WIDGET_WIDTH + TRACK_OP_WIDTH))
-			origin = QPoint( (DEFAULT_SETTINGS_WIDGET_WIDTH + TRACK_OP_WIDTH), m_origin.y()-vs);
+		QPoint origin = QPoint(m_origin.x() - hs, m_origin.y() - vs);
+
+		if(m_origin.x() - hs < (widgetTotal))
+			origin = QPoint( (widgetTotal), m_origin.y()-vs);
 		rubberBand()->setGeometry( QRect( origin,
 								   contentWidget()->mapFromParent(QPoint(m_mousePos.x(), m_mousePos.y()))
 								  ).normalized());
@@ -569,7 +575,7 @@ static inline void animateScroll( QScrollBar *scrollBar, int newVal, bool smooth
 		QTimeLine *t = scrollBar->findChild<QTimeLine *>();
 		if( t == NULL )
 		{
-			t = new QTimeLine( 600, scrollBar );
+			t = new QTimeLine( 6000, scrollBar );
 			t->setFrameRange( scrollBar->value(), newVal );
 			t->connect( t, SIGNAL( finished() ), SLOT( deleteLater() ) );
 
@@ -590,6 +596,7 @@ static inline void animateScroll( QScrollBar *scrollBar, int newVal, bool smooth
 
 void SongEditor::updatePosition( const MidiTime & t )
 {
+	qDebug() << "updatePosition" << t;
 	int widgetWidth, trackOpWidth;
 	if( ConfigManager::inst()->value( "ui", "compacttrackbuttons" ).toInt() )
 	{
