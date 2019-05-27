@@ -110,7 +110,9 @@ SampleTCO::~SampleTCO()
 	{
 		sampletrack->updateTcos();
 	}
+	Engine::mixer()->requestChangeInModel();
 	sharedObject::unref( m_sampleBuffer );
+	Engine::mixer()->doneChangeInModel();
 }
 
 
@@ -133,7 +135,9 @@ const QString & SampleTCO::sampleFile() const
 
 void SampleTCO::setSampleBuffer( SampleBuffer* sb )
 {
+	Engine::mixer()->requestChangeInModel();
 	sharedObject::unref( m_sampleBuffer );
+	Engine::mixer()->doneChangeInModel();
 	m_sampleBuffer = sb;
 	updateLength();
 
