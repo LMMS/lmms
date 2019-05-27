@@ -161,11 +161,6 @@ public:
 		return m_gigDir;
 	}
 
-	const QString & sf2Dir() const
-	{
-		return m_sf2Dir;
-	}
-
 	const QString & vstDir() const
 	{
 		return m_vstDir;
@@ -266,7 +261,6 @@ private:
 	QString m_vstDir;
 	QString m_ladDir;
 	QString m_gigDir;
-	QString m_sf2Dir;
 	QString m_version;
 #ifdef LMMS_HAVE_STK
 	QString m_stkDir;

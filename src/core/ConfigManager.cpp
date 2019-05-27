@@ -64,7 +64,6 @@ ConfigManager::ConfigManager() :
 	m_artworkDir( defaultArtworkDir() ),
 	m_vstDir( m_workingDir + "vst/" ),
 	m_gigDir( m_workingDir + GIG_PATH ),
-	m_sf2Dir( m_workingDir + SF2_PATH ),
 	m_version( defaultVersion() )
 {
 	// Detect < 1.2.0 working directory as a courtesy
@@ -300,11 +299,6 @@ void ConfigManager::setGIGDir(const QString &gd)
 	m_gigDir = gd;
 }
 
-void ConfigManager::setSF2Dir(const QString &sfd)
-{
-	m_sf2Dir = sfd;
-}
-
 
 void ConfigManager::createWorkingDir()
 {
@@ -502,7 +496,6 @@ void ConfigManager::loadConfigFile( const QString & configFile )
 			setWorkingDir( value( "paths", "workingdir" ) );
 
 			setGIGDir( value( "paths", "gigdir" ) == "" ? gigDir() : value( "paths", "gigdir" ) );
-			setSF2Dir( value( "paths", "sf2dir" ) == "" ? sf2Dir() : value( "paths", "sf2dir" ) );
 			setVSTDir( value( "paths", "vstdir" ) );
 			setLADSPADir( value( "paths", "laddir" ) );
 		#ifdef LMMS_HAVE_STK
@@ -589,7 +582,6 @@ void ConfigManager::saveConfigFile()
 	setValue( "paths", "workingdir", m_workingDir );
 	setValue( "paths", "vstdir", m_vstDir );
 	setValue( "paths", "gigdir", m_gigDir );
-	setValue( "paths", "sf2dir", m_sf2Dir );
 	setValue( "paths", "laddir", m_ladDir );
 #ifdef LMMS_HAVE_STK
 	setValue( "paths", "stkdir", m_stkDir );

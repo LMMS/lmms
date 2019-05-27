@@ -1119,10 +1119,6 @@ void sf2InstrumentView::showFileDialog()
 		ofd.setDirectory( QFileInfo( f ).absolutePath() );
 		ofd.selectFile( QFileInfo( f ).fileName() );
 	}
-	else
-	{
-		ofd.setDirectory( ConfigManager::inst()->sf2Dir() );
-	}
 
 	m_fileDialogButton->setEnabled( false );
 
