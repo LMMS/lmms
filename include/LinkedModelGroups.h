@@ -75,7 +75,7 @@ public:
 	//! @see linkControls
 	void unlinkControls(LinkedModelGroup *other, int id);
 	//! Return whether this is the first of more than one processors
-	bool isLinking() { return m_linkEnabled.size(); }
+	bool isLinking() const { return m_linkEnabled.size(); }
 
 	/*
 		Models
@@ -102,9 +102,12 @@ public:
 	/*
 		Load/Save
 	*/
-	void saveValues(class QDomDocument& doc, class QDomElement& that);
+	//! @param lmg0 The linking model group with index 0
+	void saveValues(class QDomDocument& doc, class QDomElement& that,
+					const LinkedModelGroup *lmg0);
 	void saveLinksEnabled(QDomDocument &doc, QDomElement &that);
-	void loadValues(const class QDomElement& that);
+	//! @param lmg0 The linking model group with index 0
+	void loadValues(const class QDomElement& that, const LinkedModelGroup *lmg0);
 	void loadLinksEnabled(const class QDomElement &that);
 
 	/*
