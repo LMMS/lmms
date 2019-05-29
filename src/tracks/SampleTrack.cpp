@@ -560,6 +560,10 @@ void SampleTCOView::paintEvent( QPaintEvent * pe )
 			embed::getIconPixmap( "muted", size, size ) );
 	}
 
+	if ( m_tco->m_marker )
+	{
+		p.drawLine(m_tco->m_markerPos, rect().bottom(), m_tco->m_markerPos, rect().top());
+	}
 	// recording sample tracks is not possible at the moment
 
 	/* if( m_tco->isRecord() )

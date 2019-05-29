@@ -716,31 +716,40 @@ void TrackContentObjectView::mousePressEvent( QMouseEvent * me )
 {
 	setInitialPos( me->pos() );
 	setInitialOffsets();
-	if ( m_trackView->trackContainerView()->knifeMode()
-	     && me->button() == Qt::LeftButton             )
-	{
-		SampleTCO * leftTCO = dynamic_cast<SampleTCO*>( m_tco );
-		if ( leftTCO )
-		{
-			const float ppt = m_trackView->trackContainerView()->pixelsPerTact();
-			const int x = mapToParent( me->pos() ).x();
-			MidiTime t = qMax<int>( 0, m_trackView->trackContainerView()->currentPosition() + x * MidiTime::ticksPerTact()/ppt);
-			if ( me->modifiers() & Qt::ControlModifier
-			  || me->modifiers() & Qt::AltModifier    ) {}
-			else { t = t.quantize( gui->songEditor()->m_editor->getSnapSize() ); }
-			leftTCO->copy();
-			SampleTCO * rightTCO = new SampleTCO ( leftTCO->getTrack() );
-			rightTCO->paste();
 
-			leftTCO->changeLength( t - leftTCO->startPosition() );
-			rightTCO->movePosition(t);
-			rightTCO->changeLength( rightTCO->length() - leftTCO->length() );
-			rightTCO->setStartTimeOffset( leftTCO->startTimeOffset() - leftTCO->length() );
-		}
-	}
-	else if( !fixedTCOs() && me->button() == Qt::LeftButton )
+	if( !fixedTCOs() && me->button() == Qt::LeftButton )
 	{
-		if( me->modifiers() & Qt::ControlModifier )
+		if( m_trackView->trackContainerView()->knifeMode() )
+		{
+			m_action = Split;
+			SampleTCO * sTco = dynamic_cast<SampleTCO*>( m_tco );
+			if (sTco)
+			{
+				int markerPos = me->pos().x();
+
+				if ( me->modifiers() & Qt::ControlModifier
+				  || me->modifiers() & Qt::AltModifier    )
+				{}
+				else {
+					const float ppt = m_trackView->trackContainerView()->pixelsPerTact();
+					MidiTime incs = MidiTime( MidiTime::ticksPerTact() * gui->songEditor()->m_editor->getSnapSize() );
+					MidiTime midiPos = markerPos * MidiTime::ticksPerTact() / ppt;
+					midiPos = midiPos.quantize(gui->songEditor()->m_editor->getSnapSize());
+					midiPos -= m_initialTCOPos % incs;
+					markerPos = midiPos * ppt / MidiTime::ticksPerTact();
+				}
+
+				SampleTCO * sTco = dynamic_cast<SampleTCO*>( m_tco );
+				sTco->setMarkerPos( markerPos );
+				sTco->setMarkerEnabled( true );
+				update();
+			}
+			// We can't split anything except samples right now, so disable the
+			// action to avoid entering if statements we don't need to. This
+			// also saves us a few 'if(sTco)' checks
+			else { m_action = NoAction; }
+		}
+		else if ( me->modifiers() & Qt::ControlModifier )
 		{
 			if( isSelected() )
 			{
@@ -1056,6 +1065,25 @@ void TrackContentObjectView::mouseMoveEvent( QMouseEvent * me )
 						MidiTime::ticksPerTact() ) );
 		s_textFloat->moveGlobal( this, QPoint( width() + 2, height() + 2) );
 	}
+	else if( m_action == Split )
+	{
+		int markerPos = me->pos().x();
+
+		if ( me->modifiers() & Qt::ControlModifier
+		  || me->modifiers() & Qt::AltModifier    )
+		{}
+		else {
+			MidiTime incs = MidiTime( MidiTime::ticksPerTact() * gui->songEditor()->m_editor->getSnapSize() );
+			MidiTime midiPos = markerPos * MidiTime::ticksPerTact() / ppt;
+			midiPos = midiPos.quantize(gui->songEditor()->m_editor->getSnapSize());
+			midiPos -= m_initialTCOPos % incs;
+			markerPos = midiPos * ppt / MidiTime::ticksPerTact();
+		}
+
+		SampleTCO * sTco = dynamic_cast<SampleTCO*>( m_tco );
+		sTco->setMarkerPos( markerPos );
+		update();
+	}
 	else
 	{
 		SampleTCO * sTco = dynamic_cast<SampleTCO*>( m_tco );
@@ -1092,12 +1120,40 @@ void TrackContentObjectView::mouseReleaseEvent( QMouseEvent * me )
 	{
 		setSelected( !isSelected() );
 	}
-
-	if( m_action == Move || m_action == Resize || m_action == ResizeLeft )
+	else if( m_action == Move || m_action == Resize || m_action == ResizeLeft )
 	{
 		// TODO: Fix m_tco->setJournalling() consistency
 		m_tco->setJournalling( true );
 	}
+	else if( m_action == Split )
+	{
+		SampleTCO * leftTCO = dynamic_cast<SampleTCO*>( m_tco );
+
+		leftTCO->setMarkerEnabled( false );
+
+		const float ppt = m_trackView->trackContainerView()->pixelsPerTact();
+		const int x = mapToParent( me->pos() ).x();
+		MidiTime t = qMax<int>( 0, m_trackView->trackContainerView()->currentPosition() + x * MidiTime::ticksPerTact()/ppt);
+
+		//Don't do anything if we slid off the TCO
+		if ( t <= m_initialTCOPos || t >= m_initialTCOEnd ){}
+		else {
+			if ( me->modifiers() & Qt::ControlModifier
+			  || me->modifiers() & Qt::AltModifier    ) {}
+			else { t = t.quantize( gui->songEditor()->m_editor->getSnapSize() ); }
+
+			leftTCO->copy();
+			SampleTCO * rightTCO = new SampleTCO ( leftTCO->getTrack() );
+			rightTCO->paste();
+
+			leftTCO->changeLength( t - m_initialTCOPos );
+
+			rightTCO->movePosition(t);
+			rightTCO->changeLength( m_initialTCOEnd - t );
+			rightTCO->setStartTimeOffset( leftTCO->startTimeOffset() - leftTCO->length() );
+		}
+	}
+
 	m_action = NoAction;
 	delete m_hint;
 	m_hint = NULL;
