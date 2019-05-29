@@ -1189,9 +1189,8 @@ MidiTime TrackContentObjectView::draggedTCOPos( QMouseEvent * me )
 {
 	//Pixels per tact
 	const float ppt = m_trackView->trackContainerView()->pixelsPerTact();
-	// The pixel position of the mouse, adjusted for where the clip was grabbed
-	//const int mousePos = mapToParent(me->pos()).x() - m_initialMousePos.x();
-	const int mouseOff = mapToGlobal(me->pos()).x() - m_initialMouseGlobalPos.x(); //Always starts on bar 1
+	// The pixel distance that the mouse has moved
+	const int mouseOff = mapToGlobal(me->pos()).x() - m_initialMouseGlobalPos.x();
 	MidiTime newPos = m_initialTCOPos + mouseOff * MidiTime::ticksPerTact() / ppt;
 	MidiTime offset = newPos - m_initialTCOPos;
 	// If the user is holding alt, or pressed ctrl after beginning the drag, don't quantize
