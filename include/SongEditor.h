@@ -63,6 +63,7 @@ public:
 	enum EditMode
 	{
 		DrawMode,
+		KnifeMode,
 		SelectMode
 	};
 
@@ -82,6 +83,7 @@ public slots:
 
 	void setEditMode( EditMode mode );
 	void setEditModeDraw();
+	void setEditModeKnife();
 	void setEditModeSelect();
 	void toggleProportionalSnap();
 
@@ -114,6 +116,7 @@ private:
 	virtual void wheelEvent( QWheelEvent * we );
 
 	virtual bool allowRubberband() const;
+	virtual bool knifeMode() const;
 
 
 	Song * m_song;
@@ -192,6 +195,7 @@ private:
 
 	ActionGroup * m_editModeGroup;
 	QAction* m_drawModeAction;
+	QAction* m_knifeModeAction;
 	QAction* m_selectModeAction;
 	QAction* m_crtlAction;
 

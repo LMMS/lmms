@@ -716,7 +716,29 @@ void TrackContentObjectView::mousePressEvent( QMouseEvent * me )
 {
 	setInitialPos( me->pos() );
 	setInitialOffsets();
-	if( !fixedTCOs() && me->button() == Qt::LeftButton )
+	if ( m_trackView->trackContainerView()->knifeMode()
+	     && me->button() == Qt::LeftButton             )
+	{
+		SampleTCO * leftTCO = dynamic_cast<SampleTCO*>( m_tco );
+		if ( leftTCO )
+		{
+			const float ppt = m_trackView->trackContainerView()->pixelsPerTact();
+			const int x = mapToParent( me->pos() ).x();
+			MidiTime t = qMax<int>( 0, m_trackView->trackContainerView()->currentPosition() + x * MidiTime::ticksPerTact()/ppt);
+			if ( me->modifiers() & Qt::ControlModifier
+			  || me->modifiers() & Qt::AltModifier    ) {}
+			else { t = t.quantize( gui->songEditor()->m_editor->getSnapSize() ); }
+			leftTCO->copy();
+			SampleTCO * rightTCO = new SampleTCO ( leftTCO->getTrack() );
+			rightTCO->paste();
+
+			leftTCO->changeLength( t - leftTCO->startPosition() );
+			rightTCO->movePosition(t);
+			rightTCO->changeLength( rightTCO->length() - leftTCO->length() );
+			rightTCO->setStartTimeOffset( leftTCO->startTimeOffset() - leftTCO->length() );
+		}
+	}
+	else if( !fixedTCOs() && me->button() == Qt::LeftButton )
 	{
 		if( me->modifiers() & Qt::ControlModifier )
 		{
