@@ -621,7 +621,7 @@ static inline void animateScroll( QScrollBar *scrollBar, int newVal, bool smooth
 		QTimeLine *t = scrollBar->findChild<QTimeLine *>();
 		if( t == NULL )
 		{
-			t = new QTimeLine( 6000, scrollBar );
+			t = new QTimeLine( 600, scrollBar );
 			t->setFrameRange( scrollBar->value(), newVal );
 			t->connect( t, SIGNAL( finished() ), SLOT( deleteLater() ) );
 
