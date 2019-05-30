@@ -45,7 +45,7 @@ class AutomatableModel;
 		(justification: setting the wrong typed model to a widget will cause
 		hard-to-find runtime errors)
 */
-class ControlBase
+class Control
 {
 public:
 	virtual QWidget* topWidget() = 0;
@@ -54,11 +54,11 @@ public:
 	virtual void setModel(AutomatableModel* model) = 0;
 	virtual AutomatableModel* model() = 0;
 
-	virtual ~ControlBase();
+	virtual ~Control();
 };
 
 
-class KnobControl : public ControlBase
+class KnobControl : public Control
 {
 	class Knob* m_knob;
 
@@ -74,7 +74,7 @@ public:
 };
 
 
-class ComboControl : public ControlBase
+class ComboControl : public Control
 {
 	QWidget* m_widget;
 	class ComboBox* m_combo;
@@ -92,7 +92,7 @@ public:
 };
 
 
-class LcdControl : public ControlBase
+class LcdControl : public Control
 {
 	class LcdSpinBox* m_lcd;
 
@@ -108,7 +108,7 @@ public:
 };
 
 
-class CheckControl : public ControlBase
+class CheckControl : public Control
 {
 	QWidget* m_widget;
 	class LedCheckBox* m_checkBox;

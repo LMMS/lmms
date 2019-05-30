@@ -36,7 +36,7 @@
 
 
 
-ControlBase::~ControlBase() {}
+Control::~Control() {}
 
 
 

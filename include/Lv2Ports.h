@@ -70,11 +70,16 @@ const char* toStr(Lv2Ports::Flow pf);
 const char* toStr(Lv2Ports::Type pt);
 const char* toStr(Lv2Ports::Vis pv);
 
+struct ControlPortBase;
+struct Control;
+struct Audio;
+struct Cv;
+struct Unknown;
 
 struct ConstVisitor
 {
 #define CAN_VISIT(clss) \
-virtual void visit(const struct clss& ) {}
+virtual void visit(const Lv2Ports::clss& ) {}
 
 	CAN_VISIT(ControlPortBase)
 	CAN_VISIT(Control)
@@ -88,7 +93,7 @@ virtual void visit(const struct clss& ) {}
 struct Visitor
 {
 #define CAN_VISIT(clss) \
-virtual void visit(clss& ) {}
+virtual void visit(Lv2Ports::clss& ) {}
 
 	CAN_VISIT(ControlPortBase)
 	CAN_VISIT(Control)

@@ -41,7 +41,7 @@ class Lv2ControlBase;
 
 
 //! View for one processor, Lv2ViewBase contains 2 of those for mono plugins
-class Lv2ViewProc : public LinkedModelGroupViewBase
+class Lv2ViewProc : public LinkedModelGroupView
 {
 public:
 	//! @param colNum numbers of columns for the controls
@@ -56,7 +56,7 @@ private:
 
 
 //! Base class for view for one Lv2 plugin
-class Lv2ViewBase : public LinkedModelGroupsViewBase
+class Lv2ViewBase : public LinkedModelGroupsView
 {
 protected:
 	//! @param pluginWidget A child class which inherits QWidget
@@ -84,7 +84,7 @@ private:
 	};
 
 	static AutoLilvNode uri(const char *uriStr);
-	LinkedModelGroupViewBase* getGroupView(std::size_t idx) override {
+	LinkedModelGroupView* getGroupView(std::size_t idx) override {
 		return static_cast<int>(idx) < m_procViews.size()
 			? m_procViews[static_cast<int>(idx)]
 			: nullptr;

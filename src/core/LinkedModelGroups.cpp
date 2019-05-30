@@ -122,7 +122,6 @@ void LinkedModelGroup::saveLinksEnabled(QDomDocument &doc, QDomElement &that)
 		std::size_t count = 0;
 		for (BoolModel* bmo : m_linkEnabled)
 		{
-			//that.setAttribute(m_models[count++].m_name, bmo->value());
 			bmo->saveSettings(doc, that, m_models[count++].m_name);
 		}
 	}
@@ -268,8 +267,6 @@ void LinkedModelGroups::updateLinkStatesFromGlobal()
 		first->linkAllModels(false);
 	}
 
-	// if global channel link state has changed, always ignore link
-	// status of individual ports in the future
 	m_noLink = false;
 }
 

@@ -37,9 +37,15 @@
 */
 
 
-//! View for one processor, LinkedModelGroupsViewBase contains 2
-//! of those for mono plugins
-class LinkedModelGroupViewBase : public QGroupBox
+/**
+	View for one processor, LinkedModelGroupsViewBase contains 2
+	of those for mono plugins.
+
+	@note This class, and no inheriting classes, shall inherit ModelView.
+		The "view" in the name is just for consistency
+		with LinkedModelGroupsView.
+*/
+class LinkedModelGroupView : public QGroupBox
 {
 public:
 	/**
@@ -48,16 +54,16 @@ public:
 		@param name Name for the group, like "Left" or "Group 1",
 			automatically set if not given
 	*/
-	LinkedModelGroupViewBase(QWidget *parent, class LinkedModelGroup* model,
+	LinkedModelGroupView(QWidget *parent, class LinkedModelGroup* model,
 		int colNum, int nProc, const QString &name = QString());
-	~LinkedModelGroupViewBase();
+	~LinkedModelGroupView();
 
 	//! Reconnect models if model changed
 	void modelChanged(class LinkedModelGroup *linkedModelGroup);
 
 protected:
 	//! Add a control to this widget
-	void addControl(class ControlBase *ctrl);
+	void addControl(class Control *ctrl);
 
 private:
 	void makeAllGridCellsEqualSized();
@@ -65,18 +71,23 @@ private:
 	int m_colNum; //!< column number in surrounding grid in Lv2ViewBase
 	bool m_isLinking;
 	class QGridLayout* m_grid;
-	std::vector<std::unique_ptr<class ControlBase>> m_controls;
+	std::vector<std::unique_ptr<class Control>> m_controls;
 	std::vector<std::unique_ptr<class LedCheckBox>> m_leds;
 };
 
 
-//! Base class for view for one plugin with linkable models.
-//! Provides a global channel link LED.
-class LinkedModelGroupsViewBase
+/**
+	Base class for view for one plugin with linkable models.
+	Provides a global channel link LED.
+
+	@note It's intended this class does not inherit from ModelView.
+		Inheriting classes need to do that, see Lv2Instrument.h
+*/
+class LinkedModelGroupsView
 {
 protected:
-	LinkedModelGroupsViewBase(class LinkedModelGroups *ctrlBase);
-	~LinkedModelGroupsViewBase() = default;
+	LinkedModelGroupsView(class LinkedModelGroups *ctrlBase);
+	~LinkedModelGroupsView() = default;
 
 	//! Reconnect models if model changed; to be called by child virtuals
 	void modelChanged(class LinkedModelGroups* ctrlBase);
@@ -87,7 +98,7 @@ protected:
 private:
 	//! The base class must return the adressed group view, or nullptr if index
 	//! is out of range
-	virtual LinkedModelGroupViewBase* getGroupView(std::size_t idx) = 0;
+	virtual LinkedModelGroupView* getGroupView(std::size_t idx) = 0;
 
 	// Implement deletion in the CPP file:
 	struct MultiChannelLinkDeleter { void operator()(LedCheckBox* l); };
