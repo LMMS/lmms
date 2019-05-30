@@ -317,6 +317,37 @@ void SongEditor::updateRubberband()
 		rubberBand()->setGeometry( QRect( origin,
 								   contentWidget()->mapFromParent(QPoint(m_mousePos.x(), m_mousePos.y()))
 								  ).normalized());
+		int rubberBandTrackview = trackViews().indexOf( trackViewAt( m_mousePos.y() - m_timeLine->height()) );
+		MidiTime rubberbandMidipos = MidiTime((m_mousePos.x() - widgetTotal) / pixelsPerTact() * MidiTime::ticksPerTact())
+								+  m_currentPosition ;
+
+		QVector<selectableObject *> so;
+		QList<selectableObject *> l =
+				findChildren<selectableObject *>();
+		for( QList<selectableObject *>::iterator it = l.begin(); it != l.end();
+										++it )
+		{
+			so.push_back( *it );
+		}
+
+		for( QVector<selectableObject *>::iterator it = so.begin();
+										it != so.end(); ++it )
+				{
+					TrackContentObjectView * tco = dynamic_cast<TrackContentObjectView*>(*it);
+
+					if(trackViews().indexOf(tco->getTrackView())		 >= qMin(m_rubberBandStartTrackview, rubberBandTrackview)
+						&& trackViews().indexOf(tco->getTrackView())     <= qMax(m_rubberBandStartTrackview, rubberBandTrackview)
+						&& tco->getTrackContentObject()->endPosition()   >= qMin(m_rubberbandStartMidipos, rubberbandMidipos)
+						&& tco->getTrackContentObject()->startPosition() <= qMax(m_rubberbandStartMidipos, rubberbandMidipos))
+					{
+						(*it)->setSelected(true);
+					}
+					else
+					{
+						(*it)->setSelected(false);
+					}
+
+				}
 	}
 }
 
@@ -438,13 +469,24 @@ void SongEditor::closeEvent( QCloseEvent * ce )
 
 void SongEditor::mousePressEvent(QMouseEvent *_me)
 {
+
 	if( allowRubberband() == true )
 	{
+		int widgetTotal = ConfigManager::inst()->value("ui", "compacttrackbuttons" ).toInt()==1
+				? DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT + TRACK_OP_WIDTH_COMPACT
+				: DEFAULT_SETTINGS_WIDGET_WIDTH + TRACK_OP_WIDTH;
+
 		m_scrollPos = QPoint( m_leftRightScroll->value(), contentWidget()->verticalScrollBar()->value() );
 		m_origin = contentWidget()->mapFromParent( QPoint(_me->pos().x(),
 												_me->pos().y()));
 
+
+		m_rubberBandStartTrackview = trackViews().indexOf( trackViewAt( _me->pos().y() - m_timeLine->height()) );
+		m_rubberbandStartMidipos = MidiTime((_me->pos().x() - widgetTotal) / pixelsPerTact() * MidiTime::ticksPerTact())
+								+  m_currentPosition;
+
 		rubberBand()->setEnabled( true );
+
 		rubberBand()->setGeometry( QRect( m_origin, QSize() ) );
 		rubberBand()->show();
 	}
@@ -453,6 +495,12 @@ void SongEditor::mousePressEvent(QMouseEvent *_me)
 
 void SongEditor::mouseMoveEvent(QMouseEvent *_me)
 {
+	int widgetTotal = ConfigManager::inst()->value("ui", "compacttrackbuttons" ).toInt()==1
+			? DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT + TRACK_OP_WIDTH_COMPACT
+			: DEFAULT_SETTINGS_WIDGET_WIDTH + TRACK_OP_WIDTH;
+
+
+
 	m_mousePos = _me->pos();
 	updateRubberband();
 	QWidget::mouseMoveEvent( _me );

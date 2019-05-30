@@ -142,6 +142,8 @@ private:
 	QPoint m_origin;
 	QPoint m_scrollPos;
 	QPoint m_mousePos;
+	int m_rubberBandStartTrackview;
+	MidiTime m_rubberbandStartMidipos;
 
 	friend class SongEditorWindow;
 

@@ -230,6 +230,10 @@ public:
 	bool needsUpdate();
 	void setNeedsUpdate( bool b );
 	
+	inline TrackView * getTrackView()
+	{
+		return m_trackView;
+	}
 public slots:
 	virtual bool close();
 	void cut();
@@ -256,10 +260,6 @@ protected:
 
 	float pixelsPerTact();
 
-	inline TrackView * getTrackView()
-	{
-		return m_trackView;
-	}
 
 	DataFile createTCODataFiles(const QVector<TrackContentObjectView *> & tcos) const;
 
