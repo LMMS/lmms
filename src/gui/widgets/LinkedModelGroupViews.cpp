@@ -36,7 +36,7 @@
 */
 
 
-LinkedModelGroupViewBase::LinkedModelGroupViewBase(QWidget* parent,
+LinkedModelGroupView::LinkedModelGroupView(QWidget* parent,
 	LinkedModelGroup *model, int colNum, int nProc, const QString& name) :
 	QGroupBox(parent),
 	m_colNum(colNum),
@@ -70,16 +70,16 @@ LinkedModelGroupViewBase::LinkedModelGroupViewBase(QWidget* parent,
 
 
 
-LinkedModelGroupViewBase::~LinkedModelGroupViewBase() {}
+LinkedModelGroupView::~LinkedModelGroupView() {}
 
 
 
 
-void LinkedModelGroupViewBase::modelChanged(LinkedModelGroup *group)
+void LinkedModelGroupView::modelChanged(LinkedModelGroup *group)
 {
 	// reconnect models
 	using ModelInfo = LinkedModelGroup::ModelInfo;
-	std::vector<std::unique_ptr<ControlBase>>::iterator itr = m_controls.begin();
+	std::vector<std::unique_ptr<Control>>::iterator itr = m_controls.begin();
 	std::vector<ModelInfo> models = group->models();
 	Q_ASSERT(m_controls.size() == models.size());
 
@@ -95,7 +95,7 @@ void LinkedModelGroupViewBase::modelChanged(LinkedModelGroup *group)
 
 
 
-void LinkedModelGroupViewBase::addControl(ControlBase* ctrl)
+void LinkedModelGroupView::addControl(Control* ctrl)
 {
 	int colNum2 = m_colNum * (1 + m_isLinking);
 	int wdgNum = static_cast<int>(m_controls.size() * (1 + m_isLinking));
@@ -112,7 +112,7 @@ void LinkedModelGroupViewBase::addControl(ControlBase* ctrl)
 			m_leds.push_back(std::unique_ptr<LedCheckBox>(cb));
 		}
 
-		m_controls.push_back(std::unique_ptr<ControlBase>(ctrl));
+		m_controls.push_back(std::unique_ptr<Control>(ctrl));
 		m_grid->addWidget(ctrl->topWidget(), y, x + 1, Qt::AlignCenter);
 		wdgNum += m_isLinking;
 		++wdgNum;
@@ -125,7 +125,7 @@ void LinkedModelGroupViewBase::addControl(ControlBase* ctrl)
 
 
 
-void LinkedModelGroupViewBase::makeAllGridCellsEqualSized()
+void LinkedModelGroupView::makeAllGridCellsEqualSized()
 {
 	int rowHeight = 0, colWidth = 0;
 	for (int row = 0; row < m_grid->rowCount(); ++row)
@@ -158,7 +158,7 @@ void LinkedModelGroupViewBase::makeAllGridCellsEqualSized()
 */
 
 
-LinkedModelGroupsViewBase::LinkedModelGroupsViewBase(
+LinkedModelGroupsView::LinkedModelGroupsView(
 	LinkedModelGroups *ctrlBase)
 {
 	if (ctrlBase->multiChannelLinkModel())
@@ -171,7 +171,7 @@ LinkedModelGroupsViewBase::LinkedModelGroupsViewBase(
 
 
 
-void LinkedModelGroupsViewBase::modelChanged(LinkedModelGroups *groups)
+void LinkedModelGroupsView::modelChanged(LinkedModelGroups *groups)
 {
 	if (groups->multiChannelLinkModel())
 	{
@@ -187,7 +187,7 @@ void LinkedModelGroupsViewBase::modelChanged(LinkedModelGroups *groups)
 
 
 
-void LinkedModelGroupsViewBase::MultiChannelLinkDeleter::
+void LinkedModelGroupsView::MultiChannelLinkDeleter::
 	operator()(LedCheckBox *l) { delete l; }
 
 
