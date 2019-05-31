@@ -74,7 +74,7 @@ public:
 
 	void setPixelsPerTact( int _ppt );
 
-	TrackView *trackViewAt( const int _y ) const;
+	const TrackView *trackViewAt( const int _y ) const;
 
 	virtual bool allowRubberband() const;
 

@@ -315,9 +315,8 @@ void SongEditor::updateRubberband()
 								   contentWidget()->mapFromParent(QPoint(m_mousePos.x(), m_mousePos.y()))
 								  ).normalized());
 
-		const TrackView * tv = trackViewAt(m_mousePos.y() - m_timeLine->height());
 		//the index of the TrackView and the miditime our mouse is hover
-		int rubberBandTrackview = trackViews().indexOf( trackViewAt(m_mousePos.y() - m_timeLine->height()) );
+		int rubberBandTrackview = trackViews().indexOf( const_cast<TrackView*>(trackViewAt(m_mousePos.y() - m_timeLine->height())));
 		if( rubberBandTrackview == -1 )
 		{
 			rubberBandTrackview = (m_mousePos.y() < m_timeLine->height() ? 0 : trackViews().count());
@@ -489,7 +488,7 @@ void SongEditor::mousePressEvent(QMouseEvent *_me)
 		rubberBand()->show();
 
 		//the trackView(index) and the miditime where the mouse has clicked
-		m_rubberBandStartTrackview = trackViews().indexOf( trackViewAt( _me->pos().y() - m_timeLine->height()) );
+		m_rubberBandStartTrackview = trackViews().indexOf( const_cast<TrackView*>(trackViewAt( _me->pos().y() - m_timeLine->height())));
 		if( m_rubberBandStartTrackview == -1 )
 		{
 			m_rubberBandStartTrackview = trackViews().count();

@@ -274,7 +274,7 @@ void TrackContainerView::deleteTrackView( TrackView * _tv )
 
 
 
-TrackView * TrackContainerView::trackViewAt( const int _y ) const
+const TrackView * TrackContainerView::trackViewAt( const int _y ) const
 {
 	const int abs_y = _y + m_scrollArea->verticalScrollBar()->value();
 	int y_cnt = 0;
