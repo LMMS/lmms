@@ -145,9 +145,6 @@ void VstEffect::openPlugin( const QString & _plugin )
 		return;
 	}
 
-	VstPlugin::connect( Engine::getSong(), SIGNAL( tempoChanged( bpm_t ) ), m_plugin.data(), SLOT( setTempo( bpm_t ) ) );
-	m_plugin->setTempo( Engine::getSong()->getTempo() );
-
 	delete tf;
 
 	m_key.attributes["file"] = _plugin;

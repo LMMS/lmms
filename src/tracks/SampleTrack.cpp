@@ -65,7 +65,7 @@ SampleTCO::SampleTCO( Track * _track ) :
 	// we need to receive bpm-change-events, because then we have to
 	// change length of this TCO
 	connect( Engine::getSong(), SIGNAL( tempoChanged( bpm_t ) ),
-					this, SLOT( updateLength() ) );
+					this, SLOT( updateLength() ), Qt::DirectConnection );
 	connect( Engine::getSong(), SIGNAL( timeSignatureChanged( int,int ) ),
 					this, SLOT( updateLength() ) );
 
@@ -110,7 +110,7 @@ SampleTCO::SampleTCO( Track * _track ) :
 SampleTCO::~SampleTCO()
 {
 	SampleTrack * sampletrack = dynamic_cast<SampleTrack*>( getTrack() );
-	if( sampletrack)
+	if ( sampletrack )
 	{
 		sampletrack->updateTcos();
 	}
@@ -122,10 +122,7 @@ SampleTCO::~SampleTCO()
 
 void SampleTCO::changeLength( const MidiTime & _length )
 {
-	float nom = Engine::getSong()->getTimeSigModel().getNumerator();
-	float den = Engine::getSong()->getTimeSigModel().getDenominator();
-	int ticksPerTact = DefaultTicksPerTact * ( nom / den );
-	TrackContentObject::changeLength( qMax( static_cast<int>( _length ), ticksPerTact ) );
+	TrackContentObject::changeLength( qMax( static_cast<int>( _length ), 1 ) );
 }
 
 
@@ -151,9 +148,21 @@ void SampleTCO::setSampleBuffer( SampleBuffer* sb )
 
 void SampleTCO::setSampleFile( const QString & _sf )
 {
-	m_sampleBuffer->setAudioFile( _sf );
+	int length;
+	if ( _sf.isEmpty() )
+	{	//When creating an empty sample pattern make it a bar long
+		float nom = Engine::getSong()->getTimeSigModel().getNumerator();
+		float den = Engine::getSong()->getTimeSigModel().getDenominator();
+		length = DefaultTicksPerTact * ( nom / den );
+	}
+	else
+	{	//Otherwise set it to the sample's length
+		m_sampleBuffer->setAudioFile( _sf );
+		length = sampleLength();
+	}
+	changeLength(length);
+
 	setStartTimeOffset( 0 );
-	changeLength( (int) ( m_sampleBuffer->frames() / Engine::framesPerTick() ) );
 
 	emit sampleChanged();
 	emit playbackPositionChanged();
@@ -440,8 +449,15 @@ void SampleTCOView::mouseReleaseEvent(QMouseEvent *_me)
 void SampleTCOView::mouseDoubleClickEvent( QMouseEvent * )
 {
 	QString af = m_tco->m_sampleBuffer->openAudioFile();
-	if( af != "" && af != m_tco->m_sampleBuffer->audioFile() )
-	{
+
+	if ( af.isEmpty() ) {} //Don't do anything if no file is loaded
+	else if ( af == m_tco->m_sampleBuffer->audioFile() )
+	{	//Instead of reloading the existing file, just reset the size
+		int length = (int) ( m_tco->m_sampleBuffer->frames() / Engine::framesPerTick() );
+		m_tco->changeLength(length);
+	}
+	else
+	{	//Otherwise load the new file as ususal
 		m_tco->setSampleFile( af );
 		Engine::getSong()->setModified();
 	}
