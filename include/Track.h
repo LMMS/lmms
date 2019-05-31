@@ -210,6 +210,12 @@ public:
 	{
 		return m_tco;
 	}
+
+	inline TrackView * getTrackView()
+	{
+		return m_trackView;
+	}
+
 	// qproperty access func
 	QColor mutedColor() const;
 	QColor mutedBackgroundColor() const;
@@ -229,11 +235,7 @@ public:
 	// access needsUpdate member variable
 	bool needsUpdate();
 	void setNeedsUpdate( bool b );
-	
-	inline TrackView * getTrackView()
-	{
-		return m_trackView;
-	}
+
 public slots:
 	virtual bool close();
 	void cut();

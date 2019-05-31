@@ -23,6 +23,7 @@
  */
 
 #include "SongEditor.h"
+
 #include <QTimeLine>
 #include <QAction>
 #include <QKeyEvent>
@@ -52,7 +53,6 @@
 #include "PianoRoll.h"
 #include "Track.h"
 
-#include <QDebug>
 
 positionLine::positionLine( QWidget * parent ) :
 	QWidget( parent )
@@ -82,7 +82,10 @@ SongEditor::SongEditor( Song * song ) :
 	m_smoothScroll( ConfigManager::inst()->value( "ui", "smoothscroll" ).toInt() ),
 	m_mode(DrawMode),
 	m_origin(),
-	m_mousePos()
+	m_scrollPos(),
+	m_mousePos(),
+	m_rubberBandStartTrackview(),
+	m_rubberbandStartMidipos()
 {
 	m_zoomingModel->setParent(this);
 	// create time-line
@@ -300,7 +303,7 @@ void SongEditor::scrolled( int new_pos )
 
 void SongEditor::updateRubberband()
 {
-	if(rubberBandActive())
+	if (rubberBandActive())
 	{
 		int widgetTotal = ConfigManager::inst()->value("ui", "compacttrackbuttons" ).toInt()==1
 				? DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT + TRACK_OP_WIDTH_COMPACT
@@ -311,13 +314,13 @@ void SongEditor::updateRubberband()
 
 		QPoint origin = QPoint(qMax(m_origin.x() - hs, widgetTotal), m_origin.y() - vs);
 
-		rubberBand()->setGeometry( QRect( origin,
-								   contentWidget()->mapFromParent(QPoint(m_mousePos.x(), m_mousePos.y()))
-								  ).normalized());
+		rubberBand()->setGeometry(QRect( origin,
+										 contentWidget()->mapFromParent(QPoint(m_mousePos.x(), m_mousePos.y()))
+										).normalized());
 
 		//the index of the TrackView and the miditime our mouse is hover
-		int rubberBandTrackview = trackViews().indexOf( const_cast<TrackView*>(trackViewAt(m_mousePos.y() - m_timeLine->height())));
-		if( rubberBandTrackview == -1 )
+		int rubberBandTrackview = trackViews().indexOf(const_cast<TrackView*>(trackViewAt(m_mousePos.y() - m_timeLine->height())));
+		if (rubberBandTrackview == -1)
 		{
 			rubberBandTrackview = (m_mousePos.y() < m_timeLine->height() ? 0 : trackViews().count());
 		}
@@ -327,19 +330,19 @@ void SongEditor::updateRubberband()
 		QVector<selectableObject *> so;
 		QList<selectableObject *> l = findChildren<selectableObject *>();
 
-		for(QList<selectableObject *>::iterator it = l.begin(); it != l.end(); ++it)
+		for (QList<selectableObject *>::iterator it = l.begin(); it != l.end(); ++it)
 		{
 			so.push_back( *it );
 		}
 		//iterate over all tcos
-		for( QVector<selectableObject *>::iterator it = so.begin(); it != so.end(); ++it )
+		for (QVector<selectableObject *>::iterator it = so.begin(); it != so.end(); ++it)
 		{
 			TrackContentObjectView * tco = dynamic_cast<TrackContentObjectView*>(*it);
 
-			if(    trackViews().indexOf(tco->getTrackView())     >= qMin(m_rubberBandStartTrackview, rubberBandTrackview)
-				&& trackViews().indexOf(tco->getTrackView())     <= qMax(m_rubberBandStartTrackview, rubberBandTrackview)
-				&& tco->getTrackContentObject()->endPosition()   >= qMin(m_rubberbandStartMidipos, rubberbandMidipos)
-				&& tco->getTrackContentObject()->startPosition() <= qMax(m_rubberbandStartMidipos, rubberbandMidipos))
+			if (trackViews().indexOf(tco->getTrackView())     >= qMin(m_rubberBandStartTrackview, rubberBandTrackview)
+			&&  trackViews().indexOf(tco->getTrackView())     <= qMax(m_rubberBandStartTrackview, rubberBandTrackview)
+			&&  tco->getTrackContentObject()->endPosition()   >= qMin(m_rubberbandStartMidipos, rubberbandMidipos)
+			&&  tco->getTrackContentObject()->startPosition() <= qMax(m_rubberbandStartMidipos, rubberbandMidipos))
 			{
 				(*it)->setSelected(true);
 			}
@@ -455,7 +458,7 @@ void SongEditor::wheelEvent( QWheelEvent * we )
 
 
 void SongEditor::closeEvent( QCloseEvent * ce )
- {
+{
 	if( parentWidget() )
 	{
 		parentWidget()->hide();
@@ -472,29 +475,30 @@ void SongEditor::closeEvent( QCloseEvent * ce )
 
 void SongEditor::mousePressEvent(QMouseEvent *_me)
 {
-
-	if( allowRubberband() == true )
+	if (allowRubberband())
 	{
-		int widgetTotal = ConfigManager::inst()->value("ui", "compacttrackbuttons" ).toInt()==1
+		int widgetTotal = ConfigManager::inst()->value("ui", "compacttrackbuttons").toInt()==1
 				? DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT + TRACK_OP_WIDTH_COMPACT
 				: DEFAULT_SETTINGS_WIDGET_WIDTH + TRACK_OP_WIDTH;
-
-		m_scrollPos = QPoint( m_leftRightScroll->value(), contentWidget()->verticalScrollBar()->value() );
-		m_origin = contentWidget()->mapFromParent( QPoint(_me->pos().x(),
-												_me->pos().y()));
+		//we save the position of both scrollbars into a QPoint
+		m_scrollPos = QPoint(m_leftRightScroll->value(), contentWidget()->verticalScrollBar()->value());
+		//and the mouse position
+		m_origin = contentWidget()->mapFromParent(QPoint(_me->pos().x(), _me->pos().y()));
 		//paint the rubberband
-		rubberBand()->setEnabled( true );
-		rubberBand()->setGeometry( QRect( m_origin, QSize() ) );
+		rubberBand()->setEnabled(true);
+		rubberBand()->setGeometry(QRect( m_origin, QSize()));
 		rubberBand()->show();
 
 		//the trackView(index) and the miditime where the mouse has clicked
-		m_rubberBandStartTrackview = trackViews().indexOf( const_cast<TrackView*>(trackViewAt( _me->pos().y() - m_timeLine->height())));
+		m_rubberBandStartTrackview = trackViews().indexOf(
+					const_cast<TrackView*>(trackViewAt( _me->pos().y() - m_timeLine->height())));
 		if( m_rubberBandStartTrackview == -1 )
 		{
 			m_rubberBandStartTrackview = trackViews().count();
 		}
-		m_rubberbandStartMidipos = MidiTime((_me->pos().x() - widgetTotal) / pixelsPerTact() * MidiTime::ticksPerTact())
-								+  m_currentPosition;
+		m_rubberbandStartMidipos = MidiTime((_me->pos().x() - widgetTotal)
+											/ pixelsPerTact() * MidiTime::ticksPerTact())
+											+ m_currentPosition;
 	}
 	QWidget::mousePressEvent( _me );
 }

@@ -74,7 +74,7 @@ public:
 
 	void setPixelsPerTact( int _ppt );
 
-	const TrackView *trackViewAt( const int _y ) const;
+	const TrackView * trackViewAt( const int _y ) const;
 
 	virtual bool allowRubberband() const;
 
@@ -145,7 +145,6 @@ public slots:
 	/// Removes the rubber band from display when finished with.
 	void stopRubberBand();
 
-	RubberBand *rubberBand() const;
 
 protected:
 	static const int DEFAULT_PIXELS_PER_TACT = 16;
@@ -154,6 +153,7 @@ protected:
 	virtual void resizeEvent( QResizeEvent * );
 
 	MidiTime m_currentPosition;
+	RubberBand *rubberBand() const;
 
 
 private:
