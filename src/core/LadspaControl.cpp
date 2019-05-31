@@ -42,7 +42,8 @@ LadspaControl::LadspaControl( Model * _parent, port_desc_t * _port,
 	if( m_link )
 	{
 		connect( &m_linkEnabledModel, SIGNAL( dataChanged() ),
-					 this, SLOT( linkStateChanged() ) );
+					 this, SLOT( linkStateChanged() ),
+					 Qt::DirectConnection );
 	}
 
 	switch( m_port->data_type )
