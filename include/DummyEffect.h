@@ -53,25 +53,25 @@ public:
 	{
 	}
 
-	virtual int controlCount()
+	virtual int controlCount() override
 	{
 		return 0;
 	}
 
-	virtual void saveSettings( QDomDocument &, QDomElement & )
+	virtual void saveSettings( QDomDocument &, QDomElement & ) override
 	{
 	}
 
-	virtual void loadSettings( const QDomElement & )
+	virtual void loadSettings( const QDomElement & ) override
 	{
 	}
 
-	virtual QString nodeName() const
+	virtual QString nodeName() const override
 	{
 		return "DummyControls";
 	}
 
-	virtual EffectControlDialog * createView()
+	virtual EffectControlDialog * createView() override
 	{
 		return new DummyEffectControlDialog( this );
 	}
@@ -95,12 +95,12 @@ public:
 	{
 	}
 
-	virtual EffectControls * controls()
+	virtual EffectControls * controls() override
 	{
 		return &m_controls;
 	}
 
-	bool processAudioBuffer( sampleFrame *, const fpp_t )
+	bool processAudioBuffer( sampleFrame *, const fpp_t ) override
 	{
 		return false;
 	}

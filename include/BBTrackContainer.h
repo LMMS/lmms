@@ -41,7 +41,7 @@ public:
 	virtual bool play( MidiTime _start, const fpp_t _frames,
 						const f_cnt_t _frame_base, int _tco_num = -1 );
 
-	virtual void updateAfterTrackAdd() override;
+	void updateAfterTrackAdd() override;
 
 	inline virtual QString nodeName() const override
 	{

@@ -100,8 +100,8 @@ public:
 	bool processEffects();
 
 	// ThreadableJob stuff
-	virtual void doProcessing();
-	virtual bool requiresProcessing() const
+	void doProcessing() override;
+	virtual bool requiresProcessing() const override
 	{
 		return true;
 	}

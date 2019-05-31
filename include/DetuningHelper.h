@@ -43,17 +43,17 @@ public:
 	{
 	}
 
-	virtual float defaultValue() const
+	virtual float defaultValue() const override
 	{
 		return 0;
 	}
 
-	virtual QString displayName() const
+	virtual QString displayName() const override
 	{
 		return tr( "Note detuning" );
 	}
 
-	inline virtual QString nodeName() const
+	inline virtual QString nodeName() const override
 	{
 		return "detuning";
 	}

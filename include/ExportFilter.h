@@ -44,15 +44,15 @@ public:
 				int tempo, int masterPitch, const QString &filename ) = 0;
 protected:
 
-	virtual void saveSettings( QDomDocument &, QDomElement & )
+	virtual void saveSettings( QDomDocument &, QDomElement & ) override
 	{
 	}
 
-	virtual void loadSettings( const QDomElement & )
+	virtual void loadSettings( const QDomElement & ) override
 	{
 	}
 
-	virtual QString nodeName() const
+	virtual QString nodeName() const override
 	{
 		return "import_filter";
 	}

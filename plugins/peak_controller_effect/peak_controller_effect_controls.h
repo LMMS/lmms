@@ -41,18 +41,18 @@ public:
 	{
 	}
 
-	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
-	virtual void loadSettings( const QDomElement & _this );
-	inline virtual QString nodeName() const
+	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
+	virtual void loadSettings( const QDomElement & _this ) override;
+	inline virtual QString nodeName() const override
 	{
 		return "peakcontrollereffectcontrols";
 	}
 
-	virtual int controlCount()
+	virtual int controlCount() override
 	{
 		return 1;
 	}
-	virtual EffectControlDialog * createView()
+	virtual EffectControlDialog * createView() override
 	{
 		return new PeakControllerEffectControlDialog( this );
 	}

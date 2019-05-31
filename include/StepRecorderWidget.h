@@ -55,7 +55,7 @@ public:
 	void showHint();
 
 private:
-	virtual void paintEvent(QPaintEvent * pe);
+	void paintEvent(QPaintEvent * pe) override;
 
 	int xCoordOfTick(int tick);
 

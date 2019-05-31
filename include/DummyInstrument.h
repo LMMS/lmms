@@ -47,26 +47,26 @@ public:
 	{
 	}
 
-	virtual void playNote( NotePlayHandle *, sampleFrame * buffer )
+	virtual void playNote( NotePlayHandle *, sampleFrame * buffer ) override
 	{
 		memset( buffer, 0, sizeof( sampleFrame ) *
 			Engine::mixer()->framesPerPeriod() );
 	}
 
-	virtual void saveSettings( QDomDocument &, QDomElement & )
+	virtual void saveSettings( QDomDocument &, QDomElement & ) override
 	{
 	}
 
-	virtual void loadSettings( const QDomElement & )
+	virtual void loadSettings( const QDomElement & ) override
 	{
 	}
 
-	virtual QString nodeName() const
+	virtual QString nodeName() const override
 	{
 		return "dummyinstrument";
 	}
 
-	virtual PluginView * instantiateView( QWidget * _parent )
+	virtual PluginView * instantiateView( QWidget * _parent ) override
 	{
 		return new InstrumentViewFixedSize( this, _parent );
 	}

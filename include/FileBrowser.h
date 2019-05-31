@@ -61,7 +61,7 @@ private slots:
 	void giveFocusToFilter();
 
 private:
-	virtual void keyPressEvent( QKeyEvent * ke );
+	void keyPressEvent( QKeyEvent * ke ) override;
 
 	void addItems( const QString & path );
 
@@ -93,10 +93,10 @@ public:
 
 
 protected:
-	virtual void contextMenuEvent( QContextMenuEvent * e );
-	virtual void mousePressEvent( QMouseEvent * me );
-	virtual void mouseMoveEvent( QMouseEvent * me );
-	virtual void mouseReleaseEvent( QMouseEvent * me );
+	void contextMenuEvent( QContextMenuEvent * e ) override;
+	void mousePressEvent( QMouseEvent * me ) override;
+	void mouseMoveEvent( QMouseEvent * me ) override;
+	void mouseReleaseEvent( QMouseEvent * me ) override;
 
 
 private:

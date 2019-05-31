@@ -49,7 +49,7 @@ public:
 		return m_orientation;
 	}
 
-	virtual QSize sizeHint() const
+	virtual QSize sizeHint() const override
 	{
 		QSize s = QToolButton::sizeHint();
 		s.setWidth( s.width() + 8 );
@@ -62,7 +62,7 @@ public:
 
 
 protected:
-	virtual void paintEvent( QPaintEvent * )
+	virtual void paintEvent( QPaintEvent * ) override
 	{
 		QStylePainter p( this );
 		QStyleOptionToolButton opt;

@@ -74,7 +74,7 @@ public:
 
 	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent, const QString & _name );
 	virtual void loadSettings( const QDomElement & _this, const QString & _name );
-	inline virtual QString nodeName() const
+	inline virtual QString nodeName() const override
 	{
 		return "port";
 	}
@@ -92,13 +92,13 @@ protected slots:
 	void linkStateChanged();
 
 protected:
-	virtual void saveSettings( QDomDocument& doc, QDomElement& element )
+	virtual void saveSettings( QDomDocument& doc, QDomElement& element ) override
 	{
 		Q_UNUSED(doc)
 		Q_UNUSED(element)
 	}
 
-	virtual void loadSettings( const QDomElement& element )
+	virtual void loadSettings( const QDomElement& element ) override
 	{
 		Q_UNUSED(element)
 	}

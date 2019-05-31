@@ -49,8 +49,8 @@ public:
 	TrackContainerView( TrackContainer* tc );
 	virtual ~TrackContainerView();
 
-	virtual void saveSettings( QDomDocument & _doc, QDomElement & _this );
-	virtual void loadSettings( const QDomElement & _this );
+	void saveSettings( QDomDocument & _doc, QDomElement & _this ) override;
+	void loadSettings( const QDomElement & _this ) override;
 
 	QScrollArea * contentWidget()
 	{
@@ -116,7 +116,7 @@ public:
 
 	void clearAllTracks();
 
-	virtual QString nodeName() const
+	virtual QString nodeName() const override
 	{
 		return( "trackcontainerview" );
 	}
@@ -129,8 +129,8 @@ public slots:
 	TrackView * createTrackView( Track * _t );
 	void deleteTrackView( TrackView * _tv );
 
-	virtual void dropEvent( QDropEvent * _de );
-	virtual void dragEnterEvent( QDragEnterEvent * _dee );
+	void dropEvent( QDropEvent * _de ) override;
+	void dragEnterEvent( QDragEnterEvent * _dee ) override;
 
 	///
 	/// \brief stopRubberBand
@@ -141,8 +141,7 @@ public slots:
 protected:
 	static const int DEFAULT_PIXELS_PER_TACT = 16;
 
-
-	virtual void resizeEvent( QResizeEvent * );
+	void resizeEvent( QResizeEvent * ) override;
 
 	MidiTime m_currentPosition;
 
@@ -161,7 +160,7 @@ private:
 		virtual ~scrollArea();
 
 	protected:
-		virtual void wheelEvent( QWheelEvent * _we );
+		void wheelEvent( QWheelEvent * _we ) override;
 
 	private:
 		TrackContainerView* m_trackContainerView;
@@ -195,7 +194,7 @@ public:
 	InstrumentLoaderThread( QObject *parent = 0, InstrumentTrack *it = 0,
 							QString name = "" );
 
-	void run();
+	void run() override;
 
 private:
 	InstrumentTrack *m_it;
