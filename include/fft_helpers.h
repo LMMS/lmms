@@ -43,10 +43,10 @@ const std::vector<int> FFT_BLOCK_SIZES = {256, 512, 1024, 2048, 4096, 8192, 1638
 
 // List of FFT window functions supported by precomputeWindow()
 enum FFT_WINDOWS {
-		RECTANGULAR = 0,
-		BLACKMAN_HARRIS,
-		HAMMING,
-		HANNING
+	RECTANGULAR = 0,
+	BLACKMAN_HARRIS,
+	HAMMING,
+	HANNING
 };
 
 
