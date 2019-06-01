@@ -36,7 +36,8 @@
 
 
 // Receives audio data, runs FFT analysis and stores the result.
-class SaProcessor {
+class SaProcessor
+{
 public:
 	SaProcessor(SaControls *controls);
 	virtual ~SaProcessor();

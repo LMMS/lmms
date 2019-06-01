@@ -101,7 +101,8 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 			if ( !m_controlView->isResizable() )
 			{
 				m_subWindow->setSizePolicy( QSizePolicy::Fixed, QSizePolicy::Fixed );
-				if (m_subWindow->layout()) {
+				if (m_subWindow->layout())
+				{
 					m_subWindow->layout()->setSizeConstraint(QLayout::SetFixedSize);
 				}
 			}

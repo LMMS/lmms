@@ -33,20 +33,23 @@
  *
  *	@return -1 on error, otherwise the maximum value
  */
-float maximum(const float *abs_spectrum, unsigned int spec_size) {
+float maximum(const float *abs_spectrum, unsigned int spec_size)
+{
 	float maxi = 0;
 	unsigned int i;
 
 	if (abs_spectrum == NULL) {return -1;}
 	if (spec_size <= 0) {return -1;}
 
-	for (i = 0; i < spec_size; i++) {
+	for (i = 0; i < spec_size; i++)
+	{
 		if (abs_spectrum[i] > maxi) {maxi = abs_spectrum[i];}
 	}
 	return maxi;
 }
 
-float maximum(const std::vector<float> &abs_spectrum) {
+float maximum(const std::vector<float> &abs_spectrum)
+{
 	return maximum(abs_spectrum.data(), abs_spectrum.size());
 }
 
@@ -56,19 +59,22 @@ float maximum(const std::vector<float> &abs_spectrum) {
  *
  *	@return -1 on error, 0 on success
  */
-int normalize(const float *abs_spectrum, float *norm_spectrum, unsigned int bin_count, unsigned int block_size) {
+int normalize(const float *abs_spectrum, float *norm_spectrum, unsigned int bin_count, unsigned int block_size)
+{
 	int i;
 
 	if (abs_spectrum == NULL || norm_spectrum == NULL) {return -1;}
 	if (bin_count == 0 || block_size == 0) {return -1;}
 
-	for (i = 0; i < bin_count; i++) {
+	for (i = 0; i < bin_count; i++)
+	{
 		norm_spectrum[i] = abs_spectrum[i] / block_size;
 	}
 	return 0;
 }
 
-int normalize(const std::vector<float> &abs_spectrum, std::vector<float> &norm_spectrum, unsigned int block_size) {
+int normalize(const std::vector<float> &abs_spectrum, std::vector<float> &norm_spectrum, unsigned int block_size)
+{
 	if (abs_spectrum.size() != norm_spectrum.size()) {return -1;}
 
 	return normalize(abs_spectrum.data(), norm_spectrum.data(), abs_spectrum.size(), block_size);
@@ -80,8 +86,10 @@ int normalize(const std::vector<float> &abs_spectrum, std::vector<float> &norm_s
  *	@return 1 if spectrum contains any non-zero value
  *	@return 0 otherwise
  */
-int notEmpty(const std::vector<float> &spectrum) {
-	for (int i = 0; i < spectrum.size(); i++) {
+int notEmpty(const std::vector<float> &spectrum)
+{
+	for (int i = 0; i < spectrum.size(); i++)
+	{
 		if (spectrum[i] != 0) {return 1;}
 	}
 	return 0;
@@ -92,7 +100,8 @@ int notEmpty(const std::vector<float> &spectrum) {
  *
  *	@return -1 on error
  */
-int precomputeWindow(float *window, int length, FFT_WINDOWS type, bool normalized) {
+int precomputeWindow(float *window, int length, FFT_WINDOWS type, bool normalized)
+{
 	int i;
 	float gain = 0;
 	float a0;
@@ -104,7 +113,8 @@ int precomputeWindow(float *window, int length, FFT_WINDOWS type, bool normalize
 
 	// constants taken from
 	// https://en.wikipedia.org/wiki/Window_function#AList_of_window_functions
-	switch (type) {
+	switch (type)
+	{
 		default:
 		case RECTANGULAR:
 			for (i = 0; i < length; i++) {window[i] = 1.0;}
@@ -131,7 +141,8 @@ int precomputeWindow(float *window, int length, FFT_WINDOWS type, bool normalize
 	}
 
 	// common computation for cosine-sum based windows
-	for (i = 0; i < length; i++) {
+	for (i = 0; i < length; i++)
+	{
 		window[i] =	(a0 - a1 * cos(2 * F_PI * i / ((float)length - 1.0))
 						+ a2 * cos(4 * F_PI * i / ((float)length - 1.0))
 						- a3 * cos(6 * F_PI * i / ((float)length - 1.0)));
@@ -140,9 +151,7 @@ int precomputeWindow(float *window, int length, FFT_WINDOWS type, bool normalize
 
 	// apply amplitude correction
 	gain /= (float) length;
-	for (i = 0; i < length; i++) {
-		window[i] /= gain;
-	}
+	for (i = 0; i < length; i++) {window[i] /= gain;}
 
 	return 0;
 }
@@ -154,13 +163,15 @@ int precomputeWindow(float *window, int length, FFT_WINDOWS type, bool normalize
  *
  *	@return 0 on success, else -1
  */
-int absspec(const fftwf_complex *complex_buffer, float *absspec_buffer, int compl_length) {
+int absspec(const fftwf_complex *complex_buffer, float *absspec_buffer, int compl_length)
+{
 	int i;
 
 	if (complex_buffer == NULL || absspec_buffer == NULL) {return -1;}
 	if (compl_length <= 0) {return -1;}
 
-	for (i = 0; i < compl_length; i++) {
+	for (i = 0; i < compl_length; i++)
+	{
 		absspec_buffer[i] = (float)sqrt(complex_buffer[i][0] * complex_buffer[i][0]
 							+ complex_buffer[i][1] * complex_buffer[i][1]);
 	}
@@ -175,7 +186,8 @@ int absspec(const fftwf_complex *complex_buffer, float *absspec_buffer, int comp
  *
  *	@return 0 on success, else -1
  */
-int compressbands(const float *absspec_buffer, float *compressedband, int num_old, int num_new, int bottom, int top) {
+int compressbands(const float *absspec_buffer, float *compressedband, int num_old, int num_new, int bottom, int top)
+{
 	float ratio;
 	int i, usefromold;
 	float j;
@@ -192,7 +204,8 @@ int compressbands(const float *absspec_buffer, float *compressedband, int num_ol
 	ratio = (float)usefromold / (float)num_new;
 
 	// for each new subband
-	for (i = 0; i < num_new; i++) {
+	for (i = 0; i < num_new; i++)
+	{
 		compressedband[i] = 0;
 
 		j_min = (i * ratio) + bottom;
@@ -201,7 +214,8 @@ int compressbands(const float *absspec_buffer, float *compressedband, int num_ol
 
 		j_max = j_min + ratio;
 
-		for (j = (int)j_min; j <= j_max; j++) {
+		for (j = (int)j_min; j <= j_max; j++)
+		{
 			compressedband[i] += absspec_buffer[(int)j];
 		}
 	}
@@ -210,7 +224,8 @@ int compressbands(const float *absspec_buffer, float *compressedband, int num_ol
 }
 
 
-int calc13octaveband31(float *absspec_buffer, float *subbands, int num_spec, float max_frequency) {
+int calc13octaveband31(float *absspec_buffer, float *subbands, int num_spec, float max_frequency)
+{
 	static const int onethirdoctavecenterfr[] = {20, 25, 31, 40, 50, 63, 80, 100, 125, 160, 200, 250, 315, 400, 500, 630, 800, 1000, 1250, 1600, 2000, 2500, 3150, 4000, 5000, 6300, 8000, 10000, 12500, 16000, 20000};
 	int i, j;
 	float f_min, f_max, frequency, bandwidth;
@@ -223,14 +238,16 @@ int calc13octaveband31(float *absspec_buffer, float *subbands, int num_spec, flo
 
 	/*** energy ***/
 	fpower = 0;
-	for (i = 0; i < num_spec; i++) {
+	for (i = 0; i < num_spec; i++)
+	{
 		absspec_buffer[i] = (absspec_buffer[i] * absspec_buffer[i]) / FFT_BUFFER_SIZE;
 		fpower = fpower + (2 * absspec_buffer[i]);
 	}
 	fpower = fpower - (absspec_buffer[0]); //dc not mirrored
 
 	/*** for each subband: sum up power ***/
-	for (i = 0; i < 31; i++) {
+	for (i = 0; i < 31; i++)
+	{
 		subbands[i] = 0;
 
 		// calculate bandwidth for subband
@@ -242,16 +259,17 @@ int calc13octaveband31(float *absspec_buffer, float *subbands, int num_spec, flo
 		f_max = frequency + bandwidth / 2.0;
 
 		j_min = (int)(f_min / max_frequency * (float)num_spec);
-
 		j_max = (int)(f_max / max_frequency * (float)num_spec);
 
 
-		if (j_min < 0 || j_max < 0) {
+		if (j_min < 0 || j_max < 0)
+		{
 			fprintf(stderr, "Error: calc13octaveband31() in fft_helpers.cpp line %d failed.\n", __LINE__);
 			return -1;
 		}
 
-		for (j = j_min; j <= j_max; j++) {
+		for (j = j_min; j <= j_max; j++)
+		{
 			if (j_max < num_spec) {subbands[i] += absspec_buffer[j];}
 		}
 
@@ -265,13 +283,15 @@ int calc13octaveband31(float *absspec_buffer, float *subbands, int num_spec, flo
  *
  *	@return power on success, else -1
  */
-float signalpower(const float *timesignal, int num_values) {
+float signalpower(const float *timesignal, int num_values)
+{
 	if (num_values <= 0) {return -1;}
 
 	if (timesignal == NULL) {return -1;}
 
 	float power = 0;
-	for (int i = 0; i < num_values; i++) {
+	for (int i = 0; i < num_values; i++)
+	{
 		power += timesignal[i] * timesignal[i];
 	}
 

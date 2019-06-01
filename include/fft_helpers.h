@@ -42,7 +42,8 @@ const int FFT_BUFFER_SIZE = 2048;
 const std::vector<int> FFT_BLOCK_SIZES = {256, 512, 1024, 2048, 4096, 8192, 16384};
 
 // List of FFT window functions supported by precomputeWindow()
-enum FFT_WINDOWS {
+enum FFT_WINDOWS
+{
 	RECTANGULAR = 0,
 	BLACKMAN_HARRIS,
 	HAMMING,

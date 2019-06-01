@@ -33,7 +33,8 @@
 
 
 // Top-level widget holding the configuration GUI and spectrum displays
-class SaControlsDialog : public EffectControlDialog {
+class SaControlsDialog : public EffectControlDialog
+{
 	Q_OBJECT
 public:
 	SaControlsDialog(SaControls *controls, SaProcessor *processor);

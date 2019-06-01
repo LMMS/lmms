@@ -36,7 +36,8 @@
 // Full range is defined by LOWEST_LOG_FREQ and current sample rate.
 const int LOWEST_LOG_FREQ = 10;		// arbitrary low limit for log. scale, >1
 
-enum FREQUENCY_RANGES {
+enum FREQUENCY_RANGES
+{
 	FRANGE_FULL = 0,
 	FRANGE_AUDIBLE,
 	FRANGE_BASS,
@@ -57,7 +58,8 @@ const int FRANGE_HIGH_END = 20000;
 // Reference: sine wave from -1.0 to 1.0 = 0 dB.
 // I.e. if master volume is 100 %, positive values signify clipping.
 // Doubling or halving the amplitude produces 3 dB difference.
-enum AMPLITUDE_RANGES {
+enum AMPLITUDE_RANGES
+{
 	ARANGE_EXTENDED = 0,
 	ARANGE_DEFAULT,
 	ARANGE_AUDIBLE,
@@ -77,7 +79,8 @@ const int ARANGE_NOISE_END = -20;
 class Analyzer;
 
 // Holds all the configuration values
-class SaControls : public EffectControls {
+class SaControls : public EffectControls
+{
 	Q_OBJECT
 public:
 	explicit SaControls(Analyzer* effect);

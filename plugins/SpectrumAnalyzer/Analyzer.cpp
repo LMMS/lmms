@@ -57,20 +57,19 @@ Analyzer::Analyzer(Model *parent, const Plugin::Descriptor::SubPluginFeatures::K
 
 // Take audio data and pass them to the spectrum processor.
 // Skip processing if the controls dialog isn't visible, it would only waste CPU cycles.
-bool Analyzer::processAudioBuffer(sampleFrame *buffer, const fpp_t frame_count) {
-	if (!isEnabled() || !isRunning ()) {
-		return false;
-	}
-	if (m_controls.isViewVisible()) {
-		m_processor.analyse(buffer, frame_count);
-	}
+bool Analyzer::processAudioBuffer(sampleFrame *buffer, const fpp_t frame_count)
+{
+	if (!isEnabled() || !isRunning ()) {return false;}
+	if (m_controls.isViewVisible()) {m_processor.analyse(buffer, frame_count);}
 	return isRunning();
 }
 
 
 extern "C" {
 	// needed for getting plugin out of shared lib
-	PLUGIN_EXPORT Plugin *lmms_plugin_main(Model *parent, void *data) {
+	PLUGIN_EXPORT Plugin *lmms_plugin_main(Model *parent, void *data)
+	{
 		return new Analyzer(parent, static_cast<const Plugin::Descriptor::SubPluginFeatures::Key *>(data));
 	}
 }
+

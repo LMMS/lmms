@@ -54,7 +54,8 @@ SaWaterfallView::SaWaterfallView(SaControls *controls, SaProcessor *processor, Q
 // Compose and draw all the content; called by Qt.
 // Not as performance sensitive as SaSpectrumView, most of the processing is
 // done directly in SaProcessor.
-void SaWaterfallView::paintEvent(QPaintEvent *event) {
+void SaWaterfallView::paintEvent(QPaintEvent *event)
+{
 	#ifdef SA_DEBUG
 		int start_time = std::chrono::high_resolution_clock::now().time_since_epoch().count();
 	#endif
@@ -73,7 +74,8 @@ void SaWaterfallView::paintEvent(QPaintEvent *event) {
 	painter.setRenderHint(QPainter::Antialiasing, true);
 
 	// check if time labels need to be rebuilt
-	if ((float)m_processor->m_inBlockSize / m_processor->getSampleRate() != m_oldTimePerLine) {
+	if ((float)m_processor->m_inBlockSize / m_processor->getSampleRate() != m_oldTimePerLine)
+	{
 		m_timeTics = makeTimeTics();
 		m_oldTimePerLine = (float)m_processor->m_inBlockSize / m_processor->getSampleRate();
 	}
@@ -81,24 +83,30 @@ void SaWaterfallView::paintEvent(QPaintEvent *event) {
 	// print time labels
 	float pos = 0;
 	painter.setPen(QPen(m_controls->m_colorLabels, 1, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
-	for (auto & line: m_timeTics) {
+	for (auto & line: m_timeTics)
+	{
 		pos = timeToYPixel(line.first, displayBottom);
 		// align first and last label to the edge if needed, otherwise center them
-		if (line == m_timeTics.front() && pos < label_height / 2) {
+		if (line == m_timeTics.front() && pos < label_height / 2)
+		{
 			painter.drawText(displayLeft - label_width - margin, displayTop - 1,
 							 label_width, label_height, Qt::AlignRight | Qt::AlignTop | Qt::TextDontClip,
 							 QString(line.second.c_str()));
 			painter.drawText(displayRight + margin, displayTop - 1,
 							 label_width, label_height, Qt::AlignLeft | Qt::AlignTop | Qt::TextDontClip,
 							 QString(line.second.c_str()));
-		} else if (line == m_timeTics.back() && pos > displayBottom - label_height + 2) {
+		}
+		else if (line == m_timeTics.back() && pos > displayBottom - label_height + 2)
+		{
 			painter.drawText(displayLeft - label_width - margin, displayBottom - label_height,
 							 label_width, label_height, Qt::AlignRight | Qt::AlignBottom | Qt::TextDontClip,
 							 QString(line.second.c_str()));
 			painter.drawText(displayRight + margin, displayBottom - label_height + 2,
 							 label_width, label_height, Qt::AlignLeft | Qt::AlignBottom | Qt::TextDontClip,
 							 QString(line.second.c_str()));
-		} else {
+		}
+		else
+		{
 			painter.drawText(displayLeft - label_width - margin, pos - label_height / 2,
 							 label_width, label_height, Qt::AlignRight | Qt::AlignVCenter | Qt::TextDontClip,
 							 QString(line.second.c_str()));
@@ -136,7 +144,8 @@ void SaWaterfallView::paintEvent(QPaintEvent *event) {
 
 
 // Convert time value to Y coordinate for display of given height.
-float SaWaterfallView::timeToYPixel(float time, int height) {
+float SaWaterfallView::timeToYPixel(float time, int height)
+{
 	float pixels_per_line = (float)height / m_processor->m_waterfallHeight;
 	float seconds_per_line = ((float)m_processor->m_inBlockSize / m_processor->getSampleRate());
 
@@ -145,7 +154,8 @@ float SaWaterfallView::timeToYPixel(float time, int height) {
 
 
 // Generate labels for linear time scale.
-std::vector<std::pair<float, std::string>> SaWaterfallView::makeTimeTics() {
+std::vector<std::pair<float, std::string>> SaWaterfallView::makeTimeTics()
+{
 	std::vector<std::pair<float, std::string>> result;
 	float i;
 
@@ -156,11 +166,15 @@ std::vector<std::pair<float, std::string>> SaWaterfallView::makeTimeTics() {
 	float increment = std::round(10 * limit / 7) / 10;
 
 	// NOTE: labels positions are rounded to match the (rounded) label value
-	for (i = 0; i <= limit; i += increment) {
-		if (i < 10) {
+	for (i = 0; i <= limit; i += increment)
+	{
+		if (i < 10)
+		{
 			result.push_back(std::pair<float, std::string>(std::round(i * 10) / 10,
 							 std::to_string(std::round(i * 10) / 10).substr(0, 3)));
-		} else {
+		}
+		else
+		{
 			result.push_back(std::pair<float, std::string>(std::round(i),
 							 std::to_string(std::round(i)).substr(0, 2)));
 		}
@@ -171,18 +185,21 @@ std::vector<std::pair<float, std::string>> SaWaterfallView::makeTimeTics() {
 
 // Periodically trigger repaint and check if the widget is visible.
 // If it is not, stop drawing and inform the processor.
-void SaWaterfallView::periodicUpdate() {
+void SaWaterfallView::periodicUpdate()
+{
 	m_processor->setWaterfallActive(isVisible());
 	if (isVisible()) {update();}
 }
 
 
 // Adjust window size and widget visibility when waterfall is enabled or disabbled.
-void SaWaterfallView::updateVisibility() {
+void SaWaterfallView::updateVisibility()
+{
 	// get container of the control dialog to be resized if needed
 	QWidget *subWindow = m_controls->m_controlsDialog->parentWidget();
 
-	if (m_controls->m_waterfallModel.value()) {
+	if (m_controls->m_waterfallModel.value())
+	{
 		// clear old data before showing the waterfall
 		QMutexLocker lock(&m_processor->m_dataAccess);
 		std::fill(m_processor->m_history.begin(), m_processor->m_history.end(), 0);
@@ -191,10 +208,13 @@ void SaWaterfallView::updateVisibility() {
 		setVisible(true);
 
 		// increase window size if it is too small
-		if (subWindow->size().height() < m_controls->m_controlsDialog->sizeHint().height()) {
+		if (subWindow->size().height() < m_controls->m_controlsDialog->sizeHint().height())
+		{
 			subWindow->resize(subWindow->size().width(), m_controls->m_controlsDialog->sizeHint().height());
 		}
-	} else {
+	}
+	else
+	{
 		setVisible(false);
 		// decrease window size only if it does not violate sizeHint
 		subWindow->resize(subWindow->size().width(), m_controls->m_controlsDialog->sizeHint().height());

@@ -33,13 +33,14 @@
 
 
 // Top level class; handles LMMS interface and feeds data to the data processor.
-class Analyzer : public Effect {
+class Analyzer : public Effect
+{
 public:
 	Analyzer(Model *parent, const Descriptor::SubPluginFeatures::Key *key);
 	virtual ~Analyzer() {};
 
 	virtual bool processAudioBuffer(sampleFrame *buffer, const fpp_t frame_count);
-	virtual EffectControls *controls()	{return &m_controls;}
+	virtual EffectControls *controls() {return &m_controls;}
 	SaProcessor *getProcessor() {return &m_processor;}
 
 private:
@@ -48,3 +49,4 @@ private:
 };
 
 #endif // ANALYZER_H
+

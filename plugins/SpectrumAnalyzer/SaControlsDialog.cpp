@@ -195,15 +195,19 @@ SaControlsDialog::SaControlsDialog(SaControls *controls, SaProcessor *processor)
 
 
 // Suggest the best current widget size.
-QSize SaControlsDialog::sizeHint() const {
+QSize SaControlsDialog::sizeHint() const
+{
 	// Best width is determined by spectrum display sizeHint.
 	// Best height depends on whether waterfall is visible and
 	// consists of heights of the config section, spectrum, waterfall
 	// and some reserve for margins.
-	if (m_waterfall->isVisible()) {
+	if (m_waterfall->isVisible())
+	{
 		return QSize(m_spectrum->sizeHint().width(),
 					 m_configHeight + m_spectrum->sizeHint().height() + m_waterfall->sizeHint().height() + 50);
-	} else {
+	}
+	else
+	{
 		return QSize(m_spectrum->sizeHint().width(),
 					 m_configHeight + m_spectrum->sizeHint().height() + 50);
 	}
