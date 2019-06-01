@@ -81,7 +81,7 @@ int normalize(std::vector<float> &abs_spectrum, std::vector<float> &norm_spectru
  *	returns 1 if spectrum contains any non-zero value
  *	returns 0 otherwise
  */
-int notEmpty(std::vector<float> &spectrum) {
+int notEmpty(const std::vector<float> &spectrum) {
 	for (int i = 0; i < spectrum.size(); i++) {
 		if (spectrum[i] != 0) {return 1;}
 	}
