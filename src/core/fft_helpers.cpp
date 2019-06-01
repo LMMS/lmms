@@ -69,7 +69,7 @@ int normalize(float *abs_spectrum, float *norm_spectrum, unsigned int bin_count,
 	return 0;
 }
 
-int normalize(std::vector<float> &abs_spectrum, std::vector<float> &norm_spectrum, unsigned int block_size) {
+int normalize(const std::vector<float> &abs_spectrum, std::vector<float> &norm_spectrum, unsigned int block_size) {
 	if (abs_spectrum.size() != norm_spectrum.size()) {return -1;}
 
 	return normalize(abs_spectrum.data(), norm_spectrum.data(), abs_spectrum.size(), block_size);
