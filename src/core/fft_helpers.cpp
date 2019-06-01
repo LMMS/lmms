@@ -31,10 +31,9 @@
 
 /* Returns biggest value from abs_spectrum[spec_size] array.
  *
- *	returns -1 on error
- *	returns maximum
+ *	@return -1 on error, otherwise the maximum value
  */
-float maximum(float *abs_spectrum, unsigned int spec_size) {
+float maximum(const float *abs_spectrum, unsigned int spec_size) {
 	float maxi = 0;
 	unsigned int i;
 
@@ -47,7 +46,7 @@ float maximum(float *abs_spectrum, unsigned int spec_size) {
 	return maxi;
 }
 
-float maximum(std::vector<float> &abs_spectrum) {
+float maximum(const std::vector<float> &abs_spectrum) {
 	return maximum(abs_spectrum.data(), abs_spectrum.size());
 }
 
@@ -55,9 +54,9 @@ float maximum(std::vector<float> &abs_spectrum) {
 /* Normalize the array of absolute magnitudes to a 0..1 range.
  * Block size refers to FFT block size before any zero padding.
  *
- *	returns -1 on error
+ *	@return -1 on error, 0 on success
  */
-int normalize(float *abs_spectrum, float *norm_spectrum, unsigned int bin_count, unsigned int block_size) {
+int normalize(const float *abs_spectrum, float *norm_spectrum, unsigned int bin_count, unsigned int block_size) {
 	int i;
 
 	if (abs_spectrum == NULL || norm_spectrum == NULL) {return -1;}
@@ -78,8 +77,8 @@ int normalize(const std::vector<float> &abs_spectrum, std::vector<float> &norm_s
 
 /* Check if the spectrum contains any non-zero value.
  *
- *	returns 1 if spectrum contains any non-zero value
- *	returns 0 otherwise
+ *	@return 1 if spectrum contains any non-zero value
+ *	@return 0 otherwise
  */
 int notEmpty(const std::vector<float> &spectrum) {
 	for (int i = 0; i < spectrum.size(); i++) {
@@ -91,7 +90,7 @@ int notEmpty(const std::vector<float> &spectrum) {
 
 /* Precompute an FFT window function for later real-time use.
  *
- *	returns -1 on error
+ *	@return -1 on error
  */
 int precomputeWindow(float *window, int length, FFT_WINDOWS type, bool normalized) {
 	int i;
@@ -153,9 +152,9 @@ int precomputeWindow(float *window, int length, FFT_WINDOWS type, bool normalize
  * Take care that - compl_len is not bigger than complex_buffer!
  *                - absspec buffer is big enough!
  *
- *	returns 0 on success, else -1
+ *	@return 0 on success, else -1
  */
-int absspec(fftwf_complex *complex_buffer, float *absspec_buffer, int compl_length) {
+int absspec(const fftwf_complex *complex_buffer, float *absspec_buffer, int compl_length) {
 	int i;
 
 	if (complex_buffer == NULL || absspec_buffer == NULL) {return -1;}
@@ -174,9 +173,9 @@ int absspec(fftwf_complex *complex_buffer, float *absspec_buffer, int compl_leng
  * Take care that - compressedbands[] array num_new elements long
  *                - num_old > num_new
  *
- *	returns 0 on success, else -1
+ *	@return 0 on success, else -1
  */
-int compressbands(float *absspec_buffer, float *compressedband, int num_old, int num_new, int bottom, int top) {
+int compressbands(const float *absspec_buffer, float *compressedband, int num_old, int num_new, int bottom, int top) {
 	float ratio;
 	int i, usefromold;
 	float j;
@@ -264,9 +263,9 @@ int calc13octaveband31(float *absspec_buffer, float *subbands, int num_spec, flo
 /* Compute power of finite time sequence.
  * Take care num_values is length of timesignal[]
  *
- *	returns power on success, else -1
+ *	@return power on success, else -1
  */
-float signalpower(float *timesignal, int num_values) {
+float signalpower(const float *timesignal, int num_values) {
 	if (num_values <= 0) {return -1;}
 
 	if (timesignal == NULL) {return -1;}

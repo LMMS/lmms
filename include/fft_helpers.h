@@ -38,7 +38,7 @@
 const int FFT_BUFFER_SIZE = 2048;
 
 // Allowed FFT block sizes. Ranging from barely useful to barely acceptable
-// because of performance reasons.
+// because of performance and latency reasons.
 const std::vector<int> FFT_BLOCK_SIZES = {256, 512, 1024, 2048, 4096, 8192, 16384};
 
 // List of FFT window functions supported by precomputeWindow()
@@ -52,33 +52,33 @@ enum FFT_WINDOWS {
 
 /* Returns biggest value from abs_spectrum[spec_size] array.
  *
- *	returns -1 on error
+ *	@return -1 on error, 0 on success
  */
-float LMMS_EXPORT maximum(float *abs_spectrum, unsigned int spec_size);
-float LMMS_EXPORT maximum(std::vector<float> &abs_spectrum);
+float LMMS_EXPORT maximum(const float *abs_spectrum, unsigned int spec_size);
+float LMMS_EXPORT maximum(const std::vector<float> &abs_spectrum);
 
 
 /* Normalize the abs_spectrum array of absolute values to a 0..1 range
  * based on supplied energy and stores it in the norm_spectrum array.
  *
- *	returns -1 on error
+ *	@return -1 on error
  */
-int LMMS_EXPORT normalize(float *abs_spectrum, float *norm_spectrum, unsigned int bin_count, unsigned int block_size);
-int LMMS_EXPORT normalize(std::vector<float> &abs_spectrum, std::vector<float> &norm_spectrum, unsigned int block_size);
+int LMMS_EXPORT normalize(const float *abs_spectrum, float *norm_spectrum, unsigned int bin_count, unsigned int block_size);
+int LMMS_EXPORT normalize(const std::vector<float> &abs_spectrum, std::vector<float> &norm_spectrum, unsigned int block_size);
 
 
 /* Check if the spectrum contains any non-zero value.
  *
- *	returns 1 if spectrum contains any non-zero value
- *	returns 0 otherwise
+ *	@return 1 if spectrum contains any non-zero value
+ *	@return 0 otherwise
  */
-int LMMS_EXPORT notEmpty(std::vector<float> &spectrum);
+int LMMS_EXPORT notEmpty(const std::vector<float> &spectrum);
 
 
 /* Precompute a window function for later real-time use.
  * Set normalized to false if you do not want to apply amplitude correction.
  *
- *	returns -1 on error
+ *	@return -1 on error
  */
 int LMMS_EXPORT precomputeWindow(float *window, int length, FFT_WINDOWS type, bool normalized = true);
 
@@ -87,9 +87,9 @@ int LMMS_EXPORT precomputeWindow(float *window, int length, FFT_WINDOWS type, bo
  * Take care that - compl_len is not bigger than complex_buffer!
  *				  - absspec buffer is big enough!
  *
- *	returns 0 on success, else -1
+ *	@return 0 on success, else -1
  */
-int LMMS_EXPORT absspec(fftwf_complex *complex_buffer, float *absspec_buffer,
+int LMMS_EXPORT absspec(const fftwf_complex *complex_buffer, float *absspec_buffer,
 						int compl_length);
 
 
@@ -97,21 +97,21 @@ int LMMS_EXPORT absspec(fftwf_complex *complex_buffer, float *absspec_buffer,
  * Take care that - compressedbands[] array num_new elements long
  *				  - num_old > num_new
  *
- *	  returns 0 on success, else -1
+ *	@return 0 on success, else -1
  */
-int LMMS_EXPORT compressbands( float * _absspec_buffer, float * _compressedband,
-			int _num_old, int _num_new, int _bottom, int _top );
+int LMMS_EXPORT compressbands(const float * _absspec_buffer, float * _compressedband,
+			int _num_old, int _num_new, int _bottom, int _top);
 
 
-int LMMS_EXPORT calc13octaveband31( float * _absspec_buffer, float * _subbands,
-				int _num_spec, float _max_frequency );
+int LMMS_EXPORT calc13octaveband31(float * _absspec_buffer, float * _subbands,
+				int _num_spec, float _max_frequency);
 
 
 /* compute power of finite time sequence
  * take care num_values is length of timesignal[]
  *
- *	  returns power on success, else -1
+ *	@return power on success, else -1
  */
-float LMMS_EXPORT signalpower(float *timesignal, int num_values);
+float LMMS_EXPORT signalpower(const float *timesignal, int num_values);
 
 #endif
