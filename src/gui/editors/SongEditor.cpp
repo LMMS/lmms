@@ -32,7 +32,6 @@
 #include <QMdiArea>
 #include <QMdiSubWindow>
 #include <QPainter>
-#include <QDebug>
 
 #include "AutomatableSlider.h"
 #include "ComboBox.h"
@@ -283,7 +282,8 @@ float SongEditor::getSnapSize() const{
 	// 1 Bar is the third value in the snapping dropdown
 	int val = -m_snappingModel->value() + 3;
 	// If proportional snap is on, we snap to finer values when zoomed in
-	if (m_proportionalSnap){
+	if (m_proportionalSnap)
+	{
 		val = val - m_zoomingModel->value() + 3;
 	}
 	val = max(val, -6); // -6 gives 1/64th bar snapping. Lower values cause crashing.

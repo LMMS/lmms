@@ -44,7 +44,6 @@
 #include <QMouseEvent>
 #include <QPainter>
 #include <QStyleOption>
-#include <QDebug>
 
 
 #include "AutomationPattern.h"
