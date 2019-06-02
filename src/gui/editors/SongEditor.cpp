@@ -244,14 +244,18 @@ SongEditor::SongEditor( Song * song ) :
 					this, SLOT( zoomingChanged() ) );
 
 	//Set up snapping model, 2^i
-	for ( int i = 3; i >= -4; i-- ){
-		if ( i > 0 ){
+	for ( int i = 3; i >= -4; i-- )
+	{
+		if ( i > 0 )
+		{
 			m_snappingModel->addItem( QString( "%1 Bars").arg( 1 << i ) );
 		}
-		else if ( i == 0 ){
+		else if ( i == 0 )
+		{
 			m_snappingModel->addItem( "1 Bar" );
 		}
-		else {
+		else
+		{
 			m_snappingModel->addItem( QString( "1/%1 Bar" ).arg( 1 << (-i) ) );
 		}
 	}
