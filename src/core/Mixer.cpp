@@ -1242,7 +1242,7 @@ void Mixer::fifoWriter::run()
 	disable_denormals();
 
 #if 0
-#ifdef LMMS_BUILD_LINUX
+#if defined(LMMS_BUILD_LINUX) || defined(LMMS_BUILD_FREEBSD)
 #ifdef LMMS_HAVE_SCHED_H
 	cpu_set_t mask;
 	CPU_ZERO( &mask );

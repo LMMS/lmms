@@ -666,7 +666,7 @@ int main( int argc, char * * argv )
 
 
 	// try to set realtime priority
-#ifdef LMMS_BUILD_LINUX
+#if defined(LMMS_BUILD_LINUX) || defined(LMMS_BUILD_FREEBSD)
 #ifdef LMMS_HAVE_SCHED_H
 #ifndef __OpenBSD__
 	struct sched_param sparam;
