@@ -29,9 +29,9 @@
 #include <cmath>
 #include "lmms_constants.h"
 
-/**	Returns biggest value from abs_spectrum[spec_size] array.
+/* Returns biggest value from abs_spectrum[spec_size] array.
  *
- *	@return -1 on error, otherwise the maximum value
+ * return -1 on error, otherwise the maximum value
  */
 float maximum(const float *abs_spectrum, unsigned int spec_size)
 {
@@ -54,10 +54,10 @@ float maximum(const std::vector<float> &abs_spectrum)
 }
 
 
-/**	Normalize the array of absolute magnitudes to a 0..1 range.
- *	Block size refers to FFT block size before any zero padding.
+/* Normalize the array of absolute magnitudes to a 0..1 range.
+ * Block size refers to FFT block size before any zero padding.
  *
- *	@return -1 on error, 0 on success
+ * return -1 on error, 0 on success
  */
 int normalize(const float *abs_spectrum, float *norm_spectrum, unsigned int bin_count, unsigned int block_size)
 {
@@ -81,10 +81,10 @@ int normalize(const std::vector<float> &abs_spectrum, std::vector<float> &norm_s
 }
 
 
-/**	Check if the spectrum contains any non-zero value.
+/* Check if the spectrum contains any non-zero value.
  *
- *	@return 1 if spectrum contains any non-zero value
- *	@return 0 otherwise
+ * return 1 if spectrum contains any non-zero value
+ * return 0 otherwise
  */
 int notEmpty(const std::vector<float> &spectrum)
 {
@@ -96,9 +96,9 @@ int notEmpty(const std::vector<float> &spectrum)
 }
 
 
-/**	Precompute an FFT window function for later real-time use.
+/* Precompute an FFT window function for later real-time use.
  *
- *	@return -1 on error
+ * return -1 on error
  */
 int precomputeWindow(float *window, int length, FFT_WINDOWS type, bool normalized)
 {
@@ -157,11 +157,11 @@ int precomputeWindow(float *window, int length, FFT_WINDOWS type, bool normalize
 }
 
 
-/**	Compute absolute values of complex_buffer, save to absspec_buffer.
- *	Take care that - compl_len is not bigger than complex_buffer!
- *                 - absspec buffer is big enough!
+/* Compute absolute values of complex_buffer, save to absspec_buffer.
+ * Take care that - compl_len is not bigger than complex_buffer!
+ *                - absspec buffer is big enough!
  *
- *	@return 0 on success, else -1
+ * return 0 on success, else -1
  */
 int absspec(const fftwf_complex *complex_buffer, float *absspec_buffer, int compl_length)
 {
@@ -180,11 +180,11 @@ int absspec(const fftwf_complex *complex_buffer, float *absspec_buffer, int comp
 }
 
 
-/**	Build fewer subbands from many absolute spectrum values.
- *	Take care that - compressedbands[] array num_new elements long
- *                 - num_old > num_new
+/* Build fewer subbands from many absolute spectrum values.
+ * Take care that - compressedbands[] array num_new elements long
+ *                - num_old > num_new
  *
- *	@return 0 on success, else -1
+ * return 0 on success, else -1
  */
 int compressbands(const float *absspec_buffer, float *compressedband, int num_old, int num_new, int bottom, int top)
 {
@@ -278,10 +278,10 @@ int calc13octaveband31(float *absspec_buffer, float *subbands, int num_spec, flo
 	return 0;
 }
 
-/** Compute power of finite time sequence.
- *	Take care num_values is length of timesignal[]
+/* Compute power of finite time sequence.
+ * Take care num_values is length of timesignal[]
  *
- *	@return power on success, else -1
+ * return power on success, else -1
  */
 float signalpower(const float *timesignal, int num_values)
 {
