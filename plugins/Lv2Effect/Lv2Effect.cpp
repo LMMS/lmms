@@ -74,6 +74,7 @@ bool Lv2Effect::processAudioBuffer(sampleFrame *buf, const fpp_t frames)
 	m_controls.run(frames);
 //	m_pluginMutex.unlock();
 
+	m_controls.copyModelsToLmms();
 	m_controls.copyBuffersToLmms(m_tmpOutputSmps.data(), frames);
 
 	double outSum = .0;

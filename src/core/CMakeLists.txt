@@ -93,6 +93,7 @@ set(LMMS_SRCS
 
 	core/lv2/Lv2Basics.cpp
 	core/lv2/Lv2ControlBase.cpp
+	core/lv2/Lv2Evbuf.cpp
 	core/lv2/Lv2Features.cpp
 	core/lv2/Lv2Ports.cpp
 	core/lv2/Lv2Proc.cpp

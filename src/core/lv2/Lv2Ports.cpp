@@ -27,9 +27,12 @@
 
 #ifdef LMMS_HAVE_LV2
 
+#include <lv2/lv2plug.in/ns/ext/atom/atom.h>
+
 #include "Engine.h"
 #include "Lv2Basics.h"
 #include "Lv2Manager.h"
+#include "Lv2Evbuf.h"
 
 namespace Lv2Ports {
 
@@ -57,7 +60,7 @@ const char *toStr(Type pt)
 		case Type::Unknown: return "unknown";
 		case Type::Control: return "control";
 		case Type::Audio: return "audio";
-		case Type::Event: return "event";
+		case Type::AtomSeq: return "atom-sequence";
 		case Type::Cv: return "cv";
 	}
 	return "";
@@ -168,6 +171,23 @@ std::vector<PluginIssue> Meta::get(const LilvPlugin *plugin,
 		issue(badPortType, "cvPort");
 		m_type = Type::Cv;
 	}
+	else if (isA(LV2_ATOM__AtomPort))
+	{
+		AutoLilvNode uriAtomSequence(Engine::getLv2Manager()->uri(LV2_ATOM__Sequence));
+		AutoLilvNode uriAtomBufferType(Engine::getLv2Manager()->uri(LV2_ATOM__bufferType));
+		AutoLilvNodes bufferTypes(lilv_port_get_value(plugin, lilvPort, uriAtomBufferType.get()));
+
+		if (lilv_nodes_contains(bufferTypes.get(), uriAtomSequence.get()))
+		{
+			// we accept all kinds of atom sequence ports, even if they take or
+			// offer atom types that we do not support:
+			// * atom input ports only say what *can* be input, but not what is
+			//   required as input
+			// * atom output ports only say what *can* be output, but not what must
+			//   be evaluated
+			m_type = Type::AtomSeq;
+		}
+	}
 
 	if(m_type == Type::Unknown)
 	{
@@ -241,6 +261,11 @@ void Audio::copyBuffersToCore(sampleFrame *lmmsBuf,
 		lmmsBuf[f][channel] = m_buffer[f];
 	}
 }
+
+
+
+
+void AtomSeq::Lv2EvbufDeleter::operator()(LV2_Evbuf *n) { lv2_evbuf_free(n); }
 
 
 

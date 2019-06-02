@@ -37,7 +37,7 @@ class Lv2UridCache
 public:
 	enum class Id //!< ID for m_uridCache array
 	{
-		midi_MidiEvent, //!< just an example, unused yet
+		midi_MidiEvent,
 		size
 	};
 	//! Return URID for a cache ID
