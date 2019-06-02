@@ -48,7 +48,8 @@ public:
 		LinearStyle, //!< connect each 2 samples with a line, with wrapping
 		LinearNonCyclicStyle, //!< LinearStyle without wrapping
 		BarStyle, //!< draw thick bars
-		NumGraphStyles
+		NumGraphStyles,
+		BarCenterGradStyle //!< draw color gradient coming from center
 	};
 
 	/**

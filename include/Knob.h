@@ -38,7 +38,7 @@ class TextFloat;
 
 enum knobTypes
 {
-	knobDark_28, knobBright_26, knobSmall_17, knobVintage_32, knobStyled
+	knobDark_28, knobBright_26, knobSmall_17, knobVintage_32, knobStyled, knobColored, knobSmallColored
 } ;
 
 
@@ -109,6 +109,8 @@ public:
 
 	QColor outerColor() const;
 	void setOuterColor( const QColor & c );
+	QColor innerColor() const;
+	void setInnerColor( const QColor & c );
 	QColor lineColor() const;
 	void setlineColor( const QColor & c );
 	QColor arcColor() const;
@@ -138,14 +140,28 @@ protected:
 
 	virtual float getValue( const QPoint & _p );
 
+	QString displayValue() const;
+
+	static TextFloat * s_textFloat;
+
+	QPoint m_mouseOffset;
+	QPoint m_origMousePos;
+	float m_leftOver;
+	bool m_buttonPressed;
+
+	inline float pageSize() const
+	{
+		return ( model()->maxValue() - model()->minValue() ) / 100.0f;
+	}
+
+	bool m_updateColor;
+
 private slots:
 	virtual void enterValue();
 	void friendlyUpdate();
 	void toggleScale();
 
 private:
-	QString displayValue() const;
-
 	virtual void doConnections();
 
 	QLineF calculateLine( const QPointF & _mid, float _radius,
@@ -154,30 +170,18 @@ private:
 	void drawKnob( QPainter * _p );
 	void setPosition( const QPoint & _p );
 	bool updateAngle();
+	bool updateColor();
 
 	int angleFromValue( float value, float minValue, float maxValue, float totalAngle ) const
 	{
 		return static_cast<int>( ( value - 0.5 * ( minValue + maxValue ) ) / ( maxValue - minValue ) * m_totalAngle ) % 360;
 	}
 
-	inline float pageSize() const
-	{
-		return ( model()->maxValue() - model()->minValue() ) / 100.0f;
-	}
-
-
-	static TextFloat * s_textFloat;
-
 	QString m_label;
 
 	QPixmap * m_knobPixmap;
 	BoolModel m_volumeKnob;
 	FloatModel m_volumeRatio;
-
-	QPoint m_mouseOffset;
-	QPoint m_origMousePos;
-	float m_leftOver;
-	bool m_buttonPressed;
 
 	float m_totalAngle;
 	int m_angle;
@@ -189,6 +193,7 @@ private:
 	float m_outerRadius;
 	float m_lineWidth;
 	QColor m_outerColor;
+	QColor m_innerColor;
 	QColor m_lineColor; //!< unused yet
 	QColor m_arcColor; //!< unused yet
 	
