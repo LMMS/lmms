@@ -898,7 +898,8 @@ void TrackContentObjectView::mouseMoveEvent( QMouseEvent * me )
 	{
 		MidiTime newPos = draggedTCOPos( me );
 
-		newPos = max( 0, newPos.getTicks() ); // Don't go left of bar zero
+		// Don't go left of bar zero
+		newPos = max( 0, newPos.getTicks() );
 		m_tco->movePosition( newPos );
 		m_trackView->getTrackContentWidget()->changePosition();
 		s_textFloat->setText( QString( "%1:%2" ).
