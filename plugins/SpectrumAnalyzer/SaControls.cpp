@@ -35,16 +35,16 @@ SaControls::SaControls(Analyzer *effect) :
 	m_effect(effect),
 
 	// initialize bool models and set default values
-	m_pauseModel(false, this, tr("Pause data acquisition")),
-	m_refFreezeModel(false, this, tr("Freeze current input as a reference")),
+	m_pauseModel(false, this, tr("Pause")),
+	m_refFreezeModel(false, this, tr("Reference freeze")),
 
-	m_waterfallModel(false, this, tr("Display real-time spectrogram")),
-	m_smoothModel(false, this, tr("Enable exponential moving average")),
-	m_stereoModel(false, this, tr("Display stereo channels separately")),
-	m_peakHoldModel(false, this, tr("Display envelope of peak values")),
+	m_waterfallModel(false, this, tr("Waterfall")),
+	m_smoothModel(false, this, tr("Averaging")),
+	m_stereoModel(false, this, tr("Stereo")),
+	m_peakHoldModel(false, this, tr("Peak hold")),
 
-	m_logXModel(true, this, tr("Logarithmic frequency scale")),
-	m_logYModel(true, this, tr("Logarithmic amplitude scale")),
+	m_logXModel(true, this, tr("Logarithmic frequency")),
+	m_logYModel(true, this, tr("Logarithmic amplitude")),
 
 	// default values of combo boxes are set after they are populated
 	m_freqRangeModel(this, tr("Frequency range")),

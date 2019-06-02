@@ -70,6 +70,7 @@ SaControlsDialog::SaControlsDialog(SaControls *controls, SaProcessor *processor)
 
 	// pause and freeze buttons
 	PixmapButton *pauseButton = new PixmapButton(this, tr("Pause"));
+	pauseButton->setToolTip(tr("Pause data acquisition"));
 	QPixmap *pauseOnPixmap = new QPixmap(PLUGIN_NAME::getIconPixmap("play").scaled(buttonSize, buttonSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
 	QPixmap *pauseOffPixmap = new QPixmap(PLUGIN_NAME::getIconPixmap("pause").scaled(buttonSize, buttonSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
 	pauseOnPixmap->setDevicePixelRatio(devicePixelRatio());
@@ -81,6 +82,7 @@ SaControlsDialog::SaControlsDialog(SaControls *controls, SaProcessor *processor)
 	config_layout->addWidget(pauseButton, 0, 0, 2, 1);
 
 	PixmapButton *refFreezeButton = new PixmapButton(this, tr("Reference freeze"));
+	refFreezeButton->setToolTip(tr("Freeze current input as a reference / disable falloff in peak-hold mode."));
 	QPixmap *freezeOnPixmap = new QPixmap(PLUGIN_NAME::getIconPixmap("freeze").scaled(buttonSize, buttonSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
 	QPixmap *freezeOffPixmap = new QPixmap(PLUGIN_NAME::getIconPixmap("freeze_off").scaled(buttonSize, buttonSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
 	freezeOnPixmap->setDevicePixelRatio(devicePixelRatio());
@@ -93,24 +95,28 @@ SaControlsDialog::SaControlsDialog(SaControls *controls, SaProcessor *processor)
 
 	// misc configuration switches
 	LedCheckBox *waterfallButton = new LedCheckBox(tr("Waterfall"), this);
+	waterfallButton->setToolTip(tr("Display real-time spectrogram"));
 	waterfallButton->setCheckable(true);
 	waterfallButton->setMinimumSize(70, 12);
 	waterfallButton->setModel(&controls->m_waterfallModel);
 	config_layout->addWidget(waterfallButton, 0, 1);
 
 	LedCheckBox *smoothButton = new LedCheckBox(tr("Averaging"), this);
+	smoothButton->setToolTip(tr("Enable exponential moving average"));
 	smoothButton->setCheckable(true);
 	smoothButton->setMinimumSize(70, 12);
 	smoothButton->setModel(&controls->m_smoothModel);
 	config_layout->addWidget(smoothButton, 1, 1);
 
 	LedCheckBox *stereoButton = new LedCheckBox(tr("Stereo"), this);
+	stereoButton->setToolTip(tr("Display stereo channels separately"));
 	stereoButton->setCheckable(true);
 	stereoButton->setMinimumSize(70, 12);
 	stereoButton->setModel(&controls->m_stereoModel);
 	config_layout->addWidget(stereoButton, 2, 1);
 
 	LedCheckBox *peakHoldButton = new LedCheckBox(tr("Peak hold"), this);
+	peakHoldButton->setToolTip(tr("Display envelope of peak values"));
 	peakHoldButton->setCheckable(true);
 	peakHoldButton->setMinimumSize(70, 12);
 	peakHoldButton->setModel(&controls->m_peakHoldModel);
@@ -118,6 +124,7 @@ SaControlsDialog::SaControlsDialog(SaControls *controls, SaProcessor *processor)
 
 	// frequency: linear / log. switch and range selector
 	PixmapButton *logXButton = new PixmapButton(this, tr("Logarithmic frequency"));
+	logXButton->setToolTip(tr("Switch between logarithmic and linear frequency scale"));
 	QPixmap *logXOnPixmap = new QPixmap(PLUGIN_NAME::getIconPixmap("x_log").scaled(iconSize, iconSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
 	QPixmap *logXOffPixmap = new QPixmap(PLUGIN_NAME::getIconPixmap("x_linear").scaled(iconSize, iconSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
 	logXOnPixmap->setDevicePixelRatio(devicePixelRatio());
@@ -129,6 +136,7 @@ SaControlsDialog::SaControlsDialog(SaControls *controls, SaProcessor *processor)
 	config_layout->addWidget(logXButton, 0, 2, 2, 1, Qt::AlignRight);
 
 	ComboBox *freqRangeCombo = new ComboBox(this, tr("Frequency range"));
+	freqRangeCombo->setToolTip(tr("Frequency range"));
 	freqRangeCombo->setMinimumSize(100, 22);
 	freqRangeCombo->setMaximumSize(200, 22);
 	freqRangeCombo->setModel(&controls->m_freqRangeModel);
@@ -136,6 +144,7 @@ SaControlsDialog::SaControlsDialog(SaControls *controls, SaProcessor *processor)
 
 	// amplitude: linear / log switch and range selector
 	PixmapButton *logYButton = new PixmapButton(this, tr("Logarithmic amplitude"));
+	logYButton->setToolTip(tr("Switch between logarithmic and linear amplitude scale"));
 	QPixmap *logYOnPixmap = new QPixmap(PLUGIN_NAME::getIconPixmap("y_log").scaled(iconSize, iconSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
 	QPixmap *logYOffPixmap = new QPixmap(PLUGIN_NAME::getIconPixmap("y_linear").scaled(iconSize, iconSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
 	logYOnPixmap->setDevicePixelRatio(devicePixelRatio());
@@ -147,6 +156,7 @@ SaControlsDialog::SaControlsDialog(SaControls *controls, SaProcessor *processor)
 	config_layout->addWidget(logYButton, 2, 2, 2, 1, Qt::AlignRight);
 
 	ComboBox *ampRangeCombo = new ComboBox(this, tr("Amplitude range"));
+	ampRangeCombo->setToolTip(tr("Amplitude range"));
 	ampRangeCombo->setMinimumSize(100, 22);
 	ampRangeCombo->setMaximumSize(200, 22);
 	ampRangeCombo->setModel(&controls->m_ampRangeModel);
@@ -159,7 +169,8 @@ SaControlsDialog::SaControlsDialog(SaControls *controls, SaProcessor *processor)
 	blockSizeLabel->setPixmap(blockSizeIcon->scaled(iconSize, iconSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
 	config_layout->addWidget(blockSizeLabel, 0, 4, 2, 1, Qt::AlignRight);
 
-	ComboBox *blockSizeCombo = new ComboBox(this, tr("FFT Block Size"));
+	ComboBox *blockSizeCombo = new ComboBox(this, tr("FFT block bize"));
+	blockSizeCombo->setToolTip(tr("FFT block size"));
 	blockSizeCombo->setMinimumSize(100, 22);
 	blockSizeCombo->setMaximumSize(200, 22);
 	blockSizeCombo->setModel(&controls->m_blockSizeModel);
@@ -174,7 +185,8 @@ SaControlsDialog::SaControlsDialog(SaControls *controls, SaProcessor *processor)
 	windowLabel->setPixmap(windowIcon->scaled(iconSize, iconSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
 	config_layout->addWidget(windowLabel, 2, 4, 2, 1, Qt::AlignRight);
 
-	ComboBox *windowCombo = new ComboBox(this, tr("FFT Window"));
+	ComboBox *windowCombo = new ComboBox(this, tr("FFT window type"));
+	windowCombo->setToolTip(tr("FFT window type"));
 	windowCombo->setMinimumSize(100, 22);
 	windowCombo->setMaximumSize(200, 22);
 	windowCombo->setModel(&controls->m_windowModel);
