@@ -783,7 +783,7 @@ SongEditorWindow::SongEditorWindow(Song* song) :
 	m_setProportionalSnapAction = new QAction(embed::getIconPixmap("proportional_snap"),
 											 tr("Toggle proportional snap on/off"), this);
 	m_setProportionalSnapAction->setCheckable(true);
-	m_setProportionalSnapAction->setChecked(true);
+	m_setProportionalSnapAction->setChecked(false);
 	connect(m_setProportionalSnapAction, SIGNAL(triggered()), m_editor, SLOT(toggleProportionalSnap()));
 
 	snapToolBar->addWidget( snap_lbl );
