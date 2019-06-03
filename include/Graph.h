@@ -1,7 +1,7 @@
 /*
  * Graph.h - a QT widget for displaying and manipulating waveforms
  *
- * Copyright (c) 2006-2007 Andreas Brandmaier <andy/at/brandmaier/dot/de>
+ * Copyright (c)2006-2007 Andreas Brandmaier <andy/at/brandmaier/dot/de>
  *               2008 Paul Giblock <drfaygo/at/gmail/dot/com>
  *
  * This file is part of LMMS - https://lmms.io
@@ -9,7 +9,7 @@
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
+ * version 2 of the License, or (at your option)any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -54,19 +54,19 @@ public:
 
 	/**
 	 * @brief Constructor
-	 * @param _width Pixel width of widget
-	 * @param _height Pixel height of widget
+	 * @param width Pixel width of widget
+	 * @param height Pixel height of widget
 	 */
-	Graph( QWidget * _parent, graphStyle _style = Graph::LinearStyle,
-		int _width = 132,
-		int _height = 104
+	Graph(QWidget * parent, graphStyle style = Graph::LinearStyle,
+		int width = 132,
+		int height = 104
 	);
-	virtual ~Graph() = default;
+	virtual ~Graph()= default;
 
-	void setForeground( const QPixmap & _pixmap );
+	void setForeground(const QPixmap & pixmap);
 
 
-	void setGraphColor( const QColor );
+	void setGraphColor(const QColor);
 
 	inline graphModel * model()
 	{
@@ -79,31 +79,31 @@ public:
 	}
 
 
-	inline void setGraphStyle( graphStyle _s )
+	inline void setGraphStyle(graphStyle s)
 	{
-		m_graphStyle = _s;
+		m_graphStyle = s;
 		update();
 	}
 
 signals:
 	void drawn();
 protected:
-	virtual void paintEvent( QPaintEvent * _pe );
-	virtual void dropEvent( QDropEvent * _de );
-	virtual void dragEnterEvent( QDragEnterEvent * _dee );
-	virtual void mousePressEvent( QMouseEvent * _me );
-	virtual void mouseMoveEvent( QMouseEvent * _me );
-	virtual void mouseReleaseEvent( QMouseEvent * _me );
+	virtual void paintEvent(QPaintEvent * pe);
+	virtual void dropEvent(QDropEvent * de);
+	virtual void dragEnterEvent(QDragEnterEvent * dee);
+	virtual void mousePressEvent(QMouseEvent * me);
+	virtual void mouseMoveEvent(QMouseEvent * me);
+	virtual void mouseReleaseEvent(QMouseEvent * me);
 
 protected slots:
-	void updateGraph( int _startPos, int _endPos );
+	void updateGraph(int startPos, int endPos);
 	void updateGraph();
 
 private:
 	virtual void modelChanged();
 
-	void changeSampleAt( int _x, int _y );
-	void drawLineAt( int _x, int _y, int _lastx );
+	void changeSampleAt(int x, int y);
+	void drawLineAt(int x, int y, int lastx);
 
 
 	QPixmap m_foreground;
@@ -129,41 +129,41 @@ class LMMS_EXPORT graphModel : public Model
 public:
 	/**
 	 * @brief Constructor
-	 * @param _min Minimum y value to display
-	 * @param _max Maximum y value to display
-	 * @param _size Number of samples (e.g. x value)
-	 * @param _step Step size on y axis where values snap to, or 0.0f
+	 * @param min Minimum y value to display
+	 * @param max Maximum y value to display
+	 * @param size Number of samples (e.g. x value)
+	 * @param step Step size on y axis where values snap to, or 0.0f
 	 *   for "no snapping"
 	 */
-	graphModel( float _min,
-			float _max,
-			int _size,
-			:: Model * _parent,
-			bool _default_constructed = false,
-			float _step = 0.0 );
+	graphModel(float min,
+			float max,
+			int size,
+			:: Model * parent,
+			bool default_constructed = false,
+			float step = 0.0);
 
-	virtual ~graphModel() = default;
+	virtual ~graphModel()= default;
 
 	// TODO: saveSettings, loadSettings?
 
-	inline float minValue() const
+	inline float minValue()const
 	{
-		return( m_minValue );
+		return m_minValue;
 	}
 
-	inline float maxValue() const
+	inline float maxValue()const
 	{
-		return( m_maxValue );
+		return m_maxValue;
 	}
 
-	inline int length() const
+	inline int length()const
 	{
 		return m_length;
 	}
 
-	inline const float * samples() const
+	inline const float * samples()const
 	{
-		return( m_samples.data() );
+		return m_samples.data();
 	}
 
 	//! Make cyclic convolution
@@ -175,36 +175,36 @@ public:
 
 public slots:
 	//! Set range of y values
-	void setRange( float _min, float _max );
+	void setRange(float min, float max);
 
-	void setLength( int _size );
+	void setLength(int size);
 	//! Update one sample
-	void setSampleAt( int x, float val );
+	void setSampleAt(int x, float val);
 	//! Update samples array
-	void setSamples( const float * _value );
+	void setSamples(const float * value);
 
 	void setWaveToSine();
 	void setWaveToTriangle();
 	void setWaveToSaw();
 	void setWaveToSquare();
 	void setWaveToNoise();
-	QString setWaveToUser( );
+	QString setWaveToUser();
 
 	void smooth();
 	void smoothNonCyclic();
 	void normalize();
 	void invert();
-	void shiftPhase( int _deg );
+	void shiftPhase(int deg);
 	void clear();
 	void clearInvisible();
 
 signals:
 	void lengthChanged();
-	void samplesChanged( int startPos, int endPos );
+	void samplesChanged(int startPos, int endPos);
 	void rangeChanged();
 
 private:
-	void drawSampleAt( int x, float val );
+	void drawSampleAt(int x, float val);
 
 	QVector<float> m_samples;
 	int m_length;
