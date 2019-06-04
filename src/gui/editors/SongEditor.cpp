@@ -85,15 +85,14 @@ SongEditor::SongEditor( Song * song ) :
 	m_mousePos(),
 	m_rubberBandStartTrackview(),
 	m_rubberbandStartMidipos(),
-	m_currentZoomingValue(m_zoomingModel->value())
+	m_currentZoomingValue(m_zoomingModel->value()),
+	m_trackHeadWidth(ConfigManager::inst()->value("ui", "compacttrackbuttons").toInt()==1
+					 ? DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT + TRACK_OP_WIDTH_COMPACT
+					 : DEFAULT_SETTINGS_WIDGET_WIDTH + TRACK_OP_WIDTH)
 {
 	m_zoomingModel->setParent(this);
 	// create time-line
-	int widgetTotal = ConfigManager::inst()->value( "ui",
-							"compacttrackbuttons" ).toInt()==1 ?
-		DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT + TRACK_OP_WIDTH_COMPACT :
-		DEFAULT_SETTINGS_WIDGET_WIDTH + TRACK_OP_WIDTH;
-	m_timeLine = new TimeLineWidget( widgetTotal, 32,
+	m_timeLine = new TimeLineWidget( m_trackHeadWidth, 32,
 					pixelsPerTact(),
 					m_song->m_playPos[Song::Mode_PlaySong],
 					m_currentPosition, this );
@@ -305,16 +304,11 @@ void SongEditor::updateRubberband()
 {
 	if (rubberBandActive())
 	{
-		//the width of the track head
-		int widgetTotal = ConfigManager::inst()->value("ui", "compacttrackbuttons" ).toInt()==1
-				? DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT + TRACK_OP_WIDTH_COMPACT
-				: DEFAULT_SETTINGS_WIDGET_WIDTH + TRACK_OP_WIDTH;
-
 		//take care of the zooming
 		int originX = m_origin.x();
 		if (m_currentZoomingValue != m_zoomingModel->value())
 		{
-			originX = widgetTotal + (originX - widgetTotal)
+			originX = m_trackHeadWidth + (originX - m_trackHeadWidth)
 					* m_zoomLevels[m_zoomingModel->value()] / m_zoomLevels[m_currentZoomingValue];
 		}
 
@@ -323,7 +317,7 @@ void SongEditor::updateRubberband()
 		int vs = contentWidget()->verticalScrollBar()->value() - m_scrollPos.y();
 
 		//the adjusted origin point
-		QPoint origin = QPoint(qMax(originX - hs , widgetTotal), m_origin.y() - vs);
+		QPoint origin = QPoint(qMax(originX - hs, m_trackHeadWidth), m_origin.y() - vs);
 
 		//paint the rubber band rect
 		rubberBand()->setGeometry(QRect( origin,
@@ -347,7 +341,7 @@ void SongEditor::updateRubberband()
 		}
 
 		//the miditime the mouse is hover
-		MidiTime rubberbandMidipos = MidiTime((m_mousePos.x() - widgetTotal) / pixelsPerTact()
+		MidiTime rubberbandMidipos = MidiTime((m_mousePos.x() - m_trackHeadWidth) / pixelsPerTact()
 											  * MidiTime::ticksPerTact()) + m_currentPosition ;
 		//collect all Tcos
 		QVector<selectableObject *> so;
@@ -500,9 +494,6 @@ void SongEditor::mousePressEvent(QMouseEvent *_me)
 {
 	if (allowRubberband())
 	{
-		int widgetTotal = ConfigManager::inst()->value("ui", "compacttrackbuttons").toInt()==1
-				? DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT + TRACK_OP_WIDTH_COMPACT
-				: DEFAULT_SETTINGS_WIDGET_WIDTH + TRACK_OP_WIDTH;
 		//we save the position of both scrollbars into a QPoint
 		m_scrollPos = QPoint(m_leftRightScroll->value(), contentWidget()->verticalScrollBar()->value());
 		//and the mouse position
@@ -530,7 +521,7 @@ void SongEditor::mousePressEvent(QMouseEvent *_me)
 			m_rubberBandStartTrackview = (_me->pos().y() < m_timeLine->height() ? 0 : trackViews().count());
 		}
 
-		m_rubberbandStartMidipos = MidiTime((_me->pos().x() - widgetTotal)
+		m_rubberbandStartMidipos = MidiTime((_me->pos().x() - m_trackHeadWidth)
 											/ pixelsPerTact() * MidiTime::ticksPerTact())
 											+ m_currentPosition;
 	}
@@ -544,7 +535,7 @@ void SongEditor::mouseMoveEvent(QMouseEvent *_me)
 {
 	m_mousePos = _me->pos();
 	updateRubberband();
-	QWidget::mouseMoveEvent( _me );
+	QWidget::mouseMoveEvent(_me);
 }
 
 
