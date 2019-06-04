@@ -53,7 +53,6 @@
 #include "PianoRoll.h"
 #include "Track.h"
 
-
 positionLine::positionLine( QWidget * parent ) :
 	QWidget( parent )
 {
@@ -85,7 +84,8 @@ SongEditor::SongEditor( Song * song ) :
 	m_scrollPos(),
 	m_mousePos(),
 	m_rubberBandStartTrackview(),
-	m_rubberbandStartMidipos()
+	m_rubberbandStartMidipos(),
+	m_currentZoomingValue(m_zoomingModel->value())
 {
 	m_zoomingModel->setParent(this);
 	// create time-line
@@ -305,25 +305,48 @@ void SongEditor::updateRubberband()
 {
 	if (rubberBandActive())
 	{
+		//the width of the track head
 		int widgetTotal = ConfigManager::inst()->value("ui", "compacttrackbuttons" ).toInt()==1
 				? DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT + TRACK_OP_WIDTH_COMPACT
 				: DEFAULT_SETTINGS_WIDGET_WIDTH + TRACK_OP_WIDTH;
 
+		//take care of the zooming
+		int originX = m_origin.x();
+		if (m_currentZoomingValue != m_zoomingModel->value())
+		{
+			originX = widgetTotal + (originX - widgetTotal)
+					* m_zoomLevels[m_zoomingModel->value()] / m_zoomLevels[m_currentZoomingValue];
+		}
+
+		//take care of the scrollbar position
 		int hs = (m_leftRightScroll->value() - m_scrollPos.x()) * pixelsPerTact();
 		int vs = contentWidget()->verticalScrollBar()->value() - m_scrollPos.y();
 
-		QPoint origin = QPoint(qMax(m_origin.x() - hs, widgetTotal), m_origin.y() - vs);
+		//the adjusted origin point
+		QPoint origin = QPoint(qMax(originX - hs , widgetTotal), m_origin.y() - vs);
 
+		//paint the rubber band rect
 		rubberBand()->setGeometry(QRect( origin,
 										 contentWidget()->mapFromParent(QPoint(m_mousePos.x(), m_mousePos.y()))
 										).normalized());
 
-		//the index of the TrackView and the miditime our mouse is hover
-		int rubberBandTrackview = trackViews().indexOf(const_cast<TrackView*>(trackViewAt(m_mousePos.y() - m_timeLine->height())));
-		if (rubberBandTrackview == -1)
+		//the index of the TrackView the mouse is hover
+		const TrackView * tv = trackViewAt(m_mousePos.y() - m_timeLine->height());
+		int rubberBandTrackview = 0;
+		if (tv)
+		{
+			for (QList<TrackView *>::const_iterator it = trackViews().begin(); it != trackViews().end(); ++it)
+			{
+				if ((*it) == tv) {break;}
+				rubberBandTrackview++;
+			}
+		}
+		else
 		{
 			rubberBandTrackview = (m_mousePos.y() < m_timeLine->height() ? 0 : trackViews().count());
 		}
+
+		//the miditime the mouse is hover
 		MidiTime rubberbandMidipos = MidiTime((m_mousePos.x() - widgetTotal) / pixelsPerTact()
 											  * MidiTime::ticksPerTact()) + m_currentPosition ;
 		//collect all Tcos
@@ -334,7 +357,7 @@ void SongEditor::updateRubberband()
 		{
 			so.push_back( *it );
 		}
-		//iterate over all tcos
+		//are tcos in the rect of selection?
 		for (QVector<selectableObject *>::iterator it = so.begin(); it != so.end(); ++it)
 		{
 			TrackContentObjectView * tco = dynamic_cast<TrackContentObjectView*>(*it);
@@ -484,18 +507,29 @@ void SongEditor::mousePressEvent(QMouseEvent *_me)
 		m_scrollPos = QPoint(m_leftRightScroll->value(), contentWidget()->verticalScrollBar()->value());
 		//and the mouse position
 		m_origin = contentWidget()->mapFromParent(QPoint(_me->pos().x(), _me->pos().y()));
+		//and the zooming
+		m_currentZoomingValue = zoomingModel()->value();
 		//paint the rubberband
 		rubberBand()->setEnabled(true);
 		rubberBand()->setGeometry(QRect( m_origin, QSize()));
 		rubberBand()->show();
 
 		//the trackView(index) and the miditime where the mouse has clicked
-		m_rubberBandStartTrackview = trackViews().indexOf(
-					const_cast<TrackView*>(trackViewAt( _me->pos().y() - m_timeLine->height())));
-		if( m_rubberBandStartTrackview == -1 )
+		const TrackView * tv = trackViewAt(_me->pos().y() - m_timeLine->height());
+		m_rubberBandStartTrackview = 0;
+		if (tv)
 		{
-			m_rubberBandStartTrackview = trackViews().count();
+			for (QList<TrackView *>::const_iterator it = trackViews().begin(); it != trackViews().end(); ++it)
+			{
+				if ((*it) == tv) {break;}
+				m_rubberBandStartTrackview++;
+			}
 		}
+		else
+		{
+			m_rubberBandStartTrackview = (_me->pos().y() < m_timeLine->height() ? 0 : trackViews().count());
+		}
+
 		m_rubberbandStartMidipos = MidiTime((_me->pos().x() - widgetTotal)
 											/ pixelsPerTact() * MidiTime::ticksPerTact())
 											+ m_currentPosition;
@@ -719,6 +753,7 @@ void SongEditor::zoomingChanged()
 	m_song->m_playPos[Song::Mode_PlaySong].m_timeLine->
 					setPixelsPerTact( pixelsPerTact() );
 	realignTracks();
+	updateRubberband();
 }
 
 

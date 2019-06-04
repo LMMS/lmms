@@ -144,6 +144,7 @@ private:
 	QPoint m_mousePos;
 	int m_rubberBandStartTrackview;
 	MidiTime m_rubberbandStartMidipos;
+	int m_currentZoomingValue;
 
 	friend class SongEditorWindow;
 
