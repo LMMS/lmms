@@ -145,6 +145,7 @@ private:
 	int m_rubberBandStartTrackview;
 	MidiTime m_rubberbandStartMidipos;
 	int m_currentZoomingValue;
+	int m_trackHeadWidth;
 
 	friend class SongEditorWindow;
 
