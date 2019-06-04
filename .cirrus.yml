@@ -1,0 +1,11 @@
+FreeBSD_task:
+  freebsd_instance:
+    image: freebsd-12-0-release-amd64
+  env:
+    ASSUME_ALWAYS_YES: TRUE # required for unattended "pkg" invocation
+  script:
+    - git submodule update --init --recursive
+    - pkg install cmake fftw3 fftw3-float qt-creator qt5-x11extras pulseaudio sdl20_mixer
+    - cmake -DWANT_QT5=ON
+    - make -j 2
+
