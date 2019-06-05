@@ -578,7 +578,7 @@ void Mixer::changeQuality( const struct qualitySettings & _qs )
 void Mixer::doSetAudioDevice( AudioDevice * _dev )
 {
 	// TODO: Use shared_ptr here in the future.
-	// Currently, this is save, because this is only called by
+	// Currently, this is safe, because this is only called by
 	// ProjectRenderer, and after ProjectRenderer calls this function,
 	// it does not access the old device anymore.
 	if( m_audioDev != m_oldAudioDev ) {delete m_audioDev;}
