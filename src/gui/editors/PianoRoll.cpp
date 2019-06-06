@@ -1191,9 +1191,11 @@ void PianoRoll::keyPressEvent(QKeyEvent* ke)
 	{
 		const int key_num = PianoView::getKeyFromKeyEvent( ke ) + ( DefaultOctave - 1 ) * KeysPerOctave;
 
-		if(! ke->isAutoRepeat() && key_num > -1)
+		if (!ke->isAutoRepeat() && key_num > -1)
 		{
-			m_pattern->instrumentTrack()->pianoModel()->handleKeyPress( key_num );
+			m_pattern->instrumentTrack()->pianoModel()->handleKeyPress(key_num);
+			//  if a chord is set, play all chord notes (simulate click on all):
+			playChordNotes(key_num);
 			ke->accept();
 		}
 	}
@@ -1391,10 +1393,11 @@ void PianoRoll::keyReleaseEvent(QKeyEvent* ke )
 	if( hasValidPattern() && ke->modifiers() == Qt::NoModifier )
 	{
 		const int key_num = PianoView::getKeyFromKeyEvent( ke ) + ( DefaultOctave - 1 ) * KeysPerOctave;
-
-		if( ! ke->isAutoRepeat() && key_num > -1 )
+		if (!ke->isAutoRepeat() && key_num > -1)
 		{
-			m_pattern->instrumentTrack()->pianoModel()->handleKeyRelease( key_num );
+			m_pattern->instrumentTrack()->pianoModel()->handleKeyRelease(key_num);
+			// if a chord is set, simulate click release on all chord notes
+			pauseChordNotes(key_num);
 			ke->accept();
 		}
 	}
@@ -1839,7 +1842,9 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 			{
 				// left click - play the note
 				int v = ( (float) x ) / ( (float) WHITE_KEY_WIDTH ) * MidiDefaultVelocity;
-				m_pattern->instrumentTrack()->pianoModel()->handleKeyPress( key_num, v );
+				m_pattern->instrumentTrack()->pianoModel()->handleKeyPress(key_num, v);
+				// if a chord is set, play the chords notes as well:
+				playChordNotes(key_num, v);
 			}
 		}
 		else
@@ -1942,7 +1947,10 @@ void PianoRoll::testPlayNote( Note * n )
 
 		const int baseVelocity = m_pattern->instrumentTrack()->midiPort()->baseVelocity();
 
-		m_pattern->instrumentTrack()->pianoModel()->handleKeyPress( n->key(), n->midiVelocity( baseVelocity ) );
+		m_pattern->instrumentTrack()->pianoModel()->handleKeyPress(n->key(), n->midiVelocity(baseVelocity));
+
+		// if a chord is set, play the chords notes as well:
+		playChordNotes(n->key(), n->midiVelocity(baseVelocity));
 
 		MidiEvent event( MidiMetaEvent, -1, n->key(), panningToMidi( n->getPanning() ) );
 
@@ -1965,6 +1973,9 @@ void PianoRoll::pauseTestNotes( bool pause )
 			{
 				// stop note
 				m_pattern->instrumentTrack()->pianoModel()->handleKeyRelease( note->key() );
+
+				// if a chord was set, stop the chords notes as well:
+				pauseChordNotes(note->key());
 			}
 			else
 			{
@@ -1976,19 +1987,56 @@ void PianoRoll::pauseTestNotes( bool pause )
 	}
 }
 
+void PianoRoll::playChordNotes(int key, int velocity)
+{
+	// if a chord is set, play the chords notes beside the base note.
+	Piano *pianoModel = m_pattern->instrumentTrack()->pianoModel();
+	const InstrumentFunctionNoteStacking::Chord & chord =
+			InstrumentFunctionNoteStacking::ChordTable::getInstance().getChordByName(
+				m_chordModel.currentText());
+	if (!chord.isEmpty())
+	{
+		for (int i = 1; i < chord.size(); ++i)
+		{
+			pianoModel->handleKeyPress(key + chord[i], velocity);
+		}
+	}
+}
+
+void PianoRoll::pauseChordNotes(int key)
+{
+	// if a chord was set, stop the chords notes beside the base note.
+	Piano *pianoModel = m_pattern->instrumentTrack()->pianoModel();
+	const InstrumentFunctionNoteStacking::Chord & chord =
+			InstrumentFunctionNoteStacking::ChordTable::getInstance().getChordByName(
+				m_chordModel.currentText());
+	if (!chord.isEmpty())
+	{
+		for (int i = 1; i < chord.size(); ++i)
+		{
+			pianoModel->handleKeyRelease(key + chord[i]);
+		}
+	}
+}
+
 
 
 
 void PianoRoll::testPlayKey( int key, int velocity, int pan )
 {
+	Piano *pianoModel = m_pattern->instrumentTrack()->pianoModel();
 	// turn off old key
-	m_pattern->instrumentTrack()->pianoModel()->handleKeyRelease( m_lastKey );
+	pianoModel->handleKeyRelease( m_lastKey );
+	// if a chord was set, stop the chords notes as well
+	pauseChordNotes(m_lastKey);
 
 	// remember which one we're playing
 	m_lastKey = key;
 
 	// play new key
-	m_pattern->instrumentTrack()->pianoModel()->handleKeyPress( key, velocity );
+	pianoModel->handleKeyPress( key, velocity );
+	// and if a chord is set, play chord notes:
+	playChordNotes(key, velocity);
 }
 
 
@@ -2118,6 +2166,7 @@ void PianoRoll::mouseReleaseEvent( QMouseEvent * me )
 			{
 				m_pattern->instrumentTrack()->pianoModel()->
 						handleKeyRelease( note->key() );
+				pauseChordNotes(note->key());
 				note->setIsPlaying( false );
 			}
 		}
@@ -2125,6 +2174,7 @@ void PianoRoll::mouseReleaseEvent( QMouseEvent * me )
 		// stop playing keys that we let go of
 		m_pattern->instrumentTrack()->pianoModel()->
 						handleKeyRelease( m_lastKey );
+		pauseChordNotes(m_lastKey);
 	}
 
 	m_currentNote = NULL;
@@ -2312,6 +2362,7 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 				{
 					// mouse not over this note, stop playing it.
 					m_pattern->instrumentTrack()->pianoModel()->handleKeyRelease( n->key() );
+					pauseChordNotes(n->key());
 
 					n->setIsPlaying( false );
 				}
@@ -3789,21 +3840,6 @@ void PianoRoll::finishRecordNote(const Note & n )
 							it->key(), it->getVolume(),
 							it->getPanning() );
 					n1.quantizeLength( quantization() );
-
-					//Get selected chord
-					const InstrumentFunctionNoteStacking::Chord & chord = InstrumentFunctionNoteStacking::ChordTable::getInstance()
-						.getChordByName( m_chordModel.currentText() );
-
-					if( !chord.isEmpty() )
-					{
-						for( int i = 1; i < chord.size(); i++ )
-						{
-							Note new_note( n.length(), it->pos(), it->key() + chord[i] );
-							new_note.setPanning( it->getPanning() );
-							new_note.setVolume( it->getVolume() );
-							m_pattern->addNote( new_note );
-						}
-					}
 					m_pattern->addNote( n1 );
 					update();
 					m_recordingNotes.erase( it );
