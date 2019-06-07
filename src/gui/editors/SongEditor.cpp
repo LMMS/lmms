@@ -329,9 +329,9 @@ void SongEditor::updateRubberband()
 		int rubberBandTrackview = 0;
 		if (tv)
 		{
-			for (QList<TrackView *>::const_iterator it = trackViews().begin(); it != trackViews().end(); ++it)
+			for (auto it : trackViews())
 			{
-				if ((*it) == tv) {break;}
+				if (it == tv) {break;}
 				rubberBandTrackview++;
 			}
 		}
@@ -344,28 +344,23 @@ void SongEditor::updateRubberband()
 		MidiTime rubberbandMidipos = MidiTime((m_mousePos.x() - m_trackHeadWidth) / pixelsPerTact()
 											  * MidiTime::ticksPerTact()) + m_currentPosition ;
 		//collect all Tcos
-		QVector<selectableObject *> so;
-		QList<selectableObject *> l = findChildren<selectableObject *>();
+		auto l = findChildren<selectableObject *>();
 
-		for (QList<selectableObject *>::iterator it = l.begin(); it != l.end(); ++it)
-		{
-			so.push_back( *it );
-		}
 		//are tcos in the rect of selection?
-		for (QVector<selectableObject *>::iterator it = so.begin(); it != so.end(); ++it)
+		for (auto &it : l)
 		{
-			TrackContentObjectView * tco = dynamic_cast<TrackContentObjectView*>(*it);
+			TrackContentObjectView * tco = dynamic_cast<TrackContentObjectView*>(it);
 
 			if (trackViews().indexOf(tco->getTrackView())     >= qMin(m_rubberBandStartTrackview, rubberBandTrackview)
 			&&  trackViews().indexOf(tco->getTrackView())     <= qMax(m_rubberBandStartTrackview, rubberBandTrackview)
 			&&  tco->getTrackContentObject()->endPosition()   >= qMin(m_rubberbandStartMidipos, rubberbandMidipos)
 			&&  tco->getTrackContentObject()->startPosition() <= qMax(m_rubberbandStartMidipos, rubberbandMidipos))
 			{
-				(*it)->setSelected(true);
+				it->setSelected(true);
 			}
 			else
 			{
-				(*it)->setSelected(false);
+				it->setSelected(false);
 			}
 		}
 	}
@@ -510,9 +505,9 @@ void SongEditor::mousePressEvent(QMouseEvent *_me)
 		m_rubberBandStartTrackview = 0;
 		if (tv)
 		{
-			for (QList<TrackView *>::const_iterator it = trackViews().begin(); it != trackViews().end(); ++it)
+			for (auto it : trackViews())
 			{
-				if ((*it) == tv) {break;}
+				if it == tv) {break;}
 				m_rubberBandStartTrackview++;
 			}
 		}
