@@ -3,7 +3,7 @@
  "background": "@CMAKE_SOURCE_DIR@/cmake/apple/dmg_branding.png",
  "icon-size": 128,
  "contents": [
-   { "x": 196, "y": 200, "type": "file", "path": "@CMAKE_BINARY_DIR@/@MACOSX_BUNDLE_BUNDLE_NAME@.app" },
-   { "x": 510, "y": 200, "type": "link", "path": "/Applications" }
+   { "x": 139, "y": 200, "type": "file", "path": "@CMAKE_BINARY_DIR@/@MACOSX_BUNDLE_BUNDLE_NAME@.app" },
+   { "x": 568, "y": 200, "type": "link", "path": "/Applications" }
  ]
 }
