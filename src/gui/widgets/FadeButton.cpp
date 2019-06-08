@@ -107,7 +107,6 @@ void FadeButton::customEvent( QEvent * )
 
 
 
-
 void FadeButton::paintEvent( QPaintEvent * _pe )
 {
 	QColor col = m_normalColor;
@@ -115,17 +114,7 @@ void FadeButton::paintEvent( QPaintEvent * _pe )
 	if( ! m_stateTimer.isNull() && m_stateTimer.elapsed() < FadeDuration )
 	{
 		// The first part of the fade, when a note is triggered.
-		const float state = 1 - m_stateTimer.elapsed() / FadeDuration;
-		const int r = (int)( m_holdColor.red() *
-					( 1.0f - state ) +
-			m_activatedColor.red() * state );
-		const int g = (int)( m_holdColor.green() *
-					( 1.0f - state ) +
-			m_activatedColor.green() * state );
-		const int b = (int)( m_holdColor.blue() *
-					( 1.0f - state ) +
-			m_activatedColor.blue() * state );
-		col.setRgb( r, g, b );
+		col = fadeToColor(m_activatedColor, m_holdColor, m_stateTimer, FadeDuration);
 		QTimer::singleShot( 20, this, SLOT( update() ) );
 	}
 	else if ( ! m_stateTimer.isNull()
@@ -138,17 +127,7 @@ void FadeButton::paintEvent( QPaintEvent * _pe )
 	else if ( ! m_releaseTimer.isNull() && m_releaseTimer.elapsed() < FadeDuration )
 	{
 		// Last note just ended. Fade to default color.
-		const float state = 1 - m_releaseTimer.elapsed() / FadeDuration;
-		const int r = (int)( m_normalColor.red() *
-					( 1.0f - state ) +
-			m_holdColor.red() * state );
-		const int g = (int)( m_normalColor.green() *
-					( 1.0f - state ) +
-			m_holdColor.green() * state );
-		const int b = (int)( m_normalColor.blue() *
-					( 1.0f - state ) +
-			m_holdColor.blue() * state );
-		col.setRgb( r, g, b );
+		col = fadeToColor(m_holdColor, m_normalColor, m_releaseTimer, FadeDuration);
 		QTimer::singleShot( 20, this, SLOT( update() ) );
 	}
 	else
@@ -171,6 +150,24 @@ void FadeButton::paintEvent( QPaintEvent * _pe )
 }
 
 
+QColor FadeButton::fadeToColor(QColor startCol, QColor endCol, QTime timer, float duration)
+{
+	QColor col;
+
+	const float state = 1 - timer.elapsed() / duration;
+	const int r = (int)( endCol.red() *
+				( 1.0f - state ) +
+		startCol.red() * state );
+	const int g = (int)( endCol.green() *
+				( 1.0f - state ) +
+		startCol.green() * state );
+	const int b = (int)( endCol.blue() *
+				( 1.0f - state ) +
+		startCol.blue() * state );
+	col.setRgb( r, g, b );
+
+	return col;
+}
 
 
 void FadeButton::signalUpdate()

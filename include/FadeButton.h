@@ -64,6 +64,7 @@ private:
 	int activeNotes;
 
 	void signalUpdate();
+	QColor fadeToColor(QColor, QColor, QTime, float);
 
 } ;
 
