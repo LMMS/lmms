@@ -58,8 +58,11 @@ private:
 	QTime m_stateTimer;
 	QTime m_releaseTimer;
 
+	// the default color of the widget
 	QColor m_normalColor;
+	// the color on note play
 	QColor m_activatedColor;
+	// the color after the "play" fade is done but a note is still playing
 	QColor m_holdColor;
 	int activeNotes;
 
