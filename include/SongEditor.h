@@ -113,6 +113,8 @@ private:
 
 	virtual bool allowRubberband() const;
 
+	int trackNumber(int yPos);
+
 
 	Song * m_song;
 

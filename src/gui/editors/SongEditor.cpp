@@ -325,42 +325,29 @@ void SongEditor::updateRubberband()
 										).normalized());
 
 		//the index of the TrackView the mouse is hover
-		const TrackView * tv = trackViewAt(m_mousePos.y() - m_timeLine->height());
-		int rubberBandTrackview = 0;
-		if (tv)
-		{
-			for (auto it : trackViews())
-			{
-				if (it == tv) {break;}
-				rubberBandTrackview++;
-			}
-		}
-		else
-		{
-			rubberBandTrackview = (m_mousePos.y() < m_timeLine->height() ? 0 : trackViews().count());
-		}
+		int rubberBandTrackview = trackNumber(m_mousePos.y());
 
 		//the miditime the mouse is hover
 		MidiTime rubberbandMidipos = MidiTime((m_mousePos.x() - m_trackHeadWidth) / pixelsPerTact()
 											  * MidiTime::ticksPerTact()) + m_currentPosition ;
-		//collect all Tcos
-		auto l = findChildren<selectableObject *>();
-
 		//are tcos in the rect of selection?
-		for (auto &it : l)
+		for (auto &it : findChildren<selectableObject *>())
 		{
 			TrackContentObjectView * tco = dynamic_cast<TrackContentObjectView*>(it);
+			if(tco)
+			{
+				if (trackViews().indexOf(tco->getTrackView())     >= qMin(m_rubberBandStartTrackview, rubberBandTrackview)
+				&&  trackViews().indexOf(tco->getTrackView())     <= qMax(m_rubberBandStartTrackview, rubberBandTrackview)
+				&&  tco->getTrackContentObject()->endPosition()   >= qMin(m_rubberbandStartMidipos, rubberbandMidipos)
+				&&  tco->getTrackContentObject()->startPosition() <= qMax(m_rubberbandStartMidipos, rubberbandMidipos))
+				{
+					it->setSelected(true);
+				}
+				else
+				{
+					it->setSelected(false);
+				}
 
-			if (trackViews().indexOf(tco->getTrackView())     >= qMin(m_rubberBandStartTrackview, rubberBandTrackview)
-			&&  trackViews().indexOf(tco->getTrackView())     <= qMax(m_rubberBandStartTrackview, rubberBandTrackview)
-			&&  tco->getTrackContentObject()->endPosition()   >= qMin(m_rubberbandStartMidipos, rubberbandMidipos)
-			&&  tco->getTrackContentObject()->startPosition() <= qMax(m_rubberbandStartMidipos, rubberbandMidipos))
-			{
-				it->setSelected(true);
-			}
-			else
-			{
-				it->setSelected(false);
 			}
 		}
 	}
@@ -501,22 +488,9 @@ void SongEditor::mousePressEvent(QMouseEvent *_me)
 		rubberBand()->show();
 
 		//the trackView(index) and the miditime where the mouse has clicked
-		const TrackView * tv = trackViewAt(_me->pos().y() - m_timeLine->height());
-		m_rubberBandStartTrackview = 0;
-		if (tv)
-		{
-			for (auto it : trackViews())
-			{
-				if it == tv) {break;}
-				m_rubberBandStartTrackview++;
-			}
-		}
-		else
-		{
-			m_rubberBandStartTrackview = (_me->pos().y() < m_timeLine->height() ? 0 : trackViews().count());
-		}
+		m_rubberBandStartTrackview = trackNumber(_me->y());
 
-		m_rubberbandStartMidipos = MidiTime((_me->pos().x() - m_trackHeadWidth)
+		m_rubberbandStartMidipos = MidiTime((_me->x() - m_trackHeadWidth)
 											/ pixelsPerTact() * MidiTime::ticksPerTact())
 											+ m_currentPosition;
 	}
@@ -748,6 +722,28 @@ void SongEditor::zoomingChanged()
 bool SongEditor::allowRubberband() const
 {
 	return m_mode == SelectMode;
+}
+
+
+
+
+int SongEditor::trackNumber(int yPos)
+{
+	int tn = 0;
+	const TrackView * tv = trackViewAt(yPos - m_timeLine->height());
+	if (tv)
+	{
+		for (auto it : trackViews())
+		{
+			if (it == tv) {break;}
+			tn++;
+		}
+	}
+	else
+	{
+		tn = (yPos < m_timeLine->height() ? 0 : trackViews().count());
+	}
+	return tn;
 }
 
 
