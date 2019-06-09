@@ -1212,6 +1212,7 @@ void Song::loadProject( const QString & fileName )
 bool Song::saveProjectFile( const QString & filename )
 {
 	DataFile dataFile( DataFile::SongProject );
+	m_savingProject = true;
 
 	m_tempoModel.saveSettings( dataFile, dataFile.head(), "bpm" );
 	m_timeSigModel.saveSettings( dataFile, dataFile.head(), "timesig" );
@@ -1232,6 +1233,8 @@ bool Song::saveProjectFile( const QString & filename )
 	}
 
 	saveControllerStates( dataFile, dataFile.content() );
+
+	m_savingProject = false;
 
 	return dataFile.writeFile( filename );
 }
@@ -1433,4 +1436,8 @@ QString Song::errorSummary()
 	errors.prepend( tr( "The following errors occured while loading: " ) );
 
 	return errors;
+}
+
+bool Song::isSavingProject() const {
+	return m_savingProject;
 }
