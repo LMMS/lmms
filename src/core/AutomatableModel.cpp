@@ -31,6 +31,7 @@
 #include "LocaleHelper.h"
 #include "Mixer.h"
 #include "ProjectJournal.h"
+#include "Song.h"
 
 long AutomatableModel::s_periodCounter = 0;
 
@@ -132,32 +133,37 @@ void AutomatableModel::saveSettings( QDomDocument& doc, QDomElement& element, co
 	}
 
 	if( m_controllerConnection && m_controllerConnection->getController()->type()
-				!= Controller::DummyController )
-	{
-		QDomElement controllerElement;
+				!= Controller::DummyController) {
+		// Skip saving MIDI connections if we're saving project and
+		// the discardMIDIConnections option is true.
+		if (!Engine::getSong()->isSavingProject()
+			|| !Engine::getSong()->getSaveOptions().discardMIDIConnections.value()
+			|| m_controllerConnection->getController()->type() != Controller::MidiController) {
+			QDomElement controllerElement;
 
-		// get "connection" element (and create it if needed)
-		QDomNode node = element.namedItem( "connection" );
-		if( node.isElement() )
-		{
-			controllerElement = node.toElement();
-		}
-		else
-		{
-			controllerElement = doc.createElement( "connection" );
-			element.appendChild( controllerElement );
-		}
+			// get "connection" element (and create it if needed)
+			QDomNode node = element.namedItem( "connection" );
+			if (node.isElement())
+			{
+				controllerElement = node.toElement();
+			}
+			else
+			{
+				controllerElement = doc.createElement( "connection" );
+				element.appendChild( controllerElement );
+			}
 
-		bool mustQuote = mustQuoteName(name);
-		QString elementName = mustQuote ? "controllerconnection"
+			bool mustQuote = mustQuoteName( name );
+			QString elementName = mustQuote ? "controllerconnection"
 						: name;
 
-		QDomElement element = doc.createElement( elementName );
-		if(mustQuote)
-			element.setAttribute( "nodename", name );
-		m_controllerConnection->saveSettings( doc, element );
+			QDomElement element = doc.createElement( elementName );
+			if (mustQuote)
+				element.setAttribute( "nodename", name );
+			m_controllerConnection->saveSettings( doc, element );
 
-		controllerElement.appendChild( element );
+			controllerElement.appendChild( element );
+		}
 	}
 }
 
