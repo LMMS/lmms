@@ -1272,7 +1272,7 @@ bool Song::guiSaveProjectAs( const QString & _file_name )
 	// After saving as, restore default save options.
 	m_saveOptions.setDefaultOptions();
 
-	if(saveResult)
+	if(!saveResult)
 	{
 		// Saving failed. Restore old filenames.
 		setProjectFileName(m_oldFileName);
