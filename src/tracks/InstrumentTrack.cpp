@@ -749,7 +749,12 @@ void InstrumentTrack::saveTrackSpecificSettings( QDomDocument& doc, QDomElement 
 	m_soundShaping.saveState( doc, thisElement );
 	m_noteStacking.saveState( doc, thisElement );
 	m_arpeggio.saveState( doc, thisElement );
-	m_midiPort.saveState( doc, thisElement );
+
+	// Don't save midi port info if the user chose to.
+	if (Engine::getSong()->isSavingProject()
+		&& !Engine::getSong()->getSaveOptions().discardMIDIConnections.value())
+		m_midiPort.saveState( doc, thisElement );
+
 	m_audioPort.effects()->saveState( doc, thisElement );
 }
 
