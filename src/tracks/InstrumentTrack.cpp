@@ -753,7 +753,9 @@ void InstrumentTrack::saveTrackSpecificSettings( QDomDocument& doc, QDomElement 
 	// Don't save midi port info if the user chose to.
 	if (Engine::getSong()->isSavingProject()
 		&& !Engine::getSong()->getSaveOptions().discardMIDIConnections.value())
+	{
 		m_midiPort.saveState( doc, thisElement );
+	}
 
 	m_audioPort.effects()->saveState( doc, thisElement );
 }
