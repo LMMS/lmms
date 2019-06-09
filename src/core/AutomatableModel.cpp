@@ -138,24 +138,27 @@ void AutomatableModel::saveSettings( QDomDocument& doc, QDomElement& element, co
 	bool skipMidiController = Engine::getSong()->isSavingProject()
 							  && Engine::getSong()->getSaveOptions().discardMIDIConnections.value();
 	if (m_controllerConnection && controllerType != Controller::DummyController
-		&& !(skipMidiController && controllerType == Controller::MidiController)) {
+		&& !(skipMidiController && controllerType == Controller::MidiController))
+	{
 		QDomElement controllerElement;
 
 		// get "connection" element (and create it if needed)
 		QDomNode node = element.namedItem( "connection" );
-		if (node.isElement()) {
+		if(node.isElement())
+		{
 			controllerElement = node.toElement();
-		} else {
+		}
+		else
+		{
 			controllerElement = doc.createElement( "connection" );
 			element.appendChild( controllerElement );
 		}
 
-		bool mustQuote = mustQuoteName( name );
-		QString elementName = mustQuote ? "controllerconnection"
-				: name;
+		bool mustQuote = mustQuoteName(name);
+		QString elementName = mustQuote ? "controllerconnection" : name;
 
 		QDomElement element = doc.createElement( elementName );
-		if (mustQuote)
+		if(mustQuote)
 			element.setAttribute( "nodename", name );
 		m_controllerConnection->saveSettings( doc, element );
 
