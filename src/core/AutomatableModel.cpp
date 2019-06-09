@@ -31,6 +31,7 @@
 #include "LocaleHelper.h"
 #include "Mixer.h"
 #include "ProjectJournal.h"
+#include "Song.h"
 
 long AutomatableModel::s_periodCounter = 0;
 
@@ -131,8 +132,15 @@ void AutomatableModel::saveSettings( QDomDocument& doc, QDomElement& element, co
 		}
 	}
 
-	if( m_controllerConnection && m_controllerConnection->getController()->type()
-				!= Controller::DummyController )
+	// Skip saving MIDI connections if we're saving project and
+	// the discardMIDIConnections option is true.
+	auto controllerType = m_controllerConnection
+			? m_controllerConnection->getController()->type()
+			: Controller::DummyController;
+	bool skipMidiController = Engine::getSong()->isSavingProject()
+							  && Engine::getSong()->getSaveOptions().discardMIDIConnections.value();
+	if (m_controllerConnection && controllerType != Controller::DummyController
+		&& !(skipMidiController && controllerType == Controller::MidiController))
 	{
 		QDomElement controllerElement;
 
