@@ -66,14 +66,14 @@ VersionedSaveDialog::VersionedSaveDialog( QWidget *parent,
 	layout->addLayout( hLayout, 2, 1 );
 
 	if (saveOptionsWidget) {
-		auto *groupBox = new QGroupBox(tr("Save Options"));
+		auto groupBox = new QGroupBox(tr("Save Options"));
 		auto optionsLayout = new QGridLayout;
 
 		optionsLayout->addWidget(saveOptionsWidget, 0, 0, Qt::AlignLeft);
 
 		groupBox->setLayout(optionsLayout);
 
-		layout->addWidget(groupBox, layout->rowCount()+1, 0, 1, -1);
+		layout->addWidget(groupBox, layout->rowCount() + 1, 0, 1, -1);
 	}
 
 	// Connect + and - buttons
@@ -177,10 +177,10 @@ bool VersionedSaveDialog::fileExistsQuery( QString FileName, QString WindowTitle
 SaveOptionsWidget::SaveOptionsWidget(Song::SaveOptions &saveOptions) {
 	auto *layout = new QVBoxLayout();
 
-	m_discardMIDIConnectionsCheckbox = new LedCheckBox( nullptr );
-	m_discardMIDIConnectionsCheckbox->setText(tr( "Discard MIDI connections"));
+	m_discardMIDIConnectionsCheckbox = new LedCheckBox(nullptr);
+	m_discardMIDIConnectionsCheckbox->setText(tr("Discard MIDI connections"));
 	m_discardMIDIConnectionsCheckbox->setModel(&saveOptions.discardMIDIConnections);
-	layout->addWidget( m_discardMIDIConnectionsCheckbox );
+	layout->addWidget(m_discardMIDIConnectionsCheckbox);
 
 	setLayout(layout);
 }
