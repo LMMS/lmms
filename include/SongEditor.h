@@ -113,7 +113,8 @@ private:
 
 	virtual bool allowRubberband() const;
 
-	int trackNumber(int yPos);
+	int trackIndexFromSelectionPoint(int yPos);
+	int indexOfTrackView(const TrackView* tv);
 
 
 	Song * m_song;
