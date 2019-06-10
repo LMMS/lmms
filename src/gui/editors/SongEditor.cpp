@@ -312,7 +312,11 @@ QString SongEditor::getSnapSizeString() const
 
 	if ( val >= 0 ){
 		int bars = 1 << val;
-		return QString( "%1 Bar" ).arg(bars);
+		if ( bars == 1 ) { return QString("1 Bar");
+		else
+		{
+			QString( "%1 Bars" ).arg(bars);
+		}
 	}
 	else {
 		int div = ( 1 << -val );
