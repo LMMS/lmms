@@ -2,7 +2,7 @@
  * FadeButton.cpp - implementation of fade-button
  *
  * Copyright (c) 2005-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- *
+ * 
  * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
