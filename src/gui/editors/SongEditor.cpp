@@ -77,7 +77,7 @@ SongEditor::SongEditor( Song * song ) :
 	m_song( song ),
 	m_zoomingModel(new ComboBoxModel()),
 	m_snappingModel(new ComboBoxModel()),
-	m_proportionalSnap( true ),
+	m_proportionalSnap( false ),
 	m_scrollBack( false ),
 	m_smoothScroll( ConfigManager::inst()->value( "ui", "smoothscroll" ).toInt() ),
 	m_mode(DrawMode)
