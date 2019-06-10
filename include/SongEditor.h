@@ -73,7 +73,9 @@ public:
 	void loadSettings( const QDomElement& element );
 
 	ComboBoxModel *zoomingModel() const;
+	ComboBoxModel *snappingModel() const;
 	float getSnapSize() const;
+	QString getSnapSizeString() const;
 
 public slots:
 	void scrolled( int new_pos );
@@ -145,7 +147,6 @@ private:
 	EditMode m_ctrlMode; // mode they were in before they hit ctrl
 
 	friend class SongEditorWindow;
-
 } ;
 
 
@@ -174,6 +175,8 @@ protected slots:
 	void lostFocus();
 	void adjustUiAfterProjectLoad();
 
+	void updateSnapLabel();
+
 signals:
 	void playTriggered();
 	void resized();
@@ -194,6 +197,7 @@ private:
 
 	ComboBox * m_zoomingComboBox;
 	ComboBox * m_snappingComboBox;
+	QLabel* m_snapSizeLabel;
 };
 
 #endif
