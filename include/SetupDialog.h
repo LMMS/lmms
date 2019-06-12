@@ -135,7 +135,6 @@ private:
 	bool m_disableBackup;
 	bool m_openLastProject;
 	bool m_NaNHandler;
-	bool m_hqAudioDev;
 	QString m_lang;
 	QStringList m_languages;
 
@@ -198,7 +197,6 @@ private:
 	QLineEdit * m_sf2FileLineEdit;
 #endif
 	QLineEdit * m_backgroundPicFileLineEdit;
-};
 
 	QLabel * restartWarningLbl;
 };
