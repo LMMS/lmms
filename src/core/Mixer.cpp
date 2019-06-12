@@ -577,21 +577,35 @@ void Mixer::changeQuality( const struct qualitySettings & _qs )
 
 
 
-void Mixer::setAudioDevice( AudioDevice * _dev,
-			    bool startNow )
+void Mixer::doSetAudioDevice( AudioDevice * _dev )
 {
-	stopProcessing();
+	// TODO: Use shared_ptr here in the future.
+	// Currently, this is safe, because this is only called by
+	// ProjectRenderer, and after ProjectRenderer calls this function,
+	// it does not access the old device anymore.
+	if( m_audioDev != m_oldAudioDev ) {delete m_audioDev;}
 
-	if( _dev == NULL )
+	if( _dev )
+	{
+		m_audioDev = _dev;
+	}
+	else
 	{
 		printf( "param _dev == NULL in Mixer::setAudioDevice(...). "
 					"Trying any working audio-device\n" );
 		m_audioDev = tryAudioDevices();
 	}
-	else
-	{
-		m_audioDev = _dev;
-	}
+}
+
+
+
+
+void Mixer::setAudioDevice( AudioDevice * _dev,
+			    bool startNow )
+{
+	stopProcessing();
+
+	doSetAudioDevice( _dev );
 
 	emit sampleRateChanged();
 
@@ -601,26 +615,16 @@ void Mixer::setAudioDevice( AudioDevice * _dev,
 
 
 
-void Mixer::setAudioDevice( AudioDevice * _dev,
+void Mixer::setAudioDevice(AudioDevice * _dev,
 				const struct qualitySettings & _qs,
 				bool _needs_fifo,
-				bool startNow )
+				bool startNow)
 {
-	// don't delete the audio-device
 	stopProcessing();
 
 	m_qualitySettings = _qs;
 
-	if( _dev == NULL )
-	{
-		printf( "param _dev == NULL in Mixer::setAudioDevice(...). "
-					"Trying any working audio-device\n" );
-		m_audioDev = tryAudioDevices();
-	}
-	else
-	{
-		m_audioDev = _dev;
-	}
+	doSetAudioDevice( _dev );
 
 	emit qualitySettingsChanged();
 	emit sampleRateChanged();
