@@ -25,6 +25,9 @@ matrix:
               depth: false
         - os: osx
           osx_image: xcode8.3
+before_install:
+    # appdmg doesn't work with old Node.js
+    - if [ "$TRAVIS_OS_NAME" = osx ]; then nvm install 10; fi
 install: ${TRAVIS_BUILD_DIR}/.travis/install.sh
 script: ${TRAVIS_BUILD_DIR}/.travis/script.sh
 after_script: ${TRAVIS_BUILD_DIR}/.travis/after_script.sh
