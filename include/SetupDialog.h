@@ -88,6 +88,8 @@ private slots:
 	void toggleSmoothScroll(bool enabled);
 	void toggleAnimateAFP(bool enabled);
 	void toggleSyncVSTPlugins(bool enabled);
+	void vstEmbedMethodChanged();
+	void toggleVSTAlwaysOnTop(bool en);
 	void toggleDisableAutoQuit(bool enabled);
 
 	// Audio settings widget.
@@ -117,9 +119,7 @@ private slots:
 	void openBackgroundPicFile();
 	void setBackgroundPicFile(const QString & backgroundPicFile);
 
-	void vstEmbedMethodChanged();
-	void toggleVSTAlwaysOnTop(bool en);
-
+	void showRestartWarning();
 
 private:
 	TabBar * m_tabBar;
