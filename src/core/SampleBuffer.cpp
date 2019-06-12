@@ -73,7 +73,7 @@ SampleBuffer::SampleBuffer() :
 	m_amplification( 1.0f ),
 	m_reversed( false ),
 	m_frequency( BaseFreq ),
-	m_sampleRate( Engine::mixer()->baseSampleRate() )
+	m_sampleRate( mixerSampleRate () )
 {
 
 	connect( Engine::mixer(), SIGNAL( sampleRateChanged() ), this, SLOT( sampleRateChanged() ) );
@@ -143,6 +143,11 @@ void SampleBuffer::sampleRateChanged()
 	update( true );
 }
 
+sample_rate_t SampleBuffer::mixerSampleRate()
+{
+	return Engine::mixer()->processingSampleRate();
+}
+
 
 void SampleBuffer::update( bool _keep_settings )
 {
@@ -178,7 +183,7 @@ void SampleBuffer::update( bool _keep_settings )
 		int_sample_t * buf = NULL;
 		sample_t * fbuf = NULL;
 		ch_cnt_t channels = DEFAULT_CHANNELS;
-		sample_rate_t samplerate = Engine::mixer()->baseSampleRate();
+		sample_rate_t samplerate = mixerSampleRate();
 		m_frames = 0;
 
 		const QFileInfo fileInfo( file );
@@ -366,10 +371,10 @@ void SampleBuffer::normalizeSampleRate( const sample_rate_t _src_sr,
 							bool _keep_settings )
 {
 	// do samplerate-conversion to our default-samplerate
-	if( _src_sr != Engine::mixer()->baseSampleRate() )
+	if( _src_sr != mixerSampleRate() )
 	{
 		SampleBuffer * resampled = resample( _src_sr,
-					Engine::mixer()->baseSampleRate() );
+					mixerSampleRate() );
 		MM_FREE( m_data );
 		m_frames = resampled->frames();
 		m_data = MM_ALLOC( sampleFrame, m_frames );

@@ -84,6 +84,7 @@ TimeLineWidget::TimeLineWidget( const int xoff, const int yoff, const float ppt,
 
 	m_xOffset -= s_posMarkerPixmap->width() / 2;
 
+	setMouseTracking(true);
 	m_pos.m_timeLine = this;
 
 	QTimer * updateTimer = new QTimer( this );
@@ -351,6 +352,7 @@ void TimeLineWidget::mousePressEvent( QMouseEvent* event )
 
 void TimeLineWidget::mouseMoveEvent( QMouseEvent* event )
 {
+	parentWidget()->update(); // essential for widgets that this timeline had taken their mouse move event from.
 	const MidiTime t = m_begin + static_cast<int>( qMax( event->x() - m_xOffset - m_moveXOff, 0 ) * MidiTime::ticksPerTact() / m_ppt );
 
 	switch( m_action )
