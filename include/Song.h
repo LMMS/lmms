@@ -48,7 +48,7 @@ const bpm_t MaxTempo = 999;
 const tick_t MaxSongLength = 9999 * DefaultTicksPerTact;
 
 
-class EXPORT Song : public TrackContainer
+class LMMS_EXPORT Song : public TrackContainer
 {
 	Q_OBJECT
 	mapPropertyFromModel( int,getTempo,setTempo,m_tempoModel );
@@ -64,6 +64,17 @@ public:
 		Mode_PlayAutomationPattern,
 		Mode_Count
 	} ;
+
+	struct SaveOptions {
+		/**
+		 * Should we discard MIDI ControllerConnections from project files?
+		 */
+		BoolModel discardMIDIConnections{false};
+
+		void setDefaultOptions() {
+			discardMIDIConnections.setValue(false);
+		}
+	};
 
 	void clearErrors();
 	void collectError( const QString error );
@@ -87,14 +98,21 @@ public:
 		{
 			return m_currentFrame;
 		}
+		inline void setJumped( const bool jumped )
+		{
+			m_jumped = jumped;
+		}
+		inline bool jumped() const
+		{
+			return m_jumped;
+		}
 		TimeLineWidget * m_timeLine;
 
 	private:
 		float m_currentFrame;
+		bool m_jumped;
 
 	} ;
-
-
 
 	void processNextBuffer();
 
@@ -194,9 +212,23 @@ public:
 	{
 		return m_recording;
 	}
+	
+	inline void setLoopRenderCount(int count)
+	{
+		if (count < 1)
+			m_loopRenderCount = 1;
+		else
+			m_loopRenderCount = count;
+		m_loopRenderRemaining = m_loopRenderCount;
+	}
+    
+	inline int getLoopRenderCount() const
+	{
+		return m_loopRenderCount;
+	}
 
 	bool isExportDone() const;
-	std::pair<MidiTime, MidiTime> getExportEndpoints() const;
+	int getExportProgress() const;
 
 	inline void setRenderBetweenMarkers( bool renderBetweenMarkers )
 	{
@@ -301,6 +333,11 @@ public:
 	void exportProjectMidi(QString const & exportFileName) const;
 
 	inline void setLoadOnLauch(bool value) { m_loadOnLaunch = value; }
+	SaveOptions &getSaveOptions() {
+		return m_saveOptions;
+	}
+
+	bool isSavingProject() const;
 
 public slots:
 	void playSong();
@@ -398,8 +435,11 @@ private:
 	volatile bool m_playing;
 	volatile bool m_paused;
 
+	bool m_savingProject;
 	bool m_loadingProject;
 	bool m_isCancelled;
+
+	SaveOptions m_saveOptions;
 
 	QStringList m_errors;
 
@@ -415,7 +455,14 @@ private:
 	tact_t m_elapsedTacts;
 
 	VstSyncController m_vstSyncController;
-
+    
+	int m_loopRenderCount;
+	int m_loopRenderRemaining;
+	MidiTime m_exportSongBegin;
+	MidiTime m_exportLoopBegin;
+	MidiTime m_exportLoopEnd;
+	MidiTime m_exportSongEnd;
+	MidiTime m_exportEffectiveLength;
 
 	friend class LmmsCore;
 	friend class SongEditor;

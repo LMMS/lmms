@@ -55,34 +55,34 @@ EqControlsDialog::EqControlsDialog( EqControls *controls ) :
 
 	EqSpectrumView * inSpec = new EqSpectrumView( &controls->m_inFftBands, this );
 	inSpec->move( 26, 17 );
-	inSpec->setColor( QColor( 54, 45, 142, 150 ) );
+	inSpec->setColor( QColor( 77, 101, 242, 150 ) );
 
 	EqSpectrumView * outSpec = new EqSpectrumView( &controls->m_outFftBands, this );
-	outSpec->setColor( QColor( 9, 166, 156, 150 ) );
+	outSpec->setColor( QColor( 0, 255, 239, 150 ) );
 	outSpec->move( 26, 17 );
 
 	m_parameterWidget = new EqParameterWidget( this , controls );
 	m_parameterWidget->move( 26, 17 );
 
 	setBand( 0, &controls->m_hpActiveModel, &controls->m_hpFeqModel, &controls->m_hpResModel, 0, QColor(255 ,255, 255), tr( "HP" ) ,0,0, &controls->m_hp12Model, &controls->m_hp24Model, &controls->m_hp48Model,0,0,0);
-	setBand( 1, &controls->m_lowShelfActiveModel, &controls->m_lowShelfFreqModel, &controls->m_lowShelfResModel, &controls->m_lowShelfGainModel, QColor(255 ,255, 255), tr( "Low Shelf" ), &controls->m_lowShelfPeakL , &controls->m_lowShelfPeakR,0,0,0,0,0,0 );
+	setBand( 1, &controls->m_lowShelfActiveModel, &controls->m_lowShelfFreqModel, &controls->m_lowShelfResModel, &controls->m_lowShelfGainModel, QColor(255 ,255, 255), tr( "Low-shelf" ), &controls->m_lowShelfPeakL , &controls->m_lowShelfPeakR,0,0,0,0,0,0 );
 	setBand( 2, &controls->m_para1ActiveModel, &controls->m_para1FreqModel, &controls->m_para1BwModel, &controls->m_para1GainModel, QColor(255 ,255, 255), tr( "Peak 1" ), &controls->m_para1PeakL, &controls->m_para1PeakR,0,0,0,0,0,0 );
 	setBand( 3, &controls->m_para2ActiveModel, &controls->m_para2FreqModel, &controls->m_para2BwModel, &controls->m_para2GainModel, QColor(255 ,255, 255), tr( "Peak 2" ), &controls->m_para2PeakL, &controls->m_para2PeakR,0,0,0,0,0,0 );
 	setBand( 4, &controls->m_para3ActiveModel, &controls->m_para3FreqModel, &controls->m_para3BwModel, &controls->m_para3GainModel, QColor(255 ,255, 255), tr( "Peak 3" ), &controls->m_para3PeakL, &controls->m_para3PeakR,0,0,0,0,0,0 );
 	setBand( 5, &controls->m_para4ActiveModel, &controls->m_para4FreqModel, &controls->m_para4BwModel, &controls->m_para4GainModel, QColor(255 ,255, 255), tr( "Peak 4" ), &controls->m_para4PeakL, &controls->m_para4PeakR,0,0,0,0,0,0 );
-	setBand( 6, &controls->m_highShelfActiveModel, &controls->m_highShelfFreqModel, &controls->m_highShelfResModel, &controls->m_highShelfGainModel, QColor(255 ,255, 255), tr( "High Shelf" ), &controls->m_highShelfPeakL, &controls->m_highShelfPeakR,0,0,0,0,0,0 );
+	setBand( 6, &controls->m_highShelfActiveModel, &controls->m_highShelfFreqModel, &controls->m_highShelfResModel, &controls->m_highShelfGainModel, QColor(255 ,255, 255), tr( "High-shelf" ), &controls->m_highShelfPeakL, &controls->m_highShelfPeakR,0,0,0,0,0,0 );
 	setBand( 7, &controls->m_lpActiveModel, &controls->m_lpFreqModel, &controls->m_lpResModel, 0, QColor(255 ,255, 255), tr( "LP" ) ,0,0,0,0,0, &controls->m_lp12Model, &controls->m_lp24Model, &controls->m_lp48Model);
 
 	QPixmap * faderBg = new QPixmap( PLUGIN_NAME::getIconPixmap( "faderback" ) );
 	QPixmap * faderLeds = new QPixmap( PLUGIN_NAME::getIconPixmap( "faderleds" ) );
 	QPixmap * faderKnob = new QPixmap( PLUGIN_NAME::getIconPixmap( "faderknob" ) );
 
-	EqFader * GainFaderIn = new EqFader( &controls->m_inGainModel, tr( "In Gain" ), this, faderBg, faderLeds, faderKnob, &controls->m_inPeakL, &controls->m_inPeakR );
+	EqFader * GainFaderIn = new EqFader( &controls->m_inGainModel, tr( "Input gain" ), this, faderBg, faderLeds, faderKnob, &controls->m_inPeakL, &controls->m_inPeakR );
 	GainFaderIn->move( 23, 295 );
 	GainFaderIn->setDisplayConversion( false );
 	GainFaderIn->setHintText( tr( "Gain" ), "dBv");
 
-	EqFader * GainFaderOut = new EqFader( &controls->m_outGainModel, tr( "Out Gain" ), this, faderBg, faderLeds, faderKnob, &controls->m_outPeakL, &controls->m_outPeakR );
+	EqFader * GainFaderOut = new EqFader( &controls->m_outGainModel, tr( "Output gain" ), this, faderBg, faderLeds, faderKnob, &controls->m_outPeakL, &controls->m_outPeakR );
 	GainFaderOut->move( 453, 295);
 	GainFaderOut->setDisplayConversion( false );
 	GainFaderOut->setHintText( tr( "Gain" ), "dBv" );
@@ -197,13 +197,13 @@ EqControlsDialog::EqControlsDialog( EqControls *controls ) :
 	QObject::connect( m_parameterWidget->getBandModels( 7 )->lp24 , SIGNAL ( dataChanged() ), m_parameterWidget, SLOT( updateHandle()));
 	QObject::connect( m_parameterWidget->getBandModels( 7 )->lp48 , SIGNAL ( dataChanged() ), m_parameterWidget, SLOT( updateHandle()));
 
-	automatableButtonGroup *lpBtnGrp = new automatableButtonGroup(this,tr ( "lp grp" ) );
+	automatableButtonGroup *lpBtnGrp = new automatableButtonGroup( this, tr( "LP group" ) );
 	lpBtnGrp->addButton( lp12Button );
 	lpBtnGrp->addButton( lp24Button );
 	lpBtnGrp->addButton( lp48Button );
 	lpBtnGrp->setModel( &m_controls->m_lpTypeModel, false);
 
-	automatableButtonGroup *hpBtnGrp = new automatableButtonGroup( this, tr( "hp grp" ) );
+	automatableButtonGroup *hpBtnGrp = new automatableButtonGroup( this, tr( "HP group" ) );
 	hpBtnGrp->addButton( hp12Button );
 	hpBtnGrp->addButton( hp24Button );
 	hpBtnGrp->addButton( hp48Button );

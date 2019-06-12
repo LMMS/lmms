@@ -44,6 +44,7 @@
 
 #include "embed.h"
 
+#include "plugin_export.h"
 
 extern "C"
 {
@@ -122,9 +123,6 @@ void LadspaEffect::changeSampleRate()
 	// the IDs of re-created controls have been saved and now need to be
 	// resolved again
 	AutomationPattern::resolveAllIDs();
-
-	// make sure, connections are ok
-	ControllerConnection::finalizeConnections();
 }
 
 
@@ -371,7 +369,11 @@ void LadspaEffect::pluginInstantiation()
 			}
 
 			p->scale = 1.0f;
-			if( manager->isPortToggled( m_key, port ) )
+			if( manager->isEnum( m_key, port ) )
+			{
+				p->data_type = ENUM;
+			}
+			else if( manager->isPortToggled( m_key, port ) )
 			{
 				p->data_type = TOGGLED;
 			}

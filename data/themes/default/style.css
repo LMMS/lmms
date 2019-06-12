@@ -146,11 +146,16 @@ PianoRoll {
 	qproperty-backgroundShade: rgba(255, 255, 255, 10);
 	qproperty-noteModeColor: #0bd556;
 	qproperty-noteColor: #0bd556;
+	qproperty-noteTextColor: #ffffff;
 	qproperty-noteOpacity: 165;
 	qproperty-noteBorders: false; /* boolean property, set false to have borderless notes */
-	qproperty-selectedNoteColor: #006b65;
+	qproperty-selectedNoteColor: #064d79;
+	qproperty-ghostNoteColor: #000000;
+	qproperty-ghostNoteTextColor: #ffffff;
+	qproperty-ghostNoteOpacity: 50;
+	qproperty-ghostNoteBorders: false;
 	qproperty-barColor: #078f3a;
-	qproperty-markedSemitoneColor: #06170E;
+	qproperty-markedSemitoneColor: rgba(255, 255, 255, 30);
 	/* Grid colors */
 	qproperty-lineColor: #292929;
 	qproperty-beatLineColor: #2d6b45;
@@ -180,6 +185,9 @@ GroupBox {
 VisualizationWidget  {
 	background: none;
 	border: none;
+	qproperty-normalColor: rgb(71, 253, 133);
+	qproperty-warningColor: rgb(255, 192, 64);
+	qproperty-clippingColor: rgb(255, 64, 64);
 }
 
 /* main toolbar cpu load widget - this can have transparent bg now */

@@ -26,7 +26,6 @@
 #include "FxLine.h"
 
 #include <QGraphicsProxyWidget>
-#include <QWhatsThis>
 
 #include "CaptionMenu.h"
 #include "FxMixer.h"
@@ -34,6 +33,24 @@
 #include "GuiApplication.h"
 #include "Song.h"
 
+bool FxLine::eventFilter( QObject *dist, QEvent *event )
+{
+	// If we are in a rename, capture the enter/return events and handle them
+	if ( event->type() == QEvent::KeyPress )
+	{
+		QKeyEvent * keyEvent = static_cast<QKeyEvent*>(event);
+		if( keyEvent->key() == Qt::Key_Enter || keyEvent->key() == Qt::Key_Return )
+		{
+			if( m_inRename )
+			{
+				renameFinished();
+				event->accept(); // Stop the event from propagating
+				return true;
+			}
+		}
+	}
+	return false;
+}
 
 const int FxLine::FxLineHeight = 287;
 QPixmap * FxLine::s_sendBgArrow = NULL;
@@ -78,20 +95,6 @@ FxLine::FxLine( QWidget * _parent, FxMixerView * _mv, int _channelIndex ) :
 	m_lcd->move( 4, 58 );
 	m_lcd->setMarginWidth( 1 );
 	
-	setWhatsThis( tr(
-	"The FX channel receives input from one or more instrument tracks.\n "
-	"It in turn can be routed to multiple other FX channels. LMMS automatically "
-	"takes care of preventing infinite loops for you and doesn't allow making "
-	"a connection that would result in an infinite loop.\n\n"
-	
-	"In order to route the channel to another channel, select the FX channel "
-	"and click on the \"send\" button on the channel you want to send to. "
-	"The knob under the send button controls the level of signal that is sent "
-	"to the channel.\n\n"
-	
-	"You can remove and move FX channels in the context menu, which is accessed "
-	"by right-clicking the FX channel.\n" ) );
-
 	QString name = Engine::fxMixer()->effectChannel( m_channelIndex )->m_name;
 	setToolTip( name );
 
@@ -100,6 +103,7 @@ FxLine::FxLine( QWidget * _parent, FxMixerView * _mv, int _channelIndex ) :
 	m_renameLineEdit->setFixedWidth( 65 );
 	m_renameLineEdit->setFont( pointSizeF( font(), 7.5f ) );
 	m_renameLineEdit->setReadOnly( true );
+	m_renameLineEdit->installEventFilter( this );
 
 	QGraphicsScene * scene = new QGraphicsScene();
 	scene->setSceneRect( 0, 0, 33, FxLineHeight );
@@ -234,8 +238,6 @@ void FxLine::contextMenuEvent( QContextMenuEvent * )
 		contextMenu->addSeparator();
 	}
 	contextMenu->addAction( embed::getIconPixmap( "cancel" ), tr( "Remove &unused channels" ), this, SLOT( removeUnusedChannels() ) );
-	contextMenu->addSeparator();
-	contextMenu->addHelpAction();
 	contextMenu->exec( QCursor::pos() );
 	delete contextMenu;
 }
@@ -262,6 +264,7 @@ void FxLine::renameChannel()
 void FxLine::renameFinished()
 {
 	m_inRename = false;
+	m_renameLineEdit->deselect();
 	m_renameLineEdit->setReadOnly( true );
 	m_renameLineEdit->setFixedWidth( 65 );
 	m_lcd->show();
@@ -311,14 +314,6 @@ void FxLine::moveChannelRight()
 {
 	FxMixerView * mix = gui->fxMixerView();
 	mix->moveChannelRight( m_channelIndex );
-}
-
-
-
-
-void FxLine::displayHelp()
-{
-	QWhatsThis::showText( mapToGlobal( rect().bottomRight() ), whatsThis() );
 }
 
 

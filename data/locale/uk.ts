@@ -1341,7 +1341,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>DECAY</source>
-        <translation>ЗГАСАННЯ</translation>
+        <translation>DECAY</translation>
     </message>
     <message>
         <source>Time:</source>
@@ -7359,7 +7359,7 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
     <message>
         <source>Vst Plugin Preset (*.fxp *.fxb)</source>
-        <translation>Передустановка VST плагіна (*.fxp, *.fxb)</translation>
+        <translation>Передустановка VST плагіна (*.fxp *.fxb)</translation>
     </message>
     <message>
         <source>: default</source>

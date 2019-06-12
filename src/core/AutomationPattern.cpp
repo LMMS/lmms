@@ -28,6 +28,7 @@
 
 #include "AutomationPatternView.h"
 #include "AutomationTrack.h"
+#include "LocaleHelper.h"
 #include "Note.h"
 #include "ProjectJournal.h"
 #include "BBTrackContainer.h"
@@ -98,16 +99,6 @@ AutomationPattern::AutomationPattern( const AutomationPattern & _pat_to_copy ) :
 	}
 }
 
-
-
-
-AutomationPattern::~AutomationPattern()
-{
-}
-
-
-
-
 bool AutomationPattern::addObject( AutomatableModel * _obj, bool _search_dup )
 {
 	if( _search_dup && m_objects.contains(_obj) )
@@ -154,11 +145,11 @@ void AutomationPattern::setProgressionType(
 void AutomationPattern::setTension( QString _new_tension )
 {
 	bool ok;
-	float nt = _new_tension.toFloat( & ok );
+	float nt = LocaleHelper::toFloat(_new_tension, & ok);
 
 	if( ok && nt > -0.01 && nt < 1.01 )
 	{
-		m_tension = _new_tension.toFloat();
+		m_tension = nt;
 	}
 }
 
@@ -595,7 +586,7 @@ void AutomationPattern::loadSettings( const QDomElement & _this )
 		if( element.tagName() == "time" )
 		{
 			m_timeMap[element.attribute( "pos" ).toInt()]
-				= element.attribute( "value" ).toFloat();
+				= LocaleHelper::toFloat(element.attribute("value"));
 		}
 		else if( element.tagName() == "object" )
 		{
@@ -629,12 +620,7 @@ const QString AutomationPattern::name() const
 	{
 		return m_objects.first()->fullDisplayName();
 	}
-	return tr( "Drag a control while pressing <%1>" ).arg(
-	#ifdef LMMS_BUILD_APPLE
-		"⌘");
-	#else
-		"Ctrl");
-	#endif
+	return tr( "Drag a control while pressing <%1>" ).arg(UI_CTRL_KEY);
 }
 
 
@@ -785,6 +771,16 @@ void AutomationPattern::resolveAllIDs()
 						if( o && dynamic_cast<AutomatableModel *>( o ) )
 						{
 							a->addObject( dynamic_cast<AutomatableModel *>( o ), false );
+						}
+						else
+						{
+							// FIXME: Remove this block once the automation system gets fixed
+							// This is a temporary fix for https://github.com/LMMS/lmms/issues/3781
+							o = Engine::projectJournal()->journallingObject(ProjectJournal::idFromSave(*k));
+							if( o && dynamic_cast<AutomatableModel *>( o ) )
+							{
+								a->addObject( dynamic_cast<AutomatableModel *>( o ), false );
+							}
 						}
 					}
 					a->m_idsToResolve.clear();

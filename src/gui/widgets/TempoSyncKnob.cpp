@@ -147,8 +147,6 @@ void TempoSyncKnob::contextMenuEvent( QContextMenuEvent * )
 	contextMenu.addSeparator();
 
 	}
-
-	contextMenu.addHelpAction();
 	contextMenu.exec( QCursor::pos() );
 
 	delete syncMenu;

@@ -43,7 +43,7 @@ enum knobTypes
 
 
 
-class EXPORT Knob : public QWidget, public FloatModelView
+class LMMS_EXPORT Knob : public QWidget, public FloatModelView
 {
 	Q_OBJECT
 	Q_ENUMS( knobTypes )
@@ -74,6 +74,7 @@ class EXPORT Knob : public QWidget, public FloatModelView
 public:
 	Knob( knobTypes _knob_num, QWidget * _parent = NULL, const QString & _name = QString() );
 	Knob( QWidget * _parent = NULL, const QString & _name = QString() ); //!< default ctor
+	Knob( const Knob& other ) = delete;
 	virtual ~Knob();
 
 	// TODO: remove
@@ -139,7 +140,6 @@ protected:
 
 private slots:
 	virtual void enterValue();
-	void displayHelp();
 	void friendlyUpdate();
 	void toggleScale();
 

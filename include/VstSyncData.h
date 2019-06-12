@@ -41,14 +41,15 @@
 
 struct VstSyncData
 {
-	bool isPlaying;
-	float ppqPos;
+	double ppqPos;
 	int timeSigNumer;
 	int timeSigDenom;
+	bool isPlaying;
 	bool isCycle;
 	bool hasSHM;
 	float cycleStart;
 	float cycleEnd;
+	bool m_playbackJumped;
 	int m_bufferSize;
 	int m_sampleRate;
 	int m_bpm;

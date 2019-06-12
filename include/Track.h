@@ -300,8 +300,6 @@ private:
 
 	TextFloat * m_hint;
 
-	MidiTime m_oldTime;// used for undo/redo while mouse-button is pressed
-
 // qproperty fields
 	QColor m_mutedColor;
 	QColor m_mutedBackgroundColor;
@@ -354,7 +352,7 @@ public:
 		}
 	}
 
-	bool canPasteSelection( MidiTime tcoPos, const QMimeData * mimeData );
+	bool canPasteSelection( MidiTime tcoPos, const QDropEvent *de );
 	bool pasteSelection( MidiTime tcoPos, QDropEvent * de );
 
 	MidiTime endPosition( const MidiTime & posStart );
@@ -438,6 +436,7 @@ private slots:
 	void cloneTrack();
 	void removeTrack();
 	void updateMenu();
+	void toggleRecording(bool on);
 	void recordingOn();
 	void recordingOff();
 	void clearTrack();
@@ -464,7 +463,7 @@ signals:
 
 
 // base-class for all tracks
-class EXPORT Track : public Model, public JournallingObject
+class LMMS_EXPORT Track : public Model, public JournallingObject
 {
 	Q_OBJECT
 	MM_OPERATORS
@@ -675,6 +674,10 @@ public:
 	}
 
 	virtual void update();
+
+	// Create a menu for assigning/creating channels for this track
+	// Currently instrument track and sample track supports it
+	virtual QMenu * createFxMenu(QString title, QString newFxLabel);
 
 
 public slots:

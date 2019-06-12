@@ -36,6 +36,7 @@
 #include "Piano.h"
 #include "PianoView.h"
 #include "Pitch.h"
+#include "Plugin.h"
 #include "Track.h"
 
 
@@ -52,6 +53,7 @@ class InstrumentTrackWindow;
 class InstrumentMidiIOView;
 class InstrumentMiscView;
 class Knob;
+class FxLineLcdSpinBox;
 class LcdSpinBox;
 class LeftRightNav;
 class midiPortMenu;
@@ -63,7 +65,7 @@ class LedCheckBox;
 class QLabel;
 
 
-class EXPORT InstrumentTrack : public Track, public MidiEventProcessor
+class LMMS_EXPORT InstrumentTrack : public Track, public MidiEventProcessor
 {
 	Q_OBJECT
 	MM_OPERATORS
@@ -146,7 +148,9 @@ public:
 
 
 	// load instrument whose name matches given one
-	Instrument * loadInstrument( const QString & _instrument_name );
+	Instrument * loadInstrument(const QString & _instrument_name,
+				const Plugin::Descriptor::SubPluginFeatures::Key* key = nullptr,
+				bool keyFromDnd = false);
 
 	AudioPort * audioPort()
 	{
@@ -427,6 +431,9 @@ protected slots:
 private:
 	virtual void modelChanged();
 	void viewInstrumentInDirection(int d);
+	//! adjust size of any child widget of the main tab
+	//! required to keep the old look when using a variable sized tab widget
+	void adjustTabSize(QWidget *w);
 
 	InstrumentTrack * m_track;
 	InstrumentTrackView * m_itv;
@@ -440,7 +447,7 @@ private:
 	QLabel * m_pitchLabel;
 	LcdSpinBox* m_pitchRangeSpinBox;
 	QLabel * m_pitchRangeLabel;
-	LcdSpinBox * m_effectChannelNumber;
+	FxLineLcdSpinBox * m_effectChannelNumber;
 
 
 

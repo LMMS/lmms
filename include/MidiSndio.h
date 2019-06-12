@@ -37,11 +37,10 @@
 
 #include "MidiClient.h"
 
-class QLineEdit;
 
-
-class MidiSndio : public MidiClientRaw, public QThread
+class MidiSndio : public QThread, public MidiClientRaw
 {
+	Q_OBJECT
 public:
 	MidiSndio( void );
 	virtual ~MidiSndio();

@@ -29,7 +29,6 @@
 #include <QtCore/QVector>
 #include <QWidget>
 #include <QDialog>
-#include <QtCore/QThread>
 #include <QPixmap>
 #include <QStaticText>
 
@@ -47,7 +46,7 @@ class SampleBuffer;
 
 
 
-class EXPORT Pattern : public TrackContentObject
+class LMMS_EXPORT Pattern : public TrackContentObject
 {
 	Q_OBJECT
 public:
@@ -163,7 +162,7 @@ class PatternView : public TrackContentObjectView
 
 public:
 	PatternView( Pattern* pattern, TrackView* parent );
-	virtual ~PatternView();
+	virtual ~PatternView() = default;
 
 	Q_PROPERTY(QColor noteFillColor READ getNoteFillColor WRITE setNoteFillColor)
 	Q_PROPERTY(QColor noteBorderColor READ getNoteBorderColor WRITE setNoteBorderColor)
@@ -188,6 +187,7 @@ public slots:
 
 protected slots:
 	void openInPianoRoll();
+	void setGhostInPianoRoll();
 
 	void resetName();
 	void changeName();

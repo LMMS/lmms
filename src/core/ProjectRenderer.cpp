@@ -27,6 +27,7 @@
 
 #include "ProjectRenderer.h"
 #include "Song.h"
+#include "PerfLog.h"
 
 #include "AudioFileWave.h"
 #include "AudioFileOgg.h"
@@ -151,7 +152,7 @@ void ProjectRenderer::startProcessing()
 		// Have to do mixer stuff with GUI-thread affinity in order to
 		// make slots connected to sampleRateChanged()-signals being called immediately.
 		Engine::mixer()->setAudioDevice( m_fileDev,
-						m_qualitySettings, false );
+						m_qualitySettings, false, false );
 
 		start(
 #ifndef LMMS_BUILD_WIN32
@@ -177,27 +178,24 @@ void ProjectRenderer::run()
 #endif
 #endif
 
+	PerfLogTimer perfLog("Project Render");
+
 	Engine::getSong()->startExport();
 	Engine::getSong()->updateLength();
 	// Skip first empty buffer.
 	Engine::mixer()->nextBuffer();
 
-	const Song::PlayPos & exportPos = Engine::getSong()->getPlayPos(
-							Song::Mode_PlaySong );
 	m_progress = 0;
-	std::pair<MidiTime, MidiTime> exportEndpoints = Engine::getSong()->getExportEndpoints();
-	tick_t startTick = exportEndpoints.first.getTicks();
-	tick_t endTick = exportEndpoints.second.getTicks();
-	tick_t lengthTicks = endTick - startTick;
+
+	// Now start processing
+	Engine::mixer()->startProcessing(false);
 
 	// Continually track and emit progress percentage to listeners.
-	while( exportPos.getTicks() < endTick &&
-				Engine::getSong()->isExporting() == true
-							&& !m_abort )
+	while (!Engine::getSong()->isExportDone() && !m_abort)
 	{
 		m_fileDev->processNextBuffer();
-		const int nprog = lengthTicks == 0 ? 100 : (exportPos.getTicks()-startTick) * 100 / lengthTicks;
-		if( m_progress != nprog )
+		const int nprog = Engine::getSong()->getExportProgress();
+		if (m_progress != nprog)
 		{
 			m_progress = nprog;
 			emit progressChanged( m_progress );
@@ -208,6 +206,8 @@ void ProjectRenderer::run()
 	Engine::mixer()->stopProcessing();
 
 	Engine::getSong()->stopExport();
+
+	perfLog.end();
 
 	// If the user aborted export-process, the file has to be deleted.
 	const QString f = m_fileDev->outputFile();

@@ -51,11 +51,11 @@ public:
 	FileBrowser( const QString & directories, const QString & filter,
 			const QString & title, const QPixmap & pm,
 			QWidget * parent, bool dirs_as_items = false, bool recurse = false );
-	virtual ~FileBrowser();
+	virtual ~FileBrowser() = default;
 
 private slots:
 	void reloadTree( void );
-	void expandItems( QTreeWidgetItem * item=NULL );
+	void expandItems( QTreeWidgetItem * item=NULL, QList<QString> expandedDirs = QList<QString>() );
 	// call with item=NULL to filter the entire tree
 	bool filterItems( const QString & filter, QTreeWidgetItem * item=NULL );
 	void giveFocusToFilter();
@@ -85,7 +85,11 @@ class FileBrowserTreeWidget : public QTreeWidget
 	Q_OBJECT
 public:
 	FileBrowserTreeWidget( QWidget * parent );
-	virtual ~FileBrowserTreeWidget();
+	virtual ~FileBrowserTreeWidget() = default;
+
+	//! This method returns a QList with paths (QString's) of all directories
+	//! that are expanded in the tree.
+	QList<QString> expandedDirs( QTreeWidgetItem * item = nullptr ) const;
 
 
 protected:
@@ -129,13 +133,13 @@ public:
 
 	void update( void );
 
-	inline QString fullName( QString path = QString::null )
+	inline QString fullName( QString path = QString() )
 	{
-		if( path == QString::null )
+		if( path.isEmpty() )
 		{
 			path = m_directories[0];
 		}
-		if( path != QString::null )
+		if( ! path.isEmpty() )
 		{
 			path += QDir::separator();
 		}

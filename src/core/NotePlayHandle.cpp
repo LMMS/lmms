@@ -53,7 +53,6 @@ NotePlayHandle::NotePlayHandle( InstrumentTrack* instrumentTrack,
 	PlayHandle( TypeNotePlayHandle, _offset ),
 	Note( n.length(), n.pos(), n.key(), n.getVolume(), n.getPanning(), n.detuning() ),
 	m_pluginData( NULL ),
-	m_filter( NULL ),
 	m_instrumentTrack( instrumentTrack ),
 	m_frames( 0 ),
 	m_totalFramesPlayed( 0 ),
@@ -63,6 +62,7 @@ NotePlayHandle::NotePlayHandle( InstrumentTrack* instrumentTrack,
 	m_subNotes(),
 	m_released( false ),
 	m_releaseStarted( false ),
+	m_hasMidiNote( false ),
 	m_hasParent( parent != NULL  ),
 	m_parent( parent ),
 	m_hadChildren( false ),
@@ -106,17 +106,6 @@ NotePlayHandle::NotePlayHandle( InstrumentTrack* instrumentTrack,
 		m_instrumentTrack->midiNoteOn( *this );
 	}
 
-	if( hasParent() || ! m_instrumentTrack->isArpeggioEnabled() )
-	{
-		const int baseVelocity = m_instrumentTrack->midiPort()->baseVelocity();
-
-		// send MidiNoteOn event
-		m_instrumentTrack->processOutEvent(
-			MidiEvent( MidiNoteOn, midiChannel(), midiKey(), midiVelocity( baseVelocity ) ),
-			MidiTime::fromFrames( offset(), Engine::framesPerTick() ),
-			offset() );
-	}
-
 	if( m_instrumentTrack->instrument()->flags() & Instrument::IsSingleStreamed )
 	{
 		setUsesBuffer( false );
@@ -155,8 +144,6 @@ NotePlayHandle::~NotePlayHandle()
 
 	m_subNotes.clear();
 
-	delete m_filter;
-
 	if( buffer() ) releaseBuffer();
 
 	unlock();
@@ -180,11 +167,6 @@ void NotePlayHandle::setVolume( volume_t _volume )
 void NotePlayHandle::setPanning( panning_t panning )
 {
 	Note::setPanning( panning );
-
-	MidiEvent event( MidiMetaEvent, midiChannel(), midiKey(), panningToMidi( panning ) );
-	event.setMetaEvent( MidiNotePanning );
-
-	m_instrumentTrack->processOutEvent( event );
 }
 
 
@@ -213,6 +195,21 @@ void NotePlayHandle::play( sampleFrame * _working_buffer )
 	}
 
 	lock();
+
+	if( m_totalFramesPlayed == 0 && !m_hasMidiNote
+		&& ( hasParent() || ! m_instrumentTrack->isArpeggioEnabled() ) )
+	{
+		m_hasMidiNote = true;
+
+		const int baseVelocity = m_instrumentTrack->midiPort()->baseVelocity();
+
+		// send MidiNoteOn event
+		m_instrumentTrack->processOutEvent(
+			MidiEvent( MidiNoteOn, midiChannel(), midiKey(), midiVelocity( baseVelocity ) ),
+			MidiTime::fromFrames( offset(), Engine::framesPerTick() ),
+			offset() );
+	}
+
 	if( m_frequencyNeedsUpdate )
 	{
 		updateFrequency();
@@ -238,13 +235,6 @@ void NotePlayHandle::play( sampleFrame * _working_buffer )
 	// decreasing release of an instrument-track while the note is active
 	if( framesLeft() > 0 )
 	{
-		// clear offset frames if we're at the first period
-		// skip for single-streamed instruments, because in their case NPH::play() could be called from an IPH without a buffer argument
-		// ... also, they don't actually render the sound in NPH's, which is an even better reason to skip...
-		if( m_totalFramesPlayed == 0 && ! ( m_instrumentTrack->instrument()->flags() & Instrument::IsSingleStreamed ) )
-		{
-			memset( _working_buffer, 0, sizeof( sampleFrame ) * offset() );
-		}
 		// play note!
 		m_instrumentTrack->playNote( this, _working_buffer );
 	}
@@ -372,8 +362,10 @@ void NotePlayHandle::noteOff( const f_cnt_t _s )
 	m_framesBeforeRelease = _s;
 	m_releaseFramesToDo = qMax<f_cnt_t>( 0, actualReleaseFramesToDo() );
 
-	if( hasParent() || ! m_instrumentTrack->isArpeggioEnabled() )
+	if( m_hasMidiNote )
 	{
+		m_hasMidiNote = false;
+
 		// send MidiNoteOff event
 		m_instrumentTrack->processOutEvent(
 				MidiEvent( MidiNoteOff, midiChannel(), midiKey(), 0 ),
@@ -554,7 +546,7 @@ void NotePlayHandle::resize( const bpm_t _new_tempo )
 
 NotePlayHandle ** NotePlayHandleManager::s_available;
 QReadWriteLock NotePlayHandleManager::s_mutex;
-AtomicInt NotePlayHandleManager::s_availableIndex;
+std::atomic_int NotePlayHandleManager::s_availableIndex;
 int NotePlayHandleManager::s_size;
 
 
@@ -589,7 +581,7 @@ NotePlayHandle * NotePlayHandleManager::acquire( InstrumentTrack* instrumentTrac
 		s_mutex.unlock();
 	}
 	s_mutex.lockForRead();
-	NotePlayHandle * nph = s_available[ s_availableIndex.fetchAndAddOrdered( -1 ) ];
+	NotePlayHandle * nph = s_available[s_availableIndex--];
 	s_mutex.unlock();
 
 	new( (void*)nph ) NotePlayHandle( instrumentTrack, offset, frames, noteToPlay, parent, midiEventChannel, origin );
@@ -601,7 +593,7 @@ void NotePlayHandleManager::release( NotePlayHandle * nph )
 {
 	nph->NotePlayHandle::~NotePlayHandle();
 	s_mutex.lockForRead();
-	s_available[ s_availableIndex.fetchAndAddOrdered( 1 ) + 1 ] = nph;
+	s_available[++s_availableIndex] = nph;
 	s_mutex.unlock();
 }
 
@@ -617,7 +609,7 @@ void NotePlayHandleManager::extend( int c )
 
 	for( int i=0; i < c; ++i )
 	{
-		s_available[ s_availableIndex.fetchAndAddOrdered( 1 ) + 1 ] = n;
+		s_available[++s_availableIndex] = n;
 		++n;
 	}
 }

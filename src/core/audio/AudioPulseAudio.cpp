@@ -103,6 +103,7 @@ void AudioPulseAudio::startProcessing()
 
 void AudioPulseAudio::stopProcessing()
 {
+	m_quit = true;
 	stopProcessingThread( this );
 }
 

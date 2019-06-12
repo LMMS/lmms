@@ -91,7 +91,7 @@ void AutomationPatternView::update()
 
 void AutomationPatternView::resetName()
 {
-	m_pat->setName( QString::null );
+	m_pat->setName( QString() );
 }
 
 
@@ -118,7 +118,7 @@ void AutomationPatternView::disconnectObject( QAction * _a )
 		float oldMin = m_pat->getMin();
 		float oldMax = m_pat->getMax();
 
-		m_pat->m_objects.erase( qFind( m_pat->m_objects.begin(),
+		m_pat->m_objects.erase( std::find( m_pat->m_objects.begin(),
 					m_pat->m_objects.end(),
 				dynamic_cast<AutomatableModel *>( j ) ) );
 		update();

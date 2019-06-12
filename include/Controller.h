@@ -27,7 +27,7 @@
 #ifndef CONTROLLER_H
 #define CONTROLLER_H
 
-#include "export.h"
+#include "lmms_export.h"
 #include "Engine.h"
 #include "Model.h"
 #include "JournallingObject.h"
@@ -41,7 +41,7 @@ class ControllerConnection;
 typedef QVector<Controller *> ControllerVector;
 
 
-class EXPORT Controller : public Model, public JournallingObject
+class LMMS_EXPORT Controller : public Model, public JournallingObject
 {
 	Q_OBJECT
 public:
@@ -130,6 +130,7 @@ public:
 	void removeConnection( ControllerConnection * );
 	int connectionCount() const;
 
+	bool hasModel( const Model * m ) const;
 
 public slots:
 	virtual ControllerDialog * createDialog( QWidget * _parent );
@@ -138,8 +139,6 @@ public slots:
 	{
 		m_name = _new_name;
 	}
-
-	bool hasModel( const Model * m );
 
 
 protected:

@@ -121,7 +121,7 @@ private:
 		float r;
 		float offset;
 		
-		if( not _state )
+		if( ! _state )
 		{
 			for( int i = 0; i < _pick; i++ )
 			{

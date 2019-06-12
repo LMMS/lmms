@@ -26,7 +26,8 @@
 #ifndef NOTE_PLAY_HANDLE_H
 #define NOTE_PLAY_HANDLE_H
 
-#include "AtomicInt.h"
+#include <memory>
+
 #include "BasicFilters.h"
 #include "Note.h"
 #include "PlayHandle.h"
@@ -41,12 +42,12 @@ typedef QList<NotePlayHandle *> NotePlayHandleList;
 typedef QList<const NotePlayHandle *> ConstNotePlayHandleList;
 
 
-class EXPORT NotePlayHandle : public PlayHandle, public Note
+class LMMS_EXPORT NotePlayHandle : public PlayHandle, public Note
 {
 	MM_OPERATORS
 public:
 	void * m_pluginData;
-	BasicFilters<> * m_filter;
+	std::unique_ptr<BasicFilters<>> m_filter;
 
 	// specifies origin of NotePlayHandle
 	enum Origins
@@ -302,6 +303,7 @@ private:
 	NotePlayHandleList m_subNotes;			// used for chords and arpeggios
 	volatile bool m_released;				// indicates whether note is released
 	bool m_releaseStarted;
+	bool m_hasMidiNote;
 	bool m_hasParent;						// indicates whether note has parent
 	NotePlayHandle * m_parent;			// parent note
 	bool m_hadChildren;
@@ -348,7 +350,7 @@ public:
 private:
 	static NotePlayHandle ** s_available;
 	static QReadWriteLock s_mutex;
-	static AtomicInt s_availableIndex;
+	static std::atomic_int s_availableIndex;
 	static int s_size;
 };
 

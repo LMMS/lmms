@@ -31,8 +31,9 @@
 #include "Mixer.h"
 
 
-class AudioDummy : public AudioDevice, public QThread
+class AudioDummy : public QThread, public AudioDevice
 {
+	Q_OBJECT
 public:
 	AudioDummy( bool & _success_ful, Mixer* mixer ) :
 		AudioDevice( DEFAULT_CHANNELS, mixer )

@@ -40,13 +40,16 @@ set(LMMS_SRCS
 	core/MixerWorkerThread.cpp
 	core/MixHelpers.cpp
 	core/Model.cpp
+	core/ModelVisitor.cpp
 	core/Note.cpp
 	core/NotePlayHandle.cpp
 	core/Oscillator.cpp
 	core/PeakController.cpp
+	core/PerfLog.cpp
 	core/Piano.cpp
 	core/PlayHandle.cpp
 	core/Plugin.cpp
+	core/PluginIssue.cpp
 	core/PluginFactory.cpp
 	core/PresetPreviewPlayHandle.cpp
 	core/ProjectJournal.cpp
@@ -66,6 +69,7 @@ set(LMMS_SRCS
 	core/TrackContainer.cpp
 	core/ValueBuffer.cpp
 	core/VstSyncController.cpp
+	core/StepRecorder.cpp
 
 	core/audio/AudioAlsa.cpp
 	core/audio/AudioDevice.cpp

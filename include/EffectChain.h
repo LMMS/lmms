@@ -33,7 +33,7 @@
 class Effect;
 
 
-class EXPORT EffectChain : public Model, public SerializingObject
+class LMMS_EXPORT EffectChain : public Model, public SerializingObject
 {
 	Q_OBJECT
 public:
@@ -56,11 +56,6 @@ public:
 	void startRunning();
 
 	void clear();
-
-	void setEnabled( bool _on )
-	{
-		m_enabledModel.setValue( _on );
-	}
 
 
 private:

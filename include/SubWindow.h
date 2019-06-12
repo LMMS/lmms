@@ -34,7 +34,7 @@
 #include <QPushButton>
 #include <QString>
 
-#include "export.h"
+#include "lmms_export.h"
 
 class QMoveEvent;
 class QResizeEvent;
@@ -48,7 +48,7 @@ class QWidget;
  *  for cusomizing the title bar appearance, lmms implements its own subwindow
  *  class.
  */
-class EXPORT SubWindow : public QMdiSubWindow
+class LMMS_EXPORT SubWindow : public QMdiSubWindow
 {
 	Q_OBJECT
 	Q_PROPERTY( QBrush activeColor READ activeColor WRITE setActiveColor )
@@ -92,7 +92,6 @@ private:
 	bool m_hasFocus;
 
 	static void elideText( QLabel *label, QString text );
-	bool isMaximized();
 	void adjustTitleBar();
 
 private slots:

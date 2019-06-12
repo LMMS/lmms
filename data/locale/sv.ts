@@ -1063,7 +1063,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>FREQ</source>
-        <translation>FREKV.</translation>
+        <translation>FREQ</translation>
     </message>
     <message>
         <source>Cutoff frequency</source>
@@ -1443,7 +1443,7 @@ Right clicking will bring up a context menu where you can change the order in wh
     </message>
     <message>
         <source>Freq x 100</source>
-        <translation>Frekv. x 100</translation>
+        <translation>Freq x 100</translation>
     </message>
     <message>
         <source>Modulate Env-Amount</source>
@@ -1454,7 +1454,7 @@ Right clicking will bring up a context menu where you can change the order in wh
     <name>EnvelopeAndLfoView</name>
     <message>
         <source>DEL</source>
-        <translation>RADERA</translation>
+        <translation>DEL</translation>
     </message>
     <message>
         <source>Predelay:</source>
@@ -1526,7 +1526,7 @@ Right clicking will bring up a context menu where you can change the order in wh
     </message>
     <message>
         <source>AMT</source>
-        <translation>MÄNGD</translation>
+        <translation>AMT</translation>
     </message>
     <message>
         <source>Modulation amount:</source>
@@ -1590,7 +1590,7 @@ Right clicking will bring up a context menu where you can change the order in wh
     </message>
     <message>
         <source>FREQ x 100</source>
-        <translation>FREKV. x 100</translation>
+        <translation>FREQ x 100</translation>
     </message>
     <message>
         <source>Click here if the frequency of this LFO should be multiplied by 100.</source>
@@ -1883,7 +1883,7 @@ Right clicking will bring up a context menu where you can change the order in wh
     </message>
     <message>
         <source>Freq: </source>
-        <translation>Frekv.:</translation>
+        <translation>Freq:</translation>
     </message>
 </context>
 <context>
@@ -3197,7 +3197,7 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     </message>
     <message>
         <source>FREQ</source>
-        <translation>FREKV.</translation>
+        <translation>FREQ</translation>
     </message>
     <message>
         <source>cutoff frequency:</source>
@@ -3275,7 +3275,7 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     </message>
     <message>
         <source>PAN</source>
-        <translation>PANORERA</translation>
+        <translation>PAN</translation>
     </message>
     <message>
         <source>MIDI</source>
@@ -3322,7 +3322,7 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     </message>
     <message>
         <source>PAN</source>
-        <translation>PANORERA</translation>
+        <translation>PAN</translation>
     </message>
     <message>
         <source>Pitch</source>
@@ -3939,7 +3939,7 @@ Besök https://lmms.io/documentation/ för dokumentation (Engelska).</translatio
     </message>
     <message>
         <source>&amp;View</source>
-        <translation>%Visa</translation>
+        <translation>&amp;Visa</translation>
     </message>
     <message>
         <source>Toggle metronome</source>
@@ -5982,14 +5982,14 @@ Orsak: &quot;%2&quot;</translation>
     </message>
     <message>
         <source>PAN</source>
-        <translation>PANORERA</translation>
+        <translation>PAN</translation>
     </message>
 </context>
 <context>
     <name>SetupDialog</name>
     <message>
         <source>Setup LMMS</source>
-        <translation>Ställ in LMMS</translation>
+        <translation>Inställningar</translation>
     </message>
     <message>
         <source>General settings</source>
@@ -6077,7 +6077,7 @@ Orsak: &quot;%2&quot;</translation>
     </message>
     <message>
         <source>STK rawwave directory</source>
-        <translation>Katalog för STK rå-vågform</translation>
+        <translation>Katalog för STK vågformer</translation>
     </message>
     <message>
         <source>Default Soundfont File</source>

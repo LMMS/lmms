@@ -26,6 +26,7 @@
 #include <QDir>
 #include <QMessageBox>
 #include <QApplication>
+#include <QStandardPaths>
 #include <QtCore/QTextStream>
 
 #include "ConfigManager.h"
@@ -50,7 +51,7 @@ ConfigManager * ConfigManager::s_instanceOfMe = NULL;
 
 ConfigManager::ConfigManager() :
 	m_lmmsRcFile( QDir::home().absolutePath() +"/.lmmsrc.xml" ),
-	m_workingDir( QDir::home().absolutePath() + "/lmms/"),
+	m_workingDir( QStandardPaths::writableLocation( QStandardPaths::DocumentsLocation ) + "/lmms/"),
 	m_dataDir( "data:/" ),
 	m_artworkDir( defaultArtworkDir() ),
 	m_vstDir( m_workingDir + "vst/" ),
@@ -58,6 +59,10 @@ ConfigManager::ConfigManager() :
 	m_sf2Dir( m_workingDir + SF2_PATH ),
 	m_version( defaultVersion() )
 {
+	// Detect < 1.2.0 working directory as a courtesy
+	if ( QFileInfo( QDir::home().absolutePath() + "/lmms/projects/" ).exists() )
+                m_workingDir = QDir::home().absolutePath() + "/lmms/";
+
 	if (! qgetenv("LMMS_DATA_DIR").isEmpty())
 		QDir::addSearchPath("data", QString::fromLocal8Bit(qgetenv("LMMS_DATA_DIR")));
 
@@ -197,13 +202,8 @@ QStringList ConfigManager::availabeVstEmbedMethods()
 	methods.append("win32");
 #endif
 #ifdef LMMS_BUILD_LINUX
-#if QT_VERSION >= 0x050000
 	if (static_cast<QGuiApplication*>(QApplication::instance())->
 		platformName() == "xcb")
-#else
-	if (qgetenv("QT_QPA_PLATFORM").isNull()
-		|| qgetenv("QT_QPA_PLATFORM") == "xcb")
-#endif
 	{
 		methods.append("xembed");
 	}
@@ -227,7 +227,7 @@ bool ConfigManager::hasWorkingDir() const
 
 void ConfigManager::setWorkingDir( const QString & wd )
 {
-	m_workingDir = ensureTrailingSlash( QFileInfo( wd ).canonicalFilePath() );
+	m_workingDir = ensureTrailingSlash( QDir::cleanPath( wd ) );
 }
 
 
@@ -279,9 +279,7 @@ void ConfigManager::setDefaultSoundfont( const QString & _sf )
 
 void ConfigManager::setBackgroundArtwork( const QString & _ba )
 {
-#ifdef LMMS_HAVE_FLUIDSYNTH
 	m_backgroundArtwork = _ba;
-#endif
 }
 
 void ConfigManager::setGIGDir(const QString &gd)
@@ -513,8 +511,9 @@ void ConfigManager::loadConfigFile( const QString & configFile )
 		cfg_file.close();
 	}
 
-
+	// Plugins are searched recursively, blacklist problematic locations
 	if( m_vstDir.isEmpty() || m_vstDir == QDir::separator() || m_vstDir == "/" ||
+			m_vstDir == ensureTrailingSlash( QDir::homePath() ) ||
 			!QDir( m_vstDir ).exists() )
 	{
 #ifdef LMMS_BUILD_WIN32

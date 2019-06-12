@@ -29,7 +29,7 @@
 #include "ui_patches_dialog.h"
 #include "LcdSpinBox.h"
 
-#include <fluidsynth.h>
+#include "fluidsynthshims.h"
 #include <QWidget>
 #include <QLabel>
 

@@ -616,19 +616,6 @@ PatternView::PatternView( Pattern* pattern, TrackView* parent ) :
 	setStyle( QApplication::style() );
 }
 
-
-
-
-
-
-PatternView::~PatternView()
-{
-}
-
-
-
-
-
 void PatternView::update()
 {
 	ToolTip::add(this, m_pat->name());
@@ -642,6 +629,18 @@ void PatternView::update()
 void PatternView::openInPianoRoll()
 {
 	gui->pianoRoll()->setCurrentPattern( m_pat );
+	gui->pianoRoll()->parentWidget()->show();
+	gui->pianoRoll()->show();
+	gui->pianoRoll()->setFocus();
+}
+
+
+
+
+
+void PatternView::setGhostInPianoRoll()
+{
+	gui->pianoRoll()->setGhostPattern( m_pat );
 	gui->pianoRoll()->parentWidget()->show();
 	gui->pianoRoll()->show();
 	gui->pianoRoll()->setFocus();
@@ -676,8 +675,14 @@ void PatternView::constructContextMenu( QMenu * _cm )
 	_cm->insertAction( _cm->actions()[0], a );
 	connect( a, SIGNAL( triggered( bool ) ),
 					this, SLOT( openInPianoRoll() ) );
-	_cm->insertSeparator( _cm->actions()[1] );
 
+	QAction * b = new QAction( embed::getIconPixmap( "ghost_note" ),
+						tr( "Set as ghost in piano-roll" ), _cm );
+	if( m_pat->empty() ) { b->setEnabled( false ); }
+	_cm->insertAction( _cm->actions()[1], b );
+	connect( b, SIGNAL( triggered( bool ) ),
+					this, SLOT( setGhostInPianoRoll() ) );
+	_cm->insertSeparator( _cm->actions()[2] );
 	_cm->addSeparator();
 
 	_cm->addAction( embed::getIconPixmap( "edit_erase" ),
@@ -710,8 +715,7 @@ void PatternView::mousePressEvent( QMouseEvent * _me )
 {
 	if( _me->button() == Qt::LeftButton &&
 				m_pat->m_patternType == Pattern::BeatPattern &&
-				( fixedTCOs() || pixelsPerTact() >= 96 ||
-				m_pat->m_steps != MidiTime::stepsPerTact() ) &&
+				( fixedTCOs() || pixelsPerTact() >= 96 ) &&
 				_me->y() > height() - s_stepBtnOff->height() )
 
 	// when mouse button is pressed in beat/bassline -mode
@@ -781,8 +785,7 @@ void PatternView::mouseDoubleClickEvent(QMouseEvent *_me)
 void PatternView::wheelEvent( QWheelEvent * _we )
 {
 	if( m_pat->m_patternType == Pattern::BeatPattern &&
-				( fixedTCOs() || pixelsPerTact() >= 96 ||
-				m_pat->m_steps != MidiTime::stepsPerTact() ) &&
+				( fixedTCOs() || pixelsPerTact() >= 96 ) &&
 				_we->y() > height() - s_stepBtnOff->height() )
 	{
 //	get the step number that was wheeled on and
@@ -900,8 +903,9 @@ void PatternView::paintEvent( QPaintEvent * )
 	}
 
 	// Compute pixels per tact
-	const int baseWidth = fixedTCOs() ? parentWidget()->width() : width();
-	const float pixelsPerTact = ( baseWidth - 2 * TCO_BORDER_WIDTH ) / (float) m_pat->length().getTact();
+	const int baseWidth = fixedTCOs() ? parentWidget()->width() - 2 * TCO_BORDER_WIDTH
+						: width() - TCO_BORDER_WIDTH;
+	const float pixelsPerTact = baseWidth / (float) m_pat->length().getTact();
 
 	// Length of one tact/beat in the [0,1] x [0,1] coordinate system
 	const float tactLength = 1. / m_pat->length().getTact();
@@ -1025,8 +1029,7 @@ void PatternView::paintEvent( QPaintEvent * )
 	}
 
 	// beat pattern paint event
-	else if( beatPattern &&	( fixedTCOs() || pixelsPerTact >= 96
-			|| m_pat->m_steps != MidiTime::stepsPerTact() ) )
+	else if( beatPattern &&	( fixedTCOs() || pixelsPerTact >= 96 ) )
 	{
 		QPixmap stepon0;
 		QPixmap stepon200;

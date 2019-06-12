@@ -1,4 +1,4 @@
-CMAKE_MINIMUM_REQUIRED(VERSION 3.1.0)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.3)
 
 PROJECT(lmms)
 
@@ -19,11 +19,11 @@ INCLUDE(CheckSubmodules)
 INCLUDE(AddFileDependencies)
 INCLUDE(CheckIncludeFiles)
 INCLUDE(FindPkgConfig)
+INCLUDE(GenerateExportHeader)
 
 STRING(TOUPPER          "${CMAKE_PROJECT_NAME}" PROJECT_NAME_UCASE)
 
-# Updated by maintenance tasks
-SET(PROJECT_YEAR 2017)
+SET(PROJECT_YEAR 2019)
 
 SET(PROJECT_AUTHOR      "LMMS Developers")
 SET(PROJECT_URL         "https://lmms.io")
@@ -33,7 +33,7 @@ SET(PROJECT_COPYRIGHT   "2008-${PROJECT_YEAR} ${PROJECT_AUTHOR}")
 SET(VERSION_MAJOR       "1")
 SET(VERSION_MINOR       "2")
 SET(VERSION_RELEASE     "0")
-SET(VERSION_STAGE       "rc5")
+SET(VERSION_STAGE       "rc8")
 SET(VERSION_BUILD       "0")
 SET(VERSION             "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_RELEASE}")
 IF(VERSION_STAGE)
@@ -47,7 +47,6 @@ ENDIF()
 INCLUDE(VersionInfo)
 INCLUDE(DetectMachine)
 
-
 OPTION(WANT_ALSA	"Include ALSA (Advanced Linux Sound Architecture) support" ON)
 OPTION(WANT_CALF	"Include CALF LADSPA plugins" ON)
 OPTION(WANT_CAPS	"Include C* Audio Plugin Suite (LADSPA plugins)" ON)
@@ -59,6 +58,7 @@ OPTION(WANT_MP3LAME	"Include MP3/Lame support" ON)
 OPTION(WANT_OGGVORBIS	"Include OGG/Vorbis support" ON)
 OPTION(WANT_PULSEAUDIO	"Include PulseAudio support" ON)
 OPTION(WANT_PORTAUDIO	"Include PortAudio support" ON)
+OPTION(WANT_SNDIO	"Include sndio support" ON)
 OPTION(WANT_SOUNDIO	"Include libsoundio support" ON)
 OPTION(WANT_SDL		"Include SDL (Simple DirectMedia Layer) support" ON)
 OPTION(WANT_SF2		"Include SoundFont2 player plugin" ON)
@@ -67,12 +67,16 @@ OPTION(WANT_STK		"Include Stk (Synthesis Toolkit) support" ON)
 OPTION(WANT_SWH		"Include Steve Harris's LADSPA plugins" ON)
 OPTION(WANT_TAP		"Include Tom's Audio Processing LADSPA plugins" ON)
 OPTION(WANT_VST		"Include VST support" ON)
-OPTION(WANT_VST_NOWINE	"Include partial VST support (without wine)" OFF)
+OPTION(WANT_VST_32	"Include 32-bit VST support" ON)
+OPTION(WANT_VST_64	"Include 64-bit VST support" ON)
 OPTION(WANT_WINMM	"Include WinMM MIDI support" OFF)
 OPTION(WANT_DEBUG_FPE	"Debug floating point exceptions" OFF)
 
 
 IF(LMMS_BUILD_APPLE)
+	# Fix linking on 10.14+. See issue #4762 on github
+	LINK_DIRECTORIES(/usr/local/lib)
+	SET(WANT_SOUNDIO OFF)
 	SET(WANT_ALSA OFF)
 	SET(WANT_PULSEAUDIO OFF)
 	SET(WANT_VST OFF)
@@ -88,14 +92,13 @@ IF(LMMS_BUILD_WIN32)
 	SET(WANT_ALSA OFF)
 	SET(WANT_JACK OFF)
 	SET(WANT_PULSEAUDIO OFF)
-	SET(WANT_PORTAUDIO OFF)
+	SET(WANT_SNDIO OFF)
 	SET(WANT_SOUNDIO OFF)
 	SET(WANT_WINMM ON)
 	SET(LMMS_HAVE_WINMM TRUE)
 	SET(STATUS_ALSA "<not supported on this platform>")
 	SET(STATUS_JACK "<not supported on this platform>")
 	SET(STATUS_PULSEAUDIO "<not supported on this platform>")
-	SET(STATUS_PORTAUDIO "<disabled on this platform>")
 	SET(STATUS_SOUNDIO "<disabled in this release>")
 	SET(STATUS_WINMM "OK")
 	SET(STATUS_APPLEMIDI "<not supported on this platform>")
@@ -124,6 +127,7 @@ CHECK_INCLUDE_FILES(sys/types.h LMMS_HAVE_SYS_TYPES_H)
 CHECK_INCLUDE_FILES(sys/ipc.h LMMS_HAVE_SYS_IPC_H)
 CHECK_INCLUDE_FILES(sys/shm.h LMMS_HAVE_SYS_SHM_H)
 CHECK_INCLUDE_FILES(sys/time.h LMMS_HAVE_SYS_TIME_H)
+CHECK_INCLUDE_FILES(sys/times.h LMMS_HAVE_SYS_TIMES_H)
 CHECK_INCLUDE_FILES(sched.h LMMS_HAVE_SCHED_H)
 CHECK_INCLUDE_FILES(sys/soundcard.h LMMS_HAVE_SYS_SOUNDCARD_H)
 CHECK_INCLUDE_FILES(soundcard.h LMMS_HAVE_SOUNDCARD_H)
@@ -153,7 +157,7 @@ SET(QT_LIBRARIES
 	Qt5::Xml
 )
 
-IF(LMMS_BUILD_LINUX)
+IF(LMMS_BUILD_LINUX AND WANT_VST)
     FIND_PACKAGE(Qt5 COMPONENTS X11Extras REQUIRED)
     LIST(APPEND QT_LIBRARIES Qt5::X11Extras)
 ENDIF()
@@ -165,7 +169,7 @@ FIND_PACKAGE(Qt5Test)
 SET(QT_QTTEST_LIBRARY Qt5::Test)
 
 # check for libsndfile
-PKG_CHECK_MODULES(SNDFILE REQUIRED sndfile>=1.0.18)
+FIND_PACKAGE(SndFile REQUIRED)
 IF(NOT SNDFILE_FOUND)
 	MESSAGE(FATAL_ERROR "LMMS requires libsndfile1 and libsndfile1-dev >= 1.0.18 - please install, remove CMakeCache.txt and try again!")
 ENDIF()
@@ -212,7 +216,11 @@ ENDIF(WANT_TAP)
 
 # check for CARLA
 IF(WANT_CARLA)
-	PKG_CHECK_MODULES(CARLA carla-standalone>=1.9.5)
+	PKG_CHECK_MODULES(CARLA carla-native-plugin)
+	# look for carla under old name
+	IF(NOT CARLA_FOUND)
+		PKG_CHECK_MODULES(CARLA carla-standalone>=1.9.5)
+	ENDIF()
 	IF(CARLA_FOUND)
 		SET(LMMS_HAVE_CARLA TRUE)
 		SET(STATUS_CARLA "OK")
@@ -250,7 +258,7 @@ IF(WANT_SDL AND NOT LMMS_HAVE_SDL2)
 		IF(NOT SDL_INCLUDE_DIR)
 			SET(SDL_INCLUDE_DIR "${CMAKE_FIND_ROOT_PATH}/include")
 		ENDIF()
-		
+
 	ELSE()
 		SET(STATUS_SDL "not found, please install libsdl2-dev (or similar) "
 			"if you require SDL support")
@@ -378,7 +386,6 @@ IF(WANT_JACK)
 			SET(LMMS_HAVE_WEAKJACK TRUE)
 			SET(WEAKJACK_INCLUDE_DIRS ${CMAKE_SOURCE_DIR}/src/3rdparty/weakjack/weakjack)
 			SET(STATUS_JACK "OK (weak linking enabled)")
-			SET(JACK_INCLUDE_DIRS "")
 			# use dlsym instead
 			SET(JACK_LIBRARIES ${CMAKE_DL_LIBS})
 		ELSE()
@@ -386,19 +393,22 @@ IF(WANT_JACK)
 		ENDIF()
 		SET(LMMS_HAVE_JACK TRUE)
 	ELSE(JACK_FOUND)
+		SET(JACK_INCLUDE_DIRS "")
 		SET(STATUS_JACK "not found, please install libjack0.100.0-dev (or similar) "
 			"if you require JACK support")
 	ENDIF(JACK_FOUND)
 ENDIF(WANT_JACK)
 
-
 # check for FFTW3F-library
-PKG_CHECK_MODULES(FFTW3F REQUIRED fftw3f>=3.0.0)
-
+FIND_PACKAGE(FFTW COMPONENTS fftw3f REQUIRED)
 
 # check for FLTK
 FIND_PACKAGE(FLTK)
-
+IF(FLTK_FOUND)
+	SET(STATUS_ZYN "OK")
+ELSE()
+	SET(STATUS_ZYN "not found, please install fltk")
+ENDIF()
 
 # check for Fluidsynth
 IF(WANT_SF2)
@@ -428,15 +438,16 @@ IF(LMMS_BUILD_LINUX OR LMMS_BUILD_APPLE OR LMMS_BUILD_OPENBSD)
 	FIND_PACKAGE(Threads)
 ENDIF(LMMS_BUILD_LINUX OR LMMS_BUILD_APPLE OR LMMS_BUILD_OPENBSD)
 
-# check for sndio (openbsd only, roaraudio won't work yet)
-FIND_PACKAGE(Sndio)
-IF(LMMS_BUILD_OPENBSD AND SNDIO_FOUND)
-	SET(LMMS_HAVE_SNDIO TRUE)
-	SET(STATUS_SNDIO "OK")
-ELSE()
-	SET(STATUS_SNDIO "<not found or not supported on this platform>")
-	SET(SNDIO_LIBRARY "")
-ENDIF()
+# check for sndio (roaraudio won't work yet)
+IF(WANT_SNDIO)
+	FIND_PACKAGE(Sndio)
+	IF(SNDIO_FOUND)
+		SET(LMMS_HAVE_SNDIO TRUE)
+        	SET(STATUS_SNDIO "OK")
+    	ELSE()
+        	SET(STATUS_SNDIO "<not found or not supported on this platform>")
+	ENDIF(SNDIO_FOUND)
+ENDIF(WANT_SNDIO)
 
 # check for WINE
 IF(WANT_VST)
@@ -472,10 +483,10 @@ ELSE()
 ENDIF(WANT_DEBUG_FPE)
 
 # check for libsamplerate
-PKG_CHECK_MODULES(SAMPLERATE REQUIRED samplerate>=0.1.8)
+FIND_PACKAGE(Samplerate 0.1.8 MODULE REQUIRED)
 
 # set compiler flags
-IF(CMAKE_CXX_COMPILER_ID MATCHES "GNU|AppleClang")
+IF(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
 	SET(WERROR_FLAGS "-Wall -Werror=unused-function -Wno-sign-compare -Wno-strict-overflow")
 	OPTION(USE_WERROR "Add -werror to the build flags. Stops the build on warnings" OFF)
 	IF(${USE_WERROR})
@@ -516,10 +527,26 @@ FILE(REMOVE include/lmmsconfig.h)
 FILE(GLOB LMMS_INCLUDES "${CMAKE_SOURCE_DIR}/include/*.h")
 LIST(SORT LMMS_INCLUDES)
 
+# Get list of all committers from git history, ordered by number of commits.
+# The CONTRIBUTORS file is used by AboutDialog. This information can be provided
+# with -DCONTRIBUTORS=/path/to/CONTRIBUTORS instead. For instance, to generate
+# this file for version 1.1.3, the command is:
+# 	git shortlog -sne v1.1.3 | cut -c8-
+FIND_PACKAGE(Git)
+IF(GIT_FOUND AND NOT CONTRIBUTORS)
+	SET(CONTRIBUTORS "${CMAKE_BINARY_DIR}/CONTRIBUTORS")
+	EXECUTE_PROCESS(
+		COMMAND "${GIT_EXECUTABLE}" shortlog -sne
+		COMMAND cut -c8-
+		OUTPUT_FILE "${CONTRIBUTORS}"
+		WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+		TIMEOUT 1)
+ENDIF()
+
 # we somehow have to make LMMS-binary depend on MOC-files
 ADD_FILE_DEPENDENCIES("${CMAKE_BINARY_DIR}/lmmsconfig.h")
 
-IF(CMAKE_CXX_COMPILER_ID MATCHES "GNU|AppleClang")
+IF(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
 	IF(WIN32)
 		SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-attributes")
 	ELSE(WIN32)
@@ -528,17 +555,7 @@ IF(CMAKE_CXX_COMPILER_ID MATCHES "GNU|AppleClang")
 ENDIF()
 
 # use ccache
-OPTION(USE_CCACHE "Use ccache for compilation" OFF)
-IF(USE_CCACHE)
-	FIND_PROGRAM(CCACHE ccache)
-	IF (CCACHE)
-		MESSAGE(STATUS "Using ccache found in PATH")
-		SET_PROPERTY(GLOBAL PROPERTY RULE_LAUNCH_COMPILE ${CCACHE})
-		SET_PROPERTY(GLOBAL PROPERTY RULE_LAUNCH_LINK ${CCACHE})
-	ELSE()
-		MESSAGE(WARNING "USE_CCACHE enabled, but no ccache found")
-	ENDIF()
-ENDIF()
+include(CompileCache)
 
 # make sub-directories
 ADD_SUBDIRECTORY(cmake)
@@ -604,6 +621,15 @@ ADD_CUSTOM_TARGET(dist
 			COMMAND tar cjf lmms-${VERSION}-src.tar.bz2 "${TMP}"
 			COMMAND rm -rf "${TMP}")
 
+
+#
+# add uninstall-target
+#
+ADD_CUSTOM_TARGET(uninstall
+	COMMAND ${CMAKE_COMMAND} -DCMAKE_INSTALL_PREFIX="${CMAKE_INSTALL_PREFIX}" -P "${CMAKE_CURRENT_SOURCE_DIR}/cmake/uninstall.cmake"
+)
+
+
 #
 # display configuration information
 #
@@ -650,6 +676,7 @@ MESSAGE(
 MESSAGE(
 "Optional plugins\n"
 "----------------\n"
+"* ZynAddSubFX instrument      : ${STATUS_ZYN}\n"
 "* Carla Patchbay & Rack       : ${STATUS_CARLA}\n"
 "* SoundFont2 player           : ${STATUS_FLUIDSYNTH}\n"
 "* Stk Mallets                 : ${STATUS_STK}\n"
@@ -678,4 +705,5 @@ MESSAGE(
 "-----------------------------------------------------------------\n"
 "\n\n")
 
+SET(CMAKE_INSTALL_SYSTEM_RUNTIME_DESTINATION "${BIN_DIR}")
 INCLUDE(InstallRequiredSystemLibraries)

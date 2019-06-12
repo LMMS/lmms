@@ -22,6 +22,10 @@ ENDIF(LMMS_HOST_X86 OR LMMS_HOST_X86_64)
 # build ZynAddSubFX with full optimizations
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2 -Wno-write-strings -Wno-deprecated-declarations -fpermissive")
 
+IF("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU" AND NOT "${CMAKE_CXX_COMPILER_VERSION}" VERSION_LESS "6.0.0")
+	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-misleading-indentation")
+ENDIF()
+
 IF(LMMS_BUILD_WIN32)
 	# link system-libraries
 	ADD_DEFINITIONS(-DPTW32_STATIC_LIB)
@@ -122,11 +126,6 @@ ELSE()
 ENDIF()
 TARGET_LINK_LIBRARIES(ZynAddSubFxCore zynaddsubfx_nio ${FFTW3F_LIBRARIES} ${QT_LIBRARIES} -lz -lpthread)
 
-# required libs for debug msys builds
-IF(LMMS_BUILD_MSYS AND CMAKE_BUILD_TYPE STREQUAL "Debug")
-	TARGET_LINK_LIBRARIES(ZynAddSubFxCore QtCore4 QtGui4 QtXml4)
-ENDIF()
-
 TARGET_LINK_LIBRARIES(ZynAddSubFxCore Qt5::Widgets Qt5::Xml)
 
 IF(LMMS_BUILD_WIN32)
@@ -151,7 +150,7 @@ ADD_DEPENDENCIES(zynaddsubfx ZynAddSubFxCore)
 IF(WIN32)
 	SET(WINRC "${CMAKE_CURRENT_BINARY_DIR}/zynaddsubfxrc.obj")
 	ADD_CUSTOM_COMMAND(OUTPUT "${WINRC}"
-				COMMAND "${WINDRES}"
+				COMMAND "${CMAKE_RC_COMPILER}"
 					"-I\"${CMAKE_CURRENT_SOURCE_DIR}\""
 					"-o\"${CMAKE_CURRENT_BINARY_DIR}/zynaddsubfxrc.obj\""
 					"-i\"${CMAKE_CURRENT_BINARY_DIR}/zynaddsubfx.rc\""
@@ -163,6 +162,10 @@ SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 ADD_EXECUTABLE(RemoteZynAddSubFx RemoteZynAddSubFx.cpp "${WINRC}")
 INSTALL(TARGETS RemoteZynAddSubFx RUNTIME DESTINATION "${PLUGIN_DIR}")
+
+IF(LMMS_BUILD_WIN32)
+	SET_TARGET_PROPERTIES(RemoteZynAddSubFx PROPERTIES LINK_FLAGS "${LINK_FLAGS} -mwindows")
+ENDIF(LMMS_BUILD_WIN32)
 
 # Remove useless dependencies from FLTK. Use fltk-config to avoid static library
 # in older environments

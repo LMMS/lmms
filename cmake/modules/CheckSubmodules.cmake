@@ -18,7 +18,7 @@
 # For details see the accompanying COPYING-CMAKE-SCRIPTS file.
 
 # Files which confirm a successful clone
-SET(VALID_CRUMBS "CMakeLists.txt;Makefile;Makefile.in;Makefile.am;configure.ac;configure.py;autogen.sh;.gitignore")
+SET(VALID_CRUMBS "CMakeLists.txt;Makefile;Makefile.in;Makefile.am;configure.ac;configure.py;autogen.sh;.gitignore;LICENSE;Home.md")
 
 # Try and use the specified shallow clone on submodules, if supported
 SET(DEPTH_VALUE 100)
@@ -27,6 +27,12 @@ SET(DEPTH_VALUE 100)
 SET(MAX_ATTEMPTS 2)
 
 MESSAGE("\nValidating submodules...")
+IF(NOT EXISTS "${CMAKE_SOURCE_DIR}/.gitmodules")
+	MESSAGE("Skipping the check because .gitmodules not detected."
+		"Please make sure you have all submodules in the source tree!"
+	)
+	RETURN()
+ENDIF()
 FILE(READ "${CMAKE_SOURCE_DIR}/.gitmodules" SUBMODULE_DATA)
 
 # Force English locale
@@ -113,8 +119,8 @@ MACRO(GIT_SUBMODULE SUBMODULE_PATH FORCE_DEINIT FORCE_REMOTE)
 	ENDIF()
 ENDMACRO()
 
-SET(MISSING_COMMIT_PHRASES "no such remote ref;reference is not a tree")
-SET(RETRY_PHRASES "Failed to recurse;unadvertised object;cannot create directory;already exists;${MISSING_COMMIT_PHRASES}")
+SET(MISSING_COMMIT_PHRASES "no such remote ref;reference is not a tree;unadvertised object")
+SET(RETRY_PHRASES "Failed to recurse;cannot create directory;already exists;${MISSING_COMMIT_PHRASES}")
 
 # Attempt to do lazy clone
 FOREACH(_submodule ${SUBMODULE_LIST})

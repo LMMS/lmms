@@ -56,7 +56,6 @@ AudioPort::~AudioPort()
 {
 	setExtOutputEnabled( false );
 	Engine::mixer()->removeAudioPort( this );
-	delete m_effects;
 	BufferManager::release( m_portBuffer );
 }
 
@@ -119,7 +118,9 @@ void AudioPort::doProcessing()
 	{
 		if( ph->buffer() )
 		{
-			if( ph->usesBuffer() )
+			if( ph->usesBuffer()
+				&& ( ph->type() == PlayHandle::TypeNotePlayHandle
+					|| !MixHelpers::isSilent( ph->buffer(), fpp ) ) )
 			{
 				m_bufferUsage = true;
 				MixHelpers::add( m_portBuffer, ph->buffer(), fpp );
@@ -239,7 +240,7 @@ void AudioPort::addPlayHandle( PlayHandle * handle )
 void AudioPort::removePlayHandle( PlayHandle * handle )
 {
 	m_playHandleLock.lock();
-		PlayHandleList::Iterator it =	qFind( m_playHandles.begin(), m_playHandles.end(), handle );
+		PlayHandleList::Iterator it =	std::find( m_playHandles.begin(), m_playHandles.end(), handle );
 		if( it != m_playHandles.end() )
 		{
 			m_playHandles.erase( it );

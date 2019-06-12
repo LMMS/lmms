@@ -71,15 +71,6 @@ PeakControllerDialog::~PeakControllerDialog()
 
 
 /*
-void effectView::displayHelp()
-{
-	QWhatsThis::showText( mapToGlobal( rect().bottomRight() ),
-								whatsThis() );
-}
-
-
-
-
 void effectView::closeEffects()
 {
 	m_subWindow->hide();

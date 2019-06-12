@@ -61,16 +61,6 @@ BBTCO::BBTCO( Track * _track ) :
 	setAutoResize( false );
 }
 
-
-
-
-BBTCO::~BBTCO()
-{
-}
-
-
-
-
 void BBTCO::saveSettings( QDomDocument & doc, QDomElement & element )
 {
 	element.setAttribute( "name", name() );
@@ -167,16 +157,6 @@ BBTCOView::BBTCOView( TrackContentObject * _tco, TrackView * _tv ) :
 
 	setStyle( QApplication::style() );
 }
-
-
-
-
-BBTCOView::~BBTCOView()
-{
-}
-
-
-
 
 void BBTCOView::constructContextMenu( QMenu * _cm )
 {
@@ -655,5 +635,6 @@ bool BBTrackView::close()
 void BBTrackView::clickedTrackLabel()
 {
 	Engine::getBBTrackContainer()->setCurrentBB( m_bbTrack->index() );
-	gui->getBBEditor()->show();
+	gui->getBBEditor()->parentWidget()->show();
+	gui->getBBEditor()->setFocus( Qt::ActiveWindowFocusReason );
 }

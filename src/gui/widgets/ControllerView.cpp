@@ -27,13 +27,12 @@
 
 #include <QInputDialog>
 #include <QLabel>
-#include <QLayout>
+#include <QPushButton>
 #include <QMessageBox>
 #include <QMdiArea>
 #include <QMdiSubWindow>
 #include <QPainter>
-#include <QPushButton>
-#include <QWhatsThis>
+#include <QLayout>
 
 
 #include "ControllerRackView.h"
@@ -50,8 +49,6 @@
 #include "Song.h"
 #include "StringPairDrag.h"
 #include "ToolTip.h"
-
-
 
 
 ControllerView::ControllerView( Controller * _model, QWidget * _parent ) :
@@ -271,15 +268,6 @@ void ControllerView::contextMenuEvent( QContextMenuEvent * )
 	contextMenu->addAction( embed::getIconPixmap( "cancel" ), tr( "&Move up" ), this, SLOT( moveUp() ) );
 	contextMenu->addAction( embed::getIconPixmap( "cancel" ), tr( "&Move down" ), this, SLOT( moveDown() ) );
 	contextMenu->addSeparator();
-	contextMenu->addHelpAction();
 	contextMenu->exec( QCursor::pos() );
 	delete contextMenu;
-}
-
-
-
-
-void ControllerView::displayHelp()
-{
-	QWhatsThis::showText( mapToGlobal( rect().center() ), whatsThis() );
 }

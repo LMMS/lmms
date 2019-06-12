@@ -63,7 +63,7 @@ public slots:
 	void collapseController();
 	void expandController();
 	void deleteController();
-	void displayHelp();
+
 	void toggleCollapseController();
 	void renameFinished();
 	void rename();

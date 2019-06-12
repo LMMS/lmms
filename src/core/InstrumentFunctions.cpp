@@ -30,7 +30,7 @@
 #include "InstrumentTrack.h"
 #include "Mixer.h"
 #include "PresetPreviewPlayHandle.h"
-
+#include "stdshims.h"
 
 
 InstrumentFunctionNoteStacking::ChordTable::Init InstrumentFunctionNoteStacking::ChordTable::s_initTable[] =
@@ -316,16 +316,16 @@ InstrumentFunctionArpeggio::InstrumentFunctionArpeggio( Model * _parent ) :
 		m_arpModel.addItem( chord_table[i].getName() );
 	}
 
-	m_arpDirectionModel.addItem( tr( "Up" ), new PixmapLoader( "arp_up" ) );
-	m_arpDirectionModel.addItem( tr( "Down" ), new PixmapLoader( "arp_down" ) );
-	m_arpDirectionModel.addItem( tr( "Up and down" ), new PixmapLoader( "arp_up_and_down" ) );
-	m_arpDirectionModel.addItem( tr( "Down and up" ), new PixmapLoader( "arp_up_and_down" ) );
-	m_arpDirectionModel.addItem( tr( "Random" ), new PixmapLoader( "arp_random" ) );
+	m_arpDirectionModel.addItem( tr( "Up" ), make_unique<PixmapLoader>( "arp_up" ) );
+	m_arpDirectionModel.addItem( tr( "Down" ), make_unique<PixmapLoader>( "arp_down" ) );
+	m_arpDirectionModel.addItem( tr( "Up and down" ), make_unique<PixmapLoader>( "arp_up_and_down" ) );
+	m_arpDirectionModel.addItem( tr( "Down and up" ), make_unique<PixmapLoader>( "arp_up_and_down" ) );
+	m_arpDirectionModel.addItem( tr( "Random" ), make_unique<PixmapLoader>( "arp_random" ) );
 	m_arpDirectionModel.setInitValue( ArpDirUp );
 
-	m_arpModeModel.addItem( tr( "Free" ), new PixmapLoader( "arp_free" ) );
-	m_arpModeModel.addItem( tr( "Sort" ), new PixmapLoader( "arp_sort" ) );
-	m_arpModeModel.addItem( tr( "Sync" ), new PixmapLoader( "arp_sync" ) );
+	m_arpModeModel.addItem( tr( "Free" ), make_unique<PixmapLoader>( "arp_free" ) );
+	m_arpModeModel.addItem( tr( "Sort" ), make_unique<PixmapLoader>( "arp_sort" ) );
+	m_arpModeModel.addItem( tr( "Sync" ), make_unique<PixmapLoader>( "arp_sync" ) );
 }
 
 
@@ -344,11 +344,13 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 	if( _n->origin() == NotePlayHandle::OriginArpeggio ||
 		_n->origin() == NotePlayHandle::OriginNoteStacking ||
 		!m_arpEnabledModel.value() ||
-		( _n->isReleased() && _n->releaseFramesDone() >= _n->actualReleaseFramesToDo() ) )
+		_n->isReleased() )
 	{
 		return;
 	}
 
+	// Set master note if not playing arp note or it will play as an ordinary note
+	_n->setMasterNote();
 
 	const int selected_arp = m_arpModel.value();
 
@@ -401,8 +403,6 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 		if( m_arpModeModel.value() == SortMode &&
 				( ( cur_frame / arp_frames ) % total_range ) / range != (f_cnt_t) _n->index() )
 		{
-			// Set master note if not playing arp note or it will play as an ordinary note
-			_n->setMasterNote();
 			// update counters
 			frames_processed += arp_frames;
 			cur_frame += arp_frames;
@@ -412,12 +412,8 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 		// Skip notes randomly
 		if( m_arpSkipModel.value() )
 		{
-
 			if( 100 * ( (float) rand() / (float)( RAND_MAX + 1.0f ) ) < m_arpSkipModel.value() )
 			{
-				// Set master note to prevent the note to extend over skipped notes
-				// This may only be needed for lb302
-				_n->setMasterNote();
 				// update counters
 				frames_processed += arp_frames;
 				cur_frame += arp_frames;
@@ -501,12 +497,6 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 			continue;
 		}
 
-		float vol_level = 1.0f;
-		if( _n->isReleased() )
-		{
-			vol_level = _n->volumeLevel( cur_frame + gated_frames );
-		}
-
 		// create new arp-note
 
 		// create sub-note-play-handle, only ptr to note is different
@@ -515,7 +505,7 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 				NotePlayHandleManager::acquire( _n->instrumentTrack(),
 							frames_processed,
 							gated_frames,
-							Note( MidiTime( 0 ), MidiTime( 0 ), sub_note_key, (volume_t) qRound( _n->getVolume() * vol_level ),
+							Note( MidiTime( 0 ), MidiTime( 0 ), sub_note_key, _n->getVolume(),
 									_n->getPanning(), _n->detuning() ),
 							_n, -1, NotePlayHandle::OriginArpeggio )
 				);
@@ -523,13 +513,6 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 		// update counters
 		frames_processed += arp_frames;
 		cur_frame += arp_frames;
-	}
-
-	// make sure note is handled as arp-base-note, even
-	// if we didn't add a sub-note so far
-	if( m_arpModeModel.value() != FreeMode )
-	{
-		_n->setMasterNote();
 	}
 }
 
@@ -547,7 +530,6 @@ void InstrumentFunctionArpeggio::saveSettings( QDomDocument & _doc, QDomElement 
 	m_arpTimeModel.saveSettings( _doc, _this, "arptime" );
 	m_arpGateModel.saveSettings( _doc, _this, "arpgate" );
 	m_arpDirectionModel.saveSettings( _doc, _this, "arpdir" );
-
 	m_arpModeModel.saveSettings( _doc, _this, "arpmode" );
 }
 
@@ -565,14 +547,5 @@ void InstrumentFunctionArpeggio::loadSettings( const QDomElement & _this )
 	m_arpTimeModel.loadSettings( _this, "arptime" );
 	m_arpGateModel.loadSettings( _this, "arpgate" );
 	m_arpDirectionModel.loadSettings( _this, "arpdir" );
-/*
-	// Keep compatibility with version 0.2.1 file format
-	if( _this.hasAttribute( "arpsyncmode" ) )
-	{
-	 	m_arpTimeKnob->setSyncMode(
- 		( tempoSyncKnob::tempoSyncMode ) _this.attribute(
- 						 "arpsyncmode" ).toInt() );
-	}*/
-
 	m_arpModeModel.loadSettings( _this, "arpmode" );
 }

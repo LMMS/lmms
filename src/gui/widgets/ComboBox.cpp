@@ -42,12 +42,12 @@ QPixmap * ComboBox::s_background = NULL;
 QPixmap * ComboBox::s_arrow = NULL;
 QPixmap * ComboBox::s_arrowSelected = NULL;
 
-const int CB_ARROW_BTN_WIDTH = 20;
+const int CB_ARROW_BTN_WIDTH = 18;
 
 
 ComboBox::ComboBox( QWidget * _parent, const QString & _name ) :
 	QWidget( _parent ),
-	IntModelView( new ComboBoxModel( NULL, QString::null, true ), this ),
+	IntModelView( new ComboBoxModel( NULL, QString(), true ), this ),
 	m_menu( this ),
 	m_pressed( false )
 {
@@ -198,7 +198,7 @@ void ComboBox::paintEvent( QPaintEvent * _pe )
 
 	QPixmap * arrow = m_pressed ? s_arrowSelected : s_arrow;
 
-	p.drawPixmap( width() - CB_ARROW_BTN_WIDTH + 5, 4, *arrow );
+	p.drawPixmap( width() - CB_ARROW_BTN_WIDTH + 3, 4, *arrow );
 
 	if( model() && model()->size() > 0 )
 	{
@@ -246,7 +246,6 @@ void ComboBox::setItem( QAction* item )
 		model()->setInitValue( item->data().toInt() );
 	}
 }
-
 
 
 
