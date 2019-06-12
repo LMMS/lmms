@@ -134,7 +134,6 @@ private:
 	bool m_MMPZ;
 	bool m_disableBackup;
 	bool m_openLastProject;
-	bool m_NaNHandler;
 	QString m_lang;
 	QStringList m_languages;
 
@@ -165,6 +164,7 @@ private:
 	QComboBox * m_audioInterfaces;
 	AswMap m_audioIfaceSetupWidgets;
 	trMap m_audioIfaceNames;
+	bool m_NaNHandler;
 	bool m_hqAudioDev;
 	int m_bufferSize;
 	QSlider * m_bufferSizeSlider;

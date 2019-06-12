@@ -125,12 +125,12 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 			"ui", "syncvstplugins").toInt()),
 	m_disableAutoQuit(ConfigManager::inst()->value(
 			"ui", "disableautoquit").toInt()),
+	m_NaNHandler( ConfigManager::inst()->value(
+			"app", "nanhandler", "1").toInt()),
 	m_hqAudioDev(ConfigManager::inst()->value(
 			"mixer", "hqaudio").toInt()),
 	m_bufferSize(ConfigManager::inst()->value(
 			"mixer", "framesperaudiobuffer").toInt()),
-	m_NaNHandler( ConfigManager::inst()->value( 
-			"app", "nanhandler", "1").toInt()),
 	m_workingDir(QDir::toNativeSeparators(ConfigManager::inst()->workingDir())),
 	m_vstDir(QDir::toNativeSeparators(ConfigManager::inst()->vstDir())),
 	m_ladspaDir(QDir::toNativeSeparators(ConfigManager::inst()->ladspaDir())),
@@ -400,7 +400,7 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 			this, SLOT(vstEmbedMethodChanged()));
 
 	m_vstAlwaysOnTopCheckBox = new LedCheckBox(
-			tr("Keep plugin windows on top when not embedded"), embed_tw);
+			tr("Keep plugin windows on top when not embedded"), plugins_tw);
 	labelNumber4++;
 	m_vstAlwaysOnTopCheckBox->move(XDelta, YDelta * labelNumber4);
 	m_vstAlwaysOnTopCheckBox->setChecked(m_vstAlwaysOnTop);
@@ -528,6 +528,13 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	connect(m_audioInterfaces, SIGNAL(activated(const QString &)),
 			this, SLOT(audioInterfaceChanged(const QString &)));
 
+	// Advanced setting, hidden for now
+	if(false)
+	{
+		LedCheckBox * useNaNHandler = new LedCheckBox(
+			tr("Use built-in NaN handler"), audio_w);
+		useNaNHandler->setChecked(m_NaNHandler);
+	}
 
 	// HQ mode LED.
 	LedCheckBox * hqaudio = new LedCheckBox(
@@ -894,14 +901,14 @@ void SetupDialog::accept()
 					QString::number(m_disableAutoQuit));
 	ConfigManager::inst()->setValue("mixer", "audiodev",
 					m_audioIfaceNames[m_audioInterfaces->currentText()]);
+	ConfigManager::inst()->setValue("app", "nanhandler",
+					QString::number(m_NaNHandler));
 	ConfigManager::inst()->setValue("mixer", "hqaudio",
 					QString::number(m_hqAudioDev));
 	ConfigManager::inst()->setValue("mixer", "framesperaudiobuffer",
 					QString::number(m_bufferSize));
 	ConfigManager::inst()->setValue("mixer", "mididev",
 					m_midiIfaceNames[m_midiInterfaces->currentText()]);
-	ConfigManager::inst()->setValue("app", "nanhandler",
-					QString::number(m_NaNHandler));
 	ConfigManager::inst()->setValue("ui", "vstalwaysontop",
 					QString::number(m_vstAlwaysOnTop));
 
@@ -1103,22 +1110,22 @@ void SetupDialog::setBufferSize(int value)
 		int mod_value = value % step;
 		if(mod_value < step / 2)
 		{
-			m_bufSizeSlider->setValue(value - mod_value);
+			m_bufferSizeSlider->setValue(value - mod_value);
 		}
 		else
 		{
-			m_bufSizeSlider->setValue(value + step - mod_value);
+			m_bufferSizeSlider->setValue(value + step - mod_value);
 		}
 		return;
 	}
 
-	if(m_bufSizeSlider->value() != value)
+	if(m_bufferSizeSlider->value() != value)
 	{
-		m_bufSizeSlider->setValue(value);
+		m_bufferSizeSlider->setValue(value);
 	}
 
-	m_bufferSize = _value * BUFFERSIZE_RESOLUTION;
-	m_bufSizeLbl->setText(tr("Frames: %1\nLatency: %2 ms").arg(m_bufferSize).arg(
+	m_bufferSize = value * BUFFERSIZE_RESOLUTION;
+	m_bufferSizeLbl->setText(tr("Frames: %1\nLatency: %2 ms").arg(m_bufferSize).arg(
 		1000.0f * m_bufferSize / Engine::mixer()->processingSampleRate(), 0, 'f', 1));
 }
 
