@@ -38,6 +38,8 @@
 #include "lmms_basics.h"
 #include "Song.h"
 #include "ToolTip.h"
+#include "StepRecorder.h"
+#include "StepRecorderWidget.h"
 
 class QPainter;
 class QPixmap;
@@ -59,7 +61,9 @@ class PianoRoll : public QWidget
 	Q_PROPERTY( QColor lineColor READ lineColor WRITE setLineColor )
 	Q_PROPERTY( QColor noteModeColor READ noteModeColor WRITE setNoteModeColor )
 	Q_PROPERTY( QColor noteColor READ noteColor WRITE setNoteColor )
+	Q_PROPERTY( QColor ghostNoteColor READ ghostNoteColor WRITE setGhostNoteColor )
 	Q_PROPERTY( QColor noteTextColor READ noteTextColor WRITE setNoteTextColor )
+	Q_PROPERTY( QColor ghostNoteTextColor READ ghostNoteTextColor WRITE setGhostNoteTextColor )
 	Q_PROPERTY( QColor barColor READ barColor WRITE setBarColor )
 	Q_PROPERTY( QColor selectedNoteColor READ selectedNoteColor WRITE setSelectedNoteColor )
 	Q_PROPERTY( QColor textColor READ textColor WRITE setTextColor )
@@ -68,6 +72,8 @@ class PianoRoll : public QWidget
 	Q_PROPERTY( QColor markedSemitoneColor READ markedSemitoneColor WRITE setMarkedSemitoneColor )
 	Q_PROPERTY( int noteOpacity READ noteOpacity WRITE setNoteOpacity )
 	Q_PROPERTY( bool noteBorders READ noteBorders WRITE setNoteBorders )
+	Q_PROPERTY( int ghostNoteOpacity READ ghostNoteOpacity WRITE setGhostNoteOpacity )
+	Q_PROPERTY( bool ghostNoteBorders READ ghostNoteBorders WRITE setGhostNoteBorders )
 	Q_PROPERTY( QColor backgroundShade READ backgroundShade WRITE setBackgroundShade )
 public:
 	enum EditModes
@@ -87,6 +93,8 @@ public:
 	void showPanTextFloat(panning_t pan, const QPoint &pos, int timeout=-1);
 
 	void setCurrentPattern( Pattern* newPattern );
+	void setGhostPattern( Pattern* newPattern );
+	void loadGhostNotes( const QDomElement & de );
 
 	inline void stopRecording()
 	{
@@ -96,6 +104,11 @@ public:
 	inline bool isRecording() const
 	{
 		return m_recording;
+	}
+
+	inline bool isStepRecording() const
+	{
+		return m_stepRecorder.isRecording();
 	}
 
 	const Pattern* currentPattern() const
@@ -141,6 +154,14 @@ public:
 	void setNoteOpacity( const int i );
 	bool noteBorders() const;
 	void setNoteBorders( const bool b );
+	QColor ghostNoteColor() const;
+	void setGhostNoteColor( const QColor & c );
+	QColor ghostNoteTextColor() const;
+	void setGhostNoteTextColor( const QColor & c );
+	int ghostNoteOpacity() const;
+	void setGhostNoteOpacity( const int i );
+	bool ghostNoteBorders() const;
+	void setGhostNoteBorders( const bool b );
 	QColor backgroundShade() const;
 	void setBackgroundShade( const QColor & c );
 
@@ -175,6 +196,7 @@ protected slots:
 	void play();
 	void record();
 	void recordAccompany();
+	bool toggleStepRecording();
 	void stop();
 
 	void startRecordNote( const Note & n );
@@ -192,9 +214,11 @@ protected slots:
 
 	void updatePosition(const MidiTime & t );
 	void updatePositionAccompany(const MidiTime & t );
+	void updatePositionStepRecording(const MidiTime & t );
 
 	void zoomingChanged();
 	void quantizeChanged();
+	void noteLengthChanged();
 	void quantizeNotes();
 
 	void updateSemiToneMarkerMenu();
@@ -206,9 +230,12 @@ protected slots:
 
 	void selectRegionFromPixels( int xStart, int xEnd );
 
+	void clearGhostPattern();
+
 
 signals:
 	void currentPatternChanged();
+	void ghostPatternSet(bool);
 	void semiToneMarkerMenuScaleSetEnabled(bool);
 	void semiToneMarkerMenuChordSetEnabled(bool);
 
@@ -269,6 +296,8 @@ private:
 	void testPlayNote( Note * n );
 	void testPlayKey( int _key, int _vol, int _pan );
 	void pauseTestNotes(bool pause = true );
+	void playChordNotes(int key, int velocity=-1);
+	void pauseChordNotes(int key);
 
 	QList<int> getAllOctavesForKey( int keyToMirror ) const;
 
@@ -309,6 +338,13 @@ private:
 	static const QVector<double> m_zoomLevels;
 
 	Pattern* m_pattern;
+	NoteVector m_ghostNotes;
+
+	inline const NoteVector & ghostNotes() const
+	{
+		return m_ghostNotes;
+	}
+
 	QScrollBar * m_leftRightScroll;
 	QScrollBar * m_topBottomScroll;
 
@@ -381,6 +417,9 @@ private:
 
 	friend class PianoRollWindow;
 
+	StepRecorderWidget m_stepRecorderWidget;
+	StepRecorder m_stepRecorder;
+
 	// qproperty fields
 	QColor m_barLineColor;
 	QColor m_beatLineColor;
@@ -388,6 +427,8 @@ private:
 	QColor m_noteModeColor;
 	QColor m_noteColor;
 	QColor m_noteTextColor;
+	QColor m_ghostNoteColor;
+	QColor m_ghostNoteTextColor;
 	QColor m_barColor;
 	QColor m_selectedNoteColor;
 	QColor m_textColor;
@@ -395,7 +436,9 @@ private:
 	QColor m_textShadow;
 	QColor m_markedSemitoneColor;
 	int m_noteOpacity;
+	int m_ghostNoteOpacity;
 	bool m_noteBorders;
+	bool m_ghostNoteBorders;
 	QColor m_backgroundShade;
 
 signals:
@@ -412,7 +455,8 @@ public:
 	PianoRollWindow();
 
 	const Pattern* currentPattern() const;
-	void setCurrentPattern(Pattern* pattern);
+	void setCurrentPattern( Pattern* pattern );
+	void setGhostPattern( Pattern* pattern );
 
 	int quantization() const;
 
@@ -420,6 +464,7 @@ public:
 	void stop();
 	void record();
 	void recordAccompany();
+	void toggleStepRecording();
 	void stopRecording();
 
 	bool isRecording() const;
@@ -444,10 +489,14 @@ signals:
 
 
 private slots:
-	void patternRenamed();
+	void updateAfterPatternChange();
+	void ghostPatternSet( bool state );
 
 private:
+	void patternRenamed();
 	void focusInEvent(QFocusEvent * event);
+	void stopStepRecording();
+	void updateStepRecordingIcon();
 
 	PianoRoll* m_editor;
 
@@ -456,6 +505,7 @@ private:
 	ComboBox * m_noteLenComboBox;
 	ComboBox * m_scaleComboBox;
 	ComboBox * m_chordComboBox;
+	QPushButton * m_clearGhostButton;
 
 };
 

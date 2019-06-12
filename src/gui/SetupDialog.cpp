@@ -67,8 +67,9 @@
 #include "MidiApple.h"
 #include "MidiDummy.h"
 
+constexpr int BUFFERSIZE_RESOLUTION = 32;
 
-inline void labelWidget(QWidget * w, const QString & txt)
+inline void labelWidget( QWidget * w, const QString & txt )
 {
 	QLabel * title = new QLabel(txt, w);
 	QFont f = title->font();
@@ -128,6 +129,8 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 			"mixer", "hqaudio").toInt()),
 	m_bufferSize(ConfigManager::inst()->value(
 			"mixer", "framesperaudiobuffer").toInt()),
+	m_NaNHandler( ConfigManager::inst()->value( 
+			"app", "nanhandler", "1").toInt()),
 	m_workingDir(QDir::toNativeSeparators(ConfigManager::inst()->workingDir())),
 	m_vstDir(QDir::toNativeSeparators(ConfigManager::inst()->vstDir())),
 	m_ladspaDir(QDir::toNativeSeparators(ConfigManager::inst()->ladspaDir())),
@@ -393,6 +396,17 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 		m_vstEmbedComboBox->addItem(tr("Embed using XEmbed protocol"), "xembed");
 	}
 	m_vstEmbedComboBox->setCurrentIndex(m_vstEmbedComboBox->findData(m_vstEmbedMethod));
+	connect(m_vstEmbedComboBox, SIGNAL(currentIndexChanged(int)),
+			this, SLOT(vstEmbedMethodChanged()));
+
+	m_vstAlwaysOnTopCheckBox = new LedCheckBox(
+			tr("Keep plugin windows on top when not embedded"), embed_tw);
+	labelNumber4++;
+	m_vstAlwaysOnTopCheckBox->move(XDelta, YDelta * labelNumber4);
+	m_vstAlwaysOnTopCheckBox->setChecked(m_vstAlwaysOnTop);
+	m_vstAlwaysOnTopCheckBox->setVisible(m_vstEmbedMethod == "none");
+	connect(m_vstAlwaysOnTopCheckBox, SIGNAL(toggled(bool)),
+			this, SLOT(toggleVSTAlwaysOnTop(bool)));
 
 	LedCheckBox * syncVST = new LedCheckBox(
 			tr("Sync VST plugins to host playback"), plugins_tw);
@@ -886,6 +900,10 @@ void SetupDialog::accept()
 					QString::number(m_bufferSize));
 	ConfigManager::inst()->setValue("mixer", "mididev",
 					m_midiIfaceNames[m_midiInterfaces->currentText()]);
+	ConfigManager::inst()->setValue("app", "nanhandler",
+					QString::number(m_NaNHandler));
+	ConfigManager::inst()->setValue("ui", "vstalwaysontop",
+					QString::number(m_vstAlwaysOnTop));
 
 
 	ConfigManager::inst()->setWorkingDir(QDir::fromNativeSeparators(m_workingDir));
@@ -1036,6 +1054,19 @@ void SetupDialog::toggleSyncVSTPlugins(bool enabled)
 }
 
 
+void SetupDialog::vstEmbedMethodChanged()
+{
+	m_vstEmbedMethod = m_vstEmbedComboBox->currentData().toString();
+	m_vstAlwaysOnTopCheckBox->setVisible( m_vstEmbedMethod == "none" );
+}
+
+
+void SetupDialog::toggleVSTAlwaysOnTop( bool en )
+{
+	m_vstAlwaysOnTop = en;
+}
+
+
 void SetupDialog::toggleDisableAutoQuit(bool enabled)
 {
 	m_disableAutoQuit = enabled;
@@ -1066,38 +1097,35 @@ void SetupDialog::audioInterfaceChanged(const QString & iface)
 
 void SetupDialog::setBufferSize(int value)
 {
-	const int step = DEFAULT_BUFFER_SIZE / 64;
+	const int step = DEFAULT_BUFFER_SIZE / BUFFERSIZE_RESOLUTION;
 	if(value > step && value % step)
 	{
 		int mod_value = value % step;
 		if(mod_value < step / 2)
 		{
-			m_bufferSizeSlider->setValue(value - mod_value);
+			m_bufSizeSlider->setValue(value - mod_value);
 		}
 		else
 		{
-			m_bufferSizeSlider->setValue(value + step - mod_value);
+			m_bufSizeSlider->setValue(value + step - mod_value);
 		}
 		return;
 	}
 
-	if(m_bufferSizeSlider->value() != value)
+	if(m_bufSizeSlider->value() != value)
 	{
-		m_bufferSizeSlider->setValue(value);
+		m_bufSizeSlider->setValue(value);
 	}
 
-	m_bufferSize = value * 64;
-	m_bufferSizeLbl->setText(
-			tr("Frames: %1\nLatency: %2 ms").arg(
-			m_bufferSize).arg(
-			1000.0f * m_bufferSize / Engine::mixer()->processingSampleRate(),
-			0, 'f', 1));
+	m_bufferSize = _value * BUFFERSIZE_RESOLUTION;
+	m_bufSizeLbl->setText(tr("Frames: %1\nLatency: %2 ms").arg(m_bufferSize).arg(
+		1000.0f * m_bufferSize / Engine::mixer()->processingSampleRate(), 0, 'f', 1));
 }
 
 
 void SetupDialog::resetBufferSize()
 {
-	setBufferSize(DEFAULT_BUFFER_SIZE / 64);
+	setBufferSize(DEFAULT_BUFFER_SIZE / BUFFERSIZE_RESOLUTION);
 }
 
 

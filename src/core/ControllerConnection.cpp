@@ -117,7 +117,7 @@ void ControllerConnection::setController( Controller * _controller )
 	{
 		_controller->addConnection( this );
 		QObject::connect( _controller, SIGNAL( valueChanged() ),
-				this, SIGNAL( valueChanged() ) );
+				this, SIGNAL( valueChanged() ), Qt::DirectConnection );
 	}
 
 	m_ownsController =
@@ -211,7 +211,9 @@ void ControllerConnection::loadSettings( const QDomElement & _this )
 			m_controllerId = -1;
 		}
 
-		if (!Engine::getSong()->isLoadingProject() && m_controllerId != -1)
+		if (!Engine::getSong()->isLoadingProject()
+			&& m_controllerId != -1
+			&& m_controllerId < Engine::getSong()->controllers().size())
 		{
 			setController( Engine::getSong()->
 					controllers().at( m_controllerId ) );

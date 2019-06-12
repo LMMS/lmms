@@ -474,6 +474,7 @@ void bitInvaderView::modelChanged()
 
 void bitInvaderView::sinWaveClicked()
 {
+	m_graph->model()->clearInvisible();
 	m_graph->model()->setWaveToSine();
 	Engine::getSong()->setModified();
 }
@@ -483,6 +484,7 @@ void bitInvaderView::sinWaveClicked()
 
 void bitInvaderView::triangleWaveClicked()
 {
+	m_graph->model()->clearInvisible();
 	m_graph->model()->setWaveToTriangle();
 	Engine::getSong()->setModified();
 }
@@ -492,6 +494,7 @@ void bitInvaderView::triangleWaveClicked()
 
 void bitInvaderView::sawWaveClicked()
 {
+	m_graph->model()->clearInvisible();
 	m_graph->model()->setWaveToSaw();
 	Engine::getSong()->setModified();
 }
@@ -501,6 +504,7 @@ void bitInvaderView::sawWaveClicked()
 
 void bitInvaderView::sqrWaveClicked()
 {
+	m_graph->model()->clearInvisible();
 	m_graph->model()->setWaveToSquare();
 	Engine::getSong()->setModified();
 }
@@ -510,6 +514,7 @@ void bitInvaderView::sqrWaveClicked()
 
 void bitInvaderView::noiseWaveClicked()
 {
+	m_graph->model()->clearInvisible();
 	m_graph->model()->setWaveToNoise();
 	Engine::getSong()->setModified();
 }
@@ -520,35 +525,12 @@ void bitInvaderView::noiseWaveClicked()
 void bitInvaderView::usrWaveClicked()
 {
 	QString fileName = m_graph->model()->setWaveToUser();
-	ToolTip::add( m_usrWaveBtn, fileName );
-	Engine::getSong()->setModified();
-	/*
-	m_graph->model()->setWaveToNoise();
-	Engine::getSong()->setModified();
-	// zero sample_shape
-	for (int i = 0; i < sample_length; i++)
+	if (!fileName.isEmpty())
 	{
-		sample_shape[i] = 0;
+		ToolTip::add(m_usrWaveBtn, fileName);
+		m_graph->model()->clearInvisible();
+		Engine::getSong()->setModified();
 	}
-
-	// load user shape
-	sampleBuffer buffer;
-	QString af = buffer.openAudioFile();
-	if ( af != "" )
-	{
-		buffer.setAudioFile( af );
-		
-		// copy buffer data
-		sample_length = min( sample_length, static_cast<int>(
-							buffer.frames() ) );
-		for ( int i = 0; i < sample_length; i++ )
-		{
-			sample_shape[i] = (float)*buffer.data()[i];
-		}
-	}
-
-	sampleChanged();
-	*/
 }
 
 
@@ -584,9 +566,9 @@ extern "C"
 {
 
 // necessary for getting instance out of shared lib
-PLUGIN_EXPORT Plugin * lmms_plugin_main( Model *, void * _data )
+PLUGIN_EXPORT Plugin * lmms_plugin_main( Model *m, void * )
 {
-	return( new bitInvader( static_cast<InstrumentTrack *>( _data ) ) );
+	return( new bitInvader( static_cast<InstrumentTrack *>( m ) ) );
 }
 
 

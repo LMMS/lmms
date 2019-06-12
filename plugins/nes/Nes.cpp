@@ -520,7 +520,7 @@ NesInstrument::NesInstrument( InstrumentTrack * instrumentTrack ) :
 	m_ch3Volume( 15.f, 0.f, 15.f, 1.f, this, tr( "Channel 3 volume" ) ),
 
 	//channel 4
-	m_ch4Enabled( true, this ),
+	m_ch4Enabled( false, this ),
 	m_ch4Volume( 15.f, 0.f, 15.f, 1.f, this, tr( "Channel 4 volume" ) ),
 	
 	m_ch4EnvEnabled( false, this ),
@@ -918,9 +918,9 @@ extern "C"
 {
 
 // necessary for getting instance out of shared lib
-PLUGIN_EXPORT Plugin * lmms_plugin_main( Model *, void * _data )
+PLUGIN_EXPORT Plugin * lmms_plugin_main( Model *m, void * _data )
 {
-	return( new NesInstrument( static_cast<InstrumentTrack *>( _data ) ) );
+	return( new NesInstrument( static_cast<InstrumentTrack *>( m ) ) );
 }
 
 

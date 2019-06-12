@@ -27,6 +27,7 @@
 #include <QDir>
 #include <QDomDocument>
 #include <QTemporaryFile>
+#include <QtGlobal>
 #include <QDropEvent>
 #include <QGridLayout>
 #include <QPushButton>
@@ -121,13 +122,20 @@ ZynAddSubFxInstrument::ZynAddSubFxInstrument(
 {
 	initPlugin();
 
-	connect( &m_portamentoModel, SIGNAL( dataChanged() ), this, SLOT( updatePortamento() ) );
-	connect( &m_filterFreqModel, SIGNAL( dataChanged() ), this, SLOT( updateFilterFreq() ) );
-	connect( &m_filterQModel, SIGNAL( dataChanged() ), this, SLOT( updateFilterQ() ) );
-	connect( &m_bandwidthModel, SIGNAL( dataChanged() ), this, SLOT( updateBandwidth() ) );
-	connect( &m_fmGainModel, SIGNAL( dataChanged() ), this, SLOT( updateFmGain() ) );
-	connect( &m_resCenterFreqModel, SIGNAL( dataChanged() ), this, SLOT( updateResCenterFreq() ) );
-	connect( &m_resBandwidthModel, SIGNAL( dataChanged() ), this, SLOT( updateResBandwidth() ) );
+	connect( &m_portamentoModel, SIGNAL( dataChanged() ),
+			this, SLOT( updatePortamento() ), Qt::DirectConnection );
+	connect( &m_filterFreqModel, SIGNAL( dataChanged() ),
+			this, SLOT( updateFilterFreq() ), Qt::DirectConnection );
+	connect( &m_filterQModel, SIGNAL( dataChanged() ),
+			this, SLOT( updateFilterQ() ), Qt::DirectConnection );
+	connect( &m_bandwidthModel, SIGNAL( dataChanged() ),
+			this, SLOT( updateBandwidth() ), Qt::DirectConnection );
+	connect( &m_fmGainModel, SIGNAL( dataChanged() ),
+			this, SLOT( updateFmGain() ), Qt::DirectConnection );
+	connect( &m_resCenterFreqModel, SIGNAL( dataChanged() ),
+			this, SLOT( updateResCenterFreq() ), Qt::DirectConnection );
+	connect( &m_resBandwidthModel, SIGNAL( dataChanged() ),
+			this, SLOT( updateResBandwidth() ), Qt::DirectConnection );
 
 	// now we need a play-handle which cares for calling play()
 	InstrumentPlayHandle * iph = new InstrumentPlayHandle( this, _instrumentTrack );
@@ -137,7 +145,7 @@ ZynAddSubFxInstrument::ZynAddSubFxInstrument(
 			this, SLOT( reloadPlugin() ) );
 
 	connect( instrumentTrack()->pitchRangeModel(), SIGNAL( dataChanged() ),
-				this, SLOT( updatePitchRange() ) );
+			this, SLOT( updatePitchRange() ), Qt::DirectConnection );
 }
 
 
@@ -283,6 +291,7 @@ void ZynAddSubFxInstrument::loadSettings( const QDomElement & _this )
 
 		emit settingsChanged();
 	}
+	emit instrumentTrack()->pitchModel()->dataChanged();
 }
 
 
@@ -652,10 +661,9 @@ extern "C"
 {
 
 // necessary for getting instance out of shared lib
-PLUGIN_EXPORT Plugin * lmms_plugin_main( Model *, void * _data )
+PLUGIN_EXPORT Plugin * lmms_plugin_main(Model * m, void *)
 {
-
-	return new ZynAddSubFxInstrument( static_cast<InstrumentTrack *>( _data ) );
+	return new ZynAddSubFxInstrument(static_cast<InstrumentTrack *>(m));
 }
 
 

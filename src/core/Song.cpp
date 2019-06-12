@@ -86,22 +86,24 @@ Song::Song() :
 	m_patternToPlay( NULL ),
 	m_loopPattern( false ),
 	m_elapsedTicks( 0 ),
-	m_elapsedTacts( 0 )
+	m_elapsedTacts( 0 ),
+	m_loopRenderCount(1),
+	m_loopRenderRemaining(1)
 {
 	for(int i = 0; i < Mode_Count; ++i) m_elapsedMilliSeconds[i] = 0;
 	connect( &m_tempoModel, SIGNAL( dataChanged() ),
-						this, SLOT( setTempo() ) );
+			this, SLOT( setTempo() ), Qt::DirectConnection );
 	connect( &m_tempoModel, SIGNAL( dataUnchanged() ),
-						this, SLOT( setTempo() ) );
+			this, SLOT( setTempo() ), Qt::DirectConnection );
 	connect( &m_timeSigModel, SIGNAL( dataChanged() ),
-					this, SLOT( setTimeSignature() ) );
+			this, SLOT( setTimeSignature() ), Qt::DirectConnection );
 
 
 	connect( Engine::mixer(), SIGNAL( sampleRateChanged() ), this,
 						SLOT( updateFramesPerTick() ) );
 
 	connect( &m_masterVolumeModel, SIGNAL( dataChanged() ),
-			this, SLOT( masterVolumeChanged() ) );
+			this, SLOT( masterVolumeChanged() ), Qt::DirectConnection );
 /*	connect( &m_masterPitchModel, SIGNAL( dataChanged() ),
 			this, SLOT( masterPitchChanged() ) );*/
 
@@ -258,8 +260,6 @@ void Song::processNextBuffer()
 			m_playPos[m_playMode].setTicks(
 						tl->loopBegin().getTicks() );
 
-			m_vstSyncController.setAbsolutePosition(
-						tl->loopBegin().getTicks() );
 			m_vstSyncController.setPlaybackJumped( true );
 
 			emit updateSampleTracks();
@@ -285,8 +285,6 @@ void Song::processNextBuffer()
 		{
 			int ticks = m_playPos[m_playMode].getTicks() +
 				( int )( currentFrame / framesPerTick );
-
-			m_vstSyncController.setAbsolutePosition( ticks );
 
 			// did we play a whole tact?
 			if( ticks >= MidiTime::ticksPerTact() )
@@ -324,13 +322,12 @@ void Song::processNextBuffer()
 					// wrap milli second counter
 					setToTimeByTicks(ticks);
 
-					m_vstSyncController.setAbsolutePosition( ticks );
 					m_vstSyncController.setPlaybackJumped( true );
 				}
 			}
 			m_playPos[m_playMode].setTicks( ticks );
 
-			if( checkLoop )
+			if (checkLoop || m_loopRenderRemaining > 1)
 			{
 				m_vstSyncController.startCycle(
 					tl->loopBegin().getTicks(), tl->loopEnd().getTicks() );
@@ -340,11 +337,12 @@ void Song::processNextBuffer()
 				// beginning of the range
 				if( m_playPos[m_playMode] >= tl->loopEnd() )
 				{
+					if (m_loopRenderRemaining > 1) 
+						m_loopRenderRemaining--;
 					ticks = tl->loopBegin().getTicks();
 					m_playPos[m_playMode].setTicks( ticks );
 					setToTime(tl->loopBegin());
 
-					m_vstSyncController.setAbsolutePosition( ticks );
 					m_vstSyncController.setPlaybackJumped( true );
 
 					emit updateSampleTracks();
@@ -359,7 +357,17 @@ void Song::processNextBuffer()
 			m_playPos[m_playMode].setCurrentFrame( currentFrame );
 		}
 
-		f_cnt_t framesToPlay =
+		if( framesPlayed == 0 )
+		{
+			// update VST sync position after we've corrected frame/
+			// tick count but before actually playing any frames
+			m_vstSyncController.setAbsolutePosition(
+				m_playPos[m_playMode].getTicks()
+				+ m_playPos[m_playMode].currentFrame()
+				/ (double) framesPerTick );
+		}
+
+		f_cnt_t framesToPlay = 
 			Engine::mixer()->framesPerPeriod() - framesPlayed;
 
 		f_cnt_t framesLeft = ( f_cnt_t )framesPerTick -
@@ -476,28 +484,40 @@ void Song::setModified(bool value)
 	}
 }
 
-std::pair<MidiTime, MidiTime> Song::getExportEndpoints() const
+bool Song::isExportDone() const
 {
-	if ( m_renderBetweenMarkers )
+	return !isExporting() || m_playPos[m_playMode] >= m_exportSongEnd;
+}
+
+int Song::getExportProgress() const
+{
+	MidiTime pos = m_playPos[m_playMode];
+    
+	if (pos >= m_exportSongEnd)
 	{
-		return std::pair<MidiTime, MidiTime>(
-			m_playPos[Mode_PlaySong].m_timeLine->loopBegin(),
-			m_playPos[Mode_PlaySong].m_timeLine->loopEnd()
-		);
+		return 100;
 	}
-	else if ( m_exportLoop )
+	else if (pos <= m_exportSongBegin)
 	{
-		return std::pair<MidiTime, MidiTime>( MidiTime(0, 0), MidiTime(m_length, 0) );
+		return 0;
+	}
+	else if (pos >= m_exportLoopEnd)
+	{
+		pos = (m_exportLoopBegin-m_exportSongBegin) + (m_exportLoopEnd - m_exportLoopBegin) *
+			m_loopRenderCount + (pos - m_exportLoopEnd);
+	}
+	else if ( pos >= m_exportLoopBegin )
+	{
+		pos = (m_exportLoopBegin-m_exportSongBegin) + ((m_exportLoopEnd - m_exportLoopBegin) *
+			(m_loopRenderCount - m_loopRenderRemaining)) + (pos - m_exportLoopBegin);
 	}
 	else
 	{
-		// if not exporting as a loop, we leave one bar of padding at the end of the song to accomodate reverb, etc.
-		return std::pair<MidiTime, MidiTime>( MidiTime(0, 0), MidiTime(m_length+1, 0) );
+		pos = (pos - m_exportSongBegin);
 	}
+
+	return (float)pos/(float)m_exportEffectiveLength*100.0f;
 }
-
-
-
 
 void Song::playSong()
 {
@@ -702,7 +722,10 @@ void Song::stop()
 	m_playPos[m_playMode].setCurrentFrame( 0 );
 
 	m_vstSyncController.setPlaybackState( m_exporting );
-	m_vstSyncController.setAbsolutePosition( m_playPos[m_playMode].getTicks() );
+	m_vstSyncController.setAbsolutePosition(
+		m_playPos[m_playMode].getTicks()
+		+ m_playPos[m_playMode].currentFrame()
+		/ (double) Engine::framesPerTick() );
 
 	// remove all note-play-handles that are active
 	Engine::mixer()->clear();
@@ -719,14 +742,40 @@ void Song::stop()
 void Song::startExport()
 {
 	stop();
-	if(m_renderBetweenMarkers)
+	if (m_renderBetweenMarkers)
 	{
+		m_exportSongBegin = m_exportLoopBegin = m_playPos[Mode_PlaySong].m_timeLine->loopBegin();
+		m_exportSongEnd = m_exportLoopEnd = m_playPos[Mode_PlaySong].m_timeLine->loopEnd();
+
 		m_playPos[Mode_PlaySong].setTicks( m_playPos[Mode_PlaySong].m_timeLine->loopBegin().getTicks() );
 	}
 	else
 	{
+		m_exportSongEnd = MidiTime(m_length, 0);
+        
+		// Handle potentially ridiculous loop points gracefully.
+		if (m_loopRenderCount > 1 && m_playPos[Mode_PlaySong].m_timeLine->loopEnd() > m_exportSongEnd) 
+		{
+			m_exportSongEnd = m_playPos[Mode_PlaySong].m_timeLine->loopEnd();
+		}
+
+		if (!m_exportLoop) 
+			m_exportSongEnd += MidiTime(1,0);
+        
+		m_exportSongBegin = MidiTime(0,0);
+		m_exportLoopBegin = m_playPos[Mode_PlaySong].m_timeLine->loopBegin() < m_exportSongEnd && 
+			m_playPos[Mode_PlaySong].m_timeLine->loopEnd() <= m_exportSongEnd ?
+			m_playPos[Mode_PlaySong].m_timeLine->loopBegin() : MidiTime(0,0);
+		m_exportLoopEnd = m_playPos[Mode_PlaySong].m_timeLine->loopBegin() < m_exportSongEnd && 
+			m_playPos[Mode_PlaySong].m_timeLine->loopEnd() <= m_exportSongEnd ?
+			m_playPos[Mode_PlaySong].m_timeLine->loopEnd() : MidiTime(0,0);
+
 		m_playPos[Mode_PlaySong].setTicks( 0 );
 	}
+
+	m_exportEffectiveLength = (m_exportLoopBegin - m_exportSongBegin) + (m_exportLoopEnd - m_exportLoopBegin) 
+		* m_loopRenderCount + (m_exportSongEnd - m_exportLoopEnd);
+	m_loopRenderRemaining = m_loopRenderCount;
 
 	playSong();
 
@@ -1163,6 +1212,7 @@ void Song::loadProject( const QString & fileName )
 bool Song::saveProjectFile( const QString & filename )
 {
 	DataFile dataFile( DataFile::SongProject );
+	m_savingProject = true;
 
 	m_tempoModel.saveSettings( dataFile, dataFile.head(), "bpm" );
 	m_timeSigModel.saveSettings( dataFile, dataFile.head(), "timesig" );
@@ -1183,6 +1233,8 @@ bool Song::saveProjectFile( const QString & filename )
 	}
 
 	saveControllerStates( dataFile, dataFile.content() );
+
+	m_savingProject = false;
 
 	return dataFile.writeFile( filename );
 }
@@ -1216,7 +1268,11 @@ bool Song::guiSaveProjectAs( const QString & _file_name )
 	m_oldFileName = m_fileName;
 	setProjectFileName(_file_name);
 
-	if(!guiSaveProject())
+	bool saveResult = guiSaveProject();
+	// After saving as, restore default save options.
+	m_saveOptions.setDefaultOptions();
+
+	if(!saveResult)
 	{
 		// Saving failed. Restore old filenames.
 		setProjectFileName(m_oldFileName);
@@ -1384,4 +1440,8 @@ QString Song::errorSummary()
 	errors.prepend( tr( "The following errors occured while loading: " ) );
 
 	return errors;
+}
+
+bool Song::isSavingProject() const {
+	return m_savingProject;
 }

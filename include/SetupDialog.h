@@ -117,7 +117,8 @@ private slots:
 	void openBackgroundPicFile();
 	void setBackgroundPicFile(const QString & backgroundPicFile);
 
-	void showRestartWarning();
+	void vstEmbedMethodChanged();
+	void toggleVSTAlwaysOnTop(bool en);
 
 
 private:
@@ -133,6 +134,8 @@ private:
 	bool m_MMPZ;
 	bool m_disableBackup;
 	bool m_openLastProject;
+	bool m_NaNHandler;
+	bool m_hqAudioDev;
 	QString m_lang;
 	QStringList m_languages;
 
@@ -149,6 +152,8 @@ private:
 	QLabel * m_vstEmbedLbl;
 	QComboBox* m_vstEmbedComboBox;
 	QString m_vstEmbedMethod;
+	LedCheckBox * m_vstAlwaysOnTopCheckBox;
+	bool m_vstAlwaysOnTop;
 	bool m_syncVSTPlugins;
 	bool m_disableAutoQuit;
 
@@ -193,6 +198,7 @@ private:
 	QLineEdit * m_sf2FileLineEdit;
 #endif
 	QLineEdit * m_backgroundPicFileLineEdit;
+};
 
 	QLabel * restartWarningLbl;
 };

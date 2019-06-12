@@ -521,9 +521,10 @@ void ConfigManager::loadConfigFile(const QString & configFile)
 		cfg_file.close();
 	}
 
-
-	if(m_vstDir.isEmpty() || m_vstDir == QDir::separator() || m_vstDir == "/" ||
-			!QDir(m_vstDir).exists())
+	// Plugins are searched recursively, blacklist problematic locations
+	if( m_vstDir.isEmpty() || m_vstDir == QDir::separator() || m_vstDir == "/" ||
+			m_vstDir == ensureTrailingSlash( QDir::homePath() ) ||
+			!QDir( m_vstDir ).exists() )
 	{
 #ifdef LMMS_BUILD_WIN32
 		QString programFiles = QString::fromLocal8Bit(getenv("ProgramFiles"));
