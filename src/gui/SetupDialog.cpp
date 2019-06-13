@@ -375,13 +375,11 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 			tr("Plugins"), performance_w);
 
 	m_vstEmbedLbl = new QLabel(plugins_tw);
-	counter++;
-	m_vstEmbedLbl->move(XDelta, YDelta * counter);
+	m_vstEmbedLbl->move(XDelta, YDelta * ++counter);
 	m_vstEmbedLbl->setText(tr("VST plugins embedding:"));
 
 	m_vstEmbedComboBox = new QComboBox(plugins_tw);
-	counter++;
-	m_vstEmbedComboBox->move(XDelta, YDelta * counter);
+	m_vstEmbedComboBox->move(XDelta, YDelta * ++counter);
 
 	QStringList embedMethods = ConfigManager::availabeVstEmbedMethods();
 	m_vstEmbedComboBox->addItem(tr("No embedding"), "none");
@@ -401,22 +399,18 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	connect(m_vstEmbedComboBox, SIGNAL(currentIndexChanged(int)),
 			this, SLOT(vstEmbedMethodChanged()));
 
+	counter += 2;
+
 	m_vstAlwaysOnTopCheckBox = new LedCheckBox(
 			tr("Keep plugin windows on top when not embedded"), plugins_tw);
-	counter++;
-	m_vstAlwaysOnTopCheckBox->move(XDelta, YDelta * counter);
+	m_vstAlwaysOnTopCheckBox->move(20, 66);
 	m_vstAlwaysOnTopCheckBox->setChecked(m_vstAlwaysOnTop);
 	m_vstAlwaysOnTopCheckBox->setVisible(m_vstEmbedMethod == "none");
 	connect(m_vstAlwaysOnTopCheckBox, SIGNAL(toggled(bool)),
 			this, SLOT(toggleVSTAlwaysOnTop(bool)));
 
-	LedCheckBox * syncVST = new LedCheckBox(
-			tr("Sync VST plugins to host playback"), plugins_tw);
-	counter += 2;
-	syncVST->move(XDelta, YDelta * counter);
-	syncVST->setChecked(m_syncVSTPlugins);
-	connect(syncVST, SIGNAL(toggled(bool)),
-			this, SLOT(toggleSyncVSTPlugins(bool)));
+	addLedCheckBox("Sync VST plugins to host playback", plugins_tw, counter,
+		m_syncVSTPlugins, SLOT(toggleSyncVSTPlugins(bool)));
 
 	addLedCheckBox("Keep effects running even without input", plugins_tw, counter,
 		m_disableAutoQuit, SLOT(toggleDisableAutoQuit(bool)));
