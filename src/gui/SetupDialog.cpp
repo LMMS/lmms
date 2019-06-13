@@ -193,7 +193,7 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 		int& counter,
 		bool initialState,
 		const char* toggledSlot,
-		bool showRestartWarning = true
+		bool showRestartWarning
 	){
 		LedCheckBox * checkBox = new LedCheckBox(tr(ledText), tw);
 		counter++;
@@ -221,7 +221,7 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	addLedCheckBox("Enable master oscilloscope by default", gui_tw, counter,
 		m_displayWaveform, SLOT(toggleDisplayWaveform(bool)), true);
 	addLedCheckBox("Enable all note labels in piano roll", gui_tw, counter,
-		m_printNoteLabels, SLOT(toggleNoteLabels(bool)));
+		m_printNoteLabels, SLOT(toggleNoteLabels(bool)), false);
 	addLedCheckBox("Enable compact track buttons", gui_tw, counter,
 		m_compactTrackButtons, SLOT(toggleCompactTrackButtons(bool)), true);
 	addLedCheckBox("Enable one instrument-track-window mode", gui_tw, counter,
@@ -240,9 +240,9 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	addLedCheckBox("Compress project files by default", projects_tw, counter,
 		m_MMPZ, SLOT(toggleMMPZ(bool)), true);
 	addLedCheckBox("Create a backup file when saving a project", projects_tw, counter,
-		m_disableBackup,  SLOT(toggleDisableBackup(bool)));
+		m_disableBackup, SLOT(toggleDisableBackup(bool)), false);
 	addLedCheckBox("Reopen last project on startup", projects_tw, counter,
-		m_openLastProject, SLOT(toggleOpenLastProject(bool)));
+		m_openLastProject, SLOT(toggleOpenLastProject(bool)), false);
 
 	projects_tw->setFixedHeight(YDelta + YDelta * counter);
 
