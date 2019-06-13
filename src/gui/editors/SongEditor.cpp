@@ -244,8 +244,8 @@ SongEditor::SongEditor( Song * song ) :
 					this, SLOT( scrolled( int ) ) );
 	connect( m_song, SIGNAL( lengthChanged( int ) ),
 			this, SLOT( updateScrollBar( int ) ) );
-	connect( m_leftRightScroll, SIGNAL(valueChanged(int)),this, SLOT(updateRubberband()));
-	connect( contentWidget()->verticalScrollBar(), SIGNAL(valueChanged(int)),this, SLOT(updateRubberband()));
+	connect(m_leftRightScroll, SIGNAL(valueChanged(int)),this, SLOT(updateRubberband()));
+	connect(contentWidget()->verticalScrollBar(), SIGNAL(valueChanged(int)),this, SLOT(updateRubberband()));
 	connect(m_timeLine, SIGNAL(selectionFinished()), this, SLOT(stopSelectRegion()));
 
 
@@ -304,23 +304,29 @@ void SongEditor::scrolled( int new_pos )
 
 void SongEditor::selectRegionFromPixels(int xStart, int xEnd)
 {
-	if(!m_selectRegion)
+	if (!m_selectRegion)
 	{
-		for (auto &it : findChildren<selectableObject *>())
-		{
-			it->setSelected(false);
-		}
-		rubberBand()->setEnabled( true );
+		m_selectRegion = true;
+
+		//deselect all tcos
+		for (auto &it : findChildren<selectableObject *>()) { it->setSelected(false); }
+
+		rubberBand()->setEnabled(true);
 		rubberBand()->show();
-		m_origin = QPoint( xStart, 0);
+
+		//we save the position of scrollbars, mouse position and zooming level
+		m_origin = QPoint(xStart, 0);
 		m_scrollPos = QPoint(m_leftRightScroll->value(), contentWidget()->verticalScrollBar()->value());
 		m_currentZoomingValue = zoomingModel()->value();
+
+		//calculate the song position where the mouse was clicked
 		m_rubberbandStartMidipos = MidiTime((xStart - m_trackHeadWidth)
 											/ pixelsPerTact() * MidiTime::ticksPerTact())
 											+ m_currentPosition;
 	}
-	m_selectRegion = true;
-	m_mousePos = QPoint( xEnd, std::numeric_limits<int>::max());
+	//the current mouse position within the borders of song editor
+	m_mousePos = QPoint(qMax(m_trackHeadWidth, qMin(xEnd, width()))
+						, std::numeric_limits<int>::max());
 	updateRubberband();
 }
 
@@ -340,6 +346,7 @@ void SongEditor::updateRubberband()
 	if (rubberBandActive())
 	{
 		int originX = m_origin.x();
+
 		//take care of the zooming
 		if (m_currentZoomingValue != m_zoomingModel->value())
 		{
@@ -355,23 +362,23 @@ void SongEditor::updateRubberband()
 		QPoint origin = QPoint(qMax(originX - hs, m_trackHeadWidth), m_origin.y() - vs);
 
 		//paint the rubber band rect
-		rubberBand()->setGeometry(QRect( origin,
-										 contentWidget()->mapFromParent(QPoint(m_mousePos.x(), m_mousePos.y()))
+		rubberBand()->setGeometry(QRect(origin,
+										contentWidget()->mapFromParent(QPoint(m_mousePos.x(), m_mousePos.y()))
 										).normalized());
 
 		//the index of the TrackView the mouse is hover
 		int rubberBandTrackview = trackIndexFromSelectionPoint(m_mousePos.y());
 
 		//the miditime the mouse is hover
-		MidiTime rubberbandMidipos = MidiTime((m_mousePos.x() - m_trackHeadWidth)
-											  / static_cast<int>(pixelsPerTact())
-											  * MidiTime::ticksPerTact()) + m_currentPosition ;
+		MidiTime rubberbandMidipos = MidiTime((qMin(m_mousePos.x(), width()) - m_trackHeadWidth)
+											  / pixelsPerTact() * MidiTime::ticksPerTact())
+											  + m_currentPosition;
 
 		//are tcos in the rect of selection?
 		for (auto &it : findChildren<selectableObject *>())
 		{
 			TrackContentObjectView * tco = dynamic_cast<TrackContentObjectView*>(it);
-			if(tco)
+			if (tco)
 			{
 				auto indexOfTrackView = trackViews().indexOf(tco->getTrackView());
 				bool isBeetweenRubberbandViews = indexOfTrackView >= qMin(m_rubberBandStartTrackview, rubberBandTrackview)
@@ -507,25 +514,23 @@ void SongEditor::mousePressEvent(QMouseEvent *_me)
 {
 	if (allowRubberband())
 	{
-		//we save the position of both scrollbars into a QPoint
+		//we save the position of scrollbars, mouse position and zooming level
 		m_scrollPos = QPoint(m_leftRightScroll->value(), contentWidget()->verticalScrollBar()->value());
-		//and the mouse position
 		m_origin = contentWidget()->mapFromParent(QPoint(_me->pos().x(), _me->pos().y()));
-		//and the zooming
 		m_currentZoomingValue = zoomingModel()->value();
+
 		//paint the rubberband
 		rubberBand()->setEnabled(true);
-		rubberBand()->setGeometry(QRect( m_origin, QSize()));
+		rubberBand()->setGeometry(QRect(m_origin, QSize()));
 		rubberBand()->show();
 
-		//the trackView(index) and the miditime where the mouse has clicked
+		//the trackView(index) and the miditime where the mouse was clicked
 		m_rubberBandStartTrackview = trackIndexFromSelectionPoint(_me->y());
-
 		m_rubberbandStartMidipos = MidiTime((_me->x() - m_trackHeadWidth)
 											/ pixelsPerTact() * MidiTime::ticksPerTact())
 											+ m_currentPosition;
 	}
-	QWidget::mousePressEvent( _me );
+	QWidget::mousePressEvent(_me);
 }
 
 
@@ -533,11 +538,8 @@ void SongEditor::mousePressEvent(QMouseEvent *_me)
 
 void SongEditor::mouseMoveEvent(QMouseEvent *_me)
 {
-	if(!m_selectRegion)
-	{
-		m_mousePos = _me->pos();
-		updateRubberband();
-	}
+	m_mousePos = _me->pos();
+	updateRubberband();
 	QWidget::mouseMoveEvent(_me);
 }
 
@@ -547,8 +549,8 @@ void SongEditor::mouseMoveEvent(QMouseEvent *_me)
 void SongEditor::mouseReleaseEvent(QMouseEvent *_me)
 {
 	rubberBand()->hide();
-	rubberBand()->setEnabled( false );
-	QWidget::mouseReleaseEvent( _me );
+	rubberBand()->setEnabled(false);
+	QWidget::mouseReleaseEvent(_me);
 }
 
 
