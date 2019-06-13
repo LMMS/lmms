@@ -362,9 +362,9 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 			tr("User interface (UI) effects vs. performance"), performance_w);
 
 	addLedCheckBox("Smooth scroll in song editor", ui_fx_tw, counter,
-		m_smoothScroll, SLOT(toggleSmoothScroll(bool)));
+		m_smoothScroll, SLOT(toggleSmoothScroll(bool)), false);
 	addLedCheckBox("Display playback cursor in AudioFileProcessor", ui_fx_tw, counter,
-		m_animateAFP, SLOT(toggleAnimateAFP(bool)));
+		m_animateAFP, SLOT(toggleAnimateAFP(bool)), false);
 
 	ui_fx_tw->setFixedHeight(YDelta + YDelta * counter);
 
@@ -411,10 +411,10 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 			this, SLOT(toggleVSTAlwaysOnTop(bool)));
 
 	addLedCheckBox("Sync VST plugins to host playback", plugins_tw, counter,
-		m_syncVSTPlugins, SLOT(toggleSyncVSTPlugins(bool)));
+		m_syncVSTPlugins, SLOT(toggleSyncVSTPlugins(bool)), false);
 
 	addLedCheckBox("Keep effects running even without input", plugins_tw, counter,
-		m_disableAutoQuit, SLOT(toggleDisableAutoQuit(bool)));
+		m_disableAutoQuit, SLOT(toggleDisableAutoQuit(bool)), false);
 
 	plugins_tw->setFixedHeight(YDelta + YDelta * counter);
 
