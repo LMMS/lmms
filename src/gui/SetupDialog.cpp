@@ -70,7 +70,7 @@
 
 constexpr int BUFFERSIZE_RESOLUTION = 32;
 
-inline void labelWidget( QWidget * w, const QString & txt )
+inline void labelWidget(QWidget * w, const QString & txt)
 {
 	QLabel * title = new QLabel(txt, w);
 	QFont f = title->font();
@@ -126,7 +126,7 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 			"ui", "syncvstplugins").toInt()),
 	m_disableAutoQuit(ConfigManager::inst()->value(
 			"ui", "disableautoquit").toInt()),
-	m_NaNHandler( ConfigManager::inst()->value(
+	m_NaNHandler(ConfigManager::inst()->value(
 			"app", "nanhandler", "1").toInt()),
 	m_hqAudioDev(ConfigManager::inst()->value(
 			"mixer", "hqaudio").toInt()),
@@ -1013,7 +1013,7 @@ void SetupDialog::setAutoSaveInterval(int value)
 	minutes = QString("%1 %2").arg(QString::number(m_saveInterval), minutes);
 	minutes = m_enableAutoSave ?  minutes : tr("disabled");
 	m_saveIntervalLbl->setText(
-			tr("Autosave interval: %1").arg(minutes));
+		tr("Autosave interval: %1").arg(minutes));
 }
 
 
@@ -1061,13 +1061,13 @@ void SetupDialog::toggleSyncVSTPlugins(bool enabled)
 void SetupDialog::vstEmbedMethodChanged()
 {
 	m_vstEmbedMethod = m_vstEmbedComboBox->currentData().toString();
-	m_vstAlwaysOnTopCheckBox->setVisible( m_vstEmbedMethod == "none" );
+	m_vstAlwaysOnTopCheckBox->setVisible(m_vstEmbedMethod == "none");
 }
 
 
-void SetupDialog::toggleVSTAlwaysOnTop( bool en )
+void SetupDialog::toggleVSTAlwaysOnTop(bool enabled)
 {
-	m_vstAlwaysOnTop = en;
+	m_vstAlwaysOnTop = enabled;
 }
 
 
@@ -1152,7 +1152,7 @@ void SetupDialog::midiInterfaceChanged(const QString & iface)
 void SetupDialog::openWorkingDir()
 {
 	QString new_dir = FileDialog::getExistingDirectory(this,
-			tr("Choose the LMMS working directory"), m_workingDir);
+		tr("Choose the LMMS working directory"), m_workingDir);
 	if (!new_dir.isEmpty())
 	{
 		m_workingDirLineEdit->setText(new_dir);
@@ -1169,7 +1169,7 @@ void SetupDialog::setWorkingDir(const QString & workingDir)
 void SetupDialog::openVSTDir()
 {
 	QString new_dir = FileDialog::getExistingDirectory(this,
-			tr("Choose your VST plugins directory"), m_vstDir);
+		tr("Choose your VST plugins directory"), m_vstDir);
 	if (!new_dir.isEmpty())
 	{
 		m_vstDirLineEdit->setText(new_dir);
@@ -1186,7 +1186,7 @@ void SetupDialog::setVSTDir(const QString & vstDir)
 void SetupDialog::openLADSPADir()
 {
 	QString new_dir = FileDialog::getExistingDirectory(this,
-			tr("Choose your LADSPA plugins directory"), m_ladspaDir);
+		tr("Choose your LADSPA plugins directory"), m_ladspaDir);
 	if (!new_dir.isEmpty())
 	{
 		if(m_ladspaDirLineEdit->text() == "")
@@ -1211,7 +1211,7 @@ void SetupDialog::setLADSPADir(const QString & ladspaDir)
 void SetupDialog::openSF2Dir()
 {
 	QString new_dir = FileDialog::getExistingDirectory(this,
-			tr("Choose your SF2 files directory"), m_sf2Dir);
+		tr("Choose your SF2 files directory"), m_sf2Dir);
 	if (!new_dir.isEmpty())
 	{
 		m_sf2DirLineEdit->setText(new_dir);
@@ -1229,7 +1229,7 @@ void SetupDialog::openSF2File()
 {
 #ifdef LMMS_HAVE_FLUIDSYNTH
 	QString new_file = FileDialog::getOpenFileName(this,
-			tr("Choose your default SF2 file"), m_sf2File, "SoundFont 2 files (*.sf2)");
+		tr("Choose your default SF2 file"), m_sf2File, "SoundFont 2 files (*.sf2)");
 
 	if (!new_file.isEmpty())
 	{
@@ -1250,7 +1250,7 @@ void SetupDialog::setSF2File(const QString & sf2File)
 void SetupDialog::openGIGDir()
 {
 	QString new_dir = FileDialog::getExistingDirectory(this,
-			tr("Choose your GIG files directory"), m_gigDir);
+		tr("Choose your GIG files directory"), m_gigDir);
 	if(new_dir != QString::null)
 	{
 		m_gigDirLineEdit->setText(new_dir);
@@ -1267,7 +1267,7 @@ void SetupDialog::setGIGDir(const QString & gigDir)
 void SetupDialog::openThemeDir()
 {
 	QString new_dir = FileDialog::getExistingDirectory(this,
-			tr("Choose your theme directory"), m_themeDir);
+		tr("Choose your theme directory"), m_themeDir);
 	if(new_dir != QString::null)
 	{
 		m_themeDirLineEdit->setText(new_dir);
@@ -1301,7 +1301,7 @@ void SetupDialog::openBackgroundPicFile()
 		m_themeDir :
 		m_backgroundPicFile;
 	QString new_file = FileDialog::getOpenFileName(this,
-			tr("Choose your background picture file"), dir, "Image files (" + fileTypes + ")");
+		tr("Choose your background picture file"), dir, "Picture files (" + fileTypes + ")");
 
 	if(new_file != QString::null)
 	{
