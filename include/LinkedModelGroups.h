@@ -26,6 +26,7 @@
 #define LINKEDMODELGROUPS_H
 
 
+#include <cstddef>
 #include <memory>
 #include <vector>
 
@@ -48,7 +49,7 @@ class LinkedModelGroup : public Model
 	Q_OBJECT
 signals:
 	//! Signal emitted after any of the per-control link-enabled models switch
-	void linkStateChanged(int id, bool value);
+	void linkStateChanged(std::size_t id, bool value);
 
 public:
 	/*
@@ -57,7 +58,7 @@ public:
 	//! @param parent model of the LinkedModelGroups class
 	//! @param curProc number of this processor, counted from 0
 	//! @param nProc total number of processors
-	LinkedModelGroup(Model* parent, int curProc) :
+	LinkedModelGroup(Model* parent, std::size_t curProc) :
 		Model(parent), m_curProc(curProc) {}
 	//! After all models have been added, make this processor the one which
 	//! will contain link models associated with its controls
@@ -67,13 +68,13 @@ public:
 		Linking
 	*/
 	//! Set all per-control link-enabled models to @p state, which will
-	//! also link or unlink them (via `Lv2ControlBase::linkPort()`)
+	//! also link or unlink them (via `LinkedModelGroups::linkModel()`)
 	void linkAllModels(bool state);
 	//! Link specified port with the associated port of @p other
 	//! @param id id of the port, conforming to m_models
-	void linkControls(LinkedModelGroup* other, int id);
+	void linkControls(LinkedModelGroup* other, std::size_t id);
 	//! @see linkControls
-	void unlinkControls(LinkedModelGroup *other, int id);
+	void unlinkControls(LinkedModelGroup *other, std::size_t id);
 	//! Return whether this is the first of more than one processors
 	bool isLinking() const { return m_linkEnabled.size(); }
 
@@ -113,15 +114,11 @@ public:
 	/*
 		General
 	*/
-	int curProc() const { return m_curProc; }
+	std::size_t curProc() const { return m_curProc; }
 
 protected:
 	//! Register a further model
 	void addModel(class AutomatableModel* model, const QString& name);
-
-private slots:
-	//! Callback called after any of the per-control link-enabled models switch
-	void linkStateChangedSlot();
 
 private:
 	//! models for the per-control link-enabled models
@@ -129,7 +126,7 @@ private:
 	//! models for the controls; the vector defines indices for the controls
 	std::vector<ModelInfo> m_models;
 
-	int m_curProc;
+	std::size_t m_curProc;
 };
 
 
@@ -150,8 +147,8 @@ private:
 		{
 			connect(multiChannelLinkModel(), SIGNAL(dataChanged()),
 				this, SLOT(updateLinkStatesFromGlobal()));
-			connect(getGroup(0), SIGNAL(linkStateChanged(int, bool)),
-					this, SLOT(linkPort(int, bool)));
+			connect(getGroup(0), SIGNAL(linkStateChanged(std::size_t, bool)),
+					this, SLOT(linkPort(std::size_t, bool)));
 		}
 	\endcode
 
@@ -171,11 +168,12 @@ public:
 	/*
 		to be called by slots
 	*/
-	//! Take a specified port from the first Lv2Proc and link or unlink it
-	//! from the associated port of every other Lv2Proc
-	//! @param port number conforming to Lv2Proc::m_modelVector
+	//! Take a specified model from the first LinkedModelGroup
+	//! and link or unlink it to/from the associated model
+	//! of every other LinkedModelGroup
+	//! @param model number conforming to getGroup()
 	//! @param state True iff it should be linked
-	void linkPort(int port, bool state);
+	void linkModel(std::size_t model, bool state);
 	//! Callback for the global linking LED
 	void updateLinkStatesFromGlobal();
 
