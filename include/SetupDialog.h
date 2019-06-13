@@ -29,13 +29,12 @@
 #include <QDialog>
 #include <QtCore/QMap>
 
+#include "AudioDevice.h"
+#include "AudioDeviceSetupWidget.h"
 #include "LedCheckbox.h"
 #include "lmmsconfig.h"
-#include "AudioDevice.h"
 #include "MidiClient.h"
 #include "MidiSetupWidget.h"
-
-#include "AudioDeviceSetupWidget.h"
 
 
 class QComboBox;

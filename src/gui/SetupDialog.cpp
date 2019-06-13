@@ -31,41 +31,42 @@
 #include <QMessageBox>
 #include <QScrollArea>
 
+#include "debug.h"
+#include "embed.h"
+#include "Engine.h"
+#include "FileDialog.h"
+#include "gui_templates.h"
+#include "MainWindow.h"
+#include "Mixer.h"
+#include "ProjectJournal.h"
 #include "SetupDialog.h"
 #include "TabBar.h"
 #include "TabButton.h"
-#include "gui_templates.h"
-#include "Mixer.h"
-#include "MainWindow.h"
-#include "ProjectJournal.h"
-#include "embed.h"
-#include "Engine.h"
-#include "debug.h"
 #include "ToolTip.h"
-#include "FileDialog.h"
 
 
 // Platform-specific audio-interface classes.
 #include "AudioAlsa.h"
 #include "AudioAlsaSetupWidget.h"
+#include "AudioDummy.h"
 #include "AudioJack.h"
 #include "AudioOss.h"
-#include "AudioSndio.h"
 #include "AudioPortAudio.h"
-#include "AudioSoundIo.h"
 #include "AudioPulseAudio.h"
 #include "AudioSdl.h"
-#include "AudioDummy.h"
+#include "AudioSndio.h"
+#include "AudioSoundIo.h"
 
 // Platform-specific midi-interface classes.
 #include "MidiAlsaRaw.h"
 #include "MidiAlsaSeq.h"
+#include "MidiApple.h"
+#include "MidiDummy.h"
 #include "MidiJack.h"
 #include "MidiOss.h"
 #include "MidiSndio.h"
 #include "MidiWinMM.h"
-#include "MidiApple.h"
-#include "MidiDummy.h"
+
 
 constexpr int BUFFERSIZE_RESOLUTION = 32;
 
