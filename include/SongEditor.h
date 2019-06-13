@@ -75,6 +75,8 @@ public:
 
 public slots:
 	void scrolled( int new_pos );
+	void selectRegionFromPixels(int xStart, int xEnd);
+	void stopSelectRegion();
 	void updateRubberband();
 
 	void setEditMode( EditMode mode );
@@ -149,6 +151,7 @@ private:
 	MidiTime m_rubberbandStartMidipos;
 	int m_currentZoomingValue;
 	int m_trackHeadWidth;
+	bool m_selectRegion;
 
 	friend class SongEditorWindow;
 

@@ -88,7 +88,8 @@ SongEditor::SongEditor( Song * song ) :
 	m_currentZoomingValue(m_zoomingModel->value()),
 	m_trackHeadWidth(ConfigManager::inst()->value("ui", "compacttrackbuttons").toInt()==1
 					 ? DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT + TRACK_OP_WIDTH_COMPACT
-					 : DEFAULT_SETTINGS_WIDGET_WIDTH + TRACK_OP_WIDTH)
+					 : DEFAULT_SETTINGS_WIDGET_WIDTH + TRACK_OP_WIDTH),
+	m_selectRegion(false)
 {
 	m_zoomingModel->setParent(this);
 	// create time-line
@@ -245,6 +246,7 @@ SongEditor::SongEditor( Song * song ) :
 			this, SLOT( updateScrollBar( int ) ) );
 	connect( m_leftRightScroll, SIGNAL(valueChanged(int)),this, SLOT(updateRubberband()));
 	connect( contentWidget()->verticalScrollBar(), SIGNAL(valueChanged(int)),this, SLOT(updateRubberband()));
+	connect(m_timeLine, SIGNAL(selectionFinished()), this, SLOT(stopSelectRegion()));
 
 
 	// Set up zooming model
@@ -300,12 +302,45 @@ void SongEditor::scrolled( int new_pos )
 
 
 
+void SongEditor::selectRegionFromPixels(int xStart, int xEnd)
+{
+	if(!m_selectRegion)
+	{
+		for (auto &it : findChildren<selectableObject *>())
+		{
+			it->setSelected(false);
+		}
+		rubberBand()->setEnabled( true );
+		rubberBand()->show();
+		m_origin = QPoint( xStart, 0);
+		m_scrollPos = QPoint(m_leftRightScroll->value(), contentWidget()->verticalScrollBar()->value());
+		m_currentZoomingValue = zoomingModel()->value();
+		m_rubberbandStartMidipos = MidiTime((xStart - m_trackHeadWidth)
+											/ pixelsPerTact() * MidiTime::ticksPerTact())
+											+ m_currentPosition;
+	}
+	m_selectRegion = true;
+	m_mousePos = QPoint( xEnd, std::numeric_limits<int>::max());
+	updateRubberband();
+}
+
+
+
+
+void SongEditor::stopSelectRegion()
+{
+	m_selectRegion = false;
+}
+
+
+
+
 void SongEditor::updateRubberband()
 {
 	if (rubberBandActive())
 	{
-		//take care of the zooming
 		int originX = m_origin.x();
+		//take care of the zooming
 		if (m_currentZoomingValue != m_zoomingModel->value())
 		{
 			originX = m_trackHeadWidth + (originX - m_trackHeadWidth)
@@ -331,6 +366,7 @@ void SongEditor::updateRubberband()
 		MidiTime rubberbandMidipos = MidiTime((m_mousePos.x() - m_trackHeadWidth)
 											  / static_cast<int>(pixelsPerTact())
 											  * MidiTime::ticksPerTact()) + m_currentPosition ;
+
 		//are tcos in the rect of selection?
 		for (auto &it : findChildren<selectableObject *>())
 		{
@@ -497,8 +533,11 @@ void SongEditor::mousePressEvent(QMouseEvent *_me)
 
 void SongEditor::mouseMoveEvent(QMouseEvent *_me)
 {
-	m_mousePos = _me->pos();
-	updateRubberband();
+	if(!m_selectRegion)
+	{
+		m_mousePos = _me->pos();
+		updateRubberband();
+	}
 	QWidget::mouseMoveEvent(_me);
 }
 
