@@ -808,7 +808,7 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 
 	// Restart warning label.
 	restartWarningLbl = new QLabel(
-			tr("<strong>Warning:</strong> Some changes require restarting LMMS."), extras_w);
+			tr("Some changes require restarting."), extras_w);
 	restartWarningLbl->hide();
 
 	// OK button.
