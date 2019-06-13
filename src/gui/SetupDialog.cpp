@@ -186,23 +186,17 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	labelWidget(general_w, tr("General settings"));
 
 
-	int labelNumber1 = 0;
-
-	// GUI tab.
-	TabWidget * gui_tw = new TabWidget(
-			tr("Graphical user interface (GUI)"), general_w);
-
 	auto addLedCheckBox = [&XDelta, &YDelta, this](
 		const char* ledText,
 		TabWidget* tw,
-		int& labelNumber,
+		int& counter,
 		bool initialState,
 		const char* toggledSlot,
 		bool showRestartWarning = true
 	){
 		LedCheckBox * checkBox = new LedCheckBox(tr(ledText), tw);
-		labelNumber++;
-		checkBox->move(XDelta, YDelta * labelNumber);
+		counter++;
+		checkBox->move(XDelta, YDelta * counter);
 		checkBox->setChecked(initialState);
 		connect(checkBox, SIGNAL(toggled(bool)), this, toggledSlot);
 		if (showRestartWarning)
@@ -211,37 +205,45 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 		}
 	};
 
-	addLedCheckBox("Enable tooltips", gui_tw, labelNumber1,
+
+	int counter = 0;
+
+	// GUI tab.
+	TabWidget * gui_tw = new TabWidget(
+			tr("Graphical user interface (GUI)"), general_w);
+
+
+	addLedCheckBox("Enable tooltips", gui_tw, counter,
 		m_tooltips, SLOT(toggleTooltips(bool)), true);
-	addLedCheckBox("Display volume as dBFS ", gui_tw, labelNumber1,
+	addLedCheckBox("Display volume as dBFS ", gui_tw, counter,
 		m_displaydBFS, SLOT(toggleDisplaydBFS(bool)), true);
-	addLedCheckBox("Enable master oscilloscope by default", gui_tw, labelNumber1,
+	addLedCheckBox("Enable master oscilloscope by default", gui_tw, counter,
 		m_displayWaveform, SLOT(toggleDisplayWaveform(bool)), true);
-	addLedCheckBox("Enable all note labels in piano roll", gui_tw, labelNumber1,
+	addLedCheckBox("Enable all note labels in piano roll", gui_tw, counter,
 		m_printNoteLabels, SLOT(toggleNoteLabels(bool)));
-	addLedCheckBox("Enable compact track buttons", gui_tw, labelNumber1,
+	addLedCheckBox("Enable compact track buttons", gui_tw, counter,
 		m_compactTrackButtons, SLOT(toggleCompactTrackButtons(bool)), true);
-	addLedCheckBox("Enable one instrument-track-window mode", gui_tw, labelNumber1,
+	addLedCheckBox("Enable one instrument-track-window mode", gui_tw, counter,
 		m_oneInstrumentTrackWindow, SLOT(toggleOneInstrumentTrackWindow(bool)), true);
 
-	gui_tw->setFixedHeight(YDelta + YDelta * labelNumber1);
+	gui_tw->setFixedHeight(YDelta + YDelta * counter);
 
 
-	int labelNumber2 = 0;
+	counter = 0;
 
 	// Projects tab.
 	TabWidget * projects_tw = new TabWidget(
 			tr("Projects"), general_w);
 
 
-	addLedCheckBox("Compress project files by default", projects_tw, labelNumber2,
+	addLedCheckBox("Compress project files by default", projects_tw, counter,
 		m_MMPZ, SLOT(toggleMMPZ(bool)), true);
-	addLedCheckBox("Create a backup file when saving a project", projects_tw, labelNumber2,
+	addLedCheckBox("Create a backup file when saving a project", projects_tw, counter,
 		m_disableBackup,  SLOT(toggleDisableBackup(bool)));
-	addLedCheckBox("Reopen last project on startup", projects_tw, labelNumber2,
+	addLedCheckBox("Reopen last project on startup", projects_tw, counter,
 		m_openLastProject, SLOT(toggleOpenLastProject(bool)));
 
-	projects_tw->setFixedHeight(YDelta + YDelta * labelNumber2);
+	projects_tw->setFixedHeight(YDelta + YDelta * counter);
 
 	// Language tab.
 	TabWidget * lang_tw = new TabWidget(
@@ -352,34 +354,34 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	m_runningAutoSave->setVisible(m_enableAutoSave);
 
 
-	int labelNumber3 = 0;
+	counter = 0;
 
 	// UI effect vs. performance tab.
 	TabWidget * ui_fx_tw = new TabWidget(
 			tr("User interface (UI) effects vs. performance"), performance_w);
 
-	addLedCheckBox("Smooth scroll in song editor", ui_fx_tw, labelNumber3,
+	addLedCheckBox("Smooth scroll in song editor", ui_fx_tw, counter,
 		m_smoothScroll, SLOT(toggleSmoothScroll(bool)));
-	addLedCheckBox("Display playback cursor in AudioFileProcessor", ui_fx_tw, labelNumber3,
+	addLedCheckBox("Display playback cursor in AudioFileProcessor", ui_fx_tw, counter,
 		m_animateAFP, SLOT(toggleAnimateAFP(bool)));
 
-	ui_fx_tw->setFixedHeight(YDelta + YDelta * labelNumber3);
+	ui_fx_tw->setFixedHeight(YDelta + YDelta * counter);
 
 
-	int labelNumber4 = 0;
+	counter = 0;
 
 	// Plugins tab.
 	TabWidget * plugins_tw = new TabWidget(
 			tr("Plugins"), performance_w);
 
 	m_vstEmbedLbl = new QLabel(plugins_tw);
-	labelNumber4++;
-	m_vstEmbedLbl->move(XDelta, YDelta * labelNumber4);
+	counter++;
+	m_vstEmbedLbl->move(XDelta, YDelta * counter);
 	m_vstEmbedLbl->setText(tr("VST plugins embedding:"));
 
 	m_vstEmbedComboBox = new QComboBox(plugins_tw);
-	labelNumber4++;
-	m_vstEmbedComboBox->move(XDelta, YDelta * labelNumber4);
+	counter++;
+	m_vstEmbedComboBox->move(XDelta, YDelta * counter);
 
 	QStringList embedMethods = ConfigManager::availabeVstEmbedMethods();
 	m_vstEmbedComboBox->addItem(tr("No embedding"), "none");
@@ -401,8 +403,8 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 
 	m_vstAlwaysOnTopCheckBox = new LedCheckBox(
 			tr("Keep plugin windows on top when not embedded"), plugins_tw);
-	labelNumber4++;
-	m_vstAlwaysOnTopCheckBox->move(XDelta, YDelta * labelNumber4);
+	counter++;
+	m_vstAlwaysOnTopCheckBox->move(XDelta, YDelta * counter);
 	m_vstAlwaysOnTopCheckBox->setChecked(m_vstAlwaysOnTop);
 	m_vstAlwaysOnTopCheckBox->setVisible(m_vstEmbedMethod == "none");
 	connect(m_vstAlwaysOnTopCheckBox, SIGNAL(toggled(bool)),
@@ -410,16 +412,16 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 
 	LedCheckBox * syncVST = new LedCheckBox(
 			tr("Sync VST plugins to host playback"), plugins_tw);
-	labelNumber4 += 2;
-	syncVST->move(XDelta, YDelta * labelNumber4);
+	counter += 2;
+	syncVST->move(XDelta, YDelta * counter);
 	syncVST->setChecked(m_syncVSTPlugins);
 	connect(syncVST, SIGNAL(toggled(bool)),
 			this, SLOT(toggleSyncVSTPlugins(bool)));
 
-	addLedCheckBox("Keep effects running even without input", plugins_tw, labelNumber4,
+	addLedCheckBox("Keep effects running even without input", plugins_tw, counter,
 		m_disableAutoQuit, SLOT(toggleDisableAutoQuit(bool)));
 
-	plugins_tw->setFixedHeight(YDelta + YDelta * labelNumber4);
+	plugins_tw->setFixedHeight(YDelta + YDelta * counter);
 
 
 	// Performance layout ordering.
