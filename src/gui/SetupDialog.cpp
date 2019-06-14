@@ -548,10 +548,10 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	bufferSize_tw->setFixedHeight(76);
 
 	m_bufferSizeSlider = new QSlider(Qt::Horizontal, bufferSize_tw);
-	m_bufferSizeSlider->setRange(1, 256);
+	m_bufferSizeSlider->setRange(1, 128);
 	m_bufferSizeSlider->setTickInterval(8);
 	m_bufferSizeSlider->setPageStep(8);
-	m_bufferSizeSlider->setValue(m_bufferSize / 64);
+	m_bufferSizeSlider->setValue(m_bufferSize / BUFFERSIZE_RESOLUTION);
 	m_bufferSizeSlider->setGeometry(10, 18, 340, 18);
 	m_bufferSizeSlider->setTickPosition(QSlider::TicksBelow);
 
