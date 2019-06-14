@@ -35,7 +35,7 @@
 #include "SaControls.h"
 
 
-// Receives audio data, runs FFT analysis and stores the result.
+//! Receives audio data, runs FFT analysis and stores the result.
 class SaProcessor
 {
 public:
