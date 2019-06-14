@@ -41,6 +41,7 @@ SaWaterfallView::SaWaterfallView(SaControls *controls, SaProcessor *processor, Q
 	m_controls(controls),
 	m_processor(processor)
 {
+	m_controlDialog = (EffectControlDialog*) _parent;
 	setMinimumSize(300, 150);
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
@@ -196,7 +197,8 @@ void SaWaterfallView::periodicUpdate()
 void SaWaterfallView::updateVisibility()
 {
 	// get container of the control dialog to be resized if needed
-	QWidget *subWindow = m_controls->m_controlsDialog->parentWidget();
+	QWidget *subWindow = m_controlDialog->parentWidget();
+
 
 	if (m_controls->m_waterfallModel.value())
 	{
@@ -208,16 +210,16 @@ void SaWaterfallView::updateVisibility()
 		setVisible(true);
 
 		// increase window size if it is too small
-		if (subWindow->size().height() < m_controls->m_controlsDialog->sizeHint().height())
+		if (subWindow->size().height() < m_controlDialog->sizeHint().height())
 		{
-			subWindow->resize(subWindow->size().width(), m_controls->m_controlsDialog->sizeHint().height());
+			subWindow->resize(subWindow->size().width(), m_controlDialog->sizeHint().height());
 		}
 	}
 	else
 	{
 		setVisible(false);
 		// decrease window size only if it does not violate sizeHint
-		subWindow->resize(subWindow->size().width(), m_controls->m_controlsDialog->sizeHint().height());
+		subWindow->resize(subWindow->size().width(), m_controlDialog->sizeHint().height());
 	}
 }
 

@@ -96,7 +96,6 @@ public:
 
 private:
 	Analyzer *m_effect;
-	EffectControlDialog *m_controlsDialog;
 
 	BoolModel m_pauseModel;
 	BoolModel m_refFreezeModel;

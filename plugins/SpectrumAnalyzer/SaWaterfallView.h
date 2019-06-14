@@ -55,6 +55,7 @@ private slots:
 private:
 	SaControls *m_controls;
 	SaProcessor *m_processor;
+	EffectControlDialog *m_controlDialog;
 
 	// Methods and data used to make time labels
 	float m_oldTimePerLine;
