@@ -61,7 +61,7 @@ SaControlsDialog::SaControlsDialog(SaControls *controls, SaProcessor *processor)
 	config_widget->setLayout(config_layout);
 	display_splitter->addWidget(config_widget);
 
-	// Pre-compute target pixmap size based on on monitor DPI.
+	// Pre-compute target pixmap size based on monitor DPI.
 	// Using setDevicePixelRatio() on pixmap allows the SVG image to be razor
 	// sharp on High-DPI screens, but the desired size must be manually
 	// enlarged. No idea how to make Qt do it in a more reasonable way.
