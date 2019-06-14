@@ -11,7 +11,9 @@ SaSpectrumDisplay and SaWaterfallDisplay show the result of spectrum analysis. T
 
 ## Changelog
 
-	1.0.1	2019-06-02	- code style changes
-						- added tool-tips
-						- use const for unmodified arrays passed to fft_helpers
-	1.0.0	2019-04-07	Initial release
+	1.0.1	2019-06-02
+		- code style changes
+		- added tool-tips
+		- use const for unmodified arrays passed to fft_helpers
+	1.0.0	2019-04-07
+		- initial release
