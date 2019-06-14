@@ -68,8 +68,8 @@ protected slots:
 
 private slots:
 	// General settings widget.
-	void toggleTooltips(bool enabled);
 	void toggleDisplaydBFS(bool enabled);
+	void toggleTooltips(bool enabled);
 	void toggleDisplayWaveform(bool enabled);
 	void toggleNoteLabels(bool enabled);
 	void toggleCompactTrackButtons(bool enabled);
@@ -124,8 +124,8 @@ private:
 	TabBar * m_tabBar;
 
 	// General settings widgets.
-	bool m_tooltips;
 	bool m_displaydBFS;
+	bool m_tooltips;
 	bool m_displayWaveform;
 	bool m_printNoteLabels;
 	bool m_compactTrackButtons;

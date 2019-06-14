@@ -88,10 +88,10 @@ inline void labelWidget(QWidget * w, const QString & txt)
 
 
 SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
-	m_tooltips(!ConfigManager::inst()->value(
-			"tooltips", "disabled").toInt()),
 	m_displaydBFS(ConfigManager::inst()->value(
 			"app", "displaydbfs").toInt()),
+	m_tooltips(!ConfigManager::inst()->value(
+			"tooltips", "disabled").toInt()),
 	m_displayWaveform(ConfigManager::inst()->value(
 			"ui", "displaywaveform").toInt()),
 	m_printNoteLabels(ConfigManager::inst()->value(
@@ -184,7 +184,7 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	QVBoxLayout * general_layout = new QVBoxLayout(general_w);
 	general_layout->setSpacing(10);
 	general_layout->setMargin(0);
-	labelWidget(general_w, tr("General settings"));
+	labelWidget(general_w, tr("General"));
 
 
 	auto addLedCheckBox = [&XDelta, &YDelta, this](
@@ -214,10 +214,10 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 			tr("Graphical user interface (GUI)"), general_w);
 
 
-	addLedCheckBox("Enable tooltips", gui_tw, counter,
-		m_tooltips, SLOT(toggleTooltips(bool)), true);
 	addLedCheckBox("Display volume as dBFS ", gui_tw, counter,
 		m_displaydBFS, SLOT(toggleDisplaydBFS(bool)), true);
+	addLedCheckBox("Enable tooltips", gui_tw, counter,
+		m_tooltips, SLOT(toggleTooltips(bool)), true);
 	addLedCheckBox("Enable master oscilloscope by default", gui_tw, counter,
 		m_displayWaveform, SLOT(toggleDisplayWaveform(bool)), true);
 	addLedCheckBox("Enable all note labels in piano roll", gui_tw, counter,
@@ -308,7 +308,7 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	performance_layout->setSpacing(10);
 	performance_layout->setMargin(0);
 	labelWidget(performance_w,
-			tr("Performance settings"));
+			tr("Performance"));
 
 
 	// Autosave tab.
@@ -433,7 +433,7 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	audio_layout->setSpacing(10);
 	audio_layout->setMargin(0);
 	labelWidget(audio_w,
-			tr("Audio settings"));
+			tr("Audio"));
 
 	// Audio interface tab.
 	TabWidget * audioiface_tw = new TabWidget(
@@ -588,7 +588,7 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	midi_layout->setSpacing(10);
 	midi_layout->setMargin(0);
 	labelWidget(midi_w,
-			tr("MIDI settings"));
+			tr("MIDI"));
 
 	// MIDI interface tab.
 	TabWidget * midiiface_tw = new TabWidget(
@@ -684,7 +684,7 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	paths_layout->setSpacing(10);
 	paths_layout->setMargin(0);
 
-	labelWidget(paths_w, tr("Paths settings"));
+	labelWidget(paths_w, tr("Paths"));
 
 
 	// Paths scroll area.
@@ -709,7 +709,7 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 		QLineEdit*& lineEdit,
 		const char* pixmap = "project_open")
 	{
-		TabWidget * newTw = new TabWidget(tr(caption).toUpper(),
+		TabWidget * newTw = new TabWidget(tr(caption),
 					pathSelectors);
 		newTw->setFixedHeight(48);
 
@@ -733,20 +733,20 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 		SLOT(setWorkingDir(const QString &)),
 		SLOT(openWorkingDir()),
 		m_workingDirLineEdit);
-	addPathEntry("VST-plugin directory", m_vstDir,
+	addPathEntry("VST plugins directory", m_vstDir,
 		SLOT(setVSTDir(const QString &)),
 		SLOT(openVSTDir()),
 		m_vstDirLineEdit);
-	addPathEntry("LADSPA plugin directories", m_ladspaDir,
+	addPathEntry("LADSPA plugins directories", m_ladspaDir,
 		SLOT(setLADSPADir(const QString &)),
 		SLOT(openLADSPADir()),
 		m_ladspaDirLineEdit, "add_folder");
-	addPathEntry("SF2 files directory", m_sf2Dir,
+	addPathEntry("SF2 directory", m_sf2Dir,
 		SLOT(setSF2Dir(const QString &)),
 		SLOT(openSF2Dir()),
 		m_sf2DirLineEdit);
 #ifdef LMMS_HAVE_FLUIDSYNTH
-	addPathEntry("Default Soundfont File", m_sf2File,
+	addPathEntry("Default SF2", m_sf2File,
 		SLOT(setSF2File(const QString &)),
 		SLOT(openSF2File()),
 		m_sf2FileLineEdit);
@@ -776,19 +776,19 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 
 	// Major tabs ordering.
 	m_tabBar->addTab(general_w,
-			tr("General settings"), 0, false, true)->setIcon(
+			tr("General"), 0, false, true)->setIcon(
 					embed::getIconPixmap("setup_general"));
 	m_tabBar->addTab(performance_w,
-			tr("Performance settings"), 1, false, true)->setIcon(
+			tr("Performance"), 1, false, true)->setIcon(
 					embed::getIconPixmap("setup_performance"));
 	m_tabBar->addTab(audio_w,
-			tr("Audio settings"), 2, false, true)->setIcon(
+			tr("Audio"), 2, false, true)->setIcon(
 					embed::getIconPixmap("setup_audio"));
 	m_tabBar->addTab(midi_w,
-			tr("MIDI settings"), 3, false, true)->setIcon(
+			tr("MIDI"), 3, false, true)->setIcon(
 					embed::getIconPixmap("setup_midi"));
 	m_tabBar->addTab(paths_w,
-			tr("Paths settings"), 4, true, true)->setIcon(
+			tr("Paths"), 4, true, true)->setIcon(
 					embed::getIconPixmap("setup_directories"));
 
 	m_tabBar->setActiveTab(tab_to_open);
@@ -861,10 +861,10 @@ void SetupDialog::accept()
 	from taking mouse input, rendering the application unusable. */
 	QDialog::accept();
 
-	ConfigManager::inst()->setValue("tooltips", "disabled",
-					QString::number(!m_tooltips));
 	ConfigManager::inst()->setValue("app", "displaydbfs",
 					QString::number(m_displaydBFS));
+	ConfigManager::inst()->setValue("tooltips", "disabled",
+					QString::number(!m_tooltips));
 	ConfigManager::inst()->setValue("ui", "displaywaveform",
 					QString::number(m_displayWaveform));
 	ConfigManager::inst()->setValue("ui", "printnotelabels",
@@ -941,15 +941,15 @@ void SetupDialog::accept()
 
 // General settings slots.
 
-void SetupDialog::toggleTooltips(bool enabled)
-{
-	m_tooltips = enabled;
-}
-
-
 void SetupDialog::toggleDisplaydBFS(bool enabled)
 {
 	m_displaydBFS = enabled;
+}
+
+
+void SetupDialog::toggleTooltips(bool enabled)
+{
+	m_tooltips = enabled;
 }
 
 
@@ -1011,7 +1011,7 @@ void SetupDialog::setAutoSaveInterval(int value)
 	m_saveIntervalSlider->setValue(m_saveInterval);
 	QString minutes = m_saveInterval > 1 ? tr("minutes") : tr("minute");
 	minutes = QString("%1 %2").arg(QString::number(m_saveInterval), minutes);
-	minutes = m_enableAutoSave ?  minutes : tr("disabled");
+	minutes = m_enableAutoSave ?  minutes : tr("Disabled");
 	m_saveIntervalLbl->setText(
 		tr("Autosave interval: %1").arg(minutes));
 }
@@ -1211,7 +1211,7 @@ void SetupDialog::setLADSPADir(const QString & ladspaDir)
 void SetupDialog::openSF2Dir()
 {
 	QString new_dir = FileDialog::getExistingDirectory(this,
-		tr("Choose your SF2 files directory"), m_sf2Dir);
+		tr("Choose your SF2 directory"), m_sf2Dir);
 	if (!new_dir.isEmpty())
 	{
 		m_sf2DirLineEdit->setText(new_dir);
@@ -1229,7 +1229,7 @@ void SetupDialog::openSF2File()
 {
 #ifdef LMMS_HAVE_FLUIDSYNTH
 	QString new_file = FileDialog::getOpenFileName(this,
-		tr("Choose your default SF2 file"), m_sf2File, "SoundFont 2 files (*.sf2)");
+		tr("Choose your default SF2"), m_sf2File, "SoundFont 2 files (*.sf2)");
 
 	if (!new_file.isEmpty())
 	{
@@ -1250,7 +1250,7 @@ void SetupDialog::setSF2File(const QString & sf2File)
 void SetupDialog::openGIGDir()
 {
 	QString new_dir = FileDialog::getExistingDirectory(this,
-		tr("Choose your GIG files directory"), m_gigDir);
+		tr("Choose your GIG directory"), m_gigDir);
 	if(new_dir != QString::null)
 	{
 		m_gigDirLineEdit->setText(new_dir);
@@ -1301,7 +1301,7 @@ void SetupDialog::openBackgroundPicFile()
 		m_themeDir :
 		m_backgroundPicFile;
 	QString new_file = FileDialog::getOpenFileName(this,
-		tr("Choose your background picture file"), dir, "Picture files (" + fileTypes + ")");
+		tr("Choose your background picture"), dir, "Picture files (" + fileTypes + ")");
 
 	if(new_file != QString::null)
 	{
