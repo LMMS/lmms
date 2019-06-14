@@ -32,7 +32,7 @@
 #include "SaProcessor.h"
 
 
-// Top level class; handles LMMS interface and feeds data to the data processor.
+//! Top level class; handles LMMS interface and feeds data to the data processor.
 class Analyzer : public Effect
 {
 public:
