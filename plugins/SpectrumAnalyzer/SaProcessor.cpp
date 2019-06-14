@@ -112,7 +112,7 @@ void SaProcessor::analyse(sampleFrame *in_buffer, const fpp_t frame_count)
 	
 			// Run analysis only if buffers contain enough data.
 			// Also, to prevent audio interruption and a momentary GUI freeze,
-			// skip analysis is buffers are being reallocated.
+			// skip analysis if buffers are being reallocated.
 			if (m_framesFilledUp < m_inBlockSize || m_reallocating) {return;}
 
 			// update sample rate
