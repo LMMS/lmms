@@ -37,7 +37,7 @@
 #include "SaProcessor.h"
 
 
-// Widget that displays a spectrum curve and frequency / amplitude grid
+//! Widget that displays a spectrum curve and frequency / amplitude grid
 class SaSpectrumView : public QWidget
 {
 	Q_OBJECT
