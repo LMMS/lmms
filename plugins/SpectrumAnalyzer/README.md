@@ -1,4 +1,4 @@
-# Spectrum Anylyzer plugin
+# Spectrum Analyzer plugin
 
 ## Overview
 
