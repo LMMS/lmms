@@ -54,10 +54,10 @@ void AudioPortAudioSetupUtil::updateChannels()
 
 
 AudioPortAudio::AudioPortAudio( bool & _success_ful, Mixer * _mixer ) :
-	AudioDevice( tLimit<ch_cnt_t>(
+	AudioDevice( qBound<ch_cnt_t>(
+		DEFAULT_CHANNELS,
 		ConfigManager::inst()->value( "audioportaudio", "channels" ).toInt(),
-					DEFAULT_CHANNELS, SURROUND_CHANNELS ),
-								_mixer ),
+		SURROUND_CHANNELS ), _mixer ),
 	m_paStream( NULL ),
 	m_wasPAInitError( false ),
 	m_outBuf( new surroundSampleFrame[mixer()->framesPerPeriod()] ),
