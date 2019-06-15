@@ -31,7 +31,6 @@
 #include "Engine.h"
 #include "Model.h"
 #include "JournallingObject.h"
-#include "templates.h"
 #include "ValueBuffer.h"
 
 class ControllerDialog;

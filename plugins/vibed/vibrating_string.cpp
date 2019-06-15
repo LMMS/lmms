@@ -24,7 +24,6 @@
 #include <math.h>
 
 #include "vibrating_string.h"
-#include "templates.h"
 #include "interpolation.h"
 #include "Mixer.h"
 #include "Engine.h"

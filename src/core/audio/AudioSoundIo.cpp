@@ -33,7 +33,6 @@
 #include "debug.h"
 #include "ConfigManager.h"
 #include "gui_templates.h"
-#include "templates.h"
 #include "ComboBox.h"
 #include "Mixer.h"
 

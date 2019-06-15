@@ -48,7 +48,6 @@ void AudioPortAudioSetupUtil::updateChannels()
 #include "Engine.h"
 #include "ConfigManager.h"
 #include "gui_templates.h"
-#include "templates.h"
 #include "ComboBox.h"
 #include "Mixer.h"
 

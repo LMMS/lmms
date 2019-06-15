@@ -36,7 +36,6 @@
 #include "Mixer.h"
 #include "Engine.h"
 #include "gui_templates.h"
-#include "templates.h"
 
 #ifdef LMMS_HAVE_UNISTD_H
 #include <unistd.h>

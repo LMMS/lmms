@@ -28,7 +28,6 @@
 
 #include "lmms_basics.h"
 #include "volume.h"
-#include "templates.h"
 #include "panning_constants.h"
 #include "Midi.h"
 
