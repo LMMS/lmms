@@ -35,6 +35,7 @@
 #include "MainWindow.h"
 #include "SaProcessor.h"
 
+#include <iostream>
 
 SaWaterfallView::SaWaterfallView(SaControls *controls, SaProcessor *processor, QWidget *_parent) :
 	QWidget(_parent),
@@ -119,15 +120,22 @@ void SaWaterfallView::paintEvent(QPaintEvent *event)
 
 	// draw the spectrogram precomputed in SaProcessor
 	QMutexLocker lock(&m_processor->m_dataAccess);
-	painter.drawImage(displayLeft, displayTop,					// top left corner coordinates
-					  QImage(m_processor->m_history.data(),		// raw pixel data to display
-							 m_processor->binCount(),			// width = number of frequency bins
-							 m_processor->m_waterfallHeight,	// height = number of history lines
-							 QImage::Format_RGB32
-							 ).scaled(displayWidth,				// scale to fit view..
-									  displayBottom,
-									  Qt::IgnoreAspectRatio,
-									  Qt::SmoothTransformation));
+	if (m_processor->m_waterfallNotEmpty)
+	{
+		painter.drawImage(displayLeft, displayTop,					// top left corner coordinates
+						  QImage(m_processor->m_history.data(),		// raw pixel data to display
+								 m_processor->binCount(),			// width = number of frequency bins
+								 m_processor->m_waterfallHeight,	// height = number of history lines
+								 QImage::Format_RGB32
+								 ).scaled(displayWidth,				// scale to fit view..
+										  displayBottom,
+										  Qt::IgnoreAspectRatio,
+										  Qt::SmoothTransformation));
+	}
+	else
+	{
+		painter.fillRect(displayLeft, displayTop, displayWidth, displayBottom, QColor(0,0,0));
+	}
 	lock.unlock();
 
 	// always draw the outline
