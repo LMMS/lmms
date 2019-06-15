@@ -36,7 +36,6 @@
 #include "Mixer.h"
 #include "Engine.h"
 #include "gui_templates.h"
-#include "templates.h"
 
 #ifdef LMMS_HAVE_UNISTD_H
 #include <unistd.h>
@@ -50,10 +49,11 @@
 
 
 AudioSndio::AudioSndio(bool & _success_ful, Mixer * _mixer) :
-	AudioDevice( tLimit<ch_cnt_t>(
-	    ConfigManager::inst()->value( "audiosndio", "channels" ).toInt(),
-	    DEFAULT_CHANNELS, SURROUND_CHANNELS ), _mixer ),
-            m_convertEndian ( false )
+	AudioDevice( qBound<ch_cnt_t>(
+		DEFAULT_CHANNELS,
+		ConfigManager::inst()->value( "audiosndio", "channels" ).toInt(),
+		SURROUND_CHANNELS ), _mixer ),
+	m_convertEndian ( false )
 {
 	_success_ful = false;
 
