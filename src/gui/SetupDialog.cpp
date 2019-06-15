@@ -145,7 +145,7 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 {
 	setWindowIcon(embed::getIconPixmap("setup_general"));
 	setWindowTitle(tr("Settings"));
-	setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
+	setWindowFlag(Qt::WindowContextHelpButtonHint, false);
 	setModal(true);
 	setFixedSize(454, 400);
 
