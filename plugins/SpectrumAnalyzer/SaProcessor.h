@@ -101,12 +101,13 @@ private:
 
 	// spectrum history for waterfall: new normSpectrum lines are added on top
 	std::vector<uchar> m_history;
-	const int m_waterfallHeight = 200;	// Number of stored lines.
-										// Note: high values may make it harder to see transients.
+	const unsigned int m_waterfallHeight = 200;	// Number of stored lines.
+												// Note: high values may make it harder to see transients.
 
 	// book keeping
 	bool m_spectrumActive;
 	bool m_waterfallActive;
+	unsigned int m_waterfallNotEmpty;
 	bool m_destroyed;
 	bool m_reallocating;
 

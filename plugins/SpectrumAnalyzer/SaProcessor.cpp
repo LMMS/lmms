@@ -41,6 +41,7 @@ SaProcessor::SaProcessor(SaControls *controls) :
 	m_framesFilledUp(0),
 	m_spectrumActive(false),
 	m_waterfallActive(false),
+	m_waterfallNotEmpty(0),
 	m_destroyed(false),
 	m_reallocating(false)
 {
@@ -95,7 +96,8 @@ void SaProcessor::analyse(sampleFrame *in_buffer, const fpp_t frame_count)
 		fpp_t in_frame = 0;
 		while (in_frame < frame_count)
 		{
-			// fill sample buffers
+			// fill sample buffers and check for zero input
+			bool block_empty = true;
 			for (; in_frame < frame_count && m_framesFilledUp < m_inBlockSize; in_frame++, m_framesFilledUp++)
 			{
 				if (stereo)
@@ -107,6 +109,10 @@ void SaProcessor::analyse(sampleFrame *in_buffer, const fpp_t frame_count)
 				{
 					m_bufferL[m_framesFilledUp] = (in_buffer[in_frame][0] + in_buffer[in_frame][1]) * 0.5;
 					m_bufferR[m_framesFilledUp] = (in_buffer[in_frame][0] + in_buffer[in_frame][1]) * 0.5;
+				}
+				if (in_buffer[in_frame][0] != 0 || in_buffer[in_frame][1] != 0)
+				{
+					block_empty = false;
 				}
 			}
 	
@@ -141,8 +147,18 @@ void SaProcessor::analyse(sampleFrame *in_buffer, const fpp_t frame_count)
 				absspec(m_spectrumR, m_absSpectrumR.data(), binCount());
 				normalize(m_absSpectrumR, m_normSpectrumR, m_inBlockSize);
 			}
-	
-			if (m_waterfallActive)
+
+			// count empty lines so that empty history does not have to update
+			if (block_empty && m_waterfallNotEmpty)
+			{
+				m_waterfallNotEmpty -= 1;
+			}
+			else if (!block_empty)
+			{
+				m_waterfallNotEmpty = m_waterfallHeight + 2;
+			}
+
+			if (m_waterfallActive && m_waterfallNotEmpty)
 			{
 				// move waterfall history one line down and clear the top line
 				QRgb *pixel = (QRgb *)m_history.data();
