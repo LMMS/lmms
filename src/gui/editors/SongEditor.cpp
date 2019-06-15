@@ -83,8 +83,8 @@ SongEditor::SongEditor( Song * song ) :
 	m_origin(),
 	m_scrollPos(),
 	m_mousePos(),
-	m_rubberBandStartTrackview(),
-	m_rubberbandStartMidipos(),
+	m_rubberBandStartTrackview(0),
+	m_rubberbandStartMidipos(0),
 	m_currentZoomingValue(m_zoomingModel->value()),
 	m_trackHeadWidth(ConfigManager::inst()->value("ui", "compacttrackbuttons").toInt()==1
 					 ? DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT + TRACK_OP_WIDTH_COMPACT
@@ -323,6 +323,7 @@ void SongEditor::selectRegionFromPixels(int xStart, int xEnd)
 		m_rubberbandStartMidipos = MidiTime((xStart - m_trackHeadWidth)
 											/ pixelsPerTact() * MidiTime::ticksPerTact())
 											+ m_currentPosition;
+		m_rubberBandStartTrackview = 0;
 	}
 	//the current mouse position within the borders of song editor
 	m_mousePos = QPoint(qMax(m_trackHeadWidth, qMin(xEnd, width()))
