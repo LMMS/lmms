@@ -41,13 +41,13 @@ public:
 	explicit SaWaterfallView(SaControls *controls, SaProcessor *processor, QWidget *_parent = 0);
 	virtual ~SaWaterfallView() {}
 
-	virtual QSize sizeHint() const {return QSize(400, 350);}
+	QSize sizeHint() const override {return QSize(400, 350);}
 
 	// Check if waterfall should be displayed and adjust window size if needed.
 	void updateVisibility();
 
 protected:
-	virtual void paintEvent(QPaintEvent *event);
+	void paintEvent(QPaintEvent *event) override;
 
 private slots:
 	void periodicUpdate();

@@ -45,13 +45,13 @@ public:
 	explicit SaSpectrumView(SaControls *controls, SaProcessor *processor, QWidget *_parent = 0);
 	virtual ~SaSpectrumView() {}
 
-	virtual QSize sizeHint() const {return QSize(400, 200);}
+	QSize sizeHint() const override {return QSize(400, 200);}
 
 protected:
-	virtual void paintEvent(QPaintEvent *event);
-	virtual void mouseMoveEvent(QMouseEvent *event);
-	virtual void mousePressEvent(QMouseEvent *event);
-	virtual void resizeEvent(QResizeEvent *event);
+	void paintEvent(QPaintEvent *event) override;
+	void mouseMoveEvent(QMouseEvent *event) override;
+	void mousePressEvent(QMouseEvent *event) override;
+	void resizeEvent(QResizeEvent *event) override;
 
 private slots:
 	void periodicUpdate();

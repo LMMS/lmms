@@ -39,7 +39,7 @@
 class SaProcessor
 {
 public:
-	SaProcessor(SaControls *controls);
+	explicit SaProcessor(SaControls *controls);
 	virtual ~SaProcessor();
 
 	void analyse(sampleFrame *in_buffer, const fpp_t frame_count);

@@ -86,13 +86,13 @@ public:
 	explicit SaControls(Analyzer* effect);
 	virtual ~SaControls() {}
 
-	virtual EffectControlDialog* createView();
+	EffectControlDialog* createView() override;
 
-	virtual void saveSettings (QDomDocument& doc, QDomElement& parent);
-	virtual void loadSettings (const QDomElement &_this);
+	void saveSettings (QDomDocument& doc, QDomElement& parent) override;
+	void loadSettings (const QDomElement &_this) override;
 
-	virtual QString nodeName() const {return "Analyzer";}
-	virtual int controlCount() {return 12;}
+	QString nodeName() const override {return "Analyzer";}
+	int controlCount() override {return 12;}
 
 private:
 	Analyzer *m_effect;

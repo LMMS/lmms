@@ -37,11 +37,11 @@ class SaControlsDialog : public EffectControlDialog
 {
 	Q_OBJECT
 public:
-	SaControlsDialog(SaControls *controls, SaProcessor *processor);
+	explicit SaControlsDialog(SaControls *controls, SaProcessor *processor);
 	virtual ~SaControlsDialog() {}
 
-	virtual bool isResizable() const {return true;}
-	virtual QSize sizeHint() const;
+	bool isResizable() const override {return true;}
+	QSize sizeHint() const override;
 
 private:
 	SaControls *m_controls;

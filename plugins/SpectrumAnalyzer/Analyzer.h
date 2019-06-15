@@ -39,8 +39,9 @@ public:
 	Analyzer(Model *parent, const Descriptor::SubPluginFeatures::Key *key);
 	virtual ~Analyzer() {};
 
-	virtual bool processAudioBuffer(sampleFrame *buffer, const fpp_t frame_count);
-	virtual EffectControls *controls() {return &m_controls;}
+	bool processAudioBuffer(sampleFrame *buffer, const fpp_t frame_count) override;
+	EffectControls *controls() override {return &m_controls;}
+
 	SaProcessor *getProcessor() {return &m_processor;}
 
 private:
