@@ -936,7 +936,7 @@ void SampleBuffer::visualize( QPainter & _p, const QRect & _dr,
 	const float y_space = h*0.5f;
 	const int nb_frames = focus_on_range ? _to_frame - _from_frame : m_frames;
 
-	const int fpp = tLimit<int>( nb_frames / w, 1, 20 );
+	const int fpp = qBound<int>( 1, nb_frames / w, 20 );
 	QPointF * l = new QPointF[nb_frames / fpp + 1];
 	QPointF * r = new QPointF[nb_frames / fpp + 1];
 	int n = 0;

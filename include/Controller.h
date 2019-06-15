@@ -31,7 +31,6 @@
 #include "Engine.h"
 #include "Model.h"
 #include "JournallingObject.h"
-#include "templates.h"
 #include "ValueBuffer.h"
 
 class ControllerDialog;
@@ -112,7 +111,7 @@ public:
 
 	inline static float fittedValue( float _val )
 	{
-		return tLimit<float>( _val, 0.0f, 1.0f );
+		return qBound<float>( 0.0f, _val, 1.0f );
 	}
 
 	static long runningPeriods()
