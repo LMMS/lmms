@@ -60,7 +60,6 @@
 #include "SampleBuffer.h"
 #include "Song.h"
 #include "StringPairDrag.h"
-#include "templates.h"
 #include "TextFloat.h"
 #include "ToolTip.h"
 
