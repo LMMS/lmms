@@ -56,7 +56,10 @@ TrackContainerView::TrackContainerView( TrackContainer * _tc ) :
 	m_scrollArea( new scrollArea( this ) ),
 	m_ppt( DEFAULT_PIXELS_PER_TACT ),
 	m_rubberBand( new RubberBand( m_scrollArea ) ),
-	m_origin()
+	m_origin(),
+	m_trackHeadWidth(ConfigManager::inst()->value("ui", "compacttrackbuttons").toInt()==1
+						 ? DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT + TRACK_OP_WIDTH_COMPACT
+						 : DEFAULT_SETTINGS_WIDGET_WIDTH + TRACK_OP_WIDTH)
 {
 	m_tc->setHook( this );
 	//keeps the direction of the widget, undepended on the locale
@@ -377,9 +380,10 @@ void TrackContainerView::dropEvent( QDropEvent * _de )
 		//it->toggledInstrumentTrackButton( true );
 		_de->accept();
 	}
-	else if( type == "samplefile" || type == "pluginpresetfile" 
-		|| type == "soundfontfile" || type == "vstpluginfile"
-		|| type == "patchfile" )
+	else if(type == "pluginpresetfile"
+		 || type == "soundfontfile"
+		 || type == "vstpluginfile"
+		 || type == "patchfile")
 	{
 		InstrumentTrack * it = dynamic_cast<InstrumentTrack *>(
 				Track::create( Track::InstrumentTrack,
@@ -390,6 +394,28 @@ void TrackContainerView::dropEvent( QDropEvent * _de )
 		i->loadFile( value );
 		//it->toggledInstrumentTrackButton( true );
 		_de->accept();
+	}
+	else if( type == "samplefile" )
+	{
+
+		Track * track = trackViewAt(_de->pos().y()/* - timelineheight*/)
+					  ? const_cast<Track*>(trackViewAt(_de->pos().y()/* - timelineheight*/)->getTrack())
+					  : nullptr;
+
+		SampleTrack * it = track
+						 ? dynamic_cast<SampleTrack *>(
+								  const_cast<Track*>(trackViewAt(_de->pos().y())->getTrack()/* - timelineheight*/))
+						 : dynamic_cast<SampleTrack *>(
+								  Track::create( Track::SampleTrack, m_tc));
+		if (it)
+		{
+			SampleTCO * newTco = new SampleTCO( it );
+			newTco->setSampleFile(value);
+			newTco->movePosition(fixedTCOs() == false
+								 ? MidiTime((_de->pos().x() - m_trackHeadWidth) / pixelsPerTact() * MidiTime::ticksPerTact()).toNearestTact()
+								 : MidiTime(0)
+								   );
+		}
 	}
 	else if( type == "presetfile" )
 	{

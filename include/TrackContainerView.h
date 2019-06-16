@@ -32,9 +32,10 @@
 #include <QThread>
 
 #include "Track.h"
+#include "SampleTrack.h"
 #include "JournallingObject.h"
 #include "InstrumentTrack.h"
-
+#include <QDebug>
 
 class QVBoxLayout;
 class TrackContainer;
@@ -187,6 +188,7 @@ private:
 
 	RubberBand * m_rubberBand;
 	QPoint m_origin;
+	int m_trackHeadWidth;
 
 
 signals:
