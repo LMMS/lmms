@@ -35,7 +35,6 @@
 #include "MainWindow.h"
 #include "SaProcessor.h"
 
-#include <iostream>
 
 SaWaterfallView::SaWaterfallView(SaControls *controls, SaProcessor *processor, QWidget *_parent) :
 	QWidget(_parent),
