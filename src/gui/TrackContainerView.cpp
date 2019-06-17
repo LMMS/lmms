@@ -51,6 +51,7 @@ TrackContainerView::TrackContainerView( TrackContainer * _tc ) :
 	JournallingObject(),
 	SerializingObjectHook(),
 	m_currentPosition( 0, 0 ),
+	m_timeLineWidgetHeigth(0),
 	m_tc( _tc ),
 	m_trackViews(),
 	m_scrollArea( new scrollArea( this ) ),
@@ -397,24 +398,24 @@ void TrackContainerView::dropEvent( QDropEvent * _de )
 	}
 	else if( type == "samplefile" )
 	{
-
-		Track * track = trackViewAt(_de->pos().y()/* - timelineheight*/)
-					  ? const_cast<Track*>(trackViewAt(_de->pos().y()/* - timelineheight*/)->getTrack())
-					  : nullptr;
-
-		SampleTrack * it = track
-						 ? dynamic_cast<SampleTrack *>(
-								  const_cast<Track*>(trackViewAt(_de->pos().y())->getTrack()/* - timelineheight*/))
-						 : dynamic_cast<SampleTrack *>(
-								  Track::create( Track::SampleTrack, m_tc));
-		if (it)
+		const TrackView * trackView = trackViewAt(_de->pos().y() - m_timeLineWidgetHeigth);
+		if (trackView && trackView->getTrack()->type() == Track::SampleTrack)
 		{
-			SampleTCO * newTco = new SampleTCO( it );
-			newTco->setSampleFile(value);
-			newTco->movePosition(fixedTCOs() == false
-								 ? MidiTime((_de->pos().x() - m_trackHeadWidth) / pixelsPerTact() * MidiTime::ticksPerTact()).toNearestTact()
-								 : MidiTime(0)
-								   );
+			for (auto tv : trackViews())
+			{
+				if (tv == trackView)
+				{
+					addSampleTCO(tv->getTrack(), value, _de->pos().x());
+				}
+			}
+		}
+		else
+		{
+			Track * track = Track::create(Track::SampleTrack, m_tc);
+			if (track)
+			{
+				addSampleTCO(track, value, _de->pos().x());
+			}
 		}
 	}
 	else if( type == "presetfile" )
@@ -499,6 +500,26 @@ void TrackContainerView::resizeEvent( QResizeEvent * _re )
 	realignTracks();
 	QWidget::resizeEvent( _re );
 }
+
+
+
+
+void TrackContainerView::addSampleTCO(Track *track, QString sampleFile, int xPos)
+{
+	if(track)
+	{
+		SampleTCO * newTco = new SampleTCO(track);
+		newTco->setSampleFile(sampleFile);
+		newTco->movePosition(fixedTCOs() == false
+							 ? MidiTime((xPos - m_trackHeadWidth) / pixelsPerTact()
+										* MidiTime::ticksPerTact()).toNearestTact()
+							 : MidiTime(0)
+							   );
+	}
+}
+
+
+
 
 RubberBand *TrackContainerView::rubberBand() const
 {

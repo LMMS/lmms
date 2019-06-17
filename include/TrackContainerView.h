@@ -35,7 +35,6 @@
 #include "SampleTrack.h"
 #include "JournallingObject.h"
 #include "InstrumentTrack.h"
-#include <QDebug>
 
 class QVBoxLayout;
 class TrackContainer;
@@ -153,6 +152,7 @@ protected:
 	virtual void resizeEvent( QResizeEvent * );
 
 	MidiTime m_currentPosition;
+	int m_timeLineWidgetHeigth;
 
 
 private:
@@ -177,6 +177,7 @@ private:
 	} ;
 	friend class TrackContainerView::scrollArea;
 
+	void addSampleTCO(Track * track, QString sampleFile, int xPos);
 	TrackContainer* m_tc;
 	typedef QList<TrackView *> trackViewList;
 	trackViewList m_trackViews;

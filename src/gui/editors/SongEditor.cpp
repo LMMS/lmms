@@ -555,6 +555,7 @@ static inline void animateScroll( QScrollBar *scrollBar, int newVal, bool smooth
 
 void SongEditor::updatePosition( const MidiTime & t )
 {
+	m_timeLineWidgetHeigth = m_timeLine->height();
 	int widgetWidth, trackOpWidth;
 	if( ConfigManager::inst()->value( "ui", "compacttrackbuttons" ).toInt() )
 	{
