@@ -153,7 +153,7 @@ protected:
 	virtual void resizeEvent( QResizeEvent * );
 
 	MidiTime m_currentPosition;
-	int m_timeLineWidgetHeigth;
+	int m_timeLineWidgetHeight;
 
 
 private:
