@@ -51,7 +51,7 @@ TrackContainerView::TrackContainerView( TrackContainer * _tc ) :
 	JournallingObject(),
 	SerializingObjectHook(),
 	m_currentPosition( 0, 0 ),
-	m_timeLineWidgetHeigth(0),
+	m_timeLineWidgetHeight(0),
 	m_tc( _tc ),
 	m_trackViews(),
 	m_scrollArea( new scrollArea( this ) ),
