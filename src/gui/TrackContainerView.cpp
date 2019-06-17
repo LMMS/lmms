@@ -395,7 +395,7 @@ void TrackContainerView::dropEvent( QDropEvent * _de )
 	}
 	else if(type == "samplefile")
 	{
-		const TrackView * trackView = trackViewAt(_de->pos().y() - m_timeLineWidgetHeigth);
+		const TrackView * trackView = trackViewAt(_de->pos().y() - m_timeLineWidgetHeight);
 		if (trackView && trackView->getTrack()->type() == Track::SampleTrack)
 		{
 			for (auto tv : trackViews())
