@@ -393,7 +393,7 @@ void TrackContainerView::dropEvent( QDropEvent * _de )
 		//it->toggledInstrumentTrackButton( true );
 		_de->accept();
 	}
-	else if( type == "samplefile" )
+	else if(type == "samplefile")
 	{
 		const TrackView * trackView = trackViewAt(_de->pos().y() - m_timeLineWidgetHeigth);
 		if (trackView && trackView->getTrack()->type() == Track::SampleTrack)
@@ -503,8 +503,6 @@ void TrackContainerView::resizeEvent( QResizeEvent * _re )
 
 void TrackContainerView::addSampleTCO(Track *track, QString sampleFile, int xPos)
 {
-	if(track)
-	{
 		int trackHeadWidth = ConfigManager::inst()->value("ui", "compacttrackbuttons").toInt()==1
 								 ? DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT + TRACK_OP_WIDTH_COMPACT
 								 : DEFAULT_SETTINGS_WIDGET_WIDTH + TRACK_OP_WIDTH;
@@ -515,7 +513,6 @@ void TrackContainerView::addSampleTCO(Track *track, QString sampleFile, int xPos
 										* MidiTime::ticksPerTact()).toNearestTact()
 							 : MidiTime(0)
 							   );
-	}
 }
 
 
