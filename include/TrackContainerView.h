@@ -36,6 +36,7 @@
 #include "JournallingObject.h"
 #include "InstrumentTrack.h"
 
+
 class QVBoxLayout;
 class TrackContainer;
 
@@ -189,7 +190,6 @@ private:
 
 	RubberBand * m_rubberBand;
 	QPoint m_origin;
-	int m_trackHeadWidth;
 
 
 signals:

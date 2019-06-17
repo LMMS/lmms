@@ -57,10 +57,7 @@ TrackContainerView::TrackContainerView( TrackContainer * _tc ) :
 	m_scrollArea( new scrollArea( this ) ),
 	m_ppt( DEFAULT_PIXELS_PER_TACT ),
 	m_rubberBand( new RubberBand( m_scrollArea ) ),
-	m_origin(),
-	m_trackHeadWidth(ConfigManager::inst()->value("ui", "compacttrackbuttons").toInt()==1
-						 ? DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT + TRACK_OP_WIDTH_COMPACT
-						 : DEFAULT_SETTINGS_WIDGET_WIDTH + TRACK_OP_WIDTH)
+	m_origin()
 {
 	m_tc->setHook( this );
 	//keeps the direction of the widget, undepended on the locale
@@ -508,10 +505,13 @@ void TrackContainerView::addSampleTCO(Track *track, QString sampleFile, int xPos
 {
 	if(track)
 	{
+		int trackHeadWidth = ConfigManager::inst()->value("ui", "compacttrackbuttons").toInt()==1
+								 ? DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT + TRACK_OP_WIDTH_COMPACT
+								 : DEFAULT_SETTINGS_WIDGET_WIDTH + TRACK_OP_WIDTH;
 		SampleTCO * newTco = new SampleTCO(track);
 		newTco->setSampleFile(sampleFile);
 		newTco->movePosition(fixedTCOs() == false
-							 ? MidiTime((xPos - m_trackHeadWidth) / pixelsPerTact()
+							 ? MidiTime((xPos - trackHeadWidth) / pixelsPerTact()
 										* MidiTime::ticksPerTact()).toNearestTact()
 							 : MidiTime(0)
 							   );
