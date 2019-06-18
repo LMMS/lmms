@@ -29,6 +29,7 @@
 #include "Controls.h"
 #include "LedCheckbox.h"
 #include "LinkedModelGroups.h"
+#include "stdshims.h"
 
 
 /*
@@ -37,7 +38,7 @@
 
 
 LinkedModelGroupView::LinkedModelGroupView(QWidget* parent,
-	LinkedModelGroup *model, int colNum, int nProc, const QString& name) :
+	LinkedModelGroup *model, std::size_t colNum, std::size_t nProc, const QString& name) :
 	QGroupBox(parent),
 	m_colNum(colNum),
 	m_isLinking(model->isLinking()),
@@ -45,7 +46,7 @@ LinkedModelGroupView::LinkedModelGroupView(QWidget* parent,
 {
 	if (model->models().size())
 	{
-		int curProc = model->curProc();
+		std::size_t curProc = model->curProc();
 		QString chanName;
 		if (name.isNull())
 		{
@@ -53,10 +54,12 @@ LinkedModelGroupView::LinkedModelGroupView(QWidget* parent,
 			{
 				case 1: break; // don't display any channel name
 				case 2:
-					chanName = QObject::tr(curProc ? "Right" : "Left");
+					chanName = curProc
+								? QObject::tr("Right")
+								: QObject::tr("Left");
 					break;
 				default:
-					chanName = QObject::tr("Channel ") + QString::number(curProc + 1);
+					chanName = QObject::tr("Channel %1").arg(curProc + 1);
 					break;
 			}
 		}
@@ -79,16 +82,17 @@ void LinkedModelGroupView::modelChanged(LinkedModelGroup *group)
 {
 	// reconnect models
 	using ModelInfo = LinkedModelGroup::ModelInfo;
-	std::vector<std::unique_ptr<Control>>::iterator itr = m_controls.begin();
 	std::vector<ModelInfo> models = group->models();
 	Q_ASSERT(m_controls.size() == models.size());
 
-	for (const ModelInfo& mdl : models) { (*itr++)->setModel(mdl.m_model); }
-
-	std::size_t count = 0;
-	for (std::unique_ptr<LedCheckBox>& led : m_leds)
+	for (std::size_t i = 0; i < models.size(); ++i)
 	{
-		led->setModel(group->linkEnabledModel(count++));
+		m_controls[i]->setModel(models[i].m_model);
+	}
+
+	for (std::size_t i = 0; i < m_leds.size(); ++i)
+	{
+		m_leds[i]->setModel(group->linkEnabledModel(i));
 	}
 }
 
@@ -97,7 +101,7 @@ void LinkedModelGroupView::modelChanged(LinkedModelGroup *group)
 
 void LinkedModelGroupView::addControl(Control* ctrl)
 {
-	int colNum2 = m_colNum * (1 + m_isLinking);
+	int colNum2 = static_cast<int>(m_colNum * (1 + m_isLinking));
 	int wdgNum = static_cast<int>(m_controls.size() * (1 + m_isLinking));
 	if (ctrl)
 	{
@@ -106,8 +110,8 @@ void LinkedModelGroupView::addControl(Control* ctrl)
 		// start in row one, add widgets cell by cell
 		if (m_isLinking)
 		{
-			LedCheckBox* cb = new LedCheckBox(qobject_cast<QWidget*>(
-				ctrl->topWidget()->parent()));
+			LedCheckBox* cb = new LedCheckBox(
+				ctrl->topWidget()->parentWidget());
 			m_grid->addWidget(cb, y, x);
 			m_leds.push_back(std::unique_ptr<LedCheckBox>(cb));
 		}
@@ -163,8 +167,8 @@ LinkedModelGroupsView::LinkedModelGroupsView(
 {
 	if (ctrlBase->multiChannelLinkModel())
 	{
-		m_multiChannelLink.reset(new LedCheckBox(QObject::tr("Link Channels"),
-												nullptr));
+		m_multiChannelLink = make_unique<LedCheckBox, MultiChannelLinkDeleter>
+								(QObject::tr("Link Channels"), nullptr);
 	}
 }
 
@@ -178,15 +182,21 @@ void LinkedModelGroupsView::modelChanged(LinkedModelGroups *groups)
 		m_multiChannelLink->setModel(groups->multiChannelLinkModel());
 	}
 
-	for (std::size_t i = 0; groups->getGroup(i) && getGroupView(i); ++i)
+	LinkedModelGroupView* groupView;
+	LinkedModelGroup* group;
+	for (std::size_t i = 0;
+		(group = groups->getGroup(i)) && (groupView = getGroupView(i));
+		++i)
 	{
-		getGroupView(i)->modelChanged(groups->getGroup(i));
+		groupView->modelChanged(group);
 	}
 }
 
 
 
 
+// If you wonder why the default deleter can not be used:
+// https://stackoverflow.com/questions/9954518
 void LinkedModelGroupsView::MultiChannelLinkDeleter::
 	operator()(LedCheckBox *l) { delete l; }
 

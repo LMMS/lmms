@@ -89,9 +89,6 @@ public:
 
 private slots:
 	void updatePitchRange();
-	void reloadPlugin();
-	void updateLinkStatesFromGlobal();
-	void linkPort(int id, bool state) { Lv2ControlBase::linkPort(id, state); }
 
 private:
 	QString nodeName() const override;

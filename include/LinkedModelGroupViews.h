@@ -26,6 +26,7 @@
 #define LINKEDMODELGROUPVIEWS_H
 
 
+#include <cstddef>
 #include <memory>
 #include <vector>
 #include <QGroupBox>
@@ -41,8 +42,8 @@
 	View for one processor, LinkedModelGroupsViewBase contains 2
 	of those for mono plugins.
 
-	@note This class, and no inheriting classes, shall inherit ModelView.
-		The "view" in the name is just for consistency
+	@note Neither this class, nor any inheriting classes, shall inherit
+		ModelView. The "view" in the name is just for consistency
 		with LinkedModelGroupsView.
 */
 class LinkedModelGroupView : public QGroupBox
@@ -55,7 +56,7 @@ public:
 			automatically set if not given
 	*/
 	LinkedModelGroupView(QWidget *parent, class LinkedModelGroup* model,
-		int colNum, int nProc, const QString &name = QString());
+		std::size_t colNum, std::size_t nProc, const QString &name = QString());
 	~LinkedModelGroupView();
 
 	//! Reconnect models if model changed
@@ -68,7 +69,8 @@ protected:
 private:
 	void makeAllGridCellsEqualSized();
 
-	int m_colNum; //!< column number in surrounding grid in Lv2ViewBase
+	//! column number in surrounding grid in LinkedModelGroupsView
+	std::size_t m_colNum;
 	bool m_isLinking;
 	class QGridLayout* m_grid;
 	std::vector<std::unique_ptr<class Control>> m_controls;
@@ -81,7 +83,7 @@ private:
 	Provides a global channel link LED.
 
 	@note It's intended this class does not inherit from ModelView.
-		Inheriting classes need to do that, see Lv2Instrument.h
+		Inheriting classes need to do that, see e.g. Lv2Instrument.h
 */
 class LinkedModelGroupsView
 {

@@ -80,13 +80,16 @@ Lv2Instrument::Lv2Instrument(InstrumentTrack *instrumentTrackArg,
 #endif
 		connect(instrumentTrack()->pitchRangeModel(), SIGNAL(dataChanged()),
 			this, SLOT(updatePitchRange()), Qt::DirectConnection);
-		connect(Engine::mixer(), SIGNAL(sampleRateChanged()),
-			this, SLOT(reloadPlugin()));
-		if (multiChannelLinkModel()) {
-			connect(multiChannelLinkModel(), SIGNAL(dataChanged()),
-				this, SLOT(updateLinkStatesFromGlobal()), Qt::DirectConnection);
-			connect(getGroup(0), SIGNAL(linkStateChanged(int, bool)),
-					this, SLOT(linkPort(int, bool)), Qt::DirectConnection);
+		connect(Engine::mixer(), &Mixer::sampleRateChanged,
+			this, [this](){Lv2ControlBase::reloadPlugin();});
+		if (multiChannelLinkModel())
+		{
+			connect(multiChannelLinkModel(), &BoolModel::dataChanged,
+				this, [this](){updateLinkStatesFromGlobal();},
+				Qt::DirectConnection);
+			connect(getGroup(0), &LinkedModelGroup::linkStateChanged,
+				this, [this](std::size_t id, bool value){
+				linkModel(id, value);}, Qt::DirectConnection);
 		}
 
 		// now we need a play-handle which cares for calling play()
@@ -192,19 +195,6 @@ void Lv2Instrument::updatePitchRange()
 {
 	qDebug() << "Lmms: Cannot update pitch range for lv2 plugin:"
 				"not implemented yet";
-}
-
-
-
-
-void Lv2Instrument::reloadPlugin() { Lv2ControlBase::reloadPlugin(); }
-
-
-
-
-void Lv2Instrument::updateLinkStatesFromGlobal()
-{
-	Lv2ControlBase::updateLinkStatesFromGlobal();
 }
 
 

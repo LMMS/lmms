@@ -41,13 +41,16 @@ Lv2FxControls::Lv2FxControls(class Lv2Effect *effect, const QString& uri) :
 {
 	if (isValid())
 	{
-		connect(Engine::mixer(), SIGNAL(sampleRateChanged()), this,
-			SLOT(reloadPlugin()));
-		if(multiChannelLinkModel()) {
-			connect(multiChannelLinkModel(), SIGNAL(dataChanged()),
-				this, SLOT(updateLinkStatesFromGlobal()), Qt::DirectConnection);
-			connect(getGroup(0), SIGNAL(linkStateChanged(int, bool)),
-					this, SLOT(linkPort(int, bool)), Qt::DirectConnection);
+		connect(Engine::mixer(), &Mixer::sampleRateChanged,
+			this, [this](){Lv2ControlBase::reloadPlugin();});
+		if (multiChannelLinkModel())
+		{
+			connect(multiChannelLinkModel(), &BoolModel::dataChanged,
+				this, [this](){updateLinkStatesFromGlobal();},
+				Qt::DirectConnection);
+			connect(getGroup(0), &LinkedModelGroup::linkStateChanged,
+				this, [this](std::size_t id, bool value){
+				linkModel(id, value);}, Qt::DirectConnection);
 		}
 	}
 }

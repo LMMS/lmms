@@ -50,11 +50,6 @@ public:
 
 private slots:
 	void changeControl();
-	void reloadPlugin() { Lv2ControlBase::reloadPlugin(); }
-	void updateLinkStatesFromGlobal() {
-		Lv2ControlBase::updateLinkStatesFromGlobal(); }
-	void linkPort(int id, bool state) { Lv2ControlBase::linkPort(id, state); }
-
 
 private:
 	DataFile::Types settingsType() override;

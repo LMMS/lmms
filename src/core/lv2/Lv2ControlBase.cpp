@@ -82,13 +82,14 @@ Lv2ControlBase::Lv2ControlBase(Model* that, const QString &uri) :
 			}
 
 			// initially link all controls
-			for (int i = 0; i < static_cast<int>(m_procs[0]->controlCount());
-				++i) {
-				linkPort(i, true);
+			for (std::size_t i = 0; i < m_procs[0]->controlCount(); ++i)
+			{
+				linkModel(i, true);
 			}
 		}
 	}
-	else {
+	else
+	{
 		qCritical() << "No Lv2 plugin found for URI" << uri;
 		m_valid = false;
 	}
