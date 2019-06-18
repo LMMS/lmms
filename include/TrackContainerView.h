@@ -36,7 +36,7 @@
 #include "JournallingObject.h"
 #include "InstrumentTrack.h"
 
-
+#include <QDebug>
 class QVBoxLayout;
 class TrackContainer;
 
@@ -178,7 +178,6 @@ private:
 	} ;
 	friend class TrackContainerView::scrollArea;
 
-	void addSampleTCO(Track * track, QString sampleFile, int xPos);
 	TrackContainer* m_tc;
 	typedef QList<TrackView *> trackViewList;
 	trackViewList m_trackViews;

@@ -378,10 +378,50 @@ void TrackContainerView::dropEvent( QDropEvent * _de )
 		//it->toggledInstrumentTrackButton( true );
 		_de->accept();
 	}
-	else if(type == "pluginpresetfile"
-		 || type == "soundfontfile"
-		 || type == "vstpluginfile"
-		 || type == "patchfile")
+	else if(type == "samplefile")
+	{
+		const TrackView * trackView = trackViewAt(_de->pos().y() - m_timeLineWidgetHeight);
+		//if we drop on a sample track, add sample TCO to it
+		if (trackView && trackView->getTrack()->type() == Track::SampleTrack)
+		{
+			for (auto tv : trackViews())
+			{
+				if (tv == trackView)
+				{
+					int trackHeadWidth = ConfigManager::inst()->value("ui", "compacttrackbuttons").toInt()==1
+											 ? DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT + TRACK_OP_WIDTH_COMPACT
+											 : DEFAULT_SETTINGS_WIDGET_WIDTH + TRACK_OP_WIDTH;
+
+					int xPos = _de->pos().x() < trackHeadWidth
+											  ? trackHeadWidth
+											  : _de->pos().x();
+
+					SampleTCO * newTco = new SampleTCO(tv->getTrack());
+					newTco->setSampleFile(value);
+					newTco->movePosition(fixedTCOs() == false
+										 ? MidiTime((xPos - trackHeadWidth) / pixelsPerTact()
+													* MidiTime::ticksPerTact()).toNearestTact()
+										 : MidiTime(0)
+										   );
+				}
+			}
+		}
+		//else add a new instrument track with AudioFileProcessor and load the sample to it
+		else
+		{
+			InstrumentTrack * it = dynamic_cast<InstrumentTrack *>(
+					Track::create(Track::InstrumentTrack,
+									m_tc));
+			PluginFactory::PluginInfoAndKey piakn =
+				pluginFactory->pluginSupportingExtension(FileItem::extension(value));
+			Instrument * i = it->loadInstrument(piakn.info.name(), &piakn.key);
+			i->loadFile(value);
+		}
+		_de->accept();
+	}
+	else if(type == "pluginpresetfile" || type == "soundfontfile"
+			|| type == "vstpluginfile"
+			|| type == "patchfile")
 	{
 		InstrumentTrack * it = dynamic_cast<InstrumentTrack *>(
 				Track::create( Track::InstrumentTrack,
@@ -393,28 +433,7 @@ void TrackContainerView::dropEvent( QDropEvent * _de )
 		//it->toggledInstrumentTrackButton( true );
 		_de->accept();
 	}
-	else if(type == "samplefile")
-	{
-		const TrackView * trackView = trackViewAt(_de->pos().y() - m_timeLineWidgetHeight);
-		if (trackView && trackView->getTrack()->type() == Track::SampleTrack)
-		{
-			for (auto tv : trackViews())
-			{
-				if (tv == trackView)
-				{
-					addSampleTCO(tv->getTrack(), value, _de->pos().x());
-				}
-			}
-		}
-		else
-		{
-			Track * track = Track::create(Track::SampleTrack, m_tc);
-			if (track)
-			{
-				addSampleTCO(track, value, _de->pos().x());
-			}
-		}
-	}
+
 	else if( type == "presetfile" )
 	{
 		DataFile dataFile( value );
@@ -496,23 +515,6 @@ void TrackContainerView::resizeEvent( QResizeEvent * _re )
 {
 	realignTracks();
 	QWidget::resizeEvent( _re );
-}
-
-
-
-
-void TrackContainerView::addSampleTCO(Track *track, QString sampleFile, int xPos)
-{
-		int trackHeadWidth = ConfigManager::inst()->value("ui", "compacttrackbuttons").toInt()==1
-								 ? DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT + TRACK_OP_WIDTH_COMPACT
-								 : DEFAULT_SETTINGS_WIDGET_WIDTH + TRACK_OP_WIDTH;
-		SampleTCO * newTco = new SampleTCO(track);
-		newTco->setSampleFile(sampleFile);
-		newTco->movePosition(fixedTCOs() == false
-							 ? MidiTime((xPos - trackHeadWidth) / pixelsPerTact()
-										* MidiTime::ticksPerTact()).toNearestTact()
-							 : MidiTime(0)
-							   );
 }
 
 
