@@ -36,7 +36,7 @@
 #include "JournallingObject.h"
 #include "InstrumentTrack.h"
 
-#include <QDebug>
+
 class QVBoxLayout;
 class TrackContainer;
 

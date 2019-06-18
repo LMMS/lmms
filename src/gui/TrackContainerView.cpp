@@ -433,7 +433,6 @@ void TrackContainerView::dropEvent( QDropEvent * _de )
 		//it->toggledInstrumentTrackButton( true );
 		_de->accept();
 	}
-
 	else if( type == "presetfile" )
 	{
 		DataFile dataFile( value );
