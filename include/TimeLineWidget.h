@@ -170,6 +170,7 @@ signals:
 
 	void regionSelectedFromPixels( int, int );
 	void selectionFinished();
+	void sizeChanged();
 
 
 public slots:
@@ -188,6 +189,7 @@ protected:
 	virtual void mousePressEvent( QMouseEvent * _me );
 	virtual void mouseMoveEvent( QMouseEvent * _me );
 	virtual void mouseReleaseEvent( QMouseEvent * _me );
+	virtual void resizeEvent(QResizeEvent * _re);
 
 
 private:

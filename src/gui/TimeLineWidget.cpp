@@ -418,3 +418,11 @@ void TimeLineWidget::mouseReleaseEvent( QMouseEvent* event )
 	if ( m_action == SelectSongTCO ) { emit selectionFinished(); }
 	m_action = NoAction;
 }
+
+
+
+
+void TimeLineWidget::resizeEvent(QResizeEvent *_re)
+{
+	emit sizeChanged();
+}

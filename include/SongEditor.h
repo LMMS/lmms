@@ -104,6 +104,7 @@ private slots:
 	void updateScrollBar(int len);
 
 	void zoomingChanged();
+	void timeLineHeigthChanged();
 
 private:
 	virtual void keyPressEvent( QKeyEvent * ke );

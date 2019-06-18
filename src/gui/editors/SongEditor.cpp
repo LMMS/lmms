@@ -100,6 +100,7 @@ SongEditor::SongEditor( Song * song ) :
 			this, SLOT( selectRegionFromPixels( int, int ) ) );
 	connect( m_timeLine, SIGNAL( selectionFinished() ),
 			 this, SLOT( stopRubberBand() ) );
+	connect(m_timeLine, SIGNAL(sizeChanged()), this, SLOT(timeLineHeigthChanged()));
 
 	m_positionLine = new positionLine( this );
 	static_cast<QVBoxLayout *>( layout() )->insertWidget( 1, m_timeLine );
@@ -555,7 +556,6 @@ static inline void animateScroll( QScrollBar *scrollBar, int newVal, bool smooth
 
 void SongEditor::updatePosition( const MidiTime & t )
 {
-	m_timeLineWidgetHeight = m_timeLine->height();
 	int widgetWidth, trackOpWidth;
 	if( ConfigManager::inst()->value( "ui", "compacttrackbuttons" ).toInt() )
 	{
@@ -621,6 +621,14 @@ void SongEditor::zoomingChanged()
 	m_song->m_playPos[Song::Mode_PlaySong].m_timeLine->
 					setPixelsPerTact( pixelsPerTact() );
 	realignTracks();
+}
+
+
+
+
+void SongEditor::timeLineHeigthChanged()
+{
+	m_timeLineWidgetHeight = m_timeLine->height();
 }
 
 
