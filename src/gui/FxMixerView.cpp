@@ -67,7 +67,7 @@ FxMixerView::FxMixerView() :
 	setSizePolicy( QSizePolicy::Preferred, QSizePolicy::Fixed );
 
 	setWindowTitle( tr( "Mixer" ) );
-	setWindowIcon( embed::getIconPixmap( "fx_mixer" ) );
+	setWindowIcon( embed::getIconPixmap( "mixer" ) );
 
 	// main-layout
 	QHBoxLayout * ml = new QHBoxLayout;

@@ -513,12 +513,12 @@ void MainWindow::finalize()
 					m_toolBar );
 	automation_editor_window->setShortcut( Qt::Key_F8 );
 
-	ToolButton * fx_mixer_window = new ToolButton(
-					embed::getIconPixmap( "fx_mixer" ),
+	ToolButton * mixer_window = new ToolButton(
+					embed::getIconPixmap( "mixer" ),
 					tr( "Mixer" ) + " (F9)",
 					this, SLOT( toggleFxMixerWin() ),
 					m_toolBar );
-	fx_mixer_window->setShortcut( Qt::Key_F9 );
+	mixer_window->setShortcut( Qt::Key_F9 );
 
 	ToolButton * controllers_window = new ToolButton(
 					embed::getIconPixmap( "controller" ),
@@ -540,7 +540,7 @@ void MainWindow::finalize()
 	m_toolBarLayout->addWidget( bb_editor_window, 1, 2 );
 	m_toolBarLayout->addWidget( piano_roll_window, 1, 3 );
 	m_toolBarLayout->addWidget( automation_editor_window, 1, 4 );
-	m_toolBarLayout->addWidget( fx_mixer_window, 1, 5 );
+	m_toolBarLayout->addWidget( mixer_window, 1, 5 );
 	m_toolBarLayout->addWidget( controllers_window, 1, 6 );
 	m_toolBarLayout->addWidget( project_notes_window, 1, 7 );
 	m_toolBarLayout->setColumnStretch( 100, 1 );
@@ -1177,7 +1177,7 @@ void MainWindow::updateViewMenu()
 			      this,
 			      SLOT( toggleAutomationEditorWin())
 		);
-	m_viewMenu->addAction(embed::getIconPixmap( "fx_mixer" ),
+	m_viewMenu->addAction(embed::getIconPixmap( "mixer" ),
 			      tr( "Mixer" ) + " (F9)",
 			      this, SLOT( toggleFxMixerWin() )
 		);

@@ -2,7 +2,7 @@
  * FxMixerView.h - effect-mixer-view for LMMS
  *
  * Copyright (c) 2008-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef FX_MIXER_VIEW_H
-#define FX_MIXER_VIEW_H
+#ifndef MIXER_VIEW_H
+#define MIXER_VIEW_H
 
 #include <QWidget>
 #include <QHBoxLayout>
@@ -111,7 +111,7 @@ public slots:
 
 protected:
 	virtual void closeEvent( QCloseEvent * _ce );
-	
+
 private slots:
 	void updateFaders();
 	void toggledSolo();
@@ -129,7 +129,7 @@ private:
 	QWidget * m_racksWidget;
 
 	void updateMaxChannelSelector();
-	
+
 	friend class FxChannelView;
 } ;
 
