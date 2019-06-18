@@ -378,11 +378,13 @@ void TrackContainerView::dropEvent( QDropEvent * _de )
 		//it->toggledInstrumentTrackButton( true );
 		_de->accept();
 	}
-	else if(type == "samplefile")
+	else if (type == "samplefile" || type == "pluginpresetfile"
+			|| type == "soundfontfile" || type == "vstpluginfile"
+			|| type == "patchfile")
 	{
 		const TrackView * trackView = trackViewAt(_de->pos().y() - m_timeLineWidgetHeight);
 		//if we drop on a sample track, add sample TCO to it
-		if (trackView && trackView->getTrack()->type() == Track::SampleTrack)
+		if (type == "samplefile" && trackView && trackView->getTrack()->type() == Track::SampleTrack)
 		{
 			for (auto tv : trackViews())
 			{
@@ -406,7 +408,6 @@ void TrackContainerView::dropEvent( QDropEvent * _de )
 				}
 			}
 		}
-		//else add a new instrument track with AudioFileProcessor and load the sample to it
 		else
 		{
 			InstrumentTrack * it = dynamic_cast<InstrumentTrack *>(
@@ -417,20 +418,6 @@ void TrackContainerView::dropEvent( QDropEvent * _de )
 			Instrument * i = it->loadInstrument(piakn.info.name(), &piakn.key);
 			i->loadFile(value);
 		}
-		_de->accept();
-	}
-	else if(type == "pluginpresetfile" || type == "soundfontfile"
-			|| type == "vstpluginfile"
-			|| type == "patchfile")
-	{
-		InstrumentTrack * it = dynamic_cast<InstrumentTrack *>(
-				Track::create( Track::InstrumentTrack,
-								m_tc ) );
-		PluginFactory::PluginInfoAndKey piakn =
-			pluginFactory->pluginSupportingExtension(FileItem::extension(value));
-		Instrument * i = it->loadInstrument(piakn.info.name(), &piakn.key);
-		i->loadFile( value );
-		//it->toggledInstrumentTrackButton( true );
 		_de->accept();
 	}
 	else if( type == "presetfile" )
