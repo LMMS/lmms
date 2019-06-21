@@ -28,7 +28,6 @@
 #include "Monstro.h"
 #include "Engine.h"
 #include "InstrumentTrack.h"
-#include "templates.h"
 #include "gui_templates.h"
 #include "ToolTip.h"
 #include "Song.h"

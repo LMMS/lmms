@@ -27,7 +27,6 @@
 #include "Nes.h"
 #include "Engine.h"
 #include "InstrumentTrack.h"
-#include "templates.h"
 #include "ToolTip.h"
 #include "Song.h"
 #include "lmms_math.h"
@@ -520,7 +519,7 @@ NesInstrument::NesInstrument( InstrumentTrack * instrumentTrack ) :
 	m_ch3Volume( 15.f, 0.f, 15.f, 1.f, this, tr( "Channel 3 volume" ) ),
 
 	//channel 4
-	m_ch4Enabled( true, this ),
+	m_ch4Enabled( false, this ),
 	m_ch4Volume( 15.f, 0.f, 15.f, 1.f, this, tr( "Channel 4 volume" ) ),
 	
 	m_ch4EnvEnabled( false, this ),

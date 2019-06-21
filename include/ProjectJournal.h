@@ -34,6 +34,7 @@
 class JournallingObject;
 
 
+//! @warning many parts of this class may be rewritten soon
 class ProjectJournal
 {
 public:
@@ -76,7 +77,9 @@ public:
 		reallocID( _id, NULL );
 	}
 
+	//! hack, not used when saving a file
 	static jo_id_t idToSave( jo_id_t id );
+	//! hack, not used when loading a savefile
 	static jo_id_t idFromSave( jo_id_t id );
 
 	void clearJournal();
