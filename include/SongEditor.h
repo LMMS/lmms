@@ -31,6 +31,7 @@
 
 #include "ActionGroup.h"
 #include "Editor.h"
+#include "TimeLineWidget.h"
 #include "TrackContainerView.h"
 
 class QLabel;
@@ -74,6 +75,11 @@ public:
 
 	ComboBoxModel *zoomingModel() const;
 
+	int timeLineWidgetHeight() const
+	{
+		return m_timeLine->height();
+	}
+
 public slots:
 	void scrolled( int new_pos );
 
@@ -104,7 +110,6 @@ private slots:
 	void updateScrollBar(int len);
 
 	void zoomingChanged();
-	void timeLineHeigthChanged();
 
 private:
 	virtual void keyPressEvent( QKeyEvent * ke );

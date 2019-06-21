@@ -32,7 +32,6 @@
 #include <QThread>
 
 #include "Track.h"
-#include "SampleTrack.h"
 #include "JournallingObject.h"
 #include "InstrumentTrack.h"
 
@@ -125,6 +124,11 @@ public:
 
 	RubberBand *rubberBand() const;
 
+	virtual int timeLineWidgetHeight() const
+	{
+		return 0;
+	}
+
 public slots:
 	void realignTracks();
 	TrackView * createTrackView( Track * _t );
@@ -153,7 +157,6 @@ protected:
 	virtual void resizeEvent( QResizeEvent * );
 
 	MidiTime m_currentPosition;
-	int m_timeLineWidgetHeight;
 
 
 private:

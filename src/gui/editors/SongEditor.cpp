@@ -44,7 +44,6 @@
 #include "MeterDialog.h"
 #include "Mixer.h"
 #include "TextFloat.h"
-#include "TimeLineWidget.h"
 #include "ToolTip.h"
 #include "VisualizationWidget.h"
 #include "TimeDisplayWidget.h"
@@ -100,7 +99,6 @@ SongEditor::SongEditor( Song * song ) :
 			this, SLOT( selectRegionFromPixels( int, int ) ) );
 	connect( m_timeLine, SIGNAL( selectionFinished() ),
 			 this, SLOT( stopRubberBand() ) );
-	connect(m_timeLine, SIGNAL(sizeChanged()), this, SLOT(timeLineHeigthChanged()));
 
 	m_positionLine = new positionLine( this );
 	static_cast<QVBoxLayout *>( layout() )->insertWidget( 1, m_timeLine );
@@ -621,14 +619,6 @@ void SongEditor::zoomingChanged()
 	m_song->m_playPos[Song::Mode_PlaySong].m_timeLine->
 					setPixelsPerTact( pixelsPerTact() );
 	realignTracks();
-}
-
-
-
-
-void SongEditor::timeLineHeigthChanged()
-{
-	m_timeLineWidgetHeight = m_timeLine->height();
 }
 
 

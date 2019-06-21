@@ -38,6 +38,7 @@
 #include "FileBrowser.h"
 #include "ImportFilter.h"
 #include "Instrument.h"
+#include "SampleTrack.h"
 #include "Song.h"
 #include "StringPairDrag.h"
 #include "GuiApplication.h"
@@ -51,7 +52,6 @@ TrackContainerView::TrackContainerView( TrackContainer * _tc ) :
 	JournallingObject(),
 	SerializingObjectHook(),
 	m_currentPosition( 0, 0 ),
-	m_timeLineWidgetHeight(0),
 	m_tc( _tc ),
 	m_trackViews(),
 	m_scrollArea( new scrollArea( this ) ),
@@ -382,7 +382,7 @@ void TrackContainerView::dropEvent( QDropEvent * _de )
 			|| type == "soundfontfile" || type == "vstpluginfile"
 			|| type == "patchfile")
 	{
-		const TrackView * trackView = trackViewAt(_de->pos().y() - m_timeLineWidgetHeight);
+		const TrackView * trackView = trackViewAt(_de->pos().y() - timeLineWidgetHeight());
 		//if we drop on a sample track, add sample TCO to it
 		if (type == "samplefile" && trackView && trackView->getTrack()->type() == Track::SampleTrack)
 		{
@@ -398,16 +398,17 @@ void TrackContainerView::dropEvent( QDropEvent * _de )
 											  ? trackHeadWidth
 											  : _de->pos().x();
 
-					SampleTCO * newTco = new SampleTCO(tv->getTrack());
-					newTco->setSampleFile(value);
-					newTco->movePosition(fixedTCOs() == false
-										 ? MidiTime((xPos - trackHeadWidth) / pixelsPerTact()
-													* MidiTime::ticksPerTact()).toNearestTact()
-										 : MidiTime(0)
-										   );
+					MidiTime tcoPos = fixedTCOs()
+							? MidiTime(0)
+							: MidiTime((xPos - trackHeadWidth) / pixelsPerTact()
+									   * MidiTime::ticksPerTact()).toNearestTact();
+
+					SampleTCO * sTco = dynamic_cast<SampleTCO*>(tv->getTrack()->createTCO(tcoPos));
+					if (sTco) { sTco->setSampleFile(value); }
 				}
 			}
 		}
+		//This code handles the file types if we are not dropping on a sampletrack or it's not a sample file
 		else
 		{
 			InstrumentTrack * it = dynamic_cast<InstrumentTrack *>(
@@ -502,9 +503,6 @@ void TrackContainerView::resizeEvent( QResizeEvent * _re )
 	realignTracks();
 	QWidget::resizeEvent( _re );
 }
-
-
-
 
 RubberBand *TrackContainerView::rubberBand() const
 {
