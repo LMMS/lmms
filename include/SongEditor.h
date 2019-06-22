@@ -88,9 +88,9 @@ public slots:
 
 protected:
 	virtual void closeEvent( QCloseEvent * ce );
-	virtual void mousePressEvent( QMouseEvent * _me );
-	virtual void mouseMoveEvent( QMouseEvent * _me );
-	virtual void mouseReleaseEvent( QMouseEvent * _me );
+	virtual void mousePressEvent(QMouseEvent * me);
+	virtual void mouseMoveEvent(QMouseEvent * me);
+	virtual void mouseReleaseEvent(QMouseEvent * me);
 
 private slots:
 	void setHighQuality( bool );

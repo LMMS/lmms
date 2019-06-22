@@ -511,13 +511,13 @@ void SongEditor::closeEvent( QCloseEvent * ce )
 
 
 
-void SongEditor::mousePressEvent(QMouseEvent *_me)
+void SongEditor::mousePressEvent(QMouseEvent *me)
 {
 	if (allowRubberband())
 	{
 		//we save the position of scrollbars, mouse position and zooming level
 		m_scrollPos = QPoint(m_leftRightScroll->value(), contentWidget()->verticalScrollBar()->value());
-		m_origin = contentWidget()->mapFromParent(QPoint(_me->pos().x(), _me->pos().y()));
+		m_origin = contentWidget()->mapFromParent(QPoint(me->pos().x(), me->pos().y()));
 		m_currentZoomingValue = zoomingModel()->value();
 
 		//paint the rubberband
@@ -526,32 +526,32 @@ void SongEditor::mousePressEvent(QMouseEvent *_me)
 		rubberBand()->show();
 
 		//the trackView(index) and the miditime where the mouse was clicked
-		m_rubberBandStartTrackview = trackIndexFromSelectionPoint(_me->y());
-		m_rubberbandStartMidipos = MidiTime((_me->x() - m_trackHeadWidth)
+		m_rubberBandStartTrackview = trackIndexFromSelectionPoint(me->y());
+		m_rubberbandStartMidipos = MidiTime((me->x() - m_trackHeadWidth)
 											/ pixelsPerTact() * MidiTime::ticksPerTact())
 											+ m_currentPosition;
 	}
-	QWidget::mousePressEvent(_me);
+	QWidget::mousePressEvent(me);
 }
 
 
 
 
-void SongEditor::mouseMoveEvent(QMouseEvent *_me)
+void SongEditor::mouseMoveEvent(QMouseEvent *me)
 {
-	m_mousePos = _me->pos();
+	m_mousePos = me->pos();
 	updateRubberband();
-	QWidget::mouseMoveEvent(_me);
+	QWidget::mouseMoveEvent(me);
 }
 
 
 
 
-void SongEditor::mouseReleaseEvent(QMouseEvent *_me)
+void SongEditor::mouseReleaseEvent(QMouseEvent *me)
 {
 	rubberBand()->hide();
 	rubberBand()->setEnabled(false);
-	QWidget::mouseReleaseEvent(_me);
+	QWidget::mouseReleaseEvent(me);
 }
 
 
