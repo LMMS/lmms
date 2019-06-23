@@ -71,7 +71,7 @@ private:
 	std::vector<std::pair<float, std::string>> makeLogAmpTics(int low, int high);
 	std::vector<std::pair<float, std::string>> makeLinearAmpTics(int low, int high);
 
-	// currently selected ranges (see SaConfig.h for enum definitions)
+	// currently selected ranges (see SaControls.h for enum definitions)
 	int m_freqRangeIndex;
 	int m_ampRangeIndex;
 

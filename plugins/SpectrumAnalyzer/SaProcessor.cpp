@@ -42,7 +42,6 @@ SaProcessor::SaProcessor(SaControls *controls) :
 	m_spectrumActive(false),
 	m_waterfallActive(false),
 	m_waterfallNotEmpty(0),
-	m_destroyed(false),
 	m_reallocating(false)
 {
 	m_fftWindow.resize(m_inBlockSize, 1.0);
@@ -68,9 +67,6 @@ SaProcessor::SaProcessor(SaControls *controls) :
 
 SaProcessor::~SaProcessor()
 {
-	// take a note that destructor was called; see reallocateBuffers()
-	m_destroyed = true;
-
 	if (m_fftPlanL != NULL) {fftwf_destroy_plan(m_fftPlanL);}
 	if (m_fftPlanR != NULL) {fftwf_destroy_plan(m_fftPlanR);}
 	if (m_spectrumL != NULL) {fftwf_free(m_spectrumL);}
@@ -178,15 +174,15 @@ void SaProcessor::analyse(sampleFrame *in_buffer, const fpp_t frame_count)
 					// partially or fully mapped to a pixel. Any inconsistency
 					// may be seen in the spectrogram as dark or white lines --
 					// play white noise to confirm your change did not break it.
-					float band_start = freqToXPixel(binToFreq(i) - binBandwidth() / 2.0, binCount() -1);
-					float band_end = freqToXPixel(binToFreq(i + 1) - binBandwidth() / 2.0, binCount() -1);
+					float band_start = freqToXPixel(binToFreq(i) - binBandwidth() / 2.0, binCount());
+					float band_end = freqToXPixel(binToFreq(i + 1) - binBandwidth() / 2.0, binCount());
 					if (m_controls->m_logXModel.value())
 					{
 						// Logarithmic scale
 						if (band_end - band_start > 1.0)
 						{
 							// band spans multiple pixels: draw all pixels it covers
-							for (target = band_start; target < band_end; target++)
+							for (target = band_start; target < (int)band_end; target++)
 							{
 								if (target >= 0 && target < binCount())
 								{
@@ -255,7 +251,7 @@ void SaProcessor::analyse(sampleFrame *in_buffer, const fpp_t frame_count)
 // Gamma correction is applied to make small values more visible and to make
 // a linear gradient actually appear roughly linear. The correction should be
 // around 0.42 to 0.45 for sRGB displays (or lower for bigger visibility boost).
-QRgb SaProcessor::makePixel(float left, float right, float gamma_correction)
+QRgb SaProcessor::makePixel(float left, float right, float gamma_correction) const
 {
 	if (m_controls->m_stereoModel.value())
 	{
@@ -276,12 +272,6 @@ QRgb SaProcessor::makePixel(float left, float right, float gamma_correction)
 }
 
 
-// Get sample rate value that is valid for currently stored results.
-int SaProcessor::getSampleRate() const
-{
-	return m_sampleRate;
-}
-
 
 // Inform the processor whether any display widgets actually need it.
 void SaProcessor::setSpectrumActive(bool active)
@@ -298,12 +288,6 @@ void SaProcessor::setWaterfallActive(bool active)
 // Reallocate data buffers according to newly set block size.
 void SaProcessor::reallocateBuffers()
 {
-	// The SaProcessor destructor is called before SaControlsDialog destructor.
-	// This causes problems, sice ComboBoxModel emits dataChanged() as it is
-	// destroyed, triggering reallocation in processor that is already gone --
-	// a good recipe for segfault. This check explicitly prevents it.
-	if (m_destroyed) {return;}
-
 	int new_size_index = m_controls->m_blockSizeModel.value();
 	int new_in_size, new_fft_size;
 	int new_bins;
@@ -375,9 +359,6 @@ void SaProcessor::reallocateBuffers()
 // Precompute a new FFT window based on currently selected type.
 void SaProcessor::rebuildWindow()
 {
-	// don't touch anything if destructor was called (see reallocateBuffers())
-	if (m_destroyed) {return;}
-
 	// computation is done in fft_helpers
 	QMutexLocker lock(&m_dataAccess);
 	precomputeWindow(m_fftWindow.data(), m_inBlockSize, (FFT_WINDOWS) m_controls->m_windowModel.value());
@@ -403,19 +384,46 @@ void SaProcessor::clear()
 // --------------------------------------
 // Frequency conversion helpers
 //
-float SaProcessor::binToFreq(int index)
+
+// Get sample rate value that is valid for currently stored results.
+int SaProcessor::getSampleRate() const
 {
-	return (index * getSampleRate() / 2.0) / binCount();
+	return m_sampleRate;
 }
 
 
-float SaProcessor::binBandwidth()
+// Maximum frequency of a sampled signal is equal to half of its sample rate.
+float SaProcessor::getNyquistFreq() const
 {
-	return (getSampleRate() / 2.0) / binCount();
+	return getSampleRate() / 2.0f;
 }
 
 
-float SaProcessor::getFreqRangeMin(bool linear)
+// FFTW automatically discards upper half of the symmetric FFT output, so
+// the useful bin count is the transform size divided by 2, plus zero.
+unsigned int SaProcessor::binCount() const
+{
+	return m_fftBlockSize / 2 + 1;
+}
+
+
+// Return the center frequency of given frequency bin.
+float SaProcessor::binToFreq(int bin_index) const
+{
+	return getNyquistFreq() * bin_index / binCount();
+}
+
+
+// Return width of the frequency range that falls into one bin.
+// The binCount is lowered by one since half of the first and last bin is
+// actually outside the frequency range.
+float SaProcessor::binBandwidth() const
+{
+	return getNyquistFreq() / (binCount() - 1);
+}
+
+
+float SaProcessor::getFreqRangeMin(bool linear) const
 {
 	switch (m_controls->m_freqRangeModel.value())
 	{
@@ -429,7 +437,7 @@ float SaProcessor::getFreqRangeMin(bool linear)
 }
 
 
-float SaProcessor::getFreqRangeMax()
+float SaProcessor::getFreqRangeMax() const
 {
 	switch (m_controls->m_freqRangeModel.value())
 	{
@@ -438,13 +446,13 @@ float SaProcessor::getFreqRangeMax()
 		case FRANGE_MIDS: return FRANGE_MIDS_END;
 		case FRANGE_HIGH: return FRANGE_HIGH_END;
 		default:
-		case FRANGE_FULL: return getSampleRate() / 2;
+		case FRANGE_FULL: return getNyquistFreq();
 	}
 }
 
 
 // Map frequency to pixel x position on a display of given width.
-float SaProcessor::freqToXPixel(float freq, int width)
+float SaProcessor::freqToXPixel(float freq, int width) const
 {
 	if (m_controls->m_logXModel.value())
 	{
@@ -463,7 +471,7 @@ float SaProcessor::freqToXPixel(float freq, int width)
 
 
 // Map pixel x position on display of given width back to frequency.
-float SaProcessor::xPixelToFreq(float x, int width)
+float SaProcessor::xPixelToFreq(float x, int width) const
 {
 	if (m_controls->m_logXModel.value())
 	{
@@ -484,7 +492,7 @@ float SaProcessor::xPixelToFreq(float x, int width)
 // --------------------------------------
 // Amplitude conversion helpers
 //
-float SaProcessor::getAmpRangeMin(bool linear)
+float SaProcessor::getAmpRangeMin(bool linear) const
 {
 	// return very low limit to make sure zero gets included at linear grid
 	if (linear) {return -900;}
@@ -499,7 +507,7 @@ float SaProcessor::getAmpRangeMin(bool linear)
 }
 
 
-float SaProcessor::getAmpRangeMax()
+float SaProcessor::getAmpRangeMax() const
 {
 	switch (m_controls->m_ampRangeModel.value())
 	{
@@ -512,8 +520,9 @@ float SaProcessor::getAmpRangeMax()
 }
 
 
-// Map amplitude to pixel y position on a display of given height.
-float SaProcessor::ampToYPixel(float amplitude, int height)
+// Map linear amplitude to pixel y position on a display of given height.
+// Note that display coordinates are flipped: amplitude grows from [height] to zero.
+float SaProcessor::ampToYPixel(float amplitude, int height) const
 {
 	if (m_controls->m_logYModel.value())
 	{
@@ -538,7 +547,9 @@ float SaProcessor::ampToYPixel(float amplitude, int height)
 
 
 // Map pixel y position on display of given height back to amplitude.
-float SaProcessor::yPixelToAmp(float y, int height)
+// Note that display coordinates are flipped: amplitude grows from [height] to zero.
+// Also note that in logarithmic Y mode the returned amplitude is in dB, not linear.
+float SaProcessor::yPixelToAmp(float y, int height) const
 {
 	if (m_controls->m_logYModel.value())
 	{

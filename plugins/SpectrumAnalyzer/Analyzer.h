@@ -45,8 +45,8 @@ public:
 	SaProcessor *getProcessor() {return &m_processor;}
 
 private:
-	SaControls m_controls;
 	SaProcessor m_processor;
+	SaControls m_controls;
 };
 
 #endif // ANALYZER_H
