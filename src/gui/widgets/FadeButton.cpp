@@ -35,10 +35,10 @@
 const float FadeDuration = 300;
 
 
-FadeButton::FadeButton( const QColor & _normal_color,
-			const QColor & _activated_color,
-			const QColor & holdColor,
-			QWidget * _parent ) :
+FadeButton::FadeButton(const QColor & _normal_color,
+		const QColor & _activated_color,
+		const QColor & holdColor,
+		QWidget * _parent) :
 	QAbstractButton( _parent ),
 	m_stateTimer(),
 	m_releaseTimer(),
@@ -46,9 +46,9 @@ FadeButton::FadeButton( const QColor & _normal_color,
 	m_activatedColor( _activated_color ),
 	m_holdColor( holdColor )
 {
-	setAttribute( Qt::WA_OpaquePaintEvent, true );
-	setCursor( QCursor( embed::getIconPixmap( "hand" ), 3, 3 ) );
-	setFocusPolicy( Qt::NoFocus );
+	setAttribute(Qt::WA_OpaquePaintEvent, true);
+	setCursor(QCursor(embed::getIconPixmap("hand"), 3, 3));
+	setFocusPolicy(Qt::NoFocus);
 	activeNotes = 0;
 }
 
