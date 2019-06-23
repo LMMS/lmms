@@ -330,7 +330,7 @@ void SaProcessor::reallocateBuffers()
 
 	// Lock data shared with SaSpectrumView and SaWaterfallView.
 	// The m_reallocating is here to tell analyse() to avoid asking for the
-	// lock, since wfft3 can take a while to find the fastest FFT algorithm
+	// lock, since fftw3 can take a while to find the fastest FFT algorithm
 	// for given machine, which would produce interruption in the audio stream.
 	m_reallocating = true;
 	QMutexLocker lock(&m_dataAccess);
