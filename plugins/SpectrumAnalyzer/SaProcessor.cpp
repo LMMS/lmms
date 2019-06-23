@@ -108,7 +108,7 @@ void SaProcessor::analyse(sampleFrame *in_buffer, const fpp_t frame_count)
 				else
 				{
 					m_bufferL[m_framesFilledUp] = (in_buffer[in_frame][0] + in_buffer[in_frame][1]) * 0.5;
-					m_bufferR[m_framesFilledUp] = (in_buffer[in_frame][0] + in_buffer[in_frame][1]) * 0.5;
+					m_bufferR[m_framesFilledUp] = (in_buffer[in_frame][0] + in_buffer[in_frame][1]) * 0.5f;
 				}
 				if (in_buffer[in_frame][0] != 0.f || in_buffer[in_frame][1] != 0.f)
 				{
