@@ -27,23 +27,19 @@
 
 #include <QInputDialog>
 #include <QLabel>
-#include <QPushButton>
-#include <QMessageBox>
-#include <QMdiArea>
-#include <QMdiSubWindow>
-#include <QPainter>
 #include <QLayout>
+#include <QMessageBox>
+#include <QPushButton>
 
 
-#include "ControllerRackView.h"
 #include "CaptionMenu.h"
 #include "ControllerConnection.h"
 #include "ControllerDialog.h"
+#include "ControllerRackView.h"
 #include "embed.h"
 #include "Engine.h"
 #include "gui_templates.h"
 #include "GuiApplication.h"
-#include "LedCheckbox.h"
 #include "MainWindow.h"
 #include "ProjectJournal.h"
 #include "Song.h"
@@ -51,49 +47,51 @@
 #include "ToolTip.h"
 
 
-ControllerView::ControllerView( Controller * _model, QWidget * _parent ) :
-	QFrame( _parent ),
-	ModelView( _model, this ),
-	m_controllerDlg( NULL ),
-	m_titleBarHeight( 24 ),
-	m_show( true ),
-	m_modelC( _model )
+ControllerView::ControllerView(Controller * controller, QWidget * parent) :
+	QFrame(parent),
+	ModelView(controller, this),
+	m_controllerDlg(NULL),
+	m_titleBarHeight(24),
+	m_show(true),
+	m_modelC(controller)
 {
-	const QSize buttonsize( 17, 17 );
-	setFrameStyle( QFrame::Plain );
-	setFrameShadow( QFrame::Plain );
-	setLineWidth( 0 );
-	setContentsMargins( 0, 0, 0, 0 );
-	setWhatsThis( tr( "Controllers are able to automate the value of a knob, slider, and other controls."  ) );
+	const QSize buttonsize(17, 17);
+	setFrameStyle(QFrame::Plain);
+	setFrameShadow(QFrame::Plain);
+	setLineWidth(0);
+	setContentsMargins(0, 0, 0, 0);
 
-	m_controllerDlg = getController()->createDialog( this );
-	m_controllerDlg->move( 1, m_titleBarHeight );
+	m_controllerDlg = getController()->createDialog(this);
+	m_controllerDlg->move(1, m_titleBarHeight);
 
-	controllerTypeLabel = new QLabel( this );
-	controllerTypeLabel->setText( QString( getController()->type() == Controller::LfoController ? QString( "LFO: " ) : QString( "PEAK: " ) ) );
-	controllerTypeLabel->move( 3, 3 );
+	controllerTypeLabel = new QLabel(this);
+	controllerTypeLabel->setText(QString(getController()->type() == Controller::LfoController
+										 ? QString("LFO: ")
+										 : QString("PEAK: ")));
+	controllerTypeLabel->move(3, 3);
 	controllerTypeLabel->show();
 
-	m_nameLineEdit = new QLineEdit( this );
-	m_nameLineEdit->setText( _model->name() );
-	m_nameLineEdit->setReadOnly( true );
-	m_nameLineEdit->setAttribute( Qt::WA_TransparentForMouseEvents );
-	m_nameLineEdit->move( controllerTypeLabel->sizeHint().width() + 3, 2 );
-	connect( m_nameLineEdit, SIGNAL( editingFinished() ), this, SLOT( renameFinished() ) );
+	m_nameLineEdit = new QLineEdit(this);
+	m_nameLineEdit->setText(controller->name());
+	m_nameLineEdit->setReadOnly(true);
+	m_nameLineEdit->setAttribute(Qt::WA_TransparentForMouseEvents);
+	m_nameLineEdit->move(controllerTypeLabel->sizeHint().width() + 3, 2);
+	connect(m_nameLineEdit, SIGNAL(editingFinished()), this, SLOT(renameFinished()));
 
-	setFixedWidth( m_controllerDlg->width() + 2 );
-	setFixedHeight( m_controllerDlg->height() + m_titleBarHeight + 1 );
+	setFixedWidth(m_controllerDlg->width() + 2);
+	setFixedHeight(m_controllerDlg->height() + m_titleBarHeight + 1);
 
-	m_collapse = new QPushButton( embed::getIconPixmap( "stepper-down" ), QString::null, this );
-	m_collapse->resize( buttonsize );
-	m_collapse->setFocusPolicy( Qt::NoFocus );
-	m_collapse->setCursor( Qt::ArrowCursor );
-	m_collapse->setAttribute( Qt::WA_NoMousePropagation );
-	m_collapse->setToolTip( tr( "collapse" ) );
-	m_collapse->move( width() - buttonsize.width() - 3, 3 );
-	connect( m_collapse, SIGNAL( clicked() ), this, SLOT( toggleCollapseController() ) );
-	setAcceptDrops( true );
-	setModel( _model );
+	m_collapseButton = new QPushButton(embed::getIconPixmap("stepper-down"), QString::null, this );
+	m_collapseButton->resize(buttonsize);
+	m_collapseButton->setFocusPolicy(Qt::NoFocus);
+	m_collapseButton->setCursor(Qt::ArrowCursor);
+	m_collapseButton->setAttribute(Qt::WA_NoMousePropagation);
+	m_collapseButton->setToolTip(tr("collapse"));
+	m_collapseButton->move(width() - buttonsize.width() - 3, 3);
+	connect(m_collapseButton, SIGNAL(clicked()), this, SLOT(toggleCollapseController()));
+
+	setAcceptDrops(true);
+	setModel(controller);
 }
 
 
@@ -108,9 +106,9 @@ ControllerView::~ControllerView()
 
 void ControllerView::collapseController()
 {
-	m_collapse->setIcon( embed::getIconPixmap( "stepper-left" ) );
+	m_collapseButton->setIcon(embed::getIconPixmap("stepper-left"));
 	m_controllerDlg->hide();
-	setFixedHeight( m_titleBarHeight );
+	setFixedHeight(m_titleBarHeight);
 	emit controllerCollapsed();
 	gui->getControllerRackView()->setAllCollapsed(false);
 	gui->getControllerRackView()->setAllExpanded(false);
@@ -123,11 +121,10 @@ void ControllerView::collapseController()
 void ControllerView::expandController()
 {
 	m_controllerDlg->show();
-	setFixedHeight( m_controllerDlg->height() + m_titleBarHeight + 1 );
-	m_collapse->setIcon( embed::getIconPixmap( "stepper-down" ) );
+	setFixedHeight(m_controllerDlg->height() + m_titleBarHeight + 1);
+	m_collapseButton->setIcon(embed::getIconPixmap("stepper-down"));
 	gui->getControllerRackView()->setAllCollapsed(false);
 	gui->getControllerRackView()->setAllExpanded(false);
-
 }
 
 
@@ -135,7 +132,7 @@ void ControllerView::expandController()
 
 void ControllerView::deleteController()
 {
-	emit( deleteController( this ) );
+	emit(deleteController(this));
 }
 
 
@@ -143,7 +140,7 @@ void ControllerView::deleteController()
 
 void ControllerView::toggleCollapseController()
 {
-	if( m_controllerDlg->isHidden() )
+	if(m_controllerDlg->isHidden())
 	{
 		expandController();
 	}
@@ -158,12 +155,12 @@ void ControllerView::toggleCollapseController()
 
 void ControllerView::renameFinished()
 {
-	m_nameLineEdit->setReadOnly( true );
+	m_nameLineEdit->setReadOnly(true);
 	Controller * c = castModel<Controller>();
 	QString new_name = m_nameLineEdit->text();
-	if( new_name != c->name() )
+	if (new_name != c->name())
 	{
-		c->setName( new_name );
+		c->setName(new_name);
 		Engine::getSong()->setModified();
 	}
 }
@@ -173,7 +170,7 @@ void ControllerView::renameFinished()
 
 void ControllerView::rename()
 {
-	m_nameLineEdit->setReadOnly( false );
+	m_nameLineEdit->setReadOnly(false);
 	m_nameLineEdit->setFocus();
 	m_nameLineEdit->selectAll();
 }
@@ -186,6 +183,9 @@ void ControllerView::moveUp()
 	emit controllerMoveUp(this);
 }
 
+
+
+
 void ControllerView::moveDown()
 {
 	emit controllerMoveDown(this);
@@ -194,7 +194,7 @@ void ControllerView::moveDown()
 
 
 
-void ControllerView::mouseDoubleClickEvent( QMouseEvent * event )
+void ControllerView::mouseDoubleClickEvent(QMouseEvent *)
 {
 	rename();
 }
@@ -204,34 +204,34 @@ void ControllerView::mouseDoubleClickEvent( QMouseEvent * event )
 
 void ControllerView::dragEnterEvent(QDragEnterEvent *dee)
 {
-	StringPairDrag::processDragEnterEvent( dee, "float_value,"
-												"automatable_model" );
+	StringPairDrag::processDragEnterEvent(dee, "float_value,automatable_model" );
 }
 
 
 
 
-void ControllerView::dropEvent( QDropEvent *de )
+void ControllerView::dropEvent(QDropEvent * de)
 {
-	QString type = StringPairDrag::decodeKey( de );
-	QString val = StringPairDrag::decodeValue( de );
-	if( type == "automatable_model" )
+	QString type = StringPairDrag::decodeKey(de);
+	QString val = StringPairDrag::decodeValue(de);
+	if (type == "automatable_model")
 	{
-		AutomatableModel * mod = dynamic_cast<AutomatableModel *>( Engine::projectJournal()->journallingObject( val.toInt() ) );
-		if( m_modelC->hasModel( mod ) )
+		AutomatableModel * mod = dynamic_cast<AutomatableModel *>(Engine::projectJournal()->journallingObject(val.toInt()));
+		if (m_modelC->hasModel(mod))
 		{
 			QMessageBox::warning(this, tr("LMMS"), tr("Cycle Detected."));
 		}
-		if( mod != NULL && m_modelC->hasModel( mod ) == false )
+
+		if (mod != NULL && m_modelC->hasModel(mod) == false)
 		{
-			if( mod->controllerConnection() )
+			if (mod->controllerConnection())
 			{
-				mod->controllerConnection()->setController( getController() );
+				mod->controllerConnection()->setController(getController());
 			}
 			else
 			{
-				ControllerConnection * cc = new ControllerConnection( getController() );
-				mod->setControllerConnection( cc );
+				ControllerConnection * cc = new ControllerConnection(getController());
+				mod->setControllerConnection(cc);
 			}
 		}
 	}
@@ -247,7 +247,7 @@ void ControllerView::modelChanged()
 
 
 
-void ControllerView::paintEvent(QPaintEvent* event)
+void ControllerView::paintEvent(QPaintEvent*)
 {
 	QPainter p( this );
 	QRect rect( 1, 1, width()-2, m_titleBarHeight );
@@ -257,17 +257,23 @@ void ControllerView::paintEvent(QPaintEvent* event)
 
 
 
-void ControllerView::contextMenuEvent( QContextMenuEvent * )
+void ControllerView::contextMenuEvent(QContextMenuEvent *)
 {
-	QPointer<CaptionMenu> contextMenu = new CaptionMenu( model()->displayName(), this );
-	contextMenu->addAction( embed::getIconPixmap( "cancel" ), tr( "&Remove this controller" ), this, SLOT( deleteController() ) );
-	QAction * collapse = contextMenu->addAction( embed::getIconPixmap( "stepper-left" ), tr( "&Collaps all controllers" ), this,SIGNAL( collapseAll() ) );
-	collapse->setDisabled(gui->getControllerRackView()->allCollapsed());
-	QAction * expand = contextMenu->addAction( embed::getIconPixmap( "stepper-down" ), tr( "&Expand all controllers" ), this,SIGNAL( expandAll() ) );
-	expand->setDisabled(gui->getControllerRackView()->allExpanded());
-	contextMenu->addAction( embed::getIconPixmap( "cancel" ), tr( "&Move up" ), this, SLOT( moveUp() ) );
-	contextMenu->addAction( embed::getIconPixmap( "cancel" ), tr( "&Move down" ), this, SLOT( moveDown() ) );
+	QPointer<CaptionMenu> contextMenu = new CaptionMenu(model()->displayName(), this);
+
+	contextMenu->addAction(embed::getIconPixmap("cancel"), tr("&Remove this controller"), this, SLOT(deleteController()));
+
+	contextMenu->addAction(embed::getIconPixmap("stepper-left"), tr("&Collaps all controllers"),
+												this, SIGNAL(collapseAll())
+						   )->setDisabled(gui->getControllerRackView()->allCollapsed());
+	contextMenu->addAction(embed::getIconPixmap("stepper-down"), tr("&Expand all controllers"),
+												this, SIGNAL(expandAll())
+						   )->setDisabled(gui->getControllerRackView()->allExpanded());
+	contextMenu->addAction(embed::getIconPixmap("cancel"), tr("&Move up"), this, SLOT(moveUp())
+						   )->setDisabled(gui->getControllerRackView()->controllerViews().first() == this);
+	contextMenu->addAction(embed::getIconPixmap("cancel"), tr("&Move down"), this, SLOT(moveDown())
+						   )->setDisabled(gui->getControllerRackView()->controllerViews().last() == this);
 	contextMenu->addSeparator();
-	contextMenu->exec( QCursor::pos() );
+	contextMenu->exec(QCursor::pos());
 	delete contextMenu;
 }

@@ -32,29 +32,26 @@
 #include "Controller.h"
 #include "ModelView.h"
 
-class QGroupBox;
+
 class QLineEdit;
 class QPushButton;
-class QMdiSubWindow;
-
-class LedCheckBox;
 
 
 class ControllerView : public QFrame, public ModelView
 {
 	Q_OBJECT
 public:
-	ControllerView( Controller * _controller, QWidget * _parent );
+	ControllerView(Controller * controller, QWidget * parent);
 	virtual ~ControllerView();
 
 	inline Controller * getController()
 	{
-		return( castModel<Controller>() );
+		return(castModel<Controller>());
 	}
 
 	inline const Controller * getController() const
 	{
-		return( castModel<Controller>() );
+		return(castModel<Controller>());
 	}
 
 
@@ -72,7 +69,7 @@ public slots:
 
 
 signals:
-	void deleteController( ControllerView * _view );
+	void deleteController(ControllerView * view);
 	void controllerCollapsed();
 	void collapseAll();
 	void expandAll();
@@ -81,10 +78,10 @@ signals:
 
 
 protected:
-	virtual void paintEvent( QPaintEvent * event );
-	virtual void contextMenuEvent( QContextMenuEvent * _me );
+	virtual void paintEvent(QPaintEvent *);
+	virtual void contextMenuEvent(QContextMenuEvent *);
 	virtual void modelChanged();
-	virtual void mouseDoubleClickEvent( QMouseEvent * event );
+	virtual void mouseDoubleClickEvent(QMouseEvent *);
 	virtual void dragEnterEvent( QDragEnterEvent * dee );
 	virtual void dropEvent( QDropEvent * de );
 
@@ -95,7 +92,7 @@ private:
 	bool m_show;
 	QLabel * controllerTypeLabel;
 	QLineEdit * m_nameLineEdit;
-	QPushButton * m_collapse;
+	QPushButton * m_collapseButton;
 	Controller * m_modelC;
 } ;
 

@@ -231,7 +231,7 @@ void ControllerRackView::addLfoController()
 
 void ControllerRackView::moveControllerUp(ControllerView *cv)
 {
-	if(cv != m_controllerViews.first())
+	if (cv != m_controllerViews.first())
 	{
 		int index = m_controllerViews.indexOf(cv);
 		m_scrollAreaLayout->removeWidget(cv);
@@ -246,8 +246,16 @@ void ControllerRackView::moveControllerUp(ControllerView *cv)
 void ControllerRackView::moveControllerDown(ControllerView *cv)
 {
 	//move up the controller among is the same
-	int index = m_controllerViews.indexOf(cv) + 1;
-	moveControllerUp(m_controllerViews.at(index));
+	if (cv != m_controllerViews.last())
+	{
+		int index = m_controllerViews.indexOf(cv) + 1;
+		moveControllerUp(m_controllerViews.at(index));
+	}
+}
+
+const QVector<ControllerView *> ControllerRackView::controllerViews() const
+{
+	return m_controllerViews;
 }
 
 

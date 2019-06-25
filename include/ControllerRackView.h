@@ -71,6 +71,8 @@ public slots:
 	void setAllExpanded(bool allExpanded);
 	void setAllCollapsed(bool allCollapsed);
 
+	const QVector<ControllerView *> controllerViews() const;
+
 protected:
 	virtual void closeEvent(QCloseEvent * ce);
 	virtual void resizeEvent(QResizeEvent *);
