@@ -38,7 +38,6 @@
 #include "FileBrowser.h"
 #include "ImportFilter.h"
 #include "Instrument.h"
-#include "SampleTrack.h"
 #include "Song.h"
 #include "StringPairDrag.h"
 #include "GuiApplication.h"
@@ -382,31 +381,10 @@ void TrackContainerView::dropEvent( QDropEvent * _de )
 			|| type == "soundfontfile" || type == "vstpluginfile"
 			|| type == "patchfile")
 	{
-		const TrackView * trackView = trackViewAt(_de->pos().y() - timeLineWidgetHeight());
-		//if we drop on a sample track, add sample TCO to it
-		if (type == "samplefile" && trackView && trackView->getTrack()->type() == Track::SampleTrack)
+		const TrackView * tv = trackViewAt(_de->pos().y() - timeLineWidgetHeight());
+		if (type == "samplefile" && tv && tv->getTrack()->type() == Track::SampleTrack)
 		{
-			for (auto tv : trackViews())
-			{
-				if (tv == trackView)
-				{
-					int trackHeadWidth = ConfigManager::inst()->value("ui", "compacttrackbuttons").toInt()==1
-											 ? DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT + TRACK_OP_WIDTH_COMPACT
-											 : DEFAULT_SETTINGS_WIDGET_WIDTH + TRACK_OP_WIDTH;
-
-					int xPos = _de->pos().x() < trackHeadWidth
-											  ? trackHeadWidth
-											  : _de->pos().x();
-
-					MidiTime tcoPos = fixedTCOs()
-							? MidiTime(0)
-							: MidiTime((xPos - trackHeadWidth) / pixelsPerTact()
-									   * MidiTime::ticksPerTact()).toNearestTact();
-
-					SampleTCO * sTco = dynamic_cast<SampleTCO*>(tv->getTrack()->createTCO(tcoPos));
-					if (sTco) { sTco->setSampleFile(value); }
-				}
-			}
+			_de->accept();
 		}
 		//This code handles the file types if we are not dropping on a sampletrack or it's not a sample file
 		else
