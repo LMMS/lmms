@@ -124,7 +124,6 @@ public:
 
 	RubberBand *rubberBand() const;
 
-
 public slots:
 	void realignTracks();
 	TrackView * createTrackView( Track * _t );
