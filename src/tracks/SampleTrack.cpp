@@ -917,29 +917,26 @@ void SampleTrackView::dropEvent(QDropEvent *de)
 	QString type  = StringPairDrag::decodeKey(de);
 	QString value = StringPairDrag::decodeValue(de);
 
-		if (type == "samplefile")
-		{
-			int trackHeadWidth = ConfigManager::inst()->value("ui", "compacttrackbuttons").toInt()==1
-									 ? DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT + TRACK_OP_WIDTH_COMPACT
-									 : DEFAULT_SETTINGS_WIDGET_WIDTH + TRACK_OP_WIDTH;
+	if (type == "samplefile")
+	{
+		int trackHeadWidth = ConfigManager::inst()->value("ui", "compacttrackbuttons").toInt()==1
+				? DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT + TRACK_OP_WIDTH_COMPACT
+				: DEFAULT_SETTINGS_WIDGET_WIDTH + TRACK_OP_WIDTH;
 
-			int xPos = de->pos().x() < trackHeadWidth
-									  ? trackHeadWidth
-									  : de->pos().x();
+		int xPos = de->pos().x() < trackHeadWidth
+				? trackHeadWidth
+				: de->pos().x();
 
-			MidiTime tcoPos = trackContainerView()->fixedTCOs()
-					? MidiTime(0)
-					: MidiTime(((xPos - trackHeadWidth) / trackContainerView()->pixelsPerTact()
-							   * MidiTime::ticksPerTact()) + trackContainerView()->currentPosition()
-							   ).toNearestTact();
+		MidiTime tcoPos = trackContainerView()->fixedTCOs()
+				? MidiTime(0)
+				: MidiTime(((xPos - trackHeadWidth) / trackContainerView()->pixelsPerTact()
+							* MidiTime::ticksPerTact()) + trackContainerView()->currentPosition()
+						   ).toNearestTact();
 
-			SampleTCO * sTco = static_cast<SampleTCO*>(getTrack()->createTCO(tcoPos));
-			if (sTco) { sTco->setSampleFile(value); }
-		}
-		else
-		{
-			TrackView::dropEvent(de);
-		}
+		SampleTCO * sTco = static_cast<SampleTCO*>(getTrack()->createTCO(tcoPos));
+		if (sTco) { sTco->setSampleFile(value); }
+	}
+
 }
 
 

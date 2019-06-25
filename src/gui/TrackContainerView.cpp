@@ -377,26 +377,18 @@ void TrackContainerView::dropEvent( QDropEvent * _de )
 		//it->toggledInstrumentTrackButton( true );
 		_de->accept();
 	}
-	else if (type == "samplefile" || type == "pluginpresetfile"
-			|| type == "soundfontfile" || type == "vstpluginfile"
-			|| type == "patchfile")
+	else if( type == "samplefile" || type == "pluginpresetfile"
+		|| type == "soundfontfile" || type == "vstpluginfile"
+		|| type == "patchfile" )
 	{
-		const TrackView * tv = trackViewAt(_de->pos().y() - timeLineWidgetHeight());
-		if (type == "samplefile" && tv && tv->getTrack()->type() == Track::SampleTrack)
-		{
-			_de->accept();
-		}
-		//This code handles the file types if we are not dropping on a sampletrack or it's not a sample file
-		else
-		{
-			InstrumentTrack * it = dynamic_cast<InstrumentTrack *>(
-					Track::create(Track::InstrumentTrack,
-									m_tc));
-			PluginFactory::PluginInfoAndKey piakn =
-				pluginFactory->pluginSupportingExtension(FileItem::extension(value));
-			Instrument * i = it->loadInstrument(piakn.info.name(), &piakn.key);
-			i->loadFile(value);
-		}
+		InstrumentTrack * it = dynamic_cast<InstrumentTrack *>(
+				Track::create( Track::InstrumentTrack,
+								m_tc ) );
+		PluginFactory::PluginInfoAndKey piakn =
+			pluginFactory->pluginSupportingExtension(FileItem::extension(value));
+		Instrument * i = it->loadInstrument(piakn.info.name(), &piakn.key);
+		i->loadFile( value );
+		//it->toggledInstrumentTrackButton( true );
 		_de->accept();
 	}
 	else if( type == "presetfile" )
