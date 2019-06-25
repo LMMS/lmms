@@ -124,10 +124,6 @@ public:
 
 	RubberBand *rubberBand() const;
 
-	virtual int timeLineWidgetHeight() const
-	{
-		return 0;
-	}
 
 public slots:
 	void realignTracks();

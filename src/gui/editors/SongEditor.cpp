@@ -44,6 +44,7 @@
 #include "MeterDialog.h"
 #include "Mixer.h"
 #include "TextFloat.h"
+#include "TimeLineWidget.h"
 #include "ToolTip.h"
 #include "VisualizationWidget.h"
 #include "TimeDisplayWidget.h"
