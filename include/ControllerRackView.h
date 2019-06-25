@@ -48,8 +48,8 @@ public:
 	ControllerRackView();
 	virtual ~ControllerRackView();
 
-	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
-	virtual void loadSettings( const QDomElement & _this );
+	virtual void saveSettings(QDomDocument &, QDomElement & parent);
+	virtual void loadSettings(const QDomElement & _this);
 
 	inline virtual QString nodeName() const
 	{
@@ -62,22 +62,22 @@ public:
 	bool allCollapsed() const;
 
 public slots:
-	void deleteController( ControllerView * _view );
+	void deleteController(ControllerView * view);
 	void collapsingAll();
 	void expandAll();
-	void onControllerAdded( Controller * );
-	void onControllerRemoved( Controller * );
+	void onControllerAdded(Controller *);
+	void onControllerRemoved(Controller *);
 	void onControllerCollapsed();
 	void setAllExpanded(bool allExpanded);
 	void setAllCollapsed(bool allCollapsed);
 
 protected:
-	virtual void closeEvent( QCloseEvent * _ce );
-	virtual void resizeEvent( QResizeEvent * re );
-	virtual void paintEvent( QPaintEvent * pe );
+	virtual void closeEvent(QCloseEvent * ce);
+	virtual void resizeEvent(QResizeEvent *);
+	virtual void paintEvent(QPaintEvent *);
 
 private slots:
-	void addController();
+	void addLfoController();
 	void moveControllerUp(ControllerView * cv);
 	void moveControllerDown(ControllerView * cv);
 
@@ -91,6 +91,6 @@ private:
 
 	bool m_allExpanded;
 	bool m_allCollapsed;
-} ;
+};
 
 #endif
