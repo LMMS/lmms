@@ -69,7 +69,7 @@ SaControls::SaControls(Analyzer *effect) :
 
 	// FFT block size labels are generated automatically, based on
 	// FFT_BLOCK_SIZES vector defined in fft_helpers.h
-	for (int i = 0; i < FFT_BLOCK_SIZES.size(); i++)
+	for (unsigned int i = 0; i < FFT_BLOCK_SIZES.size(); i++)
 	{
 		if (i == 0)
 		{

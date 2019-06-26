@@ -55,16 +55,16 @@ public:
 	void clear();
 
 	// information about results and unit conversion helpers
-	float binToFreq(int bin_index) const;
+	float binToFreq(unsigned int bin_index) const;
 	float binBandwidth() const;
 
-	float freqToXPixel(float frequency, int width) const;
-	float xPixelToFreq(float x, int width) const;
+	float freqToXPixel(float frequency, unsigned int width) const;
+	float xPixelToFreq(float x, unsigned int width) const;
 
-	float ampToYPixel(float amplitude, int height) const;
-	float yPixelToAmp(float y, int height) const;
+	float ampToYPixel(float amplitude, unsigned int height) const;
+	float yPixelToAmp(float y, unsigned int height) const;
 
-	int getSampleRate() const;
+	unsigned int getSampleRate() const;
 	float getNyquistFreq() const;
 
 	float getFreqRangeMin(bool linear = false) const;

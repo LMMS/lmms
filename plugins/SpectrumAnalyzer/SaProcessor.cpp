@@ -121,7 +121,7 @@ void SaProcessor::analyse(sampleFrame *in_buffer, const fpp_t frame_count)
 			m_sampleRate = Engine::mixer()->processingSampleRate();
 	
 			// apply FFT window
-			for (int i = 0; i < m_inBlockSize; i++)
+			for (unsigned int i = 0; i < m_inBlockSize; i++)
 			{
 				m_bufferL[i] = m_bufferL[i] * m_fftWindow[i];
 				m_bufferR[i] = m_bufferR[i] * m_fftWindow[i];
@@ -168,7 +168,7 @@ void SaProcessor::analyse(sampleFrame *in_buffer, const fpp_t frame_count)
 				float accL = 0;	// accumulators for merging multiple bins
 				float accR = 0;
 	
-				for (int i = 0; i < binCount(); i++)
+				for (unsigned int i = 0; i < binCount(); i++)
 				{
 					// Every frequency bin spans a frequency range that must be
 					// partially or fully mapped to a pixel. Any inconsistency
@@ -182,7 +182,7 @@ void SaProcessor::analyse(sampleFrame *in_buffer, const fpp_t frame_count)
 						if (band_end - band_start > 1.0)
 						{
 							// band spans multiple pixels: draw all pixels it covers
-							for (target = band_start; target < (int)band_end; target++)
+							for (target = (int)band_start; target < (int)band_end; target++)
 							{
 								if (target >= 0 && target < binCount())
 								{
@@ -197,7 +197,7 @@ void SaProcessor::analyse(sampleFrame *in_buffer, const fpp_t frame_count)
 						else
 						{
 							// sub-pixel drawing; add contribution of current band
-							target = band_start;
+							target = (int)band_start;
 							if ((int)band_start == (int)band_end)
 							{
 								// band ends within current target pixel, accumulate
@@ -222,7 +222,7 @@ void SaProcessor::analyse(sampleFrame *in_buffer, const fpp_t frame_count)
 					else
 					{
 						// Linear: always draws one or more pixels per band
-						for (target = band_start; target < band_end; target++)
+						for (target = (int)band_start; target < band_end; target++)
 						{
 							if (target >= 0 && target < binCount())
 							{
@@ -288,9 +288,9 @@ void SaProcessor::setWaterfallActive(bool active)
 // Reallocate data buffers according to newly set block size.
 void SaProcessor::reallocateBuffers()
 {
-	int new_size_index = m_controls->m_blockSizeModel.value();
-	int new_in_size, new_fft_size;
-	int new_bins;
+	unsigned int new_size_index = m_controls->m_blockSizeModel.value();
+	unsigned int new_in_size, new_fft_size;
+	unsigned int new_bins;
 
 	// get new block sizes and bin count based on selected index
 	if (new_size_index < FFT_BLOCK_SIZES.size())
@@ -386,7 +386,7 @@ void SaProcessor::clear()
 //
 
 // Get sample rate value that is valid for currently stored results.
-int SaProcessor::getSampleRate() const
+unsigned int SaProcessor::getSampleRate() const
 {
 	return m_sampleRate;
 }
@@ -408,7 +408,7 @@ unsigned int SaProcessor::binCount() const
 
 
 // Return the center frequency of given frequency bin.
-float SaProcessor::binToFreq(int bin_index) const
+float SaProcessor::binToFreq(unsigned int bin_index) const
 {
 	return getNyquistFreq() * bin_index / binCount();
 }
@@ -452,7 +452,7 @@ float SaProcessor::getFreqRangeMax() const
 
 
 // Map frequency to pixel x position on a display of given width.
-float SaProcessor::freqToXPixel(float freq, int width) const
+float SaProcessor::freqToXPixel(float freq, unsigned int width) const
 {
 	if (m_controls->m_logXModel.value())
 	{
@@ -471,7 +471,7 @@ float SaProcessor::freqToXPixel(float freq, int width) const
 
 
 // Map pixel x position on display of given width back to frequency.
-float SaProcessor::xPixelToFreq(float x, int width) const
+float SaProcessor::xPixelToFreq(float x, unsigned int width) const
 {
 	if (m_controls->m_logXModel.value())
 	{
@@ -522,7 +522,7 @@ float SaProcessor::getAmpRangeMax() const
 
 // Map linear amplitude to pixel y position on a display of given height.
 // Note that display coordinates are flipped: amplitude grows from [height] to zero.
-float SaProcessor::ampToYPixel(float amplitude, int height) const
+float SaProcessor::ampToYPixel(float amplitude, unsigned int height) const
 {
 	if (m_controls->m_logYModel.value())
 	{
@@ -549,7 +549,7 @@ float SaProcessor::ampToYPixel(float amplitude, int height) const
 // Map pixel y position on display of given height back to amplitude.
 // Note that display coordinates are flipped: amplitude grows from [height] to zero.
 // Also note that in logarithmic Y mode the returned amplitude is in dB, not linear.
-float SaProcessor::yPixelToAmp(float y, int height) const
+float SaProcessor::yPixelToAmp(float y, unsigned int height) const
 {
 	if (m_controls->m_logYModel.value())
 	{

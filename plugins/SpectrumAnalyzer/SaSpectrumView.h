@@ -111,16 +111,16 @@ private:
 
 	// wrappers for most used SaProcessor conversion helpers
 	// (to make local code more readable)
-	float binToFreq(int index);
-	float freqToXPixel(float frequency, int width);
-	float ampToYPixel(float amplitude, int height);
+	float binToFreq(unsigned int bin_index);
+	float freqToXPixel(float frequency, unsigned int width);
+	float ampToYPixel(float amplitude, unsigned int height);
 
 	// current boundaries for drawing
-	int m_displayTop;
-	int m_displayBottom;
-	int m_displayLeft;
-	int m_displayRight;
-	int m_displayWidth;
+	unsigned int m_displayTop;
+	unsigned int m_displayBottom;
+	unsigned int m_displayLeft;
+	unsigned int m_displayRight;
+	unsigned int m_displayWidth;
 };
 #endif // SASPECTRUMVIEW_H
 

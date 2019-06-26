@@ -65,14 +65,14 @@ SaControlsDialog::SaControlsDialog(SaControls *controls, SaProcessor *processor)
 	// Using setDevicePixelRatio() on pixmap allows the SVG image to be razor
 	// sharp on High-DPI screens, but the desired size must be manually
 	// enlarged. No idea how to make Qt do it in a more reasonable way.
-	float iconSize = 22.0 * devicePixelRatio();
-	float buttonSize = 1.2 * iconSize;
+	QSize iconSize = QSize(22.0 * devicePixelRatio(), 22.0 * devicePixelRatio());
+	QSize buttonSize = 1.2 * iconSize;
 
 	// pause and freeze buttons
 	PixmapButton *pauseButton = new PixmapButton(this, tr("Pause"));
 	pauseButton->setToolTip(tr("Pause data acquisition"));
-	QPixmap *pauseOnPixmap = new QPixmap(PLUGIN_NAME::getIconPixmap("play").scaled(buttonSize, buttonSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
-	QPixmap *pauseOffPixmap = new QPixmap(PLUGIN_NAME::getIconPixmap("pause").scaled(buttonSize, buttonSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
+	QPixmap *pauseOnPixmap = new QPixmap(PLUGIN_NAME::getIconPixmap("play").scaled(buttonSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
+	QPixmap *pauseOffPixmap = new QPixmap(PLUGIN_NAME::getIconPixmap("pause").scaled(buttonSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
 	pauseOnPixmap->setDevicePixelRatio(devicePixelRatio());
 	pauseOffPixmap->setDevicePixelRatio(devicePixelRatio());
 	pauseButton->setActiveGraphic(*pauseOnPixmap);
@@ -83,8 +83,8 @@ SaControlsDialog::SaControlsDialog(SaControls *controls, SaProcessor *processor)
 
 	PixmapButton *refFreezeButton = new PixmapButton(this, tr("Reference freeze"));
 	refFreezeButton->setToolTip(tr("Freeze current input as a reference / disable falloff in peak-hold mode."));
-	QPixmap *freezeOnPixmap = new QPixmap(PLUGIN_NAME::getIconPixmap("freeze").scaled(buttonSize, buttonSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
-	QPixmap *freezeOffPixmap = new QPixmap(PLUGIN_NAME::getIconPixmap("freeze_off").scaled(buttonSize, buttonSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
+	QPixmap *freezeOnPixmap = new QPixmap(PLUGIN_NAME::getIconPixmap("freeze").scaled(buttonSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
+	QPixmap *freezeOffPixmap = new QPixmap(PLUGIN_NAME::getIconPixmap("freeze_off").scaled(buttonSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
 	freezeOnPixmap->setDevicePixelRatio(devicePixelRatio());
 	freezeOffPixmap->setDevicePixelRatio(devicePixelRatio());
 	refFreezeButton->setActiveGraphic(*freezeOnPixmap);
@@ -125,8 +125,8 @@ SaControlsDialog::SaControlsDialog(SaControls *controls, SaProcessor *processor)
 	// frequency: linear / log. switch and range selector
 	PixmapButton *logXButton = new PixmapButton(this, tr("Logarithmic frequency"));
 	logXButton->setToolTip(tr("Switch between logarithmic and linear frequency scale"));
-	QPixmap *logXOnPixmap = new QPixmap(PLUGIN_NAME::getIconPixmap("x_log").scaled(iconSize, iconSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
-	QPixmap *logXOffPixmap = new QPixmap(PLUGIN_NAME::getIconPixmap("x_linear").scaled(iconSize, iconSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
+	QPixmap *logXOnPixmap = new QPixmap(PLUGIN_NAME::getIconPixmap("x_log").scaled(iconSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
+	QPixmap *logXOffPixmap = new QPixmap(PLUGIN_NAME::getIconPixmap("x_linear").scaled(iconSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
 	logXOnPixmap->setDevicePixelRatio(devicePixelRatio());
 	logXOffPixmap->setDevicePixelRatio(devicePixelRatio());
 	logXButton->setActiveGraphic(*logXOnPixmap);
@@ -145,8 +145,8 @@ SaControlsDialog::SaControlsDialog(SaControls *controls, SaProcessor *processor)
 	// amplitude: linear / log switch and range selector
 	PixmapButton *logYButton = new PixmapButton(this, tr("Logarithmic amplitude"));
 	logYButton->setToolTip(tr("Switch between logarithmic and linear amplitude scale"));
-	QPixmap *logYOnPixmap = new QPixmap(PLUGIN_NAME::getIconPixmap("y_log").scaled(iconSize, iconSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
-	QPixmap *logYOffPixmap = new QPixmap(PLUGIN_NAME::getIconPixmap("y_linear").scaled(iconSize, iconSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
+	QPixmap *logYOnPixmap = new QPixmap(PLUGIN_NAME::getIconPixmap("y_log").scaled(iconSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
+	QPixmap *logYOffPixmap = new QPixmap(PLUGIN_NAME::getIconPixmap("y_linear").scaled(iconSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
 	logYOnPixmap->setDevicePixelRatio(devicePixelRatio());
 	logYOffPixmap->setDevicePixelRatio(devicePixelRatio());
 	logYButton->setActiveGraphic(*logYOnPixmap);
@@ -166,7 +166,7 @@ SaControlsDialog::SaControlsDialog(SaControls *controls, SaProcessor *processor)
 	QLabel *blockSizeLabel = new QLabel("", this);
 	QPixmap *blockSizeIcon = new QPixmap(PLUGIN_NAME::getIconPixmap("block_size"));
 	blockSizeIcon->setDevicePixelRatio(devicePixelRatio());
-	blockSizeLabel->setPixmap(blockSizeIcon->scaled(iconSize, iconSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
+	blockSizeLabel->setPixmap(blockSizeIcon->scaled(iconSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
 	config_layout->addWidget(blockSizeLabel, 0, 4, 2, 1, Qt::AlignRight);
 
 	ComboBox *blockSizeCombo = new ComboBox(this, tr("FFT block bize"));
@@ -182,7 +182,7 @@ SaControlsDialog::SaControlsDialog(SaControls *controls, SaProcessor *processor)
 	QLabel *windowLabel = new QLabel("", this);
 	QPixmap *windowIcon = new QPixmap(PLUGIN_NAME::getIconPixmap("window"));
 	windowIcon->setDevicePixelRatio(devicePixelRatio());
-	windowLabel->setPixmap(windowIcon->scaled(iconSize, iconSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
+	windowLabel->setPixmap(windowIcon->scaled(iconSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
 	config_layout->addWidget(windowLabel, 2, 4, 2, 1, Qt::AlignRight);
 
 	ComboBox *windowCombo = new ComboBox(this, tr("FFT window type"));

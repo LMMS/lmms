@@ -100,16 +100,16 @@ int notEmpty(const std::vector<float> &spectrum)
  *
  * return -1 on error
  */
-int precomputeWindow(float *window, int length, FFT_WINDOWS type, bool normalized)
+int precomputeWindow(float *window, unsigned int length, FFT_WINDOWS type, bool normalized)
 {
-	int i;
+	unsigned int i;
 	float gain = 0;
 	float a0;
 	float a1;
 	float a2;
 	float a3;
 
-	if (window == NULL || length <= 0) {return -1;}
+	if (window == NULL) {return -1;}
 
 	// constants taken from
 	// https://en.wikipedia.org/wiki/Window_function#AList_of_window_functions
@@ -163,7 +163,7 @@ int precomputeWindow(float *window, int length, FFT_WINDOWS type, bool normalize
  *
  * return 0 on success, else -1
  */
-int absspec(const fftwf_complex *complex_buffer, float *absspec_buffer, int compl_length)
+int absspec(const fftwf_complex *complex_buffer, float *absspec_buffer, unsigned int compl_length)
 {
 	int i;
 

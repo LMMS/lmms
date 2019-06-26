@@ -35,11 +35,11 @@
 // NOTE: FFT_BUFFER_SIZE should be considered deprecated!
 // It is used by Eq plugin and some older code here, but this should be a user
 // switchable parameter, not a constant. Use a value from FFT_BLOCK_SIZES
-const int FFT_BUFFER_SIZE = 2048;
+const unsigned int FFT_BUFFER_SIZE = 2048;
 
 // Allowed FFT block sizes. Ranging from barely useful to barely acceptable
 // because of performance and latency reasons.
-const std::vector<int> FFT_BLOCK_SIZES = {256, 512, 1024, 2048, 4096, 8192, 16384};
+const std::vector<unsigned int> FFT_BLOCK_SIZES = {256, 512, 1024, 2048, 4096, 8192, 16384};
 
 // List of FFT window functions supported by precomputeWindow()
 enum FFT_WINDOWS
@@ -81,7 +81,7 @@ int LMMS_EXPORT notEmpty(const std::vector<float> &spectrum);
  *
  *	@return -1 on error
  */
-int LMMS_EXPORT precomputeWindow(float *window, int length, FFT_WINDOWS type, bool normalized = true);
+int LMMS_EXPORT precomputeWindow(float *window, unsigned int length, FFT_WINDOWS type, bool normalized = true);
 
 
 /**	Compute absolute values of complex_buffer, save to absspec_buffer.
@@ -91,7 +91,7 @@ int LMMS_EXPORT precomputeWindow(float *window, int length, FFT_WINDOWS type, bo
  *	@return 0 on success, else -1
  */
 int LMMS_EXPORT absspec(const fftwf_complex *complex_buffer, float *absspec_buffer,
-						int compl_length);
+						unsigned int compl_length);
 
 
 /**	Build fewer subbands from many absolute spectrum values.

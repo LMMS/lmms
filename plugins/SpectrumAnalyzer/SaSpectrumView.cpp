@@ -347,7 +347,7 @@ QPainterPath SaSpectrumView::makePath(std::vector<float> &displayBuffer, float r
 	// Bins falling to interval [x_start, x_next) contribute to a single point.
 	float max = m_displayBottom;
 	float x_start = -1;		// lower bound of currently constructed point
-	for (int n = 0; n < m_processor->binCount(); n++)
+	for (unsigned int n = 0; n < m_processor->binCount(); n++)
 	{
 		float x = freqToXPixel(binToFreq(n), m_displayWidth);
 		float x_next = freqToXPixel(binToFreq(n + 1), m_displayWidth);
@@ -569,19 +569,19 @@ void SaSpectrumView::drawCursor(QPainter &painter)
 
 
 // Wrappers for most used SaProcessor helpers (to make local code more compact).
-float SaSpectrumView::binToFreq(int bin_index)
+float SaSpectrumView::binToFreq(unsigned int bin_index)
 {
 	return m_processor->binToFreq(bin_index);
 }
 
 
-float SaSpectrumView::freqToXPixel(float frequency, int width)
+float SaSpectrumView::freqToXPixel(float frequency, unsigned int width)
 {
 	return m_processor->freqToXPixel(frequency, width);
 }
 
 
-float SaSpectrumView::ampToYPixel(float amplitude, int height)
+float SaSpectrumView::ampToYPixel(float amplitude, unsigned int height)
 {
 	return m_processor->ampToYPixel(amplitude, height);
 }

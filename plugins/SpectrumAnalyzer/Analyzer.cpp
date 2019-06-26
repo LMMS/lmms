@@ -49,8 +49,8 @@ extern "C" {
 
 Analyzer::Analyzer(Model *parent, const Plugin::Descriptor::SubPluginFeatures::Key *key) :
 	Effect(&analyzer_plugin_descriptor, parent, key),
-	m_controls(this),
-	m_processor(&m_controls)
+	m_processor(&m_controls),
+	m_controls(this)
 {
 }
 
