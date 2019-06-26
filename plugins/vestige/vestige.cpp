@@ -82,11 +82,11 @@ Plugin::Descriptor Q_DECL_EXPORT  vestige_plugin_descriptor =
 }
 
 
-class vstSubWin : public QMdiSubWindow
+class vstSubWin : public SubWindow
 {
 public:
 	vstSubWin( QWidget * _parent ) :
-		QMdiSubWindow( _parent )
+		SubWindow( _parent )
 	{
 		setAttribute( Qt::WA_DeleteOnClose, false );
 		setWindowFlags( Qt::WindowCloseButtonHint );
