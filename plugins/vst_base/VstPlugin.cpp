@@ -30,6 +30,7 @@
 #include <QTemporaryFile>
 #include <QCloseEvent>
 #include <QMdiArea>
+#include <QMdiSubWindow>
 #ifdef LMMS_BUILD_LINUX
 #if QT_VERSION < 0x050000
 #include <QX11EmbedContainer>
@@ -48,17 +49,16 @@
 #include "GuiApplication.h"
 #include "MainWindow.h"
 #include "Song.h"
-#include "SubWindow.h"
 #include "templates.h"
 #include "FileDialog.h"
 #include <QLayout>
 
 
-class vstSubWin : public SubWindow
+class vstSubWin : public QMdiSubWindow
 {
 public:
 	vstSubWin( QWidget * _parent ) :
-		SubWindow( _parent )
+		QMdiSubWindow( _parent )
 	{
 		setAttribute( Qt::WA_DeleteOnClose, false );
 	}
