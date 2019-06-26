@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2006-2008 Paul Giblock <pgib/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * lb302FilterIIR2 is based on the gsyn filter code by Andy Sloane.
  *
@@ -37,7 +37,6 @@
 #include "InstrumentView.h"
 #include "LedCheckbox.h"
 #include "Knob.h"
-#include "Mixer.h"
 #include "NotePlayHandle.h"
 #include <QMutex>
 
@@ -225,7 +224,14 @@ private:
 	      vca_a;            // Amplifier coefficient.
 
 	// Envelope State
-	int   vca_mode;         // 0: attack, 1: decay, 2: idle, 3: never played
+	enum VCA_Mode
+	{
+		attack = 0,
+		decay = 1,
+		idle = 2,
+		never_played = 3
+	};
+	VCA_Mode vca_mode;
 
 	// My hacks
 	int   sample_cnt;

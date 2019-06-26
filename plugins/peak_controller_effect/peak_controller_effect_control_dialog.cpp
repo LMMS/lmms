@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2008 Paul Giblock <drfaygo/at/gmail/dot/com>
  * 
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -39,21 +39,17 @@ PeakControllerEffectControlDialog::PeakControllerEffectControlDialog(
 				PeakControllerEffectControls * _controls ) :
 	EffectControlDialog( _controls )
 {
+	setWindowIcon( embed::getIconPixmap( "controller" ) );
 	setAutoFillBackground( true );
 	QPalette pal;
-	pal.setBrush( backgroundRole(),
-				PLUGIN_NAME::getIconPixmap( "artwork" ) );
+	pal.setBrush( backgroundRole(), PLUGIN_NAME::getIconPixmap( "artwork" ) );
 	setPalette( pal );
+	setFixedSize( 240, 80 );
 
-	QVBoxLayout * tl = new QVBoxLayout( this );
-	tl->setContentsMargins( 5, 30, 5, 8 );
-
-	QHBoxLayout * l = new QHBoxLayout;
-	l->setSpacing( 4 );
 	m_baseKnob = new Knob( knobBright_26, this );
 	m_baseKnob->setLabel( tr( "BASE" ) );
 	m_baseKnob->setModel( &_controls->m_baseModel );
-	m_baseKnob->setHintText( tr( "Base amount:" ) , "" );
+	m_baseKnob->setHintText( tr( "Base:" ) , "" );
 
 	m_amountKnob = new Knob( knobBright_26, this );
 	m_amountKnob->setLabel( tr( "AMNT" ) );
@@ -63,7 +59,7 @@ PeakControllerEffectControlDialog::PeakControllerEffectControlDialog(
 	m_amountMultKnob = new Knob( knobBright_26, this );
 	m_amountMultKnob->setLabel( tr( "MULT" ) );
 	m_amountMultKnob->setModel( &_controls->m_amountMultModel );
-	m_amountMultKnob->setHintText( tr( "Amount Multiplicator:" ) , "" );
+	m_amountMultKnob->setHintText( tr( "Amount multiplicator:" ) , "" );
 
 	m_attackKnob = new Knob( knobBright_26, this );
 	m_attackKnob->setLabel( tr( "ATCK" ) );
@@ -76,32 +72,34 @@ PeakControllerEffectControlDialog::PeakControllerEffectControlDialog(
 	m_decayKnob->setHintText( tr( "Release:" ) , "" );
 	
 	m_tresholdKnob = new Knob( knobBright_26, this );
-	m_tresholdKnob->setLabel( tr( "TRES" ) );
+	m_tresholdKnob->setLabel( tr( "TRSH" ) );
 	m_tresholdKnob->setModel( &_controls->m_tresholdModel );
 	m_tresholdKnob->setHintText( tr( "Treshold:" ) , "" );
 
-	l->addWidget( m_baseKnob );
-	l->addWidget( m_amountKnob );
-	l->addWidget( m_amountMultKnob );
-	l->addWidget( m_attackKnob );
-	l->addWidget( m_decayKnob );
-	l->addWidget( m_tresholdKnob );
-	l->addStretch(); // expand, so other widgets have minimum width
-	tl->addLayout( l );
-
-	QVBoxLayout * l2 = new QVBoxLayout; // = 2nd vbox
-
-	m_muteLed = new LedCheckBox( "Mute Effect", this );
+	m_muteLed = new LedCheckBox( tr( "Mute output" ), this );
 	m_muteLed->setModel( &_controls->m_muteModel );
 
-	m_absLed = new LedCheckBox( "Absolute Value", this );
+	m_absLed = new LedCheckBox( tr( "Absolute value" ), this );
 	m_absLed->setModel( &_controls->m_absModel );
 
-	l2->addWidget( m_muteLed );
-	l2->addWidget( m_absLed );
-	l2->addStretch(); // expand, so other widgets have minimum height
-	tl->addLayout( l2 );
+	QVBoxLayout * mainLayout = new QVBoxLayout();
+	QHBoxLayout * knobLayout = new QHBoxLayout();
+	QHBoxLayout * ledLayout = new QHBoxLayout();
 
-	setLayout( tl );
+	knobLayout->addWidget( m_baseKnob );
+	knobLayout->addWidget( m_amountKnob );
+	knobLayout->addWidget( m_amountMultKnob );
+	knobLayout->addWidget( m_attackKnob );
+	knobLayout->addWidget( m_decayKnob );
+	knobLayout->addWidget( m_tresholdKnob );
+
+	ledLayout->addWidget( m_muteLed );
+	ledLayout->addWidget( m_absLed );
+
+	mainLayout->setContentsMargins( 3, 10, 0, 0 );
+	mainLayout->addLayout( knobLayout );
+	mainLayout->addLayout( ledLayout );
+
+	setLayout( mainLayout );
 }
 

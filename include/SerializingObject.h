@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2008-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -27,7 +27,7 @@
 
 #include <QtCore/QString>
 
-#include "export.h"
+#include "lmms_export.h"
 
 
 class QDomDocument;
@@ -36,7 +36,7 @@ class QDomElement;
 class SerializingObjectHook;
 
 
-class EXPORT SerializingObject
+class LMMS_EXPORT SerializingObject
 {
 public:
 	SerializingObject();

@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2006-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -34,12 +34,12 @@
 class automatableButtonGroup;
 
 
-class EXPORT AutomatableButton : public QPushButton, public BoolModelView
+class LMMS_EXPORT AutomatableButton : public QPushButton, public BoolModelView
 {
 	Q_OBJECT
 public:
 	AutomatableButton( QWidget * _parent, const QString & _name
-			= QString::null );
+			= QString() );
 	virtual ~AutomatableButton();
 
 	inline void setCheckable( bool _on )
@@ -79,12 +79,12 @@ private:
 
 
 
-class EXPORT automatableButtonGroup : public QWidget, public IntModelView
+class LMMS_EXPORT automatableButtonGroup : public QWidget, public IntModelView
 {
 	Q_OBJECT
 public:
 	automatableButtonGroup( QWidget * _parent, const QString & _name
-			= QString::null );
+			= QString() );
 	virtual ~automatableButtonGroup();
 
 	void addButton( AutomatableButton * _btn );

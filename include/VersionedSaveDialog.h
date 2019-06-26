@@ -5,7 +5,7 @@
  *
  * Copyright (c) 2014 Lukas W <lukaswhl/at/gmail.com>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -29,21 +29,32 @@
 #define VERSIONEDSAVEDIALOG_H
 
 #include "FileDialog.h"
+#include "Song.h"
 
 class QLineEdit;
+class LedCheckBox;
 
+class SaveOptionsWidget : public QWidget {
+public:
+	SaveOptionsWidget(Song::SaveOptions &saveOptions);
+
+private:
+	LedCheckBox *m_discardMIDIConnectionsCheckbox;
+};
 
 class VersionedSaveDialog : public FileDialog
 {
 	Q_OBJECT
 public:
 	explicit VersionedSaveDialog( QWidget *parent = 0,
+								  QWidget *saveOptionsWidget = nullptr,
 								  const QString &caption = QString(),
 								  const QString &directory = QString(),
 								  const QString &filter = QString() );
 
 	// Returns true if file name was changed, returns false if it wasn't
 	static bool changeFileNameVersion( QString &fileName, bool increment );
+	static bool fileExistsQuery( QString FileName, QString WindowTitle );
 
 public slots:
 	void incrementVersion();

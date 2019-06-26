@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -78,6 +78,9 @@ private:
 	GroupBox * m_arpGroupBox;
 	ComboBox * m_arpComboBox;
 	Knob * m_arpRangeKnob;
+	Knob * m_arpCycleKnob;
+	Knob * m_arpSkipKnob;
+	Knob * m_arpMissKnob;
 	TempoSyncKnob * m_arpTimeKnob;
 	Knob * m_arpGateKnob;
 

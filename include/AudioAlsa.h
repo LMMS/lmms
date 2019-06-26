@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -33,13 +33,14 @@
 #define ALSA_PCM_NEW_HW_PARAMS_API
 
 #include <alsa/asoundlib.h>
+#include <QThread>
 
 #include "AudioDevice.h"
 
 
-class AudioAlsa : public AudioDevice, public QThread
+class AudioAlsa : public QThread, public AudioDevice
 {
-	// Public classes and enums
+	Q_OBJECT
 public:
 	/**
 	 * @brief Contains the relevant information about available ALSA devices

@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -27,6 +27,7 @@
 #define INSTRUMENT_TRACK_H
 
 #include "AudioPort.h"
+#include "GroupBox.h"
 #include "InstrumentFunctions.h"
 #include "InstrumentSoundShaping.h"
 #include "MidiEventProcessor.h"
@@ -35,6 +36,7 @@
 #include "Piano.h"
 #include "PianoView.h"
 #include "Pitch.h"
+#include "Plugin.h"
 #include "Track.h"
 
 
@@ -51,6 +53,7 @@ class InstrumentTrackWindow;
 class InstrumentMidiIOView;
 class InstrumentMiscView;
 class Knob;
+class FxLineLcdSpinBox;
 class LcdSpinBox;
 class LeftRightNav;
 class midiPortMenu;
@@ -62,7 +65,7 @@ class LedCheckBox;
 class QLabel;
 
 
-class EXPORT InstrumentTrack : public Track, public MidiEventProcessor
+class LMMS_EXPORT InstrumentTrack : public Track, public MidiEventProcessor
 {
 	Q_OBJECT
 	MM_OPERATORS
@@ -145,7 +148,9 @@ public:
 
 
 	// load instrument whose name matches given one
-	Instrument * loadInstrument( const QString & _instrument_name );
+	Instrument * loadInstrument(const QString & _instrument_name,
+				const Plugin::Descriptor::SubPluginFeatures::Key* key = nullptr,
+				bool keyFromDnd = false);
 
 	AudioPort * audioPort()
 	{
@@ -166,7 +171,7 @@ public:
 	{
 		return &m_baseNoteModel;
 	}
-	
+
 	int baseNote() const;
 
 	Piano *pianoModel()
@@ -207,6 +212,8 @@ public:
 		return &m_effectChannelModel;
 	}
 
+	void setPreviewMode( const bool );
+
 
 signals:
 	void instrumentChanged();
@@ -214,6 +221,7 @@ signals:
 	void midiNoteOff( const Note& );
 	void nameChanged();
 	void newNote();
+	void endNote();
 
 
 protected:
@@ -234,7 +242,7 @@ private:
 	MidiPort m_midiPort;
 
 	NotePlayHandle* m_notes[NumKeys];
-	QMutex m_notesMutex;
+	NotePlayHandleList m_sustainedNotes;
 
 	int m_runningMidiNotes[NumKeys];
 	QMutex m_midiNotesMutex;
@@ -243,15 +251,17 @@ private:
 
 	bool m_silentBuffersProcessed;
 
+	bool m_previewMode;
+
 	IntModel m_baseNoteModel;
 
 	NotePlayHandleList m_processHandles;
 
 	FloatModel m_volumeModel;
 	FloatModel m_panningModel;
-	
+
 	AudioPort m_audioPort;
-	
+
 	FloatModel m_pitchModel;
 	IntModel m_pitchRangeModel;
 	IntModel m_effectChannelModel;
@@ -269,7 +279,6 @@ private:
 	friend class InstrumentTrackView;
 	friend class InstrumentTrackWindow;
 	friend class NotePlayHandle;
-	friend class FlpImport;
 	friend class InstrumentMiscView;
 
 } ;
@@ -423,6 +432,9 @@ protected slots:
 private:
 	virtual void modelChanged();
 	void viewInstrumentInDirection(int d);
+	//! adjust size of any child widget of the main tab
+	//! required to keep the old look when using a variable sized tab widget
+	void adjustTabSize(QWidget *w);
 
 	InstrumentTrack * m_track;
 	InstrumentTrackView * m_itv;
@@ -436,7 +448,7 @@ private:
 	QLabel * m_pitchLabel;
 	LcdSpinBox* m_pitchRangeSpinBox;
 	QLabel * m_pitchRangeLabel;
-	LcdSpinBox * m_effectChannelNumber;
+	FxLineLcdSpinBox * m_effectChannelNumber;
 
 
 

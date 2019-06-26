@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -24,20 +24,28 @@
  
 #include "PlayHandle.h"
 #include "BufferManager.h"
+#include "Engine.h"
+#include "Mixer.h"
 
+#include <QtCore/QThread>
+#include <QDebug>
 
-PlayHandle::PlayHandle( const Type type, f_cnt_t offset ) :
-		m_type( type ),
-		m_offset( offset ),
-		m_affinity( QThread::currentThread() ),
-		m_playHandleBuffer( NULL ),
-		m_usesBuffer( true )
+#include <iterator>
+
+PlayHandle::PlayHandle(const Type type, f_cnt_t offset) :
+		m_type(type),
+		m_offset(offset),
+		m_affinity(QThread::currentThread()),
+		m_playHandleBuffer(BufferManager::acquire()),
+		m_bufferReleased(true),
+		m_usesBuffer(true)
 {
 }
 
 
 PlayHandle::~PlayHandle()
 {
+	BufferManager::release(m_playHandleBuffer);
 }
 
 
@@ -45,8 +53,9 @@ void PlayHandle::doProcessing()
 {
 	if( m_usesBuffer )
 	{
-		if( ! m_playHandleBuffer ) m_playHandleBuffer = BufferManager::acquire();
-		play( m_playHandleBuffer );
+		m_bufferReleased = false;
+		BufferManager::clear(m_playHandleBuffer, Engine::mixer()->framesPerPeriod());
+		play( buffer() );
 	}
 	else
 	{
@@ -57,6 +66,10 @@ void PlayHandle::doProcessing()
 
 void PlayHandle::releaseBuffer()
 {
-	if( m_playHandleBuffer ) BufferManager::release( m_playHandleBuffer );
-	m_playHandleBuffer = NULL;
+	m_bufferReleased = true;
 }
+
+sampleFrame* PlayHandle::buffer()
+{
+	return m_bufferReleased ? nullptr : reinterpret_cast<sampleFrame*>(m_playHandleBuffer);
+};

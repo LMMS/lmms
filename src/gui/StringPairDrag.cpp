@@ -5,7 +5,7 @@
  *
  * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -27,7 +27,6 @@
 
 #include <QMimeData>
 #include <QDragEnterEvent>
-#include <QDropEvent>
 
 
 #include "StringPairDrag.h"
@@ -41,7 +40,7 @@ StringPairDrag::StringPairDrag( const QString & _key, const QString & _value,
 {
 	if( _icon.isNull() && _w )
 	{
-		setPixmap( QPixmap::grabWidget( _w ).scaled(
+		setPixmap( _w->grab().scaled(
 						64, 64,
 						Qt::KeepAspectRatio,
 						Qt::SmoothTransformation ) );
@@ -54,7 +53,7 @@ StringPairDrag::StringPairDrag( const QString & _key, const QString & _value,
 	QMimeData * m = new QMimeData();
 	m->setData( mimeType(), txt.toUtf8() );
 	setMimeData( m );
-	start( Qt::IgnoreAction );
+	exec( Qt::LinkAction, Qt::LinkAction );
 }
 
 

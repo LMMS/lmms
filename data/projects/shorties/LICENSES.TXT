@@ -1,0 +1,23 @@
+* Crunk(Demo).mmp
+  - Artistic 2.0
+  - https://lmms.io/lsp/?action=show&file=4093
+
+* DirtyLove.mmpz
+  - CC-BY-SA
+  - https://github.com/LMMS/lmms/pull/2727
+
+* Greshz-CoolSnip.mmpz
+  - Artistic 2.0
+  - https://lmms.io/lsp/index.php?action=show&file=1170
+
+* Root84-TrancyLoop.mmpz
+  - Yellow openmusic
+  - https://lmms.io/lsp/index.php?action=show&file=246
+
+* Skiessi-222.mmpz
+  - CC (by-sa)
+  - https://lmms.io/lsp/index.php?action=show&file=543
+
+* Surrender-Main.mmpz
+  - Artistic 2.0
+  - https://lmms.io/lsp/index.php?action=show&file=489

@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -34,7 +34,7 @@
 #include "lmms_basics.h"
 
 
-class EXPORT EnvelopeAndLfoParameters : public Model, public JournallingObject
+class LMMS_EXPORT EnvelopeAndLfoParameters : public Model, public JournallingObject
 {
 	Q_OBJECT
 public:
@@ -121,6 +121,7 @@ private:
 	static LfoInstances * s_lfoInstances;
 	bool m_used;
 
+	QMutex m_paramMutex;
 
 	FloatModel m_predelayModel;
 	FloatModel m_attackModel;
@@ -179,7 +180,6 @@ private:
 
 
 	friend class EnvelopeAndLfoView;
-	friend class FlpImport;
 
 } ;
 

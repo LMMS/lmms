@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2006-2008 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -27,6 +27,7 @@
 #define AUTOMATION_EDITOR_H
 
 #include <QtCore/QMutex>
+#include <QVector>
 #include <QWidget>
 
 #include "Editor.h"
@@ -51,11 +52,14 @@ class TimeLineWidget;
 class AutomationEditor : public QWidget, public JournallingObject
 {
 	Q_OBJECT
-	Q_PROPERTY(QColor gridColor READ gridColor WRITE setGridColor)
+	Q_PROPERTY(QColor barLineColor READ barLineColor WRITE setBarLineColor)
+	Q_PROPERTY(QColor beatLineColor READ beatLineColor WRITE setBeatLineColor)
+	Q_PROPERTY(QColor lineColor READ lineColor WRITE setLineColor)
 	Q_PROPERTY(QColor vertexColor READ vertexColor WRITE setVertexColor)
 	Q_PROPERTY(QBrush scaleColor READ scaleColor WRITE setScaleColor)
 	Q_PROPERTY(QBrush graphColor READ graphColor WRITE setGraphColor)
 	Q_PROPERTY(QColor crossColor READ crossColor WRITE setCrossColor)
+	Q_PROPERTY(QColor backgroundShade READ backgroundShade WRITE setBackgroundShade)
 public:
 	void setCurrentPattern(AutomationPattern * new_pattern);
 
@@ -77,16 +81,22 @@ public:
 	}
 
 	// qproperty access methods
-	QColor gridColor() const;
+	QColor barLineColor() const;
+	void setBarLineColor(const QColor & c);
+	QColor beatLineColor() const;
+	void setBeatLineColor(const QColor & c);
+	QColor lineColor() const;
+	void setLineColor(const QColor & c);
 	QBrush graphColor() const;
+	void setGraphColor(const QBrush & c);
 	QColor vertexColor() const;
+	void setVertexColor(const QColor & c);
 	QBrush scaleColor() const;
+	void setScaleColor(const QBrush & c);
 	QColor crossColor() const;
-	void setGridColor(const QColor& c);
-	void setGraphColor(const QBrush& c);
-	void setVertexColor(const QColor& c);
-	void setScaleColor(const QBrush& c);
-	void setCrossColor(const QColor& c);
+	void setCrossColor(const QColor & c);
+	QColor backgroundShade() const;
+	void setBackgroundShade(const QColor & c);
 
 	enum EditModes
 	{
@@ -115,14 +125,14 @@ protected:
 
 	float getLevel( int y );
 	int xCoordOfTick( int tick );
-	int yCoordOfLevel( float level );
-	inline void drawLevelTick( QPainter & p, int tick,
-					float value, bool is_selected );
+	float yCoordOfLevel( float level );
+	inline void drawLevelTick( QPainter & p, int tick, float value);// bool is_selected ); //NEEDS Change in CSS
 	void removeSelection();
 	void selectAll();
 	void getSelectedValues(timeMap & selected_values );
 
 	void drawLine( int x0, float y0, int x1, float y1 );
+	void removePoints( int x0, int x1 );
 
 protected slots:
 	void play();
@@ -162,7 +172,7 @@ private:
 	} ;
 
 	// some constants...
-	static const int SCROLLBAR_SIZE = 14;
+	static const int SCROLLBAR_SIZE = 12;
 	static const int TOP_MARGIN = 16;
 
 	static const int DEFAULT_Y_DELTA = 6;
@@ -185,6 +195,8 @@ private:
 	ComboBoxModel m_zoomingXModel;
 	ComboBoxModel m_zoomingYModel;
 	ComboBoxModel m_quantizeModel;
+
+	static const QVector<double> m_zoomXLevels;
 
 	FloatModel * m_tensionModel;
 
@@ -228,6 +240,7 @@ private:
 
 	EditModes m_editMode;
 
+	bool m_mouseDownRight; //true if right click is being held down
 
 	TimeLineWidget * m_timeLine;
 	bool m_scrollBack;
@@ -236,11 +249,14 @@ private:
 	void drawAutomationPoint( QPainter & p, timeMap::iterator it );
 	bool inBBEditor();
 
-	QColor m_gridColor;
+	QColor m_barLineColor;
+	QColor m_beatLineColor;
+	QColor m_lineColor;
 	QBrush m_graphColor;
 	QColor m_vertexColor;
 	QBrush m_scaleColor;
 	QColor m_crossColor;
+	QColor m_backgroundShade;
 
 	friend class AutomationEditorWindow;
 
@@ -249,6 +265,7 @@ signals:
 	void currentPatternChanged();
 	void positionChanged( const MidiTime & );
 } ;
+
 
 
 
@@ -283,6 +300,9 @@ signals:
 protected slots:
 	void play();
 	void stop();
+
+private slots:
+	void updateWindowTitle();
 
 private:
 	QAction* m_discreteAction;

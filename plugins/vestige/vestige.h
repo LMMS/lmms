@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -73,7 +73,9 @@ public:
 	virtual PluginView * instantiateView( QWidget * _parent );
 
 protected slots:
-	void setParameter( void );
+	void setParameter( Model * action );
+	void handleConfigChange( QString cls, QString attr, QString value );
+	void reloadPlugin();
 
 private:
 	void closePlugin( void );
@@ -85,7 +87,6 @@ private:
 	QString m_pluginDLL;
 	QMdiSubWindow * m_subWindow;
 	QScrollArea * m_scrollArea;
-	Knob ** vstKnobs;
 	FloatModel ** knobFModel;
 	QObject * p_subWindow;
 	int paramCount;
@@ -108,7 +109,7 @@ public:
 protected slots:
 	void syncPlugin( void );
 	void displayAutomatedOnly( void );
-	void setParameter( void );
+	void setParameter( Model * action );
 	void closeWindow();
 
 
@@ -128,6 +129,7 @@ private:
 	QPushButton * m_syncButton;
 	QPushButton * m_displayAutomatedOnly;
 	QPushButton * m_closeButton;
+	Knob ** vstKnobs;
 
 } ;
 

@@ -5,7 +5,7 @@
  * Copyright (c) 2014 Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>
  * Copyright (c) 2006-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -37,10 +37,10 @@ CrossoverEQControls::CrossoverEQControls( CrossoverEQEffect * eff ) :
 	m_gain2( 0.f, -60.f, 30.f, 0.1f, this, "Band 2 Gain" ),
 	m_gain3( 0.f, -60.f, 30.f, 0.1f, this, "Band 3 Gain" ),
 	m_gain4( 0.f, -60.f, 30.f, 0.1f, this, "Band 4 Gain" ),
-	m_mute1( false, this, "Mute Band 1" ),
-	m_mute2( false, this, "Mute Band 2" ),
-	m_mute3( false, this, "Mute Band 3" ),
-	m_mute4( false, this, "Mute Band 4" )
+	m_mute1( true, this, "Mute Band 1" ),
+	m_mute2( true, this, "Mute Band 2" ),
+	m_mute3( true, this, "Mute Band 3" ),
+	m_mute4( true, this, "Mute Band 4" )
 {
 	connect( Engine::mixer(), SIGNAL( sampleRateChanged() ), this, SLOT( sampleRateChanged() ) );
 	connect( &m_xover12, SIGNAL( dataChanged() ), this, SLOT( xover12Changed() ) );
@@ -86,6 +86,7 @@ void CrossoverEQControls::loadSettings( const QDomElement & elem )
 	m_mute4.loadSettings( elem, "mute4" );
 	
 	m_effect->m_needsUpdate = true;
+	m_effect->clearFilterHistories();
 }
 
 void CrossoverEQControls::xover12Changed()

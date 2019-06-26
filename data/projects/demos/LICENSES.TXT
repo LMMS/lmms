@@ -1,0 +1,75 @@
+* Alf42red-Mauiwowi.mmpz
+  - CC (by-sa)
+  - https://lmms.io/lsp/index.php?action=show&file=819
+
+* EsoXLB-CPU.mmpz
+  - Artistic 2.0
+  - https://lmms.io/lsp/index.php?action=show&file=723
+
+* Farbro-Tectonic.mmpz
+  - CC (by)
+  - https://lmms.io/lsp/index.php?action=show&file=1327
+
+* Greippi - Krem Kaakkuja (Second Flight Remix)
+  - CC (by)
+  - https://lmms.io/lsp/index.php?action=show&file=6337
+
+* Impulslogik-Zen.mmpz
+  - Artistic 2.0
+  - https://lmms.io/lsp/index.php?action=show&file=581
+
+* Jousboxx-BuzzerBeater.mmpz
+  - CC BY-SA 4.0
+  - https://github.com/LMMS/lmms/pull/3482#issuecomment-293609866
+
+* Momo64-esp.mmpz
+  - Artistic 2.0
+  - https://lmms.io/lsp/index.php?action=show&file=1534
+
+* Namitryus-K-Project.mmpz
+  - CC (by-nc)
+  - https://lmms.io/lsp/index.php?action=show&file=1138
+
+* Oglsdl-Dr8v2.mmpz
+  - Artistic 2.0
+  - https://lmms.io/lsp/index.php?action=show&file=1124
+
+* Oglsdl-PpTrip.mmpz
+  - Artistic 2.0
+  - https://lmms.io/lsp/index.php?action=show&file=1156
+
+* Popsip-Electric Dancer.mmpz
+  - Creative Commons (by-nc)
+  - https://lmms.io/lsp/?action=show&file=5414
+
+* Root84-Initialize.mmpz
+  - Yellow openmusic
+  - https://lmms.io/lsp/index.php?action=show&file=628
+
+* Saber-FinalStep.mmpz
+  - BSD
+  - https://lmms.io/lsp/index.php?action=show&file=721
+
+* Settel-InnerRecreation.mmpz
+  - Artistic 2.0
+  - https://lmms.io/lsp/index.php?action=show&file=515
+
+* Socceroos-Progress.mmpz
+  - Artistic 2.0
+  - https://lmms.io/lsp/index.php?action=show&file=1516
+
+* TameAnderson-MakeMe.mmpz
+  - Artistic 2.0
+  - https://lmms.io/lsp/index.php?action=show&file=1060
+
+* Thaledric-Armageddon.mmpz
+  - Creative Commons (by-nc-sa)
+  - https://lmms.io/lsp/?action=show&file=1947
+
+* Thomasso-AxeFromThe80s.mmpz
+  - Artistic 2.0
+  - https://lmms.io/lsp/index.php?action=show&file=474
+
+* unfa-Spoken.mmpz
+  - CC (by-nc)
+  - https://lmms.io/lsp/index.php?action=show&file=4929

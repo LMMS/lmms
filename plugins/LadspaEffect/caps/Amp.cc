@@ -370,7 +370,7 @@ AmpV::one_cycle (int frames)
 
 	current.g = max (gain < 1 ? gain : pow (20, gain - 1), .000001);
 	#if 0
-	if (++_turn & 127) == 0)
+	if ( (++_turn & 127) == 0)
 		fprintf (stderr, "supply = %.3f sag = %.3f\n", supply, sag);
 	#endif
 

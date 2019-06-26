@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -30,7 +30,7 @@
 #include "ComboBoxModel.h"
 
 
-class EXPORT BBTrackContainer : public TrackContainer
+class LMMS_EXPORT BBTrackContainer : public TrackContainer
 {
 	Q_OBJECT
 	mapPropertyFromModel(int,currentBB,setCurrentBB,m_bbComboBoxModel);
@@ -41,14 +41,14 @@ public:
 	virtual bool play( MidiTime _start, const fpp_t _frames,
 						const f_cnt_t _frame_base, int _tco_num = -1 );
 
-	virtual void updateAfterTrackAdd();
+	virtual void updateAfterTrackAdd() override;
 
-	inline virtual QString nodeName() const
+	inline virtual QString nodeName() const override
 	{
 		return "bbtrackcontainer";
 	}
 
-	tact_t lengthOfBB( int _bb );
+	tact_t lengthOfBB( int _bb ) const;
 	inline tact_t lengthOfCurrentBB()
 	{
 		return lengthOfBB( currentBB() );
@@ -62,6 +62,7 @@ public:
 	void fixIncorrectPositions();
 	void createTCOsForBB( int _bb );
 
+	AutomatedValueMap automatedValuesAt(MidiTime time, int tcoNum) const override;
 
 public slots:
 	void play();

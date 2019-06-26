@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -28,21 +28,19 @@
 
 #include <QtCore/QReadWriteLock>
 #include <QtCore/QObject>
-#include <QtCore/QRect>
-#include <QtCore/QWriteLocker>
 
 #include <samplerate.h>
 
-#include "export.h"
+#include "lmms_export.h"
 #include "interpolation.h"
 #include "lmms_basics.h"
 #include "lmms_math.h"
 #include "shared_object.h"
-#include "Mixer.h"
 #include "MemoryManager.h"
 
 
 class QPainter;
+class QRect;
 
 // values for buffer margins, used for various libsamplerate interpolation modes
 // the array positions correspond to the converter_type parameter values in libsamplerate
@@ -50,7 +48,7 @@ class QPainter;
 // may need to be higher - conversely, to optimize, some may work with lower values
 const f_cnt_t MARGIN[] = { 64, 64, 64, 4, 4 };
 
-class EXPORT SampleBuffer : public QObject, public sharedObject
+class LMMS_EXPORT SampleBuffer : public QObject, public sharedObject
 {
 	Q_OBJECT
 	MM_OPERATORS
@@ -60,7 +58,7 @@ public:
 		LoopOn,
 		LoopPingPong
 	};
-	class EXPORT handleState
+	class LMMS_EXPORT handleState
 	{
 		MM_OPERATORS
 	public:
@@ -105,12 +103,12 @@ public:
 	} ;
 
 
+	SampleBuffer();
 	// constructor which either loads sample _audio_file or decodes
 	// base64-data out of string
-	SampleBuffer( const QString & _audio_file = QString(),
-						bool _is_base64_data = false );
+	SampleBuffer( const QString & _audio_file, bool _is_base64_data = false );
 	SampleBuffer( const sampleFrame * _data, const f_cnt_t _frames );
-	SampleBuffer( const f_cnt_t _frames );
+	explicit SampleBuffer( const f_cnt_t _frames );
 
 	virtual ~SampleBuffer();
 
@@ -152,19 +150,16 @@ public:
 
 	void setLoopStartFrame( f_cnt_t _start )
 	{
-		QWriteLocker writeLocker(&m_varLock);
 		m_loopStartFrame = _start;
 	}
 
 	void setLoopEndFrame( f_cnt_t _end )
 	{
-		QWriteLocker writeLocker(&m_varLock);
 		m_loopEndFrame = _end;
 	}
 
 	void setAllPointFrames( f_cnt_t _start, f_cnt_t _end, f_cnt_t _loopstart, f_cnt_t _loopend )
 	{
-		QWriteLocker writeLocker(&m_varLock);
 		m_startFrame = _start;
 		m_endFrame = _end;
 		m_loopStartFrame = _loopstart;
@@ -203,13 +198,11 @@ public:
 
 	inline void setFrequency( float _freq )
 	{
-		QWriteLocker writeLocker(&m_varLock);
 		m_frequency = _freq;
 	}
 
 	inline void setSampleRate( sample_rate_t _rate )
 	{
-		QWriteLocker writeLocker(&m_varLock);
 		m_sampleRate = _rate;
 	}
 
@@ -225,31 +218,37 @@ public:
 	QString & toBase64( QString & _dst ) const;
 
 
-	static SampleBuffer * resample( sampleFrame * _data,
-						const f_cnt_t _frames,
-						const sample_rate_t _src_sr,
+	// protect calls from the GUI to this function with dataReadLock() and
+	// dataUnlock()
+	SampleBuffer * resample( const sample_rate_t _src_sr,
 						const sample_rate_t _dst_sr );
-
-	static inline SampleBuffer * resample( SampleBuffer * _buf,
-						const sample_rate_t _src_sr,
-						const sample_rate_t _dst_sr )
-	{
-		return resample( _buf->m_data, _buf->m_frames, _src_sr,
-								_dst_sr );
-	}
 
 	void normalizeSampleRate( const sample_rate_t _src_sr,
 						bool _keep_settings = false );
 
+	// protect calls from the GUI to this function with dataReadLock() and
+	// dataUnlock(), out of loops for efficiency
 	inline sample_t userWaveSample( const float _sample ) const
 	{
-		const float frame = _sample * m_frames;
-		f_cnt_t f1 = static_cast<f_cnt_t>( frame ) % m_frames;
+		f_cnt_t frames = m_frames;
+		sampleFrame * data = m_data;
+		const float frame = _sample * frames;
+		f_cnt_t f1 = static_cast<f_cnt_t>( frame ) % frames;
 		if( f1 < 0 )
 		{
-			f1 += m_frames;
+			f1 += frames;
 		}
-		return linearInterpolate( m_data[f1][0], m_data[ (f1 + 1) % m_frames ][0], fraction( frame ) );
+		return linearInterpolate( data[f1][0], data[ (f1 + 1) % frames ][0], fraction( frame ) );
+	}
+
+	void dataReadLock()
+	{
+		m_varLock.lockForRead();
+	}
+
+	void dataUnlock()
+	{
+		m_varLock.unlock();
 	}
 
 	static QString tryToMakeRelative( const QString & _file );
@@ -266,20 +265,22 @@ public slots:
 	void sampleRateChanged();
 
 private:
+	static sample_rate_t mixerSampleRate();
+
 	void update( bool _keep_settings = false );
 
 	void convertIntToFloat ( int_sample_t * & _ibuf, f_cnt_t _frames, int _channels);
 	void directFloatWrite ( sample_t * & _fbuf, f_cnt_t _frames, int _channels);
 
-	f_cnt_t decodeSampleSF( const char * _f, sample_t * & _buf,
+	f_cnt_t decodeSampleSF( QString _f, sample_t * & _buf,
 						ch_cnt_t & _channels,
 						sample_rate_t & _sample_rate );
 #ifdef LMMS_HAVE_OGGVORBIS
-	f_cnt_t decodeSampleOGGVorbis( const char * _f, int_sample_t * & _buf,
+	f_cnt_t decodeSampleOGGVorbis( QString _f, int_sample_t * & _buf,
 						ch_cnt_t & _channels,
 						sample_rate_t & _sample_rate );
 #endif
-	f_cnt_t decodeSampleDS( const char * _f, int_sample_t * & _buf,
+	f_cnt_t decodeSampleDS( QString _f, int_sample_t * & _buf,
 						ch_cnt_t & _channels,
 						sample_rate_t & _sample_rate );
 

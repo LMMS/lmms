@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -27,6 +27,9 @@
 #ifndef SONG_EDITOR_H
 #define SONG_EDITOR_H
 
+#include <QVector>
+
+#include "ActionGroup.h"
 #include "Editor.h"
 #include "TrackContainerView.h"
 
@@ -69,6 +72,8 @@ public:
 	void saveSettings( QDomDocument& doc, QDomElement& element );
 	void loadSettings( const QDomElement& element );
 
+	ComboBoxModel *zoomingModel() const;
+
 public slots:
 	void scrolled( int new_pos );
 
@@ -77,6 +82,8 @@ public slots:
 	void setEditModeSelect();
 
 	void updatePosition( const MidiTime & t );
+	void updatePositionLine();
+	void selectAllTcos( bool select );
 
 protected:
 	virtual void closeEvent( QCloseEvent * ce );
@@ -124,14 +131,21 @@ private:
 
 	ComboBoxModel* m_zoomingModel;
 
+	static const QVector<double> m_zoomLevels;
+
 	bool m_scrollBack;
 	bool m_smoothScroll;
+	int m_widgetWidthTotal;
 
 	EditMode m_mode;
+	EditMode m_ctrlMode; // mode they were in before they hit ctrl
 
 	friend class SongEditorWindow;
 
 } ;
+
+
+
 
 class SongEditorWindow : public Editor
 {
@@ -143,21 +157,35 @@ public:
 
 	SongEditor* m_editor;
 
+protected:
+	virtual void resizeEvent( QResizeEvent * event );
+	virtual void changeEvent( QEvent * );
+
 protected slots:
 	void play();
 	void record();
 	void recordAccompany();
 	void stop();
 
+	void lostFocus();
 	void adjustUiAfterProjectLoad();
 
+signals:
+	void playTriggered();
+	void resized();
+
 private:
+	virtual void keyPressEvent( QKeyEvent * ke );
+	virtual void keyReleaseEvent( QKeyEvent * ke );
+
 	QAction* m_addBBTrackAction;
 	QAction* m_addSampleTrackAction;
 	QAction* m_addAutomationTrackAction;
 
+	ActionGroup * m_editModeGroup;
 	QAction* m_drawModeAction;
 	QAction* m_selectModeAction;
+	QAction* m_crtlAction;
 
 	ComboBox * m_zoomingComboBox;
 };

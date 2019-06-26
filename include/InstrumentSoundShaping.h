@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -25,7 +25,6 @@
 #ifndef INSTRUMENT_SOUND_SHAPING_H
 #define INSTRUMENT_SOUND_SHAPING_H
 
-#include "Mixer.h"
 #include "ComboBoxModel.h"
 
 
@@ -79,7 +78,6 @@ private:
 
 
 	friend class InstrumentSoundShapingView;
-	friend class FlpImport;
 
 } ;
 

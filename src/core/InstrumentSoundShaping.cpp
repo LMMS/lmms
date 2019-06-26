@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -22,6 +22,7 @@
  *
  */
 
+#include <QtCore/QVarLengthArray>
 #include <QDomElement>
 
 #include "InstrumentSoundShaping.h"
@@ -31,8 +32,8 @@
 #include "EnvelopeAndLfoParameters.h"
 #include "Instrument.h"
 #include "InstrumentTrack.h"
-#include "NotePlayHandle.h"
-
+#include "Mixer.h"
+#include "stdshims.h"
 
 
 const float CUT_FREQ_MULTIPLIER = 6000.0f;
@@ -79,28 +80,28 @@ InstrumentSoundShaping::InstrumentSoundShaping(
 			tr( targetNames[i][2].toUtf8().constData() ) );
 	}
 
-	m_filterModel.addItem( tr( "LowPass" ), new PixmapLoader( "filter_lp" ) );
-	m_filterModel.addItem( tr( "HiPass" ), new PixmapLoader( "filter_hp" ) );
-	m_filterModel.addItem( tr( "BandPass csg" ), new PixmapLoader( "filter_bp" ) );
-	m_filterModel.addItem( tr( "BandPass czpg" ), new PixmapLoader( "filter_bp" ) );
-	m_filterModel.addItem( tr( "Notch" ), new PixmapLoader( "filter_notch" ) );
-	m_filterModel.addItem( tr( "Allpass" ), new PixmapLoader( "filter_ap" ) );
-	m_filterModel.addItem( tr( "Moog" ), new PixmapLoader( "filter_lp" ) );
-	m_filterModel.addItem( tr( "2x LowPass" ), new PixmapLoader( "filter_2lp" ) );
-	m_filterModel.addItem( tr( "RC LowPass 12dB" ), new PixmapLoader( "filter_lp" ) );
-	m_filterModel.addItem( tr( "RC BandPass 12dB" ), new PixmapLoader( "filter_bp" ) );
-	m_filterModel.addItem( tr( "RC HighPass 12dB" ), new PixmapLoader( "filter_hp" ) );
-	m_filterModel.addItem( tr( "RC LowPass 24dB" ), new PixmapLoader( "filter_lp" ) );
-	m_filterModel.addItem( tr( "RC BandPass 24dB" ), new PixmapLoader( "filter_bp" ) );
-	m_filterModel.addItem( tr( "RC HighPass 24dB" ), new PixmapLoader( "filter_hp" ) );
-	m_filterModel.addItem( tr( "Vocal Formant Filter" ), new PixmapLoader( "filter_hp" ) );	
-	m_filterModel.addItem( tr( "2x Moog" ), new PixmapLoader( "filter_2lp" ) );
-	m_filterModel.addItem( tr( "SV LowPass" ), new PixmapLoader( "filter_lp" ) );
-	m_filterModel.addItem( tr( "SV BandPass" ), new PixmapLoader( "filter_bp" ) );
-	m_filterModel.addItem( tr( "SV HighPass" ), new PixmapLoader( "filter_hp" ) );
-	m_filterModel.addItem( tr( "SV Notch" ), new PixmapLoader( "filter_notch" ) );
-	m_filterModel.addItem( tr( "Fast Formant" ), new PixmapLoader( "filter_hp" ) );
-	m_filterModel.addItem( tr( "Tripole" ), new PixmapLoader( "filter_lp" ) );
+	m_filterModel.addItem( tr( "Low-pass" ), make_unique<PixmapLoader>( "filter_lp" ) );
+	m_filterModel.addItem( tr( "Hi-pass" ), make_unique<PixmapLoader>( "filter_hp" ) );
+	m_filterModel.addItem( tr( "Band-pass csg" ), make_unique<PixmapLoader>( "filter_bp" ) );
+	m_filterModel.addItem( tr( "Band-pass czpg" ), make_unique<PixmapLoader>( "filter_bp" ) );
+	m_filterModel.addItem( tr( "Notch" ), make_unique<PixmapLoader>( "filter_notch" ) );
+	m_filterModel.addItem( tr( "All-pass" ), make_unique<PixmapLoader>( "filter_ap" ) );
+	m_filterModel.addItem( tr( "Moog" ), make_unique<PixmapLoader>( "filter_lp" ) );
+	m_filterModel.addItem( tr( "2x Low-pass" ), make_unique<PixmapLoader>( "filter_2lp" ) );
+	m_filterModel.addItem( tr( "RC Low-pass 12 dB/oct" ), make_unique<PixmapLoader>( "filter_lp" ) );
+	m_filterModel.addItem( tr( "RC Band-pass 12 dB/oct" ), make_unique<PixmapLoader>( "filter_bp" ) );
+	m_filterModel.addItem( tr( "RC High-pass 12 dB/oct" ), make_unique<PixmapLoader>( "filter_hp" ) );
+	m_filterModel.addItem( tr( "RC Low-pass 24 dB/oct" ), make_unique<PixmapLoader>( "filter_lp" ) );
+	m_filterModel.addItem( tr( "RC Band-pass 24 dB/oct" ), make_unique<PixmapLoader>( "filter_bp" ) );
+	m_filterModel.addItem( tr( "RC High-pass 24 dB/oct" ), make_unique<PixmapLoader>( "filter_hp" ) );
+	m_filterModel.addItem( tr( "Vocal Formant" ), make_unique<PixmapLoader>( "filter_hp" ) );
+	m_filterModel.addItem( tr( "2x Moog" ), make_unique<PixmapLoader>( "filter_2lp" ) );
+	m_filterModel.addItem( tr( "SV Low-pass" ), make_unique<PixmapLoader>( "filter_lp" ) );
+	m_filterModel.addItem( tr( "SV Band-pass" ), make_unique<PixmapLoader>( "filter_bp" ) );
+	m_filterModel.addItem( tr( "SV High-pass" ), make_unique<PixmapLoader>( "filter_hp" ) );
+	m_filterModel.addItem( tr( "SV Notch" ), make_unique<PixmapLoader>( "filter_notch" ) );
+	m_filterModel.addItem( tr( "Fast Formant" ), make_unique<PixmapLoader>( "filter_hp" ) );
+	m_filterModel.addItem( tr( "Tripole" ), make_unique<PixmapLoader>( "filter_lp" ) );
 }
 
 
@@ -138,7 +139,8 @@ void InstrumentSoundShaping::processAudioBuffer( sampleFrame* buffer,
 	const f_cnt_t envTotalFrames = n->totalFramesPlayed();
 	f_cnt_t envReleaseBegin = envTotalFrames - n->releaseFramesDone() + n->framesBeforeRelease();
 
-	if( n->isReleased() == false )
+	if( !n->isReleased() || ( n->instrumentTrack()->isSustainPedalPressed() &&
+		!n->isReleaseStarted() ) )
 	{
 		envReleaseBegin += frames;
 	}
@@ -153,25 +155,25 @@ void InstrumentSoundShaping::processAudioBuffer( sampleFrame* buffer,
 
 	if( m_filterEnabledModel.value() )
 	{
-		float cutBuffer [frames];
-		float resBuffer [frames];
+		QVarLengthArray<float> cutBuffer(frames);
+		QVarLengthArray<float> resBuffer(frames);
 
 		int old_filter_cut = 0;
 		int old_filter_res = 0;
 
-		if( n->m_filter == NULL )
+		if( n->m_filter == nullptr )
 		{
-			n->m_filter = new BasicFilters<>( Engine::mixer()->processingSampleRate() );
+			n->m_filter = make_unique<BasicFilters<>>( Engine::mixer()->processingSampleRate() );
 		}
 		n->m_filter->setFilterType( m_filterModel.value() );
 
 		if( m_envLfoParameters[Cut]->isUsed() )
 		{
-			m_envLfoParameters[Cut]->fillLevel( cutBuffer, envTotalFrames, envReleaseBegin, frames );
+			m_envLfoParameters[Cut]->fillLevel( cutBuffer.data(), envTotalFrames, envReleaseBegin, frames );
 		}
 		if( m_envLfoParameters[Resonance]->isUsed() )
 		{
-			m_envLfoParameters[Resonance]->fillLevel( resBuffer, envTotalFrames, envReleaseBegin, frames );
+			m_envLfoParameters[Resonance]->fillLevel( resBuffer.data(), envTotalFrames, envReleaseBegin, frames );
 		}
 
 		const float fcv = m_filterCutModel.value();
@@ -246,8 +248,8 @@ void InstrumentSoundShaping::processAudioBuffer( sampleFrame* buffer,
 
 	if( m_envLfoParameters[Volume]->isUsed() )
 	{
-		float volBuffer [frames];
-		m_envLfoParameters[Volume]->fillLevel( volBuffer, envTotalFrames, envReleaseBegin, frames );
+		QVarLengthArray<float> volBuffer(frames);
+		m_envLfoParameters[Volume]->fillLevel( volBuffer.data(), envTotalFrames, envReleaseBegin, frames );
 
 		for( fpp_t frame = 0; frame < frames; ++frame )
 		{
@@ -299,13 +301,22 @@ f_cnt_t InstrumentSoundShaping::envFrames( const bool _only_vol ) const
 
 f_cnt_t InstrumentSoundShaping::releaseFrames() const
 {
+	if( !m_instrumentTrack->instrument() )
+	{
+		return 0;
+	}
+
+	f_cnt_t ret_val = m_instrumentTrack->instrument()->desiredReleaseFrames();
+
+	if( m_instrumentTrack->instrument()->flags().testFlag( Instrument::IsSingleStreamed ) )
+	{
+		return ret_val;
+	}
+
 	if( m_envLfoParameters[Volume]->isUsed() )
 	{
 		return m_envLfoParameters[Volume]->releaseFrames();
 	}
-	f_cnt_t ret_val = m_instrumentTrack->instrument() 
-		? m_instrumentTrack->instrument()->desiredReleaseFrames()
-		: 0;
 
 	for( int i = Volume+1; i < NumTargets; ++i )
 	{

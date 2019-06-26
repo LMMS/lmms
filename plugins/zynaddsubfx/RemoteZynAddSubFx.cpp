@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2008-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -44,8 +44,13 @@
 class RemoteZynAddSubFx : public RemotePluginClient, public LocalZynAddSubFx
 {
 public:
+#ifdef SYNC_WITH_SHM_FIFO
 	RemoteZynAddSubFx( int _shm_in, int _shm_out ) :
 		RemotePluginClient( _shm_in, _shm_out ),
+#else
+	RemoteZynAddSubFx( const char * socketPath ) :
+		RemotePluginClient( socketPath ),
+#endif
 		LocalZynAddSubFx(),
 		m_guiSleepTime( 100 ),
 		m_guiExit( false )
@@ -57,18 +62,11 @@ public:
 		waitForMessage( IdInitDone );
 
 		pthread_mutex_init( &m_guiMutex, NULL );
-		pthread_create( &m_guiThreadHandle, NULL, guiThread, this );
+		pthread_create( &m_messageThreadHandle, NULL, messageLoop, this );
 	}
 
 	virtual ~RemoteZynAddSubFx()
 	{
-		m_guiExit = true;
-#ifdef LMMS_BUILD_WIN32
-		Sleep( m_guiSleepTime * 2 );
-#else
-		usleep( m_guiSleepTime * 2 * 1000 );
-#endif
-
 		Nio::stop();
 	}
 
@@ -82,7 +80,7 @@ public:
 		LocalZynAddSubFx::setBufferSize( bufferSize() );
 	}
 
-	void run()
+	void messageLoop()
 	{
 		message m;
 		while( ( m = receiveMessage() ).id != IdQuit )
@@ -91,6 +89,7 @@ public:
 			processMessage( m );
 			pthread_mutex_unlock( &m_master->mutex );
 		}
+		m_guiExit = true;
 	}
 
 	virtual bool processMessage( const message & _m )
@@ -146,23 +145,22 @@ public:
 		LocalZynAddSubFx::processAudio( _out );
 	}
 
-	static void * guiThread( void * _arg )
+	static void * messageLoop( void * _arg )
 	{
 		RemoteZynAddSubFx * _this =
 					static_cast<RemoteZynAddSubFx *>( _arg );
 
-		_this->guiThread();
+		_this->messageLoop();
 
 		return NULL;
 	}
 
+	void guiLoop();
 
 private:
-	void guiThread();
-
 	const int m_guiSleepTime;
 
-	pthread_t m_guiThreadHandle;
+	pthread_t m_messageThreadHandle;
 	pthread_mutex_t m_guiMutex;
 	std::queue<RemotePluginClient::message> m_guiMessages;
 	bool m_guiExit;
@@ -172,7 +170,7 @@ private:
 
 
 
-void RemoteZynAddSubFx::guiThread()
+void RemoteZynAddSubFx::guiLoop()
 {
 	int exitProgram = 0;
 	MasterUI * ui = NULL;
@@ -261,7 +259,11 @@ void RemoteZynAddSubFx::guiThread()
 
 int main( int _argc, char * * _argv )
 {
+#ifdef SYNC_WITH_SHM_FIFO
 	if( _argc < 3 )
+#else
+	if( _argc < 2 )
+#endif
 	{
 		fprintf( stderr, "not enough arguments\n" );
 		return -1;
@@ -276,10 +278,14 @@ int main( int _argc, char * * _argv )
 #endif
 
 
+#ifdef SYNC_WITH_SHM_FIFO
 	RemoteZynAddSubFx * remoteZASF =
 		new RemoteZynAddSubFx( atoi( _argv[1] ), atoi( _argv[2] ) );
+#else
+	RemoteZynAddSubFx * remoteZASF = new RemoteZynAddSubFx( _argv[1] );
+#endif
 
-	remoteZASF->run();
+	remoteZASF->guiLoop();
 
 	delete remoteZASF;
 

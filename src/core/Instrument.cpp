@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2005-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -25,26 +25,15 @@
 #include "Instrument.h"
 #include "InstrumentTrack.h"
 #include "DummyInstrument.h"
-#include "NotePlayHandle.h"
-#include "Engine.h"
 
 
-Instrument::Instrument( InstrumentTrack * _instrument_track,
-					const Descriptor * _descriptor ) :
-	Plugin( _descriptor, NULL/* _instrument_track*/ ),
+Instrument::Instrument(InstrumentTrack * _instrument_track,
+			const Descriptor * _descriptor,
+			const Descriptor::SubPluginFeatures::Key *key) :
+	Plugin(_descriptor, NULL/* _instrument_track*/, key),
 	m_instrumentTrack( _instrument_track )
 {
 }
-
-
-
-
-Instrument::~Instrument()
-{
-}
-
-
-
 
 void Instrument::play( sampleFrame * )
 {
@@ -68,19 +57,15 @@ f_cnt_t Instrument::beatLen( NotePlayHandle * ) const
 
 
 
-Instrument * Instrument::instantiate( const QString & _plugin_name,
-					InstrumentTrack * _instrument_track )
+Instrument *Instrument::instantiate(const QString &_plugin_name,
+	InstrumentTrack *_instrument_track, const Descriptor::SubPluginFeatures::Key *key, bool keyFromDnd)
 {
-	Plugin * p = Plugin::instantiate( _plugin_name, _instrument_track,
-							_instrument_track );
-	// check whether instantiated plugin is an instrument
-	if( dynamic_cast<Instrument *>( p ) != NULL )
-	{
-		// everything ok, so return pointer
-		return dynamic_cast<Instrument *>( p );
-	}
-
-	// not quite... so delete plugin and return dummy instrument
+	if(keyFromDnd)
+		Q_ASSERT(!key);
+	// copy from above // TODO! common cleaner func
+	Plugin * p = Plugin::instantiateWithKey(_plugin_name, _instrument_track, key, keyFromDnd);
+	if(dynamic_cast<Instrument *>(p))
+		return dynamic_cast<Instrument *>(p);
 	delete p;
 	return( new DummyInstrument( _instrument_track ) );
 }

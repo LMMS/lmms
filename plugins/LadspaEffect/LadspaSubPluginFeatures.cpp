@@ -6,7 +6,7 @@
  * Copyright (c) 2006-2007 Danny McRae <khjklujn/at/users.sourceforge.net>
  * Copyright (c) 2006-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -39,6 +39,16 @@
 LadspaSubPluginFeatures::LadspaSubPluginFeatures( Plugin::PluginTypes _type ) :
 	SubPluginFeatures( _type )
 {
+}
+
+
+
+
+QString LadspaSubPluginFeatures::displayName(const Plugin::Descriptor::SubPluginFeatures::Key &k) const
+{
+	const ladspa_key_t & lkey = subPluginKeyToLadspaKey(&k);
+	Ladspa2LMMS * lm = Engine::getLADSPAManager();
+	return lm->getName(lkey);
 }
 
 

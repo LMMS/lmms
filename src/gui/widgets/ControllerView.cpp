@@ -4,7 +4,7 @@
  * Copyright (c) 2008-2009 Paul Giblock <drfaygo/at/gmail.com>
  * Copyright (c) 2011-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -30,7 +30,6 @@
 #include <QMdiSubWindow>
 #include <QPainter>
 #include <QInputDialog>
-#include <QWhatsThis>
 #include <QLayout>
 
 #include "ControllerView.h"
@@ -39,7 +38,6 @@
 #include "ControllerDialog.h"
 #include "gui_templates.h"
 #include "embed.h"
-#include "Engine.h"
 #include "GuiApplication.h"
 #include "LedCheckbox.h"
 #include "MainWindow.h"
@@ -93,9 +91,6 @@ ControllerView::ControllerView( Controller * _model, QWidget * _parent ) :
 
 	m_subWindow->hide();
 
-	setWhatsThis( tr( "Controllers are able to automate the value of a knob, "
-				"slider, and other controls."  ) );
-
 	setModel( _model );
 }
 
@@ -143,10 +138,7 @@ void ControllerView::deleteController()
 	emit( deleteController( this ) );
 }
 
-
-
-
-void ControllerView::mouseDoubleClickEvent( QMouseEvent * event )
+void ControllerView::renameController()
 {
 	bool ok;
 	Controller * c = castModel<Controller>();
@@ -157,8 +149,18 @@ void ControllerView::mouseDoubleClickEvent( QMouseEvent * event )
 	if( ok && !new_name.isEmpty() )
 	{
 		c->setName( new_name );
+		if( getController()->type() == Controller::LfoController )
+		{
+			m_controllerDlg->setWindowTitle( tr( "LFO" ) + " (" + new_name + ")" );
+		}
 		m_nameLabel->setText( new_name );
 	}
+}
+
+
+void ControllerView::mouseDoubleClickEvent( QMouseEvent * event )
+{
+	renameController();
 }
 
 
@@ -173,23 +175,10 @@ void ControllerView::contextMenuEvent( QContextMenuEvent * )
 {
 	QPointer<CaptionMenu> contextMenu = new CaptionMenu( model()->displayName(), this );
 	contextMenu->addAction( embed::getIconPixmap( "cancel" ),
-						tr( "&Remove this plugin" ),
+						tr( "&Remove this controller" ),
 						this, SLOT( deleteController() ) );
+	contextMenu->addAction( tr("Re&name this controller"), this, SLOT( renameController() ));
 	contextMenu->addSeparator();
-	contextMenu->addHelpAction();
 	contextMenu->exec( QCursor::pos() );
 	delete contextMenu;
 }
-
-
-
-void ControllerView::displayHelp()
-{
-	QWhatsThis::showText( mapToGlobal( rect().center() ),
-								whatsThis() );
-}
-
-
-
-
-

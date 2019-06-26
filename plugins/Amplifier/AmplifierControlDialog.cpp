@@ -4,7 +4,7 @@
  * Copyright (c) 2014 Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>
  * Copyright (c) 2006-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -38,33 +38,32 @@ AmplifierControlDialog::AmplifierControlDialog( AmplifierControls* controls ) :
 	QPalette pal;
 	pal.setBrush( backgroundRole(), PLUGIN_NAME::getIconPixmap( "artwork" ) );
 	setPalette( pal );
-	setFixedSize( 100, 125 );
+	setFixedSize( 100, 110 );
 
 	Knob * volumeKnob = new Knob( knobBright_26, this);
-	volumeKnob -> move( 20, 30 );
+	volumeKnob -> move( 16, 10 );
 	volumeKnob -> setVolumeKnob( true );
 	volumeKnob->setModel( &controls->m_volumeModel );
 	volumeKnob->setLabel( tr( "VOL" ) );
 	volumeKnob->setHintText( tr( "Volume:" ) , "%" );
 
 	Knob * panKnob = new Knob( knobBright_26, this);
-	panKnob -> move( 60, 30 );
+	panKnob -> move( 57, 10 );
 	panKnob->setModel( &controls->m_panModel );
 	panKnob->setLabel( tr( "PAN" ) );
 	panKnob->setHintText( tr( "Panning:" ) , "" );
 
 	Knob * leftKnob = new Knob( knobBright_26, this);
-	leftKnob -> move( 20, 80 );
+	leftKnob -> move( 16, 65 );
 	leftKnob -> setVolumeKnob( true );
 	leftKnob->setModel( &controls->m_leftModel );
 	leftKnob->setLabel( tr( "LEFT" ) );
 	leftKnob->setHintText( tr( "Left gain:" ) , "%" );
 
 	Knob * rightKnob = new Knob( knobBright_26, this);
-	rightKnob -> move( 60, 80 );
+	rightKnob -> move( 57, 65 );
 	rightKnob -> setVolumeKnob( true );
 	rightKnob->setModel( &controls->m_rightModel );
 	rightKnob->setLabel( tr( "RIGHT" ) );
 	rightKnob->setHintText( tr( "Right gain:" ) , "%" );
 }
-

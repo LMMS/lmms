@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -146,6 +146,11 @@ public:
 		return m_selectViewOnCreate;
 	}
 
+	/// Returns true if and only if a->startPosition() < b->startPosition()
+	static bool comparePosition(const TrackContentObject* a, const TrackContentObject* b);
+
+	MidiTime startTimeOffset() const;
+	void setStartTimeOffset( const MidiTime &startTimeOffset );
 
 public slots:
 	void copy();
@@ -172,6 +177,7 @@ private:
 
 	MidiTime m_startPosition;
 	MidiTime m_length;
+	MidiTime m_startTimeOffset;
 
 	BoolModel m_mutedModel;
 	BoolModel m_soloModel;
@@ -194,7 +200,9 @@ class TrackContentObjectView : public selectableObject, public ModelView
 	Q_PROPERTY( QColor mutedBackgroundColor READ mutedBackgroundColor WRITE setMutedBackgroundColor )
 	Q_PROPERTY( QColor selectedColor READ selectedColor WRITE setSelectedColor )
 	Q_PROPERTY( QColor textColor READ textColor WRITE setTextColor )
+	Q_PROPERTY( QColor textBackgroundColor READ textBackgroundColor WRITE setTextBackgroundColor )
 	Q_PROPERTY( QColor textShadowColor READ textShadowColor WRITE setTextShadowColor )
+	Q_PROPERTY( QColor BBPatternBackground READ BBPatternBackground WRITE setBBPatternBackground )
 	Q_PROPERTY( bool gradient READ gradient WRITE setGradient )
 
 public:
@@ -212,13 +220,17 @@ public:
 	QColor mutedBackgroundColor() const;
 	QColor selectedColor() const;
 	QColor textColor() const;
+	QColor textBackgroundColor() const;
 	QColor textShadowColor() const;
+	QColor BBPatternBackground() const;
 	bool gradient() const;
 	void setMutedColor( const QColor & c );
 	void setMutedBackgroundColor( const QColor & c );
 	void setSelectedColor( const QColor & c );
 	void setTextColor( const QColor & c );
+	void setTextBackgroundColor( const QColor & c );
 	void setTextShadowColor( const QColor & c );
+	void setBBPatternBackground( const QColor & c );
 	void setGradient( const bool & b );
 
 	// access needsUpdate member variable
@@ -258,6 +270,8 @@ protected:
 
 	DataFile createTCODataFiles(const QVector<TrackContentObjectView *> & tcos) const;
 
+	virtual void paintTextLabel(QString const & text, QPainter & painter);
+
 
 protected slots:
 	void updateLength();
@@ -271,6 +285,7 @@ private:
 		Move,
 		MoveSelection,
 		Resize,
+		ResizeLeft,
 		CopySelection,
 		ToggleSelected
 	} ;
@@ -285,14 +300,14 @@ private:
 
 	TextFloat * m_hint;
 
-	MidiTime m_oldTime;// used for undo/redo while mouse-button is pressed
-
 // qproperty fields
 	QColor m_mutedColor;
 	QColor m_mutedBackgroundColor;
 	QColor m_selectedColor;
 	QColor m_textColor;
+	QColor m_textBackgroundColor;
 	QColor m_textShadowColor;
+	QColor m_BBPatternBackground;
 	bool m_gradient;
 
  	bool m_needsUpdate;
@@ -337,7 +352,7 @@ public:
 		}
 	}
 
-	bool canPasteSelection( MidiTime tcoPos, const QMimeData * mimeData );
+	bool canPasteSelection( MidiTime tcoPos, const QDropEvent *de );
 	bool pasteSelection( MidiTime tcoPos, QDropEvent * de );
 
 	MidiTime endPosition( const MidiTime & posStart );
@@ -357,7 +372,6 @@ public:
 public slots:
 	void update();
 	void changePosition( const MidiTime & newPos = MidiTime( -1 ) );
-
 
 protected:
 	virtual void dragEnterEvent( QDragEnterEvent * dee );
@@ -422,6 +436,7 @@ private slots:
 	void cloneTrack();
 	void removeTrack();
 	void updateMenu();
+	void toggleRecording(bool on);
 	void recordingOn();
 	void recordingOff();
 	void clearTrack();
@@ -448,7 +463,7 @@ signals:
 
 
 // base-class for all tracks
-class EXPORT Track : public Model, public JournallingObject
+class LMMS_EXPORT Track : public Model, public JournallingObject
 {
 	Q_OBJECT
 	MM_OPERATORS
@@ -522,6 +537,8 @@ public:
 							const MidiTime & end );
 	void swapPositionOfTCOs( int tcoNum1, int tcoNum2 );
 
+	void createTCOsForBB( int bb );
+
 
 	void insertTact( const MidiTime & pos );
 	void removeTact( const MidiTime & pos );
@@ -570,6 +587,8 @@ public:
 	{
 		return m_processingLock.tryLock();
 	}
+
+	BoolModel* getMutedModel();
 
 public slots:
 	virtual void setName( const QString & newName )
@@ -655,6 +674,10 @@ public:
 	}
 
 	virtual void update();
+
+	// Create a menu for assigning/creating channels for this track
+	// Currently instrument track and sample track supports it
+	virtual QMenu * createFxMenu(QString title, QString newFxLabel);
 
 
 public slots:

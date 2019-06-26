@@ -5,10 +5,10 @@ pushd $ppa_dir
 
 for f in *.deb; do
 	echo "Extracting $f..."
-	ar xv $f
+	ar xv "$f"
 	rm debian-binary
 	rm control.tar.*
-	tar xf data.tar.*
+	tar xf data.tar.* --exclude=*mingw*/bin/fluid
 	rm data.tar.*
 done
 

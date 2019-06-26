@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2005-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -25,45 +25,21 @@
 #ifndef MICRO_TIMER
 #define MICRO_TIMER
 
-#include "lmmsconfig.h"
-
-#ifdef LMMS_HAVE_SYS_TIME_H
-#include <sys/time.h>
-#endif
-
-#include <cstdlib>
-#include "lmms_basics.h"
-
+#include <chrono>
 
 class MicroTimer
 {
+	using time_point = std::chrono::steady_clock::time_point;
+
 public:
-	inline MicroTimer()
-	{
-		reset();
-	}
+	MicroTimer();
+	~MicroTimer();
 
-	inline ~MicroTimer()
-	{
-	}
-
-	inline void reset()
-	{
-		gettimeofday( &begin, NULL );
-	}
-
-	inline int elapsed() const
-	{
-		struct timeval now;
-		gettimeofday( &now, NULL );
-		return ( now.tv_sec - begin.tv_sec ) * 1000 * 1000 +
-					( now.tv_usec - begin.tv_usec );
-	}
-
+	void reset();
+	int elapsed() const;
 
 private:
-	struct timeval begin;
-
+	time_point begin;
 } ;
 
 

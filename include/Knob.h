@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -30,7 +30,6 @@
 #include <QtCore/QPoint>
 
 #include "AutomatableModelView.h"
-#include "templates.h"
 
 
 class QPixmap;
@@ -43,7 +42,7 @@ enum knobTypes
 
 
 
-class EXPORT Knob : public QWidget, public FloatModelView
+class LMMS_EXPORT Knob : public QWidget, public FloatModelView
 {
 	Q_OBJECT
 	Q_ENUMS( knobTypes )
@@ -74,6 +73,7 @@ class EXPORT Knob : public QWidget, public FloatModelView
 public:
 	Knob( knobTypes _knob_num, QWidget * _parent = NULL, const QString & _name = QString() );
 	Knob( QWidget * _parent = NULL, const QString & _name = QString() ); //!< default ctor
+	Knob( const Knob& other ) = delete;
 	virtual ~Knob();
 
 	// TODO: remove
@@ -139,7 +139,6 @@ protected:
 
 private slots:
 	virtual void enterValue();
-	void displayHelp();
 	void friendlyUpdate();
 	void toggleScale();
 

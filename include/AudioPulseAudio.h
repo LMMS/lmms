@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2008-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -30,6 +30,8 @@
 #ifdef LMMS_HAVE_PULSEAUDIO
 
 #include <pulse/pulseaudio.h>
+#include <QSemaphore>
+#include <QThread>
 
 #include "AudioDevice.h"
 #include "AudioDeviceSetupWidget.h"
@@ -39,8 +41,9 @@ class LcdSpinBox;
 class QLineEdit;
 
 
-class AudioPulseAudio : public AudioDevice, public QThread
+class AudioPulseAudio : public QThread, public AudioDevice
 {
+	Q_OBJECT
 public:
 	AudioPulseAudio( bool & _success_ful, Mixer* mixer );
 	virtual ~AudioPulseAudio();
@@ -70,6 +73,8 @@ public:
 
 	void streamWriteCallback( pa_stream * s, size_t length );
 
+	void signalConnected( bool connected );
+
 	pa_stream * m_s;
 	pa_sample_spec m_sampleSpec;
 
@@ -83,6 +88,9 @@ private:
 	volatile bool m_quit;
 
 	bool m_convertEndian;
+
+	bool m_connected;
+	QSemaphore m_connectedSemaphore;
 
 } ;
 

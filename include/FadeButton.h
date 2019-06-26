@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2005-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -35,8 +35,10 @@ class FadeButton : public QAbstractButton
 {
 	Q_OBJECT
 public:
-	FadeButton( const QColor & _normal_color, const QColor &
-					_activated_color, QWidget * _parent );
+	FadeButton( const QColor & _normal_color,
+		const QColor & _activated_color,
+		const QColor & _hold_color,
+		QWidget * _parent );
 
 	virtual ~FadeButton();
 	void setActiveColor( const QColor & activated_color );
@@ -44,6 +46,7 @@ public:
 
 public slots:
 	void activate();
+	void noteEnd();
 
 
 protected:
@@ -53,13 +56,20 @@ protected:
 
 private:
 	QTime m_stateTimer;
+	QTime m_releaseTimer;
+
+	// the default color of the widget
 	QColor m_normalColor;
+	// the color on note play
 	QColor m_activatedColor;
+	// the color after the "play" fade is done but a note is still playing
+	QColor m_holdColor;
+	int activeNotes;
 
 	void signalUpdate();
+	QColor fadeToColor(QColor, QColor, QTime, float);
 
 } ;
 
 
 #endif
-

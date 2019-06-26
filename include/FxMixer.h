@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2008-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -26,11 +26,11 @@
 #define FX_MIXER_H
 
 #include "Model.h"
-#include "Mixer.h"
 #include "EffectChain.h"
 #include "JournallingObject.h"
 #include "ThreadableJob.h"
 
+#include <atomic>
 
 class FxRoute;
 typedef QVector<FxRoute *> FxRouteVector;
@@ -71,7 +71,7 @@ class FxChannel : public ThreadableJob
 		void unmuteForSolo();
 
 	
-		QAtomicInt m_dependenciesMet;
+		std::atomic_int m_dependenciesMet;
 		void incrementDeps();
 		void processed();
 		
@@ -121,7 +121,7 @@ class FxRoute : public QObject
 };
 
 
-class EXPORT FxMixer : public Model, public JournallingObject
+class LMMS_EXPORT FxMixer : public Model, public JournallingObject
 {
 	Q_OBJECT
 public:
@@ -202,7 +202,6 @@ private:
 
 	// make sure we have at least num channels
 	void allocateChannelsTo(int num);
-	QMutex m_sendsMutex;
 
 	int m_lastSoloed;
 

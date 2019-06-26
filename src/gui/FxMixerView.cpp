@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2008-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -32,19 +32,22 @@
 #include <QMdiSubWindow>
 #include <QPainter>
 #include <QPushButton>
-#include <QToolButton>
 #include <QScrollArea>
 #include <QStyle>
 #include <QKeyEvent>
 
+#include "lmms_math.h"
+
 #include "FxMixerView.h"
 #include "Knob.h"
-#include "Engine.h"
-#include "embed.h"
+#include "FxLine.h"
+#include "FxMixer.h"
 #include "GuiApplication.h"
 #include "MainWindow.h"
+#include "Mixer.h"
 #include "gui_templates.h"
 #include "InstrumentTrack.h"
+#include "SampleTrack.h"
 #include "Song.h"
 #include "BBTrackContainer.h"
 
@@ -71,7 +74,7 @@ FxMixerView::FxMixerView() :
 
 	// Set margins
 	ml->setContentsMargins( 0, 4, 0, 0 );
-	
+
 	// Channel area
 	m_channelAreaWidget = new QWidget;
 	chLayout = new QHBoxLayout( m_channelAreaWidget );
@@ -129,16 +132,16 @@ FxMixerView::FxMixerView() :
 	ml->addWidget( channelArea, 1, Qt::AlignTop );
 
 	// show the add new effect channel button
-	QPushButton * newChannelBtn = new QPushButton( embed::getIconPixmap( "new_channel" ), QString::null, this );
+	QPushButton * newChannelBtn = new QPushButton( embed::getIconPixmap( "new_channel" ), QString(), this );
 	newChannelBtn->setObjectName( "newChannelBtn" );
 	newChannelBtn->setFixedSize( fxLineSize );
 	connect( newChannelBtn, SIGNAL( clicked() ), this, SLOT( addNewChannel() ) );
 	ml->addWidget( newChannelBtn, 0, Qt::AlignTop );
 
 
-	// add the stacked layout for the effect racks of fx channels 
+	// add the stacked layout for the effect racks of fx channels
 	ml->addWidget( m_racksWidget, 0, Qt::AlignTop | Qt::AlignRight );
-	
+
 	setCurrentFxLine( m_fxChannelViews[0]->m_fxLine );
 
 	setLayout( ml );
@@ -217,10 +220,10 @@ void FxMixerView::refreshDisplay()
 		chLayout->addWidget(m_fxChannelViews[i]->m_fxLine);
 		m_racksLayout->addWidget( m_fxChannelViews[i]->m_rackView );
 	}
-	
+
 	// set selected fx line to 0
 	setCurrentFxLine( 0 );
-	
+
 	// update all fx lines
 	for( int i = 0; i < m_fxChannelViews.size(); ++i )
 	{
@@ -247,6 +250,12 @@ void FxMixerView::updateMaxChannelSelector()
 			{
 				InstrumentTrack * inst = (InstrumentTrack *) trackList[i];
 				inst->effectChannelModel()->setRange(0,
+					m_fxChannelViews.size()-1,1);
+			}
+			else if( trackList[i]->type() == Track::SampleTrack )
+			{
+				SampleTrack * strk = (SampleTrack *) trackList[i];
+				strk->effectChannelModel()->setRange(0,
 					m_fxChannelViews.size()-1,1);
 			}
 		}
@@ -277,6 +286,10 @@ FxMixerView::FxChannelView::FxChannelView(QWidget * _parent, FxMixerView * _mv,
 
 	m_fader = new Fader( &fxChannel->m_volumeModel,
 					tr( "FX Fader %1" ).arg( channelIndex ), m_fxLine );
+	m_fader->setLevelsDisplayedInDBFS();
+	m_fader->setMinPeak(dbfsToAmp(-42));
+	m_fader->setMaxPeak(dbfsToAmp(9));
+
 	m_fader->move( 16-m_fader->width()/2,
 					m_fxLine->height()-
 					m_fader->height()-5 );
@@ -300,9 +313,9 @@ FxMixerView::FxChannelView::FxChannelView(QWidget * _parent, FxMixerView * _mv,
 	m_soloBtn->setCheckable( true );
 	m_soloBtn->move( 9,  m_fader->y()-21);
 	connect(&fxChannel->m_soloModel, SIGNAL( dataChanged() ),
-			_mv, SLOT ( toggledSolo() ) );
+			_mv, SLOT ( toggledSolo() ), Qt::DirectConnection );
 	ToolTip::add( m_soloBtn, tr( "Solo FX channel" ) );
-	
+
 	// Create EffectRack for the channel
 	m_rackView = new EffectRackView( &fxChannel->m_fxChain, _mv->m_racksWidget );
 	m_rackView->setFixedSize( 245, FxLine::FxLineHeight );
@@ -348,6 +361,8 @@ void FxMixerView::updateFxLine(int index)
 	// does current channel send to this channel?
 	int selIndex = m_currentFxLine->channelIndex();
 	FxLine * thisLine = m_fxChannelViews[index]->m_fxLine;
+	thisLine->setToolTip( Engine::fxMixer()->effectChannel( index )->m_name );
+
 	FloatModel * sendModel = mix->channelSendModel(selIndex, index);
 	if( sendModel == NULL )
 	{
@@ -375,6 +390,10 @@ void FxMixerView::deleteChannel(int index)
 
 	// remember selected line
 	int selLine = m_currentFxLine->channelIndex();
+
+	// in case the deleted channel is soloed or the remaining
+	// channels will be left in a muted state
+	Engine::fxMixer()->clearChannel(index);
 
 	// delete the real channel
 	Engine::fxMixer()->deleteChannel(index);
@@ -481,6 +500,12 @@ void FxMixerView::moveChannelRight(int index)
 }
 
 
+void FxMixerView::renameChannel(int index)
+{
+	m_fxChannelViews[index]->m_fxLine->renameChannel();
+}
+
+
 
 void FxMixerView::keyPressEvent(QKeyEvent * e)
 {
@@ -516,6 +541,11 @@ void FxMixerView::keyPressEvent(QKeyEvent * e)
 			{
 				addNewChannel();
 			}
+			break;
+		case Qt::Key_Enter:
+		case Qt::Key_Return:
+		case Qt::Key_F2:
+			renameChannel( m_currentFxLine->channelIndex() );
 			break;
 	}
 }
@@ -569,30 +599,27 @@ void FxMixerView::updateFaders()
 	{
 		const float opl = m_fxChannelViews[i]->m_fader->getPeak_L();
 		const float opr = m_fxChannelViews[i]->m_fader->getPeak_R();
-		const float fall_off = 1.2;
-		if( m->effectChannel(i)->m_peakLeft > opl )
+		const float fallOff = 1.25;
+		if( m->effectChannel(i)->m_peakLeft >= opl/fallOff )
 		{
 			m_fxChannelViews[i]->m_fader->setPeak_L( m->effectChannel(i)->m_peakLeft );
-			m->effectChannel(i)->m_peakLeft = 0;
+			// Set to -1 so later we'll know if this value has been refreshed yet.
+			m->effectChannel(i)->m_peakLeft = -1;
 		}
-		else
+		else if( m->effectChannel(i)->m_peakLeft != -1 )
 		{
-			m_fxChannelViews[i]->m_fader->setPeak_L( opl/fall_off );
+			m_fxChannelViews[i]->m_fader->setPeak_L( opl/fallOff );
 		}
 
-		if( m->effectChannel(i)->m_peakRight > opr )
+		if( m->effectChannel(i)->m_peakRight >= opr/fallOff )
 		{
 			m_fxChannelViews[i]->m_fader->setPeak_R( m->effectChannel(i)->m_peakRight );
-			m->effectChannel(i)->m_peakRight = 0;
+			// Set to -1 so later we'll know if this value has been refreshed yet.
+			m->effectChannel(i)->m_peakRight = -1;
 		}
-		else
+		else if( m->effectChannel(i)->m_peakRight != -1 )
 		{
-			m_fxChannelViews[i]->m_fader->setPeak_R( opr/fall_off );
+			m_fxChannelViews[i]->m_fader->setPeak_R( opr/fallOff );
 		}
 	}
 }
-
-
-
-
-

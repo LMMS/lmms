@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2007-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -28,14 +28,14 @@
 #include <QtCore/QString>
 #include <QtCore/QObject>
 
-#include "export.h"
+#include "lmms_export.h"
 
 
-class EXPORT Model : public QObject
+class LMMS_EXPORT Model : public QObject
 {
 	Q_OBJECT
 public:
-	Model( Model * _parent, QString _display_name = QString::null,
+	Model( Model * _parent, QString _display_name = QString(),
 					bool _default_constructed = false ) :
 		QObject( _parent ),
 		m_displayName( _display_name ),

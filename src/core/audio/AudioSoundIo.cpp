@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2015 Andrew Kelley <superjoe30@gmail.com>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -33,21 +33,23 @@
 #include "debug.h"
 #include "ConfigManager.h"
 #include "gui_templates.h"
-#include "templates.h"
 #include "ComboBox.h"
-#include "LcdSpinBox.h"
+#include "Mixer.h"
 
 AudioSoundIo::AudioSoundIo( bool & outSuccessful, Mixer * _mixer ) :
-	AudioDevice( tLimit<ch_cnt_t>(
-		ConfigManager::inst()->value( "audiosoundio", "channels" ).toInt(), DEFAULT_CHANNELS, SURROUND_CHANNELS ),
-								_mixer )
+	AudioDevice( qBound<ch_cnt_t>(
+		DEFAULT_CHANNELS,
+		ConfigManager::inst()->value( "audiosoundio", "channels" ).toInt(),
+		SURROUND_CHANNELS ), _mixer )
 {
 	outSuccessful = false;
 	m_soundio = NULL;
 	m_outstream = NULL;
+	m_outBuf = NULL;
 	m_disconnectErr = 0;
 	m_outBufFrameIndex = 0;
 	m_outBufFramesTotal = 0;
+	m_stopped = true;
 
 	m_soundio = soundio_create();
 	if (!m_soundio)
@@ -194,7 +196,11 @@ void AudioSoundIo::onBackendDisconnect(int err)
 AudioSoundIo::~AudioSoundIo()
 {
 	stopProcessing();
-	soundio_destroy(m_soundio);
+	if (m_soundio)
+	{
+		soundio_destroy(m_soundio);
+		m_soundio = NULL;
+	}
 }
 
 void AudioSoundIo::startProcessing()
@@ -205,20 +211,29 @@ void AudioSoundIo::startProcessing()
 
 	m_outBuf = new surroundSampleFrame[m_outBufSize];
 
+	m_stopped = false;
 	int err;
 	if ((err = soundio_outstream_start(m_outstream)))
 	{
+		m_stopped = true;
 		fprintf(stderr, "soundio unable to start stream: %s\n", soundio_strerror(err));
 	}
 }
 
 void AudioSoundIo::stopProcessing()
 {
-	soundio_outstream_destroy(m_outstream);
-	m_outstream = NULL;
+	m_stopped = true;
+	if (m_outstream)
+	{
+		soundio_outstream_destroy(m_outstream);
+		m_outstream = NULL;
+	}
 
-	delete[] m_outBuf;
-	m_outBuf = NULL;
+	if (m_outBuf)
+	{
+		delete[] m_outBuf;
+		m_outBuf = NULL;
+	}
 }
 
 void AudioSoundIo::errorCallback(int err)
@@ -233,6 +248,7 @@ void AudioSoundIo::underflowCallback()
 
 void AudioSoundIo::writeCallback(int frameCountMin, int frameCountMax)
 {
+	if (m_stopped) {return;}
 	const struct SoundIoChannelLayout *layout = &m_outstream->layout;
 	SoundIoChannelArea *areas;
 	int bytesPerSample = m_outstream->bytes_per_sample;
@@ -254,11 +270,27 @@ void AudioSoundIo::writeCallback(int frameCountMin, int frameCountMax)
 		if (!frameCount)
 			break;
 
+		
+		if (m_stopped)
+		{
+			for (int channel = 0; channel < layout->channel_count; ++channel)
+			{
+				memset(areas[channel].ptr, 0, bytesPerSample * frameCount);
+				areas[channel].ptr += areas[channel].step * frameCount;
+			}
+			continue;
+		}
+
 		for (int frame = 0; frame < frameCount; frame += 1)
 		{
 			if (m_outBufFrameIndex >= m_outBufFramesTotal)
 			{
 				m_outBufFramesTotal = getNextBuffer(m_outBuf);
+				if (m_outBufFramesTotal == 0)
+				{
+					m_stopped = true;
+					break;
+				}
 				m_outBufFrameIndex = 0;
 			}
 
@@ -279,6 +311,10 @@ void AudioSoundIo::writeCallback(int frameCountMin, int frameCountMax)
 
 		framesLeft -= frameCount;
 	}
+}
+
+AudioSoundIoSetupUtil::~AudioSoundIoSetupUtil()
+{
 }
 
 void AudioSoundIoSetupUtil::reconnectSoundIo()
@@ -435,7 +471,11 @@ AudioSoundIo::setupWidget::~setupWidget()
 {
 	bool ok = disconnect( &m_backendModel, SIGNAL( dataChanged() ), &m_setupUtil, SLOT( reconnectSoundIo() ) );
 	assert(ok);
-	soundio_destroy(m_soundio);
+	if (m_soundio)
+	{
+		soundio_destroy(m_soundio);
+		m_soundio = NULL;
+	}
 }
 
 void AudioSoundIo::setupWidget::saveSettings()

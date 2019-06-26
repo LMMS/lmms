@@ -19,12 +19,14 @@ SET(LMMS_SRCS
 	gui/LfoControllerDialog.cpp
 	gui/LmmsPalette.cpp
 	gui/LmmsStyle.cpp
+	gui/MainApplication.cpp
 	gui/MainWindow.cpp
 	gui/MidiSetupWidget.cpp
 	gui/ModelView.cpp
 	gui/PeakControllerDialog.cpp
 	gui/PianoView.cpp
 	gui/PluginBrowser.cpp
+	gui/RowTableView.cpp
 	gui/SetupDialog.cpp
 	gui/StringPairDrag.cpp
 	gui/SubWindow.cpp
@@ -54,6 +56,7 @@ SET(LMMS_SRCS
 	gui/widgets/FadeButton.cpp
 	gui/widgets/Fader.cpp
 	gui/widgets/FxLine.cpp
+	gui/widgets/FxLineLcdSpinBox.cpp
 	gui/widgets/Graph.cpp
 	gui/widgets/GroupBox.cpp
 	gui/widgets/InstrumentFunctionViews.cpp
@@ -83,7 +86,9 @@ SET(LMMS_SRCS
 	gui/widgets/ToolButton.cpp
 	gui/widgets/ToolTip.cpp
 	gui/widgets/TrackLabelButton.cpp
+	gui/widgets/TrackRenameLineEdit.cpp
 	gui/widgets/VisualizationWidget.cpp
+	gui/widgets/StepRecorderWidget.cpp
 
 	PARENT_SCOPE
 )

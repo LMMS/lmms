@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -28,8 +28,6 @@
 #include <QInputDialog>
 #include <QMouseEvent>
 #include <QPainter>
-#include <QPalette>
-#include <QWhatsThis>
 
 #ifndef __USE_XOPEN
 #define __USE_XOPEN
@@ -41,16 +39,14 @@
 #include "ConfigManager.h"
 #include "ControllerConnection.h"
 #include "embed.h"
-#include "Engine.h"
 #include "gui_templates.h"
 #include "GuiApplication.h"
+#include "LocaleHelper.h"
 #include "MainWindow.h"
 #include "ProjectJournal.h"
 #include "Song.h"
 #include "StringPairDrag.h"
-#include "templates.h"
 #include "TextFloat.h"
-
 
 TextFloat * Knob::s_textFloat = NULL;
 
@@ -536,7 +532,6 @@ void Knob::contextMenuEvent( QContextMenuEvent * )
 		model()->isScaleLogarithmic() ? tr( "Set linear" ) : tr( "Set logarithmic" ),
 		this, SLOT( toggleScale() ) );
 	contextMenu.addSeparator();
-	contextMenu.addHelpAction();
 	contextMenu.exec( QCursor::pos() );
 }
 
@@ -564,7 +559,7 @@ void Knob::dropEvent( QDropEvent * _de )
 	QString val = StringPairDrag::decodeValue( _de );
 	if( type == "float_value" )
 	{
-		model()->setValue( val.toFloat() );
+		model()->setValue( LocaleHelper::toFloat(val) );
 		_de->accept();
 	}
 	else if( type == "automatable_model" )
@@ -635,7 +630,6 @@ void Knob::mouseMoveEvent( QMouseEvent * _me )
 		emit sliderMoved( model()->value() );
 		QCursor::setPos( mapToGlobal( m_origMousePos ) );
 	}
-
 	s_textFloat->setText( displayValue() );
 }
 
@@ -729,6 +723,7 @@ void Knob::setPosition( const QPoint & _p )
 	const float oldValue = model()->value();
 
 
+
 	if( model()->isScaleLogarithmic() ) // logarithmic code
 	{
 		const float pos = model()->minValue() < 0
@@ -738,7 +733,8 @@ void Knob::setPosition( const QPoint & _p )
 		float newValue = value * ratio;
 		if( qAbs( newValue ) >= step )
 		{
-			model()->setValue( oldValue - newValue );
+			float roundedValue = qRound( ( oldValue - value ) / step ) * step;
+			model()->setValue( roundedValue );
 			m_leftOver = 0.0f;
 		}
 		else
@@ -747,12 +743,12 @@ void Knob::setPosition( const QPoint & _p )
 		}
 	}
 
-
 	else // linear code
 	{
 		if( qAbs( value ) >= step )
 		{
-			model()->setValue( oldValue - value );
+			float roundedValue = qRound( ( oldValue - value ) / step ) * step;
+			model()->setValue( roundedValue );
 			m_leftOver = 0.0f;
 		}
 		else
@@ -769,35 +765,36 @@ void Knob::enterValue()
 {
 	bool ok;
 	float new_val;
+
 	if( isVolumeKnob() &&
-		ConfigManager::inst()->value( "app", "displaydbv" ).toInt() )
+		ConfigManager::inst()->value( "app", "displaydbfs" ).toInt() )
 	{
 		new_val = QInputDialog::getDouble(
-			this, windowTitle(),
+			this, tr( "Set value" ),
 			tr( "Please enter a new value between "
-					"-96.0 dBV and 6.0 dBV:" ),
-				20.0 * log10( model()->value() / 100.0 ),
-							-96.0, 6.0, 4, &ok );
+					"-96.0 dBFS and 6.0 dBFS:" ),
+				ampToDbfs( model()->getRoundedValue() / 100.0 ),
+							-96.0, 6.0, model()->getDigitCount(), &ok );
 		if( new_val <= -96.0 )
 		{
 			new_val = 0.0f;
 		}
 		else
 		{
-			new_val = dbvToAmp( new_val ) * 100.0;
+			new_val = dbfsToAmp( new_val ) * 100.0;
 		}
 	}
 	else
 	{
 		new_val = QInputDialog::getDouble(
-				this, windowTitle(),
+				this, tr( "Set value" ),
 				tr( "Please enter a new value between "
 						"%1 and %2:" ).
 						arg( model()->minValue() ).
 						arg( model()->maxValue() ),
-					model()->value(),
+					model()->getRoundedValue(),
 					model()->minValue(),
-					model()->maxValue(), 4, &ok );
+					model()->maxValue(), model()->getDigitCount(), &ok );
 	}
 
 	if( ok )
@@ -825,14 +822,14 @@ void Knob::friendlyUpdate()
 QString Knob::displayValue() const
 {
 	if( isVolumeKnob() &&
-		ConfigManager::inst()->value( "app", "displaydbv" ).toInt() )
+		ConfigManager::inst()->value( "app", "displaydbfs" ).toInt() )
 	{
-		return m_description.trimmed() + QString( " %1 dBV" ).
-				arg( 20.0 * log10( model()->value() / volumeRatio() ),
+		return m_description.trimmed() + QString( " %1 dBFS" ).
+				arg( ampToDbfs( model()->getRoundedValue() / volumeRatio() ),
 								3, 'f', 2 );
 	}
 	return m_description.trimmed() + QString( " %1" ).
-					arg( model()->value() ) + m_unit;
+					arg( model()->getRoundedValue() ) + m_unit;
 }
 
 
@@ -849,18 +846,3 @@ void Knob::doConnections()
 						this, SLOT( update() ) );
 	}
 }
-
-
-
-
-void Knob::displayHelp()
-{
-	QWhatsThis::showText( mapToGlobal( rect().bottomRight() ),
-								whatsThis() );
-}
-
-
-
-
-
-

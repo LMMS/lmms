@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -23,7 +23,6 @@
  */
 #include "BBTrack.h"
 
-#include <QDomElement>
 #include <QColorDialog>
 #include <QMenu>
 #include <QPainter>
@@ -39,7 +38,7 @@
 #include "RenameDialog.h"
 #include "Song.h"
 #include "SongEditor.h"
-#include "templates.h"
+#include "ToolTip.h"
 #include "TrackLabelButton.h"
 
 
@@ -61,16 +60,6 @@ BBTCO::BBTCO( Track * _track ) :
 	}
 	setAutoResize( false );
 }
-
-
-
-
-BBTCO::~BBTCO()
-{
-}
-
-
-
 
 void BBTCO::saveSettings( QDomDocument & doc, QDomElement & element )
 {
@@ -169,16 +158,6 @@ BBTCOView::BBTCOView( TrackContentObject * _tco, TrackView * _tv ) :
 	setStyle( QApplication::style() );
 }
 
-
-
-
-BBTCOView::~BBTCOView()
-{
-}
-
-
-
-
 void BBTCOView::constructContextMenu( QMenu * _cm )
 {
 	QAction * a = new QAction( embed::getIconPixmap( "bb_track" ),
@@ -223,8 +202,10 @@ void BBTCOView::paintEvent( QPaintEvent * )
 
 	setNeedsUpdate( false );
 
-	m_paintPixmap = m_paintPixmap.isNull() == true || m_paintPixmap.size() != size() 
-		? QPixmap( size() ) : m_paintPixmap;
+	if (m_paintPixmap.isNull() || m_paintPixmap.size() != size())
+	{
+		m_paintPixmap = QPixmap(size());
+	}
 
 	QPainter p( &m_paintPixmap );
 
@@ -239,7 +220,10 @@ void BBTCOView::paintEvent( QPaintEvent * )
 	
 	lingrad.setColorAt( 0, c.light( 130 ) );
 	lingrad.setColorAt( 1, c.light( 70 ) );
-	
+
+	// paint a black rectangle under the pattern to prevent glitches with transparent backgrounds
+	p.fillRect( rect(), QColor( 0, 0, 0 ) );
+
 	if( gradient() )
 	{
 		p.fillRect( rect(), lingrad );
@@ -251,6 +235,7 @@ void BBTCOView::paintEvent( QPaintEvent * )
 	
 	// bar lines
 	const int lineSize = 3;
+	p.setPen( c.darker( 200 ) );
 
 	tact_t t = Engine::getBBTrackContainer()->lengthOfBB( m_bbTCO->bbTrackIndex() );
 	if( m_bbTCO->length() > MidiTime::ticksPerTact() && t > 0 )
@@ -259,34 +244,14 @@ void BBTCOView::paintEvent( QPaintEvent * )
 								x < width() - 2;
 			x += static_cast<int>( t * pixelsPerTact() ) )
 		{
-			p.setPen( c.light( 80 ) );
 			p.drawLine( x, TCO_BORDER_WIDTH, x, TCO_BORDER_WIDTH + lineSize );
-			p.setPen( c.light( 120 ) );
 			p.drawLine( x, rect().bottom() - ( TCO_BORDER_WIDTH + lineSize ),
 			 	x, rect().bottom() - TCO_BORDER_WIDTH );
 		}
 	}
 
 	// pattern name
-	p.setRenderHint( QPainter::TextAntialiasing );
-
-	if(  m_staticTextName.text() != m_bbTCO->name() )
-	{
-		m_staticTextName.setText( m_bbTCO->name() );
-	}
-
-	QFont font;
-	font.setHintingPreference( QFont::PreferFullHinting );
-	font.setPointSize( 8 );
-	p.setFont( font );
-
-	const int textTop = TCO_BORDER_WIDTH + 1;
-	const int textLeft = TCO_BORDER_WIDTH + 1;
-
-	p.setPen( textShadowColor() );
-	p.drawStaticText( textLeft + 1, textTop + 1, m_staticTextName );
-	p.setPen( textColor() );
-	p.drawStaticText( textLeft, textTop, m_staticTextName );
+	paintTextLabel(m_bbTCO->name(), p);
 
 	// inner border
 	p.setPen( c.lighter( 130 ) );
@@ -400,6 +365,12 @@ void BBTCOView::setColor( QColor new_color )
 }
 
 
+void BBTCOView::update()
+{
+	ToolTip::add(this, m_bbTCO->name());
+
+	TrackContentObjectView::update();
+}
 
 
 
@@ -412,6 +383,7 @@ BBTrack::BBTrack( TrackContainer* tc ) :
 	s_infoMap[this] = bbNum;
 
 	setName( tr( "Beat/Bassline %1" ).arg( bbNum ) );
+	Engine::getBBTrackContainer()->createTCOsForBB( bbNum );
 	Engine::getBBTrackContainer()->setCurrentBB( bbNum );
 	Engine::getBBTrackContainer()->updateComboBox();
 
@@ -425,8 +397,9 @@ BBTrack::BBTrack( TrackContainer* tc ) :
 BBTrack::~BBTrack()
 {
 	Engine::mixer()->removePlayHandlesOfTypes( this,
-				PlayHandle::TypeNotePlayHandle
-				| PlayHandle::TypeInstrumentPlayHandle );
+					PlayHandle::TypeNotePlayHandle
+					| PlayHandle::TypeInstrumentPlayHandle
+					| PlayHandle::TypeSamplePlayHandle );
 
 	const int bb = s_infoMap[this];
 	Engine::getBBTrackContainer()->removeBB( bb );
@@ -548,7 +521,6 @@ void BBTrack::loadTrackSpecificSettings( const QDomElement & _this )
 	{
 		const int src = _this.attribute( "clonebbt" ).toInt();
 		const int dst = s_infoMap[this];
-		Engine::getBBTrackContainer()->createTCOsForBB( dst );
 		TrackContainer::TrackList tl =
 					Engine::getBBTrackContainer()->tracks();
 		// copy TCOs of all tracks from source BB (at bar "src") to destination
@@ -663,6 +635,6 @@ bool BBTrackView::close()
 void BBTrackView::clickedTrackLabel()
 {
 	Engine::getBBTrackContainer()->setCurrentBB( m_bbTrack->index() );
-	gui->getBBEditor()->show();
+	gui->getBBEditor()->parentWidget()->show();
+	gui->getBBEditor()->setFocus( Qt::ActiveWindowFocusReason );
 }
-

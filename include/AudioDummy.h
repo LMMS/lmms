@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -28,10 +28,12 @@
 #include "AudioDevice.h"
 #include "AudioDeviceSetupWidget.h"
 #include "MicroTimer.h"
+#include "Mixer.h"
 
 
-class AudioDummy : public AudioDevice, public QThread
+class AudioDummy : public QThread, public AudioDevice
 {
+	Q_OBJECT
 public:
 	AudioDummy( bool & _success_ful, Mixer* mixer ) :
 		AudioDevice( DEFAULT_CHANNELS, mixer )
@@ -83,11 +85,7 @@ private:
 
 	virtual void stopProcessing()
 	{
-		if( isRunning() )
-		{
-			wait( 1000 );
-			terminate();
-		}
+		stopProcessingThread( this );
 	}
 
 	virtual void run()

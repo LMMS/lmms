@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2014 Lukas W <lukaswhl/at/gmail.com>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -27,7 +27,7 @@
 
 #include <QtCore/QObject>
 
-#include "export.h"
+#include "lmms_export.h"
 
 class QLabel;
 
@@ -40,7 +40,7 @@ class PianoRollWindow;
 class ProjectNotes;
 class SongEditorWindow;
 
-class EXPORT GuiApplication : public QObject
+class LMMS_EXPORT GuiApplication : public QObject
 {
 	Q_OBJECT;
 public:

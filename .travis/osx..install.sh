@@ -1,20 +1,22 @@
 #!/usr/bin/env bash
 
-PACKAGES="cmake pkgconfig fftw libogg libvorbis libsndfile libsamplerate jack sdl stk fluid-synth portaudio node"
+set -e
 
-if [ $QT5 ]; then
-	PACKAGES="$PACKAGES qt5"
-else
-	PACKAGES="$PACKAGES qt"
+PACKAGES="cmake pkg-config libogg libvorbis lame libsndfile libsamplerate jack sdl libgig libsoundio stk fluid-synth portaudio node fltk qt5 carla"
+
+if "${TRAVIS}"; then
+   PACKAGES="$PACKAGES ccache"
 fi
 
-brew reinstall $PACKAGES
+# removing already installed packages from the list
+for p in $(brew list); do
+	PACKAGES=${PACKAGES//$p/}
+done;
 
-sudo npm install -g appdmg
+# shellcheck disable=SC2086
+brew install $PACKAGES
 
-# Workaround per Homebrew bug #44806
-brew reinstall fltk
-if [ $? -ne 0 ]; then
-  echo "Warning: fltk installation failed, trying workaround..."
-  brew reinstall --devel https://raw.githubusercontent.com/dpo/homebrew/ec46018128dde5bf466b013a6c7086d0880930a3/Library/Formula/fltk.rb
-fi
+# fftw tries to install gcc which conflicts with travis
+brew install fftw --ignore-dependencies
+
+npm install -g appdmg

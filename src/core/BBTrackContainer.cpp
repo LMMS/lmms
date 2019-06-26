@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -85,26 +85,23 @@ void BBTrackContainer::updateAfterTrackAdd()
 	{
 		Engine::getSong()->addBBTrack();
 	}
-
-	// make sure, new track(s) have TCOs for every beat/bassline
-	for( int i = 0; i < qMax<int>( 1, numOfBBs() ); ++i )
-	{
-		createTCOsForBB( i );
-	}
 }
 
 
 
 
-tact_t BBTrackContainer::lengthOfBB( int _bb )
+tact_t BBTrackContainer::lengthOfBB( int _bb ) const
 {
 	MidiTime max_length = MidiTime::ticksPerTact();
 
 	const TrackList & tl = tracks();
-	for( TrackList::const_iterator it = tl.begin(); it != tl.end(); ++it )
+	for (Track* t : tl)
 	{
-		max_length = qMax( max_length,
-					( *it )->getTCO( _bb )->length() );
+		// Don't create TCOs here if not exist
+		if (_bb < t->numOfTCOs())
+		{
+			max_length = qMax(max_length, t->getTCO( _bb )->length());
+		}
 	}
 
 	return max_length.nextFullTact();
@@ -221,9 +218,6 @@ void BBTrackContainer::updateComboBox()
 
 void BBTrackContainer::currentBBChanged()
 {
-	// first make sure, all channels have a TCO at current BB
-	createTCOsForBB( currentBB() );
-
 	// now update all track-labels (the current one has to become white,
 	// the others gray)
 	TrackList tl = Engine::getSong()->tracks();
@@ -241,22 +235,25 @@ void BBTrackContainer::currentBBChanged()
 
 void BBTrackContainer::createTCOsForBB( int _bb )
 {
-	if( numOfBBs() == 0 || Engine::getSong()->isLoadingProject() )
-	{
-		return;
-	}
-
 	TrackList tl = tracks();
 	for( int i = 0; i < tl.size(); ++i )
 	{
-		while( tl[i]->numOfTCOs() < _bb + 1 )
-		{
-			MidiTime position = MidiTime( tl[i]->numOfTCOs(), 0 );
-			TrackContentObject * tco = tl[i]->createTCO( position );
-			tco->movePosition( position );
-			tco->changeLength( MidiTime( 1, 0 ) );
-		}
+		tl[i]->createTCOsForBB( _bb );
 	}
+}
+
+AutomatedValueMap BBTrackContainer::automatedValuesAt(MidiTime time, int tcoNum) const
+{
+	Q_ASSERT(tcoNum >= 0);
+	Q_ASSERT(time.getTicks() >= 0);
+
+	auto length_tacts = lengthOfBB(tcoNum);
+	auto length_ticks = length_tacts * MidiTime::ticksPerTact();
+	if (time > length_ticks) {
+		time = length_ticks;
+	}
+
+	return TrackContainer::automatedValuesAt(time + (MidiTime::ticksPerTact() * tcoNum), tcoNum);
 }
 
 

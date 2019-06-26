@@ -2,7 +2,7 @@
 *
 * Copyright (c) 2014 David French <dave/dot/french3/at/googlemail/dot/com>
 *
-* This file is part of LMMS - http://lmms.io
+* This file is part of LMMS - https://lmms.io
 *
 * This program is free software; you can redistribute it and/or
 * modify it under the terms of the GNU General Public
@@ -23,14 +23,14 @@
 
 #ifndef EQFADER_H
 #define EQFADER_H
-#include "Fader.h"
-#include "EffectControls.h"
-#include "MainWindow.h"
-#include "GuiApplication.h"
-#include "TextFloat.h"
 #include <QList>
 #include <QWidget>
 
+#include "EffectControls.h"
+#include "Fader.h"
+#include "GuiApplication.h"
+#include "MainWindow.h"
+#include "TextFloat.h"
 
 
 class EqFader : public Fader
@@ -39,12 +39,12 @@ class EqFader : public Fader
 public:
 	Q_OBJECT
 public:
-	EqFader( FloatModel * model, const QString & name, QWidget * parent, QPixmap * back, QPixmap * leds, QPixmap * knob,  float* lPeak, float* rPeak ) :
-		Fader( model, name, parent, back, leds, knob )
+	EqFader( FloatModel * model, const QString & name, QWidget * parent, QPixmap * backg, QPixmap * leds, QPixmap * knobpi,  float* lPeak, float* rPeak ) :
+		Fader( model, name, parent, backg, leds, knobpi )
 	{
-		setMinimumSize( 23, 116 );
-		setMaximumSize( 23, 116 );
-		resize( 23, 116 );
+		setMinimumSize( 23, 80 );
+		setMaximumSize( 23, 80 );
+		resize( 23, 80 );
 		m_lPeak = lPeak;
 		m_rPeak = rPeak;
 		connect( gui->mainWindow(), SIGNAL( periodicUpdate() ), this, SLOT( updateVuMeters() ) );
@@ -80,7 +80,7 @@ private slots:
 	{
 		const float opl = getPeak_L();
 		const float opr = getPeak_R();
-		const float fall_off = 1.2;
+		const float fallOff = 1.07;
 		if( *m_lPeak > opl )
 		{
 			setPeak_L( *m_lPeak );
@@ -88,7 +88,7 @@ private slots:
 		}
 		else
 		{
-			setPeak_L( opl/fall_off );
+			setPeak_L( opl/fallOff );
 		}
 
 		if( *m_rPeak > opr )
@@ -98,7 +98,7 @@ private slots:
 		}
 		else
 		{
-			setPeak_R( opr/fall_off );
+			setPeak_R( opr/fallOff );
 		}
 		update();
 	}

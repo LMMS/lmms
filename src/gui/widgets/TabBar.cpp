@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -40,16 +40,6 @@ TabBar::TabBar( QWidget * _parent, QBoxLayout::Direction _dir ) :
 
 	setLayout( m_layout );
 }
-
-
-
-
-TabBar::~TabBar()
-{
-}
-
-
-
 
 TabButton * TabBar::addTab( QWidget * _w, const QString & _text, int _id,
 				bool _add_stretch, bool _text_is_tooltip )

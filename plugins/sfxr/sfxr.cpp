@@ -5,7 +5,7 @@
  *
  * Copyright (c) 2014 Wong Cho Ching
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -35,6 +35,7 @@ float frnd(float range)
 	return (float)rnd(10000)/10000*range;
 }
 
+#include <cmath>
 
 #include <QDomElement>
 
@@ -44,13 +45,15 @@ float frnd(float range)
 #include "Knob.h"
 #include "NotePlayHandle.h"
 #include "PixmapButton.h"
-#include "templates.h"
 #include "ToolTip.h"
 #include "Song.h"
 #include "MidiEvent.h"
 #include "MidiTime.h"
+#include "Mixer.h"
 
-#include "embed.cpp"
+#include "embed.h"
+
+#include "plugin_export.h"
 
 extern "C"
 {
@@ -351,7 +354,7 @@ sfxrInstrument::sfxrInstrument( InstrumentTrack * _instrument_track ) :
 	m_lpFilResoModel(0.0f, this, "LP Filter Resonance"),
 	m_hpFilCutModel(0.0f, this, "HP Filter Cutoff"),
 	m_hpFilCutSweepModel(0.0f, this, "HP Filter Cutoff Sweep"),
-	m_waveFormModel( SQR_WAVE, 0, WAVES_NUM-1, this, tr( "Wave Form" ) )
+	m_waveFormModel( SQR_WAVE, 0, WAVES_NUM-1, this, tr( "Wave" ) )
 {
 }
 
@@ -462,6 +465,7 @@ void sfxrInstrument::playNote( NotePlayHandle * _n, sampleFrame * _working_buffe
 	}
 	else if( static_cast<SfxrSynth*>(_n->m_pluginData)->isPlaying() == false )
 	{
+		memset(_working_buffer + offset, 0, sizeof(sampleFrame) * frameNum);
 		_n->noteOff();
 		return;
 	}
@@ -1117,9 +1121,9 @@ extern "C"
 {
 
 // necessary for getting instance out of shared lib
-Plugin * PLUGIN_EXPORT lmms_plugin_main( Model*, void* data )
+PLUGIN_EXPORT Plugin * lmms_plugin_main( Model* m, void* )
 {
-	return new sfxrInstrument( static_cast<InstrumentTrack *>( data ) );
+	return new sfxrInstrument( static_cast<InstrumentTrack *>( m ) );
 }
 
 

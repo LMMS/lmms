@@ -9,7 +9,7 @@
  * Copyright (C) 2005-2008 Christian Schoenebeck
  * Copyright (C) 2009-2010 Christian Schoenebeck and Grigor Iliev
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -40,8 +40,10 @@
 #include "Engine.h"
 #include "InstrumentTrack.h"
 #include "InstrumentPlayHandle.h"
+#include "Mixer.h"
 #include "NotePlayHandle.h"
 #include "Knob.h"
+#include "SampleBuffer.h"
 #include "Song.h"
 #include "ConfigManager.h"
 #include "endian_handling.h"
@@ -50,8 +52,8 @@
 #include "ToolTip.h"
 #include "LcdSpinBox.h"
 
-#include "embed.cpp"
-
+#include "embed.h"
+#include "plugin_export.h"
 
 extern "C"
 {
@@ -936,9 +938,7 @@ GigInstrumentView::GigInstrumentView( Instrument * _instrument, QWidget * _paren
 
 	connect( m_fileDialogButton, SIGNAL( clicked() ), this, SLOT( showFileDialog() ) );
 
-	ToolTip::add( m_fileDialogButton, tr( "Open other GIG file" ) );
-
-	m_fileDialogButton->setWhatsThis( tr( "Click here to open another GIG file" ) );
+	ToolTip::add( m_fileDialogButton, tr( "Open GIG file" ) );
 
 	// Patch Button
 	m_patchDialogButton = new PixmapButton( this );
@@ -950,9 +950,7 @@ GigInstrumentView::GigInstrumentView( Instrument * _instrument, QWidget * _paren
 
 	connect( m_patchDialogButton, SIGNAL( clicked() ), this, SLOT( showPatchDialog() ) );
 
-	ToolTip::add( m_patchDialogButton, tr( "Choose the patch" ) );
-
-	m_patchDialogButton->setWhatsThis( tr( "Click here to change which patch of the GIG file to use" ) );
+	ToolTip::add( m_patchDialogButton, tr( "Choose patch" ) );
 
 	// LCDs
 	m_bankNumLcd = new LcdSpinBox( 3, "21pink", this );
@@ -961,23 +959,16 @@ GigInstrumentView::GigInstrumentView( Instrument * _instrument, QWidget * _paren
 	m_patchNumLcd = new LcdSpinBox( 3, "21pink", this );
 	m_patchNumLcd->move( 161, 150 );
 
-	m_bankNumLcd->setWhatsThis( tr( "Change which instrument of the GIG file is being played" ) );
-	m_patchNumLcd->setWhatsThis( tr( "Change which instrument of the GIG file is being played" ) );
-
 	// Next row
 	m_filenameLabel = new QLabel( this );
 	m_filenameLabel->setGeometry( 61, 70, 156, 14 );
 	m_patchLabel = new QLabel( this );
 	m_patchLabel->setGeometry( 61, 94, 156, 14 );
 
-	m_filenameLabel->setWhatsThis( tr( "Which GIG file is currently being used" ) );
-	m_patchLabel->setWhatsThis( tr( "Which patch of the GIG file is currently being used" ) );
-
 	// Gain
 	m_gainKnob = new gigKnob( this );
-	m_gainKnob->setHintText( tr( "Gain" ) + " ", "" );
+	m_gainKnob->setHintText( tr( "Gain:" ) + " ", "" );
 	m_gainKnob->move( 32, 140 );
-	m_gainKnob->setWhatsThis( tr( "Factor to multiply samples by" ) );
 
 	setAutoFillBackground( true );
 	QPalette pal;
@@ -1064,7 +1055,6 @@ void GigInstrumentView::showFileDialog()
 	types << tr( "GIG Files (*.gig)" );
 	ofd.setNameFilters( types );
 
-	QString dir;
 	if( k->m_filename != "" )
 	{
 		QString f = SampleBuffer::tryToMakeAbsolute( k->m_filename );
@@ -1400,9 +1390,9 @@ extern "C"
 {
 
 // necessary for getting instance out of shared lib
-Plugin * PLUGIN_EXPORT lmms_plugin_main( Model *, void * _data )
+PLUGIN_EXPORT Plugin * lmms_plugin_main( Model *m, void * )
 {
-	return new GigInstrument( static_cast<InstrumentTrack *>( _data ) );
+	return new GigInstrument( static_cast<InstrumentTrack *>( m ) );
 }
 
 }

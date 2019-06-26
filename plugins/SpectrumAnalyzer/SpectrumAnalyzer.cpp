@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2008-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -24,8 +24,8 @@
 
 #include "SpectrumAnalyzer.h"
 
-#include "embed.cpp"
-
+#include "embed.h"
+#include "plugin_export.h"
 
 extern "C"
 {
@@ -38,7 +38,7 @@ Plugin::Descriptor PLUGIN_EXPORT spectrumanalyzer_plugin_descriptor =
 	"Tobias Doerffel <tobydox/at/users.sf.net>",
 	0x0100,
 	Plugin::Effect,
-	new PluginPixmapLoader( "logo" ),
+	new PluginPixmapLoader(),
 	NULL,
 	NULL
 } ;
@@ -163,7 +163,7 @@ extern "C"
 {
 
 // necessary for getting instance out of shared lib
-Plugin * PLUGIN_EXPORT lmms_plugin_main( Model* parent, void* data )
+PLUGIN_EXPORT Plugin * lmms_plugin_main( Model* parent, void* data )
 {
 	return new SpectrumAnalyzer( parent, static_cast<const Plugin::Descriptor::SubPluginFeatures::Key *>( data ) );
 }

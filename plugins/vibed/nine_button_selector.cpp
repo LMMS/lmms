@@ -4,7 +4,7 @@
  * Copyright (c) 2006-2007 Danny McRae <khjklujn/at/yahoo/com>
  * Copyright (c) 2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -25,8 +25,6 @@
 
 
 #include "nine_button_selector.h"
-
-#include <QWhatsThis>
 
 #include "CaptionMenu.h"
 #include "embed.h"
@@ -54,8 +52,8 @@ nineButtonSelector::nineButtonSelector(	QPixmap _button0_on,
 					int _x, int _y,
 					QWidget * _parent ):
 	QWidget( _parent ),
-	IntModelView( new nineButtonSelectorModel(0, 8, _default, NULL, 
-				QString::null, true ), this )
+	IntModelView( new nineButtonSelectorModel(0, 8, _default, NULL,
+				QString(), true ), this )
 {
 	setFixedSize( 50, 50 );
 	move( _x, _y );
@@ -252,20 +250,5 @@ void nineButtonSelector::updateButton( int _new_button )
 void nineButtonSelector::contextMenuEvent( QContextMenuEvent * )
 {
 	CaptionMenu contextMenu( windowTitle(), this );
-	contextMenu.addHelpAction();
 	contextMenu.exec( QCursor::pos() );
 }
-
-
-
-
-void nineButtonSelector::displayHelp()
-{
-	QWhatsThis::showText( mapToGlobal( rect().bottomRight() ),
-							      whatsThis() );
-}
-
-
-
-
-

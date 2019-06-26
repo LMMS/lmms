@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2006-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -25,13 +25,14 @@
 #ifndef _VST_EFFECT_H
 #define _VST_EFFECT_H
 
-#include <QMutex>
+#include <QtCore/QMutex>
+#include <QtCore/QSharedPointer>
 
 #include "Effect.h"
-#include "VstPlugin.h"
 #include "VstEffectControlDialog.h"
 #include "VstEffectControls.h"
 
+class VstPlugin;
 
 class VstEffect : public Effect
 {
@@ -58,7 +59,7 @@ private:
 	void openPlugin( const QString & _plugin );
 	void closePlugin();
 
-	VstPlugin * m_plugin;
+	QSharedPointer<VstPlugin> m_plugin;
 	QMutex m_pluginMutex;
 	EffectKey m_key;
 

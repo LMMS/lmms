@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2014 David French <dave/dot/french3/at/googlemail/dot/com>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -26,12 +26,10 @@
 #define EQCONTROLS_H
 
 #include "EffectControls.h"
-#include "EqControlsDialog.h"
-#include "Knob.h"
+#include "EqSpectrumView.h"
 
 
 class EqEffect;
-
 
 class EqControls : public EffectControls
 {
@@ -53,13 +51,10 @@ public:
 
 	virtual int controlCount()
 	{
-		return 39;
+		return 42;
 	}
 
-	virtual EffectControlDialog* createView()
-	{
-		return new EqControlsDialog( this );
-	}
+	virtual EffectControlDialog* createView();
 
 	float m_inPeakL;
 	float m_inPeakR;
@@ -79,7 +74,7 @@ public:
 	bool visable();
 
 private:
-	EqEffect* m_effect;
+	EqEffect *m_effect;
 
 	FloatModel m_inGainModel;
 	FloatModel m_outGainModel;

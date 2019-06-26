@@ -1,0 +1,85 @@
+<?xml version="1.0"?>
+<!DOCTYPE lmms-project>
+<lmms-project version="1.0" creator="LMMS" creatorversion="1.2.0" type="song">
+  <head timesig_numerator="4" mastervol="100" timesig_denominator="4" bpm="140" masterpitch="0"/>
+  <song>
+    <trackcontainer width="600" x="5" y="5" maximized="0" height="300" visible="1" type="song" minimized="0">
+      <track muted="0" type="0" name="TripleOscillator" solo="0">
+        <instrumenttrack pan="0" fxch="0" usemasterpitch="1" pitchrange="1" pitch="0" basenote="57" vol="100">
+          <instrument name="tripleoscillator">
+            <tripleoscillator phoffset2="0" userwavefile0="" finer0="0" userwavefile1="" finer1="0" userwavefile2="" finer2="0" coarse0="0" coarse1="-12" coarse2="-24" finel0="0" finel1="0" modalgo1="2" modalgo2="2" finel2="0" pan0="0" modalgo3="2" pan1="0" stphdetun0="0" pan2="0" stphdetun1="0" wavetype0="0" stphdetun2="0" wavetype1="0" wavetype2="0" vol0="33" vol1="33" phoffset0="0" phoffset1="0" vol2="33"/>
+          </instrument>
+          <eldata fres="0.5" ftype="0" fcut="14000" fwet="0">
+            <elvol lspd_denominator="4" sustain="0.5" pdel="0" userwavefile="" dec="0.5" lamt="0" latt="0" rel="0.1" amt="0" x100="0" att="0" lpdel="0" hold="0.5" lspd_syncmode="0" lshp="0" lspd="0.1" ctlenvamt="0" lspd_numerator="4"/>
+            <elcut lspd_denominator="4" sustain="0.5" pdel="0" userwavefile="" dec="0.5" lamt="0" latt="0" rel="0.1" amt="0" x100="0" att="0" lpdel="0" hold="0.5" lspd_syncmode="0" lshp="0" lspd="0.1" ctlenvamt="0" lspd_numerator="4"/>
+            <elres lspd_denominator="4" sustain="0.5" pdel="0" userwavefile="" dec="0.5" lamt="0" latt="0" rel="0.1" amt="0" x100="0" att="0" lpdel="0" hold="0.5" lspd_syncmode="0" lshp="0" lspd="0.1" ctlenvamt="0" lspd_numerator="4"/>
+          </eldata>
+          <chordcreator chord="0" chordrange="1" chord-enabled="0"/>
+          <arpeggiator arptime="100" arprange="1" arpskip="0" arptime_denominator="4" arptime_syncmode="0" arpmode="0" arpcycle="0" arp-enabled="0" arp="0" arptime_numerator="4" arpdir="0" arpmiss="0" arpgate="100"/>
+          <midiport inputcontroller="0" fixedoutputvelocity="-1" inputchannel="0" outputcontroller="0" writable="0" outputchannel="1" fixedinputvelocity="-1" fixedoutputnote="-1" outputprogram="1" basevelocity="63" readable="0"/>
+          <fxchain numofeffects="0" enabled="0"/>
+        </instrumenttrack>
+      </track>
+      <track muted="0" type="2" name="Sample track" solo="0">
+        <sampletrack pan="0" vol="100">
+          <fxchain numofeffects="0" enabled="0"/>
+        </sampletrack>
+      </track>
+      <track muted="0" type="1" name="Beat/Bassline 0" solo="0">
+        <bbtrack>
+          <trackcontainer width="640" x="610" y="5" maximized="0" height="400" visible="0" type="bbtrackcontainer" minimized="0">
+            <track muted="0" type="0" name="Kicker" solo="0">
+              <instrumenttrack pan="0" fxch="0" usemasterpitch="1" pitchrange="1" pitch="0" basenote="57" vol="100">
+                <instrument name="kicker">
+                  <kicker decay_numerator="4" decay_denominator="4" distend="0.8" click="0.4" endnote="0" version="1" decay_syncmode="0" decay="440" noise="0" slope="0.06" dist="0.8" env="0.163" startnote="1" startfreq="150" endfreq="40" gain="1"/>
+                </instrument>
+                <eldata fres="0.5" ftype="0" fcut="14000" fwet="0">
+                  <elvol lspd_denominator="4" sustain="0.5" pdel="0" userwavefile="" dec="0.5" lamt="0" latt="0" rel="0.1" amt="0" x100="0" att="0" lpdel="0" hold="0.5" lspd_syncmode="0" lshp="0" lspd="0.1" ctlenvamt="0" lspd_numerator="4"/>
+                  <elcut lspd_denominator="4" sustain="0.5" pdel="0" userwavefile="" dec="0.5" lamt="0" latt="0" rel="0.1" amt="0" x100="0" att="0" lpdel="0" hold="0.5" lspd_syncmode="0" lshp="0" lspd="0.1" ctlenvamt="0" lspd_numerator="4"/>
+                  <elres lspd_denominator="4" sustain="0.5" pdel="0" userwavefile="" dec="0.5" lamt="0" latt="0" rel="0.1" amt="0" x100="0" att="0" lpdel="0" hold="0.5" lspd_syncmode="0" lshp="0" lspd="0.1" ctlenvamt="0" lspd_numerator="4"/>
+                </eldata>
+                <chordcreator chord="0" chordrange="1" chord-enabled="0"/>
+                <arpeggiator arptime="100" arprange="1" arpskip="0" arptime_denominator="4" arptime_syncmode="0" arpmode="0" arpcycle="0" arp-enabled="0" arp="0" arptime_numerator="4" arpdir="0" arpmiss="0" arpgate="100"/>
+                <midiport inputcontroller="0" fixedoutputvelocity="-1" inputchannel="0" outputcontroller="0" writable="0" outputchannel="1" fixedinputvelocity="-1" fixedoutputnote="-1" outputprogram="1" basevelocity="63" readable="0"/>
+                <fxchain numofeffects="0" enabled="0"/>
+              </instrumenttrack>
+              <pattern steps="16" muted="0" type="0" name="Kicker" pos="0"/>
+            </track>
+          </trackcontainer>
+        </bbtrack>
+      </track>
+      <track muted="0" type="5" name="Automation track" solo="0">
+        <automationtrack/>
+      </track>
+    </trackcontainer>
+    <track muted="0" type="6" name="Automation track" solo="0">
+      <automationtrack/>
+      <automationpattern tens="1" mute="0" prog="0" name="Numerator" pos="0" len="192">
+        <object id="4975896"/>
+      </automationpattern>
+      <automationpattern tens="1" mute="0" prog="0" name="Denominator" pos="0" len="192">
+        <object id="6613237"/>
+      </automationpattern>
+      <automationpattern tens="1" mute="0" prog="0" name="Tempo" pos="0" len="192">
+        <object id="6054005"/>
+      </automationpattern>
+      <automationpattern tens="1" mute="0" prog="0" name="Master volume" pos="0" len="192">
+        <object id="1345820"/>
+      </automationpattern>
+      <automationpattern tens="1" mute="0" prog="0" name="Master pitch" pos="0" len="192">
+        <object id="5865711"/>
+      </automationpattern>
+    </track>
+    <fxmixer width="543" x="5" y="310" maximized="0" height="335" visible="1" minimized="0">
+      <fxchannel num="0" muted="0" volume="1" name="Master" soloed="0">
+        <fxchain numofeffects="0" enabled="0"/>
+      </fxchannel>
+    </fxmixer>
+    <ControllerRackView width="350" x="680" y="310" maximized="0" height="200" visible="1" minimized="0"/>
+    <pianoroll width="640" x="5" y="5" maximized="0" height="480" visible="0" minimized="0"/>
+    <automationeditor width="640" x="-36" y="0" maximized="0" height="400" visible="0" minimized="0"/>
+    <projectnotes width="640" x="700" y="10" maximized="0" height="400" visible="0" minimized="0"></projectnotes>
+    <timeline lp1pos="192" lp0pos="0" lpstate="0"/>
+    <controllers/>
+  </song>
+</lmms-project>

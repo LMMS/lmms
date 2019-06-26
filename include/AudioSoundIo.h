@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2015 Andrew Kelley <superjoe30@gmail.com>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -45,6 +45,8 @@ class AudioSoundIoSetupUtil : public QObject
 {
 	Q_OBJECT
 public:
+	virtual ~AudioSoundIoSetupUtil();
+
 	void *m_setupWidget;
 public slots:
 	void updateDevices();
@@ -106,6 +108,8 @@ private:
 	int m_outBufSize;
 	fpp_t m_outBufFramesTotal;
 	fpp_t m_outBufFrameIndex;
+
+	bool m_stopped;
 
 	int m_disconnectErr;
 	void onBackendDisconnect(int err);

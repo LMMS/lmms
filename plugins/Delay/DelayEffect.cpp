@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2014 David French <dave/dot/french3/at/googlemail/dot/com>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -24,9 +24,9 @@
 
 #include "DelayEffect.h"
 #include "Engine.h"
-#include "embed.cpp"
+#include "embed.h"
 #include "interpolation.h"
-
+#include "plugin_export.h"
 
 extern "C"
 {
@@ -39,7 +39,7 @@ Plugin::Descriptor PLUGIN_EXPORT delay_plugin_descriptor =
 	"Dave French <contact/dot/dave/dot/french3/at/googlemail/dot/com>",
 	0x0100,
 	Plugin::Effect,
-	new PluginPixmapLoader( "logo" ),
+	new PluginPixmapLoader("logo"),
 	NULL,
 	NULL
 } ;
@@ -107,7 +107,7 @@ bool DelayEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames )
 
 	if( m_delayControls.m_outGainModel.isValueChanged() )
 	{
-		m_outGain = dbvToAmp( m_delayControls.m_outGainModel.value() );
+		m_outGain = dbfsToAmp( m_delayControls.m_outGainModel.value() );
 	}
 	int sampleLength;
 	for( fpp_t f = 0; f < frames; ++f )
@@ -157,7 +157,7 @@ extern "C"
 {
 
 //needed for getting plugin out of shared lib
-Plugin * PLUGIN_EXPORT lmms_plugin_main( Model* parent, void* data )
+PLUGIN_EXPORT Plugin * lmms_plugin_main( Model* parent, void* data )
 {
 	return new DelayEffect( parent , static_cast<const Plugin::Descriptor::SubPluginFeatures::Key *>( data ) );
 }

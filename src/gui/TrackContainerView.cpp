@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -22,33 +22,28 @@
  *
  */
 
-#include <algorithm>
+#include "TrackContainerView.h"
+
+#include <cmath>
 
 #include <QApplication>
 #include <QLayout>
 #include <QMdiArea>
-#include <QProgressDialog>
-#include <QScrollBar>
 #include <QWheelEvent>
 
-
-#include "TrackContainerView.h"
 #include "TrackContainer.h"
 #include "BBTrack.h"
 #include "MainWindow.h"
-#include "debug.h"
+#include "Mixer.h"
 #include "FileBrowser.h"
 #include "ImportFilter.h"
 #include "Instrument.h"
-#include "InstrumentTrack.h"
-#include "DataFile.h"
-#include "Rubberband.h"
 #include "Song.h"
 #include "StringPairDrag.h"
-#include "Track.h"
 #include "GuiApplication.h"
 #include "PluginFactory.h"
 
+using namespace std;
 
 TrackContainerView::TrackContainerView( TrackContainer * _tc ) :
 	QWidget(),
@@ -64,7 +59,8 @@ TrackContainerView::TrackContainerView( TrackContainer * _tc ) :
 	m_origin()
 {
 	m_tc->setHook( this );
-
+	//keeps the direction of the widget, undepended on the locale
+	setLayoutDirection( Qt::LeftToRight );
 	QVBoxLayout * layout = new QVBoxLayout( this );
 	layout->setMargin( 0 );
 	layout->setSpacing( 0 );
@@ -271,7 +267,9 @@ void TrackContainerView::deleteTrackView( TrackView * _tv )
 	removeTrackView( _tv );
 	delete _tv;
 
-	t->deleteLater();
+	Engine::mixer()->requestChangeInModel();
+	delete t;
+	Engine::mixer()->doneChangeInModel();
 }
 
 
@@ -342,7 +340,7 @@ void TrackContainerView::dragEnterEvent( QDragEnterEvent * _dee )
 {
 	StringPairDrag::processDragEnterEvent( _dee,
 		QString( "presetfile,pluginpresetfile,samplefile,instrument,"
-				"importedproject,soundfontfile,vstpluginfile,projectfile,"
+				"importedproject,soundfontfile,patchfile,vstpluginfile,projectfile,"
 				"track_%1,track_%2" ).
 						arg( Track::InstrumentTrack ).
 						arg( Track::SampleTrack ) );
@@ -380,13 +378,15 @@ void TrackContainerView::dropEvent( QDropEvent * _de )
 		_de->accept();
 	}
 	else if( type == "samplefile" || type == "pluginpresetfile" 
-		|| type == "soundfontfile" || type == "vstpluginfile")
+		|| type == "soundfontfile" || type == "vstpluginfile"
+		|| type == "patchfile" )
 	{
 		InstrumentTrack * it = dynamic_cast<InstrumentTrack *>(
 				Track::create( Track::InstrumentTrack,
 								m_tc ) );
-		Instrument * i = it->loadInstrument(
-			pluginFactory->pluginSupportingExtension(FileItem::extension(value)).name());
+		PluginFactory::PluginInfoAndKey piakn =
+			pluginFactory->pluginSupportingExtension(FileItem::extension(value));
+		Instrument * i = it->loadInstrument(piakn.info.name(), &piakn.key);
 		i->loadFile( value );
 		//it->toggledInstrumentTrackButton( true );
 		_de->accept();
@@ -474,6 +474,11 @@ void TrackContainerView::resizeEvent( QResizeEvent * _re )
 	QWidget::resizeEvent( _re );
 }
 
+RubberBand *TrackContainerView::rubberBand() const
+{
+    return m_rubberBand;
+}
+
 
 
 
@@ -525,7 +530,8 @@ InstrumentLoaderThread::InstrumentLoaderThread( QObject *parent, InstrumentTrack
 
 void InstrumentLoaderThread::run()
 {
-	Instrument *i = m_it->loadInstrument( m_name );
+	Instrument *i = m_it->loadInstrument(m_name, nullptr,
+				true /*always DnD*/);
 	QObject *parent = i->parent();
 	i->setParent( 0 );
 	i->moveToThread( m_containerThread );

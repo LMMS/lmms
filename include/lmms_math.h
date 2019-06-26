@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -26,7 +26,7 @@
 #ifndef LMMS_MATH_H
 #define LMMS_MATH_H
 
-#include <stdint.h>
+#include <cstdint>
 #include "lmms_constants.h"
 #include "lmmsconfig.h"
 #include <QtCore/QtGlobal>
@@ -34,25 +34,8 @@
 #include <cmath>
 using namespace std;
 
-#if defined (LMMS_BUILD_WIN32) || defined (LMMS_BUILD_APPLE) || defined(LMMS_BUILD_HAIKU)  || defined (__FreeBSD__) || defined(__OpenBSD__)
-#ifndef isnanf
-#define isnanf(x)	isnan(x)
-#endif
-#ifndef isinff
-#define isinff(x)	isinf(x)
-#endif
-#ifndef _isnanf
-#define _isnanf(x) isnan(x)
-#endif
-#ifndef _isinff
-#define _isinff(x) isinf(x)
-#endif
 #ifndef exp10
-#define exp10(x) pow( 10.0, x )
-#endif
-#ifndef exp10f
-#define exp10f(x) powf( 10.0f, x )
-#endif
+#define exp10(x) std::pow( 10.0, x )
 #endif
 
 #ifdef __INTEL_COMPILER
@@ -229,11 +212,12 @@ static inline float logToLinearScale( float min, float max, float value )
 static inline float linearToLogScale( float min, float max, float value )
 {
 	static const float EXP = 1.0f / F_E;
-	const float val = ( value - min ) / ( max - min );
+	const float valueLimited = qBound( min, value, max);
+	const float val = ( valueLimited - min ) / ( max - min );
 	if( min < 0 )
 	{
 		const float mmax = qMax( qAbs( min ), qAbs( max ) );
-		float result = signedPowf( value / mmax, EXP ) * mmax;
+		float result = signedPowf( valueLimited / mmax, EXP ) * mmax;
 		return isnan( result ) ? 0 : result;
 	}
 	float result = powf( val, EXP ) * ( max - min ) + min;
@@ -243,10 +227,10 @@ static inline float linearToLogScale( float min, float max, float value )
 
 
 
-//! @brief Converts linear amplitude (0-1.0) to dBV scale. Handles zeroes as -inf.
-//! @param amp Linear amplitude, where 1.0 = 0dBV. 
-//! @return Amplitude in dBV. -inf for 0 amplitude.
-static inline float safeAmpToDbv( float amp )
+//! @brief Converts linear amplitude (0-1.0) to dBFS scale. Handles zeroes as -inf.
+//! @param amp Linear amplitude, where 1.0 = 0dBFS. 
+//! @return Amplitude in dBFS. -inf for 0 amplitude.
+static inline float safeAmpToDbfs( float amp )
 {
 	return amp == 0.0f
 		? -INFINITY
@@ -254,32 +238,32 @@ static inline float safeAmpToDbv( float amp )
 }
 
 
-//! @brief Converts dBV-scale to linear amplitude with 0dBV = 1.0. Handles infinity as zero.
-//! @param dbv The dBV value to convert: all infinites are treated as -inf and result in 0
+//! @brief Converts dBFS-scale to linear amplitude with 0dBFS = 1.0. Handles infinity as zero.
+//! @param dbfs The dBFS value to convert: all infinites are treated as -inf and result in 0
 //! @return Linear amplitude
-static inline float safeDbvToAmp( float dbv )
+static inline float safeDbfsToAmp( float dbfs )
 {
-	return isinff( dbv )
+	return isinf( dbfs )
 		? 0.0f
-		: exp10f( dbv * 0.05f );
+		: exp10( dbfs * 0.05f );
 }
 
 
-//! @brief Converts linear amplitude (>0-1.0) to dBV scale. 
-//! @param amp Linear amplitude, where 1.0 = 0dBV. ** Must be larger than zero! **
-//! @return Amplitude in dBV. 
-static inline float ampToDbv( float amp )
+//! @brief Converts linear amplitude (>0-1.0) to dBFS scale. 
+//! @param amp Linear amplitude, where 1.0 = 0dBFS. ** Must be larger than zero! **
+//! @return Amplitude in dBFS. 
+static inline float ampToDbfs( float amp )
 {
 	return log10f( amp ) * 20.0f;
 }
 
 
-//! @brief Converts dBV-scale to linear amplitude with 0dBV = 1.0
-//! @param dbv The dBV value to convert. ** Must be a real number - not inf/nan! **
+//! @brief Converts dBFS-scale to linear amplitude with 0dBFS = 1.0
+//! @param dbfs The dBFS value to convert. ** Must be a real number - not inf/nan! **
 //! @return Linear amplitude
-static inline float dbvToAmp( float dbv )
+static inline float dbfsToAmp( float dbfs )
 {
-	return exp10f( dbv * 0.05f );
+	return exp10( dbfs * 0.05f );
 }
 
 

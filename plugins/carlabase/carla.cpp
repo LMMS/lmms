@@ -1,9 +1,9 @@
 /*
  * carla.cpp - Carla for LMMS
  *
- * Copyright (C) 2014 Filipe Coelho <falktx@falktx.com>
+ * Copyright (C) 2014-2018 Filipe Coelho <falktx@falktx.com>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -24,24 +24,23 @@
 
 #include "carla.h"
 
-#define REAL_BUILD // FIXME this shouldn't be needed
-#include "CarlaHost.h"
-
 #include "Engine.h"
 #include "Song.h"
 #include "gui_templates.h"
 #include "InstrumentPlayHandle.h"
 #include "InstrumentTrack.h"
+#include "Mixer.h"
 
 #include <QApplication>
 #include <QFileDialog>
+#include <QFileInfo>
 #include <QPushButton>
 #include <QTimerEvent>
 #include <QVBoxLayout>
 
 #include <cstring>
 
-#include "embed.cpp"
+#include "embed.h"
 
 // this doesn't seem to be defined anywhere
 static const double ticksPerBeat = 48.0;
@@ -130,14 +129,6 @@ static const char* host_ui_save_file(NativeHostHandle, bool isDir, const char* t
 
 // -----------------------------------------------------------------------
 
-CARLA_EXPORT
-const NativePluginDescriptor* carla_get_native_patchbay_plugin();
-
-CARLA_EXPORT
-const NativePluginDescriptor* carla_get_native_rack_plugin();
-
-// -----------------------------------------------------------------------
-
 CarlaInstrument::CarlaInstrument(InstrumentTrack* const instrumentTrack, const Descriptor* const descriptor, const bool isPatchbay)
     : Instrument(instrumentTrack, descriptor),
       kIsPatchbay(isPatchbay),
@@ -149,15 +140,23 @@ CarlaInstrument::CarlaInstrument(InstrumentTrack* const instrumentTrack, const D
     fHost.uiName      = NULL;
     fHost.uiParentId  = 0;
 
-    // figure out prefix from dll filename
+    // carla/resources contains PyQt scripts required for launch
     QString dllName(carla_get_library_filename());
-
+    QString resourcesPath;
 #if defined(CARLA_OS_LINUX)
-    fHost.resourceDir = strdup(QString(dllName.split("/lib/carla")[0] + "/share/carla/resources/").toUtf8().constData());
-#else
-    fHost.resourceDir = NULL;
+    // parse prefix from dll filename
+    QDir path = QFileInfo(dllName).dir();
+    path.cdUp();
+    path.cdUp();
+    resourcesPath = path.absolutePath() + "/share/carla/resources";
+#elif defined(CARLA_OS_MAC)
+    // parse prefix from dll filename
+    QDir path = QFileInfo(dllName).dir();
+    resourcesPath = path.absolutePath() + "/resources";
+#elif defined(CARLA_OS_WIN32) || defined(CARLA_OS_WIN64)
+    // not yet supported
 #endif
-
+    fHost.resourceDir            = strdup(resourcesPath.toUtf8().constData());
     fHost.get_buffer_size        = host_get_buffer_size;
     fHost.get_sample_rate        = host_get_sample_rate;
     fHost.is_offline             = host_is_offline;
@@ -245,33 +244,23 @@ void CarlaInstrument::handleUiClosed()
     emit uiClosed();
 }
 
-intptr_t CarlaInstrument::handleDispatcher(const NativeHostDispatcherOpcode opcode, const int32_t index, const intptr_t value, void* const ptr, const float opt)
+intptr_t CarlaInstrument::handleDispatcher(const NativeHostDispatcherOpcode opcode, const int32_t, const intptr_t, void* const, const float)
 {
     intptr_t ret = 0;
 
     switch (opcode)
     {
-    case NATIVE_HOST_OPCODE_NULL:
-        break;
-    case NATIVE_HOST_OPCODE_UPDATE_PARAMETER:
-    case NATIVE_HOST_OPCODE_UPDATE_MIDI_PROGRAM:
-    case NATIVE_HOST_OPCODE_RELOAD_PARAMETERS:
-    case NATIVE_HOST_OPCODE_RELOAD_MIDI_PROGRAMS:
-    case NATIVE_HOST_OPCODE_RELOAD_ALL:
-        // nothing
-        break;
     case NATIVE_HOST_OPCODE_UI_UNAVAILABLE:
         handleUiClosed();
         break;
     case NATIVE_HOST_OPCODE_HOST_IDLE:
         qApp->processEvents();
         break;
+    default:
+        break;
     }
 
     return ret;
-
-    // unused for now
-    (void)index; (void)value; (void)ptr; (void)opt;
 }
 
 // -------------------------------------------------------------------
@@ -446,9 +435,12 @@ bool CarlaInstrument::handleMidiEvent(const MidiEvent& event, const MidiTime&, f
 
 PluginView* CarlaInstrument::instantiateView(QWidget* parent)
 {
+// Disable plugin focus per https://bugreports.qt.io/browse/QTBUG-30181
+#ifndef CARLA_OS_MAC
     if (QWidget* const window = parent->window())
         fHost.uiParentId = window->winId();
     else
+#endif
         fHost.uiParentId = 0;
 
     std::free((char*)fHost.uiName);
@@ -489,9 +481,6 @@ CarlaInstrumentView::CarlaInstrumentView(CarlaInstrument* const instrument, QWid
     m_toggleUIButton->setIcon( embed::getIconPixmap( "zoom" ) );
     m_toggleUIButton->setFont( pointSize<8>( m_toggleUIButton->font() ) );
     connect( m_toggleUIButton, SIGNAL( clicked(bool) ), this, SLOT( toggleUI( bool ) ) );
-
-    m_toggleUIButton->setWhatsThis(
-                tr( "Click here to show or hide the graphical user interface (GUI) of Carla." ) );
 
     l->addWidget( m_toggleUIButton );
     l->addStretch();

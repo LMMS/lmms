@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2008-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -25,10 +25,10 @@
 #ifndef REMOTE_PLUGIN_H
 #define REMOTE_PLUGIN_H
 
-#include "export.h"
 #include "MidiEvent.h"
 #include "VstSyncData.h"
 
+#include <atomic>
 #include <vector>
 #include <cstdio>
 #include <cstdlib>
@@ -37,10 +37,8 @@
 #include <cassert>
 
 
-#if defined(LMMS_HAVE_SYS_IPC_H) && defined(LMMS_HAVE_SEMAPHORE_H)
-#include <sys/ipc.h>
-#include <semaphore.h>
-#else
+#if !(defined(LMMS_HAVE_SYS_IPC_H) && defined(LMMS_HAVE_SEMAPHORE_H))
+#define SYNC_WITH_SHM_FIFO
 #define USE_QT_SEMAPHORES
 
 #ifdef LMMS_HAVE_PROCESS_H
@@ -74,17 +72,35 @@ typedef int32_t key_t;
 #include <locale.h>
 #endif
 
+#ifdef LMMS_HAVE_PTHREAD_H
+#include <pthread.h>
+#endif
+
 
 #ifdef BUILD_REMOTE_PLUGIN_CLIENT
-#undef EXPORT
-#define EXPORT
+#undef LMMS_EXPORT
+#define LMMS_EXPORT
 #define COMPILE_REMOTE_PLUGIN_BASE
+
+#ifndef SYNC_WITH_SHM_FIFO
+#include <sys/socket.h>
+#include <sys/un.h>
+#endif
+
 #else
+#include "lmms_export.h"
 #include <QtCore/QMutex>
 #include <QtCore/QProcess>
 #include <QtCore/QThread>
+
+#ifndef SYNC_WITH_SHM_FIFO
+#include <poll.h>
+#include <unistd.h>
 #endif
 
+#endif
+
+#ifdef SYNC_WITH_SHM_FIFO
 // sometimes we need to exchange bigger messages (e.g. for VST parameter dumps)
 // so set a usable value here
 const int SHM_FIFO_SIZE = 512*1024;
@@ -97,9 +113,6 @@ class shmFifo
 	// and 64 bit platforms
 	union sem32_t
 	{
-#ifndef USE_QT_SEMAPHORES
-		sem_t sem;
-#endif
 		int semKey;
 		char fill[32];
 	} ;
@@ -125,13 +138,8 @@ public:
 		m_shmID( -1 ),
 #endif
 		m_data( NULL ),
-#ifdef USE_QT_SEMAPHORES
-		m_dataSem( QString::null ),
-		m_messageSem( QString::null ),
-#else
-		m_dataSem( NULL ),
-		m_messageSem( NULL ),
-#endif
+		m_dataSem( QString() ),
+		m_messageSem( QString() ),
 		m_lockDepth( 0 )
 	{
 #ifdef USE_QT_SHMEM
@@ -151,7 +159,6 @@ public:
 #endif
 		assert( m_data != NULL );
 		m_data->startPtr = m_data->endPtr = 0;
-#ifdef USE_QT_SEMAPHORES
 		static int k = 0;
 		m_data->dataSem.semKey = ( getpid()<<10 ) + ++k;
 		m_data->messageSem.semKey = ( getpid()<<10 ) + ++k;
@@ -160,20 +167,6 @@ public:
 		m_messageSem.setKey( QString::number(
 						m_data->messageSem.semKey ),
 						0, QSystemSemaphore::Create );
-#else
-		m_dataSem = &m_data->dataSem.sem;
-		m_messageSem = &m_data->messageSem.sem;
-
-		if( sem_init( m_dataSem, 1, 1 ) )
-		{
-			fprintf( stderr, "could not initialize m_dataSem\n" );
-		}
-		if( sem_init( m_messageSem, 1, 0 ) )
-		{
-			fprintf( stderr, "could not initialize "
-							"m_messageSem\n" );
-		}
-#endif
 	}
 
 	// constructor for remote-/client-side - use _shm_key for making up
@@ -188,13 +181,8 @@ public:
 		m_shmID( shmget( _shm_key, 0, 0 ) ),
 #endif
 		m_data( NULL ),
-#ifdef USE_QT_SEMAPHORES
-		m_dataSem( QString::null ),
-		m_messageSem( QString::null ),
-#else
-		m_dataSem( NULL ),
-		m_messageSem( NULL ),
-#endif
+		m_dataSem( QString() ),
+		m_messageSem( QString() ),
 		m_lockDepth( 0 )
 	{
 #ifdef USE_QT_SHMEM
@@ -209,14 +197,9 @@ public:
 		}
 #endif
 		assert( m_data != NULL );
-#ifdef USE_QT_SEMAPHORES
 		m_dataSem.setKey( QString::number( m_data->dataSem.semKey ) );
 		m_messageSem.setKey( QString::number(
 						m_data->messageSem.semKey ) );
-#else
-		m_dataSem = &m_data->dataSem.sem;
-		m_messageSem = &m_data->messageSem.sem;
-#endif
 	}
 
 	~shmFifo()
@@ -226,10 +209,6 @@ public:
 		{
 #ifndef USE_QT_SHMEM
 			shmctl( m_shmID, IPC_RMID, NULL );
-#endif
-#ifndef USE_QT_SEMAPHORES
-			sem_destroy( m_dataSem );
-			sem_destroy( m_messageSem );
 #endif
 		}
 #ifndef USE_QT_SHMEM
@@ -256,26 +235,18 @@ public:
 	// recursive lock
 	inline void lock()
 	{
-		if( !isInvalid() && __sync_add_and_fetch( &m_lockDepth, 1 ) == 1 )
+		if( !isInvalid() && m_lockDepth.fetch_add( 1 ) == 0 )
 		{
-#ifdef USE_QT_SEMAPHORES
 			m_dataSem.acquire();
-#else
-			sem_wait( m_dataSem );
-#endif
 		}
 	}
 
 	// recursive unlock
 	inline void unlock()
 	{
-		if( __sync_sub_and_fetch( &m_lockDepth, 1) <= 0 )
+		if( m_lockDepth.fetch_sub( 1 ) <= 1 )
 		{
-#ifdef USE_QT_SEMAPHORES
 			m_dataSem.release();
-#else
-			sem_post( m_dataSem );
-#endif
 		}
 	}
 
@@ -284,22 +255,14 @@ public:
 	{
 		if( !isInvalid() )
 		{
-#ifdef USE_QT_SEMAPHORES
 			m_messageSem.acquire();
-#else
-			sem_wait( m_messageSem );
-#endif
 		}
 	}
 
 	// increase message-semaphore
 	inline void messageSent()
 	{
-#ifdef USE_QT_SEMAPHORES
 		m_messageSem.release();
-#else
-		sem_post( m_messageSem );
-#endif
 	}
 
 
@@ -345,16 +308,10 @@ public:
 		{
 			return false;
 		}
-#ifdef USE_QT_SEMAPHORES
 		lock();
 		const bool empty = ( m_data->startPtr == m_data->endPtr );
 		unlock();
 		return !empty;
-#else
-		int v;
-		sem_getvalue( m_messageSem, &v );
-		return v > 0;
-#endif
 	}
 
 
@@ -446,34 +403,35 @@ private:
 	int m_shmID;
 #endif
 	shmData * m_data;
-#ifdef USE_QT_SEMAPHORES
 	QSystemSemaphore m_dataSem;
 	QSystemSemaphore m_messageSem;
-#else
-	sem_t * m_dataSem;
-	sem_t * m_messageSem;
-#endif
-	volatile int m_lockDepth;
+	std::atomic_int m_lockDepth;
 
 } ;
+#endif
 
 
 
 enum RemoteMessageIDs
 {
 	IdUndefined,
+	IdHostInfoGotten,
 	IdInitDone,
 	IdQuit,
 	IdSampleRateInformation,
 	IdBufferSizeInformation,
+	IdInformationUpdated,
 	IdMidiEvent,
 	IdStartProcessing,
 	IdProcessingDone,
 	IdChangeSharedMemoryKey,
 	IdChangeInputCount,
 	IdChangeOutputCount,
+	IdChangeInputOutputCount,
 	IdShowUI,
 	IdHideUI,
+	IdToggleUI,
+	IdIsUIVisible,
 	IdSaveSettingsToString,
 	IdSaveSettingsToFile,
 	IdLoadSettingsFromString,
@@ -486,7 +444,7 @@ enum RemoteMessageIDs
 
 
 
-class EXPORT RemotePluginBase
+class LMMS_EXPORT RemotePluginBase
 {
 public:
 	struct message
@@ -567,9 +525,14 @@ public:
 
 	} ;
 
+#ifdef SYNC_WITH_SHM_FIFO
 	RemotePluginBase( shmFifo * _in, shmFifo * _out );
+#else
+	RemotePluginBase();
+#endif
 	virtual ~RemotePluginBase();
 
+#ifdef SYNC_WITH_SHM_FIFO
 	void reset( shmFifo *in, shmFifo *out )
 	{
 		delete m_in;
@@ -577,20 +540,19 @@ public:
 		m_in = in;
 		m_out = out;
 	}
+#endif
 
 	int sendMessage( const message & _m );
 	message receiveMessage();
 
 	inline bool isInvalid() const
 	{
+#ifdef SYNC_WITH_SHM_FIFO
 		return m_in->isInvalid() || m_out->isInvalid();
+#else
+		return m_invalid;
+#endif
 	}
-
-	inline bool messagesLeft()
-	{
-		return m_in->messagesLeft();
-	}
-
 
 	message waitForMessage( const message & _m,
 						bool _busy_waiting = false );
@@ -602,6 +564,61 @@ public:
 		return m;
 	}
 
+#ifndef SYNC_WITH_SHM_FIFO
+	inline int32_t readInt()
+	{
+		int32_t i;
+		read( &i, sizeof( i ) );
+		return i;
+	}
+
+	inline void writeInt( const int32_t & _i )
+	{
+		write( &_i, sizeof( _i ) );
+	}
+
+	inline std::string readString()
+	{
+		const int len = readInt();
+		if( len )
+		{
+			char * sc = new char[len + 1];
+			read( sc, len );
+			sc[len] = 0;
+			std::string s( sc );
+			delete[] sc;
+			return s;
+		}
+		return std::string();
+	}
+
+
+	inline void writeString( const std::string & _s )
+	{
+		const int len = _s.size();
+		writeInt( len );
+		write( _s.c_str(), len );
+	}
+#endif
+
+#ifndef BUILD_REMOTE_PLUGIN_CLIENT
+	inline bool messagesLeft()
+	{
+#ifdef SYNC_WITH_SHM_FIFO
+		return m_in->messagesLeft();
+#else
+		struct pollfd pollin;
+		pollin.fd = m_socket;
+		pollin.events = POLLIN;
+
+		if ( poll( &pollin, 1, 0 ) == -1 )
+		{
+			qWarning( "Unexpected poll error." );
+		}
+		return pollin.revents & POLLIN;
+#endif
+	}
+
 	inline void fetchAndProcessAllMessages()
 	{
 		while( messagesLeft() )
@@ -610,10 +627,17 @@ public:
 		}
 	}
 
+	static bool isMainThreadWaiting()
+	{
+		return waitDepthCounter() > 0;
+	}
+#endif
+
 	virtual bool processMessage( const message & _m ) = 0;
 
 
 protected:
+#ifdef SYNC_WITH_SHM_FIFO
 	inline const shmFifo * in() const
 	{
 		return m_in;
@@ -623,18 +647,96 @@ protected:
 	{
 		return m_out;
 	}
+#endif
 
 	inline void invalidate()
 	{
+#ifdef SYNC_WITH_SHM_FIFO
 		m_in->invalidate();
 		m_out->invalidate();
 		m_in->messageSent();
+#else
+		m_invalid = true;
+#endif
 	}
 
 
+#ifndef SYNC_WITH_SHM_FIFO
+	int m_socket;
+#endif
+
+
 private:
+#ifndef BUILD_REMOTE_PLUGIN_CLIENT
+	static int & waitDepthCounter()
+	{
+		static int waitDepth = 0;
+		return waitDepth;
+	}
+#endif
+
+#ifdef SYNC_WITH_SHM_FIFO
 	shmFifo * m_in;
 	shmFifo * m_out;
+#else
+	void read( void * _buf, int _len )
+	{
+		if( isInvalid() )
+		{
+			memset( _buf, 0, _len );
+			return;
+		}
+		char * buf = (char *) _buf;
+		int remaining = _len;
+		while ( remaining )
+		{
+			ssize_t nread = ::read( m_socket, buf, remaining );
+			switch ( nread )
+			{
+				case -1:
+					fprintf( stderr,
+						"Error while reading.\n" );
+				case 0:
+					invalidate();
+					memset( _buf, 0, _len );
+					return;
+			}
+			buf += nread;
+			remaining -= nread;
+		}
+	}
+
+	void write( const void * _buf, int _len )
+	{
+		if( isInvalid() )
+		{
+			return;
+		}
+		const char * buf = (const char *) _buf;
+		int remaining = _len;
+		while ( remaining )
+		{
+			ssize_t nwritten = ::write( m_socket, buf, remaining );
+			switch ( nwritten )
+			{
+				case -1:
+					fprintf( stderr,
+						"Error while writing.\n" );
+				case 0:
+					invalidate();
+					return;
+			}
+			buf += nwritten;
+			remaining -= nwritten;
+		}
+	}
+
+
+	bool m_invalid;
+
+	pthread_mutex_t m_receiveMutex;
+	pthread_mutex_t m_sendMutex;
+#endif
 
 } ;
 
@@ -647,16 +749,20 @@ class RemotePlugin;
 
 class ProcessWatcher : public QThread
 {
+	Q_OBJECT
 public:
 	ProcessWatcher( RemotePlugin * );
-	virtual ~ProcessWatcher()
-	{
-	}
+	virtual ~ProcessWatcher() = default;
 
-
-	void quit()
+	void stop()
 	{
 		m_quit = true;
+		quit();
+	}
+
+	void reset()
+	{
+		m_quit = false;
 	}
 
 private:
@@ -668,8 +774,9 @@ private:
 } ;
 
 
-class EXPORT RemotePlugin : public RemotePluginBase
+class LMMS_EXPORT RemotePlugin : public QObject, public RemotePluginBase
 {
+	Q_OBJECT
 public:
 	RemotePlugin();
 	virtual ~RemotePlugin();
@@ -683,7 +790,13 @@ public:
 #endif
 	}
 
-	bool init( const QString &pluginExecutable, bool waitForInitDoneMsg );
+	bool init( const QString &pluginExecutable, bool waitForInitDoneMsg, QStringList extraArgs = {} );
+
+	inline void waitForHostInfoGotten()
+	{
+		m_failed = waitForMessage( IdHostInfoGotten ).id
+							!= IdHostInfoGotten;
+	}
 
 	inline void waitForInitDone( bool _busyWaiting = true )
 	{
@@ -700,21 +813,25 @@ public:
 	{
 		lock();
 		sendMessage( message( IdSampleRateInformation ).addInt( _sr ) );
+		waitForMessage( IdInformationUpdated, true );
 		unlock();
 	}
 
-	void showUI()
+
+	virtual void toggleUI()
 	{
 		lock();
-		sendMessage( IdShowUI );
+		sendMessage( IdToggleUI );
 		unlock();
 	}
 
-	void hideUI()
+	int isUIVisible()
 	{
 		lock();
-		sendMessage( IdHideUI );
+		sendMessage( IdIsUIVisible );
 		unlock();
+		message m = waitForMessage( IdIsUIVisible );
+		return m.id != IdIsUIVisible ? -1 : m.getInt() ? 1 : 0;
 	}
 
 	inline bool failed() const
@@ -724,20 +841,17 @@ public:
 
 	inline void lock()
 	{
-		if( !isInvalid() )
-		{
-			m_commMutex.lock();
-		}
+		m_commMutex.lock();
 	}
 
 	inline void unlock()
 	{
-		if( !isInvalid() )
-		{
-			m_commMutex.unlock();
-		}
+		m_commMutex.unlock();
 	}
 
+public slots:
+	virtual void showUI();
+	virtual void hideUI();
 
 protected:
 	inline void setSplittedChannels( bool _on )
@@ -746,14 +860,16 @@ protected:
 	}
 
 
+	bool m_failed;
 private:
 	void resizeSharedProcessingMemory();
 
 
-	bool m_failed;
-
 	QProcess m_process;
 	ProcessWatcher m_watcher;
+
+	QString m_exec;
+	QStringList m_args;
 
 	QMutex m_commMutex;
 	bool m_splitChannels;
@@ -768,7 +884,17 @@ private:
 	int m_inputCount;
 	int m_outputCount;
 
+#ifndef SYNC_WITH_SHM_FIFO
+	int m_server;
+	QString m_socketFile;
+#endif
+
 	friend class ProcessWatcher;
+
+
+private slots:
+	void processFinished( int exitCode, QProcess::ExitStatus exitStatus );
+	void processErrored(QProcess::ProcessError err );
 } ;
 
 #endif
@@ -779,7 +905,11 @@ private:
 class RemotePluginClient : public RemotePluginBase
 {
 public:
+#ifdef SYNC_WITH_SHM_FIFO
 	RemotePluginClient( key_t _shm_in, key_t _shm_out );
+#else
+	RemotePluginClient( const char * socketPath );
+#endif
 	virtual ~RemotePluginClient();
 #ifdef USE_QT_SHMEM
 	VstSyncData * getQtVSTshm();
@@ -826,6 +956,15 @@ public:
 	{
 		m_outputCount = _i;
 		sendMessage( message( IdChangeOutputCount ).addInt( _i ) );
+	}
+
+	void setInputOutputCount( int i, int o )
+	{
+		m_inputCount = i;
+		m_outputCount = o;
+		sendMessage( message( IdChangeInputOutputCount )
+				.addInt( i )
+				.addInt( o ) );
 	}
 
 	virtual int inputCount() const
@@ -876,14 +1015,24 @@ private:
 #endif
 
 
+#ifdef SYNC_WITH_SHM_FIFO
 RemotePluginBase::RemotePluginBase( shmFifo * _in, shmFifo * _out ) :
 	m_in( _in ),
 	m_out( _out )
+#else
+RemotePluginBase::RemotePluginBase() :
+	m_socket( -1 ),
+	m_invalid( false )
+#endif
 {
 #ifdef LMMS_HAVE_LOCALE_H
 	// make sure, we're using common ways to print/scan
 	// floats to/from strings (',' vs. '.' for decimal point etc.)
 	setlocale( LC_NUMERIC, "C" );
+#endif
+#ifndef SYNC_WITH_SHM_FIFO
+	pthread_mutex_init( &m_receiveMutex, NULL );
+	pthread_mutex_init( &m_sendMutex, NULL );
 #endif
 }
 
@@ -892,8 +1041,13 @@ RemotePluginBase::RemotePluginBase( shmFifo * _in, shmFifo * _out ) :
 
 RemotePluginBase::~RemotePluginBase()
 {
+#ifdef SYNC_WITH_SHM_FIFO
 	delete m_in;
 	delete m_out;
+#else
+	pthread_mutex_destroy( &m_receiveMutex );
+	pthread_mutex_destroy( &m_sendMutex );
+#endif
 }
 
 
@@ -901,6 +1055,7 @@ RemotePluginBase::~RemotePluginBase()
 
 int RemotePluginBase::sendMessage( const message & _m )
 {
+#ifdef SYNC_WITH_SHM_FIFO
 	m_out->lock();
 	m_out->writeInt( _m.id );
 	m_out->writeInt( _m.data.size() );
@@ -912,6 +1067,18 @@ int RemotePluginBase::sendMessage( const message & _m )
 	}
 	m_out->unlock();
 	m_out->messageSent();
+#else
+	pthread_mutex_lock( &m_sendMutex );
+	writeInt( _m.id );
+	writeInt( _m.data.size() );
+	int j = 8;
+	for( unsigned int i = 0; i < _m.data.size(); ++i )
+	{
+		writeString( _m.data[i] );
+		j += 4 + _m.data[i].size();
+	}
+	pthread_mutex_unlock( &m_sendMutex );
+#endif
 
 	return j;
 }
@@ -921,6 +1088,7 @@ int RemotePluginBase::sendMessage( const message & _m )
 
 RemotePluginBase::message RemotePluginBase::receiveMessage()
 {
+#ifdef SYNC_WITH_SHM_FIFO
 	m_in->waitForMessage();
 	m_in->lock();
 	message m;
@@ -931,6 +1099,17 @@ RemotePluginBase::message RemotePluginBase::receiveMessage()
 		m.data.push_back( m_in->readString() );
 	}
 	m_in->unlock();
+#else
+	pthread_mutex_lock( &m_receiveMutex );
+	message m;
+	m.id = readInt();
+	const int s = readInt();
+	for( int i = 0; i < s; ++i )
+	{
+		m.data.push_back( readString() );
+	}
+	pthread_mutex_unlock( &m_receiveMutex );
+#endif
 	return m;
 }
 
@@ -941,6 +1120,34 @@ RemotePluginBase::message RemotePluginBase::waitForMessage(
 							const message & _wm,
 							bool _busy_waiting )
 {
+#ifndef BUILD_REMOTE_PLUGIN_CLIENT
+	if( _busy_waiting )
+	{
+		// No point processing events outside of the main thread
+		_busy_waiting = QThread::currentThread() ==
+					QCoreApplication::instance()->thread();
+	}
+
+	struct WaitDepthCounter
+	{
+		WaitDepthCounter( int & depth, bool busy ) :
+			m_depth( depth ),
+			m_busy( busy )
+		{
+			if( m_busy ) { ++m_depth; }
+		}
+
+		~WaitDepthCounter()
+		{
+			if( m_busy ) { --m_depth; }
+		}
+
+		int & m_depth;
+		bool m_busy;
+	};
+
+	WaitDepthCounter wdc( waitDepthCounter(), _busy_waiting );
+#endif
 	while( !isInvalid() )
 	{
 #ifndef BUILD_REMOTE_PLUGIN_CLIENT
@@ -976,8 +1183,13 @@ RemotePluginBase::message RemotePluginBase::waitForMessage(
 #ifdef BUILD_REMOTE_PLUGIN_CLIENT
 
 
+#ifdef SYNC_WITH_SHM_FIFO
 RemotePluginClient::RemotePluginClient( key_t _shm_in, key_t _shm_out ) :
 	RemotePluginBase( new shmFifo( _shm_in ), new shmFifo( _shm_out ) ),
+#else
+RemotePluginClient::RemotePluginClient( const char * socketPath ) :
+	RemotePluginBase(),
+#endif
 #ifdef USE_QT_SHMEM
 	m_shmObj(),
 	m_shmQtID( "/usr/bin/lmms" ),
@@ -989,12 +1201,37 @@ RemotePluginClient::RemotePluginClient( key_t _shm_in, key_t _shm_out ) :
 	m_sampleRate( 44100 ),
 	m_bufferSize( 0 )
 {
+#ifndef SYNC_WITH_SHM_FIFO
+	struct sockaddr_un sa;
+	sa.sun_family = AF_LOCAL;
+
+	size_t length = strlen( socketPath );
+	if ( length >= sizeof sa.sun_path )
+	{
+		length = sizeof sa.sun_path - 1;
+		fprintf( stderr, "Socket path too long.\n" );
+	}
+	memcpy( sa.sun_path, socketPath, length );
+	sa.sun_path[length] = '\0';
+
+	m_socket = socket( PF_LOCAL, SOCK_STREAM, 0 );
+	if ( m_socket == -1 )
+	{
+		fprintf( stderr, "Could not connect to local server.\n" );
+	}
+	if ( ::connect( m_socket, (struct sockaddr *) &sa, sizeof sa ) == -1 )
+	{
+		fprintf( stderr, "Could not connect to local server.\n" );
+	}
+#endif
+
 #ifdef USE_QT_SHMEM
 	if( m_shmQtID.attach( QSharedMemory::ReadOnly ) )
 	{
 		m_vstSyncData = (VstSyncData *) m_shmQtID.data();
 		m_bufferSize = m_vstSyncData->m_bufferSize;
 		m_sampleRate = m_vstSyncData->m_sampleRate;
+		sendMessage( IdHostInfoGotten );
 		return;
 	}
 #else
@@ -1022,6 +1259,7 @@ RemotePluginClient::RemotePluginClient( key_t _shm_in, key_t _shm_out ) :
 			{
 				m_bufferSize = m_vstSyncData->m_bufferSize;
 				m_sampleRate = m_vstSyncData->m_sampleRate;
+				sendMessage( IdHostInfoGotten );
 
 				// detach segment
 				if( shmdt(m_vstSyncData) == -1 )
@@ -1033,9 +1271,16 @@ RemotePluginClient::RemotePluginClient( key_t _shm_in, key_t _shm_out ) :
 		}
 	}
 #endif
+
 	// if attaching shared memory fails
 	sendMessage( IdSampleRateInformation );
 	sendMessage( IdBufferSizeInformation );
+	if( waitForMessage( IdBufferSizeInformation ).id
+						!= IdBufferSizeInformation )
+	{
+		fprintf( stderr, "Could not get buffer size information\n" );
+	}
+	sendMessage( IdHostInfoGotten );
 }
 
 
@@ -1050,6 +1295,13 @@ RemotePluginClient::~RemotePluginClient()
 
 #ifndef USE_QT_SHMEM
 	shmdt( m_shm );
+#endif
+
+#ifndef SYNC_WITH_SHM_FIFO
+	if ( close( m_socket ) == -1)
+	{
+		fprintf( stderr, "Error freeing resources.\n" );
+	}
 #endif
 }
 
@@ -1076,9 +1328,14 @@ bool RemotePluginClient::processMessage( const message & _m )
 		case IdSampleRateInformation:
 			m_sampleRate = _m.getInt();
 			updateSampleRate();
+			reply_message.id = IdInformationUpdated;
+			reply = true;
 			break;
 
 		case IdBufferSizeInformation:
+			// Should LMMS gain the ability to change buffer size
+			// without a restart, it must wait for this message to
+			// complete processing or else risk VST crashes
 			m_bufferSize = _m.getInt();
 			updateBufferSize();
 			break;

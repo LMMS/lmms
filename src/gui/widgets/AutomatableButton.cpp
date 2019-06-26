@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2006-2011 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -25,12 +25,9 @@
 
 #include "AutomatableButton.h"
 
-#include <QCursor>
 #include <QMouseEvent>
 
 #include "CaptionMenu.h"
-#include "Engine.h"
-#include "embed.h"
 #include "MainWindow.h"
 #include "StringPairDrag.h"
 
@@ -223,7 +220,7 @@ void automatableButtonGroup::addButton( AutomatableButton * _btn )
 
 void automatableButtonGroup::removeButton( AutomatableButton * _btn )
 {
-	m_buttons.erase( qFind( m_buttons.begin(), m_buttons.end(), _btn ) );
+	m_buttons.erase( std::find( m_buttons.begin(), m_buttons.end(), _btn ) );
 	_btn->m_group = NULL;
 }
 

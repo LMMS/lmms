@@ -4,7 +4,7 @@
  * Copyright (c) 2006-2007 Danny McRae <khjklujn/at/users.sourceforge.net>
  * Copyright (c) 2006-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -26,7 +26,6 @@
 #include <QDomElement>
 
 #include "Effect.h"
-#include "Engine.h"
 #include "EffectChain.h"
 #include "EffectControls.h"
 #include "EffectView.h"
@@ -37,9 +36,8 @@
 Effect::Effect( const Plugin::Descriptor * _desc,
 			Model * _parent,
 			const Descriptor::SubPluginFeatures::Key * _key ) :
-	Plugin( _desc, _parent ),
+	Plugin( _desc, _parent, _key ),
 	m_parent( NULL ),
-	m_key( _key ? *_key : Descriptor::SubPluginFeatures::Key()  ),
 	m_processors( 1 ),
 	m_okay( true ),
 	m_noRun( false ),
@@ -118,7 +116,7 @@ Effect * Effect::instantiate( const QString& pluginName,
 				Model * _parent,
 				Descriptor::SubPluginFeatures::Key * _key )
 {
-	Plugin * p = Plugin::instantiate( pluginName, _parent, _key );
+	Plugin * p = Plugin::instantiateWithKey( pluginName, _parent, _key );
 	// check whether instantiated plugin is an effect
 	if( dynamic_cast<Effect *>( p ) != NULL )
 	{

@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -27,7 +27,11 @@
 
 #include "MidiPort.h"
 #include "MidiClient.h"
+#include "MidiDummy.h"
+#include "Note.h"
 #include "Song.h"
+
+static MidiDummy s_dummyClient;
 
 
 
@@ -59,9 +63,12 @@ MidiPort::MidiPort( const QString& name,
 	m_readableModel.setValue( m_mode == Input || m_mode == Duplex );
 	m_writableModel.setValue( m_mode == Output || m_mode == Duplex );
 
-	connect( &m_readableModel, SIGNAL( dataChanged() ), this, SLOT( updateMidiPortMode() ) );
-	connect( &m_writableModel, SIGNAL( dataChanged() ), this, SLOT( updateMidiPortMode() ) );
-	connect( &m_outputProgramModel, SIGNAL( dataChanged() ), this, SLOT( updateOutputProgram() ) );
+	connect( &m_readableModel, SIGNAL( dataChanged() ),
+			this, SLOT( updateMidiPortMode() ), Qt::DirectConnection );
+	connect( &m_writableModel, SIGNAL( dataChanged() ),
+			this, SLOT( updateMidiPortMode() ), Qt::DirectConnection );
+	connect( &m_outputProgramModel, SIGNAL( dataChanged() ),
+			this, SLOT( updateOutputProgram() ), Qt::DirectConnection );
 
 
 	// when using with non-raw-clients we can provide buttons showing
@@ -128,11 +135,11 @@ void MidiPort::processInEvent( const MidiEvent& event, const MidiTime& time )
 			{
 				return;
 			}
-		}
 
-		if( fixedInputVelocity() >= 0 && inEvent.velocity() > 0 )
-		{
-			inEvent.setVelocity( fixedInputVelocity() );
+			if( fixedInputVelocity() >= 0 && inEvent.velocity() > 0 )
+			{
+				inEvent.setVelocity( fixedInputVelocity() );
+			}
 		}
 
 		m_midiEventProcessor->processInEvent( inEvent, time );
@@ -340,7 +347,10 @@ void MidiPort::updateMidiPortMode()
 	emit writablePortsChanged();
 	emit modeChanged();
 
-	Engine::getSong()->setModified();
+	if( Engine::getSong() )
+	{
+		Engine::getSong()->setModified();
+	}
 }
 
 
@@ -406,4 +416,7 @@ void MidiPort::updateOutputProgram()
 
 
 
-
+void MidiPort::invalidateCilent()
+{
+	m_midiClient = &s_dummyClient;
+}

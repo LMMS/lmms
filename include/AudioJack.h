@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2005-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -28,7 +28,11 @@
 #include "lmmsconfig.h"
 
 #ifdef LMMS_HAVE_JACK
+#ifndef LMMS_HAVE_WEAKJACK
 #include <jack/jack.h>
+#else
+#include "weak_libjack.h"
+#endif
 
 #include <QtCore/QVector>
 #include <QtCore/QList>
@@ -37,9 +41,9 @@
 #include "AudioDevice.h"
 #include "AudioDeviceSetupWidget.h"
 
-
 class QLineEdit;
 class LcdSpinBox;
+class MidiJack;
 
 
 class AudioJack : public QObject, public AudioDevice
@@ -48,6 +52,12 @@ class AudioJack : public QObject, public AudioDevice
 public:
 	AudioJack( bool & _success_ful, Mixer* mixer );
 	virtual ~AudioJack();
+
+	// this is to allow the jack midi connection to use the same jack client connection
+	// the jack callback is handled here, we call the midi client so that it can read
+	// it's midi data during the callback
+	AudioJack * addMidiClient(MidiJack *midiClient);
+	jack_client_t * jackClient() {return m_client;};
 
 	inline static QString name()
 	{
@@ -98,6 +108,7 @@ private:
 	bool m_active;
 	bool m_stopped;
 
+	MidiJack *m_midiClient;
 	QVector<jack_port_t *> m_outputPorts;
 	jack_default_audio_sample_t * * m_tempOutBufs;
 	surroundSampleFrame * m_outBuf;

@@ -4,7 +4,7 @@
  * Copyright (c) 2006-2008 Danny McRae <khjklujn/at/users.sourceforge.net>
  * 
  * 
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -85,7 +85,7 @@ public:
 
 	inline ~malletsSynth()
 	{
-		m_voice->noteOff( 0.0 );
+		if (m_voice) {m_voice->noteOff(0.0);}
 		delete[] m_delay;
 		delete m_voice;
 	}

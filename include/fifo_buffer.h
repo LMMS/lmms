@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2007 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -64,6 +64,12 @@ public:
 		m_reader_index %= m_size;
 		m_writer_sem.release();
 		return( element );
+	}
+
+	void waitUntilRead()
+	{
+		m_writer_sem.acquire( m_size );
+		m_writer_sem.release( m_size );
 	}
 
 	bool available()

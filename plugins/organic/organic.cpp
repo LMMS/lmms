@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2006-2008 Andreas Brandmaier <andy/at/brandmaier/dot/de>
  * 
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -33,15 +33,15 @@
 #include "Engine.h"
 #include "InstrumentTrack.h"
 #include "Knob.h"
+#include "Mixer.h"
 #include "NotePlayHandle.h"
 #include "Oscillator.h"
 #include "PixmapButton.h"
-#include "templates.h"
 #include "ToolTip.h"
 
-#include "embed.cpp"
+#include "embed.h"
 
-
+#include "plugin_export.h"
 
 
 extern "C"
@@ -232,8 +232,8 @@ void organicInstrument::playNote( NotePlayHandle * _n,
 	
 	if( _n->totalFramesPlayed() == 0 || _n->m_pluginData == NULL )
 	{
-		Oscillator * oscs_l[m_numOscillators];
-		Oscillator * oscs_r[m_numOscillators];
+		Oscillator * oscs_l[NUM_OSCILLATORS];
+		Oscillator * oscs_r[NUM_OSCILLATORS];
 
 		_n->m_pluginData = new oscPtr;
 
@@ -434,7 +434,6 @@ organicInstrumentView::organicInstrumentView( Instrument * _instrument,
 	m_fx1Knob->setFixedSize( 37, 47 );
 	m_fx1Knob->setHintText( tr( "Distortion:" ), QString() );
 	m_fx1Knob->setObjectName( "fx1Knob" );
-	m_fx1Knob->setWhatsThis( tr( "The distortion knob adds distortion to the output of the instrument. " ) );
 
 	// setup volume-knob
 	m_volKnob = new organicKnob( this );
@@ -443,8 +442,6 @@ organicInstrumentView::organicInstrumentView( Instrument * _instrument,
 	m_volKnob->setFixedSize( 37, 47 );
 	m_volKnob->setHintText( tr( "Volume:" ), "%" );
 	m_volKnob->setObjectName( "volKnob" );
-	m_volKnob->setWhatsThis( tr( "The volume knob controls the volume of the output of the instrument. "
-									"It is cumulative with the instrument window's volume control. " ) );
 
 	// randomise
 	m_randBtn = new PixmapButton( this, tr( "Randomise" ) );
@@ -453,8 +450,6 @@ organicInstrumentView::organicInstrumentView( Instrument * _instrument,
 							"randomise_pressed" ) );
 	m_randBtn->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
 								"randomise" ) );
-	m_randBtn->setWhatsThis( tr( "The randomize button randomizes all knobs except the harmonics,"
-									"main volume and distortion knobs. ") );
 	
 	connect( m_randBtn, SIGNAL ( clicked() ),
 					oi, SLOT( randomiseSettings() ) );
@@ -640,9 +635,9 @@ extern "C"
 {
 
 // necessary for getting instance out of shared lib
-Plugin * PLUGIN_EXPORT lmms_plugin_main( Model *, void * _data )
+PLUGIN_EXPORT Plugin * lmms_plugin_main( Model *m, void * )
 {
-	return( new organicInstrument( static_cast<InstrumentTrack *>( _data ) ) );
+	return( new organicInstrument( static_cast<InstrumentTrack *>( m ) ) );
 }
 
 

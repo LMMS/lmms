@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -30,47 +30,60 @@
 #include <QDomElement>
 #include <QFileInfo>
 #include <QMdiArea>
-#include <QMdiSubWindow>
 #include <QMenuBar>
 #include <QMessageBox>
 #include <QShortcut>
+#include <QLibrary>
 #include <QSplitter>
 #include <QUrl>
-#include <QWhatsThis>
 
 #include "AboutDialog.h"
 #include "AudioDummy.h"
 #include "AutomationEditor.h"
 #include "BBEditor.h"
-#include "ConfigManager.h"
 #include "ControllerRackView.h"
 #include "embed.h"
 #include "Engine.h"
+#include "ExportProjectDialog.h"
 #include "FileBrowser.h"
 #include "FileDialog.h"
 #include "FxMixerView.h"
 #include "GuiApplication.h"
-#include "InstrumentTrack.h"
-#include "lmmsversion.h"
-#include "Mixer.h"
+#include "ImportFilter.h"
 #include "PianoRoll.h"
-#include "PianoView.h"
 #include "PluginBrowser.h"
 #include "PluginFactory.h"
 #include "PluginView.h"
 #include "ProjectJournal.h"
 #include "ProjectNotes.h"
+#include "ProjectRenderer.h"
+#include "RemotePlugin.h"
 #include "SetupDialog.h"
 #include "SideBar.h"
-#include "Song.h"
 #include "SongEditor.h"
-#include "SubWindow.h"
-#include "templates.h"
+#include "TextFloat.h"
+#include "TimeLineWidget.h"
 #include "ToolButton.h"
 #include "ToolPlugin.h"
 #include "VersionedSaveDialog.h"
 
+#include "lmmsversion.h"
 
+#if !defined(LMMS_BUILD_WIN32) && !defined(LMMS_BUILD_APPLE) && !defined(LMMS_BUILD_HAIKU)
+//Work around an issue on KDE5 as per https://bugs.kde.org/show_bug.cgi?id=337491#c21
+void disableAutoKeyAccelerators(QWidget* mainWindow)
+{
+	using DisablerFunc = void(*)(QWidget*);
+	QLibrary kf5WidgetsAddon("KF5WidgetsAddons", 5);
+	DisablerFunc setNoAccelerators =
+			reinterpret_cast<DisablerFunc>(kf5WidgetsAddon.resolve("_ZN19KAcceleratorManager10setNoAccelEP7QWidget"));
+	if(setNoAccelerators)
+	{
+		setNoAccelerators(mainWindow);
+	}
+	kf5WidgetsAddon.unload();
+}
+#endif
 
 
 MainWindow::MainWindow() :
@@ -83,6 +96,9 @@ MainWindow::MainWindow() :
 	m_metronomeToggle( 0 ),
 	m_session( Normal )
 {
+#if !defined(LMMS_BUILD_WIN32) && !defined(LMMS_BUILD_APPLE) && !defined(LMMS_BUILD_HAIKU)
+	disableAutoKeyAccelerators(this);
+#endif
 	setAttribute( Qt::WA_DeleteOnClose );
 
 	QWidget * main_widget = new QWidget( this );
@@ -108,7 +124,7 @@ MainWindow::MainWindow() :
 	sideBar->appendTab( new FileBrowser(
 				confMgr->userProjectsDir() + "*" +
 				confMgr->factoryProjectsDir(),
-					"*.mmp *.mmpz *.xml *.mid *.flp",
+					"*.mmp *.mmpz *.xml *.mid",
 							tr( "My Projects" ),
 					embed::getIconPixmap( "project_file" ).transformed( QTransform().rotate( 90 ) ),
 							splitter, false, true ) );
@@ -128,7 +144,7 @@ MainWindow::MainWindow() :
 	sideBar->appendTab( new FileBrowser( QDir::homePath(), "*",
 							tr( "My Home" ),
 					embed::getIconPixmap( "home" ).transformed( QTransform().rotate( 90 ) ),
-							splitter, false, true ) );
+							splitter, false, false ) );
 
 
 	QStringList root_paths;
@@ -197,7 +213,7 @@ MainWindow::MainWindow() :
 	vbox->addWidget( w );
 	setCentralWidget( main_widget );
 
-	m_updateTimer.start( 1000 / 20, this );  // 20 fps
+	m_updateTimer.start( 1000 / 60, this );  // 60 fps
 
 	if( ConfigManager::inst()->value( "ui", "enableautosave" ).toInt() )
 	{
@@ -217,6 +233,11 @@ MainWindow::MainWindow() :
 
 	connect( Engine::getSong(), SIGNAL( playbackStateChanged() ),
 				this, SLOT( updatePlayPauseIcons() ) );
+
+	connect(Engine::getSong(), SIGNAL(stopped()), SLOT(onSongStopped()));
+
+	connect(Engine::getSong(), SIGNAL(modified()), SLOT(onSongModified()));
+	connect(Engine::getSong(), SIGNAL(projectFileNameChanged()), SLOT(onProjectFileNameChanged()));
 }
 
 
@@ -245,7 +266,7 @@ MainWindow::~MainWindow()
 void MainWindow::finalize()
 {
 	resetWindowTitle();
-	setWindowIcon( embed::getIconPixmap( "icon" ) );
+	setWindowIcon( embed::getIconPixmap( "icon_small" ) );
 
 
 	// project-popup-menu
@@ -295,26 +316,29 @@ void MainWindow::finalize()
 	project_menu->addSeparator();
 	project_menu->addAction( embed::getIconPixmap( "project_import" ),
 					tr( "Import..." ),
-					Engine::getSong(),
-					SLOT( importProject() ) );
+					this,
+					SLOT( onImportProject() ) );
 	project_menu->addAction( embed::getIconPixmap( "project_export" ),
 					tr( "E&xport..." ),
-					Engine::getSong(),
-					SLOT( exportProject() ),
+					this,
+					SLOT( onExportProject() ),
 					Qt::CTRL + Qt::Key_E );
 	project_menu->addAction( embed::getIconPixmap( "project_export" ),
 					tr( "E&xport Tracks..." ),
-					Engine::getSong(),
-					SLOT( exportProjectTracks() ),
+					this,
+					SLOT( onExportProjectTracks() ),
 					Qt::CTRL + Qt::SHIFT + Qt::Key_E );
 
 	project_menu->addAction( embed::getIconPixmap( "midi_file" ),
 					tr( "Export &MIDI..." ),
-					Engine::getSong(),
-					SLOT( exportProjectMidi() ),
+					this,
+					SLOT( onExportProjectMidi() ),
 					Qt::CTRL + Qt::Key_M );
 
+// Prevent dangling separator at end of menu per https://bugreports.qt.io/browse/QTBUG-40071
+#if !(defined(LMMS_BUILD_APPLE) && (QT_VERSION < 0x050600))
 	project_menu->addSeparator();
+#endif
 	project_menu->addAction( embed::getIconPixmap( "exit" ), tr( "&Quit" ),
 					qApp, SLOT( closeAllWindows() ),
 					Qt::CTRL + Qt::Key_Q );
@@ -385,12 +409,12 @@ void MainWindow::finalize()
 							tr( "Help" ),
 							this, SLOT( help() ) );
 	}
-	help_menu->addAction( embed::getIconPixmap( "whatsthis" ),
-					tr( "What's This?" ),
-					this, SLOT( enterWhatsThisMode() ) );
 
+// Prevent dangling separator at end of menu per https://bugreports.qt.io/browse/QTBUG-40071
+#if !(defined(LMMS_BUILD_APPLE) && (QT_VERSION < 0x050600))
 	help_menu->addSeparator();
-	help_menu->addAction( embed::getIconPixmap( "icon" ), tr( "About" ),
+#endif
+	help_menu->addAction( embed::getIconPixmap( "icon_small" ), tr( "About" ),
 				  this, SLOT( aboutLMMS() ) );
 
 	// create tool-buttons
@@ -432,19 +456,13 @@ void MainWindow::finalize()
 	ToolButton * project_export = new ToolButton(
 				embed::getIconPixmap( "project_export" ),
 					tr( "Export current project" ),
-					Engine::getSong(),
-							SLOT( exportProject() ),
-								m_toolBar );
-
-	ToolButton * whatsthis = new ToolButton(
-				embed::getIconPixmap( "whatsthis" ),
-					tr( "What's this?" ),
-					this, SLOT( enterWhatsThisMode() ),
+					this,
+							SLOT( onExportProject() ),
 								m_toolBar );
 
 	m_metronomeToggle = new ToolButton(
 				embed::getIconPixmap( "metronome" ),
-				tr( "Toggle metronome" ),
+				tr( "Metronome" ),
 				this, SLOT( onToggleMetronome() ),
 							m_toolBar );
 	m_metronomeToggle->setCheckable(true);
@@ -457,109 +475,74 @@ void MainWindow::finalize()
 	m_toolBarLayout->addWidget( project_open_recent, 0, 4 );
 	m_toolBarLayout->addWidget( project_save, 0, 5 );
 	m_toolBarLayout->addWidget( project_export, 0, 6 );
-	m_toolBarLayout->addWidget( whatsthis, 0, 7 );
-	m_toolBarLayout->addWidget( m_metronomeToggle, 0, 8 );
+	m_toolBarLayout->addWidget( m_metronomeToggle, 0, 7 );
 
 
 	// window-toolbar
 	ToolButton * song_editor_window = new ToolButton(
 					embed::getIconPixmap( "songeditor" ),
-					tr( "Show/hide Song-Editor" ) + " (F5)",
+					tr( "Song Editor" ) + " (F5)",
 					this, SLOT( toggleSongEditorWin() ),
 								m_toolBar );
 	song_editor_window->setShortcut( Qt::Key_F5 );
-	song_editor_window->setWhatsThis(
-		tr( "By pressing this button, you can show or hide the "
-			"Song-Editor. With the help of the Song-Editor you can "
-			"edit song-playlist and specify when which track "
-			"should be played. "
-			"You can also insert and move samples (e.g. "
-			"rap samples) directly into the playlist." ) );
 
 
 	ToolButton * bb_editor_window = new ToolButton(
 					embed::getIconPixmap( "bb_track_btn" ),
-					tr( "Show/hide Beat+Bassline Editor" ) +
+					tr( "Beat+Bassline Editor" ) +
 									" (F6)",
 					this, SLOT( toggleBBEditorWin() ),
 								m_toolBar );
 	bb_editor_window->setShortcut( Qt::Key_F6 );
-	bb_editor_window->setWhatsThis(
-		tr( "By pressing this button, you can show or hide the "
-			"Beat+Bassline Editor. The Beat+Bassline Editor is "
-			"needed for creating beats, and for opening, adding, and "
-			"removing channels, and for cutting, copying and pasting "
-			"beat and bassline-patterns, and for other things like "
-			"that." ) );
 
 
 	ToolButton * piano_roll_window = new ToolButton(
 						embed::getIconPixmap( "piano" ),
-						tr( "Show/hide Piano-Roll" ) +
+						tr( "Piano Roll" ) +
 									" (F7)",
 					this, SLOT( togglePianoRollWin() ),
 								m_toolBar );
 	piano_roll_window->setShortcut( Qt::Key_F7 );
-	piano_roll_window->setWhatsThis(
-			tr( "Click here to show or hide the "
-				"Piano-Roll. With the help of the Piano-Roll "
-				"you can edit melodies in an easy way."
-				) );
 
 	ToolButton * automation_editor_window = new ToolButton(
 					embed::getIconPixmap( "automation" ),
-					tr( "Show/hide Automation Editor" ) +
+					tr( "Automation Editor" ) +
 									" (F8)",
 					this,
 					SLOT( toggleAutomationEditorWin() ),
 					m_toolBar );
 	automation_editor_window->setShortcut( Qt::Key_F8 );
-	automation_editor_window->setWhatsThis(
-			tr( "Click here to show or hide the "
-				"Automation Editor. With the help of the "
-				"Automation Editor you can edit dynamic values "
-				"in an easy way."
-				) );
 
 	ToolButton * fx_mixer_window = new ToolButton(
 					embed::getIconPixmap( "fx_mixer" ),
-					tr( "Show/hide FX Mixer" ) + " (F9)",
+					tr( "FX Mixer" ) + " (F9)",
 					this, SLOT( toggleFxMixerWin() ),
 					m_toolBar );
 	fx_mixer_window->setShortcut( Qt::Key_F9 );
-	fx_mixer_window->setWhatsThis(
-		tr( "Click here to show or hide the "
-			"FX Mixer. The FX Mixer is a very powerful tool "
-			"for managing effects for your song. You can insert "
-			"effects into different effect-channels." ) );
-
-	ToolButton * project_notes_window = new ToolButton(
-					embed::getIconPixmap( "project_notes" ),
-					tr( "Show/hide project notes" ) +
-								" (F10)",
-					this, SLOT( toggleProjectNotesWin() ),
-								m_toolBar );
-	project_notes_window->setShortcut( Qt::Key_F10 );
-	project_notes_window->setWhatsThis(
-		tr( "Click here to show or hide the "
-			"project notes window. In this window you can put "
-			"down your project notes.") );
 
 	ToolButton * controllers_window = new ToolButton(
 					embed::getIconPixmap( "controller" ),
 					tr( "Show/hide controller rack" ) +
-								" (F11)",
+								" (F10)",
 					this, SLOT( toggleControllerRack() ),
 								m_toolBar );
-	controllers_window->setShortcut( Qt::Key_F11 );
+	controllers_window->setShortcut( Qt::Key_F10 );
+
+	ToolButton * project_notes_window = new ToolButton(
+					embed::getIconPixmap( "project_notes" ),
+					tr( "Show/hide project notes" ) +
+								" (F11)",
+					this, SLOT( toggleProjectNotesWin() ),
+								m_toolBar );
+	project_notes_window->setShortcut( Qt::Key_F11 );
 
 	m_toolBarLayout->addWidget( song_editor_window, 1, 1 );
 	m_toolBarLayout->addWidget( bb_editor_window, 1, 2 );
 	m_toolBarLayout->addWidget( piano_roll_window, 1, 3 );
 	m_toolBarLayout->addWidget( automation_editor_window, 1, 4 );
 	m_toolBarLayout->addWidget( fx_mixer_window, 1, 5 );
-	m_toolBarLayout->addWidget( project_notes_window, 1, 6 );
-	m_toolBarLayout->addWidget( controllers_window, 1, 7 );
+	m_toolBarLayout->addWidget( controllers_window, 1, 6 );
+	m_toolBarLayout->addWidget( project_notes_window, 1, 7 );
 	m_toolBarLayout->setColumnStretch( 100, 1 );
 
 	// setup-dialog opened before?
@@ -572,7 +555,9 @@ void MainWindow::finalize()
 	}
 	// look whether mixer failed to start the audio device selected by the
 	// user and is using AudioDummy as a fallback
-	else if( Engine::mixer()->audioDevStartFailed() )
+	// or the audio device is set to invalid one
+	else if( Engine::mixer()->audioDevStartFailed() || !Mixer::isAudioDevNameValid(
+		ConfigManager::inst()->value( "mixer", "audiodev" ) ) )
 	{
 		// if so, offer the audio settings section of the setup dialog
 		SetupDialog sd( SetupDialog::AudioSettings );
@@ -647,28 +632,24 @@ SubWindow* MainWindow::addWindowedWidget(QWidget *w, Qt::WindowFlags windowFlags
 
 void MainWindow::resetWindowTitle()
 {
-	QString title = "";
+	QString title(tr( "Untitled" ));
+
 	if( Engine::getSong()->projectFileName() != "" )
 	{
 		title = QFileInfo( Engine::getSong()->projectFileName()
 							).completeBaseName();
 	}
-	if( title == "" )
-	{
-		title = tr( "Untitled" );
-	}
+
 	if( Engine::getSong()->isModified() )
 	{
 		title += '*';
 	}
+
 	if( getSession() == Recover )
 	{
 		title += " - " + tr( "Recover session. Please save your work!" );
 	}
-	if( getSession() == Limited )
-	{
-		title += " - " + tr( "Automatic backup disabled. Remember to save your work!" );
-	}
+
 	setWindowTitle( title + " - " + tr( "LMMS %1" ).arg( LMMS_VERSION ) );
 }
 
@@ -739,9 +720,9 @@ void MainWindow::clearKeyModifiers()
 
 
 
-void MainWindow::saveWidgetState( QWidget * _w, QDomElement & _de, QSize const & sizeIfInvisible )
+void MainWindow::saveWidgetState( QWidget * _w, QDomElement & _de )
 {
-	// If our widget is the main content of a window (e.g. piano roll, FxMixer, etc), 
+	// If our widget is the main content of a window (e.g. piano roll, FxMixer, etc),
 	// we really care about the position of the *window* - not the position of the widget within its window
 	if( _w->parentWidget() != NULL &&
 			_w->parentWidget()->inherits( "QMdiSubWindow" ) )
@@ -749,7 +730,7 @@ void MainWindow::saveWidgetState( QWidget * _w, QDomElement & _de, QSize const &
 		_w = _w->parentWidget();
 	}
 
-	// If the widget is a SubWindow, then we can make use of the getTrueNormalGeometry() method that 
+	// If the widget is a SubWindow, then we can make use of the getTrueNormalGeometry() method that
 	// performs the same as normalGeometry, but isn't broken on X11 ( see https://bugreports.qt.io/browse/QTBUG-256 )
 	SubWindow *asSubWindow = qobject_cast<SubWindow*>(_w);
 	QRect normalGeom = asSubWindow != nullptr ? asSubWindow->getTrueNormalGeometry() : _w->normalGeometry();
@@ -762,7 +743,7 @@ void MainWindow::saveWidgetState( QWidget * _w, QDomElement & _de, QSize const &
 	_de.setAttribute( "x", normalGeom.x() );
 	_de.setAttribute( "y", normalGeom.y() );
 
-	QSize sizeToStore = visible ? normalGeom.size() : sizeIfInvisible;
+	QSize sizeToStore = normalGeom.size();
 	_de.setAttribute( "width", sizeToStore.width() );
 	_de.setAttribute( "height", sizeToStore.height() );
 }
@@ -774,11 +755,11 @@ void MainWindow::restoreWidgetState( QWidget * _w, const QDomElement & _de )
 {
 	QRect r( qMax( 1, _de.attribute( "x" ).toInt() ),
 			qMax( 1, _de.attribute( "y" ).toInt() ),
-			qMax( 100, _de.attribute( "width" ).toInt() ),
-			qMax( 100, _de.attribute( "height" ).toInt() ) );
+			qMax( _w->sizeHint().width(), _de.attribute( "width" ).toInt() ),
+			qMax( _w->minimumHeight(), _de.attribute( "height" ).toInt() ) );
 	if( _de.hasAttribute( "visible" ) && !r.isNull() )
 	{
-		// If our widget is the main content of a window (e.g. piano roll, FxMixer, etc), 
+		// If our widget is the main content of a window (e.g. piano roll, FxMixer, etc),
 		// we really care about the position of the *window* - not the position of the widget within its window
 		if ( _w->parentWidget() != NULL &&
 			_w->parentWidget()->inherits( "QMdiSubWindow" ) )
@@ -788,7 +769,10 @@ void MainWindow::restoreWidgetState( QWidget * _w, const QDomElement & _de )
 		// first restore the window, as attempting to resize a maximized window causes graphics glitching
 		_w->setWindowState( _w->windowState() & ~(Qt::WindowMaximized | Qt::WindowMinimized) );
 
-		_w->resize( r.size() );
+		// Check isEmpty() to work around corrupt project files with empty size
+		if ( ! r.size().isEmpty() ) {
+			_w->resize( r.size() );
+		}
 		_w->move( r.topLeft() );
 
 		// set the window to its correct minimized/maximized/restored state
@@ -813,20 +797,12 @@ void MainWindow::emptySlot()
 
 
 
-void MainWindow::enterWhatsThisMode()
-{
-	QWhatsThis::enterWhatsThisMode();
-}
-
-
-
 void MainWindow::createNewProject()
 {
 	if( mayChangeProject(true) )
 	{
 		Engine::getSong()->createNewProject();
 	}
-	runAutoSave();
 }
 
 
@@ -842,10 +818,9 @@ void MainWindow::createNewProjectFromTemplate( QAction * _idx )
 				ConfigManager::inst()->factoryTemplatesDir() :
 				ConfigManager::inst()->userTemplateDir();
 
-		Engine::getSong()->createNewProjectFromTemplate(
-			dirBase + _idx->text() + ".mpt" );
+		const QString f = dirBase + _idx->text().replace("&&", "&") + ".mpt";
+		Engine::getSong()->createNewProjectFromTemplate(f);
 	}
-	runAutoSave();
 }
 
 
@@ -870,7 +845,6 @@ void MainWindow::openProject()
 			setCursor( Qt::ArrowCursor );
 		}
 	}
-	runAutoSave();
 }
 
 
@@ -881,17 +855,26 @@ void MainWindow::updateRecentlyOpenedProjectsMenu()
 	m_recentlyOpenedProjectsMenu->clear();
 	QStringList rup = ConfigManager::inst()->recentlyOpenedProjects();
 
-//	The file history goes 30 deep but we only show the 15
-//	most recent ones that we can open.
+//	The file history goes 50 deep but we only show the 15
+//	most recent ones that we can open and omit .mpt files.
 	int shownInMenu = 0;
 	for( QStringList::iterator it = rup.begin(); it != rup.end(); ++it )
 	{
 		QFileInfo recentFile( *it );
-		if ( recentFile.exists() && 
+		if ( recentFile.exists() &&
 				*it != ConfigManager::inst()->recoveryFile() )
 		{
+			if( recentFile.suffix().toLower() == "mpt" )
+			{
+				continue;
+			}
+
 			m_recentlyOpenedProjectsMenu->addAction(
-					embed::getIconPixmap( "project_file" ), *it );
+					embed::getIconPixmap( "project_file" ), it->replace("&", "&&") );
+#ifdef LMMS_BUILD_APPLE
+			m_recentlyOpenedProjectsMenu->actions().last()->setIconVisibleInMenu(false); // QTBUG-44565 workaround
+			m_recentlyOpenedProjectsMenu->actions().last()->setIconVisibleInMenu(true);
+#endif
 			shownInMenu++;
 			if( shownInMenu >= 15 )
 			{
@@ -903,18 +886,15 @@ void MainWindow::updateRecentlyOpenedProjectsMenu()
 
 
 
-
 void MainWindow::openRecentlyOpenedProject( QAction * _action )
 {
 	if ( mayChangeProject(true) )
 	{
-		const QString & f = _action->text();
+		const QString f = _action->text().replace("&&", "&");
 		setCursor( Qt::WaitCursor );
 		Engine::getSong()->loadProject( f );
-		ConfigManager::inst()->addRecentlyOpenedProject( f );
 		setCursor( Qt::ArrowCursor );
 	}
-	runAutoSave();
 }
 
 
@@ -926,15 +906,15 @@ bool MainWindow::saveProject()
 	{
 		return( saveProjectAs() );
 	}
-	else
+	else if( this->guiSaveProject() )
 	{
-		Engine::getSong()->guiSaveProject();
 		if( getSession() == Recover )
 		{
 			sessionCleanup();
 		}
+		return true;
 	}
-	return( true );
+	return false;
 }
 
 
@@ -942,7 +922,8 @@ bool MainWindow::saveProject()
 
 bool MainWindow::saveProjectAs()
 {
-	VersionedSaveDialog sfd( this, tr( "Save Project" ), "",
+	auto optionsWidget = new SaveOptionsWidget(Engine::getSong()->getSaveOptions());
+	VersionedSaveDialog sfd( this, optionsWidget, tr( "Save Project" ), "",
 			tr( "LMMS Project" ) + " (*.mmpz *.mmp);;" +
 				tr( "LMMS Project Template" ) + " (*.mpt)" );
 	QString f = Engine::getSong()->projectFileName();
@@ -956,22 +937,40 @@ bool MainWindow::saveProjectAs()
 		sfd.setDirectory( ConfigManager::inst()->userProjectsDir() );
 	}
 
+	// Don't write over file with suffix if no suffix is provided.
+	QString suffix = ConfigManager::inst()->value( "app",
+							"nommpz" ).toInt() == 0
+						? "mmpz"
+						: "mmp" ;
+	sfd.setDefaultSuffix( suffix );
+
 	if( sfd.exec () == FileDialog::Accepted &&
 		!sfd.selectedFiles().isEmpty() && sfd.selectedFiles()[0] != "" )
 	{
 		QString fname = sfd.selectedFiles()[0] ;
-		if( sfd.selectedNameFilter().contains( "(*.mpt)" ) && !sfd.selectedFiles()[0].endsWith( ".mpt" ) )
+		if( sfd.selectedNameFilter().contains( "(*.mpt)" ) )
 		{
-			fname += ".mpt";
+			// Remove the default suffix
+			fname.remove( "." + suffix );
+			if( !sfd.selectedFiles()[0].endsWith( ".mpt" ) )
+			{
+				if( VersionedSaveDialog::fileExistsQuery( fname + ".mpt",
+						tr( "Save project template" ) ) )
+				{
+					fname += ".mpt";
+				}
+			}
 		}
-		Engine::getSong()->guiSaveProjectAs( fname );
-		if( getSession() == Recover )
+		if( this->guiSaveProjectAs( fname ) )
 		{
-			sessionCleanup();
+			if( getSession() == Recover )
+			{
+				sessionCleanup();
+			}
+			return true;
 		}
-		return( true );
 	}
-	return( false );
+	return false;
 }
 
 
@@ -989,8 +988,7 @@ bool MainWindow::saveProjectAsNewVersion()
 		do 		VersionedSaveDialog::changeFileNameVersion( fileName, true );
 		while 	( QFile( fileName ).exists() );
 
-		Engine::getSong()->guiSaveProjectAs( fileName );
-		return true;
+		return this->guiSaveProjectAs( fileName );
 	}
 }
 
@@ -1184,14 +1182,13 @@ void MainWindow::updateViewMenu()
 			      tr( "FX Mixer" ) + " (F9)",
 			      this, SLOT( toggleFxMixerWin() )
 		);
-	m_viewMenu->addAction(embed::getIconPixmap( "project_notes" ),
-			      tr( "Project Notes" ) +	" (F10)",
-			      this, SLOT( toggleProjectNotesWin() )
-		);
 	m_viewMenu->addAction(embed::getIconPixmap( "controller" ),
-			      tr( "Controller Rack" ) +
-			      " (F11)",
+			      tr( "Controller Rack" ) + " (F10)",
 			      this, SLOT( toggleControllerRack() )
+		);
+	m_viewMenu->addAction(embed::getIconPixmap( "project_notes" ),
+			      tr( "Project Notes" ) + " (F11)",
+			      this, SLOT( toggleProjectNotesWin() )
 		);
 
 	m_viewMenu->addSeparator();
@@ -1200,10 +1197,10 @@ void MainWindow::updateViewMenu()
 	// that is safe to change on the fly. There is probably some
 	// more elegant way to do this.
 	QAction *qa;
-	qa = new QAction(tr( "Volume as dBV" ), this);
-	qa->setData("displaydbv");
+	qa = new QAction(tr( "Volume as dBFS" ), this);
+	qa->setData("displaydbfs");
 	qa->setCheckable( true );
-	qa->setChecked( ConfigManager::inst()->value( "app", "displaydbv" ).toInt() );
+	qa->setChecked( ConfigManager::inst()->value( "app", "displaydbfs" ).toInt() );
 	m_viewMenu->addAction(qa);
 
 	// Maybe this is impossible?
@@ -1244,9 +1241,9 @@ void MainWindow::updateConfig( QAction * _who )
 	QString tag = _who->data().toString();
 	bool checked = _who->isChecked();
 
-	if( tag == "displaydbv" )
+	if( tag == "displaydbfs" )
 	{
-		ConfigManager::inst()->setValue( "app", "displaydbv",
+		ConfigManager::inst()->setValue( "app", "displaydbfs",
 						 QString::number(checked) );
 	}
 	else if ( tag == "tooltips" )
@@ -1356,8 +1353,8 @@ void MainWindow::closeEvent( QCloseEvent * _ce )
 	if( mayChangeProject(true) )
 	{
 		// delete recovery file
-		if( ConfigManager::inst()->value( "ui", "enableautosave" ).toInt()
-			&& getSession() != Limited )
+		if( ConfigManager::inst()->
+				value( "ui", "enableautosave" ).toInt() )
 		{
 			sessionCleanup();
 			_ce->accept();
@@ -1454,35 +1451,32 @@ void MainWindow::fillTemplatesMenu()
 {
 	m_templatesMenu->clear();
 
-	QDir user_d( ConfigManager::inst()->userTemplateDir() );
-	QStringList templates = user_d.entryList( QStringList( "*.mpt" ),
-						QDir::Files | QDir::Readable );
+	auto addTemplatesFromDir = [this]( QDir dir ) {
+		QStringList templates = dir.entryList( QStringList( "*.mpt" ),
+							QDir::Files | QDir::Readable );
 
-	m_custom_templates_count = templates.count();
-	for( QStringList::iterator it = templates.begin();
-						it != templates.end(); ++it )
-	{
-		m_templatesMenu->addAction(
-					embed::getIconPixmap( "project_file" ),
-					( *it ).left( ( *it ).length() - 4 ) );
-	}
+		if ( templates.size() && ! m_templatesMenu->actions().isEmpty() )
+		{
+			m_templatesMenu->addSeparator();
+		}
 
-	QDir d( ConfigManager::inst()->factoryProjectsDir() + "templates" );
-	templates = d.entryList( QStringList( "*.mpt" ),
-						QDir::Files | QDir::Readable );
+		for( QStringList::iterator it = templates.begin();
+							it != templates.end(); ++it )
+		{
+			m_templatesMenu->addAction(
+						embed::getIconPixmap( "project_file" ),
+						( *it ).left( ( *it ).length() - 4 ).replace("&", "&&") );
+#ifdef LMMS_BUILD_APPLE
+			m_templatesMenu->actions().last()->setIconVisibleInMenu(false); // QTBUG-44565 workaround
+			m_templatesMenu->actions().last()->setIconVisibleInMenu(true);
+#endif
+		}
 
+		return templates.size();
+	};
 
-	if( m_custom_templates_count > 0 && !templates.isEmpty() )
-	{
-		m_templatesMenu->addSeparator();
-	}
-	for( QStringList::iterator it = templates.begin();
-						it != templates.end(); ++it )
-	{
-		m_templatesMenu->addAction(
-					embed::getIconPixmap( "project_file" ),
-					( *it ).left( ( *it ).length() - 4 ) );
-	}
+	m_custom_templates_count = addTemplatesFromDir( ConfigManager::inst()->userTemplateDir() );
+	addTemplatesFromDir( ConfigManager::inst()->factoryProjectsDir() + "templates" );
 }
 
 
@@ -1502,7 +1496,7 @@ void MainWindow::showTool( QAction * _idx )
 void MainWindow::browseHelp()
 {
 	// file:// alternative for offline help
-	QString url = "http://lmms.sf.net/wiki/index.php?title=Main_Page";
+	QString url = "https://lmms.io/documentation/";
 	QDesktopServices::openUrl( url );
 	// TODO: Handle error
 }
@@ -1512,9 +1506,13 @@ void MainWindow::browseHelp()
 
 void MainWindow::autoSave()
 {
-	if( !( Engine::getSong()->isPlaying() ||
-			Engine::getSong()->isExporting() ||
-				QApplication::mouseButtons() ) )
+	if( !Engine::getSong()->isExporting() &&
+		!Engine::getSong()->isLoadingProject() &&
+		!RemotePluginBase::isMainThreadWaiting() &&
+		!QApplication::mouseButtons() &&
+		( ConfigManager::inst()->value( "ui",
+				"enablerunningautosave" ).toInt() ||
+			! Engine::getSong()->isPlaying() ) )
 	{
 		Engine::getSong()->saveProjectFile(ConfigManager::inst()->recoveryFile());
 		autoSaveTimerReset();  // Reset timer
@@ -1529,15 +1527,242 @@ void MainWindow::autoSave()
 	}
 }
 
-
-// For the occasional auto save action that isn't run
-// from the timer where we need to do extra tests.
-void MainWindow::runAutoSave()
+void MainWindow::onExportProjectMidi()
 {
-	if( ConfigManager::inst()->value( "ui", "enableautosave" ).toInt() &&
-		getSession() != Limited )
+	FileDialog efd( this );
+
+	efd.setFileMode( FileDialog::AnyFile );
+
+	QStringList types;
+	types << tr("MIDI File (*.mid)");
+	efd.setNameFilters( types );
+	QString base_filename;
+	QString const & projectFileName = Engine::getSong()->projectFileName();
+	if( !projectFileName.isEmpty() )
 	{
-		autoSave();
-		autoSaveTimerReset();  // Reset timer
+		efd.setDirectory( QFileInfo( projectFileName ).absolutePath() );
+		base_filename = QFileInfo( projectFileName ).completeBaseName();
 	}
+	else
+	{
+		efd.setDirectory( ConfigManager::inst()->userProjectsDir() );
+		base_filename = tr( "untitled" );
+	}
+	efd.selectFile( base_filename + ".mid" );
+	efd.setDefaultSuffix( "mid");
+	efd.setWindowTitle( tr( "Select file for project-export..." ) );
+
+	efd.setAcceptMode( FileDialog::AcceptSave );
+
+
+	if( efd.exec() == QDialog::Accepted && !efd.selectedFiles().isEmpty() && !efd.selectedFiles()[0].isEmpty() )
+	{
+		const QString suffix = ".mid";
+
+		QString export_filename = efd.selectedFiles()[0];
+		if (!export_filename.endsWith(suffix)) export_filename += suffix;
+
+		Engine::getSong()->exportProjectMidi(export_filename);
+	}
+}
+
+void MainWindow::exportProject(bool multiExport)
+{
+	QString const & projectFileName = Engine::getSong()->projectFileName();
+
+	FileDialog efd( gui->mainWindow() );
+
+	if ( multiExport )
+	{
+		efd.setFileMode( FileDialog::Directory);
+		efd.setWindowTitle( tr( "Select directory for writing exported tracks..." ) );
+		if( !projectFileName.isEmpty() )
+		{
+			efd.setDirectory( QFileInfo( projectFileName ).absolutePath() );
+		}
+	}
+	else
+	{
+		efd.setFileMode( FileDialog::AnyFile );
+		int idx = 0;
+		QStringList types;
+		while( ProjectRenderer::fileEncodeDevices[idx].m_fileFormat != ProjectRenderer::NumFileFormats)
+		{
+			if(ProjectRenderer::fileEncodeDevices[idx].isAvailable()) {
+				types << tr(ProjectRenderer::fileEncodeDevices[idx].m_description);
+			}
+			++idx;
+		}
+		efd.setNameFilters( types );
+		QString baseFilename;
+		if( !projectFileName.isEmpty() )
+		{
+			efd.setDirectory( QFileInfo( projectFileName ).absolutePath() );
+			baseFilename = QFileInfo( projectFileName ).completeBaseName();
+		}
+		else
+		{
+			efd.setDirectory( ConfigManager::inst()->userProjectsDir() );
+			baseFilename = tr( "untitled" );
+		}
+		efd.selectFile( baseFilename + ProjectRenderer::fileEncodeDevices[0].m_extension );
+		efd.setWindowTitle( tr( "Select file for project-export..." ) );
+	}
+
+	QString suffix = "wav";
+	efd.setDefaultSuffix( suffix );
+	efd.setAcceptMode( FileDialog::AcceptSave );
+
+	if( efd.exec() == QDialog::Accepted && !efd.selectedFiles().isEmpty() &&
+					 !efd.selectedFiles()[0].isEmpty() )
+	{
+
+		QString exportFileName = efd.selectedFiles()[0];
+		if ( !multiExport )
+		{
+			int stx = efd.selectedNameFilter().indexOf( "(*." );
+			int etx = efd.selectedNameFilter().indexOf( ")" );
+
+			if ( stx > 0 && etx > stx )
+			{
+				// Get first extension from selected dropdown.
+				// i.e. ".wav" from "WAV-File (*.wav), Dummy-File (*.dum)"
+				suffix = efd.selectedNameFilter().mid( stx + 2, etx - stx - 2 ).split( " " )[0].trimmed();
+				exportFileName.remove( "." + suffix, Qt::CaseInsensitive );
+				if ( efd.selectedFiles()[0].endsWith( suffix ) )
+				{
+					if( VersionedSaveDialog::fileExistsQuery( exportFileName + suffix,
+							tr( "Save project" ) ) )
+					{
+						exportFileName += suffix;
+					}
+				}
+			}
+		}
+
+		ExportProjectDialog epd( exportFileName, gui->mainWindow(), multiExport );
+		epd.exec();
+	}
+}
+
+void MainWindow::handleSaveResult(QString const & filename, bool songSavedSuccessfully)
+{
+	if (songSavedSuccessfully)
+	{
+		TextFloat::displayMessage( tr( "Project saved" ), tr( "The project %1 is now saved.").arg( filename ),
+				embed::getIconPixmap( "project_save", 24, 24 ), 2000 );
+		ConfigManager::inst()->addRecentlyOpenedProject(filename);
+		resetWindowTitle();
+	}
+	else
+	{
+		TextFloat::displayMessage( tr( "Project NOT saved." ), tr( "The project %1 was not saved!" ).arg(filename),
+				embed::getIconPixmap( "error" ), 4000 );
+	}
+}
+
+bool MainWindow::guiSaveProject()
+{
+	Song * song = Engine::getSong();
+	bool const songSaveResult = song->guiSaveProject();
+	handleSaveResult(song->projectFileName(), songSaveResult);
+
+	return songSaveResult;
+}
+
+bool MainWindow::guiSaveProjectAs( const QString & filename )
+{
+	Song * song = Engine::getSong();
+	bool const songSaveResult = song->guiSaveProjectAs(filename);
+	handleSaveResult(filename, songSaveResult);
+
+	return songSaveResult;
+}
+
+void MainWindow::onExportProject()
+{
+	this->exportProject();
+}
+
+void MainWindow::onExportProjectTracks()
+{
+	this->exportProject(true);
+}
+
+void MainWindow::onImportProject()
+{
+	Song * song = Engine::getSong();
+
+	if (song)
+	{
+		FileDialog ofd( nullptr, tr( "Import file" ),
+				ConfigManager::inst()->userProjectsDir(),
+				tr("MIDI sequences") +
+				" (*.mid *.midi *.rmi);;" +
+				tr("Hydrogen projects") +
+				" (*.h2song);;" +
+				tr("All file types") +
+				" (*.*)");
+
+		ofd.setFileMode( FileDialog::ExistingFiles );
+		if( ofd.exec () == QDialog::Accepted && !ofd.selectedFiles().isEmpty() )
+		{
+			ImportFilter::import( ofd.selectedFiles()[0], song );
+		}
+
+		song->setLoadOnLauch(false);
+	}
+}
+
+void MainWindow::onSongStopped()
+{
+	Song * song = Engine::getSong();
+	Song::PlayPos const & playPos = song->getPlayPos();
+
+	TimeLineWidget * tl = playPos.m_timeLine;
+
+	if( tl )
+	{
+		SongEditorWindow* songEditor = gui->songEditor();
+		switch( tl->behaviourAtStop() )
+		{
+			case TimeLineWidget::BackToZero:
+				if( songEditor && ( tl->autoScroll() == TimeLineWidget::AutoScrollEnabled ) )
+				{
+					songEditor->m_editor->updatePosition(0);
+				}
+				break;
+
+			case TimeLineWidget::BackToStart:
+				if( tl->savedPos() >= 0 )
+				{
+					if(songEditor && ( tl->autoScroll() == TimeLineWidget::AutoScrollEnabled ) )
+					{
+						songEditor->m_editor->updatePosition( MidiTime(tl->savedPos().getTicks() ) );
+					}
+					tl->savePos( -1 );
+				}
+				break;
+
+			case TimeLineWidget::KeepStopPosition:
+				break;
+		}
+	}
+}
+
+void MainWindow::onSongModified()
+{
+	// Only update the window title if the code is executed from the GUI main thread.
+	// The assumption seems to be that the Song can also be set as modified from other
+	// threads. This is not a good design! Copied from the original implementation of
+	// Song::setModified.
+	if(QThread::currentThread() == this->thread())
+	{
+		this->resetWindowTitle();
+	}
+}
+
+void MainWindow::onProjectFileNameChanged()
+{
+	this->resetWindowTitle();
 }

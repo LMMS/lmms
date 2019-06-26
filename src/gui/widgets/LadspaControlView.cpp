@@ -4,7 +4,7 @@
  * Copyright (c) 2006-2008 Danny McRae <khjklujn/at/users.sourceforge.net>
  * Copyright (c) 2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -60,7 +60,7 @@ LadspaControlView::LadspaControlView( QWidget * _parent,
 		case TOGGLED:
 		{
 			LedCheckBox * toggle = new LedCheckBox(
-				m_ctl->port()->name, this, QString::null, LedCheckBox::Green );
+				m_ctl->port()->name, this, QString(), LedCheckBox::Green );
 			toggle->setModel( m_ctl->toggledModel() );
 			layout->addWidget( toggle );
 			if( link != NULL )
@@ -77,6 +77,7 @@ LadspaControlView::LadspaControlView( QWidget * _parent,
 		}
 
 		case INTEGER:
+		case ENUM:
 		case FLOATING:
 			knb = new Knob( knobBright_26, this, m_ctl->port()->name );
 			break;
@@ -101,7 +102,6 @@ LadspaControlView::LadspaControlView( QWidget * _parent,
 		}
 		knb->setLabel( m_ctl->port()->name );
 		knb->setHintText( tr( "Value:" ), "" );
-		knb->setWhatsThis( tr( "Sorry, no help available." ) );
 		layout->addWidget( knb );
 		if( link != NULL )
 		{

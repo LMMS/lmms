@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -28,14 +28,10 @@
 #include "InstrumentFunctions.h"
 #include "InstrumentFunctionViews.h"
 #include "ComboBox.h"
-#include "embed.h"
-#include "Engine.h"
 #include "GroupBox.h"
 #include "gui_templates.h"
 #include "Knob.h"
-#include "PixmapButton.h"
 #include "TempoSyncKnob.h"
-#include "ToolTip.h"
 
 
 InstrumentFunctionNoteStackingView::InstrumentFunctionNoteStackingView( InstrumentFunctionNoteStacking* cc, QWidget* parent ) :
@@ -61,10 +57,6 @@ InstrumentFunctionNoteStackingView::InstrumentFunctionNoteStackingView( Instrume
 
 	m_chordRangeKnob->setLabel( tr( "RANGE" ) );
 	m_chordRangeKnob->setHintText( tr( "Chord range:" ), " " + tr( "octave(s)" ) );
-	m_chordRangeKnob->setWhatsThis(
-		tr( "Use this knob for setting the chord range in octaves. "
-			"The selected chord will be played within specified "
-			"number of octaves." ) );
 
 	mainLayout->addWidget( chordLabel, 0, 0 );
 	mainLayout->addWidget( m_chordsComboBox, 1, 0 );
@@ -103,6 +95,9 @@ InstrumentFunctionArpeggioView::InstrumentFunctionArpeggioView( InstrumentFuncti
 	m_arpGroupBox( new GroupBox( tr( "ARPEGGIO" ) ) ),
 	m_arpComboBox( new ComboBox() ),
 	m_arpRangeKnob( new Knob( knobBright_26 ) ),
+	m_arpCycleKnob( new Knob( knobBright_26 ) ),
+	m_arpSkipKnob( new Knob( knobBright_26 ) ),
+	m_arpMissKnob( new Knob( knobBright_26 ) ),
 	m_arpTimeKnob( new TempoSyncKnob( knobBright_26 ) ),
 	m_arpGateKnob( new Knob( knobBright_26 ) ),
 	m_arpDirectionComboBox( new ComboBox() ),
@@ -118,40 +113,29 @@ InstrumentFunctionArpeggioView::InstrumentFunctionArpeggioView( InstrumentFuncti
 	mainLayout->setHorizontalSpacing( 20 );
 	mainLayout->setVerticalSpacing( 1 );
 
-	m_arpGroupBox->setWhatsThis(
-		tr( "An arpeggio is a method playing (especially plucked) "
-			"instruments, which makes the music much livelier. "
-			"The strings of such instruments (e.g. harps) are "
-			"plucked like chords. The only difference is that "
-			"this is done in a sequential order, so the notes are "
-			"not played at the same time. Typical arpeggios are "
-			"major or minor triads, but there are a lot of other "
-			"possible chords, you can select." ) );
-
-
 	m_arpRangeKnob->setLabel( tr( "RANGE" ) );
 	m_arpRangeKnob->setHintText( tr( "Arpeggio range:" ), " " + tr( "octave(s)" ) );
-	m_arpRangeKnob->setWhatsThis(
-		tr( "Use this knob for setting the arpeggio range in octaves. "
-			"The selected arpeggio will be played within specified "
-			"number of octaves." ) );
+
+
+	m_arpCycleKnob->setLabel( tr( "CYCLE" ) );
+	m_arpCycleKnob->setHintText( tr( "Cycle notes:" ) + " ", " " + tr( "note(s)" ) );
+
+
+	m_arpSkipKnob->setLabel( tr( "SKIP" ) );
+	m_arpSkipKnob->setHintText( tr( "Skip rate:" ), tr( "%" ) );
+
+
+	m_arpMissKnob->setLabel( tr( "MISS" ) );
+	m_arpMissKnob->setHintText( tr( "Miss rate:" ), tr( "%" ) );
 
 
 	m_arpTimeKnob->setLabel( tr( "TIME" ) );
 	m_arpTimeKnob->setHintText( tr( "Arpeggio time:" ), " " + tr( "ms" ) );
-	m_arpTimeKnob->setWhatsThis(
-		tr( "Use this knob for setting the arpeggio time in "
-			"milliseconds. The arpeggio time specifies how long "
-			"each arpeggio-tone should be played." ) );
 
 
 	m_arpGateKnob->setLabel( tr( "GATE" ) );
 	m_arpGateKnob->setHintText( tr( "Arpeggio gate:" ), tr( "%" ) );
-	m_arpGateKnob->setWhatsThis(
-		tr( "Use this knob for setting the arpeggio gate. The "
-			"arpeggio gate specifies the percent of a whole "
-			"arpeggio-tone that should be played. With this you "
-			"can make cool staccato arpeggios." ) );
+
 
 	QLabel* arpChordLabel = new QLabel( tr( "Chord:" ) );
 	arpChordLabel->setFont( pointSize<8>( arpChordLabel->font() ) );
@@ -170,8 +154,11 @@ InstrumentFunctionArpeggioView::InstrumentFunctionArpeggioView( InstrumentFuncti
 	mainLayout->addWidget( m_arpModeComboBox, 7, 0 );
 
 	mainLayout->addWidget( m_arpRangeKnob, 0, 1, 2, 1, Qt::AlignHCenter );
-	mainLayout->addWidget( m_arpTimeKnob, 3, 1, 2, 1, Qt::AlignHCenter );
+	mainLayout->addWidget( m_arpCycleKnob, 0, 2, 2, 1, Qt::AlignHCenter );
+	mainLayout->addWidget( m_arpSkipKnob, 3, 1, 2, 1, Qt::AlignHCenter );
+	mainLayout->addWidget( m_arpMissKnob, 3, 2, 2, 1, Qt::AlignHCenter );
 	mainLayout->addWidget( m_arpGateKnob, 6, 1, 2, 1, Qt::AlignHCenter );
+	mainLayout->addWidget( m_arpTimeKnob, 6, 2, 2, 1, Qt::AlignHCenter );
 
 	mainLayout->setRowMinimumHeight( 2, 10 );
 	mainLayout->setRowMinimumHeight( 5, 10 );
@@ -194,6 +181,9 @@ void InstrumentFunctionArpeggioView::modelChanged()
 	m_arpGroupBox->setModel( &m_a->m_arpEnabledModel );
 	m_arpComboBox->setModel( &m_a->m_arpModel );
 	m_arpRangeKnob->setModel( &m_a->m_arpRangeModel );
+	m_arpCycleKnob->setModel( &m_a->m_arpCycleModel );
+	m_arpSkipKnob->setModel( &m_a->m_arpSkipModel );
+	m_arpMissKnob->setModel( &m_a->m_arpMissModel );
 	m_arpTimeKnob->setModel( &m_a->m_arpTimeModel );
 	m_arpGateKnob->setModel( &m_a->m_arpGateModel );
 	m_arpDirectionComboBox->setModel( &m_a->m_arpDirectionModel );

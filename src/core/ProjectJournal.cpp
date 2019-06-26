@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2006-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -28,6 +28,10 @@
 #include "Engine.h"
 #include "JournallingObject.h"
 #include "Song.h"
+
+//! Avoid clashes between loaded IDs (have the bit cleared)
+//! and newly created IDs (have the bit set)
+static const int EO_ID_MSB = 1 << 23;
 
 const int ProjectJournal::MAX_UNDO_STATES = 100; // TODO: make this configurable in settings
 
@@ -131,11 +135,9 @@ void ProjectJournal::addJournalCheckPoint( JournallingObject *jo )
 
 jo_id_t ProjectJournal::allocID( JournallingObject * _obj )
 {
-	const jo_id_t EO_ID_MAX = (1 << 23)-1;
 	jo_id_t id;
-	while( m_joIDs.contains( id =
-			static_cast<jo_id_t>( (jo_id_t)rand()*(jo_id_t)rand() %
-								 EO_ID_MAX ) ) )
+	for( jo_id_t tid = rand(); m_joIDs.contains( id = tid % EO_ID_MSB
+							| EO_ID_MSB ); tid++ )
 	{
 	}
 
@@ -154,6 +156,19 @@ void ProjectJournal::reallocID( const jo_id_t _id, JournallingObject * _obj )
 	{
 		m_joIDs[_id] = _obj;
 	}
+}
+
+
+
+
+jo_id_t ProjectJournal::idToSave( jo_id_t id )
+{
+	return id & ~EO_ID_MSB;
+}
+
+jo_id_t ProjectJournal::idFromSave( jo_id_t id )
+{
+	return id | EO_ID_MSB;
 }
 
 

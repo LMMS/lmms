@@ -1,0 +1,91 @@
+<?xml version="1.0"?>
+<!DOCTYPE lmms-project>
+<lmms-project type="song" version="1.0" creator="LMMS" creatorversion="1.2.0">
+  <head timesig_denominator="4" bpm="140" masterpitch="0" mastervol="100" timesig_numerator="4"/>
+  <song>
+    <trackcontainer visible="1" width="580" height="159" type="song" x="425" y="16" maximized="0" minimized="0">
+      <track type="1" muted="0" name="Beat/Bassline 0" solo="0">
+        <bbtrack>
+          <trackcontainer visible="1" width="580" height="249" type="bbtrackcontainer" x="426" y="182" maximized="0" minimized="0">
+            <track type="0" muted="0" name="Jupiter" solo="0">
+              <instrumenttrack pitch="0" vol="29" fxch="0" pan="0" basenote="57" usemasterpitch="1" pitchrange="1">
+                <instrument name="tripleoscillator">
+                  <tripleoscillator finel0="0" vol1="100" finel1="-16" coarse0="0" finer0="0" vol2="63" pan0="0" finer1="13" coarse1="0" finel2="0" pan1="0" coarse2="12" finer2="0" pan2="0" wavetype0="2" wavetype1="2" wavetype2="3" phoffset0="0" phoffset1="266" phoffset2="80" modalgo1="2" modalgo2="0" modalgo3="2" stphdetun0="121" stphdetun1="259" stphdetun2="92" userwavefile0="" userwavefile1="" userwavefile2="samples/shapes/smooth_inv_saw.ogg" vol0="100"/>
+                </instrument>
+                <eldata fwet="1" ftype="7" fres="1.2" fcut="1754">
+                  <elvol lspd="0.1" ctlenvamt="0" lpdel="0" pdel="0" amt="1" hold="0" syncmode="0" userwavefile="" latt="0" sustain="1" lamt="0" lshp="0" lspd_denominator="4" lspd_numerator="4" x100="0" rel="0.328" dec="0.597" att="0"/>
+                  <elcut lspd="0.2918" ctlenvamt="1" lpdel="0" pdel="0" amt="0.82" hold="0" syncmode="0" userwavefile="" latt="0" sustain="0.002" lamt="0.63" lshp="1" lspd_denominator="4" lspd_numerator="4" x100="0" rel="0.016" dec="0.136" att="0"/>
+                  <elres lspd="0.1" ctlenvamt="0" lpdel="0" pdel="0" amt="0" hold="0.499" syncmode="0" userwavefile="" latt="0" sustain="0.501" lamt="0" lshp="0" lspd_denominator="4" lspd_numerator="4" x100="0" rel="0.1" dec="0.499" att="0"/>
+                </eldata>
+                <chordcreator chordrange="1" chord="0" chord-enabled="1"/>
+                <arpeggiator arpdir="0" arpgate="100" arptime_denominator="4" syncmode="0" arp-enabled="0" arprange="2" arptime_numerator="4" arpmode="0" arp="8" arptime="158"/>
+                <midiport inputchannel="0" fixedinputvelocity="-1" outputcontroller="0" outputchannel="1" fixedoutputvelocity="-1" readable="0" fixedoutputnote="-1" outputprogram="1" writable="0" basevelocity="127" inputcontroller="0"/>
+                <fxchain numofeffects="0" enabled="0"/>
+              </instrumenttrack>
+              <pattern type="1" muted="0" steps="16" name="Jupiter" pos="0" len="192">
+                <note key="72" vol="100" pos="0" pan="0" len="12"/>
+                <note key="65" vol="84" pos="12" pan="0" len="12"/>
+                <note key="56" vol="64" pos="18" pan="0" len="12"/>
+                <note key="68" vol="46" pos="24" pan="0" len="12"/>
+                <note key="72" vol="54" pos="24" pan="0" len="12"/>
+                <note key="61" vol="64" pos="36" pan="0" len="12"/>
+                <note key="53" vol="34" pos="42" pan="0" len="12"/>
+                <note key="68" vol="16" pos="48" pan="0" len="12"/>
+                <note key="60" vol="42" pos="60" pan="0" len="12"/>
+                <note key="72" vol="6" pos="72" pan="0" len="12"/>
+                <note key="53" vol="34" pos="84" pan="0" len="12"/>
+                <note key="72" vol="100" pos="96" pan="0" len="12"/>
+                <note key="65" vol="88" pos="108" pan="0" len="12"/>
+                <note key="68" vol="58" pos="120" pan="0" len="12"/>
+                <note key="72" vol="52" pos="120" pan="0" len="12"/>
+                <note key="61" vol="66" pos="132" pan="0" len="12"/>
+                <note key="68" vol="16" pos="144" pan="0" len="12"/>
+                <note key="60" vol="56" pos="156" pan="0" len="12"/>
+                <note key="72" vol="6" pos="168" pan="0" len="12"/>
+                <note key="53" vol="50" pos="180" pan="0" len="12"/>
+              </pattern>
+            </track>
+          </trackcontainer>
+        </bbtrack>
+        <bbtco usestyle="1" muted="0" name="Beat/Baseline 0" pos="0" len="1536" color="4282417407"/>
+      </track>
+    </trackcontainer>
+    <track type="6" muted="0" name="Automation track" solo="0">
+      <automationtrack/>
+      <automationpattern prog="0" mute="0" name="Tempo" pos="0" tens="1" len="192">
+        <time pos="0" value="140"/>
+      </automationpattern>
+      <automationpattern prog="0" mute="0" name="Master volume" pos="0" tens="1" len="192">
+        <time pos="0" value="100"/>
+      </automationpattern>
+      <automationpattern prog="0" mute="0" name="Master pitch" pos="0" tens="1" len="192">
+        <time pos="0" value="0"/>
+      </automationpattern>
+      <automationpattern prog="0" mute="0" name="Numerator" pos="0" tens="1" len="192"/>
+      <automationpattern prog="0" mute="0" name="Denominator" pos="0" tens="1" len="192"/>
+      <automationpattern prog="0" mute="0" name="Tempo" pos="0" tens="1" len="192"/>
+      <automationpattern prog="0" mute="0" name="Master volume" pos="0" tens="1" len="192"/>
+      <automationpattern prog="0" mute="0" name="Master pitch" pos="0" tens="1" len="192"/>
+    </track>
+    <fxmixer visible="1" width="647" height="332" x="9" y="441" maximized="0" minimized="0">
+      <fxchannel num="0" muted="0" volume="1" name="Master" soloed="0">
+        <fxchain numofeffects="0" enabled="0"/>
+      </fxchannel>
+    </fxmixer>
+    <ControllerRackView visible="1" width="258" height="173" x="664" y="444" maximized="0" minimized="0"/>
+    <pianoroll visible="0" width="640" height="480" x="1" y="1" maximized="1" minimized="0"/>
+    <automationeditor visible="0" width="640" height="400" x="356" y="129" maximized="0" minimized="0"/>
+    <projectnotes visible="1" width="408" height="394" x="9" y="16" maximized="0" minimized="0"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
+<html><head><meta name="qrichtext" content="1" /><style type="text/css">
+p, li { white-space: pre-wrap; }
+</style></head><body style=" font-family:'Verdana'; font-size:11pt; font-weight:600; font-style:normal;">
+<p style=" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-family:'Bitstream Vera Sans'; font-size:12pt; font-style:italic; color:#ffcc00;">How to edit dynamic note-volumes:</span></p>
+<p style=" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-family:'Bitstream Vera Sans'; color:#00ffff;">1.</span><span style=" font-family:'Bitstream Vera Sans'; color:#cbcbcb;"> Open the piano-roll by double-clicking the the pattern in Beat+Baseline-Editor.</span></p>
+<p style=" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-family:'Bitstream Vera Sans'; color:#00ffff;">2.</span><span style=" font-family:'Bitstream Vera Sans'; color:#cbcbcb;"> Now in the middle you can see several notes and at the bottom there's a line for each note whose length indicates the volume of the according note.</span></p>
+<p style=" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-family:'Bitstream Vera Sans'; color:#00ffff;">3.</span><span style=" font-family:'Bitstream Vera Sans'; color:#cbcbcb;"> Try to change the volume of some notes by changing the length of these lines with the mouse.</span></p>
+<p style=" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-family:'Bitstream Vera Sans'; color:#00ffff;">4.</span><span style=" font-family:'Bitstream Vera Sans'; color:#cbcbcb;"> Listen to the result by clicking on the &quot;play&quot;-button!</span></p>
+<p style=" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-family:'Bitstream Vera Sans'; color:#cbcbcb;">(</span><span style=" font-family:'Bitstream Vera Sans'; color:#00ffff;">5.</span><span style=" font-family:'Bitstream Vera Sans'; color:#cbcbcb;"> Create your own tracks with dynamic note-volumes!!)</span></p></body></html>]]></projectnotes>
+    <timeline lp0pos="0" lp1pos="192" lpstate="0"/>
+    <controllers/>
+  </song>
+</lmms-project>

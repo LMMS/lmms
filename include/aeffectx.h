@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2006 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -26,10 +26,15 @@
 #ifndef AEFFECTX_H
 #define AEFFECTX_H
 
-#define CCONST(a, b, c, d)( ( ( (int) a ) << 24 ) |		\
-				( ( (int) b ) << 16 ) |		\
-				( ( (int) c ) << 8 ) |		\
-				( ( (int) d ) << 0 ) )
+#include <stdint.h>
+
+// Calling convention
+#define VST_CALL_CONV __cdecl
+
+#define CCONST(a, b, c, d)( ( ( (int32_t) a ) << 24 ) |		\
+				( ( (int32_t) b ) << 16 ) |		\
+				( ( (int32_t) c ) << 8 ) |		\
+				( ( (int32_t) d ) << 0 ) )
 
 const int audioMasterAutomate = 0;
 const int audioMasterVersion = 1;
@@ -101,9 +106,9 @@ const int effEditOpen = 14;
 const int effEditClose = 15;
 const int effEditIdle = 19;
 const int effEditTop = 20;
+const int effSetChunk = 24;
 const int effProcessEvents = 25;
 const int effGetEffectName = 45;
-const int effGetParameterProperties = 47; // missing
 const int effGetVendorString = 47;
 const int effGetProductString = 48;
 const int effGetVendorVersion = 49;
@@ -114,42 +119,50 @@ const int kEffectMagic = CCONST( 'V', 's', 't', 'P' );
 const int kVstLangEnglish = 1;
 const int kVstMidiType = 1;
 
+const int kVstTransportChanged = 1;
 const int kVstTransportPlaying = 1 << 1;
 const int kVstTransportCycleActive = 1 << 2;
-const int kVstTransportChanged = 1;
+const int kVstTransportRecording = 1 << 3; // currently unused
+const int kVstPpqPosValid = 1 << 9;
+const int kVstTempoValid = 1 << 10;
+const int kVstBarsValid = 1 << 11;
+const int kVstCyclePosValid = 1 << 12;
+const int kVstTimeSigValid = 1 << 13;
+const int kVstSmpteValid = 1 << 14; // currently unused
+const int kVstClockValid = 1 << 15; // currently unused
 
-/* validity flags for a VstTimeInfo structure, this info comes from the web */
+// currently unused
+const int kVstSmpte24fps = 0;
+const int kVstSmpte25fps = 1;
+const int kVstSmpte2997fps = 2;
+const int kVstSmpte30fps = 3;
+const int kVstSmpte2997dfps = 4;
+const int kVstSmpte30dfps = 5;
+const int kVstSmpteFilm16mm = 6; // very likely
+const int kVstSmpteFilm35mm = 7; // very likely
+const int kVstSmpte239fps = 10;
+const int kVstSmpte249fps = 11;
+const int kVstSmpte599fps = 12;
+const int kVstSmpte60fps = 13;
 
-const int kVstNanosValid (1 << 8);
-const int kVstPpqPosValid (1 << 9);
-const int kVstTempoValid (1 << 10);
-const int kVstBarsValid (1 << 11);
-const int kVstCyclePosValid (1 << 12);
-const int kVstTimeSigValid (1 << 13);
-const int kVstSmpteValid (1 << 14);
-const int kVstClockValid (1 << 15);
 
-
-
-
-class RemoteVstPlugin;
 
 
 class VstMidiEvent
 {
 public:
 	// 00
-	int type;
+	int32_t type;
 	// 04
-	int byteSize;
+	int32_t byteSize;
 	// 08
-	int deltaFrames;
+	int32_t deltaFrames;
 	// 0c?
-	int flags;
+	int32_t flags;
 	// 10?
-	int noteLength;
+	int32_t noteLength;
 	// 14?
-	int noteOffset;
+	int32_t noteOffset;
 	// 18
 	char midiData[4];
 	// 1c?
@@ -179,7 +192,7 @@ class VstEvents
 {
 public:
 	// 00
-	int numEvents;
+	int32_t numEvents;
 	// 04
 	void *reserved;
 	// 08
@@ -188,83 +201,37 @@ public:
 } ;
 
 
-/* constants from http://www.rawmaterialsoftware.com/juceforum/viewtopic.php?t=3740&sid=183f74631fee71a493316735e2b9f28b */
-enum Vestige2StringConstants
-{
-        VestigeMaxNameLen       = 64,
-        VestigeMaxLabelLen      = 64,
-        VestigeMaxShortLabelLen = 8,
-        VestigeMaxCategLabelLen = 24,
-        VestigeMaxFileNameLen   = 100
-};
-
-
-/* this struct taken from http://asseca.com/vst-24-specs/efGetParameterProperties.html */
-struct VstParameterProperties
-{
-    float stepFloat;              /* float step */
-    float smallStepFloat;         /* small float step */
-    float largeStepFloat;         /* large float step */
-    char label[VestigeMaxLabelLen];  /* parameter label */
-    int32_t flags;               /* @see VstParameterFlags */
-    int32_t minInteger;          /* integer minimum */
-    int32_t maxInteger;          /* integer maximum */
-    int32_t stepInteger;         /* integer step */
-    int32_t largeStepInteger;    /* large integer step */
-    char shortLabel[VestigeMaxShortLabelLen]; /* short label, recommended: 6 + delimiter */
-    int16_t displayIndex;        /* index where this parameter should be displayed (starting with 0) */
-    int16_t category;            /* 0: no category, else group index + 1 */
-    int16_t numParametersInCategory; /* number of parameters in category */
-    int16_t reserved;            /* zero */
-    char categoryLabel[VestigeMaxCategLabelLen]; /* category label, e.g. "Osc 1"  */
-    char future[16];              /* reserved for future use */
-};
-
-
-/* this enum taken from http://asseca.com/vst-24-specs/efGetParameterProperties.html */
-enum VstParameterFlags
-{
-        kVstParameterIsSwitch                = 1 << 0,  /* parameter is a switch (on/off) */
-        kVstParameterUsesIntegerMinMax       = 1 << 1,  /* minInteger, maxInteger valid */
-        kVstParameterUsesFloatStep           = 1 << 2,  /* stepFloat, smallStepFloat, largeStepFloat valid */
-        kVstParameterUsesIntStep             = 1 << 3,  /* stepInteger, largeStepInteger valid */
-        kVstParameterSupportsDisplayIndex    = 1 << 4,  /* displayIndex valid */
-        kVstParameterSupportsDisplayCategory = 1 << 5,  /* category, etc. valid */
-        kVstParameterCanRamp                 = 1 << 6   /* set if parameter value can ramp up/down */
-};
-
-
 class AEffect
 {
 public:
 	// Never use virtual functions!!!
 	// 00-03
-	int magic;
+	int32_t magic;
 	// dispatcher 04-07
-	intptr_t (* dispatcher)( AEffect * , int , int , intptr_t, void * , float );
+	intptr_t (VST_CALL_CONV * dispatcher)( AEffect * , int32_t , int32_t , intptr_t, void * , float );
 	// process, quite sure 08-0b
-	void (* process)( AEffect * , float * * , float * * , int );
+	void (VST_CALL_CONV * process)( AEffect * , float * * , float * * , int32_t );
 	// setParameter 0c-0f
-	void (* setParameter)( AEffect * , int , float );
+	void (VST_CALL_CONV * setParameter)( AEffect * , int32_t , float );
 	// getParameter 10-13
-	float (* getParameter)( AEffect * , int );
+	float (VST_CALL_CONV * getParameter)( AEffect * , int32_t );
 	// programs 14-17
-	int numPrograms;
+	int32_t numPrograms;
 	// Params 18-1b
-	int numParams;
+	int32_t numParams;
 	// Input 1c-1f
-	int numInputs;
+	int32_t numInputs;
 	// Output 20-23
-	int numOutputs;
+	int32_t numOutputs;
 	// flags 24-27
-	int flags;
+	int32_t flags;
 	// Fill somewhere 28-2b
 	void *ptr1;
 	void *ptr2;
 	// Zeroes 2c-2f 30-33 34-37 38-3b
 	char empty3[4 + 4 + 4];
 	// 1.0f 3c-3f
-	float unkown_float;
+	float unknown_float;
 	// An object? pointer 40-43
 	void *ptr3;
 	// Zeroes 44-47
@@ -274,7 +241,7 @@ public:
 	// Don't know 4c-4f
 	char unknown1[4];
 	// processReplacing 50-53
-	void (* processReplacing)( AEffect * , float * * , float * * , int );
+	void (VST_CALL_CONV * processReplacing)( AEffect * , float * * , float * * , int );
 
 } ;
 
@@ -292,22 +259,24 @@ public:
 	double nanoSeconds;
 	// 18
 	double ppqPos;
-	// 20?
+	// 20
 	double tempo;
 	// 28
 	double barStartPos;
-	// 30?
+	// 30
 	double cycleStartPos;
-	// 38?
+	// 38
 	double cycleEndPos;
-	// 40?
+	// 40
 	int32_t timeSigNumerator;
-	// 44?
+	// 44
 	int32_t timeSigDenominator;
-
-    int32_t   smpteOffset;
-    int32_t   smpteFrameRate;
-    int32_t   samplesToNextClock;
+	// 48 unused
+	int32_t smpteOffset;
+	// 4c unused
+	int32_t smpteFrameRate;
+	// 50? unused, where does this come from?
+	int32_t samplesToNextClock;
 	// 54
 	int32_t flags;
 
@@ -315,7 +284,7 @@ public:
 
 
 
-typedef intptr_t (* audioMasterCallback)( AEffect * , int32_t, int32_t, intptr_t, void * , float );
+typedef intptr_t (VST_CALL_CONV * audioMasterCallback)( AEffect * , int32_t, int32_t, intptr_t, void * , float );
 
 
 #endif

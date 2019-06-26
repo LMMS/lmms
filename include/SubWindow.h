@@ -5,7 +5,7 @@
  *
  * Copyright (c) 2015 Colin Wallace <wallace.colin.a@gmail.com>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -34,14 +34,21 @@
 #include <QPushButton>
 #include <QString>
 
-#include "export.h"
+#include "lmms_export.h"
 
 class QMoveEvent;
 class QResizeEvent;
 class QWidget;
 
-
-class EXPORT SubWindow : public QMdiSubWindow
+/**
+ * @brief The SubWindow class
+ * 
+ *  Because of a bug in the QMdiSubWindow class to save the right position and size
+ *  of a subwindow in a project and because of the inability
+ *  for cusomizing the title bar appearance, lmms implements its own subwindow
+ *  class.
+ */
+class LMMS_EXPORT SubWindow : public QMdiSubWindow
 {
 	Q_OBJECT
 	Q_PROPERTY( QBrush activeColor READ activeColor WRITE setActiveColor )
@@ -64,12 +71,15 @@ protected:
 	virtual void moveEvent( QMoveEvent * event );
 	virtual void resizeEvent( QResizeEvent * event );
 	virtual void paintEvent( QPaintEvent * pe );
-	
+	virtual void changeEvent( QEvent * event );
+
+signals:
+	void focusLost();
+
 private:
 	const QSize m_buttonSize;
 	const int m_titleBarHeight;
 	QPushButton * m_closeBtn;
-	QPushButton * m_minimizeBtn;
 	QPushButton * m_maximizeBtn;
 	QPushButton * m_restoreBtn;
 	QBrush m_activeColor;
@@ -79,8 +89,13 @@ private:
 	QRect m_trackedNormalGeom;
 	QLabel * m_windowTitle;
 	QGraphicsDropShadowEffect * m_shadow;
+	bool m_hasFocus;
 
 	static void elideText( QLabel *label, QString text );
+	void adjustTitleBar();
+
+private slots:
+	void focusChanged( QMdiSubWindow * subWindow );
 };
 
 #endif

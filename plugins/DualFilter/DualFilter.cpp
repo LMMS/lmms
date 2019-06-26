@@ -4,7 +4,7 @@
  * Copyright (c) 2014 Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>
  * Copyright (c) 2006-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -25,9 +25,9 @@
 
 #include "DualFilter.h"
 
-#include "embed.cpp"
+#include "embed.h"
 #include "BasicFilters.h"
-
+#include "plugin_export.h"
 
 extern "C"
 {
@@ -222,7 +222,7 @@ extern "C"
 {
 
 // necessary for getting instance out of shared lib
-Plugin * PLUGIN_EXPORT lmms_plugin_main( Model* parent, void* data )
+PLUGIN_EXPORT Plugin * lmms_plugin_main( Model* parent, void* data )
 {
 	return new DualFilterEffect( parent, static_cast<const Plugin::Descriptor::SubPluginFeatures::Key *>( data ) );
 }

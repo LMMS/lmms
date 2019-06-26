@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -26,20 +26,15 @@
 
 #include <QAction>
 #include <QKeyEvent>
-#include <QLabel>
 #include <QLayout>
-#include <QMdiArea>
 
 #include "ComboBox.h"
 #include "BBTrackContainer.h"
 #include "embed.h"
 #include "MainWindow.h"
 #include "Song.h"
-#include "ConfigManager.h"
-#include "DataFile.h"
 #include "StringPairDrag.h"
 
-#include "TrackContainer.h"
 #include "Pattern.h"
 
 
@@ -62,25 +57,17 @@ BBEditor::BBEditor( BBTrackContainer* tc ) :
 					  "compacttrackbuttons" ).toInt() )
 	{
 		setMinimumWidth( TRACK_OP_WIDTH_COMPACT + DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT
-			     + 2 * TCO_BORDER_WIDTH + 264 );
+			     + 2 * TCO_BORDER_WIDTH + 384 );
 	}
 	else
 	{
 		setMinimumWidth( TRACK_OP_WIDTH + DEFAULT_SETTINGS_WIDGET_WIDTH
-			     + 2 * TCO_BORDER_WIDTH + 264 );
+			     + 2 * TCO_BORDER_WIDTH + 384 );
 	}
 
 
 	m_playAction->setToolTip(tr( "Play/pause current beat/bassline (Space)" ));
 	m_stopAction->setToolTip(tr( "Stop playback of current beat/bassline (Space)" ));
-
-	m_playAction->setWhatsThis(
-		tr( "Click here to play the current "
-			"beat/bassline.  The beat/bassline is automatically "
-			"looped when its end is reached." ) );
-	m_stopAction->setWhatsThis(
-		tr( "Click here to stop playing of current "
-							"beat/bassline." ) );
 
 
 	// Beat selector
@@ -99,6 +86,10 @@ BBEditor::BBEditor( BBTrackContainer* tc ) :
 
 	trackAndStepActionsToolBar->addAction(embed::getIconPixmap("add_bb_track"), tr("Add beat/bassline"),
 						 Engine::getSong(), SLOT(addBBTrack()));
+	trackAndStepActionsToolBar->addAction(
+				embed::getIconPixmap("add_sample_track"),
+				tr("Add sample-track"), m_trackContainerView,
+				SLOT(addSampleTrack()));
 	trackAndStepActionsToolBar->addAction(embed::getIconPixmap("add_automation"), tr("Add automation-track"),
 						 m_trackContainerView, SLOT(addAutomationTrack()));
 
@@ -210,6 +201,14 @@ void BBTrackContainerView::removeSteps()
 
 
 
+void BBTrackContainerView::addSampleTrack()
+{
+	(void) Track::create( Track::SampleTrack, model() );
+}
+
+
+
+
 void BBTrackContainerView::addAutomationTrack()
 {
 	(void) Track::create( Track::AutomationTrack, model() );
@@ -230,7 +229,7 @@ void BBTrackContainerView::removeBBView(int bb)
 
 void BBTrackContainerView::saveSettings(QDomDocument& doc, QDomElement& element)
 {
-	MainWindow::saveWidgetState(parentWidget(), element, QSize( 640, 400 ) );
+	MainWindow::saveWidgetState( parentWidget(), element );
 }
 
 void BBTrackContainerView::loadSettings(const QDomElement& element)
@@ -251,7 +250,25 @@ void BBTrackContainerView::dropEvent(QDropEvent* de)
 		DataFile dataFile( value.toUtf8() );
 		Track * t = Track::create( dataFile.content().firstChild().toElement(), model() );
 
-		t->deleteTCOs();
+		// Ensure BB TCOs exist
+		bool hasValidBBTCOs = false;
+		if (t->getTCOs().size() == m_bbtc->numOfBBs())
+		{
+			hasValidBBTCOs = true;
+			for (int i = 0; i < t->getTCOs().size(); ++i)
+			{
+				if (t->getTCOs()[i]->startPosition() != MidiTime(i, 0))
+				{
+					hasValidBBTCOs = false;
+					break;
+				}
+			}
+		}
+		if (!hasValidBBTCOs)
+		{
+			t->deleteTCOs();
+			t->createTCOsForBB(m_bbtc->numOfBBs() - 1);
+		}
 		m_bbtc->updateAfterTrackAdd();
 
 		de->accept();

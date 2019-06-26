@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -25,15 +25,15 @@
 #ifndef AUDIO_DEVICE_H
 #define AUDIO_DEVICE_H
 
-#include <QtCore/QPair>
 #include <QtCore/QMutex>
-#include <QtCore/QThread>
+#include <samplerate.h>
 
-#include "Mixer.h"
-#include "TabWidget.h"
+#include "lmms_basics.h"
 
 
 class AudioPort;
+class Mixer;
+class QThread;
 
 
 class AudioDevice
@@ -132,6 +132,8 @@ protected:
 	}
 
 	bool hqAudio() const;
+
+	static void stopProcessingThread( QThread * thread );
 
 
 protected:

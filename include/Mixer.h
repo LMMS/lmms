@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -25,28 +25,15 @@
 #ifndef MIXER_H
 #define MIXER_H
 
-#include "denormals.h"
-
-#include "lmmsconfig.h"
-
-#ifndef LMMS_USE_3RDPARTY_LIBSRC
-#include <samplerate.h>
-#else
-#ifndef OUT_OF_TREE_BUILD
-#include "src/3rdparty/samplerate/samplerate.h"
-#else
-#include <samplerate.h>
-#endif
-#endif
-
-
 #include <QtCore/QMutex>
 #include <QtCore/QThread>
 #include <QtCore/QVector>
 #include <QtCore/QWaitCondition>
+#include <samplerate.h>
 
 
 #include "lmms_basics.h"
+#include "LocklessList.h"
 #include "Note.h"
 #include "fifo_buffer.h"
 #include "MixerProfiler.h"
@@ -79,7 +66,7 @@ const Octaves BaseOctave = DefaultOctave;
 class MixerWorkerThread;
 
 
-class EXPORT Mixer : public QObject
+class LMMS_EXPORT Mixer : public QObject
 {
 	Q_OBJECT
 public:
@@ -168,9 +155,13 @@ public:
 
 	void initDevices();
 	void clear();
+	void clearNewPlayHandles();
 
 
 	// audio-device-stuff
+
+	// Returns the current audio device's name. This is not necessarily
+	// the user's preferred audio device, in case you were thinking that.
 	inline const QString & audioDevName() const
 	{
 		return m_audioDevName;
@@ -180,10 +171,15 @@ public:
 		return m_audioDevStartFailed;
 	}
 
-	void setAudioDevice( AudioDevice * _dev );
+	//! Set new audio device. Old device will be deleted,
+	//! unless it's stored using storeAudioDevice
+	void setAudioDevice( AudioDevice * _dev , bool startNow );
+	//! See overloaded function
 	void setAudioDevice( AudioDevice * _dev,
 				const struct qualitySettings & _qs,
-							bool _needs_fifo );
+				bool _needs_fifo,
+				bool startNow );
+	void storeAudioDevice();
 	void restoreAudioDevice();
 	inline AudioDevice * audioDev()
 	{
@@ -194,9 +190,9 @@ public:
 	// audio-port-stuff
 	inline void addAudioPort( AudioPort * _port )
 	{
-		lock();
+		requestChangeInModel();
 		m_audioPorts.push_back( _port );
-		unlock();
+		doneChangeInModel();
 	}
 
 	void removeAudioPort( AudioPort * _port );
@@ -225,8 +221,6 @@ public:
 	}
 
 	void removePlayHandlesOfTypes( Track * _track, const quint8 types );
-
-	bool hasNotePlayHandles();
 
 
 	// methods providing information for other classes
@@ -283,38 +277,13 @@ public:
 	}
 
 
-	// methods needed by other threads to alter knob values, waveforms, etc
-	void lock()
+	struct StereoSample
 	{
-		m_globalMutex.lock();
-	}
-
-	void unlock()
-	{
-		m_globalMutex.unlock();
-	}
-
-	void lockInputFrames()
-	{
-		m_inputFramesMutex.lock();
-	}
-
-	void unlockInputFrames()
-	{
-		m_inputFramesMutex.unlock();
-	}
-
-	void lockPlayHandleRemoval()
-	{
-		m_playHandleRemovalMutex.lock();
-	}
-
-	void unlockPlayHandleRemoval()
-	{
-		m_playHandleRemovalMutex.unlock();
-	}
-
-	void getPeakValues( sampleFrame * _ab, const f_cnt_t _frames, float & peakLeft, float & peakRight ) const;
+		StereoSample(sample_t _left, sample_t _right) : left(_left), right(_right) {}
+		sample_t left;
+		sample_t right;
+	};
+	StereoSample getPeakValues(sampleFrame * _ab, const f_cnt_t _frames) const;
 
 
 	bool criticalXRuns() const;
@@ -346,6 +315,12 @@ public:
 	inline bool isMetronomeActive() const { return m_metronomeActive; }
 	inline void setMetronomeActive(bool value = true) { m_metronomeActive = value; }
 
+	void requestChangeInModel();
+	void doneChangeInModel();
+
+	static bool isAudioDevNameValid(QString name);
+	static bool isMidiDevNameValid(QString name);
+
 
 signals:
 	void qualitySettingsChanged();
@@ -371,6 +346,8 @@ private:
 
 		virtual void run();
 
+		void write( surroundSampleFrame * buffer );
+
 	} ;
 
 
@@ -387,7 +364,11 @@ private:
 
 	const surroundSampleFrame * renderNextBuffer();
 
+	void clearInternal();
 
+	void runChangesInModel();
+
+	bool m_renderOnly;
 
 	QVector<AudioPort *> m_audioPorts;
 
@@ -413,14 +394,18 @@ private:
 
 	// playhandle stuff
 	PlayHandleList m_playHandles;
-	PlayHandleList m_newPlayHandles;	// place where new playhandles are added temporarily
+	// place where new playhandles are added temporarily
+	LocklessList<PlayHandle *> m_newPlayHandles;
 	ConstPlayHandleList m_playHandlesToRemove;
 
 
 	struct qualitySettings m_qualitySettings;
 	float m_masterGain;
 
+	bool m_isProcessing;
+
 	// audio device stuff
+	void doSetAudioDevice( AudioDevice *_dev );
 	AudioDevice * m_audioDev;
 	AudioDevice * m_oldAudioDev;
 	QString m_audioDevName;
@@ -430,12 +415,6 @@ private:
 	MidiClient * m_midiClient;
 	QString m_midiClientName;
 
-	// mutexes
-	QMutex m_globalMutex;
-	QMutex m_inputFramesMutex;
-	QMutex m_playHandleMutex;			// mutex used only for adding playhandles
-	QMutex m_playHandleRemovalMutex;
-
 	// FIFO stuff
 	fifo * m_fifo;
 	fifoWriter * m_fifoWriter;
@@ -444,8 +423,21 @@ private:
 
 	bool m_metronomeActive;
 
+	bool m_clearSignal;
+
+	bool m_changesSignal;
+	unsigned int m_changes;
+	QMutex m_changesMutex;
+	QMutex m_doChangesMutex;
+	QMutex m_waitChangesMutex;
+	QWaitCondition m_changesMixerCondition;
+	QWaitCondition m_changesRequestCondition;
+
+	bool m_waitingForWrite;
+
 	friend class LmmsCore;
 	friend class MixerWorkerThread;
+	friend class ProjectRenderer;
 
 } ;
 

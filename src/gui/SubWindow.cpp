@@ -2,10 +2,12 @@
  * SubWindow.cpp - Implementation of QMdiSubWindow that correctly tracks
  *   the geometry that windows should be restored to.
  *   Workaround for https://bugreports.qt.io/browse/QTBUG-256
+ *   This implementation adds a custom themed title bar to
+ *   the subwindow.
  *
  * Copyright (c) 2015 Colin Wallace <wallace.colin.a@gmail.com>
- *
- * This file is part of LMMS - http://lmms.io
+ * Copyright (c) 2016 Steffen Baranowsky <baramgb@freenet.de>
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -28,15 +30,17 @@
 
 #include <QMdiArea>
 #include <QMoveEvent>
-#include <QResizeEvent>
+#include <QScrollBar>
 
 #include "embed.h"
+
 
 
 SubWindow::SubWindow( QWidget *parent, Qt::WindowFlags windowFlags ) :
 	QMdiSubWindow( parent, windowFlags ),
 	m_buttonSize( 17, 17 ),
-	m_titleBarHeight( 24 )
+	m_titleBarHeight( 24 ),
+	m_hasFocus( false )
 {
 	// initialize the tracked geometry to whatever Qt thinks the normal geometry currently is.
 	// this should always work, since QMdiSubWindows will not start as maximized
@@ -47,28 +51,28 @@ SubWindow::SubWindow( QWidget *parent, Qt::WindowFlags windowFlags ) :
 	m_textShadowColor = Qt::black;
 	m_borderColor = Qt::black;
 
-	// close, minimize, maximize and restore (after minimizing) buttons
-	m_closeBtn = new QPushButton( embed::getIconPixmap( "close" ), QString::null, this );
+	// close, maximize and restore (after maximizing) buttons
+	m_closeBtn = new QPushButton( embed::getIconPixmap( "close" ), QString(), this );
 	m_closeBtn->resize( m_buttonSize );
 	m_closeBtn->setFocusPolicy( Qt::NoFocus );
+	m_closeBtn->setCursor( Qt::ArrowCursor );
+	m_closeBtn->setAttribute( Qt::WA_NoMousePropagation );
 	m_closeBtn->setToolTip( tr( "Close" ) );
 	connect( m_closeBtn, SIGNAL( clicked( bool ) ), this, SLOT( close() ) );
 
-	m_maximizeBtn = new QPushButton( embed::getIconPixmap( "maximize" ), QString::null, this );
+	m_maximizeBtn = new QPushButton( embed::getIconPixmap( "maximize" ), QString(), this );
 	m_maximizeBtn->resize( m_buttonSize );
 	m_maximizeBtn->setFocusPolicy( Qt::NoFocus );
+	m_maximizeBtn->setCursor( Qt::ArrowCursor );
+	m_maximizeBtn->setAttribute( Qt::WA_NoMousePropagation );
 	m_maximizeBtn->setToolTip( tr( "Maximize" ) );
 	connect( m_maximizeBtn, SIGNAL( clicked( bool ) ), this, SLOT( showMaximized() ) );
 
-	m_minimizeBtn = new QPushButton( embed::getIconPixmap( "minimize" ), QString::null, this );
-	m_minimizeBtn->resize( m_buttonSize );
-	m_minimizeBtn->setFocusPolicy( Qt::NoFocus );
-	m_minimizeBtn->setToolTip( tr( "Minimize" ) );
-	connect( m_minimizeBtn, SIGNAL( clicked( bool ) ), this, SLOT( showMinimized() ) );
-
-	m_restoreBtn = new QPushButton( embed::getIconPixmap( "restore" ), QString::null, this );
+	m_restoreBtn = new QPushButton( embed::getIconPixmap( "restore" ), QString(), this );
 	m_restoreBtn->resize( m_buttonSize );
 	m_restoreBtn->setFocusPolicy( Qt::NoFocus );
+	m_restoreBtn->setCursor( Qt::ArrowCursor );
+	m_restoreBtn->setAttribute( Qt::WA_NoMousePropagation );
 	m_restoreBtn->setToolTip( tr( "Restore" ) );
 	connect( m_restoreBtn, SIGNAL( clicked( bool ) ), this, SLOT( showNormal() ) );
 
@@ -80,17 +84,33 @@ SubWindow::SubWindow( QWidget *parent, Qt::WindowFlags windowFlags ) :
 
 	m_windowTitle = new QLabel( this );
 	m_windowTitle->setFocusPolicy( Qt::NoFocus );
+	m_windowTitle->setAttribute( Qt::WA_TransparentForMouseEvents, true );
 	m_windowTitle->setGraphicsEffect( m_shadow );
+
+	// disable the minimize button
+	setWindowFlags( Qt::SubWindow | Qt::WindowMaximizeButtonHint |
+		Qt::WindowSystemMenuHint | Qt::WindowCloseButtonHint |
+		Qt::CustomizeWindowHint );
+	connect( mdiArea(), SIGNAL( subWindowActivated( QMdiSubWindow* ) ), this, SLOT( focusChanged( QMdiSubWindow* ) ) );
 }
 
 
 
 
+/**
+ * @brief SubWindow::paintEvent
+ * 
+ *  This draws our new title bar with custom colors
+ *  and draws a window icon on the left upper corner.
+ */
 void SubWindow::paintEvent( QPaintEvent * )
 {
 	QPainter p( this );
 	QRect rect( 0, 0, width(), m_titleBarHeight );
-	bool isActive = SubWindow::mdiArea()->activeSubWindow() == this;
+
+	bool isActive = mdiArea()
+			? mdiArea()->activeSubWindow() == this
+			: false;
 
 	p.fillRect( rect, isActive ? activeColor() : p.pen().brush() );
 
@@ -103,13 +123,46 @@ void SubWindow::paintEvent( QPaintEvent * )
 	p.drawLine( width() - 1, m_titleBarHeight, width() - 1, height() - 1 );
 
 	// window icon
-	QPixmap winicon( widget()->windowIcon().pixmap( m_buttonSize ) );
-	p.drawPixmap( 3, 3, m_buttonSize.width(), m_buttonSize.height(), winicon );
+	if( widget() )
+	{
+		QPixmap winicon( widget()->windowIcon().pixmap( m_buttonSize ) );
+		p.drawPixmap( 3, 3, m_buttonSize.width(), m_buttonSize.height(), winicon );
+	}
 }
 
 
 
 
+/**
+ * @brief SubWindow::changeEvent
+ * 
+ * Triggers if the window title changes and calls adjustTitleBar().
+ * @param event
+ */
+void SubWindow::changeEvent( QEvent *event )
+{
+	QMdiSubWindow::changeEvent( event );
+
+	if( event->type() == QEvent::WindowTitleChange )
+	{
+		adjustTitleBar();
+	}
+
+}
+
+
+
+
+/**
+ * @brief SubWindow::elideText
+ * 
+ *  Stores the given text into the given label.
+ *  Shorts the text if it's too big for the labels width
+ *  ans adds three dots (...)
+ * 
+ * @param label - holds a pointer to the QLabel
+ * @param text  - the text which will be stored (and if needed breaked down) into the QLabel.
+ */
 void SubWindow::elideText( QLabel *label, QString text )
 {
 	QFontMetrics metrix( label->font() );
@@ -121,6 +174,12 @@ void SubWindow::elideText( QLabel *label, QString text )
 
 
 
+/**
+ * @brief SubWindow::getTrueNormalGeometry
+ * 
+ *  same as QWidet::normalGeometry, but works properly under X11
+ *  see https://bugreports.qt.io/browse/QTBUG-256
+ */
 QRect SubWindow::getTrueNormalGeometry() const
 {
 	return m_trackedNormalGeom;
@@ -176,7 +235,15 @@ void SubWindow::setBorderColor( const QColor &c )
 
 
 
-
+/**
+ * @brief SubWindow::moveEvent
+ * 
+ *  overides the QMdiSubWindow::moveEvent() for saving the position
+ *  of the subwindow into m_trackedNormalGeom. This position
+ *  will be saved with the project because of an Qt bug wich doesn't
+ *  save the right position. look at: https://bugreports.qt.io/browse/QTBUG-256
+ * @param event
+ */
 void SubWindow::moveEvent( QMoveEvent * event )
 {
 	QMdiSubWindow::moveEvent( event );
@@ -191,10 +258,17 @@ void SubWindow::moveEvent( QMoveEvent * event )
 
 
 
-void SubWindow::resizeEvent( QResizeEvent * event )
+/**
+ * @brief SubWindow::adjustTitleBar
+ * 
+ *  Our title bar needs buttons for maximize/restore and close in the right upper corner.
+ *  We check if the subwindow is maximizable and put the buttons on the right positions.
+ *  At next we calculate the width of the title label and call elideText() for adding
+ *  the window title to m_windowTitle (which is a QLabel)
+ */
+void SubWindow::adjustTitleBar()
 {
 	// button adjustments
-	m_minimizeBtn->hide();
 	m_maximizeBtn->hide();
 	m_restoreBtn->hide();
 
@@ -202,7 +276,7 @@ void SubWindow::resizeEvent( QResizeEvent * event )
 	const int buttonGap = 1;
 	const int menuButtonSpace = 24;
 
-	QPoint rightButtonPos( width() - rightSpace - m_buttonSize.width() , 3 );
+	QPoint rightButtonPos( width() - rightSpace - m_buttonSize.width(), 3 );
 	QPoint middleButtonPos( width() - rightSpace - ( 2 * m_buttonSize.width() ) - buttonGap, 3 );
 	QPoint leftButtonPos( width() - rightSpace - ( 3 * m_buttonSize.width() ) - ( 2 * buttonGap ), 3 );
 
@@ -214,62 +288,85 @@ void SubWindow::resizeEvent( QResizeEvent * event )
 	// the close button is always needed and on the rightButtonPos
 	m_closeBtn->move( rightButtonPos );
 
-	// here we ask: is the Subwindow maximizable and/or minimizable
+	// here we ask: is the Subwindow maximizable and
 	// then we set the buttons and show them if needed
 	if( windowFlags() & Qt::WindowMaximizeButtonHint )
 	{
 		buttonBarWidth = buttonBarWidth + m_buttonSize.width() + buttonGap;
 		m_maximizeBtn->move( middleButtonPos );
-		m_maximizeBtn->show();
+		m_restoreBtn->move( middleButtonPos );
+		m_maximizeBtn->setHidden( isMaximized() );
 	}
 
-	if( windowFlags() & Qt::WindowMinimizeButtonHint )
-	{
-		buttonBarWidth = buttonBarWidth + m_buttonSize.width() + buttonGap;
-		if( m_maximizeBtn->isHidden() )
-		{
-			m_minimizeBtn->move( middleButtonPos );
-		}
-		else
-		{
-			m_minimizeBtn->move( leftButtonPos );
-		}
-		m_minimizeBtn->show();
-		m_restoreBtn->hide();
-		if( isMinimized() )
-		{
-			if( m_maximizeBtn->isHidden() )
-			{
-				m_restoreBtn->move( middleButtonPos );
-			}
-			else
-			{
-				m_restoreBtn->move( leftButtonPos );
-			}
-			m_restoreBtn->show();
-			m_minimizeBtn->hide();
-		}
-	}
-
-	// title QLabel adjustments
-	m_windowTitle->setAlignment( Qt::AlignHCenter );
-	m_windowTitle->setFixedWidth( widget()->width() - ( menuButtonSpace + buttonBarWidth ) );
-	m_windowTitle->move( menuButtonSpace,
-		( m_titleBarHeight / 2 ) - ( m_windowTitle->sizeHint().height() / 2 ) - 1 );
-
-	// if minimized we can't use widget()->width(). We have to hard code the width,
-	// as the width of all minimized windows is the same.
+	// we're keeping the restore button around if we open projects
+	// from older versions that have saved minimized windows
+	m_restoreBtn->setVisible( isMaximized() || isMinimized() );
 	if( isMinimized() )
 	{
-		m_windowTitle->setFixedWidth( 120 );
+		m_restoreBtn->move( m_maximizeBtn->isHidden() ?  middleButtonPos : leftButtonPos );
 	}
 
-	// truncate the label string if the window is to small. Adds "..."
-	elideText( m_windowTitle, widget()->windowTitle() );
-	m_windowTitle->setTextInteractionFlags( Qt::NoTextInteraction );
-	m_windowTitle->adjustSize();
+	if( widget() )
+	{
+		// title QLabel adjustments
+		m_windowTitle->setAlignment( Qt::AlignHCenter );
+		m_windowTitle->setFixedWidth( widget()->width() - ( menuButtonSpace + buttonBarWidth ) );
+		m_windowTitle->move( menuButtonSpace,
+			( m_titleBarHeight / 2 ) - ( m_windowTitle->sizeHint().height() / 2 ) - 1 );
 
+		// if minimized we can't use widget()->width(). We have to hard code the width,
+		// as the width of all minimized windows is the same.
+		if( isMinimized() )
+		{
+			m_windowTitle->setFixedWidth( 120 );
+		}
+
+		// truncate the label string if the window is to small. Adds "..."
+		elideText( m_windowTitle, widget()->windowTitle() );
+		m_windowTitle->setTextInteractionFlags( Qt::NoTextInteraction );
+		m_windowTitle->adjustSize();
+	}
+}
+
+
+
+void SubWindow::focusChanged( QMdiSubWindow *subWindow )
+{
+	if( m_hasFocus && subWindow != this )
+	{
+		m_hasFocus = false;
+		emit focusLost();
+	}
+	else if( subWindow == this )
+	{
+		m_hasFocus = true;
+	}
+}
+
+
+
+
+/**
+ * @brief SubWindow::resizeEvent
+ * 
+ *  On every rezise event we have to adjust our title label.
+ * 
+ *  At next we give the event to QMdiSubWindow::resizeEvent() which handles 
+ *  the event on its behavior.
+ * 
+ *  At last we store the current size into m_trackedNormalGeom. This size
+ *  will be saved with the project because of an Qt bug wich doesn't
+ *  save the right size. look at: https://bugreports.qt.io/browse/QTBUG-256
+ * 
+ * @param event
+ */
+void SubWindow::resizeEvent( QResizeEvent * event )
+{
+	// When the parent QMdiArea gets resized, maximized subwindows also gets resized, if any.
+	// In that case, we should call QMdiSubWindow::resizeEvent first
+	// to ensure we get the correct window state.
 	QMdiSubWindow::resizeEvent( event );
+	adjustTitleBar();
 
 	// if the window was resized and ISN'T minimized/maximized/fullscreen,
 	// then save the current size

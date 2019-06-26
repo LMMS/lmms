@@ -2,8 +2,8 @@
  * FileBrowser.h - include file for FileBrowser
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
- * This file is part of LMMS - http://lmms.io
+ *
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -51,10 +51,11 @@ public:
 	FileBrowser( const QString & directories, const QString & filter,
 			const QString & title, const QPixmap & pm,
 			QWidget * parent, bool dirs_as_items = false, bool recurse = false );
-	virtual ~FileBrowser();
+	virtual ~FileBrowser() = default;
 
 private slots:
 	void reloadTree( void );
+	void expandItems( QTreeWidgetItem * item=NULL, QList<QString> expandedDirs = QList<QString>() );
 	// call with item=NULL to filter the entire tree
 	bool filterItems( const QString & filter, QTreeWidgetItem * item=NULL );
 	void giveFocusToFilter();
@@ -64,7 +65,7 @@ private:
 
 	void addItems( const QString & path );
 
-	FileBrowserTreeWidget * m_l;
+	FileBrowserTreeWidget * m_fileBrowserTreeWidget;
 
 	QLineEdit * m_filterEdit;
 
@@ -84,7 +85,11 @@ class FileBrowserTreeWidget : public QTreeWidget
 	Q_OBJECT
 public:
 	FileBrowserTreeWidget( QWidget * parent );
-	virtual ~FileBrowserTreeWidget();
+	virtual ~FileBrowserTreeWidget() = default;
+
+	//! This method returns a QList with paths (QString's) of all directories
+	//! that are expanded in the tree.
+	QList<QString> expandedDirs( QTreeWidgetItem * item = nullptr ) const;
 
 
 protected:
@@ -128,13 +133,13 @@ public:
 
 	void update( void );
 
-	inline QString fullName( QString path = QString::null )
+	inline QString fullName( QString path = QString() )
 	{
-		if( path == QString::null )
+		if( path.isEmpty() )
 		{
 			path = m_directories[0];
 		}
-		if( path != QString::null )
+		if( ! path.isEmpty() )
 		{
 			path += QDir::separator();
 		}
@@ -179,7 +184,6 @@ public:
 		SoundFontFile,
 		PatchFile,
 		MidiFile,
-		FlpFile,
 		VstPluginFile,
 		UnknownFile,
 		NumFileTypes
@@ -228,7 +232,6 @@ private:
 	static QPixmap * s_soundfontFilePixmap;
 	static QPixmap * s_vstPluginFilePixmap;
 	static QPixmap * s_midiFilePixmap;
-	static QPixmap * s_flpFilePixmap;
 	static QPixmap * s_unknownFilePixmap;
 
 	QString m_path;

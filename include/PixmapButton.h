@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -31,12 +31,12 @@
 #include "AutomatableButton.h"
 
 
-class EXPORT PixmapButton : public AutomatableButton
+class LMMS_EXPORT PixmapButton : public AutomatableButton
 {
 	Q_OBJECT
 public:
 	PixmapButton( QWidget * _parent,
-					const QString & _name = QString::null );
+					const QString & _name = QString() );
 	virtual ~PixmapButton();
 
 	void setActiveGraphic( const QPixmap & _pm );

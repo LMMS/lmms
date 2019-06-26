@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2008-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -21,6 +21,8 @@
  * Boston, MA 02110-1301 USA.
  *
  */
+
+#include <cmath>
 
 #include <QLayout>
 #include <QPainter>
@@ -152,18 +154,18 @@ SpectrumAnalyzerControlDialog::SpectrumAnalyzerControlDialog( SpectrumAnalyzerCo
 	setAutoFillBackground( true );
 	QPalette pal;
 	pal.setBrush( backgroundRole(), PLUGIN_NAME::getIconPixmap( "background" ) );
-	setFixedSize( 280, 243 );
+	setFixedSize( 293, 205 );
 	setPalette( pal );
 /*	QVBoxLayout * l = new QVBoxLayout( this );*/
 	SpectrumView* v = new SpectrumView( controls->m_effect, this );
-	v->move( 27, 30 );
+	v->move( 34, 10 );
 
 	LedCheckBox * lin_spec = new LedCheckBox( tr( "Linear spectrum" ), this );
-	lin_spec->move( 24, 204 );
+	lin_spec->move( 32, 182 );
 	lin_spec->setModel( &controls->m_linearSpec );
 
 	LedCheckBox * lin_y = new LedCheckBox( tr( "Linear Y axis" ), this );
-	lin_y->move( 24, 220 );
+	lin_y->move( 137, 182 );
 	lin_y->setModel( &controls->m_linearYAxis );
 
 	connect( &controls->m_linearSpec, SIGNAL( dataChanged() ), this, SLOT( update() ) );
@@ -181,13 +183,12 @@ void SpectrumAnalyzerControlDialog::paintEvent( QPaintEvent * )
 
 	if( !m_controls->m_linearSpec.value() )
 	{
-		p.drawPixmap( 25, 183, m_logXAxis );
+		p.drawPixmap( 33, 165, m_logXAxis );
 	}
 
 	if( !m_controls->m_linearYAxis.value() )
 	{
-		p.drawPixmap( 3, 47, m_logYAxis);
+		p.drawPixmap( 10, 29, m_logYAxis);
 	}
 
 }
-

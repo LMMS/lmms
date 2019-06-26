@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -27,8 +27,7 @@
 #define INSTRUMENT_H
 
 #include <QString>
-#include <QtGlobal>
-#include "export.h"
+#include "lmms_export.h"
 #include "lmms_basics.h"
 #include "MemoryManager.h"
 #include "MidiTime.h"
@@ -42,7 +41,7 @@ class NotePlayHandle;
 class Track;
 
 
-class EXPORT Instrument : public Plugin
+class LMMS_EXPORT Instrument : public Plugin
 {
 	MM_OPERATORS
 public:
@@ -56,13 +55,16 @@ public:
 
 	Q_DECLARE_FLAGS(Flags, Flag);
 
-	Instrument( InstrumentTrack * _instrument_track,
-					const Descriptor * _descriptor );
-	virtual ~Instrument();
+	Instrument(InstrumentTrack * _instrument_track,
+			const Descriptor * _descriptor,
+			const Descriptor::SubPluginFeatures::Key * key = nullptr);
+	virtual ~Instrument() = default;
 
 	// --------------------------------------------------------------------
 	// functions that can/should be re-implemented:
 	// --------------------------------------------------------------------
+
+	virtual bool hasNoteInput() const { return true; }
 
 	// if the plugin doesn't play each note, it can create an instrument-
 	// play-handle and re-implement this method, so that it mixes its
@@ -114,10 +116,12 @@ public:
 	// provided functions:
 	// --------------------------------------------------------------------
 
-	// instantiate instrument-plugin with given name or return NULL
-	// on failure
-	static Instrument * instantiate( const QString & _plugin_name,
-									InstrumentTrack * _instrument_track );
+	//! instantiate instrument-plugin with given name or return NULL
+	//! on failure
+	static Instrument * instantiate(const QString & _plugin_name,
+		InstrumentTrack * _instrument_track,
+		const Plugin::Descriptor::SubPluginFeatures::Key* key,
+		bool keyFromDnd = false);
 
 	virtual bool isFromTrack( const Track * _track ) const;
 

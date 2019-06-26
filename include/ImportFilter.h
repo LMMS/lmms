@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2006-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -34,7 +34,7 @@
 class TrackContainer;
 
 
-class EXPORT ImportFilter : public Plugin
+class LMMS_EXPORT ImportFilter : public Plugin
 {
 public:
 	ImportFilter( const QString & _file_name,
@@ -76,6 +76,12 @@ protected:
 	inline int readBlock( char * _data, int _len )
 	{
 		return m_file.read( _data, _len );
+	}
+
+	inline QByteArray readAllData()
+	{
+		m_file.seek(0);
+		return m_file.readAll();
 	}
 
 	inline void ungetChar( char _ch )

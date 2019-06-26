@@ -42,10 +42,6 @@ Se sei interessato a tradurre LMMS o vuoi migliorare una traduzione esistente, s
         <translation>LMMS</translation>
     </message>
     <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;http://lmms.io&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;http://lmms.io&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;http://lmms.io&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;http://lmms.io&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
-    </message>
-    <message>
         <source>Involved</source>
         <translation>Coinvolti</translation>
     </message>
@@ -56,6 +52,10 @@ Se sei interessato a tradurre LMMS o vuoi migliorare una traduzione esistente, s
     <message>
         <source>Copyright © %1</source>
         <translation>Copyright © %1</translation>
+    </message>
+    <message>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://lmms.io&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;https://lmms.io&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://lmms.io&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;https://lmms.io&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
 </context>
 <context>
@@ -502,6 +502,14 @@ Se sei interessato a tradurre LMMS o vuoi migliorare una traduzione esistente, s
         <source>Model is already connected to this pattern.</source>
         <translation>Il controllo è già connesso a questo pattern.</translation>
     </message>
+    <message>
+        <source>Quantization</source>
+        <translation>Quantizzazione</translation>
+    </message>
+    <message>
+        <source>Quantization. Sets the smallest step size for the Automation Point. By default this also sets the length, clearing out other points in the range. Press &lt;Ctrl&gt; to override this behaviour.</source>
+        <translation>Quantizzazione. Imposta la massima precisione dei punti di Automazione. Controlla anche la lunghezza, cancellando quindi i punti che sono entro tale lunghezza. Puoi comunque ignorare questa funzione premendo &lt;Ctrl&gt;.</translation>
+    </message>
 </context>
 <context>
     <name>AutomationPattern</name>
@@ -512,10 +520,6 @@ Se sei interessato a tradurre LMMS o vuoi migliorare una traduzione esistente, s
 </context>
 <context>
     <name>AutomationPatternView</name>
-    <message>
-        <source>double-click to open this pattern in automation editor</source>
-        <translation>Fai doppio-click per disegnare questo pattern di automazione</translation>
-    </message>
     <message>
         <source>Open in Automation editor</source>
         <translation>Apri nell&apos;editor dell&apos;Automazione</translation>
@@ -568,7 +572,7 @@ Se sei interessato a tradurre LMMS o vuoi migliorare una traduzione esistente, s
     <name>BBEditor</name>
     <message>
         <source>Beat+Bassline Editor</source>
-        <translation>Mostra/nascondi il Beat+Bassline Editor</translation>
+        <translation>Beat+Bassline Editor</translation>
     </message>
     <message>
         <source>Play/pause current beat/bassline (Space)</source>
@@ -613,6 +617,10 @@ Se sei interessato a tradurre LMMS o vuoi migliorare una traduzione esistente, s
     <message>
         <source>Clone Steps</source>
         <translation>Clona gli step</translation>
+    </message>
+    <message>
+        <source>Add sample-track</source>
+        <translation>Aggiungi traccia campione</translation>
     </message>
 </context>
 <context>
@@ -710,10 +718,6 @@ Se sei interessato a tradurre LMMS o vuoi migliorare una traduzione esistente, s
         <translation>Guadagno in Input:</translation>
     </message>
     <message>
-        <source>NOIS</source>
-        <translation>RUMO</translation>
-    </message>
-    <message>
         <source>Input Noise:</source>
         <translation>Rumore in Input:</translation>
     </message>
@@ -730,20 +734,12 @@ Se sei interessato a tradurre LMMS o vuoi migliorare una traduzione esistente, s
         <translation>Clip in Output:</translation>
     </message>
     <message>
-        <source>Rate</source>
-        <translation>Frequenza</translation>
-    </message>
-    <message>
         <source>Rate Enabled</source>
         <translation>Abilita Frequenza</translation>
     </message>
     <message>
         <source>Enable samplerate-crushing</source>
         <translation>Abilità la riduzione di frequnza di campionamento</translation>
-    </message>
-    <message>
-        <source>Depth</source>
-        <translation>Risoluzione</translation>
     </message>
     <message>
         <source>Depth Enabled</source>
@@ -758,20 +754,28 @@ Se sei interessato a tradurre LMMS o vuoi migliorare una traduzione esistente, s
         <translation>Frequenza di campionamento:</translation>
     </message>
     <message>
-        <source>STD</source>
-        <translation>STD</translation>
-    </message>
-    <message>
         <source>Stereo difference:</source>
         <translation>Differenza stereo:</translation>
     </message>
     <message>
-        <source>Levels</source>
-        <translation>Livelli</translation>
-    </message>
-    <message>
         <source>Levels:</source>
         <translation>Livelli di quantizzazione:</translation>
+    </message>
+    <message>
+        <source>NOISE</source>
+        <translation>RUMORE</translation>
+    </message>
+    <message>
+        <source>FREQ</source>
+        <translation>FREQ</translation>
+    </message>
+    <message>
+        <source>STEREO</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>QUANT</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -900,8 +904,16 @@ Se sei interessato a tradurre LMMS o vuoi migliorare una traduzione esistente, s
         <translation>Inserire il nuovo nome di questo controller</translation>
     </message>
     <message>
-        <source>&amp;Remove this plugin</source>
-        <translation>&amp;Elimina questo plugin</translation>
+        <source>&amp;Remove this controller</source>
+        <translation>&amp;Rimuovi questo controller</translation>
+    </message>
+    <message>
+        <source>Re&amp;name this controller</source>
+        <translation>Ri&amp;nomina questo controller</translation>
+    </message>
+    <message>
+        <source>LFO</source>
+        <translation>LFO</translation>
     </message>
 </context>
 <context>
@@ -993,10 +1005,6 @@ Se sei interessato a tradurre LMMS o vuoi migliorare una traduzione esistente, s
 <context>
     <name>DelayControlsDialog</name>
     <message>
-        <source>Delay</source>
-        <translation>Delay</translation>
-    </message>
-    <message>
         <source>Lfo Amt</source>
         <translation>Quantità Lfo</translation>
     </message>
@@ -1005,16 +1013,8 @@ Se sei interessato a tradurre LMMS o vuoi migliorare una traduzione esistente, s
         <translation>Tempo di ritardo</translation>
     </message>
     <message>
-        <source>Regen</source>
-        <translation>Regen</translation>
-    </message>
-    <message>
         <source>Feedback Amount</source>
         <translation>Quantità di Feedback</translation>
-    </message>
-    <message>
-        <source>Rate</source>
-        <translation>Frequenza</translation>
     </message>
     <message>
         <source>Lfo</source>
@@ -1027,6 +1027,22 @@ Se sei interessato a tradurre LMMS o vuoi migliorare una traduzione esistente, s
     <message>
         <source>Gain</source>
         <translation>Guadagno</translation>
+    </message>
+    <message>
+        <source>DELAY</source>
+        <translation>DELAY</translation>
+    </message>
+    <message>
+        <source>FDBK</source>
+        <translation>FDBK</translation>
+    </message>
+    <message>
+        <source>RATE</source>
+        <translation>RATE</translation>
+    </message>
+    <message>
+        <source>AMNT</source>
+        <translation>Q.TÀ</translation>
     </message>
 </context>
 <context>
@@ -1284,6 +1300,10 @@ Se sei interessato a tradurre LMMS o vuoi migliorare una traduzione esistente, s
     <message>
         <source>Name</source>
         <translation>Nome</translation>
+    </message>
+    <message>
+        <source>Type</source>
+        <translation>Tipo</translation>
     </message>
     <message>
         <source>Description</source>
@@ -1864,18 +1884,6 @@ Con il click destro si apre un menu conestuale che permette di cambiare l&apos;o
         <source> Octave</source>
         <translation>Ottave</translation>
     </message>
-    <message>
-        <source>Frequency</source>
-        <translation>Frequenza</translation>
-    </message>
-    <message>
-        <source>Resonance</source>
-        <translation>Risonanza</translation>
-    </message>
-    <message>
-        <source>Bandwidth</source>
-        <translation>Larghezza di Banda</translation>
-    </message>
 </context>
 <context>
     <name>EqHandle</name>
@@ -1971,10 +1979,6 @@ Con il click destro si apre un menu conestuale che permette di cambiare l&apos;o
         <translation>Virgola mobile 32 Bit</translation>
     </message>
     <message>
-        <source>Please note that not all of the parameters above apply for all file formats.</source>
-        <translation>Non tutti i parametri si applicano nella creazione di tutti i formati.</translation>
-    </message>
-    <message>
         <source>Quality settings</source>
         <translation>Impostazioni qualità</translation>
     </message>
@@ -2039,12 +2043,6 @@ Con il click destro si apre un menu conestuale che permette di cambiare l&apos;o
         <translation>Non è stato possibile aprire il file</translation>
     </message>
     <message>
-        <source>Could not open file %1 for writing.
-Please make sure you have write-permission to the file and the directory containing the file and try again!</source>
-        <translation>Impossibile aprire in scrittura il file %1.
-Assicurarsi di avere i permessi in scrittura per il file e per la directory contenente il file e riprovare!</translation>
-    </message>
-    <message>
         <source>Export project to %1</source>
         <translation>Esporta il progetto in %1</translation>
     </message>
@@ -2060,6 +2058,95 @@ Assicurarsi di avere i permessi in scrittura per il file e per la directory cont
         <source>Rendering: %1%</source>
         <translation>Renderizzazione: %1%</translation>
     </message>
+    <message>
+        <source>Could not open file %1 for writing.
+Please make sure you have write permission to the file and the directory containing the file and try again!</source>
+        <translation>Impossibile scrivere sul file %1.
+Si prega di controllare i permessi di scrittura sul file e la cartella che lo contiene, e poi riprovare!</translation>
+    </message>
+    <message>
+        <source>24 Bit Integer</source>
+        <translation>Interi 24 Bit</translation>
+    </message>
+    <message>
+        <source>Use variable bitrate</source>
+        <translation>Usa bitrate variabile</translation>
+    </message>
+    <message>
+        <source>Stereo mode:</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Stereo</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Joint Stereo</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Mono</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Compression level:</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>(fastest)</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>(default)</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>(smallest)</source>
+        <translation type="unfinished"/>
+    </message>
+</context>
+<context>
+    <name>Expressive</name>
+    <message>
+        <source>Selected graph</source>
+        <translation>Grafico selezionato</translation>
+    </message>
+    <message>
+        <source>A1</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>A2</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>A3</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>W1 smoothing</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>W2 smoothing</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>W3 smoothing</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>PAN1</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>PAN2</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>REL TRANS</source>
+        <translation type="unfinished"/>
+    </message>
 </context>
 <context>
     <name>Fader</name>
@@ -2073,6 +2160,14 @@ Assicurarsi di avere i permessi in scrittura per il file e per la directory cont
     <message>
         <source>Browser</source>
         <translation>Browser</translation>
+    </message>
+    <message>
+        <source>Search</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Refresh list</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -2144,44 +2239,48 @@ Assicurarsi di avere i permessi in scrittura per il file e per la directory cont
 <context>
     <name>FlangerControlsDialog</name>
     <message>
-        <source>Delay</source>
-        <translation>Delay</translation>
-    </message>
-    <message>
         <source>Delay Time:</source>
         <translation>Tempo di Ritardo:</translation>
-    </message>
-    <message>
-        <source>Lfo Hz</source>
-        <translation>Lfo Hz</translation>
-    </message>
-    <message>
-        <source>Lfo:</source>
-        <translation>Frequenza Lfo:</translation>
-    </message>
-    <message>
-        <source>Amt</source>
-        <translation>Q.tà</translation>
-    </message>
-    <message>
-        <source>Amt:</source>
-        <translation>Quantità:</translation>
-    </message>
-    <message>
-        <source>Regen</source>
-        <translation>Regen</translation>
     </message>
     <message>
         <source>Feedback Amount:</source>
         <translation>Quantità di Feedback:</translation>
     </message>
     <message>
-        <source>Noise</source>
-        <translation>Rumore</translation>
-    </message>
-    <message>
         <source>White Noise Amount:</source>
         <translation>Quantità di Rumore Bianco:</translation>
+    </message>
+    <message>
+        <source>DELAY</source>
+        <translation>DELAY</translation>
+    </message>
+    <message>
+        <source>RATE</source>
+        <translation>RATE</translation>
+    </message>
+    <message>
+        <source>AMNT</source>
+        <translation>Q.TÀ</translation>
+    </message>
+    <message>
+        <source>Amount:</source>
+        <translation>Quantità:</translation>
+    </message>
+    <message>
+        <source>FDBK</source>
+        <translation>FDBK</translation>
+    </message>
+    <message>
+        <source>NOISE</source>
+        <translation>RUMORE</translation>
+    </message>
+    <message>
+        <source>Invert</source>
+        <translation>INVERTI</translation>
+    </message>
+    <message>
+        <source>Period:</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -2236,17 +2335,21 @@ Puoi rimuovere e muovere i canali con il menù contestuale, cliccando con il tas
         <source>FX %1</source>
         <translation>FX %1</translation>
     </message>
+    <message>
+        <source>Volume</source>
+        <translation>Volume</translation>
+    </message>
+    <message>
+        <source>Mute</source>
+        <translation>Muto</translation>
+    </message>
+    <message>
+        <source>Solo</source>
+        <translation>Solo</translation>
+    </message>
 </context>
 <context>
     <name>FxMixerView</name>
-    <message>
-        <source>Rename FX channel</source>
-        <translation>Rinomina il canale FX</translation>
-    </message>
-    <message>
-        <source>Enter the new name for this FX channel</source>
-        <translation>Inserire il nuovo nome di questo canale FX</translation>
-    </message>
     <message>
         <source>FX-Mixer</source>
         <translation>Mixer FX</translation>
@@ -2446,6 +2549,18 @@ Puoi rimuovere e muovere i canali con il menù contestuale, cliccando con il tas
         <source>Down and up</source>
         <translation>Giù e su</translation>
     </message>
+    <message>
+        <source>Skip rate</source>
+        <translation>Frequanza di Salto</translation>
+    </message>
+    <message>
+        <source>Miss rate</source>
+        <translation>Frequanza di Sbaglio</translation>
+    </message>
+    <message>
+        <source>Cycle steps</source>
+        <translation>Note ruotate</translation>
+    </message>
 </context>
 <context>
     <name>InstrumentFunctionArpeggioView</name>
@@ -2516,6 +2631,46 @@ Puoi rimuovere e muovere i canali con il menù contestuale, cliccando con il tas
     <message>
         <source>Mode:</source>
         <translation>Modo:</translation>
+    </message>
+    <message>
+        <source>SKIP</source>
+        <translation>SALTA</translation>
+    </message>
+    <message>
+        <source>Skip rate:</source>
+        <translation>Frequanza di Salto:</translation>
+    </message>
+    <message>
+        <source>The skip function will make the arpeggiator pause one step randomly. From its start in full counter clockwise position and no effect it will gradually progress to full amnesia at maximum setting.</source>
+        <translation>Con la funzione di salto, l&apos;arpeggiatore metterà in pausa uno step in modo casuale. Alla posizione minima non verrà applicata alcuna variazione. Aumentando il valore, invece, si arriva gradualmente ad una completa casualità dell&apos;effetto.</translation>
+    </message>
+    <message>
+        <source>MISS</source>
+        <translation>SBAGLIA</translation>
+    </message>
+    <message>
+        <source>Miss rate:</source>
+        <translation>Frequanza di Sbaglio:</translation>
+    </message>
+    <message>
+        <source>The miss function will make the arpeggiator miss the intended note.</source>
+        <translation>La funzione di sbaglio farà &quot;sbagliare&quot; l&apos;arpeggiatore, che suonerà un&apos;altra nota rispetto a quella normalmente prevista.</translation>
+    </message>
+    <message>
+        <source>CYCLE</source>
+        <translation>RUOTA</translation>
+    </message>
+    <message>
+        <source>Cycle notes:</source>
+        <translation>Note ruotate:</translation>
+    </message>
+    <message>
+        <source>note(s)</source>
+        <translation>nota(e)</translation>
+    </message>
+    <message>
+        <source>Jumps over n steps in the arpeggio and cycles around if we&apos;re over the note range. If the total note range is evenly divisible by the number of steps jumped over you will get stuck in a shorter arpeggio or even on one note.</source>
+        <translation>Salta n note dell&apos;arpeggio e torna indietro quando supera l&apos;ampiezza. Se il numero di note totali è divisibile per il numero di note saltate, l&apos;arpeggio risulterà più piccolo, eventualmente di una sola nota.</translation>
     </message>
 </context>
 <context>
@@ -2854,7 +3009,7 @@ Puoi rimuovere e muovere i canali con il menù contestuale, cliccando con il tas
     </message>
     <message>
         <source>Phrygolydian</source>
-        <translation>Phrygolydian</translation>
+        <translation>Frigia</translation>
     </message>
     <message>
         <source>Lydian</source>
@@ -2899,6 +3054,14 @@ Puoi rimuovere e muovere i canali con il menù contestuale, cliccando con il tas
     <message>
         <source>5</source>
         <translation>Quinta</translation>
+    </message>
+    <message>
+        <source>Phrygian dominant</source>
+        <translation>Frigia dominante</translation>
+    </message>
+    <message>
+        <source>Persian</source>
+        <translation>Persiana</translation>
     </message>
 </context>
 <context>
@@ -3301,20 +3464,8 @@ Puoi rimuovere e muovere i canali con il menù contestuale, cliccando con il tas
         <translation>Canale FX</translation>
     </message>
     <message>
-        <source>ENV/LFO</source>
-        <translation>ENV/LFO</translation>
-    </message>
-    <message>
-        <source>FUNC</source>
-        <translation>FUNC</translation>
-    </message>
-    <message>
         <source>FX</source>
         <translation>FX</translation>
-    </message>
-    <message>
-        <source>MIDI</source>
-        <translation>MIDI</translation>
     </message>
     <message>
         <source>Save preset</source>
@@ -3323,10 +3474,6 @@ Puoi rimuovere e muovere i canali con il menù contestuale, cliccando con il tas
     <message>
         <source>XML preset file (*.xpf)</source>
         <translation>File di preset XML (*.xpf)</translation>
-    </message>
-    <message>
-        <source>PLUGIN</source>
-        <translation>PLUGIN</translation>
     </message>
     <message>
         <source>Pitch range (semitones)</source>
@@ -3345,16 +3492,36 @@ Puoi rimuovere e muovere i canali con il menù contestuale, cliccando con il tas
         <translation>Clicca qui per salvare lo strumento corrente come preset. Al prossimo avvio, questo preset sarà visibile nel preset browser (&quot;I miei preset&quot;).</translation>
     </message>
     <message>
-        <source>MISC</source>
-        <translation>VARIE</translation>
-    </message>
-    <message>
         <source>Use these controls to view and edit the next/previous track in the song editor.</source>
         <translation>Usa questi controlli per visualizzare e modificare la prossima traccia o quella precedente nel Song Editor</translation>
     </message>
     <message>
         <source>SAVE</source>
         <translation>SALVA</translation>
+    </message>
+    <message>
+        <source>Envelope, filter &amp; LFO</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Chord stacking &amp; arpeggio</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Effects</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>MIDI settings</source>
+        <translation>Impostazioni MIDI</translation>
+    </message>
+    <message>
+        <source>Miscellaneous</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Plugin</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -3368,12 +3535,12 @@ Puoi rimuovere e muovere i canali con il menù contestuale, cliccando con il tas
         <translation>Modalità logaritmica</translation>
     </message>
     <message>
-        <source>Please enter a new value between -96.0 dBV and 6.0 dBV:</source>
-        <translation>Inserire un nuovo valore tra -96.0 dBV e 6.0 dBV:</translation>
-    </message>
-    <message>
         <source>Please enter a new value between %1 and %2:</source>
         <translation>Inserire un valore compreso tra %1 e %2:</translation>
+    </message>
+    <message>
+        <source>Please enter a new value between -96.0 dBFS and 6.0 dBFS:</source>
+        <translation>Inserire un nuovo valore tra -96.0 dBFS e 6.0 dBFS:</translation>
     </message>
 </context>
 <context>
@@ -3508,10 +3675,6 @@ Puoi rimuovere e muovere i canali con il menù contestuale, cliccando con il tas
         <translation>Questa manopola imposta la velocità dell&apos;LFO selezionato. Più grande è questo valore più velocemente l&apos;LFO oscillerà e più veloce sarà l&apos;effetto.</translation>
     </message>
     <message>
-        <source>AMT</source>
-        <translation>Q.TÀ</translation>
-    </message>
-    <message>
         <source>Modulation amount:</source>
         <translation>Quantità di modulazione:</translation>
     </message>
@@ -3569,6 +3732,10 @@ Fare doppio click per scegliere il file dell&apos;onda.</translation>
         <source>Click here for a moog saw-wave.</source>
         <translation>Clicca per usare un&apos;onda Moog a banda limitata.</translation>
     </message>
+    <message>
+        <source>AMNT</source>
+        <translation>Q.TÀ</translation>
+    </message>
 </context>
 <context>
     <name>LmmsCore</name>
@@ -3591,16 +3758,6 @@ Fare doppio click per scegliere il file dell&apos;onda.</translation>
 </context>
 <context>
     <name>MainWindow</name>
-    <message>
-        <source>Could not save config-file</source>
-        <translation>Non è stato possibile salvare il file di configurazione</translation>
-    </message>
-    <message>
-        <source>Could not save configuration file %1. You're probably not permitted to write to this file.
-Please make sure you have write-access to the file and try again.</source>
-        <translation>Non è stato possibile salvare il file di configurazione %1. Probabilmente non hai i permessi di scrittura per questo file.
-Assicurati di avere i permessi in scrittura per il file e riprova.</translation>
-    </message>
     <message>
         <source>&amp;New</source>
         <translation>&amp;Nuovo</translation>
@@ -3691,7 +3848,7 @@ Assicurati di avere i permessi in scrittura per il file e riprova.</translation>
     </message>
     <message>
         <source>Beat+Bassline Editor</source>
-        <translation>Mostra/nascondi il Beat+Bassline Editor</translation>
+        <translation>Beat+Bassline Editor</translation>
     </message>
     <message>
         <source>By pressing this button, you can show or hide the Beat+Bassline Editor. The Beat+Bassline Editor is needed for creating beats, and for opening, adding, and removing channels, and for cutting, copying and pasting beat and bassline-patterns, and for other things like that.</source>
@@ -3856,32 +4013,12 @@ Visitare http://lmms.sf.net/wiki  per la documentazione di LMMS.</translation>
         <translation>Recupera il file. Non usare più instanze di LMMS quando effettui il recupero.</translation>
     </message>
     <message>
-        <source>Ignore</source>
-        <translation>Ignora</translation>
-    </message>
-    <message>
-        <source>Launch LMMS as usual but with automatic backup disabled to prevent the present recover file from being overwritten.</source>
-        <translation>Fai partire LMMS come al solito. Il salvataggio automatico verrà disabilitato per evitare la sovrascrittura del file di recupero.</translation>
-    </message>
-    <message>
         <source>Discard</source>
         <translation>Elimina</translation>
     </message>
     <message>
         <source>Launch a default session and delete the restored files. This is not reversible.</source>
         <translation>Fai partire una sessione normale, cancellando il file di recupero in modo irreversibile.</translation>
-    </message>
-    <message>
-        <source>Quit</source>
-        <translation>Esci</translation>
-    </message>
-    <message>
-        <source>Shut down LMMS with no further action.</source>
-        <translation>Chiudi LMMS senza effettuare alcuna azione.</translation>
-    </message>
-    <message>
-        <source>Exit</source>
-        <translation>Esci</translation>
     </message>
     <message>
         <source>Preparing plugin browser</source>
@@ -3906,10 +4043,6 @@ Visitare http://lmms.sf.net/wiki  per la documentazione di LMMS.</translation>
     <message>
         <source>Save as default template</source>
         <translation>Salva come progetto default</translation>
-    </message>
-    <message>
-        <source>Export &amp;MIDI...</source>
-        <translation>Esporta &amp;MIDI...</translation>
     </message>
     <message>
         <source>&amp;View</source>
@@ -3952,10 +4085,6 @@ Visitare http://lmms.sf.net/wiki  per la documentazione di LMMS.</translation>
         <translation>Sessione di recupero. Salva al più presto!</translation>
     </message>
     <message>
-        <source>Automatic backup disabled. Remember to save your work!</source>
-        <translation>Salvataggio automatico disabilitato. Ricorda di salvare spesso!</translation>
-    </message>
-    <message>
         <source>Recovered project not saved</source>
         <translation>Progetto recuperato non salvato</translation>
     </message>
@@ -3980,16 +4109,34 @@ Visitare http://lmms.sf.net/wiki  per la documentazione di LMMS.</translation>
         <translation>In questo modo verrà modificato il tuo progetto di default corrente.</translation>
     </message>
     <message>
-        <source>Volume as dBV</source>
-        <translation>Volume in dBV</translation>
-    </message>
-    <message>
         <source>Smooth scroll</source>
         <translation>Scorrimento morbido</translation>
     </message>
     <message>
         <source>Enable note labels in piano roll</source>
         <translation>Abilita l&apos;etichetta delle note nel piano roll</translation>
+    </message>
+    <message>
+        <source>Save project template</source>
+        <translation>Salva come modello di progetto</translation>
+    </message>
+    <message>
+        <source>Volume as dBFS</source>
+        <translation>Volume in dBFS</translation>
+    </message>
+    <message>
+        <source>Could not open file</source>
+        <translation>Non è stato possibile aprire il file</translation>
+    </message>
+    <message>
+        <source>Could not open file %1 for writing.
+Please make sure you have write permission to the file and the directory containing the file and try again!</source>
+        <translation>Impossibile scrivere sul file %1.
+Si prega di controllare i permessi di scrittura sul file e la cartella che lo contiene, e poi riprovare!</translation>
+    </message>
+    <message>
+        <source>Export &amp;MIDI...</source>
+        <translation>Esporta &amp;MIDI...</translation>
     </message>
 </context>
 <context>
@@ -4046,6 +4193,19 @@ Visitare http://lmms.sf.net/wiki  per la documentazione di LMMS.</translation>
     <message>
         <source>Track</source>
         <translation>Traccia</translation>
+    </message>
+</context>
+<context>
+    <name>MidiJack</name>
+    <message>
+        <source>JACK server down</source>
+        <extracomment>When JACK(JACK Audio Connection Kit) disconnects, it will show the following message (title)</extracomment>
+        <translation>Il server JACK è down</translation>
+    </message>
+    <message>
+        <source>The JACK server seems to be shuted down.</source>
+        <extracomment>When JACK(JACK Audio Connection Kit) disconnects, it will show the following message (dialog message)</extracomment>
+        <translation>Il server JACK sembra spento.</translation>
     </message>
 </context>
 <context>
@@ -5261,14 +5421,6 @@ Vi sono due forme speciali: &quot;Random&quot; e &quot;Random morbido&quot; sono
         <translation>Elimina note</translation>
     </message>
     <message>
-        <source>use mouse wheel to set velocity of a step</source>
-        <translation>Usa la rotella del mouse per impostare il volume di uno step</translation>
-    </message>
-    <message>
-        <source>double-click to open in Piano Roll</source>
-        <translation>Fai doppio-click per aprire il pattern nel Piano Roll</translation>
-    </message>
-    <message>
         <source>Clone Steps</source>
         <translation>Clona gli step</translation>
     </message>
@@ -5342,12 +5494,12 @@ Vi sono due forme speciali: &quot;Random&quot; e &quot;Random morbido&quot; sono
         <translation>DCAD</translation>
     </message>
     <message>
-        <source>TRES</source>
-        <translation>SOGL</translation>
-    </message>
-    <message>
         <source>Treshold:</source>
         <translation>Soglia:</translation>
+    </message>
+    <message>
+        <source>TRSH</source>
+        <translation>SCARTA</translation>
     </message>
 </context>
 <context>
@@ -5594,6 +5746,10 @@ Vi sono due forme speciali: &quot;Random&quot; e &quot;Random morbido&quot; sono
         <source>Piano-Roll - no pattern</source>
         <translation>Piano-Roll - nessun pattern</translation>
     </message>
+    <message>
+        <source>Quantize</source>
+        <translation>Quantizza</translation>
+    </message>
 </context>
 <context>
     <name>PianoView</name>
@@ -5626,16 +5782,16 @@ Motivo: &quot;%2&quot;</translation>
 <context>
     <name>PluginBrowser</name>
     <message>
-        <source>Instrument plugins</source>
-        <translation>Plugin strumentali</translation>
-    </message>
-    <message>
         <source>Instrument browser</source>
         <translation>Browser strumenti</translation>
     </message>
     <message>
         <source>Drag an instrument into either the Song-Editor, the Beat+Bassline Editor or into an existing instrument track.</source>
         <translation>È possibile trascinare uno strumento nel Song-Editor, nel Beat+Bassline Editor o direttamente in un canale esistente.</translation>
+    </message>
+    <message>
+        <source>Instrument Plugins</source>
+        <translation>Plugin Strumentali</translation>
     </message>
 </context>
 <context>
@@ -5651,14 +5807,6 @@ Motivo: &quot;%2&quot;</translation>
 </context>
 <context>
     <name>ProjectNotes</name>
-    <message>
-        <source>Project notes</source>
-        <translation>Note del progetto</translation>
-    </message>
-    <message>
-        <source>Put down your project notes here.</source>
-        <translation>Scrivi qui le note per il tuo progetto.</translation>
-    </message>
     <message>
         <source>Edit Actions</source>
         <translation>Modifica azioni</translation>
@@ -5767,6 +5915,14 @@ Motivo: &quot;%2&quot;</translation>
         <source>&amp;Color...</source>
         <translation>&amp;Colore...</translation>
     </message>
+    <message>
+        <source>Project Notes</source>
+        <translation>Mostra/nascondi le note del progetto</translation>
+    </message>
+    <message>
+        <source>Enter project notes here</source>
+        <translation type="unfinished"/>
+    </message>
 </context>
 <context>
     <name>ProjectRenderer</name>
@@ -5777,6 +5933,14 @@ Motivo: &quot;%2&quot;</translation>
     <message>
         <source>Compressed OGG-File (*.ogg)</source>
         <translation>File in formato OGG compresso (*.ogg)</translation>
+    </message>
+    <message>
+        <source>FLAC-File (*.flac)</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Compressed MP3-File (*.mp3)</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -5838,6 +6002,60 @@ Motivo: &quot;%2&quot;</translation>
     </message>
 </context>
 <context>
+    <name>ReverbSCControlDialog</name>
+    <message>
+        <source>Input</source>
+        <translation>Ingresso</translation>
+    </message>
+    <message>
+        <source>Input Gain:</source>
+        <translation>Guadagno in Input:</translation>
+    </message>
+    <message>
+        <source>Size</source>
+        <translation>Grandezza</translation>
+    </message>
+    <message>
+        <source>Size:</source>
+        <translation>Grandezza:</translation>
+    </message>
+    <message>
+        <source>Color</source>
+        <translation>Colore</translation>
+    </message>
+    <message>
+        <source>Color:</source>
+        <translation>Colore:</translation>
+    </message>
+    <message>
+        <source>Output</source>
+        <translation>Uscita</translation>
+    </message>
+    <message>
+        <source>Output Gain:</source>
+        <translation>Guadagno in Output:</translation>
+    </message>
+</context>
+<context>
+    <name>ReverbSCControls</name>
+    <message>
+        <source>Input Gain</source>
+        <translation>Guadagno input</translation>
+    </message>
+    <message>
+        <source>Size</source>
+        <translation>Grandezza</translation>
+    </message>
+    <message>
+        <source>Color</source>
+        <translation>Colore</translation>
+    </message>
+    <message>
+        <source>Output Gain</source>
+        <translation>Guadagno output</translation>
+    </message>
+</context>
+<context>
     <name>SampleBuffer</name>
     <message>
         <source>Open audio file</source>
@@ -5882,6 +6100,14 @@ Motivo: &quot;%2&quot;</translation>
     <message>
         <source>All Audio-Files (*.wav *.ogg *.ds *.flac *.spx *.voc *.aif *.aiff *.au *.raw)</source>
         <translation>Tutti i file audio (*.wav *.ogg *.ds *.flac *.spx *.voc *.aif *.aiff *.au *.raw)</translation>
+    </message>
+    <message>
+        <source>Fail to open file</source>
+        <translation>Impossibile aprire il file</translation>
+    </message>
+    <message>
+        <source>Audio files are limited to %1 MB in size and %2 minutes of playing time</source>
+        <translation>I file audio hanno un limite di %1 MB in grandezza e %2 minuti in durata</translation>
     </message>
 </context>
 <context>
@@ -5984,10 +6210,6 @@ Motivo: &quot;%2&quot;</translation>
         <translation>Dopo aver modificato le impostazioni, mostra un avviso al riavvio</translation>
     </message>
     <message>
-        <source>Display volume as dBV </source>
-        <translation>Mostra il volume in dBV </translation>
-    </message>
-    <message>
         <source>Compress project files per default</source>
         <translation>Per impostazione predefinita, comprimi i file di progetto</translation>
     </message>
@@ -6044,10 +6266,6 @@ Motivo: &quot;%2&quot;</translation>
         <translation>Grafica dello sfondo</translation>
     </message>
     <message>
-        <source>FL Studio installation directory</source>
-        <translation>Directory di installazione di FL Studio</translation>
-    </message>
-    <message>
         <source>STK rawwave directory</source>
         <translation>Directory per i file rawwave STK</translation>
     </message>
@@ -6066,10 +6284,6 @@ Motivo: &quot;%2&quot;</translation>
     <message>
         <source>Smooth scroll in Song Editor</source>
         <translation>Scorrimento morbido nel Song-Editor</translation>
-    </message>
-    <message>
-        <source>Enable auto save feature</source>
-        <translation>Abilita la funzione di salvataggio automatico</translation>
     </message>
     <message>
         <source>Show playback cursor in AudioFileProcessor</source>
@@ -6128,10 +6342,6 @@ Latenza: %2 ms</translation>
     <message>
         <source>Choose artwork-theme directory</source>
         <translation>Seleziona la directory del tema grafico</translation>
-    </message>
-    <message>
-        <source>Choose FL Studio installation directory</source>
-        <translation>Seleziona la directory di installazione di FL Studio</translation>
     </message>
     <message>
         <source>Choose LADSPA plugin directory</source>
@@ -6202,14 +6412,30 @@ Latenza: %2 ms</translation>
         <translation>minuto</translation>
     </message>
     <message>
-        <source>Auto save interval: %1 %2</source>
-        <translation>Intervallo di auto-salvataggio: %1 %2</translation>
+        <source>Display volume as dBFS </source>
+        <translation>Mostra il volume in dBFS</translation>
+    </message>
+    <message>
+        <source>Enable auto-save</source>
+        <translation>Abiita funzione di salvataggio automatico</translation>
+    </message>
+    <message>
+        <source>Allow auto-save while playing</source>
+        <translation>Consenti il salvataggio automatico durante la riproduzione</translation>
+    </message>
+    <message>
+        <source>Disabled</source>
+        <translation>Disabilitato</translation>
+    </message>
+    <message>
+        <source>Auto-save interval: %1</source>
+        <translation>Intervallo di salvataggio automatico: %1</translation>
     </message>
     <message>
         <source>Set the time between automatic backup to %1.
-Remember to also save your project manually.</source>
-        <translation>Imposta l&apos;intervallo del backup automatico a %1.
-Ricorda di salvare il tuo progetto anche manualmente.</translation>
+Remember to also save your project manually. You can choose to disable saving while playing, something some older systems find difficult.</source>
+        <translation>Imposta il tempo tra i salvataggi automatici a %1.
+Ricorda di salvare i progetti manualmente. Puoi disabilitare il salvataggio automatico durante la riproduzione, in quanto potrebbe pesare troppo su un sistema datato.</translation>
     </message>
 </context>
 <context>
@@ -6251,10 +6477,6 @@ Ricorda di salvare il tuo progetto anche manualmente.</translation>
         <translation>Sequenze MIDI</translation>
     </message>
     <message>
-        <source>FL Studio projects</source>
-        <translation>Progetti FL Studio</translation>
-    </message>
-    <message>
         <source>Hydrogen projects</source>
         <translation>Progetti Hydrogen</translation>
     </message>
@@ -6293,6 +6515,10 @@ Ricorda di salvare il tuo progetto anche manualmente.</translation>
     <message>
         <source>LMMS Error report</source>
         <translation>Informazioni sull&apos;errore di LMMS</translation>
+    </message>
+    <message>
+        <source>Save project</source>
+        <translation>Salva progetto</translation>
     </message>
 </context>
 <context>
@@ -6368,20 +6594,20 @@ Assicurati di avere almeno i permessi di lettura del file e prova di nuovo.</tra
         <translation>Impossibile aprire il file %1 per la scrittura. Probabilmente non disponi dei permessi necessari alla scrittura di questo file. Assicurati di avere tali permessi e prova di nuovo.</translation>
     </message>
     <message>
-        <source>Project Version Mismatch</source>
-        <translation>Incompatibilità di versione</translation>
-    </message>
-    <message>
-        <source>This %1 was created with LMMS version %2, but version %3 is installed</source>
-        <translation>Questo %1 è stato creato con LMMS versione %2, ma ora è in uso la versione %3</translation>
-    </message>
-    <message>
         <source>template</source>
         <translation>modello</translation>
     </message>
     <message>
         <source>project</source>
         <translation>progetto</translation>
+    </message>
+    <message>
+        <source>Version difference</source>
+        <translation>Differenza di versione</translation>
+    </message>
+    <message>
+        <source>This %1 was created with LMMS %2.</source>
+        <translation>%1 creato con LMMS %2.</translation>
     </message>
 </context>
 <context>
@@ -6475,6 +6701,21 @@ Assicurati di avere almeno i permessi di lettura del file e prova di nuovo.</tra
     <message>
         <source>Channel mode</source>
         <translation>Modalità del canale</translation>
+    </message>
+</context>
+<context>
+    <name>SubWindow</name>
+    <message>
+        <source>Close</source>
+        <translation>Chiudi</translation>
+    </message>
+    <message>
+        <source>Maximize</source>
+        <translation>Massimizza</translation>
+    </message>
+    <message>
+        <source>Restore</source>
+        <translation>Apri</translation>
     </message>
 </context>
 <context>
@@ -6675,8 +6916,8 @@ Assicurarsi di avere i permessi in lettura per il file e per la directory che lo
         <translation>Importazione del file MIDI...</translation>
     </message>
     <message>
-        <source>Importing FLP-file...</source>
-        <translation>Importazione del file FLP...</translation>
+        <source>Loading Track %1 (%2/Total %3)</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -6936,6 +7177,10 @@ Assicurarsi di avere i permessi in lettura per il file e per la directory che lo
     <message>
         <source>Decrement version number</source>
         <translation>Riduci numero versione</translation>
+    </message>
+    <message>
+        <source> already exists. Do you want to replace it?</source>
+        <translation>Esiste già. Vuoi sovrascriverlo?</translation>
     </message>
 </context>
 <context>
@@ -7799,6 +8044,133 @@ Assicurarsi di avere i permessi in lettura per il file e per la directory che lo
     <message>
         <source>Stereo mode</source>
         <translation>Modalità stereo</translation>
+    </message>
+</context>
+<context>
+    <name>expressiveView</name>
+    <message>
+        <source>Select oscillator W1</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Select oscillator W2</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Select oscillator W3</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Select OUTPUT 1</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Select OUTPUT 2</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Open help window</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Sine wave</source>
+        <translation>Onda sinusoidale</translation>
+    </message>
+    <message>
+        <source>Click for a sine-wave.</source>
+        <translation>Cliccando qui si ottiene una forma d&apos;onda sinusoidale.</translation>
+    </message>
+    <message>
+        <source>Moog-Saw wave</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Click for a Moog-Saw-wave.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Exponential wave</source>
+        <translation>Onda esponenziale</translation>
+    </message>
+    <message>
+        <source>Click for an exponential wave.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Saw wave</source>
+        <translation>Onda a dente di sega</translation>
+    </message>
+    <message>
+        <source>Click here for a saw-wave.</source>
+        <translation>Cliccando qui si ottiene un&apos;onda a dente di sega.</translation>
+    </message>
+    <message>
+        <source>User defined wave</source>
+        <translation>Forma d&apos;onda personalizzata</translation>
+    </message>
+    <message>
+        <source>Click here for a user-defined shape.</source>
+        <translation>Cliccando qui è possibile definire una forma d&apos;onda personalizzata.</translation>
+    </message>
+    <message>
+        <source>Triangle wave</source>
+        <translation>Onda triangolare</translation>
+    </message>
+    <message>
+        <source>Click here for a triangle-wave.</source>
+        <translation>Cliccando qui si ottiene un&apos;onda triangolare.</translation>
+    </message>
+    <message>
+        <source>Square wave</source>
+        <translation>Onda quadra</translation>
+    </message>
+    <message>
+        <source>Click here for a square-wave.</source>
+        <translation>Cliccando qui si ottiene un&apos;onda quadra.</translation>
+    </message>
+    <message>
+        <source>White noise wave</source>
+        <translation>Rumore bianco</translation>
+    </message>
+    <message>
+        <source>Click here for white-noise.</source>
+        <translation>Cliccando qui si ottiene rumore bianco.</translation>
+    </message>
+    <message>
+        <source>WaveInterpolate</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>ExpressionValid</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>General purpose 1:</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>General purpose 2:</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>General purpose 3:</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>O1 panning:</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>O2 panning:</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Release transition:</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Smoothness</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -8717,7 +9089,7 @@ Facendo doppio click sui plugin verranno fornite informazioni sulle relative por
     </message>
 </context>
 <context>
-    <name>papuInstrument</name>
+    <name>FreeBoyInstrument</name>
     <message>
         <source>Sweep time</source>
         <translation>Tempo di sweep</translation>
@@ -8812,7 +9184,7 @@ Facendo doppio click sui plugin verranno fornite informazioni sulle relative por
     </message>
 </context>
 <context>
-    <name>papuInstrumentView</name>
+    <name>FreeBoyInstrumentView</name>
     <message>
         <source>Sweep Time:</source>
         <translation>Tempo di sweep:</translation>
@@ -9044,10 +9416,6 @@ Facendo doppio click sui plugin verranno fornite informazioni sulle relative por
         <translation>Elenca i plugin LADSPA installati</translation>
     </message>
     <message>
-        <source>Filter for importing FL Studio projects into LMMS</source>
-        <translation>Filtro per importare progetti di FL Studio in LMMS</translation>
-    </message>
-    <message>
         <source>GUS-compatible patch instrument</source>
         <translation>strumento compatibile con GUS</translation>
     </message>
@@ -9200,6 +9568,14 @@ Questo chip era utilizzato nel Commode 64.</translation>
     <message>
         <source>Filter for exporting MIDI-files from LMMS</source>
         <translation>Filtro per esportare file MIDI da LMMS</translation>
+    </message>
+    <message>
+        <source>Reverb algorithm by Sean Costello</source>
+        <translation>Algoritmo di Riverbero di Sean Costello</translation>
+    </message>
+    <message>
+        <source>Mathematical expression parser</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>

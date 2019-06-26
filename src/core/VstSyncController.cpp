@@ -4,7 +4,7 @@
  * Copyright (c) 2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * Copyright (c) 2013 Mike Choi <rdavidian71/at/gmail/dot/com>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -27,7 +27,6 @@
 
 #include "ConfigManager.h"
 #include "Engine.h"
-#include "lmmsconfig.h"
 #include "Mixer.h"
 #include "VstSyncController.h"
 #include "RemotePlugin.h"
@@ -137,12 +136,12 @@ VstSyncController::~VstSyncController()
 
 
 
-void VstSyncController::setAbsolutePosition( int ticks )
+void VstSyncController::setAbsolutePosition( double ticks )
 {
 #ifdef VST_SNC_LATENCY
-	m_syncData->ppqPos = ( ( ticks + 0 ) / (float)48 ) - m_syncData->m_latency;
+	m_syncData->ppqPos = ( ( ticks + 0 ) / 48.0 ) - m_syncData->m_latency;
 #else
-	m_syncData->ppqPos = ( ( ticks + 0 ) / (float)48 );
+	m_syncData->ppqPos = ( ( ticks + 0 ) / 48.0 );
 #endif
 }
 

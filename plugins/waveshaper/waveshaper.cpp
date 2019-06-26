@@ -4,7 +4,7 @@
  * Copyright (c) 2014 Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>
  * Copyright (c) 2006-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -26,9 +26,10 @@
 
 #include "waveshaper.h"
 #include "lmms_math.h"
-#include "embed.cpp"
+#include "embed.h"
 #include "interpolation.h"
 
+#include "plugin_export.h"
 
 extern "C"
 {
@@ -42,7 +43,7 @@ Plugin::Descriptor PLUGIN_EXPORT waveshaper_plugin_descriptor =
 	"Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>",
 	0x0100,
 	Plugin::Effect,
-	new PluginPixmapLoader( "logo" ),
+	new PluginPixmapLoader("logo"),
 	NULL,
 	NULL
 } ;
@@ -93,8 +94,8 @@ bool waveShaperEffect::processAudioBuffer( sampleFrame * _buf,
 	int inputInc = inputBuffer ? 1 : 0;
 	int outputInc = outputBufer ? 1 : 0;
 
-	float *inputPtr = inputBuffer ? &( inputBuffer->values()[ 0 ] ) : &input;
-	float *outputPtr = outputBufer ? &( outputBufer->values()[ 0 ] ) : &output;
+	const float *inputPtr = inputBuffer ? &( inputBuffer->values()[ 0 ] ) : &input;
+	const float *outputPtr = outputBufer ? &( outputBufer->values()[ 0 ] ) : &output;
 
 	for( fpp_t f = 0; f < _frames; ++f )
 	{
@@ -161,7 +162,7 @@ extern "C"
 {
 
 // necessary for getting instance out of shared lib
-Plugin * PLUGIN_EXPORT lmms_plugin_main( Model * _parent, void * _data )
+PLUGIN_EXPORT Plugin * lmms_plugin_main( Model * _parent, void * _data )
 {
 	return( new waveShaperEffect( _parent,
 		static_cast<const Plugin::Descriptor::SubPluginFeatures::Key *>(

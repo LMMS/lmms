@@ -5,7 +5,7 @@
  * Copyright (c) 2008-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * Copyright (c) 2006-2008 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -35,7 +35,7 @@ class AutomationTrack : public Track
 	Q_OBJECT
 public:
 	AutomationTrack( TrackContainer* tc, bool _hidden = false );
-	virtual ~AutomationTrack();
+	virtual ~AutomationTrack() = default;
 
 	virtual bool play( const MidiTime & _start, const fpp_t _frames,
 						const f_cnt_t _frame_base, int _tco_num = -1 );
@@ -63,7 +63,7 @@ class AutomationTrackView : public TrackView
 {
 public:
 	AutomationTrackView( AutomationTrack* at, TrackContainerView* tcv );
-	virtual ~AutomationTrackView();
+	virtual ~AutomationTrackView() = default;
 
 	virtual void dragEnterEvent( QDragEnterEvent * _dee );
 	virtual void dropEvent( QDropEvent * _de );

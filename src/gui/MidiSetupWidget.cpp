@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -36,7 +36,7 @@ MidiSetupWidget::MidiSetupWidget( const QString & caption, const QString & confi
 	m_configSection(configSection),
 	m_device(nullptr)
 {
-	// supply devName=QString::Null() (distinct from QString(""))
+	// supply devName=QString() (distinct from QString(""))
 	//   to indicate that there is no editable DEVICE field
 	if (!devName.isNull())
 	{

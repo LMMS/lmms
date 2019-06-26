@@ -4,7 +4,7 @@
  * Copyright (c) 2009 Andrew Kelley <superjoe30/at/gmail/dot/com>
  * Copyright (c) 2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -26,13 +26,15 @@
 #ifndef FX_LINE_H
 #define FX_LINE_H
 
+#include <QGraphicsView>
+#include <QLineEdit>
 #include <QWidget>
-#include <QLabel>
-#include <QStaticText>
 
 #include "Knob.h"
 #include "LcdWidget.h"
 #include "SendButtonIndicator.h"
+
+
 
 class FxMixerView;
 class SendButtonIndicator;
@@ -75,11 +77,15 @@ public:
 	QColor strokeInnerInactive() const;
 	void setStrokeInnerInactive( const QColor & c );
 
-
 	static const int FxLineHeight;
 
+	void renameChannel();
+
+	bool eventFilter (QObject *dist, QEvent *event);
+
 private:
-	void drawFxLine( QPainter* p, const FxLine *fxLine, const QString& name, bool isActive, bool sendToThis, bool receiveFromThis );
+	void drawFxLine( QPainter* p, const FxLine *fxLine, bool isActive, bool sendToThis, bool receiveFromThis );
+	QString elideName( const QString & name );
 
 	FxMixerView * m_mv;
 	LcdWidget* m_lcd;
@@ -91,17 +97,16 @@ private:
 	QColor m_strokeInnerInactive;
 	static QPixmap * s_sendBgArrow;
 	static QPixmap * s_receiveBgArrow;
-
-	QStaticText m_staticTextName;
+	bool m_inRename;
+	QLineEdit * m_renameLineEdit;
+	QGraphicsView * m_view;
 
 private slots:
-	void renameChannel();
+	void renameFinished();
 	void removeChannel();
 	void removeUnusedChannels();
 	void moveChannelLeft();
 	void moveChannelRight();
-	void displayHelp();
-
 };
 
 

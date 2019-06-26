@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -24,10 +24,9 @@
 
 #include <QDomElement>
 #include <QDir>
-#include <QFile>
-#include <QFileInfo>
 #include <QMessageBox>
 #include <QApplication>
+#include <QStandardPaths>
 #include <QtCore/QTextStream>
 
 #include "ConfigManager.h"
@@ -35,6 +34,7 @@
 #include "ProjectVersion.h"
 #include "GuiApplication.h"
 
+#include "lmmsversion.h"
 
 static inline QString ensureTrailingSlash( const QString & s )
 {
@@ -51,21 +51,29 @@ ConfigManager * ConfigManager::s_instanceOfMe = NULL;
 
 ConfigManager::ConfigManager() :
 	m_lmmsRcFile( QDir::home().absolutePath() +"/.lmmsrc.xml" ),
-	m_workingDir( QDir::home().absolutePath() + "/lmms/"),
+	m_workingDir( QStandardPaths::writableLocation( QStandardPaths::DocumentsLocation ) + "/lmms/"),
 	m_dataDir( "data:/" ),
 	m_artworkDir( defaultArtworkDir() ),
 	m_vstDir( m_workingDir + "vst/" ),
-	m_flDir( QDir::home().absolutePath() ),
 	m_gigDir( m_workingDir + GIG_PATH ),
 	m_sf2Dir( m_workingDir + SF2_PATH ),
 	m_version( defaultVersion() )
 {
+	// Detect < 1.2.0 working directory as a courtesy
+	if ( QFileInfo( QDir::home().absolutePath() + "/lmms/projects/" ).exists() )
+                m_workingDir = QDir::home().absolutePath() + "/lmms/";
+
 	if (! qgetenv("LMMS_DATA_DIR").isEmpty())
 		QDir::addSearchPath("data", QString::fromLocal8Bit(qgetenv("LMMS_DATA_DIR")));
 
 	// If we're in development (lmms is not installed) let's get the source and
 	// binary directories by reading the CMake Cache
-	QFile cmakeCache(qApp->applicationDirPath() + "/CMakeCache.txt");
+	QDir appPath = qApp->applicationDirPath();
+	// If in tests, get parent directory
+	if (appPath.dirName() == "tests") {
+		appPath.cdUp();
+	}
+	QFile cmakeCache(appPath.absoluteFilePath("CMakeCache.txt"));
 	if (cmakeCache.exists()) {
 		cmakeCache.open(QFile::ReadOnly);
 		QTextStream stream(&cmakeCache);
@@ -137,6 +145,16 @@ void ConfigManager::upgrade_1_1_90()
 	}
 }
 
+	
+void ConfigManager::upgrade_1_1_91()
+{		
+	// rename displaydbv to displaydbfs
+	if ( !value( "app", "displaydbv" ).isNull() ) {
+		setValue( "app", "displaydbfs", value( "app", "displaydbv" ) );
+		deleteValue( "app", "displaydbv" );
+	}
+}
+
 
 void ConfigManager::upgrade()
 {
@@ -148,13 +166,18 @@ void ConfigManager::upgrade()
 
 	ProjectVersion createdWith = m_version;
 	
-	if ( createdWith.setCompareType(Build) < "1.1.90" )
+	if ( createdWith.setCompareType(ProjectVersion::Build) < "1.1.90" )
 	{
 		upgrade_1_1_90();
 	}
 	
+	if ( createdWith.setCompareType(ProjectVersion::Build) < "1.1.91" )
+	{
+		upgrade_1_1_91();
+	}
+	
 	// Don't use old themes as they break the UI (i.e. 0.4 != 1.0, etc)
-	if ( createdWith.setCompareType(Minor) != LMMS_VERSION )
+	if ( createdWith.setCompareType(ProjectVersion::Minor) != LMMS_VERSION )
 	{
 		m_artworkDir = defaultArtworkDir();
 	}
@@ -163,15 +186,48 @@ void ConfigManager::upgrade()
 	m_version = LMMS_VERSION;
 }
 
+QString ConfigManager::defaultVersion() const
+{
+	return LMMS_VERSION;
+}
+
+QStringList ConfigManager::availabeVstEmbedMethods()
+{
+	QStringList methods;
+	methods.append("none");
+#if QT_VERSION >= 0x050100
+	methods.append("qt");
+#endif
+#ifdef LMMS_BUILD_WIN32
+	methods.append("win32");
+#endif
+#ifdef LMMS_BUILD_LINUX
+	if (static_cast<QGuiApplication*>(QApplication::instance())->
+		platformName() == "xcb")
+	{
+		methods.append("xembed");
+	}
+#endif
+	return methods;
+}
+
+QString ConfigManager::vstEmbedMethod() const
+{
+	QStringList methods = availabeVstEmbedMethods();
+	QString defaultMethod = *(methods.end() - 1);
+	QString currentMethod = value( "ui", "vstembedmethod", defaultMethod );
+	return methods.contains(currentMethod) ? currentMethod : defaultMethod;
+}
+
 bool ConfigManager::hasWorkingDir() const
 {
 	return QDir( m_workingDir ).exists();
 }
 
 
-void ConfigManager::setWorkingDir( const QString & _wd )
+void ConfigManager::setWorkingDir( const QString & wd )
 {
-	m_workingDir = ensureTrailingSlash( _wd );
+	m_workingDir = ensureTrailingSlash( QDir::cleanPath( wd ) );
 }
 
 
@@ -188,14 +244,6 @@ void ConfigManager::setVSTDir( const QString & _vd )
 void ConfigManager::setArtworkDir( const QString & _ad )
 {
 	m_artworkDir = ensureTrailingSlash( _ad );
-}
-
-
-
-
-void ConfigManager::setFLDir( const QString & _fd )
-{
-	m_flDir = ensureTrailingSlash( _fd );
 }
 
 
@@ -231,9 +279,7 @@ void ConfigManager::setDefaultSoundfont( const QString & _sf )
 
 void ConfigManager::setBackgroundArtwork( const QString & _ba )
 {
-#ifdef LMMS_HAVE_FLUIDSYNTH
 	m_backgroundArtwork = _ba;
-#endif
 }
 
 void ConfigManager::setGIGDir(const QString &gd)
@@ -267,7 +313,8 @@ void ConfigManager::addRecentlyOpenedProject( const QString & file )
 {
 	QFileInfo recentFile( file );
 	if( recentFile.suffix().toLower() == "mmp" ||
-			recentFile.suffix().toLower() == "mmpz" )
+		recentFile.suffix().toLower() == "mmpz" ||
+		recentFile.suffix().toLower() == "mpt" )
 	{
 		m_recentlyOpenedProjects.removeAll( file );
 		if( m_recentlyOpenedProjects.size() > 50 )
@@ -303,6 +350,16 @@ const QString & ConfigManager::value( const QString & cls,
 
 
 
+const QString & ConfigManager::value( const QString & cls,
+				      const QString & attribute,
+				      const QString & defaultVal ) const
+{
+	const QString & val = value( cls, attribute );
+	return val.isEmpty() ? defaultVal : val;
+}
+
+
+
 
 void ConfigManager::setValue( const QString & cls,
 				const QString & attribute,
@@ -310,12 +367,15 @@ void ConfigManager::setValue( const QString & cls,
 {
 	if( m_settings.contains( cls ) )
 	{
-		for( stringPairVector::iterator it = m_settings[cls].begin();
-					it != m_settings[cls].end(); ++it )
+		for( QPair<QString, QString>& pair : m_settings[cls])
 		{
-			if( ( *it ).first == attribute )
+			if( pair.first == attribute )
 			{
-				( *it ).second = value;
+				if ( pair.second != value )
+				{
+					pair.second = value;
+					emit valueChanged( cls, attribute, value );
+				}
 				return;
 			}
 		}
@@ -411,7 +471,16 @@ void ConfigManager::loadConfigFile( const QString & configFile )
 			if( value( "paths", "artwork" ) != "" )
 			{
 				m_artworkDir = value( "paths", "artwork" );
-				if( !QDir( m_artworkDir ).exists() )
+#ifdef LMMS_BUILD_WIN32
+				// Detect a QDir/QFile hang on Windows
+				// see issue #3417 on github
+				bool badPath = ( m_artworkDir == "/" || m_artworkDir == "\\" );
+#else
+				bool badPath = false;
+#endif
+
+				if( badPath || !QDir( m_artworkDir ).exists() ||
+						!QFile( m_artworkDir + "/style.css" ).exists() )
 				{
 					m_artworkDir = defaultArtworkDir();
 				}
@@ -422,7 +491,6 @@ void ConfigManager::loadConfigFile( const QString & configFile )
 			setGIGDir( value( "paths", "gigdir" ) == "" ? gigDir() : value( "paths", "gigdir" ) );
 			setSF2Dir( value( "paths", "sf2dir" ) == "" ? sf2Dir() : value( "paths", "sf2dir" ) );
 			setVSTDir( value( "paths", "vstdir" ) );
-			setFLDir( value( "paths", "fldir" ) );
 			setLADSPADir( value( "paths", "laddir" ) );
 		#ifdef LMMS_HAVE_STK
 			setSTKDir( value( "paths", "stkdir" ) );
@@ -443,8 +511,9 @@ void ConfigManager::loadConfigFile( const QString & configFile )
 		cfg_file.close();
 	}
 
-
+	// Plugins are searched recursively, blacklist problematic locations
 	if( m_vstDir.isEmpty() || m_vstDir == QDir::separator() || m_vstDir == "/" ||
+			m_vstDir == ensureTrailingSlash( QDir::homePath() ) ||
 			!QDir( m_vstDir ).exists() )
 	{
 #ifdef LMMS_BUILD_WIN32
@@ -453,11 +522,6 @@ void ConfigManager::loadConfigFile( const QString & configFile )
 #else
 		m_vstDir =  m_workingDir + "plugins/vst/";
 #endif
-	}
-
-	if( m_flDir.isEmpty() || m_flDir == QDir::separator() || m_flDir == "/")
-	{
-		m_flDir = ensureTrailingSlash( QDir::home().absolutePath() );
 	}
 
 	if( m_ladDir.isEmpty()  )
@@ -474,10 +538,21 @@ void ConfigManager::loadConfigFile( const QString & configFile )
 #elif defined(LMMS_BUILD_APPLE)
 		m_stkDir = qApp->applicationDirPath() + "/../share/stk/rawwaves/";
 #else
-		m_stkDir = "/usr/share/stk/rawwaves/";
+		if ( qApp->applicationDirPath().startsWith("/tmp/") )
+		{
+			// Assume AppImage bundle
+			m_stkDir = qApp->applicationDirPath() + "/../share/stk/rawwaves/";
+		}
+		else
+		{
+			// Fallback to system provided location
+			m_stkDir = "/usr/share/stk/rawwaves/";
+		}
 #endif
 	}
 #endif
+
+	upgrade();
 
 	QStringList searchPaths;
 	if(! qgetenv("LMMS_THEME_PATH").isNull())
@@ -490,8 +565,6 @@ void ConfigManager::loadConfigFile( const QString & configFile )
 	{
 		createWorkingDir();
 	}
-
-	upgrade();
 }
 
 
@@ -502,7 +575,6 @@ void ConfigManager::saveConfigFile()
 	setValue( "paths", "artwork", m_artworkDir );
 	setValue( "paths", "workingdir", m_workingDir );
 	setValue( "paths", "vstdir", m_vstDir );
-	setValue( "paths", "fldir", m_flDir );
 	setValue( "paths", "gigdir", m_gigDir );
 	setValue( "paths", "sf2dir", m_sf2Dir );
 	setValue( "paths", "laddir", m_ladDir );
@@ -548,19 +620,24 @@ void ConfigManager::saveConfigFile()
 	QFile outfile( m_lmmsRcFile );
 	if( !outfile.open( QIODevice::WriteOnly | QIODevice::Truncate ) )
 	{
-		QMessageBox::critical( NULL,
-			MainWindow::tr( "Could not save config-file" ),
-			MainWindow::tr( "Could not save configuration file %1. "
-					"You're probably not permitted to "
-					"write to this file.\n"
-					"Please make sure you have write-"
-					"access to the file and try again." ).
-							arg( m_lmmsRcFile  ) );
+		QString title, message;
+		title = MainWindow::tr( "Could not open file" );
+		message = MainWindow::tr( "Could not open file %1 "
+					"for writing.\nPlease make "
+					"sure you have write "
+					"permission to the file and "
+					"the directory containing the "
+					"file and try again!"
+						).arg( m_lmmsRcFile );
+		if( gui )
+		{
+			QMessageBox::critical( NULL, title, message,
+						QMessageBox::Ok,
+						QMessageBox::NoButton );
+		}
 		return;
 	}
 
 	outfile.write( xml.toUtf8() );
 	outfile.close();
 }
-
-

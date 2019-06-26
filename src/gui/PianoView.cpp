@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -36,29 +36,22 @@
  * \todo write isWhite inline function and replace throughout
  */
 
+#include <cmath>
 
 #include <QCursor>
 #include <QKeyEvent>
-#include <QMouseEvent>
 #include <QPainter>
 #include <QVBoxLayout>
-
 
 #include "PianoView.h"
 #include "Piano.h"
 #include "CaptionMenu.h"
 #include "embed.h"
-#include "Engine.h"
 #include "gui_templates.h"
 #include "InstrumentTrack.h"
 #include "Knob.h"
 #include "StringPairDrag.h"
 #include "MainWindow.h"
-#include "MidiEvent.h"
-#include "templates.h"
-#include "update_event.h"
-
-
 
 
 /*! The scale of C Major - white keys only.
@@ -136,19 +129,6 @@ PianoView::PianoView( QWidget * _parent ) :
 	layout->addWidget( m_pianoScroll );
 
 }
-
-
-
-
-/*! \brief Destroy this piano display view
- *
- */
-PianoView::~PianoView()
-{
-}
-
-
-
 
 /*! \brief Map a keyboard key being pressed to a note in our keyboard view
  *
@@ -334,13 +314,22 @@ void PianoView::modelChanged()
  */
 int PianoView::getKeyFromMouse( const QPoint & _p ) const
 {
-	int key_num = (int)( (float) _p.x() / (float) PW_WHITE_KEY_WIDTH );
+	int offset = _p.x() % PW_WHITE_KEY_WIDTH;
+	if( offset < 0 ) offset += PW_WHITE_KEY_WIDTH;
+	int key_num = ( _p.x() - offset) / PW_WHITE_KEY_WIDTH;
 
 	for( int i = 0; i <= key_num; ++i )
 	{
 		if ( Piano::isBlackKey( m_startKey+i ) )
 		{
 			++key_num;
+		}
+	}
+	for( int i = 0; i >= key_num; --i )
+	{
+		if ( Piano::isBlackKey( m_startKey+i ) )
+		{
+			--key_num;
 		}
 	}
 
@@ -352,23 +341,21 @@ int PianoView::getKeyFromMouse( const QPoint & _p ) const
 		// then do extra checking whether the mouse-cursor is over
 		// a black key
 		if( key_num > 0 && Piano::isBlackKey( key_num-1 ) &&
-			_p.x() % PW_WHITE_KEY_WIDTH <=
-					( PW_WHITE_KEY_WIDTH / 2 ) -
-						( PW_BLACK_KEY_WIDTH / 2 ) )
+			offset <= ( PW_WHITE_KEY_WIDTH / 2 ) -
+					( PW_BLACK_KEY_WIDTH / 2 ) )
 		{
 			--key_num;
 		}
 		if( key_num < NumKeys - 1 && Piano::isBlackKey( key_num+1 ) &&
-			_p.x() % PW_WHITE_KEY_WIDTH >=
-				( PW_WHITE_KEY_WIDTH -
-				  		PW_BLACK_KEY_WIDTH / 2 ) )
+			offset >= ( PW_WHITE_KEY_WIDTH -
+					PW_BLACK_KEY_WIDTH / 2 ) )
 		{
 			++key_num;
 		}
 	}
 
 	// some range-checking-stuff
-	return tLimit( key_num, 0, NumKeys - 1 );
+	return qBound( 0, key_num, NumKeys - 1 );
 }
 
 
@@ -668,8 +655,10 @@ void PianoView::focusOutEvent( QFocusEvent * )
 	// window we live in?
 	if( parentWidget()->parentWidget()->focusWidget() != this &&
 		parentWidget()->parentWidget()->focusWidget() != NULL &&
-		!parentWidget()->parentWidget()->
-				focusWidget()->inherits( "QLineEdit" ) )
+		!(parentWidget()->parentWidget()->
+				focusWidget()->inherits( "QLineEdit" ) ||
+		parentWidget()->parentWidget()->
+				focusWidget()->inherits( "QPlainTextEdit" ) ))
 	{
 		// then reclaim keyboard focus!
 		setFocus();
@@ -779,15 +768,11 @@ void PianoView::paintEvent( QPaintEvent * )
 	p.setFont( pointSize<LABEL_TEXT_SIZE>( p.font() ) );
 
 
-	// draw blue bar above the actual keyboard (there will be the labels
+	// draw bar above the keyboard (there will be the labels
 	// for all C's)
-	QLinearGradient g( 0, 0, 0, PIANO_BASE-3 );
-	g.setColorAt( 0, Qt::black );
-	g.setColorAt( 0.1, QColor( 96, 96, 96 ) );
-	g.setColorAt( 1, Qt::black );
-	p.fillRect( QRect( 0, 1, width(), PIANO_BASE-2 ), g );
+	p.fillRect( QRect( 0, 1, width(), PIANO_BASE-2 ), p.background() );
 
-	// draw stuff above the actual keyboard
+	// draw the line above the keyboard
 	p.setPen( Qt::black );
 	p.drawLine( 0, 0, width(), 0 );
 	p.drawLine( 0, PIANO_BASE-1, width(), PIANO_BASE-1 );
@@ -796,21 +781,18 @@ void PianoView::paintEvent( QPaintEvent * )
 
 	const int base_key = ( m_piano != NULL ) ?
 		m_piano->instrumentTrack()->baseNoteModel()->value() : 0;
-	g.setColorAt( 0, QApplication::palette().color( QPalette::Active,
-							QPalette::BrightText ).darker(220) );
-	g.setColorAt( 0.1, QApplication::palette().color( QPalette::Active,
-							QPalette::BrightText ) );
-	g.setColorAt( 1, QApplication::palette().color( QPalette::Active,
-							QPalette::BrightText ) );
+
+	QColor baseKeyColor = QApplication::palette().color( QPalette::Active,
+							QPalette::BrightText );
 	if( Piano::isWhiteKey( base_key ) )
 	{
 		p.fillRect( QRect( getKeyX( base_key ), 1, PW_WHITE_KEY_WIDTH-1,
-							PIANO_BASE-2 ), g );
+							PIANO_BASE-2 ), baseKeyColor );
 	}
 	else
 	{
 		p.fillRect( QRect( getKeyX( base_key ) + 1, 1,
-				PW_BLACK_KEY_WIDTH - 1, PIANO_BASE - 2 ), g );
+				PW_BLACK_KEY_WIDTH - 1, PIANO_BASE - 2 ), baseKeyColor);
 	}
 
 
