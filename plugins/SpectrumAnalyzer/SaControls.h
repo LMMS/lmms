@@ -25,8 +25,6 @@
 #ifndef SACONTROLS_H
 #define SACONTROLS_H
 
-#include <QPainter>
-
 #include "ComboBoxModel.h"
 #include "EffectControls.h"
 

@@ -28,7 +28,9 @@
 
 #include <algorithm>
 #include <cmath>
+#include <QMouseEvent>
 #include <QMutexLocker>
+#include <QPainter>
 #include <QString>
 
 #include "GuiApplication.h"

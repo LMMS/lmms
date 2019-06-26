@@ -526,7 +526,9 @@ float SaProcessor::ampToYPixel(float amplitude, unsigned int height) const
 {
 	if (m_controls->m_logYModel.value())
 	{
-		if (10 * log10(amplitude) < getAmpRangeMin())
+		// logarithmic scale: convert linear amplitude to dB (relative to 1.0)
+		float amplitude_dB = 10 * log10(amplitude);
+		if (amplitude_dB < getAmpRangeMin())
 		{
 			return height;
 		}
@@ -534,11 +536,12 @@ float SaProcessor::ampToYPixel(float amplitude, unsigned int height) const
 		{
 			float max = getAmpRangeMax();
 			float range = getAmpRangeMin() - max;
-			return (10 * log10(amplitude) - max) / range * height;
+			return (amplitude_dB - max) / range * height;
 		}
 	}
 	else
 	{
+		// linear scale: convert returned ranges from dB to linear scale
 		float max = pow(10, getAmpRangeMax() / 10);
 		float range = pow(10, getAmpRangeMin() / 10) - max;
 		return (amplitude - max) / range * height;
@@ -559,6 +562,7 @@ float SaProcessor::yPixelToAmp(float y, unsigned int height) const
 	}
 	else
 	{
+		// linear scale: convert returned ranges from dB to linear scale
 		float max = pow(10, getAmpRangeMax() / 10);
 		float range = pow(10, getAmpRangeMin() / 10) - max;
 		return max + range * (y / height);

@@ -29,13 +29,13 @@
 
 #include <string>
 #include <utility>
-#include <QMouseEvent>
-#include <QPainter>
+#include <QPainterPath>
 #include <QWidget>
 
-#include "SaControls.h"
-#include "SaProcessor.h"
-
+class QMouseEvent;
+class QPainter;
+class SaControls;
+class SaProcessor;
 
 //! Widget that displays a spectrum curve and frequency / amplitude grid
 class SaSpectrumView : public QWidget
