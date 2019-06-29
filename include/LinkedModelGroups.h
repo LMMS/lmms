@@ -138,17 +138,17 @@ private:
 
 	A typical application are two mono plugins making a stereo plugin.
 
-	Inheriting classes need to do the following connections, where the slots
-	must be defined by those classes and call the equal named functions of this
-	class:
+	Inheriting classes need to do the following connections:
 
 	\code
 		if (multiChannelLinkModel())
 		{
-			connect(multiChannelLinkModel(), SIGNAL(dataChanged()),
-				this, SLOT(updateLinkStatesFromGlobal()));
-			connect(getGroup(0), SIGNAL(linkStateChanged(std::size_t, bool)),
-					this, SLOT(linkPort(std::size_t, bool)));
+			connect(multiChannelLinkModel(), &BoolModel::dataChanged,
+				this, [this](){updateLinkStatesFromGlobal();},
+				Qt::DirectConnection);
+			connect(getGroup(0), &LinkedModelGroup::linkStateChanged,
+				this, [this](std::size_t id, bool value){
+				linkModel(id, value);}, Qt::DirectConnection);
 		}
 	\endcode
 
