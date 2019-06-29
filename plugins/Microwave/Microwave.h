@@ -250,17 +250,9 @@
 		name.addItem(tr("Decimate"), make_unique<PluginPixmapLoader>("number_1"));\
 		name.addItem(tr("Average"), make_unique<PluginPixmapLoader>("number_2"));
 
-#define visimove(name, x, y)\
-	if (x >= 0 && x <= 250)\
-	{\
-		name->move(x, y);\
-		name->setVisible(true);\
-	}\
-	else\
-	{\
-		name->move(0, 0);\
-		name->setVisible(false);\
-	}
+#define visimove(name, x, y, isVisible)\
+	name->move(x, y);\
+	name->setVisible(isVisible);
 
 
 // Create the knob, set its tooltip, set its default color

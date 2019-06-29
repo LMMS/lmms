@@ -227,7 +227,14 @@ Microwave::Microwave(InstrumentTrack * instrument_track) :
 	loadmodemodel(m_loadMode)
 
 	oversamplemodemodel(m_oversampleMode)
-	m_oversampleMode.setValue(1);// Sample averaging is default
+	m_oversampleMode.setValue(0);// Decimate is default
+	/* Decimate mode downsamples without interpolation,
+	which actually has decent quality because of
+	Microwave's non-realtime oversampling.
+
+	Average mode averages all the generated samples together,
+	which can sometimes result in fewer artifacts but oftentimes
+	messes up high frequencies.*/
 
 	connect(&m_graph, SIGNAL(samplesChanged(int, int)), this, SLOT(samplesChanged(int, int)));
 
@@ -1525,7 +1532,7 @@ MicrowaveView::MicrowaveView(Instrument * instrument,
 
 	for (int i = 0; i < 18; ++i)
 	{
-		makeknob(m_macroKnob[i], knobSmallColored, tr("Macro") + " " + QString::number(i+1) + ":", tr("Macro %1: ").arg(i + 1) + tr("This knob's value can be used in the Matrix to control many values at the same time, at different amounts.  This is immensely useful for crafting great presets."));
+		makeknob(m_macroKnob[i], knobSmallColored, tr("Macro") + " " + QString::number(i+1) + ":", tr("Macro %1: ").arg(i + 1) + tr("This knob's value can be used in the Matrix to control many values at the same time, at different amounts.  This is immensely useful for crafting great presets.  Right click on this knob for some special Macro-specific knob features."));
 	}
 
 	makeknob(m_subVolKnob, knobColored, tr("Volume"), tr("This knob, as you probably expected, controls the volume."));
@@ -1838,24 +1845,30 @@ MicrowaveView::MicrowaveView(Instrument * instrument,
 	connect(m_confirmLoadButton, SIGNAL(clicked()), this, SLOT(confirmWavetableLoadClicked()));
 	ToolTip::add(m_confirmLoadButton, tr("Load Wavetable"));
 
+	m_mainNumBox = new LcdSpinBox(2, "microwave", this, "Oscillator Number");
+	ToolTip::add(m_mainNumBox, tr("Oscillator Number"));
+
 	m_subNumBox = new LcdSpinBox(2, "microwave", this, "Sub Oscillator Number");
+	ToolTip::add(m_subNumBox, tr("Oscillator Number"));
 
 	m_sampNumBox = new LcdSpinBox(2, "microwave", this, "Sample Number");
-
-	m_mainNumBox = new LcdSpinBox(2, "microwave", this, "Oscillator Number");
+	ToolTip::add(m_sampNumBox, tr("Oscillator Number"));
 
 	m_oversampleBox = new ComboBox(this);
 	m_oversampleBox->setGeometry(0, 0, 42, 22);
 	m_oversampleBox->setFont(pointSize<8>(m_oversampleBox->font()));
+	ToolTip::add(m_oversampleBox, tr("Oversampling Amount"));
 
 	m_loadModeBox = new ComboBox(this);
 	m_loadModeBox->setGeometry(0, 0, 202, 22);
 	m_loadModeBox->setFont(pointSize<8>(m_loadModeBox->font()));
+	ToolTip::add(m_loadModeBox, tr("Oversampling Mode"));
 
 	m_openSampleButton = new PixmapButton(this);
 	m_openSampleButton->setCursor(QCursor(Qt::PointingHandCursor));
 	m_openSampleButton->setActiveGraphic(PLUGIN_NAME::getIconPixmap("fileload"));
 	m_openSampleButton->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("fileload"));
+	ToolTip::add(m_oversampleBox, tr("Load Sound Sample"));
 
 	m_effectScrollBar = new QScrollBar(Qt::Vertical, this);
 	m_effectScrollBar->setSingleStep(1);
@@ -1919,7 +1932,6 @@ MicrowaveView::MicrowaveView(Instrument * instrument,
 	connect(m_desawBtn, SIGNAL (clicked ()), this, SLOT (desawClicked()));
 
 
-	// This is a mess, but for some reason just entering a number without a variable didn't work...
 	int ii = 0;
 	connect(m_tab1Btn, &PixmapButton::clicked, this, [this, ii]() { tabBtnClicked(ii); });
 	ii = 1;
@@ -1935,15 +1947,20 @@ MicrowaveView::MicrowaveView(Instrument * instrument,
 
 
 	connect(m_mainFlipBtn, SIGNAL (clicked ()), this, SLOT (flipperClicked()));
+	ToolTip::add(m_mainFlipBtn, tr("Flip to other knobs"));
+
 	connect(m_subFlipBtn, SIGNAL (clicked ()), this, SLOT (flipperClicked()));
+	ToolTip::add(m_subFlipBtn, tr("Flip to other knobs"));
 
 	connect(m_visualizeToggle, SIGNAL(toggled(bool)), this, SLOT (visualizeToggled(bool)));
+	ToolTip::add(m_visualizeToggle, tr("Enable wavetable visualizer"));
 
 	connect(&m_b->m_mainNum, SIGNAL(dataChanged()), this, SLOT(mainNumChanged()));
 	connect(&m_b->m_subNum, SIGNAL(dataChanged()), this, SLOT(subNumChanged()));
 	connect(&m_b->m_sampNum, SIGNAL(dataChanged()), this, SLOT(sampNumChanged()));
 
 	connect(m_manualBtn, SIGNAL (clicked (bool)), this, SLOT (manualBtnClicked()));
+	ToolTip::add(m_manualBtn, tr("Open the instruction manual"));
 
 	for (int i = 0; i < 64; ++i)
 	{
@@ -2013,105 +2030,108 @@ void MicrowaveView::modelChanged()
 }
 
 
-// If you think you've seen ugly workarounds before, you haven't seen anything yet.
-// A very old version of Microwave included the GUI elements visually moving left/right.
-// Because of that, the GUI elements were just moved off of the screen rather than having their visibility toggled.
-// It is because of this that I traded out the move function with visimove, which prevents the GUI elements from
-// leaving the 250x250 GUI, and instead toggles their visibility if they try to leave, in case of things checking for the
-// bounds of the GUI elements (e.g. instrument window resizing).
+// Moves GUI elements to their correct locations and toggles their visibility when needed
 void MicrowaveView::updateScroll()
 {
-	int m_scrollVal = (m_b->m_scroll) * 250.f;
 	int modScrollVal = (m_matrixScrollBar->value()) / 100.f * 115.f;
-	int m_effectScrollVal = (m_effectScrollBar->value()) / 100.f * 92.f;
-	int m_mainFlipped = m_b->m_mainFlipped.value();
-	int m_subFlipped = m_b->m_subFlipped.value();
+	int effectScrollVal = (m_effectScrollBar->value()) / 100.f * 92.f;
+	int mainFlipped = m_b->m_mainFlipped.value();
+	int subFlipped = m_b->m_subFlipped.value();
 
-	int mainIsFlipped = m_mainFlipped * 500.f;
-	int mainIsNotFlipped = !m_mainFlipped * 500.f;
-	int m_subIsFlipped = m_subFlipped * 500.f;
-	int m_subIsNotFlipped = !m_subFlipped * 500.f;
+	bool inMainTab = m_b->m_scroll == 0;
+	bool inSubTab = m_b->m_scroll == 1;
+	bool inSampleTab = m_b->m_scroll == 2;
+	bool inMatrixTab = m_b->m_scroll == 3;
+	bool inEffectTab = m_b->m_scroll == 4;
+	bool inMiscTab = m_b->m_scroll == 5;
+	bool inWavetableLoadingTab = m_b->m_scroll == 6;
 
-	visimove(m_morphKnob, (m_scrollVal < 250 ? 23 : 1500 + 176) - m_scrollVal, 172 + mainIsFlipped);
-	visimove(m_rangeKnob, (m_scrollVal < 250 ? 55 : 1500 + 208) - m_scrollVal, 172 + mainIsFlipped);
-	visimove(m_modifyKnob, 87 - m_scrollVal, 172 + mainIsFlipped);
-	visimove(m_modifyModeBox, 127 - m_scrollVal, 186 + mainIsFlipped);
-	visimove(m_volKnob, 23 - m_scrollVal, 172 + mainIsNotFlipped);
-	visimove(m_panKnob, 55 - m_scrollVal, 172 + mainIsNotFlipped);
-	visimove(m_detuneKnob, 152 - m_scrollVal, 216 + mainIsFlipped);
-	visimove(m_phaseKnob, 184 - m_scrollVal, 203 + mainIsNotFlipped);
-	visimove(m_phaseRandKnob, 209 - m_scrollVal, 203 + mainIsNotFlipped);
-	visimove(m_enabledToggle, 85 - m_scrollVal, 229);
-	visimove(m_mutedToggle, 103 - m_scrollVal, 229);
-	visimove(m_sampLenKnob, 137 - m_scrollVal, 172 + mainIsNotFlipped);
-	visimove(m_morphMaxKnob, 101 - m_scrollVal, 172 + mainIsNotFlipped);
-	visimove(m_unisonVoicesKnob, 184 - m_scrollVal, 172);
-	visimove(m_unisonDetuneKnob, 209 - m_scrollVal, 172);
-	visimove(m_unisonMorphKnob, 184 - m_scrollVal, 203 + mainIsFlipped);
-	visimove(m_unisonModifyKnob, 209 - m_scrollVal, 203 + mainIsFlipped);
-	visimove(m_keytrackingToggle, 121 - m_scrollVal, 229 + mainIsFlipped);
-	visimove(m_tempoKnob, 152 - m_scrollVal, 216 + mainIsNotFlipped);
-	visimove(m_interpolateToggle, 121 - m_scrollVal, 229 + mainIsNotFlipped);
+	bool mainIsNotFlipped = inMainTab && !mainFlipped;
+	bool mainIsFlipped = inMainTab && mainFlipped;
 
-	visimove(m_sampleEnabledToggle, 85 + 500 - m_scrollVal, 229);
-	visimove(m_sampleMutedToggle, 103 + 500 - m_scrollVal, 229);
-	visimove(m_sampleKeytrackingToggle, 121 + 500 - m_scrollVal, 229);
-	visimove(m_sampleGraphEnabledToggle, 138 + 500 - m_scrollVal, 229);
-	visimove(m_sampleLoopToggle, 155 + 500 - m_scrollVal, 229);
-	visimove(m_sampleVolumeKnob, 23 + 500 - m_scrollVal, 172);
-	visimove(m_samplePanningKnob, 55 + 500 - m_scrollVal, 172);
-	visimove(m_sampleDetuneKnob, 93 + 500 - m_scrollVal, 172);
-	visimove(m_samplePhaseKnob, 180 + 500 - m_scrollVal, 172);
-	visimove(m_samplePhaseRandKnob, 206 + 500 - m_scrollVal, 172);
-	visimove(m_sampleStartKnob, 121 + 500 - m_scrollVal, 172);
-	visimove(m_sampleEndKnob, 145 + 500 - m_scrollVal, 172);
+	bool subIsNotFlipped = inSubTab && !subFlipped;
+	bool subIsFlipped = inSubTab && subFlipped;
+
+	visimove(m_morphKnob, ((m_b->m_scroll == 0) ? 23 : 176), 172, mainIsNotFlipped || inWavetableLoadingTab);
+	visimove(m_rangeKnob, ((m_b->m_scroll == 0) ? 55 : 208), 172, mainIsNotFlipped || inWavetableLoadingTab);
+	visimove(m_modifyKnob, 87, 172, mainIsNotFlipped);
+	visimove(m_modifyModeBox, 127, 186, mainIsNotFlipped);
+	visimove(m_volKnob, 23, 172, mainIsFlipped);
+	visimove(m_panKnob, 55, 172, mainIsFlipped);
+	visimove(m_detuneKnob, 152, 216, mainIsNotFlipped);
+	visimove(m_phaseKnob, 184, 203, mainIsFlipped);
+	visimove(m_phaseRandKnob, 209, 203, mainIsFlipped);
+	visimove(m_enabledToggle, 85, 229, inMainTab);
+	visimove(m_mutedToggle, 103, 229, inMainTab);
+	visimove(m_sampLenKnob, 137, 172, mainIsFlipped);
+	visimove(m_morphMaxKnob, 101, 172, mainIsFlipped);
+	visimove(m_unisonVoicesKnob, 184, 172, inMainTab);
+	visimove(m_unisonDetuneKnob, 209, 172, inMainTab);
+	visimove(m_unisonMorphKnob, 184, 203, mainIsNotFlipped);
+	visimove(m_unisonModifyKnob, 209, 203, mainIsNotFlipped);
+	visimove(m_keytrackingToggle, 121, 229, mainIsNotFlipped);
+	visimove(m_tempoKnob, 152, 216, mainIsFlipped);
+	visimove(m_interpolateToggle, 121, 229, mainIsFlipped);
+
+	visimove(m_sampleEnabledToggle, 85, 229, inSampleTab);
+	visimove(m_sampleMutedToggle, 103, 229, inSampleTab);
+	visimove(m_sampleKeytrackingToggle, 121, 229, inSampleTab);
+	visimove(m_sampleGraphEnabledToggle, 138, 229, inSampleTab);
+	visimove(m_sampleLoopToggle, 155, 229, inSampleTab);
+	visimove(m_sampleVolumeKnob, 23, 172, inSampleTab);
+	visimove(m_samplePanningKnob, 55, 172, inSampleTab);
+	visimove(m_sampleDetuneKnob, 93, 172, inSampleTab);
+	visimove(m_samplePhaseKnob, 180, 172, inSampleTab);
+	visimove(m_samplePhaseRandKnob, 206, 172, inSampleTab);
+	visimove(m_sampleStartKnob, 121, 172, inSampleTab);
+	visimove(m_sampleEndKnob, 145, 172, inSampleTab);
 
 	for (int i = 0; i < 8; ++i)
 	{
-		visimove(m_filtCutoffKnob[i], 32 + 1000 - m_scrollVal, i*92+55 - m_effectScrollVal);
-		visimove(m_filtResoKnob[i], 63 + 1000 - m_scrollVal, i*92+55 - m_effectScrollVal);
-		visimove(m_filtGainKnob[i], 94 + 1000 - m_scrollVal, i*92+55 - m_effectScrollVal);
+		visimove(m_filtCutoffKnob[i], 32, i*92+55 - effectScrollVal, inEffectTab);
+		visimove(m_filtResoKnob[i], 63, i*92+55 - effectScrollVal, inEffectTab);
+		visimove(m_filtGainKnob[i], 94, i*92+55 - effectScrollVal, inEffectTab);
 
-		visimove(m_filtTypeBox[i], 128 + 1000 - m_scrollVal, i*92+63 - m_effectScrollVal);
-		visimove(m_filtSlopeBox[i], 171 + 1000 - m_scrollVal, i*92+63 - m_effectScrollVal);
-		visimove(m_filtInVolKnob[i], 30 + 1000 - m_scrollVal, i*92+91 - m_effectScrollVal);
-		visimove(m_filtOutVolKnob[i], 55 + 1000 - m_scrollVal, i*92+91 - m_effectScrollVal);
-		visimove(m_filtWetDryKnob[i], 80 + 1000 - m_scrollVal, i*92+91 - m_effectScrollVal);
-		visimove(m_filtBalKnob[i], 105 + 1000 - m_scrollVal, i*92+91 - m_effectScrollVal);
-		visimove(m_filtSatuKnob[i], 135 + 1000 - m_scrollVal, i*92+91 - m_effectScrollVal);
-		visimove(m_filtFeedbackKnob[i], 167 + 1000 - m_scrollVal, i*92+91 - m_effectScrollVal);
-		visimove(m_filtDetuneKnob[i], 192 + 1000 - m_scrollVal, i*92+91 - m_effectScrollVal);
-		visimove(m_filtEnabledToggle[i], 27 + 1000 - m_scrollVal, i*92+36 - m_effectScrollVal);
-		visimove(m_filtMutedToggle[i], 166 + 1000 - m_scrollVal, i*92+36 - m_effectScrollVal);
-		visimove(m_filtKeytrackingToggle[i], 200 + 1000 - m_scrollVal, i*92+36 - m_effectScrollVal);
+		visimove(m_filtTypeBox[i], 128, i*92+63 - effectScrollVal, inEffectTab);
+		visimove(m_filtSlopeBox[i], 171, i*92+63 - effectScrollVal, inEffectTab);
+		visimove(m_filtInVolKnob[i], 30, i*92+91 - effectScrollVal, inEffectTab);
+		visimove(m_filtOutVolKnob[i], 55, i*92+91 - effectScrollVal, inEffectTab);
+		visimove(m_filtWetDryKnob[i], 80, i*92+91 - effectScrollVal, inEffectTab);
+		visimove(m_filtBalKnob[i], 105, i*92+91 - effectScrollVal, inEffectTab);
+		visimove(m_filtSatuKnob[i], 135, i*92+91 - effectScrollVal, inEffectTab);
+		visimove(m_filtFeedbackKnob[i], 167, i*92+91 - effectScrollVal, inEffectTab);
+		visimove(m_filtDetuneKnob[i], 192, i*92+91 - effectScrollVal, inEffectTab);
+		visimove(m_filtEnabledToggle[i], 27, i*92+36 - effectScrollVal, inEffectTab);
+		visimove(m_filtMutedToggle[i], 166, i*92+36 - effectScrollVal, inEffectTab);
+		visimove(m_filtKeytrackingToggle[i], 200, i*92+36 - effectScrollVal, inEffectTab);
 	}
 
-	visimove(m_subVolKnob, 23 + 250 - m_scrollVal, 172 + m_subIsFlipped);
-	visimove(m_subPanningKnob, 55 + 250 - m_scrollVal, 172 + m_subIsFlipped);
-	visimove(m_subDetuneKnob, 95 + 250 - m_scrollVal, 172 + m_subIsFlipped);
-	visimove(m_subPhaseKnob, 180 + 250 - m_scrollVal, 172);
-	visimove(m_subPhaseRandKnob, 206 + 250 - m_scrollVal, 172);
-	visimove(m_subSampLenKnob, 130 + 250 - m_scrollVal, 172 + m_subIsFlipped);
-	visimove(m_subTempoKnob, 23 + 250 - m_scrollVal, 172 + m_subIsNotFlipped);
-	visimove(m_subRateLimitKnob, 55 + 250 - m_scrollVal, 172 + m_subIsNotFlipped);
-	visimove(m_subUnisonNumKnob, 95 + 250 - m_scrollVal, 172 + m_subIsNotFlipped);
-	visimove(m_subUnisonDetuneKnob, 130 + 250 - m_scrollVal, 172 + m_subIsNotFlipped);
+	visimove(m_subVolKnob, 23, 172, subIsNotFlipped);
+	visimove(m_subPanningKnob, 55, 172, subIsNotFlipped);
+	visimove(m_subDetuneKnob, 95, 172, subIsNotFlipped);
+	visimove(m_subPhaseKnob, 180, 172, inSubTab);
+	visimove(m_subPhaseRandKnob, 206, 172, inSubTab);
+	visimove(m_subSampLenKnob, 130, 172, subIsNotFlipped);
+	visimove(m_subTempoKnob, 23, 172, subIsFlipped);
+	visimove(m_subRateLimitKnob, 55, 172, subIsFlipped);
+	visimove(m_subUnisonNumKnob, 95, 172, subIsFlipped);
+	visimove(m_subUnisonDetuneKnob, 130, 172, subIsFlipped);
 
-	if (m_subIsNotFlipped)
+	if (subIsNotFlipped)
 	{
-		visimove(m_subEnabledToggle, 85 + 250 - m_scrollVal, 229);
-		visimove(m_subMutedToggle, 103 + 250 - m_scrollVal, 229);
-		visimove(m_subKeytrackToggle, 121 + 250 - m_scrollVal, 229);
-		visimove(m_subNoiseToggle, 138 + 250 - m_scrollVal, 229);
-		visimove(m_subInterpolateToggle, 155 + 250 - m_scrollVal, 229);
+		visimove(m_subEnabledToggle, 85, 229, inSubTab);
+		visimove(m_subMutedToggle, 103, 229, inSubTab);
+		visimove(m_subKeytrackToggle, 121, 229, inSubTab);
+		visimove(m_subNoiseToggle, 138, 229, inSubTab);
+		visimove(m_subInterpolateToggle, 155, 229, inSubTab);
 	}
 	else
 	{
-		visimove(m_subEnabledToggle, 85 + 250 - m_scrollVal, 235);
-		visimove(m_subMutedToggle, 103 + 250 - m_scrollVal, 235);
-		visimove(m_subKeytrackToggle, 121 + 250 - m_scrollVal, 235);
-		visimove(m_subNoiseToggle, 138 + 250 - m_scrollVal, 235);
-		visimove(m_subInterpolateToggle, 155 + 250 - m_scrollVal, 235);
+		visimove(m_subEnabledToggle, 85, 235, inSubTab);
+		visimove(m_subMutedToggle, 103, 235, inSubTab);
+		visimove(m_subKeytrackToggle, 121, 235, inSubTab);
+		visimove(m_subNoiseToggle, 138, 235, inSubTab);
+		visimove(m_subInterpolateToggle, 155, 235, inSubTab);
 	}
 
 	int matrixRemainder = modScrollVal % 460;
@@ -2154,26 +2174,26 @@ void MicrowaveView::updateScroll()
 		modInChanged(i+matrixDivide);
 		modIn2Changed(i+matrixDivide);
 
-		visimove(m_modInBox[i], 45 + 750 - m_scrollVal, i*115+57 - matrixRemainder);
-		visimove(m_modInNumBox[i], 90 + 750 - m_scrollVal, i*115+57 - matrixRemainder);
-		visimove(m_modInAmntKnob[i], 136 + 750 - m_scrollVal, i*115+53 - matrixRemainder);
-		visimove(m_modInCurveKnob[i], 161 + 750 - m_scrollVal, i*115+53 - matrixRemainder);
-		visimove(m_modInBox2[i], 45 + 750 - m_scrollVal, i*115+118 - matrixRemainder);
-		visimove(m_modInNumBox2[i], 90 + 750 - m_scrollVal, i*115+118 - matrixRemainder);
-		visimove(m_modInAmntKnob2[i], 136 + 750 - m_scrollVal, i*115+114 - matrixRemainder);
-		visimove(m_modInCurveKnob2[i], 161 + 750 - m_scrollVal, i*115+114 - matrixRemainder);
-		visimove(m_modOutSecBox[i], 27 + 750 - m_scrollVal, i*115+88 - matrixRemainder);
-		visimove(m_modOutSigBox[i], 69 + 750 - m_scrollVal, i*115+88 - matrixRemainder);
-		visimove(m_modOutSecNumBox[i], 112 + 750 - m_scrollVal, i*115+88 - matrixRemainder);
-		visimove(m_modEnabledToggle[i], 27 + 750 - m_scrollVal, i*115+36 - matrixRemainder);
-		visimove(m_modCombineTypeBox[i], 149 + 750 - m_scrollVal, i*115+88 - matrixRemainder);
-		visimove(m_modTypeToggle[i], 195 + 750 - m_scrollVal, i*115+67 - matrixRemainder);
-		visimove(m_modType2Toggle[i], 195 + 750 - m_scrollVal, i*115+128 - matrixRemainder);
-		visimove(m_modUpArrow[i], 181 + 750 - m_scrollVal, i*115+37 - matrixRemainder);
-		visimove(m_modDownArrow[i], 199 + 750 - m_scrollVal, i*115+37 - matrixRemainder);
-		visimove(m_i1Button[i], 25 + 750 - m_scrollVal, i*115+50 - matrixRemainder);
-		visimove(m_i2Button[i], 25 + 750 - m_scrollVal, i*115+112 - matrixRemainder);
-		visimove(m_modNumText[i], 192 + 750 - m_scrollVal, i*115+89 - matrixRemainder);
+		visimove(m_modInBox[i], 45, i*115+57 - matrixRemainder, inMatrixTab);
+		visimove(m_modInNumBox[i], 90, i*115+57 - matrixRemainder, inMatrixTab);
+		visimove(m_modInAmntKnob[i], 136, i*115+53 - matrixRemainder, inMatrixTab);
+		visimove(m_modInCurveKnob[i], 161, i*115+53 - matrixRemainder, inMatrixTab);
+		visimove(m_modInBox2[i], 45, i*115+118 - matrixRemainder, inMatrixTab);
+		visimove(m_modInNumBox2[i], 90, i*115+118 - matrixRemainder, inMatrixTab);
+		visimove(m_modInAmntKnob2[i], 136, i*115+114 - matrixRemainder, inMatrixTab);
+		visimove(m_modInCurveKnob2[i], 161, i*115+114 - matrixRemainder, inMatrixTab);
+		visimove(m_modOutSecBox[i], 27, i*115+88 - matrixRemainder, inMatrixTab);
+		visimove(m_modOutSigBox[i], 69, i*115+88 - matrixRemainder, inMatrixTab);
+		visimove(m_modOutSecNumBox[i], 112, i*115+88 - matrixRemainder, inMatrixTab);
+		visimove(m_modEnabledToggle[i], 27, i*115+36 - matrixRemainder, inMatrixTab);
+		visimove(m_modCombineTypeBox[i], 149, i*115+88 - matrixRemainder, inMatrixTab);
+		visimove(m_modTypeToggle[i], 195, i*115+67 - matrixRemainder, inMatrixTab);
+		visimove(m_modType2Toggle[i], 195, i*115+128 - matrixRemainder, inMatrixTab);
+		visimove(m_modUpArrow[i], 181, i*115+37 - matrixRemainder, inMatrixTab);
+		visimove(m_modDownArrow[i], 199, i*115+37 - matrixRemainder, inMatrixTab);
+		visimove(m_i1Button[i], 25, i*115+50 - matrixRemainder, inMatrixTab);
+		visimove(m_i2Button[i], 25, i*115+112 - matrixRemainder, inMatrixTab);
+		visimove(m_modNumText[i], 192, i*115+89 - matrixRemainder, inMatrixTab);
 	}
 
 	for (int i = 0; i < 8; ++i)
@@ -2227,89 +2247,87 @@ void MicrowaveView::updateScroll()
 		refreshMacroColor(m_macroKnob[i], i);
 	}
 
-	visimove(m_visvolKnob, 230 - m_scrollVal, 24);
+	visimove(m_visvolKnob, 230, 24, inMainTab && m_b->m_visualize.value());
 
-	visimove(m_loadChnlKnob, 1500 + 111 - m_scrollVal, 121);
-	visimove(m_visualizeToggle, 213 - m_scrollVal, 26);
-	visimove(m_subNumBox, 250 + 18 - m_scrollVal, 219);
-	visimove(m_sampNumBox, 500 + 18 - m_scrollVal, 219);
-	visimove(m_mainNumBox, 18 - m_scrollVal, 219);
-	visimove(m_graph, m_scrollVal >= 500 ? 500 + 23 - m_scrollVal : 23 , 30);
-	visimove(m_openWavetableButton, (m_scrollVal < 250 ? 54 : 1500 + 115) - m_scrollVal, m_scrollVal < 250 ? 220 : 24);
-	visimove(m_openSampleButton, 54 + 500 - m_scrollVal, 220);
+	visimove(m_loadChnlKnob, 111, 121, inWavetableLoadingTab);
+	visimove(m_visualizeToggle, 213, 26, inMainTab);
+	visimove(m_mainNumBox, 18, 219, inMainTab);
+	visimove(m_subNumBox, 18, 219, inSubTab);
+	visimove(m_sampNumBox, 18, 219, inSampleTab);
+	visimove(m_graph, 23 , 30, inMainTab || inSubTab || inSampleTab);
+	visimove(m_openWavetableButton, ((m_b->m_scroll == 0) ? 54 : 115), (m_b->m_scroll == 0) ? 220 : 24, inMainTab || inWavetableLoadingTab);
+	visimove(m_openSampleButton, 54, 220, inSampleTab);
 
-	visimove(m_sinWaveBtn, 179 + 250 - m_scrollVal, 212);
-	visimove(m_triangleWaveBtn, 197 + 250 - m_scrollVal, 212);
-	visimove(m_sawWaveBtn, 215 + 250 - m_scrollVal, 212);
-	visimove(m_sqrWaveBtn, 179 + 250 - m_scrollVal, 227);
-	visimove(m_whiteNoiseWaveBtn, 197 + 250 - m_scrollVal, 227);
-	visimove(m_smoothBtn, 215 + 250 - m_scrollVal, 227);
-	visimove(m_usrWaveBtn, 54 + 250 - m_scrollVal, 220);
+	visimove(m_sinWaveBtn, 179, 212, inSubTab);
+	visimove(m_triangleWaveBtn, 197, 212, inSubTab);
+	visimove(m_sawWaveBtn, 215, 212, inSubTab);
+	visimove(m_sqrWaveBtn, 179, 227, inSubTab);
+	visimove(m_whiteNoiseWaveBtn, 197, 227, inSubTab);
+	visimove(m_smoothBtn, 215, 227, inSubTab);
+	visimove(m_usrWaveBtn, 54, 220, inSubTab);
 
-	visimove(m_sinWave2Btn, 179 + 500 - m_scrollVal, 212);
-	visimove(m_triangleWave2Btn, 197 + 500 - m_scrollVal, 212);
-	visimove(m_sawWave2Btn, 215 + 500 - m_scrollVal, 212);
-	visimove(m_sqrWave2Btn, 179 + 500 - m_scrollVal, 227);
-	visimove(m_whiteNoiseWave2Btn, 197 + 500 - m_scrollVal, 227);
-	visimove(m_smooth2Btn, 215 + 500 - m_scrollVal, 227);
-	visimove(m_usrWave2Btn, 54 + 500 - m_scrollVal, 220);
+	visimove(m_sinWave2Btn, 179, 212, inSampleTab);
+	visimove(m_triangleWave2Btn, 197, 212, inSampleTab);
+	visimove(m_sawWave2Btn, 215, 212, inSampleTab);
+	visimove(m_sqrWave2Btn, 179, 227, inSampleTab);
+	visimove(m_whiteNoiseWave2Btn, 197, 227, inSampleTab);
+	visimove(m_smooth2Btn, 215, 227, inSampleTab);
+	visimove(m_usrWave2Btn, 54, 220, inSampleTab);
 
-	visimove(m_oversampleBox, 70 + 1250 - m_scrollVal, 50);
+	visimove(m_oversampleBox, 70, 50, inMiscTab);
+	visimove(m_oversampleModeBox, 135, 50, inMiscTab);
+	visimove(m_removeDCBtn, 68, 84, inMiscTab);
 
-	visimove(m_effectScrollBar, 221 + 1000 - m_scrollVal, 32);
-	visimove(m_matrixScrollBar, 221 + 750 - m_scrollVal, 32);
+	visimove(m_effectScrollBar, 221, 32, inEffectTab);
+	visimove(m_matrixScrollBar, 221, 32, inMatrixTab);
 
-	visimove(m_filtForegroundLabel, 1000 - m_scrollVal, 0);
-	visimove(m_filtBoxesLabel, 1000 + 24 - m_scrollVal, 35 - (m_effectScrollVal % 92));
+	visimove(m_filtForegroundLabel, 0, 0, inEffectTab);
+	visimove(m_filtBoxesLabel, 24, 35 - (effectScrollVal % 92), inEffectTab);
 
-	visimove(m_matrixForegroundLabel, 750 - m_scrollVal, 0);
-	visimove(m_matrixBoxesLabel, 750 + 24 - m_scrollVal, 35 - (modScrollVal % 115));
+	visimove(m_matrixForegroundLabel, 0, 0, inMatrixTab);
+	visimove(m_matrixBoxesLabel, 24, 35 - (modScrollVal % 115), inMatrixTab);
 
-	visimove(m_macroKnob[0], 1250 + 59 - m_scrollVal, 127);
-	visimove(m_macroKnob[1], 1250 + 81 - m_scrollVal, 127);
-	visimove(m_macroKnob[2], 1250 + 103 - m_scrollVal, 127);
-	visimove(m_macroKnob[3], 1250 + 125 - m_scrollVal, 127);
-	visimove(m_macroKnob[4], 1250 + 147 - m_scrollVal, 127);
-	visimove(m_macroKnob[5], 1250 + 169 - m_scrollVal, 127);
-	visimove(m_macroKnob[6], 1250 + 59 - m_scrollVal, 147);
-	visimove(m_macroKnob[7], 1250 + 81 - m_scrollVal, 147);
-	visimove(m_macroKnob[8], 1250 + 103 - m_scrollVal, 147);
-	visimove(m_macroKnob[9], 1250 + 125 - m_scrollVal, 147);
-	visimove(m_macroKnob[10], 1250 + 147 - m_scrollVal, 147);
-	visimove(m_macroKnob[11], 1250 + 169 - m_scrollVal, 147);
-	visimove(m_macroKnob[12], 1250 + 59 - m_scrollVal, 167);
-	visimove(m_macroKnob[13], 1250 + 81 - m_scrollVal, 167);
-	visimove(m_macroKnob[14], 1250 + 103 - m_scrollVal, 167);
-	visimove(m_macroKnob[15], 1250 + 125 - m_scrollVal, 167);
-	visimove(m_macroKnob[16], 1250 + 147 - m_scrollVal, 168);
-	visimove(m_macroKnob[17], 1250 + 169 - m_scrollVal, 168);
+	visimove(m_macroKnob[0], 59, 127, inMiscTab);
+	visimove(m_macroKnob[1], 81, 127, inMiscTab);
+	visimove(m_macroKnob[2], 103, 127, inMiscTab);
+	visimove(m_macroKnob[3], 125, 127, inMiscTab);
+	visimove(m_macroKnob[4], 147, 127, inMiscTab);
+	visimove(m_macroKnob[5], 169, 127, inMiscTab);
+	visimove(m_macroKnob[6], 59, 147, inMiscTab);
+	visimove(m_macroKnob[7], 81, 147, inMiscTab);
+	visimove(m_macroKnob[8], 103, 147, inMiscTab);
+	visimove(m_macroKnob[9], 125, 147, inMiscTab);
+	visimove(m_macroKnob[10], 147, 147, inMiscTab);
+	visimove(m_macroKnob[11], 169, 147, inMiscTab);
+	visimove(m_macroKnob[12], 59, 167, inMiscTab);
+	visimove(m_macroKnob[13], 81, 167, inMiscTab);
+	visimove(m_macroKnob[14], 103, 167, inMiscTab);
+	visimove(m_macroKnob[15], 125, 167, inMiscTab);
+	visimove(m_macroKnob[16], 147, 168, inMiscTab);
+	visimove(m_macroKnob[17], 169, 168, inMiscTab);
 
-	visimove(m_tab1Btn, 1, 48);
-	visimove(m_tab2Btn, 1, 63);
-	visimove(m_tab3Btn, 1, 78);
-	visimove(m_tab4Btn, 1, 93);
-	visimove(m_tab5Btn, 1, 108);
-	visimove(m_tab6Btn, 1, 123);
+	visimove(m_tab1Btn, 1, 48, true);
+	visimove(m_tab2Btn, 1, 63, true);
+	visimove(m_tab3Btn, 1, 78, true);
+	visimove(m_tab4Btn, 1, 93, true);
+	visimove(m_tab5Btn, 1, 108, true);
+	visimove(m_tab6Btn, 1, 123, true);
 
-	visimove(m_mainFlipBtn, 3 - m_scrollVal, 145);
-	visimove(m_subFlipBtn, 250 + 3 - m_scrollVal, 145);
+	visimove(m_mainFlipBtn, 3, 145, inMainTab);
+	visimove(m_subFlipBtn, 3, 145, inSubTab);
 
-	visimove(m_manualBtn, 1250 + 49 - m_scrollVal, 199);
+	visimove(m_manualBtn, 49, 199, inMiscTab);
 
-	visimove(m_loadModeBox, 1500 + 25 - m_scrollVal, 76);
-	visimove(m_confirmLoadButton, 1500 + 93 - m_scrollVal, 187);
+	visimove(m_loadModeBox, 25, 76, inWavetableLoadingTab);
+	visimove(m_confirmLoadButton, 93, 187, inWavetableLoadingTab);
 
-	visimove(m_XBtn, 231 + 1500 - m_scrollVal, 11);
-	visimove(m_MatrixXBtn, 229 + 750 - m_scrollVal, 8);
+	visimove(m_XBtn, 231, 11, inWavetableLoadingTab);
+	visimove(m_MatrixXBtn, 229, 8, inMatrixTab);
 
-	visimove(m_normalizeBtn, 155 + 1500 - m_scrollVal, 224);
-	visimove(m_desawBtn, 39 + 1500 - m_scrollVal, 224);
-
-	visimove(m_removeDCBtn, 1250 + 68 - m_scrollVal, 84);
-	visimove(m_oversampleModeBox, 1250 + 135 - m_scrollVal, 50);
+	visimove(m_normalizeBtn, 155, 224, inWavetableLoadingTab);
+	visimove(m_desawBtn, 39, 224, inWavetableLoadingTab);
 
 	tabChanged(m_b->m_scroll);
-	m_visvolKnob->setVisible(m_b->m_visualize.value());
 }
 
 
@@ -4577,6 +4595,7 @@ void mSynth::nextStringSample(sampleFrame &outputSample, float (&m_waveforms)[8]
 			{
 				m_temp1 = round(sample_rate / detuneWithCents(440.f, m_filtDetune[l]));
 			}
+
 			if (m_filtDelayBuf[l][0].size() < m_temp1)
 			{
 				m_filtDelayBuf[l][0].resize(m_temp1);
@@ -4785,10 +4804,8 @@ void mSynth::nextStringSample(sampleFrame &outputSample, float (&m_waveforms)[8]
 						}
 					}
 
-					//Output results
-					m_temp1 = m_filtOutVol[l] * 0.01f;
-					m_filtOutputs[l][0] = m_filtPrevSampOut[l][m][0][0] * m_temp1;
-					m_filtOutputs[l][1] = m_filtPrevSampOut[l][m][0][1] * m_temp1;
+					m_filtOutputs[l][0] = m_filtPrevSampOut[l][m][0][0];
+					m_filtOutputs[l][1] = m_filtPrevSampOut[l][m][0][1];
 
 				}
 				else if (m_mode == 8)
@@ -4808,9 +4825,8 @@ void mSynth::nextStringSample(sampleFrame &outputSample, float (&m_waveforms)[8]
 						m_filtoldy2[i] = m_filty2[i];
 						m_filtoldy3[i] = m_filty3[i];
 					}
-					m_temp1 = m_filtOutVol[l] * 0.01f;
-					m_filtOutputs[l][0] = m_filty4[0] * m_temp1;
-					m_filtOutputs[l][1] = m_filty4[1] * m_temp1;
+					m_filtOutputs[l][0] = m_filty4[0];
+					m_filtOutputs[l][1] = m_filty4[1];
 				}
 
 				// Calculates Saturation.  The algorithm is just y = x ^ (1 - saturation);
@@ -4877,6 +4893,10 @@ void mSynth::nextStringSample(sampleFrame &outputSample, float (&m_waveforms)[8]
 			m_temp1 = m_filtFeedback[l] * 0.01f;
 			m_filtDelayBuf[l][0][m_filtFeedbackLoc[l]] = m_filtOutputs[l][0] * m_temp1;
 			m_filtDelayBuf[l][1][m_filtFeedbackLoc[l]] = m_filtOutputs[l][1] * m_temp1;
+
+			m_temp1 = m_filtOutVol[l] * 0.01f;
+			m_filtOutputs[l][0] *= m_temp1;
+			m_filtOutputs[l][1] *= m_temp1;
 
 			m_filtInputs[l][0] = 0;
 			m_filtInputs[l][1] = 0;
