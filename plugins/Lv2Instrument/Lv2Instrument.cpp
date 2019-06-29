@@ -235,16 +235,16 @@ Lv2InsView::Lv2InsView(Lv2Instrument *_instrument, QWidget *_parent) :
 {
 	setAutoFillBackground(true);
 	if (m_reloadPluginButton) {
-		connect(m_reloadPluginButton, SIGNAL(toggled(bool)),
-			this, SLOT(reloadPlugin()));
+		connect(m_reloadPluginButton, &QPushButton::toggled,
+			this, [this](){ castModel<Lv2Instrument>()->reloadPlugin();} );
 	}
 	if (m_toggleUIButton) {
-		connect(m_toggleUIButton, SIGNAL(toggled(bool)),
-			this, SLOT(toggleUI()));
+		connect(m_toggleUIButton, &QPushButton::toggled,
+			this, [this](){ toggleUI(); });
 	}
 	if (m_helpButton) {
-		connect(m_helpButton, SIGNAL(toggled(bool)),
-			this, SLOT(toggleHelp(bool)));
+		connect(m_helpButton, &QPushButton::toggled,
+			this, [this](bool visible){ toggleHelp(visible); });
 	}
 }
 
@@ -291,25 +291,8 @@ void Lv2InsView::dropEvent(QDropEvent *_de)
 
 
 
-void Lv2InsView::reloadPlugin()
-{
-	Lv2Instrument *model = castModel<Lv2Instrument>();
-	model->reloadPlugin();
-}
-
-
-
-
 void Lv2InsView::toggleUI()
 {
-}
-
-
-
-
-void Lv2InsView::toggleHelp(bool visible)
-{
-	Lv2ViewBase::toggleHelp(visible);
 }
 
 

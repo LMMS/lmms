@@ -39,11 +39,6 @@ public:
 	Lv2FxControlDialog(Lv2FxControls *controls);
 	virtual ~Lv2FxControlDialog() override {}
 
-private slots:
-	void reloadPlugin();
-	void toggleUI();
-	void toggleHelp(bool visible);
-
 private:
 	Lv2FxControls *lv2Controls();
 	void modelChanged() override;

@@ -68,7 +68,7 @@ protected:
 	class QPushButton *m_toggleUIButton = nullptr;
 	class QPushButton *m_helpButton = nullptr;
 
-	// to be called by child slots
+	void toggleUI();
 	void toggleHelp(bool visible);
 
 	// to be called by child virtuals

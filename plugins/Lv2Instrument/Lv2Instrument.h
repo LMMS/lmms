@@ -117,7 +117,6 @@ protected:
 private slots:
 	void reloadPlugin();
 	void toggleUI();
-	void toggleHelp(bool visible);
 
 private:
 	void modelChanged();
