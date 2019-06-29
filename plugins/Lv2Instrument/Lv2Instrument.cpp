@@ -50,7 +50,7 @@ Plugin::Descriptor PLUGIN_EXPORT lv2instrument_plugin_descriptor =
 {
 	STRINGIFY(PLUGIN_NAME),
 	"LV2",
-	QT_TRANSLATE_NOOP("Lv2Instrument",
+	QT_TRANSLATE_NOOP("pluginBrowser",
 		"plugin for using arbitrary LV2 instruments inside LMMS."),
 	"Johannes Lorenz <j.git$$$lorenz-ho.me, $$$=@>",
 	0x0100,

@@ -40,7 +40,7 @@ Plugin::Descriptor PLUGIN_EXPORT lv2effect_plugin_descriptor =
 {
 	STRINGIFY(PLUGIN_NAME),
 	"LV2",
-	QT_TRANSLATE_NOOP("Lv2Effect",
+	QT_TRANSLATE_NOOP("pluginBrowser",
 		"plugin for using arbitrary LV2-effects inside LMMS."),
 	"Johannes Lorenz <j.git$$$lorenz-ho.me, $$$=@>",
 	0x0100,
