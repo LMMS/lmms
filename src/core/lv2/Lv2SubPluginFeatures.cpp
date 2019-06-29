@@ -29,23 +29,13 @@
 
 #ifdef LMMS_HAVE_LV2
 
-#include <QApplication>
 #include <QDebug>
-#include <QDir>
 #include <QHBoxLayout>
 #include <QLabel>
-#include <QLibrary>
-#include <QtGlobal>
-#include <lv2.h>
 
-#include "AudioDevice.h"
-#include "ConfigManager.h"
 #include "Engine.h"
-#include "Mixer.h"
-#include "PluginFactory.h"
 #include "Lv2Basics.h"
 #include "Lv2Manager.h"
-#include "embed.h"
 
 
 const LilvPlugin *Lv2SubPluginFeatures::getPlugin(

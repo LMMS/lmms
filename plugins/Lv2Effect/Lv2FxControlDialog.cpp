@@ -25,21 +25,11 @@
 #include "Lv2FxControlDialog.h"
 
 #include <QDebug>
-#include <QDragEnterEvent>
-#include <QGridLayout>
-#include <QGroupBox>
-#include <QMimeData>
 #include <QPushButton>
-#include <QVBoxLayout>
 #include <lv2.h>
 
-#include "Knob.h"
-#include "LcdSpinBox.h"
-#include "LedCheckbox.h"
 #include "Lv2Effect.h"
 #include "Lv2FxControls.h"
-#include "embed.h"
-#include "gui_templates.h"
 
 
 Lv2FxControlDialog::Lv2FxControlDialog(Lv2FxControls *controls) :

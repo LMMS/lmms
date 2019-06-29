@@ -25,8 +25,6 @@
 #ifndef LV2_EFFECT_H
 #define LV2_EFFECT_H
 
-#include <QString>
-
 #include "Effect.h"
 #include "Lv2FxControls.h"
 

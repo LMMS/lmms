@@ -22,11 +22,9 @@
  *
  */
 
-#include "Lv2ControlBase.h"
+#include "Lv2Basics.h"
 
 #ifdef LMMS_HAVE_LV2
-
-#include "Lv2Basics.h"
 
 QString qStringFromPluginNode(const LilvPlugin* plug,
 	LilvNode* (*getFunc)(const LilvPlugin*))

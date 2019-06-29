@@ -27,9 +27,8 @@
 #include <QDebug>
 #include <lv2.h>
 
-#include "AutomatableModel.h"
-#include "Lv2FxControlDialog.h"
 #include "Lv2SubPluginFeatures.h"
+
 #include "embed.h"
 #include "plugin_export.h"
 

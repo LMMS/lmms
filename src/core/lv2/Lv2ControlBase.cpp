@@ -28,7 +28,6 @@
 
 #include <QtGlobal>
 
-#include "AutomatableModel.h"
 #include "Engine.h"
 #include "Lv2Manager.h"
 #include "Lv2Proc.h"

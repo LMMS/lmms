@@ -25,21 +25,15 @@
 #include "Lv2Instrument.h"
 
 #include <QDebug>
-#include <QDir>
-#include <QGridLayout>
-#include <QTemporaryFile>
-#include <lv2.h>
+#include <QDragEnterEvent>
 
-#include "AutomatableModel.h"
-#include "ControllerConnection.h"
+#include "Engine.h"
 #include "InstrumentPlayHandle.h"
 #include "InstrumentTrack.h"
-#include "Mixer.h"
-#include "LedCheckbox.h"
-#include "Lv2Proc.h"
 #include "Lv2SubPluginFeatures.h"
-#include "StringPairDrag.h" // DnD
-#include "gui_templates.h"
+#include "Mixer.h"
+#include "StringPairDrag.h"
+
 #include "embed.h"
 #include "plugin_export.h"
 

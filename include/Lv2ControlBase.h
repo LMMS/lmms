@@ -29,12 +29,10 @@
 
 #ifdef LMMS_HAVE_LV2
 
-// general LMMS includes
+#include <lilv/lilv.h>
+
 #include "DataFile.h"
-#include "lmms_basics.h"
 #include "LinkedModelGroups.h"
-#include "Lv2Basics.h"
-#include "Model.h"
 #include "Plugin.h"
 
 class Lv2Proc;
@@ -86,7 +84,7 @@ protected:
 	//! @param that the class inheriting this class and inheriting Model;
 	//!   this is the same pointer as this, but a different type
 	//! @param uri the Lv2 URI telling this class what plugin to construct
-	Lv2ControlBase(Model *that, const QString& uri);
+	Lv2ControlBase(class Model *that, const QString& uri);
 	virtual ~Lv2ControlBase() override;
 	//! Must be checked after ctor or reload
 	bool isValid() const { return m_valid; }
