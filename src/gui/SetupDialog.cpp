@@ -123,7 +123,7 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 			"ui", "animateafp", "1").toInt()),
 	m_vstEmbedMethod(ConfigManager::inst()->vstEmbedMethod()),
 	m_vstAlwaysOnTop(ConfigManager::inst()->value(
-			"ui", "vstalwaysontop", "1").toInt()),
+			"ui", "vstalwaysontop").toInt()),
 	m_syncVSTPlugins(ConfigManager::inst()->value(
 			"ui", "syncvstplugins").toInt()),
 	m_disableAutoQuit(ConfigManager::inst()->value(
