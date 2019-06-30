@@ -122,6 +122,8 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	m_animateAFP(ConfigManager::inst()->value(
 			"ui", "animateafp", "1").toInt()),
 	m_vstEmbedMethod(ConfigManager::inst()->vstEmbedMethod()),
+	m_vstAlwaysOnTop(ConfigManager::inst()->value(
+			"ui", "vstalwaysontop", "1").toInt()),
 	m_syncVSTPlugins(ConfigManager::inst()->value(
 			"ui", "syncvstplugins").toInt()),
 	m_disableAutoQuit(ConfigManager::inst()->value(
@@ -893,6 +895,8 @@ void SetupDialog::accept()
 					QString::number(m_animateAFP));
 	ConfigManager::inst()->setValue("ui", "vstembedmethod",
 					m_vstEmbedComboBox->currentData().toString());
+	ConfigManager::inst()->setValue("ui", "vstalwaysontop",
+					QString::number(m_vstAlwaysOnTop));
 	ConfigManager::inst()->setValue("ui", "syncvstplugins",
 					QString::number(m_syncVSTPlugins));
 	ConfigManager::inst()->setValue("ui", "disableautoquit",
@@ -907,8 +911,6 @@ void SetupDialog::accept()
 					QString::number(m_bufferSize));
 	ConfigManager::inst()->setValue("mixer", "mididev",
 					m_midiIfaceNames[m_midiInterfaces->currentText()]);
-	ConfigManager::inst()->setValue("ui", "vstalwaysontop",
-					QString::number(m_vstAlwaysOnTop));
 
 
 	ConfigManager::inst()->setWorkingDir(QDir::fromNativeSeparators(m_workingDir));
