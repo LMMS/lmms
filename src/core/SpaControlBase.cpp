@@ -103,11 +103,44 @@ SpaControlBase::SpaControlBase(Model* that, const QString& uniqueName,
 void SpaControlBase::saveSettings(QDomDocument &doc, QDomElement &that)
 {
 	LinkedModelGroups::saveSettings(doc, that);
+
+	if (m_procs.empty()) { /* don't even add a "states" node */ }
+	else
+	{
+		QDomElement states = doc.createElement("states");
+		that.appendChild(states);
+
+		char chanName[] = "state0";
+		for (std::size_t chanIdx = 0; chanIdx < m_procs.size(); ++chanIdx)
+		{
+			chanName[5] = '0' + static_cast<char>(chanIdx);
+			QDomElement channel = doc.createElement(
+									QString::fromUtf8(chanName));
+			states.appendChild(channel);
+			m_procs[chanIdx]->saveState(doc, channel);
+		}
+	}
 }
 
 void SpaControlBase::loadSettings(const QDomElement &that)
 {
 	LinkedModelGroups::loadSettings(that);
+
+	QDomElement states = that.firstChildElement("states");
+	if (!states.isNull() && (!m_procs.empty()))
+	{
+		QDomElement lastChan;
+		char chanName[] = "state0";
+		for (std::size_t chanIdx = 0; chanIdx < m_procs.size(); ++chanIdx)
+		{
+			chanName[5] = '0' + static_cast<char>(chanIdx);
+			QDomElement chan = states.firstChildElement(chanName);
+			if (!chan.isNull()) { lastChan = chan; }
+
+			m_procs[chanIdx]->loadState(lastChan);
+		}
+	}
+
 }
 
 SpaControlBase::~SpaControlBase() {}
@@ -123,9 +156,11 @@ SpaProc::SpaProc(Model *parent, const spa::descriptor* desc, std::size_t curProc
 
 SpaProc::~SpaProc() { shutdownPlugin(); }
 
-void SpaProc::saveSettings(QDomDocument &doc, QDomElement &that)
+
+
+
+void SpaProc::saveState(QDomDocument &doc, QDomElement &that)
 {
-	// save internal data?
 	if (m_spaDescriptor->save_has())
 	{
 		QTemporaryFile tf;
@@ -147,24 +182,9 @@ void SpaProc::saveSettings(QDomDocument &doc, QDomElement &that)
 		}
 		tf.remove();
 	}
-
-	// save connected models
-	if (m_connectedModels.size())
-	{
-		QDomElement newNode = doc.createElement("connected-models");
-		QMap<QString, AutomatableModel *>::const_iterator i =
-			m_connectedModels.constBegin();
-		while (i != m_connectedModels.constEnd())
-		{
-			i.value()->saveSettings(doc, newNode, i.key());
-			++i;
-		}
-
-		that.appendChild(newNode);
-	}
 }
 
-void SpaProc::loadSettings(const QDomElement &that)
+void SpaProc::loadState(const QDomElement &that)
 {
 	if (!that.hasChildNodes())
 	{
@@ -186,45 +206,6 @@ void SpaProc::loadSettings(const QDomElement &that)
 				tf.write(cdata.data().toUtf8());
 				tf.flush();
 				loadFile(tf.fileName());
-			}
-		}
-		// load connected models?
-		else if (node.nodeName() == "connected-models" &&
-			!(elem = node.toElement()).isNull())
-		{
-			auto do_load = [&](const QString &name,
-					       QDomElement elem) {
-				AutomatableModel *m = modelAtPort(name);
-				// this will automatically
-				// load any "connection" node:
-				m->loadSettings(elem, name);
-				m_connectedModels[name] = m;
-			};
-
-			// connected models can be given both as attributes...
-			QDomNamedNodeMap attrs = elem.attributes();
-			for (int i = 0; i < attrs.count(); ++i)
-			{
-				QDomAttr attribute = attrs.item(i).toAttr();
-				do_load(attribute.name(), elem);
-			}
-
-			// ... or as child nodes
-			for (QDomElement portnode = elem.firstChildElement();
-				!portnode.isNull();
-				portnode = portnode.nextSiblingElement())
-			{
-				// connection nodes are not loaded that way
-				if (portnode.nodeName() != "connection")
-				{
-					QString name = portnode.nodeName();
-					// the name is given as attribute?
-					if (name == "automatablemodel") {
-						name = portnode.attribute(
-							"nodename");
-					}
-					do_load(name, elem);
-				}
 			}
 		}
 	}
@@ -264,6 +245,7 @@ void SpaControlBase::uiExtShow(bool doShow)
 		m_procs[0]->uiExtShow(doShow);
 }
 
+#if 0
 void SpaProc::reloadPlugin()
 {
 	// refresh ports that are only read on restore
@@ -298,6 +280,7 @@ void SpaProc::reloadPlugin()
 		loadSettings(m.content());
 	}
 }
+#endif
 
 void SpaProc::copyModelsToPorts()
 {

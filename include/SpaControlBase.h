@@ -53,9 +53,6 @@ public:
 	~SpaProc() override;
 	bool isValid() { return m_valid; }
 
-	void saveSettings(QDomDocument &doc, QDomElement &that);
-	void loadSettings(const QDomElement &that);
-
 	void writeOsc(const char *dest, const char *args, va_list va);
 	void writeOsc(const char *dest, const char *args, ...);
 
@@ -77,7 +74,7 @@ public:
 	}
 
 protected:
-	void reloadPlugin();
+//	void reloadPlugin();
 public:
 	class AutomatableModel *modelAtPort(const QString &dest);
 
@@ -129,6 +126,8 @@ public:
 	void copyBuffersToCore(sampleFrame *buf, unsigned offset, unsigned num, fpp_t frames) const;
 
 	void uiExtShow(bool doShow);
+	void saveState(QDomDocument &doc, QDomElement &that);
+	void loadState(const QDomElement &that);
 private:
 	friend struct LmmsVisitor;
 	friend struct TypeChecker;
