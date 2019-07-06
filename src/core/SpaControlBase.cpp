@@ -28,16 +28,7 @@
 
 #include <QDebug>
 #include <QDir>
-#include <QGridLayout>
 #include <QTemporaryFile>
-
-#define SPA_PLUGIN_USE_QLIBRARY
-
-#ifdef SPA_PLUGIN_USE_QLIBRARY
-#include <QLibrary>
-#else
-#include <dlfcn.h>
-#endif
 
 #include <cassert>
 #include <spa/spa.h>
@@ -45,13 +36,11 @@
 
 #include "../include/RemotePlugin.h" // QSTR_TO_STDSTR
 #include "AutomatableModel.h"
-#include "ControllerConnection.h"
+#include "Engine.h"
 #include "Mixer.h"
 #include "SpaManager.h"
 #include "SpaOscModel.h"
 #include "StringPairDrag.h" // DnD
-#include "embed.h"
-#include "gui_templates.h"
 
 SpaControlBase::SpaControlBase(Model* that, const QString& uniqueName,
 								DataFile::Types settingsType) :
@@ -144,9 +133,9 @@ void SpaProc::saveSettings(QDomDocument &doc, QDomElement &that)
 		{
 			const std::string fn = QSTR_TO_STDSTR(
 				QDir::toNativeSeparators(tf.fileName()));
-			m_pluginMutex.lock();
+//			m_pluginMutex.lock();
 			m_plugin->save(fn.c_str(), ++m_saveTicket);
-			m_pluginMutex.unlock();
+//			m_pluginMutex.unlock();
 
 			while (!m_plugin->save_check(fn.c_str(), m_saveTicket)) {
 				QThread::msleep(1);
@@ -245,12 +234,12 @@ void SpaProc::loadSettings(const QDomElement &that)
 void SpaProc::loadFile(const QString &file)
 {
 	const QByteArray fn = file.toUtf8();
-	m_pluginMutex.lock();
+//	m_pluginMutex.lock();
 	m_plugin->load(fn.data(), ++m_saveTicket);
 	while (!m_plugin->load_check(fn.data(), m_saveTicket)) {
 		QThread::msleep(1);
 	}
-	m_pluginMutex.unlock();
+//	m_pluginMutex.unlock();
 }
 
 void SpaControlBase::loadFile(const QString &file)
@@ -286,9 +275,9 @@ void SpaProc::reloadPlugin()
 	if (m_spaDescriptor->restore_has())
 	{
 		// use the offered restore function
-		m_pluginMutex.lock();
+//		m_pluginMutex.lock();
 		m_plugin->restore(++m_restoreTicket);
-		m_pluginMutex.unlock();
+//		m_pluginMutex.unlock();
 
 		while (!m_plugin->restore_check(m_restoreTicket)) {
 			QThread::msleep(1);
@@ -463,10 +452,10 @@ struct LmmsVisitor final : public virtual spa::audio::visitor
 
 void SpaProc::initPlugin()
 {
-	m_pluginMutex.lock();
+//	m_pluginMutex.lock();
 	if (!m_spaDescriptor)
 	{
-		m_pluginMutex.unlock();
+//		m_pluginMutex.unlock();
 		m_valid = false;
 	}
 	else
@@ -493,7 +482,7 @@ void SpaProc::initPlugin()
 				<< mismatch.least_version.patch();
 			m_valid = false;
 		}
-		m_pluginMutex.unlock();
+//		m_pluginMutex.unlock();
 	}
 
 	m_ports.samplerate = Engine::mixer()->processingSampleRate();

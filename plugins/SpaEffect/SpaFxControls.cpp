@@ -24,8 +24,6 @@
 
 #include "SpaFxControls.h"
 
-#include <QDomElement>
-
 #include "Engine.h"
 #include "SpaEffect.h"
 #include "SpaFxControlDialog.h"

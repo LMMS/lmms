@@ -30,7 +30,7 @@
 #ifdef LMMS_HAVE_SPA
 
 #include <QMap>
-#include <QMutex>
+//#include <QMutex>
 #include <QString>
 #include <memory>
 #include <vector>
@@ -38,7 +38,7 @@
 // general LMMS includes
 #include "DataFile.h"
 #include "LinkedModelGroups.h"
-#include "Plugin.h"
+#include "lmms_basics.h"
 
 // includes from the spa library
 #include <spa/audio_fwd.h>
@@ -139,7 +139,7 @@ private:
 //	void loadFile(const QString &file);
 
 protected:
-	QMutex m_pluginMutex;
+//	QMutex m_pluginMutex;
 
 	void initPlugin();
 	void shutdownPlugin();

@@ -27,7 +27,6 @@
 
 #include <QMap>
 #include <QString>
-#include <memory>
 
 #include "Instrument.h"
 #include "InstrumentView.h"

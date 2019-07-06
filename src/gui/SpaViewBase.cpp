@@ -29,7 +29,6 @@
 #include <QDebug>
 #include <QGridLayout>
 #include <QPushButton>
-#include <spa/spa.h>
 
 #include "Controls.h"
 #include "embed.h"
@@ -46,7 +45,7 @@ SpaViewBase::SpaViewBase(QWidget* meAsWidget, SpaControlBase *ctrlBase)
 		meAsWidget);
 	m_grid->addWidget(m_reloadPluginButton, Rows::ButtonRow, 0, 1, 3);
 
-	if (ctrlBase->m_spaDescriptor->ui_ext())
+	if (ctrlBase->hasUi())
 	{
 		m_toggleUIButton = new QPushButton(QObject::tr("Show GUI"),
 						meAsWidget);
@@ -207,7 +206,7 @@ SpaViewProc::SpaViewProc(QWidget* parent, SpaProc *proc,
 		}
 		else
 		{
-			qDebug() << "this should never happen...";
+			qCritical() << "this should never happen...";
 		}
 	}
 }

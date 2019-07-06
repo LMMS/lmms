@@ -24,11 +24,6 @@
 
 #include "SpaEffect.h"
 
-#include <QDebug>
-#include <spa/spa.h>
-
-#include "AutomatableModel.h"
-#include "SpaFxControlDialog.h"
 #include "SpaSubPluginFeatures.h"
 #include "embed.h"
 #include "plugin_export.h"
@@ -51,7 +46,6 @@ SpaEffect::SpaEffect(Model* parent, const Descriptor::SubPluginFeatures::Key *ke
 	Effect(&spaeffect_plugin_descriptor, parent, key),
 	m_controls(this, key->attributes["plugin"])
 {
-	qDebug() << "Constructing SPA effect";
 }
 
 SpaEffect::~SpaEffect()

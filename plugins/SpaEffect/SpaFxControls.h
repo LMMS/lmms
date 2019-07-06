@@ -28,6 +28,8 @@
 #include "EffectControls.h"
 #include "SpaControlBase.h"
 
+class QDomElement;
+
 class SpaFxControls : public EffectControls, public SpaControlBase
 {
 	Q_OBJECT

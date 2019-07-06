@@ -24,16 +24,9 @@
 
 #include "SpaFxControlDialog.h"
 
-#include <QDebug>
-#include <QMimeData>
-#include <spa/audio.h>
+#include <QPushButton>
 
-#include "Knob.h"
-#include "LedCheckbox.h"
-#include "SpaEffect.h"
 #include "SpaFxControls.h"
-#include "embed.h"
-#include "gui_templates.h"
 
 SpaFxControls *SpaFxControlDialog::spaControls()
 {

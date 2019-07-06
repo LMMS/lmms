@@ -35,8 +35,7 @@
 #include "InstrumentTrack.h"
 #include "Mixer.h"
 #include "SpaSubPluginFeatures.h"
-#include "StringPairDrag.h" // DnD
-#include "gui_templates.h"
+#include "StringPairDrag.h" // DnD TODO: move to SpaViewBase?
 #include "embed.h"
 #include "plugin_export.h"
 

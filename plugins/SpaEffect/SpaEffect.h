@@ -25,10 +25,11 @@
 #ifndef SPA_EFFECT_H
 #define SPA_EFFECT_H
 
-#include <QString>
-
 #include "Effect.h"
 #include "SpaFxControls.h"
+
+class AutomatableModel;
+class QString;
 
 class SpaEffect : public Effect
 {
