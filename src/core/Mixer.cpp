@@ -831,7 +831,9 @@ void Mixer::runChangesInModel()
 	if( m_changesSignal )
 	{
 		m_waitChangesMutex.lock();
+		// allow changes in the model from other threads ...
 		m_changesRequestCondition.wakeOne();
+		// ... and wait until they are done
 		m_changesMixerCondition.wait( &m_waitChangesMutex );
 		m_waitChangesMutex.unlock();
 	}
