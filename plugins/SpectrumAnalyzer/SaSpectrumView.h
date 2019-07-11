@@ -57,7 +57,7 @@ private slots:
 	void periodicUpdate();
 
 private:
-	SaControls *m_controls;
+	const SaControls *m_controls;
 	SaProcessor *m_processor;
 
 	// grid labels (position, label) and methods to generate them

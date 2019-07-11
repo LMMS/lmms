@@ -118,9 +118,9 @@ void SaWaterfallView::paintEvent(QPaintEvent *event)
 	}
 
 	// draw the spectrogram precomputed in SaProcessor
-	QMutexLocker lock(&m_processor->m_dataAccess);
 	if (m_processor->m_waterfallNotEmpty)
 	{
+		QMutexLocker lock(&m_processor->m_dataAccess);
 		painter.drawImage(displayLeft, displayTop,					// top left corner coordinates
 						  QImage(m_processor->m_history.data(),		// raw pixel data to display
 								 m_processor->binCount(),			// width = number of frequency bins
@@ -130,12 +130,12 @@ void SaWaterfallView::paintEvent(QPaintEvent *event)
 										  displayBottom,
 										  Qt::IgnoreAspectRatio,
 										  Qt::SmoothTransformation));
+		lock.unlock();
 	}
 	else
 	{
 		painter.fillRect(displayLeft, displayTop, displayWidth, displayBottom, QColor(0,0,0));
 	}
-	lock.unlock();
 
 	// always draw the outline
 	painter.setPen(QPen(m_controls->m_colorGrid, 2, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
@@ -178,13 +178,11 @@ std::vector<std::pair<float, std::string>> SaWaterfallView::makeTimeTics()
 	{
 		if (i < 10)
 		{
-			result.push_back(std::pair<float, std::string>(std::round(i * 10) / 10,
-							 std::to_string(std::round(i * 10) / 10).substr(0, 3)));
+			result.emplace_back(std::round(i * 10) / 10, std::to_string(std::round(i * 10) / 10).substr(0, 3));
 		}
 		else
 		{
-			result.push_back(std::pair<float, std::string>(std::round(i),
-							 std::to_string(std::round(i)).substr(0, 2)));
+			result.emplace_back(std::round(i), std::to_string(std::round(i)).substr(0, 2));
 		}
 	}
 	return result;

@@ -608,11 +608,11 @@ std::vector<std::pair<int, std::string>> SaSpectrumView::makeLogFreqTics(int low
 			{
 				if (i * a[j] < 1000)
 				{
-					result.push_back(std::pair<int, std::string>(i * a[j], std::to_string(i * a[j])));
+					result.emplace_back(i * a[j], std::to_string(i * a[j]));
 				}
 				else
 				{
-					result.push_back(std::pair<int, std::string>(i * a[j], std::to_string(i * a[j] / 1000) + "k"));
+					result.emplace_back(i * a[j], std::to_string(i * a[j] / 1000) + "k");
 				}
 			}
 			// also insert denser series if high and low values are close
@@ -620,11 +620,11 @@ std::vector<std::pair<int, std::string>> SaSpectrumView::makeLogFreqTics(int low
 			{
 				if (i * b[j] < 1500)
 				{
-					result.push_back(std::pair<int, std::string>(i * b[j], std::to_string(i * b[j])));
+					result.emplace_back(i * b[j], std::to_string(i * b[j]));
 				}
 				else
 				{
-					result.push_back(std::pair<int, std::string>(i * b[j], std::to_string(i * b[j] / 1000) + "k"));
+					result.emplace_back(i * b[j], std::to_string(i * b[j] / 1000) + "k");
 				}
 			}
 		}
@@ -653,11 +653,11 @@ std::vector<std::pair<int, std::string>> SaSpectrumView::makeLinearFreqTics(int 
 		{
 			if (i < 1000)
 			{
-				result.push_back(std::pair<int, std::string>(i, std::to_string(i)));
+				result.emplace_back(i, std::to_string(i));
 			}
 			else
 			{
-				result.push_back(std::pair<int, std::string>(i, std::to_string(i/1000) + "k"));
+				result.emplace_back(i, std::to_string(i/1000) + "k");
 			}
 		}
 	}
@@ -695,7 +695,7 @@ std::vector<std::pair<float, std::string>> SaSpectrumView::makeLogAmpTics(int lo
 	{
 		if (10 * log10(i) >= (low - 0.001))
 		{
-			result.push_back(std::pair<float, std::string>(i, std::to_string((int)std::round(10 * log10(i)))));
+			result.emplace_back(i, std::to_string((int)std::round(10 * log10(i))));
 		}
 	}
 	return result;
@@ -731,26 +731,26 @@ std::vector<std::pair<float, std::string>> SaSpectrumView::makeLinearAmpTics(int
 			if (i >= 9.99 && i < 99.9)
 			{
 				nearest = std::round(i);
-				result.push_back(std::pair<float, std::string>(nearest, std::to_string(nearest).substr(0, 2)));
+				result.emplace_back(nearest, std::to_string(nearest).substr(0, 2));
 			}
 			else if (i >= 0.099)
 			{	// also covers numbers above 100
 				nearest = std::round(i * 10) / 10;
-				result.push_back(std::pair<float, std::string>(nearest, std::to_string(nearest).substr(0, 3)));
+				result.emplace_back(nearest, std::to_string(nearest).substr(0, 3));
 			}
 			else if (i >= 0.0099)
 			{
 				nearest = std::round(i * 1000) / 1000;
-				result.push_back(std::pair<float, std::string>(nearest, std::to_string(nearest).substr(0, 4)));
+				result.emplace_back(nearest, std::to_string(nearest).substr(0, 4));
 			}
 			else if	(i >= 0.00099)
 			{
 				nearest = std::round(i * 10000) / 10000;
-				result.push_back(std::pair<float, std::string>(nearest, std::to_string(nearest).substr(1, 4)));
+				result.emplace_back(nearest, std::to_string(nearest).substr(1, 4));
 			}
 			else if (i > -0.01 && i < 0.01)
 			{
-				result.push_back(std::pair<float, std::string>(i, "0"));	// an exception, zero is short..
+				result.emplace_back(i, "0");	// an exception, zero is short..
 			}
 		}
 	}

@@ -34,7 +34,7 @@
 extern "C" {
 	Plugin::Descriptor PLUGIN_EXPORT analyzer_plugin_descriptor =
 	{
-		STRINGIFY(PLUGIN_NAME),
+		"spectrumanalyzer",
 		"Spectrum Analyzer",
 		QT_TRANSLATE_NOOP("pluginBrowser", "A graphical spectrum analyzer."),
 		"Martin Pavelek <he29/dot/HS/at/gmail/dot/com>",
