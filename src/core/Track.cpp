@@ -1198,7 +1198,15 @@ MidiTime TrackContentObjectView::draggedTCOPos( QMouseEvent * me )
 	}
 	else if ( me->modifiers() & Qt::ShiftModifier )
 	{	// If shift is held, quantize position (Default in 1.2.0 and earlier)
-		newPos = newPos.quantize( gui->songEditor()->m_editor->getSnapSize() );
+		// or end position, whichever is closest to the actual position
+		MidiTime startQ = newPos.quantize( gui->songEditor()->m_editor->getSnapSize() );
+		// Find start position that gives snapped clip end position
+		MidiTime endQ = ( newPos + m_tco->length() );
+		endQ = endQ.quantize( gui->songEditor()->m_editor->getSnapSize() );
+		endQ = endQ - m_tco->length();
+		// Select the position closest to actual position
+		if ( abs(newPos - startQ) < abs(newPos - endQ) ) newPos = startQ;
+		else newPos = endQ;
 	}
 	else
 	{	// Otherwise, quantize moved distance (preserves user offsets)
