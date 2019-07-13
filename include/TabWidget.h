@@ -78,6 +78,7 @@ protected:
 	virtual void resizeEvent( QResizeEvent * _re );
 	virtual void wheelEvent( QWheelEvent * _we );
 	virtual QSize minimumSizeHint() const;
+	virtual QSize sizeHint() const;
 
 private:
 	struct widgetDesc
