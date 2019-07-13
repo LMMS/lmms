@@ -34,9 +34,12 @@ class InstrumentTrackWindow;
 
 class LMMS_EXPORT InstrumentView : public PluginView
 {
+	QSize sizeHint() const override { return QSize(250, 250); }
+	QSize minimumSizeHint() const override { return sizeHint(); }
+
 public:
 	InstrumentView( Instrument * _instrument, QWidget * _parent );
-	virtual ~InstrumentView();
+	~InstrumentView() override;
 
 	Instrument * model()
 	{
@@ -48,7 +51,7 @@ public:
 		return( castModel<Instrument>() );
 	}
 
-	virtual void setModel( Model * _model, bool = false );
+	void setModel( Model * _model, bool = false ) override;
 
 	InstrumentTrackWindow * instrumentTrackWindow();
 
