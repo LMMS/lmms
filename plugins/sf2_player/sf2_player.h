@@ -187,7 +187,7 @@ public:
 
 
 
-class sf2InstrumentView : public InstrumentView
+class sf2InstrumentView : public InstrumentView250
 {
 	Q_OBJECT
 public:

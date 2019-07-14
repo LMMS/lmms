@@ -601,7 +601,7 @@ public:
 
 sfxrInstrumentView::sfxrInstrumentView( Instrument * _instrument,
 					QWidget * _parent ) :
-	InstrumentView( _instrument, _parent )
+	InstrumentView250( _instrument, _parent )
 {
 	srand(time(NULL));
 	setAutoFillBackground( true );

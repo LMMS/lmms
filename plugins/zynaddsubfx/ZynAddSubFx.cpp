@@ -488,7 +488,7 @@ PluginView * ZynAddSubFxInstrument::instantiateView( QWidget * _parent )
 
 
 ZynAddSubFxView::ZynAddSubFxView( Instrument * _instrument, QWidget * _parent ) :
-	InstrumentView( _instrument, _parent )
+        InstrumentView250( _instrument, _parent )
 {
 	setAutoFillBackground( true );
 	QPalette pal;

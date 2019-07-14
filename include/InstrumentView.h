@@ -32,11 +32,9 @@
 class InstrumentTrackWindow;
 
 
+//! Instrument view with variable size
 class LMMS_EXPORT InstrumentView : public PluginView
 {
-	QSize sizeHint() const override { return QSize(250, 250); }
-	QSize minimumSizeHint() const override { return sizeHint(); }
-
 public:
 	InstrumentView( Instrument * _instrument, QWidget * _parent );
 	~InstrumentView() override;
@@ -55,6 +53,20 @@ public:
 
 	InstrumentTrackWindow * instrumentTrackWindow();
 
+} ;
+
+
+
+
+//! Instrument view with fixed LMMS-default size
+class LMMS_EXPORT InstrumentView250 : public InstrumentView
+{
+	QSize sizeHint() const override { return QSize(250, 250); }
+	QSize minimumSizeHint() const override { return sizeHint(); }
+
+public:
+	using InstrumentView::InstrumentView;
+	~InstrumentView250() override;
 } ;
 
 

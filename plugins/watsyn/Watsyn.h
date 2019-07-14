@@ -293,7 +293,7 @@ private:
 };
 
 
-class WatsynView : public InstrumentView
+class WatsynView : public InstrumentView250
 {
 	Q_OBJECT
 public:

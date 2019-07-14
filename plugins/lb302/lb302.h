@@ -256,7 +256,7 @@ private:
 } ;
 
 
-class lb302SynthView : public InstrumentView
+class lb302SynthView : public InstrumentView250
 {
 	Q_OBJECT
 public:

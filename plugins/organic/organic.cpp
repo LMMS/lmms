@@ -418,7 +418,7 @@ public:
 
 organicInstrumentView::organicInstrumentView( Instrument * _instrument,
 							QWidget * _parent ) :
-	InstrumentView( _instrument, _parent ),
+	InstrumentView250( _instrument, _parent ),
 	m_oscKnobs( NULL )
 {
 	organicInstrument * oi = castModel<organicInstrument>();
