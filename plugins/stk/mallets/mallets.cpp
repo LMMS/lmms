@@ -384,7 +384,7 @@ PluginView * malletsInstrument::instantiateView( QWidget * _parent )
 
 malletsInstrumentView::malletsInstrumentView( malletsInstrument * _instrument,
 							QWidget * _parent ) :
-	InstrumentView( _instrument, _parent )
+        InstrumentView250( _instrument, _parent )
 {
 	m_modalBarWidget = setupModalBarControls( this );
 	setWidgetBackground( m_modalBarWidget, "artwork" );

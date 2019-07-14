@@ -116,7 +116,7 @@ signals:
 
 
 
-class PatmanView : public InstrumentView
+class PatmanView : public InstrumentView250
 {
 	Q_OBJECT
 public:

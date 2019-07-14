@@ -419,7 +419,7 @@ public:
 
 TripleOscillatorView::TripleOscillatorView( Instrument * _instrument,
 							QWidget * _parent ) :
-	InstrumentView( _instrument, _parent )
+	InstrumentView250( _instrument, _parent )
 {
 	setAutoFillBackground( true );
 	QPalette pal;

@@ -187,7 +187,7 @@ private:
 } ;
 
 
-class malletsInstrumentView: public InstrumentView
+class malletsInstrumentView: public InstrumentView250
 {
 	Q_OBJECT
 public:

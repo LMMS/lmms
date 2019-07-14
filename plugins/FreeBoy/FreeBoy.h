@@ -111,7 +111,7 @@ private:
 } ;
 
 
-class FreeBoyInstrumentView : public InstrumentView
+class FreeBoyInstrumentView : public InstrumentView250
 {
 	Q_OBJECT
 public:
