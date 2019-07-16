@@ -1,0 +1,29 @@
+include(BundleUtilities)
+
+set(WIN_SYSTEM_LIBS "^(KERNEL32|MSVCRT|ADVAPI32|OLE32|SETUPAPI|RPCRT4|WINMM|GDI32|USER32|MPR|COMCTL32|OPENGL32|UXTHEME|WS2_32|VERSION|SHELL32|DWMAPI|DSOUND|IMM32|OLEAUT32)\\.DLL")
+
+function(gp_resolved_file_type_override resolved_file type_arg)
+    string(TOUPPER ${resolved_file} resolved_file)
+    if (resolved_file MATCHES ${WIN_SYSTEM_LIBS})
+        set(${type_arg} "system" PARENT_SCOPE)
+    else()
+        set(${type_arg} "local" PARENT_SCOPE)
+    endif()
+endfunction()
+
+function(gp_resolve_item_override context item exepath dirs resolved_item_var resolved_var)
+    string(TOUPPER ${item} item)
+    if (item MATCHES ${WIN_SYSTEM_LIBS})
+        set(${resolved_var} 1 PARENT_SCOPE)
+    endif()
+endfunction()
+
+
+# Pass these variables to the cmake install stage because cmake is idiot
+# and won't do it automatically.
+set(WIN32 @WIN32@)
+set(MSVC @MSVC@)
+set(UNIX @UNIX@)
+
+fixup_bundle(${CMAKE_INSTALL_PREFIX}/@BUNDLE_BINARY_PATH@ "" "@BUNDLE_LIBRARIES_PATHS@" IGNORE_ITEM "@BUNDLE_IGNORE_ITEMS@")
+VERIFY_APP(${CMAKE_INSTALL_PREFIX}/@BUNDLE_BINARY_PATH@)

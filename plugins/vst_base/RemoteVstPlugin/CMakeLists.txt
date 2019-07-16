@@ -76,3 +76,15 @@ endif()
 IF(STRIP)
 	ADD_CUSTOM_COMMAND(TARGET ${EXE_NAME} POST_BUILD COMMAND "${STRIP}" "$<TARGET_FILE:${EXE_NAME}>")
 ENDIF()
+
+
+# Create A fixup bundle for 32bit apps on a win64 build and win32 remotevstplugin.
+if (BITNESS EQUAL 32)
+	include(${LMMS_SOURCE_DIR}/cmake/win32/CreateFixupBundle.cmake)
+	create_fixup_bundle(
+			BINARY_PATH "plugins/32/${EXE_NAME}.exe"
+			LIBRARIES_PATHS "${CMAKE_FIND_ROOT_PATH}/lib/bin" "${CMAKE_FIND_ROOT_PATH}/bin" ${CMAKE_CXX_IMPLICIT_LINK_DIRECTORIES}
+			SCRIPT_OUTPUT_PATH "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/FixupBundle.cmake"
+	)
+endif()
+

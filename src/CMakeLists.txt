@@ -137,6 +137,9 @@ SET_DIRECTORY_PROPERTIES(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES "${LMMS_RCC_OUT}
 
 IF(LMMS_BUILD_WIN32)
 	SET(EXTRA_LIBRARIES "winmm")
+
+	# install qt's windows platform dll.
+	INSTALL(FILES $<TARGET_FILE:Qt5::QWindowsIntegrationPlugin> DESTINATION platforms)
 ENDIF()
 
 IF(LMMS_BUILD_APPLE)
@@ -208,71 +211,6 @@ IF(NOT MSVC)
 		ENDIF()
 
 		INSTALL(TARGETS lmms RUNTIME DESTINATION "${BIN_DIR}")
-		INSTALL(FILES
-					"${MINGW_PREFIX}/bin/Qt5Core.dll"
-					"${MINGW_PREFIX}/bin/Qt5Gui.dll"
-					"${MINGW_PREFIX}/bin/Qt5Widgets.dll"
-					"${MINGW_PREFIX}/bin/Qt5Xml.dll"
-				DESTINATION .)
-		INSTALL(FILES
-					"${MINGW_PREFIX}/lib/qt5/plugins/platforms/qwindows.dll"
-				DESTINATION ./platforms)
-		INSTALL(FILES
-						"${MINGW_PREFIX}/bin/libsamplerate-0.dll"
-						"${MINGW_PREFIX}/bin/libsndfile-1.dll"
-						"${MINGW_PREFIX}/bin/libvorbis-0.dll"
-						"${MINGW_PREFIX}/bin/libvorbisenc-2.dll"
-						"${MINGW_PREFIX}/bin/libvorbisfile-3.dll"
-						"${MINGW_PREFIX}/bin/libjpeg-9.dll"
-						"${MINGW_PREFIX}/bin/libogg-0.dll"
-						"${MINGW_PREFIX}/bin/libmp3lame-0.dll"
-						"${MINGW_PREFIX}/bin/libfftw3f-3.dll"
-						"${MINGW_PREFIX}/bin/libFLAC-8.dll"
-						"${MINGW_PREFIX}/bin/libpng16-16.dll"
-						"${MINGW_PREFIX}/bin/SDL.dll"
-						"${MINGW_PREFIX}/bin/libglib-2.0-0.dll"
-						"${MINGW_PREFIX}/bin/libgthread-2.0-0.dll"
-						"${MINGW_PREFIX}/bin/zlib1.dll"
-						"${MINGW_PREFIX}/${CMAKE_SYSTEM_PROCESSOR}-w64-mingw32/bin/libwinpthread-1.dll"
-					DESTINATION .)
-		IF(LMMS_BUILD_MSYS)
-			INSTALL(FILES
-						"${MINGW_PREFIX}/bin/libwinpthread-1.dll"
-						"${MINGW_PREFIX}/bin/libgcc_s_seh-1.dll"
-						"${MINGW_PREFIX}/bin/libstdc++-6.dll"
-					DESTINATION .)
-		ELSE()
-			INSTALL(FILES
-						"${MINGW_PREFIX}/${CMAKE_SYSTEM_PROCESSOR}-w64-mingw32/bin/libwinpthread-1.dll"
-					DESTINATION .)
-		ENDIF()
-		IF(FLTK_FOUND)
-			INSTALL(FILES
-						"${MINGW_PREFIX}/bin/libfltk.dll"
-					DESTINATION .)
-		ENDIF()
-		IF(FLUIDSYNTH_FOUND)
-			INSTALL(FILES
-						"${MINGW_PREFIX}/bin/libfluidsynth.dll"
-					DESTINATION .)
-		ENDIF()
-		IF(GIG_FOUND)
-			# Handle libgig-*.dll
-			FILE(GLOB GIG_LIBRARY "${MINGW_PREFIX}/bin/libgig-*.dll")
-			INSTALL(FILES
-						${GIG_LIBRARY}
-					DESTINATION .)
-		ENDIF()
-		IF(PORTAUDIO_FOUND)
-			INSTALL(FILES
-						"${MINGW_PREFIX}/bin/libportaudio-2.dll"
-					DESTINATION .)
-		ENDIF()
-		IF(SOUNDIO_FOUND)
-			INSTALL(FILES
-						"${MINGW_PREFIX}/lib/libsoundio.dll"
-					DESTINATION .)
-		ENDIF()
 
 	ELSE(LMMS_BUILD_WIN32)
 		IF(NOT LMMS_BUILD_APPLE)
@@ -393,3 +331,15 @@ ELSE(NOT MSVC)
 		#			DESTINATION .)
 		#ENDIF()
 ENDIF(NOT MSVC)
+
+if (LMMS_BUILD_WIN32)
+	include(${CMAKE_SOURCE_DIR}/cmake/win32/CreateFixupBundle.cmake)
+
+	create_and_install_fixup_bundle(
+			BINARY_PATH "lmms.exe"
+			LIBRARIES_PATHS "${CMAKE_INSTALL_PREFIX}/plugins"
+							"${CMAKE_FIND_ROOT_PATH}/lib/bin"
+							"${CMAKE_FIND_ROOT_PATH}/bin"
+			IGNORE_ITEMS RemoteVstPlugin32.exe
+	)
+endif()
