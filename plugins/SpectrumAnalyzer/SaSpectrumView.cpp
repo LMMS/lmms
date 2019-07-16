@@ -539,13 +539,10 @@ void SaSpectrumView::drawGrid(QPainter &painter)
 // Draw cursor and its coordinates if it is within display bounds.
 void SaSpectrumView::drawCursor(QPainter &painter)
 {
-	int xFreq = (int)m_processor->xPixelToFreq(m_cursor.x() - m_displayLeft, m_displayWidth);
-	float yAmp = m_processor->yPixelToAmp(m_cursor.y(), m_displayBottom);
-
-	if (	xFreq >= m_processor->getFreqRangeMin()
-		&&	xFreq <= m_processor->getFreqRangeMax()
-		&&	yAmp >= m_processor->getAmpRangeMin()
-		&&	yAmp <= m_processor->getAmpRangeMax())
+	if(		m_cursor.x() >= m_displayLeft
+		&&	m_cursor.x() <= m_displayRight
+		&&	m_cursor.y() >= m_displayTop
+		&&	m_cursor.y() <= m_displayBottom)
 	{
 		// cursor lines
 		painter.setPen(QPen(m_controls->m_colorGrid.lighter(), 1, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
@@ -558,10 +555,12 @@ void SaSpectrumView::drawCursor(QPainter &painter)
 
 		QString tmps;
 		// frequency
+		int xFreq = (int)m_processor->xPixelToFreq(m_cursor.x() - m_displayLeft, m_displayWidth);
 		tmps = QString(std::string(std::to_string(xFreq) + " Hz").c_str());
 		painter.drawText(m_displayRight -60, 18, 100, 16, Qt::AlignLeft, tmps);
 
 		// amplitude
+		float yAmp = m_processor->yPixelToAmp(m_cursor.y(), m_displayBottom);
 		if (m_controls->m_logYModel.value())
 		{
 			tmps = QString(std::string(std::to_string(yAmp).substr(0, 5) + " dB").c_str());
