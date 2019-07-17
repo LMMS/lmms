@@ -460,7 +460,7 @@ PluginView * vestigeInstrument::instantiateView( QWidget * _parent )
 
 VestigeInstrumentView::VestigeInstrumentView( Instrument * _instrument,
 							QWidget * _parent ) :
-	InstrumentView250( _instrument, _parent ),
+	InstrumentViewFixedSize( _instrument, _parent ),
 	lastPosInMenu (0)
 {
 	if( s_artwork == NULL )
@@ -892,7 +892,7 @@ void VestigeInstrumentView::paintEvent( QPaintEvent * )
 
 manageVestigeInstrumentView::manageVestigeInstrumentView( Instrument * _instrument,
 							QWidget * _parent, vestigeInstrument * m_vi2 ) :
-	InstrumentView250( _instrument, _parent )
+	InstrumentViewFixedSize( _instrument, _parent )
 {
 	m_vi = m_vi2;
 	m_vi->m_scrollArea = new QScrollArea( this );

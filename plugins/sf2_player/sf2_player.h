@@ -187,7 +187,7 @@ public:
 
 
 
-class sf2InstrumentView : public InstrumentView250
+class sf2InstrumentView : public InstrumentViewFixedSize
 {
 	Q_OBJECT
 public:

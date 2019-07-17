@@ -132,7 +132,7 @@ private:
 
 
 
-class sidInstrumentView : public InstrumentView250
+class sidInstrumentView : public InstrumentViewFixedSize
 {
 	Q_OBJECT
 public:

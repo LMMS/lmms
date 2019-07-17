@@ -136,7 +136,7 @@ private:
 
 
 
-class TripleOscillatorView : public InstrumentView250
+class TripleOscillatorView : public InstrumentViewFixedSize
 {
 	Q_OBJECT
 public:

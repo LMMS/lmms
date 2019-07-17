@@ -173,7 +173,7 @@ private slots:
 } ;
 
 
-class organicInstrumentView : public InstrumentView250
+class organicInstrumentView : public InstrumentViewFixedSize
 {
 	Q_OBJECT
 public:

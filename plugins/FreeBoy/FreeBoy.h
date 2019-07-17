@@ -111,7 +111,7 @@ private:
 } ;
 
 
-class FreeBoyInstrumentView : public InstrumentView250
+class FreeBoyInstrumentView : public InstrumentViewFixedSize
 {
 	Q_OBJECT
 public:

@@ -59,14 +59,14 @@ public:
 
 
 //! Instrument view with fixed LMMS-default size
-class LMMS_EXPORT InstrumentView250 : public InstrumentView
+class LMMS_EXPORT InstrumentViewFixedSize : public InstrumentView
 {
 	QSize sizeHint() const override { return QSize(250, 250); }
 	QSize minimumSizeHint() const override { return sizeHint(); }
 
 public:
 	using InstrumentView::InstrumentView;
-	~InstrumentView250() override;
+	~InstrumentViewFixedSize() override;
 } ;
 
 
