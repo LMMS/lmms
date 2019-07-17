@@ -24,7 +24,7 @@ build_script:
 cache:
   - c:/tools/vcpkg/installed
   - C:/Tools/vcpkg/buildtrees
-  - %HOME%\clcache
+  - "%HOME%\clcache"
 artifacts:
   - path: build/lmms-*win*.exe
     name: LMMS Installer
