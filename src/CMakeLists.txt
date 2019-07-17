@@ -215,9 +215,8 @@ IF(LMMS_BUILD_WIN32)
 
 	create_and_install_fixup_bundle(
 			BINARY_PATH "lmms.exe"
-			LIBRARIES_PATHS "${CMAKE_INSTALL_PREFIX}/plugins"
-			"${CMAKE_FIND_ROOT_PATH}/lib/bin"
-			"${CMAKE_FIND_ROOT_PATH}/bin"
+			LIBRARIES_PATHS "plugins" "lib/bin" "bin"
+			LIBRARIES_ROOTS ${CMAKE_INSTALL_PREFIX}  ${CMAKE_FIND_ROOT_PATH}
 			IGNORE_ITEMS RemoteVstPlugin32.exe
 	)
 ELSE(LMMS_BUILD_WIN32)

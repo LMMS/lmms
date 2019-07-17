@@ -22,7 +22,7 @@ endif()
 
 
 # Pass these variables to the cmake install stage because cmake is idiot
-# and won't do it automatically.
+# and won't do it automatically...
 set(WIN32 @WIN32@)
 set(MSVC @MSVC@)
 set(UNIX @UNIX@)
