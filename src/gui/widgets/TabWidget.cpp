@@ -333,6 +333,14 @@ QSize TabWidget::minimumSizeHint() const
 
 
 
+QSize TabWidget::sizeHint() const
+{
+	return minimumSizeHint();
+}
+
+
+
+
 // Return the color to be used to draw a TabWidget's title text (if any)
 QColor TabWidget::tabTitleText() const
 {

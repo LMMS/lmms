@@ -731,7 +731,7 @@ QPixmap * NesInstrumentView::s_artwork = NULL;
 
 
 NesInstrumentView::NesInstrumentView( Instrument * instrument,	QWidget * parent ) :
-	InstrumentView( instrument, parent )
+	InstrumentViewFixedSize( instrument, parent )
 {
 	setAutoFillBackground( true );
 	QPalette pal;

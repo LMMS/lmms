@@ -274,7 +274,7 @@ public:
 
 
 XpressiveView::XpressiveView(Instrument * _instrument, QWidget * _parent) :
-	InstrumentView(_instrument, _parent)
+	InstrumentViewFixedSize(_instrument, _parent)
 
 {
 	const int COL_KNOBS = 194;
