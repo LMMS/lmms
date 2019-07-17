@@ -73,7 +73,7 @@ InstrumentTrackWindow * InstrumentView::instrumentTrackWindow( void )
 
 
 
-InstrumentView250::~InstrumentView250()
+InstrumentViewFixedSize::~InstrumentViewFixedSize()
 {
 }
 

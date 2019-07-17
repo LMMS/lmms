@@ -481,7 +481,7 @@ public:
 
 sidInstrumentView::sidInstrumentView( Instrument * _instrument,
 							QWidget * _parent ) :
-	InstrumentView250( _instrument, _parent )
+	InstrumentViewFixedSize( _instrument, _parent )
 {
 
 	setAutoFillBackground( true );

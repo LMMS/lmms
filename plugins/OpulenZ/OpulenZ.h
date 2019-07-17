@@ -142,7 +142,7 @@ private:
 
 
 
-class OpulenzInstrumentView : public InstrumentView250
+class OpulenzInstrumentView : public InstrumentViewFixedSize
 {
 	Q_OBJECT
 public:

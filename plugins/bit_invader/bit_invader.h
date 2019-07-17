@@ -108,7 +108,7 @@ private:
 
 
 
-class bitInvaderView : public InstrumentView250
+class bitInvaderView : public InstrumentViewFixedSize
 {
 	Q_OBJECT
 public:

@@ -132,7 +132,7 @@ signals:
 
 
 
-class ZynAddSubFxView : public InstrumentView250
+class ZynAddSubFxView : public InstrumentViewFixedSize
 {
 	Q_OBJECT
 public:
