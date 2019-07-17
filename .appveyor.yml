@@ -16,7 +16,8 @@ build_script:
   - cd build
   - ps: $env:CMAKE_PLATFORM="$(if ($env:PLATFORM -eq 'x64') { 'x64' } else { '' })"
   - ps: $env:QT_SUFFIX="$(if ($env:PLATFORM -eq 'x64') { '_64' } else { '' })"
-  - cmake -DUSE_COMPILE_CACHE=ON -DCACHE_TOOL=%APPVEYOR_BUILD_FOLDER%/clcache.4.1.0/clcache-4.1.0/clcache.exe -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_PREFIX_PATH=c:/Qt/5.9/msvc2015%QT_SUFFIX%;c:/tools/vcpkg/installed/%PLATFORM%-windows -DCMAKE_GENERATOR_PLATFORM="%CMAKE_PLATFORM%" ..
+  - ps: $env:CMAKE_SEARCH_PATHS="c:/Qt/5.9/msvc2015%QT_SUFFIX%;c:/tools/vcpkg/installed/%PLATFORM%-windows"
+  - cmake -DUSE_COMPILE_CACHE=ON -DCACHE_TOOL=%APPVEYOR_BUILD_FOLDER%/clcache.4.1.0/clcache-4.1.0/clcache.exe -DCMAKE_PREFIX_PATH="%CMAKE_SEARCH_PATHS%" -DCMAKE_FIND_ROOT_PATH="%CMAKE_SEARCH_PATHS%" -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_GENERATOR_PLATFORM="%CMAKE_PLATFORM%" ..
   - cmake --build . --config RelWithDebInfo -- /maxcpucount
   - cmake --build . --target tests --config RelWithDebInfo
   - cpack -C RelWithDebInfo --verbose
