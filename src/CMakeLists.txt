@@ -191,155 +191,40 @@ ENDFOREACH()
 
 
 # Install
-IF(NOT MSVC)
-	IF(LMMS_BUILD_WIN32)
-		SET_TARGET_PROPERTIES(lmms PROPERTIES
-			LINK_FLAGS "${LINK_FLAGS} -mwindows"
-			ENABLE_EXPORTS ON
+IF(LMMS_BUILD_WIN32)
+	SET_TARGET_PROPERTIES(lmms PROPERTIES
+		LINK_FLAGS "${LINK_FLAGS} -mwindows"
+		ENABLE_EXPORTS ON
+	)
+
+	IF(LMMS_BUILD_MSYS)
+		# ENABLE_EXPORTS property has no effect in some MSYS2 configurations.
+		# Add the linker flag manually to create liblmms.dll.a import library
+		SET_PROPERTY(TARGET lmms
+			APPEND_STRING PROPERTY LINK_FLAGS " -Wl,--out-implib,liblmms.dll.a"
 		)
+	ENDIF()
 
-		IF(LMMS_BUILD_MSYS)
-			# ENABLE_EXPORTS property has no effect in some MSYS2 configurations.
-			# Add the linker flag manually to create liblmms.dll.a import library
-			SET_PROPERTY(TARGET lmms
-				APPEND_STRING PROPERTY LINK_FLAGS " -Wl,--out-implib,liblmms.dll.a"
-			)
-		ENDIF()
+	IF(NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
+		ADD_CUSTOM_COMMAND(TARGET lmms POST_BUILD COMMAND "${STRIP}" "$<TARGET_FILE:lmms>")
+	ENDIF()
 
-		IF(NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
-			ADD_CUSTOM_COMMAND(TARGET lmms POST_BUILD COMMAND "${STRIP}" "$<TARGET_FILE:lmms>")
-		ENDIF()
+	INSTALL(TARGETS lmms RUNTIME DESTINATION "${BIN_DIR}")
 
-		INSTALL(TARGETS lmms RUNTIME DESTINATION "${BIN_DIR}")
-
-	ELSE(LMMS_BUILD_WIN32)
-		IF(NOT LMMS_BUILD_APPLE)
-			SET_TARGET_PROPERTIES(lmms PROPERTIES LINK_FLAGS "${LINK_FLAGS} -Wl,-E")
-		ENDIF(NOT LMMS_BUILD_APPLE)
-
-		INSTALL(TARGETS lmms RUNTIME DESTINATION "${BIN_DIR}")
-		INSTALL(FILES "${CMAKE_BINARY_DIR}/lmms.1.gz" DESTINATION "${CMAKE_INSTALL_PREFIX}/share/man/man1/" PERMISSIONS OWNER_READ GROUP_READ WORLD_READ)
-
-	ENDIF(LMMS_BUILD_WIN32)
-ELSE(NOT MSVC)
-		SET_TARGET_PROPERTIES(lmms PROPERTIES
-			ENABLE_EXPORTS ON
-		)
-		INSTALL(TARGETS lmms RUNTIME DESTINATION "${BIN_DIR}")
-		
-				SET_TARGET_PROPERTIES(lmms PROPERTIES
-			LINK_FLAGS "${LINK_FLAGS} -mwindows"
-			ENABLE_EXPORTS ON
-		)
-
-		#CMAKE_FIND_ROOT_PATH
-		SET(VCPKG_ROOT ${CMAKE_FIND_ROOT_PATH})
-		
-		INSTALL(TARGETS lmms RUNTIME DESTINATION "${BIN_DIR}")
-		
-		INSTALL(FILES
-					"${VCPKG_ROOT}/bin/Qt5Core.dll"
-					"${VCPKG_ROOT}/bin/Qt5Gui.dll"
-					"${VCPKG_ROOT}/bin/Qt5Widgets.dll"
-					"${VCPKG_ROOT}/bin/Qt5Xml.dll"
-
-					"${VCPKG_ROOT}/bin/zlib1.dll"
-					"${VCPKG_ROOT}/bin/jpeg62.dll"
-					"${VCPKG_ROOT}/bin/libpng16.dll"
-					"${VCPKG_ROOT}/bin/gthread-2.dll"
-					"${VCPKG_ROOT}/bin/glib-2.dll"
-					"${VCPKG_ROOT}/bin/harfbuzz.dll"
-					"${VCPKG_ROOT}/bin/pcre2-16.dll"
-					"${VCPKG_ROOT}/bin/double-conversion.dll"
-					"${VCPKG_ROOT}/bin/freetype.dll"
-					"${VCPKG_ROOT}/bin/libbz2.dll"
-					"${VCPKG_ROOT}/bin/pcre.dll"
-					"${VCPKG_ROOT}/bin/libiconv.dll"
-					"${VCPKG_ROOT}/bin/libcharset.dll"
-					"${VCPKG_ROOT}/bin/libintl.dll"
-				DESTINATION .)
-		
-		INSTALL(FILES
-					"${VCPKG_ROOT}/plugins/platforms/qwindows.dll"
-				DESTINATION ./platforms)
-		
-		INSTALL(FILES
-					"${VCPKG_ROOT}/bin/libsndfile-1.dll"
-						"${VCPKG_ROOT}/bin/ogg.dll"
-						"${VCPKG_ROOT}/bin/vorbis.dll"
-						"${VCPKG_ROOT}/bin/vorbisenc.dll"
-						"${VCPKG_ROOT}/bin/FLAC.dll"
-						"${VCPKG_ROOT}/bin/vorbisfile.dll"
-
-					"${VCPKG_ROOT}/bin/libsamplerate-0.dll"
-					"${VCPKG_ROOT}/bin/SDL2.dll"
-					"${VCPKG_ROOT}/bin/fftw3f.dll"
-				DESTINATION .)
-		
-		#not yet in vcpkg
-		#IF(LAME_FOUND)
-		#	INSTALL(FILES
-		#				"${VCPKG_ROOT}/bin/libmp3lame-0.dll"
-		#			DESTINATION .)
-		#ENDIF(LAME_FOUND)
-		
-		IF(FLTK_FOUND)
-			INSTALL(FILES
-					"${VCPKG_ROOT}/bin/libfltk_SHARED.dll"
-						
-					"${VCPKG_ROOT}/bin/zlib1.dll"
-					"${VCPKG_ROOT}/bin/jpeg62.dll"
-				DESTINATION .)
-		ENDIF()
-		
-		IF(FLUIDSYNTH_FOUND)
-			INSTALL(FILES
-					"${VCPKG_ROOT}/bin/libfluidsynth-1.dll"
-					"${VCPKG_ROOT}/bin/glib-2.dll"
-					"${VCPKG_ROOT}/bin/pcre.dll"
-					"${VCPKG_ROOT}/bin/libiconv.dll"
-					"${VCPKG_ROOT}/bin/libcharset.dll"
-					"${VCPKG_ROOT}/bin/libintl.dll"
-				DESTINATION .)
-		ENDIF()
-
-		#not yet included in vcpkg
-		#IF(GIG_FOUND)
-		#	# Handle libgig-*.dll
-		#	FILE(GLOB GIG_LIBRARY "${VCPKG_ROOT}/bin/libgig-*.dll")
-		#	INSTALL(FILES
-		#				${GIG_LIBRARY}
-		#			DESTINATION .)
-		#ENDIF()
-
-		IF(PORTAUDIO_FOUND)
-			IF(LMMS_BUILD_WIN64)
-				INSTALL(FILES
-						"${VCPKG_ROOT}/bin/portaudio-x64.dll"
-					DESTINATION .)
-			ELSE(LMMS_BUILD_WIN64)
-				INSTALL(FILES
-						"${VCPKG_ROOT}/bin/portaudio-x86.dll"
-					DESTINATION .)
-			ENDIF(LMMS_BUILD_WIN64)
-		ENDIF()
-		
-		#not yet in vcpkg
-		#IF(SOUNDIO_FOUND)
-		#	INSTALL(FILES
-		#				"${VCPKG_ROOT}/bin/libsoundio.dll"
-		#			DESTINATION .)
-		#ENDIF()
-ENDIF(NOT MSVC)
-
-if (LMMS_BUILD_WIN32)
 	include(${CMAKE_SOURCE_DIR}/cmake/win32/CreateFixupBundle.cmake)
 
 	create_and_install_fixup_bundle(
 			BINARY_PATH "lmms.exe"
 			LIBRARIES_PATHS "${CMAKE_INSTALL_PREFIX}/plugins"
-							"${CMAKE_FIND_ROOT_PATH}/lib/bin"
-							"${CMAKE_FIND_ROOT_PATH}/bin"
+			"${CMAKE_FIND_ROOT_PATH}/lib/bin"
+			"${CMAKE_FIND_ROOT_PATH}/bin"
 			IGNORE_ITEMS RemoteVstPlugin32.exe
 	)
-endif()
+ELSE(LMMS_BUILD_WIN32)
+	IF(NOT LMMS_BUILD_APPLE)
+		SET_TARGET_PROPERTIES(lmms PROPERTIES LINK_FLAGS "${LINK_FLAGS} -Wl,-E")
+	ENDIF(NOT LMMS_BUILD_APPLE)
+
+	INSTALL(TARGETS lmms RUNTIME DESTINATION "${BIN_DIR}")
+	INSTALL(FILES "${CMAKE_BINARY_DIR}/lmms.1.gz" DESTINATION "${CMAKE_INSTALL_PREFIX}/share/man/man1/" PERMISSIONS OWNER_READ GROUP_READ WORLD_READ)
+ENDIF(LMMS_BUILD_WIN32)
