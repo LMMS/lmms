@@ -94,7 +94,7 @@ private:
 
 
 
-class kickerInstrumentView : public InstrumentView
+class kickerInstrumentView : public InstrumentViewFixedSize
 {
 	Q_OBJECT
 public:

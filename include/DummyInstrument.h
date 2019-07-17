@@ -68,7 +68,7 @@ public:
 
 	virtual PluginView * instantiateView( QWidget * _parent )
 	{
-		return new InstrumentView( this, _parent );
+		return new InstrumentViewFixedSize( this, _parent );
 	}
 } ;
 

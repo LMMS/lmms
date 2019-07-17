@@ -443,7 +443,7 @@ PluginView * patmanInstrument::instantiateView( QWidget * _parent )
 
 
 PatmanView::PatmanView( Instrument * _instrument, QWidget * _parent ) :
-	InstrumentView( _instrument, _parent ),
+	InstrumentViewFixedSize( _instrument, _parent ),
 	m_pi( NULL )
 {
 	setAutoFillBackground( true );
