@@ -34,6 +34,7 @@
 #include "embed.h"
 #include "gui_templates.h"
 #include "SpaControlBase.h"
+#include "SpaProc.h"
 #include "LedCheckbox.h"
 
 SpaViewBase::SpaViewBase(QWidget* meAsWidget, SpaControlBase *ctrlBase)

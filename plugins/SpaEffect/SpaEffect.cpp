@@ -24,6 +24,7 @@
 
 #include "SpaEffect.h"
 
+#include "SpaProc.h"
 #include "SpaSubPluginFeatures.h"
 #include "embed.h"
 #include "plugin_export.h"

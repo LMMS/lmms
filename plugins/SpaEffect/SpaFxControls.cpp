@@ -27,6 +27,7 @@
 #include "Engine.h"
 #include "SpaEffect.h"
 #include "SpaFxControlDialog.h"
+#include "SpaProc.h"
 
 SpaFxControls::SpaFxControls(class SpaEffect *effect, const QString& uniqueName) :
 	EffectControls(effect),

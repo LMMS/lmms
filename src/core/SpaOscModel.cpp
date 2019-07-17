@@ -28,7 +28,7 @@
 
 #include <QDebug>
 
-#include "SpaControlBase.h"
+#include "SpaProc.h"
 
 void BoolOscModel::sendOsc()
 {

@@ -66,6 +66,7 @@ set(LMMS_SRCS
 	core/SpaControlBase.cpp
 	core/SpaManager.cpp
 	core/SpaOscModel.cpp
+	core/SpaProc.cpp
 	core/SpaSubPluginFeatures.cpp
 	core/TempoSyncKnobModel.cpp
 	core/ToolPlugin.cpp

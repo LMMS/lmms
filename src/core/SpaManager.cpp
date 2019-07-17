@@ -211,7 +211,8 @@ spa::descriptor *SpaManager::getDescriptor(const QString uniqueName)
 
 void SpaManager::SpaInfo::cleanup()
 {
-	m_descriptor->delete_self();
+	//m_descriptor->delete_self();
+	delete m_descriptor;
 	delete m_lib;
 }
 

@@ -26,6 +26,7 @@
 
 #include <QDebug>
 #include <QDir>
+#include <QDragEnterEvent>
 #include <QTemporaryFile>
 #include <spa/audio.h>
 
@@ -34,6 +35,7 @@
 #include "InstrumentPlayHandle.h"
 #include "InstrumentTrack.h"
 #include "Mixer.h"
+#include "SpaProc.h" // TODO: remove from here -> use proper class cascading
 #include "SpaSubPluginFeatures.h"
 #include "StringPairDrag.h" // DnD TODO: move to SpaViewBase?
 #include "embed.h"
