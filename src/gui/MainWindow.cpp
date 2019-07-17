@@ -625,6 +625,7 @@ SubWindow* MainWindow::addWindowedWidget(QWidget *w, Qt::WindowFlags windowFlags
 	SubWindow *win = new SubWindow(m_workspace->viewport(), windowFlags);
 	win->setAttribute(Qt::WA_DeleteOnClose);
 	win->setWidget(w);
+	if (w->sizeHint().isValid()) {win->resize(w->sizeHint());}
 	m_workspace->addSubWindow(win);
 	return win;
 }
