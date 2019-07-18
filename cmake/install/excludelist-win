@@ -20,3 +20,4 @@ WINMM.DLL
 WS2_32.dll
 RPCRT4.dll
 dsound.dll
+SETUPAPI.dll
