@@ -37,7 +37,6 @@
 #include "NotePlayHandle.h"
 #include "Oscillator.h"
 #include "PixmapButton.h"
-#include "templates.h"
 #include "ToolTip.h"
 
 #include "embed.h"
@@ -418,7 +417,7 @@ public:
 
 organicInstrumentView::organicInstrumentView( Instrument * _instrument,
 							QWidget * _parent ) :
-	InstrumentView( _instrument, _parent ),
+	InstrumentViewFixedSize( _instrument, _parent ),
 	m_oscKnobs( NULL )
 {
 	organicInstrument * oi = castModel<organicInstrument>();

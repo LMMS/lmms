@@ -19,4 +19,4 @@ brew install $PACKAGES
 # fftw tries to install gcc which conflicts with travis
 brew install fftw --ignore-dependencies
 
-sudo npm install -g appdmg
+npm install -g appdmg

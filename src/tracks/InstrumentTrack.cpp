@@ -422,6 +422,7 @@ void InstrumentTrack::processOutEvent( const MidiEvent& event, const MidiTime& t
 				m_instrument->handleMidiEvent( MidiEvent( MidiNoteOff, midiPort()->realOutputChannel(), key, 0 ), time, offset );
 			}
 			m_midiNotesMutex.unlock();
+			emit endNote();
 			break;
 
 		default:
@@ -592,7 +593,7 @@ int InstrumentTrack::masterKey( int _midi_key ) const
 {
 
 	int key = baseNote();
-	return tLimit<int>( _midi_key - ( key - DefaultKey ), 0, NumKeys );
+	return qBound<int>( 0, _midi_key - ( key - DefaultKey ), NumKeys );
 }
 
 
@@ -749,7 +750,14 @@ void InstrumentTrack::saveTrackSpecificSettings( QDomDocument& doc, QDomElement 
 	m_soundShaping.saveState( doc, thisElement );
 	m_noteStacking.saveState( doc, thisElement );
 	m_arpeggio.saveState( doc, thisElement );
-	m_midiPort.saveState( doc, thisElement );
+
+	// Don't save midi port info if the user chose to.
+	if (Engine::getSong()->isSavingProject()
+		&& !Engine::getSong()->getSaveOptions().discardMIDIConnections.value())
+	{
+		m_midiPort.saveState( doc, thisElement );
+	}
+
 	m_audioPort.effects()->saveState( doc, thisElement );
 }
 
@@ -969,6 +977,8 @@ InstrumentTrackView::InstrumentTrackView( InstrumentTrack * _it, TrackContainerV
 							QPalette::Background),
 						QApplication::palette().color( QPalette::Active,
 							QPalette::BrightText ),
+						QApplication::palette().color( QPalette::Active,
+							QPalette::BrightText).darker(),
 						getTrackSettingsWidget() );
 	m_activityIndicator->setGeometry(
 					 widgetWidth-2*24-11, 2, 8, 28 );
@@ -979,6 +989,8 @@ InstrumentTrackView::InstrumentTrackView( InstrumentTrack * _it, TrackContainerV
 				this, SLOT( activityIndicatorReleased() ) );
 	connect( _it, SIGNAL( newNote() ),
 			 m_activityIndicator, SLOT( activate() ) );
+	connect( _it, SIGNAL( endNote() ),
+	 		m_activityIndicator, SLOT( noteEnd() ) );
 	connect( &_it->m_mutedModel, SIGNAL( dataChanged() ), this, SLOT( muteChanged() ) );
 
 	setModel( _it );
