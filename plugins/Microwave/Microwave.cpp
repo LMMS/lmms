@@ -2165,17 +2165,22 @@ void MicrowaveView::updateScroll()
 			m_modInCurveKnob2[i]->setMatrixLocation(4, 4, i);
 		}
 
+		// Bug evasion.  Without this, some display glitches happen in certain conditions.
+		modOutSecChanged(i+matrixDivide);
+		modInChanged(i+matrixDivide);
+		modIn2Changed(i+matrixDivide);
+
 		visimove(m_modInBox[i], 45, i*115+57 - matrixRemainder, inMatrixTab);
-		visimove(m_modInNumBox[i], 90, i*115+57 - matrixRemainder, inMatrixTab);
+		visimove(m_modInNumBox[i], 90, i*115+57 - matrixRemainder, inMatrixTab && m_modInNumBox[i]->isVisible());
 		visimove(m_modInAmntKnob[i], 136, i*115+53 - matrixRemainder, inMatrixTab);
 		visimove(m_modInCurveKnob[i], 161, i*115+53 - matrixRemainder, inMatrixTab);
 		visimove(m_modInBox2[i], 45, i*115+118 - matrixRemainder, inMatrixTab);
-		visimove(m_modInNumBox2[i], 90, i*115+118 - matrixRemainder, inMatrixTab);
+		visimove(m_modInNumBox2[i], 90, i*115+118 - matrixRemainder, inMatrixTab && m_modInNumBox2[i]->isVisible());
 		visimove(m_modInAmntKnob2[i], 136, i*115+114 - matrixRemainder, inMatrixTab);
 		visimove(m_modInCurveKnob2[i], 161, i*115+114 - matrixRemainder, inMatrixTab);
 		visimove(m_modOutSecBox[i], 27, i*115+88 - matrixRemainder, inMatrixTab);
-		visimove(m_modOutSigBox[i], 69, i*115+88 - matrixRemainder, inMatrixTab);
-		visimove(m_modOutSecNumBox[i], 112, i*115+88 - matrixRemainder, inMatrixTab);
+		visimove(m_modOutSigBox[i], 69, i*115+88 - matrixRemainder, inMatrixTab && m_modOutSigBox[i]->isVisible());
+		visimove(m_modOutSecNumBox[i], 112, i*115+88 - matrixRemainder, inMatrixTab && m_modOutSecNumBox[i]->isVisible());
 		visimove(m_modEnabledToggle[i], 27, i*115+36 - matrixRemainder, inMatrixTab);
 		visimove(m_modCombineTypeBox[i], 149, i*115+88 - matrixRemainder, inMatrixTab);
 		visimove(m_modTypeToggle[i], 195, i*115+67 - matrixRemainder, inMatrixTab);
@@ -2185,11 +2190,6 @@ void MicrowaveView::updateScroll()
 		visimove(m_i1Button[i], 25, i*115+50 - matrixRemainder, inMatrixTab);
 		visimove(m_i2Button[i], 25, i*115+112 - matrixRemainder, inMatrixTab);
 		visimove(m_modNumText[i], 192, i*115+89 - matrixRemainder, inMatrixTab);
-
-		// Bug evasion.  Without this, some display glitches happen in certain conditions.
-		modOutSecChanged(i+matrixDivide);
-		modInChanged(i+matrixDivide);
-		modIn2Changed(i+matrixDivide);
 	}
 
 	for (int i = 0; i < 8; ++i)
