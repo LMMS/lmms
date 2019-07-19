@@ -79,7 +79,7 @@
 #define modinmodel(name)\
 		name->clear();\
 		name->addItem(tr("None"), make_unique<PluginPixmapLoader>("none"));\
-		name->addItem(tr("Main OSC"), make_unique<PluginPixmapLoader>("sqr"));\
+		name->addItem(tr("Wavetable OSC"), make_unique<PluginPixmapLoader>("sqr"));\
 		name->addItem(tr("Sub OSC"), make_unique<PluginPixmapLoader>("sin"));\
 		name->addItem(tr("Sample OSC"), make_unique<PluginPixmapLoader>("noise"));\
 		name->addItem(tr("Filter Output"), make_unique<PluginPixmapLoader>("moog"));\
@@ -91,7 +91,7 @@
 #define modsectionsmodel(name)\
 		name->clear();\
 		name->addItem(tr("None"), make_unique<PluginPixmapLoader>("none"));\
-		name->addItem(tr("Main OSC"), make_unique<PluginPixmapLoader>("sqr"));\
+		name->addItem(tr("Wavetable OSC"), make_unique<PluginPixmapLoader>("sqr"));\
 		name->addItem(tr("Sub OSC"), make_unique<PluginPixmapLoader>("sin"));\
 		name->addItem(tr("Sample OSC"), make_unique<PluginPixmapLoader>("noise"));\
 		name->addItem(tr("Matrix"), make_unique<PluginPixmapLoader>("ramp"));\
@@ -590,7 +590,7 @@ private:
 	float m_macroArr[18] = {0};
 	//Above is for passing to mSynth initialization
 
-	int m_maxMainEnabled = 0;// The highest number of main oscillator sections that must be looped through
+	int m_maxMainEnabled = 0;// The highest number of wavetable oscillator sections that must be looped through
 	int m_maxModEnabled = 0;// The highest number of matrix sections that must be looped through
 	int m_maxSubEnabled = 0;// The highest number of sub oscillator sections that must be looped through
 	int m_maxSampleEnabled = 0;// The highest number of sample sections that must be looped through

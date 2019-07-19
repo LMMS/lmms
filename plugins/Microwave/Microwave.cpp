@@ -93,7 +93,7 @@ Microwave::Microwave(InstrumentTrack * instrument_track) :
 	Instrument(instrument_track, &microwave_plugin_descriptor),
 	m_visvol(100, 0, 1000, 0.01f, this, tr("Visualizer Volume")),
 	m_loadChnl(0, 0, 1, 1, this, tr("Wavetable Loading Channel")),
-	m_mainNum(1, 1, 8, this, tr("Main Oscillator Number")),
+	m_mainNum(1, 1, 8, this, tr("Wavetable Oscillator Number")),
 	m_subNum(1, 1, 64, this, tr("Sub Oscillator Number")),
 	m_sampNum(1, 1, 8, this, tr("Sample Number")),
 	m_oversample(this, tr("Oversampling")),
@@ -1038,7 +1038,7 @@ void Microwave::subSampLenChanged(int num)
 }
 
 
-//Stores the highest enabled main oscillator.  Helps with CPU benefit, refer to its use in mSynth::nextStringSample
+//Stores the highest enabled wavetable oscillator.  Helps with CPU benefit, refer to its use in mSynth::nextStringSample
 void Microwave::mainEnabledChanged(int num)
 {
 	for (int i = 0; i < 8; ++i)
@@ -2165,11 +2165,6 @@ void MicrowaveView::updateScroll()
 			m_modInCurveKnob2[i]->setMatrixLocation(4, 4, i);
 		}
 
-		// Bug evasion.  Without this, some display glitches happen in certain conditions.
-		modOutSecChanged(i+matrixDivide);
-		modInChanged(i+matrixDivide);
-		modIn2Changed(i+matrixDivide);
-
 		visimove(m_modInBox[i], 45, i*115+57 - matrixRemainder, inMatrixTab);
 		visimove(m_modInNumBox[i], 90, i*115+57 - matrixRemainder, inMatrixTab);
 		visimove(m_modInAmntKnob[i], 136, i*115+53 - matrixRemainder, inMatrixTab);
@@ -2190,6 +2185,11 @@ void MicrowaveView::updateScroll()
 		visimove(m_i1Button[i], 25, i*115+50 - matrixRemainder, inMatrixTab);
 		visimove(m_i2Button[i], 25, i*115+112 - matrixRemainder, inMatrixTab);
 		visimove(m_modNumText[i], 192, i*115+89 - matrixRemainder, inMatrixTab);
+
+		// Bug evasion.  Without this, some display glitches happen in certain conditions.
+		modOutSecChanged(i+matrixDivide);
+		modInChanged(i+matrixDivide);
+		modIn2Changed(i+matrixDivide);
 	}
 
 	for (int i = 0; i < 8; ++i)
@@ -2526,7 +2526,7 @@ void MicrowaveView::modOutSecChanged(int i)
 				m_modOutSecNumBox[i-matrixDivide]->hide();
 				break;
 			}
-			case 1:// Main OSC
+			case 1:// Wavetable OSC
 			{
 				m_modOutSigBox[i-matrixDivide]->show();
 				m_modOutSecNumBox[i-matrixDivide]->show();
@@ -2605,7 +2605,7 @@ void MicrowaveView::modInChanged(int i)
 				m_modInNumBox[i-matrixDivide]->hide();
 				break;
 			}
-			case 1:// Main OSC
+			case 1:// Wavetable OSC
 			{
 				m_modInNumBox[i-matrixDivide]->show();
 				m_b->m_modInNum[i]->setRange(1, 8, 1);
@@ -2671,7 +2671,7 @@ void MicrowaveView::modIn2Changed(int i)
 				m_modInNumBox2[i-matrixDivide]->hide();
 				break;
 			}
-			case 1:// Main OSC
+			case 1:// Wavetable OSC
 			{
 				m_modInNumBox2[i-matrixDivide]->show();
 				m_b->m_modInNum2[i]->setRange(1, 8, 1);
@@ -4136,7 +4136,7 @@ void mSynth::nextStringSample(sampleFrame &outputSample, float (&m_waveforms)[8]
 				{
 					break;
 				}
-				case 1:// Main Oscillator
+				case 1:// Wavetable Oscillator
 				{
 					switch (m_modOutSig[l])
 					{
@@ -4936,9 +4936,9 @@ void mSynth::nextStringSample(sampleFrame &outputSample, float (&m_waveforms)[8]
 		}
 	}
 
-	//=====================//
-	//== MAIN OSCILLATOR ==//
-	//=====================//
+	//==========================//
+	//== WAVETABLE OSCILLATOR ==//
+	//==========================//
 
 	for (int i = 0; i < m_maxMainEnabled; ++i)// m_maxMainEnabled keeps this from looping 8 times every m_sample, saving some CPU
 	{
@@ -5521,7 +5521,7 @@ void mSynth::nextStringSample(sampleFrame &outputSample, float (&m_waveforms)[8]
 	outputSample[0] = 0;
 	outputSample[1] = 0;
 
-	// Main Oscillator outputs
+	// Wavetable Oscillator outputs
 	for (int i = 0; i < m_maxMainEnabled; ++i)
 	{
 		if (m_enabled[i])
