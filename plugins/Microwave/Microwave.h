@@ -272,10 +272,8 @@
 const int STOREDSUBWAVELEN = 2048;
 const int STOREDMAINWAVELEN = 2048;
 
-// WAVERATIO is how much larger (multiplication) the waveforms are after interpolation.
-// I'd like to increase this, but I will not until project saving/loading is sped up in LMMS, since this increases that drastically.
-// I would prefer it to be 8, maybe even 16.
 // This number divided by 4 is the number of megabytes of RAM each wavetable will use up (I think?).
+// I'd like to increase this in the future, but the higher this number is, the more time it takes to load Microwave.
 const int WAVERATIO = 4;
 
 const int SUBWAVELEN = STOREDSUBWAVELEN * WAVERATIO;
@@ -493,7 +491,6 @@ private:
 	float m_storedwaveforms[8][STOREDMAINARRAYLEN] = {{0}};
 	float m_waveforms[8][MAINARRAYLEN] = {{0}};
 	bool m_mainFilled[8] = {false};
-	int m_currentTab = 0;
 	float m_storedsubs[64][STOREDSUBWAVELEN] = {{0}};
 	float m_subs[64][SUBWAVELEN] = {{0}};
 	bool m_subFilled[64] = {false};
@@ -681,8 +678,6 @@ protected slots:
 	void modEnabledChanged();
 
 private:
-	virtual void modelChanged();
-
 	void wheelEvent(QWheelEvent * me);
 	virtual void dropEvent(QDropEvent * de);
 	virtual void dragEnterEvent(QDragEnterEvent * dee);
