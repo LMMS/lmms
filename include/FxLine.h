@@ -79,8 +79,6 @@ public:
 
 	static const int FxLineHeight;
 
-	void renameChannel();
-
 	bool eventFilter (QObject *dist, QEvent *event);
 
 private:
@@ -100,6 +98,9 @@ private:
 	bool m_inRename;
 	QLineEdit * m_renameLineEdit;
 	QGraphicsView * m_view;
+
+public slots:
+	void renameChannel();
 
 private slots:
 	void renameFinished();
