@@ -269,7 +269,7 @@ void FxLine::changeColor()
 {
 	QColor color = QColorDialog::getColor();
 
-	if (!color.isValid())
+	if ( !color.isValid() )
 	{
 		return;
 	}
