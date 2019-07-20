@@ -64,9 +64,6 @@ public:
 
 	QBrush backgroundActive() const;
 	void setBackgroundActive( const QBrush & c );
-
-	QBrush customBackgroundActive() const;
-	void setCustomBackgroundActive( const QBrush & c );
 	
 	QColor strokeOuterActive() const;
 	void setStrokeOuterActive( const QColor & c );
