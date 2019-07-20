@@ -280,7 +280,7 @@ void sf2Instrument::loadFile( const QString & _file )
 		if ( pSoundFont ) {
 #ifdef CONFIG_FLUID_BANK_OFFSET
 			int iBankOff = ::fluid_synth_get_bank_offset( m_synth, fluid_sfont_get_id( pSoundFont ) );
-#endif CONFIG_FLUID_BANK_OFFSET
+#endif
 
 			fluid_sfont_iteration_start( pSoundFont );
 #if FLUIDSYNTH_VERSION_MAJOR < 2
