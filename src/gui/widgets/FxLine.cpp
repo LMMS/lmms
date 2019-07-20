@@ -159,7 +159,7 @@ void FxLine::drawFxLine( QPainter* p, const FxLine *fxLine, bool isActive, bool 
 {
 	if (!m_useStyleColor)
 	{
-		p->setBackground(m_customBackground);
+		p->setBackground( m_customBackground );
 	}
 
 	QString name = Engine::fxMixer()->effectChannel( m_channelIndex )->m_name;
@@ -281,8 +281,8 @@ void FxLine::changeColor()
 	targetChannel->m_useStyleColor = false;
 
 	m_useStyleColor = false;
-	m_customBackgroundActive.setColor(color);
-	m_customBackground.setColor(color.darker(150));
+	m_customBackgroundActive.setColor( color );
+	m_customBackground.setColor( color.darker( 150 ) );
 
 	update();
 }

@@ -69,7 +69,7 @@ FxChannel::FxChannel( int idx, Model * _parent ) :
 	m_soloModel( false, _parent ),
 	m_volumeModel( 1.0, 0.0, 2.0, 0.001, _parent ),
 	m_name(),
-	m_useStyleColor(true),
+	m_useStyleColor( true ),
 	m_lock(),
 	m_channelIndex( idx ),
 	m_queued( false ),
