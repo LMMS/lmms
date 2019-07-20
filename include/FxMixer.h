@@ -25,6 +25,8 @@
 #ifndef FX_MIXER_H
 #define FX_MIXER_H
 
+#include <QColor>
+
 #include "Model.h"
 #include "EffectChain.h"
 #include "JournallingObject.h"
@@ -56,6 +58,8 @@ class FxChannel : public ThreadableJob
 		BoolModel m_soloModel;
 		FloatModel m_volumeModel;
 		QString m_name;
+		QColor m_customColor;
+		bool m_useStyleColor;
 		QMutex m_lock;
 		int m_channelIndex; // what channel index are we
 		bool m_queued; // are we queued up for rendering yet?

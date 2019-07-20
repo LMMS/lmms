@@ -69,6 +69,7 @@ FxChannel::FxChannel( int idx, Model * _parent ) :
 	m_soloModel( false, _parent ),
 	m_volumeModel( 1.0, 0.0, 2.0, 0.001, _parent ),
 	m_name(),
+	m_useStyleColor(true),
 	m_lock(),
 	m_channelIndex( idx ),
 	m_queued( false ),
@@ -731,6 +732,8 @@ void FxMixer::saveSettings( QDomDocument & _doc, QDomElement & _this )
 		ch->m_soloModel.saveSettings( _doc, fxch, "soloed" );
 		fxch.setAttribute( "num", i );
 		fxch.setAttribute( "name", ch->m_name );
+		fxch.setAttribute( "color", ch->m_customColor.rgb() );
+		fxch.setAttribute( "usestyle", ch->m_useStyleColor ? 1 : 0 );
 
 		// add the channel sends
 		for( int si = 0; si < ch->m_sends.size(); ++si )
@@ -776,6 +779,12 @@ void FxMixer::loadSettings( const QDomElement & _this )
 		m_fxChannels[num]->m_muteModel.loadSettings( fxch, "muted" );
 		m_fxChannels[num]->m_soloModel.loadSettings( fxch, "soloed" );
 		m_fxChannels[num]->m_name = fxch.attribute( "name" );
+
+		if( fxch.hasAttribute( "usestyle" ) )
+		{
+			m_fxChannels[num]->m_customColor = QColor( fxch.attribute( "color" ).toUInt() );
+			m_fxChannels[num]->m_useStyleColor = fxch.attribute( "usestyle" ).toUInt() == 0 ? false : true;
+		}
 
 		m_fxChannels[num]->m_fxChain.restoreState( fxch.firstChildElement(
 			m_fxChannels[num]->m_fxChain.nodeName() ) );

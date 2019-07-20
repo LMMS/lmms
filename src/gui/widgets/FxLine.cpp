@@ -26,6 +26,7 @@
 #include "FxLine.h"
 
 #include <QGraphicsProxyWidget>
+#include <QColorDialog>
 
 #include "CaptionMenu.h"
 #include "FxMixer.h"
@@ -61,10 +62,13 @@ FxLine::FxLine( QWidget * _parent, FxMixerView * _mv, int _channelIndex ) :
 	m_mv( _mv ),
 	m_channelIndex( _channelIndex ),
 	m_backgroundActive( Qt::SolidPattern ),
+	m_customBackgroundActive( Qt::SolidPattern ),
+	m_customBackground( Qt::SolidPattern ),
 	m_strokeOuterActive( 0, 0, 0 ),
 	m_strokeOuterInactive( 0, 0, 0 ),
 	m_strokeInnerActive( 0, 0, 0 ),
 	m_strokeInnerInactive( 0, 0, 0 ),
+	m_useStyleColor( true ),
 	m_inRename( false )
 {
 	if( !s_sendBgArrow )
@@ -94,9 +98,15 @@ FxLine::FxLine( QWidget * _parent, FxMixerView * _mv, int _channelIndex ) :
 	m_lcd->setValue( m_channelIndex );
 	m_lcd->move( 4, 58 );
 	m_lcd->setMarginWidth( 1 );
+
+	FxChannel * channel = Engine::fxMixer()->effectChannel( m_channelIndex );
 	
-	QString name = Engine::fxMixer()->effectChannel( m_channelIndex )->m_name;
+	QString name = channel->m_name;
 	setToolTip( name );
+
+	m_useStyleColor = channel->m_useStyleColor;
+	m_customBackgroundActive.setColor( channel->m_customColor );
+	m_customBackground.setColor( channel->m_customColor.darker( 150 ) );
 
 	m_renameLineEdit = new QLineEdit();
 	m_renameLineEdit->setText( name );
@@ -147,6 +157,11 @@ void FxLine::setChannelIndex( int index )
 
 void FxLine::drawFxLine( QPainter* p, const FxLine *fxLine, bool isActive, bool sendToThis, bool receiveFromThis )
 {
+	if (!m_useStyleColor)
+	{
+		p->setBackground(m_customBackground);
+	}
+
 	QString name = Engine::fxMixer()->effectChannel( m_channelIndex )->m_name;
 	QString elidedName = elideName( name );
 	if( !m_inRename && m_renameLineEdit->text() != elidedName )
@@ -157,7 +172,8 @@ void FxLine::drawFxLine( QPainter* p, const FxLine *fxLine, bool isActive, bool 
 	int width = fxLine->rect().width();
 	int height = fxLine->rect().height();
 
-	p->fillRect( fxLine->rect(), isActive ? fxLine->backgroundActive() : p->background() );
+	QBrush backgroundActive = m_useStyleColor ? fxLine->backgroundActive() : m_customBackgroundActive;
+	p->fillRect( fxLine->rect(), isActive ? backgroundActive : p->background() );
 	
 	// inner border
 	p->setPen( isActive ? fxLine->strokeInnerActive() : fxLine->strokeInnerInactive() );
@@ -230,6 +246,10 @@ void FxLine::contextMenuEvent( QContextMenuEvent * )
 		contextMenu->addAction( tr( "Move &right" ), this, SLOT( moveChannelRight() ) );
 	}
 	contextMenu->addAction( tr( "Rename &channel" ), this, SLOT( renameChannel() ) );
+	contextMenu->addAction( embed::getIconPixmap( "colorize" ),
+			tr( "Change color" ), this, SLOT( changeColor() ) );
+	contextMenu->addAction( embed::getIconPixmap( "colorize" ),
+			tr( "Reset color to default" ), this, SLOT( resetColor() ) );
 	contextMenu->addSeparator();
 
 	if( m_channelIndex != 0 ) // no remove-option in master
@@ -240,6 +260,40 @@ void FxLine::contextMenuEvent( QContextMenuEvent * )
 	contextMenu->addAction( embed::getIconPixmap( "cancel" ), tr( "Remove &unused channels" ), this, SLOT( removeUnusedChannels() ) );
 	contextMenu->exec( QCursor::pos() );
 	delete contextMenu;
+}
+
+
+
+
+void FxLine::changeColor()
+{
+	QColor color = QColorDialog::getColor();
+
+	if (!color.isValid())
+	{
+		return;
+	}
+	m_useStyleColor = false;
+
+	FxChannel * targetChannel = Engine::fxMixer()->effectChannel( m_channelIndex );
+
+	targetChannel->m_customColor = color;
+	targetChannel->m_useStyleColor = false;
+
+	m_useStyleColor = false;
+	m_customBackgroundActive.setColor(color);
+	m_customBackground.setColor(color.darker(150));
+
+	update();
+}
+
+
+
+void FxLine::resetColor()
+{
+	FxChannel * targetChannel = Engine::fxMixer()->effectChannel( m_channelIndex );
+	targetChannel->m_useStyleColor = true;
+	m_useStyleColor = true;
 }
 
 
@@ -322,6 +376,13 @@ void FxLine::moveChannelRight()
 QBrush FxLine::backgroundActive() const
 {
 	return m_backgroundActive;
+}
+
+
+
+QBrush FxLine::customBackgroundActive() const
+{
+	return m_customBackgroundActive;
 }
 
 

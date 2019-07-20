@@ -64,6 +64,9 @@ public:
 
 	QBrush backgroundActive() const;
 	void setBackgroundActive( const QBrush & c );
+
+	QBrush customBackgroundActive() const;
+	void setCustomBackgroundActive( const QBrush & c );
 	
 	QColor strokeOuterActive() const;
 	void setStrokeOuterActive( const QColor & c );
@@ -91,17 +94,22 @@ private:
 	LcdWidget* m_lcd;
 	int m_channelIndex;
 	QBrush m_backgroundActive;
+	QBrush m_customBackgroundActive;
+	QBrush m_customBackground;
 	QColor m_strokeOuterActive;
 	QColor m_strokeOuterInactive;
 	QColor m_strokeInnerActive;
 	QColor m_strokeInnerInactive;
 	static QPixmap * s_sendBgArrow;
 	static QPixmap * s_receiveBgArrow;
+	bool m_useStyleColor;
 	bool m_inRename;
 	QLineEdit * m_renameLineEdit;
 	QGraphicsView * m_view;
 
 private slots:
+	void changeColor();
+	void resetColor();
 	void renameFinished();
 	void removeChannel();
 	void removeUnusedChannels();
