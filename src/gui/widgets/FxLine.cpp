@@ -380,12 +380,6 @@ QBrush FxLine::backgroundActive() const
 
 
 
-QBrush FxLine::customBackgroundActive() const
-{
-	return m_customBackgroundActive;
-}
-
-
 
 
 void FxLine::setBackgroundActive( const QBrush & c )
