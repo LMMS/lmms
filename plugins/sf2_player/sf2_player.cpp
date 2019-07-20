@@ -259,7 +259,6 @@ void sf2Instrument::loadSettings( const QDomElement & _this )
 
 void sf2Instrument::loadFile( const QString & _file )
 {
-    std::cout<<"sf2Instrument::loadFile()\n";
 	if( !_file.isEmpty() && QFileInfo( _file ).exists() )
 	{
 		openFile( _file, false );
