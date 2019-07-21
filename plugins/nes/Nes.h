@@ -294,7 +294,7 @@ private:
 };
 
 
-class NesInstrumentView : public InstrumentView
+class NesInstrumentView : public InstrumentViewFixedSize
 {
 	Q_OBJECT
 public:

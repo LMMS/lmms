@@ -327,7 +327,7 @@ PluginView * bitInvader::instantiateView( QWidget * _parent )
 
 bitInvaderView::bitInvaderView( Instrument * _instrument,
 					QWidget * _parent ) :
-	InstrumentView( _instrument, _parent )
+	InstrumentViewFixedSize( _instrument, _parent )
 {
 	setAutoFillBackground( true );
 	QPalette pal;

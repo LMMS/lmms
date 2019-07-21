@@ -1448,7 +1448,7 @@ void MonstroInstrument::updateSlope2()
 
 MonstroView::MonstroView( Instrument * _instrument,
 					QWidget * _parent ) :
-					InstrumentView( _instrument, _parent )
+					InstrumentViewFixedSize( _instrument, _parent )
 {
 	m_operatorsView = setupOperatorsView( this );
 	setWidgetBackground( m_operatorsView, "artwork_op" );

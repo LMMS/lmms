@@ -98,7 +98,7 @@ private:
 } ;
 
 
-class manageVestigeInstrumentView : public InstrumentView
+class manageVestigeInstrumentView : public InstrumentViewFixedSize
 {
 	Q_OBJECT
 public:
@@ -134,7 +134,7 @@ private:
 } ;
 
 
-class VestigeInstrumentView : public InstrumentView
+class VestigeInstrumentView : public InstrumentViewFixedSize
 {
 	Q_OBJECT
 public:
