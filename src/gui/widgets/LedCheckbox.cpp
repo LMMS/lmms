@@ -127,10 +127,5 @@ void LedCheckBox::initUi( LedColors _color )
 
 void LedCheckBox::onTextUpdated()
 {
-	setFixedSize( m_ledOffPixmap->width() + 5 + QFontMetrics( font() ).width( text() ), m_ledOffPixmap->height() );
+	setFixedSize( m_ledOffPixmap->width() + 5 + QFontMetrics( font() ).horizontalAdvance( text() ), m_ledOffPixmap->height() );
 }
-
-
-
-
-
