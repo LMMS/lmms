@@ -146,32 +146,32 @@ void LcdWidget::paintEvent( QPaintEvent* )
 	int margin = 1;  // QStyle::PM_DefaultFrameWidth;
 	//int lcdWidth = m_cellWidth * m_numDigits + (margin*m_marginWidth)*2;
 
-//	p.translate( width() / 2 - lcdWidth / 2, 0 ); 
+//	p.translate( width() / 2 - lcdWidth / 2, 0 );
 	p.save();
 
 	p.translate( margin, margin );
 
 	// Left Margin
-	p.drawPixmap( cellRect, *m_lcdPixmap, 
-			QRect( QPoint( charsPerPixmap*m_cellWidth, 
-				isEnabled()?0:m_cellHeight ), 
+	p.drawPixmap( cellRect, *m_lcdPixmap,
+			QRect( QPoint( charsPerPixmap*m_cellWidth,
+				isEnabled()?0:m_cellHeight ),
 			cellSize ) );
 
 	p.translate( m_marginWidth, 0 );
 
 	// Padding
-	for( int i=0; i < m_numDigits - m_display.length(); i++ ) 
+	for( int i=0; i < m_numDigits - m_display.length(); i++ )
 	{
-		p.drawPixmap( cellRect, *m_lcdPixmap, 
+		p.drawPixmap( cellRect, *m_lcdPixmap,
 			QRect( QPoint( 10 * m_cellWidth, isEnabled()?0:m_cellHeight) , cellSize ) );
 		p.translate( m_cellWidth, 0 );
 	}
 
 	// Digits
-	for( int i=0; i < m_display.length(); i++ ) 
+	for( int i=0; i < m_display.length(); i++ )
 	{
 		int val = m_display[i].digitValue();
-		if( val < 0 ) 
+		if( val < 0 )
 		{
 			if( m_display[i] == '-' )
 				val = 11;
@@ -179,14 +179,14 @@ void LcdWidget::paintEvent( QPaintEvent* )
 				val = 10;
 		}
 		p.drawPixmap( cellRect, *m_lcdPixmap,
-				QRect( QPoint( val*m_cellWidth, 
+				QRect( QPoint( val*m_cellWidth,
 					isEnabled()?0:m_cellHeight ),
 				cellSize ) );
 		p.translate( m_cellWidth, 0 );
 	}
 
 	// Right Margin
-	p.drawPixmap( QRect( 0, 0, m_marginWidth-1, m_cellHeight ), *m_lcdPixmap, 
+	p.drawPixmap( QRect( 0, 0, m_marginWidth-1, m_cellHeight ), *m_lcdPixmap,
 			QRect( charsPerPixmap*m_cellWidth, isEnabled()?0:m_cellHeight,
 				m_cellWidth / 2, m_cellHeight ) );
 
@@ -210,11 +210,11 @@ void LcdWidget::paintEvent( QPaintEvent* )
 		p.setFont( pointSizeF( p.font(), 6.5 ) );
 		p.setPen( textShadowColor() );
 		p.drawText( width() / 2 -
-				p.fontMetrics().width( m_label ) / 2 + 1,
+				p.fontMetrics().horizontalAdvance( m_label ) / 2 + 1,
 						height(), m_label );
 		p.setPen( textColor() );
 		p.drawText( width() / 2 -
-				p.fontMetrics().width( m_label ) / 2,
+				p.fontMetrics().horizontalAdvance( m_label ) / 2,
 						height() - 1, m_label );
 	}
 
@@ -252,7 +252,7 @@ void LcdWidget::updateSize()
 	else {
 		setFixedSize( qMax<int>(
 				m_cellWidth * m_numDigits + 2*(margin+m_marginWidth),
-				QFontMetrics( pointSizeF( font(), 6.5 ) ).width( m_label ) ),
+				QFontMetrics( pointSizeF( font(), 6.5 ) ).horizontalAdvance( m_label ) ),
 				m_cellHeight + (2*margin) + 9 );
 	}
 
@@ -280,8 +280,3 @@ void LcdWidget::initUi(const QString& name , const QString& style)
 
 	updateSize();
 }
-
-
-
-
-

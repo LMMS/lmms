@@ -57,10 +57,10 @@ AutomationPatternView::AutomationPatternView( AutomationPattern * _pattern,
 
 	ToolTip::add(this, m_pat->name());
 	setStyle( QApplication::style() );
-	
+
 	if( s_pat_rec == NULL ) { s_pat_rec = new QPixmap( embed::getIconPixmap(
 							"pat_rec" ) ); }
-							
+
 	update();
 }
 
@@ -258,9 +258,9 @@ void AutomationPatternView::paintEvent( QPaintEvent * )
 	QColor c;
 	bool muted = m_pat->getTrack()->isMuted() || m_pat->isMuted();
 	bool current = gui->automationEditor()->currentPattern() == m_pat;
-	
+
 	// state: selected, muted, normal
-	c = isSelected() ? selectedColor() : ( muted ? mutedBackgroundColor() 
+	c = isSelected() ? selectedColor() : ( muted ? mutedBackgroundColor()
 		:	painter.background().color() );
 
 	lingrad.setColorAt( 1, c.darker( 300 ) );
@@ -277,14 +277,14 @@ void AutomationPatternView::paintEvent( QPaintEvent * )
 	{
 		p.fillRect( rect(), c );
 	}
-	
+
 	const float ppt = fixedTCOs() ?
 			( parentWidget()->width() - 2 * TCO_BORDER_WIDTH )
 				/ (float) m_pat->timeMapLength().getTact() :
 								pixelsPerTact();
 
 	const int x_base = TCO_BORDER_WIDTH;
-	
+
 	const float min = m_pat->firstObject()->minValue<float>();
 	const float max = m_pat->firstObject()->maxValue<float>();
 
@@ -297,7 +297,7 @@ void AutomationPatternView::paintEvent( QPaintEvent * )
 
 	QLinearGradient lin2grad( 0, min, 0, max );
 	QColor col;
-	
+
 	col = !muted ? painter.pen().brush().color() : mutedColor();
 
 	lin2grad.setColorAt( 1, col.lighter( 150 ) );
@@ -366,8 +366,8 @@ void AutomationPatternView::paintEvent( QPaintEvent * )
 	}
 
 	p.setRenderHints( QPainter::Antialiasing, false );
-	p.resetMatrix();
-	
+	p.resetTransform();
+
 	// bar lines
 	const int lineSize = 3;
 	p.setPen( c.darker( 300 ) );
@@ -386,18 +386,18 @@ void AutomationPatternView::paintEvent( QPaintEvent * )
 		p.drawPixmap( 1, rect().bottom() - s_pat_rec->height(),
 		 	*s_pat_rec );
 	}
-	
+
 	// pattern name
 	paintTextLabel(m_pat->name(), p);
-	
+
 	// inner border
 	p.setPen( c.lighter( current ? 160 : 130 ) );
-	p.drawRect( 1, 1, rect().right() - TCO_BORDER_WIDTH, 
+	p.drawRect( 1, 1, rect().right() - TCO_BORDER_WIDTH,
 		rect().bottom() - TCO_BORDER_WIDTH );
-		
-	// outer border	
+
+	// outer border
 	p.setPen( current? c.lighter( 130 ) : c.darker( 300 ) );
-	p.drawRect( 0, 0, rect().right(), rect().bottom() );	
+	p.drawRect( 0, 0, rect().right(), rect().bottom() );
 
 	// draw the 'muted' pixmap only if the pattern was manualy muted
 	if( m_pat->isMuted() )
