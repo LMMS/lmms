@@ -499,10 +499,10 @@ float SaProcessor::getAmpRangeMin(bool linear) const
 	switch (m_controls->m_ampRangeModel.value())
 	{
 		case ARANGE_EXTENDED: return ARANGE_EXTENDED_START;
-		case ARANGE_AUDIBLE: return ARANGE_AUDIBLE_START;
-		case ARANGE_NOISE: return ARANGE_NOISE_START;
+		case ARANGE_SILENT: return ARANGE_SILENT_START;
+		case ARANGE_LOUD: return ARANGE_LOUD_START;
 		default:
-		case ARANGE_DEFAULT: return ARANGE_DEFAULT_START;
+		case ARANGE_AUDIBLE: return ARANGE_AUDIBLE_START;
 	}
 }
 
@@ -512,10 +512,10 @@ float SaProcessor::getAmpRangeMax() const
 	switch (m_controls->m_ampRangeModel.value())
 	{
 		case ARANGE_EXTENDED: return ARANGE_EXTENDED_END;
-		case ARANGE_AUDIBLE: return ARANGE_AUDIBLE_END;
-		case ARANGE_NOISE: return ARANGE_NOISE_END;
+		case ARANGE_SILENT: return ARANGE_SILENT_END;
+		case ARANGE_LOUD: return ARANGE_LOUD_END;
 		default:
-		case ARANGE_DEFAULT: return ARANGE_DEFAULT_END;
+		case ARANGE_AUDIBLE: return ARANGE_AUDIBLE_END;
 	}
 }
 

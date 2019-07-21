@@ -62,10 +62,10 @@ SaControls::SaControls(Analyzer *effect) :
 	m_freqRangeModel.setValue(m_freqRangeModel.findText(tr("Full (auto)")));
 
 	m_ampRangeModel.addItem(tr("Extended"));
-	m_ampRangeModel.addItem(tr("Default"));
 	m_ampRangeModel.addItem(tr("Audible"));
-	m_ampRangeModel.addItem(tr("Noise"));
-	m_ampRangeModel.setValue(m_ampRangeModel.findText(tr("Default")));
+	m_ampRangeModel.addItem(tr("Loud"));
+	m_ampRangeModel.addItem(tr("Silent"));
+	m_ampRangeModel.setValue(m_ampRangeModel.findText(tr("Audible")));
 
 	// FFT block size labels are generated automatically, based on
 	// FFT_BLOCK_SIZES vector defined in fft_helpers.h
