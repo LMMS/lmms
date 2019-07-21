@@ -294,6 +294,8 @@ void FxLine::resetColor()
 	FxChannel * targetChannel = Engine::fxMixer()->effectChannel( m_channelIndex );
 	targetChannel->m_useStyleColor = true;
 	m_useStyleColor = true;
+
+	update();
 }
 
 
