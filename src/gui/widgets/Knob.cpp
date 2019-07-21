@@ -176,7 +176,7 @@ void Knob::setLabel( const QString & txt )
 	if( m_knobPixmap )
 	{
 		setFixedSize( qMax<int>( m_knobPixmap->width(),
-					QFontMetrics( pointSizeF( font(), 6.5) ).horizontalAdvance( m_label ) ),
+					QFontMetrics( pointSizeF( font(), 6.5) ).width( m_label ) ),
 						m_knobPixmap->height() + 10 );
 	}
 	update();
@@ -691,7 +691,7 @@ void Knob::paintEvent( QPaintEvent * _me )
 				height() - 1, m_label );*/
 		p.setPen( textColor() );
 		p.drawText( width() / 2 -
-				p.fontMetrics().horizontalAdvance( m_label ) / 2,
+				p.fontMetrics().width( m_label ) / 2,
 				height() - 2, m_label );
 	}
 }
