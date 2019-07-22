@@ -76,7 +76,7 @@ public:
 	//! @see linkControls
 	void unlinkControls(LinkedModelGroup *other, std::size_t id);
 	//! Return whether this is the first of more than one processors
-	bool isLinking() const { return m_linkEnabled.size(); }
+	bool isLinking() const { return d.m_linkEnabled.size(); }
 
 	/*
 		Models
@@ -91,14 +91,14 @@ public:
 
 	class BoolModel* linkEnabledModel(std::size_t id)
 	{
-		return m_linkEnabled[id];
+		return d.m_linkEnabled[id];
 	}
 	const class BoolModel* linkEnabledModel(std::size_t id) const
 	{
-		return m_linkEnabled[id];
+		return d.m_linkEnabled[id];
 	}
-	std::vector<ModelInfo>& models() { return m_models; }
-	const std::vector<ModelInfo>& models() const { return m_models; }
+	std::vector<ModelInfo>& models() { return d.m_models; }
+	const std::vector<ModelInfo>& models() const { return d.m_models; }
 
 	/*
 		Load/Save
@@ -121,10 +121,13 @@ protected:
 	void addModel(class AutomatableModel* model, const QString& name);
 
 private:
-	//! models for the per-control link-enabled models
-	std::vector<class BoolModel*> m_linkEnabled;
-	//! models for the controls; the vector defines indices for the controls
-	std::vector<ModelInfo> m_models;
+	struct
+	{
+		//! models for the per-control link-enabled models
+		std::vector<class BoolModel*> m_linkEnabled;
+		//! models for the controls; the vector defines indices for the controls
+		std::vector<ModelInfo> m_models;
+	} d;
 
 	std::size_t m_curProc;
 };
