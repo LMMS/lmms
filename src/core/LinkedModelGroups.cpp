@@ -152,6 +152,16 @@ void LinkedModelGroup::addModel(AutomatableModel *model, const QString &name)
 
 
 
+void LinkedModelGroup::clearModels()
+{
+	using datatype = decltype(d);
+	d.~datatype();
+	new (&d) datatype();
+}
+
+
+
+
 /*
 	LinkedModelGroups
 */

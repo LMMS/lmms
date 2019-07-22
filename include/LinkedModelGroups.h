@@ -119,6 +119,8 @@ public:
 protected:
 	//! Register a further model
 	void addModel(class AutomatableModel* model, const QString& name);
+	//! Remove all models and all link-enabled models
+	void clearModels();
 
 private:
 	struct
