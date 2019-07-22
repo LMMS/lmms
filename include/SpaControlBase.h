@@ -44,31 +44,38 @@
 #include <spa/audio_fwd.h>
 #include <spa/spa_fwd.h>
 
+class AutomatableModel;
+
 class SpaProc : public LinkedModelGroup
 {
 	friend class SpaViewBase;
+
+
+	QMap<QString, AutomatableModel *> m_connectedModels;
 public:
 	SpaProc(Model *parent, const spa::descriptor* desc, std::size_t curProc,
 			DataFile::Types settingsType);
 	~SpaProc() override;
-	bool isValid() { return m_valid; }
+	//! Check if ctor succeeded
+	bool isValid() const { return m_valid; }
 
 	void writeOsc(const char *dest, const char *args, va_list va);
 	void writeOsc(const char *dest, const char *args, ...);
+
 
 	void loadFile(const QString &file);
 
 	void run(unsigned frames);
 
+	//! Return the net port, or 0 if there is currently none
 	unsigned netPort() const;
 
 	const spa::descriptor *m_spaDescriptor = nullptr;
 	spa::plugin *m_plugin = nullptr;
 
-	QMap<QString, AutomatableModel *> m_connectedModels;
 	uint64_t m_loadTicket = 0, m_saveTicket = 0, m_restoreTicket = 0;
 
-	void addModel(class AutomatableModel* model, QString str)
+	void addModel(AutomatableModel* model, QString str)
 	{
 		LinkedModelGroup::addModel(model, str);
 	}
@@ -76,7 +83,9 @@ public:
 protected:
 //	void reloadPlugin();
 public:
-	class AutomatableModel *modelAtPort(const QString &dest);
+	//! create or return an OSC model for port "dest"
+	//! RT safe if the model already exists
+	AutomatableModel *modelAtPort(const QString &dest);
 
 	int m_audioInCount = 0, m_audioOutCount = 0;
 
@@ -95,12 +104,14 @@ public:
 		struct TypedPorts
 		{
 			char m_type;
+			// storage, plugin references this
 			union
 			{
 				float m_f;
 				int m_i;
 				bool m_b;
 			} m_val;
+			// models where we copy the values from/to
 			union // TODO: use AutomatableModel?
 			{
 				class FloatModel *m_floatModel;
@@ -119,7 +130,6 @@ public:
 		std::unique_ptr<spa::audio::osc_ringbuffer> rb;
 	} m_ports;
 
-public:
 	void copyModelsToPorts();
 
 	void copyBuffersFromCore(const sampleFrame *buf, unsigned offset, unsigned num, fpp_t frames);
@@ -128,6 +138,7 @@ public:
 	void uiExtShow(bool doShow);
 	void saveState(QDomDocument &doc, QDomElement &that);
 	void loadState(const QDomElement &that);
+	void reloadPlugin();
 private:
 	friend struct LmmsVisitor;
 	friend struct TypeChecker;
@@ -170,7 +181,7 @@ public:
 	void copyBuffersToLmms(sampleFrame *buf, fpp_t frames) const;
 	void run(unsigned frames);
 
-	class AutomatableModel *modelAtPort(const QString &dest);
+	AutomatableModel *modelAtPort(const QString &dest);
 	void writeOscToAll(const char *dest, const char *args, va_list va);
 	void writeOscToAll(const char *dest, const char *args...);
 protected:

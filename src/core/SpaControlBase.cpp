@@ -245,7 +245,6 @@ void SpaControlBase::uiExtShow(bool doShow)
 		m_procs[0]->uiExtShow(doShow);
 }
 
-#if 0
 void SpaProc::reloadPlugin()
 {
 	// refresh ports that are only read on restore
@@ -269,18 +268,16 @@ void SpaProc::reloadPlugin()
 	{
 		// save state of current plugin instance
 		DataFile m(m_settingsType);
-
-		saveSettings(m, m.content());
+		saveState(m, m.content());
 
 		shutdownPlugin();
-		// init plugin (will create a new instance)
-		initPlugin();
+		initPlugin(); // (will create a new instance)
 
 		// and load the settings again
-		loadSettings(m.content());
+		loadState(m.content());
 	}
 }
-#endif
+
 
 void SpaProc::copyModelsToPorts()
 {
@@ -289,8 +286,7 @@ void SpaProc::copyModelsToPorts()
 		switch (tp.m_type)
 		{
 		case 'f':
-			tp.m_val.m_f =
-				tp.m_connectedModel.m_floatModel->value();
+			tp.m_val.m_f = tp.m_connectedModel.m_floatModel->value();
 			break;
 		case 'i':
 			tp.m_val.m_i = tp.m_connectedModel.m_intModel->value();
@@ -310,6 +306,11 @@ void SpaProc::shutdownPlugin()
 
 	m_spaDescriptor->delete_plugin(m_plugin);
 	m_plugin = nullptr;
+
+	// clear all port data (object is just raw memory after dtor call)...
+	m_ports.~LmmsPorts();
+	// ... so we can reuse it - C++ is just awesome
+	new (&m_ports) LmmsPorts(Engine::mixer()->framesPerPeriod());
 }
 
 struct LmmsVisitor final : public virtual spa::audio::visitor
@@ -391,8 +392,7 @@ struct LmmsVisitor final : public virtual spa::audio::visitor
 	{
 		qDebug() << "other control port (float)";
 		m_ports->m_userPorts.emplace_back('f');
-		SpaProc::LmmsPorts::TypedPorts &bck =
-			m_ports->m_userPorts.back();
+		SpaProc::LmmsPorts::TypedPorts &bck = m_ports->m_userPorts.back();
 		setupPort(p, bck.m_val.m_f, bck.m_connectedModel.m_floatModel,
 			p.min, p.max, p.step);
 	}
@@ -400,8 +400,7 @@ struct LmmsVisitor final : public virtual spa::audio::visitor
 	{
 		qDebug() << "other control port (int)";
 		m_ports->m_userPorts.emplace_back('i');
-		SpaProc::LmmsPorts::TypedPorts &bck =
-			m_ports->m_userPorts.back();
+		SpaProc::LmmsPorts::TypedPorts &bck = m_ports->m_userPorts.back();
 		setupPort(p, bck.m_val.m_i, bck.m_connectedModel.m_intModel,
 			p.min, p.max);
 	}
@@ -730,6 +729,7 @@ template <class UnsignedType> UnsignedType castToUnsigned(int val)
 {
 	return val >= 0 ? static_cast<unsigned>(val) : 0u;
 }
+
 
 SpaProc::LmmsPorts::LmmsPorts(int bufferSize) :
 	buffersize(castToUnsigned<unsigned>(bufferSize)),

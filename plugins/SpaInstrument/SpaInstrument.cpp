@@ -318,8 +318,7 @@ void SpaInsView::toggleUI()
 
 void SpaInsView::reloadPlugin()
 {
-	SpaInstrument *model = castModel<SpaInstrument>();
-	model->reloadPlugin();
+	castModel<SpaInstrument>()->reloadPlugin();
 }
 
 
