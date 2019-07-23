@@ -97,8 +97,14 @@ public:
 	{
 		return d.m_linkEnabled[id];
 	}
-	std::vector<ModelInfo>& models() { return d.m_models; }
-	const std::vector<ModelInfo>& models() const { return d.m_models; }
+
+	AutomatableModel* model(std::size_t i) { return d.m_models[i].m_model; }
+	const AutomatableModel* model(std::size_t i) const
+	{
+		return d.m_models[i].m_model;
+	}
+	AutomatableModel* modelWithName(const QString& name) const;
+	std::size_t modelNum() const { return models().size(); }
 
 	/*
 		Load/Save
@@ -123,6 +129,10 @@ protected:
 	void clearModels();
 
 private:
+	// TODO: remove
+	std::vector<ModelInfo>& models() { return d.m_models; }
+	const std::vector<ModelInfo>& models() const { return d.m_models; }
+
 	struct
 	{
 		//! models for the per-control link-enabled models

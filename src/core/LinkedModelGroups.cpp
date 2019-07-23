@@ -74,7 +74,18 @@ void LinkedModelGroup::linkControls(LinkedModelGroup *other, std::size_t id)
 void LinkedModelGroup::unlinkControls(LinkedModelGroup *other, std::size_t id)
 {
 	AutomatableModel::unlinkModels(
-		models()[id].m_model, other->models()[id].m_model);
+				models()[id].m_model, other->models()[id].m_model);
+}
+
+
+
+
+AutomatableModel *LinkedModelGroup::modelWithName(const QString &name) const
+{
+	auto itr = std::find_if(models().begin(), models().end(),
+		[&name](const ModelInfo& mi) -> bool
+	{ return mi.m_name == name; });
+	return itr == models().end() ? nullptr : itr->m_model;
 }
 
 
