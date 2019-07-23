@@ -105,8 +105,8 @@ FxLine::FxLine( QWidget * _parent, FxMixerView * _mv, int _channelIndex ) :
 	setToolTip( name );
 
 	m_useStyleColor = channel->m_useStyleColor;
-	m_customBackgroundActive.setColor( channel->m_customColor );
-	m_customBackground.setColor( channel->m_customColor.darker( 150 ) );
+	m_customBackgroundActive.setColor( channel->m_customColor.lighter( 125 ) );
+	m_customBackground.setColor( channel->m_customColor );
 
 	m_renameLineEdit = new QLineEdit();
 	m_renameLineEdit->setText( name );
@@ -281,8 +281,8 @@ void FxLine::changeColor()
 	targetChannel->m_useStyleColor = false;
 
 	m_useStyleColor = false;
-	m_customBackgroundActive.setColor( color );
-	m_customBackground.setColor( color.darker( 150 ) );
+	m_customBackgroundActive.setColor( color.lighter( 125 ) );
+	m_customBackground.setColor( color );
 
 	update();
 }
