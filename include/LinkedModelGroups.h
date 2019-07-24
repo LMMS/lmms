@@ -208,9 +208,12 @@ public:
 	virtual const LinkedModelGroup* getGroup(std::size_t idx) const = 0;
 
 private:
+	// Implement deletion in the CPP file:
+	struct BoolModelDeleter { void operator()(class BoolModel* l); };
+
 	//! Model for the "global" linking
 	//! Only allocated if #processors > 1
-	std::unique_ptr<class BoolModel> m_multiChannelLinkModel;
+	std::unique_ptr<class BoolModel, BoolModelDeleter> m_multiChannelLinkModel;
 
 	//! Force updateLinkStatesFromGlobal() to not unlink any ports
 	//! Implementation detail, see linkPort() implementation
