@@ -203,7 +203,7 @@ PianoRoll::PianoRoll() :
 	m_nemStr.push_back( tr( "Note Velocity" ) );
 	m_nemStr.push_back( tr( "Note Panning" ) );
 
-	QSignalMapper * signalMapper = new QSignalMapper( this );
+	//QSignalMapper * signalMapper = new QSignalMapper( this ); REMOVEME
 	m_noteEditMenu = new QMenu( this );
 	m_noteEditMenu->clear();
 	for( int i = 0; i < m_nemStr.size(); ++i )
@@ -216,7 +216,7 @@ PianoRoll::PianoRoll() :
 	connect( signalMapper, SIGNAL(mapped(int)),
 			this, SLOT(changeNoteEditMode(int)) );
 
-	signalMapper = new QSignalMapper( this );
+	//signalMapper = new QSignalMapper( this ); REMOVEME
 	m_semiToneMarkerMenu = new QMenu( this );
 
 	QAction* markSemitoneAction = new QAction( tr("Mark/unmark current semitone"), this );
