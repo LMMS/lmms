@@ -34,7 +34,6 @@
 #include <QPointer>
 #include <QScrollBar>
 #include <QStyleOption>
-#include <QSignalMapper>
 
 #ifndef __USE_XOPEN
 #define __USE_XOPEN
@@ -209,11 +208,8 @@ PianoRoll::PianoRoll() :
 	{
 		QAction * act = new QAction( m_nemStr.at(i), this );
 		connect( act, &QAction::triggered, [this, i](){ changeNoteEditMode(i); } );
-		//signalMapper->setMapping( act, i );
 		m_noteEditMenu->addAction( act );
 	}
-	//connect( signalMapper, SIGNAL(mapped(int)),
-	//		this, SLOT(changeNoteEditMode(int)) );
 
 	m_semiToneMarkerMenu = new QMenu( this );
 
