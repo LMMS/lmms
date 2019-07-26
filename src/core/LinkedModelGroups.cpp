@@ -83,7 +83,8 @@ void LinkedModelGroup::unlinkControls(LinkedModelGroup *other, std::size_t id)
 void LinkedModelGroup::saveValues(QDomDocument &doc, QDomElement &that,
 	const LinkedModelGroup *lmg0)
 {
-	Q_ASSERT(lmg0->isLinking());
+	// if multiple lmgs, the first one must currently be the linking one
+	Q_ASSERT(this == lmg0 || lmg0->isLinking());
 	for (std::size_t idx = 0; idx < m_models.size(); ++idx)
 	{
 		if (this == lmg0 || !lmg0->linkEnabledModel(idx)->value())
