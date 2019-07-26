@@ -664,5 +664,5 @@ bool BBTrackView::close()
 void BBTrackView::clickedTrackLabel()
 {
 	Engine::getBBTrackContainer()->setCurrentBB( m_bbTrack->index() );
-	gui->getBBEditor()->show();
+	gui->getBBEditor()->parentWidget()->show();
 }
