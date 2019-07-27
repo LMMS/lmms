@@ -51,96 +51,96 @@
 #define setwavemodel(name)\
 		name->clear();\
 		name->addItem(tr("None"), make_unique<PluginPixmapLoader>("none"));\
-		name->addItem(tr("Pulse Width"), make_unique<PluginPixmapLoader>("sin"));\
-		name->addItem(tr("Weird 1"), make_unique<PluginPixmapLoader>("noise"));\
-		name->addItem(tr("Weird 2"), make_unique<PluginPixmapLoader>("noise"));\
-		name->addItem(tr("Asym To Right"), make_unique<PluginPixmapLoader>("saw"));\
-		name->addItem(tr("Asym To Left"), make_unique<PluginPixmapLoader>("ramp"));\
-		name->addItem(tr("Bidirectional Asym"), make_unique<PluginPixmapLoader>("tri"));\
-		name->addItem(tr("Squish To Center"), make_unique<PluginPixmapLoader>("exp"));\
-		name->addItem(tr("Stretch From Center"), make_unique<PluginPixmapLoader>("sinabs"));\
-		name->addItem(tr("Stretch And Squish"), make_unique<PluginPixmapLoader>("tri"));\
-		name->addItem(tr("Cut Off Right"), make_unique<PluginPixmapLoader>("saw"));\
-		name->addItem(tr("Cut Off Left"), make_unique<PluginPixmapLoader>("ramp"));\
+		name->addItem(tr("Pulse Width"), make_unique<PluginPixmapLoader>("pulse_width"));\
+		name->addItem(tr("Weird 1"), make_unique<PluginPixmapLoader>("weird1"));\
+		name->addItem(tr("Weird 2"), make_unique<PluginPixmapLoader>("weird2"));\
+		name->addItem(tr("Asym To Right"), make_unique<PluginPixmapLoader>("asym_r"));\
+		name->addItem(tr("Asym To Left"), make_unique<PluginPixmapLoader>("asym_l"));\
+		name->addItem(tr("Bidirectional Asym"), make_unique<PluginPixmapLoader>("asym_r"));\
+		name->addItem(tr("Squish To Center"), make_unique<PluginPixmapLoader>("squish_to_center"));\
+		name->addItem(tr("Stretch From Center"), make_unique<PluginPixmapLoader>("stretch_from_center"));\
+		name->addItem(tr("Stretch And Squish"), make_unique<PluginPixmapLoader>("squish_to_center"));\
+		name->addItem(tr("Cut Off Right"), make_unique<PluginPixmapLoader>("cut_off_r"));\
+		name->addItem(tr("Cut Off Left"), make_unique<PluginPixmapLoader>("cut_off_l"));\
 		name->addItem(tr("Squarify"), make_unique<PluginPixmapLoader>("sqr"));\
-		name->addItem(tr("Pulsify"), make_unique<PluginPixmapLoader>("sqr"));\
-		name->addItem(tr("Flip"), make_unique<PluginPixmapLoader>("tri"));\
-		name->addItem(tr("Clip"), make_unique<PluginPixmapLoader>("sqr"));\
-		name->addItem(tr("Inverse Clip"), make_unique<PluginPixmapLoader>("sqr"));\
+		name->addItem(tr("Pulsify"), make_unique<PluginPixmapLoader>("pulse"));\
+		name->addItem(tr("Flip"), make_unique<PluginPixmapLoader>("flip"));\
+		name->addItem(tr("Clip"), make_unique<PluginPixmapLoader>("clip"));\
+		name->addItem(tr("Inverse Clip"), make_unique<PluginPixmapLoader>("clip_inverse"));\
 		name->addItem(tr("Sine"), make_unique<PluginPixmapLoader>("sin"));\
-		name->addItem(tr("Atan"), make_unique<PluginPixmapLoader>("tri"));\
-		name->addItem(tr("Sync"), make_unique<PluginPixmapLoader>("saw"));\
-		name->addItem(tr("Sync Half Interpolate"), make_unique<PluginPixmapLoader>("saw"));\
-		name->addItem(tr("Sync Interpolate"), make_unique<PluginPixmapLoader>("saw"));\
-		name->addItem(tr("Mirror"), make_unique<PluginPixmapLoader>("sinabs"));\
-		name->addItem(tr("Diagonal Morph"), make_unique<PluginPixmapLoader>("saw"));\
-		name->addItem(tr("Sideways Morph"), make_unique<PluginPixmapLoader>("saw"));
+		name->addItem(tr("Atan"), make_unique<PluginPixmapLoader>("sqrsoft"));\
+		name->addItem(tr("Sync"), make_unique<PluginPixmapLoader>("sync"));\
+		name->addItem(tr("Sync Half Interpolate"), make_unique<PluginPixmapLoader>("sync_half_inter"));\
+		name->addItem(tr("Sync Interpolate"), make_unique<PluginPixmapLoader>("sync_inter"));\
+		name->addItem(tr("Mirror"), make_unique<PluginPixmapLoader>("mirror"));\
+		name->addItem(tr("Diagonal Morph"), make_unique<PluginPixmapLoader>("diagonal_morph"));\
+		name->addItem(tr("Sideways Morph"), make_unique<PluginPixmapLoader>("sideways_morph"));
 
 #define modinmodel(name)\
 		name->clear();\
 		name->addItem(tr("None"), make_unique<PluginPixmapLoader>("none"));\
-		name->addItem(tr("Wavetable OSC"), make_unique<PluginPixmapLoader>("sqr"));\
+		name->addItem(tr("Wavetable OSC"), make_unique<PluginPixmapLoader>("wavetable"));\
 		name->addItem(tr("Sub OSC"), make_unique<PluginPixmapLoader>("sin"));\
-		name->addItem(tr("Sample OSC"), make_unique<PluginPixmapLoader>("noise"));\
-		name->addItem(tr("Filter Output"), make_unique<PluginPixmapLoader>("moog"));\
-		name->addItem(tr("Velocity"), make_unique<PluginPixmapLoader>("letter_v"));\
-		name->addItem(tr("Panning"), make_unique<PluginPixmapLoader>("letter_p"));\
+		name->addItem(tr("Sample OSC"), make_unique<PluginPixmapLoader>("sample"));\
+		name->addItem(tr("Filter Output"), make_unique<PluginPixmapLoader>("filter_lowpass"));\
+		name->addItem(tr("Velocity"), make_unique<PluginPixmapLoader>("volume"));\
+		name->addItem(tr("Panning"), make_unique<PluginPixmapLoader>("panning"));\
 		name->addItem(tr("Humanizer"), make_unique<PluginPixmapLoader>("letter_h"));\
-		name->addItem(tr("Macro"), make_unique<PluginPixmapLoader>("letter_m"));
+		name->addItem(tr("Macro"), make_unique<PluginPixmapLoader>("macro"));
 
 #define modsectionsmodel(name)\
 		name->clear();\
 		name->addItem(tr("None"), make_unique<PluginPixmapLoader>("none"));\
-		name->addItem(tr("Wavetable OSC"), make_unique<PluginPixmapLoader>("sqr"));\
+		name->addItem(tr("Wavetable OSC"), make_unique<PluginPixmapLoader>("wavetable"));\
 		name->addItem(tr("Sub OSC"), make_unique<PluginPixmapLoader>("sin"));\
-		name->addItem(tr("Sample OSC"), make_unique<PluginPixmapLoader>("noise"));\
-		name->addItem(tr("Matrix"), make_unique<PluginPixmapLoader>("ramp"));\
-		name->addItem(tr("Filter Input"), make_unique<PluginPixmapLoader>("moog"));\
-		name->addItem(tr("Filter Parameters"), make_unique<PluginPixmapLoader>("letter_f"));\
-		name->addItem(tr("Macro"), make_unique<PluginPixmapLoader>("letter_m"));
+		name->addItem(tr("Sample OSC"), make_unique<PluginPixmapLoader>("sample"));\
+		name->addItem(tr("Matrix"), make_unique<PluginPixmapLoader>("matrix"));\
+		name->addItem(tr("Filter Input"), make_unique<PluginPixmapLoader>("filter_lowpass"));\
+		name->addItem(tr("Filter Parameters"), make_unique<PluginPixmapLoader>("filter_parameters"));\
+		name->addItem(tr("Macro"), make_unique<PluginPixmapLoader>("macro"));
 
 #define mainoscsignalsmodel(name)\
 		name->clear();\
 		name->addItem(tr("None"), make_unique<PluginPixmapLoader>("none"));\
-		name->addItem(tr("Morph"), make_unique<PluginPixmapLoader>("tri"));\
-		name->addItem(tr("Range"), make_unique<PluginPixmapLoader>("sqr"));\
-		name->addItem(tr("Modify"), make_unique<PluginPixmapLoader>("moog"));\
-		name->addItem(tr("Detune"), make_unique<PluginPixmapLoader>("saw"));\
-		name->addItem(tr("Phase"), make_unique<PluginPixmapLoader>("sin"));\
-		name->addItem(tr("Volume"), make_unique<PluginPixmapLoader>("letter_v"));\
-		name->addItem(tr("Panning"), make_unique<PluginPixmapLoader>("letter_p"));\
-		name->addItem(tr("Unison Number"), make_unique<PluginPixmapLoader>("ramp"));\
-		name->addItem(tr("Unison Detune"), make_unique<PluginPixmapLoader>("saw"));\
-		name->addItem(tr("Unison Morph"), make_unique<PluginPixmapLoader>("tri"));\
-		name->addItem(tr("Unison Modify"), make_unique<PluginPixmapLoader>("moog"));
+		name->addItem(tr("Morph"), make_unique<PluginPixmapLoader>("morph"));\
+		name->addItem(tr("Range"), make_unique<PluginPixmapLoader>("range"));\
+		name->addItem(tr("Modify"), make_unique<PluginPixmapLoader>("pulse_width"));\
+		name->addItem(tr("Detune"), make_unique<PluginPixmapLoader>("detune"));\
+		name->addItem(tr("Phase"), make_unique<PluginPixmapLoader>("phase"));\
+		name->addItem(tr("Volume"), make_unique<PluginPixmapLoader>("volume"));\
+		name->addItem(tr("Panning"), make_unique<PluginPixmapLoader>("panning"));\
+		name->addItem(tr("Unison Voice Number"), make_unique<PluginPixmapLoader>("unison_number"));\
+		name->addItem(tr("Unison Detune"), make_unique<PluginPixmapLoader>("unison_detune"));\
+		name->addItem(tr("Unison Morph"), make_unique<PluginPixmapLoader>("unison_morph"));\
+		name->addItem(tr("Unison Modify"), make_unique<PluginPixmapLoader>("unison_modify"));
 
 #define subsignalsmodel(name)\
 		name->clear();\
 		name->addItem(tr("None"), make_unique<PluginPixmapLoader>("none"));\
-		name->addItem(tr("Detune"), make_unique<PluginPixmapLoader>("saw"));\
-		name->addItem(tr("Phase"), make_unique<PluginPixmapLoader>("sin"));\
-		name->addItem(tr("Volume"), make_unique<PluginPixmapLoader>("letter_v"));\
-		name->addItem(tr("Panning"), make_unique<PluginPixmapLoader>("letter_p"));\
+		name->addItem(tr("Detune"), make_unique<PluginPixmapLoader>("detune"));\
+		name->addItem(tr("Phase"), make_unique<PluginPixmapLoader>("phase"));\
+		name->addItem(tr("Volume"), make_unique<PluginPixmapLoader>("volume"));\
+		name->addItem(tr("Panning"), make_unique<PluginPixmapLoader>("panning"));\
 		name->addItem(tr("Length"), make_unique<PluginPixmapLoader>("letter_l"));\
 		name->addItem(tr("Rate Limit"), make_unique<PluginPixmapLoader>("letter_r"));\
-		name->addItem(tr("Unison Voice Number"), make_unique<PluginPixmapLoader>("ramp"));\
-		name->addItem(tr("Unison Detune"), make_unique<PluginPixmapLoader>("saw"));
+		name->addItem(tr("Unison Voice Number"), make_unique<PluginPixmapLoader>("unison_number"));\
+		name->addItem(tr("Unison Detune"), make_unique<PluginPixmapLoader>("unison_detune"));
 
 #define samplesignalsmodel(name)\
 		name->clear();\
 		name->addItem(tr("None"), make_unique<PluginPixmapLoader>("none"));\
-		name->addItem(tr("Detune"), make_unique<PluginPixmapLoader>("saw"));\
-		name->addItem(tr("Phase"), make_unique<PluginPixmapLoader>("sin"));\
-		name->addItem(tr("Volume"), make_unique<PluginPixmapLoader>("letter_v"));\
-		name->addItem(tr("Panning"), make_unique<PluginPixmapLoader>("letter_p"));
+		name->addItem(tr("Detune"), make_unique<PluginPixmapLoader>("detune"));\
+		name->addItem(tr("Phase"), make_unique<PluginPixmapLoader>("phase"));\
+		name->addItem(tr("Volume"), make_unique<PluginPixmapLoader>("volume"));\
+		name->addItem(tr("Panning"), make_unique<PluginPixmapLoader>("panning"));
 
 #define matrixsignalsmodel(name)\
 		name->clear();\
 		name->addItem(tr("None"), make_unique<PluginPixmapLoader>("none"));\
-		name->addItem(tr("Amount"), make_unique<PluginPixmapLoader>("letter_a"));\
-		name->addItem(tr("Curve"), make_unique<PluginPixmapLoader>("letter_c"));\
-		name->addItem(tr("Secondary Amount"), make_unique<PluginPixmapLoader>("letter_a"));\
-		name->addItem(tr("Secondary Curve"), make_unique<PluginPixmapLoader>("letter_c"));\
+		name->addItem(tr("Amount"), make_unique<PluginPixmapLoader>("volume"));\
+		name->addItem(tr("Curve"), make_unique<PluginPixmapLoader>("curve"));\
+		name->addItem(tr("Secondary Amount"), make_unique<PluginPixmapLoader>("volume"));\
+		name->addItem(tr("Secondary Curve"), make_unique<PluginPixmapLoader>("curve"));\
 		name->addItem(tr("Input Section"), make_unique<PluginPixmapLoader>("letter_i"));\
 		name->addItem(tr("Input Number"), make_unique<PluginPixmapLoader>("letter_i"));\
 		name->addItem(tr("Secondary Input Section"), make_unique<PluginPixmapLoader>("letter_i"));\
@@ -152,18 +152,18 @@
 #define filtersignalsmodel(name)\
 		name->clear();\
 		name->addItem(tr("None"), make_unique<PluginPixmapLoader>("none"));\
-		name->addItem(tr("Cutoff Frequency"), make_unique<PluginPixmapLoader>("moog"));\
-		name->addItem(tr("Resonance"), make_unique<PluginPixmapLoader>("ramp"));\
-		name->addItem(tr("db Gain"), make_unique<PluginPixmapLoader>("ramp"));\
-		name->addItem(tr("Filter Type"), make_unique<PluginPixmapLoader>("ramp"));\
-		name->addItem(tr("Slope"), make_unique<PluginPixmapLoader>("ramp"));\
-		name->addItem(tr("Input Volume"), make_unique<PluginPixmapLoader>("sin"));\
-		name->addItem(tr("Output Volume"), make_unique<PluginPixmapLoader>("ramp"));\
+		name->addItem(tr("Cutoff Frequency"), make_unique<PluginPixmapLoader>("filter_lowpass"));\
+		name->addItem(tr("Resonance"), make_unique<PluginPixmapLoader>("letter_r"));\
+		name->addItem(tr("db Gain"), make_unique<PluginPixmapLoader>("volume"));\
+		name->addItem(tr("Filter Type"), make_unique<PluginPixmapLoader>("letter_t"));\
+		name->addItem(tr("Slope"), make_unique<PluginPixmapLoader>("letter_s"));\
+		name->addItem(tr("Input Volume"), make_unique<PluginPixmapLoader>("volume_input"));\
+		name->addItem(tr("Output Volume"), make_unique<PluginPixmapLoader>("volume_output"));\
 		name->addItem(tr("Wet/Dry"), make_unique<PluginPixmapLoader>("ramp"));\
-		name->addItem(tr("Balance/Panning"), make_unique<PluginPixmapLoader>("ramp"));\
-		name->addItem(tr("Saturation"), make_unique<PluginPixmapLoader>("ramp"));\
-		name->addItem(tr("Feedback"), make_unique<PluginPixmapLoader>("ramp"));\
-		name->addItem(tr("Detune"), make_unique<PluginPixmapLoader>("ramp"));
+		name->addItem(tr("Balance/Panning"), make_unique<PluginPixmapLoader>("panning"));\
+		name->addItem(tr("Saturation"), make_unique<PluginPixmapLoader>("sqrsoft"));\
+		name->addItem(tr("Feedback"), make_unique<PluginPixmapLoader>("letter_f"));\
+		name->addItem(tr("Detune"), make_unique<PluginPixmapLoader>("detune"));
 
 #define mod8model(name)\
 		name->clear();\
@@ -207,7 +207,7 @@
 		name->addItem(tr("Peak"), make_unique<PluginPixmapLoader>("filter_peak"));\
 		name->addItem(tr("Notch"), make_unique<PluginPixmapLoader>("filter_notch"));\
 		name->addItem(tr("Allpass"), make_unique<PluginPixmapLoader>("filter_allpass"));\
-		name->addItem(tr("Moog Lowpass (Note: Slope is double)"), make_unique<PluginPixmapLoader>("filter_moog"));
+		name->addItem(tr("Moog Lowpass (2x Slope)"), make_unique<PluginPixmapLoader>("filter_moog"));
 
 #define filterslopesmodel(name)\
 		name->clear();\
@@ -222,10 +222,10 @@
 
 #define modcombinetypemodel(name)\
 		name->clear();\
-		name->addItem(tr("Add Bidirectional"), make_unique<PluginPixmapLoader>("number_1"));\
-		name->addItem(tr("Multiply Bidirectional"), make_unique<PluginPixmapLoader>("number_2"));\
-		name->addItem(tr("Add Unidirectional"), make_unique<PluginPixmapLoader>("number_3"));\
-		name->addItem(tr("Multiply Unidirectional"), make_unique<PluginPixmapLoader>("number_4"));
+		name->addItem(tr("Add Bidirectional"), make_unique<PluginPixmapLoader>("bidirectional_add"));\
+		name->addItem(tr("Multiply Bidirectional"), make_unique<PluginPixmapLoader>("bidirectional_multi"));\
+		name->addItem(tr("Add Unidirectional"), make_unique<PluginPixmapLoader>("unidirectional_add"));\
+		name->addItem(tr("Multiply Unidirectional"), make_unique<PluginPixmapLoader>("unidirectional_multi"));
 
 #define oversamplemodel(name)\
 		name.clear();\
@@ -273,8 +273,9 @@ const int STOREDSUBWAVELEN = 2048;
 const int STOREDMAINWAVELEN = 2048;
 
 // This number divided by 4 is the number of megabytes of RAM each wavetable will use up (I think?).
-// I'd like to increase this in the future, but the higher this number is, the more time it takes to load Microwave.
-const int WAVERATIO = 4;
+// I'd like to increase this, but the higher this number is, the more time it takes to load Microwave.
+// 16 is the ideal value here.
+const int WAVERATIO = 16;
 
 const int SUBWAVELEN = STOREDSUBWAVELEN * WAVERATIO;
 const int MAINWAVELEN = STOREDMAINWAVELEN * WAVERATIO;
@@ -488,11 +489,11 @@ private:
 	
 	BoolModel m_visualize;
 
-	float m_storedwaveforms[8][STOREDMAINARRAYLEN] = {{0}};
-	float m_waveforms[8][MAINARRAYLEN] = {{0}};
+	std::vector<float> m_storedwaveforms[8];
+	std::vector<float> m_waveforms[8];
 	bool m_mainFilled[8] = {false};
-	float m_storedsubs[64][STOREDSUBWAVELEN] = {{0}};
-	float m_subs[64][SUBWAVELEN] = {{0}};
+	std::vector<float> m_storedsubs[64];
+	std::vector<float> m_subs[64];
 	bool m_subFilled[64] = {false};
 	float m_sampGraphs[1024] = {0};
 	std::vector<float> m_samples[8][2];
@@ -883,7 +884,7 @@ public:
 		
 	virtual ~mSynth();
 	
-	void nextStringSample(sampleFrame &outputSample, float (&m_waveforms)[8][MAINARRAYLEN], float (&subs)[64][SUBWAVELEN], std::vector<float> (&m_samples)[8][2], float * sampGraphs, int maxMainEnabled, int maxSubEnabled, int maxSampleEnabled, int maxFiltEnabled, int maxModEnabled, int sample_rate, Microwave * mwc, bool removeDC, float (&m_storedsubs)[64][STOREDSUBWAVELEN]);
+	void nextStringSample(sampleFrame &outputSample, std::vector<float> (&m_waveforms)[8], std::vector<float> (&subs)[64], std::vector<float> (&m_samples)[8][2], float * sampGraphs, int maxMainEnabled, int maxSubEnabled, int maxSampleEnabled, int maxFiltEnabled, int maxModEnabled, int sample_rate, Microwave * mwc, bool removeDC, std::vector<float> (&m_storedsubs)[64]);
 
 	inline float detuneWithCents(float pitchValue, float detuneValue);
 

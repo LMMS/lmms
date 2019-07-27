@@ -104,6 +104,9 @@ Microwave::Microwave(InstrumentTrack * instrument_track) :
 {
 	for (int i = 0; i < 8; ++i)
 	{
+		m_storedwaveforms[i].reserve(STOREDMAINARRAYLEN);
+		m_waveforms[i].reserve(MAINARRAYLEN);
+
 		m_morph[i] = new FloatModel(0, 0, 254, 0.0001f, this, tr("Morph"));
 		m_range[i] = new FloatModel(1, 1, 16, 0.0001f, this, tr("Range"));
 		m_sampLen[i] = new FloatModel(2048, 1, 16384, 1.f, this, tr("Waveform Sample Length"));
@@ -173,6 +176,9 @@ Microwave::Microwave(InstrumentTrack * instrument_track) :
 
 	for (int i = 0; i < 64; ++i)
  	{
+		m_storedsubs[i].reserve(STOREDSUBWAVELEN);
+		m_subs[i].reserve(SUBWAVELEN);
+
 		m_subEnabled[i] = new BoolModel(false, this);
 		m_subVol[i] = new FloatModel(100.f, 0.f, 200.f, 0.0001f, this, tr("Volume"));
 		m_subPhase[i] = new FloatModel(0.f, 0.f, 200.f, 0.0001f, this, tr("Phase"));
@@ -437,7 +443,7 @@ void Microwave::saveSettings(QDomDocument & doc, QDomElement & thissave)
 			if (m_updateWavetable[i])
 			{
 				m_updateWavetable[i] = false;
-				base64::encode((const char *)m_storedwaveforms[i],
+				base64::encode((const char *)m_storedwaveforms[i].data(),
 					STOREDMAINARRAYLEN * sizeof(float), m_wavetableSaveStrings[i]);
 			}
 			thissave.setAttribute("waveforms"+QString::number(i), m_wavetableSaveStrings[i]);
@@ -449,7 +455,7 @@ void Microwave::saveSettings(QDomDocument & doc, QDomElement & thissave)
 	{
 		if (m_subEnabled[i]->value())
 		{
-			base64::encode((const char *)m_storedsubs[i],
+			base64::encode((const char *)m_storedsubs[i].data(),
 				STOREDSUBWAVELEN * sizeof(float), saveString);
 			thissave.setAttribute("subs"+QString::number(i), saveString);
 		}
@@ -1342,7 +1348,7 @@ inline void Microwave::fillSubOsc(int which, bool doInterpolate)
 {
 	if (doInterpolate)
 	{
-		srccpy(m_subs[which], const_cast<float*>(m_storedsubs[which]), STOREDSUBWAVELEN);
+		srccpy(m_subs[which].data(), m_storedsubs[which].data(), STOREDSUBWAVELEN);
 	}
 	else
 	{
@@ -1364,7 +1370,7 @@ inline void Microwave::fillMainOsc(int which, bool doInterpolate)
 {
 	if (doInterpolate)
 	{
-		srccpy(m_waveforms[which], const_cast<float*>(m_storedwaveforms[which]), STOREDMAINARRAYLEN);
+		srccpy(m_waveforms[which].data(), m_storedwaveforms[which].data(), STOREDMAINARRAYLEN);
 	}
 	else
 	{
@@ -2165,17 +2171,22 @@ void MicrowaveView::updateScroll()
 			m_modInCurveKnob2[i]->setMatrixLocation(4, 4, i);
 		}
 
+		// Bug evasion.  Without this, some display glitches happen in certain conditions.
+		modOutSecChanged(i+matrixDivide);
+		modInChanged(i+matrixDivide);
+		modIn2Changed(i+matrixDivide);
+
 		visimove(m_modInBox[i], 45, i*115+57 - matrixRemainder, inMatrixTab);
-		visimove(m_modInNumBox[i], 90, i*115+57 - matrixRemainder, inMatrixTab);
+		visimove(m_modInNumBox[i], 90, i*115+57 - matrixRemainder, inMatrixTab && m_modInNumBox[i]->isVisible());
 		visimove(m_modInAmntKnob[i], 136, i*115+53 - matrixRemainder, inMatrixTab);
 		visimove(m_modInCurveKnob[i], 161, i*115+53 - matrixRemainder, inMatrixTab);
 		visimove(m_modInBox2[i], 45, i*115+118 - matrixRemainder, inMatrixTab);
-		visimove(m_modInNumBox2[i], 90, i*115+118 - matrixRemainder, inMatrixTab);
+		visimove(m_modInNumBox2[i], 90, i*115+118 - matrixRemainder, inMatrixTab && m_modInNumBox2[i]->isVisible());
 		visimove(m_modInAmntKnob2[i], 136, i*115+114 - matrixRemainder, inMatrixTab);
 		visimove(m_modInCurveKnob2[i], 161, i*115+114 - matrixRemainder, inMatrixTab);
 		visimove(m_modOutSecBox[i], 27, i*115+88 - matrixRemainder, inMatrixTab);
-		visimove(m_modOutSigBox[i], 69, i*115+88 - matrixRemainder, inMatrixTab);
-		visimove(m_modOutSecNumBox[i], 112, i*115+88 - matrixRemainder, inMatrixTab);
+		visimove(m_modOutSigBox[i], 69, i*115+88 - matrixRemainder, inMatrixTab && m_modOutSigBox[i]->isVisible());
+		visimove(m_modOutSecNumBox[i], 112, i*115+88 - matrixRemainder, inMatrixTab && m_modOutSecNumBox[i]->isVisible());
 		visimove(m_modEnabledToggle[i], 27, i*115+36 - matrixRemainder, inMatrixTab);
 		visimove(m_modCombineTypeBox[i], 149, i*115+88 - matrixRemainder, inMatrixTab);
 		visimove(m_modTypeToggle[i], 195, i*115+67 - matrixRemainder, inMatrixTab);
@@ -2185,11 +2196,6 @@ void MicrowaveView::updateScroll()
 		visimove(m_i1Button[i], 25, i*115+50 - matrixRemainder, inMatrixTab);
 		visimove(m_i2Button[i], 25, i*115+112 - matrixRemainder, inMatrixTab);
 		visimove(m_modNumText[i], 192, i*115+89 - matrixRemainder, inMatrixTab);
-
-		// Bug evasion.  Without this, some display glitches happen in certain conditions.
-		modOutSecChanged(i+matrixDivide);
-		modInChanged(i+matrixDivide);
-		modIn2Changed(i+matrixDivide);
 	}
 
 	for (int i = 0; i < 8; ++i)
@@ -2318,12 +2324,13 @@ void MicrowaveView::updateScroll()
 	visimove(m_confirmLoadButton, 93, 187, inWavetableLoadingTab);
 
 	visimove(m_XBtn, 231, 11, inWavetableLoadingTab);
-	visimove(m_MatrixXBtn, 229, 8, inMatrixTab);
 
 	visimove(m_normalizeBtn, 155, 224, inWavetableLoadingTab);
 	visimove(m_desawBtn, 39, 224, inWavetableLoadingTab);
 
 	tabChanged(m_b->m_scroll);
+
+	visimove(m_MatrixXBtn, 229, 8, inMatrixTab && m_MatrixXBtn->isVisible());
 }
 
 
@@ -2346,6 +2353,8 @@ void MicrowaveView::wheelEvent(QWheelEvent * me)
 			}
 		}
 	}
+
+	me->accept();
 }
 
 
@@ -2424,7 +2433,7 @@ void MicrowaveView::mainNumChanged()
 void MicrowaveView::subNumChanged()
 {
 	m_b->m_graph.setLength(m_b->m_subSampLen[m_b->m_subNum.value()-1]->value());
-	m_b->m_graph.setSamples(m_b->m_storedsubs[m_b->m_subNum.value()-1]);
+	m_b->m_graph.setSamples(m_b->m_storedsubs[m_b->m_subNum.value()-1].data());
 	setGraphEnabledColor(m_b->m_subEnabled[m_b->m_subNum.value()-1]->value());
 
 	int subNumValue = m_b->m_subNum.value() - 1;
@@ -3777,10 +3786,10 @@ mSynth::~mSynth()
 
 
 // This is the part that puts everything together and calculates an audio output.
-void mSynth::nextStringSample(sampleFrame &outputSample, float (&m_waveforms)[8][MAINARRAYLEN], float (&m_subs)[64][SUBWAVELEN],
+void mSynth::nextStringSample(sampleFrame &outputSample, std::vector<float> (&m_waveforms)[8], std::vector<float> (&m_subs)[64],
 				std::vector<float> (&m_samples)[8][2], float * m_sampGraphs, int m_maxMainEnabled, int m_maxSubEnabled,
 				int m_maxSampleEnabled, int m_maxFiltEnabled, int m_maxModEnabled, int sample_rate, Microwave * m_mwc,
-				bool m_removeDC, float (&m_storedsubs)[64][STOREDSUBWAVELEN])
+				bool m_removeDC, std::vector<float> (&m_storedsubs)[64])
 {
 	++m_noteDuration;
 
@@ -3793,6 +3802,7 @@ void mSynth::nextStringSample(sampleFrame &outputSample, float (&m_waveforms)[8]
 	{
 		if (m_modEnabled[l])
 		{
+			// Find where the inputs are coming from
 			switch (m_modIn[l])
 			{
 				case 0:
@@ -4015,15 +4025,18 @@ void mSynth::nextStringSample(sampleFrame &outputSample, float (&m_waveforms)[8]
 				}
 			}
 
-			if (m_curModVal[0] ) { m_curModVal[0]  *= m_modInAmnt[l]  * 0.01f; }
-			if (m_curModVal[1] ) { m_curModVal[1]  *= m_modInAmnt[l]  * 0.01f; }
+			// Apply Amount knob.
+			m_curModVal[0]  *= m_modInAmnt[l]  * 0.01f;
+			m_curModVal[1]  *= m_modInAmnt[l]  * 0.01f;
+			// Since it's uncommon to use both inputs, the "if" statement helps performance.
 			if (m_curModVal2[0]) { m_curModVal2[0] *= m_modInAmnt2[l] * 0.01f; }
 			if (m_curModVal2[1]) { m_curModVal2[1] *= m_modInAmnt2[l] * 0.01f; }
 
-			// Calculate curve
+			// Calculate curve and direction
 			if (m_modCombineType[l] <= 1)// Bidirectional
 			{
-				if (m_modInCurve[l] != 100.f)// The "if" statement is there so unnecessary CPU isn't spent (pow is very expensive) if the curve knob isn't being used.
+				// The "if" statement is there so unnecessary CPU isn't spent (pow is very expensive) if the curve knob isn't being used.
+				if (m_modInCurve[l] != 100.f)
 				{
 					// Move to a scale of 0 to 1 (from -1 to 1) and then apply the curve.
 					m_temp1 = 1.f / (m_modInCurve[l] * 0.01f);
@@ -4130,6 +4143,7 @@ void mSynth::nextStringSample(sampleFrame &outputSample, float (&m_waveforms)[8]
 
 			m_comboModValMono = (m_comboModVal[0] + m_comboModVal[1]) * 0.5f;
 
+			// Send the calcluated value to the output.  Keep track of the changed values so they can be reset later on.
 			switch (m_modOutSec[l])
 			{
 				case 0:
@@ -4603,6 +4617,7 @@ void mSynth::nextStringSample(sampleFrame &outputSample, float (&m_waveforms)[8]
 			m_filtInputs[l][0] *= m_temp1;
 			m_filtInputs[l][1] *= m_temp1;
 
+			// Calculate the required size of the delay buffer
 			if (m_filtKeytracking[l])
 			{
 				m_temp1 = round(sample_rate / detuneWithCents(m_nph->frequency(), m_filtDetune[l]));
@@ -4625,7 +4640,6 @@ void mSynth::nextStringSample(sampleFrame &outputSample, float (&m_waveforms)[8]
 			{
 				m_filtFeedbackLoc[l] = 0;
 			}
-
 			m_filtInputs[l][0] += m_filtDelayBuf[l][0].at(m_filtFeedbackLoc[l]);
 			m_filtInputs[l][1] += m_filtDelayBuf[l][1].at(m_filtFeedbackLoc[l]);
 
@@ -4848,14 +4862,6 @@ void mSynth::nextStringSample(sampleFrame &outputSample, float (&m_waveforms)[8]
 					m_filtOutputs[l][1] = m_filty4[1];
 				}
 
-				// Calculates Saturation.  The algorithm is just y = x ^ (1 - saturation);
-				if (m_filtSatu[l])
-				{
-					m_temp1 = 1 - (m_filtSatu[l] * 0.01f);
-					m_filtOutputs[l][0] = pow(abs(m_filtOutputs[l][0]), m_temp1) * (m_filtOutputs[l][0] < 0 ? -1 : 1);
-					m_filtOutputs[l][1] = pow(abs(m_filtOutputs[l][1]), m_temp1) * (m_filtOutputs[l][1] < 0 ? -1 : 1);
-				}
-
 				// Balance knob wet
 				if (m_filtBal[l])
 				{
@@ -4917,6 +4923,14 @@ void mSynth::nextStringSample(sampleFrame &outputSample, float (&m_waveforms)[8]
 			m_temp1 = m_filtFeedback[l] * 0.01f;
 			m_filtDelayBuf[l][0][m_filtFeedbackLoc[l]] = m_filtOutputs[l][0] * m_temp1;
 			m_filtDelayBuf[l][1][m_filtFeedbackLoc[l]] = m_filtOutputs[l][1] * m_temp1;
+
+			// Calculates Saturation.  The algorithm is just y = x ^ (1 - saturation);
+			if (m_filtSatu[l])
+			{
+				m_temp1 = 1 - (m_filtSatu[l] * 0.01f);
+				m_filtOutputs[l][0] = pow(abs(m_filtOutputs[l][0]), m_temp1) * (m_filtOutputs[l][0] < 0 ? -1 : 1);
+				m_filtOutputs[l][1] = pow(abs(m_filtOutputs[l][1]), m_temp1) * (m_filtOutputs[l][1] < 0 ? -1 : 1);
+			}
 
 			m_temp1 = m_filtOutVol[l] * 0.01f;
 			m_filtOutputs[l][0] *= m_temp1;
@@ -5952,7 +5966,7 @@ QString MicrowaveManualView::s_manualText=
 "==FAQ==<br>"
 "<br>"
 "<br>"
-"-=WHY WON'T MY MICROWAVE MAKE SOUND?!=-<br>"
+"-=Why won't my Microwave make sound?=-<br>"
 "<br>"
 "1. Wavetable tab: You need to enable the \"Enabled\" LED (has a power icon next to it), then click the folder button to load a wavetable.  After the wavetable is loaded correctly, move the Morph knob and you should hear sound.<br>"
 "<br>"
@@ -5961,9 +5975,19 @@ QString MicrowaveManualView::s_manualText=
 "3. Sample tab: You need to enable the \"Enabled\" LED (has a power icon next to it), then click the folder button to load a sample.<br>"
 "<br>"
 "<br>"
-"-=WHY WON'T MY FILTERS WORK?!=-<br>"
+"-=Why won't my filters work?=-<br>"
 "<br>"
 "Make sure the filter is enabled.  Take the oscillator you want to send through your filter, enable its Muted LED, use it as an input in the Matrix, set the output as \"Filter Input\", and set the Matrix Amount knob to 100%.  This will prevent the original oscillator audio from being sent directly to the audio output, and send the oscillator audio to the filter.<br>"
+"<br>"
+"<br>"
+"-=Why do my filters sound incorrect and/or ugly?=-<br>"
+"<br>"
+"When using oversampling, the filter output must be interpolated to sound correct, especially with filters that leave high frequencies in the sound.  You can do this by changing the Oversampling Mode in the Miscellaneous tab to \"Average\".<br>"
+"<br>"
+"<br>"
+"-=Why is there sometimes ugly buzzing in my sound?=-<br>"
+"<br>"
+"Oversampling is essential for a high-quality sound.  Try turning up the Oversampling, and changing the Oversampling Mode to \"Average\".<br>"
 "<br>"
 ;
 
