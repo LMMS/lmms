@@ -326,6 +326,7 @@ private:
 
 	bool mouseMovedDistance( QMouseEvent * me, int distance );
 	MidiTime draggedTCOPos( QMouseEvent * me );
+	int knifeMarkerPos( QMouseEvent * me );
 } ;
 
 

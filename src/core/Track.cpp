@@ -725,22 +725,8 @@ void TrackContentObjectView::mousePressEvent( QMouseEvent * me )
 			SampleTCO * sTco = dynamic_cast<SampleTCO*>( m_tco );
 			if (sTco)
 			{
-				int markerPos = me->pos().x();
-
-				if ( me->modifiers() & Qt::ControlModifier
-				  || me->modifiers() & Qt::AltModifier    )
-				{}
-				else {
-					const float ppt = m_trackView->trackContainerView()->pixelsPerTact();
-					MidiTime incs = MidiTime( MidiTime::ticksPerTact() * gui->songEditor()->m_editor->getSnapSize() );
-					MidiTime midiPos = markerPos * MidiTime::ticksPerTact() / ppt;
-					midiPos = midiPos.quantize(gui->songEditor()->m_editor->getSnapSize());
-					midiPos -= m_initialTCOPos % incs;
-					markerPos = midiPos * ppt / MidiTime::ticksPerTact();
-				}
-
 				SampleTCO * sTco = dynamic_cast<SampleTCO*>( m_tco );
-				sTco->setMarkerPos( markerPos );
+				sTco->setMarkerPos( knifeMarkerPos( me ) );
 				sTco->setMarkerEnabled( true );
 				update();
 			}
@@ -1067,21 +1053,8 @@ void TrackContentObjectView::mouseMoveEvent( QMouseEvent * me )
 	}
 	else if( m_action == Split )
 	{
-		int markerPos = me->pos().x();
-
-		if ( me->modifiers() & Qt::ControlModifier
-		  || me->modifiers() & Qt::AltModifier    )
-		{}
-		else {
-			MidiTime incs = MidiTime( MidiTime::ticksPerTact() * gui->songEditor()->m_editor->getSnapSize() );
-			MidiTime midiPos = markerPos * MidiTime::ticksPerTact() / ppt;
-			midiPos = midiPos.quantize(gui->songEditor()->m_editor->getSnapSize());
-			midiPos -= m_initialTCOPos % incs;
-			markerPos = midiPos * ppt / MidiTime::ticksPerTact();
-		}
-
 		SampleTCO * sTco = dynamic_cast<SampleTCO*>( m_tco );
-		sTco->setMarkerPos( markerPos );
+		sTco->setMarkerPos( knifeMarkerPos( me ) );
 		update();
 	}
 	else
@@ -1131,25 +1104,41 @@ void TrackContentObjectView::mouseReleaseEvent( QMouseEvent * me )
 
 		leftTCO->setMarkerEnabled( false );
 
+		int relativePixelPos = me->pos().x();
 		const float ppt = m_trackView->trackContainerView()->pixelsPerTact();
-		const int x = mapToParent( me->pos() ).x();
-		MidiTime t = qMax<int>( 0, m_trackView->trackContainerView()->currentPosition() + x * MidiTime::ticksPerTact()/ppt);
+		MidiTime splitPos = relativePixelPos * MidiTime::ticksPerTact() / ppt;
+		const float snapSize = gui->songEditor()->m_editor->getSnapSize();
+
+		//Essentially duplicate logic from knifeMarkerPos, but shift needs to be inverted for some reason
+		if ( me->modifiers() & Qt::ControlModifier
+		  || me->modifiers() & Qt::AltModifier    ){}
+		else if ( me->modifiers() & Qt::ShiftModifier )
+		{	//If shift is held we quantize the length of the new left clip...
+			MidiTime leftPos = splitPos.quantize( snapSize );
+			//...or right clip...
+			MidiTime rightOff = m_tco->length() - splitPos;
+			MidiTime rightPos = m_tco->length() - rightOff.quantize( snapSize );
+			//...whichever gives a position closer to the cursor
+			if ( abs(leftPos - splitPos) < abs(rightPos - splitPos) ) splitPos = leftPos;
+			else splitPos = rightPos;
+		}
+		else
+		{
+			splitPos = MidiTime(splitPos + m_initialTCOPos).quantize( snapSize ) - m_initialTCOPos;
+		}
+		splitPos += m_initialTCOPos;
 
 		//Don't do anything if we slid off the TCO
-		if ( t <= m_initialTCOPos || t >= m_initialTCOEnd ){}
+		if ( splitPos <= m_initialTCOPos || splitPos >= m_initialTCOEnd ){}
 		else {
-			if ( me->modifiers() & Qt::ControlModifier
-			  || me->modifiers() & Qt::AltModifier    ) {}
-			else { t = t.quantize( gui->songEditor()->m_editor->getSnapSize() ); }
-
 			leftTCO->copy();
 			SampleTCO * rightTCO = new SampleTCO ( leftTCO->getTrack() );
 			rightTCO->paste();
 
-			leftTCO->changeLength( t - m_initialTCOPos );
+			leftTCO->changeLength( splitPos - m_initialTCOPos );
 
-			rightTCO->movePosition(t);
-			rightTCO->changeLength( m_initialTCOEnd - t );
+			rightTCO->movePosition( splitPos );
+			rightTCO->changeLength( m_initialTCOEnd - splitPos );
 			rightTCO->setStartTimeOffset( leftTCO->startTimeOffset() - leftTCO->length() );
 		}
 	}
@@ -1291,6 +1280,46 @@ MidiTime TrackContentObjectView::draggedTCOPos( QMouseEvent * me )
 		newPos = m_initialTCOPos + offset.quantize( gui->songEditor()->m_editor->getSnapSize() );
 	}
 	return newPos;
+}
+
+
+
+
+int TrackContentObjectView::knifeMarkerPos( QMouseEvent * me )
+{
+	//Position relative to start of clip
+	int markerPos = me->pos().x();
+
+	//In unquantized mode, we don't have to mess with the position at all
+	if ( me->modifiers() & Qt::ControlModifier
+	  || me->modifiers() & Qt::AltModifier    )
+	{ return markerPos; }
+	//Otherwise we...
+	else {
+		//1: Convert the position to a MidiTime
+		const float ppt = m_trackView->trackContainerView()->pixelsPerTact();
+		const float snapSize = gui->songEditor()->m_editor->getSnapSize();
+		MidiTime midiPos = markerPos * MidiTime::ticksPerTact() / ppt;
+		//2: Snap to the correct position, based on modifier keys
+		if ( me->modifiers() & Qt::ShiftModifier )
+		{	//If shift is held we quantize the length of the new left clip...
+			MidiTime leftPos = midiPos.quantize( snapSize );
+			//...or right clip...
+			MidiTime rightOff = m_tco->length() - midiPos;
+			MidiTime rightPos = m_tco->length() - rightOff.quantize( snapSize );
+			//...whichever gives a position closer to the cursor
+			if ( abs(leftPos - midiPos) < abs(rightPos - midiPos) ) midiPos = leftPos;
+			else midiPos = rightPos;
+
+			markerPos = midiPos * ppt / MidiTime::ticksPerTact();
+		}
+		else {
+			midiPos = MidiTime(midiPos + m_initialTCOPos).quantize( snapSize ) - m_initialTCOPos;
+		}
+		//3: Convert back to a pixel position
+		markerPos = midiPos * ppt / MidiTime::ticksPerTact();
+		return markerPos;
+	}
 }
 
 
