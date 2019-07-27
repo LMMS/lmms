@@ -721,10 +721,22 @@ void TrackContentObjectView::mousePressEvent( QMouseEvent * me )
 	{
 		if( m_trackView->trackContainerView()->knifeMode() )
 		{
-			m_action = Split;
 			SampleTCO * sTco = dynamic_cast<SampleTCO*>( m_tco );
-			if (sTco)
+
+			if( me->x() < RESIZE_GRIP_WIDTH && sTco
+					&& !m_tco->getAutoResize() )
 			{
+				m_action = ResizeLeft;
+				setCursor( Qt::SizeHorCursor );
+			}
+			else if( me->x() >= width() - RESIZE_GRIP_WIDTH )
+			{
+				m_action = Resize;
+				setCursor( Qt::SizeHorCursor );
+			}
+			else if (sTco)
+			{
+				m_action = Split;
 				SampleTCO * sTco = dynamic_cast<SampleTCO*>( m_tco );
 				sTco->setMarkerPos( knifeMarkerPos( me ) );
 				sTco->setMarkerEnabled( true );
