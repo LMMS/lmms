@@ -529,7 +529,7 @@ void SampleTCOView::paintEvent( QPaintEvent * pe )
 	float nom = Engine::getSong()->getTimeSigModel().getNumerator();
 	float den = Engine::getSong()->getTimeSigModel().getDenominator();
 	float ticksPerTact = DefaultTicksPerTact * nom / den;
-	
+
 	float offset =  m_tco->startTimeOffset() / ticksPerTact * pixelsPerTact();
 	QRect r = QRect( TCO_BORDER_WIDTH + offset, spacing,
 			qMax( static_cast<int>( m_tco->sampleLength() * ppt / ticksPerTact ), 1 ), rect().bottom() - 2 * spacing );
@@ -931,7 +931,7 @@ void SampleTrackView::dropEvent(QDropEvent *de)
 				? MidiTime(0)
 				: MidiTime(((xPos - trackHeadWidth) / trackContainerView()->pixelsPerTact()
 							* MidiTime::ticksPerTact()) + trackContainerView()->currentPosition()
-						   ).toNearestTact();
+						).quantize(1.0);
 
 		SampleTCO * sTco = static_cast<SampleTCO*>(getTrack()->createTCO(tcoPos));
 		if (sTco) { sTco->setSampleFile(value); }
@@ -1192,4 +1192,3 @@ void SampleTrackWindow::loadSettings(const QDomElement& element)
 		m_stv->m_tlb->setChecked(true);
 	}
 }
-

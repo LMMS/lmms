@@ -2,7 +2,7 @@
  * TimeLineWidget.cpp - class timeLine, representing a time-line with position marker
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -384,14 +384,14 @@ void TimeLineWidget::mouseMoveEvent( QMouseEvent* event )
 			}
 			else
 			{
-				m_loopPos[i] = t.toNearestTact();
+				m_loopPos[i] = t.quantize(1.0);
 			}
 			// Catch begin == end
 			if( m_loopPos[0] == m_loopPos[1] )
 			{
 				// Note, swap 1 and 0 below and the behavior "skips" the other
 				// marking instead of pushing it.
-				if( m_action == MoveLoopBegin ) 
+				if( m_action == MoveLoopBegin )
 					m_loopPos[0] -= MidiTime::ticksPerTact();
 				else
 					m_loopPos[1] += MidiTime::ticksPerTact();
