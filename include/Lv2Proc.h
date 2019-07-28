@@ -110,7 +110,7 @@ public:
 		misc
 	 */
 	class AutomatableModel *modelAtPort(const QString &uri); // unused currently
-	std::size_t controlCount() const { return LinkedModelGroup::models().size(); }
+	std::size_t controlCount() const { return LinkedModelGroup::modelNum(); }
 
 protected:
 	/*

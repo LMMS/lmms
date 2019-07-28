@@ -76,7 +76,7 @@ public:
 	//! @see linkControls
 	void unlinkControls(LinkedModelGroup *other, std::size_t id);
 	//! Return whether this is the first of more than one processors
-	bool isLinking() const { return m_linkEnabled.size(); }
+	bool isLinking() const { return d.m_linkEnabled.size(); }
 
 	/*
 		Models
@@ -91,14 +91,20 @@ public:
 
 	class BoolModel* linkEnabledModel(std::size_t id)
 	{
-		return m_linkEnabled[id];
+		return d.m_linkEnabled[id];
 	}
 	const class BoolModel* linkEnabledModel(std::size_t id) const
 	{
-		return m_linkEnabled[id];
+		return d.m_linkEnabled[id];
 	}
-	std::vector<ModelInfo>& models() { return m_models; }
-	const std::vector<ModelInfo>& models() const { return m_models; }
+
+	AutomatableModel* model(std::size_t i) { return d.m_models[i].m_model; }
+	const AutomatableModel* model(std::size_t i) const
+	{
+		return d.m_models[i].m_model;
+	}
+	AutomatableModel* modelWithName(const QString& name) const;
+	std::size_t modelNum() const { return models().size(); }
 
 	/*
 		Load/Save
@@ -119,12 +125,21 @@ public:
 protected:
 	//! Register a further model
 	void addModel(class AutomatableModel* model, const QString& name);
+	//! Remove all models and all link-enabled models
+	void clearModels();
 
 private:
-	//! models for the per-control link-enabled models
-	std::vector<class BoolModel*> m_linkEnabled;
-	//! models for the controls; the vector defines indices for the controls
-	std::vector<ModelInfo> m_models;
+	// TODO: remove
+	std::vector<ModelInfo>& models() { return d.m_models; }
+	const std::vector<ModelInfo>& models() const { return d.m_models; }
+
+	struct
+	{
+		//! models for the per-control link-enabled models
+		std::vector<class BoolModel*> m_linkEnabled;
+		//! models for the controls; the vector defines indices for the controls
+		std::vector<ModelInfo> m_models;
+	} d;
 
 	std::size_t m_curProc;
 };
@@ -193,9 +208,12 @@ public:
 	virtual const LinkedModelGroup* getGroup(std::size_t idx) const = 0;
 
 private:
+	// Implement deletion in the CPP file:
+	struct BoolModelDeleter { void operator()(class BoolModel* l); };
+
 	//! Model for the "global" linking
 	//! Only allocated if #processors > 1
-	std::unique_ptr<class BoolModel> m_multiChannelLinkModel;
+	std::unique_ptr<class BoolModel, BoolModelDeleter> m_multiChannelLinkModel;
 
 	//! Force updateLinkStatesFromGlobal() to not unlink any ports
 	//! Implementation detail, see linkPort() implementation
