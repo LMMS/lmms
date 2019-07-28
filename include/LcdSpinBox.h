@@ -40,7 +40,7 @@ public:
 
 	virtual ~LcdSpinBox() = default;
 
-	virtual void modelChanged() override
+	void modelChanged() override
 	{
 		ModelView::modelChanged();
 		update();

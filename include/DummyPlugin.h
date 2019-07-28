@@ -42,22 +42,22 @@ public:
 	{
 	}
 
-	virtual void saveSettings( QDomDocument &, QDomElement & ) override
+	void saveSettings( QDomDocument &, QDomElement & ) override
 	{
 	}
 
-	virtual void loadSettings( const QDomElement & ) override
+	void loadSettings( const QDomElement & ) override
 	{
 	}
 
-	virtual QString nodeName() const override
+	QString nodeName() const override
 	{
 		return "DummyPlugin";
 	}
 
 
 protected:
-	virtual PluginView * instantiateView( QWidget * _parent ) override
+	PluginView * instantiateView( QWidget * _parent ) override
 	{
 		return new PluginView( this, _parent );
 	}

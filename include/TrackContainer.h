@@ -124,7 +124,7 @@ public:
 	{
 	}
 
-	virtual QString nodeName() const override
+	QString nodeName() const override
 	{
 		return "DummyTrackContainer";
 	}

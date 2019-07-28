@@ -93,7 +93,7 @@ public:
 
 	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
 	void loadSettings( const QDomElement & _this ) override;
-	virtual QString nodeName() const override
+	QString nodeName() const override
 	{
 		return "el";
 	}

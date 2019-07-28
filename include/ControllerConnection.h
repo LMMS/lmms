@@ -93,7 +93,7 @@ public:
 		return "connection";
 	}
 
-	virtual QString nodeName() const override
+	QString nodeName() const override
 	{
 		return classNodeName();
 	}

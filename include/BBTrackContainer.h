@@ -43,7 +43,7 @@ public:
 
 	void updateAfterTrackAdd() override;
 
-	inline virtual QString nodeName() const override
+	inline QString nodeName() const override
 	{
 		return "bbtrackcontainer";
 	}

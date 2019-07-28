@@ -38,7 +38,7 @@ public:
 	PresetPreviewPlayHandle( const QString& presetFile, bool loadByPlugin = false, DataFile *dataFile = 0 );
 	virtual ~PresetPreviewPlayHandle();
 
-	virtual inline bool affinityMatters() const override
+	inline bool affinityMatters() const override
 	{
 		return true;
 	}

@@ -67,7 +67,7 @@ class FxChannel : public ThreadableJob
 		// pointers to other channels that send to this one
 		FxRouteVector m_receives;
 
-		virtual bool requiresProcessing() const override { return true; }
+		bool requiresProcessing() const override { return true; }
 		void unmuteForSolo();
 
 	
@@ -136,7 +136,7 @@ public:
 	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
 	void loadSettings( const QDomElement & _this ) override;
 
-	virtual QString nodeName() const override
+	QString nodeName() const override
 	{
 		return "fxmixer";
 	}

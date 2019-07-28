@@ -54,7 +54,7 @@ public:
 
 	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
 	void loadSettings( const QDomElement & _this ) override;
-	inline virtual QString nodeName() const override
+	inline QString nodeName() const override
 	{
 		return "sampletco";
 	}
@@ -156,7 +156,7 @@ public:
 		return &m_audioPort;
 	}
 
-	virtual QString nodeName() const override
+	QString nodeName() const override
 	{
 		return "sampletrack";
 	}
@@ -213,7 +213,7 @@ public slots:
 
 protected:
 	void modelChanged() override;
-	virtual QString nodeName() const override
+	QString nodeName() const override
 	{
 		return "SampleTrackView";
 	}

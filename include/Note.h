@@ -200,7 +200,7 @@ public:
 		return "note";
 	}
 
-	inline virtual QString nodeName() const override
+	inline QString nodeName() const override
 	{
 		return classNodeName();
 	}

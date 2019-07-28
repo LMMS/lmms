@@ -106,7 +106,7 @@ public:
 	void saveSettings( QDomDocument& doc, QDomElement& thisElement ) override;
 	void loadSettings( const QDomElement& thisElement ) override;
 
-	virtual QString nodeName() const override
+	QString nodeName() const override
 	{
 		return "midiport";
 	}

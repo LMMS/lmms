@@ -478,7 +478,7 @@ public:
 	void saveSettings(QDomDocument & doc, QDomElement & de ) override;
 	void loadSettings( const QDomElement & de ) override;
 
-	inline virtual QString nodeName() const override
+	inline QString nodeName() const override
 	{
 		return "pianoroll";
 	}

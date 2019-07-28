@@ -89,7 +89,7 @@ public:
 	// required for ThreadableJob
 	void doProcessing() override;
 
-	virtual bool requiresProcessing() const override
+	bool requiresProcessing() const override
 	{
 		return !isFinished();
 	}

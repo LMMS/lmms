@@ -108,7 +108,7 @@ public:
 	void play( sampleFrame* buffer ) override;
 
 	/*! Returns whether playback of note is finished and thus handle can be deleted */
-	virtual bool isFinished() const override
+	bool isFinished() const override
 	{
 		return m_released && framesLeft() <= 0;
 	}

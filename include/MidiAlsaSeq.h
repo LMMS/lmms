@@ -76,12 +76,12 @@ public:
 
 
 	// list seq-ports from ALSA
-	virtual QStringList readablePorts() const override
+	QStringList readablePorts() const override
 	{
 		return m_readablePorts;
 	}
 
-	virtual QStringList writablePorts() const override
+	QStringList writablePorts() const override
 	{
 		return m_writablePorts;
 	}

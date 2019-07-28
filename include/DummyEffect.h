@@ -53,25 +53,25 @@ public:
 	{
 	}
 
-	virtual int controlCount() override
+	int controlCount() override
 	{
 		return 0;
 	}
 
-	virtual void saveSettings( QDomDocument &, QDomElement & ) override
+	void saveSettings( QDomDocument &, QDomElement & ) override
 	{
 	}
 
-	virtual void loadSettings( const QDomElement & ) override
+	void loadSettings( const QDomElement & ) override
 	{
 	}
 
-	virtual QString nodeName() const override
+	QString nodeName() const override
 	{
 		return "DummyControls";
 	}
 
-	virtual EffectControlDialog * createView() override
+	EffectControlDialog * createView() override
 	{
 		return new DummyEffectControlDialog( this );
 	}
@@ -95,7 +95,7 @@ public:
 	{
 	}
 
-	virtual EffectControls * controls() override
+	EffectControls * controls() override
 	{
 		return &m_controls;
 	}

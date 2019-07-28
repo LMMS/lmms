@@ -124,7 +124,7 @@ public:
 	virtual ~MidiClientRaw();
 
 	// we are raw-clients for sure!
-	virtual bool isRaw() const override
+	bool isRaw() const override
 	{
 		return true;
 	}

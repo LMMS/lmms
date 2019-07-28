@@ -99,7 +99,7 @@ public:
 		emit dataChanged();
 	}
 
-	virtual QString displayName() const override
+	QString displayName() const override
 	{
 		return name();
 	}
@@ -261,7 +261,7 @@ protected:
 	void mousePressEvent( QMouseEvent * me ) override;
 	void mouseMoveEvent( QMouseEvent * me ) override;
 	void mouseReleaseEvent( QMouseEvent * me ) override;
-	virtual void resizeEvent( QResizeEvent * re ) override
+	void resizeEvent( QResizeEvent * re ) override
 	{
 		m_needsUpdate = true;
 		selectableObject::resizeEvent( re );
@@ -388,18 +388,18 @@ protected:
 	void paintEvent( QPaintEvent * pe ) override;
 	void resizeEvent( QResizeEvent * re ) override;
 
-	virtual QString nodeName() const override
+	QString nodeName() const override
 	{
 		return "trackcontentwidget";
 	}
 
-	virtual void saveSettings( QDomDocument& doc, QDomElement& element ) override
+	void saveSettings( QDomDocument& doc, QDomElement& element ) override
 	{
 		Q_UNUSED(doc)
 		Q_UNUSED(element)
 	}
 
-	virtual void loadSettings( const QDomElement& element ) override
+	void loadSettings( const QDomElement& element ) override
 	{
 		Q_UNUSED(element)
 	}
@@ -565,7 +565,7 @@ public:
 		return m_name;
 	}
 
-	virtual QString displayName() const override
+	QString displayName() const override
 	{
 		return name();
 	}
@@ -695,18 +695,18 @@ public slots:
 protected:
 	void modelChanged() override;
 
-	virtual void saveSettings( QDomDocument& doc, QDomElement& element ) override
+	void saveSettings( QDomDocument& doc, QDomElement& element ) override
 	{
 		Q_UNUSED(doc)
 		Q_UNUSED(element)
 	}
 
-	virtual void loadSettings( const QDomElement& element ) override
+	void loadSettings( const QDomElement& element ) override
 	{
 		Q_UNUSED(element)
 	}
 
-	virtual QString nodeName() const override
+	QString nodeName() const override
 	{
 		return "trackview";
 	}

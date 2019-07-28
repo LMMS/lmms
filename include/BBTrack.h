@@ -45,7 +45,7 @@ public:
 
 	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
 	void loadSettings( const QDomElement & _this ) override;
-	inline virtual QString nodeName() const override
+	inline QString nodeName() const override
 	{
 		return( "bbtco" );
 	}
@@ -184,7 +184,7 @@ public:
 	}
 
 protected:
-	inline virtual QString nodeName() const override
+	inline QString nodeName() const override
 	{
 		return( "bbtrack" );
 	}

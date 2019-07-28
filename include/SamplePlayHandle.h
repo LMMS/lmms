@@ -44,7 +44,7 @@ public:
 	SamplePlayHandle( SampleTCO* tco );
 	virtual ~SamplePlayHandle();
 
-	virtual inline bool affinityMatters() const override
+	inline bool affinityMatters() const override
 	{
 		return true;
 	}

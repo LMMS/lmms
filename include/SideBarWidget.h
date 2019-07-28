@@ -54,7 +54,7 @@ signals:
 protected:
 	void paintEvent( QPaintEvent * _pe ) override;
 	void resizeEvent( QResizeEvent * _re ) override;
-	virtual void contextMenuEvent( QContextMenuEvent * ) override
+	void contextMenuEvent( QContextMenuEvent * ) override
 	{
 	}
 

@@ -89,15 +89,15 @@ protected:
 		m_file.ungetChar( _ch );
 	}
 
-	virtual void saveSettings( QDomDocument &, QDomElement & ) override
+	void saveSettings( QDomDocument &, QDomElement & ) override
 	{
 	}
 
-	virtual void loadSettings( const QDomElement & ) override
+	void loadSettings( const QDomElement & ) override
 	{
 	}
 
-	virtual QString nodeName() const override
+	QString nodeName() const override
 	{
 		return "import_filter";
 	}
