@@ -55,7 +55,7 @@ public:
 
 private slots:
 	void reloadTree( void );
-	void expandItems( QTreeWidgetItem * item=NULL );
+	void expandItems( QTreeWidgetItem * item=NULL, QList<QString> expandedDirs = QList<QString>() );
 	// call with item=NULL to filter the entire tree
 	bool filterItems( const QString & filter, QTreeWidgetItem * item=NULL );
 	void giveFocusToFilter();
@@ -86,6 +86,10 @@ class FileBrowserTreeWidget : public QTreeWidget
 public:
 	FileBrowserTreeWidget( QWidget * parent );
 	virtual ~FileBrowserTreeWidget() = default;
+
+	//! This method returns a QList with paths (QString's) of all directories
+	//! that are expanded in the tree.
+	QList<QString> expandedDirs( QTreeWidgetItem * item = nullptr ) const;
 
 
 protected:

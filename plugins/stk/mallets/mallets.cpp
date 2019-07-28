@@ -384,7 +384,7 @@ PluginView * malletsInstrument::instantiateView( QWidget * _parent )
 
 malletsInstrumentView::malletsInstrumentView( malletsInstrument * _instrument,
 							QWidget * _parent ) :
-	InstrumentView( _instrument, _parent )
+        InstrumentViewFixedSize( _instrument, _parent )
 {
 	m_modalBarWidget = setupModalBarControls( this );
 	setWidgetBackground( m_modalBarWidget, "artwork" );
@@ -756,9 +756,9 @@ extern "C"
 {
 
 // necessary for getting instance out of shared lib
-PLUGIN_EXPORT Plugin * lmms_plugin_main( Model *, void * _data )
+PLUGIN_EXPORT Plugin * lmms_plugin_main( Model * m, void * )
 {
-	return new malletsInstrument( static_cast<InstrumentTrack *>( _data ) );
+	return new malletsInstrument( static_cast<InstrumentTrack *>( m ) );
 }
 
 

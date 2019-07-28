@@ -267,6 +267,9 @@ TrackContentObjectView::TrackContentObjectView( TrackContentObject * tco,
 	m_action( NoAction ),
 	m_initialMousePos( QPoint( 0, 0 ) ),
 	m_initialMouseGlobalPos( QPoint( 0, 0 ) ),
+	m_initialTCOPos( TimePos(0) ),
+	m_initialTCOEnd( TimePos(0) ),
+	m_initialOffsets( QVector<TimePos>() ),
 	m_hint( NULL ),
 	m_mutedColor( 0, 0, 0 ),
 	m_mutedBackgroundColor( 0, 0, 0 ),
@@ -328,8 +331,8 @@ TrackContentObjectView::~TrackContentObjectView()
 
 /*! \brief Update a TrackContentObjectView
  *
- *  TCO's get drawn only when needed, 
- *  and when a TCO is updated, 
+ *  TCO's get drawn only when needed,
+ *  and when a TCO is updated,
  *  it needs to be redrawn.
  *
  */
@@ -524,8 +527,8 @@ void TrackContentObjectView::updatePosition()
 void TrackContentObjectView::dragEnterEvent( QDragEnterEvent * dee )
 {
 	TrackContentWidget * tcw = getTrackView()->getTrackContentWidget();
-	TimePos tcoPos = TimePos( m_tco->startPosition().getTact(), 0 );
-	if( tcw->canPasteSelection( tcoPos, dee->mimeData() ) == false )
+	TimePos tcoPos = TimePos( m_tco->startPosition() );
+	if( tcw->canPasteSelection( tcoPos, dee ) == false )
 	{
 		dee->ignore();
 	}
@@ -563,7 +566,7 @@ void TrackContentObjectView::dropEvent( QDropEvent * de )
 	if( m_trackView->trackContainerView()->allowRubberband() == true )
 	{
 		TrackContentWidget * tcw = getTrackView()->getTrackContentWidget();
-		TimePos tcoPos = TimePos( m_tco->startPosition().getTact(), 0 );
+		TimePos tcoPos = TimePos( m_tco->startPosition() );
 		if( tcw->pasteSelection( tcoPos, de ) == true )
 		{
 			de->accept();
@@ -598,9 +601,9 @@ void TrackContentObjectView::dropEvent( QDropEvent * de )
  */
 void TrackContentObjectView::leaveEvent( QEvent * e )
 {
-	while( QApplication::overrideCursor() != NULL )
+	if( cursor().shape() != Qt::BitmapCursor )
 	{
-		QApplication::restoreOverrideCursor();
+		setCursor( QCursor( embed::getIconPixmap( "hand" ), 3, 3 ) );
 	}
 	if( e != NULL )
 	{
@@ -630,9 +633,12 @@ DataFile TrackContentObjectView::createTCODataFiles(
 			it != tcoViews.end(); ++it )
 	{
 		// Insert into the dom under the "tcos" element
-		int trackIndex = tc->tracks().indexOf( ( *it )->m_trackView->getTrack() );
+		Track* tcoTrack = ( *it )->m_trackView->getTrack();
+		int trackIndex = tc->tracks().indexOf( tcoTrack );
 		QDomElement tcoElement = dataFile.createElement( "tco" );
 		tcoElement.setAttribute( "trackIndex", trackIndex );
+		tcoElement.setAttribute( "trackType", tcoTrack->type() );
+		tcoElement.setAttribute( "trackName", tcoTrack->name() );
 		( *it )->m_tco->saveState( dataFile, tcoElement );
 		tcoParent.appendChild( tcoElement );
 	}
@@ -649,6 +655,7 @@ DataFile TrackContentObjectView::createTCODataFiles(
 	QDomElement metadata = dataFile.createElement( "copyMetadata" );
 	// initialTrackIndex is the index of the track that was touched
 	metadata.setAttribute( "initialTrackIndex", initialTrackIndex );
+	metadata.setAttribute( "trackContainerId", tc->id() );
 	// grabbedTCOPos is the pos of the tact containing the TCO we grabbed
 	metadata.setAttribute( "grabbedTCOPos", m_tco->startPosition() );
 
@@ -707,7 +714,8 @@ void TrackContentObjectView::paintTextLabel(QString const & text, QPainter & pai
  */
 void TrackContentObjectView::mousePressEvent( QMouseEvent * me )
 {
-	setInitialMousePos( me->pos() );
+	setInitialPos( me->pos() );
+	setInitialOffsets();
 	if( !fixedTCOs() && me->button() == Qt::LeftButton )
 	{
 		if( me->modifiers() & Qt::ControlModifier )
@@ -721,7 +729,9 @@ void TrackContentObjectView::mousePressEvent( QMouseEvent * me )
 				m_action = ToggleSelected;
 			}
 		}
-		else if( !me->modifiers() )
+		else if( !me->modifiers()
+			|| (me->modifiers() & Qt::AltModifier)
+			|| (me->modifiers() & Qt::ShiftModifier) )
 		{
 			if( isSelected() )
 			{
@@ -735,27 +745,25 @@ void TrackContentObjectView::mousePressEvent( QMouseEvent * me )
 				// move or resize
 				m_tco->setJournalling( false );
 
-				setInitialMousePos( me->pos() );
+				setInitialPos( me->pos() );
+				setInitialOffsets();
 
 				SampleTCO * sTco = dynamic_cast<SampleTCO*>( m_tco );
 				if( me->x() < RESIZE_GRIP_WIDTH && sTco
 						&& !m_tco->getAutoResize() )
 				{
 					m_action = ResizeLeft;
-					QCursor c( Qt::SizeHorCursor );
-					QApplication::setOverrideCursor( c );
+					setCursor( Qt::SizeHorCursor );
 				}
 				else if( me->x() < width() - RESIZE_GRIP_WIDTH )
 				{
 					m_action = Move;
-					QCursor c( Qt::SizeAllCursor );
-					QApplication::setOverrideCursor( c );
+					setCursor( Qt::SizeAllCursor );
 				}
 				else if( !m_tco->getAutoResize() )
 				{
 					m_action = Resize;
-					QCursor c( Qt::SizeHorCursor );
-					QApplication::setOverrideCursor( c );
+					setCursor( Qt::SizeHorCursor );
 				}
 
 				if( m_action == Move )
@@ -888,76 +896,86 @@ void TrackContentObjectView::mouseMoveEvent( QMouseEvent * me )
 	const float ppt = m_trackView->trackContainerView()->pixelsPerTact();
 	if( m_action == Move )
 	{
-		const int x = mapToParent( me->pos() ).x() - m_initialMousePos.x();
-		TimePos t = qMax( 0, (int)
-			m_trackView->trackContainerView()->currentPosition()+
-				static_cast<int>( x * TimePos::ticksPerTact() /
-									ppt ) );
-		if( ! ( me->modifiers() & Qt::ControlModifier )
-		   && me->button() == Qt::NoButton )
-		{
-			t = t.toNearestTact();
-		}
-		m_tco->movePosition( t );
+		TimePos newPos = draggedTCOPos( me );
+
+		// Don't go left of bar zero
+		newPos = max( 0, newPos.getTicks() );
+		m_tco->movePosition( newPos );
 		m_trackView->getTrackContentWidget()->changePosition();
 		s_textFloat->setText( QString( "%1:%2" ).
-				arg( m_tco->startPosition().getTact() + 1 ).
-				arg( m_tco->startPosition().getTicks() %
+				arg( newPos.getTact() + 1 ).
+				arg( newPos.getTicks() %
 						TimePos::ticksPerTact() ) );
 		s_textFloat->moveGlobal( this, QPoint( width() + 2, height() + 2 ) );
 	}
 	else if( m_action == MoveSelection )
 	{
-		const int dx = me->x() - m_initialMousePos.x();
-		const bool snap = !(me->modifiers() & Qt::ControlModifier) &&
-					me->button() == Qt::NoButton;
+		// 1: Find the position we want to move the grabbed TCO to
+		TimePos newPos = draggedTCOPos( me );
+
+		// 2: Handle moving the other selected TCOs the same distance
 		QVector<selectableObject *> so =
 			m_trackView->trackContainerView()->selectedObjects();
-		QVector<TrackContentObject *> tcos;
-		int smallestPos = 0;
-		TimePos dtick = TimePos( static_cast<int>( dx *
-					TimePos::ticksPerTact() / ppt ) );
-		if( snap )
-		{
-			dtick = dtick.toNearestTact();
-		}
-		// find out smallest position of all selected objects for not
-		// moving an object before zero
+		QVector<TrackContentObject *> tcos; // List of selected clips
+		int leftmost = 0; // Leftmost clip's offset from grabbed clip
+		// Populate tcos, find leftmost
 		for( QVector<selectableObject *>::iterator it = so.begin();
 							it != so.end(); ++it )
 		{
 			TrackContentObjectView * tcov =
 				dynamic_cast<TrackContentObjectView *>( *it );
-			if( tcov == NULL )
-			{
-				continue;
-			}
-			TrackContentObject * tco = tcov->m_tco;
-			tcos.push_back( tco );
-			smallestPos = qMin<int>( smallestPos,
-					(int)tco->startPosition() + dtick );
+			if( tcov == NULL ) { continue; }
+			tcos.push_back( tcov->m_tco );
+			int index = std::distance( so.begin(), it );
+			leftmost = min (leftmost, m_initialOffsets[index].getTicks() );
 		}
-		dtick -= smallestPos;
-		if( snap )
-		{
-			dtick = dtick.toAbsoluteTact(); // round toward 0
-		}
+		// Make sure the leftmost clip doesn't get moved to a negative position
+		if ( newPos.getTicks() + leftmost < 0 ) { newPos = -leftmost; }
+
 		for( QVector<TrackContentObject *>::iterator it = tcos.begin();
 							it != tcos.end(); ++it )
 		{
-			( *it )->movePosition( ( *it )->startPosition() + dtick );
+			int index = std::distance( tcos.begin(), it );
+			( *it )->movePosition( newPos + m_initialOffsets[index] );
 		}
 	}
 	else if( m_action == Resize || m_action == ResizeLeft )
 	{
+		// If the user is holding alt, or pressed ctrl after beginning the drag, don't quantize
+		const bool unquantized = (me->modifiers() & Qt::ControlModifier) || (me->modifiers() & Qt::AltModifier);
+		const float snapSize = gui->songEditor()->m_editor->getSnapSize();
+		// Length in ticks of one snap increment
+		const TimePos snapLength = TimePos( (int)(snapSize * TimePos::ticksPerTact()) );
+
 		if( m_action == Resize )
 		{
-			TimePos t = qMax( TimePos::ticksPerTact() / 16, static_cast<int>( me->x() * TimePos::ticksPerTact() / ppt ) );
-			if( ! ( me->modifiers() & Qt::ControlModifier ) && me->button() == Qt::NoButton )
-			{
-				t = qMax<int>( TimePos::ticksPerTact(), t.toNearestTact() );
+			// The clip's new length
+			TimePos l = static_cast<int>( me->x() * TimePos::ticksPerTact() / ppt );
+
+			if ( unquantized )
+			{	// We want to preserve this adjusted offset,
+				// even if the user switches to snapping later
+				setInitialPos( m_initialMousePos );
+				// Don't resize to less than 1 tick
+				m_tco->changeLength( qMax<int>( 1, l ) );
 			}
-			m_tco->changeLength( t );
+			else if ( me->modifiers() & Qt::ShiftModifier )
+			{	// If shift is held, quantize clip's end position
+				TimePos end = TimePos( m_initialTCOPos + l ).quantize( snapSize );
+				// The end position has to be after the clip's start
+				TimePos min = m_initialTCOPos.quantize( snapSize );
+				if ( min <= m_initialTCOPos ) min += snapLength;
+				m_tco->changeLength( qMax<int>(min - m_initialTCOPos, end - m_initialTCOPos) );
+			}
+			else
+			{	// Otherwise, resize in fixed increments
+				TimePos initialLength = m_initialTCOEnd - m_initialTCOPos;
+				TimePos offset = TimePos( l - initialLength ).quantize( snapSize );
+				// Don't resize to less than 1 tick
+				TimePos min = TimePos( initialLength % snapLength );
+				if (min < 1) min += snapLength;
+				m_tco->changeLength( qMax<int>( min, initialLength + offset) );
+			}
 		}
 		else
 		{
@@ -968,15 +986,34 @@ void TrackContentObjectView::mouseMoveEvent( QMouseEvent * me )
 
 				TimePos t = qMax( 0, (int)
 								   m_trackView->trackContainerView()->currentPosition()+
-								   static_cast<int>( x * TimePos::ticksPerTact() /
-													 ppt ) );
-				if( ! ( me->modifiers() & Qt::ControlModifier )
-						&& me->button() == Qt::NoButton )
-				{
-					t = t.toNearestTact();
+								   static_cast<int>( x * TimePos::ticksPerTact() / ppt ) );
+
+				if( unquantized )
+				{	// We want to preserve this adjusted offset,
+					// even if the user switches to snapping later
+					setInitialPos( m_initialMousePos );
+					//Don't resize to less than 1 tick
+					t = qMin<int>( m_initialTCOEnd - 1, t);
 				}
+				else if( me->modifiers() & Qt::ShiftModifier )
+				{	// If shift is held, quantize clip's start position
+					// Don't let the start position move past the end position
+					TimePos max = m_initialTCOEnd.quantize( snapSize );
+					if ( max >= m_initialTCOEnd ) max -= snapLength;
+					t = qMin<int>( max, t.quantize( snapSize ) );
+				}
+				else
+				{	// Otherwise, resize in fixed increments
+					// Don't resize to less than 1 tick
+					TimePos initialLength = m_initialTCOEnd - m_initialTCOPos;
+					TimePos minLength = TimePos( initialLength % snapLength );
+					if (minLength < 1) minLength += snapLength;
+					TimePos offset = TimePos(t - m_initialTCOPos).quantize( snapSize );
+					t = qMin<int>( m_initialTCOEnd - minLength, m_initialTCOPos + offset );
+				}
+
 				TimePos oldPos = m_tco->startPosition();
-				if( m_tco->length() + ( oldPos - t ) >= TimePos::ticksPerTact() )
+				if( m_tco->length() + ( oldPos - t ) >= 1 )
 				{
 					m_tco->movePosition( t );
 					m_trackView->getTrackContentWidget()->changePosition();
@@ -1003,17 +1040,7 @@ void TrackContentObjectView::mouseMoveEvent( QMouseEvent * me )
 		if( ( me->x() > width() - RESIZE_GRIP_WIDTH && !me->buttons() && !m_tco->getAutoResize() )
 		||  ( me->x() < RESIZE_GRIP_WIDTH && !me->buttons() && sTco && !m_tco->getAutoResize() ) )
 		{
-			if( QApplication::overrideCursor() != NULL &&
-				QApplication::overrideCursor()->shape() !=
-							Qt::SizeHorCursor )
-			{
-				while( QApplication::overrideCursor() != NULL )
-				{
-					QApplication::restoreOverrideCursor();
-				}
-			}
-			QCursor c( Qt::SizeHorCursor );
-			QApplication::setOverrideCursor( c );
+			setCursor( Qt::SizeHorCursor );
 		}
 		else
 		{
@@ -1100,7 +1127,6 @@ void TrackContentObjectView::contextMenuEvent( QContextMenuEvent * cme )
 
 
 
-
 /*! \brief How many pixels a tact (bar) takes for this trackContentObjectView.
  *
  * \return the number of pixels per tact (bar).
@@ -1108,6 +1134,27 @@ void TrackContentObjectView::contextMenuEvent( QContextMenuEvent * cme )
 float TrackContentObjectView::pixelsPerTact()
 {
 	return m_trackView->trackContainerView()->pixelsPerTact();
+}
+
+
+/*! \brief Save the offsets between all selected tracks and a clicked track */
+void TrackContentObjectView::setInitialOffsets()
+{
+	QVector<selectableObject *> so = m_trackView->trackContainerView()->selectedObjects();
+	QVector<TimePos> offsets;
+	for( QVector<selectableObject *>::iterator it = so.begin();
+						it != so.end(); ++it )
+	{
+		TrackContentObjectView * tcov =
+			dynamic_cast<TrackContentObjectView *>( *it );
+		if( tcov == NULL )
+		{
+			continue;
+		}
+		offsets.push_back( tcov->m_tco->startPosition() - m_initialTCOPos );
+	}
+
+	m_initialOffsets = offsets;
 }
 
 
@@ -1123,6 +1170,49 @@ bool TrackContentObjectView::mouseMovedDistance( QMouseEvent * me, int distance 
 	QPoint dPos = mapToGlobal( me->pos() ) - m_initialMouseGlobalPos;
 	const int pixelsMoved = dPos.manhattanLength();
 	return ( pixelsMoved > distance || pixelsMoved < -distance );
+}
+
+
+
+/*! \brief Calculate the new position of a dragged TCO from a mouse event
+ *
+ *
+ * \param me The QMouseEvent
+ */
+TimePos TrackContentObjectView::draggedTCOPos( QMouseEvent * me )
+{
+	//Pixels per tact
+	const float ppt = m_trackView->trackContainerView()->pixelsPerTact();
+	// The pixel distance that the mouse has moved
+	const int mouseOff = mapToGlobal(me->pos()).x() - m_initialMouseGlobalPos.x();
+	TimePos newPos = m_initialTCOPos + mouseOff * TimePos::ticksPerTact() / ppt;
+	TimePos offset = newPos - m_initialTCOPos;
+	// If the user is holding alt, or pressed ctrl after beginning the drag, don't quantize
+	if (    me->button() != Qt::NoButton
+		|| (me->modifiers() & Qt::ControlModifier)
+		|| (me->modifiers() & Qt::AltModifier)    )
+	{
+		// We want to preserve this adjusted offset,
+		// even if the user switches to snapping
+		setInitialPos( m_initialMousePos );
+	}
+	else if ( me->modifiers() & Qt::ShiftModifier )
+	{	// If shift is held, quantize position (Default in 1.2.0 and earlier)
+		// or end position, whichever is closest to the actual position
+		TimePos startQ = newPos.quantize( gui->songEditor()->m_editor->getSnapSize() );
+		// Find start position that gives snapped clip end position
+		TimePos endQ = ( newPos + m_tco->length() );
+		endQ = endQ.quantize( gui->songEditor()->m_editor->getSnapSize() );
+		endQ = endQ - m_tco->length();
+		// Select the position closest to actual position
+		if ( abs(newPos - startQ) < abs(newPos - endQ) ) newPos = startQ;
+		else newPos = endQ;
+	}
+	else
+	{	// Otherwise, quantize moved distance (preserves user offsets)
+		newPos = m_initialTCOPos + offset.quantize( gui->songEditor()->m_editor->getSnapSize() );
+	}
+	return newPos;
 }
 
 
@@ -1190,7 +1280,7 @@ void TrackContentWidget::updateBackground()
 
 	// draw lines
 	// vertical lines
-	pmp.setPen( QPen( gridColor(), 1 ) );	
+	pmp.setPen( QPen( gridColor(), 1 ) );
 	for( float x = 0; x < w * 2; x += ppt )
 	{
 		pmp.drawLine( QLineF( x, 0.0, x, h ) );
@@ -1201,9 +1291,9 @@ void TrackContentWidget::updateBackground()
 	{
 		pmp.drawLine( QLineF( x, 0.0, x, h ) );
 	}
-	
+
 	// horizontal line
-	pmp.setPen( QPen( gridColor(), 1 ) );	
+	pmp.setPen( QPen( gridColor(), 1 ) );
 	pmp.drawLine( 0, h-1, w*2, h-1 );
 
 	pmp.end();
@@ -1386,8 +1476,8 @@ TimePos TrackContentWidget::getPosition( int mouseX )
  */
 void TrackContentWidget::dragEnterEvent( QDragEnterEvent * dee )
 {
-	TimePos tcoPos = TimePos( getPosition( dee->pos().x() ).getTact(), 0 );
-	if( canPasteSelection( tcoPos, dee->mimeData() ) == false )
+	TimePos tcoPos = getPosition( dee->pos().x() );
+	if( canPasteSelection( tcoPos, dee ) == false )
 	{
 		dee->ignore();
 	}
@@ -1406,8 +1496,10 @@ void TrackContentWidget::dragEnterEvent( QDragEnterEvent * dee )
  * \param tcoPos the position of the TCO slot being pasted on
  * \param de the DropEvent generated
  */
-bool TrackContentWidget::canPasteSelection( TimePos tcoPos, const QMimeData * mimeData )
+bool TrackContentWidget::canPasteSelection( TimePos tcoPos, const QDropEvent* de )
 {
+	const QMimeData * mimeData = de->mimeData();
+
 	Track * t = getTrack();
 	QString type = StringPairDrag::decodeMimeKey( mimeData );
 	QString value = StringPairDrag::decodeMimeValue( mimeData );
@@ -1437,7 +1529,9 @@ bool TrackContentWidget::canPasteSelection( TimePos tcoPos, const QMimeData * mi
 	const int currentTrackIndex = tracks.indexOf( t );
 
 	// Don't paste if we're on the same tact
-	if( tcoPos == grabbedTCOTact && currentTrackIndex == initialTrackIndex )
+	auto sourceTrackContainerId = metadata.attributeNode( "trackContainerId" ).value().toUInt();
+	if( de->source() && sourceTrackContainerId == t->trackContainer()->id() &&
+			tcoPos == grabbedTCOTact && currentTrackIndex == initialTrackIndex )
 	{
 		return false;
 	}
@@ -1460,9 +1554,9 @@ bool TrackContentWidget::canPasteSelection( TimePos tcoPos, const QMimeData * mi
 		}
 
 		// Track must be of the same type
-		Track * startTrack = tracks.at( trackIndex );
+		auto startTrackType = tcoElement.attributeNode("trackType").value().toInt();
 		Track * endTrack = tracks.at( finalTrackIndex );
-		if( startTrack->type() != endTrack->type() )
+		if( startTrackType != endTrack->type() )
 		{
 			return false;
 		}
@@ -1478,7 +1572,7 @@ bool TrackContentWidget::canPasteSelection( TimePos tcoPos, const QMimeData * mi
  */
 bool TrackContentWidget::pasteSelection( TimePos tcoPos, QDropEvent * de )
 {
-	if( canPasteSelection( tcoPos, de->mimeData() ) == false )
+	if( canPasteSelection( tcoPos, de ) == false )
 	{
 		return false;
 	}
@@ -1501,7 +1595,6 @@ bool TrackContentWidget::pasteSelection( TimePos tcoPos, QDropEvent * de )
 	int initialTrackIndex = tiAttr.value().toInt();
 	QDomAttr tcoPosAttr = metadata.attributeNode( "grabbedTCOPos" );
 	TimePos grabbedTCOPos = tcoPosAttr.value().toInt();
-	TimePos grabbedTCOTact = TimePos( grabbedTCOPos.getTact(), 0 );
 
 	// Snap the mouse position to the beginning of the dropped tact, in ticks
 	const TrackContainer::TrackList tracks = getTrack()->trackContainer()->tracks();
@@ -1522,6 +1615,10 @@ bool TrackContentWidget::pasteSelection( TimePos tcoPos, QDropEvent * de )
 	// TODO -- Need to draw the hovericon either way, or ghost the TCOs
 	// onto their final position.
 
+	// All patterns should be offset the same amount as the grabbed pattern
+	// The offset is quantized (rather than the positions) to preserve fine adjustments
+	int offset = TimePos(tcoPos - grabbedTCOPos).quantize(gui->songEditor()->m_editor->getSnapSize());
+
 	for( int i = 0; i<tcoNodes.length(); i++ )
 	{
 		QDomElement outerTCOElement = tcoNodes.item( i ).toElement();
@@ -1531,13 +1628,11 @@ bool TrackContentWidget::pasteSelection( TimePos tcoPos, QDropEvent * de )
 		int finalTrackIndex = trackIndex + ( currentTrackIndex - initialTrackIndex );
 		Track * t = tracks.at( finalTrackIndex );
 
-		// Compute the final position by moving the tco's pos by
-		// the number of tacts between the first TCO and the mouse drop TCO
-		TimePos oldPos = tcoElement.attributeNode( "pos" ).value().toInt();
-		TimePos offset = oldPos - TimePos( oldPos.getTact(), 0 );
-		TimePos oldTact = TimePos( oldPos.getTact(), 0 );
-		TimePos delta = offset + ( oldTact - grabbedTCOTact );
-		TimePos pos = tcoPos + delta;
+		// The new position is the old position plus the offset.
+		TimePos pos = tcoElement.attributeNode( "pos" ).value().toInt() + offset;
+		// If we land on ourselves, offset by one snap
+		TimePos shift = TimePos::ticksPerTact() * gui->songEditor()->m_editor->getSnapSize();
+		if (offset == 0) { pos += shift; }
 
 		TrackContentObject * tco = t->createTCO( pos );
 		tco->restoreState( tcoElement );
@@ -1548,7 +1643,8 @@ bool TrackContentWidget::pasteSelection( TimePos tcoPos, QDropEvent * de )
 		}
 
 		//check tco name, if the same as source track name dont copy
-		if( tco->name() == tracks[trackIndex]->name() )
+		QString sourceTrackName = outerTCOElement.attributeNode( "trackName" ).value();
+		if( tco->name() == sourceTrackName )
 		{
 			tco->setName( "" );
 		}
@@ -1566,7 +1662,7 @@ bool TrackContentWidget::pasteSelection( TimePos tcoPos, QDropEvent * de )
  */
 void TrackContentWidget::dropEvent( QDropEvent * de )
 {
-	TimePos tcoPos = TimePos( getPosition( de->pos().x() ).getTact(), 0 );
+	TimePos tcoPos = TimePos( getPosition( de->pos().x() ) );
 	if( pasteSelection( tcoPos, de ) == true )
 	{
 		de->accept();
@@ -1919,7 +2015,7 @@ void TrackOperationsWidget::updateMenu()
 	toMenu->addAction( embed::getIconPixmap( "cancel", 16, 16 ),
 						tr( "Remove this track" ),
 						this, SLOT( removeTrack() ) );
-	
+
 	if( ! m_trackView->trackContainerView()->fixedTCOs() )
 	{
 		toMenu->addAction( tr( "Clear this track" ), this, SLOT( clearTrack() ) );
@@ -2615,7 +2711,7 @@ TrackView::TrackView( Track * track, TrackContainerView * tcv ) :
 			&m_trackContentWidget, SLOT( update() ) );
 
 	connect( &m_track->m_soloModel, SIGNAL( dataChanged() ),
-			m_track, SLOT( toggleSolo() ) );
+			m_track, SLOT( toggleSolo() ), Qt::DirectConnection );
 	// create views for already existing TCOs
 	for( Track::tcoVector::iterator it =
 					m_track->m_trackContentObjects.begin();
@@ -2862,12 +2958,12 @@ void TrackView::mouseMoveEvent( QMouseEvent * me )
 	else if( m_action == MoveTrack )
 	{
 		// look which track-widget the mouse-cursor is over
-		const int yPos = 
+		const int yPos =
 			m_trackContainerView->contentWidget()->mapFromGlobal( me->globalPos() ).y();
 		const TrackView * trackAtY = m_trackContainerView->trackViewAt( yPos );
 
-// debug code
-//			qDebug( "y position %d", yPos );
+		// debug code
+		//	qDebug( "y position %d", yPos );
 
 		// a track-widget not equal to ourself?
 		if( trackAtY != NULL && trackAtY != this )

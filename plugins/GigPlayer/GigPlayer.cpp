@@ -922,7 +922,7 @@ public:
 
 
 GigInstrumentView::GigInstrumentView( Instrument * _instrument, QWidget * _parent ) :
-	InstrumentView( _instrument, _parent )
+        InstrumentViewFixedSize( _instrument, _parent )
 {
 	GigInstrument * k = castModel<GigInstrument>();
 
@@ -1390,9 +1390,9 @@ extern "C"
 {
 
 // necessary for getting instance out of shared lib
-PLUGIN_EXPORT Plugin * lmms_plugin_main( Model *, void * _data )
+PLUGIN_EXPORT Plugin * lmms_plugin_main( Model *m, void * )
 {
-	return new GigInstrument( static_cast<InstrumentTrack *>( _data ) );
+	return new GigInstrument( static_cast<InstrumentTrack *>( m ) );
 }
 
 }

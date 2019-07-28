@@ -313,7 +313,7 @@ FxMixerView::FxChannelView::FxChannelView(QWidget * _parent, FxMixerView * _mv,
 	m_soloBtn->setCheckable( true );
 	m_soloBtn->move( 9,  m_fader->y()-21);
 	connect(&fxChannel->m_soloModel, SIGNAL( dataChanged() ),
-			_mv, SLOT ( toggledSolo() ) );
+			_mv, SLOT ( toggledSolo() ), Qt::DirectConnection );
 	ToolTip::add( m_soloBtn, tr( "Solo FX channel" ) );
 
 	// Create EffectRack for the channel
@@ -599,23 +599,25 @@ void FxMixerView::updateFaders()
 	{
 		const float opl = m_fxChannelViews[i]->m_fader->getPeak_L();
 		const float opr = m_fxChannelViews[i]->m_fader->getPeak_R();
-		const float fallOff = 1.07;
-		if( m->effectChannel(i)->m_peakLeft > opl )
+		const float fallOff = 1.25;
+		if( m->effectChannel(i)->m_peakLeft >= opl/fallOff )
 		{
 			m_fxChannelViews[i]->m_fader->setPeak_L( m->effectChannel(i)->m_peakLeft );
-			m->effectChannel(i)->m_peakLeft = 0;
+			// Set to -1 so later we'll know if this value has been refreshed yet.
+			m->effectChannel(i)->m_peakLeft = -1;
 		}
-		else
+		else if( m->effectChannel(i)->m_peakLeft != -1 )
 		{
 			m_fxChannelViews[i]->m_fader->setPeak_L( opl/fallOff );
 		}
 
-		if( m->effectChannel(i)->m_peakRight > opr )
+		if( m->effectChannel(i)->m_peakRight >= opr/fallOff )
 		{
 			m_fxChannelViews[i]->m_fader->setPeak_R( m->effectChannel(i)->m_peakRight );
-			m->effectChannel(i)->m_peakRight = 0;
+			// Set to -1 so later we'll know if this value has been refreshed yet.
+			m->effectChannel(i)->m_peakRight = -1;
 		}
-		else
+		else if( m->effectChannel(i)->m_peakRight != -1 )
 		{
 			m_fxChannelViews[i]->m_fader->setPeak_R( opr/fallOff );
 		}

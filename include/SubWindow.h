@@ -30,7 +30,6 @@
 #include <QGraphicsDropShadowEffect>
 #include <QMdiSubWindow>
 #include <QLabel>
-#include <QPainter>
 #include <QPushButton>
 #include <QString>
 

@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 set -e
 
 : "${TARGET_ARCH:=amd64}"
@@ -30,6 +30,40 @@ then
 else
 	sudo pbuilder --update --basetgz "$BASETGZ"
 fi
+
+sync_version() {
+	local VERSION
+	local MMR
+	local STAGE
+	local EXTRA
+
+	VERSION=$(git describe --tags --match v[0-9].[0-9].[0-9]*)
+	VERSION=${VERSION#v}
+	MMR=${VERSION%%-*}
+	case $VERSION in
+	*-*-*-*)
+		VERSION=${VERSION%-*}
+		STAGE=${VERSION#*-}
+		STAGE=${STAGE%-*}
+		EXTRA=${VERSION##*-}
+		VERSION=$MMR~$STAGE.$EXTRA
+		;;
+	*-*-*)
+		VERSION=${VERSION%-*}
+		EXTRA=${VERSION##*-}
+		VERSION=$MMR.$EXTRA
+		;;
+	*-*)
+		STAGE=${VERSION#*-}
+		VERSION=$MMR~$STAGE
+		;;
+	esac
+
+	sed "1 s/@VERSION@/$VERSION/" -i debian/changelog
+	echo "Set Debian version to $VERSION"
+}
+
+sync_version
 
 DIR="$PWD"
 cd ..

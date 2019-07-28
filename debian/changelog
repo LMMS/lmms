@@ -1,4 +1,4 @@
-lmms (1.2.0~rc7.1) unstable; urgency=low
+lmms (@VERSION@) unstable; urgency=low
 
   * Upstream integration.
   * Drop Debian menu entry (policy 9.6).

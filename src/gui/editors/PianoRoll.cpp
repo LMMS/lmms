@@ -709,7 +709,7 @@ void PianoRoll::setCurrentPattern( Pattern* newPattern )
 	{
 		central_key = central_key / total_notes -
 				( KeysPerOctave * NumOctaves - m_totalKeysToScroll ) / 2;
-		m_startKey = tLimit( central_key, 0, NumOctaves * KeysPerOctave );
+		m_startKey = qBound( 0, central_key, NumOctaves * KeysPerOctave );
 	}
 
 	// resizeEvent() does the rest for us (scrolling, range-checking
@@ -1007,6 +1007,9 @@ void PianoRoll::drawDetuningInfo( QPainter & _p, const Note * _n, int _x,
 {
 	int middle_y = _y + KEY_LINE_HEIGHT / 2;
 	_p.setPen( noteColor() );
+	_p.setClipRect(WHITE_KEY_WIDTH, PR_TOP_MARGIN,
+		width() - WHITE_KEY_WIDTH,
+		keyAreaBottom() - PR_TOP_MARGIN);
 
 	int old_x = 0;
 	int old_y = 0;
@@ -1188,9 +1191,11 @@ void PianoRoll::keyPressEvent(QKeyEvent* ke)
 	{
 		const int key_num = PianoView::getKeyFromKeyEvent( ke ) + ( DefaultOctave - 1 ) * KeysPerOctave;
 
-		if(! ke->isAutoRepeat() && key_num > -1)
+		if (!ke->isAutoRepeat() && key_num > -1)
 		{
-			m_pattern->instrumentTrack()->pianoModel()->handleKeyPress( key_num );
+			m_pattern->instrumentTrack()->pianoModel()->handleKeyPress(key_num);
+			//  if a chord is set, play all chord notes (simulate click on all):
+			playChordNotes(key_num);
 			ke->accept();
 		}
 	}
@@ -1319,6 +1324,7 @@ void PianoRoll::keyPressEvent(QKeyEvent* ke)
 			clearSelectedNotes();
 			break;
 
+		case Qt::Key_Backspace:
 		case Qt::Key_Delete:
 			deleteSelectedNotes();
 			ke->accept();
@@ -1387,10 +1393,11 @@ void PianoRoll::keyReleaseEvent(QKeyEvent* ke )
 	if( hasValidPattern() && ke->modifiers() == Qt::NoModifier )
 	{
 		const int key_num = PianoView::getKeyFromKeyEvent( ke ) + ( DefaultOctave - 1 ) * KeysPerOctave;
-
-		if( ! ke->isAutoRepeat() && key_num > -1 )
+		if (!ke->isAutoRepeat() && key_num > -1)
 		{
-			m_pattern->instrumentTrack()->pianoModel()->handleKeyRelease( key_num );
+			m_pattern->instrumentTrack()->pianoModel()->handleKeyRelease(key_num);
+			// if a chord is set, simulate click release on all chord notes
+			pauseChordNotes(key_num);
 			ke->accept();
 		}
 	}
@@ -1428,6 +1435,7 @@ void PianoRoll::leaveEvent(QEvent * e )
 
 	QWidget::leaveEvent( e );
 	s_textFloat->hide();
+	update(); // cleaning inner mouse-related graphics
 }
 
 
@@ -1835,7 +1843,9 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 			{
 				// left click - play the note
 				int v = ( (float) x ) / ( (float) WHITE_KEY_WIDTH ) * MidiDefaultVelocity;
-				m_pattern->instrumentTrack()->pianoModel()->handleKeyPress( key_num, v );
+				m_pattern->instrumentTrack()->pianoModel()->handleKeyPress(key_num, v);
+				// if a chord is set, play the chords notes as well:
+				playChordNotes(key_num, v);
 			}
 		}
 		else
@@ -1938,7 +1948,10 @@ void PianoRoll::testPlayNote( Note * n )
 
 		const int baseVelocity = m_pattern->instrumentTrack()->midiPort()->baseVelocity();
 
-		m_pattern->instrumentTrack()->pianoModel()->handleKeyPress( n->key(), n->midiVelocity( baseVelocity ) );
+		m_pattern->instrumentTrack()->pianoModel()->handleKeyPress(n->key(), n->midiVelocity(baseVelocity));
+
+		// if a chord is set, play the chords notes as well:
+		playChordNotes(n->key(), n->midiVelocity(baseVelocity));
 
 		MidiEvent event( MidiMetaEvent, -1, n->key(), panningToMidi( n->getPanning() ) );
 
@@ -1961,6 +1974,9 @@ void PianoRoll::pauseTestNotes( bool pause )
 			{
 				// stop note
 				m_pattern->instrumentTrack()->pianoModel()->handleKeyRelease( note->key() );
+
+				// if a chord was set, stop the chords notes as well:
+				pauseChordNotes(note->key());
 			}
 			else
 			{
@@ -1972,19 +1988,56 @@ void PianoRoll::pauseTestNotes( bool pause )
 	}
 }
 
+void PianoRoll::playChordNotes(int key, int velocity)
+{
+	// if a chord is set, play the chords notes beside the base note.
+	Piano *pianoModel = m_pattern->instrumentTrack()->pianoModel();
+	const InstrumentFunctionNoteStacking::Chord & chord =
+			InstrumentFunctionNoteStacking::ChordTable::getInstance().getChordByName(
+				m_chordModel.currentText());
+	if (!chord.isEmpty())
+	{
+		for (int i = 1; i < chord.size(); ++i)
+		{
+			pianoModel->handleKeyPress(key + chord[i], velocity);
+		}
+	}
+}
+
+void PianoRoll::pauseChordNotes(int key)
+{
+	// if a chord was set, stop the chords notes beside the base note.
+	Piano *pianoModel = m_pattern->instrumentTrack()->pianoModel();
+	const InstrumentFunctionNoteStacking::Chord & chord =
+			InstrumentFunctionNoteStacking::ChordTable::getInstance().getChordByName(
+				m_chordModel.currentText());
+	if (!chord.isEmpty())
+	{
+		for (int i = 1; i < chord.size(); ++i)
+		{
+			pianoModel->handleKeyRelease(key + chord[i]);
+		}
+	}
+}
+
 
 
 
 void PianoRoll::testPlayKey( int key, int velocity, int pan )
 {
+	Piano *pianoModel = m_pattern->instrumentTrack()->pianoModel();
 	// turn off old key
-	m_pattern->instrumentTrack()->pianoModel()->handleKeyRelease( m_lastKey );
+	pianoModel->handleKeyRelease( m_lastKey );
+	// if a chord was set, stop the chords notes as well
+	pauseChordNotes(m_lastKey);
 
 	// remember which one we're playing
 	m_lastKey = key;
 
 	// play new key
-	m_pattern->instrumentTrack()->pianoModel()->handleKeyPress( key, velocity );
+	pianoModel->handleKeyPress( key, velocity );
+	// and if a chord is set, play chord notes:
+	playChordNotes(key, velocity);
 }
 
 
@@ -2114,6 +2167,7 @@ void PianoRoll::mouseReleaseEvent( QMouseEvent * me )
 			{
 				m_pattern->instrumentTrack()->pianoModel()->
 						handleKeyRelease( note->key() );
+				pauseChordNotes(note->key());
 				note->setIsPlaying( false );
 			}
 		}
@@ -2121,6 +2175,7 @@ void PianoRoll::mouseReleaseEvent( QMouseEvent * me )
 		// stop playing keys that we let go of
 		m_pattern->instrumentTrack()->pianoModel()->
 						handleKeyRelease( m_lastKey );
+		pauseChordNotes(m_lastKey);
 	}
 
 	m_currentNote = NULL;
@@ -2160,9 +2215,9 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 	else if( m_action == ActionResizeNoteEditArea )
 	{
 		// change m_notesEditHeight and then repaint
-		m_notesEditHeight = tLimit<int>(
-					m_oldNotesEditHeight - ( me->y() - m_moveStartY ),
+		m_notesEditHeight = qBound<int>(
 					NOTE_EDIT_MIN_HEIGHT,
+					m_oldNotesEditHeight - ( me->y() - m_moveStartY ),
 					height() - PR_TOP_MARGIN - NOTE_EDIT_RESIZE_BAR -
 									PR_BOTTOM_MARGIN - KEY_AREA_MIN_HEIGHT );
 
@@ -2244,16 +2299,18 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 
 			if( me->buttons() & Qt::LeftButton )
 			{
-				vol = tLimit<int>( MinVolume +
+				vol = qBound<int>( MinVolume,
+								MinVolume +
 								( ( (float)noteEditBottom() ) - ( (float)me->y() ) ) /
 								( (float)( noteEditBottom() - noteEditTop() ) ) *
 								( MaxVolume - MinVolume ),
-											MinVolume, MaxVolume );
-				pan = tLimit<int>( PanningLeft +
+											MaxVolume );
+				pan = qBound<int>( PanningLeft,
+								PanningLeft +
 								( (float)( noteEditBottom() - me->y() ) ) /
 								( (float)( noteEditBottom() - noteEditTop() ) ) *
 								( (float)( PanningRight - PanningLeft ) ),
-										  PanningLeft, PanningRight);
+										  PanningRight);
 			}
 
 			if( m_noteEditMode == NoteEditVolume )
@@ -2308,6 +2365,7 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 				{
 					// mouse not over this note, stop playing it.
 					m_pattern->instrumentTrack()->pianoModel()->handleKeyRelease( n->key() );
+					pauseChordNotes(n->key());
 
 					n->setIsPlaying( false );
 				}
@@ -3254,6 +3312,9 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 				drawDetuningInfo( p, note,
 					x + WHITE_KEY_WIDTH,
 					y_base - key * KEY_LINE_HEIGHT );
+				p.setClipRect(WHITE_KEY_WIDTH, PR_TOP_MARGIN,
+					width() - WHITE_KEY_WIDTH,
+					height() - PR_TOP_MARGIN);
 			}
 		}
 
@@ -3375,10 +3436,10 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 		case ModeSelect: cursor = s_toolSelect; break;
 		case ModeEditDetuning: cursor = s_toolOpen; break;
 	}
-	if( cursor != NULL )
+	QPoint mousePosition = mapFromGlobal( QCursor::pos() );
+	if( cursor != NULL && mousePosition.y() > keyAreaTop() && mousePosition.x() > noteEditLeft())
 	{
-		p.drawPixmap( mapFromGlobal( QCursor::pos() ) + QPoint( 8, 8 ),
-								*cursor );
+		p.drawPixmap( mousePosition + QPoint( 8, 8 ), *cursor );
 	}
 }
 
@@ -3454,7 +3515,7 @@ void PianoRoll::wheelEvent(QWheelEvent * we )
 			{
 				for ( Note * n : nv )
 				{
-					volume_t vol = tLimit<int>( n->getVolume() + step, MinVolume, MaxVolume );
+					volume_t vol = qBound<int>( MinVolume, n->getVolume() + step, MaxVolume );
 					n->setVolume( vol );
 				}
 				bool allVolumesEqual = std::all_of( nv.begin(), nv.end(),
@@ -3473,7 +3534,7 @@ void PianoRoll::wheelEvent(QWheelEvent * we )
 			{
 				for ( Note * n : nv )
 				{
-					panning_t pan = tLimit<int>( n->getPanning() + step, PanningLeft, PanningRight );
+					panning_t pan = qBound<int>( PanningLeft, n->getPanning() + step, PanningRight );
 					n->setPanning( pan );
 				}
 				bool allPansEqual = std::all_of( nv.begin(), nv.end(),

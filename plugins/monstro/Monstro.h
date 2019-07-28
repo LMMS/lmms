@@ -569,7 +569,7 @@ private:
 
 };
 
-class MonstroView : public InstrumentView
+class MonstroView : public InstrumentViewFixedSize
 {
 	Q_OBJECT
 public:

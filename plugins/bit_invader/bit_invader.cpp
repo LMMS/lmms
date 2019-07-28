@@ -36,7 +36,6 @@
 #include "NotePlayHandle.h"
 #include "Oscillator.h"
 #include "PixmapButton.h"
-#include "templates.h"
 #include "ToolTip.h"
 #include "Song.h"
 #include "interpolation.h"
@@ -327,7 +326,7 @@ PluginView * bitInvader::instantiateView( QWidget * _parent )
 
 bitInvaderView::bitInvaderView( Instrument * _instrument,
 					QWidget * _parent ) :
-	InstrumentView( _instrument, _parent )
+	InstrumentViewFixedSize( _instrument, _parent )
 {
 	setAutoFillBackground( true );
 	QPalette pal;
@@ -566,9 +565,9 @@ extern "C"
 {
 
 // necessary for getting instance out of shared lib
-PLUGIN_EXPORT Plugin * lmms_plugin_main( Model *, void * _data )
+PLUGIN_EXPORT Plugin * lmms_plugin_main( Model *m, void * )
 {
-	return( new bitInvader( static_cast<InstrumentTrack *>( _data ) ) );
+	return( new bitInvader( static_cast<InstrumentTrack *>( m ) ) );
 }
 
 

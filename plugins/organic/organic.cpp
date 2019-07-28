@@ -37,7 +37,6 @@
 #include "NotePlayHandle.h"
 #include "Oscillator.h"
 #include "PixmapButton.h"
-#include "templates.h"
 #include "ToolTip.h"
 
 #include "embed.h"
@@ -418,7 +417,7 @@ public:
 
 organicInstrumentView::organicInstrumentView( Instrument * _instrument,
 							QWidget * _parent ) :
-	InstrumentView( _instrument, _parent ),
+	InstrumentViewFixedSize( _instrument, _parent ),
 	m_oscKnobs( NULL )
 {
 	organicInstrument * oi = castModel<organicInstrument>();
@@ -636,9 +635,9 @@ extern "C"
 {
 
 // necessary for getting instance out of shared lib
-PLUGIN_EXPORT Plugin * lmms_plugin_main( Model *, void * _data )
+PLUGIN_EXPORT Plugin * lmms_plugin_main( Model *m, void * )
 {
-	return( new organicInstrument( static_cast<InstrumentTrack *>( _data ) ) );
+	return( new organicInstrument( static_cast<InstrumentTrack *>( m ) ) );
 }
 
 

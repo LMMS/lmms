@@ -236,7 +236,7 @@ public:
 	// access needsUpdate member variable
 	bool needsUpdate();
 	void setNeedsUpdate( bool b );
-	
+
 public slots:
 	virtual bool close();
 	void cut();
@@ -297,6 +297,9 @@ private:
 	Actions m_action;
 	QPoint m_initialMousePos;
 	QPoint m_initialMouseGlobalPos;
+	TimePos m_initialTCOPos;
+	TimePos m_initialTCOEnd;
+	QVector<TimePos> m_initialOffsets;
 
 	TextFloat * m_hint;
 
@@ -311,14 +314,17 @@ private:
 	bool m_gradient;
 
  	bool m_needsUpdate;
-	inline void setInitialMousePos( QPoint pos )
+	inline void setInitialPos( QPoint pos )
 	{
 		m_initialMousePos = pos;
 		m_initialMouseGlobalPos = mapToGlobal( pos );
+		m_initialTCOPos = m_tco->startPosition();
+		m_initialTCOEnd = m_initialTCOPos + m_tco->length();
 	}
+	void setInitialOffsets();
 
 	bool mouseMovedDistance( QMouseEvent * me, int distance );
-
+	TimePos draggedTCOPos( QMouseEvent * me );
 } ;
 
 
@@ -352,7 +358,7 @@ public:
 		}
 	}
 
-	bool canPasteSelection( TimePos tcoPos, const QMimeData * mimeData );
+	bool canPasteSelection( TimePos tcoPos, const QDropEvent *de );
 	bool pasteSelection( TimePos tcoPos, QDropEvent * de );
 
 	TimePos endPosition( const TimePos & posStart );
@@ -564,13 +570,13 @@ public:
 
 	using Model::dataChanged;
 
-	inline int getHeight() 
+	inline int getHeight()
 	{
 		return m_height >= MINIMAL_TRACK_HEIGHT
-			? m_height 
+			? m_height
 			: DEFAULT_TRACK_HEIGHT;
 	}
-	inline void setHeight( int height ) 
+	inline void setHeight( int height )
 	{
 		m_height = height;
 	}

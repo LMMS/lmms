@@ -41,7 +41,6 @@
 #include "NotePlayHandle.h"
 #include "Oscillator.h"
 #include "PixmapButton.h"
-#include "templates.h"
 #include "ToolTip.h"
 #include "BandLimitedWave.h"
 
@@ -804,7 +803,7 @@ PluginView * lb302Synth::instantiateView( QWidget * _parent )
 
 
 lb302SynthView::lb302SynthView( Instrument * _instrument, QWidget * _parent ) :
-	InstrumentView( _instrument, _parent )
+	InstrumentViewFixedSize( _instrument, _parent )
 {
 	// GUI
 	m_vcfCutKnob = new Knob( knobBright_26, this );
@@ -1029,11 +1028,11 @@ extern "C"
 {
 
 // necessary for getting instance out of shared lib
-PLUGIN_EXPORT Plugin * lmms_plugin_main( Model *, void * _data )
+PLUGIN_EXPORT Plugin * lmms_plugin_main( Model * m, void * )
 {
 
 	return( new lb302Synth(
-	        static_cast<InstrumentTrack *>( _data ) ) );
+		static_cast<InstrumentTrack *>( m ) ) );
 }
 
 

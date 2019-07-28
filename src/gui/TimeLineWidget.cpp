@@ -2,7 +2,7 @@
  * TimeLineWidget.cpp - class timeLine, representing a time-line with position marker
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -84,6 +84,7 @@ TimeLineWidget::TimeLineWidget( const int xoff, const int yoff, const float ppt,
 
 	m_xOffset -= s_posMarkerPixmap->width() / 2;
 
+	setMouseTracking(true);
 	m_pos.m_timeLine = this;
 
 	QTimer * updateTimer = new QTimer( this );
@@ -351,6 +352,7 @@ void TimeLineWidget::mousePressEvent( QMouseEvent* event )
 
 void TimeLineWidget::mouseMoveEvent( QMouseEvent* event )
 {
+	parentWidget()->update(); // essential for widgets that this timeline had taken their mouse move event from.
 	const TimePos t = m_begin + static_cast<int>( qMax( event->x() - m_xOffset - m_moveXOff, 0 ) * TimePos::ticksPerTact() / m_ppt );
 
 	switch( m_action )
@@ -382,17 +384,21 @@ void TimeLineWidget::mouseMoveEvent( QMouseEvent* event )
 			}
 			else
 			{
-				m_loopPos[i] = t.toNearestTact();
+				m_loopPos[i] = t.quantize(1.0);
 			}
 			// Catch begin == end
 			if( m_loopPos[0] == m_loopPos[1] )
 			{
 				// Note, swap 1 and 0 below and the behavior "skips" the other
 				// marking instead of pushing it.
-				if( m_action == MoveLoopBegin ) 
+				if( m_action == MoveLoopBegin )
+				{
 					m_loopPos[0] -= TimePos::ticksPerTact();
+				}
 				else
+				{
 					m_loopPos[1] += TimePos::ticksPerTact();
+				}
 			}
 			update();
 			break;

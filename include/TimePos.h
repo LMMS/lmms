@@ -63,7 +63,7 @@ public:
 	TimePos( const tact_t tact, const tick_t ticks );
 	TimePos( const tick_t ticks = 0 );
 
-	TimePos toNearestTact() const;
+	TimePos quantize(float) const;
 	TimePos toAbsoluteTact() const;
 
 	TimePos& operator+=( const TimePos& time );
@@ -110,4 +110,3 @@ private:
 
 
 #endif
-

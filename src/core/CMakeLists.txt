@@ -40,6 +40,7 @@ set(LMMS_SRCS
 	core/MixerWorkerThread.cpp
 	core/MixHelpers.cpp
 	core/Model.cpp
+	core/ModelVisitor.cpp
 	core/Note.cpp
 	core/NotePlayHandle.cpp
 	core/Oscillator.cpp
@@ -48,6 +49,7 @@ set(LMMS_SRCS
 	core/Piano.cpp
 	core/PlayHandle.cpp
 	core/Plugin.cpp
+	core/PluginIssue.cpp
 	core/PluginFactory.cpp
 	core/PresetPreviewPlayHandle.cpp
 	core/ProjectJournal.cpp

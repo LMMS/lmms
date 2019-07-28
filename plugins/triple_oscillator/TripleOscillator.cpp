@@ -419,7 +419,7 @@ public:
 
 TripleOscillatorView::TripleOscillatorView( Instrument * _instrument,
 							QWidget * _parent ) :
-	InstrumentView( _instrument, _parent )
+	InstrumentViewFixedSize( _instrument, _parent )
 {
 	setAutoFillBackground( true );
 	QPalette pal;
@@ -723,9 +723,9 @@ extern "C"
 {
 
 // necessary for getting instance out of shared lib
-PLUGIN_EXPORT Plugin * lmms_plugin_main( Model *, void * _data )
+PLUGIN_EXPORT Plugin * lmms_plugin_main( Model* model, void * )
 {
-	return new TripleOscillator( static_cast<InstrumentTrack *>( _data ) );
+	return new TripleOscillator( static_cast<InstrumentTrack *>( model ) );
 }
 
 }

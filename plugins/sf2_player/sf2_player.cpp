@@ -859,7 +859,7 @@ public:
 
 
 sf2InstrumentView::sf2InstrumentView( Instrument * _instrument, QWidget * _parent ) :
-	InstrumentView( _instrument, _parent )
+	InstrumentViewFixedSize( _instrument, _parent )
 {
 //	QVBoxLayout * vl = new QVBoxLayout( this );
 //	QHBoxLayout * hl = new QHBoxLayout();
@@ -1150,9 +1150,9 @@ extern "C"
 {
 
 // necessary for getting instance out of shared lib
-PLUGIN_EXPORT Plugin * lmms_plugin_main( Model *, void * _data )
+PLUGIN_EXPORT Plugin * lmms_plugin_main( Model *m, void * )
 {
-	return new sf2Instrument( static_cast<InstrumentTrack *>( _data ) );
+	return new sf2Instrument( static_cast<InstrumentTrack *>( m ) );
 }
 
 

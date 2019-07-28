@@ -293,7 +293,7 @@ private:
 };
 
 
-class WatsynView : public InstrumentView
+class WatsynView : public InstrumentViewFixedSize
 {
 	Q_OBJECT
 public:

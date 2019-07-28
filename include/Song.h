@@ -65,6 +65,17 @@ public:
 		Mode_Count
 	} ;
 
+	struct SaveOptions {
+		/**
+		 * Should we discard MIDI ControllerConnections from project files?
+		 */
+		BoolModel discardMIDIConnections{false};
+
+		void setDefaultOptions() {
+			discardMIDIConnections.setValue(false);
+		}
+	};
+
 	void clearErrors();
 	void collectError( const QString error );
 	bool hasErrors();
@@ -322,6 +333,11 @@ public:
 	void exportProjectMidi(QString const & exportFileName) const;
 
 	inline void setLoadOnLauch(bool value) { m_loadOnLaunch = value; }
+	SaveOptions &getSaveOptions() {
+		return m_saveOptions;
+	}
+
+	bool isSavingProject() const;
 
 public slots:
 	void playSong();
@@ -419,8 +435,11 @@ private:
 	volatile bool m_playing;
 	volatile bool m_paused;
 
+	bool m_savingProject;
 	bool m_loadingProject;
 	bool m_isCancelled;
+
+	SaveOptions m_saveOptions;
 
 	QStringList m_errors;
 

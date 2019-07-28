@@ -267,7 +267,7 @@ public:
 
 kickerInstrumentView::kickerInstrumentView( Instrument * _instrument,
 							QWidget * _parent ) :
-	InstrumentView( _instrument, _parent )
+	InstrumentViewFixedSize( _instrument, _parent )
 {
 	const int ROW1 = 14;
 	const int ROW2 = ROW1 + 56;
@@ -367,9 +367,9 @@ extern "C"
 {
 
 // necessary for getting instance out of shared lib
-PLUGIN_EXPORT Plugin * lmms_plugin_main( Model *, void * _data )
+PLUGIN_EXPORT Plugin * lmms_plugin_main( Model * m, void * )
 {
-	return new kickerInstrument( static_cast<InstrumentTrack *>( _data ) );
+	return new kickerInstrument( static_cast<InstrumentTrack *>( m ) );
 }
 
 

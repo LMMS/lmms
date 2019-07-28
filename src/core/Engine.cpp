@@ -29,6 +29,7 @@
 #include "FxMixer.h"
 #include "Ladspa2LMMS.h"
 #include "Mixer.h"
+#include "Plugin.h"
 #include "PresetPreviewPlayHandle.h"
 #include "ProjectJournal.h"
 #include "Song.h"
@@ -41,6 +42,7 @@ BBTrackContainer * LmmsCore::s_bbTrackContainer = NULL;
 Song * LmmsCore::s_song = NULL;
 ProjectJournal * LmmsCore::s_projectJournal = NULL;
 Ladspa2LMMS * LmmsCore::s_ladspaManager = NULL;
+void* LmmsCore::s_dndPluginKey = nullptr;
 DummyTrackContainer * LmmsCore::s_dummyTC = NULL;
 
 
@@ -103,6 +105,12 @@ void LmmsCore::destroy()
 	delete ConfigManager::inst();
 }
 
+float LmmsCore::framesPerTick(sample_rate_t sample_rate)
+{
+	return sample_rate * 60.0f * 4 /
+			DefaultTicksPerTact / s_song->getTempo();
+}
+
 
 
 
@@ -111,5 +119,25 @@ void LmmsCore::updateFramesPerTick()
 	s_framesPerTick = s_mixer->processingSampleRate() * 60.0f * 4 /
 				DefaultTicksPerTact / s_song->getTempo();
 }
+
+
+
+
+void LmmsCore::setDndPluginKey(void *newKey)
+{
+	Q_ASSERT(static_cast<Plugin::Descriptor::SubPluginFeatures::Key*>(newKey));
+	s_dndPluginKey = newKey;
+}
+
+
+
+
+void *LmmsCore::pickDndPluginKey()
+{
+	return s_dndPluginKey;
+}
+
+
+
 
 LmmsCore * LmmsCore::s_instanceOfMe = NULL;

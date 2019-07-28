@@ -62,6 +62,7 @@ NotePlayHandle::NotePlayHandle( InstrumentTrack* instrumentTrack,
 	m_subNotes(),
 	m_released( false ),
 	m_releaseStarted( false ),
+	m_hasMidiNote( false ),
 	m_hasParent( parent != NULL  ),
 	m_parent( parent ),
 	m_hadChildren( false ),
@@ -103,17 +104,6 @@ NotePlayHandle::NotePlayHandle( InstrumentTrack* instrumentTrack,
 	if( m_origin == OriginMidiInput )
 	{
 		m_instrumentTrack->midiNoteOn( *this );
-	}
-
-	if( hasParent() || ! m_instrumentTrack->isArpeggioEnabled() )
-	{
-		const int baseVelocity = m_instrumentTrack->midiPort()->baseVelocity();
-
-		// send MidiNoteOn event
-		m_instrumentTrack->processOutEvent(
-			MidiEvent( MidiNoteOn, midiChannel(), midiKey(), midiVelocity( baseVelocity ) ),
-			TimePos::fromFrames( offset(), Engine::framesPerTick() ),
-			offset() );
 	}
 
 	if( m_instrumentTrack->instrument()->flags() & Instrument::IsSingleStreamed )
@@ -205,6 +195,21 @@ void NotePlayHandle::play( sampleFrame * _working_buffer )
 	}
 
 	lock();
+
+	if( m_totalFramesPlayed == 0 && !m_hasMidiNote
+		&& ( hasParent() || ! m_instrumentTrack->isArpeggioEnabled() ) )
+	{
+		m_hasMidiNote = true;
+
+		const int baseVelocity = m_instrumentTrack->midiPort()->baseVelocity();
+
+		// send MidiNoteOn event
+		m_instrumentTrack->processOutEvent(
+			MidiEvent( MidiNoteOn, midiChannel(), midiKey(), midiVelocity( baseVelocity ) ),
+			TimePos::fromFrames( offset(), Engine::framesPerTick() ),
+			offset() );
+	}
+
 	if( m_frequencyNeedsUpdate )
 	{
 		updateFrequency();
@@ -357,8 +362,10 @@ void NotePlayHandle::noteOff( const f_cnt_t _s )
 	m_framesBeforeRelease = _s;
 	m_releaseFramesToDo = qMax<f_cnt_t>( 0, actualReleaseFramesToDo() );
 
-	if( hasParent() || ! m_instrumentTrack->isArpeggioEnabled() )
+	if( m_hasMidiNote )
 	{
+		m_hasMidiNote = false;
+
 		// send MidiNoteOff event
 		m_instrumentTrack->processOutEvent(
 				MidiEvent( MidiNoteOff, midiChannel(), midiKey(), 0 ),
@@ -567,13 +574,9 @@ NotePlayHandle * NotePlayHandleManager::acquire( InstrumentTrack* instrumentTrac
 				int midiEventChannel,
 				NotePlayHandle::Origin origin )
 {
-	if( s_availableIndex < 0 )
-	{
-		s_mutex.lockForWrite();
-		if( s_availableIndex < 0 ) extend( NPH_CACHE_INCREMENT );
-		s_mutex.unlock();
-	}
-	s_mutex.lockForRead();
+	// TODO: use some lockless data structures
+	s_mutex.lockForWrite();
+	if (s_availableIndex < 0) { extend(NPH_CACHE_INCREMENT); }
 	NotePlayHandle * nph = s_available[s_availableIndex--];
 	s_mutex.unlock();
 

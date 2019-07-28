@@ -55,13 +55,16 @@ public:
 
 	Q_DECLARE_FLAGS(Flags, Flag);
 
-	Instrument( InstrumentTrack * _instrument_track,
-					const Descriptor * _descriptor );
+	Instrument(InstrumentTrack * _instrument_track,
+			const Descriptor * _descriptor,
+			const Descriptor::SubPluginFeatures::Key * key = nullptr);
 	virtual ~Instrument() = default;
 
 	// --------------------------------------------------------------------
 	// functions that can/should be re-implemented:
 	// --------------------------------------------------------------------
+
+	virtual bool hasNoteInput() const { return true; }
 
 	// if the plugin doesn't play each note, it can create an instrument-
 	// play-handle and re-implement this method, so that it mixes its
@@ -113,10 +116,12 @@ public:
 	// provided functions:
 	// --------------------------------------------------------------------
 
-	// instantiate instrument-plugin with given name or return NULL
-	// on failure
-	static Instrument * instantiate( const QString & _plugin_name,
-									InstrumentTrack * _instrument_track );
+	//! instantiate instrument-plugin with given name or return NULL
+	//! on failure
+	static Instrument * instantiate(const QString & _plugin_name,
+		InstrumentTrack * _instrument_track,
+		const Plugin::Descriptor::SubPluginFeatures::Key* key,
+		bool keyFromDnd = false);
 
 	virtual bool isFromTrack( const Track * _track ) const;
 

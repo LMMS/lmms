@@ -99,7 +99,7 @@ private:
     friend class CarlaInstrumentView;
 };
 
-class CarlaInstrumentView : public InstrumentView
+class CarlaInstrumentView : public InstrumentViewFixedSize
 {
     Q_OBJECT
 
