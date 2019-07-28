@@ -75,11 +75,6 @@ public:
 
 	uint64_t m_loadTicket = 0, m_saveTicket = 0, m_restoreTicket = 0;
 
-	void addModel(AutomatableModel* model, QString str)
-	{
-		LinkedModelGroup::addModel(model, str);
-	}
-
 protected:
 //	void reloadPlugin();
 public:
@@ -89,9 +84,7 @@ public:
 
 	int m_audioInCount = 0, m_audioOutCount = 0;
 
-	std::size_t controlCount() const {
-		return LinkedModelGroup::models().size();
-	}
+	std::size_t controlCount() const { return LinkedModelGroup::modelNum(); }
 
 	struct LmmsPorts
 	{

@@ -85,9 +85,7 @@ SpaControlBase::SpaControlBase(Model* that, const QString& uniqueName,
 					}
 
 					// initially link all controls
-					for (std::size_t i = 0;
-						i < m_procs[0]->models().size();
-						++i)
+					for (std::size_t i = 0; i < m_procs[0]->modelNum(); ++i)
 					{
 							linkModel(i, true);
 					}
@@ -307,6 +305,7 @@ void SpaProc::shutdownPlugin()
 	m_spaDescriptor->delete_plugin(m_plugin);
 	m_plugin = nullptr;
 
+	clearModels();
 	// clear all port data (object is just raw memory after dtor call)...
 	m_ports.~LmmsPorts();
 	// ... so we can reuse it - C++ is just awesome
@@ -699,11 +698,7 @@ AutomatableModel *SpaProc::modelAtPort(const QString &dest)
 			spaMod = vis.m_res;
 		}
 
-		if (spaMod)
-		{
-			m_connectedModels.insert(url.path(), spaMod);
-			mod = spaMod;
-		}
+		if (spaMod) { addModel(mod = spaMod, url.path()); }
 		else
 		{
 			qDebug() << "LMMS: Could not create model from "
@@ -775,9 +770,13 @@ void SpaControlBase::run(unsigned frames) {
 
 AutomatableModel *SpaControlBase::modelAtPort(const QString &dest)
 {
-	QUrl url(dest);
-	return m_procsByPort[static_cast<unsigned>(url.port())]->
-		modelAtPort(dest);
+	if (m_procs.size() == 1)
+	{
+		QUrl url(dest);
+		return m_procsByPort[static_cast<unsigned>(url.port())]->
+			modelAtPort(dest);
+	}
+	else { return nullptr; /* TODO */ }
 }
 
 

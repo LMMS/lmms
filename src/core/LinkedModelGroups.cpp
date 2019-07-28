@@ -42,10 +42,10 @@
 
 void LinkedModelGroup::makeLinkingProc()
 {
-	for (std::size_t i = 0; i < m_models.size(); ++i)
+	for (std::size_t i = 0; i < models().size(); ++i)
 	{
 		BoolModel* bmo = new BoolModel(true, this, tr("Link channels"));
-		m_linkEnabled.push_back(bmo);
+		d.m_linkEnabled.push_back(bmo);
 		connect(bmo, &BoolModel::dataChanged, this,
 				[this, bmo, i]() { emit linkStateChanged(i, bmo->value()); });
 	}
@@ -56,7 +56,7 @@ void LinkedModelGroup::makeLinkingProc()
 
 void LinkedModelGroup::linkAllModels(bool state)
 {
-	for (BoolModel* bmo : m_linkEnabled) { bmo->setValue(state); }
+	for (BoolModel* bmo : d.m_linkEnabled) { bmo->setValue(state); }
 }
 
 
@@ -65,7 +65,7 @@ void LinkedModelGroup::linkAllModels(bool state)
 void LinkedModelGroup::linkControls(LinkedModelGroup *other, std::size_t id)
 {
 	AutomatableModel::linkModels(
-		m_models[id].m_model, other->m_models[id].m_model);
+		models()[id].m_model, other->models()[id].m_model);
 }
 
 
@@ -74,7 +74,18 @@ void LinkedModelGroup::linkControls(LinkedModelGroup *other, std::size_t id)
 void LinkedModelGroup::unlinkControls(LinkedModelGroup *other, std::size_t id)
 {
 	AutomatableModel::unlinkModels(
-		m_models[id].m_model, other->m_models[id].m_model);
+				models()[id].m_model, other->models()[id].m_model);
+}
+
+
+
+
+AutomatableModel *LinkedModelGroup::modelWithName(const QString &name) const
+{
+	auto itr = std::find_if(models().begin(), models().end(),
+		[&name](const ModelInfo& mi) -> bool
+	{ return mi.m_name == name; });
+	return itr == models().end() ? nullptr : itr->m_model;
 }
 
 
@@ -83,13 +94,14 @@ void LinkedModelGroup::unlinkControls(LinkedModelGroup *other, std::size_t id)
 void LinkedModelGroup::saveValues(QDomDocument &doc, QDomElement &that,
 	const LinkedModelGroup *lmg0)
 {
-	Q_ASSERT(lmg0->isLinking());
-	for (std::size_t idx = 0; idx < m_models.size(); ++idx)
+	// if multiple lmgs, the first one must currently be the linking one
+	Q_ASSERT(this == lmg0 || lmg0->isLinking());
+	for (std::size_t idx = 0; idx < models().size(); ++idx)
 	{
 		if (this == lmg0 || !lmg0->linkEnabledModel(idx)->value())
 		{
 			// try to load, if it fails, this will load a sane initial value
-			m_models[idx].m_model->saveSettings(doc, that, m_models[idx].m_name);
+			models()[idx].m_model->saveSettings(doc, that, models()[idx].m_name);
 		}
 		else
 		{
@@ -103,9 +115,9 @@ void LinkedModelGroup::saveValues(QDomDocument &doc, QDomElement &that,
 
 void LinkedModelGroup::saveLinksEnabled(QDomDocument &doc, QDomElement &that)
 {
-	for (std::size_t i = 0; i < m_linkEnabled.size(); ++i)
+	for (std::size_t i = 0; i < d.m_linkEnabled.size(); ++i)
 	{
-		m_linkEnabled[i]->saveSettings(doc, that, m_models[i].m_name);
+		d.m_linkEnabled[i]->saveSettings(doc, that, models()[i].m_name);
 	}
 }
 
@@ -115,12 +127,12 @@ void LinkedModelGroup::saveLinksEnabled(QDomDocument &doc, QDomElement &that)
 void LinkedModelGroup::loadValues(const QDomElement &that,
 	const LinkedModelGroup* lmg0)
 {
-	for (std::size_t idx = 0; idx < m_models.size(); ++idx)
+	for (std::size_t idx = 0; idx < models().size(); ++idx)
 	{
 		if (this == lmg0 || !lmg0->linkEnabledModel(idx)->value())
 		{
 			// try to load, if it fails, this will load a sane initial value
-			m_models[idx].m_model->loadSettings(that, m_models[idx].m_name);
+			models()[idx].m_model->loadSettings(that, models()[idx].m_name);
 		}
 		else
 		{
@@ -134,9 +146,9 @@ void LinkedModelGroup::loadValues(const QDomElement &that,
 
 void LinkedModelGroup::loadLinksEnabled(const QDomElement &that)
 {
-	for (std::size_t i = 0; i < m_linkEnabled.size(); ++i)
+	for (std::size_t i = 0; i < d.m_linkEnabled.size(); ++i)
 	{
-		m_linkEnabled[i]->loadSettings(that, m_models[i].m_name);
+		d.m_linkEnabled[i]->loadSettings(that, models()[i].m_name);
 	}
 }
 
@@ -145,7 +157,17 @@ void LinkedModelGroup::loadLinksEnabled(const QDomElement &that)
 
 void LinkedModelGroup::addModel(AutomatableModel *model, const QString &name)
 {
-	m_models.emplace_back(name, model);
+	models().emplace_back(name, model);
+}
+
+
+
+
+void LinkedModelGroup::clearModels()
+{
+	using datatype = decltype(d);
+	d.~datatype();
+	new (&d) datatype();
 }
 
 
@@ -165,7 +187,8 @@ LinkedModelGroups::~LinkedModelGroups() {}
 
 void LinkedModelGroups::createMultiChannelLinkModel()
 {
-	m_multiChannelLinkModel = make_unique<BoolModel>(true, nullptr);
+	m_multiChannelLinkModel =
+		make_unique<BoolModel, BoolModelDeleter>(true, nullptr);
 }
 
 
@@ -300,3 +323,9 @@ void LinkedModelGroups::loadSettings(const QDomElement& that)
 }
 
 
+
+
+void LinkedModelGroups::BoolModelDeleter::operator()(BoolModel *l)
+{
+	delete l;
+}
