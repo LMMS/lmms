@@ -68,7 +68,7 @@ private:
 	MidiTime m_curStepStartPos;
 	MidiTime m_curStepEndPos;
 
-	int m_ppb; // pixels per bar 
+	int m_ppb; // pixels per bar
 	MidiTime m_currentPosition; // current position showed by on PianoRoll
 
 	QColor m_colorLineStart;

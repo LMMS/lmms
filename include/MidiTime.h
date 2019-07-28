@@ -64,7 +64,7 @@ public:
 	MidiTime( const tick_t ticks = 0 );
 
 	MidiTime quantize(float) const;
-	MidiTime toAbsoluteTact() const;
+	MidiTime toAbsoluteBar() const;
 
 	MidiTime& operator+=( const MidiTime& time );
 	MidiTime& operator-=( const MidiTime& time );

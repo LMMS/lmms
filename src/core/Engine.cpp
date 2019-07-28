@@ -105,10 +105,10 @@ void LmmsCore::destroy()
 	delete ConfigManager::inst();
 }
 
-float LmmsCore::framesPerTick(sample_rate_t sample_rate)
+float LmmsCore::framesPerTick(sample_rate_t sampleRate)
 {
-	return sample_rate * 60.0f * 4 /
-			DefaultTicksPerTact / s_song->getTempo();
+	return sampleRate * 60.0f * 4 /
+			DefaultTicksPerBar / s_song->getTempo();
 }
 
 

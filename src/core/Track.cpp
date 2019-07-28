@@ -1271,6 +1271,7 @@ void TrackContentWidget::updateBackground()
 	// Assume even-pixels-per-bar. Makes sense, should be like this anyways
 	int ppb = static_cast<int>( tcv->pixelsPerBar() );
 
+	// alternate between a darker and a lighter color every 4 bars
 	int w = ppb * 4;
 	int h = height();
 	m_background = QPixmap( w * 2, height() );
@@ -1383,7 +1384,7 @@ void TrackContentWidget::changePosition( const MidiTime & newPos )
 						it != m_tcoViews.end(); ++it )
 		{
 		if( ( *it )->getTrackContentObject()->
-                            startPosition().getBar() == curBB )
+						startPosition().getBar() == curBB )
 			{
 				( *it )->move( 0, ( *it )->y() );
 				( *it )->raise();
@@ -1399,7 +1400,7 @@ void TrackContentWidget::changePosition( const MidiTime & newPos )
 					it != m_tcoViews.end(); ++it )
 		{
 			if( ( *it )->getTrackContentObject()->
-	                            startPosition().getBar() != curBB )
+						startPosition().getBar() != curBB )
 			{
 				( *it )->hide();
 			}
@@ -1455,7 +1456,7 @@ void TrackContentWidget::changePosition( const MidiTime & newPos )
 
 
 
-/*! \brief Return the position of the trackContentWidget in Bars.
+/*! \brief Return the position of the trackContentWidget in bars.
  *
  * \param mouseX the mouse's current X position in pixels.
  */
@@ -2529,7 +2530,7 @@ void Track::createTCOsForBB( int bb )
 void Track::insertBar( const MidiTime & pos )
 {
 	// we'll increase the position of every TCO, positioned behind pos, by
-	// one bar 
+	// one bar
 	for( tcoVector::iterator it = m_trackContentObjects.begin();
 				it != m_trackContentObjects.end(); ++it )
 	{
