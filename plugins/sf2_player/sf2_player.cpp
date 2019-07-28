@@ -859,7 +859,7 @@ public:
 
 
 sf2InstrumentView::sf2InstrumentView( Instrument * _instrument, QWidget * _parent ) :
-	InstrumentView( _instrument, _parent )
+	InstrumentViewFixedSize( _instrument, _parent )
 {
 //	QVBoxLayout * vl = new QVBoxLayout( this );
 //	QHBoxLayout * hl = new QHBoxLayout();

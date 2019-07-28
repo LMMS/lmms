@@ -44,13 +44,18 @@ class LMMS_EXPORT Graph : public QWidget, public ModelView
 public:
 	enum graphStyle
 	{
-		NearestStyle,
-		LinearStyle,
-		LinearNonCyclicStyle,
-		BarStyle,
+		NearestStyle, //!< draw as stairs
+		LinearStyle, //!< connect each 2 samples with a line, with wrapping
+		LinearNonCyclicStyle, //!< LinearStyle without wrapping
+		BarStyle, //!< draw thick bars
 		NumGraphStyles
 	};
 
+	/**
+	 * @brief Constructor
+	 * @param _width Pixel width of widget
+	 * @param _height Pixel height of widget
+	 */
 	Graph( QWidget * _parent, graphStyle _style = Graph::LinearStyle,
 		int _width = 132,
 		int _height = 104
@@ -111,10 +116,24 @@ private:
 } ;
 
 
+/**
+	@brief 2 dimensional function plot
+
+	Function plot graph with discrete x scale and continous y scale
+	This makes it possible to display "#x" samples
+*/
 class LMMS_EXPORT graphModel : public Model
 {
 	Q_OBJECT
 public:
+	/**
+	 * @brief Constructor
+	 * @param _min Minimum y value to display
+	 * @param _max Maximum y value to display
+	 * @param _size Number of samples (e.g. x value)
+	 * @param _step Step size on y axis where values snap to, or 0.0f
+	 *   for "no snapping"
+	 */
 	graphModel( float _min,
 			float _max,
 			int _size,
@@ -146,14 +165,21 @@ public:
 		return( m_samples.data() );
 	}
 
-	void convolve(const float *convolution, const int convolutionLength, const int centerOffset);
+	//! Make cyclic convolution
+	//! @param convolution Samples to convolve with
+	//! @param convolutionLength Number of samples to take for each sum
+	//! @param centerOffset Offset for resulting values
+	void convolve(const float *convolution,
+		const int convolutionLength, const int centerOffset);
 
 public slots:
+	//! Set range of y values
 	void setRange( float _min, float _max );
 
 	void setLength( int _size );
-
+	//! Update one sample
 	void setSampleAt( int x, float val );
+	//! Update samples array
 	void setSamples( const float * _value );
 
 	void setWaveToSine();

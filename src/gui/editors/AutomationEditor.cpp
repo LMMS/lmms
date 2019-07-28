@@ -431,8 +431,8 @@ void AutomationEditor::leaveEvent(QEvent * e )
 	{
 		QApplication::restoreOverrideCursor();
 	}
-
 	QWidget::leaveEvent( e );
+	update();
 }
 
 
@@ -1511,8 +1511,11 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 		case SELECT: cursor = s_toolSelect; break;
 		case MOVE: cursor = s_toolMove; break;
 	}
-	p.drawPixmap( mapFromGlobal( QCursor::pos() ) + QPoint( 8, 8 ),
-								*cursor );
+	QPoint mousePosition = mapFromGlobal( QCursor::pos() );
+	if( cursor != NULL && mousePosition.y() > TOP_MARGIN + SCROLLBAR_SIZE)
+	{
+		p.drawPixmap( mousePosition + QPoint( 8, 8 ), *cursor );
+	}
 }
 
 

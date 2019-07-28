@@ -33,6 +33,7 @@
 #include "MidiTime.h"
 #include "ValueBuffer.h"
 #include "MemoryManager.h"
+#include "ModelVisitor.h"
 
 // simple way to map a property of a view to a model
 #define mapPropertyFromModelPtr(type,getfunc,setfunc,modelname)	\
@@ -59,6 +60,11 @@
 				modelname.setValue( (float) val );				\
 			}
 
+// use this to make subclasses visitable
+#define MODEL_IS_VISITABLE \
+	void accept(ModelVisitor& v) override { v.visit(*this); } \
+	void accept(ConstModelVisitor& v) const override { v.visit(*this); }
+
 
 
 class ControllerConnection;
@@ -68,6 +74,7 @@ class LMMS_EXPORT AutomatableModel : public Model, public JournallingObject
 	Q_OBJECT
 	MM_OPERATORS
 public:
+
 	typedef QVector<AutomatableModel *> AutoModelVector;
 
 	enum ScaleType
@@ -80,6 +87,35 @@ public:
 
 	virtual ~AutomatableModel();
 
+	// Implement those by using the MODEL_IS_VISITABLE macro
+	virtual void accept(ModelVisitor& v) = 0;
+	virtual void accept(ConstModelVisitor& v) const = 0;
+
+public:
+	/**
+	   @brief Return this class casted to Target
+	   @test AutomatableModelTest.cpp
+	   @param doThrow throw an assertion if the cast fails, instead of
+	     returning a nullptr
+	   @return the casted class if Target is the exact or a base class of
+	     *this, nullptr otherwise
+	*/
+	template<class Target>
+	Target* dynamicCast(bool doThrow = false)
+	{
+		DCastVisitor<Target> vis; accept(vis);
+		if (doThrow && !vis.result) { Q_ASSERT(false); }
+		return vis.result;
+	}
+
+	//! const overload, see overloaded function
+	template<class Target>
+	const Target* dynamicCast(bool doThrow = false) const
+	{
+		ConstDCastVisitor<Target> vis; accept(vis);
+		if (doThrow && !vis.result) { Q_ASSERT(false); }
+		return vis.result;
+	}
 
 	bool isAutomated() const;
 	bool isAutomatedOrControlled() const
@@ -283,6 +319,22 @@ protected:
 
 
 private:
+	// dynamicCast implementation
+	template<class Target>
+	struct DCastVisitor : public ModelVisitor
+	{
+		Target* result = nullptr;
+		void visit(Target& tar) { result = &tar; }
+	};
+
+	// dynamicCast implementation
+	template<class Target>
+	struct ConstDCastVisitor : public ConstModelVisitor
+	{
+		const Target* result = nullptr;
+		void visit(const Target& tar) { result = &tar; }
+	};
+
 	static bool mustQuoteName(const QString &name);
 
 	virtual void saveSettings( QDomDocument& doc, QDomElement& element )
@@ -382,6 +434,7 @@ public:
 class LMMS_EXPORT FloatModel : public TypedAutomatableModel<float>
 {
 	Q_OBJECT
+	MODEL_IS_VISITABLE
 public:
 	FloatModel( float val = 0, float min = 0, float max = 0, float step = 0,
 				Model * parent = NULL,
@@ -399,6 +452,7 @@ public:
 class LMMS_EXPORT IntModel : public TypedAutomatableModel<int>
 {
 	Q_OBJECT
+	MODEL_IS_VISITABLE
 public:
 	IntModel( int val = 0, int min = 0, int max = 0,
 				Model* parent = NULL,
@@ -414,6 +468,7 @@ public:
 class LMMS_EXPORT BoolModel : public TypedAutomatableModel<bool>
 {
 	Q_OBJECT
+	MODEL_IS_VISITABLE
 public:
 	BoolModel( const bool val = false,
 				Model* parent = NULL,

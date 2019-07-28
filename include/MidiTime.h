@@ -63,8 +63,8 @@ public:
 	MidiTime( const bar_t bar, const tick_t ticks );
 	MidiTime( const tick_t ticks = 0 );
 
-	MidiTime toNearestBar() const;
-	MidiTime toAbsoluteBar() const;
+	MidiTime quantize(float) const;
+	MidiTime toAbsoluteTact() const;
 
 	MidiTime& operator+=( const MidiTime& time );
 	MidiTime& operator-=( const MidiTime& time );
@@ -110,4 +110,3 @@ private:
 
 
 #endif
-

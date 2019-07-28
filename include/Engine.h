@@ -31,6 +31,7 @@
 
 
 #include "lmms_export.h"
+#include "lmms_basics.h"
 
 class BBTrackContainer;
 class DummyTrackContainer;
@@ -100,6 +101,9 @@ public:
 	{
 		return s_framesPerTick;
 	}
+
+	static float framesPerTick(sample_rate_t sample_rate);
+
 	static void updateFramesPerTick();
 
 	static inline LmmsCore * inst()
