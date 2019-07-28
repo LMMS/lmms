@@ -228,7 +228,7 @@ void TrackContainerView::realignTracks()
 {
 	QWidget * content = m_scrollArea->widget();
 
-	//Hide the scrollbar AND scrollbar area when it's not needed
+	//Hide the vertical scrollbar *and* its scrollbar area when not needed
 	auto verticalScrollBar = m_scrollArea->verticalScrollBar();
 	if (verticalScrollBar->maximum() == verticalScrollBar->minimum())
 	{	//min == max implies the whole editor is visible without scrolling
