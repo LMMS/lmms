@@ -86,20 +86,19 @@ void SaSpectrumView::paintEvent(QPaintEvent *event)
 	QPainter painter(this);
 	painter.setRenderHint(QPainter::Antialiasing, true);
 
-	QFontMetrics fm = painter.fontMetrics();
-	QSize fsize = fm.size(Qt::TextSingleLine, "01234567890k");
-	int fheight = fsize.height();
+	QFontMetrics fontMetrics = painter.fontMetrics();
+	int const heightOfFrequencyLabels = fontMetrics.size(Qt::TextSingleLine, "01234567890k").height();
 
 	int maximumTextWidthForAmpTics = 0;
 	for (auto const & ampTic : getAmpTicsToRender())
 	{
-		maximumTextWidthForAmpTics = std::max(fm.size(Qt::TextSingleLine, QString::fromStdString(ampTic.second)).width(), maximumTextWidthForAmpTics);
+		maximumTextWidthForAmpTics = std::max(fontMetrics.size(Qt::TextSingleLine, QString::fromStdString(ampTic.second)).width(), maximumTextWidthForAmpTics);
 	}
 
 	// drawing and path-making are split into multiple methods for clarity;
 	// display boundaries are updated here and shared as member variables
 	m_displayTop = 1;
-	m_displayBottom = height() - fheight - 2 * m_margin;
+	m_displayBottom = height() - heightOfFrequencyLabels - 2 * m_margin;
 	int const leftAndRightMargin = maximumTextWidthForAmpTics + 5;
 	m_displayLeft = leftAndRightMargin;
 	m_displayRight = width() - leftAndRightMargin;
@@ -411,8 +410,6 @@ QPainterPath SaSpectrumView::makePath(std::vector<float> &displayBuffer, float r
 // Draw background, grid and associated frequency and amplitude labels.
 void SaSpectrumView::drawGrid(QPainter &painter)
 {
-	std::vector<std::pair<int, std::string>> *freqTics = NULL;
-
 	float pos = 0;
 	float label_width = 24;
 	float label_height = 15;
@@ -423,17 +420,11 @@ void SaSpectrumView::drawGrid(QPainter &painter)
 					 m_controls->m_colorBG);
 
 	// select logarithmic or linear frequency grid and draw it
-	if (m_controls->m_logXModel.value())
-	{
-		freqTics = &m_logFreqTics;
-	}
-	else
-	{
-		freqTics = &m_linearFreqTics;
-	}
+	std::vector<std::pair<int, std::string>> const & freqTics = getFrequencyTicsToRender();
+
 	// draw frequency grid (line.first is display position)
 	painter.setPen(QPen(m_controls->m_colorGrid, 1,	Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
-	for (auto &line: *freqTics)
+	for (auto const &line: freqTics)
 	{
 		painter.drawLine(m_displayLeft + freqToXPixel(line.first, m_displayWidth),
 						 2,
@@ -444,19 +435,19 @@ void SaSpectrumView::drawGrid(QPainter &painter)
 	// print frequency labels (line.second is label)
 	float const yPosition = m_displayBottom + m_margin;
 	painter.setPen(QPen(m_controls->m_colorLabels, 1, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
-	for (auto & line: *freqTics)
+	for (auto const & line: freqTics)
 	{
 		pos = m_displayLeft + freqToXPixel(line.first, m_displayWidth);
 		QString const displayString(line.second.c_str());
 
 		// align first and last label to the edge if needed, otherwise center them
-		if (line == freqTics->front() && pos - label_width / 2 < m_displayLeft)
+		if (line == freqTics.front() && pos - label_width / 2 < m_displayLeft)
 		{
 			painter.drawText(m_displayLeft, yPosition,
 							 label_width, label_height, Qt::AlignLeft | Qt::TextDontClip,
 							 displayString);
 		}
-		else if (line == freqTics->back() && pos + label_width / 2 > m_displayRight)
+		else if (line == freqTics.back() && pos + label_width / 2 > m_displayRight)
 		{
 			painter.drawText(m_displayRight - label_width, yPosition,
 							 label_width, label_height, Qt::AlignRight | Qt::TextDontClip,
@@ -565,7 +556,7 @@ void SaSpectrumView::drawCursor(QPainter &painter)
 
 		std::string amplitudeString;
 		float yAmp = m_processor->yPixelToAmp(m_cursor.y(), m_displayBottom);
-		if (renderLogarithmicAmpTics())
+		if (isRenderLogarithmicAmpTics())
 		{
 			amplitudeString = std::string(std::to_string(yAmp).substr(0, 5) + " dB");
 		}
@@ -817,20 +808,37 @@ void SaSpectrumView::resizeEvent(QResizeEvent *event)
 	m_linearAmpTics = makeLinearAmpTics(m_processor->getAmpRangeMin(), m_processor->getAmpRangeMax());
 }
 
-bool SaSpectrumView::renderLogarithmicAmpTics() const
+bool SaSpectrumView::isRenderLogarithmicAmpTics() const
 {
 	return m_controls->m_logYModel.value();
 }
 
 std::vector<std::pair<float, std::string>> const & SaSpectrumView::getAmpTicsToRender() const
 {
-	if (renderLogarithmicAmpTics())
+	if (isRenderLogarithmicAmpTics())
 	{
 		return m_logAmpTics;
 	}
 	else
 	{
 		return m_linearAmpTics;
+	}
+}
+
+bool SaSpectrumView::isRenderLogarithmicFrequencyTics() const
+{
+	return m_controls->m_logXModel.value();
+}
+
+std::vector<std::pair<int, std::string>> const & SaSpectrumView::getFrequencyTicsToRender() const
+{
+	if (isRenderLogarithmicFrequencyTics())
+	{
+		return m_logFreqTics;
+	}
+	else
+	{
+		return m_linearFreqTics;
 	}
 }
 

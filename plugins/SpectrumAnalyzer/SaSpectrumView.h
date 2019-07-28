@@ -115,8 +115,11 @@ private:
 	float freqToXPixel(float frequency, unsigned int width);
 	float ampToYPixel(float amplitude, unsigned int height);
 
-	bool renderLogarithmicAmpTics() const;
+	bool isRenderLogarithmicAmpTics() const;
 	std::vector<std::pair<float, std::string>> const & getAmpTicsToRender() const;
+
+	bool isRenderLogarithmicFrequencyTics() const;
+	std::vector<std::pair<int, std::string>> const & getFrequencyTicsToRender() const;
 
 	// current boundaries for drawing
 	unsigned int m_displayTop;
