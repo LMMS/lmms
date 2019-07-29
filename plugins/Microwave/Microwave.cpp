@@ -5699,9 +5699,9 @@ void mSynth::nextStringSample(sampleFrame &outputSample, std::vector<float> (&m_
 
 
 // Takes input of original Hz and the number of cents to m_detune it by, and returns the detuned result in Hz.
-inline float mSynth::detuneWithCents(float pitchValue, float m_detuneValue)
+inline float mSynth::detuneWithCents(float pitchValue, float detuneValue)
 {
-	return pitchValue * std::exp2(m_detuneValue / 1200.f); 
+	return pitchValue * std::exp2(detuneValue / 1200.f); 
 }
 
 
