@@ -1123,7 +1123,7 @@ void TrackContentObjectView::mouseReleaseEvent( QMouseEvent * me )
 
 		leftTCO->setMarkerEnabled( false );
 
-		int relativePixelPos = me->pos().x();
+		const int relativePixelPos = me->pos().x();
 		const float ppt = m_trackView->trackContainerView()->pixelsPerTact();
 		MidiTime splitPos = relativePixelPos * MidiTime::ticksPerTact() / ppt;
 		const float snapSize = gui->songEditor()->m_editor->getSnapSize();
@@ -1133,10 +1133,10 @@ void TrackContentObjectView::mouseReleaseEvent( QMouseEvent * me )
 		  || me->modifiers() & Qt::AltModifier    ){}
 		else if ( me->modifiers() & Qt::ShiftModifier )
 		{	//If shift is held we quantize the length of the new left clip...
-			MidiTime leftPos = splitPos.quantize( snapSize );
+			const MidiTime leftPos = splitPos.quantize( snapSize );
 			//...or right clip...
-			MidiTime rightOff = m_tco->length() - splitPos;
-			MidiTime rightPos = m_tco->length() - rightOff.quantize( snapSize );
+			const MidiTime rightOff = m_tco->length() - splitPos;
+			const MidiTime rightPos = m_tco->length() - rightOff.quantize( snapSize );
 			//...whichever gives a position closer to the cursor
 			if ( abs(leftPos - splitPos) < abs(rightPos - splitPos) ) splitPos = leftPos;
 			else splitPos = rightPos;
@@ -1307,7 +1307,7 @@ MidiTime TrackContentObjectView::draggedTCOPos( QMouseEvent * me )
 int TrackContentObjectView::knifeMarkerPos( QMouseEvent * me )
 {
 	//Position relative to start of clip
-	int markerPos = me->pos().x();
+	const int markerPos = me->pos().x();
 
 	//In unquantized mode, we don't have to mess with the position at all
 	if ( me->modifiers() & Qt::ControlModifier
@@ -1322,15 +1322,13 @@ int TrackContentObjectView::knifeMarkerPos( QMouseEvent * me )
 		//2: Snap to the correct position, based on modifier keys
 		if ( me->modifiers() & Qt::ShiftModifier )
 		{	//If shift is held we quantize the length of the new left clip...
-			MidiTime leftPos = midiPos.quantize( snapSize );
+			const MidiTime leftPos = midiPos.quantize( snapSize );
 			//...or right clip...
-			MidiTime rightOff = m_tco->length() - midiPos;
-			MidiTime rightPos = m_tco->length() - rightOff.quantize( snapSize );
+			const MidiTime rightOff = m_tco->length() - midiPos;
+			const MidiTime rightPos = m_tco->length() - rightOff.quantize( snapSize );
 			//...whichever gives a position closer to the cursor
 			if ( abs(leftPos - midiPos) < abs(rightPos - midiPos) ) midiPos = leftPos;
 			else midiPos = rightPos;
-
-			markerPos = midiPos * ppt / MidiTime::ticksPerTact();
 		}
 		else {
 			midiPos = MidiTime(midiPos + m_initialTCOPos).quantize( snapSize ) - m_initialTCOPos;
