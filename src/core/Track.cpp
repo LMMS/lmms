@@ -1334,8 +1334,7 @@ int TrackContentObjectView::knifeMarkerPos( QMouseEvent * me )
 			midiPos = MidiTime(midiPos + m_initialTCOPos).quantize( snapSize ) - m_initialTCOPos;
 		}
 		//3: Convert back to a pixel position
-		markerPos = midiPos * ppt / MidiTime::ticksPerTact();
-		return markerPos;
+		return midiPos * ppt / MidiTime::ticksPerTact();
 	}
 }
 
