@@ -737,7 +737,6 @@ void TrackContentObjectView::mousePressEvent( QMouseEvent * me )
 			else if (sTco)
 			{
 				m_action = Split;
-				SampleTCO * sTco = dynamic_cast<SampleTCO*>( m_tco );
 				sTco->setMarkerPos( knifeMarkerPos( me ) );
 				sTco->setMarkerEnabled( true );
 				update();
@@ -840,6 +839,14 @@ void TrackContentObjectView::mousePressEvent( QMouseEvent * me )
 		else if( me->modifiers() & Qt::ShiftModifier && !fixedTCOs() )
 		{
 			remove();
+		}
+		if (m_action == Split){
+			m_action = NoAction;
+			SampleTCO * sTco = dynamic_cast<SampleTCO*>( m_tco );
+			if (sTco) {
+				sTco->setMarkerEnabled( false );
+				update();
+			}
 		}
 	}
 	else if( me->button() == Qt::MidButton )
