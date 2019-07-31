@@ -184,7 +184,6 @@ sf2Instrument::sf2Instrument( InstrumentTrack * _instrument_track ) :
 
 	InstrumentPlayHandle * iph = new InstrumentPlayHandle( this, _instrument_track );
 	Engine::mixer()->addPlayHandle( iph );
-
 }
 
 
@@ -270,7 +269,6 @@ void sf2Instrument::loadFile( const QString & _file )
 	}
 
 	// setting the first bank and patch number that is found
-	bool foundFirstPreset = false;
 	auto sSoundCount = ::fluid_synth_sfcount( m_synth );
 	for ( int i = 0; i < sSoundCount; ++i ) {
 		int iBank = 0;
@@ -290,21 +288,19 @@ void sf2Instrument::loadFile( const QString & _file )
 			fluid_preset_t *pCurPreset;
 #endif
 
-			while ( ( pCurPreset = fluid_sfont_iteration_next_wrapper( pSoundFont, pCurPreset ) ) ) {
+			if ( ( pCurPreset = fluid_sfont_iteration_next_wrapper( pSoundFont, pCurPreset ) ) ) {
+				iBank = fluid_preset_get_banknum( pCurPreset );
+				iProg = fluid_preset_get_num( pCurPreset );
+
 #ifdef CONFIG_FLUID_BANK_OFFSET
 				iBank += iBankOff;
 #endif
-				if ( pCurPreset && !foundFirstPreset ) {
-					iBank = fluid_preset_get_banknum( pCurPreset );
-					iProg = fluid_preset_get_num( pCurPreset );
 
-					::fluid_synth_bank_select( m_synth, 1, iBank );
-					::fluid_synth_program_change( m_synth, 1, iProg );
-					::fluid_synth_program_reset( m_synth );
-					m_bankNum.setValue( iBank );
-					m_patchNum.setValue( iProg );
-					foundFirstPreset = true;
-				}
+				::fluid_synth_bank_select( m_synth, 1, iBank );
+				::fluid_synth_program_change( m_synth, 1, iProg );
+				m_bankNum.setValue( iBank );
+				m_patchNum.setValue ( iProg );
+				break;
 			}
 		}
 	}
@@ -435,7 +431,6 @@ void sf2Instrument::openFile( const QString & _sf2File, bool updateTrackName )
 	{
 		instrumentTrack()->setName( QFileInfo( _sf2File ).baseName() );
 	}
-
 }
 
 
@@ -720,7 +715,6 @@ void sf2Instrument::noteOff( SF2PluginData * n )
 		fluid_synth_noteoff( m_synth, m_channel, n->midiNote );
 		m_synthMutex.unlock();
 	}
-
 }
 
 
@@ -736,7 +730,6 @@ void sf2Instrument::play( sampleFrame * _working_buffer )
 		m_synthMutex.lock();
 		fluid_synth_pitch_bend( m_synth, m_channel, m_lastMidiPitch );
 		m_synthMutex.unlock();
-
 	}
 
 	const int currentMidiPitchRange = instrumentTrack()->midiPitchRange();
@@ -852,7 +845,6 @@ void sf2Instrument::renderFrames( f_cnt_t frames, sampleFrame * buf )
 		fluid_synth_write_float( m_synth, frames, buf, 0, 2, buf, 1, 2 );
 	}
 	m_synthMutex.unlock();
-
 }
 
 
@@ -1049,7 +1041,6 @@ sf2InstrumentView::sf2InstrumentView( Instrument * _instrument, QWidget * _paren
 	setPalette( pal );
 
 	updateFilename();
-
 }
 
 
@@ -1088,7 +1079,6 @@ void sf2InstrumentView::modelChanged()
 	connect( k, SIGNAL( fileLoading() ), this, SLOT( invalidateFile() ) );
 
 	updateFilename();
-
 }
 
 
@@ -1123,8 +1113,6 @@ void sf2InstrumentView::updatePatchName()
 
 
 	update();
-
-
 }
 
 
@@ -1187,7 +1175,6 @@ void sf2InstrumentView::showPatchDialog()
 	pd.setup( k->m_synth, 1, k->instrumentTrack()->name(), &k->m_bankNum, &k->m_patchNum, m_patchLabel );
 
 	pd.exec();
-
 }
 
 
@@ -1203,6 +1190,3 @@ PLUGIN_EXPORT Plugin * lmms_plugin_main( Model *m, void * )
 
 
 }
-
-
-
