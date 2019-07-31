@@ -63,7 +63,7 @@ public:
 	MidiTime( const tact_t tact, const tick_t ticks );
 	MidiTime( const tick_t ticks = 0 );
 
-	MidiTime toNearestTact() const;
+	MidiTime quantize(float) const;
 	MidiTime toAbsoluteTact() const;
 
 	MidiTime& operator+=( const MidiTime& time );
@@ -110,4 +110,3 @@ private:
 
 
 #endif
-
