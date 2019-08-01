@@ -52,7 +52,7 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 	m_controlView( NULL )
 {
 	setFixedSize( 210, 60 );
-	
+
 	// Disable effects that are of type "DummyEffect"
 	bool isEnabled = !dynamic_cast<DummyEffect *>( effect() );
 	m_bypass = new LedCheckBox( this, "", isEnabled ? LedCheckBox::Green : LedCheckBox::Red );
@@ -97,27 +97,25 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 		m_controlView = effect()->controls()->createView();
 		if( m_controlView )
 		{
-			if( dynamic_cast<PeakControllerEffectControlDialog*>( m_controlView ) == NULL )
+			m_subWindow = gui->mainWindow()->addWindowedWidget( m_controlView );
+
+			if ( !m_controlView->isResizable() )
 			{
-				m_subWindow = gui->mainWindow()->addWindowedWidget(	m_controlView,
-											Qt::SubWindow | Qt::CustomizeWindowHint  |
-											Qt::WindowTitleHint | Qt::WindowSystemMenuHint );
 				m_subWindow->setSizePolicy( QSizePolicy::Fixed, QSizePolicy::Fixed );
-				m_subWindow->setFixedSize( m_subWindow->size() );
-
-				Qt::WindowFlags flags = m_subWindow->windowFlags();
-				flags &= ~Qt::WindowMaximizeButtonHint;
-				m_subWindow->setWindowFlags( flags );
-
-				connect( m_controlView, SIGNAL( closed() ),
-						 this, SLOT( closeEffects() ) );
-
-				m_subWindow->hide();
+				if (m_subWindow->layout())
+				{
+					m_subWindow->layout()->setSizeConstraint(QLayout::SetFixedSize);
+				}
 			}
-			else
-			{
-				gui->getControllerRackView()->subWin()->hide();
-			}
+
+			Qt::WindowFlags flags = m_subWindow->windowFlags();
+			flags &= ~Qt::WindowMaximizeButtonHint;
+			m_subWindow->setWindowFlags( flags );
+
+			connect( m_controlView, SIGNAL( closed() ),
+					this, SLOT( closeEffects() ) );
+
+			m_subWindow->hide();
 		}
 	}
 

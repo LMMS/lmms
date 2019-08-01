@@ -3978,7 +3978,11 @@ Bitte besuchen Sie http://lmms.sf.net/wiki für Dokumentationen über LMMS.</tra
     </message>
     <message>
         <source>E&amp;xport Tracks...</source>
-        <translation>E&amp;xport Tracks...</translation>
+        <translation>Tracks e&amp;xportieren...</translation>
+    </message>
+    <message>
+        <source>Export &amp;MIDI...</source>
+        <translation>&amp;MIDI exportieren...</translation>
     </message>
     <message>
         <source>Online Help</source>

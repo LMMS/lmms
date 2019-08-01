@@ -30,7 +30,6 @@
 #include <QtCore/QPoint>
 
 #include "AutomatableModelView.h"
-#include "templates.h"
 
 
 class QPixmap;
