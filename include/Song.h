@@ -317,6 +317,8 @@ public:
 
 	void addController( Controller * c );
 	void removeController( Controller * c );
+	void moveControllerUp(Controller * c);
+	void moveControllerDown(Controller *c);
 
 
 	const ControllerVector & controllers() const

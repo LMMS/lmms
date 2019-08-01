@@ -269,9 +269,9 @@ void ControllerView::contextMenuEvent(QContextMenuEvent *)
 	contextMenu->addAction(embed::getIconPixmap("stepper-down"), tr("&Expand all controllers"),
 												this, SIGNAL(expandAll())
 						   )->setDisabled(gui->getControllerRackView()->allExpanded());
-	contextMenu->addAction(embed::getIconPixmap("cancel"), tr("&Move up"), this, SLOT(moveUp())
+	contextMenu->addAction(embed::getIconPixmap("stepper-up"), tr("Move &up"), this, SLOT(moveUp())
 						   )->setDisabled(gui->getControllerRackView()->controllerViews().first() == this);
-	contextMenu->addAction(embed::getIconPixmap("cancel"), tr("&Move down"), this, SLOT(moveDown())
+	contextMenu->addAction(embed::getIconPixmap("stepper-down"), tr("Move &down"), this, SLOT(moveDown())
 						   )->setDisabled(gui->getControllerRackView()->controllerViews().last() == this);
 	contextMenu->addSeparator();
 	contextMenu->exec(QCursor::pos());

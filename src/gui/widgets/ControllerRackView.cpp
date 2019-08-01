@@ -237,6 +237,7 @@ void ControllerRackView::moveControllerUp(ControllerView *cv)
 		m_scrollAreaLayout->removeWidget(cv);
 		m_scrollAreaLayout->insertWidget(index - 1, cv);
 		m_controllerViews.move(index, index - 1);
+		Engine::getSong()->moveControllerUp(cv->getController());
 	}
 }
 
