@@ -24,6 +24,7 @@
  */
 
 #include <QLabel>
+#include <QLayout>
 #include <QPushButton>
 #include <QMdiArea>
 #include <QMdiSubWindow>
@@ -95,27 +96,34 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 		connect(ctls_btn, SIGNAL(clicked()), this, SLOT(editControls()));
 
 		m_controlView = effect()->controls()->createView();
-		if( m_controlView )
+		if (m_controlView)
 		{
-			m_subWindow = gui->mainWindow()->addWindowedWidget( m_controlView );
-
-			if ( !m_controlView->isResizable() )
+			if (dynamic_cast<PeakControllerEffectControlDialog*>(m_controlView) == nullptr)
 			{
-				m_subWindow->setSizePolicy( QSizePolicy::Fixed, QSizePolicy::Fixed );
-				if (m_subWindow->layout())
+				m_subWindow = gui->mainWindow()->addWindowedWidget( m_controlView );
+
+				if (!m_controlView->isResizable())
 				{
-					m_subWindow->layout()->setSizeConstraint(QLayout::SetFixedSize);
+					m_subWindow->setSizePolicy( QSizePolicy::Fixed, QSizePolicy::Fixed );
+					if (m_subWindow->layout())
+					{
+						m_subWindow->layout()->setSizeConstraint(QLayout::SetFixedSize);
+					}
 				}
+
+				Qt::WindowFlags flags = m_subWindow->windowFlags();
+				flags &= ~Qt::WindowMaximizeButtonHint;
+				m_subWindow->setWindowFlags( flags );
+
+				connect( m_controlView, SIGNAL( closed() ),
+						this, SLOT( closeEffects() ) );
+
+				m_subWindow->hide();
 			}
-
-			Qt::WindowFlags flags = m_subWindow->windowFlags();
-			flags &= ~Qt::WindowMaximizeButtonHint;
-			m_subWindow->setWindowFlags( flags );
-
-			connect( m_controlView, SIGNAL( closed() ),
-					this, SLOT( closeEffects() ) );
-
-			m_subWindow->hide();
+			else
+			{
+				gui->getControllerRackView()->subWin()->hide();
+			}
 		}
 	}
 

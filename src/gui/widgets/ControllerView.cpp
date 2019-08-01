@@ -29,6 +29,7 @@
 #include <QLabel>
 #include <QLayout>
 #include <QMessageBox>
+#include <QPainter>
 #include <QPushButton>
 
 
