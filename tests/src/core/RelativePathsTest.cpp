@@ -26,6 +26,7 @@
 
 #include "ConfigManager.h"
 #include "SampleBuffer.h"
+#include "PathUtil.h"
 
 #include <QDir>
 
@@ -45,6 +46,30 @@ private slots:
 		QCOMPARE(SampleBuffer::tryToMakeRelative(absPath), relPath);
 		QCOMPARE(SampleBuffer::tryToMakeAbsolute(relPath), absPath);
 		QCOMPARE(SampleBuffer::tryToMakeRelative(fuzPath), relPath);
+	}
+
+	void PathUtilComparisonTests()
+	{
+		QFileInfo fi(ConfigManager::inst()->factorySamplesDir() + "/drums/kick01.ogg");
+		QVERIFY(fi.exists());
+
+		QString absPath = fi.absoluteFilePath();
+		QString oldRelPath = "drums/kick01.ogg";
+		QString relPath = "factory:drums/kick01.ogg";
+		QString fuzPath = absPath;
+		fuzPath.replace(relPath, "drums/.///kick01.ogg");
+
+		//Test nicely formatted paths
+		QCOMPARE(PathUtil::toShortestRelative(absPath), relPath);
+		QCOMPARE(PathUtil::toAbsolute(relPath), absPath);
+
+		//Test upgrading old paths
+		QCOMPARE(PathUtil::toShortestRelative(oldRelPath), relPath);
+		QCOMPARE(PathUtil::toAbsolute(oldRelPath), absPath);
+
+		//Test weird but valid paths
+		QCOMPARE(PathUtil::toShortestRelative(fuzPath), relPath);
+		QCOMPARE(PathUtil::toAbsolute(fuzPath), absPath);
 	}
 } RelativePathTests;
 
