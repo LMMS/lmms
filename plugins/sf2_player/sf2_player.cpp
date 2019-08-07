@@ -392,7 +392,7 @@ void sf2Instrument::openFile( const QString & _sf2File, bool updateTrackName )
 
 	if( updateTrackName || instrumentTrack()->displayName() == displayName() )
 	{
-		instrumentTrack()->setName( QFileInfo( _sf2File ).baseName() );
+		instrumentTrack()->setName( PathUtil::cleanName( _sf2File ) );
 	}
 }
 

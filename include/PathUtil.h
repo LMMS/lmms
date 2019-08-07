@@ -12,8 +12,12 @@ namespace PathUtil
 	Base baseLookup( QString path );
 	QDir baseQDir ( Base base );
 
+	QString stripPrefix( QString path );
+	QString cleanName( QString path );
+
 	QString oldRelativeUpgrade( QString input );
 
+	QString cleanName( QString input );
 	QString toAbsolute( QString input );
 	QString relativeOrAbsolute( QString input, Base base );
 	QString toShortestRelative( QString input );

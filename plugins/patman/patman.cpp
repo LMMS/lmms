@@ -192,8 +192,7 @@ void patmanInstrument::setFile( const QString & _patch_file, bool _rename )
 				   	m_patchFile == "" ) )
 	{
 		// then set it to new one
-		instrumentTrack()->setName( QFileInfo( _patch_file
-								).fileName() );
+		instrumentTrack()->setName( PathUtil::cleanName( _patch_file ) );
 	}
 	// else we don't touch the instrument-track-name, because the user
 	// named it self

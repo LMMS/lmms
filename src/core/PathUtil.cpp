@@ -2,6 +2,7 @@
 
 #include <QDebug>
 #include <QDir>
+#include <QFileInfo>
 
 #include "ConfigManager.h"
 
@@ -35,6 +36,16 @@ namespace PathUtil
 			case SoundfontBase : return "soundfont:";
 			default            : return "";
 		}
+	}
+
+	QString stripPrefix( QString path )
+	{
+		return path.remove(0, basePrefix(baseLookup(path)).length() );
+	}
+
+	QString cleanName( QString path )
+	{
+		return stripPrefix( QFileInfo( path ).baseName() );
 	}
 
 	Base baseLookup( QString path )
