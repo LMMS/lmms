@@ -34,20 +34,6 @@ class RelativePathsTest : QTestSuite
 {
 	Q_OBJECT
 private slots:
-	void RelativePathComparisonTests()
-	{
-		QFileInfo fi(ConfigManager::inst()->factorySamplesDir() + "/drums/kick01.ogg");
-		QVERIFY(fi.exists());
-
-		QString absPath = fi.absoluteFilePath();
-		QString relPath = "drums/kick01.ogg";
-		QString fuzPath = absPath;
-		fuzPath.replace(relPath, "drums/.///kick01.ogg");
-		QCOMPARE(SampleBuffer::tryToMakeRelative(absPath), relPath);
-		QCOMPARE(SampleBuffer::tryToMakeAbsolute(relPath), absPath);
-		QCOMPARE(SampleBuffer::tryToMakeRelative(fuzPath), relPath);
-	}
-
 	void PathUtilComparisonTests()
 	{
 		QFileInfo fi(ConfigManager::inst()->factorySamplesDir() + "/drums/kick01.ogg");

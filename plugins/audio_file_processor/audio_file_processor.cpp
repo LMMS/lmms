@@ -97,13 +97,13 @@ audioFileProcessor::audioFileProcessor( InstrumentTrack * _instrument_track ) :
 				this, SLOT( loopPointChanged() ) );
 	connect( &m_stutterModel, SIGNAL( dataChanged() ),
 	    		this, SLOT( stutterModelChanged() ) );
-	    		
+
 //interpolation modes
 	m_interpolationModel.addItem( tr( "None" ) );
 	m_interpolationModel.addItem( tr( "Linear" ) );
 	m_interpolationModel.addItem( tr( "Sinc" ) );
 	m_interpolationModel.setValue( 1 );
-	
+
 	pointChanged();
 }
 
@@ -237,7 +237,7 @@ void audioFileProcessor::loadSettings( const QDomElement & _this )
 	{
 		setAudioFile( _this.attribute( "src" ), false );
 
-		QString absolutePath = m_sampleBuffer.tryToMakeAbsolute( m_sampleBuffer.audioFile() );
+		QString absolutePath = PathUtil::toAbsolute( m_sampleBuffer.audioFile() );
 		if ( !QFileInfo( absolutePath ).exists() )
 		{
 			QString message = tr( "Sample not found: %1" ).arg( m_sampleBuffer.audioFile() );
@@ -364,7 +364,7 @@ void audioFileProcessor::stutterModelChanged()
 }
 
 
-void audioFileProcessor::startPointChanged( void ) 
+void audioFileProcessor::startPointChanged( void )
 {
 	// check if start is over end and swap values if so
 	if( m_startPointModel.value() > m_endPointModel.value() )
@@ -391,7 +391,7 @@ void audioFileProcessor::startPointChanged( void )
 	{
 		m_endPointModel.setValue( qMin( m_endPointModel.value() + 0.001f, 1.0f ) );
 	}
-	
+
 	pointChanged();
 
 }
@@ -1285,7 +1285,3 @@ PLUGIN_EXPORT Plugin * lmms_plugin_main(Model * model, void *)
 
 
 }
-
-
-
-

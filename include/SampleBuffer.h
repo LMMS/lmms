@@ -37,6 +37,7 @@
 #include "lmms_math.h"
 #include "shared_object.h"
 #include "MemoryManager.h"
+#include "PathUtil.h"
 
 
 class QPainter;
@@ -84,7 +85,7 @@ public:
 		{
 			m_isBackwards = _backwards;
 		}
-		
+
 		int interpolationMode() const
 		{
 			return m_interpolationMode;
@@ -250,9 +251,6 @@ public:
 	{
 		m_varLock.unlock();
 	}
-
-	static QString tryToMakeRelative( const QString & _file );
-	static QString tryToMakeAbsolute(const QString & file);
 
 
 public slots:

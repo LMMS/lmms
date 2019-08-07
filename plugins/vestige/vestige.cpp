@@ -332,7 +332,7 @@ void vestigeInstrument::loadFile( const QString & _file )
 	{
 		closePlugin();
 	}
-	m_pluginDLL = SampleBuffer::tryToMakeRelative( _file );
+	m_pluginDLL = PathUtil::toShortestRelative( _file );
 	TextFloat * tf = NULL;
 	if( gui )
 	{
@@ -670,7 +670,7 @@ void VestigeInstrumentView::openPlugin()
 
 	if( m_vi->m_pluginDLL != "" )
 	{
-		QString f = SampleBuffer::tryToMakeAbsolute( m_vi->m_pluginDLL );
+		QString f = PathUtil::toAbsolute( m_vi->m_pluginDLL );
 		ofd.setDirectory( QFileInfo( f ).absolutePath() );
 		ofd.selectFile( QFileInfo( f ).fileName() );
 	}
@@ -1183,7 +1183,3 @@ Q_DECL_EXPORT Plugin * lmms_plugin_main( Model *m, void * )
 
 
 }
-
-
-
-

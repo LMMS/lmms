@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2007-2008 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
  * Copyright (c) 2009-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -198,8 +198,8 @@ void patmanInstrument::setFile( const QString & _patch_file, bool _rename )
 	// else we don't touch the instrument-track-name, because the user
 	// named it self
 
-	m_patchFile = SampleBuffer::tryToMakeRelative( _patch_file );
-	LoadErrors error = loadPatch( SampleBuffer::tryToMakeAbsolute( _patch_file ) );
+	m_patchFile = PathUtil::toShortestRelative( _patch_file );
+	LoadErrors error = loadPatch( PathUtil::toAbsolute( _patch_file ) );
 	if( error )
 	{
 		printf("Load error\n");
@@ -625,8 +625,8 @@ void PatmanView::paintEvent( QPaintEvent * )
 	QPainter p( this );
 
 	p.setFont( pointSize<8>( font() ) );
-	p.drawText( 8, 116, 235, 16, 
-			Qt::AlignLeft | Qt::TextSingleLine | Qt::AlignVCenter, 
+	p.drawText( 8, 116, 235, 16,
+			Qt::AlignLeft | Qt::TextSingleLine | Qt::AlignVCenter,
 			m_displayFilename );
 }
 
@@ -641,8 +641,3 @@ void PatmanView::modelChanged( void )
 	connect( m_pi, SIGNAL( fileChanged() ),
 			this, SLOT( updateFilename() ) );
 }
-
-
-
-
-

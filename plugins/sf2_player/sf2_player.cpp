@@ -335,8 +335,8 @@ void sf2Instrument::openFile( const QString & _sf2File, bool updateTrackName )
 	emit fileLoading();
 
 	// Used for loading file
-	char * sf2Ascii = qstrdup( qPrintable( SampleBuffer::tryToMakeAbsolute( _sf2File ) ) );
-	QString relativePath = SampleBuffer::tryToMakeRelative( _sf2File );
+	char * sf2Ascii = qstrdup( qPrintable( PathUtil::toAbsolute( _sf2File ) ) );
+	QString relativePath = PathUtil::toShortestRelative( _sf2File );
 
 	// free reference to soundfont if one is selected
 	freeFont();
@@ -1106,7 +1106,7 @@ void sf2InstrumentView::showFileDialog()
 
 	if( k->m_filename != "" )
 	{
-		QString f = SampleBuffer::tryToMakeAbsolute( k->m_filename );
+		QString f = PathUtil::toAbsolute( k->m_filename );
 		ofd.setDirectory( QFileInfo( f ).absolutePath() );
 		ofd.selectFile( QFileInfo( f ).fileName() );
 	}
@@ -1157,6 +1157,3 @@ PLUGIN_EXPORT Plugin * lmms_plugin_main( Model *m, void * )
 
 
 }
-
-
-
