@@ -315,6 +315,7 @@ public:
 	inline bool isMetronomeActive() const { return m_metronomeActive; }
 	inline void setMetronomeActive(bool value = true) { m_metronomeActive = value; }
 
+	//! Block until a change in model can be done (i.e. wait for audio thread)
 	void requestChangeInModel();
 	void doneChangeInModel();
 
@@ -366,6 +367,8 @@ private:
 
 	void clearInternal();
 
+	//! Called by the audio thread to give control to other threads,
+	//! such that they can do changes in the model (like e.g. removing effects)
 	void runChangesInModel();
 
 	bool m_renderOnly;

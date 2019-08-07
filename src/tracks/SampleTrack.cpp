@@ -529,7 +529,7 @@ void SampleTCOView::paintEvent( QPaintEvent * pe )
 	float nom = Engine::getSong()->getTimeSigModel().getNumerator();
 	float den = Engine::getSong()->getTimeSigModel().getDenominator();
 	float ticksPerTact = DefaultTicksPerTact * nom / den;
-	
+
 	float offset =  m_tco->startTimeOffset() / ticksPerTact * pixelsPerTact();
 	QRect r = QRect( TCO_BORDER_WIDTH + offset, spacing,
 			qMax( static_cast<int>( m_tco->sampleLength() * ppt / ticksPerTact ), 1 ), rect().bottom() - 2 * spacing );
@@ -710,9 +710,11 @@ TrackView * SampleTrack::createView( TrackContainerView* tcv )
 
 
 
-TrackContentObject * SampleTrack::createTCO( const MidiTime & )
+TrackContentObject * SampleTrack::createTCO(const MidiTime & pos)
 {
-	return new SampleTCO( this );
+	SampleTCO * sTco = new SampleTCO(this);
+	sTco->movePosition(pos);
+	return sTco;
 }
 
 
@@ -898,6 +900,45 @@ void SampleTrackView::modelChanged()
 
 	TrackView::modelChanged();
 }
+
+
+
+
+void SampleTrackView::dragEnterEvent(QDragEnterEvent *dee)
+{
+	StringPairDrag::processDragEnterEvent(dee, QString("samplefile"));
+}
+
+
+
+
+void SampleTrackView::dropEvent(QDropEvent *de)
+{
+	QString type  = StringPairDrag::decodeKey(de);
+	QString value = StringPairDrag::decodeValue(de);
+
+	if (type == "samplefile")
+	{
+		int trackHeadWidth = ConfigManager::inst()->value("ui", "compacttrackbuttons").toInt()==1
+				? DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT + TRACK_OP_WIDTH_COMPACT
+				: DEFAULT_SETTINGS_WIDGET_WIDTH + TRACK_OP_WIDTH;
+
+		int xPos = de->pos().x() < trackHeadWidth
+				? trackHeadWidth
+				: de->pos().x();
+
+		MidiTime tcoPos = trackContainerView()->fixedTCOs()
+				? MidiTime(0)
+				: MidiTime(((xPos - trackHeadWidth) / trackContainerView()->pixelsPerTact()
+							* MidiTime::ticksPerTact()) + trackContainerView()->currentPosition()
+						).quantize(1.0);
+
+		SampleTCO * sTco = static_cast<SampleTCO*>(getTrack()->createTCO(tcoPos));
+		if (sTco) { sTco->setSampleFile(value); }
+	}
+
+}
+
 
 
 
@@ -1151,4 +1192,3 @@ void SampleTrackWindow::loadSettings(const QDomElement& element)
 		m_stv->m_tlb->setChecked(true);
 	}
 }
-

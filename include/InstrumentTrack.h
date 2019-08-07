@@ -221,6 +221,7 @@ signals:
 	void midiNoteOff( const Note& );
 	void nameChanged();
 	void newNote();
+	void endNote();
 
 
 protected:

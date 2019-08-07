@@ -40,6 +40,8 @@ public:
 	EffectControlDialog( EffectControls * _controls );
 	virtual ~EffectControlDialog();
 
+	virtual bool isResizable() const {return false;}
+
 
 signals:
 	void closed();

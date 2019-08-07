@@ -223,7 +223,7 @@ private:
 
 
 
-class sfxrInstrumentView : public InstrumentView
+class sfxrInstrumentView : public InstrumentViewFixedSize
 {
 	Q_OBJECT
 public:

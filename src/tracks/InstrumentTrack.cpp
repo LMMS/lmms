@@ -422,6 +422,7 @@ void InstrumentTrack::processOutEvent( const MidiEvent& event, const MidiTime& t
 				m_instrument->handleMidiEvent( MidiEvent( MidiNoteOff, midiPort()->realOutputChannel(), key, 0 ), time, offset );
 			}
 			m_midiNotesMutex.unlock();
+			emit endNote();
 			break;
 
 		default:
@@ -976,6 +977,8 @@ InstrumentTrackView::InstrumentTrackView( InstrumentTrack * _it, TrackContainerV
 							QPalette::Background),
 						QApplication::palette().color( QPalette::Active,
 							QPalette::BrightText ),
+						QApplication::palette().color( QPalette::Active,
+							QPalette::BrightText).darker(),
 						getTrackSettingsWidget() );
 	m_activityIndicator->setGeometry(
 					 widgetWidth-2*24-11, 2, 8, 28 );
@@ -986,6 +989,8 @@ InstrumentTrackView::InstrumentTrackView( InstrumentTrack * _it, TrackContainerV
 				this, SLOT( activityIndicatorReleased() ) );
 	connect( _it, SIGNAL( newNote() ),
 			 m_activityIndicator, SLOT( activate() ) );
+	connect( _it, SIGNAL( endNote() ),
+	 		m_activityIndicator, SLOT( noteEnd() ) );
 	connect( &_it->m_mutedModel, SIGNAL( dataChanged() ), this, SLOT( muteChanged() ) );
 
 	setModel( _it );
@@ -1456,6 +1461,8 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 	adjustTabSize(m_ssView);
 	adjustTabSize(instrumentFunctions);
 	adjustTabSize(m_effectView);
+	// stupid bugfix, no one knows why
+	m_effectView->resize(INSTRUMENT_WIDTH - 4, INSTRUMENT_HEIGHT - 4 - 1);
 	adjustTabSize(m_midiView);
 	adjustTabSize(m_miscView);
 

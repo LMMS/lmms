@@ -803,7 +803,7 @@ PluginView * lb302Synth::instantiateView( QWidget * _parent )
 
 
 lb302SynthView::lb302SynthView( Instrument * _instrument, QWidget * _parent ) :
-	InstrumentView( _instrument, _parent )
+	InstrumentViewFixedSize( _instrument, _parent )
 {
 	// GUI
 	m_vcfCutKnob = new Knob( knobBright_26, this );

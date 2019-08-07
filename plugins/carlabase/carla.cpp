@@ -460,7 +460,7 @@ void CarlaInstrument::sampleRateChanged()
 // -------------------------------------------------------------------
 
 CarlaInstrumentView::CarlaInstrumentView(CarlaInstrument* const instrument, QWidget* const parent)
-    : InstrumentView(instrument, parent),
+    : InstrumentViewFixedSize(instrument, parent),
       fHandle(instrument->fHandle),
       fDescriptor(instrument->fDescriptor),
       fTimerId(fHandle != NULL && fDescriptor->ui_idle != NULL ? startTimer(30) : 0)

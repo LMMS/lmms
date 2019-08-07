@@ -2,7 +2,7 @@
  * TimeLineWidget.cpp - class timeLine, representing a time-line with position marker
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -310,40 +310,36 @@ void TimeLineWidget::mousePressEvent( QMouseEvent* event )
 		m_action = SelectSongTCO;
 		m_initalXSelect = event->x();
 	}
-	else if( event->button() == Qt::RightButton || event->button() == Qt::MiddleButton )
+	else if( event->button() == Qt::RightButton )
 	{
-        	m_moveXOff = s_posMarkerPixmap->width() / 2;
-		const MidiTime t = m_begin + static_cast<int>( event->x() * MidiTime::ticksPerTact() / m_ppt );
+		m_moveXOff = s_posMarkerPixmap->width() / 2;
+		const MidiTime t = m_begin + static_cast<int>( qMax( event->x() - m_xOffset - m_moveXOff, 0 ) * MidiTime::ticksPerTact() / m_ppt );
+		const MidiTime loopMid = ( m_loopPos[0] + m_loopPos[1] ) / 2;
+
+		if( t < loopMid )
+		{
+			m_action = MoveLoopBegin;
+		}
+		else if( t > loopMid )
+		{
+			m_action = MoveLoopEnd;
+		}
+
 		if( m_loopPos[0] > m_loopPos[1]  )
 		{
 			qSwap( m_loopPos[0], m_loopPos[1] );
 		}
-		if( ( event->modifiers() & Qt::ShiftModifier ) || event->button() == Qt::MiddleButton )
-		{
-			m_action = MoveLoopBegin;
-		}
-		else
-		{
-			m_action = MoveLoopEnd;
-		}
+
 		m_loopPos[( m_action == MoveLoopBegin ) ? 0 : 1] = t;
 	}
 
-	if( m_action == MoveLoopBegin )
+	if( m_action == MoveLoopBegin || m_action == MoveLoopEnd )
 	{
 		delete m_hint;
 		m_hint = TextFloat::displayMessage( tr( "Hint" ),
 					tr( "Press <%1> to disable magnetic loop points." ).arg(UI_CTRL_KEY),
 					embed::getIconPixmap( "hint" ), 0 );
 	}
-	else if( m_action == MoveLoopEnd )
-	{
-		delete m_hint;
-		m_hint = TextFloat::displayMessage( tr( "Hint" ),
-					tr( "Hold <Shift> to move the begin loop point; Press <%1> to disable magnetic loop points." ).arg(UI_CTRL_KEY),
-					embed::getIconPixmap( "hint" ), 0 );
-	}
-
 	mouseMoveEvent( event );
 }
 
@@ -374,7 +370,7 @@ void TimeLineWidget::mouseMoveEvent( QMouseEvent* event )
 		case MoveLoopBegin:
 		case MoveLoopEnd:
 		{
-			const int i = m_action - MoveLoopBegin;
+			const int i = m_action - MoveLoopBegin; // i == 0 || i == 1
 			if( event->modifiers() & Qt::ControlModifier )
 			{
 				// no ctrl-press-hint when having ctrl pressed
@@ -384,14 +380,14 @@ void TimeLineWidget::mouseMoveEvent( QMouseEvent* event )
 			}
 			else
 			{
-				m_loopPos[i] = t.toNearestTact();
+				m_loopPos[i] = t.quantize(1.0);
 			}
 			// Catch begin == end
 			if( m_loopPos[0] == m_loopPos[1] )
 			{
 				// Note, swap 1 and 0 below and the behavior "skips" the other
 				// marking instead of pushing it.
-				if( m_action == MoveLoopBegin ) 
+				if( m_action == MoveLoopBegin )
 					m_loopPos[0] -= MidiTime::ticksPerTact();
 				else
 					m_loopPos[1] += MidiTime::ticksPerTact();
