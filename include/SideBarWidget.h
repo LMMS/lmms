@@ -28,6 +28,7 @@
 #include <QPixmap>
 #include <QVBoxLayout>
 #include <QWidget>
+#include <QToolButton>
 
 
 class SideBarWidget : public QWidget
@@ -47,6 +48,11 @@ public:
 		return m_title;
 	}
 
+public slots:
+	void closeButtonClick();
+
+signals:
+	void closeButtonClicked(QWidget *);
 
 protected:
 	virtual void paintEvent( QPaintEvent * _pe );
@@ -75,6 +81,7 @@ private:
 	QVBoxLayout * m_layout;
 	QString m_title;
 	QPixmap m_icon;
+	QToolButton * m_closeBtn;
 
 } ;
 

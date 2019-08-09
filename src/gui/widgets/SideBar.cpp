@@ -121,6 +121,28 @@ void SideBar::appendTab( SideBarWidget *widget )
 	widget->setMinimumWidth( 200 );
 
 	ToolTip::add( button, widget->title() );
+
+	connect(widget, SIGNAL(closeButtonClicked(QWidget *)),
+		this, SLOT(toggleWidget(QWidget *)));
+}
+
+
+
+
+void SideBar::toggleWidget(QWidget * widget)
+{
+	for(auto it = m_widgets.begin(); it != m_widgets.end(); ++it)
+	{
+		QToolButton *curBtn = it.key();
+		QWidget *curWidget = it.value();
+
+		if(curWidget == widget)
+		{
+			curWidget->hide();
+			curBtn->setChecked(false);
+			curBtn->setToolButtonStyle(Qt::ToolButtonIconOnly);
+		}
+	}
 }
 
 

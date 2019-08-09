@@ -22,11 +22,11 @@
  *
  */
 
+#include "SideBarWidget.h"
+
 #include <QApplication>
 #include <QFontMetrics>
 #include <QPainter>
-
-#include "SideBarWidget.h"
 
 
 SideBarWidget::SideBarWidget( const QString & _title, const QPixmap & _icon,
@@ -39,6 +39,10 @@ SideBarWidget::SideBarWidget( const QString & _title, const QPixmap & _icon,
 	m_layout = new QVBoxLayout( m_contents );
 	m_layout->setSpacing( 5 );
 	m_layout->setMargin( 0 );
+	m_closeBtn = new QToolButton(this);
+	m_closeBtn->setText(QString("X"));
+	connect(m_closeBtn, SIGNAL(released()),
+		this, SLOT(closeButtonClick()));
 }
 
 
@@ -46,6 +50,14 @@ SideBarWidget::SideBarWidget( const QString & _title, const QPixmap & _icon,
 
 SideBarWidget::~SideBarWidget()
 {
+}
+
+
+
+
+void SideBarWidget::closeButtonClick()
+{
+	emit closeButtonClicked(this);
 }
 
 
@@ -80,6 +92,7 @@ void SideBarWidget::resizeEvent( QResizeEvent * )
 	const int MARGIN = 6;
 	m_contents->setGeometry( MARGIN, 40 + MARGIN, width() - MARGIN * 2,
 						height() - MARGIN * 2 - 40 );
+	m_closeBtn->move( m_contents->geometry().width() - MARGIN - 5, 5 );
 }
 
 
