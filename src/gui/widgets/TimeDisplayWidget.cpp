@@ -109,28 +109,36 @@ void TimeDisplayWidget::updateTime()
 {
 	Song* s = Engine::getSong();
 
+	int major = 0;
+	int minor = 0;
+	int milliSeconds = 0;
+
 	switch( m_displayMode )
 	{
 		case MinutesSeconds:
 			int msec;
 			msec = s->getMilliseconds();
-			m_majorValue.setNum(msec / 60000);
-			m_minorValue.setNum((msec / 1000 ) % 60);
-			m_milliSecondsValue.setNum(msec % 1000);
+			major = msec / 60000;
+			minor = (msec / 1000) % 60;
+			milliSeconds = msec % 1000;
 			break;
 
 		case BarsTicks:
 			int tick;
 			tick = s->getPlayPos().getTicks();
-			m_majorValue.setNum((int)(tick / s->ticksPerTact() ) + 1);
-			m_minorValue.setNum( ( tick % s->ticksPerTact() ) /
-						 ( s->ticksPerTact() / s->getTimeSigModel().getNumerator() ) +1 );
-			m_milliSecondsValue.setNum((tick % s->ticksPerTact()) %
-							(s->ticksPerTact() / s->getTimeSigModel().getNumerator()));
+			major = (int)(tick / s->ticksPerTact()) + 1;
+			minor = (tick % s->ticksPerTact()) /
+						 (s->ticksPerTact() / s->getTimeSigModel().getNumerator()) +1;
+			milliSeconds = (tick % s->ticksPerTact()) %
+							(s->ticksPerTact() / s->getTimeSigModel().getNumerator());
 			break;
 
 		default: break;
 	}
+
+	m_majorValue.setText( QString::number( major ).rightJustified( 4, '0' ) );
+	m_minorValue.setText( QString::number( minor ).rightJustified( 2, '0' ).prepend( ':' ) );
+	m_milliSecondsValue.setText( QString::number( milliSeconds ).rightJustified( 3, '0' ).prepend( '.' ) );
 }
 
 
