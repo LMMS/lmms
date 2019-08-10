@@ -53,12 +53,23 @@ TimeDisplayWidget::TimeDisplayWidget() :
 	m_spinBoxesLayout.addWidget( &m_milliSecondsLabel, 0, 2 );
 	m_spinBoxesLayout.addWidget( &m_milliSecondsValue, 1, 2 );
 
+	this->setStyleSheet( "background-color: rgba(0,0,0,70);" );
+
+	QString labelStyle = "font-size: 12px;";
+	QString valueStyle = "color: #0bd556; font-size: 32px;";
+
 	m_majorLabel.setAlignment(Qt::AlignRight);
+	m_majorLabel.setStyleSheet(labelStyle);
 	m_majorValue.setAlignment(Qt::AlignRight);
+	m_majorValue.setStyleSheet(valueStyle);
 	m_minorLabel.setAlignment(Qt::AlignRight);
+	m_minorLabel.setStyleSheet(labelStyle);
 	m_minorValue.setAlignment(Qt::AlignRight);
+	m_minorValue.setStyleSheet(valueStyle);
 	m_milliSecondsLabel.setAlignment(Qt::AlignRight);
+	m_milliSecondsLabel.setStyleSheet(labelStyle);
 	m_milliSecondsValue.setAlignment(Qt::AlignRight);
+	m_milliSecondsValue.setStyleSheet(valueStyle);
 
 	ToolTip::add( this, tr( "Time units" ) );
 
