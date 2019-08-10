@@ -113,12 +113,15 @@ SongEditor::SongEditor( Song * song ) :
 
 	gui->mainWindow()->addSpacingToToolBar( 40 );
 
+	gui->mainWindow()->addWidgetToToolBar( new TimeDisplayWidget );
+	gui->mainWindow()->addSpacingToToolBar( 40 );
+
 	m_tempoSpinBox = new LcdSpinBox( 3, tb, tr( "Tempo" ) );
 	m_tempoSpinBox->setModel( &m_song->m_tempoModel );
 	m_tempoSpinBox->setLabel( tr( "TEMPO" ) );
 	ToolTip::add( m_tempoSpinBox, tr( "Tempo in BPM" ) );
 
-	int tempoSpinBoxCol = gui->mainWindow()->addWidgetToToolBar( m_tempoSpinBox, 0 );
+	gui->mainWindow()->addWidgetToToolBar( m_tempoSpinBox);
 
 #if 0
 	toolButton * hq_btn = new toolButton( embed::getIconPixmap( "hq_mode" ),
@@ -130,8 +133,6 @@ SongEditor::SongEditor( Song * song ) :
 	hq_btn->setFixedWidth( 42 );
 	gui->mainWindow()->addWidgetToToolBar( hq_btn, 1, col );
 #endif
-
-	gui->mainWindow()->addWidgetToToolBar( new TimeDisplayWidget, 1, tempoSpinBoxCol );
 
 	gui->mainWindow()->addSpacingToToolBar( 10 );
 

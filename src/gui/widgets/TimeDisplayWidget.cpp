@@ -47,8 +47,6 @@ TimeDisplayWidget::TimeDisplayWidget() :
 	m_spinBoxesLayout.addWidget( &m_minorLCD );
 	m_spinBoxesLayout.addWidget( &m_milliSecondsLCD );
 
-	setMaximumHeight( 32 );
-
 	ToolTip::add( this, tr( "Time units" ) );
 
 	// update labels of LCD spinboxes
