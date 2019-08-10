@@ -37,15 +37,20 @@ TimeDisplayWidget::TimeDisplayWidget() :
 	QWidget(),
 	m_displayMode( MinutesSeconds ),
 	m_spinBoxesLayout( this ),
-	m_majorLCD( 4, this ),
+	m_majorLabel( this ),
+	m_majorValue( this ),
 	m_minorLCD( 2, this ),
 	m_milliSecondsLCD( 3, this )
 {
 	m_spinBoxesLayout.setSpacing( 0 );
 	m_spinBoxesLayout.setMargin( 0 );
-	m_spinBoxesLayout.addWidget( &m_majorLCD, 0, 0 );
+	m_spinBoxesLayout.addWidget( &m_majorLabel, 0, 0 );
+	m_spinBoxesLayout.addWidget( &m_majorValue, 1, 0 );
 	m_spinBoxesLayout.addWidget( &m_minorLCD, 0, 1 );
 	m_spinBoxesLayout.addWidget( &m_milliSecondsLCD, 0, 2 );
+
+	m_majorLabel.setAlignment(Qt::AlignRight);
+	m_majorValue.setAlignment(Qt::AlignRight);
 
 	ToolTip::add( this, tr( "Time units" ) );
 
@@ -63,13 +68,13 @@ void TimeDisplayWidget::setDisplayMode( DisplayMode displayMode )
 	switch( m_displayMode )
 	{
 		case MinutesSeconds:
-			m_majorLCD.setLabel( tr( "MIN" ) );
+			m_majorLabel.setText( tr( "MIN" ) );
 			m_minorLCD.setLabel( tr( "SEC" ) );
 			m_milliSecondsLCD.setLabel( tr( "MSEC" ) );
 			break;
 
 		case BarsTicks:
-			m_majorLCD.setLabel( tr( "BAR" ) );
+			m_majorLabel.setText( tr( "BAR" ) );
 			m_minorLCD.setLabel( tr( "BEAT" ) );
 			m_milliSecondsLCD.setLabel( tr( "TICK" ) );
 			break;
@@ -90,7 +95,7 @@ void TimeDisplayWidget::updateTime()
 		case MinutesSeconds:
 			int msec;
 			msec = s->getMilliseconds();
-			m_majorLCD.setValue(msec / 60000);
+			m_majorValue.setNum(msec / 60000);
 			m_minorLCD.setValue((msec / 1000) % 60);
 			m_milliSecondsLCD.setValue(msec % 1000);
 			break;
@@ -98,7 +103,7 @@ void TimeDisplayWidget::updateTime()
 		case BarsTicks:
 			int tick;
 			tick = s->getPlayPos().getTicks();
-			m_majorLCD.setValue((int)(tick / s->ticksPerTact()) + 1);
+			m_majorValue.setNum((int)(tick / s->ticksPerTact() ) + 1);
 			m_minorLCD.setValue((tick % s->ticksPerTact()) /
 						 (s->ticksPerTact() / s->getTimeSigModel().getNumerator() ) +1);
 			m_milliSecondsLCD.setValue((tick % s->ticksPerTact()) %

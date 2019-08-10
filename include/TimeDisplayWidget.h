@@ -28,6 +28,7 @@
 
 #include <QWidget>
 #include <QGridLayout>
+#include <QLabel>
 
 #include "LcdWidget.h"
 
@@ -61,7 +62,8 @@ private:
 
 	DisplayMode m_displayMode;
 	QGridLayout m_spinBoxesLayout;
-	LcdWidget m_majorLCD;
+	QLabel m_majorLabel;
+	QLabel m_majorValue;
 	LcdWidget m_minorLCD;
 	LcdWidget m_milliSecondsLCD;
 
