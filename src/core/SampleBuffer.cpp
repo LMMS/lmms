@@ -54,9 +54,9 @@
 #include "Engine.h"
 #include "GuiApplication.h"
 #include "Mixer.h"
+#include "PathUtil.h"
 
 #include "FileDialog.h"
-
 
 
 SampleBuffer::SampleBuffer() :
