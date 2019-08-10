@@ -34,7 +34,7 @@
 
 
 TimeDisplayWidget::TimeDisplayWidget() :
-	QWidget(),
+	QFrame(),
 	m_displayMode( MinutesSeconds ),
 	m_spinBoxesLayout( this ),
 	m_majorLabel( this ),
@@ -53,10 +53,10 @@ TimeDisplayWidget::TimeDisplayWidget() :
 	m_spinBoxesLayout.addWidget( &m_milliSecondsLabel, 0, 2 );
 	m_spinBoxesLayout.addWidget( &m_milliSecondsValue, 1, 2 );
 
-	this->setStyleSheet( "background-color: rgba(0,0,0,70);" );
+	this->setStyleSheet( "TimeDisplayWidget { border-radius: 4px; background-color: rgba(0,0,0,70); margin: 8px; padding: 4px; }" );
 
-	QString labelStyle = "font-size: 12px;";
-	QString valueStyle = "color: #0bd556; font-size: 32px;";
+	QString labelStyle = "font-size: 10px;";
+	QString valueStyle = "color: #0bd556; font-size: 24px;";
 
 	m_majorLabel.setAlignment(Qt::AlignRight);
 	m_majorLabel.setStyleSheet(labelStyle);

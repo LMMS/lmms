@@ -26,14 +26,14 @@
 #ifndef _TIME_DISPLAY_WIDGET
 #define _TIME_DISPLAY_WIDGET
 
-#include <QWidget>
+#include <QFrame>
 #include <QGridLayout>
 #include <QLabel>
 
 #include "LcdWidget.h"
 
 
-class TimeDisplayWidget : public QWidget
+class TimeDisplayWidget : public QFrame
 {
 	Q_OBJECT
 public:
