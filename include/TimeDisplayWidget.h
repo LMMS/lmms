@@ -27,7 +27,7 @@
 #define _TIME_DISPLAY_WIDGET
 
 #include <QWidget>
-#include <QHBoxLayout>
+#include <QGridLayout>
 
 #include "LcdWidget.h"
 
@@ -60,7 +60,7 @@ private:
 	void setDisplayMode( DisplayMode displayMode );
 
 	DisplayMode m_displayMode;
-	QHBoxLayout m_spinBoxesLayout;
+	QGridLayout m_spinBoxesLayout;
 	LcdWidget m_majorLCD;
 	LcdWidget m_minorLCD;
 	LcdWidget m_milliSecondsLCD;

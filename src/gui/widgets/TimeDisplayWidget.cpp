@@ -43,9 +43,9 @@ TimeDisplayWidget::TimeDisplayWidget() :
 {
 	m_spinBoxesLayout.setSpacing( 0 );
 	m_spinBoxesLayout.setMargin( 0 );
-	m_spinBoxesLayout.addWidget( &m_majorLCD );
-	m_spinBoxesLayout.addWidget( &m_minorLCD );
-	m_spinBoxesLayout.addWidget( &m_milliSecondsLCD );
+	m_spinBoxesLayout.addWidget( &m_majorLCD, 0, 0 );
+	m_spinBoxesLayout.addWidget( &m_minorLCD, 0, 1 );
+	m_spinBoxesLayout.addWidget( &m_milliSecondsLCD, 0, 2 );
 
 	ToolTip::add( this, tr( "Time units" ) );
 
