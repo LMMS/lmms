@@ -66,7 +66,8 @@ private:
 	QLabel m_majorValue;
 	QLabel m_minorLabel;
 	QLabel m_minorValue;
-	LcdWidget m_milliSecondsLCD;
+	QLabel m_milliSecondsLabel;
+	QLabel m_milliSecondsValue;
 
 } ;
 

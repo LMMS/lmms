@@ -41,7 +41,8 @@ TimeDisplayWidget::TimeDisplayWidget() :
 	m_majorValue( this ),
 	m_minorLabel( this ),
 	m_minorValue( this ),
-	m_milliSecondsLCD( 3, this )
+	m_milliSecondsLabel( this ),
+	m_milliSecondsValue( this )
 {
 	m_spinBoxesLayout.setSpacing( 0 );
 	m_spinBoxesLayout.setMargin( 0 );
@@ -49,12 +50,15 @@ TimeDisplayWidget::TimeDisplayWidget() :
 	m_spinBoxesLayout.addWidget( &m_majorValue, 1, 0 );
 	m_spinBoxesLayout.addWidget( &m_minorLabel, 0, 1 );
 	m_spinBoxesLayout.addWidget( &m_minorValue, 1, 1 );
-	m_spinBoxesLayout.addWidget( &m_milliSecondsLCD, 0, 2 );
+	m_spinBoxesLayout.addWidget( &m_milliSecondsLabel, 0, 2 );
+	m_spinBoxesLayout.addWidget( &m_milliSecondsValue, 1, 2 );
 
 	m_majorLabel.setAlignment(Qt::AlignRight);
 	m_majorValue.setAlignment(Qt::AlignRight);
 	m_minorLabel.setAlignment(Qt::AlignRight);
 	m_minorValue.setAlignment(Qt::AlignRight);
+	m_milliSecondsLabel.setAlignment(Qt::AlignRight);
+	m_milliSecondsValue.setAlignment(Qt::AlignRight);
 
 	ToolTip::add( this, tr( "Time units" ) );
 
@@ -74,13 +78,13 @@ void TimeDisplayWidget::setDisplayMode( DisplayMode displayMode )
 		case MinutesSeconds:
 			m_majorLabel.setText( tr( "MIN" ) );
 			m_minorLabel.setText( tr( "SEC" ) );
-			m_milliSecondsLCD.setLabel( tr( "MSEC" ) );
+			m_milliSecondsLabel.setText( tr( "MSEC" ) );
 			break;
 
 		case BarsTicks:
 			m_majorLabel.setText( tr( "BAR" ) );
 			m_minorLabel.setText( tr( "BEAT" ) );
-			m_milliSecondsLCD.setLabel( tr( "TICK" ) );
+			m_milliSecondsLabel.setText( tr( "TICK" ) );
 			break;
 
 		default: break;
@@ -101,7 +105,7 @@ void TimeDisplayWidget::updateTime()
 			msec = s->getMilliseconds();
 			m_majorValue.setNum(msec / 60000);
 			m_minorValue.setNum((msec / 1000 ) % 60);
-			m_milliSecondsLCD.setValue(msec % 1000);
+			m_milliSecondsValue.setNum(msec % 1000);
 			break;
 
 		case BarsTicks:
@@ -110,7 +114,7 @@ void TimeDisplayWidget::updateTime()
 			m_majorValue.setNum((int)(tick / s->ticksPerTact() ) + 1);
 			m_minorValue.setNum( ( tick % s->ticksPerTact() ) /
 						 ( s->ticksPerTact() / s->getTimeSigModel().getNumerator() ) +1 );
-			m_milliSecondsLCD.setValue((tick % s->ticksPerTact()) %
+			m_milliSecondsValue.setNum((tick % s->ticksPerTact()) %
 							(s->ticksPerTact() / s->getTimeSigModel().getNumerator()));
 			break;
 
