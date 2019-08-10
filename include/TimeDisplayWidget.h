@@ -64,7 +64,8 @@ private:
 	QGridLayout m_spinBoxesLayout;
 	QLabel m_majorLabel;
 	QLabel m_majorValue;
-	LcdWidget m_minorLCD;
+	QLabel m_minorLabel;
+	QLabel m_minorValue;
 	LcdWidget m_milliSecondsLCD;
 
 } ;
