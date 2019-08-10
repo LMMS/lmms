@@ -56,6 +56,7 @@
 #include "TextFloat.h"
 #include "ToolTip.h"
 #include "FileDialog.h"
+#include "PathUtil.h"
 
 
 #include "embed.h"

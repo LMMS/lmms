@@ -41,6 +41,7 @@
 #include "ToolTip.h"
 #include "FileDialog.h"
 #include "ConfigManager.h"
+#include "PathUtil.h"
 
 #include "embed.h"
 

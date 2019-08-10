@@ -40,6 +40,7 @@
 #include "Knob.h"
 #include "SampleBuffer.h"
 #include "Song.h"
+#include "PathUtil.h"
 
 #include "patches_dialog.h"
 #include "ToolTip.h"

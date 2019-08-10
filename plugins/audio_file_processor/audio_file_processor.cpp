@@ -43,6 +43,7 @@
 #include "ToolTip.h"
 #include "StringPairDrag.h"
 #include "DataFile.h"
+#include "PathUtil.h"
 
 #include "embed.h"
 #include "plugin_export.h"

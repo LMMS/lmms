@@ -47,6 +47,7 @@
 #include "Song.h"
 #include "ConfigManager.h"
 #include "endian_handling.h"
+#include "PathUtil.h"
 
 #include "PatchesDialog.h"
 #include "ToolTip.h"
