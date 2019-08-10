@@ -8,16 +8,15 @@ namespace PathUtil
 	enum Base { AbsoluteBase, FactoryBase, SampleBase, VSTBase, SoundfontBase };
 
 	QString baseLocation( Base base );
+	QDir baseQDir ( Base base );
 	QString basePrefix( Base base );
 	Base baseLookup( QString path );
-	QDir baseQDir ( Base base );
 
 	QString stripPrefix( QString path );
 	QString cleanName( QString path );
 
 	QString oldRelativeUpgrade( QString input );
 
-	QString cleanName( QString input );
 	QString toAbsolute( QString input );
 	QString relativeOrAbsolute( QString input, Base base );
 	QString toShortestRelative( QString input );

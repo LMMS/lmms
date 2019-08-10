@@ -26,6 +26,8 @@ namespace PathUtil
 		}
 	}
 
+	QDir baseQDir ( Base base ) { return QDir( baseLocation(base) ); }
+
 	QString basePrefix( Base base )
 	{
 		switch (base)
@@ -38,16 +40,6 @@ namespace PathUtil
 		}
 	}
 
-	QString stripPrefix( QString path )
-	{
-		return path.remove(0, basePrefix(baseLookup(path)).length() );
-	}
-
-	QString cleanName( QString path )
-	{
-		return stripPrefix( QFileInfo( path ).baseName() );
-	}
-
 	Base baseLookup( QString path )
 	{
 		for (auto base: relativeBases)
@@ -58,7 +50,21 @@ namespace PathUtil
 		return AbsoluteBase;
 	}
 
-	QDir baseQDir ( Base base ) { return QDir( baseLocation(base) ); }
+
+
+
+	QString stripPrefix( QString path )
+	{
+		return path.remove(0, basePrefix(baseLookup(path)).length() );
+	}
+
+	QString cleanName( QString path )
+	{
+		return stripPrefix( QFileInfo( path ).baseName() );
+	}
+
+
+
 
 	QString oldRelativeUpgrade( QString input )
 	{
@@ -67,6 +73,9 @@ namespace PathUtil
 		//If we can't find a factory sample, it's probably a user sample
 		return factoryInfo.exists() ? "factory:" + input : "sample:" + input;
 	}
+
+
+
 
 	QString toAbsolute( QString input )
 	{
