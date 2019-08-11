@@ -263,7 +263,7 @@ void vestigeInstrument::reloadPlugin()
 
 void vestigeInstrument::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
-	_this.setAttribute( "plugin", m_pluginDLL );
+	_this.setAttribute( "plugin", PathUtils::toShortestRelative(m_pluginDLL) );
 	m_pluginMutex.lock();
 	if( m_plugin != NULL )
 	{
@@ -332,7 +332,7 @@ void vestigeInstrument::loadFile( const QString & _file )
 	{
 		closePlugin();
 	}
-	m_pluginDLL = PathUtil::toShortestRelative( _file );
+	m_pluginDLL = PathUtil::toAbsolute( _file );
 	TextFloat * tf = NULL;
 	if( gui )
 	{
