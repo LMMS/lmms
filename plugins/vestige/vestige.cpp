@@ -263,7 +263,7 @@ void vestigeInstrument::reloadPlugin()
 
 void vestigeInstrument::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
-	_this.setAttribute( "plugin", PathUtils::toShortestRelative(m_pluginDLL) );
+	_this.setAttribute( "plugin", PathUtil::toShortestRelative(m_pluginDLL) );
 	m_pluginMutex.lock();
 	if( m_plugin != NULL )
 	{
