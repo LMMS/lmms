@@ -23,6 +23,8 @@
  *
  */
 
+#include "sf2_player.h"
+
 #include <QDebug>
 #include <QLayout>
 #include <QLabel>
@@ -30,17 +32,16 @@
 
 #include "ConfigManager.h"
 #include "FileDialog.h"
-#include "sf2_player.h"
 #include "ConfigManager.h"
 #include "Engine.h"
 #include "InstrumentTrack.h"
 #include "InstrumentPlayHandle.h"
+#include "Knob.h"
 #include "Mixer.h"
 #include "NotePlayHandle.h"
-#include "Knob.h"
+#include "PathUtil.h"
 #include "SampleBuffer.h"
 #include "Song.h"
-#include "PathUtil.h"
 
 #include "patches_dialog.h"
 #include "ToolTip.h"

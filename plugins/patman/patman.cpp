@@ -32,16 +32,15 @@
 #include "ConfigManager.h"
 #include "endian_handling.h"
 #include "Engine.h"
+#include "FileDialog.h"
 #include "gui_templates.h"
 #include "InstrumentTrack.h"
 #include "NotePlayHandle.h"
+#include "PathUtil.h"
 #include "PixmapButton.h"
 #include "Song.h"
 #include "StringPairDrag.h"
 #include "ToolTip.h"
-#include "FileDialog.h"
-#include "ConfigManager.h"
-#include "PathUtil.h"
 
 #include "embed.h"
 

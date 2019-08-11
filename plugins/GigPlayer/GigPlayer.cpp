@@ -28,6 +28,7 @@
  *
  */
 
+#include "GigPlayer.h"
 
 #include <cstring>
 #include <QDebug>
@@ -35,19 +36,18 @@
 #include <QLabel>
 #include <QDomDocument>
 
-#include "FileDialog.h"
-#include "GigPlayer.h"
-#include "Engine.h"
-#include "InstrumentTrack.h"
-#include "InstrumentPlayHandle.h"
-#include "Mixer.h"
-#include "NotePlayHandle.h"
-#include "Knob.h"
-#include "SampleBuffer.h"
-#include "Song.h"
 #include "ConfigManager.h"
 #include "endian_handling.h"
+#include "Engine.h"
+#include "FileDialog.h"
+#include "InstrumentTrack.h"
+#include "InstrumentPlayHandle.h"
+#include "Knob.h"
+#include "Mixer.h"
+#include "NotePlayHandle.h"
 #include "PathUtil.h"
+#include "SampleBuffer.h"
+#include "Song.h"
 
 #include "PatchesDialog.h"
 #include "ToolTip.h"

@@ -38,25 +38,24 @@
 #include <QMenu>
 #include <QDomElement>
 
-#include "ConfigManager.h"
 #include "BufferManager.h"
 #include "ConfigManager.h"
 #include "Engine.h"
+#include "FileDialog.h"
+#include "GuiApplication.h"
 #include "gui_templates.h"
 #include "InstrumentPlayHandle.h"
 #include "InstrumentTrack.h"
 #include "LocaleHelper.h"
 #include "MainWindow.h"
 #include "Mixer.h"
-#include "GuiApplication.h"
+#include "PathUtil.h"
 #include "PixmapButton.h"
 #include "SampleBuffer.h"
 #include "Song.h"
 #include "StringPairDrag.h"
 #include "TextFloat.h"
 #include "ToolTip.h"
-#include "FileDialog.h"
-#include "PathUtil.h"
 
 
 #include "embed.h"

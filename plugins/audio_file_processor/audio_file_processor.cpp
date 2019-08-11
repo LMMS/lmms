@@ -22,6 +22,7 @@
  *
  */
 
+#include "audio_file_processor.h"
 
 #include <QPainter>
 #include <QBitmap>
@@ -31,19 +32,17 @@
 
 #include <samplerate.h>
 
-#include "audio_file_processor.h"
 #include "ConfigManager.h"
+#include "DataFile.h"
 #include "Engine.h"
-#include "Song.h"
+#include "gui_templates.h"
 #include "InstrumentTrack.h"
+#include "interpolation.h"
 #include "Mixer.h"
 #include "NotePlayHandle.h"
-#include "interpolation.h"
-#include "gui_templates.h"
-#include "ToolTip.h"
+#include "Song.h"
 #include "StringPairDrag.h"
-#include "DataFile.h"
-#include "PathUtil.h"
+#include "ToolTip.h"
 
 #include "embed.h"
 #include "plugin_export.h"
