@@ -1,14 +1,24 @@
+# INSTALL_EXTERNAL_PROJECT: install a project created with ExternalProject_Add in the
+# parent project's install time.
+#
+# Description:
+# In a regular scenario, cmake will install external projects
+# BEFORE actually building the parent project. Since the building
+# process may use installed components from the project.
+# We want to give the external project the ability to install
+# files directly to the parent's install. Therefore, we have to
+# manually trigger the install stage with the parent's INSTALL_PREFIX.
+MACRO(INSTALL_EXTERNAL_PROJECT name)
+	ExternalProject_Get_Property(${name} BINARY_DIR)
+
+	install(CODE
+			"execute_process(COMMAND ${CMAKE_COMMAND} \"-DCMAKE_INSTALL_PREFIX=\${CMAKE_INSTALL_PREFIX}\" -P cmake_install.cmake
+        WORKING_DIRECTORY \"${BINARY_DIR}\")"
+	)
+ENDMACRO()
+
 IF(LMMS_BUILD_WIN32 AND NOT LMMS_BUILD_WIN64)
 	ADD_SUBDIRECTORY(RemoteVstPlugin)
-	IF(MSVC)
-		SET(VCPKG_ROOT "${CMAKE_FIND_ROOT_PATH}")
-		INSTALL(FILES "${VCPKG_ROOT}/bin/Qt5Core.dll" DESTINATION "${PLUGIN_DIR}/32")
-		INSTALL(FILES "${VCPKG_ROOT}/bin/zlib1.dll" DESTINATION "${PLUGIN_DIR}/32")
-	ELSE(MSVC)
-		INSTALL(FILES "${MINGW_PREFIX}/bin/Qt5Core.dll" DESTINATION "${PLUGIN_DIR}/32")
-		INSTALL(FILES "${MINGW_PREFIX}/bin/zlib1.dll" DESTINATION "${PLUGIN_DIR}/32")
-	ENDIF(MSVC)
-	INSTALL(PROGRAMS "${CMAKE_CURRENT_BINARY_DIR}/../32/RemoteVstPlugin32.exe" DESTINATION "${PLUGIN_DIR}/32")
 ELSEIF(LMMS_BUILD_WIN64 AND MSVC)
 	SET(MSVC_VER ${CMAKE_CXX_COMPILER_VERSION})
 
@@ -46,16 +56,7 @@ ELSEIF(LMMS_BUILD_WIN64 AND MSVC)
 			"-DCMAKE_PREFIX_PATH=${QT_32_PREFIX}"
 	)
 
-	INSTALL(PROGRAMS "${CMAKE_CURRENT_BINARY_DIR}/../32/RemoteVstPlugin32.exe" DESTINATION "${PLUGIN_DIR}/32")
-
-	#TODO: find a solution when not using vcpkg for qt
-	SET(VCPKG_ROOT_32 "${CMAKE_FIND_ROOT_PATH}/../x86-windows")
-
-	INSTALL(FILES "${VCPKG_ROOT_32}/bin/zlib1.dll" DESTINATION "${PLUGIN_DIR}/32")
-	INSTALL(FILES "${VCPKG_ROOT_32}/bin/pcre2-16.dll" DESTINATION "${PLUGIN_DIR}/32")
-	INSTALL(FILES "${VCPKG_ROOT_32}/bin/double-conversion.dll" DESTINATION "${PLUGIN_DIR}/32")
-	INSTALL(FILES "${VCPKG_ROOT_32}/bin/qt5core.dll" DESTINATION "${PLUGIN_DIR}/32")
-
+	INSTALL_EXTERNAL_PROJECT(RemoteVstPlugin32)
 ELSEIF(LMMS_BUILD_LINUX)
 	# Use winegcc
 	INCLUDE(CheckWineGcc)
@@ -82,9 +83,7 @@ ELSEIF(CMAKE_TOOLCHAIN_FILE_32)
 			"-DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH_32}"
 			"-DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE_32}"
 	)
-	INSTALL(FILES "${CMAKE_PREFIX_PATH_32}/bin/Qt5Core.dll" DESTINATION "${PLUGIN_DIR}/32")
-	INSTALL(FILES "${CMAKE_PREFIX_PATH_32}/bin/zlib1.dll" DESTINATION "${PLUGIN_DIR}/32")
-	INSTALL(PROGRAMS "${CMAKE_CURRENT_BINARY_DIR}/../32/RemoteVstPlugin32.exe" DESTINATION "${PLUGIN_DIR}/32")
+	INSTALL_EXTERNAL_PROJECT(RemoteVstPlugin32)
 ELSE()
 	MESSAGE(WARNING "Can't build RemoteVstPlugin32, unknown environment. Please supply CMAKE_TOOLCHAIN_FILE_32 and optionally CMAKE_PREFIX_PATH_32")
 	RETURN()
