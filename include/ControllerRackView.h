@@ -68,8 +68,6 @@ public slots:
 	void onControllerAdded(Controller *);
 	void onControllerRemoved(Controller *);
 	void onControllerCollapsed();
-	void setAllExpanded(bool allExpanded);
-	void setAllCollapsed(bool allCollapsed);
 
 	const QVector<ControllerView *> controllerViews() const;
 
@@ -90,9 +88,6 @@ private:
 	QVBoxLayout * m_scrollAreaLayout;
 	QPushButton * m_addButton;
 	QMdiSubWindow * m_subWin;
-
-	bool m_allExpanded;
-	bool m_allCollapsed;
 };
 
 #endif

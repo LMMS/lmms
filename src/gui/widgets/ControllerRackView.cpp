@@ -45,9 +45,7 @@
 
 
 ControllerRackView::ControllerRackView() :
-	QWidget(),
-	m_allExpanded(false),
-	m_allCollapsed(false)
+	QWidget()
 {
 	setWindowIcon(embed::getIconPixmap("controller"));
 	setWindowTitle(tr("Controller Rack"));
@@ -151,8 +149,6 @@ void ControllerRackView::collapsingAll()
 	{
 		it->collapseController();
 	}
-	m_allCollapsed = true;
-	m_allExpanded = false;
 }
 
 
@@ -164,8 +160,6 @@ void ControllerRackView::expandAll()
 	{
 		it->expandController();
 	}
-	m_allCollapsed = false;
-	m_allExpanded = true;
 }
 
 
@@ -197,8 +191,8 @@ void ControllerRackView::onControllerRemoved(Controller * removedController)
 		if (it->getController() == removedController)
 		{
 			ControllerView * viewOfRemovedController = it;
-			m_controllerViews.erase( std::find( m_controllerViews.begin(),
-						m_controllerViews.end(), viewOfRemovedController ) );
+			m_controllerViews.erase(std::find(m_controllerViews.begin(),
+						m_controllerViews.end(), viewOfRemovedController));
 
 			delete viewOfRemovedController;
 			m_scrollArea->verticalScrollBar()->hide();
@@ -213,6 +207,7 @@ void ControllerRackView::onControllerRemoved(Controller * removedController)
 
 void ControllerRackView::onControllerCollapsed()
 {
+	//we hide the scrollbar and test in update() if a scrollbar is needed
 	m_scrollArea->verticalScrollBar()->hide();
 	update();
 }
@@ -236,7 +231,8 @@ void ControllerRackView::moveControllerUp(ControllerView *cv)
 		int index = m_controllerViews.indexOf(cv);
 		m_scrollAreaLayout->removeWidget(cv);
 		m_scrollAreaLayout->insertWidget(index - 1, cv);
-		m_controllerViews.move(index, index - 1);
+		m_controllerViews.remove(index);
+		m_controllerViews.insert(index - 1, cv);
 		Engine::getSong()->moveControllerUp(cv->getController());
 	}
 }
@@ -246,11 +242,11 @@ void ControllerRackView::moveControllerUp(ControllerView *cv)
 
 void ControllerRackView::moveControllerDown(ControllerView *cv)
 {
-	//move up the controller among is the same
+	//move up the controller below, is the same
 	if (cv != m_controllerViews.last())
 	{
-		int index = m_controllerViews.indexOf(cv) + 1;
-		moveControllerUp(m_controllerViews.at(index));
+		int index = m_controllerViews.indexOf(cv);
+		moveControllerUp(m_controllerViews.at(index + 1));
 	}
 }
 
@@ -262,25 +258,17 @@ const QVector<ControllerView *> ControllerRackView::controllerViews() const
 
 
 
-void ControllerRackView::setAllCollapsed(bool allCollapsed)
-{
-	m_allCollapsed = allCollapsed;
-}
-
-
-
-
-void ControllerRackView::setAllExpanded(bool allExpanded)
-{
-	m_allExpanded = allExpanded;
-}
-
-
-
-
 bool ControllerRackView::allCollapsed() const
 {
-	return m_allCollapsed;
+	for (auto &it : m_controllerViews)
+	{
+		if (it->isCollapsed() == false)
+		{
+			return false;
+			break;
+		}
+	}
+	return true;
 }
 
 
@@ -288,7 +276,15 @@ bool ControllerRackView::allCollapsed() const
 
 bool ControllerRackView::allExpanded() const
 {
-	return m_allExpanded;
+	for (auto &it : m_controllerViews)
+	{
+		if (it->isCollapsed())
+		{
+			return false;
+			break;
+		}
+	}
+	return true;
 }
 
 

@@ -105,15 +105,20 @@ ControllerView::~ControllerView()
 
 
 
+bool ControllerView::isCollapsed() const
+{
+	return m_controllerDlg->isHidden();
+}
+
+
+
+
 void ControllerView::collapseController()
 {
 	m_collapseButton->setIcon(embed::getIconPixmap("stepper-left"));
 	m_controllerDlg->hide();
 	setFixedHeight(m_titleBarHeight);
 	emit controllerCollapsed();
-	gui->getControllerRackView()->setAllCollapsed(false);
-	gui->getControllerRackView()->setAllExpanded(false);
-
 }
 
 
@@ -124,8 +129,6 @@ void ControllerView::expandController()
 	m_controllerDlg->show();
 	setFixedHeight(m_controllerDlg->height() + m_titleBarHeight + 1);
 	m_collapseButton->setIcon(embed::getIconPixmap("stepper-down"));
-	gui->getControllerRackView()->setAllCollapsed(false);
-	gui->getControllerRackView()->setAllExpanded(false);
 }
 
 

@@ -54,18 +54,19 @@ public:
 		return(castModel<Controller>());
 	}
 
+	bool isCollapsed() const;
 
 public slots:
 
 	void collapseController();
 	void expandController();
-	void deleteController();
-
 	void toggleCollapseController();
-	void renameFinished();
+
 	void rename();
+	void renameFinished();
 	void moveUp();
 	void moveDown();
+	void deleteController();
 
 
 signals:
