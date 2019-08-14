@@ -209,6 +209,7 @@ private:
 	float m_bottomLevel;
 	float m_topLevel;
 
+	void centerTopBottomScroll();
 	void updateTopBottomLevels();
 
 	QScrollBar * m_leftRightScroll;
