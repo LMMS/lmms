@@ -1602,21 +1602,21 @@ void AutomationEditor::drawLevelTick(QPainter & p, int tick, float value)
 void AutomationEditor::centerTopBottomScroll()
 {
 	// default to the m_scrollLevel position
-	int pos = (int) m_scrollLevel;
+	int pos = static_cast<int>(m_scrollLevel);
 	// If a pattern exists...
-	if (m_pattern) {
+	if (m_pattern)
+	{
 		// get time map of current pattern
 		timeMap & time_map = m_pattern->getTimeMap();
 		// If time_map is not empty...
-		if ( !time_map.empty() ) {
-			// get the first object
-			timeMap::iterator it = time_map.begin();
+		if (!time_map.empty())
+		{
 			// set the position to the inverted value ((max + min) - value)
 			// If we set just (max - value), we're off by m_pattern's minimum
-			pos = m_pattern->getMax() + m_pattern->getMin() - (int) it.value();
+			pos = m_pattern->getMax() + m_pattern->getMin() - static_cast<int>(time_map.begin().value());
 		}
 	}
-	m_topBottomScroll->setValue( pos );
+	m_topBottomScroll->setValue(pos);
 }
 
 
