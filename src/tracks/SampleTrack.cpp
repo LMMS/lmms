@@ -333,7 +333,7 @@ void SampleTCOView::updateSample()
 	// set tooltip to filename so that user can see what sample this
 	// sample-tco contains
 	ToolTip::add( this, ( m_tco->m_sampleBuffer->audioFile() != "" ) ?
-					m_tco->m_sampleBuffer->audioFile() :
+					PathUtil::toAbsolute(m_tco->m_sampleBuffer->audioFile()) :
 					tr( "Double-click to open sample" ) );
 }
 
