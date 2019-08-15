@@ -37,13 +37,13 @@ namespace PathUtil
 		switch (base)
 		{
 			case FactoryBase   : return "factory:";
-			case ProjectDirBase: return "userprojects";
+			case ProjectDirBase: return "userprojects:";
 			case SampleBase    : return "sample:";
 			case VSTBase       : return "vst:";
-			case LADSPABase    : return "ladspa";
+			case LADSPABase    : return "ladspa:";
 			case SoundfontBase : return "soundfont:";
-			case GIGBase       : return "gig";
-			case PresetBase    : return "preset";
+			case GIGBase       : return "gig:";
+			case PresetBase    : return "preset:";
 			default            : return "";
 		}
 	}
