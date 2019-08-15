@@ -8,7 +8,7 @@
 
 namespace PathUtil
 {
-	std::vector<Base> relativeBases = { FactoryBase, SampleBase, VSTBase, SoundfontBase };
+	std::vector<Base> relativeBases = { FactoryBase, ProjectDirBase, SampleBase, VSTBase, LADSPABase, SoundfontBase, GIGBase, PresetBase };
 
 	QString baseLocation(Base base)
 	{
@@ -19,9 +19,13 @@ namespace PathUtil
 				QDir fsd = QDir(ConfigManager::inst()->factorySamplesDir());
 				return fsd.absolutePath() + "/";
 			}
+			case ProjectDirBase: return ConfigManager::inst()->userProjectsDir();
 			case SampleBase    : return ConfigManager::inst()->userSamplesDir();
 			case VSTBase       : return ConfigManager::inst()->userVstDir();
+			case LADSPABase    : return ConfigManager::inst()->userLadspaDir();
 			case SoundfontBase : return ConfigManager::inst()->userSf2Dir();
+			case GIGBase       : return ConfigManager::inst()->userGigDir();
+			case PresetBase    : return ConfigManager::inst()->userPresetsDir();
 			default            : return QString("");
 		}
 	}
@@ -33,9 +37,13 @@ namespace PathUtil
 		switch (base)
 		{
 			case FactoryBase   : return "factory:";
+			case ProjectDirBase: return "userprojects";
 			case SampleBase    : return "sample:";
 			case VSTBase       : return "vst:";
+			case LADSPABase    : return "ladspa";
 			case SoundfontBase : return "soundfont:";
+			case GIGBase       : return "gig";
+			case PresetBase    : return "preset";
 			default            : return "";
 		}
 	}
