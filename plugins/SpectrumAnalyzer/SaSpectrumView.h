@@ -99,9 +99,6 @@ private:
 	bool m_freezeRequest;	// new reference should be acquired
 	bool m_frozen;			// a reference is currently stored in the peakBuffer
 
-	const float m_smoothFactor = 0.15;		// alpha for exponential smoothing
-	const float m_peakDecayFactor = 0.992;	// multiplier for gradual peak decay
-
 	// top level: refresh buffers, make paths and draw the spectrum
 	void drawSpectrum(QPainter &painter);
 

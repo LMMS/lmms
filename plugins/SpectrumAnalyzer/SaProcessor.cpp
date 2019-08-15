@@ -47,12 +47,14 @@ SaProcessor::SaProcessor(SaControls *controls) :
 	m_fftWindow.resize(m_inBlockSize, 1.0);
 	precomputeWindow(m_fftWindow.data(), m_inBlockSize, BLACKMAN_HARRIS);
 
-	m_bufferL.resize(m_fftBlockSize, 0);
-	m_bufferR.resize(m_fftBlockSize, 0);
+	m_bufferL.resize(m_inBlockSize, 0);
+	m_bufferR.resize(m_inBlockSize, 0);
+	m_filteredBufferL.resize(m_fftBlockSize, 0);
+	m_filteredBufferR.resize(m_fftBlockSize, 0);
 	m_spectrumL = (fftwf_complex *) fftwf_malloc(binCount() * sizeof (fftwf_complex));
 	m_spectrumR = (fftwf_complex *) fftwf_malloc(binCount() * sizeof (fftwf_complex));
-	m_fftPlanL = fftwf_plan_dft_r2c_1d(m_fftBlockSize, m_bufferL.data(), m_spectrumL, FFTW_MEASURE);
-	m_fftPlanR = fftwf_plan_dft_r2c_1d(m_fftBlockSize, m_bufferR.data(), m_spectrumR, FFTW_MEASURE);
+	m_fftPlanL = fftwf_plan_dft_r2c_1d(m_fftBlockSize, m_filteredBufferL.data(), m_spectrumL, FFTW_MEASURE);
+	m_fftPlanR = fftwf_plan_dft_r2c_1d(m_fftBlockSize, m_filteredBufferR.data(), m_spectrumR, FFTW_MEASURE);
 
 	m_absSpectrumL.resize(binCount(), 0);
 	m_absSpectrumR.resize(binCount(), 0);
@@ -123,8 +125,8 @@ void SaProcessor::analyse(sampleFrame *in_buffer, const fpp_t frame_count)
 			// apply FFT window
 			for (unsigned int i = 0; i < m_inBlockSize; i++)
 			{
-				m_bufferL[i] = m_bufferL[i] * m_fftWindow[i];
-				m_bufferR[i] = m_bufferR[i] * m_fftWindow[i];
+				m_filteredBufferL[i] = m_bufferL[i] * m_fftWindow[i];
+				m_filteredBufferR[i] = m_bufferR[i] * m_fftWindow[i];
 			}
 	
 			// lock data shared with SaSpectrumView and SaWaterfallView
@@ -239,7 +241,20 @@ void SaProcessor::analyse(sampleFrame *in_buffer, const fpp_t frame_count)
 			#endif
 
 			// clean up before checking for more data from input buffer
-			m_framesFilledUp = 0;
+			const unsigned int overlaps = m_controls->m_windowOverlapModel.value();
+			if (overlaps == 1)			// each sample used only once
+			{
+				m_framesFilledUp = 0;
+			}
+			else
+			{
+				const unsigned int drop = m_inBlockSize / overlaps;
+				m_bufferL.erase(m_bufferL.begin(), m_bufferL.begin() + drop);
+				m_bufferR.erase(m_bufferR.begin(), m_bufferR.begin() + drop);
+				m_bufferL.resize(m_inBlockSize, 0);
+				m_bufferR.resize(m_inBlockSize, 0);
+				m_framesFilledUp -= m_inBlockSize / overlaps;
+			}
 		}
 	}
 }
@@ -251,8 +266,9 @@ void SaProcessor::analyse(sampleFrame *in_buffer, const fpp_t frame_count)
 // Gamma correction is applied to make small values more visible and to make
 // a linear gradient actually appear roughly linear. The correction should be
 // around 0.42 to 0.45 for sRGB displays (or lower for bigger visibility boost).
-QRgb SaProcessor::makePixel(float left, float right, float gamma_correction) const
+QRgb SaProcessor::makePixel(float left, float right) const
 {
+	const float gamma_correction = m_controls->m_waterfallGammaModel.value();
 	if (m_controls->m_stereoModel.value())
 	{
 		float ampL = pow(left, gamma_correction);
@@ -301,6 +317,7 @@ void SaProcessor::reallocateBuffers()
 	{
 		new_in_size = FFT_BLOCK_SIZES.back();
 	}
+	m_zeroPadFactor = m_controls->m_zeroPaddingModel.value();
 	if (new_size_index + m_zeroPadFactor < FFT_BLOCK_SIZES.size())
 	{
 		new_fft_size = FFT_BLOCK_SIZES[new_size_index + m_zeroPadFactor];
@@ -328,12 +345,14 @@ void SaProcessor::reallocateBuffers()
 	// allocate new space, create new plan and resize containers
 	m_fftWindow.resize(new_in_size, 1.0);
 	precomputeWindow(m_fftWindow.data(), new_in_size, (FFT_WINDOWS) m_controls->m_windowModel.value());
-	m_bufferL.resize(new_fft_size, 0);
-	m_bufferR.resize(new_fft_size, 0);
+	m_bufferL.resize(new_in_size, 0);
+	m_bufferR.resize(new_in_size, 0);
+	m_filteredBufferL.resize(new_fft_size, 0);
+	m_filteredBufferR.resize(new_fft_size, 0);
 	m_spectrumL = (fftwf_complex *) fftwf_malloc(new_bins * sizeof (fftwf_complex));
 	m_spectrumR = (fftwf_complex *) fftwf_malloc(new_bins * sizeof (fftwf_complex));
-	m_fftPlanL = fftwf_plan_dft_r2c_1d(new_fft_size, m_bufferL.data(), m_spectrumL, FFTW_MEASURE);
-	m_fftPlanR = fftwf_plan_dft_r2c_1d(new_fft_size, m_bufferR.data(), m_spectrumR, FFTW_MEASURE);
+	m_fftPlanL = fftwf_plan_dft_r2c_1d(new_fft_size, m_filteredBufferL.data(), m_spectrumL, FFTW_MEASURE);
+	m_fftPlanR = fftwf_plan_dft_r2c_1d(new_fft_size, m_filteredBufferR.data(), m_spectrumR, FFTW_MEASURE);
 
 	if (m_fftPlanL == NULL || m_fftPlanR == NULL)
 	{
@@ -344,6 +363,7 @@ void SaProcessor::reallocateBuffers()
 	m_normSpectrumL.resize(new_bins, 0);
 	m_normSpectrumR.resize(new_bins, 0);
 
+	m_waterfallHeight = m_controls->m_waterfallHeightModel.value();
 	m_history.resize(new_bins * m_waterfallHeight * sizeof qRgb(0,0,0), 0);
 
 	// done; publish new sizes and clean up
@@ -373,6 +393,8 @@ void SaProcessor::clear()
 	m_framesFilledUp = 0;
 	std::fill(m_bufferL.begin(), m_bufferL.end(), 0);
 	std::fill(m_bufferR.begin(), m_bufferR.end(), 0);
+	std::fill(m_filteredBufferL.begin(), m_filteredBufferL.end(), 0);
+	std::fill(m_filteredBufferR.begin(), m_filteredBufferR.end(), 0);
 	std::fill(m_absSpectrumL.begin(), m_absSpectrumL.end(), 0);
 	std::fill(m_absSpectrumR.begin(), m_absSpectrumR.end(), 0);
 	std::fill(m_normSpectrumL.begin(), m_normSpectrumL.end(), 0);

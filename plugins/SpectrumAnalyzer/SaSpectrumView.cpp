@@ -259,17 +259,17 @@ void SaSpectrumView::refreshPaths()
 	// Use updated display buffers to prepare new paths for QPainter.
 	// This is the second slowest action (first is the subsequent drawing); use
 	// the resolution parameter to balance display quality and performance.
-	m_pathL = makePath(m_displayBufferL, 1.5);
+	m_pathL = makePath(m_displayBufferL, m_controls->m_spectrumResolutionModel.value());
 	if (m_controls->m_stereoModel.value())
 	{
-		m_pathR = makePath(m_displayBufferR, 1.5);
+		m_pathR = makePath(m_displayBufferR, m_controls->m_spectrumResolutionModel.value());
 	}
 	if (m_controls->m_peakHoldModel.value() || m_controls->m_refFreezeModel.value())
 	{
-		m_pathPeakL = makePath(m_peakBufferL, 0.25);
+		m_pathPeakL = makePath(m_peakBufferL, m_controls->m_envelopeResolutionModel.value());
 		if (m_controls->m_stereoModel.value())
 		{
-			m_pathPeakR = makePath(m_peakBufferR, 0.25);
+			m_pathPeakR = makePath(m_peakBufferR, m_controls->m_envelopeResolutionModel.value());
 		}
 	}
 	#ifdef SA_DEBUG
@@ -297,7 +297,8 @@ void SaSpectrumView::updateBuffers(float *spectrum, float *displayBuffer, float 
 		{
 			if (m_controls->m_smoothModel.value())
 			{
-				displayBuffer[n] = spectrum[n] * m_smoothFactor + displayBuffer[n] * (1 - m_smoothFactor);
+				const float smoothFactor = m_controls->m_averagingWeightModel.value();
+				displayBuffer[n] = spectrum[n] * smoothFactor + displayBuffer[n] * (1 - smoothFactor);
 			}
 			else
 			{
@@ -319,7 +320,7 @@ void SaSpectrumView::updateBuffers(float *spectrum, float *displayBuffer, float 
 			}
 			else if (!m_controls->m_refFreezeModel.value())
 			{
-				peakBuffer[n] = peakBuffer[n] * m_peakDecayFactor;
+				peakBuffer[n] = peakBuffer[n] * m_controls->m_peakDecayFactorModel.value();
 			}
 		}
 		else if (!m_controls->m_refFreezeModel.value() && !m_controls->m_peakHoldModel.value())

@@ -95,6 +95,7 @@ public:
 private:
 	Analyzer *m_effect;
 
+	// basic settings
 	BoolModel m_pauseModel;
 	BoolModel m_refFreezeModel;
 
@@ -111,6 +112,17 @@ private:
 	ComboBoxModel m_blockSizeModel;
 	ComboBoxModel m_windowModel;
 
+	// advanced settings
+	FloatModel m_envelopeResolutionModel;
+	FloatModel m_spectrumResolutionModel;
+	FloatModel m_peakDecayFactorModel;
+	FloatModel m_averagingWeightModel;
+	FloatModel m_waterfallHeightModel;
+	FloatModel m_waterfallGammaModel;
+	FloatModel m_windowOverlapModel;
+	FloatModel m_zeroPaddingModel;
+
+	// colors (hard-coded, values must add up to specific numbers)
 	QColor	m_colorL;
 	QColor	m_colorR;
 	QColor	m_colorMono;

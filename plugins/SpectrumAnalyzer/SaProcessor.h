@@ -80,7 +80,7 @@ private:
 	SaControls *m_controls;
 
 	// currently valid configuration
-	const unsigned int m_zeroPadFactor = 2;	//!< use n-steps bigger FFT for given block size
+	unsigned int m_zeroPadFactor = 2;		//!< use n-steps bigger FFT for given block size
 	unsigned int m_inBlockSize;				//!< size of input (time domain) data block
 	unsigned int m_fftBlockSize;			//!< size of padded block for FFT processing
 	unsigned int m_sampleRate;
@@ -92,6 +92,8 @@ private:
 	std::vector<float> m_bufferL;			//!< time domain samples (left)
 	std::vector<float> m_bufferR;			//!< time domain samples (right)
 	std::vector<float> m_fftWindow;			//!< precomputed window function coefficients
+	std::vector<float> m_filteredBufferL;	//!< time domain samples with window function applied (left)
+	std::vector<float> m_filteredBufferR;	//!< time domain samples with window function applied (right)
 	fftwf_plan m_fftPlanL;
 	fftwf_plan m_fftPlanR;
 	fftwf_complex *m_spectrumL;				//!< frequency domain samples (complex) (left)
@@ -103,8 +105,8 @@ private:
 
 	// spectrum history for waterfall: new normSpectrum lines are added on top
 	std::vector<uchar> m_history;
-	const unsigned int m_waterfallHeight = 200;	// Number of stored lines.
-												// Note: high values may make it harder to see transients.
+	unsigned int m_waterfallHeight = 250;	// Number of stored lines.
+											// Note: high values may make it harder to see transients.
 
 	// book keeping
 	bool m_spectrumActive;
@@ -113,7 +115,7 @@ private:
 	bool m_reallocating;
 
 	// merge L and R channels and apply gamma correction to make a spectrogram pixel
-	QRgb makePixel(float left, float right, float gamma_correction = 0.30) const;
+	QRgb makePixel(float left, float right) const;
 
 	friend class SaSpectrumView;
 	friend class SaWaterfallView;

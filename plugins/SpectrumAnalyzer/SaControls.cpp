@@ -50,7 +50,17 @@ SaControls::SaControls(Analyzer *effect) :
 	m_freqRangeModel(this, tr("Frequency range")),
 	m_ampRangeModel(this, tr("Amplitude range")),
 	m_blockSizeModel(this, tr("FFT block size")),
-	m_windowModel(this, tr("FFT window type"))
+	m_windowModel(this, tr("FFT window type")),
+
+	// Advanced settings knobs
+	m_envelopeResolutionModel(0.25f, 0.1f, 3.0f, 0.05f, this, tr("Peak envelope resolution")),
+	m_spectrumResolutionModel(1.5f, 0.1f, 3.0f, 0.05f, this, tr("Spectrum display resolution")),
+	m_peakDecayFactorModel(0.992f, 0.95f, 0.999f, 0.001f, this, tr("Peak decay multiplier")),
+	m_averagingWeightModel(0.15f, 0.01f, 0.5f, 0.01f, this, tr("Averaging weight")),
+	m_waterfallHeightModel(250.0f, 50.0f, 1000.0f, 50.0f, this, tr("Waterfall history size")),
+	m_waterfallGammaModel(0.30f, 0.10f, 1.00f, 0.05f, this, tr("Waterfall gamma correction")),
+	m_windowOverlapModel(1.0f, 1.0f, 4.0f, 1.0f, this, tr("FFT window overlap")),
+	m_zeroPaddingModel(2.0f, 0.0f, 4.0f, 1.0f, this, tr("FFT zero padding"))
 {
 	// Frequency and amplitude ranges; order must match
 	// FREQUENCY_RANGES and AMPLITUDE_RANGES defined in SaControls.h
@@ -126,6 +136,15 @@ void SaControls::loadSettings(const QDomElement &_this)
 	m_ampRangeModel.loadSettings(_this, "RangeY");
 	m_blockSizeModel.loadSettings(_this, "BlockSize");
 	m_windowModel.loadSettings(_this, "WindowType");
+
+	m_envelopeResolutionModel.loadSettings(_this, "EnvelopeRes");
+	m_spectrumResolutionModel.loadSettings(_this, "SpectrumRes");
+	m_peakDecayFactorModel.loadSettings(_this, "PeakDecayFactor");
+	m_averagingWeightModel.loadSettings(_this, "AverageWeight");
+	m_waterfallHeightModel.loadSettings(_this, "WaterfallHeight");
+	m_waterfallGammaModel.loadSettings(_this, "WaterfallGamma");
+	m_windowOverlapModel.loadSettings(_this, "WindowOverlap");
+	m_zeroPaddingModel.loadSettings(_this, "ZeroPadding");
 }
 
 
@@ -141,4 +160,14 @@ void SaControls::saveSettings(QDomDocument &doc, QDomElement &parent)
 	m_ampRangeModel.saveSettings(doc, parent, "RangeY");
 	m_blockSizeModel.saveSettings(doc, parent, "BlockSize");
 	m_windowModel.saveSettings(doc, parent, "WindowType");
+
+	m_envelopeResolutionModel.saveSettings(doc, parent, "EnvelopeRes");
+	m_spectrumResolutionModel.saveSettings(doc, parent, "SpectrumRes");
+	m_peakDecayFactorModel.saveSettings(doc, parent, "PeakDecayFactor");
+	m_averagingWeightModel.saveSettings(doc, parent, "AverageWeight");
+	m_waterfallHeightModel.saveSettings(doc, parent, "WaterfallHeight");
+	m_waterfallGammaModel.saveSettings(doc, parent, "WaterfallGamma");
+	m_windowOverlapModel.saveSettings(doc, parent, "WindowOverlap");
+	m_zeroPaddingModel.saveSettings(doc, parent, "ZeroPadding");
+
 }
