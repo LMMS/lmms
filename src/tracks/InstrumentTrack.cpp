@@ -653,7 +653,9 @@ bool InstrumentTrack::play( const MidiTime & _start, const fpp_t _frames,
 	{
 		Pattern* p = dynamic_cast<Pattern*>( *it );
 		// everything which is not a pattern or muted won't be played
-		if( p == NULL || ( *it )->isMuted() )
+		if(p == NULL ||
+			(Engine::getSong()->playMode() == Song::Mode_PlaySong
+			&& (*it)->isMuted()))
 		{
 			continue;
 		}
