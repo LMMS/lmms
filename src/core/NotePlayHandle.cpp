@@ -199,7 +199,7 @@ void NotePlayHandle::play( sampleFrame * _working_buffer )
 
 	lock();
 
-	if( m_totalFramesPlayed == 0 && !m_hasMidiNote
+	if( m_totalFramesPlayed == 0 && !m_hasMidiNote && !m_released
 		&& ( hasParent() || ! m_instrumentTrack->isArpeggioEnabled() ) )
 	{
 		m_hasMidiNote = true;
