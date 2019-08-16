@@ -1,5 +1,3 @@
-#include <QDir>
-
 #include "TemplatesMenu.h"
 #include "GuiApplication.h"
 #include "ConfigManager.h"
@@ -42,30 +40,33 @@ void TemplatesMenu::fillTemplatesMenu()
 {
 		clear();
 
-		auto addTemplatesFromDir = [this]( QDir dir ) {
-				QStringList templates = dir.entryList( QStringList( "*.mpt" ),
-														QDir::Files | QDir::Readable );
-
-				if ( templates.size() && ! actions().isEmpty() )
-				{
-						addSeparator();
-				}
-
-				for( QStringList::iterator it = templates.begin();
-														it != templates.end(); ++it )
-				{
-						addAction(
-										embed::getIconPixmap( "project_file" ),
-										( *it ).left( ( *it ).length() - 4 ).replace("&", "&&") );
-#ifdef LMMS_BUILD_APPLE
-						actions().last()->setIconVisibleInMenu(false); // QTBUG-44565 workaround
-						actions().last()->setIconVisibleInMenu(true);
-#endif
-				}
-
-				return templates.size();
-		};
-
 		m_custom_templates_count = addTemplatesFromDir( ConfigManager::inst()->userTemplateDir() );
 		addTemplatesFromDir( ConfigManager::inst()->factoryProjectsDir() + "templates" );
 }
+
+
+
+
+int TemplatesMenu::addTemplatesFromDir( QDir dir ) {
+	QStringList templates = dir.entryList( QStringList( "*.mpt" ),
+											QDir::Files | QDir::Readable );
+
+	if ( templates.size() && ! actions().isEmpty() )
+	{
+			addSeparator();
+	}
+
+	for( QStringList::iterator it = templates.begin();
+											it != templates.end(); ++it )
+	{
+			addAction(
+							embed::getIconPixmap( "project_file" ),
+							( *it ).left( ( *it ).length() - 4 ).replace("&", "&&") );
+#ifdef LMMS_BUILD_APPLE
+			actions().last()->setIconVisibleInMenu(false); // QTBUG-44565 workaround
+			actions().last()->setIconVisibleInMenu(true);
+#endif
+	}
+
+	return templates.size();
+};
