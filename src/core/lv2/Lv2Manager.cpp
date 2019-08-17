@@ -119,11 +119,11 @@ bool Lv2Manager::isSubclassOf(const LilvPluginClass* clvss, const char* uriStr)
 			lilv_plugin_class_get_uri(pc2));
 	};
 	bool isFound = false;
-	for (;
-		!(isFound = clssEq(clvss, search)) && !clssEq(clvss, root);
+	while (!(isFound = clssEq(clvss, search)) && !clssEq(clvss, root))
+	{
 		clvss = lilv_plugin_classes_get_by_uri(allClasses,
-			lilv_plugin_class_get_parent_uri(clvss))
-	) ;
+			lilv_plugin_class_get_parent_uri(clvss));
+	}
 	return isFound;
 }
 
