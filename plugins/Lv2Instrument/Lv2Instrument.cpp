@@ -167,7 +167,7 @@ void Lv2Instrument::play(sampleFrame *buf)
 
 	fpp_t fpp = Engine::mixer()->framesPerPeriod();
 
-	run(static_cast<unsigned>(fpp));
+	run(fpp);
 
 	copyBuffersToLmms(buf, fpp);
 

@@ -78,30 +78,24 @@ struct Unknown;
 
 struct ConstVisitor
 {
-#define CAN_VISIT(clss) \
-virtual void visit(const Lv2Ports::clss& ) {}
+	virtual void visit(const Lv2Ports::ControlPortBase& ) {}
+	virtual void visit(const Lv2Ports::Control& ) {}
+	virtual void visit(const Lv2Ports::Audio& ) {}
+	virtual void visit(const Lv2Ports::Cv& ) {}
+	virtual void visit(const Lv2Ports::Unknown& ) {}
 
-	CAN_VISIT(ControlPortBase)
-	CAN_VISIT(Control)
-	CAN_VISIT(Audio)
-	CAN_VISIT(Cv)
-	CAN_VISIT(Unknown)
 	virtual ~ConstVisitor();
-#undef CAN_VISIT
 };
 
 struct Visitor
 {
-#define CAN_VISIT(clss) \
-virtual void visit(Lv2Ports::clss& ) {}
+	virtual void visit(Lv2Ports::ControlPortBase& ) {}
+	virtual void visit(Lv2Ports::Control& ) {}
+	virtual void visit(Lv2Ports::Audio& ) {}
+	virtual void visit(Lv2Ports::Cv& ) {}
+	virtual void visit(Lv2Ports::Unknown& ) {}
 
-	CAN_VISIT(ControlPortBase)
-	CAN_VISIT(Control)
-	CAN_VISIT(Audio)
-	CAN_VISIT(Cv)
-	CAN_VISIT(Unknown)
 	virtual ~Visitor();
-#undef CAN_VISIT
 };
 
 struct Meta
@@ -114,7 +108,7 @@ struct Meta
 	bool m_optional = false;
 	bool m_used = true;
 
-	std::vector<PluginIssue> get(const LilvPlugin* plugin, unsigned portNum);
+	std::vector<PluginIssue> get(const LilvPlugin* plugin, std::size_t portNum);
 };
 
 struct PortBase : public Meta

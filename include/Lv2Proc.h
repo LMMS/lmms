@@ -62,7 +62,7 @@ public:
 	/*
 		ctor/dtor
 	*/
-	Lv2Proc(const LilvPlugin* plugin, Model *parent, int curProc);
+	Lv2Proc(const LilvPlugin* plugin, Model *parent, std::size_t curProc);
 	virtual ~Lv2Proc();
 	//! Must be checked after ctor or reload
 	bool isValid() const { return m_valid; }
@@ -104,7 +104,7 @@ public:
 	void copyBuffersToCore(sampleFrame *buf, unsigned offset, unsigned num,
 								fpp_t frames) const;
 	//! Run the Lv2 plugin instance for @param frames frames
-	void run(unsigned frames);
+	void run(fpp_t frames);
 
 	/*
 		misc
@@ -138,9 +138,9 @@ private:
 	//! allocate m_ports, fill all with metadata, and assign meaning of ports
 	void createPorts();
 	//! fill m_ports[portNum] with metadata
-	void createPort(unsigned portNum);
+	void createPort(std::size_t portNum);
 	//! connect m_ports[portNum] with Lv2
-	void connectPort(unsigned num);
+	void connectPort(std::size_t num);
 
 	void dumpPort(std::size_t num);
 

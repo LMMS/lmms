@@ -50,7 +50,7 @@ Lv2ControlBase::Lv2ControlBase(Model* that, const QString &uri) :
 {
 	if (m_plugin)
 	{
-		int procId = 0;
+		std::size_t procId = 0;
 		int channelsLeft = DEFAULT_CHANNELS; // LMMS plugins are stereo
 		while (channelsLeft > 0)
 		{
@@ -147,7 +147,7 @@ void Lv2ControlBase::copyBuffersToLmms(sampleFrame *buf, fpp_t frames) const {
 
 
 
-void Lv2ControlBase::run(unsigned frames) {
+void Lv2ControlBase::run(fpp_t frames) {
 	for (std::unique_ptr<Lv2Proc>& c : m_procs) { c->run(frames); }
 }
 

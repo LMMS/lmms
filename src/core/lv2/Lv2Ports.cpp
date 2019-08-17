@@ -82,7 +82,7 @@ const char *toStr(Vis pv)
 
 
 std::vector<PluginIssue> Meta::get(const LilvPlugin *plugin,
-										unsigned int portNum)
+									std::size_t portNum)
 {
 	std::vector<PluginIssue> portIssues;
 	auto issue = [&portIssues](PluginIssueType i, std::string msg = "") {
@@ -90,7 +90,8 @@ std::vector<PluginIssue> Meta::get(const LilvPlugin *plugin,
 
 	Lv2Manager* man = Engine::getLv2Manager();
 
-	const LilvPort* lilvPort = lilv_plugin_get_port_by_index(plugin, portNum);
+	const LilvPort* lilvPort = lilv_plugin_get_port_by_index(
+								plugin, static_cast<uint32_t>(portNum));
 
 	auto portFunc = [&plugin, &lilvPort, &man](
 		bool (*fptr)(const LilvPlugin*, const LilvPort*, const LilvNode*),

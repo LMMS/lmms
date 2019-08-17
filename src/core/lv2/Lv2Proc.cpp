@@ -95,7 +95,7 @@ Plugin::PluginTypes Lv2Proc::check(const LilvPlugin *plugin,
 
 
 
-Lv2Proc::Lv2Proc(const LilvPlugin *plugin, Model* parent, int curProc) :
+Lv2Proc::Lv2Proc(const LilvPlugin *plugin, Model* parent, std::size_t curProc) :
 	LinkedModelGroup(parent, curProc),
 	m_plugin(plugin)
 {
@@ -218,9 +218,9 @@ void Lv2Proc::copyBuffersToCore(sampleFrame* buf,
 
 
 
-void Lv2Proc::run(unsigned frames)
+void Lv2Proc::run(fpp_t frames)
 {
-	lilv_instance_run(m_instance, frames);
+	lilv_instance_run(m_instance, static_cast<uint32_t>(frames));
 }
 
 
@@ -249,7 +249,7 @@ void Lv2Proc::initPlugin()
 
 	if (m_instance)
 	{
-		for (unsigned portNum = 0; portNum < m_ports.size(); ++portNum)
+		for (std::size_t portNum = 0; portNum < m_ports.size(); ++portNum)
 			connectPort(portNum);
 		lilv_instance_activate(m_instance);
 	}
@@ -285,13 +285,13 @@ void Lv2Proc::loadFileInternal(const QString &file)
 
 
 
-void Lv2Proc::createPort(unsigned portNum)
+void Lv2Proc::createPort(std::size_t portNum)
 {
 	Lv2Ports::Meta meta;
 	meta.get(m_plugin, portNum);
 
 	const LilvPort* lilvPort = lilv_plugin_get_port_by_index(m_plugin,
-								portNum);
+								static_cast<uint32_t>(portNum));
 	Lv2Ports::PortBase* port;
 	if (meta.m_type == Lv2Ports::Type::Control)
 	{
@@ -424,10 +424,10 @@ void Lv2Proc::createPorts()
 		}
 	};
 
-	unsigned maxPorts = lilv_plugin_get_num_ports(m_plugin);
+	std::size_t maxPorts = lilv_plugin_get_num_ports(m_plugin);
 	m_ports.resize(maxPorts);
 
-	for (unsigned portNum = 0; portNum < maxPorts; ++portNum)
+	for (std::size_t portNum = 0; portNum < maxPorts; ++portNum)
 	{
 		createPort(portNum);
 		RegisterPort registerPort;
@@ -447,10 +447,11 @@ void Lv2Proc::createPorts()
 
 struct ConnectPorts : public Lv2Ports::Visitor
 {
-	unsigned m_num;
+	std::size_t m_num;
 	LilvInstance* m_instance;
 	void con(void* location) {
-		lilv_instance_connect_port(m_instance, m_num, location);
+		lilv_instance_connect_port(m_instance,
+			static_cast<uint32_t>(m_num), location);
 	}
 	void visit(Lv2Ports::Control& ctrl) override { con(&ctrl.m_val); }
 	void visit(Lv2Ports::Audio& audio) override {
@@ -461,7 +462,7 @@ struct ConnectPorts : public Lv2Ports::Visitor
 
 ConnectPorts::~ConnectPorts() {}
 
-void Lv2Proc::connectPort(unsigned num)
+void Lv2Proc::connectPort(std::size_t num)
 {
 	ConnectPorts connect;
 	connect.m_num = num;

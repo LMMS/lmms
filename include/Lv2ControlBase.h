@@ -105,7 +105,7 @@ protected:
 	//! Copy our ports into buffers passed by LMMS
 	void copyBuffersToLmms(sampleFrame *buf, fpp_t frames) const;
 	//! Run the Lv2 plugin instance for @param frames frames
-	void run(unsigned frames);
+	void run(fpp_t frames);
 
 	/*
 		load/save, must be called from virtuals
