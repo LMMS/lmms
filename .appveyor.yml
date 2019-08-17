@@ -8,6 +8,7 @@ environment:
   matrix:
     - compiler: msvc
 install:
+  - .\bootstrap-vcpkg.bat
   - vcpkg install --triplet %PLATFORM%-windows --recurse fftw3 libsamplerate libsndfile sdl2
   - nuget install clcache -Version 4.1.0
 build_script:
