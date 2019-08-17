@@ -36,7 +36,7 @@
 #include "lmms_basics.h"
 #include "PluginIssue.h"
 
-struct ConnectPorts;
+struct ConnectPortVisitor;
 
 namespace Lv2Ports {
 
@@ -187,7 +187,7 @@ private:
 	bool m_sidechain;
 
 	// the only case when data of m_buffer may be referenced:
-	friend struct ::ConnectPorts;
+	friend struct ::ConnectPortVisitor;
 };
 
 struct Unknown : public PortBase

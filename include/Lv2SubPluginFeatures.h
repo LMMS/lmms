@@ -42,10 +42,10 @@ private:
 	static QString pluginName(const LilvPlugin *plug);
 
 public:
-	Lv2SubPluginFeatures(Plugin::PluginTypes _type);
+	Lv2SubPluginFeatures(Plugin::PluginTypes type);
 
 	virtual void fillDescriptionWidget(
-		QWidget *_parent, const Key *k) const override;
+		QWidget *parent, const Key *k) const override;
 
 	QString additionalFileExtensions(const Key &k) const override;
 	QString displayName(const Key &k) const override;
@@ -53,7 +53,7 @@ public:
 	const PixmapLoader *logo(const Key &k) const override;
 
 	void listSubPluginKeys(
-		const Plugin::Descriptor *_desc, KeyList &_kl) const override;
+		const Plugin::Descriptor *desc, KeyList &kl) const override;
 };
 
 #endif // LMMS_HAVE_LV2

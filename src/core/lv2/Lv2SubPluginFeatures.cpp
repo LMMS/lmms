@@ -58,27 +58,27 @@ QString Lv2SubPluginFeatures::pluginName(const LilvPlugin *plug)
 
 
 
-Lv2SubPluginFeatures::Lv2SubPluginFeatures(Plugin::PluginTypes _type) :
-	SubPluginFeatures(_type)
+Lv2SubPluginFeatures::Lv2SubPluginFeatures(Plugin::PluginTypes type) :
+	SubPluginFeatures(type)
 {
 }
 
 
 
 
-void Lv2SubPluginFeatures::fillDescriptionWidget(
-	QWidget *_parent, const Key *k) const
+void Lv2SubPluginFeatures::fillDescriptionWidget(QWidget *parent,
+													const Key *k) const
 {
 	const LilvPlugin *plug = getPlugin(*k);
 
-	QLabel *label = new QLabel(_parent);
+	QLabel *label = new QLabel(parent);
 	label->setText(QWidget::tr("Name: ") + pluginName(plug));
 
-	QLabel *label2 = new QLabel(_parent);
+	QLabel *label2 = new QLabel(parent);
 	label2->setText(QWidget::tr("URI: ") +
 		lilv_node_as_uri(lilv_plugin_get_uri(plug)));
 
-	QWidget *maker = new QWidget(_parent);
+	QWidget *maker = new QWidget(parent);
 	QHBoxLayout *l = new QHBoxLayout(maker);
 	l->setMargin(0);
 	l->setSpacing(0);
@@ -95,11 +95,11 @@ void Lv2SubPluginFeatures::fillDescriptionWidget(
 	l->addWidget(maker_label);
 	l->addWidget(maker_content, 1);
 
-	QWidget *copyright = new QWidget(_parent);
+	QWidget *copyright = new QWidget(parent);
 	l = new QHBoxLayout(copyright);
 	l->setMargin(0);
 	l->setSpacing(0);
-	copyright->setMinimumWidth(_parent->minimumWidth());
+	copyright->setMinimumWidth(parent->minimumWidth());
 
 	QLabel *copyright_label = new QLabel(copyright);
 	copyright_label->setText(QWidget::tr("Copyright: "));
@@ -160,8 +160,8 @@ const PixmapLoader *Lv2SubPluginFeatures::logo(
 
 
 
-void Lv2SubPluginFeatures::listSubPluginKeys(
-	const Plugin::Descriptor *_desc, KeyList &_kl) const
+void Lv2SubPluginFeatures::listSubPluginKeys(const Plugin::Descriptor *desc,
+												KeyList &kl) const
 {
 	Lv2Manager *lv2Mgr = Engine::getLv2Manager();
 	for (const std::pair<const std::string, Lv2Manager::Lv2Info> &pr :
@@ -175,7 +175,7 @@ void Lv2SubPluginFeatures::listSubPluginKeys(
 			atm["uri"] = QString::fromUtf8(pr.first.c_str());
 			const LilvPlugin* plug = pr.second.plugin();
 
-			_kl.push_back(KeyType(_desc, pluginName(plug), atm));
+			kl.push_back(KeyType(desc, pluginName(plug), atm));
 			//qDebug() << "Found LV2 sub plugin key of type" <<
 			//	m_type << ":" << pr.first.c_str();
 		}

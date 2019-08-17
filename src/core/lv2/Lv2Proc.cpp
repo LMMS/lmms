@@ -133,7 +133,7 @@ void Lv2Proc::dumpPorts()
 
 void Lv2Proc::copyModelsFromCore()
 {
-	struct FloatFromModel : public ConstModelVisitor
+	struct FloatFromModelVisitor : public ConstModelVisitor
 	{
 		const std::vector<float>* m_scalePointMap; // in
 		float m_res; // out
@@ -152,7 +152,7 @@ void Lv2Proc::copyModelsFromCore()
 		{
 			if (ctrl.m_flow == Lv2Ports::Flow::Input)
 			{
-				FloatFromModel ffm;
+				FloatFromModelVisitor ffm;
 				ffm.m_scalePointMap = &ctrl.m_scalePointMap;
 				ctrl.m_connectedModel->accept(ffm);
 				ctrl.m_val = ffm.m_res;
@@ -162,7 +162,7 @@ void Lv2Proc::copyModelsFromCore()
 		{
 			if (cv.m_flow == Lv2Ports::Flow::Input)
 			{
-				FloatFromModel ffm;
+				FloatFromModelVisitor ffm;
 				ffm.m_scalePointMap = &cv.m_scalePointMap;
 				cv.m_connectedModel->accept(ffm);
 				// dirty fix, needs better interpolation
@@ -445,26 +445,26 @@ void Lv2Proc::createPorts()
 
 
 
-struct ConnectPorts : public Lv2Ports::Visitor
+struct ConnectPortVisitor : public Lv2Ports::Visitor
 {
 	std::size_t m_num;
 	LilvInstance* m_instance;
-	void con(void* location) {
+	void connectPort(void* location) {
 		lilv_instance_connect_port(m_instance,
 			static_cast<uint32_t>(m_num), location);
 	}
-	void visit(Lv2Ports::Control& ctrl) override { con(&ctrl.m_val); }
+	void visit(Lv2Ports::Control& ctrl) override { connectPort(&ctrl.m_val); }
 	void visit(Lv2Ports::Audio& audio) override {
-		con(audio.isSideChain() ? nullptr : audio.m_buffer.data()); }
-	void visit(Lv2Ports::Unknown&) override { con(nullptr); }
-	~ConnectPorts() override;
+		connectPort(audio.isSideChain() ? nullptr : audio.m_buffer.data()); }
+	void visit(Lv2Ports::Unknown&) override { connectPort(nullptr); }
+	~ConnectPortVisitor() override;
 };
 
-ConnectPorts::~ConnectPorts() {}
+ConnectPortVisitor::~ConnectPortVisitor() {}
 
 void Lv2Proc::connectPort(std::size_t num)
 {
-	ConnectPorts connect;
+	ConnectPortVisitor connect;
 	connect.m_num = num;
 	connect.m_instance = m_instance;
 	m_ports[num]->accept(connect);

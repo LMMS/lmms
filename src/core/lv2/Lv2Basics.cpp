@@ -29,8 +29,8 @@
 QString qStringFromPluginNode(const LilvPlugin* plug,
 	LilvNode* (*getFunc)(const LilvPlugin*))
 {
-	auto conv = lilv_node_as_string;
-	return QString::fromUtf8(conv(AutoLilvNode((*getFunc)(plug)).get()));
+	return QString::fromUtf8(
+		lilv_node_as_string(AutoLilvNode((*getFunc)(plug)).get()));
 }
 
 QString qStringFromPortName(const LilvPlugin* plug, const LilvPort* port)
