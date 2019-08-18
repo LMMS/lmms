@@ -7,7 +7,8 @@
 
 namespace PathUtil
 {
-	enum Base { AbsoluteBase, FactoryBase, ProjectDirBase, SampleBase, VSTBase, LADSPABase, SoundfontBase, GIGBase, PresetBase };
+	enum Base { AbsoluteBase, ProjectDirBase, FactorySampleBase, UserSampleBase, UserVSTBase, PresetBase,
+		DefaultLADSPABase, UserLADSPABase, DefaultSoundfontBase, UserSoundfontBase, DefautlGIGBase, UserGIGBase };
 
 	QString LMMS_EXPORT baseLocation(Base base);
 	QDir LMMS_EXPORT baseQDir (Base base);
