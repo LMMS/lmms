@@ -22,9 +22,9 @@ namespace PathUtil
 			case ProjectDirBase: return ConfigManager::inst()->userProjectsDir();
 			case SampleBase    : return ConfigManager::inst()->userSamplesDir();
 			case VSTBase       : return ConfigManager::inst()->userVstDir();
-			case LADSPABase    : return ConfigManager::inst()->userLadspaDir();
-			case SoundfontBase : return ConfigManager::inst()->userSf2Dir();
-			case GIGBase       : return ConfigManager::inst()->userGigDir();
+			case LADSPABase    : return ConfigManager::inst()->ladspaDir();
+			case SoundfontBase : return ConfigManager::inst()->sf2Dir();
+			case GIGBase       : return ConfigManager::inst()->gigDir();
 			case PresetBase    : return ConfigManager::inst()->userPresetsDir();
 			default            : return QString("");
 		}
