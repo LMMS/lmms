@@ -9,7 +9,7 @@
 namespace PathUtil
 {
 	std::vector<Base> relativeBases = { ProjectDirBase, FactorySampleBase, UserSampleBase, UserVSTBase, PresetBase,
-		DefaultLADSPABase, UserLADSPABase, DefaultSoundfontBase, UserSoundfontBase, DefautlGIGBase, UserGIGBase };
+		DefaultLADSPABase, UserLADSPABase, DefaultSoundfontBase, UserSoundfontBase, DefaultGIGBase, UserGIGBase };
 
 	QString baseLocation(Base base)
 	{
