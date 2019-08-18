@@ -11,7 +11,7 @@ TemplatesMenu::TemplatesMenu(QWidget *parent) :
 {
 	connect( this, SIGNAL( aboutToShow() ), SLOT( fillTemplatesMenu() ) );
 	connect( this, SIGNAL( triggered( QAction * ) ),
-			 SLOT( createNewProjectFromTemplate( QAction * ) ) );
+		SLOT( createNewProjectFromTemplate( QAction * ) ) );
 }
 
 
@@ -19,17 +19,17 @@ TemplatesMenu::TemplatesMenu(QWidget *parent) :
 
 void TemplatesMenu::createNewProjectFromTemplate( QAction * _idx )
 {
-		if( gui->mainWindow()->mayChangeProject(true) )
-		{
-				int indexOfTemplate = actions().indexOf( _idx );
-				bool isFactoryTemplate = indexOfTemplate >= m_custom_templates_count;
-				QString dirBase =  isFactoryTemplate ?
-								ConfigManager::inst()->factoryTemplatesDir() :
-								ConfigManager::inst()->userTemplateDir();
+	if( gui->mainWindow()->mayChangeProject(true) )
+	{
+		int indexOfTemplate = actions().indexOf( _idx );
+		bool isFactoryTemplate = indexOfTemplate >= m_custom_templates_count;
+		QString dirBase =  isFactoryTemplate ?
+			ConfigManager::inst()->factoryTemplatesDir() :
+			ConfigManager::inst()->userTemplateDir();
 
-				const QString f = dirBase + _idx->text().replace("&&", "&") + ".mpt";
-				Engine::getSong()->createNewProjectFromTemplate(f);
-		}
+		const QString f = dirBase + _idx->text().replace("&&", "&") + ".mpt";
+		Engine::getSong()->createNewProjectFromTemplate(f);
+	}
 }
 
 
@@ -38,10 +38,10 @@ void TemplatesMenu::createNewProjectFromTemplate( QAction * _idx )
 
 void TemplatesMenu::fillTemplatesMenu()
 {
-		clear();
+	clear();
 
-		m_custom_templates_count = addTemplatesFromDir( ConfigManager::inst()->userTemplateDir() );
-		addTemplatesFromDir( ConfigManager::inst()->factoryProjectsDir() + "templates" );
+	m_custom_templates_count = addTemplatesFromDir( ConfigManager::inst()->userTemplateDir() );
+	addTemplatesFromDir( ConfigManager::inst()->factoryProjectsDir() + "templates" );
 }
 
 
@@ -49,24 +49,24 @@ void TemplatesMenu::fillTemplatesMenu()
 
 int TemplatesMenu::addTemplatesFromDir( QDir dir ) {
 	QStringList templates = dir.entryList( QStringList( "*.mpt" ),
-											QDir::Files | QDir::Readable );
+		QDir::Files | QDir::Readable );
 
 	if ( templates.size() && ! actions().isEmpty() )
 	{
-			addSeparator();
+		addSeparator();
 	}
 
 	for( QStringList::iterator it = templates.begin();
-											it != templates.end(); ++it )
+		it != templates.end(); ++it )
 	{
-			addAction(
-							embed::getIconPixmap( "project_file" ),
-							( *it ).left( ( *it ).length() - 4 ).replace("&", "&&") );
+		addAction(
+			embed::getIconPixmap( "project_file" ),
+			( *it ).left( ( *it ).length() - 4 ).replace("&", "&&") );
 #ifdef LMMS_BUILD_APPLE
-			actions().last()->setIconVisibleInMenu(false); // QTBUG-44565 workaround
-			actions().last()->setIconVisibleInMenu(true);
+		actions().last()->setIconVisibleInMenu(false); // QTBUG-44565 workaround
+		actions().last()->setIconVisibleInMenu(true);
 #endif
 	}
 
 	return templates.size();
-};
+}
