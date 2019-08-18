@@ -8,25 +8,29 @@
 
 namespace PathUtil
 {
-	std::vector<Base> relativeBases = { FactoryBase, ProjectDirBase, SampleBase, VSTBase, LADSPABase, SoundfontBase, GIGBase, PresetBase };
+	std::vector<Base> relativeBases = { ProjectDirBase, FactorySampleBase, UserSampleBase, UserVSTBase, PresetBase,
+		DefaultLADSPABase, UserLADSPABase, DefaultSoundfontBase, UserSoundfontBase, DefautlGIGBase, UserGIGBase };
 
 	QString baseLocation(Base base)
 	{
 		switch (base)
 		{
-			case FactoryBase   :
+			case ProjectDirBase       : return ConfigManager::inst()->userProjectsDir();
+			case FactorySampleBase    :
 			{
 				QDir fsd = QDir(ConfigManager::inst()->factorySamplesDir());
 				return fsd.absolutePath() + "/";
 			}
-			case ProjectDirBase: return ConfigManager::inst()->userProjectsDir();
-			case SampleBase    : return ConfigManager::inst()->userSamplesDir();
-			case VSTBase       : return ConfigManager::inst()->userVstDir();
-			case LADSPABase    : return ConfigManager::inst()->ladspaDir();
-			case SoundfontBase : return ConfigManager::inst()->sf2Dir();
-			case GIGBase       : return ConfigManager::inst()->gigDir();
-			case PresetBase    : return ConfigManager::inst()->userPresetsDir();
-			default            : return QString("");
+			case UserSampleBase       : return ConfigManager::inst()->userSamplesDir();
+			case UserVSTBase          : return ConfigManager::inst()->userVstDir();
+			case PresetBase           : return ConfigManager::inst()->userPresetsDir();
+			case DefaultLADSPABase    : return ConfigManager::inst()->userLadspaDir();
+			case UserLADSPABase       : return ConfigManager::inst()->ladspaDir();
+			case DefaultSoundfontBase : return ConfigManager::inst()->userSf2Dir();
+			case UserSoundfontBase    : return ConfigManager::inst()->sf2Dir();
+			case DefaultGIGBase       : return ConfigManager::inst()->userGigDir();
+			case UserGIGBase          : return ConfigManager::inst()->gigDir();
+			default                   : return QString("");
 		}
 	}
 
@@ -36,15 +40,18 @@ namespace PathUtil
 	{
 		switch (base)
 		{
-			case FactoryBase   : return "factory:";
-			case ProjectDirBase: return "userprojects:";
-			case SampleBase    : return "sample:";
-			case VSTBase       : return "vst:";
-			case LADSPABase    : return "ladspa:";
-			case SoundfontBase : return "soundfont:";
-			case GIGBase       : return "gig:";
-			case PresetBase    : return "preset:";
-			default            : return "";
+			case ProjectDirBase       : return "userprojects:";
+			case FactorySampleBase    : return "factorysample:";
+			case UserSampleBase       : return "usersample:";
+			case UserVSTBase          : return "uservst:";
+			case PresetBase           : return "preset:";
+			case DefaultLADSPABase    : return "defaultladspa:";
+			case UserLADSPABase       : return "userladspa:";
+			case DefaultSoundfontBase : return "defaultsoundfont:";
+			case UserSoundfontBase    : return "usersoundfont:";
+			case DefaultGIGBase       : return "defaultgig:";
+			case UserGIGBase          : return "usergig:";
+			default                   : return "";
 		}
 	}
 
