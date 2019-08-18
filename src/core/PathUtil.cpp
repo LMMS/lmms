@@ -83,10 +83,11 @@ namespace PathUtil
 
 	QString oldRelativeUpgrade(QString input)
 	{
-		QString factory = baseLocation(FactoryBase) + input;
+		QString factory = baseLocation(FactorySampleBase) + input;
 		QFileInfo factoryInfo(factory);
 		//If we can't find a factory sample, it's probably a user sample
-		return factoryInfo.exists() ? "factory:" + input : "sample:" + input;
+		Base base = factoryInfo.exists() ? FactorySampleBase : UserSampleBase;
+		return basePrefix(base) + input;
 	}
 
 
