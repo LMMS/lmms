@@ -652,9 +652,10 @@ bool InstrumentTrack::play( const MidiTime & _start, const fpp_t _frames,
 	for( tcoVector::Iterator it = tcos.begin(); it != tcos.end(); ++it )
 	{
 		Pattern* p = dynamic_cast<Pattern*>( *it );
-		// everything which is not a pattern or muted won't be played
+		// everything which is not a pattern won't be played
+		// A pattern playing in the Piano Roll window will always play
 		if(p == NULL ||
-			(Engine::getSong()->playMode() == Song::Mode_PlaySong
+			(Engine::getSong()->playMode() != Song::Mode_PlayPattern
 			&& (*it)->isMuted()))
 		{
 			continue;
