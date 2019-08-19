@@ -48,7 +48,7 @@ void TemplatesMenu::fillTemplatesMenu()
 
 
 
-int TemplatesMenu::addTemplatesFromDir( QDir dir ) {
+int TemplatesMenu::addTemplatesFromDir( const QDir& dir ) {
 	QStringList templates = dir.entryList( QStringList( "*.mpt" ),
 		QDir::Files | QDir::Readable );
 

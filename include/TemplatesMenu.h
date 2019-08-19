@@ -14,7 +14,7 @@ public:
 private slots:
 	void createNewProjectFromTemplate( QAction * _idx );
 	void fillTemplatesMenu();
-	int addTemplatesFromDir( QDir dir );
+	int addTemplatesFromDir( const QDir& dir );
 
 private:
 	int m_customTemplatesCount;
