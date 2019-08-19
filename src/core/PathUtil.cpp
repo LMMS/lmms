@@ -13,7 +13,7 @@ namespace PathUtil
 
 	QString baseLocation(Base base)
 	{
-		QString loc = ""
+		QString loc = "";
 		switch (base)
 		{
 			case ProjectDirBase       : loc = ConfigManager::inst()->userProjectsDir(); break;
