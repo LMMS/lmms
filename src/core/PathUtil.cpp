@@ -15,22 +15,24 @@ namespace PathUtil
 	{
 		switch (base)
 		{
-			case ProjectDirBase       : return ConfigManager::inst()->userProjectsDir();
+			QString loc = "";
+			case ProjectDirBase       : loc = ConfigManager::inst()->userProjectsDir(); break;
 			case FactorySampleBase    :
 			{
 				QDir fsd = QDir(ConfigManager::inst()->factorySamplesDir());
-				return fsd.absolutePath() + "/";
+				loc = fsd.absolutePath() + "/"; break;
 			}
-			case UserSampleBase       : return ConfigManager::inst()->userSamplesDir();
-			case UserVSTBase          : return ConfigManager::inst()->userVstDir();
-			case PresetBase           : return ConfigManager::inst()->userPresetsDir();
-			case UserLADSPABase       : return ConfigManager::inst()->ladspaDir();
-			case DefaultLADSPABase    : return ConfigManager::inst()->userLadspaDir();
-			case UserSoundfontBase    : return ConfigManager::inst()->sf2Dir();
-			case DefaultSoundfontBase : return ConfigManager::inst()->userSf2Dir();
-			case UserGIGBase          : return ConfigManager::inst()->gigDir();
-			case DefaultGIGBase       : return ConfigManager::inst()->userGigDir();
+			case UserSampleBase       : loc = ConfigManager::inst()->userSamplesDir(); break;
+			case UserVSTBase          : loc = ConfigManager::inst()->userVstDir(); break;
+			case PresetBase           : loc = ConfigManager::inst()->userPresetsDir(); break;
+			case UserLADSPABase       : loc = ConfigManager::inst()->ladspaDir(); break;
+			case DefaultLADSPABase    : loc = ConfigManager::inst()->userLadspaDir(); break;
+			case UserSoundfontBase    : loc = ConfigManager::inst()->sf2Dir(); break;
+			case DefaultSoundfontBase : loc = ConfigManager::inst()->userSf2Dir(); break;
+			case UserGIGBase          : loc = ConfigManager::inst()->gigDir(); break;
+			case DefaultGIGBase       : loc = ConfigManager::inst()->userGigDir(); break;
 			default                   : return QString("");
+			return QDir::cleanPath(loc) + QDir::separator();
 		}
 	}
 
