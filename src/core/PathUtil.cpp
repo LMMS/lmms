@@ -9,7 +9,7 @@
 namespace PathUtil
 {
 	std::vector<Base> relativeBases = { ProjectDirBase, FactorySampleBase, UserSampleBase, UserVSTBase, PresetBase,
-		DefaultLADSPABase, UserLADSPABase, DefaultSoundfontBase, UserSoundfontBase, DefaultGIGBase, UserGIGBase };
+		UserLADSPABase, DefaultLADSPABase, UserSoundfontBase, DefaultSoundfontBase, UserGIGBase, DefaultGIGBase };
 
 	QString baseLocation(Base base)
 	{
@@ -24,12 +24,12 @@ namespace PathUtil
 			case UserSampleBase       : return ConfigManager::inst()->userSamplesDir();
 			case UserVSTBase          : return ConfigManager::inst()->userVstDir();
 			case PresetBase           : return ConfigManager::inst()->userPresetsDir();
-			case DefaultLADSPABase    : return ConfigManager::inst()->userLadspaDir();
 			case UserLADSPABase       : return ConfigManager::inst()->ladspaDir();
-			case DefaultSoundfontBase : return ConfigManager::inst()->userSf2Dir();
+			case DefaultLADSPABase    : return ConfigManager::inst()->userLadspaDir();
 			case UserSoundfontBase    : return ConfigManager::inst()->sf2Dir();
-			case DefaultGIGBase       : return ConfigManager::inst()->userGigDir();
+			case DefaultSoundfontBase : return ConfigManager::inst()->userSf2Dir();
 			case UserGIGBase          : return ConfigManager::inst()->gigDir();
+			case DefaultGIGBase       : return ConfigManager::inst()->userGigDir();
 			default                   : return QString("");
 		}
 	}
@@ -45,12 +45,12 @@ namespace PathUtil
 			case UserSampleBase       : return "usersample:";
 			case UserVSTBase          : return "uservst:";
 			case PresetBase           : return "preset:";
-			case DefaultLADSPABase    : return "defaultladspa:";
 			case UserLADSPABase       : return "userladspa:";
-			case DefaultSoundfontBase : return "defaultsoundfont:";
+			case DefaultLADSPABase    : return "defaultladspa:";
 			case UserSoundfontBase    : return "usersoundfont:";
-			case DefaultGIGBase       : return "defaultgig:";
+			case DefaultSoundfontBase : return "defaultsoundfont:";
 			case UserGIGBase          : return "usergig:";
+			case DefaultGIGBase       : return "defaultgig:";
 			default                   : return "";
 		}
 	}
