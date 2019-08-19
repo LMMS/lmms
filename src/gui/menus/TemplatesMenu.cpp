@@ -7,7 +7,8 @@
 #include "Song.h"
 
 TemplatesMenu::TemplatesMenu(QWidget *parent) :
-	QMenu(tr("New from template"), parent)
+	QMenu(tr("New from template"), parent),
+	m_customTemplatesCount(0)
 {
 	connect( this, SIGNAL( aboutToShow() ), SLOT( fillTemplatesMenu() ) );
 	connect( this, SIGNAL( triggered( QAction * ) ),
@@ -22,7 +23,7 @@ void TemplatesMenu::createNewProjectFromTemplate( QAction * _idx )
 	if( gui->mainWindow()->mayChangeProject(true) )
 	{
 		int indexOfTemplate = actions().indexOf( _idx );
-		bool isFactoryTemplate = indexOfTemplate >= m_custom_templates_count;
+		bool isFactoryTemplate = indexOfTemplate >= m_customTemplatesCount;
 		QString dirBase =  isFactoryTemplate ?
 			ConfigManager::inst()->factoryTemplatesDir() :
 			ConfigManager::inst()->userTemplateDir();
@@ -40,7 +41,7 @@ void TemplatesMenu::fillTemplatesMenu()
 {
 	clear();
 
-	m_custom_templates_count = addTemplatesFromDir( ConfigManager::inst()->userTemplateDir() );
+	m_customTemplatesCount = addTemplatesFromDir(ConfigManager::inst()->userTemplateDir() );
 	addTemplatesFromDir( ConfigManager::inst()->factoryProjectsDir() + "templates" );
 }
 

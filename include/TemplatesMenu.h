@@ -17,7 +17,7 @@ private slots:
 	int addTemplatesFromDir( QDir dir );
 
 private:
-	int m_custom_templates_count;
+	int m_customTemplatesCount;
 };
 
 #endif // TEMPLATESMENU_H
