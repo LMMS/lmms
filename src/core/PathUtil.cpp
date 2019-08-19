@@ -32,8 +32,8 @@ namespace PathUtil
 			case UserGIGBase          : loc = ConfigManager::inst()->gigDir(); break;
 			case DefaultGIGBase       : loc = ConfigManager::inst()->userGigDir(); break;
 			default                   : return QString("");
-			return QDir::cleanPath(loc) + QDir::separator();
 		}
+		return QDir::cleanPath(loc) + QDir::separator();
 	}
 
 	QDir baseQDir (Base base) { return QDir(baseLocation(base)); }
