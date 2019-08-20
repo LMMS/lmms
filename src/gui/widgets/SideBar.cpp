@@ -122,8 +122,8 @@ void SideBar::appendTab( SideBarWidget *widget )
 
 	ToolTip::add( button, widget->title() );
 
-	connect(widget, SIGNAL(closeButtonClicked(QWidget *)),
-		this, SLOT(toggleWidget(QWidget *)));
+	connect(widget, &SideBarWidget::closeButtonClicked,
+		[=]() { button->click(); });
 }
 
 

@@ -28,21 +28,28 @@
 #include <QFontMetrics>
 #include <QPainter>
 
+#include "embed.h"
+
 
 SideBarWidget::SideBarWidget( const QString & _title, const QPixmap & _icon,
 							QWidget * _parent ) :
 	QWidget( _parent ),
 	m_title( _title ),
-	m_icon( _icon )
+	m_icon(_icon),
+	m_buttonSize(17, 17)
 {
 	m_contents = new QWidget( this );
 	m_layout = new QVBoxLayout( m_contents );
 	m_layout->setSpacing( 5 );
 	m_layout->setMargin( 0 );
-	m_closeBtn = new QToolButton(this);
-	m_closeBtn->setText(QString("X"));
-	connect(m_closeBtn, SIGNAL(released()),
-		this, SLOT(closeButtonClick()));
+	m_closeBtn = new QPushButton(embed::getIconPixmap("close"), QString(), this);
+	m_closeBtn->resize(m_buttonSize);
+	m_closeBtn->setFocusPolicy(Qt::NoFocus);
+	m_closeBtn->setCursor(Qt::ArrowCursor);
+	m_closeBtn->setAttribute(Qt::WA_NoMousePropagation);
+	m_closeBtn->setToolTip(tr("Close"));
+	connect(m_closeBtn, &QPushButton::clicked,
+		[=]() {this->closeButtonClicked();});
 }
 
 
@@ -50,14 +57,6 @@ SideBarWidget::SideBarWidget( const QString & _title, const QPixmap & _icon,
 
 SideBarWidget::~SideBarWidget()
 {
-}
-
-
-
-
-void SideBarWidget::closeButtonClick()
-{
-	emit closeButtonClicked(this);
 }
 
 
