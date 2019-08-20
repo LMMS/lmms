@@ -21,4 +21,3 @@ build_script:
   - cmake --build . --target tests
 cache:
   - c:/tools/vcpkg/installed
-  - "%HOME%/clcache"
