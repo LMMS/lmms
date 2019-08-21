@@ -1,3 +1,5 @@
+include(DefineInstallVar)
+
 # Like INSTALL_DEPENDENCIES but can be called from regular cmake code
 # (instead of install(CODE)), takes targets instead of files,
 # takes care of configuring search paths, and other platform-specific tweaks.
@@ -39,11 +41,7 @@ FUNCTION(INSTALL_TARGET_DEPENENCIES)
         ENDFOREACH()
     ENDFOREACH()
 
-    # Create the list of files using file(GENERATE)
-    # generator expressions on install(CODE) are not supported on old
-    # cmake versions.
-    SET(DEPLOY_LIST_FILE "${CMAKE_CURRENT_BINARY_DIR}/${DEPS_NAME}_filelist_${CMAKE_BUILD_TYPE}_$<CONFIG>.txt")
-    FILE(GENERATE OUTPUT "${DEPLOY_LIST_FILE}" CONTENT "${DEPLOY_TARGETS}")
+    DEFINE_INSTALL_VAR(NAME "DEPLOY_FILES" CONTENT "${DEPLOY_TARGETS}" GENERATOR_EXPRESSION)
 
     LIST(APPEND DEPS_LIB_DIRS ${CMAKE_CXX_IMPLICIT_LINK_DIRECTORIES})
     LIST(REMOVE_DUPLICATES DEPS_LIB_DIRS)
@@ -63,7 +61,6 @@ FUNCTION(INSTALL_TARGET_DEPENENCIES)
 
     INSTALL(CODE "
 		INCLUDE(\"${LMMS_SOURCE_DIR}/cmake/modules/InstallDependencies.cmake\")
-		FILE(READ \"${DEPLOY_LIST_FILE}\" DEPLOY_FILES)
 
 		INSTALL_DEPENDENCIES(
 			FILES \"\${DEPLOY_FILES}\"

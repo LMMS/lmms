@@ -6,7 +6,7 @@ ENDIF()
 IF(LMMS_BUILD_WIN32 OR LMMS_INSTALL_DEPENDENCIES)
 	# Install system libraries
 	include(InstallRequiredSystemLibraries)
-	include(InstallTargetDependencies.cmake)
+	include(InstallTargetDependencies)
 
 	# Collect directories to search for DLLs
 	GET_FILENAME_COMPONENT(QTBIN_DIR "${QT_QMAKE_EXECUTABLE}" PATH)
