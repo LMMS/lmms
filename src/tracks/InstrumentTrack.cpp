@@ -1461,6 +1461,8 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 	adjustTabSize(m_ssView);
 	adjustTabSize(instrumentFunctions);
 	adjustTabSize(m_effectView);
+	// stupid bugfix, no one knows why
+	m_effectView->resize(INSTRUMENT_WIDTH - 4, INSTRUMENT_HEIGHT - 4 - 1);
 	adjustTabSize(m_midiView);
 	adjustTabSize(m_miscView);
 

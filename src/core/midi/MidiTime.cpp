@@ -63,13 +63,18 @@ MidiTime::MidiTime( const tick_t ticks ) :
 {
 }
 
-MidiTime MidiTime::toNearestTact() const
+MidiTime MidiTime::quantize(float bars) const
 {
-	if( m_ticks % s_ticksPerTact >= s_ticksPerTact/2 )
-	{
-		return ( getTact() + 1 ) * s_ticksPerTact;
-	}
-	return getTact() * s_ticksPerTact;
+	//The intervals we should snap to, our new position should be a factor of this
+	int interval = s_ticksPerTact * bars;
+	//The lower position we could snap to
+	int lowPos = m_ticks / interval;
+	//Offset from the lower position
+	int offset = m_ticks % interval;
+	//1 if we should snap up, 0 if we shouldn't
+	int snapUp = offset / (interval / 2);
+
+	return (lowPos + snapUp) * interval;
 }
 
 
