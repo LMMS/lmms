@@ -42,7 +42,7 @@ FUNCTION(INSTALL_TARGET_DEPENENCIES)
     # Create the list of files using file(GENERATE)
     # generator expressions on install(CODE) are not supported on old
     # cmake versions.
-    SET(DEPLOY_LIST_FILE "${CMAKE_CURRENT_BINARY_DIR}/${DEPS_NAME}_filelist_${CMAKE_BUILD_TYPE}.txt")
+    SET(DEPLOY_LIST_FILE "${CMAKE_CURRENT_BINARY_DIR}/${DEPS_NAME}_filelist_${CMAKE_BUILD_TYPE}_$<CONFIG>.txt")
     FILE(GENERATE OUTPUT "${DEPLOY_LIST_FILE}" CONTENT "${DEPLOY_TARGETS}")
 
     LIST(APPEND DEPS_LIB_DIRS ${CMAKE_CXX_IMPLICIT_LINK_DIRECTORIES})
