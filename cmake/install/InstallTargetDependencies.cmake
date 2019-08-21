@@ -48,6 +48,8 @@ FUNCTION(INSTALL_TARGET_DEPENENCIES)
     LIST(APPEND DEPS_LIB_DIRS ${CMAKE_CXX_IMPLICIT_LINK_DIRECTORIES})
     LIST(REMOVE_DUPLICATES DEPS_LIB_DIRS)
 
+    message("${DEPS_LIB_DIRS}")
+
     IF(LMMS_BUILD_LINUX)
         FILE(DOWNLOAD "https://raw.githubusercontent.com/AppImage/AppImages/master/excludelist"
                 "${CMAKE_BINARY_DIR}/excludelist")
