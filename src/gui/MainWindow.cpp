@@ -625,6 +625,7 @@ SubWindow* MainWindow::addWindowedWidget(QWidget *w, Qt::WindowFlags windowFlags
 	SubWindow *win = new SubWindow(m_workspace->viewport(), windowFlags);
 	win->setAttribute(Qt::WA_DeleteOnClose);
 	win->setWidget(w);
+	if (w->sizeHint().isValid()) {win->resize(w->sizeHint());}
 	m_workspace->addSubWindow(win);
 	return win;
 }
@@ -922,7 +923,8 @@ bool MainWindow::saveProject()
 
 bool MainWindow::saveProjectAs()
 {
-	VersionedSaveDialog sfd( this, tr( "Save Project" ), "",
+	auto optionsWidget = new SaveOptionsWidget(Engine::getSong()->getSaveOptions());
+	VersionedSaveDialog sfd( this, optionsWidget, tr( "Save Project" ), "",
 			tr( "LMMS Project" ) + " (*.mmpz *.mmp);;" +
 				tr( "LMMS Project Template" ) + " (*.mpt)" );
 	QString f = Engine::getSong()->projectFileName();

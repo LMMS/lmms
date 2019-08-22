@@ -334,7 +334,7 @@ signals:
 
 
 
-class GigInstrumentView : public InstrumentView
+class GigInstrumentView : public InstrumentViewFixedSize
 {
 	Q_OBJECT
 public:

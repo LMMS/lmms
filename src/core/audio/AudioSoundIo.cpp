@@ -33,14 +33,14 @@
 #include "debug.h"
 #include "ConfigManager.h"
 #include "gui_templates.h"
-#include "templates.h"
 #include "ComboBox.h"
 #include "Mixer.h"
 
 AudioSoundIo::AudioSoundIo( bool & outSuccessful, Mixer * _mixer ) :
-	AudioDevice( tLimit<ch_cnt_t>(
-		ConfigManager::inst()->value( "audiosoundio", "channels" ).toInt(), DEFAULT_CHANNELS, SURROUND_CHANNELS ),
-								_mixer )
+	AudioDevice( qBound<ch_cnt_t>(
+		DEFAULT_CHANNELS,
+		ConfigManager::inst()->value( "audiosoundio", "channels" ).toInt(),
+		SURROUND_CHANNELS ), _mixer )
 {
 	outSuccessful = false;
 	m_soundio = NULL;

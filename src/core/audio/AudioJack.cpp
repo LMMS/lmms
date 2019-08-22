@@ -32,7 +32,6 @@
 
 #include "Engine.h"
 #include "GuiApplication.h"
-#include "templates.h"
 #include "gui_templates.h"
 #include "ConfigManager.h"
 #include "LcdSpinBox.h"
@@ -44,10 +43,10 @@
 
 
 AudioJack::AudioJack( bool & _success_ful, Mixer*  _mixer ) :
-	AudioDevice( tLimit<int>( ConfigManager::inst()->value(
-					"audiojack", "channels" ).toInt(),
-					DEFAULT_CHANNELS, SURROUND_CHANNELS ),
-								_mixer ),
+	AudioDevice( qBound<int>(
+		DEFAULT_CHANNELS,
+		ConfigManager::inst()->value( "audiojack", "channels" ).toInt(),
+		SURROUND_CHANNELS ), _mixer ),
 	m_client( NULL ),
 	m_active( false ),
 	m_midiClient( NULL ),

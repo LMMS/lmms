@@ -139,7 +139,7 @@ private:
 } ;
 
 
-class XpressiveView : public InstrumentView
+class XpressiveView : public InstrumentViewFixedSize
 {
 	Q_OBJECT
 public:

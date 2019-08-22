@@ -76,11 +76,14 @@ SongEditor::SongEditor( Song * song ) :
 	TrackContainerView( song ),
 	m_song( song ),
 	m_zoomingModel(new ComboBoxModel()),
+	m_snappingModel(new ComboBoxModel()),
+	m_proportionalSnap( false ),
 	m_scrollBack( false ),
 	m_smoothScroll( ConfigManager::inst()->value( "ui", "smoothscroll" ).toInt() ),
 	m_mode(DrawMode)
 {
 	m_zoomingModel->setParent(this);
+	m_snappingModel->setParent(this);
 	// create time-line
 	m_widgetWidthTotal = ConfigManager::inst()->value( "ui",
 							"compacttrackbuttons" ).toInt()==1 ?
@@ -230,7 +233,7 @@ SongEditor::SongEditor( Song * song ) :
 	connect( m_song, SIGNAL( lengthChanged( int ) ),
 			this, SLOT( updateScrollBar( int ) ) );
 
-	// Set up zooming model
+	//Set up zooming model
 	for( float const & zoomLevel : m_zoomLevels )
 	{
 		m_zoomingModel->addItem( QString( "%1\%" ).arg( zoomLevel * 100 ) );
@@ -239,6 +242,24 @@ SongEditor::SongEditor( Song * song ) :
 			m_zoomingModel->findText( "100%" ) );
 	connect( m_zoomingModel, SIGNAL( dataChanged() ),
 					this, SLOT( zoomingChanged() ) );
+
+	//Set up snapping model, 2^i
+	for ( int i = 3; i >= -4; i-- )
+	{
+		if ( i > 0 )
+		{
+			m_snappingModel->addItem( QString( "%1 Bars").arg( 1 << i ) );
+		}
+		else if ( i == 0 )
+		{
+			m_snappingModel->addItem( "1 Bar" );
+		}
+		else
+		{
+			m_snappingModel->addItem( QString( "1/%1 Bar" ).arg( 1 << (-i) ) );
+		}
+	}
+	m_snappingModel->setInitValue( m_snappingModel->findText( "1 Bar" ) );
 
 	setFocusPolicy( Qt::StrongFocus );
 	setFocus();
@@ -259,6 +280,48 @@ void SongEditor::saveSettings( QDomDocument& doc, QDomElement& element )
 void SongEditor::loadSettings( const QDomElement& element )
 {
 	MainWindow::restoreWidgetState(parentWidget(), element);
+}
+
+
+
+
+float SongEditor::getSnapSize() const
+{
+	// 1 Bar is the third value in the snapping dropdown
+	int val = -m_snappingModel->value() + 3;
+	// If proportional snap is on, we snap to finer values when zoomed in
+	if (m_proportionalSnap)
+	{
+		val = val - m_zoomingModel->value() + 3;
+	}
+	val = max(val, -6); // -6 gives 1/64th bar snapping. Lower values cause crashing.
+
+	if ( val >= 0 ){
+		return 1 << val;
+	}
+	else {
+		return 1.0 / ( 1 << -val );
+	}
+}
+
+QString SongEditor::getSnapSizeString() const
+{
+	int val = -m_snappingModel->value() + 3;
+	val = val - m_zoomingModel->value() + 3;
+	val = max(val, -6); // -6 gives 1/64th bar snapping. Lower values cause crashing.
+
+	if ( val >= 0 ){
+		int bars = 1 << val;
+		if ( bars == 1 ) { return QString("1 Bar"); }
+		else
+		{
+			return QString( "%1 Bars" ).arg(bars);
+		}
+	}
+	else {
+		int div = ( 1 << -val );
+		return QString( "1/%1 Bar" ).arg(div);
+	}
 }
 
 
@@ -296,6 +359,11 @@ void SongEditor::setEditModeDraw()
 void SongEditor::setEditModeSelect()
 {
 	setEditMode(SelectMode);
+}
+
+void SongEditor::toggleProportionalSnap()
+{
+	m_proportionalSnap = !m_proportionalSnap;
 }
 
 
@@ -653,10 +721,19 @@ ComboBoxModel *SongEditor::zoomingModel() const
 
 
 
+ComboBoxModel *SongEditor::snappingModel() const
+{
+	return m_snappingModel;
+}
+
+
+
+
 SongEditorWindow::SongEditorWindow(Song* song) :
 	Editor(Engine::mixer()->audioDev()->supportsCapture(), false),
 	m_editor(new SongEditor(song)),
-	m_crtlAction( NULL )
+	m_crtlAction( NULL ),
+	m_snapSizeLabel( new QLabel( m_toolBar ) )
 {
 	setWindowTitle( tr( "Song-Editor" ) );
 	setWindowIcon( embed::getIconPixmap( "songeditor" ) );
@@ -718,15 +795,42 @@ SongEditorWindow::SongEditorWindow(Song* song) :
 	QLabel * zoom_lbl = new QLabel( m_toolBar );
 	zoom_lbl->setPixmap( embed::getIconPixmap( "zoom" ) );
 
-	// setup zooming-stuff
+	//Set up zooming-stuff
 	m_zoomingComboBox = new ComboBox( m_toolBar );
 	m_zoomingComboBox->setFixedSize( 80, 22 );
 	m_zoomingComboBox->move( 580, 4 );
 	m_zoomingComboBox->setModel(m_editor->m_zoomingModel);
 	m_zoomingComboBox->setToolTip(tr("Horizontal zooming"));
+	connect(m_editor->zoomingModel(), SIGNAL(dataChanged()), this, SLOT(updateSnapLabel()));
 
 	zoomToolBar->addWidget( zoom_lbl );
 	zoomToolBar->addWidget( m_zoomingComboBox );
+
+	DropToolBar *snapToolBar = addDropToolBarToTop(tr("Snap controls"));
+	QLabel * snap_lbl = new QLabel( m_toolBar );
+	snap_lbl->setPixmap( embed::getIconPixmap( "quantize" ) );
+
+	//Set up quantization/snapping selector
+	m_snappingComboBox = new ComboBox( m_toolBar );
+	m_snappingComboBox->setFixedSize( 80, 22 );
+	m_snappingComboBox->setModel(m_editor->m_snappingModel);
+	m_snappingComboBox->setToolTip(tr("Clip snapping size"));
+	connect(m_editor->snappingModel(), SIGNAL(dataChanged()), this, SLOT(updateSnapLabel()));
+
+	m_setProportionalSnapAction = new QAction(embed::getIconPixmap("proportional_snap"),
+											 tr("Toggle proportional snap on/off"), this);
+	m_setProportionalSnapAction->setCheckable(true);
+	m_setProportionalSnapAction->setChecked(false);
+	connect(m_setProportionalSnapAction, SIGNAL(triggered()), m_editor, SLOT(toggleProportionalSnap()));
+	connect(m_setProportionalSnapAction, SIGNAL(triggered()), this, SLOT(updateSnapLabel()) );
+
+	snapToolBar->addWidget( snap_lbl );
+	snapToolBar->addWidget( m_snappingComboBox );
+	snapToolBar->addSeparator();
+	snapToolBar->addAction( m_setProportionalSnapAction );
+
+	snapToolBar->addSeparator();
+	snapToolBar->addWidget( m_snapSizeLabel );
 
 	connect(song, SIGNAL(projectLoaded()), this, SLOT(adjustUiAfterProjectLoad()));
 	connect(this, SIGNAL(resized()), m_editor, SLOT(updatePositionLine()));
@@ -734,7 +838,20 @@ SongEditorWindow::SongEditorWindow(Song* song) :
 
 QSize SongEditorWindow::sizeHint() const
 {
-	return {600, 300};
+	return {720, 300};
+}
+
+void SongEditorWindow::updateSnapLabel(){
+	if (m_setProportionalSnapAction->isChecked())
+	{
+		m_snapSizeLabel->setText(QString("Snap: ") + m_editor->getSnapSizeString());
+		m_snappingComboBox->setToolTip(tr("Base snapping size"));
+	}
+	else
+	{
+		m_snappingComboBox->setToolTip(tr("Clip snapping size"));
+		m_snapSizeLabel->clear();
+	}
 }
 
 

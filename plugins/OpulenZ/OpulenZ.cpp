@@ -681,7 +681,7 @@ void OpulenzInstrument::loadFile( const QString& file ) {
 
 OpulenzInstrumentView::OpulenzInstrumentView( Instrument * _instrument,
                                                         QWidget * _parent ) :
-        InstrumentView( _instrument, _parent )
+        InstrumentViewFixedSize( _instrument, _parent )
 {
 
 #define KNOB_GEN(knobname, hinttext, hintunit,xpos,ypos) \

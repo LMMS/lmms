@@ -355,7 +355,7 @@ int PianoView::getKeyFromMouse( const QPoint & _p ) const
 	}
 
 	// some range-checking-stuff
-	return tLimit( key_num, 0, NumKeys - 1 );
+	return qBound( 0, key_num, NumKeys - 1 );
 }
 
 
