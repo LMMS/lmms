@@ -61,6 +61,7 @@
 #include "SetupDialog.h"
 #include "SideBar.h"
 #include "SongEditor.h"
+#include "TemplatesMenu.h"
 #include "TextFloat.h"
 #include "TimeLineWidget.h"
 #include "ToolButton.h"
@@ -88,7 +89,6 @@ void disableAutoKeyAccelerators(QWidget* mainWindow)
 
 MainWindow::MainWindow() :
 	m_workspace( NULL ),
-	m_templatesMenu( NULL ),
 	m_recentlyOpenedProjectsMenu( NULL ),
 	m_toolsMenu( NULL ),
 	m_autoSaveTimer( this ),
@@ -277,8 +277,8 @@ void MainWindow::finalize()
 					this, SLOT( createNewProject() ),
 					QKeySequence::New );
 
-	m_templatesMenu = new TemplatesMenu( this );
-	project_menu->addMenu(m_templatesMenu);
+	auto templates_menu = new TemplatesMenu( this );
+	project_menu->addMenu(templates_menu);
 
 	project_menu->addAction( embed::getIconPixmap( "project_open" ),
 					tr( "&Open..." ),
@@ -425,7 +425,7 @@ void MainWindow::finalize()
 				tr( "Create new project from template" ),
 					this, SLOT( emptySlot() ),
 							m_toolBar );
-	project_new_from_template->setMenu( m_templatesMenu );
+	project_new_from_template->setMenu( templates_menu );
 	project_new_from_template->setPopupMode( ToolButton::InstantPopup );
 
 	ToolButton * project_open = new ToolButton(

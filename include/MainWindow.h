@@ -32,7 +32,6 @@
 
 #include "ConfigManager.h"
 #include "SubWindow.h"
-#include "TemplatesMenu.h"
 
 class QAction;
 class QDomElement;
@@ -204,7 +203,6 @@ private:
 	QWidget * m_toolBar;
 	QGridLayout * m_toolBarLayout;
 
-	TemplatesMenu * m_templatesMenu;
 	QMenu * m_recentlyOpenedProjectsMenu;
 
 	struct keyModifiers
