@@ -121,15 +121,17 @@ void SaWaterfallView::paintEvent(QPaintEvent *event)
 	if (m_processor->m_waterfallNotEmpty)
 	{
 		QMutexLocker lock(&m_processor->m_dataAccess);
-		painter.drawImage(displayLeft, displayTop,					// top left corner coordinates
-						  QImage(m_processor->m_history.data(),		// raw pixel data to display
-								 m_processor->binCount(),			// width = number of frequency bins
-								 m_processor->m_waterfallHeight,	// height = number of history lines
-								 QImage::Format_RGB32
-								 ).scaled(displayWidth,				// scale to fit view..
-										  displayBottom,
-										  Qt::IgnoreAspectRatio,
-										  Qt::SmoothTransformation));
+		QImage temp = QImage(m_processor->m_history.data(),		// raw pixel data to display
+							 m_processor->binCount(),			// width = number of frequency bins
+							 m_processor->m_waterfallHeight,	// height = number of history lines
+							 QImage::Format_RGB32
+							 ).scaled(displayWidth * devicePixelRatio(),	// scale to fit view..
+									  displayBottom * devicePixelRatio(),
+									  Qt::IgnoreAspectRatio,
+									  Qt::SmoothTransformation);
+		temp.setDevicePixelRatio(devicePixelRatio());			// display at native resolution
+		painter.drawImage(displayLeft, displayTop, temp);
+
 		lock.unlock();
 	}
 	else
