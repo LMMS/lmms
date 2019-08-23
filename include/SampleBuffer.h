@@ -37,7 +37,6 @@
 #include "lmms_math.h"
 #include "shared_object.h"
 #include "MemoryManager.h"
-#include "PathUtil.h"
 
 
 class QPainter;

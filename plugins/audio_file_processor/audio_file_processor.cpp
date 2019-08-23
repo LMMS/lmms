@@ -40,6 +40,7 @@
 #include "interpolation.h"
 #include "Mixer.h"
 #include "NotePlayHandle.h"
+#include "PathUtil.h"
 #include "Song.h"
 #include "StringPairDrag.h"
 #include "ToolTip.h"
