@@ -39,7 +39,6 @@
 
 #ifdef SA_DEBUG
 	#include <chrono>
-	#include <iostream>
 #endif
 
 
@@ -146,9 +145,11 @@ void SaSpectrumView::paintEvent(QPaintEvent *event)
 		painter.drawText(m_displayRight -100, 10, 100, 16, Qt::AlignLeft,
 						 QString(std::string("Exec avg.: " + std::to_string(m_execution_avg).substr(0, 5) + " ms").c_str()));
 		painter.drawText(m_displayRight -100, 30, 100, 16, Qt::AlignLeft,
-						 QString(std::string("Path avg: " + std::to_string(m_path_avg).substr(0, 5) + " ms").c_str()));
+						 QString(std::string("Buff. upd. avg: " + std::to_string(m_refresh_avg).substr(0, 5) + " ms").c_str()));
 		painter.drawText(m_displayRight -100, 50, 100, 16, Qt::AlignLeft,
-						 QString(std::string("Draw avg: " + std::to_string(m_draw_avg).substr(0, 5) + " ms").c_str()));
+						 QString(std::string("Path build avg: " + std::to_string(m_path_avg).substr(0, 5) + " ms").c_str()));
+		painter.drawText(m_displayRight -100, 70, 100, 16, Qt::AlignLeft,
+						 QString(std::string("Path draw avg: " + std::to_string(m_draw_avg).substr(0, 5) + " ms").c_str()));
 
 	#endif
 }
@@ -158,7 +159,7 @@ void SaSpectrumView::paintEvent(QPaintEvent *event)
 void SaSpectrumView::drawSpectrum(QPainter &painter)
 {
 	#ifdef SA_DEBUG
-		int path_time = 0, draw_time = 0;
+		int draw_time = 0;
 	#endif
 
 	// draw the graph only if there is any input, averaging residue or peaks
@@ -166,14 +167,8 @@ void SaSpectrumView::drawSpectrum(QPainter &painter)
 	if (m_decaySum > 0 || notEmpty(m_processor->m_normSpectrumL) || notEmpty(m_processor->m_normSpectrumR))
 	{
 		lock.unlock();
-		#ifdef SA_DEBUG
-			path_time = std::chrono::high_resolution_clock::now().time_since_epoch().count();
-		#endif
 		// update data buffers and reconstruct paths
 		refreshPaths();
-		#ifdef SA_DEBUG
-			path_time = std::chrono::high_resolution_clock::now().time_since_epoch().count() - path_time;
-		#endif
 
 		// draw stored paths
 		#ifdef SA_DEBUG
@@ -215,8 +210,7 @@ void SaSpectrumView::drawSpectrum(QPainter &painter)
 	}
 
 	#ifdef SA_DEBUG
-		// save performance measurement results
-		m_path_avg = 0.95 * m_path_avg + 0.05 * path_time / 1000000.0;
+		// save performance measurement result
 		m_draw_avg = 0.95 * m_draw_avg + 0.05 * draw_time / 1000000.0;
 	#endif
 }
@@ -262,7 +256,7 @@ void SaSpectrumView::refreshPaths()
 	}
 
 	#ifdef SA_DEBUG
-		int make_time = std::chrono::high_resolution_clock::now().time_since_epoch().count();
+		int path_time = std::chrono::high_resolution_clock::now().time_since_epoch().count();
 	#endif
 	// Use updated display buffers to prepare new paths for QPainter.
 	// This is the second slowest action (first is the subsequent drawing); use
@@ -281,13 +275,13 @@ void SaSpectrumView::refreshPaths()
 		}
 	}
 	#ifdef SA_DEBUG
-		make_time = std::chrono::high_resolution_clock::now().time_since_epoch().count() - make_time;
+		path_time = std::chrono::high_resolution_clock::now().time_since_epoch().count() - path_time;
 	#endif
 
 	#ifdef SA_DEBUG
-		// print measurement results
-		std::cout << "Buffer update ms: " << std::to_string(refresh_time / 1000000.0) << ", ";
-		std::cout << "Path-make ms: " << std::to_string(make_time / 1000000.0) << std::endl;
+		// save performance measurement results
+		m_refresh_avg = 0.95 * m_refresh_avg + 0.05 * refresh_time / 1000000.0;
+		m_path_avg = 0.95 * m_path_avg + 0.05 * path_time / 1000000.0;
 	#endif
 }
 

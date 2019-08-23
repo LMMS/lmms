@@ -122,6 +122,7 @@ private:
 
 	#ifdef SA_DEBUG
 		float m_execution_avg;
+		float m_refresh_avg;
 		float m_path_avg;
 		float m_draw_avg;
 	#endif
