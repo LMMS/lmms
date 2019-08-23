@@ -29,11 +29,14 @@
 
 #include <QColor>
 #include <QMutex>
+#include <QWaitCondition>
 #include <vector>
 
 #include "fft_helpers.h"
 #include "SaControls.h"
 
+template<class T>
+class ringbuffer_t;
 
 //! Receives audio data, runs FFT analysis and stores the result.
 class SaProcessor
@@ -42,7 +45,9 @@ public:
 	explicit SaProcessor(SaControls *controls);
 	virtual ~SaProcessor();
 
-	void analyse(sampleFrame *in_buffer, const fpp_t frame_count);
+	// analysis thread and a method to terminate it
+	void analyse(ringbuffer_t<sampleFrame> &ring_buffer, QWaitCondition &notifier);
+	void terminate() {m_terminate = true;}
 
 	// inform processor if any processing is actually required
 	void setSpectrumActive(bool active);
@@ -72,12 +77,22 @@ public:
 	float getAmpRangeMin(bool linear = false) const;
 	float getAmpRangeMax() const;
 
-	// data access lock must be acquired by any friendly class that touches
-	// the results, mainly to prevent unexpected mid-way reallocation
+	// Reallocation lock prevents the processor from changing size of its buffers.
+	// It is used to keep consistent bin-to-frequency mapping while drawing the
+	// spectrum. The processor is meanwhile free to work on another block.
+	QMutex m_reallocationAccess;
+	// Data access lock prevents the processor from changing both size and content
+	// of its buffers. It is used when any friendly class reads the results directly.
+	// It causes FFT analysis to be paused, so this lock should be used sparingly.
+	// If using both locks at the same time, reallocation lock MUST be acquired first.
 	QMutex m_dataAccess;
+
 
 private:
 	SaControls *m_controls;
+
+	// thread communication and control
+	bool m_terminate;
 
 	// currently valid configuration
 	unsigned int m_zeroPadFactor = 2;		//!< use n-steps bigger FFT for given block size
@@ -105,8 +120,10 @@ private:
 
 	// spectrum history for waterfall: new normSpectrum lines are added on top
 	std::vector<uchar> m_history;
-	unsigned int m_waterfallHeight = 250;	// Number of stored lines.
+	unsigned int m_waterfallHeight;			// Number of stored lines.
 											// Note: high values may make it harder to see transients.
+	const unsigned int m_waterfallMaxWidth = 3840;
+	unsigned int waterfallWidth() const;	//!< binCount value capped at 3840 (for display)
 
 	// book keeping
 	bool m_spectrumActive;

@@ -28,6 +28,7 @@
 #include "Analyzer.h"
 
 #include "embed.h"
+#include "lmms_basics.h"
 #include "plugin_export.h"
 
 #ifdef SA_DEBUG
@@ -54,33 +55,57 @@ extern "C" {
 Analyzer::Analyzer(Model *parent, const Plugin::Descriptor::SubPluginFeatures::Key *key) :
 	Effect(&analyzer_plugin_descriptor, parent, key),
 	m_processor(&m_controls),
-	m_controls(this)
+	m_controls(this),
+	m_processorThread(m_processor, m_inputBuffer, m_notifier),
+	// Buffer is sized to cover 4* the current maximum LMMS audio buffer size,
+	// so that it has some reserve space in case data processor is busy.
+	m_inputBuffer(4 * m_maxBufferSize)
 {
+	m_processorThread.start();
 }
 
 
+Analyzer::~Analyzer()
+{
+	m_processor.terminate();
+	m_notifier.wakeAll();
+	m_processorThread.wait();
+}
+
 // Take audio data and pass them to the spectrum processor.
-// Skip processing if the controls dialog isn't visible, it would only waste CPU cycles.
 bool Analyzer::processAudioBuffer(sampleFrame *buffer, const fpp_t frame_count)
 {
+	// Measure time spent in audio thread; both average and peak should be well under 1 ms.
 	#ifdef SA_DEBUG
 		unsigned int audio_time = std::chrono::high_resolution_clock::now().time_since_epoch().count();
-		if (audio_time - m_last_dump_time > 1000000000)
+		if (audio_time - m_last_dump_time > 5000000000)	// print every 5 seconds
 		{
-			std::cout << "Audio thread: " << m_sum_execution / m_dump_count << " ms avg / "
+			std::cout << "Analyzer audio thread: " << m_sum_execution / m_dump_count << " ms avg / "
 				<< m_max_execution << " ms peak." << std::endl;
 			m_last_dump_time = audio_time;
 			m_sum_execution = m_max_execution = m_dump_count = 0;
 		}
 	#endif
+
 	if (!isEnabled() || !isRunning ()) {return false;}
-	if (m_controls.isViewVisible()) {m_processor.analyse(buffer, frame_count);}
+
+	// Skip processing if the controls dialog isn't visible, it would only waste CPU cycles.
+	if (m_controls.isViewVisible()) {
+		// To avoid processing spikes on audio thread, data are stored in
+		// a lockless ringbuffer and processed in a separate thread.
+		sampleFrame_copier copier(buffer);
+		m_inputBuffer.write_func<sampleFrame_copier>(copier, frame_count);
+
+		// Inform processor to check the buffer (to avoid busy waiting).
+		m_notifier.wakeAll();
+	}
 	#ifdef SA_DEBUG
 		audio_time = std::chrono::high_resolution_clock::now().time_since_epoch().count() - audio_time;
 		m_dump_count++;
 		m_sum_execution += audio_time / 1000000.0;
 		if (audio_time / 1000000.0 > m_max_execution) {m_max_execution = audio_time / 1000000.0;}
 	#endif
+
 	return isRunning();
 }
 

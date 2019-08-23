@@ -27,51 +27,9 @@
 
 #include "ComboBoxModel.h"
 #include "EffectControls.h"
+#include "lmms_constants.h"
 
 //#define SA_DEBUG 1	// define SA_DEBUG to enable performance measurements
-
-// Frequency ranges (in Hz).
-// Full range is defined by LOWEST_LOG_FREQ and current sample rate.
-const int LOWEST_LOG_FREQ = 10;		// arbitrary low limit for log. scale, >1
-
-enum FREQUENCY_RANGES
-{
-	FRANGE_FULL = 0,
-	FRANGE_AUDIBLE,
-	FRANGE_BASS,
-	FRANGE_MIDS,
-	FRANGE_HIGH
-};
-
-const int FRANGE_AUDIBLE_START = 20;
-const int FRANGE_AUDIBLE_END = 20000;
-const int FRANGE_BASS_START = 20;
-const int FRANGE_BASS_END = 300;
-const int FRANGE_MIDS_START = 200;
-const int FRANGE_MIDS_END = 5000;
-const int FRANGE_HIGH_START = 4000;
-const int FRANGE_HIGH_END = 20000;
-
-// Amplitude ranges.
-// Reference: sine wave from -1.0 to 1.0 = 0 dB.
-// I.e. if master volume is 100 %, positive values signify clipping.
-// Doubling or halving the amplitude produces 3 dB difference.
-enum AMPLITUDE_RANGES
-{
-	ARANGE_EXTENDED = 0,
-	ARANGE_AUDIBLE,
-	ARANGE_LOUD,
-	ARANGE_SILENT
-};
-
-const int ARANGE_EXTENDED_START = -80;
-const int ARANGE_EXTENDED_END = 20;
-const int ARANGE_AUDIBLE_START = -50;
-const int ARANGE_AUDIBLE_END = 0;
-const int ARANGE_LOUD_START = -30;
-const int ARANGE_LOUD_END = 0;
-const int ARANGE_SILENT_START = -60;
-const int ARANGE_SILENT_END = -10;
 
 
 class Analyzer;
@@ -90,7 +48,7 @@ public:
 	void loadSettings (const QDomElement &_this) override;
 
 	QString nodeName() const override {return "Analyzer";}
-	int controlCount() override {return 12;}
+	int controlCount() override {return 20;}
 
 private:
 	Analyzer *m_effect;

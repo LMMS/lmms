@@ -52,6 +52,13 @@ SaWaterfallView::SaWaterfallView(SaControls *controls, SaProcessor *processor, Q
 
 	connect(gui->mainWindow(), SIGNAL(periodicUpdate()), this, SLOT(periodicUpdate()));
 
+	m_displayTop = 1;
+	m_displayBottom = height() -2;
+	m_displayLeft = 26;
+	m_displayRight = width() -26;
+	m_displayWidth = m_displayRight - m_displayLeft;
+	m_displayHeight = m_displayBottom - m_displayTop;
+
 	m_timeTics = makeTimeTics();
 	m_oldSecondsPerLine = 0;
 	m_oldHeight = 0;
@@ -70,13 +77,11 @@ SaWaterfallView::SaWaterfallView(SaControls *controls, SaProcessor *processor, Q
 void SaWaterfallView::paintEvent(QPaintEvent *event)
 {
 	#ifdef SA_DEBUG
-		int draw_time = std::chrono::high_resolution_clock::now().time_since_epoch().count();
+		unsigned int draw_time = std::chrono::high_resolution_clock::now().time_since_epoch().count();
 	#endif
 
 	// update boundary
-	m_displayTop = 1;
 	m_displayBottom = height() -2;
-	m_displayLeft = 26;
 	m_displayRight = width() -26;
 	m_displayWidth = m_displayRight - m_displayLeft;
 	m_displayHeight = m_displayBottom - m_displayTop;
@@ -136,17 +141,16 @@ void SaWaterfallView::paintEvent(QPaintEvent *event)
 	{
 		QMutexLocker lock(&m_processor->m_dataAccess);
 		QImage temp = QImage(m_processor->m_history.data(),		// raw pixel data to display
-							 m_processor->binCount(),			// width = number of frequency bins
+							 m_processor->waterfallWidth(),		// width = number of frequency bins
 							 m_processor->m_waterfallHeight,	// height = number of history lines
-							 QImage::Format_RGB32
-							 ).scaled(m_displayWidth * devicePixelRatio(),	// scale to fit view..
+							 QImage::Format_RGB32);
+		lock.unlock();
+		temp.setDevicePixelRatio(devicePixelRatio());			// display at native resolution
+		painter.drawImage(m_displayLeft, m_displayTop,
+						  temp.scaled(m_displayWidth * devicePixelRatio(),
 									  m_displayHeight * devicePixelRatio(),
 									  Qt::IgnoreAspectRatio,
-									  Qt::SmoothTransformation);
-		temp.setDevicePixelRatio(devicePixelRatio());			// display at native resolution
-		painter.drawImage(m_displayLeft, m_displayTop, temp);
-
-		lock.unlock();
+									  Qt::SmoothTransformation));
 	}
 	else
 	{
@@ -194,6 +198,7 @@ float SaWaterfallView::timeToYPixel(float time, int height)
 // Convert Y coordinate on display of given height back to time value.
 float SaWaterfallView::yPixelToTime(float position, int height)
 {
+	if (height == 0) {height = 1;}
 	float pixels_per_line = (float)height / m_processor->m_waterfallHeight;
 
 	return (position / pixels_per_line) * secondsPerLine();

@@ -30,6 +30,7 @@
 #include <QMutexLocker>
 
 #include "lmms_math.h"
+#include "../../src/3rdparty/ringbuffer/include/ringbuffer/ringbuffer.h"
 
 #ifdef SA_DEBUG
 	#include <chrono>
@@ -39,6 +40,7 @@
 
 SaProcessor::SaProcessor(SaControls *controls) :
 	m_controls(controls),
+	m_terminate(false),
 	m_inBlockSize(FFT_BLOCK_SIZES[0]),
 	m_fftBlockSize(FFT_BLOCK_SIZES[0]),
 	m_sampleRate(Engine::mixer()->processingSampleRate()),
@@ -65,7 +67,8 @@ SaProcessor::SaProcessor(SaControls *controls) :
 	m_normSpectrumL.resize(binCount(), 0);
 	m_normSpectrumR.resize(binCount(), 0);
 
-	m_history.resize(binCount() * m_waterfallHeight * sizeof qRgb(0,0,0), 0);
+	m_waterfallHeight = 100;	// a small safe value
+	m_history.resize(waterfallWidth() * m_waterfallHeight * sizeof qRgb(0,0,0), 0);
 
 	clear();
 }
@@ -85,197 +88,241 @@ SaProcessor::~SaProcessor()
 }
 
 
-// Load a batch of data from LMMS; run FFT analysis if buffer is full enough.
-void SaProcessor::analyse(sampleFrame *in_buffer, const fpp_t frame_count)
+// Load data from audio thread ringbuffer and run FFT analysis if buffer is full enough.
+void SaProcessor::analyse(ringbuffer_t<sampleFrame> &ring_buffer, QWaitCondition &notifier)
 {
-	// only take in data if any view is visible and not paused
-	if ((m_spectrumActive || m_waterfallActive) && !m_controls->m_pauseModel.value())
-	{
-		const bool stereo = m_controls->m_stereoModel.value();
-		fpp_t in_frame = 0;
-		while (in_frame < frame_count)
+	ringbuffer_reader_t<sampleFrame> reader(ring_buffer);
+
+	// Processing thread loop
+	while (!m_terminate) {
+		// If there is nothing to read, wait for notification from the writing side.
+		if (!reader.read_space()) {
+			QMutex useless_lock;
+			notifier.wait(&useless_lock);
+			useless_lock.unlock();
+		}
+
+		// skip waterfall render if processing can't keep up with input
+		bool overload = ring_buffer.write_space() < ring_buffer.maximum_eventual_write_space() / 2;
+
+		auto in_buffer = reader.read_max(ring_buffer.maximum_eventual_write_space() / 4);
+		std::size_t frame_count = in_buffer.size();
+
+		// Process received data only if any view is visible and not paused.
+		// Also, to prevent a momentary GUI freeze under high load (due to lock
+		// starvation), skip analysis when buffer reallocation is requested.
+		if ((m_spectrumActive || m_waterfallActive) && !m_controls->m_pauseModel.value() && !m_reallocating)
 		{
-			// fill sample buffers and check for zero input
-			bool block_empty = true;
-			for (; in_frame < frame_count && m_framesFilledUp < m_inBlockSize; in_frame++, m_framesFilledUp++)
+			const bool stereo = m_controls->m_stereoModel.value();
+			fpp_t in_frame = 0;
+			while (in_frame < frame_count)
 			{
+				// Lock data access to prevent reallocation from changing
+				// buffers and control variables.
+				QMutexLocker data_lock(&m_dataAccess);
+
+				// Fill sample buffers and check for zero input.
+				bool block_empty = true;
+				for (; in_frame < frame_count && m_framesFilledUp < m_inBlockSize; in_frame++, m_framesFilledUp++)
+				{
+					if (stereo)
+					{
+						m_bufferL[m_framesFilledUp] = in_buffer[in_frame][0];
+						m_bufferR[m_framesFilledUp] = in_buffer[in_frame][1];
+					}
+					else
+					{
+						m_bufferL[m_framesFilledUp] =
+						m_bufferR[m_framesFilledUp] = (in_buffer[in_frame][0] + in_buffer[in_frame][1]) * 0.5f;
+					}
+					if (in_buffer[in_frame][0] != 0.f || in_buffer[in_frame][1] != 0.f)
+					{
+						block_empty = false;
+					}
+				}
+
+				// Run analysis only if buffers contain enough data.
+				if (m_framesFilledUp < m_inBlockSize) {break;}
+
+				// Print performance analysis once per 2 seconds if debug is enabled
+				#ifdef SA_DEBUG
+					unsigned int total_time = std::chrono::high_resolution_clock::now().time_since_epoch().count();
+					if (total_time - m_last_dump_time > 2000000000)
+					{
+						std::cout << "FFT analysis: " << std::fixed << std::setprecision(2)
+							<< m_sum_execution / m_dump_count << " ms avg / "
+							<< m_max_execution << " ms peak, executing "
+							<< m_dump_count << " times per second ("
+							<< m_sum_execution / 10.0 << " % CPU usage)." << std::endl;
+						m_last_dump_time = total_time;
+						m_sum_execution = m_max_execution = m_dump_count = 0;
+					}
+				#endif
+
+				// update sample rate
+				m_sampleRate = Engine::mixer()->processingSampleRate();
+
+				// apply FFT window
+				for (unsigned int i = 0; i < m_inBlockSize; i++)
+				{
+					m_filteredBufferL[i] = m_bufferL[i] * m_fftWindow[i];
+					m_filteredBufferR[i] = m_bufferR[i] * m_fftWindow[i];
+				}
+
+				// Run FFT on left channel, convert the result to absolute magnitude
+				// spectrum and normalize it.
+				fftwf_execute(m_fftPlanL);
+				absspec(m_spectrumL, m_absSpectrumL.data(), binCount());
+				normalize(m_absSpectrumL, m_normSpectrumL, m_inBlockSize);
+
+				// repeat analysis for right channel if stereo processing is enabled
 				if (stereo)
 				{
-					m_bufferL[m_framesFilledUp] = in_buffer[in_frame][0];
-					m_bufferR[m_framesFilledUp] = in_buffer[in_frame][1];
+					fftwf_execute(m_fftPlanR);
+					absspec(m_spectrumR, m_absSpectrumR.data(), binCount());
+					normalize(m_absSpectrumR, m_normSpectrumR, m_inBlockSize);
 				}
-				else
+
+				#ifdef SA_DEBUG
+					unsigned int analysis_time = std::chrono::high_resolution_clock::now().time_since_epoch().count() - total_time;
+					std::cout << "FFT analysis: "<< analysis_time / 1000000.0 << ", ";
+				#endif
+
+				// count empty lines so that empty history does not have to update
+				if (block_empty && m_waterfallNotEmpty)
 				{
-					m_bufferL[m_framesFilledUp] =
-					m_bufferR[m_framesFilledUp] = (in_buffer[in_frame][0] + in_buffer[in_frame][1]) * 0.5f;
+					m_waterfallNotEmpty -= 1;
 				}
-				if (in_buffer[in_frame][0] != 0.f || in_buffer[in_frame][1] != 0.f)
+				else if (!block_empty)
 				{
-					block_empty = false;
+					m_waterfallNotEmpty = m_waterfallHeight + 2;
 				}
-			}
-	
-			// Run analysis only if buffers contain enough data.
-			// Also, to prevent audio interruption and a momentary GUI freeze,
-			// skip analysis if buffers are being reallocated.
-			if (m_framesFilledUp < m_inBlockSize || m_reallocating) {return;}
 
-			// Print performance analysis once per second if debug is enabled
-			#ifdef SA_DEBUG
-				unsigned int fft_time = std::chrono::high_resolution_clock::now().time_since_epoch().count();
-				if (fft_time - m_last_dump_time > 1000000000)
+				if (m_waterfallActive && m_waterfallNotEmpty)
 				{
-					std::cout << "FFT analysis: " << std::fixed << std::setprecision(2)
-						<< m_sum_execution / m_dump_count << " ms avg / "
-						<< m_max_execution << " ms peak, executing "
-						<< m_dump_count << " times per second ("
-						<< m_sum_execution / 10.0 << " % CPU usage)." << std::endl;
-					m_last_dump_time = fft_time;
-					m_sum_execution = m_max_execution = m_dump_count = 0;
-				}
-			#endif
+					#ifdef SA_DEBUG
+						unsigned int move_time = std::chrono::high_resolution_clock::now().time_since_epoch().count();
+					#endif
+					// move waterfall history one line down and clear the top line
+					QRgb *pixel = (QRgb *)m_history.data();
+					std::copy(pixel,
+							  pixel + waterfallWidth() * m_waterfallHeight - waterfallWidth(),
+							  pixel + waterfallWidth());
+					memset(pixel, 0, waterfallWidth() * sizeof (QRgb));
+					#ifdef SA_DEBUG
+						move_time = std::chrono::high_resolution_clock::now().time_since_epoch().count() - move_time;
+						std::cout << "Waterfall movement: "<< move_time / 1000000.0 << ", ";
+						unsigned int render_time = std::chrono::high_resolution_clock::now().time_since_epoch().count();
+					#endif
 
-			// update sample rate
-			m_sampleRate = Engine::mixer()->processingSampleRate();
-	
-			// apply FFT window
-			for (unsigned int i = 0; i < m_inBlockSize; i++)
-			{
-				m_filteredBufferL[i] = m_bufferL[i] * m_fftWindow[i];
-				m_filteredBufferR[i] = m_bufferR[i] * m_fftWindow[i];
-			}
-	
-			// lock data shared with SaSpectrumView and SaWaterfallView
-			QMutexLocker lock(&m_dataAccess);
+					// add newest result on top
+					int target;		// pixel being constructed
+					float accL = 0;	// accumulators for merging multiple bins
+					float accR = 0;
 
-			// Run FFT on left channel, convert the result to absolute magnitude
-			// spectrum and normalize it.
-			fftwf_execute(m_fftPlanL);
-			absspec(m_spectrumL, m_absSpectrumL.data(), binCount());
-			normalize(m_absSpectrumL, m_normSpectrumL, m_inBlockSize);
-	
-			// repeat analysis for right channel if stereo processing is enabled
-			if (stereo)
-			{
-				fftwf_execute(m_fftPlanR);
-				absspec(m_spectrumR, m_absSpectrumR.data(), binCount());
-				normalize(m_absSpectrumR, m_normSpectrumR, m_inBlockSize);
-			}
-
-			// count empty lines so that empty history does not have to update
-			if (block_empty && m_waterfallNotEmpty)
-			{
-				m_waterfallNotEmpty -= 1;
-			}
-			else if (!block_empty)
-			{
-				m_waterfallNotEmpty = m_waterfallHeight + 2;
-			}
-
-			if (m_waterfallActive && m_waterfallNotEmpty)
-			{
-				// move waterfall history one line down and clear the top line
-				QRgb *pixel = (QRgb *)m_history.data();
-				std::copy(pixel,
-						  pixel + binCount() * m_waterfallHeight - binCount(),
-						  pixel + binCount());
-				memset(pixel, 0, binCount() * sizeof (QRgb));
-
-				// add newest result on top
-				int target;		// pixel being constructed
-				float accL = 0;	// accumulators for merging multiple bins
-				float accR = 0;
-	
-				for (unsigned int i = 0; i < binCount(); i++)
-				{
-					// Every frequency bin spans a frequency range that must be
-					// partially or fully mapped to a pixel. Any inconsistency
-					// may be seen in the spectrogram as dark or white lines --
-					// play white noise to confirm your change did not break it.
-					float band_start = freqToXPixel(binToFreq(i) - binBandwidth() / 2.0, binCount());
-					float band_end = freqToXPixel(binToFreq(i + 1) - binBandwidth() / 2.0, binCount());
-					if (m_controls->m_logXModel.value())
+					for (unsigned int i = 0; i < waterfallWidth(); i++)
 					{
-						// Logarithmic scale
-						if (band_end - band_start > 1.0)
+						// fill line with red color to indicate lost data if CPU cannot keep up
+						if (overload) {
+							pixel[i] = qRgb(42, 0, 0);
+							continue;
+						}
+
+						// Every frequency bin spans a frequency range that must be
+						// partially or fully mapped to a pixel. Any inconsistency
+						// may be seen in the spectrogram as dark or white lines --
+						// play white noise to confirm your change did not break it.
+						float band_start = freqToXPixel(binToFreq(i) - binBandwidth() / 2.0, waterfallWidth());
+						float band_end = freqToXPixel(binToFreq(i + 1) - binBandwidth() / 2.0, waterfallWidth());
+						if (m_controls->m_logXModel.value())
 						{
-							// band spans multiple pixels: draw all pixels it covers
-							for (target = (int)band_start; target < (int)band_end; target++)
+							// Logarithmic scale
+							if (band_end - band_start > 1.0)
 							{
-								if (target >= 0 && target < binCount())
+								// band spans multiple pixels: draw all pixels it covers
+								for (target = (int)band_start; target < (int)band_end; target++)
+								{
+									if (target >= 0 && target < waterfallWidth())
+									{
+										pixel[target] = makePixel(m_normSpectrumL[i], m_normSpectrumR[i]);
+									}
+								}
+								// save remaining portion of the band for the following band / pixel
+								// (in case the next band uses sub-pixel drawing)
+								accL = (band_end - (int)band_end) * m_normSpectrumL[i];
+								accR = (band_end - (int)band_end) * m_normSpectrumR[i];
+							}
+							else
+							{
+								// sub-pixel drawing; add contribution of current band
+								target = (int)band_start;
+								if ((int)band_start == (int)band_end)
+								{
+									// band ends within current target pixel, accumulate
+									accL += (band_end - band_start) * m_normSpectrumL[i];
+									accR += (band_end - band_start) * m_normSpectrumR[i];
+								}
+								else
+								{
+									// Band ends in the next pixel -- finalize the current pixel.
+									// Make sure contribution is split correctly on pixel boundary.
+									accL += ((int)band_end - band_start) * m_normSpectrumL[i];
+									accR += ((int)band_end - band_start) * m_normSpectrumR[i];
+
+									if (target >= 0 && target < waterfallWidth()) {pixel[target] = makePixel(accL, accR);}
+
+									// save remaining portion of the band for the following band / pixel
+									accL = (band_end - (int)band_end) * m_normSpectrumL[i];
+									accR = (band_end - (int)band_end) * m_normSpectrumR[i];
+								}
+							}
+						}
+						else
+						{
+							// Linear: always draws one or more pixels per band
+							for (target = (int)band_start; target < band_end; target++)
+							{
+								if (target >= 0 && target < waterfallWidth())
 								{
 									pixel[target] = makePixel(m_normSpectrumL[i], m_normSpectrumR[i]);
 								}
 							}
-							// save remaining portion of the band for the following band / pixel
-							// (in case the next band uses sub-pixel drawing)
-							accL = (band_end - (int)band_end) * m_normSpectrumL[i];
-							accR = (band_end - (int)band_end) * m_normSpectrumR[i];
-						}
-						else
-						{
-							// sub-pixel drawing; add contribution of current band
-							target = (int)band_start;
-							if ((int)band_start == (int)band_end)
-							{
-								// band ends within current target pixel, accumulate
-								accL += (band_end - band_start) * m_normSpectrumL[i];
-								accR += (band_end - band_start) * m_normSpectrumR[i];
-							}
-							else
-							{
-								// Band ends in the next pixel -- finalize the current pixel.
-								// Make sure contribution is split correctly on pixel boundary.
-								accL += ((int)band_end - band_start) * m_normSpectrumL[i];
-								accR += ((int)band_end - band_start) * m_normSpectrumR[i];
-	
-								if (target >= 0 && target < binCount()) {pixel[target] = makePixel(accL, accR);}
-
-								// save remaining portion of the band for the following band / pixel
-								accL = (band_end - (int)band_end) * m_normSpectrumL[i];
-								accR = (band_end - (int)band_end) * m_normSpectrumR[i];
-							}
 						}
 					}
-					else
-					{
-						// Linear: always draws one or more pixels per band
-						for (target = (int)band_start; target < band_end; target++)
-						{
-							if (target >= 0 && target < binCount())
-							{
-								pixel[target] = makePixel(m_normSpectrumL[i], m_normSpectrumR[i]);
-							}
-						}
-					}
+					#ifdef SA_DEBUG
+						render_time = std::chrono::high_resolution_clock::now().time_since_epoch().count() - render_time;
+						std::cout << "Waterfall render: "<< render_time / 1000000.0 << ", ";
+					#endif
 				}
-			}
+				#ifdef SA_DEBUG
+					unsigned int cleanup_time = std::chrono::high_resolution_clock::now().time_since_epoch().count();
+				#endif
+				// clean up before checking for more data from input buffer
+				const unsigned int overlaps = m_controls->m_windowOverlapModel.value();
+				if (overlaps == 1)			// each sample used only once
+				{
+					m_framesFilledUp = 0;
+				}
+				else
+				{
+					const unsigned int drop = m_inBlockSize / overlaps;
+					std::move(m_bufferL.begin() + drop, m_bufferL.end(), m_bufferL.begin());
+					std::move(m_bufferR.begin() + drop, m_bufferR.end(), m_bufferR.begin());
+					m_framesFilledUp -= drop;
+				}
 
-			// clean up before checking for more data from input buffer
-			const unsigned int overlaps = m_controls->m_windowOverlapModel.value();
-			if (overlaps == 1)			// each sample used only once
-			{
-				m_framesFilledUp = 0;
-			}
-			else
-			{
-				const unsigned int drop = m_inBlockSize / overlaps;
-				m_bufferL.erase(m_bufferL.begin(), m_bufferL.begin() + drop);
-				m_bufferR.erase(m_bufferR.begin(), m_bufferR.begin() + drop);
-				m_bufferL.resize(m_inBlockSize, 0);
-				m_bufferR.resize(m_inBlockSize, 0);
-				m_framesFilledUp -= m_inBlockSize / overlaps;
-			}
-
-			#ifdef SA_DEBUG
-				// report FFT processing speed
-				fft_time = std::chrono::high_resolution_clock::now().time_since_epoch().count() - fft_time;
-				m_dump_count++;
-				m_sum_execution += fft_time / 1000000.0;
-				if (fft_time / 1000000.0 > m_max_execution) {m_max_execution = fft_time / 1000000.0;}
-			#endif
-		}
-	}
+				#ifdef SA_DEBUG
+					cleanup_time = std::chrono::high_resolution_clock::now().time_since_epoch().count() - cleanup_time;
+					std::cout << "Cleanup: "<< cleanup_time / 1000000.0 << std::endl;
+					// measure overall FFT processing speed
+					total_time = std::chrono::high_resolution_clock::now().time_since_epoch().count() - total_time;
+					m_dump_count++;
+					m_sum_execution += total_time / 1000000.0;
+					if (total_time / 1000000.0 > m_max_execution) {m_max_execution = total_time / 1000000.0;}
+				#endif
+			}	// frame filler and processing
+		}	// process if active
+	}	// thread loop end
 }
 
 
@@ -348,12 +395,16 @@ void SaProcessor::reallocateBuffers()
 
 	new_bins = new_fft_size / 2 +1;
 
-	// Lock data shared with SaSpectrumView and SaWaterfallView.
-	// The m_reallocating is here to tell analyse() to avoid asking for the
-	// lock, since fftw3 can take a while to find the fastest FFT algorithm
-	// for given machine, which would produce interruption in the audio stream.
+	// Use m_reallocating to tell analyse() to avoid asking for the lock. This
+	// is needed because under heavy load the FFT thread requests data lock so
+	// often that this routine could end up waiting even for several seconds.
 	m_reallocating = true;
-	QMutexLocker lock(&m_dataAccess);
+
+	// Lock data shared with SaSpectrumView and SaWaterfallView.
+	// Reallocation lock must be acquired first to avoid deadlock (a view class
+	// may already have it and request the "stronger" data lock on top of that).
+	QMutexLocker reloc_lock(&m_reallocationAccess);
+	QMutexLocker data_lock(&m_dataAccess);
 
 	// destroy old FFT plan and free the result buffer
 	if (m_fftPlanL != NULL) {fftwf_destroy_plan(m_fftPlanL);}
@@ -375,7 +426,9 @@ void SaProcessor::reallocateBuffers()
 
 	if (m_fftPlanL == NULL || m_fftPlanR == NULL)
 	{
-		std::cerr << "Failed to create new FFT plan!" << std::endl;
+		#ifdef SA_DEBUG
+			std::cerr << "Analyzer: failed to create new FFT plan!" << std::endl;
+		#endif
 	}
 	m_absSpectrumL.resize(new_bins, 0);
 	m_absSpectrumR.resize(new_bins, 0);
@@ -383,14 +436,18 @@ void SaProcessor::reallocateBuffers()
 	m_normSpectrumR.resize(new_bins, 0);
 
 	m_waterfallHeight = m_controls->m_waterfallHeightModel.value();
-	m_history.resize(new_bins * m_waterfallHeight * sizeof qRgb(0,0,0), 0);
+	m_history.resize((new_bins < m_waterfallMaxWidth ? new_bins : m_waterfallMaxWidth)
+					 * m_waterfallHeight
+					 * sizeof qRgb(0,0,0), 0);
 
 	// done; publish new sizes and clean up
 	m_inBlockSize = new_in_size;
 	m_fftBlockSize = new_fft_size;
 
-	lock.unlock();
+	data_lock.unlock();
+	reloc_lock.unlock();
 	m_reallocating = false;
+
 	clear();
 }
 
@@ -445,6 +502,14 @@ float SaProcessor::getNyquistFreq() const
 unsigned int SaProcessor::binCount() const
 {
 	return m_fftBlockSize / 2 + 1;
+}
+
+
+// FFT transform can easily produce more bins than can be reasonably useful for
+// display. Cap the width at 3840: full screen on UHD display should be enough.
+unsigned int SaProcessor::waterfallWidth() const
+{
+	return binCount() < m_waterfallMaxWidth ? binCount() : m_waterfallMaxWidth;
 }
 
 

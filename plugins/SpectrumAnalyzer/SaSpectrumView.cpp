@@ -220,9 +220,9 @@ void SaSpectrumView::drawSpectrum(QPainter &painter)
 // and build QPainter paths.
 void SaSpectrumView::refreshPaths()
 {
-	// Lock is required for the entire function, mainly to prevent block size
-	// changes from causing reallocation of data structures mid-way.
-	QMutexLocker lock(&m_processor->m_dataAccess);
+	// Reallocation lock is required for the entire function, to keep display
+	// buffer size consistent with block size.
+	QMutexLocker reloc_lock(&m_processor->m_reallocationAccess);
 
 	// check if bin count changed and reallocate display buffers accordingly
 	if (m_processor->binCount() != m_displayBufferL.size())
@@ -241,9 +241,12 @@ void SaSpectrumView::refreshPaths()
 	#ifdef SA_DEBUG
 		int refresh_time = std::chrono::high_resolution_clock::now().time_since_epoch().count();
 	#endif
+	// The stronger Data lock is needed only for the duration of actual data reading.
+	QMutexLocker data_lock(&m_processor->m_dataAccess);
 	m_decaySum = 0;
 	updateBuffers(m_processor->m_normSpectrumL.data(), m_displayBufferL.data(), m_peakBufferL.data());
 	updateBuffers(m_processor->m_normSpectrumR.data(), m_displayBufferR.data(), m_peakBufferR.data());
+	data_lock.unlock();
 	#ifdef SA_DEBUG
 		refresh_time = std::chrono::high_resolution_clock::now().time_since_epoch().count() - refresh_time;
 	#endif
