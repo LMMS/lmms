@@ -30,6 +30,10 @@
 #include "embed.h"
 #include "plugin_export.h"
 
+#ifdef SA_DEBUG
+	#include <chrono>
+	#include <iostream>
+#endif
 
 extern "C" {
 	Plugin::Descriptor PLUGIN_EXPORT analyzer_plugin_descriptor =
@@ -59,8 +63,24 @@ Analyzer::Analyzer(Model *parent, const Plugin::Descriptor::SubPluginFeatures::K
 // Skip processing if the controls dialog isn't visible, it would only waste CPU cycles.
 bool Analyzer::processAudioBuffer(sampleFrame *buffer, const fpp_t frame_count)
 {
+	#ifdef SA_DEBUG
+		unsigned int audio_time = std::chrono::high_resolution_clock::now().time_since_epoch().count();
+		if (audio_time - m_last_dump_time > 1000000000)
+		{
+			std::cout << "Audio thread: " << m_sum_execution / m_dump_count << " ms avg / "
+				<< m_max_execution << " ms peak." << std::endl;
+			m_last_dump_time = audio_time;
+			m_sum_execution = m_max_execution = m_dump_count = 0;
+		}
+	#endif
 	if (!isEnabled() || !isRunning ()) {return false;}
 	if (m_controls.isViewVisible()) {m_processor.analyse(buffer, frame_count);}
+	#ifdef SA_DEBUG
+		audio_time = std::chrono::high_resolution_clock::now().time_since_epoch().count() - audio_time;
+		m_dump_count++;
+		m_sum_execution += audio_time / 1000000.0;
+		if (audio_time / 1000000.0 > m_max_execution) {m_max_execution = audio_time / 1000000.0;}
+	#endif
 	return isRunning();
 }
 

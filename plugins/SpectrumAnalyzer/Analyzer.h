@@ -47,6 +47,13 @@ public:
 private:
 	SaProcessor m_processor;
 	SaControls m_controls;
+
+	#ifdef SA_DEBUG
+		int m_last_dump_time;
+		int m_dump_count;
+		float m_sum_execution;
+		float m_max_execution;
+	#endif
 };
 
 #endif // ANALYZER_H

@@ -119,6 +119,13 @@ private:
 
 	friend class SaSpectrumView;
 	friend class SaWaterfallView;
+
+	#ifdef SA_DEBUG
+		unsigned int m_last_dump_time;
+		unsigned int m_dump_count;
+		float m_sum_execution;
+		float m_max_execution;
+	#endif
 };
 #endif // SAPROCESSOR_H
 

@@ -227,6 +227,7 @@ SaControlsDialog::SaControlsDialog(SaControls *controls, SaProcessor *processor)
 	Knob *envelopeResolutionKnob = new Knob(knobSmall_17, this);
 	envelopeResolutionKnob->setModel(&controls->m_envelopeResolutionModel);
 	envelopeResolutionKnob->setLabel(tr("Envelope res."));
+	envelopeResolutionKnob->setToolTip(tr("Increase envelope resolution for better details, decrease for better GUI performance."));
 	envelopeResolutionKnob->setHintText(tr("Draw at most"), tr(" envelope points per pixel"));
 	advanced_layout->addWidget(envelopeResolutionKnob, 0, 0, 1, 1, Qt::AlignCenter);
 
@@ -234,6 +235,7 @@ SaControlsDialog::SaControlsDialog(SaControls *controls, SaProcessor *processor)
 	Knob *spectrumResolutionKnob = new Knob(knobSmall_17, this);
 	spectrumResolutionKnob->setModel(&controls->m_spectrumResolutionModel);
 	spectrumResolutionKnob->setLabel(tr("Spectrum res."));
+	spectrumResolutionKnob->setToolTip(tr("Increase spectrum resolution for better details, decrease for better GUI performance."));
 	spectrumResolutionKnob->setHintText(tr("Draw at most"), tr(" spectrum points per pixel"));
 	advanced_layout->addWidget(spectrumResolutionKnob, 1, 0, 1, 1, Qt::AlignCenter);
 
@@ -241,6 +243,7 @@ SaControlsDialog::SaControlsDialog(SaControls *controls, SaProcessor *processor)
 	Knob *peakDecayFactorKnob = new Knob(knobSmall_17, this);
 	peakDecayFactorKnob->setModel(&controls->m_peakDecayFactorModel);
 	peakDecayFactorKnob->setLabel(tr("Falloff factor"));
+	peakDecayFactorKnob->setToolTip(tr("Decrease to make peaks fall faster."));
 	peakDecayFactorKnob->setHintText(tr("Multiply buffered value by"), "");
 	advanced_layout->addWidget(peakDecayFactorKnob, 0, 1, 1, 1, Qt::AlignCenter);
 
@@ -248,6 +251,7 @@ SaControlsDialog::SaControlsDialog(SaControls *controls, SaProcessor *processor)
 	Knob *averagingWeightKnob = new Knob(knobSmall_17, this);
 	averagingWeightKnob->setModel(&controls->m_averagingWeightModel);
 	averagingWeightKnob->setLabel(tr("Averaging weight"));
+	averagingWeightKnob->setToolTip(tr("Decrease to make averaging slower and smoother."));
 	averagingWeightKnob->setHintText(tr("New sample contributes"), "");
 	advanced_layout->addWidget(averagingWeightKnob, 1, 1, 1, 1, Qt::AlignCenter);
 
@@ -255,6 +259,7 @@ SaControlsDialog::SaControlsDialog(SaControls *controls, SaProcessor *processor)
 	Knob *waterfallHeightKnob = new Knob(knobSmall_17, this);
 	waterfallHeightKnob->setModel(&controls->m_waterfallHeightModel);
 	waterfallHeightKnob->setLabel(tr("Waterfall height"));
+	waterfallHeightKnob->setToolTip(tr("Increase to get slower scrolling, decrease to see fast transitions better."));
 	waterfallHeightKnob->setHintText(tr("Keep"), tr(" lines"));
 	advanced_layout->addWidget(waterfallHeightKnob, 0, 2, 1, 1, Qt::AlignCenter);
 	processor->reallocateBuffers();
@@ -264,6 +269,7 @@ SaControlsDialog::SaControlsDialog(SaControls *controls, SaProcessor *processor)
 	Knob *waterfallGammaKnob = new Knob(knobSmall_17, this);
 	waterfallGammaKnob->setModel(&controls->m_waterfallGammaModel);
 	waterfallGammaKnob->setLabel(tr("Waterfall gamma"));
+	waterfallGammaKnob->setToolTip(tr("Decrease to see very weak signals, increase to get better contrast."));
 	waterfallGammaKnob->setHintText(tr("Gamma value:"), "");
 	advanced_layout->addWidget(waterfallGammaKnob, 1, 2, 1, 1, Qt::AlignCenter);
 
@@ -271,6 +277,7 @@ SaControlsDialog::SaControlsDialog(SaControls *controls, SaProcessor *processor)
 	Knob *windowOverlapKnob = new Knob(knobSmall_17, this);
 	windowOverlapKnob->setModel(&controls->m_windowOverlapModel);
 	windowOverlapKnob->setLabel(tr("Window overlap"));
+	windowOverlapKnob->setToolTip(tr("Increase to prevent missing fast transitions arriving near FFT window edges. Warning: high CPU usage."));
 	windowOverlapKnob->setHintText(tr("Each sample processed"), tr(" times"));
 	advanced_layout->addWidget(windowOverlapKnob, 0, 3, 1, 1, Qt::AlignCenter);
 
@@ -278,6 +285,7 @@ SaControlsDialog::SaControlsDialog(SaControls *controls, SaProcessor *processor)
 	Knob *zeroPaddingKnob = new Knob(knobSmall_17, this);
 	zeroPaddingKnob->setModel(&controls->m_zeroPaddingModel);
 	zeroPaddingKnob->setLabel(tr("Zero padding"));
+	zeroPaddingKnob->setToolTip(tr("Increase to get smoother-looking spectrum. Warning: high CPU usage."));
 	zeroPaddingKnob->setHintText(tr("Processing buffer is"), tr(" steps larger than input block"));
 	advanced_layout->addWidget(zeroPaddingKnob, 1, 3, 1, 1, Qt::AlignCenter);
 	processor->reallocateBuffers();

@@ -27,11 +27,15 @@
 
 #include <algorithm>
 #include <cmath>
-#include <iostream>
 #include <QMutexLocker>
 
 #include "lmms_math.h"
 
+#ifdef SA_DEBUG
+	#include <chrono>
+	#include <iomanip>
+	#include <iostream>
+#endif
 
 SaProcessor::SaProcessor(SaControls *controls) :
 	m_controls(controls),
@@ -84,9 +88,6 @@ SaProcessor::~SaProcessor()
 // Load a batch of data from LMMS; run FFT analysis if buffer is full enough.
 void SaProcessor::analyse(sampleFrame *in_buffer, const fpp_t frame_count)
 {
-	#ifdef SA_DEBUG
-		int start_time = std::chrono::high_resolution_clock::now().time_since_epoch().count();
-	#endif
 	// only take in data if any view is visible and not paused
 	if ((m_spectrumActive || m_waterfallActive) && !m_controls->m_pauseModel.value())
 	{
@@ -118,6 +119,21 @@ void SaProcessor::analyse(sampleFrame *in_buffer, const fpp_t frame_count)
 			// Also, to prevent audio interruption and a momentary GUI freeze,
 			// skip analysis if buffers are being reallocated.
 			if (m_framesFilledUp < m_inBlockSize || m_reallocating) {return;}
+
+			// Print performance analysis once per second if debug is enabled
+			#ifdef SA_DEBUG
+				unsigned int fft_time = std::chrono::high_resolution_clock::now().time_since_epoch().count();
+				if (fft_time - m_last_dump_time > 1000000000)
+				{
+					std::cout << "FFT analysis: " << std::fixed << std::setprecision(2)
+						<< m_sum_execution / m_dump_count << " ms avg / "
+						<< m_max_execution << " ms peak, executing "
+						<< m_dump_count << " times per second ("
+						<< m_sum_execution / 10.0 << " % CPU usage)." << std::endl;
+					m_last_dump_time = fft_time;
+					m_sum_execution = m_max_execution = m_dump_count = 0;
+				}
+			#endif
 
 			// update sample rate
 			m_sampleRate = Engine::mixer()->processingSampleRate();
@@ -234,11 +250,6 @@ void SaProcessor::analyse(sampleFrame *in_buffer, const fpp_t frame_count)
 					}
 				}
 			}
-			#ifdef SA_DEBUG
-				// report FFT processing speed
-				start_time = std::chrono::high_resolution_clock::now().time_since_epoch().count() - start_time;
-				std::cout << "Processed " << m_framesFilledUp << " samples in " << start_time / 1000000.0 << " ms" << std::endl;
-			#endif
 
 			// clean up before checking for more data from input buffer
 			const unsigned int overlaps = m_controls->m_windowOverlapModel.value();
@@ -255,6 +266,14 @@ void SaProcessor::analyse(sampleFrame *in_buffer, const fpp_t frame_count)
 				m_bufferR.resize(m_inBlockSize, 0);
 				m_framesFilledUp -= m_inBlockSize / overlaps;
 			}
+
+			#ifdef SA_DEBUG
+				// report FFT processing speed
+				fft_time = std::chrono::high_resolution_clock::now().time_since_epoch().count() - fft_time;
+				m_dump_count++;
+				m_sum_execution += fft_time / 1000000.0;
+				if (fft_time / 1000000.0 > m_max_execution) {m_max_execution = fft_time / 1000000.0;}
+			#endif
 		}
 	}
 }

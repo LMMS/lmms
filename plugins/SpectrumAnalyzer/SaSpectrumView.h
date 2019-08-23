@@ -27,6 +27,8 @@
 #ifndef SASPECTRUMVIEW_H
 #define SASPECTRUMVIEW_H
 
+#include "SaControls.h"
+
 #include <string>
 #include <utility>
 #include <QPainterPath>
@@ -34,7 +36,6 @@
 
 class QMouseEvent;
 class QPainter;
-class SaControls;
 class SaProcessor;
 
 //! Widget that displays a spectrum curve and frequency / amplitude grid
@@ -103,7 +104,7 @@ private:
 	void drawSpectrum(QPainter &painter);
 
 	// current cursor location and a method to draw it
-	QPoint m_cursor;
+	QPointF m_cursor;
 	void drawCursor(QPainter &painter);
 
 	// wrappers for most used SaProcessor conversion helpers
@@ -118,6 +119,12 @@ private:
 	unsigned int m_displayLeft;
 	unsigned int m_displayRight;
 	unsigned int m_displayWidth;
+
+	#ifdef SA_DEBUG
+		float m_execution_avg;
+		float m_path_avg;
+		float m_draw_avg;
+	#endif
 };
 #endif // SASPECTRUMVIEW_H
 

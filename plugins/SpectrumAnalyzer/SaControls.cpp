@@ -59,8 +59,8 @@ SaControls::SaControls(Analyzer *effect) :
 	m_averagingWeightModel(0.15f, 0.01f, 0.5f, 0.01f, this, tr("Averaging weight")),
 	m_waterfallHeightModel(250.0f, 50.0f, 1000.0f, 50.0f, this, tr("Waterfall history size")),
 	m_waterfallGammaModel(0.30f, 0.10f, 1.00f, 0.05f, this, tr("Waterfall gamma correction")),
-	m_windowOverlapModel(1.0f, 1.0f, 4.0f, 1.0f, this, tr("FFT window overlap")),
-	m_zeroPaddingModel(2.0f, 0.0f, 4.0f, 1.0f, this, tr("FFT zero padding"))
+	m_windowOverlapModel(1.0f, 1.0f, 3.0f, 1.0f, this, tr("FFT window overlap")),
+	m_zeroPaddingModel(2.0f, 0.0f, 3.0f, 1.0f, this, tr("FFT zero padding"))
 {
 	// Frequency and amplitude ranges; order must match
 	// FREQUENCY_RANGES and AMPLITUDE_RANGES defined in SaControls.h

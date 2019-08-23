@@ -68,7 +68,11 @@ SaSpectrumView::SaSpectrumView(SaControls *controls, SaProcessor *processor, QWi
 	m_logAmpTics = makeLogAmpTics(m_processor->getAmpRangeMin(), m_processor->getAmpRangeMax());
 	m_linearAmpTics = makeLinearAmpTics(m_processor->getAmpRangeMin(), m_processor->getAmpRangeMax());
 
-	m_cursor = QPoint(0, 0);
+	m_cursor = QPointF(0, 0);
+
+	#ifdef SA_DEBUG
+		m_execution_avg = m_path_avg = m_draw_avg = 0;
+	#endif
 }
 
 
@@ -134,12 +138,18 @@ void SaSpectrumView::paintEvent(QPaintEvent *event)
 							2.0, 2.0);
 
 	#ifdef SA_DEBUG
-		// display what FPS would be achieved if spectrum display ran in a loop
+		// display performance measurements if enabled
 		total_time = std::chrono::high_resolution_clock::now().time_since_epoch().count() - total_time;
+		m_execution_avg = 0.95 * m_execution_avg + 0.05 * total_time / 1000000.0;
 		painter.setPen(QPen(m_controls->m_colorLabels, 1,
 							Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
-		painter.drawText(m_displayRight -100, 70, 100, 16, Qt::AlignLeft,
-						 QString(std::string("Max FPS: " + std::to_string(1000000000.0 / total_time)).c_str()));
+		painter.drawText(m_displayRight -100, 10, 100, 16, Qt::AlignLeft,
+						 QString(std::string("Exec avg.: " + std::to_string(m_execution_avg).substr(0, 5) + " ms").c_str()));
+		painter.drawText(m_displayRight -100, 30, 100, 16, Qt::AlignLeft,
+						 QString(std::string("Path avg: " + std::to_string(m_path_avg).substr(0, 5) + " ms").c_str()));
+		painter.drawText(m_displayRight -100, 50, 100, 16, Qt::AlignLeft,
+						 QString(std::string("Draw avg: " + std::to_string(m_draw_avg).substr(0, 5) + " ms").c_str()));
+
 	#endif
 }
 
@@ -205,11 +215,9 @@ void SaSpectrumView::drawSpectrum(QPainter &painter)
 	}
 
 	#ifdef SA_DEBUG
-		// display measurement results
-		painter.drawText(m_displayRight -100, 90, 100, 16, Qt::AlignLeft,
-						 QString(std::string("Path ms: " + std::to_string(path_time / 1000000.0)).c_str()));
-		painter.drawText(m_displayRight -100, 110, 100, 16, Qt::AlignLeft,
-						 QString(std::string("Draw ms: " + std::to_string(draw_time / 1000000.0)).c_str()));
+		// save performance measurement results
+		m_path_avg = 0.95 * m_path_avg + 0.05 * path_time / 1000000.0;
+		m_draw_avg = 0.95 * m_draw_avg + 0.05 * draw_time / 1000000.0;
 	#endif
 }
 
@@ -540,7 +548,7 @@ void SaSpectrumView::drawGrid(QPainter &painter)
 // Draw cursor and its coordinates if it is within display bounds.
 void SaSpectrumView::drawCursor(QPainter &painter)
 {
-	if(		m_cursor.x() >= m_displayLeft
+	if (	m_cursor.x() >= m_displayLeft
 		&&	m_cursor.x() <= m_displayRight
 		&&	m_cursor.y() >= m_displayTop
 		&&	m_cursor.y() <= m_displayBottom)
@@ -552,26 +560,25 @@ void SaSpectrumView::drawCursor(QPainter &painter)
 
 		// coordinates
 		painter.setPen(QPen(m_controls->m_colorLabels.darker(), 1, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
-		painter.drawText(m_displayRight -60, 5, 100, 16, Qt::AlignLeft, "Cursor");
-
 		QString tmps;
+
 		// frequency
 		int xFreq = (int)m_processor->xPixelToFreq(m_cursor.x() - m_displayLeft, m_displayWidth);
 		tmps = QString(std::string(std::to_string(xFreq) + " Hz").c_str());
-		painter.drawText(m_displayRight -60, 18, 100, 16, Qt::AlignLeft, tmps);
+		painter.drawText(m_displayLeft +8, 8, 100, 16, Qt::AlignLeft, tmps);
 
 		// amplitude
 		float yAmp = m_processor->yPixelToAmp(m_cursor.y(), m_displayBottom);
 		if (m_controls->m_logYModel.value())
 		{
-			tmps = QString(std::string(std::to_string(yAmp).substr(0, 5) + " dB").c_str());
+			tmps = QString(std::string(std::to_string(yAmp).substr(0, 5) + " dBFS").c_str());
 		}
 		else
 		{
 			// add 0.0005 to get proper rounding to 3 decimal places
 			tmps = QString(std::string(std::to_string(0.0005f + yAmp)).substr(0, 5).c_str());
 		}
-		painter.drawText(m_displayRight -60, 30, 100, 16, Qt::AlignLeft, tmps);
+		painter.drawText(m_displayLeft +8, 20, 100, 16, Qt::AlignLeft, tmps);
 	}
 }
 
@@ -777,12 +784,12 @@ void SaSpectrumView::periodicUpdate()
 // Handle mouse input: set new cursor position.
 void SaSpectrumView::mouseMoveEvent(QMouseEvent *event)
 {
-	m_cursor = event->pos();
+	m_cursor = event->localPos();
 }
 
 void SaSpectrumView::mousePressEvent(QMouseEvent *event)
 {
-	m_cursor = event->pos();
+	m_cursor = event->localPos();
 }
 
 
