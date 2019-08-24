@@ -168,11 +168,11 @@ private slots:
 	void onExportProjectMidi();
 
 protected:
-	void closeEvent( QCloseEvent * _ce ) override;
-	void focusOutEvent( QFocusEvent * _fe ) override;
-	void keyPressEvent( QKeyEvent * _ke ) override;
-	void keyReleaseEvent( QKeyEvent * _ke ) override;
-	void timerEvent( QTimerEvent * _ev ) override;
+	virtual void closeEvent( QCloseEvent * _ce );
+	virtual void focusOutEvent( QFocusEvent * _fe );
+	virtual void keyPressEvent( QKeyEvent * _ke );
+	virtual void keyReleaseEvent( QKeyEvent * _ke );
+	virtual void timerEvent( QTimerEvent * _ev );
 
 
 private:
@@ -194,6 +194,8 @@ private:
 
 	QWidget * m_toolBar;
 	QGridLayout * m_toolBarLayout;
+
+	QMenu * m_recentlyOpenedProjectsMenu;
 
 	struct keyModifiers
 	{
@@ -227,7 +229,9 @@ private:
 
 private slots:
 	void browseHelp();
+	void openRecentlyOpenedProject( QAction * _action );
 	void showTool( QAction * _idx );
+	void updateRecentlyOpenedProjectsMenu();
 	void updateViewMenu( void );
 	void updateConfig( QAction * _who );
 	void onToggleMetronome();

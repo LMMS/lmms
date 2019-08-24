@@ -12,10 +12,12 @@ public:
 	virtual ~TemplatesMenu() = default;
 
 private slots:
-	static void createNewProjectFromTemplate(QAction * _action);
+	void createNewProjectFromTemplate( QAction * _idx );
 	void fillTemplatesMenu();
-	void addTemplatesFromDir( const QDir& dir );
+	int addTemplatesFromDir( const QDir& dir );
 
+private:
+	int m_customTemplatesCount;
 };
 
 #endif // TEMPLATESMENU_H
