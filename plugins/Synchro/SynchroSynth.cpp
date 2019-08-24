@@ -222,8 +222,12 @@ void SynchroSynth::generalChanged() {
 		int octaveDiff = m_carrierDetune.value() - m_modulatorDetune.value();
 		double pitchDifference = powf(2, octaveDiff);
 		double phase = (double)i / (double)GRAPH_SAMPLES;
-		double phaseMod = SynchroWaveform(phase * D_2PI, m_modulatorDrive.value(), m_modulatorSync.value(), m_modulatorChop.value(), m_harmonics.value()) * m_modulationStrength.value() * m_modulation.value() * PM_CONST;
-		m_resultView.setSampleAt(i, SynchroWaveform(phaseMod + phase * D_2PI * pitchDifference, m_carrierDrive.value(), m_carrierSync.value(), m_carrierChop.value(), 0));
+		double phaseResult = phase * D_2PI;
+		while (phaseResult >= D_2PI) { phaseResult -= D_2PI; }
+		double phaseMod = SynchroWaveform(phaseResult, m_modulatorDrive.value(), m_modulatorSync.value(), m_modulatorChop.value(), m_harmonics.value()) * m_modulationStrength.value() * m_modulation.value() * PM_CONST;
+		phaseResult = phaseMod + phase * D_2PI * pitchDifference;
+		while (phaseResult >= D_2PI) { phaseResult -= D_2PI; }
+		m_resultView.setSampleAt(i, SynchroWaveform(phaseResult, m_carrierDrive.value(), m_carrierSync.value(), m_carrierChop.value(), 0));
 	}
 }
 
