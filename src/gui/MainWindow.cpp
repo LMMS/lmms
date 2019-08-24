@@ -61,6 +61,7 @@
 #include "SetupDialog.h"
 #include "SideBar.h"
 #include "SongEditor.h"
+#include "TemplatesMenu.h"
 #include "TextFloat.h"
 #include "TimeLineWidget.h"
 #include "ToolButton.h"
@@ -88,7 +89,6 @@ void disableAutoKeyAccelerators(QWidget* mainWindow)
 
 MainWindow::MainWindow() :
 	m_workspace( NULL ),
-	m_templatesMenu( NULL ),
 	m_recentlyOpenedProjectsMenu( NULL ),
 	m_toolsMenu( NULL ),
 	m_autoSaveTimer( this ),
@@ -277,12 +277,8 @@ void MainWindow::finalize()
 					this, SLOT( createNewProject() ),
 					QKeySequence::New );
 
-	m_templatesMenu = new QMenu( tr("New from template"), this );
-	connect( m_templatesMenu, SIGNAL( aboutToShow() ), SLOT( fillTemplatesMenu() ) );
-	connect( m_templatesMenu, SIGNAL( triggered( QAction * ) ),
-		 SLOT( createNewProjectFromTemplate( QAction * ) ) );
-
-	project_menu->addMenu(m_templatesMenu);
+	auto templates_menu = new TemplatesMenu( this );
+	project_menu->addMenu(templates_menu);
 
 	project_menu->addAction( embed::getIconPixmap( "project_open" ),
 					tr( "&Open..." ),
@@ -429,7 +425,7 @@ void MainWindow::finalize()
 				tr( "Create new project from template" ),
 					this, SLOT( emptySlot() ),
 							m_toolBar );
-	project_new_from_template->setMenu( m_templatesMenu );
+	project_new_from_template->setMenu( templates_menu );
 	project_new_from_template->setPopupMode( ToolButton::InstantPopup );
 
 	ToolButton * project_open = new ToolButton(
@@ -803,24 +799,6 @@ void MainWindow::createNewProject()
 	if( mayChangeProject(true) )
 	{
 		Engine::getSong()->createNewProject();
-	}
-}
-
-
-
-
-void MainWindow::createNewProjectFromTemplate( QAction * _idx )
-{
-	if( m_templatesMenu && mayChangeProject(true) )
-	{
-		int indexOfTemplate = m_templatesMenu->actions().indexOf( _idx );
-		bool isFactoryTemplate = indexOfTemplate >= m_custom_templates_count;
-		QString dirBase =  isFactoryTemplate ?
-				ConfigManager::inst()->factoryTemplatesDir() :
-				ConfigManager::inst()->userTemplateDir();
-
-		const QString f = dirBase + _idx->text().replace("&&", "&") + ".mpt";
-		Engine::getSong()->createNewProjectFromTemplate(f);
 	}
 }
 
@@ -1445,40 +1423,6 @@ void MainWindow::timerEvent( QTimerEvent * _te)
 	emit periodicUpdate();
 }
 
-
-
-
-void MainWindow::fillTemplatesMenu()
-{
-	m_templatesMenu->clear();
-
-	auto addTemplatesFromDir = [this]( QDir dir ) {
-		QStringList templates = dir.entryList( QStringList( "*.mpt" ),
-							QDir::Files | QDir::Readable );
-
-		if ( templates.size() && ! m_templatesMenu->actions().isEmpty() )
-		{
-			m_templatesMenu->addSeparator();
-		}
-
-		for( QStringList::iterator it = templates.begin();
-							it != templates.end(); ++it )
-		{
-			m_templatesMenu->addAction(
-						embed::getIconPixmap( "project_file" ),
-						( *it ).left( ( *it ).length() - 4 ).replace("&", "&&") );
-#ifdef LMMS_BUILD_APPLE
-			m_templatesMenu->actions().last()->setIconVisibleInMenu(false); // QTBUG-44565 workaround
-			m_templatesMenu->actions().last()->setIconVisibleInMenu(true);
-#endif
-		}
-
-		return templates.size();
-	};
-
-	m_custom_templates_count = addTemplatesFromDir( ConfigManager::inst()->userTemplateDir() );
-	addTemplatesFromDir( ConfigManager::inst()->factoryProjectsDir() + "templates" );
-}
 
 
 
