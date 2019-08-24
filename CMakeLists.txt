@@ -709,4 +709,9 @@ MESSAGE(
 "\n\n")
 
 SET(CMAKE_INSTALL_SYSTEM_RUNTIME_DESTINATION "${BIN_DIR}")
+if(MSVC)
+	# We can't set this on the install time according to the configuration
+	SET(CMAKE_INSTALL_DEBUG_LIBRARIES TRUE)
+	SET(CMAKE_INSTALL_UCRT_LIBRARIES TRUE)
+endif()
 INCLUDE(InstallRequiredSystemLibraries)
