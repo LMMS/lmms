@@ -32,7 +32,6 @@
 
 #include "ConfigManager.h"
 #include "SubWindow.h"
-#include "RecentProjectsMenu.h"
 
 class QAction;
 class QDomElement;
@@ -203,8 +202,6 @@ private:
 
 	QWidget * m_toolBar;
 	QGridLayout * m_toolBarLayout;
-
-	RecentProjectsMenu * m_recentlyOpenedProjectsMenu;
 
 	struct keyModifiers
 	{

@@ -57,6 +57,7 @@
 #include "ProjectJournal.h"
 #include "ProjectNotes.h"
 #include "ProjectRenderer.h"
+#include "RecentProjectsMenu.h"
 #include "RemotePlugin.h"
 #include "SetupDialog.h"
 #include "SideBar.h"
@@ -89,7 +90,6 @@ void disableAutoKeyAccelerators(QWidget* mainWindow)
 
 MainWindow::MainWindow() :
 	m_workspace( NULL ),
-	m_recentlyOpenedProjectsMenu( NULL ),
 	m_toolsMenu( NULL ),
 	m_autoSaveTimer( this ),
 	m_viewMenu( NULL ),
@@ -285,8 +285,7 @@ void MainWindow::finalize()
 					this, SLOT( openProject() ),
 					QKeySequence::Open );
 
-	m_recentlyOpenedProjectsMenu = new RecentProjectsMenu(this);
-	project_menu->addMenu(m_recentlyOpenedProjectsMenu);
+	project_menu->addMenu(new RecentProjectsMenu(this));
 
 	project_menu->addAction( embed::getIconPixmap( "project_save" ),
 					tr( "&Save" ),
@@ -434,7 +433,7 @@ void MainWindow::finalize()
 				embed::getIconPixmap( "project_open_recent" ),
 					tr( "Recently opened projects" ),
 					this, SLOT( emptySlot() ), m_toolBar );
-	project_open_recent->setMenu( m_recentlyOpenedProjectsMenu );
+	project_open_recent->setMenu( new RecentProjectsMenu(this) );
 	project_open_recent->setPopupMode( ToolButton::InstantPopup );
 
 	ToolButton * project_save = new ToolButton(
