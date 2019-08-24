@@ -1,11 +1,14 @@
 #include "RecentProjectsMenu.h"
-#include "embed.h"
-#include "ConfigManager.h"
+
 #include <QFileInfo>
-#include "Song.h"
+
+#include "ConfigManager.h"
 #include "Engine.h"
-#include "MainWindow.h"
+#include "Song.h"
+
+#include "embed.h"
 #include "GuiApplication.h"
+#include "MainWindow.h"
 
 RecentProjectsMenu::RecentProjectsMenu(QWidget *parent) :
 	QMenu(tr( "&Recently Opened Projects" ), parent)
