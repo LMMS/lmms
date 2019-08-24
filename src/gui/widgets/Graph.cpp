@@ -37,18 +37,22 @@ namespace gui
 {
 
 Graph::Graph( QWidget * _parent, graphStyle _style, int _width,
-		int _height ) :
+		int _height, bool readOnly ) :
 	QWidget( _parent ),
 	/* TODO: size, background? */
 	ModelView( new graphModel( -1.0, 1.0, 128, nullptr, true ), this ),
 	m_graphStyle( _style )
 {
+	isReadOnly = readOnly;
 	m_mouseDown = false;
 	m_graphColor = QColor( 0xFF, 0xAA, 0x00 );
 
 	resize( _width, _height );
-	setAcceptDrops( true );
-	setCursor( Qt::CrossCursor );
+
+	if (!readOnly) {
+		setCursor(Qt::CrossCursor);
+		setAcceptDrops(true);
+	}
 
 	auto gModel = castModel<graphModel>();
 
@@ -99,6 +103,9 @@ void graph::loadSampleFromFile( const QString & _filename )
 
 void Graph::mouseMoveEvent ( QMouseEvent * _me )
 {
+	if (isReadOnly)
+		return;
+	
 	// get position
 	int x = _me->x();
 	int y = _me->y();
@@ -146,6 +153,9 @@ void Graph::mouseMoveEvent ( QMouseEvent * _me )
 
 void Graph::mousePressEvent( QMouseEvent * _me )
 {
+	if (isReadOnly)
+		return;
+
 	if( _me->button() == Qt::LeftButton )
 	{
 		if ( !( _me->modifiers() & Qt::ShiftModifier ) )
@@ -199,11 +209,11 @@ void Graph::drawLineAt( int _x, int _y, int _lastx )
 
 	float range = minVal - maxVal;
 	float val = ( _y*range/( height()-5 ) ) + maxVal;
-	
+
 	int sample_begin, sample_end;
 	float lastval;
 	float val_begin, val_end;
-	
+
 	if (_lastx > _x)
 	{
 		sample_begin = (int)((_x) * xscale);
@@ -220,9 +230,9 @@ void Graph::drawLineAt( int _x, int _y, int _lastx )
 		lastval = model() -> m_samples[ (int)( sample_begin ) ];
 		val_begin = lastval;
 		val_end = val;
-		
+
 	}
-	
+
 	// calculate line drawing variables
 	int linelen = sample_end - sample_begin;
 	if (linelen == 1)
@@ -268,10 +278,11 @@ void Graph::changeSampleAt( int _x, int _y )
 	model()->setSampleAt( (int)( _x*xscale ), val );
 }
 
-
-
 void Graph::mouseReleaseEvent( QMouseEvent * _me )
 {
+	if (isReadOnly)
+		return;
+
 	if( _me->button() == Qt::LeftButton )
 	{
 		// toggle mouse state
@@ -281,8 +292,6 @@ void Graph::mouseReleaseEvent( QMouseEvent * _me )
 		emit drawn();
 	}
 }
-
-
 
 void Graph::paintEvent( QPaintEvent * )
 {
@@ -301,7 +310,6 @@ void Graph::paintEvent( QPaintEvent * )
 
 	// Max index, more useful below
 	length--;
-
 
 	switch( m_graphStyle )
 	{
@@ -703,10 +711,10 @@ void graphModel::shiftPhase( int _deg )
 {
 	// calculate offset in samples
 	const int offset = ( _deg * length() ) / 360; //multiply first because integers
-	
+
 	// store values in temporary array
 	QVector<float> temp = m_samples;
-	
+
 	// shift phase
 	for( int i = 0; i < length(); i++ )
 	{
@@ -714,7 +722,7 @@ void graphModel::shiftPhase( int _deg )
 		while( o < 0 ) o += length();
 		m_samples[i] = temp[o];
 	}
-	
+
 	emit samplesChanged( 0, length()-1 );
 }
 
