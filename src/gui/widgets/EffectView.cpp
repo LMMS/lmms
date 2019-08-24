@@ -100,11 +100,11 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 		{
 			if (dynamic_cast<PeakControllerEffectControlDialog*>(m_controlView) == nullptr)
 			{
-				m_subWindow = gui->mainWindow()->addWindowedWidget( m_controlView );
+				m_subWindow = gui->mainWindow()->addWindowedWidget(m_controlView);
 
 				if (!m_controlView->isResizable())
 				{
-					m_subWindow->setSizePolicy( QSizePolicy::Fixed, QSizePolicy::Fixed );
+					m_subWindow->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 					if (m_subWindow->layout())
 					{
 						m_subWindow->layout()->setSizeConstraint(QLayout::SetFixedSize);
@@ -113,10 +113,9 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 
 				Qt::WindowFlags flags = m_subWindow->windowFlags();
 				flags &= ~Qt::WindowMaximizeButtonHint;
-				m_subWindow->setWindowFlags( flags );
+				m_subWindow->setWindowFlags(flags);
 
-				connect( m_controlView, SIGNAL( closed() ),
-						this, SLOT( closeEffects() ) );
+				connect(m_controlView, SIGNAL(closed()), this, SLOT(closeEffects()));
 
 				m_subWindow->hide();
 			}
@@ -146,7 +145,7 @@ EffectView::~EffectView()
 void EffectView::editControls()
 {
 	QMdiSubWindow * controls;
-	if( dynamic_cast<PeakControllerEffectControlDialog*>( m_controlView ) == NULL )
+	if(dynamic_cast<PeakControllerEffectControlDialog*>(m_controlView) == nullptr)
 	{
 		controls = m_subWindow;
 	}
@@ -154,18 +153,18 @@ void EffectView::editControls()
 	{
 		controls = gui->getControllerRackView()->subWin();
 	}
-	if( controls )
+	if(controls)
 	{
-		if( !controls->isVisible() )
+		if(!controls->isVisible())
 		{
 			controls->show();
 			controls->raise();
-			effect()->controls()->setViewVisible( true );
+			effect()->controls()->setViewVisible(true);
 		}
 		else
 		{
 			controls->hide();
-			effect()->controls()->setViewVisible( false );
+			effect()->controls()->setViewVisible(false);
 		}
 	}
 }

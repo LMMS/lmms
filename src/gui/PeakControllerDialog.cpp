@@ -28,6 +28,7 @@
 #include <QPushButton>
 #include <QMdiArea>
 #include <QMdiSubWindow>
+#include <QLayout>
 #include <QPainter>
 
 #include "CaptionMenu.h"
@@ -36,7 +37,6 @@
 #include "Engine.h"
 #include "MainWindow.h"
 #include "ToolTip.h"
-
 #include "PeakController.h"
 #include "ControllerDialog.h"
 #include "Knob.h"
@@ -45,7 +45,6 @@
 #include "plugins/peak_controller_effect/peak_controller_effect.h"
 #include "plugins/peak_controller_effect/peak_controller_effect_control_dialog.cpp"
 #include "EffectControlDialog.h"
-#include <QLayout>
 
 
 PeakControllerDialog::PeakControllerDialog( PeakController * _model, QWidget * _parent ) :

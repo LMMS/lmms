@@ -88,7 +88,7 @@ class PeakControllerDialog : public ControllerDialog
 {
 	Q_OBJECT
 public:
-	PeakControllerDialog(PeakController *_controller, QWidget * _parent );
+	PeakControllerDialog( PeakController *_controller, QWidget * _parent );
 	virtual ~PeakControllerDialog();
 
 protected:

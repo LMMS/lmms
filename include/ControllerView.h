@@ -82,9 +82,9 @@ protected:
 	virtual void paintEvent(QPaintEvent *);
 	virtual void contextMenuEvent(QContextMenuEvent *);
 	virtual void modelChanged();
-	virtual void mouseDoubleClickEvent(QMouseEvent *me);
-	virtual void dragEnterEvent( QDragEnterEvent * dee );
-	virtual void dropEvent( QDropEvent * de );
+	virtual void mouseDoubleClickEvent(QMouseEvent * me);
+	virtual void dragEnterEvent(QDragEnterEvent * dee);
+	virtual void dropEvent(QDropEvent * de);
 
 
 private:
