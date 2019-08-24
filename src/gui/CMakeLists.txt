@@ -43,6 +43,7 @@ SET(LMMS_SRCS
 	gui/editors/PianoRoll.cpp
 	gui/editors/SongEditor.cpp
 
+	gui/menus/RecentProjectsMenu.cpp
 	gui/menus/TemplatesMenu.cpp
 
 	gui/widgets/AutomatableButton.cpp

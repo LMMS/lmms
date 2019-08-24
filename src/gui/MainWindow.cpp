@@ -57,6 +57,7 @@
 #include "ProjectJournal.h"
 #include "ProjectNotes.h"
 #include "ProjectRenderer.h"
+#include "RecentProjectsMenu.h"
 #include "RemotePlugin.h"
 #include "SetupDialog.h"
 #include "SideBar.h"
@@ -89,7 +90,6 @@ void disableAutoKeyAccelerators(QWidget* mainWindow)
 
 MainWindow::MainWindow() :
 	m_workspace( NULL ),
-	m_recentlyOpenedProjectsMenu( NULL ),
 	m_toolsMenu( NULL ),
 	m_autoSaveTimer( this ),
 	m_viewMenu( NULL ),
@@ -292,13 +292,7 @@ void MainWindow::finalize()
 					this, SLOT( openProject() ),
 					QKeySequence::Open );
 
-	m_recentlyOpenedProjectsMenu = project_menu->addMenu(
-				embed::getIconPixmap( "project_open_recent" ),
-					tr( "&Recently Opened Projects" ) );
-	connect( m_recentlyOpenedProjectsMenu, SIGNAL( aboutToShow() ),
-			this, SLOT( updateRecentlyOpenedProjectsMenu() ) );
-	connect( m_recentlyOpenedProjectsMenu, SIGNAL( triggered( QAction * ) ),
-			this, SLOT( openRecentlyOpenedProject( QAction * ) ) );
+	project_menu->addMenu(new RecentProjectsMenu(this));
 
 	project_menu->addAction( embed::getIconPixmap( "project_save" ),
 					tr( "&Save" ),
@@ -446,7 +440,7 @@ void MainWindow::finalize()
 				embed::getIconPixmap( "project_open_recent" ),
 					tr( "Recently opened projects" ),
 					this, SLOT( emptySlot() ), m_toolBar );
-	project_open_recent->setMenu( m_recentlyOpenedProjectsMenu );
+	project_open_recent->setMenu( new RecentProjectsMenu(this) );
 	project_open_recent->setPopupMode( ToolButton::InstantPopup );
 
 	ToolButton * project_save = new ToolButton(
@@ -830,56 +824,6 @@ void MainWindow::openProject()
 			song->loadProject( ofd.selectedFiles()[0] );
 			setCursor( Qt::ArrowCursor );
 		}
-	}
-}
-
-
-
-
-void MainWindow::updateRecentlyOpenedProjectsMenu()
-{
-	m_recentlyOpenedProjectsMenu->clear();
-	QStringList rup = ConfigManager::inst()->recentlyOpenedProjects();
-
-//	The file history goes 50 deep but we only show the 15
-//	most recent ones that we can open and omit .mpt files.
-	int shownInMenu = 0;
-	for( QStringList::iterator it = rup.begin(); it != rup.end(); ++it )
-	{
-		QFileInfo recentFile( *it );
-		if ( recentFile.exists() &&
-				*it != ConfigManager::inst()->recoveryFile() )
-		{
-			if( recentFile.suffix().toLower() == "mpt" )
-			{
-				continue;
-			}
-
-			m_recentlyOpenedProjectsMenu->addAction(
-					embed::getIconPixmap( "project_file" ), it->replace("&", "&&") );
-#ifdef LMMS_BUILD_APPLE
-			m_recentlyOpenedProjectsMenu->actions().last()->setIconVisibleInMenu(false); // QTBUG-44565 workaround
-			m_recentlyOpenedProjectsMenu->actions().last()->setIconVisibleInMenu(true);
-#endif
-			shownInMenu++;
-			if( shownInMenu >= 15 )
-			{
-				return;
-			}
-		}
-	}
-}
-
-
-
-void MainWindow::openRecentlyOpenedProject( QAction * _action )
-{
-	if ( mayChangeProject(true) )
-	{
-		const QString f = _action->text().replace("&&", "&");
-		setCursor( Qt::WaitCursor );
-		Engine::getSong()->loadProject( f );
-		setCursor( Qt::ArrowCursor );
 	}
 }
 
