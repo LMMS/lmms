@@ -43,16 +43,13 @@ Graph::Graph( QWidget * _parent, graphStyle _style, int _width,
 	ModelView( new graphModel( -1.0, 1.0, 128, nullptr, true ), this ),
 	m_graphStyle( _style )
 {
-	m_isReadOnly = readOnly;
 	m_mouseDown = false;
 	m_graphColor = QColor( 0xFF, 0xAA, 0x00 );
 
 	resize( _width, _height );
 
-	if (!readOnly) {
-		setCursor(Qt::CrossCursor);
-		setAcceptDrops(true);
-	}
+	setCursor(Qt::CrossCursor);
+	setAcceptDrops(true);
 
 	auto gModel = castModel<graphModel>();
 
@@ -103,9 +100,6 @@ void graph::loadSampleFromFile( const QString & _filename )
 
 void Graph::mouseMoveEvent ( QMouseEvent * _me )
 {
-	if (m_isReadOnly)
-		return;
-
 	// get position
 	int x = _me->x();
 	int y = _me->y();
@@ -153,9 +147,6 @@ void Graph::mouseMoveEvent ( QMouseEvent * _me )
 
 void Graph::mousePressEvent( QMouseEvent * _me )
 {
-	if (m_isReadOnly)
-		return;
-
 	if( _me->button() == Qt::LeftButton )
 	{
 		if ( !( _me->modifiers() & Qt::ShiftModifier ) )
@@ -280,9 +271,6 @@ void Graph::changeSampleAt( int _x, int _y )
 
 void Graph::mouseReleaseEvent( QMouseEvent * _me )
 {
-	if (m_isReadOnly)
-		return;
-
 	if( _me->button() == Qt::LeftButton )
 	{
 		// toggle mouse state
