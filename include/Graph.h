@@ -90,8 +90,6 @@ public:
 		update();
 	}
 
-	bool isReadOnly;
-
 signals:
 	void drawn();
 protected:
@@ -119,6 +117,8 @@ private:
 
 	bool m_mouseDown;
 	int m_lastCursorX;
+
+	bool m_isReadOnly;
 
 } ;
 
