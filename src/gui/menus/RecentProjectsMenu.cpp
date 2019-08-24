@@ -13,15 +13,15 @@ RecentProjectsMenu::RecentProjectsMenu(QWidget *parent) :
 	setIcon(embed::getIconPixmap( "project_open_recent" ));
 
 	connect( this, SIGNAL( aboutToShow() ),
-			 this, SLOT( updateRecentlyOpenedProjectsMenu() ) );
+			 this, SLOT(fillMenu() ) );
 	connect( this, SIGNAL( triggered( QAction * ) ),
-			 this, SLOT( openRecentlyOpenedProject( QAction * ) ) );
+			 this, SLOT(openProject(QAction * ) ) );
 }
 
 
 
 
-void RecentProjectsMenu::updateRecentlyOpenedProjectsMenu()
+void RecentProjectsMenu::fillMenu()
 {
 	clear();
 	QStringList rup = ConfigManager::inst()->recentlyOpenedProjects();
@@ -62,7 +62,7 @@ void RecentProjectsMenu::updateRecentlyOpenedProjectsMenu()
 
 
 
-void RecentProjectsMenu::openRecentlyOpenedProject( QAction * _action )
+void RecentProjectsMenu::openProject(QAction * _action )
 {
 	if ( gui->mainWindow()->mayChangeProject(true) )
 	{

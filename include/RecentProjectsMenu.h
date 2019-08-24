@@ -10,8 +10,8 @@ public:
 	RecentProjectsMenu(QWidget *parent = nullptr);
 
 private slots:
-	void updateRecentlyOpenedProjectsMenu();
-	void openRecentlyOpenedProject( QAction * _action );
+	void fillMenu();
+	void openProject(QAction * _action );
 };
 
 #endif // RECENTPROJECTSMENU_H
