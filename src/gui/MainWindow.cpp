@@ -288,9 +288,6 @@ void MainWindow::finalize()
 	m_recentlyOpenedProjectsMenu = new RecentProjectsMenu(this);
 	project_menu->addMenu(m_recentlyOpenedProjectsMenu);
 
-	connect( m_recentlyOpenedProjectsMenu, SIGNAL( triggered( QAction * ) ),
-			this, SLOT( openRecentlyOpenedProject( QAction * ) ) );
-
 	project_menu->addAction( embed::getIconPixmap( "project_save" ),
 					tr( "&Save" ),
 					this, SLOT( saveProject() ),
@@ -821,20 +818,6 @@ void MainWindow::openProject()
 			song->loadProject( ofd.selectedFiles()[0] );
 			setCursor( Qt::ArrowCursor );
 		}
-	}
-}
-
-
-
-
-void MainWindow::openRecentlyOpenedProject( QAction * _action )
-{
-	if ( mayChangeProject(true) )
-	{
-		const QString f = _action->text().replace("&&", "&");
-		setCursor( Qt::WaitCursor );
-		Engine::getSong()->loadProject( f );
-		setCursor( Qt::ArrowCursor );
 	}
 }
 

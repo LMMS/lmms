@@ -238,7 +238,6 @@ private:
 
 private slots:
 	void browseHelp();
-	void openRecentlyOpenedProject( QAction * _action );
 	void showTool( QAction * _idx );
 	void updateViewMenu( void );
 	void updateConfig( QAction * _who );

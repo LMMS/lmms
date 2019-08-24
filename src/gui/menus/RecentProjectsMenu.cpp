@@ -2,6 +2,10 @@
 #include "embed.h"
 #include "ConfigManager.h"
 #include <QFileInfo>
+#include "Song.h"
+#include "Engine.h"
+#include "MainWindow.h"
+#include "GuiApplication.h"
 
 RecentProjectsMenu::RecentProjectsMenu(QWidget *parent) :
 	QMenu(tr( "&Recently Opened Projects" ), parent)
@@ -10,6 +14,8 @@ RecentProjectsMenu::RecentProjectsMenu(QWidget *parent) :
 
 	connect( this, SIGNAL( aboutToShow() ),
 			 this, SLOT( updateRecentlyOpenedProjectsMenu() ) );
+	connect( this, SIGNAL( triggered( QAction * ) ),
+			 this, SLOT( openRecentlyOpenedProject( QAction * ) ) );
 }
 
 
@@ -46,5 +52,19 @@ void RecentProjectsMenu::updateRecentlyOpenedProjectsMenu()
 				return;
 			}
 		}
+	}
+}
+
+
+
+
+void RecentProjectsMenu::openRecentlyOpenedProject( QAction * _action )
+{
+	if ( gui->mainWindow()->mayChangeProject(true) )
+	{
+		const QString f = _action->text().replace("&&", "&");
+		setCursor( Qt::WaitCursor );
+		Engine::getSong()->loadProject( f );
+		setCursor( Qt::ArrowCursor );
 	}
 }
