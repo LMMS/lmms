@@ -240,7 +240,6 @@ private slots:
 	void browseHelp();
 	void openRecentlyOpenedProject( QAction * _action );
 	void showTool( QAction * _idx );
-	void updateRecentlyOpenedProjectsMenu();
 	void updateViewMenu( void );
 	void updateConfig( QAction * _who );
 	void onToggleMetronome();

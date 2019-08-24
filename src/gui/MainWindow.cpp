@@ -288,8 +288,6 @@ void MainWindow::finalize()
 	m_recentlyOpenedProjectsMenu = new RecentProjectsMenu(this);
 	project_menu->addMenu(m_recentlyOpenedProjectsMenu);
 
-	connect( m_recentlyOpenedProjectsMenu, SIGNAL( aboutToShow() ),
-			this, SLOT( updateRecentlyOpenedProjectsMenu() ) );
 	connect( m_recentlyOpenedProjectsMenu, SIGNAL( triggered( QAction * ) ),
 			this, SLOT( openRecentlyOpenedProject( QAction * ) ) );
 
@@ -826,42 +824,6 @@ void MainWindow::openProject()
 	}
 }
 
-
-
-
-void MainWindow::updateRecentlyOpenedProjectsMenu()
-{
-	m_recentlyOpenedProjectsMenu->clear();
-	QStringList rup = ConfigManager::inst()->recentlyOpenedProjects();
-
-//	The file history goes 50 deep but we only show the 15
-//	most recent ones that we can open and omit .mpt files.
-	int shownInMenu = 0;
-	for( QStringList::iterator it = rup.begin(); it != rup.end(); ++it )
-	{
-		QFileInfo recentFile( *it );
-		if ( recentFile.exists() &&
-				*it != ConfigManager::inst()->recoveryFile() )
-		{
-			if( recentFile.suffix().toLower() == "mpt" )
-			{
-				continue;
-			}
-
-			m_recentlyOpenedProjectsMenu->addAction(
-					embed::getIconPixmap( "project_file" ), it->replace("&", "&&") );
-#ifdef LMMS_BUILD_APPLE
-			m_recentlyOpenedProjectsMenu->actions().last()->setIconVisibleInMenu(false); // QTBUG-44565 workaround
-			m_recentlyOpenedProjectsMenu->actions().last()->setIconVisibleInMenu(true);
-#endif
-			shownInMenu++;
-			if( shownInMenu >= 15 )
-			{
-				return;
-			}
-		}
-	}
-}
 
 
 

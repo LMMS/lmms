@@ -9,6 +9,8 @@ class RecentProjectsMenu : public QMenu
 public:
 	RecentProjectsMenu(QWidget *parent = nullptr);
 
+private slots:
+	void updateRecentlyOpenedProjectsMenu();
 };
 
 #endif // RECENTPROJECTSMENU_H
