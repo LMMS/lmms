@@ -37,7 +37,7 @@ namespace gui
 {
 
 Graph::Graph( QWidget * _parent, graphStyle _style, int _width,
-		int _height, bool readOnly ) :
+		int _height) :
 	QWidget( _parent ),
 	/* TODO: size, background? */
 	ModelView( new graphModel( -1.0, 1.0, 128, nullptr, true ), this ),
