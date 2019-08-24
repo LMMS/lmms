@@ -350,19 +350,19 @@ SynchroSynthView::SynchroSynthView(Instrument * instrument, QWidget * parent) :
 	m_modulatorDetuneKnob->move(64, 210);
 	m_modulatorDetuneKnob->setHintText(tr("modulator octave"), "");
 
-	m_carrierGraph = new Graph(this, Graph::LinearStyle, 48, 42, true);
+	m_carrierGraph = new Graph(this, Graph::LinearStyle, 48, 42);
 	m_carrierGraph->move(5, 138);
 	m_carrierGraph->setAutoFillBackground(false);
 	m_carrierGraph->setGraphColor(QColor(255, 255, 255));
 	m_carrierGraph->setEnabled(false);
 
-	m_modulatorGraph = new Graph(this, Graph::LinearStyle, 48, 42, true);
+	m_modulatorGraph = new Graph(this, Graph::LinearStyle, 48, 42);
 	m_modulatorGraph->move(5, 203);
 	m_modulatorGraph->setAutoFillBackground(false);
 	m_modulatorGraph->setGraphColor(QColor(255, 255, 255));
 	m_modulatorGraph->setEnabled(false);
 
-	m_resultGraph = new Graph(this, Graph::LinearStyle, 48, 42, true);
+	m_resultGraph = new Graph(this, Graph::LinearStyle, 48, 42);
 	m_resultGraph->move(5, 73);
 	m_resultGraph->setAutoFillBackground(false);
 	m_resultGraph->setGraphColor(QColor(255, 255, 255));
