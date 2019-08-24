@@ -148,7 +148,6 @@ public slots:
 
 	void emptySlot();
 	void createNewProject();
-	void createNewProjectFromTemplate( QAction * _idx );
 	void openProject();
 	bool saveProject();
 	bool saveProjectAs();
@@ -204,9 +203,7 @@ private:
 	QWidget * m_toolBar;
 	QGridLayout * m_toolBarLayout;
 
-	QMenu * m_templatesMenu;
 	QMenu * m_recentlyOpenedProjectsMenu;
-	int m_custom_templates_count;
 
 	struct keyModifiers
 	{
@@ -240,7 +237,6 @@ private:
 
 private slots:
 	void browseHelp();
-	void fillTemplatesMenu();
 	void openRecentlyOpenedProject( QAction * _action );
 	void showTool( QAction * _idx );
 	void updateRecentlyOpenedProjectsMenu();
