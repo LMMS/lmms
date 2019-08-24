@@ -2,6 +2,7 @@
  * ControllerView.h - view-component for an control
  *
  * Copyright (c) 2008 Paul Giblock <drfaygo/at/gmail.com>
+ * Copyright (c) 2019 Steffen Baranowsky <BaraMGB/at/freenet.de>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -56,10 +57,9 @@ public:
 
 	bool isCollapsed() const;
 
-public slots:
 
-	void collapseController();
-	void expandController();
+public slots:
+	void collapseController(bool collapse);
 	void toggleCollapseController();
 
 	void rename();
@@ -82,7 +82,7 @@ protected:
 	virtual void paintEvent(QPaintEvent *);
 	virtual void contextMenuEvent(QContextMenuEvent *);
 	virtual void modelChanged();
-	virtual void mouseDoubleClickEvent(QMouseEvent *);
+	virtual void mouseDoubleClickEvent(QMouseEvent *me);
 	virtual void dragEnterEvent( QDragEnterEvent * dee );
 	virtual void dropEvent( QDropEvent * de );
 
@@ -95,6 +95,6 @@ private:
 	QLineEdit * m_nameLineEdit;
 	QPushButton * m_collapseButton;
 	Controller * m_modelC;
-} ;
+};
 
 #endif

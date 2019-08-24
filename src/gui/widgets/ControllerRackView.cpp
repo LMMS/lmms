@@ -3,6 +3,7 @@
  *
  * Copyright (c) 2008-2009 Paul Giblock <drfaygo/at/gmail.com>
  * Copyright (c) 2010-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2019 Steffen Baranowsky <BaraMGB/at/freenet.de>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -45,7 +46,8 @@
 
 
 ControllerRackView::ControllerRackView() :
-	QWidget()
+	QWidget(),
+	m_collapsingStateOnLoad()
 {
 	setWindowIcon(embed::getIconPixmap("controller"));
 	setWindowTitle(tr("Controller Rack"));
@@ -102,9 +104,14 @@ ControllerRackView::~ControllerRackView()
 
 
 
-void ControllerRackView::saveSettings(QDomDocument &,
-							QDomElement & parent)
+void ControllerRackView::saveSettings(QDomDocument &, QDomElement & parent)
 {
+	parent.setAttribute(QString("controllerCount"), m_controllerViews.size());
+	for (auto i = 1; i <= m_controllerViews.size(); i++)
+	{
+		bool collapsed = m_controllerViews.at(i - 1)->isCollapsed();
+		parent.setAttribute(QString("controllerView") + QString::number(i), collapsed);
+	}
 	MainWindow::saveWidgetState(this, parent);
 }
 
@@ -113,6 +120,12 @@ void ControllerRackView::saveSettings(QDomDocument &,
 
 void ControllerRackView::loadSettings(const QDomElement & _this)
 {
+	int controllerCount = _this.attribute(QString("controllerCount")).toInt();
+	for (auto i = 1; i <= controllerCount; i++)
+	{
+		bool collapsingState = _this.attribute(QString("controllerView") + QString::number(i)).toInt();
+		m_collapsingStateOnLoad.append(collapsingState);
+	}
 	MainWindow::restoreWidgetState(this, _this);
 }
 
@@ -123,7 +136,7 @@ void ControllerRackView::deleteController(ControllerView * view)
 {
 	Controller * c = view->getController();
 
-	if(c->connectionCount() > 0)
+	if (c->connectionCount() > 0)
 	{
 		QMessageBox msgBox;
 		msgBox.setIcon(QMessageBox::Question);
@@ -131,7 +144,7 @@ void ControllerRackView::deleteController(ControllerView * view)
 		msgBox.setText(tr("Confirm delete? There are existing connection(s) "
 				"associated with this controller. There is no way to undo."));
 		msgBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
-		if(msgBox.exec() != QMessageBox::Ok)
+		if (msgBox.exec() != QMessageBox::Ok)
 		{
 			return;
 		}
@@ -147,7 +160,7 @@ void ControllerRackView::collapsingAll()
 {
 	for (auto &it : m_controllerViews)
 	{
-		it->collapseController();
+		it->collapseController(true);
 	}
 }
 
@@ -158,7 +171,7 @@ void ControllerRackView::expandAll()
 {
 	for (auto &it : m_controllerViews)
 	{
-		it->expandController();
+		it->collapseController(false);
 	}
 }
 
@@ -175,8 +188,15 @@ void ControllerRackView::onControllerAdded(Controller * controller)
 	connect(controllerView, SIGNAL(controllerMoveUp(ControllerView*)), this, SLOT(moveControllerUp(ControllerView*)));
 	connect(controllerView, SIGNAL(controllerMoveDown(ControllerView*)), this, SLOT(moveControllerDown(ControllerView*)));
 	m_controllerViews.append(controllerView);
-	int n = m_scrollAreaLayout->count() - 1; //-1 because the stretch?
+	int n = m_scrollAreaLayout->count() - 1;
 	m_scrollAreaLayout->insertWidget(n, controllerView);
+	if (Engine::getSong()->isLoadingProject())
+	{
+		if (m_collapsingStateOnLoad.at(m_controllerViews.size() - 1))
+		{
+			controllerView->collapseController(true);
+		}
+	}
 
 	update();
 }
@@ -207,7 +227,7 @@ void ControllerRackView::onControllerRemoved(Controller * removedController)
 
 void ControllerRackView::onControllerCollapsed()
 {
-	//we hide the scrollbar and test in update() if a scrollbar is needed
+	//we hide the scrollbar and let update() test if a scrollbar is needed
 	m_scrollArea->verticalScrollBar()->hide();
 	update();
 }
@@ -249,6 +269,9 @@ void ControllerRackView::moveControllerDown(ControllerView *cv)
 		moveControllerUp(m_controllerViews.at(index + 1));
 	}
 }
+
+
+
 
 const QVector<ControllerView *> ControllerRackView::controllerViews() const
 {

@@ -2,6 +2,7 @@
  * ControllerRackView.h - view for song's controllers
  *
  * Copyright (c) 2008-2009 Paul Giblock <drfaygo/at/gmail.com>
+ * Copyright (c) 2019 Steffen Baranowsky <BaraMGB/at/freenet.de>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -83,6 +84,7 @@ private slots:
 
 private:
 	QVector<ControllerView *> m_controllerViews;
+	QVector<bool> m_collapsingStateOnLoad;
 
 	QScrollArea * m_scrollArea;
 	QVBoxLayout * m_scrollAreaLayout;

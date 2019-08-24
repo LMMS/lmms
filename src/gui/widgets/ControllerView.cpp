@@ -3,6 +3,7 @@
  *
  * Copyright (c) 2008-2009 Paul Giblock <drfaygo/at/gmail.com>
  * Copyright (c) 2011-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2019 Steffen Baranowsky <BaraMGB/at/freenet.de>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -113,22 +114,21 @@ bool ControllerView::isCollapsed() const
 
 
 
-void ControllerView::collapseController()
+void ControllerView::collapseController(bool collapse)
 {
-	m_collapseButton->setIcon(embed::getIconPixmap("stepper-left"));
-	m_controllerDlg->hide();
-	setFixedHeight(m_titleBarHeight);
-	emit controllerCollapsed();
-}
-
-
-
-
-void ControllerView::expandController()
-{
-	m_controllerDlg->show();
-	setFixedHeight(m_controllerDlg->height() + m_titleBarHeight + 1);
-	m_collapseButton->setIcon(embed::getIconPixmap("stepper-down"));
+	if (collapse)
+	{
+		m_collapseButton->setIcon(embed::getIconPixmap("stepper-left"));
+		m_controllerDlg->hide();
+		setFixedHeight(m_titleBarHeight);
+		emit controllerCollapsed();
+	}
+	else
+	{
+		m_controllerDlg->show();
+		setFixedHeight(m_controllerDlg->height() + m_titleBarHeight + 1);
+		m_collapseButton->setIcon(embed::getIconPixmap("stepper-down"));
+	}
 }
 
 
@@ -144,14 +144,7 @@ void ControllerView::deleteController()
 
 void ControllerView::toggleCollapseController()
 {
-	if(m_controllerDlg->isHidden())
-	{
-		expandController();
-	}
-	else
-	{
-		collapseController();
-	}
+	collapseController(!m_controllerDlg->isHidden());
 }
 
 
@@ -198,9 +191,12 @@ void ControllerView::moveDown()
 
 
 
-void ControllerView::mouseDoubleClickEvent(QMouseEvent *)
+void ControllerView::mouseDoubleClickEvent(QMouseEvent * me)
 {
-	rename();
+	if (me->y() <= m_titleBarHeight)
+	{
+		rename();
+	}
 }
 
 
@@ -208,7 +204,7 @@ void ControllerView::mouseDoubleClickEvent(QMouseEvent *)
 
 void ControllerView::dragEnterEvent(QDragEnterEvent *dee)
 {
-	StringPairDrag::processDragEnterEvent(dee, "float_value,automatable_model" );
+	StringPairDrag::processDragEnterEvent(dee, "automatable_model" );
 }
 
 
@@ -221,21 +217,23 @@ void ControllerView::dropEvent(QDropEvent * de)
 	if (type == "automatable_model")
 	{
 		AutomatableModel * mod = dynamic_cast<AutomatableModel *>(Engine::projectJournal()->journallingObject(val.toInt()));
-		if (m_modelC->hasModel(mod))
+		if (mod != nullptr)
 		{
-			QMessageBox::warning(this, tr("LMMS"), tr("Cycle Detected."));
-		}
-
-		if (mod != NULL && m_modelC->hasModel(mod) == false)
-		{
-			if (mod->controllerConnection())
+			if (m_modelC->hasModel(mod))
 			{
-				mod->controllerConnection()->setController(getController());
+				QMessageBox::warning(this, tr("LMMS"), tr("Cycle Detected."));
 			}
 			else
 			{
-				ControllerConnection * cc = new ControllerConnection(getController());
-				mod->setControllerConnection(cc);
+				if (mod->controllerConnection())
+				{
+					mod->controllerConnection()->setController(getController());
+				}
+				else
+				{
+					ControllerConnection * cc = new ControllerConnection(getController());
+					mod->setControllerConnection(cc);
+				}
 			}
 		}
 	}
@@ -253,9 +251,9 @@ void ControllerView::modelChanged()
 
 void ControllerView::paintEvent(QPaintEvent*)
 {
-	QPainter p( this );
-	QRect rect( 1, 1, width()-2, m_titleBarHeight );
-	p.fillRect( rect, p.background() );
+	QPainter p(this);
+	QRect rect(1, 1, width() - 2, m_titleBarHeight);
+	p.fillRect(rect, p.background());
 }
 
 
@@ -278,6 +276,8 @@ void ControllerView::contextMenuEvent(QContextMenuEvent *)
 	contextMenu->addAction(embed::getIconPixmap("stepper-down"), tr("Move &down"), this, SLOT(moveDown())
 						   )->setDisabled(gui->getControllerRackView()->controllerViews().last() == this);
 	contextMenu->addSeparator();
+
 	contextMenu->exec(QCursor::pos());
+
 	delete contextMenu;
 }
