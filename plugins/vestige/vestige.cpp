@@ -505,7 +505,7 @@ VestigeInstrumentView::VestigeInstrumentView( Instrument * _instrument,
 	m_openPresetButton = new PixmapButton( this, "" );
 	m_openPresetButton->setCheckable( false );
 	m_openPresetButton->setCursor( Qt::PointingHandCursor );
-	m_openPresetButton->move( 200, 224 );
+	m_openPresetButton->move( 80, 130 );
 	m_openPresetButton->setActiveGraphic( embed::getIconPixmap(
 							"project_open", 20, 20 ) );
 	m_openPresetButton->setInactiveGraphic( embed::getIconPixmap(
@@ -518,7 +518,7 @@ VestigeInstrumentView::VestigeInstrumentView( Instrument * _instrument,
 	m_rolLPresetButton = new PixmapButton( this, "" );
 	m_rolLPresetButton->setCheckable( false );
 	m_rolLPresetButton->setCursor( Qt::PointingHandCursor );
-	m_rolLPresetButton->move( 190, 201 );
+	m_rolLPresetButton->move( 20, 180 );
 	m_rolLPresetButton->setActiveGraphic( embed::getIconPixmap(
 							"stepper-left-press" ) );
 	m_rolLPresetButton->setInactiveGraphic( embed::getIconPixmap(
@@ -533,7 +533,7 @@ VestigeInstrumentView::VestigeInstrumentView( Instrument * _instrument,
 	m_savePresetButton = new PixmapButton( this, "" );
 	m_savePresetButton->setCheckable( false );
 	m_savePresetButton->setCursor( Qt::PointingHandCursor );
-	m_savePresetButton->move( 224, 224 );
+	m_savePresetButton->move( 110, 130 );
 	m_savePresetButton->setActiveGraphic( embed::getIconPixmap(
 							"project_save", 20, 20  ) );
 	m_savePresetButton->setInactiveGraphic( embed::getIconPixmap(
@@ -546,7 +546,7 @@ VestigeInstrumentView::VestigeInstrumentView( Instrument * _instrument,
 	m_rolRPresetButton = new PixmapButton( this, "" );
 	m_rolRPresetButton->setCheckable( false );
 	m_rolRPresetButton->setCursor( Qt::PointingHandCursor );
-	m_rolRPresetButton->move( 209, 201 );
+	m_rolRPresetButton->move( 37, 180 );
 	m_rolRPresetButton->setActiveGraphic( embed::getIconPixmap(
 							"stepper-right-press" ) );
 	m_rolRPresetButton->setInactiveGraphic( embed::getIconPixmap(
@@ -558,33 +558,40 @@ VestigeInstrumentView::VestigeInstrumentView( Instrument * _instrument,
 	m_rolRPresetButton->setShortcut( Qt::Key_Plus );
 
 
-	m_selPresetButton = new QPushButton( tr( "" ), this );
-	m_selPresetButton->setGeometry( 228, 201, 16, 16 );
-
 	QMenu *menu = new QMenu;
-
 	connect( menu, SIGNAL( aboutToShow() ), this, SLOT( updateMenu() ) );
 
-
-	m_selPresetButton->setIcon( embed::getIconPixmap( "stepper-down" ) );
-
+	m_selPresetButton = new QPushButton("", this);
+	m_selPresetButton->setGeometry(54, 180, 16, 16);
+	m_selPresetButton->setIcon(embed::getIconPixmap( "stepper-down" ));
 	m_selPresetButton->setMenu(menu);
 
 
-	m_toggleGUIButton = new QPushButton( tr( "Show/hide GUI" ), this );
-	m_toggleGUIButton->setGeometry( 20, 130, 200, 24 );
-	m_toggleGUIButton->setIcon( embed::getIconPixmap( "zoom" ) );
-	m_toggleGUIButton->setFont( pointSize<8>( m_toggleGUIButton->font() ) );
-	connect( m_toggleGUIButton, SIGNAL( clicked() ), this,
-							SLOT( toggleGUI() ) );
+	m_toggleGUIButton = new PixmapButton( this, "" );
+	m_toggleGUIButton->setGeometry( 20, 130, 20, 20 );
+	m_toggleGUIButton->setActiveGraphic( embed::getIconPixmap(
+							"zoom", 20, 20  ) );
+	m_toggleGUIButton->setInactiveGraphic( embed::getIconPixmap(
+							"zoom", 20, 20  ) );
+	connect( m_toggleGUIButton, SIGNAL( clicked() ),
+		 this, SLOT( toggleGUI() ) );
 
-	QPushButton * note_off_all_btn = new QPushButton( tr( "Turn off all "
-							"notes" ), this );
-	note_off_all_btn->setGeometry( 20, 160, 200, 24 );
-	note_off_all_btn->setIcon( embed::getIconPixmap( "stop" ) );
-	note_off_all_btn->setFont( pointSize<8>( note_off_all_btn->font() ) );
-	connect( note_off_all_btn, SIGNAL( clicked() ), this,
-							SLOT( noteOffAll() ) );
+	m_panicButton = new PixmapButton( this, "" );
+	m_panicButton->setGeometry( 50, 130, 20, 20 );
+	m_panicButton->setActiveGraphic( embed::getIconPixmap(
+							"stop", 20, 20  ) );
+	m_panicButton->setInactiveGraphic( embed::getIconPixmap(
+							"stop", 20, 20  ) );
+	connect( m_panicButton, SIGNAL( clicked() ),
+		 this,SLOT( noteOffAll() ) );
+
+	m_localPgmChangeButton = new PixmapButton(this,
+						  tr("Capture Program Change"));
+	m_localPgmChangeButton->setActiveGraphic(embed::getIconPixmap("led_green"));
+	m_localPgmChangeButton->setInactiveGraphic(embed::getIconPixmap("led_off"));
+	m_localPgmChangeButton->setCheckable(true);
+	ToolTip::add( m_localPgmChangeButton, tr( "" ) );
+	m_localPgmChangeButton->move(20, 210);
 
 	setAcceptDrops( true );
 	_instrument2 = _instrument;
@@ -861,19 +868,51 @@ void VestigeInstrumentView::paintEvent( QPaintEvent * )
 
 	p.drawPixmap( 0, 0, *s_artwork );
 
-	QString plugin_name = ( m_vi->m_plugin != NULL ) ?
-				m_vi->m_plugin->name()/* + QString::number(
-						m_plugin->version() )*/
-					:
-				tr( "No VST plugin loaded" );
+	QString plugin_name;
+	QString presetName;
+	QString presetNumber;
+
+	if( m_vi->m_plugin != NULL )
+	{
+		plugin_name = m_vi->m_plugin->name();
+		const QString& presetStr = m_vi->m_plugin->currentProgramName();
+		int semicolonPosition = presetStr.indexOf(':');
+		if (semicolonPosition != -1)
+		{
+			presetNumber = QString(" (") +
+					presetStr.left(semicolonPosition) +
+					QString(")");
+			presetName = presetStr.mid(semicolonPosition + 1);
+		}
+		else
+		{
+			presetNumber = "";
+			presetName = presetStr;
+		}
+	}
+	else
+	{
+		plugin_name = tr( "No VST plugin loaded" );
+		presetName = tr("(no preset)");
+		presetNumber = "";
+	}
+
 	QFont f = p.font();
+	f.setBold( false );
+
+	p.setPen( QColor( 255, 255, 255 ) );
+	p.setFont( pointSize<8>( f ) );
+	p.drawText( 40, 220, tr("Capture MIDI Program Change") );
+
 	f.setBold( true );
 	p.setFont( pointSize<10>( f ) );
-	p.setPen( QColor( 255, 255, 255 ) );
 	p.drawText( 10, 100, plugin_name );
 
-	p.setPen( QColor( 50, 50, 50 ) );
-	p.drawText( 10, 211, tr( "Preset" ) );
+	p.setPen( QColor( 24, 24, 24 ) );
+	p.drawText( 20, 175, tr( "Preset" ) + presetNumber );
+
+	p.setPen( QColor( 255, 255, 255 ) );
+	p.drawText( 75, 192, presetName);
 
 //	m_pluginMutex.lock();
 	if( m_vi->m_plugin != NULL )
@@ -883,8 +922,6 @@ void VestigeInstrumentView::paintEvent( QPaintEvent * )
 		p.setFont( pointSize<8>( f ) );
 		p.drawText( 10, 114, tr( "by " ) +
 					m_vi->m_plugin->vendorString() );
-		p.setPen( QColor( 255, 255, 255 ) );
-		p.drawText( 10, 225, m_vi->m_plugin->currentProgramName() );
 	}
 
 	if( m_vi->m_subWindow != NULL )

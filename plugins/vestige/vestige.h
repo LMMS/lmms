@@ -89,6 +89,7 @@ private:
 	FloatModel ** knobFModel;
 	QObject * p_subWindow;
 	int paramCount;
+	BoolModel * m_localPgmChange;
 
 
 	friend class VestigeInstrumentView;
@@ -174,9 +175,11 @@ private:
 	PixmapButton * m_rolLPresetButton;
 	PixmapButton * m_rolRPresetButton;
 	QPushButton * m_selPresetButton;
-	QPushButton * m_toggleGUIButton;
+	PixmapButton * m_toggleGUIButton;
+	PixmapButton * m_panicButton;
 	PixmapButton * m_managePluginButton;
 	PixmapButton * m_savePresetButton;
+	PixmapButton * m_localPgmChangeButton;
 
 	Instrument * _instrument2;
 	QWidget * _parent2;
