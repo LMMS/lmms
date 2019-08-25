@@ -542,5 +542,5 @@ void NotePlayHandle::resize( const bpm_t _new_tempo )
 	}
 }
 
-const int INITIAL_NPH_CACHE = 256;
+const size_t INITIAL_NPH_CACHE = 256;
 MemoryPool<NotePlayHandle> NotePlayHandlePool{INITIAL_NPH_CACHE};
