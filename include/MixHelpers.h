@@ -37,6 +37,11 @@ bool useNaNHandler();
 
 void setNaNHandler( bool use );
 
+void clear(sampleFrame * src, int frames);
+#ifndef LMMS_DISABLE_SURROUND
+void clear(surroundSampleFrame * src, int frames);
+#endif
+
 bool sanitize( sampleFrame * src, int frames );
 
 /*! \brief Add samples from src to dst */

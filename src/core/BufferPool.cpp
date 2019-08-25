@@ -42,20 +42,6 @@ sampleFrame * BufferPool::acquire()
 	return reinterpret_cast<sampleFrame*>(pool->allocate());
 }
 
-void BufferPool::clear( sampleFrame *ab, const f_cnt_t frames, const f_cnt_t offset )
-{
-	memset( ab + offset, 0, sizeof( *ab ) * frames );
-}
-
-#ifndef LMMS_DISABLE_SURROUND
-void BufferPool::clear( surroundSampleFrame * ab, const f_cnt_t frames,
-							const f_cnt_t offset )
-{
-	memset( ab + offset, 0, sizeof( *ab ) * frames );
-}
-#endif
-
-
 void BufferPool::release( sampleFrame * buf )
 {
 	pool->deallocate(buf);

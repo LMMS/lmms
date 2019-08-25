@@ -31,11 +31,11 @@
 #include "gui_templates.h"
 #include "MainWindow.h"
 #include "Mixer.h"
+#include "MixHelpers.h"
 #include "Engine.h"
 #include "ToolTip.h"
 #include "Song.h"
 
-#include "BufferPool.h"
 
 
 VisualizationWidget::VisualizationWidget( const QPixmap & _bg, QWidget * _p,
@@ -55,7 +55,7 @@ VisualizationWidget::VisualizationWidget( const QPixmap & _bg, QWidget * _p,
 	const fpp_t frames = Engine::mixer()->framesPerPeriod();
 	m_buffer = new sampleFrame[frames];
 
-	BufferPool::clear( m_buffer, frames );
+	MixHelpers::clear( m_buffer, frames );
 
 
 	ToolTip::add( this, tr( "Oscilloscope" ) );

@@ -37,6 +37,7 @@
 #include "ConfigManager.h"
 #include "SamplePlayHandle.h"
 #include "Memory.h"
+#include "MixHelpers.h"
 #include "BufferPool.h"
 
 // platform-specific audio-interface-classes
@@ -97,7 +98,7 @@ Mixer::Mixer( bool renderOnly ) :
 		m_inputBufferFrames[i] = 0;
 		m_inputBufferSize[i] = DEFAULT_BUFFER_SIZE * 100;
 		m_inputBuffer[i] = new sampleFrame[ DEFAULT_BUFFER_SIZE * 100 ];
-		BufferPool::clear( m_inputBuffer[i], m_inputBufferSize[i] );
+		MixHelpers::clear( m_inputBuffer[i], m_inputBufferSize[i] );
 	}
 
 	// determine FIFO size and number of frames per period
@@ -140,7 +141,7 @@ Mixer::Mixer( bool renderOnly ) :
 	{
 		m_readBuf = alloc.allocate( m_framesPerPeriod );
 
-		BufferPool::clear( m_readBuf, m_framesPerPeriod );
+		MixHelpers::clear( m_readBuf, m_framesPerPeriod );
 		m_bufferPool.push_back( m_readBuf );
 	}
 
@@ -416,7 +417,7 @@ const surroundSampleFrame * Mixer::renderNextBuffer()
 	m_readBuf = m_bufferPool[m_readBuffer];
 
 	// clear last audio-buffer
-	BufferPool::clear( m_writeBuf, m_framesPerPeriod );
+	MixHelpers::clear( m_writeBuf, m_framesPerPeriod );
 
 	// prepare master mix (clear internal buffers etc.)
 	FxMixer * fxMixer = Engine::fxMixer();

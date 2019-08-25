@@ -86,6 +86,22 @@ void setNaNHandler( bool use )
 	s_NaNHandler = use;
 }
 
+void clear(sampleFrame * src, int frames)
+{
+	for (sampleFrame* frame = src; frame < src + frames; frame++) {
+		(*frame)[0] = (*frame)[1] = 0.0;
+	}
+}
+
+#ifndef LMMS_DISABLE_SURROUND
+void clear(surroundSampleFrame *src, int frames)
+{
+	for (surroundSampleFrame* frame = src; frame < src + frames; frame++) {
+		(*frame)[0] = (*frame)[1] = 0.0;
+	}
+}
+#endif
+
 /*! \brief Function for sanitizing a buffer of infs/nans - returns true if those are found */
 bool sanitize( sampleFrame * src, int frames )
 {
