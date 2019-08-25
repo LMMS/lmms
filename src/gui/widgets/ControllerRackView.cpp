@@ -190,9 +190,10 @@ void ControllerRackView::onControllerAdded(Controller * controller)
 	m_controllerViews.append(controllerView);
 	int n = m_scrollAreaLayout->count() - 1;
 	m_scrollAreaLayout->insertWidget(n, controllerView);
+
 	if (Engine::getSong()->isLoadingProject())
 	{
-		if (m_collapsingStateOnLoad.at(m_controllerViews.size() - 1))
+		if (!m_collapsingStateOnLoad.empty() && m_collapsingStateOnLoad.at(m_controllerViews.size() - 1))
 		{
 			controllerView->collapseController(true);
 		}
@@ -288,7 +289,6 @@ bool ControllerRackView::allCollapsed() const
 		if (it->isCollapsed() == false)
 		{
 			return false;
-			break;
 		}
 	}
 	return true;
@@ -304,7 +304,6 @@ bool ControllerRackView::allExpanded() const
 		if (it->isCollapsed())
 		{
 			return false;
-			break;
 		}
 	}
 	return true;
