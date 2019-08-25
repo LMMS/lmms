@@ -94,9 +94,9 @@ GuiApplication::GuiApplication()
 	QLabel versionLabel(MainWindow::tr( "Version %1" ).arg( LMMS_VERSION ));
 
 	loadingProgressLabel.setAlignment(Qt::AlignLeft);
-	loadingProgressLabel.setStyleSheet("QLabel { color : #FFFFFF; }");
+	loadingProgressLabel.setObjectName( "splashText" );
 	versionLabel.setAlignment(Qt::AlignRight);
-	versionLabel.setStyleSheet("QLabel { color : #FFFFFF; }");
+	versionLabel.setObjectName( "splashText" );
 
 	layout.addWidget(&loadingProgressLabel);
 	layout.addWidget(&versionLabel);
