@@ -67,11 +67,12 @@ void RecentProjectsMenu::fillMenu()
 
 void RecentProjectsMenu::openProject(QAction * _action )
 {
-	if ( gui->mainWindow()->mayChangeProject(true) )
+	auto mainWindow = gui->mainWindow();
+	if (mainWindow->mayChangeProject(true))
 	{
 		const QString f = _action->text().replace("&&", "&");
-		setCursor( Qt::WaitCursor );
+		mainWindow->setCursor( Qt::WaitCursor );
 		Engine::getSong()->loadProject( f );
-		setCursor( Qt::ArrowCursor );
+		mainWindow->setCursor( Qt::ArrowCursor );
 	}
 }
