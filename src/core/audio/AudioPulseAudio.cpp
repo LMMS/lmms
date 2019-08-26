@@ -139,7 +139,7 @@ static void stream_state_callback( pa_stream *s, void * userdata )
 
 		case PA_STREAM_FAILED:
 		default:
-			qCritical( "Stream errror: %s\n",
+			qCritical( "Stream error: %s\n",
 					pa_strerror(pa_context_errno(
 						pa_stream_get_context( s ) ) ) );
 	}

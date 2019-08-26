@@ -165,7 +165,7 @@ void printHelp()
 		"  rendertracks <project> [options...]   Render each track to a different file\n"
 		"  upgrade <in> [out]                    Upgrade file <in> and save as <out>\n"
 		"                                        Standard out is used if no output file\n"
-		"                                        is specifed\n"
+		"                                        is specified\n"
 		"\nGlobal options:\n"
 		"      --allowroot                Bypass root user startup check (use with\n"
 		"          caution).\n"
