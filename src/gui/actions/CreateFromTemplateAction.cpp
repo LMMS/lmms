@@ -12,7 +12,8 @@
 CreateFromTemplateAction::CreateFromTemplateAction(
 	const QFileInfo& templateFile) :
 	QAction(embed::getIconPixmap( "project_file" ),
-			templateFile.completeBaseName().replace("&", "&&")),
+			templateFile.completeBaseName().replace("&", "&&"),
+			nullptr),
 	m_templateFilePath(templateFile.absoluteFilePath())
 {
 #ifdef LMMS_BUILD_APPLE
