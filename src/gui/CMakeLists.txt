@@ -34,6 +34,8 @@ SET(LMMS_SRCS
 	gui/ToolPluginView.cpp
 	gui/TrackContainerView.cpp
 
+	gui/actions/CreateFromTemplateAction.cpp
+
 	gui/dialogs/FileDialog.cpp
 	gui/dialogs/VersionedSaveDialog.cpp
 
