@@ -25,18 +25,17 @@ void TemplatesMenu::fillTemplatesMenu()
 
 
 
-void TemplatesMenu::addTemplatesFromDir( const QDir& dir ) {
-	QStringList templates = dir.entryList( QStringList( "*.mpt" ),
-		QDir::Files | QDir::Readable );
+void TemplatesMenu::addTemplatesFromDir(const QDir& templateDir) {
+	QList<QFileInfo> templates = templateDir.entryInfoList(
+		QStringList("*.mpt" ), QDir::Files | QDir::Readable );
 
-	if ( templates.size() && ! actions().isEmpty() )
+	if ( !templates.empty() && ! actions().isEmpty() )
 	{
 		addSeparator();
 	}
 
-	for( QStringList::iterator it = templates.begin();
-		it != templates.end(); ++it )
+	for(const QFileInfo& fileInfo : templates)
 	{
-		addAction(new CreateFromTemplateAction(dir, *it));
+		addAction(new CreateFromTemplateAction(fileInfo));
 	}
 }

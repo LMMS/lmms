@@ -13,7 +13,7 @@ public:
 
 private slots:
 	void fillTemplatesMenu();
-	void addTemplatesFromDir( const QDir& dir );
+	void addTemplatesFromDir(const QDir& templateDir);
 
 };
 

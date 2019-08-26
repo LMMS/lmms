@@ -2,12 +2,12 @@
 #define CREATEFROMTEMPLATEACTION_H
 
 #include <QAction>
-#include <QDir>
+#include <QFileInfo>
 
 class CreateFromTemplateAction : public QAction {
 	Q_OBJECT
 public:
-	CreateFromTemplateAction(const QDir &templateDir, const QString &templateFilename);
+	CreateFromTemplateAction(const QFileInfo& templateFile);
 
 private:
 	QString m_templateFilePath;
