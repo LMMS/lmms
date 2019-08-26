@@ -45,7 +45,6 @@ public:
 
 private slots:
 	void toggleButton( QAbstractButton * _btn );
-	void toggleWidget(QWidget * widget);
 
 
 private:

@@ -49,7 +49,7 @@ SideBarWidget::SideBarWidget( const QString & _title, const QPixmap & _icon,
 	m_closeBtn->setAttribute(Qt::WA_NoMousePropagation);
 	m_closeBtn->setToolTip(tr("Close"));
 	connect(m_closeBtn, &QPushButton::clicked,
-		[=]() {this->closeButtonClicked();});
+		[=]() { this->closeButtonClicked(); });
 }
 
 
@@ -91,7 +91,7 @@ void SideBarWidget::resizeEvent( QResizeEvent * )
 	const int MARGIN = 6;
 	m_contents->setGeometry( MARGIN, 40 + MARGIN, width() - MARGIN * 2,
 						height() - MARGIN * 2 - 40 );
-	m_closeBtn->move( m_contents->geometry().width() - MARGIN - 5, 5 );
+	m_closeBtn->move(m_contents->geometry().width() - MARGIN - 5, 5);
 }
 
 

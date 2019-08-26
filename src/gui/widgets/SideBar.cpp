@@ -129,25 +129,6 @@ void SideBar::appendTab( SideBarWidget *widget )
 
 
 
-void SideBar::toggleWidget(QWidget * widget)
-{
-	for(auto it = m_widgets.begin(); it != m_widgets.end(); ++it)
-	{
-		QToolButton *curBtn = it.key();
-		QWidget *curWidget = it.value();
-
-		if(curWidget == widget)
-		{
-			curWidget->hide();
-			curBtn->setChecked(false);
-			curBtn->setToolButtonStyle(Qt::ToolButtonIconOnly);
-		}
-	}
-}
-
-
-
-
 void SideBar::toggleButton( QAbstractButton * button )
 {
 	QToolButton *toolButton = NULL;
