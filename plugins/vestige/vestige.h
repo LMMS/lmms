@@ -44,13 +44,14 @@ class QPushButton;
 
 class PixmapButton;
 class VstPlugin;
-
+class VestigeInstrumentView;
 
 class vestigeInstrument : public Instrument
 {
 	Q_OBJECT
 public:
 	vestigeInstrument( InstrumentTrack * _instrument_track );
+	void bindView(VestigeInstrumentView * view);
 	virtual ~vestigeInstrument();
 
 	virtual void play( sampleFrame * _working_buffer );
@@ -79,7 +80,7 @@ protected slots:
 private:
 	void closePlugin( void );
 
-
+	VestigeInstrumentView * m_pView;
 	VstPlugin * m_plugin;
 	QMutex m_pluginMutex;
 
@@ -89,12 +90,14 @@ private:
 	FloatModel ** knobFModel;
 	QObject * p_subWindow;
 	int paramCount;
-	BoolModel * m_localPgmChange;
-
+	BoolModel m_capturePgmChange;
+	BoolModel m_useBankSelectLSB;
+	unsigned int m_midiBankMSB;
+	unsigned int m_midiBankLSB;
+	unsigned int m_midiProgram;
 
 	friend class VestigeInstrumentView;
 	friend class manageVestigeInstrumentView;
-
 } ;
 
 
@@ -179,7 +182,8 @@ private:
 	PixmapButton * m_panicButton;
 	PixmapButton * m_managePluginButton;
 	PixmapButton * m_savePresetButton;
-	PixmapButton * m_localPgmChangeButton;
+	PixmapButton * m_capturePgmChangeButton;
+	PixmapButton * m_useBankSelectLSBButton;
 
 	Instrument * _instrument2;
 	QWidget * _parent2;

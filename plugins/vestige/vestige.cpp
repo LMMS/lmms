@@ -144,12 +144,15 @@ QPixmap * manageVestigeInstrumentView::s_artwork = NULL;
 
 vestigeInstrument::vestigeInstrument( InstrumentTrack * _instrument_track ) :
 	Instrument( _instrument_track, &vestige_plugin_descriptor ),
+	m_pView( NULL ),
 	m_plugin( NULL ),
 	m_pluginMutex(),
 	m_subWindow( NULL ),
 	m_scrollArea( NULL ),
 	knobFModel( NULL ),
-	p_subWindow( NULL )
+	p_subWindow( NULL ),
+	m_capturePgmChange(false, this, tr("Capture MIDI Program Change")),
+	m_useBankSelectLSB(false, this, tr("Use MIDI Bank Select LSB"))
 {
 	// now we need a play-handle which cares for calling play()
 	InstrumentPlayHandle * iph = new InstrumentPlayHandle( this, _instrument_track );
@@ -160,6 +163,10 @@ vestigeInstrument::vestigeInstrument( InstrumentTrack * _instrument_track ) :
 			 Qt::QueuedConnection );
 }
 
+void vestigeInstrument::bindView(VestigeInstrumentView * view)
+{
+	m_pView = view;
+}
 
 
 
@@ -399,7 +406,62 @@ bool vestigeInstrument::handleMidiEvent( const MidiEvent& event, const MidiTime&
 	m_pluginMutex.lock();
 	if( m_plugin != NULL )
 	{
-		m_plugin->processMidiEvent( event, offset );
+		bool programChangeRequested = false;
+		if (m_capturePgmChange.value())
+		{
+			if (event.type() == MidiControlChange)
+			{
+				if (event.controllerNumber() == MidiControllerBankSelectMSB)
+				{
+					m_midiBankMSB = event.controllerValue();
+					programChangeRequested = true;
+				}
+				else if (event.controllerNumber() == MidiControllerBankSelectLSB)
+				{
+					m_midiBankLSB = event.controllerValue();
+					programChangeRequested = true;
+				}
+			}
+			else if (event.type() == MidiProgramChange)
+			{
+				m_midiProgram = event.controllerNumber();
+				programChangeRequested = true;
+			}
+		}
+
+		if (programChangeRequested)
+		{
+			int presetNumber = m_midiProgram;
+
+			/* Some MIDI equipment makes use of both Bank Select CCs, while
+			 * others handle only Bank Select MSB. Due to this fact we need to
+			 * manually tell the software which of both conventions we expect
+			*/
+			if (m_useBankSelectLSB.value())
+			{
+				presetNumber |= (m_midiBankLSB << 7);
+				presetNumber |= (m_midiBankMSB << 14);
+			}
+			else
+			{
+				presetNumber |= (m_midiBankMSB << 7);
+			}
+#ifdef LMMS_DEBUG
+			printf("MIDI Program change to %d\n", presetNumber);
+#endif
+			m_plugin->setProgram(presetNumber);
+			if (m_pView) {
+				m_pView->update();
+			}
+		}
+		else
+		{
+			/* If we received something different than Program Change or
+			 * Bank Select message, or we don't want to process it internally,
+			 * forward it unchanged to the VST plugiled_greenn */
+			m_plugin->processMidiEvent( event, offset );
+		}
+
 	}
 	m_pluginMutex.unlock();
 
@@ -459,7 +521,9 @@ void vestigeInstrument::closePlugin( void )
 
 PluginView * vestigeInstrument::instantiateView( QWidget * _parent )
 {
-	return new VestigeInstrumentView( this, _parent );
+	VestigeInstrumentView* view = new VestigeInstrumentView( this, _parent );
+	bindView(view);
+	return view;
 }
 
 
@@ -585,13 +649,35 @@ VestigeInstrumentView::VestigeInstrumentView( Instrument * _instrument,
 	connect( m_panicButton, SIGNAL( clicked() ),
 		 this,SLOT( noteOffAll() ) );
 
-	m_localPgmChangeButton = new PixmapButton(this,
-						  tr("Capture Program Change"));
-	m_localPgmChangeButton->setActiveGraphic(embed::getIconPixmap("led_green"));
-	m_localPgmChangeButton->setInactiveGraphic(embed::getIconPixmap("led_off"));
-	m_localPgmChangeButton->setCheckable(true);
-	ToolTip::add( m_localPgmChangeButton, tr( "" ) );
-	m_localPgmChangeButton->move(20, 210);
+	m_capturePgmChangeButton = new PixmapButton(this,
+						  tr("Capture Program Change events"));
+	m_capturePgmChangeButton->setActiveGraphic(embed::getIconPixmap("led_green"));
+	m_capturePgmChangeButton->setInactiveGraphic(embed::getIconPixmap("led_off"));
+	m_capturePgmChangeButton->setCheckable(true);
+	ToolTip::add( m_capturePgmChangeButton, tr(
+			      "When enabled, VeSTige will capture MIDI Program Change "
+			      "and Bank Select events to switch presets.\n"
+			      "When disabled, the events will be routed directly "
+			      "to the VST plugin.\n"
+			      "Enable this option if the VST plugin ignores attempts "
+			      "to change the program from the MIDI controller or you "
+			      "simply want VeSTige to do this task."
+			      ));
+	m_capturePgmChangeButton->move(20, 205);
+
+	m_useBankSelectLSBButton = new PixmapButton(this,
+						  tr("Use MIDI Bank Select LSB"));
+	m_useBankSelectLSBButton->setActiveGraphic(embed::getIconPixmap("led_green"));
+	m_useBankSelectLSBButton->setInactiveGraphic(embed::getIconPixmap("led_off"));
+	m_useBankSelectLSBButton->setCheckable(true);
+	ToolTip::add( m_useBankSelectLSBButton, tr(
+			      "When enabled, VeSTige will use both Bank Select controllers "
+			      "allowing to access up to 16384 banks.\n"
+			      "When disabled, Bank Select LSB will be ignored, allowing to "
+			      "access up to 128 banks.\n"
+			      "Disable this option if your MIDI controller does not use "
+			      "Bank Select LSB controller."));
+	m_useBankSelectLSBButton->move(20, 225);
 
 	setAcceptDrops( true );
 	_instrument2 = _instrument;
@@ -659,6 +745,9 @@ VestigeInstrumentView::~VestigeInstrumentView()
 void VestigeInstrumentView::modelChanged()
 {
 	m_vi = castModel<vestigeInstrument>();
+	m_capturePgmChangeButton->setModel(&m_vi->m_capturePgmChange);
+	m_useBankSelectLSBButton->setModel(&m_vi->m_useBankSelectLSB);
+
 }
 
 
@@ -902,7 +991,8 @@ void VestigeInstrumentView::paintEvent( QPaintEvent * )
 
 	p.setPen( QColor( 255, 255, 255 ) );
 	p.setFont( pointSize<8>( f ) );
-	p.drawText( 40, 220, tr("Capture MIDI Program Change") );
+	p.drawText( 40, 215, tr("Capture Program Change events") );
+	p.drawText( 40, 235, tr("Use Bank Select LSB") );
 
 	f.setBold( true );
 	p.setFont( pointSize<10>( f ) );
