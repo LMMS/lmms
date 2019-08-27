@@ -1,5 +1,5 @@
 /*
-*SynchroSynth.cpp - 2-oscillator PM synth
+* SynchroSynth.cpp - 2-oscillator PM synth
 *
 * Copyright (c) 2019 Ian Sannar <ian/dot/sannar/at/gmail/dot/com>
 *
@@ -22,12 +22,12 @@
 *
 */
 
+#include "SynchroSynth.h"
 //Standard headers
 #include <math.h>
 //QT headers
 #include <QDomDocument>
 //LMMS headers
-#include "SynchroSynth.h"
 #include "embed.h"
 #include "Engine.h"
 #include "InstrumentTrack.h"
@@ -72,11 +72,13 @@ SynchroNote::SynchroNote(NotePlayHandle * nph, const sample_rate_t sample_rate) 
 	//Empty constructor
 }
 
-SynchroNote::~SynchroNote() {
+SynchroNote::~SynchroNote()
+{
 	//Empty destructor
 }
 
-void SynchroNote::nextStringSample(sampleFrame &outputSample, float modulationStrength, float modulationAmount, float harmonics, SynchroOscillatorSettings carrier, SynchroOscillatorSettings modulator) {
+void SynchroNote::nextStringSample(sampleFrame &outputSample, float modulationStrength, float modulationAmount, float harmonics, SynchroOscillatorSettings carrier, SynchroOscillatorSettings modulator)
+{
 	double sample_step[2] = {0, 0}; //Index 0 is carrier, index 1 is modulator
 	double noteFrequency[2] = {0, 0};
 
@@ -135,11 +137,13 @@ SynchroSynth::SynchroSynth(InstrumentTrack * instrument_track) :
 	connect(&m_modulationStrength, SIGNAL(dataChanged()), this, SLOT(generalChanged()));
 }
 
-SynchroSynth::~SynchroSynth() {
+SynchroSynth::~SynchroSynth()
+{
 	//Empty destructor
 }
 
-void SynchroSynth::saveSettings(QDomDocument & doc, QDomElement & thisElement) {
+void SynchroSynth::saveSettings(QDomDocument & doc, QDomElement & thisElement)
+{
 	// Save plugin version (does this ever get used?)
 	thisElement.setAttribute("version", SYNCRHO_VERSION);
 	m_harmonics.saveSettings(doc, thisElement, "harmonics");
@@ -154,7 +158,8 @@ void SynchroSynth::saveSettings(QDomDocument & doc, QDomElement & thisElement) {
 	m_modulatorChop.saveSettings(doc, thisElement, "modulatorChop");
 }
 
-void SynchroSynth::loadSettings(const QDomElement & thisElement) {
+void SynchroSynth::loadSettings(const QDomElement & thisElement)
+{
 	m_harmonics.loadSettings(thisElement, "harmonics");
 	m_modulationStrength.loadSettings(thisElement, "modulationStrength");
 	m_carrierDetune.loadSettings(thisElement, "carrierDetune");
@@ -167,12 +172,15 @@ void SynchroSynth::loadSettings(const QDomElement & thisElement) {
 	m_modulatorChop.loadSettings(thisElement, "modulatorChop");
 }
 
-QString SynchroSynth::nodeName() const {
+QString SynchroSynth::nodeName() const
+{
 	return synchro_plugin_descriptor.name;
 }
 
-void SynchroSynth::playNote(NotePlayHandle * n, sampleFrame * working_buffer) {
-	if (n->totalFramesPlayed() == 0 || n->m_pluginData == NULL) {
+void SynchroSynth::playNote(NotePlayHandle * n, sampleFrame * working_buffer)
+{
+	if (n->totalFramesPlayed() == 0 || n->m_pluginData == NULL)
+	{
 		n->m_pluginData = new SynchroNote(n, Engine::mixer()->processingSampleRate());
 	}
 
@@ -180,12 +188,14 @@ void SynchroSynth::playNote(NotePlayHandle * n, sampleFrame * working_buffer) {
 	const f_cnt_t offset = n->noteOffset();
 
 	SynchroNote * ps = static_cast<SynchroNote *>(n->m_pluginData);
-	for(fpp_t frame = offset; frame < frames + offset; ++frame) {
+	for(fpp_t frame = offset; frame < frames + offset; ++frame)
+	{
 		sampleFrame outputSample = {0, 0};
 		SynchroOscillatorSettings carrier = { m_carrierDetune.value(), m_carrierDrive.value(), m_carrierSync.value(), m_carrierChop.value()};
 		SynchroOscillatorSettings modulator = { m_modulatorDetune.value(), m_modulatorDrive.value(), m_modulatorSync.value(), m_modulatorChop.value() };
 		ps->nextStringSample(outputSample, m_modulationStrength.value(), m_modulation.value(), m_harmonics.value(), carrier, modulator);//replace true with toggle input
-		for(ch_cnt_t chnl = 0; chnl < DEFAULT_CHANNELS; ++chnl) {
+		for(ch_cnt_t chnl = 0; chnl < DEFAULT_CHANNELS; ++chnl)
+		{
 			working_buffer[frame][chnl] = outputSample[chnl];
 		}
 	}
@@ -193,32 +203,40 @@ void SynchroSynth::playNote(NotePlayHandle * n, sampleFrame * working_buffer) {
 	instrumentTrack()->processAudioBuffer(working_buffer, frames + offset, n);
 }
 
-void SynchroSynth::deleteNotePluginData(NotePlayHandle * n) {
+void SynchroSynth::deleteNotePluginData(NotePlayHandle * n)
+{
 	delete static_cast<SynchroNote *>(n->m_pluginData);
 }
 
-PluginView * SynchroSynth::instantiateView(QWidget * parent) {
+PluginView * SynchroSynth::instantiateView(QWidget * parent)
+{
 	return new SynchroSynthView(this, parent);
 }
 
-void SynchroSynth::carrierChanged() {
-	for (int i = 0; i < GRAPH_SAMPLES; ++i) {
+void SynchroSynth::carrierChanged()
+{
+	for (int i = 0; i < GRAPH_SAMPLES; ++i)
+	{
 		double phase = (double)i / (double)GRAPH_SAMPLES;
 		m_carrierView.setSampleAt(i, SynchroWaveform(phase * D_2PI, m_carrierDrive.value(), m_carrierSync.value(), m_carrierChop.value(), 0));
 	}
 	generalChanged();
 }
 
-void SynchroSynth::modulatorChanged() {
-	for (int i = 0; i < GRAPH_SAMPLES; ++i) {
+void SynchroSynth::modulatorChanged()
+{
+	for (int i = 0; i < GRAPH_SAMPLES; ++i)
+	{
 		double phase = (double)i / (double)GRAPH_SAMPLES;
 		m_modulatorView.setSampleAt(i, SynchroWaveform(phase * D_2PI, m_modulatorDrive.value(), m_modulatorSync.value(), m_modulatorChop.value(), m_harmonics.value()));
 	}
 	generalChanged();
 }
 
-void SynchroSynth::generalChanged() {
-	for (int i = 0; i < GRAPH_SAMPLES; ++i) {
+void SynchroSynth::generalChanged()
+{
+	for (int i = 0; i < GRAPH_SAMPLES; ++i)
+	{
 		int octaveDiff = m_carrierDetune.value() - m_modulatorDetune.value();
 		double pitchDifference = powf(2, octaveDiff);
 		double phase = (double)i / (double)GRAPH_SAMPLES;
@@ -306,7 +324,8 @@ SynchroSynthView::SynchroSynthView(Instrument * instrument, QWidget * parent) :
 	m_resultGraph->setEnabled(false);
 }
 
-void SynchroSynthView::modelChanged() {
+void SynchroSynthView::modelChanged()
+{
 	SynchroSynth * b = castModel<SynchroSynth>();
 	m_harmonicsKnob->setModel(&b->m_harmonics);
 	m_modulationStrengthKnob->setModel(&b->m_modulationStrength);
