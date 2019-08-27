@@ -82,8 +82,8 @@ TextFloat {
 
 
 /* splash screen text */
-QLabel#splashText {
-	color: #ffffff;
+QSplashScreen QLabel {
+	color: white;
 }
 
 
