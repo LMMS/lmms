@@ -71,6 +71,7 @@ public:
 
 	void setForeground( const QPixmap & _pixmap );
 
+
 	void setGraphColor( const QColor );
 
 	inline graphModel * model()
@@ -82,6 +83,7 @@ public:
 	{
 		return m_graphStyle;
 	}
+
 
 	inline void setGraphStyle( graphStyle _s )
 	{
@@ -109,6 +111,7 @@ private:
 	void changeSampleAt( int _x, int _y );
 	void drawLineAt( int _x, int _y, int _lastx );
 
+
 	QPixmap m_foreground;
 	QColor m_graphColor;
 
@@ -116,6 +119,7 @@ private:
 
 	bool m_mouseDown;
 	int m_lastCursorX;
+
 } ;
 
 
