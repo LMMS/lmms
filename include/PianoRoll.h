@@ -46,7 +46,6 @@ class QPixmap;
 class QScrollBar;
 class QString;
 class QMenu;
-class QSignalMapper;
 
 class ComboBox;
 class NotePlayHandle;

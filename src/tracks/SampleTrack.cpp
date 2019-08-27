@@ -847,6 +847,7 @@ SampleTrackView::~SampleTrackView()
 
 
 
+//FIXME: This is identical to InstrumentTrackView::createFxMenu
 QMenu * SampleTrackView::createFxMenu(QString title, QString newFxLabel)
 {
 	int channelIndex = model()->effectChannelModel()->value();
@@ -861,8 +862,6 @@ QMenu * SampleTrackView::createFxMenu(QString title, QString newFxLabel)
 
 	QMenu *fxMenu = new QMenu(title);
 
-	QSignalMapper * fxMenuSignalMapper = new QSignalMapper(fxMenu);
-
 	fxMenu->addAction(newFxLabel, this, SLOT(createFxLine()));
 	fxMenu->addSeparator();
 
@@ -872,13 +871,13 @@ QMenu * SampleTrackView::createFxMenu(QString title, QString newFxLabel)
 
 		if (currentChannel != fxChannel)
 		{
+			const auto index = currentChannel->m_channelIndex;
 			QString label = tr("FX %1: %2").arg(currentChannel->m_channelIndex).arg(currentChannel->m_name);
-			QAction * action = fxMenu->addAction(label, fxMenuSignalMapper, SLOT(map()));
-			fxMenuSignalMapper->setMapping(action, currentChannel->m_channelIndex);
+			fxMenu->addAction(label, [this, index](){
+				assignFxLine(index);
+			});
 		}
 	}
-
-	connect(fxMenuSignalMapper, SIGNAL(mapped(int)), this, SLOT(assignFxLine(int)));
 
 	return fxMenu;
 }
