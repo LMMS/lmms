@@ -38,7 +38,7 @@
 #include "plugin_export.h"
 
 #define SYNCRHO_VERSION "0.2"
-#define VOLUME_CONST 20
+#define VOLUME_CONST 0.15f
 
 static const int PM_CONST = 20;
 static const int GRAPH_SAMPLES = 48;
@@ -95,7 +95,7 @@ void SynchroNote::nextStringSample(sampleFrame &outputSample, float modulationSt
 	while (sample_index[0] >= D_2PI) { sample_index[0] -= D_2PI; }
 
 	//Index 0 is L, 1 is R. Synth is currently mono so they are the same value.
-	outputSample[0] = SynchroWaveform(sample_index[0] + pmSample, carrier.Drive, carrier.Sync, carrier.Chop, 0) * (VOLUME_CONST * ONE_PERCENT);
+	outputSample[0] = SynchroWaveform(sample_index[0] + pmSample, carrier.Drive, carrier.Sync, carrier.Chop, 0) * (VOLUME_CONST);
 	outputSample[1] = outputSample[0];
 	//outputSample[1] =
 }
