@@ -1,5 +1,5 @@
 /*
-* growl.h - 2-oscillator PM synth
+* SynchroSynth.h - 2-oscillator PM synth
 *
 * Copyright (c) 2019 Ian Sannar <ian/dot/sannar/at/gmail/dot/com>
 *
@@ -23,7 +23,6 @@
 
 #ifndef SYNCHROSYNTH_H
 #define SYNCHROSYNTH_H
-#define ONE_PERCENT 0.01f
 
 #include "lmms_constants.h"
 #include "lmms_math.h"
@@ -37,14 +36,16 @@ static const double MAGIC_HARMONICS[2][2] = {{32, 0.5}, {38, 0.025}};
 
 class SynchroSynthView; //Additional definition to prevent errors, since SynchroInstrument references it
 
-typedef struct SynchroOscillatorSettings {
+typedef struct SynchroOscillatorSettings
+{
 	double Detune;
 	double Drive;
 	double Sync;
 	double Chop;
 } SynchroOscillatorSettings;
 
-class SynchroNote {
+class SynchroNote
+{
 	MM_OPERATORS
 public:
 	SynchroNote(NotePlayHandle * nph, sample_rate_t sample_rate);
@@ -56,7 +57,8 @@ private:
 	const sample_rate_t sample_rate;
 };
 
-class SynchroSynth : public Instrument {
+class SynchroSynth : public Instrument
+{
 	Q_OBJECT
 public:
 	SynchroSynth(InstrumentTrack * instrument_track);
@@ -66,7 +68,7 @@ public:
 	virtual void saveSettings(QDomDocument & doc, QDomElement & parent);
 	virtual void loadSettings(const QDomElement & thisElement);
 	virtual QString nodeName() const;
-	virtual f_cnt_t desiredReleaseFrames() const { return( 64 ); }
+	virtual f_cnt_t desiredReleaseFrames() const { return(64); } //Not sure what this is used for
 	virtual PluginView * instantiateView(QWidget * parent);
 protected slots:
 void carrierChanged();
@@ -119,12 +121,14 @@ private:
 };
 
 //Triangle waveform generator
-static inline double tri(double x) {
+static inline double tri(double x)
+{
 	return 2.0 * fabs(2.0 * ((x / D_2PI) - floorf((x / D_2PI) + 0.5))) - 1.0;
 }
 
 //Triangle waveform with harmonic generator
-static inline double trih(double x, double harmonic) {
+static inline double trih(double x, double harmonic)
+{
 	return tri(x) + (tri(MAGIC_HARMONICS[0][0] * x) * MAGIC_HARMONICS[0][1] + tri(MAGIC_HARMONICS[1][0] * x) * MAGIC_HARMONICS[1][1]) * harmonic;
 }
 
@@ -134,19 +138,23 @@ static inline double trih(double x, double harmonic) {
 //sync: hard sync with harmonic multiple
 //chop: how strong the amplitude falloff is per waveform period
 //harmonic: how strong the magic harmonic is
-static inline double SynchroWaveform(double x, double drive, double sync, double chop, double harmonic) {
+static inline double SynchroWaveform(double x, double drive, double sync, double chop, double harmonic)
+{
 	return (atan2(trih(D_PI_2 + x * sync, harmonic) * drive, 1) / atan2(drive, 1)) / powf(D_2PI / (D_2PI - x), chop);
 }
 
-static inline double DetuneCents(float pitch, float detune) {
+static inline double DetuneCents(float pitch, float detune)
+{
 	return pitch * exp2(detune / 1200.0);
 }
 
-static inline double DetuneSemitones(float pitch, float detune) {
+static inline double DetuneSemitones(float pitch, float detune)
+{
 	return pitch * exp2(detune / 12.0);
 }
 
-static inline double DetuneOctaves(float pitch, float detune) {
+static inline double DetuneOctaves(float pitch, float detune)
+{
 	return pitch * exp2(detune);
 }
 
