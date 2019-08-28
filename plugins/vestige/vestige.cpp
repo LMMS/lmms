@@ -60,7 +60,8 @@
 
 #include "embed.h"
 
-
+static const char KEY_CAPTURE_PGM_CHANGE[] = "cap_pgm_change";
+static const char KEY_USE_BANK_SELECT_LSB[] = "use_bank_sel_lsb";
 
 extern "C"
 {
@@ -234,6 +235,9 @@ void vestigeInstrument::loadSettings( const QDomElement & _this )
 				[this, i]() { setParameter( knobFModel[i] ); }, Qt::DirectConnection);
 		}
 	}
+
+	m_capturePgmChange.loadSettings(_this, KEY_CAPTURE_PGM_CHANGE);
+	m_useBankSelectLSB.loadSettings(_this, KEY_USE_BANK_SELECT_LSB);
 	m_pluginMutex.unlock();
 }
 
@@ -311,6 +315,8 @@ void vestigeInstrument::saveSettings( QDomDocument & _doc, QDomElement & _this )
 			}
 		}
 	}
+	m_capturePgmChange.saveSettings(_doc, _this, KEY_CAPTURE_PGM_CHANGE);
+	m_useBankSelectLSB.saveSettings(_doc, _this, KEY_USE_BANK_SELECT_LSB);
 	m_pluginMutex.unlock();
 }
 
