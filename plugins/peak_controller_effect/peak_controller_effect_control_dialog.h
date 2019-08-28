@@ -42,7 +42,7 @@ public:
 	{
 	}
 
-
+	virtual bool isPeakController() const {return true;}
 protected:
 	Knob * m_baseKnob;
 	Knob * m_amountKnob;

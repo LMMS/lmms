@@ -286,7 +286,7 @@ bool ControllerRackView::allCollapsed() const
 {
 	for (auto &it : m_controllerViews)
 	{
-		if (it->isCollapsed() == false)
+		if (!it->isCollapsed())
 		{
 			return false;
 		}

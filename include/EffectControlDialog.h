@@ -41,6 +41,7 @@ public:
 	virtual ~EffectControlDialog();
 
 	virtual bool isResizable() const {return false;}
+	virtual bool isPeakController() const {return false;}
 
 
 signals:

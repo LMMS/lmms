@@ -98,7 +98,7 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 		m_controlView = effect()->controls()->createView();
 		if (m_controlView)
 		{
-			if (dynamic_cast<PeakControllerEffectControlDialog*>(m_controlView) == nullptr)
+			if (!m_controlView->isPeakController())
 			{
 				m_subWindow = gui->mainWindow()->addWindowedWidget(m_controlView);
 

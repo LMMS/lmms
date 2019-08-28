@@ -47,12 +47,12 @@ public:
 
 	inline Controller * getController()
 	{
-		return(castModel<Controller>());
+		return castModel<Controller>();
 	}
 
 	inline const Controller * getController() const
 	{
-		return(castModel<Controller>());
+		return castModel<Controller>();
 	}
 
 	bool isCollapsed() const;
