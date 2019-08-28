@@ -42,7 +42,9 @@ public:
 	{
 	}
 
-	virtual bool isPeakController() const {return true;}
+	void showDialog() override;
+	void toggleView() override;
+
 protected:
 	Knob * m_baseKnob;
 	Knob * m_amountKnob;

@@ -27,6 +27,8 @@
 #define EFFECT_CONTROL_DIALOG_H
 
 #include <QWidget>
+#include <QMdiSubWindow>
+
 
 #include "ModelView.h"
 
@@ -41,7 +43,9 @@ public:
 	virtual ~EffectControlDialog();
 
 	virtual bool isResizable() const {return false;}
-	virtual bool isPeakController() const {return false;}
+
+	virtual void showDialog();
+	virtual void toggleView();
 
 
 signals:
@@ -53,6 +57,8 @@ protected:
 
 	EffectControls * m_effectControls;
 
+private:
+	QMdiSubWindow * m_subWindow;
 } ;
 
 #endif

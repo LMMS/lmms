@@ -27,9 +27,12 @@
 
 #include <QLayout>
 #include <QLabel>
+#include <QMdiSubWindow>
 
+#include "ControllerRackView.h"
 #include "peak_controller_effect_control_dialog.h"
 #include "peak_controller_effect_controls.h"
+#include "GuiApplication.h"
 #include "Knob.h"
 #include "LedCheckbox.h"
 #include "embed.h"
@@ -101,5 +104,32 @@ PeakControllerEffectControlDialog::PeakControllerEffectControlDialog(
 	mainLayout->addLayout( ledLayout );
 
 	setLayout( mainLayout );
+}
+
+
+
+
+void PeakControllerEffectControlDialog::showDialog()
+{
+	gui->getControllerRackView()->show();
+	gui->getControllerRackView()->subWin()->hide();
+}
+
+
+
+
+void PeakControllerEffectControlDialog::toggleView()
+{
+	if (!gui->getControllerRackView()->subWin()->isVisible())
+	{
+		gui->getControllerRackView()->subWin()->show();
+		gui->getControllerRackView()->subWin()->raise();
+		m_effectControls->setViewVisible(true);
+	}
+	else
+	{
+		gui->getControllerRackView()->subWin()->hide();
+		m_effectControls->setViewVisible(false);
+	}
 }
 
