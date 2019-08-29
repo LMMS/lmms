@@ -24,27 +24,14 @@
  */
 
 
-#include <QLabel>
-#include <QPushButton>
-#include <QMdiArea>
-#include <QMdiSubWindow>
-#include <QLayout>
+
+#include "PeakController.h"
+
 #include <QPainter>
 
-#include "CaptionMenu.h"
-#include "gui_templates.h"
-#include "embed.h"
-#include "Engine.h"
-#include "MainWindow.h"
-#include "ToolTip.h"
-#include "PeakController.h"
-#include "ControllerDialog.h"
-#include "Knob.h"
-#include "TempoSyncKnob.h"
-#include "PixmapButton.h"
+#include "EffectControlDialog.h"
 #include "plugins/peak_controller_effect/peak_controller_effect.h"
 #include "plugins/peak_controller_effect/peak_controller_effect_control_dialog.cpp"
-#include "EffectControlDialog.h"
 
 
 PeakControllerDialog::PeakControllerDialog( PeakController * _model, QWidget * _parent ) :
