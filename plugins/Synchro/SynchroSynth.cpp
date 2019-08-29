@@ -179,7 +179,7 @@ void SynchroSynth::playNote(NotePlayHandle * n, sampleFrame * working_buffer)
 {
 	if (n->totalFramesPlayed() == 0 || n->m_pluginData == NULL)
 	{
-		n->m_pluginData = new SynchroNote(n, Engine::mixer()->processingSampleRate());
+		n->m_pluginData = new SynchroNote(n);
 	}
 
 	const fpp_t frames = n->framesLeftForCurrentPeriod();
@@ -249,7 +249,7 @@ void SynchroSynth::generalChanged()
 		float phase = (float)i / (float)SYNCHRO_GRAPH_SAMPLES * F_2PI;
 		while (phase >= F_2PI) { phase -= F_2PI; }
 		float phaseMod = SynchroWaveform(phase, m_modulatorDrive.value(), m_modulatorSync.value(), m_modulatorChop.value(), m_harmonics.value()) * m_modulationStrength.value() * m_modulation.value() * SYNCHRO_PM_CONST;
-		while (phaseResult >= F_2PI) { phaseResult -= F_2PI; } //This is neccessary; SynchroWaveform goes nuts when the domain goes past 2PI
+		while (phase >= F_2PI) { phase -= F_2PI; } //This is neccessary; SynchroWaveform goes nuts when the domain goes past 2PI
 		m_resultView.setSampleAt(i, SynchroWaveform(phase + phaseMod * pitchDifference, m_carrierDrive.value(), m_carrierSync.value(), m_carrierChop.value(), 0));
 	}
 }
