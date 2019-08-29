@@ -49,7 +49,7 @@ class SynchroNote
 {
 	MM_OPERATORS
 public:
-	SynchroNote(NotePlayHandle * nph, sample_rate_t sample_rate);
+	SynchroNote(NotePlayHandle * nph);
 	virtual ~SynchroNote();
 	void nextStringSample(sampleFrame &outputSample, sample_rate_t sample_rate, float modulationStrength, float modulationAmount, float harmonics, SynchroOscillatorSettings carrier, SynchroOscillatorSettings modulator);
 private:
