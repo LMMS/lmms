@@ -81,14 +81,14 @@ void SynchroNote::nextStringSample(sampleFrame &outputSample, sample_rate_t samp
 {
 	float sampleRatePi = F_2PI / sample_rate; //For oversampling
 	//Find position in modulator waveform
-	sample_index[1] += sampleRatePi * DetuneOctaves(nph->frequency(), modulator.Detune));
+	sample_index[1] += sampleRatePi * DetuneOctaves(nph->frequency(), modulator.Detune);
 	while (sample_index[1] >= F_2PI) { sample_index[1] -= F_2PI; } //Make sure phase is always between 0 and 2PI
 	//Get modulator waveform at position
 	//Modulator is calculated first because it is used by the carrier
 	float modulatorSample = SynchroWaveform(sample_index[1], modulator.Drive, modulator.Sync, modulator.Chop, harmonics) * (modulationStrength * modulationAmount);
 	float pmSample = modulatorSample * SYNCHRO_PM_CONST;
 	//Find position in carrier waveform
-	sample_index[0] += sampleRatePi * DetuneOctaves(nph->frequency(), carrier.Detune));
+	sample_index[0] += sampleRatePi * DetuneOctaves(nph->frequency(), carrier.Detune);
 	while (sample_index[0] >= F_2PI) { sample_index[0] -= F_2PI; } //Make sure phase is always between 0 and 2PI
 	//Get carrier waveform at position, accounting for modulation
 	//Index 0 is L, 1 is R. Synth is currently mono so they are the same value.
