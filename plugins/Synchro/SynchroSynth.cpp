@@ -1,26 +1,27 @@
 /*
-* SynchroSynth.cpp - 2-oscillator PM synth
-*
-* Copyright (c) 2019 Ian Sannar <ian/dot/sannar/at/gmail/dot/com>
-*
-* This file is part of LMMS - https://lmms.io
-*
-* This program is free software; you can redistribute it and/or
-* modify it under the terms of the GNU General Public
-* License as published by the Free Software Foundation; either
-* version 2 of the License, or (at your option) any later version.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-* General Public License for more details.
-*
-* You should have received a copy of the GNU General Public
-* License along with this program (see COPYING); if not, write to the
-* Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
-* Boston, MA 02110-1301 USA.
-*
-*/
+ * SynchroSynth.cpp - 2-oscillator PM synth
+ *
+ * Copyright (c) 2019 Ian Sannar <ian/dot/sannar/at/gmail/dot/com>
+ * Credit to @DouglasDGI "Lost Robot" for performance optimizations
+ *
+ * This file is part of LMMS - https://lmms.io
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public
+ * License along with this program (see COPYING); if not, write to the
+ * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ * Boston, MA 02110-1301 USA.
+ *
+ */
 
 #include "SynchroSynth.h"
 //Standard headers
@@ -34,14 +35,14 @@
 #include "lmms_constants.h"
 #include "Mixer.h"
 #include "NotePlayHandle.h"
-//Other headers
 #include "plugin_export.h"
 
-#define SYNCRHO_VERSION "0.2"
+#define SYNCRHO_VERSION "0.3"
 #define VOLUME_CONST 0.15f
 
-static const int PM_CONST = 20;
-static const int GRAPH_SAMPLES = 48;
+static const int SYNCHRO_OVERSAMPLE = 4; //Anti-aliasing samples
+static const int SYNCHRO_PM_CONST = 20; //Strength of the phase modulation
+static const int SYNCHRO_GRAPH_SAMPLES = 48; //Resolution of the waveform view GUI elements
 
 //Plugin metadata
 extern "C"
@@ -52,7 +53,7 @@ extern "C"
 		"Synchro",
 		QT_TRANSLATE_NOOP("pluginBrowser", "2-oscillator PM synth"),
 		"Ian Sannar <ian/dot/sannar/at/gmail/dot/com>",
-		0x0100,
+		0x0100, //What does this do?
 		Plugin::Instrument,
 		new PluginPixmapLoader("logo"),
 		NULL,
@@ -65,9 +66,8 @@ extern "C"
 	}
 }
 
-SynchroNote::SynchroNote(NotePlayHandle * nph, const sample_rate_t sample_rate) :
-	nph(nph),
-	sample_rate(sample_rate)
+SynchroNote::SynchroNote(NotePlayHandle * nph) :
+	nph(nph)
 {
 	//Empty constructor
 }
@@ -77,27 +77,23 @@ SynchroNote::~SynchroNote()
 	//Empty destructor
 }
 
-void SynchroNote::nextStringSample(sampleFrame &outputSample, float modulationStrength, float modulationAmount, float harmonics, SynchroOscillatorSettings carrier, SynchroOscillatorSettings modulator)
+void SynchroNote::nextStringSample(sampleFrame &outputSample, sample_rate_t sample_rate, float modulationStrength, float modulationAmount, float harmonics, SynchroOscillatorSettings carrier, SynchroOscillatorSettings modulator)
 {
-	double sample_step[2] = {0, 0}; //Index 0 is carrier, index 1 is modulator
-	double noteFrequency[2] = {0, 0};
-
-	noteFrequency[1] = DetuneOctaves(nph->frequency(), modulator.Detune);
-	sample_step[1] = D_2PI / (sample_rate / noteFrequency[1]);//Maybe do a for loop to replace boilerplate later
-	sample_index[1] += sample_step[1];
-	while (sample_index[1] >= D_2PI) { sample_index[1] -= D_2PI; }
-	double modulatorSample = SynchroWaveform(sample_index[1], modulator.Drive, modulator.Sync, modulator.Chop, harmonics) * (modulationStrength * modulationAmount);
-	double pmSample = modulatorSample * PM_CONST;
-
-	noteFrequency[0] = DetuneOctaves(nph->frequency(), carrier.Detune);
-	sample_step[0] = D_2PI / (sample_rate / noteFrequency[0]);
-	sample_index[0] += sample_step[0];
-	while (sample_index[0] >= D_2PI) { sample_index[0] -= D_2PI; }
-
+	float sampleRatePi = F_2PI / sample_rate; //For oversampling
+	//Find position in modulator waveform
+	sample_index[1] += sampleRatePi * DetuneOctaves(nph->frequency(), modulator.Detune));
+	while (sample_index[1] >= F_2PI) { sample_index[1] -= F_2PI; } //Make sure phase is always between 0 and 2PI
+	//Get modulator waveform at position
+	//Modulator is calculated first because it is used by the carrier
+	float modulatorSample = SynchroWaveform(sample_index[1], modulator.Drive, modulator.Sync, modulator.Chop, harmonics) * (modulationStrength * modulationAmount);
+	float pmSample = modulatorSample * PM_CONST;
+	//Find position in carrier waveform
+	sample_index[0] += sampleRatePi * DetuneOctaves(nph->frequency(), carrier.Detune));
+	while (sample_index[0] >= F_2PI) { sample_index[0] -= F_2PI; } //Make sure phase is always between 0 and 2PI
+	//Get carrier waveform at position, accounting for modulation
 	//Index 0 is L, 1 is R. Synth is currently mono so they are the same value.
 	outputSample[0] = SynchroWaveform(sample_index[0] + pmSample, carrier.Drive, carrier.Sync, carrier.Chop, 0) * (VOLUME_CONST);
 	outputSample[1] = outputSample[0];
-	//outputSample[1] =
 }
 
 SynchroSynth::SynchroSynth(InstrumentTrack * instrument_track) :
@@ -146,6 +142,7 @@ void SynchroSynth::saveSettings(QDomDocument & doc, QDomElement & thisElement)
 {
 	// Save plugin version (does this ever get used?)
 	thisElement.setAttribute("version", SYNCRHO_VERSION);
+	m_modulation.saveSettings(doc, thisElement, "modulation");
 	m_harmonics.saveSettings(doc, thisElement, "harmonics");
 	m_modulationStrength.saveSettings(doc, thisElement, "modulationStrength");
 	m_carrierDetune.saveSettings(doc, thisElement, "carrierDetune");
@@ -160,6 +157,7 @@ void SynchroSynth::saveSettings(QDomDocument & doc, QDomElement & thisElement)
 
 void SynchroSynth::loadSettings(const QDomElement & thisElement)
 {
+	m.modulation.loadSettings(thisElement, "modulation");
 	m_harmonics.loadSettings(thisElement, "harmonics");
 	m_modulationStrength.loadSettings(thisElement, "modulationStrength");
 	m_carrierDetune.loadSettings(thisElement, "carrierDetune");
@@ -191,12 +189,21 @@ void SynchroSynth::playNote(NotePlayHandle * n, sampleFrame * working_buffer)
 	for(fpp_t frame = offset; frame < frames + offset; ++frame)
 	{
 		sampleFrame outputSample = {0, 0};
-		SynchroOscillatorSettings carrier = { m_carrierDetune.value(), m_carrierDrive.value(), m_carrierSync.value(), m_carrierChop.value()};
+		sampleFrame tempSample = {0, 0};
+		SynchroOscillatorSettings carrier = { m_carrierDetune.value(), m_carrierDrive.value(), m_carrierSync.value(), m_carrierChop.value() };
 		SynchroOscillatorSettings modulator = { m_modulatorDetune.value(), m_modulatorDrive.value(), m_modulatorSync.value(), m_modulatorChop.value() };
-		ps->nextStringSample(outputSample, m_modulationStrength.value(), m_modulation.value(), m_harmonics.value(), carrier, modulator);//replace true with toggle input
+		
+		//Oversampling using linear interpolation
+		for (int i = 0; i < SYNCHRO_OVERSAMPLE; ++i)
+		{
+			ps->nextStringSample(tempSample, Engine::mixer()->processingSampleRate() * SYNCHRO_OVERSAMPLE, m_modulationStrength.value(), m_modulation.value(), m_harmonics.value(), carrier, modulator);
+			outputSample[0] += tempSample[0];
+			outputSample[1] += tempSample[1];
+		}
+		
 		for(ch_cnt_t chnl = 0; chnl < DEFAULT_CHANNELS; ++chnl)
 		{
-			working_buffer[frame][chnl] = outputSample[chnl];
+			working_buffer[frame][chnl] = outputSample[chnl] / SYNCHRO_OVERSAMPLE;
 		}
 	}
 	applyRelease(working_buffer, n);
@@ -215,36 +222,35 @@ PluginView * SynchroSynth::instantiateView(QWidget * parent)
 
 void SynchroSynth::carrierChanged()
 {
-	for (int i = 0; i < GRAPH_SAMPLES; ++i)
+	for (int i = 0; i < SYNCHRO_GRAPH_SAMPLES; ++i)
 	{
-		double phase = (double)i / (double)GRAPH_SAMPLES;
-		m_carrierView.setSampleAt(i, SynchroWaveform(phase * D_2PI, m_carrierDrive.value(), m_carrierSync.value(), m_carrierChop.value(), 0));
+		float phase = (float)i / (float)SYNCHRO_GRAPH_SAMPLES;
+		m_carrierView.setSampleAt(i, SynchroWaveform(phase * F_2PI, m_carrierDrive.value(), m_carrierSync.value(), m_carrierChop.value(), 0));
 	}
 	generalChanged();
 }
 
 void SynchroSynth::modulatorChanged()
 {
-	for (int i = 0; i < GRAPH_SAMPLES; ++i)
+	for (int i = 0; i < SYNCHRO_GRAPH_SAMPLES; ++i)
 	{
-		double phase = (double)i / (double)GRAPH_SAMPLES;
-		m_modulatorView.setSampleAt(i, SynchroWaveform(phase * D_2PI, m_modulatorDrive.value(), m_modulatorSync.value(), m_modulatorChop.value(), m_harmonics.value()));
+		float phase = (float)i / (float)SYNCHRO_GRAPH_SAMPLES;
+		m_modulatorView.setSampleAt(i, SynchroWaveform(phase * F_2PI, m_modulatorDrive.value(), m_modulatorSync.value(), m_modulatorChop.value(), m_harmonics.value()));
 	}
 	generalChanged();
 }
 
 void SynchroSynth::generalChanged()
 {
-	for (int i = 0; i < GRAPH_SAMPLES; ++i)
+	for (int i = 0; i < SYNCHRO_GRAPH_SAMPLES; ++i)
 	{
 		int octaveDiff = m_carrierDetune.value() - m_modulatorDetune.value();
-		double pitchDifference = powf(2, octaveDiff);
-		double phase = (double)i / (double)GRAPH_SAMPLES;
-		double phaseResult = phase * D_2PI;
-		while (phaseResult >= D_2PI) { phaseResult -= D_2PI; }
-		double phaseMod = SynchroWaveform(phaseResult, m_modulatorDrive.value(), m_modulatorSync.value(), m_modulatorChop.value(), m_harmonics.value()) * m_modulationStrength.value() * m_modulation.value() * PM_CONST;
-		phaseResult = phaseMod + phase * D_2PI * pitchDifference;
-		while (phaseResult >= D_2PI) { phaseResult -= D_2PI; }
+		float pitchDifference = powf(2, octaveDiff);
+		float phase = (float)i / (float)SYNCHRO_GRAPH_SAMPLES;
+		float phaseResult = phase * F_2PI;
+		while (phaseResult >= F_2PI) { phaseResult -= F_2PI; }
+		float phaseMod = SynchroWaveform(phaseResult, m_modulatorDrive.value(), m_modulatorSync.value(), m_modulatorChop.value(), m_harmonics.value()) * m_modulationStrength.value() * m_modulation.value() * PM_CONST;
+		while (phaseResult >= F_2PI) { phaseResult -= F_2PI; }
 		m_resultView.setSampleAt(i, SynchroWaveform(phaseResult, m_carrierDrive.value(), m_carrierSync.value(), m_carrierChop.value(), 0));
 	}
 }
