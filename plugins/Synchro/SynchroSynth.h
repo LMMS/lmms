@@ -1,25 +1,26 @@
 /*
-* SynchroSynth.h - 2-oscillator PM synth
-*
-* Copyright (c) 2019 Ian Sannar <ian/dot/sannar/at/gmail/dot/com>
-*
-* This file is part of LMMS - https://lmms.io
-*
-* This program is free software; you can redistribute it and/or
-* modify it under the terms of the GNU General Public
-* License as published by the Free Software Foundation; either
-* version 2 of the License, or (at your option) any later version.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-* General Public License for more details.
-*
-* You should have received a copy of the GNU General Public
-* License along with this program (see COPYING); if not, write to the
-* Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
-* Boston, MA 02110-1301 USA.
-*/
+ * SynchroSynth.h - 2-oscillator PM synth
+ *
+ * Copyright (c) 2019 Ian Sannar <ian/dot/sannar/at/gmail/dot/com>
+ * Credits to @DouglasDGI "Lost Robot" for performance optimizations
+ *
+ * This file is part of LMMS - https://lmms.io
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public
+ * License along with this program (see COPYING); if not, write to the
+ * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ * Boston, MA 02110-1301 USA.
+ */
 
 #ifndef SYNCHROSYNTH_H
 #define SYNCHROSYNTH_H
@@ -32,16 +33,16 @@
 #include "Knob.h"
 #include "Graph.h"
 
-static const double MAGIC_HARMONICS[2][2] = {{32, 0.5}, {38, 0.025}};
+static const float MAGIC_HARMONICS[2][2] = {{32, 0.5}, {38, 0.025}};
 
 class SynchroSynthView; //Additional definition to prevent errors, since SynchroInstrument references it
 
 typedef struct SynchroOscillatorSettings
 {
-	double Detune;
-	double Drive;
-	double Sync;
-	double Chop;
+	float Detune;
+	float Drive;
+	float Sync;
+	float Chop;
 } SynchroOscillatorSettings;
 
 class SynchroNote
@@ -50,11 +51,10 @@ class SynchroNote
 public:
 	SynchroNote(NotePlayHandle * nph, sample_rate_t sample_rate);
 	virtual ~SynchroNote();
-	void nextStringSample(sampleFrame &outputSample, float modulationStrength, float modulationAmount, float harmonics, SynchroOscillatorSettings carrier, SynchroOscillatorSettings modulator);
+	void nextStringSample(sampleFrame &outputSample, sample_rate_t sample_rate, float modulationStrength, float modulationAmount, float harmonics, SynchroOscillatorSettings carrier, SynchroOscillatorSettings modulator);
 private:
 	NotePlayHandle * nph;
-	double sample_index[2] = {0, 0}; //Index 0 is carrier, index 1 is modulator
-	const sample_rate_t sample_rate;
+	float sample_index[2] = {0, 0}; //Index 0 is carrier, index 1 is modulator
 };
 
 class SynchroSynth : public Instrument
@@ -90,6 +90,8 @@ private:
 	graphModel m_carrierView;
 	graphModel m_modulatorView;
 	graphModel m_resultView;
+	float m_carrierNormalize; //for later
+	float m_modulatorNormalize;
 	friend class SynchroSynthView;
 };
 
@@ -121,13 +123,13 @@ private:
 };
 
 //Triangle waveform generator
-static inline double tri(double x)
+static inline float tri(float x)
 {
-	return 2.0 * fabs(2.0 * ((x / D_2PI) - floorf((x / D_2PI) + 0.5))) - 1.0;
+	return 2.0 * fabs(2.0 * ((x / F_2PI) - floorf((x / F_2PI) + 0.5))) - 1.0;
 }
 
 //Triangle waveform with harmonic generator
-static inline double trih(double x, double harmonic)
+static inline float trih(float x, float harmonic)
 {
 	return tri(x) + (tri(MAGIC_HARMONICS[0][0] * x) * MAGIC_HARMONICS[0][1] + tri(MAGIC_HARMONICS[1][0] * x) * MAGIC_HARMONICS[1][1]) * harmonic;
 }
@@ -137,23 +139,23 @@ static inline double trih(double x, double harmonic)
 //drive: how much atan distortion is applied to the waveform
 //sync: hard sync with harmonic multiple
 //chop: how strong the amplitude falloff is per waveform period
-//harmonic: how strong the magic harmonic is
-static inline double SynchroWaveform(double x, double drive, double sync, double chop, double harmonic)
+//harmonic: how strong the magic harmonics are
+static inline float SynchroWaveform(float x, float drive, float sync, float chop, float harmonic)
 {
-	return (atan2(trih(D_PI_2 + x * sync, harmonic) * drive, 1) / atan2(drive, 1)) / powf(D_2PI / (D_2PI - x), chop);
+	return (atan2(trih(F_PI_2 + x * sync, harmonic) * drive, 1) / atan2(drive, 1)) / powf(F_2PI / (F_2PI - x), chop);
 }
 
-static inline double DetuneCents(float pitch, float detune)
+static inline float DetuneCents(float pitch, float detune)
 {
 	return pitch * exp2(detune / 1200.0);
 }
 
-static inline double DetuneSemitones(float pitch, float detune)
+static inline float DetuneSemitones(float pitch, float detune)
 {
 	return pitch * exp2(detune / 12.0);
 }
 
-static inline double DetuneOctaves(float pitch, float detune)
+static inline float DetuneOctaves(float pitch, float detune)
 {
 	return pitch * exp2(detune);
 }
