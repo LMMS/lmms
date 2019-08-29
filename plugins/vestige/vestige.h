@@ -44,14 +44,12 @@ class QPushButton;
 
 class PixmapButton;
 class VstPlugin;
-class VestigeInstrumentView;
 
 class vestigeInstrument : public Instrument
 {
 	Q_OBJECT
 public:
 	vestigeInstrument( InstrumentTrack * _instrument_track );
-	void bindView(VestigeInstrumentView * view);
 	virtual ~vestigeInstrument();
 
 	virtual void play( sampleFrame * _working_buffer );
@@ -72,6 +70,9 @@ public:
 
 	virtual PluginView * instantiateView( QWidget * _parent );
 
+signals:
+	void presetChanged();
+
 protected slots:
 	void setParameter( Model * action );
 	void handleConfigChange( QString cls, QString attr, QString value );
@@ -80,7 +81,6 @@ protected slots:
 private:
 	void closePlugin( void );
 
-	VestigeInstrumentView * m_pView;
 	VstPlugin * m_plugin;
 	QMutex m_pluginMutex;
 
@@ -113,6 +113,7 @@ protected slots:
 	void syncPlugin( void );
 	void displayAutomatedOnly( void );
 	void setParameter( Model * action );
+	void repaintWindow();
 	void closeWindow();
 
 
@@ -153,6 +154,7 @@ protected slots:
 	void savePreset( void );
 	void nextProgram();
 	void previousProgram();
+	void changedProgram();
 	void selPreset( void );
 	void toggleGUI( void );
 	void noteOffAll( void );

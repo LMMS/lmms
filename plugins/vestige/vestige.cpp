@@ -145,7 +145,6 @@ QPixmap * manageVestigeInstrumentView::s_artwork = NULL;
 
 vestigeInstrument::vestigeInstrument( InstrumentTrack * _instrument_track ) :
 	Instrument( _instrument_track, &vestige_plugin_descriptor ),
-	m_pView( NULL ),
 	m_plugin( NULL ),
 	m_pluginMutex(),
 	m_subWindow( NULL ),
@@ -163,13 +162,6 @@ vestigeInstrument::vestigeInstrument( InstrumentTrack * _instrument_track ) :
 			 this, SLOT( handleConfigChange(QString, QString, QString) ),
 			 Qt::QueuedConnection );
 }
-
-void vestigeInstrument::bindView(VestigeInstrumentView * view)
-{
-	m_pView = view;
-}
-
-
 
 vestigeInstrument::~vestigeInstrument()
 {
@@ -456,9 +448,7 @@ bool vestigeInstrument::handleMidiEvent( const MidiEvent& event, const MidiTime&
 			printf("MIDI Program change to %d\n", presetNumber);
 #endif
 			m_plugin->setProgram(presetNumber);
-			if (m_pView) {
-				m_pView->update();
-			}
+			emit presetChanged();
 		}
 		else
 		{
@@ -528,7 +518,8 @@ void vestigeInstrument::closePlugin( void )
 PluginView * vestigeInstrument::instantiateView( QWidget * _parent )
 {
 	VestigeInstrumentView* view = new VestigeInstrumentView( this, _parent );
-	bindView(view);
+	connect(this, SIGNAL( presetChanged() ),
+		view, SLOT( changedProgram())  );
 	return view;
 }
 
@@ -863,6 +854,13 @@ void VestigeInstrumentView::previousProgram()
 
 
 
+void VestigeInstrumentView::changedProgram()
+{
+	QWidget::update();
+}
+
+
+
 
 void VestigeInstrumentView::selPreset( void )
 {
@@ -1142,7 +1140,6 @@ void manageVestigeInstrumentView::closeWindow()
 {
 	m_vi->m_subWindow->hide();
 }
-
 
 
 
