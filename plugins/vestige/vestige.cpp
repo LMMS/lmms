@@ -661,13 +661,7 @@ VestigeInstrumentView::VestigeInstrumentView( Instrument * _instrument,
 	m_capturePgmChangeButton->setInactiveGraphic(embed::getIconPixmap("led_off"));
 	m_capturePgmChangeButton->setCheckable(true);
 	ToolTip::add( m_capturePgmChangeButton, tr(
-			      "When enabled, VeSTige will capture MIDI Program Change "
-			      "and Bank Select events to switch presets.\n"
-			      "When disabled, the events will be routed directly "
-			      "to the VST plugin.\n"
-			      "Enable this option if the VST plugin ignores attempts "
-			      "to change the program from the MIDI controller or you "
-			      "simply want VeSTige to do this task."
+			      "Use MIDI Program Change events to change active preset of VST plugin"
 			      ));
 	m_capturePgmChangeButton->move(20, 205);
 
@@ -677,12 +671,8 @@ VestigeInstrumentView::VestigeInstrumentView( Instrument * _instrument,
 	m_useBankSelectLSBButton->setInactiveGraphic(embed::getIconPixmap("led_off"));
 	m_useBankSelectLSBButton->setCheckable(true);
 	ToolTip::add( m_useBankSelectLSBButton, tr(
-			      "When enabled, VeSTige will use both Bank Select controllers "
-			      "allowing to access up to 16384 banks.\n"
-			      "When disabled, Bank Select LSB will be ignored, allowing to "
-			      "access up to 128 banks.\n"
-			      "Disable this option if your MIDI controller does not use "
-			      "Bank Select LSB controller."));
+			      "Use both MSB and LSB of Bank Select controllers"
+			      ));
 	m_useBankSelectLSBButton->move(20, 225);
 
 	setAcceptDrops( true );
