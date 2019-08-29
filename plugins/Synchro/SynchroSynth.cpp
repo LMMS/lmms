@@ -38,7 +38,7 @@
 #include "plugin_export.h"
 
 #define SYNCRHO_VERSION "0.3"
-#define VOLUME_CONST 0.15f
+#define SYNCHRO_VOLUME_CONST 0.15f
 
 static const int SYNCHRO_OVERSAMPLE = 4; //Anti-aliasing samples
 static const int SYNCHRO_PM_CONST = 20; //Strength of the phase modulation
@@ -86,13 +86,13 @@ void SynchroNote::nextStringSample(sampleFrame &outputSample, sample_rate_t samp
 	//Get modulator waveform at position
 	//Modulator is calculated first because it is used by the carrier
 	float modulatorSample = SynchroWaveform(sample_index[1], modulator.Drive, modulator.Sync, modulator.Chop, harmonics) * (modulationStrength * modulationAmount);
-	float pmSample = modulatorSample * PM_CONST;
+	float pmSample = modulatorSample * SYNCHRO_PM_CONST;
 	//Find position in carrier waveform
 	sample_index[0] += sampleRatePi * DetuneOctaves(nph->frequency(), carrier.Detune));
 	while (sample_index[0] >= F_2PI) { sample_index[0] -= F_2PI; } //Make sure phase is always between 0 and 2PI
 	//Get carrier waveform at position, accounting for modulation
 	//Index 0 is L, 1 is R. Synth is currently mono so they are the same value.
-	outputSample[0] = SynchroWaveform(sample_index[0] + pmSample, carrier.Drive, carrier.Sync, carrier.Chop, 0) * (VOLUME_CONST);
+	outputSample[0] = SynchroWaveform(sample_index[0] + pmSample, carrier.Drive, carrier.Sync, carrier.Chop, 0) * (SYNCHRO_VOLUME_CONST);
 	outputSample[1] = outputSample[0];
 }
 
@@ -109,9 +109,9 @@ SynchroSynth::SynchroSynth(InstrumentTrack * instrument_track) :
 	m_modulatorDrive(0, 1, 20, 1, this, tr("modulator drive")),
 	m_modulatorSync(1, 1, 16, 1, this, tr("modulator sync")),
 	m_modulatorChop(0, 0, 4, 0.1f, this, tr("modulator chop")),
-	m_carrierView(-1.0f, 1.0f, GRAPH_SAMPLES, this),
-	m_modulatorView(-1.0f, 1.0f, GRAPH_SAMPLES, this),
-	m_resultView(-1.0f, 1.0f, GRAPH_SAMPLES, this)
+	m_carrierView(-1.0f, 1.0f, SYNCHRO_GRAPH_SAMPLES, this),
+	m_modulatorView(-1.0f, 1.0f, SYNCHRO_GRAPH_SAMPLES, this),
+	m_resultView(-1.0f, 1.0f, SYNCHRO_GRAPH_SAMPLES, this)
 {
 	carrierChanged();
 	modulatorChanged();
@@ -157,7 +157,7 @@ void SynchroSynth::saveSettings(QDomDocument & doc, QDomElement & thisElement)
 
 void SynchroSynth::loadSettings(const QDomElement & thisElement)
 {
-	m.modulation.loadSettings(thisElement, "modulation");
+	m_modulation.loadSettings(thisElement, "modulation");
 	m_harmonics.loadSettings(thisElement, "harmonics");
 	m_modulationStrength.loadSettings(thisElement, "modulationStrength");
 	m_carrierDetune.loadSettings(thisElement, "carrierDetune");
@@ -246,12 +246,11 @@ void SynchroSynth::generalChanged()
 	{
 		int octaveDiff = m_carrierDetune.value() - m_modulatorDetune.value();
 		float pitchDifference = powf(2, octaveDiff);
-		float phase = (float)i / (float)SYNCHRO_GRAPH_SAMPLES;
-		float phaseResult = phase * F_2PI;
-		while (phaseResult >= F_2PI) { phaseResult -= F_2PI; }
-		float phaseMod = SynchroWaveform(phaseResult, m_modulatorDrive.value(), m_modulatorSync.value(), m_modulatorChop.value(), m_harmonics.value()) * m_modulationStrength.value() * m_modulation.value() * PM_CONST;
-		while (phaseResult >= F_2PI) { phaseResult -= F_2PI; }
-		m_resultView.setSampleAt(i, SynchroWaveform(phaseResult, m_carrierDrive.value(), m_carrierSync.value(), m_carrierChop.value(), 0));
+		float phase = (float)i / (float)SYNCHRO_GRAPH_SAMPLES * F_2PI;
+		while (phase >= F_2PI) { phase -= F_2PI; }
+		float phaseMod = SynchroWaveform(phase, m_modulatorDrive.value(), m_modulatorSync.value(), m_modulatorChop.value(), m_harmonics.value()) * m_modulationStrength.value() * m_modulation.value() * SYNCHRO_PM_CONST;
+		while (phaseResult >= F_2PI) { phaseResult -= F_2PI; } //This is neccessary; SynchroWaveform goes nuts when the domain goes past 2PI
+		m_resultView.setSampleAt(i, SynchroWaveform(phase + phaseMod * pitchDifference, m_carrierDrive.value(), m_carrierSync.value(), m_carrierChop.value(), 0));
 	}
 }
 
