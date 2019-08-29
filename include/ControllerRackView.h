@@ -42,7 +42,7 @@ class ControllerView;
 class Controller;
 
 
-class ControllerRackView : public QWidget, public SerializingObject
+class LMMS_EXPORT ControllerRackView : public QWidget, public SerializingObject
 {
 	Q_OBJECT
 public:
