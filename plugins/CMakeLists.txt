@@ -49,6 +49,7 @@ IF("${PLUGIN_LIST}" STREQUAL "")
 		carlarack
 		CrossoverEQ
 		Delay
+		Disintegrator
 		DualFilter
 		dynamics_processor
 		Eq
