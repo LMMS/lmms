@@ -50,6 +50,7 @@ DisintegratorControls::DisintegratorControls(DisintegratorEffect* effect) :
 	m_typeModel.addItem(tr("Mono Noise"));
 	m_typeModel.addItem(tr("Stereo Noise"));
 	m_typeModel.addItem(tr("Sine Wave"));
+	m_typeModel.addItem(tr("Self-Modulation"));
 
 	connect( Engine::mixer(), SIGNAL( sampleRateChanged() ), this, SLOT( sampleRateChanged() ) );
 }

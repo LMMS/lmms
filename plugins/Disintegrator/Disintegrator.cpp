@@ -192,6 +192,25 @@ bool DisintegratorEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frame
 
 				break;
 			}
+			case 3:// Self-Modulation
+			{
+				newInBufLoc[0] = (s[0] + 1) * 0.5f;
+				newInBufLoc[1] = (s[1] + 1) * 0.5f;
+
+				newInBufLoc[0] = m_hp.update( newInBufLoc[0], 0 );
+				newInBufLoc[0] = m_lp.update( newInBufLoc[0], 0 );
+				newInBufLoc[1] = m_hp.update( newInBufLoc[1], 1 );
+				newInBufLoc[1] = m_lp.update( newInBufLoc[1], 1 );
+
+				newInBufLoc[0] = realfmod(m_inBufLoc - newInBufLoc[0] * amount, DISINTEGRATOR_BUFFER_SIZE);
+				newInBufLoc[1] = realfmod(m_inBufLoc - newInBufLoc[1] * amount, DISINTEGRATOR_BUFFER_SIZE);
+
+				// Distance between samples
+				newInBufLocFrac[0] = fmod(newInBufLoc[0], 1);
+				newInBufLocFrac[1] = fmod(newInBufLoc[1], 1);
+
+				break;
+			}
 		}
 
 		for (int i = 0; i < 2; ++i)
