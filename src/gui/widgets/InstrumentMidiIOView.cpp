@@ -31,7 +31,9 @@
 #include "MidiPortMenu.h"
 #include "Engine.h"
 #include "embed.h"
+#include "ComboBox.h"
 #include "GroupBox.h"
+#include "ComboBoxModel.h"
 #include "gui_templates.h"
 #include "LcdSpinBox.h"
 #include "MidiClient.h"
@@ -44,7 +46,8 @@ InstrumentMidiIOView::InstrumentMidiIOView( QWidget* parent ) :
 	QWidget( parent ),
 	ModelView( NULL, this ),
 	m_rpBtn( NULL ),
-	m_wpBtn( NULL )
+	m_wpBtn( NULL ),
+	m_presetSelectPolicyComboBox(new ComboBox())
 {
 	QVBoxLayout* layout = new QVBoxLayout( this );
 	layout->setMargin( 5 );
@@ -68,6 +71,7 @@ InstrumentMidiIOView::InstrumentMidiIOView( QWidget* parent ) :
 	m_fixedInputVelocitySpinBox->setEnabled( false );
 	midiInputLayout->addWidget( m_fixedInputVelocitySpinBox );
 	midiInputLayout->addStretch();
+
 
 	connect( m_midiInputGroupBox->ledButton(), SIGNAL( toggled( bool ) ),
 			m_inputChannelSpinBox, SLOT( setEnabled( bool ) ) );
@@ -136,6 +140,23 @@ InstrumentMidiIOView::InstrumentMidiIOView( QWidget* parent ) :
 		midiOutputLayout->insertWidget( 0, m_wpBtn );
 	}
 
+
+	m_presetSelectGroupBox = new GroupBox(tr("ENABLE PRESET SELECTION"));
+	layout->addWidget( m_presetSelectGroupBox );
+
+	QHBoxLayout * presetSelectLayout = new QHBoxLayout(m_presetSelectGroupBox);
+	presetSelectLayout->setContentsMargins( 8, 18, 8, 8 );
+	presetSelectLayout->setSpacing( 6 );
+	m_presetSelectPolicyComboBox->setFixedSize(QSize(220, 20));
+	m_presetSelectPolicyComboBox->setEnabled(false);
+
+	presetSelectLayout->addWidget(m_presetSelectPolicyComboBox);
+	presetSelectLayout->addStretch();
+
+	connect( m_presetSelectGroupBox->ledButton(), SIGNAL( toggled( bool ) ),
+			m_presetSelectPolicyComboBox, SLOT( setEnabled( bool ) ) );
+
+
 #define PROVIDE_CUSTOM_BASE_VELOCITY_UI
 #ifdef PROVIDE_CUSTOM_BASE_VELOCITY_UI
 	GroupBox* baseVelocityGroupBox = new GroupBox( tr( "CUSTOM BASE VELOCITY" ) );
@@ -145,11 +166,15 @@ InstrumentMidiIOView::InstrumentMidiIOView( QWidget* parent ) :
 	baseVelocityLayout->setContentsMargins( 8, 18, 8, 8 );
 	baseVelocityLayout->setSpacing( 6 );
 
+	/* Base velocity help label hidden to preserve the window size.
+	 * Maybe there is a better solution */
+#if 0
 	QLabel* baseVelocityHelp = new QLabel( tr( "Specify the velocity normalization base for MIDI-based instruments at 100% note velocity." ) );
 	baseVelocityHelp->setWordWrap( true );
-    baseVelocityHelp->setFont( pointSize<8>( baseVelocityHelp->font() ) );
+	baseVelocityHelp->setFont( pointSize<8>( baseVelocityHelp->font() ) );
 
 	baseVelocityLayout->addWidget( baseVelocityHelp );
+#endif
 
 	m_baseVelocitySpinBox = new LcdSpinBox( 3, baseVelocityGroupBox );
 	m_baseVelocitySpinBox->setLabel( tr( "BASE VELOCITY" ) );
@@ -199,6 +224,8 @@ void InstrumentMidiIOView::modelChanged()
 	{
 		m_wpBtn->setMenu( mp->m_writablePortsMenu );
 	}
+
+	m_presetSelectPolicyComboBox->setModel(&mp->m_presetSelectPolicyModel);
 }
 
 
@@ -213,6 +240,7 @@ InstrumentMiscView::InstrumentMiscView(InstrumentTrack *it, QWidget *parent) :
 	QHBoxLayout* masterPitchLayout = new QHBoxLayout( m_pitchGroupBox );
 	masterPitchLayout->setContentsMargins( 8, 18, 8, 8 );
 	QLabel *tlabel = new QLabel(tr( "Enables the use of master pitch" ) );
+	tlabel->setFont( pointSize<8>( tlabel->font() ) );
 	m_pitchGroupBox->setModel( &it->m_useMasterPitchModel );
 	masterPitchLayout->addWidget( tlabel );
 	layout->addStretch();

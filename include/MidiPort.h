@@ -33,6 +33,7 @@
 #include "Midi.h"
 #include "MidiTime.h"
 #include "AutomatableModel.h"
+#include "ComboBoxModel.h"
 
 
 class MidiClient;
@@ -157,6 +158,8 @@ private:
 	IntModel m_baseVelocityModel;
 	BoolModel m_readableModel;
 	BoolModel m_writableModel;
+	BoolModel m_captureProgramChangeModel;
+	ComboBoxModel m_presetSelectPolicyModel;
 
 	Map m_readablePorts;
 	Map m_writablePorts;
