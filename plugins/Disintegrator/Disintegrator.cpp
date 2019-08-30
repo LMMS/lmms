@@ -194,8 +194,8 @@ bool DisintegratorEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frame
 			}
 			case 3:// Self-Modulation
 			{
-				newInBufLoc[0] = (s[0] + 1) * 0.5f;
-				newInBufLoc[1] = (s[1] + 1) * 0.5f;
+				newInBufLoc[0] = (qBound(-1.f, s[0], 1.f) + 1) * 0.5f;
+				newInBufLoc[1] = (qBound(-1.f, s[1], 1.f) + 1) * 0.5f;
 
 				newInBufLoc[0] = m_hp.update( newInBufLoc[0], 0 );
 				newInBufLoc[0] = m_lp.update( newInBufLoc[0], 0 );
