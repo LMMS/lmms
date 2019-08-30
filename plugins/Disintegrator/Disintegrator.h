@@ -44,7 +44,6 @@ public:
 	}
 
 	inline float realfmod(float k, float n);
-	inline float detuneWithOctaves(float pitchValue, float detuneValue);
 
 	inline void calcLowpassFilter(sample_t &outSamp, sample_t inSamp, int which, float lpCutoff, float resonance, sample_rate_t Fs);
 	inline void calcHighpassFilter(sample_t &outSamp, sample_t inSamp, int which, float lpCutoff, float resonance, sample_rate_t Fs);

@@ -41,6 +41,7 @@ DisintegratorControls::DisintegratorControls(DisintegratorEffect* effect) :
 	m_typeModel(this, tr("Type")),
 	m_freqModel(100.0f, 2.0f, 21050.0f, 0.01f, this, tr("Frequency"))
 {
+	// All of these are much easier to tweak when logarithmic
 	m_lowCutModel.setScaleLogarithmic(true);
 	m_highCutModel.setScaleLogarithmic(true);
 	m_amountModel.setScaleLogarithmic(true);

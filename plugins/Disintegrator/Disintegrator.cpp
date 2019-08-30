@@ -52,6 +52,7 @@ DisintegratorEffect::DisintegratorEffect(Model* parent, const Descriptor::SubPlu
 	Effect(&disintegrator_plugin_descriptor, parent, key),
 	m_disintegratorControls(this)
 {
+	// Fill buffer with 200 samples
 	for (int a = 0; a < 200; ++a)
 	{
 		for (int b = 0; b < 2; ++b)
@@ -102,17 +103,22 @@ bool DisintegratorEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frame
 	
 		sample_t s[2] = {buf[f][0], buf[f][1]};
 
+		// Increment buffer read point
 		++m_inBufLoc;
 		if (m_inBufLoc >= 200)
 		{
 			m_inBufLoc = 0;
 		}
 
+		// Write dry input to buffer
 		m_inBuf[0][m_inBufLoc] = s[0];
 		m_inBuf[1][m_inBufLoc] = s[1];
 
 		float newInBufLoc[2] = {0, 0};
 		float newInBufLocFrac[2] = {0, 0};
+
+		// Generate white noise or sine wave, apply filters, subtract the
+		// result from the buffer read point and store in a variable.
 		switch (type)
 		{
 			case 0:// Mono Noise
@@ -125,6 +131,7 @@ bool DisintegratorEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frame
 				newInBufLoc[0] = realfmod(m_inBufLoc - newInBufLoc[0] * amount, 200);
 				newInBufLoc[1] = newInBufLoc[0];
 
+				// Distance between samples
 				newInBufLocFrac[0] = fmod(newInBufLoc[0], 1);
 				newInBufLocFrac[1] = newInBufLocFrac[0];
 
@@ -143,6 +150,7 @@ bool DisintegratorEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frame
 				newInBufLoc[0] = realfmod(m_inBufLoc - newInBufLoc[0] * amount, 200);
 				newInBufLoc[1] = realfmod(m_inBufLoc - newInBufLoc[1] * amount, 200);
 
+				// Distance between samples
 				newInBufLocFrac[0] = fmod(newInBufLoc[0], 1);
 				newInBufLocFrac[1] = fmod(newInBufLoc[1], 1);
 
@@ -157,6 +165,7 @@ bool DisintegratorEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frame
 				newInBufLoc[0] = realfmod(m_inBufLoc - newInBufLoc[0] * amount, 200);
 				newInBufLoc[1] = newInBufLoc[0];
 
+				// Distance between samples
 				newInBufLocFrac[0] = fmod(newInBufLoc[0], 1);
 				newInBufLocFrac[1] = newInBufLocFrac[0];
 
@@ -176,7 +185,7 @@ bool DisintegratorEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frame
 				{
 					s[b] = m_inBuf[b][floor(newInBufLoc[b])] * (1 - newInBufLocFrac[b]) + m_inBuf[b][ceil(newInBufLoc[b])] * newInBufLocFrac[b];
 				}
-				else
+				else// For when the interpolation wraps around to the beginning of the buffer
 				{
 					s[b] = m_inBuf[b][199] * (1 - newInBufLocFrac[b]) + m_inBuf[b][0] * newInBufLocFrac[b];
 				}
@@ -196,6 +205,7 @@ bool DisintegratorEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frame
 
 inline void DisintegratorEffect::calcLowpassFilter(sample_t &outSamp, sample_t inSamp, int which, float lpCutoff, float resonance, sample_rate_t Fs)
 {
+	// "if" statement is here so the filter coefficients only need to be calculated when they change
 	if (m_prevLPCutoff[which] != lpCutoff)
 	{
 		m_prevLPCutoff[which] = lpCutoff;
@@ -224,6 +234,7 @@ inline void DisintegratorEffect::calcLowpassFilter(sample_t &outSamp, sample_t i
 
 inline void DisintegratorEffect::calcHighpassFilter(sample_t &outSamp, sample_t inSamp, int which, float hpCutoff, float resonance, sample_rate_t Fs)
 {
+	// "if" statement is here so the filter coefficients only need to be calculated when they change
 	if (m_prevHPCutoff[which] != hpCutoff)
 	{
 		m_prevHPCutoff[which] = hpCutoff;
@@ -246,14 +257,6 @@ inline void DisintegratorEffect::calcHighpassFilter(sample_t &outSamp, sample_t 
 	m_filtHPY[which][1] = m_filtHPY[which][0];
 
 	outSamp = m_filtHPY[which][0];
-}
-
-
-
-// Takes input of original Hz and the number of cents to detune it by, and returns the detuned result in Hz.
-inline float DisintegratorEffect::detuneWithOctaves(float pitchValue, float detuneValue)
-{
-	return pitchValue * std::exp2(detuneValue); 
 }
 
 

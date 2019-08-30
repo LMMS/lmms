@@ -79,7 +79,8 @@ DisintegratorControlDialog::DisintegratorControlDialog(DisintegratorControls* co
 }
 
 
-
+/* Switches between the lowcut/highcut and
+frequency knobs depending on the modulation type. */
 void DisintegratorControlDialog::updateKnobVisibility()
 {
 	if (m_controls->m_typeModel.value() == 2)
