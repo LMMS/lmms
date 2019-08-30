@@ -62,6 +62,9 @@ public:
 		return m_effectView;
 	}
 
+private slots:
+	void sampleRateChanged();
+
 private:
 	DisintegratorEffect* m_effect;
 	DisintegratorControlDialog * m_effectView;

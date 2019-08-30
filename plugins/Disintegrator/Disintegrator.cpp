@@ -35,7 +35,7 @@ Plugin::Descriptor PLUGIN_EXPORT disintegrator_plugin_descriptor =
 {
 	STRINGIFY(PLUGIN_NAME),
 	"Disintegrator",
-	QT_TRANSLATE_NOOP("pluginBrowser", "A delay modulation effect for creating very aggressive digital distortion."),
+	QT_TRANSLATE_NOOP("pluginBrowser", "A delay modulation effect for very aggressive digital distortion."),
 	"Lost Robot <r94231@gmail.com>",
 	0x0100,
 	Plugin::Effect,
@@ -50,15 +50,18 @@ Plugin::Descriptor PLUGIN_EXPORT disintegrator_plugin_descriptor =
 
 DisintegratorEffect::DisintegratorEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* key) :
 	Effect(&disintegrator_plugin_descriptor, parent, key),
-	m_disintegratorControls(this)
+	m_disintegratorControls(this),
+	m_lp( Engine::mixer()->processingSampleRate() ),
+	m_hp( Engine::mixer()->processingSampleRate() ),
+	m_needsUpdate( true )
 {
 	// Fill buffer with DISINTEGRATOR_BUFFER_SIZE number of samples
-	for (int i = 0; i < DISINTEGRATOR_BUFFER_SIZE; ++i)
+	for (int i = 0; i < 2; ++i)
 	{
 		m_inBuf[i].reserve(DISINTEGRATOR_BUFFER_SIZE);
-		for (int j = 0; j < 2; ++j)
+		for (int j = 0; j < DISINTEGRATOR_BUFFER_SIZE; ++j)
 		{
-			m_inBuf[j].push_back(0);
+			m_inBuf[i].push_back(0);
 		}
 	}
 }
@@ -70,6 +73,15 @@ DisintegratorEffect::~DisintegratorEffect()
 {
 }
 
+
+
+void DisintegratorEffect::sampleRateChanged()
+{
+	sample_rate_t sampleRate = Engine::mixer()->processingSampleRate();
+	m_lp.setSampleRate( sampleRate );
+	m_hp.setSampleRate( sampleRate );
+	m_needsUpdate = true;
+}
 
 
 
@@ -84,18 +96,26 @@ bool DisintegratorEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frame
 	const float d = dryLevel();
 	const float w = wetLevel();
 	
-	const ValueBuffer * lowCutBuf = m_disintegratorControls.m_lowCutModel.valueBuffer();
-	const ValueBuffer * highCutBuf = m_disintegratorControls.m_highCutModel.valueBuffer();
 	const ValueBuffer * amountBuf = m_disintegratorControls.m_amountModel.valueBuffer();
 	const ValueBuffer * typeBuf = m_disintegratorControls.m_typeModel.valueBuffer();
 	const ValueBuffer * freqBuf = m_disintegratorControls.m_lowCutModel.valueBuffer();
 
 	sample_rate_t sampleRate = Engine::mixer()->processingSampleRate();
 
+	// Update filters
+	if( m_needsUpdate || m_disintegratorControls.m_highCutModel.isValueChanged() )
+	{
+		m_lp.setLowpass( m_disintegratorControls.m_highCutModel.value() );
+		
+	}
+	if( m_needsUpdate || m_disintegratorControls.m_lowCutModel.isValueChanged() )
+	{
+		m_hp.setHighpass( m_disintegratorControls.m_lowCutModel.value() );
+	}
+	m_needsUpdate = false;
+
 	for (fpp_t f = 0; f < frames; ++f)
 	{
-		const float lowCut = lowCutBuf ? lowCutBuf->value(f) : m_disintegratorControls.m_lowCutModel.value();
-		const float highCut = highCutBuf ? highCutBuf->value(f) : m_disintegratorControls.m_highCutModel.value();
 		const float amount = amountBuf ? amountBuf->value(f) : m_disintegratorControls.m_amountModel.value();
 		const int type = typeBuf ? typeBuf->value(f) : m_disintegratorControls.m_typeModel.value();
 		const float freq = freqBuf ? freqBuf->value(f) : m_disintegratorControls.m_freqModel.value();
@@ -126,8 +146,8 @@ bool DisintegratorEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frame
 			{
 				newInBufLoc[0] = fast_rand() / (float)FAST_RAND_MAX;
 
-				calcHighpassFilter(newInBufLoc[0], newInBufLoc[0], 0, lowCut, sampleRate);
-				calcLowpassFilter(newInBufLoc[0], newInBufLoc[0], 0, highCut, sampleRate);
+				newInBufLoc[0] = m_hp.update( newInBufLoc[0], 0 );
+				newInBufLoc[0] = m_lp.update( newInBufLoc[0], 0 );
 
 				newInBufLoc[0] = realfmod(m_inBufLoc - newInBufLoc[0] * amount, DISINTEGRATOR_BUFFER_SIZE);
 				newInBufLoc[1] = newInBufLoc[0];
@@ -143,10 +163,10 @@ bool DisintegratorEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frame
 				newInBufLoc[0] = fast_rand() / (float)FAST_RAND_MAX;
 				newInBufLoc[1] = fast_rand() / (float)FAST_RAND_MAX;
 
-				calcHighpassFilter(newInBufLoc[0], newInBufLoc[0], 0, lowCut, sampleRate);
-				calcHighpassFilter(newInBufLoc[1], newInBufLoc[1], 1, lowCut, sampleRate);
-				calcLowpassFilter(newInBufLoc[0], newInBufLoc[0], 0, highCut, sampleRate);
-				calcLowpassFilter(newInBufLoc[1], newInBufLoc[1], 1, highCut, sampleRate);
+				newInBufLoc[0] = m_hp.update( newInBufLoc[0], 0 );
+				newInBufLoc[0] = m_lp.update( newInBufLoc[0], 0 );
+				newInBufLoc[1] = m_hp.update( newInBufLoc[1], 1 );
+				newInBufLoc[1] = m_lp.update( newInBufLoc[1], 1 );
 
 				newInBufLoc[0] = realfmod(m_inBufLoc - newInBufLoc[0] * amount, DISINTEGRATOR_BUFFER_SIZE);
 				newInBufLoc[1] = realfmod(m_inBufLoc - newInBufLoc[1] * amount, DISINTEGRATOR_BUFFER_SIZE);
@@ -204,71 +224,19 @@ bool DisintegratorEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frame
 
 
 
-inline void DisintegratorEffect::calcLowpassFilter(sample_t &outSamp, sample_t inSamp, int channel, float lpCutoff, sample_rate_t sampleRate)
-{
-	// "if" statement is here so the filter coefficients only need to be calculated when they change
-	if (m_prevLPCutoff[channel] != lpCutoff)
-	{
-		m_prevLPCutoff[channel] = lpCutoff;
-		const float w0 = D_2PI * lpCutoff / sampleRate;
-		const float tempCosW0 = cos(w0);
-		const float alpha = sin(w0) / 0.3535f;
-
-		m_LPa0 = 1 + alpha;
-		m_LPb0 = (1 - tempCosW0) * 0.5f;
-		m_LPb1 = 1 - tempCosW0;
-		m_LPa1 = -(2 * tempCosW0);
-		m_LPa2 = 1 - alpha;
-	}
-
-	m_filtLPY[channel][0] = (m_LPb0 * (inSamp + m_filtLPX[channel][2]) + m_LPb1 * m_filtLPX[channel][1] -
-				m_LPa1 * m_filtLPY[channel][1] - m_LPa2 * m_filtLPY[channel][2]) / m_LPa0;
-
-	m_filtLPX[channel][2] = m_filtLPX[channel][1];
-	m_filtLPX[channel][1] = inSamp;
-	m_filtLPY[channel][2] = m_filtLPY[channel][1];
-	m_filtLPY[channel][1] = m_filtLPY[channel][0];
-
-	outSamp = m_filtLPY[channel][0];
-}
-
-
-
-inline void DisintegratorEffect::calcHighpassFilter(sample_t &outSamp, sample_t inSamp, int channel, float hpCutoff, sample_rate_t sampleRate)
-{
-	// "if" statement is here so the filter coefficients only need to be calculated when they change
-	if (m_prevHPCutoff[channel] != hpCutoff)
-	{
-		m_prevHPCutoff[channel] = hpCutoff;
-		const float w0 = D_2PI * hpCutoff / sampleRate;
-		const float tempCosW0 = cos(w0);
-		const float alpha = sin(w0) / 0.3535f;
-
-		m_HPa0 = 1 + alpha;
-		m_HPb0 = (1 + tempCosW0) * 0.5f;
-		m_HPb1 = -(1 + tempCosW0);
-		m_HPa1 = -2 * tempCosW0;
-		m_HPa2 = 1 - alpha;
-	}
-
-	m_filtHPY[channel][0] = (m_HPb0 * (inSamp + m_filtHPX[channel][2]) + m_HPb1 * m_filtHPX[channel][1] -
-				m_HPa1 * m_filtHPY[channel][1] - m_HPa2 * m_filtHPY[channel][2]) / m_HPa0;
-
-	m_filtHPX[channel][2] = m_filtHPX[channel][1];
-	m_filtHPX[channel][1] = inSamp;
-	m_filtHPY[channel][2] = m_filtHPY[channel][1];
-	m_filtHPY[channel][1] = m_filtHPY[channel][0];
-
-	outSamp = m_filtHPY[channel][0];
-}
-
-
-
 // Handles negative values properly, unlike fmod.
 inline float DisintegratorEffect::realfmod(float k, float n)
 {
 	float r = fmod(k, n);
 	return r < 0 ? r + n : r;
+}
+
+
+
+void DisintegratorEffect::clearFilterHistories()
+{
+	m_lp.clearHistory();
+	m_hp.clearHistory();
 }
 
 

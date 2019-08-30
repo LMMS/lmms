@@ -28,6 +28,7 @@
 
 #include "DisintegratorControls.h"
 
+#include "BasicFilters.h"
 #include "Effect.h"
 #include "ValueBuffer.h"
 
@@ -47,30 +48,11 @@ public:
 		return &m_disintegratorControls;
 	}
 
+	void sampleRateChanged();
+
 	inline float realfmod(float k, float n);
 
-	inline void calcLowpassFilter(sample_t &outSamp, sample_t inSamp, int channel, float lpCutoff, sample_rate_t sampleRate);
-	inline void calcHighpassFilter(sample_t &outSamp, sample_t inSamp, int channel, float lpCutoff, sample_rate_t sampleRate);
-
-	float m_filtLPX[2][3] = {{0}};// [filter number][samples back in time]
-	float m_filtLPY[2][3] = {{0}};// [filter number][samples back in time]
-	float m_prevLPCutoff[2] = {0};
-
-	float m_LPa0;
-	float m_LPb0;
-	float m_LPb1;
-	float m_LPa1;
-	float m_LPa2;
-
-	float m_filtHPX[2][3] = {{0}};// [filter number][samples back in time]
-	float m_filtHPY[2][3] = {{0}};// [filter number][samples back in time]
-	float m_prevHPCutoff[2] = {0};
-
-	float m_HPa0;
-	float m_HPb0;
-	float m_HPb1;
-	float m_HPa1;
-	float m_HPa2;
+	void clearFilterHistories();
 
 private:
 	DisintegratorControls m_disintegratorControls;
@@ -79,6 +61,10 @@ private:
 	int m_inBufLoc = 0;
 
 	float m_sineLoc = 0;
+
+	StereoLinkwitzRiley m_lp;
+	StereoLinkwitzRiley m_hp;
+	bool m_needsUpdate;
 
 	friend class DisintegratorControls;
 

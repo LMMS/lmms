@@ -50,6 +50,8 @@ DisintegratorControls::DisintegratorControls(DisintegratorEffect* effect) :
 	m_typeModel.addItem(tr("Mono Noise"));
 	m_typeModel.addItem(tr("Stereo Noise"));
 	m_typeModel.addItem(tr("Sine Wave"));
+
+	connect( Engine::mixer(), SIGNAL( sampleRateChanged() ), this, SLOT( sampleRateChanged() ) );
 }
 
 
@@ -71,4 +73,14 @@ void DisintegratorControls::loadSettings(const QDomElement& _this)
 	m_amountModel.loadSettings(_this, "amount");
 	m_typeModel.loadSettings(_this, "type");
 	m_freqModel.loadSettings(_this, "freq");
+
+	m_effect->m_needsUpdate = true;
+	m_effect->clearFilterHistories();
+}
+
+
+
+void DisintegratorControls::sampleRateChanged()
+{
+	m_effect->sampleRateChanged();
 }
