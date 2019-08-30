@@ -33,7 +33,7 @@
 #include "ValueBuffer.h"
 
 
-const int DISINTEGRATOR_BUFFER_SIZE = 200;
+const int DISINTEGRATOR_BUFFER_SIZE = 201;
 
 
 class DisintegratorEffect : public Effect
