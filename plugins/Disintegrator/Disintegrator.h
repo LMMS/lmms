@@ -31,6 +31,10 @@
 #include "Effect.h"
 #include "ValueBuffer.h"
 
+
+const int DISINTEGRATOR_BUFFER_SIZE = 200;
+
+
 class DisintegratorEffect : public Effect
 {
 public:
@@ -45,8 +49,8 @@ public:
 
 	inline float realfmod(float k, float n);
 
-	inline void calcLowpassFilter(sample_t &outSamp, sample_t inSamp, int which, float lpCutoff, float resonance, sample_rate_t Fs);
-	inline void calcHighpassFilter(sample_t &outSamp, sample_t inSamp, int which, float lpCutoff, float resonance, sample_rate_t Fs);
+	inline void calcLowpassFilter(sample_t &outSamp, sample_t inSamp, int channel, float lpCutoff, sample_rate_t sampleRate);
+	inline void calcHighpassFilter(sample_t &outSamp, sample_t inSamp, int channel, float lpCutoff, sample_rate_t sampleRate);
 
 	float m_filtLPX[2][3] = {{0}};// [filter number][samples back in time]
 	float m_filtLPY[2][3] = {{0}};// [filter number][samples back in time]
