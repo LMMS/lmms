@@ -14,13 +14,14 @@ function(DEFINE_INSTALL_VAR)
 
     # install(CODE) does not support generator expression in ver<3.14
     if(VAR_GENERATOR_EXPRESSION AND ${CMAKE_VERSION} VERSION_LESS "3.14.0")
-        if(MSVC)
-            message(FATAL_ERROR "Installing is not supported with msvc and cmake<3.14")
-        endif()
-
         include(CreateTempFile)
-        CreateTempFilePath(OUTPUT_VAR file_path TAG "${VAR_NAME}" CONTENT "${VAR_CONTENT}")
-        install(CODE "file(READ \"${file_path}\" \"${VAR_NAME}\")")
+        if(CMAKE_CONFIGURATION_TYPES) # in case of multi-config generators like MSVC generators
+            CreateTempFilePath(OUTPUT_VAR file_path TAG "${VAR_NAME}" CONTENT "${VAR_CONTENT}" CONFIG_SUFFIX)
+            install(CODE "file(READ \"${file_path}_\${CMAKE_INSTALL_CONFIG_NAME}\" \"${VAR_NAME}\")")
+        else()
+            CreateTempFilePath(OUTPUT_VAR file_path TAG "${VAR_NAME}" CONTENT "${VAR_CONTENT}")
+            install(CODE "file(READ \"${file_path}\" \"${VAR_NAME}\")")
+        endif()
     else()
         if(VAR_GENERATOR_EXPRESSION)
             cmake_policy(SET CMP0087 NEW)
