@@ -907,6 +907,22 @@ void GigInstrument::updateSampleRate()
 
 
 
+bool GigInstrument::presetChangeSupported()
+{
+	return true;
+}
+
+
+
+void GigInstrument::changePreset(unsigned int bank, unsigned int preset)
+{
+	printf("changePreset: %04x/%02x\n", bank, preset);
+	m_bankNum.setValue(bank);
+	m_patchNum.setValue(preset);
+	emit patchChanged();
+}
+
+
 
 class gigKnob : public Knob
 {
@@ -998,6 +1014,7 @@ void GigInstrumentView::modelChanged()
 
 	connect( k, SIGNAL( fileChanged() ), this, SLOT( updateFilename() ) );
 	connect( k, SIGNAL( fileLoading() ), this, SLOT( invalidateFile() ) );
+	connect( k, SIGNAL( patchChanged()), this, SLOT( updatePatchName()));
 
 	updateFilename();
 }

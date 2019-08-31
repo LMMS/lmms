@@ -411,11 +411,11 @@ bool vestigeInstrument::presetChangeSupported()
 
 
 
-void vestigeInstrument::changePreset(unsigned int presetNumber)
+void vestigeInstrument::changePreset(unsigned int bank, unsigned int preset)
 {
 	if (m_plugin)
 	{
-		m_plugin->setProgram(presetNumber);
+		m_plugin->setProgram((bank << 7) | preset);
 		emit presetChanged();
 	}
 }

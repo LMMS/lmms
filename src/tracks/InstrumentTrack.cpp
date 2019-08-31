@@ -910,8 +910,7 @@ void InstrumentTrack::changePreset()
 	if (m_instrument)
 	{
 		m_instrument->changePreset(
-			(m_programBankMSB << 14) |
-			(m_programBankLSB << 7) |
+			(m_programBankMSB << 7) | m_programBankLSB,
 			m_programNumber);
 	}
 }

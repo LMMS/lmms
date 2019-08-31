@@ -116,7 +116,7 @@ public:
 	{
 		return false;
 	}
-	inline virtual void changePreset(unsigned int presetNumber) {}
+	inline virtual void changePreset(unsigned int bank, unsigned int preset) {}
 
 	// --------------------------------------------------------------------
 	// provided functions:
