@@ -92,11 +92,6 @@ private:
 	FloatModel ** knobFModel;
 	QObject * p_subWindow;
 	int paramCount;
-	BoolModel m_capturePgmChange;
-	BoolModel m_useBankSelectLSB;
-	unsigned int m_midiBankMSB;
-	unsigned int m_midiBankLSB;
-	unsigned int m_midiProgram;
 
 	friend class VestigeInstrumentView;
 	friend class manageVestigeInstrumentView;
@@ -182,12 +177,10 @@ private:
 	PixmapButton * m_rolLPresetButton;
 	PixmapButton * m_rolRPresetButton;
 	QPushButton * m_selPresetButton;
-	PixmapButton * m_toggleGUIButton;
-	PixmapButton * m_panicButton;
+	QPushButton * m_toggleGUIButton;
+	QPushButton * m_panicButton;
 	PixmapButton * m_managePluginButton;
 	PixmapButton * m_savePresetButton;
-	PixmapButton * m_capturePgmChangeButton;
-	PixmapButton * m_useBankSelectLSBButton;
 
 	Instrument * _instrument2;
 	QWidget * _parent2;

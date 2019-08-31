@@ -60,6 +60,8 @@
 
 #include "embed.h"
 
+
+
 extern "C"
 {
 
@@ -158,6 +160,9 @@ vestigeInstrument::vestigeInstrument( InstrumentTrack * _instrument_track ) :
 			 Qt::QueuedConnection );
 }
 
+
+
+
 vestigeInstrument::~vestigeInstrument()
 {
 	if (p_subWindow != NULL) {
@@ -222,7 +227,6 @@ void vestigeInstrument::loadSettings( const QDomElement & _this )
 				[this, i]() { setParameter( knobFModel[i] ); }, Qt::DirectConnection);
 		}
 	}
-
 	m_pluginMutex.unlock();
 }
 
@@ -404,22 +408,6 @@ bool vestigeInstrument::handleMidiEvent( const MidiEvent& event, const MidiTime&
 
 
 
-bool vestigeInstrument::presetChangeSupported()
-{
-	return true;
-}
-
-
-
-void vestigeInstrument::changePreset(unsigned int presetNumber)
-{
-	if (m_plugin)
-	{
-		m_plugin->setProgram(presetNumber);
-		emit presetChanged();
-	}
-}
-
 
 void vestigeInstrument::closePlugin( void )
 {
@@ -471,8 +459,7 @@ void vestigeInstrument::closePlugin( void )
 
 PluginView * vestigeInstrument::instantiateView( QWidget * _parent )
 {
-	VestigeInstrumentView* view = new VestigeInstrumentView( this, _parent );
-	return view;
+	return new VestigeInstrumentView( this, _parent );
 }
 
 
@@ -571,12 +558,16 @@ VestigeInstrumentView::VestigeInstrumentView( Instrument * _instrument,
 	m_rolRPresetButton->setShortcut( Qt::Key_Plus );
 
 
+	m_selPresetButton = new QPushButton( tr( "" ), this );
+	m_selPresetButton->setGeometry( 228, 201, 16, 16 );
+
 	QMenu *menu = new QMenu;
+
 	connect( menu, SIGNAL( aboutToShow() ), this, SLOT( updateMenu() ) );
 
-	m_selPresetButton = new QPushButton("", this);
-	m_selPresetButton->setGeometry( 228, 201, 16, 16 );
-	m_selPresetButton->setIcon(embed::getIconPixmap( "stepper-down" ));
+
+	m_selPresetButton->setIcon( embed::getIconPixmap( "stepper-down" ) );
+
 	m_selPresetButton->setMenu(menu);
 
 
@@ -584,20 +575,20 @@ VestigeInstrumentView::VestigeInstrumentView( Instrument * _instrument,
 	m_toggleGUIButton->setGeometry( 20, 130, 200, 24 );
 	m_toggleGUIButton->setIcon( embed::getIconPixmap( "zoom" ) );
 	m_toggleGUIButton->setFont( pointSize<8>( m_toggleGUIButton->font() ) );
-	connect( m_toggleGUIButton, SIGNAL( clicked() ),
-		 this, SLOT( toggleGUI() ) );
+	connect( m_toggleGUIButton, SIGNAL( clicked() ), this,
+							SLOT( toggleGUI() ) );
 
-	m_panicButton = new QPushButton( tr( "Turn off all notes" ), this );
-	m_panicButton->setGeometry( 20, 160, 200, 24 );
-	m_panicButton->setIcon( embed::getIconPixmap( "stop" ) );
-	m_panicButton->setFont( pointSize<8>( m_panicButton->font() ) );
-	connect( m_panicButton, SIGNAL( clicked() ),
-		 this,SLOT( noteOffAll() ) );
+	QPushButton * note_off_all_btn = new QPushButton( tr( "Turn off all "
+							"notes" ), this );
+	note_off_all_btn->setGeometry( 20, 160, 200, 24 );
+	note_off_all_btn->setIcon( embed::getIconPixmap( "stop" ) );
+	note_off_all_btn->setFont( pointSize<8>( note_off_all_btn->font() ) );
+	connect( note_off_all_btn, SIGNAL( clicked() ), this,
+							SLOT( noteOffAll() ) );
 
 	setAcceptDrops( true );
 	_instrument2 = _instrument;
 	_parent2 = _parent;
-
 }
 
 
@@ -661,10 +652,6 @@ VestigeInstrumentView::~VestigeInstrumentView()
 void VestigeInstrumentView::modelChanged()
 {
 	m_vi = castModel<vestigeInstrument>();
-
-	connect(m_vi, SIGNAL(presetChanged()),
-		this, SLOT(changedProgram()));
-
 }
 
 
@@ -755,6 +742,7 @@ void VestigeInstrumentView::savePreset()
 
 void VestigeInstrumentView::nextProgram()
 {
+
 	if ( m_vi->m_plugin != NULL ) {
 		m_vi->m_plugin->rotateProgram( 1 );
     		bool converted;
@@ -770,6 +758,7 @@ void VestigeInstrumentView::nextProgram()
 
 void VestigeInstrumentView::previousProgram()
 {
+
 	if ( m_vi->m_plugin != NULL ) {
 		m_vi->m_plugin->rotateProgram( -1 );
     		bool converted;
@@ -778,13 +767,6 @@ void VestigeInstrumentView::previousProgram()
    			lastPosInMenu = str.toInt(&converted, 10) - 1;
 		QWidget::update();
 	}
-}
-
-
-
-void VestigeInstrumentView::changedProgram()
-{
-	QWidget::update();
 }
 
 
@@ -879,49 +861,19 @@ void VestigeInstrumentView::paintEvent( QPaintEvent * )
 
 	p.drawPixmap( 0, 0, *s_artwork );
 
-	QString plugin_name;
-	QString presetName;
-	QString presetNumber;
-
-	if( m_vi->m_plugin != NULL )
-	{
-		plugin_name = m_vi->m_plugin->name();
-		const QString& presetStr = m_vi->m_plugin->currentProgramName();
-		int semicolonPosition = presetStr.indexOf(':');
-		if (semicolonPosition != -1)
-		{
-			presetNumber = QString(" (") +
-					presetStr.left(semicolonPosition) +
-					QString(")");
-			presetName = presetStr.mid(semicolonPosition + 1);
-		}
-		else
-		{
-			presetNumber = "";
-			presetName = presetStr;
-		}
-	}
-	else
-	{
-		plugin_name = tr( "No VST plugin loaded" );
-		presetName = tr("(no preset)");
-		presetNumber = "";
-	}
-
+	QString plugin_name = ( m_vi->m_plugin != NULL ) ?
+				m_vi->m_plugin->name()/* + QString::number(
+						m_plugin->version() )*/
+					:
+				tr( "No VST plugin loaded" );
 	QFont f = p.font();
-	f.setBold( false );
-
-	p.setPen( QColor( 255, 255, 255 ) );
-
 	f.setBold( true );
 	p.setFont( pointSize<10>( f ) );
+	p.setPen( QColor( 255, 255, 255 ) );
 	p.drawText( 10, 100, plugin_name );
 
-	p.setPen( QColor( 24, 24, 24 ) );
-	p.drawText( 10, 211, tr( "Preset" ) + presetNumber );
-
-	p.setPen( QColor( 255, 255, 255 ) );
-	p.drawText( 10, 230, presetName);
+	p.setPen( QColor( 50, 50, 50 ) );
+	p.drawText( 10, 211, tr( "Preset" ) );
 
 //	m_pluginMutex.lock();
 	if( m_vi->m_plugin != NULL )
@@ -931,6 +883,8 @@ void VestigeInstrumentView::paintEvent( QPaintEvent * )
 		p.setFont( pointSize<8>( f ) );
 		p.drawText( 10, 114, tr( "by " ) +
 					m_vi->m_plugin->vendorString() );
+		p.setPen( QColor( 255, 255, 255 ) );
+		p.drawText( 10, 225, m_vi->m_plugin->currentProgramName() );
 	}
 
 	if( m_vi->m_subWindow != NULL )
@@ -1065,6 +1019,7 @@ void manageVestigeInstrumentView::closeWindow()
 {
 	m_vi->m_subWindow->hide();
 }
+
 
 
 
