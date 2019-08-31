@@ -127,49 +127,53 @@ void MidiPort::setMode( Mode mode )
 }
 
 
-
-static void handleProgramChange( const MidiEvent& event,
+static bool handleProgramChange(const MidiEvent& event,
 				 InstrumentTrack* ins,
 				 int policy)
 {
 	if (event.type() == MidiProgramChange)
 	{
 		ins->setProgram(event.key());
+		return true;
 	}
 
-	if (event.type() == MidiControlChange &&
+	else if (event.type() == MidiControlChange &&
 			event.controllerNumber() == MidiControllerBankSelectMSB)
 	{
 		switch (policy)
 		{
-		case 0: break;
+		case 0:
+			return false;
 		case 1:
 			/* Only MSB is meaningful and is the only bank select
 			 * message, so it should be actually treated as LSB.
 			 * MSB should be set to zero. */
 			ins->setProgramBankMSB(0);
 			ins->setProgramBankLSB(event.controllerValue());
-			break;
+			return true;
 		case 2:
 			/* Both MSB and LSB are meaningful, so don't touch
 			 * LSB here. */
 			ins->setProgramBankMSB(event.controllerValue());
-			break;
+			return true;
 		}
 	}
 
-	if (event.type() == MidiControlChange &&
+	else if (event.type() == MidiControlChange &&
 			event.controllerNumber() == MidiControllerBankSelectLSB)
 	{
 		switch (policy)
 		{
-		case 0: break;
-		case 1: break;
+		case 0:
+		case 1:
+			return false;
 		case 2:
 			ins->setProgramBankLSB(event.controllerValue());
-			break;
+			return true;
 		}
 	}
+
+	return false;
 }
 
 
@@ -180,6 +184,10 @@ void MidiPort::processInEvent( const MidiEvent& event, const MidiTime& time )
 	if( isInputEnabled() &&
 		( inputChannel() == 0 || inputChannel()-1 == event.channel() ) )
 	{
+		/* If an event was intercepted for program change, we don't want
+		 * to pass it further to the plugin. */
+		bool forwardEvent = true;
+
 		MidiEvent inEvent = event;
 		if( event.type() == MidiNoteOn ||
 			event.type() == MidiNoteOff ||
@@ -205,11 +213,18 @@ void MidiPort::processInEvent( const MidiEvent& event, const MidiTime& time )
 
 		if (instrumentTrack != NULL &&	m_captureProgramChangeModel.value())
 		{
-			handleProgramChange(inEvent, instrumentTrack,
-					    m_presetSelectPolicyModel.value());
+			if (handleProgramChange(inEvent, instrumentTrack,
+					    m_presetSelectPolicyModel.value()))
+			{
+				/* Event was consumed for preset selection purposes */
+				forwardEvent = false;
+			}
 		}
 
-		m_midiEventProcessor->processInEvent( inEvent, time );
+		if (forwardEvent)
+		{
+			m_midiEventProcessor->processInEvent( inEvent, time );
+		}
 	}
 }
 
