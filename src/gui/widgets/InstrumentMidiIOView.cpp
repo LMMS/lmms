@@ -224,7 +224,7 @@ void InstrumentMidiIOView::modelChanged()
 	{
 		m_wpBtn->setMenu( mp->m_writablePortsMenu );
 	}
-
+	m_presetSelectGroupBox->setModel(&mp->m_captureProgramChangeModel);
 	m_presetSelectPolicyComboBox->setModel(&mp->m_presetSelectPolicyModel);
 }
 

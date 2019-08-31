@@ -890,19 +890,19 @@ Instrument * InstrumentTrack::loadInstrument(const QString & _plugin_name,
 void InstrumentTrack::setProgram(int program)
 {
 	m_programNumber = program;
-	printf("setProgram = %d\n", program);
+	changePreset();
 }
 
 void InstrumentTrack::setProgramBankMSB(int bankMSB)
 {
 	m_programBankMSB = bankMSB;
-	printf("setProgram = %d\n", bankMSB);
+	changePreset();
 }
 
 void InstrumentTrack::setProgramBankLSB(int bankLSB)
 {
 	m_programBankLSB = bankLSB;
-	printf("setProgram = %d\n", bankLSB);
+	changePreset();
 }
 
 void InstrumentTrack::changePreset()

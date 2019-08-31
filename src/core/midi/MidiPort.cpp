@@ -177,7 +177,6 @@ static void handleProgramChange( const MidiEvent& event,
 void MidiPort::processInEvent( const MidiEvent& event, const MidiTime& time )
 {
 	// mask event
-	printf("inEvent.type() = %02x", event.type());
 	if( isInputEnabled() &&
 		( inputChannel() == 0 || inputChannel()-1 == event.channel() ) )
 	{

@@ -422,9 +422,11 @@ bool vestigeInstrument::presetChangeSupported()
 
 void vestigeInstrument::changePreset(unsigned int presetNumber)
 {
-	m_plugin->setProgram(presetNumber);
-	printf("preset change to %d\n", presetNumber);
-	emit presetChanged();
+	if (m_plugin)
+	{
+		m_plugin->setProgram(presetNumber);
+		emit presetChanged();
+	}
 }
 
 
@@ -479,8 +481,6 @@ void vestigeInstrument::closePlugin( void )
 PluginView * vestigeInstrument::instantiateView( QWidget * _parent )
 {
 	VestigeInstrumentView* view = new VestigeInstrumentView( this, _parent );
-	connect(this, SIGNAL( presetChanged() ),
-		view, SLOT( changedProgram())  );
 	return view;
 }
 
@@ -630,6 +630,7 @@ VestigeInstrumentView::VestigeInstrumentView( Instrument * _instrument,
 	setAcceptDrops( true );
 	_instrument2 = _instrument;
 	_parent2 = _parent;
+
 }
 
 
@@ -695,6 +696,9 @@ void VestigeInstrumentView::modelChanged()
 	m_vi = castModel<vestigeInstrument>();
 	m_capturePgmChangeButton->setModel(&m_vi->m_capturePgmChange);
 	m_useBankSelectLSBButton->setModel(&m_vi->m_useBankSelectLSB);
+
+	connect(m_vi, SIGNAL(presetChanged()),
+		this, SLOT(changedProgram()));
 
 }
 
@@ -786,7 +790,6 @@ void VestigeInstrumentView::savePreset()
 
 void VestigeInstrumentView::nextProgram()
 {
-
 	if ( m_vi->m_plugin != NULL ) {
 		m_vi->m_plugin->rotateProgram( 1 );
     		bool converted;
@@ -802,7 +805,6 @@ void VestigeInstrumentView::nextProgram()
 
 void VestigeInstrumentView::previousProgram()
 {
-
 	if ( m_vi->m_plugin != NULL ) {
 		m_vi->m_plugin->rotateProgram( -1 );
     		bool converted;
