@@ -112,6 +112,12 @@ public:
 
 	QString fullDisplayName() const override;
 
+	inline virtual bool presetChangeSupported()
+	{
+		return false;
+	}
+	inline virtual void changePreset(unsigned int presetNumber) {}
+
 	// --------------------------------------------------------------------
 	// provided functions:
 	// --------------------------------------------------------------------

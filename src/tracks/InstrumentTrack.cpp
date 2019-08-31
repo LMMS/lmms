@@ -110,7 +110,10 @@ InstrumentTrack::InstrumentTrack( TrackContainer* tc ) :
 	m_soundShaping( this ),
 	m_arpeggio( this ),
 	m_noteStacking( this ),
-	m_piano( this )
+	m_piano( this ),
+	m_programNumber(0),
+	m_programBankMSB(0),
+	m_programBankLSB(0)
 {
 	m_pitchModel.setCenterValue( 0 );
 	m_panningModel.setCenterValue( DefaultPanning );
@@ -884,6 +887,34 @@ Instrument * InstrumentTrack::loadInstrument(const QString & _plugin_name,
 }
 
 
+void InstrumentTrack::setProgram(int program)
+{
+	m_programNumber = program;
+	printf("setProgram = %d\n", program);
+}
+
+void InstrumentTrack::setProgramBankMSB(int bankMSB)
+{
+	m_programBankMSB = bankMSB;
+	printf("setProgram = %d\n", bankMSB);
+}
+
+void InstrumentTrack::setProgramBankLSB(int bankLSB)
+{
+	m_programBankLSB = bankLSB;
+	printf("setProgram = %d\n", bankLSB);
+}
+
+void InstrumentTrack::changePreset()
+{
+	if (m_instrument)
+	{
+		m_instrument->changePreset(
+			(m_programBankMSB << 14) |
+			(m_programBankLSB << 7) |
+			m_programNumber);
+	}
+}
 
 
 

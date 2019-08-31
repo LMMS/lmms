@@ -404,60 +404,7 @@ bool vestigeInstrument::handleMidiEvent( const MidiEvent& event, const MidiTime&
 	m_pluginMutex.lock();
 	if( m_plugin != NULL )
 	{
-		bool programChangeRequested = false;
-		if (m_capturePgmChange.value())
-		{
-			if (event.type() == MidiControlChange)
-			{
-				if (event.controllerNumber() == MidiControllerBankSelectMSB)
-				{
-					m_midiBankMSB = event.controllerValue();
-					programChangeRequested = true;
-				}
-				else if (event.controllerNumber() == MidiControllerBankSelectLSB)
-				{
-					m_midiBankLSB = event.controllerValue();
-					programChangeRequested = true;
-				}
-			}
-			else if (event.type() == MidiProgramChange)
-			{
-				m_midiProgram = event.controllerNumber();
-				programChangeRequested = true;
-			}
-		}
-
-		if (programChangeRequested)
-		{
-			int presetNumber = m_midiProgram;
-
-			/* Some MIDI equipment makes use of both Bank Select CCs, while
-			 * others handle only Bank Select MSB. Due to this fact we need to
-			 * manually tell the software which of both conventions we expect
-			*/
-			if (m_useBankSelectLSB.value())
-			{
-				presetNumber |= (m_midiBankLSB << 7);
-				presetNumber |= (m_midiBankMSB << 14);
-			}
-			else
-			{
-				presetNumber |= (m_midiBankMSB << 7);
-			}
-#ifdef LMMS_DEBUG
-			printf("MIDI Program change to %d\n", presetNumber);
-#endif
-			m_plugin->setProgram(presetNumber);
-			emit presetChanged();
-		}
-		else
-		{
-			/* If we received something different than Program Change or
-			 * Bank Select message, or we don't want to process it internally,
-			 * forward it unchanged to the VST plugiled_greenn */
-			m_plugin->processMidiEvent( event, offset );
-		}
-
+		m_plugin->processMidiEvent( event, offset );
 	}
 	m_pluginMutex.unlock();
 
@@ -465,6 +412,20 @@ bool vestigeInstrument::handleMidiEvent( const MidiEvent& event, const MidiTime&
 }
 
 
+
+bool vestigeInstrument::presetChangeSupported()
+{
+	return true;
+}
+
+
+
+void vestigeInstrument::changePreset(unsigned int presetNumber)
+{
+	m_plugin->setProgram(presetNumber);
+	printf("preset change to %d\n", presetNumber);
+	emit presetChanged();
+}
 
 
 void vestigeInstrument::closePlugin( void )

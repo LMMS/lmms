@@ -214,6 +214,10 @@ public:
 
 	void setPreviewMode( const bool );
 
+	void setProgram(int program);
+	void setProgramBankMSB(int bankMSB);
+	void setProgramBankLSB(int bankLSB);
+
 
 signals:
 	void instrumentChanged();
@@ -239,6 +243,9 @@ protected slots:
 
 
 private:
+
+	void changePreset();
+
 	MidiPort m_midiPort;
 
 	NotePlayHandle* m_notes[NumKeys];
@@ -275,6 +282,9 @@ private:
 
 	Piano m_piano;
 
+	int m_programNumber;
+	int m_programBankMSB;
+	int m_programBankLSB;
 
 	friend class InstrumentTrackView;
 	friend class InstrumentTrackWindow;

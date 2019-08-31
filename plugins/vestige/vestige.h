@@ -67,6 +67,8 @@ public:
 	}
 
 	virtual bool handleMidiEvent( const MidiEvent& event, const MidiTime& time, f_cnt_t offset = 0 );
+	virtual bool presetChangeSupported();
+	virtual void changePreset(unsigned int presetNumber);
 
 	virtual PluginView * instantiateView( QWidget * _parent );
 

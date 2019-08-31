@@ -31,6 +31,8 @@
 #include "Note.h"
 #include "Song.h"
 #include "ComboBoxModel.h"
+#include "Instrument.h"
+#include "InstrumentTrack.h"
 
 static MidiDummy s_dummyClient;
 
@@ -126,10 +128,56 @@ void MidiPort::setMode( Mode mode )
 
 
 
+static void handleProgramChange( const MidiEvent& event,
+				 InstrumentTrack* ins,
+				 int policy)
+{
+	if (event.type() == MidiProgramChange)
+	{
+		ins->setProgram(event.key());
+	}
+
+	if (event.type() == MidiControlChange &&
+			event.controllerNumber() == MidiControllerBankSelectMSB)
+	{
+		switch (policy)
+		{
+		case 0: break;
+		case 1:
+			/* Only MSB is meaningful and is the only bank select
+			 * message, so it should be actually treated as LSB.
+			 * MSB should be set to zero. */
+			ins->setProgramBankMSB(0);
+			ins->setProgramBankLSB(event.controllerValue());
+			break;
+		case 2:
+			/* Both MSB and LSB are meaningful, so don't touch
+			 * LSB here. */
+			ins->setProgramBankMSB(event.controllerValue());
+			break;
+		}
+	}
+
+	if (event.type() == MidiControlChange &&
+			event.controllerNumber() == MidiControllerBankSelectLSB)
+	{
+		switch (policy)
+		{
+		case 0: break;
+		case 1: break;
+		case 2:
+			ins->setProgramBankLSB(event.controllerValue());
+			break;
+		}
+	}
+}
+
+
 
 void MidiPort::processInEvent( const MidiEvent& event, const MidiTime& time )
 {
 	// mask event
+	printf("inEvent.type() = %02x", event.type());
 	if( isInputEnabled() &&
 		( inputChannel() == 0 || inputChannel()-1 == event.channel() ) )
 	{
@@ -147,6 +195,19 @@ void MidiPort::processInEvent( const MidiEvent& event, const MidiTime& time )
 			{
 				inEvent.setVelocity( fixedInputVelocity() );
 			}
+		}
+
+		/* Program Change is relevant to Instruments only. We don't want
+		 * to expose relevant API from MidiEventProcessor since nobody else
+		 * than InstrumentTrack class will ever use it. Instead we will
+		 * check if we are working with instrument track */
+		InstrumentTrack* instrumentTrack =
+				dynamic_cast<InstrumentTrack*>(m_midiEventProcessor);
+
+		if (instrumentTrack != NULL &&	m_captureProgramChangeModel.value())
+		{
+			handleProgramChange(inEvent, instrumentTrack,
+					    m_presetSelectPolicyModel.value());
 		}
 
 		m_midiEventProcessor->processInEvent( inEvent, time );
