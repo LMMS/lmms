@@ -554,9 +554,16 @@ void SaSpectrumView::drawCursor(QPainter &painter)
 		painter.drawLine(m_cursor.x(), m_displayTop, m_cursor.x(), m_displayBottom);
 		painter.drawLine(m_displayLeft, m_cursor.y(), m_displayRight, m_cursor.y());
 
-		// coordinates: background
+		// coordinates: background box
+		QFontMetrics fontMetrics = painter.fontMetrics();
+		unsigned int const box_left = 5;
+		unsigned int const box_top = 5;
+		unsigned int const box_margin = 3;
+		unsigned int const box_height = 2*(fontMetrics.size(Qt::TextSingleLine, "0 HzdBFS").height() + box_margin);
+		unsigned int const box_width = fontMetrics.size(Qt::TextSingleLine, "-99.9 dBFS").width() + 2*box_margin;
 		painter.setPen(QPen(m_controls->m_colorLabels.darker(), 1, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
-		painter.fillRect(m_displayLeft +5, 5, 80, 32, QColor(0, 0, 0, 64));
+		painter.fillRect(m_displayLeft + box_left, m_displayTop + box_top,
+						 box_width, box_height, QColor(0, 0, 0, 64));
 
 		// coordinates: text
 		painter.setPen(QPen(m_controls->m_colorLabels, 1, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
@@ -565,7 +572,9 @@ void SaSpectrumView::drawCursor(QPainter &painter)
 		// frequency
 		int xFreq = (int)m_processor->xPixelToFreq(m_cursor.x() - m_displayLeft, m_displayWidth);
 		tmps = QString(std::string(std::to_string(xFreq) + " Hz").c_str());
-		painter.drawText(m_displayLeft +8, 8, 80, 16, Qt::AlignLeft, tmps);
+		painter.drawText(m_displayLeft + box_left + box_margin,
+						 m_displayTop + box_top + box_margin,
+						 box_width, box_height / 2, Qt::AlignLeft, tmps);
 
 		// amplitude
 		float yAmp = m_processor->yPixelToAmp(m_cursor.y(), m_displayBottom);
@@ -578,7 +587,9 @@ void SaSpectrumView::drawCursor(QPainter &painter)
 			// add 0.0005 to get proper rounding to 3 decimal places
 			tmps = QString(std::string(std::to_string(0.0005f + yAmp)).substr(0, 5).c_str());
 		}
-		painter.drawText(m_displayLeft +8, 20, 80, 16, Qt::AlignLeft, tmps);
+		painter.drawText(m_displayLeft + box_left + box_margin,
+						 m_displayTop + box_top + box_height / 2,
+						 box_width, box_height / 2, Qt::AlignLeft, tmps);
 	}
 }
 
