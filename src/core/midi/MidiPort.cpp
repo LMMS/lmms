@@ -127,67 +127,12 @@ void MidiPort::setMode( Mode mode )
 }
 
 
-bool MidiPort::processPresetSelectEvents(const MidiEvent& event,
-					InstrumentTrack* ins,
-					PresetSelectPolicy policy)
-{
-	if (event.type() == MidiProgramChange)
-	{
-		ins->setProgram(event.key());
-		return true;
-	}
-
-	else if (event.type() == MidiControlChange &&
-			event.controllerNumber() == MidiControllerBankSelectMSB)
-	{
-		switch (policy)
-		{
-		case BankSelectIgnore:
-			return false;
-		case BankSelectMSB:
-			/* Only MSB is meaningful and is the only bank select
-			 * message, so it should be actually treated as LSB.
-			 * MSB should be set to zero. */
-			ins->setProgramBankMSB(0);
-			ins->setProgramBankLSB(event.controllerValue());
-			return true;
-		case BankSelectBoth:
-			/* Both MSB and LSB are meaningful, so don't touch
-			 * LSB here. */
-			ins->setProgramBankMSB(event.controllerValue());
-			return true;
-		}
-	}
-
-	else if (event.type() == MidiControlChange &&
-			event.controllerNumber() == MidiControllerBankSelectLSB)
-	{
-		switch (policy)
-		{
-		case BankSelectIgnore:
-		case BankSelectMSB:
-			return false;
-		case BankSelectBoth:
-			ins->setProgramBankLSB(event.controllerValue());
-			return true;
-		}
-	}
-
-	return false;
-}
-
-
-
 void MidiPort::processInEvent( const MidiEvent& event, const MidiTime& time )
 {
 	// mask event
 	if( isInputEnabled() &&
 		( inputChannel() == 0 || inputChannel()-1 == event.channel() ) )
 	{
-		/* If an event was intercepted for program change, we don't want
-		 * to pass it further to the plugin. */
-		bool forwardEvent = true;
-
 		MidiEvent inEvent = event;
 		if( event.type() == MidiNoteOn ||
 			event.type() == MidiNoteOff ||
@@ -204,29 +149,7 @@ void MidiPort::processInEvent( const MidiEvent& event, const MidiTime& time )
 			}
 		}
 
-		/* Program Change is relevant to Instruments only. We don't want
-		 * to expose relevant API from MidiEventProcessor since nobody else
-		 * than InstrumentTrack class will ever use it. Instead we will
-		 * check if we are working with instrument track */
-		InstrumentTrack* instrumentTrack =
-				dynamic_cast<InstrumentTrack*>(m_midiEventProcessor);
-
-		if (instrumentTrack != NULL &&	m_captureProgramChangeModel.value())
-		{
-			if (processPresetSelectEvents(inEvent, instrumentTrack,
-				static_cast<PresetSelectPolicy>(
-					m_presetSelectPolicyModel.value()
-				)))
-			{
-				/* Event was consumed for preset selection purposes */
-				forwardEvent = false;
-			}
-		}
-
-		if (forwardEvent)
-		{
-			m_midiEventProcessor->processInEvent( inEvent, time );
-		}
+		m_midiEventProcessor->processInEvent( inEvent, time );
 	}
 }
 

@@ -214,10 +214,7 @@ public:
 
 	void setPreviewMode( const bool );
 
-	void setProgram(int program);
-	void setProgramBankMSB(int bankMSB);
-	void setProgramBankLSB(int bankLSB);
-
+	bool processPresetSelectEvents(const MidiEvent& event);
 
 signals:
 	void instrumentChanged();

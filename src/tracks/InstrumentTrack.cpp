@@ -352,6 +352,21 @@ void InstrumentTrack::processInEvent( const MidiEvent& event, const MidiTime& ti
 			{
 				silenceAllNotes();
 			}
+			if (event.controllerNumber() == MidiControllerBankSelectMSB ||
+				event.controllerNumber() == MidiControllerBankSelectLSB)
+			{
+				if (processPresetSelectEvents(event))
+				{
+					changePreset();
+				}
+			}
+			break;
+
+		case MidiProgramChange:
+			if (processPresetSelectEvents(event))
+			{
+				changePreset();
+			}
 			break;
 
 		case MidiMetaEvent:
@@ -887,23 +902,57 @@ Instrument * InstrumentTrack::loadInstrument(const QString & _plugin_name,
 }
 
 
-void InstrumentTrack::setProgram(int program)
+bool InstrumentTrack::processPresetSelectEvents(const MidiEvent& event)
 {
-	m_programNumber = program;
-	changePreset();
+	if (m_midiPort.m_captureProgramChangeModel.value() == 0)
+	{
+		return false;
+	}
+	if (event.type() == MidiProgramChange)
+	{
+		m_programNumber = event.key();
+		return true;
+	}
+
+	else if (event.type() == MidiControlChange &&
+			event.controllerNumber() == MidiControllerBankSelectMSB)
+	{
+		switch (m_midiPort.m_presetSelectPolicyModel.value())
+		{
+		case MidiPort::BankSelectIgnore:
+			return false;
+		case MidiPort::BankSelectMSB:
+			/* Only MSB is meaningful and is the only bank select
+			 * message, so it should be actually treated as LSB.
+			 * MSB should be set to zero. */
+			m_programBankMSB = 0;
+			m_programBankLSB = event.controllerValue();
+			return true;
+		case MidiPort::BankSelectBoth:
+			/* Both MSB and LSB are meaningful, so don't touch
+			 * LSB here. */
+			m_programBankMSB = event.controllerValue();
+			return true;
+		}
+	}
+
+	else if (event.type() == MidiControlChange &&
+			event.controllerNumber() == MidiControllerBankSelectLSB)
+	{
+		switch (m_midiPort.m_presetSelectPolicyModel.value())
+		{
+		case MidiPort::BankSelectIgnore:
+		case MidiPort::BankSelectMSB:
+			return false;
+		case MidiPort::BankSelectBoth:
+			m_programBankLSB = event.controllerValue();
+			return true;
+		}
+	}
+
+	return false;
 }
 
-void InstrumentTrack::setProgramBankMSB(int bankMSB)
-{
-	m_programBankMSB = bankMSB;
-	changePreset();
-}
-
-void InstrumentTrack::setProgramBankLSB(int bankLSB)
-{
-	m_programBankLSB = bankLSB;
-	changePreset();
-}
 
 void InstrumentTrack::changePreset()
 {

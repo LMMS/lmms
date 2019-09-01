@@ -40,7 +40,6 @@ class MidiClient;
 class MidiEvent;
 class MidiEventProcessor;
 class MidiPortMenu;
-class InstrumentTrack;
 
 
 // class for abstraction of MIDI-port
@@ -172,13 +171,9 @@ private:
 	Map m_readablePorts;
 	Map m_writablePorts;
 
-	bool processPresetSelectEvents(const MidiEvent& event,
-				InstrumentTrack* ins,
-				PresetSelectPolicy policy);
-
-
 	friend class ControllerConnectionDialog;
 	friend class InstrumentMidiIOView;
+	friend class InstrumentTrack;
 
 
 signals:
