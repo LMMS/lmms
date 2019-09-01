@@ -411,10 +411,20 @@ bool vestigeInstrument::presetChangeSupported()
 
 
 
-void vestigeInstrument::changePreset(unsigned int bank, unsigned int preset)
+void vestigeInstrument::changePreset(int bank, unsigned int preset)
 {
 	if (m_plugin)
 	{
+		// The "empty" bank indicates that we need to handle it
+		// anyway. Since the list of VST plugins is continuous
+		// (excluding exceptions such as SQ8L), splitting it into
+		// artifically-made banks could be confusing to the user.
+		// Therefore we treat "empty" bank as 0th one, meaning
+		// that we can access only first 128 patches.
+		if (bank == -1)
+		{
+			bank = 0;
+		}
 		m_plugin->setProgram((bank << 7) | preset);
 		emit presetChanged();
 	}

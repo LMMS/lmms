@@ -914,10 +914,16 @@ bool GigInstrument::presetChangeSupported()
 
 
 
-void GigInstrument::changePreset(unsigned int bank, unsigned int preset)
+void GigInstrument::changePreset(int bank, unsigned int preset)
 {
-	printf("changePreset: %04x/%02x\n", bank, preset);
-	m_bankNum.setValue(bank);
+	// The "empty" bank indicates that we do not want to switch
+	// banks. If we configure the preset change feature to ignore
+	// bank switching, we can set it manually and be sure
+	// that it will not reset.
+	if (bank != -1)
+	{
+		m_bankNum.setValue(bank);
+	}
 	m_patchNum.setValue(preset);
 	emit patchChanged();
 }

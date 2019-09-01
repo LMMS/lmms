@@ -884,9 +884,12 @@ bool sf2Instrument::presetChangeSupported()
 
 
 
-void sf2Instrument::changePreset(unsigned int bank, unsigned int preset)
+void sf2Instrument::changePreset(int bank, unsigned int preset)
 {
-	m_bankNum.setValue(bank);
+	if (bank != -1)
+	{
+		m_bankNum.setValue(bank);
+	}
 	m_patchNum.setValue(preset);
 
 	emit patchChanged();

@@ -85,6 +85,7 @@ const int INSTRUMENT_WIDTH	= 254;
 const int INSTRUMENT_HEIGHT	= INSTRUMENT_WIDTH;
 const int PIANO_HEIGHT		= 80;
 const int INSTRUMENT_WINDOW_CACHE_SIZE = 8;
+const int BANK_NONE             = -1;
 
 
 // #### IT:
@@ -112,8 +113,8 @@ InstrumentTrack::InstrumentTrack( TrackContainer* tc ) :
 	m_noteStacking( this ),
 	m_piano( this ),
 	m_programNumber(0),
-	m_programBankMSB(0),
-	m_programBankLSB(0)
+	m_programBankMSB(BANK_NONE),
+	m_programBankLSB(BANK_NONE)
 {
 	m_pitchModel.setCenterValue( 0 );
 	m_panningModel.setCenterValue( DefaultPanning );
@@ -910,16 +911,27 @@ bool InstrumentTrack::processPresetSelectEvents(const MidiEvent& event)
 	{
 		return false;
 	}
+
+	MidiPort::PresetSelectPolicy policy =
+		static_cast<MidiPort::PresetSelectPolicy>(
+				m_midiPort.m_presetSelectPolicyModel.value());
+
 	if (event.type() == MidiProgramChange)
 	{
 		m_programNumber = event.key();
+
+		if (policy == MidiPort::BankSelectIgnore)
+		{
+			m_programBankMSB = BANK_NONE;
+			m_programBankLSB = 0;
+		}
 		return true;
 	}
 
 	else if (event.type() == MidiControlChange &&
 			event.controllerNumber() == MidiControllerBankSelectMSB)
 	{
-		switch (m_midiPort.m_presetSelectPolicyModel.value())
+		switch (policy)
 		{
 		case MidiPort::BankSelectIgnore:
 			return false;
@@ -941,7 +953,7 @@ bool InstrumentTrack::processPresetSelectEvents(const MidiEvent& event)
 	else if (event.type() == MidiControlChange &&
 			event.controllerNumber() == MidiControllerBankSelectLSB)
 	{
-		switch (m_midiPort.m_presetSelectPolicyModel.value())
+		switch (policy)
 		{
 		case MidiPort::BankSelectIgnore:
 		case MidiPort::BankSelectMSB:
@@ -960,9 +972,16 @@ void InstrumentTrack::changePreset()
 {
 	if (m_instrument)
 	{
-		m_instrument->changePreset(
-			(m_programBankMSB << 7) | m_programBankLSB,
-			m_programNumber);
+		if (m_programBankMSB != -1)
+		{
+			m_instrument->changePreset(
+				(m_programBankMSB << 7) | m_programBankLSB,
+				m_programNumber);
+		}
+		else
+		{
+			m_instrument->changePreset(-1, m_programNumber);
+	}
 	}
 }
 

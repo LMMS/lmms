@@ -92,7 +92,7 @@ public:
 	void setParameter( const QString & _param, const QString & _value );
 
 	virtual bool presetChangeSupported();
-	virtual void changePreset(unsigned int bank, unsigned int preset);
+	virtual void changePreset(int bank, unsigned int preset);
 
 public slots:
 	void openFile( const QString & _sf2File, bool updateTrackName = true );
