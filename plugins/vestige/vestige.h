@@ -110,7 +110,6 @@ protected slots:
 	void syncPlugin( void );
 	void displayAutomatedOnly( void );
 	void setParameter( Model * action );
-	void repaintWindow();
 	void closeWindow();
 
 
