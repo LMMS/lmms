@@ -40,6 +40,7 @@ class MidiClient;
 class MidiEvent;
 class MidiEventProcessor;
 class MidiPortMenu;
+class InstrumentTrack;
 
 
 // class for abstraction of MIDI-port
@@ -159,10 +160,21 @@ private:
 	BoolModel m_readableModel;
 	BoolModel m_writableModel;
 	BoolModel m_captureProgramChangeModel;
+
+	enum PresetSelectPolicy
+	{
+		BankSelectIgnore,
+		BankSelectMSB,
+		BankSelectBoth
+	};
 	ComboBoxModel m_presetSelectPolicyModel;
 
 	Map m_readablePorts;
 	Map m_writablePorts;
+
+	bool processPresetSelectEvents(const MidiEvent& event,
+				InstrumentTrack* ins,
+				PresetSelectPolicy policy);
 
 
 	friend class ControllerConnectionDialog;

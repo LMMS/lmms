@@ -127,9 +127,9 @@ void MidiPort::setMode( Mode mode )
 }
 
 
-static bool handleProgramChange(const MidiEvent& event,
-				 InstrumentTrack* ins,
-				 int policy)
+bool MidiPort::processPresetSelectEvents(const MidiEvent& event,
+					InstrumentTrack* ins,
+					PresetSelectPolicy policy)
 {
 	if (event.type() == MidiProgramChange)
 	{
@@ -142,16 +142,16 @@ static bool handleProgramChange(const MidiEvent& event,
 	{
 		switch (policy)
 		{
-		case 0:
+		case BankSelectIgnore:
 			return false;
-		case 1:
+		case BankSelectMSB:
 			/* Only MSB is meaningful and is the only bank select
 			 * message, so it should be actually treated as LSB.
 			 * MSB should be set to zero. */
 			ins->setProgramBankMSB(0);
 			ins->setProgramBankLSB(event.controllerValue());
 			return true;
-		case 2:
+		case BankSelectBoth:
 			/* Both MSB and LSB are meaningful, so don't touch
 			 * LSB here. */
 			ins->setProgramBankMSB(event.controllerValue());
@@ -164,10 +164,10 @@ static bool handleProgramChange(const MidiEvent& event,
 	{
 		switch (policy)
 		{
-		case 0:
-		case 1:
+		case BankSelectIgnore:
+		case BankSelectMSB:
 			return false;
-		case 2:
+		case BankSelectBoth:
 			ins->setProgramBankLSB(event.controllerValue());
 			return true;
 		}
@@ -213,8 +213,10 @@ void MidiPort::processInEvent( const MidiEvent& event, const MidiTime& time )
 
 		if (instrumentTrack != NULL &&	m_captureProgramChangeModel.value())
 		{
-			if (handleProgramChange(inEvent, instrumentTrack,
-					    m_presetSelectPolicyModel.value()))
+			if (processPresetSelectEvents(inEvent, instrumentTrack,
+				static_cast<PresetSelectPolicy>(
+					m_presetSelectPolicyModel.value()
+				)))
 			{
 				/* Event was consumed for preset selection purposes */
 				forwardEvent = false;
@@ -262,6 +264,8 @@ void MidiPort::saveSettings( QDomDocument& doc, QDomElement& thisElement )
 	m_fixedOutputNoteModel.saveSettings( doc, thisElement, "fixedoutputnote" );
 	m_outputProgramModel.saveSettings( doc, thisElement, "outputprogram" );
 	m_baseVelocityModel.saveSettings( doc, thisElement, "basevelocity" );
+	m_captureProgramChangeModel.saveSettings(doc, thisElement, "captureprogramchange");
+	m_presetSelectPolicyModel.saveSettings(doc, thisElement, "presetselectpolicy");
 	m_readableModel.saveSettings( doc, thisElement, "readable" );
 	m_writableModel.saveSettings( doc, thisElement, "writable" );
 
@@ -315,6 +319,8 @@ void MidiPort::loadSettings( const QDomElement& thisElement )
 	m_fixedOutputVelocityModel.loadSettings( thisElement, "fixedoutputvelocity" );
 	m_outputProgramModel.loadSettings( thisElement, "outputprogram" );
 	m_baseVelocityModel.loadSettings( thisElement, "basevelocity" );
+	m_captureProgramChangeModel.loadSettings(thisElement, "captureprogramchange");
+	m_presetSelectPolicyModel.loadSettings(thisElement, "presetselectpolicy");
 	m_readableModel.loadSettings( thisElement, "readable" );
 	m_writableModel.loadSettings( thisElement, "writable" );
 
