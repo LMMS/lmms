@@ -52,6 +52,7 @@ public:
 	// inform processor if any processing is actually required
 	void setSpectrumActive(bool active);
 	void setWaterfallActive(bool active);
+	void flipRequest() {m_flipRequest = true;}	// request refresh of history buffer
 
 	// configuration is taken from models in SaControls; some changes require
 	// an exlicit update request (reallocation and window rebuild)
@@ -79,10 +80,12 @@ public:
 
 	// Reallocation lock prevents the processor from changing size of its buffers.
 	// It is used to keep consistent bin-to-frequency mapping while drawing the
-	// spectrum. The processor is meanwhile free to work on another block.
+	// spectrum and to make sure reading side does not find itself out of bounds.
+	// The processor is meanwhile free to work on another block.
 	QMutex m_reallocationAccess;
 	// Data access lock prevents the processor from changing both size and content
-	// of its buffers. It is used when any friendly class reads the results directly.
+	// of its buffers. It is used when writing to a result buffer, or when a friendly
+	// class reads them and needs guaranteed data consistency.
 	// It causes FFT analysis to be paused, so this lock should be used sparingly.
 	// If using both locks at the same time, reallocation lock MUST be acquired first.
 	QMutex m_dataAccess;
@@ -119,8 +122,10 @@ private:
 	std::vector<float> m_normSpectrumR;     //!< frequency domain samples (normalized) (right)
 
 	// spectrum history for waterfall: new normSpectrum lines are added on top
-	std::vector<uchar> m_history;
-	unsigned int m_waterfallHeight;			// Number of stored lines.
+	std::vector<uchar> m_history_work;		//!< local history buffer for render
+	std::vector<uchar> m_history;			//!< public buffer for reading
+	bool m_flipRequest;						//!< update public buffer only when requested
+	unsigned int m_waterfallHeight;			//!< number of stored lines in history buffer
 											// Note: high values may make it harder to see transients.
 	const unsigned int m_waterfallMaxWidth = 3840;
 	unsigned int waterfallWidth() const;	//!< binCount value capped at 3840 (for display)

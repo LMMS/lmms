@@ -20,6 +20,7 @@ SaSpectrumView and SaWaterfallView show the result of spectrum analysis. Their m
 		- FFT: separate lock for reallocation (to avoid some needless waiting)
 		- moved ranges and other constants to a separate file
 		- debug: better performance measurements
+		- various performance optimizations
 	1.0.3	2019-07-25
 		- rename and tweak amplitude ranges based on feedback
 	1.0.2	2019-07-12

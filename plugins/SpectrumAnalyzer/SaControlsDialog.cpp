@@ -259,7 +259,7 @@ SaControlsDialog::SaControlsDialog(SaControls *controls, SaProcessor *processor)
 	Knob *waterfallHeightKnob = new Knob(knobSmall_17, this);
 	waterfallHeightKnob->setModel(&controls->m_waterfallHeightModel);
 	waterfallHeightKnob->setLabel(tr("Waterfall height"));
-	waterfallHeightKnob->setToolTip(tr("Increase to get slower scrolling, decrease to see fast transitions better."));
+	waterfallHeightKnob->setToolTip(tr("Increase to get slower scrolling, decrease to see fast transitions better. Warning: medium CPU usage."));
 	waterfallHeightKnob->setHintText(tr("Keep"), tr(" lines"));
 	advanced_layout->addWidget(waterfallHeightKnob, 0, 2, 1, 1, Qt::AlignCenter);
 	processor->reallocateBuffers();

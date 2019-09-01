@@ -142,13 +142,13 @@ void SaSpectrumView::paintEvent(QPaintEvent *event)
 		m_execution_avg = 0.95 * m_execution_avg + 0.05 * total_time / 1000000.0;
 		painter.setPen(QPen(m_controls->m_colorLabels, 1,
 							Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
-		painter.drawText(m_displayRight -100, 10, 100, 16, Qt::AlignLeft,
+		painter.drawText(m_displayRight -150, 10, 100, 16, Qt::AlignLeft,
 						 QString(std::string("Exec avg.: " + std::to_string(m_execution_avg).substr(0, 5) + " ms").c_str()));
-		painter.drawText(m_displayRight -100, 30, 100, 16, Qt::AlignLeft,
+		painter.drawText(m_displayRight -150, 30, 100, 16, Qt::AlignLeft,
 						 QString(std::string("Buff. upd. avg: " + std::to_string(m_refresh_avg).substr(0, 5) + " ms").c_str()));
-		painter.drawText(m_displayRight -100, 50, 100, 16, Qt::AlignLeft,
+		painter.drawText(m_displayRight -150, 50, 100, 16, Qt::AlignLeft,
 						 QString(std::string("Path build avg: " + std::to_string(m_path_avg).substr(0, 5) + " ms").c_str()));
-		painter.drawText(m_displayRight -100, 70, 100, 16, Qt::AlignLeft,
+		painter.drawText(m_displayRight -150, 70, 100, 16, Qt::AlignLeft,
 						 QString(std::string("Path draw avg: " + std::to_string(m_draw_avg).substr(0, 5) + " ms").c_str()));
 
 	#endif
@@ -163,7 +163,7 @@ void SaSpectrumView::drawSpectrum(QPainter &painter)
 	#endif
 
 	// draw the graph only if there is any input, averaging residue or peaks
-	QMutexLocker lock(&m_processor->m_dataAccess);
+	QMutexLocker lock(&m_processor->m_reallocationAccess);
 	if (m_decaySum > 0 || notEmpty(m_processor->m_normSpectrumL) || notEmpty(m_processor->m_normSpectrumR))
 	{
 		lock.unlock();
@@ -241,12 +241,9 @@ void SaSpectrumView::refreshPaths()
 	#ifdef SA_DEBUG
 		int refresh_time = std::chrono::high_resolution_clock::now().time_since_epoch().count();
 	#endif
-	// The stronger Data lock is needed only for the duration of actual data reading.
-	QMutexLocker data_lock(&m_processor->m_dataAccess);
 	m_decaySum = 0;
 	updateBuffers(m_processor->m_normSpectrumL.data(), m_displayBufferL.data(), m_peakBufferL.data());
 	updateBuffers(m_processor->m_normSpectrumR.data(), m_displayBufferR.data(), m_peakBufferR.data());
-	data_lock.unlock();
 	#ifdef SA_DEBUG
 		refresh_time = std::chrono::high_resolution_clock::now().time_since_epoch().count() - refresh_time;
 	#endif
@@ -291,8 +288,10 @@ void SaSpectrumView::refreshPaths()
 
 // Update display buffers: add new data, update average and peaks / reference.
 // Output the sum of all displayed values -- draw only if it is non-zero.
-// NOTE: The calling function is responsible for acquiring SaProcessor data
-// access lock!
+// NOTE: The calling function is responsible for acquiring SaProcessor
+// reallocation access lock! Data access lock is not needed: the final result
+// buffer is updated very quickly and the worst case is that one frame will be
+// part new, part old. At reasonable frame rate, such difference is invisible..
 void SaSpectrumView::updateBuffers(float *spectrum, float *displayBuffer, float *peakBuffer)
 {
 	for (int n = 0; n < m_processor->binCount(); n++)
@@ -555,14 +554,18 @@ void SaSpectrumView::drawCursor(QPainter &painter)
 		painter.drawLine(m_cursor.x(), m_displayTop, m_cursor.x(), m_displayBottom);
 		painter.drawLine(m_displayLeft, m_cursor.y(), m_displayRight, m_cursor.y());
 
-		// coordinates
+		// coordinates: background
 		painter.setPen(QPen(m_controls->m_colorLabels.darker(), 1, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
+		painter.fillRect(m_displayLeft +5, 5, 80, 32, QColor(0, 0, 0, 64));
+
+		// coordinates: text
+		painter.setPen(QPen(m_controls->m_colorLabels, 1, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
 		QString tmps;
 
 		// frequency
 		int xFreq = (int)m_processor->xPixelToFreq(m_cursor.x() - m_displayLeft, m_displayWidth);
 		tmps = QString(std::string(std::to_string(xFreq) + " Hz").c_str());
-		painter.drawText(m_displayLeft +8, 8, 100, 16, Qt::AlignLeft, tmps);
+		painter.drawText(m_displayLeft +8, 8, 80, 16, Qt::AlignLeft, tmps);
 
 		// amplitude
 		float yAmp = m_processor->yPixelToAmp(m_cursor.y(), m_displayBottom);
@@ -575,7 +578,7 @@ void SaSpectrumView::drawCursor(QPainter &painter)
 			// add 0.0005 to get proper rounding to 3 decimal places
 			tmps = QString(std::string(std::to_string(0.0005f + yAmp)).substr(0, 5).c_str());
 		}
-		painter.drawText(m_displayLeft +8, 20, 100, 16, Qt::AlignLeft, tmps);
+		painter.drawText(m_displayLeft +8, 20, 80, 16, Qt::AlignLeft, tmps);
 	}
 }
 

@@ -105,12 +105,15 @@ SaControls::SaControls(Analyzer *effect) :
 
 	// Colors
 	// Background color is defined by Qt / theme.
-	// Make sure the sum of colors for L and R channel stays lower or equal
-	// to 255. Otherwise the Waterfall pixels may overflow back to 0 even when
-	// the input signal isn't clipping (over 1.0).
+	// Make sure the sum of colors for L and R channel results into a neutral
+	// color that has at least one component equal to 255 (i.e. ideally white).
+	// This means the color overflows to zero exactly when signal reaches
+	// clipping threshold, indicating the problematic frequency to user.
+	// Mono waterfall color should have similarly at least one component at 255.
 	m_colorL = QColor(51, 148, 204, 135);
 	m_colorR = QColor(204, 107, 51, 135);
 	m_colorMono = QColor(51, 148, 204, 204);
+	m_colorMonoW = QColor(64, 185, 255, 255);
 	m_colorBG = QColor(7, 7, 7, 255);			// ~20 % gray (after gamma correction)
 	m_colorGrid = QColor(30, 34, 38, 255);		// ~40 % gray (slightly cold / blue)
 	m_colorLabels = QColor(192, 202, 212, 255);	// ~90 % gray (slightly cold / blue)

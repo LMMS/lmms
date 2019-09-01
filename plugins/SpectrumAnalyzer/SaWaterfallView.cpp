@@ -139,7 +139,7 @@ void SaWaterfallView::paintEvent(QPaintEvent *event)
 	// draw the spectrogram precomputed in SaProcessor
 	if (m_processor->m_waterfallNotEmpty)
 	{
-		QMutexLocker lock(&m_processor->m_dataAccess);
+		QMutexLocker lock(&m_processor->m_reallocationAccess);
 		QImage temp = QImage(m_processor->m_history.data(),		// raw pixel data to display
 							 m_processor->waterfallWidth(),		// width = number of frequency bins
 							 m_processor->m_waterfallHeight,	// height = number of history lines
@@ -151,6 +151,7 @@ void SaWaterfallView::paintEvent(QPaintEvent *event)
 									  m_displayHeight * devicePixelRatio(),
 									  Qt::IgnoreAspectRatio,
 									  Qt::SmoothTransformation));
+		m_processor->flipRequest();
 	}
 	else
 	{
@@ -168,7 +169,7 @@ void SaWaterfallView::paintEvent(QPaintEvent *event)
 		draw_time = std::chrono::high_resolution_clock::now().time_since_epoch().count() - draw_time;
 		m_execution_avg = 0.95 * m_execution_avg + 0.05 * draw_time / 1000000.0;
 		painter.setPen(QPen(m_controls->m_colorLabels, 1, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
-		painter.drawText(m_displayRight -100, 10, 100, 16, Qt::AlignLeft,
+		painter.drawText(m_displayRight -150, 10, 100, 16, Qt::AlignLeft,
 						 QString(std::string("Exec avg.: " + std::to_string(m_execution_avg).substr(0, 5) + " ms").c_str()));
 	#endif
 }
@@ -258,7 +259,7 @@ void SaWaterfallView::updateVisibility()
 	{
 		// clear old data before showing the waterfall
 		QMutexLocker lock(&m_processor->m_dataAccess);
-		std::fill(m_processor->m_history.begin(), m_processor->m_history.end(), 0);
+		std::fill(m_processor->m_history_work.begin(), m_processor->m_history_work.end(), 0);
 		lock.unlock();
 
 		setVisible(true);
@@ -291,19 +292,23 @@ void SaWaterfallView::drawCursor(QPainter &painter)
 		painter.drawLine(m_cursor.x(), m_displayTop, m_cursor.x(), m_displayBottom);
 		painter.drawLine(m_displayLeft, m_cursor.y(), m_displayRight, m_cursor.y());
 
-		// coordinates
+		// coordinates: background
 		painter.setPen(QPen(m_controls->m_colorLabels.darker(), 1, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
+		painter.fillRect(m_displayLeft +5, 5, 80, 32, QColor(0, 0, 0, 64));
+
+		// coordinates: text
+		painter.setPen(QPen(m_controls->m_colorLabels, 1, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
 		QString tmps;
 
 		// frequency
 		int freq = (int)m_processor->xPixelToFreq(m_cursor.x() - m_displayLeft, m_displayWidth);
 		tmps = QString(std::string(std::to_string(freq) + " Hz").c_str());
-		painter.drawText(m_displayLeft +8, 8, 100, 16, Qt::AlignLeft, tmps);
+		painter.drawText(m_displayLeft +8, 8, 80, 16, Qt::AlignLeft, tmps);
 
 		// time
 		float time = yPixelToTime(m_cursor.y(), m_displayBottom);
 		tmps = QString(std::string(std::string(std::to_string(time)).substr(0, 5) + " s").c_str());
-		painter.drawText(m_displayLeft +8, 20, 100, 16, Qt::AlignLeft, tmps);
+		painter.drawText(m_displayLeft +8, 20, 80, 16, Qt::AlignLeft, tmps);
 	}
 }
 

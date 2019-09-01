@@ -68,6 +68,7 @@ SaProcessor::SaProcessor(SaControls *controls) :
 	m_normSpectrumR.resize(binCount(), 0);
 
 	m_waterfallHeight = 100;	// a small safe value
+	m_history_work.resize(waterfallWidth() * m_waterfallHeight * sizeof qRgb(0,0,0), 0);
 	m_history.resize(waterfallWidth() * m_waterfallHeight * sizeof qRgb(0,0,0), 0);
 
 	clear();
@@ -153,7 +154,7 @@ void SaProcessor::analyse(ringbuffer_t<sampleFrame> &ring_buffer, QWaitCondition
 							<< m_sum_execution / m_dump_count << " ms avg / "
 							<< m_max_execution << " ms peak, executing "
 							<< m_dump_count << " times per second ("
-							<< m_sum_execution / 10.0 << " % CPU usage)." << std::endl;
+							<< m_sum_execution / 20.0 << " % CPU usage)." << std::endl;
 						m_last_dump_time = total_time;
 						m_sum_execution = m_max_execution = m_dump_count = 0;
 					}
@@ -183,11 +184,6 @@ void SaProcessor::analyse(ringbuffer_t<sampleFrame> &ring_buffer, QWaitCondition
 					normalize(m_absSpectrumR, m_normSpectrumR, m_inBlockSize);
 				}
 
-				#ifdef SA_DEBUG
-					unsigned int analysis_time = std::chrono::high_resolution_clock::now().time_since_epoch().count() - total_time;
-					std::cout << "FFT analysis: "<< analysis_time / 1000000.0 << ", ";
-				#endif
-
 				// count empty lines so that empty history does not have to update
 				if (block_empty && m_waterfallNotEmpty)
 				{
@@ -200,20 +196,12 @@ void SaProcessor::analyse(ringbuffer_t<sampleFrame> &ring_buffer, QWaitCondition
 
 				if (m_waterfallActive && m_waterfallNotEmpty)
 				{
-					#ifdef SA_DEBUG
-						unsigned int move_time = std::chrono::high_resolution_clock::now().time_since_epoch().count();
-					#endif
 					// move waterfall history one line down and clear the top line
-					QRgb *pixel = (QRgb *)m_history.data();
+					QRgb *pixel = (QRgb *)m_history_work.data();
 					std::copy(pixel,
 							  pixel + waterfallWidth() * m_waterfallHeight - waterfallWidth(),
 							  pixel + waterfallWidth());
 					memset(pixel, 0, waterfallWidth() * sizeof (QRgb));
-					#ifdef SA_DEBUG
-						move_time = std::chrono::high_resolution_clock::now().time_since_epoch().count() - move_time;
-						std::cout << "Waterfall movement: "<< move_time / 1000000.0 << ", ";
-						unsigned int render_time = std::chrono::high_resolution_clock::now().time_since_epoch().count();
-					#endif
 
 					// add newest result on top
 					int target;		// pixel being constructed
@@ -289,14 +277,16 @@ void SaProcessor::analyse(ringbuffer_t<sampleFrame> &ring_buffer, QWaitCondition
 							}
 						}
 					}
-					#ifdef SA_DEBUG
-						render_time = std::chrono::high_resolution_clock::now().time_since_epoch().count() - render_time;
-						std::cout << "Waterfall render: "<< render_time / 1000000.0 << ", ";
-					#endif
+
+					// Copy work buffer to result buffer. Done only if requested, so
+					// that time isn't wasted on updating faster than display FPS.
+					// (The copy is about as expensive as the movement.)
+					if (m_flipRequest)
+					{
+						m_history = m_history_work;
+						m_flipRequest = false;
+					}
 				}
-				#ifdef SA_DEBUG
-					unsigned int cleanup_time = std::chrono::high_resolution_clock::now().time_since_epoch().count();
-				#endif
 				// clean up before checking for more data from input buffer
 				const unsigned int overlaps = m_controls->m_windowOverlapModel.value();
 				if (overlaps == 1)			// each sample used only once
@@ -312,8 +302,6 @@ void SaProcessor::analyse(ringbuffer_t<sampleFrame> &ring_buffer, QWaitCondition
 				}
 
 				#ifdef SA_DEBUG
-					cleanup_time = std::chrono::high_resolution_clock::now().time_since_epoch().count() - cleanup_time;
-					std::cout << "Cleanup: "<< cleanup_time / 1000000.0 << std::endl;
 					// measure overall FFT processing speed
 					total_time = std::chrono::high_resolution_clock::now().time_since_epoch().count() - total_time;
 					m_dump_count++;
@@ -347,9 +335,9 @@ QRgb SaProcessor::makePixel(float left, float right) const
 	{
 		float ampL = pow(left, gamma_correction);
 		// make mono color brighter to compensate for the fact it is not summed
-		return qRgb(m_controls->m_colorMono.lighter().red() * ampL,
-					m_controls->m_colorMono.lighter().green() * ampL,
-					m_controls->m_colorMono.lighter().blue() * ampL);
+		return qRgb(m_controls->m_colorMonoW.red() * ampL,
+					m_controls->m_colorMonoW.green() * ampL,
+					m_controls->m_colorMonoW.blue() * ampL);
 	}
 }
 
@@ -436,9 +424,12 @@ void SaProcessor::reallocateBuffers()
 	m_normSpectrumR.resize(new_bins, 0);
 
 	m_waterfallHeight = m_controls->m_waterfallHeightModel.value();
+	m_history_work.resize((new_bins < m_waterfallMaxWidth ? new_bins : m_waterfallMaxWidth)
+							* m_waterfallHeight
+							* sizeof qRgb(0,0,0), 0);
 	m_history.resize((new_bins < m_waterfallMaxWidth ? new_bins : m_waterfallMaxWidth)
-					 * m_waterfallHeight
-					 * sizeof qRgb(0,0,0), 0);
+						* m_waterfallHeight
+						* sizeof qRgb(0,0,0), 0);
 
 	// done; publish new sizes and clean up
 	m_inBlockSize = new_in_size;
@@ -475,6 +466,7 @@ void SaProcessor::clear()
 	std::fill(m_absSpectrumR.begin(), m_absSpectrumR.end(), 0);
 	std::fill(m_normSpectrumL.begin(), m_normSpectrumL.end(), 0);
 	std::fill(m_normSpectrumR.begin(), m_normSpectrumR.end(), 0);
+	std::fill(m_history_work.begin(), m_history_work.end(), 0);
 	std::fill(m_history.begin(), m_history.end(), 0);
 }
 
