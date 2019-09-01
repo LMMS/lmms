@@ -316,8 +316,9 @@ void InstrumentTrack::processInEvent( const MidiEvent& event, const MidiTime& ti
 			break;
 
 		case MidiControlChange:
-			if( event.controllerNumber() == MidiControllerSustain )
+			switch (event.controllerNumber())
 			{
+			case MidiControllerSustain:
 				if( event.controllerValue() > MidiMaxControllerValue/2 )
 				{
 					m_sustainPedalPressed = true;
@@ -342,23 +343,24 @@ void InstrumentTrack::processInEvent( const MidiEvent& event, const MidiTime& ti
 					m_sustainedNotes.clear();
 					m_sustainPedalPressed = false;
 				}
-			}
-			if( event.controllerNumber() == MidiControllerAllSoundOff ||
-				event.controllerNumber() == MidiControllerAllNotesOff ||
-				event.controllerNumber() == MidiControllerOmniOn ||
-				event.controllerNumber() == MidiControllerOmniOff ||
-				event.controllerNumber() == MidiControllerMonoOn ||
-				event.controllerNumber() == MidiControllerPolyOn )
-			{
+				break;
+
+			case MidiControllerAllSoundOff:
+			case MidiControllerAllNotesOff:
+			case MidiControllerOmniOn:
+			case MidiControllerOmniOff:
+			case MidiControllerMonoOn:
+			case MidiControllerPolyOn:
 				silenceAllNotes();
-			}
-			if (event.controllerNumber() == MidiControllerBankSelectMSB ||
-				event.controllerNumber() == MidiControllerBankSelectLSB)
-			{
+				break;
+
+			case MidiControllerBankSelectMSB:
+			case MidiControllerBankSelectLSB:
 				if (processPresetSelectEvents(event))
 				{
 					changePreset();
 				}
+				break;
 			}
 			break;
 
