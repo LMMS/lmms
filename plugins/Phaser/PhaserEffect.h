@@ -1,5 +1,5 @@
 /*
- * Phaser.h
+ * PhaserEffect.h
  *
  * Copyright (c) 2019 Lost Robot <r94231@gmail.com>
  *

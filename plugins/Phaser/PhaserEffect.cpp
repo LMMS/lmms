@@ -1,5 +1,5 @@
 /*
- * Phaser.cpp
+ * PhaserEffect.cpp
  *
  * Copyright (c) 2019 Lost Robot <r94231@gmail.com>
  *
@@ -22,7 +22,7 @@
  *
  */
 
-#include "Phaser.h"
+#include "PhaserEffect.h"
 
 #include "embed.h"
 #include "plugin_export.h"

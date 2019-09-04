@@ -26,7 +26,7 @@
 #include <QDomElement>
 
 #include "PhaserControls.h"
-#include "Phaser.h"
+#include "PhaserEffect.h"
 #include "Engine.h"
 #include "Song.h"
 #include "GuiApplication.h"

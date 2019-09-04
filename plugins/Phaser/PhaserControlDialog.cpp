@@ -24,7 +24,7 @@
 
 #include <QLayout>
 
-#include "Phaser.h"
+#include "PhaserEffect.h"
 #include "PhaserControlDialog.h"
 #include "PhaserControls.h"
 #include "embed.h"
