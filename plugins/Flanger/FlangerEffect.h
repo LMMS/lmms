@@ -53,6 +53,8 @@ private:
 	QuadratureLfo* m_lfo;
 	Noise* m_noise;
 
+	friend class FlangerControls;
+
 };
 
 #endif // FLANGEREFFECT_H

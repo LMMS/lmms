@@ -48,7 +48,7 @@ public:
 	}
 	virtual int controlCount()
 	{
-		return 5;
+		return 7;
 	}
 	virtual EffectControlDialog* createView()
 	{
@@ -58,12 +58,14 @@ public:
 private slots:
 	void changedSampleRate();
 	void changedPlaybackState();
+	void updatePhase();
 
 private:
 	FlangerEffect* m_effect;
 	FloatModel m_delayTimeModel;
 	TempoSyncKnobModel m_lfoFrequencyModel;
 	FloatModel m_lfoAmountModel;
+	FloatModel m_lfoPhaseModel;
 	FloatModel m_feedbackModel;
 	FloatModel m_whiteNoiseAmountModel;
 	BoolModel m_invertFeedbackModel;

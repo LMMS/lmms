@@ -1,7 +1,7 @@
 /*
- * quadraturelfo.cpp - defination of QuadratureLfo class.
+ * PhaserControlDialog.h
  *
- * Copyright (c) 2014 David French <dave/dot/french3/at/googlemail/dot/com>
+ * Copyright (c) 2019 Lost Robot <r94231@gmail.com>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -22,17 +22,43 @@
  *
  */
 
-#include "QuadratureLfo.h"
+#ifndef PHASER_CONTROL_DIALOG_H
+#define PHASER_CONTROL_DIALOG_H
 
-QuadratureLfo::QuadratureLfo( int sampleRate )
+#include "EffectControlDialog.h"
+#include <QLabel>
+#include "Fader.h"
+
+
+class PhaserControls;
+
+
+class PhaserControlDialog : public EffectControlDialog
 {
-	setSampleRate(sampleRate);
-}
+	Q_OBJECT
+public:
+	PhaserControlDialog( PhaserControls* controls );
+	virtual ~PhaserControlDialog()
+	{
+	}
+	PhaserControls* model()
+	{
+		return m_controls;
+	}
 
-void QuadratureLfo::tick( float *s, float *c )
-{
-	*s = sinf( m_phase );
-	*c = cosf( m_phase );
-	m_phase += m_increment;
+	const PhaserControls* model() const
+	{
+		return m_controls;
+	}
 
-}
+	QLabel * m_cutoffDotLeftLabel;
+	QLabel * m_cutoffDotRightLabel;
+
+private slots:
+	void updateSliders();
+
+private:
+	PhaserControls * m_controls;
+} ;
+
+#endif
