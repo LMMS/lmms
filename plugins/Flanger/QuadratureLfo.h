@@ -75,10 +75,10 @@ public:
 	}
 
 
-	void tick( float *s, float *c )
+	void tick( float *l, float *r )
 	{
-		*s = sinf( m_phase );
-		*c = sinf( m_phase + m_offset );
+		*l = sinf( m_phase );
+		*r = sinf( m_phase + m_offset );
 		m_phase += m_increment;
 
 	}

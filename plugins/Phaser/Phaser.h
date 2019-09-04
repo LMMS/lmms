@@ -56,8 +56,8 @@ private:
 
 	PhaserControls m_phaserControls;
 
-	float m_filtX[32][2][4] = {{0}};// [filter number][channel][samples back in time]
-	float m_filtY[32][2][4] = {{0}};// [filter number][channel][samples back in time]
+	float m_filtX[32][2][4] = {{{0}}};// [filter number][channel][samples back in time]
+	float m_filtY[32][2][4] = {{{0}}};// [filter number][channel][samples back in time]
 	std::vector<float> m_filtDelayBuf[2];
 	int m_filtFeedbackLoc = 0;
 
