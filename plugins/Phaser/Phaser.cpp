@@ -67,8 +67,10 @@ PhaserEffect::PhaserEffect(Model* parent, const Descriptor::SubPluginFeatures::K
 	calcAttack();
 	calcRelease();
 
-	m_outGain = 1.0;
-	m_inGain = 1.0;
+	m_outGain = dbfsToAmp(m_phaserControls.m_outGainModel.value());
+	m_inGain = dbfsToAmp(m_phaserControls.m_inGainModel.value());
+
+	m_lfo->setFrequency(1.0 / m_phaserControls.m_rateModel.value());
 
 	for (int b = 0; b < 2; ++b)
 	{
@@ -122,7 +124,6 @@ bool PhaserEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 	const ValueBuffer * resonanceBuf = m_phaserControls.m_resonanceModel.valueBuffer();
 	const ValueBuffer * feedbackBuf = m_phaserControls.m_feedbackModel.valueBuffer();
 	const ValueBuffer * orderBuf = m_phaserControls.m_orderModel.valueBuffer();
-	const ValueBuffer * rateBuf = m_phaserControls.m_rateModel.valueBuffer();
 	const ValueBuffer * enableLFOBuf = m_phaserControls.m_enableLFOModel.valueBuffer();
 	const ValueBuffer * amountBuf = m_phaserControls.m_amountModel.valueBuffer();
 	const ValueBuffer * wetDryBuf = m_phaserControls.m_wetDryModel.valueBuffer();
@@ -163,6 +164,10 @@ bool PhaserEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 	{
 		m_currentPeak[0] = m_currentPeak[1] = PHA_NOISE_FLOOR;
 	}
+	if (m_phaserControls.m_rateModel.isValueChanged())
+	{
+		m_lfo->setFrequency(1.0 / m_phaserControls.m_rateModel.value());
+	}
 
 	for (fpp_t f = 0; f < frames; ++f)
 	{
@@ -177,7 +182,6 @@ bool PhaserEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 		const float resonance = resonanceBuf ? resonanceBuf->value(f) : m_phaserControls.m_resonanceModel.value();
 		const float feedback = feedbackBuf ? feedbackBuf->value(f) : m_phaserControls.m_feedbackModel.value();
 		const float order = orderBuf ? orderBuf->value(f) : m_phaserControls.m_orderModel.value();
-		const float rate = rateBuf ? rateBuf->value(f) : m_phaserControls.m_rateModel.value();
 		const bool enableLFO = enableLFOBuf ? enableLFOBuf->value(f) : m_phaserControls.m_enableLFOModel.value();
 		const float amount = amountBuf ? amountBuf->value(f) : m_phaserControls.m_amountModel.value();
 		const float wetDry = wetDryBuf ? wetDryBuf->value(f) : m_phaserControls.m_wetDryModel.value();
@@ -205,7 +209,6 @@ bool PhaserEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 
 		if (enableLFO)
 		{
-			m_lfo->setFrequency(1.0 / rate);
 			m_lfo->tick(&leftLfo, &rightLfo);
 			m_realCutoff[0] = qBound(20.f, detuneWithOctaves(cutoff, leftLfo * amount + inFollow * m_currentPeak[0]), 20000.f);
 			m_realCutoff[1] = qBound(20.f, detuneWithOctaves(cutoff, rightLfo * amount + inFollow * m_currentPeak[1]), 20000.f);

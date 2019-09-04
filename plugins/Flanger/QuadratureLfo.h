@@ -40,7 +40,7 @@ public:
 
 	inline void setFrequency( double frequency )
 	{
-		if( frequency < 0 || frequency > m_srOverTwo || frequency == m_frequency )
+		if( frequency < 0 || frequency > m_samplerate / 2.0 || frequency == m_frequency )
 		{
 			return;
 		}
@@ -64,7 +64,6 @@ public:
 	{
 		m_samplerate = samplerate;
 		m_twoPiOverSr = F_2PI / samplerate;
-		m_srOverTwo = samplerate / 2.0;
 		m_increment = m_frequency * m_twoPiOverSr;
 	}
 
@@ -88,7 +87,6 @@ private:
 	double m_phase;
 	double m_increment;
 	double m_twoPiOverSr;
-	double m_srOverTwo;
 	double m_offset = D_PI;
 	int m_samplerate;
 
