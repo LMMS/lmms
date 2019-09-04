@@ -215,7 +215,7 @@ bool DisintegratorEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frame
 
 		for (int i = 0; i < 2; ++i)
 		{
-			if (fmod(newInBufLoc[i], 1) == 0)
+			if (newInBufLocFrac[i] == 0)
 			{
 				s[i] = m_inBuf[i][newInBufLoc[i]];
 			}
