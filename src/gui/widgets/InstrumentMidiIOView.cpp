@@ -57,6 +57,8 @@ InstrumentMidiIOView::InstrumentMidiIOView( QWidget* parent ) :
 
 	m_inputChannelSpinBox = new LcdSpinBox( 2, m_midiInputGroupBox );
 	m_inputChannelSpinBox->addTextForValue( 0, "--" );
+	/*: This string must be be short, its width must be less than
+	 *  width of LCD spin-box of two digits */
 	m_inputChannelSpinBox->setLabel( tr( "CHAN" ) );
 	m_inputChannelSpinBox->setEnabled( false );
 	midiInputLayout->addWidget( m_inputChannelSpinBox );
@@ -64,6 +66,8 @@ InstrumentMidiIOView::InstrumentMidiIOView( QWidget* parent ) :
 	m_fixedInputVelocitySpinBox = new LcdSpinBox( 3, m_midiInputGroupBox );
 	m_fixedInputVelocitySpinBox->setDisplayOffset( 1 );
 	m_fixedInputVelocitySpinBox->addTextForValue( 0, "---" );
+	/*: This string must be be short, its width must be less than
+	 *  width of LCD spin-box of three digits */
 	m_fixedInputVelocitySpinBox->setLabel( tr( "VELOC" ) );
 	m_fixedInputVelocitySpinBox->setEnabled( false );
 	midiInputLayout->addWidget( m_fixedInputVelocitySpinBox );
@@ -83,6 +87,8 @@ InstrumentMidiIOView::InstrumentMidiIOView( QWidget* parent ) :
 	midiOutputLayout->setContentsMargins( 8, 18, 8, 8 );
 	midiOutputLayout->setSpacing( 4 );
 	m_outputChannelSpinBox = new LcdSpinBox( 2, m_midiOutputGroupBox );
+	/*: This string must be be short, its width must be less than
+	 *  width of LCD spin-box of two digits */
 	m_outputChannelSpinBox->setLabel( tr( "CHAN" ) );
 	m_outputChannelSpinBox->setEnabled( false );
 	midiOutputLayout->addWidget( m_outputChannelSpinBox );
@@ -90,11 +96,15 @@ InstrumentMidiIOView::InstrumentMidiIOView( QWidget* parent ) :
 	m_fixedOutputVelocitySpinBox = new LcdSpinBox( 3, m_midiOutputGroupBox );
 	m_fixedOutputVelocitySpinBox->setDisplayOffset( 1 );
 	m_fixedOutputVelocitySpinBox->addTextForValue( 0, "---" );
+	/*: This string must be be short, its width must be less than
+	 *  width of LCD spin-box of three digits */
 	m_fixedOutputVelocitySpinBox->setLabel( tr( "VELOC" ) );
 	m_fixedOutputVelocitySpinBox->setEnabled( false );
 	midiOutputLayout->addWidget( m_fixedOutputVelocitySpinBox );
 
 	m_outputProgramSpinBox = new LcdSpinBox( 3, m_midiOutputGroupBox );
+	/*: This string must be be short, its width must be less than the
+	 *  width of LCD spin-box of three digits */
 	m_outputProgramSpinBox->setLabel( tr( "PROG" ) );
 	m_outputProgramSpinBox->setEnabled( false );
 	midiOutputLayout->addWidget( m_outputProgramSpinBox );
@@ -102,6 +112,8 @@ InstrumentMidiIOView::InstrumentMidiIOView( QWidget* parent ) :
 	m_fixedOutputNoteSpinBox = new LcdSpinBox( 3, m_midiOutputGroupBox );
 	m_fixedOutputNoteSpinBox->setDisplayOffset( 1 );
 	m_fixedOutputNoteSpinBox->addTextForValue( 0, "---" );
+	/*: This string must be be short, its width must be less than
+	 *  width of LCD spin-box of three digits */
 	m_fixedOutputNoteSpinBox->setLabel( tr( "NOTE" ) );
 	m_fixedOutputNoteSpinBox->setEnabled( false );
 	midiOutputLayout->addWidget( m_fixedOutputNoteSpinBox );
