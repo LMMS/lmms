@@ -73,8 +73,8 @@ PhaserControls::PhaserControls( PhaserEffect* effect ) :
 
 PhaserControls::~PhaserControls()
 {
-	disconnect( gui->mainWindow(), SIGNAL( periodicUpdate() ), 0, 0 );
 }
+
 
 void PhaserControls::saveSettings( QDomDocument& doc, QDomElement& _this )
 {
