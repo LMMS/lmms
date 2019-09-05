@@ -174,7 +174,7 @@ MainWindow::MainWindow() :
 	m_workspace = new QMdiArea( splitter );
 
 	// Load background
-	emit initProgress(tr("Loading background theme"));
+	emit initProgress(tr("Loading background picture"));
 	QString backgroundPicFile = ConfigManager::inst()->backgroundPicFile();
 	QImage backgroundPic;
 	if( !backgroundPicFile.isEmpty() )
