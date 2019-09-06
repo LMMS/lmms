@@ -151,7 +151,7 @@ sf2Instrument::sf2Instrument( InstrumentTrack * _instrument_track ) :
 	m_chorusDepth.setInitValue(settingVal);
 #endif
 
-	loadFile( ConfigManager::inst()->defaultSoundfont() );
+	loadFile( ConfigManager::inst()->sf2File() );
 
 	updateSampleRate();
 	updateReverbOn();
