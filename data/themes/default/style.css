@@ -920,7 +920,4 @@ LmmsPalette {
 	qproperty-brightText: #d1d8e4;
 	qproperty-highlight: #262b30;
 	qproperty-highlightedText: #d1d8e4;
-	/* the next two are used for whatsthis dialogs */
-	qproperty-toolTipText: #d1d8e4;
-	qproperty-toolTipBase: #101213;
 }
