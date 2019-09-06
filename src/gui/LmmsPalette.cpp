@@ -42,7 +42,7 @@ LmmsPalette::LmmsPalette( QWidget * parent, QStyle * stylearg ) :
 	m_buttonText( 0,0,0 ),
 	m_brightText( 74, 253, 133 ),
 	m_highlight( 100, 100, 100 ),
-	m_highlightedText( 255, 255, 255  ),
+	m_highlightedText( 255, 255, 255  )
 {
 	setStyle( stylearg );
 	stylearg->polish( this );
