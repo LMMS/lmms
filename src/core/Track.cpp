@@ -1123,32 +1123,35 @@ void TrackContentObjectView::mouseReleaseEvent( QMouseEvent * me )
 	{
 		SampleTCO * leftTCO = dynamic_cast<SampleTCO*>( m_tco );
 
-		if (leftTCO) { leftTCO->setMarkerEnabled( false ); }
-
-		const int relativePixelPos = me->pos().x();
-		const float ppt = m_trackView->trackContainerView()->pixelsPerTact();
-		MidiTime splitPos = relativePixelPos * MidiTime::ticksPerTact() / ppt;
-
-		if ( me->modifiers() & Qt::ControlModifier
-		  || me->modifiers() & Qt::AltModifier    ){}
-		else { splitPos = quantizeMarkerPos( splitPos, me->modifiers() & Qt::ShiftModifier ); }
-
-		splitPos += m_initialTCOPos;
-
-		//Don't split if we slid off the TCO or if we're on the clip's start/end
-		//Cutting at exactly the start/end position would create a zero length
-		//clip (bad), and a clip the same length as the original one (pointless).
-		if ( splitPos > m_initialTCOPos && splitPos < m_initialTCOEnd )
+		if (leftTCO)
 		{
-			leftTCO->copy();
-			SampleTCO * rightTCO = new SampleTCO ( leftTCO->getTrack() );
-			rightTCO->paste();
+			leftTCO->setMarkerEnabled( false );
 
-			leftTCO->changeLength( splitPos - m_initialTCOPos );
+			const int relativePixelPos = me->pos().x();
+			const float ppt = m_trackView->trackContainerView()->pixelsPerTact();
+			MidiTime splitPos = relativePixelPos * MidiTime::ticksPerTact() / ppt;
 
-			rightTCO->movePosition( splitPos );
-			rightTCO->changeLength( m_initialTCOEnd - splitPos );
-			rightTCO->setStartTimeOffset( leftTCO->startTimeOffset() - leftTCO->length() );
+			if ( me->modifiers() & Qt::ControlModifier
+			  || me->modifiers() & Qt::AltModifier    ){}
+			else { splitPos = quantizeMarkerPos( splitPos, me->modifiers() & Qt::ShiftModifier ); }
+
+			splitPos += m_initialTCOPos;
+
+			//Don't split if we slid off the TCO or if we're on the clip's start/end
+			//Cutting at exactly the start/end position would create a zero length
+			//clip (bad), and a clip the same length as the original one (pointless).
+			if ( splitPos > m_initialTCOPos && splitPos < m_initialTCOEnd )
+			{
+				leftTCO->copy();
+				SampleTCO * rightTCO = new SampleTCO ( leftTCO->getTrack() );
+				rightTCO->paste();
+
+				leftTCO->changeLength( splitPos - m_initialTCOPos );
+
+				rightTCO->movePosition( splitPos );
+				rightTCO->changeLength( m_initialTCOEnd - splitPos );
+				rightTCO->setStartTimeOffset( leftTCO->startTimeOffset() - leftTCO->length() );
+			}
 		}
 	}
 
