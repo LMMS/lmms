@@ -840,10 +840,12 @@ void TrackContentObjectView::mousePressEvent( QMouseEvent * me )
 		{
 			remove();
 		}
-		if (m_action == Split){
+		if (m_action == Split)
+		{
 			m_action = NoAction;
 			SampleTCO * sTco = dynamic_cast<SampleTCO*>( m_tco );
-			if (sTco) {
+			if (sTco)
+			{
 				sTco->setMarkerEnabled( false );
 				update();
 			}
@@ -1073,7 +1075,7 @@ void TrackContentObjectView::mouseMoveEvent( QMouseEvent * me )
 	else if( m_action == Split )
 	{
 		SampleTCO * sTco = dynamic_cast<SampleTCO*>( m_tco );
-		sTco->setMarkerPos( knifeMarkerPos( me ) );
+		if (sTco) { sTco->setMarkerPos( knifeMarkerPos( me ) ); }
 		update();
 	}
 	else
@@ -1121,35 +1123,23 @@ void TrackContentObjectView::mouseReleaseEvent( QMouseEvent * me )
 	{
 		SampleTCO * leftTCO = dynamic_cast<SampleTCO*>( m_tco );
 
-		leftTCO->setMarkerEnabled( false );
+		if (leftTCO) { leftTCO->setMarkerEnabled( false ); }
 
 		const int relativePixelPos = me->pos().x();
 		const float ppt = m_trackView->trackContainerView()->pixelsPerTact();
 		MidiTime splitPos = relativePixelPos * MidiTime::ticksPerTact() / ppt;
-		const float snapSize = gui->songEditor()->m_editor->getSnapSize();
 
-		//Essentially duplicate logic from knifeMarkerPos, but shift needs to be inverted for some reason
 		if ( me->modifiers() & Qt::ControlModifier
 		  || me->modifiers() & Qt::AltModifier    ){}
-		else if ( me->modifiers() & Qt::ShiftModifier )
-		{	//If shift is held we quantize the length of the new left clip...
-			const MidiTime leftPos = splitPos.quantize( snapSize );
-			//...or right clip...
-			const MidiTime rightOff = m_tco->length() - splitPos;
-			const MidiTime rightPos = m_tco->length() - rightOff.quantize( snapSize );
-			//...whichever gives a position closer to the cursor
-			if ( abs(leftPos - splitPos) < abs(rightPos - splitPos) ) splitPos = leftPos;
-			else splitPos = rightPos;
-		}
-		else
-		{
-			splitPos = MidiTime(splitPos + m_initialTCOPos).quantize( snapSize ) - m_initialTCOPos;
-		}
+		else { splitPos = quantizeMarkerPos( splitPos, me->modifiers() & Qt::ShiftModifier ); }
+
 		splitPos += m_initialTCOPos;
 
-		//Don't do anything if we slid off the TCO
-		if ( splitPos <= m_initialTCOPos || splitPos >= m_initialTCOEnd ){}
-		else {
+		//Don't split if we slid off the TCO or if we're on the clip's start/end
+		//Cutting at exactly the start/end position would create a zero length
+		//clip (bad), and a clip the same length as the original one (pointless).
+		if ( splitPos > m_initialTCOPos && splitPos < m_initialTCOEnd )
+		{
 			leftTCO->copy();
 			SampleTCO * rightTCO = new SampleTCO ( leftTCO->getTrack() );
 			rightTCO->paste();
@@ -1314,27 +1304,37 @@ int TrackContentObjectView::knifeMarkerPos( QMouseEvent * me )
 	  || me->modifiers() & Qt::AltModifier    )
 	{ return markerPos; }
 	//Otherwise we...
-	else {
+	else
+	{
 		//1: Convert the position to a MidiTime
 		const float ppt = m_trackView->trackContainerView()->pixelsPerTact();
-		const float snapSize = gui->songEditor()->m_editor->getSnapSize();
 		MidiTime midiPos = markerPos * MidiTime::ticksPerTact() / ppt;
 		//2: Snap to the correct position, based on modifier keys
-		if ( me->modifiers() & Qt::ShiftModifier )
-		{	//If shift is held we quantize the length of the new left clip...
-			const MidiTime leftPos = midiPos.quantize( snapSize );
-			//...or right clip...
-			const MidiTime rightOff = m_tco->length() - midiPos;
-			const MidiTime rightPos = m_tco->length() - rightOff.quantize( snapSize );
-			//...whichever gives a position closer to the cursor
-			if ( abs(leftPos - midiPos) < abs(rightPos - midiPos) ) midiPos = leftPos;
-			else midiPos = rightPos;
-		}
-		else {
-			midiPos = MidiTime(midiPos + m_initialTCOPos).quantize( snapSize ) - m_initialTCOPos;
-		}
+		midiPos = quantizeMarkerPos( midiPos, me->modifiers() & Qt::ShiftModifier );
 		//3: Convert back to a pixel position
 		return midiPos * ppt / MidiTime::ticksPerTact();
+	}
+}
+
+
+
+
+MidiTime TrackContentObjectView::quantizeMarkerPos( MidiTime midiPos, bool shiftMode )
+{
+	const float snapSize = gui->songEditor()->m_editor->getSnapSize();
+	if ( shiftMode )
+	{	//If shift is held we quantize the length of the new left clip...
+		const MidiTime leftPos = midiPos.quantize( snapSize );
+		//...or right clip...
+		const MidiTime rightOff = m_tco->length() - midiPos;
+		const MidiTime rightPos = m_tco->length() - rightOff.quantize( snapSize );
+		//...whichever gives a position closer to the cursor
+		if ( abs(leftPos - midiPos) < abs(rightPos - midiPos) ) { return leftPos; }
+		else { return rightPos; }
+	}
+	else
+	{
+		return (MidiTime(midiPos + m_initialTCOPos).quantize( snapSize ) - m_initialTCOPos);
 	}
 }
 
