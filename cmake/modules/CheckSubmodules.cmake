@@ -7,7 +7,8 @@
 #       INCLUDE(CheckSubmodules)
 #
 # Options:
-#       SET(SKIP_SUBMODULES "foo;bar")
+#       SET(PLUGIN_LIST "zynaddsubfx;...") # skips submodules for plugins not explicitely listed
+#       SET(SKIP_SUBMODULES "plugins/Xpressive/exprtk;...") # manually skip based on full path
 #
 # Or via command line:       
 #       cmake -DSKIP_SUBMODULES=foo;bar
@@ -52,12 +53,28 @@ FOREACH(_part ${SUBMODULE_LIST})
 	LIST(GET SUBMODULE_URL_LIST ${SUBMODULE_INDEX} _url)
 	STRING(REPLACE "url = " "" SUBMODULE_URL ${_url})
 
-	# Remove submodules from validation as specified in -DSKIP_SUBMODULES=foo;bar
 	SET(SKIP false)
+	SET(SKIP_REASON "(via SKIP_SUBMODULES)")
+	# Remove unwanted submodules from validation by comparing against -DPLUGIN_LIST=foo;bar
+	IF(${SUBMODULE_PATH} MATCHES "^plugins/")
+		SET(REMOVE_PLUGIN true)
+		FOREACH(_plugin ${PLUGIN_LIST})
+			IF(${SUBMODULE_PATH} MATCHES "${_plugin}")
+				SET(REMOVE_PLUGIN false)
+			ENDIF()
+		ENDFOREACH()
+
+		IF(REMOVE_PLUGIN)
+			SET(SKIP_REASON "(absent in PLUGIN_LIST)")
+			LIST(APPEND SKIP_SUBMODULES ${SUBMODULE_PATH})
+		ENDIF()
+	ENDIF()
+
+	# Remove submodules from validation as specified in -DSKIP_SUBMODULES=foo;bar
 	IF(SKIP_SUBMODULES)
 		FOREACH(_skip ${SKIP_SUBMODULES})
 			IF(${SUBMODULE_PATH} MATCHES ${_skip})
-				MESSAGE("-- Skipping ${SUBMODULE_PATH} matches \"${_skip}\"")
+				MESSAGE("-- Skipping ${SUBMODULE_PATH} matches \"${_skip}\" ${SKIP_REASON}")
 				SET(SKIP true)
 			ENDIF()
 		ENDFOREACH()
