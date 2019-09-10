@@ -80,4 +80,3 @@ IF(MSVC)
 	LIST(REMOVE_ITEM PLUGIN_LIST ${MSVC_INCOMPATIBLE_PLUGINS})
 ENDIF()
 
-# Avoid fetching unwanted submodules
