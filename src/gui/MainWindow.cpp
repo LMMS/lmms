@@ -197,7 +197,9 @@ MainWindow::MainWindow() :
 
 	hbox->addWidget(sideBar);
 	hbox->addWidget(splitter);
-	if(sideBarOnRight)
+	// If the user wants the sidebar on the right, we move the workspace and
+	// the splitter to the "left" side, or the first widgets in their list
+	if (sideBarOnRight)
 	{
 		splitter->insertWidget(0, m_workspace);
 		hbox->insertWidget(0, splitter);
