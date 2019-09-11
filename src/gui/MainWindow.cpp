@@ -119,12 +119,6 @@ MainWindow::MainWindow() :
 	ConfigManager* confMgr = ConfigManager::inst();
 	bool sideBarOnRight = confMgr->value("ui", "sidebaronright").toInt();
 
-	// create the QMdiArea with an empty splitter so the workspace is on the left
-	if(sideBarOnRight)
-	{
-		m_workspace = new QMdiArea(splitter);
-	}
-
 	emit initProgress(tr("Preparing plugin browser"));
 	sideBar->appendTab( new PluginBrowser( splitter ) );
 	emit initProgress(tr("Preparing file browsers"));
@@ -178,11 +172,7 @@ MainWindow::MainWindow() :
 					embed::getIconPixmap( "computer" ).transformed( QTransform().rotate( 90 ) ),
 							splitter, dirs_as_items) );
 
-	// create the QMdiArea with a populated splitter so the workspace is on the right
-	if(!sideBarOnRight)
-	{
-		m_workspace = new QMdiArea(splitter);
-	}
+	m_workspace = new QMdiArea(splitter);
 
 	// Load background
 	emit initProgress(tr("Loading background picture"));
@@ -205,17 +195,12 @@ MainWindow::MainWindow() :
 	m_workspace->setHorizontalScrollBarPolicy( Qt::ScrollBarAsNeeded );
 	m_workspace->setVerticalScrollBarPolicy( Qt::ScrollBarAsNeeded );
 
-	// Sidebar on right
+	hbox->addWidget(sideBar);
+	hbox->addWidget(splitter);
 	if(sideBarOnRight)
 	{
-		hbox->addWidget(splitter);
-		hbox->addWidget(sideBar);
-	}
-	// Sidebar on left
-	else
-	{
-		hbox->addWidget(sideBar);
-		hbox->addWidget(splitter);
+		splitter->insertWidget(0, m_workspace);
+		hbox->insertWidget(0, splitter);
 	}
 
 	// create global-toolbar at the top of our window
