@@ -77,22 +77,31 @@ SynchroNote::~SynchroNote()
 	//Empty destructor
 }
 
-void SynchroNote::nextStringSample(sampleFrame &outputSample, sample_rate_t sample_rate, float modulationStrength, float modulationAmount, float harmonics, SynchroOscillatorSettings carrier, SynchroOscillatorSettings modulator)
+void SynchroNote::nextStringSample(sampleFrame &outputSample,
+	sample_rate_t sample_rate, float modulationStrength,
+	float modulationAmount, float harmonics, SynchroOscillatorSettings carrier,
+	SynchroOscillatorSettings modulator)
 {
 	float sampleRatePi = F_2PI / sample_rate; //For oversampling
 	//Find position in modulator waveform
-	sample_index[1] += sampleRatePi * DetuneOctaves(nph->frequency(), modulator.Detune);
+	sample_index[1] += sampleRatePi * DetuneOctaves(nph->frequency(),
+		modulator.Detune);
 	while (sample_index[1] >= F_2PI) { sample_index[1] -= F_2PI; } //Make sure phase is always between 0 and 2PI
 	//Get modulator waveform at position
 	//Modulator is calculated first because it is used by the carrier
-	float modulatorSample = SynchroWaveform(sample_index[1], modulator.Drive, modulator.Sync, modulator.Chop, harmonics) * (modulationStrength * modulationAmount);
+	float modulatorSample = SynchroWaveform(sample_index[1], modulator.Drive,
+		modulator.Sync, modulator.Chop, harmonics)
+		* (modulationStrength * modulationAmount);
 	float pmSample = modulatorSample * SYNCHRO_PM_CONST;
 	//Find position in carrier waveform
-	sample_index[0] += sampleRatePi * DetuneOctaves(nph->frequency(), carrier.Detune);
+	sample_index[0] += sampleRatePi * DetuneOctaves(nph->frequency(),
+		carrier.Detune);
 	while (sample_index[0] >= F_2PI) { sample_index[0] -= F_2PI; } //Make sure phase is always between 0 and 2PI
 	//Get carrier waveform at position, accounting for modulation
 	//Index 0 is L, 1 is R. Synth is currently mono so they are the same value.
-	outputSample[0] = SynchroWaveform(sample_index[0] + pmSample, carrier.Drive, carrier.Sync, carrier.Chop, 0) * (SYNCHRO_VOLUME_CONST);
+	outputSample[0] = SynchroWaveform(sample_index[0] + pmSample,
+		carrier.Drive, carrier.Sync, carrier.Chop, 0)
+		* (SYNCHRO_VOLUME_CONST);
 	outputSample[1] = outputSample[0];
 }
 
@@ -117,20 +126,32 @@ SynchroSynth::SynchroSynth(InstrumentTrack * instrument_track) :
 	modulatorChanged();
 	generalChanged();
 
-	connect(&m_carrierDetune, SIGNAL(dataChanged()), this, SLOT(carrierChanged()));
-	connect(&m_carrierDrive, SIGNAL(dataChanged()), this, SLOT(carrierChanged()));
-	connect(&m_carrierSync, SIGNAL(dataChanged()), this, SLOT(carrierChanged()));
-	connect(&m_carrierChop, SIGNAL(dataChanged()), this, SLOT(carrierChanged()));
+	connect(&m_carrierDetune, SIGNAL(dataChanged()), this,
+		SLOT(carrierChanged()));
+	connect(&m_carrierDrive, SIGNAL(dataChanged()), this,
+		SLOT(carrierChanged()));
+	connect(&m_carrierSync, SIGNAL(dataChanged()), this,
+		SLOT(carrierChanged()));
+	connect(&m_carrierChop, SIGNAL(dataChanged()), this,
+		SLOT(carrierChanged()));
 
-	connect(&m_modulatorDetune, SIGNAL(dataChanged()), this, SLOT(modulatorChanged()));
-	connect(&m_modulatorDrive, SIGNAL(dataChanged()), this, SLOT(modulatorChanged()));
-	connect(&m_modulatorSync, SIGNAL(dataChanged()), this, SLOT(modulatorChanged()));
-	connect(&m_modulatorChop, SIGNAL(dataChanged()), this, SLOT(modulatorChanged()));
-	connect(&m_harmonics, SIGNAL(dataChanged()), this, SLOT(modulatorChanged()));
+	connect(&m_modulatorDetune, SIGNAL(dataChanged()), this,
+		SLOT(modulatorChanged()));
+	connect(&m_modulatorDrive, SIGNAL(dataChanged()), this,
+		SLOT(modulatorChanged()));
+	connect(&m_modulatorSync, SIGNAL(dataChanged()), this,
+		SLOT(modulatorChanged()));
+	connect(&m_modulatorChop, SIGNAL(dataChanged()), this,
+		SLOT(modulatorChanged()));
+	connect(&m_harmonics, SIGNAL(dataChanged()), this,
+		SLOT(modulatorChanged()));
 
-	connect(&m_harmonics, SIGNAL(dataChanged()), this, SLOT(generalChanged()));
-	connect(&m_modulation, SIGNAL(dataChanged()), this, SLOT(generalChanged()));
-	connect(&m_modulationStrength, SIGNAL(dataChanged()), this, SLOT(generalChanged()));
+	connect(&m_harmonics, SIGNAL(dataChanged()), this,
+		SLOT(generalChanged()));
+	connect(&m_modulation, SIGNAL(dataChanged()), this,
+		SLOT(generalChanged()));
+	connect(&m_modulationStrength, SIGNAL(dataChanged()), this,
+		SLOT(generalChanged()));
 }
 
 SynchroSynth::~SynchroSynth()
@@ -190,20 +211,29 @@ void SynchroSynth::playNote(NotePlayHandle * n, sampleFrame * working_buffer)
 	{
 		sampleFrame outputSample = {0, 0};
 		sampleFrame tempSample = {0, 0};
-		SynchroOscillatorSettings carrier = { m_carrierDetune.value(), m_carrierDrive.value(), m_carrierSync.value(), m_carrierChop.value() };
-		SynchroOscillatorSettings modulator = { m_modulatorDetune.value(), m_modulatorDrive.value(), m_modulatorSync.value(), m_modulatorChop.value() };
-		
+		SynchroOscillatorSettings carrier = { m_carrierDetune.value(),
+			m_carrierDrive.value(), m_carrierSync.value(),
+			m_carrierChop.value() };
+		SynchroOscillatorSettings modulator = { m_modulatorDetune.value(),
+			m_modulatorDrive.value(), m_modulatorSync.value(),
+			m_modulatorChop.value() };
+
 		//Oversampling using linear interpolation
 		for (int i = 0; i < SYNCHRO_OVERSAMPLE; ++i)
 		{
-			ps->nextStringSample(tempSample, Engine::mixer()->processingSampleRate() * SYNCHRO_OVERSAMPLE, m_modulationStrength.value(), m_modulation.value(), m_harmonics.value(), carrier, modulator);
+			ps->nextStringSample(tempSample,
+				Engine::mixer()->processingSampleRate()
+				* SYNCHRO_OVERSAMPLE, m_modulationStrength.value(),
+				m_modulation.value(),m_harmonics.value(), carrier,
+				modulator);
 			outputSample[0] += tempSample[0];
 			outputSample[1] += tempSample[1];
 		}
-		
+
 		for(ch_cnt_t chnl = 0; chnl < DEFAULT_CHANNELS; ++chnl)
 		{
-			working_buffer[frame][chnl] = outputSample[chnl] / SYNCHRO_OVERSAMPLE;
+			working_buffer[frame][chnl] = outputSample[chnl]
+				/ SYNCHRO_OVERSAMPLE;
 		}
 	}
 	applyRelease(working_buffer, n);
@@ -225,7 +255,9 @@ void SynchroSynth::carrierChanged()
 	for (int i = 0; i < SYNCHRO_GRAPH_SAMPLES; ++i)
 	{
 		float phase = (float)i / (float)SYNCHRO_GRAPH_SAMPLES;
-		m_carrierView.setSampleAt(i, SynchroWaveform(phase * F_2PI, m_carrierDrive.value(), m_carrierSync.value(), m_carrierChop.value(), 0));
+		m_carrierView.setSampleAt(i, SynchroWaveform(phase * F_2PI,
+			m_carrierDrive.value(), m_carrierSync.value(),
+			m_carrierChop.value(), 0));
 	}
 	generalChanged();
 }
@@ -235,7 +267,9 @@ void SynchroSynth::modulatorChanged()
 	for (int i = 0; i < SYNCHRO_GRAPH_SAMPLES; ++i)
 	{
 		float phase = (float)i / (float)SYNCHRO_GRAPH_SAMPLES;
-		m_modulatorView.setSampleAt(i, SynchroWaveform(phase * F_2PI, m_modulatorDrive.value(), m_modulatorSync.value(), m_modulatorChop.value(), m_harmonics.value()));
+		m_modulatorView.setSampleAt(i, SynchroWaveform(phase * F_2PI,
+			m_modulatorDrive.value(), m_modulatorSync.value(),
+			m_modulatorChop.value(), m_harmonics.value()));
 	}
 	generalChanged();
 }
@@ -248,9 +282,14 @@ void SynchroSynth::generalChanged()
 		float pitchDifference = powf(2, octaveDiff);
 		float phase = (float)i / (float)SYNCHRO_GRAPH_SAMPLES * F_2PI;
 		while (phase >= F_2PI) { phase -= F_2PI; }
-		float phaseMod = SynchroWaveform(phase, m_modulatorDrive.value(), m_modulatorSync.value(), m_modulatorChop.value(), m_harmonics.value()) * m_modulationStrength.value() * m_modulation.value() * SYNCHRO_PM_CONST;
+		float phaseMod = SynchroWaveform(phase, m_modulatorDrive.value(),
+			m_modulatorSync.value(), m_modulatorChop.value(),
+			m_harmonics.value()) * m_modulationStrength.value()
+			* m_modulation.value() * SYNCHRO_PM_CONST;
 		while (phase >= F_2PI) { phase -= F_2PI; } //This is neccessary; SynchroWaveform goes nuts when the domain goes past 2PI
-		m_resultView.setSampleAt(i, SynchroWaveform(phase + phaseMod * pitchDifference, m_carrierDrive.value(), m_carrierSync.value(), m_carrierChop.value(), 0));
+		m_resultView.setSampleAt(i, SynchroWaveform(phase + phaseMod *
+			pitchDifference, m_carrierDrive.value(), m_carrierSync.value(),
+			m_carrierChop.value(), 0));
 	}
 }
 
