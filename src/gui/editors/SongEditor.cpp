@@ -569,8 +569,8 @@ void SongEditor::wheelEvent( QWheelEvent * we )
 		auto cur_pos = m_leftRightScroll->value();
 		auto new_pos = cur_pos - we->angleDelta().y() / 30;
 		// If we are already at the limits of scrolling value, check if the new
-		// position is less/greater than min/max in order to propagate the
-		// wheelEvent to the parent widget
+		// position is less/greater than min/max in order to allow the parent
+		// to process the wheelEvent
 		if (
 			(cur_pos == m_leftRightScroll->minimum() && new_pos < m_leftRightScroll->minimum())
 			|| (cur_pos == m_leftRightScroll->maximum() && new_pos > m_leftRightScroll->maximum())
