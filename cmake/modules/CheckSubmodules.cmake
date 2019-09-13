@@ -117,18 +117,23 @@ MACRO(GIT_SUBMODULE SUBMODULE_PATH FORCE_DEINIT FORCE_REMOTE FULL_CLONE)
 		GIT_SUBMODULE(${SUBMODULE_PATH} false false ${FULL_CLONE_FLAG})
 	ELSE()
 		# Try to use the depth switch
-		IF(FULL_CLONE_FLAG)
+		IF(GIT_VERSION_STRING VERSION_GREATER "1.8.3")
+			# Shallow submodules were introduced in 1.8.4
+			# Shallow commits can fail to clone from non-default branches, only try once
+			MESSAGE("--   Fetching ${SUBMODULE_PATH}")
+			SET(USE_DEPTH "")
+		ELSEIF(FULL_CLONE_FLAG)
 			# Depth doesn't revert easily... It should be "--no-recommend-shallow"
 			# but it's ignored by nested submodules, use the highest value instead.
 			MESSAGE("--   Fetching ${SUBMODULE_PATH}")
-			SET(USE_DEPTH "2147483647")
+			SET(USE_DEPTH "--depth 2147483647")
 		ELSE()
 			MESSAGE("--   Fetching ${SUBMODULE_PATH} @ --depth ${DEPTH_VALUE}")
-			SET(USE_DEPTH "${DEPTH_VALUE}")
+			SET(USE_DEPTH "--depth ${DEPTH_VALUE}")
 		ENDIF()
 		
 		EXECUTE_PROCESS(
-			COMMAND ${GIT_EXECUTABLE} submodule update --init --recursive --depth ${USE_DEPTH} ${CMAKE_SOURCE_DIR}/${SUBMODULE_PATH}
+			COMMAND ${GIT_EXECUTABLE} submodule update --init --recursive ${USE_DEPTH} ${CMAKE_SOURCE_DIR}/${SUBMODULE_PATH}
 			WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
 			RESULT_VARIABLE GIT_RESULT
 			OUTPUT_VARIABLE GIT_STDOUT
@@ -184,10 +189,7 @@ FOREACH(_submodule ${SUBMODULE_LIST})
 					BREAK()
 				ELSEIF("${GIT_MESSAGE}" MATCHES "${_phrase}")
 					MESSAGE("--   Retrying ${_submodule} using 'deinit' (attempt ${COUNTED} of ${MAX_ATTEMPTS})...")
-
-					# Shallow submodules were introduced in 1.8.4
-					# Shallow commits can fail to clone from non-default branches, only try once
-					IF(GIT_VERSION_STRING VERSION_GREATER "1.8.3" AND COUNTED LESS 2)
+					IF(COUNTED LESS 2)
 						SET(FULL_CLONE false)
 					ELSE()
 						SET(FULL_CLONE true)
