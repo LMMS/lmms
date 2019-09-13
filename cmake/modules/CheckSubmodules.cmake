@@ -117,10 +117,15 @@ MACRO(GIT_SUBMODULE SUBMODULE_PATH FORCE_DEINIT FORCE_REMOTE)
 	ELSE()
 		# Try to use the depth switch
 		SET(DEPTH_CMD "")
-			MESSAGE("--   Fetching ${SUBMODULE_PATH}")
 		IF(DEPTH_VALUE)
-			SET(DEPTH_CMD "--depth" )
+			SET(DEPTH_CMD "--depth")
 			MESSAGE("--   Fetching ${SUBMODULE_PATH} @ --depth ${DEPTH_VALUE}")
+		ELSE()
+			# Depth doesn't revert easily... It should be "--no-recommend-shallow"
+			# but it's ignored by nested submodules, use the highest value instead.
+			MESSAGE("--   Fetching ${SUBMODULE_PATH}")
+			SET(DEPTH_CMD "--depth")
+			SET(DEPTH_VALUE "2147483647")
 		ENDIF()
 		
 		EXECUTE_PROCESS(
@@ -171,7 +176,7 @@ FOREACH(_submodule ${SUBMODULE_LIST})
 				ENDIF()
 			ENDFOREACH()
 			FOREACH(_phrase ${RETRY_PHRASES})
-				IF(${MISSING_COMMIT})
+				IF(${MISSING_COMMIT} AND COUNTED LESS 2)
 					LIST(FIND SUBMODULE_LIST ${_submodule} SUBMODULE_INDEX)
 					LIST(GET SUBMODULE_URL_LIST ${SUBMODULE_INDEX} SUBMODULE_URL)
 					MESSAGE("--   Retrying ${_submodule} using 'remote add submodulefix' (attempt ${COUNTED} of ${MAX_ATTEMPTS})...")
@@ -188,7 +193,7 @@ FOREACH(_submodule ${SUBMODULE_LIST})
 					ELSE()
 						UNSET(DEPTH_VALUE)
 					ENDIF()
-					
+
 					GIT_SUBMODULE(${_submodule} true false)
 					BREAK()
 				ENDIF()
