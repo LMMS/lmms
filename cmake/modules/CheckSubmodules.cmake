@@ -116,20 +116,17 @@ MACRO(GIT_SUBMODULE SUBMODULE_PATH FORCE_DEINIT FORCE_REMOTE)
 		GIT_SUBMODULE(${SUBMODULE_PATH} false false)
 	ELSE()
 		# Try to use the depth switch
-		SET(DEPTH_CMD "")
 		IF(DEPTH_VALUE)
-			SET(DEPTH_CMD "--depth")
 			MESSAGE("--   Fetching ${SUBMODULE_PATH} @ --depth ${DEPTH_VALUE}")
 		ELSE()
 			# Depth doesn't revert easily... It should be "--no-recommend-shallow"
 			# but it's ignored by nested submodules, use the highest value instead.
 			MESSAGE("--   Fetching ${SUBMODULE_PATH}")
-			SET(DEPTH_CMD "--depth")
 			SET(DEPTH_VALUE "2147483647")
 		ENDIF()
 		
 		EXECUTE_PROCESS(
-			COMMAND ${GIT_EXECUTABLE} submodule update --init --recursive ${DEPTH_CMD} ${DEPTH_VALUE} ${CMAKE_SOURCE_DIR}/${SUBMODULE_PATH}
+			COMMAND ${GIT_EXECUTABLE} submodule update --init --recursive --depth ${DEPTH_VALUE} ${CMAKE_SOURCE_DIR}/${SUBMODULE_PATH}
 			WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
 			RESULT_VARIABLE GIT_RESULT
 			OUTPUT_VARIABLE GIT_STDOUT
@@ -193,7 +190,7 @@ FOREACH(_submodule ${SUBMODULE_LIST})
 					ELSE()
 						UNSET(DEPTH_VALUE)
 					ENDIF()
-
+					
 					GIT_SUBMODULE(${_submodule} true false)
 					BREAK()
 				ENDIF()
