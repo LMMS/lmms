@@ -94,6 +94,7 @@ MACRO(GIT_SUBMODULE SUBMODULE_PATH FORCE_DEINIT FORCE_REMOTE FULL_CLONE)
 	FIND_PACKAGE(Git REQUIRED)
 	# Handle missing commits
 	SET(FORCE_REMOTE_FLAG "${FORCE_REMOTE}")
+	SET(FULL_CLONE_FLAG "${FULL_CLONE}")
 	IF(FORCE_REMOTE_FLAG)
 		MESSAGE("--   Adding remote submodulefix to ${SUBMODULE_PATH}")
 		EXECUTE_PROCESS(
@@ -104,7 +105,7 @@ MACRO(GIT_SUBMODULE SUBMODULE_PATH FORCE_DEINIT FORCE_REMOTE FULL_CLONE)
 			OUTPUT_QUIET ERROR_QUIET
 		)
 		# Recurse
-		GIT_SUBMODULE(${SUBMODULE_PATH} false false ${FULL_CLONE})
+		GIT_SUBMODULE(${SUBMODULE_PATH} false false ${FULL_CLONE_FLAG})
 	ELSEIF(${FORCE_DEINIT})
 		MESSAGE("--   Resetting ${SUBMODULE_PATH}")
 		EXECUTE_PROCESS(
@@ -113,10 +114,10 @@ MACRO(GIT_SUBMODULE SUBMODULE_PATH FORCE_DEINIT FORCE_REMOTE FULL_CLONE)
 			OUTPUT_QUIET
 		)
 		# Recurse
-		GIT_SUBMODULE(${SUBMODULE_PATH} false false ${FULL_CLONE})
+		GIT_SUBMODULE(${SUBMODULE_PATH} false false ${FULL_CLONE_FLAG})
 	ELSE()
 		# Try to use the depth switch
-		IF(FULL_CLONE)
+		IF(FULL_CLONE_FLAG)
 			# Depth doesn't revert easily... It should be "--no-recommend-shallow"
 			# but it's ignored by nested submodules, use the highest value instead.
 			MESSAGE("--   Fetching ${SUBMODULE_PATH}")
