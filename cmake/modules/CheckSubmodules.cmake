@@ -117,22 +117,25 @@ MACRO(GIT_SUBMODULE SUBMODULE_PATH FORCE_DEINIT FORCE_REMOTE FULL_CLONE)
 		GIT_SUBMODULE(${SUBMODULE_PATH} false false ${FULL_CLONE_FLAG})
 	ELSE()
 		# Try to use the depth switch
-		IF(NGIT_VERSION_STRING VERSION_LESS "1.8.4")
+		IF(GIT_VERSION_STRING VERSION_LESS "1.8.4")
 			# Shallow submodules were introduced in 1.8.4
 			MESSAGE("--   Fetching ${SUBMODULE_PATH}")
-			SET(USE_DEPTH "")
+			SET(DEPTH_CMD "")
+			SET(DEPTH_VAL "")
 		ELSEIF(FULL_CLONE_FLAG)
 			# Depth doesn't revert easily... It should be "--no-recommend-shallow"
 			# but it's ignored by nested submodules, use the highest value instead.
 			MESSAGE("--   Fetching ${SUBMODULE_PATH}")
-			SET(USE_DEPTH "--depth 2147483647")
+			SET(DEPTH_CMD "--depth")
+			SET(DEPTH_VAL "2147483647")
 		ELSE()
 			MESSAGE("--   Fetching ${SUBMODULE_PATH} @ --depth ${DEPTH_VALUE}")
-			SET(USE_DEPTH "--depth ${DEPTH_VALUE}")
+			SET(DEPTH_CMD "--depth")
+			SET(DEPTH_VAL "${DEPTH_VALUE}")
 		ENDIF()
 		
 		EXECUTE_PROCESS(
-			COMMAND ${GIT_EXECUTABLE} submodule update --init --recursive ${USE_DEPTH} ${CMAKE_SOURCE_DIR}/${SUBMODULE_PATH}
+			COMMAND ${GIT_EXECUTABLE} submodule update --init --recursive ${DEPTH_CMD} ${DEPTH_VAL} ${CMAKE_SOURCE_DIR}/${SUBMODULE_PATH}
 			WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
 			RESULT_VARIABLE GIT_RESULT
 			OUTPUT_VARIABLE GIT_STDOUT
