@@ -117,9 +117,8 @@ MACRO(GIT_SUBMODULE SUBMODULE_PATH FORCE_DEINIT FORCE_REMOTE FULL_CLONE)
 		GIT_SUBMODULE(${SUBMODULE_PATH} false false ${FULL_CLONE_FLAG})
 	ELSE()
 		# Try to use the depth switch
-		IF(GIT_VERSION_STRING VERSION_GREATER "1.8.3")
+		IF(NGIT_VERSION_STRING VERSION_LESS "1.8.4")
 			# Shallow submodules were introduced in 1.8.4
-			# Shallow commits can fail to clone from non-default branches, only try once
 			MESSAGE("--   Fetching ${SUBMODULE_PATH}")
 			SET(USE_DEPTH "")
 		ELSEIF(FULL_CLONE_FLAG)
