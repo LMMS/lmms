@@ -90,7 +90,7 @@ ENDFOREACH()
 
 # Once called, status is stored in GIT_RESULT respectively.
 # Note: Git likes to write to stderr.  Don't assume stderr is error; Check GIT_RESULT instead.
-MACRO(GIT_SUBMODULE SUBMODULE_PATH FORCE_DEINIT FORCE_REMOTE)
+MACRO(GIT_SUBMODULE SUBMODULE_PATH FORCE_DEINIT FORCE_REMOTE FULL_CLONE)
 	FIND_PACKAGE(Git REQUIRED)
 	# Handle missing commits
 	SET(FORCE_REMOTE_FLAG "${FORCE_REMOTE}")
@@ -104,7 +104,7 @@ MACRO(GIT_SUBMODULE SUBMODULE_PATH FORCE_DEINIT FORCE_REMOTE)
 			OUTPUT_QUIET ERROR_QUIET
 		)
 		# Recurse
-		GIT_SUBMODULE(${SUBMODULE_PATH} false false)
+		GIT_SUBMODULE(${SUBMODULE_PATH} false false ${FULL_CLONE})
 	ELSEIF(${FORCE_DEINIT})
 		MESSAGE("--   Resetting ${SUBMODULE_PATH}")
 		EXECUTE_PROCESS(
@@ -113,20 +113,21 @@ MACRO(GIT_SUBMODULE SUBMODULE_PATH FORCE_DEINIT FORCE_REMOTE)
 			OUTPUT_QUIET
 		)
 		# Recurse
-		GIT_SUBMODULE(${SUBMODULE_PATH} false false)
+		GIT_SUBMODULE(${SUBMODULE_PATH} false false ${FULL_CLONE})
 	ELSE()
 		# Try to use the depth switch
-		IF(DEPTH_VALUE)
-			MESSAGE("--   Fetching ${SUBMODULE_PATH} @ --depth ${DEPTH_VALUE}")
-		ELSE()
+		IF(FULL_CLONE)
 			# Depth doesn't revert easily... It should be "--no-recommend-shallow"
 			# but it's ignored by nested submodules, use the highest value instead.
 			MESSAGE("--   Fetching ${SUBMODULE_PATH}")
-			SET(DEPTH_VALUE "2147483647")
+			SET(USE_DEPTH "2147483647")
+		ELSE()
+			MESSAGE("--   Fetching ${SUBMODULE_PATH} @ --depth ${DEPTH_VALUE}")
+			SET(USE_DEPTH "${DEPTH_VALUE}")
 		ENDIF()
 		
 		EXECUTE_PROCESS(
-			COMMAND ${GIT_EXECUTABLE} submodule update --init --recursive --depth ${DEPTH_VALUE} ${CMAKE_SOURCE_DIR}/${SUBMODULE_PATH}
+			COMMAND ${GIT_EXECUTABLE} submodule update --init --recursive --depth ${USE_DEPTH} ${CMAKE_SOURCE_DIR}/${SUBMODULE_PATH}
 			WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
 			RESULT_VARIABLE GIT_RESULT
 			OUTPUT_VARIABLE GIT_STDOUT
@@ -157,7 +158,7 @@ FOREACH(_submodule ${SUBMODULE_LIST})
 		ENDIF()
 	ENDFOREACH()
 	IF(NOT CRUMB_FOUND)
-		GIT_SUBMODULE(${_submodule} false false)
+		GIT_SUBMODULE(${_submodule} false false false)
 
 		SET(COUNTED 0)
 		SET(COUNTING "")
@@ -178,7 +179,7 @@ FOREACH(_submodule ${SUBMODULE_LIST})
 					LIST(GET SUBMODULE_URL_LIST ${SUBMODULE_INDEX} SUBMODULE_URL)
 					MESSAGE("--   Retrying ${_submodule} using 'remote add submodulefix' (attempt ${COUNTED} of ${MAX_ATTEMPTS})...")
 					
-					GIT_SUBMODULE(${_submodule} false "${SUBMODULE_URL}")
+					GIT_SUBMODULE(${_submodule} false "${SUBMODULE_URL}" false)
 					BREAK()
 				ELSEIF("${GIT_MESSAGE}" MATCHES "${_phrase}")
 					MESSAGE("--   Retrying ${_submodule} using 'deinit' (attempt ${COUNTED} of ${MAX_ATTEMPTS})...")
@@ -186,12 +187,12 @@ FOREACH(_submodule ${SUBMODULE_LIST})
 					# Shallow submodules were introduced in 1.8.4
 					# Shallow commits can fail to clone from non-default branches, only try once
 					IF(GIT_VERSION_STRING VERSION_GREATER "1.8.3" AND COUNTED LESS 2)
-						# Try a shallow submodule clone
+						SET(FULL_CLONE false)
 					ELSE()
-						UNSET(DEPTH_VALUE)
+						SET(FULL_CLONE true)
 					ENDIF()
 					
-					GIT_SUBMODULE(${_submodule} true false)
+					GIT_SUBMODULE(${_submodule} true false ${FULL_CLONE})
 					BREAK()
 				ENDIF()
 			ENDFOREACH()
