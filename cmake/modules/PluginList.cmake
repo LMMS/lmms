@@ -87,6 +87,7 @@ MACRO(LIST_ALL_PLUGINS)
 	MESSAGE(FATAL_ERROR "Information was requested, aborting build!")
 ENDMACRO()
 
+OPTION(LIST_PLUGINS "Lists the available plugins for building" OFF)
 IF(LIST_PLUGINS)
 	UNSET(LIST_PLUGINS CACHE)
 	LIST_ALL_PLUGINS()
