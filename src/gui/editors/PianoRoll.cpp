@@ -537,7 +537,10 @@ void PianoRoll::markSemiTone( int i )
 				for (int ix = 0; ix < aok.size(); ++ix)
 				{
 					i = qFind(m_markedSemiTones.begin(), m_markedSemiTones.end(), aok.at(ix));
-					m_markedSemiTones.erase(i);
+					if (i != m_markedSemiTones.end())
+					{
+						m_markedSemiTones.erase(i);
+					}
 				}
 			}
 			else
