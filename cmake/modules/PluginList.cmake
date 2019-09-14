@@ -20,56 +20,77 @@ IF(LMMS_MINIMAL)
 	SET(PLUGIN_LIST ${MINIMAL_LIST} ${PLUGIN_LIST})
 ENDIF()
 
-IF("${PLUGIN_LIST}" STREQUAL "")
-	SET(PLUGIN_LIST
-		${MINIMAL_LIST}
-		Amplifier
-		BassBooster
-		bit_invader
-		Bitcrush
-		carlabase
-		carlapatchbay
-		carlarack
-		CrossoverEQ
-		Delay
-		DualFilter
-		dynamics_processor
-		Eq
-		Flanger
-		HydrogenImport
-		ladspa_browser
-		LadspaEffect
-		lb302
-		MidiImport
-		MidiExport
-		MultitapEcho
-		monstro
-		nes
-		OpulenZ
-		organic
-		FreeBoy
-		patman
-		peak_controller_effect
-		GigPlayer
-		ReverbSC
-		sf2_player
-		sfxr
-		sid
-		SpectrumAnalyzer
-		stereo_enhancer
-		stereo_matrix
-		stk
-		vst_base
-		vestige
-		VstEffect
-		watsyn
-		waveshaper
-		vibed
-		Xpressive
-		zynaddsubfx
-	)
+SET(LMMS_PLUGIN_LIST
+	${MINIMAL_LIST}
+	Amplifier
+	BassBooster
+	bit_invader
+	Bitcrush
+	carlabase
+	carlapatchbay
+	carlarack
+	CrossoverEQ
+	Delay
+	DualFilter
+	dynamics_processor
+	Eq
+	Flanger
+	HydrogenImport
+	ladspa_browser
+	LadspaEffect
+	lb302
+	MidiImport
+	MidiExport
+	MultitapEcho
+	monstro
+	nes
+	OpulenZ
+	organic
+	FreeBoy
+	patman
+	peak_controller_effect
+	GigPlayer
+	ReverbSC
+	sf2_player
+	sfxr
+	sid
+	SpectrumAnalyzer
+	stereo_enhancer
+	stereo_matrix
+	stk
+	vst_base
+	vestige
+	VstEffect
+	watsyn
+	waveshaper
+	vibed
+	Xpressive
+	zynaddsubfx
+)
 
-ENDIF("${PLUGIN_LIST}" STREQUAL "")
+IF("${PLUGIN_LIST}" STREQUAL "")
+	SET(PLUGIN_LIST ${LMMS_PLUGIN_LIST})
+ENDIF()
+
+MACRO(LIST_ALL_PLUGINS)
+	MESSAGE("\n\nAll possible -DPLUGIN_LIST values")
+	MESSAGE("\n   KEYWORD:")
+	MESSAGE("      LMMS_MINIMAL")
+	FOREACH(item IN LISTS MINIMAL_LIST)
+		MESSAGE("         ${item}")
+	ENDFOREACH()
+	MESSAGE("\n   NAME:")
+	FOREACH(item IN LISTS LMMS_PLUGIN_LIST)
+		MESSAGE("      ${item}")
+	ENDFOREACH()
+	MESSAGE("\nNote:  This value also impacts the fetching of git submodules.\n")
+	MESSAGE(FATAL_ERROR "Information was requested, aborting build!")
+ENDMACRO()
+
+IF(LIST_PLUGINS)
+	UNSET(LIST_PLUGINS CACHE)
+	LIST_ALL_PLUGINS()
+ENDIF()
 
 IF(MSVC)
 	SET(MSVC_INCOMPATIBLE_PLUGINS

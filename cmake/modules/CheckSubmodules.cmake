@@ -27,7 +27,7 @@ SET(DEPTH_VALUE 100)
 # Number of times git commands will retry before failing
 SET(MAX_ATTEMPTS 2)
 
-MESSAGE("\nValidating submodules...")
+MESSAGE("\nChecking submodules...")
 IF(NOT EXISTS "${CMAKE_SOURCE_DIR}/.gitmodules")
 	MESSAGE("Skipping the check because .gitmodules not detected."
 		"Please make sure you have all submodules in the source tree!"
@@ -46,6 +46,7 @@ SET(ENV{LANG} "en_US")
 STRING(REGEX MATCHALL "path = [-0-9A-Za-z/]+" SUBMODULE_LIST ${SUBMODULE_DATA})
 STRING(REGEX MATCHALL "url = [.:%-0-9A-Za-z/]+" SUBMODULE_URL_LIST ${SUBMODULE_DATA})
 
+SET(SKIP_COUNT 0)
 FOREACH(_part ${SUBMODULE_LIST})
 	STRING(REPLACE "path = " "" SUBMODULE_PATH ${_part})
 
@@ -59,6 +60,9 @@ FOREACH(_part ${SUBMODULE_LIST})
 	IF(${SUBMODULE_PATH} MATCHES "^plugins/")
 		SET(REMOVE_PLUGIN true)
 		FOREACH(_plugin ${PLUGIN_LIST})
+			IF(_plugin STREQUAL "")
+				CONTINUE()
+			ENDIF()
 			IF(${SUBMODULE_PATH} MATCHES "${_plugin}")
 				SET(REMOVE_PLUGIN false)
 			ENDIF()
@@ -76,6 +80,8 @@ FOREACH(_part ${SUBMODULE_LIST})
 			IF(${SUBMODULE_PATH} MATCHES ${_skip})
 				MESSAGE("-- Skipping ${SUBMODULE_PATH} matches \"${_skip}\" ${SKIP_REASON}")
 				SET(SKIP true)
+				MATH(EXPR SKIP_COUNT "${SKIP_COUNT}+1")
+				BREAK()
 			ENDIF()
 		ENDFOREACH()
 	ENDIF()
@@ -87,6 +93,33 @@ FOREACH(_part ${SUBMODULE_LIST})
 	LIST(REMOVE_ITEM SUBMODULE_URL_LIST ${_url})
 ENDFOREACH()
 
+# Count provided values
+SET(SKIP_SUBMODULES_LENGTH 0)
+FOREACH(_skip ${SKIP_SUBMODULES})
+	MATH(EXPR SKIP_SUBMODULES_LENGTH "${SKIP_SUBMODULES_LENGTH}+1")
+ENDFOREACH()
+
+# Abort if skip count differs from provided values
+IF(NOT SKIP_SUBMODULES_LENGTH EQUAL SKIP_COUNT)
+	SET(FATAL_MSG "One or more submodule(s) \"${SKIP_SUBMODULES}\" was not found, aborting.\
+\nFor a list of supported values try -DLIST_SUBMODULES=True\n")
+	UNSET(SKIP_SUBMODULES CACHE)
+	MESSAGE(FATAL_ERROR "${FATAL_MSG}")
+ENDIF()
+
+IF(LIST_SUBMODULES)
+	UNSET(LIST_SUBMODULES CACHE)
+	MESSAGE("\nAll possible -DSKIP_SUBMODULES values")
+	FOREACH(item IN LISTS SUBMODULE_LIST)
+		MESSAGE("   ${item}")
+	ENDFOREACH()
+	MESSAGE(
+		"\n"
+		"NOTE: A simple and more effective way to skip submodules is via -DPLUGIN_LIST.\n\n"
+		"See also -DLIST_PLUGINS=True for a complete list.\n"
+	)
+	MESSAGE(FATAL_ERROR "Information was requested, aborting build!")
+ENDIF()
 
 # Once called, status is stored in GIT_RESULT respectively.
 # Note: Git likes to write to stderr.  Don't assume stderr is error; Check GIT_RESULT instead.
