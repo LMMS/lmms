@@ -70,8 +70,6 @@ SaProcessor::SaProcessor(SaControls *controls) :
 	m_waterfallHeight = 100;	// a small safe value
 	m_history_work.resize(waterfallWidth() * m_waterfallHeight * sizeof qRgb(0,0,0), 0);
 	m_history.resize(waterfallWidth() * m_waterfallHeight * sizeof qRgb(0,0,0), 0);
-
-	clear();
 }
 
 
@@ -289,12 +287,16 @@ void SaProcessor::analyse(ringbuffer_t<sampleFrame> &ring_buffer, QWaitCondition
 				}
 				// clean up before checking for more data from input buffer
 				const unsigned int overlaps = m_controls->m_windowOverlapModel.value();
-				if (overlaps == 1)			// each sample used only once
+				if (overlaps == 1)	// Discard buffer, each sample used only once
 				{
 					m_framesFilledUp = 0;
 				}
 				else
 				{
+					// Drop only a part of the buffer from the beginning, so that new
+					// data can be added to the end. This means the older samples will
+					// be analyzed again, but in a different position in the window,
+					// making short transient signals show up better in the waterfall.
 					const unsigned int drop = m_inBlockSize / overlaps;
 					std::move(m_bufferL.begin() + drop, m_bufferL.end(), m_bufferL.begin());
 					std::move(m_bufferR.begin() + drop, m_bufferR.end(), m_bufferR.begin());
@@ -456,8 +458,12 @@ void SaProcessor::rebuildWindow()
 // Note: may take a few milliseconds, do not call in a loop!
 void SaProcessor::clear()
 {
+	const unsigned int overlaps = m_controls->m_windowOverlapModel.value();
 	QMutexLocker lock(&m_dataAccess);
-	m_framesFilledUp = 0;
+	// If there is any window overlap, leave space only for the new samples
+	// and treat the rest at initialized with zeros. Prevents missing
+	// transients at the start of the very first block.
+	m_framesFilledUp = m_inBlockSize - m_inBlockSize / overlaps;
 	std::fill(m_bufferL.begin(), m_bufferL.end(), 0);
 	std::fill(m_bufferR.begin(), m_bufferR.end(), 0);
 	std::fill(m_filteredBufferL.begin(), m_filteredBufferL.end(), 0);
