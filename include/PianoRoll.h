@@ -195,12 +195,13 @@ protected slots:
 	void zoomingYChanged();
 	void quantizeChanged();
 	void noteLengthChanged();
+	void keyChanged();
 	void quantizeNotes();
 
 	void updateSemiToneMarkerMenu();
 
 	void changeNoteEditMode( int i );
-	void markSemiTone( int i );
+	void markSemiTone(int i, bool fromMenu = true);
 
 	void hidePattern( Pattern* pattern );
 
@@ -311,6 +312,7 @@ private:
 	ComboBoxModel m_zoomingYModel;
 	ComboBoxModel m_quantizeModel;
 	ComboBoxModel m_noteLenModel;
+	ComboBoxModel m_keyModel;
 	ComboBoxModel m_scaleModel;
 	ComboBoxModel m_chordModel;
 
@@ -507,6 +509,7 @@ private:
 	ComboBox * m_zoomingYComboBox;
 	ComboBox * m_quantizeComboBox;
 	ComboBox * m_noteLenComboBox;
+	ComboBox * m_keyComboBox;
 	ComboBox * m_scaleComboBox;
 	ComboBox * m_chordComboBox;
 	QPushButton * m_clearGhostButton;
