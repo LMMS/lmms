@@ -2,6 +2,7 @@
 SET(PLUGIN_LIST "" CACHE STRING "List of plug-ins to build")
 STRING(REPLACE " " ";" PLUGIN_LIST "${PLUGIN_LIST}")
 OPTION(LMMS_MINIMAL "Build a minimal list of plug-ins" OFF)
+OPTION(LIST_PLUGINS "Lists the available plugins for building" OFF)
 
 SET(MINIMAL_LIST
 	audio_file_processor
@@ -87,7 +88,6 @@ MACRO(LIST_ALL_PLUGINS)
 	MESSAGE(FATAL_ERROR "Information was requested, aborting build!")
 ENDMACRO()
 
-OPTION(LIST_PLUGINS "Lists the available plugins for building" OFF)
 IF(LIST_PLUGINS)
 	UNSET(LIST_PLUGINS CACHE)
 	LIST_ALL_PLUGINS()

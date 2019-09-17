@@ -21,6 +21,9 @@
 # Files which confirm a successful clone
 SET(VALID_CRUMBS "CMakeLists.txt;Makefile;Makefile.in;Makefile.am;configure.ac;configure.py;autogen.sh;.gitignore;LICENSE;Home.md")
 
+OPTION(LIST_SUBMODULES "Lists the available git submodules for automatic cloning" OFF)
+OPTION(NO_SHALLOW_CLONE "Disable shallow cloning of submodules" OFF)
+
 # Try and use the specified shallow clone on submodules, if supported
 SET(DEPTH_VALUE 100)
 
@@ -107,7 +110,6 @@ IF(NOT SKIP_SUBMODULES_LENGTH EQUAL SKIP_COUNT)
 	MESSAGE(FATAL_ERROR "${FATAL_MSG}")
 ENDIF()
 
-OPTION(LIST_SUBMODULES "Lists the available git submodules for automatic cloning" OFF)
 IF(LIST_SUBMODULES)
 	UNSET(LIST_SUBMODULES CACHE)
 	MESSAGE("\nAll possible -DSKIP_SUBMODULES values")
@@ -151,7 +153,7 @@ MACRO(GIT_SUBMODULE SUBMODULE_PATH FORCE_DEINIT FORCE_REMOTE FULL_CLONE)
 		GIT_SUBMODULE(${SUBMODULE_PATH} false false ${FULL_CLONE_FLAG})
 	ELSE()
 		# Try to use the depth switch
-		IF(GIT_VERSION_STRING VERSION_LESS "1.8.4")
+		IF(NO_SHALLOW_CLONE OR GIT_VERSION_STRING VERSION_LESS "1.8.4")
 			# Shallow submodules were introduced in 1.8.4
 			MESSAGE("--   Fetching ${SUBMODULE_PATH}")
 			SET(DEPTH_CMD "")
