@@ -134,12 +134,12 @@ static inline float tri(float x)
 //Triangle waveform with harmonic generator
 static inline float trih(float x, float harmonic)
 {
-	return tri(x) + (tri(MAGIC_HARMONICS[0][0] * x) * MAGIC_HARMONICS[0][1]
-		+ tri(MAGIC_HARMONICS[1][0] * x) * MAGIC_HARMONICS[1][1]) * harmonic;
+	return tri(x) + ((tri(MAGIC_HARMONICS[0][0] * x) * MAGIC_HARMONICS[0][1]
+		+ tri(MAGIC_HARMONICS[1][0] * x) * MAGIC_HARMONICS[1][1])) * harmonic;
 }
 
 //Waveform function for the Synchro synthesizer.
-//x: input phase in radians
+//x: input phase in radians (please keep it between 0 and 2PI)
 //drive: how much atan distortion is applied to the waveform
 //sync: hard sync with harmonic multiple
 //chop: how strong the amplitude falloff is per waveform period
@@ -147,8 +147,8 @@ static inline float trih(float x, float harmonic)
 static inline float SynchroWaveform(float x, float drive, float sync,
 	float chop, float harmonic)
 {
-	return (atan2(trih(F_PI_2 + x * sync, harmonic) * drive, 1)
-		/ atan2(drive, 1)) / powf(F_2PI / (F_2PI - x), chop);
+	return tanhf(trih(F_PI_2 + x * sync, harmonic) * drive)
+		/ powf(F_2PI / (F_2PI - x), chop);
 }
 
 static inline float DetuneCents(float pitch, float detune)
