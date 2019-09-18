@@ -90,9 +90,9 @@ private:
 	FloatModel m_modulatorDrive;
 	FloatModel m_modulatorSync;
 	FloatModel m_modulatorChop;
-	graphModel m_carrierView;
-	graphModel m_modulatorView;
-	graphModel m_resultView;
+	graphModel m_carrierGraph;
+	graphModel m_modulatorGraph;
+	graphModel m_resultGraph;
 	float m_carrierNormalize; //for later
 	float m_modulatorNormalize;
 	friend class SynchroSynthView;

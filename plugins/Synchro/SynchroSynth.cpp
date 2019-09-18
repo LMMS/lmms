@@ -119,9 +119,9 @@ SynchroSynth::SynchroSynth(InstrumentTrack * instrument_track) :
 	m_modulatorDrive(1, 1, 7, 0.01f, this, tr("modulator drive")),
 	m_modulatorSync(1, 1, 16, 0.01f, this, tr("modulator sync")),
 	m_modulatorChop(0, 0, 4, 0.01f, this, tr("modulator chop")),
-	m_carrierView(-1.0f, 1.0f, SYNCHRO_GRAPH_SAMPLES, this),
-	m_modulatorView(-1.0f, 1.0f, SYNCHRO_GRAPH_SAMPLES, this),
-	m_resultView(-1.0f, 1.0f, SYNCHRO_GRAPH_SAMPLES, this)
+	m_carrierGraph(-1.0f, 1.0f, SYNCHRO_GRAPH_SAMPLES, this),
+	m_modulatorGraph(-1.0f, 1.0f, SYNCHRO_GRAPH_SAMPLES, this),
+	m_resultGraph(-1.0f, 1.0f, SYNCHRO_GRAPH_SAMPLES, this)
 {
 	carrierChanged();
 	modulatorChanged();
@@ -256,7 +256,7 @@ void SynchroSynth::carrierChanged()
 	for (int i = 0; i < SYNCHRO_GRAPH_SAMPLES; ++i)
 	{
 		float phase = (float)i / (float)SYNCHRO_GRAPH_SAMPLES;
-		m_carrierView.setSampleAt(i, SynchroWaveform(phase * F_2PI,
+		m_carrierGraph.setSampleAt(i, SynchroWaveform(phase * F_2PI,
 			m_carrierDrive.value(), m_carrierSync.value(),
 			m_carrierChop.value(), 0));
 	}
@@ -268,7 +268,7 @@ void SynchroSynth::modulatorChanged()
 	for (int i = 0; i < SYNCHRO_GRAPH_SAMPLES; ++i)
 	{
 		float phase = (float)i / (float)SYNCHRO_GRAPH_SAMPLES;
-		m_modulatorView.setSampleAt(i, SynchroWaveform(phase * F_2PI,
+		m_modulatorGraph.setSampleAt(i, SynchroWaveform(phase * F_2PI,
 			m_modulatorDrive.value(), m_modulatorSync.value(),
 			m_modulatorChop.value(), m_harmonics.value()));
 	}
@@ -286,7 +286,7 @@ void SynchroSynth::generalChanged()
 			m_modulatorSync.value(), m_modulatorChop.value(),
 			m_harmonics.value()) * m_modulationStrength.value()
 			* m_modulation.value() * SYNCHRO_PM_CONST;
-		m_resultView.setSampleAt(i, SynchroWaveform(phase + phaseMod *
+		m_resultGraph.setSampleAt(i, SynchroWaveform(phase + phaseMod *
 			pitchDifference, m_carrierDrive.value(), m_carrierSync.value(),
 			m_carrierChop.value(), 0));
 	}
@@ -381,7 +381,7 @@ void SynchroSynthView::modelChanged()
 	m_modulatorSyncKnob->setModel(&b->m_modulatorSync);
 	m_modulatorChopKnob->setModel(&b->m_modulatorChop);
 	m_modulatorDetuneKnob->setModel(&b->m_modulatorDetune);
-	m_carrierGraph->setModel(&b->m_carrierView);
-	m_modulatorGraph->setModel(&b->m_modulatorView);
-	m_resultGraph->setModel(&b->m_resultView);
+	m_carrierGraph->setModel(&b->m_carrierGraph);
+	m_modulatorGraph->setModel(&b->m_modulatorGraph);
+	m_resultGraph->setModel(&b->m_resultGraph);
 }
