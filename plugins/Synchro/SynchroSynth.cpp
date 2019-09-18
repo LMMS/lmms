@@ -282,6 +282,7 @@ void SynchroSynth::generalChanged()
 		int octaveDiff = m_carrierDetune.value() - m_modulatorDetune.value();
 		float pitchDifference = powf(2, octaveDiff);
 		float phase = (float)i / (float)SYNCHRO_GRAPH_SAMPLES * F_2PI;
+		while (phase >= F_2PI) { phase -= F_2PI; }
 		float phaseMod = SynchroWaveform(phase, m_modulatorDrive.value(),
 			m_modulatorSync.value(), m_modulatorChop.value(),
 			m_harmonics.value()) * m_modulationStrength.value()
