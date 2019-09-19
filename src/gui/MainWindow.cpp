@@ -291,7 +291,7 @@ void MainWindow::finalize()
 					tr( "&Save" ),
 					this, SLOT( saveProject() ),
 					QKeySequence::Save );
-	project_menu->addAction( embed::getIconPixmap( "project_saveas" ),
+	project_menu->addAction( embed::getIconPixmap( "project_save" ),
 					tr( "Save &As..." ),
 					this, SLOT( saveProjectAs() ),
 					Qt::CTRL + Qt::SHIFT + Qt::Key_S );
@@ -300,8 +300,9 @@ void MainWindow::finalize()
 					this, SLOT( saveProjectAsNewVersion() ),
 					Qt::CTRL + Qt::ALT + Qt::Key_S );
 
-	project_menu->addAction( tr( "Save as default template" ),
-				     this, SLOT( saveProjectAsDefaultTemplate() ) );
+	project_menu->addAction( embed::getIconPixmap( "project_save" ),
+					tr( "Save as default template" ),
+					this, SLOT( saveProjectAsDefaultTemplate() ) );
 
 	project_menu->addSeparator();
 	project_menu->addAction( embed::getIconPixmap( "project_import" ),
