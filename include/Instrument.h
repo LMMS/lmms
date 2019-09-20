@@ -132,8 +132,8 @@ public:
 
 
 protected:
-    // fade in to prevent clicks
-    void applyFadeIn( sampleFrame * buf, const NotePlayHandle * _n );
+	// fade in to prevent clicks
+	void applyFadeIn( sampleFrame * buf, const NotePlayHandle * _n );
 
 	// instruments may use this to apply a soft fade out at the end of
 	// notes - method does this only if really less or equal

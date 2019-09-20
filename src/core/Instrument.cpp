@@ -22,11 +22,13 @@
  *
  */
 
+#include "Instrument.h"
+
 #include <cmath>
 
-#include "Instrument.h"
-#include "InstrumentTrack.h"
 #include "DummyInstrument.h"
+#include "InstrumentTrack.h"
+#include "lmms_constants.h"
 
 
 Instrument::Instrument(InstrumentTrack * _instrument_track,
@@ -81,51 +83,49 @@ bool Instrument::isFromTrack( const Track * _track ) const
 }
 
 
-void Instrument::applyFadeIn(  sampleFrame * buf, const NotePlayHandle * _n )
+void Instrument::applyFadeIn(  sampleFrame * buf, const NotePlayHandle * n )
 {
-    // apply only if it's the start of the note
-    if( _n->totalFramesPlayed() == 0 ){
-        const fpp_t frames = _n->framesLeftForCurrentPeriod();
+	// apply only if it's the start of the note
+	if (n->totalFramesPlayed() == 0)
+	{
+		const fpp_t frames = n->framesLeftForCurrentPeriod();
 
-        // zero point crossing counts of all channels
-        int zero_crossings[DEFAULT_CHANNELS] = {0};
-        // maximum zero point crossing of all channels
-        int max_zc = 0;
-        
-        // determine the zero point crossing counts
-        for( fpp_t f = 0; f < frames; ++f )
-        {
-            for( ch_cnt_t ch=0; ch < DEFAULT_CHANNELS; ++ch )
-            {
-                if( ( buf[f-1][ch] < 0.0 && buf[f][ch] > 0.0 ) ||
-                    ( buf[f-1][ch] > 0.0 && buf[f][ch] < 0.0 ) )
-                {
-                    ++zero_crossings[ch];
-                }
-            }
-        }
+		// zero point crossing counts of all channels
+		int zero_crossings[DEFAULT_CHANNELS] = {0};
+		// maximum zero point crossing of all channels
+		int max_zc = 0;
 
-        // find the biggest one
-        for( ch_cnt_t ch = 0; ch < DEFAULT_CHANNELS; ++ch )
-        {
-            if( zero_crossings[ch] > max_zc )
-            {
-                max_zc = zero_crossings[ch];
-            }
-        }
-        
-        // calculate the length of the fade in
-        fpp_t length = (fpp_t) (
-                ( (float)frames - 1 )  /
-                ( (float)max_zc / 2.0f + 1.0f ) / 3.0f );
+		// determine the zero point crossing counts
+		for ( fpp_t f = 0; f < frames; ++f )
+		{
+			for ( ch_cnt_t ch=0; ch < DEFAULT_CHANNELS; ++ch )
+			{
+				if ( ( buf[f-1][ch] < 0.0 && buf[f][ch] > 0.0 ) ||
+						( buf[f-1][ch] > 0.0 && buf[f][ch] < 0.0 ) )
+				{
+					++zero_crossings[ch];
+					if ( zero_crossings[ch] > max_zc )
+					{
+						max_zc = zero_crossings[ch];
+					}
+				}
+			}
+		}
 
-        for( fpp_t f = 0; f < length; ++f ){
-            for( ch_cnt_t ch = 0; ch < DEFAULT_CHANNELS; ++ch ){
-                // define macro for PI?
-                buf[f][ch] *= 0.5 - 0.5 * cosf(3.1415926536f * (float) f / (float) length);
-            }
-        }
-    }
+		// calculate the length of the fade in
+		fpp_t length = (fpp_t) (
+				( (float)frames - 1 )  /
+				( (float)max_zc / 2.0f + 1.0f ) / 3.0f );
+
+		// apply fade in
+		for ( fpp_t f = 0; f < length; ++f )
+		{
+			for ( ch_cnt_t ch = 0; ch < DEFAULT_CHANNELS; ++ch )
+			{
+				buf[f][ch] *= 0.5 - 0.5 * cosf(F_PI * (float) f / (float) length);
+			}
+		}
+	}
 }
 
 void Instrument::applyRelease( sampleFrame * buf, const NotePlayHandle * _n )
