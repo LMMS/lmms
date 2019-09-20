@@ -45,21 +45,30 @@ SET(LANG_BACKUP "$ENV{LANG}")
 SET(ENV{LC_ALL} "C")
 SET(ENV{LANG} "en_US")
 
-# Assume alpha-numeric paths
-STRING(REGEX MATCHALL "path = [-0-9A-Za-z/]+" SUBMODULE_LIST ${SUBMODULE_DATA})
-STRING(REGEX MATCHALL "url = [.:%-0-9A-Za-z/]+" SUBMODULE_URL_LIST ${SUBMODULE_DATA})
+# Submodule list pairs, unparsed (WARNING: Assumes alpha-numeric paths)
+STRING(REGEX MATCHALL "path = [-0-9A-Za-z/]+" SUBMODULE_LIST_RAW ${SUBMODULE_DATA})
+STRING(REGEX MATCHALL "url = [.:%-0-9A-Za-z/]+" SUBMODULE_URL_RAW ${SUBMODULE_DATA})
+
+# Submodule list pairs, parsed
+SET(SUBMODULE_LIST "")
+SET(SUBMODULE_URL "")
 
 SET(SKIP_COUNT 0)
-FOREACH(_part ${SUBMODULE_LIST})
-	STRING(REPLACE "path = " "" SUBMODULE_PATH ${_part})
+FOREACH(_path ${SUBMODULE_LIST_RAW})
+	# Parse SUBMODULE_PATH
+	STRING(REPLACE "path = " "" SUBMODULE_PATH "${_path}")
 
-	LIST(FIND SUBMODULE_LIST ${_part} SUBMODULE_INDEX)
-	LIST(GET SUBMODULE_URL_LIST ${SUBMODULE_INDEX} _url)
-	STRING(REPLACE "url = " "" SUBMODULE_URL ${_url})
+	# Grab index for matching SUBMODULE_URL
+	LIST(FIND SUBMODULE_LIST_RAW "${_path}" SUBMODULE_INDEX)
+	LIST(GET SUBMODULE_URL_RAW ${SUBMODULE_INDEX} _url)
+
+	# Parse SUBMODULE_URL
+	STRING(REPLACE "url = " "" SUBMODULE_URL "${_url}")
 
 	SET(SKIP false)
 	SET(SKIP_REASON "(via SKIP_SUBMODULES)")
-	# Remove unwanted submodules from validation by comparing against -DPLUGIN_LIST=foo;bar
+
+	# Loop over skipped plugins, add to SKIP_SUBMODULES (e.g. -DPLUGIN_LIST=foo;bar)
 	IF(${SUBMODULE_PATH} MATCHES "^plugins/")
 		SET(REMOVE_PLUGIN true)
 		FOREACH(_plugin ${PLUGIN_LIST})
@@ -73,14 +82,14 @@ FOREACH(_part ${SUBMODULE_LIST})
 
 		IF(REMOVE_PLUGIN)
 			SET(SKIP_REASON "(absent in PLUGIN_LIST)")
-			LIST(APPEND SKIP_SUBMODULES ${SUBMODULE_PATH})
+			LIST(APPEND SKIP_SUBMODULES "${SUBMODULE_PATH}")
 		ENDIF()
 	ENDIF()
 
-	# Remove submodules from validation as specified in -DSKIP_SUBMODULES=foo;bar
+	# Finally, loop and mark "SKIP" on match
 	IF(SKIP_SUBMODULES)
 		FOREACH(_skip ${SKIP_SUBMODULES})
-			IF(${SUBMODULE_PATH} MATCHES ${_skip})
+			IF("${SUBMODULE_PATH}" MATCHES "${_skip}")
 				MESSAGE("-- Skipping ${SUBMODULE_PATH} matches \"${_skip}\" ${SKIP_REASON}")
 				SET(SKIP true)
 				MATH(EXPR SKIP_COUNT "${SKIP_COUNT}+1")
@@ -88,12 +97,11 @@ FOREACH(_part ${SUBMODULE_LIST})
 			ENDIF()
 		ENDFOREACH()
 	ENDIF()
+
 	IF(NOT SKIP)
-		LIST(INSERT SUBMODULE_LIST ${SUBMODULE_INDEX} ${SUBMODULE_PATH})
-		LIST(INSERT SUBMODULE_URL_LIST ${SUBMODULE_INDEX} ${SUBMODULE_URL})
+		LIST(APPEND SUBMODULE_LIST "${SUBMODULE_PATH}")
+		LIST(APPEND SUBMODULE_URL "${SUBMODULE_URL}")
 	ENDIF()
-	LIST(REMOVE_ITEM SUBMODULE_LIST ${_part})
-	LIST(REMOVE_ITEM SUBMODULE_URL_LIST ${_url})
 ENDFOREACH()
 
 # Count provided values
@@ -102,19 +110,13 @@ FOREACH(_skip ${SKIP_SUBMODULES})
 	MATH(EXPR SKIP_SUBMODULES_LENGTH "${SKIP_SUBMODULES_LENGTH}+1")
 ENDFOREACH()
 
-# Abort if skip count differs from provided values
-IF(NOT SKIP_SUBMODULES_LENGTH EQUAL SKIP_COUNT)
-	SET(FATAL_MSG "One or more submodule(s) \"${SKIP_SUBMODULES}\" was not found, aborting.\
-\nFor a list of supported values try -DLIST_SUBMODULES=True\n")
-	UNSET(SKIP_SUBMODULES CACHE)
-	MESSAGE(FATAL_ERROR "${FATAL_MSG}")
-ENDIF()
-
 IF(LIST_SUBMODULES)
 	UNSET(LIST_SUBMODULES CACHE)
 	MESSAGE("\nAll possible -DSKIP_SUBMODULES values")
-	FOREACH(item IN LISTS SUBMODULE_LIST)
-		MESSAGE("   ${item}")
+	FOREACH(_path ${SUBMODULE_LIST_RAW})
+		# Parse SUBMODULE_PATH
+		STRING(REPLACE "path = " "" SUBMODULE_PATH "${_path}")
+		MESSAGE("   ${SUBMODULE_PATH}")
 	ENDFOREACH()
 	MESSAGE(
 		"\n"
@@ -122,6 +124,14 @@ IF(LIST_SUBMODULES)
 		"See also -DLIST_PLUGINS=True for a complete list.\n"
 	)
 	MESSAGE(FATAL_ERROR "Information was requested, aborting build!")
+ENDIF()
+
+# Abort if skip count differs from provided values
+IF(NOT SKIP_SUBMODULES_LENGTH EQUAL SKIP_COUNT)
+	SET(FATAL_MSG "One or more submodule(s) \"${SKIP_SUBMODULES}\" was not found, aborting.\
+\nFor a list of supported values try -DLIST_SUBMODULES=True\n")
+	UNSET(SKIP_SUBMODULES CACHE)
+	MESSAGE(FATAL_ERROR "${FATAL_MSG}")
 ENDIF()
 
 # Once called, status is stored in GIT_RESULT respectively.
@@ -134,10 +144,10 @@ MACRO(GIT_SUBMODULE SUBMODULE_PATH FORCE_DEINIT FORCE_REMOTE FULL_CLONE)
 	IF(FORCE_REMOTE_FLAG)
 		MESSAGE("--   Adding remote submodulefix to ${SUBMODULE_PATH}")
 		EXECUTE_PROCESS(
-			COMMAND ${GIT_EXECUTABLE} remote rm submodulefix
-			COMMAND ${GIT_EXECUTABLE} remote add submodulefix ${FORCE_REMOTE}
-			COMMAND ${GIT_EXECUTABLE} fetch submodulefix
-			WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/${SUBMODULE_PATH}
+			COMMAND "${GIT_EXECUTABLE}" remote rm submodulefix
+			COMMAND "${GIT_EXECUTABLE}" remote add submodulefix ${FORCE_REMOTE}
+			COMMAND "${GIT_EXECUTABLE}" fetch submodulefix
+			WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/${SUBMODULE_PATH}"
 			OUTPUT_QUIET ERROR_QUIET
 		)
 		# Recurse
@@ -145,8 +155,8 @@ MACRO(GIT_SUBMODULE SUBMODULE_PATH FORCE_DEINIT FORCE_REMOTE FULL_CLONE)
 	ELSEIF(${FORCE_DEINIT})
 		MESSAGE("--   Resetting ${SUBMODULE_PATH}")
 		EXECUTE_PROCESS(
-			COMMAND ${GIT_EXECUTABLE} submodule deinit -f ${CMAKE_SOURCE_DIR}/${SUBMODULE_PATH}
-			WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+			COMMAND "${GIT_EXECUTABLE}" submodule deinit -f "${CMAKE_SOURCE_DIR}/${SUBMODULE_PATH}"
+			WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
 			OUTPUT_QUIET
 		)
 		# Recurse
@@ -171,8 +181,8 @@ MACRO(GIT_SUBMODULE SUBMODULE_PATH FORCE_DEINIT FORCE_REMOTE FULL_CLONE)
 		ENDIF()
 		
 		EXECUTE_PROCESS(
-			COMMAND ${GIT_EXECUTABLE} submodule update --init --recursive ${DEPTH_CMD} ${DEPTH_VAL} ${CMAKE_SOURCE_DIR}/${SUBMODULE_PATH}
-			WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+			COMMAND "${GIT_EXECUTABLE}" submodule update --init --recursive ${DEPTH_CMD} ${DEPTH_VAL} "${CMAKE_SOURCE_DIR}/${SUBMODULE_PATH}"
+			WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
 			RESULT_VARIABLE GIT_RESULT
 			OUTPUT_VARIABLE GIT_STDOUT
 			ERROR_VARIABLE GIT_STDERR
@@ -188,7 +198,7 @@ SET(RETRY_PHRASES "Failed to recurse;cannot create directory;already exists;${MI
 
 # Attempt to do lazy clone
 FOREACH(_submodule ${SUBMODULE_LIST})
-	STRING(REPLACE "/" ";" PATH_PARTS ${_submodule})
+	STRING(REPLACE "/" ";" PATH_PARTS "${_submodule}")
 	LIST(REVERSE PATH_PARTS)
 	LIST(GET PATH_PARTS 0 SUBMODULE_NAME)
 
@@ -202,7 +212,7 @@ FOREACH(_submodule ${SUBMODULE_LIST})
 		ENDIF()
 	ENDFOREACH()
 	IF(NOT CRUMB_FOUND)
-		GIT_SUBMODULE(${_submodule} false false false)
+		GIT_SUBMODULE("${_submodule}" false false false)
 
 		SET(COUNTED 0)
 		SET(COUNTING "")
@@ -223,7 +233,7 @@ FOREACH(_submodule ${SUBMODULE_LIST})
 					LIST(GET SUBMODULE_URL_LIST ${SUBMODULE_INDEX} SUBMODULE_URL)
 					MESSAGE("--   Retrying ${_submodule} using 'remote add submodulefix' (attempt ${COUNTED} of ${MAX_ATTEMPTS})...")
 					
-					GIT_SUBMODULE(${_submodule} false "${SUBMODULE_URL}" false)
+					GIT_SUBMODULE("${_submodule}" false "${SUBMODULE_URL}" false)
 					BREAK()
 				ELSEIF("${GIT_MESSAGE}" MATCHES "${_phrase}")
 					MESSAGE("--   Retrying ${_submodule} using 'deinit' (attempt ${COUNTED} of ${MAX_ATTEMPTS})...")
@@ -233,7 +243,7 @@ FOREACH(_submodule ${SUBMODULE_LIST})
 						SET(FULL_CLONE true)
 					ENDIF()
 					
-					GIT_SUBMODULE(${_submodule} true false ${FULL_CLONE})
+					GIT_SUBMODULE("${_submodule}" true false ${FULL_CLONE})
 					BREAK()
 				ENDIF()
 			ENDFOREACH()
