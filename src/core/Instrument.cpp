@@ -83,7 +83,7 @@ bool Instrument::isFromTrack( const Track * _track ) const
 }
 
 
-void Instrument::applyFadeIn(  sampleFrame * buf, const NotePlayHandle * n )
+void Instrument::applyFadeIn(sampleFrame * buf, const NotePlayHandle * n)
 {
 	// apply only if it's the start of the note
 	if (n->totalFramesPlayed() == 0)
@@ -96,15 +96,15 @@ void Instrument::applyFadeIn(  sampleFrame * buf, const NotePlayHandle * n )
 		int max_zc = 0;
 
 		// determine the zero point crossing counts
-		for ( fpp_t f = 0; f < frames; ++f )
+		for (fpp_t f = 0; f < frames; ++f)
 		{
-			for ( ch_cnt_t ch=0; ch < DEFAULT_CHANNELS; ++ch )
+			for (ch_cnt_t ch=0; ch < DEFAULT_CHANNELS; ++ch)
 			{
-				if ( ( buf[f-1][ch] < 0.0 && buf[f][ch] > 0.0 ) ||
-						( buf[f-1][ch] > 0.0 && buf[f][ch] < 0.0 ) )
+				if ((buf[f-1][ch] < 0.0 && buf[f][ch] > 0.0) ||
+						(buf[f-1][ch] > 0.0 && buf[f][ch] < 0.0))
 				{
 					++zero_crossings[ch];
-					if ( zero_crossings[ch] > max_zc )
+					if (zero_crossings[ch] > max_zc)
 					{
 						max_zc = zero_crossings[ch];
 					}
@@ -114,13 +114,13 @@ void Instrument::applyFadeIn(  sampleFrame * buf, const NotePlayHandle * n )
 
 		// calculate the length of the fade in
 		fpp_t length = (fpp_t) (
-				( (float)frames - 1 )  /
-				( (float)max_zc / 2.0f + 1.0f ) / 3.0f );
+				((float)frames - 1)  /
+				((float)max_zc / 2.0f + 1.0f) / 3.0f);
 
 		// apply fade in
-		for ( fpp_t f = 0; f < length; ++f )
+		for (fpp_t f = 0; f < length; ++f)
 		{
-			for ( ch_cnt_t ch = 0; ch < DEFAULT_CHANNELS; ++ch )
+			for (ch_cnt_t ch = 0; ch < DEFAULT_CHANNELS; ++ch)
 			{
 				buf[f][ch] *= 0.5 - 0.5 * cosf(F_PI * (float) f / (float) length);
 			}
