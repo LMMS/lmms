@@ -8,10 +8,10 @@
 
 namespace PathUtil
 {
-	std::vector<Base> relativeBases = { ProjectDirBase, FactorySampleBase, UserSampleBase, UserVSTBase, PresetBase,
+	Base relativeBases[] = { ProjectDirBase, FactorySampleBase, UserSampleBase, UserVSTBase, PresetBase,
 		UserLADSPABase, DefaultLADSPABase, UserSoundfontBase, DefaultSoundfontBase, UserGIGBase, DefaultGIGBase };
 
-	QString baseLocation(Base base)
+	QString baseLocation(const Base & base)
 	{
 		QString loc = "";
 		switch (base)
@@ -36,9 +36,9 @@ namespace PathUtil
 		return QDir::cleanPath(loc) + QDir::separator();
 	}
 
-	QDir baseQDir (Base base) { return QDir(baseLocation(base)); }
+	QDir baseQDir (const Base & base) { return QDir(baseLocation(base)); }
 
-	QString basePrefix(Base base)
+	QString basePrefix(const Base & base)
 	{
 		switch (base)
 		{
@@ -57,12 +57,12 @@ namespace PathUtil
 		}
 	}
 
-	Base baseLookup(QString path)
+	Base baseLookup(const QString & path)
 	{
 		for (auto base: relativeBases)
 		{
 			QString prefix = basePrefix(base);
-			if ( prefix == path.left(prefix.length()) ) { return base; }
+			if ( path.startsWith(prefix) ) { return base; }
 		}
 		return AbsoluteBase;
 	}
@@ -70,12 +70,12 @@ namespace PathUtil
 
 
 
-	QString stripPrefix(QString path)
+	QString stripPrefix(const QString & path)
 	{
-		return path.remove(0, basePrefix(baseLookup(path)).length() );
+		return path.mid( basePrefix(baseLookup(path)).length() );
 	}
 
-	QString cleanName(QString path)
+	QString cleanName(const QString & path)
 	{
 		return stripPrefix(QFileInfo(path).baseName());
 	}
@@ -83,7 +83,7 @@ namespace PathUtil
 
 
 
-	QString oldRelativeUpgrade(QString input)
+	QString oldRelativeUpgrade(const QString & input)
 	{
 		QString factory = baseLocation(FactorySampleBase) + input;
 		QFileInfo factoryInfo(factory);
@@ -95,7 +95,7 @@ namespace PathUtil
 
 
 
-	QString toAbsolute(QString input)
+	QString toAbsolute(const QString & input)
 	{
 		//First, do no harm to absolute paths
 		QFileInfo inputFileInfo = QFileInfo(input);
@@ -107,25 +107,27 @@ namespace PathUtil
 		return baseLocation(base) + upgraded.remove(0, basePrefix(base).length());
 	}
 
-	QString relativeOrAbsolute(QString input, Base base)
+	QString relativeOrAbsolute(const QString & input, const Base & base)
 	{
 		QString absolutePath = toAbsolute(input);
 		QString relativePath = baseQDir(base).relativeFilePath(absolutePath);
 		return relativePath.startsWith("..") ? absolutePath : relativePath;
 	}
 
-	QString toShortestRelative(QString input)
+	QString toShortestRelative(const QString & input)
 	{
 		QFileInfo inputFileInfo = QFileInfo(input);
 		QString absolutePath = inputFileInfo.isAbsolute() ? input : toAbsolute(input);
 
 		Base shortestBase = AbsoluteBase;
+		QString shortestPath = relativeOrAbsolute(absolutePath, shortestBase);
 		for (auto base: relativeBases)
 		{
 			QString otherPath = relativeOrAbsolute(absolutePath, base);
-			if (otherPath.length() < relativeOrAbsolute(absolutePath, shortestBase).length())
+			if (otherPath.length() < shortestPath.length())
 			{
 				shortestBase = base;
+				shortestPath = otherPath;
 			}
 		}
 		return basePrefix(shortestBase) + relativeOrAbsolute(absolutePath, shortestBase);
