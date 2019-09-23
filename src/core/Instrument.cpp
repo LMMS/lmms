@@ -100,8 +100,9 @@ void Instrument::applyFadeIn(sampleFrame * buf, const NotePlayHandle * n)
 		{
 			for (ch_cnt_t ch=0; ch < DEFAULT_CHANNELS; ++ch)
 			{
-				if ((buf[f-1][ch] < 0.0 && buf[f][ch] > 0.0) ||
-						(buf[f-1][ch] > 0.0 && buf[f][ch] < 0.0))
+                // we don't want to count [-1, 0, 1] as two crossings
+				if ((buf[f-1][ch] <= 0.0 && buf[f][ch] > 0.0) ||
+						(buf[f-1][ch] >= 0.0 && buf[f][ch] < 0.0))
 				{
 					++zero_crossings[ch];
 					if (zero_crossings[ch] > max_zc)
@@ -113,6 +114,9 @@ void Instrument::applyFadeIn(sampleFrame * buf, const NotePlayHandle * n)
 		}
 
 		// calculate the length of the fade in
+		// Length is inversely proportional to the max of zero_crossings,
+		// because for low frequencies, we need a longer fade in to
+		// prevent clicking.
 		fpp_t length = (fpp_t) (
 				((float)frames - 1)  /
 				((float)max_zc / 2.0f + 1.0f) / 3.0f);
