@@ -100,7 +100,7 @@ void Instrument::applyFadeIn(sampleFrame * buf, const NotePlayHandle * n)
 		{
 			for (ch_cnt_t ch=0; ch < DEFAULT_CHANNELS; ++ch)
 			{
-                // we don't want to count [-1, 0, 1] as two crossings
+				// we don't want to count [-1, 0, 1] as two crossings
 				if ((buf[f-1][ch] <= 0.0 && buf[f][ch] > 0.0) ||
 						(buf[f-1][ch] >= 0.0 && buf[f][ch] < 0.0))
 				{
