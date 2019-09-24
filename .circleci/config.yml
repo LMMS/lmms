@@ -59,6 +59,15 @@ jobs:
       - run:
           name: Build tests
           command: cd build && make tests
+      - run:
+          name: Build installer
+          command: |
+            cd build
+            make package
+            cp ./lmms-*.exe /tmp/artifacts/
+      - store_artifacts:
+          path: /tmp/artifacts/
+          destination: /
       - *ccache_stats
       - *save_cache
   mingw64:
@@ -79,6 +88,15 @@ jobs:
       - run:
           name: Build tests
           command: cd build && make tests
+      - run:
+          name: Build installer
+          command: |
+            cd build
+            make package
+            cp ./lmms-*.exe /tmp/artifacts/
+      - store_artifacts:
+          path: /tmp/artifacts/
+          destination: /
       - *ccache_stats
       - *save_cache
   linux.gcc:
