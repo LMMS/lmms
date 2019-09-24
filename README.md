@@ -6,6 +6,12 @@
 [![Join the chat at Discord](https://img.shields.io/badge/chat-on%20discord-7289DA.svg)](https://discord.gg/3sc5su7)
 [![Localise on transifex](https://img.shields.io/badge/localise-on_transifex-green.svg)](https://www.transifex.com/lmms/lmms/)
 
+This fork
+--------------
+
+The purpose of this fork is the development of a generic instrument synthesiser plugin.
+
+
 What is LMMS?
 --------------
 
