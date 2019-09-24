@@ -84,6 +84,7 @@ IF("${PLUGIN_LIST}" STREQUAL "")
 		vibed
 		Xpressive
 		zynaddsubfx
+		Diginstrument
 	)
 
 ENDIF("${PLUGIN_LIST}" STREQUAL "")
