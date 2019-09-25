@@ -49,6 +49,7 @@
 #include "FileDialog.h"
 #include "FxMixerView.h"
 #include "GuiApplication.h"
+#include "Menu.h"
 #include "PianoRoll.h"
 #include "PluginBrowser.h"
 #include "PluginFactory.h"
@@ -71,7 +72,7 @@ void disableAutoKeyAccelerators(QWidget* mainWindow)
 {
 	using DisablerFunc = void(*)(QWidget*);
 	QLibrary kf5WidgetsAddon("KF5WidgetsAddons", 5);
-	DisablerFunc setNoAccelerators = 
+	DisablerFunc setNoAccelerators =
 			reinterpret_cast<DisablerFunc>(kf5WidgetsAddon.resolve("_ZN19KAcceleratorManager10setNoAccelEP7QWidget"));
 	if(setNoAccelerators)
 	{
@@ -261,14 +262,14 @@ void MainWindow::finalize()
 
 
 	// project-popup-menu
-	QMenu * project_menu = new QMenu( this );
+	QMenu * project_menu = new Menu( this );
 	menuBar()->addMenu( project_menu )->setText( tr( "&File" ) );
 	project_menu->addAction( embed::getIconPixmap( "project_new" ),
 					tr( "&New" ),
 					this, SLOT( createNewProject() ),
 					QKeySequence::New );
 
-	m_templatesMenu = new QMenu( tr("New from template"), this );
+	m_templatesMenu = new Menu( tr("New from template"), this );
 	connect( m_templatesMenu, SIGNAL( aboutToShow() ), SLOT( fillTemplatesMenu() ) );
 	connect( m_templatesMenu, SIGNAL( triggered( QAction * ) ),
 		 SLOT( createNewProjectFromTemplate( QAction * ) ) );
@@ -335,7 +336,7 @@ void MainWindow::finalize()
 					Qt::CTRL + Qt::Key_Q );
 
 
-	QMenu * edit_menu = new QMenu( this );
+	QMenu * edit_menu = new Menu( this );
 	menuBar()->addMenu( edit_menu )->setText( tr( "&Edit" ) );
 	m_undoAction = edit_menu->addAction( embed::getIconPixmap( "edit_undo" ),
 					tr( "Undo" ),
@@ -361,7 +362,7 @@ void MainWindow::finalize()
 					this, SLOT( showSettingsDialog() ) );
 	connect( edit_menu, SIGNAL(aboutToShow()), this, SLOT(updateUndoRedoButtons()) );
 
-	m_viewMenu = new QMenu( this );
+	m_viewMenu = new Menu( this );
 	menuBar()->addMenu( m_viewMenu )->setText( tr( "&View" ) );
 	connect( m_viewMenu, SIGNAL( aboutToShow() ),
 		 this, SLOT( updateViewMenu() ) );
@@ -369,7 +370,7 @@ void MainWindow::finalize()
 		SLOT(updateConfig(QAction*)));
 
 
-	m_toolsMenu = new QMenu( this );
+	m_toolsMenu = new Menu( this );
 	for( const Plugin::Descriptor* desc : pluginFactory->descriptors(Plugin::Tool) )
 	{
 		m_toolsMenu->addAction( desc->logo->pixmap(), desc->displayName );
@@ -385,7 +386,7 @@ void MainWindow::finalize()
 
 
 	// help-popup-menu
-	QMenu * help_menu = new QMenu( this );
+	QMenu * help_menu = new Menu( this );
 	menuBar()->addMenu( help_menu )->setText( tr( "&Help" ) );
 	// May use offline help
 	if( true )
@@ -757,7 +758,7 @@ void MainWindow::clearKeyModifiers()
 
 void MainWindow::saveWidgetState( QWidget * _w, QDomElement & _de )
 {
-	// If our widget is the main content of a window (e.g. piano roll, FxMixer, etc), 
+	// If our widget is the main content of a window (e.g. piano roll, FxMixer, etc),
 	// we really care about the position of the *window* - not the position of the widget within its window
 	if( _w->parentWidget() != NULL &&
 			_w->parentWidget()->inherits( "QMdiSubWindow" ) )
@@ -765,7 +766,7 @@ void MainWindow::saveWidgetState( QWidget * _w, QDomElement & _de )
 		_w = _w->parentWidget();
 	}
 
-	// If the widget is a SubWindow, then we can make use of the getTrueNormalGeometry() method that 
+	// If the widget is a SubWindow, then we can make use of the getTrueNormalGeometry() method that
 	// performs the same as normalGeometry, but isn't broken on X11 ( see https://bugreports.qt.io/browse/QTBUG-256 )
 	SubWindow *asSubWindow = qobject_cast<SubWindow*>(_w);
 	QRect normalGeom = asSubWindow != nullptr ? asSubWindow->getTrueNormalGeometry() : _w->normalGeometry();
@@ -794,7 +795,7 @@ void MainWindow::restoreWidgetState( QWidget * _w, const QDomElement & _de )
 			qMax( _w->minimumHeight(), _de.attribute( "height" ).toInt() ) );
 	if( _de.hasAttribute( "visible" ) && !r.isNull() )
 	{
-		// If our widget is the main content of a window (e.g. piano roll, FxMixer, etc), 
+		// If our widget is the main content of a window (e.g. piano roll, FxMixer, etc),
 		// we really care about the position of the *window* - not the position of the widget within its window
 		if ( _w->parentWidget() != NULL &&
 			_w->parentWidget()->inherits( "QMdiSubWindow" ) )
@@ -903,7 +904,7 @@ void MainWindow::updateRecentlyOpenedProjectsMenu()
 	for( QStringList::iterator it = rup.begin(); it != rup.end(); ++it )
 	{
 		QFileInfo recentFile( *it );
-		if ( recentFile.exists() && 
+		if ( recentFile.exists() &&
 				*it != ConfigManager::inst()->recoveryFile() )
 		{
 			if( recentFile.suffix().toLower() == "mpt" )
