@@ -1025,7 +1025,7 @@ void TrackContentObjectView::mouseMoveEvent( QMouseEvent * me )
 								   m_trackView->trackContainerView()->currentPosition()+
 								   static_cast<int>( x * MidiTime::ticksPerTact() / ppt ) );
 
-				if( unquantized )
+				if( unquantizedModHeld(me) )
 				{	// We want to preserve this adjusted offset,
 					// even if the user switches to snapping later
 					setInitialPos( m_initialMousePos );
