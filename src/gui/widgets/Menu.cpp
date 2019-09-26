@@ -5,6 +5,6 @@
 
 void Menu::keyReleaseEvent(QKeyEvent *event)
 {
-  QKeyEvent e(*event);
-  QApplication::sendEvent(parentWidget(),&e);
+	QKeyEvent e(*event);
+	QApplication::sendEvent(parentWidget(),&e);
 }
