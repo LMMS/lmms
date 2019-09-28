@@ -80,7 +80,8 @@ IF("${PLUGIN_LIST}" STREQUAL "")
 		vestige
 		VstEffect
 		watsyn
-		waveshaper
+        waveshaper
+        waveshaper2
 		vibed
 		Xpressive
 		zynaddsubfx
