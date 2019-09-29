@@ -82,51 +82,79 @@ bool Instrument::isFromTrack( const Track * _track ) const
 	return( m_instrumentTrack == _track );
 }
 
-
-void Instrument::applyFadeIn(sampleFrame * buf, const NotePlayHandle * n)
+int count_zero_crossings(sampleFrame *buf,fpp_t start, fpp_t frames)
 {
-	// apply only if it's the start of the note
-	if (n->totalFramesPlayed() == 0)
+	// zero point crossing counts of all channels
+	int zero_crossings[DEFAULT_CHANNELS] = {0};
+	// maximum zero point crossing of all channels
+	int max_zc = 0;
+
+	// determine the zero point crossing counts
+	for (fpp_t f = start; f < frames; ++f)
 	{
-		const fpp_t frames = n->framesLeftForCurrentPeriod();
-
-		// zero point crossing counts of all channels
-		int zero_crossings[DEFAULT_CHANNELS] = {0};
-		// maximum zero point crossing of all channels
-		int max_zc = 0;
-
-		// determine the zero point crossing counts
-		for (fpp_t f = 0; f < frames; ++f)
+		for (ch_cnt_t ch=0; ch < DEFAULT_CHANNELS; ++ch)
 		{
-			for (ch_cnt_t ch=0; ch < DEFAULT_CHANNELS; ++ch)
+			// we don't want to count [-1, 0, 1] as two crossings
+			if ((buf[f-1][ch] <= 0.0 && buf[f][ch] > 0.0) ||
+					(buf[f-1][ch] >= 0.0 && buf[f][ch] < 0.0))
 			{
-				// we don't want to count [-1, 0, 1] as two crossings
-				if ((buf[f-1][ch] <= 0.0 && buf[f][ch] > 0.0) ||
-						(buf[f-1][ch] >= 0.0 && buf[f][ch] < 0.0))
+				++zero_crossings[ch];
+				if (zero_crossings[ch] > max_zc)
 				{
-					++zero_crossings[ch];
-					if (zero_crossings[ch] > max_zc)
-					{
-						max_zc = zero_crossings[ch];
-					}
+					max_zc = zero_crossings[ch];
 				}
 			}
 		}
+	}
+
+	return max_zc;
+}
+
+
+void Instrument::applyFadeIn(sampleFrame * buf, NotePlayHandle * n)
+{
+	f_cnt_t total = n->totalFramesPlayed();
+	if (total == 0)
+	{
+		const fpp_t frames = n->framesLeftForCurrentPeriod();
+
+		int max_zc = count_zero_crossings(buf, 1, frames);
 
 		// calculate the length of the fade in
 		// Length is inversely proportional to the max of zero_crossings,
 		// because for low frequencies, we need a longer fade in to
 		// prevent clicking.
-		fpp_t length = (fpp_t) (
-				((float)frames - 1)  /
-				((float)max_zc / 2.0f + 1.0f) / 3.0f);
+		fpp_t length = (fpp_t) (85.0  / ((float)max_zc / ((float)frames/128.0f) + 1.0f));
+		n->m_fadeInLength = length;
 
 		// apply fade in
+		length = length < frames ? length : frames;
 		for (fpp_t f = 0; f < length; ++f)
 		{
 			for (ch_cnt_t ch = 0; ch < DEFAULT_CHANNELS; ++ch)
 			{
-				buf[f][ch] *= 0.5 - 0.5 * cosf(F_PI * (float) f / (float) length);
+				buf[f][ch] *= 0.5 - 0.5 * cosf(F_PI * (float) f / (float)n->m_fadeInLength);
+			}
+		}
+	}
+	else if(total < n->m_fadeInLength)
+	{
+		const fpp_t frames = n->framesLeftForCurrentPeriod();
+
+		int new_zc = count_zero_crossings(buf, 0, frames);
+
+		if(new_zc != 0)
+		{
+			n->m_fadeInLength = (fpp_t) ((float)n->m_fadeInLength * 0.875f);
+		}
+
+		fpp_t length = n->m_fadeInLength - total;
+
+		for (fpp_t f = 0; f < length; ++f)
+		{
+			for (ch_cnt_t ch = 0; ch < DEFAULT_CHANNELS; ++ch)
+			{
+				buf[f][ch] *= 0.5 - 0.5 * cosf(F_PI * (float) (total+f) / (float)n->m_fadeInLength);
 			}
 		}
 	}
@@ -160,6 +188,3 @@ QString Instrument::fullDisplayName() const
 {
 	return instrumentTrack()->displayName();
 }
-
-
-
