@@ -234,6 +234,7 @@ protected slots:
 	void selectRegionFromPixels( int xStart, int xEnd );
 
 	void clearGhostPattern();
+	void glueNotes();
 
 
 signals:

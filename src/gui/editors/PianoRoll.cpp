@@ -36,6 +36,7 @@
 #include <QPointer>
 #include <QScrollBar>
 #include <QStyleOption>
+#include <QToolButton>
 
 #ifndef __USE_XOPEN
 #define __USE_XOPEN
@@ -659,6 +660,63 @@ void PianoRoll::clearGhostPattern()
 	setGhostPattern( nullptr );
 	emit ghostPatternSet( false );
 	update();
+}
+
+
+void PianoRoll::glueNotes()
+{
+	if (hasValidPattern())
+	{
+		if (getSelectedNotes().empty())
+		{
+			TextFloat::displayMessage( tr( "Glue notes failed" ),
+					tr( "Please select notes to glue first." ),
+					embed::getIconPixmap( "glue", 24, 24 ),
+					3000 );
+			return;
+		}
+
+		// Make undo possible
+		m_pattern->addJournalCheckPoint();
+
+		QList<Note *> noteToRemove;
+
+		NoteVector selectedNotes = getSelectedNotes();
+
+		for (Note * note : selectedNotes)
+		{
+			for (Note * n : selectedNotes)
+			{
+				if (note == n ||
+					noteToRemove.contains(n) ||
+					n->key() != note->key())
+				{
+					continue;
+				}
+
+				if (n->pos() >= note->pos() &&
+					n->pos() <= note->pos() + note->length())
+				{ // n is in range of note
+					// Set new length for note
+					int newLength = note->length() +
+									(n->pos() + n->length()) -
+									(note->pos() + note->length());
+					note->setLength(newLength);
+
+					// remove n
+					noteToRemove.push_back(n);
+				}
+			}
+		}
+
+		// Remove old notes
+		for (int i = 0; i < noteToRemove.count(); ++i)
+		{
+			m_pattern->removeNote(noteToRemove[i]);
+		}
+
+		update();
+	}
 }
 
 
@@ -4543,6 +4601,21 @@ PianoRollWindow::PianoRollWindow() :
 	DropToolBar *timeLineToolBar = addDropToolBarToTop( tr( "Timeline controls" ) );
 	m_editor->m_timeLine->addToolButtons( timeLineToolBar );
 
+	// -- Note modifier tools
+	// Toolbar
+	QToolButton * noteToolsButton = new QToolButton(m_toolBar);
+	noteToolsButton->setIcon(embed::getIconPixmap("tool"));
+	noteToolsButton->setPopupMode(QToolButton::InstantPopup);
+
+	// Glue
+	QAction * glueAction = new QAction(embed::getIconPixmap("glue"),
+				tr("Glue"), noteToolsButton);
+	connect(glueAction, SIGNAL(triggered()), m_editor, SLOT(glueNotes()));
+	glueAction->setShortcut( Qt::SHIFT | Qt::Key_G );
+
+	noteToolsButton->addAction(glueAction);
+
+	notesActionsToolBar->addWidget(noteToolsButton);
 
 	addToolBarBreak();
 
