@@ -58,6 +58,9 @@ if [ "$win64" = true ] && [ "$no_link" != true ]; then
 	extra_args="$extra_args @WINE_64_FLAGS@"
 fi
 
+# Work around https://bugs.winehq.org/show_bug.cgi?id=47710
+extra_args="$extra_args -D__WIDL_objidl_generated_name_0000000C="
+
 # Run winegcc
 export WINEBUILD=@WINE_BUILD@
 @WINE_CXX@ $extra_args $args
