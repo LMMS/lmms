@@ -198,6 +198,8 @@ AutomationEditor::AutomationEditor() :
 	setCurrentPattern( NULL );
 
 	setMouseTracking( true );
+	setFocusPolicy( Qt::StrongFocus );
+	setFocus();
 }
 
 
@@ -2514,6 +2516,11 @@ void AutomationEditorWindow::clearCurrentPattern()
 {
 	m_editor->m_pattern = nullptr;
 	setCurrentPattern(nullptr);
+}
+
+void AutomationEditorWindow::focusInEvent(QFocusEvent * event)
+{
+	m_editor->setFocus( event->reason() );
 }
 
 void AutomationEditorWindow::play()

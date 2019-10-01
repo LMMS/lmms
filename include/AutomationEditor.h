@@ -297,6 +297,9 @@ public slots:
 signals:
 	void currentPatternChanged();
 
+protected:
+	virtual void focusInEvent(QFocusEvent * event);
+
 protected slots:
 	void play();
 	void stop();
