@@ -872,7 +872,7 @@ QString XpressiveHelpView::s_helpText=
 
 XpressiveHelpView::XpressiveHelpView():QTextEdit(s_helpText)
 {
-	setWindowTitle ( "X-Pressive Help" );
+	setWindowTitle ( "Xpressive Help" );
 	setTextInteractionFlags ( Qt::TextSelectableByKeyboard | Qt::TextSelectableByMouse );
 	gui->mainWindow()->addWindowedWidget( this );
 	parentWidget()->setAttribute( Qt::WA_DeleteOnClose, false );
