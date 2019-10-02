@@ -682,29 +682,28 @@ void PianoRoll::glueNotes()
 
 		QList<Note *> noteToRemove;
 
-		for (Note * note : selectedNotes)
+		NoteVector::iterator s = selectedNotes.begin();
+		auto nx = s+1;
+		NoteVector::iterator end = selectedNotes.end();
+
+		while (s != end && nx != end)
 		{
-			for (Note * n : selectedNotes)
+			// key and position match for glue
+			if ((*s)->key() == (*nx)->key()
+				&& (*nx)->pos() >= (*s)->pos()
+				&& (*nx)->pos() <= (*s)->pos() + (*s)->length())
 			{
-				if (note == n ||
-					noteToRemove.contains(n) ||
-					n->key() != note->key())
-				{
-					continue;
-				}
-
-				if (n->pos() >= note->pos() &&
-					n->pos() <= note->pos() + note->length())
-				{ // n is in range of note
-					// Set new length for note
-					int newLength = note->length() +
-									(n->pos() + n->length()) -
-									(note->pos() + note->length());
-					note->setLength(newLength);
-
-					// remove n
-					noteToRemove.push_back(n);
-				}
+				(*s)->setLength((*s)->length() +
+							((*nx)->pos() + (*nx)->length()) -
+							((*s)->pos() + (*s)->length()));
+				noteToRemove.push_back(*nx);
+				++nx;
+			}
+			// key or position doesn't match
+			else
+			{
+				s = nx;
+				nx = s+1;
 			}
 		}
 
