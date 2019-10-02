@@ -667,7 +667,8 @@ void PianoRoll::glueNotes()
 {
 	if (hasValidPattern())
 	{
-		if (getSelectedNotes().empty())
+		NoteVector selectedNotes = getSelectedNotes();
+		if (selectedNotes.empty())
 		{
 			TextFloat::displayMessage( tr( "Glue notes failed" ),
 					tr( "Please select notes to glue first." ),
@@ -680,8 +681,6 @@ void PianoRoll::glueNotes()
 		m_pattern->addJournalCheckPoint();
 
 		QList<Note *> noteToRemove;
-
-		NoteVector selectedNotes = getSelectedNotes();
 
 		for (Note * note : selectedNotes)
 		{
