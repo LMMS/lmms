@@ -125,9 +125,9 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	m_vstAlwaysOnTop(ConfigManager::inst()->value(
 			"ui", "vstalwaysontop").toInt()),
 	m_syncVSTPlugins(ConfigManager::inst()->value(
-			"ui", "syncvstplugins").toInt()),
+			"ui", "syncvstplugins", "1").toInt()),
 	m_disableAutoQuit(ConfigManager::inst()->value(
-			"ui", "disableautoquit").toInt()),
+			"ui", "disableautoquit", "1").toInt()),
 	m_NaNHandler(ConfigManager::inst()->value(
 			"app", "nanhandler", "1").toInt()),
 	m_hqAudioDev(ConfigManager::inst()->value(
