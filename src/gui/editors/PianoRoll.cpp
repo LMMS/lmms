@@ -680,30 +680,36 @@ void PianoRoll::glueNotes()
 		// Make undo possible
 		m_pattern->addJournalCheckPoint();
 
+		// Sort notes on key (default it's sorted on pos, so after this
+		// it is sorted on key and then pos)
+		std::sort(selectedNotes.begin(), selectedNotes.end(),
+											Note::compareKey);
+
 		QList<Note *> noteToRemove;
 
-		NoteVector::iterator s = selectedNotes.begin();
-		auto nx = s+1;
+		NoteVector::iterator note = selectedNotes.begin();
+		auto nextNote = note+1;
 		NoteVector::iterator end = selectedNotes.end();
 
-		while (s != end && nx != end)
+		while (note != end && nextNote != end)
 		{
 			// key and position match for glue
-			if ((*s)->key() == (*nx)->key()
-				&& (*nx)->pos() >= (*s)->pos()
-				&& (*nx)->pos() <= (*s)->pos() + (*s)->length())
+			if ((*note)->key() == (*nextNote)->key()
+				&& (*nextNote)->pos() >= (*note)->pos()
+				&& (*nextNote)->pos() <= (*note)->pos()
+				+ (*note)->length())
 			{
-				(*s)->setLength((*s)->length() +
-							((*nx)->pos() + (*nx)->length()) -
-							((*s)->pos() + (*s)->length()));
-				noteToRemove.push_back(*nx);
-				++nx;
+				(*note)->setLength((*note)->length() +
+						((*nextNote)->pos() + (*nextNote)->length()) -
+						((*note)->pos() + (*note)->length()));
+				noteToRemove.push_back(*nextNote);
+				++nextNote;
 			}
 			// key or position doesn't match
 			else
 			{
-				s = nx;
-				nx = s+1;
+				note = nextNote;
+				nextNote = note+1;
 			}
 		}
 
