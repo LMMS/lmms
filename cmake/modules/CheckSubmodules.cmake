@@ -52,7 +52,6 @@ STRING(REGEX MATCHALL "url = [.:%-0-9A-Za-z/]+" SUBMODULE_URL_RAW ${SUBMODULE_DA
 SET(SUBMODULE_LIST "")
 SET(SUBMODULE_URL "")
 
-SET(SKIP_COUNT 0)
 FOREACH(_path ${SUBMODULE_LIST_RAW})
 	# Parse SUBMODULE_PATH
 	STRING(REPLACE "path = " "" SUBMODULE_PATH "${_path}")
@@ -89,7 +88,6 @@ FOREACH(_path ${SUBMODULE_LIST_RAW})
 			IF("${SUBMODULE_PATH}" MATCHES "${_skip}")
 				MESSAGE("-- Skipping ${SUBMODULE_PATH} matches \"${_skip}\" (absent in PLUGIN_LIST)")
 				SET(SKIP true)
-				MATH(EXPR SKIP_COUNT "${SKIP_COUNT}+1")
 				BREAK()
 			ENDIF()
 		ENDFOREACH()
@@ -100,19 +98,6 @@ FOREACH(_path ${SUBMODULE_LIST_RAW})
 		LIST(APPEND SUBMODULE_URL "${SUBMODULE_URL}")
 	ENDIF()
 ENDFOREACH()
-
-# Count provided values
-SET(SKIP_SUBMODULES_LENGTH 0)
-FOREACH(_skip ${SKIP_SUBMODULES})
-	MATH(EXPR SKIP_SUBMODULES_LENGTH "${SKIP_SUBMODULES_LENGTH}+1")
-ENDFOREACH()
-
-# Abort if skip count differs from provided values
-IF(NOT SKIP_SUBMODULES_LENGTH EQUAL SKIP_COUNT)
-	SET(FATAL_MSG "One or more submodule(s) \"${SKIP_SUBMODULES}\" was not found, aborting.")
-	UNSET(SKIP_SUBMODULES CACHE)
-	MESSAGE(FATAL_ERROR "${FATAL_MSG}")
-ENDIF()
 
 # Once called, status is stored in GIT_RESULT respectively.
 # Note: Git likes to write to stderr.  Don't assume stderr is error; Check GIT_RESULT instead.
