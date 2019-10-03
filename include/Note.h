@@ -113,12 +113,6 @@ public:
 	void quantizeLength( const int qGrid );
 	void quantizePos( const int qGrid );
 
-	static bool inline compareKey(Note * note, Note * compareNote)
-	{
-		// used for sorting notes on key.
-		return (note->key() < compareNote->key());
-	}
-
 	static inline bool lessThan( const Note * lhs, const Note * rhs )
 	{
 		// function to compare two notes - must be called explictly when
