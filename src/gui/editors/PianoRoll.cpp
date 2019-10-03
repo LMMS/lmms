@@ -683,7 +683,8 @@ void PianoRoll::glueNotes()
 		// Sort notes on key (default it's sorted on pos, so after this
 		// it is sorted on key and then pos)
 		std::sort(selectedNotes.begin(), selectedNotes.end(),
-											Note::compareKey);
+			[](const Note * note, const Note * compareNote) -> bool
+			{ return note->key() < compareNote->key(); });
 
 		QList<Note *> noteToRemove;
 
