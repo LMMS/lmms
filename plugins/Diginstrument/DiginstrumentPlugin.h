@@ -1,7 +1,10 @@
 #include "DiginstrumentView.h"
-
+#include "Synthesizer.h"
 #include "Instrument.h"
+
 #include "InstrumentTrack.h"
+#include "Engine.h"
+#include "Mixer.h"
 
 #include "plugin_export.h"
 #include "embed.h"
@@ -40,4 +43,10 @@ class DiginstrumentPlugin : public Instrument {
 	}
   private:
     friend class DiginstrumentView;
+    /*TMP*/
+    Diginstrument::Synthesizer synth;
+    Diginstrument::Instrument inst;
+    
+  private slots:
+    void sampleRateChanged();
 };
