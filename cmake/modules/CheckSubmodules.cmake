@@ -20,7 +20,6 @@
 # Files which confirm a successful clone
 SET(VALID_CRUMBS "CMakeLists.txt;Makefile;Makefile.in;Makefile.am;configure.ac;configure.py;autogen.sh;.gitignore;LICENSE;Home.md")
 
-OPTION(LIST_SUBMODULES "Lists the available git submodules for automatic cloning" OFF)
 OPTION(NO_SHALLOW_CLONE "Disable shallow cloning of submodules" OFF)
 
 # Try and use the specified shallow clone on submodules, if supported
