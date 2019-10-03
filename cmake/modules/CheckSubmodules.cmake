@@ -8,12 +8,11 @@
 #
 # Options:
 #       SET(PLUGIN_LIST "zynaddsubfx;...") # skips submodules for plugins not explicitely listed
-#       SET(SKIP_SUBMODULES "plugins/Xpressive/exprtk;...") # manually skip based on full path
 #
 # Or via command line:       
-#       cmake -DSKIP_SUBMODULES=foo;bar
+#       cmake -PLUGIN_LIST=foo;bar
 #
-# Copyright (c) 2017, Tres Finocchiaro, <tres.finocchiaro@gmail.com>
+# Copyright (c) 2019, Tres Finocchiaro, <tres.finocchiaro@gmail.com>
 #
 # Redistribution and use is allowed according to the terms of the BSD license.
 # For details see the accompanying COPYING-CMAKE-SCRIPTS file.
@@ -66,7 +65,6 @@ FOREACH(_path ${SUBMODULE_LIST_RAW})
 	STRING(REPLACE "url = " "" SUBMODULE_URL "${_url}")
 
 	SET(SKIP false)
-	SET(SKIP_REASON "(via SKIP_SUBMODULES)")
 
 	# Loop over skipped plugins, add to SKIP_SUBMODULES (e.g. -DPLUGIN_LIST=foo;bar)
 	IF(${SUBMODULE_PATH} MATCHES "^plugins/")
@@ -81,7 +79,6 @@ FOREACH(_path ${SUBMODULE_LIST_RAW})
 		ENDFOREACH()
 
 		IF(REMOVE_PLUGIN)
-			SET(SKIP_REASON "(absent in PLUGIN_LIST)")
 			LIST(APPEND SKIP_SUBMODULES "${SUBMODULE_PATH}")
 		ENDIF()
 	ENDIF()
@@ -90,7 +87,7 @@ FOREACH(_path ${SUBMODULE_LIST_RAW})
 	IF(SKIP_SUBMODULES)
 		FOREACH(_skip ${SKIP_SUBMODULES})
 			IF("${SUBMODULE_PATH}" MATCHES "${_skip}")
-				MESSAGE("-- Skipping ${SUBMODULE_PATH} matches \"${_skip}\" ${SKIP_REASON}")
+				MESSAGE("-- Skipping ${SUBMODULE_PATH} matches \"${_skip}\" (absent in PLUGIN_LIST)")
 				SET(SKIP true)
 				MATH(EXPR SKIP_COUNT "${SKIP_COUNT}+1")
 				BREAK()
@@ -110,26 +107,9 @@ FOREACH(_skip ${SKIP_SUBMODULES})
 	MATH(EXPR SKIP_SUBMODULES_LENGTH "${SKIP_SUBMODULES_LENGTH}+1")
 ENDFOREACH()
 
-IF(LIST_SUBMODULES)
-	UNSET(LIST_SUBMODULES CACHE)
-	MESSAGE("\nAll possible -DSKIP_SUBMODULES values")
-	FOREACH(_path ${SUBMODULE_LIST_RAW})
-		# Parse SUBMODULE_PATH
-		STRING(REPLACE "path = " "" SUBMODULE_PATH "${_path}")
-		MESSAGE("   ${SUBMODULE_PATH}")
-	ENDFOREACH()
-	MESSAGE(
-		"\n"
-		"NOTE: A simple and more effective way to skip submodules is via -DPLUGIN_LIST.\n\n"
-		"See also -DLIST_PLUGINS=True for a complete list.\n"
-	)
-	MESSAGE(FATAL_ERROR "Information was requested, aborting build!")
-ENDIF()
-
 # Abort if skip count differs from provided values
 IF(NOT SKIP_SUBMODULES_LENGTH EQUAL SKIP_COUNT)
-	SET(FATAL_MSG "One or more submodule(s) \"${SKIP_SUBMODULES}\" was not found, aborting.\
-\nFor a list of supported values try -DLIST_SUBMODULES=True\n")
+	SET(FATAL_MSG "One or more submodule(s) \"${SKIP_SUBMODULES}\" was not found, aborting.")
 	UNSET(SKIP_SUBMODULES CACHE)
 	MESSAGE(FATAL_ERROR "${FATAL_MSG}")
 ENDIF()
