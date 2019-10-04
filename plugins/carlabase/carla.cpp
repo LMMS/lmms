@@ -25,16 +25,25 @@
 #include "carla.h"
 
 #include "Engine.h"
-#include "Song.h"
-#include "gui_templates.h"
+#include "GuiApplication.h"
 #include "InstrumentPlayHandle.h"
 #include "InstrumentTrack.h"
+#include "MainWindow.h"
 #include "Mixer.h"
+#include "Song.h"
+#include "gui_templates.h"
 
 #include <QApplication>
 #include <QFileDialog>
 #include <QFileInfo>
+#include <QHBoxLayout>
+#include <QMdiArea>
+#include <QMessageBox>
 #include <QPushButton>
+#include <QScrollArea>
+#include <QSizePolicy>
+#include <QSpacerItem>
+#include <QString>
 #include <QTimerEvent>
 #include <QVBoxLayout>
 
@@ -134,7 +143,8 @@ CarlaInstrument::CarlaInstrument(InstrumentTrack* const instrumentTrack, const D
       kIsPatchbay(isPatchbay),
       fHandle(NULL),
       fDescriptor(isPatchbay ? carla_get_native_patchbay_plugin() : carla_get_native_rack_plugin()),
-      fMidiEventCount(0)
+      fMidiEventCount(0),
+      m_subWindow(NULL)
 {
     fHost.handle      = this;
     fHost.uiName      = NULL;
@@ -182,6 +192,12 @@ CarlaInstrument::CarlaInstrument(InstrumentTrack* const instrumentTrack, const D
     InstrumentPlayHandle * iph = new InstrumentPlayHandle( this, instrumentTrack );
     Engine::mixer()->addPlayHandle( iph );
 
+    // text filter completion
+    m_completerModel = new QStringListModel(this);
+    m_paramsCompleter = new QCompleter(m_completerModel, this);
+    m_paramsCompleter->setCaseSensitivity(Qt::CaseInsensitive);
+    m_paramsCompleter->setCompletionMode(QCompleter::PopupCompletion);
+
     connect(Engine::mixer(), SIGNAL(sampleRateChanged()), this, SLOT(sampleRateChanged()));
 }
 
@@ -211,6 +227,15 @@ CarlaInstrument::~CarlaInstrument()
         fDescriptor->cleanup(fHandle);
 
     fHandle = NULL;
+
+    if (p_subWindow != NULL) {
+        delete p_subWindow;
+        p_subWindow = NULL;
+    }
+
+    if (floatModels.isEmpty() == false) {
+        floatModels.clear();
+    }
 }
 
 // -------------------------------------------------------------------
@@ -286,14 +311,92 @@ void CarlaInstrument::saveSettings(QDomDocument& doc, QDomElement& parent)
         return;
 
     QDomDocument carlaDoc("carla");
-
     if (carlaDoc.setContent(QString(state)))
     {
         QDomNode n = doc.importNode(carlaDoc.documentElement(), true);
         parent.appendChild(n);
     }
-
     std::free(state);
+
+    for (uint32_t i=0; i < floatModels.count(); ++i)
+    {
+        QString idStr = CARLA_SETTING_PREFIX + QString::number(i);
+        floatModels[i]->saveSettings(doc, parent, idStr);
+    }
+}
+
+void CarlaInstrument::refreshParams(bool valuesOnly = false, bool init = false)
+{
+	if (fDescriptor->get_parameter_count != nullptr &&
+		fDescriptor->get_parameter_info  != nullptr &&
+		fDescriptor->get_parameter_value != nullptr &&
+		fDescriptor->set_parameter_value != nullptr)
+	{
+		uint32_t param_count = fDescriptor->get_parameter_count(fHandle);
+
+		if (!valuesOnly)
+		{
+			clearKnobModels();
+			floatModels.reserve(param_count);
+		}
+
+		QList<QString> completerData;
+
+		for (uint32_t i=0; i < param_count; ++i)
+		{
+			// https://github.com/falkTX/Carla/tree/master/source/native-plugins source/native-plugins/resources/carla-plugin
+			float param_value = fDescriptor->get_parameter_value(fHandle, i);
+
+			if (valuesOnly)
+			{
+				floatModels[i]->setValue(param_value);
+				continue;
+			}
+
+			const NativeParameter* paramInfo(fDescriptor->get_parameter_info(fHandle, i));
+
+			// Get parameter name
+			QString name = "_NO_NAME_";
+			if (paramInfo->name != nullptr){
+				name = paramInfo->name;
+			}
+
+			completerData.push_back(name);
+
+			// current_value, min, max, steps
+			floatModels.push_back(new FloatModel(param_value, paramInfo->ranges.min,
+					paramInfo->ranges.max, paramInfo->ranges.step, this, name));
+
+			// Load settings into model.
+			QString idStr = CARLA_SETTING_PREFIX + QString::number(i);
+			if (init)
+			{
+				floatModels[i]->loadSettings(settingsElem, idStr);
+			}
+
+			connect(floatModels[i], &FloatModel::dataChanged, this, [=]() {knobModelChanged(i);}, Qt::DirectConnection);
+		}
+		// Set completer data
+		m_completerModel->setStringList(completerData);
+	}
+}
+
+void CarlaInstrument::clearKnobModels(){
+	//Delete the models, this also disconnects all connections (automation and controller connections)
+	for (uint32_t i=0; i < floatModels.count(); ++i)
+	{
+		delete floatModels[i];
+	}
+
+	//Clear the list
+	floatModels.clear();
+}
+
+void CarlaInstrument::knobModelChanged(uint32_t index)
+{
+	if (fDescriptor->set_parameter_value != nullptr){
+		fDescriptor->set_parameter_value(fHandle, index, floatModels[index]->value());
+	}
 }
 
 void CarlaInstrument::loadSettings(const QDomElement& elem)
@@ -305,6 +408,10 @@ void CarlaInstrument::loadSettings(const QDomElement& elem)
     carlaDoc.appendChild(carlaDoc.importNode(elem.firstChildElement(), true ));
 
     fDescriptor->set_state(fHandle, carlaDoc.toString(0).toUtf8().constData());
+
+    // Store to load parameter knobs settings when added.
+    settingsElem = const_cast<QDomElement&>(elem);
+    refreshParams(false, true);
 }
 
 void CarlaInstrument::play(sampleFrame* workingBuffer)
@@ -460,10 +567,12 @@ void CarlaInstrument::sampleRateChanged()
 // -------------------------------------------------------------------
 
 CarlaInstrumentView::CarlaInstrumentView(CarlaInstrument* const instrument, QWidget* const parent)
-    : InstrumentViewFixedSize(instrument, parent),
+    : InstrumentView(instrument, parent),
       fHandle(instrument->fHandle),
       fDescriptor(instrument->fDescriptor),
-      fTimerId(fHandle != NULL && fDescriptor->ui_idle != NULL ? startTimer(30) : 0)
+      fTimerId(fHandle != NULL && fDescriptor->ui_idle != NULL ? startTimer(30) : 0),
+      m_carlaInstrument(instrument),
+      p_parent(parent)
 {
     setAutoFillBackground(true);
 
@@ -471,20 +580,34 @@ CarlaInstrumentView::CarlaInstrumentView(CarlaInstrument* const instrument, QWid
     pal.setBrush(backgroundRole(), instrument->kIsPatchbay ? PLUGIN_NAME::getIconPixmap("artwork-patchbay") : PLUGIN_NAME::getIconPixmap("artwork-rack"));
     setPalette(pal);
 
-    QVBoxLayout * l = new QVBoxLayout( this );
-    l->setContentsMargins( 20, 180, 10, 10 );
-    l->setSpacing( 10 );
+    QHBoxLayout * l = new QHBoxLayout(this);
+    l->setContentsMargins(20, 180, 10, 10);
+    l->setSpacing(3);
+    l->setAlignment(Qt::AlignTop);
 
-    m_toggleUIButton = new QPushButton( tr( "Show GUI" ), this );
-    m_toggleUIButton->setCheckable( true );
-    m_toggleUIButton->setChecked( false );
-    m_toggleUIButton->setIcon( embed::getIconPixmap( "zoom" ) );
-    m_toggleUIButton->setFont( pointSize<8>( m_toggleUIButton->font() ) );
-    connect( m_toggleUIButton, SIGNAL( clicked(bool) ), this, SLOT( toggleUI( bool ) ) );
+    // Show GUI button
+    m_toggleUIButton = new QPushButton(tr("Show GUI"), this);
+    m_toggleUIButton->setCheckable(true);
+    m_toggleUIButton->setChecked(false);
+    m_toggleUIButton->setIcon(embed::getIconPixmap("zoom"));
+    m_toggleUIButton->setFont(pointSize<8>(m_toggleUIButton->font()));
 
-    l->addWidget( m_toggleUIButton );
-    l->addStretch();
+    m_toggleUIButton->setToolTip(
+            tr("Click here to show or hide the graphical user interface (GUI) of Carla."));
 
+    // Open params sub window button
+    m_toggleParamsWindowButton = new QPushButton(tr("Params"), this);
+    m_toggleParamsWindowButton->setIcon(embed::getIconPixmap("controller"));
+    m_toggleParamsWindowButton->setCheckable(true);
+    m_toggleParamsWindowButton->setFont(pointSize<8>(m_toggleParamsWindowButton->font()));
+
+    // Add widgets to layout
+    l->addWidget(m_toggleUIButton);
+    l->addWidget(m_toggleParamsWindowButton);
+
+    // Connect signals
+    connect(m_toggleUIButton, SIGNAL(clicked(bool)), this, SLOT(toggleUI(bool)));
+    connect(m_toggleParamsWindowButton, SIGNAL(clicked(bool)), this, SLOT(toggleParamsWindow()));
     connect(instrument, SIGNAL(uiClosed()), this, SLOT(uiClosed()));
 }
 
@@ -517,5 +640,316 @@ void CarlaInstrumentView::timerEvent(QTimerEvent* event)
     InstrumentView::timerEvent(event);
 }
 
+void CarlaInstrumentView::toggleParamsWindow()
+{
+	if (m_carlaInstrument->m_subWindow == NULL)
+	{
+		m_carlaInstrument->p_subWindow = new CarlaParamsView(m_carlaInstrument, p_parent);
+		connect(m_carlaInstrument->m_subWindow, SIGNAL(uiClosed()), this, SLOT(paramsUiClosed()));
+	} else {
+		if (m_carlaInstrument->m_subWindow->widget()->isVisible()) {
+			m_carlaInstrument->m_subWindow->widget()->hide();
+			m_carlaInstrument->m_subWindow->hide();
+		} else {
+			m_carlaInstrument->m_subWindow->widget()->show();
+			m_carlaInstrument->m_subWindow->show();
+		}
+	}
+}
+
+void CarlaInstrumentView::paramsUiClosed()
+{
+	m_toggleParamsWindowButton->setChecked(false);
+}
+
 // -------------------------------------------------------------------
 
+CarlaParamsView::CarlaParamsView(CarlaInstrument* const instrument, QWidget* const parent)
+	: InstrumentView(instrument, parent),
+	m_carlaInstrument(instrument)
+{
+	lMaxColumns = 6;
+	lCurColumn = 0;
+	lCurRow = 0;
+
+	// Create central widget
+	/*  ___ centralWidget _______________	QWidget
+	 * |  __ verticalLayout _____________	QVBoxLayout
+	 * | |  __ m_toolBarLayout __________	QHBoxLayout
+	 * | | |
+	 * | | | option_0 | option_1 ..
+	 * | | |_____________________________
+	 * | |
+	 * | |  __ m_scrollArea _____________	QScrollArea
+	 * | | |  __ m_scrollAreaWidgetContent	QWidget
+	 * | | | |  __ m_scrollAreaLayout ___	QGridLayout
+	 * | | | | |
+	 * | | | | | knob | knob | knob
+	 * | | | | | knob | knob | knob
+	 * | | | | | knob | knob | knob
+	 * | | | | |_________________________
+	 * | | | |___________________________
+	 * | | |_____________________________
+	 * */
+	QWidget* centralWidget = new QWidget(this);
+	QVBoxLayout* verticalLayout = new QVBoxLayout(centralWidget);
+
+
+	// Toolbar
+	m_toolBarLayout = new QHBoxLayout();
+
+	// Toolbar widgets
+	// Refresh params button
+	m_refreshParamsButton = new QPushButton(tr(""), this);
+	m_refreshParamsButton->setIcon(embed::getIconPixmap("reload"));
+	m_refreshParamsButton->setToolTip(
+				tr("Click here to reload the Carla parameter knobs."));
+	QSizePolicy sizePolicy(QSizePolicy::Maximum, QSizePolicy::Fixed);
+	sizePolicy.setHorizontalStretch(0);
+	sizePolicy.setVerticalStretch(0);
+	sizePolicy.setHeightForWidth(m_refreshParamsButton->sizePolicy().hasHeightForWidth());
+	m_refreshParamsButton->setSizePolicy(sizePolicy);
+	m_refreshParamsButton->setCheckable(false);
+
+	// Refresh param values button
+	m_refreshParamValuesButton = new QPushButton(tr("Values"), this);
+	m_refreshParamValuesButton->setIcon(embed::getIconPixmap("reload"));
+	m_refreshParamValuesButton->setToolTip(
+				tr("Click here to update the Carla parameter knob "
+					"values as they are in the remote Carla instance."));
+	sizePolicy.setHeightForWidth(m_refreshParamValuesButton->sizePolicy().hasHeightForWidth());
+	m_refreshParamValuesButton->setSizePolicy(sizePolicy);
+
+	// Params filter line edit
+	m_paramsFilterLineEdit = new QLineEdit(this);
+	m_paramsFilterLineEdit->setPlaceholderText(tr("Search.."));
+	m_paramsFilterLineEdit->setCompleter(m_carlaInstrument->m_paramsCompleter);
+
+	// Clear filter line edit button
+	m_clearFilterButton = new QPushButton(tr(""), this);
+	m_clearFilterButton->setIcon(embed::getIconPixmap("edit_erase"));
+	m_clearFilterButton->setToolTip(tr("Clear filter text"));
+	sizePolicy.setHeightForWidth(m_clearFilterButton->sizePolicy().hasHeightForWidth());
+	m_clearFilterButton->setSizePolicy(sizePolicy);
+
+	// Show automated only button
+	m_automatedOnlyButton = new QPushButton(tr(""), this);
+	m_automatedOnlyButton->setIcon(embed::getIconPixmap("automation"));
+	m_automatedOnlyButton->setToolTip(
+				tr("Only show knobs with a connection."));
+	m_automatedOnlyButton->setCheckable(true);
+	sizePolicy.setHeightForWidth(m_automatedOnlyButton->sizePolicy().hasHeightForWidth());
+	m_automatedOnlyButton->setSizePolicy(sizePolicy);
+
+	// Add stuff to toolbar
+	m_toolBarLayout->addWidget(m_refreshParamsButton);
+	m_toolBarLayout->addWidget(m_refreshParamValuesButton);
+	m_toolBarLayout->addWidget(m_paramsFilterLineEdit);
+	m_toolBarLayout->addWidget(m_clearFilterButton);
+	m_toolBarLayout->addWidget(m_automatedOnlyButton);
+
+
+	// Create scroll area for the knobs
+	m_scrollArea = new QScrollArea(this);
+	m_scrollAreaWidgetContent = new QWidget();
+	m_scrollAreaLayout = new QGridLayout(m_scrollAreaWidgetContent);
+
+	m_scrollAreaWidgetContent->setLayout(m_scrollAreaLayout);
+
+	m_scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+	m_scrollArea->setWidget(m_scrollAreaWidgetContent);
+	m_scrollArea->setWidgetResizable(true);
+
+	m_scrollAreaLayout->setContentsMargins(3, 3, 3, 3);
+	m_scrollAreaLayout->setVerticalSpacing(12);
+	m_scrollAreaLayout->setHorizontalSpacing(6);
+	m_scrollAreaLayout->setColumnStretch(lMaxColumns, 1);
+
+
+	// Add m_toolBarLayout and m_scrollArea to the verticalLayout.
+	verticalLayout->addLayout(m_toolBarLayout);
+	verticalLayout->addWidget(m_scrollArea);
+
+
+	// Sub window
+	CarlaParamsSubWindow* win = new CarlaParamsSubWindow(gui->mainWindow()->workspace()->viewport(), Qt::SubWindow |
+			Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowSystemMenuHint);
+	m_carlaInstrument->m_subWindow = gui->mainWindow()->workspace()->addSubWindow(win);
+	m_carlaInstrument->m_subWindow->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::MinimumExpanding);
+	m_carlaInstrument->m_subWindow->setFixedWidth(800);
+	m_carlaInstrument->m_subWindow->setMinimumHeight(200);
+	m_carlaInstrument->m_subWindow->setWidget(centralWidget);
+	m_carlaInstrument->m_subWindow->setWindowTitle(m_carlaInstrument->instrumentTrack()->name() + tr(" - Parameters"));
+
+	// Connect signals
+	connect(m_refreshParamsButton, SIGNAL(clicked(bool)), this, SLOT(onRefreshButton()));
+	connect(m_refreshParamValuesButton, SIGNAL(clicked(bool)), this, SLOT(onRefreshValuesButton()));
+	connect(m_paramsFilterLineEdit, SIGNAL(textChanged(const QString)), this, SLOT(filterKnobs()));
+	connect(m_clearFilterButton, SIGNAL(clicked(bool)), this, SLOT(clearFilterText()));
+	connect(m_automatedOnlyButton, SIGNAL(toggled(bool)), this, SLOT(filterKnobs()));
+
+
+	refreshKnobs(); // Add buttons if there are any already.
+	m_carlaInstrument->m_subWindow->show(); // Show the subwindow
+}
+
+CarlaParamsView::~CarlaParamsView()
+{
+	// Close and delete m_subWindow
+	if (m_carlaInstrument->m_subWindow != NULL )
+	{
+		m_carlaInstrument->m_subWindow->setAttribute(Qt::WA_DeleteOnClose);
+		m_carlaInstrument->m_subWindow->close();
+
+		if (m_carlaInstrument->m_subWindow != NULL)
+			delete m_carlaInstrument->m_subWindow;
+		m_carlaInstrument->m_subWindow = NULL;
+	}
+
+	m_carlaInstrument->p_subWindow = NULL;
+
+	// Clear models
+	if (m_carlaInstrument->floatModels.isEmpty() == false)
+	{
+		m_carlaInstrument->clearKnobModels();
+	}
+}
+
+void CarlaParamsView::clearFilterText()
+{
+	m_paramsFilterLineEdit->setText("");
+}
+
+void CarlaParamsView::filterKnobs()
+{
+	QString text = m_paramsFilterLineEdit->text();
+	clearKnobs(); // Remove all knobs from the layout.
+
+	for (uint32_t i=0; i < m_knobs.count(); ++i)
+	{
+		// Filter on automation only
+		if (m_automatedOnlyButton->isChecked())
+		{
+			if (! m_carlaInstrument->floatModels[i]->isAutomatedOrControlled())
+			{
+				continue;
+			}
+		}
+		
+		// Filter on text
+		if (text != "")
+		{
+			if (m_knobs[i]->objectName().contains(text, Qt::CaseInsensitive))
+			{	
+				addKnob(i);
+			}
+		} else {
+			addKnob(i);
+		}
+	}
+}
+
+void CarlaParamsView::onRefreshButton()
+{
+	if (m_carlaInstrument->floatModels.isEmpty() == false)
+	{
+		if (QMessageBox::warning(NULL,
+				tr("Reload knobs"),
+				tr("There are already knobs loaded, if any of them "
+				"are connected to a controller or automation track "
+				"their connection will be lost. Do you want to "
+				"continue?"),
+				QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes) != QMessageBox::Yes)
+				{
+					return;
+				}
+	}
+	m_carlaInstrument->refreshParams();
+	refreshKnobs();
+}
+
+void CarlaParamsView::onRefreshValuesButton()
+{
+	m_carlaInstrument->refreshParams(true);
+}
+
+void CarlaParamsView::refreshKnobs()
+{
+	if (m_carlaInstrument->floatModels.count()==0) { return; }
+
+	// Make sure all the knobs are deleted.
+	for (uint32_t i=0; i < m_knobs.count(); ++i)
+	{
+		delete m_knobs[i]; // Delete knob widgets itself.
+	}
+	m_knobs.clear(); // Clear the pointer list.
+
+	// Clear the layout (posible spacer).
+	QLayoutItem *item;
+	while ((item = m_scrollAreaLayout->takeAt(0)))
+	{
+		if (item->widget()) {delete item->widget();}
+		delete item;
+	}
+	
+	// Reset position data.
+	lCurColumn = 0;
+	lCurRow = 0;
+
+	// Make room in QList m_knobs
+	m_knobs.reserve(m_carlaInstrument->floatModels.count());
+
+	for (uint32_t i=0; i < m_carlaInstrument->floatModels.count(); ++i)
+	{
+		m_knobs.push_back(new Knob(m_scrollAreaWidgetContent));
+		QString name = (*m_carlaInstrument->floatModels[i]).displayName();
+		m_knobs[i]->setHintText(name, "");
+		m_knobs[i]->setLabel(name);
+		m_knobs[i]->setObjectName(name); // this is being used for filtering the knobs.
+
+		// Set the newly created model to the knob.
+		m_knobs[i]->setModel(m_carlaInstrument->floatModels[i]);
+
+		// Add knob to layout
+		addKnob(i);
+	}
+
+	// Add spacer so all knobs go to top
+	QSpacerItem* verticalSpacer = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
+	m_scrollAreaLayout->addItem(verticalSpacer, lCurRow+1, 0, 1, 1);
+}
+
+void CarlaParamsView::addKnob(uint32_t index)
+{
+	// Add the new knob to layout
+	m_scrollAreaLayout->addWidget(m_knobs[index], lCurRow, lCurColumn, Qt::AlignHCenter | Qt::AlignTop);
+
+	// Chances that we did close() on the widget is big, so show it.
+	m_knobs[index]->show();
+
+	// Keep track of current column and row index.
+	if (lCurColumn < lMaxColumns-1)
+	{
+		lCurColumn++;
+	} else {
+		lCurColumn=0;
+		lCurRow++;
+	}
+}
+void CarlaParamsView::clearKnobs()
+{
+	// Remove knobs from layout.
+	for (uint32_t i=0; i < m_knobs.count(); ++i)
+	{
+		m_knobs[i]->close();
+	}
+
+	// Reset position data.
+	lCurColumn = 0;
+	lCurRow = 0;
+}
+
+void CarlaParamsView::modelChanged()
+{
+	refreshKnobs();
+}

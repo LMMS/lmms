@@ -25,10 +25,20 @@
 #ifndef CARLA_H
 #define CARLA_H
 
-#include <QtCore/QMutex>
-#include "plugin_export.h"
+#define CARLA_MAX_KNOBS            32
+#define CARLA_SETTING_PREFIX    "PARAM_KNOB_"
 
-#include "CarlaNative.h"
+// qt
+#include <QCloseEvent>
+#include <QCompleter>
+#include <QGridLayout>
+#include <QLineEdit>
+#include <QList>
+#include <QScrollArea>
+#include <QStringListModel>
+#include <QtCore/QMutex>
+
+// carla/source/includes
 #define REAL_BUILD // FIXME this shouldn't be needed
 #if CARLA_VERSION_HEX >= 0x010911
     #include "CarlaNativePlugin.h"
@@ -43,10 +53,44 @@
     const NativePluginDescriptor* carla_get_native_rack_plugin();
 #endif
 
+// lmms/include/
+#include "EffectControls.h"
 #include "Instrument.h"
 #include "InstrumentView.h"
+#include "Knob.h"
+#include "SubWindow.h"
+#include "plugin_export.h"
 
 class QPushButton;
+
+class CarlaParamsSubWindow : public SubWindow
+{
+	Q_OBJECT
+
+signals:
+	void uiClosed();
+    
+public:
+	CarlaParamsSubWindow(QWidget * _parent, Qt::WindowFlags windowFlags) :
+		SubWindow(_parent)
+	{
+		setAttribute(Qt::WA_DeleteOnClose, false);
+		setWindowFlags(windowFlags);
+	}
+
+	virtual ~CarlaParamsSubWindow()
+	{
+	}
+
+	virtual void closeEvent(QCloseEvent * event)
+	{
+		emit uiClosed();
+		hide();
+		event->ignore();
+	}
+};
+
+// -------------------------------------------------------------------
 
 class PLUGIN_EXPORT CarlaInstrument : public Instrument
 {
@@ -81,6 +125,9 @@ signals:
 
 private slots:
     void sampleRateChanged();
+    void refreshParams(bool valuesOnly, bool init);
+    void clearKnobModels();
+    void knobModelChanged(uint32_t index);
 
 private:
     const bool kIsPatchbay;
@@ -96,10 +143,22 @@ private:
     // this is only needed because note-offs are being sent during play
     QMutex fMutex;
 
+    QList<FloatModel*> floatModels;
+    QDomElement settingsElem;
+    QMdiSubWindow* m_subWindow;
+    QObject* p_subWindow;
+
+    QCompleter* m_paramsCompleter;
+    QStringListModel* m_completerModel;
+
     friend class CarlaInstrumentView;
+    friend class CarlaParamsView;
 };
 
-class CarlaInstrumentView : public InstrumentViewFixedSize
+
+// -------------------------------------------------------------------
+
+class CarlaInstrumentView : public InstrumentView
 {
     Q_OBJECT
 
@@ -110,6 +169,8 @@ public:
 private slots:
     void toggleUI(bool);
     void uiClosed();
+    void toggleParamsWindow();
+    void paramsUiClosed();
 
 private:
     virtual void modelChanged();
@@ -119,7 +180,55 @@ private:
     const NativePluginDescriptor* fDescriptor;
     int fTimerId;
 
-    QPushButton * m_toggleUIButton;
+    CarlaInstrument* const m_carlaInstrument;
+    QWidget* const p_parent;
+
+    QPushButton* m_toggleUIButton;
+    QPushButton* m_toggleParamsWindowButton;
+};
+
+// -------------------------------------------------------------------
+
+class CarlaParamsView : public InstrumentView
+{
+	Q_OBJECT
+public:
+	CarlaParamsView(CarlaInstrument* const instrument, QWidget* const parent);
+	virtual ~CarlaParamsView();
+
+signals:
+	void uiClosed();
+
+private slots:
+	void onRefreshButton();
+	void onRefreshValuesButton();
+	void refreshKnobs();
+	void filterKnobs();
+	void clearFilterText();
+
+private:
+	virtual void modelChanged();
+
+	void addKnob(uint32_t index);
+	void clearKnobs();
+
+	CarlaInstrument* const m_carlaInstrument;
+	QList<Knob*> m_knobs;
+
+	uint32_t lMaxColumns;
+	uint32_t lCurColumn;
+	uint32_t lCurRow;
+
+	QScrollArea* m_scrollArea;
+	QGridLayout* m_scrollAreaLayout;
+	QWidget* m_scrollAreaWidgetContent;
+	QHBoxLayout* m_toolBarLayout;
+
+	QPushButton* m_refreshParamsButton;
+	QPushButton* m_refreshParamValuesButton;
+	QLineEdit* m_paramsFilterLineEdit;
+	QPushButton* m_clearFilterButton;
+	QPushButton* m_automatedOnlyButton;
 };
 
 #endif
