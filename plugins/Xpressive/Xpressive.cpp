@@ -53,9 +53,9 @@
 extern "C" {
 
 Plugin::Descriptor PLUGIN_EXPORT xpressive_plugin_descriptor = { STRINGIFY(
-        PLUGIN_NAME), "Xpressive", QT_TRANSLATE_NOOP("pluginBrowser",
-		"Mathematical expression parser"), "Orr Dvori", 0x0100,
-		Plugin::Instrument, new PluginPixmapLoader("logo"), NULL, NULL };
+	PLUGIN_NAME), "Xpressive", QT_TRANSLATE_NOOP("pluginBrowser",
+	"Mathematical expression parser"), "Orr Dvori", 0x0100,
+	Plugin::Instrument, new PluginPixmapLoader("logo"), NULL, NULL };
 
 }
 
@@ -257,7 +257,6 @@ public:
 		setCenterPointY(14.5);
 		setInnerRadius(4);
 		setOuterRadius(9);
-		//setOuterColor(QColor(0xffffff));
 		setTotalAngle(300.0);
 		setLineWidth(3);
 	}
