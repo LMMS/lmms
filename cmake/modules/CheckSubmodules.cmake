@@ -181,11 +181,9 @@ FOREACH(_submodule ${SUBMODULE_LIST})
 		GIT_SUBMODULE("${_submodule}" false false false)
 
 		SET(COUNTED 0)
-		SET(COUNTING "")
 		# Handle edge-cases where submodule didn't clone properly or re-uses a non-empty directory
 		WHILE(NOT GIT_RESULT EQUAL 0 AND COUNTED LESS MAX_ATTEMPTS)
-			LIST(APPEND COUNTING "x")
-			LIST(LENGTH COUNTING COUNTED)
+			MATH(EXPR COUNTED "${COUNTED}+1")
 			SET(MISSING_COMMIT false)
 			FOREACH(_phrase ${MISSING_COMMIT_PHRASES})
 				IF("${GIT_MESSAGE}" MATCHES "${_phrase}")
