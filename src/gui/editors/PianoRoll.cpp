@@ -680,11 +680,16 @@ void PianoRoll::glueNotes()
 		// Make undo possible
 		m_pattern->addJournalCheckPoint();
 
-		// Sort notes on key (default it's sorted on pos, so after this
-		// it is sorted on key and then pos)
+		// Sort notes on key and then pos.
 		std::sort(selectedNotes.begin(), selectedNotes.end(),
 			[](const Note * note, const Note * compareNote) -> bool
-			{ return note->key() < compareNote->key(); });
+			{
+				if (note->key() == compareNote->key())
+				{
+					return note->pos() < compareNote->pos();
+				}
+				return note->key() < compareNote->key();
+			});
 
 		QList<Note *> noteToRemove;
 
