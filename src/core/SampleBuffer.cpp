@@ -387,6 +387,8 @@ void SampleBuffer::normalizeSampleRate( const sample_rate_t _src_sr,
 	{
 		SampleBuffer * resampled = resample( _src_sr,
 					mixerSampleRate() );
+
+		m_sampleRate = mixerSampleRate();
 		MM_FREE( m_data );
 		m_frames = resampled->frames();
 		m_data = MM_ALLOC( sampleFrame, m_frames );
@@ -400,6 +402,13 @@ void SampleBuffer::normalizeSampleRate( const sample_rate_t _src_sr,
 		// update frame-variables
 		m_loopStartFrame = m_startFrame = 0;
 		m_loopEndFrame = m_endFrame = m_frames;
+	}
+	else if( _src_sr != mixerSampleRate() )
+	{
+		m_startFrame *= ((float)mixerSampleRate() / _src_sr);
+		m_endFrame *= ((float)mixerSampleRate() / _src_sr);
+		m_loopStartFrame *= ((float)mixerSampleRate() / _src_sr);
+		m_loopEndFrame *= ((float)mixerSampleRate() / _src_sr);
 	}
 }
 
