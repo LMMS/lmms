@@ -5707,7 +5707,7 @@ PM bedeutet Phasen-Modulation: Die Phase von Oszillator 3 wird durch Oszillator 
     </message>
     <message>
         <source>This controls the magnification of an axis. It can be helpful to choose magnification for a specific task. For ordinary editing, the magnification should be fitted to your smallest notes. </source>
-        <translation>Dies kontrolliert die Vergrößerung einer Axe. Es kann hilfreich für bestimmte Aufgaben sein, eine Vergrößerung auszuwählen. Für normales Bearbeiten, sollte die Vergrößerung an Ihre kleinsten Noten angepasst sein. </translation>
+        <translation>Dies kontrolliert die Vergrößerung einer Achse. Es kann hilfreich für bestimmte Aufgaben sein, eine Vergrößerung auszuwählen. Für normales Bearbeiten, sollte die Vergrößerung an Ihre kleinsten Noten angepasst sein. </translation>
     </message>
     <message>
         <source>The &apos;Q&apos; stands for quantization, and controls the grid size notes and control points snap to. With smaller quantization values, you can draw shorter notes in Piano Roll, and more exact control points in the Automation Editor.</source>
@@ -5735,7 +5735,7 @@ PM bedeutet Phasen-Modulation: Die Phase von Oszillator 3 wird durch Oszillator 
     </message>
     <message>
         <source>Timeline controls</source>
-        <translation>Zeitlinien Regler</translation>
+        <translation>Zeitlinienregler</translation>
     </message>
     <message>
         <source>Zoom and note controls</source>
