@@ -54,6 +54,8 @@ SET(WINE_CXX_ARGS
 	-I${WINE_INCLUDE_BASE_DIR}
 	-I${WINE_INCLUDE_DIR}/windows
 	-L${WINE_LIBRARY_DIR}
+	# Work around https://bugs.winehq.org/show_bug.cgi?id=47710
+	-D__WIDL_objidl_generated_name_0000000C=""
 	${CMAKE_CURRENT_SOURCE_DIR}/RemoteVstPlugin.cpp
 	-std=c++0x
 	-mwindows -lpthread -lole32 ${EXTRA_FLAGS} -fno-omit-frame-pointer
