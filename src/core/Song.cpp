@@ -1086,10 +1086,44 @@ void Song::loadProject( const QString & fileName )
 		m_playPos[Mode_PlaySong].m_timeLine->toggleLoopPoints( 0 );
 	}
 
+	// convert global automation tracks to non-hidden
 	if( !dataFile.content().firstChildElement( "track" ).isNull() )
 	{
-		m_globalAutomationTrack->restoreState( dataFile.content().
-						firstChildElement( "track" ) );
+		// trackcontainer node to put the global automation tracks
+		QDomNode tc = dataFile.content().elementsByTagName("trackcontainer").at(0);
+		// global (hopefully) track node
+		QDomElement gaTrack = dataFile.content().firstChildElement("track");
+		// Double check track is global (hidden)
+		// If the parent of gaTrack is tc, we've found a trackcontainer track
+		if (gaTrack.parentNode() != tc &&
+			gaTrack.attribute("type").toInt() == Track::HiddenAutomationTrack)
+		{
+			// global automationpatterns
+			QDomNodeList aps = gaTrack.elementsByTagName("automationpattern");
+			for (int i = 0; i < aps.length(); ++i)
+			{
+				QDomElement ap = aps.item(i).toElement();
+				// If ap has time nodes, move it to trackcontainer
+				// We ignore the <object> node because it is possible to have
+				// one without the related object id
+				if (ap.elementsByTagName("time").length() > 0)
+				{
+					QDomElement aptrack = dataFile.createElement("track");
+					aptrack.setAttribute("muted", QString::number(false));
+					aptrack.setAttribute("solo", QString::number(false));
+					aptrack.setAttribute("type",
+						QString::number(Track::AutomationTrack));
+					aptrack.setAttribute("name",
+						ap.attribute("name", "Automation Track"));
+					QDomElement at = dataFile.createElement("automationtrack");
+					aptrack.appendChild(at);
+					aptrack.appendChild(aps.item(i).cloneNode());
+					tc.appendChild(aptrack);
+				}
+			}
+			// Remove the track object just in case
+			gaTrack.parentNode().removeChild(gaTrack);
+		}
 	}
 
 	//Backward compatibility for LMMS <= 0.4.15
