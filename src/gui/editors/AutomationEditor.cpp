@@ -86,6 +86,7 @@ AutomationEditor::AutomationEditor() :
 	m_scrollLevel( 0 ),
 	m_bottomLevel( 0 ),
 	m_topLevel( 0 ),
+	m_pointYLevel(0),
 	m_currentPosition(),
 	m_action( NONE ),
 	m_moveStartLevel( 0 ),
@@ -726,6 +727,10 @@ void AutomationEditor::mouseMoveEvent(QMouseEvent * mouseEvent )
 		update();
 		return;
 	}
+	
+	// sets drawCross tooltip back to mouse y position
+	// TODO: set to point's y value when mouse over point
+	m_pointYLevel = 0;
 
 	if( mouseEvent->y() > TOP_MARGIN )
 	{
@@ -1103,7 +1108,11 @@ inline void AutomationEditor::drawCross( QPainter & p )
 		mouse_pos.y() >= 0 &&
 		mouse_pos.y() <= height() - SCROLLBAR_SIZE )
 	{
-		QToolTip::showText( tt_pos, QString::number( scaledLevel ), this );
+		if (m_pointYLevel == 0) {
+			QToolTip::showText( tt_pos, QString::number( scaledLevel ), this );
+		} else if (m_pointYLevel != 0) {
+			QToolTip::showText( tt_pos, QString::number( m_pointYLevel ), this );
+		}
 	}
 }
 
@@ -1707,6 +1716,59 @@ void AutomationEditor::wheelEvent(QWheelEvent * we )
 	{
 		m_topBottomScroll->setValue( m_topBottomScroll->value() -
 							we->delta() / 30 );
+		
+		if (we->y() > TOP_MARGIN) {
+			float level = getLevel( we->y() );
+			int x = we->x();
+
+			if (x >= VALUES_WIDTH) {
+		// set or move value
+
+				x -= VALUES_WIDTH;
+			// get tick in which the cursor is posated
+				int pos_ticks = x * MidiTime::ticksPerTact() / m_ppt +
+								m_currentPosition;
+
+				// get time map of current pattern
+				timeMap & time_map = m_pattern->getTimeMap();
+
+				// will be our iterator in the following loop
+				timeMap::iterator it = time_map.begin();
+
+				// and check whether the user scrolls over an
+				// existing value
+				while (it != time_map.end()) {
+					
+					if (pos_ticks < 0) {
+						pos_ticks = 0;
+					}
+							
+					if (pos_ticks >= it.key() - MidiTime::ticksPerTact() *4 / m_ppt
+						&& (it+1==time_map.end() ||	pos_ticks <= (it+1).key())
+						&& (pos_ticks<= it.key() + MidiTime::ticksPerTact() *4 / m_ppt)) 
+					{
+						// mouse wheel up
+						if (we->delta() < 0) {
+							level = roundf(it.value() * 1000) / 1000 - 0.001;
+						// mouse wheel down
+						} else if (we->delta() > 0)	{
+							level = roundf(it.value() * 1000) / 1000 + 0.001;
+						}
+						
+						m_pointYLevel = level;
+
+						// set new value
+						m_pattern->setDragValue(MidiTime(pos_ticks), level, true, false);
+
+						// apply new value
+						m_pattern->applyDragValue();
+						
+						break;
+					}
+					++it;
+				}
+			}
+		}
 	}
 }
 
