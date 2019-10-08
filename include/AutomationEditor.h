@@ -208,6 +208,7 @@ private:
 	float m_scrollLevel;
 	float m_bottomLevel;
 	float m_topLevel;
+	float m_point_y_level;
 
 	void updateTopBottomLevels();
 
