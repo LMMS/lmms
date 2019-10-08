@@ -551,8 +551,8 @@ void SaSpectrumView::drawCursor(QPainter &painter)
 	{
 		// cursor lines
 		painter.setPen(QPen(m_controls->m_colorGrid.lighter(), 1, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
-		painter.drawLine(m_cursor.x(), m_displayTop, m_cursor.x(), m_displayBottom);
-		painter.drawLine(m_displayLeft, m_cursor.y(), m_displayRight, m_cursor.y());
+		painter.drawLine(QPointF(m_cursor.x(), m_displayTop), QPointF(m_cursor.x(), m_displayBottom));
+		painter.drawLine(QPointF(m_displayLeft, m_cursor.y()), QPointF(m_displayRight, m_cursor.y()));
 
 		// coordinates: background box
 		QFontMetrics fontMetrics = painter.fontMetrics();
@@ -793,14 +793,18 @@ void SaSpectrumView::periodicUpdate()
 
 
 // Handle mouse input: set new cursor position.
+// For some reason (a bug?), localPos() only returns integers. As a workaround
+// the fractional part is taken from windowPos() (which works correctly).
 void SaSpectrumView::mouseMoveEvent(QMouseEvent *event)
 {
-	m_cursor = event->localPos();
+	m_cursor = QPointF(	event->localPos().x() - (event->windowPos().x() - (long)event->windowPos().x()),
+						event->localPos().y() - (event->windowPos().y() - (long)event->windowPos().y()));
 }
 
 void SaSpectrumView::mousePressEvent(QMouseEvent *event)
 {
-	m_cursor = event->localPos();
+	m_cursor = QPointF(	event->localPos().x() - (event->windowPos().x() - (long)event->windowPos().x()),
+						event->localPos().y() - (event->windowPos().y() - (long)event->windowPos().y()));
 }
 
 
