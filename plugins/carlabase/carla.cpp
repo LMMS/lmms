@@ -656,11 +656,9 @@ void CarlaInstrumentView::toggleParamsWindow()
 		m_carlaInstrument->p_subWindow = new CarlaParamsView(m_carlaInstrument, p_parent);
 		connect(m_carlaInstrument->m_subWindow, SIGNAL(uiClosed()), this, SLOT(paramsUiClosed()));
 	} else {
-		if (m_carlaInstrument->m_subWindow->widget()->isVisible()) {
-			m_carlaInstrument->m_subWindow->widget()->hide();
+		if (m_carlaInstrument->m_subWindow->isVisible()) {
 			m_carlaInstrument->m_subWindow->hide();
 		} else {
-			m_carlaInstrument->m_subWindow->widget()->show();
 			m_carlaInstrument->m_subWindow->show();
 		}
 	}
