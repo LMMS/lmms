@@ -334,10 +334,19 @@ void CarlaInstrument::refreshParams(bool valuesOnly = false, bool init = false)
 	{
 		uint32_t param_count = fDescriptor->get_parameter_count(fHandle);
 
+		if (!param_count) {
+			clearKnobModels();
+			return;
+		}
+
 		if (!valuesOnly)
 		{
 			clearKnobModels();
 			floatModels.reserve(param_count);
+		}
+		else if (floatModels.empty())
+		{
+			return;
 		}
 
 		QList<QString> completerData;
@@ -875,8 +884,6 @@ void CarlaParamsView::onRefreshValuesButton()
 
 void CarlaParamsView::refreshKnobs()
 {
-	if (m_carlaInstrument->floatModels.count()==0) { return; }
-
 	// Make sure all the knobs are deleted.
 	for (uint32_t i=0; i < m_knobs.count(); ++i)
 	{
@@ -886,15 +893,17 @@ void CarlaParamsView::refreshKnobs()
 
 	// Clear the layout (posible spacer).
 	QLayoutItem *item;
-	while ((item = m_scrollAreaLayout->takeAt(0)))
+	while (item = m_scrollAreaLayout->takeAt(0))
 	{
 		if (item->widget()) {delete item->widget();}
 		delete item;
 	}
-	
+
 	// Reset position data.
 	lCurColumn = 0;
 	lCurRow = 0;
+
+	if (!m_carlaInstrument->floatModels.count()) { return; }
 
 	// Make room in QList m_knobs
 	m_knobs.reserve(m_carlaInstrument->floatModels.count());
