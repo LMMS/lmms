@@ -380,7 +380,7 @@ void CarlaInstrument::refreshParams(bool valuesOnly = false, bool init = false)
 			if (init)
 			{
 				QString idStr = CARLA_SETTING_PREFIX + QString::number(i);
-				m_paramModels[i]->loadSettings(settingsElem, idStr);
+				m_paramModels[i]->loadSettings(m_settingsElem, idStr);
 			}
 
 			connect(m_paramModels[i], &FloatModel::dataChanged, this, [=]() {knobModelChanged(i);}, Qt::DirectConnection);
@@ -419,7 +419,7 @@ void CarlaInstrument::loadSettings(const QDomElement& elem)
     fDescriptor->set_state(fHandle, carlaDoc.toString(0).toUtf8().constData());
 
     // Store to load parameter knobs settings when added.
-    settingsElem = const_cast<QDomElement&>(elem);
+    m_settingsElem = const_cast<QDomElement&>(elem);
     refreshParams(false, true);
 }
 

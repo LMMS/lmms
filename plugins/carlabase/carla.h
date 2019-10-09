@@ -139,7 +139,7 @@ private:
     QMutex fMutex;
 
     QList<FloatModel*> m_paramModels;
-    QDomElement settingsElem;
+    QDomElement m_settingsElem;
     QMdiSubWindow* m_subWindow;
     QObject* p_subWindow;
 
