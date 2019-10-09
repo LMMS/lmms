@@ -377,9 +377,9 @@ void CarlaInstrument::refreshParams(bool valuesOnly = false, bool init = false)
 					paramInfo->ranges.max, paramInfo->ranges.step, this, name));
 
 			// Load settings into model.
-			QString idStr = CARLA_SETTING_PREFIX + QString::number(i);
 			if (init)
 			{
+				QString idStr = CARLA_SETTING_PREFIX + QString::number(i);
 				floatModels[i]->loadSettings(settingsElem, idStr);
 			}
 
