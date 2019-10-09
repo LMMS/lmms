@@ -786,7 +786,7 @@ CarlaParamsView::CarlaParamsView(CarlaInstrument* const instrument, QWidget* con
 	m_carlaInstrument->m_subWindow->setFixedWidth(800);
 	m_carlaInstrument->m_subWindow->setMinimumHeight(200);
 	m_carlaInstrument->m_subWindow->setWidget(centralWidget);
-	m_carlaInstrument->m_subWindow->setWindowTitle(m_carlaInstrument->instrumentTrack()->name() + tr(" - Parameters"));
+	centralWidget->setWindowTitle(m_carlaInstrument->instrumentTrack()->name() + tr(" - Parameters"));
 
 	// Connect signals
 	connect(m_refreshParamsButton, SIGNAL(clicked(bool)), this, SLOT(onRefreshButton()));
@@ -891,7 +891,7 @@ void CarlaParamsView::refreshKnobs()
 
 	// Clear the layout (posible spacer).
 	QLayoutItem *item;
-	while (item = m_scrollAreaLayout->takeAt(0))
+	while ((item = m_scrollAreaLayout->takeAt(0)))
 	{
 		if (item->widget()) {delete item->widget();}
 		delete item;
