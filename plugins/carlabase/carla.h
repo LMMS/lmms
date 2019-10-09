@@ -78,11 +78,7 @@ public:
 		setWindowFlags(windowFlags);
 	}
 
-	virtual ~CarlaParamsSubWindow()
-	{
-	}
-
-	virtual void closeEvent(QCloseEvent * event)
+	virtual void closeEvent(QCloseEvent * event) override
 	{
 		emit uiClosed();
 		event->accept();
