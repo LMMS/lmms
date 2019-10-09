@@ -85,8 +85,7 @@ public:
 	virtual void closeEvent(QCloseEvent * event)
 	{
 		emit uiClosed();
-		hide();
-		event->ignore();
+		event->accept();
 	}
 };
 
