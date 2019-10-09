@@ -673,12 +673,11 @@ void CarlaInstrumentView::paramsUiClosed()
 
 CarlaParamsView::CarlaParamsView(CarlaInstrument* const instrument, QWidget* const parent)
 	: InstrumentView(instrument, parent),
-	m_carlaInstrument(instrument)
+	m_carlaInstrument(instrument),
+	m_maxColumns(6),
+	m_curColumn(0),
+	m_curRow(0)
 {
-	lMaxColumns = 6;
-	lCurColumn = 0;
-	lCurRow = 0;
-
 	// Create central widget
 	/*  ___ centralWidget _______________	QWidget
 	 * |  __ verticalLayout _____________	QVBoxLayout
@@ -770,7 +769,7 @@ CarlaParamsView::CarlaParamsView(CarlaInstrument* const instrument, QWidget* con
 	m_scrollAreaLayout->setContentsMargins(3, 3, 3, 3);
 	m_scrollAreaLayout->setVerticalSpacing(12);
 	m_scrollAreaLayout->setHorizontalSpacing(6);
-	m_scrollAreaLayout->setColumnStretch(lMaxColumns, 1);
+	m_scrollAreaLayout->setColumnStretch(m_maxColumns, 1);
 
 
 	// Add m_toolBarLayout and m_scrollArea to the verticalLayout.
@@ -898,8 +897,8 @@ void CarlaParamsView::refreshKnobs()
 	}
 
 	// Reset position data.
-	lCurColumn = 0;
-	lCurRow = 0;
+	m_curColumn = 0;
+	m_curRow = 0;
 
 	if (!m_carlaInstrument->m_paramModels.count()) { return; }
 
@@ -923,24 +922,24 @@ void CarlaParamsView::refreshKnobs()
 
 	// Add spacer so all knobs go to top
 	QSpacerItem* verticalSpacer = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
-	m_scrollAreaLayout->addItem(verticalSpacer, lCurRow+1, 0, 1, 1);
+	m_scrollAreaLayout->addItem(verticalSpacer, m_curRow + 1, 0, 1, 1);
 }
 
 void CarlaParamsView::addKnob(uint32_t index)
 {
 	// Add the new knob to layout
-	m_scrollAreaLayout->addWidget(m_knobs[index], lCurRow, lCurColumn, Qt::AlignHCenter | Qt::AlignTop);
+	m_scrollAreaLayout->addWidget(m_knobs[index], m_curRow, m_curColumn, Qt::AlignHCenter | Qt::AlignTop);
 
 	// Chances that we did close() on the widget is big, so show it.
 	m_knobs[index]->show();
 
 	// Keep track of current column and row index.
-	if (lCurColumn < lMaxColumns-1)
+	if (m_curColumn < m_maxColumns - 1)
 	{
-		lCurColumn++;
+		m_curColumn++;
 	} else {
-		lCurColumn=0;
-		lCurRow++;
+		m_curColumn = 0;
+		m_curRow++;
 	}
 }
 void CarlaParamsView::clearKnobs()
@@ -952,8 +951,8 @@ void CarlaParamsView::clearKnobs()
 	}
 
 	// Reset position data.
-	lCurColumn = 0;
-	lCurRow = 0;
+	m_curColumn = 0;
+	m_curRow = 0;
 }
 
 void CarlaParamsView::modelChanged()

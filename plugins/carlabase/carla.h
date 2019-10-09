@@ -210,9 +210,9 @@ private:
 	CarlaInstrument* const m_carlaInstrument;
 	QList<Knob*> m_knobs;
 
-	uint32_t lMaxColumns;
-	uint32_t lCurColumn;
-	uint32_t lCurRow;
+	const uint32_t m_maxColumns;
+	uint32_t m_curColumn;
+	uint32_t m_curRow;
 
 	QScrollArea* m_scrollArea;
 	QGridLayout* m_scrollAreaLayout;
