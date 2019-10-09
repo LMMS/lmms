@@ -69,7 +69,7 @@ class CarlaParamsSubWindow : public SubWindow
 
 signals:
 	void uiClosed();
-    
+
 public:
 	CarlaParamsSubWindow(QWidget * _parent, Qt::WindowFlags windowFlags) :
 		SubWindow(_parent)
