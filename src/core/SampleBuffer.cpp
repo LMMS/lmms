@@ -382,6 +382,7 @@ void SampleBuffer::directFloatWrite ( sample_t * & _fbuf, f_cnt_t _frames, int _
 void SampleBuffer::normalizeSampleRate( const sample_rate_t _src_sr,
 							bool _keep_settings )
 {
+	const sample_rate_t old_rate = m_sampleRate;
 	// do samplerate-conversion to our default-samplerate
 	if( _src_sr != mixerSampleRate() )
 	{
@@ -403,12 +404,13 @@ void SampleBuffer::normalizeSampleRate( const sample_rate_t _src_sr,
 		m_loopStartFrame = m_startFrame = 0;
 		m_loopEndFrame = m_endFrame = m_frames;
 	}
-	else if( _src_sr != mixerSampleRate() )
+	else if( old_rate != mixerSampleRate() )
 	{
-		m_startFrame *= ((float)mixerSampleRate() / _src_sr);
-		m_endFrame *= ((float)mixerSampleRate() / _src_sr);
-		m_loopStartFrame *= ((float)mixerSampleRate() / _src_sr);
-		m_loopEndFrame *= ((float)mixerSampleRate() / _src_sr);
+		m_startFrame *= ((float)mixerSampleRate() / old_rate);
+		m_endFrame *= ((float)mixerSampleRate() / old_rate);
+		m_loopStartFrame *= ((float)mixerSampleRate() / old_rate);
+		m_loopEndFrame *= ((float)mixerSampleRate() / old_rate);
+		m_sampleRate = mixerSampleRate();
 	}
 }
 
