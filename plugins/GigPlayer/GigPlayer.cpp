@@ -916,16 +916,30 @@ bool GigInstrument::presetChangeSupported()
 
 void GigInstrument::changePreset(int bank, unsigned int preset)
 {
+	bool presetChanged = false;
 	// The "empty" bank indicates that we do not want to switch
 	// banks. If we configure the preset change feature to ignore
 	// bank switching, we can set it manually and be sure
 	// that it will not reset.
 	if (bank != -1)
 	{
-		m_bankNum.setValue(bank);
+		if (m_bankNum.value() != bank)
+		{
+			m_bankNum.setValue(bank);
+			presetChanged = true;
+		}
 	}
-	m_patchNum.setValue(preset);
-	emit patchChanged();
+
+	if (m_patchNum.value() != preset)
+	{
+		m_patchNum.setValue(preset);
+		presetChanged = true;
+	}
+
+	if (presetChanged)
+	{
+		emit patchChanged();
+	}
 }
 
 
