@@ -138,7 +138,7 @@ private:
     // this is only needed because note-offs are being sent during play
     QMutex fMutex;
 
-    QList<FloatModel*> floatModels;
+    QList<FloatModel*> m_paramModels;
     QDomElement settingsElem;
     QMdiSubWindow* m_subWindow;
     QObject* p_subWindow;

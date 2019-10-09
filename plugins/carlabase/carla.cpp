@@ -233,8 +233,8 @@ CarlaInstrument::~CarlaInstrument()
         p_subWindow = NULL;
     }
 
-    if (floatModels.isEmpty() == false) {
-        floatModels.clear();
+    if (m_paramModels.isEmpty() == false) {
+        m_paramModels.clear();
     }
 }
 
@@ -318,10 +318,10 @@ void CarlaInstrument::saveSettings(QDomDocument& doc, QDomElement& parent)
     }
     std::free(state);
 
-    for (uint32_t i=0; i < floatModels.count(); ++i)
+    for (uint32_t i=0; i < m_paramModels.count(); ++i)
     {
         QString idStr = CARLA_SETTING_PREFIX + QString::number(i);
-        floatModels[i]->saveSettings(doc, parent, idStr);
+        m_paramModels[i]->saveSettings(doc, parent, idStr);
     }
 }
 
@@ -342,9 +342,9 @@ void CarlaInstrument::refreshParams(bool valuesOnly = false, bool init = false)
 		if (!valuesOnly)
 		{
 			clearKnobModels();
-			floatModels.reserve(param_count);
+			m_paramModels.reserve(param_count);
 		}
-		else if (floatModels.empty())
+		else if (m_paramModels.empty())
 		{
 			return;
 		}
@@ -358,7 +358,7 @@ void CarlaInstrument::refreshParams(bool valuesOnly = false, bool init = false)
 
 			if (valuesOnly)
 			{
-				floatModels[i]->setValue(param_value);
+				m_paramModels[i]->setValue(param_value);
 				continue;
 			}
 
@@ -373,17 +373,17 @@ void CarlaInstrument::refreshParams(bool valuesOnly = false, bool init = false)
 			completerData.push_back(name);
 
 			// current_value, min, max, steps
-			floatModels.push_back(new FloatModel(param_value, paramInfo->ranges.min,
+			m_paramModels.push_back(new FloatModel(param_value, paramInfo->ranges.min,
 					paramInfo->ranges.max, paramInfo->ranges.step, this, name));
 
 			// Load settings into model.
 			if (init)
 			{
 				QString idStr = CARLA_SETTING_PREFIX + QString::number(i);
-				floatModels[i]->loadSettings(settingsElem, idStr);
+				m_paramModels[i]->loadSettings(settingsElem, idStr);
 			}
 
-			connect(floatModels[i], &FloatModel::dataChanged, this, [=]() {knobModelChanged(i);}, Qt::DirectConnection);
+			connect(m_paramModels[i], &FloatModel::dataChanged, this, [=]() {knobModelChanged(i);}, Qt::DirectConnection);
 		}
 		// Set completer data
 		m_completerModel->setStringList(completerData);
@@ -392,19 +392,19 @@ void CarlaInstrument::refreshParams(bool valuesOnly = false, bool init = false)
 
 void CarlaInstrument::clearKnobModels(){
 	//Delete the models, this also disconnects all connections (automation and controller connections)
-	for (uint32_t i=0; i < floatModels.count(); ++i)
+	for (uint32_t i=0; i < m_paramModels.count(); ++i)
 	{
-		delete floatModels[i];
+		delete m_paramModels[i];
 	}
 
 	//Clear the list
-	floatModels.clear();
+	m_paramModels.clear();
 }
 
 void CarlaInstrument::knobModelChanged(uint32_t index)
 {
 	if (fDescriptor->set_parameter_value != nullptr){
-		fDescriptor->set_parameter_value(fHandle, index, floatModels[index]->value());
+		fDescriptor->set_parameter_value(fHandle, index, m_paramModels[index]->value());
 	}
 }
 
@@ -816,7 +816,7 @@ CarlaParamsView::~CarlaParamsView()
 	m_carlaInstrument->p_subWindow = NULL;
 
 	// Clear models
-	if (m_carlaInstrument->floatModels.isEmpty() == false)
+	if (m_carlaInstrument->m_paramModels.isEmpty() == false)
 	{
 		m_carlaInstrument->clearKnobModels();
 	}
@@ -837,7 +837,7 @@ void CarlaParamsView::filterKnobs()
 		// Filter on automation only
 		if (m_automatedOnlyButton->isChecked())
 		{
-			if (! m_carlaInstrument->floatModels[i]->isAutomatedOrControlled())
+			if (! m_carlaInstrument->m_paramModels[i]->isAutomatedOrControlled())
 			{
 				continue;
 			}
@@ -858,7 +858,7 @@ void CarlaParamsView::filterKnobs()
 
 void CarlaParamsView::onRefreshButton()
 {
-	if (m_carlaInstrument->floatModels.isEmpty() == false)
+	if (m_carlaInstrument->m_paramModels.isEmpty() == false)
 	{
 		if (QMessageBox::warning(NULL,
 				tr("Reload knobs"),
@@ -901,21 +901,21 @@ void CarlaParamsView::refreshKnobs()
 	lCurColumn = 0;
 	lCurRow = 0;
 
-	if (!m_carlaInstrument->floatModels.count()) { return; }
+	if (!m_carlaInstrument->m_paramModels.count()) { return; }
 
 	// Make room in QList m_knobs
-	m_knobs.reserve(m_carlaInstrument->floatModels.count());
+	m_knobs.reserve(m_carlaInstrument->m_paramModels.count());
 
-	for (uint32_t i=0; i < m_carlaInstrument->floatModels.count(); ++i)
+	for (uint32_t i=0; i < m_carlaInstrument->m_paramModels.count(); ++i)
 	{
 		m_knobs.push_back(new Knob(m_scrollAreaWidgetContent));
-		QString name = (*m_carlaInstrument->floatModels[i]).displayName();
+		QString name = (*m_carlaInstrument->m_paramModels[i]).displayName();
 		m_knobs[i]->setHintText(name, "");
 		m_knobs[i]->setLabel(name);
 		m_knobs[i]->setObjectName(name); // this is being used for filtering the knobs.
 
 		// Set the newly created model to the knob.
-		m_knobs[i]->setModel(m_carlaInstrument->floatModels[i]);
+		m_knobs[i]->setModel(m_carlaInstrument->m_paramModels[i]);
 
 		// Add knob to layout
 		addKnob(i);
