@@ -3002,7 +3002,7 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     </message>
     <message>
         <source>VELOCITY</source>
-        <translation>PRĘDKOŚĆ UDERZENIA</translation>
+        <translation>PRĘDKOŚĆ</translation>
     </message>
     <message>
         <source>ENABLE MIDI OUTPUT</source>

@@ -1678,7 +1678,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     <message>
         <location filename="../../src/gui/widgets/EffectView.cpp" line="76"/>
         <source>DECAY</source>
-        <translation>ЗГАСАННЯ</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../src/gui/widgets/EffectView.cpp" line="79"/>
