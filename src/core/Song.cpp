@@ -608,6 +608,9 @@ void Song::playPattern( const Pattern* patternToPlay, bool loop )
 
 void Song::updateLength()
 {
+	if(m_loadingProject) {
+		return;
+	}
 	m_length = 0;
 	m_tracksMutex.lockForRead();
 	for( TrackList::const_iterator it = tracks().begin();
@@ -1002,7 +1005,7 @@ void Song::createNewProject()
 	QCoreApplication::instance()->processEvents();
 
 	m_loadingProject = false;
-
+	updateLength();
 	Engine::getBBTrackContainer()->updateAfterTrackAdd();
 
 	Engine::projectJournal()->setJournalling( true );
@@ -1203,6 +1206,7 @@ void Song::loadProject( const QString & fileName )
 	}
 
 	m_loadingProject = false;
+	updateLength();
 	setModified(false);
 	m_loadOnLaunch = false;
 }
