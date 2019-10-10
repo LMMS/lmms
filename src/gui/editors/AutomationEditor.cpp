@@ -1749,10 +1749,12 @@ void AutomationEditor::wheelEvent(QWheelEvent * we )
 					{
 						// mouse wheel up
 						if (we->delta() < 0) {
-							level = roundf(it.value() * 1000) / 1000 - 0.001;
+							level = roundf(it.value() * 1000) / 1000 -
+							 m_pattern->firstObject()->step<float>();
 						// mouse wheel down
 						} else if (we->delta() > 0)	{
-							level = roundf(it.value() * 1000) / 1000 + 0.001;
+							level = roundf(it.value() * 1000) / 1000 +
+							 m_pattern->firstObject()->step<float>();
 						}
 						
 						m_pointYLevel = level;
