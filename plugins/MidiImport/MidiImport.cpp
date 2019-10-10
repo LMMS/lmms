@@ -333,8 +333,8 @@ bool MidiImport::readSMF( TrackContainer* tc )
 	for( int s = 0; s < timeSigs->length(); ++s )
 	{
 		Alg_time_sig timeSig = (*timeSigs)[s];
-		timeSigNumeratorPat->putValue(timeSig.beat*ticksPerBeat, timeSig.num);
-		timeSigDenominatorPat->putValue(timeSig.beat*ticksPerBeat, timeSig.den);
+		timeSigNumeratorPat->putValue(timeSig.beat * ticksPerBeat, timeSig.num);
+		timeSigDenominatorPat->putValue(timeSig.beat * ticksPerBeat, timeSig.den);
 	}
 	// manually call otherwise the pattern shows being 1 bar
 	timeSigNumeratorPat->updateLength();
