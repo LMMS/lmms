@@ -1612,6 +1612,41 @@ void DataFile::upgrade_1_3_0()
 			}
 		}
 	}
+
+	// convert global automation tracks to non-hidden
+	QDomElement song = firstChildElement("lmms-project")
+		.firstChildElement("song");
+	QDomElement tc = song.firstChildElement("trackcontainer");
+	QDomElement gaTrack = song.firstChildElement("track");
+	if (!gaTrack.isNull()
+		&& gaTrack.attribute("type").toInt() == Track::HiddenAutomationTrack)
+	{
+		// global automationpatterns
+		QDomNodeList aps = gaTrack.elementsByTagName("automationpattern");
+		for (int i = 0; i < aps.length(); ++i)
+		{
+			QDomElement ap = aps.item(i).toElement();
+			// If ap has time nodes, move it to trackcontainer
+			// We ignore the <object> node because it is possible to have
+			// one without the related object id
+			if (ap.elementsByTagName("time").length() > 0)
+			{
+				QDomElement aptrack = createElement("track");
+				aptrack.setAttribute("muted", QString::number(false));
+				aptrack.setAttribute("solo", QString::number(false));
+				aptrack.setAttribute("type",
+					QString::number(Track::AutomationTrack));
+				aptrack.setAttribute("name",
+					ap.attribute("name", "Automation Track"));
+				QDomElement at = createElement("automationtrack");
+				aptrack.appendChild(at);
+				aptrack.appendChild(aps.item(i).cloneNode());
+				tc.appendChild(aptrack);
+			}
+		}
+		// Remove the track object just in case
+		gaTrack.parentNode().removeChild(gaTrack);
+	}
 }
 
 void DataFile::upgrade_noHiddenClipNames()
