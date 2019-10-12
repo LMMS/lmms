@@ -607,7 +607,7 @@ VestigeInstrumentView::VestigeInstrumentView( Instrument * _instrument,
 	QPushButton * note_off_all_btn = new QPushButton( tr( "Turn off all "
 							"notes" ), this );
 	note_off_all_btn->setGeometry( 20, 160, 200, 24 );
-	note_off_all_btn->setIcon( embed::getIconPixmap( "state_stop" ) );
+	note_off_all_btn->setIcon( embed::getIconPixmap( "stop" ) );
 	note_off_all_btn->setFont( pointSize<8>( note_off_all_btn->font() ) );
 	connect( note_off_all_btn, SIGNAL( clicked() ), this,
 							SLOT( noteOffAll() ) );
