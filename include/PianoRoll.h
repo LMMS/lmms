@@ -306,6 +306,8 @@ private:
 	void playChordNotes(int key, int velocity=-1);
 	void pauseChordNotes(int key);
 
+	void updateScrollbars();
+
 	QList<int> getAllOctavesForKey( int keyToMirror ) const;
 
 	int noteEditTop() const;
