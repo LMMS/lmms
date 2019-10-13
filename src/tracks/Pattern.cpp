@@ -41,6 +41,7 @@
 #include "BBTrackContainer.h"
 #include "StringPairDrag.h"
 #include "MainWindow.h"
+#include "SongEditor.h"
 
 #include <limits>
 
@@ -649,6 +650,14 @@ void PatternView::setGhostInPianoRoll()
 
 
 
+void PatternView::setLoop()
+{
+	gui->songEditor()->setLoop( m_pat->startPosition(), m_pat->startPosition()+m_pat->length() );
+}
+
+
+
+
 void PatternView::resetName()
 {
 	m_pat->setName( m_pat->m_instrumentTrack->name() );
@@ -684,6 +693,9 @@ void PatternView::constructContextMenu( QMenu * _cm )
 					this, SLOT( setGhostInPianoRoll() ) );
 	_cm->insertSeparator( _cm->actions()[2] );
 	_cm->addSeparator();
+
+	_cm->addAction( embed::getIconPixmap( "piano" ), // TODO: Get a loop icon for this?
+			tr( "Set loop" ), this, SLOT( setLoop() ) );
 
 	_cm->addAction( embed::getIconPixmap( "edit_erase" ),
 			tr( "Clear all notes" ), m_pat, SLOT( clear() ) );

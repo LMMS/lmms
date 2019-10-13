@@ -589,7 +589,6 @@ void SongEditor::updateScrollBar( int len )
 
 
 
-
 static inline void animateScroll( QScrollBar *scrollBar, int newVal, bool smoothScroll )
 {
 	if( smoothScroll == false )
@@ -935,6 +934,12 @@ void SongEditorWindow::adjustUiAfterProjectLoad()
 	m_editor->scrolled(0);
 }
 
+
+void SongEditorWindow::setLoop( const MidiTime & from, const MidiTime & to )
+{
+	m_editor->m_timeLine->setLoop( from, to );
+	m_editor->m_timeLine->repaint();
+}
 
 
 
