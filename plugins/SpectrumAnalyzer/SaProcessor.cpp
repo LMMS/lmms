@@ -476,6 +476,21 @@ void SaProcessor::clear()
 	std::fill(m_history.begin(), m_history.end(), 0);
 }
 
+// Clear only history work buffer. Used to flush old data when waterfall
+// is shown after a period of inactivity.
+void SaProcessor::clearHistory()
+{
+	QMutexLocker lock(&m_dataAccess);
+	std::fill(m_history_work.begin(), m_history_work.end(), 0);
+}
+
+// Check if result buffers contain any non-zero values
+bool SaProcessor::spectrumNotEmpty()
+{
+	QMutexLocker lock(&m_reallocationAccess);
+	return notEmpty(m_normSpectrumL) || notEmpty(m_normSpectrumR);
+}
+
 
 // --------------------------------------
 // Frequency conversion helpers

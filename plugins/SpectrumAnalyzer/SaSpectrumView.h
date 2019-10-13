@@ -85,7 +85,7 @@ private:
 	std::vector<float> m_displayBufferR;
 	std::vector<float> m_peakBufferL;
 	std::vector<float> m_peakBufferR;
-	void updateBuffers(float *spectrum, float *displayBuffer, float *peakBuffer);
+	void updateBuffers(const float *spectrum, float *displayBuffer, float *peakBuffer);
 
 	// final paths to be drawn by QPainter and methods to build them
 	QPainterPath m_pathL;

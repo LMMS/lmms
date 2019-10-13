@@ -93,11 +93,11 @@ void SaWaterfallView::paintEvent(QPaintEvent *event)
 	painter.setRenderHint(QPainter::Antialiasing, true);
 
 	// check if time labels need to be rebuilt
-	if (secondsPerLine() != m_oldSecondsPerLine || m_processor->m_waterfallHeight != m_oldHeight)
+	if (secondsPerLine() != m_oldSecondsPerLine || m_processor->waterfallHeight() != m_oldHeight)
 	{
 		m_timeTics = makeTimeTics();
 		m_oldSecondsPerLine = secondsPerLine();
-		m_oldHeight = m_processor->m_waterfallHeight;
+		m_oldHeight = m_processor->waterfallHeight();
 	}
 
 	// print time labels
@@ -137,12 +137,12 @@ void SaWaterfallView::paintEvent(QPaintEvent *event)
 	}
 
 	// draw the spectrogram precomputed in SaProcessor
-	if (m_processor->m_waterfallNotEmpty)
+	if (m_processor->waterfallNotEmpty())
 	{
 		QMutexLocker lock(&m_processor->m_reallocationAccess);
-		QImage temp = QImage(m_processor->m_history.data(),		// raw pixel data to display
+		QImage temp = QImage(m_processor->getHistory(),			// raw pixel data to display
 							 m_processor->waterfallWidth(),		// width = number of frequency bins
-							 m_processor->m_waterfallHeight,	// height = number of history lines
+							 m_processor->waterfallHeight(),	// height = number of history lines
 							 QImage::Format_RGB32);
 		lock.unlock();
 		temp.setDevicePixelRatio(devicePixelRatio());			// display at native resolution
@@ -178,7 +178,7 @@ void SaWaterfallView::paintEvent(QPaintEvent *event)
 // Helper functions for time conversion
 float SaWaterfallView::samplesPerLine()
 {
-	return (float)m_processor->m_inBlockSize / m_controls->m_windowOverlapModel.value();
+	return (float)m_processor->inBlockSize() / m_controls->m_windowOverlapModel.value();
 }
 
 float SaWaterfallView::secondsPerLine()
@@ -190,7 +190,7 @@ float SaWaterfallView::secondsPerLine()
 // Convert time value to Y coordinate for display of given height.
 float SaWaterfallView::timeToYPixel(float time, int height)
 {
-	float pixels_per_line = (float)height / m_processor->m_waterfallHeight;
+	float pixels_per_line = (float)height / m_processor->waterfallHeight();
 
 	return pixels_per_line * time / secondsPerLine();
 }
@@ -200,7 +200,7 @@ float SaWaterfallView::timeToYPixel(float time, int height)
 float SaWaterfallView::yPixelToTime(float position, int height)
 {
 	if (height == 0) {height = 1;}
-	float pixels_per_line = (float)height / m_processor->m_waterfallHeight;
+	float pixels_per_line = (float)height / m_processor->waterfallHeight();
 
 	return (position / pixels_per_line) * secondsPerLine();
 }
@@ -258,10 +258,7 @@ void SaWaterfallView::updateVisibility()
 	if (m_controls->m_waterfallModel.value())
 	{
 		// clear old data before showing the waterfall
-		QMutexLocker lock(&m_processor->m_dataAccess);
-		std::fill(m_processor->m_history_work.begin(), m_processor->m_history_work.end(), 0);
-		lock.unlock();
-
+		m_processor->clearHistory();
 		setVisible(true);
 
 		// increase window size if it is too small

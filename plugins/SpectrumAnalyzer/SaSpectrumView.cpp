@@ -163,10 +163,8 @@ void SaSpectrumView::drawSpectrum(QPainter &painter)
 	#endif
 
 	// draw the graph only if there is any input, averaging residue or peaks
-	QMutexLocker lock(&m_processor->m_reallocationAccess);
-	if (m_decaySum > 0 || notEmpty(m_processor->m_normSpectrumL) || notEmpty(m_processor->m_normSpectrumR))
+	if (m_decaySum > 0 || m_processor->spectrumNotEmpty())
 	{
-		lock.unlock();
 		// update data buffers and reconstruct paths
 		refreshPaths();
 
@@ -204,10 +202,6 @@ void SaSpectrumView::drawSpectrum(QPainter &painter)
 			draw_time = std::chrono::high_resolution_clock::now().time_since_epoch().count() - draw_time;
 		#endif
 	}
-	else
-	{
-		lock.unlock();
-	}
 
 	#ifdef SA_DEBUG
 		// save performance measurement result
@@ -242,8 +236,8 @@ void SaSpectrumView::refreshPaths()
 		int refresh_time = std::chrono::high_resolution_clock::now().time_since_epoch().count();
 	#endif
 	m_decaySum = 0;
-	updateBuffers(m_processor->m_normSpectrumL.data(), m_displayBufferL.data(), m_peakBufferL.data());
-	updateBuffers(m_processor->m_normSpectrumR.data(), m_displayBufferR.data(), m_peakBufferR.data());
+	updateBuffers(m_processor->getSpectrumL(), m_displayBufferL.data(), m_peakBufferL.data());
+	updateBuffers(m_processor->getSpectrumR(), m_displayBufferR.data(), m_peakBufferR.data());
 	#ifdef SA_DEBUG
 		refresh_time = std::chrono::high_resolution_clock::now().time_since_epoch().count() - refresh_time;
 	#endif
@@ -292,7 +286,7 @@ void SaSpectrumView::refreshPaths()
 // reallocation access lock! Data access lock is not needed: the final result
 // buffer is updated very quickly and the worst case is that one frame will be
 // part new, part old. At reasonable frame rate, such difference is invisible..
-void SaSpectrumView::updateBuffers(float *spectrum, float *displayBuffer, float *peakBuffer)
+void SaSpectrumView::updateBuffers(const float *spectrum, float *displayBuffer, float *peakBuffer)
 {
 	for (int n = 0; n < m_processor->binCount(); n++)
 	{

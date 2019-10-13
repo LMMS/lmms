@@ -59,8 +59,21 @@ public:
 	void reallocateBuffers();
 	void rebuildWindow();
 	void clear();
+	void clearHistory();
+
+	const float *getSpectrumL() const {return m_normSpectrumL.data();}
+	const float *getSpectrumR() const {return m_normSpectrumR.data();}
+	const uchar *getHistory() const {return m_history.data();}
 
 	// information about results and unit conversion helpers
+	const unsigned int &inBlockSize() const {return m_inBlockSize;}
+	unsigned int binCount() const;			//!< size of output (frequency domain) data block
+	bool spectrumNotEmpty();				//!< check if result buffers contain any non-zero values
+
+	unsigned int waterfallWidth() const;	//!< binCount value capped at 3840 (for display)
+	const unsigned int& waterfallHeight() const {return m_waterfallHeight;}
+	bool waterfallNotEmpty() const {return m_waterfallNotEmpty;}
+
 	float binToFreq(unsigned int bin_index) const;
 	float binBandwidth() const;
 
@@ -103,8 +116,6 @@ private:
 	unsigned int m_fftBlockSize;			//!< size of padded block for FFT processing
 	unsigned int m_sampleRate;
 
-	unsigned int binCount() const;			//!< size of output (frequency domain) data block
-
 	// data buffers (roughly in the order of processing, from input to output)
 	unsigned int m_framesFilledUp;
 	std::vector<float> m_bufferL;			//!< time domain samples (left)
@@ -128,19 +139,15 @@ private:
 	unsigned int m_waterfallHeight;			//!< number of stored lines in history buffer
 											// Note: high values may make it harder to see transients.
 	const unsigned int m_waterfallMaxWidth = 3840;
-	unsigned int waterfallWidth() const;	//!< binCount value capped at 3840 (for display)
 
 	// book keeping
 	bool m_spectrumActive;
 	bool m_waterfallActive;
-	unsigned int m_waterfallNotEmpty;
+	unsigned int m_waterfallNotEmpty;		//!< number of lines remaining visible on display
 	bool m_reallocating;
 
 	// merge L and R channels and apply gamma correction to make a spectrogram pixel
 	QRgb makePixel(float left, float right) const;
-
-	friend class SaSpectrumView;
-	friend class SaWaterfallView;
 
 	#ifdef SA_DEBUG
 		unsigned int m_last_dump_time;
