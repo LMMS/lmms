@@ -4095,6 +4095,8 @@ void PianoRoll::cutSelectedNotes()
 
 	if( ! selected_notes.empty() )
 	{
+		m_pattern->addJournalCheckPoint();
+
 		copyToClipboard( selected_notes );
 
 		Engine::getSong()->setModified();

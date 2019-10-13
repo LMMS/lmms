@@ -199,6 +199,8 @@ AutomationEditor::AutomationEditor() :
 	setCurrentPattern( NULL );
 
 	setMouseTracking( true );
+	setFocusPolicy( Qt::StrongFocus );
+	setFocus();
 }
 
 
@@ -1491,7 +1493,7 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 		m_leftRightScroll->setPageStep( l );
 	}
 
-	if( validPattern() && GuiApplication::instance()->automationEditor()->hasFocus() )
+	if(validPattern() && GuiApplication::instance()->automationEditor()->m_editor->hasFocus())
 	{
 
 		drawCross( p );
@@ -2578,6 +2580,11 @@ void AutomationEditorWindow::clearCurrentPattern()
 {
 	m_editor->m_pattern = nullptr;
 	setCurrentPattern(nullptr);
+}
+
+void AutomationEditorWindow::focusInEvent(QFocusEvent * event)
+{
+	m_editor->setFocus( event->reason() );
 }
 
 void AutomationEditorWindow::play()
