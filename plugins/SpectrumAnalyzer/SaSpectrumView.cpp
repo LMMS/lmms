@@ -143,13 +143,13 @@ void SaSpectrumView::paintEvent(QPaintEvent *event)
 		painter.setPen(QPen(m_controls->m_colorLabels, 1,
 							Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
 		painter.drawText(m_displayRight -150, 10, 130, 16, Qt::AlignLeft,
-						 QString("Exec avg.: ").append(std::to_string(m_execution_avg).substr(0, 5).data()).append(" ms"));
+						 QString("Exec avg.: ").append(std::to_string(m_execution_avg).substr(0, 5).c_str()).append(" ms"));
 		painter.drawText(m_displayRight -150, 30, 130, 16, Qt::AlignLeft,
-						 QString("Buff. upd. avg: ").append(std::to_string(m_refresh_avg).substr(0, 5).data()).append(" ms"));
+						 QString("Buff. upd. avg: ").append(std::to_string(m_refresh_avg).substr(0, 5).c_str()).append(" ms"));
 		painter.drawText(m_displayRight -150, 50, 130, 16, Qt::AlignLeft,
-						 QString("Path build avg: ").append(std::to_string(m_path_avg).substr(0, 5).data()).append(" ms"));
+						 QString("Path build avg: ").append(std::to_string(m_path_avg).substr(0, 5).c_str()).append(" ms"));
 		painter.drawText(m_displayRight -150, 70, 130, 16, Qt::AlignLeft,
-						 QString("Path draw avg: ").append(std::to_string(m_draw_avg).substr(0, 5).data()).append(" ms"));
+						 QString("Path draw avg: ").append(std::to_string(m_draw_avg).substr(0, 5).c_str()).append(" ms"));
 
 	#endif
 }
@@ -574,7 +574,7 @@ void SaSpectrumView::drawCursor(QPainter &painter)
 		float yAmp = m_processor->yPixelToAmp(m_cursor.y(), m_displayBottom);
 		if (m_controls->m_logYModel.value())
 		{
-			tmps = QString(std::to_string(yAmp).substr(0, 5).data()).append(" dBFS");
+			tmps = QString(std::to_string(yAmp).substr(0, 5).c_str()).append(" dBFS");
 		}
 		else
 		{
