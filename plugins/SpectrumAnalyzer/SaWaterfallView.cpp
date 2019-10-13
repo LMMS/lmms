@@ -170,7 +170,7 @@ void SaWaterfallView::paintEvent(QPaintEvent *event)
 		m_execution_avg = 0.95 * m_execution_avg + 0.05 * draw_time / 1000000.0;
 		painter.setPen(QPen(m_controls->m_colorLabels, 1, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
 		painter.drawText(m_displayRight -150, 10, 100, 16, Qt::AlignLeft,
-						 QString(std::string("Exec avg.: " + std::to_string(m_execution_avg).substr(0, 5) + " ms").c_str()));
+						 QString("Exec avg.: ").append(std::to_string(m_execution_avg).substr(0, 5).c_str()).append(" ms"));
 	#endif
 }
 
@@ -306,14 +306,14 @@ void SaWaterfallView::drawCursor(QPainter &painter)
 
 		// frequency
 		int freq = (int)m_processor->xPixelToFreq(m_cursor.x() - m_displayLeft, m_displayWidth);
-		tmps = QString(std::string(std::to_string(freq) + " Hz").c_str());
+		tmps = QString("%1 Hz").arg(freq);
 		painter.drawText(m_displayLeft + box_left + box_margin,
 						 m_displayTop + box_top + box_margin,
 						 box_width, box_height / 2, Qt::AlignLeft, tmps);
 
 		// time
 		float time = yPixelToTime(m_cursor.y(), m_displayBottom);
-		tmps = QString(std::string(std::string(std::to_string(time)).substr(0, 5) + " s").c_str());
+		tmps = QString(std::to_string(time).substr(0, 5).c_str()).append(" s");
 		painter.drawText(m_displayLeft + box_left + box_margin,
 						 m_displayTop + box_top + box_height / 2,
 						 box_width, box_height / 2, Qt::AlignLeft, tmps);

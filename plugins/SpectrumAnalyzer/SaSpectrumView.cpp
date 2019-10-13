@@ -142,14 +142,14 @@ void SaSpectrumView::paintEvent(QPaintEvent *event)
 		m_execution_avg = 0.95 * m_execution_avg + 0.05 * total_time / 1000000.0;
 		painter.setPen(QPen(m_controls->m_colorLabels, 1,
 							Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
-		painter.drawText(m_displayRight -150, 10, 100, 16, Qt::AlignLeft,
-						 QString(std::string("Exec avg.: " + std::to_string(m_execution_avg).substr(0, 5) + " ms").c_str()));
-		painter.drawText(m_displayRight -150, 30, 100, 16, Qt::AlignLeft,
-						 QString(std::string("Buff. upd. avg: " + std::to_string(m_refresh_avg).substr(0, 5) + " ms").c_str()));
-		painter.drawText(m_displayRight -150, 50, 100, 16, Qt::AlignLeft,
-						 QString(std::string("Path build avg: " + std::to_string(m_path_avg).substr(0, 5) + " ms").c_str()));
-		painter.drawText(m_displayRight -150, 70, 100, 16, Qt::AlignLeft,
-						 QString(std::string("Path draw avg: " + std::to_string(m_draw_avg).substr(0, 5) + " ms").c_str()));
+		painter.drawText(m_displayRight -150, 10, 130, 16, Qt::AlignLeft,
+						 QString("Exec avg.: ").append(std::to_string(m_execution_avg).substr(0, 5).data()).append(" ms"));
+		painter.drawText(m_displayRight -150, 30, 130, 16, Qt::AlignLeft,
+						 QString("Buff. upd. avg: ").append(std::to_string(m_refresh_avg).substr(0, 5).data()).append(" ms"));
+		painter.drawText(m_displayRight -150, 50, 130, 16, Qt::AlignLeft,
+						 QString("Path build avg: ").append(std::to_string(m_path_avg).substr(0, 5).data()).append(" ms"));
+		painter.drawText(m_displayRight -150, 70, 130, 16, Qt::AlignLeft,
+						 QString("Path draw avg: ").append(std::to_string(m_draw_avg).substr(0, 5).data()).append(" ms"));
 
 	#endif
 }
@@ -565,7 +565,7 @@ void SaSpectrumView::drawCursor(QPainter &painter)
 
 		// frequency
 		int xFreq = (int)m_processor->xPixelToFreq(m_cursor.x() - m_displayLeft, m_displayWidth);
-		tmps = QString(std::string(std::to_string(xFreq) + " Hz").c_str());
+		tmps = QString("%1 Hz").arg(xFreq);
 		painter.drawText(m_displayLeft + box_left + box_margin,
 						 m_displayTop + box_top + box_margin,
 						 box_width, box_height / 2, Qt::AlignLeft, tmps);
@@ -574,12 +574,12 @@ void SaSpectrumView::drawCursor(QPainter &painter)
 		float yAmp = m_processor->yPixelToAmp(m_cursor.y(), m_displayBottom);
 		if (m_controls->m_logYModel.value())
 		{
-			tmps = QString(std::string(std::to_string(yAmp).substr(0, 5) + " dBFS").c_str());
+			tmps = QString(std::to_string(yAmp).substr(0, 5).data()).append(" dBFS");
 		}
 		else
 		{
 			// add 0.0005 to get proper rounding to 3 decimal places
-			tmps = QString(std::string(std::to_string(0.0005f + yAmp)).substr(0, 5).c_str());
+			tmps = QString(std::to_string(0.0005f + yAmp).substr(0, 5).c_str());
 		}
 		painter.drawText(m_displayLeft + box_left + box_margin,
 						 m_displayTop + box_top + box_height / 2,
