@@ -88,7 +88,7 @@ SaProcessor::~SaProcessor()
 
 
 // Load data from audio thread ringbuffer and run FFT analysis if buffer is full enough.
-void SaProcessor::analyse(ringbuffer_t<sampleFrame> &ring_buffer, QWaitCondition &notifier)
+void SaProcessor::analyze(ringbuffer_t<sampleFrame> &ring_buffer, QWaitCondition &notifier)
 {
 	ringbuffer_reader_t<sampleFrame> reader(ring_buffer);
 
@@ -385,7 +385,7 @@ void SaProcessor::reallocateBuffers()
 
 	new_bins = new_fft_size / 2 +1;
 
-	// Use m_reallocating to tell analyse() to avoid asking for the lock. This
+	// Use m_reallocating to tell analyze() to avoid asking for the lock. This
 	// is needed because under heavy load the FFT thread requests data lock so
 	// often that this routine could end up waiting even for several seconds.
 	m_reallocating = true;

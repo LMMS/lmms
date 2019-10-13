@@ -46,7 +46,7 @@ public:
 	virtual ~SaProcessor();
 
 	// analysis thread and a method to terminate it
-	void analyse(ringbuffer_t<sampleFrame> &ring_buffer, QWaitCondition &notifier);
+	void analyze(ringbuffer_t<sampleFrame> &ring_buffer, QWaitCondition &notifier);
 	void terminate() {m_terminate = true;}
 
 	// inform processor if any processing is actually required

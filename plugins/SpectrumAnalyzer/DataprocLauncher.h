@@ -44,7 +44,7 @@ public:
 private:
 	void run() override
 	{
-		m_processor->analyse(*m_inputBuffer, *m_notifier);
+		m_processor->analyze(*m_inputBuffer, *m_notifier);
 	}
 
 	SaProcessor *m_processor;

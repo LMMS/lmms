@@ -56,7 +56,7 @@ private:
 	// QThread::create() workaround
 	// Replace DataprocLauncher by QThread and replace initializer in constructor
 	// with the following commented line when LMMS CI starts using Qt > 5.9
-	//m_processorThread = QThread::create([=]{m_processor.analyse(m_inputBuffer, m_notifier);});
+	//m_processorThread = QThread::create([=]{m_processor.analyze(m_inputBuffer, m_notifier);});
 	DataprocLauncher m_processorThread;
 
 	ringbuffer_t<sampleFrame> m_inputBuffer;
