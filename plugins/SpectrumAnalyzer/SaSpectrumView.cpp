@@ -281,7 +281,7 @@ void SaSpectrumView::refreshPaths()
 	#ifdef SA_DEBUG
 		// save performance measurement results
 		m_refresh_avg = 0.95 * m_refresh_avg + 0.05 * refresh_time / 1000000.0;
-		m_path_avg = 0.95 * m_path_avg + 0.05 * path_time / 1000000.0;
+		m_path_avg = .95f * m_path_avg + .05f * path_time / 1000000.f;
 	#endif
 }
 
