@@ -608,9 +608,8 @@ void Song::playPattern( const Pattern* patternToPlay, bool loop )
 
 void Song::updateLength()
 {
-	if(m_loadingProject) {
-		return;
-	}
+	if (m_loadingProject) { return; }
+
 	m_length = 0;
 	m_tracksMutex.lockForRead();
 	for( TrackList::const_iterator it = tracks().begin();
