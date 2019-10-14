@@ -118,6 +118,9 @@ void Instrument::applyFadeIn(sampleFrame * buf, NotePlayHandle * n)
 	{
 		const fpp_t frames = n->framesLeftForCurrentPeriod();
 
+		// We need to skip the first sample because it almost always
+		// produces a zero crossing; it's not helpful while
+		// determining the fade in length. Hence 1
 		int max_zc = count_zero_crossings(buf, 1, frames);
 
 		// calculate the length of the fade in
