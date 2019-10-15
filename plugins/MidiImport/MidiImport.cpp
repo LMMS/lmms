@@ -309,10 +309,20 @@ bool MidiImport::readSMF( TrackContainer* tc )
 	smfMidiChannel chs[256];
 
 	MeterModel & timeSigMM = Engine::getSong()->getTimeSigModel();
-	AutomationPattern * timeSigNumeratorPat = 
-		AutomationPattern::globalAutomationPattern( &timeSigMM.numeratorModel() );
-	AutomationPattern * timeSigDenominatorPat = 
-		AutomationPattern::globalAutomationPattern( &timeSigMM.denominatorModel() );
+	AutomationTrack * nt = dynamic_cast<AutomationTrack*>(
+		Track::create(Track::AutomationTrack, Engine::getSong()));
+	nt->setName(tr("MIDI Time Signature Numerator"));
+	AutomationTrack * dt = dynamic_cast<AutomationTrack*>(
+		Track::create(Track::AutomationTrack, Engine::getSong()));
+	dt->setName(tr("MIDI Time Signature Denominator"));
+	AutomationPattern * timeSigNumeratorPat =
+		new AutomationPattern(nt);
+	timeSigNumeratorPat->setDisplayName(tr("Numerator"));
+	timeSigNumeratorPat->addObject(&timeSigMM.numeratorModel());
+	AutomationPattern * timeSigDenominatorPat =
+		new AutomationPattern(dt);
+	timeSigDenominatorPat->setDisplayName(tr("Denominator"));
+	timeSigDenominatorPat->addObject(&timeSigMM.denominatorModel());
 	
 	// TODO: adjust these to Time.Sig changes
 	double beatsPerTact = 4; 
@@ -323,19 +333,12 @@ bool MidiImport::readSMF( TrackContainer* tc )
 	for( int s = 0; s < timeSigs->length(); ++s )
 	{
 		Alg_time_sig timeSig = (*timeSigs)[s];
-		// Initial timeSig, set song-default value
-		if(/* timeSig.beat == 0*/ true )
-		{
-			// TODO set song-global default value
-			printf("Another timesig at %f\n", timeSig.beat);
-			timeSigNumeratorPat->putValue( timeSig.beat*ticksPerBeat, timeSig.num );
-			timeSigDenominatorPat->putValue( timeSig.beat*ticksPerBeat, timeSig.den );
-		}
-		else
-		{
-		}
-
+		timeSigNumeratorPat->putValue(timeSig.beat * ticksPerBeat, timeSig.num);
+		timeSigDenominatorPat->putValue(timeSig.beat * ticksPerBeat, timeSig.den);
 	}
+	// manually call otherwise the pattern shows being 1 bar
+	timeSigNumeratorPat->updateLength();
+	timeSigDenominatorPat->updateLength();
 
 	pd.setValue( 2 );
 
