@@ -1105,10 +1105,10 @@ inline void AutomationEditor::drawCross( QPainter & p )
 	float scaledLevel = m_pattern->firstObject()->scaledValue( level );
 
 	// Limit the scaled-level tooltip to the grid
-	if( mouse_pos.x() >= 0 &&
+	if(mouse_pos.x() >= 0 &&
 		mouse_pos.x() <= width() - SCROLLBAR_SIZE &&
 		mouse_pos.y() >= 0 &&
-		mouse_pos.y() <= height() - SCROLLBAR_SIZE )
+		mouse_pos.y() <= height() - SCROLLBAR_SIZE)
 	{
 		if (m_pointYLevel == 0)
 		{
@@ -1714,8 +1714,8 @@ void AutomationEditor::wheelEvent(QWheelEvent * we )
 	else if (we->modifiers() & Qt::ShiftModifier
 		|| we->orientation() == Qt::Horizontal)
 	{
-		m_leftRightScroll->setValue( m_leftRightScroll->value() -
-			we->delta() * 2 / 15 );
+		m_leftRightScroll->setValue(m_leftRightScroll->value() -
+			we->delta() * 2 / 15);
 	}
 	else
 	{
@@ -1724,7 +1724,7 @@ void AutomationEditor::wheelEvent(QWheelEvent * we )
 
 		if (we->y() > TOP_MARGIN)
 		{
-			float level = getLevel( we->y() );
+			float level = getLevel(we->y());
 			int x = we->x();
 
 			if (x >= VALUES_WIDTH)
