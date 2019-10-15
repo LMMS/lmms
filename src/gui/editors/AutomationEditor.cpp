@@ -729,7 +729,7 @@ void AutomationEditor::mouseMoveEvent(QMouseEvent * mouseEvent )
 		update();
 		return;
 	}
-	
+
 	// sets drawCross tooltip back to mouse y position
 	// TODO: set to point's y value when mouse over point
 	m_pointYLevel = 0;
@@ -1110,10 +1110,13 @@ inline void AutomationEditor::drawCross( QPainter & p )
 		mouse_pos.y() >= 0 &&
 		mouse_pos.y() <= height() - SCROLLBAR_SIZE )
 	{
-		if (m_pointYLevel == 0) {
-			QToolTip::showText( tt_pos, QString::number( scaledLevel ), this );
-		} else if (m_pointYLevel != 0) {
-			QToolTip::showText( tt_pos, QString::number( m_pointYLevel ), this );
+		if (m_pointYLevel == 0)
+		{
+			QToolTip::showText(tt_pos, QString::number(scaledLevel), this);
+		}
+		else if (m_pointYLevel != 0)
+		{
+			QToolTip::showText(tt_pos, QString::number(m_pointYLevel), this);
 		}
 	}
 }
@@ -1716,18 +1719,20 @@ void AutomationEditor::wheelEvent(QWheelEvent * we )
 	}
 	else
 	{
-		m_topBottomScroll->setValue( m_topBottomScroll->value() -
-							we->delta() / 30 );
-		
-		if (we->y() > TOP_MARGIN) {
+		m_topBottomScroll->setValue(m_topBottomScroll->value() -
+							we->delta() / 30);
+
+		if (we->y() > TOP_MARGIN)
+		{
 			float level = getLevel( we->y() );
 			int x = we->x();
 
-			if (x >= VALUES_WIDTH) {
-		// set or move value
-
+			if (x >= VALUES_WIDTH)
+			{
+				// set or move value
 				x -= VALUES_WIDTH;
-			// get tick in which the cursor is posated
+
+				// get tick in which the cursor is posated
 				int pos_ticks = x * MidiTime::ticksPerTact() / m_ppt +
 								m_currentPosition;
 
@@ -1739,26 +1744,27 @@ void AutomationEditor::wheelEvent(QWheelEvent * we )
 
 				// and check whether the user scrolls over an
 				// existing value
-				while (it != time_map.end()) {
-					
-					if (pos_ticks < 0) {
-						pos_ticks = 0;
-					}
-							
+				while (it != time_map.end())
+				{
+					pos_ticks = (pos_ticks < 0) ? 0 : pos_ticks;
+
 					if (pos_ticks >= it.key() - MidiTime::ticksPerTact() *4 / m_ppt
 						&& (it+1==time_map.end() ||	pos_ticks <= (it+1).key())
-						&& (pos_ticks<= it.key() + MidiTime::ticksPerTact() *4 / m_ppt)) 
+						&& (pos_ticks<= it.key() + MidiTime::ticksPerTact() *4 / m_ppt))
 					{
 						// mouse wheel up
-						if (we->delta() < 0) {
+						if (we->delta() < 0)
+						{
 							level = roundf(it.value() * 1000) / 1000 -
-							 m_pattern->firstObject()->step<float>();
+							m_pattern->firstObject()->step<float>();
 						// mouse wheel down
-						} else if (we->delta() > 0)	{
-							level = roundf(it.value() * 1000) / 1000 +
-							 m_pattern->firstObject()->step<float>();
 						}
-						
+						else if (we->delta() > 0)
+						{
+							level = roundf(it.value() * 1000) / 1000 +
+							m_pattern->firstObject()->step<float>();
+						}
+
 						m_pointYLevel = level;
 
 						// set new value
@@ -1766,7 +1772,7 @@ void AutomationEditor::wheelEvent(QWheelEvent * we )
 
 						// apply new value
 						m_pattern->applyDragValue();
-						
+
 						break;
 					}
 					++it;
