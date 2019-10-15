@@ -30,6 +30,7 @@
 #include <cmath>
 
 #include <QApplication>
+#include <QInputDialog>
 #include <QKeyEvent>
 #include <QLabel>
 #include <QLayout>
@@ -730,13 +731,6 @@ void AutomationEditor::mouseMoveEvent(QMouseEvent * mouseEvent )
 		return;
 	}
 
-	// sets drawCross tooltip back to mouse y position
-	// TODO: set to point's y value when mouse over point
-	if (mouseEvent->timestamp() > m_pointYLevelTimestamp)
-	{
-		m_pointYLevel = 0;
-	}
-
 	if( mouseEvent->y() > TOP_MARGIN )
 	{
 		float level = getLevel( mouseEvent->y() );
@@ -750,6 +744,7 @@ void AutomationEditor::mouseMoveEvent(QMouseEvent * mouseEvent )
 
 		int pos_ticks = x * MidiTime::ticksPerTact() / m_ppt +
 							m_currentPosition;
+
 		if( mouseEvent->buttons() & Qt::LeftButton && m_editMode == DRAW )
 		{
 			if( m_action == MOVE_VALUE )
@@ -790,63 +785,6 @@ void AutomationEditor::mouseMoveEvent(QMouseEvent * mouseEvent )
 			}
 			removePoints( m_drawLastTick, pos_ticks );
 			Engine::getSong()->setModified();
-		}
-		else if( mouseEvent->buttons() & Qt::NoButton && m_editMode == DRAW )
-		{
-			// set move- or resize-cursor
-
-			// get time map of current pattern
-			timeMap & time_map = m_pattern->getTimeMap();
-
-			// will be our iterator in the following loop
-			timeMap::iterator it = time_map.begin();
-			// loop through whole time map...
-			for( ; it != time_map.end(); ++it )
-			{
-				// and check whether the cursor is over an
-				// existing value
-				if( pos_ticks >= it.key() &&
-					( it+1==time_map.end() ||
-						pos_ticks <= (it+1).key() ) &&
-							level <= it.value() )
-				{
-					break;
-				}
-			}
-
-			// did it reach end of map because there's
-			// no value??
-			if( it != time_map.end() )
-			{
-				if( QApplication::overrideCursor() )
-				{
-					if( QApplication::overrideCursor()->shape() != Qt::SizeAllCursor )
-					{
-						while( QApplication::overrideCursor() != NULL )
-						{
-							QApplication::restoreOverrideCursor();
-						}
-
-						QCursor c( Qt::SizeAllCursor );
-						QApplication::setOverrideCursor(
-									c );
-					}
-				}
-				else
-				{
-					QCursor c( Qt::SizeAllCursor );
-					QApplication::setOverrideCursor( c );
-				}
-			}
-			else
-			{
-				// the cursor is over no value, so restore
-				// cursor
-				while( QApplication::overrideCursor() != NULL )
-				{
-					QApplication::restoreOverrideCursor();
-				}
-			}
 		}
 		else if( mouseEvent->buttons() & Qt::LeftButton &&
 						m_editMode == SELECT &&
@@ -929,7 +867,6 @@ void AutomationEditor::mouseMoveEvent(QMouseEvent * mouseEvent )
 			int tact_diff = ticks_diff / MidiTime::ticksPerTact();
 			ticks_diff = ticks_diff % MidiTime::ticksPerTact();
 
-
 			// do vertical move-stuff
 			float level_diff = level - m_moveStartLevel;
 
@@ -1006,6 +943,68 @@ void AutomationEditor::mouseMoveEvent(QMouseEvent * mouseEvent )
 			m_moveStartTick = pos_ticks;
 			m_moveStartLevel = level;
 		}
+		else if (m_editMode == DRAW)
+		{
+			// get time map of current pattern
+			timeMap & time_map = m_pattern->getTimeMap();
+			// will be our iterator in the following loop
+			timeMap::iterator it = time_map.begin();
+			// loop through whole time map...
+
+			while (it != time_map.end())
+			{
+				// and check whether the cursor is over an
+				// existing value
+				if (pos_ticks >= it.key() - MidiTime::ticksPerTact() *4 / m_ppt
+					&& (it+1==time_map.end() ||	pos_ticks <= (it+1).key())
+					&& (pos_ticks<= it.key() + MidiTime::ticksPerTact() *4 / m_ppt))
+				{
+					break;
+				}
+				it++;
+			}
+
+			m_pointYLevel = roundf(it.value() * 1000) / 1000;
+			// did it reach end of map because there's
+			// no value??
+			if( it != time_map.end() )
+			{
+				if( QApplication::overrideCursor() )
+				{
+					if( QApplication::overrideCursor()->shape() != Qt::SizeAllCursor )
+					{
+						while( QApplication::overrideCursor() != NULL )
+						{
+							QApplication::restoreOverrideCursor();
+						}
+
+						QCursor c( Qt::SizeAllCursor );
+						QApplication::setOverrideCursor(
+									c );
+					}
+				}
+				else
+				{
+					QCursor c( Qt::SizeAllCursor );
+					QApplication::setOverrideCursor( c );
+				}
+			}
+			else
+			{
+				// the cursor is over no value, so restore
+				// cursor
+				while( QApplication::overrideCursor() != NULL )
+				{
+					QApplication::restoreOverrideCursor();
+				}
+
+				// sets drawCross tooltip back to mouse y position
+				if (mouseEvent->timestamp() > m_pointYLevelTimestamp)
+				{
+						m_pointYLevel = 0;
+				}
+			}
+		}
 	}
 	else
 	{
@@ -1013,7 +1012,6 @@ void AutomationEditor::mouseMoveEvent(QMouseEvent * mouseEvent )
 					m_editMode == SELECT &&
 					m_action == SELECT_VALUES )
 		{
-
 			int x = mouseEvent->x() - VALUES_WIDTH;
 			if( x < 0 && m_currentPosition > 0 )
 			{
@@ -1038,22 +1036,20 @@ void AutomationEditor::mouseMoveEvent(QMouseEvent * mouseEvent )
 				m_leftRightScroll->setValue( m_currentPosition +
 									4 );
 			}
-
 			// get tick in which the cursor is posated
 			int pos_ticks = x * MidiTime::ticksPerTact() / m_ppt +
 							m_currentPosition;
 
 			m_selectedTick = pos_ticks -
 							m_selectStartTick;
-			if( (int) m_selectStartTick + m_selectedTick <
-									0 )
+			if ((int) m_selectStartTick + m_selectedTick < 0)
 			{
 				m_selectedTick = -m_selectStartTick;
 			}
 
-			float level = getLevel( mouseEvent->y() );
+			float level = getLevel(mouseEvent->y());
 
-			if( level <= m_bottomLevel )
+			if (level <= m_bottomLevel)
 			{
 				QCursor::setPos( mapToGlobal( QPoint( mouseEvent->x(),
 							height() -
@@ -1062,7 +1058,7 @@ void AutomationEditor::mouseMoveEvent(QMouseEvent * mouseEvent )
 					m_topBottomScroll->value() + 1 );
 				level = m_bottomLevel;
 			}
-			else if( level >= m_topLevel )
+			else if (level >= m_topLevel)
 			{
 				QCursor::setPos( mapToGlobal( QPoint( mouseEvent->x(),
 							TOP_MARGIN ) ) );
@@ -1071,7 +1067,7 @@ void AutomationEditor::mouseMoveEvent(QMouseEvent * mouseEvent )
 				level = m_topLevel;
 			}
 			m_selectedLevels = level - m_selectStartLevel;
-			if( level <= m_selectStartLevel )
+			if (level <= m_selectStartLevel)
 			{
 				--m_selectedLevels;
 			}
@@ -1080,6 +1076,15 @@ void AutomationEditor::mouseMoveEvent(QMouseEvent * mouseEvent )
 	}
 
 	update();
+}
+
+
+
+
+void AutomationEditor::mouseDoubleClickEvent( QMouseEvent * mouseEvent)
+{
+	// TODO: Double click on automation point opens Dialog Box
+	// to enter automation point y level values
 }
 
 
@@ -1711,7 +1716,6 @@ void AutomationEditor::wheelEvent(QWheelEvent * we )
 		// scroll so the tick "selected" by the mouse x doesn't move on the screen
 		m_leftRightScroll->setValue(m_leftRightScroll->value() + ticks - newTicks);
 
-
 		m_zoomingXModel.setValue( x );
 	}
 	else if (we->modifiers() & Qt::ShiftModifier
@@ -1722,9 +1726,6 @@ void AutomationEditor::wheelEvent(QWheelEvent * we )
 	}
 	else
 	{
-		m_topBottomScroll->setValue(m_topBottomScroll->value() -
-			we->delta() / 30);
-
 		if (we->y() > TOP_MARGIN)
 		{
 			float level = getLevel(we->y());
@@ -1734,17 +1735,15 @@ void AutomationEditor::wheelEvent(QWheelEvent * we )
 			{
 				// set or move value
 				x -= VALUES_WIDTH;
-
 				// get tick in which the cursor is posated
 				int pos_ticks = x * MidiTime::ticksPerTact() / m_ppt +
 					m_currentPosition;
-
+				//disable scrolling while adjusting automation point
+				bool enableYScrolling = true;
 				// get time map of current pattern
 				timeMap & time_map = m_pattern->getTimeMap();
-
 				// will be our iterator in the following loop
 				timeMap::iterator it = time_map.begin();
-
 				// and check whether the user scrolls over an
 				// existing value
 				while (it != time_map.end())
@@ -1767,19 +1766,21 @@ void AutomationEditor::wheelEvent(QWheelEvent * we )
 							level = roundf(it.value() * 1000) / 1000 +
 								m_pattern->firstObject()->step<float>();
 						}
-
 						m_pointYLevel = level;
 						m_pointYLevelTimestamp = we->timestamp();
-
+						enableYScrolling = false;
 						// set new value
 						m_pattern->setDragValue(MidiTime(pos_ticks), level, true, false);
-
 						// apply new value
 						m_pattern->applyDragValue();
-
 						break;
 					}
 					++it;
+				}
+				if (enableYScrolling)
+				{
+					m_topBottomScroll->setValue(m_topBottomScroll->value() -
+						we->delta() / 30);
 				}
 			}
 		}

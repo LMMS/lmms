@@ -119,6 +119,7 @@ protected:
 	virtual void mousePressEvent(QMouseEvent * mouseEvent);
 	virtual void mouseReleaseEvent(QMouseEvent * mouseEvent);
 	virtual void mouseMoveEvent(QMouseEvent * mouseEvent);
+	virtual void mouseDoubleClickEvent( QMouseEvent * mouseEvent);
 	virtual void paintEvent(QPaintEvent * pe);
 	virtual void resizeEvent(QResizeEvent * re);
 	virtual void wheelEvent(QWheelEvent * we);
