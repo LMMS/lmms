@@ -1,8 +1,5 @@
 #include "MultidimensionalNeighbourMap.hpp"
 
-#include <iostream>
-
-
 namespace Diginstrument{
 class Spectrum
 {
@@ -13,6 +10,7 @@ class Spectrum
 
     Spectrum(std::vector<std::pair<float, float>> components) : components(components){};
     Spectrum(const Spectrum & other) : components(other.getComponents()){}
+    Spectrum(Spectrum && other): components(std::move(other.components)){}
 
   private:
     std::vector<std::pair<float, float>> components;

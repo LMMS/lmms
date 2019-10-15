@@ -1,0 +1,295 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - diginstrument_test_coverage.info - Diginstrument/MultidimensionalNeighbourMap.hpp</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">Diginstrument</a> - MultidimensionalNeighbourMap.hpp<span style="font-size: 80%;"> (source / <a href="MultidimensionalNeighbourMap.hpp.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">diginstrument_test_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">85</td>
+            <td class="headerCovTableEntry">86</td>
+            <td class="headerCovTableEntryHi">98.8 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2019-10-15 19:17:27</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">20</td>
+            <td class="headerCovTableEntry">21</td>
+            <td class="headerCovTableEntryHi">95.2 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : #include &lt;memory&gt;</a>
+<span class="lineNum">       2 </span>            : #include &lt;algorithm&gt;
+<span class="lineNum">       3 </span>            : #include &lt;vector&gt;
+<span class="lineNum">       4 </span>            : #include &lt;cmath&gt;
+<a name="5"><span class="lineNum">       5 </span>            : </a>
+<span class="lineNum">       6 </span>            : template &lt;typename K, typename V&gt;
+<span class="lineNum">       7 </span><span class="lineCov">       2404 : class MultidimensionalNeighbourMapEntry</span>
+<span class="lineNum">       8 </span>            : {
+<span class="lineNum">       9 </span>            : public:
+<a name="10"><span class="lineNum">      10 </span>            :   K key;</a>
+<span class="lineNum">      11 </span>            : 
+<span class="lineNum">      12 </span><span class="lineCov">       1368 :   bool operator&lt;(const K key)</span>
+<span class="lineNum">      13 </span>            :   {
+<span class="lineNum">      14 </span><span class="lineCov">        684 :     return this-&gt;key &lt; key;</span>
+<a name="15"><span class="lineNum">      15 </span>            :   }</a>
+<span class="lineNum">      16 </span>            : 
+<span class="lineNum">      17 </span><span class="lineCov">         30 :   static bool CompareWithKey(const K left, const MultidimensionalNeighbourMapEntry&lt;K, V&gt; &amp;right)</span>
+<span class="lineNum">      18 </span>            :   {
+<span class="lineNum">      19 </span><span class="lineCov">         30 :     return left &lt; right.key;</span>
+<a name="20"><span class="lineNum">      20 </span>            :   }</a>
+<span class="lineNum">      21 </span>            : 
+<span class="lineNum">      22 </span><span class="lineCov">        408 :   bool operator&lt;(const MultidimensionalNeighbourMapEntry &amp;other) const</span>
+<span class="lineNum">      23 </span>            :   {
+<span class="lineNum">      24 </span><span class="lineCov">        204 :     return key &lt; other.key;</span>
+<span class="lineNum">      25 </span>            :   }
+<span class="lineNum">      26 </span>            : 
+<span class="lineNum">      27 </span>            :   bool operator==(const MultidimensionalNeighbourMapEntry &amp;other) const
+<span class="lineNum">      28 </span>            :   {
+<span class="lineNum">      29 </span>            :     return key == other.key;
+<span class="lineNum">      30 </span>            :   }
+<span class="lineNum">      31 </span>            : 
+<a name="32"><span class="lineNum">      32 </span>            :   MultidimensionalNeighbourMapEntry&lt;K, V&gt; &amp;operator=(const MultidimensionalNeighbourMapEntry &amp;other);</a>
+<span class="lineNum">      33 </span>            : 
+<span class="lineNum">      34 </span><span class="lineCov">         86 :   bool isValue() const</span>
+<span class="lineNum">      35 </span>            :   {
+<span class="lineNum">      36 </span><span class="lineCov">         86 :     return !!value;</span>
+<a name="37"><span class="lineNum">      37 </span>            :   }</a>
+<span class="lineNum">      38 </span>            : 
+<span class="lineNum">      39 </span><span class="lineCov">         24 :   const V &amp;getValue() const</span>
+<span class="lineNum">      40 </span>            :   {
+<span class="lineNum">      41 </span><span class="lineCov">         24 :     return *value;</span>
+<a name="42"><span class="lineNum">      42 </span>            :   }</a>
+<span class="lineNum">      43 </span>            : 
+<span class="lineNum">      44 </span><span class="lineCov">          2 :   void setValue(const V &amp;value)</span>
+<span class="lineNum">      45 </span>            :   {
+<span class="lineNum">      46 </span><span class="lineCov">          2 :     this-&gt;value = std::make_unique&lt;V&gt;(value);</span>
+<a name="47"><span class="lineNum">      47 </span><span class="lineCov">          2 :   }</span></a>
+<span class="lineNum">      48 </span>            : 
+<span class="lineNum">      49 </span><span class="lineCov">        200 :   std::vector&lt;MultidimensionalNeighbourMapEntry&lt;K, V&gt;&gt; &amp;getNext()</span>
+<span class="lineNum">      50 </span>            :   {
+<span class="lineNum">      51 </span><span class="lineCov">        200 :     return next;</span>
+<span class="lineNum">      52 </span>            :   }
+<a name="53"><span class="lineNum">      53 </span>            : </a>
+<span class="lineNum">      54 </span>            :   /*value constructor*/
+<span class="lineNum">      55 </span><span class="lineCov">        360 :   MultidimensionalNeighbourMapEntry(const K key, const V &amp;value) : key(key), next(0)</span>
+<span class="lineNum">      56 </span>            :   {
+<span class="lineNum">      57 </span><span class="lineCov">        180 :     this-&gt;value = std::make_unique&lt;V&gt;(value);</span>
+<a name="58"><span class="lineNum">      58 </span><span class="lineCov">        180 :   };</span></a>
+<span class="lineNum">      59 </span>            :   /*empty node constructor*/
+<span class="lineNum">      60 </span><span class="lineCov">        140 :   MultidimensionalNeighbourMapEntry(const K key) : key(key), next(0) {}</span>
+<a name="61"><span class="lineNum">      61 </span>            :   /*copy constructor*/</a>
+<span class="lineNum">      62 </span>            :   MultidimensionalNeighbourMapEntry(const MultidimensionalNeighbourMapEntry &amp;other);
+<span class="lineNum">      63 </span><span class="lineNoCov">          0 :   MultidimensionalNeighbourMapEntry() : key(0), next(0) {}</span>
+<span class="lineNum">      64 </span>            : 
+<span class="lineNum">      65 </span>            : private:
+<span class="lineNum">      66 </span>            :   std::unique_ptr&lt;V&gt; value;
+<span class="lineNum">      67 </span>            :   std::vector&lt;MultidimensionalNeighbourMapEntry&lt;K, V&gt;&gt; next;
+<span class="lineNum">      68 </span>            : };
+<span class="lineNum">      69 </span>            : 
+<a name="70"><span class="lineNum">      70 </span>            : /*TODO: complexity analisys*/</a>
+<span class="lineNum">      71 </span>            : template &lt;typename K, typename V&gt;
+<span class="lineNum">      72 </span><span class="lineCov">         88 : class MultidimensionalNeighbourMap</span>
+<span class="lineNum">      73 </span>            : {
+<span class="lineNum">      74 </span>            : public:
+<a name="75"><span class="lineNum">      75 </span>            :   std::vector&lt;V&gt; getNeighbours(const std::vector&lt;K&gt; &amp; coordinates);</a>
+<span class="lineNum">      76 </span>            :   void insert(const V &amp;value, const std::vector&lt;K&gt; &amp;coordinates);
+<span class="lineNum">      77 </span><span class="lineCov">         16 :   unsigned int getDimensions() const { return this-&gt;dimensions; }</span>
+<span class="lineNum">      78 </span>            :   void clear();
+<span class="lineNum">      79 </span>            : 
+<span class="lineNum">      80 </span>            : private:
+<span class="lineNum">      81 </span>            :   /* returns the closest neighbours of the coordinate in the array
+<span class="lineNum">      82 </span>            :       the lower neighbour is pair.first, the upper is pair.second
+<span class="lineNum">      83 </span>            :       if the coordinate is out of range, only one entry is returned, upper or lower, in the correct position
+<span class="lineNum">      84 </span>            :       if the coordinate is exact, only one entry is returned, on the lower (first) placement*/
+<span class="lineNum">      85 </span>            :   static std::pair&lt;MultidimensionalNeighbourMapEntry&lt;K, V&gt; *, MultidimensionalNeighbourMapEntry&lt;K, V&gt; *&gt; findNeighboursOnOneDimension(std::vector&lt;MultidimensionalNeighbourMapEntry&lt;K, V&gt;&gt; &amp;array, const K &amp;coordinate);
+<span class="lineNum">      86 </span>            :   static void getNeighboursRecursiveCall(std::vector&lt;MultidimensionalNeighbourMapEntry&lt;K,V&gt;&gt; &amp; array, const std::vector&lt;K&gt; &amp; coordinates, unsigned int level, std::vector&lt;V&gt; &amp; result);
+<span class="lineNum">      87 </span>            : 
+<span class="lineNum">      88 </span>            :   std::vector&lt;MultidimensionalNeighbourMapEntry&lt;K, V&gt;&gt; data;
+<span class="lineNum">      89 </span>            :   unsigned int dimensions = 0;
+<span class="lineNum">      90 </span>            : };
+<a name="91"><span class="lineNum">      91 </span>            : </a>
+<span class="lineNum">      92 </span>            : template &lt;typename K, typename V&gt;
+<span class="lineNum">      93 </span><span class="lineCov">        402 : MultidimensionalNeighbourMapEntry&lt;K, V&gt; &amp;MultidimensionalNeighbourMapEntry&lt;K, V&gt;::operator=(const MultidimensionalNeighbourMapEntry &amp;other)</span>
+<span class="lineNum">      94 </span>            : {
+<span class="lineNum">      95 </span><span class="lineCov">        402 :   key = other.key;</span>
+<span class="lineNum">      96 </span><span class="lineCov">        402 :   if (other.value)</span>
+<span class="lineNum">      97 </span><span class="lineCov">        162 :     this-&gt;value = std::make_unique&lt;V&gt;(*other.value);</span>
+<span class="lineNum">      98 </span><span class="lineCov">        402 :   this-&gt;next = other.next;</span>
+<span class="lineNum">      99 </span><span class="lineCov">        402 :   return *this;</span>
+<span class="lineNum">     100 </span>            : }
+<a name="101"><span class="lineNum">     101 </span>            : </a>
+<span class="lineNum">     102 </span>            : template &lt;typename K, typename V&gt;
+<span class="lineNum">     103 </span><span class="lineCov">       1764 : MultidimensionalNeighbourMapEntry&lt;K, V&gt;::MultidimensionalNeighbourMapEntry(const MultidimensionalNeighbourMapEntry&lt;K, V&gt; &amp;other) : key(other.key)</span>
+<span class="lineNum">     104 </span>            : {
+<span class="lineNum">     105 </span><span class="lineCov">        882 :   if (other.value)</span>
+<span class="lineNum">     106 </span><span class="lineCov">        482 :     this-&gt;value = std::make_unique&lt;V&gt;(*other.value);</span>
+<span class="lineNum">     107 </span><span class="lineCov">        882 :   this-&gt;next = other.next;</span>
+<span class="lineNum">     108 </span><span class="lineCov">        882 : }</span>
+<span class="lineNum">     109 </span>            : 
+<a name="110"><span class="lineNum">     110 </span>            : template &lt;typename K, typename V&gt;</a>
+<span class="lineNum">     111 </span>            : std::pair&lt;MultidimensionalNeighbourMapEntry&lt;K, V&gt; *, MultidimensionalNeighbourMapEntry&lt;K, V&gt; *&gt;
+<span class="lineNum">     112 </span><span class="lineCov">         32 : MultidimensionalNeighbourMap&lt;K, V&gt;::findNeighboursOnOneDimension(std::vector&lt;MultidimensionalNeighbourMapEntry&lt;K, V&gt;&gt; &amp;array, const K &amp;coordinate)</span>
+<span class="lineNum">     113 </span>            : {
+<span class="lineNum">     114 </span><span class="lineCov">         32 :   auto maybeLower = std::lower_bound(array.begin(), array.end(), coordinate);</span>
+<span class="lineNum">     115 </span><span class="lineCov">         32 :   if (coordinate == maybeLower-&gt;key)</span>
+<span class="lineNum">     116 </span>            :   {
+<span class="lineNum">     117 </span>            :     /*exact match*/
+<span class="lineNum">     118 </span><span class="lineCov">         18 :     return std::make_pair(&amp;(*maybeLower), nullptr);</span>
+<span class="lineNum">     119 </span>            :   }
+<span class="lineNum">     120 </span><span class="lineCov">         14 :   if (maybeLower == array.begin())</span>
+<span class="lineNum">     121 </span>            :   {
+<span class="lineNum">     122 </span>            :     /*out of range: low*/
+<span class="lineNum">     123 </span><span class="lineCov">          2 :     return std::make_pair(&amp;(array.front()), nullptr);</span>
+<span class="lineNum">     124 </span>            :   }
+<span class="lineNum">     125 </span><span class="lineCov">         12 :   auto maybeUpper = std::upper_bound(array.begin(), array.end(), coordinate, MultidimensionalNeighbourMapEntry&lt;K, V&gt;::CompareWithKey);</span>
+<span class="lineNum">     126 </span><span class="lineCov">         12 :   if (maybeUpper == array.end())</span>
+<span class="lineNum">     127 </span>            :   {
+<span class="lineNum">     128 </span>            :     /*out of range: high*/
+<span class="lineNum">     129 </span><span class="lineCov">          2 :     return std::make_pair(nullptr, &amp;(array.back()));</span>
+<span class="lineNum">     130 </span>            :   }
+<span class="lineNum">     131 </span><span class="lineCov">         10 :   return std::make_pair(&amp;(*(maybeLower - 1)), &amp;(*maybeUpper));</span>
+<span class="lineNum">     132 </span>            : }
+<a name="133"><span class="lineNum">     133 </span>            : </a>
+<span class="lineNum">     134 </span>            : template &lt;typename K, typename V&gt;
+<span class="lineNum">     135 </span><span class="lineCov">        182 : void MultidimensionalNeighbourMap&lt;K, V&gt;::insert(const V &amp;value, const std::vector&lt;K&gt; &amp;coordinates)</span>
+<span class="lineNum">     136 </span>            : {
+<span class="lineNum">     137 </span><span class="lineCov">        182 :   if(this-&gt;dimensions != coordinates.size() &amp;&amp; this-&gt;dimensions != 0) { /*TODO:exception?*/ return; }</span>
+<span class="lineNum">     138 </span><span class="lineCov">        182 :   std::vector&lt;MultidimensionalNeighbourMapEntry&lt;K, V&gt;&gt; *array = &amp;data;</span>
+<span class="lineNum">     139 </span><span class="lineCov">        182 :   int coordinateCounter = 0;</span>
+<span class="lineNum">     140 </span><span class="lineCov">        546 :   for (const K &amp;coordinate : coordinates)</span>
+<span class="lineNum">     141 </span>            :   {
+<span class="lineNum">     142 </span><span class="lineCov">        364 :     coordinateCounter++;</span>
+<span class="lineNum">     143 </span><span class="lineCov">        364 :     auto maybeLower = std::lower_bound(array-&gt;begin(), array-&gt;end(), coordinate);</span>
+<span class="lineNum">     144 </span><span class="lineCov">        364 :     int maybeLowerIndex = std::distance(array-&gt;begin(), maybeLower);</span>
+<span class="lineNum">     145 </span>            : 
+<span class="lineNum">     146 </span><span class="lineCov">        364 :     if (maybeLower != array-&gt;end() &amp;&amp; maybeLower-&gt;key == coordinate)</span>
+<span class="lineNum">     147 </span>            :     {
+<span class="lineNum">     148 </span><span class="lineCov">         44 :       if (maybeLower-&gt;isValue())</span>
+<span class="lineNum">     149 </span>            :       {
+<span class="lineNum">     150 </span>            :         /*found and is value*/
+<span class="lineNum">     151 </span><span class="lineCov">          2 :         maybeLower-&gt;setValue(value);</span>
+<span class="lineNum">     152 </span><span class="lineCov">          2 :         std::sort(array-&gt;begin() + maybeLowerIndex, array-&gt;end());</span>
+<span class="lineNum">     153 </span><span class="lineCov">          2 :         return;</span>
+<span class="lineNum">     154 </span>            :       }
+<span class="lineNum">     155 </span>            :       /*found, but not value - continue*/
+<span class="lineNum">     156 </span><span class="lineCov">         42 :       array = &amp;(maybeLower-&gt;getNext());</span>
+<span class="lineNum">     157 </span>            :     }
+<span class="lineNum">     158 </span>            : 
+<span class="lineNum">     159 </span>            :     else
+<span class="lineNum">     160 </span>            :     {
+<span class="lineNum">     161 </span>            :       /*not found - insert*/
+<span class="lineNum">     162 </span><span class="lineCov">        320 :       if (coordinateCounter == coordinates.size())</span>
+<span class="lineNum">     163 </span>            :       {
+<span class="lineNum">     164 </span>            :         /*last coordinate - value*/
+<span class="lineNum">     165 </span><span class="lineCov">        180 :         array-&gt;push_back(MultidimensionalNeighbourMapEntry&lt;K, V&gt;(coordinate, value));</span>
+<span class="lineNum">     166 </span><span class="lineCov">        180 :         std::sort(array-&gt;begin() + maybeLowerIndex, array-&gt;end());</span>
+<span class="lineNum">     167 </span>            :       }else{
+<span class="lineNum">     168 </span>            :         /* not last coordinate - insert node and go to next*/
+<span class="lineNum">     169 </span><span class="lineCov">        140 :         array-&gt;push_back(MultidimensionalNeighbourMapEntry&lt;K, V&gt;(coordinate));</span>
+<span class="lineNum">     170 </span><span class="lineCov">        140 :         std::sort(array-&gt;begin() + maybeLowerIndex, array-&gt;end());</span>
+<span class="lineNum">     171 </span>            :         /*find its new position to get the next dimension*/
+<span class="lineNum">     172 </span><span class="lineCov">        140 :         array = &amp;(std::lower_bound(array-&gt;begin() + maybeLowerIndex, array-&gt;end(), coordinate))-&gt;getNext();</span>
+<span class="lineNum">     173 </span>            :       }
+<span class="lineNum">     174 </span>            :       /* inicialize dimension count*/
+<span class="lineNum">     175 </span><span class="lineCov">        320 :       if(this-&gt;dimensions==0){ this-&gt;dimensions = coordinates.size(); }</span>
+<span class="lineNum">     176 </span>            :     }
+<span class="lineNum">     177 </span>            :   }
+<span class="lineNum">     178 </span>            : }
+<a name="179"><span class="lineNum">     179 </span>            : </a>
+<span class="lineNum">     180 </span>            : template &lt;typename K, typename V&gt;
+<span class="lineNum">     181 </span><span class="lineCov">         14 : std::vector&lt;V&gt; MultidimensionalNeighbourMap&lt;K, V&gt;::getNeighbours(const std::vector&lt;K&gt; &amp; coordinates)</span>
+<span class="lineNum">     182 </span>            : {
+<span class="lineNum">     183 </span><span class="lineCov">         28 :   std::vector&lt;V&gt; res;</span>
+<span class="lineNum">     184 </span>            :   /*dimension check*/
+<span class="lineNum">     185 </span><span class="lineCov">         14 :   if(this-&gt;dimensions != coordinates.size()) {/*TODO: exception?*/ return res; }</span>
+<span class="lineNum">     186 </span><span class="lineCov">         14 :   res.reserve(pow(2,coordinates.size()));</span>
+<span class="lineNum">     187 </span><span class="lineCov">         14 :   getNeighboursRecursiveCall(data, coordinates, 0, res);</span>
+<span class="lineNum">     188 </span><span class="lineCov">         14 :   return res;</span>
+<span class="lineNum">     189 </span>            : }
+<a name="190"><span class="lineNum">     190 </span>            : </a>
+<span class="lineNum">     191 </span>            : template &lt;typename K, typename V&gt;
+<span class="lineNum">     192 </span><span class="lineCov">         32 : void MultidimensionalNeighbourMap&lt;K, V&gt;::getNeighboursRecursiveCall(std::vector&lt;MultidimensionalNeighbourMapEntry&lt;K,V&gt;&gt; &amp; array,</span>
+<span class="lineNum">     193 </span>            :                                                                     const std::vector&lt;K&gt; &amp; coordinates,
+<span class="lineNum">     194 </span>            :                                                                     unsigned int level,
+<span class="lineNum">     195 </span>            :                                                                     std::vector&lt;V&gt; &amp; result)
+<span class="lineNum">     196 </span>            : {
+<span class="lineNum">     197 </span><span class="lineCov">         32 :   auto neighbours = findNeighboursOnOneDimension(array, coordinates[level]);</span>
+<span class="lineNum">     198 </span><span class="lineCov">         32 :   if(neighbours.first){</span>
+<span class="lineNum">     199 </span><span class="lineCov">         30 :     if(neighbours.first-&gt;isValue()){</span>
+<span class="lineNum">     200 </span><span class="lineCov">         18 :      result.push_back(neighbours.first-&gt;getValue());</span>
+<span class="lineNum">     201 </span>            :     }else{
+<span class="lineNum">     202 </span><span class="lineCov">         12 :       getNeighboursRecursiveCall(neighbours.first-&gt;getNext(), coordinates, level+1, result);</span>
+<span class="lineNum">     203 </span>            :     }
+<span class="lineNum">     204 </span>            :   }
+<span class="lineNum">     205 </span><span class="lineCov">         32 :   if(neighbours.second){</span>
+<span class="lineNum">     206 </span><span class="lineCov">         12 :     if(neighbours.second-&gt;isValue()){</span>
+<span class="lineNum">     207 </span><span class="lineCov">          6 :      result.push_back(neighbours.second-&gt;getValue());</span>
+<span class="lineNum">     208 </span>            :     }else{
+<span class="lineNum">     209 </span><span class="lineCov">          6 :       getNeighboursRecursiveCall(neighbours.second-&gt;getNext(), coordinates, level+1, result);</span>
+<span class="lineNum">     210 </span>            :     }
+<span class="lineNum">     211 </span>            :   }
+<span class="lineNum">     212 </span><span class="lineCov">         32 : }</span>
+<a name="213"><span class="lineNum">     213 </span>            : </a>
+<span class="lineNum">     214 </span>            : template &lt;typename K, typename V&gt;
+<span class="lineNum">     215 </span><span class="lineCov">          2 : void MultidimensionalNeighbourMap&lt;K, V&gt;::clear()</span>
+<span class="lineNum">     216 </span>            : {
+<span class="lineNum">     217 </span><span class="lineCov">          2 :   this-&gt;data.clear();</span>
+<span class="lineNum">     218 </span><span class="lineCov">          2 :   this-&gt;dimensions = 0;</span>
+<span class="lineNum">     219 </span><span class="lineCov">          2 : }</span>
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>
