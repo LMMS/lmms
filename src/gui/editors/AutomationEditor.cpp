@@ -1711,16 +1711,16 @@ void AutomationEditor::wheelEvent(QWheelEvent * we )
 
 		m_zoomingXModel.setValue( x );
 	}
-	else if( we->modifiers() & Qt::ShiftModifier
-			|| we->orientation() == Qt::Horizontal )
+	else if (we->modifiers() & Qt::ShiftModifier
+		|| we->orientation() == Qt::Horizontal)
 	{
 		m_leftRightScroll->setValue( m_leftRightScroll->value() -
-							we->delta() * 2 / 15 );
+			we->delta() * 2 / 15 );
 	}
 	else
 	{
 		m_topBottomScroll->setValue(m_topBottomScroll->value() -
-							we->delta() / 30);
+			we->delta() / 30);
 
 		if (we->y() > TOP_MARGIN)
 		{
@@ -1734,7 +1734,7 @@ void AutomationEditor::wheelEvent(QWheelEvent * we )
 
 				// get tick in which the cursor is posated
 				int pos_ticks = x * MidiTime::ticksPerTact() / m_ppt +
-				m_currentPosition;
+					m_currentPosition;
 
 				// get time map of current pattern
 				timeMap & time_map = m_pattern->getTimeMap();
@@ -1756,13 +1756,13 @@ void AutomationEditor::wheelEvent(QWheelEvent * we )
 						if (we->delta() < 0)
 						{
 							level = roundf(it.value() * 1000) / 1000 -
-							m_pattern->firstObject()->step<float>();
-						// mouse wheel down
+								m_pattern->firstObject()->step<float>();
 						}
+						// mouse wheel down
 						else if (we->delta() > 0)
 						{
 							level = roundf(it.value() * 1000) / 1000 +
-							m_pattern->firstObject()->step<float>();
+								m_pattern->firstObject()->step<float>();
 						}
 
 						m_pointYLevel = level;
