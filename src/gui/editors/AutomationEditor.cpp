@@ -1734,7 +1734,7 @@ void AutomationEditor::wheelEvent(QWheelEvent * we )
 
 				// get tick in which the cursor is posated
 				int pos_ticks = x * MidiTime::ticksPerTact() / m_ppt +
-								m_currentPosition;
+				m_currentPosition;
 
 				// get time map of current pattern
 				timeMap & time_map = m_pattern->getTimeMap();
