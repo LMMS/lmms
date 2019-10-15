@@ -732,7 +732,10 @@ void AutomationEditor::mouseMoveEvent(QMouseEvent * mouseEvent )
 
 	// sets drawCross tooltip back to mouse y position
 	// TODO: set to point's y value when mouse over point
-	m_pointYLevel = 0;
+	if (mouseEvent->timestamp() > m_pointYLevelTimestamp)
+	{
+		m_pointYLevel = 0;
+	}
 
 	if( mouseEvent->y() > TOP_MARGIN )
 	{
@@ -1766,6 +1769,7 @@ void AutomationEditor::wheelEvent(QWheelEvent * we )
 						}
 
 						m_pointYLevel = level;
+						m_pointYLevelTimestamp = we->timestamp();
 
 						// set new value
 						m_pattern->setDragValue(MidiTime(pos_ticks), level, true, false);

@@ -209,6 +209,7 @@ private:
 	float m_bottomLevel;
 	float m_topLevel;
 	float m_pointYLevel;
+	ulong m_pointYLevelTimestamp;
 
 	void updateTopBottomLevels();
 
