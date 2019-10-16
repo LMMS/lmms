@@ -1080,8 +1080,174 @@ void AutomationEditor::mouseMoveEvent(QMouseEvent * mouseEvent)
 
 void AutomationEditor::mouseDoubleClickEvent(QMouseEvent * mouseEvent)
 {
-	// TODO: Double click on automation point opens Dialog Box
-	// to enter automation point y level values
+	int x = mouseEvent->x();
+
+	if (x >= VALUES_WIDTH)
+	{
+		// set or move value
+		x -= VALUES_WIDTH;
+		// get tick in which the cursor is posated
+		int pos_ticks = x * MidiTime::ticksPerTact() / m_ppt +
+			m_currentPosition;
+		// get time map of current pattern
+		timeMap & time_map = m_pattern->getTimeMap();
+		// will be our iterator in the following loop
+		timeMap::iterator it = time_map.begin();
+		// loop through whole time map...
+
+		while (it != time_map.end())
+		{
+			// and check whether the cursor is over an
+			// existing value
+			if (pos_ticks >= it.key() - MidiTime::ticksPerTact() *4 / m_ppt
+				&& (it+1==time_map.end() ||	pos_ticks <= (it+1).key())
+				&& (pos_ticks<= it.key() + MidiTime::ticksPerTact() *4 / m_ppt))
+			{
+				break;
+			}
+			it++;
+		}
+
+		bool ok;
+		double d = QInputDialog::getDouble(this, tr("Edit Point"),
+	  	tr("Enter Y Coordinate:"), m_pointYLevel, 0, m_pattern->firstObject()->maxValue<float>(), 3, &ok);
+
+		if (ok)
+		{
+			// set new value - need to pass in pos_ticks
+			m_pattern->setDragValue(MidiTime(pos_ticks), d, true, false);
+			// apply new value
+			m_pattern->applyDragValue();
+		}
+	}
+}
+
+
+
+
+void AutomationEditor::wheelEvent(QWheelEvent * we)
+{
+	we->accept();
+	if(we->modifiers() & Qt::ControlModifier && we->modifiers() & Qt::ShiftModifier)
+	{
+		int y = m_zoomingYModel.value();
+		if(we->delta() > 0)
+		{
+			y++;
+		}
+		else if(we->delta() < 0)
+		{
+			y--;
+		}
+		y = qBound(0, y, m_zoomingYModel.size() - 1);
+		m_zoomingYModel.setValue(y);
+	}
+	else if(we->modifiers() & Qt::ControlModifier && we->modifiers() & Qt::AltModifier)
+	{
+		int q = m_quantizeModel.value();
+		if(we->delta() > 0)
+		{
+			q--;
+		}
+		else if(we->delta() < 0)
+		{
+			q++;
+		}
+		q = qBound(0, q, m_quantizeModel.size() - 1);
+		m_quantizeModel.setValue(q);
+		update();
+	}
+	else if(we->modifiers() & Qt::ControlModifier)
+	{
+		int x = m_zoomingXModel.value();
+		if(we->delta() > 0)
+		{
+			x++;
+		}
+		else if(we->delta() < 0)
+		{
+			x--;
+		}
+		x = qBound(0, x, m_zoomingXModel.size() - 1);
+
+		int mouseX = (we->x() - VALUES_WIDTH) * MidiTime::ticksPerTact();
+		// ticks based on the mouse x-position where the scroll wheel was used
+		int ticks = mouseX / m_ppt;
+		// what would be the ticks in the new zoom level on the very same mouse x
+		int newTicks = mouseX / (DEFAULT_PPT * m_zoomXLevels[x]);
+
+		// scroll so the tick "selected" by the mouse x doesn't move on the screen
+		m_leftRightScroll->setValue(m_leftRightScroll->value() + ticks - newTicks);
+
+		m_zoomingXModel.setValue(x);
+	}
+	else if (we->modifiers() & Qt::ShiftModifier
+		|| we->orientation() == Qt::Horizontal)
+	{
+		m_leftRightScroll->setValue(m_leftRightScroll->value() -
+			we->delta() * 2 / 15);
+	}
+	else
+	{
+		if (we->y() > TOP_MARGIN)
+		{
+			float level = getLevel(we->y());
+			int x = we->x();
+
+			if (x >= VALUES_WIDTH)
+			{
+				// set or move value
+				x -= VALUES_WIDTH;
+				// get tick in which the cursor is posated
+				int pos_ticks = x * MidiTime::ticksPerTact() / m_ppt +
+					m_currentPosition;
+				//disable scrolling while adjusting automation point
+				bool enableYScrolling = true;
+				// get time map of current pattern
+				timeMap & time_map = m_pattern->getTimeMap();
+				// will be our iterator in the following loop
+				timeMap::iterator it = time_map.begin();
+				// and check whether the user scrolls over an
+				// existing value
+				while (it != time_map.end())
+				{
+					pos_ticks = (pos_ticks < 0) ? 0 : pos_ticks;
+
+					if (pos_ticks >= it.key() - MidiTime::ticksPerTact() *4 / m_ppt
+						&& (it+1==time_map.end() ||	pos_ticks <= (it+1).key())
+						&& (pos_ticks<= it.key() + MidiTime::ticksPerTact() *4 / m_ppt))
+					{
+						// mouse wheel up
+						if (we->delta() < 0)
+						{
+							level = roundf(it.value() * 1000) / 1000 -
+								m_pattern->firstObject()->step<float>();
+						}
+						// mouse wheel down
+						else if (we->delta() > 0)
+						{
+							level = roundf(it.value() * 1000) / 1000 +
+								m_pattern->firstObject()->step<float>();
+						}
+						m_pointYLevel = level;
+						m_pointYLevelTimestamp = we->timestamp();
+						enableYScrolling = false;
+						// set new value
+						m_pattern->setDragValue(MidiTime(pos_ticks), level, true, false);
+						// apply new value
+						m_pattern->applyDragValue();
+						break;
+					}
+					++it;
+				}
+				if (enableYScrolling)
+				{
+					m_topBottomScroll->setValue(m_topBottomScroll->value() -
+						we->delta() / 30);
+				}
+			}
+		}
+	}
 }
 
 
@@ -1652,134 +1818,6 @@ void AutomationEditor::resizeEvent(QResizeEvent * re)
 
 	updateTopBottomLevels();
 	update();
-}
-
-
-
-
-void AutomationEditor::wheelEvent(QWheelEvent * we)
-{
-	we->accept();
-	if(we->modifiers() & Qt::ControlModifier && we->modifiers() & Qt::ShiftModifier)
-	{
-		int y = m_zoomingYModel.value();
-		if(we->delta() > 0)
-		{
-			y++;
-		}
-		else if(we->delta() < 0)
-		{
-			y--;
-		}
-		y = qBound(0, y, m_zoomingYModel.size() - 1);
-		m_zoomingYModel.setValue(y);
-	}
-	else if(we->modifiers() & Qt::ControlModifier && we->modifiers() & Qt::AltModifier)
-	{
-		int q = m_quantizeModel.value();
-		if(we->delta() > 0)
-		{
-			q--;
-		}
-		else if(we->delta() < 0)
-		{
-			q++;
-		}
-		q = qBound(0, q, m_quantizeModel.size() - 1);
-		m_quantizeModel.setValue(q);
-		update();
-	}
-	else if(we->modifiers() & Qt::ControlModifier)
-	{
-		int x = m_zoomingXModel.value();
-		if(we->delta() > 0)
-		{
-			x++;
-		}
-		else if(we->delta() < 0)
-		{
-			x--;
-		}
-		x = qBound(0, x, m_zoomingXModel.size() - 1);
-
-		int mouseX = (we->x() - VALUES_WIDTH) * MidiTime::ticksPerTact();
-		// ticks based on the mouse x-position where the scroll wheel was used
-		int ticks = mouseX / m_ppt;
-		// what would be the ticks in the new zoom level on the very same mouse x
-		int newTicks = mouseX / (DEFAULT_PPT * m_zoomXLevels[x]);
-
-		// scroll so the tick "selected" by the mouse x doesn't move on the screen
-		m_leftRightScroll->setValue(m_leftRightScroll->value() + ticks - newTicks);
-
-		m_zoomingXModel.setValue(x);
-	}
-	else if (we->modifiers() & Qt::ShiftModifier
-		|| we->orientation() == Qt::Horizontal)
-	{
-		m_leftRightScroll->setValue(m_leftRightScroll->value() -
-			we->delta() * 2 / 15);
-	}
-	else
-	{
-		if (we->y() > TOP_MARGIN)
-		{
-			float level = getLevel(we->y());
-			int x = we->x();
-
-			if (x >= VALUES_WIDTH)
-			{
-				// set or move value
-				x -= VALUES_WIDTH;
-				// get tick in which the cursor is posated
-				int pos_ticks = x * MidiTime::ticksPerTact() / m_ppt +
-					m_currentPosition;
-				//disable scrolling while adjusting automation point
-				bool enableYScrolling = true;
-				// get time map of current pattern
-				timeMap & time_map = m_pattern->getTimeMap();
-				// will be our iterator in the following loop
-				timeMap::iterator it = time_map.begin();
-				// and check whether the user scrolls over an
-				// existing value
-				while (it != time_map.end())
-				{
-					pos_ticks = (pos_ticks < 0) ? 0 : pos_ticks;
-
-					if (pos_ticks >= it.key() - MidiTime::ticksPerTact() *4 / m_ppt
-						&& (it+1==time_map.end() ||	pos_ticks <= (it+1).key())
-						&& (pos_ticks<= it.key() + MidiTime::ticksPerTact() *4 / m_ppt))
-					{
-						// mouse wheel up
-						if (we->delta() < 0)
-						{
-							level = roundf(it.value() * 1000) / 1000 -
-								m_pattern->firstObject()->step<float>();
-						}
-						// mouse wheel down
-						else if (we->delta() > 0)
-						{
-							level = roundf(it.value() * 1000) / 1000 +
-								m_pattern->firstObject()->step<float>();
-						}
-						m_pointYLevel = level;
-						m_pointYLevelTimestamp = we->timestamp();
-						enableYScrolling = false;
-						// set new value
-						m_pattern->setDragValue(MidiTime(pos_ticks), level, true, false);
-						// apply new value
-						m_pattern->applyDragValue();
-						break;
-					}
-					++it;
-				}
-				if (enableYScrolling)
-				{
-					m_topBottomScroll->setValue(m_topBottomScroll->value() -
-						we->delta() / 30);
-				}
-			}
-		}
-	}
 }
 
 
