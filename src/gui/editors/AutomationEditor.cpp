@@ -722,7 +722,7 @@ void AutomationEditor::removePoints( int x0, int x1 )
 
 
 
-void AutomationEditor::mouseMoveEvent(QMouseEvent * mouseEvent )
+void AutomationEditor::mouseMoveEvent(QMouseEvent * mouseEvent)
 {
 	QMutexLocker m( &m_patternMutex );
 	if( !validPattern() )
@@ -967,41 +967,38 @@ void AutomationEditor::mouseMoveEvent(QMouseEvent * mouseEvent )
 			m_pointYLevel = roundf(it.value() * 1000) / 1000;
 			// did it reach end of map because there's
 			// no value??
-			if( it != time_map.end() )
+			if(it != time_map.end())
 			{
-				if( QApplication::overrideCursor() )
+				if(QApplication::overrideCursor())
 				{
-					if( QApplication::overrideCursor()->shape() != Qt::SizeAllCursor )
+					if(QApplication::overrideCursor()->shape() != Qt::SizeAllCursor)
 					{
-						while( QApplication::overrideCursor() != NULL )
+						while(QApplication::overrideCursor() != NULL)
 						{
 							QApplication::restoreOverrideCursor();
 						}
-
-						QCursor c( Qt::SizeAllCursor );
-						QApplication::setOverrideCursor(
-									c );
+						QCursor c(Qt::SizeAllCursor);
+						QApplication::setOverrideCursor(c);
 					}
 				}
 				else
 				{
-					QCursor c( Qt::SizeAllCursor );
-					QApplication::setOverrideCursor( c );
+					QCursor c(Qt::SizeAllCursor);
+					QApplication::setOverrideCursor(c);
 				}
 			}
 			else
 			{
 				// the cursor is over no value, so restore
 				// cursor
-				while( QApplication::overrideCursor() != NULL )
+				while(QApplication::overrideCursor() != NULL)
 				{
 					QApplication::restoreOverrideCursor();
 				}
-
 				// sets drawCross tooltip back to mouse y position
 				if (mouseEvent->timestamp() > m_pointYLevelTimestamp)
 				{
-						m_pointYLevel = 0;
+					m_pointYLevel = 0;
 				}
 			}
 		}
@@ -1081,7 +1078,7 @@ void AutomationEditor::mouseMoveEvent(QMouseEvent * mouseEvent )
 
 
 
-void AutomationEditor::mouseDoubleClickEvent( QMouseEvent * mouseEvent)
+void AutomationEditor::mouseDoubleClickEvent(QMouseEvent * mouseEvent)
 {
 	// TODO: Double click on automation point opens Dialog Box
 	// to enter automation point y level values
@@ -1090,33 +1087,31 @@ void AutomationEditor::mouseDoubleClickEvent( QMouseEvent * mouseEvent)
 
 
 
-inline void AutomationEditor::drawCross( QPainter & p )
+inline void AutomationEditor::drawCross(QPainter & p)
 {
-	QPoint mouse_pos = mapFromGlobal( QCursor::pos() );
+	QPoint mouse_pos = mapFromGlobal(QCursor::pos());
 	int grid_bottom = height() - SCROLLBAR_SIZE - 1;
-	float level = getLevel( mouse_pos.y() );
-	float cross_y = m_y_auto ?
-		grid_bottom - ( ( grid_bottom - TOP_MARGIN )
-				* ( level - m_minLevel )
-				/ (float)( m_maxLevel - m_minLevel ) ) :
-		grid_bottom - ( level - m_bottomLevel ) * m_y_delta;
+	float level = getLevel(mouse_pos.y());
+	float cross_y = m_y_auto ? grid_bottom - ((grid_bottom - TOP_MARGIN)
+		* (level - m_minLevel) / (float)( m_maxLevel - m_minLevel))
+		: grid_bottom - (level - m_bottomLevel) * m_y_delta;
 
-	p.setPen( crossColor() );
-	p.drawLine( VALUES_WIDTH, (int) cross_y, width(), (int) cross_y );
-	p.drawLine( mouse_pos.x(), TOP_MARGIN, mouse_pos.x(), height() - SCROLLBAR_SIZE );
-
+	p.setPen(crossColor());
+	p.drawLine(VALUES_WIDTH, (int) cross_y, width(), (int) cross_y);
+	p.drawLine(mouse_pos.x(), TOP_MARGIN, mouse_pos.x(), height()
+		- SCROLLBAR_SIZE);
 
 	QPoint tt_pos =  QCursor::pos();
 	tt_pos.ry() -= 51;
 	tt_pos.rx() += 26;
 
-	float scaledLevel = m_pattern->firstObject()->scaledValue( level );
+	float scaledLevel = m_pattern->firstObject()->scaledValue(level);
 
 	// Limit the scaled-level tooltip to the grid
-	if(mouse_pos.x() >= 0 &&
-		mouse_pos.x() <= width() - SCROLLBAR_SIZE &&
-		mouse_pos.y() >= 0 &&
-		mouse_pos.y() <= height() - SCROLLBAR_SIZE)
+	if(mouse_pos.x() >= 0
+		&& mouse_pos.x() <= width() - SCROLLBAR_SIZE
+		&& mouse_pos.y() >= 0
+		&& mouse_pos.y() <= height() - SCROLLBAR_SIZE)
 	{
 		if (m_pointYLevel == 0)
 		{
@@ -1662,52 +1657,52 @@ void AutomationEditor::resizeEvent(QResizeEvent * re)
 
 
 
-void AutomationEditor::wheelEvent(QWheelEvent * we )
+void AutomationEditor::wheelEvent(QWheelEvent * we)
 {
 	we->accept();
-	if( we->modifiers() & Qt::ControlModifier && we->modifiers() & Qt::ShiftModifier )
+	if(we->modifiers() & Qt::ControlModifier && we->modifiers() & Qt::ShiftModifier)
 	{
 		int y = m_zoomingYModel.value();
-		if( we->delta() > 0 )
+		if(we->delta() > 0)
 		{
 			y++;
 		}
-		else if( we->delta() < 0 )
+		else if(we->delta() < 0)
 		{
 			y--;
 		}
-		y = qBound( 0, y, m_zoomingYModel.size() - 1 );
-		m_zoomingYModel.setValue( y );
+		y = qBound(0, y, m_zoomingYModel.size() - 1);
+		m_zoomingYModel.setValue(y);
 	}
-	else if( we->modifiers() & Qt::ControlModifier && we->modifiers() & Qt::AltModifier )
+	else if(we->modifiers() & Qt::ControlModifier && we->modifiers() & Qt::AltModifier)
 	{
 		int q = m_quantizeModel.value();
-		if( we->delta() > 0 )
+		if(we->delta() > 0)
 		{
 			q--;
 		}
-		else if( we->delta() < 0 )
+		else if(we->delta() < 0)
 		{
 			q++;
 		}
-		q = qBound( 0, q, m_quantizeModel.size() - 1 );
-		m_quantizeModel.setValue( q );
+		q = qBound(0, q, m_quantizeModel.size() - 1);
+		m_quantizeModel.setValue(q);
 		update();
 	}
-	else if( we->modifiers() & Qt::ControlModifier )
+	else if(we->modifiers() & Qt::ControlModifier)
 	{
 		int x = m_zoomingXModel.value();
-		if( we->delta() > 0 )
+		if(we->delta() > 0)
 		{
 			x++;
 		}
-		else if( we->delta() < 0 )
+		else if(we->delta() < 0)
 		{
 			x--;
 		}
-		x = qBound( 0, x, m_zoomingXModel.size() - 1 );
+		x = qBound(0, x, m_zoomingXModel.size() - 1);
 
-		int mouseX = (we->x() - VALUES_WIDTH)* MidiTime::ticksPerTact();
+		int mouseX = (we->x() - VALUES_WIDTH) * MidiTime::ticksPerTact();
 		// ticks based on the mouse x-position where the scroll wheel was used
 		int ticks = mouseX / m_ppt;
 		// what would be the ticks in the new zoom level on the very same mouse x
@@ -1716,7 +1711,7 @@ void AutomationEditor::wheelEvent(QWheelEvent * we )
 		// scroll so the tick "selected" by the mouse x doesn't move on the screen
 		m_leftRightScroll->setValue(m_leftRightScroll->value() + ticks - newTicks);
 
-		m_zoomingXModel.setValue( x );
+		m_zoomingXModel.setValue(x);
 	}
 	else if (we->modifiers() & Qt::ShiftModifier
 		|| we->orientation() == Qt::Horizontal)
