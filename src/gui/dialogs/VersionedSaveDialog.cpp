@@ -86,7 +86,7 @@ VersionedSaveDialog::VersionedSaveDialog( QWidget *parent,
 
 bool VersionedSaveDialog::changeFileNameVersion(QString &fileName, bool increment )
 {
-	static QRegExp regexp( "[- ]\\d+(\\.\\w+)?$" );
+	static QRegExp regexp( "[_ ]\\d+(\\.\\w+)?$" );
 
 	int idx = regexp.indexIn( fileName );
 	// For file names without extension (no ".mmpz")
@@ -100,7 +100,7 @@ bool VersionedSaveDialog::changeFileNameVersion(QString &fileName, bool incremen
 		if ( increment == false )
 			return false;
 		else
-			fileName.insert( insertIndex, "-01" );
+			fileName.insert( insertIndex, "_1" );
 	}
 	else
 	{
@@ -115,7 +115,7 @@ bool VersionedSaveDialog::changeFileNameVersion(QString &fileName, bool incremen
 			return false;
 		// Replace version number
 		version = increment ? version + 1 : version - 1;
-		QString newnumber = QString( "%1" ).arg( version, 2, 10, QChar( '0' ) );
+		QString newnumber = QString( "%1" ).arg( version );
 
 		fileName.replace( idx+1, number.length(), newnumber );
 	}
