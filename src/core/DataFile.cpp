@@ -1627,9 +1627,9 @@ void DataFile::upgrade_1_3_0()
 		{
 			QDomElement ap = aps.item(i).toElement();
 			// If ap has time nodes, move it to trackcontainer
-			// We ignore the <object> node because it is possible to have
-			// one without the related object id
-			if (ap.elementsByTagName("time").length() > 0)
+			// There are times when an <object> node is present without an
+			// object with the same ID in the file, so we ignore that node
+			if (ap.elementsByTagName("time").length() > 1)
 			{
 				QDomElement aptrack = createElement("track");
 				aptrack.setAttribute("muted", QString::number(false));
