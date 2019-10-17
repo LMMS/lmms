@@ -35,7 +35,7 @@
 #include "ControllerDialog.h"
 #include "LfoController.h"
 #include "MidiController.h"
-#include "PeakController.h"
+#include "ControllerFactory.h"
 
 
 long Controller::s_periods = 0;
@@ -183,60 +183,14 @@ void Controller::resetFrameCounter()
 
 Controller * Controller::create( ControllerTypes _ct, Model * _parent )
 {
-	static Controller * dummy = NULL;
-	Controller * c = NULL;
-
-	switch( _ct )
-	{
-		case Controller::DummyController:
-			if (!dummy)
-				dummy = new Controller( DummyController, NULL,
-								QString() );
-			c = dummy;
-			break;
-
-		case Controller::LfoController:
-			c = new ::LfoController( _parent );
-			break;
-
-		case Controller::PeakController:
-			//Already instantiated in EffectChain::loadSettings()
-			Q_ASSERT( false );
-			break;
-
-		case Controller::MidiController:
-			c = new ::MidiController( _parent );
-			break;
-
-		default: 
-			break;
-	}
-
-	return( c );
+	return Engine::controllerFactory()->create(_ct, _parent, nullptr);
 }
 
 
 
-Controller * Controller::create( const QDomElement & _this, Model * _parent )
-{
-	Controller * c;
-	if( _this.attribute( "type" ).toInt() == Controller::PeakController )
-	{
-		c = PeakController::getControllerBySetting( _this );
-	}
-	else
-	{
-		c = create(
-			static_cast<ControllerTypes>( _this.attribute( "type" ).toInt() ),
-										_parent );
-	}
-
-	if( c != NULL )
-	{
-		c->restoreState( _this );
-	}
-
-	return( c );
+Controller * Controller::create( const QDomElement & _this, Model * _parent ) {
+	auto controllerType = static_cast<ControllerTypes>(_this.attribute( "type" ).toInt());
+	return Engine::controllerFactory()->create(controllerType, _parent, &_this);
 }
 
 

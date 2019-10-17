@@ -36,10 +36,12 @@ class PeakControllerEffect;
 typedef QVector<PeakControllerEffect *> PeakControllerEffectVector;
 
 
-class LMMS_EXPORT PeakController : public Controller
+class PeakController : public Controller
 {
 	Q_OBJECT
 public:
+	static constexpr Controller::ControllerTypes s_peakControllerType = static_cast<ControllerTypes>(3);
+
 	PeakController( Model * _parent,
 		PeakControllerEffect *_peak_effect = NULL );
 

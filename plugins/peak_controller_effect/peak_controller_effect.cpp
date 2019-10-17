@@ -29,6 +29,7 @@
 #include "PresetPreviewPlayHandle.h"
 #include "PeakController.h"
 #include "peak_controller_effect.h"
+#include "ControllerFactory.h"
 #include "lmms_math.h"
 
 #include "embed.h"
@@ -74,6 +75,8 @@ PeakControllerEffect::PeakControllerEffect(
 		Engine::getSong()->addController( m_autoController );
 	}
 	PeakController::s_effects.append( this );
+
+	setupControllerFactory();
 }
 
 
@@ -81,6 +84,9 @@ PeakControllerEffect::PeakControllerEffect(
 
 PeakControllerEffect::~PeakControllerEffect()
 {
+	// Don't remove the controller from the factory
+	// since there might be other instances of this type.
+
 	int idx = PeakController::s_effects.indexOf( this );
 	if( idx >= 0 )
 	{
@@ -143,7 +149,27 @@ bool PeakControllerEffect::processAudioBuffer( sampleFrame * _buf,
 	return isRunning();
 }
 
+void PeakControllerEffect::setupControllerFactory() {
+	Engine::controllerFactory()->addFactory(PeakController::s_peakControllerType,
+			[] (Model *parent, const QDomElement *element) {
+		Q_ASSERT(element);
+		int effectId = element->attribute( "effectId" ).toInt();
+		auto findEffectFromEffectID = [effectId] (PeakControllerEffect *effect) {
+			return effectId == effect->m_effectId;
+		};
 
+		auto result = std::find_if(PeakController::s_effects.begin(),
+								   PeakController::s_effects.end(),
+								   findEffectFromEffectID);
+
+		if (result == PeakController::s_effects.end()) {
+			qWarning("Could not load effectid: %d; creating a new empty peak controller", effectId);
+			return new PeakController(parent);
+		}
+
+		return (*result)->controller();
+	});
+}
 
 
 extern "C"

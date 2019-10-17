@@ -74,6 +74,7 @@ private:
 
 	friend class PeakControllerEffectControls;
 
+	static void setupControllerFactory();
 } ;
 
 #endif

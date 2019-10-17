@@ -32,14 +32,14 @@
 
 #include "Mixer.h"
 #include "EffectChain.h"
-#include "plugins/peak_controller_effect/peak_controller_effect.h"
+#include "peak_controller_effect.h"
 
 PeakControllerEffectVector PeakController::s_effects;
 
 
 PeakController::PeakController( Model * _parent,
 		PeakControllerEffect * _peak_effect ) :
-	Controller( Controller::PeakController, _parent, tr( "Peak Controller" ) ),
+	Controller( s_peakControllerType, _parent, tr( "Peak Controller" ) ),
 	m_peakEffect( _peak_effect ),
 	m_currentSample( 0.0f )
 {
