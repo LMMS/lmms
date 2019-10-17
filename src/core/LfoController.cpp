@@ -226,6 +226,10 @@ ControllerDialog * LfoController::createDialog( QWidget * _parent )
 	return new LfoControllerDialog( this, _parent );
 }
 
+bool LfoController::frequentUpdates() const {
+	return true;
+}
+
 
 
 

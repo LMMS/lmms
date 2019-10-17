@@ -83,15 +83,8 @@ public:
 
 	// return whether this controller updates models frequently - used for
 	// determining when to update GUI
-	inline bool frequentUpdates() const
+	virtual bool frequentUpdates() const
 	{
-		switch( m_type )
-		{
-			case LfoController: return( true );
-			case PeakController: return( true );
-			default:
-				break;
-		}
 		return( false );
 	}
 

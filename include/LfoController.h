@@ -53,6 +53,7 @@ public:
 	virtual void loadSettings( const QDomElement & _this );
 	virtual QString nodeName() const;
 
+	bool frequentUpdates() const override;
 
 public slots:
 	virtual ControllerDialog * createDialog( QWidget * _parent );

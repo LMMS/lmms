@@ -55,6 +55,7 @@ public:
 
 	static PeakControllerEffectVector s_effects;
 
+	bool frequentUpdates() const override;
 
 public slots:
 	virtual ControllerDialog * createDialog( QWidget * _parent );

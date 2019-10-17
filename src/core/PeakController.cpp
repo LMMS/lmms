@@ -252,6 +252,8 @@ ControllerDialog * PeakController::createDialog( QWidget * _parent )
 	return new PeakControllerDialog( this, _parent );
 }
 
-
+bool PeakController::frequentUpdates() const {
+	return true;
+}
 
 
