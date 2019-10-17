@@ -27,6 +27,7 @@
 #ifndef SAPROCESSOR_H
 #define SAPROCESSOR_H
 
+#include <atomic>
 #include <QColor>
 #include <QMutex>
 #include <QWaitCondition>
@@ -42,7 +43,7 @@ class ringbuffer_t;
 class SaProcessor
 {
 public:
-	explicit SaProcessor(SaControls *controls);
+	explicit SaProcessor(const SaControls *controls);
 	virtual ~SaProcessor();
 
 	// analysis thread and a method to terminate it
@@ -66,12 +67,12 @@ public:
 	const uchar *getHistory() const {return m_history.data();}
 
 	// information about results and unit conversion helpers
-	const unsigned int &inBlockSize() const {return m_inBlockSize;}
+	unsigned int inBlockSize() const {return m_inBlockSize;}
 	unsigned int binCount() const;			//!< size of output (frequency domain) data block
 	bool spectrumNotEmpty();				//!< check if result buffers contain any non-zero values
 
 	unsigned int waterfallWidth() const;	//!< binCount value capped at 3840 (for display)
-	const unsigned int& waterfallHeight() const {return m_waterfallHeight;}
+	unsigned int waterfallHeight() const {return m_waterfallHeight;}
 	bool waterfallNotEmpty() const {return m_waterfallNotEmpty;}
 
 	float binToFreq(unsigned int bin_index) const;
@@ -105,14 +106,14 @@ public:
 
 
 private:
-	SaControls *m_controls;
+	const SaControls *m_controls;
 
 	// thread communication and control
 	bool m_terminate;
 
 	// currently valid configuration
 	unsigned int m_zeroPadFactor = 2;		//!< use n-steps bigger FFT for given block size
-	unsigned int m_inBlockSize;				//!< size of input (time domain) data block
+	std::atomic<unsigned int> m_inBlockSize;//!< size of input (time domain) data block
 	unsigned int m_fftBlockSize;			//!< size of padded block for FFT processing
 	unsigned int m_sampleRate;
 
@@ -136,14 +137,14 @@ private:
 	std::vector<uchar> m_history_work;		//!< local history buffer for render
 	std::vector<uchar> m_history;			//!< public buffer for reading
 	bool m_flipRequest;						//!< update public buffer only when requested
-	unsigned int m_waterfallHeight;			//!< number of stored lines in history buffer
+	std::atomic<unsigned int> m_waterfallHeight;	//!< number of stored lines in history buffer
 											// Note: high values may make it harder to see transients.
 	const unsigned int m_waterfallMaxWidth = 3840;
 
 	// book keeping
 	bool m_spectrumActive;
 	bool m_waterfallActive;
-	unsigned int m_waterfallNotEmpty;		//!< number of lines remaining visible on display
+	std::atomic<unsigned int> m_waterfallNotEmpty;	//!< number of lines remaining visible on display
 	bool m_reallocating;
 
 	// merge L and R channels and apply gamma correction to make a spectrogram pixel

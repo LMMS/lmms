@@ -38,7 +38,7 @@
 	#include <iostream>
 #endif
 
-SaProcessor::SaProcessor(SaControls *controls) :
+SaProcessor::SaProcessor(const SaControls *controls) :
 	m_controls(controls),
 	m_terminate(false),
 	m_inBlockSize(FFT_BLOCK_SIZES[0]),
