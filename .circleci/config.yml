@@ -12,6 +12,18 @@ shared:
       key: ccache-{{ arch }}-{{ .Environment.CIRCLE_JOB }}-{{ .Branch }}-{{ .BuildNum }}
       paths:
         - ~/.ccache
+  restore_homebrew_cache: &restore_homebrew_cache
+    restore_cache:
+      keys:
+        - homebrew-{{ arch }}-{{ .Environment.CIRCLE_JOB }}-{{ .Branch }}
+        - homebrew-{{ arch }}-{{ .Environment.CIRCLE_JOB }}
+        - homebrew-{{ arch }}
+  save_homebrew_cache: &save_homebrew_cache
+    save_cache:
+      key: homebrew-{{ arch }}-{{ .Environment.CIRCLE_JOB }}-{{ .Branch }}-{{ .BuildNum }}
+      paths:
+        - ~/Library/Caches/Homebrew
+        - /usr/local/Homebrew
 
   ccache_stats: &ccache_stats
     run:
@@ -143,10 +155,53 @@ jobs:
       - run:
           name: Shellcheck
           command: shellcheck $(find "./cmake/" -type f -name '*.sh' -o -name "*.sh.in")
+  macos:
+    environment:
+      <<: *common_environment
+    macos:
+      xcode: "9.3.1"
+    steps:
+      - checkout
+      - *init
+      - *restore_homebrew_cache
+      - *restore_cache
+      - run:
+          name: Install Homebrew dependencies
+          command: brew update && brew install ccache fftw cmake pkg-config libogg libvorbis lame libsndfile libsamplerate jack sdl libgig libsoundio stk fluid-synth portaudio fltk qt5 carla
+      - run:
+          name: Install nodejs dependencies
+          command: npm install -g appdmg
+      - run:
+          name: Building
+          command: |
+            mkdir build && cd build
+            cmake .. -DCMAKE_INSTALL_PREFIX="../target" -DCMAKE_PREFIX_PATH="$(brew --prefix qt5)" $CMAKE_OPTS -DUSE_WERROR=OFF
+            make
+      - run:
+          name: Build tests
+          command: cd build && make tests
+      - run:
+          name: Run tests
+          command: build/tests/tests
+      - run:
+          name: Build DMG
+          command: |
+            cd build
+            make install
+            make dmg
+            cp ./lmms-*.dmg /tmp/artifacts/
+      - store_artifacts:
+          path: /tmp/artifacts/
+          destination: /
+      - *save_cache
+      - *save_homebrew_cache
+
+
 workflows:
   version: 2
   build-and-test:
     jobs:
+      - macos
       - mingw32
       - mingw64
       - linux.gcc
