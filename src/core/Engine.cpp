@@ -34,6 +34,7 @@
 #include "ProjectJournal.h"
 #include "Song.h"
 #include "BandLimitedWave.h"
+#include "ControllerFactory.h"
 
 float LmmsCore::s_framesPerTick;
 Mixer* LmmsCore::s_mixer = NULL;
@@ -44,6 +45,7 @@ ProjectJournal * LmmsCore::s_projectJournal = NULL;
 Ladspa2LMMS * LmmsCore::s_ladspaManager = NULL;
 void* LmmsCore::s_dndPluginKey = nullptr;
 DummyTrackContainer * LmmsCore::s_dummyTC = NULL;
+ControllerFactory *LmmsCore::s_controllerFactory = NULL;
 
 
 
@@ -63,6 +65,7 @@ void LmmsCore::init( bool renderOnly )
 	s_fxMixer = new FxMixer;
 	s_bbTrackContainer = new BBTrackContainer;
 
+	s_controllerFactory = new ControllerFactory;
 	s_ladspaManager = new Ladspa2LMMS;
 
 	s_projectJournal->setJournalling( true );

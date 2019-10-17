@@ -40,6 +40,7 @@ class ProjectJournal;
 class Mixer;
 class Song;
 class Ladspa2LMMS;
+class ControllerFactory;
 
 
 // Note: This class is called 'LmmsCore' instead of 'Engine' because of naming
@@ -102,6 +103,11 @@ public:
 		return s_framesPerTick;
 	}
 
+	static ControllerFactory *controllerFactory()
+	{
+		return s_controllerFactory;
+	}
+
 	static float framesPerTick(sample_rate_t sample_rate);
 
 	static void updateFramesPerTick();
@@ -145,6 +151,8 @@ private:
 
 	static Ladspa2LMMS * s_ladspaManager;
 	static void* s_dndPluginKey;
+
+	static ControllerFactory *s_controllerFactory;
 
 	// even though most methods are static, an instance is needed for Qt slots/signals
 	static LmmsCore * s_instanceOfMe;

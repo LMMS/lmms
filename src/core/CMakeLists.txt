@@ -70,6 +70,7 @@ set(LMMS_SRCS
 	core/ValueBuffer.cpp
 	core/VstSyncController.cpp
 	core/StepRecorder.cpp
+	core/ControllerFactory.cpp
 
 	core/audio/AudioAlsa.cpp
 	core/audio/AudioDevice.cpp
