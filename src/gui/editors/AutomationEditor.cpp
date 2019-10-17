@@ -945,6 +945,8 @@ void AutomationEditor::mouseMoveEvent(QMouseEvent * mouseEvent)
 		}
 		else if (m_editMode == DRAW)
 		{
+			float mouseLevel = getLevel(mouseEvent->y());
+			float maxLvlFraction = m_pattern->firstObject()->maxValue<float>() * 0.05;
 			// get time map of current pattern
 			timeMap & time_map = m_pattern->getTimeMap();
 			// will be our iterator in the following loop
@@ -957,7 +959,9 @@ void AutomationEditor::mouseMoveEvent(QMouseEvent * mouseEvent)
 				// existing value
 				if (pos_ticks >= it.key() - MidiTime::ticksPerTact() *4 / m_ppt
 					&& (it+1==time_map.end() ||	pos_ticks <= (it+1).key())
-					&& (pos_ticks<= it.key() + MidiTime::ticksPerTact() *4 / m_ppt))
+					&& (pos_ticks<= it.key() + MidiTime::ticksPerTact() *4 / m_ppt)
+					&& (mouseLevel > it.value() - maxLvlFraction)
+					&& (mouseLevel < it.value() + maxLvlFraction))
 				{
 					break;
 				}
@@ -1086,6 +1090,8 @@ void AutomationEditor::mouseDoubleClickEvent(QMouseEvent * mouseEvent)
 	{
 		// set or move value
 		x -= VALUES_WIDTH;
+		float mouseLevel = getLevel(mouseEvent->y());
+		float maxLvlFraction = m_pattern->firstObject()->maxValue<float>() * 0.05;
 		// get tick in which the cursor is posated
 		int pos_ticks = x * MidiTime::ticksPerTact() / m_ppt +
 			m_currentPosition;
@@ -1101,7 +1107,9 @@ void AutomationEditor::mouseDoubleClickEvent(QMouseEvent * mouseEvent)
 			// existing value
 			if (pos_ticks >= it.key() - MidiTime::ticksPerTact() *4 / m_ppt
 				&& (it+1==time_map.end() ||	pos_ticks <= (it+1).key())
-				&& (pos_ticks<= it.key() + MidiTime::ticksPerTact() *4 / m_ppt))
+				&& (pos_ticks<= it.key() + MidiTime::ticksPerTact() *4 / m_ppt)
+				&& (mouseLevel > it.value() - maxLvlFraction)
+				&& (mouseLevel < it.value() + maxLvlFraction))
 			{
 				break;
 			}
@@ -1198,6 +1206,7 @@ void AutomationEditor::wheelEvent(QWheelEvent * we)
 			{
 				// set or move value
 				x -= VALUES_WIDTH;
+				float maxLvlFraction = m_pattern->firstObject()->maxValue<float>() * 0.05;
 				// get tick in which the cursor is posated
 				int pos_ticks = x * MidiTime::ticksPerTact() / m_ppt +
 					m_currentPosition;
@@ -1215,7 +1224,9 @@ void AutomationEditor::wheelEvent(QWheelEvent * we)
 
 					if (pos_ticks >= it.key() - MidiTime::ticksPerTact() *4 / m_ppt
 						&& (it+1==time_map.end() ||	pos_ticks <= (it+1).key())
-						&& (pos_ticks<= it.key() + MidiTime::ticksPerTact() *4 / m_ppt))
+						&& (pos_ticks<= it.key() + MidiTime::ticksPerTact() *4 / m_ppt)
+						&& (level > it.value() - maxLvlFraction)
+						&& (level < it.value() + maxLvlFraction))
 					{
 						// mouse wheel up
 						if (we->delta() < 0)
