@@ -530,11 +530,10 @@ void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 			{
 				// and check whether the user clicked on an
 				// existing value
-				if( pos_ticks >= it.key() &&
-					( it+1==time_map.end() ||
-						pos_ticks <= (it+1).key() ) &&
-		( pos_ticks<= it.key() + MidiTime::ticksPerTact() *4 / m_ppt ) &&
-		( level == it.value() || mouseEvent->button() == Qt::RightButton ) )
+				if(pos_ticks >= it.key()
+					&& (it+1==time_map.end() || pos_ticks <= (it+1).key())
+					&& (pos_ticks<= it.key() + MidiTime::ticksPerTact() * 12 / m_ppt)
+					&& (level == it.value() || mouseEvent->button() == Qt::RightButton))
 				{
 					break;
 				}
@@ -957,9 +956,9 @@ void AutomationEditor::mouseMoveEvent(QMouseEvent * mouseEvent)
 			{
 				// and check whether the cursor is over an
 				// existing value
-				if (pos_ticks >= it.key() - MidiTime::ticksPerTact() *4 / m_ppt
+				if (pos_ticks >= it.key() - MidiTime::ticksPerTact() * 12 / m_ppt
 					&& (it+1==time_map.end() ||	pos_ticks <= (it+1).key())
-					&& (pos_ticks<= it.key() + MidiTime::ticksPerTact() *4 / m_ppt)
+					&& (pos_ticks<= it.key() + MidiTime::ticksPerTact() * 12 / m_ppt)
 					&& (mouseLevel > it.value() - maxLvlFraction)
 					&& (mouseLevel < it.value() + maxLvlFraction))
 				{
@@ -1105,9 +1104,9 @@ void AutomationEditor::mouseDoubleClickEvent(QMouseEvent * mouseEvent)
 		{
 			// and check whether the cursor is over an
 			// existing value
-			if (pos_ticks >= it.key() - MidiTime::ticksPerTact() *4 / m_ppt
+			if (pos_ticks >= it.key() - MidiTime::ticksPerTact() * 12 / m_ppt
 				&& (it+1==time_map.end() ||	pos_ticks <= (it+1).key())
-				&& (pos_ticks<= it.key() + MidiTime::ticksPerTact() *4 / m_ppt)
+				&& (pos_ticks<= it.key() + MidiTime::ticksPerTact() * 12 / m_ppt)
 				&& (mouseLevel > it.value() - maxLvlFraction)
 				&& (mouseLevel < it.value() + maxLvlFraction))
 			{
@@ -1118,7 +1117,7 @@ void AutomationEditor::mouseDoubleClickEvent(QMouseEvent * mouseEvent)
 
 		bool ok;
 		double d = QInputDialog::getDouble(this, tr("Edit Point"),
-	  	tr("Enter Y Coordinate:"), m_pointYLevel, 0, m_pattern->firstObject()->maxValue<float>(), 3, &ok);
+	  	tr("New Y Value:"), m_pointYLevel, 0, m_pattern->firstObject()->maxValue<float>(), 3, &ok);
 
 		if (ok)
 		{
@@ -1222,9 +1221,9 @@ void AutomationEditor::wheelEvent(QWheelEvent * we)
 				{
 					pos_ticks = (pos_ticks < 0) ? 0 : pos_ticks;
 
-					if (pos_ticks >= it.key() - MidiTime::ticksPerTact() *4 / m_ppt
+					if (pos_ticks >= it.key() - MidiTime::ticksPerTact() * 12 / m_ppt
 						&& (it+1==time_map.end() ||	pos_ticks <= (it+1).key())
-						&& (pos_ticks<= it.key() + MidiTime::ticksPerTact() *4 / m_ppt)
+						&& (pos_ticks<= it.key() + MidiTime::ticksPerTact() * 12 / m_ppt)
 						&& (level > it.value() - maxLvlFraction)
 						&& (level < it.value() + maxLvlFraction))
 					{
