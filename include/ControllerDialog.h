@@ -33,7 +33,7 @@
 class Controller;
 
 
-class ControllerDialog : public QWidget, public ModelView
+class LMMS_EXPORT ControllerDialog : public QWidget, public ModelView
 {
     Q_OBJECT
 public:
