@@ -52,7 +52,6 @@
 #include "ProjectNotes.h"
 #include "SongEditor.h"
 #include "TimeLineWidget.h"
-#include "PeakController.h"
 
 
 tick_t MidiTime::s_ticksPerTact = DefaultTicksPerTact;
@@ -1080,9 +1079,6 @@ void Song::loadProject( const QString & fileName )
 		m_globalAutomationTrack->restoreState( dataFile.content().
 						firstChildElement( "track" ) );
 	}
-
-	//Backward compatibility for LMMS <= 0.4.15
-	PeakController::initGetControllerBySetting();
 
 	// Load mixer first to be able to set the correct range for FX channels
 	node = dataFile.content().firstChildElement( Engine::fxMixer()->nodeName() );
