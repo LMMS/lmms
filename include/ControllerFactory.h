@@ -28,7 +28,7 @@ private:
 	static Controller* restoreStateHelper(Controller *controller, const QDomElement *element);
 	void setupBuiltinControllerFactories();
 
-	std::unordered_map<Controller::ControllerTypes, FunctionType> m_controllerTypeToFactory;
+	std::unordered_map<uint32_t , FunctionType> m_controllerTypeToFactory;
 };
 
 
