@@ -406,10 +406,12 @@ void SampleBuffer::normalizeSampleRate( const sample_rate_t _src_sr,
 	}
 	else if( old_rate != mixerSampleRate() )
 	{
-		m_startFrame *= ((float)mixerSampleRate() / old_rate);
-		m_endFrame *= ((float)mixerSampleRate() / old_rate);
-		m_loopStartFrame *= ((float)mixerSampleRate() / old_rate);
-		m_loopEndFrame *= ((float)mixerSampleRate() / old_rate);
+		auto old_rate_to_new_rate_ratio = static_cast<float>(mixerSampleRate()) / old_rate;
+
+		m_startFrame = qBound(0, f_cnt_t(m_startFrame*old_rate_to_new_rate_ratio), m_frames);
+		m_endFrame = qBound(m_startFrame, f_cnt_t(m_endFrame*old_rate_to_new_rate_ratio), m_frames);
+		m_loopStartFrame = qBound(0, f_cnt_t(m_loopStartFrame*old_rate_to_new_rate_ratio), m_frames);
+		m_loopEndFrame = qBound(m_loopStartFrame, f_cnt_t(m_loopEndFrame*old_rate_to_new_rate_ratio), m_frames);
 		m_sampleRate = mixerSampleRate();
 	}
 }
