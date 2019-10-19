@@ -37,3 +37,4 @@
 [submodule "src/3rdparty/ringbuffer"]
 	path = src/3rdparty/ringbuffer
 	url = https://github.com/JohannesLorenz/ringbuffer.git
+	branch = windows-ci-fixes
