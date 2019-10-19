@@ -40,6 +40,7 @@
 #include "ToolTip.h"
 #include "StepRecorder.h"
 #include "StepRecorderWidget.h"
+#include "PositionLine.h"
 
 class QPainter;
 class QPixmap;
@@ -188,7 +189,6 @@ protected:
 	void selectAll();
 	NoteVector getSelectedNotes() const;
 	void selectNotesOnKey();
-	int xCoordOfTick( int tick );
 
 	// for entering values with dblclick in the vol/pan bars
 	void enterValue( NoteVector* nv );
@@ -279,6 +279,8 @@ private:
 		PR_BLACK_KEY
 	};
 
+	PositionLine * m_positionLine;
+
 	QVector<QString> m_nemStr; // gui names of each edit mode
 	QMenu * m_noteEditMenu; // when you right click below the key area
 
@@ -307,6 +309,7 @@ private:
 	void pauseChordNotes(int key);
 
 	void updateScrollbars();
+	void updatePositionLineHeight();
 
 	QList<int> getAllOctavesForKey( int keyToMirror ) const;
 
@@ -395,6 +398,7 @@ private:
 	int m_notesEditHeight;
 	int m_ppb;  // pixels per bar
 	int m_totalKeysToScroll;
+	int m_pianoKeysVisible;
 
 	int m_keyLineHeight;
 	int m_octaveHeight;
