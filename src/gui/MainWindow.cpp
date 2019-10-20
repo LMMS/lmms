@@ -29,11 +29,13 @@
 #include <QDesktopServices>
 #include <QDomElement>
 #include <QFileInfo>
+#include <QHBoxLayout>
 #include <QMdiArea>
 #include <QMenuBar>
 #include <QMessageBox>
 #include <QShortcut>
 #include <QLibrary>
+#include <QSpacerItem>
 #include <QSplitter>
 #include <QUrl>
 
@@ -50,6 +52,7 @@
 #include "FxMixerView.h"
 #include "GuiApplication.h"
 #include "ImportFilter.h"
+#include "MasterToolBar.h"
 #include "PianoRoll.h"
 #include "PluginBrowser.h"
 #include "PluginFactory.h"
@@ -210,11 +213,35 @@ MainWindow::MainWindow() :
 	m_toolBar->setObjectName( "mainToolbar" );
 	m_toolBar->setFixedHeight( 64 );
 	m_toolBar->move( 0, 0 );
-
-	// add layout for organizing quite complex toolbar-layouting
-	m_toolBarLayout = new QGridLayout( m_toolBar/*, 2, 1*/ );
+	
+	// Add layout for horizontally spacing the different widgets:
+	m_toolBarLayout = new QHBoxLayout( m_toolBar );
 	m_toolBarLayout->setMargin( 0 );
 	m_toolBarLayout->setSpacing( 0 );
+	
+	// First add the leftmost buttons:
+	m_toolBarButtons = new QWidget( m_toolBar );
+	m_toolBarButtons->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+
+	// Add layout for organizing quite complex toolbar-layouting:
+	m_toolBarButtonsLayout = new QGridLayout( m_toolBarButtons/*, 2, 1*/ );
+	m_toolBarButtonsLayout->setMargin( 0 );
+	m_toolBarButtonsLayout->setSpacing( 0 );
+	
+	m_toolBarLayout->addWidget( m_toolBarButtons );
+	
+	// Add spacers for horizontally centering the master toolbar widget:
+	m_toolBarLeftSpacer = new QSpacerItem( 0, 20, QSizePolicy::Maximum );
+	m_toolBarLayout->addSpacerItem( m_toolBarLeftSpacer );
+	
+	m_toolBarLayout->addSpacerItem( new QSpacerItem( 40, 20, QSizePolicy::Expanding ) );
+	
+	// In between these spacers, there will be the master tool bar.
+	
+	m_toolBarLayout->addSpacerItem( new QSpacerItem( 40, 20, QSizePolicy::Expanding ) );
+	
+	m_toolBarRightSpacer = new QSpacerItem( 180, 20, QSizePolicy::Maximum );
+	m_toolBarLayout->addSpacerItem( m_toolBarRightSpacer );
 
 	vbox->addWidget( m_toolBar );
 	vbox->addWidget( w );
@@ -263,6 +290,7 @@ MainWindow::~MainWindow()
 	delete gui->automationEditor();
 	delete gui->pianoRoll();
 	delete gui->songEditor();
+	delete gui->masterToolBar();
 	// destroy engine which will do further cleanups etc.
 	Engine::destroy();
 }
@@ -466,14 +494,14 @@ void MainWindow::finalize()
 	m_metronomeToggle->setCheckable(true);
 	m_metronomeToggle->setChecked(Engine::mixer()->isMetronomeActive());
 
-	m_toolBarLayout->setColumnMinimumWidth( 0, 5 );
-	m_toolBarLayout->addWidget( project_new, 0, 1 );
-	m_toolBarLayout->addWidget( project_new_from_template, 0, 2 );
-	m_toolBarLayout->addWidget( project_open, 0, 3 );
-	m_toolBarLayout->addWidget( project_open_recent, 0, 4 );
-	m_toolBarLayout->addWidget( project_save, 0, 5 );
-	m_toolBarLayout->addWidget( project_export, 0, 6 );
-	m_toolBarLayout->addWidget( m_metronomeToggle, 0, 7 );
+	m_toolBarButtonsLayout->setColumnMinimumWidth( 0, 5 );
+	m_toolBarButtonsLayout->addWidget( project_new, 0, 1 );
+	m_toolBarButtonsLayout->addWidget( project_new_from_template, 0, 2 );
+	m_toolBarButtonsLayout->addWidget( project_open, 0, 3 );
+	m_toolBarButtonsLayout->addWidget( project_open_recent, 0, 4 );
+	m_toolBarButtonsLayout->addWidget( project_save, 0, 5 );
+	m_toolBarButtonsLayout->addWidget( project_export, 0, 6 );
+	m_toolBarButtonsLayout->addWidget( m_metronomeToggle, 0, 7 );
 
 
 	// window-toolbar
@@ -534,14 +562,25 @@ void MainWindow::finalize()
 								m_toolBar );
 	project_notes_window->setShortcut( Qt::Key_F11 );
 
-	m_toolBarLayout->addWidget( song_editor_window, 1, 1 );
-	m_toolBarLayout->addWidget( bb_editor_window, 1, 2 );
-	m_toolBarLayout->addWidget( piano_roll_window, 1, 3 );
-	m_toolBarLayout->addWidget( automation_editor_window, 1, 4 );
-	m_toolBarLayout->addWidget( fx_mixer_window, 1, 5 );
-	m_toolBarLayout->addWidget( controllers_window, 1, 6 );
-	m_toolBarLayout->addWidget( project_notes_window, 1, 7 );
-	m_toolBarLayout->setColumnStretch( 100, 1 );
+	m_toolBarButtonsLayout->addWidget( song_editor_window, 1, 1 );
+	m_toolBarButtonsLayout->addWidget( bb_editor_window, 1, 2 );
+	m_toolBarButtonsLayout->addWidget( piano_roll_window, 1, 3 );
+	m_toolBarButtonsLayout->addWidget( automation_editor_window, 1, 4 );
+	m_toolBarButtonsLayout->addWidget( fx_mixer_window, 1, 5 );
+	m_toolBarButtonsLayout->addWidget( controllers_window, 1, 6 );
+	m_toolBarButtonsLayout->addWidget( project_notes_window, 1, 7 );
+	m_toolBarButtonsLayout->setColumnStretch( 100, 1 );
+	
+	// After adding all toolbar buttons, recalculate the size of the spacers
+	// to keep the master toolbar in the center of the window:
+	// TODO: put this in resizeEvent()!
+	m_toolBarButtons->update();
+	m_toolBarLeftSpacer->changeSize( 0, 20, QSizePolicy::Maximum );
+	// TODO: this is currently hardcoded, but it should be inside resizeEvent!
+	m_toolBarRightSpacer->changeSize( 207,
+					20, QSizePolicy::Maximum );
+	//m_toolBarRightSpacer->changeSize( m_toolBarButtons->width(),
+	//				20, QSizePolicy::Maximum );
 
 	// setup-dialog opened before?
 	if( !ConfigManager::inst()->value( "app", "configured" ).toInt() )
@@ -594,28 +633,13 @@ void MainWindow::finalize()
 
 
 
-int MainWindow::addWidgetToToolBar( QWidget * _w, int _row, int _col )
+void MainWindow::addWidgetToToolBar( QWidget * _w )
 {
-	int col = ( _col == -1 ) ? m_toolBarLayout->columnCount() + 7 : _col;
-	if( _w->height() > 32 || _row == -1 )
-	{
-		m_toolBarLayout->addWidget( _w, 0, col, 2, 1 );
-	}
-	else
-	{
-		m_toolBarLayout->addWidget( _w, _row, col );
-	}
-	return( col );
+	m_toolBarLayout->insertWidget( 3, _w );
 }
 
 
 
-
-void MainWindow::addSpacingToToolBar( int _size )
-{
-	m_toolBarLayout->setColumnMinimumWidth( m_toolBarLayout->columnCount() +
-								7, _size );
-}
 
 SubWindow* MainWindow::addWindowedWidget(QWidget *w, Qt::WindowFlags windowFlags)
 {

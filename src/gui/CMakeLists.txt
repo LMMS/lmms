@@ -42,6 +42,7 @@ SET(LMMS_SRCS
 	gui/editors/Editor.cpp
 	gui/editors/PianoRoll.cpp
 	gui/editors/SongEditor.cpp
+	gui/editors/MasterToolBar.cpp
 
 	gui/menus/RecentProjectsMenu.cpp
 	gui/menus/TemplatesMenu.cpp

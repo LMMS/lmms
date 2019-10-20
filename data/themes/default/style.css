@@ -398,6 +398,23 @@ AutomatableSlider::handle:vertical {
 	margin: -4px -12px -2px;
 }
 
+AutomatableSlider::groove:horizontal {
+	background: #040506;
+	border: none;
+	border-radius: 2px;
+	height: 2px;
+	margin: 2px 2px;
+}
+
+AutomatableSlider::handle:horizontal {
+	background: none;
+	border-image: url(resources:main_slider_horizontal.png);
+	width: 22px;
+	height: 14px;
+	border-radius: 2px;
+	margin: -6px -1px -6px -1px;
+}
+
 /* window that shows up when you add effects */
 
 EffectSelectDialog QScrollArea {
@@ -430,6 +447,13 @@ EffectControlDialog QGroupBox::title {
 
 QWidget#mainToolbar {
 	background: qlineargradient(spread:reflect, x1:0, y1:0, x2:0, y2:1, stop:0 #373f47, stop:1 #1d2122);
+}
+
+/* master toolbar frame */
+
+QFrame#masterToolbarFrame {
+	background: qlineargradient(spread:reflect, x1:0, y1:0, x2:0, y2:1, stop:0 #2c343b, stop:1 #1f2326);
+	color: #161e25;
 }
 
 /* modern time display */

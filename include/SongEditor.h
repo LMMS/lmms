@@ -101,16 +101,6 @@ protected:
 private slots:
 	void setHighQuality( bool );
 
-	void setMasterVolume( int new_val );
-	void showMasterVolumeFloat();
-	void updateMasterVolumeFloat( int new_val );
-	void hideMasterVolumeFloat();
-
-	void setMasterPitch( int new_val );
-	void showMasterPitchFloat();
-	void updateMasterPitchFloat( int new_val );
-	void hideMasterPitchFloat();
-
 	void updateScrollBar(int len);
 
 	void zoomingChanged();
@@ -129,16 +119,7 @@ private:
 
 	QScrollBar * m_leftRightScroll;
 
-	LcdSpinBox * m_tempoSpinBox;
-
 	TimeLineWidget * m_timeLine;
-
-	MeterDialog * m_timeSigDisplay;
-	AutomatableSlider * m_masterVolumeSlider;
-	AutomatableSlider * m_masterPitchSlider;
-
-	TextFloat * m_mvsStatus;
-	TextFloat * m_mpsStatus;
 
 	positionLine * m_positionLine;
 
