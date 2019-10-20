@@ -89,6 +89,7 @@ SET(LMMS_SRCS
 	gui/widgets/SendButtonIndicator.cpp
 	gui/widgets/SideBar.cpp
 	gui/widgets/SideBarWidget.cpp
+	gui/widgets/SimpleVisualizationWidget.cpp
 	gui/widgets/TabBar.cpp
 	gui/widgets/TabWidget.cpp
 	gui/widgets/TempoSyncKnob.cpp
