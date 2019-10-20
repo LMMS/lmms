@@ -67,6 +67,7 @@ SET(LMMS_SRCS
 	gui/widgets/InstrumentFunctionViews.cpp
 	gui/widgets/InstrumentMidiIOView.cpp
 	gui/widgets/InstrumentSoundShapingView.cpp
+	gui/widgets/IntegerDisplayWidget.cpp
 	gui/widgets/LeftRightNav.cpp
 	gui/widgets/Knob.cpp
 	gui/widgets/LadspaControlView.cpp
