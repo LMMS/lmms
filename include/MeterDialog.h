@@ -30,22 +30,22 @@
 
 #include "ModelView.h"
 
-class LcdSpinBox;
+class IntegerSpinBox;
 
 
 class MeterDialog : public QWidget, public ModelView
 {
 	Q_OBJECT
 public:
-	MeterDialog( QWidget * _parent, bool _simple = false );
+	MeterDialog( QWidget * _parent );
 	virtual ~MeterDialog();
 
 	void modelChanged() override;
 
 
 private:
-	LcdSpinBox * m_numerator;
-	LcdSpinBox * m_denominator;
+	IntegerSpinBox * m_numerator;
+	IntegerSpinBox * m_denominator;
 
 } ;
 
