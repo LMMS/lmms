@@ -95,6 +95,7 @@ public:
 	void setCurrentPattern( Pattern* newPattern );
 	void setGhostPattern( Pattern* newPattern );
 	void loadGhostNotes( const QDomElement & de );
+	void loadMarkedSemiTones(const QDomElement & de);
 
 	inline void stopRecording()
 	{

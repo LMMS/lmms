@@ -226,10 +226,9 @@ void TrackContainerView::scrollToTrackView( TrackView * _tv )
 
 void TrackContainerView::realignTracks()
 {
-	QWidget * content = m_scrollArea->widget();
-	content->setFixedWidth( width()
-				- m_scrollArea->verticalScrollBar()->width() );
-	content->setFixedHeight( content->minimumSizeHint().height() );
+	m_scrollArea->widget()->setFixedWidth(width());
+	m_scrollArea->widget()->setFixedHeight(
+				m_scrollArea->widget()->minimumSizeHint().height());
 
 	for( trackViewList::iterator it = m_trackViews.begin();
 						it != m_trackViews.end(); ++it )
@@ -488,7 +487,6 @@ TrackContainerView::scrollArea::scrollArea( TrackContainerView * _parent ) :
 {
 	setFrameStyle( QFrame::NoFrame );
 	setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
-	setVerticalScrollBarPolicy( Qt::ScrollBarAlwaysOn );
 }
 
 

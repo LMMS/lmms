@@ -121,6 +121,9 @@ void SideBar::appendTab( SideBarWidget *widget )
 	widget->setMinimumWidth( 200 );
 
 	ToolTip::add( button, widget->title() );
+
+	connect(widget, &SideBarWidget::closeButtonClicked,
+		[=]() { button->click(); });
 }
 
 

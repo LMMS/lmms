@@ -24,6 +24,8 @@
  *
  */
 
+#include "PianoRoll.h"
+
 #include <QApplication>
 #include <QClipboard>
 #include <QKeyEvent>
@@ -46,7 +48,6 @@
 #include "AutomationEditor.h"
 #include "ActionGroup.h"
 #include "ConfigManager.h"
-#include "PianoRoll.h"
 #include "BBTrackContainer.h"
 #include "Clipboard.h"
 #include "ComboBox.h"
@@ -549,7 +550,10 @@ void PianoRoll::markSemiTone( int i )
 				for (int ix = 0; ix < aok.size(); ++ix)
 				{
 					i = std::find(m_markedSemiTones.begin(), m_markedSemiTones.end(), aok.at(ix));
-					m_markedSemiTones.erase(i);
+					if (i != m_markedSemiTones.end())
+					{
+						m_markedSemiTones.erase(i);
+					}
 				}
 			}
 			else
@@ -652,6 +656,32 @@ void PianoRoll::clearGhostPattern()
 	setGhostPattern( nullptr );
 	emit ghostPatternSet( false );
 	update();
+}
+
+
+void PianoRoll::loadMarkedSemiTones(const QDomElement & de)
+{
+	// clear marked semitones to prevent leftover marks
+	m_markedSemiTones.clear();
+	if (de.isElement())
+	{
+		QDomNode node = de.firstChild();
+		while (!node.isNull())
+		{
+			bool ok;
+			int key = node.toElement().attribute(
+				QString("key"), QString("-1")).toInt(&ok, 10);
+			if (ok && key >= 0)
+			{
+				m_markedSemiTones.append(key);
+			}
+			node = node.nextSibling();
+		}
+	}
+	// from markSemiTone, required otherwise marks will not show
+	std::sort(m_markedSemiTones.begin(), m_markedSemiTones.end(), std::greater<int>());
+	QList<int>::iterator new_end = std::unique(m_markedSemiTones.begin(), m_markedSemiTones.end());
+	m_markedSemiTones.erase(new_end, m_markedSemiTones.end());
 }
 
 
@@ -4065,6 +4095,8 @@ void PianoRoll::cutSelectedNotes()
 
 	if( ! selected_notes.empty() )
 	{
+		m_pattern->addJournalCheckPoint();
+
 		copyToClipboard( selected_notes );
 
 		Engine::getSong()->setModified();
@@ -4697,6 +4729,18 @@ void PianoRollWindow::saveSettings( QDomDocument & doc, QDomElement & de )
 		de.appendChild( ghostNotesRoot );
 	}
 
+	if (m_editor->m_markedSemiTones.length() > 0)
+	{
+		QDomElement markedSemiTonesRoot = doc.createElement("markedSemiTones");
+		for (int ix = 0; ix < m_editor->m_markedSemiTones.size(); ++ix)
+		{
+			QDomElement semiToneNode = doc.createElement("semiTone");
+			semiToneNode.setAttribute("key", m_editor->m_markedSemiTones.at(ix));
+			markedSemiTonesRoot.appendChild(semiToneNode);
+		}
+		de.appendChild(markedSemiTonesRoot);
+	}
+
 	MainWindow::saveWidgetState( this, de );
 }
 
@@ -4706,6 +4750,7 @@ void PianoRollWindow::saveSettings( QDomDocument & doc, QDomElement & de )
 void PianoRollWindow::loadSettings( const QDomElement & de )
 {
 	m_editor->loadGhostNotes( de.firstChildElement("ghostnotes") );
+	m_editor->loadMarkedSemiTones(de.firstChildElement("markedSemiTones"));
 
 	MainWindow::restoreWidgetState( this, de );
 }

@@ -73,7 +73,7 @@ const int DEFAULT_TRACK_HEIGHT = 32;
 const int TCO_BORDER_WIDTH = 2;
 
 
-class TrackContentObject : public Model, public JournallingObject
+class LMMS_EXPORT TrackContentObject : public Model, public JournallingObject
 {
 	Q_OBJECT
 	MM_OPERATORS
