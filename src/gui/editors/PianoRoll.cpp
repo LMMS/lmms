@@ -1963,6 +1963,10 @@ void PianoRoll::mouseDoubleClickEvent(QMouseEvent * me )
 			enterValue( &nv );
 		}
 	}
+	else
+	{
+		mousePressEvent(me);
+	}
 }
 
 
