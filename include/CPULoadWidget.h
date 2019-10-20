@@ -33,6 +33,7 @@
 
 #include "lmms_basics.h"
 
+class ProgressBar;
 
 class CPULoadWidget : public QWidget
 {
@@ -42,25 +43,15 @@ public:
 	virtual ~CPULoadWidget();
 
 
-protected:
-	void paintEvent( QPaintEvent * _ev ) override;
-
-
 protected slots:
 	void updateCpuLoad();
 
 
 private:
-	int m_currentLoad;
-
-	QPixmap m_temp;
-	QPixmap m_background;
-	QPixmap m_leds;
-
-	bool m_changed;
+	float m_currentLoad;
 
 	QTimer m_updateTimer;
-
+	ProgressBar * m_progressBar;
 } ;
 
 
