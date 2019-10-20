@@ -432,6 +432,18 @@ QWidget#mainToolbar {
 	background: qlineargradient(spread:reflect, x1:0, y1:0, x2:0, y2:1, stop:0 #373f47, stop:1 #1d2122);
 }
 
+/* modern time display */
+
+QLabel#integerDisplayDigits {
+	font-size: 13pt;
+	color: #2fcc88;
+}
+
+QLabel#integerDisplayTitle {
+	font-size: 8pt;
+	color: #b0c4d7;
+}
+
 /* smaller toolbars */
 
 QToolBar {

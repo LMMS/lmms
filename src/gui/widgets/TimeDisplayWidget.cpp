@@ -33,8 +33,8 @@
 
 
 
-TimeDisplayWidget::TimeDisplayWidget() :
-	QWidget(),
+TimeDisplayWidget::TimeDisplayWidget( QWidget * _parent ) :
+	QWidget( _parent ),
 	m_displayMode( MinutesSeconds ),
 	m_spinBoxesLayout( this ),
 	m_majorLCD( 4, this ),
@@ -43,11 +43,39 @@ TimeDisplayWidget::TimeDisplayWidget() :
 {
 	m_spinBoxesLayout.setSpacing( 0 );
 	m_spinBoxesLayout.setMargin( 0 );
-	m_spinBoxesLayout.addWidget( &m_majorLCD );
-	m_spinBoxesLayout.addWidget( &m_minorLCD );
-	m_spinBoxesLayout.addWidget( &m_milliSecondsLCD );
-
-	setMaximumHeight( 32 );
+	m_spinBoxesLayout.setAlignment( Qt::AlignHCenter );
+	
+	// Add caption labels:
+	m_majorLabel = new QLabel( this );
+	m_majorLabel->setObjectName( "integerDisplayTitle" );
+	m_majorLabel->setAlignment( Qt::AlignHCenter );
+	
+	m_minorLabel = new QLabel( this );
+	m_minorLabel->setObjectName( "integerDisplayTitle" );
+	m_minorLabel->setAlignment( Qt::AlignHCenter );
+	
+	m_milliSecondsLabel = new QLabel( this );
+	m_milliSecondsLabel->setObjectName( "integerDisplayTitle" );
+	m_milliSecondsLabel->setAlignment( Qt::AlignHCenter );
+	
+	m_spinBoxesLayout.addWidget( m_majorLabel, 0, 0 );
+	m_spinBoxesLayout.addWidget( m_minorLabel, 0, 1, 1, 3 );
+	m_spinBoxesLayout.addWidget( m_milliSecondsLabel, 0, 4 );
+	
+	// Add integer displays:
+	QLabel * colon = new QLabel( ":", this );
+	colon->setObjectName( "integerDisplayDigits" );
+	
+	QLabel * dot = new QLabel( ".", this );
+	dot->setObjectName( "integerDisplayDigits" );
+	
+	m_spinBoxesLayout.addWidget( &m_majorLCD, 1, 0 );
+	m_spinBoxesLayout.addWidget(colon, 1, 1 );
+	m_spinBoxesLayout.addWidget( &m_minorLCD, 1, 2 );
+	m_spinBoxesLayout.addWidget(dot, 1, 3 );
+	m_spinBoxesLayout.addWidget( &m_milliSecondsLCD, 1, 4 );
+	
+	setMaximumHeight( 35 );
 
 	ToolTip::add( this, tr( "Time units" ) );
 
@@ -65,15 +93,15 @@ void TimeDisplayWidget::setDisplayMode( DisplayMode displayMode )
 	switch( m_displayMode )
 	{
 		case MinutesSeconds:
-			m_majorLCD.setLabel( tr( "MIN" ) );
-			m_minorLCD.setLabel( tr( "SEC" ) );
-			m_milliSecondsLCD.setLabel( tr( "MSEC" ) );
+			m_majorLabel->setText( tr( "MIN" ) );
+			m_minorLabel->setText( tr( "SEC" ) );
+			m_milliSecondsLabel->setText( tr( "MSEC" ) );
 			break;
 
 		case BarsTicks:
-			m_majorLCD.setLabel( tr( "BAR" ) );
-			m_minorLCD.setLabel( tr( "BEAT" ) );
-			m_milliSecondsLCD.setLabel( tr( "TICK" ) );
+			m_majorLabel->setText( tr( "BAR" ) );
+			m_minorLabel->setText( tr( "BEAT" ) );
+			m_milliSecondsLabel->setText( tr( "TICK" ) );
 			break;
 
 		default: break;

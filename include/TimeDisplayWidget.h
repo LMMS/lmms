@@ -27,16 +27,17 @@
 #define _TIME_DISPLAY_WIDGET
 
 #include <QWidget>
-#include <QHBoxLayout>
+#include <QGridLayout>
 
-#include "LcdWidget.h"
+#include "IntegerDisplayWidget.h"
 
+class QLabel;
 
 class TimeDisplayWidget : public QWidget
 {
 	Q_OBJECT
 public:
-	TimeDisplayWidget();
+	TimeDisplayWidget( QWidget * _parent );
 	virtual ~TimeDisplayWidget() = default;
 
 
@@ -60,10 +61,14 @@ private:
 	void setDisplayMode( DisplayMode displayMode );
 
 	DisplayMode m_displayMode;
-	QHBoxLayout m_spinBoxesLayout;
-	LcdWidget m_majorLCD;
-	LcdWidget m_minorLCD;
-	LcdWidget m_milliSecondsLCD;
+	QGridLayout m_spinBoxesLayout;
+	IntegerDisplayWidget m_majorLCD;
+	IntegerDisplayWidget m_minorLCD;
+	IntegerDisplayWidget m_milliSecondsLCD;
+	
+	QLabel * m_majorLabel;
+	QLabel * m_minorLabel;
+	QLabel * m_milliSecondsLabel;
 
 } ;
 
