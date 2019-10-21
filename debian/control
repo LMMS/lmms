@@ -37,7 +37,7 @@ Build-Depends:
  qttools5-dev,
  wine64-tools [amd64] | wine32-tools [i386]
 Standards-Version: 4.2.1.4
-Homepage: http://lmms.io/
+Homepage: https://lmms.io/
 Vcs-Browser: https://salsa.debian.org/debian-edu-pkg-team/lmms.git
 
 Package: lmms-bin
