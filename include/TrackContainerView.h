@@ -131,24 +131,17 @@ public slots:
 
 	virtual void dropEvent( QDropEvent * _de );
 	virtual void dragEnterEvent( QDragEnterEvent * _dee );
-	///
-	/// \brief selectRegionFromPixels
-	/// \param x
-	/// \param y
-	/// Use the rubber band to select TCO from all tracks using x, y pixels
-	void selectRegionFromPixels(int xStart, int xEnd);
 
 	///
 	/// \brief stopRubberBand
 	/// Removes the rubber band from display when finished with.
 	void stopRubberBand();
 
+
 protected:
 	static const int DEFAULT_PIXELS_PER_TACT = 16;
 
-	virtual void mousePressEvent( QMouseEvent * _me );
-	virtual void mouseMoveEvent( QMouseEvent * _me );
-	virtual void mouseReleaseEvent( QMouseEvent * _me );
+
 	virtual void resizeEvent( QResizeEvent * );
 
 	MidiTime m_currentPosition;
@@ -186,7 +179,7 @@ private:
 	float m_ppt;
 
 	RubberBand * m_rubberBand;
-	QPoint m_origin;
+
 
 
 signals:
