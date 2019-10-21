@@ -36,5 +36,4 @@
 	url = https://github.com/lmms/lmms.wiki.git
 [submodule "src/3rdparty/ringbuffer"]
 	path = src/3rdparty/ringbuffer
-	url = https://github.com/JohannesLorenz/ringbuffer.git
-	branch = windows-ci-fixes
+	url = https://github.com/JohannesLorenz/ringbuffer-fork.git
