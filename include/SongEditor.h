@@ -79,6 +79,9 @@ public:
 
 public slots:
 	void scrolled( int new_pos );
+	void selectRegionFromPixels(int xStart, int xEnd);
+	void stopSelectRegion();
+	void updateRubberband();
 
 	void setEditMode( EditMode mode );
 	void setEditModeDraw();
@@ -91,6 +94,9 @@ public slots:
 
 protected:
 	virtual void closeEvent( QCloseEvent * ce );
+	virtual void mousePressEvent(QMouseEvent * me);
+	virtual void mouseMoveEvent(QMouseEvent * me);
+	virtual void mouseReleaseEvent(QMouseEvent * me);
 
 private slots:
 	void setHighQuality( bool );
@@ -114,6 +120,9 @@ private:
 	virtual void wheelEvent( QWheelEvent * we );
 
 	virtual bool allowRubberband() const;
+
+	int trackIndexFromSelectionPoint(int yPos);
+	int indexOfTrackView(const TrackView* tv);
 
 
 	Song * m_song;
@@ -141,10 +150,18 @@ private:
 
 	bool m_scrollBack;
 	bool m_smoothScroll;
-	int m_widgetWidthTotal;
 
 	EditMode m_mode;
 	EditMode m_ctrlMode; // mode they were in before they hit ctrl
+
+	QPoint m_origin;
+	QPoint m_scrollPos;
+	QPoint m_mousePos;
+	int m_rubberBandStartTrackview;
+	MidiTime m_rubberbandStartMidipos;
+	int m_currentZoomingValue;
+	int m_trackHeadWidth;
+	bool m_selectRegion;
 
 	friend class SongEditorWindow;
 } ;

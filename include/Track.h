@@ -215,6 +215,12 @@ public:
 	{
 		return m_tco;
 	}
+
+	inline TrackView * getTrackView()
+	{
+		return m_trackView;
+	}
+
 	// qproperty access func
 	QColor mutedColor() const;
 	QColor mutedBackgroundColor() const;
@@ -263,10 +269,6 @@ protected:
 
 	float pixelsPerTact();
 
-	inline TrackView * getTrackView()
-	{
-		return m_trackView;
-	}
 
 	DataFile createTCODataFiles(const QVector<TrackContentObjectView *> & tcos) const;
 
