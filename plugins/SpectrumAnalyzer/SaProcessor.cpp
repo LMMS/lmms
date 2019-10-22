@@ -31,7 +31,7 @@
 
 #include "lmms_math.h"
 //#include "../../src/3rdparty/ringbuffer/include/ringbuffer/ringbuffer.h"
-#include <ringbuffer.h>
+#include <ringbuffer/ringbuffer.h>
 
 #ifdef SA_DEBUG
 	#include <chrono>

@@ -32,7 +32,7 @@
 #include "SaControls.h"
 #include "SaProcessor.h"
 #include <QWaitCondition>
-#include "../../src/3rdparty/ringbuffer/include/ringbuffer/ringbuffer.h"
+#include "ringbuffer/ringbuffer.h"
 
 //! Top level class; handles LMMS interface and feeds data to the data processor.
 class Analyzer : public Effect
