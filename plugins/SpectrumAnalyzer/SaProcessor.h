@@ -32,11 +32,10 @@
 #include <QWaitCondition>
 #include <vector>
 
+#include "ringbuffer/ringbuffer.h"
+
 #include "fft_helpers.h"
 #include "SaControls.h"
-
-template<class T>
-class ringbuffer_t;
 
 //! Receives audio data, runs FFT analysis and stores the result.
 class SaProcessor
