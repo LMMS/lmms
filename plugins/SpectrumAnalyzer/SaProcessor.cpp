@@ -30,7 +30,8 @@
 #include <QMutexLocker>
 
 #include "lmms_math.h"
-#include "../../src/3rdparty/ringbuffer/include/ringbuffer/ringbuffer.h"
+//#include "../../src/3rdparty/ringbuffer/include/ringbuffer/ringbuffer.h"
+#include <ringbuffer.h>
 
 #ifdef SA_DEBUG
 	#include <chrono>
