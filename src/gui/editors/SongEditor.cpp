@@ -95,7 +95,7 @@ SongEditor::SongEditor( Song * song ) :
 	m_zoomingModel->setParent(this);
 	m_snappingModel->setParent(this);
 	m_timeLine = new TimeLineWidget( m_trackHeadWidth, 32,
-					pixelsPerTact(),
+					pixelsPerBar(),
 					m_song->m_playPos[Song::Mode_PlaySong],
 					m_currentPosition,
 					Song::Mode_PlaySong, this );
@@ -374,7 +374,7 @@ void SongEditor::selectRegionFromPixels(int xStart, int xEnd)
 
 		//calculate the song position where the mouse was clicked
 		m_rubberbandStartMidipos = MidiTime((xStart - m_trackHeadWidth)
-											/ pixelsPerTact() * MidiTime::ticksPerTact())
+											/ pixelsPerBar() * MidiTime::ticksPerBar())
 											+ m_currentPosition;
 		m_rubberBandStartTrackview = 0;
 	}
@@ -409,7 +409,7 @@ void SongEditor::updateRubberband()
 		}
 
 		//take care of the scrollbar position
-		int hs = (m_leftRightScroll->value() - m_scrollPos.x()) * pixelsPerTact();
+		int hs = (m_leftRightScroll->value() - m_scrollPos.x()) * pixelsPerBar();
 		int vs = contentWidget()->verticalScrollBar()->value() - m_scrollPos.y();
 
 		//the adjusted origin point
@@ -425,7 +425,7 @@ void SongEditor::updateRubberband()
 
 		//the miditime the mouse is hover
 		MidiTime rubberbandMidipos = MidiTime((qMin(m_mousePos.x(), width()) - m_trackHeadWidth)
-											  / pixelsPerTact() * MidiTime::ticksPerTact())
+											  / pixelsPerBar() * MidiTime::ticksPerBar())
 											  + m_currentPosition;
 
 		//are tcos in the rect of selection?
@@ -614,7 +614,7 @@ void SongEditor::mousePressEvent(QMouseEvent *me)
 		//the trackView(index) and the miditime where the mouse was clicked
 		m_rubberBandStartTrackview = trackIndexFromSelectionPoint(me->y());
 		m_rubberbandStartMidipos = MidiTime((me->x() - m_trackHeadWidth)
-											/ pixelsPerTact() * MidiTime::ticksPerTact())
+											/ pixelsPerBar() * MidiTime::ticksPerBar())
 											+ m_currentPosition;
 	}
 	QWidget::mousePressEvent(me);
