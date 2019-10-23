@@ -72,6 +72,8 @@ const int DEFAULT_TRACK_HEIGHT = 32;
 
 const int TCO_BORDER_WIDTH = 2;
 
+char const *const FILENAME_FILTER = "[\\0000-\x1f\"*/:<>?\\\\|\x7f]";
+
 
 class TrackContentObject : public Model, public JournallingObject
 {
