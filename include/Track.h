@@ -73,7 +73,7 @@ const int DEFAULT_TRACK_HEIGHT = 32;
 const int TCO_BORDER_WIDTH = 2;
 
 
-class TrackContentObject : public Model, public JournallingObject
+class LMMS_EXPORT TrackContentObject : public Model, public JournallingObject
 {
 	Q_OBJECT
 	MM_OPERATORS
@@ -215,6 +215,12 @@ public:
 	{
 		return m_tco;
 	}
+
+	inline TrackView * getTrackView()
+	{
+		return m_trackView;
+	}
+
 	// qproperty access func
 	QColor mutedColor() const;
 	QColor mutedBackgroundColor() const;
@@ -263,10 +269,6 @@ protected:
 
 	float pixelsPerBar();
 
-	inline TrackView * getTrackView()
-	{
-		return m_trackView;
-	}
 
 	DataFile createTCODataFiles(const QVector<TrackContentObjectView *> & tcos) const;
 

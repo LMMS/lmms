@@ -151,7 +151,7 @@ sf2Instrument::sf2Instrument( InstrumentTrack * _instrument_track ) :
 	m_chorusDepth.setInitValue(settingVal);
 #endif
 
-	loadFile( ConfigManager::inst()->defaultSoundfont() );
+	loadFile( ConfigManager::inst()->sf2File() );
 
 	updateSampleRate();
 	updateReverbOn();
@@ -266,6 +266,43 @@ void sf2Instrument::loadFile( const QString & _file )
 		// for some reason we've to call that, otherwise preview of a
 		// soundfont for the first time fails
 		updateSampleRate();
+	}
+
+	// setting the first bank and patch number that is found
+	auto sSoundCount = ::fluid_synth_sfcount( m_synth );
+	for ( int i = 0; i < sSoundCount; ++i ) {
+		int iBank = 0;
+		int iProg = 0;
+		fluid_sfont_t *pSoundFont = ::fluid_synth_get_sfont( m_synth, i );
+
+		if ( pSoundFont ) {
+#ifdef CONFIG_FLUID_BANK_OFFSET
+			int iBankOff = ::fluid_synth_get_bank_offset( m_synth, fluid_sfont_get_id( pSoundFont ) );
+#endif
+
+			fluid_sfont_iteration_start( pSoundFont );
+#if FLUIDSYNTH_VERSION_MAJOR < 2
+			fluid_preset_t preset;
+			fluid_preset_t *pCurPreset = &preset;
+#else
+			fluid_preset_t *pCurPreset;
+#endif
+
+			if ( ( pCurPreset = fluid_sfont_iteration_next_wrapper( pSoundFont, pCurPreset ) ) ) {
+				iBank = fluid_preset_get_banknum( pCurPreset );
+				iProg = fluid_preset_get_num( pCurPreset );
+
+#ifdef CONFIG_FLUID_BANK_OFFSET
+				iBank += iBankOff;
+#endif
+
+				::fluid_synth_bank_select( m_synth, 1, iBank );
+				::fluid_synth_program_change( m_synth, 1, iProg );
+				m_bankNum.setValue( iBank );
+				m_patchNum.setValue ( iProg );
+				break;
+			}
+		}
 	}
 }
 
@@ -678,7 +715,6 @@ void sf2Instrument::noteOff( SF2PluginData * n )
 		fluid_synth_noteoff( m_synth, m_channel, n->midiNote );
 		m_synthMutex.unlock();
 	}
-
 }
 
 
@@ -694,7 +730,6 @@ void sf2Instrument::play( sampleFrame * _working_buffer )
 		m_synthMutex.lock();
 		fluid_synth_pitch_bend( m_synth, m_channel, m_lastMidiPitch );
 		m_synthMutex.unlock();
-
 	}
 
 	const int currentMidiPitchRange = instrumentTrack()->midiPitchRange();
@@ -1006,7 +1041,6 @@ sf2InstrumentView::sf2InstrumentView( Instrument * _instrument, QWidget * _paren
 	setPalette( pal );
 
 	updateFilename();
-
 }
 
 
@@ -1045,7 +1079,6 @@ void sf2InstrumentView::modelChanged()
 	connect( k, SIGNAL( fileLoading() ), this, SLOT( invalidateFile() ) );
 
 	updateFilename();
-
 }
 
 
@@ -1157,6 +1190,3 @@ PLUGIN_EXPORT Plugin * lmms_plugin_main( Model *m, void * )
 
 
 }
-
-
-

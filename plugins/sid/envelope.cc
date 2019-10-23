@@ -134,7 +134,7 @@ reg16 EnvelopeGenerator::rate_counter_period[] = {
 // of ENV3 with another timed loop to fully synchronize with ENV3.
 //
 // At the first period when an exponential counter period larger than one
-// is used (decay or relase), one extra cycle is spent before the envelope is
+// is used (decay or release), one extra cycle is spent before the envelope is
 // decremented. The envelope output is then delayed one cycle until the state
 // is changed to attack. Now one cycle less will be spent before the envelope
 // is incremented, and the situation is normalized.

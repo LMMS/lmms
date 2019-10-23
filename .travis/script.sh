@@ -42,5 +42,7 @@ else
 	fi
 
 	echo "Uploading $PACKAGE to transfer.sh..."
-	curl --upload-file "$PACKAGE" "https://transfer.sh/$PACKAGE" || true
+	# Limit the connection time to 3 minutes and total upload time to 5 minutes
+	# Otherwise the build may hang
+	curl --connect-timeout 180 --max-time 300 --upload-file "$PACKAGE" "https://transfer.sh/$PACKAGE" || true
 fi
