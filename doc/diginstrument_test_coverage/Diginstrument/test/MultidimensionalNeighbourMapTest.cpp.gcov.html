@@ -31,13 +31,13 @@
             <td class="headerValue">diginstrument_test_coverage.info</td>
             <td></td>
             <td class="headerItem">Lines:</td>
-            <td class="headerCovTableEntry">68</td>
-            <td class="headerCovTableEntry">68</td>
+            <td class="headerCovTableEntry">75</td>
+            <td class="headerCovTableEntry">75</td>
             <td class="headerCovTableEntryHi">100.0 %</td>
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2019-10-15 19:17:27</td>
+            <td class="headerValue">2019-10-24 12:30:25</td>
             <td></td>
             <td class="headerItem">Functions:</td>
             <td class="headerCovTableEntry">46</td>
@@ -66,102 +66,109 @@
 <span class="lineNum">       4 </span>            : 
 <a name="5"><span class="lineNum">       5 </span>            : namespace</a>
 <span class="lineNum">       6 </span>            : {
-<span class="lineNum">       7 </span><span class="lineCov">         40 : class MultidimensionalNeighbourMapTest : public ::testing::Test</span>
+<span class="lineNum">       7 </span><span class="lineCov">         20 : class MultidimensionalNeighbourMapTest : public ::testing::Test</span>
 <a name="8"><span class="lineNum">       8 </span>            : {</a>
 <span class="lineNum">       9 </span>            : protected:
-<span class="lineNum">      10 </span><span class="lineCov">         20 :   virtual void SetUp()</span>
+<span class="lineNum">      10 </span><span class="lineCov">         10 :   virtual void SetUp()</span>
 <span class="lineNum">      11 </span>            :   {
-<span class="lineNum">      12 </span><span class="lineCov">         20 :     map.insert(&quot;100; 0.5&quot;, {100, 0.5f});</span>
-<span class="lineNum">      13 </span><span class="lineCov">         20 :     map.insert(&quot;200; 0.5&quot;, {200, 0.5f});</span>
-<span class="lineNum">      14 </span><span class="lineCov">         20 :     map.insert(&quot;400; 0.5&quot;, {400, 0.5f});</span>
-<span class="lineNum">      15 </span><span class="lineCov">         20 :     map.insert(&quot;999; 0.5&quot;, {999, 0.5f});</span>
-<span class="lineNum">      16 </span><span class="lineCov">         20 :     map.insert(&quot;45; 0.5&quot;, {45, 0.5f});</span>
-<span class="lineNum">      17 </span><span class="lineCov">         20 :     map.insert(&quot;1931; 0.5&quot;, {1931, 0.5f});</span>
-<span class="lineNum">      18 </span><span class="lineCov">         20 :     map.insert(&quot;442; 0.5&quot;, {442, 0.5f});</span>
-<span class="lineNum">      19 </span><span class="lineCov">         20 :     map.insert(&quot;200; 1&quot;, {200, 1});</span>
-<a name="20"><span class="lineNum">      20 </span><span class="lineCov">         20 :     map.insert(&quot;400; 0.8&quot;, {400, 0.8f});</span></a>
-<span class="lineNum">      21 </span><span class="lineCov">         20 :   }</span>
-<span class="lineNum">      22 </span><span class="lineCov">         20 :   virtual void TearDown() {}</span>
+<span class="lineNum">      12 </span><span class="lineCov">         10 :     map.insert(&quot;100; 0.5&quot;, {100, 0.5f});</span>
+<span class="lineNum">      13 </span><span class="lineCov">         10 :     map.insert(&quot;200; 0.5&quot;, {200, 0.5f});</span>
+<span class="lineNum">      14 </span><span class="lineCov">         10 :     map.insert(&quot;400; 0.5&quot;, {400, 0.5f});</span>
+<span class="lineNum">      15 </span><span class="lineCov">         10 :     map.insert(&quot;999; 0.5&quot;, {999, 0.5f});</span>
+<span class="lineNum">      16 </span><span class="lineCov">         10 :     map.insert(&quot;45; 0.5&quot;, {45, 0.5f});</span>
+<span class="lineNum">      17 </span><span class="lineCov">         10 :     map.insert(&quot;1931; 0.5&quot;, {1931, 0.5f});</span>
+<span class="lineNum">      18 </span><span class="lineCov">         10 :     map.insert(&quot;442; 0.5&quot;, {442, 0.5f});</span>
+<span class="lineNum">      19 </span><span class="lineCov">         10 :     map.insert(&quot;200; 1&quot;, {200, 1});</span>
+<a name="20"><span class="lineNum">      20 </span><span class="lineCov">         10 :     map.insert(&quot;400; 0.8&quot;, {400, 0.8f});</span></a>
+<span class="lineNum">      21 </span><span class="lineCov">         10 :   }</span>
+<span class="lineNum">      22 </span><span class="lineCov">         10 :   virtual void TearDown() {}</span>
 <span class="lineNum">      23 </span>            : 
 <a name="24"><span class="lineNum">      24 </span>            : public:</a>
 <span class="lineNum">      25 </span>            :   MultidimensionalNeighbourMap&lt;float, std::string&gt; map;
-<span class="lineNum">      26 </span><span class="lineCov">         40 :   MultidimensionalNeighbourMapTest() {}</span>
+<span class="lineNum">      26 </span><span class="lineCov">         20 :   MultidimensionalNeighbourMapTest() {}</span>
 <a name="27"><span class="lineNum">      27 </span>            : };</a>
 <span class="lineNum">      28 </span>            : 
-<span class="lineNum">      29 </span><span class="lineCov">         16 : TEST_F(MultidimensionalNeighbourMapTest, Constructor)</span>
+<span class="lineNum">      29 </span><span class="lineCov">          8 : TEST_F(MultidimensionalNeighbourMapTest, Constructor)</span>
 <span class="lineNum">      30 </span>            : {
-<span class="lineNum">      31 </span><span class="lineCov">          4 :   MultidimensionalNeighbourMap&lt;float, std::string&gt; emptyMap;</span>
-<span class="lineNum">      32 </span><span class="lineCov">          2 :   EXPECT_EQ(0, emptyMap.getDimensions());</span>
-<a name="33"><span class="lineNum">      33 </span><span class="lineCov">          2 : }</span></a>
+<span class="lineNum">      31 </span><span class="lineCov">          2 :   MultidimensionalNeighbourMap&lt;float, std::string&gt; emptyMap;</span>
+<span class="lineNum">      32 </span><span class="lineCov">          1 :   EXPECT_EQ(0, emptyMap.getDimensions());</span>
+<a name="33"><span class="lineNum">      33 </span><span class="lineCov">          1 : }</span></a>
 <span class="lineNum">      34 </span>            : 
-<span class="lineNum">      35 </span><span class="lineCov">         16 : TEST_F(MultidimensionalNeighbourMapTest, Dimensions)</span>
+<span class="lineNum">      35 </span><span class="lineCov">          8 : TEST_F(MultidimensionalNeighbourMapTest, Dimensions)</span>
 <span class="lineNum">      36 </span>            : {
-<span class="lineNum">      37 </span><span class="lineCov">          2 :   EXPECT_EQ(2, map.getDimensions());</span>
-<a name="38"><span class="lineNum">      38 </span><span class="lineCov">          2 : }</span></a>
+<span class="lineNum">      37 </span><span class="lineCov">          1 :   EXPECT_EQ(2, map.getDimensions());</span>
+<a name="38"><span class="lineNum">      38 </span><span class="lineCov">          1 : }</span></a>
 <span class="lineNum">      39 </span>            : 
-<span class="lineNum">      40 </span><span class="lineCov">         16 : TEST_F(MultidimensionalNeighbourMapTest, Clear)</span>
+<span class="lineNum">      40 </span><span class="lineCov">          8 : TEST_F(MultidimensionalNeighbourMapTest, Clear)</span>
 <span class="lineNum">      41 </span>            : {
-<span class="lineNum">      42 </span><span class="lineCov">          2 :   EXPECT_EQ(2, map.getDimensions());</span>
-<span class="lineNum">      43 </span><span class="lineCov">          2 :   map.clear();</span>
-<span class="lineNum">      44 </span><span class="lineCov">          2 :   EXPECT_EQ(0, map.getDimensions());</span>
-<a name="45"><span class="lineNum">      45 </span><span class="lineCov">          2 : }</span></a>
+<span class="lineNum">      42 </span><span class="lineCov">          1 :   EXPECT_EQ(2, map.getDimensions());</span>
+<span class="lineNum">      43 </span><span class="lineCov">          1 :   map.clear();</span>
+<span class="lineNum">      44 </span><span class="lineCov">          1 :   EXPECT_EQ(0, map.getDimensions());</span>
+<a name="45"><span class="lineNum">      45 </span><span class="lineCov">          1 : }</span></a>
 <span class="lineNum">      46 </span>            : 
-<span class="lineNum">      47 </span><span class="lineCov">         16 : TEST_F(MultidimensionalNeighbourMapTest, ExactMatch)</span>
+<span class="lineNum">      47 </span><span class="lineCov">          8 : TEST_F(MultidimensionalNeighbourMapTest, ExactMatch)</span>
 <span class="lineNum">      48 </span>            : {
-<span class="lineNum">      49 </span><span class="lineCov">          4 :   std::vector&lt;std::string&gt; neighbours = map.getNeighbours({200, 0.5f});</span>
-<span class="lineNum">      50 </span><span class="lineCov">          2 :   EXPECT_EQ(1, neighbours.size());</span>
-<span class="lineNum">      51 </span><span class="lineCov">          2 :   EXPECT_EQ(&quot;200; 0.5&quot;, neighbours.front());</span>
-<a name="52"><span class="lineNum">      52 </span><span class="lineCov">          2 : }</span></a>
-<span class="lineNum">      53 </span>            : 
-<span class="lineNum">      54 </span><span class="lineCov">         16 : TEST_F(MultidimensionalNeighbourMapTest, OutOfBoundsLow)</span>
-<span class="lineNum">      55 </span>            : {
-<span class="lineNum">      56 </span><span class="lineCov">          4 :   std::vector&lt;std::string&gt; neighbours = map.getNeighbours({10, 0.5f});</span>
-<span class="lineNum">      57 </span><span class="lineCov">          2 :   EXPECT_EQ(1, neighbours.size());</span>
-<span class="lineNum">      58 </span><span class="lineCov">          2 :   EXPECT_EQ(&quot;45; 0.5&quot;, neighbours.front());</span>
-<a name="59"><span class="lineNum">      59 </span><span class="lineCov">          2 : }</span></a>
-<span class="lineNum">      60 </span>            : 
-<span class="lineNum">      61 </span><span class="lineCov">         16 : TEST_F(MultidimensionalNeighbourMapTest, OutOfBoundsHigh)</span>
-<span class="lineNum">      62 </span>            : {
-<span class="lineNum">      63 </span><span class="lineCov">          4 :   std::vector&lt;std::string&gt; neighbours = map.getNeighbours({99999, 0.5f});</span>
-<span class="lineNum">      64 </span><span class="lineCov">          2 :   EXPECT_EQ(1, neighbours.size());</span>
-<span class="lineNum">      65 </span><span class="lineCov">          2 :   EXPECT_EQ(&quot;1931; 0.5&quot;, neighbours.front());</span>
-<a name="66"><span class="lineNum">      66 </span><span class="lineCov">          2 : }</span></a>
-<span class="lineNum">      67 </span>            : 
-<span class="lineNum">      68 </span><span class="lineCov">         16 : TEST_F(MultidimensionalNeighbourMapTest, ExactOnSecondDimension)</span>
-<span class="lineNum">      69 </span>            : {
-<span class="lineNum">      70 </span><span class="lineCov">          4 :   std::vector&lt;std::string&gt; neighbours = map.getNeighbours({300, 0.5f});</span>
-<span class="lineNum">      71 </span><span class="lineCov">          2 :   EXPECT_EQ(2, neighbours.size());</span>
-<span class="lineNum">      72 </span><span class="lineCov">          2 :   EXPECT_EQ(&quot;200; 0.5&quot;, neighbours.front());</span>
-<span class="lineNum">      73 </span><span class="lineCov">          2 :   EXPECT_EQ(&quot;400; 0.5&quot;, neighbours.back());</span>
-<a name="74"><span class="lineNum">      74 </span><span class="lineCov">          2 : }</span></a>
-<span class="lineNum">      75 </span>            : 
-<span class="lineNum">      76 </span><span class="lineCov">         16 : TEST_F(MultidimensionalNeighbourMapTest, ExactOnFirstDimension)</span>
-<span class="lineNum">      77 </span>            : {
-<span class="lineNum">      78 </span><span class="lineCov">          4 :   std::vector&lt;std::string&gt; neighbours = map.getNeighbours({200, 0.8f});</span>
-<span class="lineNum">      79 </span><span class="lineCov">          2 :   EXPECT_EQ(2, neighbours.size());</span>
-<span class="lineNum">      80 </span><span class="lineCov">          2 :   EXPECT_EQ(&quot;200; 0.5&quot;, neighbours.front());</span>
-<span class="lineNum">      81 </span><span class="lineCov">          2 :   EXPECT_EQ(&quot;200; 1&quot;, neighbours.back());</span>
-<a name="82"><span class="lineNum">      82 </span><span class="lineCov">          2 : }</span></a>
-<span class="lineNum">      83 </span>            : 
-<span class="lineNum">      84 </span><span class="lineCov">         16 : TEST_F(MultidimensionalNeighbourMapTest, FullNeighbours)</span>
-<span class="lineNum">      85 </span>            : {
-<span class="lineNum">      86 </span><span class="lineCov">          4 :   std::vector&lt;std::string&gt; neighbours = map.getNeighbours({300, 0.666f});</span>
-<span class="lineNum">      87 </span><span class="lineCov">          2 :   EXPECT_EQ(4, neighbours.size());</span>
-<span class="lineNum">      88 </span><span class="lineCov">          2 :   EXPECT_EQ(&quot;200; 0.5&quot;, neighbours.front());</span>
-<span class="lineNum">      89 </span><span class="lineCov">          2 :   EXPECT_EQ(&quot;200; 1&quot;, neighbours[1]);</span>
-<span class="lineNum">      90 </span><span class="lineCov">          2 :   EXPECT_EQ(&quot;400; 0.5&quot;, neighbours[2]);</span>
-<span class="lineNum">      91 </span><span class="lineCov">          2 :   EXPECT_EQ(&quot;400; 0.8&quot;, neighbours.back());</span>
-<a name="92"><span class="lineNum">      92 </span><span class="lineCov">          2 : }</span></a>
-<span class="lineNum">      93 </span>            : 
-<span class="lineNum">      94 </span><span class="lineCov">         16 : TEST_F(MultidimensionalNeighbourMapTest, Overwrite)</span>
-<span class="lineNum">      95 </span>            : {
-<span class="lineNum">      96 </span><span class="lineCov">          2 :   map.insert(&quot;OWERWRITTEN&quot;, {200, 0.5f});</span>
-<span class="lineNum">      97 </span><span class="lineCov">          4 :   std::vector&lt;std::string&gt; neighbours = map.getNeighbours({200, 0.5f});</span>
-<span class="lineNum">      98 </span><span class="lineCov">          2 :   EXPECT_EQ(1, neighbours.size());</span>
-<span class="lineNum">      99 </span><span class="lineCov">          2 :   EXPECT_EQ(&quot;OWERWRITTEN&quot;, neighbours.front());</span>
-<a name="100"><span class="lineNum">     100 </span><span class="lineCov">          2 : }</span></a>
-<span class="lineNum">     101 </span>            : 
-<span class="lineNum">     102 </span><span class="lineCov">          8 : }; // namespace</span>
+<span class="lineNum">      49 </span><span class="lineCov">          2 :   std::vector&lt;std::vector&lt;std::string&gt;&gt; neighbours = map.getNeighbours({200, 0.5f});</span>
+<span class="lineNum">      50 </span><span class="lineCov">          1 :   EXPECT_EQ(1, neighbours.size());</span>
+<span class="lineNum">      51 </span><span class="lineCov">          1 :   EXPECT_EQ(1, neighbours.front().size());</span>
+<span class="lineNum">      52 </span><span class="lineCov">          1 :   EXPECT_EQ(&quot;200; 0.5&quot;, neighbours.front().front());</span>
+<a name="53"><span class="lineNum">      53 </span><span class="lineCov">          1 : }</span></a>
+<span class="lineNum">      54 </span>            : 
+<span class="lineNum">      55 </span><span class="lineCov">          8 : TEST_F(MultidimensionalNeighbourMapTest, OutOfBoundsLow)</span>
+<span class="lineNum">      56 </span>            : {
+<span class="lineNum">      57 </span><span class="lineCov">          2 :   std::vector&lt;std::vector&lt;std::string&gt;&gt; neighbours = map.getNeighbours({10, 0.5f});</span>
+<span class="lineNum">      58 </span><span class="lineCov">          1 :   EXPECT_EQ(1, neighbours.size());</span>
+<span class="lineNum">      59 </span><span class="lineCov">          1 :   EXPECT_EQ(1, neighbours.front().size());</span>
+<span class="lineNum">      60 </span><span class="lineCov">          1 :   EXPECT_EQ(&quot;45; 0.5&quot;, neighbours.front().front());</span>
+<a name="61"><span class="lineNum">      61 </span><span class="lineCov">          1 : }</span></a>
+<span class="lineNum">      62 </span>            : 
+<span class="lineNum">      63 </span><span class="lineCov">          8 : TEST_F(MultidimensionalNeighbourMapTest, OutOfBoundsHigh)</span>
+<span class="lineNum">      64 </span>            : {
+<span class="lineNum">      65 </span><span class="lineCov">          2 :   std::vector&lt;std::vector&lt;std::string&gt;&gt; neighbours = map.getNeighbours({99999, 0.5f});</span>
+<span class="lineNum">      66 </span><span class="lineCov">          1 :   EXPECT_EQ(1, neighbours.size());</span>
+<span class="lineNum">      67 </span><span class="lineCov">          1 :   EXPECT_EQ(1, neighbours.front().size());</span>
+<span class="lineNum">      68 </span><span class="lineCov">          1 :   EXPECT_EQ(&quot;1931; 0.5&quot;, neighbours.front().front());</span>
+<a name="69"><span class="lineNum">      69 </span><span class="lineCov">          1 : }</span></a>
+<span class="lineNum">      70 </span>            : 
+<span class="lineNum">      71 </span><span class="lineCov">          8 : TEST_F(MultidimensionalNeighbourMapTest, ExactOnSecondDimension)</span>
+<span class="lineNum">      72 </span>            : {
+<span class="lineNum">      73 </span><span class="lineCov">          2 :   std::vector&lt;std::vector&lt;std::string&gt;&gt; neighbours = map.getNeighbours({300, 0.5f});</span>
+<span class="lineNum">      74 </span><span class="lineCov">          1 :   EXPECT_EQ(2, neighbours.size());</span>
+<span class="lineNum">      75 </span><span class="lineCov">          1 :   EXPECT_EQ(1, neighbours.front().size());</span>
+<span class="lineNum">      76 </span><span class="lineCov">          1 :   EXPECT_EQ(1, neighbours.back().size());</span>
+<span class="lineNum">      77 </span><span class="lineCov">          1 :   EXPECT_EQ(&quot;200; 0.5&quot;, neighbours.front().front());</span>
+<span class="lineNum">      78 </span><span class="lineCov">          1 :   EXPECT_EQ(&quot;400; 0.5&quot;, neighbours.back().front());</span>
+<a name="79"><span class="lineNum">      79 </span><span class="lineCov">          1 : }</span></a>
+<span class="lineNum">      80 </span>            : 
+<span class="lineNum">      81 </span><span class="lineCov">          8 : TEST_F(MultidimensionalNeighbourMapTest, ExactOnFirstDimension)</span>
+<span class="lineNum">      82 </span>            : {
+<span class="lineNum">      83 </span><span class="lineCov">          2 :   std::vector&lt;std::vector&lt;std::string&gt;&gt; neighbours = map.getNeighbours({200, 0.8f});</span>
+<span class="lineNum">      84 </span><span class="lineCov">          1 :   EXPECT_EQ(1, neighbours.size());</span>
+<span class="lineNum">      85 </span><span class="lineCov">          1 :   EXPECT_EQ(2, neighbours.front().size());</span>
+<span class="lineNum">      86 </span><span class="lineCov">          1 :   EXPECT_EQ(&quot;200; 0.5&quot;, neighbours.back().front());</span>
+<span class="lineNum">      87 </span><span class="lineCov">          1 :   EXPECT_EQ(&quot;200; 1&quot;, neighbours.back().back());</span>
+<a name="88"><span class="lineNum">      88 </span><span class="lineCov">          1 : }</span></a>
+<span class="lineNum">      89 </span>            : 
+<span class="lineNum">      90 </span><span class="lineCov">          8 : TEST_F(MultidimensionalNeighbourMapTest, FullNeighbours)</span>
+<span class="lineNum">      91 </span>            : {
+<span class="lineNum">      92 </span><span class="lineCov">          2 :   std::vector&lt;std::vector&lt;std::string&gt;&gt; neighbours = map.getNeighbours({300, 0.666f});</span>
+<span class="lineNum">      93 </span><span class="lineCov">          1 :   EXPECT_EQ(2, neighbours.size());</span>
+<span class="lineNum">      94 </span><span class="lineCov">          1 :   EXPECT_EQ(&quot;200; 0.5&quot;, neighbours[0].front());</span>
+<span class="lineNum">      95 </span><span class="lineCov">          1 :   EXPECT_EQ(&quot;200; 1&quot;, neighbours[0].back());</span>
+<span class="lineNum">      96 </span><span class="lineCov">          1 :   EXPECT_EQ(&quot;400; 0.5&quot;, neighbours[1].front());</span>
+<span class="lineNum">      97 </span><span class="lineCov">          1 :   EXPECT_EQ(&quot;400; 0.8&quot;, neighbours[1].back());</span>
+<a name="98"><span class="lineNum">      98 </span><span class="lineCov">          1 : }</span></a>
+<span class="lineNum">      99 </span>            : 
+<span class="lineNum">     100 </span><span class="lineCov">          8 : TEST_F(MultidimensionalNeighbourMapTest, Overwrite)</span>
+<span class="lineNum">     101 </span>            : {
+<span class="lineNum">     102 </span><span class="lineCov">          1 :   map.insert(&quot;OWERWRITTEN&quot;, {200, 0.5f});</span>
+<span class="lineNum">     103 </span><span class="lineCov">          2 :   std::vector&lt;std::vector&lt;std::string&gt;&gt; neighbours = map.getNeighbours({200, 0.5f});</span>
+<span class="lineNum">     104 </span><span class="lineCov">          1 :   EXPECT_EQ(1, neighbours.size());</span>
+<span class="lineNum">     105 </span><span class="lineCov">          1 :   EXPECT_EQ(1, neighbours.front().size());</span>
+<span class="lineNum">     106 </span><span class="lineCov">          1 :   EXPECT_EQ(&quot;OWERWRITTEN&quot;, neighbours.front().front());</span>
+<a name="107"><span class="lineNum">     107 </span><span class="lineCov">          1 : }</span></a>
+<span class="lineNum">     108 </span>            : 
+<span class="lineNum">     109 </span><span class="lineCov">          4 : }; // namespace</span>
 </pre>
       </td>
     </tr>

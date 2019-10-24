@@ -46,57 +46,64 @@ TEST_F(MultidimensionalNeighbourMapTest, Clear)
 
 TEST_F(MultidimensionalNeighbourMapTest, ExactMatch)
 {
-  std::vector<std::string> neighbours = map.getNeighbours({200, 0.5f});
+  std::vector<std::vector<std::string>> neighbours = map.getNeighbours({200, 0.5f});
   EXPECT_EQ(1, neighbours.size());
-  EXPECT_EQ("200; 0.5", neighbours.front());
+  EXPECT_EQ(1, neighbours.front().size());
+  EXPECT_EQ("200; 0.5", neighbours.front().front());
 }
 
 TEST_F(MultidimensionalNeighbourMapTest, OutOfBoundsLow)
 {
-  std::vector<std::string> neighbours = map.getNeighbours({10, 0.5f});
+  std::vector<std::vector<std::string>> neighbours = map.getNeighbours({10, 0.5f});
   EXPECT_EQ(1, neighbours.size());
-  EXPECT_EQ("45; 0.5", neighbours.front());
+  EXPECT_EQ(1, neighbours.front().size());
+  EXPECT_EQ("45; 0.5", neighbours.front().front());
 }
 
 TEST_F(MultidimensionalNeighbourMapTest, OutOfBoundsHigh)
 {
-  std::vector<std::string> neighbours = map.getNeighbours({99999, 0.5f});
+  std::vector<std::vector<std::string>> neighbours = map.getNeighbours({99999, 0.5f});
   EXPECT_EQ(1, neighbours.size());
-  EXPECT_EQ("1931; 0.5", neighbours.front());
+  EXPECT_EQ(1, neighbours.front().size());
+  EXPECT_EQ("1931; 0.5", neighbours.front().front());
 }
 
 TEST_F(MultidimensionalNeighbourMapTest, ExactOnSecondDimension)
 {
-  std::vector<std::string> neighbours = map.getNeighbours({300, 0.5f});
+  std::vector<std::vector<std::string>> neighbours = map.getNeighbours({300, 0.5f});
   EXPECT_EQ(2, neighbours.size());
-  EXPECT_EQ("200; 0.5", neighbours.front());
-  EXPECT_EQ("400; 0.5", neighbours.back());
+  EXPECT_EQ(1, neighbours.front().size());
+  EXPECT_EQ(1, neighbours.back().size());
+  EXPECT_EQ("200; 0.5", neighbours.front().front());
+  EXPECT_EQ("400; 0.5", neighbours.back().front());
 }
 
 TEST_F(MultidimensionalNeighbourMapTest, ExactOnFirstDimension)
 {
-  std::vector<std::string> neighbours = map.getNeighbours({200, 0.8f});
-  EXPECT_EQ(2, neighbours.size());
-  EXPECT_EQ("200; 0.5", neighbours.front());
-  EXPECT_EQ("200; 1", neighbours.back());
+  std::vector<std::vector<std::string>> neighbours = map.getNeighbours({200, 0.8f});
+  EXPECT_EQ(1, neighbours.size());
+  EXPECT_EQ(2, neighbours.front().size());
+  EXPECT_EQ("200; 0.5", neighbours.back().front());
+  EXPECT_EQ("200; 1", neighbours.back().back());
 }
 
 TEST_F(MultidimensionalNeighbourMapTest, FullNeighbours)
 {
-  std::vector<std::string> neighbours = map.getNeighbours({300, 0.666f});
-  EXPECT_EQ(4, neighbours.size());
-  EXPECT_EQ("200; 0.5", neighbours.front());
-  EXPECT_EQ("200; 1", neighbours[1]);
-  EXPECT_EQ("400; 0.5", neighbours[2]);
-  EXPECT_EQ("400; 0.8", neighbours.back());
+  std::vector<std::vector<std::string>> neighbours = map.getNeighbours({300, 0.666f});
+  EXPECT_EQ(2, neighbours.size());
+  EXPECT_EQ("200; 0.5", neighbours[0].front());
+  EXPECT_EQ("200; 1", neighbours[0].back());
+  EXPECT_EQ("400; 0.5", neighbours[1].front());
+  EXPECT_EQ("400; 0.8", neighbours[1].back());
 }
 
 TEST_F(MultidimensionalNeighbourMapTest, Overwrite)
 {
   map.insert("OWERWRITTEN", {200, 0.5f});
-  std::vector<std::string> neighbours = map.getNeighbours({200, 0.5f});
+  std::vector<std::vector<std::string>> neighbours = map.getNeighbours({200, 0.5f});
   EXPECT_EQ(1, neighbours.size());
-  EXPECT_EQ("OWERWRITTEN", neighbours.front());
+  EXPECT_EQ(1, neighbours.front().size());
+  EXPECT_EQ("OWERWRITTEN", neighbours.front().front());
 }
 
 }; // namespace

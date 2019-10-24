@@ -72,7 +72,7 @@ template <typename K, typename V>
 class MultidimensionalNeighbourMap
 {
 public:
-  std::vector<V> getNeighbours(const std::vector<K> & coordinates);
+  std::vector<std::vector<V>> getNeighbours(const std::vector<K> & coordinates);
   void insert(const V &value, const std::vector<K> &coordinates);
   unsigned int getDimensions() const { return this->dimensions; }
   void clear();
@@ -83,7 +83,7 @@ private:
       if the coordinate is out of range, only one entry is returned, upper or lower, in the correct position
       if the coordinate is exact, only one entry is returned, on the lower (first) placement*/
   static std::pair<MultidimensionalNeighbourMapEntry<K, V> *, MultidimensionalNeighbourMapEntry<K, V> *> findNeighboursOnOneDimension(std::vector<MultidimensionalNeighbourMapEntry<K, V>> &array, const K &coordinate);
-  static void getNeighboursRecursiveCall(std::vector<MultidimensionalNeighbourMapEntry<K,V>> & array, const std::vector<K> & coordinates, unsigned int level, std::vector<V> & result);
+  static void getNeighboursRecursiveCall(std::vector<MultidimensionalNeighbourMapEntry<K,V>> & array, const std::vector<K> & coordinates, unsigned int level, std::vector<std::vector<V>> & result);
 
   std::vector<MultidimensionalNeighbourMapEntry<K, V>> data;
   unsigned int dimensions = 0;
@@ -178,12 +178,12 @@ void MultidimensionalNeighbourMap<K, V>::insert(const V &value, const std::vecto
 }
 
 template <typename K, typename V>
-std::vector<V> MultidimensionalNeighbourMap<K, V>::getNeighbours(const std::vector<K> & coordinates)
+std::vector<std::vector<V>> MultidimensionalNeighbourMap<K, V>::getNeighbours(const std::vector<K> & coordinates)
 {
-  std::vector<V> res;
   /*dimension check*/
-  if(this->dimensions != coordinates.size()) {/*TODO: exception?*/ return res; }
-  res.reserve(pow(2,coordinates.size()));
+  if(this->dimensions != coordinates.size()) {/*TODO: exception?*/ return {}; }
+  std::vector<std::vector<V>> res;
+  res.reserve(pow(2, coordinates.size()-1));
   getNeighboursRecursiveCall(data, coordinates, 0, res);
   return res;
 }
@@ -192,22 +192,18 @@ template <typename K, typename V>
 void MultidimensionalNeighbourMap<K, V>::getNeighboursRecursiveCall(std::vector<MultidimensionalNeighbourMapEntry<K,V>> & array,
                                                                     const std::vector<K> & coordinates,
                                                                     unsigned int level,
-                                                                    std::vector<V> & result)
+                                                                    std::vector<std::vector<V>> & result)
 {
   auto neighbours = findNeighboursOnOneDimension(array, coordinates[level]);
-  if(neighbours.first){
-    if(neighbours.first->isValue()){
-     result.push_back(neighbours.first->getValue());
-    }else{
-      getNeighboursRecursiveCall(neighbours.first->getNext(), coordinates, level+1, result);
-    }
-  }
-  if(neighbours.second){
-    if(neighbours.second->isValue()){
-     result.push_back(neighbours.second->getValue());
-    }else{
-      getNeighboursRecursiveCall(neighbours.second->getNext(), coordinates, level+1, result);
-    }
+  if((neighbours.first && neighbours.first->isValue()) || (neighbours.second && neighbours.second->isValue())){
+    //next node(s) is(are) value(s)
+    if(neighbours.first && neighbours.second) {result.push_back({neighbours.first->getValue(), neighbours.second->getValue()}); return;}
+    if(neighbours.first) {result.push_back({neighbours.first->getValue()}); return;}
+    if(neighbours.second) {result.push_back({neighbours.second->getValue()}); return;}
+  }else{
+    //continue search
+    if(neighbours.first){ getNeighboursRecursiveCall(neighbours.first->getNext(), coordinates, level+1, result); }
+    if(neighbours.second){ getNeighboursRecursiveCall(neighbours.second->getNext(), coordinates, level+1, result); }
   }
 }
 

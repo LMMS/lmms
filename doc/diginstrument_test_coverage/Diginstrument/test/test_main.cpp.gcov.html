@@ -37,7 +37,7 @@
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2019-10-15 19:17:27</td>
+            <td class="headerValue">2019-10-24 12:30:25</td>
             <td></td>
             <td class="headerItem">Functions:</td>
             <td class="headerCovTableEntry">3</td>
@@ -63,21 +63,21 @@
 <a name="1"><span class="lineNum">       1 </span>            : #include &lt;iostream&gt;</a>
 <a name="2"><span class="lineNum">       2 </span>            : #include &lt;gtest/gtest.h&gt;</a>
 <span class="lineNum">       3 </span>            : 
-<span class="lineNum">       4 </span><span class="lineCov">         16 : int main(int argc, char **argv)</span>
+<span class="lineNum">       4 </span><span class="lineCov">         17 : int main(int argc, char **argv)</span>
 <span class="lineNum">       5 </span>            : {
-<span class="lineNum">       6 </span><span class="lineCov">         16 :     if(argc&gt;1){</span>
-<span class="lineNum">       7 </span><span class="lineCov">         16 :         if(std::string(argv[1])==&quot;-s&quot;){</span>
-<span class="lineNum">       8 </span><span class="lineCov">         16 :             std::cout&lt;&lt;&quot;Running tests silently.&quot;&lt;&lt;std::endl;</span>
-<span class="lineNum">       9 </span><span class="lineCov">         16 :             ::testing::InitGoogleTest(&amp;argc, argv);</span>
-<span class="lineNum">      10 </span><span class="lineCov">         16 :             auto res = RUN_ALL_TESTS();</span>
-<span class="lineNum">      11 </span><span class="lineCov">         16 :             return res;</span>
+<span class="lineNum">       6 </span><span class="lineCov">         17 :     if(argc&gt;1){</span>
+<span class="lineNum">       7 </span><span class="lineCov">         17 :         if(std::string(argv[1])==&quot;-s&quot;){</span>
+<span class="lineNum">       8 </span><span class="lineCov">         17 :             std::cout&lt;&lt;&quot;Running tests silently.&quot;&lt;&lt;std::endl;</span>
+<span class="lineNum">       9 </span><span class="lineCov">         17 :             ::testing::InitGoogleTest(&amp;argc, argv);</span>
+<span class="lineNum">      10 </span><span class="lineCov">         17 :             auto res = RUN_ALL_TESTS();</span>
+<span class="lineNum">      11 </span><span class="lineCov">         17 :             return res;</span>
 <span class="lineNum">      12 </span>            :         }
 <span class="lineNum">      13 </span>            :     }
 <span class="lineNum">      14 </span><span class="lineNoCov">          0 :     ::testing::InitGoogleTest(&amp;argc, argv);</span>
 <span class="lineNum">      15 </span><span class="lineNoCov">          0 :     auto res = RUN_ALL_TESTS();</span>
 <a name="16"><span class="lineNum">      16 </span><span class="lineNoCov">          0 :     std::cin.get();</span></a>
 <span class="lineNum">      17 </span><span class="lineNoCov">          0 :     return res;</span>
-<span class="lineNum">      18 </span><span class="lineCov">         64 : }</span>
+<span class="lineNum">      18 </span><span class="lineCov">         68 : }</span>
 </pre>
       </td>
     </tr>
