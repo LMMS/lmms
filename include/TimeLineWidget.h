@@ -135,6 +135,13 @@ public:
 						m_loopPos[0] : m_loopPos[1];
 	}
 
+	inline void setLoop( const MidiTime & _from, const MidiTime & _to ) {
+		m_loopPos[0] = _from;
+		m_loopPos[1] = _to;
+		toggleLoopPoints( LoopPointsEnabled );
+		loopPointStateLoaded( LoopPointsEnabled );
+	}
+
 	inline void savePos( const MidiTime & _pos )
 	{
 		m_savedPos = _pos;

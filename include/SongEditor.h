@@ -179,6 +179,8 @@ public:
 
 	SongEditor* m_editor;
 
+	void setLoop(const MidiTime & from, const MidiTime & to);
+
 protected:
 	virtual void resizeEvent( QResizeEvent * event );
 	virtual void changeEvent( QEvent * );
