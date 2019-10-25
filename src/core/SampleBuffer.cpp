@@ -73,7 +73,8 @@ SampleBuffer::SampleBuffer() :
 	m_amplification( 1.0f ),
 	m_reversed( false ),
 	m_frequency( BaseFreq ),
-	m_sampleRate( mixerSampleRate () )
+	m_sampleRate( mixerSampleRate () ),
+	m_fromSampleTrack (false)
 {
 
 	connect( Engine::mixer(), SIGNAL( sampleRateChanged() ), this, SLOT( sampleRateChanged() ) );
@@ -128,6 +129,11 @@ SampleBuffer::SampleBuffer( const f_cnt_t _frames )
 }
 
 
+SampleBuffer::SampleBuffer(const bool from_sample_track)
+	: SampleBuffer()
+{
+	m_fromSampleTrack = from_sample_track;
+}
 
 
 SampleBuffer::~SampleBuffer()
@@ -140,6 +146,10 @@ SampleBuffer::~SampleBuffer()
 
 void SampleBuffer::sampleRateChanged()
 {
+	if (m_fromSampleTrack)
+	{
+		setSampleRate(mixerSampleRate());
+	}
 	update( true );
 }
 

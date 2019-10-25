@@ -55,7 +55,7 @@
 
 SampleTCO::SampleTCO( Track * _track ) :
 	TrackContentObject( _track ),
-	m_sampleBuffer( new SampleBuffer ),
+	m_sampleBuffer( new SampleBuffer(true) ),
 	m_isPlaying( false )
 {
 	saveJournallingState( false );

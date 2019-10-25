@@ -108,6 +108,7 @@ public:
 	// base64-data out of string
 	SampleBuffer( const QString & _audio_file, bool _is_base64_data = false );
 	SampleBuffer( const sampleFrame * _data, const f_cnt_t _frames );
+	SampleBuffer(const bool from_sample_track);
 	explicit SampleBuffer( const f_cnt_t _frames );
 
 	virtual ~SampleBuffer();
@@ -298,6 +299,7 @@ private:
 	bool m_reversed;
 	float m_frequency;
 	sample_rate_t m_sampleRate;
+	bool m_fromSampleTrack;
 
 	sampleFrame * getSampleFragment( f_cnt_t _index, f_cnt_t _frames,
 						LoopMode _loopmode,
