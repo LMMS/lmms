@@ -44,7 +44,7 @@
 #include <QMouseEvent>
 #include <QPainter>
 #include <QStyleOption>
-
+#include <QMessageBox>
 
 #include "AutomationPattern.h"
 #include "AutomationTrack.h"
@@ -1991,7 +1991,10 @@ void TrackOperationsWidget::clearTrack()
  */
 void TrackOperationsWidget::removeTrack()
 {
-	emit trackRemovalScheduled( m_trackView );
+    if( warnRemoveTrack() )
+    {
+        emit trackRemovalScheduled( m_trackView );
+    }
 }
 
 
@@ -2788,13 +2791,11 @@ QMenu * TrackView::createFxMenu(QString title, QString newFxLabel)
 
 
 
-/*! \brief Close this track View.
- *
- */
+/*! \brief Close this track View. */
 bool TrackView::close()
 {
-	m_trackContainerView->removeTrackView( this );
-	return QWidget::close();
+    m_trackContainerView->removeTrackView( this );
+    return QWidget::close();
 }
 
 
@@ -3041,4 +3042,31 @@ void TrackView::createTCOView( TrackContentObject * tco )
 		tv->setSelected( true );
 	}
 	tco->selectViewOnCreate( false );
+}
+
+
+/*! \brief Show a message box warning the user that this track is about to be closed */
+bool TrackOperationsWidget::warnRemoveTrack()
+{
+    QString messageRemoveTrack = tr("After removing a track, it can not"
+                                    "be recovered. Are you sure you want to remove track \"");
+    messageRemoveTrack += m_trackView->getTrack()->name() + "\"?";
+    QString messageTitleRemoveTrack = tr("Removing this track");
+
+    QMessageBox mb(this);
+
+    mb.setText(messageRemoveTrack);
+    mb.setWindowTitle(messageTitleRemoveTrack);
+    mb.setIcon(QMessageBox::Warning);
+    mb.addButton(QMessageBox::Cancel);
+    mb.addButton(QMessageBox::Ok);
+    mb.setDefaultButton(QMessageBox::Cancel);
+
+    int answer = mb.exec();
+
+    if( answer == QMessageBox::Ok )
+    {
+        return true;
+    }
+    return false;
 }
