@@ -73,6 +73,10 @@
  */
 const int RESIZE_GRIP_WIDTH = 4;
 
+/*! Alternate between a darker and a lighter background color every 4 bars
+ */
+const int BARS_PER_GROUP = 4;
+
 
 /*! A pointer for that text bubble used when moving segments, etc.
  *
@@ -1271,8 +1275,7 @@ void TrackContentWidget::updateBackground()
 	// Assume even-pixels-per-bar. Makes sense, should be like this anyways
 	int ppb = static_cast<int>( tcv->pixelsPerBar() );
 
-	// alternate between a darker and a lighter color every 4 bars
-	int w = ppb * 4;
+	int w = ppb * BARS_PER_GROUP;
 	int h = height();
 	m_background = QPixmap( w * 2, height() );
 	QPainter pmp( &m_background );
