@@ -92,8 +92,6 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 			"app", "displaydbfs").toInt()),
 	m_tooltips(!ConfigManager::inst()->value(
 			"tooltips", "disabled").toInt()),
-	m_displayWaveform(ConfigManager::inst()->value(
-			"ui", "displaywaveform").toInt()),
 	m_printNoteLabels(ConfigManager::inst()->value(
 			"ui", "printnotelabels").toInt()),
 	m_compactTrackButtons(ConfigManager::inst()->value(
@@ -221,8 +219,6 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 		m_displaydBFS, SLOT(toggleDisplaydBFS(bool)), true);
 	addLedCheckBox("Enable tooltips", gui_tw, counter,
 		m_tooltips, SLOT(toggleTooltips(bool)), true);
-	addLedCheckBox("Enable master oscilloscope by default", gui_tw, counter,
-		m_displayWaveform, SLOT(toggleDisplayWaveform(bool)), true);
 	addLedCheckBox("Enable all note labels in piano roll", gui_tw, counter,
 		m_printNoteLabels, SLOT(toggleNoteLabels(bool)), false);
 	addLedCheckBox("Enable compact track buttons", gui_tw, counter,
@@ -868,8 +864,6 @@ void SetupDialog::accept()
 					QString::number(m_displaydBFS));
 	ConfigManager::inst()->setValue("tooltips", "disabled",
 					QString::number(!m_tooltips));
-	ConfigManager::inst()->setValue("ui", "displaywaveform",
-					QString::number(m_displayWaveform));
 	ConfigManager::inst()->setValue("ui", "printnotelabels",
 					QString::number(m_printNoteLabels));
 	ConfigManager::inst()->setValue("ui", "compacttrackbuttons",
@@ -953,12 +947,6 @@ void SetupDialog::toggleDisplaydBFS(bool enabled)
 void SetupDialog::toggleTooltips(bool enabled)
 {
 	m_tooltips = enabled;
-}
-
-
-void SetupDialog::toggleDisplayWaveform(bool enabled)
-{
-	m_displayWaveform = enabled;
 }
 
 

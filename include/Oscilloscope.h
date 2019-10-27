@@ -1,5 +1,5 @@
 /*
- * VisualizationWidget.h - widget for visualization of sound-data
+ * Oscilloscope.h
  *
  * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
@@ -23,8 +23,8 @@
  */
 
 
-#ifndef _VISUALIZATION_WIDGET
-#define _VISUALIZATION_WIDGET
+#ifndef _OSCILLOSCOPE
+#define _OSCILLOSCOPE
 
 #include <QWidget>
 #include <QPixmap>
@@ -32,55 +32,32 @@
 #include "lmms_basics.h"
 
 
-class VisualizationWidget : public QWidget
+class Oscilloscope : public QWidget
 {
 	Q_OBJECT
 public:
-	Q_PROPERTY( QColor normalColor READ normalColor WRITE setNormalColor )
-	Q_PROPERTY( QColor warningColor READ warningColor WRITE setWarningColor )
-	Q_PROPERTY( QColor clippingColor READ clippingColor WRITE setClippingColor )
-	enum visualizationTypes
-	{
-		Simple		// add more here
-	} ;
+	Q_PROPERTY( QColor color READ getColor WRITE setColor )
 
-	VisualizationWidget( const QPixmap & _bg, QWidget * _parent,
-					visualizationTypes _vtype = Simple );
-	virtual ~VisualizationWidget();
+	Oscilloscope( const QPixmap & _bg, QWidget * _parent );
+	virtual ~Oscilloscope();
 
-	void setActive( bool _active );
-
-	QColor const & normalColor() const;
-	void setNormalColor(QColor const & normalColor);
-
-	QColor const & warningColor() const;
-	void setWarningColor(QColor const & warningColor);
-
-	QColor const & clippingColor() const;
-	void setClippingColor(QColor const & clippingColor);
+	QColor const & getColor() const;
+	void setColor(QColor const & color);
 
 
 protected:
 	virtual void paintEvent( QPaintEvent * _pe );
-	virtual void mousePressEvent( QMouseEvent * _me );
 
 
 protected slots:
 	void updateAudioBuffer( const surroundSampleFrame * buffer );
 
 private:
-	QColor const & determineLineColor(float level) const;
-
-private:
 	QPixmap s_background;
 	QPointF * m_points;
+	QColor m_color;
 
 	sampleFrame * m_buffer;
-	bool m_active;
-
-	QColor m_normalColor;
-	QColor m_warningColor;
-	QColor m_clippingColor;
 } ;
 
 #endif

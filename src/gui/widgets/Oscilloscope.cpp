@@ -1,5 +1,5 @@
 /*
- * VisualizationWidget.cpp - widget for visualization of sound-data
+ * Oscilloscope.cpp
  *
  * Copyright (c) 2005-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
@@ -26,7 +26,7 @@
 #include <QMouseEvent>
 #include <QPainter>
 
-#include "VisualizationWidget.h"
+#include "Oscilloscope.h"
 #include "GuiApplication.h"
 #include "gui_templates.h"
 #include "MainWindow.h"
@@ -38,19 +38,18 @@
 #include "BufferManager.h"
 
 
-VisualizationWidget::VisualizationWidget( const QPixmap & _bg, QWidget * _p,
-						visualizationTypes _vtype ) :
+Oscilloscope::Oscilloscope( const QPixmap & _bg, QWidget * _p ) :
 	QWidget( _p ),
 	s_background( _bg ),
 	m_points( new QPointF[Engine::mixer()->framesPerPeriod()] ),
-	m_active( false ),
-	m_normalColor(71, 253, 133),
-	m_warningColor(255, 192, 64),
-	m_clippingColor(255, 64, 64)
+	m_color(71, 253, 133)
 {
 	setFixedSize( s_background.width(), s_background.height() );
 	setAttribute( Qt::WA_OpaquePaintEvent, true );
-	setActive( ConfigManager::inst()->value( "ui", "displaywaveform").toInt() );
+
+	connect( gui->mainWindow(), SIGNAL( periodicUpdate() ), this, SLOT( update() ) );
+	connect( Engine::mixer(), SIGNAL( nextAudioBuffer( const surroundSampleFrame* ) ),
+		this, SLOT( updateAudioBuffer( const surroundSampleFrame* ) ) );
 
 	const fpp_t frames = Engine::mixer()->framesPerPeriod();
 	m_buffer = new sampleFrame[frames];
@@ -62,18 +61,14 @@ VisualizationWidget::VisualizationWidget( const QPixmap & _bg, QWidget * _p,
 }
 
 
-
-
-VisualizationWidget::~VisualizationWidget()
+Oscilloscope::~Oscilloscope()
 {
 	delete[] m_buffer;
 	delete[] m_points;
 }
 
 
-
-
-void VisualizationWidget::updateAudioBuffer( const surroundSampleFrame * buffer )
+void Oscilloscope::updateAudioBuffer( const surroundSampleFrame * buffer )
 {
 	if( !Engine::getSong()->isExporting() )
 	{
@@ -83,86 +78,33 @@ void VisualizationWidget::updateAudioBuffer( const surroundSampleFrame * buffer 
 }
 
 
-
-
-void VisualizationWidget::setActive( bool _active )
+QColor const & Oscilloscope::getColor() const
 {
-	m_active = _active;
-	if( m_active )
-	{
-		connect( gui->mainWindow(),
-					SIGNAL( periodicUpdate() ),
-					this, SLOT( update() ) );
-		connect( Engine::mixer(),
-			SIGNAL( nextAudioBuffer( const surroundSampleFrame* ) ),
-			this, SLOT( updateAudioBuffer( const surroundSampleFrame* ) ) );
-	}
-	else
-	{
-		disconnect( gui->mainWindow(),
-					SIGNAL( periodicUpdate() ),
-					this, SLOT( update() ) );
-		disconnect( Engine::mixer(),
-			SIGNAL( nextAudioBuffer( const surroundSampleFrame* ) ),
-			this, SLOT( updateAudioBuffer( const surroundSampleFrame* ) ) );
-		// we have to update (remove last waves),
-		// because timer doesn't do that anymore
-		update();
-	}
+	return m_color;
 }
 
 
-QColor const & VisualizationWidget::normalColor() const
+void Oscilloscope::setColor(QColor const & color)
 {
-	return m_normalColor;
-}
-
-void VisualizationWidget::setNormalColor(QColor const & normalColor)
-{
-	m_normalColor = normalColor;
-}
-
-QColor const & VisualizationWidget::warningColor() const
-{
-	return m_warningColor;
-}
-
-void VisualizationWidget::setWarningColor(QColor const & warningColor)
-{
-	m_warningColor = warningColor;
-}
-
-QColor const & VisualizationWidget::clippingColor() const
-{
-	return m_clippingColor;
-}
-
-void VisualizationWidget::setClippingColor(QColor const & clippingColor)
-{
-	m_clippingColor = clippingColor;
+	m_color = color;
 }
 
 
-void VisualizationWidget::paintEvent( QPaintEvent * )
+void Oscilloscope::paintEvent( QPaintEvent * )
 {
 	QPainter p( this );
 
 	p.drawPixmap( 0, 0, s_background );
 
-	if( m_active && !Engine::getSong()->isExporting() )
+	if( !Engine::getSong()->isExporting() )
 	{
 		Mixer const * mixer = Engine::mixer();
 
 		float master_output = mixer->masterGain();
 
 		const fpp_t frames = mixer->framesPerPeriod();
-		Mixer::StereoSample peakValues = mixer->getPeakValues(m_buffer, frames);
-		const float max_level = qMax<float>( peakValues.left, peakValues.right );
 
-		// Set the color of the line according to the maximum level
-		float const maxLevelWithAppliedMasterGain = max_level * master_output;
-		p.setPen(QPen(determineLineColor(maxLevelWithAppliedMasterGain), 0.7));
-
+		p.setPen(QPen(m_color, 0.7));
 		p.setRenderHint( QPainter::Antialiasing );
 
 		// now draw all that stuff
@@ -184,41 +126,4 @@ void VisualizationWidget::paintEvent( QPaintEvent * )
 			p.drawPolyline( m_points, frames );
 		}
 	}
-	else
-	{
-		p.setPen( QColor( 192, 192, 192 ) );
-		p.setFont( pointSize<7>( p.font() ) );
-		p.drawText( 6, height()-5, tr( "Click to enable" ) );
-	}
 }
-
-
-
-
-void VisualizationWidget::mousePressEvent( QMouseEvent * _me )
-{
-	if( _me->button() == Qt::LeftButton )
-	{
-		setActive( !m_active );
-	}
-}
-
-
-QColor const & VisualizationWidget::determineLineColor(float level) const
-{
-	if( level < 0.9f )
-	{
-		return normalColor();
-	}
-	else if( level <= 1.0f )
-	{
-		return warningColor();
-	}
-	else
-	{
-		return clippingColor();
-	}
-}
-
-
-

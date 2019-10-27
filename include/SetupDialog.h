@@ -70,7 +70,6 @@ private slots:
 	// General settings widget.
 	void toggleDisplaydBFS(bool enabled);
 	void toggleTooltips(bool enabled);
-	void toggleDisplayWaveform(bool enabled);
 	void toggleNoteLabels(bool enabled);
 	void toggleCompactTrackButtons(bool enabled);
 	void toggleOneInstrumentTrackWindow(bool enabled);
@@ -126,7 +125,6 @@ private:
 	// General settings widgets.
 	bool m_displaydBFS;
 	bool m_tooltips;
-	bool m_displayWaveform;
 	bool m_printNoteLabels;
 	bool m_compactTrackButtons;
 	bool m_oneInstrumentTrackWindow;
