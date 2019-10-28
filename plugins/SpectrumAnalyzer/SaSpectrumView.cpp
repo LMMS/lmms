@@ -48,7 +48,8 @@ SaSpectrumView::SaSpectrumView(SaControls *controls, SaProcessor *processor, QWi
 	m_controls(controls),
 	m_processor(processor),
 	m_freezeRequest(false),
-	m_frozen(false)
+	m_frozen(false),
+	m_margin(5.)
 {
 	setMinimumSize(360, 170);
 	setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
@@ -85,12 +86,22 @@ void SaSpectrumView::paintEvent(QPaintEvent *event)
 	QPainter painter(this);
 	painter.setRenderHint(QPainter::Antialiasing, true);
 
+	QFontMetrics fontMetrics = painter.fontMetrics();
+	int const heightOfFrequencyLabels = fontMetrics.size(Qt::TextSingleLine, "01234567890k").height();
+
+	int maximumTextWidthForAmpTics = 0;
+	for (auto const & ampTic : getAmpTicsToRender())
+	{
+		maximumTextWidthForAmpTics = std::max(fontMetrics.size(Qt::TextSingleLine, QString::fromStdString(ampTic.second)).width(), maximumTextWidthForAmpTics);
+	}
+
 	// drawing and path-making are split into multiple methods for clarity;
 	// display boundaries are updated here and shared as member variables
 	m_displayTop = 1;
-	m_displayBottom = height() -20;
-	m_displayLeft = 26;
-	m_displayRight = width() -26;
+	m_displayBottom = height() - heightOfFrequencyLabels - 2 * m_margin;
+	int const leftAndRightMargin = maximumTextWidthForAmpTics + 5;
+	m_displayLeft = leftAndRightMargin;
+	m_displayRight = width() - leftAndRightMargin;
 	m_displayWidth = m_displayRight - m_displayLeft;
 
 	// recompute range labels if needed
@@ -399,12 +410,9 @@ QPainterPath SaSpectrumView::makePath(std::vector<float> &displayBuffer, float r
 // Draw background, grid and associated frequency and amplitude labels.
 void SaSpectrumView::drawGrid(QPainter &painter)
 {
-	std::vector<std::pair<int, std::string>> *freqTics = NULL;
-	std::vector<std::pair<float, std::string>> *ampTics = NULL;
 	float pos = 0;
 	float label_width = 24;
 	float label_height = 15;
-	float margin = 5;
 
 	// always draw the background
 	painter.fillRect(m_displayLeft, m_displayTop,
@@ -412,62 +420,54 @@ void SaSpectrumView::drawGrid(QPainter &painter)
 					 m_controls->m_colorBG);
 
 	// select logarithmic or linear frequency grid and draw it
-	if (m_controls->m_logXModel.value())
-	{
-		freqTics = &m_logFreqTics;
-	}
-	else
-	{
-		freqTics = &m_linearFreqTics;
-	}
+	std::vector<std::pair<int, std::string>> const & freqTics = getFrequencyTicsToRender();
+
 	// draw frequency grid (line.first is display position)
 	painter.setPen(QPen(m_controls->m_colorGrid, 1,	Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
-	for (auto &line: *freqTics)
+	for (auto const &line: freqTics)
 	{
 		painter.drawLine(m_displayLeft + freqToXPixel(line.first, m_displayWidth),
 						 2,
 						 m_displayLeft + freqToXPixel(line.first, m_displayWidth),
 						 m_displayBottom);
 	}
+
 	// print frequency labels (line.second is label)
+	float const yPosition = m_displayBottom + m_margin;
 	painter.setPen(QPen(m_controls->m_colorLabels, 1, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
-	for (auto & line: *freqTics)
+	for (auto const & line: freqTics)
 	{
 		pos = m_displayLeft + freqToXPixel(line.first, m_displayWidth);
+		QString const displayString(line.second.c_str());
+
 		// align first and last label to the edge if needed, otherwise center them
-		if (line == freqTics->front() && pos - label_width / 2 < m_displayLeft)
+		if (line == freqTics.front() && pos - label_width / 2 < m_displayLeft)
 		{
-			painter.drawText(m_displayLeft, m_displayBottom + margin,
+			painter.drawText(m_displayLeft, yPosition,
 							 label_width, label_height, Qt::AlignLeft | Qt::TextDontClip,
-							 QString(line.second.c_str()));
+							 displayString);
 		}
-		else if (line == freqTics->back() && pos + label_width / 2 > m_displayRight)
+		else if (line == freqTics.back() && pos + label_width / 2 > m_displayRight)
 		{
-			painter.drawText(m_displayRight - label_width, m_displayBottom + margin,
+			painter.drawText(m_displayRight - label_width, yPosition,
 							 label_width, label_height, Qt::AlignRight | Qt::TextDontClip,
-							 QString(line.second.c_str()));
+							 displayString);
 		}
 		else
 		{
-			painter.drawText(pos - label_width / 2, m_displayBottom + margin,
+			painter.drawText(pos - label_width / 2, yPosition,
 							 label_width, label_height, Qt::AlignHCenter | Qt::TextDontClip,
-							 QString(line.second.c_str()));
+							 displayString);
 		}
 	}
 
-	margin = 2;
-	// select logarithmic or linear amplitude grid and draw it
-	if (m_controls->m_logYModel.value())
-	{
-		ampTics = &m_logAmpTics;
-	}
-	else
-	{
-		ampTics = &m_linearAmpTics;
-	}
+	float margin = 2;
+	// Fetch the correct amp ticks with regards to log or linear scaling
+	std::vector<std::pair<float, std::string>>  const & ampTics = getAmpTicsToRender();
+
 	// draw amplitude grid
 	painter.setPen(QPen(m_controls->m_colorGrid, 1, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
-	for (auto & line: *ampTics)
+	for (auto & line: ampTics)
 	{
 		painter.drawLine(m_displayLeft + 1,
 						 ampToYPixel(line.first, m_displayBottom),
@@ -477,11 +477,11 @@ void SaSpectrumView::drawGrid(QPainter &painter)
 	// print amplitude labels
 	painter.setPen(QPen(m_controls->m_colorLabels, 1, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
 	bool stereo = m_controls->m_stereoModel.value();
-	for (auto & line: *ampTics)
+	for (auto & line: ampTics)
 	{
 		pos = ampToYPixel(line.first, m_displayBottom);
 		// align first and last labels to edge if needed, otherwise center them
-		if (line == ampTics->back() && pos < 8)
+		if (line == ampTics.back() && pos < 8)
 		{
 			if (stereo)
 			{
@@ -498,7 +498,7 @@ void SaSpectrumView::drawGrid(QPainter &painter)
 							 label_width, label_height, Qt::AlignLeft | Qt::AlignTop | Qt::TextDontClip,
 							 QString(line.second.c_str()));
 		}
-		else if (line == ampTics->front() && pos > m_displayBottom - label_height)
+		else if (line == ampTics.front() && pos > m_displayBottom - label_height)
 		{
 			if (stereo)
 			{
@@ -549,28 +549,42 @@ void SaSpectrumView::drawCursor(QPainter &painter)
 		painter.drawLine(m_cursor.x(), m_displayTop, m_cursor.x(), m_displayBottom);
 		painter.drawLine(m_displayLeft, m_cursor.y(), m_displayRight, m_cursor.y());
 
-		// coordinates
-		painter.setPen(QPen(m_controls->m_colorLabels.darker(), 1, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
-		painter.drawText(m_displayRight -60, 5, 100, 16, Qt::AlignLeft, "Cursor");
-
-		QString tmps;
-		// frequency
+		// Collect the texts that we want to render so that we can measure them
+		QString const cursorText(tr("Cursor"));
 		int xFreq = (int)m_processor->xPixelToFreq(m_cursor.x() - m_displayLeft, m_displayWidth);
-		tmps = QString(std::string(std::to_string(xFreq) + " Hz").c_str());
-		painter.drawText(m_displayRight -60, 18, 100, 16, Qt::AlignLeft, tmps);
+		QString const frequencyText(QString::fromStdString(std::to_string(xFreq) + " Hz"));
 
-		// amplitude
+		std::string amplitudeString;
 		float yAmp = m_processor->yPixelToAmp(m_cursor.y(), m_displayBottom);
-		if (m_controls->m_logYModel.value())
+		if (isRenderLogarithmicAmpTics())
 		{
-			tmps = QString(std::string(std::to_string(yAmp).substr(0, 5) + " dB").c_str());
+			amplitudeString = std::string(std::to_string(yAmp).substr(0, 5) + " dB");
 		}
 		else
 		{
 			// add 0.0005 to get proper rounding to 3 decimal places
-			tmps = QString(std::string(std::to_string(0.0005f + yAmp)).substr(0, 5).c_str());
+			amplitudeString = std::string(std::to_string(0.0005f + yAmp)).substr(0, 5);
 		}
-		painter.drawText(m_displayRight -60, 30, 100, 16, Qt::AlignLeft, tmps);
+		QString const amplitudeText = QString::fromStdString(amplitudeString);
+
+		// Render text for "Cursor" (or its translation)
+		QFontMetrics const fm = painter.fontMetrics();
+		// Size will hold the maximum bounding box of all texts that we will render
+		QSize fsize = fm.size(Qt::TextSingleLine, cursorText);
+		fsize = fsize.expandedTo(fm.size(Qt::TextSingleLine, frequencyText));
+		fsize = fsize.expandedTo(fm.size(Qt::TextSingleLine, amplitudeText));
+		int const leftX = m_displayRight - fsize.width() - 5;
+		int const startY = 5 + fsize.height();
+		int const advanceY = fsize.height() + 3;
+
+		painter.setPen(QPen(m_controls->m_colorLabels.darker(), 1, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
+		painter.drawText(leftX, startY, cursorText);
+
+		// frequency
+		painter.drawText(leftX, startY + advanceY, frequencyText);
+
+		// amplitude
+		painter.drawText(leftX, startY + 2 * advanceY, amplitudeText);
 	}
 }
 
@@ -792,5 +806,39 @@ void SaSpectrumView::resizeEvent(QResizeEvent *event)
 	// amplitude does: rebuild labels
 	m_logAmpTics = makeLogAmpTics(m_processor->getAmpRangeMin(), m_processor->getAmpRangeMax());
 	m_linearAmpTics = makeLinearAmpTics(m_processor->getAmpRangeMin(), m_processor->getAmpRangeMax());
+}
+
+bool SaSpectrumView::isRenderLogarithmicAmpTics() const
+{
+	return m_controls->m_logYModel.value();
+}
+
+std::vector<std::pair<float, std::string>> const & SaSpectrumView::getAmpTicsToRender() const
+{
+	if (isRenderLogarithmicAmpTics())
+	{
+		return m_logAmpTics;
+	}
+	else
+	{
+		return m_linearAmpTics;
+	}
+}
+
+bool SaSpectrumView::isRenderLogarithmicFrequencyTics() const
+{
+	return m_controls->m_logXModel.value();
+}
+
+std::vector<std::pair<int, std::string>> const & SaSpectrumView::getFrequencyTicsToRender() const
+{
+	if (isRenderLogarithmicFrequencyTics())
+	{
+		return m_logFreqTics;
+	}
+	else
+	{
+		return m_linearFreqTics;
+	}
 }
 
