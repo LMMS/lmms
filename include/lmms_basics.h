@@ -137,24 +137,6 @@ typedef sample_t surroundSampleFrame[SURROUND_CHANNELS];
 typedef sample_t sampleFrameA[DEFAULT_CHANNELS] __attribute__((__aligned__(ALIGN_SIZE)));
 #endif
 
-// The sampleFrame_copier is required to store samples into the lockless ringbuffer.
-// This is because sampleFrame is just a two-element array and therefore does
-// not have a copy constructor which the ringbuffer class needs.
-class sampleFrame_copier
-{
-	const sampleFrame* src;
-public:
-	sampleFrame_copier(const sampleFrame* src) : src(src) {}
-	void operator()(std::size_t src_offset, std::size_t count, sampleFrame* dest)
-	{
-		for (std::size_t i = src_offset; i < src_offset + count; i++, dest++)
-		{
-			(*dest)[0] = src[i][0];
-			(*dest)[1] = src[i][1];
-		}
-	}
-};
-
 
 #define STRINGIFY(s) STR(s)
 #define STR(PN)	#PN

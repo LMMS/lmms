@@ -26,30 +26,27 @@
 #define DATAPROCLAUNCHER_H
 
 #include <QThread>
-#include <QWaitCondition>
 
 #include "SaProcessor.h"
-#include "../../src/3rdparty/ringbuffer/include/ringbuffer/ringbuffer.h"
+#include "LocklessRingBuffer.h"
 
 class DataprocLauncher : public QThread
 {
 public:
-	explicit DataprocLauncher(SaProcessor &proc, ringbuffer_t<sampleFrame> &buffer, QWaitCondition &notifier)
+	explicit DataprocLauncher(SaProcessor &proc, LocklessRingBuffer<sampleFrame> &buffer)
 		: m_processor(&proc),
-		m_inputBuffer(&buffer),
-		m_notifier(&notifier)
+		m_inputBuffer(&buffer)
 	{
 	}
 
 private:
 	void run() override
 	{
-		m_processor->analyze(*m_inputBuffer, *m_notifier);
+		m_processor->analyze(*m_inputBuffer);
 	}
 
 	SaProcessor *m_processor;
-	ringbuffer_t<sampleFrame> *m_inputBuffer;
-	QWaitCondition *m_notifier;
+	LocklessRingBuffer<sampleFrame> *m_inputBuffer;
 };
 
 #endif // DATAPROCLAUNCHER_H

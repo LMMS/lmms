@@ -30,7 +30,7 @@
 #include <QMutexLocker>
 
 #include "lmms_math.h"
-#include "../../src/3rdparty/ringbuffer/include/ringbuffer/ringbuffer.h"
+#include "LocklessRingBuffer.h"
 
 #ifdef SA_DEBUG
 	#include <chrono>
@@ -88,23 +88,19 @@ SaProcessor::~SaProcessor()
 
 
 // Load data from audio thread ringbuffer and run FFT analysis if buffer is full enough.
-void SaProcessor::analyze(ringbuffer_t<sampleFrame> &ring_buffer, QWaitCondition &notifier)
+void SaProcessor::analyze(LocklessRingBuffer<sampleFrame> &ring_buffer)
 {
-	ringbuffer_reader_t<sampleFrame> reader(ring_buffer);
+	LocklessRingBufferReader<sampleFrame> reader(ring_buffer);
 
 	// Processing thread loop
 	while (!m_terminate) {
 		// If there is nothing to read, wait for notification from the writing side.
-		if (!reader.read_space()) {
-			QMutex useless_lock;
-			notifier.wait(&useless_lock);
-			useless_lock.unlock();
-		}
+		if (reader.empty()) {reader.waitForData();}
 
 		// skip waterfall render if processing can't keep up with input
-		bool overload = ring_buffer.write_space() < ring_buffer.maximum_eventual_write_space() / 2;
+		bool overload = ring_buffer.free() < ring_buffer.capacity() / 2;
 
-		auto in_buffer = reader.read_max(ring_buffer.maximum_eventual_write_space() / 4);
+		auto in_buffer = reader.read_max(ring_buffer.capacity() / 4);
 		std::size_t frame_count = in_buffer.size();
 
 		// Process received data only if any view is visible and not paused.

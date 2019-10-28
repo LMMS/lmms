@@ -30,14 +30,13 @@
 #include <atomic>
 #include <QColor>
 #include <QMutex>
-#include <QWaitCondition>
 #include <vector>
 
 #include "fft_helpers.h"
 #include "SaControls.h"
 
 template<class T>
-class ringbuffer_t;
+class LocklessRingBuffer;
 
 //! Receives audio data, runs FFT analysis and stores the result.
 class SaProcessor
@@ -47,7 +46,7 @@ public:
 	virtual ~SaProcessor();
 
 	// analysis thread and a method to terminate it
-	void analyze(ringbuffer_t<sampleFrame> &ring_buffer, QWaitCondition &notifier);
+	void analyze(LocklessRingBuffer<sampleFrame> &ring_buffer);
 	void terminate() {m_terminate = true;}
 
 	// inform processor if any processing is actually required

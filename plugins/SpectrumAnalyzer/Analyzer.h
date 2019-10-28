@@ -32,7 +32,7 @@
 #include "SaControls.h"
 #include "SaProcessor.h"
 #include <QWaitCondition>
-#include "../../src/3rdparty/ringbuffer/include/ringbuffer/ringbuffer.h"
+#include "LocklessRingBuffer.h"
 
 //! Top level class; handles LMMS interface and feeds data to the data processor.
 class Analyzer : public Effect
@@ -56,11 +56,10 @@ private:
 	// QThread::create() workaround
 	// Replace DataprocLauncher by QThread and replace initializer in constructor
 	// with the following commented line when LMMS CI starts using Qt > 5.9
-	//m_processorThread = QThread::create([=]{m_processor.analyze(m_inputBuffer, m_notifier);});
+	//m_processorThread = QThread::create([=]{m_processor.analyze(m_inputBuffer);});
 	DataprocLauncher m_processorThread;
 
-	ringbuffer_t<sampleFrame> m_inputBuffer;
-	QWaitCondition m_notifier;
+	LocklessRingBuffer<sampleFrame> m_inputBuffer;
 
 	#ifdef SA_DEBUG
 		int m_last_dump_time;

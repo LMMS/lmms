@@ -56,7 +56,7 @@ Analyzer::Analyzer(Model *parent, const Plugin::Descriptor::SubPluginFeatures::K
 	Effect(&analyzer_plugin_descriptor, parent, key),
 	m_processor(&m_controls),
 	m_controls(this),
-	m_processorThread(m_processor, m_inputBuffer, m_notifier),
+	m_processorThread(m_processor, m_inputBuffer),
 	// Buffer is sized to cover 4* the current maximum LMMS audio buffer size,
 	// so that it has some reserve space in case data processor is busy.
 	m_inputBuffer(4 * m_maxBufferSize)
@@ -68,7 +68,7 @@ Analyzer::Analyzer(Model *parent, const Plugin::Descriptor::SubPluginFeatures::K
 Analyzer::~Analyzer()
 {
 	m_processor.terminate();
-	m_notifier.wakeAll();
+	m_inputBuffer.wakeAll();
 	m_processorThread.wait();
 }
 
@@ -93,11 +93,7 @@ bool Analyzer::processAudioBuffer(sampleFrame *buffer, const fpp_t frame_count)
 	if (m_controls.isViewVisible()) {
 		// To avoid processing spikes on audio thread, data are stored in
 		// a lockless ringbuffer and processed in a separate thread.
-		sampleFrame_copier copier(buffer);
-		m_inputBuffer.write_func<sampleFrame_copier>(copier, frame_count);
-
-		// Inform processor to check the buffer (to avoid busy waiting).
-		m_notifier.wakeAll();
+		m_inputBuffer.write(buffer, frame_count);
 	}
 	#ifdef SA_DEBUG
 		audio_time = std::chrono::high_resolution_clock::now().time_since_epoch().count() - audio_time;

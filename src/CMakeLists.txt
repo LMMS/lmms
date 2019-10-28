@@ -89,6 +89,25 @@ IF(NOT ("${LAME_INCLUDE_DIRS}" STREQUAL ""))
 	INCLUDE_DIRECTORIES("${LAME_INCLUDE_DIRS}")
 ENDIF()
 
+# A 3rd party lockless ring buffer library is compiled as part of the core
+SET(RINGBUFFER_DIR "${CMAKE_SOURCE_DIR}/src/3rdparty/ringbuffer/")
+LIST(APPEND LMMS_SRCS "${RINGBUFFER_DIR}/src/lib/ringbuffer.cpp")
+LIST(APPEND LMMS_INCLUDES "${RINGBUFFER_DIR}/include/ringbuffer/ringbuffer.h")
+INCLUDE_DIRECTORIES("${RINGBUFFER_DIR}/include/")
+# Create a dummy ringbuffer_export.h, since ringbuffer is not compiled as a library
+FILE(WRITE ${CMAKE_BINARY_DIR}/src/ringbuffer_export.h "#define RINGBUFFER_EXPORT")
+# Enable MLOCK support for ringbuffer if available
+INCLUDE(CheckIncludeFiles)
+CHECK_INCLUDE_FILES(sys/mman.h HAVE_SYS_MMAN)
+IF(HAVE_SYS_MMAN)
+	SET(USE_MLOCK ON)
+ELSE()
+	SET(USE_MLOCK OFF)
+ENDIF()
+# Generate ringbuffer configuration headers
+CONFIGURE_FILE(${RINGBUFFER_DIR}/src/ringbuffer-config.h.in  ${CMAKE_BINARY_DIR}/src/ringbuffer-config.h)
+CONFIGURE_FILE(${RINGBUFFER_DIR}/src/ringbuffer-version.h.in ${CMAKE_BINARY_DIR}/src/ringbuffer-version.h)
+
 # Use libraries in non-standard directories (e.g., another version of Qt)
 IF(LMMS_BUILD_LINUX)
 	LINK_LIBRARIES(-Wl,--enable-new-dtags)
