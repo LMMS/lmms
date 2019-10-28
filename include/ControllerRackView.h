@@ -2,6 +2,7 @@
  * ControllerRackView.h - view for song's controllers
  *
  * Copyright (c) 2008-2009 Paul Giblock <drfaygo/at/gmail.com>
+ * Copyright (c) 2019 Steffen Baranowsky <BaraMGB/at/freenet.de>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -25,11 +26,12 @@
 #ifndef CONTROLLER_RACK_VIEW_H
 #define CONTROLLER_RACK_VIEW_H
 
-#include <QWidget>
 #include <QCloseEvent>
+#include <QMdiSubWindow>
+#include <QWidget>
 
-#include "SerializingObject.h"
 #include "lmms_basics.h"
+#include "SerializingObject.h"
 
 
 class QPushButton;
@@ -40,44 +42,54 @@ class ControllerView;
 class Controller;
 
 
-class ControllerRackView : public QWidget, public SerializingObject
+class LMMS_EXPORT ControllerRackView : public QWidget, public SerializingObject
 {
 	Q_OBJECT
 public:
 	ControllerRackView();
 	virtual ~ControllerRackView();
 
-	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
-	virtual void loadSettings( const QDomElement & _this );
+	virtual void saveSettings(QDomDocument &, QDomElement & parent);
+	virtual void loadSettings(const QDomElement & _this);
 
 	inline virtual QString nodeName() const
 	{
 		return "ControllerRackView";
 	}
 
+	QMdiSubWindow *subWin() const;
+
+	bool allExpanded() const;
+	bool allCollapsed() const;
 
 public slots:
-	void deleteController( ControllerView * _view );
-	void onControllerAdded( Controller * );
-	void onControllerRemoved( Controller * );
+	void deleteController(ControllerView * view);
+	void collapsingAll();
+	void expandAll();
+	void onControllerAdded(Controller *);
+	void onControllerRemoved(Controller *);
+	void onControllerCollapsed();
+
+	const QVector<ControllerView *> controllerViews() const;
 
 protected:
-	virtual void closeEvent( QCloseEvent * _ce );
+	virtual void closeEvent(QCloseEvent * ce);
+	virtual void resizeEvent(QResizeEvent *);
+	virtual void paintEvent(QPaintEvent *);
 
 private slots:
-	void addController();
-
+	void addLfoController();
+	void moveControllerUp(ControllerView * cv);
+	void moveControllerDown(ControllerView * cv);
 
 private:
 	QVector<ControllerView *> m_controllerViews;
+	QVector<bool> m_collapsingStateOnLoad;
 
 	QScrollArea * m_scrollArea;
 	QVBoxLayout * m_scrollAreaLayout;
 	QPushButton * m_addButton;
-
-	// Stores the index of where to insert the next ControllerView.
-	// Needed so that the StretchItem always stays at the last position.
-	int m_nextIndex;
-} ;
+	QMdiSubWindow * m_subWin;
+};
 
 #endif

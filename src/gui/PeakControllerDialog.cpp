@@ -24,34 +24,25 @@
  */
 
 
-#include <QLabel>
-#include <QPushButton>
-#include <QMdiArea>
-#include <QPainter>
-
-#include "CaptionMenu.h"
-#include "gui_templates.h"
-#include "embed.h"
-#include "MainWindow.h"
-#include "ToolTip.h"
 
 #include "PeakController.h"
-#include "Knob.h"
-#include "TempoSyncKnob.h"
+
+#include <QPainter>
+
+#include "EffectControlDialog.h"
+#include "plugins/peak_controller_effect/peak_controller_effect.h"
+#include "plugins/peak_controller_effect/peak_controller_effect_control_dialog.cpp"
 
 
-PeakControllerDialog::PeakControllerDialog( Controller * _model, QWidget * _parent ) :
+PeakControllerDialog::PeakControllerDialog( PeakController * _model, QWidget * _parent ) :
 	ControllerDialog( _model, _parent )
 {
+	EffectControlDialog * dlg = _model->getPeakControllerEffect()->controls()->createView();
 	setWindowTitle( tr( "PEAK" ) );
 	setWindowIcon( embed::getIconPixmap( "controller" ) );
-	setFixedSize( 256, 64 );
-	
-	ToolTip::add( this, tr( "LFO Controller" ) );
-
-	QLabel * l = new QLabel( this );
-	l->setText( "Use FX's controls" );
-	l->move(10, 10);
+	setFixedSize( dlg->size() );
+	dlg->setParent( this );
+	dlg->show();
 
 	setModel( _model );
 }

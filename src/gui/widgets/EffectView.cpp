@@ -24,12 +24,13 @@
  */
 
 #include <QLabel>
+#include <QLayout>
 #include <QPushButton>
 #include <QMdiArea>
 #include <QMdiSubWindow>
 #include <QPainter>
-#include <QLayout>
 
+#include "ControllerRackView.h"
 #include "EffectView.h"
 #include "DummyEffect.h"
 #include "CaptionMenu.h"
@@ -41,12 +42,13 @@
 #include "MainWindow.h"
 #include "TempoSyncKnob.h"
 #include "ToolTip.h"
+#include "Song.h"
+#include "plugins/peak_controller_effect/peak_controller_effect_control_dialog.h"
 
 
 EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 	PluginView( _model, _parent ),
 	m_bg( embed::getIconPixmap( "effect_plugin" ) ),
-	m_subWindow( NULL ),
 	m_controlView( NULL )
 {
 	setFixedSize( 210, 60 );
@@ -90,37 +92,14 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 		QFont f = ctls_btn->font();
 		ctls_btn->setFont( pointSize<8>( f ) );
 		ctls_btn->setGeometry( 140, 14, 50, 20 );
-		connect( ctls_btn, SIGNAL( clicked() ),
-					this, SLOT( editControls() ) );
+		connect(ctls_btn, SIGNAL(clicked()), this, SLOT(editControls()));
 
 		m_controlView = effect()->controls()->createView();
-		if( m_controlView )
+		if (m_controlView)
 		{
-			m_subWindow = gui->mainWindow()->addWindowedWidget( m_controlView );
-
-			if ( !m_controlView->isResizable() )
-			{
-				m_subWindow->setSizePolicy( QSizePolicy::Fixed, QSizePolicy::Fixed );
-				if (m_subWindow->layout())
-				{
-					m_subWindow->layout()->setSizeConstraint(QLayout::SetFixedSize);
-				}
-			}
-
-			Qt::WindowFlags flags = m_subWindow->windowFlags();
-			flags &= ~Qt::WindowMaximizeButtonHint;
-			m_subWindow->setWindowFlags( flags );
-
-			connect( m_controlView, SIGNAL( closed() ),
-					this, SLOT( closeEffects() ) );
-
-			m_subWindow->hide();
+			m_controlView->showDialog();
 		}
 	}
-
-
-	//move above vst effect view creation
-	//setModel( _model );
 }
 
 
@@ -128,29 +107,15 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 
 EffectView::~EffectView()
 {
-	delete m_subWindow;
 }
-
 
 
 
 void EffectView::editControls()
 {
-	if( m_subWindow )
-	{
-		if( !m_subWindow->isVisible() )
-		{
-			m_subWindow->show();
-			m_subWindow->raise();
-			effect()->controls()->setViewVisible( true );
-		}
-		else
-		{
-			m_subWindow->hide();
-			effect()->controls()->setViewVisible( false );
-		}
-	}
+	m_controlView->toggleView();
 }
+
 
 
 
@@ -175,17 +140,6 @@ void EffectView::deletePlugin()
 	emit deletePlugin( this );
 }
 
-
-
-
-void EffectView::closeEffects()
-{
-	if( m_subWindow )
-	{
-		m_subWindow->hide();
-	}
-	effect()->controls()->setViewVisible( false );
-}
 
 
 

@@ -1411,6 +1411,34 @@ void Song::removeController( Controller * controller )
 
 
 
+void Song::moveControllerUp(Controller *c)
+{
+	if (c != m_controllers.first())
+	{
+		int index = m_controllers.indexOf(c);
+		m_controllers.remove(index);
+		m_controllers.insert(index - 1, c);
+		setModified();
+	}
+}
+
+
+
+
+void Song::moveControllerDown(Controller *c)
+{
+	if (c != m_controllers.last())
+	{
+		int index = m_controllers.indexOf(c);
+		m_controllers.remove(index);
+		m_controllers.insert(index + 1, c);
+		setModified();
+	}
+}
+
+
+
+
 void Song::clearErrors()
 {
 	m_errors.clear();

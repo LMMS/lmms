@@ -25,15 +25,19 @@
 
 #include <QMessageBox>
 #include <QCloseEvent>
+#include <QLayout>
 
 #include "EffectControlDialog.h"
 #include "EffectControls.h"
+#include "GuiApplication.h"
+#include "MainWindow.h"
 
 
 EffectControlDialog::EffectControlDialog( EffectControls * _controls ) :
 	QWidget( NULL ),
 	ModelView( _controls, this ),
-	m_effectControls( _controls )
+	m_effectControls( _controls ),
+	m_subWindow(nullptr)
 {
 	setWindowTitle( m_effectControls->effect()->displayName() );
 	setSizePolicy( QSizePolicy::Preferred, QSizePolicy::Preferred );
@@ -46,13 +50,55 @@ EffectControlDialog::~EffectControlDialog()
 {
 }
 
+void EffectControlDialog::showDialog()
+{
+	if (!m_subWindow)
+	{
+		m_subWindow = gui->mainWindow()->addWindowedWidget(this);
+		if (isResizable())
+		{
+			m_subWindow->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+			if (m_subWindow->layout())
+			{
+				m_subWindow->layout()->setSizeConstraint(QLayout::SetFixedSize);
+			}
+		}
+
+		Qt::WindowFlags flags = m_subWindow->windowFlags();
+		flags &= ~Qt::WindowMaximizeButtonHint;
+		m_subWindow->setWindowFlags(flags);
+	}
+	m_subWindow->hide();
+}
+
+
+
+
+void EffectControlDialog::toggleView()
+{
+	if (m_subWindow)
+		{
+			if (!m_subWindow->isVisible())
+			{
+				m_subWindow->show();
+				m_subWindow->raise();
+				m_effectControls->setViewVisible(true);
+			}
+			else
+			{
+				m_subWindow->hide();
+				m_effectControls->setViewVisible(false);
+			}
+		}
+}
+
 
 
 
 void EffectControlDialog::closeEvent( QCloseEvent * _ce )
 {
+	m_subWindow->hide();
 	_ce->ignore();
-	emit closed();
 }
 
 

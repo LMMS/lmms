@@ -63,7 +63,7 @@ public slots:
 	void moveUp();
 	void moveDown();
 	void deletePlugin();
-	void closeEffects();
+
 
 
 signals:
@@ -84,7 +84,6 @@ private:
 	Knob * m_wetDry;
 	TempoSyncKnob * m_autoQuit;
 	Knob * m_gate;
-	QMdiSubWindow * m_subWindow;
 	EffectControlDialog * m_controlView;
 
 } ;
