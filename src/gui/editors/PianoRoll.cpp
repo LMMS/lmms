@@ -2527,11 +2527,10 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 				}
 			}
 		}
-		else if (me->buttons() == Qt::NoButton &&
-			( m_editMode == ModeErase ||
-			m_editMode == ModeSelect ||
-			m_editMode == ModeEditDetuning))
+		else if (me->buttons() == Qt::NoButton && m_editMode != ModeDraw)
 		{
+			// Is needed to restore cursor when it previously was set to
+			// Qt::SizeVerCursor (between keyAreaBottom and noteEditTop)
 			setCursor( Qt::ArrowCursor );
 		}
 	}
