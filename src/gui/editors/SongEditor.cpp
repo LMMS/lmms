@@ -415,14 +415,13 @@ void SongEditor::setEditModeSelect()
 
 void SongEditor::keyPressEvent( QKeyEvent * ke )
 {
-	if( /*_ke->modifiers() & Qt::ShiftModifier*/
-		gui->mainWindow()->isShiftPressed() == true &&
+	bool isShiftPressed = ke->modifiers() & Qt::ShiftModifier;
+	if( isShiftPressed &&
 						( ke->key() == Qt::Key_Insert || ke->key() == Qt::Key_Enter || ke->key() == Qt::Key_Return ) )
 	{
 		m_song->insertBar();
 	}
-	else if(/* _ke->modifiers() & Qt::ShiftModifier &&*/
-			gui->mainWindow()->isShiftPressed() == true &&
+	else if( isShiftPressed &&
 						( ke->key() == Qt::Key_Delete || ke->key() == Qt::Key_Backspace ) )
 	{
 		m_song->removeBar();
@@ -458,7 +457,7 @@ void SongEditor::keyPressEvent( QKeyEvent * ke )
 
 void SongEditor::wheelEvent( QWheelEvent * we )
 {
-	if( gui->mainWindow()->isCtrlPressed() == true )
+	if( we->modifiers() & Qt::ControlModifier )
 	{
 		int z = m_zoomingModel->value();
 
@@ -480,7 +479,7 @@ void SongEditor::wheelEvent( QWheelEvent * we )
 		// and make sure, all TCO's are resized and relocated
 		realignTracks();
 	}
-	else if( gui->mainWindow()->isShiftPressed() == true || we->orientation() == Qt::Horizontal )
+	else if( (we->modifiers() & Qt::ShiftModifier) || we->orientation() == Qt::Horizontal )
 	{
 		m_leftRightScroll->setValue( m_leftRightScroll->value() -
 							we->delta() / 30 );
