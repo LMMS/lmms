@@ -601,7 +601,7 @@ void Knob::mousePressEvent( QMouseEvent * _me )
 		m_buttonPressed = true;
 	}
 	else if( _me->button() == Qt::LeftButton &&
-			gui->mainWindow()->isShiftPressed() == true )
+			(_me->modifiers() & Qt::ShiftModifier) )
 	{
 		new StringPairDrag( "float_value",
 					QString::number( model()->value() ),
