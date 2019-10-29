@@ -694,7 +694,7 @@ void TrackContentObjectView::mousePressEvent( QMouseEvent * me )
 					dataFile.toString(), thumbnail, this );
 	}
 	else if( me->button() == Qt::LeftButton &&
-		/*	engine::mainWindow()->isShiftPressed() == false &&*/
+		/* (me->modifiers() & Qt::ShiftModifier) &&*/
 							fixedTCOs() == false )
 	{
 		m_tco->addJournalCheckPoint();
