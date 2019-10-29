@@ -7,6 +7,8 @@ assignees: ''
 
 ---
 
+# Please search the issue tracker for existing bug reports before submitting your own. Delete this line to confirm no similar report has been posted yet.
+
 ### Bug Summary
 
 #### Steps to reproduce
@@ -17,10 +19,12 @@ assignees: ''
 
 #### Screenshot
 
+#### LMMS version used
+
 #### Logs
 <details>
   <summary>Click to expand</summary>
 <pre>
-# paste here
+<!-- paste logs here -->
 </pre>
 </details>
