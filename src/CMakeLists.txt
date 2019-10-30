@@ -91,7 +91,6 @@ ENDIF()
 
 # A 3rd party lockless ring buffer library is compiled as part of the core
 SET(RINGBUFFER_DIR "${CMAKE_SOURCE_DIR}/src/3rdparty/ringbuffer/")
-LIST(APPEND LMMS_SRCS "${RINGBUFFER_DIR}/src/lib/ringbuffer.cpp")
 LIST(APPEND LMMS_INCLUDES "${RINGBUFFER_DIR}/include/ringbuffer/ringbuffer.h")
 INCLUDE_DIRECTORIES("${RINGBUFFER_DIR}/include/")
 # Create a dummy ringbuffer_export.h, since ringbuffer is not compiled as a library
