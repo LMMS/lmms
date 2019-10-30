@@ -32,7 +32,7 @@
 
 //! A convenience layer for a realtime-safe and thread-safe multi-reader ring buffer library.
 template <class T>
-class LocklessRingBuffer
+class LMMS_EXPORT LocklessRingBuffer
 {
 	template<class _T>
 	friend class LocklessRingBufferReader;
@@ -59,7 +59,7 @@ private:
 
 // The sampleFrame_copier is required because sampleFrame is just a two-element
 // array and therefore does not have a copy constructor needed by std::copy.
-class sampleFrame_copier
+class LMMS_EXPORT sampleFrame_copier
 {
 	const sampleFrame* src;
 public:
@@ -77,7 +77,7 @@ public:
 
 //! Specialized ring buffer wrapper with write function modified to support sampleFrame.
 template <>
-class LocklessRingBuffer<sampleFrame>
+class LMMS_EXPORT LocklessRingBuffer<sampleFrame>
 {
 	template<class _T>
 	friend class LocklessRingBufferReader;
@@ -106,7 +106,7 @@ private:
 
 //! Wrapper for lockless ringbuffer reader
 template <class T>
-class LocklessRingBufferReader : public ringbuffer_reader_t<T>
+class LMMS_EXPORT LocklessRingBufferReader : public ringbuffer_reader_t<T>
 {
 public:
 	LocklessRingBufferReader(LocklessRingBuffer<T> &rb) :
