@@ -3014,7 +3014,7 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 		}
 
 		// don't draw over keys
-		p.setClipRect(WHITE_KEY_WIDTH, keyAreaTop(), width(), keyAreaBottom() - keyAreaTop());
+		p.setClipRect(WHITE_KEY_WIDTH, keyAreaTop(), width(), noteEditBottom() - keyAreaTop());
 
 		// draw alternating shading on bars
 		float timeSignature =
