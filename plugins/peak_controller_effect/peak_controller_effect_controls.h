@@ -41,8 +41,8 @@ public:
 	{
 	}
 
-	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
-	virtual void loadSettings( const QDomElement & _this ) override;
+	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
+	void loadSettings( const QDomElement & _this ) override;
 	inline virtual QString nodeName() const override
 	{
 		return "peakcontrollereffectcontrols";

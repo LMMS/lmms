@@ -298,7 +298,7 @@ signals:
 	void currentPatternChanged();
 
 protected:
-	virtual void focusInEvent(QFocusEvent * event);
+	void focusInEvent(QFocusEvent * event) override;
 
 protected slots:
 	void play() override;

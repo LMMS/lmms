@@ -218,8 +218,8 @@ protected:
 		return "SampleTrackView";
 	}
 
-	void dragEnterEvent(QDragEnterEvent *dee);
-	void dropEvent(QDropEvent *de);
+	void dragEnterEvent(QDragEnterEvent *dee) override;
+	void dropEvent(QDropEvent *de) override;
 
 private slots:
 	void assignFxLine( int channelIndex );
