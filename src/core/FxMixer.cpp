@@ -339,7 +339,7 @@ void FxMixer::deleteChannel( int index )
 	// if m_lastSoloed was our index, reset it
 	if (m_lastSoloed == index) { m_lastSoloed = -1; }
 	// if m_lastSoloed is > delete index, it will move left
-	else if (m_lastSoloed > index) { qMax(0, --m_lastSoloed); }
+	else if (m_lastSoloed > index) { --m_lastSoloed; }
 
 	// actually delete the channel
 	m_fxChannels.remove(index);
