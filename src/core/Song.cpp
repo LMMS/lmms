@@ -685,7 +685,7 @@ void Song::stop()
 				if( gui && gui->songEditor() &&
 						( tl->autoScroll() == TimeLineWidget::AutoScrollEnabled ) )
 				{
-					gui->songEditor()->m_editor->updatePosition(0);
+					QMetaObject::invokeMethod(gui->songEditor()->m_editor, "updatePosition", Qt::AutoConnection, Q_ARG(MidiTime, 0));
 				}
 				break;
 
@@ -699,7 +699,7 @@ void Song::stop()
 					if( gui && gui->songEditor() &&
 							( tl->autoScroll() == TimeLineWidget::AutoScrollEnabled ) )
 					{
-						gui->songEditor()->m_editor->updatePosition( MidiTime(tl->savedPos().getTicks() ) );
+						QMetaObject::invokeMethod(gui->songEditor()->m_editor, "updatePosition", Qt::AutoConnection, Q_ARG(MidiTime, tl->savedPos().getTicks()));
 					}
 					tl->savePos( -1 );
 				}
