@@ -2222,7 +2222,7 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 			return;
 		}
 		int newHeight = height() - me->y();
-		if (height() - newHeight < KEY_AREA_MIN_HEIGHT)
+		if (me->y() < KEY_AREA_MIN_HEIGHT)
 		{
 			newHeight = height() - KEY_AREA_MIN_HEIGHT -
 				PR_TOP_MARGIN - PR_BOTTOM_MARGIN; // - NOTE_EDIT_RESIZE_BAR
