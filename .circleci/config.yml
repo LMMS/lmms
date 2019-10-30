@@ -113,7 +113,7 @@ jobs:
       - *save_cache
   linux.gcc:
     docker:
-      - image: lmmsci/linux.gcc:xenial
+      - image: lmmsci/linux.gcc:16.04
     environment:
       <<: *common_environment
     steps:
@@ -122,7 +122,7 @@ jobs:
       - *restore_cache
       - run:
           name: Configure
-          command: mkdir build && cd build && cmake .. $CMAKE_OPTS -DCMAKE_INSTALL_PREFIX=./install
+          command: mkdir build && cd build && cmake .. $CMAKE_OPTS -DCMAKE_INSTALL_PREFIX=./install -DCMAKE_PREFIX_PATH=/opt/qt56
       - run:
           name: Build
           command: cd build && make
