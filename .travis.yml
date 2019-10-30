@@ -11,8 +11,6 @@ matrix:
     include:
         - env: TYPE=style
         - os: linux
-        - env: TARGET_OS=win32
-        - env: TARGET_OS=win64
         - env: TARGET_OS=debian-sid TARGET_DEPLOY=True
           git:
               depth: false
