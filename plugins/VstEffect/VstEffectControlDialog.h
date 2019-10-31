@@ -49,7 +49,7 @@ public:
 	virtual ~VstEffectControlDialog();
 
 protected:
-	virtual void paintEvent( QPaintEvent * _pe );
+	void paintEvent( QPaintEvent * _pe ) override;
 	void showEvent( QShowEvent* _se ) override;
 
 private:

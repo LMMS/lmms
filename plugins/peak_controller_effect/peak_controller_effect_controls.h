@@ -43,16 +43,16 @@ public:
 
 	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
 	void loadSettings( const QDomElement & _this ) override;
-	inline virtual QString nodeName() const override
+	inline QString nodeName() const override
 	{
 		return "peakcontrollereffectcontrols";
 	}
 
-	virtual int controlCount() override
+	int controlCount() override
 	{
 		return 1;
 	}
-	virtual EffectControlDialog * createView() override
+	EffectControlDialog * createView() override
 	{
 		return new PeakControllerEffectControlDialog( this );
 	}

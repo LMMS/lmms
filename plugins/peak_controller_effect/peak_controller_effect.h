@@ -38,7 +38,7 @@ public:
 	virtual bool processAudioBuffer( sampleFrame * _buf,
 									const fpp_t _frames ) override;
 
-	virtual EffectControls * controls() override
+	EffectControls * controls() override
 	{
 		return &m_peakControls;
 	}
