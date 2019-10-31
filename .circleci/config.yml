@@ -113,7 +113,7 @@ jobs:
       - *save_cache
   linux.gcc:
     docker:
-      - image: lmmsci/linux.gcc:xenial
+      - image: lmmsci/linux.gcc:16.04
     environment:
       <<: *common_environment
     steps:
