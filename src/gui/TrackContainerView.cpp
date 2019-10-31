@@ -54,7 +54,7 @@ TrackContainerView::TrackContainerView( TrackContainer * _tc ) :
 	m_tc( _tc ),
 	m_trackViews(),
 	m_scrollArea( new scrollArea( this ) ),
-	m_ppt( DEFAULT_PIXELS_PER_TACT ),
+	m_ppb( DEFAULT_PIXELS_PER_BAR ),
 	m_rubberBand( new RubberBand( m_scrollArea ) )
 {
 	m_tc->setHook( this );
@@ -305,9 +305,9 @@ bool TrackContainerView::allowRubberband() const
 
 
 
-void TrackContainerView::setPixelsPerTact( int _ppt )
+void TrackContainerView::setPixelsPerBar( int ppb )
 {
-	m_ppt = _ppt;
+	m_ppb = ppb;
 
 	// tell all TrackContentWidgets to update their background tile pixmap
 	for( trackViewList::Iterator it = m_trackViews.begin();

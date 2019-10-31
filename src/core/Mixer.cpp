@@ -361,12 +361,12 @@ const surroundSampleFrame * Mixer::renderNextBuffer()
 			// Stop crash with metronome if empty project
 				Engine::getSong()->countTracks() )
 	{
-		tick_t ticksPerTact = MidiTime::ticksPerTact();
-		if ( p.getTicks() % (ticksPerTact / 1 ) == 0 )
+		tick_t ticksPerBar = MidiTime::ticksPerBar();
+		if ( p.getTicks() % ( ticksPerBar / 1 ) == 0 )
 		{
 			addPlayHandle( new SamplePlayHandle( "misc/metronome02.ogg" ) );
 		}
-		else if ( p.getTicks() % (ticksPerTact /
+		else if ( p.getTicks() % ( ticksPerBar /
 			song->getTimeSigModel().getNumerator() ) == 0 )
 		{
 			addPlayHandle( new SamplePlayHandle( "misc/metronome01.ogg" ) );
@@ -1287,6 +1287,4 @@ void Mixer::fifoWriter::write( surroundSampleFrame * buffer )
 	m_mixer->m_waitingForWrite = false;
 	m_mixer->m_doChangesMutex.unlock();
 }
-
-
 

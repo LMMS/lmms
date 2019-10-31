@@ -95,7 +95,7 @@ SongEditor::SongEditor( Song * song ) :
 	m_zoomingModel->setParent(this);
 	m_snappingModel->setParent(this);
 	m_timeLine = new TimeLineWidget( m_trackHeadWidth, 32,
-					pixelsPerTact(),
+					pixelsPerBar(),
 					m_song->m_playPos[Song::Mode_PlaySong],
 					m_currentPosition,
 					Song::Mode_PlaySong, this );
@@ -374,7 +374,7 @@ void SongEditor::selectRegionFromPixels(int xStart, int xEnd)
 
 		//calculate the song position where the mouse was clicked
 		m_rubberbandStartMidipos = MidiTime((xStart - m_trackHeadWidth)
-											/ pixelsPerTact() * MidiTime::ticksPerTact())
+											/ pixelsPerBar() * MidiTime::ticksPerBar())
 											+ m_currentPosition;
 		m_rubberBandStartTrackview = 0;
 	}
@@ -409,7 +409,7 @@ void SongEditor::updateRubberband()
 		}
 
 		//take care of the scrollbar position
-		int hs = (m_leftRightScroll->value() - m_scrollPos.x()) * pixelsPerTact();
+		int hs = (m_leftRightScroll->value() - m_scrollPos.x()) * pixelsPerBar();
 		int vs = contentWidget()->verticalScrollBar()->value() - m_scrollPos.y();
 
 		//the adjusted origin point
@@ -425,7 +425,7 @@ void SongEditor::updateRubberband()
 
 		//the miditime the mouse is hover
 		MidiTime rubberbandMidipos = MidiTime((qMin(m_mousePos.x(), width()) - m_trackHeadWidth)
-											  / pixelsPerTact() * MidiTime::ticksPerTact())
+											  / pixelsPerBar() * MidiTime::ticksPerBar())
 											  + m_currentPosition;
 
 		//are tcos in the rect of selection?
@@ -485,7 +485,7 @@ void SongEditor::keyPressEvent( QKeyEvent * ke )
 	}
 	else if( ke->key() == Qt::Key_Left )
 	{
-		tick_t t = m_song->currentTick() - MidiTime::ticksPerTact();
+		tick_t t = m_song->currentTick() - MidiTime::ticksPerBar();
 		if( t >= 0 )
 		{
 			m_song->setPlayPos( t, Song::Mode_PlaySong );
@@ -493,7 +493,7 @@ void SongEditor::keyPressEvent( QKeyEvent * ke )
 	}
 	else if( ke->key() == Qt::Key_Right )
 	{
-		tick_t t = m_song->currentTick() + MidiTime::ticksPerTact();
+		tick_t t = m_song->currentTick() + MidiTime::ticksPerBar();
 		if( t < MaxSongLength )
 		{
 			m_song->setPlayPos( t, Song::Mode_PlaySong );
@@ -549,20 +549,20 @@ void SongEditor::wheelEvent( QWheelEvent * we )
 		z = qBound( 0, z, m_zoomingModel->size() - 1 );
 
 
-		int x = (we->x() - m_trackHeadWidth);
-		// tact based on the mouse x-position where the scroll wheel was used
-		int tact= x  / pixelsPerTact();
-		// what would be the tact in the new zoom level on the very same mouse x
-		int newTact = x / DEFAULT_PIXELS_PER_TACT / m_zoomLevels[z];
-		// scroll so the tact "selected" by the mouse x doesn't move on the screen
-		m_leftRightScroll->setValue(m_leftRightScroll->value() + tact - newTact);
+		int x = we->x() - m_trackHeadWidth;
+		// bar based on the mouse x-position where the scroll wheel was used
+		int bar = x / pixelsPerBar();
+		// what would be the bar in the new zoom level on the very same mouse x
+		int newBar = x / DEFAULT_PIXELS_PER_BAR / m_zoomLevels[z];
+		// scroll so the bar "selected" by the mouse x doesn't move on the screen
+		m_leftRightScroll->setValue(m_leftRightScroll->value() + bar - newBar);
 
 		// update combobox with zooming-factor
 		m_zoomingModel->setValue( z );
 
 		// update timeline
 		m_song->m_playPos[Song::Mode_PlaySong].m_timeLine->
-					setPixelsPerTact( pixelsPerTact() );
+					setPixelsPerBar( pixelsPerBar() );
 		// and make sure, all TCO's are resized and relocated
 		realignTracks();
 	}
@@ -614,7 +614,7 @@ void SongEditor::mousePressEvent(QMouseEvent *me)
 		//the trackView(index) and the miditime where the mouse was clicked
 		m_rubberBandStartTrackview = trackIndexFromSelectionPoint(me->y());
 		m_rubberbandStartMidipos = MidiTime((me->x() - m_trackHeadWidth)
-											/ pixelsPerTact() * MidiTime::ticksPerTact())
+											/ pixelsPerBar() * MidiTime::ticksPerBar())
 											+ m_currentPosition;
 	}
 	QWidget::mousePressEvent(me);
@@ -791,14 +791,14 @@ void SongEditor::updatePosition( const MidiTime & t )
 		const int w = width() - widgetWidth
 							- trackOpWidth
 							- contentWidget()->verticalScrollBar()->width(); // width of right scrollbar
-		if( t > m_currentPosition + w * MidiTime::ticksPerTact() /
-							pixelsPerTact() )
+		if( t > m_currentPosition + w * MidiTime::ticksPerBar() /
+							pixelsPerBar() )
 		{
-			animateScroll( m_leftRightScroll, t.getTact(), m_smoothScroll );
+			animateScroll( m_leftRightScroll, t.getBar(), m_smoothScroll );
 		}
 		else if( t < m_currentPosition )
 		{
-			animateScroll( m_leftRightScroll, t.getTact(), m_smoothScroll );
+			animateScroll( m_leftRightScroll, t.getBar(), m_smoothScroll );
 		}
 		m_scrollBack = false;
 	}
@@ -831,10 +831,10 @@ void SongEditor::updatePositionLine()
 
 void SongEditor::zoomingChanged()
 {
-	setPixelsPerTact( m_zoomLevels[m_zoomingModel->value()] * DEFAULT_PIXELS_PER_TACT );
+	setPixelsPerBar( m_zoomLevels[m_zoomingModel->value()] * DEFAULT_PIXELS_PER_BAR );
 
 	m_song->m_playPos[Song::Mode_PlaySong].m_timeLine->
-					setPixelsPerTact( pixelsPerTact() );
+					setPixelsPerBar( pixelsPerBar() );
 	realignTracks();
 	updateRubberband();
 }

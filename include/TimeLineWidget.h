@@ -72,15 +72,15 @@ public:
 	} ;
 
 
-	TimeLineWidget(int xoff, int yoff, float ppt, Song::PlayPos & pos,
+	TimeLineWidget(int xoff, int yoff, float ppb, Song::PlayPos & pos,
 				const MidiTime & begin, Song::PlayModes mode, QWidget * parent);
 	virtual ~TimeLineWidget();
 
 	inline QColor const & getBarLineColor() const { return m_barLineColor; }
-	inline void setBarLineColor(QColor const & tactLineColor) { m_barLineColor = tactLineColor; }
+	inline void setBarLineColor(QColor const & barLineColor) { m_barLineColor = barLineColor; }
 
 	inline QColor const & getBarNumberColor() const { return m_barNumberColor; }
-	inline void setBarNumberColor(QColor const & tactNumberColor) { m_barNumberColor = tactNumberColor; }
+	inline void setBarNumberColor(QColor const & barNumberColor) { m_barNumberColor = barNumberColor; }
 
 	inline QColor const & getInactiveLoopColor() const { return m_inactiveLoopColor; }
 	inline void setInactiveLoopColor(QColor const & inactiveLoopColor) { m_inactiveLoopColor = inactiveLoopColor; }
@@ -135,18 +135,18 @@ public:
 						m_loopPos[0] : m_loopPos[1];
 	}
 
-	inline void savePos( const MidiTime & _pos )
+	inline void savePos( const MidiTime & pos )
 	{
-		m_savedPos = _pos;
+		m_savedPos = pos;
 	}
 	inline const MidiTime & savedPos() const
 	{
 		return m_savedPos;
 	}
 
-	inline void setPixelsPerTact( float _ppt )
+	inline void setPixelsPerBar( float ppb )
 	{
-		m_ppt = _ppt;
+		m_ppb = ppb;
 		update();
 	}
 
@@ -163,7 +163,7 @@ public:
 	inline int markerX( const MidiTime & _t ) const
 	{
 		return m_xOffset + static_cast<int>( ( _t - m_begin ) *
-					m_ppt / MidiTime::ticksPerTact() );
+					m_ppb / MidiTime::ticksPerBar() );
 	}
 
 signals:
@@ -214,7 +214,7 @@ private:
 
 	int m_xOffset;
 	int m_posMarkerX;
-	float m_ppt;
+	float m_ppb;
 	Song::PlayPos & m_pos;
 	const MidiTime & m_begin;
 	const Song::PlayModes m_mode;

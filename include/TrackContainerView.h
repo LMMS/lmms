@@ -54,25 +54,25 @@ public:
 
 	QScrollArea * contentWidget()
 	{
-		return( m_scrollArea );
+		return m_scrollArea;
 	}
 
 	inline const MidiTime & currentPosition() const
 	{
-		return( m_currentPosition );
+		return m_currentPosition;
 	}
 
 	virtual bool fixedTCOs() const
 	{
-		return( false );
+		return false;
 	}
 
-	inline float pixelsPerTact() const
+	inline float pixelsPerBar() const
 	{
-		return( m_ppt );
+		return m_ppb;
 	}
 
-	void setPixelsPerTact( int _ppt );
+	void setPixelsPerBar( int ppb );
 
 	const TrackView * trackViewAt( const int _y ) const;
 
@@ -80,12 +80,12 @@ public:
 
 	inline bool rubberBandActive() const
 	{
-		return( m_rubberBand->isEnabled() && m_rubberBand->isVisible() );
+		return m_rubberBand->isEnabled() && m_rubberBand->isVisible();
 	}
 
 	inline QVector<selectableObject *> selectedObjects()
 	{
-		return( m_rubberBand->selectedObjects() );
+		return m_rubberBand->selectedObjects();
 	}
 
 
@@ -118,7 +118,7 @@ public:
 
 	virtual QString nodeName() const
 	{
-		return( "trackcontainerview" );
+		return "trackcontainerview";
 	}
 
 
@@ -139,7 +139,7 @@ public slots:
 
 
 protected:
-	static const int DEFAULT_PIXELS_PER_TACT = 16;
+	static const int DEFAULT_PIXELS_PER_BAR = 16;
 
 
 	virtual void resizeEvent( QResizeEvent * );
@@ -176,7 +176,7 @@ private:
 	scrollArea * m_scrollArea;
 	QVBoxLayout * m_scrollLayout;
 
-	float m_ppt;
+	float m_ppb;
 
 	RubberBand * m_rubberBand;
 

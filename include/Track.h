@@ -266,7 +266,7 @@ protected:
 		selectableObject::resizeEvent( re );
 	}
 
-	float pixelsPerTact();
+	float pixelsPerBar();
 
 
 	DataFile createTCODataFiles(const QVector<TrackContentObjectView *> & tcos) const;
@@ -547,10 +547,10 @@ public:
 	void createTCOsForBB( int bb );
 
 
-	void insertTact( const MidiTime & pos );
-	void removeTact( const MidiTime & pos );
+	void insertBar( const MidiTime & pos );
+	void removeBar( const MidiTime & pos );
 
-	tact_t length() const;
+	bar_t length() const;
 
 
 	inline TrackContainer* trackContainer() const
