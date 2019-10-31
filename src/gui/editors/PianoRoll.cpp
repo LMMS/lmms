@@ -1965,7 +1965,7 @@ void PianoRoll::mouseDoubleClickEvent(QMouseEvent * me )
 	}
 	else
 	{
-		mousePressEvent(me);
+		QWidget::mouseDoubleClickEvent(me);
 	}
 }
 
