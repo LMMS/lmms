@@ -122,7 +122,10 @@ jobs:
       - *restore_cache
       - run:
           name: Configure
-          command: mkdir build && cd build && cmake .. $CMAKE_OPTS -DCMAKE_INSTALL_PREFIX=./install
+          command: |
+            source /opt/qt5*/bin/qt5*-env.sh || true
+            mkdir build && cd build
+            cmake .. $CMAKE_OPTS -DCMAKE_INSTALL_PREFIX=./install
       - run:
           name: Build
           command: cd build && make
