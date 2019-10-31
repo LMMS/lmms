@@ -16,6 +16,8 @@ fi
 
 if [ $QT5 ]; then
         CMAKE_OPTS="-DWANT_QT5=$QT5 -DCMAKE_PREFIX_PATH=$MINGW $CMAKE_OPTS"
+else
+		CMAKE_OPTS="-DWANT_QT5=OFF"
 fi
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"

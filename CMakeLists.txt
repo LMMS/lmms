@@ -67,7 +67,7 @@ OPTION(WANT_TAP		"Include Tom's Audio Processing LADSPA plugins" ON)
 OPTION(WANT_VST		"Include VST support" ON)
 OPTION(WANT_VST_NOWINE	"Include partial VST support (without wine)" OFF)
 OPTION(WANT_WINMM	"Include WinMM MIDI support" OFF)
-OPTION(WANT_QT5		"Build with Qt5" OFF)
+OPTION(WANT_QT5		"Build with Qt5" ON)
 
 
 IF(LMMS_BUILD_APPLE)
