@@ -73,9 +73,9 @@ public:
 		return m_pattern != nullptr;
 	}
 
-	virtual void saveSettings(QDomDocument & doc, QDomElement & parent);
-	virtual void loadSettings(const QDomElement & parent);
-	QString nodeName() const
+	void saveSettings(QDomDocument & doc, QDomElement & parent) override;
+	void loadSettings(const QDomElement & parent) override;
+	QString nodeName() const override
 	{
 		return "automationeditor";
 	}
@@ -114,14 +114,14 @@ public slots:
 protected:
 	typedef AutomationPattern::timeMap timeMap;
 
-	virtual void keyPressEvent(QKeyEvent * ke);
-	virtual void leaveEvent(QEvent * e);
-	virtual void mousePressEvent(QMouseEvent * mouseEvent);
-	virtual void mouseReleaseEvent(QMouseEvent * mouseEvent);
-	virtual void mouseMoveEvent(QMouseEvent * mouseEvent);
-	virtual void paintEvent(QPaintEvent * pe);
-	virtual void resizeEvent(QResizeEvent * re);
-	virtual void wheelEvent(QWheelEvent * we);
+	void keyPressEvent(QKeyEvent * ke) override;
+	void leaveEvent(QEvent * e) override;
+	void mousePressEvent(QMouseEvent * mouseEvent) override;
+	void mouseReleaseEvent(QMouseEvent * mouseEvent) override;
+	void mouseMoveEvent(QMouseEvent * mouseEvent) override;
+	void paintEvent(QPaintEvent * pe) override;
+	void resizeEvent(QResizeEvent * re) override;
+	void wheelEvent(QWheelEvent * we) override;
 
 	float getLevel( int y );
 	int xCoordOfTick( int tick );
@@ -282,14 +282,14 @@ public:
 	void setCurrentPattern(AutomationPattern* pattern);
 	const AutomationPattern* currentPattern();
 
-	virtual void dropEvent( QDropEvent * _de );
-	virtual void dragEnterEvent( QDragEnterEvent * _dee );
+	void dropEvent( QDropEvent * _de ) override;
+	void dragEnterEvent( QDragEnterEvent * _dee ) override;
 
 	void open(AutomationPattern* pattern);
 
 	AutomationEditor* m_editor;
 
-	QSize sizeHint() const;
+	QSize sizeHint() const override;
 
 public slots:
 	void clearCurrentPattern();
@@ -298,11 +298,11 @@ signals:
 	void currentPatternChanged();
 
 protected:
-	virtual void focusInEvent(QFocusEvent * event);
+	void focusInEvent(QFocusEvent * event) override;
 
 protected slots:
-	void play();
-	void stop();
+	void play() override;
+	void stop() override;
 
 private slots:
 	void updateWindowTitle();

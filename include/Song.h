@@ -261,7 +261,7 @@ public:
 
 
 	bpm_t getTempo();
-	virtual AutomationPattern * tempoAutomationPattern();
+	AutomationPattern * tempoAutomationPattern() override;
 
 	AutomationTrack * globalAutomationTrack()
 	{
@@ -269,7 +269,7 @@ public:
 	}
 
 	//TODO: Add Q_DECL_OVERRIDE when Qt4 is dropped
-	AutomatedValueMap automatedValuesAt(MidiTime time, int tcoNum = -1) const;
+	AutomatedValueMap automatedValuesAt(MidiTime time, int tcoNum = -1) const override;
 
 	// file management
 	void createNewProject();
@@ -305,7 +305,7 @@ public:
 		return m_modified;
 	}
 
-	virtual QString nodeName() const
+	QString nodeName() const override
 	{
 		return "song";
 	}
