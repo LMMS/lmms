@@ -218,8 +218,8 @@ void BBTCOView::paintEvent( QPaintEvent * )
 		: ( m_bbTCO->m_useStyleColor ? painter.background().color() 
 		: m_bbTCO->colorObj() ) );
 	
-	lingrad.setColorAt( 0, c.light( 130 ) );
-	lingrad.setColorAt( 1, c.light( 70 ) );
+	lingrad.setColorAt( 0, c.lighter( 130 ) );
+	lingrad.setColorAt( 1, c.lighter( 70 ) );
 
 	// paint a black rectangle under the pattern to prevent glitches with transparent backgrounds
 	p.fillRect( rect(), QColor( 0, 0, 0 ) );
