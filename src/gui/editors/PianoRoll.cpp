@@ -36,7 +36,6 @@
 #include <QPointer>
 #include <QScrollBar>
 #include <QStyleOption>
-#include <QSignalMapper>
 
 #ifndef __USE_XOPEN
 #define __USE_XOPEN
@@ -204,20 +203,15 @@ PianoRoll::PianoRoll() :
 	m_nemStr.push_back( tr( "Note Velocity" ) );
 	m_nemStr.push_back( tr( "Note Panning" ) );
 
-	QSignalMapper * signalMapper = new QSignalMapper( this );
 	m_noteEditMenu = new QMenu( this );
 	m_noteEditMenu->clear();
 	for( int i = 0; i < m_nemStr.size(); ++i )
 	{
 		QAction * act = new QAction( m_nemStr.at(i), this );
-		connect( act, SIGNAL(triggered()), signalMapper, SLOT(map()) );
-		signalMapper->setMapping( act, i );
+		connect( act, &QAction::triggered, [this, i](){ changeNoteEditMode(i); } );
 		m_noteEditMenu->addAction( act );
 	}
-	connect( signalMapper, SIGNAL(mapped(int)),
-			this, SLOT(changeNoteEditMode(int)) );
 
-	signalMapper = new QSignalMapper( this );
 	m_semiToneMarkerMenu = new QMenu( this );
 
 	QAction* markSemitoneAction = new QAction( tr("Mark/unmark current semitone"), this );
@@ -227,27 +221,18 @@ PianoRoll::PianoRoll() :
 	QAction* unmarkAllAction = new QAction( tr("Unmark all"), this );
 	QAction* copyAllNotesAction = new QAction( tr("Select all notes on this key"), this);
 
-	connect( markSemitoneAction, SIGNAL(triggered()), signalMapper, SLOT(map()) );
-	connect( markAllOctaveSemitonesAction, SIGNAL(triggered()), signalMapper, SLOT(map()) );
-	connect( markScaleAction, SIGNAL(triggered()), signalMapper, SLOT(map()) );
-	connect( markChordAction, SIGNAL(triggered()), signalMapper, SLOT(map()) );
-	connect( unmarkAllAction, SIGNAL(triggered()), signalMapper, SLOT(map()) );
-	connect( copyAllNotesAction, SIGNAL(triggered()), signalMapper, SLOT(map()) );
-
-	signalMapper->setMapping( markSemitoneAction, static_cast<int>( stmaMarkCurrentSemiTone ) );
-	signalMapper->setMapping( markAllOctaveSemitonesAction, static_cast<int>( stmaMarkAllOctaveSemiTones ) );
-	signalMapper->setMapping( markScaleAction, static_cast<int>( stmaMarkCurrentScale ) );
-	signalMapper->setMapping( markChordAction, static_cast<int>( stmaMarkCurrentChord ) );
-	signalMapper->setMapping( unmarkAllAction, static_cast<int>( stmaUnmarkAll ) );
-	signalMapper->setMapping( copyAllNotesAction, static_cast<int>( stmaCopyAllNotesOnKey ) );
+	connect( markSemitoneAction, &QAction::triggered, [this](){ markSemiTone(stmaMarkCurrentSemiTone); });
+	connect( markAllOctaveSemitonesAction, &QAction::triggered, [this](){ markSemiTone(stmaMarkAllOctaveSemiTones); });
+	connect( markScaleAction, &QAction::triggered, [this](){ markSemiTone(stmaMarkCurrentScale); });
+	connect( markChordAction, &QAction::triggered, [this](){ markSemiTone(stmaMarkCurrentChord); });
+	connect( unmarkAllAction, &QAction::triggered, [this](){ markSemiTone(stmaUnmarkAll); });
+	connect( copyAllNotesAction, &QAction::triggered, [this](){ markSemiTone(stmaCopyAllNotesOnKey); });
 
 	markScaleAction->setEnabled( false );
 	markChordAction->setEnabled( false );
 
 	connect( this, SIGNAL(semiToneMarkerMenuScaleSetEnabled(bool)), markScaleAction, SLOT(setEnabled(bool)) );
 	connect( this, SIGNAL(semiToneMarkerMenuChordSetEnabled(bool)), markChordAction, SLOT(setEnabled(bool)) );
-
-	connect( signalMapper, SIGNAL(mapped(int)), this, SLOT(markSemiTone(int)) );
 
 	m_semiToneMarkerMenu->addAction( markSemitoneAction );
 	m_semiToneMarkerMenu->addAction( markAllOctaveSemitonesAction );

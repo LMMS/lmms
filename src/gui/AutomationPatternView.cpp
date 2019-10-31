@@ -366,7 +366,7 @@ void AutomationPatternView::paintEvent( QPaintEvent * )
 	}
 
 	p.setRenderHints( QPainter::Antialiasing, false );
-	p.resetMatrix();
+	p.resetTransform();
 	
 	// bar lines
 	const int lineSize = 3;
