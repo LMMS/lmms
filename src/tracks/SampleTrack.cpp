@@ -157,7 +157,7 @@ void SampleTCO::setSampleFile( const QString & _sf )
 	{	//When creating an empty sample pattern make it a bar long
 		float nom = Engine::getSong()->getTimeSigModel().getNumerator();
 		float den = Engine::getSong()->getTimeSigModel().getDenominator();
-		length = DefaultTicksPerTact * ( nom / den );
+		length = DefaultTicksPerBar * ( nom / den );
 	}
 	else
 	{	//Otherwise set it to the sample's length
@@ -521,18 +521,18 @@ void SampleTCOView::paintEvent( QPaintEvent * pe )
 	p.setPen( !muted ? painter.pen().brush().color() : mutedColor() );
 
 	const int spacing = TCO_BORDER_WIDTH + 1;
-	const float ppt = fixedTCOs() ?
+	const float ppb = fixedTCOs() ?
 			( parentWidget()->width() - 2 * TCO_BORDER_WIDTH )
-					/ (float) m_tco->length().getTact() :
-								pixelsPerTact();
+					/ (float) m_tco->length().getBar() :
+								pixelsPerBar();
 
 	float nom = Engine::getSong()->getTimeSigModel().getNumerator();
 	float den = Engine::getSong()->getTimeSigModel().getDenominator();
-	float ticksPerTact = DefaultTicksPerTact * nom / den;
+	float ticksPerBar = DefaultTicksPerBar * nom / den;
 
-	float offset =  m_tco->startTimeOffset() / ticksPerTact * pixelsPerTact();
+	float offset =  m_tco->startTimeOffset() / ticksPerBar * pixelsPerBar();
 	QRect r = QRect( TCO_BORDER_WIDTH + offset, spacing,
-			qMax( static_cast<int>( m_tco->sampleLength() * ppt / ticksPerTact ), 1 ), rect().bottom() - 2 * spacing );
+			qMax( static_cast<int>( m_tco->sampleLength() * ppb / ticksPerBar ), 1 ), rect().bottom() - 2 * spacing );
 	m_tco->m_sampleBuffer->visualize( p, r, pe->rect() );
 
 	QFileInfo fileInfo(m_tco->m_sampleBuffer->audioFile());
@@ -928,8 +928,8 @@ void SampleTrackView::dropEvent(QDropEvent *de)
 
 		MidiTime tcoPos = trackContainerView()->fixedTCOs()
 				? MidiTime(0)
-				: MidiTime(((xPos - trackHeadWidth) / trackContainerView()->pixelsPerTact()
-							* MidiTime::ticksPerTact()) + trackContainerView()->currentPosition()
+				: MidiTime(((xPos - trackHeadWidth) / trackContainerView()->pixelsPerBar()
+							* MidiTime::ticksPerBar()) + trackContainerView()->currentPosition()
 						).quantize(1.0);
 
 		SampleTCO * sTco = static_cast<SampleTCO*>(getTrack()->createTCO(tcoPos));

@@ -51,7 +51,7 @@ BBTCO::BBTCO( Track * _track ) :
 	m_color( 128, 128, 128 ),
 	m_useStyleColor( true )
 {
-	tact_t t = Engine::getBBTrackContainer()->lengthOfBB( bbTrackIndex() );
+	bar_t t = Engine::getBBTrackContainer()->lengthOfBB( bbTrackIndex() );
 	if( t > 0 )
 	{
 		saveJournallingState( false );
@@ -237,12 +237,12 @@ void BBTCOView::paintEvent( QPaintEvent * )
 	const int lineSize = 3;
 	p.setPen( c.darker( 200 ) );
 
-	tact_t t = Engine::getBBTrackContainer()->lengthOfBB( m_bbTCO->bbTrackIndex() );
-	if( m_bbTCO->length() > MidiTime::ticksPerTact() && t > 0 )
+	bar_t t = Engine::getBBTrackContainer()->lengthOfBB( m_bbTCO->bbTrackIndex() );
+	if( m_bbTCO->length() > MidiTime::ticksPerBar() && t > 0 )
 	{
-		for( int x = static_cast<int>( t * pixelsPerTact() );
+		for( int x = static_cast<int>( t * pixelsPerBar() );
 								x < width() - 2;
-			x += static_cast<int>( t * pixelsPerTact() ) )
+			x += static_cast<int>( t * pixelsPerBar() ) )
 		{
 			p.drawLine( x, TCO_BORDER_WIDTH, x, TCO_BORDER_WIDTH + lineSize );
 			p.drawLine( x, rect().bottom() - ( TCO_BORDER_WIDTH + lineSize ),
