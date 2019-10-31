@@ -99,11 +99,11 @@ SongEditor::SongEditor( Song * song ) :
 					m_song->m_playPos[Song::Mode_PlaySong],
 					m_currentPosition,
 					Song::Mode_PlaySong, this );
-	connect( this, SIGNAL( positionChanged( const MidiTime & ) ),
+	connect( this, SIGNAL( positionChanged( const TimePos & ) ),
 				m_song->m_playPos[Song::Mode_PlaySong].m_timeLine,
-			SLOT( updatePosition( const MidiTime & ) ) );
-	connect( m_timeLine, SIGNAL( positionChanged( const MidiTime & ) ),
-			this, SLOT( updatePosition( const MidiTime & ) ) );
+			SLOT( updatePosition( const TimePos & ) ) );
+	connect( m_timeLine, SIGNAL( positionChanged( const TimePos & ) ),
+			this, SLOT( updatePosition( const TimePos & ) ) );
 	connect( m_timeLine, SIGNAL( regionSelectedFromPixels( int, int ) ),
 			this, SLOT( selectRegionFromPixels( int, int ) ) );
 	connect( m_timeLine, SIGNAL( selectionFinished() ),
@@ -349,7 +349,7 @@ void SongEditor::setHighQuality( bool hq )
 void SongEditor::scrolled( int new_pos )
 {
 	update();
-	emit positionChanged( m_currentPosition = MidiTime( new_pos, 0 ) );
+	emit positionChanged( m_currentPosition = TimePos( new_pos, 0 ) );
 }
 
 
@@ -373,8 +373,8 @@ void SongEditor::selectRegionFromPixels(int xStart, int xEnd)
 		m_currentZoomingValue = zoomingModel()->value();
 
 		//calculate the song position where the mouse was clicked
-		m_rubberbandStartMidipos = MidiTime((xStart - m_trackHeadWidth)
-											/ pixelsPerBar() * MidiTime::ticksPerBar())
+		m_rubberbandStartMidipos = TimePos((xStart - m_trackHeadWidth)
+											/ pixelsPerBar() * TimePos::ticksPerBar())
 											+ m_currentPosition;
 		m_rubberBandStartTrackview = 0;
 	}
@@ -423,9 +423,9 @@ void SongEditor::updateRubberband()
 		//the index of the TrackView the mouse is hover
 		int rubberBandTrackview = trackIndexFromSelectionPoint(m_mousePos.y());
 
-		//the miditime the mouse is hover
-		MidiTime rubberbandMidipos = MidiTime((qMin(m_mousePos.x(), width()) - m_trackHeadWidth)
-											  / pixelsPerBar() * MidiTime::ticksPerBar())
+		//the timepos the mouse is hover
+		TimePos rubberbandMidipos = TimePos((qMin(m_mousePos.x(), width()) - m_trackHeadWidth)
+											  / pixelsPerBar() * TimePos::ticksPerBar())
 											  + m_currentPosition;
 
 		//are tcos in the rect of selection?
@@ -485,7 +485,7 @@ void SongEditor::keyPressEvent( QKeyEvent * ke )
 	}
 	else if( ke->key() == Qt::Key_Left )
 	{
-		tick_t t = m_song->currentTick() - MidiTime::ticksPerBar();
+		tick_t t = m_song->currentTick() - TimePos::ticksPerBar();
 		if( t >= 0 )
 		{
 			m_song->setPlayPos( t, Song::Mode_PlaySong );
@@ -493,7 +493,7 @@ void SongEditor::keyPressEvent( QKeyEvent * ke )
 	}
 	else if( ke->key() == Qt::Key_Right )
 	{
-		tick_t t = m_song->currentTick() + MidiTime::ticksPerBar();
+		tick_t t = m_song->currentTick() + TimePos::ticksPerBar();
 		if( t < MaxSongLength )
 		{
 			m_song->setPlayPos( t, Song::Mode_PlaySong );
@@ -611,10 +611,10 @@ void SongEditor::mousePressEvent(QMouseEvent *me)
 		rubberBand()->setGeometry(QRect(m_origin, QSize()));
 		rubberBand()->show();
 
-		//the trackView(index) and the miditime where the mouse was clicked
+		//the trackView(index) and the timepos where the mouse was clicked
 		m_rubberBandStartTrackview = trackIndexFromSelectionPoint(me->y());
-		m_rubberbandStartMidipos = MidiTime((me->x() - m_trackHeadWidth)
-											/ pixelsPerBar() * MidiTime::ticksPerBar())
+		m_rubberbandStartMidipos = TimePos((me->x() - m_trackHeadWidth)
+											/ pixelsPerBar() * TimePos::ticksPerBar())
 											+ m_currentPosition;
 	}
 	QWidget::mousePressEvent(me);
@@ -769,7 +769,7 @@ static inline void animateScroll( QScrollBar *scrollBar, int newVal, bool smooth
 
 
 
-void SongEditor::updatePosition( const MidiTime & t )
+void SongEditor::updatePosition( const TimePos & t )
 {
 	int widgetWidth, trackOpWidth;
 	if( ConfigManager::inst()->value( "ui", "compacttrackbuttons" ).toInt() )
@@ -791,7 +791,7 @@ void SongEditor::updatePosition( const MidiTime & t )
 		const int w = width() - widgetWidth
 							- trackOpWidth
 							- contentWidget()->verticalScrollBar()->width(); // width of right scrollbar
-		if( t > m_currentPosition + w * MidiTime::ticksPerBar() /
+		if( t > m_currentPosition + w * TimePos::ticksPerBar() /
 							pixelsPerBar() )
 		{
 			animateScroll( m_leftRightScroll, t.getBar(), m_smoothScroll );

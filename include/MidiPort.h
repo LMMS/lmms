@@ -31,7 +31,7 @@
 #include <QtCore/QMap>
 
 #include "Midi.h"
-#include "MidiTime.h"
+#include "TimePos.h"
 #include "AutomatableModel.h"
 
 
@@ -99,8 +99,8 @@ public:
 		return outputChannel() - 1;
 	}
 
-	void processInEvent( const MidiEvent& event, const MidiTime& time = MidiTime() );
-	void processOutEvent( const MidiEvent& event, const MidiTime& time = MidiTime() );
+	void processInEvent( const MidiEvent& event, const TimePos& time = TimePos() );
+	void processOutEvent( const MidiEvent& event, const TimePos& time = TimePos() );
 
 
 	virtual void saveSettings( QDomDocument& doc, QDomElement& thisElement );

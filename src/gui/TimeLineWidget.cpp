@@ -43,7 +43,7 @@
 QPixmap * TimeLineWidget::s_posMarkerPixmap = NULL;
 
 TimeLineWidget::TimeLineWidget( const int xoff, const int yoff, const float ppb,
-			Song::PlayPos & pos, const MidiTime & begin, Song::PlayModes mode,
+			Song::PlayPos & pos, const TimePos & begin, Song::PlayModes mode,
 							QWidget * parent ) :
 	QWidget( parent ),
 	m_inactiveLoopColor( 52, 63, 53, 64 ),
@@ -172,7 +172,7 @@ void TimeLineWidget::loadSettings( const QDomElement & _this )
 
 
 
-void TimeLineWidget::updatePosition( const MidiTime & )
+void TimeLineWidget::updatePosition( const TimePos & )
 {
 	const int new_x = markerX( m_pos );
 
@@ -249,14 +249,14 @@ void TimeLineWidget::paintEvent( QPaintEvent * )
 
 	bar_t barNumber = m_begin.getBar();
 	int const x = m_xOffset + s_posMarkerPixmap->width() / 2 -
-			( ( static_cast<int>( m_begin * m_ppb ) / MidiTime::ticksPerBar() ) % static_cast<int>( m_ppb ) );
+			( ( static_cast<int>( m_begin * m_ppb ) / TimePos::ticksPerBar() ) % static_cast<int>( m_ppb ) );
 
 	for( int i = 0; x + i * m_ppb < width(); ++i )
 	{
 		++barNumber;
 		if( ( barNumber - 1 ) %
 			qMax( 1, qRound( 1.0f / 3.0f *
-				MidiTime::ticksPerBar() / m_ppb ) ) == 0 )
+				TimePos::ticksPerBar() / m_ppb ) ) == 0 )
 		{
 			const int cx = x + qRound( i * m_ppb );
 			p.setPen( barLineColor );
@@ -313,8 +313,8 @@ void TimeLineWidget::mousePressEvent( QMouseEvent* event )
 	else if( event->button() == Qt::RightButton )
 	{
 		m_moveXOff = s_posMarkerPixmap->width() / 2;
-		const MidiTime t = m_begin + static_cast<int>( qMax( event->x() - m_xOffset - m_moveXOff, 0 ) * MidiTime::ticksPerBar() / m_ppb );
-		const MidiTime loopMid = ( m_loopPos[0] + m_loopPos[1] ) / 2;
+		const TimePos t = m_begin + static_cast<int>( qMax( event->x() - m_xOffset - m_moveXOff, 0 ) * TimePos::ticksPerBar() / m_ppb );
+		const TimePos loopMid = ( m_loopPos[0] + m_loopPos[1] ) / 2;
 
 		if( t < loopMid )
 		{
@@ -349,7 +349,7 @@ void TimeLineWidget::mousePressEvent( QMouseEvent* event )
 void TimeLineWidget::mouseMoveEvent( QMouseEvent* event )
 {
 	parentWidget()->update(); // essential for widgets that this timeline had taken their mouse move event from.
-	const MidiTime t = m_begin + static_cast<int>( qMax( event->x() - m_xOffset - m_moveXOff, 0 ) * MidiTime::ticksPerBar() / m_ppb );
+	const TimePos t = m_begin + static_cast<int>( qMax( event->x() - m_xOffset - m_moveXOff, 0 ) * TimePos::ticksPerBar() / m_ppb );
 
 	switch( m_action )
 	{
@@ -389,11 +389,11 @@ void TimeLineWidget::mouseMoveEvent( QMouseEvent* event )
 				// marking instead of pushing it.
 				if( m_action == MoveLoopBegin ) 
         {
-					m_loopPos[0] -= MidiTime::ticksPerBar();
+					m_loopPos[0] -= TimePos::ticksPerBar();
         }
 				else
         {
-					m_loopPos[1] += MidiTime::ticksPerBar();
+					m_loopPos[1] += TimePos::ticksPerBar();
         }
 			}
 			update();

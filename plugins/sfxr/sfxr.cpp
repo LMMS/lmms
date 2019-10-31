@@ -48,7 +48,7 @@ float frnd(float range)
 #include "ToolTip.h"
 #include "Song.h"
 #include "MidiEvent.h"
-#include "MidiTime.h"
+#include "TimePos.h"
 #include "Mixer.h"
 
 #include "embed.h"

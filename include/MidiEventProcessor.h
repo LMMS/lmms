@@ -26,7 +26,7 @@
 #define MIDI_EVENT_PROCESSOR_H
 
 #include "MidiEvent.h"
-#include "MidiTime.h"
+#include "TimePos.h"
 #include "MemoryManager.h"
 
 // all classes being able to process MIDI-events should inherit from this
@@ -43,8 +43,8 @@ public:
 	}
 
 	// to be implemented by inheriting classes
-	virtual void processInEvent( const MidiEvent& event, const MidiTime& time = MidiTime(), f_cnt_t offset = 0 ) = 0;
-	virtual void processOutEvent( const MidiEvent& event, const MidiTime& time = MidiTime(), f_cnt_t offset = 0 ) = 0;
+	virtual void processInEvent( const MidiEvent& event, const TimePos& time = TimePos(), f_cnt_t offset = 0 ) = 0;
+	virtual void processOutEvent( const MidiEvent& event, const TimePos& time = TimePos(), f_cnt_t offset = 0 ) = 0;
 
 } ;
 

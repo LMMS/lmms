@@ -120,7 +120,7 @@ void MidiPort::setMode( Mode mode )
 
 
 
-void MidiPort::processInEvent( const MidiEvent& event, const MidiTime& time )
+void MidiPort::processInEvent( const MidiEvent& event, const TimePos& time )
 {
 	// mask event
 	if( isInputEnabled() &&
@@ -149,7 +149,7 @@ void MidiPort::processInEvent( const MidiEvent& event, const MidiTime& time )
 
 
 
-void MidiPort::processOutEvent( const MidiEvent& event, const MidiTime& time )
+void MidiPort::processOutEvent( const MidiEvent& event, const TimePos& time )
 {
 	// mask event
 	if( isOutputEnabled() && realOutputChannel() == event.channel() )

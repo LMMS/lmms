@@ -42,7 +42,7 @@
 #include "Instrument.h"
 #include "GuiApplication.h"
 #include "MainWindow.h"
-#include "MidiTime.h"
+#include "TimePos.h"
 #include "debug.h"
 #include "Song.h"
 
@@ -159,7 +159,7 @@ public:
 	
 	AutomationTrack * at;
 	AutomationPattern * ap;
-	MidiTime lastPos;
+	TimePos lastPos;
 	
 	smfMidiCC & create( TrackContainer* tc, QString tn )
 	{
@@ -186,11 +186,11 @@ public:
 	}
 
 
-	smfMidiCC & putValue( MidiTime time, AutomatableModel * objModel, float value )
+	smfMidiCC & putValue( TimePos time, AutomatableModel * objModel, float value )
 	{
 		if( !ap || time > lastPos + DefaultTicksPerBar )
 		{
-			MidiTime pPos = MidiTime( time.getBar(), 0 );
+			TimePos pPos = TimePos( time.getBar(), 0 );
 			ap = dynamic_cast<AutomationPattern*>(
 				at->createTCO(0) );
 			ap->movePosition( pPos );
@@ -200,7 +200,7 @@ public:
 		lastPos = time;
 		time = time - ap->startPosition();
 		ap->putValue( time, value, false );
-		ap->changeLength( MidiTime( time.getBar() + 1, 0 ) ); 
+		ap->changeLength( TimePos( time.getBar() + 1, 0 ) ); 
 
 		return *this;
 	}
@@ -226,7 +226,7 @@ public:
 	Instrument * it_inst;
 	bool isSF2; 
 	bool hasNotes;
-	MidiTime lastEnd;
+	TimePos lastEnd;
 	QString trackName;
 	
 	smfMidiChannel * create( TrackContainer* tc, QString tn )
@@ -269,7 +269,7 @@ public:
 	{
 		if( !p || n.pos() > lastEnd + DefaultTicksPerBar )
 		{
-			MidiTime pPos = MidiTime( n.pos().getBar(), 0 );
+			TimePos pPos = TimePos( n.pos().getBar(), 0 );
 			p = dynamic_cast<Pattern*>( it->createTCO( 0 ) );
 			p->movePosition( pPos );
 		}

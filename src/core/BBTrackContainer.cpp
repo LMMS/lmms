@@ -53,7 +53,7 @@ BBTrackContainer::~BBTrackContainer()
 
 
 
-bool BBTrackContainer::play( MidiTime _start, fpp_t _frames,
+bool BBTrackContainer::play( TimePos _start, fpp_t _frames,
 								f_cnt_t _offset, int _tco_num )
 {
 	bool played_a_note = false;
@@ -62,7 +62,7 @@ bool BBTrackContainer::play( MidiTime _start, fpp_t _frames,
 		return false;
 	}
 
-	_start = _start % ( lengthOfBB( _tco_num ) * MidiTime::ticksPerBar() );
+	_start = _start % ( lengthOfBB( _tco_num ) * TimePos::ticksPerBar() );
 
 	TrackList tl = tracks();
 	for( TrackList::iterator it = tl.begin(); it != tl.end(); ++it )
@@ -92,7 +92,7 @@ void BBTrackContainer::updateAfterTrackAdd()
 
 bar_t BBTrackContainer::lengthOfBB( int _bb ) const
 {
-	MidiTime max_length = MidiTime::ticksPerBar();
+	TimePos max_length = TimePos::ticksPerBar();
 
 	const TrackList & tl = tracks();
 	for (Track* t : tl)
@@ -168,7 +168,7 @@ void BBTrackContainer::fixIncorrectPositions()
 	{
 		for( int i = 0; i < numOfBBs(); ++i )
 		{
-			( *it )->getTCO( i )->movePosition( MidiTime( i, 0 ) );
+			( *it )->getTCO( i )->movePosition( TimePos( i, 0 ) );
 		}
 	}
 }
@@ -242,18 +242,18 @@ void BBTrackContainer::createTCOsForBB( int _bb )
 	}
 }
 
-AutomatedValueMap BBTrackContainer::automatedValuesAt(MidiTime time, int tcoNum) const
+AutomatedValueMap BBTrackContainer::automatedValuesAt(TimePos time, int tcoNum) const
 {
 	Q_ASSERT(tcoNum >= 0);
 	Q_ASSERT(time.getTicks() >= 0);
 
 	auto length_bars = lengthOfBB(tcoNum);
-	auto length_ticks = length_bars * MidiTime::ticksPerBar();
+	auto length_ticks = length_bars * TimePos::ticksPerBar();
 	if (time > length_ticks)
 	{
 		time = length_ticks;
 	}
 
-	return TrackContainer::automatedValuesAt(time + (MidiTime::ticksPerBar() * tcoNum), tcoNum);
+	return TrackContainer::automatedValuesAt(time + (TimePos::ticksPerBar() * tcoNum), tcoNum);
 }
 

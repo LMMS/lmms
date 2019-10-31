@@ -49,7 +49,7 @@ public:
 	SampleTCO( Track * _track );
 	virtual ~SampleTCO();
 
-	virtual void changeLength( const MidiTime & _length );
+	virtual void changeLength( const TimePos & _length );
 	const QString & sampleFile() const;
 
 	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
@@ -64,7 +64,7 @@ public:
 		return m_sampleBuffer;
 	}
 
-	MidiTime sampleLength() const;
+	TimePos sampleLength() const;
 	void setSampleStartFrame( f_cnt_t startFrame );
 	void setSamplePlayLength( f_cnt_t length );
 	virtual TrackContentObjectView * createView( TrackView * _tv );
@@ -136,10 +136,10 @@ public:
 	SampleTrack( TrackContainer* tc );
 	virtual ~SampleTrack();
 
-	virtual bool play( const MidiTime & _start, const fpp_t _frames,
+	virtual bool play( const TimePos & _start, const fpp_t _frames,
 						const f_cnt_t _frame_base, int _tco_num = -1 );
 	virtual TrackView * createView( TrackContainerView* tcv );
-	virtual TrackContentObject * createTCO(const MidiTime & pos);
+	virtual TrackContentObject * createTCO(const TimePos & pos);
 
 
 	virtual void saveTrackSpecificSettings( QDomDocument & _doc,
