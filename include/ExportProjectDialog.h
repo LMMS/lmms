@@ -41,14 +41,14 @@ public:
 	ExportProjectDialog( const QString & _file_name, QWidget * _parent, bool multi_export );
 
 protected:
-	virtual void reject( void );
-	virtual void closeEvent( QCloseEvent * _ce );
+	void reject( void ) override;
+	void closeEvent( QCloseEvent * _ce ) override;
 
 
 private slots:
 	void startBtnClicked( void );
 	void updateTitleBar( int );
-	void accept();
+	void accept() override;
 	void startExport();
 
 	void onFileFormatChanged(int);

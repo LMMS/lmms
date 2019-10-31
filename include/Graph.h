@@ -87,19 +87,19 @@ public:
 signals:
 	void drawn();
 protected:
-	virtual void paintEvent( QPaintEvent * _pe );
-	virtual void dropEvent( QDropEvent * _de );
-	virtual void dragEnterEvent( QDragEnterEvent * _dee );
-	virtual void mousePressEvent( QMouseEvent * _me );
-	virtual void mouseMoveEvent( QMouseEvent * _me );
-	virtual void mouseReleaseEvent( QMouseEvent * _me );
+	void paintEvent( QPaintEvent * _pe ) override;
+	void dropEvent( QDropEvent * _de ) override;
+	void dragEnterEvent( QDragEnterEvent * _dee ) override;
+	void mousePressEvent( QMouseEvent * _me ) override;
+	void mouseMoveEvent( QMouseEvent * _me ) override;
+	void mouseReleaseEvent( QMouseEvent * _me ) override;
 
 protected slots:
 	void updateGraph( int _startPos, int _endPos );
 	void updateGraph();
 
 private:
-	virtual void modelChanged();
+	void modelChanged() override;
 
 	void changeSampleAt( int _x, int _y );
 	void drawLineAt( int _x, int _y, int _lastx );
