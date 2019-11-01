@@ -1991,7 +1991,7 @@ void TrackOperationsWidget::clearTrack()
  */
 void TrackOperationsWidget::removeTrack()
 {
-    if( warnRemoveTrack() )
+    if(confirmRemoval() )
     {
         emit trackRemovalScheduled( m_trackView );
     }
@@ -3046,15 +3046,13 @@ void TrackView::createTCOView( TrackContentObject * tco )
 
 
 /*! \brief Show a message box warning the user that this track is about to be closed */
-bool TrackOperationsWidget::warnRemoveTrack()
+bool TrackOperationsWidget::confirmRemoval()
 {
-    QString messageRemoveTrack = tr("After removing a track, it can not"
-                                    "be recovered. Are you sure you want to remove track \"");
-    messageRemoveTrack += m_trackView->getTrack()->name() + "\"?";
+    QString messageRemoveTrack = tr("After removing a track, it can not "
+                                    "be recovered. Are you sure you want to remove track \"%1\"?").arg(m_trackView->getTrack()->name());
     QString messageTitleRemoveTrack = tr("Removing this track");
 
     QMessageBox mb(this);
-
     mb.setText(messageRemoveTrack);
     mb.setWindowTitle(messageTitleRemoveTrack);
     mb.setIcon(QMessageBox::Warning);
