@@ -1948,6 +1948,10 @@ void PianoRoll::mouseDoubleClickEvent(QMouseEvent * me )
 			enterValue( &nv );
 		}
 	}
+	else
+	{
+		QWidget::mouseDoubleClickEvent(me);
+	}
 }
 
 
