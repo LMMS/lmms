@@ -438,7 +438,7 @@ public:
 protected:
 	virtual void mousePressEvent( QMouseEvent * me );
 	virtual void paintEvent( QPaintEvent * pe );
-    bool confirmRemoval();
+	bool confirmRemoval();
 
 private slots:
 	void cloneTrack();
