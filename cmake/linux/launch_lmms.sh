@@ -22,4 +22,4 @@ else
    echo "Jack does not appear to be installed.  That's OK, we'll use a dummy version instead."
    export LD_LIBRARY_PATH=$DIR/usr/lib/lmms/optional:$LD_LIBRARY_PATH
 fi
-QT_X11_NO_NATIVE_MENUBAR=1 $DIR/usr/bin/lmms.real "$@"
+QT_X11_NO_NATIVE_MENUBAR=1 "$DIR"/usr/bin/lmms.real "$@"
