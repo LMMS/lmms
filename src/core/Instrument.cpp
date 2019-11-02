@@ -82,6 +82,7 @@ bool Instrument::isFromTrack( const Track * _track ) const
 	return( m_instrumentTrack == _track );
 }
 
+// helper function for Instrument::applyFadeIn
 int count_zero_crossings(sampleFrame *buf,fpp_t start, fpp_t frames)
 {
 	// zero point crossing counts of all channels
@@ -110,9 +111,20 @@ int count_zero_crossings(sampleFrame *buf,fpp_t start, fpp_t frames)
 	return max_zc;
 }
 
+// helper function for Instrument::applyFadeIn
+fpp_t getFadeInLength(float max_length, fpp_t frames, int zero_crossings)
+{
+	// calculate the length of the fade in
+	// Length is inversely proportional to the max of zero_crossings,
+	// because for low frequencies, we need a longer fade in to
+	// prevent clicking.
+	return (fpp_t) (max_length  / ((float)zero_crossings / ((float)frames/128.0f) + 1.0f));
+}
+
 
 void Instrument::applyFadeIn(sampleFrame * buf, NotePlayHandle * n)
 {
+	const static float MAX_FADE_IN_LENGTH = 85.0;
 	f_cnt_t total = n->totalFramesPlayed();
 	if (total == 0)
 	{
@@ -123,11 +135,7 @@ void Instrument::applyFadeIn(sampleFrame * buf, NotePlayHandle * n)
 		// determining the fade in length. Hence 1
 		int max_zc = count_zero_crossings(buf, 1, frames);
 
-		// calculate the length of the fade in
-		// Length is inversely proportional to the max of zero_crossings,
-		// because for low frequencies, we need a longer fade in to
-		// prevent clicking.
-		fpp_t length = (fpp_t) (85.0  / ((float)max_zc / ((float)frames/128.0f) + 1.0f));
+		fpp_t length = getFadeInLength(MAX_FADE_IN_LENGTH,frames,max_zc);
 		n->m_fadeInLength = length;
 
 		// apply fade in
@@ -144,22 +152,23 @@ void Instrument::applyFadeIn(sampleFrame * buf, NotePlayHandle * n)
 	{
 		const fpp_t frames = n->framesLeftForCurrentPeriod();
 
-		int new_zc = count_zero_crossings(buf, 0, frames);
+		int new_zc = count_zero_crossings(buf, 1, frames);
+		fpp_t new_length = getFadeInLength(MAX_FADE_IN_LENGTH, frames, new_zc);
 
-		if(new_zc != 0)
-		{
-			n->m_fadeInLength = (fpp_t) ((float)n->m_fadeInLength * 0.875f);
-		}
-
-		fpp_t length = n->m_fadeInLength - total;
-
-		for (fpp_t f = 0; f < length; ++f)
+		for (fpp_t f = 0; f < frames; ++f)
 		{
 			for (ch_cnt_t ch = 0; ch < DEFAULT_CHANNELS; ++ch)
 			{
-				buf[f][ch] *= 0.5 - 0.5 * cosf(F_PI * (float) (total+f) / (float)n->m_fadeInLength);
+				float currentLength = n->m_fadeInLength*(1.0f-(float)f/frames) + new_length*((float)f/frames);
+				buf[f][ch] *= 0.5 - 0.5 * cosf(F_PI * (float) (total+f) / currentLength);
+				if(total+f >= currentLength)
+				{
+					n->m_fadeInLength = currentLength;
+					return;
+				}
 			}
 		}
+		n->m_fadeInLength = new_length;
 	}
 }
 
