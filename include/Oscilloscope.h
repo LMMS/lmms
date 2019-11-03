@@ -46,7 +46,7 @@ public:
 
 
 protected:
-	virtual void paintEvent( QPaintEvent * _pe );
+	virtual void paintEvent( QPaintEvent * );
 
 
 protected slots:

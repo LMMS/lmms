@@ -23,18 +23,15 @@
  */
 
 
-#include <QMouseEvent>
 #include <QPainter>
 
 #include "Oscilloscope.h"
 #include "GuiApplication.h"
-#include "gui_templates.h"
 #include "MainWindow.h"
 #include "Mixer.h"
 #include "Engine.h"
 #include "ToolTip.h"
 #include "Song.h"
-
 #include "BufferManager.h"
 
 
