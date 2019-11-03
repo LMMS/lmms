@@ -115,7 +115,7 @@ FxMixerView::FxMixerView() :
 			ChannelArea( QWidget * parent, FxMixerView * mv ) :
 				QScrollArea( parent ), m_mv( mv ) {}
 			~ChannelArea() {}
-			virtual void keyPressEvent( QKeyEvent * e )
+			void keyPressEvent( QKeyEvent * e ) override
 			{
 				m_mv->keyPressEvent( e );
 			}

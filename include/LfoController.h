@@ -49,18 +49,18 @@ public:
 
 	virtual ~LfoController();
 
-	virtual void saveSettings( QDomDocument & _doc, QDomElement & _this );
-	virtual void loadSettings( const QDomElement & _this );
-	virtual QString nodeName() const;
+	void saveSettings( QDomDocument & _doc, QDomElement & _this ) override;
+	void loadSettings( const QDomElement & _this ) override;
+	QString nodeName() const override;
 
 
 public slots:
-	virtual ControllerDialog * createDialog( QWidget * _parent );
+	ControllerDialog * createDialog( QWidget * _parent ) override;
 
 
 protected:
 	// The internal per-controller value updating function
-	virtual void updateValueBuffer();
+	void updateValueBuffer() override;
 
 	FloatModel m_baseModel;
 	TempoSyncKnobModel m_speedModel;
@@ -98,8 +98,8 @@ public:
 
 
 protected:
-	virtual void contextMenuEvent( QContextMenuEvent * _me );
-	virtual void modelChanged();
+	void contextMenuEvent( QContextMenuEvent * _me ) override;
+	void modelChanged() override;
 
 	LfoController * m_lfo;
 

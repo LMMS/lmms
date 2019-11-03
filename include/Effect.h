@@ -47,10 +47,10 @@ public:
 			const Descriptor::SubPluginFeatures::Key * _key );
 	virtual ~Effect();
 
-	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
-	virtual void loadSettings( const QDomElement & _this );
+	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
+	void loadSettings( const QDomElement & _this ) override;
 
-	inline virtual QString nodeName() const
+	inline QString nodeName() const override
 	{
 		return "effect";
 	}
@@ -170,7 +170,7 @@ protected:
 	*/
 	void checkGate( double _out_sum );
 
-	virtual PluginView * instantiateView( QWidget * );
+	PluginView * instantiateView( QWidget * ) override;
 
 	// some effects might not be capable of higher sample-rates so they can
 	// sample it down before processing and back after processing

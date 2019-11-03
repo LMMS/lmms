@@ -53,8 +53,8 @@ int TimeSig::denominator() const
 
 
 
-MidiTime::MidiTime( const tact_t tact, const tick_t ticks ) :
-	m_ticks( tact * s_ticksPerTact + ticks )
+MidiTime::MidiTime( const bar_t bar, const tick_t ticks ) :
+	m_ticks( bar * s_ticksPerBar + ticks )
 {
 }
 
@@ -66,7 +66,7 @@ MidiTime::MidiTime( const tick_t ticks ) :
 MidiTime MidiTime::quantize(float bars) const
 {
 	//The intervals we should snap to, our new position should be a factor of this
-	int interval = s_ticksPerTact * bars;
+	int interval = s_ticksPerBar * bars;
 	//The lower position we could snap to
 	int lowPos = m_ticks / interval;
 	//Offset from the lower position
@@ -78,9 +78,9 @@ MidiTime MidiTime::quantize(float bars) const
 }
 
 
-MidiTime MidiTime::toAbsoluteTact() const
+MidiTime MidiTime::toAbsoluteBar() const
 {
-	return getTact() * s_ticksPerTact;
+	return getBar() * s_ticksPerBar;
 }
 
 
@@ -98,15 +98,15 @@ MidiTime& MidiTime::operator-=( const MidiTime& time )
 }
 
 
-tact_t MidiTime::getTact() const
+bar_t MidiTime::getBar() const
 {
-	return m_ticks / s_ticksPerTact;
+	return m_ticks / s_ticksPerBar;
 }
 
 
-tact_t MidiTime::nextFullTact() const
+bar_t MidiTime::nextFullBar() const
 {
-	return (m_ticks + (s_ticksPerTact-1)) / s_ticksPerTact;
+	return ( m_ticks + ( s_ticksPerBar - 1 ) ) / s_ticksPerBar;
 }
 
 
@@ -131,23 +131,23 @@ MidiTime::operator int() const
 tick_t MidiTime::ticksPerBeat( const TimeSig &sig ) const
 {
 	// (number of ticks per bar) divided by (number of beats per bar)
-	return ticksPerTact(sig) / sig.numerator();
+	return ticksPerBar(sig) / sig.numerator();
 }
 
 
 tick_t MidiTime::getTickWithinBar( const TimeSig &sig ) const
 {
-	return m_ticks % ticksPerTact(sig);
+	return m_ticks % ticksPerBar( sig );
 }
 
 tick_t MidiTime::getBeatWithinBar( const TimeSig &sig ) const
 {
-	return getTickWithinBar(sig) / ticksPerBeat(sig);
+	return getTickWithinBar( sig ) / ticksPerBeat( sig );
 }
 
 tick_t MidiTime::getTickWithinBeat( const TimeSig &sig ) const
 {
-	return getTickWithinBar(sig) % ticksPerBeat(sig);
+	return getTickWithinBar( sig ) % ticksPerBeat( sig );
 }
 
 
@@ -160,9 +160,9 @@ f_cnt_t MidiTime::frames( const float framesPerTick ) const
 	return 0;
 }
 
-double MidiTime::getTimeInMilliseconds(bpm_t beatsPerMinute) const
+double MidiTime::getTimeInMilliseconds( bpm_t beatsPerMinute ) const
 {
-	return ticksToMilliseconds(getTicks(), beatsPerMinute);
+	return ticksToMilliseconds( getTicks(), beatsPerMinute );
 }
 
 MidiTime MidiTime::fromFrames( const f_cnt_t frames, const float framesPerTick )
@@ -171,39 +171,39 @@ MidiTime MidiTime::fromFrames( const f_cnt_t frames, const float framesPerTick )
 }
 
 
-tick_t MidiTime::ticksPerTact()
+tick_t MidiTime::ticksPerBar()
 {
-	return s_ticksPerTact;
+	return s_ticksPerBar;
 }
 
 
-tick_t MidiTime::ticksPerTact( const TimeSig &sig )
+tick_t MidiTime::ticksPerBar( const TimeSig &sig )
 {
-	return DefaultTicksPerTact * sig.numerator() / sig.denominator();
+	return DefaultTicksPerBar * sig.numerator() / sig.denominator();
 }
 
 
-int MidiTime::stepsPerTact()
+int MidiTime::stepsPerBar()
 {
-	int steps = ticksPerTact() / DefaultBeatsPerTact;
+	int steps = ticksPerBar() / DefaultBeatsPerBar;
 	return qMax( 1, steps );
 }
 
 
-void MidiTime::setTicksPerTact( tick_t tpt )
+void MidiTime::setTicksPerBar( tick_t tpb )
 {
-	s_ticksPerTact = tpt;
+	s_ticksPerBar = tpb;
 }
 
 
 MidiTime MidiTime::stepPosition( int step )
 {
-	return step * ticksPerTact() / stepsPerTact();
+	return step * ticksPerBar() / stepsPerBar();
 }
 
-double MidiTime::ticksToMilliseconds(tick_t ticks, bpm_t beatsPerMinute)
+double MidiTime::ticksToMilliseconds( tick_t ticks, bpm_t beatsPerMinute )
 {
-	return MidiTime::ticksToMilliseconds(static_cast<double>(ticks), beatsPerMinute);
+	return MidiTime::ticksToMilliseconds( static_cast<double>(ticks), beatsPerMinute );
 }
 
 double MidiTime::ticksToMilliseconds(double ticks, bpm_t beatsPerMinute)

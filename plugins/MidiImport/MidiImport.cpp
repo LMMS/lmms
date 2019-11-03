@@ -188,9 +188,9 @@ public:
 
 	smfMidiCC & putValue( MidiTime time, AutomatableModel * objModel, float value )
 	{
-		if( !ap || time > lastPos + DefaultTicksPerTact )
+		if( !ap || time > lastPos + DefaultTicksPerBar )
 		{
-			MidiTime pPos = MidiTime( time.getTact(), 0 );
+			MidiTime pPos = MidiTime( time.getBar(), 0 );
 			ap = dynamic_cast<AutomationPattern*>(
 				at->createTCO(0) );
 			ap->movePosition( pPos );
@@ -200,7 +200,7 @@ public:
 		lastPos = time;
 		time = time - ap->startPosition();
 		ap->putValue( time, value, false );
-		ap->changeLength( MidiTime( time.getTact() + 1, 0 ) ); 
+		ap->changeLength( MidiTime( time.getBar() + 1, 0 ) ); 
 
 		return *this;
 	}
@@ -267,9 +267,9 @@ public:
 
 	void addNote( Note & n )
 	{
-		if( !p || n.pos() > lastEnd + DefaultTicksPerTact )
+		if( !p || n.pos() > lastEnd + DefaultTicksPerBar )
 		{
-			MidiTime pPos = MidiTime( n.pos().getTact(), 0 );
+			MidiTime pPos = MidiTime( n.pos().getBar(), 0 );
 			p = dynamic_cast<Pattern*>( it->createTCO( 0 ) );
 			p->movePosition( pPos );
 		}
@@ -325,8 +325,8 @@ bool MidiImport::readSMF( TrackContainer* tc )
 	timeSigDenominatorPat->addObject(&timeSigMM.denominatorModel());
 	
 	// TODO: adjust these to Time.Sig changes
-	double beatsPerTact = 4; 
-	double ticksPerBeat = DefaultTicksPerTact / beatsPerTact;
+	double beatsPerBar = 4; 
+	double ticksPerBeat = DefaultTicksPerBar / beatsPerBar;
 
 	// Time-sig changes
 	Alg_time_sigs * timeSigs = &seq->time_sig;
