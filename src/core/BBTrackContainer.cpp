@@ -62,7 +62,7 @@ bool BBTrackContainer::play( MidiTime _start, fpp_t _frames,
 		return false;
 	}
 
-	_start = _start % ( lengthOfBB( _tco_num ) * MidiTime::ticksPerTact() );
+	_start = _start % ( lengthOfBB( _tco_num ) * MidiTime::ticksPerBar() );
 
 	TrackList tl = tracks();
 	for( TrackList::iterator it = tl.begin(); it != tl.end(); ++it )
@@ -90,9 +90,9 @@ void BBTrackContainer::updateAfterTrackAdd()
 
 
 
-tact_t BBTrackContainer::lengthOfBB( int _bb ) const
+bar_t BBTrackContainer::lengthOfBB( int _bb ) const
 {
-	MidiTime max_length = MidiTime::ticksPerTact();
+	MidiTime max_length = MidiTime::ticksPerBar();
 
 	const TrackList & tl = tracks();
 	for (Track* t : tl)
@@ -104,7 +104,7 @@ tact_t BBTrackContainer::lengthOfBB( int _bb ) const
 		}
 	}
 
-	return max_length.nextFullTact();
+	return max_length.nextFullBar();
 }
 
 
@@ -124,7 +124,7 @@ void BBTrackContainer::removeBB( int _bb )
 	for( TrackList::iterator it = tl.begin(); it != tl.end(); ++it )
 	{
 		delete ( *it )->getTCO( _bb );
-		( *it )->removeTact( _bb * DefaultTicksPerTact );
+		( *it )->removeBar( _bb * DefaultTicksPerBar );
 	}
 	if( _bb <= currentBB() )
 	{
@@ -151,7 +151,7 @@ void BBTrackContainer::swapBB( int _bb1, int _bb2 )
 void BBTrackContainer::updateBBTrack( TrackContentObject * _tco )
 {
 	BBTrack * t = BBTrack::findBBTrack( _tco->startPosition() /
-							DefaultTicksPerTact );
+							DefaultTicksPerBar );
 	if( t != NULL )
 	{
 		t->dataChanged();
@@ -247,16 +247,13 @@ AutomatedValueMap BBTrackContainer::automatedValuesAt(MidiTime time, int tcoNum)
 	Q_ASSERT(tcoNum >= 0);
 	Q_ASSERT(time.getTicks() >= 0);
 
-	auto length_tacts = lengthOfBB(tcoNum);
-	auto length_ticks = length_tacts * MidiTime::ticksPerTact();
-	if (time > length_ticks) {
+	auto length_bars = lengthOfBB(tcoNum);
+	auto length_ticks = length_bars * MidiTime::ticksPerBar();
+	if (time > length_ticks)
+	{
 		time = length_ticks;
 	}
 
-	return TrackContainer::automatedValuesAt(time + (MidiTime::ticksPerTact() * tcoNum), tcoNum);
+	return TrackContainer::automatedValuesAt(time + (MidiTime::ticksPerBar() * tcoNum), tcoNum);
 }
-
-
-
-
 

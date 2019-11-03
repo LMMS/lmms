@@ -255,7 +255,7 @@ public:
 				specified DOM element using <name> as attribute/node name */
 	virtual void loadSettings( const QDomElement& element, const QString& name );
 
-	virtual QString nodeName() const
+	QString nodeName() const override
 	{
 		return "automatablemodel";
 	}
@@ -337,12 +337,12 @@ private:
 
 	static bool mustQuoteName(const QString &name);
 
-	virtual void saveSettings( QDomDocument& doc, QDomElement& element )
+	void saveSettings( QDomDocument& doc, QDomElement& element ) override
 	{
 		saveSettings( doc, element, "value" );
 	}
 
-	virtual void loadSettings( const QDomElement& element )
+	void loadSettings( const QDomElement& element ) override
 	{
 		loadSettings( element, "value" );
 	}

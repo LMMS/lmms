@@ -72,13 +72,13 @@ public:
 	void setTabBorder( const QColor & c );
 
 protected:
-	virtual bool event( QEvent * event );
-	virtual void mousePressEvent( QMouseEvent * _me );
-	virtual void paintEvent( QPaintEvent * _pe );
-	virtual void resizeEvent( QResizeEvent * _re );
-	virtual void wheelEvent( QWheelEvent * _we );
-	virtual QSize minimumSizeHint() const;
-	virtual QSize sizeHint() const;
+	bool event( QEvent * event ) override;
+	void mousePressEvent( QMouseEvent * _me ) override;
+	void paintEvent( QPaintEvent * _pe ) override;
+	void resizeEvent( QResizeEvent * _re ) override;
+	void wheelEvent( QWheelEvent * _we ) override;
+	QSize minimumSizeHint() const override;
+	QSize sizeHint() const override;
 
 private:
 	struct widgetDesc

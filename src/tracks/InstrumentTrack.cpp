@@ -652,8 +652,11 @@ bool InstrumentTrack::play( const MidiTime & _start, const fpp_t _frames,
 	for( tcoVector::Iterator it = tcos.begin(); it != tcos.end(); ++it )
 	{
 		Pattern* p = dynamic_cast<Pattern*>( *it );
-		// everything which is not a pattern or muted won't be played
-		if( p == NULL || ( *it )->isMuted() )
+		// everything which is not a pattern won't be played
+		// A pattern playing in the Piano Roll window will always play
+		if(p == NULL ||
+			(Engine::getSong()->playMode() != Song::Mode_PlayPattern
+			&& (*it)->isMuted()))
 		{
 			continue;
 		}
@@ -674,7 +677,7 @@ bool InstrumentTrack::play( const MidiTime & _start, const fpp_t _frames,
 
 		if( cur_start > 0 )
 		{
-			// skip notes which are posated before start-tact
+			// skip notes which are posated before start-bar
 			while( nit != notes.end() && ( *nit )->pos() < cur_start )
 			{
 				++nit;
@@ -1236,6 +1239,7 @@ void InstrumentTrackView::muteChanged()
 
 
 
+//FIXME: This is identical to SampleTrackView::createFxMenu
 QMenu * InstrumentTrackView::createFxMenu(QString title, QString newFxLabel)
 {
 	int channelIndex = model()->effectChannelModel()->value();
@@ -1250,8 +1254,6 @@ QMenu * InstrumentTrackView::createFxMenu(QString title, QString newFxLabel)
 
 	QMenu *fxMenu = new QMenu( title );
 
-	QSignalMapper * fxMenuSignalMapper = new QSignalMapper(fxMenu);
-
 	fxMenu->addAction( newFxLabel, this, SLOT( createFxLine() ) );
 	fxMenu->addSeparator();
 
@@ -1261,13 +1263,13 @@ QMenu * InstrumentTrackView::createFxMenu(QString title, QString newFxLabel)
 
 		if ( currentChannel != fxChannel )
 		{
+			auto index = currentChannel->m_channelIndex;
 			QString label = tr( "FX %1: %2" ).arg( currentChannel->m_channelIndex ).arg( currentChannel->m_name );
-			QAction * action = fxMenu->addAction( label, fxMenuSignalMapper, SLOT( map() ) );
-			fxMenuSignalMapper->setMapping(action, currentChannel->m_channelIndex);
+			fxMenu->addAction(label, [this, index](){
+				assignFxLine(index);
+			});
 		}
 	}
-
-	connect(fxMenuSignalMapper, SIGNAL(mapped(int)), this, SLOT(assignFxLine(int)));
 
 	return fxMenu;
 }

@@ -86,7 +86,7 @@ signals:
 
 
 private:
-	virtual void run();
+	void run() override;
 
 	AudioFileDevice * m_fileDev;
 	Mixer::qualitySettings m_qualitySettings;
