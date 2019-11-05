@@ -35,10 +35,10 @@
  */
 float maximum(const float *abs_spectrum, unsigned int spec_size)
 {
-	float maxi = 0;
-
 	if (abs_spectrum == NULL) {return -1;}
 	if (spec_size == 0) {return -1;}
+
+	float maxi = 0;
 
 	for (unsigned int i = 0; i < spec_size; i++)
 	{
@@ -99,13 +99,13 @@ int notEmpty(const std::vector<float> &spectrum)
  */
 int precomputeWindow(float *window, unsigned int length, FFT_WINDOWS type, bool normalized)
 {
+	if (window == NULL) {return -1;}
+
 	float gain = 0;
 	float a0;
 	float a1;
 	float a2;
 	float a3;
-
-	if (window == NULL) {return -1;}
 
 	// constants taken from
 	// https://en.wikipedia.org/wiki/Window_function#AList_of_window_functions
@@ -215,11 +215,11 @@ int compressbands(const float *absspec_buffer, float *compressedband, int num_ol
 
 int calc13octaveband31(float *absspec_buffer, float *subbands, int num_spec, float max_frequency)
 {
-	static const int onethirdoctavecenterfr[] = {20, 25, 31, 40, 50, 63, 80, 100, 125, 160, 200, 250, 315, 400, 500, 630, 800, 1000, 1250, 1600, 2000, 2500, 3150, 4000, 5000, 6300, 8000, 10000, 12500, 16000, 20000};
-
 	if (absspec_buffer == NULL || subbands == NULL) {return -1;}
 	if (num_spec < 31) {return -1;}
 	if (max_frequency <= 0) {return -1;}
+
+	static const int onethirdoctavecenterfr[] = {20, 25, 31, 40, 50, 63, 80, 100, 125, 160, 200, 250, 315, 400, 500, 630, 800, 1000, 1250, 1600, 2000, 2500, 3150, 4000, 5000, 6300, 8000, 10000, 12500, 16000, 20000};
 
 	/*** energy ***/
 	for (int i = 0; i < num_spec; i++)
