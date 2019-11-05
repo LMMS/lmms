@@ -39,7 +39,7 @@ float maximum(const float *abs_spectrum, unsigned int spec_size)
 	unsigned int i;
 
 	if (abs_spectrum == NULL) {return -1;}
-	if (spec_size <= 0) {return -1;}
+	if (spec_size == 0) {return -1;}
 
 	for (i = 0; i < spec_size; i++)
 	{
@@ -168,7 +168,7 @@ int absspec(const fftwf_complex *complex_buffer, float *absspec_buffer, unsigned
 	int i;
 
 	if (complex_buffer == NULL || absspec_buffer == NULL) {return -1;}
-	if (compl_length <= 0) {return -1;}
+	if (compl_length == 0) {return -1;}
 
 	for (i = 0; i < compl_length; i++)
 	{
