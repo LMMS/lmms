@@ -230,20 +230,16 @@ int calc13octaveband31(float *absspec_buffer, float *subbands, int num_spec, flo
 	int i, j;
 	float f_min, f_max, frequency, bandwidth;
 	int j_min, j_max = 0;
-	float fpower;
 
 	if (absspec_buffer == NULL || subbands == NULL) {return -1;}
 	if (num_spec < 31) {return -1;}
 	if (max_frequency <= 0) {return -1;}
 
 	/*** energy ***/
-	fpower = 0;
 	for (i = 0; i < num_spec; i++)
 	{
 		absspec_buffer[i] = (absspec_buffer[i] * absspec_buffer[i]) / FFT_BUFFER_SIZE;
-		fpower = fpower + (2 * absspec_buffer[i]);
 	}
-	fpower = fpower - (absspec_buffer[0]); //dc not mirrored
 
 	/*** for each subband: sum up power ***/
 	for (i = 0; i < 31; i++)
