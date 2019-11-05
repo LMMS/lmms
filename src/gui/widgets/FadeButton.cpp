@@ -100,6 +100,16 @@ void FadeButton::noteEnd()
 
 
 
+void FadeButton::notPlaying()
+{
+	activeNotes = 0;
+	m_releaseTimer.restart();
+	signalUpdate();
+}
+
+
+
+
 void FadeButton::customEvent(QEvent *)
 {
 	update();
