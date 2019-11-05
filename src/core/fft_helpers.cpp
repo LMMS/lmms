@@ -63,7 +63,7 @@ int normalize(const float *abs_spectrum, float *norm_spectrum, unsigned int bin_
 	if (abs_spectrum == NULL || norm_spectrum == NULL) {return -1;}
 	if (bin_count == 0 || block_size == 0) {return -1;}
 
-	for (int i = 0; i < bin_count; i++)
+	for (unsigned int i = 0; i < bin_count; i++)
 	{
 		norm_spectrum[i] = abs_spectrum[i] / block_size;
 	}
@@ -85,7 +85,7 @@ int normalize(const std::vector<float> &abs_spectrum, std::vector<float> &norm_s
  */
 int notEmpty(const std::vector<float> &spectrum)
 {
-	for (int i = 0; i < spectrum.size(); i++)
+	for (std::vector<float>::size_type i = 0; i < spectrum.size(); i++)
 	{
 		if (spectrum[i] != 0) {return 1;}
 	}
@@ -164,7 +164,7 @@ int absspec(const fftwf_complex *complex_buffer, float *absspec_buffer, unsigned
 	if (complex_buffer == NULL || absspec_buffer == NULL) {return -1;}
 	if (compl_length == 0) {return -1;}
 
-	for (int i = 0; i < compl_length; i++)
+	for (unsigned int i = 0; i < compl_length; i++)
 	{
 		absspec_buffer[i] = (float)sqrt(complex_buffer[i][0] * complex_buffer[i][0]
 							+ complex_buffer[i][1] * complex_buffer[i][1]);
