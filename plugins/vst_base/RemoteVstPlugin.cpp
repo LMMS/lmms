@@ -1072,7 +1072,7 @@ void RemoteVstPlugin::getParameterDump()
 
 	for( int i = 0; i < m_plugin->numParams; ++i )
 	{
-		char paramName[65];
+		char paramName[256];
 		memset( paramName, 0, sizeof( paramName ) );
 		pluginDispatch( effGetParamName, i, 0, paramName );
 		paramName[sizeof(paramName)-1] = 0;
