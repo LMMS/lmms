@@ -46,7 +46,7 @@ class DiginstrumentPlugin : public Instrument {
     friend class DiginstrumentView;
     /*TMP*/
     Diginstrument::Synthesizer synth;
-    Diginstrument::Interpolator inst;
+    Diginstrument::Interpolator<Diginstrument::NoteSpectrum> inst;
     
   private slots:
     void sampleRateChanged();

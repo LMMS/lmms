@@ -6,7 +6,7 @@ unsigned int Diginstrument::Synthesizer::sampleRate = DEFAULT_SAMPLE_RATE;
 std::vector<float> Diginstrument::Synthesizer::sinetable(0);
 
 std::vector<float> Diginstrument::Synthesizer::playNote(const std::vector<std::pair<float, float>> components, const unsigned int frames, const unsigned int offset){
-    std::vector<float> res(frames);
+    std::vector<float> res(frames, 0);
     const unsigned int tableSize = sinetable.size();
     for(auto component : components){
         const unsigned int step = component.first * (tableSize / (float)sampleRate);
@@ -15,6 +15,10 @@ std::vector<float> Diginstrument::Synthesizer::playNote(const std::vector<std::p
             res[i] += sinetable[pos] * component.second;
             pos = (int)round((pos + step)) % tableSize;
         }
+    }
+    //TODO: do i actually need this? why does the waveform look the same?
+    for(auto e : res){
+        e=e/(float)components.size();
     }
     return res;
 }
