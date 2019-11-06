@@ -30,7 +30,6 @@
 
 #include "embed.h"
 #include "FadeButton.h"
-#include "update_event.h"
 
 
 const float FadeDuration = 300;
