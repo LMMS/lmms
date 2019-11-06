@@ -23,6 +23,7 @@
  */
  
 
+#include <QtCore/QEvent>
 #include <QTimer>
 #include <QApplication>
 #include <QPainter>
@@ -169,5 +170,5 @@ QColor FadeButton::fadeToColor(QColor startCol, QColor endCol, QTime timer, floa
 
 void FadeButton::signalUpdate()
 {
-	QApplication::postEvent(this, new updateEvent());
+	QApplication::postEvent(this, new QEvent(QEvent::User));
 }
