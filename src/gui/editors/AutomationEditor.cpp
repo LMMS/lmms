@@ -88,6 +88,7 @@ AutomationEditor::AutomationEditor() :
 	m_topLevel( 0 ),
 	m_currentPosition(),
 	m_action( NONE ),
+	m_pointYLevel(0),
 	m_moveStartLevel( 0 ),
 	m_moveStartTick( 0 ),
 	m_drawLastLevel( 0.0f ),
@@ -732,6 +733,7 @@ void AutomationEditor::mouseMoveEvent(QMouseEvent * mouseEvent )
 	if( mouseEvent->y() > TOP_MARGIN )
 	{
 		float level = getLevel( mouseEvent->y() );
+		float maxLvlFraction = m_pattern->firstObject()->maxValue<float>() * 0.05;
 		int x = mouseEvent->x();
 
 		x -= VALUES_WIDTH;
@@ -783,7 +785,7 @@ void AutomationEditor::mouseMoveEvent(QMouseEvent * mouseEvent )
 			removePoints( m_drawLastTick, pos_ticks );
 			Engine::getSong()->setModified();
 		}
-		else if( mouseEvent->buttons() & Qt::NoButton && m_editMode == DRAW )
+		if (m_editMode == DRAW)
 		{
 			// set move- or resize-cursor
 
@@ -797,10 +799,11 @@ void AutomationEditor::mouseMoveEvent(QMouseEvent * mouseEvent )
 			{
 				// and check whether the cursor is over an
 				// existing value
-				if( pos_ticks >= it.key() &&
-					( it+1==time_map.end() ||
-						pos_ticks <= (it+1).key() ) &&
-							level <= it.value() )
+				if ((it + 1 == time_map.end() || pos_ticks <= (it + 1).key())
+					&& pos_ticks >= (it.key() - MidiTime::ticksPerBar() * 12 / m_ppb)
+					&& pos_ticks <= (it.key() + MidiTime::ticksPerBar() * 12 / m_ppb)
+					&& level > (it.value() - maxLvlFraction)
+					&& level < (it.value() + maxLvlFraction))
 				{
 					break;
 				}
@@ -838,6 +841,8 @@ void AutomationEditor::mouseMoveEvent(QMouseEvent * mouseEvent )
 				{
 					QApplication::restoreOverrideCursor();
 				}
+				// sets drawCross tooltip back to mouse y position
+				if (it == time_map.end()) { m_pointYLevel = 0; }
 			}
 		}
 		else if( mouseEvent->buttons() & Qt::LeftButton &&
@@ -1105,7 +1110,14 @@ inline void AutomationEditor::drawCross( QPainter & p )
 		mouse_pos.y() >= 0 &&
 		mouse_pos.y() <= height() - SCROLLBAR_SIZE )
 	{
-		QToolTip::showText( tt_pos, QString::number( scaledLevel ), this );
+		if (m_pointYLevel == 0)
+		{
+			QToolTip::showText(tt_pos, QString::number(scaledLevel), this);
+		}
+		else if (m_pointYLevel != 0)
+		{
+			QToolTip::showText(tt_pos, QString::number(m_pointYLevel), this);
+		}
 	}
 }
 
@@ -1709,6 +1721,51 @@ void AutomationEditor::wheelEvent(QWheelEvent * we )
 	{
 		m_topBottomScroll->setValue( m_topBottomScroll->value() -
 							we->delta() / 30 );
+	}
+}
+
+
+
+
+void AutomationEditor::mouseDoubleClickEvent(QMouseEvent * mouseEvent)
+{
+	int x = mouseEvent->x();
+
+	if (x >= VALUES_WIDTH)
+	{
+		x -= VALUES_WIDTH;
+		float mouseLevel = getLevel(mouseEvent->y());
+		float maxLvlFraction = m_pattern->firstObject()->maxValue<float>() * 0.05;
+		int pos_ticks = x * MidiTime::ticksPerBar() / m_ppb + m_currentPosition;
+		timeMap & time_map = m_pattern->getTimeMap();
+		timeMap::iterator it = time_map.begin();
+
+		while (it != time_map.end())
+		{
+			// and check whether the cursor is over an
+			// existing value
+			if ((it+1==time_map.end() || pos_ticks <= (it+1).key())
+				&& (pos_ticks >= it.key() - MidiTime::ticksPerBar() * 12 / m_ppb)
+				&& (pos_ticks<= it.key() + MidiTime::ticksPerBar() * 12 / m_ppb)
+				&& (mouseLevel > it.value() - maxLvlFraction)
+				&& (mouseLevel < it.value() + maxLvlFraction))
+			{
+				// end of map or the cursor is on a point
+				break;
+			}
+			it++;
+		}
+
+		bool ok;
+		double d = QInputDialog::getDouble(this, tr("Edit Point"),
+	  	tr("New Y Value:"), m_pointYLevel, 0, m_pattern->firstObject()->maxValue<float>(), 3, &ok);
+
+		if (ok)
+		{
+			// move point to new position
+			m_pattern->setDragValue(MidiTime(pos_ticks), d, true, false);
+			m_pattern->applyDragValue();
+		}
 	}
 }
 

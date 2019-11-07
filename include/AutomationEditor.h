@@ -122,6 +122,7 @@ protected:
 	void paintEvent(QPaintEvent * pe) override;
 	void resizeEvent(QResizeEvent * re) override;
 	void wheelEvent(QWheelEvent * we) override;
+	void mouseDoubleClickEvent(QMouseEvent * mouseEvent) override;
 
 	float getLevel( int y );
 	int xCoordOfTick( int tick );
@@ -217,6 +218,8 @@ private:
 	MidiTime m_currentPosition;
 
 	Actions m_action;
+
+	float m_pointYLevel;
 
 	tick_t m_selectStartTick;
 	tick_t m_selectedTick;
