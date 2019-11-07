@@ -24,7 +24,6 @@ namespace PathUtil
 	QString LMMS_EXPORT relativeOrAbsolute(const QString & input, const Base & base);
 	QString LMMS_EXPORT toShortestRelative(const QString & input);
 
-	// QString LMMS_EXPORT toPreferredRelative(QString, std::vector<Base>);
 }
 
 #endif
