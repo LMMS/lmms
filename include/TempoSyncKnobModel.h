@@ -52,7 +52,7 @@ public:
 				const float _max, const float _step,
 				const float _scale, Model * _parent,
 				const QString & _display_name = QString() );
-	virtual ~TempoSyncKnobModel() override;
+	~TempoSyncKnobModel() override;
 
 	void saveSettings( QDomDocument & _doc, QDomElement & _this, const QString& name ) override;
 	void loadSettings( const QDomElement & _this, const QString& name ) override;

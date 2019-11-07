@@ -64,7 +64,7 @@ public:
 	Q_PROPERTY( QString text READ text WRITE setText )
 
 protected:
-	virtual void paintEvent( QPaintEvent * _pe );
+	void paintEvent( QPaintEvent * _pe ) override;
 
 
 private:

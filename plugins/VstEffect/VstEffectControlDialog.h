@@ -49,8 +49,8 @@ public:
 	virtual ~VstEffectControlDialog();
 
 protected:
-	virtual void paintEvent( QPaintEvent * _pe );
-	virtual void showEvent( QShowEvent* _se ) override;
+	void paintEvent( QPaintEvent * _pe ) override;
+	void showEvent( QShowEvent* _se ) override;
 
 private:
 	QWidget * m_pluginWidget;

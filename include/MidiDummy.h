@@ -56,7 +56,7 @@ public:
 
 
 protected:
-	virtual void sendByte( const unsigned char )
+	void sendByte( const unsigned char ) override
 	{
 	}
 

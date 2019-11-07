@@ -42,12 +42,12 @@ class bSynth
 {
 	MM_OPERATORS
 public:
-	bSynth( float * sample, int length, NotePlayHandle * _nph,
+	bSynth( float * sample, NotePlayHandle * _nph,
 			bool _interpolation, float factor, 
 			const sample_rate_t _sample_rate );
 	virtual ~bSynth();
 	
-	sample_t nextStringSample();
+	sample_t nextStringSample( float sample_length );
 
 
 private:
@@ -55,7 +55,6 @@ private:
 	float sample_realindex;
 	float* sample_shape;
 	NotePlayHandle* nph;
-	const int sample_length;
 	const sample_rate_t sample_rate;
 
 	bool interpolation;

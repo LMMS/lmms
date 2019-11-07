@@ -27,7 +27,6 @@
 #define PANNING_H
 
 #include "lmms_basics.h"
-#include "volume.h"
 #include "panning_constants.h"
 #include "Midi.h"
 

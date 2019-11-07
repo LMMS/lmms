@@ -40,7 +40,7 @@ public:
 	MeterDialog( QWidget * _parent, bool _simple = false );
 	virtual ~MeterDialog();
 
-	virtual void modelChanged();
+	void modelChanged() override;
 
 
 private:
