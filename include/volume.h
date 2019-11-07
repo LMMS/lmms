@@ -26,10 +26,7 @@
 #ifndef VOLUME_H
 #define VOLUME_H
 
-#include "lmmsconfig.h"
-
 #include "lmms_basics.h"
-#include "Midi.h"
 
 const volume_t MinVolume = 0;
 const volume_t MaxVolume = 200;
