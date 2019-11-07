@@ -218,6 +218,8 @@ private:
 
 	Actions m_action;
 
+	float m_pointYLevel;
+
 	tick_t m_selectStartTick;
 	tick_t m_selectedTick;
 	float m_selectStartLevel;
