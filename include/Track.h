@@ -39,6 +39,7 @@
 #include "AutomatableModel.h"
 #include "ModelView.h"
 #include "DataFile.h"
+#include "FadeButton.h"
 
 
 class QMenu;
@@ -737,12 +738,17 @@ private:
 
 	Actions m_action;
 
+	virtual FadeButton * getActivityIndicator()
+	{
+		return NULL;
+	}
 
 	friend class TrackLabelButton;
 
 
 private slots:
 	void createTCOView( TrackContentObject * tco );
+	void muteChanged ();
 
 } ;
 

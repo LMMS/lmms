@@ -333,7 +333,6 @@ private slots:
 	void midiInSelected();
 	void midiOutSelected();
 	void midiConfigChanged();
-	void muteChanged();
 
 	void assignFxLine( int channelIndex );
 	void createFxLine();
@@ -357,6 +356,10 @@ private:
 
 	QPoint m_lastPos;
 
+	FadeButton * getActivityIndicator()
+	{
+		return m_activityIndicator;
+	}
 
 	friend class InstrumentTrackWindow;
 
