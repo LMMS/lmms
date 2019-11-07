@@ -25,6 +25,7 @@
 #ifndef LOCKLESSRINGBUFFER_H
 #define LOCKLESSRINGBUFFER_H
 
+#include "lmms_export.h"
 #include "../src/3rdparty/ringbuffer/include/ringbuffer/ringbuffer.h"
 #include "lmms_basics.h"
 #include <QWaitCondition>
