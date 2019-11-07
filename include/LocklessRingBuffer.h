@@ -37,19 +37,19 @@ class LMMS_EXPORT LocklessRingBuffer
 	template<class _T>
 	friend class LocklessRingBufferReader;
 public:
-	LMMS_EXPORT LocklessRingBuffer(std::size_t sz) : m_buffer(sz) {};
-	LMMS_EXPORT ~LocklessRingBuffer() {};
+	LocklessRingBuffer(std::size_t sz) : m_buffer(sz) {};
+	~LocklessRingBuffer() {};
 
-	std::size_t LMMS_EXPORT write(const sampleFrame *src, size_t cnt)
+	std::size_t write(const sampleFrame *src, size_t cnt)
 	{
 		std::size_t written = m_buffer.write(src, cnt);
 		m_notifier.wakeAll();	// Let all waiting readers know new data are available.
 		return written;
 	}
 
-	std::size_t LMMS_EXPORT capacity() {return m_buffer.maximum_eventual_write_space();}
-	std::size_t LMMS_EXPORT free() {return m_buffer.write_space();}
-	void LMMS_EXPORT wakeAll() {m_notifier.wakeAll();}
+	std::size_t capacity() {return m_buffer.maximum_eventual_write_space();}
+	std::size_t free() {return m_buffer.write_space();}
+	void wakeAll() {m_notifier.wakeAll();}
 
 private:
 	ringbuffer_t<T> m_buffer;
@@ -82,10 +82,10 @@ class LMMS_EXPORT LocklessRingBuffer<sampleFrame>
 	template<class _T>
 	friend class LocklessRingBufferReader;
 public:
-	LMMS_EXPORT LocklessRingBuffer(std::size_t sz) : m_buffer(sz) {};
-	LMMS_EXPORT ~LocklessRingBuffer() {};
+	LocklessRingBuffer(std::size_t sz) : m_buffer(sz) {};
+	~LocklessRingBuffer() {};
 
-	std::size_t LMMS_EXPORT write(const sampleFrame *src, size_t cnt)
+	std::size_t write(const sampleFrame *src, size_t cnt)
 	{
         sampleFrame_copier copier(src);
         std::size_t written = m_buffer.write_func<sampleFrame_copier>(copier, cnt);
@@ -94,9 +94,9 @@ public:
 		return written;
 	}
 
-	std::size_t LMMS_EXPORT capacity() {return m_buffer.maximum_eventual_write_space();}
-	std::size_t LMMS_EXPORT free() {return m_buffer.write_space();}
-	void LMMS_EXPORT wakeAll() {m_notifier.wakeAll();}
+	std::size_t capacity() {return m_buffer.maximum_eventual_write_space();}
+	std::size_t free() {return m_buffer.write_space();}
+	void wakeAll() {m_notifier.wakeAll();}
 
 private:
 	ringbuffer_t<sampleFrame> m_buffer;
@@ -109,13 +109,13 @@ template <class T>
 class LMMS_EXPORT LocklessRingBufferReader : public ringbuffer_reader_t<T>
 {
 public:
-	LMMS_EXPORT LocklessRingBufferReader(LocklessRingBuffer<T> &rb) :
+	LocklessRingBufferReader(LocklessRingBuffer<T> &rb) :
 		ringbuffer_reader_t<T>(rb.m_buffer),
 		m_notifier(&rb.m_notifier) {};
 
-	bool LMMS_EXPORT empty() {return !this->read_space();}
+	bool empty() {return !this->read_space();}
 
-	void LMMS_EXPORT waitForData()
+	void waitForData()
 	{
 		QMutex useless_lock;
 		m_notifier->wait(&useless_lock);
