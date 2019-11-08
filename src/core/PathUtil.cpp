@@ -85,6 +85,7 @@ namespace PathUtil
 
 	QString oldRelativeUpgrade(QString input)
 	{
+		if (input.isEmpty()) { return input; }
 		QString factory = baseLocation(FactorySampleBase) + input;
 		QFileInfo factoryInfo(factory);
 		//If we can't find a factory sample, it's probably a user sample
@@ -109,6 +110,7 @@ namespace PathUtil
 
 	QString relativeOrAbsolute(QString input, Base base)
 	{
+		if (input.isEmpty()) { return input; }
 		QString absolutePath = toAbsolute(input);
 		QString relativePath = baseQDir(base).relativeFilePath(absolutePath);
 		return relativePath.startsWith("..") ? absolutePath : relativePath;

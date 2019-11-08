@@ -56,6 +56,13 @@ private slots:
 		//Test weird but valid paths
 		QCOMPARE(PathUtil::toShortestRelative(fuzPath), relPath);
 		QCOMPARE(PathUtil::toAbsolute(fuzPath), absPath);
+
+		//Empty paths should stay empty
+		QString empty = QString("");
+		QCOMPARE(PathUtil::stripPrefix(""), empty);
+		QCOMPARE(PathUtil::cleanName(""), empty);
+		QCOMPARE(PathUtil::toAbsolute(""), empty);
+		QCOMPARE(PathUtil::toShortestRelative(""), empty);
 	}
 } RelativePathTests;
 
