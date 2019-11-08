@@ -240,6 +240,10 @@ private:
 
 	TrackLabelButton * m_tlb;
 
+	FadeButton * getActivityIndicator()
+	{
+		return m_activityIndicator;
+	}
 
 	friend class SampleTrackWindow;
 
