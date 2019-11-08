@@ -42,8 +42,9 @@ class QSpacerItem;
 
 class ConfigManager;
 class PluginView;
-class ToolButton;
-
+class QToolButton;
+class ToolButtonList;
+class QResizeEvent;
 
 class MainWindow : public QMainWindow
 {
@@ -138,6 +139,7 @@ public:
 
 public slots:
 	void resetWindowTitle();
+	void layoutToolBar( ToolButtonList * sender, QResizeEvent * event );
 
 	void emptySlot();
 	void createNewProject();
@@ -194,9 +196,11 @@ private:
 	QMdiArea * m_workspace;
 
 	QWidget * m_toolBar;
-	QWidget * m_toolBarButtons;
+	//QWidget * m_toolBarButtons;
+	ToolButtonList * m_leftButtonsList;
+	ToolButtonList * m_rightButtonsList;
 	QHBoxLayout * m_toolBarLayout;
-	QGridLayout * m_toolBarButtonsLayout;
+	//QGridLayout * m_toolBarButtonsLayout;
 	QSpacerItem * m_toolBarLeftSpacer;
 	QSpacerItem * m_toolBarRightSpacer;
 
@@ -226,7 +230,7 @@ private:
 
 	QMenu * m_viewMenu;
 
-	ToolButton * m_metronomeToggle;
+	QToolButton * m_metronomeToggle;
 
 	SessionState m_session;
 

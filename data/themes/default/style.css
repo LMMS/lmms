@@ -449,6 +449,71 @@ QWidget#mainToolbar {
 	background: qlineargradient(spread:reflect, x1:0, y1:0, x2:0, y2:1, stop:0 #333a41, stop:1 #212529);
 }
 
+/* toolbar buttons */
+
+ToolButtonList QFrame#buttonListFrame {
+	border: 1px thick;
+	border-image: url(resources:toolbarbutton_frame.png) 1 stretch;
+}
+
+ToolButtonList QToolButton {
+	border: 3px thick;
+	margin: 0px;
+	padding: 1px 1px 1px 1px;
+	border-radius: 0px;
+	font-size:10px;
+	color: #fff;
+	background: none;
+	background-clip: margin;
+	background: qlineargradient(spread:reflect, x1:0, y1:0, x2:0, y2:1, stop:0 #353e47, stop:1 #22262c);
+}
+
+ToolButtonList QToolButton:!checked#left {
+	border-image: url(resources:toolbarbutton_left.png) 3 stretch;
+}
+
+ToolButtonList QToolButton:!checked#center {
+	border-image: url(resources:toolbarbutton_center.png) 3 stretch;
+}
+
+ToolButtonList QToolButton:!checked#right {
+	border-image: url(resources:toolbarbutton_right.png) 3 stretch;
+}
+
+ToolButtonList QToolButton:!checked#single {
+	border-image: url(resources:toolbarbutton_single.png) 3 stretch;
+}
+
+ToolButtonList#fileToolButtons QToolButton {
+	padding: 1px 0px 0px 1px;
+}
+
+ToolButtonList#windowToolButtons QToolButton {
+	padding: -1px -2px -2px -1px;
+}
+
+ToolButtonList QToolButton:hover {
+	border-radius: 0px;
+	border-top: 3px thick;
+	border-bottom: 3px thick;
+	background: qlineargradient(spread:reflect, x1:0, y1:0, x2:0, y2:1, stop:0 #7c8799, stop:1 #343840)
+}
+
+ToolButtonList QToolButton:pressed {
+	border-radius: 0px;
+	border-top: 3px thick;
+	border-bottom: 3px thick;
+	background: qlineargradient(spread:reflect, x1:0, y1:0, x2:0, y2:1, stop:0 #636c7a, stop:1 #262b30);
+}
+
+ToolButtonList QToolButton:checked {
+	background: qlineargradient(spread:reflect, x1:0, y1:0, x2:0, y2:1, stop:0 #1b1f22, stop:1 #13161a);
+	border-radius: 0px;
+	border-top: 3px thick;
+	border-bottom: 3px thick;
+	border-image: url(resources:toolbarbutton_checked.png) 3 stretch;
+}
+
 /* master toolbar frame */
 
 QFrame#masterToolbarFrame {
