@@ -2,6 +2,7 @@
  * ProgressBar.h - widget for displaying CPU-load or volume in the top bar
  *                    (partly based on Hydrogen's CPU-load-widget)
  *
+ * Copyright (c) 2019 Lathigos <lathigos/at/tutanota.com>
  * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of LMMS - https://lmms.io
@@ -42,7 +43,7 @@ public:
 	virtual ~ProgressBar();
 	
 	void setValue( float value );
-	float getValue() const;
+	float value() const;
 
 protected:
 	virtual void paintEvent( QPaintEvent * _ev );

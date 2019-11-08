@@ -1,6 +1,7 @@
 /*
  * SimpleVisualizationWidget.cpp - widget for visualization of sound-data
  *
+ * Copyright (c) 2019 Lathigos <lathigos/at/tutanota.com>
  * Copyright (c) 2005-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of LMMS - https://lmms.io
@@ -38,6 +39,7 @@
 
 #include "BufferManager.h"
 
+#include "lmms_math.h"
 #include "embed.h"
 
 
@@ -94,8 +96,22 @@ void SimpleVisualizationWidget::updateAudioBuffer( const surroundSampleFrame * b
 {
 	if( !Engine::getSong()->isExporting() )
 	{
-		const fpp_t fpp = Engine::mixer()->framesPerPeriod();
-		memcpy( m_buffer, buffer, sizeof( surroundSampleFrame ) * fpp );
+		FxMixer * m = Engine::fxMixer();
+		
+		// Add a slight persistence to the peak values to reduce flickering:
+		if ((m_peakLeft < m->effectChannel(0)->m_peakLeft) ||
+						(m_peakRight < m->effectChannel(0)->m_peakRight))
+		{
+			frameCounter = 0;
+		}
+
+		m_peakLeft = qMax(
+						m_peakLeft,
+						m->effectChannel(0)->m_peakLeft );
+
+		m_peakRight = qMax(
+						m_peakRight,
+						m->effectChannel(0)->m_peakRight );
 	}
 }
 
@@ -104,19 +120,36 @@ void SimpleVisualizationWidget::updateAudioBuffer( const surroundSampleFrame * b
 
 void SimpleVisualizationWidget::updateVisualization()
 {
-	const fpp_t fpp = Engine::mixer()->framesPerPeriod();
-	Mixer::StereoSample peakSamples = Engine::mixer()->getPeakValues(m_buffer, fpp);
+	// Smoothen and display the display the peak values:
+	const float fallOff = 1.25f;
 	
-	const float fallOff = 0.90;
+	float const maxDB = 9.0f;
+	float const minDB = ampToDbfs( 0.01f );
 	
-	previousPeakLeft = qMax( peakSamples.left, previousPeakLeft * fallOff );
-	previousPeakRight = qMax( peakSamples.right, previousPeakRight * fallOff );
+	float masterGain = Engine::mixer()->masterGain();
 	
-	m_progressBarLeft->setValue( previousPeakLeft );
-	m_progressBarRight->setValue( previousPeakRight );
+	// Render peaks as decibels:
+	float const peakLeftDB = ampToDbfs(
+					qMax<float>( minDB, m_peakLeft * masterGain ) );
+	float const peakRightDB = ampToDbfs(
+					qMax<float>( minDB, m_peakRight * masterGain ) );
 	
+	m_progressBarLeft->setValue( (peakLeftDB - minDB) / (maxDB - minDB) );
+	m_progressBarRight->setValue( (peakRightDB - minDB) / (maxDB - minDB) );
 	
+	// Add a slight persistence to the peak values to reduce flickering:
+	if (frameCounter > 4)
+	{
+		// Reset the peak values so that a new peak can be found:
+		m_peakLeft = m_peakLeft / fallOff;
+		m_peakRight = m_peakRight / fallOff;
+	}
+	else
+	{
+		frameCounter++;
+	}
 }
+
 
 
 

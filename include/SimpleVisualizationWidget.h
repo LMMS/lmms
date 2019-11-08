@@ -1,6 +1,7 @@
 /*
  * SimpleVisualizationWidget.h - widget for visualization of sound-data
  *
+ * Copyright (c) 2019 Lathigos <lathigos/at/tutanota.com>
  * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of LMMS - https://lmms.io
@@ -26,8 +27,10 @@
 #ifndef SIMPLE_VISUALIZATION_WIDGET
 #define SIMPLE_VISUALIZATION_WIDGET
 
-#include <QWidget>
+#include <QList>
 #include <QPixmap>
+#include <QWidget>
+#include <QTime>
 
 #include "lmms_basics.h"
 
@@ -51,8 +54,10 @@ private:
 	
 	sampleFrame * m_buffer;
 	
-	float previousPeakLeft = 0.0f;
-	float previousPeakRight = 0.0f;
+	float m_peakLeft = 0.0f;
+	float m_peakRight = 0.0f;
+	
+	int frameCounter = 0;
 } ;
 
 #endif

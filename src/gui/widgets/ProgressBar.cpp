@@ -2,6 +2,7 @@
  * ProgressBar.cpp - widget for displaying CPU-load or volume in the top bar
  *                    (partly based on Hydrogen's CPU-load-widget)
  *
+ * Copyright (c) 2019 Lathigos <lathigos/at/tutanota.com>
  * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of LMMS - https://lmms.io
@@ -38,11 +39,9 @@ ProgressBar::ProgressBar( QWidget * _parent, const QPixmap & background, const Q
 	m_leds( leds ),
 	m_changed( true )
 {
-	//setAttribute( Qt::WA_OpaquePaintEvent, true );
 	setFixedSize( m_background.width(), m_background.height() );
 
 	m_temp = QPixmap( width(), height() );
-	
 }
 
 
@@ -95,7 +94,7 @@ void ProgressBar::setValue( float value )
 
 
 
-float ProgressBar::getValue() const
+float ProgressBar::value() const
 {
 	return m_value;
 }
