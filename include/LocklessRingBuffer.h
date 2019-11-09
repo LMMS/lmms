@@ -83,4 +83,11 @@ public:
 private:
 	QWaitCondition *m_notifier;
 };
+
+
+// This is required to force MSVC compilers to export symbols for template class methods.
+// Any template instances that are not specified here will not work in plugins.
+template class LMMS_EXPORT LocklessRingBuffer<sampleFrame>;
+template class LMMS_EXPORT LocklessRingBufferReader<sampleFrame>;
+
 #endif //LOCKLESSRINGBUFFER_H
