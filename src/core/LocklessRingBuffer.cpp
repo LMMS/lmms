@@ -25,12 +25,6 @@
 #include "LocklessRingBuffer.h"
 
 
-// This is required to force MSVC compilers to export symbols for template class methods.
-// Any template instances that are not specified here will not work in plugins.
-template class LMMS_EXPORT LocklessRingBuffer<sampleFrame>;
-template class LMMS_EXPORT LocklessRingBufferReader<sampleFrame>;
-
-
 template <class T>
 LocklessRingBuffer<T>::LocklessRingBuffer(std::size_t sz) :
 	m_buffer(sz)
@@ -107,3 +101,9 @@ void LocklessRingBufferReader<T>::waitForData()
 	m_notifier->wait(&useless_lock);
 	useless_lock.unlock();
 }
+
+
+// This is required to force MSVC compilers to export symbols for template class methods.
+// Any template instances that are not specified here will not work in plugins.
+template class LMMS_EXPORT LocklessRingBuffer<sampleFrame>;
+template class LMMS_EXPORT LocklessRingBufferReader<sampleFrame>;
