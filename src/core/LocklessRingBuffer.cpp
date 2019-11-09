@@ -44,14 +44,6 @@ LocklessRingBuffer<T>::~LocklessRingBuffer()
 }
 
 
-template <class T>
-std::size_t LocklessRingBuffer<T>::write(const T *src, size_t cnt)
-{
-	std::size_t written = m_buffer.write(src, cnt);
-	m_notifier.wakeAll();	// Let all waiting readers know new data are available.
-	return written;
-}
-
 //! Specialized write function modified to support sampleFrame.
 template <>
 std::size_t LocklessRingBuffer<sampleFrame>::write(const sampleFrame *src, size_t cnt)
@@ -60,6 +52,15 @@ std::size_t LocklessRingBuffer<sampleFrame>::write(const sampleFrame *src, size_
     std::size_t written = m_buffer.write_func<sampleFrame_copier>(copier, cnt);
 	// Let all waiting readers know new data are available.
 	m_notifier.wakeAll();
+	return written;
+}
+
+
+template <class T>
+std::size_t LocklessRingBuffer<T>::write(const T *src, size_t cnt)
+{
+	std::size_t written = m_buffer.write(src, cnt);
+	m_notifier.wakeAll();	// Let all waiting readers know new data are available.
 	return written;
 }
 
