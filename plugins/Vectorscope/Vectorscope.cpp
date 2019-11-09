@@ -46,19 +46,25 @@ extern "C" {
 
 Vectorscope::Vectorscope(Model *parent, const Plugin::Descriptor::SubPluginFeatures::Key *key) :
 	Effect(&vectorscope_plugin_descriptor, parent, key),
-	m_controls(this)
+	m_controls(this),
+	// Buffer is sized to cover 4* the current maximum LMMS audio buffer size,
+	// so that it has some reserve space in case GUI thresd is busy.
+	m_inputBuffer(4 * m_maxBufferSize)
 {
 }
 
 
-// Take audio data and save them to a list for processing when redraw comes.
-// Skip processing if the controls dialog isn't visible, it would only waste CPU cycles.
+// Take audio data and store them for processing and display in the GUI thread.
 bool Vectorscope::processAudioBuffer(sampleFrame *buffer, const fpp_t frame_count)
 {
 	if (!isEnabled() || !isRunning ()) {return false;}
+
+	// Skip processing if the controls dialog isn't visible, it would only waste CPU cycles.
 	if (m_controls.isViewVisible())
 	{
-		m_dataBuffer.insert(m_dataBuffer.end(), buffer, buffer + frame_count);
+		// To avoid processing spikes on audio thread, data are stored in
+		// a lockless ringbuffer and processed in a separate thread.
+		m_inputBuffer.write(buffer, frame_count);
 	}
 	return isRunning();
 }

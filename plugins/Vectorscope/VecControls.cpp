@@ -36,7 +36,8 @@ VecControls::VecControls(Vectorscope *effect) :
 
 	// initialize models and set default values
 	m_persistenceModel(0.5f, 0.0f, 1.0f, 0.05f, this, tr("Display persistence amount")),
-	m_logarithmicModel(false, this, tr("Logarithmic scale"))
+	m_logarithmicModel(false, this, tr("Logarithmic scale")),
+	m_fullViewModel(false, this, tr("Full view"))
 {
 	// Colors
 	m_colorFG = QColor(51, 148, 204, 204);
@@ -57,6 +58,7 @@ void VecControls::loadSettings(const QDomElement &_this)
 {
 	m_persistenceModel.loadSettings(_this, "Persistence");
 	m_logarithmicModel.loadSettings(_this, "Logarithmic");
+	m_fullViewModel.loadSettings(_this, "FullView");
 }
 
 
@@ -64,4 +66,5 @@ void VecControls::saveSettings(QDomDocument &doc, QDomElement &parent)
 {
 	m_persistenceModel.saveSettings(doc, parent, "Persistence");
 	m_logarithmicModel.saveSettings(doc, parent, "Logarithmic");
+	m_fullViewModel.saveSettings(doc, parent, "FullView");
 }

@@ -24,9 +24,8 @@
 #ifndef VECTORSCOPE_H
 #define VECTORSCOPE_H
 
-#include <list>
-
 #include "Effect.h"
+#include "LocklessRingBuffer.h"
 #include "VecControls.h"
 
 
@@ -39,10 +38,14 @@ public:
 
 	bool processAudioBuffer(sampleFrame *buffer, const fpp_t frame_count) override;
 	EffectControls *controls() override {return &m_controls;}
+	LocklessRingBuffer<sampleFrame> *getBuffer() {return &m_inputBuffer;}
 
 private:
-	SaControls m_controls;
-	std::list<sampleFrame> m_dataBuffer;
+	VecControls m_controls;
+
+	// Maximum LMMS buffer size (hard coded, the actual constant is hard to get)
+	const unsigned int m_maxBufferSize = 4096;
+	LocklessRingBuffer<sampleFrame> m_inputBuffer;
 };
 
 #endif // VECTORSCOPE_H

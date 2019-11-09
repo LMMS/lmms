@@ -27,6 +27,8 @@
 
 #include "EffectControls.h"
 
+#include <QColor>
+
 class Vectorscope;
 
 // Holds all the configuration values
@@ -43,13 +45,14 @@ public:
 	void loadSettings (const QDomElement &_this) override;
 
 	QString nodeName() const override {return "Vectorscope";}
-	int controlCount() override {return 2;}
+	int controlCount() override {return 3;}
 
 private:
 	Vectorscope *m_effect;
 
-	FloatModel m_persistence;
-	BoolModel m_logarithmic;
+	FloatModel m_persistenceModel;
+	BoolModel m_logarithmicModel;
+	BoolModel m_fullViewModel;
 
 	QColor	m_colorFG;
 	QColor	m_colorBG;
