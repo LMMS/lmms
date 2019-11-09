@@ -1,6 +1,7 @@
 /*
  * MasterToolBar.cpp - Widget within the main toolbar containing general song settings.
  *
+ * Copyright (c) 2019 Lathigos <lathigos/at/tutanota.com>
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of LMMS - https://lmms.io
@@ -63,6 +64,7 @@ MasterToolBar::MasterToolBar( Song * song ) :
 	QWidget * tempoWidget = new QWidget( this );
 	tempoWidget->setMaximumHeight( 35 );
 	QVBoxLayout * tempoWidgetLayout = new QVBoxLayout( tempoWidget );
+	tempoWidgetLayout->setAlignment ( Qt::AlignRight );
 	tempoWidgetLayout->setSpacing( 0 );
 	tempoWidgetLayout->setContentsMargins( 0, 0, 0, 0 );
 	
@@ -72,12 +74,13 @@ MasterToolBar::MasterToolBar( Song * song ) :
 	
 	// Add caption label:
 	QLabel * tempoLabel = new QLabel( tempoWidget );
-	tempoLabel->setText( tr("TEMPO") );
+	tempoLabel->setText( tr( "TEMPO" ) );
 	tempoLabel->setObjectName( "integerDisplayTitle" );
-	tempoLabel->setAlignment( Qt::AlignHCenter );
 	tempoWidgetLayout->addWidget( tempoLabel );
+	tempoWidgetLayout->setAlignment( tempoLabel, Qt::AlignHCenter );
 	
 	tempoWidgetLayout->addWidget( m_tempoSpinBox );
+	tempoWidgetLayout->setAlignment( m_tempoSpinBox, Qt::AlignHCenter );
 
 	frameLayout->addWidget( tempoWidget );
 	
@@ -90,7 +93,7 @@ MasterToolBar::MasterToolBar( Song * song ) :
 	QWidget * masterSliders = new QWidget( tb );
 	QGridLayout * masterSliderLayout = new QGridLayout( masterSliders );
 	masterSliderLayout->setSpacing( 0 );
-	masterSliderLayout->setMargin( 0 );
+	masterSliderLayout->setContentsMargins( 0, 0, 0, 0 );
 	
 	// Setup the master volume slider:
 	QLabel * master_vol_lbl = new QLabel( tb );
@@ -122,6 +125,7 @@ MasterToolBar::MasterToolBar( Song * song ) :
 	masterSliderLayout->addWidget( master_vol_lbl, 1, 1, Qt::AlignVCenter );
 	masterSliderLayout->addWidget( m_masterVolumeSlider, 1, 2 );
 	
+	
 	// Setup the master pitch slider:
 	QLabel * master_pitch_lbl = new QLabel( tb );
 	master_pitch_lbl->setPixmap( embed::getIconPixmap( "master_pitch" ) );
@@ -142,7 +146,7 @@ MasterToolBar::MasterToolBar( Song * song ) :
 			SLOT( updateMasterPitchFloat( int ) ) );
 	connect( m_masterPitchSlider, SIGNAL( sliderReleased() ), this,
 			SLOT( hideMasterPitchFloat() ) );
-
+	
 	m_mpsStatus = new TextFloat;
 	m_mpsStatus->setTitle( tr( "Master pitch" ) );
 	m_mpsStatus->setPixmap( embed::getIconPixmap( "master_pitch" ) );
@@ -159,8 +163,8 @@ MasterToolBar::MasterToolBar( Song * song ) :
 	vcw_layout->setMargin( 0 );
 	vcw_layout->setSpacing( 0 );
 
-	vcw_layout->addWidget( new SimpleVisualizationWidget( vc_w ) );
-	vcw_layout->addWidget( new CPULoadWidget( vc_w ) );
+	vcw_layout->addWidget( new SimpleVisualizationWidget( vc_w ), 0, Qt::AlignTop );
+	vcw_layout->addWidget( new CPULoadWidget( vc_w ), 0, Qt::AlignBottom );
 
 	frameLayout->addWidget( vc_w );
 	

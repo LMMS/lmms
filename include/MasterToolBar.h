@@ -2,6 +2,7 @@
  * MasterToolBar.h - declaration of class MasterToolBar, a window where you can
  *                 setup your songs
  *
+ * Copyright (c) 2019 Lathigos <lathigos/at/tutanota.com>
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of LMMS - https://lmms.io
@@ -41,12 +42,10 @@ Q_OBJECT
 public:
 	MasterToolBar( Song * song );
 	~MasterToolBar();
-	
-	//TODO: Save settings & Load settings!
 
 protected:
 	virtual void closeEvent( QCloseEvent * _ce );
-	
+
 private slots:
 	void setMasterVolume( int new_val );
 	void showMasterVolumeFloat();

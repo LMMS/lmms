@@ -1,6 +1,7 @@
 /*
  * IntegerDisplayWidget.h - widget displaying numbers in modernized LCD style
  *
+ * Copyright (c) 2019 Lathigos <lathigos/at/tutanota.com>
  * Copyright (c) 2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of LMMS - https://lmms.io
@@ -28,6 +29,7 @@
 
 #include <QtCore/QMap>
 #include <QWidget>
+#include <QLabel>
 #include <QVector>
 
 #include "lmms_export.h"
@@ -35,41 +37,53 @@
 class QHBoxLayout;
 class QLabel;
 
-class LMMS_EXPORT IntegerDisplayWidget : public QWidget
+class LMMS_EXPORT IntegerDisplayWidget : public QLabel
 {
 	Q_OBJECT
 public:
 	IntegerDisplayWidget( QWidget* parent, const QString& name = QString() );
-	IntegerDisplayWidget( int numDigits, QWidget* parent, const QString& name = QString() );
-	IntegerDisplayWidget( int numDigits, const QString& style, QWidget* parent, const QString& name = QString() );
+	IntegerDisplayWidget( int numDigits,
+					QWidget* parent,
+					const QString& name = QString() );
 
 	virtual ~IntegerDisplayWidget();
 
 	void setValue( int value );
-	//void setLabel( const QString& label );
+	inline int value() { return m_value; }
 
 	void addTextForValue( int value, const QString& text )
 	{
 		m_textForValue[value] = text;
 		update();
 	}
-
-	Q_PROPERTY( int numDigits READ numDigits WRITE setNumDigits )
-
-	inline int numDigits() const { return m_numDigits; }
-	inline void setNumDigits( int n ) { m_numDigits = n; update(); }
-
+	
+	Q_PROPERTY( bool zeroesVisible READ zeroesVisible WRITE setZeroesVisible )
+	inline bool zeroesVisible() const { return m_zeroesVisible; }
+	inline void setZeroesVisible( bool b )
+	{
+		m_zeroesVisible = b;
+		setValue( m_value );
+		update();
+	}
+	
+	Q_PROPERTY( bool forceSign READ forceSign WRITE setForceSign )
+	inline bool forceSign() const { return m_forceSign; }
+	inline void setForceSign( bool b )
+	{
+		m_forceSign = b;
+		setValue( m_value );
+		update();
+	}
 
 private:
 	QMap<int, QString> m_textForValue;
 
-	QString m_display;
-	
-	QVector<QLabel *> m_digitsList;
-
 	int m_numDigits;
+	bool m_zeroesVisible = true;
+	bool m_forceSign = false;
+	int m_value = 0;
 
-	void initUi( const QString& name, const QString &style = QString("19green") ); //!< to be called by ctors
+	void initUi( const QString& name ); //!< to be called by ctors
 
 } ;
 

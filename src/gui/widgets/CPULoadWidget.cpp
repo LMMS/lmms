@@ -41,7 +41,7 @@ CPULoadWidget::CPULoadWidget( QWidget * _parent ) :
 {
 	QHBoxLayout * mainLayout = new QHBoxLayout( this );
 	mainLayout->setSpacing( 4 );
-	mainLayout->setMargin( 0 );
+	mainLayout->setContentsMargins( 0, 0, 0, 0 );
 	
 	QLabel * label = new QLabel( this );
 	label->setObjectName( "integerDisplayTitle" );
@@ -54,7 +54,6 @@ CPULoadWidget::CPULoadWidget( QWidget * _parent ) :
 	mainLayout->addWidget( m_progressBar );
 
 	ToolTip::add( this, tr( "CPU load" ) );
-	
 
 	connect( &m_updateTimer, SIGNAL( timeout() ),
 					this, SLOT( updateCpuLoad() ) );

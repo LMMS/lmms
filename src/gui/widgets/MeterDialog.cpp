@@ -1,6 +1,7 @@
 /*
  * MeterDialog.cpp - dialog for entering meter settings
  *
+ * Copyright (c) 2019 Lathigos <lathigos/at/tutanota.com>
  * Copyright (c) 2008-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * Copyright (c) 2006-2008 Danny McRae <khjklujn/at/yahoo.com>
  *
@@ -41,7 +42,8 @@ MeterDialog::MeterDialog( QWidget * _parent ) :
 {
 	QGridLayout * mainLayout = new QGridLayout( this );
 	mainLayout->setSpacing( 0 );
-	mainLayout->setMargin( 0 );
+	mainLayout->setContentsMargins( 0, 0, 0, 0 );
+	mainLayout->setHorizontalSpacing( 2 );
 
 	m_numerator = new IntegerSpinBox( 2, this, tr( "Meter Numerator" ) );
 	ToolTip::add( m_numerator, tr( "Meter numerator" ) );
@@ -58,12 +60,12 @@ MeterDialog::MeterDialog( QWidget * _parent ) :
 	// Add integer displays:
 	QLabel * forwardSlash = new QLabel( "/", this );
 	forwardSlash->setObjectName( "integerDisplayDigits" );
-	forwardSlash->setFixedWidth(6);
-
-	// TODO: remove "_simple" parameter!
-	mainLayout->addWidget( m_numerator, 1, 0 );
-	mainLayout->addWidget( forwardSlash, 1, 1 );
-	mainLayout->addWidget( m_denominator, 1, 2 );
+	forwardSlash->setFixedWidth( 7 );
+	forwardSlash->setAlignment( Qt::AlignRight | Qt::AlignTop );
+	
+	mainLayout->addWidget( m_numerator, 1, 0, Qt::AlignTop );
+	mainLayout->addWidget( forwardSlash, 1, 1, Qt::AlignTop );
+	mainLayout->addWidget( m_denominator, 1, 2, Qt::AlignTop );
 	
 	setMaximumHeight( 35 );
 }

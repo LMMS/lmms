@@ -1,6 +1,7 @@
 /*
  * IntegerSpinBox.cpp - class IntegerSpinBox, a modernized LcdSpinBox
  *
+ * Copyright (c) 2019 Lathigos <lathigos/at/tutanota.com>
  * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * Copyright (c) 2008 Paul Giblock <pgllama/at/gmail.com>
  *
@@ -27,7 +28,6 @@
 #include <QLabel>
 #include <QMouseEvent>
 #include <QPainter>
-#include <QStyleOptionFrameV2>
 #include <QInputDialog>
 
 #include "IntegerSpinBox.h"
@@ -49,8 +49,8 @@ IntegerSpinBox::IntegerSpinBox( int numDigits, QWidget* parent, const QString& n
 
 
 
-IntegerSpinBox::IntegerSpinBox( int numDigits, const QString& style, QWidget* parent, const QString& name ) :
-	IntegerDisplayWidget( numDigits, parent, name ),
+IntegerSpinBox::IntegerSpinBox( int numDigits, const QString& styleName, QWidget* parent, const QString& name ) :
+	IntegerDisplayWidget( numDigits, parent, styleName ),
 	IntModelView( new IntModel( 0, 0, 0, NULL, name, true ), this ),
 	m_mouseMoving( false ),
 	m_origMousePos(),

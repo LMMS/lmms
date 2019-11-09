@@ -1,6 +1,7 @@
 /*
  * LcdSpinBox.h - class LcdSpinBox, an improved QLCDNumber
  *
+ * Copyright (c) 2019 Lathigos <lathigos/at/tutanota.com>
  * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of LMMS - https://lmms.io
@@ -36,7 +37,7 @@ class LMMS_EXPORT IntegerSpinBox : public IntegerDisplayWidget, public IntModelV
 public:
 	IntegerSpinBox( int numDigits, QWidget* parent, const QString& name = QString() );
 
-	IntegerSpinBox( int numDigits, const QString& style, QWidget* parent, const QString& name = QString() );
+	IntegerSpinBox( int numDigits, const QString& styleName, QWidget* parent, const QString& name = QString() );
 
 	virtual ~IntegerSpinBox() = default;
 

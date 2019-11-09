@@ -1,6 +1,7 @@
 /*
  * IntegerDisplayWidget.cpp - widget displaying numbers in modernized LCD style
  *
+ * Copyright (c) 2019 Lathigos <lathigos/at/tutanota.com>
  * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * Copyright (c) 2008 Paul Giblock <pgllama/at/gmail.com>
  *
@@ -28,21 +29,16 @@
 #include <QApplication>
 #include <QHBoxLayout>
 #include <QLabel>
-#include <QMouseEvent>
-#include <QPainter>
-#include <QStyleOptionFrameV2>
+#include <QStyle>
 #include <QVBoxLayout>
 
 #include "IntegerDisplayWidget.h"
-#include "embed.h"
-#include "gui_templates.h"
-#include "MainWindow.h"
 
 
 
 
 IntegerDisplayWidget::IntegerDisplayWidget( QWidget* parent, const QString& name ) :
-	QWidget( parent ),
+	QLabel( parent ),
 	m_numDigits( 1 )
 {
 	initUi( name );
@@ -52,20 +48,10 @@ IntegerDisplayWidget::IntegerDisplayWidget( QWidget* parent, const QString& name
 
 
 IntegerDisplayWidget::IntegerDisplayWidget( int numDigits, QWidget* parent, const QString& name ) :
-	QWidget( parent ),
+	QLabel( parent ),
 	m_numDigits( numDigits )
 {
 	initUi( name );
-}
-
-
-
-
-IntegerDisplayWidget::IntegerDisplayWidget( int numDigits, const QString& style, QWidget* parent, const QString& name ) :
-	QWidget( parent ),
-	m_numDigits( numDigits )
-{
-	initUi( name, style );
 }
 
 
@@ -80,20 +66,22 @@ IntegerDisplayWidget::~IntegerDisplayWidget()
 
 void IntegerDisplayWidget::setValue( int value )
 {
-	QString s = m_textForValue[value];
-	if( s.isEmpty() )
-	{
-		s = QString::number( value );
-	}
-
-	m_display = s;
+	m_value = value;
 	
-	for ( int i=0; i < m_numDigits; i++ )
+	QString s = m_textForValue[value];
+	if (s.isEmpty())
 	{
-		QString text = "0";
-		if(i < s.size()) { text = m_display.at( s.size() - i - 1 ); }
-		m_digitsList.at( m_numDigits - i - 1 )->setText( text );
+		s = m_zeroesVisible ?
+				QString( "%1" ).arg( value, m_numDigits, 10, QChar( '0' ) ) :
+				QString::number( value );
 	}
+	
+	if ((m_forceSign == true) && (value >= 0))
+	{
+		s = "+" + s;
+	}
+	
+	setText( s );
 
 	update();
 }
@@ -101,32 +89,23 @@ void IntegerDisplayWidget::setValue( int value )
 
 
 
-void IntegerDisplayWidget::initUi(const QString& name , const QString& style)
+void IntegerDisplayWidget::initUi( const QString& name )
 {
 	setEnabled( true );
 
 	setWindowTitle( name );
+	setObjectName( name );
 	
-	// Create a layout with one widget per digit. This way, the digits won't
-	// move around when they change value and the font isn't monospace:
-	QHBoxLayout * digitsLayout = new QHBoxLayout( this );
-	digitsLayout->setSpacing( 0 );
-	digitsLayout->setMargin( 2 );
+	setAlignment( Qt::AlignHCenter | Qt::AlignTop );
 	
-	digitsLayout->addStretch();
+	setStyle( QApplication::style() );
 	
-	for ( int i=0; i < m_numDigits; i++ )
-	{
-		QLabel * currentDigit = new QLabel( "0", this );
-		currentDigit->setObjectName( "integerDisplayDigits" );
-		currentDigit->setAttribute(Qt::WA_TransparentForMouseEvents);
-		digitsLayout->addWidget(currentDigit);
-		m_digitsList.push_back(currentDigit);
-	}
+	setValue( 0 );
 	
-	digitsLayout->addStretch();
-	
-	setLayout( digitsLayout );
+	ensurePolished();
+	const QString fixedWidthString = QString( "%1" ).arg( 0, m_numDigits, 10, QChar( '0' ) );
+	int characterWidth = fontMetrics().boundingRect( fixedWidthString ).width();
+	setFixedWidth(characterWidth + 1);
 }
 
 

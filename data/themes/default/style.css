@@ -528,9 +528,19 @@ QLabel#integerDisplayDigits {
 	color: #2fcc88;
 }
 
+IntegerDisplayWidget {
+	font-size: 13pt;
+	color: #2fcc88;
+}
+
 QLabel#integerDisplayTitle {
 	font-size: 8pt;
 	color: #b0c4d7;
+}
+
+QWidget#smallMasterSpinBox {
+	font-size: 8pt;
+	color: #2fcc88;
 }
 
 /* smaller toolbars */

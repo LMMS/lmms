@@ -41,8 +41,9 @@ TimeDisplayWidget::TimeDisplayWidget( QWidget * _parent ) :
 	m_minorLCD( 2, this ),
 	m_milliSecondsLCD( 3, this )
 {
-	m_spinBoxesLayout.setSpacing( 0 );
-	m_spinBoxesLayout.setMargin( 0 );
+	m_spinBoxesLayout.setVerticalSpacing( 0 );
+	m_spinBoxesLayout.setHorizontalSpacing( 2 );
+	m_spinBoxesLayout.setContentsMargins( 0, 0, 0, 0 );
 	m_spinBoxesLayout.setAlignment( Qt::AlignHCenter );
 	
 	// Add caption labels:
@@ -64,9 +65,11 @@ TimeDisplayWidget::TimeDisplayWidget( QWidget * _parent ) :
 	
 	// Add integer displays:
 	QLabel * colon = new QLabel( ":", this );
+	colon->setAlignment( Qt::AlignTop );
 	colon->setObjectName( "integerDisplayDigits" );
 	
 	QLabel * dot = new QLabel( ".", this );
+	dot->setAlignment( Qt::AlignTop );
 	dot->setObjectName( "integerDisplayDigits" );
 	
 	m_spinBoxesLayout.addWidget( &m_majorLCD, 1, 0 );
