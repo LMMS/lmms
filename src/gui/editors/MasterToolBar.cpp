@@ -54,8 +54,8 @@ MasterToolBar::MasterToolBar( Song * song ) :
 	// Create the custom widget to show:
 	QHBoxLayout * frameLayout = new QHBoxLayout( this );
 	frameLayout->setObjectName( "masterToolbarFrameLayout" );
-	frameLayout->setSpacing( 16 );
-	frameLayout->setContentsMargins( 12, 2, 12, 2 );
+	frameLayout->setSpacing( 24 );
+	frameLayout->setContentsMargins( 18, 7, 18, 8 );
 	
 	frameLayout->addWidget( new TimeDisplayWidget( this ) );
 	frameLayout->addSpacing( 2 );
@@ -90,71 +90,56 @@ MasterToolBar::MasterToolBar( Song * song ) :
 	
 	frameLayout->addWidget( m_timeSigDisplay );
 	
-	QWidget * masterSliders = new QWidget( tb );
-	QGridLayout * masterSliderLayout = new QGridLayout( masterSliders );
-	masterSliderLayout->setSpacing( 0 );
-	masterSliderLayout->setContentsMargins( 0, 0, 0, 0 );
+	QWidget * masterControls = new QWidget( tb );
+	QGridLayout * masterControlsLayout = new QGridLayout( masterControls );
+	masterControlsLayout->setSpacing( 0 );
+	masterControlsLayout->setContentsMargins( 0, 0, 0, 0 );
 	
 	// Setup the master volume slider:
-	QLabel * master_vol_lbl = new QLabel( tb );
-	master_vol_lbl->setPixmap( embed::getIconPixmap( "master_volume" ) );
-
-	m_masterVolumeSlider = new AutomatableSlider( tb,
-							tr( "Master volume" ) );
-	m_masterVolumeSlider->setModel( &m_song->m_masterVolumeModel );
-	m_masterVolumeSlider->setOrientation( Qt::Horizontal );
-	m_masterVolumeSlider->setPageStep( 1 );
-	m_masterVolumeSlider->setTickPosition( QSlider::TicksLeft );
-	m_masterVolumeSlider->setFixedSize( 100, 23 );
-	m_masterVolumeSlider->setTickInterval( 50 );
-	ToolTip::add( m_masterVolumeSlider, tr( "Master volume" ) );
-
-	connect( m_masterVolumeSlider, SIGNAL( logicValueChanged( int ) ), this,
-			SLOT( setMasterVolume( int ) ) );
-	connect( m_masterVolumeSlider, SIGNAL( sliderPressed() ), this,
-			SLOT( showMasterVolumeFloat()) );
-	connect( m_masterVolumeSlider, SIGNAL( logicSliderMoved( int ) ), this,
-			SLOT( updateMasterVolumeFloat( int ) ) );
-	connect( m_masterVolumeSlider, SIGNAL( sliderReleased() ), this,
-			SLOT( hideMasterVolumeFloat() ) );
+	QLabel * masterVolumeLabel = new QLabel( tb );
+	masterVolumeLabel->setText( tr("VOL") );
+	masterVolumeLabel->setObjectName( "integerDisplayTitle" );
+	masterControlsLayout->addWidget( masterVolumeLabel, 0, 0, Qt::AlignTop );
 	
-	m_mvsStatus = new TextFloat;
-	m_mvsStatus->setTitle( tr( "Master volume" ) );
-	m_mvsStatus->setPixmap( embed::getIconPixmap( "master_volume" ) );
+	m_masterVolumeSpinBox = new IntegerSpinBox( 3,
+					"smallMasterSpinBox",
+					masterControls,
+					tr( "Master volume" ) );
+	m_masterVolumeSpinBox->setModel( &m_song->m_masterVolumeModel );
+	ToolTip::add( m_masterVolumeSpinBox, tr( "Master volume" ) );
+	masterControlsLayout->addWidget( m_masterVolumeSpinBox, 0, 1,
+					Qt::AlignTop | Qt::AlignRight );
+	
+	QLabel * masterVolumePercentLabel = new QLabel( masterControls );
+	masterVolumePercentLabel->setText( tr("%") );
+	masterVolumePercentLabel->setObjectName( "smallMasterSpinBox" );
+	masterControlsLayout->addWidget( masterVolumePercentLabel, 0, 2,
+					Qt::AlignTop | Qt::AlignRight );
 
-	masterSliderLayout->addWidget( master_vol_lbl, 1, 1, Qt::AlignVCenter );
-	masterSliderLayout->addWidget( m_masterVolumeSlider, 1, 2 );
+	m_masterVolumeSpinBox->setZeroesVisible( false );
 	
+	m_masterVolumeSpinBox->setAlignment( Qt::AlignRight );
 	
-	// Setup the master pitch slider:
-	QLabel * master_pitch_lbl = new QLabel( tb );
-	master_pitch_lbl->setPixmap( embed::getIconPixmap( "master_pitch" ) );
-
-	m_masterPitchSlider = new AutomatableSlider( tb, tr( "Master pitch" ) );
-	m_masterPitchSlider->setModel( &m_song->m_masterPitchModel );
-	m_masterPitchSlider->setOrientation( Qt::Horizontal );
-	m_masterPitchSlider->setPageStep( 1 );
-	m_masterPitchSlider->setTickPosition( QSlider::TicksLeft );
-	m_masterPitchSlider->setFixedSize( 100, 23 );
-	m_masterPitchSlider->setTickInterval( 12 );
-	ToolTip::add( m_masterPitchSlider, tr( "Master pitch" ) );
-	connect( m_masterPitchSlider, SIGNAL( logicValueChanged( int ) ), this,
-			SLOT( setMasterPitch( int ) ) );
-	connect( m_masterPitchSlider, SIGNAL( sliderPressed() ), this,
-			SLOT( showMasterPitchFloat() ) );
-	connect( m_masterPitchSlider, SIGNAL( logicSliderMoved( int ) ), this,
-			SLOT( updateMasterPitchFloat( int ) ) );
-	connect( m_masterPitchSlider, SIGNAL( sliderReleased() ), this,
-			SLOT( hideMasterPitchFloat() ) );
+	// Setup the master pitch widget:
+	QLabel * masterPitchLabel = new QLabel( tb );
+	masterPitchLabel->setText( tr("PITCH") );
+	masterPitchLabel->setObjectName( "integerDisplayTitle" );
+	masterControlsLayout->addWidget( masterPitchLabel, 1, 0, Qt::AlignBottom );
 	
-	m_mpsStatus = new TextFloat;
-	m_mpsStatus->setTitle( tr( "Master pitch" ) );
-	m_mpsStatus->setPixmap( embed::getIconPixmap( "master_pitch" ) );
-
-	masterSliderLayout->addWidget( master_pitch_lbl, 2, 1, Qt::AlignVCenter );
-	masterSliderLayout->addWidget( m_masterPitchSlider, 2, 2 );
+	m_masterPitchSpinBox = new IntegerSpinBox( 3,
+					"smallMasterSpinBox",
+					masterControls,
+					tr( "Master pitch" ) );
+	m_masterPitchSpinBox->setModel( &m_song->m_masterPitchModel );
+	ToolTip::add( m_masterPitchSpinBox, tr( "Master pitch" ) );
+	masterControlsLayout->addWidget( m_masterPitchSpinBox, 1, 1, 1, 2,
+					Qt::AlignBottom | Qt::AlignRight );
 	
-	frameLayout->addWidget( masterSliders );
+	m_masterPitchSpinBox->setZeroesVisible( false );
+	m_masterPitchSpinBox->setAlignment( Qt::AlignRight );
+	m_masterPitchSpinBox->setForceSign( true );
+	
+	frameLayout->addWidget( masterControls );
 	
 	// Create widget for visualization- and cpu-load-widget:
 	QWidget * vc_w = new QWidget( tb );
@@ -192,93 +177,6 @@ MasterToolBar::MasterToolBar( Song * song ) :
 
 MasterToolBar::~MasterToolBar()
 {
-}
-
-
-
-
-void MasterToolBar::setMasterVolume( int new_val )
-{
-	updateMasterVolumeFloat( new_val );
-
-	if( !m_mvsStatus->isVisible() && !m_song->m_loadingProject
-					&& m_masterVolumeSlider->showStatus() )
-	{
-		m_mvsStatus->moveGlobal( m_masterVolumeSlider,
-			QPoint( m_masterVolumeSlider->width() + 2, -2 ) );
-		m_mvsStatus->setVisibilityTimeOut( 1000 );
-	}
-	Engine::mixer()->setMasterGain( new_val / 100.0f );
-}
-
-
-
-
-void MasterToolBar::showMasterVolumeFloat( void )
-{
-	m_mvsStatus->moveGlobal( m_masterVolumeSlider,
-			QPoint( m_masterVolumeSlider->width() + 2, -2 ) );
-	m_mvsStatus->show();
-	updateMasterVolumeFloat( m_song->m_masterVolumeModel.value() );
-}
-
-
-
-
-void MasterToolBar::updateMasterVolumeFloat( int new_val )
-{
-	m_mvsStatus->setText( tr( "Value: %1%" ).arg( new_val ) );
-}
-
-
-
-
-void MasterToolBar::hideMasterVolumeFloat( void )
-{
-	m_mvsStatus->hide();
-}
-
-
-
-
-void MasterToolBar::setMasterPitch( int new_val )
-{
-	updateMasterPitchFloat( new_val );
-	if( m_mpsStatus->isVisible() == false && m_song->m_loadingProject == false
-					&& m_masterPitchSlider->showStatus() )
-	{
-		m_mpsStatus->moveGlobal( m_masterPitchSlider,
-			QPoint( m_masterPitchSlider->width() + 2, -2 ) );
-		m_mpsStatus->setVisibilityTimeOut( 1000 );
-	}
-}
-
-
-
-
-void MasterToolBar::showMasterPitchFloat( void )
-{
-	m_mpsStatus->moveGlobal( m_masterPitchSlider,
-			QPoint( m_masterPitchSlider->width() + 2, -2 ) );
-	m_mpsStatus->show();
-	updateMasterPitchFloat( m_song->m_masterPitchModel.value() );
-}
-
-
-
-
-void MasterToolBar::updateMasterPitchFloat( int new_val )
-{
-	m_mpsStatus->setText( tr( "Value: %1 semitones").arg( new_val ) );
-
-}
-
-
-
-
-void MasterToolBar::hideMasterPitchFloat( void )
-{
-	m_mpsStatus->hide();
 }
 
 

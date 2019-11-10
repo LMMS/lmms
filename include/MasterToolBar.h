@@ -46,24 +46,13 @@ public:
 protected:
 	virtual void closeEvent( QCloseEvent * _ce );
 
-private slots:
-	void setMasterVolume( int new_val );
-	void showMasterVolumeFloat();
-	void updateMasterVolumeFloat( int new_val );
-	void hideMasterVolumeFloat();
-
-	void setMasterPitch( int new_val );
-	void showMasterPitchFloat();
-	void updateMasterPitchFloat( int new_val );
-	void hideMasterPitchFloat();
-
 private:
 	Song * m_song;
 	
 	IntegerSpinBox * m_tempoSpinBox;
 	MeterDialog * m_timeSigDisplay;
-	AutomatableSlider * m_masterVolumeSlider;
-	AutomatableSlider * m_masterPitchSlider;
+	IntegerSpinBox * m_masterVolumeSpinBox;
+	IntegerSpinBox * m_masterPitchSpinBox;
 	
 	TextFloat * m_mvsStatus;
 	TextFloat * m_mpsStatus;
