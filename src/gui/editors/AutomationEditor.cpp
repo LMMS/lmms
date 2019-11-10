@@ -89,6 +89,8 @@ AutomationEditor::AutomationEditor() :
 	m_topLevel( 0 ),
 	m_currentPosition(),
 	m_action( NONE ),
+	m_dragStartLevel(0),
+	m_dragStartTick(0),
 	m_moveStartLevel( 0 ),
 	m_moveStartTick( 0 ),
 	m_drawLastLevel( 0.0f ),
@@ -555,6 +557,8 @@ void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 							m_editMode == DRAW )
 			{
 				m_pattern->addJournalCheckPoint();
+				m_dragStartLevel = level;
+				m_dragStartTick = pos_ticks;
 				// Connect the dots
 				if( mouseEvent->modifiers() & Qt::ShiftModifier )
 				{
@@ -602,15 +606,24 @@ void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 							m_editMode == DRAW ) ||
 					m_editMode == ERASE )
 			{
-				m_drawLastTick = pos_ticks;
-				m_pattern->addJournalCheckPoint();
-				// erase single value
-				if( it != time_map.end() )
+				if (m_action == MOVE_VALUE)
 				{
-					m_pattern->removeValue( it.key() );
-					Engine::getSong()->setModified();
+					m_pattern->setDragValue(MidiTime(m_dragStartTick), m_dragStartLevel,
+						true, false);
+					m_pattern->applyDragValue();
 				}
-				m_action = NONE;
+				else
+				{
+					m_drawLastTick = pos_ticks;
+					m_pattern->addJournalCheckPoint();
+					// erase single value
+					if( it != time_map.end() )
+					{
+						m_pattern->removeValue( it.key() );
+						Engine::getSong()->setModified();
+					}
+					m_action = NONE;
+				}
 			}
 			else if( mouseEvent->button() == Qt::LeftButton &&
 							m_editMode == SELECT )
@@ -755,7 +768,10 @@ void AutomationEditor::mouseMoveEvent(QMouseEvent * mouseEvent )
 		int pos_ticks = x * MidiTime::ticksPerBar() / m_ppb +
 							m_currentPosition;
 		// m_mouseDownLeft used to prevent drag when drawing line
-		if (m_mouseDownLeft && m_editMode == DRAW)
+		if (m_mouseDownLeft
+			// right button held when cancelling drag
+			&& !(mouseEvent->buttons() & Qt::RightButton)
+			&& m_editMode == DRAW )
 		{
 			if( m_action == MOVE_VALUE )
 			{
@@ -783,10 +799,13 @@ void AutomationEditor::mouseMoveEvent(QMouseEvent * mouseEvent )
 			Engine::getSong()->setModified();
 
 		}
-		else if( ( mouseEvent->buttons() & Qt::RightButton &&
-						m_editMode == DRAW ) ||
-				( mouseEvent->buttons() & Qt::LeftButton &&
-						m_editMode == ERASE ) )
+		// drag erase
+		else if ((mouseEvent->buttons() & Qt::RightButton
+			// don't want to erase when cancelling drag with left held
+			&& !(mouseEvent->buttons() & Qt::LeftButton)
+			&& m_editMode == DRAW)
+			|| (mouseEvent->buttons() & Qt::LeftButton
+			&& m_editMode == ERASE))
 		{
 			// removing automation point
 			if( pos_ticks < 0 )
@@ -1508,13 +1527,20 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 	switch( m_editMode )
 	{
 		case DRAW:
-			if( m_mouseDownRight )
+			if(m_mouseDownRight && m_action != MOVE_VALUE)
 			{
 				cursor = s_toolErase;
 			}
 			else if( m_action == MOVE_VALUE )
 			{
-				cursor = s_toolMove;
+				if (m_mouseDownRight)
+				{
+					cursor = s_toolDraw;
+				}
+				else
+				{
+					cursor = s_toolMove;
+				}
 			}
 			else
 			{

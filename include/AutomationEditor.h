@@ -223,6 +223,8 @@ private:
 	float m_selectStartLevel;
 	float m_selectedLevels;
 
+	float m_dragStartLevel;
+	tick_t m_dragStartTick;
 	float m_moveStartLevel;
 	tick_t m_moveStartTick;
 	int m_moveXOffset;
