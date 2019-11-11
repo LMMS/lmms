@@ -22,7 +22,9 @@
 
 #include "VectorView.h"
 
+#include <algorithm>
 #include <cmath>
+#include <chrono>
 #include <QImage>
 #include <QPainter>
 
@@ -32,14 +34,19 @@
 #define VEC_DEBUG
 #include <iostream>
 
+
 VectorView::VectorView(VecControls *controls, LocklessRingBuffer<sampleFrame> *inputBuffer, unsigned short displaySize, QWidget *_parent) :
 	QWidget(_parent),
 	m_controls(controls),
 	m_inputBuffer(inputBuffer),
 	m_bufferReader(*inputBuffer),
-	m_displaySize(displaySize)
+	m_displaySize(displaySize),
+	m_persistTimestamp(0),
+	m_oldHQ(m_controls->m_highQualityModel.value()),
+	m_oldX(m_displaySize / 2),
+	m_oldY(m_displaySize / 2)
 {
-	setMinimumSize(128, 128);
+	setMinimumSize(200, 200);
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
 	connect(gui->mainWindow(), SIGNAL(periodicUpdate()), this, SLOT(periodicUpdate()));
@@ -47,7 +54,7 @@ VectorView::VectorView(VecControls *controls, LocklessRingBuffer<sampleFrame> *i
 	m_displayBuffer.resize(sizeof qRgb(0,0,0) * m_displaySize * m_displaySize, 0);
 
 	#ifdef SA_DEBUG
-		m_execution_avg = 0;
+		m_executionAvg = 0;
 	#endif
 }
 
@@ -56,103 +63,153 @@ VectorView::VectorView(VecControls *controls, LocklessRingBuffer<sampleFrame> *i
 void VectorView::paintEvent(QPaintEvent *event)
 {
 	#ifdef VEC_DEBUG
-		unsigned int draw_time = std::chrono::high_resolution_clock::now().time_since_epoch().count();
+		unsigned int drawTime = std::chrono::high_resolution_clock::now().time_since_epoch().count();
 	#endif
 
-	// all drawing done in this method, local variables are sufficient for the boundary
-	const int displayTop = 1;
-	const int displayBottom = height() -2;
-	const int displayLeft = 1;
-	const int displayRight = width() -2;
+	// All drawing done in this method, local variables are sufficient for the boundary
+	const int displayTop = 0;
+	const int displayBottom = height() -1;
+	const int displayLeft = 0;
+	const int displayRight = width() -1;
 	const int displayWidth = displayRight - displayLeft;
 	const int displayHeight = displayBottom - displayTop;
 
 	const int centerX = displayLeft + (displayWidth / 2) + 1;
-	const int centerY = displayTop + (displayHeight / 2) + 1;
+	const int centerY = displayTop + (displayWidth / 2) + 1;
 
-	float label_width = 20;
-	float label_height = 16;
-	float margin = 2;
+	float labelWidth = 32;
+	float labelHeight = 32;
+	float margin = 4;
 
 	QPainter painter(this);
 	painter.setRenderHint(QPainter::Antialiasing, true);
 
-	// dim stored image based on persistence and elapsed time
-		// check timestamp, limit dimming to 10 FPS
-	const float persist = m_controls->m_persistenceModel.value();
-	for (std::size_t i = 0; i < m_displayBuffer.size(); i++)
+	QFont normalFont, boldFont;
+	boldFont.setPixelSize(32);
+	boldFont.setBold(true);
+
+	// Clear display buffer if quality setting was changed
+	bool hq = m_controls->m_highQualityModel.value();
+	if (hq != m_oldHQ)
 	{
-		m_displayBuffer.data()[i] = m_displayBuffer.data()[i] * persist;
-	}
-	// get input data using a lockless FIFO buffer
-	auto in_buffer = m_bufferReader.read_max(m_inputBuffer->capacity());
-	std::size_t frame_count = in_buffer.size();
-
-
-	//todo: idealne by to chtelo nejakou drawing function, old + new + pocet pixelu mezi nima
-		// mozna i podle vzdalenosti (tj. rychlosti) tlumit intenzitu drahy, to by byl ultimatni simulacni rezim
-
-	unsigned int x = m_displaySize / 2;
-	unsigned int y = m_displaySize / 2;
-	// draw new points on top
-	for (; frame_count; frame_count--)	// twice smaller
-	{
-		float left = in_buffer[frame_count][0] * (m_displaySize -1) * 0.25;
-		float right = in_buffer[frame_count][1] * (m_displaySize -1) * 0.25;
-
-		x = fmax(fmin((3*x_old + (right - left + m_displaySize / 2)) / 4, m_displaySize - 1), 0);
-		y = fmax(fmin((3*y_old + (m_displaySize - (right + left + m_displaySize / 2))) / 4, m_displaySize - 1), 0);
-		((QRgb*)m_displayBuffer.data())[x + y * m_displaySize] = m_controls->m_colorFG.rgb();
-
-		x = fmax(fmin((x_old + (right - left + m_displaySize / 2)) / 2, m_displaySize - 1), 0);
-		y = fmax(fmin((y_old + (m_displaySize - (right + left + m_displaySize / 2))) / 2, m_displaySize - 1), 0);
-		((QRgb*)m_displayBuffer.data())[x + y * m_displaySize] = m_controls->m_colorFG.rgb();
-
-		x = fmax(fmin((x_old + 3*(right - left + m_displaySize / 2)) / 4, m_displaySize - 1), 0);
-		y = fmax(fmin((y_old + 3*(m_displaySize - (right + left + m_displaySize / 2))) / 4, m_displaySize - 1), 0);
-		((QRgb*)m_displayBuffer.data())[x + y * m_displaySize] = m_controls->m_colorFG.rgb();
-
-		x = fmax(fmin(right - left + m_displaySize / 2, m_displaySize - 1), 0);
-		y = fmax(fmin(m_displaySize - (right + left + m_displaySize / 2), m_displaySize - 1), 0);
-		x_old = x;
-		y_old = y;
-//		std::cout << "point " << frame_count << " left " << left << " right " << right << std::endl;
-
-		((QRgb*)m_displayBuffer.data())[x + y * m_displaySize] = m_controls->m_colorFG.rgb();
+		m_oldHQ = hq;
+		for (std::size_t i = 0; i < m_displayBuffer.size(); i++)
+		{
+			m_displayBuffer.data()[i] = 0;
+		}
 	}
 
-	// draw the final image
-	QImage temp = QImage(m_displayBuffer.data(),	// raw pixel data to display
-						 m_displaySize,
-						 m_displaySize,
+	// Dim stored image based on persistence and elapsed time.
+	// In non-HQ mode, dimming pass is limited to once every 100 ms.
+	unsigned int currentTimestamp = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now().time_since_epoch()).count();
+	const unsigned int threshold = hq ? 10 : 100;
+	if (currentTimestamp - m_persistTimestamp > threshold)
+	{
+		m_persistTimestamp = currentTimestamp;
+		const std::size_t useableBuffer = hq ? m_displayBuffer.size() : m_displayBuffer.size() / 4;
+		const float persist = pow(log10(1 + 9 * m_controls->m_persistenceModel.value()), threshold / 10);
+		for (std::size_t i = 0; i < useableBuffer; i++)
+		{
+			m_displayBuffer.data()[i] = m_displayBuffer.data()[i] * persist;
+		}
+	}
+
+	// Get new data from lockless FIFO buffer
+	auto inBuffer = m_bufferReader.read_max(m_inputBuffer->capacity());
+	std::size_t frameCount = inBuffer.size();
+
+	int x;
+	int y;
+	// Draw new points on top
+	if (hq)
+	{
+		// High quality mode: check distance between points and draw a line.
+		// The longer the line is, the dimmer, simulating real electron trace on luminescent screen.
+		auto saturate = [=](unsigned short pixel) {return fmax(fmin(pixel, m_displaySize - 1), 0);};
+		for (std::size_t frame = 0; frame < frameCount; frame++)
+		{
+			float left  = inBuffer[frame][0] * (m_displaySize -1) / 4;
+			float right = inBuffer[frame][1] * (m_displaySize -1) / 4;
+
+			x = saturate(right - left + m_displaySize / 2);
+			y = saturate(m_displaySize - (right + left + m_displaySize / 2));
+
+			unsigned char points = fmin(sqrt(pow(m_oldX - x, 2.0) + pow(m_oldY - y, 2.0)), 100);
+			QColor added_color = m_controls->m_colorFG.darker(100 + 10 * points).rgb();
+
+			// Draw the new point
+			QColor current_color = ((QRgb*)m_displayBuffer.data())[x + y * m_displaySize];
+			current_color.setRed(fmin(current_color.red() + added_color.red(), 255));
+			current_color.setGreen(fmin(current_color.green() + added_color.green(), 255));
+			current_color.setBlue(fmin(current_color.blue() + added_color.blue(), 255));
+			((QRgb*)m_displayBuffer.data())[x + y * m_displaySize] = current_color.rgb();
+
+			// Draw interpolated points between the old one and the new one
+			for (unsigned char i = 1; i < points; i++)
+			{
+				x = saturate(((points - i) * m_oldX + i * (right - left + m_displaySize / 2)) / points);
+				y = saturate(((points - i) * m_oldY + i * (m_displaySize - (right + left + m_displaySize / 2))) / points);
+				QColor current_color = ((QRgb*)m_displayBuffer.data())[x + y * m_displaySize];
+				current_color.setRed(fmin(current_color.red() + added_color.red(), 255));
+				current_color.setGreen(fmin(current_color.green() + added_color.green(), 255));
+				current_color.setBlue(fmin(current_color.blue() + added_color.blue(), 255));
+				((QRgb*)m_displayBuffer.data())[x + y * m_displaySize] = current_color.rgb();
+			}
+			m_oldX = x;
+			m_oldY = y;
+		}
+	}
+	else
+	{
+		// To improve performance, non-HQ mode uses smaller buffer / display size.
+		const unsigned short activeSize = m_displaySize / 2;
+		auto saturate = [=](unsigned short pixel) {return fmax(fmin(pixel, activeSize - 1), 0);};
+		for (std::size_t frame = 0; frame < frameCount; frame++)
+		{
+			float left  = inBuffer[frame][0] * (activeSize -1) / 4;
+			float right = inBuffer[frame][1] * (activeSize -1) / 4;
+			x = saturate(right - left + activeSize / 2);
+			y = saturate(activeSize - (right + left + activeSize / 2));
+			((QRgb*)m_displayBuffer.data())[x + y * activeSize] = m_controls->m_colorFG.rgb();
+		}
+	}
+
+	// Draw background
+	painter.fillRect(displayLeft, displayTop, displayWidth, displayHeight, QColor(0,0,0));
+
+	// Draw the final image.
+	QImage temp = QImage(m_displayBuffer.data(),
+						 hq ? m_displaySize : m_displaySize / 2,
+						 hq ? m_displaySize : m_displaySize / 2,
 						 QImage::Format_RGB32);
 	temp.setDevicePixelRatio(devicePixelRatio());
 	painter.drawImage(displayLeft, displayTop,
-					  temp.scaled(displayWidth * devicePixelRatio(),
-								  displayHeight * devicePixelRatio(),
-								  Qt::IgnoreAspectRatio,
-								  Qt::SmoothTransformation));
+					  temp.scaledToWidth(displayWidth * devicePixelRatio(), Qt::SmoothTransformation));
 
-	// draw the grid
+	// Draw the grid and labels.
 	painter.setPen(QPen(m_controls->m_colorGrid, 1, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
-	painter.drawEllipse(QPoint(centerX, centerY), 8, 8);
-	painter.drawEllipse(QPoint(centerX, centerY), displayWidth/2, displayWidth/2);
+	painter.drawEllipse(QPoint(centerX, centerY), displayWidth / 2, displayWidth / 2);
+	painter.drawLine(QPoint(centerX, centerY), QPoint(displayLeft + 50, displayTop + 50));
+	painter.drawLine(QPoint(centerX, centerY), QPoint(displayRight - 50, displayTop + 50));
 
-	// draw the outline
+	painter.setFont(boldFont);
+	painter.drawText(displayLeft + margin, displayTop + margin,
+					 labelWidth, labelHeight, Qt::AlignLeft | Qt::AlignTop | Qt::TextDontClip,
+					 QString("L"));
+	painter.drawText(displayRight - margin - labelWidth, displayTop + margin,
+					 labelWidth, labelHeight, Qt::AlignRight| Qt::AlignTop | Qt::TextDontClip,
+					 QString("R"));
+	// Draw the outline.
 //	painter.setPen(QPen(m_controls->m_colorGrid, 2, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
 //	painter.drawRoundedRect(displayLeft, displayTop, displayWidth, displayBottom, 2.0, 2.0);
 
 	#ifdef VEC_DEBUG
-		//init: 40/10; disable print: 11.5/2.2; no dimming: 10/0.6; no addition: no difference
-		// → qpainter: 10/0.6	dimming 1.5/1.5		
-		// display what FPS would be achieved if vectorscope ran in a loop
-		draw_time = std::chrono::high_resolution_clock::now().time_since_epoch().count() - draw_time;
-		m_execution_avg = 0.95 * m_execution_avg + 0.05 * draw_time / 1000000.0;
+		drawTime = std::chrono::high_resolution_clock::now().time_since_epoch().count() - drawTime;
+		m_executionAvg = 0.95 * m_executionAvg + 0.05 * drawTime / 1000000.0;
 		painter.setPen(QPen(m_controls->m_colorLabels, 1, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
-		painter.drawText(displayRight -100, 10, 100, 16, Qt::AlignLeft,
-						 QString("Max FPS: ").append(std::to_string(1000.0 / m_execution_avg).c_str()));
-		painter.drawText(displayRight -100, 20, 100, 16, Qt::AlignLeft,
-						 QString("Exec avg.: ").append(std::to_string(m_execution_avg).substr(0, 5).c_str()).append(" ms"));
+		painter.setFont(normalFont);
+		painter.drawText(displayWidth / 2 - 50, margin, 100, 16, Qt::AlignLeft,
+						 QString("Exec avg.: ").append(std::to_string(m_executionAvg).substr(0, 5).c_str()).append(" ms"));
 	#endif
 }
 

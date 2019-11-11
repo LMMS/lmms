@@ -52,7 +52,7 @@ private:
 
 	FloatModel m_persistenceModel;
 	BoolModel m_logarithmicModel;
-	BoolModel m_fullViewModel;
+	BoolModel m_highQualityModel;
 
 	QColor	m_colorFG;
 	QColor	m_colorBG;

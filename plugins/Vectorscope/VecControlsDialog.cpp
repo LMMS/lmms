@@ -26,6 +26,7 @@
 
 #include <QGridLayout>
 #include <QLabel>
+#include <QResizeEvent>
 #include <QSizePolicy>
 #include <QWidget>
 
@@ -42,10 +43,11 @@ VecControlsDialog::VecControlsDialog(VecControls *controls) :
 	m_controls(controls)
 {
 	QVBoxLayout *master_layout = new QVBoxLayout;
+	master_layout->setContentsMargins(0, 2, 0, 0);
 	setLayout(master_layout);
 
 	// Visualizer widget
-	VectorView *display = new VectorView(controls, m_controls->m_effect->getBuffer(), 512, this);
+	VectorView *display = new VectorView(controls, m_controls->m_effect->getBuffer(), 1024, this);
 	master_layout->addWidget(display);
 
 	// Config area located inside visualizer
@@ -56,21 +58,21 @@ VecControlsDialog::VecControlsDialog(VecControls *controls) :
 	internal_layout->addLayout(config_layout);
 	config_layout->addLayout(switch_layout);
 
+	// High-quality switch
+	LedCheckBox *highQualityButton = new LedCheckBox(tr("HQ"), this);
+	highQualityButton->setToolTip(tr("Double the resolution and simulate continuous analog-like trace."));
+	highQualityButton->setCheckable(true);
+	highQualityButton->setMinimumSize(70, 12);
+	highQualityButton->setModel(&controls->m_highQualityModel);
+	switch_layout->addWidget(highQualityButton);
+
 	// Log. scale switch
 	LedCheckBox *logarithmicButton = new LedCheckBox(tr("Log. scale"), this);
-	logarithmicButton->setToolTip(tr("Display amplitude on logarithmic scale to better see small values"));
+	logarithmicButton->setToolTip(tr("Display amplitude on logarithmic scale to better see small values."));
 	logarithmicButton->setCheckable(true);
 	logarithmicButton->setMinimumSize(70, 12);
 	logarithmicButton->setModel(&controls->m_logarithmicModel);
 	switch_layout->addWidget(logarithmicButton);
-
-	// Full-view switch
-	LedCheckBox *fullViewButton = new LedCheckBox(tr("Full view"), this);
-	fullViewButton->setToolTip(tr("Display amplitude on logarithmic scale to better see small values"));
-	fullViewButton->setCheckable(true);
-	fullViewButton->setMinimumSize(70, 12);
-	fullViewButton->setModel(&controls->m_fullViewModel);
-	switch_layout->addWidget(fullViewButton);
 
 	config_layout->addStretch();
 
@@ -89,3 +91,4 @@ QSize VecControlsDialog::sizeHint() const
 {
 	return QSize(300, 300);
 }
+

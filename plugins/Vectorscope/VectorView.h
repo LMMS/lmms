@@ -57,15 +57,18 @@ private:
 	LocklessRingBufferReader<sampleFrame> m_bufferReader;
 
 	std::vector<uchar> m_displayBuffer;
-
-	bool m_visible;
 	const unsigned short m_displaySize;
 
-unsigned int x_old = m_displaySize / 2;
-unsigned int y_old = m_displaySize / 2;
+	bool m_visible;
+
+	// State variables for comparison with previous repaint
+	unsigned int m_persistTimestamp;
+	bool m_oldHQ;
+	int m_oldX;
+	int m_oldY;
 
 	#ifdef VEC_DEBUG
-		float m_execution_avg = 0;
+		float m_executionAvg = 0;
 	#endif
 };
 #endif // VECTORVIEW_H
