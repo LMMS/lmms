@@ -39,13 +39,18 @@ class LocklessRingBuffer
 	template<class _T>
 	friend class LocklessRingBufferReader;
 public:
-	LocklessRingBuffer(std::size_t sz);
-	~LocklessRingBuffer();
+	LocklessRingBuffer(std::size_t sz) : m_buffer(sz) {};
+	~LocklessRingBuffer() {};
 
-	std::size_t write(const T *src, size_t cnt);
-	std::size_t capacity();
-	std::size_t free();
-	void wakeAll();
+	std::size_t write(const T *src, size_t cnt)
+	{
+		std::size_t written = m_buffer.write(src, cnt);
+		m_notifier.wakeAll();	// Let all waiting readers know new data are available.
+		return written;
+	}
+	std::size_t capacity() {return m_buffer.maximum_eventual_write_space();}
+	std::size_t free() {return m_buffer.write_space();}
+	void wakeAll() {m_notifier.wakeAll();}
 
 private:
 	ringbuffer_t<T> m_buffer;
@@ -71,15 +76,51 @@ public:
 };
 
 
+//! Specialized version with write function modified to support sampleFrame.
+template <>
+class LocklessRingBuffer<sampleFrame>
+{
+	template<class _T>
+	friend class LocklessRingBufferReader;
+public:
+	LocklessRingBuffer(std::size_t sz) : m_buffer(sz) {};
+	~LocklessRingBuffer() {};
+
+	std::size_t write(const sampleFrame *src, size_t cnt)
+	{
+	    sampleFrame_copier copier(src);
+	    std::size_t written = m_buffer.write_func<sampleFrame_copier>(copier, cnt);
+		// Let all waiting readers know new data are available.
+		m_notifier.wakeAll();
+		return written;
+	}
+
+	std::size_t capacity() {return m_buffer.maximum_eventual_write_space();}
+	std::size_t free() {return m_buffer.write_space();}
+	void wakeAll() {m_notifier.wakeAll();}
+
+private:
+	ringbuffer_t<sampleFrame> m_buffer;
+	QWaitCondition m_notifier;
+};
+
+
 //! Wrapper for lockless ringbuffer reader
 template <class T>
 class LocklessRingBufferReader : public ringbuffer_reader_t<T>
 {
 public:
-	LocklessRingBufferReader(LocklessRingBuffer<T> &rb);
+	LocklessRingBufferReader(LocklessRingBuffer<T> &rb) :
+		ringbuffer_reader_t<T>(rb.m_buffer),
+		m_notifier(&rb.m_notifier) {};
 
-	bool empty();
-	void waitForData();
+	bool empty() {return !this->read_space();}
+	void waitForData()
+	{
+		QMutex useless_lock;
+		m_notifier->wait(&useless_lock);
+		useless_lock.unlock();
+	}
 private:
 	QWaitCondition *m_notifier;
 };
@@ -87,7 +128,6 @@ private:
 
 // This is required to force MSVC compilers to export symbols for template class methods.
 // Any template instances that are not specified here will not work in plugins.
-template class LMMS_EXPORT LocklessRingBuffer<sampleFrame>;
 template class LMMS_EXPORT LocklessRingBufferReader<sampleFrame>;
 
 #endif //LOCKLESSRINGBUFFER_H
