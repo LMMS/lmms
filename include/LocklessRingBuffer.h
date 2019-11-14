@@ -34,7 +34,7 @@
 
 //! A convenience layer for a realtime-safe and thread-safe multi-reader ring buffer library.
 template <class T>
-class LMMS_EXPORT LocklessRingBuffer
+class LocklessRingBuffer
 {
 	template<class _T>
 	friend class LocklessRingBufferReader;
@@ -73,7 +73,7 @@ public:
 
 //! Wrapper for lockless ringbuffer reader
 template <class T>
-class LMMS_EXPORT LocklessRingBufferReader : public ringbuffer_reader_t<T>
+class LocklessRingBufferReader : public ringbuffer_reader_t<T>
 {
 public:
 	LocklessRingBufferReader(LocklessRingBuffer<T> &rb);
