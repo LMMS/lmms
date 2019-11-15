@@ -162,7 +162,7 @@ void VstEffectControls::managePlugin( void )
 		manageVSTEffectView * tt = new manageVSTEffectView( m_effect, this);
 		ctrHandle = (QObject *)tt;
 	} else if (m_subWindow != NULL) {
-		if (m_subWindow->widget()->isVisible() == false ) { 
+		if (m_subWindow->widget()->isVisible() == false ) {
 			m_scrollArea->show();
 			m_subWindow->show();
 		} else {
@@ -308,7 +308,7 @@ manageVSTEffectView::manageVSTEffectView( VstEffect * _eff, VstEffectControls * 
         m_vi->m_scrollArea = new QScrollArea( widget );
 	l = new QGridLayout( widget );
 
-	m_vi->m_subWindow = gui->mainWindow()->addWindowedWidget(NULL, Qt::SubWindow | 
+	m_vi->m_subWindow = gui->mainWindow()->addWindowedWidget(NULL, Qt::SubWindow |
 			Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowSystemMenuHint);
 	m_vi->m_subWindow->setSizePolicy( QSizePolicy::Fixed, QSizePolicy::Fixed );
 	m_vi->m_subWindow->setFixedSize( 960, 300);
@@ -350,7 +350,7 @@ manageVSTEffectView::manageVSTEffectView( VstEffect * _eff, VstEffectControls * 
 	const QMap<QString, QString> & dump = m_effect->m_plugin->parameterDump();
 	m_vi->paramCount = dump.size();
 
-	vstKnobs = new Knob *[ m_vi->paramCount ];
+	vstKnobs = new CustomTextKnob *[ m_vi->paramCount ];
 
 	bool hasKnobModel = true;
 	if (m_vi->knobFModel == NULL) {
@@ -366,8 +366,8 @@ manageVSTEffectView::manageVSTEffectView( VstEffect * _eff, VstEffectControls * 
 		sprintf( paramStr, "param%d", i);
 		s_dumpValues = dump[ paramStr ].split( ":" );
 
-		vstKnobs[ i ] = new Knob( knobBright_26, widget, s_dumpValues.at( 1 ) );
-		vstKnobs[ i ]->setHintText( s_dumpValues.at( 1 ) + ":", "" );
+		vstKnobs[ i ] = new CustomTextKnob( knobBright_26, widget, s_dumpValues.at( 1 ) );
+		vstKnobs[ i ]->setDescription( s_dumpValues.at( 1 ) + ":" );
 		vstKnobs[ i ]->setLabel( s_dumpValues.at( 1 ).left( 15 ) );
 
 		if( !hasKnobModel )
@@ -382,6 +382,7 @@ manageVSTEffectView::manageVSTEffectView( VstEffect * _eff, VstEffectControls * 
 			[this, model]() { setParameter( model ); }, Qt::DirectConnection);
 		vstKnobs[ i ] ->setModel( model );
 	}
+	syncParameterText();
 
 	int i = 0;
 	for( int lrow = 1; lrow < ( int( m_vi->paramCount / 10 ) + 1 ) + 1; lrow++ )
@@ -444,6 +445,7 @@ void manageVSTEffectView::syncPlugin( void )
 			m_vi2->knobFModel[ i ]->setInitValue( f_value );
 		}
 	}
+	syncParameterText();
 }
 
 
@@ -462,7 +464,7 @@ void manageVSTEffectView::displayAutomatedOnly( void )
 			{
 				vstKnobs[ i ]->hide();
 				m_displayAutomatedOnly->setText( "All" );
-			} else {	
+			} else {
 				vstKnobs[ i ]->show();
 				m_displayAutomatedOnly->setText( "Automated" );
 			}
@@ -479,16 +481,33 @@ void manageVSTEffectView::setParameter( Model * action )
 
 	if ( m_effect->m_plugin != NULL ) {
 		m_effect->m_plugin->setParam( knobUNID, m_vi2->knobFModel[knobUNID]->value() );
+		syncParameterText();
 	}
 }
 
+void manageVSTEffectView::syncParameterText()
+{
+	m_effect->m_plugin->loadParameterLabels();
+	m_effect->m_plugin->loadParameterDisplays();
+
+	QString paramLabelStr   = m_effect->m_plugin->allParameterLabels();
+	QString paramDisplayStr = m_effect->m_plugin->allParameterDisplays();
+
+	QStringList paramLabelList = paramLabelStr.split("|");
+	QStringList paramDisplayList = paramDisplayStr.split("|");
+
+	for( int i = 0; i < paramLabelList.size(); ++i )
+	{
+		vstKnobs[i]->setValueText(paramDisplayList[i] + ' ' + paramLabelList[i]);
+	}
+}
 
 
 
 manageVSTEffectView::~manageVSTEffectView()
 {
 	if( m_vi2->knobFModel != NULL )
-	{ 
+	{
 		for( int i = 0; i < m_vi2->paramCount; i++ )
 		{
 			delete m_vi2->knobFModel[ i ];
@@ -507,18 +526,18 @@ manageVSTEffectView::~manageVSTEffectView()
 		delete [] m_vi2->knobFModel;
 		m_vi2->knobFModel = NULL;
 	}
- 
+
 	if( m_vi2->m_scrollArea != NULL )
 	{
 		delete m_vi2->m_scrollArea;
 		m_vi2->m_scrollArea = NULL;
 	}
- 
+
 	if( m_vi2->m_subWindow != NULL )
 	{
 		m_vi2->m_subWindow->setAttribute( Qt::WA_DeleteOnClose );
 		m_vi2->m_subWindow->close();
- 
+
 		if( m_vi2->m_subWindow != NULL )
 		{
 			delete m_vi2->m_subWindow;
@@ -528,9 +547,3 @@ manageVSTEffectView::~manageVSTEffectView()
 	//delete m_vi2->m_subWindow;
 	//m_vi2->m_subWindow = NULL;
 }
-
-
-
-
-
-

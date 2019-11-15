@@ -34,7 +34,7 @@
 
 #include <QMdiSubWindow>
 #include <QScrollArea>
-#include "Knob.h"
+#include "CustomTextKnob.h"
 #include <QLayout>
 #include <QPainter>
 #include <QObject>
@@ -111,6 +111,7 @@ protected slots:
 	void syncPlugin( void );
 	void displayAutomatedOnly( void );
 	void setParameter( Model * action );
+	void syncParameterText();
 	void closeWindow();
 
 private:
@@ -129,7 +130,7 @@ private:
 	QPushButton * m_syncButton;
 	QPushButton * m_displayAutomatedOnly;
 	QPushButton * m_closeButton;
-	Knob ** vstKnobs;
+	CustomTextKnob ** vstKnobs;
 
 } ;
 
