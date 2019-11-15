@@ -53,6 +53,7 @@ SET(LMMS_SRCS
 	gui/widgets/ControllerRackView.cpp
 	gui/widgets/ControllerView.cpp
 	gui/widgets/CPULoadWidget.cpp
+	gui/widgets/CustomTextKnob.cpp
 	gui/widgets/EffectRackView.cpp
 	gui/widgets/EffectView.cpp
 	gui/widgets/EnvelopeAndLfoView.cpp
