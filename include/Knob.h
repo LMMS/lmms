@@ -143,7 +143,7 @@ private slots:
 	void toggleScale();
 
 private:
-	QString displayValue() const;
+	virtual QString displayValue() const;
 
 	void doConnections() override;
 
