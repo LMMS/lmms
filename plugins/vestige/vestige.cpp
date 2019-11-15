@@ -38,7 +38,6 @@
 #include <QMenu>
 #include <QDomElement>
 
-#include <iostream>
 #include <string>
 
 #include "ConfigManager.h"
