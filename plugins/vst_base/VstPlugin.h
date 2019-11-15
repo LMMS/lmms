@@ -49,7 +49,7 @@ public:
 
 	void tryLoad( const QString &remoteVstPluginExecutable );
 
-	virtual bool processMessage( const message & _m );
+	bool processMessage( const message & _m ) override;
 
 	inline bool hasEditor() const
 	{
@@ -99,17 +99,17 @@ public:
 
 	QWidget * pluginWidget();
 
-	virtual void loadSettings( const QDomElement & _this );
-	virtual void saveSettings( QDomDocument & _doc, QDomElement & _this );
+	void loadSettings( const QDomElement & _this ) override;
+	void saveSettings( QDomDocument & _doc, QDomElement & _this ) override;
 
-	inline virtual QString nodeName() const
+	virtual QString nodeName() const override
 	{
 		return "vstplugin";
 	}
 
 
 	virtual void createUI(QWidget *parent);
-	bool eventFilter(QObject *obj, QEvent *event);
+	bool eventFilter(QObject *obj, QEvent *event) override;
 
 	QString embedMethod() const;
 

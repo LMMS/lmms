@@ -61,8 +61,8 @@ public:
 
 
 protected:
-	virtual void paintEvent( QPaintEvent * _pe );
-	virtual void mousePressEvent( QMouseEvent * _me );
+	void paintEvent( QPaintEvent * _pe ) override;
+	void mousePressEvent( QMouseEvent * _me ) override;
 
 
 protected slots:

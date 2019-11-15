@@ -25,9 +25,6 @@
 #ifndef PITCH_H
 #define PITCH_H
 
-#include "lmms_basics.h"
-#include "Midi.h"
-
 typedef int16_t pitch_t;
 
 const pitch_t CentsPerSemitone = 100;

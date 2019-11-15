@@ -41,15 +41,15 @@ public:
 	virtual bool play( MidiTime _start, const fpp_t _frames,
 						const f_cnt_t _frame_base, int _tco_num = -1 );
 
-	virtual void updateAfterTrackAdd() override;
+	void updateAfterTrackAdd() override;
 
-	inline virtual QString nodeName() const override
+	inline QString nodeName() const override
 	{
 		return "bbtrackcontainer";
 	}
 
-	tact_t lengthOfBB( int _bb ) const;
-	inline tact_t lengthOfCurrentBB()
+	bar_t lengthOfBB( int _bb ) const;
+	inline bar_t lengthOfCurrentBB()
 	{
 		return lengthOfBB( currentBB() );
 	}
