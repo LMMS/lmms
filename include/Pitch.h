@@ -25,6 +25,8 @@
 #ifndef PITCH_H
 #define PITCH_H
 
+#include <cstdint>
+
 typedef int16_t pitch_t;
 
 const pitch_t CentsPerSemitone = 100;
