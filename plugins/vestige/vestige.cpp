@@ -38,6 +38,9 @@
 #include <QMenu>
 #include <QDomElement>
 
+#include <iostream>
+#include <string>
+
 #include "ConfigManager.h"
 #include "BufferManager.h"
 #include "ConfigManager.h"
@@ -951,7 +954,7 @@ manageVestigeInstrumentView::manageVestigeInstrumentView( Instrument * _instrume
 	const QMap<QString, QString> & dump = m_vi->m_plugin->parameterDump();
 	m_vi->paramCount = dump.size();
 
-	vstKnobs = new Knob *[ m_vi->paramCount ];
+	vstKnobs = new CustomTextKnob *[ m_vi->paramCount ];
 
 	bool hasKnobModel = true;
 	if (m_vi->knobFModel == NULL) {
@@ -967,8 +970,8 @@ manageVestigeInstrumentView::manageVestigeInstrumentView( Instrument * _instrume
 		sprintf( paramStr, "param%d", i);
 		s_dumpValues = dump[ paramStr ].split( ":" );
 
-		vstKnobs[ i ] = new Knob( knobBright_26, this, s_dumpValues.at( 1 ) );
-		vstKnobs[ i ]->setHintText( s_dumpValues.at( 1 ) + ":", "" );
+		vstKnobs[ i ] = new CustomTextKnob( knobBright_26, this, s_dumpValues.at( 1 ) );
+		vstKnobs[ i ]->setDescription( s_dumpValues.at( 1 ) + ":" );
 		vstKnobs[ i ]->setLabel( s_dumpValues.at( 1 ).left( 15 ) );
 
 		if( !hasKnobModel )
@@ -983,6 +986,7 @@ manageVestigeInstrumentView::manageVestigeInstrumentView( Instrument * _instrume
 			[this, model]() { setParameter( model ); }, Qt::DirectConnection);
 		vstKnobs[i] ->setModel( model );
 	}
+	syncParameterText();
 
 	int i = 0;
 	for( int lrow = 1; lrow < ( int( m_vi->paramCount / 10 ) + 1 ) + 1; lrow++ )
@@ -1043,6 +1047,7 @@ void manageVestigeInstrumentView::syncPlugin( void )
 			m_vi->knobFModel[ i ]->setInitValue( f_value );
 		}
 	}
+	syncParameterText();
 }
 
 
@@ -1118,6 +1123,24 @@ void manageVestigeInstrumentView::setParameter( Model * action )
 
 	if ( m_vi->m_plugin != NULL ) {
 		m_vi->m_plugin->setParam( knobUNID, m_vi->knobFModel[knobUNID]->value() );
+		syncParameterText();
+	}
+}
+
+void manageVestigeInstrumentView::syncParameterText()
+{
+	m_vi->m_plugin->loadParameterLabels();
+	m_vi->m_plugin->loadParameterDisplays();
+
+	QString paramLabelStr   = m_vi->m_plugin->allParameterLabels();
+	QString paramDisplayStr = m_vi->m_plugin->allParameterDisplays();
+
+	QStringList paramLabelList = paramLabelStr.split("|");
+	QStringList paramDisplayList = paramDisplayStr.split("|");
+
+	for( int i = 0; i < paramLabelList.size(); ++i )
+	{
+		vstKnobs[i]->setValueText(paramDisplayList[i] + ' ' + paramLabelList[i]);
 	}
 }
 
