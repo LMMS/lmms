@@ -60,7 +60,7 @@ private:
 
 // The sampleFrame_copier is required because sampleFrame is just a two-element
 // array and therefore does not have a copy constructor needed by std::copy.
-class LMMS_EXPORT sampleFrame_copier
+class sampleFrame_copier
 {
 	const sampleFrame* src;
 public:
@@ -128,6 +128,6 @@ private:
 
 // This is required to force MSVC compilers to export symbols for template class methods.
 // Any template instances that are not specified here will not work in plugins.
-template class LMMS_EXPORT LocklessRingBufferReader<sampleFrame>;
+//template class LMMS_EXPORT LocklessRingBufferReader<sampleFrame>;
 
 #endif //LOCKLESSRINGBUFFER_H
