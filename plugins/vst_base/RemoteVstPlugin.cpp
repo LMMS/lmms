@@ -70,6 +70,7 @@
 #include <queue>
 #include <string>
 #include <iostream>
+#include <string>
 
 #include <aeffectx.h>
 
@@ -222,6 +223,10 @@ public:
 
 	// determine name of current program
 	const char * programName();
+
+	void getParameterDisplays();
+
+	void getParameterLabels();
 
 	// send name of current program back to host
 	void sendCurrentProgramName();
@@ -660,6 +665,14 @@ bool RemoteVstPlugin::processMessage( const message & _m )
 			//sendMessage( IdVstSetParameter );
 			break;
 
+		case IdVstParameterDisplays:
+			getParameterDisplays();
+			break;
+
+		case IdVstParameterLabels:
+			getParameterLabels();
+			break;
+
 
 		case IdVstIdleUpdate:
 		{
@@ -1065,6 +1078,45 @@ const char * RemoteVstPlugin::programName()
 
 	return buf;
 }
+
+
+
+
+void RemoteVstPlugin::getParameterDisplays()
+{
+	std::string presName;
+	static char buf[9];
+	for (int i=0; i< m_plugin->numParams; ++i)
+	{
+		memset( buf, 0, sizeof( buf ) );
+		pluginDispatch( effGetParamDisplay, i, 0, buf );
+		buf[8] = 0;
+		if (i != 0) presName += '|';
+		presName += buf;
+	}
+
+	sendMessage( message( IdVstParameterDisplays ).addString( presName.c_str() ) );
+}
+
+
+
+
+void RemoteVstPlugin::getParameterLabels()
+{
+	std::string presName;
+	static char buf[9];
+	for (int i=0; i< m_plugin->numParams; ++i)
+	{
+		memset( buf, 0, sizeof( buf ) );
+		pluginDispatch( effGetParamLabel, i, 0, buf );
+		buf[8] = 0;
+		if (i != 0) presName += '|';
+		presName += buf;
+	}
+
+	sendMessage( message( IdVstParameterLabels ).addString( presName.c_str() ) );
+}
+
 
 
 
