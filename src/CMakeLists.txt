@@ -90,6 +90,8 @@ IF(NOT ("${LAME_INCLUDE_DIRS}" STREQUAL ""))
 	INCLUDE_DIRECTORIES("${LAME_INCLUDE_DIRS}")
 ENDIF()
 
+LIST(APPEND LMMS_SRCS "${RINGBUFFER_DIR}/src/lib/ringbuffer.cpp")
+
 # Use libraries in non-standard directories (e.g., another version of Qt)
 IF(LMMS_BUILD_LINUX)
 	LINK_LIBRARIES(-Wl,--enable-new-dtags)

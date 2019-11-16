@@ -34,25 +34,22 @@
 
 //! A convenience layer for a realtime-safe and thread-safe multi-reader ring buffer library.
 template <class T>
-class LocklessRingBuffer
+class LocklessRingBufferBase
 {
 	template<class _T>
 	friend class LocklessRingBufferReader;
 public:
-	LocklessRingBuffer(std::size_t sz) : m_buffer(sz) {};
-	~LocklessRingBuffer() {};
-
-	std::size_t write(const T *src, size_t cnt)
+	LocklessRingBufferBase(std::size_t sz) : m_buffer(sz)
 	{
-		std::size_t written = m_buffer.write(src, cnt);
-		m_notifier.wakeAll();	// Let all waiting readers know new data are available.
-		return written;
+		m_buffer.touch();	// reserve storage space before realtime operation starts
 	}
-	std::size_t capacity() {return m_buffer.maximum_eventual_write_space();}
-	std::size_t free() {return m_buffer.write_space();}
+	~LocklessRingBufferBase() {};
+
+	std::size_t capacity() const {return m_buffer.maximum_eventual_write_space();}
+	std::size_t free() const {return m_buffer.write_space();}
 	void wakeAll() {m_notifier.wakeAll();}
 
-private:
+protected:
 	ringbuffer_t<T> m_buffer;
 	QWaitCondition m_notifier;
 };
@@ -76,32 +73,38 @@ public:
 };
 
 
-//! Specialized version with write function modified to support sampleFrame.
-template <>
-class LocklessRingBuffer<sampleFrame>
+//! Standard ring buffer template for data types with copy constructor.
+template <class T>
+class LocklessRingBuffer : public LocklessRingBufferBase<T>
 {
-	template<class _T>
-	friend class LocklessRingBufferReader;
 public:
-	LocklessRingBuffer(std::size_t sz) : m_buffer(sz) {};
-	~LocklessRingBuffer() {};
+	LocklessRingBuffer(std::size_t sz) : LocklessRingBufferBase<T>(sz) {};
 
-	std::size_t write(const sampleFrame *src, size_t cnt)
+	std::size_t write(const sampleFrame *src, std::size_t cnt, bool notify = false)
 	{
-	    sampleFrame_copier copier(src);
-	    std::size_t written = m_buffer.write_func<sampleFrame_copier>(copier, cnt);
+		std::size_t written = LocklessRingBufferBase<T>::m_buffer.write(src, cnt);
 		// Let all waiting readers know new data are available.
-		m_notifier.wakeAll();
+		if (notify) {LocklessRingBufferBase<T>::m_notifier.wakeAll();}
 		return written;
 	}
+};
 
-	std::size_t capacity() {return m_buffer.maximum_eventual_write_space();}
-	std::size_t free() {return m_buffer.write_space();}
-	void wakeAll() {m_notifier.wakeAll();}
 
-private:
-	ringbuffer_t<sampleFrame> m_buffer;
-	QWaitCondition m_notifier;
+//! Specialized ring buffer template with write function modified to support sampleFrame.
+template <>
+class LocklessRingBuffer<sampleFrame> : public LocklessRingBufferBase<sampleFrame>
+{
+public:
+	LocklessRingBuffer(std::size_t sz) : LocklessRingBufferBase<sampleFrame>(sz) {};
+
+	std::size_t write(const sampleFrame *src, std::size_t cnt, bool notify = false)
+	{
+		sampleFrame_copier copier(src);
+		std::size_t written = LocklessRingBufferBase<sampleFrame>::m_buffer.write_func<sampleFrame_copier>(copier, cnt);
+		// Let all waiting readers know new data are available.
+		if (notify) {LocklessRingBufferBase<sampleFrame>::m_notifier.wakeAll();}
+		return written;
+	}
 };
 
 
@@ -124,10 +127,5 @@ public:
 private:
 	QWaitCondition *m_notifier;
 };
-
-
-// This is required to force MSVC compilers to export symbols for template class methods.
-// Any template instances that are not specified here will not work in plugins.
-//template class LMMS_EXPORT LocklessRingBufferReader<sampleFrame>;
 
 #endif //LOCKLESSRINGBUFFER_H

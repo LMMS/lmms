@@ -93,7 +93,7 @@ bool Analyzer::processAudioBuffer(sampleFrame *buffer, const fpp_t frame_count)
 	if (m_controls.isViewVisible()) {
 		// To avoid processing spikes on audio thread, data are stored in
 		// a lockless ringbuffer and processed in a separate thread.
-		m_inputBuffer.write(buffer, frame_count);
+		m_inputBuffer.write(buffer, frame_count, true);
 	}
 	#ifdef SA_DEBUG
 		audio_time = std::chrono::high_resolution_clock::now().time_since_epoch().count() - audio_time;

@@ -1,6 +1,5 @@
 set(LMMS_SRCS
 	${LMMS_SRCS}
-	3rdparty/ringbuffer/src/lib/ringbuffer.cpp
 
 	core/AutomatableModel.cpp
 	core/AutomationPattern.cpp
