@@ -56,7 +56,7 @@ protected:
 };
 
 
-// The sampleFrame_copier is required because sampleFrame is just a two-element
+// The SampleFrameCopier is required because sampleFrame is just a two-element
 // array and therefore does not have a copy constructor needed by std::copy.
 class SampleFrameCopier
 {
@@ -100,7 +100,7 @@ public:
 
 	std::size_t write(const sampleFrame *src, std::size_t cnt, bool notify = false)
 	{
-		sampleFrame_copier copier(src);
+		SampleFrameCopier copier(src);
 		std::size_t written = LocklessRingBufferBase<sampleFrame>::m_buffer.write_func<SampleFrameCopier>(copier, cnt);
 		// Let all waiting readers know new data are available.
 		if (notify) {LocklessRingBufferBase<sampleFrame>::m_notifier.wakeAll();}
