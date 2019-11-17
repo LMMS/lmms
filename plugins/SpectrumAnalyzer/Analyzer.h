@@ -27,12 +27,14 @@
 #ifndef ANALYZER_H
 #define ANALYZER_H
 
+#include <QWaitCondition>
+
 #include "DataprocLauncher.h"
 #include "Effect.h"
+#include "LocklessRingBuffer.h"
 #include "SaControls.h"
 #include "SaProcessor.h"
-#include <QWaitCondition>
-#include "LocklessRingBuffer.h"
+
 
 //! Top level class; handles LMMS interface and feeds data to the data processor.
 class Analyzer : public Effect

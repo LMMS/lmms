@@ -25,11 +25,12 @@
 #ifndef LOCKLESSRINGBUFFER_H
 #define LOCKLESSRINGBUFFER_H
 
-#include "lmms_export.h"
-#include "../src/3rdparty/ringbuffer/include/ringbuffer/ringbuffer.h"
-#include "lmms_basics.h"
 #include <QMutex>
 #include <QWaitCondition>
+
+#include "lmms_basics.h"
+#include "lmms_export.h"
+#include "../src/3rdparty/ringbuffer/include/ringbuffer/ringbuffer.h"
 
 
 //! A convenience layer for a realtime-safe and thread-safe multi-reader ring buffer library.
@@ -57,17 +58,17 @@ protected:
 
 // The sampleFrame_copier is required because sampleFrame is just a two-element
 // array and therefore does not have a copy constructor needed by std::copy.
-class sampleFrame_copier
+class SampleFrameCopier
 {
-	const sampleFrame* src;
+	const sampleFrame* m_src;
 public:
-	sampleFrame_copier(const sampleFrame* src) : src(src) {}
+	SampleFrameCopier(const sampleFrame* src) : m_src(src) {}
 	void operator()(std::size_t src_offset, std::size_t count, sampleFrame* dest)
 	{
 		for (std::size_t i = src_offset; i < src_offset + count; i++, dest++)
 		{
-			(*dest)[0] = src[i][0];
-			(*dest)[1] = src[i][1];
+			(*dest)[0] = m_src[i][0];
+			(*dest)[1] = m_src[i][1];
 		}
 	}
 };
@@ -100,7 +101,7 @@ public:
 	std::size_t write(const sampleFrame *src, std::size_t cnt, bool notify = false)
 	{
 		sampleFrame_copier copier(src);
-		std::size_t written = LocklessRingBufferBase<sampleFrame>::m_buffer.write_func<sampleFrame_copier>(copier, cnt);
+		std::size_t written = LocklessRingBufferBase<sampleFrame>::m_buffer.write_func<SampleFrameCopier>(copier, cnt);
 		// Let all waiting readers know new data are available.
 		if (notify) {LocklessRingBufferBase<sampleFrame>::m_notifier.wakeAll();}
 		return written;
@@ -117,7 +118,7 @@ public:
 		ringbuffer_reader_t<T>(rb.m_buffer),
 		m_notifier(&rb.m_notifier) {};
 
-	bool empty() {return !this->read_space();}
+	bool empty() const {return !this->read_space();}
 	void waitForData()
 	{
 		QMutex useless_lock;

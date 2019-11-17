@@ -23,6 +23,9 @@
 #include "SaWaterfallView.h"
 
 #include <algorithm>
+#ifdef SA_DEBUG
+	#include <chrono>
+#endif
 #include <cmath>
 #include <QImage>
 #include <QMouseEvent>
@@ -35,10 +38,6 @@
 #include "GuiApplication.h"
 #include "MainWindow.h"
 #include "SaProcessor.h"
-
-#ifdef SA_DEBUG
-	#include <chrono>
-#endif
 
 
 SaWaterfallView::SaWaterfallView(SaControls *controls, SaProcessor *processor, QWidget *_parent) :

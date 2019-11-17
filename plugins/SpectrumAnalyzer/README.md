@@ -18,7 +18,7 @@ The Spectrum Analyzer is involved in three different threads:
 
 ## Changelog
 	1.1.1	2019-10-13
-		- improved interface for accessing SaProcessor provate data
+		- improved interface for accessing SaProcessor private data
 		- readme file update
 		- other small improvements based on reviews
 	1.1.0	2019-08-29

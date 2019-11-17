@@ -26,17 +26,19 @@
 #include "SaProcessor.h"
 
 #include <algorithm>
+#ifdef SA_DEBUG
+	#include <chrono>
+#endif
 #include <cmath>
+#ifdef SA_DEBUG
+	#include <iomanip>
+	#include <iostream>
+#endif
 #include <QMutexLocker>
 
 #include "lmms_math.h"
 #include "LocklessRingBuffer.h"
 
-#ifdef SA_DEBUG
-	#include <chrono>
-	#include <iomanip>
-	#include <iostream>
-#endif
 
 SaProcessor::SaProcessor(const SaControls *controls) :
 	m_controls(controls),
@@ -93,7 +95,8 @@ void SaProcessor::analyze(LocklessRingBuffer<sampleFrame> &ring_buffer)
 	LocklessRingBufferReader<sampleFrame> reader(ring_buffer);
 
 	// Processing thread loop
-	while (!m_terminate) {
+	while (!m_terminate)
+	{
 		// If there is nothing to read, wait for notification from the writing side.
 		if (reader.empty()) {reader.waitForData();}
 
@@ -205,7 +208,8 @@ void SaProcessor::analyze(LocklessRingBuffer<sampleFrame> &ring_buffer)
 					for (unsigned int i = 0; i < waterfallWidth(); i++)
 					{
 						// fill line with red color to indicate lost data if CPU cannot keep up
-						if (overload) {
+						if (overload)
+						{
 							pixel[i] = qRgb(42, 0, 0);
 							continue;
 						}
