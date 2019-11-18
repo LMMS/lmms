@@ -204,8 +204,7 @@ void SaProcessor::analyze(LocklessRingBuffer<sampleFrame> &ring_buffer)
 					int target;		// pixel being constructed
 					float accL = 0;	// accumulators for merging multiple bins
 					float accR = 0;
-
-					for (unsigned int i = 0; i < waterfallWidth(); i++)
+					for (unsigned int i = 0; i < binCount(); i++)
 					{
 						// fill line with red color to indicate lost data if CPU cannot keep up
 						if (overload)
