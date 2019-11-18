@@ -44,7 +44,7 @@ extern "C" {
 		"Spectrum Analyzer",
 		QT_TRANSLATE_NOOP("pluginBrowser", "A graphical spectrum analyzer."),
 		"Martin Pavelek <he29/dot/HS/at/gmail/dot/com>",
-		0x0111,
+		0x0112,
 		Plugin::Effect,
 		new PluginPixmapLoader("logo"),
 		NULL,

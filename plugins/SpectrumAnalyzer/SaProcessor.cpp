@@ -207,7 +207,7 @@ void SaProcessor::analyze(LocklessRingBuffer<sampleFrame> &ring_buffer)
 					for (unsigned int i = 0; i < binCount(); i++)
 					{
 						// fill line with red color to indicate lost data if CPU cannot keep up
-						if (overload)
+						if (overload && i < waterfallWidth())
 						{
 							pixel[i] = qRgb(42, 0, 0);
 							continue;
@@ -517,8 +517,11 @@ unsigned int SaProcessor::binCount() const
 }
 
 
+// Return the final width of waterfall display buffer.
+// Normally the waterfall width equals the number of frequency bins, but the
 // FFT transform can easily produce more bins than can be reasonably useful for
-// display. Cap the width at 3840: full screen on UHD display should be enough.
+// currently used display resolutions. This function limits width of the final
+// image to a given size, which is then used during waterfall render and display.
 unsigned int SaProcessor::waterfallWidth() const
 {
 	return binCount() < m_waterfallMaxWidth ? binCount() : m_waterfallMaxWidth;

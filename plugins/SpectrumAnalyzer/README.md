@@ -17,6 +17,9 @@ The Spectrum Analyzer is involved in three different threads:
 
 
 ## Changelog
+	1.1.2	2019-11-18
+		- waterfall is no longer cut short when width limit is reached
+		- various small tweaks based on final review
 	1.1.1	2019-10-13
 		- improved interface for accessing SaProcessor private data
 		- readme file update
