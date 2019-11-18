@@ -39,10 +39,11 @@ VecControls::VecControls(Vectorscope *effect) :
 	m_logarithmicModel(false, this, tr("Logarithmic scale")),
 	m_highQualityModel(false, this, tr("High quality"))
 {
-	// Colors
-	m_colorFG = QColor(60, 255, 130, 255);
-	m_colorGrid = QColor(30, 34, 38, 255);		// ~40 % gray (slightly cold / blue)
-	m_colorLabels = QColor(192, 202, 212, 255);	// ~90 % gray (slightly cold / blue)
+	// Colors (percentages include sRGB gamma correction)
+	m_colorFG = QColor(60, 255, 130, 255);		// ~LMMS green
+	m_colorGrid = QColor(76, 80, 84, 128);		// ~60 % gray (slightly cold / blue), 50 % transparent
+	m_colorLabels = QColor(76, 80, 84, 255);	// ~60 % gray (slightly cold / blue)
+	m_colorOutline = QColor(30, 34, 38, 255);	// ~40 % gray (slightly cold / blue)
 }
 
 

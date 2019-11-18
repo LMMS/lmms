@@ -23,7 +23,6 @@
 #ifndef VECTORVIEW_H
 #define VECTORVIEW_H
 
-#include <QPainter>
 #include <QWidget>
 
 #include "Knob.h"
@@ -31,7 +30,7 @@
 #include "LocklessRingBuffer.h"
 #include "VecControls.h"
 
-#define VEC_DEBUG
+//#define VEC_DEBUG
 
 
 // Widget that displays a vectorscope visualization of stereo signal.
@@ -39,7 +38,7 @@ class VectorView : public QWidget
 {
 	Q_OBJECT
 public:
-	explicit VectorView(VecControls *controls, LocklessRingBuffer<sampleFrame> *inputBuffer, unsigned short displaySize, QWidget *_parent = 0);
+	explicit VectorView(VecControls *controls, LocklessRingBuffer<sampleFrame> *inputBuffer, unsigned short displaySize, QWidget *parent = 0);
 	virtual ~VectorView() {}
 
 	QSize sizeHint() const override {return QSize(300, 300);}

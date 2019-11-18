@@ -58,6 +58,7 @@ private:
 	QColor	m_colorBG;
 	QColor	m_colorGrid;
 	QColor	m_colorLabels;
+	QColor	m_colorOutline;
 
 	friend class VecControlsDialog;
 	friend class VectorView;

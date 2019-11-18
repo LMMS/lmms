@@ -47,7 +47,7 @@ VecControlsDialog::VecControlsDialog(VecControls *controls) :
 	setLayout(master_layout);
 
 	// Visualizer widget
-	VectorView *display = new VectorView(controls, m_controls->m_effect->getBuffer(), 1024, this);
+	VectorView *display = new VectorView(controls, m_controls->m_effect->getBuffer(), 768, this);
 	master_layout->addWidget(display);
 
 	// Config area located inside visualizer
@@ -89,6 +89,5 @@ VecControlsDialog::VecControlsDialog(VecControls *controls) :
 // Suggest the best current widget size.
 QSize VecControlsDialog::sizeHint() const
 {
-	return QSize(300, 300);
+	return QSize(275, 300);
 }
-
