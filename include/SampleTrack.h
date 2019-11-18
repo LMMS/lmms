@@ -162,6 +162,11 @@ public:
 		return "sampletrack";
 	}
 
+	bool wasPlaying()
+	{
+		return m_wasPlaying;
+	}
+
 signals:
 	void playing();
 	void notPlaying();
@@ -215,6 +220,7 @@ public:
 
 public slots:
 	void showEffects();
+	void stopPlaying();
 
 
 protected:

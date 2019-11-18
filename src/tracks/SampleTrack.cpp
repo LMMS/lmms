@@ -866,7 +866,7 @@ SampleTrackView::SampleTrackView( SampleTrack * _t, TrackContainerView* tcv ) :
 	connect(_t, SIGNAL(notPlaying()),
 			m_activityIndicator, SLOT(notPlaying()));
 	connect(Engine::getSong(), SIGNAL(stopped()),
-			m_activityIndicator, SLOT(notPlaying()));
+			this, SLOT(stopPlaying()));
 
 	setModel( _t );
 
@@ -978,6 +978,16 @@ void SampleTrackView::dropEvent(QDropEvent *de)
 		if (sTco) { sTco->setSampleFile(value); }
 	}
 
+}
+
+
+
+void SampleTrackView::stopPlaying()
+{
+	if (dynamic_cast<SampleTrack*>(getTrack())->wasPlaying())
+	{
+		m_activityIndicator->notPlaying();
+	}
 }
 
 
