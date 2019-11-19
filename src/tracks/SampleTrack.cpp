@@ -984,9 +984,11 @@ void SampleTrackView::dropEvent(QDropEvent *de)
 
 void SampleTrackView::stopPlaying()
 {
-	if (dynamic_cast<SampleTrack*>(getTrack())->wasPlaying())
+	SampleTrack * smpltrck = dynamic_cast<SampleTrack*>(getTrack());
+	if (smpltrck->wasPlaying())
 	{
 		m_activityIndicator->notPlaying();
+		smpltrck->setWasPlaying(false);
 	}
 }
 

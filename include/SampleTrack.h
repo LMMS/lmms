@@ -167,6 +167,11 @@ public:
 		return m_wasPlaying;
 	}
 
+	void setWasPlaying(bool wasPlaying)
+	{
+		m_wasPlaying = wasPlaying;
+	}
+
 signals:
 	void playing();
 	void notPlaying();
