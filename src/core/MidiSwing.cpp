@@ -1,5 +1,5 @@
 /*
- * MidiSwing.cpp - Swing algo using fixed integer step adjustments that 
+ * MidiSwing.cpp - Swing algo using fixed integer step adjustments that
  *                 could be represented as midi.
  *
  * Copyright (c) 2004-2014 teknopaul <teknopaul/at/users.sourceforge.net>
@@ -55,13 +55,13 @@ int MidiSwing::isInTick(MidiTime * curStart, Note * n, Pattern * p)
 
 	int posInEigth = -1;
 	if (posInBeat >= 12 && posInBeat < 18)
-	{  
+	{
 		// 1st half of second quarter
 		// add a 0 - 24 tick shift
 		posInEigth = posInBeat - 12;  // 0-5
 	}
 	else  if (posInBeat >= 36 && posInBeat < 42)
-	{ 
+	{
 		// 1st half of third quarter
 		posInEigth = posInBeat - 36;  // 0-5
 	}

@@ -294,7 +294,7 @@ private:
 	friend class InstrumentMiscView;
 
 private slots:
-void updateGroove();
+	void updateGroove();
 };
 
 

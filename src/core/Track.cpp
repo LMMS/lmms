@@ -1999,6 +1999,9 @@ void TrackOperationsWidget::removeTrack()
 	emit trackRemovalScheduled( m_trackView );
 }
 
+
+
+
 /*! \brief Update the trackOperationsWidget context menu
  *
  *  For all track types, we have the Clone and Remove options.

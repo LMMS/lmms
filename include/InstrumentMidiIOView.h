@@ -75,6 +75,7 @@ public:
 	{
 		return m_pitchGroupBox;
 	}
+
 	GroupBox * grooveGroupBox()
 	{
 		return m_grooveGroupBox;
