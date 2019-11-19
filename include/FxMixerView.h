@@ -41,7 +41,7 @@
 class QButtonGroup;
 class FxLine;
 
-class EXPORT FxMixerView : public QWidget, public ModelView,
+class LMMS_EXPORT FxMixerView : public QWidget, public ModelView,
 					public SerializingObjectHook
 {
 	Q_OBJECT
@@ -64,10 +64,10 @@ public:
 	FxMixerView();
 	virtual ~FxMixerView();
 
-	virtual void keyPressEvent(QKeyEvent * e);
+	void keyPressEvent(QKeyEvent * e) override;
 
-	virtual void saveSettings( QDomDocument & _doc, QDomElement & _this );
-	virtual void loadSettings( const QDomElement & _this );
+	void saveSettings( QDomDocument & _doc, QDomElement & _this ) override;
+	void loadSettings( const QDomElement & _this ) override;
 
 	inline FxLine * currentFxLine()
 	{
@@ -110,7 +110,7 @@ public slots:
 	int addNewChannel();
 
 protected:
-	virtual void closeEvent( QCloseEvent * _ce );
+	void closeEvent( QCloseEvent * _ce ) override;
 	
 private slots:
 	void updateFaders();

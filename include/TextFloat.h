@@ -29,10 +29,10 @@
 #include <QWidget>
 #include <QPixmap>
 
-#include "export.h"
+#include "lmms_export.h"
 
 
-class EXPORT TextFloat : public QWidget
+class LMMS_EXPORT TextFloat : public QWidget
 {
 	Q_OBJECT
 public:
@@ -66,8 +66,8 @@ public:
 
 
 protected:
-	virtual void paintEvent( QPaintEvent * _me );
-	virtual void mousePressEvent( QMouseEvent * _me );
+	void paintEvent( QPaintEvent * _me ) override;
+	void mousePressEvent( QMouseEvent * _me ) override;
 
 
 private:

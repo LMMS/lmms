@@ -59,10 +59,7 @@ public:
 
 	virtual int controlCount();
 
-	virtual EffectControlDialog * createView()
-	{
-		return new VstEffectControlDialog( this );
-	}
+	virtual EffectControlDialog * createView();
 
 
 protected slots:
@@ -73,7 +70,7 @@ protected slots:
 	void rollPreset( void );
 	void rolrPreset( void );
 	void selPreset( void );
-	void setParameter( void );
+	void setParameter( Model * action );
 
 protected:
 	virtual void paintEvent( QPaintEvent * _pe );
@@ -96,6 +93,7 @@ private:
 	friend class VstEffectControlDialog;
 	friend class manageVSTEffectView;
 
+	bool m_vstGuiVisible;
 } ;
 
 
@@ -112,7 +110,7 @@ public:
 protected slots:
 	void syncPlugin( void );
 	void displayAutomatedOnly( void );
-	void setParameter( void );
+	void setParameter( Model * action );
 	void closeWindow();
 
 private:

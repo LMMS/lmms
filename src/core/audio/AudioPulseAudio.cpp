@@ -45,10 +45,10 @@ static void stream_write_callback(pa_stream *s, size_t length, void *userdata)
 
 
 AudioPulseAudio::AudioPulseAudio( bool & _success_ful, Mixer*  _mixer ) :
-	AudioDevice( tLimit<ch_cnt_t>(
+	AudioDevice( qBound<ch_cnt_t>(
+		DEFAULT_CHANNELS,
 		ConfigManager::inst()->value( "audiopa", "channels" ).toInt(),
-					DEFAULT_CHANNELS, SURROUND_CHANNELS ),
-								_mixer ),
+		SURROUND_CHANNELS ), _mixer ),
 	m_s( NULL ),
 	m_quit( false ),
 	m_convertEndian( false )
@@ -103,6 +103,7 @@ void AudioPulseAudio::startProcessing()
 
 void AudioPulseAudio::stopProcessing()
 {
+	m_quit = true;
 	stopProcessingThread( this );
 }
 
@@ -138,7 +139,7 @@ static void stream_state_callback( pa_stream *s, void * userdata )
 
 		case PA_STREAM_FAILED:
 		default:
-			qCritical( "Stream errror: %s\n",
+			qCritical( "Stream error: %s\n",
 					pa_strerror(pa_context_errno(
 						pa_stream_get_context( s ) ) ) );
 	}
@@ -313,7 +314,7 @@ AudioPulseAudio::setupWidget::setupWidget( QWidget * _parent ) :
 	m_device = new QLineEdit( AudioPulseAudio::probeDevice(), this );
 	m_device->setGeometry( 10, 20, 160, 20 );
 
-	QLabel * dev_lbl = new QLabel( tr( "DEVICE" ), this );
+	QLabel * dev_lbl = new QLabel( tr( "Device" ), this );
 	dev_lbl->setFont( pointSize<7>( dev_lbl->font() ) );
 	dev_lbl->setGeometry( 10, 40, 160, 10 );
 
@@ -325,7 +326,7 @@ AudioPulseAudio::setupWidget::setupWidget( QWidget * _parent ) :
 
 	m_channels = new LcdSpinBox( 1, this );
 	m_channels->setModel( m );
-	m_channels->setLabel( tr( "CHANNELS" ) );
+	m_channels->setLabel( tr( "Channels" ) );
 	m_channels->move( 180, 20 );
 
 }

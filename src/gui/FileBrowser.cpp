@@ -83,15 +83,13 @@ FileBrowser::FileBrowser(const QString & directories, const QString & filter,
 
 	m_filterEdit = new QLineEdit( searchWidget );
 	m_filterEdit->setPlaceholderText( tr("Search") );
-#if QT_VERSION >= 0x050000
 	m_filterEdit->setClearButtonEnabled( true );
-#endif
 	connect( m_filterEdit, SIGNAL( textEdited( const QString & ) ),
 			this, SLOT( filterItems( const QString & ) ) );
 
 	QPushButton * reload_btn = new QPushButton(
 				embed::getIconPixmap( "reload" ),
-						QString::null, searchWidget );
+						QString(), searchWidget );
 	reload_btn->setToolTip( tr( "Refresh list" ) );
 	connect( reload_btn, SIGNAL( clicked() ), this, SLOT( reloadTree() ) );
 
@@ -131,7 +129,7 @@ bool FileBrowser::filterItems( const QString & filter, QTreeWidgetItem * item )
 			{
 				// yes, then show everything below
 				it->setHidden( false );
-				filterItems( QString::null, it );
+				filterItems( QString(), it );
 				anyMatched = true;
 			}
 			else
@@ -165,6 +163,7 @@ bool FileBrowser::filterItems( const QString & filter, QTreeWidgetItem * item )
 
 void FileBrowser::reloadTree( void )
 {
+	QList<QString> expandedDirs = m_fileBrowserTreeWidget->expandedDirs();
 	const QString text = m_filterEdit->text();
 	m_filterEdit->clear();
 	m_fileBrowserTreeWidget->clear();
@@ -173,17 +172,17 @@ void FileBrowser::reloadTree( void )
 	{
 		addItems( *it );
 	}
-	expandItems();
+	expandItems(NULL, expandedDirs);
 	m_filterEdit->setText( text );
 	filterItems( text );
 }
 
 
 
-void FileBrowser::expandItems( QTreeWidgetItem * item )
+void FileBrowser::expandItems( QTreeWidgetItem * item, QList<QString> expandedDirs )
 {
-    int numChildren = item ? item->childCount() : m_fileBrowserTreeWidget->topLevelItemCount();
-	for( int i = 0; i < numChildren; ++i )
+	int numChildren = item ? item->childCount() : m_fileBrowserTreeWidget->topLevelItemCount();
+	for (int i = 0; i < numChildren; ++i)
 	{
 		QTreeWidgetItem * it = item ? item->child( i ) : m_fileBrowserTreeWidget->topLevelItem(i);
 		if ( m_recurse )
@@ -191,14 +190,15 @@ void FileBrowser::expandItems( QTreeWidgetItem * item )
 			it->setExpanded( true );
 		}
 		Directory *d = dynamic_cast<Directory *> ( it );
-		if( d )
+		if (d)
 		{
 			d->update();
-			d->setExpanded( false );
+			bool expand = expandedDirs.contains( d->fullName() );
+			d->setExpanded( expand );
 		}
-		if( m_recurse && it->childCount() )
+		if (m_recurse && it->childCount())
 		{
-			expandItems(it);
+			expandItems(it, expandedDirs);
 		}
 	}
 }
@@ -221,7 +221,7 @@ void FileBrowser::addItems(const QString & path )
 {
 	if( m_dirsAsItems )
 	{
-		m_fileBrowserTreeWidget->addTopLevelItem( new Directory( path, QString::null, m_filter ) );
+		m_fileBrowserTreeWidget->addTopLevelItem( new Directory( path, QString(), m_filter ) );
 		return;
 	}
 
@@ -243,7 +243,7 @@ void FileBrowser::addItems(const QString & path )
 					Directory *dd = new Directory( cur_file, path,
 												   m_filter );
 					m_fileBrowserTreeWidget->insertTopLevelItem( i,dd );
-					dd->update();
+					dd->update(); // add files to the directory
 					orphan = false;
 					break;
 				}
@@ -328,6 +328,30 @@ FileBrowserTreeWidget::FileBrowserTreeWidget(QWidget * parent ) :
 
 }
 
+QList<QString> FileBrowserTreeWidget::expandedDirs( QTreeWidgetItem * item ) const
+{
+	int numChildren = item ? item->childCount() : topLevelItemCount();
+	QList<QString> dirs;
+	for (int i = 0; i < numChildren; ++i)
+	{
+		QTreeWidgetItem * it  = item ? item->child(i) : topLevelItem(i);
+
+		// Add expanded top level directories.
+		if (it->isExpanded() && (it->type() == TypeDirectoryItem))
+		{
+			Directory *d = static_cast<Directory *> ( it );
+			dirs.append( d->fullName() );
+		}
+
+		// Add expanded child directories (recurse).
+		if (it->childCount())
+		{
+			dirs.append( expandedDirs( it ) );
+		}
+	}
+	return dirs;
+}
+
 void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent * e )
 {
 	FileItem * f = dynamic_cast<FileItem *>( itemAt( e->pos() ) );
@@ -408,7 +432,7 @@ void FileBrowserTreeWidget::mousePressEvent(QMouseEvent * me )
 			delete tf;
 		}
 		else if( ( f->extension ()== "xiz" || f->extension() == "sf2" || f->extension() == "sf3" || f->extension() == "gig" || f->extension() == "pat" ) &&
-			! pluginFactory->pluginSupportingExtension(f->extension()).isNull() )
+			! pluginFactory->pluginSupportingExtension(f->extension()).info.isNull() )
 		{
 			m_previewPlayHandle = new PresetPreviewPlayHandle( f->fullName(), f->handling() == FileItem::LoadByPlugin );
 		}
@@ -551,8 +575,9 @@ void FileBrowserTreeWidget::handleFile(FileItem * f, InstrumentTrack * it )
 			if( i == NULL ||
 				!i->descriptor()->supportsFileType( e ) )
 			{
-				i = it->loadInstrument(
-					pluginFactory->pluginSupportingExtension(e).name() );
+				PluginFactory::PluginInfoAndKey piakn =
+					pluginFactory->pluginSupportingExtension(e);
+				i = it->loadInstrument(piakn.info.name(), &piakn.key);
 			}
 			i->loadFile( f->fullName() );
 			break;

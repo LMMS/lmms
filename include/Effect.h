@@ -37,7 +37,7 @@ class EffectChain;
 class EffectControls;
 
 
-class EXPORT Effect : public Plugin
+class LMMS_EXPORT Effect : public Plugin
 {
 	MM_OPERATORS
 	Q_OBJECT
@@ -47,10 +47,10 @@ public:
 			const Descriptor::SubPluginFeatures::Key * _key );
 	virtual ~Effect();
 
-	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
-	virtual void loadSettings( const QDomElement & _this );
+	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
+	void loadSettings( const QDomElement & _this ) override;
 
-	inline virtual QString nodeName() const
+	inline QString nodeName() const override
 	{
 		return "effect";
 	}
@@ -148,11 +148,6 @@ public:
 		m_noRun = _state;
 	}
 
-	inline const Descriptor::SubPluginFeatures::Key & key() const
-	{
-		return m_key;
-	}
-
 	EffectChain * effectChain() const
 	{
 		return m_parent;
@@ -166,9 +161,16 @@ public:
 
 
 protected:
+	/**
+		Effects should call this at the end of audio processing
+
+		If the setting "Keep effects running even without input" is disabled,
+		after "decay" ms of a signal below "gate", the effect is turned off
+		and won't be processed again until it receives new audio input
+	*/
 	void checkGate( double _out_sum );
 
-	virtual PluginView * instantiateView( QWidget * );
+	PluginView * instantiateView( QWidget * ) override;
 
 	// some effects might not be capable of higher sample-rates so they can
 	// sample it down before processing and back after processing
@@ -200,8 +202,6 @@ private:
 					sample_rate_t _src_sr,
 					sampleFrame * _dst_buf, sample_rate_t _dst_sr,
 					const f_cnt_t _frames );
-
-	Descriptor::SubPluginFeatures::Key m_key;
 
 	ch_cnt_t m_processors;
 

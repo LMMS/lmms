@@ -186,8 +186,8 @@ Mixer::~Mixer()
 	}
 	delete m_fifo;
 
-	delete m_audioDev;
 	delete m_midiClient;
+	delete m_audioDev;
 
 	for( int i = 0; i < 3; i++ )
 	{
@@ -361,12 +361,12 @@ const surroundSampleFrame * Mixer::renderNextBuffer()
 			// Stop crash with metronome if empty project
 				Engine::getSong()->countTracks() )
 	{
-		tick_t ticksPerTact = MidiTime::ticksPerTact();
-		if ( p.getTicks() % (ticksPerTact / 1 ) == 0 )
+		tick_t ticksPerBar = MidiTime::ticksPerBar();
+		if ( p.getTicks() % ( ticksPerBar / 1 ) == 0 )
 		{
 			addPlayHandle( new SamplePlayHandle( "misc/metronome02.ogg" ) );
 		}
-		else if ( p.getTicks() % (ticksPerTact /
+		else if ( p.getTicks() % ( ticksPerBar /
 			song->getTimeSigModel().getNumerator() ) == 0 )
 		{
 			addPlayHandle( new SamplePlayHandle( "misc/metronome01.ogg" ) );
@@ -393,7 +393,7 @@ const surroundSampleFrame * Mixer::renderNextBuffer()
 	ConstPlayHandleList::Iterator it_rem = m_playHandlesToRemove.begin();
 	while( it_rem != m_playHandlesToRemove.end() )
 	{
-		PlayHandleList::Iterator it = qFind( m_playHandles.begin(), m_playHandles.end(), *it_rem );
+		PlayHandleList::Iterator it = std::find( m_playHandles.begin(), m_playHandles.end(), *it_rem );
 
 		if( it != m_playHandles.end() )
 		{
@@ -534,10 +534,10 @@ void Mixer::clearInternal()
 
 
 
-void Mixer::getPeakValues( sampleFrame * _ab, const f_cnt_t _frames, float & peakLeft, float & peakRight ) const
+Mixer::StereoSample Mixer::getPeakValues(sampleFrame * _ab, const f_cnt_t _frames) const
 {
-	peakLeft = 0.0f;
-	peakRight = 0.0f;
+	sample_t peakLeft = 0.0f;
+	sample_t peakRight = 0.0f;
 
 	for( f_cnt_t f = 0; f < _frames; ++f )
 	{
@@ -553,6 +553,8 @@ void Mixer::getPeakValues( sampleFrame * _ab, const f_cnt_t _frames, float & pea
 			peakRight = absRight;
 		}
 	}
+
+	return StereoSample(peakLeft, peakRight);
 }
 
 
@@ -575,53 +577,59 @@ void Mixer::changeQuality( const struct qualitySettings & _qs )
 
 
 
-void Mixer::setAudioDevice( AudioDevice * _dev )
+void Mixer::doSetAudioDevice( AudioDevice * _dev )
 {
-	stopProcessing();
+	// TODO: Use shared_ptr here in the future.
+	// Currently, this is safe, because this is only called by
+	// ProjectRenderer, and after ProjectRenderer calls this function,
+	// it does not access the old device anymore.
+	if( m_audioDev != m_oldAudioDev ) {delete m_audioDev;}
 
-	if( _dev == NULL )
+	if( _dev )
+	{
+		m_audioDev = _dev;
+	}
+	else
 	{
 		printf( "param _dev == NULL in Mixer::setAudioDevice(...). "
 					"Trying any working audio-device\n" );
 		m_audioDev = tryAudioDevices();
 	}
-	else
-	{
-		m_audioDev = _dev;
-	}
-
-	emit sampleRateChanged();
-
-	startProcessing();
 }
 
 
 
 
 void Mixer::setAudioDevice( AudioDevice * _dev,
-				const struct qualitySettings & _qs,
-				bool _needs_fifo )
+			    bool startNow )
 {
-	// don't delete the audio-device
+	stopProcessing();
+
+	doSetAudioDevice( _dev );
+
+	emit sampleRateChanged();
+
+	if (startNow) {startProcessing();}
+}
+
+
+
+
+void Mixer::setAudioDevice(AudioDevice * _dev,
+				const struct qualitySettings & _qs,
+				bool _needs_fifo,
+				bool startNow)
+{
 	stopProcessing();
 
 	m_qualitySettings = _qs;
 
-	if( _dev == NULL )
-	{
-		printf( "param _dev == NULL in Mixer::setAudioDevice(...). "
-					"Trying any working audio-device\n" );
-		m_audioDev = tryAudioDevices();
-	}
-	else
-	{
-		m_audioDev = _dev;
-	}
+	doSetAudioDevice( _dev );
 
 	emit qualitySettingsChanged();
 	emit sampleRateChanged();
 
-	startProcessing( _needs_fifo );
+	if (startNow) {startProcessing( _needs_fifo );}
 }
 
 
@@ -640,7 +648,7 @@ void Mixer::storeAudioDevice()
 
 void Mixer::restoreAudioDevice()
 {
-	if( m_oldAudioDev != NULL )
+	if( m_oldAudioDev && m_audioDev != m_oldAudioDev )
 	{
 		stopProcessing();
 		delete m_audioDev;
@@ -648,9 +656,9 @@ void Mixer::restoreAudioDevice()
 		m_audioDev = m_oldAudioDev;
 		emit sampleRateChanged();
 
-		m_oldAudioDev = NULL;
 		startProcessing();
 	}
+	m_oldAudioDev = NULL;
 }
 
 
@@ -659,7 +667,7 @@ void Mixer::restoreAudioDevice()
 void Mixer::removeAudioPort( AudioPort * _port )
 {
 	requestChangeInModel();
-	QVector<AudioPort *>::Iterator it = qFind( m_audioPorts.begin(),
+	QVector<AudioPort *>::Iterator it = std::find( m_audioPorts.begin(),
 							m_audioPorts.end(),
 							_port );
 	if( it != m_audioPorts.end() )
@@ -720,7 +728,7 @@ void Mixer::removePlayHandle( PlayHandle * _ph )
 			}
 		}
 		// Now check m_playHandles
-		PlayHandleList::Iterator it = qFind( m_playHandles.begin(),
+		PlayHandleList::Iterator it = std::find( m_playHandles.begin(),
 					m_playHandles.end(), _ph );
 		if( it != m_playHandles.end() )
 		{
@@ -823,20 +831,146 @@ void Mixer::runChangesInModel()
 	if( m_changesSignal )
 	{
 		m_waitChangesMutex.lock();
+		// allow changes in the model from other threads ...
 		m_changesRequestCondition.wakeOne();
+		// ... and wait until they are done
 		m_changesMixerCondition.wait( &m_waitChangesMutex );
 		m_waitChangesMutex.unlock();
 	}
 }
 
+bool Mixer::isAudioDevNameValid(QString name)
+{
+#ifdef LMMS_HAVE_SDL
+	if (name == AudioSdl::name())
+	{
+		return true;
+	}
+#endif
 
 
+#ifdef LMMS_HAVE_ALSA
+	if (name == AudioAlsa::name())
+	{
+		return true;
+	}
+#endif
+
+
+#ifdef LMMS_HAVE_PULSEAUDIO
+	if (name == AudioPulseAudio::name())
+	{
+		return true;
+	}
+#endif
+
+
+#ifdef LMMS_HAVE_OSS
+	if (name == AudioOss::name())
+	{
+		return true;
+	}
+#endif
+
+#ifdef LMMS_HAVE_SNDIO
+	if (name == AudioSndio::name())
+	{
+		return true;
+	}
+#endif
+
+#ifdef LMMS_HAVE_JACK
+	if (name == AudioJack::name())
+	{
+		return true;
+	}
+#endif
+
+
+#ifdef LMMS_HAVE_PORTAUDIO
+	if (name == AudioPortAudio::name())
+	{
+		return true;
+	}
+#endif
+
+
+#ifdef LMMS_HAVE_SOUNDIO
+	if (name == AudioSoundIo::name())
+	{
+		return true;
+	}
+#endif
+
+	if (name == AudioDummy::name())
+	{
+		return true;
+	}
+
+	return false;
+}
+
+bool Mixer::isMidiDevNameValid(QString name)
+{
+#ifdef LMMS_HAVE_ALSA
+	if (name == MidiAlsaSeq::name() || name == MidiAlsaRaw::name())
+	{
+		return true;
+	}
+#endif
+
+#ifdef LMMS_HAVE_JACK
+	if (name == MidiJack::name())
+	{
+		return true;
+	}
+#endif
+
+#ifdef LMMS_HAVE_OSS
+	if (name == MidiOss::name())
+	{
+		return true;
+	}
+#endif
+
+#ifdef LMMS_HAVE_SNDIO
+	if (name == MidiSndio::name())
+	{
+		return true;
+	}
+#endif
+
+#ifdef LMMS_BUILD_WIN32
+	if (name == MidiWinMM::name())
+	{
+		return true;
+	}
+#endif
+
+#ifdef LMMS_BUILD_APPLE
+    if (name == MidiApple::name())
+    {
+		return true;
+    }
+#endif
+
+    if (name == MidiDummy::name())
+    {
+		return true;
+    }
+
+	return false;
+}
 
 AudioDevice * Mixer::tryAudioDevices()
 {
 	bool success_ful = false;
 	AudioDevice * dev = NULL;
 	QString dev_name = ConfigManager::inst()->value( "mixer", "audiodev" );
+	if( !isAudioDevNameValid( dev_name ) )
+	{
+		dev_name = "";
+	}
 
 	m_audioDevStartFailed = false;
 
@@ -980,6 +1114,10 @@ MidiClient * Mixer::tryMidiClients()
 {
 	QString client_name = ConfigManager::inst()->value( "mixer",
 								"mididev" );
+	if( !isMidiDevNameValid( client_name ) )
+	{
+		client_name = "";
+	}
 
 #ifdef LMMS_HAVE_ALSA
 	if( client_name == MidiAlsaSeq::name() || client_name == "" )
@@ -1109,7 +1247,7 @@ void Mixer::fifoWriter::run()
 	disable_denormals();
 
 #if 0
-#ifdef LMMS_BUILD_LINUX
+#if defined(LMMS_BUILD_LINUX) || defined(LMMS_BUILD_FREEBSD)
 #ifdef LMMS_HAVE_SCHED_H
 	cpu_set_t mask;
 	CPU_ZERO( &mask );
@@ -1128,7 +1266,9 @@ void Mixer::fifoWriter::run()
 		write( buffer );
 	}
 
+	// Let audio backend stop processing
 	write( NULL );
+	m_fifo->waitUntilRead();
 }
 
 
@@ -1147,6 +1287,4 @@ void Mixer::fifoWriter::write( surroundSampleFrame * buffer )
 	m_mixer->m_waitingForWrite = false;
 	m_mixer->m_doChangesMutex.unlock();
 }
-
-
 

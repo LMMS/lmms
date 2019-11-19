@@ -30,7 +30,9 @@
 #include "LadspaManager.h"
 
 
-class EXPORT Ladspa2LMMS : public LadspaManager
+//! Class responsible for sorting found plugins (by LadspaManager)
+//! into categories
+class LMMS_EXPORT Ladspa2LMMS : public LadspaManager
 {
 public:
 	

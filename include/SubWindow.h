@@ -30,11 +30,10 @@
 #include <QGraphicsDropShadowEffect>
 #include <QMdiSubWindow>
 #include <QLabel>
-#include <QPainter>
 #include <QPushButton>
 #include <QString>
 
-#include "export.h"
+#include "lmms_export.h"
 
 class QMoveEvent;
 class QResizeEvent;
@@ -48,7 +47,7 @@ class QWidget;
  *  for cusomizing the title bar appearance, lmms implements its own subwindow
  *  class.
  */
-class EXPORT SubWindow : public QMdiSubWindow
+class LMMS_EXPORT SubWindow : public QMdiSubWindow
 {
 	Q_OBJECT
 	Q_PROPERTY( QBrush activeColor READ activeColor WRITE setActiveColor )
@@ -68,10 +67,10 @@ public:
 
 protected:
 	// hook the QWidget move/resize events to update the tracked geometry
-	virtual void moveEvent( QMoveEvent * event );
-	virtual void resizeEvent( QResizeEvent * event );
-	virtual void paintEvent( QPaintEvent * pe );
-	virtual void changeEvent( QEvent * event );
+	void moveEvent( QMoveEvent * event ) override;
+	void resizeEvent( QResizeEvent * event ) override;
+	void paintEvent( QPaintEvent * pe ) override;
+	void changeEvent( QEvent * event ) override;
 
 signals:
 	void focusLost();
@@ -92,7 +91,6 @@ private:
 	bool m_hasFocus;
 
 	static void elideText( QLabel *label, QString text );
-	bool isMaximized();
 	void adjustTitleBar();
 
 private slots:

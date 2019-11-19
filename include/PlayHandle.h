@@ -28,7 +28,7 @@
 #include <QtCore/QList>
 #include <QtCore/QMutex>
 
-#include "export.h"
+#include "lmms_export.h"
 
 #include "MemoryManager.h"
 
@@ -40,7 +40,7 @@ class QThread;
 class Track;
 class AudioPort;
 
-class EXPORT PlayHandle : public ThreadableJob
+class LMMS_EXPORT PlayHandle : public ThreadableJob
 {
 public:
 	enum Types
@@ -87,9 +87,9 @@ public:
 	}
 
 	// required for ThreadableJob
-	virtual void doProcessing();
+	void doProcessing() override;
 
-	virtual bool requiresProcessing() const
+	bool requiresProcessing() const override
 	{
 		return !isFinished();
 	}

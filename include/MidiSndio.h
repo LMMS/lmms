@@ -59,8 +59,8 @@ public:
 
 
 protected:
-	virtual void sendByte(const unsigned char c);
-	virtual void run(void);
+	void sendByte(const unsigned char c) override;
+	void run(void) override;
 
 private:
 	struct mio_hdl *m_hdl;

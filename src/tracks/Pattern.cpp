@@ -56,7 +56,7 @@ Pattern::Pattern( InstrumentTrack * _instrument_track ) :
 	TrackContentObject( _instrument_track ),
 	m_instrumentTrack( _instrument_track ),
 	m_patternType( BeatPattern ),
-	m_steps( MidiTime::stepsPerTact() )
+	m_steps( MidiTime::stepsPerBar() )
 {
 	setName( _instrument_track->name() );
 	if( _instrument_track->trackContainer()
@@ -161,7 +161,7 @@ void Pattern::updateLength()
 		return;
 	}
 
-	tick_t max_length = MidiTime::ticksPerTact();
+	tick_t max_length = MidiTime::ticksPerBar();
 
 	for( NoteVector::ConstIterator it = m_notes.begin();
 						it != m_notes.end(); ++it )
@@ -172,8 +172,8 @@ void Pattern::updateLength()
 							( *it )->endPos() );
 		}
 	}
-	changeLength( MidiTime( max_length ).nextFullTact() *
-						MidiTime::ticksPerTact() );
+	changeLength( MidiTime( max_length ).nextFullBar() *
+						MidiTime::ticksPerBar() );
 	updateBBTrack();
 }
 
@@ -182,7 +182,7 @@ void Pattern::updateLength()
 
 MidiTime Pattern::beatPatternLength() const
 {
-	tick_t max_length = MidiTime::ticksPerTact();
+	tick_t max_length = MidiTime::ticksPerBar();
 
 	for( NoteVector::ConstIterator it = m_notes.begin();
 						it != m_notes.end(); ++it )
@@ -194,13 +194,13 @@ MidiTime Pattern::beatPatternLength() const
 		}
 	}
 
-	if( m_steps != MidiTime::stepsPerTact() )
+	if( m_steps != MidiTime::stepsPerBar() )
 	{
-		max_length = m_steps * MidiTime::ticksPerTact() /
-						MidiTime::stepsPerTact();
+		max_length = m_steps * MidiTime::ticksPerBar() /
+						MidiTime::stepsPerBar();
 	}
 
-	return MidiTime( max_length ).nextFullTact() * MidiTime::ticksPerTact();
+	return MidiTime( max_length ).nextFullBar() * MidiTime::ticksPerBar();
 }
 
 
@@ -298,7 +298,7 @@ void Pattern::clearNotes()
 
 Note * Pattern::addStepNote( int step )
 {
-	return addNote( Note( MidiTime( -DefaultTicksPerTact ),
+	return addNote( Note( MidiTime( -DefaultTicksPerBar ),
 				MidiTime::stepPosition( step ) ), false );
 }
 
@@ -417,7 +417,7 @@ void Pattern::loadSettings( const QDomElement & _this )
 	m_steps = _this.attribute( "steps" ).toInt();
 	if( m_steps == 0 )
 	{
-		m_steps = MidiTime::stepsPerTact();
+		m_steps = MidiTime::stepsPerBar();
 	}
 
 	checkType();
@@ -466,7 +466,7 @@ void Pattern::clear()
 
 void Pattern::addSteps()
 {
-	m_steps += MidiTime::stepsPerTact();
+	m_steps += MidiTime::stepsPerBar();
 	updateLength();
 	emit dataChanged();
 }
@@ -497,7 +497,7 @@ void Pattern::cloneSteps()
 
 void Pattern::removeSteps()
 {
-	int n = MidiTime::stepsPerTact();
+	int n = MidiTime::stepsPerBar();
 	if( n < m_steps )
 	{
 		for( int i = m_steps - n; i < m_steps; ++i )
@@ -555,19 +555,19 @@ bool Pattern::empty()
 
 void Pattern::changeTimeSignature()
 {
-	MidiTime last_pos = MidiTime::ticksPerTact() - 1;
+	MidiTime last_pos = MidiTime::ticksPerBar() - 1;
 	for( NoteVector::ConstIterator cit = m_notes.begin();
 						cit != m_notes.end(); ++cit )
 	{
 		if( ( *cit )->length() < 0 && ( *cit )->pos() > last_pos )
 		{
-			last_pos = ( *cit )->pos()+MidiTime::ticksPerTact() /
-						MidiTime::stepsPerTact();
+			last_pos = ( *cit )->pos()+MidiTime::ticksPerBar() /
+						MidiTime::stepsPerBar();
 		}
 	}
-	last_pos = last_pos.nextFullTact() * MidiTime::ticksPerTact();
-	m_steps = qMax<tick_t>( MidiTime::stepsPerTact(),
-				last_pos.getTact() * MidiTime::stepsPerTact() );
+	last_pos = last_pos.nextFullBar() * MidiTime::ticksPerBar();
+	m_steps = qMax<tick_t>( MidiTime::stepsPerBar(),
+				last_pos.getBar() * MidiTime::stepsPerBar() );
 	updateLength();
 }
 
@@ -637,6 +637,18 @@ void PatternView::openInPianoRoll()
 
 
 
+
+void PatternView::setGhostInPianoRoll()
+{
+	gui->pianoRoll()->setGhostPattern( m_pat );
+	gui->pianoRoll()->parentWidget()->show();
+	gui->pianoRoll()->show();
+	gui->pianoRoll()->setFocus();
+}
+
+
+
+
 void PatternView::resetName()
 {
 	m_pat->setName( m_pat->m_instrumentTrack->name() );
@@ -663,8 +675,14 @@ void PatternView::constructContextMenu( QMenu * _cm )
 	_cm->insertAction( _cm->actions()[0], a );
 	connect( a, SIGNAL( triggered( bool ) ),
 					this, SLOT( openInPianoRoll() ) );
-	_cm->insertSeparator( _cm->actions()[1] );
 
+	QAction * b = new QAction( embed::getIconPixmap( "ghost_note" ),
+						tr( "Set as ghost in piano-roll" ), _cm );
+	if( m_pat->empty() ) { b->setEnabled( false ); }
+	_cm->insertAction( _cm->actions()[1], b );
+	connect( b, SIGNAL( triggered( bool ) ),
+					this, SLOT( setGhostInPianoRoll() ) );
+	_cm->insertSeparator( _cm->actions()[2] );
 	_cm->addSeparator();
 
 	_cm->addAction( embed::getIconPixmap( "edit_erase" ),
@@ -697,8 +715,7 @@ void PatternView::mousePressEvent( QMouseEvent * _me )
 {
 	if( _me->button() == Qt::LeftButton &&
 				m_pat->m_patternType == Pattern::BeatPattern &&
-				( fixedTCOs() || pixelsPerTact() >= 96 ||
-				m_pat->m_steps != MidiTime::stepsPerTact() ) &&
+				( fixedTCOs() || pixelsPerBar() >= 96 ) &&
 				_me->y() > height() - s_stepBtnOff->height() )
 
 	// when mouse button is pressed in beat/bassline -mode
@@ -768,8 +785,7 @@ void PatternView::mouseDoubleClickEvent(QMouseEvent *_me)
 void PatternView::wheelEvent( QWheelEvent * _we )
 {
 	if( m_pat->m_patternType == Pattern::BeatPattern &&
-				( fixedTCOs() || pixelsPerTact() >= 96 ||
-				m_pat->m_steps != MidiTime::stepsPerTact() ) &&
+				( fixedTCOs() || pixelsPerBar() >= 96 ) &&
 				_we->y() > height() - s_stepBtnOff->height() )
 	{
 //	get the step number that was wheeled on and
@@ -886,14 +902,14 @@ void PatternView::paintEvent( QPaintEvent * )
 		textBoxHeight = fontMetrics.height() + 2 * textTop;
 	}
 
-	// Compute pixels per tact
+	// Compute pixels per bar
 	const int baseWidth = fixedTCOs() ? parentWidget()->width() - 2 * TCO_BORDER_WIDTH
 						: width() - TCO_BORDER_WIDTH;
-	const float pixelsPerTact = baseWidth / (float) m_pat->length().getTact();
+	const float pixelsPerBar = baseWidth / (float) m_pat->length().getBar();
 
-	// Length of one tact/beat in the [0,1] x [0,1] coordinate system
-	const float tactLength = 1. / m_pat->length().getTact();
-	const float tickLength = tactLength / MidiTime::ticksPerTact();
+	// Length of one bar/beat in the [0,1] x [0,1] coordinate system
+	const float barLength = 1. / m_pat->length().getBar();
+	const float tickLength = barLength / MidiTime::ticksPerBar();
 
 	const int x_base = TCO_BORDER_WIDTH;
 
@@ -1013,8 +1029,7 @@ void PatternView::paintEvent( QPaintEvent * )
 	}
 
 	// beat pattern paint event
-	else if( beatPattern &&	( fixedTCOs() || pixelsPerTact >= 96
-			|| m_pat->m_steps != MidiTime::stepsPerTact() ) )
+	else if( beatPattern &&	( fixedTCOs() || pixelsPerBar >= 96 ) )
 	{
 		QPixmap stepon0;
 		QPixmap stepon200;
@@ -1082,14 +1097,14 @@ void PatternView::paintEvent( QPaintEvent * )
 	const int lineSize = 3;
 	p.setPen( c.darker( 200 ) );
 
-	for( tact_t t = 1; t < m_pat->length().getTact(); ++t )
+	for( bar_t t = 1; t < m_pat->length().getBar(); ++t )
 	{
-		p.drawLine( x_base + static_cast<int>( pixelsPerTact * t ) - 1,
+		p.drawLine( x_base + static_cast<int>( pixelsPerBar * t ) - 1,
 				TCO_BORDER_WIDTH, x_base + static_cast<int>(
-						pixelsPerTact * t ) - 1, TCO_BORDER_WIDTH + lineSize );
-		p.drawLine( x_base + static_cast<int>( pixelsPerTact * t ) - 1,
+						pixelsPerBar * t ) - 1, TCO_BORDER_WIDTH + lineSize );
+		p.drawLine( x_base + static_cast<int>( pixelsPerBar * t ) - 1,
 				rect().bottom() - ( lineSize + TCO_BORDER_WIDTH ),
-				x_base + static_cast<int>( pixelsPerTact * t ) - 1,
+				x_base + static_cast<int>( pixelsPerBar * t ) - 1,
 				rect().bottom() - TCO_BORDER_WIDTH );
 	}
 

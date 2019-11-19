@@ -57,10 +57,12 @@
 #include "ProjectJournal.h"
 #include "ProjectNotes.h"
 #include "ProjectRenderer.h"
+#include "RecentProjectsMenu.h"
 #include "RemotePlugin.h"
 #include "SetupDialog.h"
 #include "SideBar.h"
 #include "SongEditor.h"
+#include "TemplatesMenu.h"
 #include "TextFloat.h"
 #include "TimeLineWidget.h"
 #include "ToolButton.h"
@@ -69,13 +71,13 @@
 
 #include "lmmsversion.h"
 
-#if !defined(LMMS_BUILD_WIN32) && !defined(LMMS_BUILD_APPLE) && !defined(LMMS_BUILD_HAIKU) && QT_VERSION >= 0x050000
+#if !defined(LMMS_BUILD_WIN32) && !defined(LMMS_BUILD_APPLE) && !defined(LMMS_BUILD_HAIKU)
 //Work around an issue on KDE5 as per https://bugs.kde.org/show_bug.cgi?id=337491#c21
 void disableAutoKeyAccelerators(QWidget* mainWindow)
 {
 	using DisablerFunc = void(*)(QWidget*);
 	QLibrary kf5WidgetsAddon("KF5WidgetsAddons", 5);
-	DisablerFunc setNoAccelerators = 
+	DisablerFunc setNoAccelerators =
 			reinterpret_cast<DisablerFunc>(kf5WidgetsAddon.resolve("_ZN19KAcceleratorManager10setNoAccelEP7QWidget"));
 	if(setNoAccelerators)
 	{
@@ -88,15 +90,13 @@ void disableAutoKeyAccelerators(QWidget* mainWindow)
 
 MainWindow::MainWindow() :
 	m_workspace( NULL ),
-	m_templatesMenu( NULL ),
-	m_recentlyOpenedProjectsMenu( NULL ),
 	m_toolsMenu( NULL ),
 	m_autoSaveTimer( this ),
 	m_viewMenu( NULL ),
 	m_metronomeToggle( 0 ),
 	m_session( Normal )
 {
-#if !defined(LMMS_BUILD_WIN32) && !defined(LMMS_BUILD_APPLE) && !defined(LMMS_BUILD_HAIKU) && QT_VERSION >= 0x050000
+#if !defined(LMMS_BUILD_WIN32) && !defined(LMMS_BUILD_APPLE) && !defined(LMMS_BUILD_HAIKU)
 	disableAutoKeyAccelerators(this);
 #endif
 	setAttribute( Qt::WA_DeleteOnClose );
@@ -174,16 +174,16 @@ MainWindow::MainWindow() :
 	m_workspace = new QMdiArea( splitter );
 
 	// Load background
-	emit initProgress(tr("Loading background artwork"));
-	QString bgArtwork = ConfigManager::inst()->backgroundArtwork();
-	QImage bgImage;
-	if( !bgArtwork.isEmpty() )
+	emit initProgress(tr("Loading background picture"));
+	QString backgroundPicFile = ConfigManager::inst()->backgroundPicFile();
+	QImage backgroundPic;
+	if( !backgroundPicFile.isEmpty() )
 	{
-		bgImage = QImage( bgArtwork );
+		backgroundPic = QImage( backgroundPicFile );
 	}
-	if( !bgImage.isNull() )
+	if( !backgroundPicFile.isNull() )
 	{
-		m_workspace->setBackground( bgImage );
+		m_workspace->setBackground( backgroundPic );
 	}
 	else
 	{
@@ -213,7 +213,7 @@ MainWindow::MainWindow() :
 	vbox->addWidget( w );
 	setCentralWidget( main_widget );
 
-	m_updateTimer.start( 1000 / 20, this );  // 20 fps
+	m_updateTimer.start( 1000 / 60, this );  // 60 fps
 
 	if( ConfigManager::inst()->value( "ui", "enableautosave" ).toInt() )
 	{
@@ -266,7 +266,7 @@ MainWindow::~MainWindow()
 void MainWindow::finalize()
 {
 	resetWindowTitle();
-	setWindowIcon( embed::getIconPixmap( "icon" ) );
+	setWindowIcon( embed::getIconPixmap( "icon_small" ) );
 
 
 	// project-popup-menu
@@ -277,31 +277,21 @@ void MainWindow::finalize()
 					this, SLOT( createNewProject() ),
 					QKeySequence::New );
 
-	m_templatesMenu = new QMenu( tr("New from template"), this );
-	connect( m_templatesMenu, SIGNAL( aboutToShow() ), SLOT( fillTemplatesMenu() ) );
-	connect( m_templatesMenu, SIGNAL( triggered( QAction * ) ),
-		 SLOT( createNewProjectFromTemplate( QAction * ) ) );
-
-	project_menu->addMenu(m_templatesMenu);
+	auto templates_menu = new TemplatesMenu( this );
+	project_menu->addMenu(templates_menu);
 
 	project_menu->addAction( embed::getIconPixmap( "project_open" ),
 					tr( "&Open..." ),
 					this, SLOT( openProject() ),
 					QKeySequence::Open );
 
-	m_recentlyOpenedProjectsMenu = project_menu->addMenu(
-				embed::getIconPixmap( "project_open_recent" ),
-					tr( "&Recently Opened Projects" ) );
-	connect( m_recentlyOpenedProjectsMenu, SIGNAL( aboutToShow() ),
-			this, SLOT( updateRecentlyOpenedProjectsMenu() ) );
-	connect( m_recentlyOpenedProjectsMenu, SIGNAL( triggered( QAction * ) ),
-			this, SLOT( openRecentlyOpenedProject( QAction * ) ) );
+	project_menu->addMenu(new RecentProjectsMenu(this));
 
 	project_menu->addAction( embed::getIconPixmap( "project_save" ),
 					tr( "&Save" ),
 					this, SLOT( saveProject() ),
 					QKeySequence::Save );
-	project_menu->addAction( embed::getIconPixmap( "project_saveas" ),
+	project_menu->addAction( embed::getIconPixmap( "project_save" ),
 					tr( "Save &As..." ),
 					this, SLOT( saveProjectAs() ),
 					Qt::CTRL + Qt::SHIFT + Qt::Key_S );
@@ -310,8 +300,9 @@ void MainWindow::finalize()
 					this, SLOT( saveProjectAsNewVersion() ),
 					Qt::CTRL + Qt::ALT + Qt::Key_S );
 
-	project_menu->addAction( tr( "Save as default template" ),
-				     this, SLOT( saveProjectAsDefaultTemplate() ) );
+	project_menu->addAction( embed::getIconPixmap( "project_save" ),
+					tr( "Save as default template" ),
+					this, SLOT( saveProjectAsDefaultTemplate() ) );
 
 	project_menu->addSeparator();
 	project_menu->addAction( embed::getIconPixmap( "project_import" ),
@@ -336,7 +327,7 @@ void MainWindow::finalize()
 					Qt::CTRL + Qt::Key_M );
 
 // Prevent dangling separator at end of menu per https://bugreports.qt.io/browse/QTBUG-40071
-#if !(defined(LMMS_BUILD_APPLE) && (QT_VERSION >= 0x050000) && (QT_VERSION < 0x050600))
+#if !(defined(LMMS_BUILD_APPLE) && (QT_VERSION < 0x050600))
 	project_menu->addSeparator();
 #endif
 	project_menu->addAction( embed::getIconPixmap( "exit" ), tr( "&Quit" ),
@@ -411,10 +402,10 @@ void MainWindow::finalize()
 	}
 
 // Prevent dangling separator at end of menu per https://bugreports.qt.io/browse/QTBUG-40071
-#if !(defined(LMMS_BUILD_APPLE) && (QT_VERSION >= 0x050000) && (QT_VERSION < 0x050600))
+#if !(defined(LMMS_BUILD_APPLE) && (QT_VERSION < 0x050600))
 	help_menu->addSeparator();
 #endif
-	help_menu->addAction( embed::getIconPixmap( "icon" ), tr( "About" ),
+	help_menu->addAction( embed::getIconPixmap( "icon_small" ), tr( "About" ),
 				  this, SLOT( aboutLMMS() ) );
 
 	// create tool-buttons
@@ -429,7 +420,7 @@ void MainWindow::finalize()
 				tr( "Create new project from template" ),
 					this, SLOT( emptySlot() ),
 							m_toolBar );
-	project_new_from_template->setMenu( m_templatesMenu );
+	project_new_from_template->setMenu( templates_menu );
 	project_new_from_template->setPopupMode( ToolButton::InstantPopup );
 
 	ToolButton * project_open = new ToolButton(
@@ -443,7 +434,7 @@ void MainWindow::finalize()
 				embed::getIconPixmap( "project_open_recent" ),
 					tr( "Recently opened projects" ),
 					this, SLOT( emptySlot() ), m_toolBar );
-	project_open_recent->setMenu( m_recentlyOpenedProjectsMenu );
+	project_open_recent->setMenu( new RecentProjectsMenu(this) );
 	project_open_recent->setPopupMode( ToolButton::InstantPopup );
 
 	ToolButton * project_save = new ToolButton(
@@ -555,7 +546,9 @@ void MainWindow::finalize()
 	}
 	// look whether mixer failed to start the audio device selected by the
 	// user and is using AudioDummy as a fallback
-	else if( Engine::mixer()->audioDevStartFailed() )
+	// or the audio device is set to invalid one
+	else if( Engine::mixer()->audioDevStartFailed() || !Mixer::isAudioDevNameValid(
+		ConfigManager::inst()->value( "mixer", "audiodev" ) ) )
 	{
 		// if so, offer the audio settings section of the setup dialog
 		SetupDialog sd( SetupDialog::AudioSettings );
@@ -623,6 +616,7 @@ SubWindow* MainWindow::addWindowedWidget(QWidget *w, Qt::WindowFlags windowFlags
 	SubWindow *win = new SubWindow(m_workspace->viewport(), windowFlags);
 	win->setAttribute(Qt::WA_DeleteOnClose);
 	win->setWidget(w);
+	if (w && w->sizeHint().isValid()) {win->resize(w->sizeHint());}
 	m_workspace->addSubWindow(win);
 	return win;
 }
@@ -720,7 +714,7 @@ void MainWindow::clearKeyModifiers()
 
 void MainWindow::saveWidgetState( QWidget * _w, QDomElement & _de )
 {
-	// If our widget is the main content of a window (e.g. piano roll, FxMixer, etc), 
+	// If our widget is the main content of a window (e.g. piano roll, FxMixer, etc),
 	// we really care about the position of the *window* - not the position of the widget within its window
 	if( _w->parentWidget() != NULL &&
 			_w->parentWidget()->inherits( "QMdiSubWindow" ) )
@@ -728,7 +722,7 @@ void MainWindow::saveWidgetState( QWidget * _w, QDomElement & _de )
 		_w = _w->parentWidget();
 	}
 
-	// If the widget is a SubWindow, then we can make use of the getTrueNormalGeometry() method that 
+	// If the widget is a SubWindow, then we can make use of the getTrueNormalGeometry() method that
 	// performs the same as normalGeometry, but isn't broken on X11 ( see https://bugreports.qt.io/browse/QTBUG-256 )
 	SubWindow *asSubWindow = qobject_cast<SubWindow*>(_w);
 	QRect normalGeom = asSubWindow != nullptr ? asSubWindow->getTrueNormalGeometry() : _w->normalGeometry();
@@ -757,7 +751,7 @@ void MainWindow::restoreWidgetState( QWidget * _w, const QDomElement & _de )
 			qMax( _w->minimumHeight(), _de.attribute( "height" ).toInt() ) );
 	if( _de.hasAttribute( "visible" ) && !r.isNull() )
 	{
-		// If our widget is the main content of a window (e.g. piano roll, FxMixer, etc), 
+		// If our widget is the main content of a window (e.g. piano roll, FxMixer, etc),
 		// we really care about the position of the *window* - not the position of the widget within its window
 		if ( _w->parentWidget() != NULL &&
 			_w->parentWidget()->inherits( "QMdiSubWindow" ) )
@@ -767,7 +761,10 @@ void MainWindow::restoreWidgetState( QWidget * _w, const QDomElement & _de )
 		// first restore the window, as attempting to resize a maximized window causes graphics glitching
 		_w->setWindowState( _w->windowState() & ~(Qt::WindowMaximized | Qt::WindowMinimized) );
 
-		_w->resize( r.size() );
+		// Check isEmpty() to work around corrupt project files with empty size
+		if ( ! r.size().isEmpty() ) {
+			_w->resize( r.size() );
+		}
 		_w->move( r.topLeft() );
 
 		// set the window to its correct minimized/maximized/restored state
@@ -803,24 +800,6 @@ void MainWindow::createNewProject()
 
 
 
-void MainWindow::createNewProjectFromTemplate( QAction * _idx )
-{
-	if( m_templatesMenu && mayChangeProject(true) )
-	{
-		int indexOfTemplate = m_templatesMenu->actions().indexOf( _idx );
-		bool isFactoryTemplate = indexOfTemplate >= m_custom_templates_count;
-		QString dirBase =  isFactoryTemplate ?
-				ConfigManager::inst()->factoryTemplatesDir() :
-				ConfigManager::inst()->userTemplateDir();
-
-		const QString f = dirBase + _idx->text().replace("&&", "&") + ".mpt";
-		Engine::getSong()->createNewProjectFromTemplate(f);
-	}
-}
-
-
-
-
 void MainWindow::openProject()
 {
 	if( mayChangeProject(false) )
@@ -845,71 +824,21 @@ void MainWindow::openProject()
 
 
 
-void MainWindow::updateRecentlyOpenedProjectsMenu()
-{
-	m_recentlyOpenedProjectsMenu->clear();
-	QStringList rup = ConfigManager::inst()->recentlyOpenedProjects();
-
-//	The file history goes 50 deep but we only show the 15
-//	most recent ones that we can open and omit .mpt files.
-	int shownInMenu = 0;
-	for( QStringList::iterator it = rup.begin(); it != rup.end(); ++it )
-	{
-		QFileInfo recentFile( *it );
-		if ( recentFile.exists() && 
-				*it != ConfigManager::inst()->recoveryFile() )
-		{
-			if( recentFile.suffix().toLower() == "mpt" )
-			{
-				continue;
-			}
-
-			m_recentlyOpenedProjectsMenu->addAction(
-					embed::getIconPixmap( "project_file" ), it->replace("&", "&&") );
-#ifdef LMMS_BUILD_APPLE
-			m_recentlyOpenedProjectsMenu->actions().last()->setIconVisibleInMenu(false); // QTBUG-44565 workaround
-			m_recentlyOpenedProjectsMenu->actions().last()->setIconVisibleInMenu(true);
-#endif
-			shownInMenu++;
-			if( shownInMenu >= 15 )
-			{
-				return;
-			}
-		}
-	}
-}
-
-
-
-void MainWindow::openRecentlyOpenedProject( QAction * _action )
-{
-	if ( mayChangeProject(true) )
-	{
-		const QString f = _action->text().replace("&&", "&");
-		setCursor( Qt::WaitCursor );
-		Engine::getSong()->loadProject( f );
-		setCursor( Qt::ArrowCursor );
-	}
-}
-
-
-
-
 bool MainWindow::saveProject()
 {
 	if( Engine::getSong()->projectFileName() == "" )
 	{
 		return( saveProjectAs() );
 	}
-	else
+	else if( this->guiSaveProject() )
 	{
-		this->guiSaveProject();
 		if( getSession() == Recover )
 		{
 			sessionCleanup();
 		}
+		return true;
 	}
-	return( true );
+	return false;
 }
 
 
@@ -917,7 +846,8 @@ bool MainWindow::saveProject()
 
 bool MainWindow::saveProjectAs()
 {
-	VersionedSaveDialog sfd( this, tr( "Save Project" ), "",
+	auto optionsWidget = new SaveOptionsWidget(Engine::getSong()->getSaveOptions());
+	VersionedSaveDialog sfd( this, optionsWidget, tr( "Save Project" ), "",
 			tr( "LMMS Project" ) + " (*.mmpz *.mmp);;" +
 				tr( "LMMS Project Template" ) + " (*.mpt)" );
 	QString f = Engine::getSong()->projectFileName();
@@ -955,14 +885,16 @@ bool MainWindow::saveProjectAs()
 				}
 			}
 		}
-		this->guiSaveProjectAs( fname );
-		if( getSession() == Recover )
+		if( this->guiSaveProjectAs( fname ) )
 		{
-			sessionCleanup();
+			if( getSession() == Recover )
+			{
+				sessionCleanup();
+			}
+			return true;
 		}
-		return( true );
 	}
-	return( false );
+	return false;
 }
 
 
@@ -980,8 +912,7 @@ bool MainWindow::saveProjectAsNewVersion()
 		do 		VersionedSaveDialog::changeFileNameVersion( fileName, true );
 		while 	( QFile( fileName ).exists() );
 
-		this->guiSaveProjectAs( fileName );
-		return true;
+		return this->guiSaveProjectAs( fileName );
 	}
 }
 
@@ -1439,40 +1370,6 @@ void MainWindow::timerEvent( QTimerEvent * _te)
 
 
 
-void MainWindow::fillTemplatesMenu()
-{
-	m_templatesMenu->clear();
-
-	auto addTemplatesFromDir = [this]( QDir dir ) {
-		QStringList templates = dir.entryList( QStringList( "*.mpt" ),
-							QDir::Files | QDir::Readable );
-
-		if ( templates.size() && ! m_templatesMenu->actions().isEmpty() )
-		{
-			m_templatesMenu->addSeparator();
-		}
-
-		for( QStringList::iterator it = templates.begin();
-							it != templates.end(); ++it )
-		{
-			m_templatesMenu->addAction(
-						embed::getIconPixmap( "project_file" ),
-						( *it ).left( ( *it ).length() - 4 ).replace("&", "&&") );
-#ifdef LMMS_BUILD_APPLE
-			m_templatesMenu->actions().last()->setIconVisibleInMenu(false); // QTBUG-44565 workaround
-			m_templatesMenu->actions().last()->setIconVisibleInMenu(true);
-#endif
-		}
-
-		return templates.size();
-	};
-
-	m_custom_templates_count = addTemplatesFromDir( ConfigManager::inst()->userTemplateDir() );
-	addTemplatesFromDir( ConfigManager::inst()->factoryProjectsDir() + "templates" );
-}
-
-
-
 
 void MainWindow::showTool( QAction * _idx )
 {
@@ -1620,7 +1517,12 @@ void MainWindow::exportProject(bool multiExport)
 				// Get first extension from selected dropdown.
 				// i.e. ".wav" from "WAV-File (*.wav), Dummy-File (*.dum)"
 				suffix = efd.selectedNameFilter().mid( stx + 2, etx - stx - 2 ).split( " " )[0].trimmed();
-				exportFileName.remove( "." + suffix, Qt::CaseInsensitive );
+
+				Qt::CaseSensitivity cs = Qt::CaseSensitive;
+#if defined(LMMS_BUILD_APPLE) || defined(LMMS_BUILD_WIN32)
+				cs = Qt::CaseInsensitive;
+#endif
+				exportFileName.remove( "." + suffix, cs );
 				if ( efd.selectedFiles()[0].endsWith( suffix ) )
 				{
 					if( VersionedSaveDialog::fileExistsQuery( exportFileName + suffix,

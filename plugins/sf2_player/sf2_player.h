@@ -36,7 +36,7 @@
 #include "Knob.h"
 #include "LcdSpinBox.h"
 #include "LedCheckbox.h"
-#include "fluidsynth.h"
+#include "fluidsynthshims.h"
 #include "MemoryManager.h"
 
 class sf2InstrumentView;
@@ -187,7 +187,7 @@ public:
 
 
 
-class sf2InstrumentView : public InstrumentView
+class sf2InstrumentView : public InstrumentViewFixedSize
 {
 	Q_OBJECT
 public:

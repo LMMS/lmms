@@ -1468,7 +1468,7 @@ Ao premer co botón dereito aparece un menú de contexto no que se pode cambiar 
     <name>EnvelopeAndLfoView</name>
     <message>
         <source>DEL</source>
-        <translation>TMP REV</translation>
+        <translation>DEL</translation>
     </message>
     <message>
         <source>Predelay:</source>
@@ -1540,7 +1540,7 @@ Ao premer co botón dereito aparece un menú de contexto no que se pode cambiar 
     </message>
     <message>
         <source>AMT</source>
-        <translation>CANTIDADE</translation>
+        <translation>AMT</translation>
     </message>
     <message>
         <source>Modulation amount:</source>

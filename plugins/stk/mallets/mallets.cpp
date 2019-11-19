@@ -41,7 +41,7 @@
 #include "Mixer.h"
 
 #include "embed.h"
-
+#include "plugin_export.h"
 
 extern "C"
 {
@@ -384,7 +384,7 @@ PluginView * malletsInstrument::instantiateView( QWidget * _parent )
 
 malletsInstrumentView::malletsInstrumentView( malletsInstrument * _instrument,
 							QWidget * _parent ) :
-	InstrumentView( _instrument, _parent )
+        InstrumentViewFixedSize( _instrument, _parent )
 {
 	m_modalBarWidget = setupModalBarControls( this );
 	setWidgetBackground( m_modalBarWidget, "artwork" );
@@ -620,7 +620,7 @@ malletsSynth::malletsSynth( const StkFloat _pitch,
 	{
 		Stk::setSampleRate( _sample_rate );
 		Stk::setRawwavePath( QDir( ConfigManager::inst()->stkDir() ).absolutePath()
-						.toLatin1().constData() );
+						.toLocal8Bit().constData() );
 #ifndef LMMS_DEBUG
 		Stk::showWarnings( false );
 #endif
@@ -670,7 +670,7 @@ malletsSynth::malletsSynth( const StkFloat _pitch,
 	{
 		Stk::setSampleRate( _sample_rate );
 		Stk::setRawwavePath( QDir( ConfigManager::inst()->stkDir() ).absolutePath()
-						.toLatin1().constData() );
+						.toLocal8Bit().constData() );
 #ifndef LMMS_DEBUG
 		Stk::showWarnings( false );
 #endif
@@ -718,7 +718,7 @@ malletsSynth::malletsSynth( const StkFloat _pitch,
 	{
 		Stk::setSampleRate( _sample_rate );
 		Stk::setRawwavePath( QDir( ConfigManager::inst()->stkDir() ).absolutePath()
-						.toLatin1().constData() );
+						.toLocal8Bit().constData() );
 #ifndef LMMS_DEBUG
 		Stk::showWarnings( false );
 #endif
@@ -756,9 +756,9 @@ extern "C"
 {
 
 // necessary for getting instance out of shared lib
-Plugin * PLUGIN_EXPORT lmms_plugin_main( Model *, void * _data )
+PLUGIN_EXPORT Plugin * lmms_plugin_main( Model * m, void * )
 {
-	return new malletsInstrument( static_cast<InstrumentTrack *>( _data ) );
+	return new malletsInstrument( static_cast<InstrumentTrack *>( m ) );
 }
 
 

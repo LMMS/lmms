@@ -32,7 +32,7 @@
 #include "Plugin.h"
 
 
-class EXPORT ExportFilter : public Plugin
+class LMMS_EXPORT ExportFilter : public Plugin
 {
 public:
 	ExportFilter( const Descriptor * _descriptor ) : Plugin( _descriptor, NULL ) {}
@@ -44,15 +44,15 @@ public:
 				int tempo, int masterPitch, const QString &filename ) = 0;
 protected:
 
-	virtual void saveSettings( QDomDocument &, QDomElement & )
+	void saveSettings( QDomDocument &, QDomElement & ) override
 	{
 	}
 
-	virtual void loadSettings( const QDomElement & )
+	void loadSettings( const QDomElement & ) override
 	{
 	}
 
-	virtual QString nodeName() const
+	QString nodeName() const override
 	{
 		return "import_filter";
 	}

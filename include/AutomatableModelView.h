@@ -32,7 +32,7 @@
 class QMenu;
 class QMouseEvent;
 
-class EXPORT AutomatableModelView : public ModelView
+class LMMS_EXPORT AutomatableModelView : public ModelView
 {
 public:
 	AutomatableModelView( Model* model, QWidget* _this );
@@ -49,7 +49,7 @@ public:
 		return castModel<AutomatableModel>();
 	}
 
-	virtual void setModel( Model* model, bool isOldModelValid = true );
+	void setModel( Model* model, bool isOldModelValid = true ) override;
 
 	template<typename T>
 	inline T value() const
@@ -106,7 +106,7 @@ protected:
 
 
 
-template <typename ModelType> class EXPORT TypedModelView : public AutomatableModelView
+template <typename ModelType> class LMMS_EXPORT TypedModelView : public AutomatableModelView
 {
 public:
 	TypedModelView( Model* model, QWidget* _this) :
@@ -126,7 +126,6 @@ public:
 using FloatModelView = TypedModelView<FloatModel>;
 using IntModelView = TypedModelView<IntModel>;
 using BoolModelView = TypedModelView<BoolModel>;
-
 
 #endif
 

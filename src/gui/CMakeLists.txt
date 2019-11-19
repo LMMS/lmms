@@ -43,6 +43,9 @@ SET(LMMS_SRCS
 	gui/editors/PianoRoll.cpp
 	gui/editors/SongEditor.cpp
 
+	gui/menus/RecentProjectsMenu.cpp
+	gui/menus/TemplatesMenu.cpp
+
 	gui/widgets/AutomatableButton.cpp
 	gui/widgets/AutomatableSlider.cpp
 	gui/widgets/CaptionMenu.cpp
@@ -56,6 +59,7 @@ SET(LMMS_SRCS
 	gui/widgets/FadeButton.cpp
 	gui/widgets/Fader.cpp
 	gui/widgets/FxLine.cpp
+	gui/widgets/FxLineLcdSpinBox.cpp
 	gui/widgets/Graph.cpp
 	gui/widgets/GrooveView.cpp
 	gui/widgets/GroupBox.cpp
@@ -88,6 +92,7 @@ SET(LMMS_SRCS
 	gui/widgets/TrackLabelButton.cpp
 	gui/widgets/TrackRenameLineEdit.cpp
 	gui/widgets/VisualizationWidget.cpp
+	gui/widgets/StepRecorderWidget.cpp
 
 	PARENT_SCOPE
 )

@@ -36,12 +36,13 @@
 #include "NotePlayHandle.h"
 #include "Oscillator.h"
 #include "PixmapButton.h"
-#include "templates.h"
 #include "ToolTip.h"
 #include "Song.h"
 #include "interpolation.h"
 
 #include "embed.h"
+
+#include "plugin_export.h"
 
 extern "C"
 {
@@ -63,17 +64,16 @@ Plugin::Descriptor PLUGIN_EXPORT bitinvader_plugin_descriptor =
 }
 
 
-bSynth::bSynth( float * _shape, int _length, NotePlayHandle * _nph, bool _interpolation,
+bSynth::bSynth( float * _shape, NotePlayHandle * _nph, bool _interpolation,
 				float _factor, const sample_rate_t _sample_rate ) :
 	sample_index( 0 ),
 	sample_realindex( 0 ),
 	nph( _nph ),
-	sample_length( _length ),
 	sample_rate( _sample_rate ),
 	interpolation( _interpolation)
 {
-	sample_shape = new float[sample_length];
-	for (int i=0; i < _length; ++i)
+	sample_shape = new float[200];
+	for (int i=0; i < 200; ++i)
 	{
 		sample_shape[i] = _shape[i] * _factor;
 	}
@@ -86,7 +86,7 @@ bSynth::~bSynth()
 }
 
 
-sample_t bSynth::nextStringSample()
+sample_t bSynth::nextStringSample( float sample_length )
 {
 	float sample_step = 
 		static_cast<float>( sample_length / ( sample_rate / nph->frequency() ) );
@@ -139,10 +139,12 @@ sample_t bSynth::nextStringSample()
 bitInvader::bitInvader( InstrumentTrack * _instrument_track ) :
 	Instrument( _instrument_track, &bitinvader_plugin_descriptor ),
 	m_sampleLength( 128, 4, 200, 1, this, tr( "Sample length" ) ),
-	m_graph( -1.0f, 1.0f, 128, this ),
+	m_graph( -1.0f, 1.0f, 200, this ),
 	m_interpolation( false, this ),
 	m_normalize( false, this )
 {
+		
+	lengthChanged();
 
 	m_graph.setWaveToSine();
 
@@ -277,7 +279,6 @@ void bitInvader::playNote( NotePlayHandle * _n,
 
 		_n->m_pluginData = new bSynth(
 					const_cast<float*>( m_graph.samples() ),
-					m_graph.length(),
 					_n,
 					m_interpolation.value(), factor,
 				Engine::mixer()->processingSampleRate() );
@@ -289,7 +290,7 @@ void bitInvader::playNote( NotePlayHandle * _n,
 	bSynth * ps = static_cast<bSynth *>( _n->m_pluginData );
 	for( fpp_t frame = offset; frame < frames + offset; ++frame )
 	{
-		const sample_t cur = ps->nextStringSample();
+		const sample_t cur = ps->nextStringSample( m_graph.length() );
 		for( ch_cnt_t chnl = 0; chnl < DEFAULT_CHANNELS; ++chnl )
 		{
 			_working_buffer[frame][chnl] = cur;
@@ -325,7 +326,7 @@ PluginView * bitInvader::instantiateView( QWidget * _parent )
 
 bitInvaderView::bitInvaderView( Instrument * _instrument,
 					QWidget * _parent ) :
-	InstrumentView( _instrument, _parent )
+	InstrumentViewFixedSize( _instrument, _parent )
 {
 	setAutoFillBackground( true );
 	QPalette pal;
@@ -472,6 +473,7 @@ void bitInvaderView::modelChanged()
 
 void bitInvaderView::sinWaveClicked()
 {
+	m_graph->model()->clearInvisible();
 	m_graph->model()->setWaveToSine();
 	Engine::getSong()->setModified();
 }
@@ -481,6 +483,7 @@ void bitInvaderView::sinWaveClicked()
 
 void bitInvaderView::triangleWaveClicked()
 {
+	m_graph->model()->clearInvisible();
 	m_graph->model()->setWaveToTriangle();
 	Engine::getSong()->setModified();
 }
@@ -490,6 +493,7 @@ void bitInvaderView::triangleWaveClicked()
 
 void bitInvaderView::sawWaveClicked()
 {
+	m_graph->model()->clearInvisible();
 	m_graph->model()->setWaveToSaw();
 	Engine::getSong()->setModified();
 }
@@ -499,6 +503,7 @@ void bitInvaderView::sawWaveClicked()
 
 void bitInvaderView::sqrWaveClicked()
 {
+	m_graph->model()->clearInvisible();
 	m_graph->model()->setWaveToSquare();
 	Engine::getSong()->setModified();
 }
@@ -508,6 +513,7 @@ void bitInvaderView::sqrWaveClicked()
 
 void bitInvaderView::noiseWaveClicked()
 {
+	m_graph->model()->clearInvisible();
 	m_graph->model()->setWaveToNoise();
 	Engine::getSong()->setModified();
 }
@@ -518,35 +524,12 @@ void bitInvaderView::noiseWaveClicked()
 void bitInvaderView::usrWaveClicked()
 {
 	QString fileName = m_graph->model()->setWaveToUser();
-	ToolTip::add( m_usrWaveBtn, fileName );
-	Engine::getSong()->setModified();
-	/*
-	m_graph->model()->setWaveToNoise();
-	Engine::getSong()->setModified();
-	// zero sample_shape
-	for (int i = 0; i < sample_length; i++)
+	if (!fileName.isEmpty())
 	{
-		sample_shape[i] = 0;
+		ToolTip::add(m_usrWaveBtn, fileName);
+		m_graph->model()->clearInvisible();
+		Engine::getSong()->setModified();
 	}
-
-	// load user shape
-	sampleBuffer buffer;
-	QString af = buffer.openAudioFile();
-	if ( af != "" )
-	{
-		buffer.setAudioFile( af );
-		
-		// copy buffer data
-		sample_length = min( sample_length, static_cast<int>(
-							buffer.frames() ) );
-		for ( int i = 0; i < sample_length; i++ )
-		{
-			sample_shape[i] = (float)*buffer.data()[i];
-		}
-	}
-
-	sampleChanged();
-	*/
 }
 
 
@@ -582,14 +565,10 @@ extern "C"
 {
 
 // necessary for getting instance out of shared lib
-PLUGIN_EXPORT Plugin * lmms_plugin_main( Model *, void * _data )
+PLUGIN_EXPORT Plugin * lmms_plugin_main( Model *m, void * )
 {
-	return( new bitInvader( static_cast<InstrumentTrack *>( _data ) ) );
+	return( new bitInvader( static_cast<InstrumentTrack *>( m ) ) );
 }
 
 
 }
-
-
-
-

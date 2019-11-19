@@ -32,7 +32,6 @@
 
 #include "Engine.h"
 #include "GuiApplication.h"
-#include "templates.h"
 #include "gui_templates.h"
 #include "ConfigManager.h"
 #include "LcdSpinBox.h"
@@ -44,10 +43,10 @@
 
 
 AudioJack::AudioJack( bool & _success_ful, Mixer*  _mixer ) :
-	AudioDevice( tLimit<int>( ConfigManager::inst()->value(
-					"audiojack", "channels" ).toInt(),
-					DEFAULT_CHANNELS, SURROUND_CHANNELS ),
-								_mixer ),
+	AudioDevice( qBound<int>(
+		DEFAULT_CHANNELS,
+		ConfigManager::inst()->value( "audiojack", "channels" ).toInt(),
+		SURROUND_CHANNELS ), _mixer ),
 	m_client( NULL ),
 	m_active( false ),
 	m_midiClient( NULL ),
@@ -201,7 +200,6 @@ bool AudioJack::initJackClient()
 
 void AudioJack::startProcessing()
 {
-	QMutexLocker m( &m_processingMutex );
 	m_stopped = false;
 
 	if( m_active || m_client == NULL )
@@ -254,7 +252,6 @@ void AudioJack::startProcessing()
 
 void AudioJack::stopProcessing()
 {
-	QMutexLocker m( &m_processingMutex );
 	m_stopped = true;
 }
 
@@ -342,7 +339,6 @@ void AudioJack::renamePort( AudioPort * _port )
 
 int AudioJack::processCallback( jack_nframes_t _nframes, void * _udata )
 {
-	QMutexLocker m( &m_processingMutex );
 
 	// do midi processing first so that midi input can
 	// add to the following sound processing
@@ -406,6 +402,7 @@ int AudioJack::processCallback( jack_nframes_t _nframes, void * _udata )
 			m_framesDoneInCurBuf = 0;
 			if( !m_framesToDoInCurBuf )
 			{
+				m_stopped = true;
 				break;
 			}
 		}
@@ -457,7 +454,7 @@ AudioJack::setupWidget::setupWidget( QWidget * _parent ) :
 	m_clientName = new QLineEdit( cn, this );
 	m_clientName->setGeometry( 10, 20, 160, 20 );
 
-	QLabel * cn_lbl = new QLabel( tr( "CLIENT-NAME" ), this );
+	QLabel * cn_lbl = new QLabel( tr( "Client name" ), this );
 	cn_lbl->setFont( pointSize<7>( cn_lbl->font() ) );
 	cn_lbl->setGeometry( 10, 40, 160, 10 );
 
@@ -469,7 +466,7 @@ AudioJack::setupWidget::setupWidget( QWidget * _parent ) :
 
 	m_channels = new LcdSpinBox( 1, this );
 	m_channels->setModel( m );
-	m_channels->setLabel( tr( "CHANNELS" ) );
+	m_channels->setLabel( tr( "Channels" ) );
 	m_channels->move( 180, 20 );
 
 }

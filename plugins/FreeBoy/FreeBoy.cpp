@@ -42,6 +42,8 @@
 
 #include "embed.h"
 
+#include "plugin_export.h"
+
 const blip_time_t FRAME_LENGTH = 70224;
 const long CLOCK_RATE = 4194304;
 
@@ -107,11 +109,11 @@ FreeBoyInstrument::FreeBoyInstrument( InstrumentTrack * _instrument_track ) :
 	m_ch1So1Model( true, this, tr( "Channel 1 to SO2 (Left)" ) ),
 	m_ch2So1Model( true, this, tr( "Channel 2 to SO2 (Left)" ) ),
 	m_ch3So1Model( true, this, tr( "Channel 3 to SO2 (Left)" ) ),
-	m_ch4So1Model( true, this, tr( "Channel 4 to SO2 (Left)" ) ),
+	m_ch4So1Model( false, this, tr( "Channel 4 to SO2 (Left)" ) ),
 	m_ch1So2Model( true, this, tr( "Channel 1 to SO1 (Right)" ) ),
 	m_ch2So2Model( true, this, tr( "Channel 2 to SO1 (Right)" ) ),
 	m_ch3So2Model( true, this, tr( "Channel 3 to SO1 (Right)" ) ),
-	m_ch4So2Model( true, this, tr( "Channel 4 to SO1 (Right)" ) ),
+	m_ch4So2Model( false, this, tr( "Channel 4 to SO1 (Right)" ) ),
 	m_trebleModel( -20.0f, -100.0f, 200.0f, 1.0f, this, tr( "Treble" ) ),
 	m_bassModel( 461.0f, -1.0f, 600.0f, 1.0f, this, tr( "Bass" ) ),
 
@@ -281,9 +283,6 @@ void FreeBoyInstrument::playNote( NotePlayHandle * _n,
 		data += m_ch4SweepStepLengthModel.value();
 		papu->write_register( fakeClock(),  0xff21, data );
 
-		//channel 4 init
-		papu->write_register( fakeClock(),  0xff23, 128 );
-
 		_n->m_pluginData = papu;
 	}
 
@@ -385,6 +384,9 @@ void FreeBoyInstrument::playNote( NotePlayHandle * _n,
 		data = data << 3;
 		data += ropt;
 		papu->write_register( fakeClock(),  0xff22, data );
+
+		//channel 4 init
+		papu->write_register( fakeClock(),  0xff23, 128 );
 	}
 
 	int const buf_size = 2048;
@@ -455,7 +457,7 @@ public:
 
 FreeBoyInstrumentView::FreeBoyInstrumentView( Instrument * _instrument,
 							QWidget * _parent ) :
-	InstrumentView( _instrument, _parent )
+	InstrumentViewFixedSize( _instrument, _parent )
 {
 
 	setAutoFillBackground( true );
@@ -726,10 +728,10 @@ extern "C"
 {
 
 // necessary for getting instance out of shared lib
-PLUGIN_EXPORT Plugin * lmms_plugin_main( Model *, void * _data )
+PLUGIN_EXPORT Plugin * lmms_plugin_main( Model *m, void * )
 {
 	return( new FreeBoyInstrument(
-				static_cast<InstrumentTrack *>( _data ) ) );
+				static_cast<InstrumentTrack *>( m ) ) );
 }
 
 

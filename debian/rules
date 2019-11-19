@@ -1,0 +1,41 @@
+#!/usr/bin/make -f
+
+#Rodney Dawes Version simplifies things :)
+
+DH_CMAKE_BUILD_DIR=obj	-${DEB_BUILD_GNU_TYPE}
+DEB_HOST_MULTIARCH ?= $(shell dpkg-architecture -qDEB_HOST_MULTIARCH)
+DEB_HOST_ARCH      ?= $(shell dpkg-architecture -qDEB_HOST_ARCH)
+DEB_HOST_ARCH_OS   ?= $(shell dpkg-architecture -qDEB_HOST_ARCH_OS)
+DEB_HOST_ARCH_BIT  ?= $(shell dpkg-architecture -qDEB_HOST_ARCH_BITS)
+
+CMAKE_OPTS= -DCONTRIBUTORS=$(CURDIR)/doc/CONTRIBUTORS -DFORCE_VERSION=internal \
+	-DWANT_QT5=1
+ifneq ($(DEB_HOST_ARCH_OS),linux)
+CMAKE_OPTS+= -DWANT_ALSA=0
+endif
+
+ifeq ($(DEB_HOST_ARCH),amd64)
+export PATH := $(PATH):/usr/lib/wine
+WINE_PATH := /usr/lib/$(DEB_HOST_MULTIARCH)/wine
+CMAKE_OPTS+= -DWANT_VST_32=OFF -DREMOTE_VST_PLUGIN_FILEPATH_32=../../i386-linux-gnu/lmms/32/RemoteVstPlugin32 \
+	-DWINE_CXX_FLAGS=-Wl,--enable-new-dtags,-rpath=$(WINE_PATH)
+else ifeq ($(DEB_HOST_ARCH),i386)
+export PATH := $(PATH):/usr/lib/wine
+WINE_PATH := /usr/lib/$(DEB_HOST_MULTIARCH)/wine
+CMAKE_OPTS+= -DWANT_VST_64=OFF -DREMOTE_VST_PLUGIN_FILEPATH_64=../../x86_64-linux-gnu/lmms/RemoteVstPlugin64 \
+	-DWINE_CXX_FLAGS=-Wl,--enable-new-dtags,-rpath=$(WINE_PATH)
+else
+CMAKE_OPTS+= -DWANT_VST=OFF
+endif
+
+# Define NDEBUG. This helps with reproducible builds.
+# Add -Wno-error=format-truncation because truncation is expected in snprintf.
+export CFLAGS ?= $(shell dpkg-buildflags --get CFLAGS) -DNDEBUG
+export CXXFLAGS ?= $(shell dpkg-buildflags --get CXXFLAGS) -DNDEBUG \
+	-Wno-error=format-truncation
+
+%:
+	dh $@ --buildsystem cmake --parallel
+
+override_dh_auto_configure:
+	dh_auto_configure -- -DCMAKE_INSTALL_LIBDIR=lib/$(DEB_HOST_MULTIARCH) $(CMAKE_OPTS)

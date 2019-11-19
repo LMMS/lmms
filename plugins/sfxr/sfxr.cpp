@@ -45,7 +45,6 @@ float frnd(float range)
 #include "Knob.h"
 #include "NotePlayHandle.h"
 #include "PixmapButton.h"
-#include "templates.h"
 #include "ToolTip.h"
 #include "Song.h"
 #include "MidiEvent.h"
@@ -53,6 +52,8 @@ float frnd(float range)
 #include "Mixer.h"
 
 #include "embed.h"
+
+#include "plugin_export.h"
 
 extern "C"
 {
@@ -599,7 +600,7 @@ public:
 
 sfxrInstrumentView::sfxrInstrumentView( Instrument * _instrument,
 					QWidget * _parent ) :
-	InstrumentView( _instrument, _parent )
+	InstrumentViewFixedSize( _instrument, _parent )
 {
 	srand(time(NULL));
 	setAutoFillBackground( true );
@@ -1120,9 +1121,9 @@ extern "C"
 {
 
 // necessary for getting instance out of shared lib
-PLUGIN_EXPORT Plugin * lmms_plugin_main( Model*, void* data )
+PLUGIN_EXPORT Plugin * lmms_plugin_main( Model* m, void* )
 {
-	return new sfxrInstrument( static_cast<InstrumentTrack *>( data ) );
+	return new sfxrInstrument( static_cast<InstrumentTrack *>( m ) );
 }
 
 

@@ -59,6 +59,8 @@
 #include "PixmapButton.h"
 #include "ToolTip.h"
 
+#include "plugin_export.h"
+
 extern "C"
 {
 
@@ -77,9 +79,9 @@ Plugin::Descriptor PLUGIN_EXPORT opulenz_plugin_descriptor =
 };
 
 // necessary for getting instance out of shared lib
-PLUGIN_EXPORT Plugin * lmms_plugin_main( Model *, void * _data )
+PLUGIN_EXPORT Plugin * lmms_plugin_main( Model *m, void * )
 {
-        return( new OpulenzInstrument( static_cast<InstrumentTrack *>( _data ) ) );
+	return( new OpulenzInstrument( static_cast<InstrumentTrack *>( m ) ) );
 }
 
 }
@@ -679,7 +681,7 @@ void OpulenzInstrument::loadFile( const QString& file ) {
 
 OpulenzInstrumentView::OpulenzInstrumentView( Instrument * _instrument,
                                                         QWidget * _parent ) :
-        InstrumentView( _instrument, _parent )
+        InstrumentViewFixedSize( _instrument, _parent )
 {
 
 #define KNOB_GEN(knobname, hinttext, hintunit,xpos,ypos) \

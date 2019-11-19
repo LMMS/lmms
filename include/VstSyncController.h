@@ -39,7 +39,7 @@ public:
 	VstSyncController();
 	~VstSyncController();
 
-	void setAbsolutePosition( int ticks );
+	void setAbsolutePosition( double ticks );
 
 	void setPlaybackState( bool enabled )
 	{
@@ -59,6 +59,11 @@ public:
 	void stopCycle()
 	{
 		m_syncData->isCycle = false;
+	}
+
+	void setPlaybackJumped( bool jumped )
+	{
+		m_syncData->m_playbackJumped = jumped;
 	}
 
 	void update();

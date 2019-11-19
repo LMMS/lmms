@@ -44,7 +44,7 @@
 
 #include "embed.h"
 
-
+#include "plugin_export.h"
 
 
 extern "C"
@@ -66,9 +66,9 @@ Plugin::Descriptor PLUGIN_EXPORT patman_plugin_descriptor =
 
 
 // necessary for getting instance out of shared lib
-PLUGIN_EXPORT Plugin * lmms_plugin_main( Model *, void * _data )
+PLUGIN_EXPORT Plugin * lmms_plugin_main( Model *m, void * )
 {
-	return new patmanInstrument( static_cast<InstrumentTrack *>( _data ) );
+	return new patmanInstrument( static_cast<InstrumentTrack *>( m ) );
 }
 
 }
@@ -78,7 +78,6 @@ PLUGIN_EXPORT Plugin * lmms_plugin_main( Model *, void * _data )
 
 patmanInstrument::patmanInstrument( InstrumentTrack * _instrument_track ) :
 	Instrument( _instrument_track, &patman_plugin_descriptor ),
-	m_patchFile( QString::null ),
 	m_loopedModel( true, this ),
 	m_tunedModel( true, this )
 {
@@ -182,7 +181,7 @@ void patmanInstrument::setFile( const QString & _patch_file, bool _rename )
 {
 	if( _patch_file.size() <= 0 )
 	{
-		m_patchFile = QString::null;
+		m_patchFile = QString();
 		return;
 	}
 
@@ -444,7 +443,7 @@ PluginView * patmanInstrument::instantiateView( QWidget * _parent )
 
 
 PatmanView::PatmanView( Instrument * _instrument, QWidget * _parent ) :
-	InstrumentView( _instrument, _parent ),
+	InstrumentViewFixedSize( _instrument, _parent ),
 	m_pi( NULL )
 {
 	setAutoFillBackground( true );

@@ -28,6 +28,7 @@
 #include <QMdiArea>
 #include <QMdiSubWindow>
 #include <QPainter>
+#include <QLayout>
 
 #include "EffectView.h"
 #include "DummyEffect.h"
@@ -49,13 +50,13 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 	m_controlView( NULL )
 {
 	setFixedSize( 210, 60 );
-	
+
 	// Disable effects that are of type "DummyEffect"
 	bool isEnabled = !dynamic_cast<DummyEffect *>( effect() );
 	m_bypass = new LedCheckBox( this, "", isEnabled ? LedCheckBox::Green : LedCheckBox::Red );
 	m_bypass->move( 3, 3 );
 	m_bypass->setEnabled( isEnabled );
-	
+
 	ToolTip::add( m_bypass, tr( "On/Off" ) );
 
 
@@ -69,14 +70,14 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 	m_autoQuit = new TempoSyncKnob( knobBright_26, this );
 	m_autoQuit->setLabel( tr( "DECAY" ) );
 	m_autoQuit->move( 60, 5 );
-	m_autoQuit->setEnabled( isEnabled );
+	m_autoQuit->setEnabled( isEnabled && !effect()->m_autoQuitDisabled );
 	m_autoQuit->setHintText( tr( "Time:" ), "ms" );
 
 
 	m_gate = new Knob( knobBright_26, this );
 	m_gate->setLabel( tr( "GATE" ) );
 	m_gate->move( 93, 5 );
-	m_gate->setEnabled( isEnabled );
+	m_gate->setEnabled( isEnabled && !effect()->m_autoQuitDisabled );
 	m_gate->setHintText( tr( "Gate:" ), "" );
 
 
@@ -96,8 +97,15 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 		if( m_controlView )
 		{
 			m_subWindow = gui->mainWindow()->addWindowedWidget( m_controlView );
-			m_subWindow->setSizePolicy( QSizePolicy::Fixed, QSizePolicy::Fixed );
-			m_subWindow->setFixedSize( m_subWindow->size() );
+
+			if ( !m_controlView->isResizable() )
+			{
+				m_subWindow->setSizePolicy( QSizePolicy::Fixed, QSizePolicy::Fixed );
+				if (m_subWindow->layout())
+				{
+					m_subWindow->layout()->setSizeConstraint(QLayout::SetFixedSize);
+				}
+			}
 
 			Qt::WindowFlags flags = m_subWindow->windowFlags();
 			flags &= ~Qt::WindowMaximizeButtonHint;
@@ -120,18 +128,7 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 
 EffectView::~EffectView()
 {
-
-#ifdef LMMS_BUILD_LINUX
-
 	delete m_subWindow;
-#else
-	if( m_subWindow )
-	{
-		// otherwise on win32 build VST GUI can get lost
-		m_subWindow->hide();
-	}
-#endif
-
 }
 
 

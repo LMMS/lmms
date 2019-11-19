@@ -24,7 +24,6 @@
 #include <math.h>
 
 #include "vibrating_string.h"
-#include "templates.h"
 #include "interpolation.h"
 #include "Mixer.h"
 #include "Engine.h"
@@ -56,7 +55,7 @@ vibratingString::vibratingString(	float _pitch,
 
 	int pick = static_cast<int>( ceil( string_length * _pick ) );
 	
-	if( not _state )
+	if( ! _state )
 	{
 		m_impulse = new float[string_length];
 		resample( _impulse, _len, string_length );
@@ -145,9 +144,9 @@ void vibratingString::resample( float *_src, f_cnt_t _src_frames,
 							_dst_frames;
 		const float frac_pos = src_frame_float -
 				static_cast<f_cnt_t>( src_frame_float );
-		const f_cnt_t src_frame = tLimit<f_cnt_t>(
-				static_cast<f_cnt_t>( src_frame_float ),
-							1, _src_frames - 3 );
+		const f_cnt_t src_frame = qBound<f_cnt_t>(
+				1, static_cast<f_cnt_t>( src_frame_float ),
+							_src_frames - 3 );
 		m_impulse[frame] = cubicInterpolate(
 						_src[src_frame - 1],
 						_src[src_frame + 0],

@@ -24,7 +24,6 @@
 
 #include "MixerWorkerThread.h"
 
-#include <xmmintrin.h>
 #include <QDebug>
 #include <QMutex>
 #include <QWaitCondition>
@@ -32,6 +31,10 @@
 #include "denormals.h"
 #include "ThreadableJob.h"
 #include "Mixer.h"
+
+#if defined(LMMS_HOST_X86) || defined(LMMS_HOST_X86_64)
+#include <xmmintrin.h>
+#endif
 
 MixerWorkerThread::JobQueue MixerWorkerThread::globalJobQueue;
 QWaitCondition * MixerWorkerThread::queueReadyWaitCond = NULL;

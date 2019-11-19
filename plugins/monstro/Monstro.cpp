@@ -28,7 +28,6 @@
 #include "Monstro.h"
 #include "Engine.h"
 #include "InstrumentTrack.h"
-#include "templates.h"
 #include "gui_templates.h"
 #include "ToolTip.h"
 #include "Song.h"
@@ -37,6 +36,7 @@
 
 #include "embed.h"
 
+#include "plugin_export.h"
 
 extern "C"
 {
@@ -99,6 +99,11 @@ MonstroSynth::MonstroSynth( MonstroInstrument * _i, NotePlayHandle * _nph ) :
 	m_counter2r = 0;
 	m_counter3l = 0;
 	m_counter3r = 0;
+
+	m_lfo[0].resize( m_parent->m_fpp );
+	m_lfo[1].resize( m_parent->m_fpp );
+	m_env[0].resize( m_parent->m_fpp );
+	m_env[1].resize( m_parent->m_fpp );
 }
 
 
@@ -113,31 +118,31 @@ void MonstroSynth::renderOutput( fpp_t _frames, sampleFrame * _buf  )
 // macros for modulating with env/lfos
 #define modulatefreq( car, mod ) \
 		modtmp = 0.0f; \
-		if( mod##_e1 != 0.0f ) modtmp += env[0][f] * mod##_e1; \
-		if( mod##_e2 != 0.0f ) modtmp += env[1][f] * mod##_e2; \
-		if( mod##_l1 != 0.0f ) modtmp += lfo[0][f] * mod##_l1; \
-		if( mod##_l2 != 0.0f ) modtmp += lfo[1][f] * mod##_l2; \
+		if( mod##_e1 != 0.0f ) modtmp += m_env[0][f] * mod##_e1; \
+		if( mod##_e2 != 0.0f ) modtmp += m_env[1][f] * mod##_e2; \
+		if( mod##_l1 != 0.0f ) modtmp += m_lfo[0][f] * mod##_l1; \
+		if( mod##_l2 != 0.0f ) modtmp += m_lfo[1][f] * mod##_l2; \
 		car = qBound( MIN_FREQ, car * powf( 2.0f, modtmp ), MAX_FREQ );
 
 #define modulateabs( car, mod ) \
-		if( mod##_e1 != 0.0f ) car += env[0][f] * mod##_e1; \
-		if( mod##_e2 != 0.0f ) car += env[1][f] * mod##_e2; \
-		if( mod##_l1 != 0.0f ) car += lfo[0][f] * mod##_l1; \
-		if( mod##_l2 != 0.0f ) car += lfo[1][f] * mod##_l2;
+		if( mod##_e1 != 0.0f ) car += m_env[0][f] * mod##_e1; \
+		if( mod##_e2 != 0.0f ) car += m_env[1][f] * mod##_e2; \
+		if( mod##_l1 != 0.0f ) car += m_lfo[0][f] * mod##_l1; \
+		if( mod##_l2 != 0.0f ) car += m_lfo[1][f] * mod##_l2;
 
 #define modulatephs( car, mod ) \
-		if( mod##_e1 != 0.0f ) car += env[0][f] * mod##_e1; \
-		if( mod##_e2 != 0.0f ) car += env[1][f] * mod##_e2; \
-		if( mod##_l1 != 0.0f ) car += lfo[0][f] * mod##_l1; \
-		if( mod##_l2 != 0.0f ) car += lfo[1][f] * mod##_l2;
+		if( mod##_e1 != 0.0f ) car += m_env[0][f] * mod##_e1; \
+		if( mod##_e2 != 0.0f ) car += m_env[1][f] * mod##_e2; \
+		if( mod##_l1 != 0.0f ) car += m_lfo[0][f] * mod##_l1; \
+		if( mod##_l2 != 0.0f ) car += m_lfo[1][f] * mod##_l2;
 
 #define modulatevol( car, mod ) \
-		if( mod##_e1 > 0.0f ) car *= ( 1.0f - mod##_e1 + mod##_e1 * env[0][f] ); \
-		if( mod##_e1 < 0.0f ) car *= ( 1.0f + mod##_e1 * env[0][f] );	\
-		if( mod##_e2 > 0.0f ) car *= ( 1.0f - mod##_e2 + mod##_e2 * env[1][f] );	\
-		if( mod##_e2 < 0.0f ) car *= ( 1.0f + mod##_e2 * env[1][f] );	\
-		if( mod##_l1 != 0.0f ) car *= ( 1.0f + mod##_l1 * lfo[0][f] ); \
-		if( mod##_l2 != 0.0f ) car *= ( 1.0f + mod##_l2 * lfo[1][f] ); \
+		if( mod##_e1 > 0.0f ) car *= ( 1.0f - mod##_e1 + mod##_e1 * m_env[0][f] ); \
+		if( mod##_e1 < 0.0f ) car *= ( 1.0f + mod##_e1 * m_env[0][f] );	\
+		if( mod##_e2 > 0.0f ) car *= ( 1.0f - mod##_e2 + mod##_e2 * m_env[1][f] );	\
+		if( mod##_e2 < 0.0f ) car *= ( 1.0f + mod##_e2 * m_env[1][f] );	\
+		if( mod##_l1 != 0.0f ) car *= ( 1.0f + mod##_l1 * m_lfo[0][f] ); \
+		if( mod##_l2 != 0.0f ) car *= ( 1.0f + mod##_l2 * m_lfo[1][f] ); \
 		car = qBound( -MODCLIP, car, MODCLIP );
 
 
@@ -323,7 +328,7 @@ void MonstroSynth::renderOutput( fpp_t _frames, sampleFrame * _buf  )
 	float o1l_f;
 	float o1r_f;
 	float o1l_p = m_osc1l_phase + o1lpo; // we add phase offset here so we don't have to do it every frame
-	float o1r_p = m_osc1r_phase + o1rpo; // then substract it again after loop...
+	float o1r_p = m_osc1r_phase + o1rpo; // then subtract it again after loop...
 	float o1_pw;
 
 	// osc2 vars
@@ -339,12 +344,8 @@ void MonstroSynth::renderOutput( fpp_t _frames, sampleFrame * _buf  )
 	float o3r_p = m_osc3r_phase + o3rpo;
 	float sub;
 
-	// modulators
-	float lfo[2][ m_parent->m_fpp ];
-	float env[2][ m_parent->m_fpp ];
-	
 	// render modulators: envelopes, lfos
-	updateModulators( &env[0][0], &env[1][0], &lfo[0][0], &lfo[1][0], _frames );
+	updateModulators( m_env[0].data(), m_env[1].data(), m_lfo[0].data(), m_lfo[1].data(), _frames );
 
 	// begin for loop
 	for( f_cnt_t f = 0; f < _frames; ++f )
@@ -1446,7 +1447,7 @@ void MonstroInstrument::updateSlope2()
 
 MonstroView::MonstroView( Instrument * _instrument,
 					QWidget * _parent ) :
-					InstrumentView( _instrument, _parent )
+					InstrumentViewFixedSize( _instrument, _parent )
 {
 	m_operatorsView = setupOperatorsView( this );
 	setWidgetBackground( m_operatorsView, "artwork_op" );
@@ -1826,9 +1827,9 @@ extern "C"
 {
 
 // necessary for getting instance out of shared lib
-PLUGIN_EXPORT Plugin * lmms_plugin_main( Model *, void * _data )
+PLUGIN_EXPORT Plugin * lmms_plugin_main( Model *m, void * )
 {
-	return new MonstroInstrument( static_cast<InstrumentTrack *>( _data ) );
+	return new MonstroInstrument( static_cast<InstrumentTrack *>( m ) );
 }
 
 

@@ -1,0 +1,125 @@
+Source: lmms
+Section: sound
+Priority: optional
+Maintainer: Debian Edu Packaging Team <debian-edu-pkg-team@lists.alioth.debian.org>
+Uploaders:
+ Petter Reinholdtsen <pere@debian.org>,
+ Israel Dahl <israeldahl@gmail.com>,
+ Javier Serrano Polo <javier@jasp.net>,
+Build-Depends:
+ cmake,
+ debhelper (>= 9.0.0),
+ fluid,
+ ladspa-sdk,
+ libasound2-dev [linux-any],
+ libfftw3-dev,
+ libfltk1.3-dev,
+ libfluidsynth-dev,
+ libgig-dev,
+ libjack-jackd2-dev,
+ liblist-moreutils-perl,
+ libmp3lame-dev,
+ libpulse-dev,
+ libqt5x11extras5-dev,
+ libsamplerate0-dev,
+ libsdl1.2-dev,
+ libsndfile1-dev,
+ libsndio-dev,
+ libsoundio-dev,
+ libstk0-dev,
+ libvorbis-dev,
+ libxcb-keysyms1-dev,
+ libxcb-util0-dev,
+ libxml-perl,
+ libxml2-utils,
+ portaudio19-dev,
+ qtbase5-private-dev,
+ qttools5-dev,
+ wine64-tools [amd64] | wine32-tools [i386]
+Standards-Version: 4.2.1.4
+Homepage: https://lmms.io/
+Vcs-Browser: https://salsa.debian.org/debian-edu-pkg-team/lmms.git
+
+Package: lmms-bin
+Architecture: any
+Depends:
+ lmms-common (>= ${source:Version}),
+ ${shlibs:Depends},
+ ${misc:Depends},
+ stk,
+Recommends:
+ caps,
+ lmms-vst-server:i386 (>= ${source:Version}),
+ lmms-vst-server:amd64 (>= ${source:Version}),
+ tap-plugins,
+Suggests:
+ fil-plugins,
+ fluid-soundfont-gm,
+ freepats,
+ ladspa-plugin,
+ mcp-plugins,
+ omins,
+Replaces: lmms-common (<< 1.0.0-1)
+Breaks: lmms-common (<< 1.0.0-1)
+Multi-Arch: allowed
+Description: Linux Multimedia Studio - minimal installation
+ LMMS aims to be a free alternative to popular (but commercial and closed-
+ source) programs like FruityLoops, Cubase and Logic giving you the ability of
+ producing music with your computer by creating cool loops, synthesizing and
+ mixing sounds, arranging samples, having more fun with your MIDI-keyboard
+ and much more...
+ .
+ LMMS combines the features of a tracker-/sequencer-program (pattern-/channel-/
+ sample-/song-/effect-management) and those of powerful synthesizers and
+ samplers in a modern, user-friendly and easy to use graphical user-interface.
+ .
+ This package provides the minimal installation.
+
+Package: lmms
+Architecture: any
+Depends:
+ lmms-bin,
+ ${misc:Depends},
+Description: Linux Multimedia Studio
+ LMMS aims to be a free alternative to popular (but commercial and closed-
+ source) programs like FruityLoops, Cubase and Logic giving you the ability of
+ producing music with your computer by creating cool loops, synthesizing and
+ mixing sounds, arranging samples, having more fun with your MIDI-keyboard
+ and much more...
+ .
+ LMMS combines the features of a tracker-/sequencer-program (pattern-/channel-/
+ sample-/song-/effect-management) and those of powerful synthesizers and
+ samplers in a modern, user-friendly and easy to use graphical user-interface.
+ .
+ This package provides the recommended installation.
+
+Package: lmms-common
+Architecture: all
+Depends:
+ ${shlibs:Depends},
+ ${misc:Depends},
+ zynaddsubfx-data,
+Pre-Depends: ${misc:Pre-Depends}
+Description: Linux Multimedia Studio - common files
+ LMMS aims to be a free alternative to popular (but commercial and closed-
+ source) programs like FruityLoops, Cubase and Logic giving you the ability of
+ producing music with your computer by creating cool loops, synthesizing and
+ mixing sounds, arranging samples, having more fun with your MIDI-keyboard
+ and much more...
+ .
+ LMMS combines the features of a tracker-/sequencer-program (pattern-/channel-/
+ sample-/song-/effect-management) and those of powerful synthesizers and
+ samplers in a modern, user-friendly and easy to use graphical user-interface.
+ .
+ This package contains the platform independent files such as samples, presets
+ and some example projects.
+
+Package: lmms-vst-server
+Architecture: amd64 i386
+Depends:
+ wine64 [amd64] | wine64-development [amd64] | wine32 [i386] | wine32-development [i386],
+ ${shlibs:Depends},
+ ${misc:Depends},
+Recommends: lmms-bin:any
+Description: Linux Multimedia Studio - VST server
+ This package contains a helper application that loads VST plugins.

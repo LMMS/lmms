@@ -33,12 +33,14 @@
 class EffectControls;
 
 
-class EXPORT EffectControlDialog : public QWidget, public ModelView
+class LMMS_EXPORT EffectControlDialog : public QWidget, public ModelView
 {
 	Q_OBJECT
 public:
 	EffectControlDialog( EffectControls * _controls );
 	virtual ~EffectControlDialog();
+
+	virtual bool isResizable() const {return false;}
 
 
 signals:
@@ -46,7 +48,7 @@ signals:
 
 
 protected:
-	virtual void closeEvent( QCloseEvent * _ce );
+	void closeEvent( QCloseEvent * _ce ) override;
 
 	EffectControls * m_effectControls;
 

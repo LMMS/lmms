@@ -37,7 +37,7 @@ class InstrumentTrack;
 class TrackContainerView;
 
 
-class EXPORT TrackContainer : public Model, public JournallingObject
+class LMMS_EXPORT TrackContainer : public Model, public JournallingObject
 {
 	Q_OBJECT
 public:
@@ -51,9 +51,9 @@ public:
 	TrackContainer();
 	virtual ~TrackContainer();
 
-	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
+	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
 
-	virtual void loadSettings( const QDomElement & _this );
+	void loadSettings( const QDomElement & _this ) override;
 
 
 	virtual AutomationPattern * tempoAutomationPattern()
@@ -124,7 +124,7 @@ public:
 	{
 	}
 
-	virtual QString nodeName() const
+	QString nodeName() const override
 	{
 		return "DummyTrackContainer";
 	}

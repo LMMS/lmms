@@ -27,7 +27,7 @@
 
 #include "embed.h"
 #include "BasicFilters.h"
-
+#include "plugin_export.h"
 
 extern "C"
 {

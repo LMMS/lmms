@@ -139,7 +139,7 @@ private:
 } ;
 
 
-class XpressiveView : public InstrumentView
+class XpressiveView : public InstrumentViewFixedSize
 {
 	Q_OBJECT
 public:
@@ -206,22 +206,16 @@ class XpressiveHelpView: public QTextEdit
 public:
 	static XpressiveHelpView* getInstance()
 	{
-		if (!s_instance)
-		{
-			s_instance = new XpressiveHelpView();
-		}
-		return s_instance;
+		static XpressiveHelpView instance;
+		return &instance;
 	}
 	static void finalize()
 	{
-		if (s_instance) { delete s_instance; }
 	}
 
 private:
 	XpressiveHelpView();
-	static XpressiveHelpView *s_instance;
 	static QString s_helpText;
-
 };
 
 #endif

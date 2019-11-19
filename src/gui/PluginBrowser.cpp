@@ -24,14 +24,16 @@
 
 #include "PluginBrowser.h"
 
+#include <QHeaderView>
 #include <QLabel>
-#include <QPainter>
+#include <QLineEdit>
 #include <QMouseEvent>
-#include <QScrollArea>
+#include <QPainter>
 #include <QStyleOption>
+#include <QTreeWidget>
 
 #include "embed.h"
-#include "templates.h"
+#include "Engine.h"
 #include "gui_templates.h"
 #include "StringPairDrag.h"
 #include "PluginFactory.h"
@@ -59,23 +61,91 @@ PluginBrowser::PluginBrowser( QWidget * _parent ) :
 								m_view );
 	hint->setWordWrap( true );
 
-	QScrollArea* scrollarea = new QScrollArea( m_view );
-	PluginDescList* descList = new PluginDescList( m_view );
-	scrollarea->setWidget(descList);
-	scrollarea->setWidgetResizable(true);
+	QLineEdit * searchBar = new QLineEdit( m_view );
+	searchBar->setPlaceholderText( "Search" );
+	searchBar->setMaxLength( 64 );
+	searchBar->setClearButtonEnabled( true );
 
-	view_layout->addWidget(hint);
-	view_layout->addWidget(scrollarea);
+	m_descTree = new QTreeWidget( m_view );
+	m_descTree->setColumnCount( 1 );
+	m_descTree->header()->setVisible( false );
+	m_descTree->setIndentation( 10 );
+	m_descTree->setSelectionMode( QAbstractItemView::NoSelection );
+
+	connect( searchBar, SIGNAL( textEdited( const QString & ) ),
+			this, SLOT( onFilterChanged( const QString & ) ) );
+
+	view_layout->addWidget( hint );
+	view_layout->addWidget( searchBar );
+	view_layout->addWidget( m_descTree );
+
+	// Add LMMS root to the tree
+	m_lmmsRoot = new QTreeWidgetItem();
+	m_lmmsRoot->setText( 0, "LMMS" );
+	m_descTree->insertTopLevelItem( 0, m_lmmsRoot );
+	m_lmmsRoot->setExpanded( true );
+
+	// Add LV2 root to the tree
+	m_lv2Root = new QTreeWidgetItem();
+	m_lv2Root->setText( 0, "LV2" );
+	m_descTree->insertTopLevelItem( 1, m_lv2Root );
+
+	// Add plugins to the tree roots
+	addPlugins();
+
+	// Resize
+	m_descTree->header()->setSectionResizeMode( QHeaderView::ResizeToContents );
+
+	// Hide empty roots
+	updateRootVisibilities();
 }
 
 
-
-
-PluginDescList::PluginDescList(QWidget *parent) :
-	QWidget(parent)
+void PluginBrowser::updateRootVisibility( int rootIndex )
 {
-	QVBoxLayout* layout = new QVBoxLayout(this);
+	QTreeWidgetItem * root = m_descTree->topLevelItem( rootIndex );
+	root->setHidden( !root->childCount() );
+}
 
+
+void PluginBrowser::updateRootVisibilities()
+{
+	int rootCount = m_descTree->topLevelItemCount();
+	for (int rootIndex = 0; rootIndex < rootCount; ++rootIndex)
+	{
+		updateRootVisibility( rootIndex );
+	}
+}
+
+
+void PluginBrowser::onFilterChanged( const QString & filter )
+{
+	int rootCount = m_descTree->topLevelItemCount();
+	for (int rootIndex = 0; rootIndex < rootCount; ++rootIndex)
+	{
+		QTreeWidgetItem * root = m_descTree->topLevelItem( rootIndex );
+
+		int itemCount = root->childCount();
+		for (int itemIndex = 0; itemIndex < itemCount; ++itemIndex)
+		{
+			QTreeWidgetItem * item = root->child( itemIndex );
+			PluginDescWidget * descWidget = static_cast<PluginDescWidget *>
+							(m_descTree->itemWidget( item, 0));
+			if (descWidget->name().contains(filter, Qt::CaseInsensitive))
+			{
+				item->setHidden( false );
+			}
+			else
+			{
+				item->setHidden( true );
+			}
+		}
+	}
+}
+
+
+void PluginBrowser::addPlugins()
+{
 	QList<Plugin::Descriptor*> descs = pluginFactory->descriptors(Plugin::Instrument);
 	std::sort(
 			descs.begin(),
@@ -85,37 +155,71 @@ PluginDescList::PluginDescList(QWidget *parent) :
 				return qstricmp( d1->displayName, d2->displayName ) < 0 ? true : false;
 			}
 	);
-	for (const Plugin::Descriptor* desc : descs)
+
+	typedef Plugin::Descriptor::SubPluginFeatures::KeyList PluginKeyList;
+	typedef Plugin::Descriptor::SubPluginFeatures::Key PluginKey;
+	PluginKeyList subPluginKeys, pluginKeys;
+
+	for (const Plugin::Descriptor* desc: descs)
 	{
-		PluginDescWidget* p = new PluginDescWidget( *desc, this );
-		p->show();
-		layout->addWidget(p);
+		if ( desc->subPluginFeatures )
+		{
+			desc->subPluginFeatures->listSubPluginKeys(
+							desc,
+							subPluginKeys );
+		}
+		else
+		{
+			pluginKeys << PluginKey( desc, desc->name );
+		}
 	}
 
-	setLayout(layout);
-	layout->addStretch();
+	pluginKeys += subPluginKeys;
+
+	for (const PluginKey& key : pluginKeys)
+	{
+		QTreeWidgetItem * item = new QTreeWidgetItem();
+		if ( key.desc->name == QStringLiteral("lv2instrument") )
+		{
+			m_lv2Root->addChild( item );
+		}
+		else
+		{
+			m_lmmsRoot->addChild( item );
+		}
+		PluginDescWidget* p = new PluginDescWidget( key, m_descTree );
+		m_descTree->setItemWidget( item, 0, p );
+	}
 }
 
 
 
 
-PluginDescWidget::PluginDescWidget( const Plugin::Descriptor & _pd,
+PluginDescWidget::PluginDescWidget(const PluginKey &_pk,
 							QWidget * _parent ) :
 	QWidget( _parent ),
-	m_pluginDescriptor( _pd ),
-	m_logo( _pd.logo->pixmap() ),
+	m_pluginKey( _pk ),
+	m_logo( _pk.logo()->pixmap() ),
 	m_mouseOver( false )
 {
 	setFixedHeight( DEFAULT_HEIGHT );
 	setMouseTracking( true );
 	setCursor( Qt::PointingHandCursor );
-	setToolTip(_pd.description);
+	setToolTip(_pk.description());
 }
 
 
 
 
-void PluginDescWidget::paintEvent( QPaintEvent * e )
+QString PluginDescWidget::name() const
+{
+	return m_pluginKey.displayName();
+}
+
+
+
+
+void PluginDescWidget::paintEvent( QPaintEvent * )
 {
 
 	QPainter p( this );
@@ -126,7 +230,7 @@ void PluginDescWidget::paintEvent( QPaintEvent * e )
 	style()->drawPrimitive( QStyle::PE_Widget, &o, &p, this );
 
 	// Draw the rest
-	const int s = 16 + ( 32 * ( tLimit( height(), 24, 60 ) - 24 ) ) /
+	const int s = 16 + ( 32 * ( qBound( 24, height(), 60 ) - 24 ) ) /
 								( 60 - 24 );
 	const QSize logo_size( s, s );
 	QPixmap logo = m_logo.scaled( logo_size, Qt::KeepAspectRatio,
@@ -140,8 +244,7 @@ void PluginDescWidget::paintEvent( QPaintEvent * e )
 	}
 
 	p.setFont( f );
-	p.drawText( 10 + logo_size.width(), 15,
-					m_pluginDescriptor.displayName );
+	p.drawText( 10 + logo_size.width(), 15, m_pluginKey.displayName());
 }
 
 
@@ -169,10 +272,11 @@ void PluginDescWidget::leaveEvent( QEvent * _e )
 
 void PluginDescWidget::mousePressEvent( QMouseEvent * _me )
 {
-	if( _me->button() == Qt::LeftButton )
+	if ( _me->button() == Qt::LeftButton )
 	{
-		new StringPairDrag( "instrument", m_pluginDescriptor.name,
-								m_logo, this );
+		Engine::setDndPluginKey(&m_pluginKey);
+		new StringPairDrag("instrument",
+			QString::fromUtf8(m_pluginKey.desc->name), m_logo, this);
 		leaveEvent( _me );
 	}
 }

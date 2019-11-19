@@ -91,7 +91,7 @@ void AutomationPatternView::update()
 
 void AutomationPatternView::resetName()
 {
-	m_pat->setName( QString::null );
+	m_pat->setName( QString() );
 }
 
 
@@ -118,7 +118,7 @@ void AutomationPatternView::disconnectObject( QAction * _a )
 		float oldMin = m_pat->getMin();
 		float oldMax = m_pat->getMax();
 
-		m_pat->m_objects.erase( qFind( m_pat->m_objects.begin(),
+		m_pat->m_objects.erase( std::find( m_pat->m_objects.begin(),
 					m_pat->m_objects.end(),
 				dynamic_cast<AutomatableModel *>( j ) ) );
 		update();
@@ -278,10 +278,10 @@ void AutomationPatternView::paintEvent( QPaintEvent * )
 		p.fillRect( rect(), c );
 	}
 	
-	const float ppt = fixedTCOs() ?
+	const float ppb = fixedTCOs() ?
 			( parentWidget()->width() - 2 * TCO_BORDER_WIDTH )
-				/ (float) m_pat->timeMapLength().getTact() :
-								pixelsPerTact();
+				/ (float) m_pat->timeMapLength().getBar() :
+								pixelsPerBar();
 
 	const int x_base = TCO_BORDER_WIDTH;
 	
@@ -290,7 +290,7 @@ void AutomationPatternView::paintEvent( QPaintEvent * )
 
 	const float y_scale = max - min;
 	const float h = ( height() - 2 * TCO_BORDER_WIDTH ) / y_scale;
-	const float ppTick  = ppt / MidiTime::ticksPerTact();
+	const float ppTick  = ppb / MidiTime::ticksPerBar();
 
 	p.translate( 0.0f, max * height() / y_scale - TCO_BORDER_WIDTH );
 	p.scale( 1.0f, -h );
@@ -366,15 +366,15 @@ void AutomationPatternView::paintEvent( QPaintEvent * )
 	}
 
 	p.setRenderHints( QPainter::Antialiasing, false );
-	p.resetMatrix();
+	p.resetTransform();
 	
 	// bar lines
 	const int lineSize = 3;
 	p.setPen( c.darker( 300 ) );
 
-	for( tact_t t = 1; t < width() - TCO_BORDER_WIDTH; ++t )
+	for( bar_t t = 1; t < width() - TCO_BORDER_WIDTH; ++t )
 	{
-		const int tx = x_base + static_cast<int>( ppt * t ) - 2;
+		const int tx = x_base + static_cast<int>( ppb * t ) - 2;
 		p.drawLine( tx, TCO_BORDER_WIDTH, tx, TCO_BORDER_WIDTH + lineSize );
 		p.drawLine( tx,	rect().bottom() - ( lineSize + TCO_BORDER_WIDTH ),
 					tx, rect().bottom() - TCO_BORDER_WIDTH );
