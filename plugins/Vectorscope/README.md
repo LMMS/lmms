@@ -2,14 +2,13 @@
 
 ## Overview
 
-This plugin consists of one widget and back-end code to provide it with required data.
+Vectorscope is a simple stereo field visualizer. Samples are plotted into a graph, with left and right channels providing the coordinates. Previously drawn samples quickly fade away and are continuously replaced by new samples, creating a real-time plot of the most recently played samples.
 
-The top-level widget is VecControlDialog. It displays configuration knobs and the VectorView widget. The back-end class for its configuration is VecControls, which holds all configuration values.
+Similar to other effect plugins, the top-level widget is VecControlDialog. It displays configuration knobs and the main VectorView widget. The back-end configuration class is VecControls, which holds all models and configuration values.
 
-VectorView computes and shows the visualization results. Data for processing are received from the Vectorscope class, which handles the interface with LMMS.
-
+VectorView computes and shows the plot. It gets data for processing from the Vectorscope class, which handles the interface with LMMS. In order to avoid any stalling of the realtime-sensitive audio thread, data are exchanged through a lockless ring buffer.
 
 ## Changelog
 
-	1.0.0	2019-00-00
+	1.0.0	2019-11-21
 		- initial release

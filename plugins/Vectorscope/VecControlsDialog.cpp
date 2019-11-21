@@ -47,6 +47,7 @@ VecControlsDialog::VecControlsDialog(VecControls *controls) :
 	setLayout(master_layout);
 
 	// Visualizer widget
+	// The size of 768 pixels seems to offer a good balance of speed, accuracy and trace thickness.
 	VectorView *display = new VectorView(controls, m_controls->m_effect->getBuffer(), 768, this);
 	master_layout->addWidget(display);
 
@@ -86,7 +87,7 @@ VecControlsDialog::VecControlsDialog(VecControls *controls) :
 }
 
 
-// Suggest the best current widget size.
+// Suggest the best widget size.
 QSize VecControlsDialog::sizeHint() const
 {
 	return QSize(275, 300);

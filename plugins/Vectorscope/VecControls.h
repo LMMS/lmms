@@ -25,9 +25,10 @@
 #ifndef VECCONTROLS_H
 #define VECCONTROLS_H
 
+#include <QColor>
+
 #include "EffectControls.h"
 
-#include <QColor>
 
 class Vectorscope;
 
@@ -55,7 +56,6 @@ private:
 	BoolModel m_highQualityModel;
 
 	QColor	m_colorFG;
-	QColor	m_colorBG;
 	QColor	m_colorGrid;
 	QColor	m_colorLabels;
 	QColor	m_colorOutline;

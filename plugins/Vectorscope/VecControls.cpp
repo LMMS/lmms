@@ -26,8 +26,8 @@
 
 #include <QtXml/QDomElement>
 
-#include "Vectorscope.h"
 #include "VecControlsDialog.h"
+#include "Vectorscope.h"
 
 
 VecControls::VecControls(Vectorscope *effect) :

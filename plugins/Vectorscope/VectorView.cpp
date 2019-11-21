@@ -23,8 +23,8 @@
 #include "VectorView.h"
 
 #include <algorithm>
-#include <cmath>
 #include <chrono>
+#include <cmath>
 #include <QImage>
 #include <QPainter>
 
@@ -87,8 +87,9 @@ void VectorView::paintEvent(QPaintEvent *event)
 	const int labelWidth = 26;
 	const int labelHeight = 26;
 
-	// Clear display buffer if quality setting was changed
 	bool hq = m_controls->m_highQualityModel.value();
+
+	// Clear display buffer if quality setting was changed
 	if (hq != m_oldHQ)
 	{
 		m_oldHQ = hq;
@@ -109,6 +110,7 @@ void VectorView::paintEvent(QPaintEvent *event)
 	if (elapsed > threshold)
 	{
 		m_persistTimestamp = currentTimestamp;
+		// Non-HQ mode uses half the resolution → use limited buffer space.
 		const std::size_t useableBuffer = hq ? m_displayBuffer.size() : m_displayBuffer.size() / 4;
 		// The knob value is interpreted on log. scale, otherwise the effect would ramp up too slowly.
 		// Persistence value specifies fraction of light intensity that remains after 10 ms.
@@ -135,8 +137,8 @@ void VectorView::paintEvent(QPaintEvent *event)
 	const bool logScale = m_controls->m_logarithmicModel.value();
 	const unsigned short activeSize = hq ? m_displaySize : m_displaySize / 2;
 
-	// Helper lambda functions for better readability:
-	// Make sure pixel stays within display bounds
+	// Helper lambda functions for better readability
+	// Make sure pixel stays within display bounds:
 	auto saturate = [=](short pixelPos) {return fmax(fmin(pixelPos, activeSize - 1), 0);};
 	// Take existing pixel and brigthen it. Very bright light should reduce saturation and become
 	// white. This effect is easily approximated by capping elementary colors to 255 individually.
@@ -185,7 +187,7 @@ void VectorView::paintEvent(QPaintEvent *event)
 			// - one point between samples = returns exactly the specified color,
 			// - one to 99 points between samples = follows a sharp "1/x" decaying curve,
 			// - 100 points between samples = returns approximately 5 % brightness.
-			// Everything else is discarded because there is not much to see anyway.
+			// Everything else is discarded (by the 100 point cap) because there is not much to see anyway.
 			QColor addedColor = m_controls->m_colorFG.darker(75 + 20 * points).rgb();
 
 			// Draw the new pixel: the beam sweeps across area that may have been excited before
@@ -193,14 +195,16 @@ void VectorView::paintEvent(QPaintEvent *event)
 			updatePixel(x, y, addedColor);
 
 			// Draw interpolated points between the old pixel and the new one
+			int newX = right - left + activeSize / 2.f;
+			int newY = activeSize - (right + left + activeSize / 2.f);
 			for (unsigned char i = 1; i < points; i++)
 			{
-				x = saturate(((points - i) * m_oldX + i * (right - left + activeSize / 2.f)) / points);
-				y = saturate(((points - i) * m_oldY + i * (activeSize - (right + left + activeSize / 2.f))) / points);
+				x = saturate(((points - i) * m_oldX + i * newX) / points);
+				y = saturate(((points - i) * m_oldY + i * newY) / points);
 				updatePixel(x, y, addedColor);
 			}
-			m_oldX = x;
-			m_oldY = y;
+			m_oldX = newX;
+			m_oldY = newY;
 		}
 	}
 	else
@@ -231,12 +235,13 @@ void VectorView::paintEvent(QPaintEvent *event)
 
 	// Draw the final image
 	QImage temp = QImage(m_displayBuffer.data(),
-						 hq ? m_displaySize : m_displaySize / 2,
-						 hq ? m_displaySize : m_displaySize / 2,
+						 activeSize,
+						 activeSize,
 						 QImage::Format_RGB32);
 	temp.setDevicePixelRatio(devicePixelRatio());
 	painter.drawImage(displayLeft, displayTop,
-					  temp.scaledToWidth(displayWidth * devicePixelRatio(), Qt::SmoothTransformation));
+					  temp.scaledToWidth(displayWidth * devicePixelRatio(),
+					  Qt::SmoothTransformation));
 
 	// Draw the grid and labels
 	painter.setPen(QPen(m_controls->m_colorGrid, 1.5, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
@@ -256,12 +261,12 @@ void VectorView::paintEvent(QPaintEvent *event)
 
 	// Draw the outline
 	painter.setPen(QPen(m_controls->m_colorOutline, 2, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
-	painter.drawRoundedRect(1, 1, width() - 2, height() - 2, 2.0, 2.0);
+	painter.drawRoundedRect(1, 1, width() - 2, height() - 2, 2.f, 2.f);
 
 	// Optionally measure drawing performance
 	#ifdef VEC_DEBUG
 		drawTime = std::chrono::high_resolution_clock::now().time_since_epoch().count() - drawTime;
-		m_executionAvg = 0.95 * m_executionAvg + 0.05 * drawTime / 1000000.0;
+		m_executionAvg = 0.95f * m_executionAvg + 0.05f * drawTime / 1000000.f;
 		painter.setPen(QPen(m_controls->m_colorLabels, 1, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
 		painter.setFont(normalFont);
 		painter.drawText(displayWidth / 2 - 50, displayBottom - 16, 100, 16, Qt::AlignLeft,
