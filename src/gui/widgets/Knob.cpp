@@ -803,9 +803,9 @@ void Knob::enterValue()
 
 void Knob::friendlyUpdate()
 {
-	if( model()->controllerConnection() == NULL ||
+	if (model() && (model()->controllerConnection() == NULL ||
 		model()->controllerConnection()->getController()->frequentUpdates() == false ||
-				Controller::runningFrames() % (256*4) == 0 )
+				Controller::runningFrames() % (256*4) == 0))
 	{
 		update();
 	}
