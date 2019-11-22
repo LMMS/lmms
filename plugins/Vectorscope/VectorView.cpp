@@ -139,15 +139,15 @@ void VectorView::paintEvent(QPaintEvent *event)
 
 	// Helper lambda functions for better readability
 	// Make sure pixel stays within display bounds:
-	auto saturate = [=](short pixelPos) {return fmax(fmin(pixelPos, activeSize - 1), 0);};
+	auto saturate = [=](short pixelPos) {return qBound((short)0, pixelPos, (short)(activeSize - 1));};
 	// Take existing pixel and brigthen it. Very bright light should reduce saturation and become
 	// white. This effect is easily approximated by capping elementary colors to 255 individually.
-	auto updatePixel = [&](unsigned int x, unsigned int y, QColor addedColor)
+	auto updatePixel = [&](unsigned short x, unsigned short y, QColor addedColor)
 	{
 		QColor currentColor = ((QRgb*)m_displayBuffer.data())[x + y * activeSize];
-		currentColor.setRed(fmin(currentColor.red() + addedColor.red(), 255));
-		currentColor.setGreen(fmin(currentColor.green() + addedColor.green(), 255));
-		currentColor.setBlue(fmin(currentColor.blue() + addedColor.blue(), 255));
+		currentColor.setRed(std::min(currentColor.red() + addedColor.red(), 255));
+		currentColor.setGreen(std::min(currentColor.green() + addedColor.green(), 255));
+		currentColor.setBlue(std::min(currentColor.blue() + addedColor.blue(), 255));
 		((QRgb*)m_displayBuffer.data())[x + y * activeSize] = currentColor.rgb();
 	};
 
@@ -162,7 +162,8 @@ void VectorView::paintEvent(QPaintEvent *event)
 			{
 				// To better preserve shapes, the log scale is applied to the distance from origin,
 				// not the individual channels.
-				const float distance = sqrt(pow(inBuffer[frame][0], 2) + pow(inBuffer[frame][1], 2));
+				const float distance = sqrt(inBuffer[frame][0] * inBuffer[frame][0] +
+											inBuffer[frame][1] * inBuffer[frame][1]);
 				const float distanceLog = log10(1 + 9 * abs(distance));
 				const float angleCos = inBuffer[frame][0] / distance;
 				const float angleSin = inBuffer[frame][1] / distance;
@@ -180,7 +181,7 @@ void VectorView::paintEvent(QPaintEvent *event)
 			y = saturate(activeSize - (right + left + activeSize / 2.f));
 
 			// Estimate number of points needed to fill space between the old and new pixel. Cap at 100.
-			unsigned char points = fmin(sqrt(pow(m_oldX - x, 2.f) + pow(m_oldY - y, 2.f)), 100);
+			unsigned char points = std::min((int)sqrt((m_oldX - x) * (m_oldX - x) + (m_oldY - y) * (m_oldY - y)), 100);
 
 			// Large distance = dim trace. The curve for darker() is choosen so that:
 			// - no movement (0 points) actually _increases_ brightness slightly,
@@ -214,7 +215,8 @@ void VectorView::paintEvent(QPaintEvent *event)
 		for (std::size_t frame = 0; frame < frameCount; frame++)
 		{
 			if (logScale) {
-				const float distance = sqrt(pow(inBuffer[frame][0], 2) + pow(inBuffer[frame][1], 2));
+				const float distance = sqrt(inBuffer[frame][0] * inBuffer[frame][0] +
+											inBuffer[frame][1] * inBuffer[frame][1]);
 				const float distanceLog = log10(1 + 9 * abs(distance));
 				const float angleCos = inBuffer[frame][0] / distance;
 				const float angleSin = inBuffer[frame][1] / distance;
