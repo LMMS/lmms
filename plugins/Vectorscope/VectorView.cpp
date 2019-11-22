@@ -25,6 +25,7 @@
 #include <algorithm>
 #include <chrono>
 #include <cmath>
+#include <QColorDialog>
 #include <QImage>
 #include <QPainter>
 
@@ -282,4 +283,12 @@ void VectorView::periodicUpdate()
 {
 	m_visible = isVisible();
 	if (m_visible) {update();}
+}
+
+
+// Allow to change color on double-click.
+// More of an Easter egg, to avoid cluttering the interface with non-essential functionality.
+void VectorView::mouseDoubleClickEvent(QMouseEvent *event)
+{
+	m_controls->m_colorFG = QColorDialog::getColor(m_controls->m_colorFG);
 }

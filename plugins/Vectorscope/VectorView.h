@@ -23,6 +23,7 @@
 #ifndef VECTORVIEW_H
 #define VECTORVIEW_H
 
+#include <QMouseEvent>
 #include <QWidget>
 
 #include "Knob.h"
@@ -45,6 +46,7 @@ public:
 
 protected:
 	void paintEvent(QPaintEvent *event) override;
+	void mouseDoubleClickEvent(QMouseEvent *event) override;
 
 private slots:
 	void periodicUpdate();
