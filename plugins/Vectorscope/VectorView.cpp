@@ -1,4 +1,4 @@
-/* VectorViewView.cpp - implementation of VectorViewView class.
+/* VectorView.cpp - implementation of VectorView class.
  *
  * Copyright (c) 2019 Martin Pavelek <he29/dot/HS/at/gmail/dot/com>
  *
@@ -281,4 +281,3 @@ void VectorView::periodicUpdate()
 	m_visible = isVisible();
 	if (m_visible) {update();}
 }
-
