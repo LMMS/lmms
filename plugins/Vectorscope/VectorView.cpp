@@ -50,18 +50,18 @@ VectorView::VectorView(VecControls *controls, LocklessRingBuffer<sampleFrame> *i
 
 	m_displayBuffer.resize(sizeof qRgb(0,0,0) * m_displaySize * m_displaySize, 0);
 
-	#ifdef VEC_DEBUG
-		m_executionAvg = 0;
-	#endif
+#ifdef VEC_DEBUG
+	m_executionAvg = 0;
+#endif
 }
 
 
 // Compose and draw all the content; called by Qt.
 void VectorView::paintEvent(QPaintEvent *event)
 {
-	#ifdef VEC_DEBUG
-		unsigned int drawTime = std::chrono::high_resolution_clock::now().time_since_epoch().count();
-	#endif
+#ifdef VEC_DEBUG
+	unsigned int drawTime = std::chrono::high_resolution_clock::now().time_since_epoch().count();
+#endif
 
 	// All drawing done in this method, local variables are sufficient for the boundary
 	const int displayTop = 2;
@@ -122,7 +122,7 @@ void VectorView::paintEvent(QPaintEvent *event)
 		// occurs in high-intensity traces in HQ mode.
 		for (std::size_t i = 0; i < useableBuffer; i++)
 		{
-			m_displayBuffer.data()[i] = m_displayBuffer.data()[i] * persistPerFrame;
+			m_displayBuffer.data()[i] *= persistPerFrame;
 		}
 	}
 
@@ -264,14 +264,14 @@ void VectorView::paintEvent(QPaintEvent *event)
 	painter.drawRoundedRect(1, 1, width() - 2, height() - 2, 2.f, 2.f);
 
 	// Optionally measure drawing performance
-	#ifdef VEC_DEBUG
-		drawTime = std::chrono::high_resolution_clock::now().time_since_epoch().count() - drawTime;
-		m_executionAvg = 0.95f * m_executionAvg + 0.05f * drawTime / 1000000.f;
-		painter.setPen(QPen(m_controls->m_colorLabels, 1, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
-		painter.setFont(normalFont);
-		painter.drawText(displayWidth / 2 - 50, displayBottom - 16, 100, 16, Qt::AlignLeft,
-						 QString("Exec avg.: ").append(std::to_string(m_executionAvg).substr(0, 5).c_str()).append(" ms"));
-	#endif
+#ifdef VEC_DEBUG
+	drawTime = std::chrono::high_resolution_clock::now().time_since_epoch().count() - drawTime;
+	m_executionAvg = 0.95f * m_executionAvg + 0.05f * drawTime / 1000000.f;
+	painter.setPen(QPen(m_controls->m_colorLabels, 1, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
+	painter.setFont(normalFont);
+	painter.drawText(displayWidth / 2 - 50, displayBottom - 16, 100, 16, Qt::AlignLeft,
+					 QString("Exec avg.: ").append(std::to_string(m_executionAvg).substr(0, 5).c_str()).append(" ms"));
+#endif
 }
 
 

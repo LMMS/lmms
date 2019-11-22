@@ -66,8 +66,8 @@ private:
 	int m_oldX;
 	int m_oldY;
 
-	#ifdef VEC_DEBUG
-		float m_executionAvg = 0;
-	#endif
+#ifdef VEC_DEBUG
+	float m_executionAvg = 0;
+#endif
 };
 #endif // VECTORVIEW_H

@@ -54,17 +54,17 @@ EffectControlDialog* VecControls::createView()
 }
 
 
-void VecControls::loadSettings(const QDomElement &_this)
+void VecControls::loadSettings(const QDomElement &element)
 {
-	m_persistenceModel.loadSettings(_this, "Persistence");
-	m_logarithmicModel.loadSettings(_this, "Logarithmic");
-	m_highQualityModel.loadSettings(_this, "HighQuality");
+	m_persistenceModel.loadSettings(element, "Persistence");
+	m_logarithmicModel.loadSettings(element, "Logarithmic");
+	m_highQualityModel.loadSettings(element, "HighQuality");
 }
 
 
-void VecControls::saveSettings(QDomDocument &doc, QDomElement &parent)
+void VecControls::saveSettings(QDomDocument &document, QDomElement &element)
 {
-	m_persistenceModel.saveSettings(doc, parent, "Persistence");
-	m_logarithmicModel.saveSettings(doc, parent, "Logarithmic");
-	m_highQualityModel.saveSettings(doc, parent, "HighQuality");
+	m_persistenceModel.saveSettings(document, element, "Persistence");
+	m_logarithmicModel.saveSettings(document, element, "Logarithmic");
+	m_highQualityModel.saveSettings(document, element, "HighQuality");
 }

@@ -37,13 +37,13 @@ class VecControls : public EffectControls
 {
 	Q_OBJECT
 public:
-	explicit VecControls(Vectorscope* effect);
+	explicit VecControls(Vectorscope *effect);
 	virtual ~VecControls() {}
 
-	EffectControlDialog* createView() override;
+	EffectControlDialog *createView() override;
 
-	void saveSettings (QDomDocument& doc, QDomElement& parent) override;
-	void loadSettings (const QDomElement &_this) override;
+	void saveSettings (QDomDocument &document, QDomElement &element) override;
+	void loadSettings (const QDomElement &element) override;
 
 	QString nodeName() const override {return "Vectorscope";}
 	int controlCount() override {return 3;}
