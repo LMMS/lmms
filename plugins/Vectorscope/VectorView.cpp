@@ -303,7 +303,11 @@ void VectorView::periodicUpdate()
 // More of an Easter egg, to avoid cluttering the interface with non-essential functionality.
 void VectorView::mouseDoubleClickEvent(QMouseEvent *event)
 {
-	m_controls->m_colorFG = QColorDialog::getColor(m_controls->m_colorFG);
+	QColor new_color = QColorDialog::getColor(m_controls->m_colorFG);
+	if (new_color.isValid())
+	{
+		m_controls->m_colorFG = new_color;
+	}
 }
 
 
