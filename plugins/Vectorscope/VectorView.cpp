@@ -39,7 +39,9 @@ VectorView::VectorView(VecControls *controls, LocklessRingBuffer<sampleFrame> *i
 	m_inputBuffer(inputBuffer),
 	m_bufferReader(*inputBuffer),
 	m_displaySize(displaySize),
+	m_zoom(1.f),
 	m_persistTimestamp(0),
+	m_zoomTimestamp(0),
 	m_oldHQ(m_controls->m_highQualityModel.value()),
 	m_oldX(m_displaySize / 2),
 	m_oldY(m_displaySize / 2)
@@ -158,23 +160,24 @@ void VectorView::paintEvent(QPaintEvent *event)
 		// The longer the line is, the dimmer, simulating real electron trace on luminescent screen.
 		for (std::size_t frame = 0; frame < frameCount; frame++)
 		{
+			float inLeft = inBuffer[frame][0] * m_zoom;
+			float inRight = inBuffer[frame][1] * m_zoom;
 			// Scale left and right channel from (-1.0, 1.0) to display range
 			if (logScale)
 			{
 				// To better preserve shapes, the log scale is applied to the distance from origin,
 				// not the individual channels.
-				const float distance = sqrt(inBuffer[frame][0] * inBuffer[frame][0] +
-											inBuffer[frame][1] * inBuffer[frame][1]);
+				const float distance = sqrt(inLeft * inLeft + inRight * inRight);
 				const float distanceLog = log10(1 + 9 * abs(distance));
-				const float angleCos = inBuffer[frame][0] / distance;
-				const float angleSin = inBuffer[frame][1] / distance;
+				const float angleCos = inLeft / distance;
+				const float angleSin = inRight / distance;
 				left  = distanceLog * angleCos * (activeSize - 1) / 4;
 				right = distanceLog * angleSin * (activeSize - 1) / 4;
 			}
 			else
 			{
-				left  = inBuffer[frame][0] * (activeSize - 1) / 4;
-				right = inBuffer[frame][1] * (activeSize - 1) / 4;
+				left  = inLeft * (activeSize - 1) / 4;
+				right = inRight * (activeSize - 1) / 4;
 			}
 
 			// Rotate display coordinates 45 degrees, flip Y axis and make sure the result stays within bounds
@@ -215,17 +218,18 @@ void VectorView::paintEvent(QPaintEvent *event)
 		// one full-color pixel per sample.
 		for (std::size_t frame = 0; frame < frameCount; frame++)
 		{
+			float inLeft = inBuffer[frame][0] * m_zoom;
+			float inRight = inBuffer[frame][1] * m_zoom;
 			if (logScale) {
-				const float distance = sqrt(inBuffer[frame][0] * inBuffer[frame][0] +
-											inBuffer[frame][1] * inBuffer[frame][1]);
+				const float distance = sqrt(inLeft * inLeft + inRight * inRight);
 				const float distanceLog = log10(1 + 9 * abs(distance));
-				const float angleCos = inBuffer[frame][0] / distance;
-				const float angleSin = inBuffer[frame][1] / distance;
+				const float angleCos = inLeft / distance;
+				const float angleSin = inRight / distance;
 				left  = distanceLog * angleCos * (activeSize - 1) / 4;
 				right = distanceLog * angleSin * (activeSize - 1) / 4;
 			} else {
-				left  = inBuffer[frame][0] * (activeSize - 1) / 4;
-				right = inBuffer[frame][1] * (activeSize - 1) / 4;
+				left  = inLeft * (activeSize - 1) / 4;
+				right = inRight * (activeSize - 1) / 4;
 			}
 			x = saturate(right - left + activeSize / 2.f);
 			y = saturate(activeSize - (right + left + activeSize / 2.f));
@@ -266,6 +270,15 @@ void VectorView::paintEvent(QPaintEvent *event)
 	painter.setPen(QPen(m_controls->m_colorOutline, 2, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
 	painter.drawRoundedRect(1, 1, width() - 2, height() - 2, 2.f, 2.f);
 
+	// Draw zoom info if changed within last second (re-using timestamp acquired for dimming)
+	if (currentTimestamp - m_zoomTimestamp < 1000)
+	{
+		painter.setPen(QPen(m_controls->m_colorLabels, 1, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
+		painter.setFont(normalFont);
+		painter.drawText(displayWidth / 2 - 50, displayBottom - 20, 100, 16, Qt::AlignCenter,
+						 QString("Zoom: ").append(std::to_string((int)round(m_zoom * 100)).c_str()).append(" %"));
+	}
+
 	// Optionally measure drawing performance
 #ifdef VEC_DEBUG
 	drawTime = std::chrono::high_resolution_clock::now().time_since_epoch().count() - drawTime;
@@ -291,4 +304,21 @@ void VectorView::periodicUpdate()
 void VectorView::mouseDoubleClickEvent(QMouseEvent *event)
 {
 	m_controls->m_colorFG = QColorDialog::getColor(m_controls->m_colorFG);
+}
+
+
+// Change zoom level using the mouse wheel
+void VectorView::wheelEvent(QWheelEvent *event)
+{
+	// Go through integers to avoid accumulating errors
+	const unsigned short old_zoom = round(100 * m_zoom);
+	// Min-max bounds are 20 and 1000 %, step for 15°-increment mouse wheel is 20 %
+	const unsigned short new_zoom = qBound(20, old_zoom + event->angleDelta().y() / 6, 1000);
+	m_zoom = new_zoom / 100.f;
+	event->accept();
+	m_zoomTimestamp = std::chrono::duration_cast<std::chrono::milliseconds>
+	(
+		std::chrono::high_resolution_clock::now().time_since_epoch()
+	).count();
+
 }

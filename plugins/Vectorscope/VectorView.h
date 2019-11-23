@@ -24,6 +24,7 @@
 #define VECTORVIEW_H
 
 #include <QMouseEvent>
+#include <QWheelEvent>
 #include <QWidget>
 
 #include "Knob.h"
@@ -47,6 +48,7 @@ public:
 protected:
 	void paintEvent(QPaintEvent *event) override;
 	void mouseDoubleClickEvent(QMouseEvent *event) override;
+	void wheelEvent(QWheelEvent *event) override;
 
 private slots:
 	void periodicUpdate();
@@ -62,8 +64,11 @@ private:
 
 	bool m_visible;
 
+	float m_zoom;
+
 	// State variables for comparison with previous repaint
 	unsigned int m_persistTimestamp;
+	unsigned int m_zoomTimestamp;
 	bool m_oldHQ;
 	int m_oldX;
 	int m_oldY;
