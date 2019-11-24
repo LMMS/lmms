@@ -25,10 +25,10 @@
 #include <algorithm>
 #include <chrono>
 #include <cmath>
-#include <QColorDialog>
 #include <QImage>
 #include <QPainter>
 
+#include "ColorChooser.h"
 #include "GuiApplication.h"
 #include "MainWindow.h"
 
@@ -303,7 +303,7 @@ void VectorView::periodicUpdate()
 // More of an Easter egg, to avoid cluttering the interface with non-essential functionality.
 void VectorView::mouseDoubleClickEvent(QMouseEvent *event)
 {
-	QColor new_color = QColorDialog::getColor(m_controls->m_colorFG);
+	QColor new_color = ColorChooser::getColor(m_controls->m_colorFG);
 	if (new_color.isValid())
 	{
 		m_controls->m_colorFG = new_color;
