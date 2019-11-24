@@ -35,11 +35,11 @@
 DisintegratorControls::DisintegratorControls(DisintegratorEffect* effect) :
 	EffectControls(effect),
 	m_effect(effect),
-	m_lowCutModel(2.0f, 2.0f, 20000.0f, 0.01f, this, tr("Low Cut Frequency")),
-	m_highCutModel(20000.0f, 2.0f, 20000.0f, 0.01f, this, tr("High Cut Frequency")),
+	m_lowCutModel(20.0f, 20.0f, 20000.0f, 0.01f, this, tr("Low Cut Frequency")),
+	m_highCutModel(20000.0f, 20.0f, 20000.0f, 0.01f, this, tr("High Cut Frequency")),
 	m_amountModel(30.0f, 0.0f, 200.0f, 0.01f, this, tr("Amount")),
 	m_typeModel(this, tr("Type")),
-	m_freqModel(100.0f, 2.0f, 21050.0f, 0.01f, this, tr("Frequency"))
+	m_freqModel(100.0f, 1.0f, 21050.0f, 0.01f, this, tr("Frequency"))
 {
 	// All of these are much easier to tweak when logarithmic
 	m_lowCutModel.setScaleLogarithmic(true);
