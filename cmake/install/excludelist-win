@@ -1,0 +1,23 @@
+# List of DLLs considered to be system libraries.
+# This is needed when cross-compiling for Windows.
+ADVAPI32.dll
+COMCTL32.dll
+comdlg32.dll
+dwmapi.dll
+GDI32.dll
+IMM32.dll
+KERNEL32.dll
+MPR.DLL
+msvcrt.dll
+ole32.dll
+OLEAUT32.dll
+OPENGL32.DLL
+SHELL32.dll
+USER32.dll
+UxTheme.dll
+VERSION.dll
+WINMM.DLL
+WS2_32.dll
+RPCRT4.dll
+dsound.dll
+SETUPAPI.dll

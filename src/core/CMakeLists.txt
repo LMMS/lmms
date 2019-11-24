@@ -1,5 +1,6 @@
 set(LMMS_SRCS
 	${LMMS_SRCS}
+
 	core/AutomatableModel.cpp
 	core/AutomationPattern.cpp
 	core/BandLimitedWave.cpp

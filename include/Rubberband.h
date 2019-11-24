@@ -83,7 +83,7 @@ public:
 
 
 protected:
-	virtual void resizeEvent( QResizeEvent * _re );
+	void resizeEvent( QResizeEvent * _re ) override;
 
 private:
 

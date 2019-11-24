@@ -27,6 +27,8 @@
 #ifndef SASPECTRUMVIEW_H
 #define SASPECTRUMVIEW_H
 
+#include "SaControls.h"
+
 #include <string>
 #include <utility>
 #include <QPainterPath>
@@ -34,7 +36,6 @@
 
 class QMouseEvent;
 class QPainter;
-class SaControls;
 class SaProcessor;
 
 //! Widget that displays a spectrum curve and frequency / amplitude grid
@@ -84,7 +85,7 @@ private:
 	std::vector<float> m_displayBufferR;
 	std::vector<float> m_peakBufferL;
 	std::vector<float> m_peakBufferR;
-	void updateBuffers(float *spectrum, float *displayBuffer, float *peakBuffer);
+	void updateBuffers(const float *spectrum, float *displayBuffer, float *peakBuffer);
 
 	// final paths to be drawn by QPainter and methods to build them
 	QPainterPath m_pathL;
@@ -99,14 +100,11 @@ private:
 	bool m_freezeRequest;	// new reference should be acquired
 	bool m_frozen;			// a reference is currently stored in the peakBuffer
 
-	const float m_smoothFactor = 0.15;		// alpha for exponential smoothing
-	const float m_peakDecayFactor = 0.992;	// multiplier for gradual peak decay
-
 	// top level: refresh buffers, make paths and draw the spectrum
 	void drawSpectrum(QPainter &painter);
 
 	// current cursor location and a method to draw it
-	QPoint m_cursor;
+	QPointF m_cursor;
 	void drawCursor(QPainter &painter);
 
 	// wrappers for most used SaProcessor conversion helpers
@@ -121,6 +119,13 @@ private:
 	unsigned int m_displayLeft;
 	unsigned int m_displayRight;
 	unsigned int m_displayWidth;
+
+	#ifdef SA_DEBUG
+		float m_execution_avg;
+		float m_refresh_avg;
+		float m_path_avg;
+		float m_draw_avg;
+	#endif
 };
 #endif // SASPECTRUMVIEW_H
 

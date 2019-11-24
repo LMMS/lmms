@@ -71,7 +71,7 @@ public slots:
 
 
 protected:
-	virtual void paintEvent( QPaintEvent * pe );
+	void paintEvent( QPaintEvent * pe ) override;
 
 	virtual void updateSize();
 

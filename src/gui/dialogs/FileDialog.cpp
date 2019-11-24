@@ -47,7 +47,7 @@ FileDialog::FileDialog( QWidget *parent, const QString &caption,
 	// Find downloads directory
 	QDir downloadDir( QDir::homePath() + "/Downloads" );
 	if ( ! downloadDir.exists() )
-		downloadDir = QStandardPaths::writableLocation( QStandardPaths::DownloadLocation );
+		downloadDir.setPath(QStandardPaths::writableLocation( QStandardPaths::DownloadLocation ));
 	if ( downloadDir.exists() )
 		urls << QUrl::fromLocalFile( downloadDir.absolutePath() );
 

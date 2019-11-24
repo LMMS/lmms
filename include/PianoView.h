@@ -44,19 +44,19 @@ public:
 
 
 public:
-	virtual void keyPressEvent( QKeyEvent * ke );
-	virtual void keyReleaseEvent( QKeyEvent * ke );
+	void keyPressEvent( QKeyEvent * ke ) override;
+	void keyReleaseEvent( QKeyEvent * ke ) override;
 
 
 protected:
-	virtual void modelChanged();
-	virtual void contextMenuEvent( QContextMenuEvent * _me );
-	virtual void paintEvent( QPaintEvent * );
-	virtual void mousePressEvent( QMouseEvent * me );
-	virtual void mouseReleaseEvent( QMouseEvent * me );
-	virtual void mouseMoveEvent( QMouseEvent * me );
-	virtual void focusOutEvent( QFocusEvent * _fe );
-	virtual void resizeEvent( QResizeEvent * _event );
+	void modelChanged() override;
+	void contextMenuEvent( QContextMenuEvent * _me ) override;
+	void paintEvent( QPaintEvent * ) override;
+	void mousePressEvent( QMouseEvent * me ) override;
+	void mouseReleaseEvent( QMouseEvent * me ) override;
+	void mouseMoveEvent( QMouseEvent * me ) override;
+	void focusOutEvent( QFocusEvent * _fe ) override;
+	void resizeEvent( QResizeEvent * _event ) override;
 
 
 private:

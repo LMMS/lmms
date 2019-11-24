@@ -196,7 +196,12 @@ void NotePlayHandle::play( sampleFrame * _working_buffer )
 
 	lock();
 
-	if( m_totalFramesPlayed == 0 && !m_hasMidiNote
+	/* It is possible for NotePlayHandle::noteOff to be called before NotePlayHandle::play,
+	 * which results in a note-on message being sent without a subsequent note-off message.
+	 * Therefore, we check here whether the note has already been released before sending
+	 * the note-on message. */
+	if( !m_released
+		&& m_totalFramesPlayed == 0 && !m_hasMidiNote
 		&& ( hasParent() || ! m_instrumentTrack->isArpeggioEnabled() ) )
 	{
 		m_hasMidiNote = true;

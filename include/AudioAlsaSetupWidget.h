@@ -46,7 +46,7 @@ public:
 	AudioAlsaSetupWidget( QWidget * _parent );
 	virtual ~AudioAlsaSetupWidget();
 
-	virtual void saveSettings();
+	void saveSettings() override;
 
 public slots:
 	void onCurrentIndexChanged(int index);

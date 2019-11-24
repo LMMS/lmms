@@ -313,7 +313,7 @@ AutomatedValueMap TrackContainer::automatedValuesFromTracks(const TrackList &tra
 
 			MidiTime bbTime = time - tco->startPosition();
 			bbTime = std::min(bbTime, tco->length());
-			bbTime = bbTime % (bbContainer->lengthOfBB(bbIndex) * MidiTime::ticksPerTact());
+			bbTime = bbTime % (bbContainer->lengthOfBB(bbIndex) * MidiTime::ticksPerBar());
 
 			auto bbValues = bbContainer->automatedValuesAt(bbTime, bbIndex);
 			for (auto it=bbValues.begin(); it != bbValues.end(); it++)
@@ -343,9 +343,4 @@ DummyTrackContainer::DummyTrackContainer() :
 							this ) );
 	m_dummyInstrumentTrack->setJournalling( false );
 }
-
-
-
-
-
 
