@@ -57,10 +57,10 @@ public slots:
 
 
 protected:
-	virtual void contextMenuEvent( QContextMenuEvent* event );
-	virtual void mousePressEvent( QMouseEvent* event );
-	virtual void paintEvent( QPaintEvent* event );
-	virtual void wheelEvent( QWheelEvent* event );
+	void contextMenuEvent( QContextMenuEvent* event ) override;
+	void mousePressEvent( QMouseEvent* event ) override;
+	void paintEvent( QPaintEvent* event ) override;
+	void wheelEvent( QWheelEvent* event ) override;
 
 
 private:

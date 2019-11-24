@@ -186,12 +186,12 @@ private slots:
 		QVERIFY(! bbContainer->automatedValuesAt(5, bbTrack2.index()).size());
 
 		BBTCO tco(&bbTrack);
-		tco.changeLength(MidiTime::ticksPerTact() * 2);
+		tco.changeLength(MidiTime::ticksPerBar() * 2);
 		tco.movePosition(0);
 
 		QCOMPARE(song->automatedValuesAt(0)[&model], 0.0f);
 		QCOMPARE(song->automatedValuesAt(5)[&model], 0.5f);
-		QCOMPARE(song->automatedValuesAt(MidiTime::ticksPerTact() + 5)[&model], 0.5f);
+		QCOMPARE(song->automatedValuesAt(MidiTime::ticksPerBar() + 5)[&model], 0.5f);
 	}
 
 	void testGlobalAutomation()

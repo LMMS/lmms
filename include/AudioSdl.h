@@ -60,9 +60,9 @@ public:
 	{
 	public:
 		setupWidget( QWidget * _parent );
-		virtual ~setupWidget();
+		~setupWidget() override;
 
-		virtual void saveSettings();
+		void saveSettings() override;
 
 	private:
 		QLineEdit * m_device;
@@ -71,9 +71,9 @@ public:
 
 
 private:
-	virtual void startProcessing();
-	virtual void stopProcessing();
-	virtual void applyQualitySettings();
+	void startProcessing() override;
+	void stopProcessing() override;
+	void applyQualitySettings() override;
 
 	static void sdlAudioCallback( void * _udata, Uint8 * _buf, int _len );
 	void sdlAudioCallback( Uint8 * _buf, int _len );

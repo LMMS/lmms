@@ -44,16 +44,16 @@ public:
 	SamplePlayHandle( SampleTCO* tco );
 	virtual ~SamplePlayHandle();
 
-	virtual inline bool affinityMatters() const
+	inline bool affinityMatters() const override
 	{
 		return true;
 	}
 
 
-	virtual void play( sampleFrame * buffer );
-	virtual bool isFinished() const;
+	void play( sampleFrame * buffer ) override;
+	bool isFinished() const override;
 
-	virtual bool isFromTrack( const Track * _track ) const;
+	bool isFromTrack( const Track * _track ) const override;
 
 	f_cnt_t totalFrames() const;
 	inline f_cnt_t framesDone() const

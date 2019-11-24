@@ -454,7 +454,7 @@ AudioJack::setupWidget::setupWidget( QWidget * _parent ) :
 	m_clientName = new QLineEdit( cn, this );
 	m_clientName->setGeometry( 10, 20, 160, 20 );
 
-	QLabel * cn_lbl = new QLabel( tr( "CLIENT-NAME" ), this );
+	QLabel * cn_lbl = new QLabel( tr( "Client name" ), this );
 	cn_lbl->setFont( pointSize<7>( cn_lbl->font() ) );
 	cn_lbl->setGeometry( 10, 40, 160, 10 );
 
@@ -466,7 +466,7 @@ AudioJack::setupWidget::setupWidget( QWidget * _parent ) :
 
 	m_channels = new LcdSpinBox( 1, this );
 	m_channels->setModel( m );
-	m_channels->setLabel( tr( "CHANNELS" ) );
+	m_channels->setLabel( tr( "Channels" ) );
 	m_channels->move( 180, 20 );
 
 }

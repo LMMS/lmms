@@ -46,7 +46,6 @@ class QPixmap;
 class QScrollBar;
 class QString;
 class QMenu;
-class QSignalMapper;
 
 class ComboBox;
 class NotePlayHandle;
@@ -95,6 +94,7 @@ public:
 	void setCurrentPattern( Pattern* newPattern );
 	void setGhostPattern( Pattern* newPattern );
 	void loadGhostNotes( const QDomElement & de );
+	void loadMarkedSemiTones(const QDomElement & de);
 
 	inline void stopRecording()
 	{
@@ -167,17 +167,17 @@ public:
 
 
 protected:
-	virtual void keyPressEvent( QKeyEvent * ke );
-	virtual void keyReleaseEvent( QKeyEvent * ke );
-	virtual void leaveEvent( QEvent * e );
-	virtual void mousePressEvent( QMouseEvent * me );
-	virtual void mouseDoubleClickEvent( QMouseEvent * me );
-	virtual void mouseReleaseEvent( QMouseEvent * me );
-	virtual void mouseMoveEvent( QMouseEvent * me );
-	virtual void paintEvent( QPaintEvent * pe );
-	virtual void resizeEvent( QResizeEvent * re );
-	virtual void wheelEvent( QWheelEvent * we );
-	virtual void focusOutEvent( QFocusEvent * );
+	void keyPressEvent( QKeyEvent * ke ) override;
+	void keyReleaseEvent( QKeyEvent * ke ) override;
+	void leaveEvent( QEvent * e ) override;
+	void mousePressEvent( QMouseEvent * me ) override;
+	void mouseDoubleClickEvent( QMouseEvent * me ) override;
+	void mouseReleaseEvent( QMouseEvent * me ) override;
+	void mouseMoveEvent( QMouseEvent * me ) override;
+	void paintEvent( QPaintEvent * pe ) override;
+	void resizeEvent( QResizeEvent * re ) override;
+	void wheelEvent( QWheelEvent * we ) override;
+	void focusOutEvent( QFocusEvent * ) override;
 
 	int getKey( int y ) const;
 	static void drawNoteRect( QPainter & p, int x, int y,
@@ -382,7 +382,7 @@ private:
 
 	int m_oldNotesEditHeight;
 	int m_notesEditHeight;
-	int m_ppt;  // pixels per tact
+	int m_ppb;  // pixels per bar
 	int m_totalKeysToScroll;
 
 	// remember these values to use them
@@ -460,11 +460,11 @@ public:
 
 	int quantization() const;
 
-	void play();
-	void stop();
-	void record();
-	void recordAccompany();
-	void toggleStepRecording();
+	void play() override;
+	void stop() override;
+	void record() override;
+	void recordAccompany() override;
+	void toggleStepRecording() override;
 	void stopRecording();
 
 	bool isRecording() const;
@@ -474,15 +474,15 @@ public:
 
 	using SerializingObject::saveState;
 	using SerializingObject::restoreState;
-	virtual void saveSettings(QDomDocument & doc, QDomElement & de );
-	virtual void loadSettings( const QDomElement & de );
+	void saveSettings(QDomDocument & doc, QDomElement & de ) override;
+	void loadSettings( const QDomElement & de ) override;
 
-	inline virtual QString nodeName() const
+	inline QString nodeName() const override
 	{
 		return "pianoroll";
 	}
 
-	QSize sizeHint() const;
+	QSize sizeHint() const override;
 
 signals:
 	void currentPatternChanged();
@@ -494,7 +494,7 @@ private slots:
 
 private:
 	void patternRenamed();
-	void focusInEvent(QFocusEvent * event);
+	void focusInEvent(QFocusEvent * event) override;
 	void stopStepRecording();
 	void updateStepRecordingIcon();
 

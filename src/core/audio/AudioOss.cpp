@@ -59,7 +59,7 @@
 
 
 #ifndef _PATH_DEV_DSP
-#ifdef __OpenBSD__
+#if defined(__NetBSD__) || defined(__OpenBSD__)
 #define _PATH_DEV_DSP  "/dev/audio"
 #else
 #define _PATH_DEV_DSP  "/dev/dsp"
@@ -327,7 +327,7 @@ AudioOss::setupWidget::setupWidget( QWidget * _parent ) :
 	m_device = new QLineEdit( probeDevice(), this );
 	m_device->setGeometry( 10, 20, 160, 20 );
 
-	QLabel * dev_lbl = new QLabel( tr( "DEVICE" ), this );
+	QLabel * dev_lbl = new QLabel( tr( "Device" ), this );
 	dev_lbl->setFont( pointSize<7>( dev_lbl->font() ) );
 	dev_lbl->setGeometry( 10, 40, 160, 10 );
 
@@ -339,7 +339,7 @@ AudioOss::setupWidget::setupWidget( QWidget * _parent ) :
 
 	m_channels = new LcdSpinBox( 1, this );
 	m_channels->setModel( m );
-	m_channels->setLabel( tr( "CHANNELS" ) );
+	m_channels->setLabel( tr( "Channels" ) );
 	m_channels->move( 180, 20 );
 
 }

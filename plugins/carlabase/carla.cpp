@@ -324,10 +324,10 @@ void CarlaInstrument::play(sampleFrame* workingBuffer)
     fTimeInfo.playing  = s->isPlaying();
     fTimeInfo.frame    = s->getPlayPos(s->playMode()).frames(Engine::framesPerTick());
     fTimeInfo.usecs    = s->getMilliseconds()*1000;
-    fTimeInfo.bbt.bar  = s->getTacts() + 1;
+    fTimeInfo.bbt.bar  = s->getBars() + 1;
     fTimeInfo.bbt.beat = s->getBeat() + 1;
     fTimeInfo.bbt.tick = s->getBeatTicks();
-    fTimeInfo.bbt.barStartTick   = ticksPerBeat*s->getTimeSigModel().getNumerator()*s->getTacts();
+    fTimeInfo.bbt.barStartTick   = ticksPerBeat*s->getTimeSigModel().getNumerator()*s->getBars();
     fTimeInfo.bbt.beatsPerBar    = s->getTimeSigModel().getNumerator();
     fTimeInfo.bbt.beatType       = s->getTimeSigModel().getDenominator();
     fTimeInfo.bbt.ticksPerBeat   = ticksPerBeat;
