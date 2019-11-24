@@ -183,7 +183,7 @@ SaControlsDialog::SaControlsDialog(SaControls *controls, SaProcessor *processor)
 	blockSizeLabel->setPixmap(blockSizeIcon->scaled(iconSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
 	config_layout->addWidget(blockSizeLabel, 0, 4, 2, 1, Qt::AlignRight);
 
-	ComboBox *blockSizeCombo = new ComboBox(this, tr("FFT block bize"));
+	ComboBox *blockSizeCombo = new ComboBox(this, tr("FFT block size"));
 	blockSizeCombo->setToolTip(tr("FFT block size"));
 	blockSizeCombo->setMinimumSize(100, 22);
 	blockSizeCombo->setMaximumSize(200, 22);
