@@ -341,7 +341,7 @@ void CarlaInstrument::play(sampleFrame* workingBuffer)
 
     {
         const QMutexLocker ml(&fMutex);
-        fDescriptor->process(fHandle, rBuf, rBuf, bufsize, fMidiEvents, fMidiEventCount);
+        fDescriptor->process(fHandle, (const float**)rBuf, rBuf, bufsize, fMidiEvents, fMidiEventCount);
         fMidiEventCount = 0;
     }
 
