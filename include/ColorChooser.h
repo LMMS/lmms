@@ -1,6 +1,6 @@
 /* ColorChooser.h - declaration and definition of ColorChooser class.
  *
- * Copyright (c) 2019 CYBERDEViLNL <mail/at/domain/dot/tld>
+ * Copyright (c) 2019 CYBERDEViLNL <cyberdevilnl/at/protonmail/dot/ch>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -28,6 +28,7 @@
 class ColorChooser: public QColorDialog
 {
 public:
+	ColorChooser(const QColor &initial, QWidget *parent): QColorDialog(initial, parent) {};
 	ColorChooser(QWidget *parent): QColorDialog(parent) {};
 
 protected:
