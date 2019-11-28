@@ -3055,7 +3055,7 @@ bool TrackOperationsWidget::confirmRemoval()
 {
     QString messageRemoveTrack = tr("After removing a track, it can not "
                                     "be recovered. Are you sure you want to remove track \"%1\"?").arg(m_trackView->getTrack()->name());
-    QString messageTitleRemoveTrack = tr("Removing this track");
+    QString messageTitleRemoveTrack = tr("Confirm removal");
 
     QMessageBox mb(this);
     mb.setText(messageRemoveTrack);
