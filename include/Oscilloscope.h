@@ -38,7 +38,7 @@ class Oscilloscope : public QWidget
 public:
 	Q_PROPERTY( QColor color READ getColor WRITE setColor )
 
-	Oscilloscope( const QPixmap & _bg, QWidget * _parent );
+	Oscilloscope( QWidget * _parent );
 	virtual ~Oscilloscope();
 
 	QColor const & getColor() const;
@@ -53,7 +53,7 @@ protected slots:
 	void updateAudioBuffer( const surroundSampleFrame * buffer );
 
 private:
-	QPixmap s_background;
+	QPixmap m_background;
 	QPointF * m_points;
 	QColor m_color;
 
