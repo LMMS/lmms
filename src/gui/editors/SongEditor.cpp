@@ -523,6 +523,15 @@ void SongEditor::keyPressEvent( QKeyEvent * ke )
 	{
 		selectAllTcos( false );
 	}
+	else if ( ke->key() == Qt::Key_Space && ke->modifiers() & Qt::ShiftModifier )
+	{
+		tick_t t = m_song->currentTick();
+		else if ( t >= 0 && m_song->isPlaying() )
+		{
+			m_song->stop();
+			m_song->setPlayPos(t, Song::Mode_PlaySong);
+		}
+	}
 	else
 	{
 		QWidget::keyPressEvent( ke );
