@@ -392,6 +392,7 @@ void SaProcessor::reallocateBuffers()
 	// Lock data shared with SaSpectrumView and SaWaterfallView.
 	// Reallocation lock must be acquired first to avoid deadlock (a view class
 	// may already have it and request the "stronger" data lock on top of that).
+std::cout<<"get locks"<<std::endl;
 	QMutexLocker reloc_lock(&m_reallocationAccess);
 	QMutexLocker data_lock(&m_dataAccess);
 
@@ -436,8 +437,11 @@ void SaProcessor::reallocateBuffers()
 	m_inBlockSize = new_in_size;
 	m_fftBlockSize = new_fft_size;
 
+std::cout<<"going to unlock data"<<std::endl;
 	data_lock.unlock();
+std::cout<<"going to unlock reloc"<<std::endl;
 	reloc_lock.unlock();
+std::cout<<"all done"<<std::endl;
 	m_reallocating = false;
 
 	clear();

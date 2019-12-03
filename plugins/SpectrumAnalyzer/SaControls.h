@@ -29,7 +29,7 @@
 #include "EffectControls.h"
 #include "lmms_constants.h"
 
-//#define SA_DEBUG 1	// define SA_DEBUG to enable performance measurements
+#define SA_DEBUG 1	// define SA_DEBUG to enable performance measurements
 
 
 class Analyzer;
