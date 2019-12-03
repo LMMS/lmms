@@ -25,7 +25,6 @@
 #include <algorithm>
 #ifdef SA_DEBUG
 	#include <chrono>
-	#include <iostream>
 #endif
 #include <cmath>
 #include <QImage>
@@ -139,15 +138,12 @@ void SaWaterfallView::paintEvent(QPaintEvent *event)
 	// draw the spectrogram precomputed in SaProcessor
 	if (m_processor->waterfallNotEmpty())
 	{
-std::cout<<"get waterfall lock"<<std::endl;
 		QMutexLocker lock(&m_processor->m_reallocationAccess);
 		QImage temp = QImage(m_processor->getHistory(),			// raw pixel data to display
 							 m_processor->waterfallWidth(),		// width = number of frequency bins
 							 m_processor->waterfallHeight(),	// height = number of history lines
 							 QImage::Format_RGB32);
-std::cout<<"going to unlock reloc from waterfall"<<std::endl;
 		lock.unlock();
-std::cout<<"waterfall done"<<std::endl;
 		temp.setDevicePixelRatio(devicePixelRatio());			// display at native resolution
 		painter.drawImage(m_displayLeft, m_displayTop,
 						  temp.scaled(m_displayWidth * devicePixelRatio(),
