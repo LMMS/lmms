@@ -52,6 +52,8 @@ void KnobControl::setModel(AutomatableModel *model)
 
 FloatModel *KnobControl::model() { return m_knob->model(); }
 
+AutomatableModelView* KnobControl::modelView() { return m_knob; }
+
 KnobControl::KnobControl(QWidget *parent) :
 	m_knob(new Knob(parent)) {}
 
@@ -68,6 +70,8 @@ void ComboControl::setModel(AutomatableModel *model)
 }
 
 ComboBoxModel *ComboControl::model() { return m_combo->model(); }
+
+AutomatableModelView* ComboControl::modelView() { return m_combo; }
 
 ComboControl::ComboControl(QWidget *parent) :
 	m_widget(new QWidget(parent)),
@@ -97,6 +101,8 @@ void CheckControl::setModel(AutomatableModel *model)
 
 BoolModel *CheckControl::model() { return m_checkBox->model(); }
 
+AutomatableModelView* CheckControl::modelView() { return m_checkBox; }
+
 CheckControl::CheckControl(QWidget *parent) :
 	m_widget(new QWidget(parent)),
 	m_checkBox(new LedCheckBox(nullptr, QString(), LedCheckBox::Green)),
@@ -122,6 +128,8 @@ void LcdControl::setModel(AutomatableModel *model)
 }
 
 IntModel *LcdControl::model() { return m_lcd->model(); }
+
+AutomatableModelView* LcdControl::modelView() { return m_lcd; }
 
 LcdControl::LcdControl(int numDigits, QWidget *parent) :
 	m_lcd(new LcdSpinBox(numDigits, parent))

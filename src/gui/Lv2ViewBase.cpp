@@ -104,7 +104,14 @@ Lv2ViewProc::Lv2ViewProc(QWidget* parent, Lv2Proc* ctrlBase,
 		setup.m_commentUri = &commentUri;
 		port->accept(setup);
 
-		if (setup.m_control) { addControl(setup.m_control); }
+		if (setup.m_control)
+		{
+			addControl(setup.m_control,
+				lilv_node_as_string(lilv_port_get_symbol(
+					port->m_plugin, port->m_port)),
+				port->name().toUtf8().data(),
+				false);
+		}
 	}
 }
 

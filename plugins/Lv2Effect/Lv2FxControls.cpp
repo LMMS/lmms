@@ -48,9 +48,10 @@ Lv2FxControls::Lv2FxControls(class Lv2Effect *effect, const QString& uri) :
 			connect(multiChannelLinkModel(), &BoolModel::dataChanged,
 				this, [this](){updateLinkStatesFromGlobal();},
 				Qt::DirectConnection);
+/*			// linking models will be deprecated soon, anyways (#5079 voting)
 			connect(getGroup(0), &LinkedModelGroup::linkStateChanged,
 				this, [this](std::size_t id, bool value){
-				linkModel(id, value);}, Qt::DirectConnection);
+				linkModel(id, value);}, Qt::DirectConnection);*/
 		}
 	}
 }

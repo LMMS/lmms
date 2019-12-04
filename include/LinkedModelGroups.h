@@ -49,7 +49,7 @@ class LinkedModelGroup : public Model
 	Q_OBJECT
 signals:
 	//! Signal emitted after any of the per-control link-enabled models switch
-	void linkStateChanged(std::size_t id, bool value);
+	void linkStateChanged(const std::string& str, bool value);
 
 public:
 	/*
@@ -71,12 +71,12 @@ public:
 	//! also link or unlink them (via `LinkedModelGroups::linkModel()`)
 	void linkAllModels(bool state);
 	//! Link specified port with the associated port of @p other
-	//! @param id id of the port, conforming to m_models
-	void linkControls(LinkedModelGroup* other, std::size_t id);
+	//! @param id string identifier of the port
+	void linkControls(LinkedModelGroup* other, const std::string& id);
 	//! @see linkControls
-	void unlinkControls(LinkedModelGroup *other, std::size_t id);
+	void unlinkControls(LinkedModelGroup *other, const std::string &id);
 	//! Return whether this is the first of more than one processors
-	bool isLinking() const { return d.m_linkEnabled.size(); }
+	bool isLinking() const;
 
 	/*
 		Models
@@ -85,26 +85,70 @@ public:
 	{
 		QString m_name;
 		class AutomatableModel* m_model;
+		class BoolModel* m_linkEnabled = nullptr;
+		ModelInfo() { /* hopefully no one will use this */ } // TODO: remove?
 		ModelInfo(const QString& name, AutomatableModel* model)
 			: m_name(name), m_model(model) {}
 	};
 
-	class BoolModel* linkEnabledModel(std::size_t id)
+	// TODO: refactor those 4
+	AutomatableModel* model(const std::string& s)
 	{
-		return d.m_linkEnabled[id];
-	}
-	const class BoolModel* linkEnabledModel(std::size_t id) const
-	{
-		return d.m_linkEnabled[id];
+		auto itr = d.m_models.find(s);
+		if(itr == d.m_models.end())
+			throw std::runtime_error("...");
+		return itr->second.m_model;
 	}
 
-	AutomatableModel* model(std::size_t i) { return d.m_models[i].m_model; }
-	const AutomatableModel* model(std::size_t i) const
+	const AutomatableModel* model(const std::string& s) const
 	{
-		return d.m_models[i].m_model;
+		auto itr = d.m_models.find(s);
+		if(itr == d.m_models.end())
+			throw std::runtime_error("...");
+		return itr->second.m_model;
 	}
+
+	class BoolModel* linkEnabledModel(const std::string& s)
+	{
+		auto itr = d.m_models.find(s);
+		if(itr == d.m_models.end())
+			throw std::runtime_error("...");
+		return itr->second.m_linkEnabled;
+	}
+
+	const class BoolModel* linkEnabledModel(const std::string& s) const
+	{
+		auto itr = d.m_models.find(s);
+		if(itr == d.m_models.end())
+			throw std::runtime_error("...");
+		return itr->second.m_linkEnabled;
+	}
+
+	template<class Functor>
+	void foreach_model(const Functor& ftor)
+	{
+		for(auto itr = d.m_models.begin(); itr != d.m_models.end(); ++itr)
+		{
+			ftor(itr->first, itr->second);
+		}
+	}
+
+	template<class Functor>
+	void foreach_model(const Functor& ftor) const
+	{
+		for(auto itr = d.m_models.cbegin(); itr != d.m_models.cend(); ++itr)
+		{
+			ftor(itr->first, itr->second);
+		}
+	}
+
 	AutomatableModel* modelWithName(const QString& name) const;
 	std::size_t modelNum() const { return models().size(); }
+
+	// this is bad style (redirecting into the sub-class), but this class
+	// will be married with the sub-classes (Lv2Proc, SpaProc) anyways,
+	// so let's do the dirty trick for now...
+	virtual void removeControl(AutomatableModel *) {}
 
 	/*
 		Load/Save
@@ -130,15 +174,13 @@ protected:
 
 private:
 	// TODO: remove
-	std::vector<ModelInfo>& models() { return d.m_models; }
-	const std::vector<ModelInfo>& models() const { return d.m_models; }
+	std::map<std::string, ModelInfo>& models() { return d.m_models; }
+	const std::map<std::string, ModelInfo>& models() const { return d.m_models; }
 
 	struct
 	{
-		//! models for the per-control link-enabled models
-		std::vector<class BoolModel*> m_linkEnabled;
 		//! models for the controls; the vector defines indices for the controls
-		std::vector<ModelInfo> m_models;
+		std::map<std::string, ModelInfo> m_models;
 	} d;
 
 	std::size_t m_curProc;
@@ -188,7 +230,7 @@ public:
 	//! of every other LinkedModelGroup
 	//! @param model number conforming to getGroup()
 	//! @param state True iff it should be linked
-	void linkModel(std::size_t model, bool state);
+	void linkModel(const std::string &model, bool state);
 	//! Callback for the global linking LED
 	void updateLinkStatesFromGlobal();
 
