@@ -42,13 +42,13 @@
 
 void LinkedModelGroup::makeLinkingProc()
 {
-	for (std::size_t i = 0; i < models().size(); ++i)
+	foreach_model([this](const std::string& str, ModelInfo inf)
 	{
 		BoolModel* bmo = new BoolModel(true, this, tr("Link channels"));
-		d.m_linkEnabled.push_back(bmo);
+		inf.m_linkEnabled = bmo;
 		connect(bmo, &BoolModel::dataChanged, this,
-				[this, bmo, i]() { emit linkStateChanged(i, bmo->value()); });
-	}
+				[this, bmo, str]() { emit linkStateChanged(str, bmo->value()); });
+	});
 }
 
 
@@ -56,25 +56,38 @@ void LinkedModelGroup::makeLinkingProc()
 
 void LinkedModelGroup::linkAllModels(bool state)
 {
-	for (BoolModel* bmo : d.m_linkEnabled) { bmo->setValue(state); }
+	// this will call AutomatableModel::linkModels (??? TODO)
+	for (auto pr : d.m_models) { pr.second.m_linkEnabled->setValue(state); }
 }
 
 
 
 
-void LinkedModelGroup::linkControls(LinkedModelGroup *other, std::size_t id)
+void LinkedModelGroup::linkControls(LinkedModelGroup *other, const std::string& id)
 {
-	AutomatableModel::linkModels(
-		models()[id].m_model, other->models()[id].m_model);
+	auto itr1 = models().find(id);
+	auto itr2 = other->models().find(id);
+	Q_ASSERT(itr1 != models().end() && itr2 != other->models().end());
+	AutomatableModel::linkModels(itr1->second.m_model, itr2->second.m_model);
 }
 
 
 
 
-void LinkedModelGroup::unlinkControls(LinkedModelGroup *other, std::size_t id)
+void LinkedModelGroup::unlinkControls(LinkedModelGroup *other, const std::string& id)
 {
-	AutomatableModel::unlinkModels(
-				models()[id].m_model, other->models()[id].m_model);
+	auto itr1 = models().find(id);
+	auto itr2 = other->models().find(id);
+	Q_ASSERT(itr1 != models().end() && itr2 != other->models().end());
+	AutomatableModel::unlinkModels(itr1->second.m_model, itr2->second.m_model);
+}
+
+
+
+
+bool LinkedModelGroup::isLinking() const {
+	return d.m_models.size()
+		?!!d.m_models.begin()->second.m_linkEnabled : false;
 }
 
 
@@ -83,9 +96,9 @@ void LinkedModelGroup::unlinkControls(LinkedModelGroup *other, std::size_t id)
 AutomatableModel *LinkedModelGroup::modelWithName(const QString &name) const
 {
 	auto itr = std::find_if(models().begin(), models().end(),
-		[&name](const ModelInfo& mi) -> bool
-	{ return mi.m_name == name; });
-	return itr == models().end() ? nullptr : itr->m_model;
+		[&name](const std::pair<std::string, ModelInfo>& pr) -> bool
+	{ return pr.second.m_name == name; });
+	return itr == models().end() ? nullptr : itr->second.m_model;
 }
 
 
@@ -96,18 +109,18 @@ void LinkedModelGroup::saveValues(QDomDocument &doc, QDomElement &that,
 {
 	// if multiple lmgs, the first one must currently be the linking one
 	Q_ASSERT(this == lmg0 || lmg0->isLinking());
-	for (std::size_t idx = 0; idx < models().size(); ++idx)
+	foreach_model([&lmg0, this, &doc, &that](const std::string& str, ModelInfo& inf)
 	{
-		if (this == lmg0 || !lmg0->linkEnabledModel(idx)->value())
+		if (this == lmg0 || !lmg0->linkEnabledModel(str)->value())
 		{
 			// try to load, if it fails, this will load a sane initial value
-			models()[idx].m_model->saveSettings(doc, that, models()[idx].m_name);
+			inf.m_model->saveSettings(doc, that, /*models()[idx].m_name*/ inf.m_name); /* TODO: m_name useful */
 		}
 		else
 		{
 			// model has the same value as in the first LinkedModelGroup
 		}
-	}
+	});
 }
 
 
@@ -115,10 +128,11 @@ void LinkedModelGroup::saveValues(QDomDocument &doc, QDomElement &that,
 
 void LinkedModelGroup::saveLinksEnabled(QDomDocument &doc, QDomElement &that)
 {
-	for (std::size_t i = 0; i < d.m_linkEnabled.size(); ++i)
+	//for (std::size_t i = 0; i < d.m_linkEnabled.size(); ++i)
+	foreach_model([&doc, &that](const std::string&, ModelInfo& inf)
 	{
-		d.m_linkEnabled[i]->saveSettings(doc, that, models()[i].m_name);
-	}
+		inf.m_linkEnabled->saveSettings(doc, that, inf.m_name);
+	});
 }
 
 
@@ -127,18 +141,18 @@ void LinkedModelGroup::saveLinksEnabled(QDomDocument &doc, QDomElement &that)
 void LinkedModelGroup::loadValues(const QDomElement &that,
 	const LinkedModelGroup* lmg0)
 {
-	for (std::size_t idx = 0; idx < models().size(); ++idx)
+	foreach_model([lmg0, this, &that](const std::string& str, ModelInfo& inf)
 	{
-		if (this == lmg0 || !lmg0->linkEnabledModel(idx)->value())
+		if (this == lmg0 || !lmg0->linkEnabledModel(str)->value())
 		{
 			// try to load, if it fails, this will load a sane initial value
-			models()[idx].m_model->loadSettings(that, models()[idx].m_name);
+			inf.m_model->loadSettings(that, /*models()[idx].m_name*/ inf.m_name); /* TODO: m_name useful */
 		}
 		else
 		{
 			// model has the same value as in the first LinkedModelGroup
 		}
-	}
+	});
 }
 
 
@@ -146,10 +160,10 @@ void LinkedModelGroup::loadValues(const QDomElement &that,
 
 void LinkedModelGroup::loadLinksEnabled(const QDomElement &that)
 {
-	for (std::size_t i = 0; i < d.m_linkEnabled.size(); ++i)
+	foreach_model([&that](const std::string&, ModelInfo& inf)
 	{
-		d.m_linkEnabled[i]->loadSettings(that, models()[i].m_name);
-	}
+		inf.m_linkEnabled->loadSettings(that, inf.m_name);
+	});
 }
 
 
@@ -157,7 +171,8 @@ void LinkedModelGroup::loadLinksEnabled(const QDomElement &that)
 
 void LinkedModelGroup::addModel(AutomatableModel *model, const QString &name)
 {
-	models().emplace_back(name, model);
+	model->setObjectName(name);
+	models().emplace(std::string(name.toUtf8().data()), ModelInfo(name, model));
 }
 
 
@@ -194,7 +209,7 @@ void LinkedModelGroups::createMultiChannelLinkModel()
 
 
 
-void LinkedModelGroups::linkModel(std::size_t model, bool state)
+void LinkedModelGroups::linkModel(const std::string& model, bool state)
 {
 	LinkedModelGroup* first = getGroup(0);
 	LinkedModelGroup* cur;

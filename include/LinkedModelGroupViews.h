@@ -64,17 +64,28 @@ public:
 
 protected:
 	//! Add a control to this widget
-	void addControl(class Control *ctrl);
+	//! @warning This widget will own this control, do not free it
+	void addControl(class Control *ctrl, const std::string &id,
+					const std::string& display, bool removable);
+
+	void removeControl(const QString &key);
 
 private:
 	void makeAllGridCellsEqualSized();
 
+	class LinkedModelGroup* m_model;
+
 	//! column number in surrounding grid in LinkedModelGroupsView
 	std::size_t m_colNum;
 	bool m_isLinking;
-	class QGridLayout* m_grid;
-	std::vector<std::unique_ptr<class Control>> m_controls;
-	std::vector<std::unique_ptr<class LedCheckBox>> m_leds;
+	class LinkedModelGroupLayout* m_layout;
+	struct WidgetsPerModel
+	{
+		std::unique_ptr<class Control> m_ctrl;
+		class LedCheckBox* m_led = nullptr;
+	};
+
+	std::map<std::string, WidgetsPerModel> m_widgets;
 };
 
 
