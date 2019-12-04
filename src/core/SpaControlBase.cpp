@@ -79,10 +79,12 @@ SpaControlBase::SpaControlBase(Model* that, const QString& uniqueName,
 					}
 
 					// initially link all controls
-					for (std::size_t i = 0; i < m_procs[0]->modelNum(); ++i)
-					{
-							linkModel(i, true);
-					}
+					m_procs[0]->foreach_model([this]
+						(const std::string& str,
+						const LinkedModelGroup::ModelInfo& )
+						{
+							linkModel(str, true);
+						});
 			}
 	}
 	else {

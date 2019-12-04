@@ -53,6 +53,7 @@ public:
 
 	virtual void setModel(AutomatableModel* model) = 0;
 	virtual AutomatableModel* model() = 0;
+	virtual class AutomatableModelView* modelView() = 0;
 
 	virtual ~Control();
 };
@@ -68,6 +69,7 @@ public:
 
 	void setModel(AutomatableModel* model) override;
 	FloatModel* model() override;
+	class AutomatableModelView* modelView() override;
 
 	KnobControl(QWidget* parent = nullptr);
 	~KnobControl() override;
@@ -86,6 +88,7 @@ public:
 
 	void setModel(AutomatableModel* model) override;
 	ComboBoxModel* model() override;
+	class AutomatableModelView* modelView() override;
 
 	ComboControl(QWidget* parent = nullptr);
 	~ComboControl() override;
@@ -102,6 +105,7 @@ public:
 
 	void setModel(AutomatableModel* model) override;
 	IntModel* model() override;
+	class AutomatableModelView* modelView() override;
 
 	LcdControl(int numDigits, QWidget* parent = nullptr);
 	~LcdControl() override;
@@ -120,6 +124,7 @@ public:
 
 	void setModel(AutomatableModel* model) override;
 	BoolModel *model() override;
+	class AutomatableModelView* modelView() override;
 
 	CheckControl(QWidget* parent = nullptr);
 	~CheckControl() override;

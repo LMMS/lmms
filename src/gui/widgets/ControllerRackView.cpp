@@ -248,6 +248,8 @@ void ControllerRackView::dropEvent( QDropEvent *de )
 			delete mod->controllerConnection();
 			mod->setControllerConnection( nullptr );
 		}
+
+		delete mod;
 	}
 }
 

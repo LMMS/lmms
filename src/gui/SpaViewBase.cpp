@@ -32,9 +32,12 @@
 
 #include "Controls.h"
 #include "embed.h"
+#include "Engine.h"
 #include "gui_templates.h"
 #include "SpaControlBase.h"
+#include "SpaOscModel.h"
 #include "SpaProc.h"
+#include "StringPairDrag.h"
 #include "LedCheckbox.h"
 
 SpaViewBase::SpaViewBase(QWidget* meAsWidget, SpaControlBase *ctrlBase)
@@ -57,11 +60,9 @@ SpaViewBase::SpaViewBase(QWidget* meAsWidget, SpaControlBase *ctrlBase)
 			pointSize<8>(m_toggleUIButton->font()));
 		m_toggleUIButton->setWhatsThis(
 			QObject::tr("Click here to show or hide the "
-				"graphical user interface (GUI) of SPA."));
+				"graphical user interface (GUI)"));
 		m_grid->addWidget(m_toggleUIButton, Rows::ButtonRow, 3, 1, 3);
 	}
-
-	meAsWidget->setAcceptDrops(true);
 
 	std::size_t nProcs = ctrlBase->controls().size();
 	Q_ASSERT(m_colNum % nProcs == 0);
@@ -81,19 +82,29 @@ SpaViewBase::SpaViewBase(QWidget* meAsWidget, SpaControlBase *ctrlBase)
 			m_grid->addWidget(led, Rows::LinkChannelsRow, 0,
 				1, static_cast<int>(m_colNum));
 	}
+
+/*	QPushButton* m_dropEraseButton = new QPushButton(
+		QObject::tr("Drop on widget to remove it"), meAsWidget);
+	m_dropEraseButton->setEnabled(false); // only DnD target, can't be clicked
+	m_grid->addWidget(m_dropEraseButton, Rows::DropButtonRow, 0,
+				1, static_cast<int>(m_colNum));*/
 }
 
 SpaViewBase::~SpaViewBase() {}
 
 void SpaViewBase::modelChanged(SpaControlBase *ctrlBase)
 {
-	// reconnect models
 	if(m_toggleUIButton)
 	{
 		m_toggleUIButton->setChecked(ctrlBase->m_hasGUI);
 	}
+
+	// reconnect models
 	LinkedModelGroupsView::modelChanged(ctrlBase);
 }
+
+// TODO: handle modelChanged
+
 
 SpaViewProc::SpaViewProc(QWidget* parent, SpaProc *proc,
 	std::size_t colNum, std::size_t nProcs)
@@ -203,19 +214,131 @@ SpaViewProc::SpaViewProc(QWidget* parent, SpaProc *proc,
 				m_firstModelRow + wdgNum / m_rowNum,
 					wdgNum % m_rowNum);
 			++wdgNum;*/
-			addControl(control);
+			addControl(control, ports.m_id, ports.m_id, false);
 		}
 		else
 		{
 			qCritical() << "this should never happen...";
 		}
 	}
+
+	QObject::connect(proc, SIGNAL(modelAdded(AutomatableModel*)),
+					 this, SLOT(modelAdded(AutomatableModel*)), Qt::DirectConnection);
+	QObject::connect(proc, SIGNAL(modelRemoved(AutomatableModel*)),
+					 this, SLOT(modelRemoved(AutomatableModel*)), Qt::DirectConnection);
+
+	setAcceptDrops(true);
+}
+
+
+
+
+void SpaViewProc::modelAdded(AutomatableModel *mdl)
+{
+	class ModelAdder : public ModelVisitor
+	{
+		// this is duplicating stuff to the ctor routines
+		Control* m_control = nullptr;
+		QWidget* m_parent;
+		void visit(FloatModel& fm) override
+		{
+			m_control = new KnobControl(m_parent);
+			FloatOscModel& om = dynamic_cast<FloatOscModel&>(fm);
+			m_control->setText(om.displayName());
+		}
+		void visit(IntModel& im) override
+		{
+			// TODO: check max
+			m_control = new LcdControl(2, m_parent);
+			IntOscModel& om = dynamic_cast<IntOscModel&>(im);
+			m_control->setText(om.displayName());
+		}
+		void visit(BoolModel& bm) override
+		{
+			m_control = new CheckControl(m_parent);
+			BoolOscModel& om = dynamic_cast<BoolOscModel&>(bm);
+			m_control->setText(om.displayName());
+		}
+	public:
+		ModelAdder(QWidget* parent) : m_parent(parent) {}
+		Control* control() { return m_control; }
+	};
+
+	ModelAdder adder(this);
+	mdl->accept(adder);
+	addControl(adder.control(), mdl->objectName().toStdString(),
+		mdl->objectName().toStdString(), true);
+	adder.control()->setModel(mdl);
+}
+
+void SpaViewProc::modelRemoved(AutomatableModel *mdl)
+{
+	removeControl(mdl->objectName());
 }
 
 LinkedModelGroupView *SpaViewBase::getGroupView(std::size_t idx)
 {
 	return m_procViews[static_cast<int>(idx)];
 }
+
+void SpaViewBase::dropEvent( QDropEvent *de )
+{
+	// just use the first proc view for now,
+	// there will be only one proc view soon
+	if(m_procViews.size() > 0) { m_procViews[0]->dropEvent(de); }
+}
+
+void SpaViewBase::dragEnterEvent( QDragEnterEvent *de )
+{
+	// just use the first proc view for now,
+	// there will be only one proc view soon
+	if(m_procViews.size() > 0) { m_procViews[0]->dragEnterEvent(de); }
+}
+
+void SpaViewProc::dragEnterEvent(QDragEnterEvent *dev)
+{
+	void (QDragEnterEvent::*reaction)(void) = &QDragEnterEvent::ignore;
+
+	if (dev->mimeData()->hasFormat(StringPairDrag::mimeType()))
+	{
+		const QString txt =
+			dev->mimeData()->data(StringPairDrag::mimeType());
+		if (txt.section(':', 0, 0) == "pluginpresetfile") {
+			reaction = &QDragEnterEvent::acceptProposedAction;
+		}
+	}
+	else if (dev->mimeData()->hasFormat(StringPairDrag::mimeTypeOsc()))
+	{
+		const QString txt =
+			dev->mimeData()->data(StringPairDrag::mimeTypeOsc());
+		if (txt.section(':', 0, 0) == "automatable_model") {
+			reaction = &QDragEnterEvent::acceptProposedAction;
+		}
+	}
+
+	(dev->*reaction)();
+}
+
+void SpaViewProc::dropEvent(QDropEvent *dev)
+{
+	const QString type = StringPairDrag::decodeKey(dev);
+	const QString value = StringPairDrag::decodeValue(dev);
+	if (type == "pluginpresetfile")
+	{
+		m_proc->loadFile(value);
+		dev->accept();
+	}
+	else if( type == "automatable_model" )
+	{
+		Engine::getAutomatableModel( value,
+			dev->mimeData()->hasFormat( "application/x-osc-stringpair" ));
+		// this will create the model if it does not exist yet
+		dev->accept();
+	}
+	else
+		dev->ignore();
+}
+
 
 #endif // LMMS_HAVE_SPA
 

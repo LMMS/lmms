@@ -95,14 +95,10 @@ class SpaInsView : public InstrumentView, public SpaViewBase
 	Q_OBJECT
 public:
 	SpaInsView(SpaInstrument *_instrument, QWidget *_parent);
-	virtual ~SpaInsView();
-
-protected:
-	virtual void dragEnterEvent(QDragEnterEvent *_dee);
-	virtual void dropEvent(QDropEvent *_de);
+	virtual ~SpaInsView() override;
 
 private:
-	void modelChanged();
+	void modelChanged() override;
 
 private slots:
 	void toggleUI();

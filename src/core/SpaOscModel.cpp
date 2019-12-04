@@ -66,8 +66,8 @@ FloatOscModel::FloatOscModel(SpaProc *plugRef, const QString dest,
 	// Ctor for FloatModel (see using clause in SpaOscModel)
 	SpaOscModel<FloatModel>(val, min, max, step, nullptr, dest, false)
 {
-	qDebug() << "LMMS: receiving float model: (val, min, max) = (" << val
-		 << ", " << min << ", " << max << ")";
+	qDebug() << "LMMS: receiving float model: (val, min, max, step) = (" << val
+		 << ", " << min << ", " << max << ", " << step << ")";
 	init(plugRef, dest);
 	QObject::connect(this, SIGNAL(dataChanged()), this, SLOT(sendOsc()));
 }

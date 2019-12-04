@@ -37,9 +37,18 @@ class SpaControlBase;
 
 class SpaViewProc : public LinkedModelGroupView
 {
+	Q_OBJECT
 public:
 	SpaViewProc(QWidget *parent, SpaProc *proc,
-		std::size_t colNum, std::size_t nProcs);
+				std::size_t colNum, std::size_t nProcs);
+	// TODO: make those two private?
+	void dropEvent(class QDropEvent *de) override;
+	void dragEnterEvent(QDragEnterEvent *dev) override;
+private slots:
+	void modelAdded(class AutomatableModel* mdl);
+	void modelRemoved(AutomatableModel *mdl);
+private:
+	SpaProc* m_proc;
 };
 
 class SpaViewBase : LinkedModelGroupsView
@@ -63,6 +72,7 @@ protected:
 	void connectSlots(const char* toggleUiSlot);
 	SpaViewBase(class QWidget *meAsWidget, SpaControlBase* ctrlBase);
 	virtual ~SpaViewBase();
+	void dropEvent(QDropEvent *de);
 
 private:
 	//! Numbers of controls per row; must be multiple of 2 for mono effects
@@ -72,8 +82,10 @@ private:
 	{
 		ButtonRow,
 		ProcRow,
-		LinkChannelsRow
+		LinkChannelsRow/*,
+		DropButtonRow*/
 	};
+	void dragEnterEvent(QDragEnterEvent *de);
 };
 
 #if 0

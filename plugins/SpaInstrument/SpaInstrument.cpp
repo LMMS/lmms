@@ -272,35 +272,6 @@ SpaInsView::~SpaInsView()
 	}
 }
 
-void SpaInsView::dragEnterEvent(QDragEnterEvent *_dee)
-{
-	void (QDragEnterEvent::*reaction)(void) = &QDragEnterEvent::ignore;
-
-	if (_dee->mimeData()->hasFormat(StringPairDrag::mimeType()))
-	{
-		const QString txt =
-			_dee->mimeData()->data(StringPairDrag::mimeType());
-		if (txt.section(':', 0, 0) == "pluginpresetfile") {
-			reaction = &QDragEnterEvent::acceptProposedAction;
-		}
-	}
-
-	(_dee->*reaction)();
-}
-
-void SpaInsView::dropEvent(QDropEvent *_de)
-{
-	const QString type = StringPairDrag::decodeKey(_de);
-	const QString value = StringPairDrag::decodeValue(_de);
-	if (type == "pluginpresetfile")
-	{
-		castModel<SpaInstrument>()->loadFile(value);
-		_de->accept();
-		return;
-	}
-	_de->ignore();
-}
-
 void SpaInsView::modelChanged()
 {
 	SpaViewBase::modelChanged(castModel<SpaInstrument>());

@@ -154,7 +154,8 @@ Plugin::PluginTypes SpaManager::computePluginType(spa::descriptor *desc)
 		}
 	} tyc;
 
-	for (const spa::simple_str &portname : desc->port_names())
+	const auto portNames = desc->port_names();
+	for (const spa::simple_str &portname : portNames)
 	{
 		try
 		{

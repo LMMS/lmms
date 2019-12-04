@@ -6,6 +6,7 @@
 #include <QDir>
 #include <QTemporaryFile>
 #include <QUrl>
+#include <cmath>
 #include <spa/spa.h>
 #include <spa/audio.h>
 
@@ -239,7 +240,7 @@ struct LmmsVisitor final : public virtual spa::audio::visitor
 	void visit(spa::audio::control_in<float> &p) override
 	{
 		qDebug() << "other control port (float)";
-		m_ports->m_userPorts.emplace_back('f');
+		m_ports->m_userPorts.emplace_back('f', m_curName);
 		SpaProc::LmmsPorts::TypedPorts &bck = m_ports->m_userPorts.back();
 		setupPort(p, bck.m_val.m_f, bck.m_connectedModel.m_floatModel,
 			p.min, p.max, p.step);
@@ -247,7 +248,7 @@ struct LmmsVisitor final : public virtual spa::audio::visitor
 	void visit(spa::audio::control_in<int> &p) override
 	{
 		qDebug() << "other control port (int)";
-		m_ports->m_userPorts.emplace_back('i');
+		m_ports->m_userPorts.emplace_back('i', m_curName);
 		SpaProc::LmmsPorts::TypedPorts &bck = m_ports->m_userPorts.back();
 		setupPort(p, bck.m_val.m_i, bck.m_connectedModel.m_intModel,
 			p.min, p.max);
@@ -255,7 +256,7 @@ struct LmmsVisitor final : public virtual spa::audio::visitor
 	void visit(spa::audio::control_in<bool> &p) override
 	{
 		qDebug() << "other control port (bool)";
-		m_ports->m_userPorts.emplace_back('b');
+		m_ports->m_userPorts.emplace_back('b', m_curName);
 		SpaProc::LmmsPorts::TypedPorts &bck =
 			m_ports->m_userPorts.back();
 		setupPort(p, bck.m_val.m_b, bck.m_connectedModel.m_boolModel);
@@ -474,6 +475,18 @@ struct SpaOscModelFactory : public spa::audio::visitor
 	SpaProc *m_plugRef;
 	const QString m_dest;
 
+	float calc_floating_step(float step, float min, float max)
+	{
+		float d = fabsf(max - min);
+		if(step == .0f)
+		{
+			step = (d >= 10.f) ? 0.01f
+							   : (d >= 1.f) ? 0.001f
+											: 0.0001f;
+		}
+		return step;
+	}
+
 public:
 	AutomatableModel *m_res = nullptr;
 
@@ -486,15 +499,19 @@ public:
 	template <class T> using CtlIn = spa::audio::control_in<T>;
 	virtual void visit(CtlIn<float> &in)
 	{
-		make<FloatOscModel>(in.min, in.max, in.def, in.step);
+		make<FloatOscModel>(in.min, in.max,
+			calc_floating_step(in.step, in.min, in.max), in.def );
 	}
 	virtual void visit(CtlIn<double> &in)
 	{
 		// LMMS has no double models, cast it all away
-		make<FloatOscModel>(static_cast<float>(in.min),
-			static_cast<float>(in.max),
-			static_cast<float>(in.def),
-			static_cast<float>(in.step));
+		float
+			min = static_cast<float>(in.min),
+			max = static_cast<float>(in.max),
+			def = static_cast<float>(in.def),
+			step = static_cast<float>(in.step);
+		make<FloatOscModel>(min, max,
+			calc_floating_step(step, min, max), def );
 	}
 	virtual void visit(CtlIn<int> &in)
 	{
@@ -511,6 +528,17 @@ public:
 	}
 };
 
+void SpaProc::removeControl(AutomatableModel* mdl)
+{
+	auto itr = m_connectedModels.find(mdl->objectName());
+	if(itr != m_connectedModels.end())
+	{
+		emit modelRemoved(mdl);
+		m_connectedModels.erase(itr);
+	}
+}
+
+// this function is also responsible to create a model, e.g. in case of DnD
 AutomatableModel *SpaProc::modelAtPort(const QString &dest)
 {
 	QUrl url(dest);
@@ -532,7 +560,19 @@ AutomatableModel *SpaProc::modelAtPort(const QString &dest)
 			spaMod = vis.m_res;
 		}
 
-		if (spaMod) { addModel(mod = spaMod, url.path()); }
+		if (spaMod)
+		{
+			addModel(mod = spaMod, url.path());
+			m_connectedModels.insert(url.path(), spaMod);
+
+			// View needs to create another child view, e.g. a new knob:
+			emit modelAdded(spaMod);
+			emit dataChanged();
+
+			connect(mod, &AutomatableModel::destroyed,
+				this, [this, mod](jo_id_t){ removeControl(mod); },
+				Qt::DirectConnection);
+		}
 		else
 		{
 			qDebug() << "LMMS: Could not create model from "

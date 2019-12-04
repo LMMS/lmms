@@ -13,10 +13,18 @@ class AutomatableModel;
 
 class SpaProc : public LinkedModelGroup
 {
+	Q_OBJECT
 	friend class SpaViewBase;
 
 
 	QMap<QString, AutomatableModel *> m_connectedModels;
+signals:
+	// NOTE: when separating core from UI, this will need to be removed
+	// (who would kno if the client is Qt, i.e. it may not have slots at all)
+	// In this case you'd e.g. send the UI something like
+	// "/added <model meta info>"
+	void modelAdded(AutomatableModel* added);
+	void modelRemoved(AutomatableModel* removed);
 public:
 	SpaProc(Model *parent, const spa::descriptor* desc, std::size_t curProc,
 			DataFile::Types settingsType);
@@ -76,10 +84,9 @@ public:
 				class IntModel *m_intModel;
 				class BoolModel *m_boolModel;
 			} m_connectedModel;
+			std::string m_id;
 			TypedPorts() = default;
-			TypedPorts(char type) : m_type(type) {}
-			//! Should not be called, but QVector can't guarantee it
-			TypedPorts(const TypedPorts &) = delete;
+			TypedPorts(char type, std::string id) : m_type(type), m_id(id) {}
 		};
 
 		//! these are forwarded to the user in the LMMS-internal GUI
@@ -111,6 +118,8 @@ protected:
 
 	void initPlugin();
 	void shutdownPlugin();
+private:
+	void removeControl(AutomatableModel *mdl) override;
 };
 
 #endif // SPAPROC_H
