@@ -38,131 +38,36 @@
 */
 
 
-
-
-void LinkedModelGroup::makeLinkingProc()
+void LinkedModelGroup::linkControls(LinkedModelGroup *other)
 {
-	foreach_model([this](const std::string& str, ModelInfo inf)
+	foreach_model([&other](const std::string& id, ModelInfo& inf)
 	{
-		BoolModel* bmo = new BoolModel(true, this, tr("Link channels"));
-		inf.m_linkEnabled = bmo;
-		connect(bmo, &BoolModel::dataChanged, this,
-				[this, bmo, str]() { emit linkStateChanged(str, bmo->value()); });
+		auto itr2 = other->models().find(id);
+		Q_ASSERT(itr2 != other->models().end());
+		AutomatableModel::linkModels(inf.m_model, itr2->second.m_model);
 	});
 }
 
 
 
 
-void LinkedModelGroup::linkAllModels(bool state)
+void LinkedModelGroup::saveValues(QDomDocument &doc, QDomElement &that)
 {
-	// this will call AutomatableModel::linkModels (??? TODO)
-	for (auto pr : d.m_models) { pr.second.m_linkEnabled->setValue(state); }
-}
-
-
-
-
-void LinkedModelGroup::linkControls(LinkedModelGroup *other, const std::string& id)
-{
-	auto itr1 = models().find(id);
-	auto itr2 = other->models().find(id);
-	Q_ASSERT(itr1 != models().end() && itr2 != other->models().end());
-	AutomatableModel::linkModels(itr1->second.m_model, itr2->second.m_model);
-}
-
-
-
-
-void LinkedModelGroup::unlinkControls(LinkedModelGroup *other, const std::string& id)
-{
-	auto itr1 = models().find(id);
-	auto itr2 = other->models().find(id);
-	Q_ASSERT(itr1 != models().end() && itr2 != other->models().end());
-	AutomatableModel::unlinkModels(itr1->second.m_model, itr2->second.m_model);
-}
-
-
-
-
-bool LinkedModelGroup::isLinking() const {
-	return d.m_models.size()
-		?!!d.m_models.begin()->second.m_linkEnabled : false;
-}
-
-
-
-
-AutomatableModel *LinkedModelGroup::modelWithName(const QString &name) const
-{
-	auto itr = std::find_if(models().begin(), models().end(),
-		[&name](const std::pair<std::string, ModelInfo>& pr) -> bool
-	{ return pr.second.m_name == name; });
-	return itr == models().end() ? nullptr : itr->second.m_model;
-}
-
-
-
-
-void LinkedModelGroup::saveValues(QDomDocument &doc, QDomElement &that,
-	const LinkedModelGroup *lmg0)
-{
-	// if multiple lmgs, the first one must currently be the linking one
-	Q_ASSERT(this == lmg0 || lmg0->isLinking());
-	foreach_model([&lmg0, this, &doc, &that](const std::string& str, ModelInfo& inf)
+	foreach_model([&doc, &that](const std::string& , ModelInfo& inf)
 	{
-		if (this == lmg0 || !lmg0->linkEnabledModel(str)->value())
-		{
-			// try to load, if it fails, this will load a sane initial value
-			inf.m_model->saveSettings(doc, that, /*models()[idx].m_name*/ inf.m_name); /* TODO: m_name useful */
-		}
-		else
-		{
-			// model has the same value as in the first LinkedModelGroup
-		}
+		inf.m_model->saveSettings(doc, that, /*models()[idx].m_name*/ inf.m_name); /* TODO: m_name useful */
 	});
 }
 
 
 
 
-void LinkedModelGroup::saveLinksEnabled(QDomDocument &doc, QDomElement &that)
+void LinkedModelGroup::loadValues(const QDomElement &that)
 {
-	//for (std::size_t i = 0; i < d.m_linkEnabled.size(); ++i)
-	foreach_model([&doc, &that](const std::string&, ModelInfo& inf)
+	foreach_model([&that](const std::string& , ModelInfo& inf)
 	{
-		inf.m_linkEnabled->saveSettings(doc, that, inf.m_name);
-	});
-}
-
-
-
-
-void LinkedModelGroup::loadValues(const QDomElement &that,
-	const LinkedModelGroup* lmg0)
-{
-	foreach_model([lmg0, this, &that](const std::string& str, ModelInfo& inf)
-	{
-		if (this == lmg0 || !lmg0->linkEnabledModel(str)->value())
-		{
-			// try to load, if it fails, this will load a sane initial value
-			inf.m_model->loadSettings(that, /*models()[idx].m_name*/ inf.m_name); /* TODO: m_name useful */
-		}
-		else
-		{
-			// model has the same value as in the first LinkedModelGroup
-		}
-	});
-}
-
-
-
-
-void LinkedModelGroup::loadLinksEnabled(const QDomElement &that)
-{
-	foreach_model([&that](const std::string&, ModelInfo& inf)
-	{
-		inf.m_linkEnabled->loadSettings(that, inf.m_name);
+		// try to load, if it fails, this will load a sane initial value
+		inf.m_model->loadSettings(that, /*models()[idx].m_name*/ inf.m_name); /* TODO: m_name useful */
 	});
 }
 
@@ -194,64 +99,20 @@ void LinkedModelGroup::clearModels()
 
 
 
-
 LinkedModelGroups::~LinkedModelGroups() {}
 
 
 
 
-void LinkedModelGroups::createMultiChannelLinkModel()
-{
-	m_multiChannelLinkModel =
-		make_unique<BoolModel, BoolModelDeleter>(true, nullptr);
-}
-
-
-
-
-void LinkedModelGroups::linkModel(const std::string& model, bool state)
+void LinkedModelGroups::linkAllModels()
 {
 	LinkedModelGroup* first = getGroup(0);
 	LinkedModelGroup* cur;
 
-	if (state)
+	for (std::size_t i = 1; (cur = getGroup(i)); ++i)
 	{
-		for (std::size_t i = 1; (cur = getGroup(i)); ++i)
-		{
-			first->linkControls(cur, model);
-		}
+		first->linkControls(cur);
 	}
-	else
-	{
-		for (std::size_t i = 1; (cur = getGroup(i)); ++i)
-		{
-			first->unlinkControls(cur, model);
-		}
-
-		// m_multiChannelLinkModel.setValue() will call
-		// updateLinkStatesFromGlobal()...
-		// m_noLink will make sure that this will not unlink any other models
-		m_noLink = true;
-		m_multiChannelLinkModel->setValue( false );
-	}
-}
-
-
-
-
-void LinkedModelGroups::updateLinkStatesFromGlobal()
-{
-	LinkedModelGroup* first = getGroup(0);
-	if (m_multiChannelLinkModel->value())
-	{
-		first->linkAllModels(true);
-	}
-	else if (!m_noLink)
-	{
-		first->linkAllModels(false);
-	}
-
-	m_noLink = false;
 }
 
 
@@ -262,37 +123,9 @@ void LinkedModelGroups::saveSettings(QDomDocument& doc, QDomElement& that)
 	LinkedModelGroup* grp0 = getGroup(0);
 	if (grp0)
 	{
-		bool allLinked = false;
-		if (m_multiChannelLinkModel)
-		{
-			m_multiChannelLinkModel->saveSettings(doc, that, "link");
-			allLinked = m_multiChannelLinkModel->value();
-		}
-
-		if (!allLinked && getGroup(1))
-		{
-			QDomElement links = doc.createElement("links");
-			grp0->saveLinksEnabled(doc, links);
-			that.appendChild(links);
-		}
-
 		QDomElement models = doc.createElement("models");
 		that.appendChild(models);
-
-		char chanName[] = "chan0";
-		LinkedModelGroup* lmg;
-		for (std::size_t chanIdx = 0;
-			// stop after last group
-			// if all models are linked, store only the first group
-			(lmg = getGroup(chanIdx)) && !(allLinked && chanIdx > 0);
-			++chanIdx)
-		{
-			chanName[4] = '0' + static_cast<char>(chanIdx);
-			QDomElement channel = doc.createElement(
-									QString::fromUtf8(chanName));
-			models.appendChild(channel);
-			lmg->saveValues(doc, channel, grp0);
-		}
+		grp0->saveValues(doc, models);
 	}
 	else { /* don't even add a "models" node */ }
 }
@@ -306,41 +139,8 @@ void LinkedModelGroups::loadSettings(const QDomElement& that)
 	LinkedModelGroup* grp0;
 	if (!models.isNull() && (grp0 = getGroup(0)))
 	{
-		bool allLinked = false;
-		if (m_multiChannelLinkModel)
-		{
-			m_multiChannelLinkModel->loadSettings(that, "link");
-			allLinked = m_multiChannelLinkModel->value();
-		}
-
-		if (!allLinked && getGroup(1))
-		{
-			QDomElement links = that.firstChildElement("links");
-			if (!links.isNull()) { grp0->loadLinksEnabled(links); }
-		}
-
-		QDomElement lastChan;
-		char chanName[] = "chan0";
-		LinkedModelGroup* lmg;
-		for (std::size_t chanIdx = 0;
-			// stop after last group
-			// if all models are linked, read only the first group
-			(lmg = getGroup(chanIdx)) && !(allLinked && chanIdx > 0);
-			++chanIdx)
-		{
-			chanName[4] = '0' + static_cast<char>(chanIdx);
-			QDomElement chan = models.firstChildElement(chanName);
-			if (!chan.isNull()) { lastChan = chan; }
-
-			lmg->loadValues(lastChan, grp0);
-		}
+		// only load the first group, the others are linked to the first
+		grp0->loadValues(models);
 	}
 }
 
-
-
-
-void LinkedModelGroups::BoolModelDeleter::operator()(BoolModel *l)
-{
-	delete l;
-}

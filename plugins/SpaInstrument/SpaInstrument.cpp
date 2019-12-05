@@ -87,13 +87,6 @@ SpaInstrument::SpaInstrument(InstrumentTrack *instrumentTrackArg,
 		InstrumentPlayHandle *iph =
 			new InstrumentPlayHandle(this, instrumentTrackArg);
 		Engine::mixer()->addPlayHandle(iph);
-
-		if(multiChannelLinkModel()) {
-			connect(multiChannelLinkModel(), SIGNAL(dataChanged()),
-				this, SLOT(updateLinkStatesFromGlobal()));
-			connect(getGroup(0), SIGNAL(linkStateChanged(int, bool)),
-					this, SLOT(linkPort(int, bool)));
-		}
 	}
 }
 

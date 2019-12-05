@@ -174,11 +174,12 @@ Plugin::PluginTypes SpaManager::computePluginType(spa::descriptor *desc)
 	{
 		res = Plugin::PluginTypes::Undefined;
 	} // TODO: enable mono effects?
-	else if (tyc.m_inCount == 2 && tyc.m_outCount == 2)
+	else if ((tyc.m_inCount == 2 && tyc.m_outCount == 2)
+		|| (tyc.m_inCount == 1 && tyc.m_outCount == 1))
 	{
 		res = Plugin::PluginTypes::Effect;
 	}
-	else if (tyc.m_inCount == 0 && tyc.m_outCount == 2)
+	else if (tyc.m_inCount == 0 && (tyc.m_outCount == 2 || tyc.m_inCount == 1))
 	{
 		res = Plugin::PluginTypes::Instrument;
 	}

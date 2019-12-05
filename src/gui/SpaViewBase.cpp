@@ -41,7 +41,6 @@
 #include "LedCheckbox.h"
 
 SpaViewBase::SpaViewBase(QWidget* meAsWidget, SpaControlBase *ctrlBase)
-	: LinkedModelGroupsView (ctrlBase)
 {
 	m_grid = new QGridLayout(meAsWidget);
 
