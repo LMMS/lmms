@@ -76,16 +76,6 @@ Lv2Instrument::Lv2Instrument(InstrumentTrack *instrumentTrackArg,
 			this, SLOT(updatePitchRange()), Qt::DirectConnection);
 		connect(Engine::mixer(), &Mixer::sampleRateChanged,
 			this, [this](){Lv2ControlBase::reloadPlugin();});
-		if (multiChannelLinkModel())
-		{
-			connect(multiChannelLinkModel(), &BoolModel::dataChanged,
-				this, [this](){updateLinkStatesFromGlobal();},
-				Qt::DirectConnection);
-/*			// linking models will be deprecated soon, anyways (#5079 voting)
-			connect(getGroup(0), &LinkedModelGroup::linkStateChanged,
-				this, [this](std::size_t id, bool value){
-				linkModel(id, value);}, Qt::DirectConnection);*/
-		}
 
 		// now we need a play-handle which cares for calling play()
 		InstrumentPlayHandle *iph =

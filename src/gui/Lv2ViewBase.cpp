@@ -132,7 +132,6 @@ AutoLilvNode Lv2ViewProc::uri(const char *uriStr)
 
 
 Lv2ViewBase::Lv2ViewBase(QWidget* meAsWidget, Lv2ControlBase *ctrlBase)
-	: LinkedModelGroupsView (ctrlBase)
 {
 	QGridLayout* grid = new QGridLayout(meAsWidget);
 

@@ -74,19 +74,7 @@ Lv2ControlBase::Lv2ControlBase(Model* that, const QString &uri) :
 		if (m_valid)
 		{
 			m_channelsPerProc = DEFAULT_CHANNELS / m_procs.size();
-			if (m_procs.size() > 1)
-			{
-				m_procs[0]->makeLinkingProc();
-				createMultiChannelLinkModel();
-			}
-
-			// initially link all controls
-			m_procs[0]->foreach_model([this]
-				(const std::string& str,
-				const LinkedModelGroup::ModelInfo& )
-				{
-					linkModel(str, true);
-				});
+			linkAllModels();
 		}
 	}
 	else
