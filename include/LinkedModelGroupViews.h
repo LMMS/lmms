@@ -99,7 +99,6 @@ private:
 class LinkedModelGroupsView
 {
 protected:
-	LinkedModelGroupsView(class LinkedModelGroups *ctrlBase);
 	~LinkedModelGroupsView() = default;
 
 	//! Reconnect models if model changed; to be called by child virtuals

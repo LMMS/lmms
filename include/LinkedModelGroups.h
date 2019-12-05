@@ -46,11 +46,6 @@
 */
 class LinkedModelGroup : public Model
 {
-	Q_OBJECT
-signals:
-	//! Signal emitted after any of the per-control link-enabled models switch
-	void linkStateChanged(const std::string& str, bool value);
-
 public:
 	/*
 		Initialization
@@ -60,23 +55,11 @@ public:
 	//! @param nProc total number of processors
 	LinkedModelGroup(Model* parent, std::size_t curProc) :
 		Model(parent), m_curProc(curProc) {}
-	//! After all models have been added, make this processor the one which
-	//! will contain link models associated with its controls
-	void makeLinkingProc();
 
 	/*
 		Linking
 	*/
-	//! Set all per-control link-enabled models to @p state, which will
-	//! also link or unlink them (via `LinkedModelGroups::linkModel()`)
-	void linkAllModels(bool state);
-	//! Link specified port with the associated port of @p other
-	//! @param id string identifier of the port
-	void linkControls(LinkedModelGroup* other, const std::string& id);
-	//! @see linkControls
-	void unlinkControls(LinkedModelGroup *other, const std::string &id);
-	//! Return whether this is the first of more than one processors
-	bool isLinking() const;
+	void linkControls(LinkedModelGroup *other);
 
 	/*
 		Models
@@ -85,44 +68,10 @@ public:
 	{
 		QString m_name;
 		class AutomatableModel* m_model;
-		class BoolModel* m_linkEnabled = nullptr;
 		ModelInfo() { /* hopefully no one will use this */ } // TODO: remove?
 		ModelInfo(const QString& name, AutomatableModel* model)
 			: m_name(name), m_model(model) {}
 	};
-
-	// TODO: refactor those 4
-	AutomatableModel* model(const std::string& s)
-	{
-		auto itr = d.m_models.find(s);
-		if(itr == d.m_models.end())
-			throw std::runtime_error("...");
-		return itr->second.m_model;
-	}
-
-	const AutomatableModel* model(const std::string& s) const
-	{
-		auto itr = d.m_models.find(s);
-		if(itr == d.m_models.end())
-			throw std::runtime_error("...");
-		return itr->second.m_model;
-	}
-
-	class BoolModel* linkEnabledModel(const std::string& s)
-	{
-		auto itr = d.m_models.find(s);
-		if(itr == d.m_models.end())
-			throw std::runtime_error("...");
-		return itr->second.m_linkEnabled;
-	}
-
-	const class BoolModel* linkEnabledModel(const std::string& s) const
-	{
-		auto itr = d.m_models.find(s);
-		if(itr == d.m_models.end())
-			throw std::runtime_error("...");
-		return itr->second.m_linkEnabled;
-	}
 
 	template<class Functor>
 	void foreach_model(const Functor& ftor)
@@ -142,7 +91,6 @@ public:
 		}
 	}
 
-	AutomatableModel* modelWithName(const QString& name) const;
 	std::size_t modelNum() const { return models().size(); }
 
 	// this is bad style (redirecting into the sub-class), but this class
@@ -154,12 +102,9 @@ public:
 		Load/Save
 	*/
 	//! @param lmg0 The linking model group with index 0
-	void saveValues(class QDomDocument& doc, class QDomElement& that,
-					const LinkedModelGroup *lmg0);
-	void saveLinksEnabled(QDomDocument &doc, QDomElement &that);
+	void saveValues(class QDomDocument& doc, class QDomElement& that);
 	//! @param lmg0 The linking model group with index 0
-	void loadValues(const class QDomElement& that, const LinkedModelGroup *lmg0);
-	void loadLinksEnabled(const class QDomElement &that);
+	void loadValues(const class QDomElement& that);
 
 	/*
 		General
@@ -217,22 +162,7 @@ class LinkedModelGroups
 public:
 	virtual ~LinkedModelGroups();
 
-	//! Return the model for multi channel linking
-	BoolModel* multiChannelLinkModel() { return m_multiChannelLinkModel.get(); }
-	//! Create the model for multi channel linking
-	void createMultiChannelLinkModel();
-
-	/*
-		to be called by slots
-	*/
-	//! Take a specified model from the first LinkedModelGroup
-	//! and link or unlink it to/from the associated model
-	//! of every other LinkedModelGroup
-	//! @param model number conforming to getGroup()
-	//! @param state True iff it should be linked
-	void linkModel(const std::string &model, bool state);
-	//! Callback for the global linking LED
-	void updateLinkStatesFromGlobal();
+	void linkAllModels();
 
 	/*
 		Load/Save
@@ -248,18 +178,6 @@ public:
 	virtual LinkedModelGroup* getGroup(std::size_t idx) = 0;
 	//! @see getGroup
 	virtual const LinkedModelGroup* getGroup(std::size_t idx) const = 0;
-
-private:
-	// Implement deletion in the CPP file:
-	struct BoolModelDeleter { void operator()(class BoolModel* l); };
-
-	//! Model for the "global" linking
-	//! Only allocated if #processors > 1
-	std::unique_ptr<class BoolModel, BoolModelDeleter> m_multiChannelLinkModel;
-
-	//! Force updateLinkStatesFromGlobal() to not unlink any ports
-	//! Implementation detail, see linkPort() implementation
-	bool m_noLink = false;
 };
 
 

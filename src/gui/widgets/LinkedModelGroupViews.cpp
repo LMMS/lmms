@@ -43,7 +43,6 @@ LinkedModelGroupView::LinkedModelGroupView(QWidget* parent,
 	QGroupBox(parent),
 	m_model(model),
 	m_colNum(colNum),
-	m_isLinking(model->isLinking()),
 	m_layout(new LinkedModelGroupLayout(this))
 {
 	// make viewable: if there are no knobs, the user should at least see
@@ -101,9 +100,6 @@ void LinkedModelGroupView::modelChanged(LinkedModelGroup *group)
 		else
 		{
 			itr->second.m_ctrl->setModel(minf.m_model);
-			if(itr->second.m_led) {
-				itr->second.m_led->setModel(minf.m_linkEnabled);
-			}
 		}
 	});
 
@@ -228,26 +224,8 @@ void LinkedModelGroupView::makeAllGridCellsEqualSized()
 */
 
 
-LinkedModelGroupsView::LinkedModelGroupsView(
-	LinkedModelGroups *ctrlBase)
-{
-	if (ctrlBase->multiChannelLinkModel())
-	{
-		m_multiChannelLink = make_unique<LedCheckBox, MultiChannelLinkDeleter>
-								(QObject::tr("Link Channels"), nullptr);
-	}
-}
-
-
-
-
 void LinkedModelGroupsView::modelChanged(LinkedModelGroups *groups)
 {
-	if (groups->multiChannelLinkModel())
-	{
-		m_multiChannelLink->setModel(groups->multiChannelLinkModel());
-	}
-
 	LinkedModelGroupView* groupView;
 	LinkedModelGroup* group;
 	for (std::size_t i = 0;
