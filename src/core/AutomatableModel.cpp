@@ -460,6 +460,7 @@ void AutomatableModel::linkModels( AutomatableModel* model1, AutomatableModel* m
 		model1->linkModel( model2 );
 		model2->linkModel( model1 );
 	}
+	emit model1->dataChanged();
 }
 
 
