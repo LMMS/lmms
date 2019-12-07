@@ -325,7 +325,7 @@ private:
 
 
 	DataType m_dataType;
-	ScaleType m_scaleType; //! scale type, linear by default
+	ScaleType m_scaleType; //!< scale type, linear by default
 	float m_value;
 	float m_initValue;
 	float m_minValue;
