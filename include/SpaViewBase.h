@@ -40,7 +40,7 @@ class SpaViewProc : public LinkedModelGroupView
 	Q_OBJECT
 public:
 	SpaViewProc(QWidget *parent, SpaProc *proc,
-				std::size_t colNum, std::size_t nProcs);
+				std::size_t colNum);
 	// TODO: make those two private?
 	void dropEvent(class QDropEvent *de) override;
 	void dragEnterEvent(QDragEnterEvent *dev) override;
@@ -59,9 +59,9 @@ class SpaViewBase : LinkedModelGroupsView
 
 	//QVector<class AutomatableModelView*> m_modelViews;
 
-	QVector<SpaViewProc*> m_procViews; // TODO: unique_ptr
+	SpaViewProc* m_procView; // TODO: unique_ptr
 
-	LinkedModelGroupView *getGroupView(std::size_t idx) override;
+	LinkedModelGroupView *getGroupView() override;
 
 protected:
 	class QPushButton *m_toggleUIButton = nullptr;

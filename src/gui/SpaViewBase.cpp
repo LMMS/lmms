@@ -63,17 +63,10 @@ SpaViewBase::SpaViewBase(QWidget* meAsWidget, SpaControlBase *ctrlBase)
 		m_grid->addWidget(m_toggleUIButton, Rows::ButtonRow, 3, 1, 3);
 	}
 
-	std::size_t nProcs = ctrlBase->controls().size();
-	Q_ASSERT(m_colNum % nProcs == 0);
-	std::size_t colsEach = m_colNum / nProcs;
-	for (std::size_t i = 0; i < nProcs; ++i)
-	{
-			SpaViewProc* vpr = new SpaViewProc(meAsWidget,
-					ctrlBase->controls()[i].get(),
-					colsEach, nProcs);
-			m_grid->addWidget(vpr, Rows::ProcRow, static_cast<int>(i));
-			m_procViews.push_back(vpr);
-	}
+	m_procView = new SpaViewProc(meAsWidget,
+			ctrlBase->controls()[0].get(),
+			m_colNum);
+	m_grid->addWidget(m_procView, Rows::ProcRow, 0);
 }
 
 SpaViewBase::~SpaViewBase() {}
@@ -93,8 +86,8 @@ void SpaViewBase::modelChanged(SpaControlBase *ctrlBase)
 
 
 SpaViewProc::SpaViewProc(QWidget* parent, SpaProc *proc,
-	std::size_t colNum, std::size_t nProcs)
-	: LinkedModelGroupView(parent, proc, colNum, nProcs)
+	std::size_t colNum)
+	: LinkedModelGroupView(parent, proc, colNum)
 {
 #if 0
 	class SetupWidget : public Lv2Ports::Visitor
@@ -262,23 +255,19 @@ void SpaViewProc::modelRemoved(AutomatableModel *mdl)
 	removeControl(mdl->objectName());
 }
 
-LinkedModelGroupView *SpaViewBase::getGroupView(std::size_t idx)
+LinkedModelGroupView *SpaViewBase::getGroupView()
 {
-	return m_procViews[static_cast<int>(idx)];
+	return m_procView;
 }
 
 void SpaViewBase::dropEvent( QDropEvent *de )
 {
-	// just use the first proc view for now,
-	// there will be only one proc view soon
-	if(m_procViews.size() > 0) { m_procViews[0]->dropEvent(de); }
+	if(m_procView) { m_procView->dropEvent(de); }
 }
 
 void SpaViewBase::dragEnterEvent( QDragEnterEvent *de )
 {
-	// just use the first proc view for now,
-	// there will be only one proc view soon
-	if(m_procViews.size() > 0) { m_procViews[0]->dragEnterEvent(de); }
+	if(m_procView) { m_procView->dragEnterEvent(de); }
 }
 
 void SpaViewProc::dragEnterEvent(QDragEnterEvent *dev)
