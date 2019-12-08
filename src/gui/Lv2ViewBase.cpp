@@ -203,12 +203,6 @@ Lv2ViewBase::Lv2ViewBase(QWidget* meAsWidget, Lv2ControlBase *ctrlBase)
 		grid->addWidget(vpr, Rows::ProcRow, i);
 		m_procViews.push_back(vpr);
 	}
-
-	LedCheckBox* led = globalLinkLed();
-	if (led)
-	{
-		grid->addWidget(led, Rows::LinkChannelsRow, 0, 1, m_colNum);
-	}
 }
 
 

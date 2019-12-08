@@ -112,7 +112,7 @@ void LinkedModelGroupView::modelChanged(LinkedModelGroup *group)
 void LinkedModelGroupView::addControl(Control* ctrl, const std::string& id,
 	const std::string &display, bool removable)
 {
-	int wdgNum = static_cast<int>(m_widgets.size() * (1 + m_isLinking));
+	int wdgNum = static_cast<int>(m_widgets.size());
 	if (ctrl)
 	{
 		QWidget* box = new QWidget(this);
@@ -120,12 +120,6 @@ void LinkedModelGroupView::addControl(Control* ctrl, const std::string& id,
 
 		// book-keeper of widget pointers
 		WidgetsPerModel widgets;
-
-		if (m_isLinking)
-		{
-			widgets.m_led = new LedCheckBox(ctrl->topWidget()->parentWidget());
-			boxLayout->addWidget(widgets.m_led);
-		}
 
 		widgets.m_ctrl.reset(ctrl);
 		boxLayout->addWidget(ctrl->topWidget());
@@ -152,7 +146,6 @@ void LinkedModelGroupView::addControl(Control* ctrl, const std::string& id,
 		m_layout->addWidget(box);
 
 		m_widgets.emplace(id, std::move(widgets)); // TODO: use set?
-		wdgNum += m_isLinking;
 		++wdgNum;
 	}
 
@@ -235,13 +228,5 @@ void LinkedModelGroupsView::modelChanged(LinkedModelGroups *groups)
 		groupView->modelChanged(group);
 	}
 }
-
-
-
-
-// If you wonder why the default deleter can not be used:
-// https://stackoverflow.com/questions/9954518
-void LinkedModelGroupsView::MultiChannelLinkDeleter::
-	operator()(LedCheckBox *l) { delete l; }
 
 
