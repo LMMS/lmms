@@ -74,19 +74,6 @@ SpaViewBase::SpaViewBase(QWidget* meAsWidget, SpaControlBase *ctrlBase)
 			m_grid->addWidget(vpr, Rows::ProcRow, static_cast<int>(i));
 			m_procViews.push_back(vpr);
 	}
-
-	LedCheckBox* led = globalLinkLed();
-	if (led)
-	{
-			m_grid->addWidget(led, Rows::LinkChannelsRow, 0,
-				1, static_cast<int>(m_colNum));
-	}
-
-/*	QPushButton* m_dropEraseButton = new QPushButton(
-		QObject::tr("Drop on widget to remove it"), meAsWidget);
-	m_dropEraseButton->setEnabled(false); // only DnD target, can't be clicked
-	m_grid->addWidget(m_dropEraseButton, Rows::DropButtonRow, 0,
-				1, static_cast<int>(m_colNum));*/
 }
 
 SpaViewBase::~SpaViewBase() {}

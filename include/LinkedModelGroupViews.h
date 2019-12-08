@@ -77,12 +77,10 @@ private:
 
 	//! column number in surrounding grid in LinkedModelGroupsView
 	std::size_t m_colNum;
-	bool m_isLinking;
 	class LinkedModelGroupLayout* m_layout;
 	struct WidgetsPerModel
 	{
 		std::unique_ptr<class Control> m_ctrl;
-		class LedCheckBox* m_led = nullptr;
 	};
 
 	std::map<std::string, WidgetsPerModel> m_widgets;
@@ -104,18 +102,10 @@ protected:
 	//! Reconnect models if model changed; to be called by child virtuals
 	void modelChanged(class LinkedModelGroups* ctrlBase);
 
-	//! Access to the global multi channel link LED
-	LedCheckBox* globalLinkLed() { return m_multiChannelLink.get(); }
-
 private:
 	//! The base class must return the adressed group view, or nullptr if index
 	//! is out of range
 	virtual LinkedModelGroupView* getGroupView(std::size_t idx) = 0;
-
-	// Implement deletion in the CPP file:
-	struct MultiChannelLinkDeleter { void operator()(LedCheckBox* l); };
-	std::unique_ptr<class LedCheckBox, MultiChannelLinkDeleter>
-		m_multiChannelLink = nullptr;
 };
 
 
