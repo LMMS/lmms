@@ -45,9 +45,7 @@ class Lv2ViewProc : public LinkedModelGroupView
 {
 public:
 	//! @param colNum numbers of columns for the controls
-	//!   (link LEDs not counted)
-	Lv2ViewProc(QWidget *parent, Lv2Proc *ctrlBase,
-		int colNum, int nProc, const QString &name = QString());
+	Lv2ViewProc(QWidget *parent, Lv2Proc *ctrlBase, int colNum);
 	~Lv2ViewProc();
 
 private:
@@ -84,13 +82,9 @@ private:
 	};
 
 	static AutoLilvNode uri(const char *uriStr);
-	LinkedModelGroupView* getGroupView(std::size_t idx) override {
-		return static_cast<int>(idx) < m_procViews.size()
-			? m_procViews[static_cast<int>(idx)]
-			: nullptr;
-	}
+	LinkedModelGroupView* getGroupView() override { return m_procView; }
 
-	QVector<Lv2ViewProc*> m_procViews;
+	Lv2ViewProc* m_procView;
 
 	//! Numbers of controls per row; must be multiple of 2 for mono effects
 	const int m_colNum = 6;

@@ -49,9 +49,8 @@
 
 
 
-Lv2ViewProc::Lv2ViewProc(QWidget* parent, Lv2Proc* ctrlBase,
-	int colNum, int nProc, const QString& name) :
-	LinkedModelGroupView (parent, ctrlBase, colNum, nProc, name)
+Lv2ViewProc::Lv2ViewProc(QWidget* parent, Lv2Proc* ctrlBase, int colNum) :
+	LinkedModelGroupView (parent, ctrlBase, colNum)
 {
 	class SetupWidget : public Lv2Ports::Visitor
 	{
@@ -192,17 +191,10 @@ Lv2ViewBase::Lv2ViewBase(QWidget* meAsWidget, Lv2ControlBase *ctrlBase)
 		grid->addLayout(btnBox, Rows::ButtonRow, 0, 1, m_colNum);
 	}
 
-	int nProcs = static_cast<int>(ctrlBase->controls().size());
-	Q_ASSERT(m_colNum % nProcs == 0);
-	int colsEach = m_colNum / nProcs;
-	for (int i = 0; i < nProcs; ++i)
-	{
-		Lv2ViewProc* vpr = new Lv2ViewProc(meAsWidget,
-			ctrlBase->controls()[static_cast<std::size_t>(i)].get(),
-			colsEach, nProcs);
-		grid->addWidget(vpr, Rows::ProcRow, i);
-		m_procViews.push_back(vpr);
-	}
+	m_procView = new Lv2ViewProc(meAsWidget,
+		ctrlBase->controls()[static_cast<std::size_t>(0)].get(),
+		m_colNum);
+	grid->addWidget(m_procView, Rows::ProcRow, 0);
 }
 
 
