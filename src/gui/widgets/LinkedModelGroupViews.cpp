@@ -39,8 +39,8 @@
 
 
 LinkedModelGroupView::LinkedModelGroupView(QWidget* parent,
-	LinkedModelGroup *model, std::size_t colNum, std::size_t nProc, const QString& name) :
-	QGroupBox(parent),
+	LinkedModelGroup *model, std::size_t colNum) :
+	QWidget(parent),
 	m_model(model),
 	m_colNum(colNum),
 	m_layout(new LinkedModelGroupLayout(this))
@@ -48,31 +48,6 @@ LinkedModelGroupView::LinkedModelGroupView(QWidget* parent,
 	// make viewable: if there are no knobs, the user should at least see
 	// a rectangle to drop controls in
 	setMinimumSize(QSize(50, 50));
-
-	if (model->modelNum())
-	{
-		std::size_t curProc = model->curProc();
-		QString chanName;
-		if (name.isNull())
-		{
-			switch (nProc)
-			{
-				case 1: break; // don't display any channel name
-				case 2:
-					chanName = curProc
-								? QObject::tr("Right")
-								: QObject::tr("Left");
-					break;
-				default:
-					chanName = QObject::tr("Channel %1").arg(curProc + 1);
-					break;
-			}
-		}
-		else { chanName = name; }
-
-		if (!chanName.isNull()) { setTitle(chanName); }
-	}
-	else { /*setHidden(true);*/ }
 }
 
 
@@ -219,13 +194,11 @@ void LinkedModelGroupView::makeAllGridCellsEqualSized()
 
 void LinkedModelGroupsView::modelChanged(LinkedModelGroups *groups)
 {
-	LinkedModelGroupView* groupView;
-	LinkedModelGroup* group;
-	for (std::size_t i = 0;
-		(group = groups->getGroup(i)) && (groupView = getGroupView(i));
-		++i)
+	LinkedModelGroupView* groupView = getGroupView();
+	LinkedModelGroup* group0 = groups->getGroup(0);
+	if(group0 && groupView)
 	{
-		groupView->modelChanged(group);
+		groupView->modelChanged(group0);
 	}
 }
 

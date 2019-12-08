@@ -29,7 +29,7 @@
 #include <cstddef>
 #include <memory>
 #include <vector>
-#include <QGroupBox>
+#include <QWidget>
 
 
 /**
@@ -46,7 +46,7 @@
 		ModelView. The "view" in the name is just for consistency
 		with LinkedModelGroupsView.
 */
-class LinkedModelGroupView : public QGroupBox
+class LinkedModelGroupView : public QWidget
 {
 public:
 	/**
@@ -56,7 +56,7 @@ public:
 			automatically set if not given
 	*/
 	LinkedModelGroupView(QWidget *parent, class LinkedModelGroup* model,
-		std::size_t colNum, std::size_t nProc, const QString &name = QString());
+		std::size_t colNum);
 	~LinkedModelGroupView();
 
 	//! Reconnect models if model changed
@@ -105,7 +105,7 @@ protected:
 private:
 	//! The base class must return the adressed group view, or nullptr if index
 	//! is out of range
-	virtual LinkedModelGroupView* getGroupView(std::size_t idx) = 0;
+	virtual LinkedModelGroupView* getGroupView() = 0;
 };
 
 
