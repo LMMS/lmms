@@ -24,13 +24,10 @@
 
 #include "LinkedModelGroupViews.h"
 
-#include <QGridLayout>
-
+#include <QPushButton>
 #include "Controls.h"
-#include "LedCheckbox.h"
 #include "LinkedModelGroupLayout.h"
 #include "LinkedModelGroups.h"
-#include "stdshims.h"
 
 
 /*
@@ -67,7 +64,7 @@ void LinkedModelGroupView::modelChanged(LinkedModelGroup *group)
 		auto itr = m_widgets.find(str);
 		// in case there are new or deleted widgets, the subclass has already
 		// modified m_widgets, so this will go into the else case
-		if(itr == m_widgets.end())
+		if (itr == m_widgets.end())
 		{
 			// no widget? this can happen when the whole view is being destroyed
 			// (for some strange reasons)
@@ -92,7 +89,6 @@ void LinkedModelGroupView::addControl(Control* ctrl, const std::string& id,
 	{
 		QWidget* box = new QWidget(this);
 		QHBoxLayout* boxLayout = new QHBoxLayout(box);
-
 		boxLayout->addWidget(ctrl->topWidget());
 
 		if (removable)
@@ -116,11 +112,11 @@ void LinkedModelGroupView::addControl(Control* ctrl, const std::string& id,
 		box->setObjectName(QString::fromStdString(display));
 		m_layout->addWidget(box);
 
-		m_widgets.emplace(id, ctrl); // TODO: use set?
+		m_widgets.emplace(id, ctrl);
 		++wdgNum;
 	}
 
-	if(isHidden()) { setHidden(false); } // TODO: can be removed?
+	if (isHidden()) { setHidden(false); }
 }
 
 
@@ -129,7 +125,7 @@ void LinkedModelGroupView::addControl(Control* ctrl, const std::string& id,
 void LinkedModelGroupView::removeControl(const QString& key)
 {
 	auto itr = m_widgets.find(key.toStdString());
-	if(itr != m_widgets.end())
+	if (itr != m_widgets.end())
 	{
 		QLayoutItem* item = m_layout->itemByString(key);
 		Q_ASSERT(!!item);
@@ -157,7 +153,7 @@ void LinkedModelGroupsView::modelChanged(LinkedModelGroups *groups)
 {
 	LinkedModelGroupView* groupView = getGroupView();
 	LinkedModelGroup* group0 = groups->getGroup(0);
-	if(group0 && groupView)
+	if (group0 && groupView)
 	{
 		groupView->modelChanged(group0);
 	}
