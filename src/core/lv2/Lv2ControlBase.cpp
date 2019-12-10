@@ -50,12 +50,10 @@ Lv2ControlBase::Lv2ControlBase(Model* that, const QString &uri) :
 {
 	if (m_plugin)
 	{
-		std::size_t procId = 0;
 		int channelsLeft = DEFAULT_CHANNELS; // LMMS plugins are stereo
 		while (channelsLeft > 0)
 		{
-			std::unique_ptr<Lv2Proc> newOne(
-				new Lv2Proc(m_plugin, that, procId++));
+			std::unique_ptr<Lv2Proc> newOne(new Lv2Proc(m_plugin, that));
 			if (newOne->isValid())
 			{
 				channelsLeft -= std::max(

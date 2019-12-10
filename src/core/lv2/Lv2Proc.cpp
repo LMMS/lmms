@@ -95,8 +95,8 @@ Plugin::PluginTypes Lv2Proc::check(const LilvPlugin *plugin,
 
 
 
-Lv2Proc::Lv2Proc(const LilvPlugin *plugin, Model* parent, std::size_t curProc) :
-	LinkedModelGroup(parent, curProc),
+Lv2Proc::Lv2Proc(const LilvPlugin *plugin, Model* parent) :
+	LinkedModelGroup(parent),
 	m_plugin(plugin)
 {
 	if (m_plugin)
