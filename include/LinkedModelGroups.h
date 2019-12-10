@@ -78,7 +78,7 @@ public:
 	template<class Functor>
 	void foreach_model(const Functor& ftor)
 	{
-		for(auto itr = m_models.begin(); itr != m_models.end(); ++itr)
+		for (auto itr = m_models.begin(); itr != m_models.end(); ++itr)
 		{
 			ftor(itr->first, itr->second);
 		}
@@ -87,7 +87,7 @@ public:
 	template<class Functor>
 	void foreach_model(const Functor& ftor) const
 	{
-		for(auto itr = m_models.cbegin(); itr != m_models.cend(); ++itr)
+		for (auto itr = m_models.cbegin(); itr != m_models.cend(); ++itr)
 		{
 			ftor(itr->first, itr->second);
 		}

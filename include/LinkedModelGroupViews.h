@@ -68,8 +68,6 @@ protected:
 	void removeControl(const QString &key);
 
 private:
-	void makeAllGridCellsEqualSized();
-
 	class LinkedModelGroup* m_model;
 
 	//! column number in surrounding grid in LinkedModelGroupsView
