@@ -106,14 +106,12 @@ void LinkedModelGroupLayout::onTextChanged(const QString&)
 	invalidate();
 	update();
 }
-#include <QDebug>
+
 void LinkedModelGroupLayout::addItem(QLayoutItem *item)
 {
 	QWidget* widget = item->widget();
 	const QString str = widget ? widget->objectName() : QString("unnamed");
 	m_itemMap.insert(str, item);
-	// if there are at least two widget + search bar, show filter
-//	if(m_itemMap.size() > 2) { m_searchBar->setVisible(true); Q_ASSERT(false); qDebug() << "NO"; }
 	invalidate();
 }
 
@@ -143,11 +141,11 @@ int LinkedModelGroupLayout::count() const
 QMap<QString, QLayoutItem*>::const_iterator
 LinkedModelGroupLayout::pairAt(int index) const
 {
-	if(index < 0)
+	if (index < 0)
 		return m_itemMap.cend();
 	QMap<QString, QLayoutItem*>::const_iterator itr = m_itemMap.cbegin();
 	++itr; // skip search bar
-	while(index-->0 && itr != m_itemMap.cend()) { ++itr; }
+	while (index-->0 && itr != m_itemMap.cend()) { ++itr; }
 	return itr;
 }
 
@@ -240,13 +238,13 @@ int LinkedModelGroupLayout::doLayout(const QRect &rect, bool testOnly) const
 			filterText.isEmpty() || // no filter - pass all
 			itr.key().contains(filterText, Qt::CaseInsensitive))
 		{
-			if(wid)
+			if (wid)
 			{
-				if(first)
+				if (first)
 				{
 					// for the search bar, only show it if there are at least
 					// two control widgets (i.e. at least 3 widgets)
-					if(m_itemMap.size() > 2) { wid->show(); }
+					if (m_itemMap.size() > 2) { wid->show(); }
 					else { wid->hide(); }
 				}
 				else { wid->show(); }
@@ -284,7 +282,7 @@ int LinkedModelGroupLayout::doLayout(const QRect &rect, bool testOnly) const
 		}
 		else
 		{
-			if(wid) { wid->hide(); }
+			if (wid) { wid->hide(); }
 		}
 	}
 	return y + lineHeight - rect.y() + bottom;
