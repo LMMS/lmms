@@ -1,5 +1,5 @@
 /*
- * LinkedModelGroups.h - base classes for groups of linkable models
+ * LinkedModelGroups.h - base classes for groups of linked models
  *
  * Copyright (c) 2019-2019 Johannes Lorenz <j.git$$$lorenz-ho.me, $$$=@>
  *
@@ -40,9 +40,13 @@
 
 
 /**
-	Base class for a group of linkable models
+	Base class for a group of linked models
 
 	See the LinkedModelGroup class for explenations
+
+	Features:
+	* Models are stored by their QObject::objectName
+	* Models are linked automatically
 */
 class LinkedModelGroup : public Model
 {
@@ -51,13 +55,10 @@ public:
 		Initialization
 	*/
 	//! @param parent model of the LinkedModelGroups class
-	//! @param curProc number of this processor, counted from 0
-	//! @param nProc total number of processors
-	LinkedModelGroup(Model* parent, std::size_t curProc) :
-		Model(parent), m_curProc(curProc) {}
+	LinkedModelGroup(Model* parent) : Model(parent) {}
 
 	/*
-		Linking
+		Linking (initially only)
 	*/
 	void linkControls(LinkedModelGroup *other);
 
@@ -73,10 +74,11 @@ public:
 			: m_name(name), m_model(model) {}
 	};
 
+	// TODO: refactor those 2
 	template<class Functor>
 	void foreach_model(const Functor& ftor)
 	{
-		for(auto itr = d.m_models.begin(); itr != d.m_models.end(); ++itr)
+		for(auto itr = m_models.begin(); itr != m_models.end(); ++itr)
 		{
 			ftor(itr->first, itr->second);
 		}
@@ -85,13 +87,13 @@ public:
 	template<class Functor>
 	void foreach_model(const Functor& ftor) const
 	{
-		for(auto itr = d.m_models.cbegin(); itr != d.m_models.cend(); ++itr)
+		for(auto itr = m_models.cbegin(); itr != m_models.cend(); ++itr)
 		{
 			ftor(itr->first, itr->second);
 		}
 	}
 
-	std::size_t modelNum() const { return models().size(); }
+	std::size_t modelNum() const { return m_models.size(); }
 
 	// this is bad style (redirecting into the sub-class), but this class
 	// will be married with the sub-classes (Lv2Proc, SpaProc) anyways,
@@ -101,58 +103,32 @@ public:
 	/*
 		Load/Save
 	*/
-	//! @param lmg0 The linking model group with index 0
 	void saveValues(class QDomDocument& doc, class QDomElement& that);
-	//! @param lmg0 The linking model group with index 0
 	void loadValues(const class QDomElement& that);
-
-	/*
-		General
-	*/
-	std::size_t curProc() const { return m_curProc; }
 
 protected:
 	//! Register a further model
 	void addModel(class AutomatableModel* model, const QString& name);
-	//! Remove all models and all link-enabled models
+	//! Remove all models
 	void clearModels();
 
 private:
-	// TODO: remove
-	std::map<std::string, ModelInfo>& models() { return d.m_models; }
-	const std::map<std::string, ModelInfo>& models() const { return d.m_models; }
-
-	struct
-	{
-		//! models for the controls; the vector defines indices for the controls
-		std::map<std::string, ModelInfo> m_models;
-	} d;
-
-	std::size_t m_curProc;
+	//! models for the controls
+	std::map<std::string, ModelInfo> m_models;
 };
 
 
 /**
-	Container for multiple equal groups of linked models
+	Container for a group of linked models
 
 	Each group contains the same models and model types. The models are
-	numbered, and equal numbered models are associated and can be linked.
+	numbered, and equal numbered models are associated and always linked.
 
 	A typical application are two mono plugins making a stereo plugin.
 
-	Inheriting classes need to do the following connections:
-
-	\code
-		if (multiChannelLinkModel())
-		{
-			connect(multiChannelLinkModel(), &BoolModel::dataChanged,
-				this, [this](){updateLinkStatesFromGlobal();},
-				Qt::DirectConnection);
-			connect(getGroup(0), &LinkedModelGroup::linkStateChanged,
-				this, [this](std::size_t id, bool value){
-				linkModel(id, value);}, Qt::DirectConnection);
-		}
-	\endcode
+	@note Though this class can contain multiple model groups, a corresponding
+	view ("LinkedModelGroupViews") will only display one group, as they all have
+	the same values
 
 	@note Though called "container", this class does not contain, but only
 	know the single groups. The inheriting classes are responsible for storage.

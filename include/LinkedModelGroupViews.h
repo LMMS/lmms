@@ -1,5 +1,5 @@
 /*
- * LinkedModelGroupViews.h - views for groups of linkable models
+ * LinkedModelGroupViews.h - view for groups of linkable models
  *
  * Copyright (c) 2019-2019 Johannes Lorenz <j.git$$$lorenz-ho.me, $$$=@>
  *
@@ -39,8 +39,7 @@
 
 
 /**
-	View for one processor, LinkedModelGroupsViewBase contains 2
-	of those for mono plugins.
+	View for a representative processor
 
 	@note Neither this class, nor any inheriting classes, shall inherit
 		ModelView. The "view" in the name is just for consistency
@@ -52,8 +51,6 @@ public:
 	/**
 		@param colNum numbers of columns for the controls
 			(link LEDs not counted)
-		@param name Name for the group, like "Left" or "Group 1",
-			automatically set if not given
 	*/
 	LinkedModelGroupView(QWidget *parent, class LinkedModelGroup* model,
 		std::size_t colNum);
@@ -78,18 +75,12 @@ private:
 	//! column number in surrounding grid in LinkedModelGroupsView
 	std::size_t m_colNum;
 	class LinkedModelGroupLayout* m_layout;
-	struct WidgetsPerModel
-	{
-		std::unique_ptr<class Control> m_ctrl;
-	};
-
-	std::map<std::string, WidgetsPerModel> m_widgets;
+	std::map<std::string, std::unique_ptr<class Control>> m_widgets;
 };
 
 
 /**
-	Base class for view for one plugin with linkable models.
-	Provides a global channel link LED.
+	Container class for one LinkedModelGroupView
 
 	@note It's intended this class does not inherit from ModelView.
 		Inheriting classes need to do that, see e.g. Lv2Instrument.h
@@ -103,8 +94,8 @@ protected:
 	void modelChanged(class LinkedModelGroups* ctrlBase);
 
 private:
-	//! The base class must return the adressed group view, or nullptr if index
-	//! is out of range
+	//! The base class must return the adressed group view,
+	//! which has the same value as "this"
 	virtual LinkedModelGroupView* getGroupView() = 0;
 };
 
