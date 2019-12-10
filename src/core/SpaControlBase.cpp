@@ -43,13 +43,11 @@ SpaControlBase::SpaControlBase(Model* that, const QString& uniqueName,
 {
 	if (m_spaDescriptor)
 	{
-			std::size_t procId = 0;
 			int channelsLeft = DEFAULT_CHANNELS; // LMMS plugins are stereo
 			while (channelsLeft > 0)
 			{
 					std::unique_ptr<SpaProc> newOne(
-							new SpaProc(that, m_spaDescriptor, procId++,
-										settingsType));
+							new SpaProc(that, m_spaDescriptor, settingsType));
 					if (newOne->isValid())
 					{
 						channelsLeft -= std::max(

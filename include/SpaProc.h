@@ -26,7 +26,7 @@ signals:
 	void modelAdded(AutomatableModel* added);
 	void modelRemoved(AutomatableModel* removed);
 public:
-	SpaProc(Model *parent, const spa::descriptor* desc, std::size_t curProc,
+	SpaProc(Model *parent, const spa::descriptor* desc,
 			DataFile::Types settingsType);
 	~SpaProc() override;
 	//! Check if ctor succeeded

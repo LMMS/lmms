@@ -15,8 +15,8 @@
 #include "Mixer.h"
 #include "SpaOscModel.h"
 
-SpaProc::SpaProc(Model *parent, const spa::descriptor* desc, std::size_t curProc, DataFile::Types settingsType) :
-	LinkedModelGroup(parent, curProc),
+SpaProc::SpaProc(Model *parent, const spa::descriptor* desc, DataFile::Types settingsType) :
+	LinkedModelGroup(parent),
 	m_spaDescriptor(desc),
 	m_ports(Engine::mixer()->framesPerPeriod()),
 	m_settingsType(settingsType)

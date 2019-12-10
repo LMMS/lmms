@@ -1,5 +1,5 @@
 /*
- * LinkedModelGroups.cpp - base classes for groups of linkable models
+ * LinkedModelGroups.cpp - base classes for groups of linked models
  *
  * Copyright (c) 2019-2019 Johannes Lorenz <j.git$$$lorenz-ho.me, $$$=@>
  *
@@ -42,8 +42,8 @@ void LinkedModelGroup::linkControls(LinkedModelGroup *other)
 {
 	foreach_model([&other](const std::string& id, ModelInfo& inf)
 	{
-		auto itr2 = other->models().find(id);
-		Q_ASSERT(itr2 != other->models().end());
+		auto itr2 = other->m_models.find(id);
+		Q_ASSERT(itr2 != other->m_models.end());
 		AutomatableModel::linkModels(inf.m_model, itr2->second.m_model);
 	});
 }
@@ -55,7 +55,7 @@ void LinkedModelGroup::saveValues(QDomDocument &doc, QDomElement &that)
 {
 	foreach_model([&doc, &that](const std::string& , ModelInfo& inf)
 	{
-		inf.m_model->saveSettings(doc, that, /*models()[idx].m_name*/ inf.m_name); /* TODO: m_name useful */
+		inf.m_model->saveSettings(doc, that, /*m_models[idx].m_name*/ inf.m_name); /* TODO: m_name useful */
 	});
 }
 
@@ -67,7 +67,7 @@ void LinkedModelGroup::loadValues(const QDomElement &that)
 	foreach_model([&that](const std::string& , ModelInfo& inf)
 	{
 		// try to load, if it fails, this will load a sane initial value
-		inf.m_model->loadSettings(that, /*models()[idx].m_name*/ inf.m_name); /* TODO: m_name useful */
+		inf.m_model->loadSettings(that, /*m_models()[idx].m_name*/ inf.m_name); /* TODO: m_name useful */
 	});
 }
 
@@ -77,7 +77,7 @@ void LinkedModelGroup::loadValues(const QDomElement &that)
 void LinkedModelGroup::addModel(AutomatableModel *model, const QString &name)
 {
 	model->setObjectName(name);
-	models().emplace(std::string(name.toUtf8().data()), ModelInfo(name, model));
+	m_models.emplace(std::string(name.toUtf8().data()), ModelInfo(name, model));
 }
 
 
@@ -85,9 +85,7 @@ void LinkedModelGroup::addModel(AutomatableModel *model, const QString &name)
 
 void LinkedModelGroup::clearModels()
 {
-	using datatype = decltype(d);
-	d.~datatype();
-	new (&d) datatype();
+	m_models.clear();
 }
 
 

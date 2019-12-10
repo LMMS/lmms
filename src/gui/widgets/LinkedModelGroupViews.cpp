@@ -1,5 +1,5 @@
 /*
- * LinkedModelGroupViews.h - views for groups of linkable models
+ * LinkedModelGroupViews.h - view for groups of linkable models
  *
  * Copyright (c) 2019-2019 Johannes Lorenz <j.git$$$lorenz-ho.me, $$$=@>
  *
@@ -74,7 +74,7 @@ void LinkedModelGroupView::modelChanged(LinkedModelGroup *group)
 		}
 		else
 		{
-			itr->second.m_ctrl->setModel(minf.m_model);
+			itr->second->setModel(minf.m_model);
 		}
 	});
 
@@ -93,10 +93,6 @@ void LinkedModelGroupView::addControl(Control* ctrl, const std::string& id,
 		QWidget* box = new QWidget(this);
 		QHBoxLayout* boxLayout = new QHBoxLayout(box);
 
-		// book-keeper of widget pointers
-		WidgetsPerModel widgets;
-
-		widgets.m_ctrl.reset(ctrl);
 		boxLayout->addWidget(ctrl->topWidget());
 
 		if (removable)
@@ -120,14 +116,11 @@ void LinkedModelGroupView::addControl(Control* ctrl, const std::string& id,
 		box->setObjectName(QString::fromStdString(display));
 		m_layout->addWidget(box);
 
-		m_widgets.emplace(id, std::move(widgets)); // TODO: use set?
+		m_widgets.emplace(id, ctrl); // TODO: use set?
 		++wdgNum;
 	}
 
-	if(isHidden()) { setHidden(false); }
-
-	// matter of taste (takes a lot of space):
-	// makeAllGridCellsEqualSized();
+	if(isHidden()) { setHidden(false); } // TODO: can be removed?
 }
 
 
@@ -152,38 +145,6 @@ void LinkedModelGroupView::removeControl(const QString& key)
 		// repaint immediately, so we don't have dangling model views
 		m_layout->update();
 	}
-}
-
-
-
-
-void LinkedModelGroupView::makeAllGridCellsEqualSized()
-{
-#if 0
-	int rowHeight = 0, colWidth = 0;
-	for (int row = 0; row < m_layout->rowCount(); ++row)
-	{
-		for (int col = 0; col < m_layout->columnCount(); ++col)
-		{
-			QLayoutItem* layout;
-			if ((layout = m_layout->itemAtPosition(row, col)))
-			{
-				rowHeight = qMax(rowHeight, layout->geometry().height());
-				colWidth = qMax(colWidth, layout->geometry().width());
-			}
-		}
-	}
-
-	for (int row = 0; row < m_layout->rowCount(); ++row)
-	{
-		m_layout->setRowMinimumHeight(row, rowHeight);
-	}
-
-	for (int col = 0; col < m_layout->columnCount(); ++col)
-	{
-		m_layout->setColumnMinimumWidth(col, colWidth);
-	}
-#endif
 }
 
 
