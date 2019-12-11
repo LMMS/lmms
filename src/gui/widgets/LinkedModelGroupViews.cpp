@@ -42,9 +42,6 @@ LinkedModelGroupView::LinkedModelGroupView(QWidget* parent,
 	m_colNum(colNum),
 	m_layout(new LinkedModelGroupLayout(this))
 {
-	// make viewable: if there are no knobs, the user should at least see
-	// a rectangle to drop controls in
-	setMinimumSize(QSize(50, 50));
 }
 
 
