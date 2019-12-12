@@ -32,8 +32,6 @@
 #include "lmms_math.h"
 #include "MemoryManager.h"
 
-/** \brief A basic LMMS ring buffer for single-thread use. For thread and realtime safe alternative see LocklessRingBuffer.
-*/
 class LMMS_EXPORT RingBuffer : public QObject
 {
 	Q_OBJECT

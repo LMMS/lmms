@@ -34,6 +34,3 @@
 [submodule "doc/wiki"]
 	path = doc/wiki
 	url = https://github.com/lmms/lmms.wiki.git
-[submodule "src/3rdparty/ringbuffer"]
-	path = src/3rdparty/ringbuffer
-	url = https://github.com/JohannesLorenz/ringbuffer.git
