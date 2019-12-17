@@ -610,16 +610,14 @@ void Song::updateLength()
 {
 	m_length = 0;
 	m_tracksMutex.lockForRead();
-	for( TrackList::const_iterator it = tracks().begin();
-						it != tracks().end(); ++it )
+	for (auto track : tracks())
 	{
-		if( Engine::getSong()->isExporting() &&
-				( *it )->isMuted() )
+		if (m_exporting && track->isMuted())
 		{
 			continue;
 		}
 
-		const bar_t cur = ( *it )->length();
+		const bar_t cur = track->length();
 		if( cur > m_length )
 		{
 			m_length = cur;
@@ -742,6 +740,10 @@ void Song::stop()
 void Song::startExport()
 {
 	stop();
+
+	m_exporting = true;
+	updateLength();
+
 	if (m_renderBetweenMarkers)
 	{
 		m_exportSongBegin = m_exportLoopBegin = m_playPos[Mode_PlaySong].m_timeLine->loopBegin();
@@ -778,8 +780,6 @@ void Song::startExport()
 	m_loopRenderRemaining = m_loopRenderCount;
 
 	playSong();
-
-	m_exporting = true;
 
 	m_vstSyncController.setPlaybackState( true );
 }

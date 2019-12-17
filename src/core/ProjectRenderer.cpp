@@ -181,7 +181,6 @@ void ProjectRenderer::run()
 	PerfLogTimer perfLog("Project Render");
 
 	Engine::getSong()->startExport();
-	Engine::getSong()->updateLength();
 	// Skip first empty buffer.
 	Engine::mixer()->nextBuffer();
 
