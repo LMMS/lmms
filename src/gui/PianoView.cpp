@@ -107,9 +107,9 @@ PianoView::PianoView( QWidget * _parent ) :
 		s_blackKeyPressedPm = new QPixmap( embed::getIconPixmap( "black_key_pressed" ) );
 	}
 
-	setAttribute( Qt::WA_OpaquePaintEvent, true );
-	setFocusPolicy( Qt::StrongFocus );
-	setMaximumWidth( WhiteKeysPerOctave * NumOctaves * PW_WHITE_KEY_WIDTH );
+	setAttribute(Qt::WA_OpaquePaintEvent, true);
+	setFocusPolicy(Qt::StrongFocus);
+	setMaximumWidth(WhiteKeysPerOctave * NumKeys * PW_WHITE_KEY_WIDTH / KeysPerOctave);
 
 	// create scrollbar at the bottom
 	m_pianoScroll = new QScrollBar( Qt::Horizontal, this );
@@ -684,14 +684,13 @@ void PianoView::focusOutEvent( QFocusEvent * )
  *  After resizing we need to adjust range of scrollbar for not allowing
  *  to scroll too far to the right.
  *
- *  \param _event resize-event object (unused)
+ *  \param event resize-event object (unused)
  */
-void PianoView::resizeEvent( QResizeEvent * _event )
+void PianoView::resizeEvent(QResizeEvent* event)
 {
-	QWidget::resizeEvent( _event );
-	m_pianoScroll->setRange( 0, WhiteKeysPerOctave * NumOctaves -
-					(int) ceil( (float) width() /
-							PW_WHITE_KEY_WIDTH ) );
+	QWidget::resizeEvent(event);
+	m_pianoScroll->setRange(0, WhiteKeysPerOctave * (NumKeys + 1) / KeysPerOctave -
+					(int)ceil((float)width() / PW_WHITE_KEY_WIDTH));
 }
 
 
@@ -819,13 +818,11 @@ void PianoView::paintEvent( QPaintEvent * )
 
 		x += PW_WHITE_KEY_WIDTH;
 
-		if( (Keys) (cur_key%KeysPerOctave) == Key_C )
+		if ((Keys)(cur_key % KeysPerOctave) == Key_C)
 		{
-			// label key of note C with "C" and number of current
-			// octave
-			p.drawText( x - PW_WHITE_KEY_WIDTH, LABEL_TEXT_SIZE + 2,
-					QString( "C" ) + QString::number(
-					cur_key / KeysPerOctave, 10 ) );
+			// label key of note C with "C" and number of current octave
+			p.drawText(x - PW_WHITE_KEY_WIDTH, LABEL_TEXT_SIZE + 2,
+					   QString("C") + QString::number(FirstOctave + cur_key / KeysPerOctave));
 		}
 		++cur_key;
 	}
@@ -849,19 +846,19 @@ void PianoView::paintEvent( QPaintEvent * )
 	}
 
 	// now draw all black keys...
-	for( int x = 0; x < width(); )
+	for (int x = 0; x < width();)
 	{
-		if( Piano::isBlackKey( cur_key ) )
+		if (Piano::isBlackKey(cur_key))
 		{
 			// draw pressed or not pressed key, depending on
 			// state of current key
-			if( m_piano && m_piano->isKeyPressed( cur_key ) )
+			if (m_piano && m_piano->isKeyPressed(cur_key))
 			{
-				p.drawPixmap( x + PW_WHITE_KEY_WIDTH / 2, PIANO_BASE, *s_blackKeyPressedPm );
+				p.drawPixmap(x + PW_WHITE_KEY_WIDTH / 2, PIANO_BASE, *s_blackKeyPressedPm);
 			}
 			else
 			{
-				p.drawPixmap( x + PW_WHITE_KEY_WIDTH / 2, PIANO_BASE, *s_blackKeyPm );
+				p.drawPixmap(x + PW_WHITE_KEY_WIDTH / 2, PIANO_BASE, *s_blackKeyPm);
 			}
 			x += PW_WHITE_KEY_WIDTH;
 			white_cnt = 0;
@@ -871,12 +868,13 @@ void PianoView::paintEvent( QPaintEvent * )
 			// simple workaround for increasing x if there were two
 			// white keys (e.g. between E and F)
 			++white_cnt;
-			if( white_cnt > 1 )
+			if (white_cnt > 1)
 			{
 				x += PW_WHITE_KEY_WIDTH;
 			}
 		}
-		++cur_key;
+		// stop drawing when all keys are drawn, even if an extra black key could fit
+		if (++cur_key == NumKeys) {break;}
 	}
 }
 

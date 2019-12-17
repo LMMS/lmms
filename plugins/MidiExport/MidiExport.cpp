@@ -129,8 +129,7 @@ bool MidiExport::tryExport(const TrackContainer::TrackList &tracks,
 				if (n.nodeName() == "instrumenttrack")
 				{
 					QDomElement it = n.toElement();
-					// transpose +12 semitones, workaround for #1857
-					base_pitch = (69 - it.attribute("basenote", "57").toInt());
+					base_pitch = (69 - it.attribute("basenote", "69").toInt());
 					if (it.attribute("usemasterpitch", "1").toInt())
 					{
 						base_pitch += masterPitch;
@@ -200,8 +199,7 @@ bool MidiExport::tryExport(const TrackContainer::TrackList &tracks,
 			if (n.nodeName() == "instrumenttrack")
 			{
 				QDomElement it = n.toElement();
-				// transpose +12 semitones, workaround for #1857
-				base_pitch = (69 - it.attribute("basenote", "57").toInt());
+				base_pitch = (69 - it.attribute("basenote", "69").toInt());
 				if (it.attribute("usemasterpitch", "1").toInt())
 				{
 					base_pitch += masterPitch;
