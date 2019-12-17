@@ -121,11 +121,11 @@ QPixmap * PianoRoll::s_toolOpen = NULL;
 
 TextFloat * PianoRoll::s_textFloat = NULL;
 
-static QString s_noteStrings[12] = { "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"};
+static QString s_noteStrings[12] = {"C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"};
 
-static QString getNoteString( int key )
+static QString getNoteString(int key)
 {
-	return s_noteStrings[key % 12] + QString::number( static_cast<int>( key / KeysPerOctave ) );
+	return s_noteStrings[key % 12] + QString::number(static_cast<int>(FirstOctave + key / KeysPerOctave));
 }
 
 // used for drawing of piano
@@ -738,11 +738,10 @@ void PianoRoll::setCurrentPattern( Pattern* newPattern )
 		}
 	}
 
-	if( total_notes > 0 )
+	if (total_notes > 0)
 	{
-		central_key = central_key / total_notes -
-				( KeysPerOctave * NumOctaves - m_totalKeysToScroll ) / 2;
-		m_startKey = qBound( 0, central_key, NumOctaves * KeysPerOctave );
+		central_key = central_key / total_notes - (NumKeys - m_totalKeysToScroll) / 2;
+		m_startKey = qBound(0, central_key, NumKeys);
 	}
 
 	// resizeEvent() does the rest for us (scrolling, range-checking
@@ -2972,6 +2971,9 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 			break;
 		}
 
+		// override for the last MIDI key (G9)
+		if (key == NumKeys - 1) {yCorrectionForNoteLabels = 2;}
+
 		if( Piano::isWhiteKey( key ) )
 		{
 			// Draw note names if activated in the preferences, C notes are always drawn
@@ -2979,7 +2981,7 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 			{
 				QString noteString = getNoteString( key );
 
-				QPoint textStart( WHITE_KEY_WIDTH - 18, key_line_y );
+				QPoint textStart( WHITE_KEY_WIDTH - 20, key_line_y );
 				textStart += QPoint( 0, yCorrectionForNoteLabels );
 
 				p.setPen( textShadow() );
@@ -3488,17 +3490,15 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 
 
 // responsible for moving/resizing scrollbars after window-resizing
-void PianoRoll::resizeEvent(QResizeEvent * re)
+void PianoRoll::resizeEvent(QResizeEvent* re)
 {
-	m_leftRightScroll->setGeometry( WHITE_KEY_WIDTH,
-								      height() -
-								SCROLLBAR_SIZE,
-					width()-WHITE_KEY_WIDTH,
-							SCROLLBAR_SIZE );
+	m_leftRightScroll->setGeometry(WHITE_KEY_WIDTH,
+								   height() - SCROLLBAR_SIZE,
+								   width() - WHITE_KEY_WIDTH,
+								   SCROLLBAR_SIZE);
 	updateYScroll();
 
-	Engine::getSong()->getPlayPos( Song::Mode_PlayPattern
-					).m_timeLine->setFixedWidth( width() );
+	Engine::getSong()->getPlayPos(Song::Mode_PlayPattern).m_timeLine->setFixedWidth(width());
 
 	update();
 }
@@ -3664,23 +3664,16 @@ void PianoRoll::focusOutEvent( QFocusEvent * )
 
 
 
-int PianoRoll::getKey(int y ) const
+int PianoRoll::getKey(int y) const
 {
 	int key_line_y = keyAreaBottom() - 1;
 	// pressed key on piano
-	int key_num = ( key_line_y - y ) / m_keyLineHeight;
+	int key_num = (key_line_y - y) / m_keyLineHeight;
 	key_num += m_startKey;
 
 	// some range-checking-stuff
-	if( key_num < 0 )
-	{
-		key_num = 0;
-	}
-
-	if( key_num >= KeysPerOctave * NumOctaves )
-	{
-		key_num = KeysPerOctave * NumOctaves - 1;
-	}
+	if (key_num < 0) {key_num = 0;}
+	if (key_num >= NumKeys) {key_num = NumKeys - 1;}
 
 	return key_num;
 }
@@ -4050,10 +4043,8 @@ void PianoRoll::updateYScroll()
 						height() - PR_TOP_MARGIN -
 						SCROLLBAR_SIZE);
 
-	int total_pixels = m_octaveHeight * NumOctaves - (height() -
-					PR_TOP_MARGIN - PR_BOTTOM_MARGIN -
-							m_notesEditHeight);
-	m_totalKeysToScroll = total_pixels * KeysPerOctave / m_octaveHeight;
+	const int visible_space = height() - PR_TOP_MARGIN - PR_BOTTOM_MARGIN - m_notesEditHeight;
+	m_totalKeysToScroll = NumKeys - 1 - visible_space / m_keyLineHeight;
 
 	m_topBottomScroll->setRange(0, m_totalKeysToScroll);
 

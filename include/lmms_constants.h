@@ -51,7 +51,7 @@ const float F_E_R = (float) LD_E_R;
 
 // Frequency ranges (in Hz).
 // Arbitrary low limit for logarithmic frequency scale; >1 Hz.
-const int LOWEST_LOG_FREQ = 10;
+const int LOWEST_LOG_FREQ = 5;
 
 // Full range is defined by LOWEST_LOG_FREQ and current sample rate.
 enum FREQUENCY_RANGES

@@ -55,6 +55,7 @@ enum Keys
 
 enum Octaves
 {
+	Octave_m1,	// MIDI standard starts at C-1
 	Octave_0,
 	Octave_1,
 	Octave_2,
@@ -64,15 +65,16 @@ enum Octaves
 	Octave_6,
 	Octave_7,
 	Octave_8,
+	Octave_9,	// incomplete octave, MIDI only goes up to G9
 	NumOctaves
-} ;
+};
 
-
+const int FirstOctave = -1;
 const int WhiteKeysPerOctave = 7;
 const int BlackKeysPerOctave = 5;
 const int KeysPerOctave = WhiteKeysPerOctave + BlackKeysPerOctave;
-const int NumKeys = NumOctaves * KeysPerOctave;
-const int DefaultKey = DefaultOctave*KeysPerOctave + Key_A;
+const int NumKeys = qMin(NumOctaves * KeysPerOctave, 128);	// limited to MIDI range
+const int DefaultKey = DefaultOctave * KeysPerOctave + Key_A;
 
 const float MaxDetuning = 4 * 12.0f;
 
