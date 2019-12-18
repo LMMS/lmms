@@ -19,8 +19,10 @@ SpaProc::SpaProc(Model *parent, const spa::descriptor* desc, DataFile::Types set
 	LinkedModelGroup(parent),
 	m_spaDescriptor(desc),
 	m_ports(Engine::mixer()->framesPerPeriod()),
+//	writeOscInUse(ATOMIC_FLAG_INIT), // not MSVC-compatible, workaround below
 	m_settingsType(settingsType)
 {
+	m_writeOscInUse.clear(); // workaround
 	initPlugin();
 }
 
@@ -364,10 +366,15 @@ void SpaProc::initPlugin()
 	}
 }
 
+// TODO: maybe use event queue...
 void SpaProc::writeOsc(
 	const char *dest, const char *args, va_list va)
 {
+	// spinlock on atomic; realtime safe as the write function is very fast
+	 while (m_writeOscInUse.test_and_set(std::memory_order_acquire))  // acquire lock
+		; // spin
 	m_ports.rb->write(dest, args, va);
+	m_writeOscInUse.clear(std::memory_order_release);
 }
 
 void SpaProc::writeOsc(const char *dest, const char *args, ...)

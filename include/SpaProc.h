@@ -107,6 +107,7 @@ public:
 private:
 	friend struct LmmsVisitor;
 	friend struct TypeChecker;
+	std::atomic_flag m_writeOscInUse;
 	bool m_valid = true;
 	const DataFile::Types m_settingsType;
 
