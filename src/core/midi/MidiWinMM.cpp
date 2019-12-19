@@ -203,7 +203,7 @@ void MidiWinMM::handleInputEvent( HMIDIIN hm, DWORD ev )
 	const MidiPortList & l = m_inputSubs[d];
 	for (MidiPortList::ConstIterator it = l.begin(); it != l.end(); ++it)
 	{
-		switch(cmdtype)
+		switch (cmdtype)
 		{
 			case MidiNoteOn:
 			case MidiNoteOff:
@@ -301,4 +301,3 @@ void MidiWinMM::openDevices()
 
 
 #endif
-
