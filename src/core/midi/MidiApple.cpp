@@ -330,10 +330,14 @@ void MidiApple::HandleReadCallback( const MIDIPacketList *pktlist, void *srcConn
 					case MidiControlChange:		//0xB0:
 					case MidiProgramChange:		//0xC0:
 					case MidiChannelPressure:	//0xD0:
-						notifyMidiPortList(m_inputSubs[refName], MidiEvent(cmdtype, messageChannel, par1, par2 & 0xff, &endPointRef));
+						notifyMidiPortList(
+							m_inputSubs[refName],
+							MidiEvent(cmdtype, messageChannel, par1, par2 & 0xff, &endPointRef));
 						break;
 					case MidiPitchBend:			//0xE0:
-						notifyMidiPortList(m_inputSubs[refName], MidiEvent(cmdtype, messageChannel, par1 + par2 * 128, 0, &endPointRef));
+						notifyMidiPortList(
+							m_inputSubs[refName],
+							MidiEvent(cmdtype, messageChannel, par1 + par2 * 128, 0, &endPointRef));
 						break;
 					case MidiActiveSensing:		//0xF0
 					case 0xF0:

@@ -3470,14 +3470,16 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 // responsible for moving/resizing scrollbars after window-resizing
 void PianoRoll::resizeEvent(QResizeEvent* re)
 {
-	m_leftRightScroll->setGeometry(WHITE_KEY_WIDTH,
-								   height() - SCROLLBAR_SIZE,
-								   width() - WHITE_KEY_WIDTH,
-								   SCROLLBAR_SIZE);
-	m_topBottomScroll->setGeometry(width() - SCROLLBAR_SIZE,
-								   PR_TOP_MARGIN,
-								   SCROLLBAR_SIZE,
-								   height() - PR_TOP_MARGIN - SCROLLBAR_SIZE);
+	m_leftRightScroll->setGeometry(
+		WHITE_KEY_WIDTH,
+		height() - SCROLLBAR_SIZE,
+		width() - WHITE_KEY_WIDTH,
+		SCROLLBAR_SIZE);
+	m_topBottomScroll->setGeometry(
+		width() - SCROLLBAR_SIZE,
+		PR_TOP_MARGIN,
+		SCROLLBAR_SIZE,
+		height() - PR_TOP_MARGIN - SCROLLBAR_SIZE);
 
 	int visible_space = height() - PR_TOP_MARGIN - PR_BOTTOM_MARGIN - m_notesEditHeight;
 	m_totalKeysToScroll = NumKeys - 1 - visible_space / KEY_LINE_HEIGHT;
