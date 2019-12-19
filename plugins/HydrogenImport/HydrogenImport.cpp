@@ -122,7 +122,7 @@ public:
 		else if ( sKey == "B" ) {
 			m_key = NoteKey::B;
 		} 
-        return m_key + (nOctave*12)+57;
+        return m_key + ((nOctave - FirstOctave) * 12) + 69;
 	}
 
 };

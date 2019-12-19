@@ -33,7 +33,6 @@
 
 #include "Instrument.h"
 #include "InstrumentView.h"
-#include "Note.h"
 #include "CustomTextKnob.h"
 #include "SubWindow.h"
 #include "AutomatableModel.h"
