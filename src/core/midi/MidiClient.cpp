@@ -217,7 +217,7 @@ void MidiClientRaw::parseData( const unsigned char c )
 	m_midiParseData.m_midiEvent.setType(static_cast<MidiEventTypes>(m_midiParseData.m_status));
 	m_midiParseData.m_midiEvent.setChannel(m_midiParseData.m_channel);
 	m_midiParseData.m_bytes = 0; /* Related to running status! */
-	switch(m_midiParseData.m_midiEvent.type())
+	switch (m_midiParseData.m_midiEvent.type())
 	{
 		case MidiNoteOff:
 		case MidiNoteOn:
@@ -325,5 +325,4 @@ int MidiClientRaw::eventLength( const unsigned char event )
 	}
 	return 1;
 }
-
 
