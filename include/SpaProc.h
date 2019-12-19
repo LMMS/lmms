@@ -16,7 +16,7 @@ class SpaProc : public LinkedModelGroup
 	Q_OBJECT
 	friend class SpaViewBase;
 
-
+	// Dictionary for all models used - whether there by default or added
 	QMap<QString, AutomatableModel *> m_connectedModels;
 signals:
 	// NOTE: when separating core from UI, this will need to be removed
@@ -90,6 +90,8 @@ public:
 		};
 
 		//! these are forwarded to the user in the LMMS-internal GUI
+		//! inited at plugin initialization time
+		//! right after initing, they are added to LinkedModelGroup class
 		std::vector<TypedPorts> m_userPorts;
 		LmmsPorts(int bufferSize);
 		std::unique_ptr<spa::audio::osc_ringbuffer> rb;

@@ -82,8 +82,6 @@ SpaControlBase::SpaControlBase(Model* that, const QString& uniqueName,
 
 void SpaControlBase::saveSettings(QDomDocument &doc, QDomElement &that)
 {
-	LinkedModelGroups::saveSettings(doc, that);
-
 	if (m_procs.empty()) { /* don't even add a "states" node */ }
 	else
 	{
@@ -100,11 +98,14 @@ void SpaControlBase::saveSettings(QDomDocument &doc, QDomElement &that)
 			m_procs[chanIdx]->saveState(doc, channel);
 		}
 	}
+
+	LinkedModelGroups::saveSettings(doc, that);
 }
 
 void SpaControlBase::loadSettings(const QDomElement &that)
 {
-	LinkedModelGroups::loadSettings(that);
+	// first load state, then the ports ("settings")
+	// if we first load the ports, those ports might not exist in current state
 
 	QDomElement states = that.firstChildElement("states");
 	if (!states.isNull() && (!m_procs.empty()))
@@ -121,6 +122,10 @@ void SpaControlBase::loadSettings(const QDomElement &that)
 		}
 	}
 
+	// this will load only initial models and ignore added models
+	LinkedModelGroups::loadSettings(that);
+
+	// TODO: now load added models, then call modelAtPort() for each
 }
 
 SpaControlBase::~SpaControlBase() {}
