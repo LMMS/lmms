@@ -29,7 +29,6 @@
 #include "AutomationPatternView.h"
 #include "AutomationTrack.h"
 #include "LocaleHelper.h"
-#include "Note.h"
 #include "ProjectJournal.h"
 #include "BBTrackContainer.h"
 #include "Song.h"
