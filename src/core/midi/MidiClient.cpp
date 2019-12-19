@@ -265,7 +265,7 @@ void MidiClientRaw::processParsedEvent()
 void MidiClientRaw::processOutEvent(const MidiEvent& event, const MidiTime &, const MidiPort* port)
 {
 	// TODO: also evaluate _time and queue event if necessary
-	switch(event.type())
+	switch (event.type())
 	{
 		case MidiNoteOn:
 		case MidiNoteOff:
@@ -325,4 +325,3 @@ int MidiClientRaw::eventLength( const unsigned char event )
 	}
 	return 1;
 }
-
