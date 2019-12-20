@@ -690,7 +690,7 @@ void PianoView::resizeEvent(QResizeEvent* event)
 {
 	QWidget::resizeEvent(event);
 	m_pianoScroll->setRange(0, WhiteKeysPerOctave * (NumKeys + 1) / KeysPerOctave -
-					(int)ceil((float)width() / PW_WHITE_KEY_WIDTH));
+					static_cast<int>(ceil(static_cast<float>(width()) / PW_WHITE_KEY_WIDTH)));
 }
 
 

@@ -1028,6 +1028,18 @@ void DataFile::upgrade_1_3_0()
 				child.setTagName( "opulenz" );
 			}
 		}
+		else if (
+			el.attribute("name") == "zynaddsubfx" ||
+			el.attribute("name") == "vestige" ||
+			el.attribute("name") == "carlapatchbay" ||
+			el.attribute("name") == "carlarack")
+		{
+			// LMMS note range has been extended to match MIDI spec. -> base note changed from 57 to 69.
+			// Affects all MIDI-based instruments except OpulenZ.
+			el.parentNode().toElement().setAttribute(
+				"basenote",
+				el.parentNode().toElement().attribute("basenote").toInt() + 12);
+		}
 	}
 
 	list = elementsByTagName( "effect" );
