@@ -26,7 +26,7 @@
 
 #include <QPushButton>
 #include "Controls.h"
-#include "LinkedModelGroupLayout.h"
+#include "ControlLayout.h"
 #include "LinkedModelGroups.h"
 
 
@@ -40,7 +40,7 @@ LinkedModelGroupView::LinkedModelGroupView(QWidget* parent,
 	QWidget(parent),
 	m_model(model),
 	m_colNum(colNum),
-	m_layout(new LinkedModelGroupLayout(this))
+	m_layout(new ControlLayout(this))
 {
 }
 

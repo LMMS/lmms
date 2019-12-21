@@ -72,7 +72,7 @@ private:
 
 	//! column number in surrounding grid in LinkedModelGroupsView
 	std::size_t m_colNum;
-	class LinkedModelGroupLayout* m_layout;
+	class ControlLayout* m_layout;
 	std::map<std::string, std::unique_ptr<class Control>> m_widgets;
 };
 

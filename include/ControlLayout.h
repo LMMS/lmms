@@ -1,5 +1,5 @@
 /*
- * LinkedModelGroupLayout.h - layout for LinkedModelGroup class
+ * ControlLayout.h - layout for controls
  *
  * Copyright (c) 2019-2019 Johannes Lorenz <j.git$$$lorenz-ho.me, $$$=@>
  *
@@ -70,8 +70,8 @@
 **
 ****************************************************************************/
 
-#ifndef LINKEDMODELGROUPLAYOUT_H
-#define LINKEDMODELGROUPLAYOUT_H
+#ifndef CONTROLLAYOUT_H
+#define CONTROLLAYOUT_H
 
 #include <QLayout>
 #include <QMultiMap>
@@ -81,19 +81,21 @@ class QRect;
 class QString;
 
 /**
-	Layout for models
+	Layout for controls (models)
+
+	Originally token from Qt's FlowLayout example. Modified.
 
 	Features a search bar, as well as looking up widgets with string keys
 	Keys have to be provided in the widgets' objectNames
 */
-class LinkedModelGroupLayout : public QLayout
+class ControlLayout : public QLayout
 {
 	Q_OBJECT
 
 public:
-	explicit LinkedModelGroupLayout(QWidget *parent,
+	explicit ControlLayout(QWidget *parent,
 		int margin = -1, int hSpacing = -1, int vSpacing = -1);
-	~LinkedModelGroupLayout() override;
+	~ControlLayout() override;
 
 	void addItem(QLayoutItem *item) override;
 	int horizontalSpacing() const;
@@ -126,4 +128,4 @@ private:
 	class QLineEdit* m_searchBar;
 };
 
-#endif // LINKEDMODELGROUPLAYOUT_H
+#endif // CONTROLLAYOUT_H
