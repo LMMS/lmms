@@ -78,9 +78,10 @@ IF("${PLUGIN_LIST}" STREQUAL "")
 		stereo_enhancer
 		stereo_matrix
 		stk
-		vst_base
-		vestige
-		VstEffect
+		# all VST are buggy in this PR, remove them temporarily
+		# vst_base
+		# vestige
+		# VstEffect
 		watsyn
 		waveshaper
 		vibed
