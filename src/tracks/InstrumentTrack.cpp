@@ -57,6 +57,7 @@
 #include "Instrument.h"
 #include "InstrumentFunctionViews.h"
 #include "InstrumentMidiIOView.h"
+#include "InstrumentMiscView.h"
 #include "Knob.h"
 #include "LcdSpinBox.h"
 #include "LedCheckbox.h"

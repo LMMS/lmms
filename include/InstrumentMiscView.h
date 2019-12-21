@@ -1,8 +1,9 @@
 /*
- * InstrumentMidiIOView.h - widget in instrument-track-window for setting
- *                          up MIDI-related stuff
+ * InstrumentMiscView.h - widget in instrument-track-window for setting up
+ *                        miscellaneous options not covered by other tabs
  *
  * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2019 Martin Pavelek <he29.HS/at/gmail.com>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -23,46 +24,29 @@
  *
  */
 
-#ifndef INSTRUMENT_MIDI_IO_VIEW_H
-#define INSTRUMENT_MIDI_IO_VIEW_H
+#ifndef INSTRUMENT_MISC_VIEW_H
+#define INSTRUMENT_MISC_VIEW_H
 
 #include <QWidget>
 
-#include "ModelView.h"
-
 
 class GroupBox;
-class LcdSpinBox;
-class QToolButton;
-class LedCheckBox;
 class InstrumentTrack;
 
 
-class InstrumentMidiIOView : public QWidget, public ModelView
+class InstrumentMiscView : public QWidget
 {
 	Q_OBJECT
 public:
-	InstrumentMidiIOView( QWidget* parent );
-	virtual ~InstrumentMidiIOView();
+	InstrumentMiscView(InstrumentTrack *it, QWidget *parent);
+	~InstrumentMiscView();
 
+	GroupBox *pitchGroupBox() {return m_pitchGroupBox;}
+	GroupBox *microtunerGroupBox() {return m_microtunerGroupBox;}
 
 private:
-	void modelChanged() override;
-
-	GroupBox * m_midiInputGroupBox;
-	LcdSpinBox * m_inputChannelSpinBox;
-	LcdSpinBox * m_fixedInputVelocitySpinBox;
-	QToolButton * m_rpBtn;
-
-	GroupBox * m_midiOutputGroupBox;
-	LcdSpinBox * m_outputChannelSpinBox;
-	LcdSpinBox * m_fixedOutputVelocitySpinBox;
-	LcdSpinBox * m_outputProgramSpinBox;
-	LcdSpinBox * m_fixedOutputNoteSpinBox;
-	QToolButton * m_wpBtn;
-
-	LcdSpinBox* m_baseVelocitySpinBox;
-
-} ;
+	GroupBox *m_pitchGroupBox;
+	GroupBox *m_microtunerGroupBox;
+};
 
 #endif

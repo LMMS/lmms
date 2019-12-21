@@ -200,25 +200,3 @@ void InstrumentMidiIOView::modelChanged()
 		m_wpBtn->setMenu( mp->m_writablePortsMenu );
 	}
 }
-
-
-
-InstrumentMiscView::InstrumentMiscView(InstrumentTrack *it, QWidget *parent) :
-	QWidget( parent )
-{
-	QVBoxLayout* layout = new QVBoxLayout( this );
-	layout->setMargin( 5 );
-	m_pitchGroupBox = new GroupBox( tr ( "MASTER PITCH" ) );
-	layout->addWidget( m_pitchGroupBox );
-	QHBoxLayout* masterPitchLayout = new QHBoxLayout( m_pitchGroupBox );
-	masterPitchLayout->setContentsMargins( 8, 18, 8, 8 );
-	QLabel *tlabel = new QLabel(tr( "Enables the use of master pitch" ) );
-	m_pitchGroupBox->setModel( &it->m_useMasterPitchModel );
-	masterPitchLayout->addWidget( tlabel );
-	layout->addStretch();
-}
-
-InstrumentMiscView::~InstrumentMiscView()
-{
-
-}

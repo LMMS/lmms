@@ -31,7 +31,7 @@
 #include "Instrument.h"
 #include "Mixer.h"
 #include "Song.h"
-
+#include <iostream>
 
 NotePlayHandle::BaseDetuning::BaseDetuning( DetuningHelper *detuning ) :
 	m_value( detuning ? detuning->automationPattern()->valueAt( 0 ) : 0 )
@@ -501,14 +501,15 @@ bool NotePlayHandle::operator==( const NotePlayHandle & _nph ) const
 void NotePlayHandle::updateFrequency()
 {
 	int mp = m_instrumentTrack->m_useMasterPitchModel.value() ? Engine::getSong()->masterPitch() : 0;
-	const float pitch =
-		( key() -
-				m_instrumentTrack->baseNoteModel()->value() +
-				mp +
-				m_baseDetuning->value() )
-												 / 12.0f;
-	m_frequency = BaseFreq * powf( 2.0f, pitch + m_instrumentTrack->pitchModel()->value() / ( 100 * 12.0f ) );
-	m_unpitchedFrequency = BaseFreq * powf( 2.0f, pitch );
+
+	const float pitch = (key() - m_instrumentTrack->baseNoteModel()->value() + mp + m_baseDetuning->value()) / 12.0f;
+
+	// TODO: compute frequency based on values from microtuner;
+	// what about the pitch? Just keep the 100 cent range?
+	m_frequency = BaseFreq * powf(2.0f, pitch + m_instrumentTrack->pitchModel()->value() / (100 * 12.0f));
+
+	m_unpitchedFrequency = BaseFreq * powf(2.0f, pitch);
+std::cout<<"key "<<key()<<" freq "<<m_frequency<<std::endl;
 
 	for( NotePlayHandleList::Iterator it = m_subNotes.begin(); it != m_subNotes.end(); ++it )
 	{
