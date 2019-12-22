@@ -129,11 +129,12 @@ void Instrument::applyFadeIn(sampleFrame * buf, NotePlayHandle * n)
 	if (total == 0)
 	{
 		const fpp_t frames = n->framesLeftForCurrentPeriod();
+		const f_cnt_t offset = n->offset();
 
 		// We need to skip the first sample because it almost always
 		// produces a zero crossing; it's not helpful while
 		// determining the fade in length. Hence 1
-		int max_zc = count_zero_crossings(buf, 1, frames);
+		int max_zc = count_zero_crossings(buf, offset+1, offset+frames);
 
 		fpp_t length = getFadeInLength(MAX_FADE_IN_LENGTH,frames,max_zc);
 		n->m_fadeInLength = length;
@@ -144,7 +145,7 @@ void Instrument::applyFadeIn(sampleFrame * buf, NotePlayHandle * n)
 		{
 			for (ch_cnt_t ch = 0; ch < DEFAULT_CHANNELS; ++ch)
 			{
-				buf[f][ch] *= 0.5 - 0.5 * cosf(F_PI * (float) f / (float)n->m_fadeInLength);
+				buf[offset+f][ch] *= 0.5 - 0.5 * cosf(F_PI * (float) f / (float)n->m_fadeInLength);
 			}
 		}
 	}
