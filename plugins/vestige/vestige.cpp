@@ -415,6 +415,8 @@ void vestigeInstrument::changePreset(int bank, unsigned int preset)
 {
 	if (m_plugin)
 	{
+		int currentProgramNumber = m_plugin->currentProgram();
+		int newProgramNumber;
 		// The "empty" bank indicates that we need to handle it
 		// anyway. Since the list of VST plugins is continuous
 		// (excluding exceptions such as SQ8L), splitting it into
@@ -425,8 +427,12 @@ void vestigeInstrument::changePreset(int bank, unsigned int preset)
 		{
 			bank = 0;
 		}
-		m_plugin->setProgram((bank << 7) | preset);
-		emit presetChanged();
+		newProgramNumber = (bank << 7) | preset;
+		if (newProgramNumber != currentProgramNumber)
+		{
+			m_plugin->setProgram(newProgramNumber);
+			emit presetChanged();
+		}
 	}
 }
 
