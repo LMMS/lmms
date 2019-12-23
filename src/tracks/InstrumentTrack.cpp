@@ -981,7 +981,7 @@ void InstrumentTrack::changePreset()
 		else
 		{
 			m_instrument->changePreset(-1, m_programNumber);
-	}
+		}
 	}
 }
 
