@@ -109,10 +109,13 @@ const int NUM_TRIPLET_LENGTHS = 5;
 
 QPixmap * PianoRoll::s_whiteKeySmallPm = NULL;
 QPixmap * PianoRoll::s_whiteKeySmallPressedPm = NULL;
+QPixmap * PianoRoll::s_whiteKeySmallDisabledPm = NULL;
 QPixmap * PianoRoll::s_whiteKeyBigPm = NULL;
 QPixmap * PianoRoll::s_whiteKeyBigPressedPm = NULL;
+QPixmap * PianoRoll::s_whiteKeyBigDisabledPm = NULL;
 QPixmap * PianoRoll::s_blackKeyPm = NULL;
 QPixmap * PianoRoll::s_blackKeyPressedPm = NULL;
+QPixmap * PianoRoll::s_blackKeyDisabledPm = NULL;
 QPixmap * PianoRoll::s_toolDraw = NULL;
 QPixmap * PianoRoll::s_toolErase = NULL;
 QPixmap * PianoRoll::s_toolSelect = NULL;
@@ -261,6 +264,11 @@ PianoRoll::PianoRoll() :
 		s_whiteKeySmallPressedPm = new QPixmap( embed::getIconPixmap(
 						"pr_white_key_small_pressed" ) );
 	}
+	if (s_whiteKeySmallDisabledPm == NULL)
+	{
+		s_whiteKeySmallDisabledPm = new QPixmap(embed::getIconPixmap(
+						"pr_white_key_small_disabled"));
+	}
 	if( s_whiteKeyBigPm == NULL )
 	{
 		s_whiteKeyBigPm = new QPixmap( embed::getIconPixmap(
@@ -271,6 +279,11 @@ PianoRoll::PianoRoll() :
 		s_whiteKeyBigPressedPm = new QPixmap( embed::getIconPixmap(
 							"pr_white_key_big_pressed" ) );
 	}
+	if (s_whiteKeyBigDisabledPm == NULL)
+	{
+		s_whiteKeyBigDisabledPm = new QPixmap(embed::getIconPixmap(
+							"pr_white_key_big_disabled"));
+	}
 	if( s_blackKeyPm == NULL )
 	{
 		s_blackKeyPm = new QPixmap( embed::getIconPixmap(
@@ -280,6 +293,11 @@ PianoRoll::PianoRoll() :
 	{
 		s_blackKeyPressedPm = new QPixmap( embed::getIconPixmap(
 							"pr_black_key_pressed" ) );
+	}
+	if (s_blackKeyDisabledPm == NULL)
+	{
+		s_blackKeyDisabledPm = new QPixmap(embed::getIconPixmap(
+							"pr_black_key_disabled"));
 	}
 	if( s_toolDraw == NULL )
 	{

@@ -319,10 +319,13 @@ private:
 
 	static QPixmap * s_whiteKeyBigPm;
 	static QPixmap * s_whiteKeyBigPressedPm;
+	static QPixmap * s_whiteKeyBigDisabledPm;
 	static QPixmap * s_whiteKeySmallPm;
 	static QPixmap * s_whiteKeySmallPressedPm;
+	static QPixmap * s_whiteKeySmallDisabledPm;
 	static QPixmap * s_blackKeyPm;
 	static QPixmap * s_blackKeyPressedPm;
+	static QPixmap * s_blackKeyDisabledPm;
 	static QPixmap * s_toolDraw;
 	static QPixmap * s_toolErase;
 	static QPixmap * s_toolSelect;

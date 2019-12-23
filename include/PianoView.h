@@ -69,6 +69,8 @@ private:
 	static QPixmap * s_blackKeyPm;
 	static QPixmap * s_whiteKeyPressedPm;
 	static QPixmap * s_blackKeyPressedPm;
+	static QPixmap * s_whiteKeyDisabledPm;
+	static QPixmap * s_blackKeyDisabledPm;
 
 	Piano * m_piano;
 

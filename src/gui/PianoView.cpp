@@ -66,6 +66,8 @@ QPixmap * PianoView::s_whiteKeyPm = NULL;           /*!< A white key released */
 QPixmap * PianoView::s_blackKeyPm = NULL;           /*!< A black key released */
 QPixmap * PianoView::s_whiteKeyPressedPm = NULL;    /*!< A white key pressed */
 QPixmap * PianoView::s_blackKeyPressedPm = NULL;    /*!< A black key pressed */
+QPixmap * PianoView::s_whiteKeyDisabledPm = NULL;   /*!< A white key disabled */
+QPixmap * PianoView::s_blackKeyDisabledPm = NULL;   /*!< A black key disabled */
 
 
 const int PIANO_BASE = 11;          /*!< The height of the root note display */
@@ -106,6 +108,14 @@ PianoView::PianoView( QWidget * _parent ) :
 	if ( s_blackKeyPressedPm == NULL )
 	{
 		s_blackKeyPressedPm = new QPixmap( embed::getIconPixmap( "black_key_pressed" ) );
+	}
+	if (s_whiteKeyDisabledPm == NULL)
+	{
+		s_whiteKeyDisabledPm = new QPixmap(embed::getIconPixmap("white_key_disabled"));
+	}
+	if (s_blackKeyDisabledPm == NULL)
+	{
+		s_blackKeyDisabledPm = new QPixmap(embed::getIconPixmap("black_key_disabled"));
 	}
 
 	setAttribute(Qt::WA_OpaquePaintEvent, true);
@@ -847,22 +857,28 @@ void PianoView::paintEvent( QPaintEvent * )
 	int cur_key = m_startKey;
 
 	// draw all white keys...
-	for( int x = 0; x < width(); )
+	for (int x = 0; x < width();)
 	{
-		while( Piano::isBlackKey( cur_key ) )
+		while (Piano::isBlackKey(cur_key))
 		{
 			++cur_key;
 		}
 
-		// draw pressed or not pressed key, depending on state of
-		// current key
-		if( m_piano && m_piano->isKeyPressed( cur_key ) )
+		// draw normal, pressed or disabled key, depending on state and position of current key
+		if (cur_key >= first_key && cur_key <= last_key)
 		{
-			p.drawPixmap( x, PIANO_BASE, *s_whiteKeyPressedPm );
+			if (m_piano && m_piano->isKeyPressed(cur_key))
+			{
+				p.drawPixmap(x, PIANO_BASE, *s_whiteKeyPressedPm);
+			}
+			else
+			{
+				p.drawPixmap(x, PIANO_BASE, *s_whiteKeyPm);
+			}
 		}
 		else
 		{
-			p.drawPixmap( x, PIANO_BASE, *s_whiteKeyPm );
+			p.drawPixmap(x, PIANO_BASE, *s_whiteKeyDisabledPm);
 		}
 
 		x += PW_WHITE_KEY_WIDTH;
@@ -876,21 +892,27 @@ void PianoView::paintEvent( QPaintEvent * )
 		++cur_key;
 	}
 
-
 	// reset all values, because now we're going to draw all black keys
 	cur_key = m_startKey;
 	int white_cnt = 0;
 
 	int startKey = m_startKey;
-	if( startKey > 0 && Piano::isBlackKey( (Keys)(--startKey) ) )
+	if (startKey > 0 && Piano::isBlackKey((Keys)(--startKey)))
 	{
-		if( m_piano && m_piano->isKeyPressed( startKey ) )
+		if (startKey >= first_key && startKey <= last_key)
 		{
-			p.drawPixmap( 0 - PW_WHITE_KEY_WIDTH / 2, PIANO_BASE, *s_blackKeyPressedPm );
+			if (m_piano && m_piano->isKeyPressed(startKey))
+			{
+				p.drawPixmap(0 - PW_WHITE_KEY_WIDTH / 2, PIANO_BASE, *s_blackKeyPressedPm);
+			}
+			else
+			{
+				p.drawPixmap(0 - PW_WHITE_KEY_WIDTH / 2, PIANO_BASE, *s_blackKeyPm);
+			}
 		}
 		else
 		{
-			p.drawPixmap( 0 - PW_WHITE_KEY_WIDTH / 2, PIANO_BASE, *s_blackKeyPm );
+			p.drawPixmap(0 + PW_WHITE_KEY_WIDTH / 2, PIANO_BASE, *s_blackKeyDisabledPm);
 		}
 	}
 
@@ -899,15 +921,21 @@ void PianoView::paintEvent( QPaintEvent * )
 	{
 		if (Piano::isBlackKey(cur_key))
 		{
-			// draw pressed or not pressed key, depending on
-			// state of current key
-			if (m_piano && m_piano->isKeyPressed(cur_key))
+			// draw normal, pressed or disabled key, depending on state and position of current key
+			if (cur_key >= first_key && cur_key <= last_key)
 			{
-				p.drawPixmap(x + PW_WHITE_KEY_WIDTH / 2, PIANO_BASE, *s_blackKeyPressedPm);
+				if (m_piano && m_piano->isKeyPressed(cur_key))
+				{
+					p.drawPixmap(x + PW_WHITE_KEY_WIDTH / 2, PIANO_BASE, *s_blackKeyPressedPm);
+				}
+				else
+				{
+					p.drawPixmap(x + PW_WHITE_KEY_WIDTH / 2, PIANO_BASE, *s_blackKeyPm);
+				}
 			}
 			else
 			{
-				p.drawPixmap(x + PW_WHITE_KEY_WIDTH / 2, PIANO_BASE, *s_blackKeyPm);
+				p.drawPixmap(x + PW_WHITE_KEY_WIDTH / 2, PIANO_BASE, *s_blackKeyDisabledPm);
 			}
 			x += PW_WHITE_KEY_WIDTH;
 			white_cnt = 0;
