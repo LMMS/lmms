@@ -99,6 +99,8 @@ InstrumentTrack::InstrumentTrack( TrackContainer* tc ) :
 	m_silentBuffersProcessed( false ),
 	m_previewMode( false ),
 	m_baseNoteModel(0, 0, NumKeys - 1, this, tr("Base note")),
+	m_firstNoteModel(0, 0, NumKeys - 1, this, tr("First note")),
+	m_lastNoteModel(0, 0, NumKeys - 1, this, tr("Last note")),
 	m_volumeModel( DefaultVolume, MinVolume, MaxVolume, 0.1f, this, tr( "Volume" ) ),
 	m_panningModel( DefaultPanning, PanningLeft, PanningRight, 0.1f, this, tr( "Panning" ) ),
 	m_audioPort( tr( "unnamed_track" ), true, &m_volumeModel, &m_panningModel, &m_mutedModel ),
@@ -110,11 +112,14 @@ InstrumentTrack::InstrumentTrack( TrackContainer* tc ) :
 	m_soundShaping( this ),
 	m_arpeggio( this ),
 	m_noteStacking( this ),
-	m_piano( this )
+	m_piano( this ),
+	m_tuner(this)
 {
 	m_pitchModel.setCenterValue( 0 );
 	m_panningModel.setCenterValue( DefaultPanning );
 	m_baseNoteModel.setInitValue( DefaultKey );
+	m_firstNoteModel.setInitValue(0);
+	m_lastNoteModel.setInitValue(NumKeys - 1);
 
 	m_effectChannelModel.setRange( 0, Engine::fxMixer()->numChannels()-1, 1);
 
@@ -127,14 +132,12 @@ InstrumentTrack::InstrumentTrack( TrackContainer* tc ) :
 
 	setName( tr( "Default preset" ) );
 
-	connect( &m_baseNoteModel, SIGNAL( dataChanged() ),
-			this, SLOT( updateBaseNote() ), Qt::DirectConnection );
-	connect( &m_pitchModel, SIGNAL( dataChanged() ),
-			this, SLOT( updatePitch() ), Qt::DirectConnection );
-	connect( &m_pitchRangeModel, SIGNAL( dataChanged() ),
-			this, SLOT( updatePitchRange() ), Qt::DirectConnection );
-	connect( &m_effectChannelModel, SIGNAL( dataChanged() ),
-			this, SLOT( updateEffectChannel() ), Qt::DirectConnection );
+	connect(&m_baseNoteModel, SIGNAL(dataChanged()), this, SLOT(updateBaseNote()), Qt::DirectConnection);
+	connect(&m_firstNoteModel, SIGNAL(dataChanged()), this, SLOT(updateFirstNote()), Qt::DirectConnection);
+	connect(&m_baseNoteModel, SIGNAL(dataChanged()), this, SLOT(updateLastNote()), Qt::DirectConnection);
+	connect(&m_pitchModel, SIGNAL(dataChanged()), this, SLOT(updatePitch()), Qt::DirectConnection);
+	connect(&m_pitchRangeModel, SIGNAL(dataChanged()), this, SLOT(updatePitchRange()), Qt::DirectConnection);
+	connect(&m_effectChannelModel, SIGNAL(dataChanged()), this, SLOT(updateEffectChannel()), Qt::DirectConnection);
 }
 
 
@@ -145,6 +148,15 @@ int InstrumentTrack::baseNote() const
 	return m_baseNoteModel.value() - mp;
 }
 
+int InstrumentTrack::firstNote() const
+{
+	return m_firstNoteModel.value();
+}
+
+int InstrumentTrack::lastNote() const
+{
+	return m_lastNoteModel.value();
+}
 
 
 InstrumentTrack::~InstrumentTrack()
@@ -258,7 +270,8 @@ void InstrumentTrack::processInEvent( const MidiEvent& event, const MidiTime& ti
 		case MidiNoteOn:
 			if( event.velocity() > 0 )
 			{
-				if( m_notes[event.key()] == NULL )
+				// play a note only if it is not already playing and if it is within configured bounds
+				if (m_notes[event.key()] == NULL && event.key() >= firstNote() && event.key() <= lastNote())
 				{
 					NotePlayHandle* nph =
 						NotePlayHandleManager::acquire(

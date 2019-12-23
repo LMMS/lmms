@@ -30,6 +30,7 @@
 #include "GroupBox.h"
 #include "InstrumentFunctions.h"
 #include "InstrumentSoundShaping.h"
+#include "Microtuner.h"
 #include "MidiEventProcessor.h"
 #include "MidiPort.h"
 #include "NotePlayHandle.h"
@@ -172,7 +173,19 @@ public:
 		return &m_baseNoteModel;
 	}
 
+	IntModel *firstNoteModel()
+	{
+		return &m_firstNoteModel;
+	}
+
+	IntModel *lastNoteModel()
+	{
+		return &m_lastNoteModel;
+	}
+
 	int baseNote() const;
+	int firstNote() const;
+	int lastNote() const;
 
 	Piano *pianoModel()
 	{
@@ -260,7 +273,9 @@ private:
 
 	bool m_previewMode;
 
-	IntModel m_baseNoteModel;
+	IntModel m_baseNoteModel;	//! The "A4" or "440 Hz" key (default 69)
+	IntModel m_firstNoteModel;	//! First key the instrument reacts to
+	IntModel m_lastNoteModel;	//! Last key the instrument reacts to
 
 	NotePlayHandleList m_processHandles;
 
@@ -281,6 +296,8 @@ private:
 	InstrumentFunctionNoteStacking m_noteStacking;
 
 	Piano m_piano;
+
+	Microtuner m_tuner;
 
 
 	friend class InstrumentTrackView;
