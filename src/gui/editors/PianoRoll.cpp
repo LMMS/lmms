@@ -2902,6 +2902,8 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 	int keys_processed = 0;
 
 	int key = m_startKey;
+	int first_key = m_pattern->instrumentTrack()->firstNote();
+	int last_key = m_pattern->instrumentTrack()->lastNote();
 
 	// draw all white keys...
 	for( int y = key_line_y + 1 + y_offset; y > PR_TOP_MARGIN;
@@ -2909,13 +2911,19 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 	{
 		// check for white key that is only half visible on the
 		// bottom of piano-roll
-		if( keys_processed == 0 &&
-			prKeyOrder[m_startKey % KeysPerOctave] ==
-								PR_BLACK_KEY )
+		if (keys_processed == 0 && prKeyOrder[m_startKey % KeysPerOctave] == PR_BLACK_KEY)
 		{
 			// draw it!
-			p.drawPixmap( PIANO_X, y - m_whiteKeySmallHeight, WHITE_KEY_WIDTH, m_whiteKeySmallHeight,
-							*s_whiteKeySmallPm );
+			if (m_startKey >= first_key && m_startKey <= last_key)
+			{
+				p.drawPixmap(PIANO_X, y - m_whiteKeySmallHeight, WHITE_KEY_WIDTH, m_whiteKeySmallHeight,
+								*s_whiteKeySmallPm);
+			}
+			else
+			{
+				p.drawPixmap(PIANO_X, y - m_whiteKeySmallHeight, WHITE_KEY_WIDTH, m_whiteKeySmallHeight,
+								*s_whiteKeySmallDisabledPm);
+			}
 			// update y-pos
 			y -= m_whiteKeySmallHeight / 2;
 			// move first black key down (we didn't draw whole
@@ -2926,39 +2934,57 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 			first_white_key_height = m_whiteKeySmallHeight / 2;
 		}
 		// check whether to draw a big or a small white key
-		if( prKeyOrder[key % KeysPerOctave] == PR_WHITE_KEY_SMALL )
+		if (prKeyOrder[key % KeysPerOctave] == PR_WHITE_KEY_SMALL)
 		{
 			// draw a small one while checking if it is pressed or not
-			if( hasValidPattern() && m_pattern->instrumentTrack()->pianoModel()->isKeyPressed( key ) )
+			if (key >= first_key && key <= last_key)
 			{
-				p.drawPixmap(PIANO_X, y - m_whiteKeySmallHeight, WHITE_KEY_WIDTH, m_whiteKeySmallHeight,
-							*s_whiteKeySmallPressedPm);
+				if (hasValidPattern() && m_pattern->instrumentTrack()->pianoModel()->isKeyPressed(key))
+				{
+					p.drawPixmap(PIANO_X, y - m_whiteKeySmallHeight, WHITE_KEY_WIDTH, m_whiteKeySmallHeight,
+								*s_whiteKeySmallPressedPm);
+				}
+				else
+				{
+					p.drawPixmap(PIANO_X, y - m_whiteKeySmallHeight, WHITE_KEY_WIDTH, m_whiteKeySmallHeight,
+								*s_whiteKeySmallPm);
+				}
 			}
 			else
 			{
 				p.drawPixmap(PIANO_X, y - m_whiteKeySmallHeight, WHITE_KEY_WIDTH, m_whiteKeySmallHeight,
-							*s_whiteKeySmallPm);
+							*s_whiteKeySmallDisabledPm);
 			}
+
 			// update y-pos
 			y -= m_whiteKeySmallHeight;
 
 		}
-		else if( prKeyOrder[key % KeysPerOctave] == PR_WHITE_KEY_BIG )
+		else if (prKeyOrder[key % KeysPerOctave] == PR_WHITE_KEY_BIG)
 		{
 			// draw a big one while checking if it is pressed or not
-			if( hasValidPattern() && m_pattern->instrumentTrack()->pianoModel()->isKeyPressed( key ) )
+			if (key >= first_key && key <= last_key)
 			{
-				p.drawPixmap(PIANO_X, y - m_whiteKeyBigHeight, WHITE_KEY_WIDTH, m_whiteKeyBigHeight,
-							*s_whiteKeyBigPressedPm);
+				if (hasValidPattern() && m_pattern->instrumentTrack()->pianoModel()->isKeyPressed(key))
+				{
+					p.drawPixmap(PIANO_X, y - m_whiteKeyBigHeight, WHITE_KEY_WIDTH, m_whiteKeyBigHeight,
+								*s_whiteKeyBigPressedPm);
+				}
+				else
+				{
+					p.drawPixmap(PIANO_X, y-m_whiteKeyBigHeight, WHITE_KEY_WIDTH, m_whiteKeyBigHeight,
+								*s_whiteKeyBigPm);
+				}
 			}
 			else
 			{
 				p.drawPixmap(PIANO_X, y-m_whiteKeyBigHeight, WHITE_KEY_WIDTH, m_whiteKeyBigHeight,
-							*s_whiteKeyBigPm);
+							*s_whiteKeyBigDisabledPm);
 			}
+
 			// if a big white key has been the first key,
 			// black keys needs to be lifted up
-			if( keys_processed == 0 )
+			if (keys_processed == 0)
 			{
 				first_white_key_height = m_whiteKeyBigHeight;
 			}
@@ -3026,50 +3052,64 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 	key_line_y = qMin(keyAreaBottom(), m_keyLineHeight * NumKeys);
 
 	// and go!
-	for( int y = key_line_y + y_offset;
-					y > PR_TOP_MARGIN; ++keys_processed )
+	for (int y = key_line_y + y_offset; y > PR_TOP_MARGIN; ++keys_processed)
 	{
 		// check for black key that is only half visible on the bottom
 		// of piano-roll
-		if( keys_processed == 0
+		if (keys_processed == 0
 		    // current key may not be a black one
 		    && prKeyOrder[key % KeysPerOctave] != PR_BLACK_KEY
 		    // but the previous one must be black (we must check this
 		    // because there might be two white keys (E-F)
-		    && prKeyOrder[( key - 1 ) % KeysPerOctave] ==
-								PR_BLACK_KEY )
+		    && prKeyOrder[(key - 1) % KeysPerOctave] == PR_BLACK_KEY)
 		{
 			// draw the black key!
-			p.drawPixmap( PIANO_X, y - m_blackKeyHeight / 2, BLACK_KEY_WIDTH, m_blackKeyHeight,
-								*s_blackKeyPm );
+			if (key >= first_key && key <= last_key)
+			{
+				p.drawPixmap(PIANO_X, y - m_blackKeyHeight / 2, BLACK_KEY_WIDTH, m_blackKeyHeight,
+							 *s_blackKeyPm);
+			}
+			else
+			{
+				p.drawPixmap(PIANO_X, y - m_blackKeyHeight / 2, BLACK_KEY_WIDTH, m_blackKeyHeight,
+							 *s_blackKeyDisabledPm);
+			}
+
 			// is the one after the start-note a black key??
-			if( prKeyOrder[( key + 1 ) % KeysPerOctave] !=
-								PR_BLACK_KEY )
+			if (prKeyOrder[(key + 1) % KeysPerOctave] != PR_BLACK_KEY)
 			{
 				// no, then move it up!
 				y -= m_keyLineHeight / 2;
 			}
 		}
 		// current key black?
-		if( prKeyOrder[key % KeysPerOctave] == PR_BLACK_KEY)
+		if (prKeyOrder[key % KeysPerOctave] == PR_BLACK_KEY)
 		{
 			// then draw it (calculation of y very complicated,
 			// but that's the only working solution, sorry...)
 			// check if the key is pressed or not
-			if( hasValidPattern() && m_pattern->instrumentTrack()->pianoModel()->isKeyPressed( key ) )
+			if (key >= first_key && key <= last_key)
 			{
-				p.drawPixmap( PIANO_X, y - ( first_white_key_height -
-						m_whiteKeySmallHeight ) -
-						m_whiteKeySmallHeight/2 - 1 -
-						m_blackKeyHeight, BLACK_KEY_WIDTH, m_blackKeyHeight, *s_blackKeyPressedPm );
+				if (hasValidPattern() && m_pattern->instrumentTrack()->pianoModel()->isKeyPressed(key))
+				{
+					p.drawPixmap(PIANO_X, y - (first_white_key_height -	m_whiteKeySmallHeight) -
+								 m_whiteKeySmallHeight / 2 - 1 - m_blackKeyHeight,
+								 BLACK_KEY_WIDTH, m_blackKeyHeight, *s_blackKeyPressedPm);
+				}
+				else
+				{
+					p.drawPixmap(PIANO_X, y - (first_white_key_height -	m_whiteKeySmallHeight) -
+								 m_whiteKeySmallHeight / 2 - 1 - m_blackKeyHeight,
+								 BLACK_KEY_WIDTH, m_blackKeyHeight, *s_blackKeyPm);
+				}
 			}
-		    else
+			else
 			{
-				p.drawPixmap( PIANO_X, y - ( first_white_key_height -
-						m_whiteKeySmallHeight ) -
-						m_whiteKeySmallHeight/2 - 1 -
-						m_blackKeyHeight, BLACK_KEY_WIDTH, m_blackKeyHeight, *s_blackKeyPm );
+				p.drawPixmap(PIANO_X, y - (first_white_key_height -	m_whiteKeySmallHeight) -
+							 m_whiteKeySmallHeight / 2 - 1 - m_blackKeyHeight,
+							 BLACK_KEY_WIDTH, m_blackKeyHeight, *s_blackKeyDisabledPm);
 			}
+
 			// update y-pos
 			y -= m_whiteKeyBigHeight;
 			// reset white-counter
