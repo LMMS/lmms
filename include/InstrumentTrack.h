@@ -192,6 +192,11 @@ public:
 		return &m_piano;
 	}
 
+	Microtuner *microtunerModel()
+	{
+		return &m_microtuner;
+	}
+
 	bool isArpeggioEnabled() const
 	{
 		return m_arpeggio.m_arpEnabledModel.value();
@@ -297,7 +302,7 @@ private:
 
 	Piano m_piano;
 
-	Microtuner m_tuner;
+	Microtuner m_microtuner;
 
 
 	friend class InstrumentTrackView;

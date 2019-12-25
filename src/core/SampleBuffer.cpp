@@ -72,7 +72,7 @@ SampleBuffer::SampleBuffer() :
 	m_loopEndFrame( 0 ),
 	m_amplification( 1.0f ),
 	m_reversed( false ),
-	m_frequency( BaseFreq ),
+	m_frequency(DefaultBaseFreq),
 	m_sampleRate( mixerSampleRate () )
 {
 
@@ -649,6 +649,10 @@ bool SampleBuffer::play( sampleFrame * _ab, handleState * _state,
 	// variable for determining if we should currently be playing backwards in a ping-pong loop
 	bool is_backwards = _state->isBackwards();
 
+	// The SampleBuffer can play a given sample with increased or decreased pitch. However, only
+	// samples that contain a tone that matches the default base note frequency of 440 Hz will
+	// produce the exact requested pitch, so specifying it as a parametr does not make much sense.
+	// TODO: Make m_frequency confgurable? Or let callers supply the ratio instead of frequency.
 	const double freq_factor = (double) _freq / (double) m_frequency *
 		m_sampleRate / Engine::mixer()->processingSampleRate();
 

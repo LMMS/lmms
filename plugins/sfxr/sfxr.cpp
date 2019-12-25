@@ -43,13 +43,13 @@ float frnd(float range)
 #include "Engine.h"
 #include "InstrumentTrack.h"
 #include "Knob.h"
+#include "lmms_constants.h"
 #include "NotePlayHandle.h"
 #include "PixmapButton.h"
 #include "ToolTip.h"
 #include "Song.h"
 #include "MidiEvent.h"
 #include "MidiTime.h"
-#include "Mixer.h"
 
 #include "embed.h"
 
@@ -470,7 +470,8 @@ void sfxrInstrument::playNote( NotePlayHandle * _n, sampleFrame * _working_buffe
 		return;
 	}
 
-	int32_t pitchedFrameNum = (_n->frequency()/BaseFreq)*frameNum;
+	const float baseFreq = instrumentTrack()->microtunerModel()->baseFreq();
+	int32_t pitchedFrameNum = (_n->frequency() / baseFreq) * frameNum;
 
 	pitchedFrameNum /= ( currentSampleRate / 44100 );
 

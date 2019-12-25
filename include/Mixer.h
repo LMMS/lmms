@@ -54,7 +54,6 @@ const int BYTES_PER_SURROUND_FRAME = sizeof( surroundSampleFrame );
 
 const float OUTPUT_SAMPLE_MULTIPLIER = 32767.0f;
 
-const float BaseFreq = 440.f;	//FIXME: deprecated
 
 #include "PlayHandle.h"
 

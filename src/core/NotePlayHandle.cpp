@@ -24,12 +24,13 @@
  */
 
 #include "NotePlayHandle.h"
+
+#include "lmms_constants.h"
 #include "BasicFilters.h"
 #include "DetuningHelper.h"
 #include "InstrumentSoundShaping.h"
 #include "InstrumentTrack.h"
 #include "Instrument.h"
-#include "Mixer.h"
 #include "Song.h"
 #include <iostream>
 
@@ -500,20 +501,35 @@ bool NotePlayHandle::operator==( const NotePlayHandle & _nph ) const
 
 void NotePlayHandle::updateFrequency()
 {
-	int mp = m_instrumentTrack->m_useMasterPitchModel.value() ? Engine::getSong()->masterPitch() : 0;
+	int masterPitch = m_instrumentTrack->m_useMasterPitchModel.value() ? Engine::getSong()->masterPitch() : 0;
+	int baseNote = m_instrumentTrack->baseNoteModel()->value();
+	float detune = m_baseDetuning->value();
+	float instrumentPitch = m_instrumentTrack->pitchModel()->value();
 
-	const float pitch = (key() - m_instrumentTrack->baseNoteModel()->value() + mp + m_baseDetuning->value()) / 12.0f;
-
-	// TODO: compute frequency based on values from microtuner;
-	// what about the pitch? Just keep the 100 cent range?
-	m_frequency = BaseFreq * powf(2.0f, pitch + m_instrumentTrack->pitchModel()->value() / (100 * 12.0f));
-
-	m_unpitchedFrequency = BaseFreq * powf(2.0f, pitch);
-std::cout<<"key "<<key()<<" freq "<<m_frequency<<std::endl;
-
-	for( NotePlayHandleList::Iterator it = m_subNotes.begin(); it != m_subNotes.end(); ++it )
+	if (m_instrumentTrack->m_microtuner.enabled())
 	{
-		( *it )->updateFrequency();
+		// custom key mapping and scale: get frequency from the microtuner
+		// TODO: what about the pitch?
+		// keep the 100 cent range or make it scale dependent?
+		// what about master, base and instrument pitch bend? Compute "key" here or let MT do it, because mapping?
+			// or maybe call a mapping function from MT first..
+		m_frequency = m_instrumentTrack->m_microtuner.keyToFreq(key());
+		m_unpitchedFrequency = m_instrumentTrack->m_microtuner.keyToFreq(key());
+	}
+	else
+	{
+		// default key mapping and 12-TET frequency computation with default 440 Hz base note frequency
+		const float pitch = (key() - baseNote + masterPitch + detune) / 12.0f;
+		m_frequency = DefaultBaseFreq * powf(2.0f, pitch + instrumentPitch / (100 * 12.0f));
+		m_unpitchedFrequency = DefaultBaseFreq * powf(2.0f, pitch);
+	}
+
+	// DEBUG
+	std::cout<<"key "<<key()<<" freq "<<m_frequency<<std::endl;
+
+	for (NotePlayHandleList::Iterator it = m_subNotes.begin(); it != m_subNotes.end(); ++it)
+	{
+		(*it)->updateFrequency();
 	}
 }
 

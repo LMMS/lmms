@@ -113,7 +113,7 @@ InstrumentTrack::InstrumentTrack( TrackContainer* tc ) :
 	m_arpeggio( this ),
 	m_noteStacking( this ),
 	m_piano( this ),
-	m_tuner(this)
+	m_microtuner(this)
 {
 	m_pitchModel.setCenterValue( 0 );
 	m_panningModel.setCenterValue( DefaultPanning );

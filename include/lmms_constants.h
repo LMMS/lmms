@@ -49,6 +49,8 @@ const float F_PI_SQR = (float) LD_PI_SQR;
 const float F_E = (float) LD_E;
 const float F_E_R = (float) LD_E_R;
 
+const float DefaultBaseFreq = 440.f;	//! default base note frequency
+
 // Frequency ranges (in Hz).
 // Arbitrary low limit for logarithmic frequency scale; >1 Hz.
 const int LOWEST_LOG_FREQ = 5;

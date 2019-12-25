@@ -26,11 +26,14 @@
 #include "Microtuner.h"
 
 #include "ConfigManager.h"
+#include "InstrumentTrack.h"
 
 
-Microtuner::Microtuner(Model *parent) :
+Microtuner::Microtuner(InstrumentTrack *parent) :
 	Model(parent, tr("Microtuner")),
-	m_baseFreqModel(440.f, 1.f, 1000.f, 0.01f, this, tr("Base note frequency [Hz]"))
+	m_instrumentTrack(parent),
+	m_enabledModel(false, this, tr("Microtuner on / off")),
+	m_baseFreqModel(DefaultBaseFreq, 1.f, 1000.f, 0.01f, this, tr("Base note frequency [Hz]"))
 {
 }
 
@@ -40,11 +43,11 @@ Microtuner::Microtuner(Model *parent) :
  */ 
 float Microtuner::keyToFreq(int key) const
 {
-	return 0.f;
+	return baseFreq() * powf(2.0f, (key - m_instrumentTrack->baseNote()) / 12.f);
 }
 
 
-void Microtuner::saveSettings(QDomDocument & document, QDomElement &element)
+void Microtuner::saveSettings(QDomDocument &document, QDomElement &element)
 {
 }
 

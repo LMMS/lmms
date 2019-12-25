@@ -61,7 +61,7 @@ InstrumentMiscView::InstrumentMiscView(InstrumentTrack *it, QWidget *parent) :
 	int editHeight = 100;
 	int buttonSize = 19;
 	m_microtunerGroupBox = new GroupBox(tr("MICROTUNER"));
-	m_microtunerGroupBox->setModel(it->m_tuner.getEnabledModel());
+	m_microtunerGroupBox->setModel(it->m_microtuner.enabledModel());
 	layout->addWidget(m_microtunerGroupBox);
 
 	// organize into 2 main columns
@@ -73,7 +73,7 @@ InstrumentMiscView::InstrumentMiscView(InstrumentTrack *it, QWidget *parent) :
 	microtunerLayout->addLayout(generalLayout);
 
 	Knob *baseFreqKnob = new Knob(knobBright_26);
-	baseFreqKnob->setModel(it->m_tuner.getBaseFreqModel());
+	baseFreqKnob->setModel(it->m_microtuner.baseFreqModel());
 	baseFreqKnob->setLabel(tr("BASE FREQ"));
 	baseFreqKnob->setHintText(tr("Base note frequency:"), " " + tr("Hz"));
 	baseFreqKnob->setToolTip(tr("Base note frequency"));

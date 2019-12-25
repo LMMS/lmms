@@ -27,19 +27,21 @@
 
 #include "AutomatableModel.h"
 #include "JournallingObject.h"
+#include "lmms_constants.h"
 
+class InstrumentTrack;
 
 class LMMS_EXPORT Microtuner : public Model, public JournallingObject
 {
 	Q_OBJECT
 public:
-	Microtuner(Model *parent);
+	Microtuner(InstrumentTrack *parent);
 
-	bool getEnabled() const {return m_enabledModel.value();}
-	BoolModel* getEnabledModel() {return &m_enabledModel;}
+	bool enabled() const {return m_enabledModel.value();}
+	BoolModel* enabledModel() {return &m_enabledModel;}
 
-	float getBaseFreq() const {return m_baseFreqModel.value();}
-	FloatModel* getBaseFreqModel() {return &m_baseFreqModel;}
+	float baseFreq() const {return enabled() ? m_baseFreqModel.value() : DefaultBaseFreq;}
+	FloatModel* baseFreqModel() {return &m_baseFreqModel;}
 
 	float keyToFreq(int key) const;
 
@@ -49,6 +51,8 @@ protected:
 	void loadSettings(const QDomElement &element) override;
 
 private:
+	InstrumentTrack *m_instrumentTrack;
+
 	BoolModel m_enabledModel;		//! Enable microtuner (otherwise using 12-TET @440 Hz)
 
 	FloatModel m_baseFreqModel;		//! Base note frequency (typ. 440 Hz)
