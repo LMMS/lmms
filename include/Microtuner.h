@@ -35,8 +35,11 @@ class LMMS_EXPORT Microtuner : public Model, public JournallingObject
 public:
 	Microtuner(Model *parent);
 
-	float getBaseFreq() const {return m_baseFreq.value();}
-	FloatModel* getBaseFreqModel() {return &m_baseFreq;}
+	bool getEnabled() const {return m_enabledModel.value();}
+	BoolModel* getEnabledModel() {return &m_enabledModel;}
+
+	float getBaseFreq() const {return m_baseFreqModel.value();}
+	FloatModel* getBaseFreqModel() {return &m_baseFreqModel;}
 
 	float keyToFreq(int key) const;
 
@@ -46,7 +49,9 @@ protected:
 	void loadSettings(const QDomElement &element) override;
 
 private:
-	FloatModel m_baseFreq;		//! Base note frequency (typ. 440 Hz)
+	BoolModel m_enabledModel;		//! Enable microtuner (otherwise using 12-TET @440 Hz)
+
+	FloatModel m_baseFreqModel;		//! Base note frequency (typ. 440 Hz)
 };
 
 #endif

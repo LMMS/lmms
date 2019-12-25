@@ -30,7 +30,7 @@
 
 Microtuner::Microtuner(Model *parent) :
 	Model(parent, tr("Microtuner")),
-	m_baseFreq(440.f, 1.f, 10000.f, 0.01f, this, tr("Base note frequency [Hz]"))
+	m_baseFreqModel(440.f, 1.f, 1000.f, 0.01f, this, tr("Base note frequency [Hz]"))
 {
 }
 
