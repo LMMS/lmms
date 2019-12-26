@@ -126,7 +126,8 @@ public:
 
 	void clearKeyModifiers();
 
-	[[deprecated]]  // TODO Remove this function, since m_shift can get stuck down.
+	// TODO Remove this function, since m_shift can get stuck down.
+	// [[deprecated]]
 	bool isShiftPressed()
 	{
 		return m_keyMods.m_shift;
