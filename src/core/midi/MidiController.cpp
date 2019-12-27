@@ -25,6 +25,7 @@
 
 
 #include "AudioEngine.h"
+#include "MidiPort.h"
 #include "MidiController.h"
 
 namespace lmms
@@ -73,43 +74,73 @@ void MidiController::updateName()
 
 void MidiController::processInEvent(const MidiEvent& event, const TimePos& time, f_cnt_t offset)
 {
-	unsigned char controllerNum;
 	int expectedChannel = m_midiPort.inputChannel();
+	MidiPortEventModel::Values linkEventType
+			= m_midiPort.inputControllerEventType();
 	if (expectedChannel != event.channel() + 1  && expectedChannel != 0)
 	{
 		return;
 	}
 	switch(event.type())
 	{
-    case MidiControlChange:
-        if (m_midiPort.inputControllerIsCC() &&
-            m_midiPort.inputController() == event.controllerNumber() + 1)
-        {
-            unsigned char val = event.controllerValue();
-            m_previousValue = m_lastValue;
-            m_lastValue = static_cast<float>(val) / 127.0f;
-            emit valueChanged();
-        }
-    break;
+	case MidiControlChange:
+		if (linkEventType == MidiPortEventModel::EventCC &&
+			m_midiPort.inputController() == event.controllerNumber() + 1)
+		{
+			unsigned char val = event.controllerValue();
+			m_previousValue = m_lastValue;
+			m_lastValue = static_cast<float>(val) / 127.0f;
+			if (m_previousValue != m_lastValue)
+			{
+			emit valueChanged();
+			}
+		}
+	break;
 
-    case MidiNoteOn:
-        controllerNum = event.key();
-        if (m_midiPort.inputControllerIsKey() &&
-            m_midiPort.inputController() == controllerNum + 1)
-        {
-            m_previousValue = m_lastValue;
-            if (m_lastValue == 0)
-            {
-                m_lastValue = 1.0;
-            }
-            else
-            {
-                m_lastValue = 0.0;
-            }
-            emit valueChanged();
+	case MidiNoteOn:
+		if (m_midiPort.inputController() == event.key() + 1) {
+			if (linkEventType == MidiPortEventModel::EventKeyOnOnly)
+			{
+				m_previousValue = m_lastValue;
+				if (m_lastValue == 0)
+				{
+					m_lastValue = 1.0;
+				}
+				else
+				{
+					m_lastValue = 0.0;
+				}
+				if (m_previousValue != m_lastValue)
+				{
+					emit valueChanged();
+				}
+			}
+			else if (linkEventType == MidiPortEventModel::EventKeyOnOffBinary)
+			{
+				m_previousValue = m_lastValue;
+				m_lastValue = 1.0;
+				if (m_previousValue != m_lastValue)
+				{
+					emit valueChanged();
+				}
 
-        }
-        break;
+			}
+		}
+		break;
+
+		case MidiNoteOff:
+			if (linkEventType == MidiPortEventModel::EventKeyOnOffBinary &&
+				m_midiPort.inputController() == event.key() + 1)
+			{
+				m_previousValue = m_lastValue;
+				m_lastValue = 0.0;
+				if (m_previousValue != m_lastValue)
+				{
+					emit valueChanged();
+				}
+
+			}
+			break;
 
 		default:
 			// Don't care - maybe add special cases for pitch and mod later
