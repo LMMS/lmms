@@ -84,7 +84,7 @@ void MidiController::processInEvent( const MidiEvent& event, const MidiTime& tim
 {
 	unsigned char controllerNum;
 	int expectedChannel = m_midiPort.inputChannel();
-	MidiPortEventModel::Values linkEventType
+	MidiPortEventModel::Values portEvent
 			= m_midiPort.inputControllerEventType();
 	if (expectedChannel != event.channel() + 1  && expectedChannel != 0)
 	{
@@ -95,7 +95,7 @@ void MidiController::processInEvent( const MidiEvent& event, const MidiTime& tim
 		case MidiControlChange:
 			controllerNum = event.controllerNumber();
 
-			if(linkEventType == MidiPortEventModel::EventCC &&
+			if(portEvent == MidiPortEventModel::EventControlChange &&
 				m_midiPort.inputController() == controllerNum + 1)
 			{
 				unsigned char val = event.controllerValue();
@@ -111,7 +111,7 @@ void MidiController::processInEvent( const MidiEvent& event, const MidiTime& tim
 
 		case MidiNoteOn:
 			controllerNum = event.key();
-			if (linkEventType == MidiPortEventModel::EventKeyOnOnly &&
+			if (portEvent == MidiPortEventModel::EventNoteOn &&
 				m_midiPort.inputController() == controllerNum + 1)
 			{
 				m_previousValue = m_lastValue;
@@ -128,7 +128,7 @@ void MidiController::processInEvent( const MidiEvent& event, const MidiTime& tim
 					emit valueChanged();
 				}
 			}
-			if (linkEventType == MidiPortEventModel::EventKeyOnOffBinary &&
+			if (portEvent == MidiPortEventModel::EventNoteOnOff &&
 				m_midiPort.inputController() == controllerNum + 1)
 			{
 				m_previousValue = m_lastValue;
@@ -143,7 +143,7 @@ void MidiController::processInEvent( const MidiEvent& event, const MidiTime& tim
 
 		case MidiNoteOff:
 			controllerNum = event.key();
-			if (linkEventType == MidiPortEventModel::EventKeyOnOffBinary &&
+			if (portEvent == MidiPortEventModel::EventNoteOnOff &&
 				m_midiPort.inputController() == controllerNum + 1)
 			{
 				m_previousValue = m_lastValue;

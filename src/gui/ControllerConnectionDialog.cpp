@@ -51,7 +51,7 @@ class AutoDetectMidiController : public MidiController
 public:
 	AutoDetectMidiController( Model* parent ) :
 		MidiController( parent ),
-		m_detectedMidiEvent(MidiPortEventModel::EventCC),
+		m_detectedMidiEvent(MidiPortEventModel::EventControlChange),
 		m_detectedMidiChannel(0),
 		m_detectedMidiController(0)
 	{
@@ -61,6 +61,19 @@ public:
 
 	virtual ~AutoDetectMidiController()
 	{
+	}
+
+	void setDetectedMidiEvent(MidiEventTypes eventType)
+	{
+		MidiPortEventModel::Values& detectedEvt = m_detectedMidiEvent;
+		if (eventType == MidiControlChange)
+		{
+			detectedEvt = MidiPortEventModel::EventControlChange;
+		}
+		else if (eventType == MidiNoteOn)
+		{
+			detectedEvt = MidiPortEventModel::EventNoteOn;
+		}
 	}
 
 
@@ -73,18 +86,7 @@ public:
 				event.type() == MidiNoteOn )
 			{
 				m_detectedMidiChannel = event.channel() + 1;
-
-				if (event.type() == MidiControlChange)
-				{
-					m_detectedMidiEvent = MidiPortEventModel::EventCC;
-				}
-				else if (event.type() == MidiNoteOn &&
-					m_detectedMidiEvent != MidiPortEventModel::EventKeyOnOnly &&
-					m_detectedMidiEvent != MidiPortEventModel::EventKeyOnOffBinary)
-				{
-					m_detectedMidiEvent = MidiPortEventModel::EventKeyOnOnly;
-				}
-
+				setDetectedMidiEvent(event.type());
 				m_detectedMidiController = event.controllerNumber() + 1;
 				m_detectedMidiPort = Engine::mixer()->midiClient()->sourcePortName( event );
 
@@ -101,7 +103,8 @@ public:
 		MidiController* c = new MidiController( parent );
 		c->m_midiPort.setInputChannel( m_midiPort.inputChannel() );
 		c->m_midiPort.setInputController( m_midiPort.inputController() );
-		c->m_midiPort.setInputControllerEventType(m_midiPort.inputControllerEventType());
+		c->m_midiPort.setInputControllerEventType(
+					m_midiPort.inputControllerEventType());
 		c->subscribeReadablePorts( m_midiPort.readablePorts() );
 		c->updateName();
 
@@ -128,7 +131,7 @@ public slots:
 	void reset()
 	{
 		m_midiPort.setInputControllerEventType(
-					MidiPortEventModel::EventCC);
+					MidiPortEventModel::EventControlChange);
 		m_midiPort.setInputChannel( 0 );
 		m_midiPort.setInputController( 0 );
 	}
@@ -165,8 +168,8 @@ ControllerConnectionDialog::ControllerConnectionDialog( QWidget * _parent,
 	connect( m_midiGroupBox->model(), SIGNAL( dataChanged() ),
 			this, SLOT( midiToggled() ) );
 
-	m_midiEventType = new ComboBox(m_midiGroupBox, "Event type");
-	m_midiEventType->setGeometry(8, 24, 180, 22);
+	m_midiEventType = new ComboBox(m_midiGroupBox, tr("Event type"));
+	m_midiEventType->setGeometry(8, 24, 200, 22);
 
 	m_midiChannelSpinBox = new LcdSpinBox( 2, m_midiGroupBox,
 			tr( "Input channel" ) );

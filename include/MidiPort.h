@@ -45,20 +45,20 @@ class MidiPortEventModel : public ComboBoxModel
 public:
 	enum Values
 	{
-		EventCC = 0,
-		EventKeyOnOnly,
-		EventKeyOnOffBinary,
+		EventControlChange = 0,
+		EventNoteOn,
+		EventNoteOnOff,
 
 		EventLast
 	};
 	MidiPortEventModel(Model* parent = NULL,
-				Values defaultValue = EventCC,
+				Values defaultValue = EventControlChange,
 				const QString& displayName = QString()) :
 		ComboBoxModel(parent, displayName, true)
 	{
-		this->addItem(tr("Continuous Controller"));
-		this->addItem(tr("Note On (toggling)"));
-		this->addItem(tr("Note On and Off (binary)"));
+		this->addItem(tr("Knob or slider position"));
+		this->addItem(tr("Key or button press"));
+		this->addItem(tr("Key or button press or release"));
 		this->setValue(defaultValue);
 	}
 };
