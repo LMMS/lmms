@@ -47,6 +47,8 @@ class MidiPort : public Model, public SerializingObject
 	Q_OBJECT
 	mapPropertyFromModel(int,inputChannel,setInputChannel,m_inputChannelModel);
 	mapPropertyFromModel(int,outputChannel,setOutputChannel,m_outputChannelModel);
+	mapPropertyFromModel(bool,inputControllerIsKey,setInputControllerIsKey,m_inputControllerIsKeyModel);
+	mapPropertyFromModel(bool,inputControllerIsCC,setInputControllerIsCC,m_inputControllerIsCCModel);
 	mapPropertyFromModel(int,inputController,setInputController,m_inputControllerModel);
 	mapPropertyFromModel(int,outputController,setOutputController,m_outputControllerModel);
 	mapPropertyFromModel(int,fixedInputVelocity,setFixedInputVelocity,m_fixedInputVelocityModel);
@@ -148,6 +150,8 @@ private:
 
 	IntModel m_inputChannelModel;
 	IntModel m_outputChannelModel;
+	BoolModel m_inputControllerIsKeyModel;
+	BoolModel m_inputControllerIsCCModel;
 	IntModel m_inputControllerModel;
 	IntModel m_outputControllerModel;
 	IntModel m_fixedInputVelocityModel;

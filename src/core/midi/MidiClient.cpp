@@ -223,7 +223,7 @@ void MidiClientRaw::parseData( const unsigned char c )
 		case MidiNoteOn:
 		case MidiKeyPressure:
 		case MidiChannelPressure:
-			m_midiParseData.m_midiEvent.setKey( m_midiParseData.m_buffer[0] - KeysPerOctave );
+			m_midiParseData.m_midiEvent.setKey( m_midiParseData.m_buffer[0] );
 			m_midiParseData.m_midiEvent.setVelocity( m_midiParseData.m_buffer[1] );
 			break;
 
