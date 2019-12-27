@@ -84,6 +84,8 @@ void MidiController::processInEvent( const MidiEvent& event, const MidiTime& tim
 {
 	unsigned char controllerNum;
 	int expectedChannel = m_midiPort.inputChannel();
+	MidiPortEventModel::Values linkEventType
+			= m_midiPort.inputControllerEventType();
 	if (expectedChannel != event.channel() + 1  && expectedChannel != 0)
 	{
 		return;
@@ -93,19 +95,23 @@ void MidiController::processInEvent( const MidiEvent& event, const MidiTime& tim
 		case MidiControlChange:
 			controllerNum = event.controllerNumber();
 
-			if(m_midiPort.inputControllerIsCC() &&
+			if(linkEventType == MidiPortEventModel::EventCC &&
 				m_midiPort.inputController() == controllerNum + 1)
 			{
 				unsigned char val = event.controllerValue();
 				m_previousValue = m_lastValue;
 				m_lastValue = (float)( val ) / 127.0f;
-				emit valueChanged();
+				if (m_previousValue != m_lastValue)
+				{
+					emit valueChanged();
+				}
+
 			}
 			break;
 
 		case MidiNoteOn:
 			controllerNum = event.key();
-			if (m_midiPort.inputControllerIsKey() &&
+			if (linkEventType == MidiPortEventModel::EventKeyOnOnly &&
 				m_midiPort.inputController() == controllerNum + 1)
 			{
 				m_previousValue = m_lastValue;
@@ -117,9 +123,38 @@ void MidiController::processInEvent( const MidiEvent& event, const MidiTime& tim
 				{
 					m_lastValue = 0.0;
 				}
-				emit valueChanged();
+				if (m_previousValue != m_lastValue)
+				{
+					emit valueChanged();
+				}
+			}
+			if (linkEventType == MidiPortEventModel::EventKeyOnOffBinary &&
+				m_midiPort.inputController() == controllerNum + 1)
+			{
+				m_previousValue = m_lastValue;
+				m_lastValue = 1.0;
+				if (m_previousValue != m_lastValue)
+				{
+					emit valueChanged();
+				}
 
 			}
+			break;
+
+		case MidiNoteOff:
+			controllerNum = event.key();
+			if (linkEventType == MidiPortEventModel::EventKeyOnOffBinary &&
+				m_midiPort.inputController() == controllerNum + 1)
+			{
+				m_previousValue = m_lastValue;
+				m_lastValue = 0.0;
+				if (m_previousValue != m_lastValue)
+				{
+					emit valueChanged();
+				}
+
+			}
+			break;
 
 		default:
 			// Don't care - maybe add special cases for pitch and mod later

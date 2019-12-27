@@ -78,8 +78,7 @@ protected slots:
 private:
 	// Midi
 	GroupBox * m_midiGroupBox;
-	LedCheckBox * m_midiEventIsCC;
-	LedCheckBox * m_midiEventIsKey;
+	ComboBox * m_midiEventType;
 	LcdSpinBox * m_midiChannelSpinBox;
 	LcdSpinBox * m_midiControllerSpinBox;
 	LedCheckBox * m_midiAutoDetectCheckBox;

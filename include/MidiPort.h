@@ -33,13 +33,35 @@
 #include "Midi.h"
 #include "MidiTime.h"
 #include "AutomatableModel.h"
-
+#include "ComboBoxModel.h"
 
 class MidiClient;
 class MidiEvent;
 class MidiEventProcessor;
 class MidiPortMenu;
 
+class MidiPortEventModel : public ComboBoxModel
+{
+public:
+	enum Values
+	{
+		EventCC = 0,
+		EventKeyOnOnly,
+		EventKeyOnOffBinary,
+
+		EventLast
+	};
+	MidiPortEventModel(Model* parent = NULL,
+				Values defaultValue = EventCC,
+				const QString& displayName = QString()) :
+		ComboBoxModel(parent, displayName, true)
+	{
+		this->addItem(tr("Continuous Controller"));
+		this->addItem(tr("Note On (toggling)"));
+		this->addItem(tr("Note On and Off (binary)"));
+		this->setValue(defaultValue);
+	}
+};
 
 // class for abstraction of MIDI-port
 class MidiPort : public Model, public SerializingObject
@@ -47,8 +69,8 @@ class MidiPort : public Model, public SerializingObject
 	Q_OBJECT
 	mapPropertyFromModel(int,inputChannel,setInputChannel,m_inputChannelModel);
 	mapPropertyFromModel(int,outputChannel,setOutputChannel,m_outputChannelModel);
-	mapPropertyFromModel(bool,inputControllerIsKey,setInputControllerIsKey,m_inputControllerIsKeyModel);
-	mapPropertyFromModel(bool,inputControllerIsCC,setInputControllerIsCC,m_inputControllerIsCCModel);
+	mapPropertyFromModel(MidiPortEventModel::Values, inputControllerEventType,
+			     setInputControllerEventType,m_inputControllerEventTypeModel);
 	mapPropertyFromModel(int,inputController,setInputController,m_inputControllerModel);
 	mapPropertyFromModel(int,outputController,setOutputController,m_outputControllerModel);
 	mapPropertyFromModel(int,fixedInputVelocity,setFixedInputVelocity,m_fixedInputVelocityModel);
@@ -150,8 +172,7 @@ private:
 
 	IntModel m_inputChannelModel;
 	IntModel m_outputChannelModel;
-	BoolModel m_inputControllerIsKeyModel;
-	BoolModel m_inputControllerIsCCModel;
+	MidiPortEventModel m_inputControllerEventTypeModel;
 	IntModel m_inputControllerModel;
 	IntModel m_outputControllerModel;
 	IntModel m_fixedInputVelocityModel;
