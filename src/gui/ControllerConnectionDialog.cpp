@@ -91,6 +91,7 @@ public:
 		c->m_midiPort.setInputChannel( m_midiPort.inputChannel() );
 		c->m_midiPort.setInputController( m_midiPort.inputController() );
 		c->m_midiPort.setInputControllerIsKey(m_midiPort.inputControllerIsKey());
+		c->m_midiPort.setInputControllerIsCC(m_midiPort.inputControllerIsCC());
 		c->subscribeReadablePorts( m_midiPort.readablePorts() );
 		c->updateName();
 

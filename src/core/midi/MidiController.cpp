@@ -83,14 +83,18 @@ void MidiController::updateName()
 void MidiController::processInEvent( const MidiEvent& event, const MidiTime& time, f_cnt_t offset )
 {
 	unsigned char controllerNum;
+	int expectedChannel = m_midiPort.inputChannel();
+	if (expectedChannel != event.channel() + 1  && expectedChannel != 0)
+	{
+		return;
+	}
 	switch( event.type() )
 	{
 		case MidiControlChange:
 			controllerNum = event.controllerNumber();
 
-			if( m_midiPort.inputController() == controllerNum + 1 &&
-					( m_midiPort.inputChannel() == event.channel() + 1 ||
-					  m_midiPort.inputChannel() == 0 ) )
+			if(m_midiPort.inputControllerIsCC() &&
+				m_midiPort.inputController() == controllerNum + 1)
 			{
 				unsigned char val = event.controllerValue();
 				m_previousValue = m_lastValue;
@@ -98,6 +102,24 @@ void MidiController::processInEvent( const MidiEvent& event, const MidiTime& tim
 				emit valueChanged();
 			}
 			break;
+
+		case MidiNoteOn:
+			controllerNum = event.key();
+			if (m_midiPort.inputControllerIsKey() &&
+				m_midiPort.inputController() == controllerNum + 1)
+			{
+				m_previousValue = m_lastValue;
+				if (m_lastValue == 0)
+				{
+					m_lastValue = 1.0;
+				}
+				else
+				{
+					m_lastValue = 0.0;
+				}
+				emit valueChanged();
+
+			}
 
 		default:
 			// Don't care - maybe add special cases for pitch and mod later
