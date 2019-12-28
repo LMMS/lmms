@@ -30,6 +30,8 @@
 #include <QVector>
 #include <QWidget>
 #include <QInputDialog>
+#include <QFile>
+#include <QTextStream>
 
 #include "Editor.h"
 #include "ComboBoxModel.h"
@@ -218,6 +220,7 @@ protected slots:
 
 	void zoomingChanged();
 	void quantizeChanged();
+	void labelsChanged();
 	void noteLengthChanged();
 	void quantizeNotes();
 
@@ -331,6 +334,7 @@ private:
 
 	ComboBoxModel m_zoomingModel;
 	ComboBoxModel m_quantizeModel;
+	ComboBoxModel m_labelsModel;
 	ComboBoxModel m_noteLenModel;
 	ComboBoxModel m_scaleModel;
 	ComboBoxModel m_chordModel;
@@ -414,7 +418,12 @@ private:
 
 	// did we start a mouseclick with shift pressed
 	bool m_startedWithShift;
-
+	
+	bool labelsPathCorrect( QString labelsPath );
+	bool labelsFile1Correct;
+	bool labelsFile2Correct;
+	bool labelsFile3Correct;
+	
 	friend class PianoRollWindow;
 
 	StepRecorderWidget m_stepRecorderWidget;
@@ -502,6 +511,7 @@ private:
 
 	ComboBox * m_zoomingComboBox;
 	ComboBox * m_quantizeComboBox;
+	ComboBox * m_labelsComboBox;
 	ComboBox * m_noteLenComboBox;
 	ComboBox * m_scaleComboBox;
 	ComboBox * m_chordComboBox;

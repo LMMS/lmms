@@ -117,6 +117,12 @@ private slots:
 	void setThemeDir(const QString & themeDir);
 	void openBackgroundPicFile();
 	void setBackgroundPicFile(const QString & backgroundPicFile);
+	void openLabels1Dir();
+	void setLabels1Dir(const QString & labels1Dir);
+	void openLabels2Dir();
+	void setLabels2Dir(const QString & labels2Dir);
+	void openLabels3Dir();
+	void setLabels3Dir(const QString & labels3Dir);
 
 	void showRestartWarning();
 
@@ -185,6 +191,9 @@ private:
 #endif
 	QString m_themeDir;
 	QString m_backgroundPicFile;
+	QString m_labels1Dir;
+	QString m_labels2Dir;
+	QString m_labels3Dir;
 
 	QLineEdit * m_workingDirLineEdit;
 	QLineEdit * m_vstDirLineEdit;
@@ -196,6 +205,9 @@ private:
 	QLineEdit * m_sf2FileLineEdit;
 #endif
 	QLineEdit * m_backgroundPicFileLineEdit;
+	QLineEdit * m_labels1DirLineEdit;
+	QLineEdit * m_labels2DirLineEdit;
+	QLineEdit * m_labels3DirLineEdit;
 
 	QLabel * restartWarningLbl;
 };

@@ -152,6 +152,20 @@ public:
 		return m_gigDir;
 	}
 
+	const QString & labels1Dir() const
+	{
+		return m_labels1Dir;
+	}
+	
+	const QString & labels2Dir() const
+	{
+		return m_labels2Dir;
+	}
+	
+	const QString & labels3Dir() const
+	{
+		return m_labels3Dir;
+	}
 
 	QString userVstDir() const
 	{
@@ -246,7 +260,10 @@ public:
 	void setGIGDir(const QString & gigDir);
 	void setThemeDir(const QString & themeDir);
 	void setBackgroundPicFile(const QString & backgroundPicFile);
-
+	void setLabels1Dir(const QString & labels1Dir);
+	void setLabels2Dir(const QString & labels2Dir);
+	void setLabels3Dir(const QString & labels3Dir);
+	
 	// Creates the working directory & subdirectories on disk.
 	void createWorkingDir();
 
@@ -276,6 +293,9 @@ private:
 	QString m_stkDir;
 #endif
 	QString m_gigDir;
+	QString m_labels1Dir;
+	QString m_labels2Dir;
+	QString m_labels3Dir;
 	QString m_themeDir;
 	QString m_backgroundPicFile;
 	QString m_lmmsRcFile;
