@@ -1361,7 +1361,6 @@ void SetupDialog::openLabels1Dir()
 		QString line = stream.readLine();
 		QRegExp num("\\d*");
 		while (!line.isNull()) {
-			qDebug() << line;
 			if(line == ""){
 				break;
 			}
@@ -1419,7 +1418,6 @@ void SetupDialog::openLabels2Dir()
 		QString line = stream.readLine();
 		QRegExp num("\\d*");
 		while (!line.isNull()) {
-			qDebug() << line;
 			if(line == ""){
 				break;
 			}
