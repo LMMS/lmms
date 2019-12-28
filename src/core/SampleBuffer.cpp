@@ -54,6 +54,7 @@
 #include "endian_handling.h"
 #include "Engine.h"
 #include "GuiApplication.h"
+#include "lmms_constants.h"
 #include "Mixer.h"
 
 #include "FileDialog.h"

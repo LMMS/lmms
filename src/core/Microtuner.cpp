@@ -35,15 +35,54 @@ Microtuner::Microtuner(InstrumentTrack *parent) :
 	m_enabledModel(false, this, tr("Microtuner on / off")),
 	m_baseFreqModel(DefaultBaseFreq, 1.f, 1000.f, 0.01f, this, tr("Base note frequency [Hz]"))
 {
+	// TEMP: default 1:1 keyboard mapping (to be acquired from microtuner storage class)
+	m_keymap = new int[MidiNoteCount];
+	for (int i = 0; i < MidiNoteCount; i++) {m_keymap[i] = i;}
 }
 
 
-/** \brief Return frequency for a given MIDI note / key.
+Microtuner::~Microtuner()
+{
+	delete[] m_keymap;	// TEMP: remove locally generated default keymap
+}
+
+
+/** \brief Map MIDI instrument key to note number.
  *  \param key A MIDI key number ranging from 0 to 127.
- */ 
+ *  \return -1 when key is out of range or not mapped, otherwise note number from 0 to 127.
+ */
+// TODO: maybe notes shouldn't be limited to 0..127? Base note shift should allow ultra/sub-sonic..
+// Everything points to on-the-fly computation; lookup table is too limiting.
+// Although, here I just have a note number, basenote does not affect it..
+int Microtuner::keyToNote(int key) const
+{
+	return (key >= 0 && key < MidiNoteCount) ? m_keymap[key] : -1;
+}
+
+
+/** \brief Return frequency for a given note of the active scale.
+ *  \param note A note number ranging from 0 to 127.
+ *  \return Frequency in Hz; 0 if note is out of range or has invalid (-1) mapping.
+ */
+float Microtuner::noteToFreq(int note) const
+{
+	if (note < 0 || note >= MidiNoteCount) {return 0;}
+
+	// get positive or negative note position on scale, relative to base note
+	int scalePos = note - m_instrumentTrack->baseNote();
+
+	// temporary 12-TET conversion
+	return baseFreq() * powf(2.0f, scalePos / 12.f);
+}
+
+
+/** \brief Return frequency for a given MIDI key, using the active mapping and scale.
+ *  \param note A MIDI key number ranging from 0 to 127.
+ *  \return Frequency in Hz; 0 if key is out of range or not mapped.
+ */
 float Microtuner::keyToFreq(int key) const
 {
-	return baseFreq() * powf(2.0f, (key - m_instrumentTrack->baseNote()) / 12.f);
+	return noteToFreq(keyToNote(key));
 }
 
 

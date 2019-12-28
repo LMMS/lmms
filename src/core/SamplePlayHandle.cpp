@@ -27,6 +27,7 @@
 #include "BBTrack.h"
 #include "Engine.h"
 #include "InstrumentTrack.h"
+#include "lmms_constants.h"
 #include "Mixer.h"
 #include "SampleTrack.h"
 

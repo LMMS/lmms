@@ -25,17 +25,21 @@
 #ifndef MICROTUNER_H
 #define MICROTUNER_H
 
+#include <atomic>
+
 #include "AutomatableModel.h"
 #include "JournallingObject.h"
 #include "lmms_constants.h"
 
 class InstrumentTrack;
 
+
 class LMMS_EXPORT Microtuner : public Model, public JournallingObject
 {
 	Q_OBJECT
 public:
 	Microtuner(InstrumentTrack *parent);
+	~Microtuner();
 
 	bool enabled() const {return m_enabledModel.value();}
 	BoolModel* enabledModel() {return &m_enabledModel;}
@@ -43,6 +47,8 @@ public:
 	float baseFreq() const {return enabled() ? m_baseFreqModel.value() : DefaultBaseFreq;}
 	FloatModel* baseFreqModel() {return &m_baseFreqModel;}
 
+	int keyToNote(int key) const;
+	float noteToFreq(int note) const;
 	float keyToFreq(int key) const;
 
 protected:
@@ -53,9 +59,12 @@ protected:
 private:
 	InstrumentTrack *m_instrumentTrack;
 
-	BoolModel m_enabledModel;		//! Enable microtuner (otherwise using 12-TET @440 Hz)
+	BoolModel m_enabledModel;		//!< Enable microtuner (otherwise using 12-TET @440 Hz)
 
-	FloatModel m_baseFreqModel;		//! Base note frequency (typ. 440 Hz)
+	FloatModel m_baseFreqModel;		//!< Base note frequency (typ. 440 Hz)
+
+//	Scale *m_scale;
+	std::atomic<int*> m_keymap;		//!< mapping of MIDI keys (notes) to notes
 };
 
 #endif
