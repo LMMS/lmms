@@ -98,7 +98,6 @@ protected:
 	QString nodeName() const { return "spacontrols"; }
 
 	std::vector<std::unique_ptr<SpaProc>> m_procs;
-	std::map<unsigned, SpaProc*> m_procsByPort;
 
 private:
 	unsigned m_channelsPerProc;

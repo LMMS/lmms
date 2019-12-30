@@ -22,6 +22,7 @@
  *
  */
 
+#include "AutomatableModel.h"
 #include "SpaControlBase.h"
 
 #ifdef LMMS_HAVE_SPA
@@ -54,10 +55,6 @@ SpaControlBase::SpaControlBase(Model* that, const QString& uniqueName,
 								1 + static_cast<bool>(newOne->m_audioInCount),
 								1 + static_cast<bool>(newOne->m_audioOutCount));
 						Q_ASSERT(channelsLeft >= 0);
-						if(newOne->netPort())
-						{
-							m_procsByPort.emplace(newOne->netPort(), newOne.get());
-						}
 						m_procs.push_back(std::move(newOne));
 					}
 					else
@@ -125,7 +122,18 @@ void SpaControlBase::loadSettings(const QDomElement &that)
 	// this will load only initial models and ignore added models
 	LinkedModelGroups::loadSettings(that);
 
-	// TODO: now load added models, then call modelAtPort() for each
+	QDomElement models = that.firstChildElement("models");
+	for(QDomElement el = models.firstChildElement(); !el.isNull();
+		el = el.nextSiblingElement())
+	{
+		QString nodename = el.hasAttribute("nodename")	? el.attribute("nodename")
+														: el.nodeName();
+		if(!m_procs[0]->containsModel(nodename))
+		{
+			AutomatableModel* newModel = modelAtPort(nodename); // create model in all processes
+			newModel->loadSettings(models, nodename);
+		}
+	}
 }
 
 SpaControlBase::~SpaControlBase() {}
@@ -215,13 +223,18 @@ void SpaControlBase::run(unsigned frames) {
 
 AutomatableModel *SpaControlBase::modelAtPort(const QString &dest)
 {
-	if (m_procs.size() == 1)
+	QUrl url(dest);
+	// create model at all ports, if it does not yet exist
+	for (std::unique_ptr<SpaProc>& proc : m_procs)
 	{
-		QUrl url(dest);
-		return m_procsByPort[static_cast<unsigned>(url.port())]->
-			modelAtPort(dest);
+		proc->modelAtPort(url.path());
 	}
-	else { return nullptr; /* TODO */ }
+	linkAllModels(); // link the newly created models
+	// now return the right model
+	// always return the first proc's model, since this function is used for
+	// automation (all other proc's equivalent models are linked, and thus don't
+	// require automation)
+	return m_procs[0]->modelAtPort(url.path());
 }
 
 
