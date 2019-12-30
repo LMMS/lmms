@@ -94,6 +94,7 @@ public:
 	}
 
 	std::size_t modelNum() const { return m_models.size(); }
+	bool containsModel(const QString& name) const;
 
 	// this is bad style (redirecting into the sub-class), but this class
 	// will be married with the sub-classes (Lv2Proc, SpaProc) anyways,

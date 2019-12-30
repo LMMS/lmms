@@ -91,6 +91,14 @@ void LinkedModelGroup::clearModels()
 
 
 
+bool LinkedModelGroup::containsModel(const QString &name) const
+{
+	return m_models.find(name.toStdString()) != m_models.end();
+}
+
+
+
+
 /*
 	LinkedModelGroups
 */
