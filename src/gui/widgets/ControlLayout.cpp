@@ -1,5 +1,5 @@
 /*
- * LinkedModelGroups.cpp - implementation for LinkedModelGroups.h
+ * ControlLayout.cpp - implementation for ControlLayout.h
  *
  * Copyright (c) 2019-2019 Johannes Lorenz <j.git$$$lorenz-ho.me, $$$=@>
  *
@@ -71,7 +71,7 @@
 ****************************************************************************/
 
 
-#include "LinkedModelGroupLayout.h"
+#include "ControlLayout.h"
 
 #include <QWidget>
 #include <QLayoutItem>
@@ -79,11 +79,9 @@
 #include <QRect>
 #include <QString>
 
-// TODO: rename: ModelGroupLayout
+constexpr const int ControlLayout::m_minWidth;
 
-constexpr const int LinkedModelGroupLayout::m_minWidth;
-
-LinkedModelGroupLayout::LinkedModelGroupLayout(QWidget *parent, int margin, int hSpacing, int vSpacing)
+ControlLayout::ControlLayout(QWidget *parent, int margin, int hSpacing, int vSpacing)
 	: QLayout(parent), m_hSpace(hSpacing), m_vSpace(vSpacing),
 	  m_searchBar(new QLineEdit(parent))
 {
@@ -95,19 +93,19 @@ LinkedModelGroupLayout::LinkedModelGroupLayout(QWidget *parent, int margin, int 
 	m_searchBar->setHidden(true); // nothing to filter yet
 }
 
-LinkedModelGroupLayout::~LinkedModelGroupLayout()
+ControlLayout::~ControlLayout()
 {
 	QLayoutItem *item;
 	while ((item = takeAt(0))) { delete item; }
 }
 
-void LinkedModelGroupLayout::onTextChanged(const QString&)
+void ControlLayout::onTextChanged(const QString&)
 {
 	invalidate();
 	update();
 }
 
-void LinkedModelGroupLayout::addItem(QLayoutItem *item)
+void ControlLayout::addItem(QLayoutItem *item)
 {
 	QWidget* widget = item->widget();
 	const QString str = widget ? widget->objectName() : QString("unnamed");
@@ -115,7 +113,7 @@ void LinkedModelGroupLayout::addItem(QLayoutItem *item)
 	invalidate();
 }
 
-int LinkedModelGroupLayout::horizontalSpacing() const
+int ControlLayout::horizontalSpacing() const
 {
 	if (m_hSpace >= 0) { return m_hSpace; }
 	else
@@ -124,7 +122,7 @@ int LinkedModelGroupLayout::horizontalSpacing() const
 	}
 }
 
-int LinkedModelGroupLayout::verticalSpacing() const
+int ControlLayout::verticalSpacing() const
 {
 	if (m_vSpace >= 0) { return m_vSpace; }
 	else
@@ -133,13 +131,13 @@ int LinkedModelGroupLayout::verticalSpacing() const
 	}
 }
 
-int LinkedModelGroupLayout::count() const
+int ControlLayout::count() const
 {
 	return m_itemMap.size() - 1;
 }
 
 QMap<QString, QLayoutItem*>::const_iterator
-LinkedModelGroupLayout::pairAt(int index) const
+ControlLayout::pairAt(int index) const
 {
 	if (index < 0)
 		return m_itemMap.cend();
@@ -150,53 +148,53 @@ LinkedModelGroupLayout::pairAt(int index) const
 }
 
 // linear time :-(
-QLayoutItem *LinkedModelGroupLayout::itemAt(int index) const
+QLayoutItem *ControlLayout::itemAt(int index) const
 {
 	auto itr = pairAt(index);
 	return itr == m_itemMap.end() ? nullptr : itr.value();
 }
 
-QLayoutItem *LinkedModelGroupLayout::itemByString(const QString &key) const
+QLayoutItem *ControlLayout::itemByString(const QString &key) const
 {
 	auto itr = m_itemMap.find(key);
 	return (itr == m_itemMap.end()) ? nullptr : *itr;
 }
 
 // linear time :-(
-QLayoutItem *LinkedModelGroupLayout::takeAt(int index)
+QLayoutItem *ControlLayout::takeAt(int index)
 {
 	auto itr = pairAt(index);
 	return (itr == m_itemMap.end()) ? nullptr : m_itemMap.take(itr.key());
 }
 
-Qt::Orientations LinkedModelGroupLayout::expandingDirections() const
+Qt::Orientations ControlLayout::expandingDirections() const
 {
 	return Qt::Orientations();
 }
 
-bool LinkedModelGroupLayout::hasHeightForWidth() const
+bool ControlLayout::hasHeightForWidth() const
 {
 	return true;
 }
 
-int LinkedModelGroupLayout::heightForWidth(int width) const
+int ControlLayout::heightForWidth(int width) const
 {
 	int height = doLayout(QRect(0, 0, width, 0), true);
 	return height;
 }
 
-void LinkedModelGroupLayout::setGeometry(const QRect &rect)
+void ControlLayout::setGeometry(const QRect &rect)
 {
 	QLayout::setGeometry(rect);
 	doLayout(rect, false);
 }
 
-QSize LinkedModelGroupLayout::sizeHint() const
+QSize ControlLayout::sizeHint() const
 {
 	return minimumSize();
 }
 
-QSize LinkedModelGroupLayout::minimumSize() const
+QSize ControlLayout::minimumSize() const
 {
 	// original formula from Qt's FlowLayout example:
 	// get maximum height and width for all children.
@@ -215,7 +213,7 @@ QSize LinkedModelGroupLayout::minimumSize() const
 	return size;
 }
 
-int LinkedModelGroupLayout::doLayout(const QRect &rect, bool testOnly) const
+int ControlLayout::doLayout(const QRect &rect, bool testOnly) const
 {
 	int left, top, right, bottom;
 	getContentsMargins(&left, &top, &right, &bottom);
@@ -288,7 +286,7 @@ int LinkedModelGroupLayout::doLayout(const QRect &rect, bool testOnly) const
 	return y + lineHeight - rect.y() + bottom;
 }
 
-int LinkedModelGroupLayout::smartSpacing(QStyle::PixelMetric pm) const
+int ControlLayout::smartSpacing(QStyle::PixelMetric pm) const
 {
 	QObject *parent = this->parent();
 	if (!parent) { return -1; }
