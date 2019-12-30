@@ -36,6 +36,7 @@
 #include <QPointer>
 #include <QScrollBar>
 #include <QStyleOption>
+#include <QDebug>
 
 #ifndef __USE_XOPEN
 #define __USE_XOPEN
@@ -2862,31 +2863,49 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 	QStringList numbersList;
 	bool drawNoteNames = ConfigManager::inst()->value( "ui", "printnotelabels").toInt();
 	int customLabelsFile;
-	bool drawCustomLabels = 0;
-	if (m_labelsModel.value() == 0){
-		drawCustomLabels = 0;
-	} else if (m_labelsModel.value() == 1) {
-		drawCustomLabels = 1;
-		if (labelsFile1Correct){
+	bool drawCustomLabels = false;
+	if (m_labelsModel.value() == 0)
+	{
+		drawCustomLabels = false;
+	} 
+	else if (m_labelsModel.value() == 1) 
+	{
+		drawCustomLabels = true;
+		if (labelsFile1Correct)
+		{
 			customLabelsFile = 1;
-		} else if (labelsFile2Correct) {
+		} 
+		else if (labelsFile2Correct) 
+		{
 			customLabelsFile = 2;
-		} else {
+		} 
+		else 
+		{
 			customLabelsFile = 3;
 		}
-	} else if (m_labelsModel.value() == 2) {
-		drawCustomLabels = 1;
-		if (labelsFile1Correct){
-			if (labelsFile2Correct) {
+	} 
+	else if (m_labelsModel.value() == 2) 
+	{
+		drawCustomLabels = tru;
+		if (labelsFile1Correct)
+		{
+			if (labelsFile2Correct) 
+			{
 				customLabelsFile = 2;
-			} else {
+			} 
+			else 
+			{
 				customLabelsFile = 3;
 			}
-		} else {
+		} 
+		else 
+		{
 			customLabelsFile = 3;
 		}
-	} else if (m_labelsModel.value() == 3) {
-		drawCustomLabels = 1;
+	} 
+	else if (m_labelsModel.value() == 3) 
+	{
+		drawCustomLabels = true;
 		customLabelsFile = 3;
 	}
 	
@@ -2894,36 +2913,50 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 	QString labels2Path = ConfigManager::inst()->labels2Dir();
 	QString labels3Path = ConfigManager::inst()->labels3Dir();
 	
-	if (drawCustomLabels){
+	if (drawCustomLabels)
+	{
 		QString labelsPath;
-		if(customLabelsFile == 1) labelsPath = labels1Path; 
-		if(customLabelsFile == 2) labelsPath = labels2Path; 
-		if(customLabelsFile == 3) labelsPath = labels3Path; 
+		if (customLabelsFile == 1) { labelsPath = labels1Path; }
+		if (customLabelsFile == 2) { labelsPath = labels2Path; }
+		if (customLabelsFile == 3) { labelsPath = labels3Path; }
 				
 		QFile labelsFile(labelsPath);
 		labelsFile.open(QIODevice::ReadOnly);
 		QTextStream stream(&labelsFile);
 		QString line = stream.readLine();
 		QRegExp num("\\d*");
-		while (!line.isNull()) {
-			if (num.exactMatch(line.mid(0,1))){
-				if (num.exactMatch(line.mid(1,1))){
-					if (num.exactMatch(line.mid(2,1))){
+		while (!line.isNull()) 
+		{
+			if (num.exactMatch(line.mid(0,1)))
+			{
+				if (num.exactMatch(line.mid(1,1)))
+				{
+					if (num.exactMatch(line.mid(2,1)))
+					{
 						int num = line.mid(0,3).toInt();
-						if (num > 107){		
+						if (num > 107)
+						{		
 							break;
-						} else if (line.mid(3,1) != " " || line.mid(3,2) == "  "){
+						} 
+						else if (line.mid(3,1) != " " || line.mid(3,2) == "  ")
+						{
 							break;
-						} else {
+						} 
+						else 
+						{
 							//three digit number <= 107
 							int n = line.size();
 							QString labelText = line.mid(4, n-3);
 							labelsList << labelText;
 							numbersList << QString::number(num);
 						}
-					} else if (line.mid(2,1) != " " || line.mid(2,2) == "  "){
+					} 
+					else if (line.mid(2,1) != " " || line.mid(2,2) == "  ")
+					{
 						break;
-					} else {
+					} 
+					else 
+					{
 						//two digit number
 						int n = line.size();
 						QString labelText = line.mid(3, n-2);
@@ -2931,9 +2964,13 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 						labelsList << labelText;
 						numbersList << QString::number(num);
 					}
-				} else if (line.mid(1,1) != " " || line.mid(1,2) == "  ") {
+				} 
+				else if (line.mid(1,1) != " " || line.mid(1,2) == "  ") 
+				{
 					break;
-				} else {
+				} 
+				else 
+				{
 					// one digit number
 					int n = line.size();
 					QString labelText = line.mid(2, n-1);
@@ -3090,10 +3127,6 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 				}
 				p.drawText( textStart, noteString );
 			}
-		}
-		if (drawCustomLabels){
-			
-			
 		}
 		++key;
 	}
@@ -3577,11 +3610,12 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 		case ModeEditDetuning: cursor = s_toolOpen; break;
 	}
 	QPoint mousePosition = mapFromGlobal( QCursor::pos() );
-	if( cursor != NULL && mousePosition.y() > keyAreaTop() && mousePosition.x() > noteEditLeft())
+	if ( cursor != NULL && mousePosition.y() > keyAreaTop() && mousePosition.x() > noteEditLeft())
 	{
 		p.drawPixmap( mousePosition + QPoint( 8, 8 ), *cursor );
 	}
-	if(drawCustomLabels){
+	if (drawCustomLabels)
+	{
 		key = m_startKey;
 		QFont labelFont = p.font();
 		labelFont.setBold( false );
@@ -3589,12 +3623,13 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 		for( int y = keyAreaBottom() - 1; y > PR_TOP_MARGIN;
 				y -= KEY_LINE_HEIGHT )
 		{
-			if(numbersList.contains(QString::number(key))) {
+			if (numbersList.contains(QString::number(key))) 
+			{
 				int index = numbersList.indexOf(QString::number(key));
 				p.setPen(QColor(190,190,190,255));
 				QString noteString = labelsList[index];
-				QPoint textStart( WHITE_KEY_WIDTH + 1, y-2);
-				p.drawText( textStart, noteString );
+				QPoint textStart(WHITE_KEY_WIDTH + 1, y-2);
+				p.drawText(textStart, noteString);
 			}
 			++key;	
 		}
