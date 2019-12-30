@@ -1352,46 +1352,63 @@ void SetupDialog::openLabels1Dir()
 
 	if (!new_file.isEmpty())
 	{
-		bool fileCorrect = 1;
+		bool fileCorrect = true;
 		QFile labelsFile(new_file);
 		labelsFile.open(QIODevice::ReadOnly);
-		if (!labelsFile.isOpen()) return ;
+		if (!labelsFile.isOpen()) { return; }
 		
 		QTextStream stream(&labelsFile);
 		QString line = stream.readLine();
 		QRegExp num("\\d*");
-		while (!line.isNull()) {
-			if(line == ""){
+		while (!line.isNull()) 
+		{
+			if(line == "")
+			{
 				break;
 			}
-			if(line.mid(0, 2) == "//"){
+			if(line.mid(0, 2) == "//")
+			{
 				//Comment line
-			} else if (num.exactMatch(line.mid(0,1))){
-				if (num.exactMatch(line.mid(1,1))){
-					if (num.exactMatch(line.mid(2,1))){
+			} 
+			else if (num.exactMatch(line.mid(0,1)))
+			{
+				if (num.exactMatch(line.mid(1,1)))
+				{
+					if (num.exactMatch(line.mid(2,1)))
+					{
 						int number = line.mid(0,3).toInt();
-						if (number > 127){
-							fileCorrect = 0;			
+						if (number > 107)
+						{
+							fileCorrect = false;			
 							break;
-						} else if (line.mid(3,1) != " " || line.mid(3,2) == "  "){
-							fileCorrect = 0;
+						} 
+						else if (line.mid(3,1) != " " || line.mid(3,2) == "  ")
+						{
+							fileCorrect = false;
 							break;
 						}
-					} else if (line.mid(2,1) != " " || line.mid(2,2) == "  "){
-						fileCorrect = 0;
+					} 
+					else if (line.mid(2,1) != " " || line.mid(2,2) == "  ")
+					{
+						fileCorrect = false;
 						break;
 					}		
-				} else if (line.mid(1,1) != " " || line.mid(1,2) == "  ") {
-					fileCorrect = 0;
+				} 
+				else if (line.mid(1,1) != " " || line.mid(1,2) == "  ") 
+				{
+					fileCorrect = false;
 					break;
 				}	
-			} else {
-				fileCorrect = 0;
+			} 
+			else 
+			{
+				fileCorrect = false;
 				break;
 			}
 			line = stream.readLine();
 		}	
-		if(fileCorrect){
+		if(fileCorrect)
+		{
 			m_labels1DirLineEdit->setText(new_file);
 		}	
 	}
@@ -1409,46 +1426,63 @@ void SetupDialog::openLabels2Dir()
 
 	if (!new_file.isEmpty())
 	{
-		bool fileCorrect = 1;
+		bool fileCorrect = true;
 		QFile labelsFile(new_file);
 		labelsFile.open(QIODevice::ReadOnly);
-		if (!labelsFile.isOpen()) return ;
+		if (!labelsFile.isOpen()) { return; }
 		
 		QTextStream stream(&labelsFile);
 		QString line = stream.readLine();
 		QRegExp num("\\d*");
-		while (!line.isNull()) {
-			if(line == ""){
+		while (!line.isNull()) 
+		{
+			if(line == "")
+			{
 				break;
 			}
-			if(line.mid(0, 2) == "//"){
+			if(line.mid(0, 2) == "//")
+			{
 				//Comment line
-			} else if (num.exactMatch(line.mid(0,1))){
-				if (num.exactMatch(line.mid(1,1))){
-					if (num.exactMatch(line.mid(2,1))){
+			} 
+			else if (num.exactMatch(line.mid(0,1)))
+			{
+				if (num.exactMatch(line.mid(1,1)))
+				{
+					if (num.exactMatch(line.mid(2,1)))
+					{
 						int number = line.mid(0,3).toInt();
-						if (number > 127){
-							fileCorrect = 0;			
+						if (number > 107)
+						{
+							fileCorrect = false;			
 							break;
-						} else if (line.mid(3,1) != " " || line.mid(3,2) == "  "){
-							fileCorrect = 0;
+						} 
+						else if (line.mid(3,1) != " " || line.mid(3,2) == "  ")
+						{
+							fileCorrect = false;
 							break;
 						}
-					} else if (line.mid(2,1) != " " || line.mid(2,2) == "  "){
-						fileCorrect = 0;
+					} 
+					else if (line.mid(2,1) != " " || line.mid(2,2) == "  ")
+					{
+						fileCorrect = false;
 						break;
 					}		
-				} else if (line.mid(1,1) != " " || line.mid(1,2) == "  ") {
-					fileCorrect = 0;
+				} 
+				else if (line.mid(1,1) != " " || line.mid(1,2) == "  ") 
+				{
+					fileCorrect = false;
 					break;
 				}	
-			} else {
-				fileCorrect = 0;
+			} 
+			else 
+			{
+				fileCorrect = false;
 				break;
 			}
 			line = stream.readLine();
 		}	
-		if(fileCorrect){
+		if(fileCorrect)
+		{
 			m_labels2DirLineEdit->setText(new_file);
 		}	
 	}
@@ -1466,7 +1500,7 @@ void SetupDialog::openLabels3Dir()
 
 	if (!new_file.isEmpty())
 	{
-		bool fileCorrect = 1;
+		bool fileCorrect = true;
 		QFile labelsFile(new_file);
 		labelsFile.open(QIODevice::ReadOnly);
 		if (!labelsFile.isOpen()) return ;
@@ -1474,38 +1508,53 @@ void SetupDialog::openLabels3Dir()
 		QTextStream stream(&labelsFile);
 		QString line = stream.readLine();
 		QRegExp num("\\d*");
-		while (!line.isNull()) {
-			if(line == ""){
+		while (!line.isNull()) 
+		{
+			if(line == "")
+			{
 				break;
 			}
-			if(line.mid(0, 2) == "//"){
+			if(line.mid(0, 2) == "//")
+			{
 				//Comment line
-			} else if (num.exactMatch(line.mid(0,1))){
-				if (num.exactMatch(line.mid(1,1))){
-					if (num.exactMatch(line.mid(2,1))){
+			} 
+			else if (num.exactMatch(line.mid(0,1)))
+			{
+				if (num.exactMatch(line.mid(1,1)))
+				{
+					if (num.exactMatch(line.mid(2,1)))
+					{
 						int number = line.mid(0,3).toInt();
-						if (number > 127){
-							fileCorrect = 0;			
+						if (number > 107)
+						{
+							fileCorrect = false;			
 							break;
 						} else if (line.mid(3,1) != " " || line.mid(3,2) == "  "){
-							fileCorrect = 0;
+							fileCorrect = false;
 							break;
 						}
-					} else if (line.mid(2,1) != " " || line.mid(2,2) == "  "){
-						fileCorrect = 0;
+					}
+					else if (line.mid(2,1) != " " || line.mid(2,2) == "  ")
+					{
+						fileCorrect = false;
 						break;
 					}		
-				} else if (line.mid(1,1) != " " || line.mid(1,2) == "  ") {
-					fileCorrect = 0;
+				}
+				else if (line.mid(1,1) != " " || line.mid(1,2) == "  ") 
+				{
+					fileCorrect = false;
 					break;
 				}	
-			} else {
-				fileCorrect = 0;
+			}
+			else
+			{
+				fileCorrect = false;
 				break;
 			}
 			line = stream.readLine();
 		}	
-		if(fileCorrect){
+		if(fileCorrect)
+		{
 			m_labels3DirLineEdit->setText(new_file);
 		}	
 	}
