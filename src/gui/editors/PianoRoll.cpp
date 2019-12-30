@@ -2886,7 +2886,7 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 	} 
 	else if (m_labelsModel.value() == 2) 
 	{
-		drawCustomLabels = tru;
+		drawCustomLabels = true;
 		if (labelsFile1Correct)
 		{
 			if (labelsFile2Correct) 
