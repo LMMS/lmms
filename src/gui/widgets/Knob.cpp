@@ -28,6 +28,7 @@
 #include <QInputDialog>
 #include <QMouseEvent>
 #include <QPainter>
+#include <QScreen>
 #include <QWhatsThis>
 
 #ifndef __USE_XOPEN
@@ -50,6 +51,7 @@
 #include "TextFloat.h"
 
 TextFloat * Knob::s_textFloat = NULL;
+Knob::SetPosStatusType Knob::s_setPosStatus = Knob::SetPosStatusType::NotChecked;
 
 
 
@@ -586,14 +588,39 @@ void Knob::mousePressEvent( QMouseEvent * _me )
 			thisModel->saveJournallingState( false );
 		}
 
+		// on apple, we know that setPos will not work in many cases
+		// (and that the below check won't work either)
+		// to not confuse the user, we won't hide the cursor on apple,
+		// and we won't call setPos on apple either
+#ifdef LMMS_BUILD_APPLE
+		(void)s_setPosStatus;
+#else
+		if(s_setPosStatus == SetPosStatusType::NotChecked)
+		{
+			QPoint oldPos = QCursor::pos();
+			QCursor::setPos(oldPos - QPoint(1,1));
+			s_setPosStatus = (QCursor::pos() == oldPos)
+				? SetPosStatusType::NoEffect
+				: SetPosStatusType::Works;
+			QCursor::setPos(oldPos);
+		}
+#endif
+
 		const QPoint & p = _me->pos();
-		m_origMousePos = p;
-		m_mouseOffset = QPoint(0, 0);
+		m_origMousePos = m_lastMousePos = p;
 		m_leftOver = 0.0f;
 
 		emit sliderPressed();
 
-		QApplication::setOverrideCursor( Qt::BlankCursor );
+#ifndef LMMS_BUILD_APPLE
+		if(s_setPosStatus == SetPosStatusType::Works)
+		{
+			// if overriding of cursor does not work, the user can
+			// be confused when a hidden cursor reappears somewhere
+			// outside of the knob
+			QApplication::setOverrideCursor( Qt::BlankCursor );
+		}
+#endif
 		s_textFloat->setText( displayValue() );
 		s_textFloat->moveGlobal( this,
 				QPoint( width() + 2, 0 ) );
@@ -618,12 +645,55 @@ void Knob::mousePressEvent( QMouseEvent * _me )
 
 void Knob::mouseMoveEvent( QMouseEvent * _me )
 {
-	if( m_buttonPressed && _me->pos() != m_origMousePos )
+	if( m_buttonPressed && _me->pos() != m_lastMousePos )
 	{
-		m_mouseOffset = _me->pos() - m_origMousePos;
-		setPosition( m_mouseOffset );
+		// knob position is changed depending on last mouse position
+		setPosition( _me->pos() - m_lastMousePos );
 		emit sliderMoved( model()->value() );
-		QCursor::setPos( mapToGlobal( m_origMousePos ) );
+
+		// the rest of the code updates the cursor and/or m_origMousePos
+
+		// get screen min/max values where a flip is not required yet
+		const QRect& rec =
+#if QT_VERSION >= 0x050A00
+			QApplication::screenAt(QCursor::pos())->geometry();
+#else
+			QApplication::desktop()->availableGeometry();
+#endif
+		int ymax = qMax(rec.height() - 2, 0), xmax = qMax(rec.width() - 2, 0);
+		int ymin = 1, xmin = 1;
+
+		// calculate new coordinates
+		int x = QCursor::pos().x(), y = QCursor::pos().y();
+		QPoint newPos(
+			(x<xmin) ? xmax : (x>xmax) ? xmin : x,
+			(y<ymin) ? ymax : (y>ymax) ? ymin : y);
+
+		auto setCursor = [&](const QPoint& p) -> bool
+		{
+#ifdef LMMS_BUILD_APPLE
+			(void)p;
+			return false;
+#else
+			QCursor::setPos(newPos);
+			return QCursor::pos() == newPos;
+#endif
+		};
+
+		// no flip, or calling QCursor::setPos() for flip has no effect?
+		// (the latter occurs on some systems without accessability)
+		if(newPos == QCursor::pos() || !setCursor(newPos))
+		{
+			// original position for next time is current position
+			m_lastMousePos = _me->pos();
+		}
+		else
+		{
+			// successful flip of cursor
+			// bash original position to current position
+			// to avoid the knob snapping back
+			m_lastMousePos = mapFromGlobal(QCursor::pos());
+		}
 	}
 	s_textFloat->setText( displayValue() );
 }
@@ -642,7 +712,13 @@ void Knob::mouseReleaseEvent( QMouseEvent* event )
 		}
 	}
 
-	m_buttonPressed = false;
+	if( m_buttonPressed )
+	{
+		m_buttonPressed = false;
+#ifndef LMMS_BUILD_APPLE
+		QCursor::setPos( mapToGlobal( m_origMousePos ) );
+#endif
+	}
 
 	emit sliderReleased();
 
