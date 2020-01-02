@@ -61,6 +61,20 @@ private slots: // tests
 		AutomatableModel::linkModels(&m1, &m2);
 		QVERIFY(!m1Changed); // it's already linked
 		QVERIFY(!m2Changed);
+
+		resetChanged();
+		BoolModel m3(false);
+		m1.setValue(1.f);
+		m2.setValue(1.f);
+		AutomatableModel::linkModels(&m1, &m2);
+		QVERIFY(m1.value());
+		QVERIFY(m2.value());
+		QVERIFY(!m3.value());
+		AutomatableModel::linkModels(&m2, &m3); // drag m3, drop on m2
+		// m2 should take m3's (0) value
+		// due to a bug(?), this does not happen
+		QVERIFY(m2.value());
+		QVERIFY(!m3.value());
 	}
 } AutomatableModelTests;
 
