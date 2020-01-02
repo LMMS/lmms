@@ -178,7 +178,10 @@ jobs:
       - *restore_cache
       - run:
           name: Install Homebrew dependencies
-          command: brew update && brew install ccache fftw cmake pkg-config libogg libvorbis lame libsndfile libsamplerate jack sdl libgig libsoundio stk fluid-synth portaudio fltk qt5 carla
+          command: |
+            # unlink Homebrew's python 2 to prevent an node-gyp error
+            brew unlink python@2 || true
+            brew update && brew install ccache fftw cmake pkg-config libogg libvorbis lame libsndfile libsamplerate jack sdl libgig libsoundio stk fluid-synth portaudio fltk qt5 carla
       - run:
           name: Install nodejs dependencies
           command: npm install -g appdmg
