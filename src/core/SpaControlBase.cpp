@@ -29,6 +29,7 @@
 
 #include <QDebug>
 #include <QFileInfo>
+#include <QThread>
 #include <QUrl>
 
 #include <spa/spa.h>
@@ -122,6 +123,7 @@ void SpaControlBase::loadSettings(const QDomElement &that)
 	// this will load only initial models and ignore added models
 	LinkedModelGroups::loadSettings(that);
 
+	bool slept = false;
 	QDomElement models = that.firstChildElement("models");
 	for(QDomElement el = models.firstChildElement(); !el.isNull();
 		el = el.nextSiblingElement())
@@ -130,6 +132,11 @@ void SpaControlBase::loadSettings(const QDomElement &that)
 														: el.nodeName();
 		if(!m_procs[0]->containsModel(nodename))
 		{
+			if (!slept)
+			{
+				QThread::sleep(3);
+				slept = true;
+			}
 			AutomatableModel* newModel = modelAtPort(nodename); // create model in all processes
 			newModel->loadSettings(models, nodename);
 		}
