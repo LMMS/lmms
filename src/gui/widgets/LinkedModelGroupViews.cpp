@@ -109,7 +109,8 @@ void LinkedModelGroupView::addControl(Control* ctrl, const std::string& id,
 		box->setObjectName(QString::fromStdString(display));
 		m_layout->addWidget(box);
 
-		m_widgets.emplace(id, ctrl);
+		// take ownership of control and add it
+		m_widgets.emplace(id, std::unique_ptr<Control>(ctrl));
 		++wdgNum;
 	}
 
