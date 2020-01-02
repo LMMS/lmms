@@ -110,14 +110,6 @@ unset LD_LIBRARY_PATH
 # Ensure linuxdeployqt can find shared objects
 export LD_LIBRARY_PATH="${APPDIR}"usr/lib/lmms/:"${APPDIR}"usr/lib/lmms/optional:"$LD_LIBRARY_PATH"
 
-# Handle wine linking
-if [ -d "@WINE_32_LIBRARY_DIR@" ]; then
-   export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:@WINE_32_LIBRARY_DIRS@
-fi
-if [ -d "@WINE_64_LIBRARY_DIR@" ]; then
-   export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:@WINE_64_LIBRARY_DIRS@
-fi
-
 # Move executables so linuxdeployqt can find them
 ZYNLIB="${APPDIR}usr/lib/lmms/RemoteZynAddSubFx"
 VSTLIB32="${APPDIR}usr/lib/lmms/32/RemoteVstPlugin32.exe.so"
@@ -130,6 +122,16 @@ VSTBIN64="${APPDIR}usr/bin/RemoteVstPlugin64.exe.so"
 mv "$ZYNLIB" "$ZYNBIN"
 mv "$VSTLIB32" "$VSTBIN32" || true
 mv "$VSTLIB64" "$VSTBIN64" || true
+
+# Handle wine linking
+if [ -d "@WINE_32_LIBRARY_DIR@" ] && \
+		ldd "$VSTBIN32" | grep "libwine\.so" | grep "not found"; then
+   export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:"@WINE_32_LIBRARY_DIRS@"
+fi
+if [ -d "@WINE_64_LIBRARY_DIR@" ] && \
+		ldd "$VSTBIN64" | grep "libwine\.so" | grep "not found"; then
+   export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:"@WINE_64_LIBRARY_DIRS@"
+fi
 
 # Patch the desktop file
 sed -i 's/.*Exec=.*/Exec=lmms.real/' "$DESKTOPFILE"
