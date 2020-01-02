@@ -35,8 +35,8 @@ class AutomatableModelTest : QTestSuite
 	void resetChanged() { m1Changed = m2Changed = false; }
 
 private slots: // helper slots
-	void onM1Changed(Model* ) { m1Changed = true; }
-	void onM2Changed(Model* ) { m2Changed = true; }
+	void onM1Changed() { m1Changed = true; }
+	void onM2Changed() { m2Changed = true; }
 
 private slots: // tests
 	//! Test that upcast and exact casts work,
@@ -62,10 +62,10 @@ private slots: // tests
 	{
 		BoolModel m1(false), m2(false);
 
-		QObject::connect(&m1, SIGNAL(dataChanged(Model*)),
-			this, SLOT(onM1Changed(Model*)));
-		QObject::connect(&m2, SIGNAL(dataChanged(Model*)),
-			this, SLOT(onM2Changed(Model*)));
+		QObject::connect(&m1, SIGNAL(dataChanged()),
+			this, SLOT(onM1Changed()));
+		QObject::connect(&m2, SIGNAL(dataChanged()),
+			this, SLOT(onM2Changed()));
 
 		resetChanged();
 		AutomatableModel::linkModels(&m1, &m1);
