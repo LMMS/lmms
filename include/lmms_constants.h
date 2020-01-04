@@ -49,8 +49,7 @@ const float F_PI_SQR = (float) LD_PI_SQR;
 const float F_E = (float) LD_E;
 const float F_E_R = (float) LD_E_R;
 
-const float DefaultBaseFreq = 440.f;	//! default base note frequency
-const unsigned int MidiNoteCount = 128;	//! valid for both MIDI 1.0 and 2.0
+const float DefaultBaseFreq = 440.f;	//!< default base note frequency
 
 // Frequency ranges (in Hz).
 // Arbitrary low limit for logarithmic frequency scale; >1 Hz.

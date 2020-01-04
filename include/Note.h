@@ -73,8 +73,12 @@ const int FirstOctave = -1;
 const int WhiteKeysPerOctave = 7;
 const int BlackKeysPerOctave = 5;
 const int KeysPerOctave = WhiteKeysPerOctave + BlackKeysPerOctave;
-const int NumKeys = 128;	// limited to MIDI range
+const int NumKeys = 128;	//!< limited to MIDI range (valid for both MIDI 1.0 and 2.0)
 const int DefaultKey = DefaultOctave * KeysPerOctave + Key_A;
+
+//! Total number of tones that can be produced using MIDI notes + base note shifts
+const int NumNotes = 2 * NumKeys - 1;
+const int CenterNote = NumKeys - 1;		//!< note assigned to the base frequency
 
 const float MaxDetuning = 4 * 12.0f;
 

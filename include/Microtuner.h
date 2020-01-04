@@ -30,6 +30,7 @@
 #include "AutomatableModel.h"
 #include "JournallingObject.h"
 #include "lmms_constants.h"
+#include "Note.h"
 
 class InstrumentTrack;
 
@@ -44,12 +45,12 @@ public:
 	bool enabled() const {return m_enabledModel.value();}
 	BoolModel* enabledModel() {return &m_enabledModel;}
 
-	float baseFreq() const {return enabled() ? m_baseFreqModel.value() : DefaultBaseFreq;}
-	FloatModel* baseFreqModel() {return &m_baseFreqModel;}
+	float baseFreq() const {return enabled() ? m_notemap[CenterNote] : DefaultBaseFreq;}
+
+	int nearestKey(int key, int direction) const;
 
 	int keyToNote(int key) const;
-	float noteToFreq(int note) const;
-	float keyToFreq(int key) const;
+	float keyToFreq(int key, float detune = 0, float pitchShift = 0) const;
 
 protected:
 	QString nodeName() const override {return "microtuner";}
@@ -57,14 +58,13 @@ protected:
 	void loadSettings(const QDomElement &element) override;
 
 private:
-	InstrumentTrack *m_instrumentTrack;
+	InstrumentTrack *m_instrumentTrack;		// Required to access base note
 
 	BoolModel m_enabledModel;		//!< Enable microtuner (otherwise using 12-TET @440 Hz)
 
-	FloatModel m_baseFreqModel;		//!< Base note frequency (typ. 440 Hz)
-
-//	Scale *m_scale;
-	std::atomic<int*> m_keymap;		//!< mapping of MIDI keys (notes) to notes
+	// Active settings
+	std::atomic<int*> m_keymap;		//!< Mapping of MIDI keys (notes) to notes
+	std::atomic<float*> m_notemap;	//!< Mapping of notes to frequencies
 };
 
 #endif

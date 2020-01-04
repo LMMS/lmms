@@ -2902,8 +2902,18 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 	int keys_processed = 0;
 
 	int key = m_startKey;
-	int first_key = m_pattern->instrumentTrack()->firstNote();
-	int last_key = m_pattern->instrumentTrack()->lastNote();
+	int first_key;
+	int last_key;
+	if (hasValidPattern())
+	{
+		first_key = m_pattern->instrumentTrack()->firstNote();
+		last_key = m_pattern->instrumentTrack()->lastNote();
+	}
+	else
+	{
+		first_key = 0;
+		last_key = NumKeys - 1;
+	}
 
 	// draw all white keys...
 	for( int y = key_line_y + 1 + y_offset; y > PR_TOP_MARGIN;

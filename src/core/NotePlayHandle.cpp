@@ -509,12 +509,9 @@ void NotePlayHandle::updateFrequency()
 	if (m_instrumentTrack->m_microtuner.enabled())
 	{
 		// custom key mapping and scale: get frequency from the microtuner
-		// TODO: what about the pitch?
-		// keep the 100 cent range or make it scale dependent?
-		// what about master, base and instrument pitch bend? Compute "key" here or let MT do it, because mapping?
-			// or maybe call a mapping function from MT first..
-		m_frequency = m_instrumentTrack->m_microtuner.keyToFreq(key());
-		m_unpitchedFrequency = m_instrumentTrack->m_microtuner.keyToFreq(key());
+		float pitchShift = 100 * masterPitch + instrumentPitch;
+		m_frequency = m_instrumentTrack->m_microtuner.keyToFreq(key(), detune, pitchShift);
+		m_unpitchedFrequency = m_instrumentTrack->m_microtuner.keyToFreq(key(), detune, 100 * masterPitch);
 	}
 	else
 	{
@@ -525,7 +522,7 @@ void NotePlayHandle::updateFrequency()
 	}
 
 	// DEBUG
-	std::cout<<"key "<<key()<<" freq "<<m_frequency<<std::endl;
+	std::cout<<"key "<<key()<<" freq base: "<<m_unpitchedFrequency<<", pitches "<<detune<<" "<<instrumentPitch<<" "<<masterPitch<<", final freq "<<m_frequency<<std::endl;
 
 	for (NotePlayHandleList::Iterator it = m_subNotes.begin(); it != m_subNotes.end(); ++it)
 	{

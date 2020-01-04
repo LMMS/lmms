@@ -73,7 +73,7 @@ InstrumentMiscView::InstrumentMiscView(InstrumentTrack *it, QWidget *parent) :
 	microtunerLayout->addLayout(generalLayout);
 
 	Knob *baseFreqKnob = new Knob(knobBright_26);
-	baseFreqKnob->setModel(it->m_microtuner.baseFreqModel());
+//	baseFreqKnob->setModel(it->m_microtuner.baseFreqModel());
 	baseFreqKnob->setLabel(tr("BASE FREQ"));
 	baseFreqKnob->setHintText(tr("Base note frequency:"), " " + tr("Hz"));
 	baseFreqKnob->setToolTip(tr("Base note frequency"));
