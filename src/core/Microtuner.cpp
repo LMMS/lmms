@@ -22,13 +22,11 @@
  *
  */
 
-
 #include "Microtuner.h"
 
 #include "ConfigManager.h"
 #include "InstrumentTrack.h"
 
-#include <iostream>
 
 Microtuner::Microtuner(InstrumentTrack *parent) :
 	Model(parent, tr("Microtuner")),
@@ -58,100 +56,21 @@ Microtuner::~Microtuner()
 }
 
 
-/** \brief Map MIDI instrument key to note number.
- *  \param key A MIDI key number ranging from 0 to 127.
- *  \return -1 when key is out of range or not mapped, otherwise note number from 0 to 255.
- */
-int Microtuner::keyToNote(int key) const
-{
-	return (key >= 0 && key < NumKeys) ? m_keymap[key] - m_instrumentTrack->baseNoteModel()->value() : -1;
-}
-
-
-/** \brief Find the nearest mapped and valid key in a given direction.
- *  \param key Starting MIDI key (range 0 to 127).
- *  \param direction Search upwards if positive, downwards if negative.
- *  \return Nearest key with valid note mapping; -1 if not possible.
- */
-int Microtuner::nearestKey(int key, int direction) const
-{
-	if (key < 0) {key = 0;}
-	if (key >= NumKeys) {key = NumKeys -1;}
-
-	// search for keys mapped to a note in the given direction
-	direction = direction > 0 ? 1 : -1;
-	for (int i = key; i > 0 && i < KeyNum ; i += direction)
-	{
-		if (m_keymap[i] != -1) {return i;}
-	}
-
-	// no valid key found; try to find one in the other direction
-	direction *= -1;
-	for (int i = key + direction; i > 0 && i < KeyNum ; i += direction)
-	{
-		if (m_keymap[i] != -1) {return i;}
-	}
-
-	// all keys are disabled / unmapped
-	return -1;
-}
-
-
 /** \brief Return frequency for a given MIDI key, using the active mapping and scale.
  *  \param key A MIDI key number ranging from 0 to 127.
- *  \param detune Note detuning (+- number of keys).
- *  \param pitchShift Global detune / pitch shift (+- cents).
+ *  \param detune Note detuning amount (+- cents).
  *  \return Frequency in Hz; 0 if key is out of range or not mapped.
  */
-float Microtuner::keyToFreq(int key, float detune, float pitchShift) const
+float Microtuner::keyToFreq(int key, float detune) const
 {
-	float frequency;
+	if (key < 0 || key >= NumKeys) {return 0;}
+	const int note = m_keymap[key] - m_instrumentTrack->baseNoteModel()->value();
 
-	// note detuning: smoothly transition between neighbouring keys
-	if (detune != 0)
-	{
-//1.25	1.75	-1.25	-1.75
-+4 target
-*
-+2.25--detune
-+2
-*
-0 key
-*
--2
-*
+	if (note < 0 || note >= NumNotes) {return 0;}
+	float frequency = m_notemap[note];
 
-// .. OK, problem: one assumption I made is not valid: notes increase in frequency - X
-	// - noty klidne muzou byt na preskacku, jako v Rali JI scale
-	// - to znamena ze pokud budu interpolovat dve base a mezi nima je shadow s mnohem vyssi frekvenci...
-	// - on such scale, note detune would be completely unusable..
-
-		// find the two keys closest to the detuned position and translate them to notes
-		const float detunedKey = key + detune;
-		const int startKey = detune > 0 ? floor(detunedKey) : ceil(detunedKey);
-		const int endKey = detune > 0 ? ceil(detunedKey) : floor(detunedKey);
-		// 
-		const int startNote = keyToNote(nearestKey(startKey, -1 * detune));
-		const int endNote = keyToNote(nearestKey(endKey, detune));
-		// check if sensible notes were found
-		if (startNote == -1 || endNote == -1) {return 0;}
-
-		frequency *= powf(2.f, 
-	}
-	else
-	{
-		// no note detuning, map the key directly to note
-		const int note = keyToNote(key);
-		if (note < 0 || note >= NumNotes) {return 0;}
-
-		frequency = m_notemap[note];
-		std::cout<<"freq raw"<<frequency<<", ";
-	}
-
-	// pitch shift: adjust frequency by a given number of cents
-	frequency *= powf(2.f, pitchShift / (100 * 12.f));
-
-	std::cout<<"freq fin "<<frequency<<std::endl;
+	// detune or pitch shift: adjust frequency by a given number of cents
+	frequency *= powf(2.f, detune / (100 * 12.f));
 
 	return frequency;
 }

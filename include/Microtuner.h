@@ -47,10 +47,7 @@ public:
 
 	float baseFreq() const {return enabled() ? m_notemap[CenterNote] : DefaultBaseFreq;}
 
-	int nearestKey(int key, int direction) const;
-
-	int keyToNote(int key) const;
-	float keyToFreq(int key, float detune = 0, float pitchShift = 0) const;
+	float keyToFreq(int key, float detune = 0) const;
 
 protected:
 	QString nodeName() const override {return "microtuner";}
