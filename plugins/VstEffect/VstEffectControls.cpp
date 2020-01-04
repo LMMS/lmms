@@ -507,37 +507,37 @@ void manageVSTEffectView::syncParameterText()
 manageVSTEffectView::~manageVSTEffectView()
 {
 	if( m_vi2->knobFModel != NULL )
-	{
+	{ 
 		for( int i = 0; i < m_vi2->paramCount; i++ )
 		{
 			delete m_vi2->knobFModel[ i ];
 			delete vstKnobs[ i ];
 		}
 	}
-
+	
 	if( vstKnobs != NULL )
 	{
 		delete [] vstKnobs;
 		vstKnobs = NULL;
 	}
-
+	
 	if( m_vi2->knobFModel != NULL )
 	{
 		delete [] m_vi2->knobFModel;
 		m_vi2->knobFModel = NULL;
 	}
-
+	
 	if( m_vi2->m_scrollArea != NULL )
 	{
 		delete m_vi2->m_scrollArea;
 		m_vi2->m_scrollArea = NULL;
 	}
-
+	
 	if( m_vi2->m_subWindow != NULL )
 	{
 		m_vi2->m_subWindow->setAttribute( Qt::WA_DeleteOnClose );
 		m_vi2->m_subWindow->close();
-
+		
 		if( m_vi2->m_subWindow != NULL )
 		{
 			delete m_vi2->m_subWindow;
