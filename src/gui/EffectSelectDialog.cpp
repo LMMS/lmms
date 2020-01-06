@@ -27,6 +27,7 @@
 #include "ui_EffectSelectDialog.h"
 
 #include "gui_templates.h"
+#include "DummyEffect.h"
 #include "embed.h"
 #include "PluginFactory.h"
 
@@ -142,12 +143,17 @@ EffectSelectDialog::~EffectSelectDialog()
 
 Effect * EffectSelectDialog::instantiateSelectedPlugin( EffectChain * _parent )
 {
-	if( !m_currentSelection.name.isEmpty() && m_currentSelection.desc )
+	Effect* result = nullptr;
+	if(!m_currentSelection.name.isEmpty() && m_currentSelection.desc)
 	{
-		return Effect::instantiate( m_currentSelection.desc->name,
-										_parent, &m_currentSelection );
+		result = Effect::instantiate(m_currentSelection.desc->name,
+										_parent, &m_currentSelection);
 	}
-	return NULL;
+	if(!result)
+	{
+		result = new DummyEffect(_parent, QDomElement());
+	}
+	return result;
 }
 
 

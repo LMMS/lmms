@@ -218,6 +218,7 @@ Plugin * Plugin::instantiate(const QString& pluginName, Model * parent,
 {
 	const PluginFactory::PluginInfo& pi = pluginFactory->pluginInfo(pluginName.toUtf8());
 
+	Plugin* inst;
 	if( pi.isNull() )
 	{
 		if( gui )
@@ -228,37 +229,37 @@ Plugin * Plugin::instantiate(const QString& pluginName, Model * parent,
 						arg( pluginName ).arg( pluginFactory->errorString(pluginName) ),
 				QMessageBox::Ok | QMessageBox::Default );
 		}
-		return new DummyPlugin();
-	}
-
-	Plugin* inst;
-	InstantiationHook instantiationHook;
-	if ((instantiationHook = ( InstantiationHook ) pi.library->resolve( "lmms_plugin_main" )))
-	{
-		inst = instantiationHook(parent, data);
-
-		if(inst)
-		{
-			unsigned port;
-			for (std::size_t chan = 0;
-				(port = inst->netPort(chan)); ++chan)
-			{
-				Engine::addPluginByPort(port, inst);
-			}
-		}
+		inst = new DummyPlugin();
 	}
 	else
 	{
-		if( gui )
+		InstantiationHook instantiationHook;
+		if ((instantiationHook = ( InstantiationHook ) pi.library->resolve( "lmms_plugin_main" )))
 		{
-			QMessageBox::information( NULL,
-				tr( "Error while loading plugin" ),
-				tr( "Failed to load plugin \"%1\"!").arg( pluginName ),
-				QMessageBox::Ok | QMessageBox::Default );
+			inst = instantiationHook(parent, data);
+			if(inst)
+			{
+				unsigned port;
+				for (std::size_t chan = 0;
+					(port = inst->netPort(chan)); ++chan)
+				{
+					Engine::addPluginByPort(port, inst);
+				}
+			}
+	 		else { inst = new DummyPlugin();}
 		}
-		return new DummyPlugin();
+		else
+		{
+			if( gui )
+			{
+				QMessageBox::information( NULL,
+					tr( "Error while loading plugin" ),
+					tr( "Failed to load plugin \"%1\"!").arg( pluginName ),
+					QMessageBox::Ok | QMessageBox::Default );
+			}
+			inst = new DummyPlugin();
+		}
 	}
-
 
 	return inst;
 }
