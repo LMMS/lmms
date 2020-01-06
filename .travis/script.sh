@@ -8,7 +8,8 @@ if [ "$TYPE" = 'style' ]; then
 	# once it's fixed, it should be enabled again
 	# shellcheck disable=SC2185
 	# shellcheck disable=SC2046
-	shellcheck $(find -O3 "$TRAVIS_BUILD_DIR/.travis/" "$TRAVIS_BUILD_DIR/cmake/" -type f -name '*.sh' -o -name "*.sh.in")
+	shellcheck $(find -O3 . -maxdepth 3 -type f -name '*.sh' -o -name "*.sh.in")
+	shellcheck doc/bash-completion/lmms
 
 else
 

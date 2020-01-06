@@ -103,8 +103,6 @@ public:
 
 	} ;
 
-
-
 	void processNextBuffer();
 
 	inline int getLoadingTrackCount() const
@@ -203,9 +201,23 @@ public:
 	{
 		return m_recording;
 	}
+	
+	inline void setLoopRenderCount(int count)
+	{
+		if (count < 1)
+			m_loopRenderCount = 1;
+		else
+			m_loopRenderCount = count;
+		m_loopRenderRemaining = m_loopRenderCount;
+	}
+    
+	inline int getLoopRenderCount() const
+	{
+		return m_loopRenderCount;
+	}
 
 	bool isExportDone() const;
-	std::pair<MidiTime, MidiTime> getExportEndpoints() const;
+	int getExportProgress() const;
 
 	inline void setRenderBetweenMarkers( bool renderBetweenMarkers )
 	{
@@ -424,7 +436,14 @@ private:
 	tact_t m_elapsedTacts;
 
 	VstSyncController m_vstSyncController;
-
+    
+	int m_loopRenderCount;
+	int m_loopRenderRemaining;
+	MidiTime m_exportSongBegin;
+	MidiTime m_exportLoopBegin;
+	MidiTime m_exportLoopEnd;
+	MidiTime m_exportSongEnd;
+	MidiTime m_exportEffectiveLength;
 
 	friend class LmmsCore;
 	friend class SongEditor;

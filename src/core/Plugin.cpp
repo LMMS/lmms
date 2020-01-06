@@ -127,8 +127,8 @@ QString Plugin::Descriptor::SubPluginFeatures::Key::additionalFileExtensions() c
 	return desc->subPluginFeatures
 		// get from sub plugin
 		? desc->subPluginFeatures->additionalFileExtensions(*this)
-		// get from plugin
-		: nullptr;
+		// no sub plugin, so no *additional* file extensions
+		: QString();
 }
 
 
