@@ -97,7 +97,6 @@ void FadeButton::noteEnd()
 
 
 
-
 void FadeButton::paintEvent(QPaintEvent * _pe)
 {
 	QColor col = m_normalColor;
