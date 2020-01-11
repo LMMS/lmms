@@ -162,7 +162,7 @@ void VstEffectControls::managePlugin( void )
 		manageVSTEffectView * tt = new manageVSTEffectView( m_effect, this);
 		ctrHandle = (QObject *)tt;
 	} else if (m_subWindow != NULL) {
-		if (m_subWindow->widget()->isVisible() == false ) {
+		if (m_subWindow->widget()->isVisible() == false ) { 
 			m_scrollArea->show();
 			m_subWindow->show();
 		} else {
@@ -308,7 +308,7 @@ manageVSTEffectView::manageVSTEffectView( VstEffect * _eff, VstEffectControls * 
         m_vi->m_scrollArea = new QScrollArea( widget );
 	l = new QGridLayout( widget );
 
-	m_vi->m_subWindow = gui->mainWindow()->addWindowedWidget(NULL, Qt::SubWindow |
+	m_vi->m_subWindow = gui->mainWindow()->addWindowedWidget(NULL, Qt::SubWindow | 
 			Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowSystemMenuHint);
 	m_vi->m_subWindow->setSizePolicy( QSizePolicy::Fixed, QSizePolicy::Fixed );
 	m_vi->m_subWindow->setFixedSize( 960, 300);
@@ -464,7 +464,7 @@ void manageVSTEffectView::displayAutomatedOnly( void )
 			{
 				vstKnobs[ i ]->hide();
 				m_displayAutomatedOnly->setText( "All" );
-			} else {
+			} else {	
 				vstKnobs[ i ]->show();
 				m_displayAutomatedOnly->setText( "Automated" );
 			}
@@ -514,30 +514,30 @@ manageVSTEffectView::~manageVSTEffectView()
 			delete vstKnobs[ i ];
 		}
 	}
-	
+
 	if( vstKnobs != NULL )
 	{
 		delete [] vstKnobs;
 		vstKnobs = NULL;
 	}
-	
+
 	if( m_vi2->knobFModel != NULL )
 	{
 		delete [] m_vi2->knobFModel;
 		m_vi2->knobFModel = NULL;
 	}
-	
+ 
 	if( m_vi2->m_scrollArea != NULL )
 	{
 		delete m_vi2->m_scrollArea;
 		m_vi2->m_scrollArea = NULL;
 	}
-	
+ 
 	if( m_vi2->m_subWindow != NULL )
 	{
 		m_vi2->m_subWindow->setAttribute( Qt::WA_DeleteOnClose );
 		m_vi2->m_subWindow->close();
-		
+ 
 		if( m_vi2->m_subWindow != NULL )
 		{
 			delete m_vi2->m_subWindow;
@@ -547,3 +547,9 @@ manageVSTEffectView::~manageVSTEffectView()
 	//delete m_vi2->m_subWindow;
 	//m_vi2->m_subWindow = NULL;
 }
+
+
+
+
+
+
