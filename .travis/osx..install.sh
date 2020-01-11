@@ -14,4 +14,4 @@ if [ -z "$QT5" ]; then
 	brew install qt@4
 fi
 
-sudo npm install -g appdmg
+npm install -g appdmg

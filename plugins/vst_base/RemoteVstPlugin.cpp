@@ -718,6 +718,7 @@ void RemoteVstPlugin::init( const std::string & _plugin_file )
 
 static void close_check( FILE* fp )
 {
+	if (!fp) {return;}
 	if( fclose( fp ) )
 	{
 		perror( "close" );
@@ -774,10 +775,6 @@ void RemoteVstPlugin::initEditor()
 			windowSize.bottom - windowSize.top, SWP_NOACTIVATE |
 						SWP_NOMOVE | SWP_NOZORDER );
 	pluginDispatch( effEditTop );
-
-	if (! EMBED) {
-		showEditor();
-	}
 
 #ifdef LMMS_BUILD_LINUX
 	m_windowID = (intptr_t) GetProp( m_window, "__wine_x11_whole_window" );
@@ -1075,7 +1072,7 @@ void RemoteVstPlugin::getParameterDump()
 
 	for( int i = 0; i < m_plugin->numParams; ++i )
 	{
-		char paramName[32];
+		char paramName[256];
 		memset( paramName, 0, sizeof( paramName ) );
 		pluginDispatch( effGetParamName, i, 0, paramName );
 		paramName[sizeof(paramName)-1] = 0;
@@ -1119,6 +1116,12 @@ void RemoteVstPlugin::saveChunkToFile( const std::string & _file )
 		if( len > 0 )
 		{
 			FILE* fp = F_OPEN_UTF8( _file, "wb" );
+			if (!fp)
+			{
+				fprintf( stderr,
+					"Error opening file for saving chunk.\n" );
+				return;
+			}
 			if ( fwrite( chunk, 1, len, fp ) != len )
 			{
 				fprintf( stderr,
@@ -1284,6 +1287,12 @@ void RemoteVstPlugin::savePreset( const std::string & _file )
 	pBank->numPrograms = endian_swap( uIntToFile );
 
 	FILE * stream = F_OPEN_UTF8( _file, "w" );
+	if (!stream)
+	{
+		fprintf( stderr,
+			"Error opening file for saving preset.\n" );
+		return;
+	}
 	fwrite ( pBank, 1, 28, stream );
 	fwrite ( progName, 1, isPreset ? 28 : 128, stream );
 	if ( chunky ) {
@@ -1336,6 +1345,12 @@ void RemoteVstPlugin::loadPresetFile( const std::string & _file )
 	unsigned int len = 0;
 	sBank * pBank = (sBank*) new char[ sizeof( sBank ) ];
 	FILE * stream = F_OPEN_UTF8( _file, "r" );
+	if (!stream)
+	{
+		fprintf( stderr,
+			"Error opening file for loading preset.\n" );
+		return;
+	}
 	if ( fread ( pBank, 1, 56, stream ) != 56 )
 	{
 		fprintf( stderr, "Error loading preset file.\n" );
@@ -1437,6 +1452,12 @@ void RemoteVstPlugin::loadChunkFromFile( const std::string & _file, int _len )
 	char * chunk = new char[_len];
 
 	FILE* fp = F_OPEN_UTF8( _file, "rb" );
+	if (!fp)
+	{
+		fprintf( stderr,
+			"Error opening file for loading chunk.\n" );
+		return;
+	}
 	if ( fread( chunk, 1, _len, fp ) != _len )
 	{
 		fprintf( stderr, "Error loading chunk from file.\n" );
@@ -1957,7 +1978,8 @@ DWORD WINAPI RemoteVstPlugin::processingThread( LPVOID _param )
         {
 		if( m.id == IdStartProcessing
 			|| m.id == IdMidiEvent
-			|| m.id == IdVstSetParameter )
+			|| m.id == IdVstSetParameter
+			|| m.id == IdVstSetTempo )
 		{
 			_this->processMessage( m );
 		}

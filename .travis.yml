@@ -4,7 +4,7 @@ dist: xenial
 sudo: required
 cache:
     directories:
-        - apt_mingw_cache
+        - $HOME/apt_mingw_cache
         - $HOME/.ccache
         - $HOME/pbuilder-bases
 matrix:
@@ -25,9 +25,15 @@ matrix:
           osx_image: xcode8.2
           env: QT5=True
         - env: TARGET_OS=debian-sid TARGET_DEPLOY=True
+          git:
+              depth: false
         - env: TARGET_OS=debian-sid TARGET_ARCH=i386
+          git:
+              depth: false
         - compiler: clang
           env: TARGET_OS=debian-sid
+          git:
+              depth: false
 before_install:
    - . ${TRAVIS_BUILD_DIR}/.travis/${TRAVIS_OS_NAME}.${TARGET_OS}.before_install.sh
 install:
@@ -39,8 +45,6 @@ script:
     - . ${TRAVIS_BUILD_DIR}/.travis/${TRAVIS_OS_NAME}.${TARGET_OS}.script.sh
 after_script:
     - ccache -s
-before_deploy:
-    - if [ "$TARGET_OS" != debian-sid ]; then make package; fi
 deploy:
     provider: releases
     api_key:

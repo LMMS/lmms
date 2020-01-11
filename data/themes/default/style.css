@@ -81,6 +81,12 @@ TextFloat {
 }
 
 
+/* splash screen text */
+QSplashScreen QLabel {
+	color: white;
+}
+
+
 QMenu {
 	border-top: 2px solid #08993E;
 	background-color: #15191c;

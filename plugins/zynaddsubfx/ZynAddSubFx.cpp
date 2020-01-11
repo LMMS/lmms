@@ -27,6 +27,7 @@
 #include <QDir>
 #include <QDomDocument>
 #include <QTemporaryFile>
+#include <QtGlobal>
 #include <QDropEvent>
 #include <QGridLayout>
 #include <QPushButton>
@@ -291,6 +292,10 @@ void ZynAddSubFxInstrument::loadSettings( const QDomElement & _this )
 
 		emit settingsChanged();
 	}
+// FIXME: Remove this check in future versions.  Slots are public in Qt5+
+#if QT_VERSION >= 0x050000
+	emit instrumentTrack()->pitchModel()->dataChanged();
+#endif
 }
 
 

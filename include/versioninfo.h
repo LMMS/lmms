@@ -28,6 +28,10 @@
 #define PLATFORM "OpenBSD"
 #endif
 
+#ifdef LMMS_BUILD_FREEBSD
+#define PLATFORM "FreeBSD"
+#endif
+
 #ifdef LMMS_BUILD_WIN32
 #define PLATFORM "win32"
 #endif

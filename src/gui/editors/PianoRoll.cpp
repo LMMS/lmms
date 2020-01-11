@@ -537,7 +537,10 @@ void PianoRoll::markSemiTone( int i )
 				for (int ix = 0; ix < aok.size(); ++ix)
 				{
 					i = qFind(m_markedSemiTones.begin(), m_markedSemiTones.end(), aok.at(ix));
-					m_markedSemiTones.erase(i);
+					if (i != m_markedSemiTones.end())
+					{
+						m_markedSemiTones.erase(i);
+					}
 				}
 			}
 			else
@@ -883,6 +886,9 @@ void PianoRoll::drawDetuningInfo( QPainter & _p, const Note * _n, int _x,
 {
 	int middle_y = _y + KEY_LINE_HEIGHT / 2;
 	_p.setPen( noteColor() );
+	_p.setClipRect(WHITE_KEY_WIDTH, PR_TOP_MARGIN,
+		width() - WHITE_KEY_WIDTH,
+		keyAreaBottom() - PR_TOP_MARGIN);
 
 	int old_x = 0;
 	int old_y = 0;
@@ -1184,6 +1190,7 @@ void PianoRoll::keyPressEvent(QKeyEvent* ke )
 			clearSelectedNotes();
 			break;
 
+		case Qt::Key_Backspace:
 		case Qt::Key_Delete:
 			deleteSelectedNotes();
 			ke->accept();
@@ -1293,6 +1300,7 @@ void PianoRoll::leaveEvent(QEvent * e )
 
 	QWidget::leaveEvent( e );
 	s_textFloat->hide();
+	update(); // cleaning inner mouse-related graphics
 }
 
 
@@ -1788,6 +1796,10 @@ void PianoRoll::mouseDoubleClickEvent(QMouseEvent * me )
 			enterValue( &nv );
 		}
 	}
+	else
+	{
+		QWidget::mouseDoubleClickEvent(me);
+	}
 }
 
 
@@ -2167,7 +2179,7 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 						m_pattern->instrumentTrack()->processInEvent( evt );
 					}
 				}
-				else if( n->isPlaying() )
+				else if( n->isPlaying() && !isSelection() )
 				{
 					// mouse not over this note, stop playing it.
 					m_pattern->instrumentTrack()->pianoModel()->handleKeyRelease( n->key() );
@@ -3073,8 +3085,12 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 				drawDetuningInfo( p, note,
 					x + WHITE_KEY_WIDTH,
 					y_base - key * KEY_LINE_HEIGHT );
+				p.setClipRect(WHITE_KEY_WIDTH, PR_TOP_MARGIN,
+					width() - WHITE_KEY_WIDTH,
+					height() - PR_TOP_MARGIN);
 			}
 		}
+
 
 		p.setPen( QPen( noteColor(), NOTE_EDIT_LINE_WIDTH + 2 ) );
 		p.drawPoints( editHandles );
@@ -3159,10 +3175,10 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 		case ModeSelect: cursor = s_toolSelect; break;
 		case ModeEditDetuning: cursor = s_toolOpen; break;
 	}
-	if( cursor != NULL )
+	QPoint mousePosition = mapFromGlobal( QCursor::pos() );
+	if( cursor != NULL && mousePosition.y() > keyAreaTop() && mousePosition.x() > noteEditLeft())
 	{
-		p.drawPixmap( mapFromGlobal( QCursor::pos() ) + QPoint( 8, 8 ),
-								*cursor );
+		p.drawPixmap( mousePosition + QPoint( 8, 8 ), *cursor );
 	}
 }
 
@@ -3521,6 +3537,22 @@ void PianoRoll::finishRecordNote(const Note & n )
 						it->key(), it->getVolume(),
 						it->getPanning() );
 				n1.quantizeLength( quantization() );
+
+				//Get selected chord
+				const InstrumentFunctionNoteStacking::Chord & chord = InstrumentFunctionNoteStacking::ChordTable::getInstance()
+					.getChordByName( m_chordModel.currentText() );
+
+				if( !chord.isEmpty() )
+				{
+					for( int i = 1; i < chord.size(); i++ )
+					{
+						Note new_note( n.length(), it->pos(), it->key() + chord[i] );
+						new_note.setPanning( it->getPanning() );
+						new_note.setVolume( it->getVolume() );
+						m_pattern->addNote( new_note );
+					}
+				}
+
 				m_pattern->addNote( n1 );
 				update();
 				m_recordingNotes.erase( it );

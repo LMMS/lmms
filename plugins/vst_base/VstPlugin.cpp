@@ -92,7 +92,7 @@ VstPlugin::VstPlugin( const QString & _plugin ) :
 	setTempo( Engine::getSong()->getTempo() );
 
 	connect( Engine::getSong(), SIGNAL( tempoChanged( bpm_t ) ),
-			this, SLOT( setTempo( bpm_t ) ) );
+			this, SLOT( setTempo( bpm_t ) ), Qt::DirectConnection );
 	connect( Engine::mixer(), SIGNAL( sampleRateChanged() ),
 				this, SLOT( updateSampleRate() ) );
 
@@ -329,7 +329,9 @@ bool VstPlugin::processMessage( const message & _m )
 
 	case IdVstPluginWindowID:
 		m_pluginWindowID = _m.getInt();
-		if( m_embedMethod == "none" )
+		if( m_embedMethod == "none"
+			&& ConfigManager::inst()->value(
+				"ui", "vstalwaysontop" ).toInt() )
 		{
 #ifdef LMMS_BUILD_WIN32
 			// We're changing the owner, not the parent,

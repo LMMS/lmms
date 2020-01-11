@@ -181,7 +181,13 @@ vestigeInstrument::~vestigeInstrument()
 
 void vestigeInstrument::loadSettings( const QDomElement & _this )
 {
-	loadFile( _this.attribute( "plugin" ) );
+	QString plugin = _this.attribute( "plugin" );
+	if( plugin.isEmpty() )
+	{
+		return;
+	}
+
+	loadFile( plugin );
 	m_pluginMutex.lock();
 	if( m_plugin != NULL )
 	{
@@ -601,7 +607,7 @@ VestigeInstrumentView::VestigeInstrumentView( Instrument * _instrument,
 	QPushButton * note_off_all_btn = new QPushButton( tr( "Turn off all "
 							"notes" ), this );
 	note_off_all_btn->setGeometry( 20, 160, 200, 24 );
-	note_off_all_btn->setIcon( embed::getIconPixmap( "state_stop" ) );
+	note_off_all_btn->setIcon( embed::getIconPixmap( "stop" ) );
 	note_off_all_btn->setFont( pointSize<8>( note_off_all_btn->font() ) );
 	connect( note_off_all_btn, SIGNAL( clicked() ), this,
 							SLOT( noteOffAll() ) );

@@ -96,18 +96,18 @@ Song::Song() :
 	m_elapsedTacts( 0 )
 {
 	connect( &m_tempoModel, SIGNAL( dataChanged() ),
-						this, SLOT( setTempo() ) );
+			this, SLOT( setTempo() ), Qt::DirectConnection );
 	connect( &m_tempoModel, SIGNAL( dataUnchanged() ),
-						this, SLOT( setTempo() ) );
+			this, SLOT( setTempo() ), Qt::DirectConnection );
 	connect( &m_timeSigModel, SIGNAL( dataChanged() ),
-					this, SLOT( setTimeSignature() ) );
+			this, SLOT( setTimeSignature() ), Qt::DirectConnection );
 
 
 	connect( Engine::mixer(), SIGNAL( sampleRateChanged() ), this,
 						SLOT( updateFramesPerTick() ) );
 
 	connect( &m_masterVolumeModel, SIGNAL( dataChanged() ),
-			this, SLOT( masterVolumeChanged() ) );
+			this, SLOT( masterVolumeChanged() ), Qt::DirectConnection );
 /*	connect( &m_masterPitchModel, SIGNAL( dataChanged() ),
 			this, SLOT( masterPitchChanged() ) );*/
 
@@ -685,7 +685,7 @@ void Song::stop()
 				if( gui && gui->songEditor() &&
 						( tl->autoScroll() == TimeLineWidget::AutoScrollEnabled ) )
 				{
-					gui->songEditor()->m_editor->updatePosition(0);
+					QMetaObject::invokeMethod(gui->songEditor()->m_editor, "updatePosition", Qt::AutoConnection, Q_ARG(MidiTime, 0));
 				}
 				break;
 
@@ -699,7 +699,7 @@ void Song::stop()
 					if( gui && gui->songEditor() &&
 							( tl->autoScroll() == TimeLineWidget::AutoScrollEnabled ) )
 					{
-						gui->songEditor()->m_editor->updatePosition( MidiTime(tl->savedPos().getTicks() ) );
+						QMetaObject::invokeMethod(gui->songEditor()->m_editor, "updatePosition", Qt::AutoConnection, Q_ARG(MidiTime, tl->savedPos().getTicks()));
 					}
 					tl->savePos( -1 );
 				}
@@ -1414,7 +1414,12 @@ void Song::exportProject( bool multiExport )
 				// Get first extension from selected dropdown.
 				// i.e. ".wav" from "WAV-File (*.wav), Dummy-File (*.dum)"
 				suffix = efd.selectedNameFilter().mid( stx + 2, etx - stx - 2 ).split( " " )[0].trimmed();
-				exportFileName.remove( "." + suffix, Qt::CaseInsensitive );
+
+				Qt::CaseSensitivity cs = Qt::CaseSensitive;
+#if defined(LMMS_BUILD_APPLE) || defined(LMMS_BUILD_WIN32)
+				cs = Qt::CaseInsensitive;
+#endif
+				exportFileName.remove( "." + suffix, cs );
 				if ( efd.selectedFiles()[0].endsWith( suffix ) )
 				{
 					if( VersionedSaveDialog::fileExistsQuery( exportFileName + suffix,

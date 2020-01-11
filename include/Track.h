@@ -72,6 +72,8 @@ const int DEFAULT_TRACK_HEIGHT = 32;
 
 const int TCO_BORDER_WIDTH = 2;
 
+char const *const FILENAME_FILTER = "[\\0000-\x1f\"*/:<>?\\\\|\x7f]";
+
 
 class TrackContentObject : public Model, public JournallingObject
 {
@@ -210,6 +212,12 @@ public:
 	{
 		return m_tco;
 	}
+
+	inline TrackView * getTrackView()
+	{
+		return m_trackView;
+	}
+
 	// qproperty access func
 	QColor mutedColor() const;
 	QColor mutedBackgroundColor() const;
@@ -229,7 +237,7 @@ public:
 	// access needsUpdate member variable
 	bool needsUpdate();
 	void setNeedsUpdate( bool b );
-	
+
 public slots:
 	virtual bool close();
 	void cut();
@@ -256,10 +264,6 @@ protected:
 
 	float pixelsPerTact();
 
-	inline TrackView * getTrackView()
-	{
-		return m_trackView;
-	}
 
 	DataFile createTCODataFiles(const QVector<TrackContentObjectView *> & tcos) const;
 
@@ -341,7 +345,7 @@ public:
 		}
 	}
 
-	bool canPasteSelection( MidiTime tcoPos, const QMimeData * mimeData );
+	bool canPasteSelection( MidiTime tcoPos, const QDropEvent *de );
 	bool pasteSelection( MidiTime tcoPos, QDropEvent * de );
 
 	MidiTime endPosition( const MidiTime & posStart );
