@@ -50,8 +50,8 @@ public slots:
 
 
 protected:
-	virtual void customEvent( QEvent * );
-	virtual void paintEvent( QPaintEvent * _pe );
+	void customEvent( QEvent * ) override;
+	void paintEvent( QPaintEvent * _pe ) override;
 
 
 private:

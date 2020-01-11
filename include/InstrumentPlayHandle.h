@@ -40,7 +40,7 @@ public:
 	}
 
 
-	virtual void play( sampleFrame * _working_buffer )
+	void play( sampleFrame * _working_buffer ) override
 	{
 		// ensure that all our nph's have been processed first
 		ConstNotePlayHandleList nphv = NotePlayHandle::nphsOfInstrumentTrack( m_instrument->instrumentTrack(), true );
@@ -65,12 +65,12 @@ public:
 		m_instrument->play( _working_buffer );
 	}
 
-	virtual bool isFinished() const
+	bool isFinished() const override
 	{
 		return false;
 	}
 
-	virtual bool isFromTrack( const Track* _track ) const
+	bool isFromTrack( const Track* _track ) const override
 	{
 		return m_instrument->isFromTrack( _track );
 	}

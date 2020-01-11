@@ -35,7 +35,7 @@
 #endif
 
 
-typedef int32_t tact_t;
+typedef int32_t bar_t;
 typedef int32_t tick_t;
 typedef uint8_t volume_t;
 typedef int8_t panning_t;
