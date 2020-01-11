@@ -1,11 +1,25 @@
 #include "Synthesizer.h"
 
+//tmp
+#include <iostream>
+
 #define DEFAULT_SAMPLE_RATE 48000
 
 unsigned int Diginstrument::Synthesizer::sampleRate = DEFAULT_SAMPLE_RATE;
 std::vector<float> Diginstrument::Synthesizer::sinetable(0);
 
-std::vector<float> Diginstrument::Synthesizer::playNote(const std::vector<std::pair<float, float>> components, const unsigned int frames, const unsigned int offset){
+std::vector<float> Diginstrument::Synthesizer::playNote(const std::vector<float> coordinates, const unsigned int frames, const unsigned int offset){
+    /*TODO:
+            Time steps!
+            */
+    float time = (frames + offset) / (float)sampleRate;
+    //tmp
+    std::vector<float> tmp = coordinates;
+    //tmp: constant "force"
+    tmp.push_back(0.8f);
+    tmp.push_back(time);
+    std::vector<std::pair<float, float>> components = interpolator.getSpectrum(tmp);
+
     std::vector<float> res(frames, 0);
     const unsigned int tableSize = sinetable.size();
     for(auto component : components){

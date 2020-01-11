@@ -1,7 +1,5 @@
 #include "MultidimensionalNeighbourMap.hpp"
 
-#include <iostream>
-
 namespace Diginstrument{
 class Spectrum
 {
@@ -25,36 +23,37 @@ class NoteSpectrum : public Spectrum
     const std::vector<std::pair<float, float>> & getHarmonics() const{
       return harmonics;
     }
-    const std::vector<std::pair<float, float>> & getStohastics() const{
-      return stohastics;
+    const std::vector<std::pair<float, float>> & getStochastics() const{
+      return stochastics;
     }
     const std::vector<std::pair<float, float>> & getComponents() const{
       return /*TODO*/ harmonics;
     }
 
-    float getFundamentalFrequency() const {
-      return fundamentalFrequency;
+    float getLabel() const {
+      return label;
     }
 
-    NoteSpectrum(const float & fundamentalFrequency, const std::vector<std::pair<float, float>> & harmonics, const std::vector<std::pair<float, float>> & stohastics)
-              : harmonics(harmonics), stohastics(stohastics), fundamentalFrequency(fundamentalFrequency){}
+    NoteSpectrum(const float & label, const std::vector<std::pair<float, float>> & harmonics, const std::vector<std::pair<float, float>> & stohastics)
+              : harmonics(harmonics), stochastics(stohastics), label(label){}
 
   private:
     std::vector<std::pair<float, float>> harmonics;
-    std::vector<std::pair<float, float>> stohastics;
-    float fundamentalFrequency;
+    std::vector<std::pair<float, float>> stochastics;
+    float label;
 };
 
 template <typename S>
 class Interpolator
 {
   public:
-    std::vector<std::pair<float, float>> getSpectrum(std::vector<float> coordinates);
+    std::vector<std::pair<float, float>> getSpectrum(const std::vector<float> coordinates);
 
     void addSpectrum(const S & spectrum, std::vector<float> coordinates);
     void addSpectra(const std::vector<S> & spectra,  std::vector<std::vector<float>> coordinates);
 
-    S linear(S & left, S & right, const float & target);
+    S linear(S & left, S & right, const float & target, const float & leftLabel, const float & rightLabel);
+    S linearShift(S & left, S & right, const float & target, const float & leftLabel, const float & rightLabel);
 
     Interpolator();
   private:

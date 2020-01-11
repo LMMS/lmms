@@ -1,8 +1,5 @@
 #include "DiginstrumentPlugin.h"
 
-/*tmp*/
-#include <iostream>
-
 extern "C"
 {
 
@@ -54,7 +51,7 @@ void DiginstrumentPlugin::playNote( NotePlayHandle * noteHandle,
 					            sampleFrame * _working_buf )
 {
 	/*TMP*/
-	auto audioData = this->synth.playNote(inst.getSpectrum({noteHandle->frequency()}), noteHandle->framesLeftForCurrentPeriod(), noteHandle->totalFramesPlayed());
+	auto audioData = this->synth.playNote({noteHandle->frequency()}, noteHandle->framesLeftForCurrentPeriod(), noteHandle->totalFramesPlayed());
 	/*tmp: stereo*/
 	unsigned int counter = 0;
 	unsigned int offset = noteHandle->noteOffset();

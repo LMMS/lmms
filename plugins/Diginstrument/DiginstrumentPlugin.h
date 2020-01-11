@@ -1,6 +1,5 @@
 #include "DiginstrumentView.h"
 #include "Synthesizer.h"
-#include "Interpolator.h"
 
 #include "Instrument.h"
 #include "InstrumentTrack.h"

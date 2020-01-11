@@ -73,6 +73,7 @@ class MultidimensionalNeighbourMap
 {
 public:
   std::vector<std::vector<V>> getNeighbours(const std::vector<K> & coordinates);
+  std::vector<std::vector<V>> getNeighbours(const std::vector<K> & coordinates, std::vector<std::vector<K>> & labels);
   void insert(const V &value, const std::vector<K> &coordinates);
   unsigned int getDimensions() const { return this->dimensions; }
   void clear();
@@ -84,6 +85,7 @@ private:
       if the coordinate is exact, only one entry is returned, on the lower (first) placement*/
   static std::pair<MultidimensionalNeighbourMapEntry<K, V> *, MultidimensionalNeighbourMapEntry<K, V> *> findNeighboursOnOneDimension(std::vector<MultidimensionalNeighbourMapEntry<K, V>> &array, const K &coordinate);
   static void getNeighboursRecursiveCall(std::vector<MultidimensionalNeighbourMapEntry<K,V>> & array, const std::vector<K> & coordinates, unsigned int level, std::vector<std::vector<V>> & result);
+  static void getNeighboursRecursiveCall(std::vector<MultidimensionalNeighbourMapEntry<K,V>> & array, const std::vector<K> & coordinates, unsigned int level, std::vector<std::vector<V>> & result, std::vector<std::vector<K>> & labels);
 
   std::vector<MultidimensionalNeighbourMapEntry<K, V>> data;
   unsigned int dimensions = 0;
@@ -188,6 +190,23 @@ std::vector<std::vector<V>> MultidimensionalNeighbourMap<K, V>::getNeighbours(co
   return res;
 }
 
+/*labels is the per-level structure of the search tree, without the distinction of unary or binary nodes*/
+template <typename K, typename V>
+std::vector<std::vector<V>> MultidimensionalNeighbourMap<K, V>::getNeighbours(const std::vector<K> & coordinates, std::vector<std::vector<K>> & labels)
+{
+  /*dimension check*/
+  if(this->dimensions != coordinates.size()) {/*TODO: exception?*/ return {}; }
+  std::vector<std::vector<V>> res;
+  res.reserve(pow(2, coordinates.size()-1));
+  //prepare labels
+  labels = std::vector<std::vector<K>>(coordinates.size());
+  for(int i = 0; i<labels.size(); i++){
+    labels[0].reserve(pow(2, i+1));
+  }
+  getNeighboursRecursiveCall(data, coordinates, 0, res, labels);
+  return res;
+}
+
 template <typename K, typename V>
 void MultidimensionalNeighbourMap<K, V>::getNeighboursRecursiveCall(std::vector<MultidimensionalNeighbourMapEntry<K,V>> & array,
                                                                     const std::vector<K> & coordinates,
@@ -204,6 +223,45 @@ void MultidimensionalNeighbourMap<K, V>::getNeighboursRecursiveCall(std::vector<
     //continue search
     if(neighbours.first){ getNeighboursRecursiveCall(neighbours.first->getNext(), coordinates, level+1, result); }
     if(neighbours.second){ getNeighboursRecursiveCall(neighbours.second->getNext(), coordinates, level+1, result); }
+  }
+}
+
+template <typename K, typename V>
+void MultidimensionalNeighbourMap<K, V>::getNeighboursRecursiveCall(std::vector<MultidimensionalNeighbourMapEntry<K,V>> & array,
+                                                                    const std::vector<K> & coordinates,
+                                                                    unsigned int level,
+                                                                    std::vector<std::vector<V>> & result,
+                                                                    std::vector<std::vector<K>> & labels)
+{
+  auto neighbours = findNeighboursOnOneDimension(array, coordinates[level]);
+  if((neighbours.first && neighbours.first->isValue()) || (neighbours.second && neighbours.second->isValue())){
+    //next node(s) is(are) value(s)
+    if(neighbours.first && neighbours.second) {
+      labels[level].push_back(neighbours.first->key);
+      labels[level].push_back(neighbours.second->key);
+      result.push_back({neighbours.first->getValue(), neighbours.second->getValue()});
+      return;
+    }
+    if(neighbours.first) {
+      labels[level].push_back(neighbours.first->key);
+      result.push_back({neighbours.first->getValue()});
+       return;
+    }
+    if(neighbours.second) {
+      labels[level].push_back(neighbours.second->key);
+      result.push_back({neighbours.second->getValue()});
+      return;
+    }
+  }else{
+    //continue search
+    if(neighbours.first){
+      labels[level].push_back(neighbours.first->key);
+      getNeighboursRecursiveCall(neighbours.first->getNext(), coordinates, level+1, result, labels);
+    }
+    if(neighbours.second){
+      labels[level].push_back(neighbours.second->key);
+      getNeighboursRecursiveCall(neighbours.second->getNext(), coordinates, level+1, result, labels);
+    }
   }
 }
 
