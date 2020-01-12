@@ -39,4 +39,7 @@ if(LMMS_HAVE_CARLA OR LMMS_HAVE_WEAKCARLA)
                 BUILD_WITH_INSTALL_RPATH TRUE
                 INSTALL_RPATH_USE_LINK_PATH TRUE
                 INSTALL_RPATH "${CARLA_RPATH}")
+        IF(LMMS_HAVE_WEAKCARLA)
+                ADD_DEPENDENCIES(carlabase carla_native-plugin)
+        ENDIF()
 endif()
