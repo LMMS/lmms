@@ -19,7 +19,7 @@ if(LMMS_HAVE_WEAKCARLA)
   )
   INCLUDE_DIRECTORIES(${CARLA_INCLUDE_DIRS})
   ADD_LIBRARY(carla_native-plugin SHARED DummyCarla.cpp)
-  INSTALL(TARGETS carla_native-plugin LIBRARY DESTINATION "${PLUGIN_DIR}/optional")
+  INSTALL(TARGETS carla_native-plugin LIBRARY DESTINATION "${PLUGIN_DIR}")
   SET(CARLA_LIBRARIES $<TARGET_FILE:carla_native-plugin>)
   SET(CARLA_LIBRARY_DIRS $<TARGET_FILE_DIR:carla_native-plugin>)
   # Set parent scope variables so carlarack and carlapatchbay can see them
