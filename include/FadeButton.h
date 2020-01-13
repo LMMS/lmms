@@ -50,7 +50,6 @@ public slots:
 
 
 protected:
-	void customEvent( QEvent * ) override;
 	void paintEvent( QPaintEvent * _pe ) override;
 
 
@@ -66,7 +65,6 @@ private:
 	QColor m_holdColor;
 	int activeNotes;
 
-	void signalUpdate();
 	QColor fadeToColor(QColor, QColor, QTime, float);
 
 } ;
