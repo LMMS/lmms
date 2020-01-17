@@ -105,7 +105,7 @@ chmod +x "${APPDIR}usr/bin/lmms"
 unset LD_LIBRARY_PATH
 
 # Ensure linuxdeployqt can find shared objects
-export LD_LIBRARY_PATH="${APPDIR}usr/lib/lmms/":$LD_LIBRARY_PATH
+export LD_LIBRARY_PATH="${APPDIR}usr/lib/lmms/":"${APPDIR}usr/lib/lmms/optional":$LD_LIBRARY_PATH
 
 # Handle wine linking
 if [ -d "@WINE_LIBRARY_FIX@" ]; then
@@ -120,7 +120,7 @@ ZYNBIN="${APPDIR}usr/bin/RemoteZynAddSubFx"
 VSTBIN="${APPDIR}usr/bin/RemoteVstPlugin.exe.so"
 
 mv "$ZYNLIB" "$ZYNBIN"
-mv "$VSTLIB" "$VSTBIN"
+mv "$VSTLIB" "$VSTBIN" || true
 
 # Patch the desktop file
 sed -i 's/.*Exec=.*/Exec=lmms.real/' "$DESKTOPFILE"
@@ -146,13 +146,14 @@ success "Bundled and relinked dependencies"
 
 # Link to original location so lmms can find them
 ln -sr  "$ZYNBIN" "$ZYNLIB"
-ln -sr  "$VSTBIN" "$VSTLIB"
+ln -sr  "$VSTBIN" "$VSTLIB" || true
 
 # Remove wine library conflict
 rm -f "${APPDIR}/usr/lib/libwine.so.1"
 
 # Use system-provided carla
 rm -f "${APPDIR}usr/lib/"libcarla*.so
+rm -f "${APPDIR}usr/lib/lmms/optional/"libcarla*.so
 
 # Remove bundled jack in LD_LIBRARY_PATH if exists
 if [ -e "${APPDIR}/usr/lib/libjack.so.0" ]; then
