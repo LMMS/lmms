@@ -774,18 +774,25 @@ void Directory::update( void )
 		for( QStringList::iterator it = m_directories.begin();
 					it != m_directories.end(); ++it )
 		{
-			int top_index = childCount();
+			int filesBeforeAdd = childCount() - m_dirCount;
 			if( addItems( fullName( *it ) ) &&
 				( *it ).contains(
 					ConfigManager::inst()->dataDir() ) )
 			{
-				QTreeWidgetItem * sep = new QTreeWidgetItem;
-				sep->setText( 0,
-					FileBrowserTreeWidget::tr(
-						"--- Factory files ---" ) );
-				sep->setIcon( 0, embed::getIconPixmap(
-							"factory_files" ) );
-				insertChild(  m_dirCount + top_index, sep );
+				// factory file directory is added
+				// note: those are always added last
+				int filesNow = childCount() - m_dirCount;
+				if(filesNow > filesBeforeAdd) // any file appended?
+				{
+					QTreeWidgetItem * sep = new QTreeWidgetItem;
+					sep->setText( 0,
+						FileBrowserTreeWidget::tr(
+							"--- Factory files ---" ) );
+					sep->setIcon( 0, embed::getIconPixmap(
+								"factory_files" ) );
+					// add delimeter after last file before appending our files
+					insertChild( filesBeforeAdd + m_dirCount, sep );
+				}
 			}
 		}
 	}
