@@ -232,6 +232,7 @@ void FileBrowser::addItems(const QString & path )
 		return;
 	}
 
+	// try to add all directories from file system alphabetically into the tree
 	QDir cdir( path );
 	QStringList files = cdir.entryList( QDir::Dirs, QDir::Name );
 	for( QStringList::const_iterator it = files.constBegin();
@@ -247,6 +248,7 @@ void FileBrowser::addItems(const QString & path )
 						m_l->topLevelItem( i ) );
 				if( d == NULL || cur_file < d->text( 0 ) )
 				{
+					// insert before item, we're done
 					Directory *dd = new Directory( cur_file, path,
 												   m_filter );
 					m_l->insertTopLevelItem( i,dd );
@@ -256,6 +258,11 @@ void FileBrowser::addItems(const QString & path )
 				}
 				else if( cur_file == d->text( 0 ) )
 				{
+					// imagine we have subdirs named "TripleOscillator/xyz" in
+					// two directories from m_directories
+					// then only add one tree widget for both
+					// so we don't add a new Directory - we just
+					// add the path to the current directory
 					d->addDirectory( path );
 					d->update();
 					orphan = false;
@@ -264,6 +271,8 @@ void FileBrowser::addItems(const QString & path )
 			}
 			if( orphan )
 			{
+				// it has not yet been added yet, so it's (lexically)
+				// larger than all other dirs => append it at the bottom
 				Directory *d = new Directory( cur_file,
 											  path, m_filter );
 				d->update();
@@ -761,6 +770,7 @@ void Directory::update( void )
 	if( !childCount() )
 	{
 		m_dirCount = 0;
+		// for all paths leading here, add their items
 		for( QStringList::iterator it = m_directories.begin();
 					it != m_directories.end(); ++it )
 		{
@@ -796,6 +806,7 @@ bool Directory::addItems(const QString & path )
 
 	bool added_something = false;
 
+	// try to add all directories from file system alphabetically into the tree
 	QStringList files = thisDir.entryList( QDir::Dirs, QDir::Name );
 	for( QStringList::const_iterator it = files.constBegin();
 						it != files.constEnd(); ++it )
@@ -810,6 +821,7 @@ bool Directory::addItems(const QString & path )
 								child( i ) );
 				if( d == NULL || cur_file < d->text( 0 ) )
 				{
+					// insert before item, we're done
 					insertChild( i, new Directory( cur_file,
 							path, m_filter ) );
 					orphan = false;
@@ -818,6 +830,12 @@ bool Directory::addItems(const QString & path )
 				}
 				else if( cur_file == d->text( 0 ) )
 				{
+					// imagine we have top-level subdirs named "TripleOscillator" in
+					// two directories from FileBrowser::m_directories
+					// and imagine both have a sub folder named "xyz"
+					// then only add one tree widget for both
+					// so we don't add a new Directory - we just
+					// add the path to the current directory
 					d->addDirectory( path );
 					orphan = false;
 					break;
@@ -825,6 +843,8 @@ bool Directory::addItems(const QString & path )
 			}
 			if( orphan )
 			{
+				// it has not yet been added yet, so it's (lexically)
+				// larger than all other dirs => append it at the bottom
 				addChild( new Directory( cur_file, path,
 								m_filter ) );
 				m_dirCount++;
