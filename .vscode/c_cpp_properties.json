@@ -6,6 +6,7 @@
                 "${workspaceFolder}/**",
                 "${workspaceFolder}/include",
                 "/usr/include",
+                "/usr/local/include",
                 "/usr/include/x86_64-linux-gnu/qt5",
                 "/usr/include/x86_64-linux-gnu/qt5/*",
                 "/usr/include/x86_64-linux-gnu/qt5/QtCore",

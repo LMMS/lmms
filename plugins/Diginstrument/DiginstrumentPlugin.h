@@ -1,3 +1,5 @@
+#pragma once
+
 #include "DiginstrumentView.h"
 #include "Synthesizer.h"
 
@@ -8,6 +10,11 @@
 
 #include "plugin_export.h"
 #include "embed.h"
+
+#include "SampleBuffer.h"
+#include <QFileInfo>
+#include "Song.h"
+
 
 class DiginstrumentPlugin : public Instrument {
     Q_OBJECT
@@ -46,6 +53,10 @@ class DiginstrumentPlugin : public Instrument {
     /*TMP*/
     Diginstrument::Synthesizer synth;
     Diginstrument::Interpolator<Diginstrument::NoteSpectrum> inst;
+
+    typedef SampleBuffer::handleState handleState;
+	  SampleBuffer m_sampleBuffer;
+    std::string setAudioFile( const QString & _audio_file);
     
   private slots:
     void sampleRateChanged();

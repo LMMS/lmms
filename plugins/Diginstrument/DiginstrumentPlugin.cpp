@@ -1,3 +1,9 @@
+
+/*tmp*/
+#include "CWT.hpp"
+#include <string>
+#include <sstream>
+
 #include "DiginstrumentPlugin.h"
 
 extern "C"
@@ -81,4 +87,30 @@ QString DiginstrumentPlugin::fullDisplayName() const
 void DiginstrumentPlugin::sampleRateChanged(){
 	/*TODO*/
 	this->synth.setSampleRate(Engine::mixer()->processingSampleRate());
+}
+
+
+//TMP
+std::string DiginstrumentPlugin::setAudioFile( const QString & _audio_file)
+{	
+	m_sampleBuffer.setAudioFile( _audio_file );
+	std::vector<double> sample(m_sampleBuffer.frames());
+	for(int i = 0; i<sample.size(); i++){
+		//tmp: left only
+		sample[i] = m_sampleBuffer.data()[i][0];
+	}
+	CWT transform("morlet", 6, 12);
+	transform(sample);
+
+	std::ostringstream oss;
+
+	for(auto &e : transform[20]){
+		double re = e.second.first;
+		double im = e.second.second;
+		double scale = e.first;
+		double modulus = sqrt(re*re + im*im); //TODO: is this correct?
+		oss<<std::fixed<<"("<<log10(44100.0f/scale)<<","<<modulus<<"),";
+		
+	}
+	return oss.str();
 }
