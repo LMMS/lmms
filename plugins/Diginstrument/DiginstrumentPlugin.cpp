@@ -2,6 +2,7 @@
 /*tmp*/
 #include "CWT.hpp"
 #include "Extrema.hpp"
+#include "Approximation.hpp"
 #include <string>
 #include <sstream>
 
@@ -111,29 +112,40 @@ std::string DiginstrumentPlugin::setAudioFile( const QString & _audio_file)
 		double re = e.second.first;
 		double im = e.second.second;
 		if(e.first>4000) break;
-		double frequency = 44100.0f / e.first;
+		double scale = e.first;
 		double modulus = sqrt(re*re + im*im); //TODO: is this correct?
-		points.push_back(std::make_pair(frequency, modulus));
+		points.push_back(std::make_pair(scale, modulus));
 		values.push_back(modulus);
-		oss<<std::fixed<<"("<<frequency<<","<<modulus<<"),";
+		oss<<std::fixed<<"("<<scale<<","<<modulus<<"),";
 	}
 	oss<<std::endl<<std::endl;
 
 	std::pair<std::vector<unsigned int>, std::vector<unsigned int>> extrema = Extrema::Both(values.begin(), values.end(), 0);
 	oss<<"Minima: ";
 	for(auto m : extrema.first){
+		if(m>0 || m==points.size()-1){
+			auto apr = Approximation::Parabolic(points[m-1].first, points[m-1].second, points[m].first, points[m].second, points[m+1].first, points[m+1].second);
+			oss<<std::fixed<<"("<<apr.first<<","<<apr.second<<"),";
+			continue;
+		}
 		oss<<std::fixed<<"("<<points[m].first<<","<<points[m].second<<"),";
 	}
 	oss<<std::endl;
 	oss<<"Maxima: ";
 	for(auto m : extrema.second){
+		if(m>0 || m==points.size()-1){
+			auto apr = Approximation::Parabolic(points[m-1].first, points[m-1].second, points[m].first, points[m].second, points[m+1].first, points[m+1].second);
+			oss<<std::fixed<<"("<<apr.first<<","<<apr.second<<"),";
+			continue;
+		}
 		oss<<std::fixed<<"("<<points[m].first<<","<<points[m].second<<"),";
 	}
 	oss<<std::endl;
 
 	//TODO: normalize?
 	//TODO: trim?
-	//TODO: true peak
+	//DONE: true peak
+	//TODO: normalize here?
 	//TODO: actual b-spline
 
 	return oss.str();
