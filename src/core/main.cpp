@@ -438,7 +438,7 @@ int main( int argc, char * * argv )
 			}
 			
 			QFile f( QString::fromLocal8Bit( argv[i] ) );
-			f.open( QIODevice::ReadOnly);
+			f.open( QIODevice::ReadOnly );
 			QByteArray d = qCompress( f.readAll() ) ;
 			fwrite( d.constData(), sizeof(char), d.size(), stdout );
 
