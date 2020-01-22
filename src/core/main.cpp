@@ -428,7 +428,7 @@ int main( int argc, char * * argv )
 
 			return EXIT_SUCCESS;
 		}
-		else if( arg == "compress" || arg == "--compress")
+		else if( arg == "compress" || arg == "--compress" )
 		{
 			++i;
 
