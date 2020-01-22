@@ -1,6 +1,7 @@
 
 /*tmp*/
 #include "CWT.hpp"
+#include "Extrema.hpp"
 #include <string>
 #include <sstream>
 
@@ -103,14 +104,37 @@ std::string DiginstrumentPlugin::setAudioFile( const QString & _audio_file)
 	transform(sample);
 
 	std::ostringstream oss;
+	std::vector<std::pair<double, double>> points;
+	std::vector<double> values;
 
 	for(auto &e : transform[20]){
 		double re = e.second.first;
 		double im = e.second.second;
-		double scale = e.first;
+		if(e.first>4000) break;
+		double frequency = 44100.0f / e.first;
 		double modulus = sqrt(re*re + im*im); //TODO: is this correct?
-		oss<<std::fixed<<"("<<log10(44100.0f/scale)<<","<<modulus<<"),";
-		
+		points.push_back(std::make_pair(frequency, modulus));
+		values.push_back(modulus);
+		oss<<std::fixed<<"("<<frequency<<","<<modulus<<"),";
 	}
+	oss<<std::endl<<std::endl;
+
+	std::pair<std::vector<unsigned int>, std::vector<unsigned int>> extrema = Extrema::Both(values.begin(), values.end(), 0);
+	oss<<"Minima: ";
+	for(auto m : extrema.first){
+		oss<<std::fixed<<"("<<points[m].first<<","<<points[m].second<<"),";
+	}
+	oss<<std::endl;
+	oss<<"Maxima: ";
+	for(auto m : extrema.second){
+		oss<<std::fixed<<"("<<points[m].first<<","<<points[m].second<<"),";
+	}
+	oss<<std::endl;
+
+	//TODO: normalize?
+	//TODO: trim?
+	//TODO: true peak
+	//TODO: actual b-spline
+
 	return oss.str();
 }
