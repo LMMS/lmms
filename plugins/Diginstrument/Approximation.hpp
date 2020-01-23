@@ -1,5 +1,5 @@
 //An interpolation method with quadratic curve fitting
-//based on equations from: TODO
+//based on equations from: https://www.dsprelated.com/freebooks/sasp/Quadratic_Interpolation_Spectral_Peaks.html by JULIUS O. SMITH III
 namespace Approximation{
     template<typename T>
     inline std::pair<T, T> ParabolicNormalized(T a, T b, T c){
