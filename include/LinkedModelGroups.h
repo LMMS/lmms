@@ -69,7 +69,7 @@ public:
 	{
 		QString m_name;
 		class AutomatableModel* m_model;
-		ModelInfo() = delete;
+		ModelInfo() { /* hopefully no one will use this */ } // TODO: remove?
 		ModelInfo(const QString& name, AutomatableModel* model)
 			: m_name(name), m_model(model) {}
 	};
