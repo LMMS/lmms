@@ -108,8 +108,17 @@ public:
 	void loadValues(const class QDomElement& that);
 
 protected:
+	AutomatableModel* getModel(const std::string& s)
+	{
+		auto itr = m_models.find(s);
+		return (itr == m_models.end()) ? nullptr : itr->second.m_model;
+	}
+
 	//! Register a further model
 	void addModel(class AutomatableModel* model, const QString& name);
+	//! Unregister a model, return true if a model was erased
+	bool eraseModel(const QString& name);
+
 	//! Remove all models
 	void clearModels();
 

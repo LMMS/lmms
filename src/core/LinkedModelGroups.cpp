@@ -83,6 +83,14 @@ void LinkedModelGroup::addModel(AutomatableModel *model, const QString &name)
 
 
 
+bool LinkedModelGroup::eraseModel(const QString& name)
+{
+	return m_models.erase(name.toStdString()) > 0;
+}
+
+
+
+
 void LinkedModelGroup::clearModels()
 {
 	m_models.clear();
