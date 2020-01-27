@@ -16,8 +16,6 @@ class SpaProc : public LinkedModelGroup
 	Q_OBJECT
 	friend class SpaViewBase;
 
-	// Dictionary for all models used - whether there by default or added
-	QMap<QString, AutomatableModel *> m_connectedModels;
 signals:
 	// NOTE: when separating core from UI, this will need to be removed
 	// (who would kno if the client is Qt, i.e. it may not have slots at all)

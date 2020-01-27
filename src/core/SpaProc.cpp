@@ -153,6 +153,13 @@ void SpaProc::shutdownPlugin()
 {
 	m_plugin->deactivate();
 
+	foreach_model([&](const std::string& name, LinkedModelGroup::ModelInfo& minf)
+	{
+		qDebug() << "deleting" << name.c_str() << minf.m_model->id();
+		delete minf.m_model;
+		minf.m_model = nullptr;
+	});
+
 	//m_spaDescriptor->delete_plugin(m_plugin);
 	delete m_plugin;
 	m_plugin = nullptr;
@@ -168,7 +175,6 @@ struct LmmsVisitor final : public virtual spa::audio::visitor
 {
 	SpaProc* proc;
 	SpaProc::LmmsPorts *m_ports;
-	QMap<QString, AutomatableModel *> *m_connectedModels;
 	const char *m_curName;
 	int m_audioInputs = 0; // out
 	int m_audioOutputs = 0; // out
@@ -232,8 +238,6 @@ struct LmmsVisitor final : public virtual spa::audio::visitor
 		connectedModel = new ModelClass(static_cast<BaseType>(port),
 			modelCtorArgs..., nullptr,
 			QString::fromUtf8(m_curName));
-		m_connectedModels->insert(
-			QString::fromUtf8(m_curName), connectedModel);
 		proc->addModel(connectedModel, m_curName);
 	}
 
@@ -331,7 +335,6 @@ void SpaProc::initPlugin()
 			LmmsVisitor v;
 			v.proc = this;
 			v.m_ports = &m_ports;
-			v.m_connectedModels = &m_connectedModels;
 			v.m_curName = portname.data();
 			port_ref.accept(v);
 			m_audioInCount += v.m_audioInputs;
@@ -535,13 +538,23 @@ public:
 	}
 };
 
+/*
+trash button ---connection--->
+	1. LinkedModelGroup::removeControl -> SpaProc::removeControl
+		---> modelRemoved()---conn-> SpaViewProc::modelRemoved
+				-> LinkedModelGroupView::removeControl -> GUI stuff
+		---> LinkedModelGroup::eraseModel() (erases pointer from map)
+	2. delete model
+		---> destroyed -> removeControl
+		---> delete
+*/
+
 void SpaProc::removeControl(AutomatableModel* mdl)
 {
-	auto itr = m_connectedModels.find(mdl->objectName());
-	if(itr != m_connectedModels.end())
+	if(containsModel(mdl->objectName()))
 	{
 		emit modelRemoved(mdl);
-		m_connectedModels.erase(itr);
+		eraseModel(mdl->objectName());
 	}
 }
 
@@ -551,10 +564,9 @@ AutomatableModel *SpaProc::modelAtPort(const QString &dest)
 	QUrl url(dest);
 
 	AutomatableModel *mod;
-	auto itr2 = m_connectedModels.find(url.path());
-	if (itr2 != m_connectedModels.end())
+	if (containsModel(url.path()))
 	{
-		mod = *itr2;
+		mod = getModel(url.path().toStdString());
 	}
 	else
 	{
@@ -569,8 +581,8 @@ AutomatableModel *SpaProc::modelAtPort(const QString &dest)
 
 		if (spaMod)
 		{
+			// somehow, those two dictionaries look redundant:
 			addModel(mod = spaMod, url.path());
-			m_connectedModels.insert(url.path(), spaMod);
 
 			// View needs to create another child view, e.g. a new knob:
 			emit modelAdded(spaMod);
