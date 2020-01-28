@@ -6507,7 +6507,7 @@ Remember to also save your project manually. You can choose to disable saving wh
         <translation>Datei für Projekt-Export wählen...</translation>
     </message>
     <message>
-        <source>The following errors occurred while loading: </source>
+        <source>The following errors occured while loading: </source>
         <translation>Die folgenden Fehler traten während dem laden auf:</translation>
     </message>
     <message>

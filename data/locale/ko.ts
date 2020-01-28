@@ -6322,7 +6322,7 @@ Latency: %2 ms</source>
         <translation>LMMS 오류 보고</translation>
     </message>
     <message>
-        <source>The following errors occurred while loading: </source>
+        <source>The following errors occured while loading: </source>
         <translation>로딩 중 다음과 같은 오류가 발생하였습니다: </translation>
     </message>
 </context>

@@ -6221,7 +6221,7 @@ Remember to also save your project manually.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <source>The following errors occurred while loading: </source>
+        <source>The following errors occured while loading: </source>
         <translation type="unfinished"/>
     </message>
     <message>

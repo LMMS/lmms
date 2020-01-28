@@ -8253,7 +8253,7 @@ Latency: %2 ms</source>
     </message>
     <message>
         <location filename="../../src/core/Song.cpp" line="1440"/>
-        <source>The following errors occurred while loading: </source>
+        <source>The following errors occured while loading: </source>
         <translation type="unfinished"></translation>
     </message>
 </context>

@@ -6481,7 +6481,7 @@ Ingat juga untuk menyimpan proyek Anda secara manual. Anda dapat memilih untuk m
         <translation>Pilih berkas untuk ekspor-proyek...</translation>
     </message>
     <message>
-        <source>The following errors occurred while loading: </source>
+        <source>The following errors occured while loading: </source>
         <translation>Kesalahan muncul saat memuat:</translation>
     </message>
     <message>

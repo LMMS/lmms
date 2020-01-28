@@ -6510,7 +6510,7 @@ Pamiętaj również o ręcznym zapisaniu projektu. Możesz wyłączyć zapis pod
         <translation>Wybierz plik do wyeksportowania projektu…</translation>
     </message>
     <message>
-        <source>The following errors occurred while loading: </source>
+        <source>The following errors occured while loading: </source>
         <translation>Podczas ładowania wystąpiły następujące błędy:</translation>
     </message>
     <message>
