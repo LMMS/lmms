@@ -6469,7 +6469,7 @@ Remember to also save your project manually. You can choose to disable saving wh
         <translation>プロジェクトをエクスポートするファイルを選択してください...</translation>
     </message>
     <message>
-        <source>The following errors occured while loading: </source>
+        <source>The following errors occurred while loading: </source>
         <translation>読み込み中に以下のエラーが発生しました:</translation>
     </message>
     <message>

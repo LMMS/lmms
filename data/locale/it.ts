@@ -6505,7 +6505,7 @@ Ricorda di salvare i progetti manualmente. Puoi disabilitare il salvataggio auto
         <translation>Scegliere il file per l&apos;esportazione del progetto...</translation>
     </message>
     <message>
-        <source>The following errors occured while loading: </source>
+        <source>The following errors occurred while loading: </source>
         <translation>Errori durante il caricamento:</translation>
     </message>
     <message>

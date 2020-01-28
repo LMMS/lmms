@@ -7893,7 +7893,7 @@ Remember to also save your project manually.</source>
     </message>
     <message>
         <location filename="src/core/Song.cpp" line="1451"/>
-        <source>The following errors occured while loading: </source>
+        <source>The following errors occurred while loading: </source>
         <translation type="unfinished"/>
     </message>
 </context>

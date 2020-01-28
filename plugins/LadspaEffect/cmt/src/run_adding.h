@@ -55,7 +55,7 @@
 
    With -O1 or greater g++ will inline the write_output function, and
    although the code ends up slightly bigger there is no overhead compared to
-   having two seperate functions.
+   having two separate functions.
 
    Sometimes the run_adding_gain function can be made more efficient than this
    - for instance, if the output is multiplied by a gain already then you are
@@ -125,7 +125,7 @@ inline void write_control<write_output_adding>(LADSPA_Data *const out,
 
 /*
    This next bit is an attempt to facilitate the writing of slightly
-   more efficent run_adding functions without writing two seperate pieces of
+   more efficent run_adding functions without writing two separate pieces of
    code.  You can say something like
 
      LADSPA_Data fOutputGain = ... ;

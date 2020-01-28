@@ -6485,7 +6485,7 @@ Remember to also save your project manually. You can choose to disable saving wh
         <translation>为工程导出选择文件...</translation>
     </message>
     <message>
-        <source>The following errors occured while loading: </source>
+        <source>The following errors occurred while loading: </source>
         <translation>载入时发生以下错误：</translation>
     </message>
     <message>

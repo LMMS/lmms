@@ -6506,7 +6506,7 @@ Recuerda también guardar tu proyecto manualmente. Puedes elegir no guardar auto
         <translation>Selecciona un archivo para exportar proyecto...</translation>
     </message>
     <message>
-        <source>The following errors occured while loading: </source>
+        <source>The following errors occurred while loading: </source>
         <translation>Los siguientes errores ocurrieron durante la carga:</translation>
     </message>
     <message>

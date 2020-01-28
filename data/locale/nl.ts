@@ -6510,7 +6510,7 @@ Onthoud om uw project ook manueel op te slaan. U kunt kiezen om opslaan uit te s
         <translation>Selecteer bestand voor project-export...</translation>
     </message>
     <message>
-        <source>The following errors occured while loading: </source>
+        <source>The following errors occurred while loading: </source>
         <translation>De volgende fouten traden op tijdens het laden:</translation>
     </message>
     <message>

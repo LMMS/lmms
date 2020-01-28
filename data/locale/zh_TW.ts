@@ -8238,7 +8238,7 @@ Remember to also save your project manually. You can choose to disable saving wh
     </message>
     <message>
         <location filename="../../src/core/Song.cpp" line="1578"/>
-        <source>The following errors occured while loading: </source>
+        <source>The following errors occurred while loading: </source>
         <translation>載入時發生以下錯誤：</translation>
     </message>
 </context>

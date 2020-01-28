@@ -8268,7 +8268,7 @@ Nezapomeňte také svůj projekt uložit ručně. Můžete si vybrat, zda nechce
     </message>
     <message>
         <location filename="../../src/core/Song.cpp" line="1578"/>
-        <source>The following errors occured while loading: </source>
+        <source>The following errors occurred while loading: </source>
         <translation>Během načítání se vyskytly tyto chyby:</translation>
     </message>
 </context>

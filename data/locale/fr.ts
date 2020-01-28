@@ -6505,7 +6505,7 @@ Souvenez-vous de sauvegarder aussi votre projet manuellement. Vous pouvez choisi
         <translation>Sélectionnez un fichier vers lequel exporter le projet...</translation>
     </message>
     <message>
-        <source>The following errors occured while loading: </source>
+        <source>The following errors occurred while loading: </source>
         <translation>Les erreurs suivantes sont survenues lors du chargement : </translation>
     </message>
     <message>

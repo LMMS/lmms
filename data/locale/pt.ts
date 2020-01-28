@@ -6481,7 +6481,7 @@ Remember to also save your project manually. You can choose to disable saving wh
         <translation type="unfinished"/>
     </message>
     <message>
-        <source>The following errors occured while loading: </source>
+        <source>The following errors occurred while loading: </source>
         <translation type="unfinished"/>
     </message>
     <message>
