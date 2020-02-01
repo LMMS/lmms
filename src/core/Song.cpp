@@ -1437,7 +1437,7 @@ QString Song::errorSummary()
 	QString errors = m_errors.join("\n") + '\n';
 
 	errors.prepend( "\n\n" );
-	errors.prepend( tr( "The following errors occured while loading: " ) );
+	errors.prepend( tr( "The following errors occurred while loading: " ) );
 
 	return errors;
 }
