@@ -3,53 +3,47 @@
 #include <vector>
 #include <algorithm>
 
-#include "Point.hpp"
-
-/* An example:
-    BSpline<float, 2> spline;
-	spline.setControlPoints({{0, 0},
-							{0.2, 0},
-							{0.4, 0},
-							{0.6, 1},
-							{0.8, 0},
-							{1, 0}});
-	spline.setKnotVector({0,0,0, 0.25, 0.50, 0.50, 1, 1, 1});
-
-    The curve should coincide with the control polinom at 0.6
-*/
-
-//TODO: maybe exceptions, other error handling
 /*B-spline of degree D*/
 template <typename T, unsigned int D>
 class BSpline
 {
 private:
     std::vector<T> knotVector;
-    std::vector<Point<T>> controlPoints;
+    std::vector<std::pair<T, T>> controlPoints;
 
 public:
-    Point<T> operator()(T t);
+    /*Evaluate the spline at t, which must be in the range [0,1].*/
+    std::pair<T, T> operator[](T t);
+
+    /*Set the knot vector. Must be clamped and ordered. All elements must be in the range [0,1]*/
     void setKnotVector(const std::vector<T> &vector)
     {
-        //knot vector size = control points + degree + 1
-        //knot vector should be normalized between [0,1] and ordered
         this->knotVector = vector;
     }
-    void setControlPoints(const std::vector<Point<T>> &vector)
+
+    void setKnotVector(std::vector<T> && vector){
+        this->knotVector = std::move(vector);
+    }
+
+    /*Set control points.*/
+    void setControlPoints(std::vector<std::pair<T, T>> && vector){
+        this->controlPoints = std::move(vector);
+    }
+
+    void setControlPoints(const std::vector<std::pair<T, T>> &vector)
     {
         this->controlPoints = vector;
     }
 };
 
-// t should be normalized between [0,1]
 template <typename T, unsigned int D>
-Point<T> BSpline<T, D>::operator()(T t)
+std::pair<T, T> BSpline<T, D>::operator[](T t)
 {
     //deBoor algorithm
     auto lower = std::upper_bound(knotVector.begin(), knotVector.end(), t) - 1;
     unsigned int k = std::distance(knotVector.begin(), lower);
     unsigned int p = D;
-    std::vector<Point<T>> d(p + 1);
+    std::vector<std::pair<T, T>> d(p + 1 + k);
     for (int j = 0; j <= p; j++)
     {
         d[j] = controlPoints[j + k - p];

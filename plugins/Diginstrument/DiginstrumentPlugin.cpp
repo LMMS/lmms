@@ -2,8 +2,8 @@
 /*tmp*/
 #include "CWT.hpp"
 #include "Extrema.hpp"
-#include "Point.hpp"
 #include "Approximation.hpp"
+#include "SplineFitter.hpp"
 #include <string>
 #include <sstream>
 
@@ -102,21 +102,22 @@ std::string DiginstrumentPlugin::setAudioFile( const QString & _audio_file)
 		//tmp: left only
 		sample[i] = m_sampleBuffer.data()[i][0];
 	}
-	CWT transform("morlet", 6, 12);
+	const int level = 12;
+	CWT transform("morlet", 6, level);
 	transform(sample);
 
 	std::ostringstream oss;
-	std::vector<Point<double>> points;
+	std::vector<std::pair<double, double>> points;
+	points.reserve(level*11);
 	std::vector<double> values;
 
 	oss<<"Magnitude spectrum:"<<std::endl;
-	for(auto &e : transform[20]){
+	for(auto e : transform[20]){
 		double re = e.second.first;
 		double im = e.second.second;
-		if(e.first>4000) break;
 		double scale = e.first;
 		double modulus = sqrt(re*re + im*im); //TODO: is this correct?
-		points.push_back(Point<double>(scale, modulus));
+		points.emplace_back(scale, modulus);
 		values.push_back(modulus);
 		oss<<std::fixed<<scale<<" "<<modulus<<std::endl;
 	}
@@ -125,38 +126,61 @@ std::string DiginstrumentPlugin::setAudioFile( const QString & _audio_file)
 	std::pair<std::vector<unsigned int>, std::vector<unsigned int>> extrema = Extrema::Both(values.begin(), values.end(), 0);
 
 	oss<<"Minima:"<<std::endl;
-	for(auto m : extrema.first){
-		oss<<std::fixed<<points[m].x<<" "<<points[m].y<<std::endl;
+	for(int m : extrema.first){
+		oss<<std::fixed<<points[m].first<<" "<<points[m].second<<std::endl;
 	}
 	oss<<std::endl;
 	oss<<"Minima approximation:"<<std::endl;
-	for(auto m : extrema.first){
-		if(m>0 || m==points.size()-1){
-			auto apr = Approximation::Parabolic(points[m-1].x, points[m-1].y, points[m].x, points[m].y, points[m+1].x, points[m+1].y);
+	for(int m : extrema.first){
+		if(m>0 && m<=points.size()-2){
+			auto apr = Approximation::Parabolic(points[m-1].first, points[m-1].second, points[m].first, points[m].second, points[m+1].first, points[m+1].second);
 			oss<<std::fixed<<apr.first<<" "<<apr.second<<std::endl;
 			continue;
 		}
 	}
 	oss<<std::endl;
 	oss<<"Maxima:"<<std::endl;
-	for(auto m : extrema.second){
-		oss<<std::fixed<<points[m].x<<" "<<points[m].y<<std::endl;
+	for(int m : extrema.second){
+		oss<<std::fixed<<points[m].first<<" "<<points[m].second<<std::endl;
 	}
 	oss<<std::endl;
 	oss<<"Maxima approximation:"<<std::endl;
-	for(auto m : extrema.second){
-		if(m>0 || m==points.size()-1){
-			auto apr = Approximation::Parabolic(points[m-1].x, points[m-1].y, points[m].x, points[m].y, points[m+1].x, points[m+1].y);
+	for(int m : extrema.second){
+		if(m>0 && m<=points.size()-2){
+			auto apr = Approximation::Parabolic(points[m-1].first, points[m-1].second, points[m].first, points[m].second, points[m+1].first, points[m+1].second);
 			oss<<std::fixed<<apr.first<<" "<<apr.second<<std::endl;
 			continue;
 		}
 	}
 
+	BSpline<double, 4> spline = SplineFitter<double, 4>::fit({
+		std::pair<double, double>(0,7),
+		std::pair<double, double>(0.25,5),
+		std::pair<double, double>(0.45,4.5),
+		std::pair<double, double>(0.55,4.3),
+		std::pair<double, double>(0.65,4.1),
+		std::pair<double, double>(0.7,4),
+		std::pair<double, double>(0.75,4.2),
+		std::pair<double, double>(0.85,5),
+		std::pair<double, double>(0.9,6),
+		std::pair<double, double>(0.95,8),
+		std::pair<double, double>(1,12)
+	}, 7);
+
+	oss<<std::endl;
+	oss<<"Spline evaluation:"<<std::endl;
+	for(double i = 0; i<=1; i+=0.01){
+		const auto p = spline[i];
+		oss<<"("<<p.first<<","<<p.second<<"),";
+	}
+	const auto p = spline[1];
+	oss<<"("<<p.first<<","<<p.second<<"),";
+
 	//TODO: normalize?
 	//TODO: trim?
 	//DONE: true peak
 	//TODO: normalize here?
-	//TODO: actual b-spline
+	//TODO: merged b-spline
 
 	return oss.str();
 }

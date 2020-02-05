@@ -96,6 +96,7 @@ S Diginstrument::Interpolator<S>::linearShift(S & left, S & right, const float &
             it++;
         }
         accumulated.push_back(std::make_pair(baseFrequency, accumulatedAmplitude));
+        //TODO: Debug: Invalid read of size 4
         baseFrequency = it->first;
     }
 
