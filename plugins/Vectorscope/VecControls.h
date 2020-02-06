@@ -55,10 +55,10 @@ private:
 	BoolModel m_logarithmicModel;
 	BoolModel m_highQualityModel;
 
-	QColor	m_colorFG;
-	QColor	m_colorGrid;
-	QColor	m_colorLabels;
-	QColor	m_colorOutline;
+	QColor m_colorFG;
+	QColor m_colorGrid;
+	QColor m_colorLabels;
+	QColor m_colorOutline;
 
 	friend class VecControlsDialog;
 	friend class VectorView;

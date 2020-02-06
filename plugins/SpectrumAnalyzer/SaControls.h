@@ -81,13 +81,13 @@ private:
 	FloatModel m_zeroPaddingModel;
 
 	// colors (hard-coded, values must add up to specific numbers)
-	QColor	m_colorL;		//!< color of the left channel
-	QColor	m_colorR;		//!< color of the right channel
-	QColor	m_colorMono;	//!< mono color for spectrum display
-	QColor	m_colorMonoW;	//!< mono color for waterfall display
-	QColor	m_colorBG;		//!< spectrum display background color
-	QColor	m_colorGrid;	//!< color of grid lines
-	QColor	m_colorLabels;	//!< color of axis labels
+	QColor m_colorL;		//!< color of the left channel
+	QColor m_colorR;		//!< color of the right channel
+	QColor m_colorMono;		//!< mono color for spectrum display
+	QColor m_colorMonoW;	//!< mono color for waterfall display
+	QColor m_colorBG;		//!< spectrum display background color
+	QColor m_colorGrid;		//!< color of grid lines
+	QColor m_colorLabels;	//!< color of axis labels
 
 	friend class SaControlsDialog;
 	friend class SaSpectrumView;
