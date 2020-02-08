@@ -4,6 +4,7 @@
 #include "Extrema.hpp"
 #include "Approximation.hpp"
 #include "SplineFitter.hpp"
+#include "PiecewiseBSpline.hpp"
 #include <string>
 #include <sstream>
 
@@ -153,7 +154,11 @@ std::string DiginstrumentPlugin::setAudioFile( const QString & _audio_file)
 		}
 	}
 
-	BSpline<double, 4> spline = SplineFitter<double, 4>::fit({
+	const int controlPoints = 7;
+
+	PiecewiseBSpline<double, 4> spline;
+
+	spline.add(SplineFitter<double, 4>::fit({
 		std::pair<double, double>(0,7),
 		std::pair<double, double>(0.25,5),
 		std::pair<double, double>(0.45,4.5),
@@ -165,22 +170,39 @@ std::string DiginstrumentPlugin::setAudioFile( const QString & _audio_file)
 		std::pair<double, double>(0.9,6),
 		std::pair<double, double>(0.95,8),
 		std::pair<double, double>(1,12)
-	}, 7);
+	}, controlPoints));
+
+	
+	spline.add(SplineFitter<double, 4>::fit({
+		std::pair<double, double>(1,12),
+		std::pair<double, double>(1.25,5),
+		std::pair<double, double>(1.45,4.5),
+		std::pair<double, double>(1.55,4.3),
+		std::pair<double, double>(1.65,4.1),
+		std::pair<double, double>(1.7,4),
+		std::pair<double, double>(1.75,4.2),
+		std::pair<double, double>(1.85,5),
+		std::pair<double, double>(1.9,6),
+		std::pair<double, double>(1.95,8),
+		std::pair<double, double>(2,12)
+	}, controlPoints));
+
+	const auto p = spline[0.5];
+	std::cout<<"("<<p.first<<","<<p.second<<"),"<<std::endl;
 
 	oss<<std::endl;
 	oss<<"Spline evaluation:"<<std::endl;
-	for(double i = 0; i<=1; i+=0.01){
+	for(double i = 0; i<=2; i+=0.01){
 		const auto p = spline[i];
 		oss<<"("<<p.first<<","<<p.second<<"),";
 	}
-	const auto p = spline[1];
-	oss<<"("<<p.first<<","<<p.second<<"),";
 
-	//TODO: normalize?
 	//TODO: trim?
+	//TODO: normalize?
 	//DONE: true peak
-	//TODO: normalize here?
-	//TODO: merged b-spline
+	//DONE: merged b-spline
+
+	//TODO: maybe make controlPoints into template parameter aswell
 
 	return oss.str();
 }

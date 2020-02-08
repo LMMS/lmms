@@ -15,13 +15,19 @@ public:
     /*Returns the n+1 coefficients for N[i,D](u), where i equals the index in the returned array. The knot vector must be clamped!*/
     static std::vector<T> coefficients(int n, T u, const std::vector<T> &knotVector);
 
-    /*Returns a clamped knot vector of dataPoints+D+1 size with uniform spacing*/
+    /*Returns a clamped knot vector of dataPoints+D+1 size with uniform spacing.*/
     static std::vector<T> makeUniformClampedKnotVector(unsigned int points);
 
-    //Returns a vector of uniform parameters. Size is equal to the number of input points.*/
+    /*Returns a clamped knot vector of dataPoints+D+1 size with the internal knots equal to the last parameters.*/
+    static std::vector<T> makeIdentityClampedKnotVector(unsigned int points, const std::vector<T> &parameters);
+
+    /*Returns a vector of uniform parameters. Size is equal to the number of input points.*/
     static std::vector<T> generateUniformParameters(const std::vector<std::pair<T, T>> &points);
 
-    //Least square fits a D degree B-Spline to the data points using the given amount of control points.*/
+    /*Returns a vector of identity parameters, meaning they are the first coordinate mapped to [0,1]. Size is equal to the number of input points.*/
+    static std::vector<T> generateIdentityParameters(const std::vector<std::pair<T, T>> &points);
+
+    /*Least square fits a D degree B-Spline to the data points using the given amount of control points.*/
     static BSpline<T, D> fit(const std::vector<std::pair<T, T>> &dataPoints, unsigned int controlPoints);
 };
 
@@ -31,8 +37,8 @@ BSpline<T, D> SplineFitter<T, D>::fit(const std::vector<std::pair<T, T>> &points
     const int m = points.size() - 1;
     const int n = controlPoints - 1;
 
-    std::vector<T> t = generateUniformParameters(points);
-    std::vector<T> knotVector = makeUniformClampedKnotVector(n + 1);
+    std::vector<T> t = generateIdentityParameters(points);
+    std::vector<T> knotVector = makeIdentityClampedKnotVector(n + 1, t);
 
     Eigen::Matrix<double, Eigen::Dynamic, 2> Q(n + 1, 2);
     Eigen::Matrix<double, Eigen::Dynamic, 2> P(m + 1, 2);
@@ -142,4 +148,42 @@ std::vector<T> SplineFitter<T, D>::generateUniformParameters(const std::vector<s
         t[k] = k * L;
     }
     return t;
+}
+
+template <typename T, unsigned int D>
+std::vector<T> SplineFitter<T, D>::generateIdentityParameters(const std::vector<std::pair<T, T>> &dataPoints)
+{
+    std::vector<T> t;
+    t.reserve(dataPoints.size());
+    const T L = dataPoints.back().first - dataPoints.front().first;
+    const T x0 = dataPoints.front().first;
+    for (const std::pair<T, T> &p : dataPoints)
+    {
+        t.emplace_back((p.first - x0) / L);
+    }
+    return t;
+}
+
+template <typename T, unsigned int D>
+std::vector<T> SplineFitter<T, D>::makeIdentityClampedKnotVector(unsigned int points, const std::vector<T> &parameters)
+{
+    std::vector<T> knotVector(points + D + 1, 0);
+    for (int i = 0; i < D + 1; i++)
+    {
+        knotVector[i] = 0;
+    }
+    for (int i = knotVector.size() - 1; i > knotVector.size() - D - 2; i--)
+    {
+        knotVector[i] = 1;
+    }
+    for (int i = 1; i < points - D; i++)
+    {
+        const int index = points - i;
+        for (int j = parameters.size() - i - 1; j > parameters.size() - i - D - 1; j--)
+        {
+            knotVector[index] += parameters[j];
+        }
+        knotVector[index] /= (T)D;
+    }
+    return knotVector;
 }

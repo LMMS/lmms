@@ -21,18 +21,30 @@ public:
         this->knotVector = vector;
     }
 
-    void setKnotVector(std::vector<T> && vector){
+    void setKnotVector(std::vector<T> &&vector)
+    {
         this->knotVector = std::move(vector);
     }
 
     /*Set control points.*/
-    void setControlPoints(std::vector<std::pair<T, T>> && vector){
+    void setControlPoints(std::vector<std::pair<T, T>> &&vector)
+    {
         this->controlPoints = std::move(vector);
     }
 
     void setControlPoints(const std::vector<std::pair<T, T>> &vector)
     {
         this->controlPoints = vector;
+    }
+
+    std::vector<T> getKnotVector() const
+    {
+        return knotVector;
+    }
+
+    std::vector<std::pair<T, T>> getControlPoints() const
+    {
+        return controlPoints;
     }
 };
 
