@@ -8,14 +8,15 @@ ENDIF()
 
 # If Carla was not provided by the system, make a dummy library instead
 if(LMMS_HAVE_WEAKCARLA)
-  # Mimic the Makefile header
-  FILE(WRITE ${CMAKE_CURRENT_BINARY_DIR}/config.h "")
+  # Mimic the autoconf header
+  FILE(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/autoconf)
+  FILE(WRITE ${CMAKE_CURRENT_BINARY_DIR}/autoconf/config.h "")
   SET(CARLA_INCLUDE_DIRS
     ${CMAKE_CURRENT_SOURCE_DIR}/carla/source
     ${CMAKE_CURRENT_SOURCE_DIR}/carla/source/includes
     ${CMAKE_CURRENT_SOURCE_DIR}/carla/source/utils
     ${CMAKE_CURRENT_SOURCE_DIR}/carla/source/backend
-    ${CMAKE_CURRENT_BINARY_DIR}
+    ${CMAKE_CURRENT_BINARY_DIR}/autoconf
   )
   INCLUDE_DIRECTORIES(${CARLA_INCLUDE_DIRS})
   ADD_LIBRARY(carla_native-plugin MODULE DummyCarla.cpp)
