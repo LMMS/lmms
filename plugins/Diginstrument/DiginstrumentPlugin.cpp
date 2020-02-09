@@ -5,8 +5,11 @@
 #include "Approximation.hpp"
 #include "SplineFitter.hpp"
 #include "PiecewiseBSpline.hpp"
+#include "SpectrumFitter.hpp"
+#include "SplineSpectrum.hpp"
 #include <string>
 #include <sstream>
+#include <iostream>
 
 #include "DiginstrumentPlugin.h"
 
@@ -112,97 +115,83 @@ std::string DiginstrumentPlugin::setAudioFile( const QString & _audio_file)
 	points.reserve(level*11);
 	std::vector<double> values;
 
-	oss<<"Magnitude spectrum:"<<std::endl;
-	for(auto e : transform[20]){
-		double re = e.second.first;
-		double im = e.second.second;
-		double scale = e.first;
+	/*oss<<"Magnitude spectrum:"<<std::endl;
+	const auto momentarySpectrum = transform[20];
+	for(int i = momentarySpectrum.size()-1;i>=0;i--){
+		double re = momentarySpectrum[i].second.first;
+		double im = momentarySpectrum[i].second.second;
+		double scale = (double)m_sampleBuffer.sampleRate()/(momentarySpectrum[i].first);
 		double modulus = sqrt(re*re + im*im); //TODO: is this correct?
 		points.emplace_back(scale, modulus);
 		values.push_back(modulus);
+		//oss<<std::fixed<<"("<<scale<<","<<modulus<<"),";
 		oss<<std::fixed<<scale<<" "<<modulus<<std::endl;
 	}
-	oss<<std::endl<<std::endl;
+	oss<<std::endl<<std::endl;*/
 
-	std::pair<std::vector<unsigned int>, std::vector<unsigned int>> extrema = Extrema::Both(values.begin(), values.end(), 0);
+	/*SpectrumFitter<double, 4> fitter(2);
+	SplineSpectrum<double> spectrum = fitter.fit(points);*/
 
-	oss<<"Minima:"<<std::endl;
-	for(int m : extrema.first){
-		oss<<std::fixed<<points[m].first<<" "<<points[m].second<<std::endl;
-	}
+	/*oss<<"Spectrum harmoics:"<<std::endl;
+	for(auto h : spectrum.getHarmonics())
+	{
+		//oss<<"("<<h.first<<","<<h.second<<"),";
+		oss<<std::fixed<<h.first<<" "<<h.second<<std::endl;
+	}*/
+
 	oss<<std::endl;
-	oss<<"Minima approximation:"<<std::endl;
-	for(int m : extrema.first){
-		if(m>0 && m<=points.size()-2){
-			auto apr = Approximation::Parabolic(points[m-1].first, points[m-1].second, points[m].first, points[m].second, points[m+1].first, points[m+1].second);
-			oss<<std::fixed<<apr.first<<" "<<apr.second<<std::endl;
-			continue;
+	/*oss<<"Spline evaluation:"<<std::endl;
+	for(double i = 15; i<=24000; i+=5){
+		const auto p = spectrum[i];
+		//oss<<"("<<p.first<<","<<p.second<<"),";
+		oss<<std::fixed<<p.first<<" "<<p.second<<std::endl;
+	}*/
+
+	auto icwt = transform.inverseTransform();
+	std::vector<double> reconstruction(icwt.size(),0);
+	 unsigned int tableSize = m_sampleBuffer.sampleRate();
+    std::vector<float> sinetable(tableSize);
+    for(int i = 0; i<tableSize; i++){
+        sinetable[i] = (float)sin(((double)i / (double)tableSize) * M_PI * 2.0);
+    }
+
+	for(int i = 0; i<icwt.size();i++)
+	{
+		const auto momentarySpectrum = transform[i];
+		std::vector<std::pair<double, double>> points;
+		points.reserve(level*11);
+		std::vector<double> values;
+		for(int i = momentarySpectrum.size()-1;i>=0;i--){
+			double re = momentarySpectrum[i].second.first;
+			double im = momentarySpectrum[i].second.second;
+			double scale = (double)m_sampleBuffer.sampleRate()/(momentarySpectrum[i].first);
+			double modulus = sqrt(re*re + im*im); //TODO: is this correct?
+			points.emplace_back(scale, modulus);
+			values.push_back(modulus);
+			//oss<<std::fixed<<"("<<scale<<","<<modulus<<"),";
+			//oss<<std::fixed<<scale<<" "<<modulus<<std::endl;
 		}
-	}
-	oss<<std::endl;
-	oss<<"Maxima:"<<std::endl;
-	for(int m : extrema.second){
-		oss<<std::fixed<<points[m].first<<" "<<points[m].second<<std::endl;
-	}
-	oss<<std::endl;
-	oss<<"Maxima approximation:"<<std::endl;
-	for(int m : extrema.second){
-		if(m>0 && m<=points.size()-2){
-			auto apr = Approximation::Parabolic(points[m-1].first, points[m-1].second, points[m].first, points[m].second, points[m+1].first, points[m+1].second);
-			oss<<std::fixed<<apr.first<<" "<<apr.second<<std::endl;
-			continue;
+		SpectrumFitter<double, 4> fitter(2);
+		SplineSpectrum<double> spectrum = fitter.fit(points);
+		//harmonics
+		for(auto h : spectrum.getHarmonics())
+		{
+			const unsigned int step = h.first * (tableSize / (float)m_sampleBuffer.sampleRate());
+        	unsigned int pos = (i * step) % tableSize;
+            reconstruction[i] += sinetable[pos] * h.second;
 		}
+		oss<<std::fixed<<reconstruction[i]<<" "<<icwt[i]<<std::endl;
 	}
+	/*for(auto s : icwt)
+	{
+		oss<<std::fixed<<s<<std::endl;
+	}*/
 
-	const int controlPoints = 7;
+	//TODO: trim spectrum?
+	//TODO: normalize spectrum?
 
-	PiecewiseBSpline<double, 4> spline;
-
-	spline.add(SplineFitter<double, 4>::fit({
-		std::pair<double, double>(0,7),
-		std::pair<double, double>(0.25,5),
-		std::pair<double, double>(0.45,4.5),
-		std::pair<double, double>(0.55,4.3),
-		std::pair<double, double>(0.65,4.1),
-		std::pair<double, double>(0.7,4),
-		std::pair<double, double>(0.75,4.2),
-		std::pair<double, double>(0.85,5),
-		std::pair<double, double>(0.9,6),
-		std::pair<double, double>(0.95,8),
-		std::pair<double, double>(1,12)
-	}, controlPoints));
-
-	
-	spline.add(SplineFitter<double, 4>::fit({
-		std::pair<double, double>(1,12),
-		std::pair<double, double>(1.25,5),
-		std::pair<double, double>(1.45,4.5),
-		std::pair<double, double>(1.55,4.3),
-		std::pair<double, double>(1.65,4.1),
-		std::pair<double, double>(1.7,4),
-		std::pair<double, double>(1.75,4.2),
-		std::pair<double, double>(1.85,5),
-		std::pair<double, double>(1.9,6),
-		std::pair<double, double>(1.95,8),
-		std::pair<double, double>(2,12)
-	}, controlPoints));
-
-	const auto p = spline[0.5];
-	std::cout<<"("<<p.first<<","<<p.second<<"),"<<std::endl;
-
-	oss<<std::endl;
-	oss<<"Spline evaluation:"<<std::endl;
-	for(double i = 0; i<=2; i+=0.01){
-		const auto p = spline[i];
-		oss<<"("<<p.first<<","<<p.second<<"),";
-	}
-
-	//TODO: trim?
-	//TODO: normalize?
-	//DONE: true peak
-	//DONE: merged b-spline
-
-	//TODO: maybe make controlPoints into template parameter aswell
+	//tmp
+	std::cout<<oss.str()<<std::endl;
 
 	return oss.str();
 }

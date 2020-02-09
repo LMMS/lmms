@@ -50,6 +50,9 @@ public:
     bool add(BSpline<T, D> &&spline);
     bool add(const BSpline<T, D> &spline);
 
+    /*Return the peaks of the spline.*/
+    std::vector<std::pair<T, T>> getPeaks() const;
+
     /*Evaluate the spline at x*/
     std::pair<T, T> operator[](T x);
 };
@@ -96,15 +99,28 @@ std::pair<T, T> PiecewiseBSpline<T, D>::operator[](T x)
     //out of bounds, lower
     if (x < pieces.front().begin)
     {
-        return pieces.front().spline[pieces.front().begin];
+        return pieces.front().spline[0];
     }
     //find the correct spline
     auto it = std::lower_bound(pieces.begin(), pieces.end(), x);
     //out of bounds, upper
     if (it == pieces.end())
     {
-        return pieces.back().spline[pieces.back().end];
+        return pieces.back().spline[1];
     }
     //map to [0,1]
     return it->spline[(x - it->begin) / (it->end - it->begin)];
+}
+
+template <typename T, unsigned int D>
+std::vector<std::pair<T, T>> PiecewiseBSpline<T, D>::getPeaks() const
+{
+    std::vector<std::pair<T, T>> res;
+    res.reserve(pieces.size());
+    for(const auto & piece : pieces)
+    {
+        res.emplace_back(piece.spline.getControlPoints().back());
+    }
+    res.resize(res.size()-1);
+    return res;
 }

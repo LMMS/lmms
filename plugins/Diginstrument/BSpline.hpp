@@ -51,6 +51,8 @@ public:
 template <typename T, unsigned int D>
 std::pair<T, T> BSpline<T, D>::operator[](T t)
 {
+    if(t == 0) { return controlPoints.front(); }
+    if(t == 1) { return controlPoints.back(); }
     //deBoor algorithm
     auto lower = std::upper_bound(knotVector.begin(), knotVector.end(), t) - 1;
     unsigned int k = std::distance(knotVector.begin(), lower);

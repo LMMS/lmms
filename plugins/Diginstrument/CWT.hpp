@@ -66,6 +66,13 @@ public:
         return res;
     }
 
+    std::vector<double> inverseTransform()
+    {
+        std::vector<double> res(signalLength);
+        icwt(wt, &res[0]);
+        return res;
+    }
+
     CWT(const std::string & name, const double & parameter, unsigned int level){
         setWavelet(name, parameter, level);
     }

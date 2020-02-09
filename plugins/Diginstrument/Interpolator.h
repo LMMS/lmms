@@ -1,3 +1,5 @@
+#pragma once
+
 #include "MultidimensionalNeighbourMap.hpp"
 
 namespace Diginstrument{
