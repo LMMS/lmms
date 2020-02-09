@@ -139,6 +139,10 @@ void SpaControlBase::loadSettings(const QDomElement &that)
 			}
 			AutomatableModel* newModel = modelAtPort(nodename); // create model in all processes
 			newModel->loadSettings(models, nodename);
+			for(std::unique_ptr<SpaProc>& proc : m_procs)
+			{
+				proc->addModel(newModel, nodename);
+			}
 		}
 	}
 }
