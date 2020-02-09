@@ -50,6 +50,7 @@
 */
 class LinkedModelGroup : public Model
 {
+	Q_OBJECT
 public:
 	/*
 		Initialization
@@ -95,11 +96,7 @@ public:
 
 	std::size_t modelNum() const { return m_models.size(); }
 	bool containsModel(const QString& name) const;
-
-	// this is bad style (redirecting into the sub-class), but this class
-	// will be married with the sub-classes (Lv2Proc, SpaProc) anyways,
-	// so let's do the dirty trick for now...
-	virtual void removeControl(AutomatableModel *) {}
+	void removeControl(AutomatableModel *);
 
 	/*
 		Load/Save
@@ -107,7 +104,15 @@ public:
 	void saveValues(class QDomDocument& doc, class QDomElement& that);
 	void loadValues(const class QDomElement& that);
 
-protected:
+signals:
+	// NOTE: when separating core from UI, this will need to be removed
+	// (who would kno if the client is Qt, i.e. it may not have slots at all)
+	// In this case you'd e.g. send the UI something like
+	// "/added <model meta info>"
+	void modelAdded(AutomatableModel* added);
+	void modelRemoved(AutomatableModel* removed);
+
+public:
 	AutomatableModel* getModel(const std::string& s)
 	{
 		auto itr = m_models.find(s);

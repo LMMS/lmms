@@ -78,6 +78,31 @@ void LinkedModelGroup::addModel(AutomatableModel *model, const QString &name)
 {
 	model->setObjectName(name);
 	m_models.emplace(std::string(name.toUtf8().data()), ModelInfo(name, model));
+	connect(model, &AutomatableModel::destroyed,
+				this, [this, model](jo_id_t){
+					if(containsModel(model->objectName()))
+					{
+						emit modelRemoved(model);
+						eraseModel(model->objectName());
+					}
+				},
+				Qt::DirectConnection);
+
+	// View needs to create another child view, e.g. a new knob:
+	emit modelAdded(model);
+	emit dataChanged();
+}
+
+
+
+
+void LinkedModelGroup::removeControl(AutomatableModel* mdl)
+{
+	if(containsModel(mdl->objectName()))
+	{
+		emit modelRemoved(mdl);
+		eraseModel(mdl->objectName());
+	}
 }
 
 
