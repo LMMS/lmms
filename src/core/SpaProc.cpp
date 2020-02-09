@@ -549,15 +549,6 @@ trash button ---connection--->
 		---> delete
 */
 
-void SpaProc::removeControl(AutomatableModel* mdl)
-{
-	if(containsModel(mdl->objectName()))
-	{
-		emit modelRemoved(mdl);
-		eraseModel(mdl->objectName());
-	}
-}
-
 // this function is also responsible to create a model, e.g. in case of DnD
 AutomatableModel *SpaProc::modelAtPort(const QString &dest)
 {
@@ -583,14 +574,6 @@ AutomatableModel *SpaProc::modelAtPort(const QString &dest)
 		{
 			// somehow, those two dictionaries look redundant:
 			addModel(mod = spaMod, url.path());
-
-			// View needs to create another child view, e.g. a new knob:
-			emit modelAdded(spaMod);
-			emit dataChanged();
-
-			connect(mod, &AutomatableModel::destroyed,
-				this, [this, mod](jo_id_t){ removeControl(mod); },
-				Qt::DirectConnection);
 		}
 		else
 		{

@@ -16,13 +16,6 @@ class SpaProc : public LinkedModelGroup
 	Q_OBJECT
 	friend class SpaViewBase;
 
-signals:
-	// NOTE: when separating core from UI, this will need to be removed
-	// (who would kno if the client is Qt, i.e. it may not have slots at all)
-	// In this case you'd e.g. send the UI something like
-	// "/added <model meta info>"
-	void modelAdded(AutomatableModel* added);
-	void modelRemoved(AutomatableModel* removed);
 public:
 	SpaProc(Model *parent, const spa::descriptor* desc,
 			DataFile::Types settingsType);
@@ -119,8 +112,6 @@ protected:
 
 	void initPlugin();
 	void shutdownPlugin();
-private:
-	void removeControl(AutomatableModel *mdl) override;
 };
 
 #endif // SPAPROC_H
