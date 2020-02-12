@@ -87,6 +87,7 @@ ControlLayout::ControlLayout(QWidget *parent, int margin, int hSpacing, int vSpa
 {
 	setContentsMargins(margin, margin, margin, margin);
 	m_searchBar->setPlaceholderText("filter");
+	m_searchBar->setObjectName(s_searchBarName);
 	connect(m_searchBar, SIGNAL(textChanged(const QString&)),
 		this, SLOT(onTextChanged(const QString& )));
 	addWidget(m_searchBar);
@@ -140,9 +141,17 @@ QMap<QString, QLayoutItem*>::const_iterator
 ControlLayout::pairAt(int index) const
 {
 	if (index < 0) { return m_itemMap.cend(); }
+
+	auto skip = [&](QLayoutItem* item) -> bool
+	{
+		return item->widget()->objectName() == s_searchBarName;
+	};
+
 	QMap<QString, QLayoutItem*>::const_iterator itr = m_itemMap.cbegin();
-	++itr; // skip search bar
-	while (index-->0 && itr != m_itemMap.cend()) { ++itr; }
+	for (; itr != m_itemMap.cend() && (index > 0 || skip(itr.value())); ++itr)
+	{
+		if(!skip(itr.value())) { index--; }
+	}
 	return itr;
 }
 

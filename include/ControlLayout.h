@@ -126,6 +126,8 @@ private:
 	// 400 looks good and is ~4 knobs in a row
 	constexpr const static int m_minWidth = 400;
 	class QLineEdit* m_searchBar;
+	//! name of search bar, must be ASCII sorted before any alpha numerics
+	static constexpr const char* s_searchBarName = "!!searchBar!!";
 };
 
 #endif // CONTROLLAYOUT_H
