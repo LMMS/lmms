@@ -87,6 +87,7 @@ ControlLayout::ControlLayout(QWidget *parent, int margin, int hSpacing, int vSpa
 {
 	setContentsMargins(margin, margin, margin, margin);
 	m_searchBar->setPlaceholderText("filter");
+	m_searchBar->setObjectName(s_searchBarName);
 	connect(m_searchBar, SIGNAL(textChanged(const QString&)),
 		this, SLOT(onTextChanged(const QString& )));
 	addWidget(m_searchBar);
@@ -139,11 +140,18 @@ int ControlLayout::count() const
 QMap<QString, QLayoutItem*>::const_iterator
 ControlLayout::pairAt(int index) const
 {
-	if (index < 0)
-		return m_itemMap.cend();
+	if (index < 0) { return m_itemMap.cend(); }
+
+	auto skip = [&](QLayoutItem* item) -> bool
+	{
+		return item->widget()->objectName() == s_searchBarName;
+	};
+
 	QMap<QString, QLayoutItem*>::const_iterator itr = m_itemMap.cbegin();
-	++itr; // skip search bar
-	while (index-->0 && itr != m_itemMap.cend()) { ++itr; }
+	for (; itr != m_itemMap.cend() && (index > 0 || skip(itr.value())); ++itr)
+	{
+		if(!skip(itr.value())) { index--; }
+	}
 	return itr;
 }
 
@@ -151,7 +159,7 @@ ControlLayout::pairAt(int index) const
 QLayoutItem *ControlLayout::itemAt(int index) const
 {
 	auto itr = pairAt(index);
-	return itr == m_itemMap.end() ? nullptr : itr.value();
+	return (itr == m_itemMap.end()) ? nullptr : itr.value();
 }
 
 QLayoutItem *ControlLayout::itemByString(const QString &key) const
@@ -231,12 +239,11 @@ int ControlLayout::doLayout(const QRect &rect, bool testOnly) const
 		itr.next();
 		QLayoutItem* item = itr.value();
 		QWidget *wid = item->widget();
-
-		if (first || // do not filter search bar
-			filterText.isEmpty() || // no filter - pass all
-			itr.key().contains(filterText, Qt::CaseInsensitive))
+		if (wid)
 		{
-			if (wid)
+			if (	first || // do not filter search bar
+				filterText.isEmpty() || // no filter - pass all
+				itr.key().contains(filterText, Qt::CaseInsensitive))
 			{
 				if (first)
 				{
@@ -277,10 +284,10 @@ int ControlLayout::doLayout(const QRect &rect, bool testOnly) const
 				lineHeight = qMax(lineHeight, item->sizeHint().height());
 				first = false;
 			}
-		}
-		else
-		{
-			if (wid) { wid->hide(); }
+			else
+			{
+				wid->hide();
+			}
 		}
 	}
 	return y + lineHeight - rect.y() + bottom;

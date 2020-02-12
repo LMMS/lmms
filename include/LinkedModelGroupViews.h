@@ -41,6 +41,10 @@
 /**
 	View for a representative processor
 
+	Features:
+	* Remove button for removable models
+	* Simple handling of adding, removing and model changing
+
 	@note Neither this class, nor any inheriting classes, shall inherit
 		ModelView. The "view" in the name is just for consistency
 		with LinkedModelGroupsView.
