@@ -2,29 +2,30 @@
 
 #include <vector>
 #include <math.h>
+#include <algorithm>
 
-#include "Interpolator.h"
+namespace Diginstrument
+{
 
-namespace Diginstrument{
-class Synthesizer {
-  public:
-    std::vector<float> playNote(const std::vector<float> coordinates, 
-                                const unsigned int frames,
-                                const unsigned int offset/*TODO: should be frames or seconds?*/);
-
-    void static setSampleRate(const unsigned int sampleRate);
-
-    Synthesizer();
-
-  private:
-    static unsigned int sampleRate;
-    static std::vector<float> sinetable;
-
-    void static buildSinetable();
-
-    Diginstrument::Interpolator<NoteSpectrum> interpolator;
-    /*TODO:
-        time step
-        */
+struct Oscillator
+{
+  unsigned int position = 0;
 };
+
+class Synthesizer
+{
+public:
+  std::vector<float> playNote(std::vector<std::pair<double, double>>, const unsigned int frames, const unsigned int offset);
+
+  void static setSampleRate(const unsigned int sampleRate);
+
+  Synthesizer();
+
+private:
+  static unsigned int sampleRate;
+  static std::vector<float> sinetable;
+  std::vector<Oscillator> bank;
+
+  void static buildSinetable();
 };
+}; // namespace Diginstrument

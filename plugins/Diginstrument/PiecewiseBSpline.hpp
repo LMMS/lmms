@@ -20,11 +20,11 @@ private:
         T end;
 
     public:
-        bool operator<(const Piece &other)
+        bool operator<(const Piece &other) const
         {
             return (begin < other.beigin && end < other.end);
         }
-        bool operator<(const T x)
+        bool operator<(const T x) const
         {
             return this->end < x;
         }
@@ -54,7 +54,31 @@ public:
     std::vector<std::pair<T, T>> getPeaks() const;
 
     /*Evaluate the spline at x*/
-    std::pair<T, T> operator[](T x);
+    std::pair<T, T> operator[](T x) const;
+
+    const std::vector<Piece> &getPieces() const
+    {
+        return pieces;
+    }
+
+    PiecewiseBSpline() : pieces({}) {}
+    PiecewiseBSpline(const PiecewiseBSpline &spline) : pieces(spline.pieces) {}
+    PiecewiseBSpline(PiecewiseBSpline &&spline) : pieces(std::move(spline.pieces)) {}
+
+    //TODO
+    const T getBegin() const
+    {
+        if (pieces.size() == 0)
+            return -1;
+        return pieces.front().begin;
+    }
+    //TODO
+    const T getEnd() const
+    {
+        if (pieces.size() == 0)
+            return -1;
+        return pieces.back().end;
+    }
 };
 
 template <typename T, unsigned int D>
@@ -94,7 +118,7 @@ bool PiecewiseBSpline<T, D>::add(const BSpline<T, D> &spline)
 }
 
 template <typename T, unsigned int D>
-std::pair<T, T> PiecewiseBSpline<T, D>::operator[](T x)
+std::pair<T, T> PiecewiseBSpline<T, D>::operator[](T x) const
 {
     //out of bounds, lower
     if (x < pieces.front().begin)
@@ -115,12 +139,14 @@ std::pair<T, T> PiecewiseBSpline<T, D>::operator[](T x)
 template <typename T, unsigned int D>
 std::vector<std::pair<T, T>> PiecewiseBSpline<T, D>::getPeaks() const
 {
+    if (pieces.size() == 0)
+        return {};
     std::vector<std::pair<T, T>> res;
     res.reserve(pieces.size());
-    for(const auto & piece : pieces)
+    for (const auto &piece : pieces)
     {
         res.emplace_back(piece.spline.getControlPoints().back());
     }
-    res.resize(res.size()-1);
+    res.resize(res.size() - 1);
     return res;
 }

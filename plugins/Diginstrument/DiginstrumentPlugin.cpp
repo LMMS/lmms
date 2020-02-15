@@ -16,93 +16,93 @@
 extern "C"
 {
 
-Plugin::Descriptor PLUGIN_EXPORT diginstrument_plugin_descriptor =
-{
-	STRINGIFY( PLUGIN_NAME ),
-	"Diginstrument",
-	QT_TRANSLATE_NOOP( "pluginBrowser",
-				"WIP"
-				"Test" ),
-	"Máté Szokolai",
-	0x0110,
-	Plugin::Instrument,
-	new PluginPixmapLoader( "logo" ),
-	NULL,
-	NULL
-};
+	Plugin::Descriptor PLUGIN_EXPORT diginstrument_plugin_descriptor =
+		{
+			STRINGIFY(PLUGIN_NAME),
+			"Diginstrument",
+			QT_TRANSLATE_NOOP("pluginBrowser",
+							  "WIP"
+							  "Test"),
+			"Máté Szokolai",
+			0x0110,
+			Plugin::Instrument,
+			new PluginPixmapLoader("logo"),
+			NULL,
+			NULL};
 
-// necessary for getting instance out of shared lib
-PLUGIN_EXPORT Plugin * lmms_plugin_main( Model* model, void * )
-{
-	return new DiginstrumentPlugin( static_cast<InstrumentTrack *>( model ) );
+	// necessary for getting instance out of shared lib
+	PLUGIN_EXPORT Plugin *lmms_plugin_main(Model *model, void *)
+	{
+		return new DiginstrumentPlugin(static_cast<InstrumentTrack *>(model));
+	}
 }
 
-}
-
-DiginstrumentPlugin::DiginstrumentPlugin( InstrumentTrack * _instrument_track ) :
-	Instrument( _instrument_track, &diginstrument_plugin_descriptor )
+DiginstrumentPlugin::DiginstrumentPlugin(InstrumentTrack *_instrument_track) : Instrument(_instrument_track, &diginstrument_plugin_descriptor)
 {
-    /*TODO */
+	/*TODO */
 	synth.setSampleRate(Engine::mixer()->processingSampleRate());
 }
 
-DiginstrumentPlugin::~DiginstrumentPlugin(){}
+DiginstrumentPlugin::~DiginstrumentPlugin() {}
 
-PluginView * DiginstrumentPlugin::instantiateView( QWidget * _parent )
+PluginView *DiginstrumentPlugin::instantiateView(QWidget *_parent)
 {
-	return new DiginstrumentView( this, _parent );
+	return new DiginstrumentView(this, _parent);
 }
 
-void DiginstrumentPlugin::loadSettings( const QDomElement & _this ){}
-void DiginstrumentPlugin::saveSettings( QDomDocument & _doc, QDomElement & _parent ){}
+void DiginstrumentPlugin::loadSettings(const QDomElement &_this) {}
+void DiginstrumentPlugin::saveSettings(QDomDocument &_doc, QDomElement &_parent) {}
 
-QString DiginstrumentPlugin::nodeName() const{
-    return "TEST";
+QString DiginstrumentPlugin::nodeName() const
+{
+	return "TEST";
 }
 
-void DiginstrumentPlugin::playNote( NotePlayHandle * noteHandle,
-					            sampleFrame * _working_buf )
+void DiginstrumentPlugin::playNote(NotePlayHandle *noteHandle,
+								   sampleFrame *_working_buf)
 {
 	/*TMP*/
-	auto audioData = this->synth.playNote({noteHandle->frequency()}, noteHandle->framesLeftForCurrentPeriod(), noteHandle->totalFramesPlayed());
+	double time = (noteHandle->framesLeftForCurrentPeriod() + noteHandle->totalFramesPlayed()) / (double)/*tmp*/ Engine::mixer()->processingSampleRate();
+	auto audioData = this->synth.playNote(inst.getSpectrum({noteHandle->frequency(), time}), noteHandle->framesLeftForCurrentPeriod(), noteHandle->totalFramesPlayed());
 	/*tmp: stereo*/
 	unsigned int counter = 0;
 	unsigned int offset = noteHandle->noteOffset();
-	for (auto frame : audioData){
+	for (auto frame : audioData)
+	{
 		_working_buf[counter + offset][0] = _working_buf[counter + offset][1] = frame;
 		counter++;
 	}
-	applyRelease( _working_buf, noteHandle );
-	instrumentTrack()->processAudioBuffer( _working_buf, audioData.size() + noteHandle->noteOffset(), noteHandle );
+	applyRelease(_working_buf, noteHandle);
+	instrumentTrack()->processAudioBuffer(_working_buf, audioData.size() + noteHandle->noteOffset(), noteHandle);
 }
 
-void DiginstrumentPlugin::deleteNotePluginData( NotePlayHandle * _note_to_play )
+void DiginstrumentPlugin::deleteNotePluginData(NotePlayHandle *_note_to_play)
 {
-
 }
 
-f_cnt_t DiginstrumentPlugin::beatLen( NotePlayHandle * _n ) const
+f_cnt_t DiginstrumentPlugin::beatLen(NotePlayHandle *_n) const
 {
-    return 0;
+	return 0;
 }
 
 QString DiginstrumentPlugin::fullDisplayName() const
 {
-    return "TEST";
+	return "TEST";
 }
 
-void DiginstrumentPlugin::sampleRateChanged(){
+void DiginstrumentPlugin::sampleRateChanged()
+{
 	/*TODO*/
 	this->synth.setSampleRate(Engine::mixer()->processingSampleRate());
 }
 
-
 //TMP
-std::string DiginstrumentPlugin::setAudioFile( const QString & _audio_file)
-{	
-	m_sampleBuffer.setAudioFile( _audio_file );
+std::string DiginstrumentPlugin::setAudioFile(const QString &_audio_file)
+{
+	m_sampleBuffer.setAudioFile(_audio_file);
 	std::vector<double> sample(m_sampleBuffer.frames());
-	for(int i = 0; i<sample.size(); i++){
+	for (int i = 0; i < sample.size(); i++)
+	{
 		//tmp: left only
 		sample[i] = m_sampleBuffer.data()[i][0];
 	}
@@ -112,86 +112,58 @@ std::string DiginstrumentPlugin::setAudioFile( const QString & _audio_file)
 
 	std::ostringstream oss;
 	std::vector<std::pair<double, double>> points;
-	points.reserve(level*11);
-	std::vector<double> values;
+	points.reserve(level * 11);
 
-	/*oss<<"Magnitude spectrum:"<<std::endl;
-	const auto momentarySpectrum = transform[20];
-	for(int i = momentarySpectrum.size()-1;i>=0;i--){
-		double re = momentarySpectrum[i].second.first;
-		double im = momentarySpectrum[i].second.second;
-		double scale = (double)m_sampleBuffer.sampleRate()/(momentarySpectrum[i].first);
-		double modulus = sqrt(re*re + im*im); //TODO: is this correct?
-		points.emplace_back(scale, modulus);
-		values.push_back(modulus);
-		//oss<<std::fixed<<"("<<scale<<","<<modulus<<"),";
-		oss<<std::fixed<<scale<<" "<<modulus<<std::endl;
-	}
-	oss<<std::endl<<std::endl;*/
+	//TMP: static label for frequency
+	double label = 440;
 
-	/*SpectrumFitter<double, 4> fitter(2);
-	SplineSpectrum<double> spectrum = fitter.fit(points);*/
-
-	/*oss<<"Spectrum harmoics:"<<std::endl;
-	for(auto h : spectrum.getHarmonics())
-	{
-		//oss<<"("<<h.first<<","<<h.second<<"),";
-		oss<<std::fixed<<h.first<<" "<<h.second<<std::endl;
-	}*/
-
-	oss<<std::endl;
-	/*oss<<"Spline evaluation:"<<std::endl;
-	for(double i = 15; i<=24000; i+=5){
-		const auto p = spectrum[i];
-		//oss<<"("<<p.first<<","<<p.second<<"),";
-		oss<<std::fixed<<p.first<<" "<<p.second<<std::endl;
-	}*/
-
-	auto icwt = transform.inverseTransform();
-	std::vector<double> reconstruction(icwt.size(),0);
-	 unsigned int tableSize = m_sampleBuffer.sampleRate();
-    std::vector<float> sinetable(tableSize);
-    for(int i = 0; i<tableSize; i++){
-        sinetable[i] = (float)sin(((double)i / (double)tableSize) * M_PI * 2.0);
-    }
-
-	for(int i = 0; i<icwt.size();i++)
+	inst = Diginstrument::Interpolator<double, SplineSpectrum<double>>();
+	inst.addSpectrum(SplineSpectrum<double>(label), {label, (double)m_sampleBuffer.frames() / (double)m_sampleBuffer.sampleRate()});
+	for (int i = 0; i < m_sampleBuffer.frames(); /*tmp i+=0.001*(double)m_sampleBuffer.sampleRate()*/ i++)
 	{
 		const auto momentarySpectrum = transform[i];
 		std::vector<std::pair<double, double>> points;
-		points.reserve(level*11);
-		std::vector<double> values;
-		for(int i = momentarySpectrum.size()-1;i>=0;i--){
+		points.reserve(level * 11);
+
+		for (int i = momentarySpectrum.size() - 1; i >= 0; i--)
+		{
 			double re = momentarySpectrum[i].second.first;
 			double im = momentarySpectrum[i].second.second;
-			double scale = (double)m_sampleBuffer.sampleRate()/(momentarySpectrum[i].first);
-			double modulus = sqrt(re*re + im*im); //TODO: is this correct?
-			points.emplace_back(scale, modulus);
-			values.push_back(modulus);
-			//oss<<std::fixed<<"("<<scale<<","<<modulus<<"),";
+			double frequency = (double)m_sampleBuffer.sampleRate() / (momentarySpectrum[i].first);
+			//tmp: convert to amplitude here
+			//double modulus = sqrt(re*re + im*im);
+			const double amp = sqrt(frequency * (re * re + im * im)) / 200.0;
+			points.emplace_back(frequency, amp);
+			//output magnitude spectrum
+			//oss<<std::fixed<<"("<<frequency<<","<<amp<<"),";
 			//oss<<std::fixed<<scale<<" "<<modulus<<std::endl;
 		}
+		//fit spline to magnitude spectrum
 		SpectrumFitter<double, 4> fitter(2);
-		SplineSpectrum<double> spectrum = fitter.fit(points);
-		//harmonics
-		for(auto h : spectrum.getHarmonics())
+		SplineSpectrum<double> spectrum(fitter.fit(points), label);
+		//only add "valid" splines
+		if (spectrum.getHarmonics().size() > 0 && spectrum.getBegin() <= 20 && spectrum.getEnd() > 20000)
 		{
-			const unsigned int step = h.first * (tableSize / (float)m_sampleBuffer.sampleRate());
-        	unsigned int pos = (i * step) % tableSize;
-            reconstruction[i] += sinetable[pos] * h.second;
+			inst.addSpectrum(spectrum, {label, (double)i / (double)m_sampleBuffer.sampleRate()});
 		}
-		oss<<std::fixed<<reconstruction[i]<<" "<<icwt[i]<<std::endl;
 	}
-	/*for(auto s : icwt)
+
+	//output the synthesised signal and the inverse-CWT of the signal for comparison
+	auto icwt = transform.inverseTransform();
+	for (int i = 0; i < icwt.size(); i++)
 	{
-		oss<<std::fixed<<s<<std::endl;
-	}*/
+		const double time = (double)i / (double)m_sampleBuffer.sampleRate();
+		auto rec = synth.playNote(inst.getSpectrum({label, time}), 1, i);
+		oss << std::fixed << rec.front() << " " << icwt[i] << std::endl;
+	}
 
 	//TODO: trim spectrum?
-	//TODO: normalize spectrum?
+	//TODO: how to mix the output with consistent levels without clipping
+
+	//TODO: get rid of std::pair
 
 	//tmp
-	std::cout<<oss.str()<<std::endl;
+	std::cout << oss.str() << std::endl;
 
 	return oss.str();
 }

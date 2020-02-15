@@ -36,7 +36,8 @@ private:
     unsigned int signalLength;
 
 public:
-    bool setWavelet(const std::string & name, const double & parameter, unsigned int level){
+    bool setWavelet(const std::string &name, const double &parameter, unsigned int level)
+    {
         this->wavelet = name;
         this->waveletParameter = parameter;
         this->level = level;
@@ -55,13 +56,15 @@ public:
         cwt(wt, &signal[0]);
     }
 
-    std::vector<std::pair<double, std::pair<double, double>>> operator[](unsigned int time){
+    std::vector<std::pair<double, std::pair<double, double>>> operator[](unsigned int time)
+    {
         unsigned int totalScales = octaves * level;
         std::vector<std::pair<double, std::pair<double, double>>> res;
-        res.reserve(octaves*level);
-        for(int k = 0; k<totalScales; ++k){
+        res.reserve(octaves * level);
+        for (int k = 0; k < totalScales; ++k)
+        {
             int i = time + k * signalLength;
-            res.emplace_back(wt->scale[k], std::make_pair(wt->output[i].re,wt->output[i].im));
+            res.emplace_back(wt->period[k], std::make_pair(wt->output[i].re, wt->output[i].im));
         }
         return res;
     }
@@ -73,11 +76,13 @@ public:
         return res;
     }
 
-    CWT(const std::string & name, const double & parameter, unsigned int level){
+    CWT(const std::string &name, const double &parameter, unsigned int level)
+    {
         setWavelet(name, parameter, level);
     }
 
-    ~CWT(){
+    ~CWT()
+    {
         cwt_free(wt);
     }
 };

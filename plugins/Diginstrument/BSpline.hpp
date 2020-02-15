@@ -13,7 +13,7 @@ private:
 
 public:
     /*Evaluate the spline at t, which must be in the range [0,1].*/
-    std::pair<T, T> operator[](T t);
+    std::pair<T, T> operator[](T t) const;
 
     /*Set the knot vector. Must be clamped and ordered. All elements must be in the range [0,1]*/
     void setKnotVector(const std::vector<T> &vector)
@@ -46,13 +46,22 @@ public:
     {
         return controlPoints;
     }
+
+    BSpline() : knotVector({}), controlPoints({}) {}
+    BSpline(const BSpline &other) : knotVector(other.knotVector), controlPoints(other.controlPoints) {}
 };
 
 template <typename T, unsigned int D>
-std::pair<T, T> BSpline<T, D>::operator[](T t)
+std::pair<T, T> BSpline<T, D>::operator[](T t) const
 {
-    if(t == 0) { return controlPoints.front(); }
-    if(t == 1) { return controlPoints.back(); }
+    if (t == 0)
+    {
+        return controlPoints.front();
+    }
+    if (t == 1)
+    {
+        return controlPoints.back();
+    }
     //deBoor algorithm
     auto lower = std::upper_bound(knotVector.begin(), knotVector.end(), t) - 1;
     unsigned int k = std::distance(knotVector.begin(), lower);

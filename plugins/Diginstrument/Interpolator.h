@@ -1,65 +1,47 @@
 #pragma once
 
 #include "MultidimensionalNeighbourMap.hpp"
+#include "Spectrum.hpp"
+#include "SplineSpectrum.hpp"
 
-namespace Diginstrument{
-class Spectrum
+namespace Diginstrument
 {
-  public:
-    virtual const std::vector<std::pair<float, float>> & getComponents() const{
-      return components;
-    }
-
-    Spectrum(const std::vector<std::pair<float, float>> & components) : components(components){};
-    Spectrum(const Spectrum & other) : components(other.getComponents()){}
-    Spectrum(Spectrum && other): components(std::move(other.components)){}
-    Spectrum(): components(){}
-
-  private:
-    std::vector<std::pair<float, float>> components;
-};
-
-class NoteSpectrum : public Spectrum
-{ 
-  public:
-    const std::vector<std::pair<float, float>> & getHarmonics() const{
-      return harmonics;
-    }
-    const std::vector<std::pair<float, float>> & getStochastics() const{
-      return stochastics;
-    }
-    const std::vector<std::pair<float, float>> & getComponents() const{
-      return /*TODO*/ harmonics;
-    }
-
-    float getLabel() const {
-      return label;
-    }
-
-    NoteSpectrum(const float & label, const std::vector<std::pair<float, float>> & harmonics, const std::vector<std::pair<float, float>> & stohastics)
-              : harmonics(harmonics), stochastics(stohastics), label(label){}
-
-  private:
-    std::vector<std::pair<float, float>> harmonics;
-    std::vector<std::pair<float, float>> stochastics;
-    float label;
-};
-
-template <typename S>
+template <typename T, class S>
 class Interpolator
 {
-  public:
-    std::vector<std::pair<float, float>> getSpectrum(const std::vector<float> coordinates);
+public:
+  //TODO: references?/rvalues?
+  std::vector<std::pair<T, T>> getSpectrum(const std::vector<T> &coordinates);
 
-    void addSpectrum(const S & spectrum, std::vector<float> coordinates);
-    void addSpectra(const std::vector<S> & spectra,  std::vector<std::vector<float>> coordinates);
+  void addSpectrum(const S &spectrum, std::vector<T> coordinates);
+  void addSpectra(const std::vector<S> &spectra, std::vector<std::vector<T>> coordinates);
 
-    S linear(S & left, S & right, const float & target, const float & leftLabel, const float & rightLabel);
-    S linearShift(S & left, S & right, const float & target, const float & leftLabel, const float & rightLabel);
+  S linear(S &left, S &right, const T &target, const T &leftLabel, const T &rightLabel);
+  S linearShift(S &left, S &right, const T &target, const T &leftLabel, const T &rightLabel);
 
-    Interpolator();
-  private:
-    MultidimensionalNeighbourMap<float, S> data;
-    float frequencyStep;
+  Interpolator() {}
+
+private:
+  MultidimensionalNeighbourMap<T, S> data;
+  T frequencyStep;
 };
+
+template <typename T>
+class Interpolator<T, SplineSpectrum<T>>
+{
+public:
+  SplineSpectrum<T> getSpectrum(const std::vector<T> &coordinates);
+
+  void addSpectrum(const SplineSpectrum<T> &spectrum, std::vector<T> coordinates);
+  void addSpectra(const std::vector<SplineSpectrum<T>> &spectra, std::vector<std::vector<T>> coordinates);
+
+  SplineSpectrum<T> linear(SplineSpectrum<T> &left, SplineSpectrum<T> &right, const T &target, const T &leftLabel, const T &rightLabel);
+  SplineSpectrum<T> linearShift(SplineSpectrum<T> &left, SplineSpectrum<T> &right, const T &target, const T &leftLabel, const T &rightLabel);
+
+  Interpolator() {}
+
+private:
+  MultidimensionalNeighbourMap<T, SplineSpectrum<T>> data;
+  T frequencyStep = 0;
 };
+}; // namespace Diginstrument
