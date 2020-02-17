@@ -37,7 +37,7 @@ class PhaserControlDialog : public EffectControlDialog
 {
 	Q_OBJECT
 public:
-	PhaserControlDialog( PhaserControls* controls );
+	PhaserControlDialog(PhaserControls* controls);
 	virtual ~PhaserControlDialog()
 	{
 	}
@@ -62,3 +62,4 @@ private:
 } ;
 
 #endif
+

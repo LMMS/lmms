@@ -34,6 +34,7 @@
 
 class PhaserEffect : public Effect
 {
+	Q_OBJECT
 public:
 	PhaserEffect(Model * parent, const Descriptor::SubPluginFeatures::Key * key);
 	virtual ~PhaserEffect();
@@ -46,20 +47,29 @@ public:
 
 	float m_realCutoff[2] = {0, 0};
 
+private slots:
+	void calcAttack();
+	void calcRelease();
+	void calcDistortion();
+	void calcFeedback();
+	void calcOutGain();
+	void calcInGain();
+	void calcDelay();
+	void calcPhase();
+
 private:
 	inline void calcAllpassFilter(sample_t &outSamp, sample_t inSamp, sample_rate_t Fs, int filtNum, int channel, float b0, float b1);
 	inline float detuneWithOctaves(float pitchValue, float detuneValue);
 	void changeSampleRate();
 	void restartLFO();
-	void calcAttack();
-	void calcRelease();
 
 	PhaserControls m_phaserControls;
 
 	float m_filtX[32][2][4] = {{{0}}};// [filter number][channel][samples back in time]
 	float m_filtY[32][2][4] = {{{0}}};// [filter number][channel][samples back in time]
 	std::vector<float> m_filtDelayBuf[2];
-	int m_filtFeedbackLoc = 0;
+	int m_delayBufSize;
+	float m_filtFeedbackLoc = 0;
 
 	QuadratureLfo * m_lfo;
 
@@ -74,12 +84,21 @@ private:
 
 	double m_attCoeff;
 	double m_relCoeff;
+	float m_distVal;
+	float m_feedbackVal;
+	float m_delayVal;
 
 	float m_outGain;
 	float m_inGain;
+
+	float m_firstAdd[2] = {0};
+	float m_secondAdd[2] = {0};
+
+	float m_sampAvg[2] = {0};
 
 	friend class PhaserControls;
 
 } ;
 
 #endif
+
