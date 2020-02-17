@@ -56,12 +56,12 @@ private slots:
 	void calcInGain();
 	void calcDelay();
 	void calcPhase();
+	void changeSampleRate();
+	void restartLFO();
 
 private:
 	inline void calcAllpassFilter(sample_t &outSamp, sample_t inSamp, sample_rate_t Fs, int filtNum, int channel, float b0, float b1);
 	inline float detuneWithOctaves(float pitchValue, float detuneValue);
-	void changeSampleRate();
-	void restartLFO();
 
 	PhaserControls m_phaserControls;
 
