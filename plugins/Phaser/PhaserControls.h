@@ -38,11 +38,11 @@ class PhaserControls : public EffectControls
 {
 	Q_OBJECT
 public:
-	PhaserControls( PhaserEffect* effect );
+	PhaserControls(PhaserEffect* effect);
 	virtual ~PhaserControls();
 
-	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
-	virtual void loadSettings( const QDomElement & _this );
+	virtual void saveSettings(QDomDocument & _doc, QDomElement & _parent);
+	virtual void loadSettings(const QDomElement & _this);
 	inline virtual QString nodeName() const
 	{
 		return "PhaserControls";
@@ -50,12 +50,12 @@ public:
 
 	virtual int controlCount()
 	{
-		return 10;
+		return 17;
 	}
 
 	virtual EffectControlDialog * createView()
 	{
-		m_pluginView = new PhaserControlDialog( this );
+		m_pluginView = new PhaserControlDialog(this);
 		return m_pluginView;
 	}
 
@@ -63,11 +63,6 @@ public:
 	float m_inPeakR;
 	float m_outPeakL;
 	float m_outPeakR;
-
-private slots:
-	void changedSampleRate();
-	void changedPlaybackState();
-	void updatePhase();
 
 private:
 	PhaserEffect* m_effect;
@@ -81,12 +76,14 @@ private:
 	FloatModel m_amountModel;
 	BoolModel m_enableLFOModel;
 	FloatModel m_phaseModel;
-	FloatModel m_wetDryModel;
 	FloatModel m_inFollowModel;
 	FloatModel m_attackModel;
 	FloatModel m_releaseModel;
+	FloatModel m_distortionModel;
 	FloatModel m_outGainModel;
 	FloatModel m_inGainModel;
+	BoolModel m_invertModel;
+	BoolModel m_wetModel;
 
 	PhaserControlDialog * m_pluginView;
 
