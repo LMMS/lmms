@@ -1620,9 +1620,13 @@ bool TrackContentWidget::pasteSelection( MidiTime tcoPos, QDropEvent * de )
 	// TODO -- Need to draw the hovericon either way, or ghost the TCOs
 	// onto their final position.
 
+	float snapSize = gui->songEditor()->m_editor->getSnapSize();
 	// All patterns should be offset the same amount as the grabbed pattern
+	MidiTime offset = MidiTime(tcoPos - grabbedTCOPos);
+	// Users expect clips to "fall" backwards, so bias the offset
+	offset = offset - MidiTime::ticksPerBar() * snapSize / 2;
 	// The offset is quantized (rather than the positions) to preserve fine adjustments
-	int offset = MidiTime(tcoPos - grabbedTCOPos).quantize(gui->songEditor()->m_editor->getSnapSize());
+	offset = offset.quantize(snapSize);
 
 	for( int i = 0; i<tcoNodes.length(); i++ )
 	{
