@@ -51,8 +51,8 @@ Plugin::Descriptor PLUGIN_EXPORT Phaser_plugin_descriptor =
 }
 
 
-const float PHA_NOISE_FLOOR = 0.00001f;
-const double PHA_LOG = 2.2;
+constexpr float PHA_NOISE_FLOOR = 0.00001f;
+constexpr double PHA_LOG = 2.2;
 
 
 PhaserEffect::PhaserEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* key) :
@@ -268,14 +268,18 @@ bool PhaserEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 		the coefficient names are inaccurate concerning what
 		they actually do.
 		*/
+		float b0[2];
+		float b1[2];
 		for (int b = 0; b < 2; ++b)
 		{
 			const float w0 = m_twoPiOverSr * m_realCutoff[b];
 			const float a0 = 1 + (sin(w0) / (resonance * 2.f));
-			m_b0[b] = (1 - (a0 - 1)) / a0;
-			m_b1[b] = (-2*cos(w0)) / a0;
+			b0[b] = (1 - (a0 - 1)) / a0;
+			b1[b] = (-2*cos(w0)) / a0;
 		}
 
+		float firstAdd[2];
+		float secondAdd[2];
 
 		// Read next value from delay buffer
 		float readLoc = m_filtFeedbackLoc - m_delayVal;
@@ -285,40 +289,38 @@ bool PhaserEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 		{
 			for (int i = 0; i < 2; ++i)
 			{
-				m_secondAdd[i] = m_filtDelayBuf[i][floor(readLoc)] * (1 - readLocFrac) + m_filtDelayBuf[i][ceil(readLoc)] * readLocFrac;
+				secondAdd[i] = m_filtDelayBuf[i][floor(readLoc)] * (1 - readLocFrac) + m_filtDelayBuf[i][ceil(readLoc)] * readLocFrac;
 			}
 		}
 		else// For when the interpolation wraps around to the beginning of the buffer
 		{
 			for (int i = 0; i < 2; ++i)
 			{
-				m_secondAdd[i] = m_filtDelayBuf[i][m_delayBufSize - 1] * (1 - readLocFrac) + m_filtDelayBuf[i][0] * readLocFrac;
+				secondAdd[i] = m_filtDelayBuf[i][m_delayBufSize - 1] * (1 - readLocFrac) + m_filtDelayBuf[i][0] * readLocFrac;
 			}
 		}
 
 
 		// Add feedback results to dry signal
-		m_firstAdd[0] = s[0] + m_secondAdd[0];
-		m_firstAdd[1] = s[1] + m_secondAdd[1];
+		firstAdd[0] = s[0] + secondAdd[0];
+		firstAdd[1] = s[1] + secondAdd[1];
 
 		
 		// Unleash the allpass filters
-		m_secondAdd[0] = m_firstAdd[0];
-		m_secondAdd[1] = m_firstAdd[1];
+		secondAdd[0] = firstAdd[0];
+		secondAdd[1] = firstAdd[1];
 		for (int a = 0; a < order; ++a)
 		{
 			for (int b = 0; b < 2; ++b)
 			{
-				sample_t outSamp;
-				calcAllpassFilter(outSamp, m_secondAdd[b], sample_rate, a, b, m_b0[b], m_b1[b]);
-				m_secondAdd[b] = outSamp;
+				secondAdd[b] = calcAllpassFilter(secondAdd[b], sample_rate, a, b, b0[b], b1[b]);
 			}
 		}
 
 
 		// Get final result
-		s[0] = (m_secondAdd[0] * (invert ? -1 : 1) + m_firstAdd[0] * !wetIsolate) / 2.f;
-		s[1] = (m_secondAdd[1] * (invert ? -1 : 1) + m_firstAdd[1] * !wetIsolate) / 2.f;
+		s[0] = (secondAdd[0] * (invert ? -1 : 1) + firstAdd[0] * !wetIsolate) / 2.f;
+		s[1] = (secondAdd[1] * (invert ? -1 : 1) + firstAdd[1] * !wetIsolate) / 2.f;
 
 
 		/*
@@ -327,8 +329,8 @@ bool PhaserEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 		I used tanh(x/2)*2 rather than just tanh(x) because tanh(x)
 		decreased the volume too much for my liking.
 		*/
-		m_secondAdd[0] = tanh(m_secondAdd[0] * 0.5) * 2;
-		m_secondAdd[1] = tanh(m_secondAdd[1] * 0.5) * 2;
+		secondAdd[0] = tanh(secondAdd[0] * 0.5) * 2;
+		secondAdd[1] = tanh(secondAdd[1] * 0.5) * 2;
 
 		if (m_distVal)
 		{
@@ -346,8 +348,8 @@ bool PhaserEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 			Note that the DC offset added here by this distortion is
 			removed later on.
 			*/
-			m_secondAdd[0] = abs(m_secondAdd[0] + 1.5 - m_distVal * 1.5);
-			m_secondAdd[1] = abs(m_secondAdd[1] + 1.5 - m_distVal * 1.5);
+			secondAdd[0] = abs(secondAdd[0] + 1.5 - m_distVal * 1.5);
+			secondAdd[1] = abs(secondAdd[1] + 1.5 - m_distVal * 1.5);
 		}
 
 		// Remove DC Offset
@@ -355,8 +357,8 @@ bool PhaserEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 		{
 			// Just subtract the approximate average of the latest many
 			// audio samples.
-			m_sampAvg[i] = m_sampAvg[i] * 0.999 + m_secondAdd[i] * 0.001;
-			m_secondAdd[i] -= m_sampAvg[i];
+			m_sampAvg[i] = m_sampAvg[i] * 0.999 + secondAdd[i] * 0.001;
+			secondAdd[i] -= m_sampAvg[i];
 		}
 
 
@@ -367,8 +369,8 @@ bool PhaserEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 			m_filtFeedbackLoc -= m_delayBufSize;
 		}
 		// Send new value to delay line
-		m_filtDelayBuf[0][m_filtFeedbackLoc] = m_secondAdd[0] * m_feedbackVal;
-		m_filtDelayBuf[1][m_filtFeedbackLoc] = m_secondAdd[1] * m_feedbackVal;
+		m_filtDelayBuf[0][m_filtFeedbackLoc] = secondAdd[0] * m_feedbackVal;
+		m_filtDelayBuf[1][m_filtFeedbackLoc] = secondAdd[1] * m_feedbackVal;
 
 		s[0] *= m_outGain;
 		s[1] *= m_outGain;
@@ -395,21 +397,22 @@ bool PhaserEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 
 
 
-inline void PhaserEffect::calcAllpassFilter(sample_t &outSamp, sample_t inSamp, sample_rate_t Fs, int filtNum, int channel, float b0, float b1)
+sample_t PhaserEffect::calcAllpassFilter(sample_t inSamp, sample_rate_t Fs, int filtNum, int channel, float b0, float b1)
 {
 	// The original formula can be found here: https://pastebin.com/AyMH6k36
 	// Much effort was put into CPU optimization, so now the filters
 	// only require a very small number of operations.
-	m_filtY[filtNum][channel][0] = b0 * (inSamp - m_filtY[filtNum][channel][2]) +
-		b1 * (m_filtX[filtNum][channel][1] - m_filtY[filtNum][channel][1]) +
-		m_filtX[filtNum][channel][2];
 
-	m_filtX[filtNum][channel][2] = m_filtX[filtNum][channel][1];
-	m_filtX[filtNum][channel][1] = inSamp;
-	m_filtY[filtNum][channel][2] = m_filtY[filtNum][channel][1];
+	float filterOutput = b0 * (inSamp - m_filtY[filtNum][channel][1]) +
+		b1 * (m_filtX[filtNum][channel][0] - m_filtY[filtNum][channel][0]) +
+		m_filtX[filtNum][channel][1];
+
+	m_filtX[filtNum][channel][1] = m_filtX[filtNum][channel][0];
+	m_filtX[filtNum][channel][0] = inSamp;
 	m_filtY[filtNum][channel][1] = m_filtY[filtNum][channel][0];
+	m_filtY[filtNum][channel][0] = filterOutput;
 
-	outSamp = m_filtY[filtNum][channel][0];
+	return filterOutput;
 }
 
 
@@ -442,7 +445,7 @@ void PhaserEffect::restartLFO()
 
 
 // Takes input of original Hz and the number of cents to detune it by, and returns the detuned result in Hz.
-inline float PhaserEffect::detuneWithOctaves(float pitchValue, float detuneValue)
+float PhaserEffect::detuneWithOctaves(float pitchValue, float detuneValue)
 {
 	return pitchValue * std::exp2(detuneValue); 
 }

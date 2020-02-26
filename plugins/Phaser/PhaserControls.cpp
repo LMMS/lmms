@@ -33,9 +33,9 @@
 #include "MainWindow.h"
 
 
-const int PHA_DOT_SLIDER_LENGTH = 338;
-const float PHA_MIN_FREQ = 20;
-const float PHA_MAX_FREQ = 20000;
+constexpr int PHA_DOT_SLIDER_LENGTH = 338;
+constexpr float PHA_MIN_FREQ = 20;
+constexpr float PHA_MAX_FREQ = 20000;
 
 
 PhaserControls::PhaserControls(PhaserEffect* effect) :
@@ -62,14 +62,6 @@ PhaserControls::PhaserControls(PhaserEffect* effect) :
 	m_cutoffModel.setScaleLogarithmic(true);
 	m_resonanceModel.setScaleLogarithmic(true);
 	m_delayModel.setScaleLogarithmic(true);
-
-	m_outPeakL = 0.0;
-	m_outPeakR = 0.0;
-}
-
-
-PhaserControls::~PhaserControls()
-{
 }
 
 

@@ -36,16 +36,15 @@
 #include "ToolTip.h"
 
 
-const int PHA_DOT_SLIDER_LENGTH = 338;
-const float PHA_MIN_FREQ = 20;
-const float PHA_MAX_FREQ = 20000;
+constexpr int PHA_DOT_SLIDER_LENGTH = 338;
+constexpr float PHA_MIN_FREQ = 20;
+constexpr float PHA_MAX_FREQ = 20000;
 
 
 PhaserControlDialog::PhaserControlDialog(PhaserControls* controls) :
-	EffectControlDialog(controls)
+	EffectControlDialog(controls),
+	m_controls(controls)
 {
-	m_controls = controls;
-
 	setAutoFillBackground(true);
 	QPalette pal;
 	pal.setBrush(backgroundRole(), PLUGIN_NAME::getIconPixmap("artwork"));
@@ -183,9 +182,9 @@ PhaserControlDialog::PhaserControlDialog(PhaserControls* controls) :
 void PhaserControlDialog::updateSliders()
 {
 	// Magic. Do not touch.
-	m_cutoffDotLeftLabel->move((int((log2(model()->m_effect->m_realCutoff[0]) - log2(PHA_MIN_FREQ)) /
+	m_cutoffDotLeftLabel->move((int((log2(m_controls->m_effect->getCutoff(0)) - log2(PHA_MIN_FREQ)) /
 		log2(PHA_MAX_FREQ / PHA_MIN_FREQ) * PHA_DOT_SLIDER_LENGTH)) + 12, 139);
-	m_cutoffDotRightLabel->move((int((log2(model()->m_effect->m_realCutoff[1]) - log2(PHA_MIN_FREQ)) /
+	m_cutoffDotRightLabel->move((int((log2(m_controls->m_effect->getCutoff(1)) - log2(PHA_MIN_FREQ)) /
 		log2(PHA_MAX_FREQ / PHA_MIN_FREQ) * PHA_DOT_SLIDER_LENGTH)) + 12, 139);
 }
 

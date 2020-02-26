@@ -24,6 +24,7 @@
 
 #include "FlangerEffect.h"
 #include "Engine.h"
+#include "Song.h"
 
 #include "embed.h"
 #include "plugin_export.h"
@@ -55,6 +56,11 @@ FlangerEffect::FlangerEffect( Model *parent, const Plugin::Descriptor::SubPlugin
 	m_lDelay = new MonoDelay( 1, Engine::mixer()->processingSampleRate() );
 	m_rDelay = new MonoDelay( 1, Engine::mixer()->processingSampleRate() );
 	m_noise = new Noise;
+
+	connect( Engine::mixer(), SIGNAL( sampleRateChanged() ), this, SLOT( changeSampleRate() ) );
+	connect( Engine::getSong(), SIGNAL( playbackStateChanged() ), this, SLOT( restartLFO() ) );
+
+	connect( &m_flangerControls.m_lfoPhaseModel, SIGNAL( dataChanged() ), this, SLOT( updatePhase() ) );
 }
 
 
@@ -140,11 +146,15 @@ void FlangerEffect::changeSampleRate()
 }
 
 
-
-
 void FlangerEffect::restartLFO()
 {
 	m_lfo->restart();
+}
+
+
+void FlangerEffect::updatePhase()
+{
+	m_lfo->setOffset( m_flangerControls.m_lfoPhaseModel.value() / 180 * D_PI );
 }
 
 

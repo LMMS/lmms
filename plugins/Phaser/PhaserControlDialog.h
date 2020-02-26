@@ -38,17 +38,8 @@ class PhaserControlDialog : public EffectControlDialog
 	Q_OBJECT
 public:
 	PhaserControlDialog(PhaserControls* controls);
-	virtual ~PhaserControlDialog()
+	~PhaserControlDialog() override
 	{
-	}
-	PhaserControls* model()
-	{
-		return m_controls;
-	}
-
-	const PhaserControls* model() const
-	{
-		return m_controls;
 	}
 
 	QLabel * m_cutoffDotLeftLabel;
