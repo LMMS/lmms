@@ -324,7 +324,8 @@ void sidInstrument::playNote( NotePlayHandle * _n,
 
 	cSID *sid = static_cast<cSID *>( _n->m_pluginData );
 	int delta_t = clockrate * frames / samplerate + 4;
-	short buf[frames];
+	// avoid variable length array for msvc compat
+	short* buf = reinterpret_cast<short*>(_working_buffer + offset);
 	unsigned char sidreg[NUMSIDREGS];
 
 	for (int c = 0; c < NUMSIDREGS; c++)
@@ -429,7 +430,8 @@ void sidInstrument::playNote( NotePlayHandle * _n,
 	if(num!=frames)
 		printf("!!!Not enough samples\n");
 
-	for( fpp_t frame = 0; frame < frames; ++frame )
+	// loop backwards to avoid overwriting data in the short-to-float conversion
+	for( fpp_t frame = frames - 1; frame >= 0; frame-- )
 	{
 		sample_t s = float(buf[frame])/32768.0;
 		for( ch_cnt_t ch = 0; ch < DEFAULT_CHANNELS; ++ch )

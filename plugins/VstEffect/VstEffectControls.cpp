@@ -90,7 +90,8 @@ void VstEffectControls::loadSettings( const QDomElement & _this )
 				knobFModel[ i ]->setInitValue(LocaleHelper::toFloat(s_dumpValues.at(2)));
 			}
 
-			connect( knobFModel[i], SIGNAL( dataChanged() ), this, SLOT( setParameter() ) );
+			connect( knobFModel[i], &FloatModel::dataChanged, this,
+				[this, i]() { setParameter( knobFModel[i] ); }, Qt::DirectConnection);
 		}
 
 	}
@@ -100,10 +101,8 @@ void VstEffectControls::loadSettings( const QDomElement & _this )
 
 
 
-void VstEffectControls::setParameter( void )
+void VstEffectControls::setParameter( Model * action )
 {
-
-	Model *action = qobject_cast<Model *>(sender());
 	int knobUNID = action->displayName().toInt();
 
 	if ( m_effect->m_plugin != NULL ) {
@@ -377,9 +376,11 @@ manageVSTEffectView::manageVSTEffectView( VstEffect * _eff, VstEffectControls * 
 			m_vi->knobFModel[ i ] = new FloatModel( LocaleHelper::toFloat(s_dumpValues.at(2)),
 					0.0f, 1.0f, 0.01f, _eff, tr( paramStr ) );
 		}
-		connect( m_vi->knobFModel[ i ], SIGNAL( dataChanged() ), this, 
-								SLOT( setParameter() ) );
-		vstKnobs[ i ] ->setModel( m_vi->knobFModel[ i ] );
+
+		FloatModel * model = m_vi->knobFModel[i];
+		connect( model, &FloatModel::dataChanged, this,
+			[this, model]() { setParameter( model ); }, Qt::DirectConnection);
+		vstKnobs[ i ] ->setModel( model );
 	}
 
 	int i = 0;
@@ -472,10 +473,8 @@ void manageVSTEffectView::displayAutomatedOnly( void )
 
 
 
-void manageVSTEffectView::setParameter( void )
+void manageVSTEffectView::setParameter( Model * action )
 {
-
-	Model *action = qobject_cast<Model *>(sender());
 	int knobUNID = action->displayName().toInt();
 
 	if ( m_effect->m_plugin != NULL ) {

@@ -304,12 +304,12 @@ void SongEditor::setEditModeSelect()
 void SongEditor::keyPressEvent( QKeyEvent * ke )
 {
 	if( ke->modifiers() & Qt::ShiftModifier &&
-						ke->key() == Qt::Key_Insert )
+						( ke->key() == Qt::Key_Insert || ke->key() == Qt::Key_Enter || ke->key() == Qt::Key_Return ) )
 	{
 		m_song->insertBar();
 	}
 	else if( ke->modifiers() & Qt::ShiftModifier &&
-						ke->key() == Qt::Key_Delete )
+						( ke->key() == Qt::Key_Delete || ke->key() == Qt::Key_Backspace ) )
 	{
 		m_song->removeBar();
 	}
@@ -654,7 +654,7 @@ ComboBoxModel *SongEditor::zoomingModel() const
 
 
 SongEditorWindow::SongEditorWindow(Song* song) :
-	Editor(Engine::mixer()->audioDev()->supportsCapture()),
+	Editor(Engine::mixer()->audioDev()->supportsCapture(), false),
 	m_editor(new SongEditor(song)),
 	m_crtlAction( NULL )
 {
@@ -743,6 +743,16 @@ QSize SongEditorWindow::sizeHint() const
 void SongEditorWindow::resizeEvent(QResizeEvent *event)
 {
 	emit resized();
+}
+
+
+void SongEditorWindow::changeEvent(QEvent *event)
+{
+	QWidget::changeEvent(event);
+	if (event->type() == QEvent::WindowStateChange)
+	{
+		m_editor->realignTracks();
+	}
 }
 
 

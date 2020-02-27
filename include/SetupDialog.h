@@ -122,6 +122,9 @@ private slots:
 	void toggleDisplayWaveform( bool en );
 	void toggleDisableAutoquit( bool en );
 
+	void vstEmbedMethodChanged();
+	void toggleVSTAlwaysOnTop( bool en );
+
 	void setLanguage( int lang );
 
 
@@ -138,6 +141,7 @@ private:
 	bool m_MMPZ;
 	bool m_disableBackup;
 	bool m_openLastProject;
+	bool m_NaNHandler;
 	bool m_hqAudioDev;
 	QString m_lang;
 	QStringList m_languages;
@@ -202,6 +206,8 @@ private:
 
 	QComboBox* m_vstEmbedComboBox;
 	QString m_vstEmbedMethod;
+	LedCheckBox * m_vstAlwaysOnTopCheckBox;
+	bool m_vstAlwaysOnTop;
 } ;
 
 

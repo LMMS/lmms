@@ -352,7 +352,7 @@ public:
 		}
 	}
 
-	bool canPasteSelection( MidiTime tcoPos, const QMimeData * mimeData );
+	bool canPasteSelection( MidiTime tcoPos, const QDropEvent *de );
 	bool pasteSelection( MidiTime tcoPos, QDropEvent * de );
 
 	MidiTime endPosition( const MidiTime & posStart );
@@ -674,6 +674,10 @@ public:
 	}
 
 	virtual void update();
+
+	// Create a menu for assigning/creating channels for this track
+	// Currently instrument track and sample track supports it
+	virtual QMenu * createFxMenu(QString title, QString newFxLabel);
 
 
 public slots:

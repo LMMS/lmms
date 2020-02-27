@@ -58,6 +58,7 @@ SET(LMMS_SRCS
 	gui/widgets/FadeButton.cpp
 	gui/widgets/Fader.cpp
 	gui/widgets/FxLine.cpp
+	gui/widgets/FxLineLcdSpinBox.cpp
 	gui/widgets/Graph.cpp
 	gui/widgets/GroupBox.cpp
 	gui/widgets/InstrumentFunctionViews.cpp
@@ -91,6 +92,7 @@ SET(LMMS_SRCS
 	gui/widgets/TrackLabelButton.cpp
 	gui/widgets/TrackRenameLineEdit.cpp
 	gui/widgets/VisualizationWidget.cpp
+	gui/widgets/StepRecorderWidget.cpp
 
 	PARENT_SCOPE
 )

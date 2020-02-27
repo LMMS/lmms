@@ -89,7 +89,7 @@ TimeLineWidget::TimeLineWidget( const int xoff, const int yoff, const float ppt,
 	QTimer * updateTimer = new QTimer( this );
 	connect( updateTimer, SIGNAL( timeout() ),
 					this, SLOT( updatePosition() ) );
-	updateTimer->start( 50 );
+	updateTimer->start( 1000 / 60 );  // 60 fps
 	connect( Engine::getSong(), SIGNAL( timeSignatureChanged( int,int ) ),
 					this, SLOT( update() ) );
 }

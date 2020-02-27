@@ -114,6 +114,9 @@ public:
 	void createUI( QWidget *parent ) override
 	{
 		Q_UNUSED(parent);
+		if ( !hasEditor() ) {
+			return;
+		}
 		if ( embedMethod() != "none" ) {
 			m_pluginSubWindow.reset(new vstSubWin( gui->mainWindow()->workspace() ));
 			VstPlugin::createUI( m_pluginSubWindow.get() );
@@ -183,7 +186,13 @@ vestigeInstrument::~vestigeInstrument()
 
 void vestigeInstrument::loadSettings( const QDomElement & _this )
 {
-	loadFile( _this.attribute( "plugin" ) );
+	QString plugin = _this.attribute( "plugin" );
+	if( plugin.isEmpty() )
+	{
+		return;
+	}
+
+	loadFile( plugin );
 	m_pluginMutex.lock();
 	if( m_plugin != NULL )
 	{
@@ -214,7 +223,8 @@ void vestigeInstrument::loadSettings( const QDomElement & _this )
 				knobFModel[ i ]->setInitValue(LocaleHelper::toFloat(s_dumpValues.at(2)));
 			}
 
-			connect( knobFModel[i], SIGNAL( dataChanged() ), this, SLOT( setParameter() ) );
+			connect( knobFModel[i], &FloatModel::dataChanged, this,
+				[this, i]() { setParameter( knobFModel[i] ); }, Qt::DirectConnection);
 		}
 	}
 	m_pluginMutex.unlock();
@@ -223,10 +233,8 @@ void vestigeInstrument::loadSettings( const QDomElement & _this )
 
 
 
-void vestigeInstrument::setParameter( void )
+void vestigeInstrument::setParameter( Model * action )
 {
-
-	Model *action = qobject_cast<Model *>(sender());
 	int knobUNID = action->displayName().toInt();
 
 	if ( m_plugin != NULL ) {
@@ -969,8 +977,11 @@ manageVestigeInstrumentView::manageVestigeInstrumentView( Instrument * _instrume
 			m_vi->knobFModel[ i ] = new FloatModel( LocaleHelper::toFloat(s_dumpValues.at(2)),
 				0.0f, 1.0f, 0.01f, castModel<vestigeInstrument>(), tr( paramStr ) );
 		}
-		connect( m_vi->knobFModel[i], SIGNAL( dataChanged() ), this, SLOT( setParameter() ) );
-		vstKnobs[i] ->setModel( m_vi->knobFModel[i] );
+
+		FloatModel * model = m_vi->knobFModel[i];
+		connect( model, &FloatModel::dataChanged, this,
+			[this, model]() { setParameter( model ); }, Qt::DirectConnection);
+		vstKnobs[i] ->setModel( model );
 	}
 
 	int i = 0;
@@ -1101,10 +1112,8 @@ manageVestigeInstrumentView::~manageVestigeInstrumentView()
 
 
 
-void manageVestigeInstrumentView::setParameter( void )
+void manageVestigeInstrumentView::setParameter( Model * action )
 {
-
-	Model *action = qobject_cast<Model *>(sender());
 	int knobUNID = action->displayName().toInt();
 
 	if ( m_vi->m_plugin != NULL ) {

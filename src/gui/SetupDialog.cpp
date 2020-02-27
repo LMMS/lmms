@@ -66,6 +66,8 @@
 #include "MidiApple.h"
 #include "MidiDummy.h"
 
+constexpr int BUFFERSIZE_RESOLUTION = 32;
+
 inline void labelWidget( QWidget * _w, const QString & _txt )
 {
 	QLabel * title = new QLabel( _txt, _w );
@@ -98,6 +100,8 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 							"disablebackup" ).toInt() ),
 	m_openLastProject( ConfigManager::inst()->value( "app",
 							"openlastproject" ).toInt() ),
+	m_NaNHandler( ConfigManager::inst()->value( "app",
+							"nanhandler", "1" ).toInt() ),
 	m_hqAudioDev( ConfigManager::inst()->value( "mixer",
 							"hqaudio" ).toInt() ),
 	m_lang( ConfigManager::inst()->value( "app",
@@ -126,7 +130,7 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 	m_compactTrackButtons( ConfigManager::inst()->value( "ui",
 					"compacttrackbuttons" ).toInt() ),
 	m_syncVSTPlugins( ConfigManager::inst()->value( "ui",
-							"syncvstplugins" ).toInt() ),
+							"syncvstplugins", "1" ).toInt() ),
 	m_animateAFP(ConfigManager::inst()->value( "ui",
 						   "animateafp", "1" ).toInt() ),
 	m_printNoteLabels(ConfigManager::inst()->value( "ui",
@@ -134,8 +138,10 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 	m_displayWaveform(ConfigManager::inst()->value( "ui",
 						   "displaywaveform").toInt() ),
 	m_disableAutoQuit(ConfigManager::inst()->value( "ui",
-						   "disableautoquit").toInt() ),
-	m_vstEmbedMethod( ConfigManager::inst()->vstEmbedMethod() )
+						   "disableautoquit", "1" ).toInt() ),
+	m_vstEmbedMethod( ConfigManager::inst()->vstEmbedMethod() ),
+	m_vstAlwaysOnTop( ConfigManager::inst()->value( "ui",
+						   "vstalwaysontop" ).toInt() )
 {
 	setWindowIcon( embed::getIconPixmap( "setup_general" ) );
 	setWindowTitle( tr( "Setup LMMS" ) );
@@ -176,12 +182,12 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 	bufsize_tw->setFixedHeight( 80 );
 
 	m_bufSizeSlider = new QSlider( Qt::Horizontal, bufsize_tw );
-	m_bufSizeSlider->setRange( 1, 256 );
+	m_bufSizeSlider->setRange( 1, 128 );
 	m_bufSizeSlider->setTickPosition( QSlider::TicksBelow );
 	m_bufSizeSlider->setPageStep( 8 );
 	m_bufSizeSlider->setTickInterval( 8 );
 	m_bufSizeSlider->setGeometry( 10, 16, 340, 18 );
-	m_bufSizeSlider->setValue( m_bufferSize / 64 );
+	m_bufSizeSlider->setValue( m_bufferSize / BUFFERSIZE_RESOLUTION );
 
 	connect( m_bufSizeSlider, SIGNAL( valueChanged( int ) ), this,
 						SLOT( setBufferSize( int ) ) );
@@ -245,8 +251,17 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 
 	misc_tw->setFixedHeight( YDelta*labelNumber + HeaderSize );
 
+	// Advanced setting, hidden for now
+	if( false )
+	{
+		LedCheckBox * useNaNHandler = new LedCheckBox(
+				tr( "Use built-in NaN handler" ),
+								misc_tw );
+		useNaNHandler->setChecked( m_NaNHandler );
+	}
+
 	TabWidget* embed_tw = new TabWidget( tr( "PLUGIN EMBEDDING" ), general);
-	embed_tw->setFixedHeight( 48 );
+	embed_tw->setFixedHeight( 66 );
 	m_vstEmbedComboBox = new QComboBox( embed_tw );
 	m_vstEmbedComboBox->move( XDelta, YDelta );
 
@@ -265,6 +280,17 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 		m_vstEmbedComboBox->addItem( tr( "Embed using XEmbed protocol" ), "xembed" );
 	}
 	m_vstEmbedComboBox->setCurrentIndex( m_vstEmbedComboBox->findData( m_vstEmbedMethod ) );
+	connect( m_vstEmbedComboBox, SIGNAL( currentIndexChanged( int ) ),
+				this, SLOT( vstEmbedMethodChanged() ) );
+
+	m_vstAlwaysOnTopCheckBox = new LedCheckBox(
+				tr( "Keep plugin windows on top when not embedded" ),
+								embed_tw );
+	m_vstAlwaysOnTopCheckBox->move( 20, 44 );
+	m_vstAlwaysOnTopCheckBox->setChecked( m_vstAlwaysOnTop );
+	m_vstAlwaysOnTopCheckBox->setVisible( m_vstEmbedMethod == "none" );
+	connect( m_vstAlwaysOnTopCheckBox, SIGNAL( toggled( bool ) ),
+				this, SLOT( toggleVSTAlwaysOnTop( bool ) ) );
 
 	TabWidget * lang_tw = new TabWidget( tr( "LANGUAGE" ), general );
 	lang_tw->setFixedHeight( 48 );
@@ -414,7 +440,7 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 #endif
 	addPathEntry("Themes directory", m_artworkDir,
 		SLOT(setArtworkDir(const QString &)),
-		SLOT(openArtwortDir()),
+		SLOT(openArtworkDir()),
 		m_adLineEdit, pathSelectors);
 	pathSelectorLayout->addStretch();
 	addPathEntry("Background artwork", m_backgroundArtwork,
@@ -813,6 +839,8 @@ void SetupDialog::accept()
 					QString::number( !m_disableBackup ) );
 	ConfigManager::inst()->setValue( "app", "openlastproject",
 					QString::number( m_openLastProject ) );
+	ConfigManager::inst()->setValue( "app", "nanhandler",
+					QString::number( m_NaNHandler ) );
 	ConfigManager::inst()->setValue( "mixer", "hqaudio",
 					QString::number( m_hqAudioDev ) );
 	ConfigManager::inst()->setValue( "ui", "smoothscroll",
@@ -839,7 +867,9 @@ void SetupDialog::accept()
 					QString::number( m_disableAutoQuit ) );
 	ConfigManager::inst()->setValue( "app", "language", m_lang );
 	ConfigManager::inst()->setValue( "ui", "vstembedmethod",
-					m_vstEmbedComboBox->currentData().toString() );
+					m_vstEmbedMethod );
+	ConfigManager::inst()->setValue( "ui", "vstalwaysontop",
+					QString::number( m_vstAlwaysOnTop ) );
 
 
 	ConfigManager::inst()->setWorkingDir(QDir::fromNativeSeparators(m_workingDir));
@@ -877,7 +907,7 @@ void SetupDialog::accept()
 
 void SetupDialog::setBufferSize( int _value )
 {
-	const int step = DEFAULT_BUFFER_SIZE / 64;
+	const int step = DEFAULT_BUFFER_SIZE / BUFFERSIZE_RESOLUTION;
 	if( _value > step && _value % step )
 	{
 		int mod_value = _value % step;
@@ -897,7 +927,7 @@ void SetupDialog::setBufferSize( int _value )
 		m_bufSizeSlider->setValue( _value );
 	}
 
-	m_bufferSize = _value * 64;
+	m_bufferSize = _value * BUFFERSIZE_RESOLUTION;
 	m_bufSizeLbl->setText( tr( "Frames: %1\nLatency: %2 ms" ).arg(
 					m_bufferSize ).arg(
 						1000.0f * m_bufferSize /
@@ -910,7 +940,7 @@ void SetupDialog::setBufferSize( int _value )
 
 void SetupDialog::resetBufSize()
 {
-	setBufferSize( DEFAULT_BUFFER_SIZE / 64 );
+	setBufferSize( DEFAULT_BUFFER_SIZE / BUFFERSIZE_RESOLUTION );
 }
 
 
@@ -1041,6 +1071,20 @@ void SetupDialog::toggleOneInstrumentTrackWindow( bool _enabled )
 {
 	m_oneInstrumentTrackWindow = _enabled;
 }
+
+
+void SetupDialog::vstEmbedMethodChanged()
+{
+	m_vstEmbedMethod = m_vstEmbedComboBox->currentData().toString();
+	m_vstAlwaysOnTopCheckBox->setVisible( m_vstEmbedMethod == "none" );
+}
+
+
+void SetupDialog::toggleVSTAlwaysOnTop( bool en )
+{
+	m_vstAlwaysOnTop = en;
+}
+
 
 void SetupDialog::setLanguage( int lang )
 {

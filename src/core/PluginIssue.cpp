@@ -49,7 +49,7 @@ const char *PluginIssue::msgFor(const PluginIssueType &it)
 		case featureNotSupported:
 			return "required feature not supported";
 		case badPortType:
-			return "unsupported port Type";
+			return "unsupported port type";
 		case noIssue:
 			return nullptr;
 	}
@@ -62,7 +62,7 @@ const char *PluginIssue::msgFor(const PluginIssueType &it)
 QDebug operator<<(QDebug stream, const PluginIssue &iss)
 {
 	stream << PluginIssue::msgFor(iss.m_issueType);
-	if(iss.m_info.length())
+	if (iss.m_info.length())
 	{
 		stream.nospace() << ": " << iss.m_info.c_str();
 	}

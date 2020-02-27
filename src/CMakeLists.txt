@@ -45,7 +45,7 @@ INCLUDE(GenQrc)
 ADD_GEN_QRC(LMMS_RCC_OUT lmms.qrc
 	"${CMAKE_SOURCE_DIR}/doc/AUTHORS"
 	"${CMAKE_SOURCE_DIR}/LICENSE.txt"
-	"${CMAKE_BINARY_DIR}/CONTRIBUTORS"
+	"${CONTRIBUTORS}"
 )
 
 # Paths relative to lmms executable
