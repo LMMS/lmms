@@ -174,19 +174,22 @@ void MidiJack::JackMidiRead(jack_nframes_t nframes)
 	jack_nframes_t event_index = 0;
 	jack_nframes_t event_count = jack_midi_get_event_count(port_buf);
 
-	jack_midi_event_get(&in_event, port_buf, 0);
-	for(i=0; i<nframes; i++)
+	int rval = jack_midi_event_get(&in_event, port_buf, 0);
+	if (rval == 0 /* 0 = success */)
 	{
-		if((in_event.time == i) && (event_index < event_count))
+		for(i=0; i<nframes; i++)
 		{
-			// lmms is setup to parse bytes coming from a device
-			// parse it byte by byte as it expects
-			for(b=0;b<in_event.size;b++)
-				parseData( *(in_event.buffer + b) );
+			if((in_event.time == i) && (event_index < event_count))
+			{
+				// lmms is setup to parse bytes coming from a device
+				// parse it byte by byte as it expects
+				for(b=0;b<in_event.size;b++)
+					parseData( *(in_event.buffer + b) );
 
-			event_index++;
-			if(event_index < event_count)
-				jack_midi_event_get(&in_event, port_buf, event_index);
+				event_index++;
+				if(event_index < event_count)
+					jack_midi_event_get(&in_event, port_buf, event_index);
+			}
 		}
 	}
 }
