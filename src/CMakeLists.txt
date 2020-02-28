@@ -27,6 +27,7 @@ INCLUDE_DIRECTORIES(
 	"${CMAKE_BINARY_DIR}/include"
 	"${CMAKE_SOURCE_DIR}"
 	"${CMAKE_SOURCE_DIR}/include"
+	"${RINGBUFFER_DIR}/include"
 )
 
 IF(WIN32 AND MSVC)
@@ -88,6 +89,8 @@ ENDIF()
 IF(NOT ("${LAME_INCLUDE_DIRS}" STREQUAL ""))
 	INCLUDE_DIRECTORIES("${LAME_INCLUDE_DIRS}")
 ENDIF()
+
+LIST(APPEND LMMS_SRCS "${RINGBUFFER_DIR}/src/lib/ringbuffer.cpp")
 
 # Use libraries in non-standard directories (e.g., another version of Qt)
 IF(LMMS_BUILD_LINUX)

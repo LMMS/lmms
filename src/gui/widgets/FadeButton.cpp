@@ -24,12 +24,10 @@
  
 
 #include <QTimer>
-#include <QApplication>
 #include <QPainter>
 
 #include "embed.h"
 #include "FadeButton.h"
-#include "update_event.h"
 
 
 const float FadeDuration = 300;
@@ -71,7 +69,7 @@ void FadeButton::activate()
 {
 	m_stateTimer.restart();
 	activeNotes++;
-	signalUpdate();
+	update();
 }
 
 
@@ -94,14 +92,6 @@ void FadeButton::noteEnd()
 		m_releaseTimer.restart();
 	}
 
-	signalUpdate();
-}
-
-
-
-
-void FadeButton::customEvent(QEvent *)
-{
 	update();
 }
 
@@ -164,10 +154,4 @@ QColor FadeButton::fadeToColor(QColor startCol, QColor endCol, QTime timer, floa
 	col.setRgb(r, g, b);
 
 	return col;
-}
-
-
-void FadeButton::signalUpdate()
-{
-	QApplication::postEvent(this, new updateEvent());
 }

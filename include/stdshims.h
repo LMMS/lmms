@@ -21,6 +21,13 @@ std::unique_ptr<T> make_unique(Args&&... args)
 {
 	return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
 }
+
+//! Overload for the case a deleter should be specified
+template<typename T, typename Deleter, typename... Args>
+std::unique_ptr<T, Deleter> make_unique(Args&&... args)
+{
+	return std::unique_ptr<T, Deleter>(new T(std::forward<Args>(args)...));
+}
 #endif
 
 #endif // include guard

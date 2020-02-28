@@ -63,6 +63,7 @@ int normalize(const float *abs_spectrum, float *norm_spectrum, unsigned int bin_
 	if (abs_spectrum == NULL || norm_spectrum == NULL) {return -1;}
 	if (bin_count == 0 || block_size == 0) {return -1;}
 
+	block_size /= 2;
 	for (unsigned int i = 0; i < bin_count; i++)
 	{
 		norm_spectrum[i] = abs_spectrum[i] / block_size;

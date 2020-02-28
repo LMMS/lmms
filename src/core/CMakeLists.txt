@@ -1,5 +1,6 @@
 set(LMMS_SRCS
 	${LMMS_SRCS}
+
 	core/AutomatableModel.cpp
 	core/AutomationPattern.cpp
 	core/BandLimitedWave.cpp
@@ -30,6 +31,7 @@ set(LMMS_SRCS
 	core/LadspaControl.cpp
 	core/LadspaManager.cpp
 	core/LfoController.cpp
+	core/LinkedModelGroups.cpp
 	core/LocklessAllocator.cpp
 	core/MemoryHelper.cpp
 	core/MemoryManager.cpp
