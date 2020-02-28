@@ -28,6 +28,7 @@
 #include <QPixmap>
 #include <QVBoxLayout>
 #include <QWidget>
+#include <QPushButton>
 
 
 class SideBarWidget : public QWidget
@@ -47,11 +48,13 @@ public:
 		return m_title;
 	}
 
+signals:
+	void closeButtonClicked();
 
 protected:
-	virtual void paintEvent( QPaintEvent * _pe );
-	virtual void resizeEvent( QResizeEvent * _re );
-	virtual void contextMenuEvent( QContextMenuEvent * )
+	void paintEvent( QPaintEvent * _pe ) override;
+	void resizeEvent( QResizeEvent * _re ) override;
+	void contextMenuEvent( QContextMenuEvent * ) override
 	{
 	}
 
@@ -75,6 +78,8 @@ private:
 	QVBoxLayout * m_layout;
 	QString m_title;
 	QPixmap m_icon;
+	QPushButton * m_closeBtn;
+	const QSize m_buttonSize;
 
 } ;
 

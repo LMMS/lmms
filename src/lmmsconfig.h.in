@@ -3,6 +3,7 @@
 #cmakedefine LMMS_BUILD_WIN64
 #cmakedefine LMMS_BUILD_APPLE
 #cmakedefine LMMS_BUILD_OPENBSD
+#cmakedefine LMMS_BUILD_FREEBSD
 #cmakedefine LMMS_BUILD_HAIKU
 
 #cmakedefine LMMS_HOST_X86

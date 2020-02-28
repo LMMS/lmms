@@ -30,6 +30,7 @@
 
 #include <QMdiArea>
 #include <QMoveEvent>
+#include <QPainter>
 #include <QScrollBar>
 
 #include "embed.h"

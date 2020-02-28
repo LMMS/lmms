@@ -33,14 +33,14 @@
 #include "debug.h"
 #include "ConfigManager.h"
 #include "gui_templates.h"
-#include "templates.h"
 #include "ComboBox.h"
 #include "Mixer.h"
 
 AudioSoundIo::AudioSoundIo( bool & outSuccessful, Mixer * _mixer ) :
-	AudioDevice( tLimit<ch_cnt_t>(
-		ConfigManager::inst()->value( "audiosoundio", "channels" ).toInt(), DEFAULT_CHANNELS, SURROUND_CHANNELS ),
-								_mixer )
+	AudioDevice( qBound<ch_cnt_t>(
+		DEFAULT_CHANNELS,
+		ConfigManager::inst()->value( "audiosoundio", "channels" ).toInt(),
+		SURROUND_CHANNELS ), _mixer )
 {
 	outSuccessful = false;
 	m_soundio = NULL;
@@ -426,14 +426,14 @@ AudioSoundIo::setupWidget::setupWidget( QWidget * _parent ) :
 	m_backend = new ComboBox( this, "BACKEND" );
 	m_backend->setGeometry( 64, 15, 260, 20 );
 
-	QLabel * backend_lbl = new QLabel( tr( "BACKEND" ), this );
+	QLabel * backend_lbl = new QLabel( tr( "Backend" ), this );
 	backend_lbl->setFont( pointSize<7>( backend_lbl->font() ) );
 	backend_lbl->move( 8, 18 );
 
 	m_device = new ComboBox( this, "DEVICE" );
 	m_device->setGeometry( 64, 35, 260, 20 );
 
-	QLabel * dev_lbl = new QLabel( tr( "DEVICE" ), this );
+	QLabel * dev_lbl = new QLabel( tr( "Device" ), this );
 	dev_lbl->setFont( pointSize<7>( dev_lbl->font() ) );
 	dev_lbl->move( 8, 38 );
 

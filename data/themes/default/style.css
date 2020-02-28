@@ -9,16 +9,23 @@ QLabel, QTreeWidget, QListWidget, QGroupBox, QMenuBar {
 
 QTreeView {
 	outline: none;
+	font-size: 12px;
+}
+
+QTreeWidget::item {
+	padding: 1px;
 }
 
 QTreeWidget::item:hover,
 QTreeWidget::branch:hover {
 	background-color: #3C444E;
+	padding-left: 0px;
 }
 
 QTreeWidget::item:selected,
 QTreeWidget::branch:selected {
 	background-color: #17793b;
+	padding-left: 0px;
 }
 
 QTreeView::branch:has-children:open {
@@ -78,6 +85,12 @@ QToolTip {
 TextFloat {
 	background: #040506;
 	color: #d1d8e4;
+}
+
+
+/* splash screen text */
+QSplashScreen QLabel {
+	color: white;
 }
 
 
@@ -920,7 +933,4 @@ LmmsPalette {
 	qproperty-brightText: #d1d8e4;
 	qproperty-highlight: #262b30;
 	qproperty-highlightedText: #d1d8e4;
-	/* the next two are used for whatsthis dialogs */
-	qproperty-toolTipText: #d1d8e4;
-	qproperty-toolTipBase: #101213;
 }

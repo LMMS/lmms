@@ -45,7 +45,6 @@ float frnd(float range)
 #include "Knob.h"
 #include "NotePlayHandle.h"
 #include "PixmapButton.h"
-#include "templates.h"
 #include "ToolTip.h"
 #include "Song.h"
 #include "MidiEvent.h"

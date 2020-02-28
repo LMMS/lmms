@@ -51,7 +51,7 @@ public:
 	positionLine( QWidget * parent );
 
 private:
-	virtual void paintEvent( QPaintEvent * pe );
+	void paintEvent( QPaintEvent * pe ) override;
 
 } ;
 
@@ -69,24 +69,34 @@ public:
 	SongEditor( Song * song );
 	~SongEditor();
 
-	void saveSettings( QDomDocument& doc, QDomElement& element );
-	void loadSettings( const QDomElement& element );
+	void saveSettings( QDomDocument& doc, QDomElement& element ) override;
+	void loadSettings( const QDomElement& element ) override;
 
 	ComboBoxModel *zoomingModel() const;
+	ComboBoxModel *snappingModel() const;
+	float getSnapSize() const;
+	QString getSnapSizeString() const;
 
 public slots:
 	void scrolled( int new_pos );
+	void selectRegionFromPixels(int xStart, int xEnd);
+	void stopSelectRegion();
+	void updateRubberband();
 
 	void setEditMode( EditMode mode );
 	void setEditModeDraw();
 	void setEditModeSelect();
+	void toggleProportionalSnap();
 
 	void updatePosition( const MidiTime & t );
 	void updatePositionLine();
 	void selectAllTcos( bool select );
 
 protected:
-	virtual void closeEvent( QCloseEvent * ce );
+	void closeEvent( QCloseEvent * ce ) override;
+	void mousePressEvent(QMouseEvent * me) override;
+	void mouseMoveEvent(QMouseEvent * me) override;
+	void mouseReleaseEvent(QMouseEvent * me) override;
 
 private slots:
 	void setHighQuality( bool );
@@ -106,10 +116,13 @@ private slots:
 	void zoomingChanged();
 
 private:
-	virtual void keyPressEvent( QKeyEvent * ke );
-	virtual void wheelEvent( QWheelEvent * we );
+	void keyPressEvent( QKeyEvent * ke ) override;
+	void wheelEvent( QWheelEvent * we ) override;
 
-	virtual bool allowRubberband() const;
+	bool allowRubberband() const override;
+
+	int trackIndexFromSelectionPoint(int yPos);
+	int indexOfTrackView(const TrackView* tv);
 
 
 	Song * m_song;
@@ -130,18 +143,27 @@ private:
 	positionLine * m_positionLine;
 
 	ComboBoxModel* m_zoomingModel;
+	ComboBoxModel* m_snappingModel;
+	bool m_proportionalSnap;
 
 	static const QVector<double> m_zoomLevels;
 
 	bool m_scrollBack;
 	bool m_smoothScroll;
-	int m_widgetWidthTotal;
 
 	EditMode m_mode;
 	EditMode m_ctrlMode; // mode they were in before they hit ctrl
 
-	friend class SongEditorWindow;
+	QPoint m_origin;
+	QPoint m_scrollPos;
+	QPoint m_mousePos;
+	int m_rubberBandStartTrackview;
+	MidiTime m_rubberbandStartMidipos;
+	int m_currentZoomingValue;
+	int m_trackHeadWidth;
+	bool m_selectRegion;
 
+	friend class SongEditorWindow;
 } ;
 
 
@@ -153,34 +175,37 @@ class SongEditorWindow : public Editor
 public:
 	SongEditorWindow( Song* song );
 
-	QSize sizeHint() const;
+	QSize sizeHint() const override;
 
 	SongEditor* m_editor;
 
 protected:
-	virtual void resizeEvent( QResizeEvent * event );
-	virtual void changeEvent( QEvent * );
+	void resizeEvent( QResizeEvent * event ) override;
+	void changeEvent( QEvent * ) override;
 
 protected slots:
-	void play();
-	void record();
-	void recordAccompany();
-	void stop();
+	void play() override;
+	void record() override;
+	void recordAccompany() override;
+	void stop() override;
 
 	void lostFocus();
 	void adjustUiAfterProjectLoad();
+
+	void updateSnapLabel();
 
 signals:
 	void playTriggered();
 	void resized();
 
 private:
-	virtual void keyPressEvent( QKeyEvent * ke );
-	virtual void keyReleaseEvent( QKeyEvent * ke );
+	void keyPressEvent( QKeyEvent * ke ) override;
+	void keyReleaseEvent( QKeyEvent * ke ) override;
 
 	QAction* m_addBBTrackAction;
 	QAction* m_addSampleTrackAction;
 	QAction* m_addAutomationTrackAction;
+	QAction* m_setProportionalSnapAction;
 
 	ActionGroup * m_editModeGroup;
 	QAction* m_drawModeAction;
@@ -188,6 +213,8 @@ private:
 	QAction* m_crtlAction;
 
 	ComboBox * m_zoomingComboBox;
+	ComboBox * m_snappingComboBox;
+	QLabel* m_snapSizeLabel;
 };
 
 #endif

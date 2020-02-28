@@ -42,7 +42,8 @@ TempoSyncKnobModel::TempoSyncKnobModel( const float _val, const float _min,
 	m_custom( _parent )
 {
 	connect( Engine::getSong(), SIGNAL( tempoChanged( bpm_t ) ),
-			this, SLOT( calculateTempoSyncTime( bpm_t ) ) );
+			this, SLOT( calculateTempoSyncTime( bpm_t ) ),
+			Qt::DirectConnection );
 }
 
 
@@ -154,7 +155,8 @@ void TempoSyncKnobModel::setSyncMode( TempoSyncMode _new_mode )
 		if( _new_mode == SyncCustom )
 		{
 			connect( &m_custom, SIGNAL( dataChanged() ),
-					this, SLOT( updateCustom() ) );
+					this, SLOT( updateCustom() ),
+					Qt::DirectConnection );
 		}
 	}
 	calculateTempoSyncTime( Engine::getSong()->getTempo() );

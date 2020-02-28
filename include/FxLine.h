@@ -51,10 +51,10 @@ public:
 	FxLine( QWidget * _parent, FxMixerView * _mv, int _channelIndex);
 	~FxLine();
 
-	virtual void paintEvent( QPaintEvent * );
-	virtual void mousePressEvent( QMouseEvent * );
-	virtual void mouseDoubleClickEvent( QMouseEvent * );
-	virtual void contextMenuEvent( QContextMenuEvent * );
+	void paintEvent( QPaintEvent * ) override;
+	void mousePressEvent( QMouseEvent * ) override;
+	void mouseDoubleClickEvent( QMouseEvent * ) override;
+	void contextMenuEvent( QContextMenuEvent * ) override;
 
 	inline int channelIndex() { return m_channelIndex; }
 	void setChannelIndex(int index);
@@ -79,9 +79,7 @@ public:
 
 	static const int FxLineHeight;
 
-	void renameChannel();
-
-	bool eventFilter (QObject *dist, QEvent *event);
+	bool eventFilter (QObject *dist, QEvent *event) override;
 
 private:
 	void drawFxLine( QPainter* p, const FxLine *fxLine, bool isActive, bool sendToThis, bool receiveFromThis );
@@ -100,6 +98,9 @@ private:
 	bool m_inRename;
 	QLineEdit * m_renameLineEdit;
 	QGraphicsView * m_view;
+
+public slots:
+	void renameChannel();
 
 private slots:
 	void renameFinished();

@@ -60,7 +60,6 @@
 #include "MainWindow.h"
 #include "Mixer.h"
 #include "Song.h"
-#include "templates.h"
 #include "FileDialog.h"
 
 #ifdef LMMS_BUILD_LINUX
@@ -162,7 +161,7 @@ VstPlugin::VstPlugin( const QString & _plugin ) :
 	setTempo( Engine::getSong()->getTempo() );
 
 	connect( Engine::getSong(), SIGNAL( tempoChanged( bpm_t ) ),
-			this, SLOT( setTempo( bpm_t ) ) );
+			this, SLOT( setTempo( bpm_t ) ), Qt::DirectConnection );
 	connect( Engine::mixer(), SIGNAL( sampleRateChanged() ),
 				this, SLOT( updateSampleRate() ) );
 

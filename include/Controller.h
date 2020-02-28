@@ -31,7 +31,6 @@
 #include "Engine.h"
 #include "Model.h"
 #include "JournallingObject.h"
-#include "templates.h"
 #include "ValueBuffer.h"
 
 class ControllerDialog;
@@ -102,9 +101,9 @@ public:
 	}
 
 
-	virtual void saveSettings( QDomDocument & _doc, QDomElement & _this );
-	virtual void loadSettings( const QDomElement & _this );
-	virtual QString nodeName() const;
+	void saveSettings( QDomDocument & _doc, QDomElement & _this ) override;
+	void loadSettings( const QDomElement & _this ) override;
+	QString nodeName() const override;
 
 	static Controller * create( ControllerTypes _tt, Model * _parent );
 	static Controller * create( const QDomElement & _this,
@@ -112,7 +111,7 @@ public:
 
 	inline static float fittedValue( float _val )
 	{
-		return tLimit<float>( _val, 0.0f, 1.0f );
+		return qBound<float>( 0.0f, _val, 1.0f );
 	}
 
 	static long runningPeriods()

@@ -28,7 +28,6 @@
 #include "base64.h"
 #include "Engine.h"
 #include "InstrumentTrack.h"
-#include "templates.h"
 #include "ToolTip.h"
 #include "Song.h"
 #include "lmms_math.h"
