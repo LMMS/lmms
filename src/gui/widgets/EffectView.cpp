@@ -70,14 +70,14 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 	m_autoQuit = new TempoSyncKnob( knobBright_26, this );
 	m_autoQuit->setLabel( tr( "DECAY" ) );
 	m_autoQuit->move( 60, 5 );
-	m_autoQuit->setEnabled( isEnabled );
+	m_autoQuit->setEnabled( isEnabled && !effect()->m_autoQuitDisabled );
 	m_autoQuit->setHintText( tr( "Time:" ), "ms" );
 
 
 	m_gate = new Knob( knobBright_26, this );
 	m_gate->setLabel( tr( "GATE" ) );
 	m_gate->move( 93, 5 );
-	m_gate->setEnabled( isEnabled );
+	m_gate->setEnabled( isEnabled && !effect()->m_autoQuitDisabled );
 	m_gate->setHintText( tr( "Gate:" ), "" );
 
 
@@ -97,9 +97,14 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 		if( m_controlView )
 		{
 			m_subWindow = gui->mainWindow()->addWindowedWidget( m_controlView );
-			m_subWindow->setSizePolicy( QSizePolicy::Fixed, QSizePolicy::Fixed );
-			if (m_subWindow->layout()) {
-				m_subWindow->layout()->setSizeConstraint(QLayout::SetFixedSize);
+
+			if ( !m_controlView->isResizable() )
+			{
+				m_subWindow->setSizePolicy( QSizePolicy::Fixed, QSizePolicy::Fixed );
+				if (m_subWindow->layout())
+				{
+					m_subWindow->layout()->setSizeConstraint(QLayout::SetFixedSize);
+				}
 			}
 
 			Qt::WindowFlags flags = m_subWindow->windowFlags();

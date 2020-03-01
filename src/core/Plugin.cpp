@@ -22,16 +22,14 @@
  *
  */
 
+#include "Plugin.h"
+
 #include <QtGlobal>
 #include <QtCore/QDebug>
 #include <QtCore/QDir>
 #include <QtCore/QLibrary>
 #include <QMessageBox>
 
-// comment separator to prevent clang's header sorting
-#include "lmmsconfig.h"
-
-#include "Plugin.h"
 #include "embed.h"
 #include "Engine.h"
 #include "GuiApplication.h"
@@ -319,5 +317,6 @@ QDomElement Plugin::Descriptor::SubPluginFeatures::Key::saveXML(
 	}
 	return e;
 }
+
 
 

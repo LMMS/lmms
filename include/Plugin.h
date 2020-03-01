@@ -196,8 +196,8 @@ public:
 
 
 		private:
-			// You can add stuff values mapped by "Key" below
-			// The defaults are sane, i.e. redirect to sub plugins
+			// You can add values mapped by "Key" below
+			// The defaults are sane, i.e. redirect to sub plugin's
 			// supererior descriptor
 
 			virtual QString additionalFileExtensions(const Key&) const
@@ -239,7 +239,7 @@ public:
 	virtual ~Plugin();
 
 	//! Return display-name out of sub plugin or descriptor
-	virtual QString displayName() const;
+	QString displayName() const override;
 
 	//! Return logo out of sub plugin or descriptor
 	const PixmapLoader *logo() const;

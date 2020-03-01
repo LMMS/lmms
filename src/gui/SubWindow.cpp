@@ -1,4 +1,4 @@
-﻿/*
+/*
  * SubWindow.cpp - Implementation of QMdiSubWindow that correctly tracks
  *   the geometry that windows should be restored to.
  *   Workaround for https://bugreports.qt.io/browse/QTBUG-256
@@ -30,6 +30,7 @@
 
 #include <QMdiArea>
 #include <QMoveEvent>
+#include <QPainter>
 #include <QScrollBar>
 
 #include "embed.h"
@@ -169,32 +170,6 @@ void SubWindow::elideText( QLabel *label, QString text )
 	int width = label->width() - 2;
 	QString clippedText = metrix.elidedText( text, Qt::ElideRight, width );
 	label->setText( clippedText );
-}
-
-
-
-
-/**
- * @brief SubWindow::isMaximized
- * 
- * This function checks if the subwindow is maximized.
- * QMdiSubWindow::isMaximized() doesn't work on MacOS.
- * Therefore we need our own implementation for checking this
- * @return true if the subwindow is maximized at the moment.
- *         false if it's not.
- */
-bool SubWindow::isMaximized()
-{
-#ifdef LMMS_BUILD_APPLE
-	// check if subwindow size is identical to the MdiArea size, accounting for scrollbars
-	int hScrollBarHeight = mdiArea()->horizontalScrollBar()->isVisible() ? mdiArea()->horizontalScrollBar()->size().height() : 0;
-	int vScrollBarWidth = mdiArea()->verticalScrollBar()->isVisible() ? mdiArea()->verticalScrollBar()->size().width() : 0;
-	QSize areaSize( this->mdiArea()->size().width() - vScrollBarWidth, this->mdiArea()->size().height() - hScrollBarHeight );
-
-	return areaSize == this->size();
-#else
-	return QMdiSubWindow::isMaximized();
-#endif
 }
 
 
@@ -375,10 +350,10 @@ void SubWindow::focusChanged( QMdiSubWindow *subWindow )
 /**
  * @brief SubWindow::resizeEvent
  * 
- *  On every rezise event we have to adjust our title label.
- * 
- *  At next we give the event to QMdiSubWindow::resizeEvent() which handles 
+ *  At first we give the event to QMdiSubWindow::resizeEvent() which handles
  *  the event on its behavior.
+ *
+ *  On every resize event we have to adjust our title label.
  * 
  *  At last we store the current size into m_trackedNormalGeom. This size
  *  will be saved with the project because of an Qt bug wich doesn't
@@ -388,8 +363,11 @@ void SubWindow::focusChanged( QMdiSubWindow *subWindow )
  */
 void SubWindow::resizeEvent( QResizeEvent * event )
 {
-	adjustTitleBar();
+	// When the parent QMdiArea gets resized, maximized subwindows also gets resized, if any.
+	// In that case, we should call QMdiSubWindow::resizeEvent first
+	// to ensure we get the correct window state.
 	QMdiSubWindow::resizeEvent( event );
+	adjustTitleBar();
 
 	// if the window was resized and ISN'T minimized/maximized/fullscreen,
 	// then save the current size

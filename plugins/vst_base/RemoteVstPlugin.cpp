@@ -65,6 +65,7 @@
 #	include <mutex>
 #endif
 
+#include <algorithm>
 #include <vector>
 #include <queue>
 #include <string>
@@ -415,8 +416,8 @@ private:
 	// host to plugin synchronisation data structure
 	struct in
 	{
-		float lastppqPos;
-		float m_Timestamp;
+		double lastppqPos;
+		double m_Timestamp;
 		int32_t m_lastFlags;
 	} ;
 
@@ -733,6 +734,7 @@ void RemoteVstPlugin::init( const std::string & _plugin_file )
 
 static void close_check( FILE* fp )
 {
+	if (!fp) {return;}
 	if( fclose( fp ) )
 	{
 		perror( "fclose" );
@@ -789,10 +791,6 @@ void RemoteVstPlugin::initEditor()
 			windowSize.bottom - windowSize.top, SWP_NOACTIVATE |
 						SWP_NOMOVE | SWP_NOZORDER );
 	pluginDispatch( effEditTop );
-
-	if (! EMBED) {
-		showEditor();
-	}
 
 #ifdef LMMS_BUILD_LINUX
 	m_windowID = (intptr_t) GetProp( m_window, "__wine_x11_whole_window" );
@@ -912,6 +910,14 @@ void RemoteVstPlugin::process( const sampleFrame * _in, sampleFrame * _out )
 #define MIDI_EVENT_BUFFER_COUNT		1024
 		static char eventsBuffer[sizeof( VstEvents ) + sizeof( VstMidiEvent * ) * MIDI_EVENT_BUFFER_COUNT];
 		static VstMidiEvent vme[MIDI_EVENT_BUFFER_COUNT];
+
+		// first sort events chronologically, since some plugins
+		// (e.g. Sinnah) can hang if they're out of order
+		std::stable_sort( m_midiEvents.begin(), m_midiEvents.end(),
+				[]( const VstMidiEvent &a, const VstMidiEvent &b )
+				{
+					return a.deltaFrames < b.deltaFrames;
+				} );
 
 		VstEvents* events = (VstEvents *) eventsBuffer;
 		events->reserved = 0;
@@ -1123,6 +1129,12 @@ void RemoteVstPlugin::saveChunkToFile( const std::string & _file )
 		if( len > 0 )
 		{
 			FILE* fp = F_OPEN_UTF8( _file, "wb" );
+			if (!fp)
+			{
+				fprintf( stderr,
+					"Error opening file for saving chunk.\n" );
+				return;
+			}
 			if ( fwrite( chunk, 1, len, fp ) != len )
 			{
 				fprintf( stderr,
@@ -1288,6 +1300,12 @@ void RemoteVstPlugin::savePreset( const std::string & _file )
 	pBank->numPrograms = endian_swap( uIntToFile );
 
 	FILE * stream = F_OPEN_UTF8( _file, "w" );
+	if (!stream)
+	{
+		fprintf( stderr,
+			"Error opening file for saving preset.\n" );
+		return;
+	}
 	fwrite ( pBank, 1, 28, stream );
 	fwrite ( progName, 1, isPreset ? 28 : 128, stream );
 	if ( chunky ) {
@@ -1340,6 +1358,12 @@ void RemoteVstPlugin::loadPresetFile( const std::string & _file )
 	unsigned int len = 0;
 	sBank * pBank = (sBank*) new char[ sizeof( sBank ) ];
 	FILE * stream = F_OPEN_UTF8( _file, "r" );
+	if (!stream)
+	{
+		fprintf( stderr,
+			"Error opening file for loading preset.\n" );
+		return;
+	}
 	if ( fread ( pBank, 1, 56, stream ) != 56 )
 	{
 		fprintf( stderr, "Error loading preset file.\n" );
@@ -1441,6 +1465,12 @@ void RemoteVstPlugin::loadChunkFromFile( const std::string & _file, int _len )
 	char * chunk = new char[_len];
 
 	FILE* fp = F_OPEN_UTF8( _file, "rb" );
+	if (!fp)
+	{
+		fprintf( stderr,
+			"Error opening file for loading chunk.\n" );
+		return;
+	}
 	if ( fread( chunk, 1, _len, fp ) != _len )
 	{
 		fprintf( stderr, "Error loading chunk from file.\n" );
@@ -1609,10 +1639,20 @@ intptr_t RemoteVstPlugin::hostCallback( AEffect * _effect, int32_t _opcode,
 			}
 			else if( __plugin->m_vstSyncData->isPlaying )
 			{
-				__plugin->m_in->lastppqPos += (
-							__plugin->m_vstSyncData->hasSHM ?
-							__plugin->m_vstSyncData->m_bpm :
-							__plugin->m_bpm ) / (float)10340;
+				if( __plugin->m_vstSyncData->hasSHM )
+				{
+					__plugin->m_in->lastppqPos +=
+						__plugin->m_vstSyncData->m_bpm / 60.0
+						* __plugin->m_vstSyncData->m_bufferSize
+						/ __plugin->m_vstSyncData->m_sampleRate;
+				}
+				else
+				{
+					__plugin->m_in->lastppqPos +=
+						__plugin->m_bpm / 60.0
+						* __plugin->bufferSize()
+						/ __plugin->sampleRate();
+				}
 				_timeInfo.ppqPos = __plugin->m_in->lastppqPos;
 			}
 //			_timeInfo.ppqPos = __plugin->m_vstSyncData->ppqPos;
@@ -1945,7 +1985,10 @@ DWORD WINAPI RemoteVstPlugin::processingThread( LPVOID _param )
 	RemotePluginClient::message m;
 	while( ( m = _this->receiveMessage() ).id != IdQuit )
         {
-		if( m.id == IdStartProcessing || m.id == IdMidiEvent )
+		if( m.id == IdStartProcessing
+			|| m.id == IdMidiEvent
+			|| m.id == IdVstSetParameter
+			|| m.id == IdVstSetTempo )
 		{
 			_this->processMessage( m );
 		}

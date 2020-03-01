@@ -5,30 +5,46 @@ ENDIF()
 INCLUDE(BuildPlugin)
 INCLUDE(ExternalProject)
 
+# These variables are not meant to be used normally, except packaging
+SET(REMOTE_VST_PLUGIN_FILEPATH_32 "32/RemoteVstPlugin32" CACHE STRING "Relative file path to RemoteVstPlugin32")
+SET(REMOTE_VST_PLUGIN_FILEPATH_64 "RemoteVstPlugin64" CACHE STRING "Relative file path to RemoteVstPlugin64")
+
 ADD_SUBDIRECTORY(vstbase)
-
-IF(LMMS_BUILD_LINUX AND WANT_VST_NOWINE)
-	RETURN()
-ENDIF()
-
-SET(LMMS_BINARY_DIR ${CMAKE_BINARY_DIR})
-SET(LMMS_SOURCE_DIR ${CMAKE_SOURCE_DIR})
 
 SET(EXTERNALPROJECT_ARGS
 	SOURCE_DIR "${CMAKE_CURRENT_LIST_DIR}/RemoteVstPlugin"
-	INSTALL_COMMAND ""
+	#INSTALL_COMMAND ""
 	BUILD_ALWAYS ON
+	# Skip the install step.
+	INSTALL_COMMAND ""
 )
+
+set(export_variables
+		"LMMS_SOURCE_DIR"
+		"LMMS_BINARY_DIR"
+		"CMAKE_MODULE_PATH"
+		"CMAKE_RUNTIME_OUTPUT_DIRECTORY"
+		"CMAKE_BUILD_TYPE"
+		"LMMS_BUILD_LINUX"
+		"LMMS_BUILD_WIN32"
+		"PLUGIN_DIR")
 
 SET(EXTERNALPROJECT_CMAKE_ARGS
-	"-DLMMS_SOURCE_DIR=${CMAKE_SOURCE_DIR}"
-	"-DLMMS_BINARY_DIR=${CMAKE_BINARY_DIR}"
-	"-DCMAKE_RUNTIME_OUTPUT_DIRECTORY=${CMAKE_RUNTIME_OUTPUT_DIRECTORY}"
-	"-DCMAKE_MODULE_PATH=${CMAKE_MODULE_PATH}"
-	"-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}"
+	"-DBUILD_WITH_EXTERNALPROJECT=ON"
 )
 
+macro(_export_var_to_external var_name)
+	list(APPEND EXTERNALPROJECT_CMAKE_ARGS "-D${var_name}=${${var_name}}")
+endmacro()
+foreach(var ${export_variables})
+	_export_var_to_external(${var})
+endforeach()
+
 # build 32 bit version of RemoteVstPlugin
-INCLUDE("${CMAKE_CURRENT_LIST_DIR}/RemoteVstPlugin32.cmake")
+IF(WANT_VST_32)
+	INCLUDE("${CMAKE_CURRENT_LIST_DIR}/RemoteVstPlugin32.cmake")
+ENDIF()
 # build 64 bit version of RemoteVstPlugin
-INCLUDE("${CMAKE_CURRENT_LIST_DIR}/RemoteVstPlugin64.cmake")
+IF(WANT_VST_64)
+	INCLUDE("${CMAKE_CURRENT_LIST_DIR}/RemoteVstPlugin64.cmake")
+ENDIF()

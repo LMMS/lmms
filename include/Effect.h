@@ -47,10 +47,10 @@ public:
 			const Descriptor::SubPluginFeatures::Key * _key );
 	virtual ~Effect();
 
-	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
-	virtual void loadSettings( const QDomElement & _this );
+	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
+	void loadSettings( const QDomElement & _this ) override;
 
-	inline virtual QString nodeName() const
+	inline QString nodeName() const override
 	{
 		return "effect";
 	}
@@ -161,9 +161,16 @@ public:
 
 
 protected:
+	/**
+		Effects should call this at the end of audio processing
+
+		If the setting "Keep effects running even without input" is disabled,
+		after "decay" ms of a signal below "gate", the effect is turned off
+		and won't be processed again until it receives new audio input
+	*/
 	void checkGate( double _out_sum );
 
-	virtual PluginView * instantiateView( QWidget * );
+	PluginView * instantiateView( QWidget * ) override;
 
 	// some effects might not be capable of higher sample-rates so they can
 	// sample it down before processing and back after processing

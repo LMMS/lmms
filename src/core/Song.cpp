@@ -55,7 +55,7 @@
 #include "PeakController.h"
 
 
-tick_t MidiTime::s_ticksPerTact = DefaultTicksPerTact;
+tick_t MidiTime::s_ticksPerBar = DefaultTicksPerBar;
 
 
 
@@ -66,7 +66,7 @@ Song::Song() :
 								this ) ) ),
 	m_tempoModel( DefaultTempo, MinTempo, MaxTempo, this, tr( "Tempo" ) ),
 	m_timeSigModel( this ),
-	m_oldTicksPerTact( DefaultTicksPerTact ),
+	m_oldTicksPerBar( DefaultTicksPerBar ),
 	m_masterVolumeModel( 100, 0, 200, this, tr( "Master volume" ) ),
 	m_masterPitchModel( 0, -12, 12, this, tr( "Master pitch" ) ),
 	m_fileName(),
@@ -86,24 +86,24 @@ Song::Song() :
 	m_patternToPlay( NULL ),
 	m_loopPattern( false ),
 	m_elapsedTicks( 0 ),
-	m_elapsedTacts( 0 ),
+	m_elapsedBars( 0 ),
 	m_loopRenderCount(1),
 	m_loopRenderRemaining(1)
 {
 	for(int i = 0; i < Mode_Count; ++i) m_elapsedMilliSeconds[i] = 0;
 	connect( &m_tempoModel, SIGNAL( dataChanged() ),
-						this, SLOT( setTempo() ) );
+			this, SLOT( setTempo() ), Qt::DirectConnection );
 	connect( &m_tempoModel, SIGNAL( dataUnchanged() ),
-						this, SLOT( setTempo() ) );
+			this, SLOT( setTempo() ), Qt::DirectConnection );
 	connect( &m_timeSigModel, SIGNAL( dataChanged() ),
-					this, SLOT( setTimeSignature() ) );
+			this, SLOT( setTimeSignature() ), Qt::DirectConnection );
 
 
 	connect( Engine::mixer(), SIGNAL( sampleRateChanged() ), this,
 						SLOT( updateFramesPerTick() ) );
 
 	connect( &m_masterVolumeModel, SIGNAL( dataChanged() ),
-			this, SLOT( masterVolumeChanged() ) );
+			this, SLOT( masterVolumeChanged() ), Qt::DirectConnection );
 /*	connect( &m_masterPitchModel, SIGNAL( dataChanged() ),
 			this, SLOT( masterPitchChanged() ) );*/
 
@@ -162,10 +162,10 @@ void Song::setTempo()
 
 void Song::setTimeSignature()
 {
-	MidiTime::setTicksPerTact( ticksPerTact() );
-	emit timeSignatureChanged( m_oldTicksPerTact, ticksPerTact() );
+	MidiTime::setTicksPerBar( ticksPerBar() );
+	emit timeSignatureChanged( m_oldTicksPerBar, ticksPerBar() );
 	emit dataChanged();
-	m_oldTicksPerTact = ticksPerTact();
+	m_oldTicksPerBar = ticksPerBar();
 
 	m_vstSyncController.setTimeSignature(
 		getTimeSigModel().getNumerator(), getTimeSigModel().getDenominator() );
@@ -260,8 +260,6 @@ void Song::processNextBuffer()
 			m_playPos[m_playMode].setTicks(
 						tl->loopBegin().getTicks() );
 
-			m_vstSyncController.setAbsolutePosition(
-						tl->loopBegin().getTicks() );
 			m_vstSyncController.setPlaybackJumped( true );
 
 			emit updateSampleTracks();
@@ -288,22 +286,20 @@ void Song::processNextBuffer()
 			int ticks = m_playPos[m_playMode].getTicks() +
 				( int )( currentFrame / framesPerTick );
 
-			m_vstSyncController.setAbsolutePosition( ticks );
-
-			// did we play a whole tact?
-			if( ticks >= MidiTime::ticksPerTact() )
+			// did we play a whole bar?
+			if( ticks >= MidiTime::ticksPerBar() )
 			{
 				// per default we just continue playing even if
 				// there's no more stuff to play
 				// (song-play-mode)
-				int maxTact = m_playPos[m_playMode].getTact()
+				int maxBar = m_playPos[m_playMode].getBar()
 									+ 2;
 
-				// then decide whether to go over to next tact
-				// or to loop back to first tact
+				// then decide whether to go over to next bar
+				// or to loop back to first bar
 				if( m_playMode == Mode_PlayBB )
 				{
-					maxTact = Engine::getBBTrackContainer()
+					maxBar = Engine::getBBTrackContainer()
 							->lengthOfCurrentBB();
 				}
 				else if( m_playMode == Mode_PlayPattern &&
@@ -311,22 +307,21 @@ void Song::processNextBuffer()
 					tl != NULL &&
 					tl->loopPointsEnabled() == false )
 				{
-					maxTact = m_patternToPlay->length()
-								.getTact();
+					maxBar = m_patternToPlay->length()
+								.getBar();
 				}
 
 				// end of played object reached?
-				if( m_playPos[m_playMode].getTact() + 1
-								>= maxTact )
+				if( m_playPos[m_playMode].getBar() + 1
+								>= maxBar )
 				{
 					// then start from beginning and keep
 					// offset
-					ticks %= ( maxTact * MidiTime::ticksPerTact() );
+					ticks %= ( maxBar * MidiTime::ticksPerBar() );
 
 					// wrap milli second counter
 					setToTimeByTicks(ticks);
 
-					m_vstSyncController.setAbsolutePosition( ticks );
 					m_vstSyncController.setPlaybackJumped( true );
 				}
 			}
@@ -348,7 +343,6 @@ void Song::processNextBuffer()
 					m_playPos[m_playMode].setTicks( ticks );
 					setToTime(tl->loopBegin());
 
-					m_vstSyncController.setAbsolutePosition( ticks );
 					m_vstSyncController.setPlaybackJumped( true );
 
 					emit updateSampleTracks();
@@ -363,7 +357,17 @@ void Song::processNextBuffer()
 			m_playPos[m_playMode].setCurrentFrame( currentFrame );
 		}
 
-		f_cnt_t framesToPlay =
+		if( framesPlayed == 0 )
+		{
+			// update VST sync position after we've corrected frame/
+			// tick count but before actually playing any frames
+			m_vstSyncController.setAbsolutePosition(
+				m_playPos[m_playMode].getTicks()
+				+ m_playPos[m_playMode].currentFrame()
+				/ (double) framesPerTick );
+		}
+
+		f_cnt_t framesToPlay = 
 			Engine::mixer()->framesPerPeriod() - framesPlayed;
 
 		f_cnt_t framesLeft = ( f_cnt_t )framesPerTick -
@@ -403,8 +407,8 @@ void Song::processNextBuffer()
 		m_playPos[m_playMode].setCurrentFrame( framesToPlay +
 								currentFrame );
 		m_elapsedMilliSeconds[m_playMode] += MidiTime::ticksToMilliseconds(framesToPlay / framesPerTick, getTempo());
-		m_elapsedTacts = m_playPos[Mode_PlaySong].getTact();
-		m_elapsedTicks = ( m_playPos[Mode_PlaySong].getTicks() % ticksPerTact() ) / 48;
+		m_elapsedBars = m_playPos[Mode_PlaySong].getBar();
+		m_elapsedTicks = ( m_playPos[Mode_PlaySong].getTicks() % ticksPerBar() ) / 48;
 	}
 }
 
@@ -615,7 +619,7 @@ void Song::updateLength()
 			continue;
 		}
 
-		const tact_t cur = ( *it )->length();
+		const bar_t cur = ( *it )->length();
 		if( cur > m_length )
 		{
 			m_length = cur;
@@ -718,7 +722,10 @@ void Song::stop()
 	m_playPos[m_playMode].setCurrentFrame( 0 );
 
 	m_vstSyncController.setPlaybackState( m_exporting );
-	m_vstSyncController.setAbsolutePosition( m_playPos[m_playMode].getTicks() );
+	m_vstSyncController.setAbsolutePosition(
+		m_playPos[m_playMode].getTicks()
+		+ m_playPos[m_playMode].currentFrame()
+		/ (double) Engine::framesPerTick() );
 
 	// remove all note-play-handles that are active
 	Engine::mixer()->clear();
@@ -798,7 +805,7 @@ void Song::insertBar()
 	for( TrackList::const_iterator it = tracks().begin();
 					it != tracks().end(); ++it )
 	{
-		( *it )->insertTact( m_playPos[Mode_PlaySong] );
+		( *it )->insertBar( m_playPos[Mode_PlaySong] );
 	}
 	m_tracksMutex.unlock();
 }
@@ -812,7 +819,7 @@ void Song::removeBar()
 	for( TrackList::const_iterator it = tracks().begin();
 					it != tracks().end(); ++it )
 	{
-		( *it )->removeTact( m_playPos[Mode_PlaySong] );
+		( *it )->removeBar( m_playPos[Mode_PlaySong] );
 	}
 	m_tracksMutex.unlock();
 }
@@ -1205,6 +1212,7 @@ void Song::loadProject( const QString & fileName )
 bool Song::saveProjectFile( const QString & filename )
 {
 	DataFile dataFile( DataFile::SongProject );
+	m_savingProject = true;
 
 	m_tempoModel.saveSettings( dataFile, dataFile.head(), "bpm" );
 	m_timeSigModel.saveSettings( dataFile, dataFile.head(), "timesig" );
@@ -1225,6 +1233,8 @@ bool Song::saveProjectFile( const QString & filename )
 	}
 
 	saveControllerStates( dataFile, dataFile.content() );
+
+	m_savingProject = false;
 
 	return dataFile.writeFile( filename );
 }
@@ -1258,7 +1268,11 @@ bool Song::guiSaveProjectAs( const QString & _file_name )
 	m_oldFileName = m_fileName;
 	setProjectFileName(_file_name);
 
-	if(!guiSaveProject())
+	bool saveResult = guiSaveProject();
+	// After saving as, restore default save options.
+	m_saveOptions.setDefaultOptions();
+
+	if(!saveResult)
 	{
 		// Saving failed. Restore old filenames.
 		setProjectFileName(m_oldFileName);
@@ -1423,7 +1437,11 @@ QString Song::errorSummary()
 	QString errors = m_errors.join("\n") + '\n';
 
 	errors.prepend( "\n\n" );
-	errors.prepend( tr( "The following errors occured while loading: " ) );
+	errors.prepend( tr( "The following errors occurred while loading: " ) );
 
 	return errors;
+}
+
+bool Song::isSavingProject() const {
+	return m_savingProject;
 }

@@ -53,6 +53,7 @@ class InstrumentTrackWindow;
 class InstrumentMidiIOView;
 class InstrumentMiscView;
 class Knob;
+class FxLineLcdSpinBox;
 class LcdSpinBox;
 class LeftRightNav;
 class midiPortMenu;
@@ -79,8 +80,8 @@ public:
 
 	MidiEvent applyMasterKey( const MidiEvent& event );
 
-	virtual void processInEvent( const MidiEvent& event, const MidiTime& time = MidiTime(), f_cnt_t offset = 0 );
-	virtual void processOutEvent( const MidiEvent& event, const MidiTime& time = MidiTime(), f_cnt_t offset = 0 );
+	void processInEvent( const MidiEvent& event, const MidiTime& time = MidiTime(), f_cnt_t offset = 0 ) override;
+	void processOutEvent( const MidiEvent& event, const MidiTime& time = MidiTime(), f_cnt_t offset = 0 ) override;
 	// silence all running notes played by this track
 	void silenceAllNotes( bool removeIPH = false );
 
@@ -110,7 +111,7 @@ public:
 	void deleteNotePluginData( NotePlayHandle * _n );
 
 	// name-stuff
-	virtual void setName( const QString & _new_name );
+	void setName( const QString & _new_name ) override;
 
 	// translate given key of a note-event to absolute key (i.e.
 	// add global master-pitch and base-note of this instrument track)
@@ -130,18 +131,18 @@ public:
 
 	// play everything in given frame-range - creates note-play-handles
 	virtual bool play( const MidiTime & _start, const fpp_t _frames,
-						const f_cnt_t _frame_base, int _tco_num = -1 );
+						const f_cnt_t _frame_base, int _tco_num = -1 ) override;
 	// create new view for me
-	virtual TrackView * createView( TrackContainerView* tcv );
+	TrackView * createView( TrackContainerView* tcv ) override;
 
 	// create new track-content-object = pattern
-	virtual TrackContentObject * createTCO( const MidiTime & _pos );
+	TrackContentObject * createTCO( const MidiTime & _pos ) override;
 
 
 	// called by track
 	virtual void saveTrackSpecificSettings( QDomDocument & _doc,
-							QDomElement & _parent );
-	virtual void loadTrackSpecificSettings( const QDomElement & _this );
+							QDomElement & _parent ) override;
+	void loadTrackSpecificSettings( const QDomElement & _this ) override;
 
 	using Track::setJournalling;
 
@@ -220,10 +221,11 @@ signals:
 	void midiNoteOff( const Note& );
 	void nameChanged();
 	void newNote();
+	void endNote();
 
 
 protected:
-	virtual QString nodeName() const
+	QString nodeName() const override
 	{
 		return "instrumenttrack";
 	}
@@ -315,12 +317,12 @@ public:
 	static void cleanupWindowCache();
 
 	// Create a menu for assigning/creating channels for this track
-	QMenu * createFxMenu( QString title, QString newFxLabel );
+	QMenu * createFxMenu( QString title, QString newFxLabel ) override;
 
 
 protected:
-	virtual void dragEnterEvent( QDragEnterEvent * _dee );
-	virtual void dropEvent( QDropEvent * _de );
+	void dragEnterEvent( QDragEnterEvent * _dee ) override;
+	void dropEvent( QDropEvent * _de ) override;
 
 
 private slots:
@@ -402,8 +404,8 @@ public:
 
 	static void dragEnterEventGeneric( QDragEnterEvent * _dee );
 
-	virtual void dragEnterEvent( QDragEnterEvent * _dee );
-	virtual void dropEvent( QDropEvent * _de );
+	void dragEnterEvent( QDragEnterEvent * _dee ) override;
+	void dropEvent( QDropEvent * _de ) override;
 
 
 public slots:
@@ -415,11 +417,11 @@ public slots:
 
 protected:
 	// capture close-events for toggling instrument-track-button
-	virtual void closeEvent( QCloseEvent * _ce );
-	virtual void focusInEvent( QFocusEvent * _fe );
+	void closeEvent( QCloseEvent * _ce ) override;
+	void focusInEvent( QFocusEvent * _fe ) override;
 
-	virtual void saveSettings( QDomDocument & _doc, QDomElement & _this );
-	virtual void loadSettings( const QDomElement & _this );
+	void saveSettings( QDomDocument & _doc, QDomElement & _this ) override;
+	void loadSettings( const QDomElement & _this ) override;
 
 
 protected slots:
@@ -428,8 +430,11 @@ protected slots:
 	void viewPrevInstrument();
 
 private:
-	virtual void modelChanged();
+	void modelChanged() override;
 	void viewInstrumentInDirection(int d);
+	//! adjust size of any child widget of the main tab
+	//! required to keep the old look when using a variable sized tab widget
+	void adjustTabSize(QWidget *w);
 
 	InstrumentTrack * m_track;
 	InstrumentTrackView * m_itv;
@@ -443,7 +448,7 @@ private:
 	QLabel * m_pitchLabel;
 	LcdSpinBox* m_pitchRangeSpinBox;
 	QLabel * m_pitchRangeLabel;
-	LcdSpinBox * m_effectChannelNumber;
+	FxLineLcdSpinBox * m_effectChannelNumber;
 
 
 

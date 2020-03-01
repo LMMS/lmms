@@ -180,7 +180,7 @@ MidiTime AutomationPattern::timeMapLength() const
 {
 	if( m_timeMap.isEmpty() ) return 0;
 	timeMap::const_iterator it = m_timeMap.end();
-	return MidiTime( MidiTime( (it-1).key() ).nextFullTact(), 0 );
+	return MidiTime( MidiTime( (it-1).key() ).nextFullBar(), 0 );
 }
 
 
@@ -771,6 +771,26 @@ void AutomationPattern::resolveAllIDs()
 						if( o && dynamic_cast<AutomatableModel *>( o ) )
 						{
 							a->addObject( dynamic_cast<AutomatableModel *>( o ), false );
+						}
+						else
+						{
+							// FIXME: Remove this block once the automation system gets fixed
+							// This is a temporary fix for https://github.com/LMMS/lmms/issues/3781
+							o = Engine::projectJournal()->journallingObject(ProjectJournal::idFromSave(*k));
+							if( o && dynamic_cast<AutomatableModel *>( o ) )
+							{
+								a->addObject( dynamic_cast<AutomatableModel *>( o ), false );
+							}
+							else
+							{
+								// FIXME: Remove this block once the automation system gets fixed
+								// This is a temporary fix for https://github.com/LMMS/lmms/issues/4781
+								o = Engine::projectJournal()->journallingObject(ProjectJournal::idToSave(*k));
+								if( o && dynamic_cast<AutomatableModel *>( o ) )
+								{
+									a->addObject( dynamic_cast<AutomatableModel *>( o ), false );
+								}
+							}
 						}
 					}
 					a->m_idsToResolve.clear();

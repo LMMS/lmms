@@ -1,4 +1,7 @@
 INCLUDE(BuildPlugin)
 INCLUDE_DIRECTORIES(${FFTW3F_INCLUDE_DIRS})
+
 LINK_LIBRARIES(${FFTW3F_LIBRARIES})
-BUILD_PLUGIN(spectrumanalyzer SpectrumAnalyzer.cpp SpectrumAnalyzerControls.cpp SpectrumAnalyzerControlDialog.cpp SpectrumAnalyzer.h SpectrumAnalyzerControls.h SpectrumAnalyzerControlDialog.h MOCFILES SpectrumAnalyzerControlDialog.h SpectrumAnalyzerControls.h EMBEDDED_RESOURCES *.png)
+
+BUILD_PLUGIN(analyzer Analyzer.cpp SaProcessor.cpp SaControls.cpp SaControlsDialog.cpp SaSpectrumView.cpp SaWaterfallView.cpp
+MOCFILES SaProcessor.h SaControls.h SaControlsDialog.h SaSpectrumView.h SaWaterfallView.h DataprocLauncher.h EMBEDDED_RESOURCES *.svg logo.png)

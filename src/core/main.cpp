@@ -65,6 +65,7 @@
 #include "GuiApplication.h"
 #include "ImportFilter.h"
 #include "MainWindow.h"
+#include "MixHelpers.h"
 #include "OutputSettings.h"
 #include "ProjectRenderer.h"
 #include "RenderManager.h"
@@ -164,7 +165,7 @@ void printHelp()
 		"  rendertracks <project> [options...]   Render each track to a different file\n"
 		"  upgrade <in> [out]                    Upgrade file <in> and save as <out>\n"
 		"                                        Standard out is used if no output file\n"
-		"                                        is specifed\n"
+		"                                        is specified\n"
 		"\nGlobal options:\n"
 		"      --allowroot                Bypass root user startup check (use with\n"
 		"          caution).\n"
@@ -343,7 +344,13 @@ int main( int argc, char * * argv )
 		return EXIT_FAILURE;
 	}
 #endif
-
+#ifdef LMMS_BUILD_LINUX
+	// don't let OS steal the menu bar. FIXME: only effective on Qt4
+	QCoreApplication::setAttribute( Qt::AA_DontUseNativeMenuBar );
+#endif
+#if QT_VERSION >= QT_VERSION_CHECK(5, 6, 0)
+	QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
+#endif
 	QCoreApplication * app = coreOnly ?
 			new QCoreApplication( argc, argv ) :
 					new MainApplication( argc, argv );
@@ -688,6 +695,10 @@ int main( int argc, char * * argv )
 
 	ConfigManager::inst()->loadConfigFile(configFile);
 
+	// Hidden settings
+	MixHelpers::setNaNHandler( ConfigManager::inst()->value( "app",
+						"nanhandler", "1" ).toInt() );
+
 	// set language
 	QString pos = ConfigManager::inst()->value( "app", "language" );
 	if( pos.isEmpty() )
@@ -710,7 +721,7 @@ int main( int argc, char * * argv )
 
 
 	// try to set realtime priority
-#ifdef LMMS_BUILD_LINUX
+#if defined(LMMS_BUILD_LINUX) || defined(LMMS_BUILD_FREEBSD)
 #ifdef LMMS_HAVE_SCHED_H
 #ifndef __OpenBSD__
 	struct sched_param sparam;
@@ -883,7 +894,7 @@ int main( int argc, char * * argv )
 			}
 			else // Exit
 			{
-				return 0;
+				return EXIT_SUCCESS;
 			}
 		}
 

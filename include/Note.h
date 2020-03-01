@@ -200,7 +200,7 @@ public:
 		return "note";
 	}
 
-	inline virtual QString nodeName() const
+	inline QString nodeName() const override
 	{
 		return classNodeName();
 	}
@@ -218,8 +218,8 @@ public:
 
 
 protected:
-	virtual void saveSettings( QDomDocument & doc, QDomElement & parent );
-	virtual void loadSettings( const QDomElement & _this );
+	void saveSettings( QDomDocument & doc, QDomElement & parent ) override;
+	void loadSettings( const QDomElement & _this ) override;
 
 
 private:

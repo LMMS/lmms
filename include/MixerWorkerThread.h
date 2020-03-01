@@ -106,7 +106,7 @@ public:
 
 
 private:
-	virtual void run();
+	void run() override;
 
 	static JobQueue globalJobQueue;
 	static QWaitCondition * queueReadyWaitCond;

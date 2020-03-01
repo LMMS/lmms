@@ -64,11 +64,11 @@ public:
 		{
 		}
 
-		virtual void saveSettings()
+		void saveSettings() override
 		{
 		}
 
-		virtual void show()
+		void show() override
 		{
 			parentWidget()->hide();
 			QWidget::show();
@@ -78,17 +78,17 @@ public:
 
 
 private:
-	virtual void startProcessing()
+	void startProcessing() override
 	{
 		start();
 	}
 
-	virtual void stopProcessing()
+	void stopProcessing() override
 	{
 		stopProcessingThread( this );
 	}
 
-	virtual void run()
+	void run() override
 	{
 		MicroTimer timer;
 		while( true )

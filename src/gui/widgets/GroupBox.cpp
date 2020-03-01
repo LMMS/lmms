@@ -90,7 +90,7 @@ void GroupBox::paintEvent( QPaintEvent * pe )
 	p.fillRect( 0, 0, width() - 1, height() - 1, p.background() );
 
 	// outer rect
-	p.setPen( p.background().color().dark( 150 ) );
+	p.setPen( p.background().color().darker( 150 ) );
 	p.drawRect( 0, 0, width() - 1, height() - 1 );
 
 	// draw line below titlebar

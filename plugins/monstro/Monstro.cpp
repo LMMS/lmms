@@ -28,7 +28,6 @@
 #include "Monstro.h"
 #include "Engine.h"
 #include "InstrumentTrack.h"
-#include "templates.h"
 #include "gui_templates.h"
 #include "ToolTip.h"
 #include "Song.h"
@@ -329,7 +328,7 @@ void MonstroSynth::renderOutput( fpp_t _frames, sampleFrame * _buf  )
 	float o1l_f;
 	float o1r_f;
 	float o1l_p = m_osc1l_phase + o1lpo; // we add phase offset here so we don't have to do it every frame
-	float o1r_p = m_osc1r_phase + o1rpo; // then substract it again after loop...
+	float o1r_p = m_osc1r_phase + o1rpo; // then subtract it again after loop...
 	float o1_pw;
 
 	// osc2 vars
@@ -1448,7 +1447,7 @@ void MonstroInstrument::updateSlope2()
 
 MonstroView::MonstroView( Instrument * _instrument,
 					QWidget * _parent ) :
-					InstrumentView( _instrument, _parent )
+					InstrumentViewFixedSize( _instrument, _parent )
 {
 	m_operatorsView = setupOperatorsView( this );
 	setWidgetBackground( m_operatorsView, "artwork_op" );

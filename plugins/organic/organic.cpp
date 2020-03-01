@@ -37,7 +37,6 @@
 #include "NotePlayHandle.h"
 #include "Oscillator.h"
 #include "PixmapButton.h"
-#include "templates.h"
 #include "ToolTip.h"
 
 #include "embed.h"
@@ -307,7 +306,7 @@ void organicInstrument::playNote( NotePlayHandle * _n,
 	// fxKnob is [0;1]
 	float t =  m_fx1Model.value();
 	
-	for (int i=0 ; i < frames ; i++)
+	for (int i=0 ; i < frames + offset ; i++)
 	{
 		_working_buffer[i][0] = waveshape( _working_buffer[i][0], t ) *
 						m_volModel.value() / 100.0f;
@@ -418,7 +417,7 @@ public:
 
 organicInstrumentView::organicInstrumentView( Instrument * _instrument,
 							QWidget * _parent ) :
-	InstrumentView( _instrument, _parent ),
+	InstrumentViewFixedSize( _instrument, _parent ),
 	m_oscKnobs( NULL )
 {
 	organicInstrument * oi = castModel<organicInstrument>();

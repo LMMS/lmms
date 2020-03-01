@@ -61,7 +61,7 @@ signals:
 
 
 protected:
-	virtual void mousePressEvent( QMouseEvent * _me );
+	void mousePressEvent( QMouseEvent * _me ) override;
 
 
 private:

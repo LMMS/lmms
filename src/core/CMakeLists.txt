@@ -1,5 +1,6 @@
 set(LMMS_SRCS
 	${LMMS_SRCS}
+
 	core/AutomatableModel.cpp
 	core/AutomationPattern.cpp
 	core/BandLimitedWave.cpp
@@ -50,6 +51,7 @@ set(LMMS_SRCS
 	core/Piano.cpp
 	core/PlayHandle.cpp
 	core/Plugin.cpp
+	core/PluginIssue.cpp
 	core/PluginFactory.cpp
 	core/PresetPreviewPlayHandle.cpp
 	core/ProjectJournal.cpp

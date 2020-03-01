@@ -754,13 +754,19 @@ public:
 	ProcessWatcher( RemotePlugin * );
 	virtual ~ProcessWatcher() = default;
 
-	void quit()
+	void stop()
 	{
 		m_quit = true;
+		quit();
+	}
+
+	void reset()
+	{
+		m_quit = false;
 	}
 
 private:
-	virtual void run();
+	void run() override;
 
 	RemotePlugin * m_plugin;
 	volatile bool m_quit;
@@ -797,7 +803,7 @@ public:
 		m_failed = waitForMessage( IdInitDone, _busyWaiting ).id != IdInitDone;
 	}
 
-	virtual bool processMessage( const message & _m );
+	bool processMessage( const message & _m ) override;
 
 	bool process( const sampleFrame * _in_buf, sampleFrame * _out_buf );
 
@@ -861,6 +867,9 @@ private:
 
 	QProcess m_process;
 	ProcessWatcher m_watcher;
+
+	QString m_exec;
+	QStringList m_args;
 
 	QMutex m_commMutex;
 	bool m_splitChannels;

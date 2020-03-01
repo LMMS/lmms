@@ -28,7 +28,6 @@
 #include "base64.h"
 #include "Engine.h"
 #include "InstrumentTrack.h"
-#include "templates.h"
 #include "ToolTip.h"
 #include "Song.h"
 #include "lmms_math.h"
@@ -667,7 +666,7 @@ void WatsynInstrument::updateWaveB2()
 
 WatsynView::WatsynView( Instrument * _instrument,
 					QWidget * _parent ) :
-	InstrumentView( _instrument, _parent )
+	InstrumentViewFixedSize( _instrument, _parent )
 {
 	setAutoFillBackground( true );
 	QPalette pal;
