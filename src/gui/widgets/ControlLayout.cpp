@@ -73,6 +73,8 @@
 
 #include "ControlLayout.h"
 
+#include "stdshims.h"
+
 #include <QWidget>
 #include <QLayoutItem>
 #include <QLineEdit>
@@ -208,7 +210,7 @@ QSize ControlLayout::minimumSize() const
 	// get maximum height and width for all children.
 	// as Qt will later call heightForWidth, only the width here really matters
 	QSize size;
-	for (const QLayoutItem *item : qAsConst(m_itemMap))
+	for (const QLayoutItem *item : as_const(m_itemMap))
 	{
 		size = size.expandedTo(item->minimumSize());
 	}
