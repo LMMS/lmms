@@ -86,7 +86,6 @@ Song::Song() :
 	m_renderBetweenMarkers( false ),
 	m_playing( false ),
 	m_paused( false ),
-	m_savingProject( false ),
 	m_loadingProject( false ),
 	m_isCancelled( false ),
 	m_playMode( Mode_None ),
