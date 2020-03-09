@@ -86,7 +86,7 @@ int normalize(const std::vector<float> &abs_spectrum, std::vector<float> &norm_s
  */
 int notEmpty(const std::vector<float> &spectrum)
 {
-	for (const float &s : spectrum)
+	for (float s : spectrum)
 	{
 		if (s != 0) {return 1;}
 	}
