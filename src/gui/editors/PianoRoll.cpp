@@ -152,6 +152,8 @@ PianoRoll::PianoRoll() :
 	m_zoomingModel(),
 	m_quantizeModel(),
 	m_noteLenModel(),
+	m_scaleModel(),
+	m_chordModel(),
 	m_pattern( NULL ),
 	m_currentPosition(),
 	m_recording( false ),
