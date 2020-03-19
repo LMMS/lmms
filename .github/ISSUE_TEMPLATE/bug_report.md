@@ -19,7 +19,13 @@ assignees: ''
 
 #### Screenshot
 
-#### LMMS version used
+#### Affected LMMS versions
+
+<!--
+LMMS's version is visible on the splash screen and under Help > About.
+If your version isn't from lmms.io/download, please note which branch it was built from.
+Finally, if possible, please test if the bug occurs on both stable and master.
+-->
 
 #### Logs
 <details>
