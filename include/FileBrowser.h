@@ -109,7 +109,7 @@ protected:
 
 private:
 	void handleFile( FileItem * fi, InstrumentTrack * it );
-	void openInNewInstrumentTrack( TrackContainer* tc );
+	void openInNewInstrumentTrack( TrackContainer* tc, FileItem* item );
 
 
 	bool m_mousePressed;
@@ -118,14 +118,16 @@ private:
 	PlayHandle* m_previewPlayHandle;
 	QMutex m_pphMutex;
 
-	FileItem * m_contextMenuItem;
+	void populateSampleMenu(QMenu& contextMenu, FileItem* item);
+	void populatePluginMenu(QMenu& contextMenu, FileItem* item);
 
 
 private slots:
 	void activateListItem( QTreeWidgetItem * item, int column );
-	void openInNewInstrumentTrackBBE( void );
-	void openInNewInstrumentTrackSE( void );
-	void sendToActiveInstrumentTrack( void );
+	void openInNewInstrumentTrackBBE( FileItem* item );
+	void openInNewInstrumentTrackSE( FileItem* item );
+	void openInNewSampleTrack( FileItem* item );
+	void sendToActiveInstrumentTrack( FileItem* item );
 	void updateDirectory( QTreeWidgetItem * item );
 	void openContainingFolder();
 

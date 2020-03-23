@@ -322,8 +322,7 @@ FileBrowserTreeWidget::FileBrowserTreeWidget(QWidget * parent ) :
 	m_mousePressed( false ),
 	m_pressPos(),
 	m_previewPlayHandle( NULL ),
-	m_pphMutex( QMutex::Recursive ),
-	m_contextMenuItem( NULL )
+	m_pphMutex( QMutex::Recursive )
 {
 	setColumnCount( 1 );
 	headerItem()->setHidden( true );
@@ -364,42 +363,82 @@ QList<QString> FileBrowserTreeWidget::expandedDirs( QTreeWidgetItem * item ) con
 
 void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent * e )
 {
-	FileItem * f = dynamic_cast<FileItem *>(itemAt(e->pos()));
-	if (f == nullptr)
+	FileItem * file = dynamic_cast<FileItem *>( itemAt( e->pos() ) );
+	if( file != NULL )
 	{
-		return;
+		QMenu contextMenu( this );
+		switch( file-> type() )
+		{
+			case FileItem::SampleFile:
+				populateSampleMenu(contextMenu, file);
+				break;
+			default:
+				if ( file->handling() == FileItem::LoadByPlugin ||
+			 	     file->handling() == FileItem::LoadAsPreset)
+				{
+					populatePluginMenu(contextMenu, file);
+				}
+		}
+		if (!contextMenu.isEmpty()) { contextMenu.exec( e->globalPos() ); }
 	}
+}
 
-	if (f->handling() == FileItem::LoadAsPreset || f->handling() == FileItem::LoadByPlugin)
-	{
-		// Set the member to the current FileItem so that it is available during the
-		// execution of the slots of the context menu we are about to create and execute.
-		m_contextMenuItem = f;
-
-		QMenu contextMenu(this);
-
-		contextMenu.addAction(tr("Send to active instrument-track"),
+void FileBrowserTreeWidget::populateSampleMenu(QMenu& contextMenu, FileItem* file)
+{
+	contextMenu.addAction( tr( "Send to active instrument-track" ),
 					this,
-					SLOT(sendToActiveInstrumentTrack()));
-		contextMenu.addAction(tr("Open in new instrument-track/Song Editor"),
+				SLOT( sendToActiveInstrumentTrack(file) ) );
+
+	QAction *songEditorHeader = new QAction(tr("Song Editor"));
+	songEditorHeader->setDisabled(true);
+	contextMenu.addAction(songEditorHeader);
+	contextMenu.addAction( tr( "Send to new AFP Instance (Right Arrow)"),
 					this,
-					SLOT(openInNewInstrumentTrackSE()));
-		contextMenu.addAction(tr("Open in new instrument-track/B+B Editor"),
+				SLOT( openInNewInstrumentTrackSE(file) ) );
+
+	QAction *bbEditorHeader = new QAction(tr("B+B Editor"));
+	bbEditorHeader->setDisabled(true);
+	contextMenu.addAction(bbEditorHeader);
+	contextMenu.addAction( tr("Send to new AFP Instance (Ctrl + Right Arrow)"),
 					this,
-					SLOT(openInNewInstrumentTrackBBE()));
+				SLOT( openInNewInstrumentTrackBBE(file) ) );
+				
+	contextMenu.addSeparator();
 
-		contextMenu.addSeparator();
+	contextMenu.addAction(QIcon(embed::getIconPixmap("folder")),
+				tr("Open containing folder"),
+				this,
+				SLOT(openContainingFolder()));
 
-		contextMenu.addAction(QIcon(embed::getIconPixmap("folder")),
-					tr("Open containing folder"),
+}
+
+void FileBrowserTreeWidget::populatePluginMenu(QMenu& contextMenu, FileItem* file)
+{
+	contextMenu.addAction( tr( "Send to active instrument-track" ),
 					this,
-					SLOT(openContainingFolder()));
+				SLOT( sendToActiveInstrumentTrack(file) ) );
 
-		contextMenu.exec(e->globalPos());
+	QAction *songEditorHeader = new QAction(tr("Song Editor"));
+	songEditorHeader->setDisabled(true);
+	contextMenu.addAction(songEditorHeader);
+	contextMenu.addAction( tr( "Send to new Instrument Track (Right Arrow)"),
+					this,
+				SLOT( openInNewInstrumentTrackSE(file) ) );
 
-		// The context menu has been executed so we can reset this member back to nullptr.
-		m_contextMenuItem = nullptr;
-	}
+	QAction *bbEditorHeader = new QAction(tr("B+B Editor"));
+	bbEditorHeader->setDisabled(true);
+	contextMenu.addAction(bbEditorHeader);
+	contextMenu.addAction( tr( "Send to new Instrument Track "
+							"(Ctrl + Right Arrow)" ),
+					this,
+				SLOT( openInNewInstrumentTrackBBE(file) ) );
+				
+	contextMenu.addSeparator();
+
+	contextMenu.addAction(QIcon(embed::getIconPixmap("folder")),
+				tr("Open containing folder"),
+				this,
+				SLOT(openContainingFolder()));
 }
 
 
@@ -663,31 +702,31 @@ void FileBrowserTreeWidget::activateListItem(QTreeWidgetItem * item,
 
 
 
-void FileBrowserTreeWidget::openInNewInstrumentTrack( TrackContainer* tc )
+void FileBrowserTreeWidget::openInNewInstrumentTrack( TrackContainer* tc, FileItem* item )
 {
-	if( m_contextMenuItem->handling() == FileItem::LoadAsPreset ||
-		m_contextMenuItem->handling() == FileItem::LoadByPlugin )
+	if( item->handling() == FileItem::LoadAsPreset ||
+		item->handling() == FileItem::LoadByPlugin )
 	{
 		InstrumentTrack * it = dynamic_cast<InstrumentTrack *>(
 				Track::create( Track::InstrumentTrack, tc ) );
-		handleFile( m_contextMenuItem, it );
+		handleFile( item, it );
 	}
 }
 
 
 
 
-void FileBrowserTreeWidget::openInNewInstrumentTrackBBE( void )
+void FileBrowserTreeWidget::openInNewInstrumentTrackBBE( FileItem* item )
 {
-	openInNewInstrumentTrack( Engine::getBBTrackContainer() );
+	openInNewInstrumentTrack( Engine::getBBTrackContainer(), item );
 }
 
 
 
 
-void FileBrowserTreeWidget::openInNewInstrumentTrackSE( void )
+void FileBrowserTreeWidget::openInNewInstrumentTrackSE( FileItem* item )
 {
-	openInNewInstrumentTrack( Engine::getSong() );
+	openInNewInstrumentTrack( Engine::getSong(), item );
 }
 
 
@@ -709,7 +748,15 @@ void FileBrowserTreeWidget::openContainingFolder()
 
 
 
-void FileBrowserTreeWidget::sendToActiveInstrumentTrack( void )
+void FileBrowserTreeWidget::openInNewSampleTrack( FileItem* item )
+{
+
+}
+
+
+
+
+void FileBrowserTreeWidget::sendToActiveInstrumentTrack( FileItem* item )
 {
 	// get all windows opened in the workspace
 	QList<QMdiSubWindow*> pl =
@@ -726,7 +773,7 @@ void FileBrowserTreeWidget::sendToActiveInstrumentTrack( void )
 						w.previous()->widget() );
 		if( itw != NULL && itw->isHidden() == false )
 		{
-			handleFile( m_contextMenuItem, itw->model() );
+			handleFile( item, itw->model() );
 			break;
 		}
 	}
@@ -1111,7 +1158,3 @@ QString FileItem::extension(const QString & file )
 {
 	return QFileInfo( file ).suffix().toLower();
 }
-
-
-
-
