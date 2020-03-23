@@ -390,11 +390,11 @@ void FileBrowserTreeWidget::keyPressEvent(QKeyEvent * ke )
 			}
 		case Qt::Key_Right:
 		{
-			if (!ke->isAutoRepeat()){
+			if (!ke->isAutoRepeat() && file != NULL){
 				if (!ke->modifiers())
-					{ tryAddSEInstrumentTrack(file); }
+					{ openInNewInstrumentTrackSE(file); }
 				else if (ke->modifiers() & Qt::ControlModifier)
-					{ tryAddBBInstrumentTrack(file); }
+					{ openInNewInstrumentTrackBBE(file); }
 			}
 			break;
 		}
@@ -416,8 +416,7 @@ void FileBrowserTreeWidget::keyPressEvent(QKeyEvent * ke )
 void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent * e )
 {
 	FileItem * file = dynamic_cast<FileItem *>( itemAt( e->pos() ) );
-	if( file != NULL && (file->handling() == FileItem::LoadByPlugin ||
-	                    file->handling() == FileItem::LoadAsPreset) )
+	if( file != NULL && file->isTrack() )
 	{
 		QMenu contextMenu( this );
 
@@ -571,9 +570,7 @@ void FileBrowserTreeWidget::previewFileItem(FileItem* file)
 		m_previewPlayHandle = new PresetPreviewPlayHandle(
 			file->fullName(), file->handling() == FileItem::LoadByPlugin );
 	}
-	else if( file->type() != FileItem::VstPluginFile &&
-			( file->handling() == FileItem::LoadAsPreset ||
-			file->handling() == FileItem::LoadByPlugin ) )
+	else if( file->type() != FileItem::VstPluginFile && file->isTrack() )
 	{
 		DataFile dataFile( file->fullName() );
 		if( !dataFile.validate( file->extension() ) )
@@ -769,8 +766,7 @@ void FileBrowserTreeWidget::activateListItem(QTreeWidgetItem * item,
 
 void FileBrowserTreeWidget::openInNewInstrumentTrack( TrackContainer* tc, FileItem* item )
 {
-	if( item->handling() == FileItem::LoadAsPreset ||
-		item->handling() == FileItem::LoadByPlugin )
+	if( item->isTrack() )
 	{
 		InstrumentTrack * it = dynamic_cast<InstrumentTrack *>(
 				Track::create( Track::InstrumentTrack, tc ) );
@@ -810,22 +806,6 @@ void FileBrowserTreeWidget::openContainingFolder()
 		QDesktopServices::openUrl(QUrl::fromLocalFile(fileInfo.dir().path()));
 	}
 }
-
-
-
-void FileBrowserTreeWidget::tryAddSEInstrumentTrack(FileItem* file)
-{
-	if (file != NULL && file->isTrack()){ openInNewInstrumentTrackSE(file); }
-}
-
-
-
-
-void FileBrowserTreeWidget::tryAddBBInstrumentTrack(FileItem* file)
-{
-	if (file != NULL && file->isTrack()){ openInNewInstrumentTrackBBE(file); }
-}
-
 
 
 
