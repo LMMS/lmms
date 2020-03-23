@@ -99,6 +99,10 @@ public:
 	//! that are expanded in the tree.
 	QList<QString> expandedDirs( QTreeWidgetItem * item = nullptr ) const;
 
+	void tryAddSEInstrumentTrack(FileItem* file);
+	void tryAddBBInstrumentTrack(FileItem* file);
+	void previewFileItem(FileItem* file);
+
 
 protected:
 	void contextMenuEvent( QContextMenuEvent * e ) override;
@@ -108,6 +112,8 @@ protected:
 
 
 private:
+	void keyPressEvent( QKeyEvent * ke ) override;
+
 	void handleFile( FileItem * fi, InstrumentTrack * it );
 	void openInNewInstrumentTrack( TrackContainer* tc, FileItem* item );
 
@@ -118,8 +124,8 @@ private:
 	PlayHandle* m_previewPlayHandle;
 	QMutex m_pphMutex;
 
-	void populateSampleMenu(QMenu& contextMenu, FileItem* item);
-	void populatePluginMenu(QMenu& contextMenu, FileItem* item);
+	QList<QAction*> getContextActionsSE(FileItem* item);
+	QList<QAction*> getContextActionsBBE(FileItem* item);
 
 
 private slots:
@@ -234,6 +240,11 @@ public:
 	inline FileHandling handling( void ) const
 	{
 		return( m_handling );
+	}
+
+	inline bool isTrack( void ) const
+	{
+		return m_handling == LoadAsPreset || m_handling == LoadByPlugin;
 	}
 
 	QString extension( void );
