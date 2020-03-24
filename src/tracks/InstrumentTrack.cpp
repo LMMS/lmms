@@ -445,7 +445,7 @@ void InstrumentTrack::silenceAllNotes( bool removeIPH )
 	}
 	m_midiNotesMutex.unlock();
 
-	lock();
+	Engine::mixer()->requestChangeInModel();
 	// invalidate all NotePlayHandles and PresetPreviewHandles linked to this track
 	m_processHandles.clear();
 
@@ -455,7 +455,7 @@ void InstrumentTrack::silenceAllNotes( bool removeIPH )
 		flags |= PlayHandle::TypeInstrumentPlayHandle;
 	}
 	Engine::mixer()->removePlayHandlesOfTypes( this, flags );
-	unlock();
+	Engine::mixer()->doneChangeInModel();
 }
 
 
@@ -544,11 +544,13 @@ void InstrumentTrack::setName( const QString & _new_name )
 
 void InstrumentTrack::updateBaseNote()
 {
+	Engine::mixer()->requestChangeInModel();
 	for( NotePlayHandleList::Iterator it = m_processHandles.begin();
 					it != m_processHandles.end(); ++it )
 	{
 		( *it )->setFrequencyUpdate();
 	}
+	Engine::mixer()->doneChangeInModel();
 }
 
 
