@@ -31,6 +31,7 @@
 #include <QDebug>
 #include <QDir>
 #include <QLibrary>
+#include <QElapsedTimer>
 
 #include "ConfigManager.h"
 #include "Plugin.h"
@@ -86,6 +87,9 @@ const LilvPlugin *Lv2Manager::getPlugin(const QString uri)
 void Lv2Manager::initPlugins()
 {
 	const LilvPlugins* plugins = lilv_world_get_all_plugins(m_world);
+	std::size_t pluginCount = 0, pluginsLoaded = 0;
+	QElapsedTimer timer;
+	timer.start();
 
 	LILV_FOREACH(plugins, itr, plugins)
 	{
@@ -97,7 +101,13 @@ void Lv2Manager::initPlugins()
 
 		m_lv2InfoMap[lilv_node_as_uri(lilv_plugin_get_uri(curPlug))]
 			= std::move(info);
+		pluginsLoaded += issues.empty();
+		++pluginCount;
 	}
+
+	qDebug() << "Lv2 plugin SUMMARY:"
+		<< pluginsLoaded << "of" << pluginCount << " loaded in"
+		<< timer.elapsed() << "msecs.";
 }
 
 
