@@ -18,15 +18,15 @@ if(LMMS_HAVE_WEAKCARLA)
     ${CMAKE_CURRENT_SOURCE_DIR}/carla/source/backend
     ${CMAKE_CURRENT_BINARY_DIR}/autoconf
   )
-  INCLUDE_DIRECTORIES(${CARLA_INCLUDE_DIRS})
-  ADD_LIBRARY(carla_native-plugin MODULE DummyCarla.cpp)
-  INSTALL(TARGETS carla_native-plugin LIBRARY DESTINATION "${PLUGIN_DIR}/optional")
-  SET(CARLA_LIBRARIES $<TARGET_FILE:carla_native-plugin>)
-  SET(CARLA_LIBRARY_DIRS $<TARGET_FILE_DIR:carla_native-plugin>)
+  ADD_LIBRARY(carla_native-plugin SHARED DummyCarla.cpp)
+  TARGET_INCLUDE_DIRECTORIES(carla_native-plugin PUBLIC ${CARLA_INCLUDE_DIRS})
+  INSTALL(TARGETS carla_native-plugin
+    LIBRARY DESTINATION "${PLUGIN_DIR}/optional"
+    RUNTIME DESTINATION "${PLUGIN_DIR}/optional"
+  )
+  SET(CARLA_LIBRARIES carla_native-plugin)
   # Set parent scope variables so carlarack and carlapatchbay can see them
   SET(CARLA_LIBRARIES ${CARLA_LIBRARIES} PARENT_SCOPE)
-  SET(CARLA_INCLUDE_DIRS ${CARLA_INCLUDE_DIRS} PARENT_SCOPE)
-  SET(CARLA_LIBRARY_DIRS ${CARLA_LIBRARY_DIRS} PARENT_SCOPE)
 endif()
 
 if(LMMS_HAVE_CARLA OR LMMS_HAVE_WEAKCARLA)
