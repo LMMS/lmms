@@ -73,6 +73,7 @@
 
 #include "ControlLayout.h"
 
+#include <QtGlobal>
 #include <QWidget>
 #include <QLayoutItem>
 #include <QLineEdit>
