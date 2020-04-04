@@ -236,6 +236,7 @@ public:
 		m_centerValue = centerVal;
 	}
 
+	//! link @p m1 and @p m2, let @p m1 take the values of @p m2
 	static void linkModels( AutomatableModel* m1, AutomatableModel* m2 );
 	static void unlinkModels( AutomatableModel* m1, AutomatableModel* m2 );
 
@@ -359,7 +360,7 @@ private:
 	template<class T> void roundAt( T &value, const T &where ) const;
 
 
-	ScaleType m_scaleType; //! scale type, linear by default
+	ScaleType m_scaleType; //!< scale type, linear by default
 	float m_value;
 	float m_initValue;
 	float m_minValue;

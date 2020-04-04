@@ -100,7 +100,7 @@ private:
 	int m_numDigits;
 	int m_marginWidth;
 
-	void initUi( const QString& name, const QString &style = QString("19green") ); //!< to be called by ctors
+	void initUi( const QString& name, const QString &style ); //!< to be called by ctors
 
 } ;
 

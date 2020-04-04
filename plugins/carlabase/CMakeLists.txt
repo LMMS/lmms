@@ -6,7 +6,30 @@ IF(NOT CMAKE_VERSION VERSION_LESS 3.9)
   CMAKE_POLICY(SET CMP0068 OLD)
 ENDIF()
 
-if(LMMS_HAVE_CARLA)
+# If Carla was not provided by the system, make a dummy library instead
+if(LMMS_HAVE_WEAKCARLA)
+  # Mimic the autoconf header
+  FILE(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/autoconf)
+  FILE(WRITE ${CMAKE_CURRENT_BINARY_DIR}/autoconf/config.h "")
+  SET(CARLA_INCLUDE_DIRS
+    ${CMAKE_CURRENT_SOURCE_DIR}/carla/source
+    ${CMAKE_CURRENT_SOURCE_DIR}/carla/source/includes
+    ${CMAKE_CURRENT_SOURCE_DIR}/carla/source/utils
+    ${CMAKE_CURRENT_SOURCE_DIR}/carla/source/backend
+    ${CMAKE_CURRENT_BINARY_DIR}/autoconf
+  )
+  ADD_LIBRARY(carla_native-plugin SHARED DummyCarla.cpp)
+  TARGET_INCLUDE_DIRECTORIES(carla_native-plugin PUBLIC ${CARLA_INCLUDE_DIRS})
+  INSTALL(TARGETS carla_native-plugin
+    LIBRARY DESTINATION "${PLUGIN_DIR}/optional"
+    RUNTIME DESTINATION "${PLUGIN_DIR}/optional"
+  )
+  SET(CARLA_LIBRARIES carla_native-plugin)
+  # Set parent scope variables so carlarack and carlapatchbay can see them
+  SET(CARLA_LIBRARIES ${CARLA_LIBRARIES} PARENT_SCOPE)
+endif()
+
+if(LMMS_HAVE_CARLA OR LMMS_HAVE_WEAKCARLA)
         INCLUDE(BuildPlugin)
         INCLUDE_DIRECTORIES(${CARLA_INCLUDE_DIRS})
         LINK_DIRECTORIES(${CARLA_LIBRARY_DIRS})
@@ -17,4 +40,7 @@ if(LMMS_HAVE_CARLA)
                 BUILD_WITH_INSTALL_RPATH TRUE
                 INSTALL_RPATH_USE_LINK_PATH TRUE
                 INSTALL_RPATH "${CARLA_RPATH}")
-endif(LMMS_HAVE_CARLA)
+        IF(LMMS_HAVE_WEAKCARLA)
+                ADD_DEPENDENCIES(carlabase carla_native-plugin)
+        ENDIF()
+endif()
