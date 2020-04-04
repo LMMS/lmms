@@ -229,7 +229,8 @@ IF(WANT_CARLA)
 		SET(LMMS_HAVE_CARLA TRUE)
 		SET(STATUS_CARLA "OK")
 	ELSE(CARLA_FOUND)
-		SET(STATUS_CARLA "not found, please install the latest carla")
+		SET(LMMS_HAVE_WEAKCARLA TRUE)
+		SET(STATUS_CARLA "OK (weak linking enabled)")
 	ENDIF(CARLA_FOUND)
 ENDIF(WANT_CARLA)
 
@@ -499,7 +500,7 @@ IF(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
 
 	# Due to a regression in gcc-4.8.X, we need to disable array-bounds check
 	IF (CMAKE_COMPILER_IS_GNUCXX AND ((CMAKE_CXX_COMPILER_VERSION VERSION_EQUAL "4.8.0") OR (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER "4.8.0") OR LMMS_BUILD_WIN32))
-		SET(WERROR_FLAGS "${WERROR_FLAGS} -Wno-array-bounds")
+		SET(WERROR_FLAGS "${WERROR_FLAGS} -Wno-array-bounds -Wno-attributes")
 	ENDIF()
 ELSEIF(MSVC)
 	# Remove any existing /W flags

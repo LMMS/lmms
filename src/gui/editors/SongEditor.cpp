@@ -473,12 +473,13 @@ void SongEditor::toggleProportionalSnap()
 
 void SongEditor::keyPressEvent( QKeyEvent * ke )
 {
-	if( ke->modifiers() & Qt::ShiftModifier &&
+	bool isShiftPressed = ke->modifiers() & Qt::ShiftModifier;
+	if( isShiftPressed &&
 						( ke->key() == Qt::Key_Insert || ke->key() == Qt::Key_Enter || ke->key() == Qt::Key_Return ) )
 	{
 		m_song->insertBar();
 	}
-	else if( ke->modifiers() & Qt::ShiftModifier &&
+	else if( isShiftPressed &&
 						( ke->key() == Qt::Key_Delete || ke->key() == Qt::Key_Backspace ) )
 	{
 		m_song->removeBar();
@@ -517,7 +518,7 @@ void SongEditor::keyPressEvent( QKeyEvent * ke )
 	}
 	else if( ke->key() == Qt::Key_A && ke->modifiers() & Qt::ControlModifier )
 	{
-		selectAllTcos( !(ke->modifiers() & Qt::ShiftModifier) );
+		selectAllTcos( !isShiftPressed );
 	}
 	else if( ke->key() == Qt::Key_Escape )
 	{

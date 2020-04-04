@@ -2382,7 +2382,7 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 						m_pattern->instrumentTrack()->processInEvent( evt );
 					}
 				}
-				else if( n->isPlaying() )
+				else if( n->isPlaying() && !isSelection() )
 				{
 					// mouse not over this note, stop playing it.
 					m_pattern->instrumentTrack()->pianoModel()->handleKeyRelease( n->key() );
