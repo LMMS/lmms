@@ -22,26 +22,27 @@ public:
     static std::vector<T> makeIdentityClampedKnotVector(unsigned int points, const std::vector<T> &parameters);
 
     /*Returns a vector of uniform parameters. Size is equal to the number of input points.*/
-    static std::vector<T> generateUniformParameters(const std::vector<std::pair<T, T>> &points);
+    static std::vector<T> generateUniformParameters(const std::vector<std::vector<T>> &points);
 
     /*Returns a vector of identity parameters, meaning they are the first coordinate mapped to [0,1]. Size is equal to the number of input points.*/
-    static std::vector<T> generateIdentityParameters(const std::vector<std::pair<T, T>> &points);
+    static std::vector<T> generateIdentityParameters(const std::vector<std::vector<T>> &points);
 
     /*Least square fits a D degree B-Spline to the data points using the given amount of control points.*/
-    static BSpline<T, D> fit(const std::vector<std::pair<T, T>> &dataPoints, unsigned int controlPoints);
+    static BSpline<T, D> fit(const std::vector<std::vector<T>> &dataPoints, unsigned int controlPoints);
 };
 
 template <typename T, unsigned int D>
-BSpline<T, D> SplineFitter<T, D>::fit(const std::vector<std::pair<T, T>> &points, unsigned int controlPoints)
+BSpline<T, D> SplineFitter<T, D>::fit(const std::vector<std::vector<T>> &points, unsigned int controlPoints)
 {
     const int m = points.size() - 1;
     const int n = controlPoints - 1;
+    const int pointDimension = points.front().size();
 
     std::vector<T> t = generateIdentityParameters(points);
     std::vector<T> knotVector = makeIdentityClampedKnotVector(n + 1, t);
 
-    Eigen::Matrix<double, Eigen::Dynamic, 2> Q(n + 1, 2);
-    Eigen::Matrix<double, Eigen::Dynamic, 2> P(m + 1, 2);
+    Eigen::MatrixXd Q(n + 1, pointDimension);
+    Eigen::MatrixXd P(m + 1, pointDimension);
     Eigen::MatrixXd A(m + 1, n + 1);
     A.setZero();
     Q.setZero();
@@ -59,9 +60,12 @@ BSpline<T, D> SplineFitter<T, D>::fit(const std::vector<std::pair<T, T>> &points
 
     //Fill P with the data points
     for (int i = 0; i <= m; i++)
-    {
-        P(i, 0) = points[i].first;
-        P(i, 1) = points[i].second;
+    {   
+        for(int j = 0; j<pointDimension; j++)
+        {
+            P(i, j) = points[i][j];
+            P(i, j) = points[i][j];
+        }
     }
 
     //Solve A*Q = P
@@ -69,12 +73,18 @@ BSpline<T, D> SplineFitter<T, D>::fit(const std::vector<std::pair<T, T>> &points
 
     //Construct the B-Spline
     BSpline<T, D> res;
-    std::vector<std::pair<T, T>> resPoints(n + 1);
+    std::vector<std::vector<T>> resPoints(n + 1);
     resPoints.front() = points.front();
     resPoints.back() = points.back();
     for (int i = 1; i < resPoints.size() - 1; i++)
     {
-        resPoints[i] = std::pair<T, T>(Q(i, 0), Q(i, 1));
+        //TODO: use all dimesnions in result
+        std::vector<T> resPoint(pointDimension,0);
+        for(int j = 0; j<pointDimension;j++)
+        {
+            resPoint[j] = Q(i,j);
+        }
+        resPoints[i] = resPoint;
     }
     res.setControlPoints(std::move(resPoints));
     res.setKnotVector(std::move(knotVector));
@@ -139,7 +149,7 @@ std::vector<T> SplineFitter<T, D>::makeUniformClampedKnotVector(unsigned int dat
 }
 
 template <typename T, unsigned int D>
-std::vector<T> SplineFitter<T, D>::generateUniformParameters(const std::vector<std::pair<T, T>> &dataPoints)
+std::vector<T> SplineFitter<T, D>::generateUniformParameters(const std::vector<std::vector<T>> &dataPoints)
 {
     std::vector<T> t(dataPoints.size());
     const T L = (T)1 / (T)(dataPoints.size() - 1);
@@ -151,15 +161,15 @@ std::vector<T> SplineFitter<T, D>::generateUniformParameters(const std::vector<s
 }
 
 template <typename T, unsigned int D>
-std::vector<T> SplineFitter<T, D>::generateIdentityParameters(const std::vector<std::pair<T, T>> &dataPoints)
+std::vector<T> SplineFitter<T, D>::generateIdentityParameters(const std::vector<std::vector<T>> &dataPoints)
 {
     std::vector<T> t;
     t.reserve(dataPoints.size());
-    const T L = dataPoints.back().first - dataPoints.front().first;
-    const T x0 = dataPoints.front().first;
-    for (const std::pair<T, T> &p : dataPoints)
+    const T L = dataPoints.back().front() - dataPoints.front().front();
+    const T x0 = dataPoints.front().front();
+    for (const std::vector<T> &p : dataPoints)
     {
-        t.emplace_back((p.first - x0) / L);
+        t.emplace_back((p.front() - x0) / L);
     }
     return t;
 }

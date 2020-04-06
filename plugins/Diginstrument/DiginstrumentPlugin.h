@@ -16,6 +16,20 @@
 #include <QFileInfo>
 #include "Song.h"
 
+/*tmp*/
+#include "CWT.hpp"
+#include "Extrema.hpp"
+#include "Approximation.hpp"
+#include "Interpolation.hpp"
+#include "SplineFitter.hpp"
+#include "PiecewiseBSpline.hpp"
+#include "SpectrumFitter.hpp"
+#include "SplineSpectrum.hpp"
+#include <string>
+#include <sstream>
+#include <iostream>
+
+
 class DiginstrumentPlugin : public Instrument
 {
   Q_OBJECT
@@ -54,7 +68,7 @@ private:
   friend class DiginstrumentView;
   /*TMP*/
   Diginstrument::Synthesizer synth;
-  Diginstrument::Interpolator<double, SplineSpectrum<double>> inst;
+  Diginstrument::Interpolator<double, SplineSpectrum<double, 4>> inst;
 
   typedef SampleBuffer::handleState handleState;
   SampleBuffer m_sampleBuffer;

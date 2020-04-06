@@ -4,18 +4,23 @@
 #include <math.h>
 #include <algorithm>
 
+#include "Spectrum.hpp"
+
 namespace Diginstrument
 {
 
 struct Oscillator
 {
-  unsigned int position = 0;
+  //tmp
+  //unsigned int position = 0;
+  double position = 0;
 };
 
 class Synthesizer
 {
 public:
-  std::vector<float> playNote(std::vector<std::pair<double, double>>, const unsigned int frames, const unsigned int offset);
+  //std::vector<float> playNote(std::vector<std::pair<double, double>>, const unsigned int frames, const unsigned int offset);
+  std::vector<float> playNote(const Spectrum<double> & startSpectrum, const Spectrum<double> & endSpectrum, const unsigned int frames, const unsigned int offset);
 
   void static setSampleRate(const unsigned int sampleRate);
 

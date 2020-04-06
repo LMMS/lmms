@@ -3,27 +3,28 @@
 #include "Spectrum.hpp"
 #include "PiecewiseBSpline.hpp"
 
-template <typename T>
+template <typename T, unsigned int D>
 class SplineSpectrum : public Diginstrument::Spectrum<T>
 {
-private:
-  PiecewiseBSpline<T, 4> spline;
-  T label;
-
 public:
   SplineSpectrum(T label) : spline(), label(label) {}
-  SplineSpectrum(PiecewiseBSpline<T, 4> &&spline) : spline(std::move(spline)), label(0) {}
-  SplineSpectrum(const PiecewiseBSpline<T, 4> &spline) : spline(spline), label(0) {}
-  SplineSpectrum(PiecewiseBSpline<T, 4> &&spline, T label) : spline(std::move(spline)), label(label) {}
-  SplineSpectrum(const PiecewiseBSpline<T, 4> &spline, T label) : spline(spline), label(label) {}
+  SplineSpectrum(PiecewiseBSpline<T, D> &&spline) : spline(std::move(spline)), label(0) {}
+  SplineSpectrum(const PiecewiseBSpline<T, D> &spline) : spline(spline), label(0) {}
+  SplineSpectrum(PiecewiseBSpline<T, D> &&spline, T label) : spline(std::move(spline)), label(label) {}
+  SplineSpectrum(const PiecewiseBSpline<T, D> &spline, T label) : spline(spline), label(label) {}
 
-  std::vector<std::pair<T, T>> getHarmonics() const
+  std::vector<Diginstrument::Component<T>> getHarmonics() const
   {
     //TMP
-    return spline.getPeaks();
+    std::vector<Diginstrument::Component<T>> res;
+    for (std::vector<T> peak : spline.getPeaks())
+    {
+      res.emplace_back(Diginstrument::Component<T>{peak[0], peak[1], peak[2]});
+    }
+    return res;
   }
 
-  std::vector<std::pair<T, T>> getComponents(const T quality) const
+  std::vector<Diginstrument::Component<T>> getComponents(const T quality) const
   {
     //harmonics+inbetween
     //TODO: how to synthesize the residual signal?
@@ -31,9 +32,14 @@ public:
     return getHarmonics();
   }
 
-  std::pair<T, T> operator[](T x) const
+  Diginstrument::Component<T> operator[](T x) const
   {
-    return spline[x];
+    const auto p = spline[x];
+    if (p.size() < 3)
+    {
+      return Diginstrument::Component<T>(0, 0, 0);
+    }
+    return Diginstrument::Component<T>(spline[x][0], spline[x][1], spline[x][2]);
   }
 
   const T getBegin() const
@@ -45,4 +51,13 @@ public:
   {
     return spline.getEnd();
   }
+
+  PiecewiseBSpline<T, D> &getSpline()
+  {
+    return spline;
+  }
+
+private:
+  PiecewiseBSpline<T, D> spline;
+  T label;
 };

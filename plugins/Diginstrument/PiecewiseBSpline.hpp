@@ -9,7 +9,7 @@
 template <typename T, unsigned int D>
 class PiecewiseBSpline
 {
-private:
+public:
     class Piece
     {
         friend class PiecewiseBSpline;
@@ -29,34 +29,53 @@ private:
             return this->end < x;
         }
 
+        T getBegin() const
+        {
+            return begin;
+        }
+
+        T getEnd() const
+        {
+            return end;
+        }
+
+        const BSpline<T, D> &getSpline() const
+        {
+            return spline;
+        }
+
+        void stretchTo(T begin, T end)
+        {
+            spline.stretchTo(begin, end);
+            this->begin = begin;
+            this->end = end;
+        }
+
         Piece(BSpline<T, D> &&spline) : spline(std::move(spline))
         {
-            begin = this->spline.getControlPoints().front().first;
-            end = this->spline.getControlPoints().back().first;
+            begin = this->spline.getControlPoints().front().front();
+            end = this->spline.getControlPoints().back().front();
         }
 
         Piece(const BSpline<T, D> &spline)
             : spline(spline),
-              begin(spline.getControlPoints().front().first),
-              end(spline.getControlPoints().back().first)
+              begin(spline.getControlPoints().front().front()),
+              end(spline.getControlPoints().back().front())
         {
         }
     };
 
-    std::vector<Piece> pieces;
-
-public:
     /*Add a B-Spline as the next piece. If the piece doesn't align, it will not be added.*/
     bool add(BSpline<T, D> &&spline);
     bool add(const BSpline<T, D> &spline);
 
     /*Return the peaks of the spline.*/
-    std::vector<std::pair<T, T>> getPeaks() const;
+    std::vector<std::vector<T>> getPeaks() const;
 
     /*Evaluate the spline at x*/
-    std::pair<T, T> operator[](T x) const;
+    std::vector<T> operator[](T x) const;
 
-    const std::vector<Piece> &getPieces() const
+    std::vector<Piece> &getPieces()
     {
         return pieces;
     }
@@ -79,6 +98,9 @@ public:
             return -1;
         return pieces.back().end;
     }
+
+private:
+    std::vector<Piece> pieces;
 };
 
 template <typename T, unsigned int D>
@@ -90,10 +112,11 @@ bool PiecewiseBSpline<T, D>::add(BSpline<T, D> &&spline)
         return true;
     }
     //if it does not fit, don't add
-    if (pieces.back().spline.getControlPoints().back().first != spline.getControlPoints().front().first || pieces.back().spline.getControlPoints().back().second != spline.getControlPoints().front().second)
+    //tmp:disabled
+    /*if (pieces.back().spline.getControlPoints().back()[0] != spline.getControlPoints().front()[0] || pieces.back().spline.getControlPoints().back().second != spline.getControlPoints().front().second)
     {
         return false;
-    }
+    }*/
     //else add the piece
     pieces.emplace_back(std::move(spline));
     return true;
@@ -108,18 +131,20 @@ bool PiecewiseBSpline<T, D>::add(const BSpline<T, D> &spline)
         return true;
     }
     //if it does not fit, don't add
-    if (pieces.back().spline.getControlPoints().back().first != spline.getControlPoints().front().first || pieces.back().spline.getControlPoints().back().second != spline.getControlPoints().front().second)
+    //tmp:disabled
+    /*if (pieces.back().spline.getControlPoints().back().first != spline.getControlPoints().front().first || pieces.back().spline.getControlPoints().back().second != spline.getControlPoints().front().second)
     {
         return false;
-    }
+    }*/
     //else add the piece
     pieces.emplace_back(spline);
     return true;
 }
 
 template <typename T, unsigned int D>
-std::pair<T, T> PiecewiseBSpline<T, D>::operator[](T x) const
-{
+std::vector<T> PiecewiseBSpline<T, D>::operator[](T x) const
+{   
+    if(pieces.size() == 0) { return std::vector<T>(); }
     //out of bounds, lower
     if (x < pieces.front().begin)
     {
@@ -137,11 +162,11 @@ std::pair<T, T> PiecewiseBSpline<T, D>::operator[](T x) const
 }
 
 template <typename T, unsigned int D>
-std::vector<std::pair<T, T>> PiecewiseBSpline<T, D>::getPeaks() const
+std::vector<std::vector<T>> PiecewiseBSpline<T, D>::getPeaks() const
 {
     if (pieces.size() == 0)
         return {};
-    std::vector<std::pair<T, T>> res;
+    std::vector<std::vector<T>> res;
     res.reserve(pieces.size());
     for (const auto &piece : pieces)
     {

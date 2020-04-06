@@ -6,6 +6,10 @@
 #include "PointSelector.hpp"
 #include "PiecewiseBSpline.hpp"
 #include "Extrema.hpp"
+#include "Spectrum.hpp"
+
+//tmp
+#include <iostream>
 
 //TODO: maybe: merge pieces for fitting if they are not long enough
 /* Fits a PiecewiseBSpline of degree D to a set of points using the least squares method.*/
@@ -16,11 +20,15 @@ private:
     double indexDistanceBase;
 
     /*Returns a new vector containing the elements of the parameter vector that have the indices given in the parameter 'indices'.*/
-    static std::vector<std::pair<T, T>> subvectorByIndices(const std::vector<std::pair<T, T>> &vector, const std::vector<unsigned int> &indices);
+    static std::vector<std::vector<T>> subvectorByIndices(const std::vector<std::vector<T>> &vector, const std::vector<unsigned int> &indices);
 
 public:
-    /*Fit a PiecewiseBSpline to the given points.*/
-    PiecewiseBSpline<T, D> fit(std::vector<std::pair<T, T>> spectrum);
+    /*Fit a PiecewiseBSpline to the given points. Points should be ordered ascending by frequency*/
+    PiecewiseBSpline<T, D> fit(const std::vector<std::vector<T>> & spectrum, const std::pair<std::vector<unsigned int>, std::vector<unsigned int>> & extrema);
+
+    //TODO
+    std::vector<PiecewiseBSpline<T, D>> fit(const std::vector<std::vector<std::vector<T>>> & spectra,
+                                            const std::vector<std::pair<std::vector<unsigned int>, std::vector<unsigned int>>> & extrema);
 
     /*Constructor.
      The parameter given is the base of the exponential expression used to select a subset of points to fit to between two local maxima.
@@ -28,26 +36,11 @@ public:
     SpectrumFitter(double indexDistanceBase) : indexDistanceBase(indexDistanceBase) {}
 };
 
+/*Fit to one spectrum with pre-calculated extrema*/
 template <typename T, unsigned int D>
-PiecewiseBSpline<T, D> SpectrumFitter<T, D>::fit(std::vector<std::pair<T, T>> spectrum)
-{
+PiecewiseBSpline<T, D> SpectrumFitter<T, D>::fit(const std::vector<std::vector<T>> & spectrum, const std::pair<std::vector<unsigned int>, std::vector<unsigned int>> & extrema)
+{    
     PiecewiseBSpline<T, D> res;
-    //determine the indices of local extrema in the spectrum
-    std::vector<T> values;
-    values.reserve(spectrum.size());
-    for (const std::pair<T, T> &point : spectrum)
-    {
-        values.emplace_back(point.second);
-    }
-    const auto extrema = Extrema::Both(values.begin(), values.end(), 0);
-    //Approximate true maxima
-    for (auto &index : extrema.second)
-    {
-        if (index == 0 || index == spectrum.size() - 1)
-            continue;
-        spectrum[index] = Approximation::Parabolic(spectrum[index - 1].first, spectrum[index - 1].second, spectrum[index].first, spectrum[index].second, spectrum[index + 1].first, spectrum[index + 1].second);
-    }
-
     auto minima = extrema.first.begin();
     auto maxima = extrema.second.begin();
     //if the first extremity is a minimum, do a "half-fit"
@@ -58,7 +51,7 @@ PiecewiseBSpline<T, D> SpectrumFitter<T, D>::fit(std::vector<std::pair<T, T>> sp
         if (indices.size() > D)
         {
             res.add(SplineFitter<T, D>::fit(subvectorByIndices(spectrum, indices), indices.size()));
-        }
+        }/*TMP: abort if bad*/ else {return res;}
         //res.add(SplineFitter<T, D>::fit(subvectorByIndices(spectrum, indices), indices.size()));
         minima++;
     }
@@ -72,7 +65,7 @@ PiecewiseBSpline<T, D> SpectrumFitter<T, D>::fit(std::vector<std::pair<T, T>> sp
         if (indices.size() > D)
         {
             res.add(SplineFitter<T, D>::fit(subvectorByIndices(spectrum, indices), indices.size()));
-        }
+        }/*TMP: abort if bad*/ else {return res;}
         //res.add(SplineFitter<T, D>::fit(subvectorByIndices(spectrum, indices), indices.size()));
         maxima++;
         minima++;
@@ -86,16 +79,28 @@ PiecewiseBSpline<T, D> SpectrumFitter<T, D>::fit(std::vector<std::pair<T, T>> sp
         if (indices.size() > D)
         {
             res.add(SplineFitter<T, D>::fit(subvectorByIndices(spectrum, indices), indices.size()));
-        }
+        }/*TMP: abort if bad*/ else {return res;}
         //res.add(SplineFitter<T, D>::fit(subvectorByIndices(spectrum, indices), indices.size()));
     }
     return res;
 }
 
 template <typename T, unsigned int D>
-std::vector<std::pair<T, T>> SpectrumFitter<T, D>::subvectorByIndices(const std::vector<std::pair<T, T>> &vector, const std::vector<unsigned int> &indices)
+std::vector<PiecewiseBSpline<T, D>> SpectrumFitter<T, D>::fit(const std::vector<std::vector<std::vector<T>>> & spectra, const std::vector<std::pair<std::vector<unsigned int>, std::vector<unsigned int>>> & extrema)
 {
-    std::vector<std::pair<T, T>> res;
+    std::vector<PiecewiseBSpline<T, D>> res;
+    res.reserve(spectra.size());
+    for(int i = 0; i<spectra.size(); i++)
+    {
+        res.push_back(fit(spectra[i], extrema[i]));
+    }
+    return res;
+}
+
+template <typename T, unsigned int D>
+std::vector<std::vector<T>> SpectrumFitter<T, D>::subvectorByIndices(const std::vector<std::vector<T>> &vector, const std::vector<unsigned int> &indices)
+{
+    std::vector<std::vector<T>> res;
     res.reserve(indices.size());
     for (auto &index : indices)
     {

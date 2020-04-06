@@ -3,6 +3,10 @@
 #include "MultidimensionalNeighbourMap.hpp"
 #include "Spectrum.hpp"
 #include "SplineSpectrum.hpp"
+#include "Interpolation.hpp"
+
+#include <deque>
+#include <algorithm>
 
 namespace Diginstrument
 {
@@ -11,13 +15,13 @@ class Interpolator
 {
 public:
   //TODO: references?/rvalues?
-  std::vector<std::pair<T, T>> getSpectrum(const std::vector<T> &coordinates);
+  std::vector<Component<T>> getSpectrum(const std::vector<T> &coordinates);
 
   void addSpectrum(const S &spectrum, std::vector<T> coordinates);
   void addSpectra(const std::vector<S> &spectra, std::vector<std::vector<T>> coordinates);
 
-  S linear(S &left, S &right, const T &target, const T &leftLabel, const T &rightLabel);
-  S linearShift(S &left, S &right, const T &target, const T &leftLabel, const T &rightLabel);
+  static S linear(const S &left,const S &right, const T &target, const T &leftLabel, const T &rightLabel);
+  static S linearShift(const S &left, const S &right, const T &target, const T &leftLabel, const T &rightLabel);
 
   Interpolator() {}
 
@@ -27,21 +31,25 @@ private:
 };
 
 template <typename T>
-class Interpolator<T, SplineSpectrum<T>>
+class Interpolator<T, SplineSpectrum<T, 4>>
 {
 public:
-  SplineSpectrum<T> getSpectrum(const std::vector<T> &coordinates);
+  SplineSpectrum<T, 4> getSpectrum(const std::vector<T> &coordinates);
 
-  void addSpectrum(const SplineSpectrum<T> &spectrum, std::vector<T> coordinates);
-  void addSpectra(const std::vector<SplineSpectrum<T>> &spectra, std::vector<std::vector<T>> coordinates);
+  void addSpectrum(const SplineSpectrum<T, 4> &spectrum, std::vector<T> coordinates);
+  void addSpectra(const std::vector<SplineSpectrum<T, 4>> &spectra, std::vector<std::vector<T>> coordinates);
 
-  SplineSpectrum<T> linear(SplineSpectrum<T> &left, SplineSpectrum<T> &right, const T &target, const T &leftLabel, const T &rightLabel);
-  SplineSpectrum<T> linearShift(SplineSpectrum<T> &left, SplineSpectrum<T> &right, const T &target, const T &leftLabel, const T &rightLabel);
+  static SplineSpectrum<T, 4> linear(SplineSpectrum<T, 4> left, SplineSpectrum<T, 4> right, const T &target, const T &leftLabel, const T &rightLabel, bool shifting = false);
 
   Interpolator() {}
 
 private:
-  MultidimensionalNeighbourMap<T, SplineSpectrum<T>> data;
+  MultidimensionalNeighbourMap<T, SplineSpectrum<T, 4>> data;
+  //tmp
+  constexpr static double maxFrequencyDistance = 0.5;
   T frequencyStep = 0;
+
+  static BSpline<T, 4> matchPieces(BSpline<T, 4> left, const BSpline<T, 4> right, T rightRatio);
+  static PiecewiseBSpline<T, 4> consolidatePieces(PiecewiseBSpline<T, 4> & left, PiecewiseBSpline<T, 4> & right, T rightRatio);
 };
 }; // namespace Diginstrument

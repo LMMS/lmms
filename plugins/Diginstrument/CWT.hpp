@@ -1,3 +1,5 @@
+#pragma once
+
 #include "wavelib.h"
 
 #include <string>
