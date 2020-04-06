@@ -230,6 +230,8 @@ protected:
 		return "instrumenttrack";
 	}
 
+	QString getInstrumentName(const QDomElement & thisElement) const;
+
 
 protected slots:
 	void updateBaseNote();
