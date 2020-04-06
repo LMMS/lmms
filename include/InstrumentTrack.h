@@ -214,6 +214,10 @@ public:
 
 	void setPreviewMode( const bool );
 
+	bool isPreviewMode() const
+	{
+		return m_previewMode;
+	}
 
 signals:
 	void instrumentChanged();
