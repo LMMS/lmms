@@ -192,6 +192,8 @@ protected:
 	// for entering values with dblclick in the vol/pan bars
 	void enterValue( NoteVector* nv );
 
+	void updateYScroll();
+
 protected slots:
 	void play();
 	void record();
@@ -217,6 +219,7 @@ protected slots:
 	void updatePositionStepRecording(const MidiTime & t );
 
 	void zoomingChanged();
+	void zoomingYChanged();
 	void quantizeChanged();
 	void noteLengthChanged();
 	void quantizeNotes();
@@ -330,12 +333,14 @@ private:
 	static TextFloat * s_textFloat;
 
 	ComboBoxModel m_zoomingModel;
+	ComboBoxModel m_zoomingYModel;
 	ComboBoxModel m_quantizeModel;
 	ComboBoxModel m_noteLenModel;
 	ComboBoxModel m_scaleModel;
 	ComboBoxModel m_chordModel;
 
 	static const QVector<double> m_zoomLevels;
+	static const QVector<double> m_zoomYLevels;
 
 	Pattern* m_pattern;
 	NoteVector m_ghostNotes;
@@ -384,6 +389,12 @@ private:
 	int m_notesEditHeight;
 	int m_ppb;  // pixels per bar
 	int m_totalKeysToScroll;
+
+	static int s_keyLineHeight;
+	int m_octaveHeight;
+	int m_whiteKeySmallHeight;
+	int m_whiteKeyBigHeight;
+	int m_blackKeyHeight;
 
 	// remember these values to use them
 	// for the next note that is set
@@ -501,6 +512,7 @@ private:
 	PianoRoll* m_editor;
 
 	ComboBox * m_zoomingComboBox;
+	ComboBox * m_zoomingYComboBox;
 	ComboBox * m_quantizeComboBox;
 	ComboBox * m_noteLenComboBox;
 	ComboBox * m_scaleComboBox;
