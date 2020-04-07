@@ -78,11 +78,28 @@ const int SCROLLBAR_SIZE = 12;
 const int PIANO_X = 0;
 
 const int WHITE_KEY_WIDTH = 64;
-const int WHITE_KEY_SMALL_HEIGHT = 18;
+const int BLACK_KEY_WIDTH = 41;
+/*const int WHITE_KEY_SMALL_HEIGHT = 18;
 const int WHITE_KEY_BIG_HEIGHT = 24;
 const int BLACK_KEY_HEIGHT = 16;
 const int KEY_LINE_HEIGHT = 12;
-const int OCTAVE_HEIGHT = KEY_LINE_HEIGHT * KeysPerOctave;	// = 12 * 12;
+const int OCTAVE_HEIGHT = KEY_LINE_HEIGHT * KeysPerOctave;	// = 12 * 12;*/
+
+// double size
+/*const int WHITE_KEY_SMALL_HEIGHT = 27; //18*2; // key line * 1.5
+const int WHITE_KEY_BIG_HEIGHT = 36; //24*2; // key line * 2
+const int BLACK_KEY_HEIGHT = 24; //16*2; // keyline * 1.3333
+const int KEY_LINE_HEIGHT = 18; //12*2;
+const int OCTAVE_HEIGHT = KEY_LINE_HEIGHT * KeysPerOctave;	// = 12 * 12;*/
+
+const int KEY_LINE_HEIGHT = 24;
+const int DEFAULT_KEY_LINE_WIDTH = 12;
+const int OCTAVE_HEIGHT = KEY_LINE_HEIGHT * KeysPerOctave;
+const int WHITE_KEY_SMALL_HEIGHT = KEY_LINE_HEIGHT * 1.5;
+const int WHITE_KEY_BIG_HEIGHT = KEY_LINE_HEIGHT * 2;
+const int BLACK_KEY_HEIGHT = round(KEY_LINE_HEIGHT * 1.3333);
+
+
 
 const int NOTE_EDIT_RESIZE_BAR = 6;
 const int NOTE_EDIT_MIN_HEIGHT = 50;
@@ -139,7 +156,7 @@ PianoRoll::PianoRollKeyTypes PianoRoll::prKeyOrder[] =
 } ;
 
 
-const int DEFAULT_PR_PPB = KEY_LINE_HEIGHT * DefaultStepsPerBar;
+const int DEFAULT_PR_PPB = DEFAULT_KEY_LINE_WIDTH * DefaultStepsPerBar;
 
 const QVector<double> PianoRoll::m_zoomLevels =
 		{ 0.125f, 0.25f, 0.5f, 1.0f, 2.0f, 4.0f, 8.0f };
@@ -2884,7 +2901,7 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 								PR_BLACK_KEY )
 		{
 			// draw it!
-			p.drawPixmap( PIANO_X, y - WHITE_KEY_SMALL_HEIGHT,
+			p.drawPixmap( PIANO_X, y - WHITE_KEY_SMALL_HEIGHT, WHITE_KEY_WIDTH, WHITE_KEY_SMALL_HEIGHT,
 							*s_whiteKeySmallPm );
 			// update y-pos
 			y -= WHITE_KEY_SMALL_HEIGHT / 2;
@@ -2901,11 +2918,13 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 			// draw a small one while checking if it is pressed or not
 			if( hasValidPattern() && m_pattern->instrumentTrack()->pianoModel()->isKeyPressed( key ) )
 			{
-				p.drawPixmap( PIANO_X, y - WHITE_KEY_SMALL_HEIGHT, *s_whiteKeySmallPressedPm );
+				p.drawPixmap(PIANO_X, y - WHITE_KEY_SMALL_HEIGHT, WHITE_KEY_WIDTH, WHITE_KEY_SMALL_HEIGHT,
+							*s_whiteKeySmallPressedPm);
 			}
 			else
 			{
-				p.drawPixmap( PIANO_X, y - WHITE_KEY_SMALL_HEIGHT, *s_whiteKeySmallPm );
+				p.drawPixmap(PIANO_X, y - WHITE_KEY_SMALL_HEIGHT, WHITE_KEY_WIDTH, WHITE_KEY_SMALL_HEIGHT,
+							*s_whiteKeySmallPm);
 			}
 			// update y-pos
 			y -= WHITE_KEY_SMALL_HEIGHT;
@@ -2916,11 +2935,13 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 			// draw a big one while checking if it is pressed or not
 			if( hasValidPattern() && m_pattern->instrumentTrack()->pianoModel()->isKeyPressed( key ) )
 			{
-				p.drawPixmap( PIANO_X, y - WHITE_KEY_BIG_HEIGHT, *s_whiteKeyBigPressedPm );
+				p.drawPixmap(PIANO_X, y - WHITE_KEY_BIG_HEIGHT, WHITE_KEY_WIDTH, WHITE_KEY_BIG_HEIGHT,
+							*s_whiteKeyBigPressedPm);
 			}
 			else
 			{
-				p.drawPixmap( PIANO_X, y-WHITE_KEY_BIG_HEIGHT, *s_whiteKeyBigPm );
+				p.drawPixmap(PIANO_X, y-WHITE_KEY_BIG_HEIGHT, WHITE_KEY_WIDTH, WHITE_KEY_BIG_HEIGHT,
+							*s_whiteKeyBigPm);
 			}
 			// if a big white key has been the first key,
 			// black keys needs to be lifted up
@@ -3000,7 +3021,7 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 								PR_BLACK_KEY )
 		{
 			// draw the black key!
-			p.drawPixmap( PIANO_X, y - BLACK_KEY_HEIGHT / 2,
+			p.drawPixmap( PIANO_X, y - BLACK_KEY_HEIGHT / 2, BLACK_KEY_WIDTH, BLACK_KEY_HEIGHT,
 								*s_blackKeyPm );
 			// is the one after the start-note a black key??
 			if( prKeyOrder[( key + 1 ) % KeysPerOctave] !=
@@ -3021,14 +3042,14 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 				p.drawPixmap( PIANO_X, y - ( first_white_key_height -
 						WHITE_KEY_SMALL_HEIGHT ) -
 						WHITE_KEY_SMALL_HEIGHT/2 - 1 -
-						BLACK_KEY_HEIGHT, *s_blackKeyPressedPm );
+						BLACK_KEY_HEIGHT, BLACK_KEY_WIDTH, BLACK_KEY_HEIGHT, *s_blackKeyPressedPm );
 			}
 		    else
 			{
 				p.drawPixmap( PIANO_X, y - ( first_white_key_height -
 						WHITE_KEY_SMALL_HEIGHT ) -
 						WHITE_KEY_SMALL_HEIGHT/2 - 1 -
-						BLACK_KEY_HEIGHT, *s_blackKeyPm );
+						BLACK_KEY_HEIGHT, BLACK_KEY_WIDTH, BLACK_KEY_HEIGHT, *s_blackKeyPm );
 			}
 			// update y-pos
 			y -= WHITE_KEY_BIG_HEIGHT;
