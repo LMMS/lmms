@@ -23,8 +23,8 @@
  *
  */
 
- #ifndef POSITION_LINE_H
- #define POSITION_LINE_H
+#ifndef POSITION_LINE_H
+#define POSITION_LINE_H
 
 #include <QWidget>
 
@@ -46,4 +46,4 @@ private:
 	QColor m_lineColor;
 };
 
- #endif
+#endif

@@ -2882,7 +2882,7 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 		int grid_line_y = keyAreaTop() + m_keyLineHeight - 1;
 		static const int yTextCorrections[KeysPerOctave] = {
 		/*   C      D      E   F      G      A      B   */
-			-4, 0, -8, 0, -6, -4, 0, -8, 0, -8, 0, -6
+		    -4, 0, -8, 0, -6, -4, 0, -8, 0, -8, 0, -6
 		};
 		// lambda function for returning height of key
 		auto keyHeight = [&](
