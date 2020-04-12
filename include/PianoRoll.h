@@ -394,7 +394,6 @@ private:
 	int m_moveStartX;
 	int m_moveStartY;
 
-	int m_oldNotesEditHeight;
 	int m_notesEditHeight;
 	int m_ppb;  // pixels per bar
 	int m_totalKeysToScroll;

@@ -170,7 +170,6 @@ PianoRoll::PianoRoll() :
 	m_mouseDownTick( 0 ),
 	m_lastMouseX( 0 ),
 	m_lastMouseY( 0 ),
-	m_oldNotesEditHeight( 100 ),
 	m_notesEditHeight( 100 ),
 	m_ppb( DEFAULT_PR_PPB ),
 	m_keyLineHeight(DEFAULT_KEY_LINE_HEIGHT),
@@ -1552,7 +1551,6 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 	{
 		// resizing the note edit area
 		m_action = ActionResizeNoteEditArea;
-		m_oldNotesEditHeight = m_notesEditHeight;
 		return;
 	}
 
@@ -2148,11 +2146,6 @@ void PianoRoll::mouseReleaseEvent( QMouseEvent * me )
 			{
 				clearSelectedNotes();
 			}
-		}
-
-		if (m_action == ActionResizeNoteEditArea)
-		{
-			m_oldNotesEditHeight = m_notesEditHeight;
 		}
 	}
 
@@ -2837,11 +2830,6 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 	if (hasValidPattern())
 	{
 		int pianoArea, partialKeyVisible, topKey, topNote;
-		// if resizing the note edit area, don't touch m_oldNotesEditHeight
-		if (m_action != ActionResizeNoteEditArea)
-		{
-			m_notesEditHeight = m_oldNotesEditHeight;
-		}
 		pianoArea = keyAreaBottom() - keyAreaTop();
 		m_pianoKeysVisible = pianoArea / m_keyLineHeight;
 		partialKeyVisible = pianoArea % m_keyLineHeight;
@@ -2855,10 +2843,9 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 		}
 		topKey = qBound(0, m_startKey + m_pianoKeysVisible - 1, NumKeys - 1);
 		topNote = topKey % KeysPerOctave;
-		// if resizing the note edit area, don't touch m_oldNotesEditHeight
+		// if resizing the note edit area
 		if (m_action != ActionResizeNoteEditArea && partialKeyVisible != 0)
 		{
-			m_oldNotesEditHeight = m_notesEditHeight;
 			// adding height always means we don't have to add keys
 			m_notesEditHeight += partialKeyVisible;
 		}
