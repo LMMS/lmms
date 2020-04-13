@@ -5,87 +5,58 @@
 
 //tmp
 #include <iostream>
-int samplecounter = 0;
-#include "Interpolation.hpp"
 
 unsigned int Diginstrument::Synthesizer::sampleRate = DEFAULT_SAMPLE_RATE;
 std::vector<float> Diginstrument::Synthesizer::sinetable(0);
 
 std::vector<float> Diginstrument::Synthesizer::playNote(const Spectrum<double> & startSpectrum, const Spectrum<double> & endSpectrum, const unsigned int frames, const unsigned int offset)
 {
+    //TODO: banks
     std::vector<float> res(frames, 0);
     const unsigned int tableSize = sinetable.size();
     auto components = startSpectrum.getComponents(0);
+    auto endComponents = endSpectrum.getComponents(0);
     //sort components by amplitude, to mitigate jumps
-    //TODO: reevaluate this after including phase 
-    //TODO: after removing std::pair, add various comparators
     std::sort(components.begin(), components.end(), Component<double>::sortByAmplitudeDescending);
+    std::sort(endComponents.begin(), endComponents.end(), Component<double>::sortByAmplitudeDescending);
     //this will "reset" the bank: unused oscillators are destroyed or necessary new ones are constructed
     bank.resize(components.size());
     int nextBank = 0;
 
-    //tmp:debug
-    /*if(components.size()>0)
-    {
-        //std::cout<<components.front().frequency<<" "<<components.front().phase<<std::endl;
-        std::cout<<std::fixed<<components.front().phase<<" ";
-    }
-    else{
-        //std::cout<<"0 0"<<std::endl;
-        std::cout<<0<<" ";
-    }*/
-    /*if(offset>68500 && offset<69500)
-    {
-        if(components.size()>0)
-        {
-            std::cout<<std::fixed<<"("<<offset<<","<<components.front().phase<<"),";
-        }
-        else{
-        std::cout<<std::fixed<<"("<<offset<<",0),";
-        }
-    }*/
-    //~debug
-
-    for (auto component : components)
+    for (int k = 0; k<components.size(); k++)
     {
         //tmp
-        if (component.amplitude < 0.001)
+        if (components[k].amplitude < 0.001)
             continue;
 
-        //calculate step size according to frequency
-        const double step = component.frequency * ((double)tableSize / (double)sampleRate);
-        //project phase into sineTable
-        int pos = (int)(((std::remainder(component.phase, 2*M_PI)+M_PI) / (2*M_PI)) * (double)(tableSize));
+        //TODO: starting phase , maybe if bank[i].position = -1?
+        const auto component = components[k];
+        //TODO: end and start components might differ in amount
+        auto endComponent = Component<double>{component.frequency,0,0};
+        if (k<endComponents.size())
+            endComponent = endComponents[k];
 
-        //tmp: time for freq instead of phase
-        float time = (float)offset/44100.0;
-
-        const double endPhase = endSpectrum[component.frequency].phase;
-
-        if (component.amplitude>0.1) std::cout<<component.frequency<<std::endl;
-
-
+         //tmp: start phase WIP
+        if(bank[nextBank].position < 0)
+        {
+            //TODO: TMP: there was a phase of 90? ill use remainder, but this may be wrong
+            bank[nextBank].position = std::round(((std::remainder(component.phase, 2*M_PI) + M_PI) / (M_PI * 2)) * (double)tableSize);
+        }
+       
         for (int i = 0; i < frames; i++)
         {
-            //res[i] += sinetable[bank[nextBank].position] * component.amplitude;
-            //bank[nextBank].position = (int)round((bank[nextBank].position + step)) % tableSize;
-            //res[i] += sinetable[pos] * component.amplitude;
-            //pos = (int)round((pos + step)) % tableSize;
-            const double intPhase = Interpolation::Linear((double)0, component.phase, (double)frames, endPhase, (double)i);
-            //pos = (int)(((std::remainder(intPhase, 2*M_PI)+M_PI) / (2*M_PI)) * (double)(tableSize));
-            //phase + cos : this works
-            //YOU WERE MISSING THE AMPTTTTTT!!!
-            //res[i]+= cos(intPhase+M_PI * component.frequency);
-            //freq + cos
-            res[i]+= component.amplitude * cos(2*M_PI*time*component.frequency);
-            time+= 1.0/44100.0;
-            //std::cout<<"("<<i+offset<<","<<intPhase<<"),";
-            //std::cout<<"("<<i+offset<<","<<res[i]<<"),";
+            //TODO: benchmark and optimize
+            const double intFreq = Interpolation::Linear((double)0, component.frequency, (double)frames, endComponent.frequency, (double)i);
+            const double intAmp = Interpolation::Linear((double)0, component.amplitude, (double)frames, endComponent.amplitude, (double)i);
+            //calculate step size according to frequency
+            const double step = intFreq * ((double)tableSize / (double)sampleRate);
+            res[i] += sinetable[bank[nextBank].position] * intAmp;
+            //tmp:debug
+            //std::cout<<intFreq<< ", amp: "<<intAmp<<" @ "<<nextBank<<std::endl;
+            //TODO: what is the best bank indexing schema?
+            bank[nextBank].position = (int)round((bank[nextBank].position + step)) % tableSize;
         }
-        //bank[nextBank].position = component.phase;
-        //nextBank++;
-        //tmp
-        samplecounter++;
+        nextBank++;
     }
     //TODO: do i actually need this? why does the waveform look the same?
     /*for(auto e : res){

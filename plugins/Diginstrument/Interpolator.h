@@ -4,6 +4,7 @@
 #include "Spectrum.hpp"
 #include "SplineSpectrum.hpp"
 #include "Interpolation.hpp"
+#include "PeakMatcher.h"
 
 #include <deque>
 #include <algorithm>
@@ -46,7 +47,7 @@ public:
 private:
   MultidimensionalNeighbourMap<T, SplineSpectrum<T, 4>> data;
   //tmp
-  constexpr static double maxFrequencyDistance = 0.5;
+  constexpr static double maxFrequencyDistance = 0.2;
   T frequencyStep = 0;
 
   static BSpline<T, 4> matchPieces(BSpline<T, 4> left, const BSpline<T, 4> right, T rightRatio);

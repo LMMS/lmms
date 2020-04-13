@@ -5,15 +5,14 @@
 #include <algorithm>
 
 #include "Spectrum.hpp"
+#include "Interpolation.hpp"
 
 namespace Diginstrument
 {
 
 struct Oscillator
 {
-  //tmp
-  //unsigned int position = 0;
-  double position = 0;
+  int position = -1;
 };
 
 class Synthesizer

@@ -229,52 +229,35 @@ SplineSpectrum<T, 4> Diginstrument::Interpolator<T, SplineSpectrum<T, 4>>::linea
     //const T leftDistance = target-leftLabel;
 
     //1) stretch pieces
-    // if (shifting /*tmp*/ && left.getSpline().getPeaks().size()>0 && right.getSpline().getPeaks().size()>0)
-    // {
-    //     //TMP: match only the strongest peak to the strongest peak
-    //     const auto lPeaks = left.getSpline().getPeaks();
-    //     auto lMaxIt = std::max_element(lPeaks.begin(), lPeaks.end(), [](const std::vector<T> &l, const std::vector<T> &r) { return l[2] < r[2]; });
-    //     std::vector<T> lMax = *lMaxIt;
-    //     int lIndex = std::distance(lPeaks.begin(), lMaxIt);
-    //     std::vector<std::pair<unsigned int, double>> distances;
-    //     distances.reserve(right.getSpline().getPeaks().size());
-    //     int index = 0;
-    //     for (auto &r : right.getSpline().getPeaks())
-    //     {
-    //         distances.push_back(std::make_pair(index, fabs(lMax[2] - r[2])));
-    //         index++;
-    //     }
-    //     std::sort(distances.begin(), distances.end(), [](const std::pair<unsigned int, double> &left, const std::pair<unsigned int, double> &right) { return left.second < right.second; });
-    //     //std::cout<<"closest in amplitude to ("<<lMax[0]<<", "<<lMax[2]<<") : ("<<right.getSpline().getPeaks()[distances.front().first][0]<<", "<<right.getSpline().getPeaks()[distances.front().first][2]<<")"<<std::endl;
-    //     auto &l = left.getSpline().getPieces()[lIndex];
-    //     auto &r = right.getSpline().getPieces()[distances.front().first];
-    //     const T target = (r.getEnd() - l.getEnd()) * rightRatio + l.getEnd();
-    //     //std::cout<<"closest in amplitude to ("<<l.getEnd()<<" - "<<r.getEnd()<<") - "<<target<<std::endl;
-    //     l.stretchTo(l.getBegin(), target);
-    //     r.stretchTo(r.getBegin(), target);
-    //     left.getSpline().getPieces()[lIndex + 1].stretchTo(target, left.getSpline().getPieces()[lIndex + 1].getEnd());
-    //     right.getSpline().getPieces()[distances.front().first + 1].stretchTo(target, right.getSpline().getPieces()[distances.front().first + 1].getEnd());
-    //     //tmp: visualize
-    //     auto leftComponents = left.getComponents(0);
-    //     auto rightComponents = right.getComponents(0);
-    //     std::sort(leftComponents.begin(), leftComponents.end(), Component<double>::sortByAmplitudeDescending);
-    //     std::sort(rightComponents.begin(), rightComponents.end(), Component<double>::sortByAmplitudeDescending);
-    //     if (abs(leftComponents.size() - rightComponents.size()) > 2 && leftComponents.front().frequency > 100 && rightComponents.front().frequency < 130 && rightRatio > 0.3 && rightRatio < 0.34 /*leftComponents.front().frequency<100 && leftComponents.front().frequency>60&& rightComponents.front().frequency<130 && rightComponents.front().frequency>110*/)
-    //     {
-    //         /*for(double i = 20; i<200; i+=0.5)
-    //         {
-    //             std::cout<<std::fixed<<"("<<i<<","<<left[i].amplitude<<"),";
-    //         }
-    //         std::cout<<std::endl<<std::endl<<std::endl<<std::endl;
-    //         for(double i = 20; i<200; i+=0.5)
-    //         {
-    //             std::cout<<std::fixed<<"("<<i<<","<<right[i].amplitude<<"),";
-    //         }
-    //         std::cout<<std::endl<<std::endl<<std::fixed<<leftComponents.front().frequency<<" ("<<leftComponents.size()<<") => "<<rightComponents.front().frequency<<" ("<<rightComponents.size()<<")"<<std::endl;
-    //         std::cout<<std::endl<<std::endl<<std::endl<<std::endl;*/
-    //     }
-    // }
+    if (shifting /*tmp*/ && left.getSpline().getPeaks().size()>0 && right.getSpline().getPeaks().size()>0)
+    {
+        auto leftComponents = left.getComponents(0);
+        auto rightComponents = right.getComponents(0);
+        auto matches = PeakMatcher::matchPeaks(leftComponents, rightComponents);
 
+        //TODO: process matches
+        //TODO: test
+        //tmp: debug
+        std::cout<<"left has: "<<leftComponents.size()<<", right has: "<<rightComponents.size()<<" - matches: "<<matches.size()<<std::endl;
+        //TODO: new or dead peaks get  matched to another - multiple targets for a peak
+        for( auto & match : matches)
+        {
+            //tmp:debug
+            std::cout<<leftComponents[match.left].frequency<< " - "<<rightComponents[match.right].frequency<<" : "<<match.distance<<std::endl;
+            //tmp: limit
+            if(match.distance > 200) continue;
+            auto &l = left.getSpline().getPieces()[match.left];
+            auto &r = right.getSpline().getPieces()[match.right];
+            const T target = (r.getEnd() - l.getEnd()) * rightRatio + l.getEnd();
+            //std::cout<<l.getBegin()<<", "<<l.getEnd()<<" to "<<target<<std::endl;
+            //std::cout<<r.getBegin()<<", "<<r.getEnd()<<" to "<<target<<std::endl;
+            left.getSpline().stretchPieceEndTo(match.left, target);
+            right.getSpline().stretchPieceEndTo(match.right, target);
+            //std::cout<<std::endl;    
+        }
+        std::cout<<std::endl;    
+    }
+    //TODO: splines that cover too short a distance cause problems: zero ratio split, maybe too few points to split?
     //2) consolidate peaks
     auto res = consolidatePieces(left.getSpline(), right.getSpline(), rightRatio);
 
@@ -293,6 +276,14 @@ SplineSpectrum<T, 4> Diginstrument::Interpolator<T, SplineSpectrum<T, 4>>::linea
     {
         std::cout<<std::fixed<<"("<<i<<","<<res[i][2]<<"),";
     }*/
+
+    //tmp:debug:
+    std::cout<<"RES: "<<std::endl;
+    for(auto & c : SplineSpectrum<T, 4>(res).getComponents(0))
+    {
+        std::cout<<std::fixed<<c.frequency<<" : "<<c.amplitude<<std::endl;
+    }
+    std::cout<<std::endl<<std::endl;
 
     return SplineSpectrum<T, 4>(std::move(res));
 }
@@ -319,6 +310,24 @@ PiecewiseBSpline<T, 4> Diginstrument::Interpolator<T, SplineSpectrum<T, 4>>::con
     //while there is a piece left to process in either of the stacks
     while (!leftPieces.empty() && !rightPieces.empty())
     {
+        //TODO: tmp: if one of the pieces is "too short" (results in split of ratio 0)
+        //NOTE: i think i need maxFD, else it would want to split and thats impossible
+        //NOTE: or just move one end directly, maybe even into target?
+        //TODO: merge these instead to next piece
+        if(!rightPieces.empty() && rightPieces.back().getEnd() - rightPieces.back().getBegin() <= maxFrequencyDistance)
+        {
+            std::cout<<"discarding from right: "<<rightPieces.back().getBegin()<<" - "<<rightPieces.back().getEnd()<<std::endl;
+            rightPieces.pop_back();
+            rightEnd = rightPieces.back().getEnd();
+            continue;
+        }
+        if(!leftPieces.empty() && leftPieces.back().getEnd() - leftPieces.back().getBegin() <= maxFrequencyDistance)
+        {
+            std::cout<<"discarding from left: "<<leftPieces.back().getBegin()<<" - "<<leftPieces.back().getEnd()<<std::endl;
+            leftPieces.pop_back();
+            leftEnd = leftPieces.back().getEnd();
+            continue;
+        }
         //if the pieces don't fit, that is the ends are too far away
         if (fabs(leftEnd - rightEnd) > maxFrequencyDistance)
         {
@@ -327,6 +336,7 @@ PiecewiseBSpline<T, 4> Diginstrument::Interpolator<T, SplineSpectrum<T, 4>>::con
             {
                 //split right
                 const T ratio = (leftEnd - rightPieces.back().getBegin()) / (rightPieces.back().getEnd() - rightPieces.back().getBegin());
+                std::cout<<"splitting left @ "<<ratio<<std::endl;
                 auto split = rightPieces.back().getSpline().split(ratio);
                 //match left with split left
                 res.add(matchPieces(leftPieces.back().getSpline(), split.first, rightRatio));
@@ -340,6 +350,7 @@ PiecewiseBSpline<T, 4> Diginstrument::Interpolator<T, SplineSpectrum<T, 4>>::con
             {
                 //split left
                 const T ratio = (rightEnd - leftPieces.back().getBegin()) / (leftPieces.back().getEnd() - leftPieces.back().getBegin());
+                std::cout<<"splitting left @ "<<ratio<<std::endl;
                 auto split = leftPieces.back().getSpline().split(ratio);
                 //match right with split left
                 res.add(matchPieces(split.first, rightPieces.back().getSpline(), rightRatio));
@@ -358,6 +369,7 @@ PiecewiseBSpline<T, 4> Diginstrument::Interpolator<T, SplineSpectrum<T, 4>>::con
             //remove matched pieces
             leftPieces.pop_back();
             rightPieces.pop_back();
+            //adjust begin of next pieces TODO?
         }
         //step
         if (!leftPieces.empty())
@@ -446,6 +458,7 @@ BSpline<T, 4> Diginstrument::Interpolator<T, SplineSpectrum<T, 4>>::matchPieces(
         leftBegin[1] * leftRatio + rightBegin[1] * rightRatio,
         //leftBegin[1],
         leftBegin[2] * leftRatio + rightBegin[2] * rightRatio});
+        //TODO: phase: how to interpolate "starting phase"?
     for (int i = 1; i < left.getControlPoints().size() - 1; i++)
     {
         const std::vector<T> leftCP = left.getControlPoints()[i];

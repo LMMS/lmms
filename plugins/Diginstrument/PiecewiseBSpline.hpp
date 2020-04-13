@@ -4,6 +4,9 @@
 
 #include "BSpline.hpp"
 
+//tmp
+#include <iostream>
+
 /*A piecewise B-Spline, made by linking D-degree splines together.
  The pieces must fit together to ensure C1 continuity.*/
 template <typename T, unsigned int D>
@@ -74,6 +77,9 @@ public:
 
     /*Evaluate the spline at x*/
     std::vector<T> operator[](T x) const;
+
+    /*Move the end of the selected spline while compressing in-between pieces into the space.*/
+    void stretchPieceEndTo(unsigned int pieceIndex, const double target);
 
     std::vector<Piece> &getPieces()
     {
@@ -174,4 +180,111 @@ std::vector<std::vector<T>> PiecewiseBSpline<T, D>::getPeaks() const
     }
     res.resize(res.size() - 1);
     return res;
+}
+
+template <typename T, unsigned int D>
+void PiecewiseBSpline<T, D>::stretchPieceEndTo(unsigned int pieceIndex, const double target)
+{
+    //TODO: not fully tested: totally affected pieces
+    Piece & piece = this->pieces[pieceIndex];
+    //TODO: double precision makes equality useless : introduce own epsilon
+    if (piece.getEnd() == target) return;
+    if (target > piece.getEnd())
+    {
+        //std::cout<<"stretching right "<<this->pieces[pieceIndex].getBegin()<< " - "<<this->pieces[pieceIndex].getEnd()<<" to : "<<target<<std::endl;
+        //stretch right
+        int i = pieceIndex+1;
+        std::vector<std::reference_wrapper<Piece>> affectedPieces;
+        //pieces which are affected totally
+        while(this->pieces[i].getEnd()<target && i<this->pieces.size())
+        {
+            //tmp: debug
+            //std::cout<<"fully affected piece: "<<this->pieces[i].getBegin()<< " - "<<this->pieces[i].getEnd()<<std::endl;
+            affectedPieces.emplace_back(this->pieces[i]);
+            i++;
+        }
+        //last piece, where only begin is affected
+        if (i < this->pieces.size())
+        {
+            //tmp:debug
+            //std::cout<<"last affected piece: "<<this->pieces[i].getBegin()<< " - "<<this->pieces[i].getEnd()<<std::endl;
+            affectedPieces.emplace_back(this->pieces[i]);
+        }
+        //fit affected pieces into [target, last.end)
+        const double newRangeLength = affectedPieces.back().get().getEnd() - target;
+        const double rangeLength = affectedPieces.back().get().getEnd() - piece.getEnd();
+        for(int i = 0; i<affectedPieces.size()-1; i++)
+        {
+            affectedPieces[i].get().stretchTo(
+                ((affectedPieces[i].get().getBegin() - piece.getEnd()) / rangeLength ) * newRangeLength + target,
+                ((affectedPieces[i].get().getEnd() - piece.getEnd()) / rangeLength ) * newRangeLength + target
+            );
+        }
+        //stretch last piece, begin only
+        affectedPieces.back().get().stretchTo(
+            ((affectedPieces.back().get().getBegin() - piece.getEnd()) / rangeLength ) * newRangeLength + target,
+            affectedPieces.back().get().getEnd()
+        );
+        piece.stretchTo(piece.getBegin(), target);
+        //tmp:debug
+        //std::cout<<piece.getBegin()<< " - "<<piece.getEnd()<<std::endl;
+    }
+    if (target < piece.getEnd())
+    {
+        //std::cout<<"stretching left "<<this->pieces[pieceIndex].getBegin()<< " - "<<this->pieces[pieceIndex].getEnd()<<" to : "<<target<<std::endl;
+        //stretch left
+        int i = pieceIndex-1;
+        std::vector<std::reference_wrapper<Piece>> affectedPieces;
+        //pieces which are affected totally
+        while(this->pieces[i].getBegin()>target && i>=0)
+        {
+            //tmp: debug
+            //std::cout<<"fully affected piece: "<<this->pieces[i].getBegin()<< " - "<<this->pieces[i].getEnd()<<std::endl;
+            affectedPieces.emplace_back(this->pieces[i]);
+            i--;
+        }
+        //last piece, where only end is affected
+        if (i>=0 && this->pieces[i].getEnd()>target)
+        {
+            //tmp:debug
+            //std::cout<<"last affected piece: "<<this->pieces[i].getBegin()<< " - "<<this->pieces[i].getEnd()<<std::endl;
+            affectedPieces.emplace_back(this->pieces[i]);
+        }
+        //fit affected pieces into (last.begin, target)
+        if(affectedPieces.size()>0)
+        {
+            const double newRangeLength = target - affectedPieces.back().get().getBegin();
+            const double rangeLength = piece.getEnd() - affectedPieces.back().get().getBegin();
+            for(int i = 0; i<affectedPieces.size()-1; i++)
+            {
+                affectedPieces[i].get().stretchTo(
+                    ((affectedPieces[i].get().getBegin() - affectedPieces.back().get().getBegin()) / rangeLength ) * newRangeLength + affectedPieces.back().get().getBegin(),
+                    ((affectedPieces[i].get().getEnd() - affectedPieces.back().get().getBegin()) / rangeLength ) * newRangeLength + affectedPieces.back().get().getBegin()
+                );
+            }
+            //stretch last piece, end only
+            affectedPieces.back().get().stretchTo(
+                affectedPieces.back().get().getBegin(),
+                ((affectedPieces.back().get().getEnd() - affectedPieces.back().get().getBegin()) / rangeLength ) * newRangeLength + affectedPieces.back().get().getBegin()
+            );
+            //stretch the piece itself
+            piece.stretchTo(
+                ((piece.getBegin() - affectedPieces.back().get().getBegin()) / rangeLength ) * newRangeLength + affectedPieces.back().get().getBegin(),
+                target
+            );
+        }else{
+            //std::cout<<"no affected pieces; self only: "<<piece.getBegin()<< " - "<<piece.getEnd()<<std::endl;
+            //stretch just the end of piece
+            piece.stretchTo(piece.getBegin(), target);
+        }
+        //plus the first right neighbour, where only begin is affected
+        if (pieceIndex+1 < this->pieces.size())
+        {
+            //tmp: debug
+            //std::cout<<"affected piece (right neighbour): "<<this->pieces[pieceIndex+1].getBegin()<< " - "<<this->pieces[pieceIndex+1].getEnd()<<std::endl;
+            this->pieces[pieceIndex+1].stretchTo(target, this->pieces[pieceIndex+1].getEnd());
+        }
+        //tmp:debug
+        //std::cout<<"result of left stretch: "<<piece.getBegin()<< " - "<<piece.getEnd()<<std::endl;
+    }
 }
