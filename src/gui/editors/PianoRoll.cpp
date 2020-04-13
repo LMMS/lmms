@@ -2662,11 +2662,11 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 			break;
 	}
 	// start drawing at the bottom
-	int key_line_y = qMin(keyAreaBottom() - 1, OCTAVE_HEIGHT * 9);
+	int key_line_y = qMin(keyAreaBottom() - 1, KEY_LINE_HEIGHT * NumKeys);
 	// we need to set m_notesEditHeight here because it needs to fill in the
-	// rest of the window if key_line_y is bound to OCTAVE_HEIGHT*9
-	if (key_line_y == OCTAVE_HEIGHT * 9) {
-		m_notesEditHeight = height() - (PR_TOP_MARGIN + OCTAVE_HEIGHT * 9);
+	// rest of the window if key_line_y is bound to KEY_LINE_HEIGHT * NumKeys
+	if (key_line_y == KEY_LINE_HEIGHT * NumKeys) {
+		m_notesEditHeight = height() - (PR_TOP_MARGIN + KEY_LINE_HEIGHT * NumKeys);
 	}
 	// used for aligning black-keys later
 	int first_white_key_height = WHITE_KEY_SMALL_HEIGHT;
@@ -2787,7 +2787,7 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 	key = m_startKey;
 	keys_processed = 0;
 	int white_cnt = 0;
-	key_line_y = qMin(keyAreaBottom() - 1, OCTAVE_HEIGHT * 9);
+	key_line_y = qMin(keyAreaBottom() - 1, KEY_LINE_HEIGHT * NumKeys);
 
 	// and go!
 	for( int y = key_line_y + y_offset;
