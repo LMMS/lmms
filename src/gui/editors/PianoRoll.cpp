@@ -176,7 +176,7 @@ PianoRoll::PianoRoll() :
 	m_keyLineHeight(DEFAULT_KEY_LINE_HEIGHT),
 	m_octaveHeight(m_keyLineHeight * KeysPerOctave),
 	m_whiteKeySmallHeight(round(m_keyLineHeight * 1.5)),
-	m_whiteKeyBigHeight(round(m_keyLineHeight * 2)),
+	m_whiteKeyBigHeight(m_keyLineHeight * 2),
 	m_blackKeyHeight(round(m_keyLineHeight * 1.3333)),
 	m_lenOfNewNotes( MidiTime( 0, DefaultTicksPerBar/4 ) ),
 	m_lastNoteVolume( DefaultVolume ),
@@ -4310,7 +4310,7 @@ void PianoRoll::zoomingYChanged()
 	m_keyLineHeight = m_zoomYLevels[m_zoomingYModel.value()] * DEFAULT_KEY_LINE_HEIGHT;
 	m_octaveHeight = m_keyLineHeight * KeysPerOctave;
 	m_whiteKeySmallHeight = round(m_keyLineHeight * 1.5);
-	m_whiteKeyBigHeight = round(m_keyLineHeight * 2);
+	m_whiteKeyBigHeight = m_keyLineHeight * 2;
 	m_blackKeyHeight = round(m_keyLineHeight * 1.3333);
 
 	updateYScroll();
