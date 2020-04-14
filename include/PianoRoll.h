@@ -180,7 +180,7 @@ protected:
 	void focusOutEvent( QFocusEvent * ) override;
 
 	int getKey( int y ) const;
-	static void drawNoteRect( QPainter & p, int x, int y,
+	void drawNoteRect( QPainter & p, int x, int y,
 					int  width, const Note * n, const QColor & noteCol, const QColor & noteTextColor,
 					const QColor & selCol, const int noteOpc, const bool borderless, bool drawNoteName );
 	void removeSelection();
@@ -390,7 +390,7 @@ private:
 	int m_ppb;  // pixels per bar
 	int m_totalKeysToScroll;
 
-	static int s_keyLineHeight;
+	int m_keyLineHeight;
 	int m_octaveHeight;
 	int m_whiteKeySmallHeight;
 	int m_whiteKeyBigHeight;
