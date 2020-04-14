@@ -24,6 +24,7 @@
  */
 
 
+#include <QDesktopServices>
 #include <QHBoxLayout>
 #include <QKeyEvent>
 #include <QLineEdit>
@@ -380,6 +381,11 @@ void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent * e )
 								"B+B Editor" ),
 						this,
 					SLOT( openInNewInstrumentTrackBBE() ) );
+		contextMenu.addSeparator();
+		contextMenu.addAction( QIcon(embed::getIconPixmap( "folder" )),
+					tr( "Open containing folder" ),
+					this,
+					SLOT( openContainingFolder() ) );
 		contextMenu.exec( e->globalPos() );
 		m_contextMenuItem = NULL;
 	}
@@ -669,6 +675,16 @@ void FileBrowserTreeWidget::openInNewInstrumentTrackSE( void )
 	openInNewInstrumentTrack( Engine::getSong() );
 }
 
+
+
+void FileBrowserTreeWidget::openContainingFolder()
+{
+	if (m_contextMenuItem)
+	{
+		QFileInfo fileInfo(m_contextMenuItem->fullName());
+		QDesktopServices::openUrl(QUrl::fromLocalFile(fileInfo.dir().path()));
+	}
+}
 
 
 
