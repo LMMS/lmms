@@ -34,6 +34,7 @@
 #include "AudioWeakJack.h"
 #endif
 
+#include <atomic>
 #include <QtCore/QVector>
 #include <QtCore/QList>
 #include <QtCore/QMap>
@@ -106,7 +107,7 @@ private:
 	jack_client_t * m_client;
 
 	bool m_active;
-	bool m_stopped;
+	std::atomic<bool> m_stopped;
 
 	MidiJack *m_midiClient;
 	QVector<jack_port_t *> m_outputPorts;
