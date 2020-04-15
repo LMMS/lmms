@@ -56,6 +56,8 @@ AudioJack::AudioJack( bool & _success_ful, Mixer*  _mixer ) :
 	m_framesDoneInCurBuf( 0 ),
 	m_framesToDoInCurBuf( 0 )
 {
+	m_stopped = true;
+
 	_success_ful = initJackClient();
 	if( _success_ful )
 	{
@@ -201,8 +203,6 @@ bool AudioJack::initJackClient()
 
 void AudioJack::startProcessing()
 {
-	m_stopped = false;
-
 	if( m_active || m_client == NULL )
 	{
 		return;
@@ -245,6 +245,7 @@ void AudioJack::startProcessing()
 		}
 	}
 
+	m_stopped = false;
 	free( ports );
 }
 
