@@ -1009,7 +1009,7 @@ void PianoRoll::drawNoteRect( QPainter & p, int x, int y,
 
 			int const distanceToBorder = 2;
 			int const xOffset = borderWidth + distanceToBorder;
-			int const yOffset = ((noteHeight + fontMetrics.capHeight()) * 8 + 8) / 16;
+			int const yOffset = ((noteHeight + fontMetrics.capHeight()) + 1) / 2;
 
 			if (textSize.width() < noteWidth - xOffset)
 			{
