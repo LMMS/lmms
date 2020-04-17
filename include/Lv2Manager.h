@@ -73,8 +73,6 @@
 //! Class to keep track of all LV2 plugins
 class Lv2Manager
 {
-	LilvWorld* m_world;
-
 public:
 	void initPlugins();
 
@@ -117,6 +115,7 @@ public:
 	Iterator end() { return Iterator(m_lv2InfoMap.end()); }
 
 private:
+	LilvWorld* m_world;
 	std::map<std::string, Lv2Info> m_lv2InfoMap;
 	bool isSubclassOf(const LilvPluginClass *clvss, const char *uriStr);
 };
