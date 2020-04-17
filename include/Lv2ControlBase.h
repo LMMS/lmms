@@ -73,9 +73,11 @@ public:
 
 	const LilvPlugin* getPlugin() const { return m_plugin; }
 
+	Lv2Proc *control(std::size_t idx) { return m_procs[idx].get(); }
+	const Lv2Proc *control(std::size_t idx) const { return m_procs[idx].get(); }
+
 	bool hasGui() const { return m_hasGUI; }
 	void setHasGui(bool val) { m_hasGUI = val; }
-	std::vector<std::unique_ptr<Lv2Proc>>& controls() { return m_procs; }
 
 protected:
 	/*

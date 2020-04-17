@@ -191,9 +191,7 @@ Lv2ViewBase::Lv2ViewBase(QWidget* meAsWidget, Lv2ControlBase *ctrlBase)
 		grid->addLayout(btnBox, Rows::ButtonRow, 0, 1, m_colNum);
 	}
 
-	m_procView = new Lv2ViewProc(meAsWidget,
-		ctrlBase->controls()[static_cast<std::size_t>(0)].get(),
-		m_colNum);
+	m_procView = new Lv2ViewProc(meAsWidget, ctrlBase->control(0), m_colNum);
 	grid->addWidget(m_procView, Rows::ProcRow, 0);
 }
 
