@@ -125,14 +125,15 @@ struct PortBase : public Meta
 	virtual ~PortBase();
 };
 
-#define IS_PORT_TYPE \
-void accept(Visitor& v) override { v.visit(*this); } \
-void accept(ConstVisitor& v) const override { v.visit(*this); }
-
-struct ControlPortBase : public PortBase
+template<typename Derived, typename Base>
+struct VisitablePort : public Base
 {
-	IS_PORT_TYPE
+	void accept(Visitor& v) override { v.visit(static_cast<Derived&>(*this)); }
+	void accept(ConstVisitor& v) const override { v.visit(static_cast<const Derived&>(*this)); }
+};
 
+struct ControlPortBase : public VisitablePort<ControlPortBase, PortBase>
+{
 	//! LMMS models
 	//! Always up-to-date, except during runs
 	std::unique_ptr<class AutomatableModel> m_connectedModel;
@@ -143,30 +144,32 @@ struct ControlPortBase : public PortBase
 	std::vector<float> m_scalePointMap;
 };
 
-struct Control : public ControlPortBase
+struct Control : public VisitablePort<Control, ControlPortBase>
 {
-	IS_PORT_TYPE
-
 	//! Data location which Lv2 plugins see
 	//! Model values are being copied here every run
 	//! Between runs, this data is not up-to-date
 	float m_val;
+
+	// overwrite accept() from ControlPortBase
+	void accept(Visitor& v) override { v.visit(*this); }
+	void accept(ConstVisitor& v) const override { v.visit(*this); }
 };
 
-struct Cv : public ControlPortBase
+struct Cv : public VisitablePort<Cv, ControlPortBase>
 {
-	IS_PORT_TYPE
-
 	//! Data location which Lv2 plugins see
 	//! Model values are being copied here every run
 	//! Between runs, this data is not up-to-date
 	std::vector<float> m_buffer;
+
+	// overwrite accept() from ControlPortBase
+	void accept(Visitor& v) override { v.visit(*this); }
+	void accept(ConstVisitor& v) const override { v.visit(*this); }
 };
 
-struct Audio : public PortBase
+struct Audio : public VisitablePort<Audio, PortBase>
 {
-	IS_PORT_TYPE
-
 	Audio(std::size_t bufferSize, bool isSidechain);
 
 	//! Copy buffer passed by LMMS into our ports
@@ -190,11 +193,9 @@ private:
 	friend struct ::ConnectPortVisitor;
 };
 
-struct Unknown : public PortBase
+struct Unknown : public VisitablePort<Unknown, PortBase>
 {
-	IS_PORT_TYPE
 };
-#undef IS_PORT_TYPE
 
 /*
 	port casts
