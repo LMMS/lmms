@@ -111,8 +111,8 @@ public:
 
 	using Lv2InfoMap = std::map<std::string, Lv2Info>;
 	using Iterator = Lv2InfoMap::iterator;
-	Iterator begin() { return Iterator(m_lv2InfoMap.begin()); }
-	Iterator end() { return Iterator(m_lv2InfoMap.end()); }
+	Iterator begin() { return m_lv2InfoMap.begin(); }
+	Iterator end() { return m_lv2InfoMap.end(); }
 
 private:
 	LilvWorld* m_world;
