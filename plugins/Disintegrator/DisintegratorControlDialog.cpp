@@ -33,10 +33,9 @@
 
 
 DisintegratorControlDialog::DisintegratorControlDialog(DisintegratorControls* controls) :
-	EffectControlDialog(controls)
+	EffectControlDialog(controls),
+	m_controls(controls)
 {
-	m_controls = controls;
-
 	setAutoFillBackground(true);
 	QPalette pal;
 	pal.setBrush(backgroundRole(), PLUGIN_NAME::getIconPixmap("artwork"));

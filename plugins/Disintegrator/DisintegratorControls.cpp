@@ -52,7 +52,7 @@ DisintegratorControls::DisintegratorControls(DisintegratorEffect* effect) :
 	m_typeModel.addItem(tr("Sine Wave"));
 	m_typeModel.addItem(tr("Self-Modulation"));
 
-	connect( Engine::mixer(), SIGNAL( sampleRateChanged() ), this, SLOT( sampleRateChanged() ) );
+	connect(Engine::mixer(), SIGNAL(sampleRateChanged()), this, SLOT(sampleRateChanged()));
 }
 
 

@@ -51,9 +51,9 @@ Plugin::Descriptor PLUGIN_EXPORT disintegrator_plugin_descriptor =
 DisintegratorEffect::DisintegratorEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* key) :
 	Effect(&disintegrator_plugin_descriptor, parent, key),
 	m_disintegratorControls(this),
-	m_lp( Engine::mixer()->processingSampleRate() ),
-	m_hp( Engine::mixer()->processingSampleRate() ),
-	m_needsUpdate( true )
+	m_lp(Engine::mixer()->processingSampleRate()),
+	m_hp(Engine::mixer()->processingSampleRate()),
+	m_needsUpdate(true)
 {
 	// Fill buffer with DISINTEGRATOR_BUFFER_SIZE number of samples
 	for (int i = 0; i < 2; ++i)
@@ -68,18 +68,11 @@ DisintegratorEffect::DisintegratorEffect(Model* parent, const Descriptor::SubPlu
 
 
 
-
-DisintegratorEffect::~DisintegratorEffect()
-{
-}
-
-
-
 void DisintegratorEffect::sampleRateChanged()
 {
 	sample_rate_t sampleRate = Engine::mixer()->processingSampleRate();
-	m_lp.setSampleRate( sampleRate );
-	m_hp.setSampleRate( sampleRate );
+	m_lp.setSampleRate(sampleRate);
+	m_hp.setSampleRate(sampleRate);
 	m_needsUpdate = true;
 }
 
@@ -103,14 +96,14 @@ bool DisintegratorEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frame
 	sample_rate_t sampleRate = Engine::mixer()->processingSampleRate();
 
 	// Update filters
-	if( m_needsUpdate || m_disintegratorControls.m_highCutModel.isValueChanged() )
+	if(m_needsUpdate || m_disintegratorControls.m_highCutModel.isValueChanged())
 	{
-		m_lp.setLowpass( m_disintegratorControls.m_highCutModel.value() );
+		m_lp.setLowpass(m_disintegratorControls.m_highCutModel.value());
 		
 	}
-	if( m_needsUpdate || m_disintegratorControls.m_lowCutModel.isValueChanged() )
+	if(m_needsUpdate || m_disintegratorControls.m_lowCutModel.isValueChanged())
 	{
-		m_hp.setHighpass( m_disintegratorControls.m_lowCutModel.value() );
+		m_hp.setHighpass(m_disintegratorControls.m_lowCutModel.value());
 	}
 	m_needsUpdate = false;
 
@@ -119,8 +112,6 @@ bool DisintegratorEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frame
 		const float amount = amountBuf ? amountBuf->value(f) : m_disintegratorControls.m_amountModel.value();
 		const int type = typeBuf ? typeBuf->value(f) : m_disintegratorControls.m_typeModel.value();
 		const float freq = freqBuf ? freqBuf->value(f) : m_disintegratorControls.m_freqModel.value();
-
-		outSum += buf[f][0]*buf[f][0] + buf[f][1]*buf[f][1];
 	
 		sample_t s[2] = {buf[f][0], buf[f][1]};
 
@@ -146,8 +137,8 @@ bool DisintegratorEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frame
 			{
 				newInBufLoc[0] = fast_rand() / (float)FAST_RAND_MAX;
 
-				newInBufLoc[0] = m_hp.update( newInBufLoc[0], 0 );
-				newInBufLoc[0] = m_lp.update( newInBufLoc[0], 0 );
+				newInBufLoc[0] = m_hp.update(newInBufLoc[0], 0);
+				newInBufLoc[0] = m_lp.update(newInBufLoc[0], 0);
 
 				newInBufLoc[0] = realfmod(m_inBufLoc - newInBufLoc[0] * amount, DISINTEGRATOR_BUFFER_SIZE);
 				newInBufLoc[1] = newInBufLoc[0];
@@ -163,10 +154,10 @@ bool DisintegratorEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frame
 				newInBufLoc[0] = fast_rand() / (float)FAST_RAND_MAX;
 				newInBufLoc[1] = fast_rand() / (float)FAST_RAND_MAX;
 
-				newInBufLoc[0] = m_hp.update( newInBufLoc[0], 0 );
-				newInBufLoc[0] = m_lp.update( newInBufLoc[0], 0 );
-				newInBufLoc[1] = m_hp.update( newInBufLoc[1], 1 );
-				newInBufLoc[1] = m_lp.update( newInBufLoc[1], 1 );
+				newInBufLoc[0] = m_hp.update(newInBufLoc[0], 0);
+				newInBufLoc[0] = m_lp.update(newInBufLoc[0], 0);
+				newInBufLoc[1] = m_hp.update(newInBufLoc[1], 1);
+				newInBufLoc[1] = m_lp.update(newInBufLoc[1], 1);
 
 				newInBufLoc[0] = realfmod(m_inBufLoc - newInBufLoc[0] * amount, DISINTEGRATOR_BUFFER_SIZE);
 				newInBufLoc[1] = realfmod(m_inBufLoc - newInBufLoc[1] * amount, DISINTEGRATOR_BUFFER_SIZE);
@@ -197,10 +188,10 @@ bool DisintegratorEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frame
 				newInBufLoc[0] = (qBound(-1.f, s[0], 1.f) + 1) * 0.5f;
 				newInBufLoc[1] = (qBound(-1.f, s[1], 1.f) + 1) * 0.5f;
 
-				newInBufLoc[0] = m_hp.update( newInBufLoc[0], 0 );
-				newInBufLoc[0] = m_lp.update( newInBufLoc[0], 0 );
-				newInBufLoc[1] = m_hp.update( newInBufLoc[1], 1 );
-				newInBufLoc[1] = m_lp.update( newInBufLoc[1], 1 );
+				newInBufLoc[0] = m_hp.update(newInBufLoc[0], 0);
+				newInBufLoc[0] = m_lp.update(newInBufLoc[0], 0);
+				newInBufLoc[1] = m_hp.update(newInBufLoc[1], 1);
+				newInBufLoc[1] = m_lp.update(newInBufLoc[1], 1);
 
 				newInBufLoc[0] = realfmod(m_inBufLoc - newInBufLoc[0] * amount, DISINTEGRATOR_BUFFER_SIZE);
 				newInBufLoc[1] = realfmod(m_inBufLoc - newInBufLoc[1] * amount, DISINTEGRATOR_BUFFER_SIZE);
@@ -234,6 +225,8 @@ bool DisintegratorEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frame
 
 		buf[f][0] = d * buf[f][0] + w * s[0];
 		buf[f][1] = d * buf[f][1] + w * s[1];
+
+		outSum += buf[f][0] + buf[f][1];
 	}
 
 	checkGate(outSum / frames);

@@ -40,10 +40,6 @@ public:
 	DisintegratorControlDialog(DisintegratorControls* controls);
 	DisintegratorControls * m_controls;
 
-	virtual ~DisintegratorControlDialog()
-	{
-	}
-
 private slots:
 	void updateKnobVisibility();
 

@@ -33,17 +33,16 @@
 #include "ValueBuffer.h"
 
 
-const int DISINTEGRATOR_BUFFER_SIZE = 201;
+constexpr int DISINTEGRATOR_BUFFER_SIZE = 201;
 
 
 class DisintegratorEffect : public Effect
 {
 public:
 	DisintegratorEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* key);
-	virtual ~DisintegratorEffect();
-	virtual bool processAudioBuffer(sampleFrame* buf, const fpp_t frames);
+	bool processAudioBuffer(sampleFrame* buf, const fpp_t frames) override;
 
-	virtual EffectControls* controls()
+	EffectControls* controls() override
 	{
 		return &m_disintegratorControls;
 	}

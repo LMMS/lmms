@@ -40,26 +40,22 @@ class DisintegratorControls : public EffectControls
 	Q_OBJECT
 public:
 	DisintegratorControls(DisintegratorEffect* effect);
-	virtual ~DisintegratorControls()
-	{
-	}
 
-	virtual void saveSettings(QDomDocument & _doc, QDomElement & _parent);
-	virtual void loadSettings(const QDomElement & _this);
-	inline virtual QString nodeName() const
+	void saveSettings(QDomDocument & _doc, QDomElement & _parent) override;
+	void loadSettings(const QDomElement & _this) override;
+	inline QString nodeName() const override
 	{
 		return "DisintegratorControls";
 	}
 
-	virtual int controlCount()
+	int controlCount() override
 	{
 		return 5;
 	}
 
-	virtual EffectControlDialog* createView()
+	EffectControlDialog* createView() override
 	{
-		m_effectView = new DisintegratorControlDialog(this);
-		return m_effectView;
+		return new DisintegratorControlDialog(this);
 	}
 
 private slots:
@@ -67,7 +63,6 @@ private slots:
 
 private:
 	DisintegratorEffect* m_effect;
-	DisintegratorControlDialog * m_effectView;
 
 	FloatModel m_lowCutModel;
 	FloatModel m_highCutModel;
