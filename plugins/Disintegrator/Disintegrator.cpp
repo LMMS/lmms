@@ -151,20 +151,18 @@ bool DisintegratorEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frame
 			}
 			case 1:// Stereo Noise
 			{
-				newInBufLoc[0] = fast_rand() / (float)FAST_RAND_MAX;
-				newInBufLoc[1] = fast_rand() / (float)FAST_RAND_MAX;
+				for (int i = 0; i < 2; ++i)
+				{
+					newInBufLoc[i] = fast_rand() / (float)FAST_RAND_MAX;
 
-				newInBufLoc[0] = m_hp.update(newInBufLoc[0], 0);
-				newInBufLoc[0] = m_lp.update(newInBufLoc[0], 0);
-				newInBufLoc[1] = m_hp.update(newInBufLoc[1], 1);
-				newInBufLoc[1] = m_lp.update(newInBufLoc[1], 1);
+					newInBufLoc[i] = m_hp.update(newInBufLoc[i], 0);
+					newInBufLoc[i] = m_lp.update(newInBufLoc[i], 0);
 
-				newInBufLoc[0] = realfmod(m_inBufLoc - newInBufLoc[0] * amount, DISINTEGRATOR_BUFFER_SIZE);
-				newInBufLoc[1] = realfmod(m_inBufLoc - newInBufLoc[1] * amount, DISINTEGRATOR_BUFFER_SIZE);
+					newInBufLoc[i] = realfmod(m_inBufLoc - newInBufLoc[i] * amount, DISINTEGRATOR_BUFFER_SIZE);
 
-				// Distance between samples
-				newInBufLocFrac[0] = fmod(newInBufLoc[0], 1);
-				newInBufLocFrac[1] = fmod(newInBufLoc[1], 1);
+					// Distance between samples
+					newInBufLocFrac[i] = fmod(newInBufLoc[i], 1);
+				}
 
 				break;
 			}
@@ -185,20 +183,18 @@ bool DisintegratorEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frame
 			}
 			case 3:// Self-Modulation
 			{
-				newInBufLoc[0] = (qBound(-1.f, s[0], 1.f) + 1) * 0.5f;
-				newInBufLoc[1] = (qBound(-1.f, s[1], 1.f) + 1) * 0.5f;
+				for (int i = 0; i < 2; ++i)
+				{
+					newInBufLoc[i] = (qBound(-1.f, s[i], 1.f) + 1) * 0.5f;
 
-				newInBufLoc[0] = m_hp.update(newInBufLoc[0], 0);
-				newInBufLoc[0] = m_lp.update(newInBufLoc[0], 0);
-				newInBufLoc[1] = m_hp.update(newInBufLoc[1], 1);
-				newInBufLoc[1] = m_lp.update(newInBufLoc[1], 1);
+					newInBufLoc[i] = m_hp.update(newInBufLoc[i], 0);
+					newInBufLoc[i] = m_lp.update(newInBufLoc[i], 0);
 
-				newInBufLoc[0] = realfmod(m_inBufLoc - newInBufLoc[0] * amount, DISINTEGRATOR_BUFFER_SIZE);
-				newInBufLoc[1] = realfmod(m_inBufLoc - newInBufLoc[1] * amount, DISINTEGRATOR_BUFFER_SIZE);
+					newInBufLoc[i] = realfmod(m_inBufLoc - newInBufLoc[i] * amount, DISINTEGRATOR_BUFFER_SIZE);
 
-				// Distance between samples
-				newInBufLocFrac[0] = fmod(newInBufLoc[0], 1);
-				newInBufLocFrac[1] = fmod(newInBufLoc[1], 1);
+					// Distance between samples
+					newInBufLocFrac[i] = fmod(newInBufLoc[i], 1);
+				}
 
 				break;
 			}
