@@ -14,7 +14,6 @@ INCLUDE_DIRECTORIES(
 	"${CMAKE_BINARY_DIR}/src"
 )
 
-
 # See cmake/modules/PluginList.cmake
 FOREACH(PLUGIN ${PLUGIN_LIST})
 	ADD_SUBDIRECTORY(${PLUGIN})
