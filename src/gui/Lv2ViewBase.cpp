@@ -52,13 +52,13 @@
 Lv2ViewProc::Lv2ViewProc(QWidget* parent, Lv2Proc* ctrlBase, int colNum) :
 	LinkedModelGroupView (parent, ctrlBase, colNum)
 {
-	class SetupWidget : public Lv2Ports::Visitor
+	class SetupWidget : public Lv2Ports::ConstVisitor
 	{
 	public:
 		QWidget* m_par; // input
 		const AutoLilvNode* m_commentUri; // input
 		Control* m_control = nullptr; // output
-		void visit(Lv2Ports::Control& port) override
+		void visit(const Lv2Ports::Control& port) override
 		{
 			if (port.m_flow == Lv2Ports::Flow::Input)
 			{
@@ -96,22 +96,23 @@ Lv2ViewProc::Lv2ViewProc(QWidget* parent, Lv2Proc* ctrlBase, int colNum) :
 	};
 
 	AutoLilvNode commentUri = uri(LILV_NS_RDFS "comment");
-	for (std::unique_ptr<Lv2Ports::PortBase>& port : ctrlBase->getPorts())
-	{
-		SetupWidget setup;
-		setup.m_par = this;
-		setup.m_commentUri = &commentUri;
-		port->accept(setup);
-
-		if (setup.m_control)
+	ctrlBase->foreach_port(
+		[this, &commentUri](const Lv2Ports::PortBase* port)
 		{
-			addControl(setup.m_control,
-				lilv_node_as_string(lilv_port_get_symbol(
-					port->m_plugin, port->m_port)),
-				port->name().toUtf8().data(),
-				false);
-		}
-	}
+			SetupWidget setup;
+			setup.m_par = this;
+			setup.m_commentUri = &commentUri;
+			port->accept(setup);
+
+			if (setup.m_control)
+			{
+				addControl(setup.m_control,
+					lilv_node_as_string(lilv_port_get_symbol(
+						port->m_plugin, port->m_port)),
+					port->name().toUtf8().data(),
+					false);
+			}
+		});
 }
 
 

@@ -82,8 +82,22 @@ public:
 	const StereoPortRef& inPorts() const { return m_inPorts; }
 	StereoPortRef& outPorts() { return m_outPorts; }
 	const StereoPortRef& outPorts() const { return m_outPorts; }
-	std::vector<std::unique_ptr<Lv2Ports::PortBase>>& getPorts() { return m_ports; }
-	const std::vector<std::unique_ptr<Lv2Ports::PortBase>>& getPorts() const { return m_ports; }
+	template<class Functor>
+	void foreach_port(const Functor& ftor)
+	{
+		for (std::unique_ptr<Lv2Ports::PortBase>& port : m_ports)
+		{
+			ftor(port.get());
+		}
+	}
+	template<class Functor>
+	void foreach_port(const Functor& ftor) const
+	{
+		for (const std::unique_ptr<Lv2Ports::PortBase>& port : m_ports)
+		{
+			ftor(port.get());
+		}
+	}
 
 	//! Debug function to print ports to stdout
 	void dumpPorts();
