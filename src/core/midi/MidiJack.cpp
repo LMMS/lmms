@@ -95,6 +95,8 @@ MidiJack::MidiJack() :
 		/* jack midi out not implemented
 		   JackMidiWrite and sendByte needs to be functional
 		   before enabling this
+		   If you enable this, also enable the
+		   corresponding jack_port_unregister line below
 		m_output_port = jack_port_register(
 				jackClient(), "MIDI out", JACK_DEFAULT_MIDI_TYPE,
 				JackPortIsOutput, 0);
@@ -123,9 +125,11 @@ MidiJack::~MidiJack()
 			printf("Failed to unregister jack midi input\n");
 		}
 
+		/* Unused yet, see the corresponding jack_port_register call
 		if( jack_port_unregister( jackClient(), m_output_port) != 0){
 			printf("Failed to unregister jack midi output\n");
 		}
+		*/
 
 		if(m_jackClient)
 		{
