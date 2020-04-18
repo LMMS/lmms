@@ -96,10 +96,7 @@ PhaserEffect::PhaserEffect(Model* parent, const Descriptor::SubPluginFeatures::K
 
 PhaserEffect::~PhaserEffect()
 {
-	if (m_lfo)
-	{
-		delete m_lfo;
-	}
+	delete m_lfo;
 
 	delete m_rms[0];
 	delete m_rms[1];
@@ -179,14 +176,13 @@ bool PhaserEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 	float lInPeak = 0.0;
 	float rInPeak = 0.0;
 
-	if (m_phaserControls.m_inFollowModel.isValueChanged() && !m_phaserControls.m_inFollowModel.value())
+	if (m_phaserControls.m_inFollowModel.isValueChanged() && m_phaserControls.m_inFollowModel.value() == 0)
 	{
 		m_currentPeak[0] = m_currentPeak[1] = PHA_NOISE_FLOOR;
 	}
-	if (m_phaserControls.m_rateModel.isValueChanged())
-	{
-		m_lfo->setFrequency(1.0 / m_phaserControls.m_rateModel.value());
-	}
+	
+	m_lfo->setFrequency(1.0 / m_phaserControls.m_rateModel.value());
+
 
 	for (fpp_t f = 0; f < frames; ++f)
 	{
@@ -210,16 +206,12 @@ bool PhaserEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 		allpass/comb hybrid.
 		*/
 
+		float drySignal[2] = {buf[f][0], buf[f][1]};
 
+		drySignal[0] *= m_inGain;
+		drySignal[1] *= m_inGain;
 
-
-
-		outSum += buf[f][0]*buf[f][0] + buf[f][1]*buf[f][1];
-
-		buf[f][0] *= m_inGain;
-		buf[f][1] *= m_inGain;
-
-		sample_t s[2] = { buf[f][0], buf[f][1] };
+		sample_t s[2] = {drySignal[0], drySignal[1]};
 
 		const float cutoff = cutoffBuf ? cutoffBuf->value(f) : m_phaserControls.m_cutoffModel.value();
 		const float resonance = resonanceBuf ? resonanceBuf->value(f) : m_phaserControls.m_resonanceModel.value();
@@ -376,13 +368,15 @@ bool PhaserEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 		s[1] *= m_outGain;
 
 		// Calculate values for displaying volume in the two volume meters
-		lInPeak = buf[f][0] > lInPeak ? buf[f][0] : lInPeak;
-		rInPeak = buf[f][1] > rInPeak ? buf[f][1] : rInPeak;
+		lInPeak = drySignal[0] > lInPeak ? drySignal[0] : lInPeak;
+		rInPeak = drySignal[1] > rInPeak ? drySignal[1] : rInPeak;
 		lOutPeak = s[0] > lOutPeak ? s[0] : lOutPeak;
 		rOutPeak = s[1] > rOutPeak ? s[1] : rOutPeak;
 
 		buf[f][0] = d * buf[f][0] + w * s[0];
 		buf[f][1] = d * buf[f][1] + w * s[1];
+
+		outSum += buf[f][0] + buf[f][1];
 	}
 
 	checkGate(outSum / frames);
@@ -429,11 +423,8 @@ void PhaserEffect::changeSampleRate()
 		m_filtDelayBuf[b].resize(m_delayBufSize);
 	}
 
-	delete m_rms[0];
-	delete m_rms[1];
-
-	m_rms[0] = new RmsHelper(64 * Engine::mixer()->processingSampleRate() / 44100);
-	m_rms[1] = new RmsHelper(64 * Engine::mixer()->processingSampleRate() / 44100);
+	m_rms[0]->setSize(64 * Engine::mixer()->processingSampleRate() / 44100);
+	m_rms[1]->setSize(64 * Engine::mixer()->processingSampleRate() / 44100);
 }
 
 
