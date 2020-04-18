@@ -346,8 +346,8 @@ int AudioJack::processCallback( jack_nframes_t _nframes, void * _udata )
 	// add to the following sound processing
 	if( m_midiClient && _nframes > 0 )
 	{
-		m_midiClient->JackMidiRead(_nframes);
-		m_midiClient->JackMidiWrite(_nframes);
+		m_midiClient.load()->JackMidiRead(_nframes);
+		m_midiClient.load()->JackMidiWrite(_nframes);
 	}
 
 	for( int c = 0; c < channels(); ++c )

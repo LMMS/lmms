@@ -116,6 +116,9 @@ MidiJack::~MidiJack()
 {
 	if(jackClient())
 	{
+		// remove ourselves first (atomically), so we will not get called again
+		m_jackAudio->removeMidiClient();
+
 		if( jack_port_unregister( jackClient(), m_input_port) != 0){
 			printf("Failed to unregister jack midi input\n");
 		}
