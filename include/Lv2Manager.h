@@ -109,13 +109,14 @@ public:
 	//! Return descriptor with URI @p uri or nullptr if none exists
 	const LilvPlugin *getPlugin(const QString uri);
 
-	using Iterator = std::map<std::string, Lv2Info>::iterator;
+	using Lv2InfoMap = std::map<std::string, Lv2Info>;
+	using Iterator = Lv2InfoMap::iterator;
 	Iterator begin() { return Iterator(m_lv2InfoMap.begin()); }
 	Iterator end() { return Iterator(m_lv2InfoMap.end()); }
 
 private:
 	LilvWorld* m_world;
-	std::map<std::string, Lv2Info> m_lv2InfoMap;
+	Lv2InfoMap m_lv2InfoMap;
 	bool isSubclassOf(const LilvPluginClass *clvss, const char *uriStr);
 };
 
