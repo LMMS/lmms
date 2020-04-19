@@ -141,7 +141,7 @@ void Lv2Proc::copyModelsFromCore()
 		void visit(const IntModel& m) override {
 			m_res = static_cast<float>(m.value()); }
 		void visit(const BoolModel& m) override {
-			m_res = static_cast<bool>(m.value()); }
+			m_res = static_cast<float>(m.value()); }
 		void visit(const ComboBoxModel& m) override {
 			m_res = (*m_scalePointMap)[static_cast<std::size_t>(m.value())]; }
 	};
