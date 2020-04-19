@@ -55,25 +55,24 @@ DisintegratorEffect::DisintegratorEffect(Model* parent, const Descriptor::SubPlu
 	m_hp(Engine::mixer()->processingSampleRate()),
 	m_needsUpdate(true)
 {
-	// Fill buffer with DISINTEGRATOR_BUFFER_SIZE number of samples
-	for (int i = 0; i < 2; ++i)
-	{
-		m_inBuf[i].reserve(DISINTEGRATOR_BUFFER_SIZE);
-		for (int j = 0; j < DISINTEGRATOR_BUFFER_SIZE; ++j)
-		{
-			m_inBuf[i].push_back(0);
-		}
-	}
+	emit sampleRateChanged();
 }
 
 
 
 void DisintegratorEffect::sampleRateChanged()
 {
-	sample_rate_t sampleRate = Engine::mixer()->processingSampleRate();
-	m_lp.setSampleRate(sampleRate);
-	m_hp.setSampleRate(sampleRate);
+	m_sampleRate = Engine::mixer()->processingSampleRate();
+	m_sampleRateMult = m_sampleRate / 44100.f;
+	m_lp.setSampleRate(m_sampleRate);
+	m_hp.setSampleRate(m_sampleRate);
 	m_needsUpdate = true;
+
+	m_bufferSize = (m_sampleRate / 44100.f) * 200.f + 1.f;
+	for (int i = 0; i < 2; ++i)
+	{
+		m_inBuf[i].resize(m_bufferSize);
+	}
 }
 
 
@@ -92,8 +91,6 @@ bool DisintegratorEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frame
 	const ValueBuffer * amountBuf = m_disintegratorControls.m_amountModel.valueBuffer();
 	const ValueBuffer * typeBuf = m_disintegratorControls.m_typeModel.valueBuffer();
 	const ValueBuffer * freqBuf = m_disintegratorControls.m_lowCutModel.valueBuffer();
-
-	sample_rate_t sampleRate = Engine::mixer()->processingSampleRate();
 
 	// Update filters
 	if(m_needsUpdate || m_disintegratorControls.m_highCutModel.isValueChanged())
@@ -117,7 +114,7 @@ bool DisintegratorEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frame
 
 		// Increment buffer read point
 		++m_inBufLoc;
-		if (m_inBufLoc >= DISINTEGRATOR_BUFFER_SIZE)
+		if (m_inBufLoc >= m_bufferSize)
 		{
 			m_inBufLoc = 0;
 		}
@@ -140,7 +137,7 @@ bool DisintegratorEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frame
 				newInBufLoc[0] = m_hp.update(newInBufLoc[0], 0);
 				newInBufLoc[0] = m_lp.update(newInBufLoc[0], 0);
 
-				newInBufLoc[0] = realfmod(m_inBufLoc - newInBufLoc[0] * amount, DISINTEGRATOR_BUFFER_SIZE);
+				newInBufLoc[0] = realfmod(m_inBufLoc - newInBufLoc[0] * amount * m_sampleRateMult, m_bufferSize);
 				newInBufLoc[1] = newInBufLoc[0];
 
 				// Distance between samples
@@ -158,7 +155,7 @@ bool DisintegratorEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frame
 					newInBufLoc[i] = m_hp.update(newInBufLoc[i], 0);
 					newInBufLoc[i] = m_lp.update(newInBufLoc[i], 0);
 
-					newInBufLoc[i] = realfmod(m_inBufLoc - newInBufLoc[i] * amount, DISINTEGRATOR_BUFFER_SIZE);
+					newInBufLoc[i] = realfmod(m_inBufLoc - newInBufLoc[i] * amount * m_sampleRateMult, m_bufferSize);
 
 					// Distance between samples
 					newInBufLocFrac[i] = fmod(newInBufLoc[i], 1);
@@ -168,11 +165,11 @@ bool DisintegratorEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frame
 			}
 			case 2:// Sine Wave
 			{
-				m_sineLoc = fmod(m_sineLoc + (freq / (float)sampleRate * F_2PI), F_2PI);
+				m_sineLoc = fmod(m_sineLoc + (freq / m_sampleRate * F_2PI), F_2PI);
 
 				newInBufLoc[0] = (sin(m_sineLoc) + 1) * 0.5f;
 
-				newInBufLoc[0] = realfmod(m_inBufLoc - newInBufLoc[0] * amount, DISINTEGRATOR_BUFFER_SIZE);
+				newInBufLoc[0] = realfmod(m_inBufLoc - newInBufLoc[0] * amount * m_sampleRateMult, m_bufferSize);
 				newInBufLoc[1] = newInBufLoc[0];
 
 				// Distance between samples
@@ -190,7 +187,7 @@ bool DisintegratorEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frame
 					newInBufLoc[i] = m_hp.update(newInBufLoc[i], 0);
 					newInBufLoc[i] = m_lp.update(newInBufLoc[i], 0);
 
-					newInBufLoc[i] = realfmod(m_inBufLoc - newInBufLoc[i] * amount, DISINTEGRATOR_BUFFER_SIZE);
+					newInBufLoc[i] = realfmod(m_inBufLoc - newInBufLoc[i] * amount * m_sampleRateMult, m_bufferSize);
 
 					// Distance between samples
 					newInBufLocFrac[i] = fmod(newInBufLoc[i], 1);
@@ -208,13 +205,13 @@ bool DisintegratorEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frame
 			}
 			else
 			{
-				if (newInBufLoc[i] < DISINTEGRATOR_BUFFER_SIZE - 1)
+				if (newInBufLoc[i] < m_bufferSize - 1)
 				{
 					s[i] = m_inBuf[i][floor(newInBufLoc[i])] * (1 - newInBufLocFrac[i]) + m_inBuf[i][ceil(newInBufLoc[i])] * newInBufLocFrac[i];
 				}
 				else// For when the interpolation wraps around to the beginning of the buffer
 				{
-					s[i] = m_inBuf[i][DISINTEGRATOR_BUFFER_SIZE - 1] * (1 - newInBufLocFrac[i]) + m_inBuf[i][0] * newInBufLocFrac[i];
+					s[i] = m_inBuf[i][m_bufferSize - 1] * (1 - newInBufLocFrac[i]) + m_inBuf[i][0] * newInBufLocFrac[i];
 				}
 			}
 		}

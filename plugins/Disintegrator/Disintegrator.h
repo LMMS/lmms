@@ -33,9 +33,6 @@
 #include "ValueBuffer.h"
 
 
-constexpr int DISINTEGRATOR_BUFFER_SIZE = 201;
-
-
 class DisintegratorEffect : public Effect
 {
 public:
@@ -64,6 +61,10 @@ private:
 	StereoLinkwitzRiley m_lp;
 	StereoLinkwitzRiley m_hp;
 	bool m_needsUpdate;
+
+	float m_sampleRate;
+	float m_sampleRateMult;
+	int m_bufferSize = 201;
 
 	friend class DisintegratorControls;
 
