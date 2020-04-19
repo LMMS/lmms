@@ -104,11 +104,7 @@ std::vector<PluginIssue> Meta::get(const LilvPlugin *plugin,
 	auto isA = [&portFunc](const char* str) {
 		return portFunc(lilv_port_is_a, str); };
 
-	std::string portName;
-	{
-		AutoLilvNode nameNode(lilv_port_get_name(plugin, lilvPort));
-		portName = lilv_node_as_string(nameNode.get());
-	}
+	const std::string portName = stdStringFromPortName(plugin, lilvPort);
 
 	m_optional = hasProperty(LV2_CORE__connectionOptional);
 

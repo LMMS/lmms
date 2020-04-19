@@ -34,6 +34,7 @@
 #include <lilv/lilv.h>
 #include <memory>
 #include <QString>
+#include <string>
 
 struct LilvNodeDeleter
 {
@@ -51,15 +52,16 @@ using AutoLilvNodes = std::unique_ptr<LilvNodes, LilvNodesDeleter>;
 /**
 	Return QString from a plugin's node, everything will be freed automatically
 	@param plug The plugin where the node is
-	@param getFun The function to return the node from the plugin
-	@param convFunc convFunc The plugin to return a char pointer from that node;
-	  this is usually lilv_node_as_string or lilv_node_as_uri
+	@param getFunc The function to return the node from the plugin
 */
 QString qStringFromPluginNode(const LilvPlugin* plug,
 		LilvNode * (*getFunc)(const LilvPlugin*));
 
 //! Return port name as QString, everything will be freed automatically
 QString qStringFromPortName(const LilvPlugin* plug, const LilvPort* port);
+
+//! Return port name as std::string, everything will be freed automatically
+std::string stdStringFromPortName(const LilvPlugin* plug, const LilvPort* port);
 
 #endif // LMMS_HAVE_LV2
 #endif // LV2BASICS_H
