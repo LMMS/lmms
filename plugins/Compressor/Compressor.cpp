@@ -530,17 +530,16 @@ bool CompressorEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 		m_prevOut[0] = s[0];
 		m_prevOut[1] = s[1];
 
-		if (autoMakeup)
-		{
-			s[0] *= m_autoMakeupVal;
-			s[1] *= m_autoMakeupVal;
-		}
-
 		// Negate wet signal from dry signal
 		if (audition)
 		{
 			s[0] = -s[0] + trueDrySignal[0];
 			s[1] = -s[1] + trueDrySignal[1];
+		}
+		else if (autoMakeup)
+		{
+			s[0] *= m_autoMakeupVal;
+			s[1] *= m_autoMakeupVal;
 		}
 
 		// Calculate wet/dry value results
