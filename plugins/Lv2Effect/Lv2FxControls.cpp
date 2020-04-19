@@ -36,8 +36,7 @@
 
 Lv2FxControls::Lv2FxControls(class Lv2Effect *effect, const QString& uri) :
 	EffectControls(effect),
-	Lv2ControlBase(this, uri),
-	m_effect(effect)
+	Lv2ControlBase(this, uri)
 {
 	if (isValid())
 	{

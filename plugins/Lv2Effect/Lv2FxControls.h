@@ -55,7 +55,6 @@ private:
 	DataFile::Types settingsType() override;
 	void setNameFromFile(const QString &name) override;
 
-	Lv2Effect *m_effect;
 	friend class Lv2FxControlDialog;
 	friend class Lv2Effect;
 };
