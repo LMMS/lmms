@@ -37,7 +37,7 @@ Lv2FxControlDialog::Lv2FxControlDialog(Lv2FxControls *controls) :
 	Lv2ViewBase(this, controls)
 {
 	if (m_reloadPluginButton) {
-		connect(m_reloadPluginButton, &QPushButton::toggled,
+		connect(m_reloadPluginButton, &QPushButton::clicked,
 				this, [this](){ lv2Controls()->reloadPlugin(); });
 	}
 	if (m_toggleUIButton) {

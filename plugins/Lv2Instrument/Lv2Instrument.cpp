@@ -220,7 +220,7 @@ Lv2InsView::Lv2InsView(Lv2Instrument *_instrument, QWidget *_parent) :
 {
 	setAutoFillBackground(true);
 	if (m_reloadPluginButton) {
-		connect(m_reloadPluginButton, &QPushButton::toggled,
+		connect(m_reloadPluginButton, &QPushButton::clicked,
 			this, [this](){ castModel<Lv2Instrument>()->reloadPlugin();} );
 	}
 	if (m_toggleUIButton) {
