@@ -108,7 +108,7 @@ const LinkedModelGroup *Lv2ControlBase::getGroup(std::size_t idx) const
 
 
 void Lv2ControlBase::copyModelsFromLmms() {
-	for (std::unique_ptr<Lv2Proc>& c : m_procs) { c->copyModelsFromCore(); }
+	for (auto& c : m_procs) { c->copyModelsFromCore(); }
 }
 
 
@@ -116,7 +116,7 @@ void Lv2ControlBase::copyModelsFromLmms() {
 
 void Lv2ControlBase::copyBuffersFromLmms(const sampleFrame *buf, fpp_t frames) {
 	unsigned offset = 0;
-	for (std::unique_ptr<Lv2Proc>& c : m_procs) {
+	for (auto& c : m_procs) {
 		c->copyBuffersFromCore(buf, offset, m_channelsPerProc, frames);
 		offset += m_channelsPerProc;
 	}
@@ -127,7 +127,7 @@ void Lv2ControlBase::copyBuffersFromLmms(const sampleFrame *buf, fpp_t frames) {
 
 void Lv2ControlBase::copyBuffersToLmms(sampleFrame *buf, fpp_t frames) const {
 	unsigned offset = 0;
-	for (const std::unique_ptr<Lv2Proc>& c : m_procs) {
+	for (const auto& c : m_procs) {
 		c->copyBuffersToCore(buf, offset, m_channelsPerProc, frames);
 		offset += m_channelsPerProc;
 	}
@@ -137,7 +137,7 @@ void Lv2ControlBase::copyBuffersToLmms(sampleFrame *buf, fpp_t frames) const {
 
 
 void Lv2ControlBase::run(fpp_t frames) {
-	for (std::unique_ptr<Lv2Proc>& c : m_procs) { c->run(frames); }
+	for (auto& c : m_procs) { c->run(frames); }
 }
 
 
@@ -181,7 +181,7 @@ void Lv2ControlBase::reloadPlugin()
 
 std::size_t Lv2ControlBase::controlCount() const {
 	std::size_t res = 0;
-	for (const std::unique_ptr<Lv2Proc>& c : m_procs) { res += c->controlCount(); }
+	for (const auto& c : m_procs) { res += c->controlCount(); }
 	return res;
 }
 
