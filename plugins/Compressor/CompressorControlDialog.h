@@ -122,8 +122,6 @@ protected:
 
 private slots:
 	void updateDisplay();
-	void autoAttackToggled();
-	void autoReleaseToggled();
 	void peakmodeChanged();
 	void stereoLinkChanged();
 	void lookaheadChanged();
