@@ -3,7 +3,7 @@
  *                          Plugin::Descriptor::SubPluginFeatures for
  *                          hosting LV2 plugins
  *
- * Copyright (c) 2018-2019 Johannes Lorenz <j.git$$$lorenz-ho.me, $$$=@>
+ * Copyright (c) 2018-2020 Johannes Lorenz <jlsf2013$users.sourceforge.net, $=@>
  *
  * This file is part of LMMS - https://lmms.io
  *

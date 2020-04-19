@@ -1,7 +1,7 @@
 /*
- * Lv2Ports.cpp - Lv2 port implementation
+ * Lv2Ports.cpp - Lv2 port classes implementation
  *
- * Copyright (c) 2019-2019 Johannes Lorenz <j.git$$$lorenz-ho.me, $$$=@>
+ * Copyright (c) 2019-2020 Johannes Lorenz <jlsf2013$users.sourceforge.net, $=@>
  *
  * This file is part of LMMS - https://lmms.io
  *

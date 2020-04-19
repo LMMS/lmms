@@ -1,7 +1,7 @@
 /*
  * Lv2Effect.cpp - implementation of LV2 effect
  *
- * Copyright (c) 2018-2019 Johannes Lorenz <j.git$$$lorenz-ho.me, $$$=@>
+ * Copyright (c) 2018-2020 Johannes Lorenz <jlsf2013$users.sourceforge.net, $=@>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -41,7 +41,7 @@ Plugin::Descriptor PLUGIN_EXPORT lv2effect_plugin_descriptor =
 	"LV2",
 	QT_TRANSLATE_NOOP("pluginBrowser",
 		"plugin for using arbitrary LV2-effects inside LMMS."),
-	"Johannes Lorenz <j.git$$$lorenz-ho.me, $$$=@>",
+	"Johannes Lorenz <jlsf2013$$$users.sourceforge.net, $$$=@>",
 	0x0100,
 	Plugin::Effect,
 	new PluginPixmapLoader("logo"),

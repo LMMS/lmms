@@ -1,7 +1,7 @@
 /*
- * Lv2Controls.h - controls for bassboosterx -effect
+ * Lv2FxControls.h - Lv2FxControls implementation
  *
- * Copyright (c) 2018-2019 Johannes Lorenz <j.git$$$lorenz-ho.me, $$$=@>
+ * Copyright (c) 2018-2020 Johannes Lorenz <jlsf2013$users.sourceforge.net, $=@>
  *
  * This file is part of LMMS - https://lmms.io
  *
