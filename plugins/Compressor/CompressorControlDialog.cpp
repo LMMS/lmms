@@ -358,6 +358,7 @@ void CompressorControlDialog::updateDisplay()
 {
 	if (!isVisible())
 	{
+		m_timeElapsed.restart();
 		return;
 	}
 
