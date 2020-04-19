@@ -364,30 +364,41 @@ QList<QString> FileBrowserTreeWidget::expandedDirs( QTreeWidgetItem * item ) con
 
 void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent * e )
 {
-	FileItem * f = dynamic_cast<FileItem *>( itemAt( e->pos() ) );
-	if( f != NULL && ( f->handling() == FileItem::LoadAsPreset ||
-				 f->handling() == FileItem::LoadByPlugin ) )
+	FileItem * f = dynamic_cast<FileItem *>(itemAt(e->pos()));
+	if (f == nullptr)
 	{
+		return;
+	}
+
+	if (f->handling() == FileItem::LoadAsPreset || f->handling() == FileItem::LoadByPlugin)
+	{
+		// Set the member to the current FileItem so that it is available during the
+		// execution of the slots of the context menu we are about to create and execute.
 		m_contextMenuItem = f;
-		QMenu contextMenu( this );
-		contextMenu.addAction( tr( "Send to active instrument-track" ),
-						this,
-					SLOT( sendToActiveInstrumentTrack() ) );
-		contextMenu.addAction( tr( "Open in new instrument-track/"
-								"Song Editor" ),
-						this,
-					SLOT( openInNewInstrumentTrackSE() ) );
-		contextMenu.addAction( tr( "Open in new instrument-track/"
-								"B+B Editor" ),
-						this,
-					SLOT( openInNewInstrumentTrackBBE() ) );
-		contextMenu.addSeparator();
-		contextMenu.addAction( QIcon(embed::getIconPixmap( "folder" )),
-					tr( "Open containing folder" ),
+
+		QMenu contextMenu(this);
+
+		contextMenu.addAction(tr("Send to active instrument-track"),
 					this,
-					SLOT( openContainingFolder() ) );
-		contextMenu.exec( e->globalPos() );
-		m_contextMenuItem = NULL;
+					SLOT(sendToActiveInstrumentTrack()));
+		contextMenu.addAction(tr("Open in new instrument-track/Song Editor"),
+					this,
+					SLOT(openInNewInstrumentTrackSE()));
+		contextMenu.addAction(tr("Open in new instrument-track/B+B Editor"),
+					this,
+					SLOT(openInNewInstrumentTrackBBE()));
+
+		contextMenu.addSeparator();
+
+		contextMenu.addAction(QIcon(embed::getIconPixmap("folder")),
+					tr("Open containing folder"),
+					this,
+					SLOT(openContainingFolder()));
+
+		contextMenu.exec(e->globalPos());
+
+		// The context menu has been executed so we can reset this member back to nullptr.
+		m_contextMenuItem = nullptr;
 	}
 }
 
