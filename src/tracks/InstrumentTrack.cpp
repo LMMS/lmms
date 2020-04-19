@@ -447,7 +447,7 @@ void InstrumentTrack::silenceAllNotes( bool removeIPH )
 	}
 	m_midiNotesMutex.unlock();
 
-	lock();
+	Engine::mixer()->requestChangeInModel();
 	// invalidate all NotePlayHandles and PresetPreviewHandles linked to this track
 	m_processHandles.clear();
 
@@ -457,7 +457,7 @@ void InstrumentTrack::silenceAllNotes( bool removeIPH )
 		flags |= PlayHandle::TypeInstrumentPlayHandle;
 	}
 	Engine::mixer()->removePlayHandlesOfTypes( this, flags );
-	unlock();
+	Engine::mixer()->doneChangeInModel();
 }
 
 
@@ -546,11 +546,13 @@ void InstrumentTrack::setName( const QString & _new_name )
 
 void InstrumentTrack::updateBaseNote()
 {
+	Engine::mixer()->requestChangeInModel();
 	for( NotePlayHandleList::Iterator it = m_processHandles.begin();
 					it != m_processHandles.end(); ++it )
 	{
 		( *it )->setFrequencyUpdate();
 	}
+	Engine::mixer()->doneChangeInModel();
 }
 
 
@@ -1599,7 +1601,7 @@ void InstrumentTrackWindow::saveSettingsBtnClicked()
 	sfd.setDirectory( presetRoot + m_track->instrumentName() );
 	sfd.setFileMode( FileDialog::AnyFile );
 	QString fname = m_track->name();
-	sfd.selectFile( fname.remove(QRegExp("[^a-zA-Z0-9_\\-\\d\\s]")) );
+	sfd.selectFile(fname.remove(QRegExp(FILENAME_FILTER)));
 	sfd.setDefaultSuffix( "xpf");
 
 	if( sfd.exec() == QDialog::Accepted &&

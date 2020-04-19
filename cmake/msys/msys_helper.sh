@@ -68,7 +68,7 @@ stkver="4.5.1"
 mingw_root="/$(echo "$MSYSTEM"|tr '[:upper:]' '[:lower:]')"
 
 info "Downloading and building fltk $fltkver"
-if ! which fluid; then
+if ! command -v fluid; then
 	wget http://fltk.org/pub/fltk/$fltkver/fltk-$fltkver-source.tar.gz -O "$HOME/fltk-source.tar.gz"
 	tar zxf "$HOME/fltk-source.tar.gz" -C "$HOME/"
 	pushd "$HOME/fltk-$fltkver"

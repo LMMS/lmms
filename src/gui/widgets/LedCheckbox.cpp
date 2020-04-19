@@ -39,13 +39,9 @@ static const QString names[LedCheckBox::NumColors] =
 
 
 
-//! @todo: in C++11, we can use delegating ctors
-#define DEFAULT_LEDCHECKBOX_INITIALIZER_LIST \
-	AutomatableButton( _parent, _name )
-
 LedCheckBox::LedCheckBox( const QString & _text, QWidget * _parent,
 				const QString & _name, LedColors _color ) :
-	DEFAULT_LEDCHECKBOX_INITIALIZER_LIST,
+	AutomatableButton( _parent, _name ),
 	m_text( _text )
 {
 	initUi( _color );
@@ -56,12 +52,9 @@ LedCheckBox::LedCheckBox( const QString & _text, QWidget * _parent,
 
 LedCheckBox::LedCheckBox( QWidget * _parent,
 				const QString & _name, LedColors _color ) :
-	DEFAULT_LEDCHECKBOX_INITIALIZER_LIST
+	LedCheckBox( QString(), _parent, _name, _color )
 {
-	initUi( _color );
 }
-
-#undef DEFAULT_LEDCHECKBOX_INITIALIZER_LIST
 
 
 

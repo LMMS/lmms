@@ -99,33 +99,8 @@ cp -R /usr/share/stk/rawwaves/ "${APPDIR}usr/share/stk/"
 
 # Create a wrapper script which calls the lmms executable
 mv "${APPDIR}usr/bin/lmms" "${APPDIR}usr/bin/lmms.real"
-# shellcheck disable=SC1083
-cat >"${APPDIR}usr/bin/lmms" <<EOL
-#!/usr/bin/env bash
-DIR="\$( cd "\$( dirname "\${BASH_SOURCE[0]}" )" && pwd )"
-export PATH="\$PATH:/sbin"
-if which carla > /dev/null 2>&1; then
-   CARLAPATH="\$(which carla)"
-   CARLAPREFIX="\${CARLAPATH%/bin*}"
-   echo "Carla appears to be installed on this system at \$CARLAPREFIX/lib[64]/carla so we'll use it."
-   export LD_LIBRARY_PATH=\$CARLAPREFIX/lib/carla:\$CARLAPREFIX/lib64/carla:\$LD_LIBRARY_PATH
-else
-   echo "Carla does not appear to be installed.  That's OK, please ignore any related library errors."
-fi
-export LD_LIBRARY_PATH=\$DIR/usr/lib/:\$DIR/usr/lib/lmms:\$LD_LIBRARY_PATH
-# Prevent segfault on VirualBox
-if lsmod |grep vboxguest > /dev/null 2>&1; then
-   echo "VirtualBox detected.  Forcing libgl software rendering."
-   export LIBGL_ALWAYS_SOFTWARE=1;
-fi
-if ldconfig -p | grep libjack.so.0 > /dev/null 2>&1; then
-   echo "Jack appears to be installed on this system, so we'll use it."
-else
-   echo "Jack does not appear to be installed.  That's OK, we'll use a dummy version instead."
-   export LD_LIBRARY_PATH=\$DIR/usr/lib/lmms/optional:\$LD_LIBRARY_PATH
-fi
-QT_X11_NO_NATIVE_MENUBAR=1 \$DIR/usr/bin/lmms.real "\$@"
-EOL
+
+cp "@CMAKE_CURRENT_SOURCE_DIR@/launch_lmms.sh" "${APPDIR}usr/bin/lmms"
 
 chmod +x "${APPDIR}usr/bin/lmms"
 
@@ -133,15 +108,7 @@ chmod +x "${APPDIR}usr/bin/lmms"
 unset LD_LIBRARY_PATH
 
 # Ensure linuxdeployqt can find shared objects
-export LD_LIBRARY_PATH="${APPDIR}usr/lib/lmms/":$LD_LIBRARY_PATH
-
-# Handle wine linking
-if [ -d "@WINE_32_LIBRARY_DIR@" ]; then
-   export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:@WINE_32_LIBRARY_DIRS@
-fi
-if [ -d "@WINE_64_LIBRARY_DIR@" ]; then
-   export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:@WINE_64_LIBRARY_DIRS@
-fi
+export LD_LIBRARY_PATH="${APPDIR}"usr/lib/lmms/:"${APPDIR}"usr/lib/lmms/optional:"$LD_LIBRARY_PATH"
 
 # Move executables so linuxdeployqt can find them
 ZYNLIB="${APPDIR}usr/lib/lmms/RemoteZynAddSubFx"
@@ -153,8 +120,18 @@ VSTBIN32="${APPDIR}usr/bin/RemoteVstPlugin32.exe.so"
 VSTBIN64="${APPDIR}usr/bin/RemoteVstPlugin64.exe.so"
 
 mv "$ZYNLIB" "$ZYNBIN"
-mv "$VSTLIB32" "$VSTBIN32"
-mv "$VSTLIB64" "$VSTBIN64"
+mv "$VSTLIB32" "$VSTBIN32" || true
+mv "$VSTLIB64" "$VSTBIN64" || true
+
+# Handle wine linking
+if [ -d "@WINE_32_LIBRARY_DIR@" ] && \
+		ldd "$VSTBIN32" | grep "libwine\.so" | grep "not found"; then
+   export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:"@WINE_32_LIBRARY_DIRS@"
+fi
+if [ -d "@WINE_64_LIBRARY_DIR@" ] && \
+		ldd "$VSTBIN64" | grep "libwine\.so" | grep "not found"; then
+   export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:"@WINE_64_LIBRARY_DIRS@"
+fi
 
 # Patch the desktop file
 sed -i 's/.*Exec=.*/Exec=lmms.real/' "$DESKTOPFILE"
@@ -182,14 +159,15 @@ success "Bundled and relinked dependencies"
 
 # Link to original location so lmms can find them
 ln -sr  "$ZYNBIN" "$ZYNLIB"
-ln -sr  "$VSTBIN32" "$VSTLIB32"
-ln -sr  "$VSTBIN64" "$VSTLIB64"
+ln -sr  "$VSTBIN32" "$VSTLIB32" || true
+ln -sr  "$VSTBIN64" "$VSTLIB64" || true
 
 # Remove wine library conflict
 rm -f "${APPDIR}/usr/lib/libwine.so.1"
 
 # Use system-provided carla
 rm -f "${APPDIR}usr/lib/"libcarla*.so
+rm -f "${APPDIR}usr/lib/lmms/optional/"libcarla*.so
 
 # Remove bundled jack in LD_LIBRARY_PATH if exists
 if [ -e "${APPDIR}/usr/lib/libjack.so.0" ]; then
