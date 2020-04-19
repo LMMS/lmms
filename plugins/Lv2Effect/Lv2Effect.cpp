@@ -72,16 +72,14 @@ bool Lv2Effect::processAudioBuffer(sampleFrame *buf, const fpp_t frames)
 {
 	if (!isEnabled() || !isRunning()) { return false; }
 
-	Lv2FxControls& ctrl = m_controls;
-
-	ctrl.copyBuffersFromLmms(buf, frames);
+	m_controls.copyBuffersFromLmms(buf, frames);
 	m_controls.copyModelsFromLmms();
 
 //	m_pluginMutex.lock();
-	ctrl.run(frames);
+	m_controls.run(frames);
 //	m_pluginMutex.unlock();
 
-	ctrl.copyBuffersToLmms(buf, frames);
+	m_controls.copyBuffersToLmms(buf, frames);
 
 	double outSum = .0;
 	for(fpp_t f = 0; f < frames; ++f)
