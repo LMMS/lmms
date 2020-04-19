@@ -101,7 +101,7 @@ void Lv2Manager::initPlugins()
 
 		m_lv2InfoMap[lilv_node_as_uri(lilv_plugin_get_uri(curPlug))]
 			= std::move(info);
-		pluginsLoaded += issues.empty();
+		if(issues.empty()) { ++pluginsLoaded; }
 		++pluginCount;
 	}
 
