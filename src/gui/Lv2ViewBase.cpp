@@ -56,7 +56,7 @@ Lv2ViewProc::Lv2ViewProc(QWidget* parent, Lv2Proc* ctrlBase, int colNum) :
 	{
 	public:
 		QWidget* m_par; // input
-		const AutoLilvNode* m_commentUri; // input
+		const LilvNode* m_commentUri; // input
 		Control* m_control = nullptr; // output
 		void visit(const Lv2Ports::Control& port) override
 		{
@@ -83,7 +83,7 @@ Lv2ViewProc::Lv2ViewProc(QWidget* parent, Lv2Proc* ctrlBase, int colNum) :
 				m_control->setText(port.name());
 
 				LilvNodes* props = lilv_port_get_value(
-					port.m_plugin, port.m_port, m_commentUri->get());
+					port.m_plugin, port.m_port, m_commentUri);
 				LILV_FOREACH(nodes, itr, props)
 				{
 					const LilvNode* nod = lilv_nodes_get(props, itr);
@@ -101,7 +101,7 @@ Lv2ViewProc::Lv2ViewProc(QWidget* parent, Lv2Proc* ctrlBase, int colNum) :
 		{
 			SetupWidget setup;
 			setup.m_par = this;
-			setup.m_commentUri = &commentUri;
+			setup.m_commentUri = commentUri.get();
 			port->accept(setup);
 
 			if (setup.m_control)
