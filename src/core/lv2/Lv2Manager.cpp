@@ -78,7 +78,7 @@ const LilvPlugin *Lv2Manager::getPlugin(const std::string &uri)
 
 const LilvPlugin *Lv2Manager::getPlugin(const QString &uri)
 {
-	return getPlugin(std::string(uri.toUtf8()));
+	return getPlugin(uri.toStdString());
 }
 
 
