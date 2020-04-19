@@ -107,7 +107,7 @@ public:
 	//! Return descriptor with URI @p uri or nullptr if none exists
 	const LilvPlugin *getPlugin(const std::string &uri);
 	//! Return descriptor with URI @p uri or nullptr if none exists
-	const LilvPlugin *getPlugin(const QString uri);
+	const LilvPlugin *getPlugin(const QString& uri);
 
 	using Lv2InfoMap = std::map<std::string, Lv2Info>;
 	using Iterator = Lv2InfoMap::iterator;
