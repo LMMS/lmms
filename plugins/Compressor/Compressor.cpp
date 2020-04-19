@@ -98,9 +98,6 @@ CompressorEffect::~CompressorEffect()
 {
 	delete m_rms[0];
 	delete m_rms[1];
-
-	src_delete(src_state[0]);
-	src_delete(src_state[1]);
 }
 
 

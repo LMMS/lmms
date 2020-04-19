@@ -73,9 +73,6 @@ private:
 	inline int realmod(int k, int n);
 	inline float realfmod(float k, float n);
 
-	int err;
-	SRC_STATE * src_state[2] = {src_new(SRC_SINC_FASTEST, 1, &err), src_new(SRC_SINC_FASTEST, 1, &err)};
-
 	std::vector<float> m_preLookaheadBuf[2];
 	int m_preLookaheadBufLoc[2] = {0};
 
