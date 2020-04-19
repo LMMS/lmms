@@ -91,7 +91,6 @@ public:
 		//! ctor used inside Lv2Manager
 		Lv2Info(const LilvPlugin* plug, Plugin::PluginTypes type, bool valid) :
 			m_plugin(plug), m_type(type), m_valid(valid) {}
-		Lv2Info(const Lv2Info &) = delete;
 		Lv2Info(Lv2Info&& other) = default;
 		Lv2Info& operator=(Lv2Info&& other) = default;
 
