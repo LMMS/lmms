@@ -49,8 +49,6 @@ public:
 
 private:
 	Lv2FxControls m_controls;
-
-	friend class Lv2FxControls;
 };
 
 #endif // LMMS_HAVE_LV2
