@@ -1009,7 +1009,12 @@ void PianoRoll::drawNoteRect( QPainter & p, int x, int y,
 
 			int const distanceToBorder = 2;
 			int const xOffset = borderWidth + distanceToBorder;
-			int const yOffset = ((noteHeight + fontMetrics.capHeight()) + 1) / 2;
+
+			// noteTextHeight, textSize are not suitable for determining vertical spacing, 
+			// capHeight() can be used for this, but requires Qt 5.8. 
+			// We use boundingRect() with QChar (the QString version returns wrong value).
+			QRect const boundingRect = fontMetrics.boundingRect(QChar::fromLatin1('H'));
+			int const yOffset = (noteHeight - boundingRect.top() - boundingRect.bottom()) / 2;
 
 			if (textSize.width() < noteWidth - xOffset)
 			{
