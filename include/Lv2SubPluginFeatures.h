@@ -44,7 +44,7 @@ private:
 public:
 	Lv2SubPluginFeatures(Plugin::PluginTypes type);
 
-	virtual void fillDescriptionWidget(
+	void fillDescriptionWidget(
 		QWidget *parent, const Key *k) const override;
 
 	QString additionalFileExtensions(const Key &k) const override;

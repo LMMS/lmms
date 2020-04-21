@@ -108,15 +108,15 @@ public:
 	Lv2InsView(Lv2Instrument *_instrument, QWidget *_parent);
 
 protected:
-	virtual void dragEnterEvent(QDragEnterEvent *_dee);
-	virtual void dropEvent(QDropEvent *_de);
+	void dragEnterEvent(QDragEnterEvent *_dee) override;
+	void dropEvent(QDropEvent *_de) override;
 
 private slots:
 	void reloadPlugin();
 	void toggleUI();
 
 private:
-	void modelChanged();
+	void modelChanged() override;
 };
 
 

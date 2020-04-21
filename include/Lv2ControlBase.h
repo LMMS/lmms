@@ -87,7 +87,7 @@ protected:
 	//!   this is the same pointer as this, but a different type
 	//! @param uri the Lv2 URI telling this class what plugin to construct
 	Lv2ControlBase(class Model *that, const QString& uri);
-	virtual ~Lv2ControlBase() override;
+	~Lv2ControlBase() override;
 	//! Must be checked after ctor or reload
 	bool isValid() const { return m_valid; }
 
