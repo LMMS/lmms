@@ -163,16 +163,15 @@ void Lv2SubPluginFeatures::listSubPluginKeys(const Plugin::Descriptor *desc,
 												KeyList &kl) const
 {
 	Lv2Manager *lv2Mgr = Engine::getLv2Manager();
-	for (const std::pair<const std::string, Lv2Manager::Lv2Info> &pr :
-		*lv2Mgr)
+	for (const auto &uriInfoPair : *lv2Mgr)
 	{
-		if (pr.second.type() == m_type && pr.second.isValid())
+		if (uriInfoPair.second.type() == m_type && uriInfoPair.second.isValid())
 		{
 			using KeyType =
 				Plugin::Descriptor::SubPluginFeatures::Key;
 			KeyType::AttributeMap atm;
-			atm["uri"] = QString::fromUtf8(pr.first.c_str());
-			const LilvPlugin* plug = pr.second.plugin();
+			atm["uri"] = QString::fromUtf8(uriInfoPair.first.c_str());
+			const LilvPlugin* plug = uriInfoPair.second.plugin();
 
 			kl.push_back(KeyType(desc, pluginName(plug), atm));
 			//qDebug() << "Found LV2 sub plugin key of type" <<
