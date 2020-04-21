@@ -37,7 +37,6 @@ class Lv2FxControlDialog : public EffectControlDialog, public Lv2ViewBase
 
 public:
 	Lv2FxControlDialog(Lv2FxControls *controls);
-	virtual ~Lv2FxControlDialog() override {}
 
 private:
 	Lv2FxControls *lv2Controls();

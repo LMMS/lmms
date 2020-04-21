@@ -236,11 +236,6 @@ Lv2InsView::Lv2InsView(Lv2Instrument *_instrument, QWidget *_parent) :
 
 
 
-Lv2InsView::~Lv2InsView() {}
-
-
-
-
 void Lv2InsView::dragEnterEvent(QDragEnterEvent *_dee)
 {
 	void (QDragEnterEvent::*reaction)(void) = &QDragEnterEvent::ignore;

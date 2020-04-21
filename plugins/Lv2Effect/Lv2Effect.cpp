@@ -61,13 +61,6 @@ Lv2Effect::Lv2Effect(Model* parent, const Descriptor::SubPluginFeatures::Key *ke
 
 
 
-Lv2Effect::~Lv2Effect()
-{
-}
-
-
-
-
 bool Lv2Effect::processAudioBuffer(sampleFrame *buf, const fpp_t frames)
 {
 	if (!isEnabled() || !isRunning()) { return false; }

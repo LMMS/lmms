@@ -37,7 +37,6 @@ public:
 		initialization
 	*/
 	Lv2Effect(Model* parent, const Descriptor::SubPluginFeatures::Key* _key);
-	~Lv2Effect() override;
 	//! Must be checked after ctor or reload
 	bool isValid() const { return m_controls.isValid(); }
 

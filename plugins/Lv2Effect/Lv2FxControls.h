@@ -36,7 +36,6 @@ class Lv2FxControls : public EffectControls, public Lv2ControlBase
 	Q_OBJECT
 public:
 	Lv2FxControls(Lv2Effect *effect, const QString &uri);
-	~Lv2FxControls() override {}
 
 	void saveSettings(QDomDocument &_doc, QDomElement &_parent) override;
 	void loadSettings(const QDomElement &that) override;

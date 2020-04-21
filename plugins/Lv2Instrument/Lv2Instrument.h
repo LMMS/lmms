@@ -106,7 +106,6 @@ class Lv2InsView : public InstrumentView, public Lv2ViewBase
 	Q_OBJECT
 public:
 	Lv2InsView(Lv2Instrument *_instrument, QWidget *_parent);
-	virtual ~Lv2InsView();
 
 protected:
 	virtual void dragEnterEvent(QDragEnterEvent *_dee);
