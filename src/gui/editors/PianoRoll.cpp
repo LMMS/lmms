@@ -2787,7 +2787,7 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 	key = m_startKey;
 	keys_processed = 0;
 	int white_cnt = 0;
-	key_line_y = qMin(keyAreaBottom() - 1, KEY_LINE_HEIGHT * NumKeys);
+	key_line_y = qMin(keyAreaBottom(), KEY_LINE_HEIGHT * NumKeys);
 
 	// and go!
 	for( int y = key_line_y + y_offset;
