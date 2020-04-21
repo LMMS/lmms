@@ -692,6 +692,12 @@ void FileBrowserTreeWidget::openContainingFolder()
 {
 	if (m_contextMenuItem)
 	{
+		// Delegate to QDesktopServices::openUrl with the directory of the selected file. Please note that
+		// this will only open the directory but not select the file as this is much more complicated due
+		// to different implementations that are needed for different platforms (Linux/Windows/MacOS).
+
+		// Using QDesktopServices::openUrl seems to be the most simple cross platform way which uses
+		// functionality that's already available in Qt.
 		QFileInfo fileInfo(m_contextMenuItem->fullName());
 		QDesktopServices::openUrl(QUrl::fromLocalFile(fileInfo.dir().path()));
 	}
