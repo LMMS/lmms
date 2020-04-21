@@ -99,15 +99,7 @@ Lv2Proc::Lv2Proc(const LilvPlugin *plugin, Model* parent) :
 	LinkedModelGroup(parent),
 	m_plugin(plugin)
 {
-	if (m_plugin)
-	{
-		initPlugin();
-	}
-	else
-	{
-		qCritical() << ":-( ! No descriptor found for" << plugin;
-		m_valid = false;
-	}
+	initPlugin();
 }
 
 
