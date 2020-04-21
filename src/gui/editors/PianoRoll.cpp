@@ -2867,6 +2867,8 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 
 	// set font-size to 8
 	p.setFont( pointSize<8>( p.font() ) );
+	QFontMetrics fontMetrics(p.font());
+	int const fontHeight = fontMetrics.boundingRect(QChar::fromLatin1('H')).height();
 
 	// y_offset is used to align the piano-keys on the key-lines
 	int y_offset = 0;
@@ -2961,20 +2963,22 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 		int yCorrectionForNoteLabels = 0;
 
 		int keyCode = key % KeysPerOctave;
-		switch( keyCode )
+		switch (keyCode)
 		{
-		case 0:
-		case 5:
-			yCorrectionForNoteLabels = -4;
+		case 0: // C
+		case 5: // F
+			yCorrectionForNoteLabels = (m_whiteKeySmallHeight - fontHeight + 1) / -2;
 			break;
-		case 2:
-		case 7:
-		case 9:
-			yCorrectionForNoteLabels = -2;
+		case 2: // D
+		case 7: // G
+		case 9: // A
+			yCorrectionForNoteLabels = (m_whiteKeyBigHeight / 2 - fontHeight + 1) / -2;
 			break;
-		case 4:
-		case 11:
-			yCorrectionForNoteLabels = 2;
+		case 4: // E
+		case 11: // B
+			// calculate center point of key and move half of text
+			yCorrectionForNoteLabels = -(((m_whiteKeySmallHeight - (m_whiteKeySmallHeight * 2 + 3) / 6) / 4)
+										 - fontHeight / 2);
 			break;
 		}
 
