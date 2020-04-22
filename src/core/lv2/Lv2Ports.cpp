@@ -137,20 +137,20 @@ std::vector<PluginIssue> Meta::get(const LilvPlugin *plugin,
 			lilv_port_get_range(plugin, lilvPort, &defN,
 					isToggle ? nullptr : &minN,
 					isToggle ? nullptr : &maxN);
+			AutoLilvNode def(defN), min(minN), max(maxN);
 
 			auto takeRangeValue = [&](LilvNode* node,
 				float& storeHere, PluginIssueType it)
 			{
 				if (node) { storeHere = lilv_node_as_float(node); }
 				else { issue(it, portName); }
-				lilv_node_free(node);
 			};
 
-			takeRangeValue(defN, m_def, portHasNoDef);
+			takeRangeValue(def.get(), m_def, portHasNoDef);
 			if (!isToggle)
 			{
-				takeRangeValue(minN, m_min, portHasNoMin);
-				takeRangeValue(maxN, m_max, portHasNoMax);
+				takeRangeValue(min.get(), m_min, portHasNoMin);
+				takeRangeValue(max.get(), m_max, portHasNoMax);
 
 				if (m_max - m_min > 15.0f)
 				{

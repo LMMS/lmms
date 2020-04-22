@@ -82,15 +82,14 @@ Lv2ViewProc::Lv2ViewProc(QWidget* parent, Lv2Proc* ctrlBase, int colNum) :
 				}
 				m_control->setText(port.name());
 
-				LilvNodes* props = lilv_port_get_value(
-					port.m_plugin, port.m_port, m_commentUri);
-				LILV_FOREACH(nodes, itr, props)
+				AutoLilvNodes props(lilv_port_get_value(
+					port.m_plugin, port.m_port, m_commentUri));
+				LILV_FOREACH(nodes, itr, props.get())
 				{
-					const LilvNode* nod = lilv_nodes_get(props, itr);
+					const LilvNode* nod = lilv_nodes_get(props.get(), itr);
 					m_control->topWidget()->setToolTip(lilv_node_as_string(nod));
 					break;
 				}
-				lilv_nodes_free(props);
 			}
 		}
 	};
@@ -164,11 +163,11 @@ Lv2ViewBase::Lv2ViewBase(QWidget* meAsWidget, Lv2ControlBase *ctrlBase)
 	// note: the lifetime of C++ objects ends after the top expression in the
 	// expression syntax tree, so the AutoLilvNode gets freed after the function
 	// has been called
-	LilvNodes* props = lilv_plugin_get_value(ctrlBase->getPlugin(),
-				uri(LILV_NS_RDFS "comment").get());
-	LILV_FOREACH(nodes, itr, props)
+	AutoLilvNodes props(lilv_plugin_get_value(ctrlBase->getPlugin(),
+				uri(LILV_NS_RDFS "comment").get()));
+	LILV_FOREACH(nodes, itr, props.get())
 	{
-		const LilvNode* node = lilv_nodes_get(props, itr);
+		const LilvNode* node = lilv_nodes_get(props.get(), itr);
 		QLabel* infoLabel = new QLabel(lilv_node_as_string(node));
 		infoLabel->setWordWrap(true);
 		infoLabel->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
@@ -185,7 +184,6 @@ Lv2ViewBase::Lv2ViewBase(QWidget* meAsWidget, Lv2ControlBase *ctrlBase)
 
 		break;
 	}
-	lilv_nodes_free(props);
 
 	if(m_reloadPluginButton || m_toggleUIButton || m_helpButton)
 	{
