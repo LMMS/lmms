@@ -103,30 +103,35 @@ SynchroNote::SynchroNote(NotePlayHandle * nph) :
 	//Empty constructor
 }
 
+SynchroNote::~SynchroNote()
+{
+	//Empty destructor
+}
+
 void SynchroNote::nextStringSample(sampleFrame &outputSample,
 	sample_rate_t sample_rate, float modulationStrength,
 	float modulationAmount, float harmonics, SynchroOscillatorSettings carrier,
 	SynchroOscillatorSettings modulator)
 {
-	float freqToSampleStep = F_2PI / sample_rate; //For oversampling
+	float freqToSampleStep = F_2PI / sample_rate;
 	//Find position in modulator waveform
-	sample_index[1] += freqToSampleStep * DetuneOctaves(nph->frequency(),
+	modulatorSampleIndex += freqToSampleStep * DetuneOctaves(nph->frequency(),
 		modulator.Detune);
-	while (sample_index[1] >= F_2PI) { sample_index[1] -= F_2PI; } //Make sure phase is always between 0 and 2PI
+	while (modulatorSampleIndex >= F_2PI) { modulatorSampleIndex -= F_2PI; } //Make sure phase is always between 0 and 2PI
 	//Get modulator waveform at position
 	//Modulator is calculated first because it is used by the carrier
-	float modulatorSample = SynchroWaveform(sample_index[1], modulator.Drive,
+	float modulatorSample = SynchroWaveform(modulatorSampleIndex, modulator.Drive,
 		modulator.Sync, modulator.Chop, harmonics)
 		* (modulationStrength * modulationAmount);
 	float pmSample = modulatorSample * SYNCHRO_PM_CONST;
 	//Find position in carrier waveform
-	sample_index[0] += freqToSampleStep * DetuneOctaves(nph->frequency(),
+	carrierSampleIndex += freqToSampleStep * DetuneOctaves(nph->frequency(),
 		carrier.Detune);
-	while (sample_index[0] >= F_2PI) { sample_index[0] -= F_2PI; } //Make sure phase is always between 0 and 2PI
-	while (sample_index[0] < 0) { sample_index[0] += F_2PI; } //Phase modulation might push it below 0
+	while (carrierSampleIndex >= F_2PI) { carrierSampleIndex -= F_2PI; } //Make sure phase is always between 0 and 2PI
+	while (carrierSampleIndex < 0) { carrierSampleIndex += F_2PI; } //Phase modulation might push it below 0
 	//Get carrier waveform at position, accounting for modulation
 	//Index 0 is L, 1 is R. Synth is currently mono so they are the same value.
-	outputSample[0] = SynchroWaveform(sample_index[0] + pmSample,
+	outputSample[0] = SynchroWaveform(carrierSampleIndex + pmSample,
 		carrier.Drive, carrier.Sync, carrier.Chop, 0)
 		* (SYNCHRO_VOLUME_CONST);
 	outputSample[1] = outputSample[0];
