@@ -109,9 +109,9 @@ SynchroNote::~SynchroNote()
 }
 
 void SynchroNote::nextStringSample(sampleFrame &outputSample,
-	sample_rate_t sample_rate, float modulationStrength,
-	float modulationAmount, float harmonics, SynchroOscillatorSettings carrier,
-	SynchroOscillatorSettings modulator)
+	sample_rate_t sample_rate, const float & modulationStrength,
+	const float & modulationAmount, const float & harmonics, const SynchroOscillatorSettings & carrier,
+	const SynchroOscillatorSettings & modulator)
 {
 	float freqToSampleStep = F_2PI / sample_rate;
 	//Find position in modulator waveform
@@ -236,12 +236,19 @@ QString SynchroSynth::nodeName() const
 
 void SynchroSynth::playNote(NotePlayHandle * n, sampleFrame * working_buffer)
 {
-	n->m_pluginData = new SynchroNote(n);
+	if (n->totalFramesPlayed() == 0 || n->m_pluginData == NULL)
+	{
+		n->m_pluginData = new SynchroNote(n);
+	}
 
 	const fpp_t frames = n->framesLeftForCurrentPeriod();
 	const f_cnt_t offset = n->noteOffset();
 
 	SynchroNote * ps = static_cast<SynchroNote *>(n->m_pluginData);
+
+	const ValueBuffer * modBuf = m_modulation.valueBuffer();
+	const ValueBuffer * modStrBuf = m_modulationStrength.valueBuffer();
+
 	for(fpp_t frame = offset; frame < frames + offset; ++frame)
 	{
 		sampleFrame outputSample = {0, 0};
@@ -256,10 +263,13 @@ void SynchroSynth::playNote(NotePlayHandle * n, sampleFrame * working_buffer)
 		//Oversampling using linear interpolation
 		for (int i = 0; i < SYNCHRO_OVERSAMPLE; ++i)
 		{
+			float strength = modStrBuf ? modStrBuf->value(frame) : m_modulationStrength.value();
+			float amount = modBuf ? modBuf->value(frame) : m_modulation.value();
+
 			ps->nextStringSample(tempSample,
 				Engine::mixer()->processingSampleRate()
-				* SYNCHRO_OVERSAMPLE, m_modulationStrength.value(),
-				m_modulation.value(),m_harmonics.value(), carrier,
+				* SYNCHRO_OVERSAMPLE, strength,
+				amount, m_harmonics.value(), carrier,
 				modulator);
 			outputSample[0] += tempSample[0];
 			outputSample[1] += tempSample[1];

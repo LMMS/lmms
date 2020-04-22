@@ -52,12 +52,13 @@ public:
 	SynchroNote(NotePlayHandle * nph);
 	virtual ~SynchroNote();
 	void nextStringSample(sampleFrame &outputSample, sample_rate_t sample_rate,
-		float modulationStrength, float modulationAmount, float harmonics,
-		SynchroOscillatorSettings carrier,
-		SynchroOscillatorSettings modulator);
+		const float & modulationStrength, const float & modulationAmount, const float & harmonics,
+		const SynchroOscillatorSettings & carrier,
+		const SynchroOscillatorSettings & modulator);
 private:
 	NotePlayHandle * nph;
-	float sample_index[2] = {0, 0}; //Index 0 is carrier, index 1 is modulator
+	float carrierSampleIndex = 0;
+	float modulatorSampleIndex = 0;
 };
 
 class SynchroSynth : public Instrument
