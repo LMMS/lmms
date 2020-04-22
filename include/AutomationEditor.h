@@ -240,6 +240,7 @@ private:
 
 	EditModes m_editMode;
 
+	bool m_mouseDownLeft;
 	bool m_mouseDownRight; //true if right click is being held down
 
 	TimeLineWidget * m_timeLine;
