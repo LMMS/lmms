@@ -37,12 +37,12 @@
 #include "NotePlayHandle.h"
 #include "plugin_export.h"
 
-#define SYNCRHO_VERSION "0.5"
-#define SYNCHRO_VOLUME_CONST 0.15f
+constexpr char SYNCHRO_VERSION [] = "0.5";
+constexpr float SYNCHRO_VOLUME_CONST = 0.15f;
 
-static const int SYNCHRO_OVERSAMPLE = 4; //Anti-aliasing samples
-static const int SYNCHRO_PM_CONST = 20; //Strength of the phase modulation
-static const int SYNCHRO_GRAPH_SAMPLES = 48; //Resolution of the waveform view GUI elements
+constexpr int SYNCHRO_OVERSAMPLE = 4; //Anti-aliasing samples
+constexpr int SYNCHRO_PM_CONST = 20; //Strength of the phase modulation
+constexpr int SYNCHRO_GRAPH_SAMPLES = 48; //Resolution of the waveform view GUI elements
 
 //Plugin metadata
 extern "C"
@@ -66,15 +66,41 @@ extern "C"
 	}
 }
 
+//Triangle waveform generator
+static inline float tri(float x)
+{
+	return 2.0 * fabs(2.0 * ((x / F_2PI) - floorf((x / F_2PI) + 0.5))) - 1.0;
+}
+
+//Triangle waveform with harmonic generator
+static inline float trih(float x, float harmonic)
+{
+	return tri(x) + ((tri(MAGIC_HARMONICS[0][0] * x) * MAGIC_HARMONICS[0][1]
+		+ tri(MAGIC_HARMONICS[1][0] * x) * MAGIC_HARMONICS[1][1])) * harmonic;
+}
+
+//Waveform function for the Synchro synthesizer.
+//x: input phase in radians (please keep it between 0 and 2PI)
+//drive: how much atan distortion is applied to the waveform
+//sync: hard sync with harmonic multiple
+//chop: how strong the amplitude falloff is per waveform period
+//harmonic: how strong the magic harmonics are
+static inline float SynchroWaveform(float x, float drive, float sync,
+	float chop, float harmonic)
+{
+	return tanhf(trih(F_PI_2 + x * sync, harmonic) * drive)
+		/ powf(F_2PI / (F_2PI - x), chop);
+}
+
+static inline float DetuneOctaves(float pitch, float detune)
+{
+	return pitch * exp2(detune);
+}
+
 SynchroNote::SynchroNote(NotePlayHandle * nph) :
 	nph(nph)
 {
 	//Empty constructor
-}
-
-SynchroNote::~SynchroNote()
-{
-	//Empty destructor
 }
 
 void SynchroNote::nextStringSample(sampleFrame &outputSample,
@@ -82,9 +108,9 @@ void SynchroNote::nextStringSample(sampleFrame &outputSample,
 	float modulationAmount, float harmonics, SynchroOscillatorSettings carrier,
 	SynchroOscillatorSettings modulator)
 {
-	float sampleRatePi = F_2PI / sample_rate; //For oversampling
+	float freqToSampleStep = F_2PI / sample_rate; //For oversampling
 	//Find position in modulator waveform
-	sample_index[1] += sampleRatePi * DetuneOctaves(nph->frequency(),
+	sample_index[1] += freqToSampleStep * DetuneOctaves(nph->frequency(),
 		modulator.Detune);
 	while (sample_index[1] >= F_2PI) { sample_index[1] -= F_2PI; } //Make sure phase is always between 0 and 2PI
 	//Get modulator waveform at position
@@ -94,7 +120,7 @@ void SynchroNote::nextStringSample(sampleFrame &outputSample,
 		* (modulationStrength * modulationAmount);
 	float pmSample = modulatorSample * SYNCHRO_PM_CONST;
 	//Find position in carrier waveform
-	sample_index[0] += sampleRatePi * DetuneOctaves(nph->frequency(),
+	sample_index[0] += freqToSampleStep * DetuneOctaves(nph->frequency(),
 		carrier.Detune);
 	while (sample_index[0] >= F_2PI) { sample_index[0] -= F_2PI; } //Make sure phase is always between 0 and 2PI
 	while (sample_index[0] < 0) { sample_index[0] += F_2PI; } //Phase modulation might push it below 0
@@ -166,15 +192,10 @@ SynchroSynth::SynchroSynth(InstrumentTrack * instrument_track) :
 		SLOT(generalChanged()));
 }
 
-SynchroSynth::~SynchroSynth()
-{
-	//Empty destructor
-}
-
 void SynchroSynth::saveSettings(QDomDocument & doc, QDomElement & thisElement)
 {
 	// Save plugin version (does this ever get used?)
-	thisElement.setAttribute("version", SYNCRHO_VERSION);
+	thisElement.setAttribute("version", SYNCHRO_VERSION);
 	m_modulation.saveSettings(doc, thisElement, "modulation");
 	m_harmonics.saveSettings(doc, thisElement, "harmonics");
 	m_modulationStrength.saveSettings(doc, thisElement, "modulationStrength");
@@ -210,10 +231,7 @@ QString SynchroSynth::nodeName() const
 
 void SynchroSynth::playNote(NotePlayHandle * n, sampleFrame * working_buffer)
 {
-	if (n->totalFramesPlayed() == 0 || n->m_pluginData == NULL)
-	{
-		n->m_pluginData = new SynchroNote(n);
-	}
+	n->m_pluginData = new SynchroNote(n);
 
 	const fpp_t frames = n->framesLeftForCurrentPeriod();
 	const f_cnt_t offset = n->noteOffset();
@@ -300,7 +318,8 @@ void SynchroSynth::generalChanged()
 			* m_modulation.value() * SYNCHRO_PM_CONST;
 		phase = phase + phaseMod * pitchDifference;
 		while (phase >= F_2PI) { phase -= F_2PI; }
-		m_resultGraph.setSampleAt(i, SynchroWaveform(phase, m_carrierDrive.value(), m_carrierSync.value(),
+		m_resultGraph.setSampleAt(i, SynchroWaveform(phase,
+			m_carrierDrive.value(), m_carrierSync.value(),
 			m_carrierChop.value(), 0));
 	}
 }

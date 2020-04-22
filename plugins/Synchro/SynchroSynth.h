@@ -65,15 +65,14 @@ class SynchroSynth : public Instrument
 	Q_OBJECT
 public:
 	SynchroSynth(InstrumentTrack * instrument_track);
-	virtual ~SynchroSynth();
 	virtual void playNote(NotePlayHandle * n, sampleFrame * working_buffer);
 	virtual void deleteNotePluginData(NotePlayHandle * n);
 	virtual void saveSettings(QDomDocument & doc, QDomElement & parent);
 	virtual void loadSettings(const QDomElement & thisElement);
 	virtual QString nodeName() const;
-	virtual f_cnt_t desiredReleaseFrames() const { return(64); } //Not sure what this is used for
+	virtual f_cnt_t desiredReleaseFrames() const { return(64); } //Explained @ https://github.com/LMMS/lmms/pull/5147/files#r326900890
 	virtual PluginView * instantiateView(QWidget * parent);
-	virtual Flags flags() const {	return IsSingleStreamed; } //Disables default envelopes/LFOs
+	//virtual Flags flags() const {	return IsSingleStreamed; } //Disables default envelopes/LFOs
 protected slots:
 void carrierChanged();
 void modulatorChanged();
@@ -116,7 +115,6 @@ class SynchroSynthView : public InstrumentView
 public:
 	SynchroSynthView(Instrument * instrument, QWidget * parent);
 	QSize sizeHint() const override { return QSize(448, 250); }
-	virtual ~SynchroSynthView() {};
 protected slots:
 private:
 	virtual void modelChanged();
@@ -148,46 +146,5 @@ private:
 	Graph * m_resultGraph;
 	static QPixmap * s_artwork;
 };
-
-//Triangle waveform generator
-static inline float tri(float x)
-{
-	return 2.0 * fabs(2.0 * ((x / F_2PI) - floorf((x / F_2PI) + 0.5))) - 1.0;
-}
-
-//Triangle waveform with harmonic generator
-static inline float trih(float x, float harmonic)
-{
-	return tri(x) + ((tri(MAGIC_HARMONICS[0][0] * x) * MAGIC_HARMONICS[0][1]
-		+ tri(MAGIC_HARMONICS[1][0] * x) * MAGIC_HARMONICS[1][1])) * harmonic;
-}
-
-//Waveform function for the Synchro synthesizer.
-//x: input phase in radians (please keep it between 0 and 2PI)
-//drive: how much atan distortion is applied to the waveform
-//sync: hard sync with harmonic multiple
-//chop: how strong the amplitude falloff is per waveform period
-//harmonic: how strong the magic harmonics are
-static inline float SynchroWaveform(float x, float drive, float sync,
-	float chop, float harmonic)
-{
-	return tanhf(trih(F_PI_2 + x * sync, harmonic) * drive)
-		/ powf(F_2PI / (F_2PI - x), chop);
-}
-
-static inline float DetuneCents(float pitch, float detune)
-{
-	return pitch * exp2(detune / 1200.0);
-}
-
-static inline float DetuneSemitones(float pitch, float detune)
-{
-	return pitch * exp2(detune / 12.0);
-}
-
-static inline float DetuneOctaves(float pitch, float detune)
-{
-	return pitch * exp2(detune);
-}
 
 #endif
