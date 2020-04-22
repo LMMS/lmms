@@ -73,6 +73,7 @@ public:
 	virtual QString nodeName() const;
 	virtual f_cnt_t desiredReleaseFrames() const { return(64); } //Not sure what this is used for
 	virtual PluginView * instantiateView(QWidget * parent);
+	virtual Flags flags() const {	return IsSingleStreamed; } //Disables default envelopes/LFOs
 protected slots:
 void carrierChanged();
 void modulatorChanged();
@@ -82,14 +83,25 @@ private:
 	BoolModel m_useHarmonics;
 	FloatModel m_modulationStrength;
 	FloatModel m_modulation;
+
 	FloatModel m_carrierDetune;
 	FloatModel m_carrierDrive;
 	FloatModel m_carrierSync;
 	FloatModel m_carrierChop;
+	FloatModel m_carrierAttack;
+	FloatModel m_carrierDecay;
+	FloatModel m_carrierSustain;
+	FloatModel m_carrierRelease;
+
 	FloatModel m_modulatorDetune;
 	FloatModel m_modulatorDrive;
 	FloatModel m_modulatorSync;
 	FloatModel m_modulatorChop;
+	FloatModel m_modulatorAttack;
+	FloatModel m_modulatorDecay;
+	FloatModel m_modulatorSustain;
+	FloatModel m_modulatorRelease;
+
 	graphModel m_carrierGraph;
 	graphModel m_modulatorGraph;
 	graphModel m_resultGraph;
@@ -103,6 +115,7 @@ class SynchroSynthView : public InstrumentView
 	Q_OBJECT
 public:
 	SynchroSynthView(Instrument * instrument, QWidget * parent);
+	QSize sizeHint() const override { return QSize(448, 250); }
 	virtual ~SynchroSynthView() {};
 protected slots:
 private:
@@ -111,14 +124,25 @@ private:
 	//led button
 	Knob * m_modulationStrengthKnob;
 	Knob * m_modulationKnob;
+
 	Knob * m_carrierDetuneKnob;
 	Knob * m_carrierDriveKnob;
 	Knob * m_carrierSyncKnob;
 	Knob * m_carrierChopKnob;
+	Knob * m_carrierAttackKnob;
+	Knob * m_carrierDecayKnob;
+	Knob * m_carrierSustainKnob;
+	Knob * m_carrierReleaseKnob;
+
 	Knob * m_modulatorDetuneKnob;
 	Knob * m_modulatorDriveKnob;
 	Knob * m_modulatorSyncKnob;
 	Knob * m_modulatorChopKnob;
+	Knob * m_modulatorAttackKnob;
+	Knob * m_modulatorDecayKnob;
+	Knob * m_modulatorSustainKnob;
+	Knob * m_modulatorReleaseKnob;
+
 	Graph * m_carrierGraph;
 	Graph * m_modulatorGraph;
 	Graph * m_resultGraph;

@@ -37,7 +37,7 @@
 #include "NotePlayHandle.h"
 #include "plugin_export.h"
 
-#define SYNCRHO_VERSION "0.4"
+#define SYNCRHO_VERSION "0.5"
 #define SYNCHRO_VOLUME_CONST 0.15f
 
 static const int SYNCHRO_OVERSAMPLE = 4; //Anti-aliasing samples
@@ -111,14 +111,25 @@ SynchroSynth::SynchroSynth(InstrumentTrack * instrument_track) :
 	m_harmonics(0, 0, 1.0f, 0.01f, this, tr("harmonics")),
 	m_modulationStrength(0.5, 0, 1, 0.01f, this, tr("modulation maximum")),
 	m_modulation(0, 0, 1, 0.001f, this, tr("modulation")),
+
 	m_carrierDetune(0, -4, 0, 1, this, tr("voice octave")),
 	m_carrierDrive(1, 1, 7, 0.01f, this, tr("voice drive")),
 	m_carrierSync(1, 1, 16, 0.01f, this, tr("voice sync")),
 	m_carrierChop(0, 0, 4, 0.01f, this, tr("voice chop")),
+	m_carrierAttack(0, 0, 1, 0.01f, this, tr("voice attack")),
+	m_carrierDecay(0, 0, 1, 0.01f, this, tr("voice decay")),
+	m_carrierSustain(0, 0, 1, 0.01f, this, tr("voice sustain")),
+	m_carrierRelease(0, 0, 1, 0.01f, this, tr("voice release")),
+
 	m_modulatorDetune(0, -4, 0, 1, this, tr("modulator octave")),
 	m_modulatorDrive(1, 1, 7, 0.01f, this, tr("modulator drive")),
 	m_modulatorSync(1, 1, 16, 0.01f, this, tr("modulator sync")),
 	m_modulatorChop(0, 0, 4, 0.01f, this, tr("modulator chop")),
+	m_modulatorAttack(0, 0, 1, 0.01f, this, tr("modulator attack")),
+	m_modulatorDecay(0, 0, 1, 0.01f, this, tr("modulator decay")),
+	m_modulatorSustain(0, 0, 1, 0.01f, this, tr("modulator sustain")),
+	m_modulatorRelease(0, 0, 1, 0.01f, this, tr("modulator release")),
+
 	m_carrierGraph(-1.0f, 1.0f, SYNCHRO_GRAPH_SAMPLES, this),
 	m_modulatorGraph(-1.0f, 1.0f, SYNCHRO_GRAPH_SAMPLES, this),
 	m_resultGraph(-1.0f, 1.0f, SYNCHRO_GRAPH_SAMPLES, this)
@@ -305,15 +316,15 @@ SynchroSynthView::SynchroSynthView(Instrument * instrument, QWidget * parent) :
 
 	//General Controls
 	m_harmonicsKnob = new Knob(knobDark_28, this);
-	m_harmonicsKnob->move(136, 80);
+	m_harmonicsKnob->move(185, 80);
 	m_harmonicsKnob->setHintText(tr("harmonics"), "");
 
 	m_modulationStrengthKnob = new Knob(knobDark_28, this);
-	m_modulationStrengthKnob->move(200, 80);
+	m_modulationStrengthKnob->move(281, 80);
 	m_modulationStrengthKnob->setHintText(tr("modulation maximum"), "");
 
 	m_modulationKnob = new Knob(knobDark_28, this);
-	m_modulationKnob->move(72, 80);
+	m_modulationKnob->move(89, 80);
 	m_modulationKnob->setHintText(tr("modulation"), "");
 
 	//Carrier Controls
@@ -333,6 +344,22 @@ SynchroSynthView::SynchroSynthView(Instrument * instrument, QWidget * parent) :
 	m_carrierDetuneKnob->move(64, 144);
 	m_carrierDetuneKnob->setHintText(tr("voice octave"), "");
 
+	m_carrierAttackKnob = new Knob(knobDark_28, this);
+	m_carrierAttackKnob->move(257, 144);
+	m_carrierAttackKnob->setHintText(tr("voice attack"), "");
+
+	m_carrierDecayKnob = new Knob(knobDark_28, this);
+	m_carrierDecayKnob->move(305, 144);
+	m_carrierDecayKnob->setHintText(tr("voice decay"), "");
+
+	m_carrierSustainKnob = new Knob(knobDark_28, this);
+	m_carrierSustainKnob->move(353, 144);
+	m_carrierSustainKnob->setHintText(tr("voice sustain"), "");
+
+	m_carrierReleaseKnob = new Knob(knobDark_28, this);
+	m_carrierReleaseKnob->move(401, 144);
+	m_carrierReleaseKnob->setHintText(tr("voice release"), "");
+
 	//Modulator Controls
 	m_modulatorDriveKnob = new Knob(knobDark_28, this);
 	m_modulatorDriveKnob->move(113, 210);
@@ -349,6 +376,22 @@ SynchroSynthView::SynchroSynthView(Instrument * instrument, QWidget * parent) :
 	m_modulatorDetuneKnob = new Knob(knobDark_28, this);
 	m_modulatorDetuneKnob->move(64, 210);
 	m_modulatorDetuneKnob->setHintText(tr("modulator octave"), "");
+
+	m_modulatorAttackKnob = new Knob(knobDark_28, this);
+	m_modulatorAttackKnob->move(257, 210);
+	m_modulatorAttackKnob->setHintText(tr("modulator attack"), "");
+
+	m_modulatorDecayKnob = new Knob(knobDark_28, this);
+	m_modulatorDecayKnob->move(305, 210);
+	m_modulatorDecayKnob->setHintText(tr("modulator decay"), "");
+
+	m_modulatorSustainKnob = new Knob(knobDark_28, this);
+	m_modulatorSustainKnob->move(353, 210);
+	m_modulatorSustainKnob->setHintText(tr("modulator sustain"), "");
+
+	m_modulatorReleaseKnob = new Knob(knobDark_28, this);
+	m_modulatorReleaseKnob->move(401, 210);
+	m_modulatorReleaseKnob->setHintText(tr("modulator release"), "");
 
 	m_carrierGraph = new Graph(this, Graph::LinearStyle, 48, 42);
 	m_carrierGraph->move(5, 138);
@@ -375,14 +418,25 @@ void SynchroSynthView::modelChanged()
 	m_harmonicsKnob->setModel(&b->m_harmonics);
 	m_modulationStrengthKnob->setModel(&b->m_modulationStrength);
 	m_modulationKnob->setModel(&b->m_modulation);
+
 	m_carrierDriveKnob->setModel(&b->m_carrierDrive);
 	m_carrierSyncKnob->setModel(&b->m_carrierSync);
 	m_carrierChopKnob->setModel(&b->m_carrierChop);
 	m_carrierDetuneKnob->setModel(&b->m_carrierDetune);
+	m_carrierAttackKnob->setModel(&b->m_carrierAttack);
+	m_carrierDecayKnob->setModel(&b->m_carrierDecay);
+	m_carrierSustainKnob->setModel(&b->m_carrierSustain);
+	m_carrierReleaseKnob->setModel(&b->m_carrierRelease);
+
 	m_modulatorDriveKnob->setModel(&b->m_modulatorDrive);
 	m_modulatorSyncKnob->setModel(&b->m_modulatorSync);
 	m_modulatorChopKnob->setModel(&b->m_modulatorChop);
 	m_modulatorDetuneKnob->setModel(&b->m_modulatorDetune);
+	m_modulatorAttackKnob->setModel(&b->m_modulatorAttack);
+	m_modulatorDecayKnob->setModel(&b->m_modulatorDecay);
+	m_modulatorSustainKnob->setModel(&b->m_modulatorSustain);
+	m_modulatorReleaseKnob->setModel(&b->m_modulatorRelease);
+
 	m_carrierGraph->setModel(&b->m_carrierGraph);
 	m_modulatorGraph->setModel(&b->m_modulatorGraph);
 	m_resultGraph->setModel(&b->m_resultGraph);
