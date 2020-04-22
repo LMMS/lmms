@@ -1772,8 +1772,9 @@ void PianoRoll::mouseDoubleClickEvent(QMouseEvent * me )
 		{
 			const Note * closest = NULL;
 			int closest_dist = 9999999;
-			// if we caught multiple notes, find the closest...
-			if( nv.size() > 1 )
+			// if we caught multiple notes and we're not editing a
+			// selection, find the closest...
+			if( nv.size() > 1 && !isSelection() )
 			{
 				for ( const Note * i : nv )
 				{
