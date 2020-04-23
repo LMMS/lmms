@@ -1,7 +1,7 @@
 /*
  * SynchroSynth.h - 2-oscillator PM synth
  *
- * Copyright (c) 2019 Ian Sannar <ian/dot/sannar/at/gmail/dot/com>
+ * Copyright (c) 2020 Ian Sannar <ian/dot/sannar/at/gmail/dot/com>
  * Credits to @DouglasDGI "Lost Robot" for performance optimizations
  *
  * This file is part of LMMS - https://lmms.io
@@ -25,107 +25,59 @@
 #ifndef SYNCHROSYNTH_H
 #define SYNCHROSYNTH_H
 
-#include "lmms_constants.h"
-#include "lmms_math.h"
-#include "Instrument.h"
-#include "InstrumentView.h"
-#include "MemoryManager.h"
-#include "Knob.h"
-#include "Graph.h"
+#include "Graph.h" //Required for the waveform view
+#include "Instrument.h" //Required for the synth
+#include "InstrumentView.h" //Required for instrument GUI
+#include "Knob.h" //Required to use knobs
+#include "NotePlayHandle.h" //Required for audio rendering
 
-static const float MAGIC_HARMONICS[2][2] = {{32, 0.5}, {38, 0.025}};
+constexpr char SYNCHRO_VERSION [] = "0.6";
+constexpr float SYNCHRO_VOLUME_CONST = 0.15f; //Prevents clipping
+constexpr int SYNCHRO_OVERSAMPLE = 4; //Anti-aliasing samples
+constexpr int SYNCHRO_PM_CONST = 20; //Strength of the phase modulation
+constexpr int SYNCHRO_GRAPH_SAMPLES = 48; //Resolution of the waveform view
+constexpr float MAGIC_HARMONICS[2][2] = {{32, 0.5}, {38, 0.025}}; //Yoioioi
 
-class SynchroSynthView; //Additional definition to prevent errors, since SynchroInstrument references it
-
+//Used to pass the oscillator settings from the GUI to the synth itself
 struct SynchroOscillatorSettings
 {
-	float Detune;
-	float Drive;
-	float Sync;
-	float Chop;
-	float Attack;
-	float Decay;
-	float Sustain;
-	float Release;
+	float Detune; //Detune in octaves
+	float Drive; //Saturation amount
+	float Sync; //Hard-sync frequency multiplier
+	float Chop; //Per-period waveform damping
+	float Attack; //Amplitude attack time (fade-in)
+	float Decay; //Amplitude decay time (fade-out to sustain value)
+	float Sustain; //Amplitude sustain value
+	float Release; //Amplitude release time (fade out to silence)
 };
 
+//Renders the sound for each note or something
 class SynchroNote
 {
 	MM_OPERATORS
 public:
-	SynchroNote(NotePlayHandle * nph);
-	virtual ~SynchroNote();
+	SynchroNote(NotePlayHandle * nph); //Constructor
+	//Renders a single sample of audio
 	void nextStringSample(sampleFrame &outputSample, sample_rate_t sample_rate,
-		const float & modulationStrength, const float & modulationAmount,
-		const float & harmonics,
-		const SynchroOscillatorSettings & carrier,
-		const SynchroOscillatorSettings & modulator);
+		const float & modulationStrength, const float & modulationAmount, const float & harmonics,
+		const SynchroOscillatorSettings & carrier, const SynchroOscillatorSettings & modulator);
 private:
 	NotePlayHandle * nph;
-	float carrierSampleIndex = 0;
-	float modulatorSampleIndex = 0;
+	float carrierSampleIndex = 0; //The index (or phase) of the carrier oscillator
+	float modulatorSampleIndex = 0; //The index (or phase) of the modulator oscillator
 };
 
-class SynchroSynth : public Instrument
-{
-	Q_OBJECT
-public:
-	SynchroSynth(InstrumentTrack * instrument_track);
-	virtual void playNote(NotePlayHandle * n, sampleFrame * working_buffer);
-	virtual void deleteNotePluginData(NotePlayHandle * n);
-	virtual void saveSettings(QDomDocument & doc, QDomElement & parent);
-	virtual void loadSettings(const QDomElement & thisElement);
-	virtual QString nodeName() const;
-	virtual f_cnt_t desiredReleaseFrames() const;
-	virtual PluginView * instantiateView(QWidget * parent);
-	//virtual Flags flags() const {	return IsSingleStreamed; } //Disables default envelopes/LFOs
-protected slots:
-void carrierChanged();
-void modulatorChanged();
-void generalChanged();
-private:
-	FloatModel m_harmonics;
-	BoolModel m_useHarmonics;
-	FloatModel m_modulationStrength;
-	FloatModel m_modulation;
-
-	FloatModel m_carrierDetune;
-	FloatModel m_carrierDrive;
-	FloatModel m_carrierSync;
-	FloatModel m_carrierChop;
-	FloatModel m_carrierAttack;
-	FloatModel m_carrierDecay;
-	FloatModel m_carrierSustain;
-	FloatModel m_carrierRelease;
-
-	FloatModel m_modulatorDetune;
-	FloatModel m_modulatorDrive;
-	FloatModel m_modulatorSync;
-	FloatModel m_modulatorChop;
-	FloatModel m_modulatorAttack;
-	FloatModel m_modulatorDecay;
-	FloatModel m_modulatorSustain;
-	FloatModel m_modulatorRelease;
-
-	graphModel m_carrierGraph;
-	graphModel m_modulatorGraph;
-	graphModel m_resultGraph;
-	float m_carrierNormalize; //for later
-	float m_modulatorNormalize;
-	friend class SynchroSynthView;
-};
-
+//Synth GUI
 class SynchroSynthView : public InstrumentView
 {
 	Q_OBJECT
 public:
 	SynchroSynthView(Instrument * instrument, QWidget * parent);
-	QSize sizeHint() const override { return QSize(448, 250); }
+	QSize sizeHint() const override { return QSize(448, 250); } //~3px wider than the artwork
 protected slots:
 private:
 	virtual void modelChanged();
 	Knob * m_harmonicsKnob;
-	//led button
 	Knob * m_modulationStrengthKnob;
 	Knob * m_modulationKnob;
 
@@ -150,7 +102,52 @@ private:
 	Graph * m_carrierGraph;
 	Graph * m_modulatorGraph;
 	Graph * m_resultGraph;
-	static QPixmap * s_artwork;
+};
+
+//Middleman between the GUI, LMMS, and each note (SynchroNote)
+class SynchroSynth : public Instrument
+{
+	Q_OBJECT
+public:
+	SynchroSynth(InstrumentTrack * instrument_track);
+	virtual void playNote(NotePlayHandle * n, sampleFrame * working_buffer);
+	virtual void deleteNotePluginData(NotePlayHandle * n) { delete static_cast<SynchroNote *>(n->m_pluginData); };
+	virtual void saveSettings(QDomDocument & doc, QDomElement & parent);
+	virtual void loadSettings(const QDomElement & thisElement);
+	virtual QString nodeName() const;
+	virtual f_cnt_t desiredReleaseFrames() const;
+	virtual PluginView * instantiateView(QWidget * parent) { return new SynchroSynthView(this, parent); };
+protected slots:
+	void carrierChanged();
+	void modulatorChanged();
+	void generalChanged();
+private:
+	FloatModel m_harmonics;
+	FloatModel m_modulationStrength;
+	FloatModel m_modulation;
+
+	FloatModel m_carrierDetune;
+	FloatModel m_carrierDrive;
+	FloatModel m_carrierSync;
+	FloatModel m_carrierChop;
+	FloatModel m_carrierAttack;
+	FloatModel m_carrierDecay;
+	FloatModel m_carrierSustain;
+	FloatModel m_carrierRelease;
+
+	FloatModel m_modulatorDetune;
+	FloatModel m_modulatorDrive;
+	FloatModel m_modulatorSync;
+	FloatModel m_modulatorChop;
+	FloatModel m_modulatorAttack;
+	FloatModel m_modulatorDecay;
+	FloatModel m_modulatorSustain;
+	FloatModel m_modulatorRelease;
+
+	graphModel m_carrierGraph;
+	graphModel m_modulatorGraph;
+	graphModel m_resultGraph;
+	friend class SynchroSynthView;
 };
 
 #endif
