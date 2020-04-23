@@ -2868,7 +2868,8 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 	// set font-size to 8
 	p.setFont( pointSize<8>( p.font() ) );
 	QFontMetrics fontMetrics(p.font());
-	int const fontHeight = fontMetrics.boundingRect(QChar::fromLatin1('H')).height();
+	QRect const boundingRect = fontMetrics.boundingRect(QChar::fromLatin1('H'));
+	int const fontHeight = - boundingRect.top() - boundingRect.bottom();
 
 	// y_offset is used to align the piano-keys on the key-lines
 	int y_offset = 0;
