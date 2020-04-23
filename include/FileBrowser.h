@@ -127,6 +127,7 @@ private slots:
 	void openInNewInstrumentTrackSE( void );
 	void sendToActiveInstrumentTrack( void );
 	void updateDirectory( QTreeWidgetItem * item );
+	void openContainingFolder();
 
 } ;
 
