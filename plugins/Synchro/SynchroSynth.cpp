@@ -40,7 +40,7 @@
 constexpr char SYNCHRO_VERSION [] = "0.5";
 constexpr float SYNCHRO_VOLUME_CONST = 0.15f;
 
-constexpr int SYNCHRO_OVERSAMPLE = 4; //Anti-aliasing samples
+constexpr int SYNCHRO_OVERSAMPLE = 8; //Anti-aliasing samples
 constexpr int SYNCHRO_PM_CONST = 20; //Strength of the phase modulation
 constexpr int SYNCHRO_GRAPH_SAMPLES = 48; //Resolution of the waveform view GUI elements
 
@@ -97,6 +97,18 @@ static inline float DetuneOctaves(float pitch, float detune)
 	return pitch * exp2(detune);
 }
 
+//Linear interpolation for envelopes
+static inline float lerp(float from, float to, float x)
+{
+	return from + x * (to - from);
+}
+
+//Exponential interpolation for envelopes
+static inline float expi(float from, float to, float x)
+{
+	return from + pow(x, F_E) * (to - from);
+}
+
 SynchroNote::SynchroNote(NotePlayHandle * nph) :
 	nph(nph)
 {
@@ -110,30 +122,75 @@ SynchroNote::~SynchroNote()
 
 void SynchroNote::nextStringSample(sampleFrame &outputSample,
 	sample_rate_t sample_rate, const float & modulationStrength,
-	const float & modulationAmount, const float & harmonics, const SynchroOscillatorSettings & carrier,
+	const float & modulationAmount, const float & harmonics,
+	const SynchroOscillatorSettings & carrier,
 	const SynchroOscillatorSettings & modulator)
 {
 	float freqToSampleStep = F_2PI / sample_rate;
+	float NoteTime = nph->totalFramesPlayed();
 	//Find position in modulator waveform
 	modulatorSampleIndex += freqToSampleStep * DetuneOctaves(nph->frequency(),
 		modulator.Detune);
 	while (modulatorSampleIndex >= F_2PI) { modulatorSampleIndex -= F_2PI; } //Make sure phase is always between 0 and 2PI
 	//Get modulator waveform at position
 	//Modulator is calculated first because it is used by the carrier
-	float modulatorSample = SynchroWaveform(modulatorSampleIndex, modulator.Drive,
-		modulator.Sync, modulator.Chop, harmonics)
+	float modulatorSample = SynchroWaveform(modulatorSampleIndex,
+		modulator.Drive, modulator.Sync, modulator.Chop, harmonics)
 		* (modulationStrength * modulationAmount);
-	float pmSample = modulatorSample * SYNCHRO_PM_CONST;
+	//Modulator envelope
+	float modulatorEnvelope;
+	float modulatorAtk = modulator.Attack * 0.001
+		* Engine::mixer()->processingSampleRate(); //Using sample_rate here gives an incorrect envelope length for some reason
+	float modulatorDec = modulator.Decay * 0.001
+		* Engine::mixer()->processingSampleRate();
+	float modulatorRel = modulator.Release * 0.001
+		* Engine::mixer()->processingSampleRate();
+	if (NoteTime < modulatorAtk) {
+		modulatorEnvelope = lerp(0, 1, NoteTime / modulatorAtk);
+	} else if (NoteTime <= modulatorAtk + modulatorDec) {
+		modulatorEnvelope = expi(1, modulator.Sustain, NoteTime
+			/ (modulatorAtk + modulatorDec));
+	} else { //Sustain
+		modulatorEnvelope = modulator.Sustain;
+	}
+	if (nph->isReleased()) { //Release
+		float releaseProgress = (nph->releaseFramesDone() < modulatorRel) ?
+			nph->releaseFramesDone() : modulatorRel;
+		modulatorEnvelope *= expi(1, 0, releaseProgress / modulatorRel);
+	}
+
+	float pmSample = modulatorSample * modulatorEnvelope * SYNCHRO_PM_CONST;
 	//Find position in carrier waveform
 	carrierSampleIndex += freqToSampleStep * DetuneOctaves(nph->frequency(),
 		carrier.Detune);
 	while (carrierSampleIndex >= F_2PI) { carrierSampleIndex -= F_2PI; } //Make sure phase is always between 0 and 2PI
 	while (carrierSampleIndex < 0) { carrierSampleIndex += F_2PI; } //Phase modulation might push it below 0
 	//Get carrier waveform at position, accounting for modulation
+	//Carrier envelope
+	float carrierEnvelope;
+	float carrierAtk = carrier.Attack * 0.001
+		* Engine::mixer()->processingSampleRate();
+	float carrierDec = carrier.Decay * 0.001
+		* Engine::mixer()->processingSampleRate();
+	float carrierRel = carrier.Release * 0.001
+		* Engine::mixer()->processingSampleRate();
+	if (NoteTime < carrierAtk) {
+		carrierEnvelope = lerp(0, 1, NoteTime / carrierAtk);
+	} else if (NoteTime <= carrierAtk + carrierDec) {
+		carrierEnvelope = expi(1, carrier.Sustain, NoteTime
+			/ (carrierAtk + carrierDec));
+	} else { //Sustain
+		carrierEnvelope = carrier.Sustain;
+	}
+	if (nph->isReleased()) { //Release
+		float releaseProgress = (nph->releaseFramesDone() < carrierRel) ?
+			nph->releaseFramesDone() : carrierRel;
+		carrierEnvelope *= expi(1, 0, releaseProgress / carrierRel);
+	}
 	//Index 0 is L, 1 is R. Synth is currently mono so they are the same value.
 	outputSample[0] = SynchroWaveform(carrierSampleIndex + pmSample,
 		carrier.Drive, carrier.Sync, carrier.Chop, 0)
-		* (SYNCHRO_VOLUME_CONST);
+		* carrierEnvelope * SYNCHRO_VOLUME_CONST;
 	outputSample[1] = outputSample[0];
 }
 
@@ -147,19 +204,19 @@ SynchroSynth::SynchroSynth(InstrumentTrack * instrument_track) :
 	m_carrierDrive(1, 1, 7, 0.01f, this, tr("voice drive")),
 	m_carrierSync(1, 1, 16, 0.01f, this, tr("voice sync")),
 	m_carrierChop(0, 0, 4, 0.01f, this, tr("voice chop")),
-	m_carrierAttack(0, 0, 1, 0.01f, this, tr("voice attack")),
-	m_carrierDecay(0, 0, 1, 0.01f, this, tr("voice decay")),
-	m_carrierSustain(0, 0, 1, 0.01f, this, tr("voice sustain")),
-	m_carrierRelease(0, 0, 1, 0.01f, this, tr("voice release")),
+	m_carrierAttack(10, 10, 1000, 1, this, tr("voice attack")),
+	m_carrierDecay(50, 10, 4000, 1, this, tr("voice decay")),
+	m_carrierSustain(1.0f, 0, 1.0f, 0.01f, this, tr("voice sustain")),
+	m_carrierRelease(20, 20, 4000, 1, this, tr("voice release")),
 
 	m_modulatorDetune(0, -4, 0, 1, this, tr("modulator octave")),
 	m_modulatorDrive(1, 1, 7, 0.01f, this, tr("modulator drive")),
 	m_modulatorSync(1, 1, 16, 0.01f, this, tr("modulator sync")),
 	m_modulatorChop(0, 0, 4, 0.01f, this, tr("modulator chop")),
-	m_modulatorAttack(0, 0, 1, 0.01f, this, tr("modulator attack")),
-	m_modulatorDecay(0, 0, 1, 0.01f, this, tr("modulator decay")),
-	m_modulatorSustain(0, 0, 1, 0.01f, this, tr("modulator sustain")),
-	m_modulatorRelease(0, 0, 1, 0.01f, this, tr("modulator release")),
+	m_modulatorAttack(0, 0, 1000, 1, this, tr("modulator attack")),
+	m_modulatorDecay(50, 10, 4000, 1, this, tr("modulator decay")),
+	m_modulatorSustain(1.0f, 0, 1.0f, 0.01f, this, tr("modulator sustain")),
+	m_modulatorRelease(4000, 10, 4000, 1, this, tr("modulator release")),
 
 	m_carrierGraph(-1.0f, 1.0f, SYNCHRO_GRAPH_SAMPLES, this),
 	m_modulatorGraph(-1.0f, 1.0f, SYNCHRO_GRAPH_SAMPLES, this),
@@ -195,6 +252,12 @@ SynchroSynth::SynchroSynth(InstrumentTrack * instrument_track) :
 		SLOT(generalChanged()));
 	connect(&m_modulationStrength, SIGNAL(dataChanged()), this,
 		SLOT(generalChanged()));
+}
+
+f_cnt_t SynchroSynth::desiredReleaseFrames() const
+{
+	return (f_cnt_t)(m_carrierRelease.value() * 0.001
+		* Engine::mixer()->processingSampleRate());
 }
 
 void SynchroSynth::saveSettings(QDomDocument & doc, QDomElement & thisElement)
@@ -236,10 +299,8 @@ QString SynchroSynth::nodeName() const
 
 void SynchroSynth::playNote(NotePlayHandle * n, sampleFrame * working_buffer)
 {
-	if (n->totalFramesPlayed() == 0 || n->m_pluginData == NULL)
-	{
+	if (n->m_pluginData == NULL)
 		n->m_pluginData = new SynchroNote(n);
-	}
 
 	const fpp_t frames = n->framesLeftForCurrentPeriod();
 	const f_cnt_t offset = n->noteOffset();
@@ -255,15 +316,19 @@ void SynchroSynth::playNote(NotePlayHandle * n, sampleFrame * working_buffer)
 		sampleFrame tempSample = {0, 0};
 		SynchroOscillatorSettings carrier = { m_carrierDetune.value(),
 			m_carrierDrive.value(), m_carrierSync.value(),
-			m_carrierChop.value() };
+			m_carrierChop.value(), m_carrierAttack.value(), m_carrierDecay.value(),
+			m_carrierSustain.value(), m_carrierRelease.value() };
 		SynchroOscillatorSettings modulator = { m_modulatorDetune.value(),
 			m_modulatorDrive.value(), m_modulatorSync.value(),
-			m_modulatorChop.value() };
+			m_modulatorChop.value(), m_modulatorAttack.value(),
+			m_modulatorDecay.value(), m_modulatorSustain.value(),
+			m_modulatorRelease.value() };
 
 		//Oversampling using linear interpolation
 		for (int i = 0; i < SYNCHRO_OVERSAMPLE; ++i)
 		{
-			float strength = modStrBuf ? modStrBuf->value(frame) : m_modulationStrength.value();
+			float strength = modStrBuf ? modStrBuf->value(frame)
+				: m_modulationStrength.value();
 			float amount = modBuf ? modBuf->value(frame) : m_modulation.value();
 
 			ps->nextStringSample(tempSample,
@@ -281,8 +346,8 @@ void SynchroSynth::playNote(NotePlayHandle * n, sampleFrame * working_buffer)
 				/ SYNCHRO_OVERSAMPLE;
 		}
 	}
-	applyRelease(working_buffer, n);
-	instrumentTrack()->processAudioBuffer(working_buffer, frames + offset, n);
+	//applyRelease(working_buffer, n);
+	//instrumentTrack()->processAudioBuffer(working_buffer, frames + offset, n);
 }
 
 void SynchroSynth::deleteNotePluginData(NotePlayHandle * n)

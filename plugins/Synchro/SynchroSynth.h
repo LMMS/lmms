@@ -37,13 +37,17 @@ static const float MAGIC_HARMONICS[2][2] = {{32, 0.5}, {38, 0.025}};
 
 class SynchroSynthView; //Additional definition to prevent errors, since SynchroInstrument references it
 
-typedef struct SynchroOscillatorSettings
+struct SynchroOscillatorSettings
 {
 	float Detune;
 	float Drive;
 	float Sync;
 	float Chop;
-} SynchroOscillatorSettings;
+	float Attack;
+	float Decay;
+	float Sustain;
+	float Release;
+};
 
 class SynchroNote
 {
@@ -52,7 +56,8 @@ public:
 	SynchroNote(NotePlayHandle * nph);
 	virtual ~SynchroNote();
 	void nextStringSample(sampleFrame &outputSample, sample_rate_t sample_rate,
-		const float & modulationStrength, const float & modulationAmount, const float & harmonics,
+		const float & modulationStrength, const float & modulationAmount,
+		const float & harmonics,
 		const SynchroOscillatorSettings & carrier,
 		const SynchroOscillatorSettings & modulator);
 private:
@@ -71,7 +76,7 @@ public:
 	virtual void saveSettings(QDomDocument & doc, QDomElement & parent);
 	virtual void loadSettings(const QDomElement & thisElement);
 	virtual QString nodeName() const;
-	virtual f_cnt_t desiredReleaseFrames() const { return(64); } //Explained @ https://github.com/LMMS/lmms/pull/5147/files#r326900890
+	virtual f_cnt_t desiredReleaseFrames() const;
 	virtual PluginView * instantiateView(QWidget * parent);
 	//virtual Flags flags() const {	return IsSingleStreamed; } //Disables default envelopes/LFOs
 protected slots:
