@@ -61,6 +61,8 @@ FxLine::FxLine( QWidget * _parent, FxMixerView * _mv, int _channelIndex ) :
 	m_mv( _mv ),
 	m_channelIndex( _channelIndex ),
 	m_backgroundActive( Qt::SolidPattern ),
+	m_backgroundSendTo(Qt::SolidPattern),
+	m_backgroundReceiveFrom(Qt::SolidPattern),
 	m_strokeOuterActive( 0, 0, 0 ),
 	m_strokeOuterInactive( 0, 0, 0 ),
 	m_strokeInnerActive( 0, 0, 0 ),
@@ -157,7 +159,18 @@ void FxLine::drawFxLine( QPainter* p, const FxLine *fxLine, bool isActive, bool 
 	int width = fxLine->rect().width();
 	int height = fxLine->rect().height();
 
-	p->fillRect( fxLine->rect(), isActive ? fxLine->backgroundActive() : p->background() );
+	if (sendToThis)
+	{
+		p->fillRect(fxLine->rect(), fxLine->backgroundSendTo());
+	}
+	else if (receiveFromThis)
+	{
+		p->fillRect(fxLine->rect(), fxLine->backgroundReceiveFrom());
+	}
+	else
+	{
+		p->fillRect( fxLine->rect(), isActive ? fxLine->backgroundActive() : p->background() );
+	}
 	
 	// inner border
 	p->setPen( isActive ? fxLine->strokeInnerActive() : fxLine->strokeInnerInactive() );
@@ -330,6 +343,38 @@ QBrush FxLine::backgroundActive() const
 void FxLine::setBackgroundActive( const QBrush & c )
 {
 	m_backgroundActive = c;
+}
+
+
+
+
+QBrush FxLine::backgroundSendTo() const
+{
+	return m_backgroundSendTo;
+}
+
+
+
+
+void FxLine::setBackgroundSendTo(const QBrush &c)
+{
+	m_backgroundSendTo = c;
+}
+
+
+
+
+QBrush FxLine::backgroundReceiveFrom() const
+{
+	return m_backgroundReceiveFrom;
+}
+
+
+
+
+void FxLine::setBackgroundReceiveFrom(const QBrush &c)
+{
+	m_backgroundReceiveFrom = c;
 }
 
 
