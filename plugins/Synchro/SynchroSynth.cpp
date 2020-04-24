@@ -502,6 +502,8 @@ void SynchroSynth::loadSettings(const QDomElement & thisElement)
 	m_modulatorRelease.loadSettings(thisElement, "modulatorRelease");
 }
 
+QString SynchroSynth::nodeName() const { return synchro_plugin_descriptor.name; };
+
 //Update carrier waveform view
 void SynchroSynth::carrierChanged()
 {
@@ -550,5 +552,3 @@ void SynchroSynth::generalChanged()
 			m_carrierChop.value(), 0));
 	}
 }
-
-QString SynchroSynth::nodeName() const { return synchro_plugin_descriptor.name; };

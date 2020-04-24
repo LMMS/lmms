@@ -56,7 +56,8 @@ class SynchroNote
 {
 	MM_OPERATORS
 public:
-	SynchroNote(NotePlayHandle * nph); //Constructor
+	//Constructor
+	SynchroNote(NotePlayHandle * nph);
 	//Renders a single sample of audio
 	void nextStringSample(sampleFrame &outputSample, sample_rate_t sample_rate,
 		const float & modulationStrength, const float & modulationAmount, const float & harmonics,
@@ -111,20 +112,20 @@ class SynchroSynth : public Instrument
 public:
 	SynchroSynth(InstrumentTrack * instrument_track);
 	virtual void playNote(NotePlayHandle * n, sampleFrame * working_buffer);
-	virtual void deleteNotePluginData(NotePlayHandle * n) { delete static_cast<SynchroNote *>(n->m_pluginData); };
+	virtual f_cnt_t desiredReleaseFrames() const;
 	virtual void saveSettings(QDomDocument & doc, QDomElement & parent);
 	virtual void loadSettings(const QDomElement & thisElement);
 	virtual QString nodeName() const;
-	virtual f_cnt_t desiredReleaseFrames() const;
 	virtual PluginView * instantiateView(QWidget * parent) { return new SynchroSynthView(this, parent); };
+	virtual void deleteNotePluginData(NotePlayHandle * n) { delete static_cast<SynchroNote *>(n->m_pluginData); };
 protected slots:
 	void carrierChanged();
 	void modulatorChanged();
 	void generalChanged();
 private:
+	FloatModel m_modulation;
 	FloatModel m_harmonics;
 	FloatModel m_modulationStrength;
-	FloatModel m_modulation;
 
 	FloatModel m_carrierDetune;
 	FloatModel m_carrierDrive;
