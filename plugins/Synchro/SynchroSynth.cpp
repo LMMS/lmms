@@ -87,7 +87,7 @@ static inline float lerp(float from, float to, float x)
 //x: the progress between the two values between 0 and 1
 static inline float expInterpol(float from, float to, float x)
 {
-	return from + x * x * (to - from);
+	return from + sqrt(x) * (to - from);
 }
 
 //Detunes by octaves
@@ -440,7 +440,7 @@ void SynchroSynth::playNote(NotePlayHandle * n, sampleFrame * working_buffer)
 		}
 	}
 	//applyRelease(working_buffer, n);
-	//instrumentTrack()->processAudioBuffer(working_buffer, frames + offset, n);
+	instrumentTrack()->processAudioBuffer(working_buffer, frames + offset, n);
 }
 
 //Tells LMMS how much extra time Synchro needs at the end of a note to finish our envelopes
