@@ -31,6 +31,7 @@
 #include "Engine.h" //Required to access sample rate
 #include "InstrumentTrack.h" //Required for the plugin to appear in LMMS
 #include "lmms_constants.h" //Greater precision than math.h constants?
+#include "lmms_math.h" //Faster math
 #include "Mixer.h" //Required to access sample rate
 #include "NotePlayHandle.h" //Required for audio rendering
 #include "plugin_export.h" //Required for the plugin to appear in LMMS
@@ -87,7 +88,7 @@ static inline float lerp(float from, float to, float x)
 //x: the progress between the two values between 0 and 1
 static inline float expInterpol(float from, float to, float x)
 {
-	return from + sqrt(x) * (to - from);
+	return from + fastSqrt(x) * (to - from);
 }
 
 //Detunes by octaves
@@ -98,6 +99,16 @@ static inline float DetuneOctaves(float pitch, float detune)
 	return pitch * exp2(detune);
 }
 
+//Fast hyperbolic tangent approximation function
+//
+static inline float fastTanh(const float x)
+{
+	const double absX = fabs(x);
+	const double sqrX = x * x;
+	const double z = x * (0.773062670268356 + ax + (0.757118539838817 + 0.0139332362248817 * x2 * x2) * x2 * ax);
+	return z / (0.795956503022967 + fabs(z)));
+}
+
 //Waveform function for the Synchro synthesizer.
 //x: input phase in radians (please keep it between 0 and 2PI)
 //drive: how much atan distortion is applied to the waveform
@@ -106,7 +117,7 @@ static inline float DetuneOctaves(float pitch, float detune)
 //harmonic: how strong the magic harmonics are
 static inline float SynchroWaveform(float x, float drive, float sync, float chop, float harmonic)
 {
-	return tanhf(trih(F_PI_2 + x * sync, harmonic) * drive / powf(F_2PI / (F_2PI - x), chop));
+	return fastTanh(trih(F_PI_2 + x * sync, harmonic) * drive / powf(F_2PI / (F_2PI - x), chop));
 }
 
 //SynchroNote empty constructor
