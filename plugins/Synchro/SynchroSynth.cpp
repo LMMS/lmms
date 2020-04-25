@@ -106,7 +106,7 @@ static inline float fastTanh(const float x)
 	const double absX = fabs(x);
 	const double sqrX = x * x;
 	const double z = x * (0.773062670268356 + absX + (0.757118539838817 + 0.0139332362248817 * sqrX * sqrX) * sqrX * absX);
-	return z / (0.795956503022967 + fabs(z)));
+	return z / (0.795956503022967 + fabs(z));
 }
 
 //Waveform function for the Synchro synthesizer.
