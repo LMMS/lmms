@@ -722,7 +722,8 @@ void PatternView::mousePressEvent( QMouseEvent * _me )
 //	get the step number that was clicked on and
 //	do calculations in floats to prevent rounding errors...
 		float tmp = ( ( float(_me->x()) - TCO_BORDER_WIDTH ) *
-				float( m_pat -> m_steps ) ) / float(width() - TCO_BORDER_WIDTH*2);
+				float( m_pat -> m_steps ) ) / float(width() - TCO_BORDER_WIDTH*2)
+								+ 0.05f + 0.005f * m_pat->m_steps;
 
 		int step = int( tmp );
 
