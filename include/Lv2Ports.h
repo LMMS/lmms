@@ -186,6 +186,7 @@ struct Audio : public VisitablePort<Audio, PortBase>
 	std::size_t bufferSize() const { return m_buffer.size(); }
 
 private:
+	//! the buffer where Lv2 reads/writes the data from/to
 	std::vector<float> m_buffer;
 	bool m_sidechain;
 
