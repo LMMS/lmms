@@ -771,8 +771,7 @@ void InstrumentTrack::saveTrackSpecificSettings( QDomDocument& doc, QDomElement 
 
 void InstrumentTrack::loadTrackSpecificSettings( const QDomElement & thisElement )
 {
-	silenceAllNotes(!(m_previewMode && m_instrument && m_instrument->nodeName() == "vestige"
-					&& getInstrumentName(thisElement) == "vestige"));
+	silenceAllNotes(!(m_previewMode && m_instrument && m_instrument->nodeName() == getInstrumentName(thisElement)));
 
 	lock();
 
@@ -821,14 +820,10 @@ void InstrumentTrack::loadTrackSpecificSettings( const QDomElement & thisElement
 				typedef Plugin::Descriptor::SubPluginFeatures::Key PluginKey;
 				PluginKey key(node.toElement().elementsByTagName("key").item(0).toElement());
 
-				// don't delete vestige instrument in preview mode because loading vst
-				// can take long time, so better try change settings without recreating
-				// everything (this speeds up the loading of subsequent presets from one plugin)
-				if (m_previewMode && m_instrument && m_instrument->nodeName() == "vestige" &&
-						node.toElement().attribute("name") == "vestige")
+				// don't delete instrument in preview mode if it's the same
+				if (m_previewMode && m_instrument && m_instrument->nodeName() == node.toElement().attribute("name"))
 				{
 					m_instrument->restoreState(node.firstChildElement());
-					emit instrumentChanged();
 				}
 				else
 				{
