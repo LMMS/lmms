@@ -151,36 +151,19 @@ void MidiPort::processInEvent( const MidiEvent& event, const MidiTime& time )
 
 void MidiPort::processOutEvent( const MidiEvent& event, const MidiTime& time )
 {
-	// If we selected a channel from 1-16, we will only route the selected channel.
-	// But if we selected channel 0 ("--") we will route all channels out.
-	if( isOutputEnabled() )
+	// When output is enabled, route midi events if the selected channel matches
+	// the event channel or if there's no selected channel (value 0, represented by "--")
+	if( isOutputEnabled() && ( outputChannel() == 0 || realOutputChannel() == event.channel() ) )
 	{
-		// Selected channel 0 ("--"). Route all channels
-		if( outputChannel() == 0 )
+		MidiEvent outEvent = event;
+
+		if( fixedOutputVelocity() >= 0 && event.velocity() > 0 &&
+			( event.type() == MidiNoteOn || event.type() == MidiKeyPressure ) )
 		{
-			MidiEvent outEvent = event;
-
-			if( fixedOutputVelocity() >= 0 && event.velocity() > 0 &&
-				( event.type() == MidiNoteOn || event.type() == MidiKeyPressure ) )
-			{
-				outEvent.setVelocity( fixedOutputVelocity() );
-			}
-
-			m_midiClient->processOutEvent( outEvent, time, this );
+			outEvent.setVelocity( fixedOutputVelocity() );
 		}
-		// Selected channel between 1-16. Mask event.
-		else if( realOutputChannel() == event.channel() )
-		{
-			MidiEvent outEvent = event;
 
-			if( fixedOutputVelocity() >= 0 && event.velocity() > 0 &&
-				( event.type() == MidiNoteOn || event.type() == MidiKeyPressure ) )
-			{
-				outEvent.setVelocity( fixedOutputVelocity() );
-			}
-
-			m_midiClient->processOutEvent( outEvent, time, this );
-		}
+		m_midiClient->processOutEvent( outEvent, time, this );
 	}
 }
 
