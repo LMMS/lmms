@@ -179,18 +179,15 @@ const AutomationPattern::objectVector& AutomationPattern::objects() const
 MidiTime AutomationPattern::timeMapLength() const
 {
 	MidiTime one_bar = MidiTime(1, 0);
-	if (m_timeMap.isEmpty())
-	{
-		return one_bar;
-	}
+	if (m_timeMap.isEmpty()) { return one_bar; }
+
 	timeMap::const_iterator it = m_timeMap.end();
 	tick_t last_tick = static_cast<tick_t>((it-1).key());
-	bar_t last_bar = qMax(0, MidiTime(last_tick).nextFullBar() - 1);
-	if (last_bar == 0 && last_tick == 0)
-	{
-		return one_bar;
-	}
-	return MidiTime(last_bar, last_tick);
+	// if last_tick is 0 (single item at tick 0)
+	// return length as a whole bar to prevent disappearing TCO
+	if (last_tick == 0) { return one_bar; }
+
+	return MidiTime(last_tick);
 }
 
 
@@ -198,7 +195,8 @@ MidiTime AutomationPattern::timeMapLength() const
 
 void AutomationPattern::updateLength()
 {
-	changeLength( timeMapLength() );
+	// Do not resize down in case user manually extended up
+	changeLength(qMax(length(), timeMapLength()));
 }
 
 
