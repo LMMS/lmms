@@ -84,6 +84,7 @@ InstrumentMidiIOView::InstrumentMidiIOView( QWidget* parent ) :
 	midiOutputLayout->setSpacing( 6 );
 
 	m_outputChannelSpinBox = new LcdSpinBox( 2, m_midiOutputGroupBox );
+	m_outputChannelSpinBox->addTextForValue( 0, "--" );
 	m_outputChannelSpinBox->setLabel( tr( "CHANNEL" ) );
 	m_outputChannelSpinBox->setEnabled( false );
 	midiOutputLayout->addWidget( m_outputChannelSpinBox );

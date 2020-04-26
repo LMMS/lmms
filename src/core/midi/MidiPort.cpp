@@ -47,7 +47,7 @@ MidiPort::MidiPort( const QString& name,
 	m_midiEventProcessor( eventProcessor ),
 	m_mode( mode ),
 	m_inputChannelModel( 0, 0, MidiChannelCount, this, tr( "Input channel" ) ),
-	m_outputChannelModel( 1, 1, MidiChannelCount, this, tr( "Output channel" ) ),
+	m_outputChannelModel( 1, 0, MidiChannelCount, this, tr( "Output channel" ) ),
 	m_inputControllerModel( 0, 0, MidiControllerCount, this, tr( "Input controller" ) ),
 	m_outputControllerModel( 0, 0, MidiControllerCount, this, tr( "Output controller" ) ),
 	m_fixedInputVelocityModel( -1, -1, MidiMaxVelocity, this, tr( "Fixed input velocity" ) ),
@@ -151,18 +151,36 @@ void MidiPort::processInEvent( const MidiEvent& event, const MidiTime& time )
 
 void MidiPort::processOutEvent( const MidiEvent& event, const MidiTime& time )
 {
-	// mask event
-	if( isOutputEnabled() && realOutputChannel() == event.channel() )
+	// If we selected a channel from 1-16, we will only route the selected channel.
+	// But if we selected channel 0 ("--") we will route all channels out.
+	if( isOutputEnabled() )
 	{
-		MidiEvent outEvent = event;
-
-		if( fixedOutputVelocity() >= 0 && event.velocity() > 0 &&
-			( event.type() == MidiNoteOn || event.type() == MidiKeyPressure ) )
+		// Selected channel 0 ("--"). Route all channels
+		if( outputChannel() == 0 )
 		{
-			outEvent.setVelocity( fixedOutputVelocity() );
-		}
+			MidiEvent outEvent = event;
 
-		m_midiClient->processOutEvent( outEvent, time, this );
+			if( fixedOutputVelocity() >= 0 && event.velocity() > 0 &&
+				( event.type() == MidiNoteOn || event.type() == MidiKeyPressure ) )
+			{
+				outEvent.setVelocity( fixedOutputVelocity() );
+			}
+
+			m_midiClient->processOutEvent( outEvent, time, this );
+		}
+		// Selected channel between 1-16. Mask event.
+		else if( realOutputChannel() == event.channel() )
+		{
+			MidiEvent outEvent = event;
+
+			if( fixedOutputVelocity() >= 0 && event.velocity() > 0 &&
+				( event.type() == MidiNoteOn || event.type() == MidiKeyPressure ) )
+			{
+				outEvent.setVelocity( fixedOutputVelocity() );
+			}
+
+			m_midiClient->processOutEvent( outEvent, time, this );
+		}
 	}
 }
 
