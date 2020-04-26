@@ -170,7 +170,7 @@ struct Cv : public VisitablePort<Cv, ControlPortBase>
 
 struct Audio : public VisitablePort<Audio, PortBase>
 {
-	Audio(std::size_t bufferSize, bool isSidechain);
+	Audio(std::size_t bufferSize, bool isSidechain, bool isOptional);
 
 	//! Copy buffer passed by LMMS into our ports
 	void copyBuffersFromCore(const sampleFrame *lmmsBuf,
@@ -183,12 +183,15 @@ struct Audio : public VisitablePort<Audio, PortBase>
 		unsigned channel, fpp_t frames) const;
 
 	bool isSideChain() const { return m_sidechain; }
+	bool isOptional() const { return m_optional; }
+	bool mustBeUsed() const { return !isSideChain() && !isOptional(); }
 	std::size_t bufferSize() const { return m_buffer.size(); }
 
 private:
 	//! the buffer where Lv2 reads/writes the data from/to
 	std::vector<float> m_buffer;
 	bool m_sidechain;
+	bool m_optional;
 
 	// the only case when data of m_buffer may be referenced:
 	friend struct ::ConnectPortVisitor;

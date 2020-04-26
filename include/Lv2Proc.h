@@ -159,6 +159,7 @@ private:
 	void dumpPort(std::size_t num);
 
 	static bool portIsSideChain(const LilvPlugin* plugin, const LilvPort *port);
+	static bool portIsOptional(const LilvPlugin* plugin, const LilvPort *port);
 	static AutoLilvNode uri(const char* uriStr);
 };
 

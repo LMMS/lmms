@@ -52,9 +52,12 @@ Plugin::PluginTypes Lv2Proc::check(const LilvPlugin *plugin,
 		std::vector<PluginIssue> tmp = meta.get(plugin, portNum);
 		std::move(tmp.begin(), tmp.end(), std::back_inserter(issues));
 
-		if (meta.m_type == Lv2Ports::Type::Audio &&
+		bool portMustBeUsed =
 			!portIsSideChain(plugin,
-							lilv_plugin_get_port_by_index(plugin, portNum)))
+							lilv_plugin_get_port_by_index(plugin, portNum)) &&
+			!portIsOptional(plugin,
+							lilv_plugin_get_port_by_index(plugin, portNum));
+		if (meta.m_type == Lv2Ports::Type::Audio && portMustBeUsed)
 			++audioChannels[meta.m_flow == Lv2Ports::Flow::Output
 				? outCount : inCount];
 	}
@@ -351,7 +354,8 @@ void Lv2Proc::createPort(std::size_t portNum)
 			new Lv2Ports::Audio(
 					static_cast<std::size_t>(
 						Engine::mixer()->framesPerPeriod()),
-					portIsSideChain(m_plugin, lilvPort)
+					portIsSideChain(m_plugin, lilvPort),
+					portIsOptional(m_plugin, lilvPort)
 				);
 		port = audio;
 	} else {
@@ -394,7 +398,7 @@ void Lv2Proc::createPorts()
 
 		void visit(Lv2Ports::Audio& audio) override
 		{
-			if (!audio.isSideChain())
+			if (audio.mustBeUsed())
 			{
 				StereoPortRef dummy;
 				StereoPortRef* portRef = &dummy;
@@ -446,8 +450,10 @@ struct ConnectPortVisitor : public Lv2Ports::Visitor
 			static_cast<uint32_t>(m_num), location);
 	}
 	void visit(Lv2Ports::Control& ctrl) override { connectPort(&ctrl.m_val); }
-	void visit(Lv2Ports::Audio& audio) override {
-		connectPort(audio.isSideChain() ? nullptr : audio.m_buffer.data()); }
+	void visit(Lv2Ports::Audio& audio) override
+	{
+		connectPort((audio.mustBeUsed()) ? audio.m_buffer.data() : nullptr);
+	}
 	void visit(Lv2Ports::Unknown&) override { connectPort(nullptr); }
 	~ConnectPortVisitor() override;
 };
@@ -510,9 +516,16 @@ void Lv2Proc::dumpPort(std::size_t num)
 bool Lv2Proc::portIsSideChain(const LilvPlugin *plugin, const LilvPort *port)
 {
 	return	lilv_port_has_property(plugin, port,
-							uri(LV2_CORE_PREFIX "isSidechain").get()) ||
-			lilv_port_has_property(plugin, port,
-							uri(LV2_CORE__connectionOptional).get());
+									uri(LV2_CORE_PREFIX "isSidechain").get());
+}
+
+
+
+
+bool Lv2Proc::portIsOptional(const LilvPlugin *plugin, const LilvPort *port)
+{
+	return	lilv_port_has_property(plugin, port,
+									uri(LV2_CORE__connectionOptional).get());
 }
 
 

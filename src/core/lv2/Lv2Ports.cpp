@@ -197,8 +197,8 @@ QString PortBase::uri() const
 
 
 
-Audio::Audio(std::size_t bufferSize, bool isSidechain)
-	: m_buffer(bufferSize), m_sidechain(isSidechain)
+Audio::Audio(std::size_t bufferSize, bool isSidechain, bool isOptional)
+	: m_buffer(bufferSize), m_sidechain(isSidechain), m_optional(isOptional)
 {
 }
 
