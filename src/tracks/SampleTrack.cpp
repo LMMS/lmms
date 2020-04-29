@@ -592,7 +592,8 @@ SampleTrack::SampleTrack( TrackContainer* tc ) :
 	m_panningModel( DefaultPanning, PanningLeft, PanningRight, 0.1f,
 					this, tr( "Panning" ) ),
 	m_effectChannelModel( 0, 0, 0, this, tr( "FX channel" ) ),
-	m_audioPort( tr( "Sample track" ), true, &m_volumeModel, &m_panningModel, &m_mutedModel )
+	m_audioPort( tr( "Sample track" ), true, &m_volumeModel, &m_panningModel, &m_mutedModel ),
+	m_wasPlaying(false)
 {
 	setName( tr( "Sample track" ) );
 	m_panningModel.setCenterValue( DefaultPanning );
@@ -617,11 +618,17 @@ bool SampleTrack::play( const MidiTime & _start, const fpp_t _frames,
 {
 	m_audioPort.effects()->startRunning();
 	bool played_a_note = false;	// will be return variable
+	bool is_playing = false;
 
 	tcoVector tcos;
 	::BBTrack * bb_track = NULL;
 	if( _tco_num >= 0 )
 	{
+		if (m_wasPlaying && _start > getTCO(_tco_num)->length())
+		{
+			m_wasPlaying = false;
+			emit notPlaying();
+		}
 		if( _start != 0 )
 		{
 			return false;
@@ -630,6 +637,8 @@ bool SampleTrack::play( const MidiTime & _start, const fpp_t _frames,
 		if (trackContainer() == (TrackContainer*)Engine::getBBTrackContainer())
 		{
 			bb_track = BBTrack::findBBTrack( _tco_num );
+			m_wasPlaying = true;
+			emit playing();
 		}
 	}
 	else
@@ -641,6 +650,10 @@ bool SampleTrack::play( const MidiTime & _start, const fpp_t _frames,
 
 			if( _start >= sTco->startPosition() && _start < sTco->endPosition() )
 			{
+				if (sTco->isPlaying())
+				{
+					is_playing = true;
+				}
 				if( sTco->isPlaying() == false && _start > sTco->startPosition() + sTco->startTimeOffset() )
 				{
 					auto bufferFramesPerTick = Engine::framesPerTick (sTco->sampleBuffer ()->sampleRate ());
@@ -657,6 +670,7 @@ bool SampleTrack::play( const MidiTime & _start, const fpp_t _frames,
 						sTco->setSamplePlayLength( samplePlayLength );
 						tcos.push_back( sTco );
 						sTco->setIsPlaying( true );
+						is_playing = true;
 					}
 				}
 			}
@@ -665,6 +679,18 @@ bool SampleTrack::play( const MidiTime & _start, const fpp_t _frames,
 				sTco->setIsPlaying( false );
 			}
 		}
+
+		if (is_playing && !m_wasPlaying)
+		{
+			m_wasPlaying = true;
+			emit playing();
+		}
+		else if (!is_playing && m_wasPlaying)
+		{
+			m_wasPlaying = false;
+			emit notPlaying();
+		}
+
 	}
 
 	for( tcoVector::Iterator it = tcos.begin(); it != tcos.end(); ++it )
@@ -826,6 +852,22 @@ SampleTrackView::SampleTrackView( SampleTrack * _t, TrackContainerView* tcv ) :
 	m_panningKnob->setLabel( tr( "PAN" ) );
 	m_panningKnob->show();
 
+	m_activityIndicator = new FadeButton(QApplication::palette().color(QPalette::Active,
+							QPalette::Background),
+						QApplication::palette().color(QPalette::Active,
+							QPalette::BrightText),
+						QApplication::palette().color(QPalette::Active,
+							QPalette::BrightText).darker(),
+						getTrackSettingsWidget());
+	m_activityIndicator->setGeometry(settingsWidgetWidth-2*24-11, 2, 8, 28);
+	m_activityIndicator->show();
+	connect(_t, SIGNAL(playing()),
+			 m_activityIndicator, SLOT(activate()));
+	connect(_t, SIGNAL(notPlaying()),
+			m_activityIndicator, SLOT(notPlaying()));
+	connect(Engine::getSong(), SIGNAL(stopped()),
+			this, SLOT(stopPlaying()));
+
 	setModel( _t );
 
 	m_window = new SampleTrackWindow(this);
@@ -936,6 +978,18 @@ void SampleTrackView::dropEvent(QDropEvent *de)
 		if (sTco) { sTco->setSampleFile(value); }
 	}
 
+}
+
+
+
+void SampleTrackView::stopPlaying()
+{
+	SampleTrack * smpltrck = dynamic_cast<SampleTrack*>(getTrack());
+	if (smpltrck->wasPlaying())
+	{
+		m_activityIndicator->notPlaying();
+		smpltrck->setWasPlaying(false);
+	}
 }
 
 
