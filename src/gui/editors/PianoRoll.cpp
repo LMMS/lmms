@@ -2869,7 +2869,9 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 	p.setFont( pointSize<8>( p.font() ) );
 	QFontMetrics fontMetrics(p.font());
 	QRect const boundingRect = fontMetrics.boundingRect(QChar::fromLatin1('H'));
-	int const fontHeight = - boundingRect.top() - boundingRect.bottom();
+	// This is two times of the y coordinate of the center of the bounding rectangle
+	// (-(top+bottom)=-2(center)) but labelHeight is more intuitive/describing name
+	int const labelHeight = - boundingRect.top() - boundingRect.bottom();
 
 	// y_offset is used to align the piano-keys on the key-lines
 	int y_offset = 0;
@@ -2968,18 +2970,18 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 		{
 		case 0: // C
 		case 5: // F
-			yCorrectionForNoteLabels = (m_whiteKeySmallHeight - fontHeight + 1) / -2;
+			yCorrectionForNoteLabels = (m_whiteKeySmallHeight - labelHeight + 1) / -2;
 			break;
 		case 2: // D
 		case 7: // G
 		case 9: // A
-			yCorrectionForNoteLabels = (m_whiteKeyBigHeight / 2 - fontHeight + 1) / -2;
+			yCorrectionForNoteLabels = (m_whiteKeyBigHeight / 2 - labelHeight + 1) / -2;
 			break;
 		case 4: // E
 		case 11: // B
 			// calculate center point of key and move half of text
 			yCorrectionForNoteLabels = -(((m_whiteKeySmallHeight - (m_whiteKeySmallHeight * 2 + 3) / 6) / 4)
-										 - fontHeight / 2);
+										 - labelHeight / 2);
 			break;
 		}
 
