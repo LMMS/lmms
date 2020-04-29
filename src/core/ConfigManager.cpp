@@ -303,6 +303,30 @@ void ConfigManager::setBackgroundPicFile(const QString & backgroundPicFile)
 
 
 
+void ConfigManager::setLabels1Dir(const QString & labels1Dir)
+{
+	m_labels1Dir = labels1Dir;
+}
+
+
+
+
+void ConfigManager::setLabels2Dir(const QString & labels2Dir)
+{
+	m_labels2Dir = labels2Dir;
+}
+
+
+
+
+void ConfigManager::setLabels3Dir(const QString & labels3Dir)
+{
+	m_labels3Dir = labels3Dir;
+}
+
+
+
+
 void ConfigManager::createWorkingDir()
 {
 	QDir().mkpath(m_workingDir);
@@ -509,6 +533,9 @@ void ConfigManager::loadConfigFile(const QString & configFile)
 			setSF2File(value("paths", "defaultsf2"));
 		#endif
 			setBackgroundPicFile(value("paths", "backgroundtheme"));
+			setLabels1Dir(value("paths", "labels1Dir"));
+			setLabels2Dir(value("paths", "labels2Dir"));
+			setLabels3Dir(value("paths", "labels3Dir"));
 		}
 		else if(gui)
 		{
@@ -595,6 +622,9 @@ void ConfigManager::saveConfigFile()
 	setValue("paths", "defaultsf2", m_sf2File);
 #endif
 	setValue("paths", "backgroundtheme", m_backgroundPicFile);
+	setValue("paths", "labels1Dir", m_labels1Dir);
+	setValue("paths", "labels2Dir", m_labels2Dir);
+	setValue("paths", "labels3Dir", m_labels3Dir);
 
 	QDomDocument doc("lmms-config-file");
 

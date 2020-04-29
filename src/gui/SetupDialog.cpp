@@ -30,6 +30,8 @@
 #include <QLineEdit>
 #include <QMessageBox>
 #include <QScrollArea>
+#include <QTextStream>
+#include <QFile>
 
 #include "debug.h"
 #include "embed.h"
@@ -143,7 +145,10 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	m_sf2File(QDir::toNativeSeparators(ConfigManager::inst()->sf2File())),
 #endif
 	m_themeDir(QDir::toNativeSeparators(ConfigManager::inst()->themeDir())),
-	m_backgroundPicFile(QDir::toNativeSeparators(ConfigManager::inst()->backgroundPicFile()))
+	m_backgroundPicFile(QDir::toNativeSeparators(ConfigManager::inst()->backgroundPicFile())),
+	m_labels1Dir(QDir::toNativeSeparators(ConfigManager::inst()->labels1Dir())),
+	m_labels2Dir(QDir::toNativeSeparators(ConfigManager::inst()->labels2Dir())),
+	m_labels3Dir(QDir::toNativeSeparators(ConfigManager::inst()->labels3Dir()))
 {
 	setWindowIcon(embed::getIconPixmap("setup_general"));
 	setWindowTitle(tr("Settings"));
@@ -766,7 +771,18 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 		SLOT(setBackgroundPicFile(const QString &)),
 		SLOT(openBackgroundPicFile()),
 		m_backgroundPicFileLineEdit);
-
+	addPathEntry("Piano roll custom labels 1", m_labels1Dir,
+		SLOT(setLabels1Dir(const QString &)),
+		SLOT(openLabels1Dir()),
+		m_labels1DirLineEdit);
+	addPathEntry("Piano roll custom labels 2", m_labels2Dir,
+		SLOT(setLabels2Dir(const QString &)),
+		SLOT(openLabels2Dir()),
+		m_labels2DirLineEdit);
+	addPathEntry("Piano roll custom labels 3", m_labels3Dir,
+		SLOT(setLabels3Dir(const QString &)),
+		SLOT(openLabels3Dir()),
+		m_labels3DirLineEdit);
 	pathSelectorsLayout->addStretch();
 
 	pathSelectors->setLayout(pathSelectorsLayout);
@@ -923,6 +939,11 @@ void SetupDialog::accept()
 	ConfigManager::inst()->setGIGDir(QDir::fromNativeSeparators(m_gigDir));
 	ConfigManager::inst()->setThemeDir(QDir::fromNativeSeparators(m_themeDir));
 	ConfigManager::inst()->setBackgroundPicFile(m_backgroundPicFile);
+	ConfigManager::inst()->setLabels1Dir(QDir::fromNativeSeparators(m_labels1Dir));
+	ConfigManager::inst()->setLabels2Dir(QDir::fromNativeSeparators(m_labels2Dir));
+	ConfigManager::inst()->setLabels3Dir(QDir::fromNativeSeparators(m_labels3Dir));
+
+
 
 	// Tell all audio-settings-widgets to save their settings.
 	for(AswMap::iterator it = m_audioIfaceSetupWidgets.begin();
@@ -1319,7 +1340,225 @@ void SetupDialog::setBackgroundPicFile(const QString & backgroundPicFile)
 }
 
 
+void SetupDialog::setLabels1Dir(const QString & labels1Dir)
+{
+	m_labels1Dir = labels1Dir;
+}
 
+void SetupDialog::openLabels1Dir()
+{
+	QString new_file = FileDialog::getOpenFileName(this,
+		tr("Choose your labels file"), m_labels1Dir, "Text files (*.txt)");
+
+	if (!new_file.isEmpty())
+	{
+		bool fileCorrect = true;
+		QFile labelsFile(new_file);
+		labelsFile.open(QIODevice::ReadOnly);
+		if (!labelsFile.isOpen()) { return; }
+		
+		QTextStream stream(&labelsFile);
+		QString line = stream.readLine();
+		QRegExp num("\\d*");
+		while (!line.isNull()) 
+		{
+			if(line == "")
+			{
+				break;
+			}
+			if(line.mid(0, 2) == "//")
+			{
+				//Comment line
+			} 
+			else if (num.exactMatch(line.mid(0,1)))
+			{
+				if (num.exactMatch(line.mid(1,1)))
+				{
+					if (num.exactMatch(line.mid(2,1)))
+					{
+						int number = line.mid(0,3).toInt();
+						if (number > 107)
+						{
+							fileCorrect = false;			
+							break;
+						} 
+						else if (line.mid(3,1) != " " || line.mid(3,2) == "  ")
+						{
+							fileCorrect = false;
+							break;
+						}
+					} 
+					else if (line.mid(2,1) != " " || line.mid(2,2) == "  ")
+					{
+						fileCorrect = false;
+						break;
+					}		
+				} 
+				else if (line.mid(1,1) != " " || line.mid(1,2) == "  ") 
+				{
+					fileCorrect = false;
+					break;
+				}	
+			} 
+			else 
+			{
+				fileCorrect = false;
+				break;
+			}
+			line = stream.readLine();
+		}	
+		if(fileCorrect)
+		{
+			m_labels1DirLineEdit->setText(new_file);
+		}	
+	}
+}
+
+void SetupDialog::setLabels2Dir(const QString & labels2Dir)
+{
+	m_labels2Dir = labels2Dir;
+}
+
+void SetupDialog::openLabels2Dir()
+{
+	QString new_file = FileDialog::getOpenFileName(this,
+		tr("Choose your labels file"), m_labels2Dir, "Text files (*.txt)");
+
+	if (!new_file.isEmpty())
+	{
+		bool fileCorrect = true;
+		QFile labelsFile(new_file);
+		labelsFile.open(QIODevice::ReadOnly);
+		if (!labelsFile.isOpen()) { return; }
+		
+		QTextStream stream(&labelsFile);
+		QString line = stream.readLine();
+		QRegExp num("\\d*");
+		while (!line.isNull()) 
+		{
+			if(line == "")
+			{
+				break;
+			}
+			if(line.mid(0, 2) == "//")
+			{
+				//Comment line
+			} 
+			else if (num.exactMatch(line.mid(0,1)))
+			{
+				if (num.exactMatch(line.mid(1,1)))
+				{
+					if (num.exactMatch(line.mid(2,1)))
+					{
+						int number = line.mid(0,3).toInt();
+						if (number > 107)
+						{
+							fileCorrect = false;			
+							break;
+						} 
+						else if (line.mid(3,1) != " " || line.mid(3,2) == "  ")
+						{
+							fileCorrect = false;
+							break;
+						}
+					} 
+					else if (line.mid(2,1) != " " || line.mid(2,2) == "  ")
+					{
+						fileCorrect = false;
+						break;
+					}		
+				} 
+				else if (line.mid(1,1) != " " || line.mid(1,2) == "  ") 
+				{
+					fileCorrect = false;
+					break;
+				}	
+			} 
+			else 
+			{
+				fileCorrect = false;
+				break;
+			}
+			line = stream.readLine();
+		}	
+		if(fileCorrect)
+		{
+			m_labels2DirLineEdit->setText(new_file);
+		}	
+	}
+}
+
+void SetupDialog::setLabels3Dir(const QString & labels3Dir)
+{
+	m_labels3Dir = labels3Dir;
+}
+
+void SetupDialog::openLabels3Dir()
+{
+	QString new_file = FileDialog::getOpenFileName(this,
+		tr("Choose your labels file"), m_labels3Dir, "Text files (*.txt)");
+
+	if (!new_file.isEmpty())
+	{
+		bool fileCorrect = true;
+		QFile labelsFile(new_file);
+		labelsFile.open(QIODevice::ReadOnly);
+		if (!labelsFile.isOpen()) return ;
+		
+		QTextStream stream(&labelsFile);
+		QString line = stream.readLine();
+		QRegExp num("\\d*");
+		while (!line.isNull()) 
+		{
+			if(line == "")
+			{
+				break;
+			}
+			if(line.mid(0, 2) == "//")
+			{
+				//Comment line
+			} 
+			else if (num.exactMatch(line.mid(0,1)))
+			{
+				if (num.exactMatch(line.mid(1,1)))
+				{
+					if (num.exactMatch(line.mid(2,1)))
+					{
+						int number = line.mid(0,3).toInt();
+						if (number > 107)
+						{
+							fileCorrect = false;			
+							break;
+						} else if (line.mid(3,1) != " " || line.mid(3,2) == "  "){
+							fileCorrect = false;
+							break;
+						}
+					}
+					else if (line.mid(2,1) != " " || line.mid(2,2) == "  ")
+					{
+						fileCorrect = false;
+						break;
+					}		
+				}
+				else if (line.mid(1,1) != " " || line.mid(1,2) == "  ") 
+				{
+					fileCorrect = false;
+					break;
+				}	
+			}
+			else
+			{
+				fileCorrect = false;
+				break;
+			}
+			line = stream.readLine();
+		}	
+		if(fileCorrect)
+		{
+			m_labels3DirLineEdit->setText(new_file);
+		}	
+	}
+}
 
 void SetupDialog::showRestartWarning()
 {

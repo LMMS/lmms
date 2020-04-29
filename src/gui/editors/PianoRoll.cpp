@@ -36,6 +36,7 @@
 #include <QPointer>
 #include <QScrollBar>
 #include <QStyleOption>
+#include <QDebug>
 
 #ifndef __USE_XOPEN
 #define __USE_XOPEN
@@ -106,7 +107,6 @@ const int NUM_EVEN_LENGTHS = 6;
 const int NUM_TRIPLET_LENGTHS = 5;
 
 
-
 QPixmap * PianoRoll::s_whiteKeySmallPm = NULL;
 QPixmap * PianoRoll::s_whiteKeySmallPressedPm = NULL;
 QPixmap * PianoRoll::s_whiteKeyBigPm = NULL;
@@ -128,7 +128,9 @@ static QString getNoteString( int key )
 	return s_noteStrings[key % 12] + QString::number( static_cast<int>( key / KeysPerOctave ) );
 }
 
-
+bool labelsFile1Correct = 0;
+bool labelsFile2Correct = 0;
+bool labelsFile3Correct = 0;
 
 // used for drawing of piano
 PianoRoll::PianoRollKeyTypes PianoRoll::prKeyOrder[] =
@@ -151,6 +153,7 @@ PianoRoll::PianoRoll() :
 	m_semiToneMarkerMenu( NULL ),
 	m_zoomingModel(),
 	m_quantizeModel(),
+	m_labelsModel(),
 	m_noteLenModel(),
 	m_scaleModel(),
 	m_chordModel(),
@@ -368,6 +371,32 @@ PianoRoll::PianoRoll() :
 	connect( &m_quantizeModel, SIGNAL( dataChanged() ),
 					this, SLOT( quantizeChanged() ) );
 
+	// Set up labels model
+	m_labelsModel.addItem( tr( "No labels" ) );
+	
+	QString labels1Path = ConfigManager::inst()->labels1Dir();
+	QString labels2Path = ConfigManager::inst()->labels2Dir();
+	QString labels3Path = ConfigManager::inst()->labels3Dir();
+	
+	if(labelsPathCorrect(labels1Path)){
+		labelsFile1Correct = 1;
+		m_labelsModel.addItem( tr( "Labels file 1" ) );
+	}
+	if(labelsPathCorrect(labels2Path)){
+		labelsFile2Correct = 1;
+		m_labelsModel.addItem( tr( "Labels file 2" ) );
+	}
+	if(labelsPathCorrect(labels3Path)){
+		labelsFile3Correct = 1;
+		m_labelsModel.addItem( tr( "Labels file 3" ) );
+	}
+		
+	m_labelsModel.setValue( 0 );
+
+	
+	connect( &m_labelsModel, SIGNAL( dataChanged() ),
+					this, SLOT( labelsChanged() ) );
+	
 	// Set up note length model
 	m_noteLenModel.addItem( tr( "Last note" ),
 					make_unique<PixmapLoader>( "edit_draw" ) );
@@ -2832,8 +2861,132 @@ int PianoRoll::xCoordOfTick( int tick )
 
 void PianoRoll::paintEvent(QPaintEvent * pe )
 {
+	QStringList labelsList;
+	QStringList numbersList;
 	bool drawNoteNames = ConfigManager::inst()->value( "ui", "printnotelabels").toInt();
-
+	int customLabelsFile;
+	bool drawCustomLabels = false;
+	if (m_labelsModel.value() == 0)
+	{
+		drawCustomLabels = false;
+	} 
+	else if (m_labelsModel.value() == 1) 
+	{
+		drawCustomLabels = true;
+		if (labelsFile1Correct)
+		{
+			customLabelsFile = 1;
+		} 
+		else if (labelsFile2Correct) 
+		{
+			customLabelsFile = 2;
+		} 
+		else 
+		{
+			customLabelsFile = 3;
+		}
+	} 
+	else if (m_labelsModel.value() == 2) 
+	{
+		drawCustomLabels = true;
+		if (labelsFile1Correct)
+		{
+			if (labelsFile2Correct) 
+			{
+				customLabelsFile = 2;
+			} 
+			else 
+			{
+				customLabelsFile = 3;
+			}
+		} 
+		else 
+		{
+			customLabelsFile = 3;
+		}
+	} 
+	else if (m_labelsModel.value() == 3) 
+	{
+		drawCustomLabels = true;
+		customLabelsFile = 3;
+	}
+	
+	QString labels1Path = ConfigManager::inst()->labels1Dir();
+	QString labels2Path = ConfigManager::inst()->labels2Dir();
+	QString labels3Path = ConfigManager::inst()->labels3Dir();
+	
+	if (drawCustomLabels)
+	{
+		QString labelsPath;
+		if (customLabelsFile == 1) { labelsPath = labels1Path; }
+		if (customLabelsFile == 2) { labelsPath = labels2Path; }
+		if (customLabelsFile == 3) { labelsPath = labels3Path; }
+				
+		QFile labelsFile(labelsPath);
+		labelsFile.open(QIODevice::ReadOnly);
+		QTextStream stream(&labelsFile);
+		QString line = stream.readLine();
+		QRegExp num("\\d*");
+		while (!line.isNull()) 
+		{
+			if (num.exactMatch(line.mid(0,1)))
+			{
+				if (num.exactMatch(line.mid(1,1)))
+				{
+					if (num.exactMatch(line.mid(2,1)))
+					{
+						int num = line.mid(0,3).toInt();
+						if (num > 107)
+						{		
+							break;
+						} 
+						else if (line.mid(3,1) != " " || line.mid(3,2) == "  ")
+						{
+							break;
+						} 
+						else 
+						{
+							//three digit number <= 107
+							int n = line.size();
+							QString labelText = line.mid(4, n-3);
+							labelsList << labelText;
+							numbersList << QString::number(num);
+						}
+					} 
+					else if (line.mid(2,1) != " " || line.mid(2,2) == "  ")
+					{
+						break;
+					} 
+					else 
+					{
+						//two digit number
+						int n = line.size();
+						QString labelText = line.mid(3, n-2);
+						int num = line.mid(0,2).toInt();	
+						labelsList << labelText;
+						numbersList << QString::number(num);
+					}
+				} 
+				else if (line.mid(1,1) != " " || line.mid(1,2) == "  ") 
+				{
+					break;
+				} 
+				else 
+				{
+					// one digit number
+					int n = line.size();
+					QString labelText = line.mid(2, n-1);
+					int num = line.mid(0,1).toInt();	
+					labelsList << labelText;
+					numbersList << QString::number(num);
+				}
+			}
+			line = stream.readLine();
+		}
+	}
+	
+	
+	
 	QStyleOption opt;
 	opt.initFrom( this );
 	QPainter p( this );
@@ -3116,6 +3269,7 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 			}
 			p.drawLine( WHITE_KEY_WIDTH, y, width(), y );
 			++key;
+			
 		}
 
 
@@ -3458,9 +3612,29 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 		case ModeEditDetuning: cursor = s_toolOpen; break;
 	}
 	QPoint mousePosition = mapFromGlobal( QCursor::pos() );
-	if( cursor != NULL && mousePosition.y() > keyAreaTop() && mousePosition.x() > noteEditLeft())
+	if ( cursor != NULL && mousePosition.y() > keyAreaTop() && mousePosition.x() > noteEditLeft())
 	{
 		p.drawPixmap( mousePosition + QPoint( 8, 8 ), *cursor );
+	}
+	if (drawCustomLabels)
+	{
+		key = m_startKey;
+		QFont labelFont = p.font();
+		labelFont.setBold( false );
+		p.setFont( pointSize<8>( labelFont ) );
+		for( int y = keyAreaBottom() - 1; y > PR_TOP_MARGIN;
+				y -= KEY_LINE_HEIGHT )
+		{
+			if (numbersList.contains(QString::number(key))) 
+			{
+				int index = numbersList.indexOf(QString::number(key));
+				p.setPen(QColor(190,190,190,255));
+				QString noteString = labelsList[index];
+				QPoint textStart(WHITE_KEY_WIDTH + 1, y-2);
+				p.drawText(textStart, noteString);
+			}
+			++key;	
+		}
 	}
 }
 
@@ -4286,6 +4460,11 @@ void PianoRoll::quantizeChanged()
 	update();
 }
 
+void PianoRoll::labelsChanged()
+{
+	update();
+}
+
 void PianoRoll::noteLengthChanged()
 {
 	m_stepRecorder.setStepsLength(newNoteLen());
@@ -4423,6 +4602,50 @@ Note * PianoRoll::noteUnderMouse()
 	return NULL;
 }
 
+bool PianoRoll::labelsPathCorrect( QString labelsPath ){
+	bool fileCorrect = 1;
+	QFile labelsFile(labelsPath);
+	if (!labelsFile.exists()){
+		return false;
+	}
+	labelsFile.open(QIODevice::ReadOnly);
+	if (!labelsFile.isOpen()) fileCorrect = 0 ;
+	QTextStream stream(&labelsFile);
+	QString line = stream.readLine();
+	QRegExp num("\\d*");
+	while (!line.isNull()) {
+		if(line == ""){
+			break;
+		}
+		if(line.mid(0, 2) == "//"){
+		//Comment line
+		} else if (num.exactMatch(line.mid(0,1))){
+			if (num.exactMatch(line.mid(1,1))){
+				if (num.exactMatch(line.mid(2,1))){
+					int number = line.mid(0,3).toInt();
+					if (number > 127){
+						fileCorrect = 0;			
+						break;
+					} else if (line.mid(3,1) != " " || line.mid(3,2) == "  "){
+						fileCorrect = 0;
+						break;
+					}
+				} else if (line.mid(2,1) != " " || line.mid(2,2) == "  "){
+					fileCorrect = 0;
+					break;
+				}		
+			} else if (line.mid(1,1) != " " || line.mid(1,2) == "  ") {
+				fileCorrect = 0;
+				break;
+			}	
+		} else {
+			fileCorrect = 0;
+			break;
+		}
+		line = stream.readLine();
+	}
+	return fileCorrect;	
+}
 
 
 
@@ -4517,6 +4740,15 @@ PianoRollWindow::PianoRollWindow() :
 	m_quantizeComboBox->setFixedSize( 64, 22 );
 	m_quantizeComboBox->setToolTip( tr( "Quantization") );
 
+	// setup labels-stuff
+	QLabel * labels_lbl = new QLabel( m_toolBar );
+	labels_lbl->setPixmap( embed::getIconPixmap( "quantize" ) );
+
+	m_labelsComboBox = new ComboBox( m_toolBar );
+	m_labelsComboBox->setModel( &m_editor->m_labelsModel );
+	m_labelsComboBox->setFixedSize( 100, 22 );
+	m_labelsComboBox->setToolTip( tr( "labels") );
+
 	// setup note-len-stuff
 	QLabel * note_len_lbl = new QLabel( m_toolBar );
 	note_len_lbl->setPixmap( embed::getIconPixmap( "note" ) );
@@ -4570,7 +4802,11 @@ PianoRollWindow::PianoRollWindow() :
 	zoomAndNotesToolBar->addSeparator();
 	zoomAndNotesToolBar->addWidget( chord_lbl );
 	zoomAndNotesToolBar->addWidget( m_chordComboBox );
-
+	
+	zoomAndNotesToolBar->addSeparator();
+	zoomAndNotesToolBar->addWidget( labels_lbl );
+	zoomAndNotesToolBar->addWidget( m_labelsComboBox );
+	
 	zoomAndNotesToolBar->addSeparator();
 	zoomAndNotesToolBar->addWidget( m_clearGhostButton );
 
