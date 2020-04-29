@@ -75,6 +75,14 @@ void FadeButton::activate()
 
 
 
+void FadeButton::activateOnce()
+{
+	if (activeNotes == 0) { activate(); }
+}
+
+
+
+
 void FadeButton::noteEnd()
 {
 	if (activeNotes <= 0)
@@ -92,26 +100,9 @@ void FadeButton::noteEnd()
 		m_releaseTimer.restart();
 	}
 
-	signalUpdate();
-}
-
-
-
-
-void FadeButton::notPlaying()
-{
-	activeNotes = 0;
-	m_releaseTimer.restart();
-	signalUpdate();
-}
-
-
-
-
-void FadeButton::customEvent(QEvent *)
-{
 	update();
 }
+
 
 
 

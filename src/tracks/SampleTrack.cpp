@@ -593,7 +593,7 @@ SampleTrack::SampleTrack( TrackContainer* tc ) :
 					this, tr( "Panning" ) ),
 	m_effectChannelModel( 0, 0, 0, this, tr( "FX channel" ) ),
 	m_audioPort( tr( "Sample track" ), true, &m_volumeModel, &m_panningModel, &m_mutedModel ),
-	m_wasPlaying(false)
+	m_isPlaying(false)
 {
 	setName( tr( "Sample track" ) );
 	m_panningModel.setCenterValue( DefaultPanning );
@@ -618,27 +618,26 @@ bool SampleTrack::play( const MidiTime & _start, const fpp_t _frames,
 {
 	m_audioPort.effects()->startRunning();
 	bool played_a_note = false;	// will be return variable
-	bool is_playing = false;
+	bool nowPlaying = false;
 
 	tcoVector tcos;
 	::BBTrack * bb_track = NULL;
 	if( _tco_num >= 0 )
 	{
-		if (m_wasPlaying && _start > getTCO(_tco_num)->length())
+		if (_start > getTCO(_tco_num)->length())
 		{
-			m_wasPlaying = false;
-			emit notPlaying();
+			nowPlaying = false;
 		}
 		if( _start != 0 )
 		{
+			nowPlaying = false;
 			return false;
 		}
 		tcos.push_back( getTCO( _tco_num ) );
 		if (trackContainer() == (TrackContainer*)Engine::getBBTrackContainer())
 		{
 			bb_track = BBTrack::findBBTrack( _tco_num );
-			m_wasPlaying = true;
-			emit playing();
+			nowPlaying = true;
 		}
 	}
 	else
@@ -650,10 +649,6 @@ bool SampleTrack::play( const MidiTime & _start, const fpp_t _frames,
 
 			if( _start >= sTco->startPosition() && _start < sTco->endPosition() )
 			{
-				if (sTco->isPlaying())
-				{
-					is_playing = true;
-				}
 				if( sTco->isPlaying() == false && _start > sTco->startPosition() + sTco->startTimeOffset() )
 				{
 					auto bufferFramesPerTick = Engine::framesPerTick (sTco->sampleBuffer ()->sampleRate ());
@@ -670,7 +665,7 @@ bool SampleTrack::play( const MidiTime & _start, const fpp_t _frames,
 						sTco->setSamplePlayLength( samplePlayLength );
 						tcos.push_back( sTco );
 						sTco->setIsPlaying( true );
-						is_playing = true;
+						nowPlaying = true;
 					}
 				}
 			}
@@ -678,20 +673,10 @@ bool SampleTrack::play( const MidiTime & _start, const fpp_t _frames,
 			{
 				sTco->setIsPlaying( false );
 			}
+			nowPlaying = nowPlaying || sTco->isPlaying();
 		}
-
-		if (is_playing && !m_wasPlaying)
-		{
-			m_wasPlaying = true;
-			emit playing();
-		}
-		else if (!is_playing && m_wasPlaying)
-		{
-			m_wasPlaying = false;
-			emit notPlaying();
-		}
-
 	}
+	setPlaying(nowPlaying);
 
 	for( tcoVector::Iterator it = tcos.begin(); it != tcos.end(); ++it )
 	{
@@ -861,10 +846,7 @@ SampleTrackView::SampleTrackView( SampleTrack * _t, TrackContainerView* tcv ) :
 						getTrackSettingsWidget());
 	m_activityIndicator->setGeometry(settingsWidgetWidth-2*24-11, 2, 8, 28);
 	m_activityIndicator->show();
-	connect(_t, SIGNAL(playing()),
-			 m_activityIndicator, SLOT(activate()));
-	connect(_t, SIGNAL(notPlaying()),
-			m_activityIndicator, SLOT(notPlaying()));
+	connect(_t, SIGNAL(playingChanged()), this, SLOT(updateIndicator()));
 	connect(Engine::getSong(), SIGNAL(stopped()),
 			this, SLOT(stopPlaying()));
 
@@ -872,6 +854,15 @@ SampleTrackView::SampleTrackView( SampleTrack * _t, TrackContainerView* tcv ) :
 
 	m_window = new SampleTrackWindow(this);
 	m_window->toggleVisibility(false);
+}
+
+
+
+
+void SampleTrackView::updateIndicator()
+{
+	if (model()->isPlaying()) m_activityIndicator->activateOnce();
+	else { m_activityIndicator->noteEnd(); }
 }
 
 
@@ -978,18 +969,6 @@ void SampleTrackView::dropEvent(QDropEvent *de)
 		if (sTco) { sTco->setSampleFile(value); }
 	}
 
-}
-
-
-
-void SampleTrackView::stopPlaying()
-{
-	SampleTrack * smpltrck = dynamic_cast<SampleTrack*>(getTrack());
-	if (smpltrck->wasPlaying())
-	{
-		m_activityIndicator->notPlaying();
-		smpltrck->setWasPlaying(false);
-	}
 }
 
 
