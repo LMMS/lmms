@@ -46,8 +46,8 @@ public:
 
 public slots:
 	void activate();
+	void activateOnce();
 	void noteEnd();
-	void notPlaying();
 
 
 protected:

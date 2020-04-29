@@ -162,19 +162,19 @@ public:
 		return "sampletrack";
 	}
 
-	bool wasPlaying()
+	bool isPlaying()
 	{
-		return m_wasPlaying;
+		return m_isPlaying;
 	}
 
-	void setWasPlaying(bool wasPlaying)
+	void setPlaying(bool playing)
 	{
-		m_wasPlaying = wasPlaying;
+		if (m_isPlaying != playing) { emit playingChanged(); }
+		m_isPlaying = playing;
 	}
 
 signals:
-	void playing();
-	void notPlaying();
+	void playingChanged();
 
 public slots:
 	void updateTcos();
@@ -186,7 +186,7 @@ private:
 	FloatModel m_panningModel;
 	IntModel m_effectChannelModel;
 	AudioPort m_audioPort;
-	bool m_wasPlaying;
+	bool m_isPlaying;
 
 
 
@@ -225,7 +225,7 @@ public:
 
 public slots:
 	void showEffects();
-	void stopPlaying();
+	void updateIndicator();
 
 
 protected:
