@@ -618,7 +618,6 @@ bool SampleTrack::play( const MidiTime & _start, const fpp_t _frames,
 {
 	m_audioPort.effects()->startRunning();
 	bool played_a_note = false;	// will be return variable
-	bool nowPlaying = false;
 
 	tcoVector tcos;
 	::BBTrack * bb_track = NULL;
@@ -626,22 +625,22 @@ bool SampleTrack::play( const MidiTime & _start, const fpp_t _frames,
 	{
 		if (_start > getTCO(_tco_num)->length())
 		{
-			nowPlaying = false;
+			setPlaying(false);
 		}
 		if( _start != 0 )
 		{
-			nowPlaying = false;
 			return false;
 		}
 		tcos.push_back( getTCO( _tco_num ) );
 		if (trackContainer() == (TrackContainer*)Engine::getBBTrackContainer())
 		{
 			bb_track = BBTrack::findBBTrack( _tco_num );
-			nowPlaying = true;
+			setPlaying(true);
 		}
 	}
 	else
 	{
+		bool nowPlaying = false;
 		for( int i = 0; i < numOfTCOs(); ++i )
 		{
 			TrackContentObject * tco = getTCO( i );
@@ -675,8 +674,8 @@ bool SampleTrack::play( const MidiTime & _start, const fpp_t _frames,
 			}
 			nowPlaying = nowPlaying || sTco->isPlaying();
 		}
+		setPlaying(nowPlaying);
 	}
-	setPlaying(nowPlaying);
 
 	for( tcoVector::Iterator it = tcos.begin(); it != tcos.end(); ++it )
 	{
