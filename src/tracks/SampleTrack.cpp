@@ -585,21 +585,19 @@ void SampleTCOView::paintEvent( QPaintEvent * pe )
 
 
 
-SampleTrack::SampleTrack( TrackContainer* tc ) :
-	Track( Track::SampleTrack, tc ),
-	m_volumeModel( DefaultVolume, MinVolume, MaxVolume, 0.1f, this,
-							tr( "Volume" ) ),
-	m_panningModel( DefaultPanning, PanningLeft, PanningRight, 0.1f,
-					this, tr( "Panning" ) ),
-	m_effectChannelModel( 0, 0, 0, this, tr( "FX channel" ) ),
-	m_audioPort( tr( "Sample track" ), true, &m_volumeModel, &m_panningModel, &m_mutedModel ),
+SampleTrack::SampleTrack(TrackContainer* tc) :
+	Track(Track::SampleTrack, tc),
+	m_volumeModel(DefaultVolume, MinVolume, MaxVolume, 0.1f, this, tr("Volume")),
+	m_panningModel(DefaultPanning, PanningLeft, PanningRight, 0.1f, this, tr("Panning")),
+	m_effectChannelModel(0, 0, 0, this, tr("FX channel")),
+	m_audioPort(tr("Sample track"), true, &m_volumeModel, &m_panningModel, &m_mutedModel),
 	m_isPlaying(false)
 {
-	setName( tr( "Sample track" ) );
-	m_panningModel.setCenterValue( DefaultPanning );
-	m_effectChannelModel.setRange( 0, Engine::fxMixer()->numChannels()-1, 1);
+	setName(tr("Sample track"));
+	m_panningModel.setCenterValue(DefaultPanning);
+	m_effectChannelModel.setRange(0, Engine::fxMixer()->numChannels()-1, 1);
 
-	connect( &m_effectChannelModel, SIGNAL( dataChanged() ), this, SLOT( updateEffectChannel() ) );
+	connect(&m_effectChannelModel, SIGNAL(dataChanged()), this, SLOT(updateEffectChannel()));
 }
 
 
@@ -836,13 +834,12 @@ SampleTrackView::SampleTrackView( SampleTrack * _t, TrackContainerView* tcv ) :
 	m_panningKnob->setLabel( tr( "PAN" ) );
 	m_panningKnob->show();
 
-	m_activityIndicator = new FadeButton(QApplication::palette().color(QPalette::Active,
-							QPalette::Background),
-						QApplication::palette().color(QPalette::Active,
-							QPalette::BrightText),
-						QApplication::palette().color(QPalette::Active,
-							QPalette::BrightText).darker(),
-						getTrackSettingsWidget());
+	m_activityIndicator = new FadeButton(
+		QApplication::palette().color(QPalette::Active, QPalette::Background),
+		QApplication::palette().color(QPalette::Active, QPalette::BrightText),
+		QApplication::palette().color(QPalette::Active, QPalette::BrightText).darker(),
+		getTrackSettingsWidget()
+	);
 	m_activityIndicator->setGeometry(settingsWidgetWidth-2*24-11, 2, 8, 28);
 	m_activityIndicator->show();
 	connect(_t, SIGNAL(playingChanged()), this, SLOT(updateIndicator()));
@@ -860,7 +857,7 @@ SampleTrackView::SampleTrackView( SampleTrack * _t, TrackContainerView* tcv ) :
 
 void SampleTrackView::updateIndicator()
 {
-	if (model()->isPlaying()) m_activityIndicator->activateOnce();
+	if (model()->isPlaying()) { m_activityIndicator->activateOnce(); }
 	else { m_activityIndicator->noteEnd(); }
 }
 
