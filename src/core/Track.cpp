@@ -3066,13 +3066,14 @@ void TrackView::muteChanged()
 		if (m_track->m_mutedModel.value())
 		{
 			actind->setActiveColor(QApplication::palette().color(
-							QPalette::Active,
-							QPalette::Highlight));
-		} else
+				QPalette::Active, QPalette::Highlight
+			));
+		}
+		else
 		{
 			actind->setActiveColor(QApplication::palette().color(
-							QPalette::Active,
-							QPalette::BrightText));
+				QPalette::Active, QPalette::BrightText
+			));
 		}
 	}
 }
