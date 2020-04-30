@@ -507,7 +507,7 @@ void PianoRoll::changeNoteEditMode( int i )
 
 void PianoRoll::markSemiTone( int i )
 {
-	const int key = getKey( mapFromGlobal( m_semiToneMarkerMenu->pos() ).y() );
+	const int key = m_pianoKeySelected;
 	const InstrumentFunctionNoteStacking::Chord * chord = nullptr;
 
 	switch( static_cast<SemiToneMarkerAction>( i ) )
@@ -1704,6 +1704,7 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 			if( me->buttons() == Qt::RightButton )
 			{
 				// right click, tone marker contextual menu
+				m_pianoKeySelected = getKey( me->y() );
 				m_semiToneMarkerMenu->popup( mapToGlobal( QPoint( me->x(), me->y() ) ) );
 			}
 			else
