@@ -161,7 +161,7 @@ void printHelp()
 		"Actions:\n"
 		"  <no action> [options...] [<project>]  Start LMMS in normal GUI mode\n"
 		"  dump <in>                             Dump XML of compressed file <in>\n"
-		"  compress <in>                         Compress file <n>\n"
+		"  compress <in>                         Compress file <in>\n"
 		"  render <project> [options...]         Render given project file\n"
 		"  rendertracks <project> [options...]   Render each track to a different file\n"
 		"  upgrade <in> [out]                    Upgrade file <in> and save as <out>\n"
