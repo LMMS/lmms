@@ -70,3 +70,10 @@ InstrumentTrackWindow * InstrumentView::instrumentTrackWindow( void )
 					parentWidget()->parentWidget() ) );
 }
 
+
+
+
+InstrumentViewFixedSize::~InstrumentViewFixedSize()
+{
+}
+

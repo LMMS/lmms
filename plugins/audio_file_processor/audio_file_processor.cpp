@@ -449,7 +449,7 @@ QPixmap * AudioFileProcessorView::s_artwork = NULL;
 
 AudioFileProcessorView::AudioFileProcessorView( Instrument * _instrument,
 							QWidget * _parent ) :
-	InstrumentView( _instrument, _parent )
+	InstrumentViewFixedSize( _instrument, _parent )
 {
 	if( s_artwork == NULL )
 	{

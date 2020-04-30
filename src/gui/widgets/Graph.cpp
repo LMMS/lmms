@@ -235,8 +235,9 @@ void Graph::drawLineAt( int _x, int _y, int _lastx )
 		model()->drawSampleAt( sample_begin + i , val_begin + ((i ) * ystep));
 	}
 
-	
-	model()->samplesChanged( sample_begin, sample_end );
+	// We've changed [sample_end, sample_begin)
+	// However, samplesChanged expects two end points
+	model()->samplesChanged(sample_begin, sample_end - 1);
 }
 
 void Graph::changeSampleAt( int _x, int _y )

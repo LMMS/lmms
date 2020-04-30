@@ -110,7 +110,7 @@ public:
 		return true;
 	}
 
-	virtual QString fullDisplayName() const;
+	QString fullDisplayName() const override;
 
 	// --------------------------------------------------------------------
 	// provided functions:

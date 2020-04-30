@@ -114,7 +114,9 @@ SampleTCO::~SampleTCO()
 	{
 		sampletrack->updateTcos();
 	}
+	Engine::mixer()->requestChangeInModel();
 	sharedObject::unref( m_sampleBuffer );
+	Engine::mixer()->doneChangeInModel();
 }
 
 
@@ -137,7 +139,9 @@ const QString & SampleTCO::sampleFile() const
 
 void SampleTCO::setSampleBuffer( SampleBuffer* sb )
 {
+	Engine::mixer()->requestChangeInModel();
 	sharedObject::unref( m_sampleBuffer );
+	Engine::mixer()->doneChangeInModel();
 	m_sampleBuffer = sb;
 	updateLength();
 
@@ -153,7 +157,7 @@ void SampleTCO::setSampleFile( const QString & _sf )
 	{	//When creating an empty sample pattern make it a bar long
 		float nom = Engine::getSong()->getTimeSigModel().getNumerator();
 		float den = Engine::getSong()->getTimeSigModel().getDenominator();
-		length = DefaultTicksPerTact * ( nom / den );
+		length = DefaultTicksPerBar * ( nom / den );
 	}
 	else
 	{	//Otherwise set it to the sample's length
@@ -269,6 +273,8 @@ void SampleTCO::saveSettings( QDomDocument & _doc, QDomElement & _this )
 		QString s;
 		_this.setAttribute( "data", m_sampleBuffer->toBase64( s ) );
 	}
+
+	_this.setAttribute ("sample_rate", m_sampleBuffer->sampleRate());
 	// TODO: start- and end-frame
 }
 
@@ -289,6 +295,10 @@ void SampleTCO::loadSettings( const QDomElement & _this )
 	changeLength( _this.attribute( "len" ).toInt() );
 	setMuted( _this.attribute( "muted" ).toInt() );
 	setStartTimeOffset( _this.attribute( "off" ).toInt() );
+
+	if (_this.hasAttribute("sample_rate")) {
+		m_sampleBuffer->setSampleRate(_this.attribute("sample_rate").toInt());
+	}
 }
 
 
@@ -511,18 +521,18 @@ void SampleTCOView::paintEvent( QPaintEvent * pe )
 	p.setPen( !muted ? painter.pen().brush().color() : mutedColor() );
 
 	const int spacing = TCO_BORDER_WIDTH + 1;
-	const float ppt = fixedTCOs() ?
+	const float ppb = fixedTCOs() ?
 			( parentWidget()->width() - 2 * TCO_BORDER_WIDTH )
-					/ (float) m_tco->length().getTact() :
-								pixelsPerTact();
+					/ (float) m_tco->length().getBar() :
+								pixelsPerBar();
 
 	float nom = Engine::getSong()->getTimeSigModel().getNumerator();
 	float den = Engine::getSong()->getTimeSigModel().getDenominator();
-	float ticksPerTact = DefaultTicksPerTact * nom / den;
-	
-	float offset =  m_tco->startTimeOffset() / ticksPerTact * pixelsPerTact();
+	float ticksPerBar = DefaultTicksPerBar * nom / den;
+
+	float offset =  m_tco->startTimeOffset() / ticksPerBar * pixelsPerBar();
 	QRect r = QRect( TCO_BORDER_WIDTH + offset, spacing,
-			qMax( static_cast<int>( m_tco->sampleLength() * ppt / ticksPerTact ), 1 ), rect().bottom() - 2 * spacing );
+			qMax( static_cast<int>( m_tco->sampleLength() * ppb / ticksPerBar ), 1 ), rect().bottom() - 2 * spacing );
 	m_tco->m_sampleBuffer->visualize( p, r, pe->rect() );
 
 	QFileInfo fileInfo(m_tco->m_sampleBuffer->audioFile());
@@ -628,13 +638,14 @@ bool SampleTrack::play( const MidiTime & _start, const fpp_t _frames,
 		{
 			TrackContentObject * tco = getTCO( i );
 			SampleTCO * sTco = dynamic_cast<SampleTCO*>( tco );
-			float framesPerTick = Engine::framesPerTick();
+
 			if( _start >= sTco->startPosition() && _start < sTco->endPosition() )
 			{
 				if( sTco->isPlaying() == false && _start > sTco->startPosition() + sTco->startTimeOffset() )
 				{
-					f_cnt_t sampleStart = framesPerTick * ( _start - sTco->startPosition() - sTco->startTimeOffset() );
-					f_cnt_t tcoFrameLength = framesPerTick * ( sTco->endPosition() - sTco->startPosition() - sTco->startTimeOffset() );
+					auto bufferFramesPerTick = Engine::framesPerTick (sTco->sampleBuffer ()->sampleRate ());
+					f_cnt_t sampleStart = bufferFramesPerTick * ( _start - sTco->startPosition() - sTco->startTimeOffset() );
+					f_cnt_t tcoFrameLength = bufferFramesPerTick * ( sTco->endPosition() - sTco->startPosition() - sTco->startTimeOffset() );
 					f_cnt_t sampleBufferLength = sTco->sampleBuffer()->frames();
 					//if the Tco smaller than the sample length we play only until Tco end
 					//else we play the sample to the end but nothing more
@@ -699,9 +710,11 @@ TrackView * SampleTrack::createView( TrackContainerView* tcv )
 
 
 
-TrackContentObject * SampleTrack::createTCO( const MidiTime & )
+TrackContentObject * SampleTrack::createTCO(const MidiTime & pos)
 {
-	return new SampleTCO( this );
+	SampleTCO * sTco = new SampleTCO(this);
+	sTco->movePosition(pos);
+	return sTco;
 }
 
 
@@ -834,6 +847,7 @@ SampleTrackView::~SampleTrackView()
 
 
 
+//FIXME: This is identical to InstrumentTrackView::createFxMenu
 QMenu * SampleTrackView::createFxMenu(QString title, QString newFxLabel)
 {
 	int channelIndex = model()->effectChannelModel()->value();
@@ -848,8 +862,6 @@ QMenu * SampleTrackView::createFxMenu(QString title, QString newFxLabel)
 
 	QMenu *fxMenu = new QMenu(title);
 
-	QSignalMapper * fxMenuSignalMapper = new QSignalMapper(fxMenu);
-
 	fxMenu->addAction(newFxLabel, this, SLOT(createFxLine()));
 	fxMenu->addSeparator();
 
@@ -859,13 +871,13 @@ QMenu * SampleTrackView::createFxMenu(QString title, QString newFxLabel)
 
 		if (currentChannel != fxChannel)
 		{
+			const auto index = currentChannel->m_channelIndex;
 			QString label = tr("FX %1: %2").arg(currentChannel->m_channelIndex).arg(currentChannel->m_name);
-			QAction * action = fxMenu->addAction(label, fxMenuSignalMapper, SLOT(map()));
-			fxMenuSignalMapper->setMapping(action, currentChannel->m_channelIndex);
+			fxMenu->addAction(label, [this, index](){
+				assignFxLine(index);
+			});
 		}
 	}
-
-	connect(fxMenuSignalMapper, SIGNAL(mapped(int)), this, SLOT(assignFxLine(int)));
 
 	return fxMenu;
 }
@@ -887,6 +899,45 @@ void SampleTrackView::modelChanged()
 
 	TrackView::modelChanged();
 }
+
+
+
+
+void SampleTrackView::dragEnterEvent(QDragEnterEvent *dee)
+{
+	StringPairDrag::processDragEnterEvent(dee, QString("samplefile"));
+}
+
+
+
+
+void SampleTrackView::dropEvent(QDropEvent *de)
+{
+	QString type  = StringPairDrag::decodeKey(de);
+	QString value = StringPairDrag::decodeValue(de);
+
+	if (type == "samplefile")
+	{
+		int trackHeadWidth = ConfigManager::inst()->value("ui", "compacttrackbuttons").toInt()==1
+				? DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT + TRACK_OP_WIDTH_COMPACT
+				: DEFAULT_SETTINGS_WIDGET_WIDTH + TRACK_OP_WIDTH;
+
+		int xPos = de->pos().x() < trackHeadWidth
+				? trackHeadWidth
+				: de->pos().x();
+
+		MidiTime tcoPos = trackContainerView()->fixedTCOs()
+				? MidiTime(0)
+				: MidiTime(((xPos - trackHeadWidth) / trackContainerView()->pixelsPerBar()
+							* MidiTime::ticksPerBar()) + trackContainerView()->currentPosition()
+						).quantize(1.0);
+
+		SampleTCO * sTco = static_cast<SampleTCO*>(getTrack()->createTCO(tcoPos));
+		if (sTco) { sTco->setSampleFile(value); }
+	}
+
+}
+
 
 
 
@@ -1140,4 +1191,3 @@ void SampleTrackWindow::loadSettings(const QDomElement& element)
 		m_stv->m_tlb->setChecked(true);
 	}
 }
-

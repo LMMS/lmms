@@ -196,7 +196,12 @@ void NotePlayHandle::play( sampleFrame * _working_buffer )
 
 	lock();
 
-	if( m_totalFramesPlayed == 0 && !m_hasMidiNote
+	/* It is possible for NotePlayHandle::noteOff to be called before NotePlayHandle::play,
+	 * which results in a note-on message being sent without a subsequent note-off message.
+	 * Therefore, we check here whether the note has already been released before sending
+	 * the note-on message. */
+	if( !m_released
+		&& m_totalFramesPlayed == 0 && !m_hasMidiNote
 		&& ( hasParent() || ! m_instrumentTrack->isArpeggioEnabled() ) )
 	{
 		m_hasMidiNote = true;
@@ -532,6 +537,15 @@ void NotePlayHandle::processMidiTime( const MidiTime& time )
 
 void NotePlayHandle::resize( const bpm_t _new_tempo )
 {
+	if (origin() == OriginMidiInput ||
+		(origin() == OriginNoteStacking && m_parent->origin() == OriginMidiInput))
+	{
+		// Don't resize notes from MIDI input - they should continue to play
+		// until the key is released, and their large duration can cause
+		// overflows in this method.
+		return;
+	}
+
 	double completed = m_totalFramesPlayed / (double) m_frames;
 	double new_frames = m_origFrames * m_origTempo / (double) _new_tempo;
 	m_frames = (f_cnt_t)new_frames;
@@ -574,13 +588,9 @@ NotePlayHandle * NotePlayHandleManager::acquire( InstrumentTrack* instrumentTrac
 				int midiEventChannel,
 				NotePlayHandle::Origin origin )
 {
-	if( s_availableIndex < 0 )
-	{
-		s_mutex.lockForWrite();
-		if( s_availableIndex < 0 ) extend( NPH_CACHE_INCREMENT );
-		s_mutex.unlock();
-	}
-	s_mutex.lockForRead();
+	// TODO: use some lockless data structures
+	s_mutex.lockForWrite();
+	if (s_availableIndex < 0) { extend(NPH_CACHE_INCREMENT); }
 	NotePlayHandle * nph = s_available[s_availableIndex--];
 	s_mutex.unlock();
 

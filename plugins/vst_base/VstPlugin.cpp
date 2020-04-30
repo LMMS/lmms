@@ -60,7 +60,6 @@
 #include "MainWindow.h"
 #include "Mixer.h"
 #include "Song.h"
-#include "templates.h"
 #include "FileDialog.h"
 
 #ifdef LMMS_BUILD_LINUX

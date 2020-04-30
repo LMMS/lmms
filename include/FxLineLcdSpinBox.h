@@ -42,8 +42,8 @@ public:
 	void setTrackView(TrackView * tv);
 
 protected:
-	virtual void mouseDoubleClickEvent(QMouseEvent* event);
-	virtual void contextMenuEvent(QContextMenuEvent* event);
+	void mouseDoubleClickEvent(QMouseEvent* event) override;
+	void contextMenuEvent(QContextMenuEvent* event) override;
 
 private:
 	TrackView * m_tv;

@@ -361,12 +361,12 @@ const surroundSampleFrame * Mixer::renderNextBuffer()
 			// Stop crash with metronome if empty project
 				Engine::getSong()->countTracks() )
 	{
-		tick_t ticksPerTact = MidiTime::ticksPerTact();
-		if ( p.getTicks() % (ticksPerTact / 1 ) == 0 )
+		tick_t ticksPerBar = MidiTime::ticksPerBar();
+		if ( p.getTicks() % ( ticksPerBar / 1 ) == 0 )
 		{
 			addPlayHandle( new SamplePlayHandle( "misc/metronome02.ogg" ) );
 		}
-		else if ( p.getTicks() % (ticksPerTact /
+		else if ( p.getTicks() % ( ticksPerBar /
 			song->getTimeSigModel().getNumerator() ) == 0 )
 		{
 			addPlayHandle( new SamplePlayHandle( "misc/metronome01.ogg" ) );
@@ -577,21 +577,35 @@ void Mixer::changeQuality( const struct qualitySettings & _qs )
 
 
 
-void Mixer::setAudioDevice( AudioDevice * _dev,
-			    bool startNow )
+void Mixer::doSetAudioDevice( AudioDevice * _dev )
 {
-	stopProcessing();
+	// TODO: Use shared_ptr here in the future.
+	// Currently, this is safe, because this is only called by
+	// ProjectRenderer, and after ProjectRenderer calls this function,
+	// it does not access the old device anymore.
+	if( m_audioDev != m_oldAudioDev ) {delete m_audioDev;}
 
-	if( _dev == NULL )
+	if( _dev )
+	{
+		m_audioDev = _dev;
+	}
+	else
 	{
 		printf( "param _dev == NULL in Mixer::setAudioDevice(...). "
 					"Trying any working audio-device\n" );
 		m_audioDev = tryAudioDevices();
 	}
-	else
-	{
-		m_audioDev = _dev;
-	}
+}
+
+
+
+
+void Mixer::setAudioDevice( AudioDevice * _dev,
+			    bool startNow )
+{
+	stopProcessing();
+
+	doSetAudioDevice( _dev );
 
 	emit sampleRateChanged();
 
@@ -601,26 +615,16 @@ void Mixer::setAudioDevice( AudioDevice * _dev,
 
 
 
-void Mixer::setAudioDevice( AudioDevice * _dev,
+void Mixer::setAudioDevice(AudioDevice * _dev,
 				const struct qualitySettings & _qs,
 				bool _needs_fifo,
-				bool startNow )
+				bool startNow)
 {
-	// don't delete the audio-device
 	stopProcessing();
 
 	m_qualitySettings = _qs;
 
-	if( _dev == NULL )
-	{
-		printf( "param _dev == NULL in Mixer::setAudioDevice(...). "
-					"Trying any working audio-device\n" );
-		m_audioDev = tryAudioDevices();
-	}
-	else
-	{
-		m_audioDev = _dev;
-	}
+	doSetAudioDevice( _dev );
 
 	emit qualitySettingsChanged();
 	emit sampleRateChanged();
@@ -827,7 +831,9 @@ void Mixer::runChangesInModel()
 	if( m_changesSignal )
 	{
 		m_waitChangesMutex.lock();
+		// allow changes in the model from other threads ...
 		m_changesRequestCondition.wakeOne();
+		// ... and wait until they are done
 		m_changesMixerCondition.wait( &m_waitChangesMutex );
 		m_waitChangesMutex.unlock();
 	}
@@ -1241,7 +1247,7 @@ void Mixer::fifoWriter::run()
 	disable_denormals();
 
 #if 0
-#ifdef LMMS_BUILD_LINUX
+#if defined(LMMS_BUILD_LINUX) || defined(LMMS_BUILD_FREEBSD)
 #ifdef LMMS_HAVE_SCHED_H
 	cpu_set_t mask;
 	CPU_ZERO( &mask );
@@ -1281,6 +1287,4 @@ void Mixer::fifoWriter::write( surroundSampleFrame * buffer )
 	m_mixer->m_waitingForWrite = false;
 	m_mixer->m_doChangesMutex.unlock();
 }
-
-
 

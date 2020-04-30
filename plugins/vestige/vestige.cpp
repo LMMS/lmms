@@ -82,11 +82,11 @@ Plugin::Descriptor Q_DECL_EXPORT  vestige_plugin_descriptor =
 }
 
 
-class vstSubWin : public QMdiSubWindow
+class vstSubWin : public SubWindow
 {
 public:
 	vstSubWin( QWidget * _parent ) :
-		QMdiSubWindow( _parent )
+		SubWindow( _parent )
 	{
 		setAttribute( Qt::WA_DeleteOnClose, false );
 		setWindowFlags( Qt::WindowCloseButtonHint );
@@ -468,7 +468,7 @@ PluginView * vestigeInstrument::instantiateView( QWidget * _parent )
 
 VestigeInstrumentView::VestigeInstrumentView( Instrument * _instrument,
 							QWidget * _parent ) :
-	InstrumentView( _instrument, _parent ),
+	InstrumentViewFixedSize( _instrument, _parent ),
 	lastPosInMenu (0)
 {
 	if( s_artwork == NULL )
@@ -900,7 +900,7 @@ void VestigeInstrumentView::paintEvent( QPaintEvent * )
 
 manageVestigeInstrumentView::manageVestigeInstrumentView( Instrument * _instrument,
 							QWidget * _parent, vestigeInstrument * m_vi2 ) :
-	InstrumentView( _instrument, _parent )
+	InstrumentViewFixedSize( _instrument, _parent )
 {
 	m_vi = m_vi2;
 	m_vi->m_scrollArea = new QScrollArea( this );

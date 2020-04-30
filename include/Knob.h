@@ -30,7 +30,6 @@
 #include <QtCore/QPoint>
 
 #include "AutomatableModelView.h"
-#include "templates.h"
 
 
 class QPixmap;
@@ -127,16 +126,16 @@ signals:
 
 
 protected:
-	virtual void contextMenuEvent( QContextMenuEvent * _me );
-	virtual void dragEnterEvent( QDragEnterEvent * _dee );
-	virtual void dropEvent( QDropEvent * _de );
-	virtual void focusOutEvent( QFocusEvent * _fe );
-	virtual void mousePressEvent( QMouseEvent * _me );
-	virtual void mouseReleaseEvent( QMouseEvent * _me );
-	virtual void mouseMoveEvent( QMouseEvent * _me );
-	virtual void mouseDoubleClickEvent( QMouseEvent * _me );
-	virtual void paintEvent( QPaintEvent * _me );
-	virtual void wheelEvent( QWheelEvent * _me );
+	void contextMenuEvent( QContextMenuEvent * _me ) override;
+	void dragEnterEvent( QDragEnterEvent * _dee ) override;
+	void dropEvent( QDropEvent * _de ) override;
+	void focusOutEvent( QFocusEvent * _fe ) override;
+	void mousePressEvent( QMouseEvent * _me ) override;
+	void mouseReleaseEvent( QMouseEvent * _me ) override;
+	void mouseMoveEvent( QMouseEvent * _me ) override;
+	void mouseDoubleClickEvent( QMouseEvent * _me ) override;
+	void paintEvent( QPaintEvent * _me ) override;
+	void wheelEvent( QWheelEvent * _me ) override;
 
 	virtual float getValue( const QPoint & _p );
 
@@ -162,7 +161,7 @@ private slots:
 	void toggleScale();
 
 private:
-	virtual void doConnections();
+	void doConnections() override;
 
 	QLineF calculateLine( const QPointF & _mid, float _radius,
 						float _innerRadius = 1) const;

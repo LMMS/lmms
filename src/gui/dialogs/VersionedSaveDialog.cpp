@@ -28,13 +28,15 @@
 #include <QLineEdit>
 #include <QMessageBox>
 #include <QPushButton>
+#include <QGroupBox>
+#include <QLabel>
 
 #include "VersionedSaveDialog.h"
-
-
+#include "LedCheckbox.h"
 
 
 VersionedSaveDialog::VersionedSaveDialog( QWidget *parent,
+										  QWidget *saveOptionsWidget,
 										  const QString &caption,
 										  const QString &directory,
 										  const QString &filter ) :
@@ -62,6 +64,17 @@ VersionedSaveDialog::VersionedSaveDialog( QWidget *parent,
 	hLayout->addWidget( plusButton );
 	hLayout->addWidget( minusButton );
 	layout->addLayout( hLayout, 2, 1 );
+
+	if (saveOptionsWidget) {
+		auto groupBox = new QGroupBox(tr("Save Options"));
+		auto optionsLayout = new QGridLayout;
+
+		optionsLayout->addWidget(saveOptionsWidget, 0, 0, Qt::AlignLeft);
+
+		groupBox->setLayout(optionsLayout);
+
+		layout->addWidget(groupBox, layout->rowCount() + 1, 0, 1, -1);
+	}
 
 	// Connect + and - buttons
 	connect( plusButton, SIGNAL( clicked() ), this, SLOT( incrementVersion() ));
@@ -159,4 +172,15 @@ bool VersionedSaveDialog::fileExistsQuery( QString FileName, QString WindowTitle
 		}
 	}
 	return fileExists;
+}
+
+SaveOptionsWidget::SaveOptionsWidget(Song::SaveOptions &saveOptions) {
+	auto *layout = new QVBoxLayout();
+
+	m_discardMIDIConnectionsCheckbox = new LedCheckBox(nullptr);
+	m_discardMIDIConnectionsCheckbox->setText(tr("Discard MIDI connections"));
+	m_discardMIDIConnectionsCheckbox->setModel(&saveOptions.discardMIDIConnections);
+	layout->addWidget(m_discardMIDIConnectionsCheckbox);
+
+	setLayout(layout);
 }

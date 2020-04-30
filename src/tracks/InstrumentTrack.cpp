@@ -422,6 +422,7 @@ void InstrumentTrack::processOutEvent( const MidiEvent& event, const MidiTime& t
 				m_instrument->handleMidiEvent( MidiEvent( MidiNoteOff, midiPort()->realOutputChannel(), key, 0 ), time, offset );
 			}
 			m_midiNotesMutex.unlock();
+			emit endNote();
 			break;
 
 		default:
@@ -446,7 +447,7 @@ void InstrumentTrack::silenceAllNotes( bool removeIPH )
 	}
 	m_midiNotesMutex.unlock();
 
-	lock();
+	Engine::mixer()->requestChangeInModel();
 	// invalidate all NotePlayHandles and PresetPreviewHandles linked to this track
 	m_processHandles.clear();
 
@@ -456,7 +457,7 @@ void InstrumentTrack::silenceAllNotes( bool removeIPH )
 		flags |= PlayHandle::TypeInstrumentPlayHandle;
 	}
 	Engine::mixer()->removePlayHandlesOfTypes( this, flags );
-	unlock();
+	Engine::mixer()->doneChangeInModel();
 }
 
 
@@ -545,11 +546,13 @@ void InstrumentTrack::setName( const QString & _new_name )
 
 void InstrumentTrack::updateBaseNote()
 {
+	Engine::mixer()->requestChangeInModel();
 	for( NotePlayHandleList::Iterator it = m_processHandles.begin();
 					it != m_processHandles.end(); ++it )
 	{
 		( *it )->setFrequencyUpdate();
 	}
+	Engine::mixer()->doneChangeInModel();
 }
 
 
@@ -592,7 +595,7 @@ int InstrumentTrack::masterKey( int _midi_key ) const
 {
 
 	int key = baseNote();
-	return tLimit<int>( _midi_key - ( key - DefaultKey ), 0, NumKeys );
+	return qBound<int>( 0, _midi_key - ( key - DefaultKey ), NumKeys );
 }
 
 
@@ -651,8 +654,11 @@ bool InstrumentTrack::play( const MidiTime & _start, const fpp_t _frames,
 	for( tcoVector::Iterator it = tcos.begin(); it != tcos.end(); ++it )
 	{
 		Pattern* p = dynamic_cast<Pattern*>( *it );
-		// everything which is not a pattern or muted won't be played
-		if( p == NULL || ( *it )->isMuted() )
+		// everything which is not a pattern won't be played
+		// A pattern playing in the Piano Roll window will always play
+		if(p == NULL ||
+			(Engine::getSong()->playMode() != Song::Mode_PlayPattern
+			&& (*it)->isMuted()))
 		{
 			continue;
 		}
@@ -673,7 +679,7 @@ bool InstrumentTrack::play( const MidiTime & _start, const fpp_t _frames,
 
 		if( cur_start > 0 )
 		{
-			// skip notes which are posated before start-tact
+			// skip notes which are posated before start-bar
 			while( nit != notes.end() && ( *nit )->pos() < cur_start )
 			{
 				++nit;
@@ -749,7 +755,14 @@ void InstrumentTrack::saveTrackSpecificSettings( QDomDocument& doc, QDomElement 
 	m_soundShaping.saveState( doc, thisElement );
 	m_noteStacking.saveState( doc, thisElement );
 	m_arpeggio.saveState( doc, thisElement );
-	m_midiPort.saveState( doc, thisElement );
+
+	// Don't save midi port info if the user chose to.
+	if (Engine::getSong()->isSavingProject()
+		&& !Engine::getSong()->getSaveOptions().discardMIDIConnections.value())
+	{
+		m_midiPort.saveState( doc, thisElement );
+	}
+
 	m_audioPort.effects()->saveState( doc, thisElement );
 }
 
@@ -969,6 +982,8 @@ InstrumentTrackView::InstrumentTrackView( InstrumentTrack * _it, TrackContainerV
 							QPalette::Background),
 						QApplication::palette().color( QPalette::Active,
 							QPalette::BrightText ),
+						QApplication::palette().color( QPalette::Active,
+							QPalette::BrightText).darker(),
 						getTrackSettingsWidget() );
 	m_activityIndicator->setGeometry(
 					 widgetWidth-2*24-11, 2, 8, 28 );
@@ -979,6 +994,8 @@ InstrumentTrackView::InstrumentTrackView( InstrumentTrack * _it, TrackContainerV
 				this, SLOT( activityIndicatorReleased() ) );
 	connect( _it, SIGNAL( newNote() ),
 			 m_activityIndicator, SLOT( activate() ) );
+	connect( _it, SIGNAL( endNote() ),
+	 		m_activityIndicator, SLOT( noteEnd() ) );
 	connect( &_it->m_mutedModel, SIGNAL( dataChanged() ), this, SLOT( muteChanged() ) );
 
 	setModel( _it );
@@ -1224,6 +1241,7 @@ void InstrumentTrackView::muteChanged()
 
 
 
+//FIXME: This is identical to SampleTrackView::createFxMenu
 QMenu * InstrumentTrackView::createFxMenu(QString title, QString newFxLabel)
 {
 	int channelIndex = model()->effectChannelModel()->value();
@@ -1238,8 +1256,6 @@ QMenu * InstrumentTrackView::createFxMenu(QString title, QString newFxLabel)
 
 	QMenu *fxMenu = new QMenu( title );
 
-	QSignalMapper * fxMenuSignalMapper = new QSignalMapper(fxMenu);
-
 	fxMenu->addAction( newFxLabel, this, SLOT( createFxLine() ) );
 	fxMenu->addSeparator();
 
@@ -1249,13 +1265,13 @@ QMenu * InstrumentTrackView::createFxMenu(QString title, QString newFxLabel)
 
 		if ( currentChannel != fxChannel )
 		{
+			auto index = currentChannel->m_channelIndex;
 			QString label = tr( "FX %1: %2" ).arg( currentChannel->m_channelIndex ).arg( currentChannel->m_name );
-			QAction * action = fxMenu->addAction( label, fxMenuSignalMapper, SLOT( map() ) );
-			fxMenuSignalMapper->setMapping(action, currentChannel->m_channelIndex);
+			fxMenu->addAction(label, [this, index](){
+				assignFxLine(index);
+			});
 		}
 	}
-
-	connect(fxMenuSignalMapper, SIGNAL(mapped(int)), this, SLOT(assignFxLine(int)));
 
 	return fxMenu;
 }
@@ -1449,6 +1465,8 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 	adjustTabSize(m_ssView);
 	adjustTabSize(instrumentFunctions);
 	adjustTabSize(m_effectView);
+	// stupid bugfix, no one knows why
+	m_effectView->resize(INSTRUMENT_WIDTH - 4, INSTRUMENT_HEIGHT - 4 - 1);
 	adjustTabSize(m_midiView);
 	adjustTabSize(m_miscView);
 
@@ -1583,7 +1601,7 @@ void InstrumentTrackWindow::saveSettingsBtnClicked()
 	sfd.setDirectory( presetRoot + m_track->instrumentName() );
 	sfd.setFileMode( FileDialog::AnyFile );
 	QString fname = m_track->name();
-	sfd.selectFile( fname.remove(QRegExp("[^a-zA-Z0-9_\\-\\d\\s]")) );
+	sfd.selectFile(fname.remove(QRegExp(FILENAME_FILTER)));
 	sfd.setDefaultSuffix( "xpf");
 
 	if( sfd.exec() == QDialog::Accepted &&

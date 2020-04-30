@@ -265,6 +265,8 @@ public slots:
 	void sampleRateChanged();
 
 private:
+	static sample_rate_t mixerSampleRate();
+
 	void update( bool _keep_settings = false );
 
 	void convertIntToFloat ( int_sample_t * & _ibuf, f_cnt_t _frames, int _channels);

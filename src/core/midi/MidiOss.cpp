@@ -71,7 +71,11 @@ QString MidiOss::probeDevice()
 		{
 			return getenv( "MIDIDEV" );
 		}
+#ifdef __NetBSD__
+		return "/dev/rmidi0";
+#else
 		return "/dev/midi";
+#endif
 	}
 	return dev;
 }

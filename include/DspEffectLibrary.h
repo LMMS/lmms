@@ -27,7 +27,6 @@
 #define DSP_EFFECT_LIBRARY_H
 
 #include "lmms_math.h"
-#include "templates.h"
 #include "lmms_constants.h"
 #include "lmms_basics.h"
 

@@ -45,7 +45,6 @@ float frnd(float range)
 #include "Knob.h"
 #include "NotePlayHandle.h"
 #include "PixmapButton.h"
-#include "templates.h"
 #include "ToolTip.h"
 #include "Song.h"
 #include "MidiEvent.h"
@@ -601,7 +600,7 @@ public:
 
 sfxrInstrumentView::sfxrInstrumentView( Instrument * _instrument,
 					QWidget * _parent ) :
-	InstrumentView( _instrument, _parent )
+	InstrumentViewFixedSize( _instrument, _parent )
 {
 	srand(time(NULL));
 	setAutoFillBackground( true );

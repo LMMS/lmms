@@ -34,7 +34,6 @@
 
 #include "embed.h"
 #include "Engine.h"
-#include "templates.h"
 #include "gui_templates.h"
 #include "StringPairDrag.h"
 #include "PluginFactory.h"
@@ -231,7 +230,7 @@ void PluginDescWidget::paintEvent( QPaintEvent * )
 	style()->drawPrimitive( QStyle::PE_Widget, &o, &p, this );
 
 	// Draw the rest
-	const int s = 16 + ( 32 * ( tLimit( height(), 24, 60 ) - 24 ) ) /
+	const int s = 16 + ( 32 * ( qBound( 24, height(), 60 ) - 24 ) ) /
 								( 60 - 24 );
 	const QSize logo_size( s, s );
 	QPixmap logo = m_logo.scaled( logo_size, Qt::KeepAspectRatio,

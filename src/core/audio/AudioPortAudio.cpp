@@ -48,16 +48,15 @@ void AudioPortAudioSetupUtil::updateChannels()
 #include "Engine.h"
 #include "ConfigManager.h"
 #include "gui_templates.h"
-#include "templates.h"
 #include "ComboBox.h"
 #include "Mixer.h"
 
 
 AudioPortAudio::AudioPortAudio( bool & _success_ful, Mixer * _mixer ) :
-	AudioDevice( tLimit<ch_cnt_t>(
+	AudioDevice( qBound<ch_cnt_t>(
+		DEFAULT_CHANNELS,
 		ConfigManager::inst()->value( "audioportaudio", "channels" ).toInt(),
-					DEFAULT_CHANNELS, SURROUND_CHANNELS ),
-								_mixer ),
+		SURROUND_CHANNELS ), _mixer ),
 	m_paStream( NULL ),
 	m_wasPAInitError( false ),
 	m_outBuf( new surroundSampleFrame[mixer()->framesPerPeriod()] ),
@@ -413,14 +412,14 @@ AudioPortAudio::setupWidget::setupWidget( QWidget * _parent ) :
 	m_backend = new ComboBox( this, "BACKEND" );
 	m_backend->setGeometry( 64, 15, 260, 20 );
 
-	QLabel * backend_lbl = new QLabel( tr( "BACKEND" ), this );
+	QLabel * backend_lbl = new QLabel( tr( "Backend" ), this );
 	backend_lbl->setFont( pointSize<7>( backend_lbl->font() ) );
 	backend_lbl->move( 8, 18 );
 
 	m_device = new ComboBox( this, "DEVICE" );
 	m_device->setGeometry( 64, 35, 260, 20 );
 
-	QLabel * dev_lbl = new QLabel( tr( "DEVICE" ), this );
+	QLabel * dev_lbl = new QLabel( tr( "Device" ), this );
 	dev_lbl->setFont( pointSize<7>( dev_lbl->font() ) );
 	dev_lbl->move( 8, 38 );
 	
@@ -432,7 +431,7 @@ AudioPortAudio::setupWidget::setupWidget( QWidget * _parent ) :
 
 	m_channels = new LcdSpinBox( 1, this );
 	m_channels->setModel( m );
-	m_channels->setLabel( tr( "CHANNELS" ) );
+	m_channels->setLabel( tr( "Channels" ) );
 	m_channels->move( 308, 20 );*/
 
 	connect( &m_setupUtil.m_backendModel, SIGNAL( dataChanged() ),

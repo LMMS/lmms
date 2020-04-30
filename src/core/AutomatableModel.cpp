@@ -31,6 +31,7 @@
 #include "LocaleHelper.h"
 #include "Mixer.h"
 #include "ProjectJournal.h"
+#include "Song.h"
 
 long AutomatableModel::s_periodCounter = 0;
 
@@ -131,8 +132,15 @@ void AutomatableModel::saveSettings( QDomDocument& doc, QDomElement& element, co
 		}
 	}
 
-	if( m_controllerConnection && m_controllerConnection->getController()->type()
-				!= Controller::DummyController )
+	// Skip saving MIDI connections if we're saving project and
+	// the discardMIDIConnections option is true.
+	auto controllerType = m_controllerConnection
+			? m_controllerConnection->getController()->type()
+			: Controller::DummyController;
+	bool skipMidiController = Engine::getSong()->isSavingProject()
+							  && Engine::getSong()->getSaveOptions().discardMIDIConnections.value();
+	if (m_controllerConnection && controllerType != Controller::DummyController
+		&& !(skipMidiController && controllerType == Controller::MidiController))
 	{
 		QDomElement controllerElement;
 
@@ -431,7 +439,7 @@ void AutomatableModel::setStep( const float step )
 
 float AutomatableModel::fittedValue( float value ) const
 {
-	value = tLimit<float>( value, m_minValue, m_maxValue );
+	value = qBound<float>( m_minValue, value, m_maxValue );
 
 	if( m_step != 0 && m_hasStrictStepSize )
 	{
@@ -491,8 +499,23 @@ void AutomatableModel::unlinkModel( AutomatableModel* model )
 
 void AutomatableModel::linkModels( AutomatableModel* model1, AutomatableModel* model2 )
 {
+	if (!model1->m_linkedModels.contains( model2 ) && model1 != model2)
+	{
+		// copy data
+		model1->m_value = model2->m_value;
+		if (model1->valueBuffer() && model2->valueBuffer())
+		{
+			std::copy_n(model2->valueBuffer()->data(),
+				model1->valueBuffer()->length(),
+				model1->valueBuffer()->data());
+		}
+		// send dataChanged() before linking (because linking will
+		// connect the two dataChanged() signals)
+		emit model1->dataChanged();
+		// finally: link the models
 		model1->linkModel( model2 );
 		model2->linkModel( model1 );
+	}
 }
 
 

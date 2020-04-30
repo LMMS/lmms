@@ -51,7 +51,7 @@ protected slots:
 
 
 private:
-	virtual void modelChanged();
+	void modelChanged() override;
 
 	MidiPort::Modes m_mode;
 

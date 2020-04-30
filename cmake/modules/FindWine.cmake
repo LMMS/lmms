@@ -11,8 +11,16 @@ MACRO(_findwine_find_flags output expression result)
 	STRING(REPLACE " " ";" WINEBUILD_FLAGS "${output}")
 	FOREACH(FLAG ${WINEBUILD_FLAGS})
 		IF("${FLAG}" MATCHES "${expression}")
-			SET(${result} "${FLAG}")
+			LIST(APPEND ${result} "${FLAG}")
 		ENDIF()
+	ENDFOREACH()
+ENDMACRO()
+
+MACRO(_regex_replace_foreach EXPRESSION REPLACEMENT RESULT INPUT)
+	SET(${RESULT} "")
+	FOREACH(ITEM ${INPUT})
+		STRING(REGEX REPLACE "${EXPRESSION}" "${REPLACEMENT}" ITEM "${ITEM}")
+		LIST(APPEND ${RESULT} "${ITEM}")
 	ENDFOREACH()
 ENDMACRO()
 
@@ -31,10 +39,10 @@ IF(WINE_CXX)
 	_findwine_find_flags("${WINEBUILD_OUTPUT_32}" "^-isystem" WINEGCC_INCLUDE_DIR)
 	_findwine_find_flags("${WINEBUILD_OUTPUT_32}" "libwinecrt0\\.a.*" WINECRT_32)
 	_findwine_find_flags("${WINEBUILD_OUTPUT_64}" "libwinecrt0\\.a.*" WINECRT_64)
-	STRING(REGEX REPLACE "^-isystem" "" WINE_INCLUDE_HINT "${WINEGCC_INCLUDE_DIR}")
-	STRING(REGEX REPLACE "/wine/windows$" "" WINE_INCLUDE_HINT "${WINE_INCLUDE_HINT}")
-	STRING(REGEX REPLACE "libwinecrt0\\.a.*" "" WINE_32_LIBRARY_DIR "${WINECRT_32}")
-	STRING(REGEX REPLACE "libwinecrt0\\.a.*" "" WINE_64_LIBRARY_DIR "${WINECRT_64}")
+	_regex_replace_foreach("^-isystem" "" WINE_INCLUDE_HINT "${WINEGCC_INCLUDE_DIR}")
+	_regex_replace_foreach("/wine/windows$" "" WINE_INCLUDE_HINT "${WINE_INCLUDE_HINT}")
+	STRING(REGEX REPLACE "wine/libwinecrt0\\.a.*" "" WINE_32_LIBRARY_DIR "${WINECRT_32}")
+	STRING(REGEX REPLACE "wine/libwinecrt0\\.a.*" "" WINE_64_LIBRARY_DIR "${WINECRT_64}")
 
 	IF(BUGGED_WINEGCC)
 		MESSAGE(WARNING "Your winegcc is unusable due to https://bugs.winehq.org/show_bug.cgi?id=46293,\n
@@ -76,7 +84,7 @@ IF(WINE_CXX)
 ENDIF()
 
 FIND_PATH(WINE_INCLUDE_DIR wine/exception.h
-	HINTS "${WINE_INCLUDE_HINT}"
+	HINTS ${WINE_INCLUDE_HINT}
 )
 
 SET(_ARCHITECTURE ${CMAKE_LIBRARY_ARCHITECTURE})

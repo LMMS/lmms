@@ -324,17 +324,23 @@ void CarlaInstrument::play(sampleFrame* workingBuffer)
     fTimeInfo.playing  = s->isPlaying();
     fTimeInfo.frame    = s->getPlayPos(s->playMode()).frames(Engine::framesPerTick());
     fTimeInfo.usecs    = s->getMilliseconds()*1000;
-    fTimeInfo.bbt.bar  = s->getTacts() + 1;
+    fTimeInfo.bbt.bar  = s->getBars() + 1;
     fTimeInfo.bbt.beat = s->getBeat() + 1;
     fTimeInfo.bbt.tick = s->getBeatTicks();
-    fTimeInfo.bbt.barStartTick   = ticksPerBeat*s->getTimeSigModel().getNumerator()*s->getTacts();
+    fTimeInfo.bbt.barStartTick   = ticksPerBeat*s->getTimeSigModel().getNumerator()*s->getBars();
     fTimeInfo.bbt.beatsPerBar    = s->getTimeSigModel().getNumerator();
     fTimeInfo.bbt.beatType       = s->getTimeSigModel().getDenominator();
     fTimeInfo.bbt.ticksPerBeat   = ticksPerBeat;
     fTimeInfo.bbt.beatsPerMinute = s->getTempo();
 
+#ifndef _MSC_VER
     float buf1[bufsize];
     float buf2[bufsize];
+#else
+    float *buf1 = static_cast<float *>(_alloca(bufsize * sizeof(float)));
+    float *buf2 = static_cast<float *>(_alloca(bufsize * sizeof(float)));
+#endif
+
     float* rBuf[] = { buf1, buf2 };
     std::memset(buf1, 0, sizeof(float)*bufsize);
     std::memset(buf2, 0, sizeof(float)*bufsize);
@@ -438,7 +444,8 @@ PluginView* CarlaInstrument::instantiateView(QWidget* parent)
 // Disable plugin focus per https://bugreports.qt.io/browse/QTBUG-30181
 #ifndef CARLA_OS_MAC
     if (QWidget* const window = parent->window())
-        fHost.uiParentId = window->winId();
+        // TODO: Remove cast; Only needed for Qt4
+        fHost.uiParentId = (uintptr_t)window->winId();
     else
 #endif
         fHost.uiParentId = 0;
@@ -460,7 +467,7 @@ void CarlaInstrument::sampleRateChanged()
 // -------------------------------------------------------------------
 
 CarlaInstrumentView::CarlaInstrumentView(CarlaInstrument* const instrument, QWidget* const parent)
-    : InstrumentView(instrument, parent),
+    : InstrumentViewFixedSize(instrument, parent),
       fHandle(instrument->fHandle),
       fDescriptor(instrument->fDescriptor),
       fTimerId(fHandle != NULL && fDescriptor->ui_idle != NULL ? startTimer(30) : 0)

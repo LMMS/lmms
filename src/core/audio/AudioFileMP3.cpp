@@ -120,6 +120,7 @@ bool AudioFileMP3::initEncoder()
 	lame_set_brate(m_lame, bitRate);
 
 	// Add a comment
+	id3tag_init(m_lame);
 	id3tag_set_comment(m_lame, "Created with LMMS");
 
 	return lame_init_params(m_lame) != -1;

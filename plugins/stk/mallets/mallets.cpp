@@ -338,6 +338,7 @@ void malletsInstrument::playNote( NotePlayHandle * _n,
 				Engine::mixer()->processingSampleRate() );
 		}
 		m.unlock();
+		static_cast<malletsSynth *>(_n->m_pluginData)->setPresetIndex(p);
 	}
 
 	const fpp_t frames = _n->framesLeftForCurrentPeriod();
@@ -345,6 +346,7 @@ void malletsInstrument::playNote( NotePlayHandle * _n,
 
 	malletsSynth * ps = static_cast<malletsSynth *>( _n->m_pluginData );
 	ps->setFrequency( freq );
+	p = ps->presetIndex();
 
 	sample_t add_scale = 0.0f;
 	if( p == 10 && m_isOldVersionModel.value() == true )
@@ -355,9 +357,9 @@ void malletsInstrument::playNote( NotePlayHandle * _n,
 	for( fpp_t frame = offset; frame < frames + offset; ++frame )
 	{
 		_working_buffer[frame][0] = ps->nextSampleLeft() *
-				( m_scalers[m_presetsModel.value()] + add_scale );
+				( m_scalers[p] + add_scale );
 		_working_buffer[frame][1] = ps->nextSampleRight() *
-				( m_scalers[m_presetsModel.value()] + add_scale );
+				( m_scalers[p] + add_scale );
 	}
 
 	instrumentTrack()->processAudioBuffer( _working_buffer, frames + offset, _n );
@@ -384,7 +386,7 @@ PluginView * malletsInstrument::instantiateView( QWidget * _parent )
 
 malletsInstrumentView::malletsInstrumentView( malletsInstrument * _instrument,
 							QWidget * _parent ) :
-	InstrumentView( _instrument, _parent )
+        InstrumentViewFixedSize( _instrument, _parent )
 {
 	m_modalBarWidget = setupModalBarControls( this );
 	setWidgetBackground( m_modalBarWidget, "artwork" );
@@ -579,7 +581,6 @@ void malletsInstrumentView::modelChanged()
 void malletsInstrumentView::changePreset()
 {
 	malletsInstrument * inst = castModel<malletsInstrument>();
-	inst->instrumentTrack()->silenceAllNotes();
 	int _preset = inst->m_presetsModel.value();
 
 	if( _preset < 9 )
@@ -614,7 +615,8 @@ malletsSynth::malletsSynth( const StkFloat _pitch,
 				const StkFloat _control11,
 				const int _control16,
 				const uint8_t _delay,
-				const sample_rate_t _sample_rate )
+				const sample_rate_t _sample_rate ) :
+	m_presetIndex(0)
 {
 	try
 	{
@@ -664,7 +666,8 @@ malletsSynth::malletsSynth( const StkFloat _pitch,
 				const StkFloat _control11,
 				const StkFloat _control128,
 				const uint8_t _delay,
-				const sample_rate_t _sample_rate )
+				const sample_rate_t _sample_rate ) :
+	m_presetIndex(0)
 {
 	try
 	{
@@ -712,7 +715,8 @@ malletsSynth::malletsSynth( const StkFloat _pitch,
 				const StkFloat _control64,
 				const StkFloat _control128,
 				const uint8_t _delay,
-				const sample_rate_t _sample_rate )
+				const sample_rate_t _sample_rate ) :
+	m_presetIndex(0)
 {
 	try
 	{

@@ -41,7 +41,7 @@ public:
 
 
 protected:
-	virtual void mousePressEvent( QMouseEvent* mouseEvent );
+	void mousePressEvent( QMouseEvent* mouseEvent ) override;
 
 
 private slots:

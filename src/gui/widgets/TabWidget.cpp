@@ -319,8 +319,8 @@ QSize TabWidget::minimumSizeHint() const
 		for ( widgetStack::const_iterator it = m_widgets.begin();
 							it != m_widgets.end(); ++it )
 		{
-			maxWidth = std::max(maxWidth, it->w->width());
-			maxHeight = std::max(maxHeight, it->w->height());
+			maxWidth = std::max(maxWidth, it->w->minimumSizeHint().width());
+			maxHeight = std::max(maxHeight, it->w->minimumSizeHint().height());
 		}
 		// "-1" :
 		// in "addTab", under "Position tab's window", the widget is
@@ -328,6 +328,28 @@ QSize TabWidget::minimumSizeHint() const
 		return QSize(maxWidth + 4, maxHeight + m_tabbarHeight - 1);
 	}
 	else { return QWidget::minimumSizeHint(); }
+}
+
+
+
+
+QSize TabWidget::sizeHint() const
+{
+	if (m_resizable)
+	{
+		int maxWidth = 0, maxHeight = 0;
+		for ( widgetStack::const_iterator it = m_widgets.begin();
+							it != m_widgets.end(); ++it )
+		{
+			maxWidth = std::max(maxWidth, it->w->sizeHint().width());
+			maxHeight = std::max(maxHeight, it->w->sizeHint().height());
+		}
+		// "-1" :
+		// in "addTab", under "Position tab's window", the widget is
+		// moved up by 1 pixel
+		return QSize(maxWidth + 4, maxHeight + m_tabbarHeight - 1);
+	}
+	else { return QWidget::sizeHint(); }
 }
 
 

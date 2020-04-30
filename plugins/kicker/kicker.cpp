@@ -267,7 +267,7 @@ public:
 
 kickerInstrumentView::kickerInstrumentView( Instrument * _instrument,
 							QWidget * _parent ) :
-	InstrumentView( _instrument, _parent )
+	InstrumentViewFixedSize( _instrument, _parent )
 {
 	const int ROW1 = 14;
 	const int ROW2 = ROW1 + 56;

@@ -82,7 +82,7 @@ private:
 
 
 
-class vibedView : public InstrumentView
+class vibedView : public InstrumentViewFixedSize
 {
 	Q_OBJECT
 public:

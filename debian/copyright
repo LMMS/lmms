@@ -1,4 +1,4 @@
-Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
 Upstream-Name: LMMS
 Upstream-Contact: https://github.com/LMMS/lmms
 Source: https://github.com/LMMS/lmms/tags
@@ -1367,7 +1367,7 @@ License: WOL
  documentation for any purpose is hereby granted without fee, provided that
  the above copyright notice and this license appear in all source copies.
  THIS SOFTWARE IS PROVIDED "AS IS" WITHOUT EXPRESS OR IMPLIED WARRANTY OF
- ANY KIND. See http://www.dspguru.com/wol.htm for more information.
+ ANY KIND. See https://www.dspguru.com/wol.htm for more information.
 
 License: non-free
  This license does not comply with Debian Free Software Guidelines.

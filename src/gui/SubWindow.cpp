@@ -1,4 +1,4 @@
-﻿/*
+/*
  * SubWindow.cpp - Implementation of QMdiSubWindow that correctly tracks
  *   the geometry that windows should be restored to.
  *   Workaround for https://bugreports.qt.io/browse/QTBUG-256
@@ -30,6 +30,7 @@
 
 #include <QMdiArea>
 #include <QMoveEvent>
+#include <QPainter>
 #include <QScrollBar>
 
 #include "embed.h"
@@ -349,10 +350,10 @@ void SubWindow::focusChanged( QMdiSubWindow *subWindow )
 /**
  * @brief SubWindow::resizeEvent
  * 
- *  On every rezise event we have to adjust our title label.
- * 
- *  At next we give the event to QMdiSubWindow::resizeEvent() which handles 
+ *  At first we give the event to QMdiSubWindow::resizeEvent() which handles
  *  the event on its behavior.
+ *
+ *  On every resize event we have to adjust our title label.
  * 
  *  At last we store the current size into m_trackedNormalGeom. This size
  *  will be saved with the project because of an Qt bug wich doesn't

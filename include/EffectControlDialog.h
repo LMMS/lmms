@@ -40,13 +40,15 @@ public:
 	EffectControlDialog( EffectControls * _controls );
 	virtual ~EffectControlDialog();
 
+	virtual bool isResizable() const {return false;}
+
 
 signals:
 	void closed();
 
 
 protected:
-	virtual void closeEvent( QCloseEvent * _ce );
+	void closeEvent( QCloseEvent * _ce ) override;
 
 	EffectControls * m_effectControls;
 

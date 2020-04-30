@@ -115,7 +115,7 @@ FxMixerView::FxMixerView() :
 			ChannelArea( QWidget * parent, FxMixerView * mv ) :
 				QScrollArea( parent ), m_mv( mv ) {}
 			~ChannelArea() {}
-			virtual void keyPressEvent( QKeyEvent * e )
+			void keyPressEvent( QKeyEvent * e ) override
 			{
 				m_mv->keyPressEvent( e );
 			}
@@ -599,23 +599,25 @@ void FxMixerView::updateFaders()
 	{
 		const float opl = m_fxChannelViews[i]->m_fader->getPeak_L();
 		const float opr = m_fxChannelViews[i]->m_fader->getPeak_R();
-		const float fallOff = 1.07;
-		if( m->effectChannel(i)->m_peakLeft > opl )
+		const float fallOff = 1.25;
+		if( m->effectChannel(i)->m_peakLeft >= opl/fallOff )
 		{
 			m_fxChannelViews[i]->m_fader->setPeak_L( m->effectChannel(i)->m_peakLeft );
-			m->effectChannel(i)->m_peakLeft = 0;
+			// Set to -1 so later we'll know if this value has been refreshed yet.
+			m->effectChannel(i)->m_peakLeft = -1;
 		}
-		else
+		else if( m->effectChannel(i)->m_peakLeft != -1 )
 		{
 			m_fxChannelViews[i]->m_fader->setPeak_L( opl/fallOff );
 		}
 
-		if( m->effectChannel(i)->m_peakRight > opr )
+		if( m->effectChannel(i)->m_peakRight >= opr/fallOff )
 		{
 			m_fxChannelViews[i]->m_fader->setPeak_R( m->effectChannel(i)->m_peakRight );
-			m->effectChannel(i)->m_peakRight = 0;
+			// Set to -1 so later we'll know if this value has been refreshed yet.
+			m->effectChannel(i)->m_peakRight = -1;
 		}
-		else
+		else if( m->effectChannel(i)->m_peakRight != -1 )
 		{
 			m_fxChannelViews[i]->m_fader->setPeak_R( opr/fallOff );
 		}

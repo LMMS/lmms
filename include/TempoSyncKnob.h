@@ -52,7 +52,7 @@ public:
 		return castModel<TempoSyncKnobModel>();
 	}
 
-	virtual void modelChanged();
+	void modelChanged() override;
 
 
 signals:
@@ -61,7 +61,7 @@ signals:
 
 
 protected:
-	virtual void contextMenuEvent( QContextMenuEvent * _me );
+	void contextMenuEvent( QContextMenuEvent * _me ) override;
 
 
 protected slots:

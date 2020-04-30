@@ -124,7 +124,7 @@ public:
 	virtual ~MidiClientRaw();
 
 	// we are raw-clients for sure!
-	virtual bool isRaw() const
+	bool isRaw() const override
 	{
 		return true;
 	}
@@ -141,7 +141,7 @@ protected:
 private:
 	// this does MIDI-event-process
 	void processParsedEvent();
-	virtual void processOutEvent( const MidiEvent& event, const MidiTime& time, const MidiPort* port );
+	void processOutEvent( const MidiEvent& event, const MidiTime& time, const MidiPort* port ) override;
 
 	// small helper function returning length of a certain event - this
 	// is necessary for parsing raw-MIDI-data

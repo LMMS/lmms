@@ -2,7 +2,7 @@
 
 set -e
 
-PACKAGES="cmake pkg-config libogg libvorbis lame libsndfile libsamplerate jack sdl libgig libsoundio stk fluid-synth portaudio node fltk qt5 carla"
+PACKAGES="cmake pkg-config libogg libvorbis lame libsndfile libsamplerate jack sdl libgig libsoundio stk fluid-synth portaudio node fltk qt carla"
 
 if "${TRAVIS}"; then
    PACKAGES="$PACKAGES ccache"
@@ -19,4 +19,4 @@ brew install $PACKAGES
 # fftw tries to install gcc which conflicts with travis
 brew install fftw --ignore-dependencies
 
-sudo npm install -g appdmg
+npm install -g appdmg
