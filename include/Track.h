@@ -742,7 +742,7 @@ private:
 
 	virtual FadeButton * getActivityIndicator()
 	{
-		return NULL;
+		return nullptr;
 	}
 
 	friend class TrackLabelButton;
