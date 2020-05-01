@@ -1212,6 +1212,21 @@ int PianoRoll::selectionCount() const // how many notes are selected?
 
 
 
+
+void PianoRoll::invertSelection() const
+{
+	if( m_pattern != NULL )
+	{
+		for( Note *note : m_pattern->notes() )
+		{
+			note->setSelected( ! note->selected() );
+		}
+	}
+}
+
+
+
+
 void PianoRoll::keyPressEvent(QKeyEvent* ke)
 {
 	if(m_stepRecorder.isRecording())
@@ -1354,6 +1369,19 @@ void PianoRoll::keyPressEvent(QKeyEvent* ke)
 					selectAll();
 				}
 				update();
+			}
+			break;
+
+		case Qt::Key_I:
+			if( ke->modifiers() & Qt::ControlModifier )
+			{
+				ke->accept();
+				if (ke->modifiers() & Qt::ShiftModifier)
+				{
+					// Ctrl + Shift + I = inverts selection
+					invertSelection();
+					update();
+				}
 			}
 			break;
 
