@@ -840,7 +840,7 @@ SampleTrackView::SampleTrackView( SampleTrack * _t, TrackContainerView* tcv ) :
 		QApplication::palette().color(QPalette::Active, QPalette::BrightText).darker(),
 		getTrackSettingsWidget()
 	);
-	m_activityIndicator->setGeometry(settingsWidgetWidth-2*24-11, 2, 8, 28);
+	m_activityIndicator->setGeometry(settingsWidgetWidth - 2 * 24 - 11, 2, 8, 28);
 	m_activityIndicator->show();
 	connect(_t, SIGNAL(playingChanged()), this, SLOT(updateIndicator()));
 	connect(Engine::getSong(), SIGNAL(stopped()),
