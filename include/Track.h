@@ -745,12 +745,14 @@ private:
 		return nullptr;
 	}
 
+	void setIndicatorMute(FadeButton* indicator, bool muted);
+
 	friend class TrackLabelButton;
 
 
 private slots:
 	void createTCOView( TrackContentObject * tco );
-	void muteChanged ();
+	void muteChanged();
 
 } ;
 
