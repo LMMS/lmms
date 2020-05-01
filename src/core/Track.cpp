@@ -3060,20 +3060,15 @@ void TrackView::createTCOView( TrackContentObject * tco )
 
 void TrackView::muteChanged()
 {
-	FadeButton * actind = getActivityIndicator();
-	if (actind)
-	{
-		if (m_track->m_mutedModel.value())
-		{
-			actind->setActiveColor(QApplication::palette().color(
-				QPalette::Active, QPalette::Highlight
-			));
-		}
-		else
-		{
-			actind->setActiveColor(QApplication::palette().color(
-				QPalette::Active, QPalette::BrightText
-			));
-		}
-	}
+	FadeButton * indicator = getActivityIndicator();
+	if (indicator) { setIndicatorMute(indicator, m_track->m_mutedModel.value()); }
+}
+
+
+
+
+void TrackView::setIndicatorMute(FadeButton* indicator, bool muted)
+{
+	QPalette::ColorRole role = muted ? QPalette::Highlight : QPalette::BrightText;
+	indicator->setActiveColor(QApplication::palette().color(QPalette::Active, role));
 }
