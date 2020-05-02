@@ -77,7 +77,7 @@ Knob::Knob( QWidget * _parent, const QString & _name ) :
 
 
 
-void initLineColors()
+void Knob::initLineColors()
 {
 	// This is a workaround to enable style sheets for knobs which are not styled knobs.
 	//
@@ -134,6 +134,38 @@ void Knob::initUi( const QString & _name )
 
 
 
+void convertPixmapToGreyScale(QPixmap* pixmap)
+{
+	QImage temp = pixmap->toImage().convertToFormat(QImage::Format_ARGB32);
+	for (int i = 0; i < temp.height(); ++i)
+	{
+		for (int j = 0; j < temp.width(); ++j)
+		{
+			QColor pix;
+			pix = temp.pixelColor(i, j);
+			quint8 gscale = quint8( (11*pix.red() + 16*pix.green() + 5*pix.blue()) / 32);
+			QRgba64 pix_grey64;
+			pix_grey64 = QRgba64::fromRgba( gscale, gscale, gscale, quint8(pix.alpha()) );
+			temp.setPixelColor(i, j, pix_grey64);
+		}
+	} 
+	pixmap->convertFromImage(temp);	
+}
+
+
+
+
+void Knob::resetPixmap()
+{
+	if( m_knobPixmap )
+	{
+		delete m_knobPixmap;
+	}
+}
+
+
+
+
 void Knob::onKnobNumUpdated()
 {
 	if( m_knobNum != knobStyled )
@@ -158,7 +190,13 @@ void Knob::onKnobNumUpdated()
 		}
 
 		// If knobFilename is still empty here we should get the fallback pixmap of size 1x1
+		resetPixmap();
 		m_knobPixmap = new QPixmap( embed::getIconPixmap( knobFilename.toUtf8().constData() ) );
+
+		if ( !this->isEnabled() )
+		{
+			convertPixmapToGreyScale( m_knobPixmap );
+		}
 
 		setFixedSize( m_knobPixmap->width(), m_knobPixmap->height() );
 	}
@@ -167,20 +205,9 @@ void Knob::onKnobNumUpdated()
 
 
 
-void Knob::resetPixMap()
-{
-	if( m_knobPixmap )
-	{
-		delete m_knobPixmap;
-	}
-}
-
-
-
-
 Knob::~Knob()
 {
-	resetPixMap();
+	resetPixmap();
 }
 
 
@@ -857,3 +884,38 @@ void Knob::doConnections()
 						this, SLOT( update() ) );
 	}
 }
+
+
+
+
+void Knob::changeEvent( QEvent * _ev )
+{
+	if ( _ev->type() == QEvent::EnabledChange)
+	{
+		setEnabledTheme( this->isEnabled() );
+	}
+}
+
+
+
+
+void Knob::setEnabledTheme( bool enabled )
+{
+	this->setProperty( "enabled", enabled );
+	if ( !enabled )
+	{
+		this->setStyle( QApplication::style() );
+	}
+	else
+	{
+		initLineColors();
+	}
+	onKnobNumUpdated();
+	if ( !m_label.isEmpty() )
+	{
+		setLabel(m_label);
+	}
+	m_cache = QImage();
+	update();
+}
+
