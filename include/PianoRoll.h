@@ -250,6 +250,7 @@ private:
 
 	QList<int> m_markedSemiTones;
 	QMenu * m_semiToneMarkerMenu; // when you right click on the key area
+	int m_pianoKeySelected;
 
 	PianoRoll();
 	PianoRoll( const PianoRoll & );
