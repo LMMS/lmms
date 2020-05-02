@@ -99,15 +99,23 @@ void Knob::initUi( const QString & _name )
 	// drawKnob method uses the line color to draw the lines. By assigning the palette colors
 	// as the line colors here the knob lines will be drawn in this color unless the stylesheet
 	// overrides that color.
+
+	QColor col;
 	switch (knobNum())
 	{
 	case knobSmall_17:
 	case knobBright_26:
 	case knobDark_28:
 		setlineColor(QApplication::palette().color( QPalette::Active, QPalette::WindowText ));
+		col = QColor(QApplication::palette().color( QPalette::Active, QPalette::WindowText)); 
+		col.setAlpha( 70 );
+		setarcColor( col );
 		break;
 	case knobVintage_32:
 		setlineColor(QApplication::palette().color( QPalette::Active, QPalette::Shadow ));
+		col = QColor(QApplication::palette().color( QPalette::Active, QPalette::Shadow));
+		col.setAlpha( 70 );
+		setarcColor( col );
 		break;
 	default:
 		break;
@@ -440,14 +448,9 @@ void Knob::drawKnob( QPainter * _p )
 	const int arcLineWidth = 2;
 	const int arcRectSize = m_knobPixmap->width() - arcLineWidth;
 
-	QColor col;
-	if( m_knobNum == knobVintage_32 )
-	{	col = QApplication::palette().color( QPalette::Active, QPalette::Shadow ); }
-	else
-	{	col = QApplication::palette().color( QPalette::Active, QPalette::WindowText ); }
-	col.setAlpha( 70 );
 
-	p.setPen( QPen( col, 2 ) );
+
+	p.setPen( QPen( arcColor(), 2 ) );
 	p.drawArc( mid.x() - arcRectSize/2, 1, arcRectSize, arcRectSize, 315*16, 16*m_totalAngle );
 
 	switch( m_knobNum )
