@@ -40,6 +40,11 @@ QMdiArea {
 	background-color: #111314;
 }
 
+Knob[enabled=false] {
+	qproperty-lineColor: rgb(120, 120, 120);
+	qproperty-arcColor: rgba(120, 120, 120, 70);
+}
+
 AutomationEditor {
 	color: #ffffff;
 	background-color: #141616;
