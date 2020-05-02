@@ -47,6 +47,8 @@ class LMMS_EXPORT Knob : public QWidget, public FloatModelView
 	Q_OBJECT
 	Q_ENUMS( knobTypes )
 
+	Q_PROPERTY(bool enabled READ isEnabled)
+
 	Q_PROPERTY(float innerRadius READ innerRadius WRITE setInnerRadius)
 	Q_PROPERTY(float outerRadius READ outerRadius WRITE setOuterRadius)
 
@@ -68,7 +70,7 @@ class LMMS_EXPORT Knob : public QWidget, public FloatModelView
 	Q_PROPERTY(QColor textColor READ textColor WRITE setTextColor)
 
 	void initUi( const QString & _name ); //!< to be called by ctors
-	void onKnobNumUpdated(); //!< to be called when you updated @a m_knobNum
+	void onKnobNumUpdated(); //!< to be called when you updated @a m_knobNum 
 
 public:
 	Knob( knobTypes _knob_num, QWidget * _parent = NULL, const QString & _name = QString() );
@@ -134,6 +136,7 @@ protected:
 	void mouseDoubleClickEvent( QMouseEvent * _me ) override;
 	void paintEvent( QPaintEvent * _me ) override;
 	void wheelEvent( QWheelEvent * _me ) override;
+	void changeEvent( QEvent * _ev) override;
 
 	virtual float getValue( const QPoint & _p );
 
@@ -145,6 +148,7 @@ private slots:
 private:
 	QString displayValue() const;
 
+	void initLineColors();
 	void doConnections() override;
 
 	QLineF calculateLine( const QPointF & _mid, float _radius,
@@ -153,6 +157,9 @@ private:
 	void drawKnob( QPainter * _p );
 	void setPosition( const QPoint & _p );
 	bool updateAngle();
+	void resetPixmap();
+
+	void setEnabledTheme(bool); 
 
 	int angleFromValue( float value, float minValue, float maxValue, float totalAngle ) const
 	{
