@@ -167,12 +167,20 @@ void Knob::onKnobNumUpdated()
 
 
 
-Knob::~Knob()
+void Knob::resetPixMap()
 {
 	if( m_knobPixmap )
 	{
 		delete m_knobPixmap;
 	}
+}
+
+
+
+
+Knob::~Knob()
+{
+	resetPixMap();
 }
 
 
