@@ -77,21 +77,8 @@ Knob::Knob( QWidget * _parent, const QString & _name ) :
 
 
 
-void Knob::initUi( const QString & _name )
+void initLineColors()
 {
-	if( s_textFloat == NULL )
-	{
-		s_textFloat = new TextFloat;
-	}
-
-	setWindowTitle( _name );
-
-	onKnobNumUpdated();
-	setTotalAngle( 270.0f );
-	setInnerRadius( 1.0f );
-	setOuterRadius( 10.0f );
-	setFocusPolicy( Qt::ClickFocus );
-
 	// This is a workaround to enable style sheets for knobs which are not styled knobs.
 	//
 	// It works as follows: the palette colors that are assigned as the line color previously
@@ -120,7 +107,27 @@ void Knob::initUi( const QString & _name )
 	default:
 		break;
 	}
+}
 
+
+
+
+void Knob::initUi( const QString & _name )
+{
+	if( s_textFloat == NULL )
+	{
+		s_textFloat = new TextFloat;
+	}
+
+	setWindowTitle( _name );
+
+	onKnobNumUpdated();
+	setTotalAngle( 270.0f );
+	setInnerRadius( 1.0f );
+	setOuterRadius( 10.0f );
+	setFocusPolicy( Qt::ClickFocus );
+
+	initLineColors();	
 	doConnections();
 }
 
