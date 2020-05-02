@@ -70,7 +70,7 @@ class LMMS_EXPORT Knob : public QWidget, public FloatModelView
 	Q_PROPERTY(QColor textColor READ textColor WRITE setTextColor)
 
 	void initUi( const QString & _name ); //!< to be called by ctors
-	void onKnobNumUpdated(); //!< to be called when you updated @a m_knobNum 
+	void onKnobNumUpdated(); //!< to be called when you updated @a m_knobNum
 
 public:
 	Knob( knobTypes _knob_num, QWidget * _parent = NULL, const QString & _name = QString() );
