@@ -134,7 +134,7 @@ void Knob::initUi( const QString & _name )
 
 
 
-void convertPixmapToGreyScale(QPixmap* pixmap)
+void convertPixmapToGrayScale(QPixmap* pixmap)
 {
 	QImage temp = pixmap->toImage().convertToFormat(QImage::Format_ARGB32);
 	for (int i = 0; i < temp.height(); ++i)
@@ -144,9 +144,9 @@ void convertPixmapToGreyScale(QPixmap* pixmap)
 			QColor pix;
 			pix = temp.pixelColor(i, j);
 			quint8 gscale = quint8( (11*pix.red() + 16*pix.green() + 5*pix.blue()) / 32);
-			QRgba64 pix_grey64;
-			pix_grey64 = QRgba64::fromRgba( gscale, gscale, gscale, quint8(pix.alpha()) );
-			temp.setPixelColor(i, j, pix_grey64);
+			QRgba64 pix_gray64;
+			pix_gray64 = QRgba64::fromRgba( gscale, gscale, gscale, quint8(pix.alpha()) );
+			temp.setPixelColor(i, j, pix_gray64);
 		}
 	} 
 	pixmap->convertFromImage(temp);	
@@ -195,7 +195,7 @@ void Knob::onKnobNumUpdated()
 
 		if ( !this->isEnabled() )
 		{
-			convertPixmapToGreyScale( m_knobPixmap );
+			convertPixmapToGrayScale( m_knobPixmap );
 		}
 
 		setFixedSize( m_knobPixmap->width(), m_knobPixmap->height() );
