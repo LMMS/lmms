@@ -68,9 +68,9 @@ signals:
 
 
 protected:
-	virtual void contextMenuEvent( QContextMenuEvent * _me );
-	virtual void modelChanged();
-	virtual void mouseDoubleClickEvent( QMouseEvent * event );
+	void contextMenuEvent( QContextMenuEvent * _me ) override;
+	void modelChanged() override;
+	void mouseDoubleClickEvent( QMouseEvent * event ) override;
 
 
 private:

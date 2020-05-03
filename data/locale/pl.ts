@@ -3108,7 +3108,7 @@ Możesz usunąć i przenieść kanały FX w menu kontekstowym, które jest dost�
     </message>
     <message>
         <source>VELOCITY</source>
-        <translation>GŁOŚNOŚĆ UDERZENIA</translation>
+        <translation>PRĘDKOŚĆ</translation>
     </message>
     <message>
         <source>ENABLE MIDI OUTPUT</source>

@@ -101,9 +101,9 @@ public:
 	}
 
 
-	virtual void saveSettings( QDomDocument & _doc, QDomElement & _this );
-	virtual void loadSettings( const QDomElement & _this );
-	virtual QString nodeName() const;
+	void saveSettings( QDomDocument & _doc, QDomElement & _this ) override;
+	void loadSettings( const QDomElement & _this ) override;
+	QString nodeName() const override;
 
 	static Controller * create( ControllerTypes _tt, Model * _parent );
 	static Controller * create( const QDomElement & _this,

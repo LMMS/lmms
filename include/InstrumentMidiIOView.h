@@ -47,7 +47,7 @@ public:
 
 
 private:
-	virtual void modelChanged();
+	void modelChanged() override;
 
 	GroupBox * m_midiInputGroupBox;
 	LcdSpinBox * m_inputChannelSpinBox;

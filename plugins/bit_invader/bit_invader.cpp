@@ -64,17 +64,16 @@ Plugin::Descriptor PLUGIN_EXPORT bitinvader_plugin_descriptor =
 }
 
 
-bSynth::bSynth( float * _shape, int _length, NotePlayHandle * _nph, bool _interpolation,
+bSynth::bSynth( float * _shape, NotePlayHandle * _nph, bool _interpolation,
 				float _factor, const sample_rate_t _sample_rate ) :
 	sample_index( 0 ),
 	sample_realindex( 0 ),
 	nph( _nph ),
-	sample_length( _length ),
 	sample_rate( _sample_rate ),
 	interpolation( _interpolation)
 {
-	sample_shape = new float[sample_length];
-	for (int i=0; i < _length; ++i)
+	sample_shape = new float[200];
+	for (int i=0; i < 200; ++i)
 	{
 		sample_shape[i] = _shape[i] * _factor;
 	}
@@ -87,7 +86,7 @@ bSynth::~bSynth()
 }
 
 
-sample_t bSynth::nextStringSample()
+sample_t bSynth::nextStringSample( float sample_length )
 {
 	float sample_step = 
 		static_cast<float>( sample_length / ( sample_rate / nph->frequency() ) );
@@ -140,10 +139,12 @@ sample_t bSynth::nextStringSample()
 bitInvader::bitInvader( InstrumentTrack * _instrument_track ) :
 	Instrument( _instrument_track, &bitinvader_plugin_descriptor ),
 	m_sampleLength( 128, 4, 200, 1, this, tr( "Sample length" ) ),
-	m_graph( -1.0f, 1.0f, 128, this ),
+	m_graph( -1.0f, 1.0f, 200, this ),
 	m_interpolation( false, this ),
 	m_normalize( false, this )
 {
+		
+	lengthChanged();
 
 	m_graph.setWaveToSine();
 
@@ -278,7 +279,6 @@ void bitInvader::playNote( NotePlayHandle * _n,
 
 		_n->m_pluginData = new bSynth(
 					const_cast<float*>( m_graph.samples() ),
-					m_graph.length(),
 					_n,
 					m_interpolation.value(), factor,
 				Engine::mixer()->processingSampleRate() );
@@ -290,7 +290,7 @@ void bitInvader::playNote( NotePlayHandle * _n,
 	bSynth * ps = static_cast<bSynth *>( _n->m_pluginData );
 	for( fpp_t frame = offset; frame < frames + offset; ++frame )
 	{
-		const sample_t cur = ps->nextStringSample();
+		const sample_t cur = ps->nextStringSample( m_graph.length() );
 		for( ch_cnt_t chnl = 0; chnl < DEFAULT_CHANNELS; ++chnl )
 		{
 			_working_buffer[frame][chnl] = cur;
@@ -572,7 +572,3 @@ PLUGIN_EXPORT Plugin * lmms_plugin_main( Model *m, void * )
 
 
 }
-
-
-
-

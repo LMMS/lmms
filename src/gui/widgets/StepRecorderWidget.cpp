@@ -26,7 +26,7 @@
 
 StepRecorderWidget::StepRecorderWidget(
 		QWidget * parent,
-		const int ppt,
+		const int ppb,
 		const int marginTop,
 		const int marginBottom,
 		const int marginLeft,
@@ -42,15 +42,15 @@ StepRecorderWidget::StepRecorderWidget(
 	m_colorLineStart = baseColor.darker(120);
 
 	setAttribute(Qt::WA_NoSystemBackground, true);
-	setPixelsPerTact(ppt);
+	setPixelsPerBar(ppb);
 
 	m_top = m_marginTop;
 	m_left = m_marginLeft;
 }
 
-void StepRecorderWidget::setPixelsPerTact(int ppt)
+void StepRecorderWidget::setPixelsPerBar(int ppb)
 {
-	m_ppt = ppt;
+	m_ppb = ppb;
 }
 
 void StepRecorderWidget::setCurrentPosition(MidiTime currentPosition)
@@ -125,7 +125,7 @@ void StepRecorderWidget::paintEvent(QPaintEvent * pe)
 
 int StepRecorderWidget::xCoordOfTick(int tick)
 {
-	return m_marginLeft + ((tick - m_currentPosition) * m_ppt / MidiTime::ticksPerTact());
+	return m_marginLeft + ((tick - m_currentPosition) * m_ppb / MidiTime::ticksPerBar());
 }
 
 

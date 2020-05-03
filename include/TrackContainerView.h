@@ -49,30 +49,30 @@ public:
 	TrackContainerView( TrackContainer* tc );
 	virtual ~TrackContainerView();
 
-	virtual void saveSettings( QDomDocument & _doc, QDomElement & _this );
-	virtual void loadSettings( const QDomElement & _this );
+	void saveSettings( QDomDocument & _doc, QDomElement & _this ) override;
+	void loadSettings( const QDomElement & _this ) override;
 
 	QScrollArea * contentWidget()
 	{
-		return( m_scrollArea );
+		return m_scrollArea;
 	}
 
 	inline const MidiTime & currentPosition() const
 	{
-		return( m_currentPosition );
+		return m_currentPosition;
 	}
 
 	virtual bool fixedTCOs() const
 	{
-		return( false );
+		return false;
 	}
 
-	inline float pixelsPerTact() const
+	inline float pixelsPerBar() const
 	{
-		return( m_ppt );
+		return m_ppb;
 	}
 
-	void setPixelsPerTact( int _ppt );
+	void setPixelsPerBar( int ppb );
 
 	const TrackView * trackViewAt( const int _y ) const;
 
@@ -81,12 +81,12 @@ public:
 
 	inline bool rubberBandActive() const
 	{
-		return( m_rubberBand->isEnabled() && m_rubberBand->isVisible() );
+		return m_rubberBand->isEnabled() && m_rubberBand->isVisible();
 	}
 
 	inline QVector<selectableObject *> selectedObjects()
 	{
-		return( m_rubberBand->selectedObjects() );
+		return m_rubberBand->selectedObjects();
 	}
 
 
@@ -117,9 +117,9 @@ public:
 
 	void clearAllTracks();
 
-	virtual QString nodeName() const
+	QString nodeName() const override
 	{
-		return( "trackcontainerview" );
+		return "trackcontainerview";
 	}
 
 
@@ -130,27 +130,19 @@ public slots:
 	TrackView * createTrackView( Track * _t );
 	void deleteTrackView( TrackView * _tv );
 
-	virtual void dropEvent( QDropEvent * _de );
-	virtual void dragEnterEvent( QDragEnterEvent * _dee );
-	///
-	/// \brief selectRegionFromPixels
-	/// \param x
-	/// \param y
-	/// Use the rubber band to select TCO from all tracks using x, y pixels
-	void selectRegionFromPixels(int xStart, int xEnd);
+	void dropEvent( QDropEvent * _de ) override;
+	void dragEnterEvent( QDragEnterEvent * _dee ) override;
 
 	///
 	/// \brief stopRubberBand
 	/// Removes the rubber band from display when finished with.
 	void stopRubberBand();
 
-protected:
-	static const int DEFAULT_PIXELS_PER_TACT = 16;
 
-	virtual void mousePressEvent( QMouseEvent * _me );
-	virtual void mouseMoveEvent( QMouseEvent * _me );
-	virtual void mouseReleaseEvent( QMouseEvent * _me );
-	virtual void resizeEvent( QResizeEvent * );
+protected:
+	static const int DEFAULT_PIXELS_PER_BAR = 16;
+
+	void resizeEvent( QResizeEvent * ) override;
 
 	MidiTime m_currentPosition;
 
@@ -169,7 +161,7 @@ private:
 		virtual ~scrollArea();
 
 	protected:
-		virtual void wheelEvent( QWheelEvent * _we );
+		void wheelEvent( QWheelEvent * _we ) override;
 
 	private:
 		TrackContainerView* m_trackContainerView;
@@ -184,10 +176,10 @@ private:
 	scrollArea * m_scrollArea;
 	QVBoxLayout * m_scrollLayout;
 
-	float m_ppt;
+	float m_ppb;
 
 	RubberBand * m_rubberBand;
-	QPoint m_origin;
+
 
 
 signals:
@@ -203,7 +195,7 @@ public:
 	InstrumentLoaderThread( QObject *parent = 0, InstrumentTrack *it = 0,
 							QString name = "" );
 
-	void run();
+	void run() override;
 
 private:
 	InstrumentTrack *m_it;

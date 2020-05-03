@@ -345,7 +345,7 @@ private:
 		fifo * m_fifo;
 		volatile bool m_writing;
 
-		virtual void run();
+		void run() override;
 
 		void write( surroundSampleFrame * buffer );
 

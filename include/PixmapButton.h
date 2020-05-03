@@ -42,17 +42,17 @@ public:
 	void setActiveGraphic( const QPixmap & _pm );
 	void setInactiveGraphic( const QPixmap & _pm, bool _update = true );
 
-	QSize sizeHint() const;
+	QSize sizeHint() const override;
 
 signals:
 	void doubleClicked();
 
 
 protected:
-	virtual void paintEvent( QPaintEvent * _pe );
-	virtual void mousePressEvent( QMouseEvent * _me );
-	virtual void mouseReleaseEvent( QMouseEvent * _me );
-	virtual void mouseDoubleClickEvent( QMouseEvent * _me );
+	void paintEvent( QPaintEvent * _pe ) override;
+	void mousePressEvent( QMouseEvent * _me ) override;
+	void mouseReleaseEvent( QMouseEvent * _me ) override;
+	void mouseDoubleClickEvent( QMouseEvent * _me ) override;
 
 
 private:

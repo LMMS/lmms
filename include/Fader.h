@@ -109,13 +109,13 @@ public:
 	}
 
 private:
-	virtual void contextMenuEvent( QContextMenuEvent * _me );
-	virtual void mousePressEvent( QMouseEvent *ev );
-	virtual void mouseDoubleClickEvent( QMouseEvent* mouseEvent );
-	virtual void mouseMoveEvent( QMouseEvent *ev );
-	virtual void mouseReleaseEvent( QMouseEvent * _me );
-	virtual void wheelEvent( QWheelEvent *ev );
-	virtual void paintEvent( QPaintEvent *ev );
+	void contextMenuEvent( QContextMenuEvent * _me ) override;
+	void mousePressEvent( QMouseEvent *ev ) override;
+	void mouseDoubleClickEvent( QMouseEvent* mouseEvent ) override;
+	void mouseMoveEvent( QMouseEvent *ev ) override;
+	void mouseReleaseEvent( QMouseEvent * _me ) override;
+	void wheelEvent( QWheelEvent *ev ) override;
+	void paintEvent( QPaintEvent *ev ) override;
 
 	inline bool clips(float const & value) const { return value >= 1.0f; }
 

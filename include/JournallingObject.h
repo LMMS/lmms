@@ -59,9 +59,9 @@ public:
 	void addJournalCheckPoint();
 
 	virtual QDomElement saveState( QDomDocument & _doc,
-									QDomElement & _parent );
+									QDomElement & _parent ) override;
 
-	virtual void restoreState( const QDomElement & _this );
+	void restoreState( const QDomElement & _this ) override;
 
 	inline bool isJournalling() const
 	{

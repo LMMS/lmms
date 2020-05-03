@@ -47,7 +47,7 @@ signals:
 
 
 protected:
-	virtual void closeEvent( QCloseEvent * _ce );
+	void closeEvent( QCloseEvent * _ce ) override;
 
 } ;
 
