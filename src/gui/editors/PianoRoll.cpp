@@ -1412,7 +1412,7 @@ void PianoRoll::keyPressEvent(QKeyEvent* ke)
 			{
 				m_ctrlMode = m_editMode;
 				m_editMode = ModeSelect;
-				QApplication::changeOverrideCursor( Qt::ArrowCursor );
+				setCursor( Qt::ArrowCursor );
 				ke->accept();
 			}
 			break;
@@ -1466,11 +1466,6 @@ void PianoRoll::keyReleaseEvent(QKeyEvent* ke )
 
 void PianoRoll::leaveEvent(QEvent * e )
 {
-	while( QApplication::overrideCursor() != NULL )
-	{
-		QApplication::restoreOverrideCursor();
-	}
-
 	QWidget::leaveEvent( e );
 	s_textFloat->hide();
 	update(); // cleaning inner mouse-related graphics
@@ -1560,7 +1555,7 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 	{
 		m_ctrlMode = m_editMode;
 		m_editMode = ModeSelect;
-		QApplication::changeOverrideCursor( QCursor( Qt::ArrowCursor ) );
+		setCursor( Qt::ArrowCursor );
 		update();
 	}
 
@@ -1778,8 +1773,7 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 					m_action = ActionResizeNote;
 
 					// set resize-cursor
-					QCursor c( Qt::SizeHorCursor );
-					QApplication::setOverrideCursor( c );
+					setCursor( Qt::SizeHorCursor );
 				}
 				else
 				{
@@ -1792,8 +1786,7 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 					m_action = ActionMoveNote;
 
 					// set move-cursor
-					QCursor c( Qt::SizeAllCursor );
-					QApplication::setOverrideCursor( c );
+					setCursor( Qt::SizeAllCursor );
 
 					// if they're holding shift, copy all selected notes
 					if( ! is_new_note && me->modifiers() & Qt::ShiftModifier )
@@ -2225,7 +2218,7 @@ void PianoRoll::mouseReleaseEvent( QMouseEvent * me )
 
 	if( m_editMode == ModeDraw )
 	{
-		QApplication::restoreOverrideCursor();
+		setCursor( Qt::ArrowCursor );
 	}
 
 	if( mustRepaint )
@@ -2249,8 +2242,7 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 	{
 		if( me->y() > keyAreaBottom() && me->y() < noteEditTop() )
 		{
-			QApplication::setOverrideCursor(
-					QCursor( Qt::SizeVerCursor ) );
+			setCursor( Qt::SizeVerCursor );
 			return;
 		}
 	}
@@ -2463,37 +2455,19 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 				bool atTail = note->length() > 0 && x > noteRightX -
 							RESIZE_AREA_WIDTH;
 				Qt::CursorShape cursorShape = atTail ? Qt::SizeHorCursor :
-				                                       Qt::SizeAllCursor;
-				if( QApplication::overrideCursor() )
-				{
-					if( QApplication::overrideCursor()->shape() != cursorShape )
-					{
-						while( QApplication::overrideCursor() != NULL )
-						{
-							QApplication::restoreOverrideCursor();
-						}
-						QApplication::setOverrideCursor(QCursor(cursorShape));
-					}
-				}
-				else
-				{
-					QApplication::setOverrideCursor(QCursor(cursorShape));
-				}
+													Qt::SizeAllCursor;
+				setCursor( cursorShape );
 			}
 			else
 			{
 				// the cursor is over no note, so restore cursor
-				while( QApplication::overrideCursor() != NULL )
-				{
-					QApplication::restoreOverrideCursor();
-				}
+				setCursor( Qt::ArrowCursor );
 			}
 		}
 		else if( me->buttons() & Qt::LeftButton &&
 						m_editMode == ModeSelect &&
 						m_action == ActionSelectNotes )
 		{
-
 			// change size of selection
 
 			// get tick in which the cursor is posated
@@ -2564,6 +2538,12 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 					++it;
 				}
 			}
+		}
+		else if (me->buttons() == Qt::NoButton && m_editMode != ModeDraw)
+		{
+			// Is needed to restore cursor when it previously was set to
+			// Qt::SizeVerCursor (between keyAreaBottom and noteEditTop)
+			setCursor( Qt::ArrowCursor );
 		}
 	}
 	else
@@ -2643,7 +2623,7 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 				--m_selectedKeys;
 			}
 		}
-		QApplication::restoreOverrideCursor();
+		setCursor( Qt::ArrowCursor );
 	}
 
 	m_lastMouseX = me->x();
