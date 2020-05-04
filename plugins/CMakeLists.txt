@@ -9,13 +9,6 @@ IF(LMMS_BUILD_APPLE)
 	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
 ENDIF()
 
-IF(MINGW_PREFIX)
-	# There's a bug in some CMake or MinGW versions that passes -std=c++11 when
-	# compiling C files (e.g. fmopl.c). Remove -Werror for plugins to work
-	# around this.
-	STRING(REPLACE "-Werror " "" CMAKE_C_FLAGS ${CMAKE_C_FLAGS})
-ENDIF()
-
 INCLUDE_DIRECTORIES(
 	${SAMPLERATE_INCLUDE_DIRS}
 	"${CMAKE_BINARY_DIR}/src"

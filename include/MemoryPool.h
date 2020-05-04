@@ -39,7 +39,7 @@ public:
 	using value_type = T;
 	template<class U> struct rebind { typedef MemoryPool<U> other; };
 
-	MemoryPool(size_t nmemb) :	_MemoryPool_Base(sizeof(T), nmemb) {}
+	MemoryPool(size_t nmemb) : _MemoryPool_Base(sizeof(T), nmemb) {}
 
 	T * allocate(size_t n = 1)
 	{
