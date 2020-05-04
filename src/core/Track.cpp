@@ -2719,6 +2719,9 @@ TrackView::TrackView( Track * track, TrackContainerView * tcv ) :
 	connect( &m_track->m_mutedModel, SIGNAL( dataChanged() ),
 			&m_trackContentWidget, SLOT( update() ) );
 
+	connect(&m_track->m_mutedModel, SIGNAL(dataChanged()),
+			this, SLOT(muteChanged()));
+
 	connect( &m_track->m_soloModel, SIGNAL( dataChanged() ),
 			m_track, SLOT( toggleSolo() ), Qt::DirectConnection );
 	// create views for already existing TCOs
@@ -3050,4 +3053,22 @@ void TrackView::createTCOView( TrackContentObject * tco )
 		tv->setSelected( true );
 	}
 	tco->selectViewOnCreate( false );
+}
+
+
+
+
+void TrackView::muteChanged()
+{
+	FadeButton * indicator = getActivityIndicator();
+	if (indicator) { setIndicatorMute(indicator, m_track->m_mutedModel.value()); }
+}
+
+
+
+
+void TrackView::setIndicatorMute(FadeButton* indicator, bool muted)
+{
+	QPalette::ColorRole role = muted ? QPalette::Highlight : QPalette::BrightText;
+	indicator->setActiveColor(QApplication::palette().color(QPalette::Active, role));
 }
