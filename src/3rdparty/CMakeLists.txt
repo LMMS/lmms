@@ -61,3 +61,22 @@ ELSE()
 	# Install DLL
 	install(TARGETS cds RUNTIME DESTINATION .)
 ENDIF()
+
+# The lockless ring buffer library is compiled as part of the core
+SET(RINGBUFFER_DIR "${CMAKE_SOURCE_DIR}/src/3rdparty/ringbuffer/")
+SET(RINGBUFFER_DIR ${RINGBUFFER_DIR} PARENT_SCOPE)
+# Create a dummy ringbuffer_export.h, since ringbuffer is not compiled as a library
+FILE(WRITE ${CMAKE_BINARY_DIR}/src/ringbuffer_export.h
+	"#include \"${CMAKE_BINARY_DIR}/src/lmms_export.h\"\n
+	#define RINGBUFFER_EXPORT LMMS_EXPORT")
+# Enable MLOCK support for ringbuffer if available
+INCLUDE(CheckIncludeFiles)
+CHECK_INCLUDE_FILES(sys/mman.h HAVE_SYS_MMAN)
+IF(HAVE_SYS_MMAN)
+    SET(USE_MLOCK ON)
+ELSE()
+    SET(USE_MLOCK OFF)
+ENDIF()
+# Generate ringbuffer configuration headers
+CONFIGURE_FILE(${RINGBUFFER_DIR}/src/ringbuffer-config.h.in  ${CMAKE_BINARY_DIR}/src/ringbuffer-config.h)
+CONFIGURE_FILE(${RINGBUFFER_DIR}/src/ringbuffer-version.h.in ${CMAKE_BINARY_DIR}/src/ringbuffer-version.h)

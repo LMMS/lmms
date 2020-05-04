@@ -328,7 +328,7 @@ void MonstroSynth::renderOutput( fpp_t _frames, sampleFrame * _buf  )
 	float o1l_f;
 	float o1r_f;
 	float o1l_p = m_osc1l_phase + o1lpo; // we add phase offset here so we don't have to do it every frame
-	float o1r_p = m_osc1r_phase + o1rpo; // then substract it again after loop...
+	float o1r_p = m_osc1r_phase + o1rpo; // then subtract it again after loop...
 	float o1_pw;
 
 	// osc2 vars

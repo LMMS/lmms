@@ -210,7 +210,7 @@ QColor const & VisualizationWidget::determineLineColor(float level) const
 	{
 		return normalColor();
 	}
-	else if( level < 1.0f )
+	else if( level <= 1.0f )
 	{
 		return warningColor();
 	}

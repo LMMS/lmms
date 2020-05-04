@@ -140,13 +140,13 @@ public:
 	const QString name() const;
 
 	// settings-management
-	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
-	virtual void loadSettings( const QDomElement & _this );
+	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
+	void loadSettings( const QDomElement & _this ) override;
 
 	static const QString classNodeName() { return "automationpattern"; }
-	QString nodeName() const { return classNodeName(); }
+	QString nodeName() const override { return classNodeName(); }
 
-	virtual TrackContentObjectView * createView( TrackView * _tv );
+	TrackContentObjectView * createView( TrackView * _tv ) override;
 
 
 	static bool isAutomated( const AutomatableModel * _m );

@@ -57,6 +57,7 @@
 #include "ProjectJournal.h"
 #include "ProjectNotes.h"
 #include "ProjectRenderer.h"
+#include "RecentProjectsMenu.h"
 #include "RemotePlugin.h"
 #include "SetupDialog.h"
 #include "SideBar.h"
@@ -89,7 +90,6 @@ void disableAutoKeyAccelerators(QWidget* mainWindow)
 
 MainWindow::MainWindow() :
 	m_workspace( NULL ),
-	m_recentlyOpenedProjectsMenu( NULL ),
 	m_toolsMenu( NULL ),
 	m_autoSaveTimer( this ),
 	m_viewMenu( NULL ),
@@ -174,16 +174,16 @@ MainWindow::MainWindow() :
 	m_workspace = new QMdiArea( splitter );
 
 	// Load background
-	emit initProgress(tr("Loading background artwork"));
-	QString bgArtwork = ConfigManager::inst()->backgroundArtwork();
-	QImage bgImage;
-	if( !bgArtwork.isEmpty() )
+	emit initProgress(tr("Loading background picture"));
+	QString backgroundPicFile = ConfigManager::inst()->backgroundPicFile();
+	QImage backgroundPic;
+	if( !backgroundPicFile.isEmpty() )
 	{
-		bgImage = QImage( bgArtwork );
+		backgroundPic = QImage( backgroundPicFile );
 	}
-	if( !bgImage.isNull() )
+	if( !backgroundPicFile.isNull() )
 	{
-		m_workspace->setBackground( bgImage );
+		m_workspace->setBackground( backgroundPic );
 	}
 	else
 	{
@@ -285,19 +285,13 @@ void MainWindow::finalize()
 					this, SLOT( openProject() ),
 					QKeySequence::Open );
 
-	m_recentlyOpenedProjectsMenu = project_menu->addMenu(
-				embed::getIconPixmap( "project_open_recent" ),
-					tr( "&Recently Opened Projects" ) );
-	connect( m_recentlyOpenedProjectsMenu, SIGNAL( aboutToShow() ),
-			this, SLOT( updateRecentlyOpenedProjectsMenu() ) );
-	connect( m_recentlyOpenedProjectsMenu, SIGNAL( triggered( QAction * ) ),
-			this, SLOT( openRecentlyOpenedProject( QAction * ) ) );
+	project_menu->addMenu(new RecentProjectsMenu(this));
 
 	project_menu->addAction( embed::getIconPixmap( "project_save" ),
 					tr( "&Save" ),
 					this, SLOT( saveProject() ),
 					QKeySequence::Save );
-	project_menu->addAction( embed::getIconPixmap( "project_saveas" ),
+	project_menu->addAction( embed::getIconPixmap( "project_save" ),
 					tr( "Save &As..." ),
 					this, SLOT( saveProjectAs() ),
 					Qt::CTRL + Qt::SHIFT + Qt::Key_S );
@@ -306,8 +300,9 @@ void MainWindow::finalize()
 					this, SLOT( saveProjectAsNewVersion() ),
 					Qt::CTRL + Qt::ALT + Qt::Key_S );
 
-	project_menu->addAction( tr( "Save as default template" ),
-				     this, SLOT( saveProjectAsDefaultTemplate() ) );
+	project_menu->addAction( embed::getIconPixmap( "project_save" ),
+					tr( "Save as default template" ),
+					this, SLOT( saveProjectAsDefaultTemplate() ) );
 
 	project_menu->addSeparator();
 	project_menu->addAction( embed::getIconPixmap( "project_import" ),
@@ -439,7 +434,7 @@ void MainWindow::finalize()
 				embed::getIconPixmap( "project_open_recent" ),
 					tr( "Recently opened projects" ),
 					this, SLOT( emptySlot() ), m_toolBar );
-	project_open_recent->setMenu( m_recentlyOpenedProjectsMenu );
+	project_open_recent->setMenu( new RecentProjectsMenu(this) );
 	project_open_recent->setPopupMode( ToolButton::InstantPopup );
 
 	ToolButton * project_save = new ToolButton(
@@ -823,56 +818,6 @@ void MainWindow::openProject()
 			song->loadProject( ofd.selectedFiles()[0] );
 			setCursor( Qt::ArrowCursor );
 		}
-	}
-}
-
-
-
-
-void MainWindow::updateRecentlyOpenedProjectsMenu()
-{
-	m_recentlyOpenedProjectsMenu->clear();
-	QStringList rup = ConfigManager::inst()->recentlyOpenedProjects();
-
-//	The file history goes 50 deep but we only show the 15
-//	most recent ones that we can open and omit .mpt files.
-	int shownInMenu = 0;
-	for( QStringList::iterator it = rup.begin(); it != rup.end(); ++it )
-	{
-		QFileInfo recentFile( *it );
-		if ( recentFile.exists() &&
-				*it != ConfigManager::inst()->recoveryFile() )
-		{
-			if( recentFile.suffix().toLower() == "mpt" )
-			{
-				continue;
-			}
-
-			m_recentlyOpenedProjectsMenu->addAction(
-					embed::getIconPixmap( "project_file" ), it->replace("&", "&&") );
-#ifdef LMMS_BUILD_APPLE
-			m_recentlyOpenedProjectsMenu->actions().last()->setIconVisibleInMenu(false); // QTBUG-44565 workaround
-			m_recentlyOpenedProjectsMenu->actions().last()->setIconVisibleInMenu(true);
-#endif
-			shownInMenu++;
-			if( shownInMenu >= 15 )
-			{
-				return;
-			}
-		}
-	}
-}
-
-
-
-void MainWindow::openRecentlyOpenedProject( QAction * _action )
-{
-	if ( mayChangeProject(true) )
-	{
-		const QString f = _action->text().replace("&&", "&");
-		setCursor( Qt::WaitCursor );
-		Engine::getSong()->loadProject( f );
-		setCursor( Qt::ArrowCursor );
 	}
 }
 
@@ -1360,6 +1305,7 @@ void MainWindow::sessionCleanup()
 
 void MainWindow::focusOutEvent( QFocusEvent * _fe )
 {
+	// TODO Remove this function, since it is apparently never actually called!
 	// when loosing focus we do not receive key-(release!)-events anymore,
 	// so we might miss release-events of one the modifiers we're watching!
 	clearKeyModifiers();
@@ -1573,7 +1519,12 @@ void MainWindow::exportProject(bool multiExport)
 				// Get first extension from selected dropdown.
 				// i.e. ".wav" from "WAV-File (*.wav), Dummy-File (*.dum)"
 				suffix = efd.selectedNameFilter().mid( stx + 2, etx - stx - 2 ).split( " " )[0].trimmed();
-				exportFileName.remove( "." + suffix, Qt::CaseInsensitive );
+
+				Qt::CaseSensitivity cs = Qt::CaseSensitive;
+#if defined(LMMS_BUILD_APPLE) || defined(LMMS_BUILD_WIN32)
+				cs = Qt::CaseInsensitive;
+#endif
+				exportFileName.remove( "." + suffix, cs );
 				if ( efd.selectedFiles()[0].endsWith( suffix ) )
 				{
 					if( VersionedSaveDialog::fileExistsQuery( exportFileName + suffix,

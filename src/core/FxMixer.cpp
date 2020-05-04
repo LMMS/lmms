@@ -336,6 +336,11 @@ void FxMixer::deleteChannel( int index )
 		deleteChannelSend( ch->m_receives.first() );
 	}
 
+	// if m_lastSoloed was our index, reset it
+	if (m_lastSoloed == index) { m_lastSoloed = -1; }
+	// if m_lastSoloed is > delete index, it will move left
+	else if (m_lastSoloed > index) { --m_lastSoloed; }
+
 	// actually delete the channel
 	m_fxChannels.remove(index);
 	delete ch;
@@ -372,6 +377,10 @@ void FxMixer::moveChannelLeft( int index )
 	}
 	// channels to swap
 	int a = index - 1, b = index;
+
+	// check if m_lastSoloed is one of our swaps
+	if (m_lastSoloed == a) { m_lastSoloed = b; }
+	else if (m_lastSoloed == b) { m_lastSoloed = a; }
 
 	// go through every instrument and adjust for the channel index change
 	QVector<Track *> songTrackList = Engine::getSong()->tracks();

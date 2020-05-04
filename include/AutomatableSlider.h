@@ -51,12 +51,12 @@ signals:
 
 
 protected:
-	virtual void contextMenuEvent( QContextMenuEvent * _me );
-	virtual void mousePressEvent( QMouseEvent * _me );
-	virtual void mouseReleaseEvent( QMouseEvent * _me );
-	virtual void wheelEvent( QWheelEvent * _me );
+	void contextMenuEvent( QContextMenuEvent * _me ) override;
+	void mousePressEvent( QMouseEvent * _me ) override;
+	void mouseReleaseEvent( QMouseEvent * _me ) override;
+	void wheelEvent( QWheelEvent * _me ) override;
 
-	virtual void modelChanged();
+	void modelChanged() override;
 
 
 private:

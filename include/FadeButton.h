@@ -46,12 +46,12 @@ public:
 
 public slots:
 	void activate();
+	void activateOnce();
 	void noteEnd();
 
 
 protected:
-	virtual void customEvent( QEvent * );
-	virtual void paintEvent( QPaintEvent * _pe );
+	void paintEvent( QPaintEvent * _pe ) override;
 
 
 private:
@@ -66,7 +66,6 @@ private:
 	QColor m_holdColor;
 	int activeNotes;
 
-	void signalUpdate();
 	QColor fadeToColor(QColor, QColor, QTime, float);
 
 } ;

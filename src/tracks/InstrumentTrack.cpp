@@ -447,7 +447,7 @@ void InstrumentTrack::silenceAllNotes( bool removeIPH )
 	}
 	m_midiNotesMutex.unlock();
 
-	lock();
+	Engine::mixer()->requestChangeInModel();
 	// invalidate all NotePlayHandles and PresetPreviewHandles linked to this track
 	m_processHandles.clear();
 
@@ -457,7 +457,7 @@ void InstrumentTrack::silenceAllNotes( bool removeIPH )
 		flags |= PlayHandle::TypeInstrumentPlayHandle;
 	}
 	Engine::mixer()->removePlayHandlesOfTypes( this, flags );
-	unlock();
+	Engine::mixer()->doneChangeInModel();
 }
 
 
@@ -546,11 +546,13 @@ void InstrumentTrack::setName( const QString & _new_name )
 
 void InstrumentTrack::updateBaseNote()
 {
+	Engine::mixer()->requestChangeInModel();
 	for( NotePlayHandleList::Iterator it = m_processHandles.begin();
 					it != m_processHandles.end(); ++it )
 	{
 		( *it )->setFrequencyUpdate();
 	}
+	Engine::mixer()->doneChangeInModel();
 }
 
 
@@ -677,7 +679,7 @@ bool InstrumentTrack::play( const MidiTime & _start, const fpp_t _frames,
 
 		if( cur_start > 0 )
 		{
-			// skip notes which are posated before start-tact
+			// skip notes which are posated before start-bar
 			while( nit != notes.end() && ( *nit )->pos() < cur_start )
 			{
 				++nit;
@@ -994,7 +996,6 @@ InstrumentTrackView::InstrumentTrackView( InstrumentTrack * _it, TrackContainerV
 			 m_activityIndicator, SLOT( activate() ) );
 	connect( _it, SIGNAL( endNote() ),
 	 		m_activityIndicator, SLOT( noteEnd() ) );
-	connect( &_it->m_mutedModel, SIGNAL( dataChanged() ), this, SLOT( muteChanged() ) );
 
 	setModel( _it );
 }
@@ -1223,22 +1224,7 @@ void InstrumentTrackView::midiConfigChanged()
 
 
 
-void InstrumentTrackView::muteChanged()
-{
-	if(model()->m_mutedModel.value() )
-	{
-		m_activityIndicator->setActiveColor( QApplication::palette().color( QPalette::Active,
-															 QPalette::Highlight ) );
-	} else
-	{
-		m_activityIndicator->setActiveColor( QApplication::palette().color( QPalette::Active,
-															 QPalette::BrightText ) );
-	}
-}
-
-
-
-
+//FIXME: This is identical to SampleTrackView::createFxMenu
 QMenu * InstrumentTrackView::createFxMenu(QString title, QString newFxLabel)
 {
 	int channelIndex = model()->effectChannelModel()->value();
@@ -1253,8 +1239,6 @@ QMenu * InstrumentTrackView::createFxMenu(QString title, QString newFxLabel)
 
 	QMenu *fxMenu = new QMenu( title );
 
-	QSignalMapper * fxMenuSignalMapper = new QSignalMapper(fxMenu);
-
 	fxMenu->addAction( newFxLabel, this, SLOT( createFxLine() ) );
 	fxMenu->addSeparator();
 
@@ -1264,13 +1248,13 @@ QMenu * InstrumentTrackView::createFxMenu(QString title, QString newFxLabel)
 
 		if ( currentChannel != fxChannel )
 		{
+			auto index = currentChannel->m_channelIndex;
 			QString label = tr( "FX %1: %2" ).arg( currentChannel->m_channelIndex ).arg( currentChannel->m_name );
-			QAction * action = fxMenu->addAction( label, fxMenuSignalMapper, SLOT( map() ) );
-			fxMenuSignalMapper->setMapping(action, currentChannel->m_channelIndex);
+			fxMenu->addAction(label, [this, index](){
+				assignFxLine(index);
+			});
 		}
 	}
-
-	connect(fxMenuSignalMapper, SIGNAL(mapped(int)), this, SLOT(assignFxLine(int)));
 
 	return fxMenu;
 }
@@ -1600,7 +1584,7 @@ void InstrumentTrackWindow::saveSettingsBtnClicked()
 	sfd.setDirectory( presetRoot + m_track->instrumentName() );
 	sfd.setFileMode( FileDialog::AnyFile );
 	QString fname = m_track->name();
-	sfd.selectFile( fname.remove(QRegExp("[^a-zA-Z0-9_\\-\\d\\s]")) );
+	sfd.selectFile(fname.remove(QRegExp(FILENAME_FILTER)));
 	sfd.setDefaultSuffix( "xpf");
 
 	if( sfd.exec() == QDialog::Accepted &&

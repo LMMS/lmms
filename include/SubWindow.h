@@ -67,10 +67,10 @@ public:
 
 protected:
 	// hook the QWidget move/resize events to update the tracked geometry
-	virtual void moveEvent( QMoveEvent * event );
-	virtual void resizeEvent( QResizeEvent * event );
-	virtual void paintEvent( QPaintEvent * pe );
-	virtual void changeEvent( QEvent * event );
+	void moveEvent( QMoveEvent * event ) override;
+	void resizeEvent( QResizeEvent * event ) override;
+	void paintEvent( QPaintEvent * pe ) override;
+	void changeEvent( QEvent * event ) override;
 
 signals:
 	void focusLost();

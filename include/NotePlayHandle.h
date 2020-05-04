@@ -73,8 +73,8 @@ public:
 		return p;
 	}
 
-	virtual void setVolume( volume_t volume );
-	virtual void setPanning( panning_t panning );
+	void setVolume( volume_t volume ) override;
+	void setPanning( panning_t panning ) override;
 
 	int midiKey() const;
 	int midiChannel() const
@@ -104,10 +104,10 @@ public:
 	}
 
 	/*! Renders one chunk using the attached instrument into the buffer */
-	virtual void play( sampleFrame* buffer );
+	void play( sampleFrame* buffer ) override;
 
 	/*! Returns whether playback of note is finished and thus handle can be deleted */
-	virtual bool isFinished() const
+	bool isFinished() const override
 	{
 		return m_released && framesLeft() <= 0;
 	}
@@ -119,7 +119,7 @@ public:
 	fpp_t framesLeftForCurrentPeriod() const;
 
 	/*! Returns whether the play handle plays on a certain track */
-	virtual bool isFromTrack( const Track* _track ) const;
+	bool isFromTrack( const Track* _track ) const override;
 
 	/*! Releases the note (and plays release frames */
 	void noteOff( const f_cnt_t offset = 0 );

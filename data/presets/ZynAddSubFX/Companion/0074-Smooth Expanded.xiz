@@ -19,7 +19,7 @@
 <string name="author">Will Godfrey
 GPL V 2 or later</string>
 <string name="comments">Now has a slow long tail.
-Only really noticable on lower notes.</string>
+Only really noticeable on lower notes.</string>
 <par name="type" value="12" />
 </INFO>
 <INSTRUMENT_KIT>

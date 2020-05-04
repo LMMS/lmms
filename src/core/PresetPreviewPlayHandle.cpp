@@ -54,7 +54,7 @@ public:
 	{
 	}
 
-	virtual QString nodeName() const
+	QString nodeName() const override
 	{
 		return "previewtrackcontainer";
 	}

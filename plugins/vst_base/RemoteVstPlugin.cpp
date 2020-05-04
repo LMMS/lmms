@@ -734,6 +734,7 @@ void RemoteVstPlugin::init( const std::string & _plugin_file )
 
 static void close_check( FILE* fp )
 {
+	if (!fp) {return;}
 	if( fclose( fp ) )
 	{
 		perror( "fclose" );
@@ -1084,7 +1085,7 @@ void RemoteVstPlugin::getParameterDump()
 
 	for( int i = 0; i < m_plugin->numParams; ++i )
 	{
-		char paramName[32];
+		char paramName[256];
 		memset( paramName, 0, sizeof( paramName ) );
 		pluginDispatch( effGetParamName, i, 0, paramName );
 		paramName[sizeof(paramName)-1] = 0;
@@ -1128,6 +1129,12 @@ void RemoteVstPlugin::saveChunkToFile( const std::string & _file )
 		if( len > 0 )
 		{
 			FILE* fp = F_OPEN_UTF8( _file, "wb" );
+			if (!fp)
+			{
+				fprintf( stderr,
+					"Error opening file for saving chunk.\n" );
+				return;
+			}
 			if ( fwrite( chunk, 1, len, fp ) != len )
 			{
 				fprintf( stderr,
@@ -1292,7 +1299,13 @@ void RemoteVstPlugin::savePreset( const std::string & _file )
 	if (!isPreset &&!chunky) uIntToFile = (unsigned int) m_plugin->numPrograms;
 	pBank->numPrograms = endian_swap( uIntToFile );
 
-	FILE * stream = F_OPEN_UTF8( _file, "w" );
+	FILE * stream = F_OPEN_UTF8( _file, "wb" );
+	if (!stream)
+	{
+		fprintf( stderr,
+			"Error opening file for saving preset.\n" );
+		return;
+	}
 	fwrite ( pBank, 1, 28, stream );
 	fwrite ( progName, 1, isPreset ? 28 : 128, stream );
 	if ( chunky ) {
@@ -1344,7 +1357,13 @@ void RemoteVstPlugin::loadPresetFile( const std::string & _file )
 	unsigned int * pLen = new unsigned int[ 1 ];
 	unsigned int len = 0;
 	sBank * pBank = (sBank*) new char[ sizeof( sBank ) ];
-	FILE * stream = F_OPEN_UTF8( _file, "r" );
+	FILE * stream = F_OPEN_UTF8( _file, "rb" );
+	if (!stream)
+	{
+		fprintf( stderr,
+			"Error opening file for loading preset.\n" );
+		return;
+	}
 	if ( fread ( pBank, 1, 56, stream ) != 56 )
 	{
 		fprintf( stderr, "Error loading preset file.\n" );
@@ -1446,6 +1465,12 @@ void RemoteVstPlugin::loadChunkFromFile( const std::string & _file, int _len )
 	char * chunk = new char[_len];
 
 	FILE* fp = F_OPEN_UTF8( _file, "rb" );
+	if (!fp)
+	{
+		fprintf( stderr,
+			"Error opening file for loading chunk.\n" );
+		return;
+	}
 	if ( fread( chunk, 1, _len, fp ) != _len )
 	{
 		fprintf( stderr, "Error loading chunk from file.\n" );

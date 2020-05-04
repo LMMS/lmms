@@ -36,9 +36,9 @@ public:
 						const Descriptor::SubPluginFeatures::Key * _key );
 	virtual ~PeakControllerEffect();
 	virtual bool processAudioBuffer( sampleFrame * _buf,
-									const fpp_t _frames );
+									const fpp_t _frames ) override;
 
-	virtual EffectControls * controls()
+	EffectControls * controls() override
 	{
 		return &m_peakControls;
 	}
