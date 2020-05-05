@@ -1142,7 +1142,7 @@ void RemoteVstPlugin::getParameterDump()
 
 	for( int i = 0; i < m_plugin->numParams; ++i )
 	{
-		char paramName[32];
+		char paramName[256];
 		memset( paramName, 0, sizeof( paramName ) );
 		pluginDispatch( effGetParamName, i, 0, paramName );
 		paramName[sizeof(paramName)-1] = 0;
@@ -1356,7 +1356,7 @@ void RemoteVstPlugin::savePreset( const std::string & _file )
 	if (!isPreset &&!chunky) uIntToFile = (unsigned int) m_plugin->numPrograms;
 	pBank->numPrograms = endian_swap( uIntToFile );
 
-	FILE * stream = F_OPEN_UTF8( _file, "w" );
+	FILE * stream = F_OPEN_UTF8( _file, "wb" );
 	if (!stream)
 	{
 		fprintf( stderr,
@@ -1414,7 +1414,7 @@ void RemoteVstPlugin::loadPresetFile( const std::string & _file )
 	unsigned int * pLen = new unsigned int[ 1 ];
 	unsigned int len = 0;
 	sBank * pBank = (sBank*) new char[ sizeof( sBank ) ];
-	FILE * stream = F_OPEN_UTF8( _file, "r" );
+	FILE * stream = F_OPEN_UTF8( _file, "rb" );
 	if (!stream)
 	{
 		fprintf( stderr,

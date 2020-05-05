@@ -52,6 +52,7 @@ SET(LMMS_SRCS
 	gui/widgets/ComboBox.cpp
 	gui/widgets/ControllerRackView.cpp
 	gui/widgets/ControllerView.cpp
+	gui/widgets/Controls.cpp
 	gui/widgets/CPULoadWidget.cpp
 	gui/widgets/CustomTextKnob.cpp
 	gui/widgets/EffectRackView.cpp
@@ -72,6 +73,8 @@ SET(LMMS_SRCS
 	gui/widgets/LcdSpinBox.cpp
 	gui/widgets/LcdWidget.cpp
 	gui/widgets/LedCheckbox.cpp
+	gui/widgets/ControlLayout.cpp
+	gui/widgets/LinkedModelGroupViews.cpp
 	gui/widgets/MeterDialog.cpp
 	gui/widgets/MidiPortMenu.cpp
 	gui/widgets/NStateButton.cpp

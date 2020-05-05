@@ -159,7 +159,7 @@ void TrackContentObject::movePosition( const MidiTime & pos )
 
 /*! \brief Change the length of this TrackContentObject
  *
- *  If the track content object's length has chaanged, update it.  We
+ *  If the track content object's length has changed, update it.  We
  *  also add a journal entry for undo and update the display.
  *
  * \param _length The new length of the track content object.
@@ -1620,9 +1620,13 @@ bool TrackContentWidget::pasteSelection( MidiTime tcoPos, QDropEvent * de )
 	// TODO -- Need to draw the hovericon either way, or ghost the TCOs
 	// onto their final position.
 
+	float snapSize = gui->songEditor()->m_editor->getSnapSize();
 	// All patterns should be offset the same amount as the grabbed pattern
+	MidiTime offset = MidiTime(tcoPos - grabbedTCOPos);
+	// Users expect clips to "fall" backwards, so bias the offset
+	offset = offset - MidiTime::ticksPerBar() * snapSize / 2;
 	// The offset is quantized (rather than the positions) to preserve fine adjustments
-	int offset = MidiTime(tcoPos - grabbedTCOPos).quantize(gui->songEditor()->m_editor->getSnapSize());
+	offset = offset.quantize(snapSize);
 
 	for( int i = 0; i<tcoNodes.length(); i++ )
 	{
@@ -2715,6 +2719,9 @@ TrackView::TrackView( Track * track, TrackContainerView * tcv ) :
 	connect( &m_track->m_mutedModel, SIGNAL( dataChanged() ),
 			&m_trackContentWidget, SLOT( update() ) );
 
+	connect(&m_track->m_mutedModel, SIGNAL(dataChanged()),
+			this, SLOT(muteChanged()));
+
 	connect( &m_track->m_soloModel, SIGNAL( dataChanged() ),
 			m_track, SLOT( toggleSolo() ), Qt::DirectConnection );
 	// create views for already existing TCOs
@@ -3046,4 +3053,22 @@ void TrackView::createTCOView( TrackContentObject * tco )
 		tv->setSelected( true );
 	}
 	tco->selectViewOnCreate( false );
+}
+
+
+
+
+void TrackView::muteChanged()
+{
+	FadeButton * indicator = getActivityIndicator();
+	if (indicator) { setIndicatorMute(indicator, m_track->m_mutedModel.value()); }
+}
+
+
+
+
+void TrackView::setIndicatorMute(FadeButton* indicator, bool muted)
+{
+	QPalette::ColorRole role = muted ? QPalette::Highlight : QPalette::BrightText;
+	indicator->setActiveColor(QApplication::palette().color(QPalette::Active, role));
 }

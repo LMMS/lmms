@@ -894,7 +894,7 @@ int main( int argc, char * * argv )
 			}
 			else // Exit
 			{
-				return 0;
+				return EXIT_SUCCESS;
 			}
 		}
 
