@@ -1103,18 +1103,18 @@ void RemoteVstPlugin::getParameterDisplays()
 // join the ParameterLabels (units) and send them to host
 void RemoteVstPlugin::getParameterLabels()
 {
-	std::string presName;
+	std::string paramLabels;
 	static char buf[9]; // buffer for getting string
 	for (int i=0; i< m_plugin->numParams; ++i)
 	{
 		memset( buf, 0, sizeof( buf ) ); // fill with '\0' because got string may not to be ended with '\0'
-		pluginDispatch( effGetParamLabel, i, 0, buf );
+		pluginDispatch( effGetParamLabels, i, 0, buf );
 		buf[8] = 0;
-		if (i != 0) presName += '|';
-		presName += buf;
+		if (i != 0) paramLabels += '|';
+		paramLabels += buf;
 	}
 
-	sendMessage( message( IdVstParameterLabels ).addString( presName.c_str() ) );
+	sendMessage( message( IdVstParameterLabels ).addString( paramLabels.c_str() ) );
 }
 
 
