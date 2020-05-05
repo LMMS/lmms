@@ -150,6 +150,8 @@ public:
 		update();
 	}
 
+	void setXOffset(const int x);
+
 	void addToolButtons(QToolBar* _tool_bar );
 
 
