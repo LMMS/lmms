@@ -1004,7 +1004,6 @@ InstrumentTrackView::InstrumentTrackView( InstrumentTrack * _it, TrackContainerV
 			 m_activityIndicator, SLOT( activate() ) );
 	connect( _it, SIGNAL( endNote() ),
 	 		m_activityIndicator, SLOT( noteEnd() ) );
-	connect( &_it->m_mutedModel, SIGNAL( dataChanged() ), this, SLOT( muteChanged() ) );
 
 	setModel( _it );
 }
@@ -1228,22 +1227,6 @@ void InstrumentTrackView::midiConfigChanged()
 {
 	m_midiInputAction->setChecked( model()->m_midiPort.isReadable() );
 	m_midiOutputAction->setChecked( model()->m_midiPort.isWritable() );
-}
-
-
-
-
-void InstrumentTrackView::muteChanged()
-{
-	if(model()->m_mutedModel.value() )
-	{
-		m_activityIndicator->setActiveColor( QApplication::palette().color( QPalette::Active,
-															 QPalette::Highlight ) );
-	} else
-	{
-		m_activityIndicator->setActiveColor( QApplication::palette().color( QPalette::Active,
-															 QPalette::BrightText ) );
-	}
 }
 
 
