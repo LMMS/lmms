@@ -86,7 +86,6 @@ InstrumentMidiIOView::InstrumentMidiIOView( QWidget* parent ) :
 	m_outputChannelSpinBox = new LcdSpinBox( 2, m_midiOutputGroupBox );
 	m_outputChannelSpinBox->addTextForValue( 0, "--" );
 	m_outputChannelSpinBox->setLabel( tr( "CHANNEL" ) );
-	m_outputChannelSpinBox->setEnabled( true );
 	midiOutputLayout->addWidget( m_outputChannelSpinBox );
 
 	m_fixedOutputVelocitySpinBox = new LcdSpinBox( 3, m_midiOutputGroupBox );

@@ -395,11 +395,9 @@ void InstrumentTrack::processOutEvent( const MidiEvent& event, const MidiTime& t
 
 	// If we have a selected output midi channel between 1-16, we will use that channel to handle the midi event.
 	// But if our selected midi output channel is 0 ("--"), we will use the event channel instead.
-	auto handleEventOutputChannel = midiPort()->realOutputChannel();
-	if( midiPort()->outputChannel() == 0 )
-	{
-		handleEventOutputChannel = event.channel();
-	}
+	const auto handleEventOutputChannel = midiPort()->outputChannel() == 0
+		? event.channel()
+		: midiPort()->realOutputChannel();
 
 	switch( event.type() )
 	{
