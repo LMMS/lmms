@@ -1134,8 +1134,22 @@ void manageVestigeInstrumentView::syncParameterText()
 	QString paramLabelStr   = m_vi->m_plugin->allParameterLabels();
 	QString paramDisplayStr = m_vi->m_plugin->allParameterDisplays();
 
-	QStringList paramLabelList = paramLabelStr.split("|");
-	QStringList paramDisplayList = paramDisplayStr.split("|");
+	QStringList paramLabelList;
+	QStringList paramDisplayList;
+
+	for( int i = 0; i < paramLabelStr.size(); )
+	{
+		const int length = paramLabelStr[i].digitValue();
+		paramLabelList.append(paramLabelStr.mid(i + 1, length));
+		i += length + 1;
+	}
+
+	for( int i = 0; i < paramDisplayStr.size(); )
+	{
+		const int length = paramDisplayStr[i].digitValue();
+		paramDisplayList.append(paramDisplayStr.mid(i + 1, length));
+		i += length + 1;
+	}
 
 	for( int i = 0; i < paramLabelList.size(); ++i )
 	{

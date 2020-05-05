@@ -71,6 +71,7 @@
 #include <string>
 #include <iostream>
 #include <string>
+#include <cstring>
 
 #include <aeffectx.h>
 
@@ -1091,7 +1092,9 @@ void RemoteVstPlugin::getParameterDisplays()
 		memset( buf, 0, sizeof( buf ) ); // fill with '\0' because got string may not to be ended with '\0'
 		pluginDispatch( effGetParamDisplay, i, 0, buf );
 		buf[8] = 0;
-		if (i != 0) paramDisplays += '|';
+
+		// each field shaped like: [length:number][content:string]
+		paramDisplays += '0' + strlen(buf); // add length descriptor (length is up to 8)
 		paramDisplays += buf;
 	}
 
@@ -1108,9 +1111,11 @@ void RemoteVstPlugin::getParameterLabels()
 	for (int i=0; i< m_plugin->numParams; ++i)
 	{
 		memset( buf, 0, sizeof( buf ) ); // fill with '\0' because got string may not to be ended with '\0'
-		pluginDispatch( effGetParamLabels, i, 0, buf );
+		pluginDispatch( effGetParamLabel, i, 0, buf );
 		buf[8] = 0;
-		if (i != 0) paramLabels += '|';
+
+		// each field shaped like: [length:number][content:string]
+		paramLabels += '0' + strlen(buf); // add length descriptor (length is up to 8)
 		paramLabels += buf;
 	}
 
