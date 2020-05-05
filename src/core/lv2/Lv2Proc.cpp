@@ -185,9 +185,13 @@ void Lv2Proc::copyBuffersFromCore(const sampleFrame *buf,
 		// mono input
 		// (this happens if we have two outputs and only one input)
 		if (inPorts().m_right)
+		{
 			inPorts().m_right->copyBuffersFromCore(buf, offset + 1, frames);
+		}
 		else
+		{
 			inPorts().m_left->addBuffersFromCore(buf, offset + 1, frames);
+		}
 	}
 }
 
