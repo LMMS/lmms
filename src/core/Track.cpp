@@ -1148,9 +1148,18 @@ void TrackContentObjectView::mouseReleaseEvent( QMouseEvent * me )
 			//clip (bad), and a clip the same length as the original one (pointless).
 			if ( splitPos > m_initialTCOPos && splitPos < m_initialTCOEnd )
 			{
+<<<<<<< HEAD
 				SampleTCO * rightTCO = new SampleTCO ( leftTCO->getTrack() );
 				rightTCO->setSampleBuffer( leftTCO->sampleBuffer() );
 				rightTCO->setIsPlaying(leftTCO->isPlaying());
+=======
+				//leftTCO->copy();
+				SampleTCO * rightTCO = new SampleTCO ( leftTCO->getTrack() );
+				rightTCO->setSampleBuffer( leftTCO->sampleBuffer() );
+				rightTCO->setIsPlaying(leftTCO->isPlaying());
+				leftTCO->getTrack()->addTCO( rightTCO );
+				//rightTCO->paste();
+>>>>>>> aac9c07c0000b4ae28f4fd24bedf3efa66670e7a
 
 				leftTCO->changeLength( splitPos - m_initialTCOPos );
 
