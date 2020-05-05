@@ -185,7 +185,7 @@ Lv2ViewBase::Lv2ViewBase(QWidget* meAsWidget, Lv2ControlBase *ctrlBase)
 		break;
 	}
 
-	if(m_reloadPluginButton || m_toggleUIButton || m_helpButton)
+	if (m_reloadPluginButton || m_toggleUIButton || m_helpButton)
 	{
 		grid->addLayout(btnBox, Rows::ButtonRow, 0, 1, m_colNum);
 	}
@@ -207,9 +207,9 @@ Lv2ViewBase::~Lv2ViewBase() {
 
 void Lv2ViewBase::toggleHelp(bool visible)
 {
-	if ( m_helpWindow )
+	if (m_helpWindow)
 	{
-		if ( visible ) { m_helpWindow->show(); m_helpWindow->raise(); }
+		if (visible) { m_helpWindow->show(); m_helpWindow->raise(); }
 		else { m_helpWindow->hide(); }
 	}
 }
