@@ -1084,18 +1084,18 @@ const char * RemoteVstPlugin::programName()
 // join the ParameterDisplays (stringified values without units) and send them to host
 void RemoteVstPlugin::getParameterDisplays()
 {
-	std::string presName;
+	std::string paramDisplays;
 	static char buf[9]; // buffer for getting string
 	for (int i=0; i< m_plugin->numParams; ++i)
 	{
 		memset( buf, 0, sizeof( buf ) ); // fill with '\0' because got string may not to be ended with '\0'
 		pluginDispatch( effGetParamDisplay, i, 0, buf );
 		buf[8] = 0;
-		if (i != 0) presName += '|';
-		presName += buf;
+		if (i != 0) paramDisplays += '|';
+		paramDisplays += buf;
 	}
 
-	sendMessage( message( IdVstParameterDisplays ).addString( presName.c_str() ) );
+	sendMessage( message( IdVstParameterDisplays ).addString( paramDisplays.c_str() ) );
 }
 
 
