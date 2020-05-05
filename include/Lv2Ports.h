@@ -150,10 +150,6 @@ struct Control : public VisitablePort<Control, ControlPortBase>
 	//! Model values are being copied here every run
 	//! Between runs, this data is not up-to-date
 	float m_val;
-
-	// overwrite accept() from ControlPortBase
-	void accept(Visitor& v) override { v.visit(*this); }
-	void accept(ConstVisitor& v) const override { v.visit(*this); }
 };
 
 struct Cv : public VisitablePort<Cv, ControlPortBase>
@@ -162,10 +158,6 @@ struct Cv : public VisitablePort<Cv, ControlPortBase>
 	//! Model values are being copied here every run
 	//! Between runs, this data is not up-to-date
 	std::vector<float> m_buffer;
-
-	// overwrite accept() from ControlPortBase
-	void accept(Visitor& v) override { v.visit(*this); }
-	void accept(ConstVisitor& v) const override { v.visit(*this); }
 };
 
 struct Audio : public VisitablePort<Audio, PortBase>
