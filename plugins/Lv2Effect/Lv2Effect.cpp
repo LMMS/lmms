@@ -55,7 +55,7 @@ Plugin::Descriptor PLUGIN_EXPORT lv2effect_plugin_descriptor =
 Lv2Effect::Lv2Effect(Model* parent, const Descriptor::SubPluginFeatures::Key *key) :
 	Effect(&lv2effect_plugin_descriptor, parent, key),
 	m_controls(this, key->attributes["uri"]),
-	tmpOutputSmps(Engine::mixer()->framesPerPeriod())
+	m_tmpOutputSmps(Engine::mixer()->framesPerPeriod())
 {
 }
 
@@ -65,7 +65,7 @@ Lv2Effect::Lv2Effect(Model* parent, const Descriptor::SubPluginFeatures::Key *ke
 bool Lv2Effect::processAudioBuffer(sampleFrame *buf, const fpp_t frames)
 {
 	if (!isEnabled() || !isRunning()) { return false; }
-	Q_ASSERT(frames <= (fpp_t)tmpOutputSmps.size());
+	Q_ASSERT(frames <= (fpp_t)m_tmpOutputSmps.size());
 
 	m_controls.copyBuffersFromLmms(buf, frames);
 	m_controls.copyModelsFromLmms();
@@ -74,7 +74,7 @@ bool Lv2Effect::processAudioBuffer(sampleFrame *buf, const fpp_t frames)
 	m_controls.run(frames);
 //	m_pluginMutex.unlock();
 
-	m_controls.copyBuffersToLmms(tmpOutputSmps.data(), frames);
+	m_controls.copyBuffersToLmms(m_tmpOutputSmps.data(), frames);
 
 	double outSum = .0;
 	bool corrupt = wetLevel() < 0; // #3261 - if w < 0, bash w := 0, d := 1
@@ -82,11 +82,11 @@ bool Lv2Effect::processAudioBuffer(sampleFrame *buf, const fpp_t frames)
 	const float w = corrupt ? 0 : wetLevel();
 	for(fpp_t f = 0; f < frames; ++f)
 	{
-		double l = static_cast<double>(tmpOutputSmps[f][0]);
-		double r = static_cast<double>(tmpOutputSmps[f][1]);
+		double l = static_cast<double>(m_tmpOutputSmps[f][0]);
+		double r = static_cast<double>(m_tmpOutputSmps[f][1]);
 		outSum += l*l + r*r;
-		buf[f][0] = d * buf[f][0] + w * tmpOutputSmps[f][0];
-		buf[f][1] = d * buf[f][1] + w * tmpOutputSmps[f][1];
+		buf[f][0] = d * buf[f][0] + w * m_tmpOutputSmps[f][0];
+		buf[f][1] = d * buf[f][1] + w * m_tmpOutputSmps[f][1];
 	}
 	checkGate(outSum / frames);
 

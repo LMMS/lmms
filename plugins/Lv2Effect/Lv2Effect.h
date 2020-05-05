@@ -48,7 +48,7 @@ public:
 
 private:
 	Lv2FxControls m_controls;
-	std::vector<sampleFrame> tmpOutputSmps;
+	std::vector<sampleFrame> m_tmpOutputSmps;
 };
 
 #endif // LMMS_HAVE_LV2
