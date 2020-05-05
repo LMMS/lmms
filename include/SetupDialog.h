@@ -74,6 +74,7 @@ private slots:
 	void toggleNoteLabels(bool enabled);
 	void toggleCompactTrackButtons(bool enabled);
 	void toggleOneInstrumentTrackWindow(bool enabled);
+	void toggleSideBarOnRight(bool enabled);
 	void toggleMMPZ(bool enabled);
 	void toggleDisableBackup(bool enabled);
 	void toggleOpenLastProject(bool enabled);
@@ -130,6 +131,7 @@ private:
 	bool m_printNoteLabels;
 	bool m_compactTrackButtons;
 	bool m_oneInstrumentTrackWindow;
+	bool m_sideBarOnRight;
 	bool m_MMPZ;
 	bool m_disableBackup;
 	bool m_openLastProject;
