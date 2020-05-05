@@ -499,8 +499,8 @@ float Knob::getValue( const QPoint & _p )
 {
 	float value;
 
-	// arcane mathemagicks for calculating knob movement
-	value = ( ( _p.y() + _p.y() * qMin( qAbs( _p.y() / 2.5f ), 6.0f ) ) ) / 12.0f;
+	// knob value increase is linear to mouse movement
+	value = .09f * _p.y();
 
 	// if shift pressed we want slower movement
 	if( gui->mainWindow()->isShiftPressed() )
