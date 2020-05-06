@@ -75,6 +75,7 @@ public:
 	typedef std::vector<T, MmAllocator<T> > vector;
 
 private:
+	MemoryManager::MmCounter m_counter;
 	MemoryManager::ThreadGuard m_threadGuard;
 };
 
