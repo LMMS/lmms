@@ -44,7 +44,7 @@ private slots:
 			ptrs.push(pool.allocate_bounded());
 			QVERIFY(ptrs.top());
 		}
-		QCOMPARE(pool.allocate_bounded(), nullptr);
+		QCOMPARE(pool.allocate_bounded(), static_cast<T*>(nullptr));
 		ptrs.push(pool.allocate());
 		QVERIFY(ptrs.top());
 

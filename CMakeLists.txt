@@ -171,9 +171,6 @@ ENDIF()
 # Resolve Qt5::qmake to full path for use in packaging scripts
 GET_TARGET_PROPERTY(QT_QMAKE_EXECUTABLE "${Qt5Core_QMAKE_EXECUTABLE}" IMPORTED_LOCATION)
 
-FIND_PACKAGE(Qt5Test)
-SET(QT_QTTEST_LIBRARY Qt5::Test)
-
 # check for libsndfile
 FIND_PACKAGE(SndFile REQUIRED)
 IF(NOT SNDFILE_FOUND)
