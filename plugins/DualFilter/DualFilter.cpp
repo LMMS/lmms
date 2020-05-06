@@ -193,11 +193,11 @@ bool DualFilterEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames 
 			s[0] += ( s2[0] * mix2 );
 			s[1] += ( s2[1] * mix2 );
 		}
-		outSum += buf[f][0]*buf[f][0] + buf[f][1]*buf[f][1];
 
 		// do another mix with dry signal
 		buf[f][0] = d * buf[f][0] + w * s[0];
 		buf[f][1] = d * buf[f][1] + w * s[1];
+		outSum += buf[f][0] * buf[f][0] + buf[f][1] * buf[f][1];
 
 		//increment pointers
 		cut1Ptr += cut1Inc;
