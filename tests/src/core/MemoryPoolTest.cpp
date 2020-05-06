@@ -36,11 +36,12 @@ private slots:
 	void MemoryPoolTests()
 	{
 		using T = std::array<char, 16>;
-		MemoryPool<T> pool(256);
+		int n = 256;
+		MemoryPool<T> pool(n);
 
 		std::stack<T*> ptrs;
 
-		for (int i=0; i < 256; i++) {
+		for (int i=0; i < n; i++) {
 			ptrs.push(pool.allocate_bounded());
 			QVERIFY(ptrs.top());
 		}
