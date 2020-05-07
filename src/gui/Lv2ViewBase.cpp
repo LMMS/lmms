@@ -151,9 +151,6 @@ Lv2ViewBase::Lv2ViewBase(QWidget* meAsWidget, Lv2ControlBase *ctrlBase)
 		m_toggleUIButton->setIcon(embed::getIconPixmap("zoom"));
 		m_toggleUIButton->setFont(
 			pointSize<8>(m_toggleUIButton->font()));
-		m_toggleUIButton->setWhatsThis(
-			QObject::tr("Click here to show or hide the "
-				"Lv2 graphical user interface (GUI)."));
 		btnBox->addWidget(m_toggleUIButton, 0);
 	}
 	btnBox->addStretch(1);
