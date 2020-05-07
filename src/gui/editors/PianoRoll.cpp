@@ -64,6 +64,11 @@
 #include "TimeLineWidget.h"
 #include "StepRecorderWidget.h"
 
+//for random
+#include <time.h>
+//for debug
+#include <QtTest/QTest>
+#include <QDebug>
 
 using std::move;
 
@@ -4312,6 +4317,102 @@ int PianoRoll::quantization() const
 }
 
 
+
+
+void PianoRoll::humanizeNotes() //quantizeNotes()
+{
+    /*The method will humanize a selection of chords in 1/192 steps*/
+
+    if( ! hasValidPattern() )
+    {
+        return;
+    }
+    int lower = 1;//Humanize/span is 1..4 1/192 in size
+    int upper = 4;
+    int subt = 1; //shift between adding and subtracting position
+    int adder = 100; 
+  
+    // Use current time as seed for random generator
+    srand(time(0)); 
+    m_pattern->addJournalCheckPoint();
+    NoteVector notes = getSelectedNotes();//selected notes only
+    for( Note* n : notes )
+    {
+        int rr = rand() % (upper - lower + 1) + lower; 
+        int signer = rand() % (adder - subt + 1) + lower; 
+        if ( signer < 50 ) n->setPos( n->pos() - rr );
+        else n->setPos( n->pos() + rr );
+    }
+
+    update();//Project is changed. Update
+    gui->songEditor()->update();
+    Engine::getSong()->setModified();
+}
+
+/*
+void PianoRoll::strumNotes() //top/|down
+//Method for chord-strumming.
+//The strum-distance is the chosen Q-value
+//Left-click strums from bottom to top
+//Right-click from top to buttom
+
+{
+  if( ! hasValidPattern() )
+    {
+        return;
+    }
+  m_pattern->addJournalCheckPoint();
+  NoteVector notes = getSelectedNotes();//selected notes only
+  int notesInChord = notes.count();//how many notes are in this chord
+  int index = 6;
+  for( Note* n : notes ) //for each selected
+  {
+    n->setPos( n->pos() + index );
+    index += 6;
+    if (index >= notesInChord) continue;    
+  }
+    
+    qDebug() << "notes my lovdear" << notes.count(); 
+    update();//Project is changed. Update
+    gui->songEditor()->update();
+    Engine::getSong()->setModified();
+    
+}
+*/
+
+void PianoRoll::strumNotes() //top/|down
+//Method for chord-strumming.
+//The strum-distance is the chosen Q-value
+//Left-click strums from bottom to top
+//Right-click from top to buttom
+
+{
+  if( ! hasValidPattern() )
+    {
+        return;
+    }
+  m_pattern->addJournalCheckPoint();
+  NoteVector notes = getSelectedNotes();//selected notes only
+  int notesInChord = notes.count();//how many notes are in this chord
+  int index = 6;
+  for( Note* n : notes ) //for each selected
+  {
+    n = notes.at(notesInChord-1);
+    notesInChord-=1;
+    n->setPos( n->pos() + index );
+    index += 6;
+    if (notesInChord<=1) continue;    
+  }
+    
+    qDebug() << "notes my lovdear" << notes.count(); 
+    update();//Project is changed. Update
+    gui->songEditor()->update();
+    Engine::getSong()->setModified();
+    
+}
+
+
+
 void PianoRoll::quantizeNotes()
 {
 	if( ! hasValidPattern() )
@@ -4456,15 +4557,28 @@ PianoRollWindow::PianoRollWindow() :
 
 	connect( editModeGroup, SIGNAL( triggered( int ) ), m_editor, SLOT( setEditMode( int ) ) );
 
-	QAction* quantizeAction = new QAction(embed::getIconPixmap( "quantize" ), tr( "Quantize" ), this );
+//Create a new klickbutton action, left the current buttons
+	QAction* quantizeAction = 
+    new QAction(embed::getIconPixmap( "quantize" ), tr( "Quantize" ), this );
 	connect( quantizeAction, SIGNAL( triggered() ), m_editor, SLOT( quantizeNotes() ) );
 
+	QAction* humanizeAction = 
+    new QAction(embed::getIconPixmap( "quantize" ), tr( "Humanize Selected Notes" ), this );
+	connect( humanizeAction, SIGNAL( triggered() ), m_editor, SLOT( humanizeNotes() ) );
+
+	QAction* strumNotesAction = 
+    new QAction(embed::getIconPixmap( "edit_erase" ), tr( "Strum Selected by Q-value" ), this );
+	connect( strumNotesAction, SIGNAL( triggered() ), m_editor, SLOT( strumNotes() ) );
+
+//add physical buttons for each of the defined QActions, in this order
 	notesActionsToolBar->addAction( drawAction );
 	notesActionsToolBar->addAction( eraseAction );
 	notesActionsToolBar->addAction( selectAction );
 	notesActionsToolBar->addAction( pitchBendAction );
 	notesActionsToolBar->addSeparator();
 	notesActionsToolBar->addAction( quantizeAction );
+    notesActionsToolBar->addAction( humanizeAction );
+    notesActionsToolBar->addAction( strumNotesAction );
 
 	// Copy + paste actions
 	DropToolBar *copyPasteActionsToolBar =  addDropToolBarToTop( tr( "Copy paste controls" ) );
@@ -4811,3 +4925,4 @@ void PianoRollWindow::updateStepRecordingIcon()
 		m_toggleStepRecordingAction->setIcon(embed::getIconPixmap("record_step_off"));
 	}
 }
+
