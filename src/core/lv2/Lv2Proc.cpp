@@ -174,10 +174,10 @@ void Lv2Proc::copyModelsFromCore()
 
 
 void Lv2Proc::copyBuffersFromCore(const sampleFrame *buf,
-									unsigned offset, unsigned num,
+									unsigned firstChan, unsigned num,
 									fpp_t frames)
 {
-	inPorts().m_left->copyBuffersFromCore(buf, offset, frames);
+	inPorts().m_left->copyBuffersFromCore(buf, firstChan, frames);
 	if (num > 1)
 	{
 		// if the caller requests to take input from two channels, but we only
@@ -186,11 +186,11 @@ void Lv2Proc::copyBuffersFromCore(const sampleFrame *buf,
 		// (this happens if we have two outputs and only one input)
 		if (inPorts().m_right)
 		{
-			inPorts().m_right->copyBuffersFromCore(buf, offset + 1, frames);
+			inPorts().m_right->copyBuffersFromCore(buf, firstChan + 1, frames);
 		}
 		else
 		{
-			inPorts().m_left->averageWithBuffersFromCore(buf, offset + 1, frames);
+			inPorts().m_left->averageWithBuffersFromCore(buf, firstChan + 1, frames);
 		}
 	}
 }
@@ -199,10 +199,10 @@ void Lv2Proc::copyBuffersFromCore(const sampleFrame *buf,
 
 
 void Lv2Proc::copyBuffersToCore(sampleFrame* buf,
-								unsigned offset, unsigned num,
+								unsigned firstChan, unsigned num,
 								fpp_t frames) const
 {
-	outPorts().m_left->copyBuffersToCore(buf, offset + 0, frames);
+	outPorts().m_left->copyBuffersToCore(buf, firstChan + 0, frames);
 	if (num > 1)
 	{
 		// if the caller requests to copy into two channels, but we only have
@@ -210,7 +210,7 @@ void Lv2Proc::copyBuffersToCore(sampleFrame* buf,
 		// (this happens if we have two inputs and only one output)
 		Lv2Ports::Audio* ap = outPorts().m_right
 			? outPorts().m_right : outPorts().m_left;
-		ap->copyBuffersToCore(buf, offset + 1, frames);
+		ap->copyBuffersToCore(buf, firstChan + 1, frames);
 	}
 }
 

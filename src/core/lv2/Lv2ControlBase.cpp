@@ -115,10 +115,10 @@ void Lv2ControlBase::copyModelsFromLmms() {
 
 
 void Lv2ControlBase::copyBuffersFromLmms(const sampleFrame *buf, fpp_t frames) {
-	unsigned offset = 0;
+	unsigned firstChan = 0; // tell the procs which channels they shall read from
 	for (auto& c : m_procs) {
-		c->copyBuffersFromCore(buf, offset, m_channelsPerProc, frames);
-		offset += m_channelsPerProc;
+		c->copyBuffersFromCore(buf, firstChan, m_channelsPerProc, frames);
+		firstChan += m_channelsPerProc;
 	}
 }
 
@@ -126,10 +126,10 @@ void Lv2ControlBase::copyBuffersFromLmms(const sampleFrame *buf, fpp_t frames) {
 
 
 void Lv2ControlBase::copyBuffersToLmms(sampleFrame *buf, fpp_t frames) const {
-	unsigned offset = 0;
+	unsigned firstChan = 0; // tell the procs which channels they shall write to
 	for (const auto& c : m_procs) {
-		c->copyBuffersToCore(buf, offset, m_channelsPerProc, frames);
-		offset += m_channelsPerProc;
+		c->copyBuffersToCore(buf, firstChan, m_channelsPerProc, frames);
+		firstChan += m_channelsPerProc;
 	}
 }
 

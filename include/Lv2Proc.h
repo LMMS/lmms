@@ -107,15 +107,31 @@ public:
 	*/
 	//! Copy values from all connected models into the respective ports
 	void copyModelsFromCore();
-	//! Copy buffer passed by the core into our ports
-	//! @param offset Offset in each frame of @p buf to take
-	//! @param num Number of buffers provided in @param buf
+	/**
+	 * Copy buffer passed by the core into our ports
+	 * @param buf buffer of sample frames, each sample frame is something like
+	 *   a `float[<number-of-procs> * <channels per proc>]` array.
+	 * @param firstChan The offset for @p buf where we have to read our
+	 *   first channel.
+	 *   This marks the first sample in each sample frame where we read from.
+	 *   If we are the 2nd of 2 mono procs, this can be greater than 0.
+	 * @param num Number of channels we must read from @param buf (starting at
+	 *   @p offset)
+	 */
 	void copyBuffersFromCore(const sampleFrame *buf,
-								unsigned offset, unsigned num, fpp_t frames);
-	//! Copy our ports into buffers passed by the core
-	//! @param offset Offset in each frame of @p buf to fill
-	//! @param num Number of buffers in @param buf we must fill
-	void copyBuffersToCore(sampleFrame *buf, unsigned offset, unsigned num,
+								unsigned firstChan, unsigned num, fpp_t frames);
+	/**
+	 * Copy our ports into buffers passed by the core
+	 * @param buf buffer of sample frames, each sample frame is something like
+	 *   a `float[<number-of-procs> * <channels per proc>]` array.
+	 * @param firstChan The offset for @p buf where we have to write our
+	 *   first channel.
+	 *   This marks the first sample in each sample frame where we write to.
+	 *   If we are the 2nd of 2 mono procs, this can be greater than 0.
+	 * @param num Number of channels we must write to @param buf (starting at
+	 *   @p offset)
+	 */
+	void copyBuffersToCore(sampleFrame *buf, unsigned firstChan, unsigned num,
 								fpp_t frames) const;
 	//! Run the Lv2 plugin instance for @param frames frames
 	void run(fpp_t frames);
