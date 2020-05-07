@@ -82,11 +82,11 @@ bool Lv2Effect::processAudioBuffer(sampleFrame *buf, const fpp_t frames)
 	const float w = corrupt ? 0 : wetLevel();
 	for(fpp_t f = 0; f < frames; ++f)
 	{
-		double l = static_cast<double>(m_tmpOutputSmps[f][0]);
-		double r = static_cast<double>(m_tmpOutputSmps[f][1]);
-		outSum += l*l + r*r;
 		buf[f][0] = d * buf[f][0] + w * m_tmpOutputSmps[f][0];
 		buf[f][1] = d * buf[f][1] + w * m_tmpOutputSmps[f][1];
+		double l = static_cast<double>(buf[f][0]);
+		double r = static_cast<double>(buf[f][1]);
+		outSum += l*l + r*r;
 	}
 	checkGate(outSum / frames);
 
