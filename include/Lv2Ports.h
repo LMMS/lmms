@@ -168,7 +168,7 @@ struct Audio : public VisitablePort<Audio, PortBase>
 	void copyBuffersFromCore(const sampleFrame *lmmsBuf,
 		unsigned channel, fpp_t frames);
 	//! Add buffer passed by LMMS into our ports, and halve the result
-	void addBuffersFromCore(const sampleFrame *lmmsBuf,
+	void averageWithBuffersFromCore(const sampleFrame *lmmsBuf,
 		unsigned channel, fpp_t frames);
 	//! Copy our ports into buffers passed by LMMS
 	void copyBuffersToCore(sampleFrame *lmmsBuf,

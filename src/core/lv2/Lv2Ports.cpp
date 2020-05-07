@@ -217,7 +217,7 @@ void Audio::copyBuffersFromCore(const sampleFrame *lmmsBuf,
 
 
 
-void Audio::addBuffersFromCore(const sampleFrame *lmmsBuf,
+void Audio::averageWithBuffersFromCore(const sampleFrame *lmmsBuf,
 	unsigned channel, fpp_t frames)
 {
 	for (std::size_t f = 0; f < static_cast<unsigned>(frames); ++f)

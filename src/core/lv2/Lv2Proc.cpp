@@ -190,7 +190,7 @@ void Lv2Proc::copyBuffersFromCore(const sampleFrame *buf,
 		}
 		else
 		{
-			inPorts().m_left->addBuffersFromCore(buf, offset + 1, frames);
+			inPorts().m_left->averageWithBuffersFromCore(buf, offset + 1, frames);
 		}
 	}
 }
