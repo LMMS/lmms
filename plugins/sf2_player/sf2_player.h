@@ -91,8 +91,8 @@ public:
 
 	void setParameter( const QString & _param, const QString & _value );
 
-	virtual bool presetChangeSupported();
-	virtual void changePreset(int bank, unsigned int preset);
+	bool presetChangeSupported() override;
+	void changePreset(int bank, unsigned int preset) override;
 
 public slots:
 	void openFile( const QString & _sf2File, bool updateTrackName = true );

@@ -267,8 +267,8 @@ public:
 
 
 	void setParameter( const QString & _param, const QString & _value );
-	virtual bool presetChangeSupported() override;
-	virtual void changePreset(int bank, unsigned int preset) override;
+	bool presetChangeSupported() override;
+	void changePreset(int bank, unsigned int preset) override;
 
 
 public slots:
