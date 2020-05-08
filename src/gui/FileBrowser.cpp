@@ -24,6 +24,7 @@
  */
 
 
+#include <QDesktopServices>
 #include <QHBoxLayout>
 #include <QKeyEvent>
 #include <QLineEdit>
@@ -363,25 +364,41 @@ QList<QString> FileBrowserTreeWidget::expandedDirs( QTreeWidgetItem * item ) con
 
 void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent * e )
 {
-	FileItem * f = dynamic_cast<FileItem *>( itemAt( e->pos() ) );
-	if( f != NULL && ( f->handling() == FileItem::LoadAsPreset ||
-				 f->handling() == FileItem::LoadByPlugin ) )
+	FileItem * f = dynamic_cast<FileItem *>(itemAt(e->pos()));
+	if (f == nullptr)
 	{
+		return;
+	}
+
+	if (f->handling() == FileItem::LoadAsPreset || f->handling() == FileItem::LoadByPlugin)
+	{
+		// Set the member to the current FileItem so that it is available during the
+		// execution of the slots of the context menu we are about to create and execute.
 		m_contextMenuItem = f;
-		QMenu contextMenu( this );
-		contextMenu.addAction( tr( "Send to active instrument-track" ),
-						this,
-					SLOT( sendToActiveInstrumentTrack() ) );
-		contextMenu.addAction( tr( "Open in new instrument-track/"
-								"Song Editor" ),
-						this,
-					SLOT( openInNewInstrumentTrackSE() ) );
-		contextMenu.addAction( tr( "Open in new instrument-track/"
-								"B+B Editor" ),
-						this,
-					SLOT( openInNewInstrumentTrackBBE() ) );
-		contextMenu.exec( e->globalPos() );
-		m_contextMenuItem = NULL;
+
+		QMenu contextMenu(this);
+
+		contextMenu.addAction(tr("Send to active instrument-track"),
+					this,
+					SLOT(sendToActiveInstrumentTrack()));
+		contextMenu.addAction(tr("Open in new instrument-track/Song Editor"),
+					this,
+					SLOT(openInNewInstrumentTrackSE()));
+		contextMenu.addAction(tr("Open in new instrument-track/B+B Editor"),
+					this,
+					SLOT(openInNewInstrumentTrackBBE()));
+
+		contextMenu.addSeparator();
+
+		contextMenu.addAction(QIcon(embed::getIconPixmap("folder")),
+					tr("Open containing folder"),
+					this,
+					SLOT(openContainingFolder()));
+
+		contextMenu.exec(e->globalPos());
+
+		// The context menu has been executed so we can reset this member back to nullptr.
+		m_contextMenuItem = nullptr;
 	}
 }
 
@@ -669,6 +686,22 @@ void FileBrowserTreeWidget::openInNewInstrumentTrackSE( void )
 	openInNewInstrumentTrack( Engine::getSong() );
 }
 
+
+
+void FileBrowserTreeWidget::openContainingFolder()
+{
+	if (m_contextMenuItem)
+	{
+		// Delegate to QDesktopServices::openUrl with the directory of the selected file. Please note that
+		// this will only open the directory but not select the file as this is much more complicated due
+		// to different implementations that are needed for different platforms (Linux/Windows/MacOS).
+
+		// Using QDesktopServices::openUrl seems to be the most simple cross platform way which uses
+		// functionality that's already available in Qt.
+		QFileInfo fileInfo(m_contextMenuItem->fullName());
+		QDesktopServices::openUrl(QUrl::fromLocalFile(fileInfo.dir().path()));
+	}
+}
 
 
 
