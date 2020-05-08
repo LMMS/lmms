@@ -27,14 +27,11 @@
 
 #include <QLabel>
 #include <QLayout>
-#include <QLineEdit>
-#include <QPushButton>
-#include <QTextEdit>
 
 #include "ComboBox.h"
 #include "GroupBox.h"
 #include "InstrumentTrack.h"
-#include "Knob.h"
+#include "LedCheckbox.h"
 
 
 InstrumentMiscView::InstrumentMiscView(InstrumentTrack *it, QWidget *parent) :
@@ -54,87 +51,36 @@ InstrumentMiscView::InstrumentMiscView(InstrumentTrack *it, QWidget *parent) :
 	QLabel *tlabel = new QLabel(tr("Enables the use of master pitch"));
 	masterPitchLayout->addWidget(tlabel);
 
-
 	// Microtuner settings
-	int scaleEditWidth = 75;
-	int mappingEditWidth = 75;
-	int editHeight = 100;
-	int buttonSize = 19;
+	int comboHeight = 22;	// using the same constant as zoom combo in SongEditor
 	m_microtunerGroupBox = new GroupBox(tr("MICROTUNER"));
 	m_microtunerGroupBox->setModel(it->m_microtuner.enabledModel());
 	layout->addWidget(m_microtunerGroupBox);
 
-	// organize into 2 main columns
-	QHBoxLayout *microtunerLayout = new QHBoxLayout(m_microtunerGroupBox);
-	microtunerLayout->setContentsMargins(6, 18, 6, 8);
+	QVBoxLayout *microtunerLayout = new QVBoxLayout(m_microtunerGroupBox);
+	microtunerLayout->setContentsMargins(8, 18, 8, 8);
 
-	// 1) general controls
-	QVBoxLayout *generalLayout = new QVBoxLayout(m_microtunerGroupBox);
-	microtunerLayout->addLayout(generalLayout);
+	QLabel *scaleLabel = new QLabel(tr("Active scale:"));
+	microtunerLayout->addWidget(scaleLabel);
 
-	Knob *baseFreqKnob = new Knob(knobBright_26);
-//	baseFreqKnob->setModel(it->m_microtuner.baseFreqModel());
-	baseFreqKnob->setLabel(tr("BASE FREQ"));
-	baseFreqKnob->setHintText(tr("Base note frequency:"), " " + tr("Hz"));
-	baseFreqKnob->setToolTip(tr("Base note frequency"));
-	generalLayout->addWidget(baseFreqKnob);
+	ComboBox *scaleCombo = new ComboBox();
+	scaleCombo->setFixedHeight(comboHeight);
+	microtunerLayout->addWidget(scaleCombo);
 
-	generalLayout->addStretch();
+	QLabel *keymapLabel = new QLabel(tr("Active keymap:"));
+	microtunerLayout->addWidget(keymapLabel);
 
-	QPushButton *applyButton = new QPushButton(tr("Apply"), m_microtunerGroupBox);
-	applyButton->setFixedWidth(50);
-	generalLayout->addWidget(applyButton);
+	ComboBox *keymapCombo = new ComboBox();
+	keymapCombo->setFixedHeight(comboHeight);
+	microtunerLayout->addWidget(keymapCombo);
 
-	// 2) edit column (scale and mapping)
-	QGridLayout *editLayout = new QGridLayout(m_microtunerGroupBox);
-	editLayout->setSpacing(2);
-	microtunerLayout->addLayout(editLayout);
+	LedCheckBox *importCheckbox = new LedCheckBox(tr("Import first and last notes from keymap"), this);
+	importCheckbox->setToolTip(tr("When enabled, the first and last note of this instrument will be overwritten with values specified by the active keymap."));
+	importCheckbox->setCheckable(true);
+	microtunerLayout->addWidget(importCheckbox);
 
-	QLineEdit *scaleNameEdit = new QLineEdit("12-TET", m_microtunerGroupBox);
-	scaleNameEdit->setToolTip(tr("Scale description"));
-	editLayout->addWidget(scaleNameEdit, 0, 0, 1, 4);
-
-	// 2.1) scale sub-column
-	// scale load / save buttons
-	QLabel *scaleLabel = new QLabel(tr("Scale:"));
-	editLayout->addWidget(scaleLabel, 1, 0, 1, 2, Qt::AlignBottom);
-	QPushButton *scaleLoadButton = new QPushButton(tr("Load"), m_microtunerGroupBox);
-	QPushButton *scaleSaveButton = new QPushButton(tr("Save"), m_microtunerGroupBox);
-	scaleLoadButton->setFixedSize(scaleEditWidth / 2 - 1, buttonSize);
-	scaleSaveButton->setFixedSize(scaleEditWidth / 2 - 1, buttonSize);
-	editLayout->addWidget(scaleLoadButton, 2, 0, 1, 1);
-	editLayout->addWidget(scaleSaveButton, 2, 1, 1, 1);
-
-	QTextEdit *scaleTextEdit = new QTextEdit(m_microtunerGroupBox);
-	scaleTextEdit->setFixedSize(scaleEditWidth, editHeight);
-	scaleTextEdit->setAcceptRichText(false);
-	scaleTextEdit->setPlainText("100.0\n200.0\n300.0\n400.0\n500.0\n600.0\n700.0\n800.0\n900.0\n1000.0\n1100.0\n1200.0");
-	editLayout->addWidget(scaleTextEdit, 3, 0, 1, 2, Qt::AlignLeft | Qt::AlignBottom);
-
-	// 2.2) mapping sub-column
-	QVBoxLayout *mappingLayout = new QVBoxLayout(m_microtunerGroupBox);
-	microtunerLayout->addLayout(mappingLayout);
-
-	mappingLayout->addStretch();
-
-	// mapping load / save buttons
-	QLabel *mappingLabel = new QLabel(tr("Keymap:"));
-	editLayout->addWidget(mappingLabel, 1, 2, 1, 2, Qt::AlignBottom);
-	QPushButton *mappingLoadButton = new QPushButton(tr("Load"), m_microtunerGroupBox);
-	QPushButton *mappingSaveButton = new QPushButton(tr("Save"), m_microtunerGroupBox);
-	mappingLoadButton->setFixedSize(mappingEditWidth / 2 - 1, buttonSize);
-	mappingSaveButton->setFixedSize(mappingEditWidth / 2 - 1, buttonSize);
-	editLayout->addWidget(mappingLoadButton, 2, 2, 1, 1);
-	editLayout->addWidget(mappingSaveButton, 2, 3, 1, 1);
-
-	QTextEdit *mappingTextEdit = new QTextEdit(m_microtunerGroupBox);
-	mappingTextEdit->setFixedSize(mappingEditWidth, editHeight);
-	mappingTextEdit->setAcceptRichText(false);
-	mappingTextEdit->setPlainText("1\n2\n4\n5\n6\n7\n8\n9\n10\n11");
-	editLayout->addWidget(mappingTextEdit, 3, 2, 1, 2, Qt::AlignRight | Qt::AlignBottom);
-
-	// fill remaining space
-//	layout->addStretch();
+	// Fill remaining space
+	layout->addStretch();
 }
 
 InstrumentMiscView::~InstrumentMiscView()

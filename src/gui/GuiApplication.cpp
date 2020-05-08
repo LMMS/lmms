@@ -35,6 +35,7 @@
 #include "ControllerRackView.h"
 #include "FxMixerView.h"
 #include "MainWindow.h"
+#include "MicrotunerConfig.h"
 #include "PianoRoll.h"
 #include "ProjectNotes.h"
 #include "SongEditor.h"
@@ -139,6 +140,10 @@ GuiApplication::GuiApplication()
 	m_projectNotes = new ProjectNotes;
 	connect(m_projectNotes, SIGNAL(destroyed(QObject*)), this, SLOT(childDestroyed(QObject*)));
 
+	displayInitProgress(tr("Preparing microtuner"));
+	m_microtunerConfig = new MicrotunerConfig;
+	connect(m_microtunerConfig, SIGNAL(destroyed(QObject*)), this, SLOT(childDestroyed(QObject*)));
+
 	displayInitProgress(tr("Preparing beat/bassline editor"));
 	m_bbEditor = new BBEditor(Engine::getBBTrackContainer());
 	connect(m_bbEditor, SIGNAL(destroyed(QObject*)), this, SLOT(childDestroyed(QObject*)));
@@ -205,6 +210,10 @@ void GuiApplication::childDestroyed(QObject *obj)
 	else if (obj == m_projectNotes)
 	{
 		m_projectNotes = nullptr;
+	}
+	else if (obj == m_microtunerConfig)
+	{
+		m_microtunerConfig = nullptr;
 	}
 	else if (obj == m_controllerRackView)
 	{

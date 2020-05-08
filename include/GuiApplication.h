@@ -36,6 +36,7 @@ class BBEditor;
 class ControllerRackView;
 class FxMixerView;
 class MainWindow;
+class MicrotunerConfig;
 class PianoRollWindow;
 class ProjectNotes;
 class SongEditorWindow;
@@ -55,6 +56,7 @@ public:
 	BBEditor* getBBEditor() { return m_bbEditor; }
 	PianoRollWindow* pianoRoll() { return m_pianoRoll; }
 	ProjectNotes* getProjectNotes() { return m_projectNotes; }
+	MicrotunerConfig* getMicrotunerConfig() { return m_microtunerConfig; }
 	AutomationEditorWindow* automationEditor() { return m_automationEditor; }
 	ControllerRackView* getControllerRackView() { return m_controllerRackView; }
 
@@ -74,6 +76,7 @@ private:
 	BBEditor* m_bbEditor;
 	PianoRollWindow* m_pianoRoll;
 	ProjectNotes* m_projectNotes;
+	MicrotunerConfig* m_microtunerConfig;
 	ControllerRackView* m_controllerRackView;
 	QLabel* m_loadingProgressLabel;
 };

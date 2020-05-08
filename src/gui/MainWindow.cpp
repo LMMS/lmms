@@ -50,6 +50,7 @@
 #include "FxMixerView.h"
 #include "GuiApplication.h"
 #include "ImportFilter.h"
+#include "MicrotunerConfig.h"
 #include "PianoRoll.h"
 #include "PluginBrowser.h"
 #include "PluginFactory.h"
@@ -534,6 +535,14 @@ void MainWindow::finalize()
 								m_toolBar );
 	project_notes_window->setShortcut( Qt::Key_F11 );
 
+	ToolButton * microtuner_window = new ToolButton(
+					embed::getIconPixmap( "microtuner" ),
+					tr( "Microtuner configuration" ) +
+								" (F12)",
+					this, SLOT( toggleMicrotunerWin() ),
+								m_toolBar );
+	microtuner_window->setShortcut( Qt::Key_F12 );
+
 	m_toolBarLayout->addWidget( song_editor_window, 1, 1 );
 	m_toolBarLayout->addWidget( bb_editor_window, 1, 2 );
 	m_toolBarLayout->addWidget( piano_roll_window, 1, 3 );
@@ -541,6 +550,7 @@ void MainWindow::finalize()
 	m_toolBarLayout->addWidget( fx_mixer_window, 1, 5 );
 	m_toolBarLayout->addWidget( controllers_window, 1, 6 );
 	m_toolBarLayout->addWidget( project_notes_window, 1, 7 );
+	m_toolBarLayout->addWidget( microtuner_window, 1, 8 );
 	m_toolBarLayout->setColumnStretch( 100, 1 );
 
 	// setup-dialog opened before?
@@ -1086,6 +1096,13 @@ void MainWindow::toggleFxMixerWin()
 }
 
 
+
+void MainWindow::toggleMicrotunerWin()
+{
+	toggleWindow( gui->getMicrotunerConfig() );
+}
+
+
 void MainWindow::updateViewMenu()
 {
 	m_viewMenu->clear();
@@ -1120,6 +1137,10 @@ void MainWindow::updateViewMenu()
 	m_viewMenu->addAction(embed::getIconPixmap( "project_notes" ),
 			      tr( "Project Notes" ) + " (F11)",
 			      this, SLOT( toggleProjectNotesWin() )
+		);
+	m_viewMenu->addAction(embed::getIconPixmap( "microtuner" ),
+			      tr( "Microtuner" ) + " (F12)",
+			      this, SLOT( toggleMicrotunerWin() )
 		);
 
 	m_viewMenu->addSeparator();
