@@ -1,5 +1,5 @@
 /*
- * VisualizationWidget.h - widget for visualization of sound-data
+ * Oscilloscope.h
  *
  * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
@@ -23,8 +23,8 @@
  */
 
 
-#ifndef _VISUALIZATION_WIDGET
-#define _VISUALIZATION_WIDGET
+#ifndef _OSCILLOSCOPE
+#define _OSCILLOSCOPE
 
 #include <QWidget>
 #include <QPixmap>
@@ -32,7 +32,7 @@
 #include "lmms_basics.h"
 
 
-class VisualizationWidget : public QWidget
+class Oscilloscope : public QWidget
 {
 	Q_OBJECT
 public:
@@ -44,9 +44,9 @@ public:
 		Simple		// add more here
 	} ;
 
-	VisualizationWidget( const QPixmap & _bg, QWidget * _parent,
+	Oscilloscope( const QPixmap & _bg, QWidget * _parent,
 					visualizationTypes _vtype = Simple );
-	virtual ~VisualizationWidget();
+	virtual ~Oscilloscope();
 
 	void setActive( bool _active );
 
