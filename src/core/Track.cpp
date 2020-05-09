@@ -257,6 +257,8 @@ TrackContentObjectView::TrackContentObjectView( TrackContentObject * tco,
 	m_textShadowColor( 0, 0, 0 ),
 	m_BBPatternBackground( 0, 0, 0 ),
 	m_gradient( true ),
+	m_mouseHotspotX(0),
+	m_mouseHotspotY(0),
 	m_needsUpdate( true )
 {
 	if( s_textFloat == NULL )
@@ -268,7 +270,7 @@ TrackContentObjectView::TrackContentObjectView( TrackContentObject * tco,
 	setAttribute( Qt::WA_OpaquePaintEvent, true );
 	setAttribute( Qt::WA_DeleteOnClose, true );
 	setFocusPolicy( Qt::StrongFocus );
-	setCursor( QCursor( embed::getIconPixmap( "hand" ), 3, 3 ) );
+	setCursor( QCursor( embed::getIconPixmap( "hand" ), m_mouseHotspotX, m_mouseHotspotY ) );
 	move( 0, 0 );
 	show();
 
@@ -317,6 +319,12 @@ TrackContentObjectView::~TrackContentObjectView()
  */
 void TrackContentObjectView::update()
 {
+	if( !m_cursorSetYet )
+	{
+		setCursor( QCursor( embed::getIconPixmap( "hand" ), m_mouseHotspotX, m_mouseHotspotY ) );
+		m_cursorSetYet = true;
+	}
+
 	if( fixedTCOs() )
 	{
 		updateLength();
@@ -572,7 +580,7 @@ void TrackContentObjectView::leaveEvent( QEvent * e )
 {
 	if( cursor().shape() != Qt::BitmapCursor )
 	{
-		setCursor( QCursor( embed::getIconPixmap( "hand" ), 3, 3 ) );
+		setCursor( QCursor( embed::getIconPixmap( "hand" ), m_mouseHotspotX, m_mouseHotspotY ) );
 	}
 	if( e != NULL )
 	{

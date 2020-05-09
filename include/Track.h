@@ -201,6 +201,8 @@ class TrackContentObjectView : public selectableObject, public ModelView
 	Q_PROPERTY( QColor textShadowColor READ textShadowColor WRITE setTextShadowColor )
 	Q_PROPERTY( QColor BBPatternBackground READ BBPatternBackground WRITE setBBPatternBackground )
 	Q_PROPERTY( bool gradient READ gradient WRITE setGradient )
+	Q_PROPERTY( int mouseHotspotX READ getMouseHotspotX WRITE setMouseHotspotX )
+	Q_PROPERTY( int mouseHotspotY READ getMouseHotspotY WRITE setMouseHotspotY )
 
 public:
 	TrackContentObjectView( TrackContentObject * tco, TrackView * tv );
@@ -226,6 +228,8 @@ public:
 	QColor textShadowColor() const;
 	QColor BBPatternBackground() const;
 	bool gradient() const;
+	int getMouseHotspotX() const { return m_mouseHotspotX; }
+	int getMouseHotspotY() const { return m_mouseHotspotY; }
 	void setMutedColor( const QColor & c );
 	void setMutedBackgroundColor( const QColor & c );
 	void setSelectedColor( const QColor & c );
@@ -233,6 +237,9 @@ public:
 	void setTextShadowColor( const QColor & c );
 	void setBBPatternBackground( const QColor & c );
 	void setGradient( const bool & b );
+	void setMouseHotspotX(int x) { m_mouseHotspotX = x; }
+	void setMouseHotspotY(int y) { m_mouseHotspotY = y; }
+
 
 	// access needsUpdate member variable
 	bool needsUpdate();
@@ -302,8 +309,11 @@ private:
 	QColor m_textShadowColor;
 	QColor m_BBPatternBackground;
 	bool m_gradient;
+	int m_mouseHotspotX;
+	int m_mouseHotspotY;
+	bool m_cursorSetYet = false;
 
- 	bool m_needsUpdate;
+	bool m_needsUpdate;
 	inline void setInitialMousePos( QPoint pos )
 	{
 		m_initialMousePos = pos;
