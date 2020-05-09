@@ -1,5 +1,5 @@
 /*
- * VisualizationWidget.h - widget for visualization of sound-data
+ * Oscilloscope.h
  *
  * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
@@ -23,8 +23,8 @@
  */
 
 
-#ifndef _VISUALIZATION_WIDGET
-#define _VISUALIZATION_WIDGET
+#ifndef _OSCILLOSCOPE
+#define _OSCILLOSCOPE
 
 #include <QWidget>
 #include <QPixmap>
@@ -32,21 +32,16 @@
 #include "lmms_basics.h"
 
 
-class VisualizationWidget : public QWidget
+class Oscilloscope : public QWidget
 {
 	Q_OBJECT
 public:
 	Q_PROPERTY( QColor normalColor READ normalColor WRITE setNormalColor )
 	Q_PROPERTY( QColor warningColor READ warningColor WRITE setWarningColor )
 	Q_PROPERTY( QColor clippingColor READ clippingColor WRITE setClippingColor )
-	enum visualizationTypes
-	{
-		Simple		// add more here
-	} ;
 
-	VisualizationWidget( const QPixmap & _bg, QWidget * _parent,
-					visualizationTypes _vtype = Simple );
-	virtual ~VisualizationWidget();
+	Oscilloscope( QWidget * _parent );
+	virtual ~Oscilloscope();
 
 	void setActive( bool _active );
 
@@ -72,7 +67,7 @@ private:
 	QColor const & determineLineColor(float level) const;
 
 private:
-	QPixmap s_background;
+	QPixmap m_background;
 	QPointF * m_points;
 
 	sampleFrame * m_buffer;
