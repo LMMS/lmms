@@ -39,13 +39,8 @@ public:
 	Q_PROPERTY( QColor normalColor READ normalColor WRITE setNormalColor )
 	Q_PROPERTY( QColor warningColor READ warningColor WRITE setWarningColor )
 	Q_PROPERTY( QColor clippingColor READ clippingColor WRITE setClippingColor )
-	enum visualizationTypes
-	{
-		Simple		// add more here
-	} ;
 
-	Oscilloscope( const QPixmap & _bg, QWidget * _parent,
-					visualizationTypes _vtype = Simple );
+	Oscilloscope( const QPixmap & _bg, QWidget * _parent );
 	virtual ~Oscilloscope();
 
 	void setActive( bool _active );

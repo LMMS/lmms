@@ -38,8 +38,7 @@
 #include "BufferManager.h"
 
 
-Oscilloscope::Oscilloscope( const QPixmap & _bg, QWidget * _p,
-						visualizationTypes _vtype ) :
+Oscilloscope::Oscilloscope( const QPixmap & _bg, QWidget * _p ) :
 	QWidget( _p ),
 	s_background( _bg ),
 	m_points( new QPointF[Engine::mixer()->framesPerPeriod()] ),
