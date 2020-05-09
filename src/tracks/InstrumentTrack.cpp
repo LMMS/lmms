@@ -875,7 +875,7 @@ void InstrumentTrack::setPreviewMode( const bool value )
 
 QString InstrumentTrack::getSavedInstrumentName(const QDomElement &thisElement) const
 {
-	QDomNode elem = thisElement.firstChildElement("instrument");
+	QDomElement elem = thisElement.firstChildElement("instrument");
 	if (!elem.isNull())
 	{
 		return elem.attribute("name");
