@@ -198,9 +198,15 @@ void vestigeInstrument::loadSettings( const QDomElement & _this )
 	{
 		m_plugin->loadSettings( _this );
 
-		if ( _this.attribute( "guivisible" ).toInt() ) {
+		if (instrumentTrack() != NULL && instrumentTrack()->isPreviewMode())
+		{
+			m_plugin->hideUI();
+		}
+		else if (_this.attribute( "guivisible" ).toInt())
+		{
 			m_plugin->showUI();
-		} else {
+		} else
+		{
 			m_plugin->hideUI();
 		}
 
@@ -322,11 +328,16 @@ void vestigeInstrument::loadFile( const QString & _file )
 {
 	m_pluginMutex.lock();
 	const bool set_ch_name = ( m_plugin != NULL &&
-        	instrumentTrack()->name() == m_plugin->name() ) ||
-            	instrumentTrack()->name() == InstrumentTrack::tr( "Default preset" ) ||
-            	instrumentTrack()->name() == displayName();
+			instrumentTrack()->name() == m_plugin->name() ) ||
+			instrumentTrack()->name() == InstrumentTrack::tr( "Default preset" ) ||
+			instrumentTrack()->name() == displayName();
 
 	m_pluginMutex.unlock();
+
+	// if the same is loaded don't load again (for preview)
+	if (instrumentTrack() != NULL && instrumentTrack()->isPreviewMode() &&
+			m_pluginDLL == SampleBuffer::tryToMakeRelative( _file ))
+		return;
 
 	if ( m_plugin != NULL )
 	{
@@ -354,8 +365,11 @@ void vestigeInstrument::loadFile( const QString & _file )
 		return;
 	}
 
-	m_plugin->createUI(nullptr);
-	m_plugin->showUI();
+	if ( !(instrumentTrack() != NULL && instrumentTrack()->isPreviewMode()))
+	{
+		m_plugin->createUI(nullptr);
+		m_plugin->showUI();
+	}
 
 	if( set_ch_name )
 	{
