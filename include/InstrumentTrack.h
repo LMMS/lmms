@@ -234,7 +234,8 @@ protected:
 		return "instrumenttrack";
 	}
 
-	QString getInstrumentName(const QDomElement & thisElement) const;
+	// get the name of the instrument in the saved data
+	QString getSavedInstrumentName(const QDomElement & thisElement) const;
 
 
 protected slots:

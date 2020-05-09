@@ -771,7 +771,11 @@ void InstrumentTrack::saveTrackSpecificSettings( QDomDocument& doc, QDomElement 
 
 void InstrumentTrack::loadTrackSpecificSettings( const QDomElement & thisElement )
 {
-	silenceAllNotes(!(m_previewMode && m_instrument && m_instrument->nodeName() == getInstrumentName(thisElement)));
+	// don't delete instrument in preview mode if it's the same
+	// we can't do this for other situations due to some issues with linked models
+	bool reuseInstrument = m_previewMode && m_instrument && m_instrument->nodeName() == getSavedInstrumentName(thisElement);
+	// remove the InstrumentPlayHandle if and only if we need to delete the instrument
+	silenceAllNotes(!reuseInstrument);
 
 	lock();
 
@@ -820,8 +824,7 @@ void InstrumentTrack::loadTrackSpecificSettings( const QDomElement & thisElement
 				typedef Plugin::Descriptor::SubPluginFeatures::Key PluginKey;
 				PluginKey key(node.toElement().elementsByTagName("key").item(0).toElement());
 
-				// don't delete instrument in preview mode if it's the same
-				if (m_previewMode && m_instrument && m_instrument->nodeName() == node.toElement().attribute("name"))
+				if (reuseInstrument)
 				{
 					m_instrument->restoreState(node.firstChildElement());
 				}
@@ -870,16 +873,12 @@ void InstrumentTrack::setPreviewMode( const bool value )
 
 
 
-QString InstrumentTrack::getInstrumentName(const QDomElement &thisElement) const
+QString InstrumentTrack::getSavedInstrumentName(const QDomElement &thisElement) const
 {
-	QDomNode node = thisElement.firstChild();
-	while (!node.isNull())
+	QDomNode elem = thisElement.firstChildElement("instrument");
+	if (!elem.isNull())
 	{
-		if (node.isElement() && node.nodeName() == "instrument")
-		{
-			return node.toElement().attribute("name");
-		}
-		node = node.nextSibling();
+		return elem.attribute("name");
 	}
 	return "";
 }
