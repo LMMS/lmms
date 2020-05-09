@@ -311,7 +311,7 @@ private:
 	bool m_gradient;
 	int m_mouseHotspotX;
 	int m_mouseHotspotY;
-	bool m_cursorSetYet = false;
+	bool m_cursorSetYet;
 
 	bool m_needsUpdate;
 	inline void setInitialMousePos( QPoint pos )

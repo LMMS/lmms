@@ -257,8 +257,9 @@ TrackContentObjectView::TrackContentObjectView( TrackContentObject * tco,
 	m_textShadowColor( 0, 0, 0 ),
 	m_BBPatternBackground( 0, 0, 0 ),
 	m_gradient( true ),
-	m_mouseHotspotX(0),
-	m_mouseHotspotY(0),
+	m_mouseHotspotX( 0 ),
+	m_mouseHotspotY( 0 ),
+	m_cursorSetYet( false ),
 	m_needsUpdate( true )
 {
 	if( s_textFloat == NULL )
