@@ -34,20 +34,20 @@
 #include "Engine.h"
 #include "ToolTip.h"
 #include "Song.h"
-
+#include "embed.h"
 #include "BufferManager.h"
 
 
-Oscilloscope::Oscilloscope( const QPixmap & _bg, QWidget * _p ) :
+Oscilloscope::Oscilloscope( QWidget * _p ) :
 	QWidget( _p ),
-	s_background( _bg ),
+	m_background( embed::getIconPixmap( "output_graph" ) ),
 	m_points( new QPointF[Engine::mixer()->framesPerPeriod()] ),
 	m_active( false ),
 	m_normalColor(71, 253, 133),
 	m_warningColor(255, 192, 64),
 	m_clippingColor(255, 64, 64)
 {
-	setFixedSize( s_background.width(), s_background.height() );
+	setFixedSize( m_background.width(), m_background.height() );
 	setAttribute( Qt::WA_OpaquePaintEvent, true );
 	setActive( ConfigManager::inst()->value( "ui", "displaywaveform").toInt() );
 
@@ -146,7 +146,7 @@ void Oscilloscope::paintEvent( QPaintEvent * )
 {
 	QPainter p( this );
 
-	p.drawPixmap( 0, 0, s_background );
+	p.drawPixmap( 0, 0, m_background );
 
 	if( m_active && !Engine::getSong()->isExporting() )
 	{

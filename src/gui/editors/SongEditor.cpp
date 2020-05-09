@@ -217,8 +217,7 @@ SongEditor::SongEditor( Song * song ) :
 	vcw_layout->setSpacing( 0 );
 
 	//vcw_layout->addStretch();
-	vcw_layout->addWidget( new Oscilloscope(
-			embed::getIconPixmap( "output_graph" ), vc_w ) );
+	vcw_layout->addWidget( new Oscilloscope( vc_w ) );
 
 	vcw_layout->addWidget( new CPULoadWidget( vc_w ) );
 	vcw_layout->addStretch();

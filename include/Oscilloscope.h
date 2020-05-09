@@ -40,7 +40,7 @@ public:
 	Q_PROPERTY( QColor warningColor READ warningColor WRITE setWarningColor )
 	Q_PROPERTY( QColor clippingColor READ clippingColor WRITE setClippingColor )
 
-	Oscilloscope( const QPixmap & _bg, QWidget * _parent );
+	Oscilloscope( QWidget * _parent );
 	virtual ~Oscilloscope();
 
 	void setActive( bool _active );
@@ -67,7 +67,7 @@ private:
 	QColor const & determineLineColor(float level) const;
 
 private:
-	QPixmap s_background;
+	QPixmap m_background;
 	QPointF * m_points;
 
 	sampleFrame * m_buffer;
