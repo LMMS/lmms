@@ -191,7 +191,7 @@ GroupBox {
 
 /* main toolbar oscilloscope - can have transparent bg now */
 
-VisualizationWidget  {
+Oscilloscope {
 	background: none;
 	border: none;
 	qproperty-normalColor: rgb(71, 253, 133);
