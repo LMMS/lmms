@@ -26,6 +26,7 @@
 
 #ifdef LMMS_HAVE_LV2
 
+#include <cstdlib>
 #include <lilv/lilv.h>
 #include <lv2.h>
 #include <QDebug>
@@ -44,6 +45,9 @@
 
 Lv2Manager::Lv2Manager()
 {
+	const char* dbgStr = getenv("LMMS_LV2_DEBUG");
+	m_debug = (dbgStr && *dbgStr);
+
 	m_world = lilv_world_new();
 	lilv_world_load_all(m_world);
 }
@@ -96,7 +100,7 @@ void Lv2Manager::initPlugins()
 		const LilvPlugin* curPlug = lilv_plugins_get(plugins, itr);
 
 		std::vector<PluginIssue> issues;
-		Plugin::PluginTypes type = Lv2ControlBase::check(curPlug, issues, true);
+		Plugin::PluginTypes type = Lv2ControlBase::check(curPlug, issues, m_debug);
 		Lv2Info info(curPlug, type, issues.empty());
 
 		m_lv2InfoMap[lilv_node_as_uri(lilv_plugin_get_uri(curPlug))]
@@ -108,6 +112,22 @@ void Lv2Manager::initPlugins()
 	qDebug() << "Lv2 plugin SUMMARY:"
 		<< pluginsLoaded << "of" << pluginCount << " loaded in"
 		<< timer.elapsed() << "msecs.";
+	if(pluginsLoaded != pluginCount)
+	{
+		if (m_debug)
+		{
+			qDebug() <<
+				"If you don't want to see all this debug output, please set\n"
+				"  environment variable \"LMMS_LV2_DEBUG\" to empty or\n"
+				"  do not set it.";
+		}
+		else
+		{
+			qDebug() <<
+				"For details about not loaded plugins, please set\n"
+				"  environment variable \"LMMS_LV2_DEBUG\" to nonempty.";
+		}
+	}
 }
 
 

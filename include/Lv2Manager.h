@@ -115,6 +115,7 @@ public:
 	Iterator end() { return m_lv2InfoMap.end(); }
 
 private:
+	bool m_debug; //!< if set, debug output will be printed
 	LilvWorld* m_world;
 	Lv2InfoMap m_lv2InfoMap;
 	bool isSubclassOf(const LilvPluginClass *clvss, const char *uriStr);
