@@ -45,6 +45,9 @@ public:
 	bool enabled() const {return m_enabledModel.value();}
 	BoolModel* enabledModel() {return &m_enabledModel;}
 
+	void updateScale();
+	void updateKeymap();
+
 	float baseFreq() const {return enabled() ? m_notemap[CenterNote] : DefaultBaseFreq;}
 
 	float keyToFreq(int key, float detune = 0) const;
@@ -55,13 +58,13 @@ protected:
 	void loadSettings(const QDomElement &element) override;
 
 private:
-	InstrumentTrack *m_instrumentTrack;		// Required to access base note
+	InstrumentTrack *m_instrumentTrack;		// Required to access base note etc.
 
 	BoolModel m_enabledModel;		//!< Enable microtuner (otherwise using 12-TET @440 Hz)
 
 	// Active settings
-	std::atomic<int*> m_keymap;		//!< Mapping of MIDI keys (notes) to notes
-	std::atomic<float*> m_notemap;	//!< Mapping of notes to frequencies
+	std::atomic<int*> m_keymap;		//!< Mapping of MIDI keys to LMMS notes
+	std::atomic<float*> m_notemap;	//!< Mapping of LMMS notes to frequencies
 };
 
 #endif

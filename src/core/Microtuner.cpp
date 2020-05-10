@@ -24,8 +24,15 @@
 
 #include "Microtuner.h"
 
+#include <vector>
+#include <cmath>
+
 #include "ConfigManager.h"
+#include "Engine.h"
 #include "InstrumentTrack.h"
+#include "Keymap.h"
+#include "Scale.h"
+#include "Song.h"
 
 
 Microtuner::Microtuner(InstrumentTrack *parent) :
@@ -33,18 +40,18 @@ Microtuner::Microtuner(InstrumentTrack *parent) :
 	m_instrumentTrack(parent),
 	m_enabledModel(false, this, tr("Microtuner on / off"))
 {
-	// TEMP: default 1:1 keyboard mapping (to be acquired from microtuner storage class)
+	// default 1:1 keyboard mapping
 	m_keymap = new int[NumKeys];
 	for (int i = 0; i < NumKeys; i++)
 	{
 		m_keymap[i] = i + (NumKeys - 1);
 	}
-	// TEMP: default 12-TET scale mapping
+
+	// dummy note-frequency mapping (all notes map to base frequency)
 	m_notemap = new float[NumNotes];
 	for (int i = 0; i < NumNotes; i++)
 	{
-		int scalePos = i - (NumKeys - 1);
-		m_notemap[i] = DefaultBaseFreq * powf(2.0f, scalePos / 12.f);
+		m_notemap[i] = DefaultBaseFreq;
 	}
 }
 
@@ -55,6 +62,38 @@ Microtuner::~Microtuner()
 	delete[] m_notemap;	// TEMP: remove locally generated default notemap
 }
 
+
+// Compute a new note-frequency mapping based on active scale
+void Microtuner::updateScale()
+{
+	std::vector<Interval> intervals = Engine::getSong()->getScale(m_instrumentTrack->scaleModel()->value())
+		.getIntervals();
+	int octaveDegree = intervals.size() - 1;
+	double octaveRatio = intervals[octaveDegree].getRatio();
+	for (int i = 0; i < NumNotes; i++)
+	{
+		int scalePos = i - (NumKeys - 1);
+		int degree_rem = scalePos % octaveDegree;
+		int degree = degree_rem >= 0 ? degree_rem : degree_rem + octaveDegree;	// get true modulo
+		m_notemap[i] = DefaultBaseFreq * intervals[degree].getRatio() *
+						pow(octaveRatio, floor((float)scalePos / octaveDegree));
+	}
+}
+
+
+// TODO: alt.: misto updatovani LUTky to pocitat on the fly? Pak by sel jednoduchy pointer na Scale / Intervals
+// vyhoda LUT:		high performance when defs are stable
+// nevyhoda LUT:	needs to push mass updates (what if someone scrolls base frequency? Each step = recompute 50 instruments...)
+
+
+// Swap pointers to active keymap data structures
+void Microtuner::updateKeymap()
+{
+	// TODO
+
+	// keymap change may also affect note-frequency mapping (i.e. change in base frequency)
+	updateScale();
+}
 
 /** \brief Return frequency for a given MIDI key, using the active mapping and scale.
  *  \param key A MIDI key number ranging from 0 to 127.

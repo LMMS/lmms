@@ -1446,3 +1446,17 @@ QString Song::errorSummary()
 bool Song::isSavingProject() const {
 	return m_savingProject;
 }
+
+
+Scale & Song::getScale(unsigned int index)
+{
+	if (index < MaxScaleCount) {return m_scales[index];}
+	else {return m_scales[0];}
+}
+
+
+Keymap & Song::getKeymap(unsigned int index)
+{
+	if (index < MaxKeymapCount) {return m_keymaps[index];}
+	else {return m_keymaps[0];}
+}

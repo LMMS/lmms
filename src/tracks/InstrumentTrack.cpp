@@ -62,6 +62,7 @@
 #include "LcdSpinBox.h"
 #include "LedCheckbox.h"
 #include "LeftRightNav.h"
+#include "lmms_constants.h"
 #include "MainWindow.h"
 #include "MidiClient.h"
 #include "MidiPortMenu.h"
@@ -113,7 +114,9 @@ InstrumentTrack::InstrumentTrack( TrackContainer* tc ) :
 	m_arpeggio( this ),
 	m_noteStacking( this ),
 	m_piano( this ),
-	m_microtuner(this)
+	m_microtuner(this),
+	m_scaleModel(this, tr("Selected scale")),
+	m_keymapModel(this, tr("Selected keyboard mapping"))
 {
 	m_pitchModel.setCenterValue( 0 );
 	m_panningModel.setCenterValue( DefaultPanning );
@@ -129,6 +132,15 @@ InstrumentTrack::InstrumentTrack( TrackContainer* tc ) :
 		m_runningMidiNotes[i] = 0;
 	}
 
+	for (unsigned int i = 0; i < MaxScaleCount; i++)
+	{
+		m_scaleModel.addItem(Engine::getSong()->getScale(i).getDescription());
+	}
+
+	for (unsigned int i = 0; i < MaxKeymapCount; i++)
+	{
+		m_keymapModel.addItem(Engine::getSong()->getKeymap(i).getDescription());
+	}
 
 	setName( tr( "Default preset" ) );
 
@@ -138,6 +150,9 @@ InstrumentTrack::InstrumentTrack( TrackContainer* tc ) :
 	connect(&m_pitchModel, SIGNAL(dataChanged()), this, SLOT(updatePitch()), Qt::DirectConnection);
 	connect(&m_pitchRangeModel, SIGNAL(dataChanged()), this, SLOT(updatePitchRange()), Qt::DirectConnection);
 	connect(&m_effectChannelModel, SIGNAL(dataChanged()), this, SLOT(updateEffectChannel()), Qt::DirectConnection);
+
+	connect(&m_scaleModel, SIGNAL(dataChanged()), this, SLOT(updateScale()), Qt::DirectConnection);
+	connect(&m_keymapModel, SIGNAL(dataChanged()), this, SLOT(updateKeymap()), Qt::DirectConnection);
 }
 
 
@@ -569,6 +584,24 @@ void InstrumentTrack::updateBaseNote()
 }
 
 
+void InstrumentTrack::updateFirstNote()
+{
+/*	for( NotePlayHandleList::Iterator it = m_processHandles.begin();
+					it != m_processHandles.end(); ++it )
+	{
+		( *it )->setFrequencyUpdate();
+	}*/
+}
+
+
+void InstrumentTrack::updateLastNote()
+{
+/*	for( NotePlayHandleList::Iterator it = m_processHandles.begin();
+					it != m_processHandles.end(); ++it )
+	{
+		( *it )->setFrequencyUpdate();
+	}*/
+}
 
 
 void InstrumentTrack::updatePitch()
@@ -602,6 +635,16 @@ void InstrumentTrack::updateEffectChannel()
 }
 
 
+void InstrumentTrack::updateScale()
+{
+	m_microtuner.updateScale();
+}
+
+
+void InstrumentTrack::updateKeymap()
+{
+	m_microtuner.updateKeymap();
+}
 
 
 int InstrumentTrack::masterKey( int _midi_key ) const

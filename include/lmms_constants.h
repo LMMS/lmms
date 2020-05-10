@@ -51,6 +51,10 @@ const float F_E_R = (float) LD_E_R;
 
 const float DefaultBaseFreq = 440.f;	//!< default base note frequency
 
+const unsigned int MaxScaleCount = 10;	//!< number of scales per projects
+const unsigned int MaxKeymapCount = 10;	//!< number of keyboard mappings per project
+
+
 // Frequency ranges (in Hz).
 // Arbitrary low limit for logarithmic frequency scale; >1 Hz.
 const int LOWEST_LOG_FREQ = 5;

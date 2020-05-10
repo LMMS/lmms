@@ -197,6 +197,16 @@ public:
 		return &m_microtuner;
 	}
 
+	ComboBoxModel *scaleModel()
+	{
+		return &m_scaleModel;
+	}
+
+	ComboBoxModel *keymapModel()
+	{
+		return &m_keymapModel;
+	}
+
 	bool isArpeggioEnabled() const
 	{
 		return m_arpeggio.m_arpEnabledModel.value();
@@ -258,9 +268,13 @@ protected:
 
 protected slots:
 	void updateBaseNote();
+	void updateFirstNote();
+	void updateLastNote();
 	void updatePitch();
 	void updatePitchRange();
 	void updateEffectChannel();
+	void updateScale();
+	void updateKeymap();
 
 
 private:
@@ -303,6 +317,8 @@ private:
 	Piano m_piano;
 
 	Microtuner m_microtuner;
+	ComboBoxModel m_scaleModel;
+	ComboBoxModel m_keymapModel;
 
 
 	friend class InstrumentTrackView;

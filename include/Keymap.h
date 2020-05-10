@@ -1,8 +1,6 @@
 /*
- * InstrumentMiscView.h - widget in instrument-track-window for setting up
- *                        miscellaneous options not covered by other tabs
+ * Keymap.h - holds information about a scale and its intervals
  *
- * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * Copyright (c) 2019 Martin Pavelek <he29.HS/at/gmail.com>
  *
  * This file is part of LMMS - https://lmms.io
@@ -24,36 +22,26 @@
  *
  */
 
-#ifndef INSTRUMENT_MISC_VIEW_H
-#define INSTRUMENT_MISC_VIEW_H
+#ifndef KEYMAP_H
+#define KEYMAP_H
 
-#include <QWidget>
+#include <vector>
+#include <QObject>
+#include <QString>
 
-
-class ComboBox;
-class GroupBox;
-class InstrumentTrack;
-
-
-class InstrumentMiscView : public QWidget
+class Keymap : public QObject
 {
 	Q_OBJECT
 public:
-	InstrumentMiscView(InstrumentTrack *it, QWidget *parent);
-	~InstrumentMiscView();
+	Keymap();
+	Keymap(QString description);
 
-	GroupBox *pitchGroupBox() {return m_pitchGroupBox;}
-	GroupBox *microtunerGroupBox() {return m_microtunerGroupBox;}
-
-	ComboBox *scaleCombo() {return m_scaleCombo;}
-	ComboBox *keymapCombo() {return m_keymapCombo;}
+	QString getDescription() const;
+	void setDescription(QString description);
 
 private:
-	GroupBox *m_pitchGroupBox;
-	GroupBox *m_microtunerGroupBox;
+	QString m_description;
 
-	ComboBox *m_scaleCombo;
-	ComboBox *m_keymapCombo;
 };
 
 #endif

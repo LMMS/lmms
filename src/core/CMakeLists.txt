@@ -27,6 +27,7 @@ set(LMMS_SRCS
 	core/InstrumentPlayHandle.cpp
 	core/InstrumentSoundShaping.cpp
 	core/JournallingObject.cpp
+	core/Keymap.cpp
 	core/Ladspa2LMMS.cpp
 	core/LadspaControl.cpp
 	core/LadspaManager.cpp
@@ -64,6 +65,7 @@ set(LMMS_SRCS
 	core/SampleBuffer.cpp
 	core/SamplePlayHandle.cpp
 	core/SampleRecordHandle.cpp
+	core/Scale.cpp
 	core/SerializingObject.cpp
 	core/Song.cpp
 	core/TempoSyncKnobModel.cpp

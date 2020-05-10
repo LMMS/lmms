@@ -147,6 +147,12 @@ MicrotunerConfig::MicrotunerConfig() :
 	subWin->setWindowFlags(flags);
 }
 
+/*
+void MicrotunerConfig::applyScale()
+{
+	//TODO: validate entries, update stored scale, update instrument combo boxes and LUTs
+}
+*/
 
 void MicrotunerConfig::saveSettings(QDomDocument &document, QDomElement &element)
 {

@@ -32,8 +32,10 @@
 
 #include "TrackContainer.h"
 #include "Controller.h"
+#include "Keymap.h"
 #include "MeterModel.h"
 #include "Mixer.h"
+#include "Scale.h"
 #include "VstSyncController.h"
 
 
@@ -339,6 +341,9 @@ public:
 
 	bool isSavingProject() const;
 
+	Scale & getScale(unsigned int index);
+	Keymap & getKeymap(unsigned int index);
+
 public slots:
 	void playSong();
 	void record();
@@ -463,6 +468,9 @@ private:
 	MidiTime m_exportLoopEnd;
 	MidiTime m_exportSongEnd;
 	MidiTime m_exportEffectiveLength;
+
+	Scale m_scales[10];
+	Keymap m_keymaps[10];
 
 	friend class LmmsCore;
 	friend class SongEditor;

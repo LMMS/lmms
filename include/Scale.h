@@ -25,17 +25,27 @@
 #ifndef SCALE_H
 #define SCALE_H
 
-#include <string>
+#include <cmath>
 #include <vector>
+#include <QObject>
+#include <QString>
 
 
-struct LMMS_EXPORT Interval
+class Interval
 {
-	Interval(double ratio) : m_numerator(ratio), m_denominator(1){};
+public:
+	Interval(double cents) : m_numerator(cents), m_denominator(0) {};
 	Interval(unsigned long numerator, unsigned long denominator) :
 		m_numerator(numerator),
-		m_denominator(denominator > 0 ? denominator : 1){};
+		m_denominator(denominator > 0 ? denominator : 1) {};
 
+	float getRatio() const
+	{
+		if (m_denominator) {return m_numerator / m_denominator;}
+		else {return powf(2.f, m_numerator / 1200.f);}
+	}
+
+private:
 	// Scala specifies that numerators and denominators should go at least up to 2147483647;
 	// that is 10 significant digits (→ needs double) and 32 bits signed (→ needs long).
 	double m_numerator;				//!< numerator of the interval fraction
@@ -43,17 +53,22 @@ struct LMMS_EXPORT Interval
 };
 
 
-class LMMS_EXPORT Scale
+class Scale : public QObject
 {
+	Q_OBJECT
 public:
-	Scale(std::string description, std::vector<Interval> intervals);
+	Scale();
+	Scale(QString description, std::vector<Interval> intervals);
 
-	QString getDescription();
+	QString getDescription() const;
 	void setDescription(QString description);
 
+	std::vector<Interval> & getIntervals() {return m_intervals;}
+
 private:
+	QString m_description;
+	std::vector<Interval> m_intervals;
 
-
-}
+};
 
 #endif
