@@ -511,7 +511,7 @@ float Knob::getValue( const QPoint & _p )
 
 	// knob value increase is linear to mouse movement
 	// for larger screens, change the knob slower
-	value = .09f * (_p.y()*(1080/s_desktopSize.y()));
+	value = .09f * (((float)_p.y())*(1080.f/(float)s_desktopSize.y()));
 
 	// if shift pressed we want slower movement
 	if( gui->mainWindow()->isShiftPressed() )
