@@ -37,7 +37,6 @@ class Oscilloscope : public QWidget
 	Q_OBJECT
 public:
 	Q_PROPERTY( QColor normalColor READ normalColor WRITE setNormalColor )
-	Q_PROPERTY( QColor warningColor READ warningColor WRITE setWarningColor )
 	Q_PROPERTY( QColor clippingColor READ clippingColor WRITE setClippingColor )
 
 	Oscilloscope( QWidget * _parent );
@@ -47,9 +46,6 @@ public:
 
 	QColor const & normalColor() const;
 	void setNormalColor(QColor const & normalColor);
-
-	QColor const & warningColor() const;
-	void setWarningColor(QColor const & warningColor);
 
 	QColor const & clippingColor() const;
 	void setClippingColor(QColor const & clippingColor);
@@ -74,7 +70,6 @@ private:
 	bool m_active;
 
 	QColor m_normalColor;
-	QColor m_warningColor;
 	QColor m_clippingColor;
 } ;
 
