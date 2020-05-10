@@ -216,7 +216,7 @@ SongEditor::SongEditor( Song * song ) :
 	vcw_layout->setMargin( 0 );
 	vcw_layout->setSpacing( 0 );
 
-	//vcw_layout->addStretch();
+	vcw_layout->addStretch();
 	vcw_layout->addWidget( new Oscilloscope( vc_w ) );
 
 	vcw_layout->addWidget( new CPULoadWidget( vc_w ) );
