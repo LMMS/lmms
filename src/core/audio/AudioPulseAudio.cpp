@@ -26,6 +26,7 @@
 #include <QLabel>
 
 #include "AudioPulseAudio.h"
+#include "Logging.h"
 
 #ifdef LMMS_HAVE_PULSEAUDIO
 
@@ -134,12 +135,12 @@ static void stream_state_callback( pa_stream *s, void * userdata )
 			break;
 
 		case PA_STREAM_READY:
-			qDebug( "Stream successfully created\n" );
+			Log_Inf( "Stream successfully created" );
 			break;
 
 		case PA_STREAM_FAILED:
 		default:
-			qCritical( "Stream error: %s\n",
+			Log_Err( "Stream error: %s\n",
 					pa_strerror(pa_context_errno(
 						pa_stream_get_context( s ) ) ) );
 	}
@@ -160,7 +161,7 @@ static void context_state_callback(pa_context *c, void *userdata)
 
 		case PA_CONTEXT_READY:
 		{
-			qDebug( "Connection established.\n" );
+			Log_Inf("Connection established");
 			_this->m_s = pa_stream_new( c, "lmms", &_this->m_sampleSpec,  NULL);
 			pa_stream_set_state_callback( _this->m_s, stream_state_callback, _this );
 			pa_stream_set_write_callback( _this->m_s, stream_write_callback, _this );
@@ -195,7 +196,8 @@ static void context_state_callback(pa_context *c, void *userdata)
 
 		case PA_CONTEXT_FAILED:
 		default:
-			qCritical( "Connection failure: %s\n", pa_strerror( pa_context_errno( c ) ) );
+			Log_Err( "Connection failure: %s",
+				 pa_strerror( pa_context_errno( c ) ) );
 			_this->signalConnected( false );
 	}
 }

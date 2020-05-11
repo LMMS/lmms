@@ -39,6 +39,9 @@
 #include <QPushButton>
 #include <QTextStream>
 
+#include "Logging.h"
+#include "ConsoleLogSink.h"
+
 #ifdef LMMS_BUILD_WIN32
 #include <windows.h>
 #endif
@@ -693,6 +696,12 @@ int main( int argc, char * * argv )
 		fileCheck( fileToImport );
 	}
 
+	LogManager::inst().addSink(new ConsoleLogSink(
+					LogVerbosity::Debug_Lo,
+					LogManager::inst()));
+
+	Log_Inf("Logging activated");
+
 	ConfigManager::inst()->loadConfigFile(configFile);
 
 	// Hidden settings
@@ -729,7 +738,7 @@ int main( int argc, char * * argv )
 				sched_get_priority_min( SCHED_FIFO ) ) / 2;
 	if( sched_setscheduler( 0, SCHED_FIFO, &sparam ) == -1 )
 	{
-		printf( "Notice: could not set realtime priority.\n" );
+		Log_Wrn("Could not set realtime priority.");
 	}
 #endif
 #endif
@@ -738,7 +747,7 @@ int main( int argc, char * * argv )
 #ifdef LMMS_BUILD_WIN32
 	if( !SetPriorityClass( GetCurrentProcess(), HIGH_PRIORITY_CLASS ) )
 	{
-		printf( "Notice: could not set high priority.\n" );
+		Log_Wrn("Could not set realtime priority.");
 	}
 #endif
 
@@ -765,14 +774,15 @@ int main( int argc, char * * argv )
 		Engine::init( true );
 		destroyEngine = true;
 
-		printf( "Loading project...\n" );
+		Log_Inf("Loading project...");
 		Engine::getSong()->loadProject( fileToLoad );
 		if( Engine::getSong()->isEmpty() )
 		{
-			printf("The project %s is empty, aborting!\n", fileToLoad.toUtf8().constData() );
+			Log_Wrn("The project %s is empty, aborting!",
+				fileToLoad.toUtf8().constData() );
 			exit( EXIT_FAILURE );
 		}
-		printf( "Done\n" );
+		Log_Inf("Done");
 
 		Engine::getSong()->setExportLoop( renderLoop );
 

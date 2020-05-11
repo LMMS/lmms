@@ -9,6 +9,7 @@ set(LMMS_SRCS
 	core/BufferManager.cpp
 	core/Clipboard.cpp
 	core/ComboBoxModel.cpp
+	core/ConsoleLogSink.cpp
 	core/ConfigManager.cpp
 	core/Controller.cpp
 	core/ControllerConnection.cpp
@@ -33,6 +34,7 @@ set(LMMS_SRCS
 	core/LfoController.cpp
 	core/LinkedModelGroups.cpp
 	core/LocklessAllocator.cpp
+	core/Logging.cpp
 	core/MemoryHelper.cpp
 	core/MemoryManager.cpp
 	core/MeterModel.cpp
