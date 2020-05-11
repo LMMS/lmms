@@ -2811,7 +2811,7 @@ void PianoRoll::dragNotes( int x, int y, bool alt, bool shift, bool ctrl )
 				if (note->selected())
 				{
 					int newLength = note->oldLength() + off_ticks;
-					newLength = qMax(alt ? 1 : quantization(), newLength);
+					if (newLength <= 0) { newLength = alt ? 1 : quantization(); }
 					note->setLength(MidiTime(newLength));
 
 					m_lenOfNewNotes = note->length();
