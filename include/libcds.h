@@ -17,5 +17,7 @@ namespace _cdslib
 	void thread_deinit();
 
 	static NiftyCounter<init, deinit> _counter;
-	static NiftyCounterTL<thread_init, thread_deinit> _thread_counter;
+	static thread_local NiftyCounterTL<_cdslib::thread_init, _cdslib::thread_deinit> _thread_counter;
 }
+
+#define CDS_THREAD_GUARD() (void)_cdslib::_thread_counter;

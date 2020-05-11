@@ -28,6 +28,8 @@ public:
 		, m_numElms(nmemb)
 		, m_freelist(nmemb)
 	{
+		CDS_THREAD_GUARD();
+
 		m_buffer = new char[m_elementSize * m_numElms];
 		for (size_t i = 0; i < m_numElms; i++) {
 			m_freelist.push(m_buffer + (i * m_elementSize));
