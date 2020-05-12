@@ -3216,7 +3216,7 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 	currentKeyCol.setAlpha( 64 );
 
 	// horizontal line for the key under the cursor
-	if( hasValidPattern() )
+	if(hasValidPattern() && gui->pianoRoll()->hasFocus())
 	{
 		int key_num = getKey( mapFromGlobal( QCursor::pos() ).y() );
 		p.fillRect( 10, keyAreaBottom() + 3 - m_keyLineHeight *
@@ -3228,32 +3228,35 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 	p.fillRect( QRect( 0, keyAreaBottom(),
 					width()-PR_RIGHT_MARGIN, NOTE_EDIT_RESIZE_BAR ), editAreaCol );
 
-	const QPixmap * cursor = NULL;
-	// draw current edit-mode-icon below the cursor
-	switch( m_editMode )
+	if (gui->pianoRoll()->hasFocus())
 	{
-		case ModeDraw:
-			if( m_mouseDownRight )
-			{
-				cursor = s_toolErase;
-			}
-			else if( m_action == ActionMoveNote )
-			{
-				cursor = s_toolMove;
-			}
-			else
-			{
-				cursor = s_toolDraw;
-			}
-			break;
-		case ModeErase: cursor = s_toolErase; break;
-		case ModeSelect: cursor = s_toolSelect; break;
-		case ModeEditDetuning: cursor = s_toolOpen; break;
-	}
-	QPoint mousePosition = mapFromGlobal( QCursor::pos() );
-	if( cursor != NULL && mousePosition.y() > keyAreaTop() && mousePosition.x() > noteEditLeft())
-	{
-		p.drawPixmap( mousePosition + QPoint( 8, 8 ), *cursor );
+		const QPixmap * cursor = NULL;
+		// draw current edit-mode-icon below the cursor
+		switch( m_editMode )
+		{
+			case ModeDraw:
+				if( m_mouseDownRight )
+				{
+					cursor = s_toolErase;
+				}
+				else if( m_action == ActionMoveNote )
+				{
+					cursor = s_toolMove;
+				}
+				else
+				{
+					cursor = s_toolDraw;
+				}
+				break;
+			case ModeErase: cursor = s_toolErase; break;
+			case ModeSelect: cursor = s_toolSelect; break;
+			case ModeEditDetuning: cursor = s_toolOpen; break;
+		}
+		QPoint mousePosition = mapFromGlobal( QCursor::pos() );
+		if( cursor != NULL && mousePosition.y() > keyAreaTop() && mousePosition.x() > noteEditLeft())
+		{
+			p.drawPixmap( mousePosition + QPoint( 8, 8 ), *cursor );
+		}
 	}
 }
 
@@ -4591,6 +4594,13 @@ void PianoRollWindow::loadSettings( const QDomElement & de )
 QSize PianoRollWindow::sizeHint() const
 {
 	return { INITIAL_PIANOROLL_WIDTH, INITIAL_PIANOROLL_HEIGHT };
+}
+
+
+
+bool PianoRollWindow::hasFocus() const
+{
+	return m_editor->hasFocus();
 }
 
 

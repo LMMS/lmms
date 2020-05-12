@@ -490,6 +490,7 @@ public:
 	}
 
 	QSize sizeHint() const override;
+	bool hasFocus() const;
 
 signals:
 	void currentPatternChanged();
