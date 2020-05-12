@@ -1,5 +1,3 @@
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c11 -Wno-unused-variable")
-
 add_library(rpmalloc STATIC
 	rpmalloc/rpmalloc/rpmalloc.c
 	rpmalloc/rpmalloc/rpmalloc.h
@@ -8,6 +6,14 @@ add_library(rpmalloc STATIC
 target_include_directories(rpmalloc PUBLIC
 	${CMAKE_CURRENT_SOURCE_DIR}/rpmalloc/rpmalloc
 )
+
+set_property(TARGET rpmalloc PROPERTY C_STANDARD 11)
+
+IF(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+	target_compile_options(rpmalloc
+		PRIVATE -Wno-unused-variable
+	)
+endif()
 
 if (NOT LMMS_BUILD_WIN32)
 	target_compile_definitions(rpmalloc
