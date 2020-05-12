@@ -40,6 +40,7 @@
 #include <QTextStream>
 
 #include "Logging.h"
+#include "LoggingThread.h"
 #include "ConsoleLogSink.h"
 
 #ifdef LMMS_BUILD_WIN32
@@ -138,6 +139,40 @@ inline void loadTranslation( const QString & tname,
 }
 
 
+void qDebugToLogManagerAdapter(QtMsgType type, const QMessageLogContext &context, const QString &msg)
+{
+	QByteArray localMsg = msg.toLocal8Bit();
+	LogVerbosity verbosity = LogVerbosity::Debug_Hi;
+
+	switch (type) {
+	case QtFatalMsg:
+		verbosity = LogVerbosity::Fatal;
+		break;
+
+	case QtCriticalMsg:
+		verbosity = LogVerbosity::Error;
+		break;
+
+	case QtWarningMsg:
+		verbosity = LogVerbosity::Warning;
+		break;
+
+	case QtInfoMsg:
+		verbosity = LogVerbosity::Info;
+		break;
+
+	case QtDebugMsg:
+		verbosity = LogVerbosity::Debug_Lo;
+		break;
+	}
+
+	LogLine logLine(verbosity,
+			context.file ? context.file : "",
+			context.line,
+			localMsg.constData());
+	LogManager::inst().push(logLine);
+
+}
 
 
 void printVersion( char *executableName )
@@ -699,9 +734,11 @@ int main( int argc, char * * argv )
 	LogManager::inst().addSink(new ConsoleLogSink(
 					LogVerbosity::Debug_Lo,
 					LogManager::inst()));
+	LoggingThread::inst().start();
+
+	qInstallMessageHandler(qDebugToLogManagerAdapter);
 
 	Log_Inf("Logging activated");
-	Log_Str_Inf << "C++ style too!";
 
 	ConfigManager::inst()->loadConfigFile(configFile);
 

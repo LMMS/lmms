@@ -4,7 +4,7 @@
 #include <string>
 #include <sstream>
 #include <vector>
-
+#include <QMutex>
 class LogManager;
 
 enum class LogVerbosity
@@ -43,6 +43,7 @@ public:
 	virtual ~LogSink();
 
 	virtual void onLogLine(const LogLine& line) = 0;
+	virtual void onTermination();
 
 	LogVerbosity getMaxVerbosity()
 	{
@@ -63,8 +64,14 @@ public:
 
 	void pauseFlush();
 	void resumeFlush();
+	bool isFlushPaused() const;
 
-	void push(const LogLine& logLine);
+	void push(const LogLine logLine);
+	void push(LogVerbosity verbosity,
+		std::string fileName,
+		unsigned int fileLineNo,
+		std::string content);
+
 	void flush();
 
 private:
@@ -74,6 +81,9 @@ private:
 	LogVerbosity m_maxVerbosity;
 	std::vector<LogSink*> m_sinks;
 	std::vector<LogLine> m_pendingLogLines;
+
+	mutable QMutex m_flushPausedMutex;
+	QMutex m_pendingLogLinesMutex;
 };
 
 class LogIostreamWrapper: public std::ostringstream
@@ -93,8 +103,7 @@ private:
 	do {                                                                   \
 		char _content[1024];                                           \
 		snprintf(_content, sizeof(_content), format, ##__VA_ARGS__);   \
-		LogLine _logLine(verb, __FILE__, __LINE__, _content);          \
-		LogManager::inst().push(std::move(_logLine));                  \
+		LogManager::inst().push(verb, __FILE__, __LINE__, _content);   \
 	} while(0)
 
 #define Log_Fatal(format,...) Log_Gen(LogVerbosity::Fatal, format, ##__VA_ARGS__);
