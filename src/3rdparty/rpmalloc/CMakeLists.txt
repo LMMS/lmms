@@ -1,4 +1,4 @@
-set(CMAKE_C_FLAGS "-std=c11")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c11 -Wno-unused-variable")
 
 add_library(rpmalloc STATIC
 	rpmalloc/rpmalloc/rpmalloc.c

@@ -521,7 +521,7 @@ void PianoRoll::changeNoteEditMode( int i )
 
 void PianoRoll::markSemiTone( int i )
 {
-	const int key = getKey( mapFromGlobal( m_semiToneMarkerMenu->pos() ).y() );
+	const int key = m_pianoKeySelected;
 	const InstrumentFunctionNoteStacking::Chord * chord = nullptr;
 
 	switch( static_cast<SemiToneMarkerAction>( i ) )
@@ -1868,6 +1868,7 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 			if( me->buttons() == Qt::RightButton )
 			{
 				// right click - tone marker contextual menu
+				m_pianoKeySelected = getKey( me->y() );
 				m_semiToneMarkerMenu->popup( mapToGlobal( QPoint( me->x(), me->y() ) ) );
 			}
 			else if( me->buttons() == Qt::LeftButton )
@@ -1938,8 +1939,9 @@ void PianoRoll::mouseDoubleClickEvent(QMouseEvent * me )
 		{
 			const Note * closest = NULL;
 			int closest_dist = 9999999;
-			// if we caught multiple notes, find the closest...
-			if( nv.size() > 1 )
+			// if we caught multiple notes and we're not editing a
+			// selection, find the closest...
+			if( nv.size() > 1 && !isSelection() )
 			{
 				for ( const Note * i : nv )
 				{
@@ -2870,7 +2872,12 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 			break;
 	}
 	// start drawing at the bottom
-	int key_line_y = keyAreaBottom() - 1;
+	int key_line_y = qMin(keyAreaBottom() - 1, m_keyLineHeight * NumKeys);
+	// we need to set m_notesEditHeight here because it needs to fill in the
+	// rest of the window if key_line_y is bound to m_keyLineHeight * NumKeys
+	if (key_line_y == m_keyLineHeight * NumKeys) {
+		m_notesEditHeight = height() - (PR_TOP_MARGIN + m_keyLineHeight * NumKeys);
+	}
 	// used for aligning black-keys later
 	int first_white_key_height = m_whiteKeySmallHeight;
 	// key-counter - only needed for finding out whether the processed
@@ -2996,9 +3003,10 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 	key = m_startKey;
 	keys_processed = 0;
 	int white_cnt = 0;
+	key_line_y = qMin(keyAreaBottom(), m_keyLineHeight * NumKeys);
 
 	// and go!
-	for( int y = keyAreaBottom() + y_offset;
+	for( int y = key_line_y + y_offset;
 					y > PR_TOP_MARGIN; ++keys_processed )
 	{
 		// check for black key that is only half visible on the bottom
@@ -3064,16 +3072,16 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 
 	// erase the area below the piano, because there might be keys that
 	// should be only half-visible
-	p.fillRect( QRect( 0, keyAreaBottom(),
-			WHITE_KEY_WIDTH, noteEditBottom() - keyAreaBottom() ), bgColor );
+	p.fillRect( QRect( 0, key_line_y,
+			WHITE_KEY_WIDTH, noteEditBottom() - key_line_y ), bgColor );
 
 	// display note editing info
 	QFont f = p.font();
 	f.setBold( false );
 	p.setFont( pointSize<10>( f ) );
 	p.setPen( noteModeColor() );
-	p.drawText( QRect( 0, keyAreaBottom(),
-					  WHITE_KEY_WIDTH, noteEditBottom() - keyAreaBottom() ),
+	p.drawText( QRect( 0, key_line_y,
+					  WHITE_KEY_WIDTH, noteEditBottom() - key_line_y ),
 			   Qt::AlignCenter | Qt::TextWordWrap,
 			   m_nemStr.at( m_noteEditMode ) + ":" );
 
@@ -3114,7 +3122,7 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 
 		// Draw horizontal lines
 		key = m_startKey;
-		for( int y = keyAreaBottom() - 1; y > PR_TOP_MARGIN;
+		for( int y = key_line_y - 1; y > PR_TOP_MARGIN;
 				y -= m_keyLineHeight )
 		{
 			if( static_cast<Keys>( key % KeysPerOctave ) == Key_C )
@@ -3173,10 +3181,10 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 		for( int i = 0; i < m_markedSemiTones.size(); i++ )
 		{
 			const int key_num = m_markedSemiTones.at( i );
-			const int y = keyAreaBottom() + 5
+			const int y = key_line_y + 5
 				- m_keyLineHeight * ( key_num - m_startKey + 1 );
 
-			if( y > keyAreaBottom() )
+			if( y > key_line_y )
 			{
 				break;
 			}
@@ -3204,14 +3212,14 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 		qSwap<int>( sel_key_start, sel_key_end );
 	}
 
-	int y_base = keyAreaBottom() - 1;
+	int y_base = key_line_y - 1;
 	if( hasValidPattern() )
 	{
 		p.setClipRect( WHITE_KEY_WIDTH, PR_TOP_MARGIN,
 				width() - WHITE_KEY_WIDTH,
 				height() - PR_TOP_MARGIN );
 
-		const int visible_keys = ( keyAreaBottom()-keyAreaTop() ) /
+		const int visible_keys = ( key_line_y-keyAreaTop() ) /
 							m_keyLineHeight + 2;
 
 		QPolygonF editHandles;
@@ -3438,13 +3446,13 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 	if( hasValidPattern() )
 	{
 		int key_num = getKey( mapFromGlobal( QCursor::pos() ).y() );
-		p.fillRect( 10, keyAreaBottom() + 3 - m_keyLineHeight *
+		p.fillRect( 10, key_line_y + 3 - m_keyLineHeight *
 					( key_num - m_startKey + 1 ), width() - 10, m_keyLineHeight - 7, currentKeyCol );
 	}
 
 	// bar to resize note edit area
 	p.setClipRect( 0, 0, width(), height() );
-	p.fillRect( QRect( 0, keyAreaBottom(),
+	p.fillRect( QRect( 0, key_line_y,
 					width()-PR_RIGHT_MARGIN, NOTE_EDIT_RESIZE_BAR ), editAreaCol );
 
 	const QPixmap * cursor = NULL;
