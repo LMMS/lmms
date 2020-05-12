@@ -14,9 +14,9 @@ const unsigned int USEC_PER_SEC = 1000000;
 
 
 LogLine::LogLine(LogVerbosity verbosity,
-		const char* fileName,
+		std::string fileName,
 		unsigned int fileLineNo,
-		const char* content)
+		std::string content)
 {
 	static unsigned int logLineNo = 0;
 	static unsigned long int initialTimestamp = 0;
@@ -150,5 +150,18 @@ void LogManager::flush()
 		}
 	}
 	m_pendingLogLines.clear();
+}
+
+LogIostreamWrapper::LogIostreamWrapper(LogVerbosity verbosity,
+					std::string fileName,
+					unsigned int fileLineNo)
+	: m_line(verbosity, fileName, fileLineNo, "")
+{
+}
+
+LogIostreamWrapper::~LogIostreamWrapper()
+{
+	m_line.content = this->str();
+	LogManager::inst().push(m_line);
 }
 

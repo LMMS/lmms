@@ -2,6 +2,7 @@
 #define DEBUG_TRACE_H
 
 #include <string>
+#include <sstream>
 #include <vector>
 
 class LogManager;
@@ -28,9 +29,9 @@ struct LogLine
 	std::string content;
 
 	LogLine(LogVerbosity verbosity,
-		const char* fileName,
+		std::string fileName,
 		unsigned int fileLineNo,
-		const char* content);
+		std::string content);
 
 	std::string toString() const;
 };
@@ -75,6 +76,19 @@ private:
 	std::vector<LogLine> m_pendingLogLines;
 };
 
+class LogIostreamWrapper: public std::ostringstream
+{
+public:
+	LogIostreamWrapper(LogVerbosity verbosity,
+			std::string fileName,
+			unsigned int fileLineNo);
+
+	~LogIostreamWrapper() override;
+
+private:
+	LogLine m_line;
+};
+
 #define Log_Gen(verb,format,...)                                               \
 	do {                                                                   \
 		char _content[1024];                                           \
@@ -89,5 +103,13 @@ private:
 #define Log_Inf(format,...) Log_Gen(LogVerbosity::Info, format, ##__VA_ARGS__);
 #define Log_Dbg_Lo(format, ...) Log_Gen(LogVerbosity::Debug_Lo, format, ##__VA_ARGS__);
 #define Log_Dbg_Hi(format, ...) Log_Gen(LogVerbosity::Debug_Hi, format, ##__VA_ARGS__);
+
+#define Log_Str_Gen(verb) LogIostreamWrapper(verb, __FILE__, __LINE__)
+#define Log_Str_Fatal Log_Str_Gen(LogVerbosity::Fatal)
+#define Log_Str_Err Log_Str_Gen(LogVerbosity::Error)
+#define Log_Str_Wrn Log_Str_Gen(LogVerbosity::Warning)
+#define Log_Str_Inf Log_Str_Gen(LogVerbosity::Info)
+#define Log_Str_Dbg_Lo Log_Str_Gen(LogVerbosity::Debug_Lo)
+#define Log_Str_Dbg_Hi Log_Str_Gen(LogVerbosity::Debug_Hi)
 
 #endif // DEBUG_TRACE_H

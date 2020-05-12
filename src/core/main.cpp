@@ -701,6 +701,7 @@ int main( int argc, char * * argv )
 					LogManager::inst()));
 
 	Log_Inf("Logging activated");
+	Log_Str_Inf << "C++ style too!";
 
 	ConfigManager::inst()->loadConfigFile(configFile);
 
