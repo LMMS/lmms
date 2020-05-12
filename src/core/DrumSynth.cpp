@@ -325,6 +325,8 @@ int DrumSynth::GetDSFileSamples(QString dsfile, int16_t *&wave, int channels, sa
   timestretch = .01f * mem_time * GetPrivateProfileFloat(sec,"Stretch",100.0,dsfile);
   if(timestretch<0.2f) timestretch=0.2f;
   if(timestretch>10.f) timestretch=10.f;
+  // the unit of envelope lengths is a sample in 44100Hz sample rate, so correct it
+  timestretch *= Fs / 44100.f;
 
   DGain = 1.0f; //leave this here!
   DGain = (float)powf(10.0, 0.05 * GetPrivateProfileFloat(sec,"Level",0,dsfile));

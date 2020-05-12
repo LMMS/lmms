@@ -1,8 +1,3 @@
-set(CMAKE_C_FLAGS "")
-set(CMAKE_CXX_FLAGS "")
-set(CMAKE_C_FLAGS_DEBUG "")
-set(CMAKE_CXX_FLAGS_DEBUG "")
-
 IF(LMMS_BUILD_LINUX AND WANT_VST)
 	set(BUILD_SHARED_LIBS OFF)
 	add_subdirectory(qt5-x11embed)
