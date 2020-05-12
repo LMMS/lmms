@@ -77,6 +77,7 @@ SET(LMMS_SRCS
 	gui/widgets/MeterDialog.cpp
 	gui/widgets/MidiPortMenu.cpp
 	gui/widgets/NStateButton.cpp
+	gui/widgets/Oscilloscope.cpp
 	gui/widgets/PixmapButton.cpp
 	gui/widgets/ProjectNotes.cpp
 	gui/widgets/RenameDialog.cpp
@@ -93,7 +94,6 @@ SET(LMMS_SRCS
 	gui/widgets/ToolTip.cpp
 	gui/widgets/TrackLabelButton.cpp
 	gui/widgets/TrackRenameLineEdit.cpp
-	gui/widgets/VisualizationWidget.cpp
 	gui/widgets/StepRecorderWidget.cpp
 
 	PARENT_SCOPE

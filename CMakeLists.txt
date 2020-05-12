@@ -573,15 +573,20 @@ ADD_SUBDIRECTORY(doc)
 # install tasks
 ADD_SUBDIRECTORY(cmake/install)
 
-ADD_CUSTOM_COMMAND(OUTPUT "${CMAKE_BINARY_DIR}/lmms.1.gz"
-				COMMAND gzip -c ${CMAKE_SOURCE_DIR}/doc/lmms.1 > ${CMAKE_BINARY_DIR}/lmms.1.gz
-				DEPENDS "${CMAKE_SOURCE_DIR}/doc/lmms.1"
-				COMMENT "Generating lmms.1.gz"
-				VERBATIM)
+FIND_PACKAGE(UnixCommands)
+IF(GZIP)
+	ADD_CUSTOM_COMMAND(OUTPUT "${CMAKE_BINARY_DIR}/lmms.1.gz"
+					COMMAND ${GZIP} -c ${CMAKE_SOURCE_DIR}/doc/lmms.1 > ${CMAKE_BINARY_DIR}/lmms.1.gz
+					DEPENDS "${CMAKE_SOURCE_DIR}/doc/lmms.1"
+					COMMENT "Generating lmms.1.gz"
+					VERBATIM)
 
 
-ADD_CUSTOM_TARGET(manpage ALL
-				DEPENDS "${CMAKE_BINARY_DIR}/lmms.1.gz")
+	ADD_CUSTOM_TARGET(manpage ALL
+					DEPENDS "${CMAKE_BINARY_DIR}/lmms.1.gz")
+ELSEIF(UNIX)
+	MESSAGE(FATAL_ERROR "Can't find gzip required for generating lmms.1.gz")
+ENDIF()
 
 # install headers
 

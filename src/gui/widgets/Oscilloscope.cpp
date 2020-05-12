@@ -1,5 +1,5 @@
 /*
- * VisualizationWidget.cpp - widget for visualization of sound-data
+ * Oscilloscope.cpp
  *
  * Copyright (c) 2005-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
@@ -26,7 +26,7 @@
 #include <QMouseEvent>
 #include <QPainter>
 
-#include "VisualizationWidget.h"
+#include "Oscilloscope.h"
 #include "GuiApplication.h"
 #include "gui_templates.h"
 #include "MainWindow.h"
@@ -35,20 +35,19 @@
 #include "Engine.h"
 #include "ToolTip.h"
 #include "Song.h"
+#include "embed.h"
 
 
-
-VisualizationWidget::VisualizationWidget( const QPixmap & _bg, QWidget * _p,
-						visualizationTypes _vtype ) :
+Oscilloscope::Oscilloscope( QWidget * _p ) :
 	QWidget( _p ),
-	s_background( _bg ),
+	m_background( embed::getIconPixmap( "output_graph" ) ),
 	m_points( new QPointF[Engine::mixer()->framesPerPeriod()] ),
 	m_active( false ),
 	m_normalColor(71, 253, 133),
 	m_warningColor(255, 192, 64),
 	m_clippingColor(255, 64, 64)
 {
-	setFixedSize( s_background.width(), s_background.height() );
+	setFixedSize( m_background.width(), m_background.height() );
 	setAttribute( Qt::WA_OpaquePaintEvent, true );
 	setActive( ConfigManager::inst()->value( "ui", "displaywaveform").toInt() );
 
@@ -64,7 +63,7 @@ VisualizationWidget::VisualizationWidget( const QPixmap & _bg, QWidget * _p,
 
 
 
-VisualizationWidget::~VisualizationWidget()
+Oscilloscope::~Oscilloscope()
 {
 	delete[] m_buffer;
 	delete[] m_points;
@@ -73,7 +72,7 @@ VisualizationWidget::~VisualizationWidget()
 
 
 
-void VisualizationWidget::updateAudioBuffer( const surroundSampleFrame * buffer )
+void Oscilloscope::updateAudioBuffer( const surroundSampleFrame * buffer )
 {
 	if( !Engine::getSong()->isExporting() )
 	{
@@ -85,7 +84,7 @@ void VisualizationWidget::updateAudioBuffer( const surroundSampleFrame * buffer 
 
 
 
-void VisualizationWidget::setActive( bool _active )
+void Oscilloscope::setActive( bool _active )
 {
 	m_active = _active;
 	if( m_active )
@@ -112,42 +111,42 @@ void VisualizationWidget::setActive( bool _active )
 }
 
 
-QColor const & VisualizationWidget::normalColor() const
+QColor const & Oscilloscope::normalColor() const
 {
 	return m_normalColor;
 }
 
-void VisualizationWidget::setNormalColor(QColor const & normalColor)
+void Oscilloscope::setNormalColor(QColor const & normalColor)
 {
 	m_normalColor = normalColor;
 }
 
-QColor const & VisualizationWidget::warningColor() const
+QColor const & Oscilloscope::warningColor() const
 {
 	return m_warningColor;
 }
 
-void VisualizationWidget::setWarningColor(QColor const & warningColor)
+void Oscilloscope::setWarningColor(QColor const & warningColor)
 {
 	m_warningColor = warningColor;
 }
 
-QColor const & VisualizationWidget::clippingColor() const
+QColor const & Oscilloscope::clippingColor() const
 {
 	return m_clippingColor;
 }
 
-void VisualizationWidget::setClippingColor(QColor const & clippingColor)
+void Oscilloscope::setClippingColor(QColor const & clippingColor)
 {
 	m_clippingColor = clippingColor;
 }
 
 
-void VisualizationWidget::paintEvent( QPaintEvent * )
+void Oscilloscope::paintEvent( QPaintEvent * )
 {
 	QPainter p( this );
 
-	p.drawPixmap( 0, 0, s_background );
+	p.drawPixmap( 0, 0, m_background );
 
 	if( m_active && !Engine::getSong()->isExporting() )
 	{
@@ -195,7 +194,7 @@ void VisualizationWidget::paintEvent( QPaintEvent * )
 
 
 
-void VisualizationWidget::mousePressEvent( QMouseEvent * _me )
+void Oscilloscope::mousePressEvent( QMouseEvent * _me )
 {
 	if( _me->button() == Qt::LeftButton )
 	{
@@ -204,7 +203,7 @@ void VisualizationWidget::mousePressEvent( QMouseEvent * _me )
 }
 
 
-QColor const & VisualizationWidget::determineLineColor(float level) const
+QColor const & Oscilloscope::determineLineColor(float level) const
 {
 	if( level < 0.9f )
 	{
