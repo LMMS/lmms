@@ -74,7 +74,7 @@ protected:
 
 private:
 	bool m_mouseMoving;
-	QPoint m_origMousePos;
+	QPoint m_lastMousePos; //!< mouse position in last mouseMoveEvent
 	int m_displayOffset;
 	void enterValue();
 
