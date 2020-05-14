@@ -4335,11 +4335,11 @@ void PianoRoll::zoomingYChanged()
 void PianoRoll::toggleCaptureKeyboard( int state )
 {
 	// Message box for confirmation
-	QMessageBox mb( tr( "Are you sure you want to lock the keyboard?" ),
+	QMessageBox mb( tr( "Are you sure you want to capture the keyboard?" ),
 			tr( "Enabling this feature will capture the keyboard to the piano roll, "
-				"making it unusable on other applications until the feature is disabled.\n"
+				"making it unusable on other applications until it's disabled.\n"
 				"Are you sure you want to enable it?\n\n"
-				"Hint: Press Esc to quickly disable the keyboard lock." ),
+				"Hint: Press Esc to quickly disable the keyboard capture." ),
 			QMessageBox::Warning,
 			QMessageBox::Yes,
 			QMessageBox::No,
@@ -4588,8 +4588,8 @@ PianoRollWindow::PianoRollWindow() :
 
 	m_editor->m_captureKeyboardButton = new NStateButton( keyboardControlToolBar );
 	m_editor->m_captureKeyboardButton->setGeneralToolTip( tr("Enable/Disable Keyboard Capture") );
-	m_editor->m_captureKeyboardButton->addState( embed::getIconPixmap( "loop_points_off" ) );
-	m_editor->m_captureKeyboardButton->addState( embed::getIconPixmap( "loop_points_on" ) );
+	m_editor->m_captureKeyboardButton->addState( embed::getIconPixmap( "capture_keyboard_off" ) );
+	m_editor->m_captureKeyboardButton->addState( embed::getIconPixmap( "capture_keyboard_on" ) );
 
 	keyboardControlToolBar->addWidget( m_editor->m_captureKeyboardButton );
 	connect( m_editor->m_captureKeyboardButton, SIGNAL( changedState( int ) ), m_editor, SLOT( toggleCaptureKeyboard( int ) ) );
