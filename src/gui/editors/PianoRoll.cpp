@@ -63,6 +63,7 @@
 #include "TextFloat.h"
 #include "TimeLineWidget.h"
 #include "StepRecorderWidget.h"
+#include "NStateButton.h"
 
 
 using std::move;
@@ -206,7 +207,8 @@ PianoRoll::PianoRoll() :
 	m_ghostNoteOpacity( 255 ),
 	m_noteBorders( true ),
 	m_ghostNoteBorders( true ),
-	m_backgroundShade( 0, 0, 0 )
+	m_backgroundShade( 0, 0, 0 ),
+	m_captureKeyboard( false )
 {
 	// gui names of edit modes
 	m_nemStr.push_back( tr( "Note Velocity" ) );
@@ -4317,6 +4319,12 @@ void PianoRoll::zoomingYChanged()
 	update();
 }
 
+// Toggle capture keyboard variable
+void PianoRoll::toggleCaptureKeyboard(int state)
+{
+	// State 1 = On. State 0 = Off
+	m_captureKeyboard = state ? true : false;
+}
 
 void PianoRoll::quantizeChanged()
 {
@@ -4531,6 +4539,17 @@ PianoRollWindow::PianoRollWindow() :
 	DropToolBar *timeLineToolBar = addDropToolBarToTop( tr( "Timeline controls" ) );
 	m_editor->m_timeLine->addToolButtons( timeLineToolBar );
 
+
+	// Add a toolbar with capture keyboard feature
+	DropToolBar *keyboardControlToolBar = addDropToolBarToTop( tr( "Keyboard controls" ) );
+
+	NStateButton * captureKeyboardButton = new NStateButton( keyboardControlToolBar );
+	captureKeyboardButton->setGeneralToolTip( tr("Enable/Disable Keyboard Capture") );
+	captureKeyboardButton->addState( embed::getIconPixmap( "loop_points_off" ) );
+	captureKeyboardButton->addState( embed::getIconPixmap( "loop_points_on" ) );
+
+	keyboardControlToolBar->addWidget( captureKeyboardButton );
+	connect( captureKeyboardButton, SIGNAL( changedState( int ) ), m_editor, SLOT( toggleCaptureKeyboard( int ) ) );
 
 	addToolBarBreak();
 

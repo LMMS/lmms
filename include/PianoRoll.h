@@ -235,6 +235,8 @@ protected slots:
 
 	void clearGhostPattern();
 
+	// For toggling the capture keyboard feature
+	void toggleCaptureKeyboard(int state);
 
 signals:
 	void currentPatternChanged();
@@ -452,6 +454,9 @@ private:
 	bool m_noteBorders;
 	bool m_ghostNoteBorders;
 	QColor m_backgroundShade;
+
+	// Capture Keyboard
+	bool m_captureKeyboard;
 
 signals:
 	void positionChanged( const MidiTime & );
