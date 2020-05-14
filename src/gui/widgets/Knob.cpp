@@ -587,7 +587,7 @@ void Knob::mousePressEvent( QMouseEvent * _me )
 		}
 
 		const QPoint & p = _me->pos();
-		m_origMousePos = m_lastMousePos = p;
+		m_lastMousePos = p;
 		m_leftOver = 0.0f;
 
 		emit sliderPressed();
