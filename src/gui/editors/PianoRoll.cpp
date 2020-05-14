@@ -1217,6 +1217,17 @@ int PianoRoll::selectionCount() const // how many notes are selected?
 
 void PianoRoll::keyPressEvent(QKeyEvent* ke)
 {
+
+	// Just for the capture keyboard feature:
+	if( m_captureKeyboard ){
+		// In that context, escape will turn off the capture keyboard feature (but we don't return false
+		// because it also has a function inside the piano roll).
+		if( ke->key() == Qt::Key_Escape)
+		{
+			m_captureKeyboardButton->changeState(0); // Disable the capture keyboard
+		}
+	}
+
 	if(m_stepRecorder.isRecording())
 	{
 		bool handled = m_stepRecorder.keyPressEvent(ke);
@@ -4327,7 +4338,8 @@ void PianoRoll::toggleCaptureKeyboard( int state )
 	QMessageBox mb( tr( "Are you sure you want to lock the keyboard?" ),
 			tr( "Enabling this feature will capture the keyboard to the piano roll, "
 				"making it unusable on other applications until the feature is disabled.\n"
-				"Are you sure you want to enable it?" ),
+				"Are you sure you want to enable it?\n\n"
+				"Hint: Press Esc to quickly disable the keyboard lock." ),
 			QMessageBox::Warning,
 			QMessageBox::Yes,
 			QMessageBox::No,
