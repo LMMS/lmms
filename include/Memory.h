@@ -51,6 +51,7 @@ public:
 };
 
 static MemoryManager::MmCounter _mm_counter;
+static thread_local MemoryManager::MmCounter _mm_thread_counter;
 
 template<typename T>
 class MmAllocator
@@ -73,10 +74,6 @@ public:
 	}
 
 	typedef std::vector<T, MmAllocator<T> > vector;
-
-private:
-	MemoryManager::MmCounter m_counter;
-	MemoryManager::ThreadGuard m_threadGuard;
 };
 
 class _AlignedAllocator_Base
