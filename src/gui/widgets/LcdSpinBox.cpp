@@ -41,7 +41,7 @@ LcdSpinBox::LcdSpinBox( int numDigits, QWidget* parent, const QString& name ) :
 	LcdWidget( numDigits, parent, name ),
 	IntModelView( new IntModel( 0, 0, 0, NULL, name, true ), this ),
 	m_mouseMoving( false ),
-	m_origMousePos(),
+	m_lastMousePos(),
 	m_displayOffset( 0 )
 {
 }
@@ -53,7 +53,7 @@ LcdSpinBox::LcdSpinBox( int numDigits, const QString& style, QWidget* parent, co
 	LcdWidget( numDigits, parent, name ),
 	IntModelView( new IntModel( 0, 0, 0, NULL, name, true ), this ),
 	m_mouseMoving( false ),
-	m_origMousePos(),
+	m_lastMousePos(),
 	m_displayOffset( 0 )
 {
 }
@@ -90,8 +90,7 @@ void LcdSpinBox::mousePressEvent( QMouseEvent* event )
 						event->y() < cellHeight() + 2  )
 	{
 		m_mouseMoving = true;
-		m_origMousePos = event->globalPos();
-		QApplication::setOverrideCursor( Qt::BlankCursor );
+		m_lastMousePos = event->globalPos();
 
 		AutomatableModel *thisModel = model();
 		if( thisModel )
@@ -113,7 +112,7 @@ void LcdSpinBox::mouseMoveEvent( QMouseEvent* event )
 {
 	if( m_mouseMoving )
 	{
-		int dy = event->globalY() - m_origMousePos.y();
+		int dy = 3 * (event->globalY() - m_lastMousePos.y());
 		if( event->modifiers() & Qt::ShiftModifier )
 			dy = qBound( -4, dy/4, 4 );
 		if( dy > 1 || dy < -1 )
@@ -121,8 +120,8 @@ void LcdSpinBox::mouseMoveEvent( QMouseEvent* event )
 			model()->setInitValue( model()->value() -
 						dy / 2 * model()->step<int>() );
 			emit manualChange();
-			QCursor::setPos( m_origMousePos );
 		}
+		m_lastMousePos = event->globalPos();
 	}
 }
 
@@ -134,10 +133,7 @@ void LcdSpinBox::mouseReleaseEvent( QMouseEvent* )
 	if( m_mouseMoving )
 	{
 		model()->restoreJournallingState();
-
-		QCursor::setPos( m_origMousePos );
 		QApplication::restoreOverrideCursor();
-
 		m_mouseMoving = false;
 	}
 }
