@@ -36,6 +36,7 @@
 #include <QPointer>
 #include <QScrollBar>
 #include <QStyleOption>
+#include <QMessageBox>
 
 #ifndef __USE_XOPEN
 #define __USE_XOPEN
@@ -4320,10 +4321,40 @@ void PianoRoll::zoomingYChanged()
 }
 
 // Toggle capture keyboard variable
-void PianoRoll::toggleCaptureKeyboard(int state)
+void PianoRoll::toggleCaptureKeyboard( int state )
 {
+	// Message box for confirmation
+	QMessageBox mb( tr( "Are you sure you want to lock the keyboard?" ),
+			tr( "Enabling this feature will capture the keyboard to the piano roll, "
+				"making it unusable on other applications until the feature is disabled.\n"
+				"Are you sure you want to enable it?" ),
+			QMessageBox::Warning,
+			QMessageBox::Yes,
+			QMessageBox::No,
+			QMessageBox::NoButton,
+			this );
+
 	// State 1 = On. State 0 = Off
-	m_captureKeyboard = state ? true : false;
+	if( state == 1 )
+	{
+		int answer = mb.exec();
+		if( answer == QMessageBox::Yes )
+		{
+			this->grabKeyboard();
+			m_captureKeyboard = true;
+		}
+		else
+		{
+			m_captureKeyboardButton->changeState(0);
+		}
+	}
+	else
+	{
+		if( m_captureKeyboard == true ){
+			this->releaseKeyboard();
+			m_captureKeyboard = false;
+		}
+	}
 }
 
 void PianoRoll::quantizeChanged()
@@ -4543,13 +4574,13 @@ PianoRollWindow::PianoRollWindow() :
 	// Add a toolbar with capture keyboard feature
 	DropToolBar *keyboardControlToolBar = addDropToolBarToTop( tr( "Keyboard controls" ) );
 
-	NStateButton * captureKeyboardButton = new NStateButton( keyboardControlToolBar );
-	captureKeyboardButton->setGeneralToolTip( tr("Enable/Disable Keyboard Capture") );
-	captureKeyboardButton->addState( embed::getIconPixmap( "loop_points_off" ) );
-	captureKeyboardButton->addState( embed::getIconPixmap( "loop_points_on" ) );
+	m_editor->m_captureKeyboardButton = new NStateButton( keyboardControlToolBar );
+	m_editor->m_captureKeyboardButton->setGeneralToolTip( tr("Enable/Disable Keyboard Capture") );
+	m_editor->m_captureKeyboardButton->addState( embed::getIconPixmap( "loop_points_off" ) );
+	m_editor->m_captureKeyboardButton->addState( embed::getIconPixmap( "loop_points_on" ) );
 
-	keyboardControlToolBar->addWidget( captureKeyboardButton );
-	connect( captureKeyboardButton, SIGNAL( changedState( int ) ), m_editor, SLOT( toggleCaptureKeyboard( int ) ) );
+	keyboardControlToolBar->addWidget( m_editor->m_captureKeyboardButton );
+	connect( m_editor->m_captureKeyboardButton, SIGNAL( changedState( int ) ), m_editor, SLOT( toggleCaptureKeyboard( int ) ) );
 
 	addToolBarBreak();
 

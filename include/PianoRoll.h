@@ -40,6 +40,7 @@
 #include "ToolTip.h"
 #include "StepRecorder.h"
 #include "StepRecorderWidget.h"
+#include "NStateButton.h"
 
 class QPainter;
 class QPixmap;
@@ -457,6 +458,7 @@ private:
 
 	// Capture Keyboard
 	bool m_captureKeyboard;
+	NStateButton * m_captureKeyboardButton;
 
 signals:
 	void positionChanged( const MidiTime & );
