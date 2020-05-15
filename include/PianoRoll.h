@@ -458,6 +458,7 @@ private:
 
 	// Capture Keyboard
 	bool m_captureKeyboard;
+	bool m_captureKeyboardAsk; // Enables/Disables the confirmation dialog
 	NStateButton * m_captureKeyboardButton;
 
 signals:

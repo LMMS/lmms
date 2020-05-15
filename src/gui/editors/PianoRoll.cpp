@@ -37,6 +37,7 @@
 #include <QScrollBar>
 #include <QStyleOption>
 #include <QMessageBox>
+#include <QCheckBox>
 
 #ifndef __USE_XOPEN
 #define __USE_XOPEN
@@ -209,7 +210,8 @@ PianoRoll::PianoRoll() :
 	m_noteBorders( true ),
 	m_ghostNoteBorders( true ),
 	m_backgroundShade( 0, 0, 0 ),
-	m_captureKeyboard( false )
+	m_captureKeyboard( false ),
+	m_captureKeyboardAsk( true )
 {
 	// gui names of edit modes
 	m_nemStr.push_back( tr( "Note Velocity" ) );
@@ -4346,11 +4348,22 @@ void PianoRoll::toggleCaptureKeyboard( int state )
 			QMessageBox::NoButton,
 			this );
 
+	// Don't ask again checkbox
+	QCheckBox * cb = new QCheckBox("Don't ask me again.");
+	QObject::connect(cb, &QCheckBox::stateChanged, [this](int state){
+		if( static_cast<Qt::CheckState>(state) == Qt::CheckState::Checked ){
+			m_captureKeyboardAsk = false;
+		}
+	});
+	mb.setCheckBox(cb);
+
 	// State 1 = On. State 0 = Off
 	if( state == 1 )
 	{
-		int answer = mb.exec();
-		if( answer == QMessageBox::Yes )
+		// Answer is Yes if the "Don't ask again" box was ticked
+		int answer = m_captureKeyboardAsk ? mb.exec() : static_cast<int>(QMessageBox::Yes);
+
+		if( answer == static_cast<int>(QMessageBox::Yes) )
 		{
 			this->grabKeyboard();
 			m_captureKeyboard = true;
