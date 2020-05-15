@@ -2,6 +2,7 @@
 #include "LoggingThread.h"
 #include <sstream>
 #include <iomanip>
+#include <map>
 #include <sys/time.h>
 
 const int LOG_BUFFER_SIZE = 256;
@@ -99,6 +100,11 @@ void LogSink::onTermination()
 {
 }
 
+void LogSink::setMaxVerbosity(LogVerbosity verbosity)
+{
+	m_maxVerbosity = verbosity;
+	LogManager::inst().notifyVerbosityChanged();
+}
 
 LogManager& LogManager::inst()
 {
@@ -195,6 +201,19 @@ void LogManager::push(LogVerbosity verbosity,
 	push(std::move(logLine));
 }
 
+void LogManager::notifyVerbosityChanged()
+{
+	m_maxVerbosity = LogVerbosity::Fatal;
+	for (LogSink* sink: m_sinks)
+	{
+		LogVerbosity sinkVerbosity = sink->getMaxVerbosity();
+		if (sinkVerbosity > m_maxVerbosity)
+		{
+			m_maxVerbosity = sinkVerbosity;
+		}
+	}
+}
+
 void LogManager::flush()
 {
 	m_pendingLogLinesMutex.lock();
@@ -232,4 +251,16 @@ LogIostreamWrapper::~LogIostreamWrapper()
 	LogManager::inst().push(m_line);
 }
 
+LogVerbosity stringToLogVerbosity(std::string s)
+{
+	static const std::map<std::string, LogVerbosity> mapping = {
+		{"fatal", LogVerbosity::Fatal},
+		{"error", LogVerbosity::Error},
+		{"warning", LogVerbosity::Warning},
+		{"info", LogVerbosity::Info},
+		{"debug_lo", LogVerbosity::Debug_Lo},
+		{"debug_hi", LogVerbosity::Debug_Hi}
+	};
 
+	return mapping.at(s);
+}

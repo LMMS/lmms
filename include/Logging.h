@@ -19,6 +19,8 @@ enum class LogVerbosity
 	Last
 };
 
+LogVerbosity stringToLogVerbosity(std::string s);
+
 struct LogLine
 {
 	LogVerbosity verbosity;
@@ -50,6 +52,8 @@ public:
 		return m_maxVerbosity;
 	}
 
+	void setMaxVerbosity(LogVerbosity verbosity);
+
 private:
 	LogVerbosity m_maxVerbosity;
 	LogManager& m_logManager;
@@ -73,6 +77,8 @@ public:
 		std::string content);
 
 	void flush();
+
+	void notifyVerbosityChanged();
 
 private:
 	LogManager();

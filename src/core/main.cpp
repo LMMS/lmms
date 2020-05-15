@@ -210,6 +210,17 @@ void printHelp()
 		"  -c, --config <configfile>      Get the configuration from <configfile>\n"
 		"  -h, --help                     Show this usage information and exit.\n"
 		"  -v, --version                  Show version information and exit.\n"
+		"  --console-log <max-level>      Set the maximum level of verbosity of log lines\n"
+		"                                 displayed on the console.\n"
+		"          Possible values: \n"
+		"              - fatal\n"
+		"              - error\n"
+		"              - warning\n"
+		"              - info\n"
+		"              - debug_lo\n"
+		"              - debug_hi\n"
+		"  --no-logging-thread            Disable the logging thread, forcing all log lines\n"
+		"                                 to appear immediately. Might affect the performance.\n"
 		"\nOptions if no action is given:\n"
 		"      --geometry <geometry>      Specify the size and position of\n"
 		"          the main window\n"
@@ -338,6 +349,8 @@ int main( int argc, char * * argv )
 	bool allowRoot = false;
 	bool renderLoop = false;
 	bool renderTracks = false;
+	bool useLoggingThread = true;
+	LogVerbosity consoleLogVerbosity = LogVerbosity::Warning;
 	QString fileToLoad, fileToImport, renderOut, profilerOutputFile, configFile;
 
 	// first of two command-line parsing stages
@@ -711,6 +724,27 @@ int main( int argc, char * * argv )
 
 			configFile = QString::fromLocal8Bit( argv[i] );
 		}
+		else if (arg == "--console-log")
+		{
+			++i;
+			if (i == argc)
+			{
+				return usageError("No log level specified");
+			}
+			try
+			{
+				consoleLogVerbosity = stringToLogVerbosity(argv[i]);
+			}
+			catch (std::out_of_range&)
+			{
+				return usageError(QString("Invalid log level: %1")
+						.arg(argv[i]));
+			}
+		}
+		else if (arg == "--no-logging-thread")
+		{
+			useLoggingThread = false;
+		}
 		else
 		{
 			if( argv[i][0] == '-' )
@@ -731,10 +765,16 @@ int main( int argc, char * * argv )
 		fileCheck( fileToImport );
 	}
 
+	/* Initialize loggers */
 	LogManager::inst().addSink(new ConsoleLogSink(
-					LogVerbosity::Debug_Lo,
+					consoleLogVerbosity,
 					LogManager::inst()));
-	LoggingThread::inst().start();
+	/* All sinks will be freed by LogManager */
+	if (useLoggingThread)
+	{
+		LoggingThread::inst().start();
+	}
+
 
 	qInstallMessageHandler(qDebugToLogManagerAdapter);
 
