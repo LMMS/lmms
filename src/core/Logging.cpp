@@ -81,7 +81,8 @@ LogLine::LogLine(LogVerbosity verbosity,
 std::string LogLine::toString() const
 {
 	const char VERBOSITY_LETTERS[] = {'F', 'E', 'W', 'I', 'L', 'H'};
-	static_assert(sizeof(VERBOSITY_LETTERS) == (int)LogVerbosity::Last);
+	static_assert(sizeof(VERBOSITY_LETTERS) == (int)LogVerbosity::Last,
+		      "The set of verbosity letters does not match the enum");
 
 	std::ostringstream os;
 	if (verbosity < LogVerbosity::Last)
