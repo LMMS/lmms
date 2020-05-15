@@ -219,6 +219,8 @@ public:
 		return m_previewMode;
 	}
 
+	void autoAssignMidiDevice( bool );
+
 signals:
 	void instrumentChanged();
 	void midiNoteOn( const Note& );
@@ -259,6 +261,8 @@ private:
 	bool m_silentBuffersProcessed;
 
 	bool m_previewMode;
+
+	bool m_hasAutoMidiDev;
 
 	IntModel m_baseNoteModel;
 
