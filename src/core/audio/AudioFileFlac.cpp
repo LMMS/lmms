@@ -89,7 +89,7 @@ bool AudioFileFlac::startEncoding()
 void AudioFileFlac::writeBuffer(surroundSampleFrame const* _ab, fpp_t const frames, float master_gain)
 {
 	OutputSettings::BitDepth depth = getOutputSettings().getBitDepth();
-	float clipvalue = std::nextafter( -1.0f, 0.0f );
+	float clipvalue = std::nextafterf( -1.0f, 0.0f );
 
 	if (depth == OutputSettings::Depth_24Bit || depth == OutputSettings::Depth_32Bit) // Float encoding
 	{
