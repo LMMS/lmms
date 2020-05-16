@@ -4349,7 +4349,7 @@ void PianoRoll::toggleCaptureKeyboard(int state)
 			this);
 
 	// Don't ask again checkbox
-	QCheckBox * cb = new QCheckBox("Don't ask me again.");
+	QCheckBox *cb = new QCheckBox("Don't ask me again.");
 	QObject::connect(cb, &QCheckBox::stateChanged, [this](int state){
 		if (state == static_cast<int>(Qt::CheckState::Checked)){
 			m_captureKeyboardAsk = false;
@@ -4598,7 +4598,7 @@ PianoRollWindow::PianoRollWindow() :
 
 
 	// Add a toolbar with capture keyboard feature
-	DropToolBar * keyboardControlToolBar = addDropToolBarToTop(tr("Keyboard controls"));
+	DropToolBar *keyboardControlToolBar = addDropToolBarToTop(tr("Keyboard controls"));
 
 	m_editor->m_captureKeyboardButton = new NStateButton(keyboardControlToolBar);
 	m_editor->m_captureKeyboardButton->setGeneralToolTip(tr("Enable/Disable Keyboard Capture"));
