@@ -5,7 +5,7 @@
  * Copyright (c) 2017 Hyunjin Song <tteu.ingog/at/gmail.com>
  *
  * This file is part of LMMS - https://lmms.io
- * 
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
  * License as published by the Free Software Foundation; either
@@ -357,4 +357,3 @@ PLUGIN_EXPORT Plugin * lmms_plugin_main( Model *, void * _data )
 
 
 }
-
