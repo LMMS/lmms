@@ -503,7 +503,7 @@ void SongEditor::keyPressEvent( QKeyEvent * ke )
 	{
 		m_song->setPlayPos( 0, Song::Mode_PlaySong );
 	}
-	else if( ke->key() == Qt::Key_Delete )
+	else if( ke->key() == Qt::Key_Delete || ke->key() == Qt::Key_Backspace )
 	{
 		QVector<TrackContentObjectView *> tcoViews;
 		QVector<selectableObject *> so = selectedObjects();
