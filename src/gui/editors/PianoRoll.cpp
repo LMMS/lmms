@@ -210,8 +210,8 @@ PianoRoll::PianoRoll() :
 	m_noteBorders( true ),
 	m_ghostNoteBorders( true ),
 	m_backgroundShade( 0, 0, 0 ),
-	m_captureKeyboard( false ),
-	m_captureKeyboardAsk( true )
+	m_captureKeyboard(false),
+	m_captureKeyboardAsk(true)
 {
 	// gui names of edit modes
 	m_nemStr.push_back( tr( "Note Velocity" ) );
@@ -1219,12 +1219,12 @@ int PianoRoll::selectionCount() const // how many notes are selected?
 
 void PianoRoll::keyPressEvent(QKeyEvent* ke)
 {
-
 	// Just for the capture keyboard feature:
-	if( m_captureKeyboard ){
-		// In that context, escape will turn off the capture keyboard feature (but we don't return false
-		// because it also has a function inside the piano roll).
-		if( ke->key() == Qt::Key_Escape)
+	if (m_captureKeyboard)
+	{
+		// In that context, escape will turn off the capture keyboard feature (but we don't
+		// consume the event because it also does something inside the piano roll).
+		if (ke->key() == Qt::Key_Escape)
 		{
 			m_captureKeyboardButton->changeState(0); // Disable the capture keyboard
 		}
@@ -4334,36 +4334,36 @@ void PianoRoll::zoomingYChanged()
 }
 
 // Toggle capture keyboard variable
-void PianoRoll::toggleCaptureKeyboard( int state )
+void PianoRoll::toggleCaptureKeyboard(int state)
 {
 	// Message box for confirmation
-	QMessageBox mb( tr( "Are you sure you want to capture the keyboard?" ),
-			tr( "Enabling this feature will capture the keyboard to the piano roll, "
+	QMessageBox mb(tr("Are you sure you want to capture the keyboard?"),
+			tr("Enabling this feature will capture the keyboard to the piano roll, "
 				"making it unusable on other applications until it's disabled.\n"
 				"Are you sure you want to enable it?\n\n"
-				"Hint: Press Esc to quickly disable the keyboard capture." ),
+				"Hint: Press Esc to quickly disable the keyboard capture."),
 			QMessageBox::Warning,
 			QMessageBox::Yes,
 			QMessageBox::No,
 			QMessageBox::NoButton,
-			this );
+			this);
 
 	// Don't ask again checkbox
 	QCheckBox * cb = new QCheckBox("Don't ask me again.");
 	QObject::connect(cb, &QCheckBox::stateChanged, [this](int state){
-		if( static_cast<Qt::CheckState>(state) == Qt::CheckState::Checked ){
+		if (state == static_cast<int>(Qt::CheckState::Checked)){
 			m_captureKeyboardAsk = false;
 		}
 	});
 	mb.setCheckBox(cb);
 
 	// State 1 = On. State 0 = Off
-	if( state == 1 )
+	if (state == 1)
 	{
 		// Answer is Yes if the "Don't ask again" box was ticked
 		int answer = m_captureKeyboardAsk ? mb.exec() : static_cast<int>(QMessageBox::Yes);
 
-		if( answer == static_cast<int>(QMessageBox::Yes) )
+		if (answer == static_cast<int>(QMessageBox::Yes))
 		{
 			this->grabKeyboard();
 			m_captureKeyboard = true;
@@ -4375,7 +4375,8 @@ void PianoRoll::toggleCaptureKeyboard( int state )
 	}
 	else
 	{
-		if( m_captureKeyboard == true ){
+		if (m_captureKeyboard == true)
+		{
 			this->releaseKeyboard();
 			m_captureKeyboard = false;
 		}
@@ -4597,15 +4598,15 @@ PianoRollWindow::PianoRollWindow() :
 
 
 	// Add a toolbar with capture keyboard feature
-	DropToolBar *keyboardControlToolBar = addDropToolBarToTop( tr( "Keyboard controls" ) );
+	DropToolBar * keyboardControlToolBar = addDropToolBarToTop(tr("Keyboard controls"));
 
-	m_editor->m_captureKeyboardButton = new NStateButton( keyboardControlToolBar );
-	m_editor->m_captureKeyboardButton->setGeneralToolTip( tr("Enable/Disable Keyboard Capture") );
-	m_editor->m_captureKeyboardButton->addState( embed::getIconPixmap( "capture_keyboard_off" ) );
-	m_editor->m_captureKeyboardButton->addState( embed::getIconPixmap( "capture_keyboard_on" ) );
+	m_editor->m_captureKeyboardButton = new NStateButton(keyboardControlToolBar);
+	m_editor->m_captureKeyboardButton->setGeneralToolTip(tr("Enable/Disable Keyboard Capture"));
+	m_editor->m_captureKeyboardButton->addState(embed::getIconPixmap("capture_keyboard_off"));
+	m_editor->m_captureKeyboardButton->addState(embed::getIconPixmap("capture_keyboard_on"));
 
-	keyboardControlToolBar->addWidget( m_editor->m_captureKeyboardButton );
-	connect( m_editor->m_captureKeyboardButton, SIGNAL( changedState( int ) ), m_editor, SLOT( toggleCaptureKeyboard( int ) ) );
+	keyboardControlToolBar->addWidget(m_editor->m_captureKeyboardButton);
+	connect(m_editor->m_captureKeyboardButton, SIGNAL(changedState(int)), m_editor, SLOT(toggleCaptureKeyboard(int)));
 
 	addToolBarBreak();
 
