@@ -201,8 +201,8 @@ class TrackContentObjectView : public selectableObject, public ModelView
 	Q_PROPERTY( QColor textShadowColor READ textShadowColor WRITE setTextShadowColor )
 	Q_PROPERTY( QColor BBPatternBackground READ BBPatternBackground WRITE setBBPatternBackground )
 	Q_PROPERTY( bool gradient READ gradient WRITE setGradient )
-	Q_PROPERTY( int mouseHotspotX READ getMouseHotspotX WRITE setMouseHotspotX )
-	Q_PROPERTY( int mouseHotspotY READ getMouseHotspotY WRITE setMouseHotspotY )
+	Q_PROPERTY( int mouseHotspotX WRITE setMouseHotspotX )
+	Q_PROPERTY( int mouseHotspotY WRITE setMouseHotspotY )
 
 public:
 	TrackContentObjectView( TrackContentObject * tco, TrackView * tv );
@@ -228,8 +228,6 @@ public:
 	QColor textShadowColor() const;
 	QColor BBPatternBackground() const;
 	bool gradient() const;
-	int getMouseHotspotX() const { return m_mouseHotspotX; }
-	int getMouseHotspotY() const { return m_mouseHotspotY; }
 	void setMutedColor( const QColor & c );
 	void setMutedBackgroundColor( const QColor & c );
 	void setSelectedColor( const QColor & c );
