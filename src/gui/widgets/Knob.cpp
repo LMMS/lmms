@@ -56,11 +56,12 @@ TextFloat * Knob::s_textFloat = NULL;
 Knob::Knob( knobTypes _knob_num, QWidget * _parent, const QString & _name ) :
 	QWidget( _parent ),
 	FloatModelView( new FloatModel( 0, 0, 0, 1, NULL, _name, true ), this ),
+	m_buttonPressed( false ),
+	m_updateColor( false ),
 	m_label( "" ),
 	m_knobPixmap( NULL ),
 	m_volumeKnob( false ),
 	m_volumeRatio( 100.0, 0.0, 1000000.0 ),
-	m_buttonPressed( false ),
 	m_angle( -10 ),
 	m_lineWidth( 0 ),
 	m_textColor( 255, 255, 255 ),
@@ -109,6 +110,10 @@ void Knob::initUi( const QString & _name )
 	case knobVintage_32:
 		setlineColor(QApplication::palette().color( QPalette::Active, QPalette::Shadow ));
 		break;
+	case knobColored:
+		break;
+	case knobSmallColored:
+		break;
 	default:
 		break;
 	}
@@ -137,6 +142,12 @@ void Knob::onKnobNumUpdated()
 			break;
 		case knobVintage_32:
 			knobFilename = "knob05";
+			break;
+		case knobColored:
+			knobFilename = "knob02";
+			break;
+		case knobSmallColored:
+			knobFilename = "knob03";
 			break;
 		case knobStyled: // only here to stop the compiler from complaining
 			break;
@@ -303,6 +314,21 @@ QColor Knob::outerColor() const
 void Knob::setOuterColor( const QColor & c )
 {
 	m_outerColor = c;
+	m_updateColor = true;
+}
+
+
+QColor Knob::innerColor() const
+{
+	return m_innerColor;
+}
+
+
+
+void Knob::setInnerColor( const QColor & c )
+{
+	m_innerColor = c;
+	m_updateColor = true;
 }
 
 
@@ -317,6 +343,7 @@ QColor Knob::lineColor() const
 void Knob::setlineColor( const QColor & c )
 {
 	m_lineColor = c;
+	m_updateColor = true;
 }
 
 
@@ -331,6 +358,7 @@ QColor Knob::arcColor() const
 void Knob::setarcColor( const QColor & c )
 {
 	m_arcColor = c;
+	m_updateColor = true;
 }
 
 
@@ -379,14 +407,14 @@ bool Knob::updateAngle()
 
 
 
-
 void Knob::drawKnob( QPainter * _p )
 {
-	if( updateAngle() == false && !m_cache.isNull() )
+	if( updateAngle() == false && m_updateColor == false && !m_cache.isNull() )
 	{
 		_p->drawImage( 0, 0, m_cache );
 		return;
 	}
+	else if( m_updateColor ) { m_updateColor = false; }
 
 	m_cache = QImage( size(), QImage::Format_ARGB32 );
 	m_cache.fill( qRgba( 0, 0, 0, 0 ) );
@@ -429,9 +457,12 @@ void Knob::drawKnob( QPainter * _p )
 	const float radius = m_knobPixmap->width() / 2.0f - 1;
 	mid = QPoint( width() / 2, m_knobPixmap->height() / 2 );
 
-	p.drawPixmap( static_cast<int>(
-				width() / 2 - m_knobPixmap->width() / 2 ), 0,
-				*m_knobPixmap );
+	if( m_knobNum != knobColored && m_knobNum != knobSmallColored )
+	{
+		p.drawPixmap( static_cast<int>(
+					width() / 2 - m_knobPixmap->width() / 2 ), 0,
+					*m_knobPixmap );
+	}
 
 	p.setRenderHint( QPainter::Antialiasing );
 
@@ -443,6 +474,8 @@ void Knob::drawKnob( QPainter * _p )
 	QColor col;
 	if( m_knobNum == knobVintage_32 )
 	{	col = QApplication::palette().color( QPalette::Active, QPalette::Shadow ); }
+	else if( m_knobNum == knobColored || m_knobNum == knobSmallColored )
+	{	col = m_arcColor; }
 	else
 	{	col = QApplication::palette().color( QPalette::Active, QPalette::WindowText ); }
 	col.setAlpha( 70 );
@@ -473,6 +506,35 @@ void Knob::drawKnob( QPainter * _p )
 			QLineF ln = calculateLine( mid, re, rb );
 			ln.translate( 1, 1 );
 			p.drawLine( ln );
+			break;
+		}
+		case knobColored:
+		{
+			// Draw circle
+			p.setPen( QPen( m_innerColor, 2 ) );
+			p.setBrush( m_innerColor );
+			p.drawEllipse( QRectF( mid.x()-7, mid.y()-7, 15, 15 ) );
+
+			// Draw line
+			p.setPen( QPen( lineColor(), 2 ) );
+			const float rb = qMax<float>( ( radius - 10 ) / 3.0,
+									0.0 );
+			const float re = qMax<float>( ( radius - 4 ), 0.0 );
+			QLineF ln = calculateLine( mid, re, rb );
+			ln.translate( 1, 1 );
+			p.drawLine( ln );
+			break;
+		}
+		case knobSmallColored:
+		{
+			// Draw circle
+			p.setPen( QPen( m_innerColor, 2 ) );
+			p.setBrush( m_innerColor );
+			p.drawEllipse( QRectF( mid.x()-4, mid.y()-4, 9, 9 ) );
+
+			// Draw line
+			p.setPen( QPen( lineColor(), 2 ) );
+			p.drawLine( calculateLine( mid, radius-2 ) );
 			break;
 		}
 		case knobVintage_32:

@@ -40,6 +40,7 @@ SET(LMMS_PLUGIN_LIST
 	ladspa_browser
 	LadspaEffect
 	lb302
+	Microwave
 	MidiImport
 	MidiExport
 	MultitapEcho

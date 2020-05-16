@@ -385,7 +385,49 @@ void Graph::paintEvent( QPaintEvent * )
 			}
 
 			break;
+		case Graph::BarCenterGradStyle:
+			m_foreground.fill(Qt::transparent);
+			for( int i=0; i <= length; i++ )
+			{
+				QLinearGradient gradient(0, 0, 0, height() / 2.f);
+				gradient.setSpread(QGradient::Spread(1));// ReflectSpread, so gradient on bottom half is a reflection of the top half
+        			gradient.setColorAt(0, QColor::fromRgbF(m_graphColor.red() / 256.f, m_graphColor.green() / 256.f, m_graphColor.blue() / 256.f, 0.55));
+        			gradient.setColorAt(1, QColor::fromRgbF(m_graphColor.red() / 256.f, m_graphColor.green() / 256.f, m_graphColor.blue() / 256.f, 0));
+				if( (*samps)[i] >= 0 )// Graph value is above middle
+				{
+					p.fillRect( 2+static_cast<int>( i*xscale ),
+								2+static_cast<int>( ( (*samps)[i] - maxVal ) * yscale ),
+								static_cast<int>( (i+1)*xscale ) - static_cast<int>( i*xscale ),
+								qMax( static_cast<int>( ( ( minVal - maxVal ) * yscale ) / 2.f ) - static_cast<int>( ( (*samps)[i] - maxVal ) * yscale ), 1 ),
+								gradient );
+				}
+				else// Graph value is below middle
+				{
+					p.fillRect( 2+static_cast<int>( i*xscale ),
+								2+static_cast<int>( ( (*samps)[i] - maxVal ) * yscale ),
+								static_cast<int>( (i+1)*xscale ) - static_cast<int>( i*xscale ),
+								static_cast<int>( ( ( minVal - maxVal ) * yscale ) / 2.f ) - static_cast<int>( ( (*samps)[i] - maxVal ) * yscale ),
+								gradient );
+				}
 
+				p.setPen( QPen( m_graphColor, 1.0 ) );
+
+				p.drawLine(2+static_cast<int>(i*xscale),
+						2+static_cast<int>( ( (*samps)[i] - maxVal ) * yscale ),
+						2+static_cast<int>((i+1)*xscale),
+						2+static_cast<int>( ( (*samps)[i] - maxVal ) * yscale )
+						);
+
+				if( i != length )// So (*samps)[i+1] doesn't grab something too far
+				{
+					p.drawLine(2+static_cast<int>((i+1)*xscale),
+						2+static_cast<int>( ( (*samps)[i] - maxVal ) * yscale ),
+						2+static_cast<int>((i+1)*xscale),
+						2+static_cast<int>( ( (*samps)[i+1] - maxVal ) * yscale )
+						);
+				}
+			}
+			break;
 		default:
 			break;
 	}
@@ -636,14 +678,13 @@ void graphModel::smoothNonCyclic()
 	emit samplesChanged(0, length()-1);
 }
 
-void graphModel::convolve(const float *convolution,
-	const int convolutionLength, const int centerOffset)
+//makes a cyclic convolution.
+void graphModel::convolve(const float *convolution, const int convolutionLength, const int centerOffset)
 {
 	// store values in temporary array
 	QVector<float> temp = m_samples;
 	const int graphLength = length();
 	float sum;
-	// make a cyclic convolution
 	for ( int i = 0; i <  graphLength; i++ )
 	{
 		sum = 0;
@@ -713,6 +754,7 @@ void graphModel::shiftPhase( int _deg )
 	emit samplesChanged( 0, length()-1 );
 }
 
+// Clear visible graph
 void graphModel::clear()
 {
 	const int graph_length = length();
@@ -720,7 +762,6 @@ void graphModel::clear()
 		m_samples[i] = 0;
 	emit samplesChanged( 0, graph_length - 1 );
 }
-
 
 // Clear any part of the graph that isn't displayed
 void graphModel::clearInvisible()

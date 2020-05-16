@@ -228,7 +228,7 @@ public:
 
 	// protect calls from the GUI to this function with dataReadLock() and
 	// dataUnlock(), out of loops for efficiency
-	inline sample_t userWaveSample( const float _sample ) const
+	inline sample_t userWaveSample( const float _sample, const int channel = 0 ) const
 	{
 		f_cnt_t frames = m_frames;
 		sampleFrame * data = m_data;
@@ -238,7 +238,7 @@ public:
 		{
 			f1 += frames;
 		}
-		return linearInterpolate( data[f1][0], data[ (f1 + 1) % frames ][0], fraction( frame ) );
+		return linearInterpolate( data[f1][channel], data[ (f1 + 1) % frames ][channel], fraction( frame ) );
 	}
 
 	void dataReadLock()
