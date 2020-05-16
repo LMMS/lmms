@@ -27,8 +27,9 @@
 #define _MIDI_EXPORT_H
 
 
+#include "MidiFile.h"
+#include "DataFile.h"
 #include "ExportFilter.h"
-#include "MidiFile.hpp"
 #include "Note.h"
 
 class QDomNode;
@@ -36,31 +37,85 @@ class QDomNode;
 namespace lmms
 {
 
+/*---------------------------------------------------------------------------*/
 
-const int BUFFER_SIZE = 50*1024;
-using MTrack = MidiFile::MIDITrack<BUFFER_SIZE>;
-
-struct MidiNote
+//! MIDI exporting base class
+class MidiExport : public ExportFilter
 {
-	int time;
-	uint8_t pitch;
-	int duration;
-	uint8_t volume;
-	Note::Type type;
-
-	inline bool operator<(const MidiNote &b) const
+private:
+	//! A single MIDI note
+	struct Note
 	{
-		return this->time < b.time;
-	}
-} ;
+		using Type = ::lmms::Note::Type;
 
-using MidiNoteVector = std::vector<MidiNote>;
-using MidiNoteIterator = std::vector<MidiNote>::iterator;
+		//! The pitch (tone), which can be lower or higher
+		uint8_t m_pitch;
 
-class MidiExport: public ExportFilter
-{
-// 	Q_OBJECT
+		//! Volume (loudness)
+		uint8_t m_volume;
+
+		//! Absolute time (from song start) when the note starts playing
+		int m_time;
+
+		//! For how long the note plays
+		int m_duration;
+
+		Type type;
+
+		//! Sort notes by time
+		inline bool operator<(const Note &b) const
+		{
+			return m_time < b.m_time;
+		}
+	};
+
+	/*-----------------------------------------------------------------------*/
+
+	//! A clip of MIDI notes
+	class Clip
+	{
+	private:
+		//! List of actual notes
+		std::vector<Note> m_notes;
+
+	public:
+		//! Append notes from root node to clip
+		void write(const QDomNode &root,
+				int basePitch, double baseVolume, int baseTime);
+
+		//! Adjust special duration pattern clip notes by resizing them accordingly
+		void processPatternNotes(int cutPos);
+
+		//! Add clip notes to MIDI file track
+		void writeToTrack(MidiFile::Track &mTrack) const;
+
+		//! Write sorted notes to a explicitly repeating pattern clip
+		void writeToPattern(Clip &patternClip,
+				int len, int base, int start, int end);
+	};
+
+	/*-----------------------------------------------------------------------*/
+
+	//! MIDI file object to work with
+	MidiFile *m_file;
+
+	//! Song global tempo
+	int m_tempo;
+
+	//! Song master pitch
+	int m_masterPitch;
+
+	//! Current (incremental) track channel number for non drum tracks
+	uint8_t m_channel = 0;
+
+	//! DataFile to be used by Qt elements
+	DataFile m_dataFile = DataFile(DataFile::Type::SongProject);
+
+	//! Matrix containing (start, end) pairs for pattern objects
+	std::vector<std::vector<std::pair<int, int>>> m_plists;
+
 public:
+	//! Explicit constructor for setting plugin descriptor
 	MidiExport();
 	~MidiExport() override = default;
 
@@ -74,28 +129,33 @@ public:
 	// not even considered during the generation of the MIDI.
 	static constexpr int DefaultBeatLength = 1500;
 
-	gui::PluginView* instantiateView(QWidget *) override
-	{
-		return nullptr;
-	}
-
+	//! \brief Export tracks from a project to a .mid extension MIDI file
+	//! \param tracks Normal instrument tracks
+	//! \param patternStoreTracks PatternStore tracks
+	//! \param tempo Song global tempo
+	//! \param masterPitch Song master pitch
+	//! \param filename Name of file to be saved
+	//! \return If operation was successful
 	bool tryExport(const TrackContainer::TrackList &tracks,
-				const TrackContainer::TrackList &patternTracks,
-				int tempo, int masterPitch, const QString &filename) override;
-	
+			const TrackContainer::TrackList &patternStoreTracks,
+			int tempo, int masterPitch, const QString &filename) override;
+
 private:
-	void writeMidiClip(MidiNoteVector &midiClip, const QDomNode& n,
-				int base_pitch, double base_volume, int base_time);
-	void writeMidiClipToTrack(MTrack &mtrack, MidiNoteVector &nv);
-	void writePatternClip(MidiNoteVector &src, MidiNoteVector &dst,
-				int len, int base, int start, int end);
-	void processPatternNotes(MidiNoteVector &nv, int cutPos);
+	//! Process a given instrument track
+	void processTrack(Track *track, size_t channelID, bool isPattern=false);
 
-	void error();
+	//! Build a repeating clip from a normal one and write to MIDI track
+	void writePatternClip(Clip &clip, const QDomElement &clipElem,
+			uint8_t channelID, MidiFile::Track &midiTrack);
 
+	//! Process a given pattern track
+	void processPatternTrack(Track *track);
 
+	//! Necessary for lmms_plugin_main()
+	gui::PluginView *instantiateView(QWidget *) override { return nullptr; }
 } ;
 
+/*---------------------------------------------------------------------------*/
 
 } // namespace lmms
 
