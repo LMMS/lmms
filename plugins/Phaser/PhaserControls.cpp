@@ -46,7 +46,7 @@ PhaserControls::PhaserControls(PhaserEffect* effect) :
 	m_feedbackModel(0.0f, -100.0f, 100.0f, 0.01f, this, tr("Feedback")),
 	m_orderModel(8, 1, 32, this, tr("Order")),
 	m_delayModel(0.0f, 0.0f, 20.0f, 0.001f, this, tr("Delay")),
-	m_rateModel(10.0f, 0.01f, 60.0f, 0.001f, 60000.0, this, tr("Rate")),
+	m_rateModel(9.0f, 0.01f, 60.0f, 0.001f, 60000.0, this, tr("Rate")),
 	m_amountModel(4.5f, 0.f, 5.0f, 0.01f, this, tr("Amount")),
 	m_enableLFOModel(true , this, tr("Enable LFO")),
 	m_phaseModel(180.0f, 0.f, 360.0f, 0.01f, this, tr("Phase")),
@@ -62,6 +62,7 @@ PhaserControls::PhaserControls(PhaserEffect* effect) :
 	m_cutoffModel.setScaleLogarithmic(true);
 	m_resonanceModel.setScaleLogarithmic(true);
 	m_delayModel.setScaleLogarithmic(true);
+	m_rateModel.setScaleLogarithmic(true);
 }
 
 
