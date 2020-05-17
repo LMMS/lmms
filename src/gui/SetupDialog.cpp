@@ -100,6 +100,8 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 			"ui", "compacttrackbuttons").toInt()),
 	m_oneInstrumentTrackWindow(ConfigManager::inst()->value(
 			"ui", "oneinstrumenttrackwindow").toInt()),
+	m_sideBarOnRight(ConfigManager::inst()->value(
+			"ui", "sidebaronright").toInt()),
 	m_MMPZ(!ConfigManager::inst()->value(
 			"app", "nommpz").toInt()),
 	m_disableBackup(!ConfigManager::inst()->value(
@@ -229,6 +231,8 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 		m_compactTrackButtons, SLOT(toggleCompactTrackButtons(bool)), true);
 	addLedCheckBox("Enable one instrument-track-window mode", gui_tw, counter,
 		m_oneInstrumentTrackWindow, SLOT(toggleOneInstrumentTrackWindow(bool)), true);
+	addLedCheckBox("Show sidebar on the right-hand side", gui_tw, counter,
+		m_sideBarOnRight, SLOT(toggleSideBarOnRight(bool)), true);
 
 	gui_tw->setFixedHeight(YDelta + YDelta * counter);
 
@@ -876,6 +880,8 @@ void SetupDialog::accept()
 					QString::number(m_compactTrackButtons));
 	ConfigManager::inst()->setValue("ui", "oneinstrumenttrackwindow",
 					QString::number(m_oneInstrumentTrackWindow));
+	ConfigManager::inst()->setValue("ui", "sidebaronright",
+					QString::number(m_sideBarOnRight));
 	ConfigManager::inst()->setValue("app", "nommpz",
 					QString::number(!m_MMPZ));
 	ConfigManager::inst()->setValue("app", "disablebackup",
@@ -977,6 +983,12 @@ void SetupDialog::toggleCompactTrackButtons(bool enabled)
 void SetupDialog::toggleOneInstrumentTrackWindow(bool enabled)
 {
 	m_oneInstrumentTrackWindow = enabled;
+}
+
+
+void SetupDialog::toggleSideBarOnRight(bool enabled)
+{
+	m_sideBarOnRight = enabled;
 }
 
 

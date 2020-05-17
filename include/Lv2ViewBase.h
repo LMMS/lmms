@@ -49,6 +49,7 @@ public:
 	~Lv2ViewProc();
 
 private:
+	void leaveEvent(class QEvent *) override;
 	static AutoLilvNode uri(const char *uriStr);
 };
 

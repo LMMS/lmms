@@ -4,7 +4,7 @@ set -e
 
 PACKAGES="cmake libsndfile-dev fftw3-dev libvorbis-dev libogg-dev libmp3lame-dev
 	libasound2-dev libjack-jackd2-dev libsdl-dev libsamplerate0-dev libstk0-dev stk
-	libfluidsynth-dev portaudio19-dev g++-multilib libfltk1.3-dev
+	libfluidsynth-dev portaudio19-dev g++-multilib libfltk1.3-dev fluid
 	libgig-dev libsoundio-dev qt59base qt59translations qt59tools"
 
 # swh build dependencies
@@ -21,9 +21,3 @@ PACKAGES="$PACKAGES $SWH_PACKAGES $VST_PACKAGES $LV2_PACKAGES libjack-jackd2-0"
 
 # shellcheck disable=SC2086
 sudo apt-get install -y $PACKAGES
-
-# kxstudio repo offers Carla; avoid package conflicts (wine, etc) by running last
-sudo add-apt-repository -y ppa:kxstudio-debian/libs
-sudo add-apt-repository -y ppa:kxstudio-debian/apps
-sudo apt-get update
-sudo apt-get install -y carla

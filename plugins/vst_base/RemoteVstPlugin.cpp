@@ -70,6 +70,8 @@
 #include <queue>
 #include <string>
 #include <iostream>
+#include <string>
+#include <cstring>
 
 #include <aeffectx.h>
 
@@ -222,6 +224,10 @@ public:
 
 	// determine name of current program
 	const char * programName();
+
+	void getParameterDisplays();
+
+	void getParameterLabels();
 
 	// send name of current program back to host
 	void sendCurrentProgramName();
@@ -660,6 +666,14 @@ bool RemoteVstPlugin::processMessage( const message & _m )
 			//sendMessage( IdVstSetParameter );
 			break;
 
+		case IdVstParameterDisplays:
+			getParameterDisplays();
+			break;
+
+		case IdVstParameterLabels:
+			getParameterLabels();
+			break;
+
 
 		case IdVstIdleUpdate:
 		{
@@ -1068,6 +1082,49 @@ const char * RemoteVstPlugin::programName()
 
 
 
+// join the ParameterDisplays (stringified values without units) and send them to host
+void RemoteVstPlugin::getParameterDisplays()
+{
+	std::string paramDisplays;
+	static char buf[9]; // buffer for getting string
+	for (int i=0; i< m_plugin->numParams; ++i)
+	{
+		memset( buf, 0, sizeof( buf ) ); // fill with '\0' because got string may not to be ended with '\0'
+		pluginDispatch( effGetParamDisplay, i, 0, buf );
+		buf[8] = 0;
+
+		// each field shaped like: [length:number][content:string]
+		paramDisplays += '0' + strlen(buf); // add length descriptor (length is up to 8)
+		paramDisplays += buf;
+	}
+
+	sendMessage( message( IdVstParameterDisplays ).addString( paramDisplays.c_str() ) );
+}
+
+
+
+// join the ParameterLabels (units) and send them to host
+void RemoteVstPlugin::getParameterLabels()
+{
+	std::string paramLabels;
+	static char buf[9]; // buffer for getting string
+	for (int i=0; i< m_plugin->numParams; ++i)
+	{
+		memset( buf, 0, sizeof( buf ) ); // fill with '\0' because got string may not to be ended with '\0'
+		pluginDispatch( effGetParamLabel, i, 0, buf );
+		buf[8] = 0;
+
+		// each field shaped like: [length:number][content:string]
+		paramLabels += '0' + strlen(buf); // add length descriptor (length is up to 8)
+		paramLabels += buf;
+	}
+
+	sendMessage( message( IdVstParameterLabels ).addString( paramLabels.c_str() ) );
+}
+
+
+
+
 void RemoteVstPlugin::sendCurrentProgramName()
 {
 	char presName[64];
@@ -1085,7 +1142,7 @@ void RemoteVstPlugin::getParameterDump()
 
 	for( int i = 0; i < m_plugin->numParams; ++i )
 	{
-		char paramName[32];
+		char paramName[256];
 		memset( paramName, 0, sizeof( paramName ) );
 		pluginDispatch( effGetParamName, i, 0, paramName );
 		paramName[sizeof(paramName)-1] = 0;
@@ -1299,7 +1356,7 @@ void RemoteVstPlugin::savePreset( const std::string & _file )
 	if (!isPreset &&!chunky) uIntToFile = (unsigned int) m_plugin->numPrograms;
 	pBank->numPrograms = endian_swap( uIntToFile );
 
-	FILE * stream = F_OPEN_UTF8( _file, "w" );
+	FILE * stream = F_OPEN_UTF8( _file, "wb" );
 	if (!stream)
 	{
 		fprintf( stderr,
@@ -1357,7 +1414,7 @@ void RemoteVstPlugin::loadPresetFile( const std::string & _file )
 	unsigned int * pLen = new unsigned int[ 1 ];
 	unsigned int len = 0;
 	sBank * pBank = (sBank*) new char[ sizeof( sBank ) ];
-	FILE * stream = F_OPEN_UTF8( _file, "r" );
+	FILE * stream = F_OPEN_UTF8( _file, "rb" );
 	if (!stream)
 	{
 		fprintf( stderr,

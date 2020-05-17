@@ -447,7 +447,7 @@ void InstrumentTrack::silenceAllNotes( bool removeIPH )
 	}
 	m_midiNotesMutex.unlock();
 
-	lock();
+	Engine::mixer()->requestChangeInModel();
 	// invalidate all NotePlayHandles and PresetPreviewHandles linked to this track
 	m_processHandles.clear();
 
@@ -457,7 +457,7 @@ void InstrumentTrack::silenceAllNotes( bool removeIPH )
 		flags |= PlayHandle::TypeInstrumentPlayHandle;
 	}
 	Engine::mixer()->removePlayHandlesOfTypes( this, flags );
-	unlock();
+	Engine::mixer()->doneChangeInModel();
 }
 
 
@@ -546,11 +546,13 @@ void InstrumentTrack::setName( const QString & _new_name )
 
 void InstrumentTrack::updateBaseNote()
 {
+	Engine::mixer()->requestChangeInModel();
 	for( NotePlayHandleList::Iterator it = m_processHandles.begin();
 					it != m_processHandles.end(); ++it )
 	{
 		( *it )->setFrequencyUpdate();
 	}
+	Engine::mixer()->doneChangeInModel();
 }
 
 
@@ -769,7 +771,11 @@ void InstrumentTrack::saveTrackSpecificSettings( QDomDocument& doc, QDomElement 
 
 void InstrumentTrack::loadTrackSpecificSettings( const QDomElement & thisElement )
 {
-	silenceAllNotes( true );
+	// don't delete instrument in preview mode if it's the same
+	// we can't do this for other situations due to some issues with linked models
+	bool reuseInstrument = m_previewMode && m_instrument && m_instrument->nodeName() == getSavedInstrumentName(thisElement);
+	// remove the InstrumentPlayHandle if and only if we need to delete the instrument
+	silenceAllNotes(!reuseInstrument);
 
 	lock();
 
@@ -813,33 +819,39 @@ void InstrumentTrack::loadTrackSpecificSettings( const QDomElement & thisElement
 			{
 				m_audioPort.effects()->restoreState( node.toElement() );
 			}
-			else if( node.nodeName() == "instrument" )
+			else if(node.nodeName() == "instrument")
 			{
 				typedef Plugin::Descriptor::SubPluginFeatures::Key PluginKey;
-				PluginKey key( node.toElement().elementsByTagName( "key" ).item( 0 ).toElement() );
+				PluginKey key(node.toElement().elementsByTagName("key").item(0).toElement());
 
-				delete m_instrument;
-				m_instrument = NULL;
-				m_instrument = Instrument::instantiate(
-					node.toElement().attribute( "name" ), this, &key);
-				m_instrument->restoreState( node.firstChildElement() );
-
-				emit instrumentChanged();
+				if (reuseInstrument)
+				{
+					m_instrument->restoreState(node.firstChildElement());
+				}
+				else
+				{
+					delete m_instrument;
+					m_instrument = NULL;
+					m_instrument = Instrument::instantiate(
+						node.toElement().attribute("name"), this, &key);
+					m_instrument->restoreState(node.firstChildElement());
+					emit instrumentChanged();
+				}
 			}
 			// compat code - if node-name doesn't match any known
 			// one, we assume that it is an instrument-plugin
 			// which we'll try to load
-			else if( AutomationPattern::classNodeName() != node.nodeName() &&
+			else if(AutomationPattern::classNodeName() != node.nodeName() &&
 					ControllerConnection::classNodeName() != node.nodeName() &&
-					!node.toElement().hasAttribute( "id" ) )
+					!node.toElement().hasAttribute( "id" ))
 			{
 				delete m_instrument;
 				m_instrument = NULL;
 				m_instrument = Instrument::instantiate(
 					node.nodeName(), this, nullptr, true);
-				if( m_instrument->nodeName() == node.nodeName() )
+				if (m_instrument->nodeName() == node.nodeName())
 				{
-					m_instrument->restoreState( node.toElement() );
+					m_instrument->restoreState(node.toElement());
 				}
 				emit instrumentChanged();
 			}
@@ -856,6 +868,19 @@ void InstrumentTrack::loadTrackSpecificSettings( const QDomElement & thisElement
 void InstrumentTrack::setPreviewMode( const bool value )
 {
 	m_previewMode = value;
+}
+
+
+
+
+QString InstrumentTrack::getSavedInstrumentName(const QDomElement &thisElement) const
+{
+	QDomElement elem = thisElement.firstChildElement("instrument");
+	if (!elem.isNull())
+	{
+		return elem.attribute("name");
+	}
+	return "";
 }
 
 
@@ -994,7 +1019,6 @@ InstrumentTrackView::InstrumentTrackView( InstrumentTrack * _it, TrackContainerV
 			 m_activityIndicator, SLOT( activate() ) );
 	connect( _it, SIGNAL( endNote() ),
 	 		m_activityIndicator, SLOT( noteEnd() ) );
-	connect( &_it->m_mutedModel, SIGNAL( dataChanged() ), this, SLOT( muteChanged() ) );
 
 	setModel( _it );
 }
@@ -1218,22 +1242,6 @@ void InstrumentTrackView::midiConfigChanged()
 {
 	m_midiInputAction->setChecked( model()->m_midiPort.isReadable() );
 	m_midiOutputAction->setChecked( model()->m_midiPort.isWritable() );
-}
-
-
-
-
-void InstrumentTrackView::muteChanged()
-{
-	if(model()->m_mutedModel.value() )
-	{
-		m_activityIndicator->setActiveColor( QApplication::palette().color( QPalette::Active,
-															 QPalette::Highlight ) );
-	} else
-	{
-		m_activityIndicator->setActiveColor( QApplication::palette().color( QPalette::Active,
-															 QPalette::BrightText ) );
-	}
 }
 
 
@@ -1599,7 +1607,7 @@ void InstrumentTrackWindow::saveSettingsBtnClicked()
 	sfd.setDirectory( presetRoot + m_track->instrumentName() );
 	sfd.setFileMode( FileDialog::AnyFile );
 	QString fname = m_track->name();
-	sfd.selectFile( fname.remove(QRegExp("[^a-zA-Z0-9_\\-\\d\\s]")) );
+	sfd.selectFile(fname.remove(QRegExp(FILENAME_FILTER)));
 	sfd.setDefaultSuffix( "xpf");
 
 	if( sfd.exec() == QDialog::Accepted &&

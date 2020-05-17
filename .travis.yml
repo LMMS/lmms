@@ -1,6 +1,6 @@
 language: cpp
 compiler: gcc
-dist: trusty
+dist: xenial
 sudo: required
 cache:
     directories:

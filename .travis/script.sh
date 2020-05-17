@@ -22,7 +22,7 @@ else
 	"$TRAVIS_BUILD_DIR/.travis/$TRAVIS_OS_NAME.$TARGET_OS.script.sh"
 
 	# Package and upload non-tagged builds
-	if [ ! -z "$TRAVIS_TAG" ]; then
+	if [ -n "$TRAVIS_TAG" ]; then
 		# Skip, handled by travis deploy instead
 		exit 0
 	elif [[ $TARGET_OS == win* ]]; then

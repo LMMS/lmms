@@ -142,6 +142,14 @@ void LinkedModelGroupView::removeControl(const QString& key)
 }
 
 
+
+
+void LinkedModelGroupView::removeFocusFromSearchBar()
+{
+	m_layout->removeFocusFromSearchBar();
+}
+
+
 /*
 	LinkedModelGroupsViewBase
 */
