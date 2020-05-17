@@ -21,13 +21,12 @@
 #include <string>
 #include <vector>
 #include <algorithm>
-#include <utility>
 #include <cstring>
 #include <cassert>
 
 using std::string;
 using std::vector;
-using std::move;
+using std::sort;
 
 /*---------------------------------------------------------------------------*/
 
@@ -88,7 +87,7 @@ const size_t writeBigEndian2(uint16_t val, uint8_t *buffer)
 
 /*---------------------------------------------------------------------------*/
 
-//! Class to encapsulate the MIDI header structure
+//! Class to encapsulate MIDI header structure
 class MIDIHeader
 {
 private:
@@ -348,7 +347,7 @@ public:
 	{
 		// Created sorted vector of events
 		vector<Event> eventsSorted = events;
-		std::sort(eventsSorted.begin(), eventsSorted.end());
+		sort(eventsSorted.begin(), eventsSorted.end());
 
 		uint32_t timeLast = 0;
 		for (Event &e : eventsSorted)

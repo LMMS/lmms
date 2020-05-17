@@ -31,31 +31,52 @@
 #include "ExportFilter.h"
 #include "MidiFile.hpp"
 
+using std::vector;
 
-const int BUFFER_SIZE = 50*1024;
-typedef MidiFile::MIDITrack<BUFFER_SIZE> MTrack;
+/*---------------------------------------------------------------------------*/
 
+//! Size of the buffer used for exporting info
+constexpr size_t BUFFER_SIZE = 50*1024;
+
+//! A single note
 struct MidiNote
 {
-	int time;
+	//! The pitch (tone), which can be lower or higher
 	uint8_t pitch;
-	int duration;
+
+	//! Volume (loudness)
 	uint8_t volume;
 
+	//! Absolute time (from song start) when the note starts playing
+	int time;
+
+	//! For how long the note plays
+	int duration;
+
+	//! Sort notes by time
 	inline bool operator<(const MidiNote &b) const
 	{
-		return this->time < b.time;
+		return time < b.time;
 	}
-} ;
+};
 
-typedef std::vector<MidiNote> MidiNoteVector;
-typedef std::vector<MidiNote>::iterator MidiNoteIterator;
+// Helper vector typedefs
+typedef vector<MidiNote> MidiNoteVector;
+typedef vector<MidiNote>::iterator MidiNoteIterator;
 
+/*---------------------------------------------------------------------------*/
 
-
+//! MIDI exporting base class
 class MidiExport: public ExportFilter
 {
-// 	Q_OBJECT
+	typedef MidiFile::MIDITrack<BUFFER_SIZE> MTrack;
+
+private:
+	struct Pattern;
+	void writeBBPattern(Pattern &src, Pattern &dst,
+			int len, int base, int start, int end);
+	void error();
+
 public:
 	MidiExport();
 	~MidiExport();
@@ -65,22 +86,13 @@ public:
 		return nullptr;
 	}
 
-	virtual bool tryExport(const TrackContainer::TrackList &tracks,
+	//! Export (or try to) a list of tracks with tempo and MP
+	//  to designated filename. Return if operation was successful
+	bool tryExport(const TrackContainer::TrackList &tracks,
 				const TrackContainer::TrackList &tracks_BB,
 				int tempo, int masterPitch, const QString &filename);
-
-private:
-	void writePattern(MidiNoteVector &pat, QDomNode n,
-				int base_pitch, double base_volume, int base_time);
-	void writePatternToTrack(MTrack &mtrack, MidiNoteVector &nv);
-	void writeBBPattern(MidiNoteVector &src, MidiNoteVector &dst,
-				int len, int base, int start, int end);
-	void ProcessBBNotes(MidiNoteVector &nv, int cutPos);
-
-	void error();
-
-
 } ;
 
+/*---------------------------------------------------------------------------*/
 
 #endif
