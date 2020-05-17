@@ -110,6 +110,9 @@ public:
 	void setGeometry(const QRect &rect) override;
 	QSize sizeHint() const override;
 	QLayoutItem *takeAt(int index) override;
+	//! remove focus from QLineEdit search bar
+	//! this may be useful if the mouse is outside the layout
+	void removeFocusFromSearchBar();
 
 private slots:
 	void onTextChanged(const QString&);
