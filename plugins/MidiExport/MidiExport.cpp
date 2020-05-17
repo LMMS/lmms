@@ -23,14 +23,15 @@
  *
  */
 
-#include <stack>
-
 #include "MidiExport.h"
+
+#include <stack>
 
 #include "BBTrack.h"
 #include "InstrumentTrack.h"
 #include "LocaleHelper.h"
 #include "plugin_export.h"
+#include "../sf2_player/sf2_player.h"
 
 using std::pair;
 using std::vector;
@@ -162,8 +163,6 @@ struct MidiExport::Pattern
 
 /*---------------------------------------------------------------------------*/
 
-//! Export a list of normal tracks and a list of BB ones, with
-//  global tempo and master pitch, to a MIDI file indicated by <filename>
 bool MidiExport::tryExport(const TrackContainer::TrackList &tracks,
 			const TrackContainer::TrackList &tracksBB,
 			int tempo, int masterPitch, const QString &filename)
@@ -203,15 +202,27 @@ bool MidiExport::tryExport(const TrackContainer::TrackList &tracks,
 
 		if (track->type() == Track::InstrumentTrack)
 		{
-			// Firstly, add info about tempo and track name (at time 0)
-			mtrack.addName(track->name().toStdString(), 0);
-			mtrack.addProgramChange(rand() % 8, 0);
-			mtrack.addTempo(tempo, 0);
-
 			// Cast track as a instrument one and save info from it to element
 			InstrumentTrack *instTrack =
 					dynamic_cast<InstrumentTrack *>(track);
 			element = instTrack->saveState(dataFile, dataFile.content());
+
+			// Add info about tempo and track number
+			mtrack.addTempo(tempo, 0);
+			mtrack.addName(track->name().toStdString(), 0);
+
+			// If the current track is a Sf2 Player one, set the current
+			// patch for to the exporting track. Note that this only works
+			// decently if the current bank is a GM 1~128 one (which would be
+			// needed as the default either way for successful import).
+			uint8_t patch = 0;
+			QString instName = instTrack->instrumentName();
+			if (instName == "Sf2 Player")
+			{
+				class Instrument *inst = instTrack->instrument();
+				patch = inst->childModel("patch")->value<uint8_t>();
+			}
+			mtrack.addProgramChange(patch, 0);
 
 			// Get track info and then update pattern
 			int basePitch = 57;
@@ -284,15 +295,15 @@ bool MidiExport::tryExport(const TrackContainer::TrackList &tracks,
 		MTrack mtrack(5);
 		DataFile dataFile(DataFile::SongProject);
 
-		// Cast track as a instrument one and save info from it to element
-		if (track->type() != Track::InstrumentTrack) continue;
-		InstrumentTrack *instTrack = dynamic_cast<InstrumentTrack *>(track);
-		element = instTrack->saveState(dataFile, dataFile.content());
-
 		// Add usual info to start of track
 		mtrack.addName(track->name().toStdString(), 0);
 		// mtrack.addProgramChange(0, 0);
 		mtrack.addTempo(tempo, 0);
+
+		// Cast track as a instrument one and save info from it to element
+		if (track->type() != Track::InstrumentTrack) continue;
+		InstrumentTrack *instTrack = dynamic_cast<InstrumentTrack *>(track);
+		element = instTrack->saveState(dataFile, dataFile.content());
 
 		// Get track info and then update pattern(s)
 		int basePitch = 57;

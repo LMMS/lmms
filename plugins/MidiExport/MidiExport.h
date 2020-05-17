@@ -84,7 +84,7 @@ public:
 		return nullptr;
 	}
 
-	//! Export (or try to) a list of tracks with tempo and MP
+	//! Export a list of tracks with tempo and master pitch
 	//  to designated filename. Return if operation was successful
 	bool tryExport(const TrackContainer::TrackList &tracks,
 			const TrackContainer::TrackList &tracksBB,
