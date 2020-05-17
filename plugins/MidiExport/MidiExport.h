@@ -73,8 +73,6 @@ class MidiExport: public ExportFilter
 
 private:
 	struct Pattern;
-	void writeBBPattern(Pattern &src, Pattern &dst,
-			int len, int base, int start, int end);
 	void error();
 
 public:
@@ -89,8 +87,8 @@ public:
 	//! Export (or try to) a list of tracks with tempo and MP
 	//  to designated filename. Return if operation was successful
 	bool tryExport(const TrackContainer::TrackList &tracks,
-				const TrackContainer::TrackList &tracks_BB,
-				int tempo, int masterPitch, const QString &filename);
+			const TrackContainer::TrackList &tracksBB,
+			int tempo, int masterPitch, const QString &filename);
 } ;
 
 /*---------------------------------------------------------------------------*/

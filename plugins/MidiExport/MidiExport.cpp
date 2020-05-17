@@ -23,21 +23,18 @@
  *
  */
 
-#include <QDomDocument>
-#include <QDir>
-#include <QApplication>
-#include <QMessageBox>
-#include <QProgressDialog>
+#include <stack>
 
 #include "MidiExport.h"
 
-#include "lmms_math.h"
-#include "TrackContainer.h"
 #include "BBTrack.h"
 #include "InstrumentTrack.h"
 #include "LocaleHelper.h"
 #include "plugin_export.h"
 
+using std::pair;
+using std::vector;
+using std::stack;
 using std::sort;
 
 extern "C"
@@ -46,7 +43,7 @@ extern "C"
 //! Standardized plugin descriptor for MIDI exporter
 Plugin::Descriptor PLUGIN_EXPORT midiexport_plugin_descriptor =
 {
-	STRINGIFY( PLUGIN_NAME ),
+	STRINGIFY(PLUGIN_NAME),
 	"MIDI Export",
 	QT_TRANSLATE_NOOP("pluginBrowser",
 		"Filter for exporting MIDI-files from LMMS"),
@@ -63,49 +60,58 @@ Plugin::Descriptor PLUGIN_EXPORT midiexport_plugin_descriptor =
 
 /*---------------------------------------------------------------------------*/
 
-MidiExport::MidiExport() : ExportFilter( &midiexport_plugin_descriptor) {}
+// Constructor and destructor
+MidiExport::MidiExport() :
+		ExportFilter(&midiexport_plugin_descriptor) {}
 MidiExport::~MidiExport() {}
 
 /*---------------------------------------------------------------------------*/
 
+//! Represents a pattern of notes
 struct MidiExport::Pattern
 {
+	//! Vector of actual notes
 	MidiNoteVector notes;
 
-	void write(QDomNode element,
-			int base_pitch, double base_volume, int base_time)
+	//! Append notes from root node to pattern
+	void write(const QDomNode root,
+			int basePitch, double baseVolume, int baseTime)
 	{
-		// TODO interpret steps="12" muted="0" type="1" name="Piano1"  len="2592"
-		for (QDomNode node = element.firstChild(); !node.isNull();
-				node = node.nextSibling())
+		// TODO interpret steps="12" muted="0" type="1" name="Piano1" len="259"
+		for (QDomNode node = root.firstChild(); not node.isNull();
+				node = root.nextSibling())
 		{
 			QDomElement note = node.toElement();
-			if (note.attribute("len", "0") == "0") continue;
-			// TODO interpret pan="0" fxch="0" pitchrange="1"
 
+			// Ignore zero-length notes
+			if (note.attribute("len", "0") == "0") continue;
+
+			// Adjust note attributes based on base measures
 			MidiNote mnote;
-			int pitch = note.attribute("key", "0").toInt() + base_pitch;
+			int pitch = note.attribute("key", "0").toInt() + basePitch;
 			mnote.pitch = qBound(0, pitch, 127);
-			 // Map from LMMS volume to MIDI velocity
-			double volume = LocaleHelper::toDouble(note.attribute("vol", "100"));
-			volume *= base_volume * (127.0 / 200.0);
+			double volume =
+					LocaleHelper::toDouble(note.attribute("vol", "100"));
+			volume *= baseVolume * (127.0 / 200.0);
 			mnote.volume = qMin(qRound(volume), 127);
-			mnote.time = base_time + note.attribute("pos", "0").toInt();
+			mnote.time = baseTime + note.attribute("pos", "0").toInt();
 			mnote.duration = note.attribute("len", "0").toInt();
 
+			// Append note to vector
 			notes.push_back(mnote);
 		}
 	}
 
-	void writeToTrack(MTrack &mtrack)
+	//! Add pattern notes to MIDI file track
+	void writeToTrack(MTrack &mtrack) const
 	{
-		for (MidiNote &n : notes) {
+		for (const MidiNote &n : notes) {
 			mtrack.addNote(n.pitch, n.volume,
 					n.time / 48.0, n.duration / 48.0);
 		}
 	}
 
-	//! Adjust negative duration BB notes by resizing them positively
+	//! Adjust special duration BB notes by resizing them accordingly
 	void processBBNotes(int cutPos)
 	{
 		// Sort in reverse order
@@ -116,13 +122,39 @@ struct MidiExport::Pattern
 		{
 			if (n.time < cur)
 			{
+				// Set last two notes positions
 				next = cur;
 				cur = n.time;
 			}
 			if (n.duration < 0)
 			{
+				// Note should have positive duration that neither
+				// overlaps next one nor exceeds cutPos
 				n.duration = qMin(-n.duration, next - cur);
 				n.duration = qMin(n.duration, cutPos - n.time);
+			}
+		}
+	}
+
+	//! Write sorted notes to a BB explictly repeating pattern
+	void writeToBB(Pattern &bbPat, int len, int base, int start, int end)
+	{
+		// Avoid misplaced start and end positions
+		if (start >= end) return;
+
+		// Adjust positions relatively to base pos
+		start -= base;
+		end -= base;
+
+		sort(notes.begin(), notes.end());
+		for (MidiNote note : notes)
+		{
+			// TODO
+			int t0 = note.time + ceil((start - note.time) / len) * len;
+			for (int time = t0;	time < end; time += len)
+			{
+				note.time = base + time;
+				bbPat.notes.push_back(note);
 			}
 		}
 	}
@@ -130,23 +162,19 @@ struct MidiExport::Pattern
 
 /*---------------------------------------------------------------------------*/
 
+//! Export a list of normal tracks and a list of BB ones, with
+//  global tempo and master pitch, to a MIDI file indicated by <filename>
 bool MidiExport::tryExport(const TrackContainer::TrackList &tracks,
 			const TrackContainer::TrackList &tracksBB,
 			int tempo, int masterPitch, const QString &filename)
 {
-	// Open .mid file, from where to be exported, in write mode
+	// Open designated blank MIDI file (and data stream) for writing
 	QFile f(filename);
 	f.open(QIODevice::WriteOnly);
 	QDataStream midiout(&f);
 
-	InstrumentTrack* instTrack;
-	BBTrack* bbTrack;
-	QDomElement element;
-
-	uint8_t buffer[BUFFER_SIZE];
-
 	// Count total number of tracks
-	uint8_t nTracks = 0;
+	int nTracks = 0;
 	for (const Track *track : tracks)
 	{
 		if (track->type() == Track::InstrumentTrack) nTracks++;
@@ -156,57 +184,68 @@ bool MidiExport::tryExport(const TrackContainer::TrackList &tracks,
 		if (track->type() == Track::InstrumentTrack) nTracks++;
 	}
 
-	// Write MIDI header data to file
+	// Write MIDI header data to stream
 	MidiFile::MIDIHeader header(nTracks);
+	uint8_t buffer[BUFFER_SIZE];
 	size_t size = header.writeToBuffer(buffer);
-	midiout.writeRawData((char *)buffer, size);
+	midiout.writeRawData((char *) buffer, size);
 
-	std::vector<std::vector<std::pair<int,int>>> plists;
+	// Matrix containing (start, end) pairs for BB objects
+	vector<vector<pair<int, int>>> plists;
 
 	// Iterate through "normal" tracks
+	QDomElement element;
 	for (Track *track : tracks)
 	{
-		DataFile dataFile(DataFile::SongProject);
 		MTrack mtrack;
+		DataFile dataFile(DataFile::SongProject);
 
 		if (track->type() == Track::InstrumentTrack)
 		{
 			// Firstly, add info about tempo and track name (at time 0)
 			mtrack.addName(track->name().toStdString(), 0);
-			//mtrack.addProgramChange(0, 0);
+			// mtrack.addProgramChange(0, 0);
 			mtrack.addTempo(tempo, 0);
 
-			instTrack = dynamic_cast<InstrumentTrack *>(track);
+			// Cast track as a instrument one and save info from it to element
+			InstrumentTrack *instTrack =
+					dynamic_cast<InstrumentTrack *>(track);
 			element = instTrack->saveState(dataFile, dataFile.content());
 
-			int base_pitch = 0;
-			double base_volume = 1.0;
-			int base_time = 0;
-
+			// Get track info and then update pattern
+			int basePitch;
+			double baseVolume;
 			Pattern pat;
-
 			for (QDomNode node = element.firstChild(); not node.isNull();
 					node = node.nextSibling())
 			{
+				QDomElement e = node.toElement();
+
 				if (node.nodeName() == "instrumenttrack")
 				{
-					QDomElement it = node.toElement();
-					// transpose +12 semitones, workaround for #1857
-					base_pitch = (69 - it.attribute("basenote", "57").toInt());
-					if (it.attribute("usemasterpitch", "1").toInt())
+					// Transpose +12 semitones (workaround for #1857).
+					// Adjust to masterPitch if enabled
+					basePitch = e.attribute("basenote", "57").toInt();
+					basePitch = 69 - basePitch;
+					if (e.attribute("usemasterpitch", "1").toInt())
 					{
-						base_pitch += masterPitch;
+						basePitch += masterPitch;
 					}
-					base_volume = LocaleHelper::toDouble(
-							it.attribute("volume", "100"))/100.0;
+					// Volume ranges in [0, 2]
+					baseVolume = LocaleHelper::toDouble(
+							e.attribute("volume", "100"))/100.0;
 				}
 				else if (node.nodeName() == "pattern")
 				{
-					base_time = node.toElement().attribute("pos", "0").toInt();
-					pat.write(node, base_pitch, base_volume, base_time);
+					// Base time == initial position
+					int baseTime = e.attribute("pos", "0").toInt();
+
+					// Write track notes to pattern
+					pat.write(node, basePitch, baseVolume, baseTime);
 				}
 
 			}
+			// Write pattern info to MIDI file track, and then to stream
 			pat.processBBNotes(INT_MAX);
 			pat.writeToTrack(mtrack);
 			size = mtrack.writeToBuffer(buffer);
@@ -215,22 +254,25 @@ bool MidiExport::tryExport(const TrackContainer::TrackList &tracks,
 
 		else if (track->type() == Track::BBTrack)
 		{
-			bbTrack = dynamic_cast<BBTrack *>(track);
+			// Cast track as a BB one and save info from it to element
+			BBTrack *bbTrack = dynamic_cast<BBTrack *>(track);
 			element = bbTrack->saveState(dataFile, dataFile.content());
 
-			std::vector<std::pair<int,int>> plist;
+			// Build lists of (start, end) pairs from BB note objects
+			vector<pair<int,int>> plist;
 			for (QDomNode node = element.firstChild(); not node.isNull();
 					node = node.nextSibling())
 			{
 				if (node.nodeName() == "bbtco")
 				{
-					QDomElement it = node.toElement();
-					int pos = it.attribute("pos", "0").toInt();
-					int len = it.attribute("len", "0").toInt();
-					plist.push_back(std::pair<int,int>(pos, pos+len));
+					QDomElement e = node.toElement();
+					int start = e.attribute("pos", "0").toInt();
+					int end = start + e.attribute("len", "0").toInt();
+					plist.push_back(pair<int,int>(start, end));
 				}
 			}
-			std::sort(plist.begin(), plist.end());
+			// Sort list in ascending order and append it to matrix
+			sort(plist.begin(), plist.end());
 			plists.push_back(plist);
 		}
 	}
@@ -238,110 +280,101 @@ bool MidiExport::tryExport(const TrackContainer::TrackList &tracks,
 	// Iterate through BB tracks
 	for (Track* track : tracksBB)
 	{
-		DataFile dataFile(DataFile::SongProject);
 		MTrack mtrack;
+		DataFile dataFile(DataFile::SongProject);
 
-		auto itr = plists.begin();
-		std::vector<std::pair<int,int>> st;
-
+		// Cast track as a instrument one and save info from it to element
 		if (track->type() != Track::InstrumentTrack) continue;
-
-		mtrack.addName(track->name().toStdString(), 0);
-		//mtrack.addProgramChange(0, 0);
-		mtrack.addTempo(tempo, 0);
-
-		instTrack = dynamic_cast<InstrumentTrack *>(track);
+		InstrumentTrack *instTrack = dynamic_cast<InstrumentTrack *>(track);
 		element = instTrack->saveState(dataFile, dataFile.content());
 
-		int base_pitch = 0;
-		double base_volume = 1.0;
+		// Add usual info to start of track
+		mtrack.addName(track->name().toStdString(), 0);
+		// mtrack.addProgramChange(0, 0);
+		mtrack.addTempo(tempo, 0);
 
+		// Get track info and then update pattern(s)
+		int basePitch;
+		double baseVolume;
+		int i = 0;
 		for (QDomNode node = element.firstChild(); not node.isNull();
 				node = node.nextSibling())
 		{
+			QDomElement e = node.toElement();
+
 			if (node.nodeName() == "instrumenttrack")
 			{
-				QDomElement it = node.toElement();
-				// transpose +12 semitones, workaround for #1857
-				base_pitch = (69 - it.attribute("basenote", "57").toInt());
-				if (it.attribute("usemasterpitch", "1").toInt())
+				// Transpose +12 semitones (workaround for #1857).
+				// Adjust to masterPitch if enabled
+				basePitch = e.attribute("basenote", "57").toInt();
+				basePitch = 69 - basePitch;
+				if (e.attribute("usemasterpitch", "1").toInt())
 				{
-					base_pitch += masterPitch;
+					basePitch += masterPitch;
 				}
-				base_volume = LocaleHelper::toDouble(
-						it.attribute("volume", "100"))/100.0;
+				// Volume ranges in [0, 2]
+				baseVolume = LocaleHelper::toDouble(
+						e.attribute("volume", "100"))/100.0;
 			}
 			else if (node.nodeName() == "pattern")
 			{
-				std::vector<std::pair<int,int>> &plist = *itr;
-
+				// Write to-be repeated BB notes to pattern
+				// (notice base time of 0)
 				Pattern pat, bbPat;
-				pat.write(node, base_pitch, base_volume, 0);
+				pat.write(node, basePitch, baseVolume, 0);
 
-				// workaround for nested BBTCOs
+				// Workaround for nested BBTCOs
 				int pos = 0;
-				int len = node.toElement().attribute("steps", "1").toInt();
-				len *= 12;
+				int len = 12 * e.attribute("steps", "1").toInt();
+
+				// Iterate through BBTCO pairs of current list
+				// TODO: Rewrite or completely refactor this
+				vector<pair<int,int>> &plist = plists[i++];
+				stack<pair<int, int>> st;
 				for (pair<int, int> &p : plist)
 				{
-					while (not st.empty() and st.back().second <= p.first)
+					while (not st.empty() and st.top().second <= p.first)
 					{
-						writeBBPattern(pat, bbPat,
-								len, st.back().first, pos, st.back().second);
-						pos = st.back().second;
-						st.pop_back();
+						pat.writeToBB(bbPat,
+								len, st.top().first, pos, st.top().second);
+						pos = st.top().second;
+						st.pop();
 					}
-					if (not st.empty() and st.back().second <= p.second)
+					if (not st.empty() and st.top().second <= p.second)
 					{
-						writeBBPattern(pat, bbPat,
-								len, st.back().first, pos, p.first);
+						pat.writeToBB(bbPat,
+								len, st.top().first, pos, p.first);
 						pos = p.first;
-						while (not st.empty() and st.back().second <= p.second)
+						while (not st.empty() and st.top().second <= p.second)
 						{
-							st.pop_back();
+							st.pop();
 						}
 					}
-					st.push_back(p);
+					st.push(p);
 					pos = p.first;
 				}
 				while (not st.empty())
 				{
-					writeBBPattern(pat, bbPat,
-							len, st.back().first, pos, st.back().second);
-					pos = st.back().second;
-					st.pop_back();
+					pat.writeToBB(bbPat,
+							len, st.top().first, pos, st.top().second);
+					pos = st.top().second;
+					st.pop();
 				}
+				// Write pattern info to MIDI file track
 				bbPat.processBBNotes(pos);
 				bbPat.writeToTrack(mtrack);
-				++itr;
+
+				// Increment matrix line index
+				i++;
 			}
 		}
+		// Write track data to stream
 		size = mtrack.writeToBuffer(buffer);
 		midiout.writeRawData((char *) buffer, size);
 	}
 
-	// Always returns true
+	// Always returns success... for now?
 	return true;
-}
-
-/*---------------------------------------------------------------------------*/
-
-void MidiExport::writeBBPattern(Pattern &src, Pattern &dst,
-				int len, int base, int start, int end)
-{
-	if (start >= end) { return; }
-	start -= base;
-	end -= base;
-	std::sort(src.notes.begin(), src.notes.end());
-	for (MidiNote note : src.notes)
-	{
-		for (int time = note.time + ceil((start - note.time) / len) * len;
-				time < end; time += len)
-		{
-			note.time += base;
-			dst.notes.push_back(note);
-		}
-	}
 }
 
 /*---------------------------------------------------------------------------*/
@@ -350,9 +383,9 @@ extern "C"
 {
 
 // Necessary for getting instance out of shared lib
-PLUGIN_EXPORT Plugin * lmms_plugin_main( Model *, void * _data )
+PLUGIN_EXPORT Plugin * lmms_plugin_main(Model *, void * _data)
 {
 	return new MidiExport();
 }
 
-}
+} // extern "C"
