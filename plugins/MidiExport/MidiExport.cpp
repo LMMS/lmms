@@ -79,7 +79,7 @@ struct MidiExport::Pattern
 	{
 		// TODO interpret steps="12" muted="0" type="1" name="Piano1" len="259"
 		for (QDomNode node = root.firstChild(); not node.isNull();
-				node = root.nextSibling())
+				node = node.nextSibling())
 		{
 			QDomElement note = node.toElement();
 
@@ -195,16 +195,17 @@ bool MidiExport::tryExport(const TrackContainer::TrackList &tracks,
 
 	// Iterate through "normal" tracks
 	QDomElement element;
+	uint8_t channel_id = 0;
 	for (Track *track : tracks)
 	{
-		MTrack mtrack;
+		MTrack mtrack(channel_id++);
 		DataFile dataFile(DataFile::SongProject);
 
 		if (track->type() == Track::InstrumentTrack)
 		{
 			// Firstly, add info about tempo and track name (at time 0)
 			mtrack.addName(track->name().toStdString(), 0);
-			// mtrack.addProgramChange(0, 0);
+			mtrack.addProgramChange(rand() % 8, 0);
 			mtrack.addTempo(tempo, 0);
 
 			// Cast track as a instrument one and save info from it to element
@@ -213,8 +214,8 @@ bool MidiExport::tryExport(const TrackContainer::TrackList &tracks,
 			element = instTrack->saveState(dataFile, dataFile.content());
 
 			// Get track info and then update pattern
-			int basePitch;
-			double baseVolume;
+			int basePitch = 57;
+			double baseVolume = 1.0;
 			Pattern pat;
 			for (QDomNode node = element.firstChild(); not node.isNull();
 					node = node.nextSibling())
@@ -233,7 +234,7 @@ bool MidiExport::tryExport(const TrackContainer::TrackList &tracks,
 					}
 					// Volume ranges in [0, 2]
 					baseVolume = LocaleHelper::toDouble(
-							e.attribute("volume", "100"))/100.0;
+							e.attribute("volume", "100")) / 100.0;
 				}
 				else if (node.nodeName() == "pattern")
 				{
@@ -280,7 +281,7 @@ bool MidiExport::tryExport(const TrackContainer::TrackList &tracks,
 	// Iterate through BB tracks
 	for (Track* track : tracksBB)
 	{
-		MTrack mtrack;
+		MTrack mtrack(5);
 		DataFile dataFile(DataFile::SongProject);
 
 		// Cast track as a instrument one and save info from it to element
@@ -294,8 +295,8 @@ bool MidiExport::tryExport(const TrackContainer::TrackList &tracks,
 		mtrack.addTempo(tempo, 0);
 
 		// Get track info and then update pattern(s)
-		int basePitch;
-		double baseVolume;
+		int basePitch = 57;
+		double baseVolume = 1.0;
 		int i = 0;
 		for (QDomNode node = element.firstChild(); not node.isNull();
 				node = node.nextSibling())
@@ -363,9 +364,6 @@ bool MidiExport::tryExport(const TrackContainer::TrackList &tracks,
 				// Write pattern info to MIDI file track
 				bbPat.processBBNotes(pos);
 				bbPat.writeToTrack(mtrack);
-
-				// Increment matrix line index
-				i++;
 			}
 		}
 		// Write track data to stream

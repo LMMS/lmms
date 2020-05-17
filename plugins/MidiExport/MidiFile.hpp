@@ -212,7 +212,7 @@ struct Event
 				break;
 
 			case PROG_CHANGE:
-				// Change to another numbered program
+				// Change patch number
 				code = (0xC << 4) | channel;
 				size = writeVarLength(time, buffer);
 				buffer[size++] = code;
@@ -269,10 +269,12 @@ private:
 	}
 
 public:
-	//! Channel number corresponding to self
-	uint8_t channel = 0;
+	//! Track channel number
+	uint8_t channel;
 
-	// TODO: Constructor?
+	//! Constructor
+	MIDITrack(uint8_t channel):
+			channel(channel) {}
 
 	/*-----------------------------------------------------------------------*/
 
