@@ -120,7 +120,7 @@ void LcdSpinBox::mouseMoveEvent( QMouseEvent* event )
 {
 	if( m_mouseMoving )
 	{
-		int dy = 3 * (event->globalY() - m_lastMousePos.y());
+		int dy = 2 * (event->globalY() - m_lastMousePos.y());
 		if( event->modifiers() & Qt::ShiftModifier )
 			dy = qBound( -4, dy/4, 4 );
 		if( dy > 1 || dy < -1 )
