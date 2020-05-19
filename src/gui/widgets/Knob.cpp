@@ -695,7 +695,8 @@ void Knob::paintEvent( QPaintEvent * _me )
 void Knob::wheelEvent( QWheelEvent * _we )
 {
 	_we->accept();
-	const int inc = ( _we->delta() > 0 ) ? 1 : -1;
+	const float stepMult = model()->range() / 2000 / model()->step<float>();
+	const int inc = ( ( _we->delta() > 0 ) ? 1 : -1 ) * ( ( stepMult < 1 ) ? 1 : stepMult );
 	model()->incValue( inc );
 
 

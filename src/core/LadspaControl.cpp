@@ -80,7 +80,7 @@ LadspaControl::LadspaControl( Model * _parent, port_desc_t * _port,
 				( m_port->max - m_port->min )
 				/ ( m_port->name.toUpper() == "GAIN"
 					&& m_port->max == 10.0f ? 4000.0f :
-								( m_port->suggests_logscale ? 8000.0f : 800.0f ) ) );
+								( m_port->suggests_logscale ? 8000000.0f : 800000.0f ) ) );
 			m_knobModel.setInitValue( m_port->def );
 			connect( &m_knobModel, SIGNAL( dataChanged() ),
 						 this, SLOT( knobChanged() ) );
