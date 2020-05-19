@@ -28,6 +28,7 @@
 #include <string>
 #include <sstream>
 #include <vector>
+#include <map>
 #include "ringbuffer/ringbuffer.h"
 #include <atomic>
 
@@ -47,6 +48,19 @@ enum class LogVerbosity
 
 LogVerbosity stringToLogVerbosity(std::string s);
 
+class LogTopic
+{
+public:
+	LogTopic(std::string name);
+	std::string name() const;
+	int id() const { return m_id; }
+private:
+	int m_id;
+	static std::map<int, std::string> ms_topicIds;
+};
+
+extern LogTopic LT_Default;
+
 struct LogLine
 {
 	LogVerbosity verbosity;
@@ -55,11 +69,13 @@ struct LogLine
 	std::string fileName;
 	unsigned int fileLineNo;
 	std::string content;
+	LogTopic topic;
 
 	LogLine(LogVerbosity verbosity,
 		std::string fileName,
 		unsigned int fileLineNo,
-		std::string content);
+		std::string content,
+		LogTopic topic);
 
 	std::string toString() const;
 };
@@ -100,7 +116,8 @@ public:
 	void push(LogVerbosity verbosity,
 		std::string fileName,
 		unsigned int fileLineNo,
-		std::string content);
+		std::string content,
+		LogTopic topic);
 
 	void flush();
 
@@ -121,7 +138,8 @@ class LogIostreamWrapper: public std::ostringstream
 public:
 	LogIostreamWrapper(LogVerbosity verbosity,
 			std::string fileName,
-			unsigned int fileLineNo);
+			unsigned int fileLineNo,
+			LogTopic topic);
 
 	~LogIostreamWrapper() override;
 
@@ -129,26 +147,38 @@ private:
 	LogLine* m_pLine;
 };
 
-#define Log_Gen(verb,format,...)                                               \
-	do {                                                                   \
-		char _content[1024];                                           \
-		snprintf(_content, sizeof(_content), format, ##__VA_ARGS__);   \
-		LogManager::inst().push(verb, __FILE__, __LINE__, _content);   \
+#define Log_Gen(verb,topic,format,...)                                             \
+	do {                                                                       \
+		char _content[1024];                                               \
+		snprintf(_content, sizeof(_content), format, ##__VA_ARGS__);       \
+		LogManager::inst().push(verb, __FILE__, __LINE__,                  \
+					_content, topic);                          \
 	} while(0)
 
-#define Log_Fatal(format,...) Log_Gen(LogVerbosity::Fatal, format, ##__VA_ARGS__);
-#define Log_Err(format,...) Log_Gen(LogVerbosity::Error, format, ##__VA_ARGS__);
-#define Log_Wrn(format,...) Log_Gen(LogVerbosity::Warning, format, ##__VA_ARGS__);
-#define Log_Inf(format,...) Log_Gen(LogVerbosity::Info, format, ##__VA_ARGS__);
-#define Log_Dbg_Lo(format, ...) Log_Gen(LogVerbosity::Debug_Lo, format, ##__VA_ARGS__);
-#define Log_Dbg_Hi(format, ...) Log_Gen(LogVerbosity::Debug_Hi, format, ##__VA_ARGS__);
+#define Log_Fatal(topic,format,...) \
+	Log_Gen(LogVerbosity::Fatal, topic, format, ##__VA_ARGS__);
 
-#define Log_Str_Gen(verb) LogIostreamWrapper(verb, __FILE__, __LINE__)
-#define Log_Str_Fatal Log_Str_Gen(LogVerbosity::Fatal)
-#define Log_Str_Err Log_Str_Gen(LogVerbosity::Error)
-#define Log_Str_Wrn Log_Str_Gen(LogVerbosity::Warning)
-#define Log_Str_Inf Log_Str_Gen(LogVerbosity::Info)
-#define Log_Str_Dbg_Lo Log_Str_Gen(LogVerbosity::Debug_Lo)
-#define Log_Str_Dbg_Hi Log_Str_Gen(LogVerbosity::Debug_Hi)
+#define Log_Err(topic,format,...) \
+	Log_Gen(LogVerbosity::Error, topic, format, ##__VA_ARGS__);
+
+#define Log_Wrn(topic,format,...) \
+	Log_Gen(LogVerbosity::Warning, topic, format, ##__VA_ARGS__);
+
+#define Log_Inf(topic,format,...) \
+	Log_Gen(LogVerbosity::Info, topic, format, ##__VA_ARGS__);
+
+#define Log_Dbg_Lo(topic,format, ...) \
+	Log_Gen(LogVerbosity::Debug_Lo, topic, format, ##__VA_ARGS__);
+
+#define Log_Dbg_Hi(topic,format, ...) \
+	Log_Gen(LogVerbosity::Debug_Hi, topic, format, ##__VA_ARGS__);
+
+#define Log_Str_Gen(verb, topic) LogIostreamWrapper(verb, __FILE__, __LINE__, topic)
+#define Log_Str_Fatal(topic) Log_Str_Gen(LogVerbosity::Fatal, topic)
+#define Log_Str_Err(topic) Log_Str_Gen(LogVerbosity::Error, topic)
+#define Log_Str_Wrn(topic) Log_Str_Gen(LogVerbosity::Warning, topic)
+#define Log_Str_Inf(topic) Log_Str_Gen(LogVerbosity::Info, topic)
+#define Log_Str_Dbg_Lo(topic) Log_Str_Gen(LogVerbosity::Debug_Lo, topic)
+#define Log_Str_Dbg_Hi(topic) Log_Str_Gen(LogVerbosity::Debug_Hi, topic)
 
 #endif // DEBUG_TRACE_H

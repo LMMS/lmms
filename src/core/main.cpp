@@ -141,6 +141,8 @@ inline void loadTranslation( const QString & tname,
 
 void qDebugToLogManagerAdapter(QtMsgType type, const QMessageLogContext &context, const QString &msg)
 {
+	static LogTopic LT_QtInternal("qtInternal");
+
 	QByteArray localMsg = msg.toLocal8Bit();
 	LogVerbosity verbosity = LogVerbosity::Debug_Hi;
 
@@ -169,7 +171,8 @@ void qDebugToLogManagerAdapter(QtMsgType type, const QMessageLogContext &context
 	LogLine* logLine = new LogLine(verbosity,
 			context.file ? context.file : "",
 			context.line,
-			localMsg.constData());
+			localMsg.constData(),
+			LT_QtInternal);
 	LogManager::inst().push(logLine);
 
 }
@@ -778,7 +781,7 @@ int main( int argc, char * * argv )
 
 	qInstallMessageHandler(qDebugToLogManagerAdapter);
 
-	Log_Inf("Logging activated");
+	Log_Inf(LT_Default, "Logging activated");
 
 	ConfigManager::inst()->loadConfigFile(configFile);
 
@@ -816,7 +819,7 @@ int main( int argc, char * * argv )
 				sched_get_priority_min( SCHED_FIFO ) ) / 2;
 	if( sched_setscheduler( 0, SCHED_FIFO, &sparam ) == -1 )
 	{
-		Log_Wrn("Could not set realtime priority.");
+		Log_Wrn(LT_Default, "Could not set realtime priority.");
 	}
 #endif
 #endif
@@ -825,7 +828,7 @@ int main( int argc, char * * argv )
 #ifdef LMMS_BUILD_WIN32
 	if( !SetPriorityClass( GetCurrentProcess(), HIGH_PRIORITY_CLASS ) )
 	{
-		Log_Wrn("Could not set realtime priority.");
+		Log_Wrn(LT_Default, "Could not set realtime priority.");
 	}
 #endif
 
@@ -835,11 +838,11 @@ int main( int argc, char * * argv )
 	sa.sa_flags = SA_SIGINFO;
 	if ( sigemptyset( &sa.sa_mask ) )
 	{
-		fprintf( stderr, "Signal initialization failed.\n" );
+		Log_Err(LT_Default, "Signal initialization failed");
 	}
 	if ( sigaction( SIGPIPE, &sa, NULL ) )
 	{
-		fprintf( stderr, "Signal initialization failed.\n" );
+		Log_Err(LT_Default, "Signal initialization failed");
 	}
 #endif
 
@@ -852,15 +855,15 @@ int main( int argc, char * * argv )
 		Engine::init( true );
 		destroyEngine = true;
 
-		Log_Inf("Loading project...");
+		Log_Inf(LT_Default, "Loading project...");
 		Engine::getSong()->loadProject( fileToLoad );
 		if( Engine::getSong()->isEmpty() )
 		{
-			Log_Wrn("The project %s is empty, aborting!",
+			Log_Wrn(LT_Default, "The project %s is empty, aborting!",
 				fileToLoad.toUtf8().constData() );
 			exit( EXIT_FAILURE );
 		}
-		Log_Inf("Done");
+		Log_Inf(LT_Default, "Done");
 
 		Engine::getSong()->setExportLoop( renderLoop );
 

@@ -29,8 +29,11 @@
 #include <map>
 #include <sys/time.h>
 
-const int LOG_BUFFER_SIZE = 256;
+const int LOG_BUFFER_SIZE = 1024;
 const unsigned int USEC_PER_SEC = 1000000;
+
+std::map<int, std::string>  LogTopic::ms_topicIds;
+LogTopic LT_Default("default");
 
 #if defined(WIN32) || defined(_WIN32)
 	#define PATH_SEPARATOR "\\"
@@ -39,19 +42,45 @@ const unsigned int USEC_PER_SEC = 1000000;
 #endif
 
 
+LogTopic::LogTopic(std::string name)
+{
+	static int nextId = 1;
+
+	/* Check if a topic has not been already registered. If yes, substitute
+	 * the identifier rather than generating a new one */
+	for (const std::pair<int, std::string>& idName: ms_topicIds)
+	{
+		if (idName.second == name)
+		{
+			m_id = idName.first;
+			return;
+		}
+	}
+
+	m_id = nextId++;
+	ms_topicIds[m_id] = name;
+}
+
+std::string LogTopic::name() const
+{
+	return ms_topicIds[m_id];
+}
+
 LogLine::LogLine(LogVerbosity verbosity,
 		std::string fileName,
 		unsigned int fileLineNo,
-		std::string content)
+		std::string content,
+		LogTopic topic)
+	: verbosity(verbosity)
+	, fileLineNo(fileLineNo)
+	, content(content)
+	, topic(topic)
 {
 	static unsigned int logLineNo = 0;
 	static unsigned long int initialTimestamp = 0;
 	struct timeval tv;
 
-	this->verbosity = verbosity;
-	this->fileLineNo = fileLineNo;
 	this->fileName = fileName;
-	this->content = content;
 	this->logLineNo = logLineNo++;
 
 	/* Fill the timestamp information */
@@ -106,6 +135,8 @@ std::string LogLine::toString() const
 	{
 		os << "-?";
 	}
+
+	os << "-#" << topic.name();
 
 	os << ": " << content;
 
@@ -193,7 +224,8 @@ void LogManager::push(LogLine* logLine)
 	}
 	else if (m_pendingLogLines.write_space() == 1)
 	{
-		Log_Wrn("Log queue overflow, some lines might be dropped");
+		Log_Wrn(LT_Default,
+			"Log queue overflow, some lines might be dropped");
 	}
 
 	/* If the logging thread is not used, make the log message appear
@@ -207,9 +239,11 @@ void LogManager::push(LogLine* logLine)
 void LogManager::push(LogVerbosity verbosity,
 			std::string fileName,
 			unsigned int fileLineNo,
-			std::string content)
+			std::string content,
+			LogTopic topic)
 {
-	LogLine* logLine = new LogLine(verbosity, fileName, fileLineNo, content);
+	LogLine* logLine = new LogLine(verbosity,fileName, fileLineNo,
+					content, topic);
 	push(logLine);
 }
 
@@ -247,8 +281,9 @@ void LogManager::flush()
 
 LogIostreamWrapper::LogIostreamWrapper(LogVerbosity verbosity,
 					std::string fileName,
-					unsigned int fileLineNo)
-	: m_pLine(new LogLine(verbosity, fileName, fileLineNo, ""))
+					unsigned int fileLineNo,
+					LogTopic topic)
+	: m_pLine(new LogLine(verbosity, fileName, fileLineNo, "", topic))
 {
 }
 
@@ -269,6 +304,5 @@ LogVerbosity stringToLogVerbosity(std::string s)
 		{"debug_lo", LogVerbosity::Debug_Lo},
 		{"debug_hi", LogVerbosity::Debug_Hi}
 	};
-
 	return mapping.at(s);
 }

@@ -36,6 +36,8 @@
 #include "gui_templates.h"
 #include "Engine.h"
 
+LogTopic LT_PulseAudio("pulseaudio");
+
 
 static void stream_write_callback(pa_stream *s, size_t length, void *userdata)
 {
@@ -135,12 +137,14 @@ static void stream_state_callback( pa_stream *s, void * userdata )
 			break;
 
 		case PA_STREAM_READY:
-			Log_Inf( "Stream successfully created" );
+			Log_Inf(LT_PulseAudio,
+				"Stream successfully created" );
 			break;
 
 		case PA_STREAM_FAILED:
 		default:
-			Log_Err( "Stream error: %s\n",
+			Log_Err(LT_PulseAudio,
+				"Stream error: %s\n",
 					pa_strerror(pa_context_errno(
 						pa_stream_get_context( s ) ) ) );
 	}
@@ -161,7 +165,7 @@ static void context_state_callback(pa_context *c, void *userdata)
 
 		case PA_CONTEXT_READY:
 		{
-			Log_Inf("Connection established");
+			Log_Inf(LT_PulseAudio, "Connection established");
 			_this->m_s = pa_stream_new( c, "lmms", &_this->m_sampleSpec,  NULL);
 			pa_stream_set_state_callback( _this->m_s, stream_state_callback, _this );
 			pa_stream_set_write_callback( _this->m_s, stream_write_callback, _this );
@@ -196,7 +200,8 @@ static void context_state_callback(pa_context *c, void *userdata)
 
 		case PA_CONTEXT_FAILED:
 		default:
-			Log_Err( "Connection failure: %s",
+			Log_Err(LT_PulseAudio,
+				"Connection failure: %s",
 				 pa_strerror( pa_context_errno( c ) ) );
 			_this->signalConnected( false );
 	}
@@ -210,7 +215,7 @@ void AudioPulseAudio::run()
 	pa_mainloop * mainLoop = pa_mainloop_new();
 	if( !mainLoop )
 	{
-		qCritical( "pa_mainloop_new() failed.\n" );
+		Log_Err(LT_PulseAudio, "pa_mainloop_new() failed" );
 		return;
 	}
 	pa_mainloop_api * mainloop_api = pa_mainloop_get_api( mainLoop );
@@ -218,7 +223,7 @@ void AudioPulseAudio::run()
 	pa_context *context = pa_context_new( mainloop_api, "lmms" );
 	if ( context == NULL )
 	{
-		qCritical( "pa_context_new() failed." );
+		Log_Err(LT_PulseAudio, "pa_context_new() failed" );
 		return;
 	}
 
