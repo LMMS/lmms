@@ -80,9 +80,9 @@ void RenderManager::renderNextTrack()
 		m_tracksToRender.pop_back();
 
 		// mute everything but the track we are about to render
-		for( auto it = m_unmuted.begin(); it != m_unmuted.end(); ++it )
+		for (auto track : m_unmuted)
 		{
-			(*it)->setMuted( (*it) != renderTrack );
+			track->setMuted(track != renderTrack);
 		}
 
 		// for multi-render, prefix each output file with a different number
