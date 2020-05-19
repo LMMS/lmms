@@ -46,7 +46,7 @@
 #include "TextFloat.h"
 #include "TimeLineWidget.h"
 #include "ToolTip.h"
-#include "VisualizationWidget.h"
+#include "Oscilloscope.h"
 #include "TimeDisplayWidget.h"
 #include "AudioDevice.h"
 #include "PianoRoll.h"
@@ -210,15 +210,14 @@ SongEditor::SongEditor( Song * song ) :
 
 	gui->mainWindow()->addSpacingToToolBar( 10 );
 
-	// create widget for visualization- and cpu-load-widget
+	// create widget for oscilloscope- and cpu-load-widget
 	QWidget * vc_w = new QWidget( tb );
 	QVBoxLayout * vcw_layout = new QVBoxLayout( vc_w );
 	vcw_layout->setMargin( 0 );
 	vcw_layout->setSpacing( 0 );
 
-	//vcw_layout->addStretch();
-	vcw_layout->addWidget( new VisualizationWidget(
-			embed::getIconPixmap( "output_graph" ), vc_w ) );
+	vcw_layout->addStretch();
+	vcw_layout->addWidget( new Oscilloscope( vc_w ) );
 
 	vcw_layout->addWidget( new CPULoadWidget( vc_w ) );
 	vcw_layout->addStretch();
@@ -473,12 +472,13 @@ void SongEditor::toggleProportionalSnap()
 
 void SongEditor::keyPressEvent( QKeyEvent * ke )
 {
-	if( ke->modifiers() & Qt::ShiftModifier &&
+	bool isShiftPressed = ke->modifiers() & Qt::ShiftModifier;
+	if( isShiftPressed &&
 						( ke->key() == Qt::Key_Insert || ke->key() == Qt::Key_Enter || ke->key() == Qt::Key_Return ) )
 	{
 		m_song->insertBar();
 	}
-	else if( ke->modifiers() & Qt::ShiftModifier &&
+	else if( isShiftPressed &&
 						( ke->key() == Qt::Key_Delete || ke->key() == Qt::Key_Backspace ) )
 	{
 		m_song->removeBar();
@@ -503,7 +503,7 @@ void SongEditor::keyPressEvent( QKeyEvent * ke )
 	{
 		m_song->setPlayPos( 0, Song::Mode_PlaySong );
 	}
-	else if( ke->key() == Qt::Key_Delete )
+	else if( ke->key() == Qt::Key_Delete || ke->key() == Qt::Key_Backspace )
 	{
 		QVector<TrackContentObjectView *> tcoViews;
 		QVector<selectableObject *> so = selectedObjects();
@@ -517,7 +517,7 @@ void SongEditor::keyPressEvent( QKeyEvent * ke )
 	}
 	else if( ke->key() == Qt::Key_A && ke->modifiers() & Qt::ControlModifier )
 	{
-		selectAllTcos( !(ke->modifiers() & Qt::ShiftModifier) );
+		selectAllTcos( !isShiftPressed );
 	}
 	else if( ke->key() == Qt::Key_Escape )
 	{

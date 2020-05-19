@@ -182,7 +182,7 @@ QString RenderManager::pathForTrack(const Track *track, int num)
 {
 	QString extension = ProjectRenderer::getFileExtensionFromFormat( m_format );
 	QString name = track->name();
-	name = name.remove(QRegExp("[^a-zA-Z]"));
+	name = name.remove(QRegExp(FILENAME_FILTER));
 	name = QString( "%1_%2%3" ).arg( num ).arg( name ).arg( extension );
 	return QDir(m_outputPath).filePath(name);
 }

@@ -1,7 +1,6 @@
-/*
- * update_event.h - signal GUI updates
+/* ColorChooser.h - declaration and definition of ColorChooser class.
  *
- * Copyright (c) 2007 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
+ * Copyright (c) 2019 CYBERDEViLNL <cyberdevilnl/at/protonmail/dot/ch>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -22,23 +21,21 @@
  *
  */
 
+#include <QColorDialog>
+#include <QApplication>
+#include <QKeyEvent>
 
-#ifndef UPDATE_EVENT_H
-#define UPDATE_EVENT_H
-
-#include "custom_events.h"
-
-
-
-class updateEvent : public QEvent
+class ColorChooser: public QColorDialog
 {
 public:
-	updateEvent() :
-		QEvent( (QEvent::Type)customEvents::GUI_UPDATE )
+	ColorChooser(const QColor &initial, QWidget *parent): QColorDialog(initial, parent) {};
+	ColorChooser(QWidget *parent): QColorDialog(parent) {};
+
+protected:
+	// Forward key events to the parent to prevent stuck notes when the dialog gets focus
+	void keyReleaseEvent(QKeyEvent *event) override
 	{
+		QKeyEvent ke(*event);
+		QApplication::sendEvent(parentWidget(), &ke);
 	}
-
-} ;
-
-
-#endif
+};

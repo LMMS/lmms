@@ -499,8 +499,23 @@ void AutomatableModel::unlinkModel( AutomatableModel* model )
 
 void AutomatableModel::linkModels( AutomatableModel* model1, AutomatableModel* model2 )
 {
+	if (!model1->m_linkedModels.contains( model2 ) && model1 != model2)
+	{
+		// copy data
+		model1->m_value = model2->m_value;
+		if (model1->valueBuffer() && model2->valueBuffer())
+		{
+			std::copy_n(model2->valueBuffer()->data(),
+				model1->valueBuffer()->length(),
+				model1->valueBuffer()->data());
+		}
+		// send dataChanged() before linking (because linking will
+		// connect the two dataChanged() signals)
+		emit model1->dataChanged();
+		// finally: link the models
 		model1->linkModel( model2 );
 		model2->linkModel( model1 );
+	}
 }
 
 

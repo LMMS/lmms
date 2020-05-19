@@ -1,7 +1,7 @@
 /*
- * custom_events.h - custom event types list
+ * VecControlsDialog.h - declatation of VecControlsDialog class.
  *
- * Copyright (c) 2007 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
+ * Copyright (c) 2019 Martin Pavelek <he29/dot/HS/at/gmail/dot/com>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -22,25 +22,26 @@
  *
  */
 
+#ifndef VECCONTROLSDIALOG_H
+#define VECCONTROLSDIALOG_H
 
-#ifndef CUSTOM_EVENTS_H
-#define CUSTOM_EVENTS_H
+#include "EffectControlDialog.h"
 
+class VecControls;
 
-#include <QtCore/QEvent>
-
-
-namespace customEvents
+//! Top-level widget holding the configuration GUI and vector display
+class VecControlsDialog : public EffectControlDialog
 {
+	Q_OBJECT
+public:
+	explicit VecControlsDialog(VecControls *controls);
+	virtual ~VecControlsDialog() {}
 
-	enum Type
-	{
-		GUI_UPDATE = QEvent::User
-	} ;
+	bool isResizable() const override {return true;}
+	QSize sizeHint() const override;
 
-}
+private:
+	VecControls *m_controls;
+};
 
-
-
-
-#endif
+#endif // VECCONTROLSDIALOG_H

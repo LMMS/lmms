@@ -178,9 +178,16 @@ const AutomationPattern::objectVector& AutomationPattern::objects() const
 
 MidiTime AutomationPattern::timeMapLength() const
 {
-	if( m_timeMap.isEmpty() ) return 0;
+	MidiTime one_bar = MidiTime(1, 0);
+	if (m_timeMap.isEmpty()) { return one_bar; }
+
 	timeMap::const_iterator it = m_timeMap.end();
-	return MidiTime( MidiTime( (it-1).key() ).nextFullBar(), 0 );
+	tick_t last_tick = static_cast<tick_t>((it-1).key());
+	// if last_tick is 0 (single item at tick 0)
+	// return length as a whole bar to prevent disappearing TCO
+	if (last_tick == 0) { return one_bar; }
+
+	return MidiTime(last_tick);
 }
 
 
@@ -188,7 +195,8 @@ MidiTime AutomationPattern::timeMapLength() const
 
 void AutomationPattern::updateLength()
 {
-	changeLength( timeMapLength() );
+	// Do not resize down in case user manually extended up
+	changeLength(qMax(length(), timeMapLength()));
 }
 
 
@@ -223,12 +231,7 @@ MidiTime AutomationPattern::putValue( const MidiTime & time,
 	}
 	generateTangents( it, 3 );
 
-	// we need to maximize our length in case we're part of a hidden
-	// automation track as the user can't resize this pattern
-	if( getTrack() && getTrack()->type() == Track::HiddenAutomationTrack )
-	{
-		updateLength();
-	}
+	updateLength();
 
 	emit dataChanged();
 
@@ -251,10 +254,7 @@ void AutomationPattern::removeValue( const MidiTime & time )
 	}
 	generateTangents(it, 3);
 
-	if( getTrack() && getTrack()->type() == Track::HiddenAutomationTrack )
-	{
-		updateLength();
-	}
+	updateLength();
 
 	emit dataChanged();
 }

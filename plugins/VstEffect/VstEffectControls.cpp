@@ -350,7 +350,7 @@ manageVSTEffectView::manageVSTEffectView( VstEffect * _eff, VstEffectControls * 
 	const QMap<QString, QString> & dump = m_effect->m_plugin->parameterDump();
 	m_vi->paramCount = dump.size();
 
-	vstKnobs = new Knob *[ m_vi->paramCount ];
+	vstKnobs = new CustomTextKnob *[ m_vi->paramCount ];
 
 	bool hasKnobModel = true;
 	if (m_vi->knobFModel == NULL) {
@@ -366,8 +366,8 @@ manageVSTEffectView::manageVSTEffectView( VstEffect * _eff, VstEffectControls * 
 		sprintf( paramStr, "param%d", i);
 		s_dumpValues = dump[ paramStr ].split( ":" );
 
-		vstKnobs[ i ] = new Knob( knobBright_26, widget, s_dumpValues.at( 1 ) );
-		vstKnobs[ i ]->setHintText( s_dumpValues.at( 1 ) + ":", "" );
+		vstKnobs[ i ] = new CustomTextKnob( knobBright_26, widget, s_dumpValues.at( 1 ) );
+		vstKnobs[ i ]->setDescription( s_dumpValues.at( 1 ) + ":" );
 		vstKnobs[ i ]->setLabel( s_dumpValues.at( 1 ).left( 15 ) );
 
 		if( !hasKnobModel )
@@ -382,6 +382,7 @@ manageVSTEffectView::manageVSTEffectView( VstEffect * _eff, VstEffectControls * 
 			[this, model]() { setParameter( model ); }, Qt::DirectConnection);
 		vstKnobs[ i ] ->setModel( model );
 	}
+	syncParameterText();
 
 	int i = 0;
 	for( int lrow = 1; lrow < ( int( m_vi->paramCount / 10 ) + 1 ) + 1; lrow++ )
@@ -444,6 +445,7 @@ void manageVSTEffectView::syncPlugin( void )
 			m_vi2->knobFModel[ i ]->setInitValue( f_value );
 		}
 	}
+	syncParameterText();
 }
 
 
@@ -479,9 +481,40 @@ void manageVSTEffectView::setParameter( Model * action )
 
 	if ( m_effect->m_plugin != NULL ) {
 		m_effect->m_plugin->setParam( knobUNID, m_vi2->knobFModel[knobUNID]->value() );
+		syncParameterText();
 	}
 }
 
+void manageVSTEffectView::syncParameterText()
+{
+	m_effect->m_plugin->loadParameterLabels();
+	m_effect->m_plugin->loadParameterDisplays();
+
+	QString paramLabelStr   = m_effect->m_plugin->allParameterLabels();
+	QString paramDisplayStr = m_effect->m_plugin->allParameterDisplays();
+
+	QStringList paramLabelList;
+	QStringList paramDisplayList;
+
+	for( int i = 0; i < paramLabelStr.size(); )
+	{
+		const int length = paramLabelStr[i].digitValue();
+		paramLabelList.append(paramLabelStr.mid(i + 1, length));
+		i += length + 1;
+	}
+
+	for( int i = 0; i < paramDisplayStr.size(); )
+	{
+		const int length = paramDisplayStr[i].digitValue();
+		paramDisplayList.append(paramDisplayStr.mid(i + 1, length));
+		i += length + 1;
+	}
+
+	for( int i = 0; i < paramLabelList.size(); ++i )
+	{
+		vstKnobs[i]->setValueText(paramDisplayList[i] + ' ' + paramLabelList[i]);
+	}
+}
 
 
 

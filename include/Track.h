@@ -39,6 +39,7 @@
 #include "AutomatableModel.h"
 #include "ModelView.h"
 #include "DataFile.h"
+#include "FadeButton.h"
 
 
 class QMenu;
@@ -70,6 +71,8 @@ const int MINIMAL_TRACK_HEIGHT = 32;
 const int DEFAULT_TRACK_HEIGHT = 32;
 
 const int TCO_BORDER_WIDTH = 2;
+
+char const *const FILENAME_FILTER = "[\\0000-\x1f\"*/:<>?\\\\|\x7f]";
 
 
 class LMMS_EXPORT TrackContentObject : public Model, public JournallingObject
@@ -737,12 +740,19 @@ private:
 
 	Actions m_action;
 
+	virtual FadeButton * getActivityIndicator()
+	{
+		return nullptr;
+	}
+
+	void setIndicatorMute(FadeButton* indicator, bool muted);
 
 	friend class TrackLabelButton;
 
 
 private slots:
 	void createTCOView( TrackContentObject * tco );
+	void muteChanged();
 
 } ;
 

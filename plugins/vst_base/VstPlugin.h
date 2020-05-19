@@ -91,6 +91,16 @@ public:
 		return m_allProgramNames;
 	}
 
+	inline const QString& allParameterLabels() const
+	{
+		return m_allParameterLabels;
+	}
+
+	inline const QString& allParameterDisplays() const
+	{
+		return m_allParameterDisplays;
+	}
+
 	int currentProgram();
 
 	const QMap<QString, QString> & parameterDump();
@@ -120,6 +130,8 @@ public slots:
 	void setProgram( int index );
 	void rotateProgram( int offset );
 	void loadProgramNames();
+	void loadParameterLabels();
+	void loadParameterDisplays();
 	void savePreset( void );
 	void setParam( int i, float f );
 	void idleUpdate();
@@ -148,6 +160,8 @@ private:
 	QString m_productString;
 	QString m_currentProgramName;
 	QString m_allProgramNames;
+	QString m_allParameterLabels;
+	QString m_allParameterDisplays;
 
 	QString p_name;
 
