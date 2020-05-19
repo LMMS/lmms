@@ -438,6 +438,14 @@ bool VstPlugin::processMessage( const message & _m )
 			m_allProgramNames = _m.getQString();
 			break;
 
+		case IdVstParameterLabels:
+			m_allParameterLabels = _m.getQString();
+			break;
+
+		case IdVstParameterDisplays:
+			m_allParameterDisplays = _m.getQString();
+			break;
+
 		case IdVstPluginUniqueID:
 			// TODO: display graphically in case of failure
 			printf("unique ID: %s\n", _m.getString().c_str() );
@@ -525,6 +533,28 @@ void VstPlugin::loadProgramNames()
 	lock();
 	sendMessage( message( IdVstProgramNames ) );
 	waitForMessage( IdVstProgramNames, true );
+	unlock();
+}
+
+
+
+
+void VstPlugin::loadParameterLabels()
+{
+	lock();
+	sendMessage( message( IdVstParameterLabels ) );
+	waitForMessage( IdVstParameterLabels, true );
+	unlock();
+}
+
+
+
+
+void VstPlugin::loadParameterDisplays()
+{
+	lock();
+	sendMessage( message( IdVstParameterDisplays ) );
+	waitForMessage( IdVstParameterDisplays, true );
 	unlock();
 }
 

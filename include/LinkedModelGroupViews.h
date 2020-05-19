@@ -71,6 +71,8 @@ protected:
 
 	void removeControl(const QString &key);
 
+	void removeFocusFromSearchBar();
+
 private:
 	class LinkedModelGroup* m_model;
 
