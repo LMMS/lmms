@@ -273,8 +273,6 @@ protected slots:
 	void updatePitch();
 	void updatePitchRange();
 	void updateEffectChannel();
-	void updateScale();
-	void updateKeymap();
 
 
 private:

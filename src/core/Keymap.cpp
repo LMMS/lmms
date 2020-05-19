@@ -26,16 +26,23 @@
 
 
 Keymap::Keymap() :
-	m_description(tr("default (440 Hz, all keys)"))
+	m_description(tr("default (440 Hz, all keys)")),
+	m_baseFreq(440.f)
 {
-
+	// default 1:1 keyboard mapping (base note value must be subtracted to get a final LMMS note)
+	for (int i = 0; i < NumKeys; i++)
+	{
+		m_map[i] = i + (NumKeys - 1);
+	}
 }
+
 
 Keymap::Keymap(QString description) :
 	m_description(description)
 {
 
 }
+
 
 QString Keymap::getDescription() const
 {

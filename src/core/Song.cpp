@@ -1448,14 +1448,14 @@ bool Song::isSavingProject() const {
 }
 
 
-Scale & Song::getScale(unsigned int index)
+const Scale &Song::getScale(unsigned int index) const
 {
 	if (index < MaxScaleCount) {return m_scales[index];}
 	else {return m_scales[0];}
 }
 
 
-Keymap & Song::getKeymap(unsigned int index)
+const Keymap &Song::getKeymap(unsigned int index) const
 {
 	if (index < MaxKeymapCount) {return m_keymaps[index];}
 	else {return m_keymaps[0];}

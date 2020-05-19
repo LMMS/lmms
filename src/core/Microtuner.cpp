@@ -40,60 +40,29 @@ Microtuner::Microtuner(InstrumentTrack *parent) :
 	m_instrumentTrack(parent),
 	m_enabledModel(false, this, tr("Microtuner on / off"))
 {
-	// default 1:1 keyboard mapping
-	m_keymap = new int[NumKeys];
-	for (int i = 0; i < NumKeys; i++)
-	{
-		m_keymap[i] = i + (NumKeys - 1);
-	}
-
-	// dummy note-frequency mapping (all notes map to base frequency)
-	m_notemap = new float[NumNotes];
-	for (int i = 0; i < NumNotes; i++)
-	{
-		m_notemap[i] = DefaultBaseFreq;
-	}
 }
 
 
 Microtuner::~Microtuner()
 {
-	delete[] m_keymap;	// TEMP: remove locally generated default keymap
-	delete[] m_notemap;	// TEMP: remove locally generated default notemap
 }
 
 
-// Compute a new note-frequency mapping based on active scale
-void Microtuner::updateScale()
+/** \brief Return base frequency, based on currently selected keymap.
+ *  \return Frequency in Hz
+ */
+float Microtuner::baseFreq() const
 {
-	std::vector<Interval> intervals = Engine::getSong()->getScale(m_instrumentTrack->scaleModel()->value())
-		.getIntervals();
-	int octaveDegree = intervals.size() - 1;
-	double octaveRatio = intervals[octaveDegree].getRatio();
-	for (int i = 0; i < NumNotes; i++)
+	if (enabled())
 	{
-		int scalePos = i - (NumKeys - 1);
-		int degree_rem = scalePos % octaveDegree;
-		int degree = degree_rem >= 0 ? degree_rem : degree_rem + octaveDegree;	// get true modulo
-		m_notemap[i] = DefaultBaseFreq * intervals[degree].getRatio() *
-						pow(octaveRatio, floor((float)scalePos / octaveDegree));
+		return Engine::getSong()->getKeymap(m_instrumentTrack->keymapModel()->value()).getBaseFreq();
+	}
+	else
+	{
+		return DefaultBaseFreq;
 	}
 }
 
-
-// TODO: alt.: misto updatovani LUTky to pocitat on the fly? Pak by sel jednoduchy pointer na Scale / Intervals
-// vyhoda LUT:		high performance when defs are stable
-// nevyhoda LUT:	needs to push mass updates (what if someone scrolls base frequency? Each step = recompute 50 instruments...)
-
-
-// Swap pointers to active keymap data structures
-void Microtuner::updateKeymap()
-{
-	// TODO
-
-	// keymap change may also affect note-frequency mapping (i.e. change in base frequency)
-	updateScale();
-}
 
 /** \brief Return frequency for a given MIDI key, using the active mapping and scale.
  *  \param key A MIDI key number ranging from 0 to 127.
@@ -103,10 +72,29 @@ void Microtuner::updateKeymap()
 float Microtuner::keyToFreq(int key, float detune) const
 {
 	if (key < 0 || key >= NumKeys) {return 0;}
-	const int note = m_keymap[key] - m_instrumentTrack->baseNoteModel()->value();
 
+	// Get keymap and scale selected at this moment
+	const unsigned int keymap_id = m_instrumentTrack->keymapModel()->value();
+	const unsigned int scale_id = m_instrumentTrack->scaleModel()->value();
+
+	const Keymap &keymap = Engine::getSong()->getKeymap(keymap_id);
+	const Scale &scale = Engine::getSong()->getScale(scale_id);
+
+	// Convert MIDI key to LMMS note number (affected by key mapping and base note)
+	const int note = keymap.map(key, m_instrumentTrack->baseNoteModel()->value());
 	if (note < 0 || note >= NumNotes) {return 0;}
-	float frequency = m_notemap[note];
+
+	// Convert LMMS note to frequency
+	const std::vector<Interval> &intervals = scale.getIntervals();	//TODO: intervals may be empty for fraction of a second during definition update; also, the size could change before subsequent reads.. but copy would be nasty, it may be quite large..
+	const int octaveDegree = intervals.size() - 1;
+	const double octaveRatio = intervals[octaveDegree].getRatio();
+
+	const int scalePos = note - (NumKeys - 1);	//FIXME wtf, why does this work; should be minus the middle note?
+	const int degree_rem = scalePos % octaveDegree;
+	const int degree = degree_rem >= 0 ? degree_rem : degree_rem + octaveDegree;	// get true modulo
+
+	float frequency = keymap.getBaseFreq() * intervals[degree].getRatio() *
+					pow(octaveRatio, floor((float)scalePos / octaveDegree));
 
 	// detune or pitch shift: adjust frequency by a given number of cents
 	frequency *= powf(2.f, detune / (100 * 12.f));

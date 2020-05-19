@@ -29,6 +29,8 @@
 #include <QObject>
 #include <QString>
 
+#include "Note.h"
+
 class Keymap : public QObject
 {
 	Q_OBJECT
@@ -39,9 +41,15 @@ public:
 	QString getDescription() const;
 	void setDescription(QString description);
 
+	float getBaseFreq() const {return m_baseFreq;}
+
+	int map(int key, int baseNote) const {return m_map[key] - baseNote;}
+
 private:
 	QString m_description;
 
+	float m_baseFreq;			//!< frequency of the base note (usually A4 @440 Hz)
+	int m_map [NumKeys];		//!< the actual keymap
 };
 
 #endif

@@ -150,9 +150,6 @@ InstrumentTrack::InstrumentTrack( TrackContainer* tc ) :
 	connect(&m_pitchModel, SIGNAL(dataChanged()), this, SLOT(updatePitch()), Qt::DirectConnection);
 	connect(&m_pitchRangeModel, SIGNAL(dataChanged()), this, SLOT(updatePitchRange()), Qt::DirectConnection);
 	connect(&m_effectChannelModel, SIGNAL(dataChanged()), this, SLOT(updateEffectChannel()), Qt::DirectConnection);
-
-	connect(&m_scaleModel, SIGNAL(dataChanged()), this, SLOT(updateScale()), Qt::DirectConnection);
-	connect(&m_keymapModel, SIGNAL(dataChanged()), this, SLOT(updateKeymap()), Qt::DirectConnection);
 }
 
 
@@ -635,16 +632,6 @@ void InstrumentTrack::updateEffectChannel()
 }
 
 
-void InstrumentTrack::updateScale()
-{
-	m_microtuner.updateScale();
-}
-
-
-void InstrumentTrack::updateKeymap()
-{
-	m_microtuner.updateKeymap();
-}
 
 
 int InstrumentTrack::masterKey( int _midi_key ) const

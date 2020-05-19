@@ -63,7 +63,8 @@ public:
 	QString getDescription() const;
 	void setDescription(QString description);
 
-	std::vector<Interval> & getIntervals() {return m_intervals;}
+	const std::vector<Interval> &getIntervals() const {return m_intervals;}
+	void setIntervals(std::vector<Interval> input) {m_intervals = input;}
 
 private:
 	QString m_description;

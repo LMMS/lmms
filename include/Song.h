@@ -341,8 +341,8 @@ public:
 
 	bool isSavingProject() const;
 
-	Scale & getScale(unsigned int index);
-	Keymap & getKeymap(unsigned int index);
+	const Scale &getScale(unsigned int index) const;
+	const Keymap &getKeymap(unsigned int index) const;
 
 public slots:
 	void playSong();
