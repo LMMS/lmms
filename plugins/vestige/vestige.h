@@ -45,6 +45,7 @@ class QPushButton;
 class PixmapButton;
 class VstPlugin;
 
+
 class vestigeInstrument : public Instrument
 {
 	Q_OBJECT
@@ -83,6 +84,7 @@ protected slots:
 private:
 	void closePlugin( void );
 
+
 	VstPlugin * m_plugin;
 	QMutex m_pluginMutex;
 
@@ -93,8 +95,10 @@ private:
 	QObject * p_subWindow;
 	int paramCount;
 
+
 	friend class VestigeInstrumentView;
 	friend class manageVestigeInstrumentView;
+
 } ;
 
 

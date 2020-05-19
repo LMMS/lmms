@@ -62,6 +62,8 @@
 
 #include "embed.h"
 
+
+
 extern "C"
 {
 
@@ -159,6 +161,9 @@ vestigeInstrument::vestigeInstrument( InstrumentTrack * _instrument_track ) :
 			 this, SLOT( handleConfigChange(QString, QString, QString) ),
 			 Qt::QueuedConnection );
 }
+
+
+
 
 vestigeInstrument::~vestigeInstrument()
 {
@@ -629,7 +634,6 @@ VestigeInstrumentView::VestigeInstrumentView( Instrument * _instrument,
 	setAcceptDrops( true );
 	_instrument2 = _instrument;
 	_parent2 = _parent;
-
 }
 
 
@@ -787,6 +791,7 @@ void VestigeInstrumentView::savePreset()
 
 void VestigeInstrumentView::nextProgram()
 {
+
 	if ( m_vi->m_plugin != NULL ) {
 		m_vi->m_plugin->rotateProgram( 1 );
     		bool converted;
@@ -1098,6 +1103,7 @@ void manageVestigeInstrumentView::closeWindow()
 {
 	m_vi->m_subWindow->hide();
 }
+
 
 
 

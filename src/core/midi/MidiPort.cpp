@@ -127,6 +127,8 @@ void MidiPort::setMode( Mode mode )
 }
 
 
+
+
 void MidiPort::processInEvent( const MidiEvent& event, const MidiTime& time )
 {
 	// mask event
