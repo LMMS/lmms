@@ -793,7 +793,6 @@ void Song::stopExport()
 {
 	stop();
 	m_exporting = false;
-	m_exportLoop = false;
 
 	m_vstSyncController.setPlaybackState( m_playing );
 }
