@@ -28,7 +28,9 @@
 #include <string>
 #include <sstream>
 #include <vector>
-#include <QMutex>
+#include "ringbuffer/ringbuffer.h"
+#include <atomic>
+
 class LogManager;
 
 enum class LogVerbosity
@@ -94,7 +96,7 @@ public:
 	void resumeFlush();
 	bool isFlushPaused() const;
 
-	void push(const LogLine logLine);
+	void push(LogLine *logLine);
 	void push(LogVerbosity verbosity,
 		std::string fileName,
 		unsigned int fileLineNo,
@@ -107,13 +109,11 @@ public:
 private:
 	LogManager();
 
-	bool m_flushPaused;
+	std::atomic_bool m_flushPaused;
 	LogVerbosity m_maxVerbosity;
 	std::vector<LogSink*> m_sinks;
-	std::vector<LogLine> m_pendingLogLines;
-
-	mutable QMutex m_flushPausedMutex;
-	QMutex m_pendingLogLinesMutex;
+	ringbuffer_t<LogLine*> m_pendingLogLines;
+	ringbuffer_reader_t<LogLine*> m_pendingLogLinesReader;
 };
 
 class LogIostreamWrapper: public std::ostringstream
@@ -126,7 +126,7 @@ public:
 	~LogIostreamWrapper() override;
 
 private:
-	LogLine m_line;
+	LogLine* m_pLine;
 };
 
 #define Log_Gen(verb,format,...)                                               \

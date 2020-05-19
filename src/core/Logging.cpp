@@ -138,9 +138,10 @@ LogManager& LogManager::inst()
 }
 
 LogManager::LogManager()
+	: m_pendingLogLines(LOG_BUFFER_SIZE)
+	, m_pendingLogLinesReader(m_pendingLogLines)
 {
-	m_pendingLogLines.reserve(LOG_BUFFER_SIZE);
-	m_flushPaused = false;
+	m_flushPaused.store(false);
 }
 
 LogManager::~LogManager()
@@ -159,20 +160,13 @@ void LogManager::addSink(LogSink* sink)
 
 void LogManager::pauseFlush()
 {
-	m_flushPausedMutex.lock();
-	m_flushPaused = true;
-	m_flushPausedMutex.unlock();
+	m_flushPaused.store(true);
 }
 
 void LogManager::resumeFlush()
 {
-	m_flushPausedMutex.lock();
-	m_flushPaused = false;
-	m_flushPausedMutex.unlock();
-
-	/* If the logging thread is not used, flush immediately the log lines
-	 * that were generated in performance-critical section. */
-	if (!LoggingThread::inst().isRunning())
+	m_flushPaused.store(false);
+	if (LoggingThread::inst().isRunning())
 	{
 		flush();
 	}
@@ -180,34 +174,27 @@ void LogManager::resumeFlush()
 
 bool LogManager::isFlushPaused() const
 {
-	bool result;
-
-	m_flushPausedMutex.lock();
-	result = m_flushPaused;
-	m_flushPausedMutex.unlock();
-
-	return result;
+	return m_flushPaused.load();
 }
 
 
-void LogManager::push(const LogLine logLine)
+void LogManager::push(LogLine* logLine)
 {
-	if (m_maxVerbosity > logLine.verbosity) return;
-
-	/* The logger thread might be now caching the log lines with the intent
-	 * of flushing them. It is better not to interfere */
-	m_pendingLogLinesMutex.lock();
-
-	if (m_pendingLogLines.size() < LOG_BUFFER_SIZE -1)
+	if (m_maxVerbosity > logLine->verbosity)
 	{
-		m_pendingLogLines.push_back(logLine);
+		/* Drop the line immediately if it has no chance to ever appear */
+		delete logLine;
+		return;
 	}
-	else if (m_pendingLogLines.size() == LOG_BUFFER_SIZE - 1)
+
+	if (m_pendingLogLines.write_space() > 1)
+	{
+		m_pendingLogLines.write(&logLine, 1);
+	}
+	else if (m_pendingLogLines.write_space() == 1)
 	{
 		Log_Wrn("Log queue overflow, some lines might be dropped");
 	}
-
-	m_pendingLogLinesMutex.unlock();
 
 	/* If the logging thread is not used, make the log message appear
 	 * immediately unless we are in a performance-critical section */
@@ -222,8 +209,8 @@ void LogManager::push(LogVerbosity verbosity,
 			unsigned int fileLineNo,
 			std::string content)
 {
-	LogLine logLine(verbosity, fileName, fileLineNo, content);
-	push(std::move(logLine));
+	LogLine* logLine = new LogLine(verbosity, fileName, fileLineNo, content);
+	push(logLine);
 }
 
 void LogManager::notifyVerbosityChanged()
@@ -240,40 +227,36 @@ void LogManager::notifyVerbosityChanged()
 }
 
 void LogManager::flush()
-{
-	m_pendingLogLinesMutex.lock();
-	std::vector<LogLine> pendingLogLines(m_pendingLogLines);
-	m_pendingLogLines.clear();
-	m_pendingLogLinesMutex.unlock();
+{	
+	auto seq = m_pendingLogLinesReader.read_max(LOG_BUFFER_SIZE);
 
-	/* We have saved all the log lines and cleared the main buffer.
-	 * Other threads may now fill up the main buffer again, but they
-	 * will not be blocked by us writing down (potentially slowly)
-	 * the contents of the buffer. */
-
-	for (LogLine& logLine: pendingLogLines)
+	for (size_t ix = 0; ix < seq.size(); ix++)
 	{
+		LogLine* logLine = seq[ix];
 		for (LogSink* pSink: m_sinks)
 		{
-			if (logLine.verbosity <= pSink->getMaxVerbosity())
+			if (logLine->verbosity <= pSink->getMaxVerbosity())
 			{
-				pSink->onLogLine(logLine);
+				pSink->onLogLine(*logLine);
 			}
 		}
+		delete logLine;
 	}
+
 }
 
 LogIostreamWrapper::LogIostreamWrapper(LogVerbosity verbosity,
 					std::string fileName,
 					unsigned int fileLineNo)
-	: m_line(verbosity, fileName, fileLineNo, "")
+	: m_pLine(new LogLine(verbosity, fileName, fileLineNo, ""))
 {
 }
 
 LogIostreamWrapper::~LogIostreamWrapper()
 {
-	m_line.content = this->str();
-	LogManager::inst().push(m_line);
+	m_pLine->content = this->str();
+	LogManager::inst().push(m_pLine);
+	/* m_pLine will be freed by the LogManager */
 }
 
 LogVerbosity stringToLogVerbosity(std::string s)

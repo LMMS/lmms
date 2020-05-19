@@ -166,7 +166,7 @@ void qDebugToLogManagerAdapter(QtMsgType type, const QMessageLogContext &context
 		break;
 	}
 
-	LogLine logLine(verbosity,
+	LogLine* logLine = new LogLine(verbosity,
 			context.file ? context.file : "",
 			context.line,
 			localMsg.constData());
