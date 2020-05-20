@@ -1,8 +1,8 @@
 #include <iostream>
 #include "ConsoleLogSink.h"
 
-ConsoleLogSink::ConsoleLogSink(LogVerbosity maxVerbosity, LogManager& logManager)
-	: LogSink(maxVerbosity, logManager)
+ConsoleLogSink::ConsoleLogSink()
+	: LogSink(LogSinkType::Console)
 {
 }
 

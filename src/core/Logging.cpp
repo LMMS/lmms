@@ -29,7 +29,7 @@
 #include <map>
 #include <sys/time.h>
 #include <QThread>
-
+#include "LogSink.h"
 
 const int LOG_BUFFER_SIZE = 1024;
 const unsigned int USEC_PER_SEC = 1000000;
@@ -44,7 +44,6 @@ LogTopic LT_Default("default");
 #else
 	#define PATH_SEPARATOR "/"
 #endif
-
 
 LogTopic::LogTopic(std::string name)
 {
@@ -149,25 +148,6 @@ std::string LogLine::toString() const
 	return os.str();
 }
 
-LogSink::LogSink(LogVerbosity maxVerbosity, LogManager& logManager)
-	: m_maxVerbosity(maxVerbosity), m_logManager(logManager)
-{
-}
-
-LogSink::~LogSink()
-{
-}
-
-void LogSink::onTermination()
-{
-}
-
-void LogSink::setMaxVerbosity(LogVerbosity verbosity)
-{
-	m_maxVerbosity = verbosity;
-	LogManager::inst().notifyVerbosityChanged();
-}
-
 LogManager& LogManager::inst()
 {
 	static LogManager instance;
@@ -185,7 +165,6 @@ LogManager::~LogManager()
 {
 	for (LogSink* pSink: m_sinks)
 	{
-		pSink->onTermination();
 		delete pSink;
 	}
 }
@@ -224,13 +203,6 @@ void LogManager::push(LogLine* logLine)
 		registerCurrentThread("");
 	}
 
-	if (m_maxVerbosity > logLine->verbosity)
-	{
-		/* Drop the line immediately if it has no chance to ever appear */
-		delete logLine;
-		return;
-	}
-
 	if (m_pendingLogLines.write_space() > 1)
 	{
 		m_pendingLogLines.write(&logLine, 1);
@@ -247,6 +219,14 @@ void LogManager::push(LogLine* logLine)
 	{
 		flush();
 	}
+
+	/* In case of fatal error flush the messages immediately,
+	 * then terminate the application */
+	if (logLine->verbosity == LogVerbosity::Fatal)
+	{
+		flush();
+		abort();
+	}
 }
 
 void LogManager::push(LogVerbosity verbosity,
@@ -260,19 +240,6 @@ void LogManager::push(LogVerbosity verbosity,
 	push(logLine);
 }
 
-void LogManager::notifyVerbosityChanged()
-{
-	m_maxVerbosity = LogVerbosity::Fatal;
-	for (LogSink* sink: m_sinks)
-	{
-		LogVerbosity sinkVerbosity = sink->getMaxVerbosity();
-		if (sinkVerbosity > m_maxVerbosity)
-		{
-			m_maxVerbosity = sinkVerbosity;
-		}
-	}
-}
-
 void LogManager::flush()
 {	
 	auto seq = m_pendingLogLinesReader.read_max(LOG_BUFFER_SIZE);
@@ -282,7 +249,8 @@ void LogManager::flush()
 		LogLine* logLine = seq[ix];
 		for (LogSink* pSink: m_sinks)
 		{
-			if (logLine->verbosity <= pSink->getMaxVerbosity())
+			if (pSink->canAcceptLogLine(logLine->topic,
+							logLine->verbosity))
 			{
 				pSink->onLogLine(*logLine);
 			}

@@ -213,9 +213,15 @@ void printHelp()
 		"  -c, --config <configfile>      Get the configuration from <configfile>\n"
 		"  -h, --help                     Show this usage information and exit.\n"
 		"  -v, --version                  Show version information and exit.\n"
-		"  --console-log <max-level>      Set the maximum level of verbosity of log lines\n"
-		"                                 displayed on the console.\n"
-		"          Possible values: \n"
+		"  --log <configuration string>   Configure a log sink to accept the log lines\n"
+		"                                 of defined verbosity level. Can be used more\n"
+		"                                 than once. \n"
+		"          Accepted formats of configuration strings are: \n"
+		"              - <sink>=<level>\n"
+		"              - <sink>#<topic>=<level>\n"
+		"          Possible sinks are:\n"
+		"              - console\n"
+		"          Possible log levels: \n"
 		"              - fatal\n"
 		"              - error\n"
 		"              - warning\n"
@@ -296,6 +302,89 @@ int noInputFileError()
 	return usageError( "No input file specified" );
 }
 
+void initializeLoggers(std::vector<std::string> configurationStrings)
+{
+	/* Initialize loggers */
+	ConsoleLogSink* consoleLogSink = new ConsoleLogSink();
+	LogManager::inst().registerCurrentThread("main");
+	LogManager::inst().addSink(consoleLogSink);
+
+	/* All sinks will be freed by LogManager */
+
+	for (const std::string& confString: configurationStrings)
+	{
+		std::string sinkName;
+		std::string topicStr;
+		std::string verbosityStr;
+		int posTopicOp = confString.find('#');
+		int posLevelOp = confString.find('=');
+
+		/* Allowed formats are:
+		 * sinkname=level
+		 * sinkname#topic=level
+		*/
+		if (posLevelOp != std::string::npos)
+		{
+			if (posTopicOp != std::string::npos)
+			{
+				sinkName = confString.substr(0, posTopicOp);
+				topicStr = confString.substr(posTopicOp+1,
+						posLevelOp - posTopicOp - 1);
+				verbosityStr = confString.substr(posLevelOp+1);
+			}
+			else
+			{
+				sinkName = confString.substr(0, posLevelOp);
+				verbosityStr = confString.substr(posLevelOp+1);
+
+			}
+		}
+		else
+		{
+			Log_Fatal(LT_Default, "Invalid log configuration string. "
+				"Expected operator '=' not found");
+			continue;
+		}
+
+		LogVerbosity verbosity;
+		try
+		{
+			verbosity = stringToLogVerbosity(verbosityStr);
+		}
+		catch(std::out_of_range)
+		{
+			Log_Fatal(LT_Default, "Invalid log verbosity: %s",
+				verbosityStr.c_str());
+			continue;
+		}
+
+		LogSink* sink = nullptr;
+		if (sinkName == "console")
+		{
+			sink = consoleLogSink;
+		}
+
+		if (!sink)
+		{
+			Log_Fatal(LT_Default, "Invalid log sink: %s",
+				sinkName.c_str());
+			continue;
+		}
+
+		if (topicStr.empty())
+		{
+			sink->setDefaultMaxVerbosity(verbosity);
+		}
+		else
+		{
+			sink->setMaxVerbosity(topicStr, verbosity);
+		}
+
+	}
+
+
+}
+
 
 int main( int argc, char * * argv )
 {
@@ -353,7 +442,7 @@ int main( int argc, char * * argv )
 	bool renderLoop = false;
 	bool renderTracks = false;
 	bool useLoggingThread = true;
-	LogVerbosity consoleLogVerbosity = LogVerbosity::Warning;
+	std::vector<std::string> logConfigurationStrings;
 	QString fileToLoad, fileToImport, renderOut, profilerOutputFile, configFile;
 
 	// first of two command-line parsing stages
@@ -727,22 +816,14 @@ int main( int argc, char * * argv )
 
 			configFile = QString::fromLocal8Bit( argv[i] );
 		}
-		else if (arg == "--console-log")
+		else if (arg == "--log")
 		{
 			++i;
 			if (i == argc)
 			{
-				return usageError("No log level specified");
+				return usageError("No log configuration specified");
 			}
-			try
-			{
-				consoleLogVerbosity = stringToLogVerbosity(argv[i]);
-			}
-			catch (std::out_of_range&)
-			{
-				return usageError(QString("Invalid log level: %1")
-						.arg(argv[i]));
-			}
+			logConfigurationStrings.push_back(argv[i]);
 		}
 		else if (arg == "--no-logging-thread")
 		{
@@ -768,12 +849,8 @@ int main( int argc, char * * argv )
 		fileCheck( fileToImport );
 	}
 
-	/* Initialize loggers */
-	LogManager::inst().registerCurrentThread("main");
-	LogManager::inst().addSink(new ConsoleLogSink(
-					consoleLogVerbosity,
-					LogManager::inst()));
-	/* All sinks will be freed by LogManager */
+	initializeLoggers(logConfigurationStrings);
+
 	if (useLoggingThread)
 	{
 		LoggingThread::inst().start();

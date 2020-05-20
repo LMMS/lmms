@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef DEBUG_TRACE_H
-#define DEBUG_TRACE_H
+#ifndef LOGGING_H
+#define LOGGING_H
 
 #include <string>
 #include <sstream>
@@ -55,6 +55,16 @@ public:
 	LogTopic(std::string name);
 	std::string name() const;
 	int id() const { return m_id; }
+
+	bool operator<(const LogTopic& other) const
+	{
+		return this->m_id < other.m_id;
+	}
+
+	bool operator==(const LogTopic& other) const
+	{
+		return this->m_id == other.m_id;
+	}
 private:
 	int m_id;
 	static std::map<int, std::string> ms_topicIds;
@@ -82,26 +92,7 @@ struct LogLine
 	std::string toString() const;
 };
 
-class LogSink
-{
-public:
-	LogSink(LogVerbosity maxVerbosity, LogManager& logManager);
-	virtual ~LogSink();
-
-	virtual void onLogLine(const LogLine& line) = 0;
-	virtual void onTermination();
-
-	LogVerbosity getMaxVerbosity()
-	{
-		return m_maxVerbosity;
-	}
-
-	void setMaxVerbosity(LogVerbosity verbosity);
-
-private:
-	LogVerbosity m_maxVerbosity;
-	LogManager& m_logManager;
-};
+class LogSink;
 
 class LogManager
 {
@@ -122,7 +113,6 @@ public:
 		LogTopic topic);
 
 	void flush();
-	void notifyVerbosityChanged();
 	void registerCurrentThread(std::string name);
 	std::string threadName(Qt::HANDLE threadId);
 
@@ -130,7 +120,6 @@ private:
 	LogManager();
 
 	std::atomic_bool m_flushPaused;
-	LogVerbosity m_maxVerbosity;
 	std::vector<LogSink*> m_sinks;
 	ringbuffer_t<LogLine*> m_pendingLogLines;
 	ringbuffer_reader_t<LogLine*> m_pendingLogLinesReader;
@@ -186,4 +175,4 @@ private:
 #define Log_Str_Dbg_Lo(topic) Log_Str_Gen(LogVerbosity::Debug_Lo, topic)
 #define Log_Str_Dbg_Hi(topic) Log_Str_Gen(LogVerbosity::Debug_Hi, topic)
 
-#endif // DEBUG_TRACE_H
+#endif // LOGGING_H

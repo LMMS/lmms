@@ -36,6 +36,7 @@ set(LMMS_SRCS
 	core/LocklessAllocator.cpp
 	core/Logging.cpp
 	core/LoggingThread.cpp
+	core/LogSink.cpp
 	core/MemoryHelper.cpp
 	core/MemoryManager.cpp
 	core/MeterModel.cpp
