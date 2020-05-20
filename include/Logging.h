@@ -31,6 +31,7 @@
 #include <map>
 #include "ringbuffer/ringbuffer.h"
 #include <atomic>
+#include <Qt>
 
 class LogManager;
 
@@ -70,6 +71,7 @@ struct LogLine
 	unsigned int fileLineNo;
 	std::string content;
 	LogTopic topic;
+	Qt::HANDLE thread;
 
 	LogLine(LogVerbosity verbosity,
 		std::string fileName,
@@ -120,8 +122,9 @@ public:
 		LogTopic topic);
 
 	void flush();
-
 	void notifyVerbosityChanged();
+	void registerCurrentThread(std::string name);
+	std::string threadName(Qt::HANDLE threadId);
 
 private:
 	LogManager();
@@ -131,6 +134,8 @@ private:
 	std::vector<LogSink*> m_sinks;
 	ringbuffer_t<LogLine*> m_pendingLogLines;
 	ringbuffer_reader_t<LogLine*> m_pendingLogLinesReader;
+
+	static std::map<Qt::HANDLE, std::string> ms_threadIds;
 };
 
 class LogIostreamWrapper: public std::ostringstream

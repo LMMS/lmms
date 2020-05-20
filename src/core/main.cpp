@@ -769,6 +769,7 @@ int main( int argc, char * * argv )
 	}
 
 	/* Initialize loggers */
+	LogManager::inst().registerCurrentThread("main");
 	LogManager::inst().addSink(new ConsoleLogSink(
 					consoleLogVerbosity,
 					LogManager::inst()));

@@ -28,11 +28,15 @@
 #include <iomanip>
 #include <map>
 #include <sys/time.h>
+#include <QThread>
+
 
 const int LOG_BUFFER_SIZE = 1024;
 const unsigned int USEC_PER_SEC = 1000000;
 
 std::map<int, std::string>  LogTopic::ms_topicIds;
+std::map<Qt::HANDLE, std::string> LogManager::ms_threadIds;
+
 LogTopic LT_Default("default");
 
 #if defined(WIN32) || defined(_WIN32)
@@ -136,6 +140,8 @@ std::string LogLine::toString() const
 		os << "-?";
 	}
 
+	os << "-[" << LogManager::inst().threadName(thread) << "]";
+
 	os << "-#" << topic.name();
 
 	os << ": " << content;
@@ -211,6 +217,13 @@ bool LogManager::isFlushPaused() const
 
 void LogManager::push(LogLine* logLine)
 {
+	logLine->thread = QThread::currentThreadId();
+	if (ms_threadIds.find(logLine->thread) == ms_threadIds.end())
+	{
+		/* Generate default thread name */
+		registerCurrentThread("");
+	}
+
 	if (m_maxVerbosity > logLine->verbosity)
 	{
 		/* Drop the line immediately if it has no chance to ever appear */
@@ -276,8 +289,25 @@ void LogManager::flush()
 		}
 		delete logLine;
 	}
-
 }
+
+void LogManager::registerCurrentThread(std::string name)
+{
+	static int unnamedThreadNextId = 1;
+	if (name.empty())
+	{
+		std::ostringstream os;
+		os << "Thread" << unnamedThreadNextId++;
+		name = os.str();
+	}
+	ms_threadIds[QThread::currentThreadId()] = name;
+}
+
+std::string LogManager::threadName(Qt::HANDLE threadId)
+{
+	return ms_threadIds.at(threadId);
+}
+
 
 LogIostreamWrapper::LogIostreamWrapper(LogVerbosity verbosity,
 					std::string fileName,
