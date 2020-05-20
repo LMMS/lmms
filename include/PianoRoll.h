@@ -402,6 +402,9 @@ private:
 	volume_t m_lastNoteVolume;
 	panning_t m_lastNotePanning;
 
+	//When resizing several notes, we want to calculate a common minimum length
+	MidiTime m_minResizeLen;
+
 	int m_startKey; // first key when drawing
 	int m_lastKey;
 
