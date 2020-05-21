@@ -22,6 +22,7 @@
  *
  */
 
+#include <memory>
 #include <QApplication>
 #include <QBitmap>
 #include <QFontMetrics>
@@ -57,7 +58,7 @@ Knob::Knob( knobTypes _knob_num, QWidget * _parent, const QString & _name ) :
 	QWidget( _parent ),
 	FloatModelView( new FloatModel( 0, 0, 0, 1, NULL, _name, true ), this ),
 	m_label( "" ),
-	m_knobPixmap( NULL ),
+	m_knobPixmap( nullptr ),
 	m_volumeKnob( false ),
 	m_volumeRatio( 100.0, 0.0, 1000000.0 ),
 	m_buttonPressed( false ),
@@ -104,10 +105,16 @@ void Knob::initUi( const QString & _name )
 	case knobSmall_17:
 	case knobBright_26:
 	case knobDark_28:
-		setlineColor(QApplication::palette().color( QPalette::Active, QPalette::WindowText ));
+		m_lineActiveColor = QApplication::palette().color(QPalette::Active, QPalette::WindowText);
+		m_arcActiveColor = QColor(QApplication::palette().color(
+									QPalette::Active, QPalette::WindowText));
+		m_arcActiveColor.setAlpha(70);
 		break;
 	case knobVintage_32:
-		setlineColor(QApplication::palette().color( QPalette::Active, QPalette::Shadow ));
+		m_lineActiveColor = QApplication::palette().color(QPalette::Active, QPalette::Shadow);
+		m_arcActiveColor = QColor(QApplication::palette().color(
+									QPalette::Active, QPalette::Shadow));
+		m_arcActiveColor.setAlpha(70);
 		break;
 	default:
 		break;
@@ -143,20 +150,12 @@ void Knob::onKnobNumUpdated()
 		}
 
 		// If knobFilename is still empty here we should get the fallback pixmap of size 1x1
-		m_knobPixmap = new QPixmap( embed::getIconPixmap( knobFilename.toUtf8().constData() ) );
-
+		m_knobPixmap.reset(new QPixmap(embed::getIconPixmap(knobFilename.toUtf8().constData())));
+		if (!this->isEnabled())
+		{
+			convertPixmapToGrayScale(m_knobPixmap);
+		}
 		setFixedSize( m_knobPixmap->width(), m_knobPixmap->height() );
-	}
-}
-
-
-
-
-Knob::~Knob()
-{
-	if( m_knobPixmap )
-	{
-		delete m_knobPixmap;
 	}
 }
 
@@ -382,6 +381,10 @@ bool Knob::updateAngle()
 
 void Knob::drawKnob( QPainter * _p )
 {
+	bool enabled = this->isEnabled();
+	setarcColor(enabled ? m_arcActiveColor : m_arcInactiveColor);
+	setlineColor(enabled ? m_lineActiveColor : m_lineInactiveColor);
+
 	if( updateAngle() == false && !m_cache.isNull() )
 	{
 		_p->drawImage( 0, 0, m_cache );
@@ -440,33 +443,24 @@ void Knob::drawKnob( QPainter * _p )
 	const int arcLineWidth = 2;
 	const int arcRectSize = m_knobPixmap->width() - arcLineWidth;
 
-	QColor col;
-	if( m_knobNum == knobVintage_32 )
-	{	col = QApplication::palette().color( QPalette::Active, QPalette::Shadow ); }
-	else
-	{	col = QApplication::palette().color( QPalette::Active, QPalette::WindowText ); }
-	col.setAlpha( 70 );
-
-	p.setPen( QPen( col, 2 ) );
+	p.setPen(QPen(arcColor(), 2));
 	p.drawArc( mid.x() - arcRectSize/2, 1, arcRectSize, arcRectSize, 315*16, 16*m_totalAngle );
 
+	p.setPen(QPen(lineColor(), 2));
 	switch( m_knobNum )
 	{
 		case knobSmall_17:
 		{
-			p.setPen( QPen( lineColor(), 2 ) );
 			p.drawLine( calculateLine( mid, radius-2 ) );
 			break;
 		}
 		case knobBright_26:
 		{
-			p.setPen( QPen( lineColor(), 2 ) );
 			p.drawLine( calculateLine( mid, radius-5 ) );
 			break;
 		}
 		case knobDark_28:
 		{
-			p.setPen( QPen( lineColor(), 2 ) );
 			const float rb = qMax<float>( ( radius - 10 ) / 3.0,
 									0.0 );
 			const float re = qMax<float>( ( radius - 4 ), 0.0 );
@@ -477,7 +471,6 @@ void Knob::drawKnob( QPainter * _p )
 		}
 		case knobVintage_32:
 		{
-			p.setPen( QPen( lineColor(), 2 ) );
 			p.drawLine( calculateLine( mid, radius-2, 2 ) );
 			break;
 		}
@@ -838,4 +831,38 @@ void Knob::doConnections()
 		QObject::connect( model(), SIGNAL( propertiesChanged() ),
 						this, SLOT( update() ) );
 	}
+}
+
+
+void Knob::changeEvent(QEvent * ev)
+{
+	if (ev->type() == QEvent::EnabledChange)
+	{
+		onKnobNumUpdated();
+		if (!m_label.isEmpty())
+		{
+			setLabel(m_label);
+		}
+		m_cache = QImage();
+		update();
+	}
+}
+
+
+void convertPixmapToGrayScale(std::unique_ptr<QPixmap> &pixMap)
+{
+	QImage temp = pixMap->toImage().convertToFormat(QImage::Format_ARGB32);
+	for (int i = 0; i < temp.height(); ++i)
+	{
+		for (int j = 0; j < temp.width(); ++j)
+		{
+			QColor pix;
+			pix = temp.pixelColor(i, j);
+			quint8 gscale = quint8((0.2126*pix.red() + 0.7152*pix.green() + 0.0722*pix.blue()));
+			QRgba64 pix_gray64;
+			pix_gray64 = QRgba64::fromRgba(gscale, gscale, gscale, quint8(pix.alpha()));
+			temp.setPixelColor(i, j, pix_gray64);
+		}
+	}
+	pixMap->convertFromImage(temp);
 }
