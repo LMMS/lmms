@@ -23,6 +23,7 @@
  *
  */
 
+#include <cmath>
 #include <QApplication>
 #include <QLabel>
 #include <QMouseEvent>
@@ -120,13 +121,14 @@ void LcdSpinBox::mouseMoveEvent( QMouseEvent* event )
 {
 	if( m_mouseMoving )
 	{
-		int dy = 2 * (event->globalY() - m_lastMousePos.y());
+		float dy = static_cast<float>(event->globalY() - m_lastMousePos.y());
 		if( event->modifiers() & Qt::ShiftModifier )
-			dy = qBound( -4, dy/4, 4 );
-		if( dy > 1 || dy < -1 )
+			dy = qBound( -4.f, dy/4.f, 4.f );
+		if(dy > .5f || dy < -.5f) // that means "if dy != 0"
 		{
-			model()->setInitValue( model()->value() -
-						dy / 2 * model()->step<int>() );
+			float initValueNotRounded = model()->value() -
+						dy / 2 * model()->step<int>();
+			model()->setInitValue( roundf(initValueNotRounded) );
 			emit manualChange();
 		}
 		m_lastMousePos = event->globalPos();
