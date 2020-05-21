@@ -696,7 +696,15 @@ void Knob::wheelEvent( QWheelEvent * _we )
 {
 	_we->accept();
 	const float stepMult = model()->range() / 2000 / model()->step<float>();
-	const int inc = ( ( _we->delta() > 0 ) ? 1 : -1 ) * ( ( stepMult < 1 ) ? 1 : stepMult );
+	int inc = ( ( _we->delta() > 0 ) ? 1 : -1 ) * ( ( stepMult < 1 ) ? 1 : stepMult );
+
+#if QT_VERSION >= 0x050700
+	if( _we->inverted() ) {
+		// handle "natural" scrolling
+		inc = -inc;
+	}
+#endif
+
 	model()->incValue( inc );
 
 
