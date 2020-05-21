@@ -358,6 +358,7 @@ void sf2Instrument::openFile( const QString & _sf2File, bool updateTrackName )
 	// Add to map, if doesn't exist.
 	else
 	{
+		bool loaded = false;
 		if( fluid_is_soundfont( sf2Ascii ) )
 		{
 			m_fontId = fluid_synth_sfload( m_synth, sf2Ascii, true );
@@ -367,17 +368,13 @@ void sf2Instrument::openFile( const QString & _sf2File, bool updateTrackName )
 				// Grab this sf from the top of the stack and add to list
 				m_font = new sf2Font( fluid_synth_get_sfont( m_synth, 0 ) );
 				s_fonts.insert( relativePath, m_font );
-			}
-			else
-			{
-				collectErrorForUI( sf2Instrument::tr( "A soundfont %1 could not be loaded." ).
-					arg( QFileInfo( _sf2File ).baseName() ) );
+				loaded = true;
 			}
 		}
-		else
+
+		if(!loaded)
 		{
-			qDebug() << QFileInfo( _sf2File ).baseName() ;
-			collectErrorForUI( sf2Instrument::tr( "File %1 is not a soundfont." ).
+			collectErrorForUI( sf2Instrument::tr( "A soundfont %1 could not be loaded." ).
 				arg( QFileInfo( _sf2File ).baseName() ) );
 		}
 	}
