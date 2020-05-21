@@ -70,6 +70,7 @@ MasterToolBar::MasterToolBar( Song * song ) :
 	
 	m_tempoSpinBox = new IntegerSpinBox( 3, tempoWidget, tr( "Tempo" ) );
 	m_tempoSpinBox->setModel( &m_song->m_tempoModel );
+	m_tempoSpinBox->setZeroesVisible( false );
 	ToolTip::add( m_tempoSpinBox, tr( "Tempo in BPM" ) );
 	
 	// Add caption label:

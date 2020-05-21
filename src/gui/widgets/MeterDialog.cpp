@@ -46,9 +46,13 @@ MeterDialog::MeterDialog( QWidget * _parent ) :
 	mainLayout->setHorizontalSpacing( 2 );
 
 	m_numerator = new IntegerSpinBox( 2, this, tr( "Meter Numerator" ) );
+	m_numerator->setAlignment( Qt::AlignRight );
+	m_numerator->setZeroesVisible( false );
 	ToolTip::add( m_numerator, tr( "Meter numerator" ) );
 
 	m_denominator = new IntegerSpinBox( 2, this, tr( "Meter Denominator" ) );
+	m_denominator->setAlignment( Qt::AlignLeft );
+	m_denominator->setZeroesVisible( false );
 	ToolTip::add( m_denominator, tr( "Meter denominator" ) );
 	
 	// Add caption label:
