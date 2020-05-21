@@ -26,6 +26,7 @@
 #ifndef KNOB_H
 #define KNOB_H
 
+#include <memory>
 #include <QWidget>
 #include <QtCore/QPoint>
 
@@ -41,6 +42,7 @@ enum knobTypes
 } ;
 
 
+void convertPixmapToGrayScale(std::unique_ptr<QPixmap> &pixMap);
 
 class LMMS_EXPORT Knob : public QWidget, public FloatModelView
 {
@@ -60,6 +62,12 @@ class LMMS_EXPORT Knob : public QWidget, public FloatModelView
 	Q_PROPERTY(QColor outerColor READ outerColor WRITE setOuterColor)
 	Q_PROPERTY(QColor lineColor READ lineColor WRITE setlineColor)
 	Q_PROPERTY(QColor arcColor READ arcColor WRITE setarcColor)
+
+	Q_PROPERTY(QColor lineActiveColor MEMBER m_lineActiveColor)
+	Q_PROPERTY(QColor lineInactiveColor MEMBER m_lineInactiveColor)
+	Q_PROPERTY(QColor arcActiveColor MEMBER m_arcActiveColor)
+	Q_PROPERTY(QColor arcInactiveColor MEMBER m_arcInactiveColor)
+
 	mapPropertyFromModel(bool,isVolumeKnob,setVolumeKnob,m_volumeKnob);
 	mapPropertyFromModel(float,volumeRatio,setVolumeRatio,m_volumeRatio);
 
@@ -74,7 +82,7 @@ public:
 	Knob( knobTypes _knob_num, QWidget * _parent = NULL, const QString & _name = QString() );
 	Knob( QWidget * _parent = NULL, const QString & _name = QString() ); //!< default ctor
 	Knob( const Knob& other ) = delete;
-	virtual ~Knob();
+	virtual ~Knob() {};
 
 	// TODO: remove
 	inline void setHintText( const QString & _txt_before,
@@ -134,6 +142,7 @@ protected:
 	void mouseDoubleClickEvent( QMouseEvent * _me ) override;
 	void paintEvent( QPaintEvent * _me ) override;
 	void wheelEvent( QWheelEvent * _me ) override;
+	void changeEvent(QEvent * ev) override;
 
 	virtual float getValue( const QPoint & _p );
 
@@ -169,7 +178,7 @@ private:
 
 	QString m_label;
 
-	QPixmap * m_knobPixmap;
+	std::unique_ptr<QPixmap> m_knobPixmap;
 	BoolModel m_volumeKnob;
 	FloatModel m_volumeRatio;
 
@@ -189,6 +198,11 @@ private:
 	QColor m_outerColor;
 	QColor m_lineColor; //!< unused yet
 	QColor m_arcColor; //!< unused yet
+
+	QColor m_lineActiveColor;
+	QColor m_lineInactiveColor;
+	QColor m_arcActiveColor;
+	QColor m_arcInactiveColor;
 	
 	QColor m_textColor;
 
