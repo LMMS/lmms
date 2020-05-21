@@ -257,8 +257,7 @@ TrackContentObjectView::TrackContentObjectView( TrackContentObject * tco,
 	m_textShadowColor( 0, 0, 0 ),
 	m_BBPatternBackground( 0, 0, 0 ),
 	m_gradient( true ),
-	m_mouseHotspotX( 0 ),
-	m_mouseHotspotY( 0 ),
+	m_mouseHotspotHand( 0, 0 ),
 	m_cursorSetYet( false ),
 	m_needsUpdate( true )
 {
@@ -271,7 +270,7 @@ TrackContentObjectView::TrackContentObjectView( TrackContentObject * tco,
 	setAttribute( Qt::WA_OpaquePaintEvent, true );
 	setAttribute( Qt::WA_DeleteOnClose, true );
 	setFocusPolicy( Qt::StrongFocus );
-	setCursor( QCursor( embed::getIconPixmap( "hand" ), m_mouseHotspotX, m_mouseHotspotY ) );
+	setCursor( QCursor( embed::getIconPixmap( "hand" ), m_mouseHotspotHand.width(), m_mouseHotspotHand.height() ) );
 	move( 0, 0 );
 	show();
 
@@ -322,7 +321,7 @@ void TrackContentObjectView::update()
 {
 	if( !m_cursorSetYet )
 	{
-		setCursor( QCursor( embed::getIconPixmap( "hand" ), m_mouseHotspotX, m_mouseHotspotY ) );
+		setCursor( QCursor( embed::getIconPixmap( "hand" ), m_mouseHotspotHand.width(), m_mouseHotspotHand.height() ) );
 		m_cursorSetYet = true;
 	}
 
@@ -395,6 +394,11 @@ void TrackContentObjectView::setBBPatternBackground( const QColor & c )
 
 void TrackContentObjectView::setGradient( const bool & b )
 { m_gradient = b; }
+
+void TrackContentObjectView::setMouseHotspotHand(const QSize & s)
+{
+	m_mouseHotspotHand = s;
+}
 
 // access needsUpdate member variable
 bool TrackContentObjectView::needsUpdate()
@@ -581,7 +585,7 @@ void TrackContentObjectView::leaveEvent( QEvent * e )
 {
 	if( cursor().shape() != Qt::BitmapCursor )
 	{
-		setCursor( QCursor( embed::getIconPixmap( "hand" ), m_mouseHotspotX, m_mouseHotspotY ) );
+		setCursor( QCursor( embed::getIconPixmap( "hand" ), m_mouseHotspotHand.width(), m_mouseHotspotHand.height() ) );
 	}
 	if( e != NULL )
 	{

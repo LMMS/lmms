@@ -619,8 +619,7 @@ TrackContentObjectView   {
 	qproperty-textShadowColor: rgb( 0, 0, 0 );
 	qproperty-gradient: true; /* boolean property, set true to have a gradient */
 	/* finger tip offset of cursor */
-	qproperty-mouseHotspotX: 3;
-	qproperty-mouseHotspotY: 3;
+	qproperty-mouseHotspotHand: 3px 3px;
 }
 
 /* instrument pattern */
