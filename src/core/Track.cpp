@@ -1151,9 +1151,7 @@ void TrackContentObjectView::mouseReleaseEvent( QMouseEvent * me )
 				leftTCO->getTrack()->addJournalCheckPoint();
 				leftTCO->getTrack()->saveJournallingState( false );
 
-				SampleTCO * rightTCO = new SampleTCO ( leftTCO->getTrack() );
-				rightTCO->setSampleBuffer( leftTCO->sampleBuffer() );
-				rightTCO->setIsPlaying(leftTCO->isPlaying());
+				SampleTCO * rightTCO = new SampleTCO ( *leftTCO );
 
 				leftTCO->changeLength( splitPos - m_initialTCOPos );
 

@@ -47,6 +47,7 @@ class SampleTCO : public TrackContentObject
 	mapPropertyFromModel(bool,isRecord,setRecord,m_recordModel);
 public:
 	SampleTCO( Track * _track );
+	SampleTCO( const SampleTCO& orig );
 	virtual ~SampleTCO();
 
 	void changeLength( const MidiTime & _length ) override;

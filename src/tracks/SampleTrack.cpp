@@ -104,6 +104,13 @@ SampleTCO::SampleTCO( Track * _track ) :
 	updateTrackTcos();
 }
 
+SampleTCO::SampleTCO( const SampleTCO& orig ) :
+	SampleTCO( orig.getTrack() )
+{
+	m_sampleBuffer = new SampleBuffer(*orig.m_sampleBuffer);
+	m_isPlaying = orig.m_isPlaying;
+}
+
 
 
 
