@@ -41,6 +41,7 @@
 LcdSpinBox::LcdSpinBox( int numDigits, QWidget* parent, const QString& name ) :
 	LcdWidget( numDigits, parent, name ),
 	IntModelView( new IntModel( 0, 0, 0, NULL, name, true ), this ),
+	m_remainder( 0.f ),
 	m_mouseMoving( false ),
 	m_lastMousePos(),
 	m_displayOffset( 0 )
@@ -53,6 +54,7 @@ LcdSpinBox::LcdSpinBox( int numDigits, QWidget* parent, const QString& name ) :
 LcdSpinBox::LcdSpinBox( int numDigits, const QString& style, QWidget* parent, const QString& name ) :
 	LcdWidget( numDigits, parent, name ),
 	IntModelView( new IntModel( 0, 0, 0, NULL, name, true ), this ),
+	m_remainder( 0.f ),
 	m_mouseMoving( false ),
 	m_lastMousePos(),
 	m_displayOffset( 0 )
@@ -121,17 +123,20 @@ void LcdSpinBox::mouseMoveEvent( QMouseEvent* event )
 {
 	if( m_mouseMoving )
 	{
-		float dy = static_cast<float>(event->globalY() - m_lastMousePos.y());
-		if( event->modifiers() & Qt::ShiftModifier )
-			dy = qBound( -4.f, dy/4.f, 4.f );
-		if(dy > .5f || dy < -.5f) // that means "if dy != 0"
+		int dy = event->globalY() - m_lastMousePos.y();
+		if( dy )
 		{
-			float initValueNotRounded = model()->value() -
-						dy / 2 * model()->step<int>();
-			model()->setInitValue( roundf(initValueNotRounded) );
+			float fdy = static_cast<float>(dy);
+			if( event->modifiers() & Qt::ShiftModifier )
+				fdy = qBound( -4.f, fdy/4.f, 4.f );
+			float floatValNotRounded = model()->value() + m_remainder -
+										fdy / 2.f * model()->step<int>();
+			float floatValRounded = roundf( floatValNotRounded );
+			m_remainder = floatValNotRounded - floatValRounded;
+			model()->setInitValue( floatValRounded );
 			emit manualChange();
+			m_lastMousePos = event->globalPos();
 		}
-		m_lastMousePos = event->globalPos();
 	}
 }
 
