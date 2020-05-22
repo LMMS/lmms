@@ -27,9 +27,15 @@
 #include <sstream>
 #include <iomanip>
 #include <map>
-#include <sys/time.h>
 #include <QThread>
 #include "LogSink.h"
+#include <chrono>
+
+#if defined(WIN32) || defined(_WIN32)
+	#define PATH_SEPARATOR "\\"
+#else
+	#define PATH_SEPARATOR "/"
+#endif
 
 const int LOG_BUFFER_SIZE = 1024;
 const unsigned int USEC_PER_SEC = 1000000;
@@ -39,11 +45,6 @@ std::map<Qt::HANDLE, std::string> LogManager::ms_threadIds;
 
 LogTopic LT_Default("default");
 
-#if defined(WIN32) || defined(_WIN32)
-	#define PATH_SEPARATOR "\\"
-#else
-	#define PATH_SEPARATOR "/"
-#endif
 
 LogTopic::LogTopic(std::string name)
 {
@@ -81,14 +82,13 @@ LogLine::LogLine(LogVerbosity verbosity,
 {
 	static unsigned int logLineNo = 0;
 	static unsigned long int initialTimestamp = 0;
-	struct timeval tv;
 
 	this->fileName = fileName;
 	this->logLineNo = logLineNo++;
 
 	/* Fill the timestamp information */
-	gettimeofday(&tv, nullptr);
-	this->timestamp = tv.tv_sec * USEC_PER_SEC + tv.tv_usec;
+	this->timestamp = std::chrono::duration_cast<std::chrono::microseconds>(
+			std::chrono::system_clock::now().time_since_epoch()).count();
 
 	/* If the timestamp was not set yet, initialize it with the value
 	 * we have just obtained - this way the very first log line will
