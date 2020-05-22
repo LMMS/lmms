@@ -129,8 +129,8 @@ void LcdSpinBox::mouseMoveEvent( QMouseEvent* event )
 			float fdy = static_cast<float>(dy);
 			if( event->modifiers() & Qt::ShiftModifier )
 				fdy = qBound( -4.f, fdy/4.f, 4.f );
-			float floatValNotRounded = model()->value() + m_remainder -
-										fdy / 2.f * model()->step<int>();
+			float floatValNotRounded =
+				model()->value() + m_remainder - fdy / 2.f * model()->step<int>();
 			float floatValRounded = roundf( floatValNotRounded );
 			m_remainder = floatValNotRounded - floatValRounded;
 			model()->setInitValue( floatValRounded );
@@ -189,6 +189,5 @@ void LcdSpinBox::enterValue()
 		model()->setValue( new_val );
 	}
 }
-
 
 
