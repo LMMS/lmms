@@ -28,52 +28,80 @@
 
 #include <QString>
 
-#include "ExportFilter.h"
 #include "MidiFile.hpp"
+#include "DataFile.h"
+#include "ExportFilter.h"
 
+using std::pair;
 using std::vector;
 
 /*---------------------------------------------------------------------------*/
-
-//! Size of the buffer used for exporting info
-constexpr size_t BUFFER_SIZE = 50*1024;
 
 //! A single note
 struct MidiNote
 {
 	//! The pitch (tone), which can be lower or higher
-	uint8_t pitch;
+	uint8_t m_pitch;
 
 	//! Volume (loudness)
-	uint8_t volume;
+	uint8_t m_volume;
 
 	//! Absolute time (from song start) when the note starts playing
-	int time;
+	int m_time;
 
 	//! For how long the note plays
-	int duration;
+	int m_duration;
 
 	//! Sort notes by time
 	inline bool operator<(const MidiNote &b) const
 	{
-		return time < b.time;
+		return m_time < b.m_time;
 	}
 };
-
-// Helper vector typedefs
-typedef vector<MidiNote> MidiNoteVector;
-typedef vector<MidiNote>::iterator MidiNoteIterator;
 
 /*---------------------------------------------------------------------------*/
 
 //! MIDI exporting base class
-class MidiExport: public ExportFilter
+class MidiExport : public ExportFilter
 {
-	typedef MidiFile::MIDITrack<BUFFER_SIZE> MTrack;
-
 private:
-	struct Pattern;
-	void error();
+	//! Represents a pattern of notes
+	struct Pattern
+	{
+		//! Vector of actual notes
+		vector<MidiNote> m_notes;
+
+		//! Append notes from root node to pattern
+		void write(const QDomNode &root,
+				int basePitch, double baseVolume, int baseTime);
+
+		//! Add pattern notes to MIDI file track
+		void writeToTrack(MidiFile::Track &mTrack) const;
+
+		//! Adjust special duration BB notes by resizing them accordingly
+		void processBBNotes(int cutPos);
+
+		//! Write sorted notes to a explicitly repeating BB pattern
+		void writeToBB(Pattern &bbPat,
+				int len, int base, int start, int end);
+	};
+
+	//! DataFile to be used by Qt elements
+	DataFile m_dataFile = DataFile(DataFile::SongProject);
+
+	MidiFile *m_file;
+
+	//! Song tempo
+	int m_tempo;
+
+	//! Song master pitch
+	int m_masterPitch;
+
+	//! Matrix containing (start, end) pairs for BB objects
+	vector<vector<pair<int, int>>> m_plists;
+
+	void foo(Track *track, uint8_t &channelID, bool isBB=false);
+	void goo(Track *track);
 
 public:
 	MidiExport();
@@ -84,8 +112,9 @@ public:
 		return nullptr;
 	}
 
-	//! Export a list of tracks with tempo and master pitch
-	//  to designated filename. Return if operation was successful
+	//! Export normal and BB tracks from a project with designated
+	//  tempo and master pitch to a file indicated by \param filename
+	//  \return If operation was successful
 	bool tryExport(const TrackContainer::TrackList &tracks,
 			const TrackContainer::TrackList &tracksBB,
 			int tempo, int masterPitch, const QString &filename);
