@@ -14,10 +14,11 @@
 
 #include <cstddef>
 #include <memory>
+#include "lmms_export.h"
 
-class _MemoryPool_Private;
+class LMMS_EXPORT _MemoryPool_Private;
 
-class _MemoryPool_Base
+class LMMS_EXPORT _MemoryPool_Base
 {
 public:
 	_MemoryPool_Base(size_t size, size_t nmemb);

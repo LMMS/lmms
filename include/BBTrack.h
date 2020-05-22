@@ -31,13 +31,14 @@
 #include <QtCore/QMap>
 #include <QStaticText>
 
+#include "lmms_export.h"
 #include "Track.h"
 
 class TrackLabelButton;
 class TrackContainer;
 
 
-class BBTCO : public TrackContentObject
+class LMMS_EXPORT BBTCO : public TrackContentObject
 {
 public:
 	BBTCO( Track * _track );

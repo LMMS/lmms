@@ -28,12 +28,13 @@
 #define PROJECT_VERSION_H
 
 #include <QtCore/QString>
+#include "lmms_export.h"
 
 /*! \brief Version number parsing and comparison
  *
  *  Parses and compares version information.  i.e. "1.0.3" < "1.0.10"
  */
-class ProjectVersion
+class LMMS_EXPORT ProjectVersion
 {
 public:
 	enum CompareType { Major, Minor, Release, Stage, Build };

@@ -54,7 +54,7 @@ static MemoryManager::MmCounter _mm_counter;
 static thread_local MemoryManager::MmCounter _mm_thread_counter;
 
 template<typename T>
-class MmAllocator
+class LMMS_EXPORT MmAllocator
 {
 public:
 	MmAllocator() = default;

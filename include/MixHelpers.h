@@ -26,6 +26,7 @@
 #define MIX_HELPERS_H
 
 #include "lmms_basics.h"
+#include "lmms_export.h"
 
 class ValueBuffer;
 namespace MixHelpers
@@ -35,7 +36,7 @@ bool isSilent( const sampleFrame* src, int frames );
 
 bool useNaNHandler();
 
-void setNaNHandler( bool use );
+LMMS_EXPORT void setNaNHandler( bool use );
 
 void clear(sampleFrame * src, int frames);
 #ifndef LMMS_DISABLE_SURROUND

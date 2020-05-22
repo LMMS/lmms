@@ -25,6 +25,8 @@
 #ifndef MAIN_WINDOW_H
 #define MAIN_WINDOW_H
 
+#include "lmms_export.h"
+
 #include <QtCore/QBasicTimer>
 #include <QtCore/QTimer>
 #include <QtCore/QList>
@@ -43,7 +45,7 @@ class PluginView;
 class ToolButton;
 
 
-class MainWindow : public QMainWindow
+class LMMS_EXPORT MainWindow : public QMainWindow
 {
 	Q_OBJECT
 public:
@@ -61,7 +63,7 @@ public:
 	void addSpacingToToolBar( int _size );
 
 	// wrap the widget with a window decoration and add it to the workspace
-	LMMS_EXPORT SubWindow* addWindowedWidget(QWidget *w, Qt::WindowFlags windowFlags=0);
+	SubWindow* addWindowedWidget(QWidget *w, Qt::WindowFlags windowFlags=0);
 
 
 	///
