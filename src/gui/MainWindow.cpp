@@ -219,29 +219,29 @@ MainWindow::MainWindow() :
 	
 	// Add layout for horizontally spacing the different widgets:
 	m_toolBarLayout = new QHBoxLayout( m_toolBar );
-	m_toolBarLayout->setContentsMargins( 5, 0, 5, 0 );
-	m_toolBarLayout->setSpacing( 5 );
+	m_toolBarLayout->setContentsMargins( 15, 0, 15, 0 );
+	m_toolBarLayout->setSpacing( 15 );
 	
-	// First add the leftmost buttons:
-	m_toolBarLayout->addSpacerItem( new QSpacerItem( 10, 20, QSizePolicy::Maximum ) );
-	m_leftButtonsList = new ToolButtonList( "fileToolButtons", m_toolBar );
-	m_toolBarLayout->addWidget( m_leftButtonsList );
-	
-	// Add spacers for horizontally centering the master toolbar widget:
+	// First add spacers for horizontally centering the master toolbar widget:
 	m_toolBarLeftSpacer = new QSpacerItem( 0, 20, QSizePolicy::Maximum );
 	m_toolBarLayout->addSpacerItem( m_toolBarLeftSpacer );
 	m_toolBarLayout->addSpacerItem( new QSpacerItem( 0, 20, QSizePolicy::Expanding ) );
 	
-	// In between these spacers, there will be the master tool bar.
+	// Then add the leftmost buttons:
+	m_toolBarLayout->addSpacerItem( new QSpacerItem( 10, 20, QSizePolicy::Maximum ) );
+	m_leftButtonsList = new ToolButtonList( "fileToolButtons", m_toolBar );
+	m_toolBarLayout->addWidget( m_leftButtonsList );
 	
-	m_toolBarLayout->addSpacerItem( new QSpacerItem( 0, 20, QSizePolicy::Expanding ) );
-	m_toolBarRightSpacer = new QSpacerItem( 180, 20, QSizePolicy::Maximum );
-	m_toolBarLayout->addSpacerItem( m_toolBarRightSpacer );
+	// In between these spacers, there will be the master tool bar.
 	
 	m_rightButtonsList = new ToolButtonList( "windowToolButtons", m_toolBar );
 	m_toolBarLayout->addWidget( m_rightButtonsList );
 	m_toolBarLayout->addSpacerItem( new QSpacerItem( 10, 20, QSizePolicy::Maximum ) );
 	
+	m_toolBarLayout->addSpacerItem( new QSpacerItem( 0, 20, QSizePolicy::Expanding ) );
+	m_toolBarRightSpacer = new QSpacerItem( 180, 20, QSizePolicy::Maximum );
+	m_toolBarLayout->addSpacerItem( m_toolBarRightSpacer );
+
 	connect( m_leftButtonsList,
 					&ToolButtonList::resized,
 					this,
