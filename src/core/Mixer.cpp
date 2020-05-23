@@ -1203,8 +1203,18 @@ MidiClient * Mixer::tryMidiClients()
     printf( "midi apple didn't work: client_name=%s\n", client_name.toUtf8().constData());
 #endif
 
-	printf( "Couldn't create MIDI-client, neither with ALSA nor with "
-		"OSS. Will use dummy-MIDI-client.\n" );
+	if(client_name != MidiDummy::name())
+	{
+		if (client_name.isEmpty())
+		{
+			printf("Unknown MIDI-client. ");
+		}
+		else
+		{
+			printf("Couldn't create %s MIDI-client. ", client_name.toUtf8().constData());
+		}
+		printf("Will use dummy-MIDI-client.\n");
+	}
 
 	m_midiClientName = MidiDummy::name();
 
