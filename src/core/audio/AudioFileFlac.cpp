@@ -100,7 +100,7 @@ void AudioFileFlac::writeBuffer(surroundSampleFrame const* _ab, fpp_t const fram
 			{
 				// Clip the negative side to -0.999999 in order to prevent it from changing sign
 				// Upstream issue: https://github.com/erikd/libsndfile/issues/309
-				// When this commit is reverted libsndfile-1.0.29 must be made a recuirement for FLAC
+				// When this commit is reverted libsndfile-1.0.29 must be made a requirement for FLAC
 				buf[frame*channels() + channel] = qMax( clipvalue, _ab[frame][channel] * master_gain );
 			}
 		}
