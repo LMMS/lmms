@@ -90,9 +90,6 @@ private:
 
 	/*-----------------------------------------------------------------------*/
 
-	//! DataFile to be used by Qt elements
-	DataFile m_dataFile = DataFile(DataFile::SongProject);
-
 	//! MIDI file object to work with
 	MidiFile *m_file;
 
@@ -101,6 +98,9 @@ private:
 
 	//! Song master pitch
 	int m_masterPitch;
+
+	//! DataFile to be used by Qt elements
+	DataFile m_dataFile = DataFile(DataFile::SongProject);
 
 	//! Matrix containing (start, end) pairs for BB objects
 	vector<vector<pair<int, int>>> m_plists;
@@ -125,7 +125,7 @@ public:
 
 private:
 	//! Process a given instrument track
-	void processTrack(Track *track, uint8_t &channelID, bool isBB=false);
+	void processTrack(Track *track, size_t channelID, bool isBB=false);
 
 	//! Build a repeating pattern from a normal one and write to MIDI track
 	void writeBbPattern(Pattern &pat, const QDomElement &patElem,

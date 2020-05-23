@@ -2,7 +2,7 @@
 #define _MIDI_FILE_H
 
 /**
- * Name:        MidiFile.cpp
+ * Name:        MidiFile.h
  * Purpose:     C++ re-write of the python module MidiFile.py
  * Author:      Mohamed Abdel Maksoud <mohamed at amaksoud.com>
  *-----------------------------------------------------------------------------
@@ -60,7 +60,7 @@ private:
 
 		//! \brief Write bytes to vector (or buffer by default)
 		//! \param bytes List of bytes to be written
-		//! \param v Pointer to vector (if none, use \ref m_buffer )
+		//! \param v Pointer to vector (if none, use \ref m_buffer)
 		void writeBytes(vector<uint8_t> bytes,
 				vector<uint8_t> *v=nullptr);
 
@@ -80,7 +80,7 @@ private:
 		void writeBigEndian2(uint16_t val, vector<uint8_t> *v=nullptr);
 
 		//! Write section info to buffer
-		virtual void writeToBuffer();
+		virtual void writeToBuffer() {}
 	};
 
 	/*-----------------------------------------------------------------------*/
@@ -91,14 +91,14 @@ public:
 	{
 	private:
 		//! Number of tracks in MIDI file
-		uint16_t m_numTracks;
+		const int m_numTracks;
 
 		//! How many ticks each beat has
-		uint16_t m_ticksPerBeat;
+		const int m_ticksPerBeat;
 
 	public:
 		//! Constructor
-		Header(uint16_t numTracks, uint16_t ticksPerBeat=TICKS_PER_BEAT);
+		Header(int numTracks, int ticksPerBeat=TICKS_PER_BEAT);
 
 		//! Write header info to buffer
 		void writeToBuffer();
@@ -167,11 +167,11 @@ public:
 		//! Variable-length vector of events
 		vector<Event> m_events;
 
-		//! Append a single event to vector
-		void addEvent(Event event, uint32_t time);
-
 		//! Track channel number
 		uint8_t m_channel;
+
+		//! Append a single event to vector
+		void addEvent(Event event, uint32_t time);
 
 	public:
 		//! Constructor
@@ -225,10 +225,12 @@ public:
 	//! List of tracks
 	vector<Track> m_tracks;
 
-	//! \brief Open data stream for writing to file and reserve track space
+	//! \brief Open data stream for writing to file and create list of tracks
 	//! \param filename Name of file to be opened
-	//! \param nTracks Total number of MIDI tracks
-	MidiFile(const QString &filename, uint16_t nTracks);
+	//! \param nInstTracks Number of instrument tracks
+	//! \param nInstBbTracks Number of instrument BB tracks
+	MidiFile(const QString &filename,
+			int nInstTracks, int nInstBbTracks);
 
 	//! Write all data (both header and tracks) to stream
 	void writeAllToStream();

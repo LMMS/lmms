@@ -35,24 +35,29 @@ using std::sort;
 
 /*---------------------------------------------------------------------------*/
 
-MidiFile::MidiFile(const QString &filename, uint16_t nTracks):
-		m_file(filename), m_header(nTracks)
+MidiFile::MidiFile(const QString &filename,
+		int nInstTracks, int nInstBbTracks):
+		m_file(filename),
+		m_header(nInstTracks + nInstBbTracks)
 {
 	// Open designated blank MIDI file (and data stream) for writing
 	m_file.open(QIODevice::WriteOnly);
 	m_stream = QSharedPointer<QDataStream>(new QDataStream(&m_file));
 
-	// Reserve space for track list
-	m_tracks.reserve(nTracks);
-	for (size_t i = 0; i < nTracks; i++)
+	// Add tracks with ascending channel numbers (skipping 10)
+	size_t id = 0;
+	for (size_t i = 0; i < nInstTracks; ++i)
 	{
-		m_tracks.push_back(Track(i));
+		if (++id == 9) ++id;
+		m_tracks.push_back(Track(id));
 	}
+	// Add channel 10 tracks for all instrument BB ones
+	m_tracks.insert(m_tracks.end(), nInstBbTracks, Track(9));
 }
 
 void MidiFile::writeAllToStream()
 {
-	// reinterpret_cast should be used to convert raw data to (char *)
+	// reinterpret_cast is used to convert raw uint8_t data to char
 	m_stream->writeRawData(
 			reinterpret_cast<char *>(m_header.m_buffer.data()),
 			m_header.m_buffer.size());
@@ -123,7 +128,7 @@ void MidiFile::Section::writeBigEndian2(uint16_t val,
 
 /*---------------------------------------------------------------------------*/
 
-MidiFile::Header::Header(uint16_t numTracks, uint16_t ticksPerBeat):
+MidiFile::Header::Header(int numTracks, int ticksPerBeat):
 		m_numTracks(numTracks),
 		m_ticksPerBeat(ticksPerBeat) {}
 
@@ -216,7 +221,7 @@ void MidiFile::Track::writeToBuffer()
 	writeBigEndian4(size, &v);
 	for (size_t i = 0; i < 4; ++i)
 	{
-		m_buffer[idx + i] = v[i];
+		m_buffer[idx - 4 + i] = v[i];
 	}
 }
 

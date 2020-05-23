@@ -151,46 +151,43 @@ MidiExport::MidiExport() :
 /*---------------------------------------------------------------------------*/
 
 bool MidiExport::tryExport(const TrackContainer::TrackList &tracks,
-		const TrackContainer::TrackList &tracksBB,
+		const TrackContainer::TrackList &tracksBb,
 		int tempo, int masterPitch, const QString &filename)
 {
-	// Count total number of tracks
-	uint16_t nTracks = 0;
-	for (auto trackList : {tracks, tracksBB})
+	// Count number of instrument (and instrument BB) tracks
+	int nInstTracks = 0;
+	for (const Track *track : tracks)
 	{
-		for (const Track *track : trackList)
-		{
-			if (track->type() == Track::InstrumentTrack) { nTracks++; }
-		}
+		if (track->type() == Track::InstrumentTrack) { nInstTracks++; }
 	}
+	int nInstBbTracks = tracksBb.size();
+
 	// Create MIDI file object
-	MidiFile file(filename, nTracks);
+	MidiFile file(filename, nInstTracks, nInstBbTracks);
 	m_file = &file;
+	m_tempo = tempo;
+	m_masterPitch = masterPitch;
 
 	// Write header info
 	m_file->m_header.writeToBuffer();
 
-	// Set tempo and pitch properties
-	m_tempo = tempo;
-	m_masterPitch = masterPitch;
-
 	// Iterate through "normal" tracks
-	uint8_t channel_id = 0;
+	size_t trackIdx = 0;
 	for (Track *track : tracks)
 	{
 		if (track->type() == Track::InstrumentTrack)
 		{
-			processTrack(track, channel_id);
+			processTrack(track, trackIdx++);
 		}
 		else if (track->type() == Track::BBTrack)
 		{
 			processBbTrack(track);
 		}
 	}
-	// Iterate through BB tracks
-	for (Track *track : tracksBB)
+	// Iterate through instrument BB tracks
+	for (Track *track : tracksBb)
 	{
-		processTrack(track, channel_id, true);
+		processTrack(track, trackIdx++, true);
 	}
 	// Write all buffered data to stream
 	m_file->writeAllToStream();
@@ -199,26 +196,27 @@ bool MidiExport::tryExport(const TrackContainer::TrackList &tracks,
 	return true;
 }
 
-void MidiExport::processTrack(Track *track, uint8_t &channelID, bool isBB)
+void MidiExport::processTrack(Track *track, size_t trackIdx, bool isBb)
 {
 	// Cast track as a instrument one and save info from it to element
 	InstrumentTrack *instTrack = dynamic_cast<InstrumentTrack *>(track);
 	QDomElement root = instTrack->saveState(m_dataFile, m_dataFile.content());
 
-	// Create track with incremental id
-	MidiFile::Track &midiTrack = m_file->m_tracks[channelID++];
+	// Get next MIDI file track object of the list
+	MidiFile::Track &midiTrack = m_file->m_tracks[trackIdx];
 
 	// Add info about tempo and track name
 	midiTrack.addTempo(m_tempo, 0);
 	midiTrack.addName(track->name().toStdString(), 0);
 
 	// If the current track is a Sf2 Player one, set the current
-	// patch for to the exporting track. Note that this only works
+	// patch to the exporting track. Note that this only works
 	// decently if the current bank is a GM 1~128 one (which would be
 	// needed as the default either way for successful import).
+	// BB tracks are always bank 128 (see MidiImport), patch 0.
 	uint8_t patch = 0;
 	QString instName = instTrack->instrumentName();
-	if (instName == "Sf2 Player")
+	if (instName == "Sf2 Player" and not isBb)
 	{
 		class Instrument *inst = instTrack->instrument();
 		patch = inst->childModel("patch")->value<uint8_t>();
@@ -240,35 +238,42 @@ void MidiExport::processTrack(Track *track, uint8_t &channelID, bool isBB)
 	double baseVolume = LocaleHelper::toDouble(
 			trackElem.attribute("volume", "100")) / 100.0;
 
-	// ---- Pattern ---- //
-	QDomNode patternNode = root.firstChildElement("pattern");
-	QDomElement patElem = patternNode.toElement();
-	Pattern pat;
-	if (not isBB)
+	// ---- Patterns ---- //
+	uint8_t bbId = 0;
+	for (QDomNode patNode = root.firstChildElement("pattern");
+			not patNode.isNull();
+			patNode = patNode.nextSiblingElement("pattern"))
 	{
-		// Base time == initial position
-		int baseTime = patElem.attribute("pos", "0").toInt();
+		QDomElement patElem = patNode.toElement();
+		Pattern pat;
+		if (not isBb)
+		{
+			// Base time == initial position
+			int baseTime = patElem.attribute("pos", "0").toInt();
 
-		// Write track notes to pattern
-		pat.write(patternNode, basePitch, baseVolume, baseTime);
+			// Write track notes to pattern
+			pat.write(patNode, basePitch, baseVolume, baseTime);
 
-		// Write pattern info to MIDI file track
-		pat.processBbNotes(INT_MAX);
-		pat.writeToTrack(midiTrack);
+			// Write pattern info to MIDI file track
+			pat.processBbNotes(INT_MAX);
+			pat.writeToTrack(midiTrack);
+		}
+		else
+		{
+			// Write to-be repeated BB notes to pattern
+			// (notice base time of 0)
+			pat.write(patNode, basePitch, baseVolume, 0);
+
+			// Write pattern to track
+			writeBbPattern(pat, patElem, bbId++, midiTrack);
+		}
 	}
-	else
-	{
-		// Write to-be repeated BB notes to pattern
-		// (notice base time of 0)
-		pat.write(patternNode, basePitch, baseVolume, 0);
-	}
-
 	// Write track data to buffer
 	midiTrack.writeToBuffer();
 }
 
 void MidiExport::writeBbPattern(Pattern &pat, const QDomElement &patElem,
-		uint8_t channelID, MidiFile::Track &midiTrack)
+		uint8_t bbId, MidiFile::Track &midiTrack)
 {
 	// Workaround for nested BBTCOs
 	int pos = 0;
@@ -276,7 +281,7 @@ void MidiExport::writeBbPattern(Pattern &pat, const QDomElement &patElem,
 
 	// Iterate through BBTCO pairs of current list
 	// TODO: This *may* need some corrections?
-	const vector<pair<int,int>> &plist = m_plists[channelID - 1];
+	const vector<pair<int,int>> &plist = m_plists[bbId];
 	stack<pair<int, int>> st;
 	Pattern bbPat;
 	for (const pair<int, int> &p : plist)
