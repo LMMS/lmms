@@ -122,17 +122,6 @@ Lv2ViewProc::~Lv2ViewProc() {}
 
 
 
-void Lv2ViewProc::leaveEvent(QEvent *)
-{
-	if(!rect().contains(mapFromGlobal(QCursor::pos())))
-	{
-		removeFocusFromSearchBar();
-	}
-}
-
-
-
-
 AutoLilvNode Lv2ViewProc::uri(const char *uriStr)
 {
 	return Engine::getLv2Manager()->uri(uriStr);
