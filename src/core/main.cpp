@@ -161,6 +161,7 @@ void printHelp()
 		"Actions:\n"
 		"  <no action> [options...] [<project>]  Start LMMS in normal GUI mode\n"
 		"  dump <in>                             Dump XML of compressed file <in>\n"
+		"  compress <in>                         Compress file <in>\n"
 		"  render <project> [options...]         Render given project file\n"
 		"  rendertracks <project> [options...]   Render each track to a different file\n"
 		"  upgrade <in> [out]                    Upgrade file <in> and save as <out>\n"
@@ -424,6 +425,22 @@ int main( int argc, char * * argv )
 			f.open( QIODevice::ReadOnly );
 			QString d = qUncompress( f.readAll() );
 			printf( "%s\n", d.toUtf8().constData() );
+
+			return EXIT_SUCCESS;
+		}
+		else if( arg == "compress" || arg == "--compress" )
+		{
+			++i;
+
+			if( i == argc )
+			{
+				return noInputFileError();
+			}
+			
+			QFile f( QString::fromLocal8Bit( argv[i] ) );
+			f.open( QIODevice::ReadOnly );
+			QByteArray d = qCompress( f.readAll() ) ;
+			fwrite( d.constData(), sizeof(char), d.size(), stdout );
 
 			return EXIT_SUCCESS;
 		}
