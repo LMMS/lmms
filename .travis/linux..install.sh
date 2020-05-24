@@ -13,8 +13,11 @@ SWH_PACKAGES="perl libxml2-utils libxml-perl liblist-moreutils-perl"
 # VST dependencies
 VST_PACKAGES="wine-dev qt59x11extras qtbase5-private-dev libxcb-util0-dev libxcb-keysyms1-dev"
 
+# LV2 dependencies; libsuil-dev is not required
+LV2_PACKAGES="lv2-dev liblilv-dev"
+
 # Help with unmet dependencies
-PACKAGES="$PACKAGES $SWH_PACKAGES $VST_PACKAGES libjack-jackd2-0"
+PACKAGES="$PACKAGES $SWH_PACKAGES $VST_PACKAGES $LV2_PACKAGES libjack-jackd2-0"
 
 # shellcheck disable=SC2086
 sudo apt-get install -y $PACKAGES
