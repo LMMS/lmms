@@ -1606,6 +1606,11 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 					// then resize the note
 					m_action = ActionResizeNote;
 
+					for (Note *note : getSelectedNotes())
+					{
+					    if (note->oldLength() <= 0) { note->setOldLength(4); }
+					}
+
 					// set resize-cursor
 					QCursor c( Qt::SizeHorCursor );
 					QApplication::setOverrideCursor( c );
@@ -2521,13 +2526,6 @@ void PianoRoll::dragNotes( int x, int y, bool alt, bool shift, bool ctrl )
 
 		if (shift)
 		{
-			for (Note *note : notes)
-			{
-				if (note->selected())
-				{
-					if (note->oldLength() <= 0){note->setOldLength(4);}
-				}
-			}
 			// Algorithm:
 			// Relative to the starting point of the left-most selected note,
 			//   all selected note start-points and *endpoints* (not length) should be scaled by a calculated factor.
@@ -2616,7 +2614,6 @@ void PianoRoll::dragNotes( int x, int y, bool alt, bool shift, bool ctrl )
 			{
 				if (note->selected())
 				{
-					if (note->oldLength() <= 0){note->setOldLength(4);}
 					int newLength = note->oldLength() + off_ticks;
 					newLength = qMax(1, newLength);
 					note->setLength( MidiTime(newLength) );
