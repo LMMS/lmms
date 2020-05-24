@@ -35,24 +35,16 @@ using std::sort;
 
 /*---------------------------------------------------------------------------*/
 
-MidiFile::MidiFile(const QString &filename,
-		int nInstTracks, int nInstBbTracks):
+MidiFile::MidiFile(const QString &filename, int nTracks):
 		m_file(filename),
-		m_header(nInstTracks + nInstBbTracks)
+		m_header(nTracks)
 {
 	// Open designated blank MIDI file (and data stream) for writing
 	m_file.open(QIODevice::WriteOnly);
 	m_stream = QSharedPointer<QDataStream>(new QDataStream(&m_file));
 
-	// Add tracks with ascending channel numbers (skipping 10)
-	size_t id = 0;
-	for (size_t i = 0; i < nInstTracks; ++i)
-	{
-		if (++id == 9) ++id;
-		m_tracks.push_back(Track(id));
-	}
-	// Add channel 10 tracks for all instrument BB ones
-	m_tracks.insert(m_tracks.end(), nInstBbTracks, Track(9));
+	// Resize track list
+	m_tracks.resize(nTracks);
 }
 
 void MidiFile::writeAllToStream()
@@ -149,9 +141,6 @@ void MidiFile::Header::writeToBuffer()
 }
 
 /*---------------------------------------------------------------------------*/
-
-MidiFile::Track::Track(uint8_t channel):
-		m_channel(channel) {}
 
 void MidiFile::Track::addEvent(Event event, uint32_t time)
 {

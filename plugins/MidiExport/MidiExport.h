@@ -99,14 +99,14 @@ private:
 	//! Song master pitch
 	int m_masterPitch;
 
+	//! Current (incremental) track channel number for non drum tracks
+	uint8_t m_channel = 0;
+
 	//! DataFile to be used by Qt elements
 	DataFile m_dataFile = DataFile(DataFile::SongProject);
 
 	//! Matrix containing (start, end) pairs for BB objects
 	vector<vector<pair<int, int>>> m_plists;
-
-	//! Necessary for lmms_plugin_main()
-	PluginView *instantiateView(QWidget *) { return nullptr; }
 
 public:
 	//! Explicit constructor for setting plugin descriptor
@@ -133,6 +133,9 @@ private:
 
 	//! Process a given BB track
 	void processBbTrack(Track *track);
+
+	//! Necessary for lmms_plugin_main()
+	PluginView *instantiateView(QWidget *) { return nullptr; }
 } ;
 
 /*---------------------------------------------------------------------------*/

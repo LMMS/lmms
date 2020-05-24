@@ -167,16 +167,15 @@ public:
 		//! Variable-length vector of events
 		vector<Event> m_events;
 
+	public:
 		//! Track channel number
 		uint8_t m_channel;
 
+	private:
 		//! Append a single event to vector
 		void addEvent(Event event, uint32_t time);
 
 	public:
-		//! Constructor
-		Track(uint8_t channel);
-
 		//! \brief Add both NOTE_ON and NOTE_OFF effects
 		//! \param pitch Note pitch
 		//! \param volume Note volume
@@ -227,10 +226,8 @@ public:
 
 	//! \brief Open data stream for writing to file and create list of tracks
 	//! \param filename Name of file to be opened
-	//! \param nInstTracks Number of instrument tracks
-	//! \param nInstBbTracks Number of instrument BB tracks
-	MidiFile(const QString &filename,
-			int nInstTracks, int nInstBbTracks);
+	//! \param nTracks Number of instrument (BB and non BB) tracks
+	MidiFile(const QString &filename, int nTracks);
 
 	//! Write all data (both header and tracks) to stream
 	void writeAllToStream();

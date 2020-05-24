@@ -155,15 +155,15 @@ bool MidiExport::tryExport(const TrackContainer::TrackList &tracks,
 		int tempo, int masterPitch, const QString &filename)
 {
 	// Count number of instrument (and instrument BB) tracks
-	int nInstTracks = 0;
+	int nTracks = 0;
 	for (const Track *track : tracks)
 	{
-		if (track->type() == Track::InstrumentTrack) { nInstTracks++; }
+		if (track->type() == Track::InstrumentTrack) { nTracks++; }
 	}
-	int nInstBbTracks = tracksBb.size();
+	nTracks += tracksBb.size();
 
 	// Create MIDI file object
-	MidiFile file(filename, nInstTracks, nInstBbTracks);
+	MidiFile file(filename, nTracks);
 	m_file = &file;
 	m_tempo = tempo;
 	m_masterPitch = masterPitch;
@@ -202,8 +202,10 @@ void MidiExport::processTrack(Track *track, size_t trackIdx, bool isBb)
 	InstrumentTrack *instTrack = dynamic_cast<InstrumentTrack *>(track);
 	QDomElement root = instTrack->saveState(m_dataFile, m_dataFile.content());
 
-	// Get next MIDI file track object of the list
+	// Get next MIDI file track object of the list and set its channel
 	MidiFile::Track &midiTrack = m_file->m_tracks[trackIdx];
+	if (m_channel == 9) { ++m_channel; }
+	midiTrack.m_channel = m_channel++;
 
 	// Add info about tempo and track name
 	midiTrack.addTempo(m_tempo, 0);
@@ -216,10 +218,18 @@ void MidiExport::processTrack(Track *track, size_t trackIdx, bool isBb)
 	// BB tracks are always bank 128 (see MidiImport), patch 0.
 	uint8_t patch = 0;
 	QString instName = instTrack->instrumentName();
-	if (instName == "Sf2 Player" and not isBb)
+	if (instName == "Sf2 Player")
 	{
 		class Instrument *inst = instTrack->instrument();
-		patch = inst->childModel("patch")->value<uint8_t>();
+		uint8_t bank = inst->childModel("bank")->value<uint8_t>();
+		if (bank == 128)
+		{
+			// Drum Sf2 track, so set its channel to 10
+			// (and reverse counter increment)
+			midiTrack.m_channel = 9;
+			m_channel--;
+		}
+		else { patch = inst->childModel("patch")->value<uint8_t>(); }
 	}
 	midiTrack.addProgramChange(patch, 0);
 
