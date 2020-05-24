@@ -2521,6 +2521,13 @@ void PianoRoll::dragNotes( int x, int y, bool alt, bool shift, bool ctrl )
 
 		if (shift)
 		{
+			for (Note *note : notes)
+			{
+				if (note->selected())
+				{
+					if (note->oldLength() <= 0){note->setOldLength(4);}
+				}
+			}
 			// Algorithm:
 			// Relative to the starting point of the left-most selected note,
 			//   all selected note start-points and *endpoints* (not length) should be scaled by a calculated factor.
