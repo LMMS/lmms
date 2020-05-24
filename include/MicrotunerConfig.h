@@ -55,6 +55,12 @@ private:
 	void updateScaleForm();
 	void updateKeymapForm();
 
+	bool validateScaleForm();
+	bool validateKeymapForm();
+
+	bool applyScale();
+	bool applyKeymap();
+
 	ComboBoxModel m_scaleComboModel;		//!< ID of scale currently selected for editing
 	ComboBoxModel m_keymapComboModel;		//!< ID of keymap currently selected for editing
 

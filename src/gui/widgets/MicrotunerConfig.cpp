@@ -26,7 +26,9 @@
 
 #include <QHBoxLayout>
 #include <QLabel>
+#include <QMessageBox>
 #include <QPushButton>
+#include <QRegExp>
 
 #include "ComboBox.h"
 #include "embed.h"
@@ -65,8 +67,8 @@ MicrotunerConfig::MicrotunerConfig() :
 	microtunerLayout->addWidget(scaleCombo, 1, 0, 1, 2);
 	connect(&m_scaleComboModel, &ComboBoxModel::dataChanged, [=] {updateScaleForm();});
 
-	m_scaleNameEdit = new QLineEdit("12-TET");		// make sure all these ←↓ are populated
-	m_scaleNameEdit->setToolTip(tr("Scale description"));		// based on the scale model ..
+	m_scaleNameEdit = new QLineEdit("12-TET");
+	m_scaleNameEdit->setToolTip(tr("Scale description. Cannot start with \"!\" and cannot contain a newline character."));
 	microtunerLayout->addWidget(m_scaleNameEdit, 2, 0, 1, 2);
 
 	QPushButton *scaleLoadButton = new QPushButton(tr("Load"));
@@ -77,10 +79,12 @@ MicrotunerConfig::MicrotunerConfig() :
 	m_scaleTextEdit = new QTextEdit();
 	m_scaleTextEdit->setAcceptRichText(false);
 	m_scaleTextEdit->setPlainText("100.0\n200.0\n300.0\n400.0\n500.0\n600.0\n700.0\n800.0\n900.0\n1000.0\n1100.0\n1200.0");
+	m_scaleTextEdit->setToolTip(tr("Enter intervals on separate lines. Numbers containing a decimal point are treated as cents. Other input is treated as an integer ratio and must be in the form of \'a/b\' or \'a\'. Unity (0.0 cents or ratio 1/1) is always present as a hidden first value."));
 	microtunerLayout->addWidget(m_scaleTextEdit, 4, 0, 4, 2, Qt::AlignLeft | Qt::AlignTop);
 
 	QPushButton *applyScaleButton = new QPushButton(tr("Apply scale"));
 	microtunerLayout->addWidget(applyScaleButton, 8, 0, 1, 2);
+	connect(applyScaleButton, &QPushButton::clicked, [=] {applyScale();});
 
 	// Mapping sub-column
 	QLabel *keymapLabel = new QLabel(tr("Keymap:"));
@@ -97,7 +101,7 @@ MicrotunerConfig::MicrotunerConfig() :
 	connect(&m_keymapComboModel, &ComboBoxModel::dataChanged, [=] {updateKeymapForm();});
 
 	m_keymapNameEdit = new QLineEdit("default");
-	m_keymapNameEdit->setToolTip(tr("Keymap description"));
+	m_keymapNameEdit->setToolTip(tr("Keymap description. Cannot start with \"!\" and cannot contain a newline character."));
 	microtunerLayout->addWidget(m_keymapNameEdit, 2, 2, 1, 2);
 
 	QPushButton *keymapLoadButton = new QPushButton(tr("Load"));
@@ -108,6 +112,7 @@ MicrotunerConfig::MicrotunerConfig() :
 	m_keymapTextEdit = new QTextEdit();
 	m_keymapTextEdit->setAcceptRichText(false);
 	m_keymapTextEdit->setPlainText("0\n1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11");
+	m_keymapTextEdit->setToolTip(tr("Enter key mappings on separate lines. Each line assigns a scale degree to a key, starting with the middle key and continuing in sequence. The pattern repeats for keys outside of the explicit keymap range. Multiple keys can be mapped to the same scale degree. Enter \'x\' if you wish to leave the key disabled / not mapped."));
 	microtunerLayout->addWidget(m_keymapTextEdit, 4, 2, 1, 2, Qt::AlignRight | Qt::AlignTop);
 
 	// Mapping ranges
@@ -141,6 +146,7 @@ MicrotunerConfig::MicrotunerConfig() :
 
 	QPushButton *applyKeymapButton = new QPushButton(tr("Apply keymap"));
 	microtunerLayout->addWidget(applyKeymapButton, 8, 2, 1, 2);
+	connect(applyKeymapButton, &QPushButton::clicked, [=] {applyKeymap();});
 
 	updateScaleForm();
 	updateKeymapForm();
@@ -205,12 +211,103 @@ void MicrotunerConfig::updateKeymapForm()
 }
 
 
-/*
-void MicrotunerConfig::applyScale()
+/**
+ * \brief Validate the entered interval definitions
+ * \return true if input is valid, false if problems were detected
+ */
+bool MicrotunerConfig::validateScaleForm()
 {
-	//TODO: validate entries, update stored scale, update instrument combo boxes and LUTs
+	auto fail = [=](QString message) {QMessageBox::critical(this, tr("Scale parsing error"), message);};
+
+	// check name
+	QString name = m_scaleNameEdit->text();
+	if (name.length() > 0 && name[0] == '!') {fail(tr("Scale name cannot start with an exclamation mark")); return false;}
+	if (name.contains('\n')) {fail(tr("Scale name cannot contain a new-line character")); return false;}
+
+	// check intervals
+	QStringList input = m_scaleTextEdit->toPlainText().split('\n', QString::SkipEmptyParts);
+	for (auto &line: input)
+	{
+		if (line.size() == 0) {continue;}
+		if (line[0] == '!') {continue;}		// comment
+		QString firstSection = line.section(QRegExp("\\s+|/"), 0, 0, QString::SectionSkipEmpty);
+		if (firstSection.contains('.'))		// cent mode
+		{
+			bool ok = true;
+			firstSection.toFloat(&ok);
+			if (!ok) {fail(tr("Interval defined in cents cannot be converted to a number")); return false;}
+		}
+		else								// ratio mode
+		{
+			bool ok = true;
+			int num = 1, den = 1;
+			den = firstSection.toInt(&ok);
+			if (!ok) {fail(tr("Denominator of an interval defined as a ratio cannot be converted to a number")); return false;}
+			if (line.contains('/'))
+			{
+				num = line.split('/').at(1).section(QRegExp("\\s+"), 0, 0, QString::SectionSkipEmpty).toInt(&ok);
+			}
+			if (!ok) {fail(tr("Numerator of an interval defined as a ratio cannot be converted to a number")); return false;}
+			if (num * den < 0) {fail(tr("Interval defined as a ratio cannot be negative")); return false;}
+		}
+	}
+	return true;
 }
-*/
+
+
+/**
+ * \brief Validate the entered key mapping and other values
+ * \return true if input is valid, false if problems were detected
+ */
+bool MicrotunerConfig::validateKeymapForm()
+{
+	auto fail = [=](QString message) {QMessageBox::critical(this, tr("Keymap parsing error"), message);};
+
+	// check name
+	QString name = m_keymapNameEdit->text();
+	if (name.length() > 0 && name[0] == '!') {fail(tr("Keymap name cannot start with an exclamation mark")); return false;}
+	if (name.contains('\n')) {fail(tr("Keymap name cannot contain a new-line character")); return false;}
+
+	// check key mappings
+	QStringList input = m_keymapTextEdit->toPlainText().split('\n', QString::SkipEmptyParts);
+	for (auto &line: input)
+	{
+		if (line.size() == 0) {continue;}
+		if (line[0] == '!') {continue;}			// comment
+		QString firstSection = line.section(QRegExp("\\s+"), 0, 0, QString::SectionSkipEmpty);
+		if (firstSection == "x") {continue;}	// not mapped
+		// otherwise must contain a number
+		bool ok = true;
+		int deg = 0;
+		deg = firstSection.toInt(&ok);
+		if (!ok) {fail(tr("Scale degree cannot be converted to a whole number")); return false;}
+		if (deg < 0) {fail(tr("Scale degree cannot be negative")); return false;}
+	}
+
+	return true;
+}
+
+
+
+bool MicrotunerConfig::applyScale()
+{
+	validateScaleForm();
+
+	//TODO: update stored scale
+
+	return true;
+}
+
+
+bool MicrotunerConfig::applyKeymap()
+{
+	validateKeymapForm();
+
+	//TODO: update stored keymap and other values
+
+	return true;
+}
+
 
 void MicrotunerConfig::saveSettings(QDomDocument &document, QDomElement &element)
 {
