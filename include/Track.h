@@ -30,6 +30,7 @@
 #include <QtCore/QList>
 #include <QWidget>
 #include <QSignalMapper>
+#include <QSize>
 #include <QColor>
 #include <QMimeData>
 
@@ -201,6 +202,9 @@ class TrackContentObjectView : public selectableObject, public ModelView
 	Q_PROPERTY( QColor textShadowColor READ textShadowColor WRITE setTextShadowColor )
 	Q_PROPERTY( QColor BBPatternBackground READ BBPatternBackground WRITE setBBPatternBackground )
 	Q_PROPERTY( bool gradient READ gradient WRITE setGradient )
+	// We have to use a QSize here because using QPoint isn't supported.
+	// width -> x, height -> y
+	Q_PROPERTY( QSize mouseHotspotHand WRITE setMouseHotspotHand )
 
 public:
 	TrackContentObjectView( TrackContentObject * tco, TrackView * tv );
@@ -233,6 +237,7 @@ public:
 	void setTextShadowColor( const QColor & c );
 	void setBBPatternBackground( const QColor & c );
 	void setGradient( const bool & b );
+	void setMouseHotspotHand(const QSize & s);
 
 	// access needsUpdate member variable
 	bool needsUpdate();
@@ -302,8 +307,10 @@ private:
 	QColor m_textShadowColor;
 	QColor m_BBPatternBackground;
 	bool m_gradient;
+	QSize m_mouseHotspotHand; // QSize must be used because QPoint isn't supported by property system
+	bool m_cursorSetYet;
 
- 	bool m_needsUpdate;
+	bool m_needsUpdate;
 	inline void setInitialMousePos( QPoint pos )
 	{
 		m_initialMousePos = pos;
