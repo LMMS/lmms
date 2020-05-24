@@ -843,8 +843,6 @@ SampleTrackView::SampleTrackView( SampleTrack * _t, TrackContainerView* tcv ) :
 	m_activityIndicator->setGeometry(settingsWidgetWidth - 2 * 24 - 11, 2, 8, 28);
 	m_activityIndicator->show();
 	connect(_t, SIGNAL(playingChanged()), this, SLOT(updateIndicator()));
-	connect(Engine::getSong(), SIGNAL(stopped()),
-			this, SLOT(stopPlaying()));
 
 	setModel( _t );
 
