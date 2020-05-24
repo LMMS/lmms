@@ -73,8 +73,9 @@ protected:
 	virtual void mouseDoubleClickEvent( QMouseEvent * _me );
 
 private:
+	float m_remainder; //!< floating offset of spinbox in [-0.5, 0.5]
 	bool m_mouseMoving;
-	QPoint m_origMousePos;
+	QPoint m_lastMousePos; //!< mouse position in last mouseMoveEvent
 	int m_displayOffset;
 	void enterValue();
 
