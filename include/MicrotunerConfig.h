@@ -25,11 +25,13 @@
 #ifndef MICROTUNER_CONFIG_H
 #define MICROTUNER_CONFIG_H
 
-#include <QMainWindow>
 #include <QCloseEvent>
+#include <QLineEdit>
+#include <QMainWindow>
+#include <QTextEdit>
 
+#include "ComboBoxModel.h"
 #include "SerializingObject.h"
-
 
 class LMMS_EXPORT MicrotunerConfig : public QWidget, public SerializingObject
 {
@@ -50,7 +52,17 @@ protected:
 	void closeEvent(QCloseEvent *ce) override;
 
 private:
+	void updateScaleForm();
+	void updateKeymapForm();
 
+	ComboBoxModel m_scaleComboModel;		//!< ID of scale currently selected for editing
+	ComboBoxModel m_keymapComboModel;		//!< ID of keymap currently selected for editing
+
+	QLineEdit *m_scaleNameEdit;				//!< edit field for the scale name or description
+	QLineEdit *m_keymapNameEdit;			//!< edit field for the keymap name or description
+
+	QTextEdit *m_scaleTextEdit;				//!< text editor field for interval definitions
+	QTextEdit *m_keymapTextEdit;			//!< text editor field for key mappings
 };
 
 #endif

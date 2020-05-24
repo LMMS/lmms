@@ -26,16 +26,17 @@
 
 #include <QHBoxLayout>
 #include <QLabel>
-#include <QLineEdit>
 #include <QPushButton>
-#include <QTextEdit>
 
 #include "ComboBox.h"
 #include "embed.h"
+#include "Engine.h"
 #include "GuiApplication.h"
 #include "Knob.h"
 #include "LcdSpinBox.h"
+#include "lmms_constants.h"
 #include "MainWindow.h"
+#include "Song.h"
 
 
 MicrotunerConfig::MicrotunerConfig() :
@@ -54,48 +55,60 @@ MicrotunerConfig::MicrotunerConfig() :
 	QLabel *scaleLabel = new QLabel(tr("Scale:"));
 	microtunerLayout->addWidget(scaleLabel, 0, 0, 1, 2, Qt::AlignBottom);
 
+	for (unsigned int i = 0; i < MaxScaleCount; i++)
+	{
+		m_scaleComboModel.addItem(Engine::getSong()->getScale(i).getDescription());
+	}
 	ComboBox *scaleCombo = new ComboBox();
 	scaleCombo->setFixedHeight(comboHeight);
+	scaleCombo->setModel(&m_scaleComboModel);
 	microtunerLayout->addWidget(scaleCombo, 1, 0, 1, 2);
+	connect(&m_scaleComboModel, &ComboBoxModel::dataChanged, [=] {updateScaleForm();});
 
-	QLineEdit *scaleNameEdit = new QLineEdit("12-TET");
-	scaleNameEdit->setToolTip(tr("Scale description"));
-	microtunerLayout->addWidget(scaleNameEdit, 2, 0, 1, 2);
+	m_scaleNameEdit = new QLineEdit("12-TET");		// make sure all these ←↓ are populated
+	m_scaleNameEdit->setToolTip(tr("Scale description"));		// based on the scale model ..
+	microtunerLayout->addWidget(m_scaleNameEdit, 2, 0, 1, 2);
 
 	QPushButton *scaleLoadButton = new QPushButton(tr("Load"));
 	QPushButton *scaleSaveButton = new QPushButton(tr("Save"));
 	microtunerLayout->addWidget(scaleLoadButton, 3, 0, 1, 1);
 	microtunerLayout->addWidget(scaleSaveButton, 3, 1, 1, 1);
 
-	QTextEdit *scaleTextEdit = new QTextEdit();
-	scaleTextEdit->setAcceptRichText(false);
-	scaleTextEdit->setPlainText("100.0\n200.0\n300.0\n400.0\n500.0\n600.0\n700.0\n800.0\n900.0\n1000.0\n1100.0\n1200.0");
-	microtunerLayout->addWidget(scaleTextEdit, 4, 0, 4, 2, Qt::AlignLeft | Qt::AlignTop);
+	m_scaleTextEdit = new QTextEdit();
+	m_scaleTextEdit->setAcceptRichText(false);
+	m_scaleTextEdit->setPlainText("100.0\n200.0\n300.0\n400.0\n500.0\n600.0\n700.0\n800.0\n900.0\n1000.0\n1100.0\n1200.0");
+	microtunerLayout->addWidget(m_scaleTextEdit, 4, 0, 4, 2, Qt::AlignLeft | Qt::AlignTop);
 
 	QPushButton *applyScaleButton = new QPushButton(tr("Apply scale"));
 	microtunerLayout->addWidget(applyScaleButton, 8, 0, 1, 2);
 
 	// Mapping sub-column
-	QLabel *mappingLabel = new QLabel(tr("Keymap:"));
-	microtunerLayout->addWidget(mappingLabel, 0, 2, 1, 2, Qt::AlignBottom);
+	QLabel *keymapLabel = new QLabel(tr("Keymap:"));
+	microtunerLayout->addWidget(keymapLabel, 0, 2, 1, 2, Qt::AlignBottom);
 
+	for (unsigned int i = 0; i < MaxKeymapCount; i++)
+	{
+		m_keymapComboModel.addItem(Engine::getSong()->getKeymap(i).getDescription());
+	}
 	ComboBox *keymapCombo = new ComboBox();
 	keymapCombo->setFixedHeight(comboHeight);
+	keymapCombo->setModel(&m_keymapComboModel);
 	microtunerLayout->addWidget(keymapCombo, 1, 2, 1, 2);
+	connect(&m_keymapComboModel, &ComboBoxModel::dataChanged, [=] {updateKeymapForm();});
 
-	QLineEdit *keymapNameEdit = new QLineEdit("default");
-	keymapNameEdit->setToolTip(tr("Keymap description"));
-	microtunerLayout->addWidget(keymapNameEdit, 2, 2, 1, 2);
+	m_keymapNameEdit = new QLineEdit("default");
+	m_keymapNameEdit->setToolTip(tr("Keymap description"));
+	microtunerLayout->addWidget(m_keymapNameEdit, 2, 2, 1, 2);
 
-	QPushButton *mappingLoadButton = new QPushButton(tr("Load"));
-	QPushButton *mappingSaveButton = new QPushButton(tr("Save"));
-	microtunerLayout->addWidget(mappingLoadButton, 3, 2, 1, 1);
-	microtunerLayout->addWidget(mappingSaveButton, 3, 3, 1, 1);
+	QPushButton *keymapLoadButton = new QPushButton(tr("Load"));
+	QPushButton *keymapSaveButton = new QPushButton(tr("Save"));
+	microtunerLayout->addWidget(keymapLoadButton, 3, 2, 1, 1);
+	microtunerLayout->addWidget(keymapSaveButton, 3, 3, 1, 1);
 
-	QTextEdit *mappingTextEdit = new QTextEdit();
-	mappingTextEdit->setAcceptRichText(false);
-	mappingTextEdit->setPlainText("0\n1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11");
-	microtunerLayout->addWidget(mappingTextEdit, 4, 2, 1, 2, Qt::AlignRight | Qt::AlignTop);
+	m_keymapTextEdit = new QTextEdit();
+	m_keymapTextEdit->setAcceptRichText(false);
+	m_keymapTextEdit->setPlainText("0\n1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11");
+	microtunerLayout->addWidget(m_keymapTextEdit, 4, 2, 1, 2, Qt::AlignRight | Qt::AlignTop);
 
 	// Mapping ranges
 	QGridLayout *keymapRangeLayout = new QGridLayout();
@@ -126,11 +139,11 @@ MicrotunerConfig::MicrotunerConfig() :
 	baseFreqKnob->setToolTip(tr("Base note frequency"));
 	microtunerLayout->addWidget(baseFreqKnob, 7, 2, 1, 2);
 
-
 	QPushButton *applyKeymapButton = new QPushButton(tr("Apply keymap"));
 	microtunerLayout->addWidget(applyKeymapButton, 8, 2, 1, 2);
 
-
+	updateScaleForm();
+	updateKeymapForm();
 	this->setLayout(microtunerLayout);
 
 	// Add to the main window and setup fixed size etc.
@@ -146,6 +159,51 @@ MicrotunerConfig::MicrotunerConfig() :
 	flags &= ~Qt::WindowMaximizeButtonHint;
 	subWin->setWindowFlags(flags);
 }
+
+
+/**
+ * \brief Fill all the scale-related values based on currently selected scale
+ */
+void MicrotunerConfig::updateScaleForm()
+{
+	const unsigned int scaleID = m_scaleComboModel.value();
+
+	m_scaleNameEdit->setText(Engine::getSong()->getScale(scaleID).getDescription());
+
+	// fill in the intervals
+	m_scaleTextEdit->setText("");
+	const std::vector<Interval> &intervals = Engine::getSong()->getScale(scaleID).getIntervals();
+	for (unsigned int i = 1; i < intervals.size(); i++)
+	{
+		m_scaleTextEdit->append(intervals[i].getString());
+	}
+	// scroll back to the top
+	QTextCursor tmp = m_scaleTextEdit->textCursor();
+	tmp.movePosition(QTextCursor::Start);
+	m_scaleTextEdit->setTextCursor(tmp);
+}
+
+
+/**
+ * \brief Fill all the keymap-related values based on currently selected keymap
+ */
+void MicrotunerConfig::updateKeymapForm()
+{
+	const unsigned int keymapID = m_keymapComboModel.value();
+
+	m_keymapNameEdit->setText(Engine::getSong()->getKeymap(keymapID).getDescription());
+
+	m_keymapTextEdit->setText("");
+	const std::vector<int> &map = Engine::getSong()->getKeymap(keymapID).getMap();
+	for (unsigned int i = 0; i < map.size(); i++)
+	{
+		m_keymapTextEdit->append(QString::number(map[i]));
+	}
+	QTextCursor tmp = m_keymapTextEdit->textCursor();
+	tmp.movePosition(QTextCursor::Start);
+	m_keymapTextEdit->setTextCursor(tmp);
+}
+
 
 /*
 void MicrotunerConfig::applyScale()

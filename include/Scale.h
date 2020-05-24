@@ -45,6 +45,12 @@ public:
 		else {return powf(2.f, m_numerator / 1200.f);}
 	}
 
+	QString getString() const
+	{
+		if (m_denominator) {return QString::number(m_numerator) + "/" + QString::number(m_denominator);}
+		else {return QString::number(m_numerator);}
+	}
+
 private:
 	// Scala specifies that numerators and denominators should go at least up to 2147483647;
 	// that is 10 significant digits (→ needs double) and 32 bits signed (→ needs long).
@@ -67,8 +73,8 @@ public:
 	void setIntervals(std::vector<Interval> input) {m_intervals = input;}
 
 private:
-	QString m_description;
-	std::vector<Interval> m_intervals;
+	QString m_description;					//!< name or description of the scale
+	std::vector<Interval> m_intervals;		//!< a series of ratios that define the scale
 
 };
 

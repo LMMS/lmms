@@ -76,27 +76,41 @@ float Microtuner::keyToFreq(int key, float detune) const
 	// Get keymap and scale selected at this moment
 	const unsigned int keymap_id = m_instrumentTrack->keymapModel()->value();
 	const unsigned int scale_id = m_instrumentTrack->scaleModel()->value();
-
 	const Keymap &keymap = Engine::getSong()->getKeymap(keymap_id);
 	const Scale &scale = Engine::getSong()->getScale(scale_id);
+	const std::vector<Interval> &intervals = scale.getIntervals();
+	//TODO: intervals may be empty for fraction of a second during definition update; also, the size could change before subsequent reads.. but copy would be nasty, it may be quite large..
 
-	// Convert MIDI key to LMMS note number (affected by key mapping and base note)
-	const int note = keymap.map(key, m_instrumentTrack->baseNoteModel()->value());
-	if (note < 0 || note >= NumNotes) {return 0;}
-
-	// Convert LMMS note to frequency
-	const std::vector<Interval> &intervals = scale.getIntervals();	//TODO: intervals may be empty for fraction of a second during definition update; also, the size could change before subsequent reads.. but copy would be nasty, it may be quite large..
+	// Convert MIDI key to scale degree + octave offset.
+	// The octaves are primarily driven by the keymap wraparound: octave count is increased or decreased if the key
+	// goes over or under keymap range. In case the keymap refers to a degree that does not exist in the scale, it is
+	// assumed the keymap is non-repeating or just really big, so the octaves are also driven by the scale wraparound.
+	const int keymapDegree = keymap.getDegree(key);		// which interval should be used according to the keymap
+	const int keymapOctave = keymap.getOctave(key);		// how many times did the keymap repeat
 	const int octaveDegree = intervals.size() - 1;
+	const int scaleOctave = keymapDegree >= 0 ? keymapDegree / octaveDegree : keymapDegree / octaveDegree - 1;
+
+	const int degree_rem = keymapDegree % octaveDegree;
+	const int scaleDegree = degree_rem >= 0 ? degree_rem : degree_rem + octaveDegree;	// get true modulo
+
+	// Compute base note (the "A4 reference") degree and octave
+	const int baseNote = m_instrumentTrack->baseNoteModel()->value();
+	const int baseKeymapDegree = keymap.getDegree(baseNote);
+	const int baseKeymapOctave = keymap.getOctave(baseNote);
+	const int baseScaleOctave = baseKeymapDegree >= 0 ?
+		baseKeymapDegree / octaveDegree : baseKeymapDegree / octaveDegree - 1;
+
+	const int baseDegree_rem = baseKeymapDegree % octaveDegree;
+	const int baseScaleDegree = baseDegree_rem >= 0 ? baseDegree_rem : baseDegree_rem + octaveDegree;
+
+	// Compute frequency of the middle note and the final frequency
 	const double octaveRatio = intervals[octaveDegree].getRatio();
+	const float middleFreq = (keymap.getBaseFreq() / pow(octaveRatio, (baseScaleOctave + baseKeymapOctave)))
+								/ intervals[baseScaleDegree].getRatio();
 
-	const int scalePos = note - (NumKeys - 1);	//FIXME wtf, why does this work; should be minus the middle note?
-	const int degree_rem = scalePos % octaveDegree;
-	const int degree = degree_rem >= 0 ? degree_rem : degree_rem + octaveDegree;	// get true modulo
+	float frequency = middleFreq * intervals[scaleDegree].getRatio() * pow(octaveRatio, keymapOctave + scaleOctave);
 
-	float frequency = keymap.getBaseFreq() * intervals[degree].getRatio() *
-					pow(octaveRatio, floor((float)scalePos / octaveDegree));
-
-	// detune or pitch shift: adjust frequency by a given number of cents
+	// Detune or pitch shift: adjust frequency by a given number of cents
 	frequency *= powf(2.f, detune / (100 * 12.f));
 
 	return frequency;

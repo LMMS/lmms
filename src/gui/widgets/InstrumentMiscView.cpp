@@ -63,18 +63,18 @@ InstrumentMiscView::InstrumentMiscView(InstrumentTrack *it, QWidget *parent) :
 	QLabel *scaleLabel = new QLabel(tr("Active scale:"));
 	microtunerLayout->addWidget(scaleLabel);
 
-	m_scaleCombo = new ComboBox();
-	m_scaleCombo->setModel(it->scaleModel());
-	m_scaleCombo->setFixedHeight(comboHeight);
-	microtunerLayout->addWidget(m_scaleCombo);
+	ComboBox *scaleCombo = new ComboBox();
+	scaleCombo->setModel(it->scaleModel());
+	scaleCombo->setFixedHeight(comboHeight);
+	microtunerLayout->addWidget(scaleCombo);
 
 	QLabel *keymapLabel = new QLabel(tr("Active keymap:"));
 	microtunerLayout->addWidget(keymapLabel);
 
-	m_keymapCombo = new ComboBox();
-	m_keymapCombo->setModel(it->keymapModel());
-	m_keymapCombo->setFixedHeight(comboHeight);
-	microtunerLayout->addWidget(m_keymapCombo);
+	ComboBox *keymapCombo = new ComboBox();
+	keymapCombo->setModel(it->keymapModel());
+	keymapCombo->setFixedHeight(comboHeight);
+	microtunerLayout->addWidget(keymapCombo);
 
 	LedCheckBox *importCheckbox = new LedCheckBox(tr("Import first and last notes from keymap"), this);
 	importCheckbox->setToolTip(tr("When enabled, the first and last note of this instrument will be overwritten with values specified by the active keymap."));

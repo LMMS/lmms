@@ -41,15 +41,24 @@ public:
 	QString getDescription() const;
 	void setDescription(QString description);
 
+	int getMiddleKey() const {return m_middleKey;}
+	int getFirstKey() const {return m_firstKey;}
+	int getLastKey() const {return m_lastKey;}
 	float getBaseFreq() const {return m_baseFreq;}
 
-	int map(int key, int baseNote) const {return m_map[key] - baseNote;}
+	int getSize() const {return m_map.size();}
+	int getDegree(int key) const;
+	int getOctave(int key) const;
+	const std::vector<int> &getMap() const {return m_map;}
 
 private:
-	QString m_description;
+	QString m_description;				//!< name or description of the keymap
 
-	float m_baseFreq;			//!< frequency of the base note (usually A4 @440 Hz)
-	int m_map [NumKeys];		//!< the actual keymap
+	std::vector<int> m_map;				//!< key to scale degree mapping
+	int m_middleKey;					//!< first line of the map refers to this key
+	int m_firstKey;						//!< first key that will be mapped
+	int m_lastKey;						//!< last key that will be mapped
+	float m_baseFreq;					//!< frequency of the base note (usually A4 @440 Hz)
 };
 
 #endif
