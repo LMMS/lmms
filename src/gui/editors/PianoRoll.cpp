@@ -1606,6 +1606,11 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 					// then resize the note
 					m_action = ActionResizeNote;
 
+					for (Note *note : getSelectedNotes())
+					{
+					    if (note->oldLength() <= 0) { note->setOldLength(4); }
+					}
+
 					// set resize-cursor
 					QCursor c( Qt::SizeHorCursor );
 					QApplication::setOverrideCursor( c );
