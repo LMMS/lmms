@@ -73,7 +73,7 @@ void MidiFile::Section::writeBytes(vector<uint8_t> bytes,
 		vector<uint8_t> *v)
 {
 	// Insert <bytes> content to the end of *v
-	if (not v) v = &m_buffer;
+	if (!v) v = &m_buffer;
 	v->insert(v->end(), bytes.begin(), bytes.end());
 }
 
@@ -91,7 +91,7 @@ void MidiFile::Section::writeVarLength(uint32_t val)
 		val >>= 7;
 	}
 	// Add packs in reverse order to actual buffer
-	while (not little_endian.empty())
+	while (!little_endian.empty())
 	{
 		m_buffer.push_back(little_endian.top());
 		little_endian.pop();

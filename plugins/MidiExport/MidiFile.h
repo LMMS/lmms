@@ -153,7 +153,7 @@ private:
 		inline bool operator<(const Event& b) const
 		{
 			if (m_time < b.m_time) { return true; }
-			return (m_time == b.m_time and m_type > b.m_type);
+			return (m_time == b.m_time && m_type > b.m_type);
 		}
 	};
 

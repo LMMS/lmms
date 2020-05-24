@@ -63,7 +63,7 @@ void MidiExport::Pattern::write(const QDomNode &root,
 		int basePitch, double baseVolume, int baseTime)
 {
 	// TODO interpret steps="12" muted="0" type="1" name="Piano1" len="259"
-	for (QDomNode node = root.firstChild(); not node.isNull();
+	for (QDomNode node = root.firstChild(); !node.isNull();
 			node = node.nextSibling())
 	{
 		QDomElement element = node.toElement();
@@ -251,12 +251,11 @@ void MidiExport::processTrack(Track *track, size_t trackIdx, bool isBb)
 	// ---- Patterns ---- //
 	uint8_t bbId = 0;
 	for (QDomNode patNode = root.firstChildElement("pattern");
-			not patNode.isNull();
-			patNode = patNode.nextSiblingElement("pattern"))
+			!patNode.isNull(); patNode = patNode.nextSiblingElement("pattern"))
 	{
 		QDomElement patElem = patNode.toElement();
 		Pattern pat;
-		if (not isBb)
+		if (!isBb)
 		{
 			// Base time == initial position
 			int baseTime = patElem.attribute("pos", "0").toInt();
@@ -296,17 +295,17 @@ void MidiExport::writeBbPattern(Pattern &pat, const QDomElement &patElem,
 	Pattern bbPat;
 	for (const pair<int, int> &p : plist)
 	{
-		while (not st.empty() and st.top().second <= p.first)
+		while (!st.empty() && st.top().second <= p.first)
 		{
 			pat.writeToBb(bbPat, len, st.top().first, pos, st.top().second);
 			pos = st.top().second;
 			st.pop();
 		}
-		if (not st.empty() and st.top().second <= p.second)
+		if (!st.empty() && st.top().second <= p.second)
 		{
 			pat.writeToBb(bbPat, len, st.top().first, pos, p.first);
 			pos = p.first;
-			while (not st.empty() and st.top().second <= p.second)
+			while (!st.empty() && st.top().second <= p.second)
 			{
 				st.pop();
 			}
@@ -314,7 +313,7 @@ void MidiExport::writeBbPattern(Pattern &pat, const QDomElement &patElem,
 		st.push(p);
 		pos = p.first;
 	}
-	while (not st.empty())
+	while (!st.empty())
 	{
 		pat.writeToBb(bbPat, len, st.top().first, pos, st.top().second);
 		pos = st.top().second;
@@ -334,7 +333,7 @@ void MidiExport::processBbTrack(Track *track)
 	// Build lists of (start, end) pairs from BB note objects
 	vector<pair<int,int>> plist;
 	for (QDomNode bbtcoNode = root.firstChildElement("bbtco");
-			not bbtcoNode.isNull();
+			!bbtcoNode.isNull();
 			bbtcoNode = bbtcoNode.nextSiblingElement("bbtco"))
 	{
 		QDomElement bbtcoElem = bbtcoNode.toElement();
