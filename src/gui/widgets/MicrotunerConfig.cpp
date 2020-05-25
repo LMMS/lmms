@@ -24,7 +24,7 @@
 
 #include "MicrotunerConfig.h"
 
-#include <QHBoxLayout>
+#include <QGridLayout>
 #include <QLabel>
 #include <QMessageBox>
 #include <QPushButton>
@@ -42,7 +42,13 @@
 
 
 MicrotunerConfig::MicrotunerConfig() :
-	QWidget()
+	QWidget(),
+	m_scaleComboModel(NULL, tr("Selected scale")),
+	m_keymapComboModel(NULL, tr("Selected keymap")),
+	m_firstKeyModel(0, 0, NumKeys - 1, NULL, tr("First key")),
+	m_lastKeyModel(NumKeys - 1, 0, NumKeys - 1, NULL, tr("Last key")),
+	m_middleKeyModel(60, 0, NumKeys - 1, NULL, tr("Middle key")),
+	m_baseFreqModel(440.f, 0.1f, 9999.999f, 0.001f, NULL, tr("Base note frequency"))
 {
 	setWindowIcon(embed::getIconPixmap("microtuner"));
 	setWindowTitle(tr("Microtuner"));
@@ -53,7 +59,9 @@ MicrotunerConfig::MicrotunerConfig() :
 	QGridLayout *microtunerLayout = new QGridLayout();
 	microtunerLayout->setSpacing(2);
 
+	// ----------------------------------
 	// Scale sub-column
+	//
 	QLabel *scaleLabel = new QLabel(tr("Scale:"));
 	microtunerLayout->addWidget(scaleLabel, 0, 0, 1, 2, Qt::AlignBottom);
 
@@ -80,13 +88,15 @@ MicrotunerConfig::MicrotunerConfig() :
 	m_scaleTextEdit->setAcceptRichText(false);
 	m_scaleTextEdit->setPlainText("100.0\n200.0\n300.0\n400.0\n500.0\n600.0\n700.0\n800.0\n900.0\n1000.0\n1100.0\n1200.0");
 	m_scaleTextEdit->setToolTip(tr("Enter intervals on separate lines. Numbers containing a decimal point are treated as cents. Other input is treated as an integer ratio and must be in the form of \'a/b\' or \'a\'. Unity (0.0 cents or ratio 1/1) is always present as a hidden first value."));
-	microtunerLayout->addWidget(m_scaleTextEdit, 4, 0, 4, 2, Qt::AlignLeft | Qt::AlignTop);
+	microtunerLayout->addWidget(m_scaleTextEdit, 4, 0, 5, 2, Qt::AlignLeft | Qt::AlignTop);
 
 	QPushButton *applyScaleButton = new QPushButton(tr("Apply scale"));
-	microtunerLayout->addWidget(applyScaleButton, 8, 0, 1, 2);
+	microtunerLayout->addWidget(applyScaleButton, 9, 0, 1, 2);
 	connect(applyScaleButton, &QPushButton::clicked, [=] {applyScale();});
 
+	// ----------------------------------
 	// Mapping sub-column
+	//
 	QLabel *keymapLabel = new QLabel(tr("Keymap:"));
 	microtunerLayout->addWidget(keymapLabel, 0, 2, 1, 2, Qt::AlignBottom);
 
@@ -112,40 +122,43 @@ MicrotunerConfig::MicrotunerConfig() :
 	m_keymapTextEdit = new QTextEdit();
 	m_keymapTextEdit->setAcceptRichText(false);
 	m_keymapTextEdit->setPlainText("0\n1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11");
-	m_keymapTextEdit->setToolTip(tr("Enter key mappings on separate lines. Each line assigns a scale degree to a key, starting with the middle key and continuing in sequence. The pattern repeats for keys outside of the explicit keymap range. Multiple keys can be mapped to the same scale degree. Enter \'x\' if you wish to leave the key disabled / not mapped."));
+	m_keymapTextEdit->setToolTip(tr("Enter key mappings on separate lines. Each line assigns a scale degree to a MIDI key, starting with the middle key and continuing in sequence. The pattern repeats for keys outside of the explicit keymap range. Multiple keys can be mapped to the same scale degree. Enter \'x\' if you wish to leave the key disabled / not mapped."));
 	microtunerLayout->addWidget(m_keymapTextEdit, 4, 2, 1, 2, Qt::AlignRight | Qt::AlignTop);
 
 	// Mapping ranges
 	QGridLayout *keymapRangeLayout = new QGridLayout();
 	microtunerLayout->addLayout(keymapRangeLayout, 5, 2, 2, 2, Qt::AlignCenter | Qt::AlignTop);
 
-	QLabel *firstNoteLabel = new QLabel(tr("First:"));
-	keymapRangeLayout->addWidget(firstNoteLabel, 0, 0, Qt::AlignBottom);
-	LcdSpinBox *firstNoteSpin = new LcdSpinBox(3, NULL, tr("First note"));
-	firstNoteSpin->setToolTip(tr("First MIDI note that will be tuned"));
-	keymapRangeLayout->addWidget(firstNoteSpin, 1, 0);
+	QLabel *firstKeyLabel = new QLabel(tr("First:"));
+	keymapRangeLayout->addWidget(firstKeyLabel, 0, 0, Qt::AlignBottom);
+	LcdSpinBox *firstKeySpin = new LcdSpinBox(3, NULL, tr("First key"));
+	firstKeySpin->setToolTip(tr("First MIDI key that will be mapped"));
+	firstKeySpin->setModel(&m_firstKeyModel);
+	keymapRangeLayout->addWidget(firstKeySpin, 1, 0);
 
-	QLabel *lastNoteLabel = new QLabel(tr("Last:"));
-	keymapRangeLayout->addWidget(lastNoteLabel, 0, 1, Qt::AlignBottom);
-	LcdSpinBox *lastNoteSpin = new LcdSpinBox(3, NULL, tr("Last note"));
-	lastNoteSpin->setToolTip(tr("Last MIDI note that will be tuned"));
-	keymapRangeLayout->addWidget(lastNoteSpin, 1, 1);
+	QLabel *lastKeyLabel = new QLabel(tr("Last:"));
+	keymapRangeLayout->addWidget(lastKeyLabel, 0, 1, Qt::AlignBottom);
+	LcdSpinBox *lastKeySpin = new LcdSpinBox(3, NULL, tr("Last key"));
+	lastKeySpin->setToolTip(tr("Last MIDI key that will be mapped"));
+	lastKeySpin->setModel(&m_lastKeyModel);
+	keymapRangeLayout->addWidget(lastKeySpin, 1, 1);
 
-	QLabel *middleNoteLabel = new QLabel(tr("Middle:"));
-	keymapRangeLayout->addWidget(middleNoteLabel, 0, 2, Qt::AlignBottom);
-	LcdSpinBox *middleNoteSpin = new LcdSpinBox(3, NULL, tr("Middle note"));
-	middleNoteSpin->setToolTip(tr("First key in the keymap is mapped to this MIDI note"));
-	keymapRangeLayout->addWidget(middleNoteSpin, 1, 2);
+	QLabel *middleKeyLabel = new QLabel(tr("Middle:"));
+	keymapRangeLayout->addWidget(middleKeyLabel, 0, 2, Qt::AlignBottom);
+	LcdSpinBox *middleKeySpin = new LcdSpinBox(3, NULL, tr("Middle key"));
+	middleKeySpin->setToolTip(tr("First line in the keymap refers to this MIDI key"));
+	middleKeySpin->setModel(&m_middleKeyModel);
+	keymapRangeLayout->addWidget(middleKeySpin, 1, 2);
 
-	Knob *baseFreqKnob = new Knob(knobBright_26);
-//	baseFreqKnob->setModel(it->m_microtuner.baseFreqModel());
-	baseFreqKnob->setLabel(tr("BASE FREQ"));
-	baseFreqKnob->setHintText(tr("Base note frequency:"), " " + tr("Hz"));
-	baseFreqKnob->setToolTip(tr("Base note frequency"));
-	microtunerLayout->addWidget(baseFreqKnob, 7, 2, 1, 2);
+	QLabel *baseFreqLabel = new QLabel(tr("Base note frequency:"));
+	microtunerLayout->addWidget(baseFreqLabel, 7, 2, 1, 2, Qt::AlignBottom);
+	LcdFloatSpinBox *baseFreqSpin = new LcdFloatSpinBox(4, 3, NULL, tr("Base note frequency"));
+	baseFreqSpin->setModel(&m_baseFreqModel);
+	baseFreqSpin->setToolTip(tr("Base note frequency"));
+	microtunerLayout->addWidget(baseFreqSpin, 8, 2, 1, 2);
 
 	QPushButton *applyKeymapButton = new QPushButton(tr("Apply keymap"));
-	microtunerLayout->addWidget(applyKeymapButton, 8, 2, 1, 2);
+	microtunerLayout->addWidget(applyKeymapButton, 9, 2, 1, 2);
 	connect(applyKeymapButton, &QPushButton::clicked, [=] {applyKeymap();});
 
 	updateScaleForm();

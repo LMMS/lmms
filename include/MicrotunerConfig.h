@@ -30,7 +30,10 @@
 #include <QMainWindow>
 #include <QTextEdit>
 
+#include "AutomatableModel.h"
 #include "ComboBoxModel.h"
+#include "LcdFloatSpinBox.h"
+#include "LcdSpinBox.h"
 #include "SerializingObject.h"
 
 class LMMS_EXPORT MicrotunerConfig : public QWidget, public SerializingObject
@@ -69,6 +72,12 @@ private:
 
 	QTextEdit *m_scaleTextEdit;				//!< text editor field for interval definitions
 	QTextEdit *m_keymapTextEdit;			//!< text editor field for key mappings
+
+	IntModel m_firstKeyModel;				//!< model for spinbox of currently edited first key
+	IntModel m_lastKeyModel;				//!< model for spinbox of currently edited last key
+	IntModel m_middleKeyModel;				//!< model for spinbox of currently edited middle key
+
+	FloatModel m_baseFreqModel;				//!< model for spinbox of currently edited base note frequency
 };
 
 #endif

@@ -39,28 +39,29 @@
 
 
 
-LcdWidget::LcdWidget( QWidget* parent, const QString& name ) :
-	LcdWidget( 1, parent, name )
+LcdWidget::LcdWidget( QWidget* parent, const QString& name, bool leadingZero ) :
+	LcdWidget( 1, parent, name, leadingZero )
 {
 }
 
 
 
 
-LcdWidget::LcdWidget( int numDigits, QWidget* parent, const QString& name ) :
-	LcdWidget( numDigits, QString("19green"), parent, name )
+LcdWidget::LcdWidget( int numDigits, QWidget* parent, const QString& name, bool leadingZero ) :
+	LcdWidget( numDigits, QString("19green"), parent, name, leadingZero )
 {
 }
 
 
 
 
-LcdWidget::LcdWidget( int numDigits, const QString& style, QWidget* parent, const QString& name ) :
+LcdWidget::LcdWidget( int numDigits, const QString& style, QWidget* parent, const QString& name, bool leadingZero ) :
 	QWidget( parent ),
 	m_label(),
 	m_textColor( 255, 255, 255 ),
 	m_textShadowColor( 64, 64, 64 ),
-	m_numDigits( numDigits )
+	m_numDigits( numDigits ),
+	m_leadingZero( leadingZero )
 {
 	initUi( name, style );
 }
@@ -79,16 +80,15 @@ LcdWidget::~LcdWidget()
 void LcdWidget::setValue( int value )
 {
 	QString s = m_textForValue[value];
-	if( s.isEmpty() )
+	if (s.isEmpty())
 	{
 		s = QString::number( value );
-		// TODO: if pad == true
-		/*
-		while( (int) s.length() < m_numDigits )
-		{
-			s = "0" + s;
+		if (m_leadingZero) {
+			while (s.length() < m_numDigits)
+			{
+				s = "0" + s;
+			}
 		}
-		*/
 	}
 
 	m_display = s;

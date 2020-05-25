@@ -72,6 +72,7 @@ SET(LMMS_SRCS
 	gui/widgets/LeftRightNav.cpp
 	gui/widgets/Knob.cpp
 	gui/widgets/LadspaControlView.cpp
+	gui/widgets/LcdFloatSpinBox.cpp
 	gui/widgets/LcdSpinBox.cpp
 	gui/widgets/LcdWidget.cpp
 	gui/widgets/LedCheckbox.cpp
