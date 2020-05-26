@@ -69,6 +69,8 @@ public:
 
 	int cellHeight() const { return m_cellHeight; }
 
+	void setSeamless(bool left, bool right) {m_seamlessLeft = left; m_seamlessRight = right; updateSize();}
+
 public slots:
 	virtual void setMarginWidth( int width );
 
@@ -97,6 +99,8 @@ private:
 	int m_cellHeight;
 	int m_numDigits;
 	int m_marginWidth;
+	int m_seamlessLeft;
+	int m_seamlessRight;
 	bool m_leadingZero;
 
 	void initUi( const QString& name, const QString &style ); //!< to be called by ctors

@@ -129,30 +129,26 @@ MicrotunerConfig::MicrotunerConfig() :
 	QGridLayout *keymapRangeLayout = new QGridLayout();
 	microtunerLayout->addLayout(keymapRangeLayout, 5, 2, 2, 2, Qt::AlignCenter | Qt::AlignTop);
 
-	QLabel *firstKeyLabel = new QLabel(tr("First:"));
-	keymapRangeLayout->addWidget(firstKeyLabel, 0, 0, Qt::AlignBottom);
 	LcdSpinBox *firstKeySpin = new LcdSpinBox(3, NULL, tr("First key"));
+	firstKeySpin->setLabel(tr("FIRST"));
 	firstKeySpin->setToolTip(tr("First MIDI key that will be mapped"));
 	firstKeySpin->setModel(&m_firstKeyModel);
 	keymapRangeLayout->addWidget(firstKeySpin, 1, 0);
 
-	QLabel *lastKeyLabel = new QLabel(tr("Last:"));
-	keymapRangeLayout->addWidget(lastKeyLabel, 0, 1, Qt::AlignBottom);
 	LcdSpinBox *lastKeySpin = new LcdSpinBox(3, NULL, tr("Last key"));
+	lastKeySpin->setLabel(tr("LAST"));
 	lastKeySpin->setToolTip(tr("Last MIDI key that will be mapped"));
 	lastKeySpin->setModel(&m_lastKeyModel);
 	keymapRangeLayout->addWidget(lastKeySpin, 1, 1);
 
-	QLabel *middleKeyLabel = new QLabel(tr("Middle:"));
-	keymapRangeLayout->addWidget(middleKeyLabel, 0, 2, Qt::AlignBottom);
 	LcdSpinBox *middleKeySpin = new LcdSpinBox(3, NULL, tr("Middle key"));
+	middleKeySpin->setLabel(tr("MIDDLE"));
 	middleKeySpin->setToolTip(tr("First line in the keymap refers to this MIDI key"));
 	middleKeySpin->setModel(&m_middleKeyModel);
 	keymapRangeLayout->addWidget(middleKeySpin, 1, 2);
 
-	QLabel *baseFreqLabel = new QLabel(tr("Base note frequency:"));
-	microtunerLayout->addWidget(baseFreqLabel, 7, 2, 1, 2, Qt::AlignBottom);
 	LcdFloatSpinBox *baseFreqSpin = new LcdFloatSpinBox(4, 3, NULL, tr("Base note frequency"));
+	baseFreqSpin->setLabel(tr("BASE NOTE FREQ"));
 	baseFreqSpin->setModel(&m_baseFreqModel);
 	baseFreqSpin->setToolTip(tr("Base note frequency"));
 	microtunerLayout->addWidget(baseFreqSpin, 8, 2, 1, 2);

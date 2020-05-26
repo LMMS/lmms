@@ -32,12 +32,15 @@
 #include <QInputDialog>
 #include <QLabel>
 #include <QMouseEvent>
+#include <QPainter>
 #include <QPixmap>
 #include <QStyleOptionFrameV2>
+#include <QVBoxLayout>
 
 #include "CaptionMenu.h"
 #include "embed.h"
 #include "GuiApplication.h"
+#include "gui_templates.h"
 #include "MainWindow.h"
 
 
@@ -69,7 +72,11 @@ LcdFloatSpinBox::LcdFloatSpinBox(int numWhole, int numFrac, const QString& style
 
 void LcdFloatSpinBox::layoutSetup(const QString &style)
 {
+	// Assemble the LCD parts
 	QHBoxLayout *lcdLayout = new QHBoxLayout();
+
+	m_wholeDisplay.setSeamless(false, true);
+	m_fractionDisplay.setSeamless(true, false);
 
 	lcdLayout->addWidget(&m_wholeDisplay);  
 
@@ -80,10 +87,16 @@ void LcdFloatSpinBox::layoutSetup(const QString &style)
 
 	lcdLayout->addWidget(&m_fractionDisplay);
 
-	lcdLayout->addStretch(1);
 	lcdLayout->setContentsMargins(0, 0, 0, 0);
 	lcdLayout->setSpacing(0);
-	this->setLayout(lcdLayout);
+
+	// Add space for label
+	QVBoxLayout *outerLayout = new QVBoxLayout();
+	outerLayout->addLayout(lcdLayout);
+	outerLayout->addSpacing(9);
+	outerLayout->setContentsMargins(0, 0, 0, 0);
+	outerLayout->setSizeConstraint(QLayout::SetFixedSize);
+	this->setLayout(outerLayout);
 }
 
 
@@ -216,4 +229,27 @@ float LcdFloatSpinBox::getStep()
 {
 	if (m_intStep) {return 1;}
 	else {return model()->step<float>();}
+}
+
+
+void LcdFloatSpinBox::paintEvent(QPaintEvent*)
+{
+	QPainter p(this);
+
+	// Border
+	QStyleOptionFrame opt;
+	opt.initFrom(this);
+	opt.state = QStyle::State_Sunken;
+	opt.rect = QRect(0, 0, width() - 1, m_wholeDisplay.height());
+	style()->drawPrimitive(QStyle::PE_Frame, &opt, &p, this);
+
+	// Label
+	if (!m_label.isEmpty())
+	{
+		p.setFont(pointSizeF(p.font(), 6.5));
+		p.setPen(m_wholeDisplay.textShadowColor());
+		p.drawText(width() / 2 - p.fontMetrics().width(m_label) / 2 + 1, height(), m_label);
+		p.setPen(m_wholeDisplay.textColor());
+		p.drawText(width() / 2 - p.fontMetrics().width(m_label) / 2, height() - 1, m_label);
+	}
 }

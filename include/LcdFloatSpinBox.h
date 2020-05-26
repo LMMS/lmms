@@ -60,6 +60,8 @@ public:
 		return m_displayOffset;
 	}
 
+	void setLabel(const QString &label) {m_label = label;}
+
 public slots:
 	virtual void update();
 
@@ -70,6 +72,7 @@ protected:
 	void mouseReleaseEvent(QMouseEvent *me) override;
 	void wheelEvent(QWheelEvent *we) override;
 	void mouseDoubleClickEvent(QMouseEvent *me) override;
+	void paintEvent(QPaintEvent *pe) override;
 
 private:
 	void layoutSetup(const QString &style = QString("19green"));
@@ -82,6 +85,7 @@ private:
 	bool m_intStep;
 	QPoint m_origMousePos;
 	int m_displayOffset;
+	QString m_label;
 
 signals:
 	void manualChange();
