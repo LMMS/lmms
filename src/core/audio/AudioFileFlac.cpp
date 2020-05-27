@@ -22,6 +22,9 @@
  *
  */
 
+#include <QtGlobal>
+
+#include <cmath>
 #include <memory>
 
 #include "AudioFileFlac.h"
@@ -86,6 +89,7 @@ bool AudioFileFlac::startEncoding()
 void AudioFileFlac::writeBuffer(surroundSampleFrame const* _ab, fpp_t const frames, float master_gain)
 {
 	OutputSettings::BitDepth depth = getOutputSettings().getBitDepth();
+	float clipvalue = std::nextafterf( -1.0f, 0.0f );
 
 	if (depth == OutputSettings::Depth_24Bit || depth == OutputSettings::Depth_32Bit) // Float encoding
 	{
@@ -94,7 +98,10 @@ void AudioFileFlac::writeBuffer(surroundSampleFrame const* _ab, fpp_t const fram
 		{
 			for(ch_cnt_t channel=0; channel<channels(); ++channel)
 			{
-				buf[frame*channels() + channel] = _ab[frame][channel] * master_gain;
+				// Clip the negative side to just above -1.0 in order to prevent it from changing sign
+				// Upstream issue: https://github.com/erikd/libsndfile/issues/309
+				// When this commit is reverted libsndfile-1.0.29 must be made a requirement for FLAC
+				buf[frame*channels() + channel] = qMax( clipvalue, _ab[frame][channel] * master_gain );
 			}
 		}
 		sf_writef_float(m_sf,static_cast<float*>(buf.get()),frames);
