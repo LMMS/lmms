@@ -36,7 +36,12 @@ class Keymap : public QObject
 	Q_OBJECT
 public:
 	Keymap();
-	Keymap(QString description);
+	Keymap(	QString description,
+			std::vector<int> newMap,
+			int newFirst,
+			int newLast,
+			int newMiddle,
+			float newBase);
 
 	QString getDescription() const;
 	void setDescription(QString description);
@@ -55,9 +60,9 @@ private:
 	QString m_description;				//!< name or description of the keymap
 
 	std::vector<int> m_map;				//!< key to scale degree mapping
-	int m_middleKey;					//!< first line of the map refers to this key
 	int m_firstKey;						//!< first key that will be mapped
 	int m_lastKey;						//!< last key that will be mapped
+	int m_middleKey;					//!< first line of the map refers to this key
 	float m_baseFreq;					//!< frequency of the base note (usually A4 @440 Hz)
 };
 

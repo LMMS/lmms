@@ -111,6 +111,9 @@ Song::Song() :
 
 	qRegisterMetaType<Note>( "Note" );
 	setType( SongContainer );
+
+	for (int i = 0; i < MaxScaleCount; i++) {m_scales[i] = std::make_shared<const Scale>();}
+	for (int i = 0; i < MaxKeymapCount; i++) {m_keymaps[i] = std::make_shared<const Keymap>();}
 }
 
 
@@ -1448,15 +1451,33 @@ bool Song::isSavingProject() const {
 }
 
 
-const Scale &Song::getScale(unsigned int index) const
+std::shared_ptr<const Scale> Song::getScale(unsigned int index) const
 {
-	if (index < MaxScaleCount) {return m_scales[index];}
-	else {return m_scales[0];}
+	if (index >= MaxScaleCount) {index = 0;}
+
+	return std::atomic_load(&m_scales[index]);
 }
 
 
-const Keymap &Song::getKeymap(unsigned int index) const
+std::shared_ptr<const Keymap> Song::getKeymap(unsigned int index) const
 {
-	if (index < MaxKeymapCount) {return m_keymaps[index];}
-	else {return m_keymaps[0];}
+	if (index >= MaxKeymapCount) {index = 0;}
+
+	return std::atomic_load(&m_keymaps[index]);
+}
+
+
+void Song::setScale(unsigned int index, std::shared_ptr<const Scale> newScale)
+{
+	if (index >= MaxScaleCount) {index = 0;}
+
+	std::atomic_store(&m_scales[index], newScale);
+}
+
+
+void Song::setKeymap(unsigned int index, std::shared_ptr<const Keymap> newMap)
+{
+	if (index >= MaxKeymapCount) {index = 0;}
+
+	std::atomic_store(&m_keymaps[index], newMap);
 }

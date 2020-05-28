@@ -33,6 +33,7 @@
 #include "TrackContainer.h"
 #include "Controller.h"
 #include "Keymap.h"
+#include "lmms_constants.h"
 #include "MeterModel.h"
 #include "Mixer.h"
 #include "Scale.h"
@@ -341,8 +342,10 @@ public:
 
 	bool isSavingProject() const;
 
-	const Scale &getScale(unsigned int index) const;
-	const Keymap &getKeymap(unsigned int index) const;
+	std::shared_ptr<const Scale> getScale(unsigned int index) const;
+	std::shared_ptr<const Keymap> getKeymap(unsigned int index) const;
+	void setScale(unsigned int index, std::shared_ptr<const Scale> newScale);
+	void setKeymap(unsigned int index, std::shared_ptr<const Keymap> newMap);
 
 public slots:
 	void playSong();
@@ -469,8 +472,8 @@ private:
 	MidiTime m_exportSongEnd;
 	MidiTime m_exportEffectiveLength;
 
-	Scale m_scales[10];
-	Keymap m_keymaps[10];
+	std::shared_ptr<const Scale> m_scales[MaxScaleCount];
+	std::shared_ptr<const Keymap> m_keymaps[MaxKeymapCount];
 
 	friend class LmmsCore;
 	friend class SongEditor;

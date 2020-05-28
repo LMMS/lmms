@@ -134,12 +134,12 @@ InstrumentTrack::InstrumentTrack( TrackContainer* tc ) :
 
 	for (unsigned int i = 0; i < MaxScaleCount; i++)
 	{
-		m_scaleModel.addItem(Engine::getSong()->getScale(i).getDescription());
+		m_scaleModel.addItem(Engine::getSong()->getScale(i)->getDescription());
 	}
 
 	for (unsigned int i = 0; i < MaxKeymapCount; i++)
 	{
-		m_keymapModel.addItem(Engine::getSong()->getKeymap(i).getDescription());
+		m_keymapModel.addItem(Engine::getSong()->getKeymap(i)->getDescription());
 	}
 
 	setName( tr( "Default preset" ) );

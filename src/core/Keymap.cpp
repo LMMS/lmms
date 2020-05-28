@@ -27,9 +27,9 @@
 
 Keymap::Keymap() :
 	m_description(tr("default (440 Hz, all keys)")),
-	m_middleKey(0),
 	m_firstKey(0),
 	m_lastKey(NumKeys - 1),
+	m_middleKey(0),
 	m_baseFreq(440.f)
 {
 	// default 1:1 keyboard mapping
@@ -40,8 +40,18 @@ Keymap::Keymap() :
 }
 
 
-Keymap::Keymap(QString description) :
-	m_description(description)
+Keymap::Keymap(	QString description,
+				std::vector<int> newMap,
+				int newFirst,
+				int newLast,
+				int newMiddle,
+				float newBase) :
+	m_description(description),
+	m_map(newMap),
+	m_firstKey(newFirst),
+	m_lastKey(newLast),
+	m_middleKey(newMiddle),
+	m_baseFreq(newBase)
 {
 }
 
@@ -56,7 +66,7 @@ int Keymap::getDegree(int key) const
 	if (key < m_firstKey || key > m_lastKey) {return -1;}
 
 	const int keyOffset = key - m_middleKey;								// -127..127
-	const int key_rem = keyOffset % (int)m_map.size();							// remainder
+	const int key_rem = keyOffset % (int)m_map.size();						// remainder
 	const int key_mod = key_rem >= 0 ? key_rem : key_rem + m_map.size();	// true modulo
 	return m_map[key_mod];
 }
@@ -69,7 +79,7 @@ int Keymap::getDegree(int key) const
  */
 int Keymap::getOctave(int key) const
 {
-	if (key < m_firstKey || key > m_lastKey) {return 0;}
+	if (key < m_firstKey || key > m_lastKey || m_map[key] == -1) {return 0;}
 
 	const int keyOffset = key - m_middleKey;
 	return keyOffset >= 0 ? keyOffset / (int)m_map.size() : (keyOffset + 1) / (int)m_map.size() - 1;

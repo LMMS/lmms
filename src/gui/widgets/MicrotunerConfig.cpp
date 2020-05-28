@@ -67,7 +67,7 @@ MicrotunerConfig::MicrotunerConfig() :
 
 	for (unsigned int i = 0; i < MaxScaleCount; i++)
 	{
-		m_scaleComboModel.addItem(Engine::getSong()->getScale(i).getDescription());
+		m_scaleComboModel.addItem(Engine::getSong()->getScale(i)->getDescription());
 	}
 	ComboBox *scaleCombo = new ComboBox();
 	scaleCombo->setFixedHeight(comboHeight);
@@ -102,7 +102,7 @@ MicrotunerConfig::MicrotunerConfig() :
 
 	for (unsigned int i = 0; i < MaxKeymapCount; i++)
 	{
-		m_keymapComboModel.addItem(Engine::getSong()->getKeymap(i).getDescription());
+		m_keymapComboModel.addItem(Engine::getSong()->getKeymap(i)->getDescription());
 	}
 	ComboBox *keymapCombo = new ComboBox();
 	keymapCombo->setFixedHeight(comboHeight);
@@ -151,7 +151,7 @@ MicrotunerConfig::MicrotunerConfig() :
 	baseFreqSpin->setLabel(tr("BASE NOTE FREQ"));
 	baseFreqSpin->setModel(&m_baseFreqModel);
 	baseFreqSpin->setToolTip(tr("Base note frequency"));
-	microtunerLayout->addWidget(baseFreqSpin, 8, 2, 1, 2);
+	microtunerLayout->addWidget(baseFreqSpin, 8, 2, 1, 2, Qt::AlignCenter);
 
 	QPushButton *applyKeymapButton = new QPushButton(tr("Apply keymap"));
 	microtunerLayout->addWidget(applyKeymapButton, 9, 2, 1, 2);
@@ -181,13 +181,16 @@ MicrotunerConfig::MicrotunerConfig() :
  */
 void MicrotunerConfig::updateScaleForm()
 {
-	const unsigned int scaleID = m_scaleComboModel.value();
+	Song *song = Engine::getSong();
+	if (song == NULL) {return;}
 
-	m_scaleNameEdit->setText(Engine::getSong()->getScale(scaleID).getDescription());
+	auto newScale = song->getScale(m_scaleComboModel.value());
+
+	m_scaleNameEdit->setText(newScale->getDescription());
 
 	// fill in the intervals
 	m_scaleTextEdit->setText("");
-	const std::vector<Interval> &intervals = Engine::getSong()->getScale(scaleID).getIntervals();
+	const std::vector<Interval> &intervals = newScale->getIntervals();
 	for (unsigned int i = 1; i < intervals.size(); i++)
 	{
 		m_scaleTextEdit->append(intervals[i].getString());
@@ -204,19 +207,29 @@ void MicrotunerConfig::updateScaleForm()
  */
 void MicrotunerConfig::updateKeymapForm()
 {
-	const unsigned int keymapID = m_keymapComboModel.value();
+	Song *song = Engine::getSong();
+	if (song == NULL) {return;}
 
-	m_keymapNameEdit->setText(Engine::getSong()->getKeymap(keymapID).getDescription());
+	auto newMap = song->getKeymap(m_keymapComboModel.value());
+
+	m_keymapNameEdit->setText(newMap->getDescription());
 
 	m_keymapTextEdit->setText("");
-	const std::vector<int> &map = Engine::getSong()->getKeymap(keymapID).getMap();
+	const std::vector<int> &map = newMap->getMap();
 	for (unsigned int i = 0; i < map.size(); i++)
 	{
-		m_keymapTextEdit->append(QString::number(map[i]));
+		if (map[i] >= 0) {m_keymapTextEdit->append(QString::number(map[i]));}
+		else {m_keymapTextEdit->append("x");}
 	}
 	QTextCursor tmp = m_keymapTextEdit->textCursor();
 	tmp.movePosition(QTextCursor::Start);
 	m_keymapTextEdit->setTextCursor(tmp);
+
+	m_firstKeyModel.setValue(newMap->getFirstKey());
+	m_lastKeyModel.setValue(newMap->getLastKey());
+	m_middleKeyModel.setValue(newMap->getMiddleKey());
+
+	m_baseFreqModel.setValue(newMap->getBaseFreq());
 }
 
 
@@ -250,11 +263,11 @@ bool MicrotunerConfig::validateScaleForm()
 		{
 			bool ok = true;
 			int num = 1, den = 1;
-			den = firstSection.toInt(&ok);
+			num = firstSection.toInt(&ok);
 			if (!ok) {fail(tr("Denominator of an interval defined as a ratio cannot be converted to a number")); return false;}
 			if (line.contains('/'))
 			{
-				num = line.split('/').at(1).section(QRegExp("\\s+"), 0, 0, QString::SectionSkipEmpty).toInt(&ok);
+				den = line.split('/').at(1).section(QRegExp("\\s+"), 0, 0, QString::SectionSkipEmpty).toInt(&ok);
 			}
 			if (!ok) {fail(tr("Numerator of an interval defined as a ratio cannot be converted to a number")); return false;}
 			if (num * den < 0) {fail(tr("Interval defined as a ratio cannot be negative")); return false;}
@@ -300,9 +313,38 @@ bool MicrotunerConfig::validateKeymapForm()
 
 bool MicrotunerConfig::applyScale()
 {
-	validateScaleForm();
+	if (!validateScaleForm()) {return false;};
 
-	//TODO: update stored scale
+	std::vector<Interval> newIntervals;
+	newIntervals.push_back(Interval(1, 1));
+
+	QStringList input = m_scaleTextEdit->toPlainText().split('\n', QString::SkipEmptyParts);
+	for (auto &line: input)
+	{
+		if (line.size() == 0) {continue;}
+		if (line[0] == '!') {continue;}		// comment
+		QString firstSection = line.section(QRegExp("\\s+|/"), 0, 0, QString::SectionSkipEmpty);
+		if (firstSection.contains('.'))		// cent mode
+		{
+			newIntervals.push_back(Interval(firstSection.toFloat()));
+		}
+		else								// ratio mode
+		{
+			int num = 1, den = 1;
+			num = firstSection.toInt();
+			if (line.contains('/'))
+			{
+				den = line.split('/').at(1).section(QRegExp("\\s+"), 0, 0, QString::SectionSkipEmpty).toInt();
+			}
+			newIntervals.push_back(Interval(num, den));
+		}
+	}
+
+	Song *song = Engine::getSong();
+	if (song == NULL) {return false;}
+
+	auto newScale = std::make_shared<Scale>(m_scaleNameEdit->text(), newIntervals);
+	song->setScale(m_scaleComboModel.value(), newScale);
 
 	return true;
 }
@@ -310,9 +352,34 @@ bool MicrotunerConfig::applyScale()
 
 bool MicrotunerConfig::applyKeymap()
 {
-	validateKeymapForm();
+	if (!validateKeymapForm()) {return false;}
 
-	//TODO: update stored keymap and other values
+	std::vector<int> newMap;
+
+	QStringList input = m_keymapTextEdit->toPlainText().split('\n', QString::SkipEmptyParts);
+	for (auto &line: input)
+	{
+		if (line.size() == 0) {continue;}
+		if (line[0] == '!') {continue;}			// comment
+		QString firstSection = line.section(QRegExp("\\s+"), 0, 0, QString::SectionSkipEmpty);
+		if (firstSection == "x")
+		{
+			newMap.push_back(-1);				// not mapped
+			continue;
+		}
+		newMap.push_back(firstSection.toInt());
+	}
+
+	Song *song = Engine::getSong();
+	if (song == NULL) {return false;}
+
+	auto newKeymap = std::make_shared<Keymap>(m_keymapNameEdit->text(),
+											  newMap,
+											  m_firstKeyModel.value(),
+											  m_lastKeyModel.value(),
+											  m_middleKeyModel.value(),
+											  m_baseFreqModel.value());
+	song->setKeymap(m_keymapComboModel.value(), newKeymap);
 
 	return true;
 }
