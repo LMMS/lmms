@@ -305,6 +305,7 @@ InstrumentFunctionArpeggio::InstrumentFunctionArpeggio( Model * _parent ) :
 	m_arpCycleModel( 0.0f, 0.0f, 6.0f, 1.0f, this, tr( "Cycle steps" ) ),
 	m_arpSkipModel( 0.0f, 0.0f, 100.0f, 1.0f, this, tr( "Skip rate" ) ),
 	m_arpMissModel( 0.0f, 0.0f, 100.0f, 1.0f, this, tr( "Miss rate" ) ),
+	m_arpFloorModel( 0.0f, 0.0f, 16.0f, 1.0f, this, tr( "Floor" ) ),
 	m_arpCeilModel( 20.0f, 0.0f, 16.0f, 1.0f, this, tr( "Ceiling" ) ),
 	m_arpTimeModel( 200.0f, 25.0f, 2000.0f, 1.0f, 2000, this, tr( "Arpeggio time" ) ),
 	m_arpGateModel( 100.0f, 1.0f, 200.0f, 1.0f, this, tr( "Arpeggio gate" ) ),
@@ -486,6 +487,13 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 			cur_arp_idx %= range;
 		}
 
+		// Floor.
+		int floor = m_arpFloorModel.value();
+		if( cur_arp_idx < floor )
+		{
+			cur_arp_idx = floor;
+		}
+
 		// Ceil. Note stuck at set index.
 		int ceiling = m_arpCeilModel.value();
 		if( ceiling < m_arpCeilModel.maxValue() && ceiling < cur_arp_idx )
@@ -535,6 +543,7 @@ void InstrumentFunctionArpeggio::saveSettings( QDomDocument & _doc, QDomElement 
 	m_arpCycleModel.saveSettings( _doc, _this, "arpcycle" );
 	m_arpSkipModel.saveSettings( _doc, _this, "arpskip" );
 	m_arpMissModel.saveSettings( _doc, _this, "arpmiss" );
+	m_arpFloorModel.saveSettings( _doc, _this, "arpfloor" );
 	m_arpCeilModel.saveSettings( _doc, _this, "arpceiling" );
 	m_arpTimeModel.saveSettings( _doc, _this, "arptime" );
 	m_arpGateModel.saveSettings( _doc, _this, "arpgate" );
@@ -553,6 +562,7 @@ void InstrumentFunctionArpeggio::loadSettings( const QDomElement & _this )
 	m_arpCycleModel.loadSettings( _this, "arpcycle" );
 	m_arpSkipModel.loadSettings( _this, "arpskip" );
 	m_arpMissModel.loadSettings( _this, "arpmiss" );
+	m_arpFloorModel.loadSettings( _this, "arpfloor" );
 	m_arpCeilModel.loadSettings( _this, "arpceiling" );
 	m_arpTimeModel.loadSettings( _this, "arptime" );
 	m_arpGateModel.loadSettings( _this, "arpgate" );

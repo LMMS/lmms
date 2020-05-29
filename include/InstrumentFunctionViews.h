@@ -81,6 +81,7 @@ private:
 	Knob * m_arpCycleKnob;
 	Knob * m_arpSkipKnob;
 	Knob * m_arpMissKnob;
+	Knob * m_arpFloorKnob;
 	Knob * m_arpCeilKnob;
 	TempoSyncKnob * m_arpTimeKnob;
 	Knob * m_arpGateKnob;
