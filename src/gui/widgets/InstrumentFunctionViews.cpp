@@ -98,6 +98,7 @@ InstrumentFunctionArpeggioView::InstrumentFunctionArpeggioView( InstrumentFuncti
 	m_arpCycleKnob( new Knob( knobBright_26 ) ),
 	m_arpSkipKnob( new Knob( knobBright_26 ) ),
 	m_arpMissKnob( new Knob( knobBright_26 ) ),
+	m_arpCeilKnob( new Knob( knobBright_26 ) ),
 	m_arpTimeKnob( new TempoSyncKnob( knobBright_26 ) ),
 	m_arpGateKnob( new Knob( knobBright_26 ) ),
 	m_arpDirectionComboBox( new ComboBox() ),
@@ -110,7 +111,7 @@ InstrumentFunctionArpeggioView::InstrumentFunctionArpeggioView( InstrumentFuncti
 	QGridLayout* mainLayout = new QGridLayout( m_arpGroupBox );
 	mainLayout->setContentsMargins( 8, 18, 8, 8 );
 	mainLayout->setColumnStretch( 0, 1 );
-	mainLayout->setHorizontalSpacing( 20 );
+	mainLayout->setHorizontalSpacing( 8 );
 	mainLayout->setVerticalSpacing( 1 );
 
 	m_arpRangeKnob->setLabel( tr( "RANGE" ) );
@@ -127,6 +128,12 @@ InstrumentFunctionArpeggioView::InstrumentFunctionArpeggioView( InstrumentFuncti
 
 	m_arpMissKnob->setLabel( tr( "MISS" ) );
 	m_arpMissKnob->setHintText( tr( "Miss rate:" ), tr( "%" ) );
+
+
+	m_arpCeilKnob->setLabel( tr( "CEIL" ) );
+	m_arpCeilKnob->setHintText( tr( "Top note clamp:" ) + " ", " " );
+	m_arpCeilKnob->setWhatsThis(
+		tr( "Note gets stuck on same top-key after this amount of steps.") );
 
 
 	m_arpTimeKnob->setLabel( tr( "TIME" ) );
@@ -157,6 +164,7 @@ InstrumentFunctionArpeggioView::InstrumentFunctionArpeggioView( InstrumentFuncti
 	mainLayout->addWidget( m_arpCycleKnob, 0, 2, 2, 1, Qt::AlignHCenter );
 	mainLayout->addWidget( m_arpSkipKnob, 3, 1, 2, 1, Qt::AlignHCenter );
 	mainLayout->addWidget( m_arpMissKnob, 3, 2, 2, 1, Qt::AlignHCenter );
+	mainLayout->addWidget( m_arpCeilKnob, 3, 3, 2, 1, Qt::AlignHCenter );
 	mainLayout->addWidget( m_arpGateKnob, 6, 1, 2, 1, Qt::AlignHCenter );
 	mainLayout->addWidget( m_arpTimeKnob, 6, 2, 2, 1, Qt::AlignHCenter );
 
@@ -184,6 +192,7 @@ void InstrumentFunctionArpeggioView::modelChanged()
 	m_arpCycleKnob->setModel( &m_a->m_arpCycleModel );
 	m_arpSkipKnob->setModel( &m_a->m_arpSkipModel );
 	m_arpMissKnob->setModel( &m_a->m_arpMissModel );
+	m_arpCeilKnob->setModel( &m_a->m_arpCeilModel );
 	m_arpTimeKnob->setModel( &m_a->m_arpTimeModel );
 	m_arpGateKnob->setModel( &m_a->m_arpGateModel );
 	m_arpDirectionComboBox->setModel( &m_a->m_arpDirectionModel );

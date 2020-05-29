@@ -199,6 +199,7 @@ private:
 	FloatModel m_arpCycleModel;
 	FloatModel m_arpSkipModel;
 	FloatModel m_arpMissModel;
+	FloatModel m_arpCeilModel;
 	TempoSyncKnobModel m_arpTimeModel;
 	FloatModel m_arpGateModel;
 	ComboBoxModel m_arpDirectionModel;
