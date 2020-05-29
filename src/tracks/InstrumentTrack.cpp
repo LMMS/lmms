@@ -117,7 +117,8 @@ InstrumentTrack::InstrumentTrack( TrackContainer* tc ) :
 	m_piano( this ),
 	m_microtuner(this),
 	m_scaleModel(this, tr("Selected scale")),
-	m_keymapModel(this, tr("Selected keyboard mapping"))
+	m_keymapModel(this, tr("Selected keyboard mapping")),
+	m_keyRangeImportModel(true)
 {
 	m_pitchModel.setCenterValue( 0 );
 	m_panningModel.setCenterValue( DefaultPanning );
@@ -135,12 +136,12 @@ InstrumentTrack::InstrumentTrack( TrackContainer* tc ) :
 
 	for (unsigned int i = 0; i < MaxScaleCount; i++)
 	{
-		m_scaleModel.addItem(Engine::getSong()->getScale(i)->getDescription());
+		m_scaleModel.addItem(QString::number(i) + ": " + Engine::getSong()->getScale(i)->getDescription());
 	}
 
 	for (unsigned int i = 0; i < MaxKeymapCount; i++)
 	{
-		m_keymapModel.addItem(Engine::getSong()->getKeymap(i)->getDescription());
+		m_keymapModel.addItem(QString::number(i) + ": " + Engine::getSong()->getKeymap(i)->getDescription());
 	}
 
 	setName( tr( "Default preset" ) );
@@ -962,13 +963,15 @@ void InstrumentTrack::updateScaleList(int index)
 {
 	if (index >= 0 && index < MaxScaleCount)
 	{
-		m_scaleModel.replaceItem(index, Engine::getSong()->getScale(index)->getDescription());
+		m_scaleModel.replaceItem(index,
+			QString::number(index) + ": " + Engine::getSong()->getScale(index)->getDescription());
 	}
 	else
 	{
 		for (int i = 0; i < MaxScaleCount; i++)
 		{
-			m_scaleModel.replaceItem(index, Engine::getSong()->getScale(i)->getDescription());
+			m_scaleModel.replaceItem(i,
+				QString::number(i) + ": " + Engine::getSong()->getScale(i)->getDescription());
 		}
 	}
 }
@@ -981,13 +984,15 @@ void InstrumentTrack::updateKeymapList(int index)
 {
 	if (index >= 0 && index < MaxKeymapCount)
 	{
-		m_keymapModel.replaceItem(index, Engine::getSong()->getKeymap(index)->getDescription());
+		m_keymapModel.replaceItem(index,
+			QString::number(index) + ": " + Engine::getSong()->getKeymap(index)->getDescription());
 	}
 	else
 	{
 		for (int i = 0; i < MaxKeymapCount; i++)
 		{
-			m_keymapModel.replaceItem(index, Engine::getSong()->getKeymap(i)->getDescription());
+			m_keymapModel.replaceItem(i,
+				QString::number(i) + ": " + Engine::getSong()->getKeymap(i)->getDescription());
 		}
 	}
 }
@@ -1670,6 +1675,7 @@ void InstrumentTrackWindow::modelChanged()
 	m_miscView->microtunerGroupBox()->setModel(m_track->microtunerModel()->enabledModel());
 	m_miscView->scaleCombo()->setModel(m_track->scaleModel());
 	m_miscView->keymapCombo()->setModel(m_track->keymapModel());
+	m_miscView->rangeImportCheckbox()->setModel(m_track->keyRangeImportModel());
 	updateName();
 }
 

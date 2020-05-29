@@ -76,10 +76,11 @@ InstrumentMiscView::InstrumentMiscView(InstrumentTrack *it, QWidget *parent) :
 	m_keymapCombo->setFixedHeight(comboHeight);
 	microtunerLayout->addWidget(m_keymapCombo);
 
-	LedCheckBox *importCheckbox = new LedCheckBox(tr("Import first and last notes from keymap"), this);
-	importCheckbox->setToolTip(tr("When enabled, the first and last note of this instrument will be overwritten with values specified by the active keymap."));
-	importCheckbox->setCheckable(true);
-	microtunerLayout->addWidget(importCheckbox);
+	m_rangeImportCheckbox = new LedCheckBox(tr("Import note ranges from keymap"), this);
+	m_rangeImportCheckbox->setModel(it->keyRangeImportModel());
+	m_rangeImportCheckbox->setToolTip(tr("When enabled, the first, last and base notes of this instrument will be overwritten with values specified by the selected keymap."));
+	m_rangeImportCheckbox->setCheckable(true);
+	microtunerLayout->addWidget(m_rangeImportCheckbox);
 
 	// Fill remaining space
 	layout->addStretch();

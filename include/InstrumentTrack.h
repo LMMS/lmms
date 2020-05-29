@@ -207,6 +207,11 @@ public:
 		return &m_keymapModel;
 	}
 
+	BoolModel *keyRangeImportModel()
+	{
+		return &m_keyRangeImportModel;
+	}
+
 	bool isArpeggioEnabled() const
 	{
 		return m_arpeggio.m_arpEnabledModel.value();
@@ -319,6 +324,7 @@ private:
 	Microtuner m_microtuner;
 	ComboBoxModel m_scaleModel;
 	ComboBoxModel m_keymapModel;
+	BoolModel m_keyRangeImportModel;
 
 
 	friend class InstrumentTrackView;

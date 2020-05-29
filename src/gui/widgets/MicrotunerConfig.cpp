@@ -67,7 +67,7 @@ MicrotunerConfig::MicrotunerConfig() :
 
 	for (unsigned int i = 0; i < MaxScaleCount; i++)
 	{
-		m_scaleComboModel.addItem(Engine::getSong()->getScale(i)->getDescription());
+		m_scaleComboModel.addItem(QString::number(i) + ": " + Engine::getSong()->getScale(i)->getDescription());
 	}
 	ComboBox *scaleCombo = new ComboBox();
 	scaleCombo->setFixedHeight(comboHeight);
@@ -87,7 +87,7 @@ MicrotunerConfig::MicrotunerConfig() :
 	m_scaleTextEdit = new QTextEdit();
 	m_scaleTextEdit->setAcceptRichText(false);
 	m_scaleTextEdit->setPlainText("100.0\n200.0\n300.0\n400.0\n500.0\n600.0\n700.0\n800.0\n900.0\n1000.0\n1100.0\n1200.0");
-	m_scaleTextEdit->setToolTip(tr("Enter intervals on separate lines. Numbers containing a decimal point are treated as cents. Other input is treated as an integer ratio and must be in the form of \'a/b\' or \'a\'. Unity (0.0 cents or ratio 1/1) is always present as a hidden first value."));
+	m_scaleTextEdit->setToolTip(tr("Enter intervals on separate lines. Numbers containing a decimal point are treated as cents.\nOther inputs are treated as integer ratios and must be in the form of \'a/b\' or \'a\'.\nUnity (0.0 cents or ratio 1/1) is always present as a hidden first value; do not enter it manually."));
 	microtunerLayout->addWidget(m_scaleTextEdit, 4, 0, 5, 2, Qt::AlignLeft | Qt::AlignTop);
 
 	QPushButton *applyScaleButton = new QPushButton(tr("Apply scale"));
@@ -102,7 +102,7 @@ MicrotunerConfig::MicrotunerConfig() :
 
 	for (unsigned int i = 0; i < MaxKeymapCount; i++)
 	{
-		m_keymapComboModel.addItem(Engine::getSong()->getKeymap(i)->getDescription());
+		m_keymapComboModel.addItem(QString::number(i) + ": " + Engine::getSong()->getKeymap(i)->getDescription());
 	}
 	ComboBox *keymapCombo = new ComboBox();
 	keymapCombo->setFixedHeight(comboHeight);
@@ -122,7 +122,7 @@ MicrotunerConfig::MicrotunerConfig() :
 	m_keymapTextEdit = new QTextEdit();
 	m_keymapTextEdit->setAcceptRichText(false);
 	m_keymapTextEdit->setPlainText("0\n1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11");
-	m_keymapTextEdit->setToolTip(tr("Enter key mappings on separate lines. Each line assigns a scale degree to a MIDI key, starting with the middle key and continuing in sequence. The pattern repeats for keys outside of the explicit keymap range. Multiple keys can be mapped to the same scale degree. Enter \'x\' if you wish to leave the key disabled / not mapped."));
+	m_keymapTextEdit->setToolTip(tr("Enter key mappings on separate lines. Each line assigns a scale degree to a MIDI key,\nstarting with the middle key and continuing in sequence.\nThe pattern repeats for keys outside of the explicit keymap range.\nMultiple keys can be mapped to the same scale degree.\nEnter \'x\' if you wish to leave the key disabled / not mapped."));
 	microtunerLayout->addWidget(m_keymapTextEdit, 4, 2, 1, 2, Qt::AlignRight | Qt::AlignTop);
 
 	// Mapping ranges
@@ -345,7 +345,8 @@ bool MicrotunerConfig::applyScale()
 
 	auto newScale = std::make_shared<Scale>(m_scaleNameEdit->text(), newIntervals);
 	song->setScale(m_scaleComboModel.value(), newScale);
-	m_scaleComboModel.replaceItem(m_scaleComboModel.value(), m_scaleNameEdit->text());
+	m_scaleComboModel.replaceItem(m_scaleComboModel.value(),
+		QString::number(m_scaleComboModel.value()) + ": " + m_scaleNameEdit->text());
 
 	return true;
 }
@@ -381,7 +382,8 @@ bool MicrotunerConfig::applyKeymap()
 											  m_middleKeyModel.value(),
 											  m_baseFreqModel.value());
 	song->setKeymap(m_keymapComboModel.value(), newKeymap);
-	m_keymapComboModel.replaceItem(m_keymapComboModel.value(), m_keymapNameEdit->text());
+	m_keymapComboModel.replaceItem(m_keymapComboModel.value(),
+		QString::number(m_keymapComboModel.value()) + ": " + m_keymapNameEdit->text());
 
 	return true;
 }
