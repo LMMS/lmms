@@ -270,6 +270,8 @@ protected slots:
 	void updateBaseNote();
 	void updateFirstNote();
 	void updateLastNote();
+	void updateScaleList(int index);
+	void updateKeymapList(int index);
 	void updatePitch();
 	void updatePitchRange();
 	void updateEffectChannel();

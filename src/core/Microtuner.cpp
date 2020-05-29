@@ -89,7 +89,7 @@ float Microtuner::keyToFreq(int key, float detune) const
 	const int keymapDegree = keymap->getDegree(key);		// which interval should be used according to the keymap
 	if (keymapDegree == -1) {return 0;}						// key is not mapped
 	const int keymapOctave = keymap->getOctave(key);		// how many times did the keymap repeat
-	const int octaveDegree = intervals.size() - 1;
+	const int octaveDegree = intervals.size() - 1;			// index of the interval with octave ratio
 	const int scaleOctave = keymapDegree >= 0 ? keymapDegree / octaveDegree : keymapDegree / octaveDegree - 1;
 
 	const int degree_rem = keymapDegree % octaveDegree;

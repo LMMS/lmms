@@ -493,6 +493,8 @@ signals:
 	void stopped();
 	void modified();
 	void projectFileNameChanged();
+	void scaleListChanged(int index);
+	void keymapListChanged(int index);
 } ;
 
 

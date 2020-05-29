@@ -1472,6 +1472,7 @@ void Song::setScale(unsigned int index, std::shared_ptr<const Scale> newScale)
 	if (index >= MaxScaleCount) {index = 0;}
 
 	std::atomic_store(&m_scales[index], newScale);
+	emit scaleListChanged(index);
 }
 
 
@@ -1480,4 +1481,5 @@ void Song::setKeymap(unsigned int index, std::shared_ptr<const Keymap> newMap)
 	if (index >= MaxKeymapCount) {index = 0;}
 
 	std::atomic_store(&m_keymaps[index], newMap);
+	emit keymapListChanged(index);
 }

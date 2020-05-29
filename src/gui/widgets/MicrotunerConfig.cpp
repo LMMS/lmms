@@ -345,6 +345,7 @@ bool MicrotunerConfig::applyScale()
 
 	auto newScale = std::make_shared<Scale>(m_scaleNameEdit->text(), newIntervals);
 	song->setScale(m_scaleComboModel.value(), newScale);
+	m_scaleComboModel.replaceItem(m_scaleComboModel.value(), m_scaleNameEdit->text());
 
 	return true;
 }
@@ -380,6 +381,7 @@ bool MicrotunerConfig::applyKeymap()
 											  m_middleKeyModel.value(),
 											  m_baseFreqModel.value());
 	song->setKeymap(m_keymapComboModel.value(), newKeymap);
+	m_keymapComboModel.replaceItem(m_keymapComboModel.value(), m_keymapNameEdit->text());
 
 	return true;
 }

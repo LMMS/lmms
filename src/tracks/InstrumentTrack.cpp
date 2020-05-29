@@ -41,6 +41,7 @@
 #include "AutomationPattern.h"
 #include "BBTrack.h"
 #include "CaptionMenu.h"
+#include "ComboBox.h"
 #include "ConfigManager.h"
 #include "ControllerConnection.h"
 #include "EffectChain.h"
@@ -146,7 +147,9 @@ InstrumentTrack::InstrumentTrack( TrackContainer* tc ) :
 
 	connect(&m_baseNoteModel, SIGNAL(dataChanged()), this, SLOT(updateBaseNote()), Qt::DirectConnection);
 	connect(&m_firstNoteModel, SIGNAL(dataChanged()), this, SLOT(updateFirstNote()), Qt::DirectConnection);
-	connect(&m_baseNoteModel, SIGNAL(dataChanged()), this, SLOT(updateLastNote()), Qt::DirectConnection);
+	connect(&m_lastNoteModel, SIGNAL(dataChanged()), this, SLOT(updateLastNote()), Qt::DirectConnection);
+	connect(Engine::getSong(), SIGNAL(scaleListChanged(int)), this, SLOT(updateScaleList(int)), Qt::DirectConnection);
+	connect(Engine::getSong(), SIGNAL(keymapListChanged(int)), this, SLOT(updateKeymapList(int)), Qt::DirectConnection);
 	connect(&m_pitchModel, SIGNAL(dataChanged()), this, SLOT(updatePitch()), Qt::DirectConnection);
 	connect(&m_pitchRangeModel, SIGNAL(dataChanged()), this, SLOT(updatePitchRange()), Qt::DirectConnection);
 	connect(&m_effectChannelModel, SIGNAL(dataChanged()), this, SLOT(updateEffectChannel()), Qt::DirectConnection);
@@ -951,6 +954,44 @@ Instrument * InstrumentTrack::loadInstrument(const QString & _plugin_name,
 
 
 
+/**
+ * \brief Update scale name displayed in the microtuner scale list.
+ * \param index Index of the scale to update; update all scales if -1 or out of range.
+ */
+void InstrumentTrack::updateScaleList(int index)
+{
+	if (index >= 0 && index < MaxScaleCount)
+	{
+		m_scaleModel.replaceItem(index, Engine::getSong()->getScale(index)->getDescription());
+	}
+	else
+	{
+		for (int i = 0; i < MaxScaleCount; i++)
+		{
+			m_scaleModel.replaceItem(index, Engine::getSong()->getScale(i)->getDescription());
+		}
+	}
+}
+
+/**
+ * \brief Update keymap name displayed in the microtuner scale list.
+ * \param index Index of the keymap to update; update all keymaps if -1 or out of range.
+ */
+void InstrumentTrack::updateKeymapList(int index)
+{
+	if (index >= 0 && index < MaxKeymapCount)
+	{
+		m_keymapModel.replaceItem(index, Engine::getSong()->getKeymap(index)->getDescription());
+	}
+	else
+	{
+		for (int i = 0; i < MaxKeymapCount; i++)
+		{
+			m_keymapModel.replaceItem(index, Engine::getSong()->getKeymap(i)->getDescription());
+		}
+	}
+}
+
 
 
 // #### ITV:
@@ -1626,7 +1667,9 @@ void InstrumentTrackWindow::modelChanged()
 	m_midiView->setModel( &m_track->m_midiPort );
 	m_effectView->setModel( m_track->m_audioPort.effects() );
 	m_miscView->pitchGroupBox()->setModel(&m_track->m_useMasterPitchModel);
-	m_miscView->microtunerGroupBox()->setModel(m_track->m_microtuner.enabledModel());
+	m_miscView->microtunerGroupBox()->setModel(m_track->microtunerModel()->enabledModel());
+	m_miscView->scaleCombo()->setModel(m_track->scaleModel());
+	m_miscView->keymapCombo()->setModel(m_track->keymapModel());
 	updateName();
 }
 
