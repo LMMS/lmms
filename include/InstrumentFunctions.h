@@ -185,6 +185,13 @@ public:
 	}
 
 
+
+protected slots:
+
+	void updateNoteRange();
+
+
+
 private:
 	enum ArpModes
 	{

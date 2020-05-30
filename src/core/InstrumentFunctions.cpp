@@ -328,6 +328,16 @@ InstrumentFunctionArpeggio::InstrumentFunctionArpeggio( Model * _parent ) :
 	m_arpModeModel.addItem( tr( "Free" ), make_unique<PixmapLoader>( "arp_free" ) );
 	m_arpModeModel.addItem( tr( "Sort" ), make_unique<PixmapLoader>( "arp_sort" ) );
 	m_arpModeModel.addItem( tr( "Sync" ), make_unique<PixmapLoader>( "arp_sync" ) );
+
+	connect( &m_arpRangeModel, SIGNAL( dataChanged() ),
+			this, SLOT( updateNoteRange() ), Qt::DirectConnection );
+	connect( &m_arpModel, SIGNAL( dataChanged() ),
+			this, SLOT( updateNoteRange() ), Qt::DirectConnection );
+	connect( &m_arpFloorModel, SIGNAL( dataChanged() ),
+			this, SLOT( updateNoteRange() ), Qt::DirectConnection );
+	connect( &m_arpCeilModel, SIGNAL( dataChanged() ),
+			this, SLOT( updateNoteRange() ), Qt::DirectConnection );
+	updateNoteRange();
 }
 
 
@@ -335,6 +345,27 @@ InstrumentFunctionArpeggio::InstrumentFunctionArpeggio( Model * _parent ) :
 
 InstrumentFunctionArpeggio::~InstrumentFunctionArpeggio()
 {
+}
+
+
+
+
+void InstrumentFunctionArpeggio::updateNoteRange()
+{
+	const InstrumentFunctionNoteStacking::ChordTable & chord_table =
+				InstrumentFunctionNoteStacking::ChordTable::getInstance();
+	const int cur_chord_size = chord_table[m_arpModel.value()].size();
+	float noteRange = m_arpRangeModel.value() * cur_chord_size;
+	m_arpFloorModel.setRange( 0.0f, noteRange );
+	m_arpCeilModel.setRange( 0.0f, noteRange );
+	/*if( m_arpFloorModel.value() >= m_arpCeilModel.value() )
+	{
+		m_arpFloorModel.setValue( m_arpCeilModel.value() );
+	}*/
+	if( m_arpCeilModel.value() < m_arpFloorModel.value() )
+	{
+		m_arpCeilModel.setValue( m_arpFloorModel.value() );
+	}
 }
 
 
