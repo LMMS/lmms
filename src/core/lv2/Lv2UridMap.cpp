@@ -59,7 +59,7 @@ LV2_URID UridMap::map(const char *uri)
 			std::string uriStr = uri;
 
 			// the URID map is global, so mutex it
-			m_MapMutex.lock();
+			std::lock_guard<std::mutex> guard (m_MapMutex);
 			{
 				// 1 is the first free URID
 				std::size_t index = 1u + m_unMap.size();
@@ -70,8 +70,6 @@ LV2_URID UridMap::map(const char *uri)
 					result = static_cast<LV2_URID>(index);
 				}
 			}
-			m_MapMutex.unlock();
-
 		}
 		catch(...) { /* result variable is already 0 */ }
 	}
