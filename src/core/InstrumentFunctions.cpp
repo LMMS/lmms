@@ -487,14 +487,14 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 			cur_arp_idx %= range;
 		}
 
-		// Floor.
+		// Floor
 		int floor = m_arpFloorModel.value();
 		if( cur_arp_idx < floor )
 		{
 			cur_arp_idx = floor;
 		}
 
-		// Ceil. Note stuck at set index.
+		// Ceil - Note stuck at set index
 		int ceiling = m_arpCeilModel.value();
 		if( ceiling < m_arpCeilModel.maxValue() && ceiling < cur_arp_idx )
 		{
