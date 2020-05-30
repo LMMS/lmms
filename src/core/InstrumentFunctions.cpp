@@ -362,12 +362,10 @@ void InstrumentFunctionArpeggio::updateNoteRange()
 				InstrumentFunctionNoteStacking::ChordTable::getInstance();
 	const int cur_chord_size = chord_table[m_arpModel.value()].size();
 	float noteRange = m_arpRangeModel.value() * cur_chord_size;
+
 	m_arpFloorModel.setRange( 0.0f, noteRange );
 	m_arpCeilModel.setRange( 0.0f, noteRange );
-	/*if( m_arpFloorModel.value() >= m_arpCeilModel.value() )
-	{
-		m_arpFloorModel.setValue( m_arpCeilModel.value() );
-	}*/
+
 	if( sticky )
 	{
 		m_arpCeilModel.setValue( m_arpCeilModel.maxValue() );
