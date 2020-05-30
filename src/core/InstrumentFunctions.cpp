@@ -352,6 +352,12 @@ InstrumentFunctionArpeggio::~InstrumentFunctionArpeggio()
 
 void InstrumentFunctionArpeggio::updateNoteRange()
 {
+	bool sticky = false;
+	if( m_arpCeilModel.value() == m_arpFloorModel.maxValue() )
+	{
+		sticky = true;
+	}
+
 	const InstrumentFunctionNoteStacking::ChordTable & chord_table =
 				InstrumentFunctionNoteStacking::ChordTable::getInstance();
 	const int cur_chord_size = chord_table[m_arpModel.value()].size();
@@ -362,7 +368,11 @@ void InstrumentFunctionArpeggio::updateNoteRange()
 	{
 		m_arpFloorModel.setValue( m_arpCeilModel.value() );
 	}*/
-	if( m_arpCeilModel.value() < m_arpFloorModel.value() )
+	if( sticky )
+	{
+		m_arpCeilModel.setValue( m_arpCeilModel.maxValue() );
+	}
+	else if( m_arpCeilModel.value() < m_arpFloorModel.value() )
 	{
 		m_arpCeilModel.setValue( m_arpFloorModel.value() );
 	}
