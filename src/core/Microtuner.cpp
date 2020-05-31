@@ -133,7 +133,7 @@ float Microtuner::baseFreq() const
  */
 float Microtuner::keyToFreq(int key, float detune) const
 {
-	if (key < 0 || key >= NumKeys) {return 0;}
+	if (key < firstKey() || key > lastKey()) {return 0;}
 	Song *song = Engine::getSong();
 	if (song == NULL) {return 0;}
 
@@ -181,6 +181,19 @@ float Microtuner::keyToFreq(int key, float detune) const
 
 	return frequency;
 }
+
+
+bool Microtuner::isKeyMapped(int key) const
+{
+	if (key < firstKey() || key > lastKey()) {return false;}
+	if (!enabled()) {return true;}
+
+	Song *song = Engine::getSong();
+	if (song == NULL) {return false;}
+
+	return song->getKeymap(m_keymapModel.value())->getDegree(key) != -1;
+}
+
 
 /**
  * \brief Update scale name displayed in the microtuner scale list.

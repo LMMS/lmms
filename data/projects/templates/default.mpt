@@ -81,5 +81,296 @@
     <projectnotes width="640" x="700" y="10" maximized="0" height="400" visible="0" minimized="0"></projectnotes>
     <timeline lp1pos="192" lp0pos="0" lpstate="0"/>
     <controllers/>
+    <scales>
+      <scale description="12-tone EDO (default)">
+        <interval num="1" den="1"/>
+        <interval num="100" den="0"/>
+        <interval num="200" den="0"/>
+        <interval num="300" den="0"/>
+        <interval num="400" den="0"/>
+        <interval num="500" den="0"/>
+        <interval num="600" den="0"/>
+        <interval num="700" den="0"/>
+        <interval num="800" den="0"/>
+        <interval num="900" den="0"/>
+        <interval num="1000" den="0"/>
+        <interval num="1100" den="0"/>
+        <interval num="2" den="1"/>
+      </scale>
+      <scale description="24-tone EDO">
+        <interval num="1" den="1"/>
+        <interval num="50" den="0"/>
+        <interval num="100" den="0"/>
+        <interval num="150" den="0"/>
+        <interval num="200" den="0"/>
+        <interval num="250" den="0"/>
+        <interval num="300" den="0"/>
+        <interval num="350" den="0"/>
+        <interval num="400" den="0"/>
+        <interval num="450" den="0"/>
+        <interval num="500" den="0"/>
+        <interval num="550" den="0"/>
+        <interval num="600" den="0"/>
+        <interval num="650" den="0"/>
+        <interval num="700" den="0"/>
+        <interval num="750" den="0"/>
+        <interval num="800" den="0"/>
+        <interval num="850" den="0"/>
+        <interval num="900" den="0"/>
+        <interval num="950" den="0"/>
+        <interval num="1000" den="0"/>
+        <interval num="1050" den="0"/>
+        <interval num="1100" den="0"/>
+        <interval num="1150" den="0"/>
+        <interval num="2" den="1"/>
+      </scale>
+      <scale description="7-tone JI C-major (Ptolemaic)">
+        <interval num="1" den="1"/>
+        <interval num="9" den="8"/>
+        <interval num="5" den="4"/>
+        <interval num="4" den="3"/>
+        <interval num="3" den="2"/>
+        <interval num="5" den="3"/>
+        <interval num="15" den="8"/>
+        <interval num="2" den="1"/>
+      </scale>
+      <scale description="12-tone JI (3-limit / Pythagorean)">
+        <interval num="1" den="1"/>
+        <interval num="256" den="243"/>
+        <interval num="9" den="8"/>
+        <interval num="32" den="27"/>
+        <interval num="81" den="64"/>
+        <interval num="4" den="3"/>
+        <interval num="729" den="512"/>
+        <interval num="3" den="2"/>
+        <interval num="128" den="81"/>
+        <interval num="27" den="16"/>
+        <interval num="16" den="9"/>
+        <interval num="243" den="128"/>
+        <interval num="2" den="1"/>
+      </scale>
+      <scale description="5-tone A-minor (3-limit / Pythagorean)">
+        <interval num="1" den="1"/>
+        <interval num="32" den="27"/>
+        <interval num="4" den="3"/>
+        <interval num="3" den="2"/>
+        <interval num="16" den="9"/>
+        <interval num="2" den="1"/>
+      </scale>
+    </scales>
+    <keymaps>
+      <keymap middle_key="0" description="all keys 1:1 (default)" base_freq="440" last_key="127" first_key="0" base_key="69">
+        <degree value="0"/>
+        <degree value="1"/>
+        <degree value="2"/>
+        <degree value="3"/>
+        <degree value="4"/>
+        <degree value="5"/>
+        <degree value="6"/>
+        <degree value="7"/>
+        <degree value="8"/>
+        <degree value="9"/>
+        <degree value="10"/>
+        <degree value="11"/>
+        <degree value="12"/>
+        <degree value="13"/>
+        <degree value="14"/>
+        <degree value="15"/>
+        <degree value="16"/>
+        <degree value="17"/>
+        <degree value="18"/>
+        <degree value="19"/>
+        <degree value="20"/>
+        <degree value="21"/>
+        <degree value="22"/>
+        <degree value="23"/>
+        <degree value="24"/>
+        <degree value="25"/>
+        <degree value="26"/>
+        <degree value="27"/>
+        <degree value="28"/>
+        <degree value="29"/>
+        <degree value="30"/>
+        <degree value="31"/>
+        <degree value="32"/>
+        <degree value="33"/>
+        <degree value="34"/>
+        <degree value="35"/>
+        <degree value="36"/>
+        <degree value="37"/>
+        <degree value="38"/>
+        <degree value="39"/>
+        <degree value="40"/>
+        <degree value="41"/>
+        <degree value="42"/>
+        <degree value="43"/>
+        <degree value="44"/>
+        <degree value="45"/>
+        <degree value="46"/>
+        <degree value="47"/>
+        <degree value="48"/>
+        <degree value="49"/>
+        <degree value="50"/>
+        <degree value="51"/>
+        <degree value="52"/>
+        <degree value="53"/>
+        <degree value="54"/>
+        <degree value="55"/>
+        <degree value="56"/>
+        <degree value="57"/>
+        <degree value="58"/>
+        <degree value="59"/>
+        <degree value="60"/>
+        <degree value="61"/>
+        <degree value="62"/>
+        <degree value="63"/>
+        <degree value="64"/>
+        <degree value="65"/>
+        <degree value="66"/>
+        <degree value="67"/>
+        <degree value="68"/>
+        <degree value="69"/>
+        <degree value="70"/>
+        <degree value="71"/>
+        <degree value="72"/>
+        <degree value="73"/>
+        <degree value="74"/>
+        <degree value="75"/>
+        <degree value="76"/>
+        <degree value="77"/>
+        <degree value="78"/>
+        <degree value="79"/>
+        <degree value="80"/>
+        <degree value="81"/>
+        <degree value="82"/>
+        <degree value="83"/>
+        <degree value="84"/>
+        <degree value="85"/>
+        <degree value="86"/>
+        <degree value="87"/>
+        <degree value="88"/>
+        <degree value="89"/>
+        <degree value="90"/>
+        <degree value="91"/>
+        <degree value="92"/>
+        <degree value="93"/>
+        <degree value="94"/>
+        <degree value="95"/>
+        <degree value="96"/>
+        <degree value="97"/>
+        <degree value="98"/>
+        <degree value="99"/>
+        <degree value="100"/>
+        <degree value="101"/>
+        <degree value="102"/>
+        <degree value="103"/>
+        <degree value="104"/>
+        <degree value="105"/>
+        <degree value="106"/>
+        <degree value="107"/>
+        <degree value="108"/>
+        <degree value="109"/>
+        <degree value="110"/>
+        <degree value="111"/>
+        <degree value="112"/>
+        <degree value="113"/>
+        <degree value="114"/>
+        <degree value="115"/>
+        <degree value="116"/>
+        <degree value="117"/>
+        <degree value="118"/>
+        <degree value="119"/>
+        <degree value="120"/>
+        <degree value="121"/>
+        <degree value="122"/>
+        <degree value="123"/>
+        <degree value="124"/>
+        <degree value="125"/>
+        <degree value="126"/>
+        <degree value="127"/>
+      </keymap>
+      <keymap middle_key="60" description="white keys to 7 degrees" base_freq="440" last_key="127" first_key="0" base_key="69">
+        <degree value="0"/>
+        <degree value="-1"/>
+        <degree value="1"/>
+        <degree value="-1"/>
+        <degree value="2"/>
+        <degree value="3"/>
+        <degree value="-1"/>
+        <degree value="4"/>
+        <degree value="-1"/>
+        <degree value="5"/>
+        <degree value="-1"/>
+        <degree value="6"/>
+      </keymap>
+      <keymap middle_key="60" description="white keys to 12 degrees" base_freq="440" last_key="127" first_key="0" base_key="69">
+        <degree value="0"/>
+        <degree value="-1"/>
+        <degree value="2"/>
+        <degree value="-1"/>
+        <degree value="4"/>
+        <degree value="5"/>
+        <degree value="-1"/>
+        <degree value="7"/>
+        <degree value="-1"/>
+        <degree value="9"/>
+        <degree value="-1"/>
+        <degree value="11"/>
+      </keymap>
+      <keymap middle_key="60" description="white keys to 24 degrees" base_freq="440" last_key="127" first_key="0" base_key="69">
+        <degree value="0"/>
+        <degree value="-1"/>
+        <degree value="2"/>
+        <degree value="-1"/>
+        <degree value="4"/>
+        <degree value="5"/>
+        <degree value="-1"/>
+        <degree value="7"/>
+        <degree value="-1"/>
+        <degree value="9"/>
+        <degree value="-1"/>
+        <degree value="11"/>
+        <degree value="12"/>
+        <degree value="-1"/>
+        <degree value="14"/>
+        <degree value="-1"/>
+        <degree value="16"/>
+        <degree value="17"/>
+        <degree value="-1"/>
+        <degree value="19"/>
+        <degree value="-1"/>
+        <degree value="21"/>
+        <degree value="-1"/>
+        <degree value="23"/>
+      </keymap>
+      <keymap middle_key="60" description="black keys to 5 degrees" base_freq="440" last_key="127" first_key="0" base_key="61">
+        <degree value="-1"/>
+        <degree value="0"/>
+        <degree value="-1"/>
+        <degree value="1"/>
+        <degree value="-1"/>
+        <degree value="-1"/>
+        <degree value="2"/>
+        <degree value="-1"/>
+        <degree value="3"/>
+        <degree value="-1"/>
+        <degree value="4"/>
+        <degree value="-1"/>
+      </keymap>
+      <keymap middle_key="60" description="black keys to 12 degrees" base_freq="466.165" last_key="127" first_key="0" base_key="70">
+        <degree value="-1"/>
+        <degree value="1"/>
+        <degree value="-1"/>
+        <degree value="3"/>
+        <degree value="-1"/>
+        <degree value="-1"/>
+        <degree value="6"/>
+        <degree value="-1"/>
+        <degree value="8"/>
+        <degree value="-1"/>
+        <degree value="10"/>
+        <degree value="-1"/>
+      </keymap>
+    </keymaps>
   </song>
 </lmms-project>

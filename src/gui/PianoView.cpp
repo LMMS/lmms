@@ -865,7 +865,7 @@ void PianoView::paintEvent( QPaintEvent * )
 		}
 
 		// draw normal, pressed or disabled key, depending on state and position of current key
-		if (cur_key >= first_key && cur_key <= last_key)
+		if (m_piano->instrumentTrack()->microtuner()->isKeyMapped(cur_key))
 		{
 			if (m_piano && m_piano->isKeyPressed(cur_key))
 			{
@@ -899,7 +899,7 @@ void PianoView::paintEvent( QPaintEvent * )
 	int startKey = m_startKey;
 	if (startKey > 0 && Piano::isBlackKey((Keys)(--startKey)))
 	{
-		if (startKey >= first_key && startKey <= last_key)
+		if (m_piano->instrumentTrack()->microtuner()->isKeyMapped(startKey))
 		{
 			if (m_piano && m_piano->isKeyPressed(startKey))
 			{
@@ -922,7 +922,7 @@ void PianoView::paintEvent( QPaintEvent * )
 		if (Piano::isBlackKey(cur_key))
 		{
 			// draw normal, pressed or disabled key, depending on state and position of current key
-			if (cur_key >= first_key && cur_key <= last_key)
+			if (m_piano->instrumentTrack()->microtuner()->isKeyMapped(cur_key))
 			{
 				if (m_piano && m_piano->isKeyPressed(cur_key))
 				{

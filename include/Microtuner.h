@@ -55,6 +55,7 @@ public:
 	float baseFreq() const;
 
 	float keyToFreq(int key, float detune = 0) const;
+	bool isKeyMapped(int key) const;
 
 	QString nodeName() const override {return "microtuner";}
 	void saveSettings(QDomDocument & document, QDomElement &element) override;
