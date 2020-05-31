@@ -297,12 +297,6 @@ private:
 	static const int cm_scrollAmtHoriz = 10;
 	static const int cm_scrollAmtVert = 1;
 
-	// static QPixmap * s_whiteKeyBigPm;
-	// static QPixmap * s_whiteKeyBigPressedPm;
-	// static QPixmap * s_whiteKeySmallPm;
-	// static QPixmap * s_whiteKeySmallPressedPm;
-	// static QPixmap * s_blackKeyPm;
-	// static QPixmap * s_blackKeyPressedPm;
 	static QPixmap * s_toolDraw;
 	static QPixmap * s_toolErase;
 	static QPixmap * s_toolSelect;
@@ -367,6 +361,7 @@ private:
 	int m_moveStartY;
 
 	int m_notesEditHeight;
+	int m_userSetNotesEditHeight;
 	int m_ppb;  // pixels per bar
 	int m_totalKeysToScroll;
 	int m_pianoKeysVisible;

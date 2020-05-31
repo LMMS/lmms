@@ -166,6 +166,7 @@ PianoRoll::PianoRoll() :
 	m_lastMouseX( 0 ),
 	m_lastMouseY( 0 ),
 	m_notesEditHeight( 100 ),
+	m_userSetNotesEditHeight(100),
 	m_ppb( DEFAULT_PR_PPB ),
 	m_keyLineHeight(DEFAULT_KEY_LINE_HEIGHT),
 	m_octaveHeight(m_keyLineHeight * KeysPerOctave),
@@ -2070,6 +2071,7 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 		}
 		// change m_notesEditHeight and then repaint
 		m_notesEditHeight = qMax(NOTE_EDIT_MIN_HEIGHT, newHeight);
+		m_userSetNotesEditHeight = m_notesEditHeight;
 		m_stepRecorderWidget.setBottomMargin(PR_BOTTOM_MARGIN + m_notesEditHeight);
 		updateScrollbars();
 		updatePositionLineHeight();
@@ -2682,28 +2684,40 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 		m_pianoKeysVisible = pianoArea / m_keyLineHeight;
 		partialKeyVisible = pianoArea % m_keyLineHeight;
 		// check if we're below the minimum key area size
-		if (m_pianoKeysVisible * m_keyLineHeight <= KEY_AREA_MIN_HEIGHT)
+		if (m_pianoKeysVisible * m_keyLineHeight < KEY_AREA_MIN_HEIGHT)
 		{
 			m_pianoKeysVisible = KEY_AREA_MIN_HEIGHT / m_keyLineHeight;
 			partialKeyVisible = KEY_AREA_MIN_HEIGHT % m_keyLineHeight;
+			// have to modifiy the notes edit area height instead
 			m_notesEditHeight = height() - KEY_AREA_MIN_HEIGHT - PR_TOP_MARGIN - PR_BOTTOM_MARGIN;
 		}
 		// check if we're trying to show more keys than available
 		else if (m_pianoKeysVisible >= NumKeys)
 		{
-			// always increase m_notesEditHeight to compensate
 			m_pianoKeysVisible = NumKeys;
+			// have to modify the notes edit area height instead
 			m_notesEditHeight = height() - (NumKeys * m_keyLineHeight) -
 				PR_TOP_MARGIN - PR_BOTTOM_MARGIN;
 			partialKeyVisible = 0;
 		}
 		topKey = qBound(0, m_startKey + m_pianoKeysVisible - 1, NumKeys - 1);
 		topNote = topKey % KeysPerOctave;
-		// if resizing the note edit area
+		// if not resizing the note edit area, we can change m_notesEditHeight
 		if (m_action != ActionResizeNoteEditArea && partialKeyVisible != 0)
 		{
-			// adding height always means we don't have to add keys
-			m_notesEditHeight += partialKeyVisible;
+			// calculate the height change adding and subtracting the partial key
+			int noteAreaPlus = (m_notesEditHeight + partialKeyVisible) - m_userSetNotesEditHeight;
+			int noteAreaMinus = m_userSetNotesEditHeight - (m_notesEditHeight - partialKeyVisible);
+			// if adding the partial key to height is more distant from the set height
+			// we want to subtract the partial key
+			if (noteAreaPlus > noteAreaMinus)
+			{
+				m_notesEditHeight -= partialKeyVisible;
+				// since we're adding a partial key, we add one to the number visible
+				m_pianoKeysVisible += 1;
+			}
+			// otherwise we add height
+			else { m_notesEditHeight += partialKeyVisible; }
 		}
 		updatePositionLineHeight();
 		int x, q = quantization(), tick;
@@ -2992,8 +3006,8 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 			width() - m_whiteKeyWidth,
 			height() - PR_TOP_MARGIN);
 
-		const int visible_keys = m_pianoKeysVisible; //( keyAreaBottom()-keyAreaTop() ) /
-							//m_keyLineHeight + 2;
+		const int topKey = qBound(0, m_startKey + m_pianoKeysVisible - 1, NumKeys - 1);
+		const int bottomKey = topKey - m_pianoKeysVisible;
 
 		QPolygonF editHandles;
 
@@ -3026,7 +3040,7 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 				}
 
 				// is the note in visible area?
-				if( key > 0 && key <= visible_keys )
+				if (note->key() > bottomKey && note->key() <= topKey)
 				{
 
 					// we've done and checked all, let's draw the note
@@ -3067,7 +3081,7 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 			}
 
 			// is the note in visible area?
-			if( key > 0 && key <= visible_keys )
+			if (note->key() > bottomKey && note->key() <= topKey)
 			{
 
 				// we've done and checked all, let's draw the note
@@ -3154,7 +3168,7 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 			}
 
 			// is the note in visible area?
-			if( key > 0 && key <= visible_keys )
+			if (note->key() > bottomKey && note->key() <= topKey)
 			{
 
 				// we've done and checked all, let's draw the note
