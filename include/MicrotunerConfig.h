@@ -28,7 +28,7 @@
 #include <QCloseEvent>
 #include <QLineEdit>
 #include <QMainWindow>
-#include <QTextEdit>
+#include <QPlainTextEdit>
 
 #include "AutomatableModel.h"
 #include "ComboBoxModel.h"
@@ -51,13 +51,16 @@ public:
 		return "MicrotunerConfig";
 	}
 
+public slots:
+	void updateScaleList(int index);
+	void updateKeymapList(int index);
+	void updateScaleForm();
+	void updateKeymapForm();
+
 protected:
 	void closeEvent(QCloseEvent *ce) override;
 
 private:
-	void updateScaleForm();
-	void updateKeymapForm();
-
 	bool validateScaleForm();
 	bool validateKeymapForm();
 
@@ -70,13 +73,14 @@ private:
 	QLineEdit *m_scaleNameEdit;				//!< edit field for the scale name or description
 	QLineEdit *m_keymapNameEdit;			//!< edit field for the keymap name or description
 
-	QTextEdit *m_scaleTextEdit;				//!< text editor field for interval definitions
-	QTextEdit *m_keymapTextEdit;			//!< text editor field for key mappings
+	QPlainTextEdit *m_scaleTextEdit;		//!< text editor field for interval definitions
+	QPlainTextEdit *m_keymapTextEdit;		//!< text editor field for key mappings
 
 	IntModel m_firstKeyModel;				//!< model for spinbox of currently edited first key
 	IntModel m_lastKeyModel;				//!< model for spinbox of currently edited last key
 	IntModel m_middleKeyModel;				//!< model for spinbox of currently edited middle key
 
+	IntModel m_baseKeyModel;				//!< model for spinbox of currently edited base key
 	FloatModel m_baseFreqModel;				//!< model for spinbox of currently edited base note frequency
 };
 

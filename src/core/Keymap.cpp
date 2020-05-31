@@ -24,19 +24,18 @@
 
 #include "Keymap.h"
 
+#include <QDomElement>
+
 
 Keymap::Keymap() :
-	m_description(tr("default (440 Hz, all keys)")),
+	m_description(tr("empty")),
 	m_firstKey(0),
-	m_lastKey(NumKeys - 1),
-	m_middleKey(0),
-	m_baseFreq(440.f)
+	m_lastKey(127),
+	m_middleKey(DefaultMiddleKey),
+	m_baseKey(DefaultBaseKey),
+	m_baseFreq(DefaultBaseFreq)
 {
-	// default 1:1 keyboard mapping
-	for (int i = 0; i < NumKeys; i++)
-	{
-		m_map.push_back(i);
-	}
+	m_map.push_back(-1);
 }
 
 
@@ -45,13 +44,15 @@ Keymap::Keymap(	QString description,
 				int newFirst,
 				int newLast,
 				int newMiddle,
-				float newBase) :
+				int newBaseKey,
+				float newBaseFreq) :
 	m_description(description),
 	m_map(newMap),
 	m_firstKey(newFirst),
 	m_lastKey(newLast),
 	m_middleKey(newMiddle),
-	m_baseFreq(newBase)
+	m_baseKey(newBaseKey),
+	m_baseFreq(newBaseFreq)
 {
 }
 
@@ -97,3 +98,43 @@ void Keymap::setDescription(QString description)
 	m_description = description;
 }
 
+
+void Keymap::saveSettings(QDomDocument &document, QDomElement &element)
+{
+	element.setAttribute("description", m_description);
+
+	element.setAttribute("first_key", m_firstKey);
+	element.setAttribute("last_key", m_lastKey);
+	element.setAttribute("middle_key", m_middleKey);
+	element.setAttribute("base_key", m_baseKey);
+	element.setAttribute("base_freq", m_baseFreq);
+
+    for (int i = 0; i < m_map.size(); i++)
+    {
+		QDomElement degree = document.createElement("degree");
+		element.appendChild(degree);
+        degree.setAttribute("value", m_map[i]);
+    }
+
+}
+
+
+void Keymap::loadSettings(const QDomElement &element)
+{
+	m_description = element.attribute("description");
+
+	m_firstKey	= element.attribute("first_key").toInt();
+	m_lastKey	= element.attribute("last_key").toInt();
+	m_middleKey	= element.attribute("middle_key").toInt();
+	m_baseKey	= element.attribute("base_key").toInt();
+	m_baseFreq	= element.attribute("base_freq").toDouble();
+
+	QDomNode node = element.firstChild();
+	m_map.clear();
+
+	for (int i = 0; !node.isNull(); i++)
+	{
+		m_map.push_back(node.toElement().attribute("value").toInt());
+		node = node.nextSibling();
+	}
+}

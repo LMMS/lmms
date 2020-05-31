@@ -24,23 +24,13 @@
 
 #include "Scale.h"
 
+#include <QDomElement>
+
 
 Scale::Scale() :
-	m_description(tr("default (12-TET)"))
+	m_description(tr("empty"))
 {
 	m_intervals.push_back(Interval(1, 1));
-	m_intervals.push_back(Interval(100.0));
-	m_intervals.push_back(Interval(200.0));
-	m_intervals.push_back(Interval(300.0));
-	m_intervals.push_back(Interval(400.0));
-	m_intervals.push_back(Interval(500.0));
-	m_intervals.push_back(Interval(600.0));
-	m_intervals.push_back(Interval(700.0));
-	m_intervals.push_back(Interval(800.0));
-	m_intervals.push_back(Interval(900.0));
-	m_intervals.push_back(Interval(1000.0));
-	m_intervals.push_back(Interval(1100.0));
-	m_intervals.push_back(Interval(2, 1));
 }
 
 Scale::Scale(QString description, std::vector<Interval> intervals) :
@@ -61,3 +51,45 @@ void Scale::setDescription(QString description)
 	m_description = description;
 }
 
+
+void Interval::saveSettings(QDomDocument &document, QDomElement &element)
+{
+	element.setAttribute("num", QString::number(m_numerator));
+	element.setAttribute("den", QString::number(m_denominator));
+}
+
+
+void Interval::loadSettings(const QDomElement &element)
+{
+	m_numerator = element.attribute("num").toDouble();
+	m_denominator = element.attribute("den").toULong();
+}
+
+
+void Scale::saveSettings(QDomDocument &document, QDomElement &element)
+{
+	element.setAttribute("description", m_description);
+
+    for (auto it = m_intervals.begin(); it != m_intervals.end(); it++)
+    {
+        (*it).saveState(document, element);
+    }
+
+}
+
+
+void Scale::loadSettings(const QDomElement &element)
+{
+	m_description = element.attribute("description");
+
+	QDomNode node = element.firstChild();
+	m_intervals.clear();
+
+	for (int i = 0; !node.isNull(); i++)
+	{
+		Interval temp;
+		temp.restoreState(node.toElement());
+		m_intervals.push_back(temp);
+		node = node.nextSibling();
+	}
+}

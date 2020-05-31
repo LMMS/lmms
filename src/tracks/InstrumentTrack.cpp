@@ -101,8 +101,8 @@ InstrumentTrack::InstrumentTrack( TrackContainer* tc ) :
 	m_silentBuffersProcessed( false ),
 	m_previewMode( false ),
 	m_baseNoteModel(0, 0, NumKeys - 1, this, tr("Base note")),
-	m_firstNoteModel(0, 0, NumKeys - 1, this, tr("First note")),
-	m_lastNoteModel(0, 0, NumKeys - 1, this, tr("Last note")),
+	m_firstKeyModel(0, 0, NumKeys - 1, this, tr("First note")),
+	m_lastKeyModel(0, 0, NumKeys - 1, this, tr("Last note")),
 	m_volumeModel( DefaultVolume, MinVolume, MaxVolume, 0.1f, this, tr( "Volume" ) ),
 	m_panningModel( DefaultPanning, PanningLeft, PanningRight, 0.1f, this, tr( "Panning" ) ),
 	m_audioPort( tr( "unnamed_track" ), true, &m_volumeModel, &m_panningModel, &m_mutedModel ),
@@ -115,16 +115,13 @@ InstrumentTrack::InstrumentTrack( TrackContainer* tc ) :
 	m_arpeggio( this ),
 	m_noteStacking( this ),
 	m_piano( this ),
-	m_microtuner(this),
-	m_scaleModel(this, tr("Selected scale")),
-	m_keymapModel(this, tr("Selected keyboard mapping")),
-	m_keyRangeImportModel(true)
+	m_microtuner(this)
 {
 	m_pitchModel.setCenterValue( 0 );
 	m_panningModel.setCenterValue( DefaultPanning );
 	m_baseNoteModel.setInitValue( DefaultKey );
-	m_firstNoteModel.setInitValue(0);
-	m_lastNoteModel.setInitValue(NumKeys - 1);
+	m_firstKeyModel.setInitValue(0);
+	m_lastKeyModel.setInitValue(NumKeys - 1);
 
 	m_effectChannelModel.setRange( 0, Engine::fxMixer()->numChannels()-1, 1);
 
@@ -134,23 +131,11 @@ InstrumentTrack::InstrumentTrack( TrackContainer* tc ) :
 		m_runningMidiNotes[i] = 0;
 	}
 
-	for (unsigned int i = 0; i < MaxScaleCount; i++)
-	{
-		m_scaleModel.addItem(QString::number(i) + ": " + Engine::getSong()->getScale(i)->getDescription());
-	}
-
-	for (unsigned int i = 0; i < MaxKeymapCount; i++)
-	{
-		m_keymapModel.addItem(QString::number(i) + ": " + Engine::getSong()->getKeymap(i)->getDescription());
-	}
-
 	setName( tr( "Default preset" ) );
 
 	connect(&m_baseNoteModel, SIGNAL(dataChanged()), this, SLOT(updateBaseNote()), Qt::DirectConnection);
-	connect(&m_firstNoteModel, SIGNAL(dataChanged()), this, SLOT(updateFirstNote()), Qt::DirectConnection);
-	connect(&m_lastNoteModel, SIGNAL(dataChanged()), this, SLOT(updateLastNote()), Qt::DirectConnection);
-	connect(Engine::getSong(), SIGNAL(scaleListChanged(int)), this, SLOT(updateScaleList(int)), Qt::DirectConnection);
-	connect(Engine::getSong(), SIGNAL(keymapListChanged(int)), this, SLOT(updateKeymapList(int)), Qt::DirectConnection);
+	connect(&m_firstKeyModel, SIGNAL(dataChanged()), this, SLOT(updateFirstNote()), Qt::DirectConnection);
+	connect(&m_lastKeyModel, SIGNAL(dataChanged()), this, SLOT(updateLastNote()), Qt::DirectConnection);
 	connect(&m_pitchModel, SIGNAL(dataChanged()), this, SLOT(updatePitch()), Qt::DirectConnection);
 	connect(&m_pitchRangeModel, SIGNAL(dataChanged()), this, SLOT(updatePitchRange()), Qt::DirectConnection);
 	connect(&m_effectChannelModel, SIGNAL(dataChanged()), this, SLOT(updateEffectChannel()), Qt::DirectConnection);
@@ -161,17 +146,17 @@ int InstrumentTrack::baseNote() const
 {
 	int mp = m_useMasterPitchModel.value() ? Engine::getSong()->masterPitch() : 0;
 
-	return m_baseNoteModel.value() - mp;
+	return m_microtuner.baseKey() - mp;
 }
 
-int InstrumentTrack::firstNote() const
+int InstrumentTrack::firstKey() const
 {
-	return m_firstNoteModel.value();
+	return m_microtuner.firstKey();
 }
 
-int InstrumentTrack::lastNote() const
+int InstrumentTrack::lastKey() const
 {
-	return m_lastNoteModel.value();
+	return m_microtuner.lastKey();
 }
 
 
@@ -287,7 +272,7 @@ void InstrumentTrack::processInEvent( const MidiEvent& event, const MidiTime& ti
 			if( event.velocity() > 0 )
 			{
 				// play a note only if it is not already playing and if it is within configured bounds
-				if (m_notes[event.key()] == NULL && event.key() >= firstNote() && event.key() <= lastNote())
+				if (m_notes[event.key()] == NULL && event.key() >= firstKey() && event.key() <= lastKey())
 				{
 					NotePlayHandle* nph =
 						NotePlayHandleManager::acquire(
@@ -788,6 +773,7 @@ void InstrumentTrack::saveTrackSpecificSettings( QDomDocument& doc, QDomElement 
 	m_effectChannelModel.saveSettings( doc, thisElement, "fxch" );
 	m_baseNoteModel.saveSettings( doc, thisElement, "basenote" );
 	m_useMasterPitchModel.saveSettings( doc, thisElement, "usemasterpitch");
+	m_microtuner.saveSettings(doc, thisElement);
 
 	if( m_instrument != NULL )
 	{
@@ -837,6 +823,7 @@ void InstrumentTrack::loadTrackSpecificSettings( const QDomElement & thisElement
 	}
 	m_baseNoteModel.loadSettings( thisElement, "basenote" );
 	m_useMasterPitchModel.loadSettings( thisElement, "usemasterpitch");
+	m_microtuner.loadSettings(thisElement);
 
 	// clear effect-chain just in case we load an old preset without FX-data
 	m_audioPort.effects()->clear();
@@ -953,49 +940,6 @@ Instrument * InstrumentTrack::loadInstrument(const QString & _plugin_name,
 	return m_instrument;
 }
 
-
-
-/**
- * \brief Update scale name displayed in the microtuner scale list.
- * \param index Index of the scale to update; update all scales if -1 or out of range.
- */
-void InstrumentTrack::updateScaleList(int index)
-{
-	if (index >= 0 && index < MaxScaleCount)
-	{
-		m_scaleModel.replaceItem(index,
-			QString::number(index) + ": " + Engine::getSong()->getScale(index)->getDescription());
-	}
-	else
-	{
-		for (int i = 0; i < MaxScaleCount; i++)
-		{
-			m_scaleModel.replaceItem(i,
-				QString::number(i) + ": " + Engine::getSong()->getScale(i)->getDescription());
-		}
-	}
-}
-
-/**
- * \brief Update keymap name displayed in the microtuner scale list.
- * \param index Index of the keymap to update; update all keymaps if -1 or out of range.
- */
-void InstrumentTrack::updateKeymapList(int index)
-{
-	if (index >= 0 && index < MaxKeymapCount)
-	{
-		m_keymapModel.replaceItem(index,
-			QString::number(index) + ": " + Engine::getSong()->getKeymap(index)->getDescription());
-	}
-	else
-	{
-		for (int i = 0; i < MaxKeymapCount; i++)
-		{
-			m_keymapModel.replaceItem(i,
-				QString::number(i) + ": " + Engine::getSong()->getKeymap(i)->getDescription());
-		}
-	}
-}
 
 
 
@@ -1672,10 +1616,10 @@ void InstrumentTrackWindow::modelChanged()
 	m_midiView->setModel( &m_track->m_midiPort );
 	m_effectView->setModel( m_track->m_audioPort.effects() );
 	m_miscView->pitchGroupBox()->setModel(&m_track->m_useMasterPitchModel);
-	m_miscView->microtunerGroupBox()->setModel(m_track->microtunerModel()->enabledModel());
-	m_miscView->scaleCombo()->setModel(m_track->scaleModel());
-	m_miscView->keymapCombo()->setModel(m_track->keymapModel());
-	m_miscView->rangeImportCheckbox()->setModel(m_track->keyRangeImportModel());
+	m_miscView->microtunerGroupBox()->setModel(m_track->m_microtuner.enabledModel());
+	m_miscView->scaleCombo()->setModel(m_track->m_microtuner.scaleModel());
+	m_miscView->keymapCombo()->setModel(m_track->m_microtuner.keymapModel());
+	m_miscView->rangeImportCheckbox()->setModel(m_track->m_microtuner.keyRangeImportModel());
 	updateName();
 }
 

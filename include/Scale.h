@@ -30,10 +30,12 @@
 #include <QObject>
 #include <QString>
 
+#include "SerializingObject.h"
 
-class Interval
+class Interval : public SerializingObject
 {
 public:
+	Interval() : m_numerator(1), m_denominator(1) {};
 	Interval(double cents) : m_numerator(cents), m_denominator(0) {};
 	Interval(unsigned long numerator, unsigned long denominator) :
 		m_numerator(numerator),
@@ -51,6 +53,10 @@ public:
 		else {return QString().sprintf("%0.1f", m_numerator);}
 	}
 
+	void saveSettings(QDomDocument &doc, QDomElement &element) override;
+	void loadSettings(const QDomElement &element) override;
+	inline QString nodeName() const override {return "interval";}
+
 private:
 	// Scala specifies that numerators and denominators should go at least up to 2147483647;
 	// that is 10 significant digits (→ needs double) and 32 bits signed (→ needs long).
@@ -59,7 +65,7 @@ private:
 };
 
 
-class Scale : public QObject
+class Scale : public QObject, public SerializingObject
 {
 	Q_OBJECT
 public:
@@ -71,6 +77,10 @@ public:
 
 	const std::vector<Interval> &getIntervals() const {return m_intervals;}
 	void setIntervals(std::vector<Interval> input) {m_intervals = input;}
+
+	void saveSettings(QDomDocument &doc, QDomElement &element) override;
+	void loadSettings(const QDomElement &element) override;
+	inline QString nodeName() const override {return "scale";}
 
 private:
 	QString m_description;					//!< name or description of the scale

@@ -49,8 +49,8 @@ const float F_PI_SQR = (float) LD_PI_SQR;
 const float F_E = (float) LD_E;
 const float F_E_R = (float) LD_E_R;
 
-const float DefaultBaseFreq = 440.f;	//!< default base note frequency
 
+// Microtuner
 const unsigned int MaxScaleCount = 10;	//!< number of scales per projects
 const unsigned int MaxKeymapCount = 10;	//!< number of keyboard mappings per project
 

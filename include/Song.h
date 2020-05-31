@@ -344,8 +344,8 @@ public:
 
 	std::shared_ptr<const Scale> getScale(unsigned int index) const;
 	std::shared_ptr<const Keymap> getKeymap(unsigned int index) const;
-	void setScale(unsigned int index, std::shared_ptr<const Scale> newScale);
-	void setKeymap(unsigned int index, std::shared_ptr<const Keymap> newMap);
+	void setScale(unsigned int index, std::shared_ptr<Scale> newScale);
+	void setKeymap(unsigned int index, std::shared_ptr<Keymap> newMap);
 
 public slots:
 	void playSong();
@@ -413,6 +413,12 @@ private:
 
 	void removeAllControllers();
 
+	void saveScaleStates(QDomDocument &doc, QDomElement &element);
+	void restoreScaleStates(const QDomElement &element);
+
+	void saveKeymapStates(QDomDocument &doc, QDomElement &element);
+	void restoreKeymapStates(const QDomElement &element);
+
 	void processAutomations(const TrackList& tracks, MidiTime timeStart, fpp_t frames);
 
 	void setModified(bool value);
@@ -472,8 +478,8 @@ private:
 	MidiTime m_exportSongEnd;
 	MidiTime m_exportEffectiveLength;
 
-	std::shared_ptr<const Scale> m_scales[MaxScaleCount];
-	std::shared_ptr<const Keymap> m_keymaps[MaxKeymapCount];
+	std::shared_ptr<Scale> m_scales[MaxScaleCount];
+	std::shared_ptr<Keymap> m_keymaps[MaxKeymapCount];
 
 	friend class LmmsCore;
 	friend class SongEditor;

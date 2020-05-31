@@ -30,8 +30,9 @@
 #include <QString>
 
 #include "Note.h"
+#include "SerializingObject.h"
 
-class Keymap : public QObject
+class Keymap : public QObject, public SerializingObject
 {
 	Q_OBJECT
 public:
@@ -41,7 +42,8 @@ public:
 			int newFirst,
 			int newLast,
 			int newMiddle,
-			float newBase);
+			int newBaseKey,
+			float newBaseFreq);
 
 	QString getDescription() const;
 	void setDescription(QString description);
@@ -49,12 +51,17 @@ public:
 	int getMiddleKey() const {return m_middleKey;}
 	int getFirstKey() const {return m_firstKey;}
 	int getLastKey() const {return m_lastKey;}
+	int getBaseKey() const {return m_baseKey;}
 	float getBaseFreq() const {return m_baseFreq;}
 
 	int getSize() const {return m_map.size();}
 	int getDegree(int key) const;
 	int getOctave(int key) const;
 	const std::vector<int> &getMap() const {return m_map;}
+
+    void saveSettings(QDomDocument &doc, QDomElement &element) override;
+    void loadSettings(const QDomElement &element) override;
+	inline QString nodeName() const override {return "keymap";}
 
 private:
 	QString m_description;				//!< name or description of the keymap
@@ -63,6 +70,7 @@ private:
 	int m_firstKey;						//!< first key that will be mapped
 	int m_lastKey;						//!< last key that will be mapped
 	int m_middleKey;					//!< first line of the map refers to this key
+	int m_baseKey;						//!< key which is assigned the reference "base note"
 	float m_baseFreq;					//!< frequency of the base note (usually A4 @440 Hz)
 };
 

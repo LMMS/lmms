@@ -2906,8 +2906,8 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 	int last_key;
 	if (hasValidPattern())
 	{
-		first_key = m_pattern->instrumentTrack()->firstNote();
-		last_key = m_pattern->instrumentTrack()->lastNote();
+		first_key = m_pattern->instrumentTrack()->firstKey();
+		last_key = m_pattern->instrumentTrack()->lastKey();
 	}
 	else
 	{

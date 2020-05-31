@@ -47,8 +47,9 @@ MicrotunerConfig::MicrotunerConfig() :
 	m_keymapComboModel(NULL, tr("Selected keymap")),
 	m_firstKeyModel(0, 0, NumKeys - 1, NULL, tr("First key")),
 	m_lastKeyModel(NumKeys - 1, 0, NumKeys - 1, NULL, tr("Last key")),
-	m_middleKeyModel(60, 0, NumKeys - 1, NULL, tr("Middle key")),
-	m_baseFreqModel(440.f, 0.1f, 9999.999f, 0.001f, NULL, tr("Base note frequency"))
+	m_middleKeyModel(DefaultMiddleKey, 0, NumKeys - 1, NULL, tr("Middle key")),
+	m_baseKeyModel(DefaultBaseKey, 0, NumKeys - 1, NULL, tr("Base key")),
+	m_baseFreqModel(DefaultBaseFreq, 0.1f, 9999.999f, 0.001f, NULL, tr("Base note frequency"))
 {
 	setWindowIcon(embed::getIconPixmap("microtuner"));
 	setWindowTitle(tr("Microtuner"));
@@ -84,14 +85,13 @@ MicrotunerConfig::MicrotunerConfig() :
 	microtunerLayout->addWidget(scaleLoadButton, 3, 0, 1, 1);
 	microtunerLayout->addWidget(scaleSaveButton, 3, 1, 1, 1);
 
-	m_scaleTextEdit = new QTextEdit();
-	m_scaleTextEdit->setAcceptRichText(false);
+	m_scaleTextEdit = new QPlainTextEdit();
 	m_scaleTextEdit->setPlainText("100.0\n200.0\n300.0\n400.0\n500.0\n600.0\n700.0\n800.0\n900.0\n1000.0\n1100.0\n1200.0");
 	m_scaleTextEdit->setToolTip(tr("Enter intervals on separate lines. Numbers containing a decimal point are treated as cents.\nOther inputs are treated as integer ratios and must be in the form of \'a/b\' or \'a\'.\nUnity (0.0 cents or ratio 1/1) is always present as a hidden first value; do not enter it manually."));
-	microtunerLayout->addWidget(m_scaleTextEdit, 4, 0, 5, 2, Qt::AlignLeft | Qt::AlignTop);
+	microtunerLayout->addWidget(m_scaleTextEdit, 4, 0, 2, 2, Qt::AlignLeft | Qt::AlignTop);
 
 	QPushButton *applyScaleButton = new QPushButton(tr("Apply scale"));
-	microtunerLayout->addWidget(applyScaleButton, 9, 0, 1, 2);
+	microtunerLayout->addWidget(applyScaleButton, 6, 0, 1, 2);
 	connect(applyScaleButton, &QPushButton::clicked, [=] {applyScale();});
 
 	// ----------------------------------
@@ -119,46 +119,57 @@ MicrotunerConfig::MicrotunerConfig() :
 	microtunerLayout->addWidget(keymapLoadButton, 3, 2, 1, 1);
 	microtunerLayout->addWidget(keymapSaveButton, 3, 3, 1, 1);
 
-	m_keymapTextEdit = new QTextEdit();
-	m_keymapTextEdit->setAcceptRichText(false);
+	m_keymapTextEdit = new QPlainTextEdit();
 	m_keymapTextEdit->setPlainText("0\n1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11");
 	m_keymapTextEdit->setToolTip(tr("Enter key mappings on separate lines. Each line assigns a scale degree to a MIDI key,\nstarting with the middle key and continuing in sequence.\nThe pattern repeats for keys outside of the explicit keymap range.\nMultiple keys can be mapped to the same scale degree.\nEnter \'x\' if you wish to leave the key disabled / not mapped."));
 	microtunerLayout->addWidget(m_keymapTextEdit, 4, 2, 1, 2, Qt::AlignRight | Qt::AlignTop);
 
 	// Mapping ranges
 	QGridLayout *keymapRangeLayout = new QGridLayout();
-	microtunerLayout->addLayout(keymapRangeLayout, 5, 2, 2, 2, Qt::AlignCenter | Qt::AlignTop);
+	microtunerLayout->addLayout(keymapRangeLayout, 5, 2, 1, 2, Qt::AlignCenter | Qt::AlignTop);
 
 	LcdSpinBox *firstKeySpin = new LcdSpinBox(3, NULL, tr("First key"));
 	firstKeySpin->setLabel(tr("FIRST"));
 	firstKeySpin->setToolTip(tr("First MIDI key that will be mapped"));
 	firstKeySpin->setModel(&m_firstKeyModel);
-	keymapRangeLayout->addWidget(firstKeySpin, 1, 0);
+	keymapRangeLayout->addWidget(firstKeySpin, 0, 0);
 
 	LcdSpinBox *lastKeySpin = new LcdSpinBox(3, NULL, tr("Last key"));
 	lastKeySpin->setLabel(tr("LAST"));
 	lastKeySpin->setToolTip(tr("Last MIDI key that will be mapped"));
 	lastKeySpin->setModel(&m_lastKeyModel);
-	keymapRangeLayout->addWidget(lastKeySpin, 1, 1);
+	keymapRangeLayout->addWidget(lastKeySpin, 0, 1);
 
 	LcdSpinBox *middleKeySpin = new LcdSpinBox(3, NULL, tr("Middle key"));
 	middleKeySpin->setLabel(tr("MIDDLE"));
 	middleKeySpin->setToolTip(tr("First line in the keymap refers to this MIDI key"));
 	middleKeySpin->setModel(&m_middleKeyModel);
-	keymapRangeLayout->addWidget(middleKeySpin, 1, 2);
+	keymapRangeLayout->addWidget(middleKeySpin, 0, 2);
+
+	LcdSpinBox *baseKeySpin = new LcdSpinBox(3, NULL, tr("Base key"));
+	baseKeySpin->setLabel(tr("BASE N."));
+	baseKeySpin->setToolTip(tr("Base note frequency will be assigned to this MIDI key"));
+	baseKeySpin->setModel(&m_baseKeyModel);
+	keymapRangeLayout->addWidget(baseKeySpin, 1, 0);
 
 	LcdFloatSpinBox *baseFreqSpin = new LcdFloatSpinBox(4, 3, NULL, tr("Base note frequency"));
 	baseFreqSpin->setLabel(tr("BASE NOTE FREQ"));
 	baseFreqSpin->setModel(&m_baseFreqModel);
 	baseFreqSpin->setToolTip(tr("Base note frequency"));
-	microtunerLayout->addWidget(baseFreqSpin, 8, 2, 1, 2, Qt::AlignCenter);
+	keymapRangeLayout->addWidget(baseFreqSpin, 1, 1, 1, 2);
 
 	QPushButton *applyKeymapButton = new QPushButton(tr("Apply keymap"));
-	microtunerLayout->addWidget(applyKeymapButton, 9, 2, 1, 2);
+	microtunerLayout->addWidget(applyKeymapButton, 6, 2, 1, 2);
 	connect(applyKeymapButton, &QPushButton::clicked, [=] {applyKeymap();});
 
 	updateScaleForm();
 	updateKeymapForm();
+	connect(Engine::getSong(), SIGNAL(scaleListChanged(int)), this, SLOT(updateScaleList(int)), Qt::DirectConnection);
+	connect(Engine::getSong(), SIGNAL(scaleListChanged(int)), this, SLOT(updateScaleForm()), Qt::DirectConnection);
+	connect(Engine::getSong(), SIGNAL(keymapListChanged(int)), this, SLOT(updateKeymapList(int)), Qt::DirectConnection);
+	connect(Engine::getSong(), SIGNAL(keymapListChanged(int)), this, SLOT(updateKeymapForm()), Qt::DirectConnection);
+
+	microtunerLayout->setRowStretch(4, 10);
 	this->setLayout(microtunerLayout);
 
 	// Add to the main window and setup fixed size etc.
@@ -177,6 +188,50 @@ MicrotunerConfig::MicrotunerConfig() :
 
 
 /**
+ * \brief Update list of available scales.
+ * \param index Index of the scale to update; update all scales if -1 or out of range.
+ */
+void MicrotunerConfig::updateScaleList(int index)
+{
+	if (index >= 0 && index < MaxScaleCount)
+	{
+		m_scaleComboModel.replaceItem(index,
+			QString::number(index) + ": " + Engine::getSong()->getScale(index)->getDescription());
+	}
+	else
+	{
+		for (int i = 0; i < MaxScaleCount; i++)
+		{
+			m_scaleComboModel.replaceItem(i,
+				QString::number(i) + ": " + Engine::getSong()->getScale(i)->getDescription());
+		}
+	}
+}
+
+
+/**
+ * \brief Update list of available keymaps.
+ * \param index Index of the keymap to update; update all keymaps if -1 or out of range.
+ */
+void MicrotunerConfig::updateKeymapList(int index)
+{
+	if (index >= 0 && index < MaxKeymapCount)
+	{
+		m_keymapComboModel.replaceItem(index,
+			QString::number(index) + ": " + Engine::getSong()->getKeymap(index)->getDescription());
+	}
+	else
+	{
+		for (int i = 0; i < MaxKeymapCount; i++)
+		{
+			m_keymapComboModel.replaceItem(i,
+				QString::number(i) + ": " + Engine::getSong()->getKeymap(i)->getDescription());
+		}
+	}
+}
+
+
+/**
  * \brief Fill all the scale-related values based on currently selected scale
  */
 void MicrotunerConfig::updateScaleForm()
@@ -189,11 +244,11 @@ void MicrotunerConfig::updateScaleForm()
 	m_scaleNameEdit->setText(newScale->getDescription());
 
 	// fill in the intervals
-	m_scaleTextEdit->setText("");
+	m_scaleTextEdit->setPlainText("");
 	const std::vector<Interval> &intervals = newScale->getIntervals();
 	for (unsigned int i = 1; i < intervals.size(); i++)
 	{
-		m_scaleTextEdit->append(intervals[i].getString());
+		m_scaleTextEdit->appendPlainText(intervals[i].getString());
 	}
 	// scroll back to the top
 	QTextCursor tmp = m_scaleTextEdit->textCursor();
@@ -214,12 +269,12 @@ void MicrotunerConfig::updateKeymapForm()
 
 	m_keymapNameEdit->setText(newMap->getDescription());
 
-	m_keymapTextEdit->setText("");
+	m_keymapTextEdit->setPlainText("");
 	const std::vector<int> &map = newMap->getMap();
 	for (unsigned int i = 0; i < map.size(); i++)
 	{
-		if (map[i] >= 0) {m_keymapTextEdit->append(QString::number(map[i]));}
-		else {m_keymapTextEdit->append("x");}
+		if (map[i] >= 0) {m_keymapTextEdit->appendPlainText(QString::number(map[i]));}
+		else {m_keymapTextEdit->appendPlainText("x");}
 	}
 	QTextCursor tmp = m_keymapTextEdit->textCursor();
 	tmp.movePosition(QTextCursor::Start);
@@ -228,7 +283,7 @@ void MicrotunerConfig::updateKeymapForm()
 	m_firstKeyModel.setValue(newMap->getFirstKey());
 	m_lastKeyModel.setValue(newMap->getLastKey());
 	m_middleKeyModel.setValue(newMap->getMiddleKey());
-
+	m_baseKeyModel.setValue(newMap->getBaseKey());
 	m_baseFreqModel.setValue(newMap->getBaseFreq());
 }
 
@@ -345,8 +400,6 @@ bool MicrotunerConfig::applyScale()
 
 	auto newScale = std::make_shared<Scale>(m_scaleNameEdit->text(), newIntervals);
 	song->setScale(m_scaleComboModel.value(), newScale);
-	m_scaleComboModel.replaceItem(m_scaleComboModel.value(),
-		QString::number(m_scaleComboModel.value()) + ": " + m_scaleNameEdit->text());
 
 	return true;
 }
@@ -380,10 +433,12 @@ bool MicrotunerConfig::applyKeymap()
 											  m_firstKeyModel.value(),
 											  m_lastKeyModel.value(),
 											  m_middleKeyModel.value(),
+											  m_baseKeyModel.value(),
 											  m_baseFreqModel.value());
 	song->setKeymap(m_keymapComboModel.value(), newKeymap);
-	m_keymapComboModel.replaceItem(m_keymapComboModel.value(),
-		QString::number(m_keymapComboModel.value()) + ": " + m_keymapNameEdit->text());
+
+	if (newKeymap->getDegree(newKeymap->getBaseKey()) == -1) {
+		QMessageBox::warning(this, tr("Invalid keymap"), "Base key is not mapped to any scale degree. No sound will be produced as there is no way to assign reference frequency to any note.");}
 
 	return true;
 }

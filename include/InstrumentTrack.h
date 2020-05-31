@@ -173,43 +173,28 @@ public:
 		return &m_baseNoteModel;
 	}
 
-	IntModel *firstNoteModel()
+	IntModel *firstKeyModel()
 	{
-		return &m_firstNoteModel;
+		return &m_firstKeyModel;
 	}
 
-	IntModel *lastNoteModel()
+	IntModel *lastKeyModel()
 	{
-		return &m_lastNoteModel;
+		return &m_lastKeyModel;
 	}
 
 	int baseNote() const;
-	int firstNote() const;
-	int lastNote() const;
+	int firstKey() const;
+	int lastKey() const;
 
 	Piano *pianoModel()
 	{
 		return &m_piano;
 	}
 
-	Microtuner *microtunerModel()
+	Microtuner *microtuner()
 	{
 		return &m_microtuner;
-	}
-
-	ComboBoxModel *scaleModel()
-	{
-		return &m_scaleModel;
-	}
-
-	ComboBoxModel *keymapModel()
-	{
-		return &m_keymapModel;
-	}
-
-	BoolModel *keyRangeImportModel()
-	{
-		return &m_keyRangeImportModel;
 	}
 
 	bool isArpeggioEnabled() const
@@ -275,8 +260,6 @@ protected slots:
 	void updateBaseNote();
 	void updateFirstNote();
 	void updateLastNote();
-	void updateScaleList(int index);
-	void updateKeymapList(int index);
 	void updatePitch();
 	void updatePitchRange();
 	void updateEffectChannel();
@@ -298,8 +281,8 @@ private:
 	bool m_previewMode;
 
 	IntModel m_baseNoteModel;	//! The "A4" or "440 Hz" key (default 69)
-	IntModel m_firstNoteModel;	//! First key the instrument reacts to
-	IntModel m_lastNoteModel;	//! Last key the instrument reacts to
+	IntModel m_firstKeyModel;	//! First key the instrument reacts to
+	IntModel m_lastKeyModel;	//! Last key the instrument reacts to
 
 	NotePlayHandleList m_processHandles;
 
@@ -313,7 +296,6 @@ private:
 	IntModel m_effectChannelModel;
 	BoolModel m_useMasterPitchModel;
 
-
 	Instrument * m_instrument;
 	InstrumentSoundShaping m_soundShaping;
 	InstrumentFunctionArpeggio m_arpeggio;
@@ -322,10 +304,6 @@ private:
 	Piano m_piano;
 
 	Microtuner m_microtuner;
-	ComboBoxModel m_scaleModel;
-	ComboBoxModel m_keymapModel;
-	BoolModel m_keyRangeImportModel;
-
 
 	friend class InstrumentTrackView;
 	friend class InstrumentTrackWindow;

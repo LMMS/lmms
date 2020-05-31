@@ -295,8 +295,8 @@ void PianoView::modelChanged()
 	if (m_piano != NULL)
 	{
 		connect(m_piano->instrumentTrack()->baseNoteModel(), SIGNAL(dataChanged()), this, SLOT(update()));
-		connect(m_piano->instrumentTrack()->firstNoteModel(), SIGNAL(dataChanged()), this, SLOT(update()));
-		connect(m_piano->instrumentTrack()->lastNoteModel(), SIGNAL(dataChanged()), this, SLOT(update()));
+		connect(m_piano->instrumentTrack()->firstKeyModel(), SIGNAL(dataChanged()), this, SLOT(update()));
+		connect(m_piano->instrumentTrack()->lastKeyModel(), SIGNAL(dataChanged()), this, SLOT(update()));
 	}
 }
 
@@ -407,8 +407,8 @@ void PianoView::contextMenuEvent(QContextMenuEvent *me)
 	IntModel *noteModel;
 	int key = getKeyFromMouse(me->pos());
 	int base = m_piano->instrumentTrack()->baseNote();
-	int first = m_piano->instrumentTrack()->firstNote();
-	int last = m_piano->instrumentTrack()->lastNote();
+	int first = m_piano->instrumentTrack()->firstKey();
+	int last = m_piano->instrumentTrack()->lastKey();
 
 	if (abs(key - base) < abs(key - first) && abs(key - base) < abs(key - last))
 	{
@@ -418,12 +418,12 @@ void PianoView::contextMenuEvent(QContextMenuEvent *me)
 	else if (abs(key - first) < abs(key - last))
 	{
 		title = tr("First note");
-		noteModel = m_piano->instrumentTrack()->firstNoteModel();
+		noteModel = m_piano->instrumentTrack()->firstKeyModel();
 	}
 	else
 	{
 		title = tr("Last note");
-		noteModel = m_piano->instrumentTrack()->lastNoteModel();
+		noteModel = m_piano->instrumentTrack()->lastKeyModel();
 	}
 
 	CaptionMenu contextMenu(title);
@@ -484,8 +484,8 @@ void PianoView::mousePressEvent(QMouseEvent *me)
 		{
 			// upper section, move or drag the base / first / last note marker
 			int base = m_piano->instrumentTrack()->baseNote();
-			int first = m_piano->instrumentTrack()->firstNote();
-			int last = m_piano->instrumentTrack()->lastNote();
+			int first = m_piano->instrumentTrack()->firstKey();
+			int last = m_piano->instrumentTrack()->lastKey();
 
 			// move the model whose marker is closest to the pressed key
 			if (abs(key_num - base) < abs(key_num - first) && abs(key_num - base) < abs(key_num - last))
@@ -494,11 +494,11 @@ void PianoView::mousePressEvent(QMouseEvent *me)
 			}
 			else if (abs(key_num - first) < abs(key_num - last))
 			{
-				m_movedNoteModel = m_piano->instrumentTrack()->firstNoteModel();
+				m_movedNoteModel = m_piano->instrumentTrack()->firstKeyModel();
 			}
 			else
 			{
-				m_movedNoteModel = m_piano->instrumentTrack()->lastNoteModel();
+				m_movedNoteModel = m_piano->instrumentTrack()->lastKeyModel();
 			}
 
 			if (me->modifiers() & Qt::ControlModifier)
@@ -836,8 +836,8 @@ void PianoView::paintEvent( QPaintEvent * )
 
 	// Draw the base note marker and first / last note boundary markers
 	const int base_key = (m_piano != NULL) ? m_piano->instrumentTrack()->baseNoteModel()->value() : 0;
-	const int first_key = (m_piano != NULL) ? m_piano->instrumentTrack()->firstNoteModel()->value() : 0;
-	const int last_key = (m_piano != NULL) ? m_piano->instrumentTrack()->lastNoteModel()->value() : 0;
+	const int first_key = (m_piano != NULL) ? m_piano->instrumentTrack()->firstKeyModel()->value() : 0;
+	const int last_key = (m_piano != NULL) ? m_piano->instrumentTrack()->lastKeyModel()->value() : 0;
 	QColor marker_color = QApplication::palette().color(QPalette::Active, QPalette::BrightText);
 
 	// - prepare triangle shapes for start / end markers
