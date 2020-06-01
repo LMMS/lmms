@@ -181,6 +181,7 @@ PianoRoll::PianoRoll() :
 	m_lenOfNewNotes( MidiTime( 0, DefaultTicksPerBar/4 ) ),
 	m_lastNoteVolume( DefaultVolume ),
 	m_lastNotePanning( DefaultPanning ),
+	m_minResizeLen( 0 ),
 	m_startKey( INITIAL_START_KEY ),
 	m_lastKey( 0 ),
 	m_editMode( ModeDraw ),
@@ -1010,8 +1011,8 @@ void PianoRoll::drawNoteRect( QPainter & p, int x, int y,
 			int const distanceToBorder = 2;
 			int const xOffset = borderWidth + distanceToBorder;
 
-			// noteTextHeight, textSize are not suitable for determining vertical spacing, 
-			// capHeight() can be used for this, but requires Qt 5.8. 
+			// noteTextHeight, textSize are not suitable for determining vertical spacing,
+			// capHeight() can be used for this, but requires Qt 5.8.
 			// We use boundingRect() with QChar (the QString version returns wrong value).
 			QRect const boundingRect = fontMetrics.boundingRect(QChar::fromLatin1('H'));
 			int const yOffset = (noteHeight - boundingRect.top() - boundingRect.bottom()) / 2;
@@ -1772,9 +1773,13 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 					// then resize the note
 					m_action = ActionResizeNote;
 
+					m_minResizeLen = quantization();
 					for (Note *note : getSelectedNotes())
 					{
-					    if (note->oldLength() <= 0) { note->setOldLength(4); }
+						if (note->oldLength() <= 0) { note->setOldLength(4); }
+						int thisMin = note->oldLength() % quantization();
+						if (thisMin == 0) { thisMin = quantization(); }
+						if (thisMin < m_minResizeLen) { m_minResizeLen = thisMin; }
 					}
 
 					// set resize-cursor
@@ -2813,13 +2818,14 @@ void PianoRoll::dragNotes( int x, int y, bool alt, bool shift, bool ctrl )
 		else
 		{
 			// shift is not pressed; stretch length of selected notes but not their position
+			int minLength = alt ? 1 : m_minResizeLen.getTicks();
+
 			for (Note *note : notes)
 			{
 				if (note->selected())
 				{
-					int newLength = note->oldLength() + off_ticks;
-					newLength = qMax(1, newLength);
-					note->setLength( MidiTime(newLength) );
+					int newLength = qMax(minLength, note->oldLength() + off_ticks);
+					note->setLength(MidiTime(newLength));
 
 					m_lenOfNewNotes = note->length();
 				}
