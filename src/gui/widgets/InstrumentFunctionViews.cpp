@@ -112,7 +112,7 @@ InstrumentFunctionArpeggioView::InstrumentFunctionArpeggioView( InstrumentFuncti
 	QGridLayout* mainLayout = new QGridLayout( m_arpGroupBox );
 	mainLayout->setContentsMargins( 8, 18, 8, 8 );
 	mainLayout->setColumnStretch( 0, 1 );
-	mainLayout->setHorizontalSpacing( 8 );
+	mainLayout->setHorizontalSpacing( 12 );
 	mainLayout->setVerticalSpacing( 1 );
 
 	m_arpRangeKnob->setLabel( tr( "RANGE" ) );
@@ -167,14 +167,14 @@ InstrumentFunctionArpeggioView::InstrumentFunctionArpeggioView( InstrumentFuncti
 	mainLayout->addWidget( arpModeLabel, 6, 0 );
 	mainLayout->addWidget( m_arpModeComboBox, 7, 0 );
 
-	mainLayout->addWidget( m_arpRangeKnob, 0, 1, 2, 1, Qt::AlignHCenter );
 	mainLayout->addWidget( m_arpCycleKnob, 0, 2, 2, 1, Qt::AlignHCenter );
+	mainLayout->addWidget( m_arpRangeKnob, 0, 3, 2, 1, Qt::AlignHCenter );
 	mainLayout->addWidget( m_arpSkipKnob, 3, 1, 2, 1, Qt::AlignHCenter );
 	mainLayout->addWidget( m_arpMissKnob, 3, 2, 2, 1, Qt::AlignHCenter );
-	mainLayout->addWidget( m_arpFloorKnob, 3, 3, 2, 1, Qt::AlignHCenter );
-	mainLayout->addWidget( m_arpCeilKnob, 3, 4, 2, 1, Qt::AlignHCenter );
-	mainLayout->addWidget( m_arpGateKnob, 6, 1, 2, 1, Qt::AlignHCenter );
-	mainLayout->addWidget( m_arpTimeKnob, 6, 2, 2, 1, Qt::AlignHCenter );
+	mainLayout->addWidget( m_arpTimeKnob, 3, 3, 2, 1, Qt::AlignHCenter );
+	mainLayout->addWidget( m_arpFloorKnob,6, 1, 2, 1, Qt::AlignHCenter );
+	mainLayout->addWidget( m_arpCeilKnob, 6, 2, 2, 1, Qt::AlignHCenter );
+	mainLayout->addWidget( m_arpGateKnob, 6, 3, 2, 1, Qt::AlignHCenter );
 
 	mainLayout->setRowMinimumHeight( 2, 10 );
 	mainLayout->setRowMinimumHeight( 5, 10 );
