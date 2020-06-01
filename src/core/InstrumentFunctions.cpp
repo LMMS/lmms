@@ -337,6 +337,8 @@ InstrumentFunctionArpeggio::InstrumentFunctionArpeggio( Model * _parent ) :
 			this, SLOT( updateNoteRange() ), Qt::DirectConnection );
 	connect( &m_arpCeilModel, SIGNAL( dataChanged() ),
 			this, SLOT( updateNoteRange() ), Qt::DirectConnection );
+	connect( &m_arpCycleModel, SIGNAL( dataChanged() ),
+			this, SLOT( updateNoteRange() ), Qt::DirectConnection );
 	updateNoteRange();
 }
 
@@ -363,6 +365,7 @@ void InstrumentFunctionArpeggio::updateNoteRange()
 	const int cur_chord_size = chord_table[m_arpModel.value()].size();
 	float noteRange = m_arpRangeModel.value() * cur_chord_size;
 
+	m_arpCycleModel.setRange( 0.0f, noteRange - 1.0f );
 	m_arpFloorModel.setRange( 0.0f, noteRange );
 	m_arpCeilModel.setRange( 0.0f, noteRange );
 
