@@ -2,7 +2,7 @@
  * FadeButton.cpp - implementation of fade-button
  *
  * Copyright (c) 2005-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -21,30 +21,33 @@
  * Boston, MA 02110-1301 USA.
  *
  */
- 
+
 
 #include <QTimer>
-#include <QApplication>
 #include <QPainter>
 
 #include "embed.h"
 #include "FadeButton.h"
-#include "update_event.h"
 
 
 const float FadeDuration = 300;
 
 
-FadeButton::FadeButton( const QColor & _normal_color,
-			const QColor & _activated_color, QWidget * _parent ) :
+FadeButton::FadeButton(const QColor & _normal_color,
+		const QColor & _activated_color,
+		const QColor & holdColor,
+		QWidget * _parent) :
 	QAbstractButton( _parent ),
 	m_stateTimer(),
+	m_releaseTimer(),
 	m_normalColor( _normal_color ),
-	m_activatedColor( _activated_color )
+	m_activatedColor( _activated_color ),
+	m_holdColor( holdColor )
 {
-	setAttribute( Qt::WA_OpaquePaintEvent, true );
-	setCursor( QCursor( embed::getIconPixmap( "hand" ), 3, 3 ) );
-	setFocusPolicy( Qt::NoFocus );
+	setAttribute(Qt::WA_OpaquePaintEvent, true);
+	setCursor(QCursor(embed::getIconPixmap("hand"), 3, 3));
+	setFocusPolicy(Qt::NoFocus);
+	activeNotes = 0;
 }
 
 
@@ -54,7 +57,7 @@ FadeButton::~FadeButton()
 {
 }
 
-void FadeButton::setActiveColor( const QColor & activated_color )
+void FadeButton::setActiveColor(const QColor & activated_color)
 {
 	m_activatedColor = activated_color;
 }
@@ -65,63 +68,99 @@ void FadeButton::setActiveColor( const QColor & activated_color )
 void FadeButton::activate()
 {
 	m_stateTimer.restart();
-	signalUpdate();
-}
-
-
-
-
-void FadeButton::customEvent( QEvent * )
-{
+	activeNotes++;
 	update();
 }
 
 
 
 
-void FadeButton::paintEvent( QPaintEvent * _pe )
+void FadeButton::activateOnce()
 {
-	QColor col = m_normalColor;
-	if( ! m_stateTimer.isNull() && m_stateTimer.elapsed() < FadeDuration )
+	if (activeNotes == 0) { activate(); }
+}
+
+
+
+
+void FadeButton::noteEnd()
+{
+	if (activeNotes <= 0)
 	{
-		const float state = 1 - m_stateTimer.elapsed() / FadeDuration;
-		const int r = (int)( m_normalColor.red() *
-					( 1.0f - state ) +
-			m_activatedColor.red() * state );
-		const int g = (int)( m_normalColor.green() *
-					( 1.0f - state ) +
-			m_activatedColor.green() * state );
-		const int b = (int)( m_normalColor.blue() *
-					( 1.0f - state ) +
-			m_activatedColor.blue() * state );
-		col.setRgb( r, g, b );
-		QTimer::singleShot( 20, this, SLOT( update() ) );
+		qWarning("noteEnd() triggered without a corresponding activate()!");
+		activeNotes = 0;
+	}
+	else
+	{
+		activeNotes--;
 	}
 
-	QPainter p( this );
-	p.fillRect( rect(), col );
+	if (activeNotes == 0)
+	{
+		m_releaseTimer.restart();
+	}
+
+	update();
+}
+
+
+
+
+void FadeButton::paintEvent(QPaintEvent * _pe)
+{
+	QColor col = m_normalColor;
+
+	if(!m_stateTimer.isNull() && m_stateTimer.elapsed() < FadeDuration)
+	{
+		// The first part of the fade, when a note is triggered.
+		col = fadeToColor(m_activatedColor, m_holdColor, m_stateTimer, FadeDuration);
+		QTimer::singleShot(20, this, SLOT(update()));
+	}
+	else if (!m_stateTimer.isNull()
+		&& m_stateTimer.elapsed() >= FadeDuration
+		&& activeNotes > 0)
+	{
+		// The fade is done, but at least one note is still held.
+		col = m_holdColor;
+	}
+	else if (!m_releaseTimer.isNull() && m_releaseTimer.elapsed() < FadeDuration)
+	{
+		// Last note just ended. Fade to default color.
+		col = fadeToColor(m_holdColor, m_normalColor, m_releaseTimer, FadeDuration);
+		QTimer::singleShot(20, this, SLOT(update()));
+	}
+	else
+	{
+		// No fade, no notes. Set to default color.
+		col = m_normalColor;
+	}
+
+	QPainter p(this);
+	p.fillRect(rect(), col);
 
 	int w = rect().right();
 	int h = rect().bottom();
-	p.setPen( m_normalColor.darker(130) );
-	p.drawLine( w, 1, w, h );
-	p.drawLine( 1, h, w, h );
-	p.setPen( m_normalColor.lighter(130) );
-	p.drawLine( 0, 0, 0, h-1 );
-	p.drawLine( 0, 0, w, 0 );
+	p.setPen(m_normalColor.darker(130));
+	p.drawLine(w, 1, w, h);
+	p.drawLine(1, h, w, h);
+	p.setPen(m_normalColor.lighter(130));
+	p.drawLine(0, 0, 0, h-1);
+	p.drawLine(0, 0, w, 0);
 }
 
 
-
-
-void FadeButton::signalUpdate()
+QColor FadeButton::fadeToColor(QColor startCol, QColor endCol, QTime timer, float duration)
 {
-	QApplication::postEvent( this, new updateEvent() );
+	QColor col;
+
+	const float state = 1 - timer.elapsed() / duration;
+	const int r = (int)(endCol.red() * (1.0f - state)
+		+ startCol.red() * state);
+	const int g = (int)(endCol.green() * (1.0f - state)
+		+ startCol.green() * state);
+	const int b = (int)(endCol.blue() * (1.0f - state)
+		+ startCol.blue() * state);
+	col.setRgb(r, g, b);
+
+	return col;
 }
-
-
-
-
-
-
-

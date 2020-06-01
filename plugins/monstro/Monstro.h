@@ -26,6 +26,7 @@
 #ifndef MONSTRO_H
 #define MONSTRO_H
 
+#include <vector>
 
 #include "Instrument.h"
 #include "InstrumentView.h"
@@ -299,6 +300,9 @@ private:
 	int m_counter2r;
 	int m_counter3l;
 	int m_counter3r;
+
+	std::vector<float> m_lfo[2];
+	std::vector<float> m_env[2];
 };
 
 class MonstroInstrument : public Instrument
@@ -565,7 +569,7 @@ private:
 
 };
 
-class MonstroView : public InstrumentView
+class MonstroView : public InstrumentViewFixedSize
 {
 	Q_OBJECT
 public:

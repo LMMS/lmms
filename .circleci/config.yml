@@ -12,6 +12,18 @@ shared:
       key: ccache-{{ arch }}-{{ .Environment.CIRCLE_JOB }}-{{ .Branch }}-{{ .BuildNum }}
       paths:
         - ~/.ccache
+  restore_homebrew_cache: &restore_homebrew_cache
+    restore_cache:
+      keys:
+        - homebrew-{{ arch }}-{{ .Environment.CIRCLE_JOB }}-{{ .Branch }}
+        - homebrew-{{ arch }}-{{ .Environment.CIRCLE_JOB }}
+        - homebrew-{{ arch }}
+  save_homebrew_cache: &save_homebrew_cache
+    save_cache:
+      key: homebrew-{{ arch }}-{{ .Environment.CIRCLE_JOB }}-{{ .Branch }}-{{ .BuildNum }}
+      paths:
+        - ~/Library/Caches/Homebrew
+        - /usr/local/Homebrew
 
   ccache_stats: &ccache_stats
     run:
@@ -28,6 +40,16 @@ shared:
       name: Initialize
       command: |
         mkdir -p /tmp/artifacts
+        # Workaround for failing submodule fetching
+        git config --global --unset url."ssh://git@github.com".insteadOf || true
+        if [[ -n "${CIRCLE_PR_NUMBER}" ]]
+        then
+            echo "Fetching out merged pull request"
+            git fetch -u origin refs/pull/${CIRCLE_PR_NUMBER}/merge:pr/merge
+            git checkout pr/merge
+        else
+            echo "Not a pull request"
+        fi
 
   # Commmon environment variables
   common_environment: &common_environment
@@ -54,6 +76,18 @@ jobs:
             ../cmake/build_win32.sh
             make lmms
             make
+      - run:
+          name: Build tests
+          command: cd build && make tests
+      - run:
+          name: Build installer
+          command: |
+            cd build
+            make package
+            cp ./lmms-*.exe /tmp/artifacts/
+      - store_artifacts:
+          path: /tmp/artifacts/
+          destination: /
       - *ccache_stats
       - *save_cache
   mingw64:
@@ -71,11 +105,23 @@ jobs:
             mkdir build && cd build
             ../cmake/build_win64.sh
             make
+      - run:
+          name: Build tests
+          command: cd build && make tests
+      - run:
+          name: Build installer
+          command: |
+            cd build
+            make package
+            cp ./lmms-*.exe /tmp/artifacts/
+      - store_artifacts:
+          path: /tmp/artifacts/
+          destination: /
       - *ccache_stats
       - *save_cache
   linux.gcc:
     docker:
-      - image: lmmsci/linux.gcc:18.04
+      - image: lmmsci/linux.gcc:16.04
     environment:
       <<: *common_environment
     steps:
@@ -84,7 +130,10 @@ jobs:
       - *restore_cache
       - run:
           name: Configure
-          command: mkdir build && cd build && cmake .. $CMAKE_OPTS -DCMAKE_INSTALL_PREFIX=./install
+          command: |
+            source /opt/qt5*/bin/qt5*-env.sh || true
+            mkdir build && cd build
+            cmake .. $CMAKE_OPTS -DCMAKE_INSTALL_PREFIX=./install
       - run:
           name: Build
           command: cd build && make
@@ -100,7 +149,7 @@ jobs:
           command: |
             cd build
             make install
-            make appimage
+            make appimage || (cat appimage.log && false)
             cp ./lmms-*.AppImage /tmp/artifacts/
       - store_artifacts:
           path: /tmp/artifacts/
@@ -117,10 +166,56 @@ jobs:
       - run:
           name: Shellcheck
           command: shellcheck $(find "./cmake/" -type f -name '*.sh' -o -name "*.sh.in")
+  macos:
+    environment:
+      <<: *common_environment
+    macos:
+      xcode: "9.3.1"
+    steps:
+      - checkout
+      - *init
+      - *restore_homebrew_cache
+      - *restore_cache
+      - run:
+          name: Install Homebrew dependencies
+          command: |
+            # unlink Homebrew's python 2 to prevent an node-gyp error
+            brew unlink python@2 || true
+            brew update && brew install ccache fftw cmake pkg-config libogg libvorbis lame libsndfile libsamplerate jack sdl libgig libsoundio stk fluid-synth portaudio fltk qt5 carla
+      - run:
+          name: Install nodejs dependencies
+          command: npm install -g appdmg
+      - run:
+          name: Building
+          command: |
+            mkdir build && cd build
+            cmake .. -DCMAKE_INSTALL_PREFIX="../target" -DCMAKE_PREFIX_PATH="$(brew --prefix qt5)" $CMAKE_OPTS -DUSE_WERROR=OFF
+            make
+      - run:
+          name: Build tests
+          command: cd build && make tests
+      - run:
+          name: Run tests
+          command: build/tests/tests
+      - run:
+          name: Build DMG
+          command: |
+            cd build
+            make install
+            make dmg
+            cp ./lmms-*.dmg /tmp/artifacts/
+      - store_artifacts:
+          path: /tmp/artifacts/
+          destination: /
+      - *save_cache
+      - *save_homebrew_cache
+
+
 workflows:
   version: 2
   build-and-test:
     jobs:
+      - macos
       - mingw32
       - mingw64
       - linux.gcc

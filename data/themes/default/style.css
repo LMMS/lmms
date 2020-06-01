@@ -9,16 +9,23 @@ QLabel, QTreeWidget, QListWidget, QGroupBox, QMenuBar {
 
 QTreeView {
 	outline: none;
+	font-size: 12px;
+}
+
+QTreeWidget::item {
+	padding: 1px;
 }
 
 QTreeWidget::item:hover,
 QTreeWidget::branch:hover {
 	background-color: #3C444E;
+	padding-left: 0px;
 }
 
 QTreeWidget::item:selected,
 QTreeWidget::branch:selected {
 	background-color: #17793b;
+	padding-left: 0px;
 }
 
 QTreeView::branch:has-children:open {
@@ -78,6 +85,12 @@ QToolTip {
 TextFloat {
 	background: #040506;
 	color: #d1d8e4;
+}
+
+
+/* splash screen text */
+QSplashScreen QLabel {
+	color: white;
 }
 
 
@@ -142,9 +155,14 @@ PianoRoll {
 	qproperty-backgroundShade: rgba(255, 255, 255, 10);
 	qproperty-noteModeColor: #0bd556;
 	qproperty-noteColor: #0bd556;
+	qproperty-noteTextColor: #ffffff;
 	qproperty-noteOpacity: 165;
 	qproperty-noteBorders: false; /* boolean property, set false to have borderless notes */
 	qproperty-selectedNoteColor: #064d79;
+	qproperty-ghostNoteColor: #000000;
+	qproperty-ghostNoteTextColor: #ffffff;
+	qproperty-ghostNoteOpacity: 50;
+	qproperty-ghostNoteBorders: false;
 	qproperty-barColor: #078f3a;
 	qproperty-markedSemitoneColor: rgba(255, 255, 255, 30);
 	/* Grid colors */
@@ -173,9 +191,12 @@ GroupBox {
 
 /* main toolbar oscilloscope - can have transparent bg now */
 
-VisualizationWidget  {
+Oscilloscope {
 	background: none;
 	border: none;
+	qproperty-normalColor: rgb(71, 253, 133);
+	qproperty-warningColor: rgb(255, 192, 64);
+	qproperty-clippingColor: rgb(255, 64, 64);
 }
 
 /* main toolbar cpu load widget - this can have transparent bg now */
@@ -912,7 +933,4 @@ LmmsPalette {
 	qproperty-brightText: #d1d8e4;
 	qproperty-highlight: #262b30;
 	qproperty-highlightedText: #d1d8e4;
-	/* the next two are used for whatsthis dialogs */
-	qproperty-toolTipText: #d1d8e4;
-	qproperty-toolTipBase: #101213;
 }

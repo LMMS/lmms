@@ -30,8 +30,9 @@
 #include "Mixer.h"
 #include "OutputSettings.h"
 
+#include "lmms_export.h"
 
-class ProjectRenderer : public QThread
+class LMMS_EXPORT ProjectRenderer : public QThread
 {
 	Q_OBJECT
 public:
@@ -85,7 +86,7 @@ signals:
 
 
 private:
-	virtual void run();
+	void run() override;
 
 	AudioFileDevice * m_fileDev;
 	Mixer::qualitySettings m_qualitySettings;

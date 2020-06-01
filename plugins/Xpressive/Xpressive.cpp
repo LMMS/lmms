@@ -48,12 +48,14 @@
 
 #include "ExprSynth.h"
 
+#include "plugin_export.h"
+
 extern "C" {
 
 Plugin::Descriptor PLUGIN_EXPORT xpressive_plugin_descriptor = { STRINGIFY(
-		PLUGIN_NAME), "X-Pressive", QT_TRANSLATE_NOOP("pluginBrowser",
-		"Mathematical expression parser"), "Orr Dvori", 0x0100,
-		Plugin::Instrument, new PluginPixmapLoader("logo"), NULL, NULL };
+	PLUGIN_NAME), "Xpressive", QT_TRANSLATE_NOOP("pluginBrowser",
+	"Mathematical expression parser"), "Orr Dvori", 0x0100,
+	Plugin::Instrument, new PluginPixmapLoader("logo"), NULL, NULL };
 
 }
 
@@ -95,9 +97,9 @@ Xpressive::Xpressive(InstrumentTrack* instrument_track) :
 	m_interpolateW1(false, this),
 	m_interpolateW2(false, this),
 	m_interpolateW3(false, this),
-	m_panning1( 1, -1.0f, 1.0f, 0.01f, this, tr("PAN1")),
-	m_panning2(-1, -1.0f, 1.0f, 0.01f, this, tr("PAN2")),
-	m_relTransition(50.0f, 0.0f, 500.0f, 1.0f, this, tr("REL TRANS")),
+	m_panning1( 1, -1.0f, 1.0f, 0.01f, this, tr("Panning 1")),
+	m_panning2(-1, -1.0f, 1.0f, 0.01f, this, tr("Panning 2")),
+	m_relTransition(50.0f, 0.0f, 500.0f, 1.0f, this, tr("Rel trans")),
 	m_W1(GRAPH_LENGTH),
 	m_W2(GRAPH_LENGTH),
 	m_W3(GRAPH_LENGTH),
@@ -255,7 +257,6 @@ public:
 		setCenterPointY(14.5);
 		setInnerRadius(4);
 		setOuterRadius(9);
-		setOuterColor(QColor(0x519fff));
 		setTotalAngle(300.0);
 		setLineWidth(3);
 	}
@@ -272,17 +273,21 @@ public:
 
 
 XpressiveView::XpressiveView(Instrument * _instrument, QWidget * _parent) :
-	InstrumentView(_instrument, _parent)
+	InstrumentViewFixedSize(_instrument, _parent)
 
 {
-	const int COL_KNOBS = 194;
-	const int ROW_KNOBSA1 = 26;
-	const int ROW_KNOBSA2 = 26 + 32;
-	const int ROW_KNOBSA3 = 26 + 64;
-	const int ROW_KNOBSP1 = 126;
-	const int ROW_KNOBSP2 = 126 + 32;
-	const int ROW_KNOBREL = 126 + 64;
-	const int ROW_WAVEBTN = 234;
+	const int COL_KNOBS = 191;
+	const int BASE_START = 2;
+	const int ROW_KNOBSA1 = BASE_START;
+	const int ROW_KNOBSA2 = BASE_START + 32;
+	const int ROW_KNOBSA3 = BASE_START + 64;
+	const int ROW_KNOBSP1 = BASE_START + 100;
+	const int ROW_KNOBSP2 = BASE_START + 100 + 32;
+	const int ROW_KNOBREL = BASE_START + 100 + 64;
+	const int ROW_BTN = BASE_START + 85;
+	const int ROW_WAVEBTN = BASE_START + 233 - 26;
+	const int EXPR_TEXT_Y = BASE_START + 102;
+	const int EXPR_TEXT_H = 90;
 
 	setAutoFillBackground(true);
 	QPalette pal;
@@ -291,13 +296,13 @@ XpressiveView::XpressiveView(Instrument * _instrument, QWidget * _parent) :
 	setPalette(pal);
 
 	m_graph = new Graph(this, Graph::LinearStyle, 180, 81);
-	m_graph->move(9, 27);
+	m_graph->move(3, BASE_START + 1);
 	m_graph->setAutoFillBackground(true);
 	m_graph->setGraphColor(QColor(255, 255, 255));
 	m_graph->setEnabled(false);
 
-	/*ToolTip::add(m_graph, tr("Draw your own waveform here "
-			"by dragging your mouse on this graph."));*/
+	ToolTip::add(m_graph, tr("Draw your own waveform here "
+			"by dragging your mouse on this graph."));
 
 	pal = QPalette();
 	pal.setBrush(backgroundRole(), PLUGIN_NAME::getIconPixmap("wavegraph"));
@@ -311,37 +316,37 @@ XpressiveView::XpressiveView(Instrument * _instrument, QWidget * _parent) :
 	PixmapButton * m_helpBtn;
 
 	m_w1Btn = new PixmapButton(this, NULL);
-	m_w1Btn->move(9, 111);
+	m_w1Btn->move(3, ROW_BTN);
 	m_w1Btn->setActiveGraphic(PLUGIN_NAME::getIconPixmap("w1_active"));
 	m_w1Btn->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("w1_inactive"));
 	ToolTip::add(m_w1Btn, tr("Select oscillator W1"));
 
 	m_w2Btn = new PixmapButton(this, NULL);
-	m_w2Btn->move(32, 111);
+	m_w2Btn->move(26, ROW_BTN);
 	m_w2Btn->setActiveGraphic(PLUGIN_NAME::getIconPixmap("w2_active"));
 	m_w2Btn->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("w2_inactive"));
 	ToolTip::add(m_w2Btn, tr("Select oscillator W2"));
 
 	m_w3Btn = new PixmapButton(this, NULL);
-	m_w3Btn->move(55, 111);
+	m_w3Btn->move(49, ROW_BTN);
 	m_w3Btn->setActiveGraphic(PLUGIN_NAME::getIconPixmap("w3_active"));
 	m_w3Btn->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("w3_inactive"));
 	ToolTip::add(m_w3Btn, tr("Select oscillator W3"));
 
 	m_o1Btn = new PixmapButton(this, NULL);
-	m_o1Btn->move(85, 111);
+	m_o1Btn->move(79, ROW_BTN);
 	m_o1Btn->setActiveGraphic(PLUGIN_NAME::getIconPixmap("o1_active"));
 	m_o1Btn->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("o1_inactive"));
-	ToolTip::add(m_o1Btn, tr("Select OUTPUT 1"));
+	ToolTip::add(m_o1Btn, tr("Select output O1"));
 
 	m_o2Btn = new PixmapButton(this, NULL);
-	m_o2Btn->move(107, 111);
+	m_o2Btn->move(101, ROW_BTN);
 	m_o2Btn->setActiveGraphic(PLUGIN_NAME::getIconPixmap("o2_active"));
 	m_o2Btn->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("o2_inactive"));
-	ToolTip::add(m_o2Btn, tr("Select OUTPUT 2"));
+	ToolTip::add(m_o2Btn, tr("Select output O2"));
 
 	m_helpBtn = new PixmapButton(this, NULL);
-	m_helpBtn->move(139, 111);
+	m_helpBtn->move(133, ROW_BTN);
 	m_helpBtn->setActiveGraphic(PLUGIN_NAME::getIconPixmap("help_active"));
 	m_helpBtn->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("help_inactive"));
 	ToolTip::add(m_helpBtn, tr("Open help window"));
@@ -357,72 +362,72 @@ XpressiveView::XpressiveView(Instrument * _instrument, QWidget * _parent) :
 	m_selectedGraphGroup->setModel(&e->selectedGraph());
 
 	m_sinWaveBtn = new PixmapButton(this, tr("Sine wave"));
-	m_sinWaveBtn->move(10, ROW_WAVEBTN);
+	m_sinWaveBtn->move(4, ROW_WAVEBTN);
 	m_sinWaveBtn->setActiveGraphic(embed::getIconPixmap("sin_wave_active"));
 	m_sinWaveBtn->setInactiveGraphic(embed::getIconPixmap("sin_wave_inactive"));
-	ToolTip::add(m_sinWaveBtn, tr("Click for a sine-wave."));
+	ToolTip::add(m_sinWaveBtn, tr("Sine wave"));
 
-	m_moogWaveBtn = new PixmapButton(this, tr("Moog-Saw wave"));
-	m_moogWaveBtn->move(10, ROW_WAVEBTN-14);
+	m_moogWaveBtn = new PixmapButton(this, tr("Moog-saw wave"));
+	m_moogWaveBtn->move(4, ROW_WAVEBTN-14);
 	m_moogWaveBtn->setActiveGraphic(
 		embed::getIconPixmap( "moog_saw_wave_active" ) );
 	m_moogWaveBtn->setInactiveGraphic(embed::getIconPixmap("moog_saw_wave_inactive"));
-	ToolTip::add(m_moogWaveBtn, tr("Click for a Moog-Saw-wave."));
+	ToolTip::add(m_moogWaveBtn, tr("Moog-saw wave"));
 
 	m_expWaveBtn = new PixmapButton(this, tr("Exponential wave"));
-	m_expWaveBtn->move(10 +14, ROW_WAVEBTN-14);
+	m_expWaveBtn->move(4 +14, ROW_WAVEBTN-14);
 	m_expWaveBtn->setActiveGraphic(embed::getIconPixmap( "exp_wave_active" ) );
 	m_expWaveBtn->setInactiveGraphic(embed::getIconPixmap( "exp_wave_inactive" ) );
-	ToolTip::add(m_expWaveBtn, tr("Click for an exponential wave."));
+	ToolTip::add(m_expWaveBtn, tr("Exponential wave"));
 
 	m_sawWaveBtn = new PixmapButton(this, tr("Saw wave"));
-	m_sawWaveBtn->move(10 + 14 * 2, ROW_WAVEBTN-14);
+	m_sawWaveBtn->move(4 + 14 * 2, ROW_WAVEBTN-14);
 	m_sawWaveBtn->setActiveGraphic(embed::getIconPixmap("saw_wave_active"));
 	m_sawWaveBtn->setInactiveGraphic(embed::getIconPixmap("saw_wave_inactive"));
-	ToolTip::add(m_sawWaveBtn, tr("Click here for a saw-wave."));
+	ToolTip::add(m_sawWaveBtn, tr("Saw wave"));
 
-	m_usrWaveBtn = new PixmapButton(this, tr("User defined wave"));
-	m_usrWaveBtn->move(10 + 14 * 3, ROW_WAVEBTN-14);
+	m_usrWaveBtn = new PixmapButton(this, tr("User-defined wave"));
+	m_usrWaveBtn->move(4 + 14 * 3, ROW_WAVEBTN-14);
 	m_usrWaveBtn->setActiveGraphic(embed::getIconPixmap("usr_wave_active"));
 	m_usrWaveBtn->setInactiveGraphic(embed::getIconPixmap("usr_wave_inactive"));
-	ToolTip::add(m_usrWaveBtn, tr("Click here for a user-defined shape."));
+	ToolTip::add(m_usrWaveBtn, tr("User-defined wave"));
 
 	m_triangleWaveBtn = new PixmapButton(this, tr("Triangle wave"));
-	m_triangleWaveBtn->move(10 + 14, ROW_WAVEBTN);
+	m_triangleWaveBtn->move(4 + 14, ROW_WAVEBTN);
 	m_triangleWaveBtn->setActiveGraphic(
 			embed::getIconPixmap("triangle_wave_active"));
 	m_triangleWaveBtn->setInactiveGraphic(
 			embed::getIconPixmap("triangle_wave_inactive"));
-	ToolTip::add(m_triangleWaveBtn, tr("Click here for a triangle-wave."));
+	ToolTip::add(m_triangleWaveBtn, tr("Triangle wave"));
 
 	m_sqrWaveBtn = new PixmapButton(this, tr("Square wave"));
-	m_sqrWaveBtn->move(10 + 14 * 2, ROW_WAVEBTN);
+	m_sqrWaveBtn->move(4 + 14 * 2, ROW_WAVEBTN);
 	m_sqrWaveBtn->setActiveGraphic(embed::getIconPixmap("square_wave_active"));
 	m_sqrWaveBtn->setInactiveGraphic(
 			embed::getIconPixmap("square_wave_inactive"));
-	ToolTip::add(m_sqrWaveBtn, tr("Click here for a square-wave."));
+	ToolTip::add(m_sqrWaveBtn, tr("Square wave"));
 
-	m_whiteNoiseWaveBtn = new PixmapButton(this, tr("White noise wave"));
-	m_whiteNoiseWaveBtn->move(10 + 14 * 3, ROW_WAVEBTN);
+	m_whiteNoiseWaveBtn = new PixmapButton(this, tr("White noise"));
+	m_whiteNoiseWaveBtn->move(4 + 14 * 3, ROW_WAVEBTN);
 	m_whiteNoiseWaveBtn->setActiveGraphic(
 			embed::getIconPixmap("white_noise_wave_active"));
 	m_whiteNoiseWaveBtn->setInactiveGraphic(
 			embed::getIconPixmap("white_noise_wave_inactive"));
-	ToolTip::add(m_whiteNoiseWaveBtn, tr("Click here for white-noise."));
+	ToolTip::add(m_whiteNoiseWaveBtn, tr("White noise"));
 
 
 	m_waveInterpolate  = new LedCheckBox("Interpolate", this, tr("WaveInterpolate"),
 										 LedCheckBox::Green);
-	m_waveInterpolate->move(120, 230);
+	m_waveInterpolate->move(2, 230);
 
 	m_expressionValidToggle = new LedCheckBox("", this, tr("ExpressionValid"),
 			LedCheckBox::Red);
-	m_expressionValidToggle->move(174, 216);
+	m_expressionValidToggle->move(168, EXPR_TEXT_Y+EXPR_TEXT_H-2);
 	m_expressionValidToggle->setEnabled( false );
 
 	m_expressionEditor = new QPlainTextEdit(this);
-	m_expressionEditor->move(9, 128);
-	m_expressionEditor->resize(180, 90);
+	m_expressionEditor->move(3, EXPR_TEXT_Y);
+	m_expressionEditor->resize(180, EXPR_TEXT_H);
 
 	m_generalPurposeKnob[0] = new XpressiveKnob(this,"A1");
 	m_generalPurposeKnob[0]->setHintText(tr("General purpose 1:"), "");
@@ -450,9 +455,16 @@ XpressiveView::XpressiveView(Instrument * _instrument, QWidget * _parent) :
 
 
 
-	m_smoothKnob=new Knob(this,"Smoothness");
+	m_smoothKnob=new Knob(knobStyled, this, "Smoothness");
+	m_smoothKnob->setFixedSize(25, 25);
+	m_smoothKnob->setCenterPointX(12.5);
+	m_smoothKnob->setCenterPointY(12.5);
+	m_smoothKnob->setInnerRadius(4);
+	m_smoothKnob->setOuterRadius(9);
+	m_smoothKnob->setTotalAngle(280.0);
+	m_smoothKnob->setLineWidth(3);
 	m_smoothKnob->setHintText(tr("Smoothness"), "");
-	m_smoothKnob->move(80, 220);
+	m_smoothKnob->move(66, EXPR_TEXT_Y + EXPR_TEXT_H + 4);
 
 	connect(m_generalPurposeKnob[0], SIGNAL(sliderMoved(float)), this,
 			SLOT(expressionChanged()));
@@ -746,7 +758,7 @@ void XpressiveView::updateLayout() {
 
 void XpressiveView::sinWaveClicked() {
 	if (m_output_expr)
-		m_expressionEditor->appendPlainText("sinew(t*f)");
+		m_expressionEditor->appendPlainText("sinew(integrate(f))");
 	else
 		m_expressionEditor->appendPlainText("sinew(t)");
 	Engine::getSong()->setModified();
@@ -754,7 +766,7 @@ void XpressiveView::sinWaveClicked() {
 
 void XpressiveView::triangleWaveClicked() {
 	if (m_output_expr)
-		m_expressionEditor->appendPlainText("trianglew(t*f)");
+		m_expressionEditor->appendPlainText("trianglew(integrate(f))");
 	else
 		m_expressionEditor->appendPlainText("trianglew(t)");
 	Engine::getSong()->setModified();
@@ -762,7 +774,7 @@ void XpressiveView::triangleWaveClicked() {
 
 void XpressiveView::sawWaveClicked() {
 	if (m_output_expr)
-		m_expressionEditor->appendPlainText("saww(t*f)");
+		m_expressionEditor->appendPlainText("saww(integrate(f))");
 	else
 		m_expressionEditor->appendPlainText("saww(t)");
 	Engine::getSong()->setModified();
@@ -770,7 +782,7 @@ void XpressiveView::sawWaveClicked() {
 
 void XpressiveView::sqrWaveClicked() {
 	if (m_output_expr)
-		m_expressionEditor->appendPlainText("squarew(t*f)");
+		m_expressionEditor->appendPlainText("squarew(integrate(f))");
 	else
 		m_expressionEditor->appendPlainText("squarew(t)");
 	Engine::getSong()->setModified();
@@ -784,7 +796,7 @@ void XpressiveView::noiseWaveClicked() {
 void XpressiveView::moogSawWaveClicked()
 {
 	if (m_output_expr)
-		m_expressionEditor->appendPlainText("moogsaww(t*f)");
+		m_expressionEditor->appendPlainText("moogsaww(integrate(f))");
 	else
 		m_expressionEditor->appendPlainText("moogsaww(t)");
 	Engine::getSong()->setModified();
@@ -792,7 +804,7 @@ void XpressiveView::moogSawWaveClicked()
 void XpressiveView::expWaveClicked()
 {
 	if (m_output_expr)
-		m_expressionEditor->appendPlainText("expw(t*f)");
+		m_expressionEditor->appendPlainText("expw(integrate(f))");
 	else
 		m_expressionEditor->appendPlainText("expw(t)");
 	Engine::getSong()->setModified();
@@ -804,8 +816,6 @@ void XpressiveView::usrWaveClicked() {
 	smoothChanged();
 	Engine::getSong()->setModified();
 }
-
-XpressiveHelpView* XpressiveHelpView::s_instance=0;
 
 QString XpressiveHelpView::s_helpText=
 "<b>O1, O2</b> - Two output waves. Panning is controled by PN1 and PN2.<br>"
@@ -861,7 +871,7 @@ QString XpressiveHelpView::s_helpText=
 
 XpressiveHelpView::XpressiveHelpView():QTextEdit(s_helpText)
 {
-	setWindowTitle ( "X-Pressive Help" );
+	setWindowTitle ( "Xpressive Help" );
 	setTextInteractionFlags ( Qt::TextSelectableByKeyboard | Qt::TextSelectableByMouse );
 	gui->mainWindow()->addWindowedWidget( this );
 	parentWidget()->setAttribute( Qt::WA_DeleteOnClose, false );
@@ -874,16 +884,11 @@ void XpressiveView::helpClicked() {
 
 }
 
-__attribute__((destructor)) static void module_destroy()
-{
-	XpressiveHelpView::finalize();
-}
-
 extern "C" {
 
 // necessary for getting instance out of shared lib
-Plugin * PLUGIN_EXPORT lmms_plugin_main(Model *, void * _data) {
-	return (new Xpressive(static_cast<InstrumentTrack *>(_data)));
+PLUGIN_EXPORT Plugin * lmms_plugin_main(Model *m, void *) {
+	return (new Xpressive(static_cast<InstrumentTrack *>(m)));
 }
 
 }

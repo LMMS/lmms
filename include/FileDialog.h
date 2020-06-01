@@ -28,9 +28,9 @@
 
 #include <QFileDialog>
 
-#include "export.h"
+#include "lmms_export.h"
 
-class EXPORT FileDialog : public QFileDialog
+class LMMS_EXPORT FileDialog : public QFileDialog
 {
 	Q_OBJECT
 public:

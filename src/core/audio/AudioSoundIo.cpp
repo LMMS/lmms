@@ -33,14 +33,14 @@
 #include "debug.h"
 #include "ConfigManager.h"
 #include "gui_templates.h"
-#include "templates.h"
 #include "ComboBox.h"
 #include "Mixer.h"
 
 AudioSoundIo::AudioSoundIo( bool & outSuccessful, Mixer * _mixer ) :
-	AudioDevice( tLimit<ch_cnt_t>(
-		ConfigManager::inst()->value( "audiosoundio", "channels" ).toInt(), DEFAULT_CHANNELS, SURROUND_CHANNELS ),
-								_mixer )
+	AudioDevice( qBound<ch_cnt_t>(
+		DEFAULT_CHANNELS,
+		ConfigManager::inst()->value( "audiosoundio", "channels" ).toInt(),
+		SURROUND_CHANNELS ), _mixer )
 {
 	outSuccessful = false;
 	m_soundio = NULL;
@@ -49,6 +49,7 @@ AudioSoundIo::AudioSoundIo( bool & outSuccessful, Mixer * _mixer ) :
 	m_disconnectErr = 0;
 	m_outBufFrameIndex = 0;
 	m_outBufFramesTotal = 0;
+	m_stopped = true;
 
 	m_soundio = soundio_create();
 	if (!m_soundio)
@@ -210,15 +211,18 @@ void AudioSoundIo::startProcessing()
 
 	m_outBuf = new surroundSampleFrame[m_outBufSize];
 
+	m_stopped = false;
 	int err;
 	if ((err = soundio_outstream_start(m_outstream)))
 	{
+		m_stopped = true;
 		fprintf(stderr, "soundio unable to start stream: %s\n", soundio_strerror(err));
 	}
 }
 
 void AudioSoundIo::stopProcessing()
 {
+	m_stopped = true;
 	if (m_outstream)
 	{
 		soundio_outstream_destroy(m_outstream);
@@ -244,6 +248,7 @@ void AudioSoundIo::underflowCallback()
 
 void AudioSoundIo::writeCallback(int frameCountMin, int frameCountMax)
 {
+	if (m_stopped) {return;}
 	const struct SoundIoChannelLayout *layout = &m_outstream->layout;
 	SoundIoChannelArea *areas;
 	int bytesPerSample = m_outstream->bytes_per_sample;
@@ -265,11 +270,27 @@ void AudioSoundIo::writeCallback(int frameCountMin, int frameCountMax)
 		if (!frameCount)
 			break;
 
+		
+		if (m_stopped)
+		{
+			for (int channel = 0; channel < layout->channel_count; ++channel)
+			{
+				memset(areas[channel].ptr, 0, bytesPerSample * frameCount);
+				areas[channel].ptr += areas[channel].step * frameCount;
+			}
+			continue;
+		}
+
 		for (int frame = 0; frame < frameCount; frame += 1)
 		{
 			if (m_outBufFrameIndex >= m_outBufFramesTotal)
 			{
 				m_outBufFramesTotal = getNextBuffer(m_outBuf);
+				if (m_outBufFramesTotal == 0)
+				{
+					m_stopped = true;
+					break;
+				}
 				m_outBufFrameIndex = 0;
 			}
 
@@ -405,14 +426,14 @@ AudioSoundIo::setupWidget::setupWidget( QWidget * _parent ) :
 	m_backend = new ComboBox( this, "BACKEND" );
 	m_backend->setGeometry( 64, 15, 260, 20 );
 
-	QLabel * backend_lbl = new QLabel( tr( "BACKEND" ), this );
+	QLabel * backend_lbl = new QLabel( tr( "Backend" ), this );
 	backend_lbl->setFont( pointSize<7>( backend_lbl->font() ) );
 	backend_lbl->move( 8, 18 );
 
 	m_device = new ComboBox( this, "DEVICE" );
 	m_device->setGeometry( 64, 35, 260, 20 );
 
-	QLabel * dev_lbl = new QLabel( tr( "DEVICE" ), this );
+	QLabel * dev_lbl = new QLabel( tr( "Device" ), this );
 	dev_lbl->setFont( pointSize<7>( dev_lbl->font() ) );
 	dev_lbl->move( 8, 38 );
 

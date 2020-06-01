@@ -1,7 +1,7 @@
 /*
  * ReverbSC.cpp - A native reverb based on an algorithm by Sean Costello
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -24,6 +24,7 @@
 #include "ReverbSC.h"
 
 #include "embed.h"
+#include "plugin_export.h"
 
 #define DB2LIN(X) pow(10, X / 20.0f);
 

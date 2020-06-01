@@ -37,7 +37,6 @@
 #include <QtCore/QVector>
 #include <QtCore/QList>
 #include <QtCore/QMap>
-#include <QMutexLocker>
 
 #include "AudioDevice.h"
 #include "AudioDeviceSetupWidget.h"
@@ -108,7 +107,6 @@ private:
 
 	bool m_active;
 	bool m_stopped;
-	QMutex m_processingMutex;
 
 	MidiJack *m_midiClient;
 	QVector<jack_port_t *> m_outputPorts;

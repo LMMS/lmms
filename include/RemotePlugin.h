@@ -25,7 +25,6 @@
 #ifndef REMOTE_PLUGIN_H
 #define REMOTE_PLUGIN_H
 
-#include "export.h"
 #include "MidiEvent.h"
 #include "VstSyncData.h"
 
@@ -79,8 +78,8 @@ typedef int32_t key_t;
 
 
 #ifdef BUILD_REMOTE_PLUGIN_CLIENT
-#undef EXPORT
-#define EXPORT
+#undef LMMS_EXPORT
+#define LMMS_EXPORT
 #define COMPILE_REMOTE_PLUGIN_BASE
 
 #ifndef SYNC_WITH_SHM_FIFO
@@ -89,6 +88,7 @@ typedef int32_t key_t;
 #endif
 
 #else
+#include "lmms_export.h"
 #include <QtCore/QMutex>
 #include <QtCore/QProcess>
 #include <QtCore/QThread>
@@ -138,8 +138,8 @@ public:
 		m_shmID( -1 ),
 #endif
 		m_data( NULL ),
-		m_dataSem( QString::null ),
-		m_messageSem( QString::null ),
+		m_dataSem( QString() ),
+		m_messageSem( QString() ),
 		m_lockDepth( 0 )
 	{
 #ifdef USE_QT_SHMEM
@@ -181,8 +181,8 @@ public:
 		m_shmID( shmget( _shm_key, 0, 0 ) ),
 #endif
 		m_data( NULL ),
-		m_dataSem( QString::null ),
-		m_messageSem( QString::null ),
+		m_dataSem( QString() ),
+		m_messageSem( QString() ),
 		m_lockDepth( 0 )
 	{
 #ifdef USE_QT_SHMEM
@@ -444,7 +444,7 @@ enum RemoteMessageIDs
 
 
 
-class EXPORT RemotePluginBase
+class LMMS_EXPORT RemotePluginBase
 {
 public:
 	struct message
@@ -752,18 +752,21 @@ class ProcessWatcher : public QThread
 	Q_OBJECT
 public:
 	ProcessWatcher( RemotePlugin * );
-	virtual ~ProcessWatcher()
-	{
-	}
+	virtual ~ProcessWatcher() = default;
 
-
-	void quit()
+	void stop()
 	{
 		m_quit = true;
+		quit();
+	}
+
+	void reset()
+	{
+		m_quit = false;
 	}
 
 private:
-	virtual void run();
+	void run() override;
 
 	RemotePlugin * m_plugin;
 	volatile bool m_quit;
@@ -771,7 +774,7 @@ private:
 } ;
 
 
-class EXPORT RemotePlugin : public QObject, public RemotePluginBase
+class LMMS_EXPORT RemotePlugin : public QObject, public RemotePluginBase
 {
 	Q_OBJECT
 public:
@@ -800,7 +803,7 @@ public:
 		m_failed = waitForMessage( IdInitDone, _busyWaiting ).id != IdInitDone;
 	}
 
-	virtual bool processMessage( const message & _m );
+	bool processMessage( const message & _m ) override;
 
 	bool process( const sampleFrame * _in_buf, sampleFrame * _out_buf );
 
@@ -857,14 +860,16 @@ protected:
 	}
 
 
+	bool m_failed;
 private:
 	void resizeSharedProcessingMemory();
 
 
-	bool m_failed;
-
 	QProcess m_process;
 	ProcessWatcher m_watcher;
+
+	QString m_exec;
+	QStringList m_args;
 
 	QMutex m_commMutex;
 	bool m_splitChannels;
@@ -889,6 +894,7 @@ private:
 
 private slots:
 	void processFinished( int exitCode, QProcess::ExitStatus exitStatus );
+	void processErrored(QProcess::ProcessError err );
 } ;
 
 #endif

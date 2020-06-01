@@ -1,7 +1,7 @@
 /*
  * carla.h - Carla for LMMS
  *
- * Copyright (C) 2014 Filipe Coelho <falktx@falktx.com>
+ * Copyright (C) 2014-2018 Filipe Coelho <falktx@falktx.com>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -26,15 +26,28 @@
 #define CARLA_H
 
 #include <QtCore/QMutex>
+#include "carlabase_export.h"
 
 #include "CarlaNative.h"
+#if CARLA_VERSION_HEX >= 0x010911
+    #include "CarlaNativePlugin.h"
+#else
+    #include "CarlaBackend.h"
+    #include "CarlaNative.h"
+    #include "CarlaUtils.h"
+    CARLA_EXPORT
+    const NativePluginDescriptor* carla_get_native_patchbay_plugin();
+
+    CARLA_EXPORT
+    const NativePluginDescriptor* carla_get_native_rack_plugin();
+#endif
 
 #include "Instrument.h"
 #include "InstrumentView.h"
 
 class QPushButton;
 
-class PLUGIN_EXPORT CarlaInstrument : public Instrument
+class CARLABASE_EXPORT CarlaInstrument : public Instrument
 {
     Q_OBJECT
 
@@ -44,7 +57,7 @@ public:
     CarlaInstrument(InstrumentTrack* const instrumentTrack, const Descriptor* const descriptor, const bool isPatchbay);
     virtual ~CarlaInstrument();
 
-    // CarlaNative functions
+    // Carla NativeHostDescriptor functions
     uint32_t handleGetBufferSize() const;
     double handleGetSampleRate() const;
     bool handleIsOffline() const;
@@ -85,7 +98,7 @@ private:
     friend class CarlaInstrumentView;
 };
 
-class CarlaInstrumentView : public InstrumentView
+class CarlaInstrumentView : public InstrumentViewFixedSize
 {
     Q_OBJECT
 

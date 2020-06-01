@@ -24,6 +24,9 @@
 
 #include "VstPlugin.h"
 
+#include "communication.h"
+
+#include <QtCore/QtEndian>
 #include <QtCore/QDebug>
 #include <QDir>
 #include <QFileInfo>
@@ -34,55 +37,87 @@
 #include <QMdiSubWindow>
 
 #ifdef LMMS_BUILD_LINUX
-#	if QT_VERSION < 0x050000
-#		include <QX11EmbedContainer>
-#		include <QX11Info>
-#	else
-#		include "X11EmbedContainer.h"
-#		include <QWindow>
-#	endif
+#	include <QX11Info>
+#	include "X11EmbedContainer.h"
 #endif
 
-#if QT_VERSION >= 0x050000
-#	include <QWindow>
-#endif
+#include <QWindow>
 
 #include <QDomDocument>
 
 #ifdef LMMS_BUILD_WIN32
+#	ifndef NOMINMAX
+#		define NOMINMAX
+#	endif
+
 #	include <windows.h>
 #	include <QLayout>
 #endif
 
 #include "ConfigManager.h"
 #include "GuiApplication.h"
+#include "LocaleHelper.h"
 #include "MainWindow.h"
 #include "Mixer.h"
 #include "Song.h"
-#include "templates.h"
 #include "FileDialog.h"
 
-class vstSubWin : public QMdiSubWindow
+#ifdef LMMS_BUILD_LINUX
+#	include <X11/Xlib.h>
+#endif
+
+namespace PE
+{
+// Utilities for reading PE file machine type
+// See specification at https://msdn.microsoft.com/library/windows/desktop/ms680547(v=vs.85).aspx
+
+// Work around name conflict
+#ifdef i386
+#	undef i386
+#endif
+
+enum class MachineType : uint16_t
+{
+	unknown = 0x0,
+	amd64 = 0x8664,
+	i386 = 0x14c,
+};
+
+class FileInfo
 {
 public:
-	vstSubWin( QWidget * _parent ) :
-		QMdiSubWindow( _parent )
+	FileInfo(QString filePath)
+		: m_file(filePath)
 	{
-		setAttribute( Qt::WA_DeleteOnClose, false );
+		m_file.open(QFile::ReadOnly);
+		m_map = m_file.map(0, m_file.size());
+		if (m_map == nullptr) {
+			throw std::runtime_error("Cannot map file");
+		}
+	}
+	~FileInfo()
+	{
+		m_file.unmap(m_map);
 	}
 
-	virtual ~vstSubWin()
+	MachineType machineType()
 	{
+		int32_t peOffset = qFromLittleEndian(* reinterpret_cast<int32_t*>(m_map + 0x3C));
+		uchar* peSignature = m_map + peOffset;
+		if (memcmp(peSignature, "PE\0\0", 4)) {
+			throw std::runtime_error("Invalid PE file");
+		}
+		uchar * coffHeader = peSignature + 4;
+		uint16_t machineType = qFromLittleEndian(* reinterpret_cast<uint16_t*>(coffHeader));
+		return static_cast<MachineType>(machineType);
 	}
 
-	virtual void closeEvent( QCloseEvent * e )
-	{
-		// ignore close-events - for some reason otherwise the VST GUI
-		// remains hidden when re-opening
-		hide();
-		e->ignore();
-	}
-} ;
+private:
+	QFile m_file;
+	uchar* m_map;
+};
+
+}
 
 
 VstPlugin::VstPlugin( const QString & _plugin ) :
@@ -91,25 +126,42 @@ VstPlugin::VstPlugin( const QString & _plugin ) :
 	m_embedMethod( gui
 			? ConfigManager::inst()->vstEmbedMethod()
 			: "headless" ),
-	m_badDllFormat( false ),
 	m_version( 0 ),
 	m_currentProgram()
 {
+	if( QDir::isRelativePath( m_plugin ) )
+	{
+		m_plugin = ConfigManager::inst()->vstDir()  + m_plugin;
+	}
+
 	setSplittedChannels( true );
 
-	tryLoad( REMOTE_VST_PLUGIN_FILEPATH );
-#ifdef LMMS_BUILD_WIN64
-	if( m_badDllFormat )
-	{
-		m_badDllFormat = false;
-		tryLoad( "32/RemoteVstPlugin32" );
+	PE::MachineType machineType;
+	try {
+		PE::FileInfo peInfo(m_plugin);
+		machineType = peInfo.machineType();
+	} catch (std::runtime_error& e) {
+		qCritical() << "Error while determining PE file's machine type: " << e.what();
+		machineType = PE::MachineType::unknown;
 	}
-#endif
+
+	switch(machineType)
+	{
+	case PE::MachineType::amd64:
+		tryLoad( REMOTE_VST_PLUGIN_FILEPATH_64 ); // Default: RemoteVstPlugin64
+		break;
+	case PE::MachineType::i386:
+		tryLoad( REMOTE_VST_PLUGIN_FILEPATH_32 ); // Default: 32/RemoteVstPlugin32
+		break;
+	default:
+		m_failed = true;
+		return;
+	}
 
 	setTempo( Engine::getSong()->getTempo() );
 
 	connect( Engine::getSong(), SIGNAL( tempoChanged( bpm_t ) ),
-			this, SLOT( setTempo( bpm_t ) ) );
+			this, SLOT( setTempo( bpm_t ) ), Qt::DirectConnection );
 	connect( Engine::mixer(), SIGNAL( sampleRateChanged() ),
 				this, SLOT( updateSampleRate() ) );
 
@@ -124,7 +176,6 @@ VstPlugin::VstPlugin( const QString & _plugin ) :
 
 VstPlugin::~VstPlugin()
 {
-	delete m_pluginSubWindow;
 	delete m_pluginWidget;
 }
 
@@ -155,16 +206,7 @@ void VstPlugin::tryLoad( const QString &remoteVstPluginExecutable )
 		default: break;
 	}
 	sendMessage( message( IdVstSetLanguage ).addInt( hlang ) );
-
-
-	QString p = m_plugin;
-		if( QFileInfo( p ).dir().isRelative() )
-		{
-			p = ConfigManager::inst()->vstDir()  + p;
-		}
-
-
-	sendMessage( message( IdVstLoadPlugin ).addString( QSTR_TO_STDSTR( p ) ) );
+	sendMessage( message( IdVstLoadPlugin ).addString( QSTR_TO_STDSTR( m_plugin ) ) );
 
 	waitForInitDone();
 
@@ -174,39 +216,11 @@ void VstPlugin::tryLoad( const QString &remoteVstPluginExecutable )
 
 
 
-void VstPlugin::hideEditor()
-{
-	QWidget * w = pluginWidget();
-	if( w )
-	{
-		w->hide();
-	}
-}
-
-
-
-
-void VstPlugin::toggleEditor()
-{
-	QWidget * w = pluginWidget();
-	if( w )
-	{
-		w->setVisible( !w->isVisible() );
-	}
-}
-
-
-
-
 void VstPlugin::loadSettings( const QDomElement & _this )
 {
-	if( _this.attribute( "guivisible" ).toInt() )
+	if( _this.hasAttribute( "program" ) )
 	{
-		showUI();
-	}
-	else
-	{
-		hideUI();
+		setProgram( _this.attribute( "program" ).toInt() );
 	}
 
 	const int num_params = _this.attribute( "numparams" ).toInt();
@@ -227,11 +241,6 @@ void VstPlugin::loadSettings( const QDomElement & _this )
 			dump[key] = _this.attribute( key );
 		}
 		setParameterDump( dump );
-	}
-
-	if( _this.hasAttribute( "program" ) )
-	{
-		setProgram( _this.attribute( "program" ).toInt() );
 	}
 }
 
@@ -286,7 +295,7 @@ void VstPlugin::toggleUI()
 	}
 	else if (pluginWidget())
 	{
-		toggleEditor();
+		toggleEditorVisibility();
 	}
 }
 
@@ -351,7 +360,7 @@ void VstPlugin::setParameterDump( const QMap<QString, QString> & _pdump )
 		{
 			( *it ).section( ':', 0, 0 ).toInt(),
 			"",
-			( *it ).section( ':', 2, -1 ).toFloat()
+			LocaleHelper::toFloat((*it).section(':', 2, -1))
 		} ;
 		m.addInt( item.index );
 		m.addString( item.shortLabel );
@@ -362,21 +371,9 @@ void VstPlugin::setParameterDump( const QMap<QString, QString> & _pdump )
 	unlock();
 }
 
-QWidget *VstPlugin::pluginWidget(bool _top_widget)
+QWidget *VstPlugin::pluginWidget()
 {
-	if ( m_embedMethod == "none" || !m_pluginWidget )
-	{
-		return nullptr;
-	}
-
-	if ( _top_widget && m_pluginWidget->parentWidget() == m_pluginSubWindow )
-	{
-		return m_pluginSubWindow;
-	}
-	else
-	{
-		return m_pluginWidget;
-	}
+	return m_pluginWidget;
 }
 
 
@@ -386,12 +383,26 @@ bool VstPlugin::processMessage( const message & _m )
 {
 	switch( _m.id )
 	{
-	case IdVstBadDllFormat:
-		m_badDllFormat = true;
-		break;
-
 	case IdVstPluginWindowID:
 		m_pluginWindowID = _m.getInt();
+		if( m_embedMethod == "none"
+			&& ConfigManager::inst()->value(
+				"ui", "vstalwaysontop" ).toInt() )
+		{
+#ifdef LMMS_BUILD_WIN32
+			// We're changing the owner, not the parent,
+			// so this is legal despite MSDN's warning
+			SetWindowLongPtr( (HWND)(intptr_t) m_pluginWindowID,
+					GWLP_HWNDPARENT,
+					(LONG_PTR) gui->mainWindow()->winId() );
+#endif
+
+#ifdef LMMS_BUILD_LINUX
+			XSetTransientForHint( QX11Info::display(),
+					m_pluginWindowID,
+					gui->mainWindow()->winId() );
+#endif
+		}
 		break;
 
 	case IdVstPluginEditorGeometry:
@@ -427,6 +438,14 @@ bool VstPlugin::processMessage( const message & _m )
 			m_allProgramNames = _m.getQString();
 			break;
 
+		case IdVstParameterLabels:
+			m_allParameterLabels = _m.getQString();
+			break;
+
+		case IdVstParameterDisplays:
+			m_allParameterDisplays = _m.getQString();
+			break;
+
 		case IdVstPluginUniqueID:
 			// TODO: display graphically in case of failure
 			printf("unique ID: %s\n", _m.getString().c_str() );
@@ -458,6 +477,10 @@ bool VstPlugin::processMessage( const message & _m )
 }
 
 
+QWidget *VstPlugin::editor()
+{
+	return m_pluginWidget;
+}
 
 
 void VstPlugin::openPreset( )
@@ -510,6 +533,28 @@ void VstPlugin::loadProgramNames()
 	lock();
 	sendMessage( message( IdVstProgramNames ) );
 	waitForMessage( IdVstProgramNames, true );
+	unlock();
+}
+
+
+
+
+void VstPlugin::loadParameterLabels()
+{
+	lock();
+	sendMessage( message( IdVstParameterLabels ) );
+	waitForMessage( IdVstParameterLabels, true );
+	unlock();
+}
+
+
+
+
+void VstPlugin::loadParameterDisplays()
+{
+	lock();
+	sendMessage( message( IdVstParameterDisplays ) );
+	waitForMessage( IdVstParameterDisplays, true );
 	unlock();
 }
 
@@ -579,15 +624,10 @@ void VstPlugin::showUI()
 	}
 	else if ( m_embedMethod != "headless" )
 	{
-		if (! pluginWidget()) {
-			createUI( NULL, false );
+		if (! editor()) {
+			qWarning() << "VstPlugin::showUI called before VstPlugin::createUI";
 		}
-
-		QWidget * w = pluginWidget();
-		if( w )
-		{
-			w->show();
-		}
+		toggleEditorVisibility( true );
 	}
 }
 
@@ -599,7 +639,7 @@ void VstPlugin::hideUI()
 	}
 	else if ( pluginWidget() != nullptr )
 	{
-		hideEditor();
+		toggleEditorVisibility( false );
 	}
 }
 
@@ -654,22 +694,39 @@ QByteArray VstPlugin::saveChunk()
 	return a;
 }
 
-void VstPlugin::createUI( QWidget * parent, bool isEffect )
+void VstPlugin::toggleEditorVisibility( int visible )
 {
+	QWidget* w = editor();
+	if ( ! w ) {
+		return;
+	}
+
+	if ( visible < 0 ) {
+		visible = ! w->isVisible();
+	}
+	w->setVisible( visible );
+}
+
+void VstPlugin::createUI( QWidget * parent )
+{
+	if ( m_pluginWidget ) {
+		qWarning() << "VstPlugin::createUI called twice";
+		m_pluginWidget->setParent( parent );
+		return;
+	}
+
 	if( m_pluginWindowID == 0 )
 	{
 		return;
 	}
 
 	QWidget* container = nullptr;
-	m_pluginSubWindow = new vstSubWin( gui->mainWindow()->workspace() );
-	auto sw = m_pluginSubWindow.data();
 
 #if QT_VERSION >= 0x050100
 	if (m_embedMethod == "qt" )
 	{
 		QWindow* vw = QWindow::fromWinId(m_pluginWindowID);
-		container = QWidget::createWindowContainer(vw, sw );
+		container = QWidget::createWindowContainer(vw, parent );
 		container->installEventFilter(this);
 	} else
 #endif
@@ -708,7 +765,11 @@ void VstPlugin::createUI( QWidget * parent, bool isEffect )
 #ifdef LMMS_BUILD_LINUX
 	if (m_embedMethod == "xembed" )
 	{
-		QX11EmbedContainer * embedContainer = new QX11EmbedContainer( sw );
+		if (parent)
+		{
+			parent->setAttribute(Qt::WA_NativeWindow);
+		}
+		QX11EmbedContainer * embedContainer = new QX11EmbedContainer( parent );
 		connect(embedContainer, SIGNAL(clientIsEmbedded()), this, SLOT(handleClientEmbed()));
 		embedContainer->embedClient( m_pluginWindowID );
 		container = embedContainer;
@@ -716,31 +777,13 @@ void VstPlugin::createUI( QWidget * parent, bool isEffect )
 #endif
 	{
 		qCritical() << "Unknown embed method" << m_embedMethod;
-		delete m_pluginSubWindow;
 		return;
 	}
 
 	container->setFixedSize( m_pluginGeometry );
 	container->setWindowTitle( name() );
 
-	if( parent == NULL )
-	{
-		m_pluginWidget = container;
-
-		sw->setWidget(container);
-
-		if( isEffect )
-		{
-			sw->setAttribute( Qt::WA_TranslucentBackground );
-			sw->setWindowFlags( Qt::FramelessWindowHint );
-		}
-		else
-		{
-			sw->setWindowFlags( Qt::WindowCloseButtonHint );
-		}
-	};
-
-	container->setFixedSize( m_pluginGeometry );
+	m_pluginWidget = container;
 }
 
 bool VstPlugin::eventFilter(QObject *obj, QEvent *event)

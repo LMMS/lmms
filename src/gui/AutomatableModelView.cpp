@@ -42,9 +42,7 @@
 static float floatFromClipboard(bool* ok=nullptr);
 
 AutomatableModelView::AutomatableModelView( ::Model* model, QWidget* _this ) :
-	ModelView( model, _this ),
-	m_description( QString::null ),
-	m_unit( QString::null )
+	ModelView( model, _this )
 {
 	widget()->setAcceptDrops( true );
 	widget()->setCursor( QCursor( embed::getIconPixmap( "hand" ), 3, 3 ) );

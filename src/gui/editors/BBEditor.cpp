@@ -69,14 +69,6 @@ BBEditor::BBEditor( BBTrackContainer* tc ) :
 	m_playAction->setToolTip(tr( "Play/pause current beat/bassline (Space)" ));
 	m_stopAction->setToolTip(tr( "Stop playback of current beat/bassline (Space)" ));
 
-	m_playAction->setWhatsThis(
-		tr( "Click here to play the current "
-			"beat/bassline.  The beat/bassline is automatically "
-			"looped when its end is reached." ) );
-	m_stopAction->setWhatsThis(
-		tr( "Click here to stop playing of current "
-							"beat/bassline." ) );
-
 
 	// Beat selector
 	DropToolBar *beatSelectionToolBar = addDropToolBarToTop(tr("Beat selector"));
@@ -258,7 +250,25 @@ void BBTrackContainerView::dropEvent(QDropEvent* de)
 		DataFile dataFile( value.toUtf8() );
 		Track * t = Track::create( dataFile.content().firstChild().toElement(), model() );
 
-		t->deleteTCOs();
+		// Ensure BB TCOs exist
+		bool hasValidBBTCOs = false;
+		if (t->getTCOs().size() == m_bbtc->numOfBBs())
+		{
+			hasValidBBTCOs = true;
+			for (int i = 0; i < t->getTCOs().size(); ++i)
+			{
+				if (t->getTCOs()[i]->startPosition() != MidiTime(i, 0))
+				{
+					hasValidBBTCOs = false;
+					break;
+				}
+			}
+		}
+		if (!hasValidBBTCOs)
+		{
+			t->deleteTCOs();
+			t->createTCOsForBB(m_bbtc->numOfBBs() - 1);
+		}
 		m_bbtc->updateAfterTrackAdd();
 
 		de->accept();

@@ -28,7 +28,6 @@
 #include <QInputDialog>
 #include <QMouseEvent>
 #include <QPainter>
-#include <QWhatsThis>
 
 #ifndef __USE_XOPEN
 #define __USE_XOPEN
@@ -42,6 +41,7 @@
 #include "embed.h"
 #include "gui_templates.h"
 #include "GuiApplication.h"
+#include "LocaleHelper.h"
 #include "MainWindow.h"
 #include "ProjectJournal.h"
 #include "Song.h"
@@ -52,34 +52,27 @@ TextFloat * Knob::s_textFloat = NULL;
 
 
 
-//! @todo: in C++11, we can use delegating ctors
-#define DEFAULT_KNOB_INITIALIZER_LIST \
-	QWidget( _parent ), \
-	FloatModelView( new FloatModel( 0, 0, 0, 1, NULL, _name, true ), this ), \
-	m_label( "" ), \
-	m_knobPixmap( NULL ), \
-	m_volumeKnob( false ), \
-	m_volumeRatio( 100.0, 0.0, 1000000.0 ), \
-	m_buttonPressed( false ), \
-	m_angle( -10 ), \
-	m_lineWidth( 0 ), \
-	m_textColor( 255, 255, 255 )
 
 Knob::Knob( knobTypes _knob_num, QWidget * _parent, const QString & _name ) :
-	DEFAULT_KNOB_INITIALIZER_LIST,
+	QWidget( _parent ),
+	FloatModelView( new FloatModel( 0, 0, 0, 1, NULL, _name, true ), this ),
+	m_label( "" ),
+	m_knobPixmap( NULL ),
+	m_volumeKnob( false ),
+	m_volumeRatio( 100.0, 0.0, 1000000.0 ),
+	m_buttonPressed( false ),
+	m_angle( -10 ),
+	m_lineWidth( 0 ),
+	m_textColor( 255, 255, 255 ),
 	m_knobNum( _knob_num )
 {
 	initUi( _name );
 }
 
 Knob::Knob( QWidget * _parent, const QString & _name ) :
-	DEFAULT_KNOB_INITIALIZER_LIST,
-	m_knobNum( knobBright_26 )
+	Knob( knobBright_26, _parent, _name )
 {
-	initUi( _name );
 }
-
-#undef DEFAULT_KNOB_INITIALIZER_LIST
 
 
 
@@ -532,7 +525,6 @@ void Knob::contextMenuEvent( QContextMenuEvent * )
 		model()->isScaleLogarithmic() ? tr( "Set linear" ) : tr( "Set logarithmic" ),
 		this, SLOT( toggleScale() ) );
 	contextMenu.addSeparator();
-	contextMenu.addHelpAction();
 	contextMenu.exec( QCursor::pos() );
 }
 
@@ -560,7 +552,7 @@ void Knob::dropEvent( QDropEvent * _de )
 	QString val = StringPairDrag::decodeValue( _de );
 	if( type == "float_value" )
 	{
-		model()->setValue( val.toFloat() );
+		model()->setValue( LocaleHelper::toFloat(val) );
 		_de->accept();
 	}
 	else if( type == "automatable_model" )
@@ -607,7 +599,7 @@ void Knob::mousePressEvent( QMouseEvent * _me )
 		m_buttonPressed = true;
 	}
 	else if( _me->button() == Qt::LeftButton &&
-			gui->mainWindow()->isShiftPressed() == true )
+			(_me->modifiers() & Qt::ShiftModifier) )
 	{
 		new StringPairDrag( "float_value",
 					QString::number( model()->value() ),
@@ -703,7 +695,8 @@ void Knob::paintEvent( QPaintEvent * _me )
 void Knob::wheelEvent( QWheelEvent * _we )
 {
 	_we->accept();
-	const int inc = ( _we->delta() > 0 ) ? 1 : -1;
+	const float stepMult = model()->range() / 2000 / model()->step<float>();
+	const int inc = ( ( _we->delta() > 0 ) ? 1 : -1 ) * ( ( stepMult < 1 ) ? 1 : stepMult );
 	model()->incValue( inc );
 
 
@@ -809,9 +802,9 @@ void Knob::enterValue()
 
 void Knob::friendlyUpdate()
 {
-	if( model()->controllerConnection() == NULL ||
+	if (model() && (model()->controllerConnection() == NULL ||
 		model()->controllerConnection()->getController()->frequentUpdates() == false ||
-				Controller::runningFrames() % (256*4) == 0 )
+				Controller::runningFrames() % (256*4) == 0))
 	{
 		update();
 	}
@@ -846,13 +839,4 @@ void Knob::doConnections()
 		QObject::connect( model(), SIGNAL( propertiesChanged() ),
 						this, SLOT( update() ) );
 	}
-}
-
-
-
-
-void Knob::displayHelp()
-{
-	QWhatsThis::showText( mapToGlobal( rect().bottomRight() ),
-								whatsThis() );
 }

@@ -25,8 +25,8 @@
  *
  */
 
-#ifndef _LADSPA_SUBPLUGIN_FEATURES_H
-#define _LADSPA_SUBPLUGIN_FEATURES_H
+#ifndef LADSPA_SUBPLUGIN_FEATURES_H
+#define LADSPA_SUBPLUGIN_FEATURES_H
 
 #include "LadspaManager.h"
 #include "Plugin.h"
@@ -37,11 +37,13 @@ class LadspaSubPluginFeatures : public Plugin::Descriptor::SubPluginFeatures
 public:
 	LadspaSubPluginFeatures( Plugin::PluginTypes _type );
 
-	virtual void fillDescriptionWidget( QWidget * _parent,
-												const Key * _key ) const;
+	QString displayName(const Key& k) const override;
+	void fillDescriptionWidget( QWidget * _parent,
+												const Key * _key ) const override;
 
 	virtual void listSubPluginKeys( const Plugin::Descriptor * _desc,
-												KeyList & _kl ) const;
+												KeyList & _kl ) const override;
+
 
 	static ladspa_key_t subPluginKeyToLadspaKey( const Key * _key );
 

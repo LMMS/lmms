@@ -66,6 +66,12 @@ public:
 		return( element );
 	}
 
+	void waitUntilRead()
+	{
+		m_writer_sem.acquire( m_size );
+		m_writer_sem.release( m_size );
+	}
+
 	bool available()
 	{
 		return( m_reader_sem.available() );

@@ -80,9 +80,9 @@ void RenderManager::renderNextTrack()
 		m_tracksToRender.pop_back();
 
 		// mute everything but the track we are about to render
-		for( auto it = m_unmuted.begin(); it != m_unmuted.end(); ++it )
+		for (auto track : m_unmuted)
 		{
-			(*it)->setMuted( (*it) != renderTrack );
+			track->setMuted(track != renderTrack);
 		}
 
 		// for multi-render, prefix each output file with a different number
@@ -103,7 +103,7 @@ void RenderManager::renderTracks()
 		Track* tk = (*it);
 		Track::TrackTypes type = tk->type();
 
-		// Don't mute automation tracks
+		// Don't render automation tracks
 		if ( tk->isMuted() == false &&
 				( type == Track::InstrumentTrack || type == Track::SampleTrack ) )
 		{
@@ -115,7 +115,11 @@ void RenderManager::renderTracks()
 	for( auto it = t2.begin(); it != t2.end(); ++it )
 	{
 		Track* tk = (*it);
-		if ( tk->isMuted() == false )
+		Track::TrackTypes type = tk->type();
+
+		// Don't render automation tracks
+		if ( tk->isMuted() == false &&
+				( type == Track::InstrumentTrack || type == Track::SampleTrack ) )
 		{
 			m_unmuted.push_back(tk);
 		}
@@ -178,7 +182,7 @@ QString RenderManager::pathForTrack(const Track *track, int num)
 {
 	QString extension = ProjectRenderer::getFileExtensionFromFormat( m_format );
 	QString name = track->name();
-	name = name.remove(QRegExp("[^a-zA-Z]"));
+	name = name.remove(QRegExp(FILENAME_FILTER));
 	name = QString( "%1_%2%3" ).arg( num ).arg( name ).arg( extension );
 	return QDir(m_outputPath).filePath(name);
 }

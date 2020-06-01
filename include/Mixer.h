@@ -66,7 +66,7 @@ const Octaves BaseOctave = DefaultOctave;
 class MixerWorkerThread;
 
 
-class EXPORT Mixer : public QObject
+class LMMS_EXPORT Mixer : public QObject
 {
 	Q_OBJECT
 public:
@@ -171,10 +171,14 @@ public:
 		return m_audioDevStartFailed;
 	}
 
-	void setAudioDevice( AudioDevice * _dev );
+	//! Set new audio device. Old device will be deleted,
+	//! unless it's stored using storeAudioDevice
+	void setAudioDevice( AudioDevice * _dev , bool startNow );
+	//! See overloaded function
 	void setAudioDevice( AudioDevice * _dev,
 				const struct qualitySettings & _qs,
-							bool _needs_fifo );
+				bool _needs_fifo,
+				bool startNow );
 	void storeAudioDevice();
 	void restoreAudioDevice();
 	inline AudioDevice * audioDev()
@@ -273,7 +277,13 @@ public:
 	}
 
 
-	void getPeakValues( sampleFrame * _ab, const f_cnt_t _frames, float & peakLeft, float & peakRight ) const;
+	struct StereoSample
+	{
+		StereoSample(sample_t _left, sample_t _right) : left(_left), right(_right) {}
+		sample_t left;
+		sample_t right;
+	};
+	StereoSample getPeakValues(sampleFrame * _ab, const f_cnt_t _frames) const;
 
 
 	bool criticalXRuns() const;
@@ -305,8 +315,12 @@ public:
 	inline bool isMetronomeActive() const { return m_metronomeActive; }
 	inline void setMetronomeActive(bool value = true) { m_metronomeActive = value; }
 
+	//! Block until a change in model can be done (i.e. wait for audio thread)
 	void requestChangeInModel();
 	void doneChangeInModel();
+
+	static bool isAudioDevNameValid(QString name);
+	static bool isMidiDevNameValid(QString name);
 
 
 signals:
@@ -331,7 +345,7 @@ private:
 		fifo * m_fifo;
 		volatile bool m_writing;
 
-		virtual void run();
+		void run() override;
 
 		void write( surroundSampleFrame * buffer );
 
@@ -353,6 +367,8 @@ private:
 
 	void clearInternal();
 
+	//! Called by the audio thread to give control to other threads,
+	//! such that they can do changes in the model (like e.g. removing effects)
 	void runChangesInModel();
 
 	bool m_renderOnly;
@@ -392,6 +408,7 @@ private:
 	bool m_isProcessing;
 
 	// audio device stuff
+	void doSetAudioDevice( AudioDevice *_dev );
 	AudioDevice * m_audioDev;
 	AudioDevice * m_oldAudioDev;
 	QString m_audioDevName;

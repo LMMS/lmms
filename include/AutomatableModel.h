@@ -33,6 +33,7 @@
 #include "MidiTime.h"
 #include "ValueBuffer.h"
 #include "MemoryManager.h"
+#include "ModelVisitor.h"
 
 // simple way to map a property of a view to a model
 #define mapPropertyFromModelPtr(type,getfunc,setfunc,modelname)	\
@@ -59,15 +60,21 @@
 				modelname.setValue( (float) val );				\
 			}
 
+// use this to make subclasses visitable
+#define MODEL_IS_VISITABLE \
+	void accept(ModelVisitor& v) override { v.visit(*this); } \
+	void accept(ConstModelVisitor& v) const override { v.visit(*this); }
+
 
 
 class ControllerConnection;
 
-class EXPORT AutomatableModel : public Model, public JournallingObject
+class LMMS_EXPORT AutomatableModel : public Model, public JournallingObject
 {
 	Q_OBJECT
 	MM_OPERATORS
 public:
+
 	typedef QVector<AutomatableModel *> AutoModelVector;
 
 	enum ScaleType
@@ -80,6 +87,35 @@ public:
 
 	virtual ~AutomatableModel();
 
+	// Implement those by using the MODEL_IS_VISITABLE macro
+	virtual void accept(ModelVisitor& v) = 0;
+	virtual void accept(ConstModelVisitor& v) const = 0;
+
+public:
+	/**
+	   @brief Return this class casted to Target
+	   @test AutomatableModelTest.cpp
+	   @param doThrow throw an assertion if the cast fails, instead of
+	     returning a nullptr
+	   @return the casted class if Target is the exact or a base class of
+	     *this, nullptr otherwise
+	*/
+	template<class Target>
+	Target* dynamicCast(bool doThrow = false)
+	{
+		DCastVisitor<Target> vis; accept(vis);
+		if (doThrow && !vis.result) { Q_ASSERT(false); }
+		return vis.result;
+	}
+
+	//! const overload, see overloaded function
+	template<class Target>
+	const Target* dynamicCast(bool doThrow = false) const
+	{
+		ConstDCastVisitor<Target> vis; accept(vis);
+		if (doThrow && !vis.result) { Q_ASSERT(false); }
+		return vis.result;
+	}
 
 	bool isAutomated() const;
 	bool isAutomatedOrControlled() const
@@ -200,6 +236,7 @@ public:
 		m_centerValue = centerVal;
 	}
 
+	//! link @p m1 and @p m2, let @p m1 take the values of @p m2
 	static void linkModels( AutomatableModel* m1, AutomatableModel* m2 );
 	static void unlinkModels( AutomatableModel* m1, AutomatableModel* m2 );
 
@@ -219,7 +256,7 @@ public:
 				specified DOM element using <name> as attribute/node name */
 	virtual void loadSettings( const QDomElement& element, const QString& name );
 
-	virtual QString nodeName() const
+	QString nodeName() const override
 	{
 		return "automatablemodel";
 	}
@@ -283,12 +320,30 @@ protected:
 
 
 private:
-	virtual void saveSettings( QDomDocument& doc, QDomElement& element )
+	// dynamicCast implementation
+	template<class Target>
+	struct DCastVisitor : public ModelVisitor
+	{
+		Target* result = nullptr;
+		void visit(Target& tar) { result = &tar; }
+	};
+
+	// dynamicCast implementation
+	template<class Target>
+	struct ConstDCastVisitor : public ConstModelVisitor
+	{
+		const Target* result = nullptr;
+		void visit(const Target& tar) { result = &tar; }
+	};
+
+	static bool mustQuoteName(const QString &name);
+
+	void saveSettings( QDomDocument& doc, QDomElement& element ) override
 	{
 		saveSettings( doc, element, "value" );
 	}
 
-	virtual void loadSettings( const QDomElement& element )
+	void loadSettings( const QDomElement& element ) override
 	{
 		loadSettings( element, "value" );
 	}
@@ -305,7 +360,7 @@ private:
 	template<class T> void roundAt( T &value, const T &where ) const;
 
 
-	ScaleType m_scaleType; //! scale type, linear by default
+	ScaleType m_scaleType; //!< scale type, linear by default
 	float m_value;
 	float m_initValue;
 	float m_minValue;
@@ -349,7 +404,7 @@ signals:
 
 
 
-template <typename T> class EXPORT TypedAutomatableModel : public AutomatableModel
+template <typename T> class LMMS_EXPORT TypedAutomatableModel : public AutomatableModel
 {
 public:
 	using AutomatableModel::AutomatableModel;
@@ -377,9 +432,10 @@ public:
 
 // some typed AutomatableModel-definitions
 
-class EXPORT FloatModel : public TypedAutomatableModel<float>
+class LMMS_EXPORT FloatModel : public TypedAutomatableModel<float>
 {
 	Q_OBJECT
+	MODEL_IS_VISITABLE
 public:
 	FloatModel( float val = 0, float min = 0, float max = 0, float step = 0,
 				Model * parent = NULL,
@@ -394,9 +450,10 @@ public:
 } ;
 
 
-class EXPORT IntModel : public TypedAutomatableModel<int>
+class LMMS_EXPORT IntModel : public TypedAutomatableModel<int>
 {
 	Q_OBJECT
+	MODEL_IS_VISITABLE
 public:
 	IntModel( int val = 0, int min = 0, int max = 0,
 				Model* parent = NULL,
@@ -409,9 +466,10 @@ public:
 } ;
 
 
-class EXPORT BoolModel : public TypedAutomatableModel<bool>
+class LMMS_EXPORT BoolModel : public TypedAutomatableModel<bool>
 {
 	Q_OBJECT
+	MODEL_IS_VISITABLE
 public:
 	BoolModel( const bool val = false,
 				Model* parent = NULL,

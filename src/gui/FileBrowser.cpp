@@ -24,6 +24,7 @@
  */
 
 
+#include <QDesktopServices>
 #include <QHBoxLayout>
 #include <QKeyEvent>
 #include <QLineEdit>
@@ -83,15 +84,13 @@ FileBrowser::FileBrowser(const QString & directories, const QString & filter,
 
 	m_filterEdit = new QLineEdit( searchWidget );
 	m_filterEdit->setPlaceholderText( tr("Search") );
-#if QT_VERSION >= 0x050000
 	m_filterEdit->setClearButtonEnabled( true );
-#endif
 	connect( m_filterEdit, SIGNAL( textEdited( const QString & ) ),
 			this, SLOT( filterItems( const QString & ) ) );
 
 	QPushButton * reload_btn = new QPushButton(
 				embed::getIconPixmap( "reload" ),
-						QString::null, searchWidget );
+						QString(), searchWidget );
 	reload_btn->setToolTip( tr( "Refresh list" ) );
 	connect( reload_btn, SIGNAL( clicked() ), this, SLOT( reloadTree() ) );
 
@@ -131,7 +130,7 @@ bool FileBrowser::filterItems( const QString & filter, QTreeWidgetItem * item )
 			{
 				// yes, then show everything below
 				it->setHidden( false );
-				filterItems( QString::null, it );
+				filterItems( QString(), it );
 				anyMatched = true;
 			}
 			else
@@ -165,6 +164,7 @@ bool FileBrowser::filterItems( const QString & filter, QTreeWidgetItem * item )
 
 void FileBrowser::reloadTree( void )
 {
+	QList<QString> expandedDirs = m_fileBrowserTreeWidget->expandedDirs();
 	const QString text = m_filterEdit->text();
 	m_filterEdit->clear();
 	m_fileBrowserTreeWidget->clear();
@@ -173,17 +173,17 @@ void FileBrowser::reloadTree( void )
 	{
 		addItems( *it );
 	}
-	expandItems();
+	expandItems(NULL, expandedDirs);
 	m_filterEdit->setText( text );
 	filterItems( text );
 }
 
 
 
-void FileBrowser::expandItems( QTreeWidgetItem * item )
+void FileBrowser::expandItems( QTreeWidgetItem * item, QList<QString> expandedDirs )
 {
-    int numChildren = item ? item->childCount() : m_fileBrowserTreeWidget->topLevelItemCount();
-	for( int i = 0; i < numChildren; ++i )
+	int numChildren = item ? item->childCount() : m_fileBrowserTreeWidget->topLevelItemCount();
+	for (int i = 0; i < numChildren; ++i)
 	{
 		QTreeWidgetItem * it = item ? item->child( i ) : m_fileBrowserTreeWidget->topLevelItem(i);
 		if ( m_recurse )
@@ -191,14 +191,15 @@ void FileBrowser::expandItems( QTreeWidgetItem * item )
 			it->setExpanded( true );
 		}
 		Directory *d = dynamic_cast<Directory *> ( it );
-		if( d )
+		if (d)
 		{
 			d->update();
-			d->setExpanded( false );
+			bool expand = expandedDirs.contains( d->fullName() );
+			d->setExpanded( expand );
 		}
-		if( m_recurse && it->childCount() )
+		if (m_recurse && it->childCount())
 		{
-			expandItems(it);
+			expandItems(it, expandedDirs);
 		}
 	}
 }
@@ -221,10 +222,11 @@ void FileBrowser::addItems(const QString & path )
 {
 	if( m_dirsAsItems )
 	{
-		m_fileBrowserTreeWidget->addTopLevelItem( new Directory( path, QString::null, m_filter ) );
+		m_fileBrowserTreeWidget->addTopLevelItem( new Directory( path, QString(), m_filter ) );
 		return;
 	}
 
+	// try to add all directories from file system alphabetically into the tree
 	QDir cdir( path );
 	QStringList files = cdir.entryList( QDir::Dirs, QDir::Name );
 	for( QStringList::const_iterator it = files.constBegin();
@@ -240,15 +242,21 @@ void FileBrowser::addItems(const QString & path )
 						m_fileBrowserTreeWidget->topLevelItem( i ) );
 				if( d == NULL || cur_file < d->text( 0 ) )
 				{
+					// insert before item, we're done
 					Directory *dd = new Directory( cur_file, path,
 												   m_filter );
 					m_fileBrowserTreeWidget->insertTopLevelItem( i,dd );
-					dd->update();
+					dd->update(); // add files to the directory
 					orphan = false;
 					break;
 				}
 				else if( cur_file == d->text( 0 ) )
 				{
+					// imagine we have subdirs named "TripleOscillator/xyz" in
+					// two directories from m_directories
+					// then only add one tree widget for both
+					// so we don't add a new Directory - we just
+					// add the path to the current directory
 					d->addDirectory( path );
 					d->update();
 					orphan = false;
@@ -257,6 +265,8 @@ void FileBrowser::addItems(const QString & path )
 			}
 			if( orphan )
 			{
+				// it has not yet been added yet, so it's (lexically)
+				// larger than all other dirs => append it at the bottom
 				Directory *d = new Directory( cur_file,
 											  path, m_filter );
 				d->update();
@@ -328,27 +338,67 @@ FileBrowserTreeWidget::FileBrowserTreeWidget(QWidget * parent ) :
 
 }
 
+QList<QString> FileBrowserTreeWidget::expandedDirs( QTreeWidgetItem * item ) const
+{
+	int numChildren = item ? item->childCount() : topLevelItemCount();
+	QList<QString> dirs;
+	for (int i = 0; i < numChildren; ++i)
+	{
+		QTreeWidgetItem * it  = item ? item->child(i) : topLevelItem(i);
+
+		// Add expanded top level directories.
+		if (it->isExpanded() && (it->type() == TypeDirectoryItem))
+		{
+			Directory *d = static_cast<Directory *> ( it );
+			dirs.append( d->fullName() );
+		}
+
+		// Add expanded child directories (recurse).
+		if (it->childCount())
+		{
+			dirs.append( expandedDirs( it ) );
+		}
+	}
+	return dirs;
+}
+
 void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent * e )
 {
-	FileItem * f = dynamic_cast<FileItem *>( itemAt( e->pos() ) );
-	if( f != NULL && ( f->handling() == FileItem::LoadAsPreset ||
-				 f->handling() == FileItem::LoadByPlugin ) )
+	FileItem * f = dynamic_cast<FileItem *>(itemAt(e->pos()));
+	if (f == nullptr)
 	{
+		return;
+	}
+
+	if (f->handling() == FileItem::LoadAsPreset || f->handling() == FileItem::LoadByPlugin)
+	{
+		// Set the member to the current FileItem so that it is available during the
+		// execution of the slots of the context menu we are about to create and execute.
 		m_contextMenuItem = f;
-		QMenu contextMenu( this );
-		contextMenu.addAction( tr( "Send to active instrument-track" ),
-						this,
-					SLOT( sendToActiveInstrumentTrack() ) );
-		contextMenu.addAction( tr( "Open in new instrument-track/"
-								"Song Editor" ),
-						this,
-					SLOT( openInNewInstrumentTrackSE() ) );
-		contextMenu.addAction( tr( "Open in new instrument-track/"
-								"B+B Editor" ),
-						this,
-					SLOT( openInNewInstrumentTrackBBE() ) );
-		contextMenu.exec( e->globalPos() );
-		m_contextMenuItem = NULL;
+
+		QMenu contextMenu(this);
+
+		contextMenu.addAction(tr("Send to active instrument-track"),
+					this,
+					SLOT(sendToActiveInstrumentTrack()));
+		contextMenu.addAction(tr("Open in new instrument-track/Song Editor"),
+					this,
+					SLOT(openInNewInstrumentTrackSE()));
+		contextMenu.addAction(tr("Open in new instrument-track/B+B Editor"),
+					this,
+					SLOT(openInNewInstrumentTrackBBE()));
+
+		contextMenu.addSeparator();
+
+		contextMenu.addAction(QIcon(embed::getIconPixmap("folder")),
+					tr("Open containing folder"),
+					this,
+					SLOT(openContainingFolder()));
+
+		contextMenu.exec(e->globalPos());
+
+		// The context menu has been executed so we can reset this member back to nullptr.
+		m_contextMenuItem = nullptr;
 	}
 }
 
@@ -407,8 +457,12 @@ void FileBrowserTreeWidget::mousePressEvent(QMouseEvent * me )
 			m_previewPlayHandle = s;
 			delete tf;
 		}
-		else if( ( f->extension ()== "xiz" || f->extension() == "sf2" || f->extension() == "sf3" || f->extension() == "gig" || f->extension() == "pat" ) &&
-			! pluginFactory->pluginSupportingExtension(f->extension()).isNull() )
+		else if ( ( f->extension ()== "xiz" || f->extension() == "sf2" || f->extension() == "sf3" || f->extension() == "gig" || f->extension() == "pat"
+#ifdef LMMS_HAVE_LV2
+			|| f->extension() == "lv2"
+#endif
+			) &&
+			! pluginFactory->pluginSupportingExtension(f->extension()).info.isNull() )
 		{
 			m_previewPlayHandle = new PresetPreviewPlayHandle( f->fullName(), f->handling() == FileItem::LoadByPlugin );
 		}
@@ -420,8 +474,7 @@ void FileBrowserTreeWidget::mousePressEvent(QMouseEvent * me )
 			if( !dataFile.validate( f->extension() ) )
 			{
 				QMessageBox::warning( 0, tr ( "Error" ),
-					f->fullName() + " " + tr( "does not appear to be a valid" ) + " " + f->extension() +
-									  " " + tr( "file" ),
+					tr( "%1 does not appear to be a valid %2 file" ).arg( f->fullName(), f->extension() ),
 					QMessageBox::Ok, QMessageBox::NoButton );
 				m_pphMutex.unlock();
 				return;
@@ -551,8 +604,9 @@ void FileBrowserTreeWidget::handleFile(FileItem * f, InstrumentTrack * it )
 			if( i == NULL ||
 				!i->descriptor()->supportsFileType( e ) )
 			{
-				i = it->loadInstrument(
-					pluginFactory->pluginSupportingExtension(e).name() );
+				PluginFactory::PluginInfoAndKey piakn =
+					pluginFactory->pluginSupportingExtension(e);
+				i = it->loadInstrument(piakn.info.name(), &piakn.key);
 			}
 			i->loadFile( f->fullName() );
 			break;
@@ -636,6 +690,22 @@ void FileBrowserTreeWidget::openInNewInstrumentTrackSE( void )
 	openInNewInstrumentTrack( Engine::getSong() );
 }
 
+
+
+void FileBrowserTreeWidget::openContainingFolder()
+{
+	if (m_contextMenuItem)
+	{
+		// Delegate to QDesktopServices::openUrl with the directory of the selected file. Please note that
+		// this will only open the directory but not select the file as this is much more complicated due
+		// to different implementations that are needed for different platforms (Linux/Windows/MacOS).
+
+		// Using QDesktopServices::openUrl seems to be the most simple cross platform way which uses
+		// functionality that's already available in Qt.
+		QFileInfo fileInfo(m_contextMenuItem->fullName());
+		QDesktopServices::openUrl(QUrl::fromLocalFile(fileInfo.dir().path()));
+	}
+}
 
 
 
@@ -744,21 +814,29 @@ void Directory::update( void )
 	if( !childCount() )
 	{
 		m_dirCount = 0;
+		// for all paths leading here, add their items
 		for( QStringList::iterator it = m_directories.begin();
 					it != m_directories.end(); ++it )
 		{
-			int top_index = childCount();
+			int filesBeforeAdd = childCount() - m_dirCount;
 			if( addItems( fullName( *it ) ) &&
 				( *it ).contains(
 					ConfigManager::inst()->dataDir() ) )
 			{
-				QTreeWidgetItem * sep = new QTreeWidgetItem;
-				sep->setText( 0,
-					FileBrowserTreeWidget::tr(
-						"--- Factory files ---" ) );
-				sep->setIcon( 0, embed::getIconPixmap(
-							"factory_files" ) );
-				insertChild(  m_dirCount + top_index, sep );
+				// factory file directory is added
+				// note: those are always added last
+				int filesNow = childCount() - m_dirCount;
+				if(filesNow > filesBeforeAdd) // any file appended?
+				{
+					QTreeWidgetItem * sep = new QTreeWidgetItem;
+					sep->setText( 0,
+						FileBrowserTreeWidget::tr(
+							"--- Factory files ---" ) );
+					sep->setIcon( 0, embed::getIconPixmap(
+								"factory_files" ) );
+					// add delimeter after last file before appending our files
+					insertChild( filesBeforeAdd + m_dirCount, sep );
+				}
 			}
 		}
 	}
@@ -779,6 +857,7 @@ bool Directory::addItems(const QString & path )
 
 	bool added_something = false;
 
+	// try to add all directories from file system alphabetically into the tree
 	QStringList files = thisDir.entryList( QDir::Dirs, QDir::Name );
 	for( QStringList::const_iterator it = files.constBegin();
 						it != files.constEnd(); ++it )
@@ -793,6 +872,7 @@ bool Directory::addItems(const QString & path )
 								child( i ) );
 				if( d == NULL || cur_file < d->text( 0 ) )
 				{
+					// insert before item, we're done
 					insertChild( i, new Directory( cur_file,
 							path, m_filter ) );
 					orphan = false;
@@ -801,6 +881,12 @@ bool Directory::addItems(const QString & path )
 				}
 				else if( cur_file == d->text( 0 ) )
 				{
+					// imagine we have top-level subdirs named "TripleOscillator" in
+					// two directories from FileBrowser::m_directories
+					// and imagine both have a sub folder named "xyz"
+					// then only add one tree widget for both
+					// so we don't add a new Directory - we just
+					// add the path to the current directory
 					d->addDirectory( path );
 					orphan = false;
 					break;
@@ -808,6 +894,8 @@ bool Directory::addItems(const QString & path )
 			}
 			if( orphan )
 			{
+				// it has not yet been added yet, so it's (lexically)
+				// larger than all other dirs => append it at the bottom
 				addChild( new Directory( cur_file, path,
 								m_filter ) );
 				m_dirCount++;
@@ -983,6 +1071,11 @@ void FileItem::determineFileType( void )
 	else if( ext == "dll" )
 	{
 		m_type = VstPluginFile;
+		m_handling = LoadByPlugin;
+	}
+	else if ( ext == "lv2" )
+	{
+		m_type = PresetFile;
 		m_handling = LoadByPlugin;
 	}
 	else

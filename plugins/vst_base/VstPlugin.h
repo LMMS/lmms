@@ -33,12 +33,14 @@
 #include <QWidget>
 
 #include "JournallingObject.h"
-#include "communication.h"
+#include "RemotePlugin.h"
+
+#include "vstbase_export.h"
 
 class vstSubWin;
 
 
-class PLUGIN_EXPORT VstPlugin : public RemotePlugin, public JournallingObject
+class VSTBASE_EXPORT VstPlugin : public RemotePlugin, public JournallingObject
 {
 	Q_OBJECT
 public:
@@ -47,15 +49,17 @@ public:
 
 	void tryLoad( const QString &remoteVstPluginExecutable );
 
-	virtual bool processMessage( const message & _m );
+	bool processMessage( const message & _m ) override;
 
 	inline bool hasEditor() const
 	{
 		return m_pluginWindowID != 0;
 	}
 
-	void hideEditor();
-	void toggleEditor();
+	/// Same as pluginWidget(), but can be overwritten in sub-classes to modify
+	/// behavior the UI. This is used in VstInstrumentPlugin to wrap the VST UI
+	/// in a QMdiSubWindow
+	virtual QWidget* editor();
 
 	inline const QString & name() const
 	{
@@ -87,26 +91,35 @@ public:
 		return m_allProgramNames;
 	}
 
+	inline const QString& allParameterLabels() const
+	{
+		return m_allParameterLabels;
+	}
+
+	inline const QString& allParameterDisplays() const
+	{
+		return m_allParameterDisplays;
+	}
+
 	int currentProgram();
 
 	const QMap<QString, QString> & parameterDump();
 	void setParameterDump( const QMap<QString, QString> & _pdump );
 
 
-	QWidget * pluginWidget( bool _top_widget = true );
+	QWidget * pluginWidget();
 
-	virtual void loadSettings( const QDomElement & _this );
-	virtual void saveSettings( QDomDocument & _doc, QDomElement & _this );
+	void loadSettings( const QDomElement & _this ) override;
+	void saveSettings( QDomDocument & _doc, QDomElement & _this ) override;
 
-	inline virtual QString nodeName() const
+	virtual QString nodeName() const override
 	{
 		return "vstplugin";
 	}
 
-	void toggleUI() override;
 
-	void createUI( QWidget *parent, bool isEffect );
-	bool eventFilter(QObject *obj, QEvent *event);
+	virtual void createUI(QWidget *parent);
+	bool eventFilter(QObject *obj, QEvent *event) override;
 
 	QString embedMethod() const;
 
@@ -117,12 +130,15 @@ public slots:
 	void setProgram( int index );
 	void rotateProgram( int offset );
 	void loadProgramNames();
+	void loadParameterLabels();
+	void loadParameterDisplays();
 	void savePreset( void );
 	void setParam( int i, float f );
 	void idleUpdate();
 
 	void showUI() override;
 	void hideUI() override;
+	void toggleUI() override;
 
 	void handleClientEmbed();
 
@@ -130,14 +146,13 @@ private:
 	void loadChunk( const QByteArray & _chunk );
 	QByteArray saveChunk();
 
+	void toggleEditorVisibility(int visible = -1);
+
 	QString m_plugin;
 	QPointer<QWidget> m_pluginWidget;
-	QPointer<vstSubWin> m_pluginSubWindow;
 	int m_pluginWindowID;
 	QSize m_pluginGeometry;
 	const QString m_embedMethod;
-
-	bool m_badDllFormat;
 
 	QString m_name;
 	int m_version;
@@ -145,6 +160,8 @@ private:
 	QString m_productString;
 	QString m_currentProgramName;
 	QString m_allProgramNames;
+	QString m_allParameterLabels;
+	QString m_allParameterDisplays;
 
 	QString p_name;
 

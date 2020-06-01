@@ -24,7 +24,9 @@
 
 #include "FlangerEffect.h"
 #include "Engine.h"
+
 #include "embed.h"
+#include "plugin_export.h"
 
 extern "C"
 {
@@ -68,7 +70,7 @@ FlangerEffect::~FlangerEffect()
 	{
 		delete m_rDelay;
 	}
-	if(m_lfo )
+	if( m_lfo )
 	{
 		delete m_lfo;
 	}
@@ -136,6 +138,15 @@ void FlangerEffect::changeSampleRate()
 	m_lDelay->setSampleRate( Engine::mixer()->processingSampleRate() );
 	m_rDelay->setSampleRate( Engine::mixer()->processingSampleRate() );
 }
+
+
+
+
+void FlangerEffect::restartLFO()
+{
+	m_lfo->restart();
+}
+
 
 
 

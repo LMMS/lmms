@@ -1,7 +1,7 @@
 /*
  * carlapatchbay.cpp - Carla for LMMS (Patchbay)
  *
- * Copyright (C) 2014 Filipe Coelho <falktx@falktx.com>
+ * Copyright (C) 2014-2018 Filipe Coelho <falktx@falktx.com>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -25,6 +25,8 @@
 #include "carla.h"
 
 #include "embed.h"
+#include "plugin_export.h"
+#include "InstrumentTrack.h"
 
 extern "C"
 {
@@ -36,16 +38,16 @@ Plugin::Descriptor PLUGIN_EXPORT carlapatchbay_plugin_descriptor =
     QT_TRANSLATE_NOOP( "pluginBrowser",
                        "Carla Patchbay Instrument" ),
     "falkTX <falktx/at/falktx.com>",
-    0x0195,
+    CARLA_VERSION_HEX,
     Plugin::Instrument,
     new PluginPixmapLoader( "logo" ),
     NULL,
     NULL
 } ;
 
-Plugin* PLUGIN_EXPORT lmms_plugin_main(Model*, void* data)
+PLUGIN_EXPORT Plugin* lmms_plugin_main(Model* m, void*)
 {
-    return new CarlaInstrument(static_cast<InstrumentTrack*>(data), &carlapatchbay_plugin_descriptor, true);
+    return new CarlaInstrument(static_cast<InstrumentTrack*>(m), &carlapatchbay_plugin_descriptor, true);
 }
 
 }

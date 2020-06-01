@@ -28,14 +28,14 @@
 
 #include <qstring.h>
 
-#include "export.h"
+#include "lmms_export.h"
 
 class QWidget;
 
 
 struct ToolTip
 {
-	static void EXPORT add( QWidget * _w, const QString & _txt );
+	static void LMMS_EXPORT add( QWidget * _w, const QString & _txt );
 } ;
 
 

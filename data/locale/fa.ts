@@ -1218,7 +1218,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>DECAY</source>
-        <translation type="unfinished">محو-DECAY</translation>
+        <translation type="unfinished">DECAY</translation>
     </message>
     <message>
         <source>Time:</source>
@@ -1360,7 +1360,7 @@ Right clicking will bring up a context menu where you can change the order in wh
     </message>
     <message>
         <source>HOLD</source>
-        <translation type="unfinished">نگهداری-HOLD</translation>
+        <translation type="unfinished">HOLD</translation>
     </message>
     <message>
         <source>Hold:</source>

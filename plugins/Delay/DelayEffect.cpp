@@ -26,7 +26,7 @@
 #include "Engine.h"
 #include "embed.h"
 #include "interpolation.h"
-
+#include "plugin_export.h"
 
 extern "C"
 {

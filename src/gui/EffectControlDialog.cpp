@@ -36,6 +36,7 @@ EffectControlDialog::EffectControlDialog( EffectControls * _controls ) :
 	m_effectControls( _controls )
 {
 	setWindowTitle( m_effectControls->effect()->displayName() );
+	setSizePolicy( QSizePolicy::Preferred, QSizePolicy::Preferred );
 }
 
 

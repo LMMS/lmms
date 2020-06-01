@@ -31,12 +31,12 @@
 #include <QDropEvent>
 #include <QMimeData>
 
-#include "export.h"
+#include "lmms_export.h"
 
 class QPixmap;
 
 
-class EXPORT StringPairDrag : public QDrag
+class LMMS_EXPORT StringPairDrag : public QDrag
 {
 public:
 	StringPairDrag( const QString & _key, const QString & _value,

@@ -1030,7 +1030,7 @@ Se sei interessato a tradurre LMMS o vuoi migliorare una traduzione esistente, s
     </message>
     <message>
         <source>DELAY</source>
-        <translation>RITARDO</translation>
+        <translation>DELAY</translation>
     </message>
     <message>
         <source>FDBK</source>
@@ -1038,7 +1038,7 @@ Se sei interessato a tradurre LMMS o vuoi migliorare una traduzione esistente, s
     </message>
     <message>
         <source>RATE</source>
-        <translation>FREQUENZA</translation>
+        <translation>RATE</translation>
     </message>
     <message>
         <source>AMNT</source>
@@ -2252,11 +2252,11 @@ Si prega di controllare i permessi di scrittura sul file e la cartella che lo co
     </message>
     <message>
         <source>DELAY</source>
-        <translation>RITARDO</translation>
+        <translation>DELAY</translation>
     </message>
     <message>
         <source>RATE</source>
-        <translation>FREQUENZA</translation>
+        <translation>RATE</translation>
     </message>
     <message>
         <source>AMNT</source>

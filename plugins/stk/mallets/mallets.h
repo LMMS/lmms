@@ -85,7 +85,7 @@ public:
 
 	inline ~malletsSynth()
 	{
-		m_voice->noteOff( 0.0 );
+		if (m_voice) {m_voice->noteOff(0.0);}
 		delete[] m_delay;
 		delete m_voice;
 	}
@@ -120,8 +120,19 @@ public:
 		}
 	}
 
+	inline int presetIndex()
+	{
+		return m_presetIndex;
+	}
+
+	inline void setPresetIndex(int presetIndex)
+	{
+		m_presetIndex = presetIndex;
+	}
+
 
 protected:
+	int m_presetIndex;
 	Instrmnt * m_voice;
 
 	StkFloat * m_delay;
@@ -187,7 +198,7 @@ private:
 } ;
 
 
-class malletsInstrumentView: public InstrumentView
+class malletsInstrumentView: public InstrumentViewFixedSize
 {
 	Q_OBJECT
 public:

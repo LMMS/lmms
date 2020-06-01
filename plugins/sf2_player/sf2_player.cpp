@@ -46,7 +46,7 @@
 #include "LcdSpinBox.h"
 
 #include "embed.h"
-
+#include "plugin_export.h"
 
 extern "C"
 {
@@ -99,15 +99,15 @@ sf2Instrument::sf2Instrument( InstrumentTrack * _instrument_track ) :
 	m_patchNum( 0, 0, 127, this, tr("Patch") ),
 	m_gain( 1.0f, 0.0f, 5.0f, 0.01f, this, tr( "Gain" ) ),
 	m_reverbOn( false, this, tr( "Reverb" ) ),
-	m_reverbRoomSize( FLUID_REVERB_DEFAULT_ROOMSIZE, 0, 1.0, 0.01f, this, tr( "Reverb Roomsize" ) ),
-	m_reverbDamping( FLUID_REVERB_DEFAULT_DAMP, 0, 1.0, 0.01, this, tr( "Reverb Damping" ) ),
-	m_reverbWidth( FLUID_REVERB_DEFAULT_WIDTH, 0, 1.0, 0.01f, this, tr( "Reverb Width" ) ),
-	m_reverbLevel( FLUID_REVERB_DEFAULT_LEVEL, 0, 1.0, 0.01f, this, tr( "Reverb Level" ) ),
+	m_reverbRoomSize( FLUID_REVERB_DEFAULT_ROOMSIZE, 0, 1.0, 0.01f, this, tr( "Reverb room size" ) ),
+	m_reverbDamping( FLUID_REVERB_DEFAULT_DAMP, 0, 1.0, 0.01, this, tr( "Reverb damping" ) ),
+	m_reverbWidth( FLUID_REVERB_DEFAULT_WIDTH, 0, 1.0, 0.01f, this, tr( "Reverb width" ) ),
+	m_reverbLevel( FLUID_REVERB_DEFAULT_LEVEL, 0, 1.0, 0.01f, this, tr( "Reverb level" ) ),
 	m_chorusOn( false, this, tr( "Chorus" ) ),
-	m_chorusNum( FLUID_CHORUS_DEFAULT_N, 0, 10.0, 1.0, this, tr( "Chorus Lines" ) ),
-	m_chorusLevel( FLUID_CHORUS_DEFAULT_LEVEL, 0, 10.0, 0.01, this, tr( "Chorus Level" ) ),
-	m_chorusSpeed( FLUID_CHORUS_DEFAULT_SPEED, 0.29, 5.0, 0.01, this, tr( "Chorus Speed" ) ),
-	m_chorusDepth( FLUID_CHORUS_DEFAULT_DEPTH, 0, 46.0, 0.05, this, tr( "Chorus Depth" ) )
+	m_chorusNum( FLUID_CHORUS_DEFAULT_N, 0, 10.0, 1.0, this, tr( "Chorus voices" ) ),
+	m_chorusLevel( FLUID_CHORUS_DEFAULT_LEVEL, 0, 10.0, 0.01, this, tr( "Chorus level" ) ),
+	m_chorusSpeed( FLUID_CHORUS_DEFAULT_SPEED, 0.29, 5.0, 0.01, this, tr( "Chorus speed" ) ),
+	m_chorusDepth( FLUID_CHORUS_DEFAULT_DEPTH, 0, 46.0, 0.05, this, tr( "Chorus depth" ) )
 {
 	for( int i = 0; i < 128; ++i )
 	{
@@ -128,7 +128,30 @@ sf2Instrument::sf2Instrument( InstrumentTrack * _instrument_track ) :
 	// everytime we load a new soundfont.
 	m_synth = new_fluid_synth( m_settings );
 
-	loadFile( ConfigManager::inst()->defaultSoundfont() );
+#if FLUIDSYNTH_VERSION_MAJOR >= 2
+	// Get the default values from the setting
+	double settingVal;
+
+	fluid_settings_getnum_default(m_settings, "synth.reverb.room-size", &settingVal);
+	m_reverbRoomSize.setInitValue(settingVal);
+	fluid_settings_getnum_default(m_settings, "synth.reverb.damping", &settingVal);
+	m_reverbDamping.setInitValue(settingVal);
+	fluid_settings_getnum_default(m_settings, "synth.reverb.width", &settingVal);
+	m_reverbWidth.setInitValue(settingVal);
+	fluid_settings_getnum_default(m_settings, "synth.reverb.level", &settingVal);
+	m_reverbLevel.setInitValue(settingVal);
+
+	fluid_settings_getnum_default(m_settings, "synth.chorus.nr", &settingVal);
+	m_chorusNum.setInitValue(settingVal);
+	fluid_settings_getnum_default(m_settings, "synth.chorus.level", &settingVal);
+	m_chorusLevel.setInitValue(settingVal);
+	fluid_settings_getnum_default(m_settings, "synth.chorus.speed", &settingVal);
+	m_chorusSpeed.setInitValue(settingVal);
+	fluid_settings_getnum_default(m_settings, "synth.chorus.depth", &settingVal);
+	m_chorusDepth.setInitValue(settingVal);
+#endif
+
+	loadFile( ConfigManager::inst()->sf2File() );
 
 	updateSampleRate();
 	updateReverbOn();
@@ -243,6 +266,43 @@ void sf2Instrument::loadFile( const QString & _file )
 		// for some reason we've to call that, otherwise preview of a
 		// soundfont for the first time fails
 		updateSampleRate();
+	}
+
+	// setting the first bank and patch number that is found
+	auto sSoundCount = ::fluid_synth_sfcount( m_synth );
+	for ( int i = 0; i < sSoundCount; ++i ) {
+		int iBank = 0;
+		int iProg = 0;
+		fluid_sfont_t *pSoundFont = ::fluid_synth_get_sfont( m_synth, i );
+
+		if ( pSoundFont ) {
+#ifdef CONFIG_FLUID_BANK_OFFSET
+			int iBankOff = ::fluid_synth_get_bank_offset( m_synth, fluid_sfont_get_id( pSoundFont ) );
+#endif
+
+			fluid_sfont_iteration_start( pSoundFont );
+#if FLUIDSYNTH_VERSION_MAJOR < 2
+			fluid_preset_t preset;
+			fluid_preset_t *pCurPreset = &preset;
+#else
+			fluid_preset_t *pCurPreset;
+#endif
+
+			if ( ( pCurPreset = fluid_sfont_iteration_next_wrapper( pSoundFont, pCurPreset ) ) ) {
+				iBank = fluid_preset_get_banknum( pCurPreset );
+				iProg = fluid_preset_get_num( pCurPreset );
+
+#ifdef CONFIG_FLUID_BANK_OFFSET
+				iBank += iBankOff;
+#endif
+
+				::fluid_synth_bank_select( m_synth, 1, iBank );
+				::fluid_synth_program_change( m_synth, 1, iProg );
+				m_bankNum.setValue( iBank );
+				m_patchNum.setValue ( iProg );
+				break;
+			}
+		}
 	}
 }
 
@@ -393,7 +453,6 @@ QString sf2Instrument::getCurrentPatchName()
 	int iBankSelected = m_bankNum.value();
 	int iProgSelected = m_patchNum.value();
 
-	fluid_preset_t preset;
 	// For all soundfonts (in reversed stack order) fill the available programs...
 	int cSoundFonts = ::fluid_synth_sfcount( m_synth );
 	for( int i = 0; i < cSoundFonts; i++ )
@@ -404,21 +463,26 @@ QString sf2Instrument::getCurrentPatchName()
 #ifdef CONFIG_FLUID_BANK_OFFSET
 			int iBankOffset =
 				fluid_synth_get_bank_offset(
-						m_synth, pSoundFont->id );
+						m_synth, fluid_sfont_get_id(pSoundFont) );
 #endif
-			pSoundFont->iteration_start( pSoundFont );
-			while( pSoundFont->iteration_next( pSoundFont,
-								&preset ) )
+			fluid_sfont_iteration_start( pSoundFont );
+#if FLUIDSYNTH_VERSION_MAJOR < 2
+			fluid_preset_t preset;
+			fluid_preset_t *pCurPreset = &preset;
+#else
+			fluid_preset_t *pCurPreset;
+#endif
+			while ((pCurPreset = fluid_sfont_iteration_next_wrapper(pSoundFont, pCurPreset)))
 			{
-				int iBank = preset.get_banknum( &preset );
+				int iBank = fluid_preset_get_banknum( pCurPreset );
 #ifdef CONFIG_FLUID_BANK_OFFSET
 				iBank += iBankOffset;
 #endif
-				int iProg = preset.get_num( &preset );
+				int iProg = fluid_preset_get_num( pCurPreset );
 				if( iBank == iBankSelected && iProg ==
 								iProgSelected )
 				{
-					return preset.get_name( &preset );
+					return fluid_preset_get_name( pCurPreset );
 				}
 			}
 		}
@@ -651,7 +715,6 @@ void sf2Instrument::noteOff( SF2PluginData * n )
 		fluid_synth_noteoff( m_synth, m_channel, n->midiNote );
 		m_synthMutex.unlock();
 	}
-
 }
 
 
@@ -667,7 +730,6 @@ void sf2Instrument::play( sampleFrame * _working_buffer )
 		m_synthMutex.lock();
 		fluid_synth_pitch_bend( m_synth, m_channel, m_lastMidiPitch );
 		m_synthMutex.unlock();
-
 	}
 
 	const int currentMidiPitchRange = instrumentTrack()->midiPitchRange();
@@ -832,7 +894,7 @@ public:
 
 
 sf2InstrumentView::sf2InstrumentView( Instrument * _instrument, QWidget * _parent ) :
-	InstrumentView( _instrument, _parent )
+	InstrumentViewFixedSize( _instrument, _parent )
 {
 //	QVBoxLayout * vl = new QVBoxLayout( this );
 //	QHBoxLayout * hl = new QHBoxLayout();
@@ -851,9 +913,7 @@ sf2InstrumentView::sf2InstrumentView( Instrument * _instrument, QWidget * _paren
 
 	connect( m_fileDialogButton, SIGNAL( clicked() ), this, SLOT( showFileDialog() ) );
 
-	ToolTip::add( m_fileDialogButton, tr( "Open other SoundFont file" ) );
-
-	m_fileDialogButton->setWhatsThis( tr( "Click here to open another SF2 file" ) );
+	ToolTip::add( m_fileDialogButton, tr( "Open SoundFont file" ) );
 
 	// Patch Button
 	m_patchDialogButton = new PixmapButton( this );
@@ -865,7 +925,7 @@ sf2InstrumentView::sf2InstrumentView( Instrument * _instrument, QWidget * _paren
 
 	connect( m_patchDialogButton, SIGNAL( clicked() ), this, SLOT( showPatchDialog() ) );
 
-	ToolTip::add( m_patchDialogButton, tr( "Choose the patch" ) );
+	ToolTip::add( m_patchDialogButton, tr( "Choose patch" ) );
 
 
 	// LCDs
@@ -900,7 +960,7 @@ sf2InstrumentView::sf2InstrumentView( Instrument * _instrument, QWidget * _paren
 
 	// Gain
 	m_gainKnob = new sf2Knob( this );
-	m_gainKnob->setHintText( tr("Gain"), "" );
+	m_gainKnob->setHintText( tr("Gain:"), "" );
 	m_gainKnob->move( 86, 55 );
 //	vl->addWidget( m_gainKnob );
 
@@ -914,26 +974,22 @@ sf2InstrumentView::sf2InstrumentView( Instrument * _instrument, QWidget * _paren
 	m_reverbButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "reverb_on" ) );
 	m_reverbButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "reverb_off" ) );
 	ToolTip::add( m_reverbButton, tr( "Apply reverb (if supported)" ) );
-	m_reverbButton->setWhatsThis(
-		tr( "This button enables the reverb effect. "
-			"This is useful for cool effects, but only works on "
-			"files that support it." ) );
 
 
 	m_reverbRoomSizeKnob = new sf2Knob( this );
-	m_reverbRoomSizeKnob->setHintText( tr("Reverb Roomsize:"), "" );
+	m_reverbRoomSizeKnob->setHintText( tr("Room size:"), "" );
 	m_reverbRoomSizeKnob->move( 93, 160 );
 
 	m_reverbDampingKnob = new sf2Knob( this );
-	m_reverbDampingKnob->setHintText( tr("Reverb Damping:"), "" );
+	m_reverbDampingKnob->setHintText( tr("Damping:"), "" );
 	m_reverbDampingKnob->move( 130, 160 );
 
 	m_reverbWidthKnob = new sf2Knob( this );
-	m_reverbWidthKnob->setHintText( tr("Reverb Width:"), "" );
+	m_reverbWidthKnob->setHintText( tr("Width:"), "" );
 	m_reverbWidthKnob->move( 167, 160 );
 
 	m_reverbLevelKnob = new sf2Knob( this );
-	m_reverbLevelKnob->setHintText( tr("Reverb Level:"), "" );
+	m_reverbLevelKnob->setHintText( tr("Level:"), "" );
 	m_reverbLevelKnob->move( 204, 160 );
 
 /*	hl->addWidget( m_reverbOnLed );
@@ -954,25 +1010,21 @@ sf2InstrumentView::sf2InstrumentView( Instrument * _instrument, QWidget * _paren
 	m_chorusButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "chorus_on" ) );
 	m_chorusButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "chorus_off" ) );
 	ToolTip::add( m_chorusButton, tr( "Apply chorus (if supported)" ) );
-	m_chorusButton->setWhatsThis(
-		tr( "This button enables the chorus effect. "
-			"This is useful for cool echo effects, but only works on "
-			"files that support it." ) );
 
 	m_chorusNumKnob = new sf2Knob( this );
-	m_chorusNumKnob->setHintText( tr("Chorus Lines:"), "" );
+	m_chorusNumKnob->setHintText( tr("Voices:"), "" );
 	m_chorusNumKnob->move( 93, 206 );
 
 	m_chorusLevelKnob = new sf2Knob( this );
-	m_chorusLevelKnob->setHintText( tr("Chorus Level:"), "" );
+	m_chorusLevelKnob->setHintText( tr("Level:"), "" );
 	m_chorusLevelKnob->move( 130 , 206 );
 
 	m_chorusSpeedKnob = new sf2Knob( this );
-	m_chorusSpeedKnob->setHintText( tr("Chorus Speed:"), "" );
+	m_chorusSpeedKnob->setHintText( tr("Speed:"), "" );
 	m_chorusSpeedKnob->move( 167 , 206 );
 
 	m_chorusDepthKnob = new sf2Knob( this );
-	m_chorusDepthKnob->setHintText( tr("Chorus Depth:"), "" );
+	m_chorusDepthKnob->setHintText( tr("Depth:"), "" );
 	m_chorusDepthKnob->move( 204 , 206 );
 /*
 	hl->addWidget( m_chorusOnLed );
@@ -989,7 +1041,6 @@ sf2InstrumentView::sf2InstrumentView( Instrument * _instrument, QWidget * _paren
 	setPalette( pal );
 
 	updateFilename();
-
 }
 
 
@@ -1028,7 +1079,6 @@ void sf2InstrumentView::modelChanged()
 	connect( k, SIGNAL( fileLoading() ), this, SLOT( invalidateFile() ) );
 
 	updateFilename();
-
 }
 
 
@@ -1133,13 +1183,10 @@ extern "C"
 {
 
 // necessary for getting instance out of shared lib
-Plugin * PLUGIN_EXPORT lmms_plugin_main( Model *, void * _data )
+PLUGIN_EXPORT Plugin * lmms_plugin_main( Model *m, void * )
 {
-	return new sf2Instrument( static_cast<InstrumentTrack *>( _data ) );
+	return new sf2Instrument( static_cast<InstrumentTrack *>( m ) );
 }
 
 
 }
-
-
-

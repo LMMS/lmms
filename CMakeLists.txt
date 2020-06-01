@@ -1,8 +1,10 @@
-CMAKE_MINIMUM_REQUIRED(VERSION 3.1.0)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.3)
 
 PROJECT(lmms)
 
 SET(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/modules" ${CMAKE_MODULE_PATH})
+SET(LMMS_BINARY_DIR ${CMAKE_BINARY_DIR})
+SET(LMMS_SOURCE_DIR ${CMAKE_SOURCE_DIR})
 
 IF(COMMAND CMAKE_POLICY)
 	CMAKE_POLICY(SET CMP0005 NEW)
@@ -13,16 +15,19 @@ IF(COMMAND CMAKE_POLICY)
 		CMAKE_POLICY(SET CMP0050 OLD)
 	ENDIF()
 	CMAKE_POLICY(SET CMP0020 NEW)
+	CMAKE_POLICY(SET CMP0057 NEW)
 ENDIF(COMMAND CMAKE_POLICY)
 
+INCLUDE(PluginList)
 INCLUDE(CheckSubmodules)
 INCLUDE(AddFileDependencies)
 INCLUDE(CheckIncludeFiles)
 INCLUDE(FindPkgConfig)
+INCLUDE(GenerateExportHeader)
 
 STRING(TOUPPER          "${CMAKE_PROJECT_NAME}" PROJECT_NAME_UCASE)
 
-SET(PROJECT_YEAR 2018)
+SET(PROJECT_YEAR 2019)
 
 SET(PROJECT_AUTHOR      "LMMS Developers")
 SET(PROJECT_URL         "https://lmms.io")
@@ -31,8 +36,8 @@ SET(PROJECT_DESCRIPTION "${PROJECT_NAME_UCASE} - Free music production software"
 SET(PROJECT_COPYRIGHT   "2008-${PROJECT_YEAR} ${PROJECT_AUTHOR}")
 SET(VERSION_MAJOR       "1")
 SET(VERSION_MINOR       "2")
-SET(VERSION_RELEASE     "0")
-SET(VERSION_STAGE       "rc5")
+SET(VERSION_RELEASE     "1")
+SET(VERSION_STAGE       "")
 SET(VERSION_BUILD       "0")
 SET(VERSION             "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_RELEASE}")
 IF(VERSION_STAGE)
@@ -46,7 +51,6 @@ ENDIF()
 INCLUDE(VersionInfo)
 INCLUDE(DetectMachine)
 
-
 OPTION(WANT_ALSA	"Include ALSA (Advanced Linux Sound Architecture) support" ON)
 OPTION(WANT_CALF	"Include CALF LADSPA plugins" ON)
 OPTION(WANT_CAPS	"Include C* Audio Plugin Suite (LADSPA plugins)" ON)
@@ -54,10 +58,13 @@ OPTION(WANT_CARLA	"Include Carla plugin" ON)
 OPTION(WANT_CMT		"Include Computer Music Toolkit LADSPA plugins" ON)
 OPTION(WANT_JACK	"Include JACK (Jack Audio Connection Kit) support" ON)
 OPTION(WANT_WEAKJACK	"Loosely link JACK libraries" ON)
+OPTION(WANT_LV2		"Include Lv2 plugins" ON)
+OPTION(WANT_SUIL	"Include SUIL for LV2 plugin UIs" ON)
 OPTION(WANT_MP3LAME	"Include MP3/Lame support" ON)
 OPTION(WANT_OGGVORBIS	"Include OGG/Vorbis support" ON)
 OPTION(WANT_PULSEAUDIO	"Include PulseAudio support" ON)
 OPTION(WANT_PORTAUDIO	"Include PortAudio support" ON)
+OPTION(WANT_SNDIO	"Include sndio support" ON)
 OPTION(WANT_SOUNDIO	"Include libsoundio support" ON)
 OPTION(WANT_SDL		"Include SDL (Simple DirectMedia Layer) support" ON)
 OPTION(WANT_SF2		"Include SoundFont2 player plugin" ON)
@@ -66,12 +73,16 @@ OPTION(WANT_STK		"Include Stk (Synthesis Toolkit) support" ON)
 OPTION(WANT_SWH		"Include Steve Harris's LADSPA plugins" ON)
 OPTION(WANT_TAP		"Include Tom's Audio Processing LADSPA plugins" ON)
 OPTION(WANT_VST		"Include VST support" ON)
-OPTION(WANT_VST_NOWINE	"Include partial VST support (without wine)" OFF)
+OPTION(WANT_VST_32	"Include 32-bit VST support" ON)
+OPTION(WANT_VST_64	"Include 64-bit VST support" ON)
 OPTION(WANT_WINMM	"Include WinMM MIDI support" OFF)
 OPTION(WANT_DEBUG_FPE	"Debug floating point exceptions" OFF)
 
 
 IF(LMMS_BUILD_APPLE)
+	# Fix linking on 10.14+. See issue #4762 on github
+	LINK_DIRECTORIES(/usr/local/lib)
+	SET(WANT_SOUNDIO OFF)
 	SET(WANT_ALSA OFF)
 	SET(WANT_PULSEAUDIO OFF)
 	SET(WANT_VST OFF)
@@ -87,14 +98,13 @@ IF(LMMS_BUILD_WIN32)
 	SET(WANT_ALSA OFF)
 	SET(WANT_JACK OFF)
 	SET(WANT_PULSEAUDIO OFF)
-	SET(WANT_PORTAUDIO OFF)
+	SET(WANT_SNDIO OFF)
 	SET(WANT_SOUNDIO OFF)
 	SET(WANT_WINMM ON)
 	SET(LMMS_HAVE_WINMM TRUE)
 	SET(STATUS_ALSA "<not supported on this platform>")
 	SET(STATUS_JACK "<not supported on this platform>")
 	SET(STATUS_PULSEAUDIO "<not supported on this platform>")
-	SET(STATUS_PORTAUDIO "<disabled on this platform>")
 	SET(STATUS_SOUNDIO "<disabled in this release>")
 	SET(STATUS_WINMM "OK")
 	SET(STATUS_APPLEMIDI "<not supported on this platform>")
@@ -136,7 +146,7 @@ CHECK_INCLUDE_FILES(locale.h LMMS_HAVE_LOCALE_H)
 
 LIST(APPEND CMAKE_PREFIX_PATH "${CMAKE_INSTALL_PREFIX}")
 
-FIND_PACKAGE(Qt5 COMPONENTS Core Gui Widgets Xml REQUIRED)
+FIND_PACKAGE(Qt5 5.6.0 COMPONENTS Core Gui Widgets Xml REQUIRED)
 FIND_PACKAGE(Qt5 COMPONENTS LinguistTools QUIET)
 
 INCLUDE_DIRECTORIES(
@@ -153,7 +163,7 @@ SET(QT_LIBRARIES
 	Qt5::Xml
 )
 
-IF(LMMS_BUILD_LINUX)
+IF(LMMS_BUILD_LINUX AND WANT_VST)
     FIND_PACKAGE(Qt5 COMPONENTS X11Extras REQUIRED)
     LIST(APPEND QT_LIBRARIES Qt5::X11Extras)
 ENDIF()
@@ -165,7 +175,7 @@ FIND_PACKAGE(Qt5Test)
 SET(QT_QTTEST_LIBRARY Qt5::Test)
 
 # check for libsndfile
-PKG_CHECK_MODULES(SNDFILE REQUIRED sndfile>=1.0.18)
+FIND_PACKAGE(SndFile REQUIRED)
 IF(NOT SNDFILE_FOUND)
 	MESSAGE(FATAL_ERROR "LMMS requires libsndfile1 and libsndfile1-dev >= 1.0.18 - please install, remove CMakeCache.txt and try again!")
 ENDIF()
@@ -173,6 +183,39 @@ ENDIF()
 IF(NOT SNDFILE_VERSION VERSION_LESS 1.0.26)
 	SET(LMMS_HAVE_SF_COMPLEVEL TRUE)
 ENDIF()
+
+IF(WANT_LV2)
+	IF(PKG_CONFIG_FOUND)
+		PKG_CHECK_MODULES(LV2 lv2)
+		PKG_CHECK_MODULES(LILV lilv-0)
+		IF(LV2_FOUND AND LILV_FOUND)
+			SET(LMMS_HAVE_LV2 TRUE)
+			SET(STATUS_LV2 "OK")
+		ELSE()
+			SET(STATUS_LV2 "not found, install it or set PKG_CONFIG_PATH appropriately")
+		ENDIF()
+	ELSE()
+		SET(STATUS_LV2 "not found, requires pkg-config")
+	ENDIF()
+ELSE(WANT_LV2)
+	SET(STATUS_LV2 "not built as requested")
+ENDIF(WANT_LV2)
+
+IF(WANT_SUIL)
+	IF(PKG_CONFIG_FOUND)
+		PKG_CHECK_MODULES(SUIL suil-0)
+		IF(SUIL_FOUND)
+			SET(LMMS_HAVE_SUIL TRUE)
+			SET(STATUS_SUIL "OK")
+		ELSE()
+			SET(STATUS_SUIL "not found, install it or set PKG_CONFIG_PATH appropriately")
+		ENDIF()
+	ELSE()
+		SET(STATUS_SUIL "not found, requires pkg-config")
+	ENDIF()
+ELSE(WANT_SUIL)
+	SET(STATUS_SUIL "not built as requested")
+ENDIF(WANT_SUIL)
 
 IF(WANT_CALF)
 	SET(LMMS_HAVE_CALF TRUE)
@@ -212,12 +255,17 @@ ENDIF(WANT_TAP)
 
 # check for CARLA
 IF(WANT_CARLA)
-	PKG_CHECK_MODULES(CARLA carla-standalone>=1.9.5)
+	PKG_CHECK_MODULES(CARLA carla-native-plugin)
+	# look for carla under old name
+	IF(NOT CARLA_FOUND)
+		PKG_CHECK_MODULES(CARLA carla-standalone>=1.9.5)
+	ENDIF()
 	IF(CARLA_FOUND)
 		SET(LMMS_HAVE_CARLA TRUE)
 		SET(STATUS_CARLA "OK")
 	ELSE(CARLA_FOUND)
-		SET(STATUS_CARLA "not found, please install the latest carla")
+		SET(LMMS_HAVE_WEAKCARLA TRUE)
+		SET(STATUS_CARLA "OK (weak linking enabled)")
 	ENDIF(CARLA_FOUND)
 ENDIF(WANT_CARLA)
 
@@ -378,7 +426,6 @@ IF(WANT_JACK)
 			SET(LMMS_HAVE_WEAKJACK TRUE)
 			SET(WEAKJACK_INCLUDE_DIRS ${CMAKE_SOURCE_DIR}/src/3rdparty/weakjack/weakjack)
 			SET(STATUS_JACK "OK (weak linking enabled)")
-			SET(JACK_INCLUDE_DIRS "")
 			# use dlsym instead
 			SET(JACK_LIBRARIES ${CMAKE_DL_LIBS})
 		ELSE()
@@ -386,15 +433,14 @@ IF(WANT_JACK)
 		ENDIF()
 		SET(LMMS_HAVE_JACK TRUE)
 	ELSE(JACK_FOUND)
+		SET(JACK_INCLUDE_DIRS "")
 		SET(STATUS_JACK "not found, please install libjack0.100.0-dev (or similar) "
 			"if you require JACK support")
 	ENDIF(JACK_FOUND)
 ENDIF(WANT_JACK)
 
-
 # check for FFTW3F-library
-PKG_CHECK_MODULES(FFTW3F REQUIRED fftw3f>=3.0.0)
-
+FIND_PACKAGE(FFTW COMPONENTS fftw3f REQUIRED)
 
 # check for FLTK
 FIND_PACKAGE(FLTK)
@@ -428,19 +474,20 @@ If(WANT_GIG)
 ENDIF(WANT_GIG)
 
 # check for pthreads
-IF(LMMS_BUILD_LINUX OR LMMS_BUILD_APPLE OR LMMS_BUILD_OPENBSD)
+IF(LMMS_BUILD_LINUX OR LMMS_BUILD_APPLE OR LMMS_BUILD_OPENBSD OR LMMS_BUILD_FREEBSD)
 	FIND_PACKAGE(Threads)
-ENDIF(LMMS_BUILD_LINUX OR LMMS_BUILD_APPLE OR LMMS_BUILD_OPENBSD)
+ENDIF(LMMS_BUILD_LINUX OR LMMS_BUILD_APPLE OR LMMS_BUILD_OPENBSD OR LMMS_BUILD_FREEBSD)
 
-# check for sndio (openbsd only, roaraudio won't work yet)
-FIND_PACKAGE(Sndio)
-IF(LMMS_BUILD_OPENBSD AND SNDIO_FOUND)
-	SET(LMMS_HAVE_SNDIO TRUE)
-	SET(STATUS_SNDIO "OK")
-ELSE()
-	SET(STATUS_SNDIO "<not found or not supported on this platform>")
-	SET(SNDIO_LIBRARY "")
-ENDIF()
+# check for sndio (roaraudio won't work yet)
+IF(WANT_SNDIO)
+	FIND_PACKAGE(Sndio)
+	IF(SNDIO_FOUND)
+		SET(LMMS_HAVE_SNDIO TRUE)
+        	SET(STATUS_SNDIO "OK")
+    	ELSE()
+        	SET(STATUS_SNDIO "<not found or not supported on this platform>")
+	ENDIF(SNDIO_FOUND)
+ENDIF(WANT_SNDIO)
 
 # check for WINE
 IF(WANT_VST)
@@ -476,10 +523,10 @@ ELSE()
 ENDIF(WANT_DEBUG_FPE)
 
 # check for libsamplerate
-PKG_CHECK_MODULES(SAMPLERATE REQUIRED samplerate>=0.1.8)
+FIND_PACKAGE(Samplerate 0.1.8 MODULE REQUIRED)
 
 # set compiler flags
-IF(CMAKE_CXX_COMPILER_ID MATCHES "GNU|AppleClang")
+IF(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
 	SET(WERROR_FLAGS "-Wall -Werror=unused-function -Wno-sign-compare -Wno-strict-overflow")
 	OPTION(USE_WERROR "Add -werror to the build flags. Stops the build on warnings" OFF)
 	IF(${USE_WERROR})
@@ -488,7 +535,7 @@ IF(CMAKE_CXX_COMPILER_ID MATCHES "GNU|AppleClang")
 
 	# Due to a regression in gcc-4.8.X, we need to disable array-bounds check
 	IF (CMAKE_COMPILER_IS_GNUCXX AND ((CMAKE_CXX_COMPILER_VERSION VERSION_EQUAL "4.8.0") OR (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER "4.8.0") OR LMMS_BUILD_WIN32))
-		SET(WERROR_FLAGS "${WERROR_FLAGS} -Wno-array-bounds")
+		SET(WERROR_FLAGS "${WERROR_FLAGS} -Wno-array-bounds -Wno-attributes")
 	ENDIF()
 ELSEIF(MSVC)
 	# Remove any existing /W flags
@@ -539,7 +586,7 @@ ENDIF()
 # we somehow have to make LMMS-binary depend on MOC-files
 ADD_FILE_DEPENDENCIES("${CMAKE_BINARY_DIR}/lmmsconfig.h")
 
-IF(CMAKE_CXX_COMPILER_ID MATCHES "GNU|AppleClang")
+IF(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
 	IF(WIN32)
 		SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-attributes")
 	ELSE(WIN32)
@@ -548,17 +595,7 @@ IF(CMAKE_CXX_COMPILER_ID MATCHES "GNU|AppleClang")
 ENDIF()
 
 # use ccache
-OPTION(USE_CCACHE "Use ccache for compilation" OFF)
-IF(USE_CCACHE)
-	FIND_PROGRAM(CCACHE ccache)
-	IF (CCACHE)
-		MESSAGE(STATUS "Using ccache found in PATH")
-		SET_PROPERTY(GLOBAL PROPERTY RULE_LAUNCH_COMPILE ${CCACHE})
-		SET_PROPERTY(GLOBAL PROPERTY RULE_LAUNCH_LINK ${CCACHE})
-	ELSE()
-		MESSAGE(WARNING "USE_CCACHE enabled, but no ccache found")
-	ENDIF()
-ENDIF()
+include(CompileCache)
 
 # make sub-directories
 ADD_SUBDIRECTORY(cmake)
@@ -568,18 +605,23 @@ ADD_SUBDIRECTORY(tests)
 ADD_SUBDIRECTORY(data)
 ADD_SUBDIRECTORY(doc)
 
-# post-install tasks
-ADD_SUBDIRECTORY(cmake/postinstall)
+# install tasks
+ADD_SUBDIRECTORY(cmake/install)
 
-ADD_CUSTOM_COMMAND(OUTPUT "${CMAKE_BINARY_DIR}/lmms.1.gz"
-				COMMAND gzip -c ${CMAKE_SOURCE_DIR}/doc/lmms.1 > ${CMAKE_BINARY_DIR}/lmms.1.gz
-				DEPENDS "${CMAKE_SOURCE_DIR}/doc/lmms.1"
-				COMMENT "Generating lmms.1.gz"
-				VERBATIM)
+FIND_PACKAGE(UnixCommands)
+IF(GZIP)
+	ADD_CUSTOM_COMMAND(OUTPUT "${CMAKE_BINARY_DIR}/lmms.1.gz"
+					COMMAND ${GZIP} -c ${CMAKE_SOURCE_DIR}/doc/lmms.1 > ${CMAKE_BINARY_DIR}/lmms.1.gz
+					DEPENDS "${CMAKE_SOURCE_DIR}/doc/lmms.1"
+					COMMENT "Generating lmms.1.gz"
+					VERBATIM)
 
 
-ADD_CUSTOM_TARGET(manpage ALL
-				DEPENDS "${CMAKE_BINARY_DIR}/lmms.1.gz")
+	ADD_CUSTOM_TARGET(manpage ALL
+					DEPENDS "${CMAKE_BINARY_DIR}/lmms.1.gz")
+ELSEIF(UNIX)
+	MESSAGE(FATAL_ERROR "Can't find gzip required for generating lmms.1.gz")
+ENDIF()
 
 # install headers
 
@@ -623,6 +665,15 @@ ADD_CUSTOM_TARGET(dist
 			COMMAND rm -rf `find "${TMP}" -name cmake_install.cmake` `find "${TMP}" -name Makefile` `find "${TMP}" -type d -name CMakeFiles` "${TMP}/CMakeCache.txt"
 			COMMAND tar cjf lmms-${VERSION}-src.tar.bz2 "${TMP}"
 			COMMAND rm -rf "${TMP}")
+
+
+#
+# add uninstall-target
+#
+ADD_CUSTOM_TARGET(uninstall
+	COMMAND ${CMAKE_COMMAND} -DCMAKE_INSTALL_PREFIX="${CMAKE_INSTALL_PREFIX}" -P "${CMAKE_CURRENT_SOURCE_DIR}/cmake/uninstall.cmake"
+)
+
 
 #
 # display configuration information
@@ -670,6 +721,8 @@ MESSAGE(
 MESSAGE(
 "Optional plugins\n"
 "----------------\n"
+"* Lv2 plugins                 : ${STATUS_LV2}\n"
+"* SUIL for plugin UIs         : ${STATUS_SUIL}\n"
 "* ZynAddSubFX instrument      : ${STATUS_ZYN}\n"
 "* Carla Patchbay & Rack       : ${STATUS_CARLA}\n"
 "* SoundFont2 player           : ${STATUS_FLUIDSYNTH}\n"
@@ -699,4 +752,10 @@ MESSAGE(
 "-----------------------------------------------------------------\n"
 "\n\n")
 
+SET(CMAKE_INSTALL_SYSTEM_RUNTIME_DESTINATION "${BIN_DIR}")
+if(MSVC)
+	# We can't set this on the install time according to the configuration
+	SET(CMAKE_INSTALL_DEBUG_LIBRARIES TRUE)
+	SET(CMAKE_INSTALL_UCRT_LIBRARIES TRUE)
+endif()
 INCLUDE(InstallRequiredSystemLibraries)

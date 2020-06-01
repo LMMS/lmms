@@ -1,0 +1,3 @@
+version=3
+opts="filenamemangle=s/(?:.*\/)?v?(\d[\d\.]*)\.tar\.gz/lmms_$1.tar.gz/" \
+https://github.com/LMMS/lmms/tags (?:.*/)?v?(\d[\d\.]*)\.tar\.gz

@@ -30,7 +30,6 @@
 #include <QtCore/QPoint>
 
 #include "AutomatableModelView.h"
-#include "templates.h"
 
 
 class QPixmap;
@@ -43,7 +42,7 @@ enum knobTypes
 
 
 
-class EXPORT Knob : public QWidget, public FloatModelView
+class LMMS_EXPORT Knob : public QWidget, public FloatModelView
 {
 	Q_OBJECT
 	Q_ENUMS( knobTypes )
@@ -74,6 +73,7 @@ class EXPORT Knob : public QWidget, public FloatModelView
 public:
 	Knob( knobTypes _knob_num, QWidget * _parent = NULL, const QString & _name = QString() );
 	Knob( QWidget * _parent = NULL, const QString & _name = QString() ); //!< default ctor
+	Knob( const Knob& other ) = delete;
 	virtual ~Knob();
 
 	// TODO: remove
@@ -124,29 +124,28 @@ signals:
 
 
 protected:
-	virtual void contextMenuEvent( QContextMenuEvent * _me );
-	virtual void dragEnterEvent( QDragEnterEvent * _dee );
-	virtual void dropEvent( QDropEvent * _de );
-	virtual void focusOutEvent( QFocusEvent * _fe );
-	virtual void mousePressEvent( QMouseEvent * _me );
-	virtual void mouseReleaseEvent( QMouseEvent * _me );
-	virtual void mouseMoveEvent( QMouseEvent * _me );
-	virtual void mouseDoubleClickEvent( QMouseEvent * _me );
-	virtual void paintEvent( QPaintEvent * _me );
-	virtual void wheelEvent( QWheelEvent * _me );
+	void contextMenuEvent( QContextMenuEvent * _me ) override;
+	void dragEnterEvent( QDragEnterEvent * _dee ) override;
+	void dropEvent( QDropEvent * _de ) override;
+	void focusOutEvent( QFocusEvent * _fe ) override;
+	void mousePressEvent( QMouseEvent * _me ) override;
+	void mouseReleaseEvent( QMouseEvent * _me ) override;
+	void mouseMoveEvent( QMouseEvent * _me ) override;
+	void mouseDoubleClickEvent( QMouseEvent * _me ) override;
+	void paintEvent( QPaintEvent * _me ) override;
+	void wheelEvent( QWheelEvent * _me ) override;
 
 	virtual float getValue( const QPoint & _p );
 
 private slots:
 	virtual void enterValue();
-	void displayHelp();
 	void friendlyUpdate();
 	void toggleScale();
 
 private:
-	QString displayValue() const;
+	virtual QString displayValue() const;
 
-	virtual void doConnections();
+	void doConnections() override;
 
 	QLineF calculateLine( const QPointF & _mid, float _radius,
 						float _innerRadius = 1) const;

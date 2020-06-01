@@ -56,6 +56,10 @@ protected:
 		return m_outputFile.isOpen();
 	}
 
+	inline int outputFileHandle() const
+	{
+		return m_outputFile.handle();
+	}
 
 private:
 	QFile m_outputFile;

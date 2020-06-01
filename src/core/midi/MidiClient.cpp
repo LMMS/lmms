@@ -38,6 +38,10 @@ MidiClient::MidiClient()
 MidiClient::~MidiClient()
 {
 	//TODO: noteOffAll(); / clear all ports
+	for (MidiPort* port : m_midiPorts)
+	{
+		port->invalidateCilent();
+	}
 }
 
 
@@ -73,7 +77,7 @@ void MidiClient::removePort( MidiPort* port )
 	}
 
 	QVector<MidiPort *>::Iterator it =
-		qFind( m_midiPorts.begin(), m_midiPorts.end(), port );
+		std::find( m_midiPorts.begin(), m_midiPorts.end(), port );
 	if( it != m_midiPorts.end() )
 	{
 		m_midiPorts.erase( it );
@@ -218,9 +222,13 @@ void MidiClientRaw::parseData( const unsigned char c )
 		case MidiNoteOff:
 		case MidiNoteOn:
 		case MidiKeyPressure:
-		case MidiProgramChange:
 		case MidiChannelPressure:
 			m_midiParseData.m_midiEvent.setKey( m_midiParseData.m_buffer[0] - KeysPerOctave );
+			m_midiParseData.m_midiEvent.setVelocity( m_midiParseData.m_buffer[1] );
+			break;
+
+		case MidiProgramChange:
+			m_midiParseData.m_midiEvent.setKey( m_midiParseData.m_buffer[0] );
 			m_midiParseData.m_midiEvent.setVelocity( m_midiParseData.m_buffer[1] );
 			break;
 

@@ -31,8 +31,8 @@
 namespace embed
 {
 
-
-QPixmap getIconPixmap(const QString& pixmapName, int width, int height )
+QPixmap getIconPixmap(const QString& pixmapName,
+	int width, int height, const char** xpm )
 {
 	QString cacheName;
 	if (width > 0 && height > 0)
@@ -50,19 +50,28 @@ QPixmap getIconPixmap(const QString& pixmapName, int width, int height )
 	{
 		return pixmap;
 	}
-	QImageReader reader(QString("artwork:%1").arg(pixmapName));
 
-	if (width > 0 && height > 0)
+	if(xpm)
 	{
-		reader.setScaledSize(QSize(width, height));
+		pixmap = QPixmap(xpm);
 	}
-
-	pixmap = QPixmap::fromImageReader(&reader);
-	if (pixmap.isNull())
+	else
 	{
-		qWarning().nospace() << "Error loading icon pixmap " << pixmapName << ": " <<
-								reader.errorString().toLocal8Bit().data();
-		return QPixmap(1,1);
+		QImageReader reader(QString("artwork:%1").arg(pixmapName));
+
+		if (width > 0 && height > 0)
+		{
+			reader.setScaledSize(QSize(width, height));
+		}
+
+		pixmap = QPixmap::fromImageReader(&reader);
+
+		if (pixmap.isNull())
+		{
+			qWarning().nospace() << "Error loading icon pixmap " << pixmapName << ": " <<
+									reader.errorString().toLocal8Bit().data();
+			return QPixmap(1,1);
+		}
 	}
 
 	// Save to cache and return

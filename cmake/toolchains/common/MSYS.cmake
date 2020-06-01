@@ -2,7 +2,6 @@
 SET(CMAKE_FIND_ROOT_PATH            ${MINGW_PREFIX})
 SET(CMAKE_INSTALL_PREFIX            ${MINGW_PREFIX})
 
-
 # Windows msys mingw ships with a mostly-suitable preconfigured environment
 SET(STRIP                       ${MINGW_PREFIX}/bin/strip)
 SET(CMAKE_RC_COMPILER           ${MINGW_PREFIX}/bin/windres)
@@ -19,19 +18,5 @@ ENDIF()
 # Msys compiler does not support @CMakeFiles/Include syntax
 SET(CMAKE_C_USE_RESPONSE_FILE_FOR_INCLUDES   OFF)
 SET(CMAKE_CXX_USE_RESPONSE_FILE_FOR_INCLUDES OFF)
-
-# Variable to assist override Qt debug libraries with release versions
-SET(QT_OVERRIDE_LIBRARIES
-	optimized;${MINGW_PREFIX}/bin/QtGui4.dll;
-	optimized;${MINGW_PREFIX}/bin/QtCore4.dll;
-	optimized;${MINGW_PREFIX}/bin/QtXml4.dll;
-	debug;${MINGW_PREFIX}/bin/QtGui4.dll;
-	debug;${MINGW_PREFIX}/bin/QtCore4.dll;
-	debug;${MINGW_PREFIX}/bin/QtXml4.dll;
-)
-IF(LMMS_BUILD_MSYS AND CMAKE_BUILD_TYPE STREQUAL "Debug")
-	# Override Qt debug libraries with release versions
-	SET(QT_LIBRARIES "${QT_OVERRIDE_LIBRARIES}")
-ENDIF()
 
 SET(LMMS_BUILD_MSYS 1)

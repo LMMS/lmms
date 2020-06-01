@@ -29,6 +29,7 @@
 #include "interpolation.h"
 
 #include "embed.h"
+#include "plugin_export.h"
 
 extern "C"
 {
@@ -214,10 +215,10 @@ bool dynProcEffect::processAudioBuffer( sampleFrame * _buf,
 		s[0] *= outputGain;
 		s[1] *= outputGain;
 
-		out_sum += _buf[f][0]*_buf[f][0] + _buf[f][1]*_buf[f][1];
 // mix wet/dry signals
 		_buf[f][0] = d * _buf[f][0] + w * s[0];
 		_buf[f][1] = d * _buf[f][1] + w * s[1];
+		out_sum += _buf[f][0] * _buf[f][0] + _buf[f][1] * _buf[f][1];
 	}
 
 	checkGate( out_sum / _frames );

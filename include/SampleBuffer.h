@@ -31,7 +31,7 @@
 
 #include <samplerate.h>
 
-#include "export.h"
+#include "lmms_export.h"
 #include "interpolation.h"
 #include "lmms_basics.h"
 #include "lmms_math.h"
@@ -49,7 +49,7 @@ class QRect;
 // may need to be higher - conversely, to optimize, some may work with lower values
 const f_cnt_t MARGIN[] = { 64, 64, 64, 4, 4 };
 
-class EXPORT SampleBuffer : public QObject, public sharedObject
+class LMMS_EXPORT SampleBuffer : public QObject, public sharedObject
 {
 	Q_OBJECT
 	MM_OPERATORS
@@ -59,7 +59,7 @@ public:
 		LoopOn,
 		LoopPingPong
 	};
-	class EXPORT handleState
+	class LMMS_EXPORT handleState
 	{
 		MM_OPERATORS
 	public:
@@ -269,20 +269,22 @@ public slots:
 	void sampleRateChanged();
 
 private:
+	static sample_rate_t mixerSampleRate();
+
 	void update( bool _keep_settings = false );
 
 	void convertIntToFloat ( int_sample_t * & _ibuf, f_cnt_t _frames, int _channels);
 	void directFloatWrite ( sample_t * & _fbuf, f_cnt_t _frames, int _channels);
 
-	f_cnt_t decodeSampleSF( const char * _f, sample_t * & _buf,
+	f_cnt_t decodeSampleSF( QString _f, sample_t * & _buf,
 						ch_cnt_t & _channels,
 						sample_rate_t & _sample_rate );
 #ifdef LMMS_HAVE_OGGVORBIS
-	f_cnt_t decodeSampleOGGVorbis( const char * _f, int_sample_t * & _buf,
+	f_cnt_t decodeSampleOGGVorbis( QString _f, int_sample_t * & _buf,
 						ch_cnt_t & _channels,
 						sample_rate_t & _sample_rate );
 #endif
-	f_cnt_t decodeSampleDS( const char * _f, int_sample_t * & _buf,
+	f_cnt_t decodeSampleDS( QString _f, int_sample_t * & _buf,
 						ch_cnt_t & _channels,
 						sample_rate_t & _sample_rate );
 

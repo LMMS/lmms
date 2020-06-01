@@ -111,7 +111,7 @@ private:
 class AudioFileProcessorWaveView;
 
 
-class AudioFileProcessorView : public InstrumentView
+class AudioFileProcessorView : public InstrumentViewFixedSize
 {
 	Q_OBJECT
 public:
@@ -211,7 +211,6 @@ public:
 
 	private:
 		bool checkBound( double _v ) const;
-
 	} ;
 
 
@@ -276,6 +275,7 @@ private:
 
 	void updateGraph();
 	void reverse();
+	void updateCursor( QMouseEvent * _me = nullptr );
 
 	static bool isCloseTo( int _a, int _b )
 	{

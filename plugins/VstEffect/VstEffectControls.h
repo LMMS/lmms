@@ -34,7 +34,7 @@
 
 #include <QMdiSubWindow>
 #include <QScrollArea>
-#include "Knob.h"
+#include "CustomTextKnob.h"
 #include <QLayout>
 #include <QPainter>
 #include <QObject>
@@ -59,10 +59,7 @@ public:
 
 	virtual int controlCount();
 
-	virtual EffectControlDialog * createView()
-	{
-		return new VstEffectControlDialog( this );
-	}
+	virtual EffectControlDialog * createView();
 
 
 protected slots:
@@ -73,7 +70,7 @@ protected slots:
 	void rollPreset( void );
 	void rolrPreset( void );
 	void selPreset( void );
-	void setParameter( void );
+	void setParameter( Model * action );
 
 protected:
 	virtual void paintEvent( QPaintEvent * _pe );
@@ -96,6 +93,7 @@ private:
 	friend class VstEffectControlDialog;
 	friend class manageVSTEffectView;
 
+	bool m_vstGuiVisible;
 } ;
 
 
@@ -112,7 +110,8 @@ public:
 protected slots:
 	void syncPlugin( void );
 	void displayAutomatedOnly( void );
-	void setParameter( void );
+	void setParameter( Model * action );
+	void syncParameterText();
 	void closeWindow();
 
 private:
@@ -131,7 +130,7 @@ private:
 	QPushButton * m_syncButton;
 	QPushButton * m_displayAutomatedOnly;
 	QPushButton * m_closeButton;
-	Knob ** vstKnobs;
+	CustomTextKnob ** vstKnobs;
 
 } ;
 

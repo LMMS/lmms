@@ -47,10 +47,12 @@ protected:
 	DropToolBar * addDropToolBar(Qt::ToolBarArea whereToAdd, QString const & windowTitle);
 	DropToolBar * addDropToolBar(QWidget * parent, Qt::ToolBarArea whereToAdd, QString const & windowTitle);
 
+	void closeEvent( QCloseEvent * _ce ) override;
 protected slots:
 	virtual void play() {}
 	virtual void record() {}
 	virtual void recordAccompany() {}
+	virtual void toggleStepRecording() {}
 	virtual void stop() {}
 
 private slots:
@@ -64,7 +66,7 @@ protected:
 	///
 	/// \param	record	If set true, the editor's toolbar will contain record
 	///					buttons in addition to the play and stop buttons.
-	Editor(bool record = false);
+	Editor(bool record = false, bool record_step = false);
 	virtual ~Editor();
 
 
@@ -73,6 +75,7 @@ protected:
 	QAction* m_playAction;
 	QAction* m_recordAction;
 	QAction* m_recordAccompanyAction;
+	QAction* m_toggleStepRecordingAction;
 	QAction* m_stopAction;
 };
 
@@ -89,8 +92,8 @@ signals:
 	void dropped(QDropEvent* event);
 
 protected:
-	void dragEnterEvent(QDragEnterEvent* event);
-	void dropEvent(QDropEvent* event);
+	void dragEnterEvent(QDragEnterEvent* event) override;
+	void dropEvent(QDropEvent* event) override;
 };
 
 

@@ -33,6 +33,7 @@
 #include "Mixer.h"
 #include "Engine.h"
 
+#include <QDebug>
 #include <QDir>
 
 #ifndef SYNC_WITH_SHM_FIFO
@@ -54,7 +55,10 @@ ProcessWatcher::ProcessWatcher( RemotePlugin * _p ) :
 
 void ProcessWatcher::run()
 {
-	while( !m_quit && m_plugin->isRunning() )
+	m_plugin->m_process.start( m_plugin->m_exec, m_plugin->m_args );
+	exec();
+	m_plugin->m_process.moveToThread( m_plugin->thread() );
+	while( !m_quit && m_plugin->messagesLeft() )
 	{
 		msleep( 200 );
 	}
@@ -62,6 +66,7 @@ void ProcessWatcher::run()
 	{
 		fprintf( stderr,
 				"remote plugin died! invalidating now.\n" );
+
 		m_plugin->invalidate();
 	}
 }
@@ -78,7 +83,6 @@ RemotePlugin::RemotePlugin() :
 	RemotePluginBase(),
 #endif
 	m_failed( true ),
-	m_process(),
 	m_watcher( this ),
 	m_commMutex( QMutex::Recursive ),
 	m_splitChannels( false ),
@@ -98,14 +102,14 @@ RemotePlugin::RemotePlugin() :
 
 	m_socketFile = QDir::tempPath() + QDir::separator() +
 						QUuid::createUuid().toString();
-	const char * path = m_socketFile.toUtf8().constData();
-	size_t length = strlen( path );
+	auto path = m_socketFile.toUtf8();
+	size_t length = path.length();
 	if ( length >= sizeof sa.sun_path )
 	{
 		length = sizeof sa.sun_path - 1;
 		qWarning( "Socket path too long." );
 	}
-	memcpy( sa.sun_path, path, length );
+	memcpy(sa.sun_path, path.constData(), length );
 	sa.sun_path[length] = '\0';
 
 	m_server = socket( PF_LOCAL, SOCK_STREAM, 0 );
@@ -113,13 +117,22 @@ RemotePlugin::RemotePlugin() :
 	{
 		qWarning( "Unable to start the server." );
 	}
-	remove( path );
+	remove(path.constData());
 	int ret = bind( m_server, (struct sockaddr *) &sa, sizeof sa );
 	if ( ret == -1 || listen( m_server, 1 ) == -1 )
 	{
 		qWarning( "Unable to start the server." );
 	}
 #endif
+
+	connect( &m_process, SIGNAL( finished( int, QProcess::ExitStatus ) ),
+		this, SLOT( processFinished( int, QProcess::ExitStatus ) ),
+		Qt::DirectConnection );
+	connect( &m_process, SIGNAL( errorOccurred( QProcess::ProcessError ) ),
+			 this, SLOT( processErrored( QProcess::ProcessError ) ),
+		Qt::DirectConnection );
+	connect( &m_process, SIGNAL( finished( int, QProcess::ExitStatus ) ),
+		&m_watcher, SLOT( quit() ), Qt::DirectConnection );
 }
 
 
@@ -127,7 +140,7 @@ RemotePlugin::RemotePlugin() :
 
 RemotePlugin::~RemotePlugin()
 {
-	m_watcher.quit();
+	m_watcher.stop();
 	m_watcher.wait();
 
 	if( m_failed == false )
@@ -201,6 +214,11 @@ bool RemotePlugin::init(const QString &pluginExecutable,
 		return failed();
 	}
 
+	// ensure the watcher is ready in case we're running again
+	// (e.g. 32-bit VST plugins on Windows)
+	m_watcher.wait();
+	m_watcher.reset();
+
 	QStringList args;
 #ifdef SYNC_WITH_SHM_FIFO
 	// swap in and out for bidirectional communication
@@ -213,14 +231,14 @@ bool RemotePlugin::init(const QString &pluginExecutable,
 #ifndef DEBUG_REMOTE_PLUGIN
 	m_process.setProcessChannelMode( QProcess::ForwardedChannels );
 	m_process.setWorkingDirectory( QCoreApplication::applicationDirPath() );
-	m_process.start( exec, args );
+	m_exec = exec;
+	m_args = args;
+	// we start the process on the watcher thread to work around QTBUG-8819
+	m_process.moveToThread( &m_watcher );
 	m_watcher.start( QThread::LowestPriority );
 #else
 	qDebug() << exec << args;
 #endif
-
-	connect( &m_process, SIGNAL( finished( int, QProcess::ExitStatus ) ),
-		this, SLOT( processFinished( int, QProcess::ExitStatus ) ) );
 
 #ifndef SYNC_WITH_SHM_FIFO
 	struct pollfd pollin;
@@ -454,9 +472,22 @@ void RemotePlugin::resizeSharedProcessingMemory()
 void RemotePlugin::processFinished( int exitCode,
 					QProcess::ExitStatus exitStatus )
 {
+	if ( exitStatus == QProcess::CrashExit )
+	{
+		qCritical() << "Remote plugin crashed";
+	}
+	else if ( exitCode )
+	{
+		qCritical() << "Remote plugin exit code: " << exitCode;
+	}
 #ifndef SYNC_WITH_SHM_FIFO
 	invalidate();
 #endif
+}
+
+void RemotePlugin::processErrored( QProcess::ProcessError err )
+{
+	qCritical() << "Process error: " << err;
 }
 
 

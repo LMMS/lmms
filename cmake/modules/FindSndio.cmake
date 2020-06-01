@@ -19,14 +19,16 @@ if(SNDIO_LIBRARY)
    get_filename_component(SNDIO_LIBRARY_DIR ${SNDIO_LIBRARY} PATH)
 endif(SNDIO_LIBRARY)
 
-check_library_exists(sndio sio_open "${SNDIO_LIBRARY_DIR}" HAVE_SNDIO)
-if(HAVE_SNDIO)
-    message(STATUS "Found sndio: ${SNDIO_LIBRARY}")
-else(HAVE_SNDIO)
-    message(STATUS "sndio not found")
-endif(HAVE_SNDIO)
-set(SNDIO_FOUND ${HAVE_SNDIO})
+check_library_exists(sndio sio_open "${SNDIO_LIBRARY_DIR}" HAVE_SIO_OPEN)
 
-find_path(SNDIO_INCLUDES sndio.h)
+find_path(SNDIO_INCLUDE_DIR sndio.h)
 
-mark_as_advanced(SNDIO_INCLUDES SNDIO_LIBRARY)
+include(FindPackageHandleStandardArgs)
+find_package_handle_standard_args(SNDIO DEFAULT_MSG SNDIO_LIBRARY SNDIO_INCLUDE_DIR HAVE_SIO_OPEN)
+
+if(SNDIO_FOUND)
+    set(SNDIO_INCLUDE_DIRS "${SNDIO_INCLUDE_DIR}")
+    set(SNDIO_LIBRARIES "${SNDIO_LIBRARY}")
+endif()
+
+mark_as_advanced(SNDIO_INCLUDE_DIR SNDIO_LIBRARY SNDIO_INCLUDE_DIRS SNDIO_LIBRARIES)

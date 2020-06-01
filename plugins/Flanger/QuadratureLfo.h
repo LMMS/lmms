@@ -53,6 +53,14 @@ public:
 
 
 
+	inline void restart()
+	{
+		m_phase = 0;
+	}
+
+
+
+
 	inline void setSampleRate ( int samplerate )
 	{
 		m_samplerate = samplerate;

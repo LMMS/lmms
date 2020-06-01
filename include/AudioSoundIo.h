@@ -109,6 +109,8 @@ private:
 	fpp_t m_outBufFramesTotal;
 	fpp_t m_outBufFrameIndex;
 
+	bool m_stopped;
+
 	int m_disconnectErr;
 	void onBackendDisconnect(int err);
 

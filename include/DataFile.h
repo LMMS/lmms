@@ -29,12 +29,12 @@
 
 #include <QDomDocument>
 
-#include "export.h"
+#include "lmms_export.h"
 #include "MemoryManager.h"
 
 class QTextStream;
 
-class EXPORT DataFile : public QDomDocument
+class LMMS_EXPORT DataFile : public QDomDocument
 {
 	MM_OPERATORS
 public:
@@ -84,25 +84,6 @@ public:
 		return m_type;
 	}
 
-	// small helper class for adjusting application's locale settings
-	// when loading or saving floating point values rendered to strings
-	class LocaleHelper
-	{
-	public:
-		enum Modes
-		{
-			ModeLoad,
-			ModeSave,
-			ModeCount
-		};
-		typedef Modes Mode;
-
-		LocaleHelper( Mode mode );
-		~LocaleHelper();
-
-	};
-
-
 private:
 	static Type type( const QString& typeName );
 	static QString typeName( Type type );
@@ -134,7 +115,7 @@ private:
 	void loadData( const QByteArray & _data, const QString & _sourceFile );
 
 
-	struct EXPORT typeDescStruct
+	struct LMMS_EXPORT typeDescStruct
 	{
 		Type m_type;
 		QString m_name;

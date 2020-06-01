@@ -28,7 +28,9 @@
 #include "ConfigManager.h"
 #include "FxMixer.h"
 #include "Ladspa2LMMS.h"
+#include "Lv2Manager.h"
 #include "Mixer.h"
+#include "Plugin.h"
 #include "PresetPreviewPlayHandle.h"
 #include "ProjectJournal.h"
 #include "Song.h"
@@ -41,7 +43,11 @@ FxMixer * LmmsCore::s_fxMixer = NULL;
 BBTrackContainer * LmmsCore::s_bbTrackContainer = NULL;
 Song * LmmsCore::s_song = NULL;
 ProjectJournal * LmmsCore::s_projectJournal = NULL;
+#ifdef LMMS_HAVE_LV2
+Lv2Manager * LmmsCore::s_lv2Manager = nullptr;
+#endif
 Ladspa2LMMS * LmmsCore::s_ladspaManager = NULL;
+void* LmmsCore::s_dndPluginKey = nullptr;
 DummyTrackContainer * LmmsCore::s_dummyTC = NULL;
 
 
@@ -64,6 +70,10 @@ void LmmsCore::init( bool renderOnly )
 	s_fxMixer = new FxMixer;
 	s_bbTrackContainer = new BBTrackContainer;
 
+#ifdef LMMS_HAVE_LV2
+	s_lv2Manager = new Lv2Manager;
+	s_lv2Manager->initPlugins();
+#endif
 	s_ladspaManager = new Ladspa2LMMS;
 
 	s_projectJournal->setJournalling( true );
@@ -96,6 +106,9 @@ void LmmsCore::destroy()
 	deleteHelper( &s_fxMixer );
 	deleteHelper( &s_mixer );
 
+#ifdef LMMS_HAVE_LV2
+	deleteHelper( &s_lv2Manager );
+#endif
 	deleteHelper( &s_ladspaManager );
 
 	//delete ConfigManager::inst();
@@ -110,13 +123,39 @@ void LmmsCore::destroy()
 	Oscillator::destroyFFTPlans();
 }
 
+float LmmsCore::framesPerTick(sample_rate_t sampleRate)
+{
+	return sampleRate * 60.0f * 4 /
+			DefaultTicksPerBar / s_song->getTempo();
+}
+
 
 
 
 void LmmsCore::updateFramesPerTick()
 {
 	s_framesPerTick = s_mixer->processingSampleRate() * 60.0f * 4 /
-				DefaultTicksPerTact / s_song->getTempo();
+				DefaultTicksPerBar / s_song->getTempo();
 }
+
+
+
+
+void LmmsCore::setDndPluginKey(void *newKey)
+{
+	Q_ASSERT(static_cast<Plugin::Descriptor::SubPluginFeatures::Key*>(newKey));
+	s_dndPluginKey = newKey;
+}
+
+
+
+
+void *LmmsCore::pickDndPluginKey()
+{
+	return s_dndPluginKey;
+}
+
+
+
 
 LmmsCore * LmmsCore::s_instanceOfMe = NULL;

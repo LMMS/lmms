@@ -1,0 +1,25 @@
+usr/share/applications
+usr/share/bash-completion
+usr/share/icons
+usr/share/lmms/[a-o]*
+usr/share/lmms/presets/[A-Y]*
+usr/share/lmms/projects/demos/Alf42red-*
+usr/share/lmms/projects/demos/CapDan
+usr/share/lmms/projects/demos/EsoXLB-*
+usr/share/lmms/projects/demos/Impulslogik-*
+usr/share/lmms/projects/demos/Jousboxx-*
+usr/share/lmms/projects/demos/Momo64-*
+usr/share/lmms/projects/demos/Oglsdl-*
+usr/share/lmms/projects/demos/Settel-*
+usr/share/lmms/projects/demos/Socceroos-*
+usr/share/lmms/projects/demos/TameAnderson-*
+usr/share/lmms/projects/demos/Thomasso-*
+usr/share/lmms/projects/shorties/Crunk*
+usr/share/lmms/projects/shorties/Greshz-*
+usr/share/lmms/projects/shorties/Surrender-*
+usr/share/lmms/projects/templates
+usr/share/lmms/projects/tutorials
+usr/share/lmms/[q-z]*
+usr/share/man
+usr/share/mime
+debian/lmms.xpm usr/share/pixmaps/

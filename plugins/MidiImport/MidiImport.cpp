@@ -26,8 +26,11 @@
 #include <QDomDocument>
 #include <QDir>
 #include <QApplication>
+#include <QFile>
 #include <QMessageBox>
 #include <QProgressDialog>
+
+#include <sstream>
 
 #include "MidiImport.h"
 #include "TrackContainer.h"
@@ -41,8 +44,10 @@
 #include "MainWindow.h"
 #include "MidiTime.h"
 #include "debug.h"
-#include "embed.h"
 #include "Song.h"
+
+#include "embed.h"
+#include "plugin_export.h"
 
 #include "portsmf/allegro.h"
 
@@ -98,11 +103,11 @@ bool MidiImport::tryImport( TrackContainer* tc )
 
 #ifdef LMMS_HAVE_FLUIDSYNTH
 	if( gui != NULL &&
-		ConfigManager::inst()->defaultSoundfont().isEmpty() )
+		ConfigManager::inst()->sf2File().isEmpty() )
 	{
 		QMessageBox::information( gui->mainWindow(),
 			tr( "Setup incomplete" ),
-			tr( "You do not have set up a default soundfont in "
+			tr( "You have not set up a default soundfont in "
 				"the settings dialog (Edit->Settings). "
 				"Therefore no sound will be played back after "
 				"importing this MIDI file. You should download "
@@ -183,9 +188,9 @@ public:
 
 	smfMidiCC & putValue( MidiTime time, AutomatableModel * objModel, float value )
 	{
-		if( !ap || time > lastPos + DefaultTicksPerTact )
+		if( !ap || time > lastPos + DefaultTicksPerBar )
 		{
-			MidiTime pPos = MidiTime( time.getTact(), 0 );
+			MidiTime pPos = MidiTime( time.getBar(), 0 );
 			ap = dynamic_cast<AutomationPattern*>(
 				at->createTCO(0) );
 			ap->movePosition( pPos );
@@ -195,7 +200,7 @@ public:
 		lastPos = time;
 		time = time - ap->startPosition();
 		ap->putValue( time, value, false );
-		ap->changeLength( MidiTime( time.getTact() + 1, 0 ) ); 
+		ap->changeLength( MidiTime( time.getBar() + 1, 0 ) ); 
 
 		return *this;
 	}
@@ -212,8 +217,7 @@ public:
 		p( NULL ),
 		it_inst( NULL ),
 		isSF2( false ),
-		hasNotes( false ),
-		lastEnd( 0 )
+		hasNotes( false )
 	{ }
 	
 	InstrumentTrack * it;
@@ -221,7 +225,6 @@ public:
 	Instrument * it_inst;
 	bool isSF2; 
 	bool hasNotes;
-	MidiTime lastEnd;
 	QString trackName;
 	
 	smfMidiChannel * create( TrackContainer* tc, QString tn )
@@ -237,7 +240,7 @@ public:
 			if( it_inst )
 			{
 				isSF2 = true;
-				it_inst->loadFile( ConfigManager::inst()->defaultSoundfont() );
+				it_inst->loadFile( ConfigManager::inst()->sf2File() );
 				it_inst->childModel( "bank" )->setValue( 0 );
 				it_inst->childModel( "patch" )->setValue( 0 );
 			}
@@ -252,9 +255,11 @@ public:
 			if( trackName != "") {
 				it->setName( tn );
 			}
-			lastEnd = 0;
 			// General MIDI default
 			it->pitchRangeModel()->setInitValue( 2 );
+
+			// Create a default pattern
+			p = dynamic_cast<Pattern*>(it->createTCO(0));
 		}
 		return this;
 	}
@@ -262,16 +267,37 @@ public:
 
 	void addNote( Note & n )
 	{
-		if( !p || n.pos() > lastEnd + DefaultTicksPerTact )
+		if (!p)
 		{
-			MidiTime pPos = MidiTime( n.pos().getTact(), 0 );
-			p = dynamic_cast<Pattern*>( it->createTCO( 0 ) );
-			p->movePosition( pPos );
+			p = dynamic_cast<Pattern*>(it->createTCO(0));
 		}
+		p->addNote(n, false);
 		hasNotes = true;
-		lastEnd = n.pos() + n.length();
-		n.setPos( n.pos( p->startPosition() ) );
-		p->addNote( n, false );
+	}
+
+	void splitPatterns()
+	{
+		Pattern * newPattern = nullptr;
+		MidiTime lastEnd(0);
+
+		p->rearrangeAllNotes();
+		for (auto n : p->notes())
+		{
+			if (!newPattern || n->pos() > lastEnd + DefaultTicksPerBar)
+			{
+				MidiTime pPos = MidiTime(n->pos().getBar(), 0);
+				newPattern = dynamic_cast<Pattern*>(it->createTCO(0));
+				newPattern->movePosition(pPos);
+			}
+			lastEnd = n->pos() + n->length();
+
+			Note newNote(*n);
+			newNote.setPos(n->pos(newPattern->startPosition()));
+			newPattern->addNote(newNote, false);
+		}
+
+		delete p;
+		p = nullptr;
 	}
 
 };
@@ -279,8 +305,6 @@ public:
 
 bool MidiImport::readSMF( TrackContainer* tc )
 {
-	QString filename = file().fileName();
-	closeFile();
 
 	const int preTrackSteps = 2;
 	QProgressDialog pd( TrackContainer::tr( "Importing MIDI-file..." ),
@@ -291,7 +315,11 @@ bool MidiImport::readSMF( TrackContainer* tc )
 
 	pd.setValue( 0 );
 
-	Alg_seq_ptr seq = new Alg_seq(filename.toLocal8Bit(), true);
+	std::stringstream stream;
+	QByteArray arr = readAllData();
+	stream.str(std::string(arr.constData(), arr.size()));
+
+	Alg_seq_ptr seq = new Alg_seq(stream, true);
 	seq->convert_to_beats();
 
 	pd.setMaximum( seq->tracks()  + preTrackSteps );
@@ -302,33 +330,36 @@ bool MidiImport::readSMF( TrackContainer* tc )
 	smfMidiChannel chs[256];
 
 	MeterModel & timeSigMM = Engine::getSong()->getTimeSigModel();
-	AutomationPattern * timeSigNumeratorPat = 
-		AutomationPattern::globalAutomationPattern( &timeSigMM.numeratorModel() );
-	AutomationPattern * timeSigDenominatorPat = 
-		AutomationPattern::globalAutomationPattern( &timeSigMM.denominatorModel() );
+	AutomationTrack * nt = dynamic_cast<AutomationTrack*>(
+		Track::create(Track::AutomationTrack, Engine::getSong()));
+	nt->setName(tr("MIDI Time Signature Numerator"));
+	AutomationTrack * dt = dynamic_cast<AutomationTrack*>(
+		Track::create(Track::AutomationTrack, Engine::getSong()));
+	dt->setName(tr("MIDI Time Signature Denominator"));
+	AutomationPattern * timeSigNumeratorPat =
+		new AutomationPattern(nt);
+	timeSigNumeratorPat->setDisplayName(tr("Numerator"));
+	timeSigNumeratorPat->addObject(&timeSigMM.numeratorModel());
+	AutomationPattern * timeSigDenominatorPat =
+		new AutomationPattern(dt);
+	timeSigDenominatorPat->setDisplayName(tr("Denominator"));
+	timeSigDenominatorPat->addObject(&timeSigMM.denominatorModel());
 	
 	// TODO: adjust these to Time.Sig changes
-	double beatsPerTact = 4; 
-	double ticksPerBeat = DefaultTicksPerTact / beatsPerTact;
+	double beatsPerBar = 4; 
+	double ticksPerBeat = DefaultTicksPerBar / beatsPerBar;
 
 	// Time-sig changes
 	Alg_time_sigs * timeSigs = &seq->time_sig;
 	for( int s = 0; s < timeSigs->length(); ++s )
 	{
 		Alg_time_sig timeSig = (*timeSigs)[s];
-		// Initial timeSig, set song-default value
-		if(/* timeSig.beat == 0*/ true )
-		{
-			// TODO set song-global default value
-			printf("Another timesig at %f\n", timeSig.beat);
-			timeSigNumeratorPat->putValue( timeSig.beat*ticksPerBeat, timeSig.num );
-			timeSigDenominatorPat->putValue( timeSig.beat*ticksPerBeat, timeSig.den );
-		}
-		else
-		{
-		}
-
+		timeSigNumeratorPat->putValue(timeSig.beat * ticksPerBeat, timeSig.num);
+		timeSigDenominatorPat->putValue(timeSig.beat * ticksPerBeat, timeSig.den);
 	}
+	// manually call otherwise the pattern shows being 1 bar
+	timeSigNumeratorPat->updateLength();
+	timeSigDenominatorPat->updateLength();
 
 	pd.setValue( 2 );
 
@@ -421,7 +452,7 @@ bool MidiImport::readSMF( TrackContainer* tc )
 				Note n( (ticks < 1 ? 1 : ticks ),
 						noteEvt->get_start_time() * ticksPerBeat,
 						noteEvt->get_identifier() - 12,
-						noteEvt->get_loud());
+						noteEvt->get_loud() * (200.f / 127.f)); // Map from MIDI velocity to LMMS volume
 				ch->addNote( n );
 				
 			}
@@ -529,7 +560,11 @@ bool MidiImport::readSMF( TrackContainer* tc )
 	
 	for( int c=0; c < 256; ++c )
 	{
-		if( !chs[c].hasNotes && chs[c].it )
+		if (chs[c].hasNotes)
+		{
+			chs[c].splitPatterns();
+		}
+		else if (chs[c].it)
 		{
 			printf(" Should remove empty track\n");
 			// must delete trackView first - but where is it?

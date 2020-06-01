@@ -27,8 +27,6 @@
 #ifndef _COMMUNICATION_H
 #define _COMMUNICATION_H
 
-#include "RemotePlugin.h"
-
 
 
 struct VstParameterDumpItem
@@ -69,10 +67,11 @@ enum VstRemoteMessageIDs
 	IdVstSetProgram,
 	IdVstRotateProgram,
 	IdVstIdleUpdate,
+	IdVstParameterDisplays,
+	IdVstParameterLabels,
 
 	// remoteVstPlugin -> vstPlugin
 	IdVstFailedLoadingPlugin,
-	IdVstBadDllFormat,
 	IdVstPluginWindowID,
 	IdVstPluginEditorGeometry,
 	IdVstPluginName,

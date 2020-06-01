@@ -28,6 +28,7 @@
 
 #include "AutomationPatternView.h"
 #include "AutomationTrack.h"
+#include "LocaleHelper.h"
 #include "Note.h"
 #include "ProjectJournal.h"
 #include "BBTrackContainer.h"
@@ -144,11 +145,11 @@ void AutomationPattern::setProgressionType(
 void AutomationPattern::setTension( QString _new_tension )
 {
 	bool ok;
-	float nt = _new_tension.toFloat( & ok );
+	float nt = LocaleHelper::toFloat(_new_tension, & ok);
 
 	if( ok && nt > -0.01 && nt < 1.01 )
 	{
-		m_tension = _new_tension.toFloat();
+		m_tension = nt;
 	}
 }
 
@@ -177,9 +178,16 @@ const AutomationPattern::objectVector& AutomationPattern::objects() const
 
 MidiTime AutomationPattern::timeMapLength() const
 {
-	if( m_timeMap.isEmpty() ) return 0;
+	MidiTime one_bar = MidiTime(1, 0);
+	if (m_timeMap.isEmpty()) { return one_bar; }
+
 	timeMap::const_iterator it = m_timeMap.end();
-	return MidiTime( MidiTime( (it-1).key() ).nextFullTact(), 0 );
+	tick_t last_tick = static_cast<tick_t>((it-1).key());
+	// if last_tick is 0 (single item at tick 0)
+	// return length as a whole bar to prevent disappearing TCO
+	if (last_tick == 0) { return one_bar; }
+
+	return MidiTime(last_tick);
 }
 
 
@@ -187,7 +195,8 @@ MidiTime AutomationPattern::timeMapLength() const
 
 void AutomationPattern::updateLength()
 {
-	changeLength( timeMapLength() );
+	// Do not resize down in case user manually extended up
+	changeLength(qMax(length(), timeMapLength()));
 }
 
 
@@ -222,12 +231,7 @@ MidiTime AutomationPattern::putValue( const MidiTime & time,
 	}
 	generateTangents( it, 3 );
 
-	// we need to maximize our length in case we're part of a hidden
-	// automation track as the user can't resize this pattern
-	if( getTrack() && getTrack()->type() == Track::HiddenAutomationTrack )
-	{
-		updateLength();
-	}
+	updateLength();
 
 	emit dataChanged();
 
@@ -250,10 +254,7 @@ void AutomationPattern::removeValue( const MidiTime & time )
 	}
 	generateTangents(it, 3);
 
-	if( getTrack() && getTrack()->type() == Track::HiddenAutomationTrack )
-	{
-		updateLength();
-	}
+	updateLength();
 
 	emit dataChanged();
 }
@@ -585,7 +586,7 @@ void AutomationPattern::loadSettings( const QDomElement & _this )
 		if( element.tagName() == "time" )
 		{
 			m_timeMap[element.attribute( "pos" ).toInt()]
-				= element.attribute( "value" ).toFloat();
+				= LocaleHelper::toFloat(element.attribute("value"));
 		}
 		else if( element.tagName() == "object" )
 		{
@@ -619,12 +620,7 @@ const QString AutomationPattern::name() const
 	{
 		return m_objects.first()->fullDisplayName();
 	}
-	return tr( "Drag a control while pressing <%1>" ).arg(
-	#ifdef LMMS_BUILD_APPLE
-		"⌘");
-	#else
-		"Ctrl");
-	#endif
+	return tr( "Drag a control while pressing <%1>" ).arg(UI_CTRL_KEY);
 }
 
 
@@ -775,6 +771,26 @@ void AutomationPattern::resolveAllIDs()
 						if( o && dynamic_cast<AutomatableModel *>( o ) )
 						{
 							a->addObject( dynamic_cast<AutomatableModel *>( o ), false );
+						}
+						else
+						{
+							// FIXME: Remove this block once the automation system gets fixed
+							// This is a temporary fix for https://github.com/LMMS/lmms/issues/3781
+							o = Engine::projectJournal()->journallingObject(ProjectJournal::idFromSave(*k));
+							if( o && dynamic_cast<AutomatableModel *>( o ) )
+							{
+								a->addObject( dynamic_cast<AutomatableModel *>( o ), false );
+							}
+							else
+							{
+								// FIXME: Remove this block once the automation system gets fixed
+								// This is a temporary fix for https://github.com/LMMS/lmms/issues/4781
+								o = Engine::projectJournal()->journallingObject(ProjectJournal::idToSave(*k));
+								if( o && dynamic_cast<AutomatableModel *>( o ) )
+								{
+									a->addObject( dynamic_cast<AutomatableModel *>( o ), false );
+								}
+							}
 						}
 					}
 					a->m_idsToResolve.clear();

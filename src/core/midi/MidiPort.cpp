@@ -27,8 +27,11 @@
 
 #include "MidiPort.h"
 #include "MidiClient.h"
+#include "MidiDummy.h"
 #include "Note.h"
 #include "Song.h"
+
+static MidiDummy s_dummyClient;
 
 
 
@@ -60,9 +63,12 @@ MidiPort::MidiPort( const QString& name,
 	m_readableModel.setValue( m_mode == Input || m_mode == Duplex );
 	m_writableModel.setValue( m_mode == Output || m_mode == Duplex );
 
-	connect( &m_readableModel, SIGNAL( dataChanged() ), this, SLOT( updateMidiPortMode() ) );
-	connect( &m_writableModel, SIGNAL( dataChanged() ), this, SLOT( updateMidiPortMode() ) );
-	connect( &m_outputProgramModel, SIGNAL( dataChanged() ), this, SLOT( updateOutputProgram() ) );
+	connect( &m_readableModel, SIGNAL( dataChanged() ),
+			this, SLOT( updateMidiPortMode() ), Qt::DirectConnection );
+	connect( &m_writableModel, SIGNAL( dataChanged() ),
+			this, SLOT( updateMidiPortMode() ), Qt::DirectConnection );
+	connect( &m_outputProgramModel, SIGNAL( dataChanged() ),
+			this, SLOT( updateOutputProgram() ), Qt::DirectConnection );
 
 
 	// when using with non-raw-clients we can provide buttons showing
@@ -410,4 +416,7 @@ void MidiPort::updateOutputProgram()
 
 
 
-
+void MidiPort::invalidateCilent()
+{
+	m_midiClient = &s_dummyClient;
+}

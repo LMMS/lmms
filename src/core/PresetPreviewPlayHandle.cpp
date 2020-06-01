@@ -54,7 +54,7 @@ public:
 	{
 	}
 
-	virtual QString nodeName() const
+	QString nodeName() const override
 	{
 		return "previewtrackcontainer";
 	}
@@ -137,8 +137,10 @@ PresetPreviewPlayHandle::PresetPreviewPlayHandle( const QString & _preset_file, 
 							suffix().toLower();
 		if( i == NULL || !i->descriptor()->supportsFileType( ext ) )
 		{
+			const PluginFactory::PluginInfoAndKey& infoAndKey =
+				pluginFactory->pluginSupportingExtension(ext);
 			i = s_previewTC->previewInstrumentTrack()->
-				loadInstrument(pluginFactory->pluginSupportingExtension(ext).name());
+				loadInstrument(infoAndKey.info.name(), &infoAndKey.key);
 		}
 		if( i != NULL )
 		{
@@ -154,19 +156,9 @@ PresetPreviewPlayHandle::PresetPreviewPlayHandle( const QString & _preset_file, 
 			dataFileCreated = true;
 		}
 
-		// vestige previews are bug prone; fallback on 3xosc with volume of 0
-		// without an instrument in preview track, it will segfault
-		if(dataFile->content().elementsByTagName( "vestige" ).length() == 0 )
-		{
-			s_previewTC->previewInstrumentTrack()->
-					loadTrackSpecificSettings(
-						dataFile->content().firstChild().toElement() );
-		}
-		else
-		{
-			s_previewTC->previewInstrumentTrack()->loadInstrument("tripleoscillator");
-			s_previewTC->previewInstrumentTrack()->setVolume( 0 );
-		}
+		s_previewTC->previewInstrumentTrack()->loadTrackSpecificSettings(
+					dataFile->content().firstChild().toElement());
+
 		if( dataFileCreated )
 		{
 			delete dataFile;

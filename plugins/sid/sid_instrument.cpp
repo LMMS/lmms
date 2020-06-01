@@ -42,6 +42,7 @@
 #include "ToolTip.h"
 
 #include "embed.h"
+#include "plugin_export.h"
 
 #define C64_PAL_CYCLES_PER_SEC  985248
 
@@ -55,14 +56,14 @@ unsigned char sidorder[] =
    0x0c,0x0d,0x09,0x0a,0x07,0x08,0x0b,
    0x13,0x14,0x10,0x11,0x0e,0x0f,0x12};
 
-static const char *attackTime[16] = { "2 mS", "8 mS", "16 mS", "24 mS",
-									"38 mS", "56 mS", "68 mS", "80 mS",
-									"100 mS", "250 mS", "500 mS", "800 mS",
-									"1 S", "3 S", "5 S", "8 S" };
-static const char *decRelTime[16] = { "6 mS", "24 mS", "48 mS", "72 mS",
-									"114 mS", "168 mS", "204 mS", "240 mS",
-									"300 mS", "750 mS", "1.5 S", "2.4 S",
-									"3 S", "9 S", "15 S", "24 S" };
+static const char *attackTime[16] = { "2 ms", "8 ms", "16 ms", "24 ms",
+									"38 ms", "56 ms", "68 ms", "80 ms",
+									"100 ms", "250 ms", "500 ms", "800 ms",
+									"1 s", "3 s", "5 s", "8 s" };
+static const char *decRelTime[16] = { "6 ms", "24 ms", "48 ms", "72 ms",
+									"114 ms", "168 ms", "204 ms", "240 ms",
+									"300 ms", "750 ms", "1.5 s", "2.4 s",
+									"3 s", "9 s", "15 s", "24 s" };
 // release time time in ms
 static const int relTime[16] = { 6, 24, 48, 72, 114, 168, 204, 240, 300, 750,
 								1500, 2400, 3000, 9000, 15000, 24000 };
@@ -121,7 +122,7 @@ voiceObject::~voiceObject()
 sidInstrument::sidInstrument( InstrumentTrack * _instrument_track ) :
 	Instrument( _instrument_track, &sid_plugin_descriptor ),
 	// filter	
-	m_filterFCModel( 1024.0f, 0.0f, 2047.0f, 1.0f, this, tr( "Cutoff" ) ),
+	m_filterFCModel( 1024.0f, 0.0f, 2047.0f, 1.0f, this, tr( "Cutoff frequency" ) ),
 	m_filterResonanceModel( 8.0f, 0.0f, 15.0f, 1.0f, this, tr( "Resonance" ) ),
 	m_filterModeModel( LowPass, 0, NumFilterTypes-1, this, tr( "Filter type" )),
 	
@@ -323,7 +324,8 @@ void sidInstrument::playNote( NotePlayHandle * _n,
 
 	cSID *sid = static_cast<cSID *>( _n->m_pluginData );
 	int delta_t = clockrate * frames / samplerate + 4;
-	short buf[frames];
+	// avoid variable length array for msvc compat
+	short* buf = reinterpret_cast<short*>(_working_buffer + offset);
 	unsigned char sidreg[NUMSIDREGS];
 
 	for (int c = 0; c < NUMSIDREGS; c++)
@@ -428,7 +430,8 @@ void sidInstrument::playNote( NotePlayHandle * _n,
 	if(num!=frames)
 		printf("!!!Not enough samples\n");
 
-	for( fpp_t frame = 0; frame < frames; ++frame )
+	// loop backwards to avoid overwriting data in the short-to-float conversion
+	for( fpp_t frame = frames - 1; frame >= 0; frame-- )
 	{
 		sample_t s = float(buf[frame])/32768.0;
 		for( ch_cnt_t ch = 0; ch < DEFAULT_CHANNELS; ++ch )
@@ -480,7 +483,7 @@ public:
 
 sidInstrumentView::sidInstrumentView( Instrument * _instrument,
 							QWidget * _parent ) :
-	InstrumentView( _instrument, _parent )
+	InstrumentViewFixedSize( _instrument, _parent )
 {
 
 	setAutoFillBackground( true );
@@ -497,26 +500,26 @@ sidInstrumentView::sidInstrumentView( Instrument * _instrument,
 	m_resKnob->move( 7 + 28, 64 );
 
 	m_cutKnob = new sidKnob( this );
-	m_cutKnob->setHintText( tr( "Cutoff frequency:" ), "Hz" );
+	m_cutKnob->setHintText( tr( "Cutoff frequency:" ), " Hz" );
 	m_cutKnob->move( 7 + 2*28, 64 );
 
 	PixmapButton * hp_btn = new PixmapButton( this, NULL );
 	hp_btn->move( 140, 77 );
 	hp_btn->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "hpred" ) );
 	hp_btn->setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "hp" ) );
-	ToolTip::add( hp_btn, tr( "High-Pass filter ") );
+	ToolTip::add( hp_btn, tr( "High-pass filter ") );
 
 	PixmapButton * bp_btn = new PixmapButton( this, NULL );
 	bp_btn->move( 164, 77 );
 	bp_btn->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "bpred" ) );
 	bp_btn->setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "bp" ) );
-	ToolTip::add( bp_btn, tr( "Band-Pass filter ") );
+	ToolTip::add( bp_btn, tr( "Band-pass filter ") );
 
 	PixmapButton * lp_btn = new PixmapButton( this, NULL );
 	lp_btn->move( 185, 77 );
 	lp_btn->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "lpred" ) );
 	lp_btn->setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "lp" ) );
-	ToolTip::add( lp_btn, tr( "Low-Pass filter ") );
+	ToolTip::add( lp_btn, tr( "Low-pass filter ") );
 
 	m_passBtnGrp = new automatableButtonGroup( this );
 	m_passBtnGrp->addButton( hp_btn );
@@ -528,7 +531,7 @@ sidInstrumentView::sidInstrumentView( Instrument * _instrument,
 	m_offButton->move( 207, 77 );
 	m_offButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "3offred" ) );
 	m_offButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "3off" ) );
-	ToolTip::add( m_offButton, tr( "Voice3 Off ") );
+	ToolTip::add( m_offButton, tr( "Voice 3 off ") );
 
 	PixmapButton * mos6581_btn = new PixmapButton( this, NULL );
 	mos6581_btn->move( 170, 59 );
@@ -551,41 +554,26 @@ sidInstrumentView::sidInstrumentView( Instrument * _instrument,
 		Knob *ak = new sidKnob( this );
 		ak->setHintText( tr("Attack:"), "" );
 		ak->move( 7, 114 + i*50 );
-		ak->setWhatsThis( tr ( "Attack rate determines how rapidly the output "
-				"of Voice %1 rises from zero to peak amplitude." ).arg( i+1 ) );
 
 		Knob *dk = new sidKnob( this );
 		dk->setHintText( tr("Decay:") , "" );
 		dk->move( 7 + 28, 114 + i*50 );
-		dk->setWhatsThis( tr ( "Decay rate determines how rapidly the output "
-				"falls from the peak amplitude to the selected Sustain level." ) );
 
 		Knob *sk = new sidKnob( this );
 		sk->setHintText( tr("Sustain:"), "" );
 		sk->move( 7 + 2*28, 114 + i*50 );
-		sk->setWhatsThis( tr ( "Output of Voice %1 will remain at the selected "
-				"Sustain amplitude as long as the note is held." ).arg( i+1 ) );
 
 		Knob *rk = new sidKnob( this );
 		rk->setHintText( tr("Release:"), "" );
 		rk->move( 7 + 3*28, 114 + i*50 );
-		rk->setWhatsThis( tr ( "The output of of Voice %1 will fall from "
-				"Sustain amplitude to zero amplitude at the selected Release "
-				"rate." ).arg( i+1 ) );
 
 		Knob *pwk = new sidKnob( this );
 		pwk->setHintText( tr("Pulse Width:"), "" );
 		pwk->move( 7 + 4*28, 114 + i*50 );
-		pwk->setWhatsThis( tr ( "The Pulse Width resolution allows the width "
-				"to be smoothly swept with no discernable stepping. The Pulse "
-				"waveform on Oscillator %1 must be selected to have any audible"
-				" effect." ).arg( i+1 ) );
 
 		Knob *crsk = new sidKnob( this );
 		crsk->setHintText( tr("Coarse:"), " semitones" );
 		crsk->move( 147, 114 + i*50 );
-		crsk->setWhatsThis( tr ( "The Coarse detuning allows to detune Voice "
-				"%1 one octave up or down." ).arg( i+1 ) );
 
 		PixmapButton * pulse_btn = new PixmapButton( this, NULL );
 		pulse_btn->move( 187, 101 + i*50 );
@@ -593,7 +581,7 @@ sidInstrumentView::sidInstrumentView( Instrument * _instrument,
 			PLUGIN_NAME::getIconPixmap( "pulsered" ) );
 		pulse_btn->setInactiveGraphic(
 			PLUGIN_NAME::getIconPixmap( "pulse" ) );
-		ToolTip::add( pulse_btn, tr( "Pulse Wave" ) );
+		ToolTip::add( pulse_btn, tr( "Pulse wave" ) );
 
 		PixmapButton * triangle_btn = new PixmapButton( this, NULL );
 		triangle_btn->move( 168, 101 + i*50 );
@@ -601,7 +589,7 @@ sidInstrumentView::sidInstrumentView( Instrument * _instrument,
 			PLUGIN_NAME::getIconPixmap( "trianglered" ) );
 		triangle_btn->setInactiveGraphic(
 			PLUGIN_NAME::getIconPixmap( "triangle" ) );
-		ToolTip::add( triangle_btn, tr( "Triangle Wave" ) );
+		ToolTip::add( triangle_btn, tr( "Triangle wave" ) );
 
 		PixmapButton * saw_btn = new PixmapButton( this, NULL );
 		saw_btn->move( 207, 101 + i*50 );
@@ -609,7 +597,7 @@ sidInstrumentView::sidInstrumentView( Instrument * _instrument,
 			PLUGIN_NAME::getIconPixmap( "sawred" ) );
 		saw_btn->setInactiveGraphic(
 			PLUGIN_NAME::getIconPixmap( "saw" ) );
-		ToolTip::add( saw_btn, tr( "SawTooth" ) );
+		ToolTip::add( saw_btn, tr( "Saw wave" ) );
 
 		PixmapButton * noise_btn = new PixmapButton( this, NULL );
 		noise_btn->move( 226, 101 + i*50 );
@@ -627,8 +615,6 @@ sidInstrumentView::sidInstrumentView( Instrument * _instrument,
 		wfbg->addButton( saw_btn );
 		wfbg->addButton( noise_btn );
 
-		int syncRingWidth[] = { 3, 1, 2 };
-
 		PixmapButton * sync_btn = new PixmapButton( this, NULL );
 		sync_btn->setCheckable( true );
 		sync_btn->move( 207, 134 + i*50 );
@@ -637,10 +623,6 @@ sidInstrumentView::sidInstrumentView( Instrument * _instrument,
 		sync_btn->setInactiveGraphic(
 			PLUGIN_NAME::getIconPixmap( "sync" ) );
 		ToolTip::add( sync_btn, tr( "Sync" ) );
-		sync_btn->setWhatsThis( tr ( "Sync synchronizes the fundamental "
-			"frequency of Oscillator %1 with the fundamental frequency of "
-			"Oscillator %2 producing \"Hard Sync\" effects." ).arg( i+1 )
-			.arg( syncRingWidth[i] ) );
 
 		PixmapButton * ringMod_btn = new PixmapButton( this, NULL );
 		ringMod_btn->setCheckable( true );
@@ -649,11 +631,7 @@ sidInstrumentView::sidInstrumentView( Instrument * _instrument,
 			PLUGIN_NAME::getIconPixmap( "ringred" ) );
 		ringMod_btn->setInactiveGraphic(
 			PLUGIN_NAME::getIconPixmap( "ring" ) );
-		ToolTip::add( ringMod_btn, tr( "Ring-Mod" ) );
-		ringMod_btn->setWhatsThis( tr ( "Ring-mod replaces the Triangle "
-			"Waveform output of Oscillator %1 with a \"Ring Modulated\" "
-			"combination of Oscillators %1 and %2." ).arg( i+1 )
-			.arg( syncRingWidth[i] ) );
+		ToolTip::add( ringMod_btn, tr( "Ring modulation" ) );
 
 		PixmapButton * filter_btn = new PixmapButton( this, NULL );
 		filter_btn->setCheckable( true );
@@ -663,10 +641,6 @@ sidInstrumentView::sidInstrumentView( Instrument * _instrument,
 		filter_btn->setInactiveGraphic(
 			PLUGIN_NAME::getIconPixmap( "filter" ) );
 		ToolTip::add( filter_btn, tr( "Filtered" ) );
-		filter_btn->setWhatsThis( tr ( "When Filtered is on, Voice %1 will be "
-			"processed through the Filter. When Filtered is off, Voice %1 "
-			"appears directly at the output, and the Filter has no effect on "
-			"it." ).arg( i+1 ) );
 
 		PixmapButton * test_btn = new PixmapButton( this, NULL );
 		test_btn->setCheckable( true );
@@ -676,8 +650,6 @@ sidInstrumentView::sidInstrumentView( Instrument * _instrument,
 		test_btn->setInactiveGraphic(
 			PLUGIN_NAME::getIconPixmap( "test" ) );
 		ToolTip::add( test_btn, tr( "Test" ) );
-		test_btn->setWhatsThis( tr ( "Test, when set, resets and locks "
-			"Oscillator %1 at zero until Test is turned off." ).arg( i+1 ) );
 
 		m_voiceKnobs[i] = voiceKnobs( ak, dk, sk, rk, pwk, crsk, wfbg,
 								sync_btn, ringMod_btn, filter_btn, test_btn );
@@ -713,7 +685,7 @@ void sidInstrumentView::updateKnobHint()
 		ToolTip::add( m_voiceKnobs[i].m_relKnob,
 						decRelTime[(int)k->m_voice[i]->m_releaseModel.value()]);
 	
-		m_voiceKnobs[i].m_pwKnob->setHintText( tr( "Pulse Width:" )+ " ", " (" +
+		m_voiceKnobs[i].m_pwKnob->setHintText( tr( "Pulse width:" )+ " ", " (" +
 				QString::number(  (double)k->m_voice[i]->
 				m_pulseWidthModel.value() / 40.95 ) + "%)" );
 		ToolTip::add( m_voiceKnobs[i].m_pwKnob,
@@ -722,9 +694,9 @@ void sidInstrumentView::updateKnobHint()
 	}
 	m_cutKnob->setHintText( tr( "Cutoff frequency:" ) + " ", " (" +
 				QString::number ( (int) ( 9970.0 / 2047.0 *
-				(double)k->m_filterFCModel.value() + 30.0 ) ) + "Hz)" );
+				(double)k->m_filterFCModel.value() + 30.0 ) ) + " Hz)" );
 	ToolTip::add( m_cutKnob, QString::number( (int) ( 9970.0 / 2047.0 *
-					 (double)k->m_filterFCModel.value() + 30.0 ) ) + "Hz" );
+					 (double)k->m_filterFCModel.value() + 30.0 ) ) + " Hz" );
 }
 
 
@@ -822,10 +794,9 @@ extern "C"
 {
 
 // necessary for getting instance out of shared lib
-PLUGIN_EXPORT Plugin * lmms_plugin_main( Model *, void * _data )
+PLUGIN_EXPORT Plugin * lmms_plugin_main( Model *m, void * )
 {
-	return( new sidInstrument(
-				static_cast<InstrumentTrack *>( _data ) ) );
+	return( new sidInstrument( static_cast<InstrumentTrack *>( m ) ) );
 }
 
 

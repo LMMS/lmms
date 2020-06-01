@@ -123,9 +123,14 @@ PianoRoll {
 	qproperty-backgroundShade: rgba( 255, 255, 255, 10 );
 	qproperty-noteModeColor: rgb( 255, 255, 255 );
 	qproperty-noteColor: rgb( 119, 199, 216 );
+	qproperty-noteTextColor: rgb( 255, 255, 255 );
 	qproperty-noteOpacity: 128;
 	qproperty-noteBorders: true; /* boolean property, set false to have borderless notes */
 	qproperty-selectedNoteColor: rgb( 0, 125, 255 );
+	qproperty-ghostNoteColor: #000000;
+	qproperty-ghostNoteTextColor: #ffffff;
+	qproperty-ghostNoteOpacity: 50;
+	qproperty-ghostNoteBorders: true;
 	qproperty-barColor: #4afd85;
 	qproperty-markedSemitoneColor: rgba( 0, 255, 200, 60 );
 	/* Grid colors */
@@ -154,9 +159,12 @@ GroupBox {
 
 /* main toolbar oscilloscope - can have transparent bg now */
 
-VisualizationWidget  {
+Oscilloscope {
 	background: none;
 	border: none;
+	qproperty-normalColor: rgb(71, 253, 133);
+	qproperty-warningColor: rgb(255, 192, 64);
+	qproperty-clippingColor: rgb(255, 64, 64);
 }
 
 /* main toolbar cpu load widget - this can have transparent bg now */
@@ -889,7 +897,4 @@ LmmsPalette {
 	qproperty-brightText: #4afd85;
 	qproperty-highlight: #202020;
 	qproperty-highlightedText: #ffffff;
-	/* the next two are used for whatsthis dialogs */
-	qproperty-toolTipText: #000;
-	qproperty-toolTipBase: #c9c9c9;
 }

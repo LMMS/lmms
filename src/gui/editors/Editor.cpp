@@ -32,6 +32,7 @@
 #include <QAction>
 #include <QMdiArea>
 #include <QShortcut>
+#include <QCloseEvent>
 
 
 void Editor::setPauseIcon(bool displayPauseIcon)
@@ -73,11 +74,12 @@ void Editor::togglePlayStop()
 		play();
 }
 
-Editor::Editor(bool record) :
+Editor::Editor(bool record, bool stepRecord) :
 	m_toolBar(new DropToolBar(this)),
 	m_playAction(nullptr),
 	m_recordAction(nullptr),
 	m_recordAccompanyAction(nullptr),
+	m_toggleStepRecordingAction(nullptr),
 	m_stopAction(nullptr)
 {
 	m_toolBar = addDropToolBarToTop(tr("Transport controls"));
@@ -93,11 +95,13 @@ Editor::Editor(bool record) :
 
 	m_recordAction = new QAction(embed::getIconPixmap("record"), tr("Record"), this);
 	m_recordAccompanyAction = new QAction(embed::getIconPixmap("record_accompany"), tr("Record while playing"), this);
+	m_toggleStepRecordingAction = new QAction(embed::getIconPixmap("record_step_off"), tr("Toggle Step Recording"), this);
 
 	// Set up connections
 	connect(m_playAction, SIGNAL(triggered()), this, SLOT(play()));
 	connect(m_recordAction, SIGNAL(triggered()), this, SLOT(record()));
 	connect(m_recordAccompanyAction, SIGNAL(triggered()), this, SLOT(recordAccompany()));
+	connect(m_toggleStepRecordingAction, SIGNAL(triggered()), this, SLOT(toggleStepRecording()));
 	connect(m_stopAction, SIGNAL(triggered()), this, SLOT(stop()));
 	new QShortcut(Qt::Key_Space, this, SLOT(togglePlayStop()));
 
@@ -107,6 +111,10 @@ Editor::Editor(bool record) :
 	{
 		addButton(m_recordAction, "recordButton");
 		addButton(m_recordAccompanyAction, "recordAccompanyButton");
+	}
+	if(stepRecord)
+	{
+		addButton(m_toggleStepRecordingAction, "stepRecordButton");
 	}
 	addButton(m_stopAction, "stopButton");
 }
@@ -121,8 +129,18 @@ QAction *Editor::playAction() const
 	return m_playAction;
 }
 
-
-
+void Editor::closeEvent( QCloseEvent * _ce )
+{
+	if( parentWidget() )
+	{
+		parentWidget()->hide();
+	}
+	else
+	{
+		hide();
+	}
+	_ce->ignore();
+ }
 
 DropToolBar::DropToolBar(QWidget* parent) : QToolBar(parent)
 {
@@ -138,3 +156,6 @@ void DropToolBar::dropEvent(QDropEvent* event)
 {
 	dropped(event);
 }
+
+
+

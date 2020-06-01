@@ -27,6 +27,7 @@
 #include <QDir>
 #include <QDomDocument>
 #include <QTemporaryFile>
+#include <QtGlobal>
 #include <QDropEvent>
 #include <QGridLayout>
 #include <QPushButton>
@@ -40,6 +41,7 @@
 #include "InstrumentPlayHandle.h"
 #include "InstrumentTrack.h"
 #include "gui_templates.h"
+#include "Song.h"
 #include "StringPairDrag.h"
 #include "RemoteZynAddSubFx.h"
 #include "LocalZynAddSubFx.h"
@@ -47,8 +49,7 @@
 #include "ControllerConnection.h"
 
 #include "embed.h"
-
-
+#include "plugin_export.h"
 
 extern "C"
 {
@@ -111,23 +112,30 @@ ZynAddSubFxInstrument::ZynAddSubFxInstrument(
 	m_plugin( NULL ),
 	m_remotePlugin( NULL ),
 	m_portamentoModel( 0, 0, 127, 1, this, tr( "Portamento" ) ),
-	m_filterFreqModel( 64, 0, 127, 1, this, tr( "Filter Frequency" ) ),
-	m_filterQModel( 64, 0, 127, 1, this, tr( "Filter Resonance" ) ),
+	m_filterFreqModel( 64, 0, 127, 1, this, tr( "Filter frequency" ) ),
+	m_filterQModel( 64, 0, 127, 1, this, tr( "Filter resonance" ) ),
 	m_bandwidthModel( 64, 0, 127, 1, this, tr( "Bandwidth" ) ),
-	m_fmGainModel( 127, 0, 127, 1, this, tr( "FM Gain" ) ),
-	m_resCenterFreqModel( 64, 0, 127, 1, this, tr( "Resonance Center Frequency" ) ),
-	m_resBandwidthModel( 64, 0, 127, 1, this, tr( "Resonance Bandwidth" ) ),
-	m_forwardMidiCcModel( true, this, tr( "Forward MIDI Control Change Events" ) )
+	m_fmGainModel( 127, 0, 127, 1, this, tr( "FM gain" ) ),
+	m_resCenterFreqModel( 64, 0, 127, 1, this, tr( "Resonance center frequency" ) ),
+	m_resBandwidthModel( 64, 0, 127, 1, this, tr( "Resonance bandwidth" ) ),
+	m_forwardMidiCcModel( true, this, tr( "Forward MIDI control change events" ) )
 {
 	initPlugin();
 
-	connect( &m_portamentoModel, SIGNAL( dataChanged() ), this, SLOT( updatePortamento() ) );
-	connect( &m_filterFreqModel, SIGNAL( dataChanged() ), this, SLOT( updateFilterFreq() ) );
-	connect( &m_filterQModel, SIGNAL( dataChanged() ), this, SLOT( updateFilterQ() ) );
-	connect( &m_bandwidthModel, SIGNAL( dataChanged() ), this, SLOT( updateBandwidth() ) );
-	connect( &m_fmGainModel, SIGNAL( dataChanged() ), this, SLOT( updateFmGain() ) );
-	connect( &m_resCenterFreqModel, SIGNAL( dataChanged() ), this, SLOT( updateResCenterFreq() ) );
-	connect( &m_resBandwidthModel, SIGNAL( dataChanged() ), this, SLOT( updateResBandwidth() ) );
+	connect( &m_portamentoModel, SIGNAL( dataChanged() ),
+			this, SLOT( updatePortamento() ), Qt::DirectConnection );
+	connect( &m_filterFreqModel, SIGNAL( dataChanged() ),
+			this, SLOT( updateFilterFreq() ), Qt::DirectConnection );
+	connect( &m_filterQModel, SIGNAL( dataChanged() ),
+			this, SLOT( updateFilterQ() ), Qt::DirectConnection );
+	connect( &m_bandwidthModel, SIGNAL( dataChanged() ),
+			this, SLOT( updateBandwidth() ), Qt::DirectConnection );
+	connect( &m_fmGainModel, SIGNAL( dataChanged() ),
+			this, SLOT( updateFmGain() ), Qt::DirectConnection );
+	connect( &m_resCenterFreqModel, SIGNAL( dataChanged() ),
+			this, SLOT( updateResCenterFreq() ), Qt::DirectConnection );
+	connect( &m_resBandwidthModel, SIGNAL( dataChanged() ),
+			this, SLOT( updateResBandwidth() ), Qt::DirectConnection );
 
 	// now we need a play-handle which cares for calling play()
 	InstrumentPlayHandle * iph = new InstrumentPlayHandle( this, _instrumentTrack );
@@ -137,7 +145,7 @@ ZynAddSubFxInstrument::ZynAddSubFxInstrument(
 			this, SLOT( reloadPlugin() ) );
 
 	connect( instrumentTrack()->pitchRangeModel(), SIGNAL( dataChanged() ),
-				this, SLOT( updatePitchRange() ) );
+			this, SLOT( updatePitchRange() ), Qt::DirectConnection );
 }
 
 
@@ -240,7 +248,6 @@ void ZynAddSubFxInstrument::loadSettings( const QDomElement & _this )
 	doc.appendChild( doc.importNode( data, true ) );
 
 	QTemporaryFile tf;
-	tf.setAutoRemove( false );
 	if( tf.open() )
 	{
 		QByteArray a = doc.toString( 0 ).toUtf8();
@@ -284,6 +291,7 @@ void ZynAddSubFxInstrument::loadSettings( const QDomElement & _this )
 
 		emit settingsChanged();
 	}
+	emit instrumentTrack()->pitchModel()->dataChanged();
 }
 
 
@@ -326,7 +334,7 @@ QString ZynAddSubFxInstrument::nodeName() const
 
 void ZynAddSubFxInstrument::play( sampleFrame * _buf )
 {
-	m_pluginMutex.lock();
+	if (!m_pluginMutex.tryLock(Engine::getSong()->isExporting() ? -1 : 0)) {return;}
 	if( m_remotePlugin )
 	{
 		m_remotePlugin->process( NULL, _buf );
@@ -489,7 +497,7 @@ PluginView * ZynAddSubFxInstrument::instantiateView( QWidget * _parent )
 
 
 ZynAddSubFxView::ZynAddSubFxView( Instrument * _instrument, QWidget * _parent ) :
-	InstrumentView( _instrument, _parent )
+        InstrumentViewFixedSize( _instrument, _parent )
 {
 	setAutoFillBackground( true );
 	QPalette pal;
@@ -507,11 +515,11 @@ ZynAddSubFxView::ZynAddSubFxView( Instrument * _instrument, QWidget * _parent ) 
 	m_portamento->setLabel( tr( "PORT" ) );
 
 	m_filterFreq = new Knob( knobBright_26, this );
-	m_filterFreq->setHintText( tr( "Filter Frequency:" ), "" );
+	m_filterFreq->setHintText( tr( "Filter frequency:" ), "" );
 	m_filterFreq->setLabel( tr( "FREQ" ) );
 
 	m_filterQ = new Knob( knobBright_26, this );
-	m_filterQ->setHintText( tr( "Filter Resonance:" ), "" );
+	m_filterQ->setHintText( tr( "Filter resonance:" ), "" );
 	m_filterQ->setLabel( tr( "RES" ) );
 
 	m_bandwidth = new Knob( knobBright_26, this );
@@ -519,7 +527,7 @@ ZynAddSubFxView::ZynAddSubFxView( Instrument * _instrument, QWidget * _parent ) 
 	m_bandwidth->setLabel( tr( "BW" ) );
 
 	m_fmGain = new Knob( knobBright_26, this );
-	m_fmGain->setHintText( tr( "FM Gain:" ), "" );
+	m_fmGain->setHintText( tr( "FM gain:" ), "" );
 	m_fmGain->setLabel( tr( "FM GAIN" ) );
 
 	m_resCenterFreq = new Knob( knobBright_26, this );
@@ -530,7 +538,7 @@ ZynAddSubFxView::ZynAddSubFxView( Instrument * _instrument, QWidget * _parent ) 
 	m_resBandwidth->setHintText( tr( "Resonance bandwidth:" ), "" );
 	m_resBandwidth->setLabel( tr( "RES BW" ) );
 
-	m_forwardMidiCC = new LedCheckBox( tr( "Forward MIDI Control Changes" ), this );
+	m_forwardMidiCC = new LedCheckBox( tr( "Forward MIDI control changes" ), this );
 
 	m_toggleUIButton = new QPushButton( tr( "Show GUI" ), this );
 	m_toggleUIButton->setCheckable( true );
@@ -539,9 +547,6 @@ ZynAddSubFxView::ZynAddSubFxView( Instrument * _instrument, QWidget * _parent ) 
 	m_toggleUIButton->setFont( pointSize<8>( m_toggleUIButton->font() ) );
 	connect( m_toggleUIButton, SIGNAL( toggled( bool ) ), this,
 							SLOT( toggleUI() ) );
-	m_toggleUIButton->setWhatsThis(
-		tr( "Click here to show or hide the graphical user interface "
-			"(GUI) of ZynAddSubFX." ) );
 
 	l->addWidget( m_toggleUIButton, 0, 0, 1, 4 );
 	l->setRowStretch( 1, 5 );
@@ -645,8 +650,6 @@ void ZynAddSubFxView::toggleUI()
 			connect( model->m_remotePlugin, SIGNAL( clickedCloseButton() ),
 						m_toggleUIButton, SLOT( toggle() ) );
 		}
-
-		ControllerConnection::finalizeConnections();
 	}
 }
 
@@ -658,10 +661,9 @@ extern "C"
 {
 
 // necessary for getting instance out of shared lib
-PLUGIN_EXPORT Plugin * lmms_plugin_main( Model *, void * _data )
+PLUGIN_EXPORT Plugin * lmms_plugin_main(Model * m, void *)
 {
-
-	return new ZynAddSubFxInstrument( static_cast<InstrumentTrack *>( _data ) );
+	return new ZynAddSubFxInstrument(static_cast<InstrumentTrack *>(m));
 }
 
 

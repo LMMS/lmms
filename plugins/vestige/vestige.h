@@ -29,14 +29,13 @@
 
 #include <QMutex>
 #include <QLayout>
-#include <QMdiSubWindow>
 #include <QScrollArea>
 
 #include "Instrument.h"
 #include "InstrumentView.h"
 #include "Note.h"
-#include "Knob.h"
-
+#include "CustomTextKnob.h"
+#include "SubWindow.h"
 #include "AutomatableModel.h"
 
 
@@ -73,7 +72,7 @@ public:
 	virtual PluginView * instantiateView( QWidget * _parent );
 
 protected slots:
-	void setParameter( void );
+	void setParameter( Model * action );
 	void handleConfigChange( QString cls, QString attr, QString value );
 	void reloadPlugin();
 
@@ -98,7 +97,7 @@ private:
 } ;
 
 
-class manageVestigeInstrumentView : public InstrumentView
+class manageVestigeInstrumentView : public InstrumentViewFixedSize
 {
 	Q_OBJECT
 public:
@@ -109,7 +108,8 @@ public:
 protected slots:
 	void syncPlugin( void );
 	void displayAutomatedOnly( void );
-	void setParameter( void );
+	void setParameter( Model * action );
+	void syncParameterText();
 	void closeWindow();
 
 
@@ -129,12 +129,12 @@ private:
 	QPushButton * m_syncButton;
 	QPushButton * m_displayAutomatedOnly;
 	QPushButton * m_closeButton;
-	Knob ** vstKnobs;
+	CustomTextKnob ** vstKnobs;
 
 } ;
 
 
-class VestigeInstrumentView : public InstrumentView
+class VestigeInstrumentView : public InstrumentViewFixedSize
 {
 	Q_OBJECT
 public:

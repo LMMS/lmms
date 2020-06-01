@@ -59,6 +59,8 @@
 #include "PixmapButton.h"
 #include "ToolTip.h"
 
+#include "plugin_export.h"
+
 extern "C"
 {
 
@@ -77,9 +79,9 @@ Plugin::Descriptor PLUGIN_EXPORT opulenz_plugin_descriptor =
 };
 
 // necessary for getting instance out of shared lib
-PLUGIN_EXPORT Plugin * lmms_plugin_main( Model *, void * _data )
+PLUGIN_EXPORT Plugin * lmms_plugin_main( Model *m, void * )
 {
-        return( new OpulenzInstrument( static_cast<InstrumentTrack *>( _data ) ) );
+	return( new OpulenzInstrument( static_cast<InstrumentTrack *>( m ) ) );
 }
 
 }
@@ -94,45 +96,45 @@ const unsigned int adlib_opadd[OPL2_VOICES] = {0x00, 0x01, 0x02, 0x08, 0x09, 0x0
 OpulenzInstrument::OpulenzInstrument( InstrumentTrack * _instrument_track ) :
 	Instrument( _instrument_track, &opulenz_plugin_descriptor ),
 	m_patchModel( 0, 0, 127, this, tr( "Patch" ) ),
-	op1_a_mdl(14.0, 0.0, 15.0, 1.0, this, tr( "Op 1 Attack" )  ),
-	op1_d_mdl(14.0, 0.0, 15.0, 1.0, this, tr( "Op 1 Decay" )   ),
-	op1_s_mdl(3.0, 0.0, 15.0, 1.0, this, tr( "Op 1 Sustain" )   ),
-	op1_r_mdl(10.0, 0.0, 15.0, 1.0, this, tr( "Op 1 Release" )   ),
-	op1_lvl_mdl(62.0, 0.0, 63.0, 1.0, this, tr( "Op 1 Level" )   ),
-	op1_scale_mdl(0.0, 0.0, 3.0, 1.0, this, tr( "Op 1 Level Scaling" ) ),
-	op1_mul_mdl(0.0, 0.0, 15.0, 1.0, this, tr( "Op 1 Frequency Multiple" ) ),
-	feedback_mdl(0.0, 0.0, 7.0, 1.0, this, tr( "Op 1 Feedback" )    ),
-	op1_ksr_mdl(false, this, tr( "Op 1 Key Scaling Rate" ) ),
-	op1_perc_mdl(false, this, tr( "Op 1 Percussive Envelope" )   ),
-	op1_trem_mdl(true, this, tr( "Op 1 Tremolo" )   ),
-	op1_vib_mdl(false, this, tr( "Op 1 Vibrato" )   ),
+	op1_a_mdl(14.0, 0.0, 15.0, 1.0, this, tr( "Op 1 attack" )  ),
+	op1_d_mdl(14.0, 0.0, 15.0, 1.0, this, tr( "Op 1 decay" )   ),
+	op1_s_mdl(3.0, 0.0, 15.0, 1.0, this, tr( "Op 1 sustain" )   ),
+	op1_r_mdl(10.0, 0.0, 15.0, 1.0, this, tr( "Op 1 release" )   ),
+	op1_lvl_mdl(62.0, 0.0, 63.0, 1.0, this, tr( "Op 1 level" )   ),
+	op1_scale_mdl(0.0, 0.0, 3.0, 1.0, this, tr( "Op 1 level scaling" ) ),
+	op1_mul_mdl(0.0, 0.0, 15.0, 1.0, this, tr( "Op 1 frequency multiplier" ) ),
+	feedback_mdl(0.0, 0.0, 7.0, 1.0, this, tr( "Op 1 feedback" )    ),
+	op1_ksr_mdl(false, this, tr( "Op 1 key scaling rate" ) ),
+	op1_perc_mdl(false, this, tr( "Op 1 percussive envelope" )   ),
+	op1_trem_mdl(true, this, tr( "Op 1 tremolo" )   ),
+	op1_vib_mdl(false, this, tr( "Op 1 vibrato" )   ),
 	op1_w0_mdl(  ),
 	op1_w1_mdl(  ),
 	op1_w2_mdl(  ),
 	op1_w3_mdl(  ),
-	op1_waveform_mdl(0,0,3,this, tr( "Op 1 Waveform" ) ),
+	op1_waveform_mdl(0,0,3,this, tr( "Op 1 waveform" ) ),
 
 
-	op2_a_mdl(1.0, 0.0, 15.0, 1.0, this, tr( "Op 2 Attack" )   ),
-	op2_d_mdl(3.0, 0.0, 15.0, 1.0, this, tr( "Op 2 Decay" )   ),
-	op2_s_mdl(14.0, 0.0, 15.0, 1.0, this, tr( "Op 2 Sustain" ) ),
-	op2_r_mdl(12.0, 0.0, 15.0, 1.0, this, tr( "Op 2 Release" )   ),
-	op2_lvl_mdl(63.0, 0.0, 63.0, 1.0, this, tr( "Op 2 Level" )   ),
-	op2_scale_mdl(0.0, 0.0, 3.0, 1.0, this, tr( "Op 2 Level Scaling" ) ),
-	op2_mul_mdl(1.0, 0.0, 15.0, 1.0, this, tr( "Op 2 Frequency Multiple" ) ),
-	op2_ksr_mdl(false, this, tr( "Op 2 Key Scaling Rate" ) ),
-	op2_perc_mdl(false, this, tr( "Op 2 Percussive Envelope" )   ),
-	op2_trem_mdl(false, this, tr( "Op 2 Tremolo" )   ),
-	op2_vib_mdl(true, this, tr( "Op 2 Vibrato" )   ),
+	op2_a_mdl(1.0, 0.0, 15.0, 1.0, this, tr( "Op 2 attack" )   ),
+	op2_d_mdl(3.0, 0.0, 15.0, 1.0, this, tr( "Op 2 decay" )   ),
+	op2_s_mdl(14.0, 0.0, 15.0, 1.0, this, tr( "Op 2 sustain" ) ),
+	op2_r_mdl(12.0, 0.0, 15.0, 1.0, this, tr( "Op 2 release" )   ),
+	op2_lvl_mdl(63.0, 0.0, 63.0, 1.0, this, tr( "Op 2 level" )   ),
+	op2_scale_mdl(0.0, 0.0, 3.0, 1.0, this, tr( "Op 2 level scaling" ) ),
+	op2_mul_mdl(1.0, 0.0, 15.0, 1.0, this, tr( "Op 2 frequency multiplier" ) ),
+	op2_ksr_mdl(false, this, tr( "Op 2 key scaling rate" ) ),
+	op2_perc_mdl(false, this, tr( "Op 2 percussive envelope" )   ),
+	op2_trem_mdl(false, this, tr( "Op 2 tremolo" )   ),
+	op2_vib_mdl(true, this, tr( "Op 2 vibrato" )   ),
 	op2_w0_mdl(  ),
 	op2_w1_mdl(  ),
 	op2_w2_mdl(  ),
 	op2_w3_mdl(  ),
-	op2_waveform_mdl(0,0,3,this, tr( "Op 2 Waveform" ) ),
+	op2_waveform_mdl(0,0,3,this, tr( "Op 2 waveform" ) ),
 
 	fm_mdl(true, this, tr( "FM" )   ),
-	vib_depth_mdl(false, this, tr( "Vibrato Depth" )   ),
-	trem_depth_mdl(false, this, tr( "Tremolo Depth" )   )
+	vib_depth_mdl(false, this, tr( "Vibrato depth" )   ),
+	trem_depth_mdl(false, this, tr( "Tremolo depth" )   )
 {
 
 	// Create an emulator - samplerate, 16 bit, mono
@@ -679,7 +681,7 @@ void OpulenzInstrument::loadFile( const QString& file ) {
 
 OpulenzInstrumentView::OpulenzInstrumentView( Instrument * _instrument,
                                                         QWidget * _parent ) :
-        InstrumentView( _instrument, _parent )
+        InstrumentViewFixedSize( _instrument, _parent )
 {
 
 #define KNOB_GEN(knobname, hinttext, hintunit,xpos,ypos) \

@@ -38,13 +38,14 @@
 #include "lmms_basics.h"
 #include "Song.h"
 #include "ToolTip.h"
+#include "StepRecorder.h"
+#include "StepRecorderWidget.h"
 
 class QPainter;
 class QPixmap;
 class QScrollBar;
 class QString;
 class QMenu;
-class QSignalMapper;
 
 class ComboBox;
 class NotePlayHandle;
@@ -59,6 +60,9 @@ class PianoRoll : public QWidget
 	Q_PROPERTY( QColor lineColor READ lineColor WRITE setLineColor )
 	Q_PROPERTY( QColor noteModeColor READ noteModeColor WRITE setNoteModeColor )
 	Q_PROPERTY( QColor noteColor READ noteColor WRITE setNoteColor )
+	Q_PROPERTY( QColor ghostNoteColor READ ghostNoteColor WRITE setGhostNoteColor )
+	Q_PROPERTY( QColor noteTextColor READ noteTextColor WRITE setNoteTextColor )
+	Q_PROPERTY( QColor ghostNoteTextColor READ ghostNoteTextColor WRITE setGhostNoteTextColor )
 	Q_PROPERTY( QColor barColor READ barColor WRITE setBarColor )
 	Q_PROPERTY( QColor selectedNoteColor READ selectedNoteColor WRITE setSelectedNoteColor )
 	Q_PROPERTY( QColor textColor READ textColor WRITE setTextColor )
@@ -67,6 +71,8 @@ class PianoRoll : public QWidget
 	Q_PROPERTY( QColor markedSemitoneColor READ markedSemitoneColor WRITE setMarkedSemitoneColor )
 	Q_PROPERTY( int noteOpacity READ noteOpacity WRITE setNoteOpacity )
 	Q_PROPERTY( bool noteBorders READ noteBorders WRITE setNoteBorders )
+	Q_PROPERTY( int ghostNoteOpacity READ ghostNoteOpacity WRITE setGhostNoteOpacity )
+	Q_PROPERTY( bool ghostNoteBorders READ ghostNoteBorders WRITE setGhostNoteBorders )
 	Q_PROPERTY( QColor backgroundShade READ backgroundShade WRITE setBackgroundShade )
 public:
 	enum EditModes
@@ -86,6 +92,9 @@ public:
 	void showPanTextFloat(panning_t pan, const QPoint &pos, int timeout=-1);
 
 	void setCurrentPattern( Pattern* newPattern );
+	void setGhostPattern( Pattern* newPattern );
+	void loadGhostNotes( const QDomElement & de );
+	void loadMarkedSemiTones(const QDomElement & de);
 
 	inline void stopRecording()
 	{
@@ -95,6 +104,11 @@ public:
 	inline bool isRecording() const
 	{
 		return m_recording;
+	}
+
+	inline bool isStepRecording() const
+	{
+		return m_stepRecorder.isRecording();
 	}
 
 	const Pattern* currentPattern() const
@@ -122,6 +136,8 @@ public:
 	void setNoteModeColor( const QColor & c );
 	QColor noteColor() const;
 	void setNoteColor( const QColor & c );
+	QColor noteTextColor() const;
+	void setNoteTextColor( const QColor & c );
 	QColor barColor() const;
 	void setBarColor( const QColor & c );
 	QColor selectedNoteColor() const;
@@ -138,27 +154,35 @@ public:
 	void setNoteOpacity( const int i );
 	bool noteBorders() const;
 	void setNoteBorders( const bool b );
+	QColor ghostNoteColor() const;
+	void setGhostNoteColor( const QColor & c );
+	QColor ghostNoteTextColor() const;
+	void setGhostNoteTextColor( const QColor & c );
+	int ghostNoteOpacity() const;
+	void setGhostNoteOpacity( const int i );
+	bool ghostNoteBorders() const;
+	void setGhostNoteBorders( const bool b );
 	QColor backgroundShade() const;
 	void setBackgroundShade( const QColor & c );
 
 
 protected:
-	virtual void keyPressEvent( QKeyEvent * ke );
-	virtual void keyReleaseEvent( QKeyEvent * ke );
-	virtual void leaveEvent( QEvent * e );
-	virtual void mousePressEvent( QMouseEvent * me );
-	virtual void mouseDoubleClickEvent( QMouseEvent * me );
-	virtual void mouseReleaseEvent( QMouseEvent * me );
-	virtual void mouseMoveEvent( QMouseEvent * me );
-	virtual void paintEvent( QPaintEvent * pe );
-	virtual void resizeEvent( QResizeEvent * re );
-	virtual void wheelEvent( QWheelEvent * we );
-	virtual void focusOutEvent( QFocusEvent * );
+	void keyPressEvent( QKeyEvent * ke ) override;
+	void keyReleaseEvent( QKeyEvent * ke ) override;
+	void leaveEvent( QEvent * e ) override;
+	void mousePressEvent( QMouseEvent * me ) override;
+	void mouseDoubleClickEvent( QMouseEvent * me ) override;
+	void mouseReleaseEvent( QMouseEvent * me ) override;
+	void mouseMoveEvent( QMouseEvent * me ) override;
+	void paintEvent( QPaintEvent * pe ) override;
+	void resizeEvent( QResizeEvent * re ) override;
+	void wheelEvent( QWheelEvent * we ) override;
+	void focusOutEvent( QFocusEvent * ) override;
 
 	int getKey( int y ) const;
-	static void drawNoteRect( QPainter & p, int x, int y,
-					int  width, const Note * n, const QColor & noteCol,
-					const QColor & selCol, const int noteOpc, const bool borderless );
+	void drawNoteRect( QPainter & p, int x, int y,
+					int  width, const Note * n, const QColor & noteCol, const QColor & noteTextColor,
+					const QColor & selCol, const int noteOpc, const bool borderless, bool drawNoteName );
 	void removeSelection();
 	void selectAll();
 	NoteVector getSelectedNotes();
@@ -168,10 +192,13 @@ protected:
 	// for entering values with dblclick in the vol/pan bars
 	void enterValue( NoteVector* nv );
 
+	void updateYScroll();
+
 protected slots:
 	void play();
 	void record();
 	void recordAccompany();
+	bool toggleStepRecording();
 	void stop();
 
 	void startRecordNote( const Note & n );
@@ -189,9 +216,12 @@ protected slots:
 
 	void updatePosition(const MidiTime & t );
 	void updatePositionAccompany(const MidiTime & t );
+	void updatePositionStepRecording(const MidiTime & t );
 
 	void zoomingChanged();
+	void zoomingYChanged();
 	void quantizeChanged();
+	void noteLengthChanged();
 	void quantizeNotes();
 
 	void updateSemiToneMarkerMenu();
@@ -203,9 +233,12 @@ protected slots:
 
 	void selectRegionFromPixels( int xStart, int xEnd );
 
+	void clearGhostPattern();
+
 
 signals:
 	void currentPatternChanged();
+	void ghostPatternSet(bool);
 	void semiToneMarkerMenuScaleSetEnabled(bool);
 	void semiToneMarkerMenuChordSetEnabled(bool);
 
@@ -250,6 +283,7 @@ private:
 
 	QList<int> m_markedSemiTones;
 	QMenu * m_semiToneMarkerMenu; // when you right click on the key area
+	int m_pianoKeySelected;
 
 	PianoRoll();
 	PianoRoll( const PianoRoll & );
@@ -266,6 +300,8 @@ private:
 	void testPlayNote( Note * n );
 	void testPlayKey( int _key, int _vol, int _pan );
 	void pauseTestNotes(bool pause = true );
+	void playChordNotes(int key, int velocity=-1);
+	void pauseChordNotes(int key);
 
 	QList<int> getAllOctavesForKey( int keyToMirror ) const;
 
@@ -298,14 +334,23 @@ private:
 	static TextFloat * s_textFloat;
 
 	ComboBoxModel m_zoomingModel;
+	ComboBoxModel m_zoomingYModel;
 	ComboBoxModel m_quantizeModel;
 	ComboBoxModel m_noteLenModel;
 	ComboBoxModel m_scaleModel;
 	ComboBoxModel m_chordModel;
 
 	static const QVector<double> m_zoomLevels;
+	static const QVector<double> m_zoomYLevels;
 
 	Pattern* m_pattern;
+	NoteVector m_ghostNotes;
+
+	inline const NoteVector & ghostNotes() const
+	{
+		return m_ghostNotes;
+	}
+
 	QScrollBar * m_leftRightScroll;
 	QScrollBar * m_topBottomScroll;
 
@@ -343,8 +388,14 @@ private:
 
 	int m_oldNotesEditHeight;
 	int m_notesEditHeight;
-	int m_ppt;  // pixels per tact
+	int m_ppb;  // pixels per bar
 	int m_totalKeysToScroll;
+
+	int m_keyLineHeight;
+	int m_octaveHeight;
+	int m_whiteKeySmallHeight;
+	int m_whiteKeyBigHeight;
+	int m_blackKeyHeight;
 
 	// remember these values to use them
 	// for the next note that is set
@@ -378,12 +429,18 @@ private:
 
 	friend class PianoRollWindow;
 
+	StepRecorderWidget m_stepRecorderWidget;
+	StepRecorder m_stepRecorder;
+
 	// qproperty fields
 	QColor m_barLineColor;
 	QColor m_beatLineColor;
 	QColor m_lineColor;
 	QColor m_noteModeColor;
 	QColor m_noteColor;
+	QColor m_noteTextColor;
+	QColor m_ghostNoteColor;
+	QColor m_ghostNoteTextColor;
 	QColor m_barColor;
 	QColor m_selectedNoteColor;
 	QColor m_textColor;
@@ -391,7 +448,9 @@ private:
 	QColor m_textShadow;
 	QColor m_markedSemitoneColor;
 	int m_noteOpacity;
+	int m_ghostNoteOpacity;
 	bool m_noteBorders;
+	bool m_ghostNoteBorders;
 	QColor m_backgroundShade;
 
 signals:
@@ -408,14 +467,16 @@ public:
 	PianoRollWindow();
 
 	const Pattern* currentPattern() const;
-	void setCurrentPattern(Pattern* pattern);
+	void setCurrentPattern( Pattern* pattern );
+	void setGhostPattern( Pattern* pattern );
 
 	int quantization() const;
 
-	void play();
-	void stop();
-	void record();
-	void recordAccompany();
+	void play() override;
+	void stop() override;
+	void record() override;
+	void recordAccompany() override;
+	void toggleStepRecording() override;
 	void stopRecording();
 
 	bool isRecording() const;
@@ -425,33 +486,39 @@ public:
 
 	using SerializingObject::saveState;
 	using SerializingObject::restoreState;
-	virtual void saveSettings(QDomDocument & doc, QDomElement & de );
-	virtual void loadSettings( const QDomElement & de );
+	void saveSettings(QDomDocument & doc, QDomElement & de ) override;
+	void loadSettings( const QDomElement & de ) override;
 
-	inline virtual QString nodeName() const
+	inline QString nodeName() const override
 	{
 		return "pianoroll";
 	}
 
-	QSize sizeHint() const;
+	QSize sizeHint() const override;
 
 signals:
 	void currentPatternChanged();
 
 
 private slots:
-	void patternRenamed();
+	void updateAfterPatternChange();
+	void ghostPatternSet( bool state );
 
 private:
-	void focusInEvent(QFocusEvent * event);
+	void patternRenamed();
+	void focusInEvent(QFocusEvent * event) override;
+	void stopStepRecording();
+	void updateStepRecordingIcon();
 
 	PianoRoll* m_editor;
 
 	ComboBox * m_zoomingComboBox;
+	ComboBox * m_zoomingYComboBox;
 	ComboBox * m_quantizeComboBox;
 	ComboBox * m_noteLenComboBox;
 	ComboBox * m_scaleComboBox;
 	ComboBox * m_chordComboBox;
+	QPushButton * m_clearGhostButton;
 
 };
 

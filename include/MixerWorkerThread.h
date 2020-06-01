@@ -47,10 +47,10 @@ public:
 			Dynamic	// jobs can be added while processing queue
 		} ;
 
-#define JOB_QUEUE_SIZE 1024
+#define JOB_QUEUE_SIZE 8192
 		JobQueue() :
 			m_items(),
-			m_queueSize( 0 ),
+			m_writeIndex( 0 ),
 			m_itemsDone( 0 ),
 			m_opMode( Static )
 		{
@@ -66,7 +66,7 @@ public:
 
 	private:
 		std::atomic<ThreadableJob*> m_items[JOB_QUEUE_SIZE];
-		std::atomic_int m_queueSize;
+		std::atomic_int m_writeIndex;
 		std::atomic_int m_itemsDone;
 		OperationMode m_opMode;
 
@@ -106,7 +106,7 @@ public:
 
 
 private:
-	virtual void run();
+	void run() override;
 
 	static JobQueue globalJobQueue;
 	static QWaitCondition * queueReadyWaitCond;

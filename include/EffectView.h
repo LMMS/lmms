@@ -63,7 +63,6 @@ public slots:
 	void moveUp();
 	void moveDown();
 	void deletePlugin();
-	void displayHelp();
 	void closeEffects();
 
 
@@ -74,9 +73,9 @@ signals:
 
 
 protected:
-	virtual void contextMenuEvent( QContextMenuEvent * _me );
-	virtual void paintEvent( QPaintEvent * _pe );
-	virtual void modelChanged();
+	void contextMenuEvent( QContextMenuEvent * _me ) override;
+	void paintEvent( QPaintEvent * _pe ) override;
+	void modelChanged() override;
 
 
 private:

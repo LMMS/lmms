@@ -80,7 +80,7 @@ private slots:
 	{
 		const float opl = getPeak_L();
 		const float opr = getPeak_R();
-		const float fall_off = 1.2;
+		const float fallOff = 1.07;
 		if( *m_lPeak > opl )
 		{
 			setPeak_L( *m_lPeak );
@@ -88,7 +88,7 @@ private slots:
 		}
 		else
 		{
-			setPeak_L( opl/fall_off );
+			setPeak_L( opl/fallOff );
 		}
 
 		if( *m_rPeak > opr )
@@ -98,7 +98,7 @@ private slots:
 		}
 		else
 		{
-			setPeak_R( opr/fall_off );
+			setPeak_R( opr/fallOff );
 		}
 		update();
 	}

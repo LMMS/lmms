@@ -40,7 +40,7 @@ DualFilterControls::DualFilterControls( DualFilterEffect* effect ) :
 
 	m_enabled1Model( true, this, tr( "Filter 1 enabled" ) ),
 	m_filter1Model( this, tr( "Filter 1 type" ) ),
-	m_cut1Model( 7000.0f, 1.0f, 20000.0f, 1.0f, this, tr( "Cutoff 1 frequency" ) ),
+	m_cut1Model( 7000.0f, 1.0f, 20000.0f, 1.0f, this, tr( "Cutoff frequency 1" ) ),
 	m_res1Model( 0.5, BasicFilters<>::minQ(), 10.0, 0.01, this, tr( "Q/Resonance 1" ) ),
 	m_gain1Model( 100.0f, 0.0f, 200.0f, 0.1f, this, tr( "Gain 1" ) ),
 
@@ -48,52 +48,52 @@ DualFilterControls::DualFilterControls( DualFilterEffect* effect ) :
 
 	m_enabled2Model( true, this, tr( "Filter 2 enabled" ) ),
 	m_filter2Model( this, tr( "Filter 2 type" ) ),
-	m_cut2Model( 7000.0f, 1.0f, 20000.0f, 1.0f, this, tr( "Cutoff 2 frequency" ) ),
+	m_cut2Model( 7000.0f, 1.0f, 20000.0f, 1.0f, this, tr( "Cutoff frequency 2" ) ),
 	m_res2Model( 0.5, BasicFilters<>::minQ(), 10.0, 0.01, this, tr( "Q/Resonance 2" ) ),
 	m_gain2Model( 100.0f, 0.0f, 200.0f, 0.1f, this, tr( "Gain 2" ) )
 {
-	m_filter1Model.addItem( tr( "LowPass" ), make_unique<PixmapLoader>( "filter_lp" ) );
-	m_filter1Model.addItem( tr( "HiPass" ), make_unique<PixmapLoader>( "filter_hp" ) );
-	m_filter1Model.addItem( tr( "BandPass csg" ), make_unique<PixmapLoader>( "filter_bp" ) );
-	m_filter1Model.addItem( tr( "BandPass czpg" ), make_unique<PixmapLoader>( "filter_bp" ) );
+	m_filter1Model.addItem( tr( "Low-pass" ), make_unique<PixmapLoader>( "filter_lp" ) );
+	m_filter1Model.addItem( tr( "Hi-pass" ), make_unique<PixmapLoader>( "filter_hp" ) );
+	m_filter1Model.addItem( tr( "Band-pass csg" ), make_unique<PixmapLoader>( "filter_bp" ) );
+	m_filter1Model.addItem( tr( "Band-pass czpg" ), make_unique<PixmapLoader>( "filter_bp" ) );
 	m_filter1Model.addItem( tr( "Notch" ), make_unique<PixmapLoader>( "filter_notch" ) );
-	m_filter1Model.addItem( tr( "Allpass" ), make_unique<PixmapLoader>( "filter_ap" ) );
+	m_filter1Model.addItem( tr( "All-pass" ), make_unique<PixmapLoader>( "filter_ap" ) );
 	m_filter1Model.addItem( tr( "Moog" ), make_unique<PixmapLoader>( "filter_lp" ) );
-	m_filter1Model.addItem( tr( "2x LowPass" ), make_unique<PixmapLoader>( "filter_2lp" ) );
-	m_filter1Model.addItem( tr( "RC LowPass 12dB" ), make_unique<PixmapLoader>( "filter_lp" ) );
-	m_filter1Model.addItem( tr( "RC BandPass 12dB" ), make_unique<PixmapLoader>( "filter_bp" ) );
-	m_filter1Model.addItem( tr( "RC HighPass 12dB" ), make_unique<PixmapLoader>( "filter_hp" ) );
-	m_filter1Model.addItem( tr( "RC LowPass 24dB" ), make_unique<PixmapLoader>( "filter_lp" ) );
-	m_filter1Model.addItem( tr( "RC BandPass 24dB" ), make_unique<PixmapLoader>( "filter_bp" ) );
-	m_filter1Model.addItem( tr( "RC HighPass 24dB" ), make_unique<PixmapLoader>( "filter_hp" ) );
-	m_filter1Model.addItem( tr( "Vocal Formant Filter" ), make_unique<PixmapLoader>( "filter_hp" ) );
+	m_filter1Model.addItem( tr( "2x Low-pass" ), make_unique<PixmapLoader>( "filter_2lp" ) );
+	m_filter1Model.addItem( tr( "RC Low-pass 12 dB/oct" ), make_unique<PixmapLoader>( "filter_lp" ) );
+	m_filter1Model.addItem( tr( "RC Band-pass 12 dB/oct" ), make_unique<PixmapLoader>( "filter_bp" ) );
+	m_filter1Model.addItem( tr( "RC High-pass 12 dB/oct" ), make_unique<PixmapLoader>( "filter_hp" ) );
+	m_filter1Model.addItem( tr( "RC Low-pass 24 dB/oct" ), make_unique<PixmapLoader>( "filter_lp" ) );
+	m_filter1Model.addItem( tr( "RC Band-pass 24 dB/oct" ), make_unique<PixmapLoader>( "filter_bp" ) );
+	m_filter1Model.addItem( tr( "RC High-pass 24 dB/oct" ), make_unique<PixmapLoader>( "filter_hp" ) );
+	m_filter1Model.addItem( tr( "Vocal Formant" ), make_unique<PixmapLoader>( "filter_hp" ) );
 	m_filter1Model.addItem( tr( "2x Moog" ), make_unique<PixmapLoader>( "filter_2lp" ) );
-	m_filter1Model.addItem( tr( "SV LowPass" ), make_unique<PixmapLoader>( "filter_lp" ) );
-	m_filter1Model.addItem( tr( "SV BandPass" ), make_unique<PixmapLoader>( "filter_bp" ) );
-	m_filter1Model.addItem( tr( "SV HighPass" ), make_unique<PixmapLoader>( "filter_hp" ) );
+	m_filter1Model.addItem( tr( "SV Low-pass" ), make_unique<PixmapLoader>( "filter_lp" ) );
+	m_filter1Model.addItem( tr( "SV Band-pass" ), make_unique<PixmapLoader>( "filter_bp" ) );
+	m_filter1Model.addItem( tr( "SV High-pass" ), make_unique<PixmapLoader>( "filter_hp" ) );
 	m_filter1Model.addItem( tr( "SV Notch" ), make_unique<PixmapLoader>( "filter_notch" ) );
 	m_filter1Model.addItem( tr( "Fast Formant" ), make_unique<PixmapLoader>( "filter_hp" ) );
 	m_filter1Model.addItem( tr( "Tripole" ), make_unique<PixmapLoader>( "filter_lp" ) );
 
-	m_filter2Model.addItem( tr( "LowPass" ), make_unique<PixmapLoader>( "filter_lp" ) );
-	m_filter2Model.addItem( tr( "HiPass" ), make_unique<PixmapLoader>( "filter_hp" ) );
-	m_filter2Model.addItem( tr( "BandPass csg" ), make_unique<PixmapLoader>( "filter_bp" ) );
-	m_filter2Model.addItem( tr( "BandPass czpg" ), make_unique<PixmapLoader>( "filter_bp" ) );
+	m_filter2Model.addItem( tr( "Low-pass" ), make_unique<PixmapLoader>( "filter_lp" ) );
+	m_filter2Model.addItem( tr( "Hi-pass" ), make_unique<PixmapLoader>( "filter_hp" ) );
+	m_filter2Model.addItem( tr( "Band-pass csg" ), make_unique<PixmapLoader>( "filter_bp" ) );
+	m_filter2Model.addItem( tr( "Band-pass czpg" ), make_unique<PixmapLoader>( "filter_bp" ) );
 	m_filter2Model.addItem( tr( "Notch" ), make_unique<PixmapLoader>( "filter_notch" ) );
-	m_filter2Model.addItem( tr( "Allpass" ), make_unique<PixmapLoader>( "filter_ap" ) );
+	m_filter2Model.addItem( tr( "All-pass" ), make_unique<PixmapLoader>( "filter_ap" ) );
 	m_filter2Model.addItem( tr( "Moog" ), make_unique<PixmapLoader>( "filter_lp" ) );
-	m_filter2Model.addItem( tr( "2x LowPass" ), make_unique<PixmapLoader>( "filter_2lp" ) );
-	m_filter2Model.addItem( tr( "RC LowPass 12dB" ), make_unique<PixmapLoader>( "filter_lp" ) );
-	m_filter2Model.addItem( tr( "RC BandPass 12dB" ), make_unique<PixmapLoader>( "filter_bp" ) );
-	m_filter2Model.addItem( tr( "RC HighPass 12dB" ), make_unique<PixmapLoader>( "filter_hp" ) );
-	m_filter2Model.addItem( tr( "RC LowPass 24dB" ), make_unique<PixmapLoader>( "filter_lp" ) );
-	m_filter2Model.addItem( tr( "RC BandPass 24dB" ), make_unique<PixmapLoader>( "filter_bp" ) );
-	m_filter2Model.addItem( tr( "RC HighPass 24dB" ), make_unique<PixmapLoader>( "filter_hp" ) );
-	m_filter2Model.addItem( tr( "Vocal Formant Filter" ), make_unique<PixmapLoader>( "filter_hp" ) );
+	m_filter2Model.addItem( tr( "2x Low-pass" ), make_unique<PixmapLoader>( "filter_2lp" ) );
+	m_filter2Model.addItem( tr( "RC Low-pass 12 dB/oct" ), make_unique<PixmapLoader>( "filter_lp" ) );
+	m_filter2Model.addItem( tr( "RC Band-pass 12 dB/oct" ), make_unique<PixmapLoader>( "filter_bp" ) );
+	m_filter2Model.addItem( tr( "RC High-pass 12 dB/oct" ), make_unique<PixmapLoader>( "filter_hp" ) );
+	m_filter2Model.addItem( tr( "RC Low-pass 24 dB/oct" ), make_unique<PixmapLoader>( "filter_lp" ) );
+	m_filter2Model.addItem( tr( "RC Band-pass 24 dB/oct" ), make_unique<PixmapLoader>( "filter_bp" ) );
+	m_filter2Model.addItem( tr( "RC High-pass 24 dB/oct" ), make_unique<PixmapLoader>( "filter_hp" ) );
+	m_filter2Model.addItem( tr( "Vocal Formant" ), make_unique<PixmapLoader>( "filter_hp" ) );
 	m_filter2Model.addItem( tr( "2x Moog" ), make_unique<PixmapLoader>( "filter_2lp" ) );
-	m_filter2Model.addItem( tr( "SV LowPass" ), make_unique<PixmapLoader>( "filter_lp" ) );
-	m_filter2Model.addItem( tr( "SV BandPass" ), make_unique<PixmapLoader>( "filter_bp" ) );
-	m_filter2Model.addItem( tr( "SV HighPass" ), make_unique<PixmapLoader>( "filter_hp" ) );
+	m_filter2Model.addItem( tr( "SV Low-pass" ), make_unique<PixmapLoader>( "filter_lp" ) );
+	m_filter2Model.addItem( tr( "SV Band-pass" ), make_unique<PixmapLoader>( "filter_bp" ) );
+	m_filter2Model.addItem( tr( "SV High-pass" ), make_unique<PixmapLoader>( "filter_hp" ) );
 	m_filter2Model.addItem( tr( "SV Notch" ), make_unique<PixmapLoader>( "filter_notch" ) );
 	m_filter2Model.addItem( tr( "Fast Formant" ), make_unique<PixmapLoader>( "filter_hp" ) );
 	m_filter2Model.addItem( tr( "Tripole" ), make_unique<PixmapLoader>( "filter_lp" ) );

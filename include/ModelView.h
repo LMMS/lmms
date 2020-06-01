@@ -29,7 +29,7 @@
 #include "Model.h"
 
 
-class EXPORT ModelView
+class LMMS_EXPORT ModelView
 {
 public:
 	ModelView( Model* model, QWidget* widget );

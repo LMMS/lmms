@@ -30,13 +30,13 @@
 #include <QLayout>
 #include <QWidget>
 
-#include "export.h"
+#include "lmms_export.h"
 
 
 class TabButton;
 
 
-class EXPORT TabBar : public QWidget
+class LMMS_EXPORT TabBar : public QWidget
 {
 	Q_OBJECT
 public:

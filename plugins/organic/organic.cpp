@@ -37,12 +37,11 @@
 #include "NotePlayHandle.h"
 #include "Oscillator.h"
 #include "PixmapButton.h"
-#include "templates.h"
 #include "ToolTip.h"
 
 #include "embed.h"
 
-
+#include "plugin_export.h"
 
 
 extern "C"
@@ -233,8 +232,8 @@ void organicInstrument::playNote( NotePlayHandle * _n,
 	
 	if( _n->totalFramesPlayed() == 0 || _n->m_pluginData == NULL )
 	{
-		Oscillator * oscs_l[m_numOscillators];
-		Oscillator * oscs_r[m_numOscillators];
+		Oscillator * oscs_l[NUM_OSCILLATORS];
+		Oscillator * oscs_r[NUM_OSCILLATORS];
 
 		_n->m_pluginData = new oscPtr;
 
@@ -307,7 +306,7 @@ void organicInstrument::playNote( NotePlayHandle * _n,
 	// fxKnob is [0;1]
 	float t =  m_fx1Model.value();
 	
-	for (int i=0 ; i < frames ; i++)
+	for (int i=0 ; i < frames + offset ; i++)
 	{
 		_working_buffer[i][0] = waveshape( _working_buffer[i][0], t ) *
 						m_volModel.value() / 100.0f;
@@ -418,7 +417,7 @@ public:
 
 organicInstrumentView::organicInstrumentView( Instrument * _instrument,
 							QWidget * _parent ) :
-	InstrumentView( _instrument, _parent ),
+	InstrumentViewFixedSize( _instrument, _parent ),
 	m_oscKnobs( NULL )
 {
 	organicInstrument * oi = castModel<organicInstrument>();
@@ -435,7 +434,6 @@ organicInstrumentView::organicInstrumentView( Instrument * _instrument,
 	m_fx1Knob->setFixedSize( 37, 47 );
 	m_fx1Knob->setHintText( tr( "Distortion:" ), QString() );
 	m_fx1Knob->setObjectName( "fx1Knob" );
-	m_fx1Knob->setWhatsThis( tr( "The distortion knob adds distortion to the output of the instrument. " ) );
 
 	// setup volume-knob
 	m_volKnob = new organicKnob( this );
@@ -444,8 +442,6 @@ organicInstrumentView::organicInstrumentView( Instrument * _instrument,
 	m_volKnob->setFixedSize( 37, 47 );
 	m_volKnob->setHintText( tr( "Volume:" ), "%" );
 	m_volKnob->setObjectName( "volKnob" );
-	m_volKnob->setWhatsThis( tr( "The volume knob controls the volume of the output of the instrument. "
-									"It is cumulative with the instrument window's volume control. " ) );
 
 	// randomise
 	m_randBtn = new PixmapButton( this, tr( "Randomise" ) );
@@ -454,8 +450,6 @@ organicInstrumentView::organicInstrumentView( Instrument * _instrument,
 							"randomise_pressed" ) );
 	m_randBtn->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
 								"randomise" ) );
-	m_randBtn->setWhatsThis( tr( "The randomize button randomizes all knobs except the harmonics,"
-									"main volume and distortion knobs. ") );
 	
 	connect( m_randBtn, SIGNAL ( clicked() ),
 					oi, SLOT( randomiseSettings() ) );
@@ -641,9 +635,9 @@ extern "C"
 {
 
 // necessary for getting instance out of shared lib
-PLUGIN_EXPORT Plugin * lmms_plugin_main( Model *, void * _data )
+PLUGIN_EXPORT Plugin * lmms_plugin_main( Model *m, void * )
 {
-	return( new organicInstrument( static_cast<InstrumentTrack *>( _data ) ) );
+	return( new organicInstrument( static_cast<InstrumentTrack *>( m ) ) );
 }
 
 

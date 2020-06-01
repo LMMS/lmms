@@ -29,7 +29,7 @@
 class QDataStream;
 class QString;
 
-#include "export.h"
+#include "lmms_export.h"
 #include "interpolation.h"
 #include "lmms_basics.h"
 #include "lmms_math.h"
@@ -82,7 +82,7 @@ QDataStream& operator>> ( QDataStream &in, WaveMipMap &waveMipMap );
 
 
 
-class EXPORT BandLimitedWave
+class LMMS_EXPORT BandLimitedWave
 {
 public:
 	enum Waveforms
