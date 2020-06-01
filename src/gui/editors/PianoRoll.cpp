@@ -3656,9 +3656,6 @@ void PianoRoll::focusOutEvent( QFocusEvent * )
 			m_pattern->instrumentTrack()->pianoModel()->midiEventProcessor()->processInEvent( MidiEvent( MidiNoteOff, -1, i, 0 ) );
 			m_pattern->instrumentTrack()->pianoModel()->setKeyState( i, false );
 		}
-
-		// De-assign midi device
-		m_pattern->instrumentTrack()->autoAssignMidiDevice(false);
 	}
 	m_editMode = m_ctrlMode;
 	update();

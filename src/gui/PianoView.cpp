@@ -674,8 +674,6 @@ void PianoView::focusOutEvent( QFocusEvent * )
 		m_piano->setKeyState( i, false );
 	}
 
-	// Deassign midi device
-	m_piano->instrumentTrack()->autoAssignMidiDevice(false);
 
 	update();
 }

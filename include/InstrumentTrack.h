@@ -263,6 +263,7 @@ private:
 	bool m_previewMode;
 
 	bool m_hasAutoMidiDev;
+	static InstrumentTrack *s_autoAssignedTrack;
 
 	IntModel m_baseNoteModel;
 

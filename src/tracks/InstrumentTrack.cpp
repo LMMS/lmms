@@ -150,6 +150,13 @@ int InstrumentTrack::baseNote() const
 
 InstrumentTrack::~InstrumentTrack()
 {
+	// De-assign midi device
+	if (m_hasAutoMidiDev)
+	{
+		autoAssignMidiDevice(false);
+		s_autoAssignedTrack = NULL;
+	}
+	
 	// kill all running notes and the iph
 	silenceAllNotes( true );
 
@@ -915,12 +922,23 @@ Instrument * InstrumentTrack::loadInstrument(const QString & _plugin_name,
 
 
 
+InstrumentTrack *InstrumentTrack::s_autoAssignedTrack = NULL;
+
 /*! \brief Automatically assign a midi controller to this track, based on the midiautoassign setting
  *
  *  \param assign set to true to connect the midi device, set to false to disconnect
  */
 void InstrumentTrack::autoAssignMidiDevice(bool assign)
 {
+	if (assign)
+	{
+		if (s_autoAssignedTrack)
+		{
+			s_autoAssignedTrack->autoAssignMidiDevice(false);
+		}
+		s_autoAssignedTrack = this;
+	}
+
 	const QString &device = ConfigManager::inst()->value("midi", "midiautoassign");
 	// Check if the device exists
 	if ( Engine::mixer()->midiClient()->readablePorts().indexOf(device) >= 0 )
