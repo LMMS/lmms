@@ -25,6 +25,7 @@
 
 #include <QMouseEvent>
 #include <QPainter>
+#include <QPainterPath>
 #include <QMenu>
 
 #include "AutomationEditor.h"
