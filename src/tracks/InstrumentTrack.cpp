@@ -940,6 +940,12 @@ void InstrumentTrack::autoAssignMidiDevice(bool assign)
 	}
 
 	const QString &device = ConfigManager::inst()->value("midi", "midiautoassign");
+	if ( Engine::mixer()->midiClient()->isRaw() && device != "none" )
+	{
+		m_midiPort.setReadable( assign );
+		return;
+	}
+
 	// Check if the device exists
 	if ( Engine::mixer()->midiClient()->readablePorts().indexOf(device) >= 0 )
 	{

@@ -685,7 +685,14 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	m_assignableMidiDevices = new QComboBox(midiAutoAssign_tw);
 	m_assignableMidiDevices->setGeometry(10, 20, 240, 28);
 	m_assignableMidiDevices->addItem("none");
-	m_assignableMidiDevices->addItems(Engine::mixer()->midiClient()->readablePorts());
+	if ( !Engine::mixer()->midiClient()->isRaw() )
+	{
+		m_assignableMidiDevices->addItems(Engine::mixer()->midiClient()->readablePorts());
+	}
+	else
+	{
+		m_assignableMidiDevices->addItem("yes");
+	}
 	int current = m_assignableMidiDevices->findText(ConfigManager::inst()->value("midi", "midiautoassign"));
 	if (current >= 0)
 	{
