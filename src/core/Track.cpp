@@ -283,6 +283,9 @@ TrackContentObjectView::TrackContentObjectView( TrackContentObject * tco,
 	m_BBPatternBackground( 0, 0, 0 ),
 	m_gradient( true ),
 	m_mouseHotspotHand( 0, 0 ),
+	m_mouseHotspotKnife( 0, 0 ),
+	m_cursorHand( QCursor( embed::getIconPixmap( "hand" ) ) ),
+	m_cursorKnife( QCursor( embed::getIconPixmap( "cursor_knife" ) ) ),
 	m_cursorSetYet( false ),
 	m_needsUpdate( true )
 {
@@ -295,7 +298,7 @@ TrackContentObjectView::TrackContentObjectView( TrackContentObject * tco,
 	setAttribute( Qt::WA_OpaquePaintEvent, true );
 	setAttribute( Qt::WA_DeleteOnClose, true );
 	setFocusPolicy( Qt::StrongFocus );
-	setCursor( QCursor( embed::getIconPixmap( "hand" ), m_mouseHotspotHand.width(), m_mouseHotspotHand.height() ) );
+	setCursor( m_cursorHand );
 	move( 0, 0 );
 	show();
 
@@ -346,7 +349,9 @@ void TrackContentObjectView::update()
 {
 	if( !m_cursorSetYet )
 	{
-		setCursor( QCursor( embed::getIconPixmap( "hand" ), m_mouseHotspotHand.width(), m_mouseHotspotHand.height() ) );
+		m_cursorHand = QCursor( embed::getIconPixmap( "hand" ), m_mouseHotspotHand.width(), m_mouseHotspotHand.height() );
+		m_cursorKnife = QCursor( embed::getIconPixmap( "cursor_knife" ), m_mouseHotspotKnife.width(), m_mouseHotspotKnife.height() );
+		setCursor( m_cursorHand );
 		m_cursorSetYet = true;
 	}
 
@@ -433,6 +438,11 @@ void TrackContentObjectView::setGradient( const bool & b )
 void TrackContentObjectView::setMouseHotspotHand(const QSize & s)
 {
 	m_mouseHotspotHand = s;
+}
+
+void TrackContentObjectView::setMouseHotspotKnife(const QSize & s)
+{
+	m_mouseHotspotKnife = s;
 }
 
 // access needsUpdate member variable
@@ -622,7 +632,7 @@ void TrackContentObjectView::leaveEvent( QEvent * e )
 {
 	if( cursor().shape() != Qt::BitmapCursor )
 	{
-		setCursor( QCursor( embed::getIconPixmap( "hand" ), m_mouseHotspotHand.width(), m_mouseHotspotHand.height() ) );
+		setCursor( m_cursorHand );
 	}
 	if( e != NULL )
 	{
@@ -756,6 +766,7 @@ void TrackContentObjectView::mousePressEvent( QMouseEvent * me )
 			else if (sTco)
 			{
 				m_action = Split;
+				setCursor( m_cursorKnife );
 				sTco->setMarkerPos( knifeMarkerPos( me ) );
 				sTco->setMarkerEnabled( true );
 				update();
@@ -1093,12 +1104,19 @@ void TrackContentObjectView::mouseMoveEvent( QMouseEvent * me )
 	else if( m_action == Split )
 	{
 		SampleTCO * sTco = dynamic_cast<SampleTCO*>( m_tco );
-		if (sTco) { sTco->setMarkerPos( knifeMarkerPos( me ) ); }
+		if (sTco) {
+			setCursor( m_cursorKnife );
+			sTco->setMarkerPos( knifeMarkerPos( me ) );
+		}
 		update();
 	}
 	else
 	{
 		SampleTCO * sTco = dynamic_cast<SampleTCO*>( m_tco );
+		
+		if (sTco && m_trackView->trackContainerView()->knifeMode())
+		{ setCursor( m_cursorKnife ); }
+
 		if( ( me->x() > width() - RESIZE_GRIP_WIDTH && !me->buttons() && !m_tco->getAutoResize() )
 		||  ( me->x() < RESIZE_GRIP_WIDTH && !me->buttons() && sTco && !m_tco->getAutoResize() ) )
 		{

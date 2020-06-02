@@ -210,6 +210,7 @@ class TrackContentObjectView : public selectableObject, public ModelView
 	// We have to use a QSize here because using QPoint isn't supported.
 	// width -> x, height -> y
 	Q_PROPERTY( QSize mouseHotspotHand WRITE setMouseHotspotHand )
+	Q_PROPERTY( QSize mouseHotspotKnife WRITE setMouseHotspotKnife )
 
 public:
 	TrackContentObjectView( TrackContentObject * tco, TrackView * tv );
@@ -245,6 +246,7 @@ public:
 	void setBBPatternBackground( const QColor & c );
 	void setGradient( const bool & b );
 	void setMouseHotspotHand(const QSize & s);
+	void setMouseHotspotKnife(const QSize & s);
 
 	// access needsUpdate member variable
 	bool needsUpdate();
@@ -322,7 +324,10 @@ private:
 	QColor m_textShadowColor;
 	QColor m_BBPatternBackground;
 	bool m_gradient;
-	QSize m_mouseHotspotHand; // QSize must be used because QPoint isn't supported by property system
+	QSize m_mouseHotspotHand; // QSize must be used because QPoint
+	QSize m_mouseHotspotKnife; // isn't supported by property system
+	QCursor m_cursorHand;
+	QCursor m_cursorKnife;
 	bool m_cursorSetYet;
 
 	bool m_needsUpdate;

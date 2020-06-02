@@ -51,6 +51,9 @@ public:
 	SampleTCO( const SampleTCO& orig );
 	virtual ~SampleTCO();
 
+	//According to the Rule of Three we should have this
+	//SampleTCO& operator= ( const SampleTCO& that );
+
 	void changeLength( const MidiTime & _length ) override;
 	const QString & sampleFile() const;
 

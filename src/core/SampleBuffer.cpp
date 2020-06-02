@@ -153,6 +153,31 @@ SampleBuffer::SampleBuffer( const SampleBuffer& orig ):
 
 
 
+SampleBuffer& SampleBuffer::operator=( const SampleBuffer& that )
+{
+	m_audioFile = that.m_audioFile;
+	m_origData = MM_ALLOC( sampleFrame, that.m_origFrames );
+	m_origFrames = that.m_origFrames;
+	m_data = MM_ALLOC( sampleFrame, that.m_frames );
+	m_frames = that.m_frames;
+	m_startFrame = that.m_startFrame;
+	m_endFrame = that.m_endFrame;
+	m_loopStartFrame = that.m_loopStartFrame;
+	m_loopEndFrame = that.m_loopEndFrame;
+	m_amplification = that.m_amplification;
+	m_reversed = that.m_reversed;
+	m_frequency = that.m_frequency;
+	m_sampleRate = that.m_sampleRate;
+	memcpy( m_origData, that.m_origData, m_origFrames * BYTES_PER_FRAME );
+	memcpy( m_data, that.m_data, m_frames * BYTES_PER_FRAME );
+	update();
+
+	return *this;
+}
+
+
+
+
 SampleBuffer::~SampleBuffer()
 {
 	MM_FREE( m_origData );

@@ -111,6 +111,8 @@ public:
 	explicit SampleBuffer( const f_cnt_t _frames );
 	SampleBuffer( const SampleBuffer& orig );
 
+	SampleBuffer& operator= ( const SampleBuffer& that );
+
 	virtual ~SampleBuffer();
 
 	bool play( sampleFrame * _ab, handleState * _state,
