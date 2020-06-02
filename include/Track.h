@@ -295,6 +295,7 @@ private:
 		MoveSelection,
 		Resize,
 		ResizeLeft,
+		Split,
 		CopySelection,
 		ToggleSelected
 	} ;
@@ -335,7 +336,10 @@ private:
 	void setInitialOffsets();
 
 	bool mouseMovedDistance( QMouseEvent * me, int distance );
+	bool unquantizedModHeld( QMouseEvent * me );
 	MidiTime draggedTCOPos( QMouseEvent * me );
+	int knifeMarkerPos( QMouseEvent * me );
+	MidiTime quantizeMarkerPos( MidiTime, bool shiftMode );
 } ;
 
 

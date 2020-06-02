@@ -130,6 +130,29 @@ SampleBuffer::SampleBuffer( const f_cnt_t _frames )
 
 
 
+SampleBuffer::SampleBuffer( const SampleBuffer& orig ):
+	m_audioFile( orig.m_audioFile ),
+	m_origData( MM_ALLOC( sampleFrame, orig.m_origFrames ) ),
+	m_origFrames( orig.m_origFrames ),
+	m_data( MM_ALLOC( sampleFrame, orig.m_frames ) ),
+	m_frames( orig.m_frames ),
+	m_startFrame( orig.m_startFrame ),
+	m_endFrame( orig.m_endFrame ),
+	m_loopStartFrame( orig.m_loopStartFrame ),
+	m_loopEndFrame( orig.m_loopEndFrame ),
+	m_amplification( orig.m_amplification ),
+	m_reversed( orig.m_reversed ),
+	m_frequency( orig.m_frequency ),
+	m_sampleRate( orig.m_sampleRate )
+{
+	//Deep copy m_origData and m_data from original
+	memcpy( m_origData, orig.m_origData, m_origFrames * BYTES_PER_FRAME );
+	memcpy( m_data, orig.m_data, m_frames * BYTES_PER_FRAME );
+}
+
+
+
+
 SampleBuffer::~SampleBuffer()
 {
 	MM_FREE( m_origData );
@@ -781,7 +804,7 @@ bool SampleBuffer::play( sampleFrame * _ab, handleState * _state,
 		}
 	}
 
-	if( tmp != NULL ) 
+	if( tmp != NULL )
 	{
 		MM_FREE( tmp );
 	}
@@ -1488,7 +1511,7 @@ SampleBuffer::handleState::handleState( bool _varying_pitch, int interpolation_m
 {
 	int error;
 	m_interpolationMode = interpolation_mode;
-	
+
 	if( ( m_resamplingData = src_new( interpolation_mode, DEFAULT_CHANNELS, &error ) ) == NULL )
 	{
 		qDebug( "Error: src_new() failed in sample_buffer.cpp!\n" );

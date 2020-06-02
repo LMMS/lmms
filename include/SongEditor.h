@@ -63,6 +63,7 @@ public:
 	enum EditMode
 	{
 		DrawMode,
+		KnifeMode,
 		SelectMode
 	};
 
@@ -85,6 +86,7 @@ public slots:
 
 	void setEditMode( EditMode mode );
 	void setEditModeDraw();
+	void setEditModeKnife();
 	void setEditModeSelect();
 	void toggleProportionalSnap();
 
@@ -120,6 +122,7 @@ private:
 	void wheelEvent( QWheelEvent * we ) override;
 
 	bool allowRubberband() const override;
+	bool knifeMode() const override;
 
 	int trackIndexFromSelectionPoint(int yPos);
 	int indexOfTrackView(const TrackView* tv);
@@ -209,6 +212,7 @@ private:
 
 	ActionGroup * m_editModeGroup;
 	QAction* m_drawModeAction;
+	QAction* m_knifeModeAction;
 	QAction* m_selectModeAction;
 	QAction* m_crtlAction;
 

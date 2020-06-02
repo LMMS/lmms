@@ -735,9 +735,37 @@ void TrackContentObjectView::mousePressEvent( QMouseEvent * me )
 {
 	setInitialPos( me->pos() );
 	setInitialOffsets();
+
 	if( !fixedTCOs() && me->button() == Qt::LeftButton )
 	{
-		if( me->modifiers() & Qt::ControlModifier )
+		if( m_trackView->trackContainerView()->knifeMode() )
+		{
+			SampleTCO * sTco = dynamic_cast<SampleTCO*>( m_tco );
+
+			if( me->x() < RESIZE_GRIP_WIDTH && sTco
+					&& !m_tco->getAutoResize() )
+			{
+				m_action = ResizeLeft;
+				setCursor( Qt::SizeHorCursor );
+			}
+			else if( me->x() >= width() - RESIZE_GRIP_WIDTH )
+			{
+				m_action = Resize;
+				setCursor( Qt::SizeHorCursor );
+			}
+			else if (sTco)
+			{
+				m_action = Split;
+				sTco->setMarkerPos( knifeMarkerPos( me ) );
+				sTco->setMarkerEnabled( true );
+				update();
+			}
+			// We can't split anything except samples right now, so disable the
+			// action to avoid entering if statements we don't need to. This
+			// also saves us a few 'if(sTco)' checks
+			else { m_action = NoAction; }
+		}
+		else if ( me->modifiers() & Qt::ControlModifier )
 		{
 			if( isSelected() )
 			{
@@ -830,6 +858,16 @@ void TrackContentObjectView::mousePressEvent( QMouseEvent * me )
 		else if( me->modifiers() & Qt::ShiftModifier && !fixedTCOs() )
 		{
 			remove();
+		}
+		if (m_action == Split)
+		{
+			m_action = NoAction;
+			SampleTCO * sTco = dynamic_cast<SampleTCO*>( m_tco );
+			if (sTco)
+			{
+				sTco->setMarkerEnabled( false );
+				update();
+			}
 		}
 	}
 	else if( me->button() == Qt::MidButton )
@@ -960,8 +998,6 @@ void TrackContentObjectView::mouseMoveEvent( QMouseEvent * me )
 	}
 	else if( m_action == Resize || m_action == ResizeLeft )
 	{
-		// If the user is holding alt, or pressed ctrl after beginning the drag, don't quantize
-		const bool unquantized = (me->modifiers() & Qt::ControlModifier) || (me->modifiers() & Qt::AltModifier);
 		const float snapSize = gui->songEditor()->m_editor->getSnapSize();
 		// Length in ticks of one snap increment
 		const MidiTime snapLength = MidiTime( (int)(snapSize * MidiTime::ticksPerBar()) );
@@ -971,7 +1007,8 @@ void TrackContentObjectView::mouseMoveEvent( QMouseEvent * me )
 			// The clip's new length
 			MidiTime l = static_cast<int>( me->x() * MidiTime::ticksPerBar() / ppb );
 
-			if ( unquantized )
+			// If the user is holding alt, or pressed ctrl after beginning the drag, don't quantize
+			if ( unquantizedModHeld(me) )
 			{	// We want to preserve this adjusted offset,
 				// even if the user switches to snapping later
 				setInitialPos( m_initialMousePos );
@@ -1007,7 +1044,7 @@ void TrackContentObjectView::mouseMoveEvent( QMouseEvent * me )
 									m_trackView->trackContainerView()->currentPosition() +
 									static_cast<int>( x * MidiTime::ticksPerBar() / ppb ) );
 
-				if( unquantized )
+				if( unquantizedModHeld(me) )
 				{	// We want to preserve this adjusted offset,
 					// even if the user switches to snapping later
 					setInitialPos( m_initialMousePos );
@@ -1053,6 +1090,12 @@ void TrackContentObjectView::mouseMoveEvent( QMouseEvent * me )
 						MidiTime::ticksPerBar() ) );
 		s_textFloat->moveGlobal( this, QPoint( width() + 2, height() + 2) );
 	}
+	else if( m_action == Split )
+	{
+		SampleTCO * sTco = dynamic_cast<SampleTCO*>( m_tco );
+		if (sTco) { sTco->setMarkerPos( knifeMarkerPos( me ) ); }
+		update();
+	}
 	else
 	{
 		SampleTCO * sTco = dynamic_cast<SampleTCO*>( m_tco );
@@ -1089,12 +1132,51 @@ void TrackContentObjectView::mouseReleaseEvent( QMouseEvent * me )
 	{
 		setSelected( !isSelected() );
 	}
-
-	if( m_action == Move || m_action == Resize || m_action == ResizeLeft )
+	else if( m_action == Move || m_action == Resize || m_action == ResizeLeft )
 	{
 		// TODO: Fix m_tco->setJournalling() consistency
 		m_tco->setJournalling( true );
 	}
+	else if( m_action == Split )
+	{
+		SampleTCO * leftTCO = dynamic_cast<SampleTCO*>( m_tco );
+
+		if (leftTCO)
+		{
+			leftTCO->setMarkerEnabled( false );
+
+			const int relativePixelPos = me->pos().x();
+			const float ppb = m_trackView->trackContainerView()->pixelsPerBar();
+			MidiTime splitPos = relativePixelPos * MidiTime::ticksPerBar() / ppb;
+
+			if ( !unquantizedModHeld(me) )
+			{
+				splitPos = quantizeMarkerPos( splitPos, me->modifiers() & Qt::ShiftModifier );
+			}
+
+			splitPos += m_initialTCOPos;
+
+			//Don't split if we slid off the TCO or if we're on the clip's start/end
+			//Cutting at exactly the start/end position would create a zero length
+			//clip (bad), and a clip the same length as the original one (pointless).
+			if ( splitPos > m_initialTCOPos && splitPos < m_initialTCOEnd )
+			{
+				leftTCO->getTrack()->addJournalCheckPoint();
+				leftTCO->getTrack()->saveJournallingState( false );
+
+				SampleTCO * rightTCO = new SampleTCO ( *leftTCO );
+
+				leftTCO->changeLength( splitPos - m_initialTCOPos );
+
+				rightTCO->movePosition( splitPos );
+				rightTCO->changeLength( m_initialTCOEnd - splitPos );
+				rightTCO->setStartTimeOffset( leftTCO->startTimeOffset() - leftTCO->length() );
+
+				leftTCO->getTrack()->restoreJournallingState();
+			}
+		}
+	}
+
 	m_action = NoAction;
 	delete m_hint;
 	m_hint = NULL;
@@ -1193,6 +1275,14 @@ bool TrackContentObjectView::mouseMovedDistance( QMouseEvent * me, int distance 
 
 
 
+
+bool TrackContentObjectView::unquantizedModHeld( QMouseEvent * me )
+{
+	return me->modifiers() & Qt::ControlModifier || me->modifiers() & Qt::AltModifier;
+}
+
+
+
 /*! \brief Calculate the new position of a dragged TCO from a mouse event
  *
  *
@@ -1207,12 +1297,8 @@ MidiTime TrackContentObjectView::draggedTCOPos( QMouseEvent * me )
 	MidiTime newPos = m_initialTCOPos + mouseOff * MidiTime::ticksPerBar() / ppb;
 	MidiTime offset = newPos - m_initialTCOPos;
 	// If the user is holding alt, or pressed ctrl after beginning the drag, don't quantize
-	if (    me->button() != Qt::NoButton
-		|| (me->modifiers() & Qt::ControlModifier)
-		|| (me->modifiers() & Qt::AltModifier)    )
-	{
-		// We want to preserve this adjusted offset,
-		// even if the user switches to snapping
+	if ( me->button() != Qt::NoButton || unquantizedModHeld(me) )
+	{	// We want to preserve this adjusted offset,  even if the user switches to snapping
 		setInitialPos( m_initialMousePos );
 	}
 	else if ( me->modifiers() & Qt::ShiftModifier )
@@ -1232,6 +1318,50 @@ MidiTime TrackContentObjectView::draggedTCOPos( QMouseEvent * me )
 		newPos = m_initialTCOPos + offset.quantize( gui->songEditor()->m_editor->getSnapSize() );
 	}
 	return newPos;
+}
+
+
+
+
+int TrackContentObjectView::knifeMarkerPos( QMouseEvent * me )
+{
+	//Position relative to start of clip
+	const int markerPos = me->pos().x();
+
+	//In unquantized mode, we don't have to mess with the position at all
+	if ( unquantizedModHeld(me) ) { return markerPos; }
+	else
+	{	//Otherwise we...
+		//1: Convert the position to a MidiTime
+		const float ppb = m_trackView->trackContainerView()->pixelsPerBar();
+		MidiTime midiPos = markerPos * MidiTime::ticksPerBar() / ppb;
+		//2: Snap to the correct position, based on modifier keys
+		midiPos = quantizeMarkerPos( midiPos, me->modifiers() & Qt::ShiftModifier );
+		//3: Convert back to a pixel position
+		return midiPos * ppb / MidiTime::ticksPerBar();
+	}
+}
+
+
+
+
+MidiTime TrackContentObjectView::quantizeMarkerPos( MidiTime midiPos, bool shiftMode )
+{
+	const float snapSize = gui->songEditor()->m_editor->getSnapSize();
+	if ( shiftMode )
+	{	//If shift is held we quantize the length of the new left clip...
+		const MidiTime leftPos = midiPos.quantize( snapSize );
+		//...or right clip...
+		const MidiTime rightOff = m_tco->length() - midiPos;
+		const MidiTime rightPos = m_tco->length() - rightOff.quantize( snapSize );
+		//...whichever gives a position closer to the cursor
+		if ( abs(leftPos - midiPos) < abs(rightPos - midiPos) ) { return leftPos; }
+		else { return rightPos; }
+	}
+	else
+	{
+		return (MidiTime(midiPos + m_initialTCOPos).quantize( snapSize ) - m_initialTCOPos);
+	}
 }
 
 

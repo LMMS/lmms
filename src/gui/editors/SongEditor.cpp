@@ -457,6 +457,11 @@ void SongEditor::setEditModeDraw()
 	setEditMode(DrawMode);
 }
 
+void SongEditor::setEditModeKnife()
+{
+	setEditMode(KnifeMode);
+}
+
 void SongEditor::setEditModeSelect()
 {
 	setEditMode(SelectMode);
@@ -862,6 +867,14 @@ bool SongEditor::allowRubberband() const
 
 
 
+bool SongEditor::knifeMode() const
+{
+	return m_mode == KnifeMode;
+}
+
+
+
+
 int SongEditor::trackIndexFromSelectionPoint(int yPos)
 {
 	const TrackView * tv = trackViewAt(yPos - m_timeLine->height());
@@ -946,13 +959,16 @@ SongEditorWindow::SongEditorWindow(Song* song) :
 
 	m_editModeGroup = new ActionGroup(this);
 	m_drawModeAction = m_editModeGroup->addAction(embed::getIconPixmap("edit_draw"), tr("Draw mode"));
+	m_knifeModeAction = m_editModeGroup->addAction(embed::getIconPixmap("edit_knife"), tr("Knife mode (split sample clips)"));
 	m_selectModeAction = m_editModeGroup->addAction(embed::getIconPixmap("edit_select"), tr("Edit mode (select and move)"));
 	m_drawModeAction->setChecked(true);
 
 	connect(m_drawModeAction, SIGNAL(triggered()), m_editor, SLOT(setEditModeDraw()));
+	connect(m_knifeModeAction, SIGNAL(triggered()), m_editor, SLOT(setEditModeKnife()));
 	connect(m_selectModeAction, SIGNAL(triggered()), m_editor, SLOT(setEditModeSelect()));
 
 	editActionsToolBar->addAction( m_drawModeAction );
+	editActionsToolBar->addAction( m_knifeModeAction );
 	editActionsToolBar->addAction( m_selectModeAction );
 
 	DropToolBar *timeLineToolBar = addDropToolBarToTop(tr("Timeline controls"));

@@ -48,6 +48,7 @@ class SampleTCO : public TrackContentObject
 	mapPropertyFromModel(bool,isRecord,setRecord,m_recordModel);
 public:
 	SampleTCO( Track * _track );
+	SampleTCO( const SampleTCO& orig );
 	virtual ~SampleTCO();
 
 	void changeLength( const MidiTime & _length ) override;
@@ -74,6 +75,15 @@ public:
 	bool isPlaying() const;
 	void setIsPlaying(bool isPlaying);
 
+	void inline setMarkerPos( int x )
+	{
+		m_markerPos = x;
+	}
+	void inline setMarkerEnabled( bool e )
+	{
+		m_marker = e;
+	}
+
 public slots:
 	void setSampleBuffer( SampleBuffer* sb );
 	void setSampleFile( const QString & _sf );
@@ -88,6 +98,8 @@ private:
 	BoolModel m_recordModel;
 	bool m_isPlaying;
 
+	bool m_marker = false;
+	int m_markerPos = 0;
 
 	friend class SampleTCOView;
 
