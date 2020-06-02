@@ -393,6 +393,12 @@ void InstrumentTrack::processOutEvent( const MidiEvent& event, const MidiTime& t
 	const MidiEvent transposedEvent = applyMasterKey( event );
 	const int key = transposedEvent.key();
 
+	// If we have a selected output midi channel between 1-16, we will use that channel to handle the midi event.
+	// But if our selected midi output channel is 0 ("--"), we will use the event channel instead.
+	const auto handleEventOutputChannel = midiPort()->outputChannel() == 0
+		? event.channel()
+		: midiPort()->realOutputChannel();
+
 	switch( event.type() )
 	{
 		case MidiNoteOn:
@@ -403,10 +409,10 @@ void InstrumentTrack::processOutEvent( const MidiEvent& event, const MidiTime& t
 			{
 				if( m_runningMidiNotes[key] > 0 )
 				{
-					m_instrument->handleMidiEvent( MidiEvent( MidiNoteOff, midiPort()->realOutputChannel(), key, 0 ), time, offset );
+					m_instrument->handleMidiEvent( MidiEvent( MidiNoteOff, handleEventOutputChannel, key, 0 ), time, offset );
 				}
 				++m_runningMidiNotes[key];
-				m_instrument->handleMidiEvent( MidiEvent( MidiNoteOn, midiPort()->realOutputChannel(), key, event.velocity() ), time, offset );
+				m_instrument->handleMidiEvent( MidiEvent( MidiNoteOn, handleEventOutputChannel, key, event.velocity() ), time, offset );
 
 			}
 			m_midiNotesMutex.unlock();
@@ -419,7 +425,7 @@ void InstrumentTrack::processOutEvent( const MidiEvent& event, const MidiTime& t
 
 			if( key >= 0 && key < NumKeys && --m_runningMidiNotes[key] <= 0 )
 			{
-				m_instrument->handleMidiEvent( MidiEvent( MidiNoteOff, midiPort()->realOutputChannel(), key, 0 ), time, offset );
+				m_instrument->handleMidiEvent( MidiEvent( MidiNoteOff, handleEventOutputChannel, key, 0 ), time, offset );
 			}
 			m_midiNotesMutex.unlock();
 			emit endNote();
