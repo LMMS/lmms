@@ -355,7 +355,7 @@ InstrumentFunctionArpeggio::~InstrumentFunctionArpeggio()
 void InstrumentFunctionArpeggio::updateNoteRange()
 {
 	bool sticky = false;
-	if( m_arpCeilModel.value() == m_arpFloorModel.maxValue() )
+	if( m_arpCeilModel.value() ==  m_arpCeilModel.maxValue() )
 	{
 		sticky = true;
 	}
@@ -365,9 +365,9 @@ void InstrumentFunctionArpeggio::updateNoteRange()
 	const int cur_chord_size = chord_table[m_arpModel.value()].size();
 	float noteRange = m_arpRangeModel.value() * cur_chord_size;
 
-	m_arpCycleModel.setRange( 0.0f, qMax( 1.0f, noteRange - 1.0f ) );
-	m_arpFloorModel.setRange( 0.0f, noteRange );
-	m_arpCeilModel.setRange( 0.0f, noteRange );
+	m_arpCycleModel.setRange( 0.0f, qMax( 0.0f, noteRange - 1.0f ) );
+	m_arpFloorModel.setRange( 0.0f, qMax( 0.0f, noteRange - 1.0f ) );
+	m_arpCeilModel.setRange( 0.0f, qMax( 0.0f, noteRange - 1.0f ) );
 
 	if( sticky )
 	{
