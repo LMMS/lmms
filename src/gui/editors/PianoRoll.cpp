@@ -1773,13 +1773,21 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 					// then resize the note
 					m_action = ActionResizeNote;
 
+					//Calculate the minimum length we should allow when resizing
+					//each note, and let all notes use the smallest one found
 					m_minResizeLen = quantization();
 					for (Note *note : getSelectedNotes())
 					{
+						//Notes from the BB editor can have a negative length, so
+						//change their length to the displayed one before resizing
 						if (note->oldLength() <= 0) { note->setOldLength(4); }
+						//Let the note be sized down by quantized increments, stopping
+						//when the next step down would result in a negative length
 						int thisMin = note->oldLength() % quantization();
-						if (thisMin == 0) { thisMin = quantization(); }
-						if (thisMin < m_minResizeLen) { m_minResizeLen = thisMin; }
+						//The initial value for m_minResizeLen is the minimum length of
+						//a note divisible by the current Q. Therefore we ignore notes
+						//where thisMin == 0 when checking for a new minimum
+						if (thisMin > 0 && thisMin < m_minResizeLen) { m_minResizeLen = thisMin; }
 					}
 
 					// set resize-cursor
