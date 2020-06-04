@@ -1420,19 +1420,15 @@ void Song::clearErrors()
 
 void Song::collectError( const QString error )
 {
-	if( !m_errors.contains( error ) )
-	{
-		m_errors[ error ] = 1;
-	} else {
-		m_errors[ error ]++;
-	}
+	if (!m_errors.contains(error)) { m_errors[error] = 1; }
+	else { m_errors[ error ]++; }
 }
 
 
 
 bool Song::hasErrors()
 {
-	return ( !m_errors.isEmpty() );
+	return !(m_errors.isEmpty());
 }
 
 
@@ -1441,8 +1437,9 @@ QString Song::errorSummary()
 {
 	QString errors;
 
-	QHash<QString, int>::const_iterator i = m_errors.constBegin();
-	while (i != m_errors.constEnd()) {
+	auto i = m_errors.constBegin();
+	while (i != m_errors.constEnd())
+	{
 		errors.append( i.key() );
 		if( i.value() > 1 )
 		{
