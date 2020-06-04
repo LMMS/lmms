@@ -185,7 +185,7 @@ protected:
 					const QColor & selCol, const int noteOpc, const bool borderless, bool drawNoteName );
 	void removeSelection();
 	void selectAll();
-	NoteVector getSelectedNotes();
+	NoteVector getSelectedNotes() const;
 	void selectNotesOnKey();
 	int xCoordOfTick( int tick );
 
@@ -212,7 +212,7 @@ protected slots:
 	void copySelectedNotes();
 	void cutSelectedNotes();
 	void pasteNotes();
-	void deleteSelectedNotes();
+	bool deleteSelectedNotes();
 
 	void updatePosition(const MidiTime & t );
 	void updatePositionAccompany(const MidiTime & t );
@@ -294,7 +294,9 @@ private:
 	MidiTime newNoteLen() const;
 
 	void shiftPos(int amount);
+	void shiftPos(NoteVector notes, int amount);
 	void shiftSemiTone(int amount);
+	void shiftSemiTone(NoteVector notes, int amount);
 	bool isSelection() const;
 	int selectionCount() const;
 	void testPlayNote( Note * n );
