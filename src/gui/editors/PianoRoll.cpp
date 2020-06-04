@@ -1755,7 +1755,6 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 					// if they're holding shift, copy all selected notes
 					if( ! is_new_note && me->modifiers() & Qt::ShiftModifier )
 					{
-						auto selectedNotes = getSelectedNotes();
 						for (Note* note: selectedNotes)
 						{
 							Note * newNote = m_pattern->addNote(*note, false);
@@ -2678,7 +2677,8 @@ void PianoRoll::dragNotes( int x, int y, bool alt, bool shift, bool ctrl )
 			// This factor is such that the endpoint of the note whose handle is being dragged should lie under the cursor.
 			// first, determine the start-point of the left-most selected note:
 			int stretchStartTick = -1;
-			for (const Note *note : getSelectedNotes())
+			auto selectedNotes = getSelectedNotes();
+			for (const Note *note : selectedNotes)
 			{
 				if (stretchStartTick < 0 || note->oldPos().getTicks() < stretchStartTick)
 				{
@@ -2687,7 +2687,7 @@ void PianoRoll::dragNotes( int x, int y, bool alt, bool shift, bool ctrl )
 			}
 			// determine the ending tick of the right-most selected note
 			const Note *posteriorNote = nullptr;
-			for (const Note *note : getSelectedNotes())
+			for (const Note *note : selectedNotes)
 			{
 				if (posteriorNote == nullptr ||
 					note->oldPos().getTicks() + note->oldLength().getTicks() >
@@ -2705,7 +2705,7 @@ void PianoRoll::dragNotes( int x, int y, bool alt, bool shift, bool ctrl )
 
 			// process all selected notes & determine how much the endpoint of the right-most note was shifted
 			int posteriorDeltaThisFrame = 0;
-			for (Note *note : getSelectedNotes())
+			for (Note *note : selectedNotes)
 			{
 				// scale relative start and end positions by scaleFactor
 				int newStart = stretchStartTick + scaleFactor *
