@@ -140,10 +140,10 @@ SampleBuffer::~SampleBuffer()
 	{
 		for(int i = 0 ; i < OscillatorConstants::WAVE_TABLES_PER_WAVEFORM_COUNT; ++i)
 		{
-			delete m_userAntiAliasWaveTable[i];
+			delete [] m_userAntiAliasWaveTable[i];
 			m_userAntiAliasWaveTable[i] = NULL;
 		}
-		delete m_userAntiAliasWaveTable;
+		delete [] m_userAntiAliasWaveTable;
 		m_userAntiAliasWaveTable = NULL;
 	}
 }
@@ -287,6 +287,16 @@ void SampleBuffer::update( bool _keep_settings )
 	}
 
 	emit sampleUpdated();
+
+	// allocate space for anti-aliased wave table
+	if (m_userAntiAliasWaveTable == NULL)
+	{
+		m_userAntiAliasWaveTable = new sample_t *[OscillatorConstants::WAVE_TABLES_PER_WAVEFORM_COUNT];
+		for (int i=0; i < OscillatorConstants::WAVE_TABLES_PER_WAVEFORM_COUNT; ++i)
+		{
+			m_userAntiAliasWaveTable[i] = new sample_t[OscillatorConstants::WAVETABLE_LENGTH];
+		}
+	}
 	Oscillator::generateAntiAliasUserWaveTable(this);
 
 	if( fileLoadError )
