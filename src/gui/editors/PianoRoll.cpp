@@ -1711,15 +1711,10 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 					note->setOldPos( note->pos() );
 					note->setOldLength( note->length() );
 
-					m_moveBoundaryLeft = qMin(
-										note->pos().getTicks(),
-										(tick_t) m_moveBoundaryLeft );
-					m_moveBoundaryRight = qMax( (int) note->endPos(),
-											m_moveBoundaryRight );
-					m_moveBoundaryBottom = qMin( note->key(),
-									   m_moveBoundaryBottom );
-					m_moveBoundaryTop = qMax( note->key(),
-												m_moveBoundaryTop );
+					m_moveBoundaryLeft = qMin(note->pos().getTicks(), (tick_t) m_moveBoundaryLeft);
+					m_moveBoundaryRight = qMax((int) note->endPos(), m_moveBoundaryRight);
+					m_moveBoundaryBottom = qMin(note->key(), m_moveBoundaryBottom);
+					m_moveBoundaryTop = qMax(note->key(), m_moveBoundaryTop);
 				}
 
 				// clicked at the "tail" of the note?
@@ -2668,6 +2663,8 @@ void PianoRoll::dragNotes( int x, int y, bool alt, bool shift, bool ctrl )
 		// If shift is pressed we resize and rearrange only the selected notes
 		// If shift + ctrl then we also rearrange all posterior notes (sticky)
 		// If shift is pressed but only one note is selected, apply sticky
+		
+		auto selectedNotes = getSelectedNotes();
 
 		if (shift)
 		{
@@ -2677,7 +2674,6 @@ void PianoRoll::dragNotes( int x, int y, bool alt, bool shift, bool ctrl )
 			// This factor is such that the endpoint of the note whose handle is being dragged should lie under the cursor.
 			// first, determine the start-point of the left-most selected note:
 			int stretchStartTick = -1;
-			auto selectedNotes = getSelectedNotes();
 			for (const Note *note : selectedNotes)
 			{
 				if (stretchStartTick < 0 || note->oldPos().getTicks() < stretchStartTick)
@@ -2753,7 +2749,7 @@ void PianoRoll::dragNotes( int x, int y, bool alt, bool shift, bool ctrl )
 		else
 		{
 			// shift is not pressed; stretch length of selected notes but not their position
-			for (Note *note : getSelectedNotes())
+			for (Note *note : selectedNotes)
 			{
 				int newLength = note->oldLength() + off_ticks;
 				newLength = qMax(1, newLength);
