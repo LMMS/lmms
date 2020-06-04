@@ -2688,8 +2688,15 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 		{
 			m_pianoKeysVisible = KEY_AREA_MIN_HEIGHT / m_keyLineHeight;
 			partialKeyVisible = KEY_AREA_MIN_HEIGHT % m_keyLineHeight;
+			// if we have a partial key, just show it
+			if (partialKeyVisible > 0)
+			{
+				m_pianoKeysVisible += 1;
+				partialKeyVisible = 0;
+			}
 			// have to modifiy the notes edit area height instead
-			m_notesEditHeight = height() - KEY_AREA_MIN_HEIGHT - PR_TOP_MARGIN - PR_BOTTOM_MARGIN;
+			m_notesEditHeight = height() - (m_pianoKeysVisible * m_keyLineHeight)
+				- PR_TOP_MARGIN - PR_BOTTOM_MARGIN;
 		}
 		// check if we're trying to show more keys than available
 		else if (m_pianoKeysVisible >= NumKeys)
@@ -3293,11 +3300,11 @@ void PianoRoll::updateScrollbars()
 	);
 	int pianoArea = keyAreaBottom() - PR_TOP_MARGIN;
 	int numKeysVisible = pianoArea / m_keyLineHeight;
-	m_totalKeysToScroll = NumKeys - numKeysVisible;
+	m_totalKeysToScroll = qMax(0, NumKeys - numKeysVisible);
 	m_topBottomScroll->setRange(0, m_totalKeysToScroll);
 	if (m_startKey > m_totalKeysToScroll)
 	{
-		m_startKey = m_totalKeysToScroll;
+		m_startKey = qMax(0, m_totalKeysToScroll);
 	}
 	m_topBottomScroll->setValue(m_totalKeysToScroll - m_startKey);
 }
@@ -3708,7 +3715,7 @@ void PianoRoll::horScrolled(int new_pos )
 void PianoRoll::verScrolled( int new_pos )
 {
 	// revert value
-	m_startKey = m_totalKeysToScroll - new_pos;
+	m_startKey = qMax(0, m_totalKeysToScroll - new_pos);
 
 	update();
 }
@@ -3862,13 +3869,13 @@ void PianoRoll::updateYScroll()
 	int total_pixels = m_octaveHeight * NumOctaves - (height() -
 					PR_TOP_MARGIN - PR_BOTTOM_MARGIN -
 							m_notesEditHeight);
-	m_totalKeysToScroll = total_pixels * KeysPerOctave / m_octaveHeight;
+	m_totalKeysToScroll = qMax(0, total_pixels * KeysPerOctave / m_octaveHeight);
 
 	m_topBottomScroll->setRange(0, m_totalKeysToScroll);
 
 	if(m_startKey > m_totalKeysToScroll)
 	{
-		m_startKey = m_totalKeysToScroll;
+		m_startKey = qMax(0, m_totalKeysToScroll);
 	}
 	m_topBottomScroll->setValue(m_totalKeysToScroll - m_startKey);
 }
