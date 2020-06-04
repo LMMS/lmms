@@ -30,6 +30,7 @@
 #include "Mixer.h"
 #include "AutomatableModel.h"
 #include "fftw3.h"
+#include "fft_helpers.h"
 
 
 
@@ -185,8 +186,6 @@ void Oscillator::generateSquareWaveTable(int bands, sample_t * table)
 //expects sample in sample buffer
 void Oscillator::generateFromFFT(int bands, float threshold, sample_t * table)
 {
-	float max = 0;
-	
 	//set unrequired bands to zero 
 	for (int i = bands; i < OscillatorConstants::WAVETABLE_LENGTH * 2 + 1 - bands; i++)
 	{
@@ -203,16 +202,8 @@ void Oscillator::generateFromFFT(int bands, float threshold, sample_t * table)
 	}
 	//ifft
 	fftwf_execute(s_ifftPlan);
-	//normalise
-	for (int i = 0; i < OscillatorConstants::WAVETABLE_LENGTH; ++i)
-	{
-		max = fmax(max, s_sampleBuffer[i]);
-	}
-	//copy to generateWaveTable
-	for (int i = 0; i < OscillatorConstants::WAVETABLE_LENGTH; ++i)
-	{
-		table[i] = s_sampleBuffer[i] / max;
-	}
+	//normalize and copy to result buffer
+	normalize(s_sampleBuffer, table, OscillatorConstants::WAVETABLE_LENGTH, 2*OscillatorConstants::WAVETABLE_LENGTH + 1);
 }
 
 void Oscillator::generateAntiAliasUserWaveTable(SampleBuffer *sampleBuffer)
@@ -226,7 +217,7 @@ void Oscillator::generateAntiAliasUserWaveTable(SampleBuffer *sampleBuffer)
 			s_sampleBuffer[i] = sampleBuffer->userWaveSample((float)i / (float)OscillatorConstants::WAVETABLE_LENGTH);
 		}
 		fftwf_execute(s_fftPlan);
-		Oscillator::generateFromFFT(OscillatorConstants::MAX_FREQ / freqFromWaveTableBand(i), 0.1f, sampleBuffer->m_userAntiAliasWaveTable[i]);
+		Oscillator::generateFromFFT(OscillatorConstants::MAX_FREQ / freqFromWaveTableBand(i), 0.001f, sampleBuffer->m_userAntiAliasWaveTable[i]);
 	}
 }
 
