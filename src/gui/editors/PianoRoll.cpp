@@ -1142,6 +1142,7 @@ void PianoRoll::shiftPos(int amount) //Shift notes pos by amount
 	if (!hasValidPattern()) { return; }
 
 	auto selectedNotes = getSelectedNotes();
+	//If no notes are selected, shift all of them, otherwise shift selection
 	if (selectedNotes.empty()) { return shiftPos(m_pattern->notes(), amount); }
 	else { return shiftPos(selectedNotes, amount); }
 }
@@ -1154,7 +1155,7 @@ void PianoRoll::shiftPos(NoteVector notes, int amount)
 	auto shiftAmount = (leftMostPos > -amount) ? amount : -leftMostPos;
 	if (shiftAmount == 0) { return; }
 
-	for( Note *note : notes ) { note->setPos( note->pos() + shiftAmount ); }
+	for (Note *note : notes) { note->setPos( note->pos() + shiftAmount ); }
 
 	m_pattern->rearrangeAllNotes();
 	m_pattern->updateLength();
@@ -1690,7 +1691,7 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 				m_mouseDownTick = m_currentPosition;
 
 				//If clicked on an unselected note, remove selection and select that new note
-				if(!m_currentNote->selected())
+				if (!m_currentNote->selected())
 				{
 					clearSelectedNotes();
 					m_currentNote->setSelected( true );
@@ -1704,7 +1705,7 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 				m_moveBoundaryTop = m_moveBoundaryBottom;
 
 				//Figure out the bounding box of all the selected notes
-				for (Note* note: selectedNotes)
+				for (Note *note: selectedNotes)
 				{
 					// remember note starting positions
 					note->setOldKey( note->key() );
@@ -1750,9 +1751,9 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 					// if they're holding shift, copy all selected notes
 					if( ! is_new_note && me->modifiers() & Qt::ShiftModifier )
 					{
-						for (Note* note: selectedNotes)
+						for (Note *note: selectedNotes)
 						{
-							Note * newNote = m_pattern->addNote(*note, false);
+							Note *newNote = m_pattern->addNote(*note, false);
 							newNote->setSelected(false);
 						}
 
@@ -2628,7 +2629,7 @@ void PianoRoll::dragNotes( int x, int y, bool alt, bool shift, bool ctrl )
 	{
 		for (Note *note : getSelectedNotes())
 		{
-			if( shift && ! m_startedWithShift )
+			if (shift && ! m_startedWithShift)
 			{
 				// quick resize, toggled by holding shift after starting a note move, but not before
 				int ticks_new = note->oldLength().getTicks() + off_ticks;
@@ -2709,7 +2710,7 @@ void PianoRoll::dragNotes( int x, int y, bool alt, bool shift, bool ctrl )
 				int newEnd = stretchStartTick + scaleFactor *
 					(note->oldPos().getTicks()+note->oldLength().getTicks() - stretchStartTick);
 				// if  not holding alt, quantize the offsets
-				if(!alt)
+				if (!alt)
 				{
 					// quantize start time
 					int oldStart = note->oldPos().getTicks();
@@ -4124,14 +4125,14 @@ void PianoRoll::pasteNotes()
 //Return false if no notes are deleted
 bool PianoRoll::deleteSelectedNotes()
 {
-	if(!hasValidPattern()) { return false; }
+	if (!hasValidPattern()) { return false; }
 
 	auto selectedNotes = getSelectedNotes();
 	if (selectedNotes.empty()) { return false; }
 
 	m_pattern->addJournalCheckPoint();
 
-	for(Note* note: selectedNotes) { m_pattern->removeNote( note ); }
+	for (Note* note: selectedNotes) { m_pattern->removeNote( note ); }
 
 	Engine::getSong()->setModified();
 	update();
