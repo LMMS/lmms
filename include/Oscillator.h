@@ -34,10 +34,12 @@
 #include <stdlib.h>
 #endif
 
+#include "Engine.h"
 #include <fftw3.h>
 #include "OscillatorConstants.h"
 #include "SampleBuffer.h"
 #include "lmms_constants.h"
+#include "Mixer.h"
 
 class IntModel;
 
@@ -182,7 +184,7 @@ public:
 		control.f2 = control.f1 < OscillatorConstants::WAVETABLE_LENGTH - 1 ?
 					control.f1 + 1 :
 					0;
-		control.band = waveTableBandFromFreq(m_freq);
+		control.band = waveTableBandFromFreq(m_freq * m_detuning * Engine::mixer()->processingSampleRate());
 		return control;
 	}
 
