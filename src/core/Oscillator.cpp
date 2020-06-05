@@ -25,6 +25,10 @@
 
 #include "Oscillator.h"
 
+#if !defined(__MINGW32__) && !defined(__MINGW64__)
+	#include <thread>
+#endif
+
 #include "BufferManager.h"
 #include "Engine.h"
 #include "Mixer.h"
@@ -255,48 +259,83 @@ void Oscillator::destroyFFTPlans()
 void Oscillator::generateWaveTables()
 {
 	//generate sine tables
-	for (int i = 0; i < OscillatorConstants::WAVE_TABLES_PER_WAVEFORM_COUNT; ++i)
+	auto sinGen = []()
 	{
-		generateSineWaveTable(s_waveTables[WaveShapes::SineWave][i]);
-	}
-	//generate saw tables
-	for (int i = 0; i < OscillatorConstants::WAVE_TABLES_PER_WAVEFORM_COUNT; ++i)
-	{
-		generateSawWaveTable(OscillatorConstants::MAX_FREQ / freqFromWaveTableBand(i), s_waveTables[WaveShapes::SawWave][i]);
-	}
-	//generate square tables
-	for (int i = 0; i < OscillatorConstants::WAVE_TABLES_PER_WAVEFORM_COUNT; ++i)
-	{
-		generateSquareWaveTable(OscillatorConstants::MAX_FREQ / freqFromWaveTableBand(i), s_waveTables[WaveShapes::SquareWave][i]);
-	}
-	//generate triangle tables
-	for (int i = 0; i < OscillatorConstants::WAVE_TABLES_PER_WAVEFORM_COUNT; ++i)
-	{
-		generateTriangleWaveTable(OscillatorConstants::MAX_FREQ / freqFromWaveTableBand(i), s_waveTables[WaveShapes::TriangleWave][i]);
-	}
-	//generate moogSaw tables
-	//generate signal buffer
-	for (int i = 0; i < OscillatorConstants::WAVE_TABLES_PER_WAVEFORM_COUNT; ++i)
-	{
-		for (int i = 0; i < OscillatorConstants::WAVETABLE_LENGTH; ++i)
+		for (int i = 0; i < OscillatorConstants::WAVE_TABLES_PER_WAVEFORM_COUNT; ++i)
 		{
-			Oscillator::s_sampleBuffer[i] = moogSawSample((float)i / (float)OscillatorConstants::WAVETABLE_LENGTH);
+			generateSineWaveTable(s_waveTables[WaveShapes::SineWave][i]);
 		}
-		fftwf_execute(s_fftPlan);
-		generateFromFFT(OscillatorConstants::MAX_FREQ / freqFromWaveTableBand(i), 0.2f, s_waveTables[WaveShapes::MoogSawWave][i]);
-	}
+	};
 
-	//generate Exp tables
-	//generate signal buffer
-	for (int i = 0; i < OscillatorConstants::WAVE_TABLES_PER_WAVEFORM_COUNT; ++i)
+	//generate saw tables
+	auto sawGen = []()
 	{
-		for (int i = 0; i < OscillatorConstants::WAVETABLE_LENGTH; ++i)
+		for (int i = 0; i < OscillatorConstants::WAVE_TABLES_PER_WAVEFORM_COUNT; ++i)
 		{
-			s_sampleBuffer[i] = expSample((float)i / (float)OscillatorConstants::WAVETABLE_LENGTH);
+			generateSawWaveTable(OscillatorConstants::MAX_FREQ / freqFromWaveTableBand(i), s_waveTables[WaveShapes::SawWave][i]);
 		}
-		fftwf_execute(s_fftPlan);
-		generateFromFFT(OscillatorConstants::MAX_FREQ / freqFromWaveTableBand(i), 0.2f, s_waveTables[WaveShapes::ExponentialWave][i]);
-	}
+	};
+	//generate square tables
+	auto squareGen = []()
+	{
+		for (int i = 0; i < OscillatorConstants::WAVE_TABLES_PER_WAVEFORM_COUNT; ++i)
+		{
+			generateSquareWaveTable(OscillatorConstants::MAX_FREQ / freqFromWaveTableBand(i), s_waveTables[WaveShapes::SquareWave][i]);
+		}
+	};
+	//generate triangle tables
+	auto triangleGen = []()
+	{
+		for (int i = 0; i < OscillatorConstants::WAVE_TABLES_PER_WAVEFORM_COUNT; ++i)
+		{
+			generateTriangleWaveTable(OscillatorConstants::MAX_FREQ / freqFromWaveTableBand(i), s_waveTables[WaveShapes::TriangleWave][i]);
+		}
+	};
+	auto fftGen = []()
+	{
+		//generate moogSaw tables
+		//generate signal buffer
+		for (int i = 0; i < OscillatorConstants::WAVE_TABLES_PER_WAVEFORM_COUNT; ++i)
+		{
+			for (int i = 0; i < OscillatorConstants::WAVETABLE_LENGTH; ++i)
+			{
+				Oscillator::s_sampleBuffer[i] = moogSawSample((float)i / (float)OscillatorConstants::WAVETABLE_LENGTH);
+			}
+			fftwf_execute(s_fftPlan);
+			generateFromFFT(OscillatorConstants::MAX_FREQ / freqFromWaveTableBand(i), 0.2f, s_waveTables[WaveShapes::MoogSawWave][i]);
+		}
+
+		//generate Exp tables
+		//generate signal buffer
+		for (int i = 0; i < OscillatorConstants::WAVE_TABLES_PER_WAVEFORM_COUNT; ++i)
+		{
+			for (int i = 0; i < OscillatorConstants::WAVETABLE_LENGTH; ++i)
+			{
+				s_sampleBuffer[i] = expSample((float)i / (float)OscillatorConstants::WAVETABLE_LENGTH);
+			}
+			fftwf_execute(s_fftPlan);
+			generateFromFFT(OscillatorConstants::MAX_FREQ / freqFromWaveTableBand(i), 0.2f, s_waveTables[WaveShapes::ExponentialWave][i]);
+		}
+	};
+
+#if !defined(__MINGW32__) && !defined(__MINGW64__)
+	std::thread sinThread(sinGen);
+	std::thread sawThread(sawGen);
+	std::thread squareThread(squareGen);
+	std::thread triangleThread(triangleGen);
+	std::thread fftThread(fftGen);
+	sinThread.join();
+	sawThread.join();
+	squareThread.join();
+	triangleThread.join();
+	fftThread.join();
+#else
+	sinGen();
+	sawGen();
+	squareGen();
+	triangleGen();
+	fftGen();
+#endif
 }
 
 
