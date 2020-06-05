@@ -60,6 +60,12 @@ public slots:
 protected:
 	void closeEvent(QCloseEvent *ce) override;
 
+private slots:
+	bool loadScaleFromFile();
+	bool loadKeymapFromFile();
+	bool saveScaleToFile();
+	bool saveKeymapToFile();
+
 private:
 	bool validateScaleForm();
 	bool validateKeymapForm();

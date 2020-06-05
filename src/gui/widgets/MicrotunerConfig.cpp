@@ -24,19 +24,23 @@
 
 #include "MicrotunerConfig.h"
 
+#include <QFile>
 #include <QGridLayout>
 #include <QLabel>
 #include <QMessageBox>
 #include <QPushButton>
 #include <QRegExp>
+#include <QTextStream>
 
 #include "ComboBox.h"
 #include "embed.h"
 #include "Engine.h"
+#include "FileDialog.h"
 #include "GuiApplication.h"
 #include "Knob.h"
 #include "LcdSpinBox.h"
 #include "lmms_constants.h"
+#include "lmmsversion.h"
 #include "MainWindow.h"
 #include "Song.h"
 
@@ -80,10 +84,12 @@ MicrotunerConfig::MicrotunerConfig() :
 	m_scaleNameEdit->setToolTip(tr("Scale description. Cannot start with \"!\" and cannot contain a newline character."));
 	microtunerLayout->addWidget(m_scaleNameEdit, 2, 0, 1, 2);
 
-	QPushButton *scaleLoadButton = new QPushButton(tr("Load"));
-	QPushButton *scaleSaveButton = new QPushButton(tr("Save"));
-	microtunerLayout->addWidget(scaleLoadButton, 3, 0, 1, 1);
-	microtunerLayout->addWidget(scaleSaveButton, 3, 1, 1, 1);
+	QPushButton *loadScaleButton = new QPushButton(tr("Load"));
+	QPushButton *saveScaleButton = new QPushButton(tr("Save"));
+	microtunerLayout->addWidget(loadScaleButton, 3, 0, 1, 1);
+	microtunerLayout->addWidget(saveScaleButton, 3, 1, 1, 1);
+	connect(loadScaleButton, &QPushButton::clicked, [=] {loadScaleFromFile();});
+	connect(saveScaleButton, &QPushButton::clicked, [=] {saveScaleToFile();});
 
 	m_scaleTextEdit = new QPlainTextEdit();
 	m_scaleTextEdit->setPlainText("100.0\n200.0\n300.0\n400.0\n500.0\n600.0\n700.0\n800.0\n900.0\n1000.0\n1100.0\n1200.0");
@@ -114,10 +120,12 @@ MicrotunerConfig::MicrotunerConfig() :
 	m_keymapNameEdit->setToolTip(tr("Keymap description. Cannot start with \"!\" and cannot contain a newline character."));
 	microtunerLayout->addWidget(m_keymapNameEdit, 2, 2, 1, 2);
 
-	QPushButton *keymapLoadButton = new QPushButton(tr("Load"));
-	QPushButton *keymapSaveButton = new QPushButton(tr("Save"));
-	microtunerLayout->addWidget(keymapLoadButton, 3, 2, 1, 1);
-	microtunerLayout->addWidget(keymapSaveButton, 3, 3, 1, 1);
+	QPushButton *loadKeymapButton = new QPushButton(tr("Load"));
+	QPushButton *saveKeymapButton = new QPushButton(tr("Save"));
+	microtunerLayout->addWidget(loadKeymapButton, 3, 2, 1, 1);
+	microtunerLayout->addWidget(saveKeymapButton, 3, 3, 1, 1);
+	connect(loadKeymapButton, &QPushButton::clicked, [=] {loadKeymapFromFile();});
+	connect(saveKeymapButton, &QPushButton::clicked, [=] {saveKeymapToFile();});
 
 	m_keymapTextEdit = new QPlainTextEdit();
 	m_keymapTextEdit->setPlainText("0\n1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11");
@@ -289,7 +297,7 @@ void MicrotunerConfig::updateKeymapForm()
 
 
 /**
- * \brief Validate the entered interval definitions
+ * \brief Validate the scale name and entered interval definitions
  * \return true if input is valid, false if problems were detected
  */
 bool MicrotunerConfig::validateScaleForm()
@@ -365,7 +373,10 @@ bool MicrotunerConfig::validateKeymapForm()
 }
 
 
-
+/**
+ * \brief Parse and apply the entered scale definition
+ * \return true if input is valid, false if problems were detected
+ */
 bool MicrotunerConfig::applyScale()
 {
 	if (!validateScaleForm()) {return false;};
@@ -405,6 +416,10 @@ bool MicrotunerConfig::applyScale()
 }
 
 
+/**
+ * \brief Parse and apply the entered keymap definition
+ * \return true if input is valid, false if problems were detected
+ */
 bool MicrotunerConfig::applyKeymap()
 {
 	if (!validateKeymapForm()) {return false;}
@@ -439,6 +454,174 @@ bool MicrotunerConfig::applyKeymap()
 
 	if (newKeymap->getDegree(newKeymap->getBaseKey()) == -1) {
 		QMessageBox::warning(this, tr("Invalid keymap"), "Base key is not mapped to any scale degree. No sound will be produced as there is no way to assign reference frequency to any note.");}
+
+	return true;
+}
+
+
+/**
+ * \brief Parse an .scl file and apply the loaded scale if it is valid
+ * \return true if input is valid, false if problems were detected
+ */
+bool MicrotunerConfig::loadScaleFromFile()
+{
+	QString fileName = FileDialog::getOpenFileName(this, tr("Open scale"), "", tr("Scala scale definition (*.scl)"));
+	if (fileName == "") {return false;}
+	QFile file(fileName);
+	if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+	{
+		QMessageBox::critical(this, tr("Scale load failure"), tr("Unable to open selected file."));
+		return false;
+	}
+	QTextStream stream(&file);
+	int i = -2, limit = 0;
+
+	m_scaleNameEdit->setText("");
+	m_scaleTextEdit->clear();
+	while (!stream.atEnd() && i < limit)
+	{
+		QString line = stream.readLine();
+		if (line != "" && line[0] == '!') {continue;}					// comment
+		switch(i) {
+			case -2:	m_scaleNameEdit->setText(line); break;			// first non-comment line = name or description
+			case -1:	limit = line.toInt(); break;					// second non-comment line = degree count
+			default:	m_scaleTextEdit->appendPlainText(line); break;	// all other lines = interval definitions
+		}
+		i++;
+	}
+
+	return applyScale();
+}
+
+
+/**
+ * \brief Parse a .kbm file and apply the loaded keymap if it is valid
+ * \return true if input is valid, false if problems were detected
+ */
+bool MicrotunerConfig::loadKeymapFromFile()
+{
+	QString fileName = FileDialog::getOpenFileName(this, tr("Open keymap"), "", tr("Scala keymap definition (*.kbm)"));
+	if (fileName == "") {return false;}
+	QFile file(fileName);
+	if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+	{
+		QMessageBox::critical(this, tr("Keymap load failure"), tr("Unable to open selected file."));
+		return false;
+	}
+	QTextStream stream(&file);
+	int i = -7, limit = 0;
+
+	m_keymapNameEdit->setText(QFileInfo(fileName).baseName());		// .kbm does not store description, use file name
+	m_keymapTextEdit->clear();
+
+	while (!stream.atEnd() && i < limit)
+	{
+		QString line = stream.readLine();
+		if (line != "" && line[0] == '!')
+		{
+			if (line.length() > 1 && line[1] == '!' && i == -7)		// LMMS extension: double "!" occuring before any
+			{														// value is loaded marks a description field.
+				m_keymapNameEdit->setText(line.mid(2));
+			}
+			continue;
+		}
+		switch(i) {
+			case -7:	limit = line.toInt(); break;						// first non-comment line = keymap size
+			case -6:	m_firstKeyModel.setValue(line.toInt()); break;		// second non-comment line = first key
+			case -5:	m_lastKeyModel.setValue(line.toInt()); break;		// third non-comment line = last key
+			case -4:	m_middleKeyModel.setValue(line.toInt()); break;		// fourth non-comment line = middle key
+			case -3:	m_baseKeyModel.setValue(line.toInt()); break;		// fifth non-comment line = base key
+			case -2:	m_baseFreqModel.setValue(line.toDouble()); break;	// sixth non-comment line = base freq
+			case -1:	break;	// ignored									// seventh non-comment line = octave degree
+			default:	m_keymapTextEdit->appendPlainText(line); break;		// all other lines = mapping definitions
+		}
+		i++;
+	}
+
+	return applyKeymap();
+}
+
+
+/**
+ * \brief Save currently entered scale definition as .scl file
+ * \return true if input is valid, false if problems were detected
+ */
+bool MicrotunerConfig::saveScaleToFile()
+{
+	if (!validateScaleForm()) {return false;}
+	QString fileName = FileDialog::getSaveFileName(this, tr("Save scale"), "", tr("Scala scale definition (*.scl)"));
+	if (fileName == "") {return false;}
+	if (QFileInfo(fileName).suffix() != "scl") {fileName = fileName + ".scl";}
+	QFile file(fileName);
+	if (!file.open(QIODevice::WriteOnly))
+	{
+		QMessageBox::critical(this, tr("Scale save failure"), tr("Unable to open selected file for writing."));
+		return false;
+	}
+	Song *song = Engine::getSong();
+	if (song == NULL) {return false;}
+
+	QTextStream stream(&file);
+	stream << "! " << QFileInfo(fileName).fileName() << "\n";
+	stream << "! Exported from LMMS " LMMS_VERSION "\n";
+	stream << "!\n";
+	stream << "! Scale description:\n";
+	stream << m_scaleNameEdit->text() << "\n";
+	stream << "!\n";
+	stream << "! Number of degrees:\n";
+	stream << song->getScale(m_scaleComboModel.value())->getIntervals().size() - 1 << "\n";
+	stream << "!\n";
+	stream << "! Intervals:\n";
+	stream << m_scaleTextEdit->toPlainText() << "\n";
+
+	return true;
+}
+
+
+/**
+ * \brief Save currently entered keymap definition as .kbm file
+ * \return true if input is valid, false if problems were detected
+ */
+bool MicrotunerConfig::saveKeymapToFile()
+{
+	if (!validateKeymapForm()) {return false;}
+	QString fileName = FileDialog::getSaveFileName(this, tr("Save keymap"), "", tr("Scala keymap definition (*.kbm)"));
+	if (fileName == "") {return false;}
+	if (QFileInfo(fileName).suffix() != "kbm") {fileName = fileName + ".kbm";}
+	QFile file(fileName);
+	if (!file.open(QIODevice::WriteOnly))
+	{
+		QMessageBox::critical(this, tr("Keymap save failure"), tr("Unable to open selected file for writing."));
+		return false;
+	}
+	Song *song = Engine::getSong();
+	if (song == NULL) {return false;}
+
+	QTextStream stream(&file);
+	stream << "! " << QFileInfo(fileName).fileName() << "\n";
+	stream << "! Exported from LMMS " LMMS_VERSION "\n";
+	stream << "!\n";
+	stream << "! Keymap description:\n";
+	stream << "!!" << m_keymapNameEdit->text() << "\n";
+	stream << "!\n";
+	stream << "! Keymap size:\n";
+	stream << song->getKeymap(m_keymapComboModel.value())->getMap().size() << "\n";
+	stream << "!\n";
+	stream << "! First key:\n";
+	stream << m_firstKeyModel.value() << "\n";
+	stream << "! Last key:\n";
+	stream << m_lastKeyModel.value() << "\n";
+	stream << "! Middle key:\n";
+	stream << m_middleKeyModel.value() << "\n";
+	stream << "! Base key:\n";
+	stream << m_baseKeyModel.value() << "\n";
+	stream << "! Base frequency:\n";
+	stream << m_baseFreqModel.value() << "\n";
+	stream << "! Octave degree:\n";		// NOTE: defined by currently selected scale!
+	stream << song->getScale(m_scaleComboModel.value())->getIntervals().size() - 1 << "\n";
+	stream << "!\n";
+	stream << "! Key mappings:\n";
+	stream << m_keymapTextEdit->toPlainText() << "\n";
 
 	return true;
 }
