@@ -314,7 +314,7 @@ void Oscillator::generateWaveTables()
 				s_sampleBuffer[i] = expSample((float)i / (float)OscillatorConstants::WAVETABLE_LENGTH);
 			}
 			fftwf_execute(s_fftPlan);
-			generateFromFFT(OscillatorConstants::MAX_FREQ / freqFromWaveTableBand(i), 0.2f, s_waveTables[WaveShapes::ExponentialWave][i]);
+			generateFromFFT(OscillatorConstants::MAX_FREQ / freqFromWaveTableBand(i), 0.001f, s_waveTables[WaveShapes::ExponentialWave][i]);
 		}
 	};
 
