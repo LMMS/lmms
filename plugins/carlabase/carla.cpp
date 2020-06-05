@@ -333,8 +333,14 @@ void CarlaInstrument::play(sampleFrame* workingBuffer)
     fTimeInfo.bbt.ticksPerBeat   = ticksPerBeat;
     fTimeInfo.bbt.beatsPerMinute = s->getTempo();
 
+#ifndef _MSC_VER
     float buf1[bufsize];
     float buf2[bufsize];
+#else
+    float *buf1 = static_cast<float *>(_alloca(bufsize * sizeof(float)));
+    float *buf2 = static_cast<float *>(_alloca(bufsize * sizeof(float)));
+#endif
+
     float* rBuf[] = { buf1, buf2 };
     std::memset(buf1, 0, sizeof(float)*bufsize);
     std::memset(buf2, 0, sizeof(float)*bufsize);
@@ -438,7 +444,8 @@ PluginView* CarlaInstrument::instantiateView(QWidget* parent)
 // Disable plugin focus per https://bugreports.qt.io/browse/QTBUG-30181
 #ifndef CARLA_OS_MAC
     if (QWidget* const window = parent->window())
-        fHost.uiParentId = window->winId();
+        // TODO: Remove cast; Only needed for Qt4
+        fHost.uiParentId = (uintptr_t)window->winId();
     else
 #endif
         fHost.uiParentId = 0;

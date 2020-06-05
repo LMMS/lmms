@@ -2,7 +2,7 @@
  * FadeButton.cpp - implementation of fade-button
  *
  * Copyright (c) 2005-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -21,7 +21,7 @@
  * Boston, MA 02110-1301 USA.
  *
  */
- 
+
 
 #include <QTimer>
 #include <QPainter>
@@ -75,6 +75,14 @@ void FadeButton::activate()
 
 
 
+void FadeButton::activateOnce()
+{
+	if (activeNotes == 0) { activate(); }
+}
+
+
+
+
 void FadeButton::noteEnd()
 {
 	if (activeNotes <= 0)
@@ -94,6 +102,7 @@ void FadeButton::noteEnd()
 
 	update();
 }
+
 
 
 
@@ -145,7 +154,7 @@ QColor FadeButton::fadeToColor(QColor startCol, QColor endCol, QTime timer, floa
 	QColor col;
 
 	const float state = 1 - timer.elapsed() / duration;
-	const int r = (int)(endCol.red() * (1.0f - state) 
+	const int r = (int)(endCol.red() * (1.0f - state)
 		+ startCol.red() * state);
 	const int g = (int)(endCol.green() * (1.0f - state)
 		+ startCol.green() * state);

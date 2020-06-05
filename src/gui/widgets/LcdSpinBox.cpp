@@ -23,6 +23,7 @@
  *
  */
 
+#include <cmath>
 #include <QApplication>
 #include <QLabel>
 #include <QMouseEvent>
@@ -40,8 +41,9 @@
 LcdSpinBox::LcdSpinBox( int numDigits, QWidget* parent, const QString& name ) :
 	LcdWidget( numDigits, parent, name ),
 	IntModelView( new IntModel( 0, 0, 0, NULL, name, true ), this ),
+	m_remainder( 0.f ),
 	m_mouseMoving( false ),
-	m_origMousePos(),
+	m_lastMousePos(),
 	m_displayOffset( 0 )
 {
 }
@@ -52,8 +54,9 @@ LcdSpinBox::LcdSpinBox( int numDigits, QWidget* parent, const QString& name ) :
 LcdSpinBox::LcdSpinBox( int numDigits, const QString& style, QWidget* parent, const QString& name ) :
 	LcdWidget( numDigits, parent, name ),
 	IntModelView( new IntModel( 0, 0, 0, NULL, name, true ), this ),
+	m_remainder( 0.f ),
 	m_mouseMoving( false ),
-	m_origMousePos(),
+	m_lastMousePos(),
 	m_displayOffset( 0 )
 {
 }
@@ -90,8 +93,7 @@ void LcdSpinBox::mousePressEvent( QMouseEvent* event )
 						event->y() < cellHeight() + 2  )
 	{
 		m_mouseMoving = true;
-		m_origMousePos = event->globalPos();
-		QApplication::setOverrideCursor( Qt::BlankCursor );
+		m_lastMousePos = event->globalPos();
 
 		AutomatableModel *thisModel = model();
 		if( thisModel )
@@ -113,15 +115,20 @@ void LcdSpinBox::mouseMoveEvent( QMouseEvent* event )
 {
 	if( m_mouseMoving )
 	{
-		int dy = event->globalY() - m_origMousePos.y();
-		if( gui->mainWindow()->isShiftPressed() )
-			dy = qBound( -4, dy/4, 4 );
-		if( dy > 1 || dy < -1 )
+		int dy = event->globalY() - m_lastMousePos.y();
+		if( dy )
 		{
-			model()->setInitValue( model()->value() -
-						dy / 2 * model()->step<int>() );
+			float fdy = static_cast<float>(dy);
+			if( event->modifiers() & Qt::ShiftModifier ) {
+				fdy = qBound( -4.f, fdy/4.f, 4.f );
+			}
+			float floatValNotRounded =
+				model()->value() + m_remainder - fdy / 2.f * model()->step<int>();
+			float floatValRounded = roundf( floatValNotRounded );
+			m_remainder = floatValNotRounded - floatValRounded;
+			model()->setInitValue( floatValRounded );
 			emit manualChange();
-			QCursor::setPos( m_origMousePos );
+			m_lastMousePos = event->globalPos();
 		}
 	}
 }
@@ -134,10 +141,7 @@ void LcdSpinBox::mouseReleaseEvent( QMouseEvent* )
 	if( m_mouseMoving )
 	{
 		model()->restoreJournallingState();
-
-		QCursor::setPos( m_origMousePos );
 		QApplication::restoreOverrideCursor();
-
 		m_mouseMoving = false;
 	}
 }
@@ -178,6 +182,4 @@ void LcdSpinBox::enterValue()
 		model()->setValue( new_val );
 	}
 }
-
-
 

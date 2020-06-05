@@ -585,20 +585,19 @@ void SampleTCOView::paintEvent( QPaintEvent * pe )
 
 
 
-SampleTrack::SampleTrack( TrackContainer* tc ) :
-	Track( Track::SampleTrack, tc ),
-	m_volumeModel( DefaultVolume, MinVolume, MaxVolume, 0.1f, this,
-							tr( "Volume" ) ),
-	m_panningModel( DefaultPanning, PanningLeft, PanningRight, 0.1f,
-					this, tr( "Panning" ) ),
-	m_effectChannelModel( 0, 0, 0, this, tr( "FX channel" ) ),
-	m_audioPort( tr( "Sample track" ), true, &m_volumeModel, &m_panningModel, &m_mutedModel )
+SampleTrack::SampleTrack(TrackContainer* tc) :
+	Track(Track::SampleTrack, tc),
+	m_volumeModel(DefaultVolume, MinVolume, MaxVolume, 0.1f, this, tr("Volume")),
+	m_panningModel(DefaultPanning, PanningLeft, PanningRight, 0.1f, this, tr("Panning")),
+	m_effectChannelModel(0, 0, 0, this, tr("FX channel")),
+	m_audioPort(tr("Sample track"), true, &m_volumeModel, &m_panningModel, &m_mutedModel),
+	m_isPlaying(false)
 {
-	setName( tr( "Sample track" ) );
-	m_panningModel.setCenterValue( DefaultPanning );
-	m_effectChannelModel.setRange( 0, Engine::fxMixer()->numChannels()-1, 1);
+	setName(tr("Sample track"));
+	m_panningModel.setCenterValue(DefaultPanning);
+	m_effectChannelModel.setRange(0, Engine::fxMixer()->numChannels()-1, 1);
 
-	connect( &m_effectChannelModel, SIGNAL( dataChanged() ), this, SLOT( updateEffectChannel() ) );
+	connect(&m_effectChannelModel, SIGNAL(dataChanged()), this, SLOT(updateEffectChannel()));
 }
 
 
@@ -622,6 +621,10 @@ bool SampleTrack::play( const MidiTime & _start, const fpp_t _frames,
 	::BBTrack * bb_track = NULL;
 	if( _tco_num >= 0 )
 	{
+		if (_start > getTCO(_tco_num)->length())
+		{
+			setPlaying(false);
+		}
 		if( _start != 0 )
 		{
 			return false;
@@ -630,10 +633,12 @@ bool SampleTrack::play( const MidiTime & _start, const fpp_t _frames,
 		if (trackContainer() == (TrackContainer*)Engine::getBBTrackContainer())
 		{
 			bb_track = BBTrack::findBBTrack( _tco_num );
+			setPlaying(true);
 		}
 	}
 	else
 	{
+		bool nowPlaying = false;
 		for( int i = 0; i < numOfTCOs(); ++i )
 		{
 			TrackContentObject * tco = getTCO( i );
@@ -657,6 +662,7 @@ bool SampleTrack::play( const MidiTime & _start, const fpp_t _frames,
 						sTco->setSamplePlayLength( samplePlayLength );
 						tcos.push_back( sTco );
 						sTco->setIsPlaying( true );
+						nowPlaying = true;
 					}
 				}
 			}
@@ -664,7 +670,9 @@ bool SampleTrack::play( const MidiTime & _start, const fpp_t _frames,
 			{
 				sTco->setIsPlaying( false );
 			}
+			nowPlaying = nowPlaying || sTco->isPlaying();
 		}
+		setPlaying(nowPlaying);
 	}
 
 	for( tcoVector::Iterator it = tcos.begin(); it != tcos.end(); ++it )
@@ -826,10 +834,29 @@ SampleTrackView::SampleTrackView( SampleTrack * _t, TrackContainerView* tcv ) :
 	m_panningKnob->setLabel( tr( "PAN" ) );
 	m_panningKnob->show();
 
+	m_activityIndicator = new FadeButton(
+		QApplication::palette().color(QPalette::Active, QPalette::Background),
+		QApplication::palette().color(QPalette::Active, QPalette::BrightText),
+		QApplication::palette().color(QPalette::Active, QPalette::BrightText).darker(),
+		getTrackSettingsWidget()
+	);
+	m_activityIndicator->setGeometry(settingsWidgetWidth - 2 * 24 - 11, 2, 8, 28);
+	m_activityIndicator->show();
+	connect(_t, SIGNAL(playingChanged()), this, SLOT(updateIndicator()));
+
 	setModel( _t );
 
 	m_window = new SampleTrackWindow(this);
 	m_window->toggleVisibility(false);
+}
+
+
+
+
+void SampleTrackView::updateIndicator()
+{
+	if (model()->isPlaying()) { m_activityIndicator->activateOnce(); }
+	else { m_activityIndicator->noteEnd(); }
 }
 
 

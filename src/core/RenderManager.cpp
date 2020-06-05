@@ -80,9 +80,9 @@ void RenderManager::renderNextTrack()
 		m_tracksToRender.pop_back();
 
 		// mute everything but the track we are about to render
-		for( auto it = m_unmuted.begin(); it != m_unmuted.end(); ++it )
+		for (auto track : m_unmuted)
 		{
-			(*it)->setMuted( (*it) != renderTrack );
+			track->setMuted(track != renderTrack);
 		}
 
 		// for multi-render, prefix each output file with a different number
@@ -182,7 +182,7 @@ QString RenderManager::pathForTrack(const Track *track, int num)
 {
 	QString extension = ProjectRenderer::getFileExtensionFromFormat( m_format );
 	QString name = track->name();
-	name = name.remove(QRegExp("[^a-zA-Z]"));
+	name = name.remove(QRegExp(FILENAME_FILTER));
 	name = QString( "%1_%2%3" ).arg( num ).arg( name ).arg( extension );
 	return QDir(m_outputPath).filePath(name);
 }

@@ -35,6 +35,7 @@
 #include <QLayout>
 #include <QMdiArea>
 #include <QPainter>
+#include <QPainterPath>
 #include <QScrollBar>
 #include <QStyleOption>
 #include <QToolTip>
@@ -96,6 +97,7 @@ AutomationEditor::AutomationEditor() :
 	m_y_delta( DEFAULT_Y_DELTA ),
 	m_y_auto( true ),
 	m_editMode( DRAW ),
+	m_mouseDownLeft(false),
 	m_mouseDownRight( false ),
 	m_scrollBack( false ),
 	m_barLineColor( 0, 0, 0 ),
@@ -539,6 +541,10 @@ void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 				++it;
 			}
 
+			if (mouseEvent->button() == Qt::LeftButton)
+			{
+				m_mouseDownLeft = true;
+			}
 			if( mouseEvent->button() == Qt::RightButton )
 			{
 				m_mouseDownRight = true;
@@ -555,6 +561,7 @@ void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 					drawLine( m_drawLastTick,
 							m_drawLastLevel,
 							pos_ticks, level );
+					m_mouseDownLeft = false;
 				}
 				m_drawLastTick = pos_ticks;
 				m_drawLastLevel = level;
@@ -657,6 +664,11 @@ void AutomationEditor::mouseReleaseEvent(QMouseEvent * mouseEvent )
 {
 	bool mustRepaint = false;
 
+	if (mouseEvent->button() == Qt::LeftButton)
+	{
+		m_mouseDownLeft = false;
+		mustRepaint = true;
+	}
 	if ( mouseEvent->button() == Qt::RightButton )
 	{
 		m_mouseDownRight = false;
@@ -742,7 +754,8 @@ void AutomationEditor::mouseMoveEvent(QMouseEvent * mouseEvent )
 
 		int pos_ticks = x * MidiTime::ticksPerBar() / m_ppb +
 							m_currentPosition;
-		if( mouseEvent->buttons() & Qt::LeftButton && m_editMode == DRAW )
+		// m_mouseDownLeft used to prevent drag when drawing line
+		if (m_mouseDownLeft && m_editMode == DRAW)
 		{
 			if( m_action == MOVE_VALUE )
 			{

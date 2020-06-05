@@ -46,6 +46,7 @@ public:
 
 public slots:
 	void activate();
+	void activateOnce();
 	void noteEnd();
 
 
