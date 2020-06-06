@@ -35,7 +35,6 @@ Keymap::Keymap() :
 	m_baseKey(DefaultBaseKey),
 	m_baseFreq(DefaultBaseFreq)
 {
-	m_map.push_back(-1);
 }
 
 
@@ -65,6 +64,7 @@ Keymap::Keymap(	QString description,
 int Keymap::getDegree(int key) const
 {
 	if (key < m_firstKey || key > m_lastKey) {return -1;}
+	if (m_map.size() == 0) {return key;}	// exception: empty mapping table means linear (1:1) mapping
 
 	const int keyOffset = key - m_middleKey;								// -127..127
 	const int key_rem = keyOffset % (int)m_map.size();						// remainder
@@ -80,7 +80,8 @@ int Keymap::getDegree(int key) const
  */
 int Keymap::getOctave(int key) const
 {
-	if (key < m_firstKey || key > m_lastKey || m_map[key] == -1) {return 0;}
+	// The keymap wraparound cannot cause an octave transition if a key isn't mapped or the map is empty → return 0
+	if (key < m_firstKey || key > m_lastKey || m_map.size() == 0 || m_map[key] == -1) {return 0;}
 
 	const int keyOffset = key - m_middleKey;
 	return keyOffset >= 0 ? keyOffset / (int)m_map.size() : (keyOffset + 1) / (int)m_map.size() - 1;
