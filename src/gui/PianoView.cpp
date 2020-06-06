@@ -47,9 +47,11 @@
 #include "Piano.h"
 #include "CaptionMenu.h"
 #include "embed.h"
+#include "Engine.h"
 #include "gui_templates.h"
 #include "InstrumentTrack.h"
 #include "Knob.h"
+#include "Song.h"
 #include "StringPairDrag.h"
 #include "MainWindow.h"
 
@@ -139,6 +141,8 @@ PianoView::PianoView( QWidget * _parent ) :
 	layout->addSpacing( PIANO_BASE+PW_WHITE_KEY_HEIGHT );
 	layout->addWidget( m_pianoScroll );
 
+	// trigger a redraw if keymap definitions change (different keys may become disabled)
+	connect(Engine::getSong(), SIGNAL(keymapListChanged(int)), this, SLOT(update()));
 }
 
 /*! \brief Map a keyboard key being pressed to a note in our keyboard view
@@ -297,6 +301,9 @@ void PianoView::modelChanged()
 		connect(m_piano->instrumentTrack()->baseNoteModel(), SIGNAL(dataChanged()), this, SLOT(update()));
 		connect(m_piano->instrumentTrack()->firstKeyModel(), SIGNAL(dataChanged()), this, SLOT(update()));
 		connect(m_piano->instrumentTrack()->lastKeyModel(), SIGNAL(dataChanged()), this, SLOT(update()));
+		connect(m_piano->instrumentTrack()->microtuner()->keymapModel(), SIGNAL(dataChanged()), this, SLOT(update()));
+		connect(m_piano->instrumentTrack()->microtuner()->keyRangeImportModel(), SIGNAL(dataChanged()),
+				this, SLOT(update()));
 	}
 }
 

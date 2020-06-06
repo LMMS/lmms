@@ -475,6 +475,9 @@ PianoRoll::PianoRoll() :
 			this, SLOT( selectRegionFromPixels( int, int ) ) );
 
 	m_stepRecorder.initialize();
+
+	// trigger a redraw if keymap definitions change (different keys may become disabled)
+	connect(Engine::getSong(), SIGNAL(keymapListChanged(int)), this, SLOT(update()));
 }
 
 
@@ -772,6 +775,10 @@ void PianoRoll::setCurrentPattern( Pattern* newPattern )
 	connect( m_pattern->instrumentTrack(), SIGNAL( midiNoteOn( const Note& ) ), this, SLOT( startRecordNote( const Note& ) ) );
 	connect( m_pattern->instrumentTrack(), SIGNAL( midiNoteOff( const Note& ) ), this, SLOT( finishRecordNote( const Note& ) ) );
 	connect( m_pattern->instrumentTrack()->pianoModel(), SIGNAL( dataChanged() ), this, SLOT( update() ) );
+
+	connect(m_pattern->instrumentTrack()->microtuner()->keymapModel(), SIGNAL(dataChanged()), this, SLOT(update()));
+	connect(m_pattern->instrumentTrack()->microtuner()->keyRangeImportModel(), SIGNAL(dataChanged()),
+				this, SLOT(update()));
 
 	update();
 	emit currentPatternChanged();
@@ -2912,7 +2919,7 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 		if (keys_processed == 0 && prKeyOrder[m_startKey % KeysPerOctave] == PR_BLACK_KEY)
 		{
 			// draw it!
-			if (m_pattern->instrumentTrack()->microtuner()->isKeyMapped(m_startKey))
+			if (hasValidPattern() && m_pattern->instrumentTrack()->microtuner()->isKeyMapped(m_startKey))
 			{
 				p.drawPixmap(PIANO_X, y - m_whiteKeySmallHeight, WHITE_KEY_WIDTH, m_whiteKeySmallHeight,
 								*s_whiteKeySmallPm);
@@ -2935,7 +2942,7 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 		if (prKeyOrder[key % KeysPerOctave] == PR_WHITE_KEY_SMALL)
 		{
 			// draw a small one while checking if it is pressed or not
-			if (m_pattern->instrumentTrack()->microtuner()->isKeyMapped(key))
+			if (hasValidPattern() && m_pattern->instrumentTrack()->microtuner()->isKeyMapped(key))
 			{
 				if (hasValidPattern() && m_pattern->instrumentTrack()->pianoModel()->isKeyPressed(key))
 				{
@@ -2961,7 +2968,7 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 		else if (prKeyOrder[key % KeysPerOctave] == PR_WHITE_KEY_BIG)
 		{
 			// draw a big one while checking if it is pressed or not
-			if (m_pattern->instrumentTrack()->microtuner()->isKeyMapped(key))
+			if (hasValidPattern() && m_pattern->instrumentTrack()->microtuner()->isKeyMapped(key))
 			{
 				if (hasValidPattern() && m_pattern->instrumentTrack()->pianoModel()->isKeyPressed(key))
 				{
@@ -3062,7 +3069,7 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 		    && prKeyOrder[(key - 1) % KeysPerOctave] == PR_BLACK_KEY)
 		{
 			// draw the black key!
-			if (m_pattern->instrumentTrack()->microtuner()->isKeyMapped(key))
+			if (hasValidPattern() && m_pattern->instrumentTrack()->microtuner()->isKeyMapped(key))
 			{
 				p.drawPixmap(PIANO_X, y - m_blackKeyHeight / 2, BLACK_KEY_WIDTH, m_blackKeyHeight,
 							 *s_blackKeyPm);
@@ -3086,7 +3093,7 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 			// then draw it (calculation of y very complicated,
 			// but that's the only working solution, sorry...)
 			// check if the key is pressed or not
-			if (m_pattern->instrumentTrack()->microtuner()->isKeyMapped(key))
+			if (hasValidPattern() && m_pattern->instrumentTrack()->microtuner()->isKeyMapped(key))
 			{
 				if (hasValidPattern() && m_pattern->instrumentTrack()->pianoModel()->isKeyPressed(key))
 				{

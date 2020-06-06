@@ -617,8 +617,8 @@ bool MicrotunerConfig::saveKeymapToFile()
 	stream << m_baseKeyModel.value() << "\n";
 	stream << "! Base frequency:\n";
 	stream << m_baseFreqModel.value() << "\n";
-	stream << "! Octave degree:\n";		// NOTE: defined by currently selected scale!
-	stream << song->getScale(m_scaleComboModel.value())->getIntervals().size() - 1 << "\n";
+	stream << "! Octave degree (always using the last scale degre):\n";
+	stream << "0\n";
 	stream << "!\n";
 	stream << "! Key mappings:\n";
 	stream << m_keymapTextEdit->toPlainText() << "\n";
