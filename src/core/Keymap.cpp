@@ -1,5 +1,5 @@
 /*
- * Keymap.cpp - implementation of scale class
+ * Keymap.cpp - implementation of keymap class
  *
  * Copyright (c) 2020 Martin Pavelek <he29.HS/at/gmail.com>
  *
@@ -67,7 +67,7 @@ int Keymap::getDegree(int key) const
 	if (m_map.size() == 0) {return key;}	// exception: empty mapping table means linear (1:1) mapping
 
 	const int keyOffset = key - m_middleKey;								// -127..127
-	const int key_rem = keyOffset % (int)m_map.size();						// remainder
+	const int key_rem = keyOffset % static_cast<int>(m_map.size());			// remainder
 	const int key_mod = key_rem >= 0 ? key_rem : key_rem + m_map.size();	// true modulo
 	return m_map[key_mod];
 }
@@ -81,10 +81,17 @@ int Keymap::getDegree(int key) const
 int Keymap::getOctave(int key) const
 {
 	// The keymap wraparound cannot cause an octave transition if a key isn't mapped or the map is empty → return 0
-	if (key < m_firstKey || key > m_lastKey || m_map.size() == 0 || m_map[key] == -1) {return 0;}
+	if (key < m_firstKey || key > m_lastKey || m_map.size() == 0 || getDegree(key) == -1) {return 0;}
 
 	const int keyOffset = key - m_middleKey;
-	return keyOffset >= 0 ? keyOffset / (int)m_map.size() : (keyOffset + 1) / (int)m_map.size() - 1;
+	if (keyOffset >= 0)
+	{
+		return keyOffset / static_cast<int>(m_map.size());
+	}
+	else
+	{
+		return (keyOffset + 1) / static_cast<int>(m_map.size()) - 1;
+	}
 }
 
 
@@ -110,13 +117,12 @@ void Keymap::saveSettings(QDomDocument &document, QDomElement &element)
 	element.setAttribute("base_key", m_baseKey);
 	element.setAttribute("base_freq", m_baseFreq);
 
-    for (int i = 0; i < m_map.size(); i++)
-    {
+	for (int i = 0; i < m_map.size(); i++)
+	{
 		QDomElement degree = document.createElement("degree");
 		element.appendChild(degree);
-        degree.setAttribute("value", m_map[i]);
-    }
-
+		degree.setAttribute("value", m_map[i]);
+	}
 }
 
 

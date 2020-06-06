@@ -3110,7 +3110,7 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 			}
 			else
 			{
-				p.drawPixmap(PIANO_X, y - (first_white_key_height -	m_whiteKeySmallHeight) -
+				p.drawPixmap(PIANO_X, y - (first_white_key_height - m_whiteKeySmallHeight) -
 							 m_whiteKeySmallHeight / 2 - 1 - m_blackKeyHeight,
 							 BLACK_KEY_WIDTH, m_blackKeyHeight, *s_blackKeyDisabledPm);
 			}

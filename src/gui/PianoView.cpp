@@ -849,13 +849,13 @@ void PianoView::paintEvent( QPaintEvent * )
 	p.setPen( Qt::white );
 
 	// Controls for first / last / base key models are shown only if microtuner or its key range import are disabled
-	if (!m_piano->instrumentTrack()->microtuner()->enabled() ||
-		!m_piano->instrumentTrack()->microtuner()->keyRangeImport())
+	if (m_piano != NULL && (!m_piano->instrumentTrack()->microtuner()->enabled() ||
+		!m_piano->instrumentTrack()->microtuner()->keyRangeImport()))
 	{
 		// Draw the base note marker and first / last note boundary markers
-		const int base_key = (m_piano != NULL) ? m_piano->instrumentTrack()->baseNoteModel()->value() : 0;
-		const int first_key = (m_piano != NULL) ? m_piano->instrumentTrack()->firstKeyModel()->value() : 0;
-		const int last_key = (m_piano != NULL) ? m_piano->instrumentTrack()->lastKeyModel()->value() : 0;
+		const int base_key = m_piano->instrumentTrack()->baseNoteModel()->value();
+		const int first_key = m_piano->instrumentTrack()->firstKeyModel()->value();
+		const int last_key = m_piano->instrumentTrack()->lastKeyModel()->value();
 		QColor marker_color = QApplication::palette().color(QPalette::Active, QPalette::BrightText);
 
 		// - prepare triangle shapes for start / end markers
@@ -884,7 +884,7 @@ void PianoView::paintEvent( QPaintEvent * )
 		}
 
 		// draw normal, pressed or disabled key, depending on state and position of current key
-		if (m_piano->instrumentTrack()->microtuner()->isKeyMapped(cur_key))
+		if (m_piano && m_piano->instrumentTrack()->microtuner()->isKeyMapped(cur_key))
 		{
 			if (m_piano && m_piano->isKeyPressed(cur_key))
 			{
@@ -918,7 +918,7 @@ void PianoView::paintEvent( QPaintEvent * )
 	int startKey = m_startKey;
 	if (startKey > 0 && Piano::isBlackKey((Keys)(--startKey)))
 	{
-		if (m_piano->instrumentTrack()->microtuner()->isKeyMapped(startKey))
+		if (m_piano && m_piano->instrumentTrack()->microtuner()->isKeyMapped(startKey))
 		{
 			if (m_piano && m_piano->isKeyPressed(startKey))
 			{
@@ -941,7 +941,7 @@ void PianoView::paintEvent( QPaintEvent * )
 		if (Piano::isBlackKey(cur_key))
 		{
 			// draw normal, pressed or disabled key, depending on state and position of current key
-			if (m_piano->instrumentTrack()->microtuner()->isKeyMapped(cur_key))
+			if (m_piano && m_piano->instrumentTrack()->microtuner()->isKeyMapped(cur_key))
 			{
 				if (m_piano && m_piano->isKeyPressed(cur_key))
 				{

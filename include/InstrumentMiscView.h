@@ -3,7 +3,7 @@
  *                        miscellaneous options not covered by other tabs
  *
  * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * Copyright (c) 2019 Martin Pavelek <he29.HS/at/gmail.com>
+ * Copyright (c) 2020 Martin Pavelek <he29.HS/at/gmail.com>
  *
  * This file is part of LMMS - https://lmms.io
  *

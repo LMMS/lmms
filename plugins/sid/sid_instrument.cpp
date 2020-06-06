@@ -353,8 +353,6 @@ void sidInstrument::playNote( NotePlayHandle * _n,
 		base = i*7;
 		// freq ( Fn = Fout / Fclk * 16777216 ) + coarse detuning
 		freq = _n->frequency();
-		// TODO: wtf does this even do o_O
-		// it apparently converts back to note (assuming 12TET), alters it and goes back? ....
 		note = 69.0 + 12.0 * log( freq / 440.0 ) / log( 2 );
 		note += m_voice[i]->m_coarseModel.value();
 		freq = 440.0 * pow( 2.0, (note-69.0)/12.0 );

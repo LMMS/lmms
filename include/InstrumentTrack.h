@@ -258,8 +258,6 @@ protected:
 
 protected slots:
 	void updateBaseNote();
-	void updateFirstNote();
-	void updateLastNote();
 	void updatePitch();
 	void updatePitchRange();
 	void updateEffectChannel();

@@ -51,7 +51,7 @@ const float F_E_R = (float) LD_E_R;
 
 
 // Microtuner
-const unsigned int MaxScaleCount = 10;	//!< number of scales per projects
+const unsigned int MaxScaleCount = 10;	//!< number of scales per project
 const unsigned int MaxKeymapCount = 10;	//!< number of keyboard mappings per project
 
 

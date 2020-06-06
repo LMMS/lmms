@@ -37,8 +37,8 @@ Scale::Scale(QString description, std::vector<Interval> intervals) :
 	m_description(description),
 	m_intervals(intervals)
 {
-
 }
+
 
 QString Scale::getDescription() const
 {

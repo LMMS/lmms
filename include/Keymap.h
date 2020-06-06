@@ -1,7 +1,7 @@
 /*
- * Keymap.h - holds information about a scale and its intervals
+ * Keymap.h - holds information about a key mapping
  *
- * Copyright (c) 2019 Martin Pavelek <he29.HS/at/gmail.com>
+ * Copyright (c) 2020 Martin Pavelek <he29.HS/at/gmail.com>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -59,8 +59,8 @@ public:
 	int getOctave(int key) const;
 	const std::vector<int> &getMap() const {return m_map;}
 
-    void saveSettings(QDomDocument &doc, QDomElement &element) override;
-    void loadSettings(const QDomElement &element) override;
+	void saveSettings(QDomDocument &doc, QDomElement &element) override;
+	void loadSettings(const QDomElement &element) override;
 	inline QString nodeName() const override {return "keymap";}
 
 private:

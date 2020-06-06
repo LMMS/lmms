@@ -454,7 +454,7 @@ bool MicrotunerConfig::applyKeymap()
 	song->setKeymap(m_keymapComboModel.value(), newKeymap);
 
 	if (newKeymap->getDegree(newKeymap->getBaseKey()) == -1) {
-		QMessageBox::warning(this, tr("Invalid keymap"), "Base key is not mapped to any scale degree. No sound will be produced as there is no way to assign reference frequency to any note.");}
+		QMessageBox::warning(this, tr("Invalid keymap"), tr("Base key is not mapped to any scale degree. No sound will be produced as there is no way to assign reference frequency to any note."));}
 
 	return true;
 }
@@ -642,7 +642,7 @@ void MicrotunerConfig::loadSettings(const QDomElement &element)
 
 void MicrotunerConfig::closeEvent(QCloseEvent *ce)
 {
-	if (parentWidget())	{parentWidget()->hide();}
+	if (parentWidget()) {parentWidget()->hide();}
 	else {hide();}
 	ce->ignore();
 }

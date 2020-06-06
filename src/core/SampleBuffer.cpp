@@ -652,8 +652,7 @@ bool SampleBuffer::play( sampleFrame * _ab, handleState * _state,
 
 	// The SampleBuffer can play a given sample with increased or decreased pitch. However, only
 	// samples that contain a tone that matches the default base note frequency of 440 Hz will
-	// produce the exact requested pitch, so specifying it as a parametr does not make much sense.
-	// TODO: Make m_frequency confgurable? Or let callers supply the ratio instead of frequency.
+	// produce the exact requested pitch in [Hz].
 	const double freq_factor = (double) _freq / (double) m_frequency *
 		m_sampleRate / Engine::mixer()->processingSampleRate();
 

@@ -32,7 +32,6 @@
 #include "InstrumentTrack.h"
 #include "Instrument.h"
 #include "Song.h"
-#include <iostream>
 
 NotePlayHandle::BaseDetuning::BaseDetuning( DetuningHelper *detuning ) :
 	m_value( detuning ? detuning->automationPattern()->valueAt( 0 ) : 0 )
@@ -520,9 +519,6 @@ void NotePlayHandle::updateFrequency()
 		m_frequency = DefaultBaseFreq * powf(2.0f, pitch + instrumentPitch / (100 * 12.0f));
 		m_unpitchedFrequency = DefaultBaseFreq * powf(2.0f, pitch);
 	}
-
-	// DEBUG
-	std::cout<<"key "<<key()<<" freq base: "<<m_unpitchedFrequency<<", pitches "<<detune<<" "<<instrumentPitch<<" "<<masterPitch<<", final freq "<<m_frequency<<std::endl;
 
 	for (NotePlayHandleList::Iterator it = m_subNotes.begin(); it != m_subNotes.end(); ++it)
 	{

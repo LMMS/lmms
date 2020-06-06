@@ -1,7 +1,7 @@
 /*
  * Microtuner.cpp - manage tuning and scale information of an instrument
  *
- * Copyright (c) 2019 Martin Pavelek <he29.HS/at/gmail.com>
+ * Copyright (c) 2020 Martin Pavelek <he29.HS/at/gmail.com>
  *
  * This file is part of LMMS - https://lmms.io
  *
