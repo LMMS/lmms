@@ -403,7 +403,9 @@ void PianoView::pianoScrolled( int _new_pos )
  */
 void PianoView::contextMenuEvent(QContextMenuEvent *me)
 {
-	if (me->pos().y() > PIANO_BASE || m_piano == NULL )
+	if (me->pos().y() > PIANO_BASE || m_piano == NULL ||
+		(m_piano->instrumentTrack()->microtuner()->enabled() &&
+		 m_piano->instrumentTrack()->microtuner()->keyRangeImport()))
 	{
 		QWidget::contextMenuEvent(me);
 		return;
@@ -487,7 +489,8 @@ void PianoView::mousePressEvent(QMouseEvent *me)
 
 			emit keyPressed(key_num);
 		}
-		else
+		else if (!m_piano->instrumentTrack()->microtuner()->enabled() ||
+				 !m_piano->instrumentTrack()->microtuner()->keyRangeImport())
 		{
 			// upper section, move or drag the base / first / last note marker
 			int base = m_piano->instrumentTrack()->baseNote();
@@ -518,6 +521,10 @@ void PianoView::mousePressEvent(QMouseEvent *me)
 				m_movedNoteModel->setInitValue(static_cast<float>(key_num));
 				emit baseNoteChanged();	// TODO: not actually used by anything?
 			}
+		}
+		else
+		{
+			m_movedNoteModel = NULL;
 		}
 
 		// and let the user see that he pressed a key... :)
@@ -841,25 +848,30 @@ void PianoView::paintEvent( QPaintEvent * )
 
 	p.setPen( Qt::white );
 
-	// Draw the base note marker and first / last note boundary markers
-	const int base_key = (m_piano != NULL) ? m_piano->instrumentTrack()->baseNoteModel()->value() : 0;
-	const int first_key = (m_piano != NULL) ? m_piano->instrumentTrack()->firstKeyModel()->value() : 0;
-	const int last_key = (m_piano != NULL) ? m_piano->instrumentTrack()->lastKeyModel()->value() : 0;
-	QColor marker_color = QApplication::palette().color(QPalette::Active, QPalette::BrightText);
+	// Controls for first / last / base key models are shown only if microtuner or its key range import are disabled
+	if (!m_piano->instrumentTrack()->microtuner()->enabled() ||
+		!m_piano->instrumentTrack()->microtuner()->keyRangeImport())
+	{
+		// Draw the base note marker and first / last note boundary markers
+		const int base_key = (m_piano != NULL) ? m_piano->instrumentTrack()->baseNoteModel()->value() : 0;
+		const int first_key = (m_piano != NULL) ? m_piano->instrumentTrack()->firstKeyModel()->value() : 0;
+		const int last_key = (m_piano != NULL) ? m_piano->instrumentTrack()->lastKeyModel()->value() : 0;
+		QColor marker_color = QApplication::palette().color(QPalette::Active, QPalette::BrightText);
 
-	// - prepare triangle shapes for start / end markers
-	QPainterPath first_marker(QPoint(getKeyX(first_key) + 1, 1));
-	first_marker.lineTo(getKeyX(first_key) + 1, PIANO_BASE);
-	first_marker.lineTo(getKeyX(first_key) + PIANO_BASE / 2 + 1, PIANO_BASE / 2);
+		// - prepare triangle shapes for start / end markers
+		QPainterPath first_marker(QPoint(getKeyX(first_key) + 1, 1));
+		first_marker.lineTo(getKeyX(first_key) + 1, PIANO_BASE);
+		first_marker.lineTo(getKeyX(first_key) + PIANO_BASE / 2 + 1, PIANO_BASE / 2);
 
-	QPainterPath last_marker(QPoint(getKeyX(last_key) + getKeyWidth(last_key), 1));
-	last_marker.lineTo(getKeyX(last_key) + getKeyWidth(last_key), PIANO_BASE);
-	last_marker.lineTo(getKeyX(last_key) + getKeyWidth(last_key) - PIANO_BASE / 2, PIANO_BASE / 2);
+		QPainterPath last_marker(QPoint(getKeyX(last_key) + getKeyWidth(last_key), 1));
+		last_marker.lineTo(getKeyX(last_key) + getKeyWidth(last_key), PIANO_BASE);
+		last_marker.lineTo(getKeyX(last_key) + getKeyWidth(last_key) - PIANO_BASE / 2, PIANO_BASE / 2);
 
-	// - fill all markers
-	p.fillRect(QRect(getKeyX(base_key), 1, getKeyWidth(base_key) - 1, PIANO_BASE - 2), marker_color);
-	p.fillPath(first_marker, marker_color);
-	p.fillPath(last_marker, marker_color);
+		// - fill all markers
+		p.fillRect(QRect(getKeyX(base_key), 1, getKeyWidth(base_key) - 1, PIANO_BASE - 2), marker_color);
+		p.fillPath(first_marker, marker_color);
+		p.fillPath(last_marker, marker_color);
+	}
 
 	int cur_key = m_startKey;
 

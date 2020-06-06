@@ -1610,6 +1610,16 @@ void InstrumentTrackWindow::modelChanged()
 		m_pitchRangeLabel->hide();
 	}
 
+	if (m_track->instrument() && m_track->instrument()->flags().testFlag(Instrument::IsMidiBased))
+	{
+		m_miscView->microtunerGroupBox()->hide();
+		m_track->m_microtuner.enabledModel()->setValue(false);
+	}
+	else
+	{
+		m_miscView->microtunerGroupBox()->show();
+	}
+
 	m_ssView->setModel( &m_track->m_soundShaping );
 	m_noteStackingView->setModel( &m_track->m_noteStacking );
 	m_arpeggioView->setModel( &m_track->m_arpeggio );

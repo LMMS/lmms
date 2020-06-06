@@ -94,6 +94,7 @@ MicrotunerConfig::MicrotunerConfig() :
 	m_scaleTextEdit = new QPlainTextEdit();
 	m_scaleTextEdit->setPlainText("100.0\n200.0\n300.0\n400.0\n500.0\n600.0\n700.0\n800.0\n900.0\n1000.0\n1100.0\n1200.0");
 	m_scaleTextEdit->setToolTip(tr("Enter intervals on separate lines. Numbers containing a decimal point are treated as cents.\nOther inputs are treated as integer ratios and must be in the form of \'a/b\' or \'a\'.\nUnity (0.0 cents or ratio 1/1) is always present as a hidden first value; do not enter it manually."));
+	m_scaleTextEdit->setFixedHeight(240);	// QTextEdit refuses to expand and must therefore use fixed size :(
 	microtunerLayout->addWidget(m_scaleTextEdit, 4, 0, 2, 2, Qt::AlignLeft | Qt::AlignTop);
 
 	QPushButton *applyScaleButton = new QPushButton(tr("Apply scale"));
@@ -185,7 +186,7 @@ MicrotunerConfig::MicrotunerConfig() :
 
 	subWin->setAttribute(Qt::WA_DeleteOnClose, false);
 	subWin->setFixedWidth(300);
-	subWin->setMinimumHeight(300);
+	subWin->setFixedHeight(380);
 	subWin->hide();
 
 	// No maximize button
