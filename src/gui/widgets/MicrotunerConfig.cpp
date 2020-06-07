@@ -444,13 +444,15 @@ bool MicrotunerConfig::applyKeymap()
 	Song *song = Engine::getSong();
 	if (song == NULL) {return false;}
 
-	auto newKeymap = std::make_shared<Keymap>(m_keymapNameEdit->text(),
-											  newMap,
-											  m_firstKeyModel.value(),
-											  m_lastKeyModel.value(),
-											  m_middleKeyModel.value(),
-											  m_baseKeyModel.value(),
-											  m_baseFreqModel.value());
+	auto newKeymap = std::make_shared<Keymap>(
+		m_keymapNameEdit->text(),
+		newMap,
+		m_firstKeyModel.value(),
+		m_lastKeyModel.value(),
+		m_middleKeyModel.value(),
+		m_baseKeyModel.value(),
+		m_baseFreqModel.value()
+	);
 	song->setKeymap(m_keymapComboModel.value(), newKeymap);
 
 	if (newKeymap->getDegree(newKeymap->getBaseKey()) == -1) {

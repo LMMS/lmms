@@ -3555,10 +3555,12 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 // responsible for moving/resizing scrollbars after window-resizing
 void PianoRoll::resizeEvent(QResizeEvent* re)
 {
-	m_leftRightScroll->setGeometry(WHITE_KEY_WIDTH,
-								   height() - SCROLLBAR_SIZE,
-								   width() - WHITE_KEY_WIDTH,
-								   SCROLLBAR_SIZE);
+	m_leftRightScroll->setGeometry(
+		WHITE_KEY_WIDTH,
+		height() - SCROLLBAR_SIZE,
+		width() - WHITE_KEY_WIDTH,
+		SCROLLBAR_SIZE
+	);
 	updateYScroll();
 
 	Engine::getSong()->getPlayPos(Song::Mode_PlayPattern).m_timeLine->setFixedWidth(width());
