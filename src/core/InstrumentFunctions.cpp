@@ -302,7 +302,7 @@ InstrumentFunctionArpeggio::InstrumentFunctionArpeggio( Model * _parent ) :
 	m_arpEnabledModel( false ),
 	m_arpModel( this, tr( "Arpeggio type" ) ),
 	m_arpRangeModel( 1.0f, 1.0f, 9.0f, 1.0f, this, tr( "Arpeggio range" ) ),
-	m_arpCycleModel( 0.0f, 0.0f, 1.0f, 1.0f, this, tr( "Cycle steps" ) ),
+	m_arpCycleModel( 0.0f, 0.0f, 6.0f, 1.0f, this, tr( "Cycle steps" ) ),
 	m_arpSkipModel( 0.0f, 0.0f, 100.0f, 1.0f, this, tr( "Skip rate" ) ),
 	m_arpMissModel( 0.0f, 0.0f, 100.0f, 1.0f, this, tr( "Miss rate" ) ),
 	m_arpFloorModel( 0.0f, 0.0f, 1.0f, 1.0f, this, tr( "Floor" ) ),
@@ -365,7 +365,7 @@ void InstrumentFunctionArpeggio::updateNoteRange()
 	const int cur_chord_size = chord_table[m_arpModel.value()].size();
 	float noteRange = m_arpRangeModel.value() * cur_chord_size;
 
-	m_arpCycleModel.setRange( 0.0f, qMax( 0.0f, noteRange - 1.0f ) );
+	m_arpCycleModel.setRange( 0.0f, qMax( 6.0f, noteRange - 1.0f ) );
 	m_arpFloorModel.setRange( 0.0f, qMax( 0.0f, noteRange - 1.0f ) );
 	m_arpCeilModel.setRange( 0.0f, qMax( 0.0f, noteRange - 1.0f ) );
 
