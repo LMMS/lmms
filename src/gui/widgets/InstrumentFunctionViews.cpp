@@ -133,14 +133,10 @@ InstrumentFunctionArpeggioView::InstrumentFunctionArpeggioView( InstrumentFuncti
 
 	m_arpFloorKnob->setLabel( tr( "FLOOR" ) );
 	m_arpFloorKnob->setHintText( tr( "Bottom note clamp:" ) + " ", " " );
-	m_arpFloorKnob->setWhatsThis(
-		tr( "Note gets stuck on same bottom key when they go below this amount of steps.") );
 
 
 	m_arpCeilKnob->setLabel( tr( "CEIL" ) );
 	m_arpCeilKnob->setHintText( tr( "Top note clamp:" ) + " ", " " );
-	m_arpCeilKnob->setWhatsThis(
-		tr( "Note gets stuck on same top-key after this amount of steps.") );
 
 
 	m_arpTimeKnob->setLabel( tr( "TIME" ) );
