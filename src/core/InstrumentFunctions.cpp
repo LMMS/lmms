@@ -605,7 +605,17 @@ void InstrumentFunctionArpeggio::loadSettings( const QDomElement & _this )
 	m_arpSkipModel.loadSettings( _this, "arpskip" );
 	m_arpMissModel.loadSettings( _this, "arpmiss" );
 	m_arpFloorModel.loadSettings( _this, "arpfloor" );
-	m_arpCeilModel.loadSettings( _this, "arpceiling" );
+
+	// make older projects work with ceiling
+	if( ! _this.hasAttribute( "arpceiling" ) )
+	{
+		m_arpCeilModel.setValue( m_arpCeilModel.maxValue() );
+	}
+	else
+	{
+		m_arpCeilModel.loadSettings( _this, "arpceiling" );
+	}
+
 	m_arpTimeModel.loadSettings( _this, "arptime" );
 	m_arpGateModel.loadSettings( _this, "arpgate" );
 	m_arpDirectionModel.loadSettings( _this, "arpdir" );
