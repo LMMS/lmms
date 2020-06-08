@@ -691,7 +691,7 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	}
 	else
 	{
-		m_assignableMidiDevices->addItem("yes");
+		m_assignableMidiDevices->addItem("all");
 	}
 	int current = m_assignableMidiDevices->findText(ConfigManager::inst()->value("midi", "midiautoassign"));
 	if (current >= 0)
