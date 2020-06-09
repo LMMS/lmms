@@ -148,7 +148,7 @@ public:
 	template<class T>
 	inline T value( int frameOffset = 0 ) const
 	{
-		if( unlikely( hasLinkedModels() || m_controllerConnection != NULL ) )
+		if( Q_UNLIKELY( hasLinkedModels() || m_controllerConnection != NULL ) )
 		{
 			return castValue<T>( controllerValue( frameOffset ) );
 		}
