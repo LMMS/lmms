@@ -2,7 +2,7 @@
 
 set -e
 
-PACKAGES="cmake pkg-config libogg libvorbis lame libsndfile libsamplerate jack sdl libgig libsoundio stk fluid-synth portaudio node fltk qt carla"
+PACKAGES="cmake pkg-config libogg libvorbis lame libsndfile libsamplerate lilv lv2 jack sdl libgig libsoundio stk fluid-synth portaudio node fltk qt carla"
 
 if "${TRAVIS}"; then
    PACKAGES="$PACKAGES ccache"
