@@ -86,7 +86,7 @@ public slots:
 	void removeSteps();
 	void addSampleTrack();
 	void addAutomationTrack();
-	void cloneBBTrackPattern();
+	void clonePattern();
 
 protected slots:
 	void dropEvent(QDropEvent * de ) override;
