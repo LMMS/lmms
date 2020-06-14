@@ -717,7 +717,7 @@ void TrackContentObjectView::mousePressEvent( QMouseEvent * me )
 
 		setInitialMousePos( me->pos() );
 
-		if( me->x() < width() - RESIZE_GRIP_WIDTH )
+		if( m_tco->getAutoResize() || me->x() < width() - RESIZE_GRIP_WIDTH )
 		{
 			m_action = Move;
 			setCursor( Qt::SizeAllCursor );
@@ -738,7 +738,7 @@ void TrackContentObjectView::mousePressEvent( QMouseEvent * me )
 							MidiTime::ticksPerTact() ) );
 			s_textFloat->moveGlobal( this, QPoint( width() + 2, height() + 2 ) );
 		}
-		else if( !m_tco->getAutoResize() )
+		else
 		{
 			m_action = Resize;
 			setCursor( Qt::SizeHorCursor );
