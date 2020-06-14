@@ -41,6 +41,7 @@
 #include <QCursor>
 #include <QKeyEvent>
 #include <QPainter>
+#include <QPainterPath>
 #include <QVBoxLayout>
 
 #include "PianoView.h"
