@@ -38,13 +38,15 @@ Keymap::Keymap() :
 }
 
 
-Keymap::Keymap(	QString description,
-				std::vector<int> newMap,
-				int newFirst,
-				int newLast,
-				int newMiddle,
-				int newBaseKey,
-				float newBaseFreq) :
+Keymap::Keymap(
+	QString description,
+	std::vector<int> newMap,
+	int newFirst,
+	int newLast,
+	int newMiddle,
+	int newBaseKey,
+	float newBaseFreq
+) :
 	m_description(description),
 	m_map(newMap),
 	m_firstKey(newFirst),
