@@ -178,6 +178,7 @@ protected:
 	void resizeEvent( QResizeEvent * re ) override;
 	void wheelEvent( QWheelEvent * we ) override;
 	void focusOutEvent( QFocusEvent * ) override;
+	void focusInEvent( QFocusEvent * ) override;
 
 	int getKey( int y ) const;
 	void drawNoteRect( QPainter & p, int x, int y,
