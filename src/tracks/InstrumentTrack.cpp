@@ -97,6 +97,7 @@ InstrumentTrack::InstrumentTrack( TrackContainer* tc ) :
 	m_sustainPedalPressed( false ),
 	m_silentBuffersProcessed( false ),
 	m_previewMode( false ),
+	m_hasAutoMidiDev( false ),
 	m_baseNoteModel( 0, 0, KeysPerOctave * NumOctaves - 1, this,
 							tr( "Base note" ) ),
 	m_volumeModel( DefaultVolume, MinVolume, MaxVolume, 0.1f, this, tr( "Volume" ) ),
@@ -149,6 +150,13 @@ int InstrumentTrack::baseNote() const
 
 InstrumentTrack::~InstrumentTrack()
 {
+	// De-assign midi device
+	if (m_hasAutoMidiDev)
+	{
+		autoAssignMidiDevice(false);
+		s_autoAssignedTrack = NULL;
+	}
+	
 	// kill all running notes and the iph
 	silenceAllNotes( true );
 
@@ -766,7 +774,13 @@ void InstrumentTrack::saveTrackSpecificSettings( QDomDocument& doc, QDomElement 
 	if (Engine::getSong()->isSavingProject()
 		&& !Engine::getSong()->getSaveOptions().discardMIDIConnections.value())
 	{
+		// Don't save auto assigned midi device connection
+		bool hasAuto = m_hasAutoMidiDev;
+		autoAssignMidiDevice(false);
+
 		m_midiPort.saveState( doc, thisElement );
+
+		autoAssignMidiDevice(hasAuto);
 	}
 
 	m_audioPort.effects()->saveState( doc, thisElement );
@@ -913,6 +927,38 @@ Instrument * InstrumentTrack::loadInstrument(const QString & _plugin_name,
 }
 
 
+
+InstrumentTrack *InstrumentTrack::s_autoAssignedTrack = NULL;
+
+/*! \brief Automatically assign a midi controller to this track, based on the midiautoassign setting
+ *
+ *  \param assign set to true to connect the midi device, set to false to disconnect
+ */
+void InstrumentTrack::autoAssignMidiDevice(bool assign)
+{
+	if (assign)
+	{
+		if (s_autoAssignedTrack)
+		{
+			s_autoAssignedTrack->autoAssignMidiDevice(false);
+		}
+		s_autoAssignedTrack = this;
+	}
+
+	const QString &device = ConfigManager::inst()->value("midi", "midiautoassign");
+	if ( Engine::mixer()->midiClient()->isRaw() && device != "none" )
+	{
+		m_midiPort.setReadable( assign );
+		return;
+	}
+
+	// Check if the device exists
+	if ( Engine::mixer()->midiClient()->readablePorts().indexOf(device) >= 0 )
+	{
+		m_midiPort.subscribeReadablePort(device, assign);
+		m_hasAutoMidiDev = assign;
+	}
+}
 
 
 
