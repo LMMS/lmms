@@ -64,12 +64,6 @@
 #include "TimeLineWidget.h"
 #include "StepRecorderWidget.h"
 
-//for random
-#include <time.h>
-//for debug
-#include <QtTest/QTest>
-#include <QDebug>
-
 using std::move;
 
 typedef AutomationPattern::timeMap timeMap;
