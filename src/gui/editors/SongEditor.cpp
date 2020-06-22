@@ -55,7 +55,7 @@
 positionLine::positionLine( QWidget * parent ) :
 	QWidget( parent )
 {
-	setFixedWidth( 1 );
+	setFixedWidth( 8 );
 	setAttribute( Qt::WA_NoSystemBackground, true );
 }
 
@@ -65,7 +65,15 @@ positionLine::positionLine( QWidget * parent ) :
 void positionLine::paintEvent( QPaintEvent * pe )
 {
 	QPainter p( this );
-	p.fillRect( rect(), QColor( 255, 255, 255, 153 ) );
+	
+	// Create the gradient trail behind the line
+	QLinearGradient gradient(rect().bottomLeft(), rect().bottomRight());
+	gradient.setColorAt(0, QColor (255, 255, 255, 0) );
+	gradient.setColorAt(0.875, QColor (255, 255, 255, 60) );
+	gradient.setColorAt(1, QColor (255, 255, 255, 153) );
+	
+	// Fill line
+	p.fillRect( rect(), gradient );
 }
 
 const QVector<double> SongEditor::m_zoomLevels =
@@ -808,7 +816,7 @@ void SongEditor::updatePosition( const MidiTime & t )
 	if( x >= trackOpWidth + widgetWidth -1 )
 	{
 		m_positionLine->show();
-		m_positionLine->move( x, m_timeLine->height() );
+		m_positionLine->move( x-7, m_timeLine->height() );
 	}
 	else
 	{
