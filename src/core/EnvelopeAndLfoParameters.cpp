@@ -34,8 +34,6 @@
 extern const float SECS_PER_ENV_SEGMENT = 5.0f;
 // how long should be one LFO-oscillation maximal?
 extern const float SECS_PER_LFO_OSCILLATION = 20.0f;
-// minimum number of frames for ENV/LFO stages that mustn't be '0'
-const f_cnt_t minimumFrames = 1;
 
 
 EnvelopeAndLfoParameters::LfoInstances * EnvelopeAndLfoParameters::s_lfoInstances = NULL;
@@ -59,8 +57,7 @@ void EnvelopeAndLfoParameters::LfoInstances::trigger()
 void EnvelopeAndLfoParameters::LfoInstances::reset()
 {
 	QMutexLocker m( &m_lfoListMutex );
-	for( LfoList::Iterator it = m_lfos.begin();
-							it != m_lfos.end(); ++it )
+	for( LfoList::Iterator it = m_lfos.begin(); it != m_lfos.end(); ++it )
 	{
 		( *it )->m_lfoFrame = 0;
 		( *it )->m_bad_lfoShapeData = true;
@@ -89,17 +86,20 @@ void EnvelopeAndLfoParameters::LfoInstances::remove( EnvelopeAndLfoParameters * 
 
 
 EnvelopeAndLfoParameters::EnvelopeAndLfoParameters(
-					float _value_for_zero_amount,
-							Model * _parent ) :
-	Model( _parent ),
+    float _value_for_zero_amount,
+    Model * _parent ) :    
+    Model( _parent ),
 	m_used( false ),
+    
+ 
+//  m_predelayModel( val, min, max, incr,  this, tr( ">info<" ) )   
 	m_predelayModel( 0.0, 0.0, 2.0, 0.001, this, tr( "Env pre-delay" ) ),
 	m_attackModel( 0.025, 0.0, 2.0, 0.001, this, tr( "Env attack" ) ),
 	m_holdModel( 0.0, 0.0, 2.0, 0.001,     this, tr( "Env hold" ) ),
 	m_decayModel( 0.6, 0.0, 2.0, 0.001,    this, tr( "Env decay" ) ),
 	m_sustainModel( 0.0, 0.0, 1.0, 0.001,  this, tr( "Env sustain" ) ),
 	m_releaseModel( 0.2, 0.0, 2.0, 0.001,  this, tr( "Env release" ) ),
-	m_amountModel( 1.0, -1.0, 1.0, 0.005,  this, tr( "Env mod amount" ) ),
+	m_amountModel( 1.0, -1.0, 1.0, 0.005,  this, tr( "Env mod amount" ) ), //AMP 
 	m_valueForZeroAmount( _value_for_zero_amount ),
 	m_pahdFrames( 0 ),
 	m_rFrames( 0 ),
@@ -107,15 +107,15 @@ EnvelopeAndLfoParameters::EnvelopeAndLfoParameters(
 	m_rEnv( NULL ),
 	m_pahdBufSize( 0 ),
 	m_rBufSize( 0 ),
-	m_lfoPredelayModel( 0.0, 0.0, 1.0, 0.001, this, tr( "LFO pre-delay" ) ),
-	m_lfoAttackModel( 0.0, 0.0, 1.0, 0.001, this, tr( "LFO attack" ) ),
+	m_lfoPredelayModel( 0.0, 0.0, 1.0, 0.001, this, tr( "LFO Predelay" ) ),
+	m_lfoAttackModel( 0.0, 0.0, 1.0, 0.001, this, tr( "LFO Attack" ) ),
 	m_lfoSpeedModel( 0.1, 0.001, 1.0, 0.0001,
-				SECS_PER_LFO_OSCILLATION * 1000.0, this,
-							tr( "LFO frequency" ) ),
-	m_lfoAmountModel( 0.0, -1.0, 1.0, 0.005, this, tr( "LFO mod amount" ) ),
-	m_lfoWaveModel( SineWave, 0, NumLfoShapes, this, tr( "LFO wave shape" ) ),
-	m_x100Model( false, this, tr( "LFO frequency x 100" ) ),
-	m_controlEnvAmountModel( false, this, tr( "Modulate env amount" ) ),
+	SECS_PER_LFO_OSCILLATION * 1000.0, this,
+	tr( "LFO speed" ) ),
+	m_lfoAmountModel( 0.0, -1.0, 1.0, 0.005, this, tr( "LFO Modulation" ) ),
+	m_lfoWaveModel( SineWave, 0, NumLfoShapes, this, tr( "LFO Wave Shape" ) ),
+	m_x100Model( false, this, tr( "Freq x 100" ) ),
+	m_controlEnvAmountModel( false, this, tr( "Modulate Env-Amount" ) ),
 	m_lfoFrame( 0 ),
 	m_lfoAmountIsZero( false ),
 	m_lfoShapeData( NULL )
@@ -144,7 +144,6 @@ EnvelopeAndLfoParameters::EnvelopeAndLfoParameters(
 			this, SLOT( updateSampleVars() ), Qt::DirectConnection );
 	connect( &m_amountModel, SIGNAL( dataChanged() ),
 			this, SLOT( updateSampleVars() ), Qt::DirectConnection );
-
 	connect( &m_lfoPredelayModel, SIGNAL( dataChanged() ),
 			this, SLOT( updateSampleVars() ), Qt::DirectConnection );
 	connect( &m_lfoAttackModel, SIGNAL( dataChanged() ),
@@ -157,7 +156,6 @@ EnvelopeAndLfoParameters::EnvelopeAndLfoParameters(
 			this, SLOT( updateSampleVars() ), Qt::DirectConnection );
 	connect( &m_x100Model, SIGNAL( dataChanged() ),
 			this, SLOT( updateSampleVars() ), Qt::DirectConnection );
-
 	connect( Engine::mixer(), SIGNAL( sampleRateChanged() ),
 				this, SLOT( updateSampleVars() ) );
 
@@ -274,7 +272,7 @@ inline void EnvelopeAndLfoParameters::fillLfoLevel( float * _buf,
 	}
 
 	fpp_t offset = 0;
-	const float lafI = 1.0f / qMax( minimumFrames, m_lfoAttackFrames );
+	const float lafI = 1.0f / m_lfoAttackFrames;
 	for( ; offset < _frames && _frame < m_lfoAttackFrames; ++offset,
 								++_frame )
 	{
@@ -380,11 +378,21 @@ void EnvelopeAndLfoParameters::loadSettings( const QDomElement & _this )
 /*	 ### TODO:
 	Old reversed sustain kept for backward compatibility
 	with 4.15 file format*/
+
 	if( _this.hasAttribute( "sus" ) )
 	{
 		m_sustainModel.loadSettings( _this, "sus" );
 		m_sustainModel.setValue( 1.0 - m_sustainModel.value() );
 	}
+
+	// ### TODO:
+/*	// Keep compatibility with version 2.1 file format
+	if( _this.hasAttribute( "lfosyncmode" ) )
+	{
+		m_lfoSpeedKnob->setSyncMode(
+		( TempoSyncKnob::TtempoSyncMode ) _this.attribute(
+						"lfosyncmode" ).toInt() );
+	}*/
 
 	m_userWave.setAudioFile( _this.attribute( "userwavefile" ) );
 
@@ -400,23 +408,20 @@ void EnvelopeAndLfoParameters::updateSampleVars()
 
 	const float frames_per_env_seg = SECS_PER_ENV_SEGMENT *
 				Engine::mixer()->processingSampleRate();
-
 	// TODO: Remove the expKnobVals, time should be linear
 	const f_cnt_t predelay_frames = static_cast<f_cnt_t>(
 							frames_per_env_seg *
 					expKnobVal( m_predelayModel.value() ) );
 
-	const f_cnt_t attack_frames = qMax( minimumFrames,
-					static_cast<f_cnt_t>( frames_per_env_seg *
-					expKnobVal( m_attackModel.value() ) ) );
+	const f_cnt_t attack_frames = static_cast<f_cnt_t>( frames_per_env_seg *
+					expKnobVal( m_attackModel.value() ) );
 
 	const f_cnt_t hold_frames = static_cast<f_cnt_t>( frames_per_env_seg *
 					expKnobVal( m_holdModel.value() ) );
 
-	const f_cnt_t decay_frames = qMax( minimumFrames,
-					static_cast<f_cnt_t>( frames_per_env_seg *
+	const f_cnt_t decay_frames = static_cast<f_cnt_t>( frames_per_env_seg *
 					expKnobVal( m_decayModel.value() *
-					( 1 - m_sustainModel.value() ) ) ) );
+						( 1 - m_sustainModel.value() ) ) );
 
 	m_sustainLevel = m_sustainModel.value();
 	m_amount = m_amountModel.value();
@@ -433,11 +438,10 @@ void EnvelopeAndLfoParameters::updateSampleVars()
 								decay_frames;
 	m_rFrames = static_cast<f_cnt_t>( frames_per_env_seg *
 					expKnobVal( m_releaseModel.value() ) );
-	m_rFrames = qMax( minimumFrames, m_rFrames );
 
 	if( static_cast<int>( floorf( m_amount * 1000.0f ) ) == 0 )
 	{
-		m_rFrames = minimumFrames;
+		m_rFrames = 0;
 	}
 
 	// if the buffers are too small, make bigger ones - so we only alloc new memory when necessary
