@@ -28,6 +28,7 @@
 #define SONG_EDITOR_H
 
 #include <QVector>
+#include <QLinearGradient>
 
 #include "ActionGroup.h"
 #include "Editor.h"
@@ -45,13 +46,27 @@ class Song;
 class TextFloat;
 class TimeLineWidget;
 
+Q_DECLARE_METATYPE(QLinearGradient)
+
 class positionLine : public QWidget
 {
+	Q_OBJECT
+	Q_PROPERTY( bool tailGradient READ tailGradient WRITE setTailGradient )
+	Q_PROPERTY( QColor lineColor READ lineColor WRITE setLineColor )
 public:
 	positionLine( QWidget * parent );
+	
+	// qproperty access functions
+	bool tailGradient() const;
+	void setTailGradient( const bool & g );
+	QColor lineColor() const;
+	void setLineColor( const QColor & c );
 
 private:
 	void paintEvent( QPaintEvent * pe ) override;
+	
+	bool m_tailGradient;
+	QColor m_lineColor;
 
 } ;
 

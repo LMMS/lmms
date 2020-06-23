@@ -53,14 +53,13 @@
 #include "Track.h"
 
 positionLine::positionLine( QWidget * parent ) :
-	QWidget( parent )
+	QWidget( parent ),
+	m_tailGradient ( false ),
+	m_lineColor (0, 0, 0, 0)
 {
 	setFixedWidth( 8 );
 	setAttribute( Qt::WA_NoSystemBackground, true );
 }
-
-
-
 
 void positionLine::paintEvent( QPaintEvent * pe )
 {
@@ -68,9 +67,22 @@ void positionLine::paintEvent( QPaintEvent * pe )
 	
 	// Create the gradient trail behind the line
 	QLinearGradient gradient(rect().bottomLeft(), rect().bottomRight());
-	gradient.setColorAt(0, QColor (255, 255, 255, 0) );
-	gradient.setColorAt(0.875, QColor (255, 255, 255, 60) );
-	gradient.setColorAt(1, QColor (255, 255, 255, 153) );
+	
+	gradient.setColorAt(0,
+		QColor (m_lineColor.red(), m_lineColor.green(), m_lineColor.blue(), 0) );
+	gradient.setColorAt(1,
+		QColor (m_lineColor.red(), m_lineColor.green(), m_lineColor.blue(), 153) );
+		
+	if (m_tailGradient) 
+	{ 
+		gradient.setColorAt(0.875, 
+			QColor (m_lineColor.red(), m_lineColor.green(), m_lineColor.blue(), 60) );
+	}
+	else 
+	{ 
+		gradient.setColorAt(0.875, 
+			QColor (m_lineColor.red(), m_lineColor.green(), m_lineColor.blue(), 0) );
+	}
 	
 	// Fill line
 	p.fillRect( rect(), gradient );
@@ -1139,3 +1151,15 @@ void SongEditorWindow::keyReleaseEvent( QKeyEvent *ke )
 		}
 	}
 }
+
+bool positionLine::tailGradient() const
+{ return m_tailGradient; }
+
+void positionLine::setTailGradient( const bool & g )
+{ m_tailGradient = g; }
+
+QColor positionLine::lineColor() const
+{ return m_lineColor; }
+
+void positionLine::setLineColor( const QColor & c )
+{ m_lineColor = c; }
