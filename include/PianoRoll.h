@@ -220,9 +220,10 @@ protected slots:
 	void quantizeChanged();
 	void noteLengthChanged();
 	void quantizeNotes();
-    void humanizeNotes();
-    void strumNotes();
- 
+    void humanizeNotesVel();
+    void humanizeNotesLen();
+    void strumNotesUp();
+    void strumNotesDn(); 
 
 	void updateSemiToneMarkerMenu();
 
