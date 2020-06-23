@@ -59,6 +59,7 @@ positionLine::positionLine( QWidget * parent ) :
 {
 	setFixedWidth( 8 );
 	setAttribute( Qt::WA_NoSystemBackground, true );
+	setAttribute( Qt::WA_TransparentForMouseEvents );
 }
 
 void positionLine::paintEvent( QPaintEvent * pe )

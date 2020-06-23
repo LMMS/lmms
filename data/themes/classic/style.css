@@ -120,7 +120,7 @@ QMenu::indicator:selected {
 
 positionLine {
 	qproperty-tailGradient: false;
-	qproperty-lineColor: rgba(255, 255, 255, 153);
+	qproperty-lineColor: rgb(255, 255, 255);
 }
 
 PianoRoll {
