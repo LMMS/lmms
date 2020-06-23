@@ -45,20 +45,6 @@ script:
     - . ${TRAVIS_BUILD_DIR}/.travis/${TRAVIS_OS_NAME}.${TARGET_OS}.script.sh
 after_script:
     - ccache -s
-deploy:
-    provider: releases
-    api_key:
-        secure: d4a+x4Gugpss7JK2DcHjyBZDmEFFh4iVfKDfITSD50T6Mc6At4LMgojvEu+6qT6IyOY2vm3UVT6fhyeuWDTRDwW9tfFlaHVA0h8aTRD+eAXOA7pQ8rEMwQO3+WCKuKTfEqUkpL4wxhww8dpkv54tqeIs0S4TBqz9tk8UhzU7XbE=
-    file_glob: true
-    file:
-        - lmms-${TRAVIS_TAG:1}-$TARGET_OS.exe
-        - /var/cache/pbuilder/result/lmms_*.tar.xz
-    skip_cleanup: true
-    on:
-        tags: true
-        all_branches: true
-        condition: '"$TARGET_DEPLOY" = True'
-    repo: LMMS/lmms
 notifications:
     webhooks:
        urls:
