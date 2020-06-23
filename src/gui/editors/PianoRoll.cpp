@@ -64,6 +64,8 @@
 #include "TimeLineWidget.h"
 #include "StepRecorderWidget.h"
 
+
+
 using std::move;
 
 typedef AutomationPattern::timeMap timeMap;
@@ -1393,11 +1395,46 @@ void PianoRoll::keyPressEvent(QKeyEvent* ke)
 				QApplication::changeOverrideCursor( Qt::ArrowCursor );
 				ke->accept();
 			}
-			break;
+			break;  
+
+        case Qt::Key_Plus:
+            if( ! hasValidPattern() )
+            {
+                return;
+            }
+            else
+            {
+            m_pattern->addJournalCheckPoint();
+            NoteVector notes = getSelectedNotes();//selected notes only
+                for( Note* n : notes ) //for each selected
+                {
+                    n->setLength( n->length() + 1 ); 
+                }		     				
+            ke->accept();
+            m_pattern->updateLength();	
+			}	
+			break; 
+	
+        case Qt::Key_Minus:
+            if( ! hasValidPattern() )
+            {
+                return;
+            }
+            else
+            {
+            m_pattern->addJournalCheckPoint();
+            NoteVector notes = getSelectedNotes();//selected notes only
+                for( Note* n : notes ) //for each selected
+                {
+                    n->setLength( n->length() - 1 );                    
+                }		    				
+            ke->accept();
+            m_pattern->updateLength();	
+			}	
+			break; 
 		default:
 			break;
 	}
-
 	update();
 }
 
@@ -1572,7 +1609,7 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 
 			x -= WHITE_KEY_WIDTH;
 
-			// get tick in which the user clicked
+	        // get tick in which the user clicked
 			int pos_ticks = x * MidiTime::ticksPerBar() / m_ppb +
 							m_currentPosition;
 
@@ -3317,7 +3354,7 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 
 				editHandleTop = noteEditBottom() -
 					( (float)( note->getPanning() - PanningLeft ) ) /
-					( (float)( (PanningRight - PanningLeft ) ) ) *
+				( (float)( (PanningRight - PanningLeft ) ) ) *
 					( (float)( noteEditBottom() - noteEditTop() ) );
 
 				p.drawLine( QLine( noteEditLeft() + x, noteEditTop() +
@@ -3758,10 +3795,11 @@ void PianoRoll::recordAccompany()
 
 	m_pattern->addJournalCheckPoint();
 	m_recording = true;
-
 	if( m_pattern->getTrack()->trackContainer() == Engine::getSong() )
 	{
-		Engine::getSong()->playSong();
+		
+        Engine::getSong()->playPattern( m_pattern );
+        Engine::getSong()->playSong();
 	}
 	else
 	{
@@ -4001,10 +4039,8 @@ void PianoRoll::enterValue( NoteVector* nv )
 		bool ok;
 		int new_val;
 		new_val = QInputDialog::getInt(	this, "Piano roll: note velocity",
-					tr( "Please enter a new value between %1 and %2:" ).
-						arg( MinVolume ).arg( MaxVolume ),
-					(*nv)[0]->getVolume(),
-					MinVolume, MaxVolume, 1, &ok );
+		tr( "Please enter a new value between %1 and %2:" ).arg( MinVolume ).arg( 
+            MaxVolume ),(*nv)[0]->getVolume(),MinVolume, MaxVolume, 1, &ok );
 
 		if( ok )
 		{
@@ -4311,11 +4347,38 @@ int PianoRoll::quantization() const
 }
 
 
-
-
-void PianoRoll::humanizeNotes() //quantizeNotes()
+void PianoRoll::humanizeNotesVel() //velocity version
 {
-    /*The method will humanize a selection of chords in 1/192 steps*/
+    //The method will humanize velosities of a selection of notes
+    if( ! hasValidPattern() )
+    {
+        return;
+    }
+
+    int lower = 5;//Humanize-span is 5..20 %
+    int upper = 20;
+    int subt = 1; //shift between adding and subtracting 
+    int adder = 100; 
+  
+    // Use current time as seed for random generator
+    srand(time(0)); 
+    m_pattern->addJournalCheckPoint();
+    NoteVector notes = getSelectedNotes();//selected notes only
+    for( Note* n : notes )
+    {
+        int rr = rand() % (upper - lower + 1) + lower; 
+        int signer = rand() % (adder - subt + 1) + lower; 
+        if ( signer < 50 ) n->setVolume( n->getVolume()+rr );  
+        else n->setVolume( n->getVolume()-rr );          
+    }
+    update();//Project is changed. Update
+    gui->songEditor()->update();
+    Engine::getSong()->setModified();
+}
+
+void PianoRoll::humanizeNotesLen() //length ver.
+{
+    //The method will humanize position of a selection of notes
 
     if( ! hasValidPattern() )
     {
@@ -4324,8 +4387,7 @@ void PianoRoll::humanizeNotes() //quantizeNotes()
     int lower = 1;//Humanize/span is 1..4 1/192 in size
     int upper = 4;
     int subt = 1; //shift between adding and subtracting position
-    int adder = 100; 
-  
+    int adder = 100;   
     // Use current time as seed for random generator
     srand(time(0)); 
     m_pattern->addJournalCheckPoint();
@@ -4337,74 +4399,142 @@ void PianoRoll::humanizeNotes() //quantizeNotes()
         if ( signer < 50 ) n->setPos( n->pos() - rr );
         else n->setPos( n->pos() + rr );
     }
-
+    m_pattern->rearrangeAllNotes();
+	m_pattern->updateLength();
+	m_pattern->dataChanged();
     update();//Project is changed. Update
     gui->songEditor()->update();
     Engine::getSong()->setModified();
 }
 
-/*
-void PianoRoll::strumNotes() //top/|down
+
+int returnStrum(int st)//input : read value from comboBox Q. Output : size of strum
+{
+int strumSize = 0;
+
+    switch (st)
+	{
+    
+    //------sys-notes------------
+		case 1:
+        strumSize = 196;//Wholenote			
+			break;
+        case 2:
+        strumSize = 98;	//halfnote		
+			break;
+        case 3:
+        strumSize = 48;	//quoter		
+			break;
+        case 4:
+        strumSize = 24;	// 1/8		
+			break;
+        case 5:
+        strumSize = 12;	//1/16		
+			break;
+        case 6:
+        strumSize = 6;	//1/32		
+			break;
+        case 7:
+        strumSize = 3;	//1/64		
+			break;
+    //---------triplets------------
+        case 8:
+        strumSize = 64;	//1/2		
+			break;
+        case 9:
+        strumSize = 32;	//1/4		
+			break;
+        case 10:
+        strumSize = 16;	//1/8		
+			break;
+        case 11:
+        strumSize = 8;	//1/16
+			break;
+        case 12:
+        strumSize = 4;	//1/32		
+			break;
+        default:
+        strumSize = 1;	//1/192	//smallest tick-value Availble if option 0 #notelock# is chosen
+			break;
+    }
+    return strumSize; 
+}
+
+
+void PianoRoll::strumNotesUp() //top/|down
 //Method for chord-strumming.
 //The strum-distance is the chosen Q-value
-//Left-click strums from bottom to top
-//Right-click from top to buttom
-
 {
   if( ! hasValidPattern() )
     {
         return;
     }
+  int notesInChord = 0; //initializations
+  int index = 0;
   m_pattern->addJournalCheckPoint();
   NoteVector notes = getSelectedNotes();//selected notes only
-  int notesInChord = notes.count();//how many notes are in this chord
-  int index = 6;
+  notesInChord = notes.count();//how many notes are in this chord
+  index = m_quantizeModel.value(); //uses UserSet Q-Value in combobox
+                                       //This value is position, so it need to be qualified
+                                       //to real piano/roll values 
+  int strumSz = returnStrum(index); //size of note movement;
+  int strum = strumSz;//keep orr. value of selected strumming
+  bool firstDone = false;//first note should not be moved 
   for( Note* n : notes ) //for each selected
   {
-    n->setPos( n->pos() + index );
-    index += 6;
-    if (index >= notesInChord) continue;    
+  if( firstDone ){
+    n->setPos( n->pos() + strumSz );
+    strumSz += strum;
+    if (index >= notesInChord) continue;}  
+  firstDone = true;
+  }    
+    m_pattern->rearrangeAllNotes();
+	m_pattern->updateLength();
+	m_pattern->dataChanged();
+    update();//Project is changed. Update
+    gui->songEditor()->update();
+    Engine::getSong()->setModified();
+    
+}
+
+void PianoRoll::strumNotesDn() //down-top
+//Method for chord-strumming.
+//The strum-distance is the chosen Q-value
+{
+  if( ! hasValidPattern() )
+  {
+     return;
   }
-    
-    qDebug() << "notes my lovdear" << notes.count(); 
-    update();//Project is changed. Update
-    gui->songEditor()->update();
-    Engine::getSong()->setModified();
-    
-}
-*/
-
-void PianoRoll::strumNotes() //top/|down
-//Method for chord-strumming.
-//The strum-distance is the chosen Q-value
-//Left-click strums from bottom to top
-//Right-click from top to buttom
-
-{
-  if( ! hasValidPattern() )
-    {
-        return;
-    }
+  int notesInChord = 0; //initializations
+  int index = 0;
   m_pattern->addJournalCheckPoint();
-  NoteVector notes = getSelectedNotes();//selected notes only
-  int notesInChord = notes.count();//how many notes are in this chord
-  int index = 6;
+  NoteVector notes = getSelectedNotes();//NoteVector of class QVector
+  notesInChord = notes.count();//how many notes are in this chord
+  index = m_quantizeModel.value(); //uses UserSet Q-Value in combobox
+                                       //This value is position, so it need to be qualified
+                                       //to real piano/roll values
+  int strumSz = returnStrum(index); //size of note movement  
+  int strum = strumSz;//keep orr. value of selected strumming
+  bool firstDone = false;//first note should not be moved
   for( Note* n : notes ) //for each selected
   {
-    n = notes.at(notesInChord-1);
+    n = notes.at(notesInChord-1);//Use QVector-method .at
     notesInChord-=1;
-    n->setPos( n->pos() + index );
-    index += 6;
-    if (notesInChord<=1) continue;    
-  }
-    
-    qDebug() << "notes my lovdear" << notes.count(); 
+    if( firstDone ){ 
+        n->setPos( n->pos() + strumSz );
+        strumSz += strum;
+    }
+    firstDone = true;
+        if (notesInChord<=1) continue;       
+  }  
+    m_pattern->rearrangeAllNotes();
+    m_pattern->updateLength();
+    m_pattern->dataChanged();
     update();//Project is changed. Update
     gui->songEditor()->update();
     Engine::getSong()->setModified();
-    
+    notes.clear();//delete content -if not repeated strums on same selection fails
 }
-
 
 
 void PianoRoll::quantizeNotes()
@@ -4443,9 +4573,6 @@ void PianoRoll::quantizeNotes()
 	gui->songEditor()->update();
 	Engine::getSong()->setModified();
 }
-
-
-
 
 void PianoRoll::updateSemiToneMarkerMenu()
 {
@@ -4548,21 +4675,29 @@ PianoRollWindow::PianoRollWindow() :
 	eraseAction->setShortcut( Qt::SHIFT | Qt::Key_E );
 	selectAction->setShortcut( Qt::SHIFT | Qt::Key_S );
 	pitchBendAction->setShortcut( Qt::SHIFT | Qt::Key_T );
-
 	connect( editModeGroup, SIGNAL( triggered( int ) ), m_editor, SLOT( setEditMode( int ) ) );
 
-//Create a new klickbutton action, left the current buttons
+//Create a new clickbutton action, to the right on tollbar of previous button(s)
 	QAction* quantizeAction = 
     new QAction(embed::getIconPixmap( "quantize" ), tr( "Quantize" ), this );
 	connect( quantizeAction, SIGNAL( triggered() ), m_editor, SLOT( quantizeNotes() ) );
 
-	QAction* humanizeAction = 
-    new QAction(embed::getIconPixmap( "quantize" ), tr( "Humanize Selected Notes" ), this );
-	connect( humanizeAction, SIGNAL( triggered() ), m_editor, SLOT( humanizeNotes() ) );
+	QAction* humanizeVelAction = 
+    new QAction(embed::getIconPixmap( "humaVel" ), tr( "Humanize Selected Note-Velocity" ), this );
+	connect( humanizeVelAction, SIGNAL( triggered() ), m_editor, SLOT( humanizeNotesVel() ) );
 
-	QAction* strumNotesAction = 
-    new QAction(embed::getIconPixmap( "edit_erase" ), tr( "Strum Selected by Q-value" ), this );
-	connect( strumNotesAction, SIGNAL( triggered() ), m_editor, SLOT( strumNotes() ) );
+    QAction* humanizeLenAction = 
+    new QAction(embed::getIconPixmap( "humaPos" ), tr( "Humanize Selected Note-position" ), this );
+	connect( humanizeLenAction, SIGNAL( triggered() ), m_editor, SLOT( humanizeNotesLen() ) );
+
+	QAction* strumNotesUpAction = 
+    new QAction(embed::getIconPixmap( "strumUp" ), tr( "Strum Selected by Q-value" ), this );
+	connect( strumNotesUpAction, SIGNAL( triggered() ), m_editor, SLOT( strumNotesUp() ) );
+	
+    QAction* strumNotesDnAction = 
+    new QAction(embed::getIconPixmap( "strumDwn" ), tr( "Strum Selected by Q-value" ), this );
+	connect( strumNotesDnAction, SIGNAL( triggered() ), m_editor, SLOT( strumNotesDn() ) );
+
 
 //add physical buttons for each of the defined QActions, in this order
 	notesActionsToolBar->addAction( drawAction );
@@ -4571,8 +4706,11 @@ PianoRollWindow::PianoRollWindow() :
 	notesActionsToolBar->addAction( pitchBendAction );
 	notesActionsToolBar->addSeparator();
 	notesActionsToolBar->addAction( quantizeAction );
-    notesActionsToolBar->addAction( humanizeAction );
-    notesActionsToolBar->addAction( strumNotesAction );
+//anj
+    notesActionsToolBar->addAction( humanizeVelAction );
+    notesActionsToolBar->addAction( humanizeLenAction );
+    notesActionsToolBar->addAction( strumNotesUpAction );
+    notesActionsToolBar->addAction( strumNotesDnAction );
 
 	// Copy + paste actions
 	DropToolBar *copyPasteActionsToolBar =  addDropToolBarToTop( tr( "Copy paste controls" ) );
