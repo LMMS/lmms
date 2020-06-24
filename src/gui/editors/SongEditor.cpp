@@ -52,12 +52,21 @@
 #include "PianoRoll.h"
 #include "Track.h"
 
-positionLine::positionLine( QWidget * parent ) :
+const QVector<double> positionLine::m_zoomLevels =
+		{ 0.125f, 0.25f, 0.5f, 1.0f, 2.0f, 4.0f, 8.0f, 16.0f };
+
+positionLine::positionLine( QWidget * parent, ComboBoxModel* zoom, Song* song ) :
 	QWidget( parent ),
 	m_tailGradient ( false ),
 	m_lineColor (0, 0, 0, 0)
 {
-	setFixedWidth( 8 );
+	m_x = 0;
+	m_y = 0;
+	m_width = 8;
+	currentZoom = zoom;
+	p_song = song;
+	resize( m_width, height() );
+	
 	setAttribute( Qt::WA_NoSystemBackground, true );
 	setAttribute( Qt::WA_TransparentForMouseEvents );
 }
@@ -66,31 +75,77 @@ void positionLine::paintEvent( QPaintEvent * pe )
 {
 	QPainter p( this );
 	
-	// Create the gradient trail behind the line
-	QLinearGradient gradient(rect().bottomLeft(), rect().bottomRight());
+	// Resize based on the zoom value
+	m_width = 8.0f * m_zoomLevels[ currentZoom->value() ];
+	resize( m_width, height() );
 	
-	gradient.setColorAt(0,
-		QColor (m_lineColor.red(), m_lineColor.green(), m_lineColor.blue(), 0) );
-	gradient.setColorAt(1,
-		QColor (m_lineColor.red(), m_lineColor.green(), m_lineColor.blue(), 153) );
+	// If width is 1, we don't need a gradient
+	if (m_width == 1)
+	{
+		p.fillRect ( rect(),
+			QColor (m_lineColor.red(), m_lineColor.green(), m_lineColor.blue(), 153) );
+	}
+	
+	// If width > 1, we need the gradient
+	else
+	{
+		// Create the gradient trail behind the line
+		QLinearGradient gradient(rect().bottomLeft(), rect().bottomRight());
 		
-	if (m_tailGradient) 
-	{ 
-		gradient.setColorAt(0.875, 
-			QColor (m_lineColor.red(), m_lineColor.green(), m_lineColor.blue(), 60) );
-	}
-	else 
-	{ 
-		gradient.setColorAt(0.875, 
+		// If gradient is enabled and we're playing, enable gradient
+		if (p_song->isPlaying() && m_tailGradient)
+			gradient.setColorAt((double)( ( width() - 1.0f )/width() ),
+				QColor (m_lineColor.red(), m_lineColor.green(), m_lineColor.blue(), 60) );
+		else
+			gradient.setColorAt((double)( ( width() - 1.0f )/width() ),
+				QColor (m_lineColor.red(), m_lineColor.green(), m_lineColor.blue(), 0) );
+		
+		// Fill in the remaining parts
+		gradient.setColorAt(0,
 			QColor (m_lineColor.red(), m_lineColor.green(), m_lineColor.blue(), 0) );
+		gradient.setColorAt(1,
+			QColor (m_lineColor.red(), m_lineColor.green(), m_lineColor.blue(), 153) );
+		
+		// Fill line
+		p.fillRect( rect(), gradient );
 	}
-	
-	// Fill line
-	p.fillRect( rect(), gradient );
 }
 
 const QVector<double> SongEditor::m_zoomLevels =
 		{ 0.125f, 0.25f, 0.5f, 1.0f, 2.0f, 4.0f, 8.0f, 16.0f };
+
+int positionLine::width( void )
+{
+	m_width = 8.0f * m_zoomLevels[ currentZoom->value() ];
+	return m_width;
+}
+
+void positionLine::go( int x, int y )
+{
+	move(x, y);
+	m_x = x + width() - 1;
+	m_y = y;
+}
+
+void positionLine::zoomUpdate()
+{ move ( m_x - width() + 1, m_y ); }
+
+// Essentially causes a redraw so that gradient does not persist
+void positionLine::playStateChanged()
+{ repaint(); }
+
+// QProperty handles
+bool positionLine::tailGradient() const
+{ return m_tailGradient; }
+
+void positionLine::setTailGradient( const bool & g )
+{ m_tailGradient = g; }
+
+QColor positionLine::lineColor() const
+{ return m_lineColor; }
+
+void positionLine::setLineColor( const QColor & c )
+{ m_lineColor = c; }
 
 
 SongEditor::SongEditor( Song * song ) :
@@ -129,8 +184,10 @@ SongEditor::SongEditor( Song * song ) :
 			this, SLOT( selectRegionFromPixels( int, int ) ) );
 	connect( m_timeLine, SIGNAL( selectionFinished() ),
 			 this, SLOT( stopRubberBand() ) );
+	connect( m_song, SIGNAL( playbackStateChanged() ),
+			 this, SLOT( playbackStateChanged() ) );
 
-	m_positionLine = new positionLine( this );
+	m_positionLine = new positionLine( this, m_zoomingModel, m_song );
 	static_cast<QVBoxLayout *>( layout() )->insertWidget( 1, m_timeLine );
 
 
@@ -829,7 +886,7 @@ void SongEditor::updatePosition( const MidiTime & t )
 	if( x >= trackOpWidth + widgetWidth -1 )
 	{
 		m_positionLine->show();
-		m_positionLine->move( x-7, m_timeLine->height() );
+		m_positionLine->go( x-( m_positionLine->width() - 1 ), m_timeLine->height() );
 	}
 	else
 	{
@@ -858,9 +915,14 @@ void SongEditor::zoomingChanged()
 					setPixelsPerBar( pixelsPerBar() );
 	realignTracks();
 	updateRubberband();
+	
+	m_positionLine->zoomUpdate();
 }
 
-
+void SongEditor::playbackStateChanged()
+{
+	m_positionLine->playStateChanged();
+}
 
 
 void SongEditor::selectAllTcos( bool select )
@@ -1152,15 +1214,3 @@ void SongEditorWindow::keyReleaseEvent( QKeyEvent *ke )
 		}
 	}
 }
-
-bool positionLine::tailGradient() const
-{ return m_tailGradient; }
-
-void positionLine::setTailGradient( const bool & g )
-{ m_tailGradient = g; }
-
-QColor positionLine::lineColor() const
-{ return m_lineColor; }
-
-void positionLine::setLineColor( const QColor & c )
-{ m_lineColor = c; }
