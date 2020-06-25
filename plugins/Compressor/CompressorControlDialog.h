@@ -52,10 +52,6 @@ constexpr int COMP_BOX_Y = 280;
 
 constexpr float COMP_NOISE_FLOOR = 0.000001;// -120 dbFs
 
-// -2.2 seems to be the best value for this.
-// I've seen some compressors choose -1, however.
-constexpr float COMP_LOG = -2.2;
-
 
 
 class CompressorControls;

@@ -31,6 +31,9 @@
 #include "ValueBuffer.h"
 #include "RmsHelper.h"
 
+
+constexpr float COMP_LOG = -2.2;
+
 class CompressorEffect : public Effect
 {
 	Q_OBJECT
@@ -67,7 +70,7 @@ private slots:
 private:
 	CompressorControls m_compressorControls;
 
-	float timeToCoeff(float time);
+	float msToCoeff(float ms);
 
 	inline void calcTiltFilter(sample_t inputSample, sample_t &outputSample, int filtNum);
 	inline int realmod(int k, int n);
@@ -100,6 +103,8 @@ private:
 	float m_rangeVal;
 	float m_tiltVal;
 	float m_mixVal;
+
+	float m_coeffPrecalc;
 
 	sampleFrame m_maxLookaheadVal = {0};
 	int m_maxLookaheadTimer[2] = {1, 1};

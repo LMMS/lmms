@@ -101,10 +101,10 @@ CompressorEffect::~CompressorEffect()
 }
 
 
-float CompressorEffect::timeToCoeff(float time)
+float CompressorEffect::msToCoeff(float ms)
 {
 	// Convert time in milliseconds to applicable lowpass coefficient
-	return expf(COMP_LOG / (time * m_sampleRate * 0.001f));
+	return expf(m_coeffPrecalc / ms);
 }
 
 
@@ -120,12 +120,14 @@ void CompressorEffect::calcAutoMakeup()
 	}
 	else if (abs(1 - m_thresholdVal) < m_kneeVal)// If the input is within the knee's range
 	{
-		const float temp = 0 - m_thresholdVal + m_kneeVal;
-		tempGainResult = 0 + ((m_compressorControls.m_limiterModel.value() ? 0 : m_ratioVal) - 1) * temp * temp / (4 * m_kneeVal);
+		const float temp = m_thresholdVal + m_kneeVal;
+		tempGainResult = ((m_compressorControls.m_limiterModel.value() ? 0 : m_ratioVal) - 1) * temp * temp / (4 * m_kneeVal);
 	}
 	else
 	{
-		tempGainResult = m_compressorControls.m_limiterModel.value() ? m_thresholdVal : (m_thresholdVal + (0 - m_thresholdVal) * m_ratioVal);
+		tempGainResult = m_compressorControls.m_limiterModel.value()
+			? m_thresholdVal
+			: (m_thresholdVal + m_thresholdVal * m_ratioVal);
 	}
 
 	m_autoMakeupVal = 1.f / dbfsToAmp(tempGainResult);
@@ -133,12 +135,12 @@ void CompressorEffect::calcAutoMakeup()
 
 void CompressorEffect::calcAttack()
 {
-	m_attCoeff = timeToCoeff(m_compressorControls.m_attackModel.value());
+	m_attCoeff = msToCoeff(m_compressorControls.m_attackModel.value());
 }
 
 void CompressorEffect::calcRelease()
 {
-	m_relCoeff = timeToCoeff(m_compressorControls.m_releaseModel.value());
+	m_relCoeff = msToCoeff(m_compressorControls.m_releaseModel.value());
 }
 
 void CompressorEffect::calcAutoAttack()
@@ -174,7 +176,9 @@ void CompressorEffect::calcRatio()
 void CompressorEffect::calcRange()
 {
 	// Range is inactive when turned all the way down
-	m_rangeVal = (m_compressorControls.m_rangeModel.value() > m_compressorControls.m_rangeModel.minValue()) ? dbfsToAmp(m_compressorControls.m_rangeModel.value()) : 0;
+	m_rangeVal = (m_compressorControls.m_rangeModel.value() > m_compressorControls.m_rangeModel.minValue())
+			? dbfsToAmp(m_compressorControls.m_rangeModel.value())
+			: 0;
 }
 
 void CompressorEffect::resizeRMS()
@@ -247,7 +251,7 @@ void CompressorEffect::calcMix()
 
 bool CompressorEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 {
-	if(!isEnabled() || !isRunning ())
+	if (!isEnabled() || !isRunning ())
 	{
 		// Clear lookahead buffers and other values when needed
 		if (!m_cleanedBuffers)
@@ -370,11 +374,11 @@ bool CompressorEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 
 			float t = inputValue;
 
-			if(t > m_yL[i])// Attack phase
+			if (t > m_yL[i])// Attack phase
 			{
 				// Calculate attack value depending on crest factor
 				const float att = m_autoAttVal
-					? timeToCoeff(2.f * m_compressorControls.m_attackModel.value() / ((m_crestFactorVal[i] - 1) * m_autoAttVal + 1))
+					? msToCoeff(2.f * m_compressorControls.m_attackModel.value() / ((m_crestFactorVal[i] - 1) * m_autoAttVal + 1))
 					: m_attCoeff;
 
 				m_yL[i] = m_yL[i] * att + (1 - att) * t;
@@ -384,7 +388,7 @@ bool CompressorEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 			{
 				// Calculate release value depending on crest factor
 				const float rel = m_autoRelVal
-					? timeToCoeff(2.f * m_compressorControls.m_releaseModel.value() / ((m_crestFactorVal[i] - 1) * m_autoRelVal + 1))
+					? msToCoeff(2.f * m_compressorControls.m_releaseModel.value() / ((m_crestFactorVal[i] - 1) * m_autoRelVal + 1))
 					: m_relCoeff;
 
 				if (m_holdTimer[i])// Don't change peak if hold is being applied
@@ -418,7 +422,9 @@ bool CompressorEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 			}
 			else// Above knee
 			{
-				gainResult[i] = limiter ? m_thresholdVal : (m_thresholdVal + (currentPeakDbfs - m_thresholdVal) * m_ratioVal);
+				gainResult[i] = limiter
+					? m_thresholdVal
+					: (m_thresholdVal + (currentPeakDbfs - m_thresholdVal) * m_ratioVal);
 			}
 
 			gainResult[i] = dbfsToAmp(gainResult[i]) / m_yL[i];
@@ -472,7 +478,7 @@ bool CompressorEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 		}
 
 		// Bias compression to the left or right (or mid or side)
-		if (stereoBalance)
+		if (stereoBalance != 0)
 		{
 			gainResult[0] = 1 - ((1 - gainResult[0]) * (stereoBalance > 0 ? 1 - stereoBalance : 1));
 			gainResult[1] = 1 - ((1 - gainResult[1]) * (stereoBalance < 0 ? 1 + stereoBalance : 1));
@@ -590,6 +596,8 @@ inline void CompressorEffect::calcTiltFilter(sample_t inputSample, sample_t &out
 void CompressorEffect::changeSampleRate()
 {
 	m_sampleRate = Engine::mixer()->processingSampleRate();
+
+	m_coeffPrecalc = COMP_LOG / (m_sampleRate * 0.001f);
 
 	// 200 ms
 	m_crestTimeConst = exp(-1.f / (0.2 * m_sampleRate));
