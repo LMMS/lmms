@@ -51,21 +51,21 @@ Q_DECLARE_METATYPE(QLinearGradient)
 class positionLine : public QWidget
 {
 	Q_OBJECT
-	Q_PROPERTY( bool tailGradient READ tailGradient WRITE setTailGradient )
-	Q_PROPERTY( QColor lineColor READ lineColor WRITE setLineColor )
+	Q_PROPERTY ( bool tailGradient READ tailGradient WRITE setTailGradient )
+	Q_PROPERTY ( QColor lineColor READ lineColor WRITE setLineColor )
 public:
-	positionLine( QWidget * parent, ComboBoxModel*, Song* );
+	positionLine ( QWidget * parent, ComboBoxModel * zoom, Song * song );
 	
 	int width ();
-	void go (int, int);
+	void go ( int x, int y );	// NOTE: Check SongEditor.cpp for usage
 	void zoomUpdate ();
 	void playStateChanged ();
 	
 	// qproperty access functions
-	bool tailGradient() const;
-	void setTailGradient( const bool & g );
-	QColor lineColor() const;
-	void setLineColor( const QColor & c );
+	bool tailGradient () const;
+	void setTailGradient ( const bool & g );
+	QColor lineColor () const;
+	void setLineColor ( const QColor & c );
 
 private:
 	void paintEvent( QPaintEvent * pe ) override;
@@ -77,13 +77,13 @@ private:
 	QColor m_lineColor;
 	
 	// to accomodate the change in size by zoom
-	ComboBoxModel* currentZoom;
+	ComboBoxModel * currentZoom;
 	static const QVector<double> m_zoomLevels;
 	
 	// to remove gradient when the line is not moving
-	Song * p_song;
+	Song * p_song;	// NOTE: p here stands for pointer
 
-} ;
+};
 
 
 class SongEditor : public TrackContainerView
