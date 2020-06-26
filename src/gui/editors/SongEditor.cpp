@@ -52,7 +52,7 @@
 #include "PianoRoll.h"
 #include "Track.h"
 
-const QVector<double> positionLine::m_zoomLevels =
+const QVector<double> positionLine::s_zoomLevels =
 		{ 0.125f, 0.25f, 0.5f, 1.0f, 2.0f, 4.0f, 8.0f, 16.0f };
 
 positionLine::positionLine( QWidget* parent, ComboBoxModel* zoom) :
@@ -72,7 +72,7 @@ void positionLine::paintEvent( QPaintEvent* pe )
 	QPainter p( this );
 	
 	// Resize based on the zoom value
-	resize( 8.0f * m_zoomLevels[ m_currentZoom->value() ], height() );
+	resize( 8.0f * s_zoomLevels[ m_currentZoom->value() ], height() );
 	
 	// If width is 1, we don't need a gradient
 	if (width() == 1)

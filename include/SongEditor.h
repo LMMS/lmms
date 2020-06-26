@@ -68,7 +68,7 @@ private:
 	
 	// to accomodate the change in size by zoom
 	ComboBoxModel* m_currentZoom;
-	static const QVector<double> m_zoomLevels;
+	static const QVector<double> s_zoomLevels;
 
 };
 
