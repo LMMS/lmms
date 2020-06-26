@@ -2653,7 +2653,14 @@ void Track::toggleSolo()
 			{
 				( *it )->m_mutedBeforeSolo = ( *it )->isMuted();
 			}
-			( *it )->setMuted( *it == this ? false : true );
+			// Don't mute AutomationTracks (keep their original state)
+			if( *it == this ){
+				( *it )->setMuted( false );
+			} else {
+				if( ( *it )->type() != AutomationTrack ){
+					( *it )->setMuted( true );
+				}
+			}
 			if( *it != this )
 			{
 				( *it )->m_soloModel.setValue( false );
