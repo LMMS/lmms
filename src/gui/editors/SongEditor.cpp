@@ -55,32 +55,27 @@
 const QVector<double> positionLine::m_zoomLevels =
 		{ 0.125f, 0.25f, 0.5f, 1.0f, 2.0f, 4.0f, 8.0f, 16.0f };
 
-positionLine::positionLine( QWidget * parent, ComboBoxModel * zoom, Song * song ) :
+positionLine::positionLine( QWidget* parent, ComboBoxModel* zoom) :
 	QWidget( parent ),
 	m_tailGradient ( false ),
 	m_lineColor (0, 0, 0, 0)
 {
-	m_x = 0;
-	m_y = 0;
-	m_width = 8;
-	currentZoom = zoom;
-	p_song = song;
-	resize( m_width, height() );
+	m_currentZoom = zoom;
+	resize( 8, height() );
 	
 	setAttribute( Qt::WA_NoSystemBackground, true );
 	setAttribute( Qt::WA_TransparentForMouseEvents );
 }
 
-void positionLine::paintEvent( QPaintEvent * pe )
+void positionLine::paintEvent( QPaintEvent* pe )
 {
 	QPainter p( this );
 	
 	// Resize based on the zoom value
-	m_width = 8.0f * m_zoomLevels[ currentZoom->value() ];
-	resize( m_width, height() );
+	resize( 8.0f * m_zoomLevels[ m_currentZoom->value() ], height() );
 	
 	// If width is 1, we don't need a gradient
-	if (m_width == 1)
+	if (width() == 1)
 	{
 		p.fillRect( rect(),
 			QColor( m_lineColor.red(), m_lineColor.green(), m_lineColor.blue(), 153) );
@@ -93,8 +88,8 @@ void positionLine::paintEvent( QPaintEvent * pe )
 		QLinearGradient gradient( rect().bottomLeft(), rect().bottomRight() );
 		
 		// If gradient is enabled, we're in focus and we're playing, enable gradient
-		if (p_song->isPlaying() && m_tailGradient && 
-			p_song->playMode() == Song::Mode_PlaySong)
+		if (Engine::getSong()->isPlaying() && m_tailGradient && 
+			Engine::getSong()->playMode() == Song::Mode_PlaySong)
 		{
 			gradient.setColorAt((double)( ( width() - 1.0f )/width() ),
 				QColor( m_lineColor.red(), m_lineColor.green(), m_lineColor.blue(), 60) );
@@ -115,28 +110,6 @@ void positionLine::paintEvent( QPaintEvent * pe )
 		p.fillRect( rect(), gradient );
 	}
 }
-
-int positionLine::width( void )
-{
-	m_width = 8.0f * m_zoomLevels[ currentZoom->value() ];
-	return m_width;
-}
-
-// synonymous to move(), but use this instead of move() so position line can log changes in its m_x & m_y
-void positionLine::go( int x, int y )
-{
-	move( x, y );
-	m_x = x + width() - 1;
-	m_y = y;
-}
-
-// update width if zoom changes
-void positionLine::zoomUpdate()
-{ move ( m_x - width() + 1, m_y ); }
-
-// Essentially repaints so that gradient does not persist when stopped (this is a bug fix)
-void positionLine::playStateChanged()
-{ repaint(); }
 
 // QProperty handles
 bool positionLine::tailGradient() const
@@ -193,11 +166,12 @@ SongEditor::SongEditor( Song * song ) :
 			this, SLOT( selectRegionFromPixels( int, int ) ) );
 	connect( m_timeLine, SIGNAL( selectionFinished() ),
 			 this, SLOT( stopRubberBand() ) );
-	connect( m_song, SIGNAL( playbackStateChanged() ),
-			 this, SLOT( playbackStateChanged() ) );
 
-	m_positionLine = new positionLine( this, m_zoomingModel, m_song );
+	m_positionLine = new positionLine( this, m_zoomingModel );
 	static_cast<QVBoxLayout *>( layout() )->insertWidget( 1, m_timeLine );
+	
+	connect( m_song, SIGNAL( playbackStateChanged() ),
+			 m_positionLine, SLOT( update() ) );
 
 
 	// add some essential widgets to global tool-bar
@@ -337,6 +311,8 @@ SongEditor::SongEditor( Song * song ) :
 			m_zoomingModel->findText( "100%" ) );
 	connect( m_zoomingModel, SIGNAL( dataChanged() ),
 					this, SLOT( zoomingChanged() ) );
+	connect( m_zoomingModel, SIGNAL( dataChanged() ),
+					m_positionLine, SLOT( update() ) );
 
 	//Set up snapping model, 2^i
 	for ( int i = 3; i >= -4; i-- )
@@ -895,7 +871,7 @@ void SongEditor::updatePosition( const MidiTime & t )
 	if( x >= trackOpWidth + widgetWidth -1 )
 	{
 		m_positionLine->show();
-		m_positionLine->go( x-( m_positionLine->width() - 1 ), m_timeLine->height() );
+		m_positionLine->move( x-( m_positionLine->width() - 1 ), m_timeLine->height() );
 	}
 	else
 	{
@@ -924,13 +900,6 @@ void SongEditor::zoomingChanged()
 					setPixelsPerBar( pixelsPerBar() );
 	realignTracks();
 	updateRubberband();
-	
-	m_positionLine->zoomUpdate();
-}
-
-void SongEditor::playbackStateChanged()
-{
-	m_positionLine->playStateChanged();
 }
 
 

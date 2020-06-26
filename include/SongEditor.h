@@ -46,20 +46,13 @@ class Song;
 class TextFloat;
 class TimeLineWidget;
 
-Q_DECLARE_METATYPE(QLinearGradient)
-
 class positionLine : public QWidget
 {
 	Q_OBJECT
 	Q_PROPERTY ( bool tailGradient READ tailGradient WRITE setTailGradient )
 	Q_PROPERTY ( QColor lineColor READ lineColor WRITE setLineColor )
 public:
-	positionLine ( QWidget * parent, ComboBoxModel * zoom, Song * song );
-	
-	int width ();
-	void go ( int x, int y );	// NOTE: Check SongEditor.cpp for usage
-	void zoomUpdate ();
-	void playStateChanged ();
+	positionLine ( QWidget* parent, ComboBoxModel* zoom );
 	
 	// qproperty access functions
 	bool tailGradient () const;
@@ -68,20 +61,14 @@ public:
 	void setLineColor ( const QColor & c );
 
 private:
-	void paintEvent( QPaintEvent * pe ) override;
-	
-	int m_width;
-	int m_x, m_y;	// NOTE: m_x is the playback position, not the position where the tail starts
+	void paintEvent( QPaintEvent* pe ) override;
 	
 	bool m_tailGradient;
 	QColor m_lineColor;
 	
 	// to accomodate the change in size by zoom
-	ComboBoxModel * currentZoom;
+	ComboBoxModel* m_currentZoom;
 	static const QVector<double> m_zoomLevels;
-	
-	// to remove gradient when the line is not moving
-	Song * p_song;	// NOTE: p here stands for pointer
 
 };
 
@@ -144,8 +131,6 @@ private slots:
 	void updateScrollBar(int len);
 
 	void zoomingChanged();
-	
-	void playbackStateChanged();
 
 private:
 	void keyPressEvent( QKeyEvent * ke ) override;
