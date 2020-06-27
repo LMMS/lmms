@@ -2656,10 +2656,8 @@ void Track::toggleSolo()
 			// Don't mute AutomationTracks (keep their original state)
 			if( *it == this ){
 				( *it )->setMuted( false );
-			} else {
-				if( ( *it )->type() != AutomationTrack ){
-					( *it )->setMuted( true );
-				}
+			} else if( ( *it )->type() != AutomationTrack ){
+				( *it )->setMuted( true );
 			}
 			if( *it != this )
 			{
@@ -2668,7 +2666,10 @@ void Track::toggleSolo()
 		}
 		else if( !soloBefore )
 		{
-			( *it )->setMuted( ( *it )->m_mutedBeforeSolo );
+			// Only restores the mute state if the track isn't an Automation Track
+			if( ( *it )->type() != AutomationTrack ){
+				( *it )->setMuted( ( *it )->m_mutedBeforeSolo );
+			}
 		}
 	}
 }
