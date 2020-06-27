@@ -49,21 +49,21 @@ class TimeLineWidget;
 class positionLine : public QWidget
 {
 	Q_OBJECT
-	Q_PROPERTY ( bool tailGradient READ tailGradient WRITE setTailGradient )
+	Q_PROPERTY ( bool tailGradient READ hasTailGradient WRITE setHasTailGradient )
 	Q_PROPERTY ( QColor lineColor READ lineColor WRITE setLineColor )
 public:
 	positionLine ( QWidget* parent, ComboBoxModel* zoom );
 	
 	// qproperty access functions
-	bool tailGradient () const;
-	void setTailGradient ( const bool & g );
+	bool hasTailGradient () const;
+	void setHasTailGradient ( const bool g );
 	QColor lineColor () const;
 	void setLineColor ( const QColor & c );
 
 private:
 	void paintEvent( QPaintEvent* pe ) override;
 	
-	bool m_tailGradient;
+	bool m_hasTailGradient;
 	QColor m_lineColor;
 	
 	// to accomodate the change in size by zoom

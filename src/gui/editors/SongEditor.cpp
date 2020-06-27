@@ -57,7 +57,7 @@ const QVector<double> positionLine::s_zoomLevels =
 
 positionLine::positionLine( QWidget* parent, ComboBoxModel* zoom) :
 	QWidget( parent ),
-	m_tailGradient ( false ),
+	m_hasTailGradient ( false ),
 	m_lineColor (0, 0, 0, 0)
 {
 	m_currentZoom = zoom;
@@ -88,15 +88,15 @@ void positionLine::paintEvent( QPaintEvent* pe )
 		QLinearGradient gradient( rect().bottomLeft(), rect().bottomRight() );
 		
 		// If gradient is enabled, we're in focus and we're playing, enable gradient
-		if (Engine::getSong()->isPlaying() && m_tailGradient && 
+		if (Engine::getSong()->isPlaying() && m_hasTailGradient && 
 			Engine::getSong()->playMode() == Song::Mode_PlaySong)
 		{
-			gradient.setColorAt((double)( ( width() - 1.0f )/width() ),
+			gradient.setColorAt(( ( width() - 1.0f )/width() ),
 				QColor( m_lineColor.red(), m_lineColor.green(), m_lineColor.blue(), 60) );
 		}
 		else
 		{
-			gradient.setColorAt((double)( ( width() - 1.0f )/width() ),
+			gradient.setColorAt(( ( width() - 1.0f )/width() ),
 				QColor( m_lineColor.red(), m_lineColor.green(), m_lineColor.blue(), 0) );
 		}
 		
@@ -112,11 +112,11 @@ void positionLine::paintEvent( QPaintEvent* pe )
 }
 
 // QProperty handles
-bool positionLine::tailGradient() const
-{ return m_tailGradient; }
+bool positionLine::hasTailGradient() const
+{ return m_hasTailGradient; }
 
-void positionLine::setTailGradient( const bool & g )
-{ m_tailGradient = g; }
+void positionLine::setHasTailGradient( const bool g )
+{ m_hasTailGradient = g; }
 
 QColor positionLine::lineColor() const
 { return m_lineColor; }
