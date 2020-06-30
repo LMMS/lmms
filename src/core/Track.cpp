@@ -1871,16 +1871,23 @@ TrackOperationsWidget::TrackOperationsWidget( TrackView * parent ) :
 	m_soloBtn->setInactiveGraphic( embed::getIconPixmap( "led_off" ) );
 	m_soloBtn->setCheckable( true );
 
+	m_soloAutomationsBtn = new PixmapButton( this, tr( "Solo with Automations" ) );
+	m_soloAutomationsBtn->setActiveGraphic( embed::getIconPixmap( "led_purple" ) );
+	m_soloAutomationsBtn->setInactiveGraphic( embed::getIconPixmap( "led_off" ) );
+	m_soloAutomationsBtn->setCheckable( true );
+
 	if( ConfigManager::inst()->value( "ui",
 					  "compacttrackbuttons" ).toInt() )
 	{
 		m_muteBtn->move( 46, 0 );
-		m_soloBtn->move( 46, 16 );
+		m_soloBtn->move( 46, 9 );
+		m_soloAutomationsBtn->move( 46, 18 );
 	}
 	else
 	{
 		m_muteBtn->move( 46, 8 );
 		m_soloBtn->move( 62, 8 );
+		m_soloAutomationsBtn->move( 78, 8 );
 	}
 
 	m_muteBtn->show();
@@ -1888,6 +1895,14 @@ TrackOperationsWidget::TrackOperationsWidget( TrackView * parent ) :
 
 	m_soloBtn->show();
 	ToolTip::add( m_soloBtn, tr( "Solo" ) );
+
+	m_soloAutomationsBtn->show();
+	ToolTip::add( m_soloAutomationsBtn, tr( "Solo with Automations" ) );
+	// The purple LED will simply enable the regular solo (red LED). But since it will also
+	// change m_soloAutomationsModel to true, the behavior of the solo will be different
+	// keeping the automation tracks on their current state (either muted or unmuted).
+	connect( m_soloAutomationsBtn, SIGNAL( clicked() ),
+			m_soloBtn, SLOT( toggle() ) );
 
 	connect( this, SIGNAL( trackRemovalScheduled( TrackView * ) ),
 			m_trackView->trackContainerView(),
@@ -2643,6 +2658,13 @@ void Track::toggleSolo()
 	}
 
 	const bool solo = m_soloModel.value();
+
+	// Turn off the soloAutomationsBtn LED if we are disabling the solo
+	if( !solo )
+	{
+		m_soloAutomationsModel.setValue( false );
+	}
+
 	for( TrackContainer::TrackList::const_iterator it = tl.begin();
 							it != tl.end(); ++it )
 	{
@@ -2653,24 +2675,34 @@ void Track::toggleSolo()
 			{
 				( *it )->m_mutedBeforeSolo = ( *it )->isMuted();
 			}
-			// Don't mute AutomationTracks (keep their original state)
 			if( *it == this ){
 				( *it )->setMuted( false );
-			} else if( ( *it )->type() != AutomationTrack ){
-				( *it )->setMuted( true );
+			} else {
+				// Only mutes the automation tracks if the soloAutomationsBtn LED is not
+				// toggled
+				if( ( *it )->type() == AutomationTrack ){
+					if( !m_soloAutomationsModel.value() )
+					{
+						( *it )->setMuted( true );
+					}
+				} else {
+					( *it )->setMuted( true );
+				}
 			}
 			if( *it != this )
 			{
 				( *it )->m_soloModel.setValue( false );
+				// If the soloAutomationsBtn LED is activated on another track we disable it as well
+				( *it )->m_soloAutomationsModel.setValue( false );
 			}
 		}
-		else if( !soloBefore && (* it )->type() != AutomationTrack )
+		else if( !soloBefore )
 		{
-			// Only restores the mute state if the track isn't an Automation Track
 			( *it )->setMuted( ( *it )->m_mutedBeforeSolo );
 		}
 	}
 }
+
 
 
 
@@ -2841,6 +2873,7 @@ void TrackView::modelChanged()
 	connect( m_track, SIGNAL( destroyedTrack() ), this, SLOT( close() ) );
 	m_trackOperationsWidget.m_muteBtn->setModel( &m_track->m_mutedModel );
 	m_trackOperationsWidget.m_soloBtn->setModel( &m_track->m_soloModel );
+	m_trackOperationsWidget.m_soloAutomationsBtn->setModel( &m_track->m_soloAutomationsModel );
 	ModelView::modelChanged();
 	setFixedHeight( m_track->getHeight() );
 }

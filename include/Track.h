@@ -57,7 +57,7 @@ class TrackView;
 
 
 const int DEFAULT_SETTINGS_WIDGET_WIDTH = 224;
-const int TRACK_OP_WIDTH = 78;
+const int TRACK_OP_WIDTH = 94;
 // This shaves 150-ish pixels off track buttons,
 // ruled from config: ui.compacttrackbuttons
 const int DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT = 96;
@@ -466,6 +466,7 @@ private:
 	QPushButton * m_trackOps;
 	PixmapButton * m_muteBtn;
 	PixmapButton * m_soloBtn;
+	PixmapButton * m_soloAutomationsBtn; // Purple LED that enables solo with automations
 
 
 	friend class TrackView;
@@ -628,6 +629,8 @@ protected:
 private:
 	BoolModel m_soloModel;
 	bool m_mutedBeforeSolo;
+
+	BoolModel m_soloAutomationsModel; // That option prevents solo from muting automation tracks
 
 	bool m_simpleSerializingMode;
 
