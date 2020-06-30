@@ -2653,21 +2653,29 @@ void Track::toggleSolo()
 			{
 				( *it )->m_mutedBeforeSolo = ( *it )->isMuted();
 			}
-			// Don't mute AutomationTracks (keep their original state)
+			// Don't mute AutomationTracks (keep their original state) unless we are on the sololegacybehavior mode
 			if( *it == this ){
 				( *it )->setMuted( false );
-			} else if( ( *it )->type() != AutomationTrack ){
-				( *it )->setMuted( true );
+			} else {
+				if( ConfigManager::inst()->value("app","sololegacybehavior").toInt() || ( *it )->type() != AutomationTrack ){
+					( *it )->setMuted( true );
+				}
 			}
 			if( *it != this )
 			{
 				( *it )->m_soloModel.setValue( false );
 			}
 		}
-		else if( !soloBefore && (* it )->type() != AutomationTrack )
+		else if( !soloBefore )
 		{
-			// Only restores the mute state if the track isn't an Automation Track
-			( *it )->setMuted( ( *it )->m_mutedBeforeSolo );
+			// Unless we are on the sololegacybehavior mode, only restores the
+			// mute state if the track isn't an Automation Track
+			if( ConfigManager::inst()->value("app","sololegacybehavior").toInt() )
+			{
+				( *it )->setMuted( ( *it )->m_mutedBeforeSolo );
+			} else if( ( *it )->type() != AutomationTrack ) {
+				( *it )->setMuted( ( *it )->m_mutedBeforeSolo );
+			}
 		}
 	}
 }
