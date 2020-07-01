@@ -52,15 +52,11 @@
 #include "PianoRoll.h"
 #include "Track.h"
 
-const QVector<double> positionLine::s_zoomLevels =
-		{ 0.125f, 0.25f, 0.5f, 1.0f, 2.0f, 4.0f, 8.0f, 16.0f };
-
-positionLine::positionLine( QWidget* parent, ComboBoxModel* zoom) :
+positionLine::positionLine( QWidget* parent ) :
 	QWidget( parent ),
 	m_hasTailGradient ( false ),
 	m_lineColor (0, 0, 0, 0)
 {
-	m_currentZoom = zoom;
 	resize( 8, height() );
 	
 	setAttribute( Qt::WA_NoSystemBackground, true );
@@ -72,7 +68,7 @@ void positionLine::paintEvent( QPaintEvent* pe )
 	QPainter p( this );
 	
 	// Resize based on the zoom value
-	resize( 8.0f * s_zoomLevels[ m_currentZoom->value() ], height() );
+	//resize( 8.0f * s_zoomLevels[ m_currentZoom->value() ], height() );
 	
 	// If width is 1, we don't need a gradient
 	if (width() == 1)
@@ -91,12 +87,12 @@ void positionLine::paintEvent( QPaintEvent* pe )
 		if (Engine::getSong()->isPlaying() && m_hasTailGradient && 
 			Engine::getSong()->playMode() == Song::Mode_PlaySong)
 		{
-			gradient.setColorAt(( ( width() - 1.0f )/width() ),
+			gradient.setColorAt(( ( width() - 1.0 )/width() ),
 				QColor( m_lineColor.red(), m_lineColor.green(), m_lineColor.blue(), 60) );
 		}
 		else
 		{
-			gradient.setColorAt(( ( width() - 1.0f )/width() ),
+			gradient.setColorAt(( ( width() - 1.0 )/width() ),
 				QColor( m_lineColor.red(), m_lineColor.green(), m_lineColor.blue(), 0) );
 		}
 		
@@ -123,6 +119,17 @@ QColor positionLine::lineColor() const
 
 void positionLine::setLineColor( const QColor & c )
 { m_lineColor = c; }
+
+// NOTE: the move() implementation fixes a bug where the position line would appear
+// in an unexpected location when positioned at the start of the track
+void positionLine::zoomChange( double zoom )
+{
+	move( x() + width() - 1, y() );
+	resize( 8.0 * zoom, height() );
+	move( x() - width() + 1, y() );
+	
+	update();
+}
 
 
 
@@ -167,11 +174,13 @@ SongEditor::SongEditor( Song * song ) :
 	connect( m_timeLine, SIGNAL( selectionFinished() ),
 			 this, SLOT( stopRubberBand() ) );
 
-	m_positionLine = new positionLine( this, m_zoomingModel );
+	m_positionLine = new positionLine( this );
 	static_cast<QVBoxLayout *>( layout() )->insertWidget( 1, m_timeLine );
 	
 	connect( m_song, SIGNAL( playbackStateChanged() ),
 			 m_positionLine, SLOT( update() ) );
+	connect( this, SIGNAL( zoomingValueChanged( double ) ),
+			 m_positionLine, SLOT( zoomChange( double ) ) );
 
 
 	// add some essential widgets to global tool-bar
@@ -900,6 +909,8 @@ void SongEditor::zoomingChanged()
 					setPixelsPerBar( pixelsPerBar() );
 	realignTracks();
 	updateRubberband();
+	
+	emit zoomingValueChanged( m_zoomLevels[m_zoomingModel->value()] );
 }
 
 

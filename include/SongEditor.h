@@ -52,7 +52,7 @@ class positionLine : public QWidget
 	Q_PROPERTY ( bool tailGradient READ hasTailGradient WRITE setHasTailGradient )
 	Q_PROPERTY ( QColor lineColor READ lineColor WRITE setLineColor )
 public:
-	positionLine ( QWidget* parent, ComboBoxModel* zoom );
+	positionLine ( QWidget* parent );
 	
 	// qproperty access functions
 	bool hasTailGradient () const;
@@ -60,15 +60,14 @@ public:
 	QColor lineColor () const;
 	void setLineColor ( const QColor & c );
 
+public slots:
+	void zoomChange (double zoom);
+
 private:
 	void paintEvent( QPaintEvent* pe ) override;
 	
 	bool m_hasTailGradient;
 	QColor m_lineColor;
-	
-	// to accomodate the change in size by zoom
-	ComboBoxModel* m_currentZoom;
-	static const QVector<double> s_zoomLevels;
 
 };
 
@@ -181,6 +180,9 @@ private:
 	bool m_selectRegion;
 
 	friend class SongEditorWindow;
+
+signals:
+	void zoomingValueChanged( double );
 } ;
 
 
