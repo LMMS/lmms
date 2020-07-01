@@ -235,7 +235,7 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 		m_oneInstrumentTrackWindow, SLOT(toggleOneInstrumentTrackWindow(bool)), true);
 	addLedCheckBox("Show sidebar on the right-hand side", gui_tw, counter,
 		m_sideBarOnRight, SLOT(toggleSideBarOnRight(bool)), true);
-	addLedCheckBox("Use solo legacy behavior", gui_tw, counter,
+	addLedCheckBox("Mute automation tracks during solo", gui_tw, counter,
 		m_soloLegacyBehavior, SLOT(toggleSoloLegacyBehavior(bool)), false);
 
 	gui_tw->setFixedHeight(YDelta + YDelta * counter);
