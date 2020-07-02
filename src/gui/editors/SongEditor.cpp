@@ -67,9 +67,6 @@ void positionLine::paintEvent( QPaintEvent* pe )
 {
 	QPainter p( this );
 	
-	// Resize based on the zoom value
-	//resize( 8.0f * s_zoomLevels[ m_currentZoom->value() ], height() );
-	
 	// If width is 1, we don't need a gradient
 	if (width() == 1)
 	{
