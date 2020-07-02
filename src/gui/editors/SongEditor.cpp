@@ -121,10 +121,10 @@ void positionLine::setLineColor( const QColor & c )
 // in an unexpected location when positioned at the start of the track
 void positionLine::zoomChange( double zoom )
 {
-	int X = x() + width() - 1;
+	int playHeadPos = x() + width() - 1;
 	
 	resize( 8.0 * zoom, height() );
-	move( X - width() + 1, y() );
+	move( playHeadPos - width() + 1, y() );
 	
 	update();
 }
