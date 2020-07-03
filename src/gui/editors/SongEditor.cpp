@@ -555,17 +555,7 @@ void SongEditor::keyPressEvent( QKeyEvent * ke )
 	}
 	else if( isShiftPressed && ke->key() == Qt::Key_Space )
 	{
-		if ( m_song->isPlaying() )
-		{
-			tick_t playPos = m_song->currentTick();
-			m_song->stop();
-			m_song->setPlayPos( playPos, Song::Mode_PlaySong );
-		}
-
-		else
-		{
-			m_song->playSong();
-		}
+		m_song->togglePause();
 	}
 	else if( ke->key() == Qt::Key_Left )
 	{
