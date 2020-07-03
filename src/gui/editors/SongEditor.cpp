@@ -107,7 +107,6 @@ void positionLine::paintEvent( QPaintEvent* pe )
 // QProperty handles
 bool positionLine::hasTailGradient() const
 { return m_hasTailGradient; }
-<<<<<<< HEAD
 
 void positionLine::setHasTailGradient( const bool g )
 { m_hasTailGradient = g; }
@@ -118,18 +117,6 @@ QColor positionLine::lineColor() const
 void positionLine::setLineColor( const QColor & c )
 { m_lineColor = c; }
 
-=======
-
-void positionLine::setHasTailGradient( const bool g )
-{ m_hasTailGradient = g; }
-
-QColor positionLine::lineColor() const
-{ return m_lineColor; }
-
-void positionLine::setLineColor( const QColor & c )
-{ m_lineColor = c; }
-
->>>>>>> 984fd3a935cb7b85ead204dc81ff32293aa556cf
 // NOTE: the move() implementation fixes a bug where the position line would appear
 // in an unexpected location when positioned at the start of the track
 void positionLine::zoomChange( double zoom )
