@@ -561,6 +561,7 @@ void SongEditor::keyPressEvent( QKeyEvent * ke )
 			m_song->stop();
 			m_song->setPlayPos( playPos, Song::Mode_PlaySong );
 		}
+
 		else
 		{
 			m_song->playSong();
