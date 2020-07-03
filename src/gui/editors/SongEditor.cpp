@@ -553,10 +553,6 @@ void SongEditor::keyPressEvent( QKeyEvent * ke )
 	{
 		m_song->removeBar();
 	}
-	else if( isShiftPressed && ke->key() == Qt::Key_Space )
-	{
-		m_song->togglePause();
-	}
 	else if( ke->key() == Qt::Key_Left )
 	{
 		tick_t t = m_song->currentTick() - MidiTime::ticksPerBar();
