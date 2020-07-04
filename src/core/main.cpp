@@ -86,9 +86,10 @@ inline void loadTranslation( const QString & tname,
 	QTranslator * t = new QTranslator( QCoreApplication::instance() );
 	QString name = tname + ".qm";
 
-	t->load( name, dir );
-
-	QCoreApplication::instance()->installTranslator( t );
+	if (t->load(name, dir))
+	{
+		QCoreApplication::instance()->installTranslator(t);
+	}
 }
 
 
@@ -651,18 +652,16 @@ int main( int argc, char * * argv )
 		pos = QLocale::system().name().left( 2 );
 	}
 
-#ifdef LMMS_BUILD_WIN32
-#undef QT_TRANSLATIONS_DIR
-#define QT_TRANSLATIONS_DIR ConfigManager::inst()->localeDir()
-#endif
-
-#ifdef QT_TRANSLATIONS_DIR
-	// load translation for Qt-widgets/-dialogs
-	loadTranslation( QString( "qt_" ) + pos,
-					QString( QT_TRANSLATIONS_DIR ) );
-#endif
 	// load actual translation for LMMS
 	loadTranslation( pos );
+
+	// load translation for Qt-widgets/-dialogs
+#ifdef QT_TRANSLATIONS_DIR
+	// load from the original path first
+	loadTranslation(QString("qt_") + pos, QT_TRANSLATIONS_DIR);
+#endif
+	// override it with bundled/custom one, if exists
+	loadTranslation(QString("qt_") + pos, ConfigManager::inst()->localeDir());
 
 
 	// try to set realtime priority
