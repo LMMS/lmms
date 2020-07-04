@@ -39,7 +39,7 @@ before_install:
 install:
     - . ${TRAVIS_BUILD_DIR}/.travis/${TRAVIS_OS_NAME}.${TARGET_OS}.install.sh
 before_script:
-    - export CMAKE_FLAGS="-DWANT_QT5=$QT5 -DUSE_WERROR=ON -DCMAKE_BUILD_TYPE=RelWithDebInfo"
+    - export CMAKE_FLAGS="-DWANT_QT5=$QT5 -DUSE_WERROR=ON -DCMAKE_BUILD_TYPE=RelWithDebInfo -DBUNDLE_QT_TRANSLATIONS=ON"
     - if [ -z "$TRAVIS_TAG" ]; then export CMAKE_FLAGS="$CMAKE_FLAGS -DUSE_CCACHE=ON"; fi
 script:
     - . ${TRAVIS_BUILD_DIR}/.travis/${TRAVIS_OS_NAME}.${TARGET_OS}.script.sh
