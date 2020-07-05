@@ -455,6 +455,15 @@ void FxMixerView::deleteUnusedChannels()
 					break;
 				}
 			}
+			else if( t->type() == Track::SampleTrack )
+			{
+				SampleTrack *strack = dynamic_cast<SampleTrack *>( t );
+				if( i == strack->effectChannelModel()->value(0) )
+				{
+					empty=false;
+					break;
+				}
+			}
 		}
 		FxChannel * ch = Engine::fxMixer()->effectChannel( i );
 		// delete channel if no references found
