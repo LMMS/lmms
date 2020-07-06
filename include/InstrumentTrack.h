@@ -27,6 +27,7 @@
 #define INSTRUMENT_TRACK_H
 
 #include "AudioPort.h"
+#include "Groove.h"
 #include "GroupBox.h"
 #include "InstrumentFunctions.h"
 #include "InstrumentSoundShaping.h"
@@ -92,6 +93,8 @@ public:
 
 	f_cnt_t beatLen( NotePlayHandle * _n ) const;
 
+	void disableGroove();
+	void enableGroove();
 
 	// for capturing note-play-events -> need that for arpeggio,
 	// filter and so on
@@ -156,6 +159,8 @@ public:
 	{
 		return &m_audioPort;
 	}
+
+	Groove * groove();
 
 	MidiPort * midiPort()
 	{
@@ -274,10 +279,16 @@ private:
 
 	AudioPort m_audioPort;
 
+	// Track specific groove or NULL
+	Groove * m_groove;
+	Groove * m_noGroove;
+	bool m_grooveOn; //if true temporarily return nooop Groove for the groove
+
 	FloatModel m_pitchModel;
 	IntModel m_pitchRangeModel;
 	IntModel m_effectChannelModel;
 	BoolModel m_useMasterPitchModel;
+	BoolModel m_useGrooveModel;
 
 
 	Instrument * m_instrument;
@@ -288,12 +299,15 @@ private:
 	Piano m_piano;
 
 
+
 	friend class InstrumentTrackView;
 	friend class InstrumentTrackWindow;
 	friend class NotePlayHandle;
 	friend class InstrumentMiscView;
 
-} ;
+private slots:
+	void updateGroove();
+};
 
 
 
