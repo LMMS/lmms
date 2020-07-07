@@ -439,38 +439,28 @@ void FxMixerView::deleteUnusedChannels()
 	tracks += Engine::getSong()->tracks();
 	tracks += Engine::getBBTrackContainer()->tracks();
 
-	// go through all FX Channels
+	bool inUse[m_fxChannelViews.size()] = {false};
+
+	for (Track* t: tracks)
+	{
+		int channel = 0;
+		if (t->type() == Track::InstrumentTrack)
+		{
+			InstrumentTrack* inst = dynamic_cast<InstrumentTrack *>(t);
+			channel = inst->effectChannelModel()->value();
+		}
+		else if (t->type() == Track::SampleTrack)
+		{
+			SampleTrack *strack = dynamic_cast<SampleTrack *>(t);
+			channel = strack->effectChannelModel()->value();
+		}
+		inUse[channel] = true;
+	}
+
 	for(int i = m_fxChannelViews.size()-1; i > 0; --i)
 	{
-		// check if an instrument references to the current channel
-		bool empty=true;
-		for( Track* t : tracks )
-		{
-			if( t->type() == Track::InstrumentTrack )
-			{
-				InstrumentTrack* inst = dynamic_cast<InstrumentTrack *>( t );
-				if( i == inst->effectChannelModel()->value(0) )
-				{
-					empty=false;
-					break;
-				}
-			}
-			else if( t->type() == Track::SampleTrack )
-			{
-				SampleTrack *strack = dynamic_cast<SampleTrack *>( t );
-				if( i == strack->effectChannelModel()->value(0) )
-				{
-					empty=false;
-					break;
-				}
-			}
-		}
-		FxChannel * ch = Engine::fxMixer()->effectChannel( i );
-		// delete channel if no references found
-		if( empty && ch->m_receives.isEmpty() )
-		{
-			deleteChannel( i );
-		}
+		if(!inUse[i] && Engine::fxMixer()->effectChannel(i)->m_receives.isEmpty())
+		{ deleteChannel(i); }
 	}
 }
 
