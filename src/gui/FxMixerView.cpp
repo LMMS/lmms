@@ -412,12 +412,9 @@ void FxMixerView::deleteChannel(int index)
 	m_channelAreaWidget->adjustSize();
 
 	// make sure every channel knows what index it is
-	for(int i=0; i<m_fxChannelViews.size(); ++i)
+	for(int i=index + 1; i<m_fxChannelViews.size(); ++i)
 	{
-		if( i > index )
-		{
-			m_fxChannelViews[i]->m_fxLine->setChannelIndex(i-1);
-		}
+		m_fxChannelViews[i]->m_fxLine->setChannelIndex(i-1);
 	}
 	m_fxChannelViews.remove(index);
 
