@@ -245,6 +245,9 @@ MainWindow::MainWindow() :
 
 	connect(Engine::getSong(), SIGNAL(modified()), SLOT(onSongModified()));
 	connect(Engine::getSong(), SIGNAL(projectFileNameChanged()), SLOT(onProjectFileNameChanged()));
+
+	maximised = ( isMaximized() ? true : false );
+	new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_F11), this, SLOT(toggleFullscreen()));
 }
 
 
@@ -738,6 +741,7 @@ void MainWindow::saveWidgetState( QWidget * _w, QDomElement & _de )
 	_de.setAttribute( "visible", visible );
 	_de.setAttribute( "minimized", _w->isMinimized() );
 	_de.setAttribute( "maximized", _w->isMaximized() );
+	_de.setAttribute( "fullscreen", _w->isFullScreen() );
 
 	_de.setAttribute( "x", normalGeom.x() );
 	_de.setAttribute( "y", normalGeom.y() );
@@ -782,6 +786,9 @@ void MainWindow::restoreWidgetState( QWidget * _w, const QDomElement & _de )
 		flags = _de.attribute( "maximized" ).toInt() ?
 				( flags | Qt::WindowMaximized ) :
 				( flags & ~Qt::WindowMaximized );
+		flags = _de.attribute( "fullscreen" ).toInt() ?
+				( flags | Qt::WindowFullScreen ) :
+				( flags & ~Qt::WindowFullScreen );
 		_w->setWindowState( flags );
 
 		_w->setVisible( _de.attribute( "visible" ).toInt() );
@@ -1005,6 +1012,21 @@ void MainWindow::toggleWindow( QWidget *window, bool forceShow )
 	m_workspace->setVerticalScrollBarPolicy( Qt::ScrollBarAsNeeded );
 }
 
+
+
+void MainWindow::toggleFullscreen()
+{
+	if ( !isFullScreen() )
+	{
+		maximised = isMaximized();
+		showFullScreen();
+	}
+	else
+	{
+		show();
+		showMaximized();
+	}
+}
 
 
 
