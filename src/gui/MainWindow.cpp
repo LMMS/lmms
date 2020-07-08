@@ -246,7 +246,7 @@ MainWindow::MainWindow() :
 	connect(Engine::getSong(), SIGNAL(modified()), SLOT(onSongModified()));
 	connect(Engine::getSong(), SIGNAL(projectFileNameChanged()), SLOT(onProjectFileNameChanged()));
 
-	maximised = ( isMaximized() ? true : false );
+	maximised = isMaximized();
 	new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_F11), this, SLOT(toggleFullscreen()));
 }
 
