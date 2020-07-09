@@ -109,11 +109,12 @@ private:
 	sampleFrame m_maxLookaheadVal = {0};
 	int m_maxLookaheadTimer[2] = {1, 1};
 	
-	RmsHelper * m_rms[2];
+	float m_rmsTimeConst;
+	float m_rmsVal[2] = {0, 0};
 
-	float m_crestPeakVal[2] = {0,0};
-	float m_crestRmsVal[2] = {0,0};
-	float m_crestFactorVal[2] = {0,0};
+	float m_crestPeakVal[2] = {0, 0};
+	float m_crestRmsVal[2] = {0, 0};
+	float m_crestFactorVal[2] = {0, 0};
 	float m_crestTimeConst;
 
 	float m_tiltOut[2] = {0};

@@ -41,7 +41,7 @@ CompressorControls::CompressorControls(CompressorEffect* effect) :
 	m_kneeModel(12.0f, 0.0f, 96.0f, 0.01f, this, tr("Knee")),
 	m_holdModel(0.0f, 0.0f, 500.0f, 0.01f, this, tr("Hold")),
 	m_rangeModel(-240.0f, -240.0f, 0.0f, 0.01f, this, tr("Range")),
-	m_rmsModel(64.0f, 1.0f, 2048.0f, 1.0f, this, tr("RMS Size")),
+	m_rmsModel(10.0f, 0.0f, 1000.0f, 0.01f, this, tr("RMS Size")),
 	m_midsideModel(0.0f, 0.0f, 1.0f, this, tr("Mid/Side")),
 	m_peakmodeModel(0.0f, 0.0f, 1.0f, this, tr("Peak Mode")),
 	m_lookaheadLengthModel(0.0f, 0.0f, 20.0f, 0.0001f, this, tr("Lookahead Length")),

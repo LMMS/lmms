@@ -57,10 +57,6 @@ CompressorEffect::CompressorEffect(Model* parent, const Descriptor::SubPluginFea
 
 	m_yL[0] = m_yL[1] = COMP_NOISE_FLOOR;
 
-	// These will be resized later
-	m_rms[0] = new RmsHelper(1);
-	m_rms[1] = new RmsHelper(1);
-
 	// 200 ms
 	m_crestTimeConst = exp(-1.f / (0.2f * m_sampleRate));
 
@@ -86,6 +82,7 @@ CompressorEffect::CompressorEffect(Model* parent, const Descriptor::SubPluginFea
 	connect(&m_compressorControls.m_thresholdModel, SIGNAL(dataChanged()), this, SLOT(calcAutoMakeup()));
 	connect(&m_compressorControls.m_ratioModel, SIGNAL(dataChanged()), this, SLOT(calcAutoMakeup()));
 	connect(&m_compressorControls.m_kneeModel, SIGNAL(dataChanged()), this, SLOT(calcAutoMakeup()));
+	connect(&m_compressorControls.m_autoMakeupModel, SIGNAL(dataChanged()), this, SLOT(calcAutoMakeup()));
 
 	connect(Engine::mixer(), SIGNAL(sampleRateChanged()), this, SLOT(changeSampleRate()));
 	emit changeSampleRate();
@@ -96,8 +93,6 @@ CompressorEffect::CompressorEffect(Model* parent, const Descriptor::SubPluginFea
 
 CompressorEffect::~CompressorEffect()
 {
-	delete m_rms[0];
-	delete m_rms[1];
 }
 
 
@@ -114,24 +109,26 @@ void CompressorEffect::calcAutoMakeup()
 	// Formulas using the compressor's Threshold, Ratio, and Knee values to estimate a good makeup gain value
 
 	float tempGainResult;
-	if (0 - m_thresholdVal < -m_kneeVal)
+	if (-m_thresholdVal < -m_kneeVal)// Below knee
 	{
 		tempGainResult = 0;
 	}
-	else if (abs(1 - m_thresholdVal) < m_kneeVal)// If the input is within the knee's range
+	else if (abs(1 - m_thresholdVal) < m_kneeVal)// Within knee
 	{
-		const float temp = m_thresholdVal + m_kneeVal;
+		const float temp = -m_thresholdVal + m_kneeVal;
 		tempGainResult = ((m_compressorControls.m_limiterModel.value() ? 0 : m_ratioVal) - 1) * temp * temp / (4 * m_kneeVal);
 	}
-	else
+	else// Above knee
 	{
 		tempGainResult = m_compressorControls.m_limiterModel.value()
 			? m_thresholdVal
-			: (m_thresholdVal + m_thresholdVal * m_ratioVal);
+			: (m_thresholdVal - m_thresholdVal * m_ratioVal);
 	}
 
 	m_autoMakeupVal = 1.f / dbfsToAmp(tempGainResult);
 }
+
+
 
 void CompressorEffect::calcAttack()
 {
@@ -183,8 +180,7 @@ void CompressorEffect::calcRange()
 
 void CompressorEffect::resizeRMS()
 {
-	m_rms[0]->setSize(m_compressorControls.m_rmsModel.value() * m_sampleRate / 44100.f);
-	m_rms[1]->setSize(m_compressorControls.m_rmsModel.value() * m_sampleRate / 44100.f);
+	m_rmsTimeConst = exp(-1.f / (m_compressorControls.m_rmsModel.value() * 0.001f * m_sampleRate));
 }
 
 void CompressorEffect::calcLookaheadLength()
@@ -322,8 +318,10 @@ bool CompressorEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 			m_crestRmsVal[i] = m_crestTimeConst * m_crestRmsVal[i] + ((1 - m_crestTimeConst) * (inputValue * inputValue));
 			m_crestFactorVal[i] = m_crestPeakVal[i] / m_crestRmsVal[i];
 
+			m_rmsVal[i] = m_rmsTimeConst * m_rmsVal[i] + ((1 - m_rmsTimeConst) * (inputValue * inputValue));
+
 			// Grab the peak or RMS value
-			inputValue = qMax(COMP_NOISE_FLOOR, peakmode ? abs(inputValue) : m_rms[i]->update(inputValue));
+			inputValue = qMax(COMP_NOISE_FLOOR, peakmode ? abs(inputValue) : m_rmsVal[i]);
 
 			// The following code uses math magic to semi-efficiently
 			// find the largest value in the lookahead buffer.
@@ -555,8 +553,8 @@ bool CompressorEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 
 		outSum += s[0] + s[1];
 
-		lInPeak = buf[f][0] > lInPeak ? buf[f][0] : lInPeak;
-		rInPeak = buf[f][1] > rInPeak ? buf[f][1] : rInPeak;
+		lInPeak = drySignal[0] > lInPeak ? drySignal[0] : lInPeak;
+		rInPeak = drySignal[1] > rInPeak ? drySignal[1] : rInPeak;
 		lOutPeak = s[0] > lOutPeak ? s[0] : lOutPeak;
 		rOutPeak = s[1] > rOutPeak ? s[1] : rOutPeak;
 	}
