@@ -338,7 +338,7 @@ void vestigeInstrument::loadFile( const QString & _file )
 
 	// if the same is loaded don't load again (for preview)
 	if (instrumentTrack() != NULL && instrumentTrack()->isPreviewMode() &&
-			m_pluginDLL == SampleBuffer::tryToMakeRelative( _file ))
+			m_pluginDLL == PathUtil::toShortestRelative( _file ))
 		return;
 
 	if ( m_plugin != NULL )
