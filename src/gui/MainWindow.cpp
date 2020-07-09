@@ -1143,6 +1143,10 @@ void MainWindow::updateViewMenu()
 			      tr( "Project Notes" ) + " (F11)",
 			      this, SLOT( toggleProjectNotesWin() )
 		);
+	m_viewMenu->addAction(embed::getIconPixmap( "maximize" ),
+				tr( "Fullscreen" ) + " (Ctrl+F11)",
+				this, SLOT( toggleFullscreen() ) 
+		);
 
 	m_viewMenu->addSeparator();
 
