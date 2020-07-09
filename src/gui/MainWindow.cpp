@@ -1019,8 +1019,7 @@ void MainWindow::toggleFullscreen()
 	}
 	else
 	{
-		show();
-		showMaximized();
+		maximised ? showMaximized() : showNormal();
 	}
 }
 
