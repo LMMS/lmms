@@ -412,12 +412,9 @@ void FxMixerView::deleteChannel(int index)
 	m_channelAreaWidget->adjustSize();
 
 	// make sure every channel knows what index it is
-	for(int i=0; i<m_fxChannelViews.size(); ++i)
+	for(int i=index + 1; i<m_fxChannelViews.size(); ++i)
 	{
-		if( i > index )
-		{
-			m_fxChannelViews[i]->m_fxLine->setChannelIndex(i-1);
-		}
+		m_fxChannelViews[i]->m_fxLine->setChannelIndex(i-1);
 	}
 	m_fxChannelViews.remove(index);
 
@@ -441,8 +438,11 @@ void FxMixerView::deleteUnusedChannels()
 
 	std::vector<bool> inUse(m_fxChannelViews.size(), false);
 
+	//Populate inUse by checking the destination channel for every track
 	for (Track* t: tracks)
 	{
+		//The channel that this track sends to. Since master channel is always in use,
+		//setting this to 0 is a safe default (for tracks that don't sent to the mixer).
 		int channel = 0;
 		if (t->type() == Track::InstrumentTrack)
 		{
@@ -457,9 +457,10 @@ void FxMixerView::deleteUnusedChannels()
 		inUse[channel] = true;
 	}
 
+	//Check all channels except master, delete those with no incoming sends
 	for(int i = m_fxChannelViews.size()-1; i > 0; --i)
 	{
-		if(!inUse[i] && Engine::fxMixer()->effectChannel(i)->m_receives.isEmpty())
+		if (!inUse[i] && Engine::fxMixer()->effectChannel(i)->m_receives.isEmpty())
 		{ deleteChannel(i); }
 	}
 }
