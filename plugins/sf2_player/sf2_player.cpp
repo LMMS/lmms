@@ -151,7 +151,7 @@ sf2Instrument::sf2Instrument( InstrumentTrack * _instrument_track ) :
 	m_chorusDepth.setInitValue(settingVal);
 #endif
 
-	loadFile( ConfigManager::inst()->defaultSoundfont() );
+	loadFile( ConfigManager::inst()->sf2File() );
 
 	updateSampleRate();
 	updateReverbOn();
@@ -396,18 +396,24 @@ void sf2Instrument::openFile( const QString & _sf2File, bool updateTrackName )
 	// Add to map, if doesn't exist.
 	else
 	{
-		m_fontId = fluid_synth_sfload( m_synth, sf2Ascii, true );
+		bool loaded = false;
+		if( fluid_is_soundfont( sf2Ascii ) )
+		{
+			m_fontId = fluid_synth_sfload( m_synth, sf2Ascii, true );
 
-		if( fluid_synth_sfcount( m_synth ) > 0 )
-		{
-			// Grab this sf from the top of the stack and add to list
-			m_font = new sf2Font( fluid_synth_get_sfont( m_synth, 0 ) );
-			s_fonts.insert( relativePath, m_font );
+			if( fluid_synth_sfcount( m_synth ) > 0 )
+			{
+				// Grab this sf from the top of the stack and add to list
+				m_font = new sf2Font( fluid_synth_get_sfont( m_synth, 0 ) );
+				s_fonts.insert( relativePath, m_font );
+				loaded = true;
+			}
 		}
-		else
+
+		if(!loaded)
 		{
-			collectErrorForUI( sf2Instrument::tr( "A soundfont %1 could not be loaded." ).arg( QFileInfo( _sf2File ).baseName() ) );
-			// TODO: Why is the filename missing when the file does not exist?
+			collectErrorForUI( sf2Instrument::tr( "A soundfont %1 could not be loaded." ).
+				arg( QFileInfo( _sf2File ).baseName() ) );
 		}
 	}
 

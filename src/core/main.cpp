@@ -129,9 +129,10 @@ inline void loadTranslation( const QString & tname,
 	QTranslator * t = new QTranslator( QCoreApplication::instance() );
 	QString name = tname + ".qm";
 
-	t->load( name, dir );
-
-	QCoreApplication::instance()->installTranslator( t );
+	if (t->load(name, dir))
+	{
+		QCoreApplication::instance()->installTranslator(t);
+	}
 }
 
 
@@ -161,6 +162,7 @@ void printHelp()
 		"Actions:\n"
 		"  <no action> [options...] [<project>]  Start LMMS in normal GUI mode\n"
 		"  dump <in>                             Dump XML of compressed file <in>\n"
+		"  compress <in>                         Compress file <in>\n"
 		"  render <project> [options...]         Render given project file\n"
 		"  rendertracks <project> [options...]   Render each track to a different file\n"
 		"  upgrade <in> [out]                    Upgrade file <in> and save as <out>\n"
@@ -424,6 +426,22 @@ int main( int argc, char * * argv )
 			f.open( QIODevice::ReadOnly );
 			QString d = qUncompress( f.readAll() );
 			printf( "%s\n", d.toUtf8().constData() );
+
+			return EXIT_SUCCESS;
+		}
+		else if( arg == "compress" || arg == "--compress" )
+		{
+			++i;
+
+			if( i == argc )
+			{
+				return noInputFileError();
+			}
+			
+			QFile f( QString::fromLocal8Bit( argv[i] ) );
+			f.open( QIODevice::ReadOnly );
+			QByteArray d = qCompress( f.readAll() ) ;
+			fwrite( d.constData(), sizeof(char), d.size(), stdout );
 
 			return EXIT_SUCCESS;
 		}
@@ -706,22 +724,20 @@ int main( int argc, char * * argv )
 		pos = QLocale::system().name().left( 2 );
 	}
 
-#ifdef LMMS_BUILD_WIN32
-#undef QT_TRANSLATIONS_DIR
-#define QT_TRANSLATIONS_DIR ConfigManager::inst()->localeDir()
-#endif
-
-#ifdef QT_TRANSLATIONS_DIR
-	// load translation for Qt-widgets/-dialogs
-	loadTranslation( QString( "qt_" ) + pos,
-					QString( QT_TRANSLATIONS_DIR ) );
-#endif
 	// load actual translation for LMMS
 	loadTranslation( pos );
 
+	// load translation for Qt-widgets/-dialogs
+#ifdef QT_TRANSLATIONS_DIR
+	// load from the original path first
+	loadTranslation(QString("qt_") + pos, QT_TRANSLATIONS_DIR);
+#endif
+	// override it with bundled/custom one, if exists
+	loadTranslation(QString("qt_") + pos, ConfigManager::inst()->localeDir());
+
 
 	// try to set realtime priority
-#ifdef LMMS_BUILD_LINUX
+#if defined(LMMS_BUILD_LINUX) || defined(LMMS_BUILD_FREEBSD)
 #ifdef LMMS_HAVE_SCHED_H
 #ifndef __OpenBSD__
 	struct sched_param sparam;
@@ -894,7 +910,7 @@ int main( int argc, char * * argv )
 			}
 			else // Exit
 			{
-				return 0;
+				return EXIT_SUCCESS;
 			}
 		}
 

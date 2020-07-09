@@ -60,7 +60,7 @@ private slots:
 
 
 private:
-	virtual void modelChanged();
+	void modelChanged() override;
 
 	inline EffectChain* fxChain()
 	{

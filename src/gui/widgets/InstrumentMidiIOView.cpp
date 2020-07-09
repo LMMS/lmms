@@ -86,7 +86,9 @@ InstrumentMidiIOView::InstrumentMidiIOView( QWidget* parent ) :
 	QHBoxLayout* midiOutputLayout = new QHBoxLayout( m_midiOutputGroupBox );
 	midiOutputLayout->setContentsMargins( 8, 18, 8, 8 );
 	midiOutputLayout->setSpacing( 4 );
+    
 	m_outputChannelSpinBox = new LcdSpinBox( 2, m_midiOutputGroupBox );
+	m_outputChannelSpinBox->addTextForValue( 0, "--" );
 	/*: This string must be be short, its width must be less than
 	 *  width of LCD spin-box of two digits */
 	m_outputChannelSpinBox->setLabel( tr( "CHAN" ) );
@@ -119,8 +121,6 @@ InstrumentMidiIOView::InstrumentMidiIOView( QWidget* parent ) :
 	midiOutputLayout->addWidget( m_fixedOutputNoteSpinBox );
 	midiOutputLayout->addStretch();
 
-	connect( m_midiOutputGroupBox->ledButton(), SIGNAL( toggled( bool ) ),
-			m_outputChannelSpinBox, SLOT( setEnabled( bool ) ) );
 	connect( m_midiOutputGroupBox->ledButton(), SIGNAL( toggled( bool ) ),
 		m_fixedOutputVelocitySpinBox, SLOT( setEnabled( bool ) ) );
 	connect( m_midiOutputGroupBox->ledButton(), SIGNAL( toggled( bool ) ),

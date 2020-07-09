@@ -59,7 +59,7 @@ public:
 private:
 	virtual void writeBuffer( const surroundSampleFrame * _ab,
 						const fpp_t _frames,
-						const float _master_gain );
+						const float _master_gain ) override;
 
 	bool startEncoding();
 	void finishEncoding();

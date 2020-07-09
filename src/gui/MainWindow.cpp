@@ -117,6 +117,7 @@ MainWindow::MainWindow() :
 	splitter->setChildrenCollapsible( false );
 
 	ConfigManager* confMgr = ConfigManager::inst();
+	bool sideBarOnRight = confMgr->value("ui", "sidebaronright").toInt();
 
 	emit initProgress(tr("Preparing plugin browser"));
 	sideBar->appendTab( new PluginBrowser( splitter ) );
@@ -137,7 +138,7 @@ MainWindow::MainWindow() :
 	sideBar->appendTab( new FileBrowser(
 				confMgr->userPresetsDir() + "*" +
 				confMgr->factoryPresetsDir(),
-					"*.xpf *.cs.xml *.xiz",
+					"*.xpf *.cs.xml *.xiz *.lv2",
 					tr( "My Presets" ),
 					embed::getIconPixmap( "preset_file" ).transformed( QTransform().rotate( 90 ) ),
 							splitter , false, true  ) );
@@ -171,19 +172,19 @@ MainWindow::MainWindow() :
 					embed::getIconPixmap( "computer" ).transformed( QTransform().rotate( 90 ) ),
 							splitter, dirs_as_items) );
 
-	m_workspace = new QMdiArea( splitter );
+	m_workspace = new QMdiArea(splitter);
 
 	// Load background
-	emit initProgress(tr("Loading background artwork"));
-	QString bgArtwork = ConfigManager::inst()->backgroundArtwork();
-	QImage bgImage;
-	if( !bgArtwork.isEmpty() )
+	emit initProgress(tr("Loading background picture"));
+	QString backgroundPicFile = ConfigManager::inst()->backgroundPicFile();
+	QImage backgroundPic;
+	if( !backgroundPicFile.isEmpty() )
 	{
-		bgImage = QImage( bgArtwork );
+		backgroundPic = QImage( backgroundPicFile );
 	}
-	if( !bgImage.isNull() )
+	if( !backgroundPicFile.isNull() )
 	{
-		m_workspace->setBackground( bgImage );
+		m_workspace->setBackground( backgroundPic );
 	}
 	else
 	{
@@ -194,9 +195,15 @@ MainWindow::MainWindow() :
 	m_workspace->setHorizontalScrollBarPolicy( Qt::ScrollBarAsNeeded );
 	m_workspace->setVerticalScrollBarPolicy( Qt::ScrollBarAsNeeded );
 
-	hbox->addWidget( sideBar );
-	hbox->addWidget( splitter );
-
+	hbox->addWidget(sideBar);
+	hbox->addWidget(splitter);
+	// If the user wants the sidebar on the right, we move the workspace and
+	// the splitter to the "left" side, or the first widgets in their list
+	if (sideBarOnRight)
+	{
+		splitter->insertWidget(0, m_workspace);
+		hbox->insertWidget(0, splitter);
+	}
 
 	// create global-toolbar at the top of our window
 	m_toolBar = new QWidget( main_widget );
@@ -291,7 +298,7 @@ void MainWindow::finalize()
 					tr( "&Save" ),
 					this, SLOT( saveProject() ),
 					QKeySequence::Save );
-	project_menu->addAction( embed::getIconPixmap( "project_saveas" ),
+	project_menu->addAction( embed::getIconPixmap( "project_save" ),
 					tr( "Save &As..." ),
 					this, SLOT( saveProjectAs() ),
 					Qt::CTRL + Qt::SHIFT + Qt::Key_S );
@@ -300,8 +307,9 @@ void MainWindow::finalize()
 					this, SLOT( saveProjectAsNewVersion() ),
 					Qt::CTRL + Qt::ALT + Qt::Key_S );
 
-	project_menu->addAction( tr( "Save as default template" ),
-				     this, SLOT( saveProjectAsDefaultTemplate() ) );
+	project_menu->addAction( embed::getIconPixmap( "project_save" ),
+					tr( "Save as default template" ),
+					this, SLOT( saveProjectAsDefaultTemplate() ) );
 
 	project_menu->addSeparator();
 	project_menu->addAction( embed::getIconPixmap( "project_import" ),
@@ -1304,6 +1312,7 @@ void MainWindow::sessionCleanup()
 
 void MainWindow::focusOutEvent( QFocusEvent * _fe )
 {
+	// TODO Remove this function, since it is apparently never actually called!
 	// when loosing focus we do not receive key-(release!)-events anymore,
 	// so we might miss release-events of one the modifiers we're watching!
 	clearKeyModifiers();
@@ -1517,7 +1526,12 @@ void MainWindow::exportProject(bool multiExport)
 				// Get first extension from selected dropdown.
 				// i.e. ".wav" from "WAV-File (*.wav), Dummy-File (*.dum)"
 				suffix = efd.selectedNameFilter().mid( stx + 2, etx - stx - 2 ).split( " " )[0].trimmed();
-				exportFileName.remove( "." + suffix, Qt::CaseInsensitive );
+
+				Qt::CaseSensitivity cs = Qt::CaseSensitive;
+#if defined(LMMS_BUILD_APPLE) || defined(LMMS_BUILD_WIN32)
+				cs = Qt::CaseInsensitive;
+#endif
+				exportFileName.remove( "." + suffix, cs );
 				if ( efd.selectedFiles()[0].endsWith( suffix ) )
 				{
 					if( VersionedSaveDialog::fileExistsQuery( exportFileName + suffix,

@@ -118,6 +118,11 @@ QMenu::indicator:selected {
 	background-color: #747474;
 }
 
+positionLine {
+	qproperty-tailGradient: false;
+	qproperty-lineColor: rgb(255, 255, 255);
+}
+
 PianoRoll {
 	background-color: rgb(0, 0, 0);
 	qproperty-backgroundShade: rgba( 255, 255, 255, 10 );
@@ -159,7 +164,7 @@ GroupBox {
 
 /* main toolbar oscilloscope - can have transparent bg now */
 
-VisualizationWidget  {
+Oscilloscope {
 	background: none;
 	border: none;
 	qproperty-normalColor: rgb(71, 253, 133);
@@ -622,6 +627,8 @@ TrackContentObjectView   {
 	qproperty-textBackgroundColor: rgba(0, 0, 0, 75);
 	qproperty-textShadowColor: rgb( 0, 0, 0 );
 	qproperty-gradient: true; /* boolean property, set true to have a gradient */
+	/* finger tip offset of cursor */
+	qproperty-mouseHotspotHand: 3px 3px;
 	
 	font-size: 11px;
 }
@@ -897,7 +904,4 @@ LmmsPalette {
 	qproperty-brightText: #4afd85;
 	qproperty-highlight: #202020;
 	qproperty-highlightedText: #ffffff;
-	/* the next two are used for whatsthis dialogs */
-	qproperty-toolTipText: #000;
-	qproperty-toolTipBase: #c9c9c9;
 }

@@ -168,7 +168,7 @@ void ProjectRenderer::run()
 {
 	MemoryManager::ThreadGuard mmThreadGuard; Q_UNUSED(mmThreadGuard);
 #if 0
-#ifdef LMMS_BUILD_LINUX
+#if defined(LMMS_BUILD_LINUX) || defined(LMMS_BUILD_FREEBSD)
 #ifdef LMMS_HAVE_SCHED_H
 	cpu_set_t mask;
 	CPU_ZERO( &mask );
@@ -181,7 +181,6 @@ void ProjectRenderer::run()
 	PerfLogTimer perfLog("Project Render");
 
 	Engine::getSong()->startExport();
-	Engine::getSong()->updateLength();
 	// Skip first empty buffer.
 	Engine::mixer()->nextBuffer();
 

@@ -49,7 +49,7 @@ public:
 		return castModel<AutomatableModel>();
 	}
 
-	virtual void setModel( Model* model, bool isOldModelValid = true );
+	void setModel( Model* model, bool isOldModelValid = true ) override;
 
 	template<typename T>
 	inline T value() const

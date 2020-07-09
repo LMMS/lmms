@@ -29,6 +29,7 @@
 #include <QLayout>
 
 #include "AudioPort.h"
+#include "FadeButton.h"
 #include "FxMixer.h"
 #include "FxLineLcdSpinBox.h"
 #include "Track.h"
@@ -49,12 +50,12 @@ public:
 	SampleTCO( Track * _track );
 	virtual ~SampleTCO();
 
-	virtual void changeLength( const MidiTime & _length );
+	void changeLength( const MidiTime & _length ) override;
 	const QString & sampleFile() const;
 
-	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
-	virtual void loadSettings( const QDomElement & _this );
-	inline virtual QString nodeName() const
+	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
+	void loadSettings( const QDomElement & _this ) override;
+	inline QString nodeName() const override
 	{
 		return "sampletco";
 	}
@@ -67,7 +68,7 @@ public:
 	MidiTime sampleLength() const;
 	void setSampleStartFrame( f_cnt_t startFrame );
 	void setSamplePlayLength( f_cnt_t length );
-	virtual TrackContentObjectView * createView( TrackView * _tv );
+	TrackContentObjectView * createView( TrackView * _tv ) override;
 
 
 	bool isPlaying() const;
@@ -112,13 +113,13 @@ public slots:
 
 
 protected:
-	virtual void contextMenuEvent( QContextMenuEvent * _cme );
-	virtual void mousePressEvent( QMouseEvent * _me );
-	virtual void mouseReleaseEvent( QMouseEvent * _me );
-	virtual void dragEnterEvent( QDragEnterEvent * _dee );
-	virtual void dropEvent( QDropEvent * _de );
-	virtual void mouseDoubleClickEvent( QMouseEvent * );
-	virtual void paintEvent( QPaintEvent * );
+	void contextMenuEvent( QContextMenuEvent * _cme ) override;
+	void mousePressEvent( QMouseEvent * _me ) override;
+	void mouseReleaseEvent( QMouseEvent * _me ) override;
+	void dragEnterEvent( QDragEnterEvent * _dee ) override;
+	void dropEvent( QDropEvent * _de ) override;
+	void mouseDoubleClickEvent( QMouseEvent * ) override;
+	void paintEvent( QPaintEvent * ) override;
 
 
 private:
@@ -137,14 +138,14 @@ public:
 	virtual ~SampleTrack();
 
 	virtual bool play( const MidiTime & _start, const fpp_t _frames,
-						const f_cnt_t _frame_base, int _tco_num = -1 );
-	virtual TrackView * createView( TrackContainerView* tcv );
-	virtual TrackContentObject * createTCO(const MidiTime & pos);
+						const f_cnt_t _frame_base, int _tco_num = -1 ) override;
+	TrackView * createView( TrackContainerView* tcv ) override;
+	TrackContentObject * createTCO( const MidiTime & _pos ) override;
 
 
 	virtual void saveTrackSpecificSettings( QDomDocument & _doc,
-							QDomElement & _parent );
-	virtual void loadTrackSpecificSettings( const QDomElement & _this );
+							QDomElement & _parent ) override;
+	void loadTrackSpecificSettings( const QDomElement & _this ) override;
 
 	inline IntModel * effectChannelModel()
 	{
@@ -156,10 +157,24 @@ public:
 		return &m_audioPort;
 	}
 
-	virtual QString nodeName() const
+	QString nodeName() const override
 	{
 		return "sampletrack";
 	}
+
+	bool isPlaying()
+	{
+		return m_isPlaying;
+	}
+
+	void setPlaying(bool playing)
+	{
+		if (m_isPlaying != playing) { emit playingChanged(); }
+		m_isPlaying = playing;
+	}
+
+signals:
+	void playingChanged();
 
 public slots:
 	void updateTcos();
@@ -171,6 +186,7 @@ private:
 	FloatModel m_panningModel;
 	IntModel m_effectChannelModel;
 	AudioPort m_audioPort;
+	bool m_isPlaying;
 
 
 
@@ -204,22 +220,23 @@ public:
 	}
 
 
-	virtual QMenu * createFxMenu( QString title, QString newFxLabel );
+	QMenu * createFxMenu( QString title, QString newFxLabel ) override;
 
 
 public slots:
 	void showEffects();
+	void updateIndicator();
 
 
 protected:
-	void modelChanged();
-	virtual QString nodeName() const
+	void modelChanged() override;
+	QString nodeName() const override
 	{
 		return "SampleTrackView";
 	}
 
-	void dragEnterEvent(QDragEnterEvent *dee);
-	void dropEvent(QDropEvent *de);
+	void dragEnterEvent(QDragEnterEvent *dee) override;
+	void dropEvent(QDropEvent *de) override;
 
 private slots:
 	void assignFxLine( int channelIndex );
@@ -230,9 +247,14 @@ private:
 	SampleTrackWindow * m_window;
 	Knob * m_volumeKnob;
 	Knob * m_panningKnob;
+	FadeButton * m_activityIndicator;
 
 	TrackLabelButton * m_tlb;
 
+	FadeButton * getActivityIndicator()
+	{
+		return m_activityIndicator;
+	}
 
 	friend class SampleTrackWindow;
 
@@ -273,13 +295,13 @@ public slots:
 
 protected:
 	// capture close-events for toggling sample-track-button
-	virtual void closeEvent(QCloseEvent * ce);
+	void closeEvent(QCloseEvent * ce) override;
 
-	virtual void saveSettings(QDomDocument & doc, QDomElement & element);
-	virtual void loadSettings(const QDomElement & element);
+	void saveSettings(QDomDocument & doc, QDomElement & element) override;
+	void loadSettings(const QDomElement & element) override;
 
 private:
-	virtual void modelChanged();
+	void modelChanged() override;
 
 	SampleTrack * m_track;
 	SampleTrackView * m_stv;

@@ -148,7 +148,7 @@ public:
 	template<class T>
 	inline T value( int frameOffset = 0 ) const
 	{
-		if( unlikely( hasLinkedModels() || m_controllerConnection != NULL ) )
+		if( hasLinkedModels() || m_controllerConnection != NULL )
 		{
 			return castValue<T>( controllerValue( frameOffset ) );
 		}
@@ -236,6 +236,7 @@ public:
 		m_centerValue = centerVal;
 	}
 
+	//! link @p m1 and @p m2, let @p m1 take the values of @p m2
 	static void linkModels( AutomatableModel* m1, AutomatableModel* m2 );
 	static void unlinkModels( AutomatableModel* m1, AutomatableModel* m2 );
 
@@ -255,7 +256,7 @@ public:
 				specified DOM element using <name> as attribute/node name */
 	virtual void loadSettings( const QDomElement& element, const QString& name );
 
-	virtual QString nodeName() const
+	QString nodeName() const override
 	{
 		return "automatablemodel";
 	}
@@ -337,12 +338,12 @@ private:
 
 	static bool mustQuoteName(const QString &name);
 
-	virtual void saveSettings( QDomDocument& doc, QDomElement& element )
+	void saveSettings( QDomDocument& doc, QDomElement& element ) override
 	{
 		saveSettings( doc, element, "value" );
 	}
 
-	virtual void loadSettings( const QDomElement& element )
+	void loadSettings( const QDomElement& element ) override
 	{
 		loadSettings( element, "value" );
 	}
@@ -359,7 +360,7 @@ private:
 	template<class T> void roundAt( T &value, const T &where ) const;
 
 
-	ScaleType m_scaleType; //! scale type, linear by default
+	ScaleType m_scaleType; //!< scale type, linear by default
 	float m_value;
 	float m_initValue;
 	float m_minValue;

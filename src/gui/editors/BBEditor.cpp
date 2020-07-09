@@ -29,6 +29,7 @@
 #include <QLayout>
 
 #include "ComboBox.h"
+#include "BBTrack.h"
 #include "BBTrackContainer.h"
 #include "embed.h"
 #include "MainWindow.h"
@@ -86,6 +87,8 @@ BBEditor::BBEditor( BBTrackContainer* tc ) :
 
 	trackAndStepActionsToolBar->addAction(embed::getIconPixmap("add_bb_track"), tr("Add beat/bassline"),
 						 Engine::getSong(), SLOT(addBBTrack()));
+	trackAndStepActionsToolBar->addAction(embed::getIconPixmap("clone_bb_track_pattern"), tr("Clone beat/bassline pattern"),
+						 m_trackContainerView, SLOT(clonePattern()));
 	trackAndStepActionsToolBar->addAction(
 				embed::getIconPixmap("add_sample_track"),
 				tr("Add sample-track"), m_trackContainerView,
@@ -310,4 +313,23 @@ void BBTrackContainerView::makeSteps( bool clone )
 			}
 		}
 	}
+}
+
+// Creates a clone of the current BB track with the same pattern, but no TCOs in the song editor
+// TODO: Avoid repeated code from cloneTrack and clearTrack in TrackOperationsWidget somehow
+void BBTrackContainerView::clonePattern()
+{
+	// Get the current BBTrack id
+	BBTrackContainer *bbtc = static_cast<BBTrackContainer*>(model());
+	const int cur_bb = bbtc->currentBB();
+
+	BBTrack *bbt = BBTrack::findBBTrack(cur_bb);
+
+	// Clone the track
+	Track *newTrack = bbt->clone();
+
+	// Track still have the TCOs which is undesirable in this case, clear the track
+	newTrack->lock();
+	newTrack->deleteTCOs();
+	newTrack->unlock();
 }

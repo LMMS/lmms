@@ -11,6 +11,8 @@
 TemplatesMenu::TemplatesMenu(QWidget *parent) :
 	QMenu(tr("New from template"), parent)
 {
+	setIcon(embed::getIconPixmap("project_new"));
+
 	connect( this, SIGNAL( aboutToShow() ), SLOT( fillTemplatesMenu() ) );
 	connect( this, SIGNAL( triggered( QAction * ) ),
 		SLOT( createNewProjectFromTemplate( QAction * ) ) );

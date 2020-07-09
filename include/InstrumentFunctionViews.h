@@ -49,7 +49,7 @@ public:
 
 
 private:
-	virtual void modelChanged();
+	void modelChanged() override;
 
 	InstrumentFunctionNoteStacking * m_cc;
 
@@ -72,7 +72,7 @@ public:
 
 
 private:
-	virtual void modelChanged();
+	void modelChanged() override;
 
 	InstrumentFunctionArpeggio * m_a;
 	GroupBox * m_arpGroupBox;

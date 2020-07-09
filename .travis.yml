@@ -1,6 +1,6 @@
 language: cpp
 compiler: gcc
-dist: trusty
+dist: xenial
 sudo: required
 cache:
     directories:
@@ -11,8 +11,6 @@ matrix:
     include:
         - env: TYPE=style
         - os: linux
-        - env: TARGET_OS=win32
-        - env: TARGET_OS=win64
         - env: TARGET_OS=debian-sid TARGET_DEPLOY=True
           git:
               depth: false
@@ -24,7 +22,7 @@ matrix:
           git:
               depth: false
         - os: osx
-          osx_image: xcode8.3
+          osx_image: xcode9.4
 before_install:
     # appdmg doesn't work with old Node.js
     - if [ "$TRAVIS_OS_NAME" = osx ]; then nvm install 10; fi
@@ -33,17 +31,3 @@ script: ${TRAVIS_BUILD_DIR}/.travis/script.sh
 after_script: ${TRAVIS_BUILD_DIR}/.travis/after_script.sh
 before_deploy:
     - if [ "$TARGET_OS" != debian-sid ]; then make package; fi
-deploy:
-    provider: releases
-    api_key:
-        secure: d4a+x4Gugpss7JK2DcHjyBZDmEFFh4iVfKDfITSD50T6Mc6At4LMgojvEu+6qT6IyOY2vm3UVT6fhyeuWDTRDwW9tfFlaHVA0h8aTRD+eAXOA7pQ8rEMwQO3+WCKuKTfEqUkpL4wxhww8dpkv54tqeIs0S4TBqz9tk8UhzU7XbE=
-    file_glob: true
-    file:
-        - lmms-${TRAVIS_TAG:1}-$TARGET_OS.exe
-        - /var/cache/pbuilder/result/lmms_*.tar.xz
-    skip_cleanup: true
-    on:
-        tags: true
-        all_branches: true
-        condition: '"$TARGET_DEPLOY" = True'
-    repo: LMMS/lmms

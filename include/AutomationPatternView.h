@@ -44,7 +44,7 @@ public:
 public slots:
 	/// Opens this view's pattern in the global automation editor
 	void openInAutomationEditor();
-	virtual void update();
+	void update() override;
 
 
 protected slots:
@@ -56,11 +56,11 @@ protected slots:
 	void flipX();
 
 protected:
-	virtual void constructContextMenu( QMenu * );
-	virtual void mouseDoubleClickEvent(QMouseEvent * me );
-	virtual void paintEvent( QPaintEvent * pe );
-	virtual void dragEnterEvent( QDragEnterEvent * _dee );
-	virtual void dropEvent( QDropEvent * _de );
+	void constructContextMenu( QMenu * ) override;
+	void mouseDoubleClickEvent(QMouseEvent * me ) override;
+	void paintEvent( QPaintEvent * pe ) override;
+	void dragEnterEvent( QDragEnterEvent * _dee ) override;
+	void dropEvent( QDropEvent * _de ) override;
 
 
 private:

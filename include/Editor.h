@@ -47,7 +47,7 @@ protected:
 	DropToolBar * addDropToolBar(Qt::ToolBarArea whereToAdd, QString const & windowTitle);
 	DropToolBar * addDropToolBar(QWidget * parent, Qt::ToolBarArea whereToAdd, QString const & windowTitle);
 
-	virtual void closeEvent( QCloseEvent * _ce );
+	void closeEvent( QCloseEvent * _ce ) override;
 protected slots:
 	virtual void play() {}
 	virtual void record() {}
@@ -58,6 +58,9 @@ protected slots:
 private slots:
 	/// Called by pressing the space key. Plays or stops.
 	void togglePlayStop();
+	
+	/// Called by pressing shift+space. Toggles pause state.
+	void togglePause();
 
 signals:
 
@@ -92,8 +95,8 @@ signals:
 	void dropped(QDropEvent* event);
 
 protected:
-	void dragEnterEvent(QDragEnterEvent* event);
-	void dropEvent(QDropEvent* event);
+	void dragEnterEvent(QDragEnterEvent* event) override;
+	void dropEvent(QDropEvent* event) override;
 };
 
 

@@ -125,19 +125,11 @@ public:
 
 	void clearKeyModifiers();
 
-	bool isCtrlPressed()
-	{
-		return m_keyMods.m_ctrl;
-	}
-
+	// TODO Remove this function, since m_shift can get stuck down.
+	// [[deprecated]]
 	bool isShiftPressed()
 	{
 		return m_keyMods.m_shift;
-	}
-
-	bool isAltPressed()
-	{
-		return m_keyMods.m_alt;
 	}
 
 	static void saveWidgetState( QWidget * _w, QDomElement & _de );
@@ -176,11 +168,11 @@ private slots:
 	void onExportProjectMidi();
 
 protected:
-	virtual void closeEvent( QCloseEvent * _ce );
-	virtual void focusOutEvent( QFocusEvent * _fe );
-	virtual void keyPressEvent( QKeyEvent * _ke );
-	virtual void keyReleaseEvent( QKeyEvent * _ke );
-	virtual void timerEvent( QTimerEvent * _ev );
+	void closeEvent( QCloseEvent * _ce ) override;
+	void focusOutEvent( QFocusEvent * _fe ) override;
+	void keyPressEvent( QKeyEvent * _ke ) override;
+	void keyReleaseEvent( QKeyEvent * _ke ) override;
+	void timerEvent( QTimerEvent * _ev ) override;
 
 
 private:

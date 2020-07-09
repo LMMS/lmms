@@ -44,10 +44,10 @@ public:
 	SampleRecordHandle( SampleTCO* tco );
 	virtual ~SampleRecordHandle();
 
-	virtual void play( sampleFrame * _working_buffer );
-	virtual bool isFinished() const;
+	void play( sampleFrame * _working_buffer ) override;
+	bool isFinished() const override;
 
-	virtual bool isFromTrack( const Track * _track ) const;
+	bool isFromTrack( const Track * _track ) const override;
 
 	f_cnt_t framesRecorded() const;
 	void createSampleBuffer( SampleBuffer * * _sample_buf );
