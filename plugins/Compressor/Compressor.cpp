@@ -600,8 +600,8 @@ void CompressorEffect::changeSampleRate()
 	// 200 ms
 	m_crestTimeConst = exp(-1.f / (0.2 * m_sampleRate));
 
-	// 20 ms
-	m_lookaheadDelayLength = 0.020 * m_sampleRate;
+	// 21 ms
+	m_lookaheadDelayLength = 0.021 * m_sampleRate;
 	m_inputBuf[0].resize(m_lookaheadDelayLength);
 	m_inputBuf[1].resize(m_lookaheadDelayLength);
 
