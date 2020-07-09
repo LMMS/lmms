@@ -246,7 +246,7 @@ MainWindow::MainWindow() :
 	connect(Engine::getSong(), SIGNAL(modified()), SLOT(onSongModified()));
 	connect(Engine::getSong(), SIGNAL(projectFileNameChanged()), SLOT(onProjectFileNameChanged()));
 
-	maximised = isMaximized();
+	maximized = isMaximized();
 	new QShortcut(QKeySequence(Qt::Key_F11), this, SLOT(toggleFullscreen()));
 }
 
@@ -1014,12 +1014,12 @@ void MainWindow::toggleFullscreen()
 {
 	if ( !isFullScreen() )
 	{
-		maximised = isMaximized();
+		maximized = isMaximized();
 		showFullScreen();
 	}
 	else
 	{
-		maximised ? showMaximized() : showNormal();
+		maximized ? showMaximized() : showNormal();
 	}
 }
 

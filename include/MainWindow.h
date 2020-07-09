@@ -226,7 +226,7 @@ private:
 
 	SessionState m_session;
 	
-	bool maximised;
+	bool maximized;
 
 private slots:
 	void browseHelp();
