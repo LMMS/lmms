@@ -247,7 +247,7 @@ MainWindow::MainWindow() :
 	connect(Engine::getSong(), SIGNAL(projectFileNameChanged()), SLOT(onProjectFileNameChanged()));
 
 	maximised = isMaximized();
-	new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_F11), this, SLOT(toggleFullscreen()));
+	new QShortcut(QKeySequence(Qt::Key_F11), this, SLOT(toggleFullscreen()));
 }
 
 
@@ -482,60 +482,60 @@ void MainWindow::finalize()
 	// window-toolbar
 	ToolButton * song_editor_window = new ToolButton(
 					embed::getIconPixmap( "songeditor" ),
-					tr( "Song Editor" ) + " (F5)",
+					tr( "Song Editor" ) + " (Ctrl + F5)",
 					this, SLOT( toggleSongEditorWin() ),
 								m_toolBar );
-	song_editor_window->setShortcut( Qt::Key_F5 );
+	song_editor_window->setShortcut( Qt::CTRL + Qt::Key_F5 );
 
 
 	ToolButton * bb_editor_window = new ToolButton(
 					embed::getIconPixmap( "bb_track_btn" ),
 					tr( "Beat+Bassline Editor" ) +
-									" (F6)",
+									" (Ctrl + F6)",
 					this, SLOT( toggleBBEditorWin() ),
 								m_toolBar );
-	bb_editor_window->setShortcut( Qt::Key_F6 );
+	bb_editor_window->setShortcut( Qt::CTRL + Qt::Key_F6 );
 
 
 	ToolButton * piano_roll_window = new ToolButton(
 						embed::getIconPixmap( "piano" ),
 						tr( "Piano Roll" ) +
-									" (F7)",
+									" (Ctrl + F7)",
 					this, SLOT( togglePianoRollWin() ),
 								m_toolBar );
-	piano_roll_window->setShortcut( Qt::Key_F7 );
+	piano_roll_window->setShortcut( Qt::CTRL + Qt::Key_F7 );
 
 	ToolButton * automation_editor_window = new ToolButton(
 					embed::getIconPixmap( "automation" ),
 					tr( "Automation Editor" ) +
-									" (F8)",
+									" (Ctrl + F8)",
 					this,
 					SLOT( toggleAutomationEditorWin() ),
 					m_toolBar );
-	automation_editor_window->setShortcut( Qt::Key_F8 );
+	automation_editor_window->setShortcut( Qt::CTRL + Qt::Key_F8 );
 
 	ToolButton * fx_mixer_window = new ToolButton(
 					embed::getIconPixmap( "fx_mixer" ),
-					tr( "FX Mixer" ) + " (F9)",
+					tr( "FX Mixer" ) + " (Ctrl + F9)",
 					this, SLOT( toggleFxMixerWin() ),
 					m_toolBar );
-	fx_mixer_window->setShortcut( Qt::Key_F9 );
+	fx_mixer_window->setShortcut( Qt::CTRL + Qt::Key_F9 );
 
 	ToolButton * controllers_window = new ToolButton(
 					embed::getIconPixmap( "controller" ),
 					tr( "Show/hide controller rack" ) +
-								" (F10)",
+								" (Ctrl + F10)",
 					this, SLOT( toggleControllerRack() ),
 								m_toolBar );
-	controllers_window->setShortcut( Qt::Key_F10 );
+	controllers_window->setShortcut( Qt::CTRL + Qt::Key_F10 );
 
 	ToolButton * project_notes_window = new ToolButton(
 					embed::getIconPixmap( "project_notes" ),
 					tr( "Show/hide project notes" ) +
-								" (F11)",
+								" (Ctrl + F11)",
 					this, SLOT( toggleProjectNotesWin() ),
 								m_toolBar );
-	project_notes_window->setShortcut( Qt::Key_F11 );
+	project_notes_window->setShortcut( Qt::CTRL + Qt::Key_F11 );
 
 	m_toolBarLayout->addWidget( song_editor_window, 1, 1 );
 	m_toolBarLayout->addWidget( bb_editor_window, 1, 2 );
@@ -1115,36 +1115,36 @@ void MainWindow::updateViewMenu()
 	// Not that it's straight visible <-> invisible, more like
 	// not on top -> top <-> invisible
 	m_viewMenu->addAction(embed::getIconPixmap( "songeditor" ),
-			      tr( "Song Editor" ) + " (F5)",
+			      tr( "Song Editor" ) + " (Ctrl + F5)",
 			      this, SLOT( toggleSongEditorWin() )
 		);
 	m_viewMenu->addAction(embed::getIconPixmap( "bb_track" ),
-					tr( "Beat+Bassline Editor" ) + " (F6)",
+					tr( "Beat+Bassline Editor" ) + " (Ctrl + F6)",
 					this, SLOT( toggleBBEditorWin() )
 		);
 	m_viewMenu->addAction(embed::getIconPixmap( "piano" ),
-			      tr( "Piano Roll" ) + " (F7)",
+			      tr( "Piano Roll" ) + " (Ctrl + F7)",
 			      this, SLOT( togglePianoRollWin() )
 		);
 	m_viewMenu->addAction(embed::getIconPixmap( "automation" ),
-			      tr( "Automation Editor" ) + " (F8)",
+			      tr( "Automation Editor" ) + " (Ctrl + F8)",
 			      this,
 			      SLOT( toggleAutomationEditorWin())
 		);
 	m_viewMenu->addAction(embed::getIconPixmap( "fx_mixer" ),
-			      tr( "FX Mixer" ) + " (F9)",
+			      tr( "FX Mixer" ) + " (Ctrl + F9)",
 			      this, SLOT( toggleFxMixerWin() )
 		);
 	m_viewMenu->addAction(embed::getIconPixmap( "controller" ),
-			      tr( "Controller Rack" ) + " (F10)",
+			      tr( "Controller Rack" ) + " (Ctrl + F10)",
 			      this, SLOT( toggleControllerRack() )
 		);
 	m_viewMenu->addAction(embed::getIconPixmap( "project_notes" ),
-			      tr( "Project Notes" ) + " (F11)",
+			      tr( "Project Notes" ) + " (Ctrl + F11)",
 			      this, SLOT( toggleProjectNotesWin() )
 		);
 	m_viewMenu->addAction(embed::getIconPixmap( "maximize" ),
-				tr( "Fullscreen" ) + " (Ctrl+F11)",
+				tr( "Fullscreen" ) + " (F11)",
 				this, SLOT( toggleFullscreen() ) 
 		);
 
