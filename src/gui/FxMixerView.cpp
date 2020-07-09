@@ -439,7 +439,7 @@ void FxMixerView::deleteUnusedChannels()
 	tracks += Engine::getSong()->tracks();
 	tracks += Engine::getBBTrackContainer()->tracks();
 
-	bool inUse[m_fxChannelViews.size()] = {false};
+	std::vector<bool> inUse(m_fxChannelViews.size(), false);
 
 	for (Track* t: tracks)
 	{
