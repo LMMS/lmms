@@ -4,9 +4,6 @@
 
 #include "BSpline.hpp"
 
-//tmp
-#include <iostream>
-
 /*A piecewise B-Spline, made by linking D-degree splines together.
  The pieces must fit together to ensure C1 continuity.*/
 template <typename T, unsigned int D>
@@ -119,7 +116,7 @@ bool PiecewiseBSpline<T, D>::add(BSpline<T, D> &&spline)
     }
     //if it does not fit, don't add
     //tmp:disabled
-    /*if (pieces.back().spline.getControlPoints().back()[0] != spline.getControlPoints().front()[0] || pieces.back().spline.getControlPoints().back().second != spline.getControlPoints().front().second)
+    /*if (pieces.back().spline.getControlPoints().back()[0] != spline.getControlPoints().front()[0] || pieces.back().spline.getControlPoints().back()[2] != spline.getControlPoints().front()[2])
     {
         return false;
     }*/
@@ -138,7 +135,7 @@ bool PiecewiseBSpline<T, D>::add(const BSpline<T, D> &spline)
     }
     //if it does not fit, don't add
     //tmp:disabled
-    /*if (pieces.back().spline.getControlPoints().back().first != spline.getControlPoints().front().first || pieces.back().spline.getControlPoints().back().second != spline.getControlPoints().front().second)
+    /*if (pieces.back().spline.getControlPoints().back()[0] != spline.getControlPoints().front()[0] || pieces.back().spline.getControlPoints().back()[2] != spline.getControlPoints().front()[2])
     {
         return false;
     }*/
@@ -191,23 +188,18 @@ void PiecewiseBSpline<T, D>::stretchPieceEndTo(unsigned int pieceIndex, const do
     if (piece.getEnd() == target) return;
     if (target > piece.getEnd())
     {
-        //std::cout<<"stretching right "<<this->pieces[pieceIndex].getBegin()<< " - "<<this->pieces[pieceIndex].getEnd()<<" to : "<<target<<std::endl;
         //stretch right
         int i = pieceIndex+1;
         std::vector<std::reference_wrapper<Piece>> affectedPieces;
         //pieces which are affected totally
         while(this->pieces[i].getEnd()<target && i<this->pieces.size())
         {
-            //tmp: debug
-            //std::cout<<"fully affected piece: "<<this->pieces[i].getBegin()<< " - "<<this->pieces[i].getEnd()<<std::endl;
             affectedPieces.emplace_back(this->pieces[i]);
             i++;
         }
         //last piece, where only begin is affected
         if (i < this->pieces.size())
         {
-            //tmp:debug
-            //std::cout<<"last affected piece: "<<this->pieces[i].getBegin()<< " - "<<this->pieces[i].getEnd()<<std::endl;
             affectedPieces.emplace_back(this->pieces[i]);
         }
         //fit affected pieces into [target, last.end)
@@ -226,28 +218,22 @@ void PiecewiseBSpline<T, D>::stretchPieceEndTo(unsigned int pieceIndex, const do
             affectedPieces.back().get().getEnd()
         );
         piece.stretchTo(piece.getBegin(), target);
-        //tmp:debug
-        //std::cout<<piece.getBegin()<< " - "<<piece.getEnd()<<std::endl;
+        
     }
     if (target < piece.getEnd())
     {
-        //std::cout<<"stretching left "<<this->pieces[pieceIndex].getBegin()<< " - "<<this->pieces[pieceIndex].getEnd()<<" to : "<<target<<std::endl;
         //stretch left
         int i = pieceIndex-1;
         std::vector<std::reference_wrapper<Piece>> affectedPieces;
         //pieces which are affected totally
         while(this->pieces[i].getBegin()>target && i>=0)
         {
-            //tmp: debug
-            //std::cout<<"fully affected piece: "<<this->pieces[i].getBegin()<< " - "<<this->pieces[i].getEnd()<<std::endl;
             affectedPieces.emplace_back(this->pieces[i]);
             i--;
         }
         //last piece, where only end is affected
         if (i>=0 && this->pieces[i].getEnd()>target)
         {
-            //tmp:debug
-            //std::cout<<"last affected piece: "<<this->pieces[i].getBegin()<< " - "<<this->pieces[i].getEnd()<<std::endl;
             affectedPieces.emplace_back(this->pieces[i]);
         }
         //fit affected pieces into (last.begin, target)
@@ -273,18 +259,13 @@ void PiecewiseBSpline<T, D>::stretchPieceEndTo(unsigned int pieceIndex, const do
                 target
             );
         }else{
-            //std::cout<<"no affected pieces; self only: "<<piece.getBegin()<< " - "<<piece.getEnd()<<std::endl;
             //stretch just the end of piece
             piece.stretchTo(piece.getBegin(), target);
         }
         //plus the first right neighbour, where only begin is affected
         if (pieceIndex+1 < this->pieces.size())
         {
-            //tmp: debug
-            //std::cout<<"affected piece (right neighbour): "<<this->pieces[pieceIndex+1].getBegin()<< " - "<<this->pieces[pieceIndex+1].getEnd()<<std::endl;
             this->pieces[pieceIndex+1].stretchTo(target, this->pieces[pieceIndex+1].getEnd());
         }
-        //tmp:debug
-        //std::cout<<"result of left stretch: "<<piece.getBegin()<< " - "<<piece.getEnd()<<std::endl;
     }
 }

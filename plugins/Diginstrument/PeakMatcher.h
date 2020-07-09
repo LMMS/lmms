@@ -1,3 +1,5 @@
+#pragma once
+
 #include <cmath>
 #include <vector>
 #include <unordered_set>

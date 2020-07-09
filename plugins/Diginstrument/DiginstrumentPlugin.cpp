@@ -49,12 +49,9 @@ void DiginstrumentPlugin::playNote(NotePlayHandle *noteHandle,
 								   sampleFrame *_working_buf)
 {
 	/*TMP*/
-	const double endTime = (noteHandle->framesLeftForCurrentPeriod() + noteHandle->totalFramesPlayed()) / (double)/*tmp*/ Engine::mixer()->processingSampleRate();
 	const double startTime = noteHandle->totalFramesPlayed() / (double)Engine::mixer()->processingSampleRate();
-	//TODO: store previous spectrum
-	const auto startSpectrum = inst.getSpectrum({noteHandle->frequency(), startTime});
-	const auto endSpectrum = inst.getSpectrum({noteHandle->frequency(), endTime});
-	auto audioData = this->synth.playNote(startSpectrum, endSpectrum, noteHandle->framesLeftForCurrentPeriod(), noteHandle->totalFramesPlayed());
+	const auto spectrum = inst.getSpectrum({noteHandle->frequency(), startTime});
+	auto audioData = this->synth.playNote(spectrum, noteHandle->framesLeftForCurrentPeriod(), noteHandle->totalFramesPlayed(), /*tmp*/ m_sampleBuffer.sampleRate());
 	/*tmp: stereo*/
 	unsigned int counter = 0;
 	unsigned int offset = noteHandle->noteOffset();
@@ -97,109 +94,134 @@ std::string DiginstrumentPlugin::setAudioFile(const QString &_audio_file)
 		//tmp: left only
 		sample[i] = m_sampleBuffer.data()[i][0];
 	}
-	const int level = 12;
+	const int level =24;
 	CWT transform("morlet", 6, level);
 	transform(sample);
 
+	//tmp: outputs
+	//TODO
 	std::ostringstream oss;
+	std::ofstream raw;
+	std::ofstream peaks;
+	std::ofstream spline;
+
+	raw.open("raw.txt");
+	peaks.open("peaks.txt");
 
 	//TMP: static label for frequency
-	double label = 440;
+	const double label = 440;
+	const double transformStep = 0.001*(double)m_sampleBuffer.sampleRate();
 
 	inst = Diginstrument::Interpolator<double, SplineSpectrum<double, 4>>();
+	//add empty spectrum to end
 	inst.addSpectrum(SplineSpectrum<double, 4>((double)m_sampleBuffer.frames() / (double)m_sampleBuffer.sampleRate()), {label, (double)m_sampleBuffer.frames() / (double)m_sampleBuffer.sampleRate()});
+	SpectrumFitter<double, 4> fitter(1.25);
 
-	std::vector<std::vector<std::vector<double>>> spectra;
-	std::vector<std::pair<std::vector<unsigned int>, std::vector<unsigned int>>> extremaVector;
-
-	//TODO: reserve based on how many moments are processed
-	//spectra.reserve(?);
-	//extrema.reserve(?);
-	const double transformStep = 0.01*(double)m_sampleBuffer.sampleRate();
-	//TODO: make it possible to skip transforms
-	// 1) process transforms into spectra
-		// 1.1) simultaniously get maxima
-		// 1.2) simultaniously approximate true maxima
-	for (int i = 0; i < m_sampleBuffer.frames(); i++)
+	//new loop
+	for (int i = 0; i<m_sampleBuffer.frames(); i+=transformStep)
 	{
 		const auto momentarySpectrum = transform[i];
-		std::vector<std::vector<double>> points;
-		points.reserve(level * 11);
-		std::vector<double> values;
-		values.reserve(level * 11);
-
+		std::vector<std::vector<double>> rawSpectrum;
+		rawSpectrum.reserve(level * 11);
 		//process the complex result of the CWT into "amplitude and phase spectrum"
 		for (int j = momentarySpectrum.size() - 1; j >= 0; j--)
 		{
-			double re = momentarySpectrum[j].second.first;
-			double im = momentarySpectrum[j].second.second;
-			double frequency = (double)m_sampleBuffer.sampleRate() / (momentarySpectrum[j].first);
-			//TODO: verify this energy-to-amplitude equation
-			const double amp = sqrt(frequency * (re * re + im * im)) / 200.0;
-			double phase = atan2(im, re);
-			points.emplace_back(std::vector<double>{frequency, phase, amp});
-			values.emplace_back(amp);
+			const double & re = momentarySpectrum[j].second.first;
+			const double & im = momentarySpectrum[j].second.second;
+			const double frequency = (double)m_sampleBuffer.sampleRate() / (momentarySpectrum[j].first);
+			const double mag = (re*re + im*im);
+			//TODO: maybe: do I need phase?
+			const double phase = atan2(im, re);
+			//tmp: to reduce oscillations in tiny peaks, set magnitude treshold
+			//TODO: add with 0, or just leave out?
+			//tmp: amp
+			//const double amp = (sqrt( (frequency * component.amplitude) / (double)sampleRate));
+			if(mag>0.0001){rawSpectrum.emplace_back(std::vector<double>{frequency, phase, mag}); }
+			//if(amp>0.001){rawSpectrum.emplace_back(std::vector<double>{frequency, phase, amp}); }
+			else{ rawSpectrum.emplace_back(std::vector<double>{frequency, phase, 0}); }
+
+			//tmp: raw output
+			raw<<std::fixed<<(double)i/(double)m_sampleBuffer.sampleRate()<<" "<<frequency<<" "<<mag<<std::endl;
 		}
-		//determine local extrema based on amplitude
-		const auto extrema = Extrema::Both(values.begin(), values.end(), 0);
-		//Approximate true maxima on frequency-amplitude plane
-		for (auto &index : extrema.second)
+
+		//tmp: note: no checks ,just rvalue insert
+		//tmp: no peak approximation
+		//const auto peaksAndValleys = Diginstrument::PeakAndValleyApproximation(Extrema::Differential::intermixed(rawSpectrum.begin(), rawSpectrum.end()));
+		const auto peaksAndValleys = Extrema::Differential::intermixed(rawSpectrum.begin(), rawSpectrum.end());
+		//tmp: peak output
+		for (auto p : peaksAndValleys)
 		{
-			if (index == 0 || index == points.size() - 1)
+			//tmp
+			if(p.pointType==Extrema::Differential::CriticalPoint::PointType::maximum)
 			{
-				continue;
+				auto Y = Interpolation::CubicLagrange(rawSpectrum[p.index-1][0], rawSpectrum[p.index-1][2], rawSpectrum[p.index][0], rawSpectrum[p.index][2], rawSpectrum[p.index+1][0], rawSpectrum[p.index+1][2], rawSpectrum[p.index+2][0], rawSpectrum[p.index+2][2], p.x);
+				peaks<<std::fixed<<(double)i/(double)m_sampleBuffer.sampleRate()<<" "<<p.x<<" "<<Y<<std::endl;
 			}
-			const auto point = Approximation::Parabolic(points[index - 1][0], points[index - 1][2], points[index][0], points[index][2], points[index + 1][0], points[index + 1][2]);
-			//TODO: what happens to phase, if the chosen peak oscillates?
-				//first impression: it doesnt matter, as phase is only used when a new component is "born" from 0 amplitude
-			points[index] = {point.first, points[index][1], point.second};
 		}
-		//add the spectrum to the spectra
-		spectra.push_back(std::move(points));
-		extremaVector.push_back(std::move(extrema));
+		const auto spline = fitter.peakValleyFit(rawSpectrum, peaksAndValleys);
+		inst.addSpectrum(
+			SplineSpectrum(
+				//spline
+				spline,
+				//spline label (time)
+				(double)i/(double)m_sampleBuffer.sampleRate()
+			)
+			//coordinates: {pitch, time}
+			//tmp: fix frequency label
+			, {label, (double)i / (double)m_sampleBuffer.sampleRate()}
+		);
 	}
 
-	int rejected = 0;
-	//fit splines to spectra
-	SpectrumFitter<double, 4> fitter(1.25);
-	for(int i = 0; i<spectra.size()-transformStep+1; i+=transformStep)
-	{
-		auto spline = fitter.fit(spectra[i], extremaVector[i]);
-		//only add "valid" splines
-		if (spline.getPeaks().size() > 0 && spline.getBegin() <= 12 && spline.getEnd() > 21000)
-		{
-			inst.addSpectrum(SplineSpectrum(std::move(spline), (double)i/(double)m_sampleBuffer.sampleRate()), {label, (double)i / (double)m_sampleBuffer.sampleRate()});
-		}
-		else
-			rejected++;
-	}
+	// int rejected = 0;
+	// int noComponents = 0;
+	// int incomplete = 0;
+	// int emptySplines = 0;
+	// int goodBeginBadEnd = 0;
+	// int badBedginGoodEnd = 0;
+	// 	//only add "valid" splines
+	// 	if (spline.getPieces().size() > 0 /*&& spline.getBegin() <= 12 && spline.getEnd() > 21000*/)
+	// 	{
+	// 		inst.addSpectrum(SplineSpectrum(std::move(spline), (double)i/(double)m_sampleBuffer.sampleRate()), {label, (double)i / (double)m_sampleBuffer.sampleRate()});
+	// 	}
+	// 	else
+	// 	{
+	// 		if(spline.getPeaks().size()==0 && spline.getEnd()>0) {noComponents++;}
+	// 		if(spline.getPieces().size()==0) {emptySplines++;}
+	// 		if((spline.getBegin() > 12 && spline.getBegin()>0) || (spline.getEnd() < 21000 && spline.getEnd()>0)) {incomplete++;}
+	// 		if(spline.getBegin()<12 && spline.getEnd()<21000 && spline.getBegin()>0 && spline.getEnd()>0) { goodBeginBadEnd++; }
+	// 		if(spline.getBegin()>12 && spline.getEnd()>21000 && spline.getBegin()>0 && spline.getEnd()>0) { badBedginGoodEnd++; }
+	// 		rejected++;
+	// 	}
+	// }
 	
 	//TMP: output the synthesised signal and the inverse-CWT of the signal for comparison
-	//TMP: debug:
-	double prev = 0;
-	int sameCounter = 0;
-	auto icwt = transform.inverseTransform();
+	/*auto icwt = transform.inverseTransform();
 	for (int i = 0; i < icwt.size()-1; i++)
 	{
 		const double time = (double)i / (double)m_sampleBuffer.sampleRate();
-		const double endtime = (double)(i+1) / (double)m_sampleBuffer.sampleRate();
-		auto spline = inst.getSpectrum({label, time});
-		auto components = spline.getComponents(0);
-		auto rec = synth.playNote(inst.getSpectrum({label, time}), inst.getSpectrum({label, endtime}), 1 ,i);
+		auto rec = synth.playNote(inst.getSpectrum({label, time}), 1 ,i, (double)m_sampleBuffer.sampleRate());
 		oss << std::fixed << rec.front() << " " << icwt[i] << std::endl;
-		if(rec.front()==prev) {sameCounter++;}
-		prev = rec.front();
-	}
-	//std::cout<<"Identical subsequent samples: "<<sameCounter<<"/"<<icwt.size()<<std::endl;
-	//std::cout<<"rejected splines: "<<rejected<<"/"<<icwt.size()<<std::endl;
+	}*/
+	/*std::cout<<"rejected splines: "<<rejected<<"/"<<spectra.size()/transformStep<<" ("<<100*rejected/(spectra.size()/transformStep)<<"%)"<<std::endl;
+	if(rejected>0){
+	std::cout<<"cause: no peaks: "<<noComponents<<"/"<<rejected<<" ("<<100*noComponents/rejected<<"%)"<<std::endl;
+	std::cout<<"cause: empty spline: "<<emptySplines<<"/"<<rejected<<" ("<<100*emptySplines/rejected<<"%)"<<std::endl;
+	std::cout<<"cause: incomplete: "<<incomplete<<"/"<<rejected<<" ("<<100*incomplete/rejected<<"%)"<<std::endl;
+	std::cout<<"cause: good begin, bad end: "<<goodBeginBadEnd<<"/"<<rejected<<" ("<<100*goodBeginBadEnd/rejected<<"%)"<<std::endl;
+	std::cout<<"cause: good end, bad begin: "<<badBedginGoodEnd<<"/"<<rejected<<" ("<<100*badBedginGoodEnd/rejected<<"%)"<<std::endl;
+	}*/
 
 	//TODO: trim spectrum?
 	//TODO: how to mix the output with consistent levels without clipping
 
 	//tmp
-	//std::cout << oss.str() << std::endl;
+	std::cout << oss.str() << std::endl;
 
 	//TODO: get rid of beégetett 4
+
+	//tmp: close files
+	raw.close();
+	peaks.close();
 
 	return oss.str();
 }

@@ -25,10 +25,11 @@
 #include "PiecewiseBSpline.hpp"
 #include "SpectrumFitter.hpp"
 #include "SplineSpectrum.hpp"
+#include "PeakApproximation.h"
 #include <string>
 #include <sstream>
 #include <iostream>
-
+#include <fstream>
 
 class DiginstrumentPlugin : public Instrument
 {

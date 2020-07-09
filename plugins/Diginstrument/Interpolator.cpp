@@ -238,14 +238,14 @@ SplineSpectrum<T, 4> Diginstrument::Interpolator<T, SplineSpectrum<T, 4>>::linea
         //TODO: process matches
         //TODO: test
         //tmp: debug
-        std::cout<<"left has: "<<leftComponents.size()<<", right has: "<<rightComponents.size()<<" - matches: "<<matches.size()<<std::endl;
+        //std::cout<<"left has: "<<leftComponents.size()<<", right has: "<<rightComponents.size()<<" - matches: "<<matches.size()<<std::endl;
         //TODO: new or dead peaks get  matched to another - multiple targets for a peak
         for( auto & match : matches)
         {
             //tmp:debug
-            std::cout<<leftComponents[match.left].frequency<< " - "<<rightComponents[match.right].frequency<<" : "<<match.distance<<std::endl;
+            //std::cout<<leftComponents[match.left].frequency<< " - "<<rightComponents[match.right].frequency<<" : "<<match.distance<<std::endl;
             //tmp: limit
-            if(match.distance > 200) continue;
+            if(match.distance > 20) continue;
             auto &l = left.getSpline().getPieces()[match.left];
             auto &r = right.getSpline().getPieces()[match.right];
             const T target = (r.getEnd() - l.getEnd()) * rightRatio + l.getEnd();
@@ -255,7 +255,7 @@ SplineSpectrum<T, 4> Diginstrument::Interpolator<T, SplineSpectrum<T, 4>>::linea
             right.getSpline().stretchPieceEndTo(match.right, target);
             //std::cout<<std::endl;    
         }
-        std::cout<<std::endl;    
+        //std::cout<<std::endl;    
     }
     //TODO: splines that cover too short a distance cause problems: zero ratio split, maybe too few points to split?
     //2) consolidate peaks
@@ -278,12 +278,12 @@ SplineSpectrum<T, 4> Diginstrument::Interpolator<T, SplineSpectrum<T, 4>>::linea
     }*/
 
     //tmp:debug:
-    std::cout<<"RES: "<<std::endl;
+    /*std::cout<<"RES: "<<std::endl;
     for(auto & c : SplineSpectrum<T, 4>(res).getComponents(0))
     {
         std::cout<<std::fixed<<c.frequency<<" : "<<c.amplitude<<std::endl;
     }
-    std::cout<<std::endl<<std::endl;
+    std::cout<<std::endl<<std::endl;*/
 
     return SplineSpectrum<T, 4>(std::move(res));
 }
@@ -306,7 +306,9 @@ PiecewiseBSpline<T, 4> Diginstrument::Interpolator<T, SplineSpectrum<T, 4>>::con
     }
 
     double leftEnd = leftPieces.back().getEnd();
+    double leftBegin = leftPieces.back().getBegin();
     double rightEnd = rightPieces.back().getEnd();
+    double rightBegin = rightPieces.back().getBegin();
     //while there is a piece left to process in either of the stacks
     while (!leftPieces.empty() && !rightPieces.empty())
     {
@@ -314,31 +316,121 @@ PiecewiseBSpline<T, 4> Diginstrument::Interpolator<T, SplineSpectrum<T, 4>>::con
         //NOTE: i think i need maxFD, else it would want to split and thats impossible
         //NOTE: or just move one end directly, maybe even into target?
         //TODO: merge these instead to next piece
-        if(!rightPieces.empty() && rightPieces.back().getEnd() - rightPieces.back().getBegin() <= maxFrequencyDistance)
+        //TODO: note: this discards errors where begin>end as well
+        if(rightPieces.back().getEnd() - rightPieces.back().getBegin() <= maxFrequencyDistance)
         {
-            std::cout<<"discarding from right: "<<rightPieces.back().getBegin()<<" - "<<rightPieces.back().getEnd()<<std::endl;
+            //std::cout<<"discarding from right: "<<rightPieces.back().getBegin()<<" - "<<rightPieces.back().getEnd()<<std::endl;
+            //tmp: set opposite piece begin and res latest piece end : could be dangerous if new begin > end
+            leftPieces.back().stretchTo(rightPieces.back().getEnd(), leftPieces.back().getEnd());
+            res.getPieces().back().stretchTo(res.getPieces().back().getBegin(), rightPieces.back().getEnd());
             rightPieces.pop_back();
-            rightEnd = rightPieces.back().getEnd();
-            continue;
-        }
-        if(!leftPieces.empty() && leftPieces.back().getEnd() - leftPieces.back().getBegin() <= maxFrequencyDistance)
-        {
-            std::cout<<"discarding from left: "<<leftPieces.back().getBegin()<<" - "<<leftPieces.back().getEnd()<<std::endl;
-            leftPieces.pop_back();
-            leftEnd = leftPieces.back().getEnd();
-            continue;
-        }
-        //if the pieces don't fit, that is the ends are too far away
-        if (fabs(leftEnd - rightEnd) > maxFrequencyDistance)
-        {
-            //if the left piece is shorter
-            if (leftEnd < rightEnd)
+            //step left and right
+            if(!leftPieces.empty())
             {
-                //split right
-                const T ratio = (leftEnd - rightPieces.back().getBegin()) / (rightPieces.back().getEnd() - rightPieces.back().getBegin());
-                std::cout<<"splitting left @ "<<ratio<<std::endl;
+                leftEnd = leftPieces.back().getEnd();
+                leftBegin = leftPieces.back().getBegin();
+            }
+            else
+            {
+                //TODO
+            }
+            if(!rightPieces.empty())
+            {
+                rightEnd = rightPieces.back().getEnd();
+                rightBegin = rightPieces.back().getBegin();
+            }
+            else
+            {
+                //TODO
+            }
+            continue;
+        }
+        if(leftPieces.back().getEnd() - leftPieces.back().getBegin() <= maxFrequencyDistance)
+        {
+            //std::cout<<"discarding from left: "<<leftPieces.back().getBegin()<<" - "<<leftPieces.back().getEnd()<<std::endl;
+            //tmp: set opposite piece begin and res latest piece end : could be dangerous if new begin > end
+            rightPieces.back().stretchTo(leftPieces.back().getEnd(), rightPieces.back().getEnd());
+            res.getPieces().back().stretchTo(res.getPieces().back().getBegin(), leftPieces.back().getEnd());
+            leftPieces.pop_back();
+            //step left and right
+            if(!leftPieces.empty())
+            {
+                leftEnd = leftPieces.back().getEnd();
+                leftBegin = leftPieces.back().getBegin();
+            }
+            else
+            {
+                //TODO
+            }
+            if(!rightPieces.empty())
+            {
+                rightEnd = rightPieces.back().getEnd();
+                rightBegin = rightPieces.back().getBegin();
+            }
+            else
+            {
+                //TODO
+            }
+            continue;
+        }
+        //Note: cases with matching endpoints first, to use epsilon distance
+        //matching endpoints
+        if( fabs(leftBegin-rightBegin) <= maxFrequencyDistance && fabs(leftEnd-rightEnd) <= maxFrequencyDistance )
+        {
+            //add totally matching pieces
+            res.add(matchPieces(leftPieces.back().getSpline(), rightPieces.back().getSpline(), rightRatio));
+            //remove matched pieces
+            rightPieces.pop_back();
+            leftPieces.pop_back();
+            //step left and right
+            if(!leftPieces.empty())
+            {
+                leftEnd = leftPieces.back().getEnd();
+                leftBegin = leftPieces.back().getBegin();
+            }
+            else
+            {
+                //TODO
+            }
+            if(!rightPieces.empty())
+            {
+                rightEnd = rightPieces.back().getEnd();
+                rightBegin = rightPieces.back().getBegin();
+            }
+            else
+            {
+                //TODO
+            }
+            continue;
+        }
+        //partial overlap, matching start points
+        if( fabs(leftBegin-rightBegin) <= maxFrequencyDistance )
+        {
+            if(leftEnd>rightEnd)
+            {
+                //split left at right end
+                const T ratio = (rightEnd - leftBegin) / (leftEnd - leftBegin);
+                //tmp:
+                //std::cout<<"splitting left @ "<<ratio<<std::endl;
+                auto split = leftPieces.back().getSpline().split(ratio);
+                //match split first with right
+                res.add(matchPieces(split.first, rightPieces.back().getSpline(), rightRatio));
+                //remove matched and split pieces
+                rightPieces.pop_back();
+                leftPieces.pop_back();
+                //add split right back
+                leftPieces.push_back(split.second);
+            }
+            if(leftEnd<rightEnd)
+            {
+                //split right at left end
+                const T ratio = (leftEnd - rightBegin) / (rightEnd - rightBegin);
+                //tmp:
+                //std::cout<<"splitting right @ "<<ratio<<std::endl;
                 auto split = rightPieces.back().getSpline().split(ratio);
-                //match left with split left
+                //tmp:
+                //std::cout<<"split ("<<rightPieces.back().getBegin()<<", "<<rightPieces.back().getEnd()<<") into ("<<split.first.getControlPoints().front()[0]<<" , "<<split.first.getControlPoints().back()[0]<<") - ("<<split.second.getControlPoints().front()[0]<<", "<<split.second.getControlPoints().back()[0]<<")"<<std::endl;
+                //match split first with right
                 res.add(matchPieces(leftPieces.back().getSpline(), split.first, rightRatio));
                 //remove matched and split pieces
                 rightPieces.pop_back();
@@ -346,39 +438,161 @@ PiecewiseBSpline<T, 4> Diginstrument::Interpolator<T, SplineSpectrum<T, 4>>::con
                 //add split right back
                 rightPieces.push_back(split.second);
             }
+            //step left and right
+            if(!leftPieces.empty())
+            {
+                leftEnd = leftPieces.back().getEnd();
+                leftBegin = leftPieces.back().getBegin();
+            }
             else
             {
-                //split left
-                const T ratio = (rightEnd - leftPieces.back().getBegin()) / (leftPieces.back().getEnd() - leftPieces.back().getBegin());
-                std::cout<<"splitting left @ "<<ratio<<std::endl;
+                //TODO
+            }
+            if(!rightPieces.empty())
+            {
+                rightEnd = rightPieces.back().getEnd();
+                rightBegin = rightPieces.back().getBegin();
+            }
+            else
+            {
+                //TODO
+            }
+            continue;
+        }
+        //partial overlap, matching end points
+        //TODO: note: might be same as partial overlap with no endpoints...
+        if( fabs(leftEnd-rightEnd) <= maxFrequencyDistance )
+        {
+            if(leftBegin<rightBegin)
+            {
+                //split left at right begin
+                const T ratio = (rightBegin - leftBegin) / (leftEnd - leftBegin);
+                //tmp:
+                //std::cout<<"splitting left @ "<<ratio<<std::endl;
                 auto split = leftPieces.back().getSpline().split(ratio);
-                //match right with split left
-                res.add(matchPieces(split.first, rightPieces.back().getSpline(), rightRatio));
-                //remove matched and split pieces
+                //add split part that had no everlap
+                res.add(split.first);
                 leftPieces.pop_back();
-                rightPieces.pop_back();
-                //add split right back
                 leftPieces.push_back(split.second);
+                //step left
+                if(!leftPieces.empty())
+                {
+                    leftEnd = leftPieces.back().getEnd();
+                    leftBegin = leftPieces.back().getBegin();
+                }
+                else
+                {
+                    //TODO
+                }
+                continue;
+            }
+            if(leftBegin>rightBegin)
+            {
+                //split right at left begin
+                const T ratio = (leftBegin - rightBegin) / (rightEnd - rightBegin);
+                //tmp:
+                //std::cout<<"splitting right @ "<<ratio<<std::endl;
+                auto split = rightPieces.back().getSpline().split(ratio);
+                //add split part that had no everlap
+                res.add(split.first);
+                rightPieces.pop_back();
+                rightPieces.push_back(split.second);
+                //step right
+                if(!rightPieces.empty())
+                {
+                    rightEnd = rightPieces.back().getEnd();
+                    rightBegin = rightPieces.back().getBegin();
+                }
+                else
+                {
+                    //TODO
+                }
+                continue;
             }
         }
-        //Ends are within range of eachother
-        else
+        //no overlap
+        if(leftBegin<rightBegin && leftEnd<rightBegin)
         {
-            //match pieces
-            res.add(matchPieces(leftPieces.back().getSpline(), rightPieces.back().getSpline(), rightRatio));
-            //remove matched pieces
+            //left only
+            res.add(leftPieces.back().getSpline());
             leftPieces.pop_back();
+            //step left
+            if(!leftPieces.empty())
+            {
+                leftEnd = leftPieces.back().getEnd();
+                leftBegin = leftPieces.back().getBegin();
+            }
+            else
+            {
+                //TODO
+            }
+            continue;
+        }
+        if(leftBegin>rightBegin && leftBegin>rightEnd)
+        {
+            //right only
+            res.add(rightPieces.back().getSpline());
             rightPieces.pop_back();
-            //adjust begin of next pieces TODO?
+            //step right
+            if(!rightPieces.empty())
+            {
+                rightEnd = rightPieces.back().getEnd();
+                rightBegin = rightPieces.back().getBegin();
+            }
+            else
+            {
+                //TODO
+            }
+            continue;
         }
-        //step
-        if (!leftPieces.empty())
+        //if one encompasses the other
+        //TODO?
+        //partial overlap, no matching endpoints
+        if(leftBegin>rightBegin && leftBegin<rightEnd && leftEnd>rightEnd)
         {
-            leftEnd = leftPieces.back().getEnd();
+            //split right at left begin
+            const T ratio = (leftBegin - rightBegin) / (rightEnd - rightBegin);
+            //tmp:
+            //std::cout<<"splitting right @ "<<ratio<<std::endl;
+            auto split = rightPieces.back().getSpline().split(ratio);
+            //add split part that had no everlap
+            res.add(split.first);
+            rightPieces.pop_back();
+            rightPieces.push_back(split.second);
+            //step right
+            if(!rightPieces.empty())
+            {
+                rightEnd = rightPieces.back().getEnd();
+                rightBegin = rightPieces.back().getBegin();
+            }
+            else
+            {
+                //TODO
+            }
+            continue;
         }
-        if (!rightPieces.empty())
+        if(leftBegin<rightBegin && leftEnd>rightBegin && leftEnd<rightEnd)
         {
-            rightEnd = rightPieces.back().getEnd();
+            //split left at right begin
+            const T ratio = (rightBegin - leftBegin) / (leftEnd - leftBegin);
+            //tmp:
+            //std::cout<<"splitting left @ "<<ratio<<std::endl;
+            auto split = leftPieces.back().getSpline().split(ratio);
+            //add split part that had no everlap
+            res.add(split.first);
+            leftPieces.pop_back();
+            leftPieces.push_back(split.second);
+            //step left
+            if(!leftPieces.empty())
+            {
+                leftEnd = leftPieces.back().getEnd();
+                leftBegin = leftPieces.back().getBegin();
+            }
+            else
+            {
+                //TODO
+            }
+            continue;
         }
     }
     return res;

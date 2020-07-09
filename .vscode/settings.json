@@ -68,6 +68,7 @@
         "jacobi": "cpp",
         "lu": "cpp",
         "qr": "cpp",
-        "svd": "cpp"
+        "svd": "cpp",
+        "unordered_set": "cpp"
     }
 }
