@@ -766,7 +766,7 @@ public:
 	}
 
 private:
-	virtual void run();
+	void run() override;
 
 	RemotePlugin * m_plugin;
 	volatile bool m_quit;
@@ -803,7 +803,7 @@ public:
 		m_failed = waitForMessage( IdInitDone, _busyWaiting ).id != IdInitDone;
 	}
 
-	virtual bool processMessage( const message & _m );
+	bool processMessage( const message & _m ) override;
 
 	bool process( const sampleFrame * _in_buf, sampleFrame * _out_buf );
 

@@ -50,7 +50,7 @@ public:
 
 
 private:
-	virtual void modelChanged();
+	void modelChanged() override;
 
 
 	InstrumentSoundShaping * m_ss;

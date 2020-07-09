@@ -306,7 +306,7 @@ void organicInstrument::playNote( NotePlayHandle * _n,
 	// fxKnob is [0;1]
 	float t =  m_fx1Model.value();
 	
-	for (int i=0 ; i < frames ; i++)
+	for (int i=0 ; i < frames + offset ; i++)
 	{
 		_working_buffer[i][0] = waveshape( _working_buffer[i][0], t ) *
 						m_volModel.value() / 100.0f;

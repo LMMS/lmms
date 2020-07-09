@@ -55,7 +55,7 @@
 #include "PeakController.h"
 
 
-tick_t MidiTime::s_ticksPerTact = DefaultTicksPerTact;
+tick_t MidiTime::s_ticksPerBar = DefaultTicksPerBar;
 
 
 
@@ -66,9 +66,10 @@ Song::Song() :
 								this ) ) ),
 	m_tempoModel( DefaultTempo, MinTempo, MaxTempo, this, tr( "Tempo" ) ),
 	m_timeSigModel( this ),
-	m_oldTicksPerTact( DefaultTicksPerTact ),
+	m_oldTicksPerBar( DefaultTicksPerBar ),
 	m_masterVolumeModel( 100, 0, 200, this, tr( "Master volume" ) ),
 	m_masterPitchModel( 0, -12, 12, this, tr( "Master pitch" ) ),
+	m_nLoadingTrack( 0 ),
 	m_fileName(),
 	m_oldFileName(),
 	m_modified( false ),
@@ -79,6 +80,7 @@ Song::Song() :
 	m_renderBetweenMarkers( false ),
 	m_playing( false ),
 	m_paused( false ),
+	m_savingProject( false ),
 	m_loadingProject( false ),
 	m_isCancelled( false ),
 	m_playMode( Mode_None ),
@@ -86,7 +88,7 @@ Song::Song() :
 	m_patternToPlay( NULL ),
 	m_loopPattern( false ),
 	m_elapsedTicks( 0 ),
-	m_elapsedTacts( 0 ),
+	m_elapsedBars( 0 ),
 	m_loopRenderCount(1),
 	m_loopRenderRemaining(1)
 {
@@ -162,10 +164,10 @@ void Song::setTempo()
 
 void Song::setTimeSignature()
 {
-	MidiTime::setTicksPerTact( ticksPerTact() );
-	emit timeSignatureChanged( m_oldTicksPerTact, ticksPerTact() );
+	MidiTime::setTicksPerBar( ticksPerBar() );
+	emit timeSignatureChanged( m_oldTicksPerBar, ticksPerBar() );
 	emit dataChanged();
-	m_oldTicksPerTact = ticksPerTact();
+	m_oldTicksPerBar = ticksPerBar();
 
 	m_vstSyncController.setTimeSignature(
 		getTimeSigModel().getNumerator(), getTimeSigModel().getDenominator() );
@@ -286,20 +288,20 @@ void Song::processNextBuffer()
 			int ticks = m_playPos[m_playMode].getTicks() +
 				( int )( currentFrame / framesPerTick );
 
-			// did we play a whole tact?
-			if( ticks >= MidiTime::ticksPerTact() )
+			// did we play a whole bar?
+			if( ticks >= MidiTime::ticksPerBar() )
 			{
 				// per default we just continue playing even if
 				// there's no more stuff to play
 				// (song-play-mode)
-				int maxTact = m_playPos[m_playMode].getTact()
+				int maxBar = m_playPos[m_playMode].getBar()
 									+ 2;
 
-				// then decide whether to go over to next tact
-				// or to loop back to first tact
+				// then decide whether to go over to next bar
+				// or to loop back to first bar
 				if( m_playMode == Mode_PlayBB )
 				{
-					maxTact = Engine::getBBTrackContainer()
+					maxBar = Engine::getBBTrackContainer()
 							->lengthOfCurrentBB();
 				}
 				else if( m_playMode == Mode_PlayPattern &&
@@ -307,17 +309,17 @@ void Song::processNextBuffer()
 					tl != NULL &&
 					tl->loopPointsEnabled() == false )
 				{
-					maxTact = m_patternToPlay->length()
-								.getTact();
+					maxBar = m_patternToPlay->length()
+								.getBar();
 				}
 
 				// end of played object reached?
-				if( m_playPos[m_playMode].getTact() + 1
-								>= maxTact )
+				if( m_playPos[m_playMode].getBar() + 1
+								>= maxBar )
 				{
 					// then start from beginning and keep
 					// offset
-					ticks %= ( maxTact * MidiTime::ticksPerTact() );
+					ticks %= ( maxBar * MidiTime::ticksPerBar() );
 
 					// wrap milli second counter
 					setToTimeByTicks(ticks);
@@ -407,8 +409,8 @@ void Song::processNextBuffer()
 		m_playPos[m_playMode].setCurrentFrame( framesToPlay +
 								currentFrame );
 		m_elapsedMilliSeconds[m_playMode] += MidiTime::ticksToMilliseconds(framesToPlay / framesPerTick, getTempo());
-		m_elapsedTacts = m_playPos[Mode_PlaySong].getTact();
-		m_elapsedTicks = ( m_playPos[Mode_PlaySong].getTicks() % ticksPerTact() ) / 48;
+		m_elapsedBars = m_playPos[Mode_PlaySong].getBar();
+		m_elapsedTicks = ( m_playPos[Mode_PlaySong].getTicks() % ticksPerBar() ) / 48;
 	}
 }
 
@@ -610,16 +612,14 @@ void Song::updateLength()
 {
 	m_length = 0;
 	m_tracksMutex.lockForRead();
-	for( TrackList::const_iterator it = tracks().begin();
-						it != tracks().end(); ++it )
+	for (auto track : tracks())
 	{
-		if( Engine::getSong()->isExporting() &&
-				( *it )->isMuted() )
+		if (m_exporting && track->isMuted())
 		{
 			continue;
 		}
 
-		const tact_t cur = ( *it )->length();
+		const bar_t cur = track->length();
 		if( cur > m_length )
 		{
 			m_length = cur;
@@ -742,6 +742,10 @@ void Song::stop()
 void Song::startExport()
 {
 	stop();
+
+	m_exporting = true;
+	updateLength();
+
 	if (m_renderBetweenMarkers)
 	{
 		m_exportSongBegin = m_exportLoopBegin = m_playPos[Mode_PlaySong].m_timeLine->loopBegin();
@@ -779,8 +783,6 @@ void Song::startExport()
 
 	playSong();
 
-	m_exporting = true;
-
 	m_vstSyncController.setPlaybackState( true );
 }
 
@@ -791,7 +793,6 @@ void Song::stopExport()
 {
 	stop();
 	m_exporting = false;
-	m_exportLoop = false;
 
 	m_vstSyncController.setPlaybackState( m_playing );
 }
@@ -805,7 +806,7 @@ void Song::insertBar()
 	for( TrackList::const_iterator it = tracks().begin();
 					it != tracks().end(); ++it )
 	{
-		( *it )->insertTact( m_playPos[Mode_PlaySong] );
+		( *it )->insertBar( m_playPos[Mode_PlaySong] );
 	}
 	m_tracksMutex.unlock();
 }
@@ -819,7 +820,7 @@ void Song::removeBar()
 	for( TrackList::const_iterator it = tracks().begin();
 					it != tracks().end(); ++it )
 	{
-		( *it )->removeTact( m_playPos[Mode_PlaySong] );
+		( *it )->removeBar( m_playPos[Mode_PlaySong] );
 	}
 	m_tracksMutex.unlock();
 }
@@ -1420,24 +1421,37 @@ void Song::clearErrors()
 
 void Song::collectError( const QString error )
 {
-	m_errors.append( error );
+	if (!m_errors.contains(error)) { m_errors[error] = 1; }
+	else { m_errors[ error ]++; }
 }
 
 
 
 bool Song::hasErrors()
 {
-	return ( m_errors.length() > 0 );
+	return !(m_errors.isEmpty());
 }
 
 
 
 QString Song::errorSummary()
 {
-	QString errors = m_errors.join("\n") + '\n';
+	QString errors;
+
+	auto i = m_errors.constBegin();
+	while (i != m_errors.constEnd())
+	{
+		errors.append( i.key() );
+		if( i.value() > 1 )
+		{
+			errors.append( tr(" (repeated %1 times)").arg( i.value() ) );
+		}
+		errors.append("\n");
+		++i;
+	}
 
 	errors.prepend( "\n\n" );
-	errors.prepend( tr( "The following errors occured while loading: " ) );
+	errors.prepend( tr( "The following errors occurred while loading: " ) );
 
 	return errors;
 }

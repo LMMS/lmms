@@ -85,15 +85,15 @@ public:
 
 	static void finalizeConnections();
 
-	virtual void saveSettings( QDomDocument & _doc, QDomElement & _this );
-	virtual void loadSettings( const QDomElement & _this );
+	void saveSettings( QDomDocument & _doc, QDomElement & _this ) override;
+	void loadSettings( const QDomElement & _this ) override;
 
 	static inline const QString classNodeName()
 	{
 		return "connection";
 	}
 
-	virtual QString nodeName() const
+	QString nodeName() const override
 	{
 		return classNodeName();
 	}

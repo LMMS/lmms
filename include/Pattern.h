@@ -94,9 +94,9 @@ public:
 	Pattern * nextPattern() const;
 
 	// settings-management
-	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
-	virtual void loadSettings( const QDomElement & _this );
-	inline virtual QString nodeName() const
+	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
+	void loadSettings( const QDomElement & _this ) override;
+	inline QString nodeName() const override
 	{
 		return "pattern";
 	}
@@ -109,7 +109,7 @@ public:
 	bool empty();
 
 
-	virtual TrackContentObjectView * createView( TrackView * _tv );
+	TrackContentObjectView * createView( TrackView * _tv ) override;
 
 
 	using Model::dataChanged;
@@ -182,7 +182,7 @@ public:
 	void setMutedNoteBorderColor(QColor const & color) { m_mutedNoteBorderColor = color; }
 
 public slots:
-	virtual void update();
+	void update() override;
 
 
 protected slots:
@@ -194,11 +194,11 @@ protected slots:
 
 
 protected:
-	virtual void constructContextMenu( QMenu * );
-	virtual void mousePressEvent( QMouseEvent * _me );
-	virtual void mouseDoubleClickEvent( QMouseEvent * _me );
-	virtual void paintEvent( QPaintEvent * pe );
-	virtual void wheelEvent( QWheelEvent * _we );
+	void constructContextMenu( QMenu * ) override;
+	void mousePressEvent( QMouseEvent * _me ) override;
+	void mouseDoubleClickEvent( QMouseEvent * _me ) override;
+	void paintEvent( QPaintEvent * pe ) override;
+	void wheelEvent( QWheelEvent * _we ) override;
 
 
 private:

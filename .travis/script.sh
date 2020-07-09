@@ -13,7 +13,7 @@ if [ "$TYPE" = 'style' ]; then
 
 else
 
-	export CMAKE_FLAGS="-DCMAKE_BUILD_TYPE=RelWithDebInfo"
+	export CMAKE_FLAGS="-DCMAKE_BUILD_TYPE=RelWithDebInfo -DBUNDLE_QT_TRANSLATIONS=ON"
 
 	if [ -z "$TRAVIS_TAG" ]; then
 		export CMAKE_FLAGS="$CMAKE_FLAGS -DUSE_CCACHE=ON"
@@ -22,7 +22,7 @@ else
 	"$TRAVIS_BUILD_DIR/.travis/$TRAVIS_OS_NAME.$TARGET_OS.script.sh"
 
 	# Package and upload non-tagged builds
-	if [ ! -z "$TRAVIS_TAG" ]; then
+	if [ -n "$TRAVIS_TAG" ]; then
 		# Skip, handled by travis deploy instead
 		exit 0
 	elif [[ $TARGET_OS == win* ]]; then
@@ -42,5 +42,7 @@ else
 	fi
 
 	echo "Uploading $PACKAGE to transfer.sh..."
-	curl --upload-file "$PACKAGE" "https://transfer.sh/$PACKAGE" || true
+	# Limit the connection time to 3 minutes and total upload time to 5 minutes
+	# Otherwise the build may hang
+	curl --connect-timeout 180 --max-time 300 --upload-file "$PACKAGE" "https://transfer.sh/$PACKAGE" || true
 fi

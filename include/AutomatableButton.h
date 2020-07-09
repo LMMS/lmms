@@ -48,7 +48,7 @@ public:
 		model()->setJournalling( _on );
 	}
 
-	virtual void modelChanged();
+	void modelChanged() override;
 
 
 public slots:
@@ -62,9 +62,9 @@ public slots:
 
 
 protected:
-	virtual void contextMenuEvent( QContextMenuEvent * _me );
-	virtual void mousePressEvent( QMouseEvent * _me );
-	virtual void mouseReleaseEvent( QMouseEvent * _me );
+	void contextMenuEvent( QContextMenuEvent * _me ) override;
+	void mousePressEvent( QMouseEvent * _me ) override;
+	void mouseReleaseEvent( QMouseEvent * _me ) override;
 
 
 private:
@@ -92,7 +92,7 @@ public:
 
 	void activateButton( AutomatableButton * _btn );
 
-	virtual void modelChanged();
+	void modelChanged() override;
 
 
 private slots:

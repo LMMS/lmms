@@ -48,6 +48,14 @@ class FileBrowser : public SideBarWidget
 {
 	Q_OBJECT
 public:
+	/**
+		Create a file browser side bar widget
+		@param directories '*'-separated list of directories to search for.
+			If a directory of factory files should be in the list it
+			must be the last one (for the factory files delimiter to work)
+		@param filter Filter as used in QDir::match
+		@param recurse *to be documented*
+	*/
 	FileBrowser( const QString & directories, const QString & filter,
 			const QString & title, const QPixmap & pm,
 			QWidget * parent, bool dirs_as_items = false, bool recurse = false );
@@ -61,7 +69,7 @@ private slots:
 	void giveFocusToFilter();
 
 private:
-	virtual void keyPressEvent( QKeyEvent * ke );
+	void keyPressEvent( QKeyEvent * ke ) override;
 
 	void addItems( const QString & path );
 
@@ -69,8 +77,8 @@ private:
 
 	QLineEdit * m_filterEdit;
 
-	QString m_directories;
-	QString m_filter;
+	QString m_directories; //!< Directories to search, split with '*'
+	QString m_filter; //!< Filter as used in QDir::match()
 
 	bool m_dirsAsItems;
 	bool m_recurse;
@@ -93,10 +101,10 @@ public:
 
 
 protected:
-	virtual void contextMenuEvent( QContextMenuEvent * e );
-	virtual void mousePressEvent( QMouseEvent * me );
-	virtual void mouseMoveEvent( QMouseEvent * me );
-	virtual void mouseReleaseEvent( QMouseEvent * me );
+	void contextMenuEvent( QContextMenuEvent * e ) override;
+	void mousePressEvent( QMouseEvent * me ) override;
+	void mouseMoveEvent( QMouseEvent * me ) override;
+	void mouseReleaseEvent( QMouseEvent * me ) override;
 
 
 private:
@@ -119,6 +127,7 @@ private slots:
 	void openInNewInstrumentTrackSE( void );
 	void sendToActiveInstrumentTrack( void );
 	void updateDirectory( QTreeWidgetItem * item );
+	void openContainingFolder();
 
 } ;
 
@@ -163,7 +172,14 @@ private:
 	static QPixmap * s_folderOpenedPixmap;
 	static QPixmap * s_folderLockedPixmap;
 
+	//! Directories that lead here
+	//! Initially, this is just set to the current path of a directory
+	//! If, however, you have e.g. 'TripleOscillator/xyz' in two of the
+	//! file browser's search directories 'a' and 'b', this will have two
+	//! entries 'a/TripleOscillator' and 'b/TripleOscillator'
+	//! and 'xyz' in the tree widget
 	QStringList m_directories;
+	//! Filter as used in QDir::match()
 	QString m_filter;
 
 	int m_dirCount;

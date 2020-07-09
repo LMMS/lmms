@@ -62,7 +62,7 @@ public:
 		setupWidget( QWidget * _parent );
 		virtual ~setupWidget();
 
-		virtual void saveSettings();
+		void saveSettings() override;
 
 	private:
 		QLineEdit * m_device;
@@ -80,10 +80,10 @@ public:
 
 
 private:
-	virtual void startProcessing();
-	virtual void stopProcessing();
-	virtual void applyQualitySettings();
-	virtual void run();
+	void startProcessing() override;
+	void stopProcessing() override;
+	void applyQualitySettings() override;
+	void run() override;
 
 	volatile bool m_quit;
 

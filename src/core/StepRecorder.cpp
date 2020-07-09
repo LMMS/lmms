@@ -32,7 +32,8 @@ const int REMOVE_RELEASED_NOTE_TIME_THRESHOLD_MS = 70;
 
 StepRecorder::StepRecorder(PianoRoll& pianoRoll, StepRecorderWidget& stepRecorderWidget):
 	m_pianoRoll(pianoRoll),
-	m_stepRecorderWidget(stepRecorderWidget)
+	m_stepRecorderWidget(stepRecorderWidget),
+	m_pattern(nullptr)
 {
 	m_stepRecorderWidget.hide();
 }

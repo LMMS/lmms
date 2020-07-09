@@ -35,7 +35,7 @@
 #endif
 
 
-typedef int32_t tact_t;
+typedef int32_t bar_t;
 typedef int32_t tick_t;
 typedef uint8_t volume_t;
 typedef int8_t panning_t;
@@ -55,9 +55,6 @@ typedef uint16_t fx_ch_t;			// FX-channel (0 to MAX_EFFECT_CHANNEL)
 
 typedef uint32_t jo_id_t;			// (unique) ID of a journalling object
 
-// use for improved branch prediction
-#define likely(x)	Q_LIKELY(x)
-#define unlikely(x)	Q_UNLIKELY(x)
 
 // windows headers define "min" and "max" macros, breaking the methods bwloe
 #undef min

@@ -52,34 +52,27 @@ TextFloat * Knob::s_textFloat = NULL;
 
 
 
-//! @todo: in C++11, we can use delegating ctors
-#define DEFAULT_KNOB_INITIALIZER_LIST \
-	QWidget( _parent ), \
-	FloatModelView( new FloatModel( 0, 0, 0, 1, NULL, _name, true ), this ), \
-	m_label( "" ), \
-	m_knobPixmap( NULL ), \
-	m_volumeKnob( false ), \
-	m_volumeRatio( 100.0, 0.0, 1000000.0 ), \
-	m_buttonPressed( false ), \
-	m_angle( -10 ), \
-	m_lineWidth( 0 ), \
-	m_textColor( 255, 255, 255 )
 
 Knob::Knob( knobTypes _knob_num, QWidget * _parent, const QString & _name ) :
-	DEFAULT_KNOB_INITIALIZER_LIST,
+	QWidget( _parent ),
+	FloatModelView( new FloatModel( 0, 0, 0, 1, NULL, _name, true ), this ),
+	m_label( "" ),
+	m_knobPixmap( NULL ),
+	m_volumeKnob( false ),
+	m_volumeRatio( 100.0, 0.0, 1000000.0 ),
+	m_buttonPressed( false ),
+	m_angle( -10 ),
+	m_lineWidth( 0 ),
+	m_textColor( 255, 255, 255 ),
 	m_knobNum( _knob_num )
 {
 	initUi( _name );
 }
 
 Knob::Knob( QWidget * _parent, const QString & _name ) :
-	DEFAULT_KNOB_INITIALIZER_LIST,
-	m_knobNum( knobBright_26 )
+	Knob( knobBright_26, _parent, _name )
 {
-	initUi( _name );
 }
-
-#undef DEFAULT_KNOB_INITIALIZER_LIST
 
 
 
@@ -503,8 +496,8 @@ float Knob::getValue( const QPoint & _p )
 {
 	float value;
 
-	// arcane mathemagicks for calculating knob movement
-	value = ( ( _p.y() + _p.y() * qMin( qAbs( _p.y() / 2.5f ), 6.0f ) ) ) / 12.0f;
+	// knob value increase is linear to mouse movement
+	value = .4f * _p.y();
 
 	// if shift pressed we want slower movement
 	if( gui->mainWindow()->isShiftPressed() )
@@ -592,13 +585,11 @@ void Knob::mousePressEvent( QMouseEvent * _me )
 		}
 
 		const QPoint & p = _me->pos();
-		m_origMousePos = p;
-		m_mouseOffset = QPoint(0, 0);
+		m_lastMousePos = p;
 		m_leftOver = 0.0f;
 
 		emit sliderPressed();
 
-		QApplication::setOverrideCursor( Qt::BlankCursor );
 		s_textFloat->setText( displayValue() );
 		s_textFloat->moveGlobal( this,
 				QPoint( width() + 2, 0 ) );
@@ -606,7 +597,7 @@ void Knob::mousePressEvent( QMouseEvent * _me )
 		m_buttonPressed = true;
 	}
 	else if( _me->button() == Qt::LeftButton &&
-			gui->mainWindow()->isShiftPressed() == true )
+			(_me->modifiers() & Qt::ShiftModifier) )
 	{
 		new StringPairDrag( "float_value",
 					QString::number( model()->value() ),
@@ -623,12 +614,13 @@ void Knob::mousePressEvent( QMouseEvent * _me )
 
 void Knob::mouseMoveEvent( QMouseEvent * _me )
 {
-	if( m_buttonPressed && _me->pos() != m_origMousePos )
+	if( m_buttonPressed && _me->pos() != m_lastMousePos )
 	{
-		m_mouseOffset = _me->pos() - m_origMousePos;
-		setPosition( m_mouseOffset );
+		// knob position is changed depending on last mouse position
+		setPosition( _me->pos() - m_lastMousePos );
 		emit sliderMoved( model()->value() );
-		QCursor::setPos( mapToGlobal( m_origMousePos ) );
+		// original position for next time is current position
+		m_lastMousePos = _me->pos();
 	}
 	s_textFloat->setText( displayValue() );
 }
@@ -702,7 +694,8 @@ void Knob::paintEvent( QPaintEvent * _me )
 void Knob::wheelEvent( QWheelEvent * _we )
 {
 	_we->accept();
-	const int inc = ( _we->delta() > 0 ) ? 1 : -1;
+	const float stepMult = model()->range() / 2000 / model()->step<float>();
+	const int inc = ( ( _we->delta() > 0 ) ? 1 : -1 ) * ( ( stepMult < 1 ) ? 1 : stepMult );
 	model()->incValue( inc );
 
 
@@ -808,9 +801,9 @@ void Knob::enterValue()
 
 void Knob::friendlyUpdate()
 {
-	if( model()->controllerConnection() == NULL ||
+	if (model() && (model()->controllerConnection() == NULL ||
 		model()->controllerConnection()->getController()->frequentUpdates() == false ||
-				Controller::runningFrames() % (256*4) == 0 )
+				Controller::runningFrames() % (256*4) == 0))
 	{
 		update();
 	}

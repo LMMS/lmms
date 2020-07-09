@@ -24,6 +24,7 @@
 #define EQSPECTRUMVIEW_H
 
 #include <QPainter>
+#include <QPainterPath>
 #include <QWidget>
 
 #include "fft_helpers.h"

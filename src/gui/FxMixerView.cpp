@@ -115,7 +115,7 @@ FxMixerView::FxMixerView() :
 			ChannelArea( QWidget * parent, FxMixerView * mv ) :
 				QScrollArea( parent ), m_mv( mv ) {}
 			~ChannelArea() {}
-			virtual void keyPressEvent( QKeyEvent * e )
+			void keyPressEvent( QKeyEvent * e ) override
 			{
 				m_mv->keyPressEvent( e );
 			}
@@ -450,6 +450,15 @@ void FxMixerView::deleteUnusedChannels()
 			{
 				InstrumentTrack* inst = dynamic_cast<InstrumentTrack *>( t );
 				if( i == inst->effectChannelModel()->value(0) )
+				{
+					empty=false;
+					break;
+				}
+			}
+			else if( t->type() == Track::SampleTrack )
+			{
+				SampleTrack *strack = dynamic_cast<SampleTrack *>( t );
+				if( i == strack->effectChannelModel()->value(0) )
 				{
 					empty=false;
 					break;

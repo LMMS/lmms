@@ -158,7 +158,7 @@ void SampleTCO::setSampleFile( const QString & _sf )
 	{	//When creating an empty sample pattern make it a bar long
 		float nom = Engine::getSong()->getTimeSigModel().getNumerator();
 		float den = Engine::getSong()->getTimeSigModel().getDenominator();
-		length = DefaultTicksPerTact * ( nom / den );
+		length = DefaultTicksPerBar * ( nom / den );
 	}
 	else
 	{	//Otherwise set it to the sample's length
@@ -522,18 +522,18 @@ void SampleTCOView::paintEvent( QPaintEvent * pe )
 	p.setPen( !muted ? painter.pen().brush().color() : mutedColor() );
 
 	const int spacing = TCO_BORDER_WIDTH + 1;
-	const float ppt = fixedTCOs() ?
+	const float ppb = fixedTCOs() ?
 			( parentWidget()->width() - 2 * TCO_BORDER_WIDTH )
-					/ (float) m_tco->length().getTact() :
-								pixelsPerTact();
+					/ (float) m_tco->length().getBar() :
+								pixelsPerBar();
 
 	float nom = Engine::getSong()->getTimeSigModel().getNumerator();
 	float den = Engine::getSong()->getTimeSigModel().getDenominator();
-	float ticksPerTact = DefaultTicksPerTact * nom / den;
+	float ticksPerBar = DefaultTicksPerBar * nom / den;
 
-	float offset =  m_tco->startTimeOffset() / ticksPerTact * pixelsPerTact();
+	float offset =  m_tco->startTimeOffset() / ticksPerBar * pixelsPerBar();
 	QRect r = QRect( TCO_BORDER_WIDTH + offset, spacing,
-			qMax( static_cast<int>( m_tco->sampleLength() * ppt / ticksPerTact ), 1 ), rect().bottom() - 2 * spacing );
+			qMax( static_cast<int>( m_tco->sampleLength() * ppb / ticksPerBar ), 1 ), rect().bottom() - 2 * spacing );
 	m_tco->m_sampleBuffer->visualize( p, r, pe->rect() );
 
 	QFileInfo fileInfo(m_tco->m_sampleBuffer->audioFile());
@@ -586,20 +586,19 @@ void SampleTCOView::paintEvent( QPaintEvent * pe )
 
 
 
-SampleTrack::SampleTrack( TrackContainer* tc ) :
-	Track( Track::SampleTrack, tc ),
-	m_volumeModel( DefaultVolume, MinVolume, MaxVolume, 0.1f, this,
-							tr( "Volume" ) ),
-	m_panningModel( DefaultPanning, PanningLeft, PanningRight, 0.1f,
-					this, tr( "Panning" ) ),
-	m_effectChannelModel( 0, 0, 0, this, tr( "FX channel" ) ),
-	m_audioPort( tr( "Sample track" ), true, &m_volumeModel, &m_panningModel, &m_mutedModel )
+SampleTrack::SampleTrack(TrackContainer* tc) :
+	Track(Track::SampleTrack, tc),
+	m_volumeModel(DefaultVolume, MinVolume, MaxVolume, 0.1f, this, tr("Volume")),
+	m_panningModel(DefaultPanning, PanningLeft, PanningRight, 0.1f, this, tr("Panning")),
+	m_effectChannelModel(0, 0, 0, this, tr("FX channel")),
+	m_audioPort(tr("Sample track"), true, &m_volumeModel, &m_panningModel, &m_mutedModel),
+	m_isPlaying(false)
 {
-	setName( tr( "Sample track" ) );
-	m_panningModel.setCenterValue( DefaultPanning );
-	m_effectChannelModel.setRange( 0, Engine::fxMixer()->numChannels()-1, 1);
+	setName(tr("Sample track"));
+	m_panningModel.setCenterValue(DefaultPanning);
+	m_effectChannelModel.setRange(0, Engine::fxMixer()->numChannels()-1, 1);
 
-	connect( &m_effectChannelModel, SIGNAL( dataChanged() ), this, SLOT( updateEffectChannel() ) );
+	connect(&m_effectChannelModel, SIGNAL(dataChanged()), this, SLOT(updateEffectChannel()));
 }
 
 
@@ -623,6 +622,10 @@ bool SampleTrack::play( const MidiTime & _start, const fpp_t _frames,
 	::BBTrack * bb_track = NULL;
 	if( _tco_num >= 0 )
 	{
+		if (_start > getTCO(_tco_num)->length())
+		{
+			setPlaying(false);
+		}
 		if( _start != 0 )
 		{
 			return false;
@@ -631,10 +634,12 @@ bool SampleTrack::play( const MidiTime & _start, const fpp_t _frames,
 		if (trackContainer() == (TrackContainer*)Engine::getBBTrackContainer())
 		{
 			bb_track = BBTrack::findBBTrack( _tco_num );
+			setPlaying(true);
 		}
 	}
 	else
 	{
+		bool nowPlaying = false;
 		for( int i = 0; i < numOfTCOs(); ++i )
 		{
 			TrackContentObject * tco = getTCO( i );
@@ -658,6 +663,7 @@ bool SampleTrack::play( const MidiTime & _start, const fpp_t _frames,
 						sTco->setSamplePlayLength( samplePlayLength );
 						tcos.push_back( sTco );
 						sTco->setIsPlaying( true );
+						nowPlaying = true;
 					}
 				}
 			}
@@ -665,7 +671,9 @@ bool SampleTrack::play( const MidiTime & _start, const fpp_t _frames,
 			{
 				sTco->setIsPlaying( false );
 			}
+			nowPlaying = nowPlaying || sTco->isPlaying();
 		}
+		setPlaying(nowPlaying);
 	}
 
 	for( tcoVector::Iterator it = tcos.begin(); it != tcos.end(); ++it )
@@ -827,10 +835,29 @@ SampleTrackView::SampleTrackView( SampleTrack * _t, TrackContainerView* tcv ) :
 	m_panningKnob->setLabel( tr( "PAN" ) );
 	m_panningKnob->show();
 
+	m_activityIndicator = new FadeButton(
+		QApplication::palette().color(QPalette::Active, QPalette::Background),
+		QApplication::palette().color(QPalette::Active, QPalette::BrightText),
+		QApplication::palette().color(QPalette::Active, QPalette::BrightText).darker(),
+		getTrackSettingsWidget()
+	);
+	m_activityIndicator->setGeometry(settingsWidgetWidth - 2 * 24 - 11, 2, 8, 28);
+	m_activityIndicator->show();
+	connect(_t, SIGNAL(playingChanged()), this, SLOT(updateIndicator()));
+
 	setModel( _t );
 
 	m_window = new SampleTrackWindow(this);
 	m_window->toggleVisibility(false);
+}
+
+
+
+
+void SampleTrackView::updateIndicator()
+{
+	if (model()->isPlaying()) { m_activityIndicator->activateOnce(); }
+	else { m_activityIndicator->noteEnd(); }
 }
 
 
@@ -848,6 +875,7 @@ SampleTrackView::~SampleTrackView()
 
 
 
+//FIXME: This is identical to InstrumentTrackView::createFxMenu
 QMenu * SampleTrackView::createFxMenu(QString title, QString newFxLabel)
 {
 	int channelIndex = model()->effectChannelModel()->value();
@@ -862,8 +890,6 @@ QMenu * SampleTrackView::createFxMenu(QString title, QString newFxLabel)
 
 	QMenu *fxMenu = new QMenu(title);
 
-	QSignalMapper * fxMenuSignalMapper = new QSignalMapper(fxMenu);
-
 	fxMenu->addAction(newFxLabel, this, SLOT(createFxLine()));
 	fxMenu->addSeparator();
 
@@ -873,13 +899,13 @@ QMenu * SampleTrackView::createFxMenu(QString title, QString newFxLabel)
 
 		if (currentChannel != fxChannel)
 		{
+			const auto index = currentChannel->m_channelIndex;
 			QString label = tr("FX %1: %2").arg(currentChannel->m_channelIndex).arg(currentChannel->m_name);
-			QAction * action = fxMenu->addAction(label, fxMenuSignalMapper, SLOT(map()));
-			fxMenuSignalMapper->setMapping(action, currentChannel->m_channelIndex);
+			fxMenu->addAction(label, [this, index](){
+				assignFxLine(index);
+			});
 		}
 	}
-
-	connect(fxMenuSignalMapper, SIGNAL(mapped(int)), this, SLOT(assignFxLine(int)));
 
 	return fxMenu;
 }
@@ -930,8 +956,8 @@ void SampleTrackView::dropEvent(QDropEvent *de)
 
 		MidiTime tcoPos = trackContainerView()->fixedTCOs()
 				? MidiTime(0)
-				: MidiTime(((xPos - trackHeadWidth) / trackContainerView()->pixelsPerTact()
-							* MidiTime::ticksPerTact()) + trackContainerView()->currentPosition()
+				: MidiTime(((xPos - trackHeadWidth) / trackContainerView()->pixelsPerBar()
+							* MidiTime::ticksPerBar()) + trackContainerView()->currentPosition()
 						).quantize(1.0);
 
 		SampleTCO * sTco = static_cast<SampleTCO*>(getTrack()->createTCO(tcoPos));

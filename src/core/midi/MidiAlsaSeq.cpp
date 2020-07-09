@@ -563,7 +563,7 @@ void MidiAlsaSeq::run()
 
 				case SND_SEQ_EVENT_CONTROLLER:
 					dest->processInEvent( MidiEvent(
-								MidiControlChange,
+							MidiControlChange,
 							ev->data.control.channel,
 							ev->data.control.param,
 							ev->data.control.value, source ),
@@ -572,11 +572,11 @@ void MidiAlsaSeq::run()
 
 				case SND_SEQ_EVENT_PGMCHANGE:
 					dest->processInEvent( MidiEvent(
-								MidiProgramChange,
+							MidiProgramChange,
 							ev->data.control.channel,
-							ev->data.control.param,
-							ev->data.control.value, source ),
-									MidiTime() );
+							ev->data.control.value,	0,
+							source ),
+								MidiTime() );
 					break;
 
 				case SND_SEQ_EVENT_CHANPRESS:

@@ -9,16 +9,23 @@ QLabel, QTreeWidget, QListWidget, QGroupBox, QMenuBar {
 
 QTreeView {
 	outline: none;
+	font-size: 12px;
+}
+
+QTreeWidget::item {
+	padding: 1px;
 }
 
 QTreeWidget::item:hover,
 QTreeWidget::branch:hover {
 	background-color: #3C444E;
+	padding-left: 0px;
 }
 
 QTreeWidget::item:selected,
 QTreeWidget::branch:selected {
 	background-color: #17793b;
+	padding-left: 0px;
 }
 
 QTreeView::branch:has-children:open {
@@ -81,6 +88,12 @@ TextFloat {
 }
 
 
+/* splash screen text */
+QSplashScreen QLabel {
+	color: white;
+}
+
+
 QMenu {
 	border-top: 2px solid #08993E;
 	background-color: #15191c;
@@ -137,6 +150,11 @@ QMenu::indicator:selected {
 	background-color: #101213;
 }
 
+positionLine {
+	qproperty-tailGradient: true;
+	qproperty-lineColor: rgb(255, 255, 255);
+}
+
 PianoRoll {
 	background-color: #141616;
 	qproperty-backgroundShade: rgba(255, 255, 255, 10);
@@ -178,7 +196,7 @@ GroupBox {
 
 /* main toolbar oscilloscope - can have transparent bg now */
 
-VisualizationWidget  {
+Oscilloscope {
 	background: none;
 	border: none;
 	qproperty-normalColor: rgb(71, 253, 133);
@@ -647,6 +665,8 @@ TrackContentObjectView   {
 	qproperty-textBackgroundColor: rgba(0, 0, 0, 75);
 	qproperty-textShadowColor: rgba(0,0,0,200);
 	qproperty-gradient: false; /* boolean property, set true to have a gradient */
+	/* finger tip offset of cursor */
+	qproperty-mouseHotspotHand: 7px 2px;
 	
 	font-size: 11px;
 }
@@ -920,7 +940,4 @@ LmmsPalette {
 	qproperty-brightText: #d1d8e4;
 	qproperty-highlight: #262b30;
 	qproperty-highlightedText: #d1d8e4;
-	/* the next two are used for whatsthis dialogs */
-	qproperty-toolTipText: #d1d8e4;
-	qproperty-toolTipBase: #101213;
 }

@@ -96,17 +96,20 @@ public:
 
 	int realOutputChannel() const
 	{
-		return outputChannel() - 1;
+		// There's a possibility of outputChannel being 0 ("--"), which is used to keep all
+		// midi channels when forwarding. In that case, realOutputChannel will return the
+		// default channel 1 (whose value is 0).
+		return outputChannel() ? outputChannel() - 1 : 0;
 	}
 
 	void processInEvent( const MidiEvent& event, const MidiTime& time = MidiTime() );
 	void processOutEvent( const MidiEvent& event, const MidiTime& time = MidiTime() );
 
 
-	virtual void saveSettings( QDomDocument& doc, QDomElement& thisElement );
-	virtual void loadSettings( const QDomElement& thisElement );
+	void saveSettings( QDomDocument& doc, QDomElement& thisElement ) override;
+	void loadSettings( const QDomElement& thisElement ) override;
 
-	virtual QString nodeName() const
+	QString nodeName() const override
 	{
 		return "midiport";
 	}

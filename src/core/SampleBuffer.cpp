@@ -369,11 +369,14 @@ void SampleBuffer::directFloatWrite ( sample_t * & _fbuf, f_cnt_t _frames, int _
 void SampleBuffer::normalizeSampleRate( const sample_rate_t _src_sr,
 							bool _keep_settings )
 {
+	const sample_rate_t old_rate = m_sampleRate;
 	// do samplerate-conversion to our default-samplerate
 	if( _src_sr != mixerSampleRate() )
 	{
 		SampleBuffer * resampled = resample( _src_sr,
 					mixerSampleRate() );
+
+		m_sampleRate = mixerSampleRate();
 		MM_FREE( m_data );
 		m_frames = resampled->frames();
 		m_data = MM_ALLOC( sampleFrame, m_frames );
@@ -387,6 +390,16 @@ void SampleBuffer::normalizeSampleRate( const sample_rate_t _src_sr,
 		// update frame-variables
 		m_loopStartFrame = m_startFrame = 0;
 		m_loopEndFrame = m_endFrame = m_frames;
+	}
+	else if( old_rate != mixerSampleRate() )
+	{
+		auto old_rate_to_new_rate_ratio = static_cast<float>(mixerSampleRate()) / old_rate;
+
+		m_startFrame = qBound(0, f_cnt_t(m_startFrame*old_rate_to_new_rate_ratio), m_frames);
+		m_endFrame = qBound(m_startFrame, f_cnt_t(m_endFrame*old_rate_to_new_rate_ratio), m_frames);
+		m_loopStartFrame = qBound(0, f_cnt_t(m_loopStartFrame*old_rate_to_new_rate_ratio), m_frames);
+		m_loopEndFrame = qBound(m_loopStartFrame, f_cnt_t(m_loopEndFrame*old_rate_to_new_rate_ratio), m_frames);
+		m_sampleRate = mixerSampleRate();
 	}
 }
 

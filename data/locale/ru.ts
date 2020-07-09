@@ -1664,7 +1664,7 @@ Oe Ai &lt;oeai/at/symbiants/dot/com&gt;</translation>
     <message>
         <location filename="../../src/gui/widgets/EffectView.cpp" line="66"/>
         <source>W/D</source>
-        <translation>НАСЫЩ</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/gui/widgets/EffectView.cpp" line="69"/>
@@ -1679,7 +1679,7 @@ Oe Ai &lt;oeai/at/symbiants/dot/com&gt;</translation>
     <message>
         <location filename="../../src/gui/widgets/EffectView.cpp" line="76"/>
         <source>DECAY</source>
-        <translation>ЗАТУХАНИЕ</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/gui/widgets/EffectView.cpp" line="79"/>

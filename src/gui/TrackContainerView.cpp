@@ -54,9 +54,8 @@ TrackContainerView::TrackContainerView( TrackContainer * _tc ) :
 	m_tc( _tc ),
 	m_trackViews(),
 	m_scrollArea( new scrollArea( this ) ),
-	m_ppt( DEFAULT_PIXELS_PER_TACT ),
-	m_rubberBand( new RubberBand( m_scrollArea ) ),
-	m_origin()
+	m_ppb( DEFAULT_PIXELS_PER_BAR ),
+	m_rubberBand( new RubberBand( m_scrollArea ) )
 {
 	m_tc->setHook( this );
 	//keeps the direction of the widget, undepended on the locale
@@ -226,10 +225,9 @@ void TrackContainerView::scrollToTrackView( TrackView * _tv )
 
 void TrackContainerView::realignTracks()
 {
-	QWidget * content = m_scrollArea->widget();
-	content->setFixedWidth( width()
-				- m_scrollArea->verticalScrollBar()->width() );
-	content->setFixedHeight( content->minimumSizeHint().height() );
+	m_scrollArea->widget()->setFixedWidth(width());
+	m_scrollArea->widget()->setFixedHeight(
+				m_scrollArea->widget()->minimumSizeHint().height());
 
 	for( trackViewList::iterator it = m_trackViews.begin();
 						it != m_trackViews.end(); ++it )
@@ -307,9 +305,9 @@ bool TrackContainerView::allowRubberband() const
 
 
 
-void TrackContainerView::setPixelsPerTact( int _ppt )
+void TrackContainerView::setPixelsPerBar( int ppb )
 {
-	m_ppt = _ppt;
+	m_ppb = ppb;
 
 	// tell all TrackContentWidgets to update their background tile pixmap
 	for( trackViewList::Iterator it = m_trackViews.begin();
@@ -346,12 +344,8 @@ void TrackContainerView::dragEnterEvent( QDragEnterEvent * _dee )
 						arg( Track::SampleTrack ) );
 }
 
-void TrackContainerView::selectRegionFromPixels(int xStart, int xEnd)
-{
-	m_rubberBand->setEnabled( true );
-	m_rubberBand->show();
-	m_rubberBand->setGeometry( min( xStart, xEnd ), 0, max( xStart, xEnd ) - min( xStart, xEnd ), std::numeric_limits<int>::max() );
-}
+
+
 
 void TrackContainerView::stopRubberBand()
 {
@@ -428,55 +422,18 @@ void TrackContainerView::dropEvent( QDropEvent * _de )
 
 
 
-void TrackContainerView::mousePressEvent( QMouseEvent * _me )
-{
-	if( allowRubberband() == true )
-	{
-		m_origin = m_scrollArea->mapFromParent( _me->pos() );
-		m_rubberBand->setEnabled( true );
-		m_rubberBand->setGeometry( QRect( m_origin, QSize() ) );
-		m_rubberBand->show();
-	}
-	QWidget::mousePressEvent( _me );
-}
-
-
-
-
-void TrackContainerView::mouseMoveEvent( QMouseEvent * _me )
-{
-	if( rubberBandActive() == true )
-	{
-		m_rubberBand->setGeometry( QRect( m_origin,
-				m_scrollArea->mapFromParent( _me->pos() ) ).
-								normalized() );
-	}
-	QWidget::mouseMoveEvent( _me );
-}
-
-
-
-
-void TrackContainerView::mouseReleaseEvent( QMouseEvent * _me )
-{
-	m_rubberBand->hide();
-	m_rubberBand->setEnabled( false );
-	QWidget::mouseReleaseEvent( _me );
-}
-
-
-
-
-
 void TrackContainerView::resizeEvent( QResizeEvent * _re )
 {
 	realignTracks();
 	QWidget::resizeEvent( _re );
 }
 
+
+
+
 RubberBand *TrackContainerView::rubberBand() const
 {
-    return m_rubberBand;
+	return m_rubberBand;
 }
 
 
@@ -488,7 +445,6 @@ TrackContainerView::scrollArea::scrollArea( TrackContainerView * _parent ) :
 {
 	setFrameStyle( QFrame::NoFrame );
 	setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
-	setVerticalScrollBarPolicy( Qt::ScrollBarAlwaysOn );
 }
 
 
