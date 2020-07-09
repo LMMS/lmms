@@ -1421,21 +1421,34 @@ void Song::clearErrors()
 
 void Song::collectError( const QString error )
 {
-	m_errors.append( error );
+	if (!m_errors.contains(error)) { m_errors[error] = 1; }
+	else { m_errors[ error ]++; }
 }
 
 
 
 bool Song::hasErrors()
 {
-	return ( m_errors.length() > 0 );
+	return !(m_errors.isEmpty());
 }
 
 
 
 QString Song::errorSummary()
 {
-	QString errors = m_errors.join("\n") + '\n';
+	QString errors;
+
+	auto i = m_errors.constBegin();
+	while (i != m_errors.constEnd())
+	{
+		errors.append( i.key() );
+		if( i.value() > 1 )
+		{
+			errors.append( tr(" (repeated %1 times)").arg( i.value() ) );
+		}
+		errors.append("\n");
+		++i;
+	}
 
 	errors.prepend( "\n\n" );
 	errors.prepend( tr( "The following errors occurred while loading: " ) );

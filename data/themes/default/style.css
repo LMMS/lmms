@@ -150,6 +150,11 @@ QMenu::indicator:selected {
 	background-color: #101213;
 }
 
+positionLine {
+	qproperty-tailGradient: true;
+	qproperty-lineColor: rgb(255, 255, 255);
+}
+
 PianoRoll {
 	background-color: #141616;
 	qproperty-backgroundShade: rgba(255, 255, 255, 10);
