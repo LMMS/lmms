@@ -115,7 +115,7 @@ Editor::Editor(bool record, bool stepRecord) :
 	connect(m_stopAction, SIGNAL(triggered()), this, SLOT(stop()));
 	new QShortcut(Qt::Key_Space, this, SLOT(togglePlayStop()));
 	new QShortcut(QKeySequence(Qt::SHIFT + Qt::Key_Space), this, SLOT(togglePause()));
-	new QShortcut(QKeySequence(Qt::ALT + Qt::Key_F11), this, SLOT(toggleMaximise()));
+	new QShortcut(QKeySequence(Qt::SHIFT + Qt::Key_F11), this, SLOT(toggleMaximise()));
 
 	// Add actions to toolbar
 	addButton(m_playAction, "playButton");
