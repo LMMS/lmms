@@ -256,4 +256,3 @@ AutomatedValueMap BBTrackContainer::automatedValuesAt(MidiTime time, int tcoNum)
 
 	return TrackContainer::automatedValuesAt(time + (MidiTime::ticksPerBar() * tcoNum), tcoNum);
 }
-

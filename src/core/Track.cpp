@@ -39,6 +39,7 @@
 
 #include <assert.h>
 
+#include <QColorDialog>
 #include <QLayout>
 #include <QMenu>
 #include <QMouseEvent>
@@ -243,6 +244,17 @@ MidiTime TrackContentObject::startTimeOffset() const
 void TrackContentObject::setStartTimeOffset( const MidiTime &startTimeOffset )
 {
 	m_startTimeOffset = startTimeOffset;
+}
+
+void TrackContentObject::setBGColor( QColor & c )
+{
+	m_bgcolor = c;
+	emit trackColorChanged( m_bgcolor );
+}
+
+QColor TrackContentObject::BGColor()
+{
+	return m_bgcolor;
 }
 
 
@@ -1824,7 +1836,6 @@ void TrackContentWidget::setGridColor( const QBrush & c )
 void TrackContentWidget::setEmbossColor( const QBrush & c )
 { m_embossColor = c; }
 
-
 // ===========================================================================
 // trackOperationsWidget
 // ===========================================================================
@@ -2017,6 +2028,28 @@ void TrackOperationsWidget::removeTrack()
 }
 
 
+void TrackOperationsWidget::setBackgroundColor( QColor & c )
+{ m_backgroundColor = c; }
+QColor TrackOperationsWidget::backgroundColor()
+{ return m_backgroundColor; }
+
+
+void TrackOperationsWidget::changeTrackColor()
+{
+	QColor new_color = QColorDialog::getColor( QPalette::Background );
+	if( ! new_color.isValid() )
+	{
+		return;
+	}
+	m_backgroundColor = new_color;
+	emit colorChanged( m_backgroundColor );
+}
+
+void TrackOperationsWidget::resetTrackColor()
+{
+	m_backgroundColor = QPalette::Background;
+	emit colorChanged( m_backgroundColor );
+}
 
 
 /*! \brief Update the trackOperationsWidget context menu
@@ -2057,6 +2090,12 @@ void TrackOperationsWidget::updateMenu()
 		toMenu->addAction( tr( "Turn all recording on" ), this, SLOT( recordingOn() ) );
 		toMenu->addAction( tr( "Turn all recording off" ), this, SLOT( recordingOff() ) );
 	}
+	
+	toMenu->addSeparator();
+	toMenu->addAction( embed::getIconPixmap( "colorize" ),
+						tr( "Change color" ), this, SLOT( changeTrackColor() ) );
+	toMenu->addAction( embed::getIconPixmap( "colorize" ),
+						tr( "Reset color to default" ), this, SLOT( resetTrackColor() ) );
 }
 
 
@@ -2668,6 +2707,15 @@ void Track::toggleSolo()
 
 
 
+void Track::trackColorChanged ( QColor & c )
+{
+	for (int i = 0; i < numOfTCOs(); i++)
+	{
+		m_trackContentObjects[i]->setBGColor(c);
+	}
+}
+
+
 
 BoolModel *Track::getMutedModel()
 {
@@ -2737,6 +2785,10 @@ TrackView::TrackView( Track * track, TrackContainerView * tcv ) :
 
 	connect( &m_track->m_soloModel, SIGNAL( dataChanged() ),
 			m_track, SLOT( toggleSolo() ), Qt::DirectConnection );
+	
+	connect( &m_trackOperationsWidget, SIGNAL( colorChanged( QColor & ) ),
+			m_track, SLOT( trackColorChanged( QColor & ) ) );
+	
 	// create views for already existing TCOs
 	for( Track::tcoVector::iterator it =
 					m_track->m_trackContentObjects.begin();
