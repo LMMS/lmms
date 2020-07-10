@@ -85,7 +85,7 @@ CompressorEffect::CompressorEffect(Model* parent, const Descriptor::SubPluginFea
 	connect(&m_compressorControls.m_autoMakeupModel, SIGNAL(dataChanged()), this, SLOT(calcAutoMakeup()));
 
 	connect(Engine::mixer(), SIGNAL(sampleRateChanged()), this, SLOT(changeSampleRate()));
-	emit changeSampleRate();
+	changeSampleRate();
 }
 
 
@@ -606,20 +606,20 @@ void CompressorEffect::changeSampleRate()
 	m_preLookaheadBuf[0].resize(m_lookaheadDelayLength);
 	m_preLookaheadBuf[1].resize(m_lookaheadDelayLength);
 
-	emit calcAutoMakeup();
-	emit calcAttack();
-	emit calcRelease();
-	emit calcRatio();
-	emit calcRange();
-	emit calcLookaheadLength();
-	emit calcHold();
-	emit resizeRMS();
-	emit calcThreshold();
-	emit calcKnee();
-	emit calcOutGain();
-	emit calcInGain();
-	emit calcTiltCoeffs();
-	emit calcMix();
+	calcAutoMakeup();
+	calcAttack();
+	calcRelease();
+	calcRatio();
+	calcRange();
+	calcLookaheadLength();
+	calcHold();
+	resizeRMS();
+	calcThreshold();
+	calcKnee();
+	calcOutGain();
+	calcInGain();
+	calcTiltCoeffs();
+	calcMix();
 }
 
 

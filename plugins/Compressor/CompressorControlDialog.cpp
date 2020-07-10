@@ -298,10 +298,10 @@ CompressorControlDialog::CompressorControlDialog(CompressorControls* controls) :
 
 	m_timeElapsed.start();
 
-	emit peakmodeChanged();
-	emit stereoLinkChanged();
-	emit lookaheadChanged();
-	emit limiterChanged();
+	peakmodeChanged();
+	stereoLinkChanged();
+	lookaheadChanged();
+	limiterChanged();
 }
 
 
