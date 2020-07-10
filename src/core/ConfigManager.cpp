@@ -66,8 +66,10 @@ ConfigManager::ConfigManager() : m_version(defaultVersion())
 	m_sf2Dir = m_workingDir + SF2_PATH;
 	m_gigDir = m_workingDir + GIG_PATH;
 	m_themeDir = defaultThemeDir();
-	if (! qgetenv("LMMS_DATA_DIR").isEmpty())
+	if (!qgetenv("LMMS_DATA_DIR").isEmpty())
+	{
 		QDir::addSearchPath("data", QString::fromLocal8Bit(qgetenv("LMMS_DATA_DIR")));
+	}
 	initDevelopmentWorkingDir();
 
 #ifdef LMMS_BUILD_WIN32

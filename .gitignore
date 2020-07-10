@@ -1,7 +1,5 @@
 /build
 /target
-/.idea
-/cmake-build-debug
 .*.sw?
 .DS_Store
 *~
