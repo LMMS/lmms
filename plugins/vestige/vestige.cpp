@@ -345,7 +345,7 @@ void vestigeInstrument::loadFile( const QString & _file )
 	{
 		closePlugin();
 	}
-	m_pluginDLL = PathUtil::toAbsolute( _file );
+	m_pluginDLL = PathUtil::toShortestRelative( _file );
 	TextFloat * tf = NULL;
 	if( gui )
 	{
