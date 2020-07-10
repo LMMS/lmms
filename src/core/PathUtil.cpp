@@ -11,7 +11,7 @@ namespace PathUtil
 	Base relativeBases[] = { Base::ProjectDir, Base::FactorySample, Base::UserSample, Base::UserVST, Base::Preset,
 		Base::UserLADSPA, Base::DefaultLADSPA, Base::UserSoundfont, Base::DefaultSoundfont, Base::UserGIG, Base::DefaultGIG };
 
-	QString baseLocation(const Base & base)
+	QString baseLocation(const Base base)
 	{
 		QString loc = "";
 		switch (base)
@@ -36,9 +36,9 @@ namespace PathUtil
 		return QDir::cleanPath(loc) + QDir::separator();
 	}
 
-	QDir baseQDir (const Base & base) { return QDir(baseLocation(base)); }
+	QDir baseQDir (const Base base) { return QDir(baseLocation(base)); }
 
-	QString basePrefix(const Base & base)
+	QString basePrefix(const Base base)
 	{
 		switch (base)
 		{
@@ -108,7 +108,7 @@ namespace PathUtil
 		return baseLocation(base) + upgraded.remove(0, basePrefix(base).length());
 	}
 
-	QString relativeOrAbsolute(const QString & input, const Base & base)
+	QString relativeOrAbsolute(const QString & input, const Base base)
 	{
 		if (input.isEmpty()) { return input; }
 		QString absolutePath = toAbsolute(input);
