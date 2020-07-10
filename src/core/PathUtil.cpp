@@ -33,7 +33,7 @@ namespace PathUtil
 			case Base::DefaultGIG       : loc = ConfigManager::inst()->userGigDir(); break;
 			default                   : return QString("");
 		}
-		return QDir::cleanPath(loc) + QDir::separator();
+		return QDir::cleanPath(loc) + "/";
 	}
 
 	QDir baseQDir (const Base base) { return QDir(baseLocation(base)); }
@@ -42,18 +42,18 @@ namespace PathUtil
 	{
 		switch (base)
 		{
-			case Base::ProjectDir       : return "userprojects:";
-			case Base::FactorySample    : return "factorysample:";
-			case Base::UserSample       : return "usersample:";
-			case Base::UserVST          : return "uservst:";
-			case Base::Preset           : return "preset:";
-			case Base::UserLADSPA       : return "userladspa:";
-			case Base::DefaultLADSPA    : return "defaultladspa:";
-			case Base::UserSoundfont    : return "usersoundfont:";
-			case Base::DefaultSoundfont : return "defaultsoundfont:";
-			case Base::UserGIG          : return "usergig:";
-			case Base::DefaultGIG       : return "defaultgig:";
-			default                   : return "";
+			case Base::ProjectDir       : return QStringLiteral("userprojects:");
+			case Base::FactorySample    : return QStringLiteral("factorysample:");
+			case Base::UserSample       : return QStringLiteral("usersample:");
+			case Base::UserVST          : return QStringLiteral("uservst:");
+			case Base::Preset           : return QStringLiteral("preset:");
+			case Base::UserLADSPA       : return QStringLiteral("userladspa:");
+			case Base::DefaultLADSPA    : return QStringLiteral("defaultladspa:");
+			case Base::UserSoundfont    : return QStringLiteral("usersoundfont:");
+			case Base::DefaultSoundfont : return QStringLiteral("defaultsoundfont:");
+			case Base::UserGIG          : return QStringLiteral("usergig:");
+			case Base::DefaultGIG       : return QStringLiteral("defaultgig:");
+			default                   : return QStringLiteral("");
 		}
 	}
 
