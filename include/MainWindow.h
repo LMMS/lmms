@@ -155,6 +155,7 @@ public slots:
 	void toggleFxMixerWin();
 	void togglePianoRollWin();
 	void toggleControllerRack();
+	void toggleMidiCCRack();
 
 	void updatePlayPauseIcons();
 

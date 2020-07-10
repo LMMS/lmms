@@ -39,6 +39,7 @@ class MainWindow;
 class PianoRollWindow;
 class ProjectNotes;
 class SongEditorWindow;
+class MidiCCRackView;
 
 class LMMS_EXPORT GuiApplication : public QObject
 {
@@ -57,6 +58,7 @@ public:
 	ProjectNotes* getProjectNotes() { return m_projectNotes; }
 	AutomationEditorWindow* automationEditor() { return m_automationEditor; }
 	ControllerRackView* getControllerRackView() { return m_controllerRackView; }
+	MidiCCRackView* getMidiCCRackView() { return m_midiCCRackView; }
 
 public slots:
 	void displayInitProgress(const QString &msg);
@@ -75,6 +77,7 @@ private:
 	PianoRollWindow* m_pianoRoll;
 	ProjectNotes* m_projectNotes;
 	ControllerRackView* m_controllerRackView;
+	MidiCCRackView* m_midiCCRackView;
 	QLabel* m_loadingProgressLabel;
 };
 

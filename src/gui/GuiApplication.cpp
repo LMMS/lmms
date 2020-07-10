@@ -38,6 +38,7 @@
 #include "PianoRoll.h"
 #include "ProjectNotes.h"
 #include "SongEditor.h"
+#include "MidiCCRackView.h"
 
 #include <QApplication>
 #include <QDir>
@@ -134,6 +135,10 @@ GuiApplication::GuiApplication()
 	displayInitProgress(tr("Preparing controller rack"));
 	m_controllerRackView = new ControllerRackView;
 	connect(m_controllerRackView, SIGNAL(destroyed(QObject*)), this, SLOT(childDestroyed(QObject*)));
+
+	displayInitProgress(tr("Preparing midi cc rack"));
+	m_midiCCRackView = new MidiCCRackView;
+	connect(m_midiCCRackView, SIGNAL(destroyed(QObject*)), this, SLOT(childDestroyed(QObject*)));
 
 	displayInitProgress(tr("Preparing project notes"));
 	m_projectNotes = new ProjectNotes;
