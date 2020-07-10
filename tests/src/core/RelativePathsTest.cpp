@@ -41,7 +41,7 @@ private slots:
 
 		QString absPath = fi.absoluteFilePath();
 		QString oldRelPath = "drums/kick01.ogg";
-		QString relPath = PathUtil::basePrefix(PathUtil::FactorySampleBase) + "drums/kick01.ogg";
+		QString relPath = PathUtil::basePrefix(PathUtil::Base::FactorySample) + "drums/kick01.ogg";
 		QString fuzPath = absPath;
 		fuzPath.replace(relPath, "drums/.///kick01.ogg");
 
