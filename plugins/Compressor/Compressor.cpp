@@ -187,12 +187,7 @@ void CompressorEffect::calcLookaheadLength()
 {
 	m_lookaheadLength = qMax(m_compressorControls.m_lookaheadLengthModel.value() * 0.001f * m_sampleRate, 1.f);
 
-	m_lookaheadBuf[0].resize(m_lookaheadLength);
-	m_lookaheadBuf[1].resize(m_lookaheadLength);
-
 	m_preLookaheadLength = ceil(m_lookaheadDelayLength - m_lookaheadLength);
-	m_preLookaheadBuf[0].resize(m_preLookaheadLength);
-	m_preLookaheadBuf[1].resize(m_preLookaheadLength);
 }
 
 void CompressorEffect::calcThreshold()
@@ -321,7 +316,7 @@ bool CompressorEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 			m_rmsVal[i] = m_rmsTimeConst * m_rmsVal[i] + ((1 - m_rmsTimeConst) * (inputValue * inputValue));
 
 			// Grab the peak or RMS value
-			inputValue = qMax(COMP_NOISE_FLOOR, peakmode ? abs(inputValue) : m_rmsVal[i]);
+			inputValue = qMax(COMP_NOISE_FLOOR, peakmode ? abs(inputValue) : sqrt(m_rmsVal[i]));
 
 			// The following code uses math magic to semi-efficiently
 			// find the largest value in the lookahead buffer.
@@ -600,10 +595,16 @@ void CompressorEffect::changeSampleRate()
 	// 200 ms
 	m_crestTimeConst = exp(-1.f / (0.2 * m_sampleRate));
 
-	// 21 ms
-	m_lookaheadDelayLength = 0.021 * m_sampleRate;
+	// 20 ms
+	m_lookaheadDelayLength = 0.02 * m_sampleRate;
 	m_inputBuf[0].resize(m_lookaheadDelayLength);
 	m_inputBuf[1].resize(m_lookaheadDelayLength);
+
+	m_lookaheadBuf[0].resize(m_lookaheadDelayLength);
+	m_lookaheadBuf[1].resize(m_lookaheadDelayLength);
+
+	m_preLookaheadBuf[0].resize(m_lookaheadDelayLength);
+	m_preLookaheadBuf[1].resize(m_lookaheadDelayLength);
 
 	emit calcAutoMakeup();
 	emit calcAttack();
