@@ -100,6 +100,26 @@ public:
 	{
 		return "pattern";
 	}
+	
+	unsigned int color() const
+	{
+		return( m_color.rgb() );
+	}
+	
+	QColor colorObj() const
+	{
+		return m_color;
+	}
+
+	void setColor( const QColor & c )
+	{
+		m_color = QColor( c );
+	}
+
+	void setUseStyleColor( bool b )
+	{
+		m_useStyleColor = b;
+	}
 
 	inline InstrumentTrack * instrumentTrack() const
 	{
@@ -110,7 +130,9 @@ public:
 
 
 	TrackContentObjectView * createView( TrackView * _tv ) override;
-
+	
+	void setBGColor( QColor & c );
+	QColor BGColor();
 
 	using Model::dataChanged;
 
@@ -144,6 +166,9 @@ private:
 	int m_steps;
 
 	Pattern * adjacentPatternByOffset(int offset) const;
+
+	QColor m_color;
+	bool m_useStyleColor;
 
 	friend class PatternView;
 	friend class BBTrackContainerView;
@@ -181,6 +206,12 @@ public:
 	QColor const & getMutedNoteBorderColor() const { return m_mutedNoteBorderColor; }
 	void setMutedNoteBorderColor(QColor const & color) { m_mutedNoteBorderColor = color; }
 
+	QColor color() const
+	{
+		return( m_pat->m_color );
+	}
+	void setColor( QColor _new_color );
+
 public slots:
 	void update() override;
 
@@ -191,6 +222,8 @@ protected slots:
 
 	void resetName();
 	void changeName();
+	
+	void trackColorChanged( QColor & );
 
 
 protected:

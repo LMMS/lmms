@@ -153,7 +153,10 @@ BBTCOView::BBTCOView( TrackContentObject * _tco, TrackView * _tv ) :
 	m_bbTCO( dynamic_cast<BBTCO *>( _tco ) ),
 	m_paintPixmap()
 {
-	connect( _tco->getTrack(), SIGNAL( dataChanged() ), this, SLOT( update() ) );
+	connect( _tco->getTrack(), SIGNAL( dataChanged() ), 
+			this, SLOT( update() ) );
+	connect( _tco, SIGNAL( trackColorChanged( QColor & ) ),
+			this, SLOT( trackColorChanged( QColor & ) ) );
 
 	setStyle( QApplication::style() );
 }
@@ -372,7 +375,26 @@ void BBTCOView::update()
 	TrackContentObjectView::update();
 }
 
-
+void BBTCOView::trackColorChanged( QColor & c )
+{
+	if( isSelected() )
+	{
+		QVector<selectableObject *> selected =
+				gui->songEditor()->m_editor->selectedObjects();
+		for( QVector<selectableObject *>::iterator it =
+							selected.begin();
+						it != selected.end(); ++it )
+		{
+			BBTCOView * bb_tcov = dynamic_cast<BBTCOView *>( *it );
+			if( bb_tcov )
+			{
+				bb_tcov->setColor( c );
+			}
+		}
+	}
+	else
+	{ setColor(c); }
+}
 
 QColor * BBTrack::s_lastTCOColor = NULL;
 

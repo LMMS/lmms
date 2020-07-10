@@ -107,6 +107,7 @@ protected slots:
 	void changeName();
 	void changeColor();
 	void resetColor();
+	void trackColorChanged( QColor & c );
 
 
 protected:

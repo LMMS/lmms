@@ -56,7 +56,9 @@
 SampleTCO::SampleTCO( Track * _track ) :
 	TrackContentObject( _track ),
 	m_sampleBuffer( new SampleBuffer ),
-	m_isPlaying( false )
+	m_isPlaying( false ),
+	m_useStyleColor( true ),
+	m_color( 128, 128, 128 )
 {
 	saveJournallingState( false );
 	setSampleFile( "" );
@@ -323,6 +325,9 @@ SampleTCOView::SampleTCOView( SampleTCO * _tco, TrackView * _tv ) :
 	// track future changes of SampleTCO
 	connect( m_tco, SIGNAL( sampleChanged() ),
 			this, SLOT( updateSample() ) );
+	
+	connect( m_tco, SIGNAL( trackColorChanged( QColor & ) ),
+			this, SLOT( trackColorChanged( QColor & ) ) );
 
 	setStyle( QApplication::style() );
 }
@@ -501,7 +506,8 @@ void SampleTCOView::paintEvent( QPaintEvent * pe )
 
 	// state: selected, muted, normal
 	c = isSelected() ? selectedColor() : ( muted ? mutedBackgroundColor()
-		: painter.background().color() );
+		: ( m_tco->m_useStyleColor ? painter.background().color()
+		: m_tco->colorObj() ) );
 
 	lingrad.setColorAt( 1, c.darker( 300 ) );
 	lingrad.setColorAt( 0, c );
@@ -580,7 +586,37 @@ void SampleTCOView::paintEvent( QPaintEvent * pe )
 	painter.drawPixmap( 0, 0, m_paintPixmap );
 }
 
+void SampleTCOView::setColor( QColor new_color )
+{
+	if( new_color.rgb() != m_tco->color() )
+	{
+		m_tco->setColor( new_color );
+		m_tco->m_useStyleColor = false;
+		Engine::getSong()->setModified();
+		update();
+	}
+}
 
+void SampleTCOView::trackColorChanged( QColor & c )
+{
+	if( isSelected() )
+	{
+		QVector<selectableObject *> selected =
+				gui->songEditor()->m_editor->selectedObjects();
+		for( QVector<selectableObject *>::iterator it =
+							selected.begin();
+						it != selected.end(); ++it )
+		{
+			SampleTCOView * scov = dynamic_cast<SampleTCOView *>( *it );
+			if( scov )
+			{
+				scov->setColor( c );
+			}
+		}
+	}
+	else
+	{ setColor(c); }
+}
 
 
 

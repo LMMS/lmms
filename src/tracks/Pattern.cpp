@@ -41,6 +41,7 @@
 #include "BBTrackContainer.h"
 #include "StringPairDrag.h"
 #include "MainWindow.h"
+#include "SongEditor.h"
 
 #include <limits>
 
@@ -56,7 +57,9 @@ Pattern::Pattern( InstrumentTrack * _instrument_track ) :
 	TrackContentObject( _instrument_track ),
 	m_instrumentTrack( _instrument_track ),
 	m_patternType( BeatPattern ),
-	m_steps( MidiTime::stepsPerBar() )
+	m_steps( MidiTime::stepsPerBar() ),
+	m_color( 128, 128, 128 ),
+	m_useStyleColor( true )
 {
 	setName( _instrument_track->name() );
 	if( _instrument_track->trackContainer()
@@ -75,7 +78,9 @@ Pattern::Pattern( const Pattern& other ) :
 	TrackContentObject( other.m_instrumentTrack ),
 	m_instrumentTrack( other.m_instrumentTrack ),
 	m_patternType( other.m_patternType ),
-	m_steps( other.m_steps )
+	m_steps( other.m_steps ),
+	m_color( 128, 128, 128 ),
+	m_useStyleColor( true )
 {
 	for( NoteVector::ConstIterator it = other.m_notes.begin(); it != other.m_notes.end(); ++it )
 	{
@@ -586,6 +591,8 @@ PatternView::PatternView( Pattern* pattern, TrackView* parent ) :
 {
 	connect( gui->pianoRoll(), SIGNAL( currentPatternChanged() ),
 			this, SLOT( update() ) );
+	connect( m_pat, SIGNAL( trackColorChanged( QColor & ) ),
+			this, SLOT( trackColorChanged( QColor & ) ) );
 
 	if( s_stepBtnOn0 == NULL )
 	{
@@ -665,7 +672,37 @@ void PatternView::changeName()
 	m_pat->setName( s );
 }
 
+void PatternView::setColor( QColor new_color )
+{
+	if( new_color.rgb() != m_pat->color() )
+	{
+		m_pat->setColor( new_color );
+		m_pat->m_useStyleColor = false;
+		Engine::getSong()->setModified();
+		update();
+	}
+}
 
+void PatternView::trackColorChanged( QColor & c )
+{
+	if( isSelected() )
+	{
+		QVector<selectableObject *> selected =
+				gui->songEditor()->m_editor->selectedObjects();
+		for( QVector<selectableObject *>::iterator it =
+							selected.begin();
+						it != selected.end(); ++it )
+		{
+			PatternView * pcov = dynamic_cast<PatternView *>( *it );
+			if( pcov )
+			{
+				pcov->setColor( c );
+			}
+		}
+	}
+	else
+	{ setColor(c); }
+}
 
 
 void PatternView::constructContextMenu( QMenu * _cm )
@@ -864,9 +901,12 @@ void PatternView::paintEvent( QPaintEvent * )
 	bool beatPattern = m_pat->m_patternType == Pattern::BeatPattern;
 
 	// state: selected, normal, beat pattern, muted
-	QColor c = isSelected() ? selectedColor() : ( ( !muted && !beatPattern )
+	/*QColor c = isSelected() ? selectedColor() : ( ( !muted && !beatPattern )
 		? painter.background().color() : ( beatPattern
-		? BBPatternBackground() : mutedBackgroundColor() ) );
+		? BBPatternBackground() : mutedBackgroundColor() ) );*/
+	QColor c = isSelected() ? selectedColor() : ( muted ? mutedBackgroundColor()
+		: ( m_pat->m_useStyleColor ? painter.background().color()
+		: m_pat->colorObj() ) );
 
 	// invert the gradient for the background in the B&B editor
 	QLinearGradient lingrad( 0, 0, 0, height() );

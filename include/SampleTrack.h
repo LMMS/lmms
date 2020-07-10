@@ -64,6 +64,27 @@ public:
 	{
 		return m_sampleBuffer;
 	}
+	
+	unsigned int color() const
+	{
+		return( m_color.rgb() );
+	}
+	
+	QColor colorObj() const
+	{
+		return m_color;
+	}
+
+	void setColor( const QColor & c )
+	{
+		m_color = QColor( c );
+	}
+
+	void setUseStyleColor( bool b )
+	{
+		m_useStyleColor = b;
+	}
+
 
 	MidiTime sampleLength() const;
 	void setSampleStartFrame( f_cnt_t startFrame );
@@ -87,7 +108,9 @@ private:
 	SampleBuffer* m_sampleBuffer;
 	BoolModel m_recordModel;
 	bool m_isPlaying;
-
+	
+	bool m_useStyleColor;
+	QColor m_color;
 
 	friend class SampleTCOView;
 
@@ -106,11 +129,17 @@ class SampleTCOView : public TrackContentObjectView
 public:
 	SampleTCOView( SampleTCO * _tco, TrackView * _tv );
 	virtual ~SampleTCOView() = default;
+	
+	QColor color() const
+	{
+		return( m_tco->m_color );
+	}
+	void setColor( QColor _new_color );
 
 public slots:
 	void updateSample();
 
-
+	void trackColorChanged( QColor & );
 
 protected:
 	void contextMenuEvent( QContextMenuEvent * _cme ) override;
