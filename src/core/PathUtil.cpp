@@ -8,29 +8,29 @@
 
 namespace PathUtil
 {
-	Base relativeBases[] = { ProjectDirBase, FactorySampleBase, UserSampleBase, UserVSTBase, PresetBase,
-		UserLADSPABase, DefaultLADSPABase, UserSoundfontBase, DefaultSoundfontBase, UserGIGBase, DefaultGIGBase };
+	Base relativeBases[] = { Base::ProjectDir, Base::FactorySample, Base::UserSample, Base::UserVST, Base::Preset,
+		Base::UserLADSPA, Base::DefaultLADSPA, Base::UserSoundfont, Base::DefaultSoundfont, Base::UserGIG, Base::DefaultGIG };
 
 	QString baseLocation(const Base & base)
 	{
 		QString loc = "";
 		switch (base)
 		{
-			case ProjectDirBase       : loc = ConfigManager::inst()->userProjectsDir(); break;
-			case FactorySampleBase    :
+			case Base::ProjectDir       : loc = ConfigManager::inst()->userProjectsDir(); break;
+			case Base::FactorySample    :
 			{
 				QDir fsd = QDir(ConfigManager::inst()->factorySamplesDir());
 				loc = fsd.absolutePath() + "/"; break;
 			}
-			case UserSampleBase       : loc = ConfigManager::inst()->userSamplesDir(); break;
-			case UserVSTBase          : loc = ConfigManager::inst()->userVstDir(); break;
-			case PresetBase           : loc = ConfigManager::inst()->userPresetsDir(); break;
-			case UserLADSPABase       : loc = ConfigManager::inst()->ladspaDir(); break;
-			case DefaultLADSPABase    : loc = ConfigManager::inst()->userLadspaDir(); break;
-			case UserSoundfontBase    : loc = ConfigManager::inst()->sf2Dir(); break;
-			case DefaultSoundfontBase : loc = ConfigManager::inst()->userSf2Dir(); break;
-			case UserGIGBase          : loc = ConfigManager::inst()->gigDir(); break;
-			case DefaultGIGBase       : loc = ConfigManager::inst()->userGigDir(); break;
+			case Base::UserSample       : loc = ConfigManager::inst()->userSamplesDir(); break;
+			case Base::UserVST          : loc = ConfigManager::inst()->userVstDir(); break;
+			case Base::Preset           : loc = ConfigManager::inst()->userPresetsDir(); break;
+			case Base::UserLADSPA       : loc = ConfigManager::inst()->ladspaDir(); break;
+			case Base::DefaultLADSPA    : loc = ConfigManager::inst()->userLadspaDir(); break;
+			case Base::UserSoundfont    : loc = ConfigManager::inst()->sf2Dir(); break;
+			case Base::DefaultSoundfont : loc = ConfigManager::inst()->userSf2Dir(); break;
+			case Base::UserGIG          : loc = ConfigManager::inst()->gigDir(); break;
+			case Base::DefaultGIG       : loc = ConfigManager::inst()->userGigDir(); break;
 			default                   : return QString("");
 		}
 		return QDir::cleanPath(loc) + QDir::separator();
@@ -42,17 +42,17 @@ namespace PathUtil
 	{
 		switch (base)
 		{
-			case ProjectDirBase       : return "userprojects:";
-			case FactorySampleBase    : return "factorysample:";
-			case UserSampleBase       : return "usersample:";
-			case UserVSTBase          : return "uservst:";
-			case PresetBase           : return "preset:";
-			case UserLADSPABase       : return "userladspa:";
-			case DefaultLADSPABase    : return "defaultladspa:";
-			case UserSoundfontBase    : return "usersoundfont:";
-			case DefaultSoundfontBase : return "defaultsoundfont:";
-			case UserGIGBase          : return "usergig:";
-			case DefaultGIGBase       : return "defaultgig:";
+			case Base::ProjectDir       : return "userprojects:";
+			case Base::FactorySample    : return "factorysample:";
+			case Base::UserSample       : return "usersample:";
+			case Base::UserVST          : return "uservst:";
+			case Base::Preset           : return "preset:";
+			case Base::UserLADSPA       : return "userladspa:";
+			case Base::DefaultLADSPA    : return "defaultladspa:";
+			case Base::UserSoundfont    : return "usersoundfont:";
+			case Base::DefaultSoundfont : return "defaultsoundfont:";
+			case Base::UserGIG          : return "usergig:";
+			case Base::DefaultGIG       : return "defaultgig:";
 			default                   : return "";
 		}
 	}
@@ -64,7 +64,7 @@ namespace PathUtil
 			QString prefix = basePrefix(base);
 			if ( path.startsWith(prefix) ) { return base; }
 		}
-		return AbsoluteBase;
+		return Base::Absolute;
 	}
 
 
@@ -86,10 +86,10 @@ namespace PathUtil
 	QString oldRelativeUpgrade(const QString & input)
 	{
 		if (input.isEmpty()) { return input; }
-		QString factory = baseLocation(FactorySampleBase) + input;
+		QString factory = baseLocation(Base::FactorySample) + input;
 		QFileInfo factoryInfo(factory);
 		//If we can't find a factory sample, it's probably a user sample
-		Base base = factoryInfo.exists() ? FactorySampleBase : UserSampleBase;
+		Base base = factoryInfo.exists() ? Base::FactorySample : Base::UserSample;
 		return basePrefix(base) + input;
 	}
 
@@ -121,7 +121,7 @@ namespace PathUtil
 		QFileInfo inputFileInfo = QFileInfo(input);
 		QString absolutePath = inputFileInfo.isAbsolute() ? input : toAbsolute(input);
 
-		Base shortestBase = AbsoluteBase;
+		Base shortestBase = Base::Absolute;
 		QString shortestPath = relativeOrAbsolute(absolutePath, shortestBase);
 		for (auto base: relativeBases)
 		{
