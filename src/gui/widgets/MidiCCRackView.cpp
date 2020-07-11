@@ -32,9 +32,9 @@ MidiCCRackView::MidiCCRackView() :
 	// Adjust window attributes, sizing and position
 	subWin->setAttribute( Qt::WA_DeleteOnClose, false );
 	subWin->move( 780, 50 );
-	subWin->resize( 350, 200 );
+	subWin->resize( 350, 300 );
 	subWin->setFixedWidth( 350 );
-	subWin->setMinimumHeight( 200 );
+	subWin->setMinimumHeight( 300 );
 
 	// Main window layout
 	QVBoxLayout *mainLayout = new QVBoxLayout( this );
@@ -44,12 +44,12 @@ MidiCCRackView::MidiCCRackView() :
 	QWidget *trackToolBar = new QWidget();
 	QHBoxLayout *trackToolBarLayout = new QHBoxLayout( trackToolBar );
 	QLabel *trackLabel = new QLabel( tr("Track: ") );
-	ComboBox *trackComboBox = new ComboBox();
+	m_trackComboBox = new ComboBox();
 
 	trackToolBarLayout->addWidget(trackLabel);
-	trackToolBarLayout->addWidget(trackComboBox);
+	trackToolBarLayout->addWidget(m_trackComboBox);
 	trackToolBarLayout->setStretchFactor( trackLabel, 1 );
-	trackToolBarLayout->setStretchFactor( trackComboBox, 2 );
+	trackToolBarLayout->setStretchFactor( m_trackComboBox, 2 );
 	trackToolBar->setFixedHeight(40);
 
 	// Knobs GroupBox - Here we have the MIDI CC controller knobs for the selected track
@@ -73,11 +73,10 @@ MidiCCRackView::MidiCCRackView() :
 	knobsGroupBoxLayout->addWidget(knobsScrollArea);
 
 	// Adds the controller knobs
-	Knob *k;
-	for(int i = 0; i < 127; i++){
-		k = new Knob( knobBright_26 );
-		k->setLabel( QString("CC %1").arg(QString::number(i + 1)) );
-		knobsAreaLayout->addWidget( k, i/3, i%3 );
+	for(int i = 0; i < MIDI_CC_MAX_CONTROLLERS; i++){
+		m_controllerKnob[i] = new Knob( knobBright_26 );
+		m_controllerKnob[i]->setLabel( QString("CC %1").arg(QString::number(i + 1)) );
+		knobsAreaLayout->addWidget( m_controllerKnob[i], i/3, i%3 );
 	}
 
 	// Adding everything to the main layout

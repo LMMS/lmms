@@ -6,6 +6,10 @@
 
 #include "SerializingObject.h"
 #include "lmms_basics.h"
+#include "ComboBox.h"
+#include "Knob.h"
+
+const int MIDI_CC_MAX_CONTROLLERS = 127;
 
 class MidiCCRackView : public QWidget, public SerializingObject
 {
@@ -21,6 +25,10 @@ public:
 	{
 		return "MidiCCRackView";
 	}
+
+private:
+	ComboBox *m_trackComboBox;
+	Knob *m_controllerKnob[MIDI_CC_MAX_CONTROLLERS]; // Holds the knob widgets for each controller
 
 //protected:
 //	void closeEvent( QCloseEvent * _ce ) override;
