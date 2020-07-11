@@ -93,6 +93,25 @@ public:
 
 	void applyDragValue();
 
+	unsigned int color() const
+	{
+		return( m_color.rgb() );
+	}
+	
+	QColor colorObj() const
+	{
+		return m_color;
+	}
+
+	void setColor( const QColor & c )
+	{
+		m_color = QColor( c );
+	}
+
+	void setUseStyleColor( bool b )
+	{
+		m_useStyleColor = b;
+	}
 
 	bool isDragging() const
 	{
@@ -192,6 +211,9 @@ private:
 
 	static const float DEFAULT_MIN_VALUE;
 	static const float DEFAULT_MAX_VALUE;
+	
+	QColor m_color;
+	bool m_useStyleColor;
 
 	friend class AutomationPatternView;
 

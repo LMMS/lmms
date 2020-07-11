@@ -53,6 +53,8 @@ AutomationPatternView::AutomationPatternView( AutomationPattern * _pattern,
 			this, SLOT( update() ) );
 	connect( gui->automationEditor(), SIGNAL( currentPatternChanged() ),
 			this, SLOT( update() ) );
+	connect( m_pat, SIGNAL( trackColorChanged( QColor & ) ),
+			this, SLOT( trackColorChanged( QColor & ) ) );
 
 	setAttribute( Qt::WA_OpaquePaintEvent, true );
 
@@ -166,6 +168,38 @@ void AutomationPatternView::flipX()
 
 
 
+void AutomationPatternView::setColor( QColor new_color )
+{
+	if( new_color.rgb() != m_pat->color() )
+	{
+		m_pat->setColor( new_color );
+		m_pat->m_useStyleColor = false;
+		Engine::getSong()->setModified();
+		update();
+	}
+}
+
+void AutomationPatternView::trackColorChanged( QColor & c )
+{
+	if( isSelected() )
+	{
+		QVector<selectableObject *> selected =
+				gui->songEditor()->m_editor->selectedObjects();
+		for( QVector<selectableObject *>::iterator it =
+							selected.begin();
+						it != selected.end(); ++it )
+		{
+			AutomationPatternView * apcov = dynamic_cast<AutomationPatternView *>( *it );
+			if( apcov )
+			{
+				apcov->setColor( c );
+			}
+		}
+	}
+	else
+	{ setColor(c); }
+}
+
 
 void AutomationPatternView::constructContextMenu( QMenu * _cm )
 {
@@ -261,8 +295,11 @@ void AutomationPatternView::paintEvent( QPaintEvent * )
 	bool current = gui->automationEditor()->currentPattern() == m_pat;
 	
 	// state: selected, muted, normal
-	c = isSelected() ? selectedColor() : ( muted ? mutedBackgroundColor() 
-		:	painter.background().color() );
+	/*c = isSelected() ? selectedColor() : ( muted ? mutedBackgroundColor() 
+		:	painter.background().color() );*/
+	c = isSelected() ? selectedColor() : ( muted ? mutedBackgroundColor()
+		: ( m_pat->m_useStyleColor ? painter.background().color()
+		: m_pat->colorObj() ) );
 
 	lingrad.setColorAt( 1, c.darker( 300 ) );
 	lingrad.setColorAt( 0, c );

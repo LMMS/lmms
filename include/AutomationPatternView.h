@@ -27,9 +27,10 @@
 
 #include <QStaticText>
 
+#include "AutomationPattern.h"
+#include "Song.h"
+#include "SongEditor.h"
 #include "Track.h"
-
-class AutomationPattern;
 
 
 class AutomationPatternView : public TrackContentObjectView
@@ -41,6 +42,12 @@ public:
 	AutomationPatternView( AutomationPattern * _pat, TrackView * _parent );
 	virtual ~AutomationPatternView();
 
+	QColor color() const
+	{
+		return( m_pat->m_color );
+	}
+	void setColor( QColor _new_color );
+	
 public slots:
 	/// Opens this view's pattern in the global automation editor
 	void openInAutomationEditor();
@@ -54,6 +61,8 @@ protected slots:
 	void toggleRecording();
 	void flipY();
 	void flipX();
+	
+	void trackColorChanged( QColor & );
 
 protected:
 	void constructContextMenu( QMenu * ) override;
