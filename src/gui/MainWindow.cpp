@@ -1138,7 +1138,7 @@ void MainWindow::updateViewMenu()
 			      tr( "Project Notes" ) + " (Ctrl + F11)",
 			      this, SLOT( toggleProjectNotesWin() )
 		);
-	m_viewMenu->addAction(embed::getIconPixmap( "maximize" ),
+	m_viewMenu->addAction(embed::getIconPixmap( "Fullscreen" ),
 				tr( "Fullscreen" ) + " (F11)",
 				this, SLOT( toggleFullscreen() ) 
 		);
