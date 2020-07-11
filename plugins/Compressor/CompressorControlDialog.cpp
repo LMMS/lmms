@@ -380,8 +380,8 @@ void CompressorControlDialog::updateDisplay()
 		m_controls->m_effect->m_displayPeak[1] = COMP_NOISE_FLOOR;
 		m_controls->m_effect->m_displayGain[0] = 1;
 		m_controls->m_effect->m_displayGain[1] = 1;
-		m_lastPoint = dbfsToYPoint(-9999);
-		m_lastGainPoint = dbfsToYPoint(0);
+		//m_lastPoint = dbfsToYPoint(-9999);
+		//m_lastGainPoint = dbfsToYPoint(0);
 	}
 
 	const float peakAvg = (m_controls->m_effect->m_displayPeak[0] + m_controls->m_effect->m_displayPeak[1]) * 0.5f;
@@ -575,8 +575,10 @@ void CompressorControlDialog::paintEvent(QPaintEvent *event)
 		p.setOpacity(0.25);
 		p.drawPixmap(0, 0, m_kneePixmap);
 		p.setOpacity(1);
-		p.drawPixmap(0, 0, m_kneePixmap2);
-		p.setOpacity(1);
+		if (m_controls->m_effect->isEnabled() && m_controls->m_effect->isRunning())
+		{
+			p.drawPixmap(0, 0, m_kneePixmap2);
+		}
 		p.drawPixmap(0, 0, m_miscPixmap);
 
 		p.end();

@@ -242,12 +242,14 @@ void CompressorEffect::calcMix()
 
 bool CompressorEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 {
-	if (!isEnabled() || !isRunning ())
+	if (!isEnabled() || !isRunning())
 	{
 		// Clear lookahead buffers and other values when needed
 		if (!m_cleanedBuffers)
 		{
 			m_yL[0] = m_yL[1] = COMP_NOISE_FLOOR;
+			m_displayPeak[0] = m_displayPeak[1] = COMP_NOISE_FLOOR;
+			m_displayGain[0] = m_displayGain[1] = COMP_NOISE_FLOOR;
 			std::fill(std::begin(m_lookaheadBuf[0]), std::end(m_lookaheadBuf[0]), 0);
 			std::fill(std::begin(m_lookaheadBuf[1]), std::end(m_lookaheadBuf[1]), 0);
 			m_lookaheadBufLoc[0] = 0;
@@ -256,6 +258,9 @@ bool CompressorEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 			std::fill(std::begin(m_preLookaheadBuf[1]), std::end(m_preLookaheadBuf[1]), 0);
 			m_preLookaheadBufLoc[0] = 0;
 			m_preLookaheadBufLoc[1] = 0;
+			std::fill(std::begin(m_inputBuf[0]), std::end(m_inputBuf[0]), 0);
+			std::fill(std::begin(m_inputBuf[1]), std::end(m_inputBuf[1]), 0);
+			m_inputBufLoc = 0;
 			m_cleanedBuffers = true;
 		}
 		return false;
