@@ -39,7 +39,8 @@ ControllerConnectionVector ControllerConnection::s_connections;
 ControllerConnection::ControllerConnection( Controller * _controller ) :
 	m_controller( NULL ),
 	m_controllerId( -1 ),
-	m_ownsController( false )
+	m_ownsController(false),
+	m_controllerMidi (false)
 {
 	if( _controller != NULL )
 	{
@@ -59,7 +60,8 @@ ControllerConnection::ControllerConnection( Controller * _controller ) :
 ControllerConnection::ControllerConnection( int _controllerId ) :
 	m_controller( Controller::create( Controller::DummyController, NULL ) ),
 	m_controllerId( _controllerId ),
-	m_ownsController( false )
+	m_ownsController( false ),
+	m_controllerMidi (false)
 {
 	s_connections.append( this );
 }
@@ -120,8 +122,16 @@ void ControllerConnection::setController( Controller * _controller )
 				this, SIGNAL( valueChanged() ), Qt::DirectConnection );
 	}
 
-	m_ownsController =
-			( _controller->type() == Controller::MidiController );
+	if (_controller->type() == Controller::MidiController)
+	{
+		m_ownsController = true;
+		m_controllerMidi = true;
+	}
+	else
+	{
+		m_ownsController = false;
+		m_controllerMidi = false;
+	}
 
 	// If we don't own the controller, allow deletion of controller
 	// to delete the connection

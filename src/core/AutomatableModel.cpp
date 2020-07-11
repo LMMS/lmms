@@ -53,7 +53,9 @@ AutomatableModel::AutomatableModel(
 	m_controllerConnection( NULL ),
 	m_valueBuffer( static_cast<int>( Engine::mixer()->framesPerPeriod() ) ),
 	m_lastUpdatedPeriod( -1 ),
-	m_hasSampleExactData( false )
+	m_hasSampleExactData(false),
+	m_controllerOrValue (false),
+	m_mValueChanged(false)
 
 {
 	m_value = fittedValue( val );
@@ -311,6 +313,7 @@ void AutomatableModel::setValue( const float value )
 			}
 		}
 		m_valueChanged = true;
+		m_mValueChanged = true;
 		emit dataChanged();
 	}
 	else
@@ -392,6 +395,7 @@ void AutomatableModel::setAutomatedValue( const float value )
 			}
 		}
 		m_valueChanged = true;
+		m_mValueChanged = true;
 		emit dataChanged();
 	}
 	--m_setValueDepth;
@@ -550,6 +554,7 @@ void AutomatableModel::setControllerConnection( ControllerConnection* c )
 				this, SIGNAL( dataChanged() ), Qt::DirectConnection );
 		QObject::connect( m_controllerConnection, SIGNAL( destroyed() ), this, SLOT( unlinkControllerConnection() ) );
 		m_valueChanged = true;
+		m_mValueChanged = true;
 		emit dataChanged();
 	}
 }

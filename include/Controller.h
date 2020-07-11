@@ -131,6 +131,13 @@ public:
 
 	bool hasModel( const Model * m ) const;
 
+	bool isValueChanged()
+	{
+		bool valch = m_valueChanged;
+		m_valueChanged = false;
+		return valch;
+	}
+
 public slots:
 	virtual ControllerDialog * createDialog( QWidget * _parent );
 
@@ -163,6 +170,8 @@ protected:
 	static ControllerVector s_controllers;
 
 	static long s_periods;
+
+	bool m_valueChanged;
 
 
 signals:

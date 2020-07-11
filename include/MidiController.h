@@ -59,7 +59,6 @@ public:
 	// Used by controllerConnectionDialog to copy
 	void subscribeReadablePorts( const MidiPort::Map & _map );
 
-
 public slots:
 	ControllerDialog * createDialog( QWidget * _parent ) override;
 	void updateName();

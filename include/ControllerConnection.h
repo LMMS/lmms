@@ -98,6 +98,10 @@ public:
 		return classNodeName();
 	}
 
+	bool isControllerMidi()
+	{
+		return m_controllerMidi;
+	}
 
 public slots:
 	void deleteConnection();
@@ -111,6 +115,8 @@ protected:
 	bool m_ownsController;
 
 	static ControllerConnectionVector s_connections;
+
+	bool m_controllerMidi;
 
 signals:
 	// The value changed while the mixer isn't running (i.e: MIDI CC)

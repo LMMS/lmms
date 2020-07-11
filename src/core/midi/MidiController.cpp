@@ -95,6 +95,7 @@ void MidiController::processInEvent( const MidiEvent& event, const MidiTime& tim
 				unsigned char val = event.controllerValue();
 				m_previousValue = m_lastValue;
 				m_lastValue = (float)( val ) / 127.0f;
+				m_valueChanged = true;
 				emit valueChanged();
 			}
 			break;

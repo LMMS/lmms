@@ -50,7 +50,8 @@ Controller::Controller( ControllerTypes _type, Model * _parent,
 	m_valueBuffer( Engine::mixer()->framesPerPeriod() ),
 	m_bufferLastUpdated( -1 ),
 	m_connectionCount( 0 ),
-	m_type( _type )
+	m_type(_type),
+	m_valueChanged(false)
 {
 	if( _type != DummyController && _type != MidiController )
 	{
