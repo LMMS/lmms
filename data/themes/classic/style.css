@@ -168,7 +168,6 @@ Oscilloscope {
 	background: none;
 	border: none;
 	qproperty-normalColor: rgb(71, 253, 133);
-	qproperty-warningColor: rgb(255, 192, 64);
 	qproperty-clippingColor: rgb(255, 64, 64);
 }
 
