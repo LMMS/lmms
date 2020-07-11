@@ -7,6 +7,7 @@
 #include "SerializingObject.h"
 #include "lmms_basics.h"
 #include "ComboBox.h"
+#include "ComboBoxModel.h"
 #include "Knob.h"
 
 const int MIDI_CC_MAX_CONTROLLERS = 127;
@@ -26,8 +27,13 @@ public:
 		return "MidiCCRackView";
 	}
 
+public slots:
+	void updateTracksComboBox();
+
 private:
 	ComboBox *m_trackComboBox;
+	ComboBoxModel *m_trackComboBoxModel;
+
 	Knob *m_controllerKnob[MIDI_CC_MAX_CONTROLLERS]; // Holds the knob widgets for each controller
 
 //protected:

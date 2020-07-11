@@ -12,8 +12,14 @@
 #include "MainWindow.h"
 #include "embed.h"
 #include "ComboBox.h"
+#include "ComboBoxModel.h"
 #include "GroupBox.h"
 #include "Knob.h"
+#include "Track.h"
+#include "TrackContainer.h"
+#include "BBTrackContainer.h"
+#include "Engine.h"
+#include "Song.h"
 
 
 MidiCCRackView::MidiCCRackView() :
@@ -45,6 +51,8 @@ MidiCCRackView::MidiCCRackView() :
 	QHBoxLayout *trackToolBarLayout = new QHBoxLayout( trackToolBar );
 	QLabel *trackLabel = new QLabel( tr("Track: ") );
 	m_trackComboBox = new ComboBox();
+	m_trackComboBoxModel = new ComboBoxModel();
+	m_trackComboBox->setModel(m_trackComboBoxModel);
 
 	trackToolBarLayout->addWidget(trackLabel);
 	trackToolBarLayout->addWidget(m_trackComboBox);
@@ -79,6 +87,24 @@ MidiCCRackView::MidiCCRackView() :
 		knobsAreaLayout->addWidget( m_controllerKnob[i], i/3, i%3 );
 	}
 
+	// Connections are made to make sure the track ComboBox is updated when tracks are
+	// added, removed or renamed
+	// On the song editor:
+	connect( Engine::getSong() , SIGNAL( trackAdded(Track *) ),
+		this, SLOT( updateTracksComboBox() ) );
+	connect( Engine::getSong() , SIGNAL( trackRemoved() ),
+		this, SLOT( updateTracksComboBox() ) );
+	connect( Engine::getSong() , SIGNAL( trackRenamed() ),
+		this, SLOT( updateTracksComboBox() ) );
+	// On the BB editor:
+	connect( Engine::getBBTrackContainer() , SIGNAL( trackAdded(Track *) ),
+		this, SLOT( updateTracksComboBox() ) );
+	connect( Engine::getBBTrackContainer() , SIGNAL( trackRemoved() ),
+		this, SLOT( updateTracksComboBox() ) );
+	connect( Engine::getBBTrackContainer() , SIGNAL( trackRenamed() ),
+		this, SLOT( updateTracksComboBox() ) );
+
+
 	// Adding everything to the main layout
 	mainLayout->addWidget(trackToolBar);
 	mainLayout->addWidget(knobsGroupBox);
@@ -86,6 +112,37 @@ MidiCCRackView::MidiCCRackView() :
 
 MidiCCRackView::~MidiCCRackView()
 {
+}
+
+void MidiCCRackView::updateTracksComboBox()
+{
+	// Reset the combo box model and fill it with instrument tracks from the song editor
+	m_trackComboBoxModel->clear();
+
+	TrackContainer::TrackList songEditorTracks;
+	songEditorTracks += Engine::getSong()->tracks();
+	int songEditorID = 1;
+
+	TrackContainer::TrackList bbEditorTracks;
+	bbEditorTracks += Engine::getBBTrackContainer()->tracks();
+	int bbEditorID = 1;
+
+	for(Track *t: songEditorTracks)
+	{
+		if( t->type() == Track::InstrumentTrack )
+		{
+			m_trackComboBoxModel->addItem("SongEditor: " + QString::number(songEditorID) + ". " + t->name());
+			++songEditorID;
+		}
+	}
+	for(Track *t: bbEditorTracks)
+	{
+		if( t->type() == Track::InstrumentTrack )
+		{
+			m_trackComboBoxModel->addItem("BBEditor: " + QString::number(bbEditorID) + ". " + t->name());
+			++bbEditorID;
+		}
+	}
 }
 
 void MidiCCRackView::saveSettings( QDomDocument & _doc,
