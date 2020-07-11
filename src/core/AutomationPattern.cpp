@@ -542,6 +542,8 @@ void AutomationPattern::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	_this.setAttribute( "prog", QString::number( progressionType() ) );
 	_this.setAttribute( "tens", QString::number( getTension() ) );
 	_this.setAttribute( "mute", QString::number( isMuted() ) );
+	_this.setAttribute( "stylecolor", m_useStyleColor );
+	_this.setAttribute( "color", m_color.rgb() );
 
 	for( timeMap::const_iterator it = m_timeMap.begin();
 						it != m_timeMap.end(); ++it )
@@ -596,6 +598,12 @@ void AutomationPattern::loadSettings( const QDomElement & _this )
 		{
 			m_idsToResolve << element.attribute( "id" ).toInt();
 		}
+	}
+	
+	if( _this.hasAttribute( "stylecolor" ) )
+	{
+		m_useStyleColor = _this.attribute( "stylecolor" ).toInt();
+		m_color.setRgb( _this.attribute( "color" ).toUInt() );
 	}
 
 	int len = _this.attribute( "len" ).toInt();

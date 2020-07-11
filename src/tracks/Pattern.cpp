@@ -364,6 +364,8 @@ void Pattern::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
 	_this.setAttribute( "type", m_patternType );
 	_this.setAttribute( "name", name() );
+	_this.setAttribute( "stylecolor", m_useStyleColor );
+	_this.setAttribute( "color", m_color.rgb() );
 	// as the target of copied/dragged pattern is always an existing
 	// pattern, we must not store actual position, instead we store -1
 	// which tells loadSettings() not to mess around with position
@@ -395,6 +397,13 @@ void Pattern::loadSettings( const QDomElement & _this )
 	m_patternType = static_cast<PatternTypes>( _this.attribute( "type"
 								).toInt() );
 	setName( _this.attribute( "name" ) );
+	
+	if( _this.hasAttribute( "stylecolor" ) )
+	{
+		m_useStyleColor = _this.attribute( "stylecolor" ).toInt();
+		m_color.setRgb( _this.attribute( "color" ).toUInt() );
+	}
+	
 	if( _this.attribute( "pos" ).toInt() >= 0 )
 	{
 		movePosition( _this.attribute( "pos" ).toInt() );
