@@ -3,7 +3,9 @@
 #include <QMdiSubWindow>
 #include <QHBoxLayout>
 #include <QVBoxLayout>
+#include <QGridLayout>
 #include <QLabel>
+#include <QScrollArea>
 
 #include "MidiCCRackView.h"
 #include "GuiApplication.h"
@@ -11,6 +13,7 @@
 #include "embed.h"
 #include "ComboBox.h"
 #include "GroupBox.h"
+#include "Knob.h"
 
 
 MidiCCRackView::MidiCCRackView() :
@@ -39,7 +42,7 @@ MidiCCRackView::MidiCCRackView() :
 	// Track Selector Layout - Here we select which track we are sending CC messages to
 	// We use a widget to be able to make this layout have a fixed height
 	QWidget *trackToolBar = new QWidget();
-	QHBoxLayout *trackToolBarLayout = new QHBoxLayout(trackToolBar);
+	QHBoxLayout *trackToolBarLayout = new QHBoxLayout( trackToolBar );
 	QLabel *trackLabel = new QLabel( tr("Track: ") );
 	ComboBox *trackComboBox = new ComboBox();
 
@@ -49,15 +52,37 @@ MidiCCRackView::MidiCCRackView() :
 	trackToolBarLayout->setStretchFactor( trackComboBox, 2 );
 	trackToolBar->setFixedHeight(40);
 
-	// Knobs Layout - Here we have the MIDI CC controller knobs for the selected track
-	QVBoxLayout *knobsLayout = new QVBoxLayout();
+	// Knobs GroupBox - Here we have the MIDI CC controller knobs for the selected track
 	GroupBox *knobsGroupBox = new GroupBox( tr("MIDI CC Knobs:") );
 
-	knobsLayout->addWidget(knobsGroupBox);
+	// Layout to keep scrollable area under the GroupBox header
+	QVBoxLayout *knobsGroupBoxLayout = new QVBoxLayout();
+	knobsGroupBoxLayout->setContentsMargins( 5, 16, 5, 5 );
 
-	// Adding both to the main layout
+	knobsGroupBox->setLayout(knobsGroupBoxLayout);
+
+	// Scrollable area + widget + its layout that will have all the knobs
+	QScrollArea *knobsScrollArea = new QScrollArea();
+	QWidget *knobsArea = new QWidget();
+	QGridLayout *knobsAreaLayout = new QGridLayout();
+
+	knobsArea->setLayout( knobsAreaLayout );
+	knobsScrollArea->setWidget( knobsArea );
+	knobsScrollArea->setWidgetResizable( true );
+
+	knobsGroupBoxLayout->addWidget(knobsScrollArea);
+
+	// Adds the controller knobs
+	Knob *k;
+	for(int i = 0; i < 127; i++){
+		k = new Knob( knobBright_26 );
+		k->setLabel( QString("CC %1").arg(QString::number(i + 1)) );
+		knobsAreaLayout->addWidget( k, i/3, i%3 );
+	}
+
+	// Adding everything to the main layout
 	mainLayout->addWidget(trackToolBar);
-	mainLayout->addLayout(knobsLayout);
+	mainLayout->addWidget(knobsGroupBox);
 }
 
 MidiCCRackView::~MidiCCRackView()
