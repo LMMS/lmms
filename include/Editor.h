@@ -62,6 +62,8 @@ private slots:
 	/// Called by pressing shift+space. Toggles pause state.
 	void togglePause();
 
+	void toggleMaximize();
+
 signals:
 
 protected:

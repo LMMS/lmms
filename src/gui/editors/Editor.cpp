@@ -79,6 +79,11 @@ void Editor::togglePause()
 	Engine::getSong()->togglePause();
 }
 
+void Editor::toggleMaximize()
+{
+	isMaximized() ? showNormal() : showMaximized();
+}
+
 Editor::Editor(bool record, bool stepRecord) :
 	m_toolBar(new DropToolBar(this)),
 	m_playAction(nullptr),
@@ -110,6 +115,7 @@ Editor::Editor(bool record, bool stepRecord) :
 	connect(m_stopAction, SIGNAL(triggered()), this, SLOT(stop()));
 	new QShortcut(Qt::Key_Space, this, SLOT(togglePlayStop()));
 	new QShortcut(QKeySequence(Qt::SHIFT + Qt::Key_Space), this, SLOT(togglePause()));
+	new QShortcut(QKeySequence(Qt::SHIFT + Qt::Key_F11), this, SLOT(toggleMaximize()));
 
 	// Add actions to toolbar
 	addButton(m_playAction, "playButton");
