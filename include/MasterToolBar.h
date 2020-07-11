@@ -1,8 +1,9 @@
 /*
- * CPULoadWidget.h - widget for displaying CPU-load (partly based on
- *                    Hydrogen's CPU-load-widget)
+ * MasterToolBar.h - declaration of class MasterToolBar, a window where you can
+ *                 setup your songs
  *
- * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2019 Lathigos <lathigos/at/tutanota.com>
+ * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -24,35 +25,37 @@
  */
 
 
-#ifndef CPULOAD_WIDGET_H
-#define CPULOAD_WIDGET_H
+#ifndef MASTER_TOOL_BAR_H
+#define MASTER_TOOL_BAR_H
 
-#include <QtCore/QTimer>
-#include <QPixmap>
 #include <QWidget>
 
-#include "lmms_basics.h"
+class AutomatableSlider;
+class IntegerSpinBox;
+class MeterDialog;
+class Song;
+class TextFloat;
 
-class ProgressBar;
-
-class CPULoadWidget : public QWidget
+class MasterToolBar : public QWidget
 {
-	Q_OBJECT
+Q_OBJECT
 public:
-	CPULoadWidget( QWidget * _parent );
-	virtual ~CPULoadWidget();
+	MasterToolBar( Song * song );
+	~MasterToolBar();
 
-
-protected slots:
-	void updateCpuLoad();
-
+protected:
+	virtual void closeEvent( QCloseEvent * _ce );
 
 private:
-	float m_currentLoad;
-
-	QTimer m_updateTimer;
-	ProgressBar * m_progressBar;
-} ;
-
+	Song * m_song;
+	
+	IntegerSpinBox * m_tempoSpinBox;
+	MeterDialog * m_timeSigDisplay;
+	IntegerSpinBox * m_masterVolumeSpinBox;
+	IntegerSpinBox * m_masterPitchSpinBox;
+	
+	TextFloat * m_mvsStatus;
+	TextFloat * m_mpsStatus;
+};
 
 #endif

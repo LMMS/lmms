@@ -1,7 +1,8 @@
 /*
- * CPULoadWidget.h - widget for displaying CPU-load (partly based on
- *                    Hydrogen's CPU-load-widget)
+ * ProgressBar.h - widget for displaying CPU-load or volume in the top bar
+ *                    (partly based on Hydrogen's CPU-load-widget)
  *
+ * Copyright (c) 2019 Lathigos <lathigos/at/tutanota.com>
  * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of LMMS - https://lmms.io
@@ -24,8 +25,8 @@
  */
 
 
-#ifndef CPULOAD_WIDGET_H
-#define CPULOAD_WIDGET_H
+#ifndef PROGRESS_BAR_H
+#define PROGRESS_BAR_H
 
 #include <QtCore/QTimer>
 #include <QPixmap>
@@ -33,25 +34,29 @@
 
 #include "lmms_basics.h"
 
-class ProgressBar;
 
-class CPULoadWidget : public QWidget
+class ProgressBar : public QWidget
 {
 	Q_OBJECT
 public:
-	CPULoadWidget( QWidget * _parent );
-	virtual ~CPULoadWidget();
+	ProgressBar( QWidget * _parent, const QPixmap & background, const QPixmap & leds );
+	virtual ~ProgressBar();
+	
+	void setValue( float value );
+	float value() const;
 
-
-protected slots:
-	void updateCpuLoad();
-
+protected:
+	virtual void paintEvent( QPaintEvent * _ev );
 
 private:
-	float m_currentLoad;
+	float m_value;
 
-	QTimer m_updateTimer;
-	ProgressBar * m_progressBar;
+	QPixmap m_temp;
+	QPixmap m_background;
+	QPixmap m_leds;
+
+	bool m_changed;
+
 } ;
 
 

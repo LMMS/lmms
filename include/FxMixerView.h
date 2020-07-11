@@ -58,6 +58,9 @@ public:
 		PixmapButton * m_soloBtn;
 		Fader * m_fader;
 		EffectRackView * m_rackView;
+		
+		float m_peakLeft = 0.0f;
+		float m_peakRight = 0.0f;
 	};
 
 
@@ -115,6 +118,7 @@ protected:
 private slots:
 	void updateFaders();
 	void toggledSolo();
+	void nextAudioBuffer( const surroundSampleFrame * buffer );
 
 private:
 

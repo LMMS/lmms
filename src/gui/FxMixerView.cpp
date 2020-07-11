@@ -151,7 +151,11 @@ FxMixerView::FxMixerView() :
 	connect( gui->mainWindow(), SIGNAL( periodicUpdate() ),
 					this, SLOT( updateFaders() ) );
 
-
+	connect( Engine::mixer(),
+					SIGNAL( nextAudioBuffer( const surroundSampleFrame* ) ),
+					this,
+					SLOT( nextAudioBuffer( const surroundSampleFrame* ) ) );
+	
 	// add ourself to workspace
 	QMdiSubWindow * subWin = gui->mainWindow()->addWindowedWidget( this );
 	Qt::WindowFlags flags = subWin->windowFlags();
@@ -165,6 +169,8 @@ FxMixerView::FxMixerView() :
 
 	// we want to receive dataChanged-signals in order to update
 	setModel( m );
+	
+	
 }
 
 FxMixerView::~FxMixerView()
@@ -589,37 +595,54 @@ void FxMixerView::clear()
 
 void FxMixerView::updateFaders()
 {
-	FxMixer * m = Engine::fxMixer();
-
 	// apply master gain
-	m->effectChannel(0)->m_peakLeft *= Engine::mixer()->masterGain();
-	m->effectChannel(0)->m_peakRight *= Engine::mixer()->masterGain();
+	m_fxChannelViews[0]->m_peakLeft *= Engine::mixer()->masterGain();
+	m_fxChannelViews[0]->m_peakRight *= Engine::mixer()->masterGain();
 
 	for( int i = 0; i < m_fxChannelViews.size(); ++i )
 	{
 		const float opl = m_fxChannelViews[i]->m_fader->getPeak_L();
 		const float opr = m_fxChannelViews[i]->m_fader->getPeak_R();
 		const float fallOff = 1.25;
-		if( m->effectChannel(i)->m_peakLeft >= opl/fallOff )
+		if( m_fxChannelViews[i]->m_peakLeft >= opl/fallOff )
 		{
-			m_fxChannelViews[i]->m_fader->setPeak_L( m->effectChannel(i)->m_peakLeft );
+			m_fxChannelViews[i]->m_fader->setPeak_L( m_fxChannelViews[i]->m_peakLeft );
 			// Set to -1 so later we'll know if this value has been refreshed yet.
-			m->effectChannel(i)->m_peakLeft = -1;
+			m_fxChannelViews[i]->m_peakLeft = -1;
 		}
-		else if( m->effectChannel(i)->m_peakLeft != -1 )
+		else if( m_fxChannelViews[i]->m_peakLeft != -1 )
 		{
 			m_fxChannelViews[i]->m_fader->setPeak_L( opl/fallOff );
 		}
 
-		if( m->effectChannel(i)->m_peakRight >= opr/fallOff )
+		if( m_fxChannelViews[i]->m_peakRight >= opr/fallOff )
 		{
-			m_fxChannelViews[i]->m_fader->setPeak_R( m->effectChannel(i)->m_peakRight );
+			m_fxChannelViews[i]->m_fader->setPeak_R( m_fxChannelViews[i]->m_peakRight );
 			// Set to -1 so later we'll know if this value has been refreshed yet.
-			m->effectChannel(i)->m_peakRight = -1;
+			m_fxChannelViews[i]->m_peakRight = -1;
 		}
-		else if( m->effectChannel(i)->m_peakRight != -1 )
+		else if( m_fxChannelViews[i]->m_peakRight != -1 )
 		{
 			m_fxChannelViews[i]->m_fader->setPeak_R( opr/fallOff );
 		}
+	}
+}
+
+
+
+
+void FxMixerView::nextAudioBuffer( const surroundSampleFrame * buffer )
+{
+	FxMixer * m = Engine::fxMixer();
+
+	for( int i = 0; i < m_fxChannelViews.size(); ++i )
+	{
+		m_fxChannelViews[i]->m_peakLeft = qMax(
+						m_fxChannelViews[i]->m_peakLeft,
+						m->effectChannel(i)->m_peakLeft );
+		
+		m_fxChannelViews[i]->m_peakRight = qMax(
+						m_fxChannelViews[i]->m_peakRight,
+						m->effectChannel(i)->m_peakRight );
 	}
 }

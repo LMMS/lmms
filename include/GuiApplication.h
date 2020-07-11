@@ -39,6 +39,7 @@ class MainWindow;
 class PianoRollWindow;
 class ProjectNotes;
 class SongEditorWindow;
+class MasterToolBar;
 
 class LMMS_EXPORT GuiApplication : public QObject
 {
@@ -51,6 +52,7 @@ public:
 
 	MainWindow* mainWindow() { return m_mainWindow; }
 	FxMixerView* fxMixerView() { return m_fxMixerView; }
+	MasterToolBar* masterToolBar() { return m_masterToolBar; }
 	SongEditorWindow* songEditor() { return m_songEditor; }
 	BBEditor* getBBEditor() { return m_bbEditor; }
 	PianoRollWindow* pianoRoll() { return m_pianoRoll; }
@@ -69,6 +71,7 @@ private:
 
 	MainWindow* m_mainWindow;
 	FxMixerView* m_fxMixerView;
+	MasterToolBar* m_masterToolBar;
 	SongEditorWindow* m_songEditor;
 	AutomationEditorWindow* m_automationEditor;
 	BBEditor* m_bbEditor;

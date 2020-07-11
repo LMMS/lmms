@@ -466,6 +466,7 @@ private:
 
 	friend class LmmsCore;
 	friend class SongEditor;
+	friend class MasterToolBar;
 	friend class mainWindow;
 	friend class ControllerRackView;
 

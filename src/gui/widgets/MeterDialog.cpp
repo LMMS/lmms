@@ -1,6 +1,7 @@
 /*
  * MeterDialog.cpp - dialog for entering meter settings
  *
+ * Copyright (c) 2019 Lathigos <lathigos/at/tutanota.com>
  * Copyright (c) 2008-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * Copyright (c) 2006-2008 Danny McRae <khjklujn/at/yahoo.com>
  *
@@ -31,71 +32,46 @@
 #include "MeterDialog.h"
 #include "MeterModel.h"
 #include "gui_templates.h"
-#include "LcdSpinBox.h"
+#include "IntegerSpinBox.h"
 #include "ToolTip.h"
 
 
-MeterDialog::MeterDialog( QWidget * _parent, bool _simple ) :
+MeterDialog::MeterDialog( QWidget * _parent ) :
 	QWidget( _parent ),
 	ModelView( NULL, this )
 {
-	QVBoxLayout * vlayout = new QVBoxLayout( this );
-	vlayout->setSpacing( 0 );
-	vlayout->setMargin( 0 );
+	QGridLayout * mainLayout = new QGridLayout( this );
+	mainLayout->setSpacing( 0 );
+	mainLayout->setContentsMargins( 0, 0, 0, 0 );
+	mainLayout->setHorizontalSpacing( 2 );
 
-	QWidget * num = new QWidget( this );
-	QHBoxLayout * num_layout = new QHBoxLayout( num );
-	num_layout->setSpacing( 0 );
-	num_layout->setMargin( 0 );
-
-
-	m_numerator = new LcdSpinBox( 2, num, tr( "Meter Numerator" ) );
+	m_numerator = new IntegerSpinBox( 2, this, tr( "Meter Numerator" ) );
+	m_numerator->setAlignment( Qt::AlignRight );
+	m_numerator->setZeroesVisible( false );
 	ToolTip::add( m_numerator, tr( "Meter numerator" ) );
 
-	num_layout->addWidget( m_numerator );
-
-	if( !_simple )
-	{
-		QLabel * num_label = new QLabel( tr( "Meter Numerator" ), num );
-		QFont f = num_label->font();
-		num_label->setFont( pointSize<7>( f ) );
-		num_layout->addSpacing( 5 );
-		num_layout->addWidget( num_label );
-	}
-	num_layout->addStretch();
-
-
-	QWidget * den = new QWidget( this );
-	QHBoxLayout * den_layout = new QHBoxLayout( den );
-	den_layout->setSpacing( 0 );
-	den_layout->setMargin( 0 );
-
-	m_denominator = new LcdSpinBox( 2, den, tr( "Meter Denominator" ) );
+	m_denominator = new IntegerSpinBox( 2, this, tr( "Meter Denominator" ) );
+	m_denominator->setAlignment( Qt::AlignLeft );
+	m_denominator->setZeroesVisible( false );
 	ToolTip::add( m_denominator, tr( "Meter denominator" ) );
-	if( _simple )
-	{
-		m_denominator->setLabel( tr( "TIME SIG" ) );
-	}
-
-	den_layout->addWidget( m_denominator );
-
-	if( !_simple )
-	{
-		QLabel * den_label = new QLabel( tr( "Meter Denominator" ),
-									den );
-		QFont f = den_label->font();
-		den_label->setFont( pointSize<7>( f ) );
-		den_layout->addSpacing( 5 );
-		den_layout->addWidget( den_label );
-	}
-	den_layout->addStretch();
-
-
-	vlayout->addSpacing( _simple ? 1 : 3 );
-	vlayout->addWidget( num );
-	vlayout->addSpacing( 2 );
-	vlayout->addWidget( den );
-	vlayout->addStretch();
+	
+	// Add caption label:
+	QLabel * mainLabel = new QLabel( tr("TIME SIG"), this );
+	mainLabel->setObjectName( "integerDisplayTitle" );
+	mainLabel->setAlignment( Qt::AlignHCenter );
+	mainLayout->addWidget( mainLabel, 0, 0, 1, 3 );
+	
+	// Add integer displays:
+	QLabel * forwardSlash = new QLabel( "/", this );
+	forwardSlash->setObjectName( "integerDisplayDigits" );
+	forwardSlash->setFixedWidth( 7 );
+	forwardSlash->setAlignment( Qt::AlignRight | Qt::AlignTop );
+	
+	mainLayout->addWidget( m_numerator, 1, 0, Qt::AlignTop );
+	mainLayout->addWidget( forwardSlash, 1, 1, Qt::AlignTop );
+	mainLayout->addWidget( m_denominator, 1, 2, Qt::AlignTop );
+	
+	setMaximumHeight( 35 );
 }
 
 

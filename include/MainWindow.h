@@ -36,12 +36,15 @@
 class QAction;
 class QDomElement;
 class QGridLayout;
+class QHBoxLayout;
 class QMdiArea;
+class QSpacerItem;
 
 class ConfigManager;
 class PluginView;
-class ToolButton;
-
+class QToolButton;
+class ToolButtonList;
+class QResizeEvent;
 
 class MainWindow : public QMainWindow
 {
@@ -57,8 +60,7 @@ public:
 		return m_toolBar;
 	}
 
-	int addWidgetToToolBar( QWidget * _w, int _row = -1, int _col = -1 );
-	void addSpacingToToolBar( int _size );
+	void addWidgetToToolBar( QWidget * _w );
 
 	// wrap the widget with a window decoration and add it to the workspace
 	LMMS_EXPORT SubWindow* addWindowedWidget(QWidget *w, Qt::WindowFlags windowFlags=0);
@@ -137,6 +139,7 @@ public:
 
 public slots:
 	void resetWindowTitle();
+	void layoutToolBar( ToolButtonList * sender, QResizeEvent * event );
 
 	void emptySlot();
 	void createNewProject();
@@ -193,7 +196,13 @@ private:
 	QMdiArea * m_workspace;
 
 	QWidget * m_toolBar;
-	QGridLayout * m_toolBarLayout;
+	//QWidget * m_toolBarButtons;
+	ToolButtonList * m_leftButtonsList;
+	ToolButtonList * m_rightButtonsList;
+	QHBoxLayout * m_toolBarLayout;
+	//QGridLayout * m_toolBarButtonsLayout;
+	QSpacerItem * m_toolBarLeftSpacer;
+	QSpacerItem * m_toolBarRightSpacer;
 
 	struct keyModifiers
 	{
@@ -221,7 +230,7 @@ private:
 
 	QMenu * m_viewMenu;
 
-	ToolButton * m_metronomeToggle;
+	QToolButton * m_metronomeToggle;
 
 	SessionState m_session;
 

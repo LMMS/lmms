@@ -29,13 +29,17 @@
 #include <QDesktopServices>
 #include <QDomElement>
 #include <QFileInfo>
+#include <QHBoxLayout>
 #include <QMdiArea>
 #include <QMenuBar>
 #include <QMessageBox>
 #include <QShortcut>
 #include <QLibrary>
+#include <QSpacerItem>
 #include <QSplitter>
 #include <QUrl>
+#include <QToolButton>
+#include <QResizeEvent>
 
 #include "AboutDialog.h"
 #include "AudioDummy.h"
@@ -50,6 +54,7 @@
 #include "FxMixerView.h"
 #include "GuiApplication.h"
 #include "ImportFilter.h"
+#include "MasterToolBar.h"
 #include "PianoRoll.h"
 #include "PluginBrowser.h"
 #include "PluginFactory.h"
@@ -66,6 +71,7 @@
 #include "TextFloat.h"
 #include "TimeLineWidget.h"
 #include "ToolButton.h"
+#include "ToolButtonList.h"
 #include "ToolPlugin.h"
 #include "VersionedSaveDialog.h"
 
@@ -210,11 +216,44 @@ MainWindow::MainWindow() :
 	m_toolBar->setObjectName( "mainToolbar" );
 	m_toolBar->setFixedHeight( 64 );
 	m_toolBar->move( 0, 0 );
+	
+	// Add layout for horizontally spacing the different widgets:
+	m_toolBarLayout = new QHBoxLayout( m_toolBar );
+	m_toolBarLayout->setContentsMargins( 5, 0, 5, 0 );
+	m_toolBarLayout->setSpacing( 5 );
 
-	// add layout for organizing quite complex toolbar-layouting
-	m_toolBarLayout = new QGridLayout( m_toolBar/*, 2, 1*/ );
-	m_toolBarLayout->setMargin( 0 );
-	m_toolBarLayout->setSpacing( 0 );
+	// First add the leftmost buttons:
+	m_toolBarLayout->addSpacerItem( new QSpacerItem( 10, 20, QSizePolicy::Maximum ) );
+	m_leftButtonsList = new ToolButtonList( "fileToolButtons", m_toolBar );
+	m_toolBarLayout->addWidget( m_leftButtonsList );
+	
+	// Add spacers for horizontally centering the master toolbar widget:
+	m_toolBarLeftSpacer = new QSpacerItem( 0, 20, QSizePolicy::Maximum );
+	m_toolBarLayout->addSpacerItem( m_toolBarLeftSpacer );
+	m_toolBarLayout->addSpacerItem( new QSpacerItem( 0, 20, QSizePolicy::Expanding ) );
+	
+	// In between these spacers, there will be the master tool bar.
+
+	m_toolBarLayout->addSpacerItem( new QSpacerItem( 0, 20, QSizePolicy::Expanding ) );
+	m_toolBarRightSpacer = new QSpacerItem( 180, 20, QSizePolicy::Maximum );
+	m_toolBarLayout->addSpacerItem( m_toolBarRightSpacer );
+	
+	m_rightButtonsList = new ToolButtonList( "windowToolButtons", m_toolBar );
+	m_toolBarLayout->addWidget( m_rightButtonsList );
+	m_toolBarLayout->addSpacerItem( new QSpacerItem( 10, 20, QSizePolicy::Maximum ) );
+
+	connect( m_leftButtonsList,
+					&ToolButtonList::resized,
+					this,
+					[=]( QResizeEvent * event )
+							{ layoutToolBar( m_leftButtonsList, event ); }
+						);
+	connect( m_rightButtonsList,
+					&ToolButtonList::resized,
+					this,
+					[=]( QResizeEvent * event )
+							{ layoutToolBar( m_rightButtonsList, event ); }
+						);
 
 	vbox->addWidget( m_toolBar );
 	vbox->addWidget( w );
@@ -263,6 +302,7 @@ MainWindow::~MainWindow()
 	delete gui->automationEditor();
 	delete gui->pianoRoll();
 	delete gui->songEditor();
+	delete gui->masterToolBar();
 	// destroy engine which will do further cleanups etc.
 	Engine::destroy();
 }
@@ -415,133 +455,65 @@ void MainWindow::finalize()
 	help_menu->addAction( embed::getIconPixmap( "icon_small" ), tr( "About" ),
 				  this, SLOT( aboutLMMS() ) );
 
-	// create tool-buttons
-	ToolButton * project_new = new ToolButton(
-					embed::getIconPixmap( "project_new" ),
-					tr( "Create new project" ),
-					this, SLOT( createNewProject() ),
-							m_toolBar );
-
-	ToolButton * project_new_from_template = new ToolButton(
-			embed::getIconPixmap( "project_new_from_template" ),
-				tr( "Create new project from template" ),
-					this, SLOT( emptySlot() ),
-							m_toolBar );
-	project_new_from_template->setMenu( templates_menu );
-	project_new_from_template->setPopupMode( ToolButton::InstantPopup );
-
-	ToolButton * project_open = new ToolButton(
-					embed::getIconPixmap( "project_open" ),
-					tr( "Open existing project" ),
-					this, SLOT( openProject() ),
-								m_toolBar );
-
-
-	ToolButton * project_open_recent = new ToolButton(
-				embed::getIconPixmap( "project_open_recent" ),
-					tr( "Recently opened projects" ),
-					this, SLOT( emptySlot() ), m_toolBar );
-	project_open_recent->setMenu( new RecentProjectsMenu(this) );
-	project_open_recent->setPopupMode( ToolButton::InstantPopup );
-
-	ToolButton * project_save = new ToolButton(
-					embed::getIconPixmap( "project_save" ),
-					tr( "Save current project" ),
-					this, SLOT( saveProject() ),
-								m_toolBar );
-
-
-	ToolButton * project_export = new ToolButton(
-				embed::getIconPixmap( "project_export" ),
-					tr( "Export current project" ),
-					this,
-							SLOT( onExportProject() ),
-								m_toolBar );
-
-	m_metronomeToggle = new ToolButton(
-				embed::getIconPixmap( "metronome" ),
-				tr( "Metronome" ),
-				this, SLOT( onToggleMetronome() ),
-							m_toolBar );
-	m_metronomeToggle->setCheckable(true);
-	m_metronomeToggle->setChecked(Engine::mixer()->isMetronomeActive());
-
-	m_toolBarLayout->setColumnMinimumWidth( 0, 5 );
-	m_toolBarLayout->addWidget( project_new, 0, 1 );
-	m_toolBarLayout->addWidget( project_new_from_template, 0, 2 );
-	m_toolBarLayout->addWidget( project_open, 0, 3 );
-	m_toolBarLayout->addWidget( project_open_recent, 0, 4 );
-	m_toolBarLayout->addWidget( project_save, 0, 5 );
-	m_toolBarLayout->addWidget( project_export, 0, 6 );
-	m_toolBarLayout->addWidget( m_metronomeToggle, 0, 7 );
-
-
-	// window-toolbar
-	ToolButton * song_editor_window = new ToolButton(
+	// Create window visibility buttons toolbar:
+	QToolButton * song_editor_window = m_leftButtonsList->addToolButton(
 					embed::getIconPixmap( "songeditor" ),
 					tr( "Song Editor" ) + " (F5)",
-					this, SLOT( toggleSongEditorWin() ),
-								m_toolBar );
+					this, SLOT( toggleSongEditorWin() ) );
 	song_editor_window->setShortcut( Qt::Key_F5 );
 
 
-	ToolButton * bb_editor_window = new ToolButton(
+	QToolButton * bb_editor_window = m_leftButtonsList->addToolButton(
 					embed::getIconPixmap( "bb_track_btn" ),
 					tr( "Beat+Bassline Editor" ) +
 									" (F6)",
-					this, SLOT( toggleBBEditorWin() ),
-								m_toolBar );
+					this, SLOT( toggleBBEditorWin() ) );
 	bb_editor_window->setShortcut( Qt::Key_F6 );
 
 
-	ToolButton * piano_roll_window = new ToolButton(
+	QToolButton * piano_roll_window = m_leftButtonsList->addToolButton(
 						embed::getIconPixmap( "piano" ),
 						tr( "Piano Roll" ) +
 									" (F7)",
-					this, SLOT( togglePianoRollWin() ),
-								m_toolBar );
+					this, SLOT( togglePianoRollWin() ) );
 	piano_roll_window->setShortcut( Qt::Key_F7 );
 
-	ToolButton * automation_editor_window = new ToolButton(
+	QToolButton * automation_editor_window = m_leftButtonsList->addToolButton(
 					embed::getIconPixmap( "automation" ),
 					tr( "Automation Editor" ) +
 									" (F8)",
 					this,
-					SLOT( toggleAutomationEditorWin() ),
-					m_toolBar );
+					SLOT( toggleAutomationEditorWin() ) );
 	automation_editor_window->setShortcut( Qt::Key_F8 );
 
-	ToolButton * fx_mixer_window = new ToolButton(
+	QToolButton * fx_mixer_window = m_leftButtonsList->addToolButton(
 					embed::getIconPixmap( "fx_mixer" ),
 					tr( "FX Mixer" ) + " (F9)",
-					this, SLOT( toggleFxMixerWin() ),
-					m_toolBar );
+					this, SLOT( toggleFxMixerWin() ) );
 	fx_mixer_window->setShortcut( Qt::Key_F9 );
 
-	ToolButton * controllers_window = new ToolButton(
+	QToolButton * controllers_window = m_leftButtonsList->addToolButton(
 					embed::getIconPixmap( "controller" ),
 					tr( "Show/hide controller rack" ) +
 								" (F10)",
-					this, SLOT( toggleControllerRack() ),
-								m_toolBar );
+					this, SLOT( toggleControllerRack() ) );
 	controllers_window->setShortcut( Qt::Key_F10 );
 
-	ToolButton * project_notes_window = new ToolButton(
+	QToolButton * project_notes_window = m_leftButtonsList->addToolButton(
 					embed::getIconPixmap( "project_notes" ),
 					tr( "Show/hide project notes" ) +
 								" (F11)",
-					this, SLOT( toggleProjectNotesWin() ),
-								m_toolBar );
+					this, SLOT( toggleProjectNotesWin() ) );
 	project_notes_window->setShortcut( Qt::Key_F11 );
 
-	m_toolBarLayout->addWidget( song_editor_window, 1, 1 );
-	m_toolBarLayout->addWidget( bb_editor_window, 1, 2 );
-	m_toolBarLayout->addWidget( piano_roll_window, 1, 3 );
-	m_toolBarLayout->addWidget( automation_editor_window, 1, 4 );
-	m_toolBarLayout->addWidget( fx_mixer_window, 1, 5 );
-	m_toolBarLayout->addWidget( controllers_window, 1, 6 );
-	m_toolBarLayout->addWidget( project_notes_window, 1, 7 );
-	m_toolBarLayout->setColumnStretch( 100, 1 );
+	m_leftButtonsList->addSeparator();
+
+	m_metronomeToggle = m_leftButtonsList->addToolButton(
+				embed::getIconPixmap( "metronome" ),
+				tr( "Metronome" ),
+				this, SLOT( onToggleMetronome() ) );
+	m_metronomeToggle->setCheckable(true);
+	m_metronomeToggle->setChecked(Engine::mixer()->isMetronomeActive());
 
 	// setup-dialog opened before?
 	if( !ConfigManager::inst()->value( "app", "configured" ).toInt() )
@@ -594,28 +566,37 @@ void MainWindow::finalize()
 
 
 
-int MainWindow::addWidgetToToolBar( QWidget * _w, int _row, int _col )
+void MainWindow::addWidgetToToolBar( QWidget * _w )
 {
-	int col = ( _col == -1 ) ? m_toolBarLayout->columnCount() + 7 : _col;
-	if( _w->height() > 32 || _row == -1 )
-	{
-		m_toolBarLayout->addWidget( _w, 0, col, 2, 1 );
-	}
-	else
-	{
-		m_toolBarLayout->addWidget( _w, _row, col );
-	}
-	return( col );
+	m_toolBarLayout->insertWidget( 4, _w );
 }
 
 
 
 
-void MainWindow::addSpacingToToolBar( int _size )
+void MainWindow::layoutToolBar( ToolButtonList * sender, QResizeEvent * event )
 {
-	m_toolBarLayout->setColumnMinimumWidth( m_toolBarLayout->columnCount() +
-								7, _size );
+	// After adding a toolbar button, recalculate the size of the spacers
+	// to keep the master toolbar in the center of the window:
+	if (m_leftButtonsList->width() > m_rightButtonsList->width())
+	{
+		m_toolBarLeftSpacer->changeSize( 0, 20, QSizePolicy::Maximum );
+		m_toolBarRightSpacer->changeSize(
+					m_leftButtonsList->width() - m_rightButtonsList->width(),
+					20, QSizePolicy::Maximum );
+	}
+	else if (m_leftButtonsList->width() <= m_rightButtonsList->width())
+	{
+		m_toolBarRightSpacer->changeSize( 0, 20, QSizePolicy::Maximum );
+		m_toolBarLeftSpacer->changeSize(
+					m_rightButtonsList->width() - m_leftButtonsList->width(),
+					20, QSizePolicy::Maximum );
+	}
+	
 }
+
+
+
 
 SubWindow* MainWindow::addWindowedWidget(QWidget *w, Qt::WindowFlags windowFlags)
 {

@@ -38,12 +38,14 @@
 #include "PianoRoll.h"
 #include "ProjectNotes.h"
 #include "SongEditor.h"
+#include "MasterToolBar.h"
 
 #include <QApplication>
 #include <QDir>
 #include <QtGlobal>
 #include <QMessageBox>
 #include <QSplashScreen>
+
 
 GuiApplication* GuiApplication::s_instance = nullptr;
 
@@ -122,6 +124,10 @@ GuiApplication::GuiApplication()
 	connect(m_mainWindow, SIGNAL(destroyed(QObject*)), this, SLOT(childDestroyed(QObject*)));
 	connect(m_mainWindow, SIGNAL(initProgress(const QString&)), 
 		this, SLOT(displayInitProgress(const QString&)));
+	
+	displayInitProgress(tr("Preparing master tool bar"));
+	m_masterToolBar = new MasterToolBar(Engine::getSong());
+	connect(m_masterToolBar, SIGNAL(destroyed(QObject*)), this, SLOT(childDestroyed(QObject*)));
 
 	displayInitProgress(tr("Preparing song editor"));
 	m_songEditor = new SongEditorWindow(Engine::getSong());
@@ -185,6 +191,10 @@ void GuiApplication::childDestroyed(QObject *obj)
 	else if (obj == m_fxMixerView)
 	{
 		m_fxMixerView = nullptr;
+	}
+	else if (obj == m_masterToolBar)
+	{
+		m_masterToolBar = nullptr;
 	}
 	else if (obj == m_songEditor)
 	{

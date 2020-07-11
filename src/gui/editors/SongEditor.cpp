@@ -180,19 +180,6 @@ SongEditor::SongEditor( Song * song ) :
 	connect( this, SIGNAL( zoomingValueChanged( double ) ),
 			 m_positionLine, SLOT( zoomChange( double ) ) );
 
-
-	// add some essential widgets to global tool-bar
-	QWidget * tb = gui->mainWindow()->toolBar();
-
-	gui->mainWindow()->addSpacingToToolBar( 40 );
-
-	m_tempoSpinBox = new LcdSpinBox( 3, tb, tr( "Tempo" ) );
-	m_tempoSpinBox->setModel( &m_song->m_tempoModel );
-	m_tempoSpinBox->setLabel( tr( "TEMPO" ) );
-	ToolTip::add( m_tempoSpinBox, tr( "Tempo in BPM" ) );
-
-	int tempoSpinBoxCol = gui->mainWindow()->addWidgetToToolBar( m_tempoSpinBox, 0 );
-
 #if 0
 	toolButton * hq_btn = new toolButton( embed::getIconPixmap( "hq_mode" ),
 						tr( "High quality mode" ),
@@ -203,94 +190,6 @@ SongEditor::SongEditor( Song * song ) :
 	hq_btn->setFixedWidth( 42 );
 	gui->mainWindow()->addWidgetToToolBar( hq_btn, 1, col );
 #endif
-
-	gui->mainWindow()->addWidgetToToolBar( new TimeDisplayWidget, 1, tempoSpinBoxCol );
-
-	gui->mainWindow()->addSpacingToToolBar( 10 );
-
-	m_timeSigDisplay = new MeterDialog( this, true );
-	m_timeSigDisplay->setModel( &m_song->m_timeSigModel );
-	gui->mainWindow()->addWidgetToToolBar( m_timeSigDisplay );
-
-	gui->mainWindow()->addSpacingToToolBar( 10 );
-
-
-	QLabel * master_vol_lbl = new QLabel( tb );
-	master_vol_lbl->setPixmap( embed::getIconPixmap( "master_volume" ) );
-
-	m_masterVolumeSlider = new AutomatableSlider( tb,
-							tr( "Master volume" ) );
-	m_masterVolumeSlider->setModel( &m_song->m_masterVolumeModel );
-	m_masterVolumeSlider->setOrientation( Qt::Vertical );
-	m_masterVolumeSlider->setPageStep( 1 );
-	m_masterVolumeSlider->setTickPosition( QSlider::TicksLeft );
-	m_masterVolumeSlider->setFixedSize( 26, 60 );
-	m_masterVolumeSlider->setTickInterval( 50 );
-	ToolTip::add( m_masterVolumeSlider, tr( "Master volume" ) );
-
-	connect( m_masterVolumeSlider, SIGNAL( logicValueChanged( int ) ), this,
-			SLOT( setMasterVolume( int ) ) );
-	connect( m_masterVolumeSlider, SIGNAL( sliderPressed() ), this,
-			SLOT( showMasterVolumeFloat()) );
-	connect( m_masterVolumeSlider, SIGNAL( logicSliderMoved( int ) ), this,
-			SLOT( updateMasterVolumeFloat( int ) ) );
-	connect( m_masterVolumeSlider, SIGNAL( sliderReleased() ), this,
-			SLOT( hideMasterVolumeFloat() ) );
-
-	m_mvsStatus = new TextFloat;
-	m_mvsStatus->setTitle( tr( "Master volume" ) );
-	m_mvsStatus->setPixmap( embed::getIconPixmap( "master_volume" ) );
-
-	gui->mainWindow()->addWidgetToToolBar( master_vol_lbl );
-	gui->mainWindow()->addWidgetToToolBar( m_masterVolumeSlider );
-
-
-	gui->mainWindow()->addSpacingToToolBar( 10 );
-
-
-	QLabel * master_pitch_lbl = new QLabel( tb );
-	master_pitch_lbl->setPixmap( embed::getIconPixmap( "master_pitch" ) );
-	master_pitch_lbl->setFixedHeight( 64 );
-
-	m_masterPitchSlider = new AutomatableSlider( tb, tr( "Master pitch" ) );
-	m_masterPitchSlider->setModel( &m_song->m_masterPitchModel );
-	m_masterPitchSlider->setOrientation( Qt::Vertical );
-	m_masterPitchSlider->setPageStep( 1 );
-	m_masterPitchSlider->setTickPosition( QSlider::TicksLeft );
-	m_masterPitchSlider->setFixedSize( 26, 60 );
-	m_masterPitchSlider->setTickInterval( 12 );
-	ToolTip::add( m_masterPitchSlider, tr( "Master pitch" ) );
-	connect( m_masterPitchSlider, SIGNAL( logicValueChanged( int ) ), this,
-			SLOT( setMasterPitch( int ) ) );
-	connect( m_masterPitchSlider, SIGNAL( sliderPressed() ), this,
-			SLOT( showMasterPitchFloat() ) );
-	connect( m_masterPitchSlider, SIGNAL( logicSliderMoved( int ) ), this,
-			SLOT( updateMasterPitchFloat( int ) ) );
-	connect( m_masterPitchSlider, SIGNAL( sliderReleased() ), this,
-			SLOT( hideMasterPitchFloat() ) );
-
-	m_mpsStatus = new TextFloat;
-	m_mpsStatus->setTitle( tr( "Master pitch" ) );
-	m_mpsStatus->setPixmap( embed::getIconPixmap( "master_pitch" ) );
-
-	gui->mainWindow()->addWidgetToToolBar( master_pitch_lbl );
-	gui->mainWindow()->addWidgetToToolBar( m_masterPitchSlider );
-
-	gui->mainWindow()->addSpacingToToolBar( 10 );
-
-	// create widget for oscilloscope- and cpu-load-widget
-	QWidget * vc_w = new QWidget( tb );
-	QVBoxLayout * vcw_layout = new QVBoxLayout( vc_w );
-	vcw_layout->setMargin( 0 );
-	vcw_layout->setSpacing( 0 );
-
-	vcw_layout->addStretch();
-	vcw_layout->addWidget( new Oscilloscope( vc_w ) );
-
-	vcw_layout->addWidget( new CPULoadWidget( vc_w ) );
-	vcw_layout->addStretch();
-
-	gui->mainWindow()->addWidgetToToolBar( vc_w );
 
 	static_cast<QVBoxLayout *>( layout() )->insertWidget( 0, m_timeLine );
 
@@ -708,93 +607,6 @@ void SongEditor::mouseReleaseEvent(QMouseEvent *me)
 	rubberBand()->hide();
 	rubberBand()->setEnabled(false);
 	QWidget::mouseReleaseEvent(me);
-}
-
-
-
-
-void SongEditor::setMasterVolume( int new_val )
-{
-	updateMasterVolumeFloat( new_val );
-
-	if( !m_mvsStatus->isVisible() && !m_song->m_loadingProject
-					&& m_masterVolumeSlider->showStatus() )
-	{
-		m_mvsStatus->moveGlobal( m_masterVolumeSlider,
-			QPoint( m_masterVolumeSlider->width() + 2, -2 ) );
-		m_mvsStatus->setVisibilityTimeOut( 1000 );
-	}
-	Engine::mixer()->setMasterGain( new_val / 100.0f );
-}
-
-
-
-
-void SongEditor::showMasterVolumeFloat( void )
-{
-	m_mvsStatus->moveGlobal( m_masterVolumeSlider,
-			QPoint( m_masterVolumeSlider->width() + 2, -2 ) );
-	m_mvsStatus->show();
-	updateMasterVolumeFloat( m_song->m_masterVolumeModel.value() );
-}
-
-
-
-
-void SongEditor::updateMasterVolumeFloat( int new_val )
-{
-	m_mvsStatus->setText( tr( "Value: %1%" ).arg( new_val ) );
-}
-
-
-
-
-void SongEditor::hideMasterVolumeFloat( void )
-{
-	m_mvsStatus->hide();
-}
-
-
-
-
-void SongEditor::setMasterPitch( int new_val )
-{
-	updateMasterPitchFloat( new_val );
-	if( m_mpsStatus->isVisible() == false && m_song->m_loadingProject == false
-					&& m_masterPitchSlider->showStatus() )
-	{
-		m_mpsStatus->moveGlobal( m_masterPitchSlider,
-			QPoint( m_masterPitchSlider->width() + 2, -2 ) );
-		m_mpsStatus->setVisibilityTimeOut( 1000 );
-	}
-}
-
-
-
-
-void SongEditor::showMasterPitchFloat( void )
-{
-	m_mpsStatus->moveGlobal( m_masterPitchSlider,
-			QPoint( m_masterPitchSlider->width() + 2, -2 ) );
-	m_mpsStatus->show();
-	updateMasterPitchFloat( m_song->m_masterPitchModel.value() );
-}
-
-
-
-
-void SongEditor::updateMasterPitchFloat( int new_val )
-{
-	m_mpsStatus->setText( tr( "Value: %1 semitones").arg( new_val ) );
-
-}
-
-
-
-
-void SongEditor::hideMasterPitchFloat( void )
-{
-	m_mpsStatus->hide();
 }
 
 

@@ -1,13 +1,13 @@
 /*
- * CPULoadWidget.h - widget for displaying CPU-load (partly based on
- *                    Hydrogen's CPU-load-widget)
+ * SimpleVisualizationWidget.h - widget for visualization of sound-data
  *
- * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- *
+ * Copyright (c) 2019 Lathigos <lathigos/at/tutanota.com>
+ * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * 
  * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public
+ * modify it under the terms of"the GNU General Public
  * License as published by the Free Software Foundation; either
  * version 2 of the License, or (at your option) any later version.
  *
@@ -24,35 +24,40 @@
  */
 
 
-#ifndef CPULOAD_WIDGET_H
-#define CPULOAD_WIDGET_H
+#ifndef SIMPLE_VISUALIZATION_WIDGET
+#define SIMPLE_VISUALIZATION_WIDGET
 
-#include <QtCore/QTimer>
+#include <QList>
 #include <QPixmap>
 #include <QWidget>
+#include <QTime>
 
 #include "lmms_basics.h"
 
 class ProgressBar;
 
-class CPULoadWidget : public QWidget
+class SimpleVisualizationWidget : public QWidget
 {
 	Q_OBJECT
 public:
-	CPULoadWidget( QWidget * _parent );
-	virtual ~CPULoadWidget();
+	SimpleVisualizationWidget( QWidget * _parent );
+	virtual ~SimpleVisualizationWidget();
 
 
 protected slots:
-	void updateCpuLoad();
-
+	void updateVisualization();
+	void updateAudioBuffer( const surroundSampleFrame * buffer );
 
 private:
-	float m_currentLoad;
-
-	QTimer m_updateTimer;
-	ProgressBar * m_progressBar;
+	ProgressBar * m_progressBarLeft;
+	ProgressBar * m_progressBarRight;
+	
+	sampleFrame * m_buffer;
+	
+	float m_peakLeft = 0.0f;
+	float m_peakRight = 0.0f;
+	
+	int frameCounter = 0;
 } ;
-
 
 #endif

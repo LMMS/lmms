@@ -43,6 +43,7 @@ SET(LMMS_SRCS
 	gui/editors/Editor.cpp
 	gui/editors/PianoRoll.cpp
 	gui/editors/SongEditor.cpp
+	gui/editors/MasterToolBar.cpp
 
 	gui/menus/RecentProjectsMenu.cpp
 	gui/menus/TemplatesMenu.cpp
@@ -68,6 +69,8 @@ SET(LMMS_SRCS
 	gui/widgets/InstrumentFunctionViews.cpp
 	gui/widgets/InstrumentMidiIOView.cpp
 	gui/widgets/InstrumentSoundShapingView.cpp
+	gui/widgets/IntegerDisplayWidget.cpp
+	gui/widgets/IntegerSpinBox.cpp
 	gui/widgets/LeftRightNav.cpp
 	gui/widgets/Knob.cpp
 	gui/widgets/LadspaControlView.cpp
@@ -81,18 +84,21 @@ SET(LMMS_SRCS
 	gui/widgets/NStateButton.cpp
 	gui/widgets/Oscilloscope.cpp
 	gui/widgets/PixmapButton.cpp
+	gui/widgets/ProgressBar.cpp
 	gui/widgets/ProjectNotes.cpp
 	gui/widgets/RenameDialog.cpp
 	gui/widgets/Rubberband.cpp
 	gui/widgets/SendButtonIndicator.cpp
 	gui/widgets/SideBar.cpp
 	gui/widgets/SideBarWidget.cpp
+	gui/widgets/SimpleVisualizationWidget.cpp
 	gui/widgets/TabBar.cpp
 	gui/widgets/TabWidget.cpp
 	gui/widgets/TempoSyncKnob.cpp
 	gui/widgets/TextFloat.cpp
 	gui/widgets/TimeDisplayWidget.cpp
 	gui/widgets/ToolButton.cpp
+	gui/widgets/ToolButtonList.cpp
 	gui/widgets/ToolTip.cpp
 	gui/widgets/TrackLabelButton.cpp
 	gui/widgets/TrackRenameLineEdit.cpp
