@@ -86,11 +86,22 @@ namespace PathUtil
 	QString oldRelativeUpgrade(const QString & input)
 	{
 		if (input.isEmpty()) { return input; }
-		QString factory = baseLocation(Base::FactorySample) + input;
-		QFileInfo factoryInfo(factory);
-		//If we can't find a factory sample, it's probably a user sample
-		Base base = factoryInfo.exists() ? Base::FactorySample : Base::UserSample;
-		return basePrefix(base) + input;
+
+		//Start by assuming that the file is a user sample
+		Base assumedBase = Base::UserSample;
+
+		//Check if it's a factory sample
+		QString factoryPath = baseLocation(Base::FactorySample) + input;
+		QFileInfo factoryInfo(factoryPath);
+		if (factoryInfo.exists()) { assumedBase = Base::FactorySample; }	
+
+		//Check if it's a VST
+		QString vstPath = baseLocation(Base::UserVST) + input;
+		QFileInfo vstInfo(vstPath);
+		if (vstInfo.exists()) { assumedBase = Base::UserVST; }
+
+		//Assume we've found the correct base location, return the full path
+		return basePrefix(assumedBase) + input;
 	}
 
 

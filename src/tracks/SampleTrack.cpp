@@ -536,9 +536,10 @@ void SampleTCOView::paintEvent( QPaintEvent * pe )
 			qMax( static_cast<int>( m_tco->sampleLength() * ppb / ticksPerBar ), 1 ), rect().bottom() - 2 * spacing );
 	m_tco->m_sampleBuffer->visualize( p, r, pe->rect() );
 
-	QFileInfo fileInfo(m_tco->m_sampleBuffer->audioFile());
-	QString filename = fileInfo.fileName();
-	paintTextLabel(filename, p);
+	//QFileInfo fileInfo(m_tco->m_sampleBuffer->audioFile());
+
+	QString name = PathUtil::cleanName(m_tco->m_sampleBuffer->audioFile());
+	paintTextLabel(name, p);
 
 	// disable antialiasing for borders, since its not needed
 	p.setRenderHint( QPainter::Antialiasing, false );
