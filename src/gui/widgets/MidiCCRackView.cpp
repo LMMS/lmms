@@ -20,6 +20,8 @@
 #include "BBTrackContainer.h"
 #include "Engine.h"
 #include "Song.h"
+#include "SongEditor.h"
+#include "BBEditor.h"
 
 
 MidiCCRackView::MidiCCRackView() :
@@ -102,6 +104,11 @@ MidiCCRackView::MidiCCRackView() :
 	connect( Engine::getBBTrackContainer() , SIGNAL( trackRemoved() ),
 		this, SLOT( updateTracksComboBox() ) );
 	connect( Engine::getBBTrackContainer() , SIGNAL( trackRenamed() ),
+		this, SLOT( updateTracksComboBox() ) );
+	// Also when tracks are moved on the song editor and BB editor
+	connect( gui->songEditor()->m_editor, SIGNAL( movedTrackView() ),
+		this, SLOT( updateTracksComboBox() ) );
+	connect( gui->getBBEditor()->trackContainerView(), SIGNAL( movedTrackView() ),
 		this, SLOT( updateTracksComboBox() ) );
 
 

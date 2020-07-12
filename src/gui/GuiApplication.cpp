@@ -136,10 +136,6 @@ GuiApplication::GuiApplication()
 	m_controllerRackView = new ControllerRackView;
 	connect(m_controllerRackView, SIGNAL(destroyed(QObject*)), this, SLOT(childDestroyed(QObject*)));
 
-	displayInitProgress(tr("Preparing midi cc rack"));
-	m_midiCCRackView = new MidiCCRackView;
-	connect(m_midiCCRackView, SIGNAL(destroyed(QObject*)), this, SLOT(childDestroyed(QObject*)));
-
 	displayInitProgress(tr("Preparing project notes"));
 	m_projectNotes = new ProjectNotes;
 	connect(m_projectNotes, SIGNAL(destroyed(QObject*)), this, SLOT(childDestroyed(QObject*)));
@@ -155,6 +151,10 @@ GuiApplication::GuiApplication()
 	displayInitProgress(tr("Preparing automation editor"));
 	m_automationEditor = new AutomationEditorWindow;
 	connect(m_automationEditor, SIGNAL(destroyed(QObject*)), this, SLOT(childDestroyed(QObject*)));
+
+	displayInitProgress(tr("Preparing midi cc rack"));
+	m_midiCCRackView = new MidiCCRackView;
+	connect(m_midiCCRackView, SIGNAL(destroyed(QObject*)), this, SLOT(childDestroyed(QObject*)));
 
 	splashScreen.finish(m_mainWindow);
 	m_mainWindow->finalize();

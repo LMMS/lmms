@@ -183,6 +183,7 @@ private:
 
 signals:
 	void positionChanged( const MidiTime & _pos );
+	void movedTrackView();
 
 
 } ;
