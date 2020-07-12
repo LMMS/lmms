@@ -140,6 +140,7 @@ public slots:
 	void updateSample();
 
 	void trackColorChanged( QColor & );
+	void trackColorReset();
 
 protected:
 	void contextMenuEvent( QContextMenuEvent * _cme ) override;

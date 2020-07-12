@@ -155,8 +155,11 @@ BBTCOView::BBTCOView( TrackContentObject * _tco, TrackView * _tv ) :
 {
 	connect( _tco->getTrack(), SIGNAL( dataChanged() ), 
 			this, SLOT( update() ) );
+	
 	connect( _tco, SIGNAL( trackColorChanged( QColor & ) ),
 			this, SLOT( trackColorChanged( QColor & ) ) );
+	connect( _tco, SIGNAL( trackColorReset() ),
+			this, SLOT( resetColor() ) );
 
 	setStyle( QApplication::style() );
 }

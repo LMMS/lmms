@@ -63,6 +63,7 @@ protected slots:
 	void flipX();
 	
 	void trackColorChanged( QColor & );
+	void trackColorReset();
 
 protected:
 	void constructContextMenu( QMenu * ) override;

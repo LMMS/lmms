@@ -55,6 +55,8 @@ AutomationPatternView::AutomationPatternView( AutomationPattern * _pattern,
 			this, SLOT( update() ) );
 	connect( m_pat, SIGNAL( trackColorChanged( QColor & ) ),
 			this, SLOT( trackColorChanged( QColor & ) ) );
+	connect( m_pat, SIGNAL( trackColorReset() ),
+			this, SLOT( trackColorReset() ) );
 
 	setAttribute( Qt::WA_OpaquePaintEvent, true );
 
@@ -174,6 +176,16 @@ void AutomationPatternView::setColor( QColor new_color )
 	{
 		m_pat->setColor( new_color );
 		m_pat->m_useStyleColor = false;
+		Engine::getSong()->setModified();
+		update();
+	}
+}
+
+void AutomationPatternView::trackColorReset()
+{
+	if( ! m_pat->m_useStyleColor )
+	{
+		m_pat->m_useStyleColor = true;
 		Engine::getSong()->setModified();
 		update();
 	}
