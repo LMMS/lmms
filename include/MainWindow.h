@@ -155,6 +155,7 @@ public slots:
 	void toggleFxMixerWin();
 	void togglePianoRollWin();
 	void toggleControllerRack();
+	void toggleFullscreen();
 	void toggleMidiCCRack();
 
 	void updatePlayPauseIcons();
@@ -225,6 +226,8 @@ private:
 	ToolButton * m_metronomeToggle;
 
 	SessionState m_session;
+	
+	bool maximized;
 
 private slots:
 	void browseHelp();
