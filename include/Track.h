@@ -133,6 +133,36 @@ public:
 	{
 		return m_autoResize;
 	}
+	
+	unsigned int color() const
+	{
+		return( m_color.rgb() );
+	}
+	
+	QColor colorObj() const
+	{
+		return m_color;
+	}
+
+	void setColor( const QColor & c )
+	{
+		m_color = QColor( c );
+	}
+	
+	void setColorRgb( const unsigned int & c )
+	{
+		m_color.setRgb( c );
+	}
+
+	void setUseStyleColor( bool b )
+	{
+		m_useStyleColor = b;
+	}
+	
+	bool useStyleColor()
+	{
+		return m_useStyleColor;
+	}
 
 	virtual void movePosition( const MidiTime & pos );
 	virtual void changeLength( const MidiTime & length );
@@ -195,6 +225,8 @@ private:
 	bool m_selectViewOnCreate;
 
 	QColor m_bgcolor;
+	QColor m_color;
+	bool m_useStyleColor;
 
 	friend class TrackContentObjectView;
 

@@ -103,7 +103,9 @@ TrackContentObject::TrackContentObject( Track * track ) :
 	m_startPosition(),
 	m_length(),
 	m_mutedModel( false, this, tr( "Mute" ) ),
-	m_selectViewOnCreate( false )
+	m_selectViewOnCreate( false ),
+	m_color( 128, 128, 128 ),
+	m_useStyleColor( false )
 {
 	if( getTrack() )
 	{
@@ -2406,6 +2408,12 @@ void Track::loadSettings( const QDomElement & element )
  */
 TrackContentObject * Track::addTCO( TrackContentObject * tco )
 {
+	if ( m_trackContentObjects.size() >= 1 )
+	{
+		tco->setColor( m_trackContentObjects[0]->colorObj() );
+		tco->setUseStyleColor( m_trackContentObjects[0]->useStyleColor() );
+	}
+	
 	m_trackContentObjects.push_back( tco );
 
 	emit trackContentObjectAdded( tco );

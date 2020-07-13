@@ -100,26 +100,6 @@ public:
 	{
 		return "pattern";
 	}
-	
-	unsigned int color() const
-	{
-		return( m_color.rgb() );
-	}
-	
-	QColor colorObj() const
-	{
-		return m_color;
-	}
-
-	void setColor( const QColor & c )
-	{
-		m_color = QColor( c );
-	}
-
-	void setUseStyleColor( bool b )
-	{
-		m_useStyleColor = b;
-	}
 
 	inline InstrumentTrack * instrumentTrack() const
 	{
@@ -167,9 +147,6 @@ private:
 
 	Pattern * adjacentPatternByOffset(int offset) const;
 
-	QColor m_color;
-	bool m_useStyleColor;
-
 	friend class PatternView;
 	friend class BBTrackContainerView;
 
@@ -208,7 +185,7 @@ public:
 
 	QColor color() const
 	{
-		return( m_pat->m_color );
+		return( m_pat->color() );
 	}
 	void setColor( QColor _new_color );
 
