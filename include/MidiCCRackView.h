@@ -9,8 +9,11 @@
 #include "ComboBox.h"
 #include "ComboBoxModel.h"
 #include "Knob.h"
+#include "TrackContainer.h"
 
 const int MIDI_CC_MAX_CONTROLLERS = 127;
+
+class InstrumentTrack;
 
 class MidiCCRackView : public QWidget, public SerializingObject
 {
@@ -29,10 +32,12 @@ public:
 
 public slots:
 	void updateTracksComboBox();
+	void updateKnobsModels();
 
 private:
 	ComboBox *m_trackComboBox;
 	ComboBoxModel *m_trackComboBoxModel;
+	TrackContainer::TrackList m_tracks; // List with pointers to the ComboBox tracks themselfs
 
 	Knob *m_controllerKnob[MIDI_CC_MAX_CONTROLLERS]; // Holds the knob widgets for each controller
 

@@ -16,6 +16,7 @@
 #include "GroupBox.h"
 #include "Knob.h"
 #include "Track.h"
+#include "InstrumentTrack.h"
 #include "TrackContainer.h"
 #include "BBTrackContainer.h"
 #include "Engine.h"
@@ -111,6 +112,9 @@ MidiCCRackView::MidiCCRackView() :
 	connect( gui->getBBEditor()->trackContainerView(), SIGNAL( movedTrackView() ),
 		this, SLOT( updateTracksComboBox() ) );
 
+	// Connection to update the knobs when the ComboBox selects another track
+	connect( m_trackComboBoxModel, SIGNAL( dataChanged() ),
+		this, SLOT( updateKnobsModels() ));
 
 	// Adding everything to the main layout
 	mainLayout->addWidget(trackToolBar);
@@ -123,15 +127,18 @@ MidiCCRackView::~MidiCCRackView()
 
 void MidiCCRackView::updateTracksComboBox()
 {
-	// Reset the combo box model and fill it with instrument tracks from the song editor
+	// Reset the combo box model to fill it with instrument tracks from the song/BB editors
 	m_trackComboBoxModel->clear();
 
+	// Reset our list with pointers to the tracks
+	m_tracks.clear();
+
 	TrackContainer::TrackList songEditorTracks;
-	songEditorTracks += Engine::getSong()->tracks();
+	songEditorTracks = Engine::getSong()->tracks();
 	int songEditorID = 1;
 
 	TrackContainer::TrackList bbEditorTracks;
-	bbEditorTracks += Engine::getBBTrackContainer()->tracks();
+	bbEditorTracks = Engine::getBBTrackContainer()->tracks();
 	int bbEditorID = 1;
 
 	for(Track *t: songEditorTracks)
@@ -139,6 +146,7 @@ void MidiCCRackView::updateTracksComboBox()
 		if( t->type() == Track::InstrumentTrack )
 		{
 			m_trackComboBoxModel->addItem("SongEditor: " + QString::number(songEditorID) + ". " + t->name());
+			m_tracks += t;
 			++songEditorID;
 		}
 	}
@@ -147,7 +155,29 @@ void MidiCCRackView::updateTracksComboBox()
 		if( t->type() == Track::InstrumentTrack )
 		{
 			m_trackComboBoxModel->addItem("BBEditor: " + QString::number(bbEditorID) + ". " + t->name());
+			m_tracks += t;
 			++bbEditorID;
+		}
+	}
+
+	updateKnobsModels();
+}
+
+void MidiCCRackView::updateKnobsModels()
+{
+	if( m_tracks.size() > 0 )
+	{
+		InstrumentTrack *selectedTrack = dynamic_cast<InstrumentTrack *>( m_tracks[ m_trackComboBoxModel->value() ] );
+
+		// TODO: I need to figure out why this line is necessary. Without it I get a segfault because at
+		// LMMS's startup sometimes m_tracks will hold tracks that have type() == Tracks::InstrumentTracks
+		// but casting the to InstrumentTrack * returns a nullptr. Meaning maybe the constructor wasn't
+		// executed yet.
+		if( selectedTrack )
+		{
+			for( int i = 0; i < MIDI_CC_MAX_CONTROLLERS; ++i ){
+				m_controllerKnob[i]->setModel( selectedTrack->m_midiCCModel[i] );
+			}
 		}
 	}
 }

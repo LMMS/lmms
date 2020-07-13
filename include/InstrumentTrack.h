@@ -38,6 +38,7 @@
 #include "Pitch.h"
 #include "Plugin.h"
 #include "Track.h"
+#include "MidiCCRackView.h"
 
 
 
@@ -220,6 +221,8 @@ public:
 	}
 
 	void autoAssignMidiDevice( bool );
+
+	FloatModel *m_midiCCModel[MIDI_CC_MAX_CONTROLLERS];
 
 signals:
 	void instrumentChanged();

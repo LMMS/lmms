@@ -74,6 +74,7 @@
 #include "StringPairDrag.h"
 #include "TrackContainerView.h"
 #include "TrackLabelButton.h"
+#include "MidiCCRackView.h"
 
 
 const char * volume_help = QT_TRANSLATE_NOOP( "InstrumentTrack",
@@ -123,6 +124,12 @@ InstrumentTrack::InstrumentTrack( TrackContainer* tc ) :
 	{
 		m_notes[i] = NULL;
 		m_runningMidiNotes[i] = 0;
+	}
+
+	// Initialize the MIDI CC controller models
+	for( int i = 0; i < MIDI_CC_MAX_CONTROLLERS; ++i )
+	{
+		m_midiCCModel[i] = new FloatModel(0.0f, 0.0f, 127.0f, 1.0f);
 	}
 
 
