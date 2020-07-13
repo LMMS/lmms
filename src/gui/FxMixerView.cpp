@@ -50,6 +50,7 @@
 #include "SampleTrack.h"
 #include "Song.h"
 #include "BBTrackContainer.h"
+#include "TrackContainer.h" // For TrackContainer::TrackList typedef
 
 FxMixerView::FxMixerView() :
 	QWidget(),
@@ -237,13 +238,13 @@ void FxMixerView::refreshDisplay()
 // update the and max. channel number for every instrument
 void FxMixerView::updateMaxChannelSelector()
 {
-	QVector<Track *> songTrackList = Engine::getSong()->tracks();
-	QVector<Track *> bbTrackList = Engine::getBBTrackContainer()->tracks();
+	TrackContainer::TrackList songTrackList = Engine::getSong()->tracks();
+	TrackContainer::TrackList bbTrackList = Engine::getBBTrackContainer()->tracks();
 
-	QVector<Track *> trackLists[] = {songTrackList, bbTrackList};
+	TrackContainer::TrackList trackLists[] = {songTrackList, bbTrackList};
 	for(int tl=0; tl<2; ++tl)
 	{
-		QVector<Track *> trackList = trackLists[tl];
+		TrackContainer::TrackList trackList = trackLists[tl];
 		for(int i=0; i<trackList.size(); ++i)
 		{
 			if( trackList[i]->type() == Track::InstrumentTrack )
