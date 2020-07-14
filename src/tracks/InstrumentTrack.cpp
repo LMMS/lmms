@@ -127,6 +127,11 @@ InstrumentTrack::InstrumentTrack( TrackContainer* tc ) :
 		m_runningMidiNotes[i] = 0;
 	}
 
+
+	// Initialize the m_midiCCEnabled variable, but it's actually going to be connected
+	// to a LedButton
+	m_midiCCEnable = new BoolModel( false, NULL, "Enable/Disable MIDI CC" );
+
 	// Initialize the MIDI CC controller models and connect them to the method that processes
 	// the midi cc events
 	QSignalMapper *midiCCSignalMapper = new QSignalMapper( this );
@@ -267,6 +272,12 @@ MidiEvent InstrumentTrack::applyMasterKey( const MidiEvent& event )
 
 void InstrumentTrack::processCCEvent(int controller)
 {
+	// Does nothing if the LED is disabled
+	if( !m_midiCCEnable->value() )
+	{
+		return;
+	}
+
 	uint8_t channel = static_cast<uint8_t>( midiPort()->realOutputChannel() );
 	uint16_t cc = static_cast<uint16_t>( controller );
 	uint16_t value = static_cast<uint16_t>( m_midiCCModel[ controller ]->value() );

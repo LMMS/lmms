@@ -222,6 +222,7 @@ public:
 
 	void autoAssignMidiDevice( bool );
 
+	BoolModel *m_midiCCEnable;
 	FloatModel *m_midiCCModel[MIDI_CC_MAX_CONTROLLERS];
 
 signals:

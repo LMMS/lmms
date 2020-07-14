@@ -39,6 +39,8 @@ private:
 	ComboBoxModel *m_trackComboBoxModel;
 	TrackContainer::TrackList m_tracks; // List with pointers to the ComboBox tracks themselfs
 
+	PixmapButton *m_midiCCLed; // LED to enable disable MIDI CC
+
 	Knob *m_controllerKnob[MIDI_CC_MAX_CONTROLLERS]; // Holds the knob widgets for each controller
 
 //protected:
