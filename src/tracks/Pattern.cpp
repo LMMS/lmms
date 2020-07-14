@@ -925,8 +925,9 @@ void PatternView::paintEvent( QPaintEvent * )
 		: ( m_pat->useStyleColor() ? painter.background().color()
 		: m_pat->colorObj() ) );*/
 	QColor c = isSelected() ? selectedColor() : ( muted
-		? mutedBackgroundColor() : ( m_pat->useStyleColor()
-		? m_pat->colorObj() : painter.background().color() ) );
+		? mutedBackgroundColor() : ( m_pat->empty()
+		? QColor ( 48, 48, 48 ) : ( ! m_pat->useStyleColor()
+		? m_pat->colorObj() : painter.background().color() ) ) );
 
 	// invert the gradient for the background in the B&B editor
 	QLinearGradient lingrad( 0, 0, 0, height() );

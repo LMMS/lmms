@@ -64,26 +64,6 @@ public:
 	{
 		return m_sampleBuffer;
 	}
-	
-	unsigned int color() const
-	{
-		return( m_color.rgb() );
-	}
-	
-	QColor colorObj() const
-	{
-		return m_color;
-	}
-
-	void setColor( const QColor & c )
-	{
-		m_color = QColor( c );
-	}
-
-	void setUseStyleColor( bool b )
-	{
-		m_useStyleColor = b;
-	}
 
 
 	MidiTime sampleLength() const;
@@ -108,9 +88,6 @@ private:
 	SampleBuffer* m_sampleBuffer;
 	BoolModel m_recordModel;
 	bool m_isPlaying;
-	
-	bool m_useStyleColor;
-	QColor m_color;
 
 	friend class SampleTCOView;
 
@@ -132,7 +109,7 @@ public:
 	
 	QColor color() const
 	{
-		return( m_tco->m_color );
+		return( m_tco->colorObj() );
 	}
 	void setColor( QColor _new_color );
 

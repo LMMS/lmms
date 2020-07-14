@@ -47,9 +47,7 @@ BBTrack::infoMap BBTrack::s_infoMap;
 
 
 BBTCO::BBTCO( Track * _track ) :
-	TrackContentObject( _track ),
-	m_color( 128, 128, 128 ),
-	m_useStyleColor( true )
+	TrackContentObject( _track )
 {
 	bar_t t = Engine::getBBTrackContainer()->lengthOfBB( bbTrackIndex() );
 	if( t > 0 )
@@ -75,15 +73,7 @@ void BBTCO::saveSettings( QDomDocument & doc, QDomElement & element )
 	element.setAttribute( "len", length() );
 	element.setAttribute( "muted", isMuted() );
 	element.setAttribute( "color", color() );
-	
-	if( m_useStyleColor )
-	{
-		element.setAttribute( "usestyle", 1 );
-	}
-	else
-	{
-		element.setAttribute( "usestyle", 0 );
-	}
+	element.setAttribute( "stylecolor", useStyleColor() );
 }
 
 
@@ -101,32 +91,42 @@ void BBTCO::loadSettings( const QDomElement & element )
 	{
 		toggleMute();
 	}
-
-	if( element.hasAttribute( "color" ) )
+	
+	// for files saved in 1.3-onwards
+	if( element.hasAttribute( "stylecolor" ) )
 	{
-		setColor( QColor( element.attribute( "color" ).toUInt() ) );
+		setUseStyleColor( element.attribute( "stylecolor" ).toUInt() );
+		setColor( element.attribute( "color" ) );
 	}
 	
-	if( element.hasAttribute( "usestyle" ) )
-	{
-		if( element.attribute( "usestyle" ).toUInt() == 1 ) 
-		{
-			m_useStyleColor = true;
-		}
-		else
-		{
-			m_useStyleColor = false;
-		}
-	}
+	// for files saved before 1.3
 	else
 	{
-		if( m_color.rgb() == qRgb( 128, 182, 175 ) || m_color.rgb() == qRgb( 64, 128, 255 ) ) // old or older default color
+		if( element.hasAttribute( "color" ) )
 		{
-			m_useStyleColor = true;
+			setColor( QColor( element.attribute( "color" ).toUInt() ) );
+		}
+		if( element.hasAttribute( "usestyle" ) )
+		{
+			if( element.attribute( "usestyle" ).toUInt() == 1 ) 
+			{
+				setUseStyleColor( true );
+			}
+			else
+			{
+				setUseStyleColor( false );
+			}
 		}
 		else
 		{
-			m_useStyleColor = false;
+			if( color() == qRgb( 128, 182, 175 ) || color() == qRgb( 64, 128, 255 ) ) // old or older default color
+			{
+				setUseStyleColor( true );
+			}
+			else
+			{
+				setUseStyleColor( false );
+			}
 		}
 	}
 }
@@ -221,7 +221,7 @@ void BBTCOView::paintEvent( QPaintEvent * )
 	
 	// state: selected, muted, default, user selected
 	c = isSelected() ? selectedColor() : ( muted ? mutedBackgroundColor() 
-		: ( m_bbTCO->m_useStyleColor ? painter.background().color() 
+		: ( m_bbTCO->useStyleColor() ? painter.background().color() 
 		: m_bbTCO->colorObj() ) );
 	
 	lingrad.setColorAt( 0, c.lighter( 130 ) );
@@ -317,7 +317,7 @@ void BBTCOView::changeName()
 
 void BBTCOView::changeColor()
 {
-	QColor new_color = QColorDialog::getColor( m_bbTCO->m_color );
+	QColor new_color = QColorDialog::getColor( m_bbTCO->colorObj() );
 	if( ! new_color.isValid() )
 	{
 		return;
@@ -347,13 +347,13 @@ void BBTCOView::changeColor()
 /** \brief Makes the BB pattern use the colour defined in the stylesheet */
 void BBTCOView::resetColor()
 {
-	if( ! m_bbTCO->m_useStyleColor )
+	if( ! m_bbTCO->useStyleColor() )
 	{
-		m_bbTCO->m_useStyleColor = true;
+		m_bbTCO->setUseStyleColor( true );
 		Engine::getSong()->setModified();
 		update();
 	}
-	BBTrack::clearLastTCOColor();
+	//BBTrack::clearLastTCOColor();
 }
 
 
@@ -363,11 +363,11 @@ void BBTCOView::setColor( QColor new_color )
 	if( new_color.rgb() != m_bbTCO->color() )
 	{
 		m_bbTCO->setColor( new_color );
-		m_bbTCO->m_useStyleColor = false;
+		m_bbTCO->setUseStyleColor( false );
 		Engine::getSong()->setModified();
 		update();
 	}
-	BBTrack::setLastTCOColor( new_color );
+	//BBTrack::setLastTCOColor( new_color );
 }
 
 

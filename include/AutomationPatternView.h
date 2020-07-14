@@ -44,7 +44,7 @@ public:
 
 	QColor color() const
 	{
-		return( m_pat->m_color );
+		return( m_pat->colorObj() );
 	}
 	void setColor( QColor _new_color );
 	

@@ -175,7 +175,7 @@ void AutomationPatternView::setColor( QColor new_color )
 	if( new_color.rgb() != m_pat->color() )
 	{
 		m_pat->setColor( new_color );
-		m_pat->m_useStyleColor = false;
+		m_pat->setUseStyleColor( false );
 		Engine::getSong()->setModified();
 		update();
 	}
@@ -183,9 +183,9 @@ void AutomationPatternView::setColor( QColor new_color )
 
 void AutomationPatternView::trackColorReset()
 {
-	if( ! m_pat->m_useStyleColor )
+	if( ! m_pat->useStyleColor() )
 	{
-		m_pat->m_useStyleColor = true;
+		m_pat->setUseStyleColor( true );
 		Engine::getSong()->setModified();
 		update();
 	}
@@ -310,8 +310,8 @@ void AutomationPatternView::paintEvent( QPaintEvent * )
 	/*c = isSelected() ? selectedColor() : ( muted ? mutedBackgroundColor() 
 		:	painter.background().color() );*/
 	c = isSelected() ? selectedColor() : ( muted ? mutedBackgroundColor()
-		: ( m_pat->m_useStyleColor ? painter.background().color()
-		: m_pat->colorObj() ) );
+		: ( ! m_pat->useStyleColor() ? m_pat->colorObj()
+		: painter.background().color() ) );
 
 	lingrad.setColorAt( 1, c.darker( 300 ) );
 	lingrad.setColorAt( 0, c );

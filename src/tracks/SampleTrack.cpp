@@ -56,9 +56,7 @@
 SampleTCO::SampleTCO( Track * _track ) :
 	TrackContentObject( _track ),
 	m_sampleBuffer( new SampleBuffer ),
-	m_isPlaying( false ),
-	m_useStyleColor( true ),
-	m_color( 128, 128, 128 )
+	m_isPlaying( false )
 {
 	saveJournallingState( false );
 	setSampleFile( "" );
@@ -277,8 +275,8 @@ void SampleTCO::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	}
 
 	_this.setAttribute( "sample_rate", m_sampleBuffer->sampleRate());
-	_this.setAttribute( "stylecolor", m_useStyleColor );
-	_this.setAttribute( "color", m_color.rgb() );
+	_this.setAttribute( "stylecolor", useStyleColor() );
+	_this.setAttribute( "color", color() );
 	// TODO: start- and end-frame
 }
 
@@ -306,8 +304,8 @@ void SampleTCO::loadSettings( const QDomElement & _this )
 	
 	if( _this.hasAttribute( "stylecolor" ) )
 	{
-		m_useStyleColor = _this.attribute( "stylecolor" ).toInt();
-		m_color.setRgb( _this.attribute( "color" ).toUInt() );
+		setUseStyleColor( _this.attribute( "stylecolor" ).toInt() );
+		setColor( _this.attribute( "color" ).toUInt() );
 	}
 }
 
@@ -517,8 +515,8 @@ void SampleTCOView::paintEvent( QPaintEvent * pe )
 
 	// state: selected, muted, normal
 	c = isSelected() ? selectedColor() : ( muted ? mutedBackgroundColor()
-		: ( m_tco->m_useStyleColor ? painter.background().color()
-		: m_tco->colorObj() ) );
+		: ( ! m_tco->useStyleColor() ? m_tco->colorObj()
+		: painter.background().color() ) );
 
 	lingrad.setColorAt( 1, c.darker( 300 ) );
 	lingrad.setColorAt( 0, c );
@@ -560,12 +558,12 @@ void SampleTCOView::paintEvent( QPaintEvent * pe )
 	p.setRenderHint( QPainter::Antialiasing, false );
 
 	// inner border
-	p.setPen( c.lighter( 160 ) );
+	p.setPen( c.lighter( 135 ) );
 	p.drawRect( 1, 1, rect().right() - TCO_BORDER_WIDTH,
 		rect().bottom() - TCO_BORDER_WIDTH );
 
 	// outer border
-	p.setPen( c.darker( 300 ) );
+	p.setPen( c.darker( 200 ) );
 	p.drawRect( 0, 0, rect().right(), rect().bottom() );
 
 	// draw the 'muted' pixmap only if the pattern was manualy muted
@@ -602,7 +600,7 @@ void SampleTCOView::setColor( QColor new_color )
 	if( new_color.rgb() != m_tco->color() )
 	{
 		m_tco->setColor( new_color );
-		m_tco->m_useStyleColor = false;
+		m_tco->setUseStyleColor( false );
 		Engine::getSong()->setModified();
 		update();
 	}
@@ -610,9 +608,9 @@ void SampleTCOView::setColor( QColor new_color )
 
 void SampleTCOView::trackColorReset()
 {
-	if( ! m_tco->m_useStyleColor )
+	if( ! m_tco->useStyleColor() )
 	{
-		m_tco->m_useStyleColor = true;
+		m_tco->setUseStyleColor( true );
 		Engine::getSong()->setModified();
 		update();
 	}

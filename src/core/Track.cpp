@@ -106,7 +106,7 @@ TrackContentObject::TrackContentObject( Track * track ) :
 	m_mutedModel( false, this, tr( "Mute" ) ),
 	m_selectViewOnCreate( false ),
 	m_color( 128, 128, 128 ),
-	m_useStyleColor( false )
+	m_useStyleColor( true )
 {
 	if( getTrack() )
 	{
@@ -2041,7 +2041,7 @@ QColor TrackOperationsWidget::backgroundColor()
 
 void TrackOperationsWidget::changeTrackColor()
 {
-	QColor new_color = QColorDialog::getColor( QPalette::Background );
+	QColor new_color = QColorDialog::getColor( m_backgroundColor );
 	if( ! new_color.isValid() )
 	{ return; }
 	
@@ -2051,7 +2051,6 @@ void TrackOperationsWidget::changeTrackColor()
 
 void TrackOperationsWidget::resetTrackColor()
 {
-	m_backgroundColor = QPalette::Background;
 	emit colorReset();
 }
 

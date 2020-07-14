@@ -49,9 +49,7 @@ AutomationPattern::AutomationPattern( AutomationTrack * _auto_track ) :
 	m_progressionType( DiscreteProgression ),
 	m_dragging( false ),
 	m_isRecording( false ),
-	m_lastRecordedValue( 0 ),
-	m_color( 128, 128, 128 ),
-	m_useStyleColor( true )
+	m_lastRecordedValue( 0 )
 {
 	changeLength( MidiTime( 1, 0 ) );
 	if( getTrack() )
@@ -79,9 +77,7 @@ AutomationPattern::AutomationPattern( const AutomationPattern & _pat_to_copy ) :
 	m_autoTrack( _pat_to_copy.m_autoTrack ),
 	m_objects( _pat_to_copy.m_objects ),
 	m_tension( _pat_to_copy.m_tension ),
-	m_progressionType( _pat_to_copy.m_progressionType ),
-	m_color( 128, 128, 128 ),
-	m_useStyleColor( true )
+	m_progressionType( _pat_to_copy.m_progressionType )
 {
 	for( timeMap::const_iterator it = _pat_to_copy.m_timeMap.begin();
 				it != _pat_to_copy.m_timeMap.end(); ++it )
@@ -542,8 +538,8 @@ void AutomationPattern::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	_this.setAttribute( "prog", QString::number( progressionType() ) );
 	_this.setAttribute( "tens", QString::number( getTension() ) );
 	_this.setAttribute( "mute", QString::number( isMuted() ) );
-	_this.setAttribute( "stylecolor", m_useStyleColor );
-	_this.setAttribute( "color", m_color.rgb() );
+	_this.setAttribute( "stylecolor", useStyleColor() );
+	_this.setAttribute( "color", color() );
 
 	for( timeMap::const_iterator it = m_timeMap.begin();
 						it != m_timeMap.end(); ++it )
@@ -602,8 +598,8 @@ void AutomationPattern::loadSettings( const QDomElement & _this )
 	
 	if( _this.hasAttribute( "stylecolor" ) )
 	{
-		m_useStyleColor = _this.attribute( "stylecolor" ).toInt();
-		m_color.setRgb( _this.attribute( "color" ).toUInt() );
+		setUseStyleColor( _this.attribute( "stylecolor" ).toInt() );
+		setColor( _this.attribute( "color" ).toUInt() );
 	}
 
 	int len = _this.attribute( "len" ).toInt();

@@ -50,33 +50,11 @@ public:
 		return( "bbtco" );
 	}
 
-	unsigned int color() const
-	{
-		return( m_color.rgb() );
-	}
-	
-	QColor colorObj() const
-	{
-		return m_color;
-	}
-
-	void setColor( const QColor & c )
-	{
-		m_color = QColor( c );
-	}
-
-	void setUseStyleColor( bool b )
-	{
-		m_useStyleColor = b;
-	}
-
 	int bbTrackIndex();
 
 	TrackContentObjectView * createView( TrackView * _tv ) override;
 
 private:
-	QColor m_color;
-	bool m_useStyleColor;
 
 
 	friend class BBTCOView;
@@ -94,7 +72,7 @@ public:
 
 	QColor color() const
 	{
-		return( m_bbTCO->m_color );
+		return( m_bbTCO->colorObj() );
 	}
 	void setColor( QColor _new_color );
 
