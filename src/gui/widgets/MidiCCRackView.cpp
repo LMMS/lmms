@@ -44,6 +44,7 @@ MidiCCRackView::MidiCCRackView() :
 	subWin->resize( 350, 300 );
 	subWin->setFixedWidth( 350 );
 	subWin->setMinimumHeight( 300 );
+	subWin->hide();
 
 	// Main window layout
 	QVBoxLayout *mainLayout = new QVBoxLayout( this );
@@ -64,15 +65,13 @@ MidiCCRackView::MidiCCRackView() :
 	trackToolBar->setFixedHeight(40);
 
 	// Knobs GroupBox - Here we have the MIDI CC controller knobs for the selected track
-	GroupBox *knobsGroupBox = new GroupBox( tr("MIDI CC Knobs:") );
-
-	m_midiCCLed = knobsGroupBox->ledButton();
+	m_midiCCGroupBox = new GroupBox( tr("MIDI CC Knobs:") );
 
 	// Layout to keep scrollable area under the GroupBox header
 	QVBoxLayout *knobsGroupBoxLayout = new QVBoxLayout();
 	knobsGroupBoxLayout->setContentsMargins( 5, 16, 5, 5 );
 
-	knobsGroupBox->setLayout(knobsGroupBoxLayout);
+	m_midiCCGroupBox->setLayout(knobsGroupBoxLayout);
 
 	// Scrollable area + widget + its layout that will have all the knobs
 	QScrollArea *knobsScrollArea = new QScrollArea();
@@ -120,7 +119,7 @@ MidiCCRackView::MidiCCRackView() :
 
 	// Adding everything to the main layout
 	mainLayout->addWidget(trackToolBar);
-	mainLayout->addWidget(knobsGroupBox);
+	mainLayout->addWidget(m_midiCCGroupBox);
 }
 
 MidiCCRackView::~MidiCCRackView()
@@ -178,7 +177,7 @@ void MidiCCRackView::updateKnobsModels()
 		if( selectedTrack )
 		{
 			// Set the LED button to enable/disable the track midi cc
-			m_midiCCLed->setModel( selectedTrack->m_midiCCEnable );
+			m_midiCCGroupBox->setModel( selectedTrack->m_midiCCEnable );
 
 			// Set the model for each Knob
 			for( int i = 0; i < MIDI_CC_MAX_CONTROLLERS; ++i ){

@@ -10,6 +10,7 @@
 #include "ComboBoxModel.h"
 #include "Knob.h"
 #include "TrackContainer.h"
+#include "GroupBox.h"
 
 const int MIDI_CC_MAX_CONTROLLERS = 128;
 
@@ -39,7 +40,7 @@ private:
 	ComboBoxModel *m_trackComboBoxModel;
 	TrackContainer::TrackList m_tracks; // List with pointers to the ComboBox tracks themselfs
 
-	PixmapButton *m_midiCCLed; // LED to enable disable MIDI CC
+	GroupBox *m_midiCCGroupBox; // MIDI CC GroupBox (used to enable disable MIDI CC)
 
 	Knob *m_controllerKnob[MIDI_CC_MAX_CONTROLLERS]; // Holds the knob widgets for each controller
 
