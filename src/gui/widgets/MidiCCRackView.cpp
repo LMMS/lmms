@@ -29,7 +29,7 @@ MidiCCRackView::MidiCCRackView() :
 	QWidget()
 {
 	setWindowIcon( embed::getIconPixmap( "midi_cc_rack" ) );
-	setWindowTitle( tr("Midi CC Rack") );
+	setWindowTitle( tr("MIDI CC Rack") );
 
 	QMdiSubWindow * subWin = gui->mainWindow()->addWindowedWidget( this );
 

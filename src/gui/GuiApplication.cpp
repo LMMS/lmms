@@ -152,7 +152,7 @@ GuiApplication::GuiApplication()
 	m_automationEditor = new AutomationEditorWindow;
 	connect(m_automationEditor, SIGNAL(destroyed(QObject*)), this, SLOT(childDestroyed(QObject*)));
 
-	displayInitProgress(tr("Preparing midi cc rack"));
+	displayInitProgress(tr("Preparing MIDI CC rack"));
 	m_midiCCRackView = new MidiCCRackView;
 	connect(m_midiCCRackView, SIGNAL(destroyed(QObject*)), this, SLOT(childDestroyed(QObject*)));
 
