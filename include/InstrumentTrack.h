@@ -232,6 +232,8 @@ signals:
 	void newNote();
 	void endNote();
 
+public slots:
+	void processCCEvent(int controller);
 
 protected:
 	QString nodeName() const override

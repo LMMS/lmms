@@ -35,6 +35,7 @@
 #include <QMessageBox>
 #include <QMdiSubWindow>
 #include <QPainter>
+#include <QSignalMapper>
 
 #include "FileDialog.h"
 #include "InstrumentTrack.h"
@@ -126,11 +127,19 @@ InstrumentTrack::InstrumentTrack( TrackContainer* tc ) :
 		m_runningMidiNotes[i] = 0;
 	}
 
-	// Initialize the MIDI CC controller models
+	// Initialize the MIDI CC controller models and connect them to the method that processes
+	// the midi cc events
+	QSignalMapper *midiCCSignalMapper = new QSignalMapper( this );
+
 	for( int i = 0; i < MIDI_CC_MAX_CONTROLLERS; ++i )
 	{
-		m_midiCCModel[i] = new FloatModel(0.0f, 0.0f, 127.0f, 1.0f);
+		m_midiCCModel[i] = new FloatModel(0.0f, 0.0f, 127.0f, 1.0f, NULL, QString("CC Controller ") + QString::number(i));
+		connect( m_midiCCModel[i], SIGNAL( dataChanged() ),
+			midiCCSignalMapper, SLOT( map() ) );
+		midiCCSignalMapper->setMapping( m_midiCCModel[i], i );
 	}
+	connect( midiCCSignalMapper, SIGNAL( mapped(int) ),
+		this, SLOT( processCCEvent(int) ) );
 
 
 	setName( tr( "Default preset" ) );
@@ -251,6 +260,18 @@ MidiEvent InstrumentTrack::applyMasterKey( const MidiEvent& event )
 			break;
 	}
 	return copy;
+}
+
+
+
+
+void InstrumentTrack::processCCEvent(int controller)
+{
+	uint8_t channel = static_cast<uint8_t>( midiPort()->realOutputChannel() );
+	uint16_t cc = static_cast<uint16_t>( controller );
+	uint16_t value = static_cast<uint16_t>( m_midiCCModel[ controller ]->value() );
+
+	processOutEvent( MidiEvent( MidiControlChange, channel, cc, value ) );
 }
 
 

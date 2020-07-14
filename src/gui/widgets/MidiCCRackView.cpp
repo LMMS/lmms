@@ -86,7 +86,7 @@ MidiCCRackView::MidiCCRackView() :
 	// Adds the controller knobs
 	for(int i = 0; i < MIDI_CC_MAX_CONTROLLERS; i++){
 		m_controllerKnob[i] = new Knob( knobBright_26 );
-		m_controllerKnob[i]->setLabel( QString("CC %1").arg(QString::number(i + 1)) );
+		m_controllerKnob[i]->setLabel( QString("CC %1").arg(QString::number(i)) );
 		knobsAreaLayout->addWidget( m_controllerKnob[i], i/3, i%3 );
 	}
 

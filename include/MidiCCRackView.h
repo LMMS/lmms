@@ -11,7 +11,7 @@
 #include "Knob.h"
 #include "TrackContainer.h"
 
-const int MIDI_CC_MAX_CONTROLLERS = 127;
+const int MIDI_CC_MAX_CONTROLLERS = 128;
 
 class InstrumentTrack;
 
