@@ -43,9 +43,6 @@ private:
 
 	Knob *m_controllerKnob[MIDI_CC_MAX_CONTROLLERS]; // Holds the knob widgets for each controller
 
-//protected:
-//	void closeEvent( QCloseEvent * _ce ) override;
-
 };
 
 #endif
