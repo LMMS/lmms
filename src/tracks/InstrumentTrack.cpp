@@ -795,6 +795,15 @@ void InstrumentTrack::saveTrackSpecificSettings( QDomDocument& doc, QDomElement 
 	m_baseNoteModel.saveSettings( doc, thisElement, "basenote" );
 	m_useMasterPitchModel.saveSettings( doc, thisElement, "usemasterpitch");
 
+	// Save MIDI CC stuff
+	m_midiCCEnable->saveSettings( doc, thisElement, "enablecc" );
+	QDomElement midiCC = doc.createElement( "midicontrollers" );
+	thisElement.appendChild( midiCC );
+	for( int i = 0; i < MIDI_CC_MAX_CONTROLLERS; ++i )
+	{
+		m_midiCCModel[i]->saveSettings( doc, midiCC, "cc" + QString::number(i) );
+	}
+
 	if( m_instrument != NULL )
 	{
 		QDomElement i = doc.createElement( "instrument" );
@@ -850,6 +859,9 @@ void InstrumentTrack::loadTrackSpecificSettings( const QDomElement & thisElement
 	m_baseNoteModel.loadSettings( thisElement, "basenote" );
 	m_useMasterPitchModel.loadSettings( thisElement, "usemasterpitch");
 
+	// Load MIDI CC stuff
+	m_midiCCEnable->loadSettings( thisElement, "enablecc" );
+
 	// clear effect-chain just in case we load an old preset without FX-data
 	m_audioPort.effects()->clear();
 
@@ -895,6 +907,13 @@ void InstrumentTrack::loadTrackSpecificSettings( const QDomElement & thisElement
 						node.toElement().attribute("name"), this, &key);
 					m_instrument->restoreState(node.firstChildElement());
 					emit instrumentChanged();
+				}
+			}
+			else if(node.nodeName() == "midicontrollers")
+			{
+				for( int i = 0; i < MIDI_CC_MAX_CONTROLLERS; ++i )
+				{
+					m_midiCCModel[i]->loadSettings( node.toElement(), "cc" + QString::number(i) );
 				}
 			}
 			// compat code - if node-name doesn't match any known
