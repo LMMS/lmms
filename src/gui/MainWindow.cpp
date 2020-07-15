@@ -541,7 +541,7 @@ void MainWindow::finalize()
 	ToolButton * midi_cc_rack_window = new ToolButton(
 					embed::getIconPixmap( "midi_cc_rack" ),
 					tr( "Show/hide MIDI CC rack") +
-								" (F12)",
+								" (Ctrl+8)",
 					this, SLOT( toggleMidiCCRack() ),
 								m_toolBar );
 	midi_cc_rack_window->setShortcut( Qt::CTRL + Qt::Key_8 );
