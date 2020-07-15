@@ -295,6 +295,8 @@ public slots:
 	void cut();
 	void remove();
 	void update() override;
+	void changeSelectedColor( QColor & );
+	void disableSelectedColor();
 
 protected:
 	virtual void constructContextMenu( QMenu * )
@@ -356,6 +358,7 @@ private:
 	QColor m_mutedColor;
 	QColor m_mutedBackgroundColor;
 	QColor m_selectedColor;
+	QColor m_customSelectedColor;
 	QColor m_textColor;
 	QColor m_textBackgroundColor;
 	QColor m_textShadowColor;
@@ -363,6 +366,8 @@ private:
 	bool m_gradient;
 	QSize m_mouseHotspotHand; // QSize must be used because QPoint isn't supported by property system
 	bool m_cursorSetYet;
+
+	bool m_usesCustomSelectedColor;
 
 	bool m_needsUpdate;
 	inline void setInitialPos( QPoint pos )
