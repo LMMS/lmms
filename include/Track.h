@@ -482,9 +482,16 @@ class TrackOperationsWidget : public QWidget
 public:
 	TrackOperationsWidget( TrackView * parent );
 	~TrackOperationsWidget();
+	
+	/*void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
+	void loadSettings( const QDomElement & _this ) override;*/
 
 	void setBackgroundColor( QColor & );
-	QColor backgroundColor();
+	
+	void setTrackHasColor( bool b )
+	{
+		hasColor = b;
+	}
 
 
 protected:
@@ -502,6 +509,13 @@ private slots:
 	void recordingOn();
 	void recordingOff();
 	void clearTrack();
+	
+	void loadColorSettings( unsigned int );
+	QColor backgroundColor();
+	bool trackHasColor()
+	{
+		return hasColor;
+	}
 
 private:
 	static QPixmap * s_grip;
@@ -513,6 +527,8 @@ private:
 	PixmapButton * m_soloBtn;
 
 	QColor m_backgroundColor;
+	bool hasColor;
+	bool gradientNeedsUpdate;
 
 	friend class TrackView;
 
@@ -652,7 +668,12 @@ public:
 	{
 		return m_processingLock.tryLock();
 	}
-
+	
+	QColor backgroundColor()
+	{
+		return m_backgroundColor;
+	}
+	
 	BoolModel* getMutedModel();
 
 public slots:
@@ -684,6 +705,9 @@ private:
 	tcoVector m_trackContentObjects;
 
 	QMutex m_processingLock;
+	
+	QColor m_backgroundColor;
+	bool hasColor;
 
 	friend class TrackView;
 
@@ -692,7 +716,10 @@ signals:
 	void destroyedTrack();
 	void nameChanged();
 	void trackContentObjectAdded( TrackContentObject * );
+	void loadedColorSettings( unsigned int );
 
+	QColor requestTrackBGColor();
+	bool requestTrackHasColor();
 } ;
 
 
@@ -739,6 +766,8 @@ public:
 	{
 		return m_action == MoveTrack;
 	}
+	
+	
 
 	virtual void update();
 
@@ -790,8 +819,8 @@ private:
 
 	Track * m_track;
 	TrackContainerView * m_trackContainerView;
-
 	TrackOperationsWidget m_trackOperationsWidget;
+	
 	QWidget m_trackSettingsWidget;
 	TrackContentWidget m_trackContentWidget;
 

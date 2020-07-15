@@ -41,12 +41,12 @@
 
 #include <QColorDialog>
 #include <QLayout>
+#include <QLinearGradient>
 #include <QMenu>
 #include <QMouseEvent>
 #include <QPainter>
 #include <QStyleOption>
 #include <QVariant>
-
 
 #include "AutomationPattern.h"
 #include "AutomationTrack.h"
@@ -1859,7 +1859,10 @@ QPixmap * TrackOperationsWidget::s_grip = NULL;     /*!< grip pixmap */
  */
 TrackOperationsWidget::TrackOperationsWidget( TrackView * parent ) :
 	QWidget( parent ),             /*!< The parent widget */
-	m_trackView( parent )          /*!< The parent track view */
+	m_trackView( parent ),          /*!< The parent track view */
+	//m_backgroundColor(),
+	hasColor( false ),
+	gradientNeedsUpdate( false )
 {
 	ToolTip::add( this, tr( "Press <%1> while clicking on move-grip "
 				"to begin a new drag'n'drop action." ).arg(UI_CTRL_KEY) );
@@ -1911,6 +1914,14 @@ TrackOperationsWidget::TrackOperationsWidget( TrackView * parent ) :
 			m_trackView->trackContainerView(),
 				SLOT( deleteTrackView( TrackView * ) ),
 							Qt::QueuedConnection );
+	
+	m_backgroundColor = m_trackView->getTrack()->backgroundColor();
+	
+	if( m_backgroundColor != QColor( 0, 0, 0 ) )
+	{
+		hasColor = true;
+	}
+	
 }
 
 
@@ -1924,6 +1935,23 @@ TrackOperationsWidget::~TrackOperationsWidget()
 }
 
 
+/*void TrackOperationsWidget::saveSettings( QDomDocument & _doc, QDomElement & _this )
+{
+	_this.setAttribute( "type", "trackopwidget" );
+	_this.setAttribute( "trackcolor", m_backgroundColor.rgb() );
+	_this.setAttribute( "hascolor", hasColor );
+}
+
+void TrackOperationsWidget::loadSettings( const QDomElement & _this )
+{
+	if( _this.hasAttribute( "hascolor" ) )
+	{
+		hasColor = _this.attribute( "hascolor" ).toInt();
+		m_backgroundColor.setRgb( _this.attribute( "trackcolor" ) );
+	}
+	
+	update();
+}*/
 
 
 /*! \brief Respond to trackOperationsWidget mouse events
@@ -1973,7 +2001,20 @@ void TrackOperationsWidget::mousePressEvent( QMouseEvent * me )
 void TrackOperationsWidget::paintEvent( QPaintEvent * pe )
 {
 	QPainter p( this );
-	p.fillRect( rect(), palette().brush(QPalette::Background) );
+	
+	if( hasColor ) 
+	{
+		QLinearGradient gradient( rect().bottomLeft(), rect().bottomRight() );
+		gradient.setColorAt( 0, m_backgroundColor );
+		gradient.setColorAt( 0.8, palette().brush(QPalette::Background).color() );
+		gradient.setColorAt( 1, palette().brush(QPalette::Background).color() );
+		
+		p.fillRect( rect(), gradient );
+	}
+	else
+	{
+		p.fillRect( rect(), palette().brush(QPalette::Background) );
+	}
 
 	if( m_trackView->isMovingTrack() == false )
 	{
@@ -1988,6 +2029,12 @@ void TrackOperationsWidget::paintEvent( QPaintEvent * pe )
 							"track_op_grip_c" ) );
 
 		p.drawPixmap( 2, 2, *s_grip );
+	}
+		
+	if( gradientNeedsUpdate )
+	{
+		gradientNeedsUpdate = false;
+		update();
 	}
 }
 
@@ -2058,12 +2105,16 @@ void TrackOperationsWidget::changeTrackColor()
 	{ return; }
 	
 	m_backgroundColor = new_color;
+	hasColor = true;
 	emit colorChanged( m_backgroundColor );
+	gradientNeedsUpdate = true;
 }
 
 void TrackOperationsWidget::resetTrackColor()
 {
+	hasColor = false;
 	emit colorReset();
+	gradientNeedsUpdate = true;
 }
 
 
@@ -2129,6 +2180,14 @@ void TrackOperationsWidget::toggleRecording( bool on )
 }
 
 
+void TrackOperationsWidget::loadColorSettings( unsigned int c )
+{
+	m_backgroundColor.setRgb( c );
+	setTrackHasColor( true );
+	gradientNeedsUpdate = true;
+	update();
+}
+
 
 void TrackOperationsWidget::recordingOn()
 {
@@ -2166,7 +2225,9 @@ Track::Track( TrackTypes type, TrackContainer * tc ) :
 	m_soloModel( false, this, tr( "Solo" ) ),
 					/*!< For controlling track soloing */
 	m_simpleSerializingMode( false ),
-	m_trackContentObjects()         /*!< The track content objects (segments) */
+	m_trackContentObjects(),        /*!< The track content objects (segments) */
+	m_backgroundColor( 0, 0, 0 ),
+	hasColor( false )
 {
 	m_trackContainer->addTrack( this );
 	m_height = -1;
@@ -2311,7 +2372,17 @@ void Track::saveSettings( QDomDocument & doc, QDomElement & element )
 	{
 		element.setAttribute( "trackheight", m_height );
 	}
-
+	
+	if( hasColor )
+	{
+		element.setAttribute( "trackbgcolor", m_backgroundColor.rgb() );
+		element.setAttribute( "hascolor", 1 );
+	}
+	else
+	{
+		element.setAttribute( "hascolor", 0 );
+	}
+	
 	QDomElement tsDe = doc.createElement( nodeName() );
 	// let actual track (InstrumentTrack, bbTrack, sampleTrack etc.) save
 	// its settings
@@ -2363,6 +2434,17 @@ void Track::loadSettings( const QDomElement & element )
 	// Get the mutedBeforeSolo value so we can recover the muted state if any solo was active.
 	// Older project files that didn't have this attribute will set the value to false (issue 5562)
 	m_mutedBeforeSolo = QVariant( element.attribute( "mutedBeforeSolo", "0" ) ).toBool();
+
+	if( element.hasAttribute( "hascolor" ) )
+	{
+		unsigned int loadedHasColor = element.attribute( "hascolor" ).toUInt();
+		if( loadedHasColor == 1 )
+		{
+			unsigned int loadedColor = element.attribute( "trackbgcolor" ).toUInt();
+			m_backgroundColor.setRgba( loadedColor );
+			hasColor = true;
+		}
+	}
 
 	if( m_simpleSerializingMode )
 	{
@@ -2425,11 +2507,8 @@ void Track::loadSettings( const QDomElement & element )
  */
 TrackContentObject * Track::addTCO( TrackContentObject * tco )
 {
-	if ( m_trackContentObjects.size() >= 1 )
-	{
-		tco->setColor( m_trackContentObjects[0]->colorObj() );
-		tco->setUseStyleColor( m_trackContentObjects[0]->useStyleColor() );
-	}
+	tco->setColor( m_backgroundColor );
+	tco->setUseStyleColor( ! hasColor );
 	
 	m_trackContentObjects.push_back( tco );
 
@@ -2737,6 +2816,8 @@ void Track::trackColorChanged( QColor & c )
 	{
 		m_trackContentObjects[i]->setBGColor(c);
 	}
+	hasColor = true;
+	m_backgroundColor = c;
 }
 
 void Track::trackColorReset()
@@ -2745,6 +2826,7 @@ void Track::trackColorReset()
 	{
 		m_trackContentObjects[i]->resetColor();
 	}
+	hasColor = false;
 }
 
 
@@ -2822,6 +2904,15 @@ TrackView::TrackView( Track * track, TrackContainerView * tcv ) :
 			
 	connect( &m_trackOperationsWidget, SIGNAL( colorReset() ),
 			m_track, SLOT( trackColorReset() ) );
+	
+	connect( m_track, SIGNAL( loadedColorSettings( unsigned int ) ),
+			&m_trackOperationsWidget, SLOT( loadColorSettings( unsigned int ) ) );
+			
+	connect( m_track, SIGNAL( requestTrackBGColor() ),
+			&m_trackOperationsWidget, SLOT( backgroundColor() ) );
+			
+	connect( m_track, SIGNAL( requestTrackHasColor() ),
+			&m_trackOperationsWidget, SLOT( trackHasColor() ) );
 			
 	// create views for already existing TCOs
 	for( Track::tcoVector::iterator it =
