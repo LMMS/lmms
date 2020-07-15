@@ -511,6 +511,7 @@ private slots:
 	void clearTrack();
 	
 	void loadColorSettings( unsigned int );
+	void updateColorGradient();
 	QColor backgroundColor();
 	bool trackHasColor()
 	{

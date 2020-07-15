@@ -1860,7 +1860,6 @@ QPixmap * TrackOperationsWidget::s_grip = NULL;     /*!< grip pixmap */
 TrackOperationsWidget::TrackOperationsWidget( TrackView * parent ) :
 	QWidget( parent ),             /*!< The parent widget */
 	m_trackView( parent ),          /*!< The parent track view */
-	//m_backgroundColor(),
 	hasColor( false ),
 	gradientNeedsUpdate( false )
 {
@@ -1915,6 +1914,9 @@ TrackOperationsWidget::TrackOperationsWidget( TrackView * parent ) :
 				SLOT( deleteTrackView( TrackView * ) ),
 							Qt::QueuedConnection );
 	
+	connect( m_trackView->getTrack()->getMutedModel(), SIGNAL( dataChanged() ),
+			this, SLOT( updateColorGradient() ) );
+	
 	m_backgroundColor = m_trackView->getTrack()->backgroundColor();
 	
 	if( m_backgroundColor != QColor( 0, 0, 0 ) )
@@ -1933,25 +1935,6 @@ TrackOperationsWidget::TrackOperationsWidget( TrackView * parent ) :
 TrackOperationsWidget::~TrackOperationsWidget()
 {
 }
-
-
-/*void TrackOperationsWidget::saveSettings( QDomDocument & _doc, QDomElement & _this )
-{
-	_this.setAttribute( "type", "trackopwidget" );
-	_this.setAttribute( "trackcolor", m_backgroundColor.rgb() );
-	_this.setAttribute( "hascolor", hasColor );
-}
-
-void TrackOperationsWidget::loadSettings( const QDomElement & _this )
-{
-	if( _this.hasAttribute( "hascolor" ) )
-	{
-		hasColor = _this.attribute( "hascolor" ).toInt();
-		m_backgroundColor.setRgb( _this.attribute( "trackcolor" ) );
-	}
-	
-	update();
-}*/
 
 
 /*! \brief Respond to trackOperationsWidget mouse events
@@ -2002,7 +1985,7 @@ void TrackOperationsWidget::paintEvent( QPaintEvent * pe )
 {
 	QPainter p( this );
 	
-	if( hasColor ) 
+	if( hasColor && ! m_trackView->getTrack()->getMutedModel()->value() ) 
 	{
 		QLinearGradient gradient( rect().bottomLeft(), rect().bottomRight() );
 		gradient.setColorAt( 0, m_backgroundColor );
@@ -2164,6 +2147,21 @@ void TrackOperationsWidget::updateMenu()
 						tr( "Reset color to default" ), this, SLOT( resetTrackColor() ) );
 }
 
+void TrackOperationsWidget::updateColorGradient()
+{
+	gradientNeedsUpdate = true;
+	update();
+}
+
+
+void TrackOperationsWidget::loadColorSettings( unsigned int c )
+{
+	m_backgroundColor.setRgb( c );
+	setTrackHasColor( true );
+	gradientNeedsUpdate = true;
+	update();
+}
+
 
 void TrackOperationsWidget::toggleRecording( bool on )
 {
@@ -2177,15 +2175,6 @@ void TrackOperationsWidget::toggleRecording( bool on )
 		}
 		atv->update();
 	}
-}
-
-
-void TrackOperationsWidget::loadColorSettings( unsigned int c )
-{
-	m_backgroundColor.setRgb( c );
-	setTrackHasColor( true );
-	gradientNeedsUpdate = true;
-	update();
 }
 
 
