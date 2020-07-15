@@ -134,18 +134,12 @@ InstrumentTrack::InstrumentTrack( TrackContainer* tc ) :
 
 	// Initialize the MIDI CC controller models and connect them to the method that processes
 	// the midi cc events
-	QSignalMapper *midiCCSignalMapper = new QSignalMapper( this );
-
 	for( int i = 0; i < MIDI_CC_MAX_CONTROLLERS; ++i )
 	{
 		m_midiCCModel[i] = new FloatModel(0.0f, 0.0f, 127.0f, 1.0f, NULL, QString("CC Controller ") + QString::number(i));
-		connect( m_midiCCModel[i], SIGNAL( dataChanged() ),
-			midiCCSignalMapper, SLOT( map() ) );
-		midiCCSignalMapper->setMapping( m_midiCCModel[i], i );
+		connect( m_midiCCModel[i], &FloatModel::dataChanged,
+			this, [this, i]{ processCCEvent(i); }, Qt::DirectConnection );
 	}
-	connect( midiCCSignalMapper, SIGNAL( mapped(int) ),
-		this, SLOT( processCCEvent(int) ) );
-
 
 	setName( tr( "Default preset" ) );
 
