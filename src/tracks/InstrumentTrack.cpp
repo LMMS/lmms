@@ -35,7 +35,6 @@
 #include <QMessageBox>
 #include <QMdiSubWindow>
 #include <QPainter>
-#include <QSignalMapper>
 
 #include "FileDialog.h"
 #include "InstrumentTrack.h"
