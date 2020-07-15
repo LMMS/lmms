@@ -1,18 +1,18 @@
-#include "DiginstrumentPlugin.h"
+#include "AnalyzerPlugin.h"
 
 extern "C"
 {
 
-	Plugin::Descriptor PLUGIN_EXPORT diginstrument_plugin_descriptor =
+	Plugin::Descriptor PLUGIN_EXPORT diginstrument_spectral_analyzer_plugin_descriptor =
 		{
 			STRINGIFY(PLUGIN_NAME),
-			"Diginstrument",
+			"Diginstrument Spectral Analyzer",
 			QT_TRANSLATE_NOOP("pluginBrowser",
 							  "WIP"
 							  "Test"),
 			"Máté Szokolai",
 			0x0110,
-			Plugin::Instrument,
+			Plugin::Tool,
 			new PluginPixmapLoader("logo"),
 			NULL,
 			NULL};
@@ -20,75 +20,40 @@ extern "C"
 	// necessary for getting instance out of shared lib
 	PLUGIN_EXPORT Plugin *lmms_plugin_main(Model *model, void *)
 	{
-		return new DiginstrumentPlugin(static_cast<InstrumentTrack *>(model));
+		return new AnalyzerPlugin();
 	}
 }
 
-DiginstrumentPlugin::DiginstrumentPlugin(InstrumentTrack *_instrument_track) : Instrument(_instrument_track, &diginstrument_plugin_descriptor)
+AnalyzerPlugin::AnalyzerPlugin() : ToolPlugin(&diginstrument_spectral_analyzer_plugin_descriptor, NULL)
 {
 	/*TODO */
-	synth.setSampleRate(Engine::mixer()->processingSampleRate());
 }
 
-DiginstrumentPlugin::~DiginstrumentPlugin() {}
+AnalyzerPlugin::~AnalyzerPlugin() {}
 
-PluginView *DiginstrumentPlugin::instantiateView(QWidget *_parent)
+PluginView *AnalyzerPlugin::instantiateView(QWidget *_parent)
 {
-	return new DiginstrumentView(this, _parent);
+	return new AnalyzerView(this);
 }
 
-void DiginstrumentPlugin::loadSettings(const QDomElement &_this) {}
-void DiginstrumentPlugin::saveSettings(QDomDocument &_doc, QDomElement &_parent) {}
+void AnalyzerPlugin::loadSettings(const QDomElement &_this) {}
+void AnalyzerPlugin::saveSettings(QDomDocument &_doc, QDomElement &_parent) {}
 
-QString DiginstrumentPlugin::nodeName() const
-{
-	return "TEST";
-}
-
-void DiginstrumentPlugin::playNote(NotePlayHandle *noteHandle,
-								   sampleFrame *_working_buf)
-{
-	/*TMP*/
-	const double startTime = noteHandle->totalFramesPlayed() / (double)Engine::mixer()->processingSampleRate();
-	const auto spectrum = inst.getSpectrum({noteHandle->frequency(), startTime});
-	auto audioData = this->synth.playNote(spectrum, noteHandle->framesLeftForCurrentPeriod(), noteHandle->totalFramesPlayed(), /*tmp*/ m_sampleBuffer.sampleRate());
-	/*tmp: stereo*/
-	unsigned int counter = 0;
-	unsigned int offset = noteHandle->noteOffset();
-	for (auto frame : audioData)
-	{
-		_working_buf[counter + offset][0] = _working_buf[counter + offset][1] = frame;
-		counter++;
-	}
-	applyRelease(_working_buf, noteHandle);
-	instrumentTrack()->processAudioBuffer(_working_buf, audioData.size() + noteHandle->noteOffset(), noteHandle);
-}
-
-void DiginstrumentPlugin::deleteNotePluginData(NotePlayHandle *_note_to_play)
-{
-}
-
-f_cnt_t DiginstrumentPlugin::beatLen(NotePlayHandle *_n) const
-{
-	return 0;
-}
-
-QString DiginstrumentPlugin::fullDisplayName() const
+QString AnalyzerPlugin::nodeName() const
 {
 	return "TEST";
 }
 
-void DiginstrumentPlugin::sampleRateChanged()
+QString AnalyzerPlugin::fullDisplayName() const
 {
-	/*TODO*/
-	this->synth.setSampleRate(Engine::mixer()->processingSampleRate());
+	return "TEST";
 }
 
 //TMP
-std::string DiginstrumentPlugin::setAudioFile(const QString &_audio_file)
+std::string AnalyzerPlugin::setAudioFile(const QString &_audio_file)
 {
 	m_sampleBuffer.setAudioFile(_audio_file);
-	std::vector<double> sample(m_sampleBuffer.frames());
+	/*std::vector<double> sample(m_sampleBuffer.frames());
 	for (int i = 0; i < sample.size(); i++)
 	{
 		//tmp: left only
@@ -96,7 +61,7 @@ std::string DiginstrumentPlugin::setAudioFile(const QString &_audio_file)
 	}
 	const int level =24;
 	CWT transform("morlet", 6, level);
-	transform(sample);
+	transform(sample);*/
 
 	//tmp: outputs
 	//TODO
@@ -112,13 +77,13 @@ std::string DiginstrumentPlugin::setAudioFile(const QString &_audio_file)
 	const double label = 440;
 	const double transformStep = 0.001*(double)m_sampleBuffer.sampleRate();
 
-	inst = Diginstrument::Interpolator<double, SplineSpectrum<double, 4>>();
+	//inst = Analyzer::Interpolator<double, SplineSpectrum<double, 4>>();
 	//add empty spectrum to end
-	inst.addSpectrum(SplineSpectrum<double, 4>((double)m_sampleBuffer.frames() / (double)m_sampleBuffer.sampleRate()), {label, (double)m_sampleBuffer.frames() / (double)m_sampleBuffer.sampleRate()});
-	SpectrumFitter<double, 4> fitter(1.25);
+	//inst.addSpectrum(SplineSpectrum<double, 4>((double)m_sampleBuffer.frames() / (double)m_sampleBuffer.sampleRate()), {label, (double)m_sampleBuffer.frames() / (double)m_sampleBuffer.sampleRate()});
+	//SpectrumFitter<double, 4> fitter(1.25);
 
 	//new loop
-	for (int i = 0; i<m_sampleBuffer.frames(); i+=transformStep)
+	/*for (int i = 0; i<m_sampleBuffer.frames(); i+=transformStep)
 	{
 		const auto momentarySpectrum = transform[i];
 		std::vector<std::vector<double>> rawSpectrum;
@@ -146,7 +111,7 @@ std::string DiginstrumentPlugin::setAudioFile(const QString &_audio_file)
 
 		//tmp: note: no checks ,just rvalue insert
 		//tmp: no peak approximation
-		//const auto peaksAndValleys = Diginstrument::PeakAndValleyApproximation(Extrema::Differential::intermixed(rawSpectrum.begin(), rawSpectrum.end()));
+		//const auto peaksAndValleys = Analyzer::PeakAndValleyApproximation(Extrema::Differential::intermixed(rawSpectrum.begin(), rawSpectrum.end()));
 		const auto peaksAndValleys = Extrema::Differential::intermixed(rawSpectrum.begin(), rawSpectrum.end());
 		//tmp: peak output
 		for (auto p : peaksAndValleys)
@@ -170,7 +135,7 @@ std::string DiginstrumentPlugin::setAudioFile(const QString &_audio_file)
 			//tmp: fix frequency label
 			, {label, (double)i / (double)m_sampleBuffer.sampleRate()}
 		);
-	}
+	}*/
 
 	// int rejected = 0;
 	// int noComponents = 0;

@@ -1,10 +1,10 @@
 #pragma once
 
 #include "MultidimensionalNeighbourMap.hpp"
-#include "Spectrum.hpp"
-#include "SplineSpectrum.hpp"
-#include "Interpolation.hpp"
-#include "PeakMatcher.h"
+#include "../common/Spectrum.hpp"
+#include "../common/SplineSpectrum.hpp"
+#include "../common/Interpolation.hpp"
+#include "../common/PeakMatcher.h"
 
 #include <deque>
 #include <algorithm>

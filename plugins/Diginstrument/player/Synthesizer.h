@@ -5,9 +5,9 @@
 #include <algorithm>
 #include <set>
 
-#include "Spectrum.hpp"
-#include "Interpolation.hpp"
-#include "PeakMatcher.h"
+#include "../common/Spectrum.hpp"
+#include "../common/Interpolation.hpp"
+#include "../common/PeakMatcher.h"
 
 namespace Diginstrument
 {

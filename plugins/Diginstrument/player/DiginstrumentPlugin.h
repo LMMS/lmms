@@ -17,15 +17,15 @@
 #include "Song.h"
 
 /*tmp*/
-#include "CWT.hpp"
-#include "Extrema.hpp"
-#include "Approximation.hpp"
-#include "Interpolation.hpp"
-#include "SplineFitter.hpp"
-#include "PiecewiseBSpline.hpp"
-#include "SpectrumFitter.hpp"
-#include "SplineSpectrum.hpp"
-#include "PeakApproximation.h"
+//#include "CWT.hpp"
+//#include "Extrema.hpp"
+#include "../common/Approximation.hpp"
+#include "../common/Interpolation.hpp"
+//#include "SplineFitter.hpp"
+#include "../common/PiecewiseBSpline.hpp"
+//#include "SpectrumFitter.hpp"
+#include "../common/SplineSpectrum.hpp"
+//#include "PeakApproximation.h"
 #include <string>
 #include <sstream>
 #include <iostream>

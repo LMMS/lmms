@@ -4,7 +4,7 @@
 #include <iterator>
 #include <algorithm>
 
-#include "Intersection.hpp"
+#include "../common/Intersection.hpp"
 
 //tmp
 #include <iostream>
