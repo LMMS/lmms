@@ -917,18 +917,13 @@ void PatternView::paintEvent( QPaintEvent * )
 	bool const muted = m_pat->getTrack()->isMuted() || m_pat->isMuted();
 	bool current = gui->pianoRoll()->currentPattern() == m_pat;
 	bool beatPattern = m_pat->m_patternType == Pattern::BeatPattern;
+	bool beatTrack = m_pat->getTrack()->type() == Track::BBTrack;
 
-	// state: selected, normal, beat pattern, muted
-	/*QColor c = isSelected() ? selectedColor() : ( ( !muted && !m_pat->useStyleColor() )
-		? painter.background().color() : ( m_pat->useStyleColor()
-		? m_pat->colorObj() : mutedBackgroundColor() ) );*/
-	/*QColor c = isSelected() ? selectedColor() : ( muted ? mutedBackgroundColor()
-		: ( m_pat->useStyleColor() ? painter.background().color()
-		: m_pat->colorObj() ) );*/
-	QColor c = isSelected() ? selectedColor() : ( muted
-		? mutedBackgroundColor() : ( m_pat->empty()
-		? QColor ( 48, 48, 48 ) : ( ! m_pat->useStyleColor()
-		? m_pat->colorObj() : painter.background().color() ) ) );
+	// state: selected, normal, beat pattern, muted, colored
+	QColor c = isSelected() ? selectedColor() : ( ( !muted && m_pat->useStyleColor() && !beatPattern )
+		? painter.background().color() : ( beatPattern
+		? BBPatternBackground() : ( muted
+		? mutedBackgroundColor() : m_pat->colorObj() ) ) );
 
 	// invert the gradient for the background in the B&B editor
 	QLinearGradient lingrad( 0, 0, 0, height() );
