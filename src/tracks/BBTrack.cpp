@@ -363,10 +363,12 @@ void BBTCOView::setColor( QColor new_color )
 	if( new_color.rgb() != m_bbTCO->color() )
 	{
 		m_bbTCO->setColor( new_color );
-		m_bbTCO->setUseStyleColor( false );
-		Engine::getSong()->setModified();
-		update();
 	}
+	
+	m_bbTCO->setUseStyleColor( false );
+	Engine::getSong()->setModified();
+	update();
+	
 	//BBTrack::setLastTCOColor( new_color );
 }
 

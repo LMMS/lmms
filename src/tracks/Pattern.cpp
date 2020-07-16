@@ -681,13 +681,14 @@ void PatternView::changeName()
 
 void PatternView::setColor( QColor new_color )
 {
+	// change color only if it is different
 	if( new_color.rgb() != m_pat->color() )
-	{
-		m_pat->setColor( new_color );
-		m_pat->setUseStyleColor( false );
-		Engine::getSong()->setModified();
-		update();
-	}
+	{ m_pat->setColor( new_color ); }
+	
+	// force TCO to use color
+	m_pat->setUseStyleColor( false );
+	Engine::getSong()->setModified();
+	update();
 }
 
 void PatternView::trackColorReset()

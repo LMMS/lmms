@@ -175,10 +175,11 @@ void AutomationPatternView::setColor( QColor new_color )
 	if( new_color.rgb() != m_pat->color() )
 	{
 		m_pat->setColor( new_color );
-		m_pat->setUseStyleColor( false );
-		Engine::getSong()->setModified();
-		update();
 	}
+	
+	m_pat->setUseStyleColor( false );
+	Engine::getSong()->setModified();
+	update();
 }
 
 void AutomationPatternView::trackColorReset()

@@ -600,10 +600,11 @@ void SampleTCOView::setColor( QColor new_color )
 	if( new_color.rgb() != m_tco->color() )
 	{
 		m_tco->setColor( new_color );
-		m_tco->setUseStyleColor( false );
-		Engine::getSong()->setModified();
-		update();
 	}
+	
+	m_tco->setUseStyleColor( false );
+	Engine::getSong()->setModified();
+	update();
 }
 
 void SampleTCOView::trackColorReset()
