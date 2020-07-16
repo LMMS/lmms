@@ -302,8 +302,8 @@ TrackContentObjectView::TrackContentObjectView( TrackContentObject * tco,
 	m_gradient( true ),
 	m_mouseHotspotHand( 0, 0 ),
 	m_cursorSetYet( false ),
-	m_needsUpdate( true ),
-	m_usesCustomSelectedColor( ! m_tco->useStyleColor() )
+	m_usesCustomSelectedColor( ! m_tco->useStyleColor() ),
+	m_needsUpdate( true )
 {
 	if( s_textFloat == NULL )
 	{
