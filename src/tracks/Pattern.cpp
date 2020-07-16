@@ -917,7 +917,6 @@ void PatternView::paintEvent( QPaintEvent * )
 	bool const muted = m_pat->getTrack()->isMuted() || m_pat->isMuted();
 	bool current = gui->pianoRoll()->currentPattern() == m_pat;
 	bool beatPattern = m_pat->m_patternType == Pattern::BeatPattern;
-	bool beatTrack = m_pat->getTrack()->type() == Track::BBTrack;
 
 	// state: selected, normal, beat pattern, muted, colored
 	QColor c = isSelected() ? selectedColor() : ( ( !muted && m_pat->useStyleColor() && !beatPattern )
