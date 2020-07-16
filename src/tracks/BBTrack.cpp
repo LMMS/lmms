@@ -95,8 +95,10 @@ void BBTCO::loadSettings( const QDomElement & element )
 	// for files saved in 1.3-onwards
 	if( element.hasAttribute( "stylecolor" ) )
 	{
+		QColor loadedColor;
+		loadedColor.setRgb( element.attribute( "color" ).toUInt() );
 		setUseStyleColor( element.attribute( "stylecolor" ).toUInt() );
-		setColor( element.attribute( "color" ) );
+		setColor( loadedColor );
 	}
 	
 	// for files saved before 1.3
