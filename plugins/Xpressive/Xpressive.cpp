@@ -877,6 +877,11 @@ XpressiveHelpView::XpressiveHelpView():QTextEdit(s_helpText)
 	parentWidget()->setAttribute( Qt::WA_DeleteOnClose, false );
 	parentWidget()->setWindowIcon( PLUGIN_NAME::getIconPixmap( "logo" ) );
 	parentWidget()->setFixedSize( 300, 500);
+	
+	// No maximize button
+	Qt::WindowFlags flags = parentWidget()->windowFlags();
+	flags &= ~Qt::WindowMaximizeButtonHint;
+	parentWidget()->setWindowFlags( flags );
 }
 
 void XpressiveView::helpClicked() {
