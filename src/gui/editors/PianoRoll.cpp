@@ -703,11 +703,10 @@ void PianoRoll::glueNotes()
 			if ((*note)->key() == (*nextNote)->key()
 				&& (*nextNote)->pos() >= (*note)->pos()
 				&& (*nextNote)->pos() <= (*note)->pos()
-				+ (*note)->length())
+				+ qMax(MidiTime(0), (*note)->length()))
 			{
-				(*note)->setLength((*note)->length() +
-						((*nextNote)->pos() + (*nextNote)->length()) -
-						((*note)->pos() + (*note)->length()));
+				(*note)->setLength(qMax((*note)->length(),
+					MidiTime((*nextNote)->endPos() - (*note)->pos())));
 				noteToRemove.push_back(*nextNote);
 				++nextNote;
 			}
