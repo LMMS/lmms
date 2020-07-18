@@ -25,7 +25,8 @@ public:
 class Synthesizer
 {
 public:
-  //std::vector<float> playNote(std::vector<std::pair<double, double>>, const unsigned int frames, const unsigned int offset);
+//TODO: is sample rate supposed to be provided here?
+  std::vector<float> playNote(const std::vector<Diginstrument::Component<double>> & components, const unsigned int frames, const unsigned int offset, const unsigned int & sampleRate);
   std::vector<float> playNote(const Spectrum<double> & spectrum, const unsigned int frames, const unsigned int offset, const unsigned int & sampleRate);
 
   void static setSampleRate(const unsigned int sampleRate);

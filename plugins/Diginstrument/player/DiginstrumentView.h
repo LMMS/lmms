@@ -4,7 +4,8 @@
 #include "DiginstrumentPlugin.h"
 
 #include <QPushButton>
-#include <QTextEdit>
+#include <QLineEdit>
+#include <QFileDialog>
 
 class DiginstrumentView : public InstrumentViewFixedSize /*TMP: fixed size */
 {
@@ -16,14 +17,13 @@ class DiginstrumentView : public InstrumentViewFixedSize /*TMP: fixed size */
     /*TODO*/
 
   protected slots:
-    void openAudioFile();
-    void copyTextEditToClipboard();
+    void openInstrumentFile();
 
   private:
 	  virtual void modelChanged( void );
 
-    QPushButton * m_openAudioFileButton;
-    QPushButton * m_copyToClipboardButton;
-    QTextEdit * m_textarea;
+    QPushButton * m_openInstrumentFileButton;
+    QLineEdit * m_nameField;
+    QLineEdit * m_typeField;
     /*TODO*/
 };

@@ -9,6 +9,30 @@
 unsigned int Diginstrument::Synthesizer::outSampleRate = DEFAULT_SAMPLE_RATE;
 std::vector<float> Diginstrument::Synthesizer::sinetable(0);
 
+std::vector<float> Diginstrument::Synthesizer::playNote(const std::vector<Diginstrument::Component<double>> & components, const unsigned int frames, const unsigned int offset, const unsigned int & sampleRate)
+{
+    std::vector<float> res(frames, 0);
+
+    for(auto & component : components)
+    {
+        //tmp
+        if (component.amplitude < 0.001)
+            continue;
+
+        const double step = component.frequency * ((double)sinetable.size() / (double)sampleRate);
+        //tmp
+        std::cout<<component.frequency<<" "<<component.amplitude<<std::endl;
+        int pos = 0;
+
+        for (int i = 0; i < frames; i++)
+        {
+            res[i]=component.amplitude * sinetable[pos];
+            pos = (int)std::round((pos + step)) % sinetable.size();
+        }
+    }
+    return res;
+}
+
 std::vector<float> Diginstrument::Synthesizer::playNote(const Spectrum<double> & spectrum, const unsigned int frames, const unsigned int offset, const unsigned int & sampleRate)
 {
     //TODO: banks

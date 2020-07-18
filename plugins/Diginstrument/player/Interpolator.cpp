@@ -10,6 +10,9 @@ std::vector<Diginstrument::Component<T>> Diginstrument::Interpolator<T, S>::getS
     std::vector<std::vector<T>> labels;
     std::vector<std::vector<S>> possiblePairs = data.getNeighbours(coordinates, labels);
 
+    //tmp
+    std::cout<<"coordinates: "<<coordinates[0]<<", "<<coordinates[1]<<std::endl;
+
     if (possiblePairs.size() == 0)
     { /*TODO: exception?*/
         return std::vector<Diginstrument::Component<T>>{};
@@ -86,24 +89,24 @@ std::vector<Diginstrument::Component<T>> Diginstrument::Interpolator<T, S>::getS
 
     return std::vector<Diginstrument::Component<T>>{};
 }
-/*
+/*tmp: un-commented linearShift and removed const from header*/
 template <typename T, class S>
 S Diginstrument::Interpolator<T, S>::linearShift(S &left, S &right, const T &target, const T &leftLabel, const T &rightLabel)
 {
-    std::cout << "shifting interpolation: " << target << ", between: " << leftLabel << ", " << rightLabel << std::endl;
+    //std::cout << "shifting interpolation: " << target << ", between: " << leftLabel << ", " << rightLabel << std::endl;
     T rightWeight = target / (rightLabel - leftLabel);
     T leftWeight = 1.0f - rightWeight;
     T leftRatio = target / leftLabel;
     T rightRatio = target / rightLabel;
     //TODO: expand to stochastics
-    std::vector<std::pair<T, T>> harmonics;
+    std::vector<Diginstrument::Component<T>> harmonics;
     for (auto &h : left.getHarmonics())
     {
-        harmonics.push_back(std::make_pair(leftRatio * h.first, leftWeight * h.second));
+        harmonics.push_back({leftRatio * h.frequency, 0, leftWeight * h.amplitude});
     }
     for (auto &h : right.getHarmonics())
     {
-        harmonics.push_back(std::make_pair(rightRatio * h.first, rightWeight * h.second));
+        harmonics.push_back({leftRatio * h.frequency, 0, leftWeight * h.amplitude});
     }
 
     //if one was empty, we dont need to accumulate
@@ -113,33 +116,34 @@ S Diginstrument::Interpolator<T, S>::linearShift(S &left, S &right, const T &tar
     }
     //accumulate energy in frequency-windows
     std::sort(harmonics.begin(), harmonics.end());
-    std::vector<std::pair<T, T>> accumulated;
+    std::vector<Diginstrument::Component<T>> accumulated;
     accumulated.reserve(harmonics.size() / 2);
     auto it = harmonics.begin();
-    T baseFrequency = it->first;
+    T baseFrequency = it->frequency;
     while (it != harmonics.end())
     {
         T accumulatedAmplitude = 0;
-        while (it != harmonics.end() && it->first <= baseFrequency + frequencyStep)
+        while (it != harmonics.end() && it->frequency <= baseFrequency + frequencyStep)
         {
-            accumulatedAmplitude += it->second;
+            accumulatedAmplitude += it->amplitude;
             it++;
         }
-        accumulated.push_back(std::make_pair(baseFrequency, accumulatedAmplitude));
+        accumulated.push_back({baseFrequency, 0, accumulatedAmplitude});
         //TODO: Debug: Invalid read of size 4
-        baseFrequency = it->first;
+        baseFrequency = it->frequency;
     }
 
     return S(target, std::move(harmonics), {});
 }
-*/
+
 //TODO: this is probably totally wrong after the introduction of phase...
-/*template <typename T, class S>
-S Diginstrument::Interpolator<T, S>::linear(S &left, S &right, const T &target, const T &leftLabel, const T &rightLabel)
+//tmp: uncommented
+template <typename T, class S>
+S Diginstrument::Interpolator<T, S>::linear(const S &left, const S &right, const T &target, const T &leftLabel, const T &rightLabel)
 {
     //TODO: think about the shifting of splinespectrum
     //TODO: MAYBE: write separate for differenct spectrum types
-    std::cout << "interpolation: " << target << ", between: " << leftLabel << ", " << rightLabel << std::endl;
+    //std::cout << "interpolation: " << target << ", between: " << leftLabel << ", " << rightLabel << std::endl;
     T rightWeight = target / (rightLabel - leftLabel);
     T leftWeight = 1.0f - rightWeight;
     //TODO: expand to stochastics
@@ -161,7 +165,7 @@ S Diginstrument::Interpolator<T, S>::linear(S &left, S &right, const T &target, 
     }
     //accumulate energy in frequency-windows 
     std::sort(harmonics.begin(), harmonics.end());
-    std::vector<std::pair<T, T>> accumulated;
+    std::vector<Diginstrument::Component<T>> accumulated;
     accumulated.reserve(harmonics.size() / 2);
     auto it = harmonics.begin();
     T baseFrequency = it->frequency;
@@ -173,38 +177,24 @@ S Diginstrument::Interpolator<T, S>::linear(S &left, S &right, const T &target, 
             accumulatedAmplitude += it->amplitude;
             it++;
         }
-        accumulated.push_back(std::make_pair(baseFrequency, accumulatedAmplitude));
+        accumulated.push_back({baseFrequency, 0, accumulatedAmplitude});
         baseFrequency = it->frequency;
     }
 
     return S(target, std::move(harmonics), {});
-}*/
-
-// template <typename T, class S>
-// Diginstrument::Interpolator<T, S>::Interpolator()
-// {
-//     //tmp: identity data
-//     this->frequencyStep = 0; //??? whats this?
-//     /*data.insert(S(2000,{std::make_pair(2000, 1), std::make_pair(4000, 0.5f), std::make_pair(6000, 0.33f), std::make_pair(8000, 0.25f)}, {}), {2000, 1, 0});
-//     data.insert(S(20, {std::make_pair(20, 1), std::make_pair(40, 0.5f), std::make_pair(60, 0.33f), std::make_pair(80, 0.25f)}, {}), {20, 1, 0});
-//     data.insert(S(40000, {std::make_pair(40000, 1)}, {}), {40000, 1, 0});*/
-
-//     //tmp: decay point
-//     /*data.insert(S(2000,{}, {}), {2000, 0, 0.5f});
-//     data.insert(S(20, {}, {}), {20, 0, 0.5f});
-//     data.insert(S(40000, {}, {}), {40000, 0, 0.5f});*/
-
-//     //tmp: add more for more neighbours, but still not full neighbourhood
-//     /*data.insert(S(2000,{}, {}), {2000, 1, 0.5f});
-//     data.insert(S(20, {}, {}), {20, 1, 0.5f});
-//     data.insert(S(40000, {}, {}), {40000, 1, 0.5f});*/
-// }
+}
 
 template <typename T, class S>
 void Diginstrument::Interpolator<T, S>::addSpectrum(const S &spectrum, std::vector<T> coordinates)
 {
     //TODO:test, check, better
     data.insert(spectrum, coordinates);
+}
+
+template <typename T, class S>
+void Diginstrument::Interpolator<T, S>::clear()
+{
+    data.clear();
 }
 
 template <typename T>

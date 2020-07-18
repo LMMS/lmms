@@ -18,11 +18,13 @@ public:
   //TODO: references?/rvalues?
   std::vector<Component<T>> getSpectrum(const std::vector<T> &coordinates);
 
+  void clear();
+
   void addSpectrum(const S &spectrum, std::vector<T> coordinates);
   void addSpectra(const std::vector<S> &spectra, std::vector<std::vector<T>> coordinates);
 
-  static S linear(const S &left,const S &right, const T &target, const T &leftLabel, const T &rightLabel);
-  static S linearShift(const S &left, const S &right, const T &target, const T &leftLabel, const T &rightLabel);
+  /*static*/ S linear(const S &left,const S &right, const T &target, const T &leftLabel, const T &rightLabel);
+  /*static*/ S linearShift( S &left, S &right, const T &target, const T &leftLabel, const T &rightLabel);
 
   Interpolator() {}
 

@@ -17,19 +17,24 @@
 #include "Song.h"
 
 /*tmp*/
-//#include "CWT.hpp"
-//#include "Extrema.hpp"
 #include "../common/Approximation.hpp"
 #include "../common/Interpolation.hpp"
-//#include "SplineFitter.hpp"
 #include "../common/PiecewiseBSpline.hpp"
-//#include "SpectrumFitter.hpp"
 #include "../common/SplineSpectrum.hpp"
-//#include "PeakApproximation.h"
-#include <string>
-#include <sstream>
+#include "../common/Spectrum.hpp"
+#include <nlohmann/json.hpp>
 #include <iostream>
-#include <fstream>
+
+using json = nlohmann::json;
+
+class InstrumentData
+{
+  //todo
+  public:
+    std::string name;
+    std::string type;
+    json _json;
+};
 
 class DiginstrumentPlugin : public Instrument
 {
@@ -69,11 +74,14 @@ private:
   friend class DiginstrumentView;
   /*TMP*/
   Diginstrument::Synthesizer synth;
-  Diginstrument::Interpolator<double, SplineSpectrum<double, 4>> inst;
+  //TODO: make inst spectrum type work - discrete only for now
+  //Diginstrument::Interpolator<double, SplineSpectrum<double, 4>> inst;
+  Diginstrument::Interpolator<double, Diginstrument::NoteSpectrum<double>> inst;
+  std::string fileName;
+  InstrumentData inst_data;
 
-  typedef SampleBuffer::handleState handleState;
-  SampleBuffer m_sampleBuffer;
-  std::string setAudioFile(const QString &_audio_file);
+  bool setInstrumentFile(const QString & fileName);
+  bool loadInstrumentFile();
 
 private slots:
   void sampleRateChanged();

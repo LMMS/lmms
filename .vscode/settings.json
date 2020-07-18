@@ -69,6 +69,11 @@
         "lu": "cpp",
         "qr": "cpp",
         "svd": "cpp",
-        "unordered_set": "cpp"
-    }
+        "unordered_set": "cpp",
+        "any": "cpp",
+        "forward_list": "cpp",
+        "valarray": "cpp",
+        "variant": "cpp"
+    },
+    "cmake.configureOnOpen": true
 }

@@ -3,6 +3,8 @@
     "spectrum_type" : "discrete",
     "coordinates" :
         [ "pitch", "time"],
+    "data_coordinates" :
+        [ "frequency", "amplitude" ],
     "spectra" :
     [
         {
