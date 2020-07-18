@@ -1148,6 +1148,10 @@ void MainWindow::updateViewMenu()
 			      tr( "Project Notes" ) + "\tCtrl+7",
 			      this, SLOT( toggleProjectNotesWin() )
 		);
+	m_viewMenu->addAction(embed::getIconPixmap( "midi_cc_rack" ),
+			      tr( "MIDI CC Rack" ) + "\tCtrl+8",
+			      this, SLOT( toggleMidiCCRack() )
+		);
 
 	m_viewMenu->addSeparator();
 	
