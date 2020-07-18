@@ -509,6 +509,7 @@ private slots:
 	void removeTrack();
 	void updateMenu();
 	void changeTrackColor();
+	void randomTrackColor();
 	void resetTrackColor();
 	void toggleRecording(bool on);
 	void recordingOn();

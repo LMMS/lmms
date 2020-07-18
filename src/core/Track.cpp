@@ -38,6 +38,8 @@
 #include "Track.h"
 
 #include <assert.h>
+#include <cstdlib>
+#include <ctime>
 
 #include <QColorDialog>
 #include <QLayout>
@@ -1945,6 +1947,8 @@ TrackOperationsWidget::TrackOperationsWidget( TrackView * parent ) :
 		hasColor = true;
 	}
 	
+	srand( time( 0 ) );
+	
 }
 
 
@@ -2097,7 +2101,8 @@ void TrackOperationsWidget::changeTrackColor()
 	
 	for( int i = 0; i < 48; i += 6 )
 	{
-		for( int j = 0; j < 6; j++ ) {
+		for( int j = 0; j < 6; j++ )
+		{
 			buffer.setHsl( qMax( 0, 44 * ( i / 6 ) - 1 ), 150 - 20 * j, 150 - 10 * j );
 			colorDialog.setStandardColor( i + j, buffer );
 		}
@@ -2118,6 +2123,31 @@ void TrackOperationsWidget::resetTrackColor()
 {
 	hasColor = false;
 	emit colorReset();
+	gradientNeedsUpdate = true;
+}
+
+void TrackOperationsWidget::randomTrackColor()
+{
+	int index = rand() % 48;
+	QColor buffer( 0, 0, 0 );
+	
+	for( int i = 0; i < 48; i += 6 )
+	{
+		for( int j = 0; j < 6; j++ )
+		{
+			if( i + j + 1 == index )
+			{
+				buffer.setHsl( qMax( 0, 44 * ( i / 6 ) - 1 ), 150 - 20 * j, 150 - 10 * j );	
+				break;
+			}
+		}
+		
+	}
+
+	m_backgroundColor = buffer;
+	emit colorChanged( m_backgroundColor );
+	
+	hasColor = true;
 	gradientNeedsUpdate = true;
 }
 
@@ -2166,6 +2196,8 @@ void TrackOperationsWidget::updateMenu()
 						tr( "Change color" ), this, SLOT( changeTrackColor() ) );
 	toMenu->addAction( embed::getIconPixmap( "colorize" ),
 						tr( "Reset color to default" ), this, SLOT( resetTrackColor() ) );
+	toMenu->addAction( embed::getIconPixmap( "colorize" ),
+						tr( "Set random color" ), this, SLOT( randomTrackColor() ) );
 }
 
 void TrackOperationsWidget::updateColorGradient()
