@@ -26,11 +26,14 @@ public:
   /*static*/ S linear(const S &left,const S &right, const T &target, const T &leftLabel, const T &rightLabel);
   /*static*/ S linearShift( S &left, S &right, const T &target, const T &leftLabel, const T &rightLabel);
 
+  //TODO: new matching from scratch, as i confused myself...
+  static S matchSpectra(const S & left, const S & right, const T &target, const T &leftLabel, const T &rightLabel);
+
   Interpolator() {}
 
 private:
   MultidimensionalNeighbourMap<T, S> data;
-  T frequencyStep;
+  static constexpr T frequencyStep = 0.001;
 };
 
 template <typename T>

@@ -6,6 +6,7 @@
 template <typename T, class S>
 std::vector<Diginstrument::Component<T>> Diginstrument::Interpolator<T, S>::getSpectrum(const std::vector<T> &coordinates)
 {
+    //TODO: make this recursive?
     std::vector<Diginstrument::Component<T>> res;
     std::vector<std::vector<T>> labels;
     std::vector<std::vector<S>> possiblePairs = data.getNeighbours(coordinates, labels);
@@ -89,6 +90,31 @@ std::vector<Diginstrument::Component<T>> Diginstrument::Interpolator<T, S>::getS
 
     return std::vector<Diginstrument::Component<T>>{};
 }
+
+template <typename T, class S>
+S Diginstrument::Interpolator<T, S>::matchSpectra(const S &left, const S &right, const T &target, const T &leftLabel, const T &rightLabel)
+{
+    //tmp
+    std::cout<<"matching splines: "<<leftLabel<<", "<<rightLabel<<" @ "<<target<<std::endl;
+    //conclusion: matching looks good
+
+    //bins
+    //if they are "close enough", consider them a bin
+    //calculate an average frequency
+    //accumulate or average amplitude?
+
+    //step 1: distinct, constant harmonics
+
+    //frequency
+    //match the peaks
+    //move matched peaks to their weighted frequency
+    //do the bin thing again, or just merge them at the above step?
+    //if a peak has no match, should i leave it or shift it too?
+
+    return Diginstrument::NoteSpectrum<double>(0,{},{});
+}
+
+
 /*tmp: un-commented linearShift and removed const from header*/
 template <typename T, class S>
 S Diginstrument::Interpolator<T, S>::linearShift(S &left, S &right, const T &target, const T &leftLabel, const T &rightLabel)
@@ -98,6 +124,7 @@ S Diginstrument::Interpolator<T, S>::linearShift(S &left, S &right, const T &tar
     T leftWeight = 1.0f - rightWeight;
     T leftRatio = target / leftLabel;
     T rightRatio = target / rightLabel;
+    //tmp
     //TODO: expand to stochastics
     std::vector<Diginstrument::Component<T>> harmonics;
     for (auto &h : left.getHarmonics())
@@ -106,7 +133,7 @@ S Diginstrument::Interpolator<T, S>::linearShift(S &left, S &right, const T &tar
     }
     for (auto &h : right.getHarmonics())
     {
-        harmonics.push_back({leftRatio * h.frequency, 0, leftWeight * h.amplitude});
+        harmonics.push_back({rightRatio * h.frequency, 0, leftWeight * h.amplitude});
     }
 
     //if one was empty, we dont need to accumulate
@@ -125,6 +152,8 @@ S Diginstrument::Interpolator<T, S>::linearShift(S &left, S &right, const T &tar
         T accumulatedAmplitude = 0;
         while (it != harmonics.end() && it->frequency <= baseFrequency + frequencyStep)
         {
+            //tmp
+            std::cout<<it->frequency<<" <= "<<baseFrequency + frequencyStep<<std::endl;
             accumulatedAmplitude += it->amplitude;
             it++;
         }

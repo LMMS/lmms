@@ -36,8 +36,11 @@ public:
 private:
   static unsigned int outSampleRate;
   static std::vector<float> sinetable;
-  std::vector<Component<double>> bank;
+  //std::vector<Component<double>> bank;
   std::vector<int> updateCounters;
+
+  //tmp
+  std::vector<int> bank;
 
   void static buildSinetable();
 };

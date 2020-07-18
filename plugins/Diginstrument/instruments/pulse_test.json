@@ -1,5 +1,5 @@
 {
-    "name" : "Testing violin",
+    "name" : "Pure Sine",
     "spectrum_type" : "discrete",
     "coordinates" :
         [ "pitch", "time"],
@@ -7,14 +7,6 @@
         [ "frequency", "amplitude" ],
     "spectra" :
     [
-        {
-            "pitch" : 440,
-            "time" : 0,
-            "components" :
-            [
-                [ 440, 1], [880, 0.5], [1320, 0.33], [1760, 0.25], [2200, 0.2]
-            ]
-        },
         {
             "pitch" : 20,
             "time" : 0,
@@ -24,27 +16,36 @@
             ]
         },
         {
-            "pitch" : 22000,
+            "pitch" : 20,
+            "time" : 0.5,
+            "components" :
+            [
+                [ 20, 0]
+            ]
+        },
+        {
+            "pitch" : 20000,
             "time" : 0,
             "components" :
             [
-                [ 22000, 1]
+                [ 20000, 1]
+            ]
+        },
+        {
+            "pitch" : 20000,
+            "time" : 0.5,
+            "components" :
+            [
+                [ 20000, 0]
             ]
         },
         {
             "pitch" : 440,
-            "time" : 1,
-            "components" : []
-        },
-        {
-            "pitch" : 20,
-            "time" : 1,
-            "components" : []
-        },
-        {
-            "pitch" : 22000,
-            "time" : 1,
-            "components" : []
+            "time" : 0,
+            "components" :
+            [
+                [ 440, 1], [455, 1]
+            ]
         }
     ]
 }
