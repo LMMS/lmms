@@ -132,6 +132,7 @@ private:
 
 	void setType( PatternTypes _new_pattern_type );
 	void checkType();
+	void adjustSteps();
 
 	void resizeToFirstTrack();
 

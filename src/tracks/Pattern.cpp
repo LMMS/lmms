@@ -55,13 +55,14 @@ QPixmap * PatternView::s_stepBtnOffLight = NULL;
 Pattern::Pattern( InstrumentTrack * _instrument_track ) :
 	TrackContentObject( _instrument_track ),
 	m_instrumentTrack( _instrument_track ),
-	m_patternType( BeatPattern ),
+	m_patternType( MelodyPattern ),
 	m_steps( MidiTime::stepsPerBar() )
 {
 	setName( _instrument_track->name() );
 	if( _instrument_track->trackContainer()
 					== Engine::getBBTrackContainer() )
 	{
+		m_patternType = Pattern::BeatPattern;
 		resizeToFirstTrack();
 	}
 	init();
@@ -218,6 +219,7 @@ Note * Pattern::addNote( const Note & _new_note, const bool _quant_pos )
 	m_notes.insert(std::upper_bound(m_notes.begin(), m_notes.end(), new_note, Note::lessThan), new_note);
 	instrumentTrack()->unlock();
 
+	adjustSteps();
 	checkType();
 	updateLength();
 
@@ -244,11 +246,18 @@ void Pattern::removeNote( Note * _note_to_del )
 		++it;
 	}
 	instrumentTrack()->unlock();
-
+	
+	adjustSteps();
 	checkType();
 	updateLength();
 
 	emit dataChanged();
+}
+
+
+void Pattern::adjustSteps()
+{
+	m_steps = qMax(1, MidiTime(m_notes.last()->pos()).nextFullBar()) * MidiTime::stepsPerBar();
 }
 
 

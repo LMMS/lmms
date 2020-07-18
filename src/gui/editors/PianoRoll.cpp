@@ -4126,6 +4126,15 @@ void PianoRoll::pasteNotes()
 			cur_note.restoreState( list.item( i ).toElement() );
 			cur_note.setPos( cur_note.pos() + Note::quantized( m_timeLine->pos(), quantization() ) );
 
+			if ((cur_note.length().getTicks() == -DefaultTicksPerBar) && (m_pattern->type() != Pattern::BeatPattern)) 
+			{
+				// the length of copied notes is set to the length of the instruments envelope
+				f_cnt_t envFrames = m_pattern->instrumentTrack()->envFrames();
+				// if notes have zero length due to rounding set the length to a small value
+				tick_t noteLength = qMax(static_cast<float>(1), envFrames / Engine::framesPerTick());
+				cur_note.setLength(MidiTime(noteLength));
+			}
+
 			// select it
 			cur_note.setSelected( true );
 
