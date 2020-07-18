@@ -92,7 +92,6 @@ InstrumentMidiIOView::InstrumentMidiIOView( QWidget* parent ) :
 	/*: This string must be be short, its width must be less than
 	 *  width of LCD spin-box of two digits */
 	m_outputChannelSpinBox->setLabel( tr( "CHAN" ) );
-	m_outputChannelSpinBox->setEnabled( false );
 	midiOutputLayout->addWidget( m_outputChannelSpinBox );
 
 	m_fixedOutputVelocitySpinBox = new LcdSpinBox( 3, m_midiOutputGroupBox );
