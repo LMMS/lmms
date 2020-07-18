@@ -247,7 +247,6 @@ void Pattern::removeNote( Note * _note_to_del )
 	}
 	instrumentTrack()->unlock();
 	
-	adjustSteps();
 	checkType();
 	updateLength();
 
