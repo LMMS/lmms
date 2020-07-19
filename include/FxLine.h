@@ -80,27 +80,6 @@ public:
 	static const int FxLineHeight;
 
 	bool eventFilter (QObject *dist, QEvent *event) override;
-	
-	/*unsigned int color()
-	{
-		return m_color.rgb();
-	}
-	void setColor( unsigned int c )
-	{
-		m_color.setRgb( c );
-	}
-	
-	bool hasColor()
-	{
-		return m_hasColor;
-	}
-	void setHasColor( bool b )
-	{
-		m_hasColor = b;
-	}*/
-	
-	/*void saveSettings( QDomElement & _this );
-	void loadSettings( const QDomElement & _this );*/
 
 private:
 	void drawFxLine( QPainter* p, const FxLine *fxLine, bool isActive, bool sendToThis, bool receiveFromThis );

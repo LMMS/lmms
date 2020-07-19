@@ -416,28 +416,6 @@ void FxLine::setStrokeInnerInactive( const QColor & c )
 	m_strokeInnerInactive = c;
 }
 
-
-/*void FxLine::saveSettings( QDomElement & _this )
-{
-	QString mixercolor = "mixercolor" + QString::number( m_channelIndex );
-	QString hascolor = "hascolor" + QString::number( m_channelIndex );
-
-	_this.setAttribute( mixercolor, m_color.rgb() );
-	_this.setAttribute( hascolor, m_hasColor );
-}
-
-void FxLine::loadSettings( const QDomElement & _this )
-{
-	QString mixercolor = "mixercolor" + QString::number( m_channelIndex );
-	QString hascolor = "hascolor" + QString::number( m_channelIndex );
-	
-	if( _this.hasAttribute( hascolor ) )
-	{
-		m_hasColor = _this.attribute( hascolor ).toUInt() == 1 ? true : false;
-		m_color.setRgb( _this.attribute( mixercolor ).toUInt() );
-	}
-}*/
-
 void FxLine::changeColor()
 {
 	QColorDialog colorDialog( Engine::fxMixer()->effectChannel( m_channelIndex )->m_color );
