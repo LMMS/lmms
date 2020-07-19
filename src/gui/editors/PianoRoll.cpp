@@ -4052,7 +4052,7 @@ void PianoRoll::updatePosition( const MidiTime & t )
 	if (pos >= m_currentPosition && pos <= m_currentPosition + width() - m_whiteKeyWidth)
 	{
 		m_positionLine->show();
-		m_positionLine->move(pos - m_currentPosition + m_whiteKeyWidth, keyAreaTop());
+		m_positionLine->move(pos - (m_positionLine->width() - 1) - m_currentPosition + m_whiteKeyWidth, keyAreaTop());
 	}
 	else
 	{
@@ -4107,6 +4107,7 @@ void PianoRoll::zoomingChanged()
 
 	m_timeLine->setPixelsPerBar( m_ppb );
 	m_stepRecorderWidget.setPixelsPerBar( m_ppb );
+	m_positionLine->zoomChange(m_zoomLevels[m_zoomingModel.value()]);
 
 	update();
 }

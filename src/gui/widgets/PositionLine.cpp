@@ -52,24 +52,26 @@ void PositionLine::paintEvent(QPaintEvent* pe)
 		c.setAlpha(153);
 		p.fillRect(rect(), c);
 	}
-
 	// If width > 1, we need the gradient
 	else
 	{
 		// Create the gradient trail behind the line
 		QLinearGradient gradient(rect().bottomLeft(), rect().bottomRight());
+		qreal w = (width() - 1.0) / width();
 
 		// If gradient is enabled, we're in focus and we're playing, enable gradient
-		if (Engine::getSong()->isPlaying() && m_hasTailGradient && 
-			Engine::getSong()->playMode() == Song::Mode_PlaySong)
+		if (m_hasTailGradient &&
+			Engine::getSong()->isPlaying() &&
+			(Engine::getSong()->playMode() == Song::Mode_PlaySong ||
+			 Engine::getSong()->playMode() == Song::Mode_PlayPattern))
 		{
 			c.setAlpha(60);
-			gradient.setColorAt((width() - 1.0)/width(), c);
+			gradient.setColorAt(w, c);
 		}
 		else
 		{
 			c.setAlpha(0);
-			gradient.setColorAt((width() - 1.0 )/width(), c);
+			gradient.setColorAt(w, c);
 		}
 
 		// Fill in the remaining parts

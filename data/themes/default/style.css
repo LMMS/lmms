@@ -150,7 +150,7 @@ QMenu::indicator:selected {
 	background-color: #101213;
 }
 
-positionLine {
+PositionLine {
 	qproperty-tailGradient: true;
 	qproperty-lineColor: rgb(255, 255, 255);
 }
