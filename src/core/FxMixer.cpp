@@ -73,7 +73,8 @@ FxChannel::FxChannel( int idx, Model * _parent ) :
 	m_lock(),
 	m_channelIndex( idx ),
 	m_queued( false ),
-	m_dependenciesMet(0)
+	m_dependenciesMet(0),
+	m_hasColor( false )
 {
 	BufferManager::clear( m_buffer, Engine::mixer()->framesPerPeriod() );
 }
@@ -741,6 +742,8 @@ void FxMixer::saveSettings( QDomDocument & _doc, QDomElement & _this )
 		ch->m_soloModel.saveSettings( _doc, fxch, "soloed" );
 		fxch.setAttribute( "num", i );
 		fxch.setAttribute( "name", ch->m_name );
+		fxch.setAttribute( "hascolor", ch->m_hasColor );
+		fxch.setAttribute( "mixercolor", ch->m_color.rgb() );
 
 		// add the channel sends
 		for( int si = 0; si < ch->m_sends.size(); ++si )
@@ -786,6 +789,11 @@ void FxMixer::loadSettings( const QDomElement & _this )
 		m_fxChannels[num]->m_muteModel.loadSettings( fxch, "muted" );
 		m_fxChannels[num]->m_soloModel.loadSettings( fxch, "soloed" );
 		m_fxChannels[num]->m_name = fxch.attribute( "name" );
+		if( fxch.hasAttribute( "hascolor" ) )
+		{
+			m_fxChannels[num]->m_hasColor = fxch.attribute( "hascolor" ).toInt();
+			m_fxChannels[num]->m_color.setRgb( fxch.attribute( "mixercolor" ).toUInt() );
+		}
 
 		m_fxChannels[num]->m_fxChain.restoreState( fxch.firstChildElement(
 			m_fxChannels[num]->m_fxChain.nodeName() ) );

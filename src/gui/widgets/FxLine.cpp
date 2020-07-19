@@ -25,6 +25,10 @@
 
 #include "FxLine.h"
 
+#include <cstdlib>
+#include <ctime>
+
+#include <QColorDialog>
 #include <QGraphicsProxyWidget>
 
 #include "CaptionMenu.h"
@@ -120,6 +124,10 @@ FxLine::FxLine( QWidget * _parent, FxMixerView * _mv, int _channelIndex ) :
 	proxyWidget->setPos( 8, 145 );
 
 	connect( m_renameLineEdit, SIGNAL( editingFinished() ), this, SLOT( renameFinished() ) );
+	
+	connect( &Engine::fxMixer()->effectChannel( m_channelIndex )->m_muteModel, SIGNAL( dataChanged() ), this, SLOT( update() ) );
+	
+	srand( time( 0 ) );
 }
 
 
@@ -148,6 +156,7 @@ void FxLine::setChannelIndex( int index )
 void FxLine::drawFxLine( QPainter* p, const FxLine *fxLine, bool isActive, bool sendToThis, bool receiveFromThis )
 {
 	QString name = Engine::fxMixer()->effectChannel( m_channelIndex )->m_name;
+	bool muted = Engine::fxMixer()->effectChannel( m_channelIndex )->m_muteModel.value();
 	QString elidedName = elideName( name );
 	if( !m_inRename && m_renameLineEdit->text() != elidedName )
 	{
@@ -157,7 +166,13 @@ void FxLine::drawFxLine( QPainter* p, const FxLine *fxLine, bool isActive, bool 
 	int width = fxLine->rect().width();
 	int height = fxLine->rect().height();
 
-	p->fillRect( fxLine->rect(), isActive ? fxLine->backgroundActive() : p->background() );
+	QColor color = muted ? ( isActive ? fxLine->backgroundActive().color() : p->background().color() )
+					: ( Engine::fxMixer()->effectChannel( m_channelIndex )->m_hasColor ? ( isActive ? Engine::fxMixer()->effectChannel( m_channelIndex )->m_color.darker( 120 ) 
+					: Engine::fxMixer()->effectChannel( m_channelIndex )->m_color.darker( 150 ) )
+					: ( isActive ? fxLine->backgroundActive().color()
+					: p->background().color() ) );
+
+	p->fillRect( fxLine->rect(), color );
 	
 	// inner border
 	p->setPen( isActive ? fxLine->strokeInnerActive() : fxLine->strokeInnerInactive() );
@@ -238,6 +253,11 @@ void FxLine::contextMenuEvent( QContextMenuEvent * )
 		contextMenu->addSeparator();
 	}
 	contextMenu->addAction( embed::getIconPixmap( "cancel" ), tr( "Remove &unused channels" ), this, SLOT( removeUnusedChannels() ) );
+	
+	contextMenu->addSeparator();
+	contextMenu->addAction( embed::getIconPixmap( "colorize" ), tr( "Set channel color" ), this, SLOT( changeColor() ) );
+	contextMenu->addAction( embed::getIconPixmap( "colorize" ), tr( "Remove channel color" ), this, SLOT( resetColor() ) );
+	contextMenu->addAction( embed::getIconPixmap( "colorize" ), tr( "Pick random channel color" ), this, SLOT( randomColor() ) );
 	contextMenu->exec( QCursor::pos() );
 	delete contextMenu;
 }
@@ -394,4 +414,80 @@ QColor FxLine::strokeInnerInactive() const
 void FxLine::setStrokeInnerInactive( const QColor & c )
 {
 	m_strokeInnerInactive = c;
+}
+
+
+/*void FxLine::saveSettings( QDomElement & _this )
+{
+	QString mixercolor = "mixercolor" + QString::number( m_channelIndex );
+	QString hascolor = "hascolor" + QString::number( m_channelIndex );
+
+	_this.setAttribute( mixercolor, m_color.rgb() );
+	_this.setAttribute( hascolor, m_hasColor );
+}
+
+void FxLine::loadSettings( const QDomElement & _this )
+{
+	QString mixercolor = "mixercolor" + QString::number( m_channelIndex );
+	QString hascolor = "hascolor" + QString::number( m_channelIndex );
+	
+	if( _this.hasAttribute( hascolor ) )
+	{
+		m_hasColor = _this.attribute( hascolor ).toUInt() == 1 ? true : false;
+		m_color.setRgb( _this.attribute( mixercolor ).toUInt() );
+	}
+}*/
+
+void FxLine::changeColor()
+{
+	QColorDialog colorDialog( Engine::fxMixer()->effectChannel( m_channelIndex )->m_color );
+	QColor buffer( 0, 0, 0 );
+	
+	for( int i = 0; i < 48; i += 6 )
+	{
+		for( int j = 0; j < 6; j++ )
+		{
+			buffer.setHsl( qMax( 0, 44 * ( i / 6 ) - 1 ), 150 - 20 * j, 140 - 10 * j );
+			colorDialog.setStandardColor( i + j, buffer );
+		}
+		
+	}
+	
+	QColor new_color = colorDialog.getColor( Engine::fxMixer()->effectChannel( m_channelIndex )->m_color );
+	if( ! new_color.isValid() )
+	{ return; }
+	
+	Engine::fxMixer()->effectChannel( m_channelIndex )->m_color = new_color;
+	Engine::fxMixer()->effectChannel( m_channelIndex )->m_hasColor = true;
+	
+	update();
+}
+
+void FxLine::resetColor()
+{
+	Engine::fxMixer()->effectChannel( m_channelIndex )->m_hasColor = false;
+	update();
+}
+
+void FxLine::randomColor()
+{
+	int index = rand() % 48;
+	QColor buffer( 0, 0, 0 );
+	
+	for( int i = 0; i < 48; i += 6 )
+	{
+		for( int j = 0; j < 6; j++ )
+		{
+			if( i + j + 1 == index )
+			{
+				buffer.setHsl( qMax( 0, 44 * ( i / 6 ) - 1 ), 150 - 20 * j, 140 - 10 * j );	
+				break;
+			}
+		}
+		
+	}
+
+	Engine::fxMixer()->effectChannel( m_channelIndex )->m_color = buffer;
+	Engine::fxMixer()->effectChannel( m_channelIndex )->m_hasColor = true;
+	update();
 }

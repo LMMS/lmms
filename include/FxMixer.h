@@ -32,6 +32,8 @@
 
 #include <atomic>
 
+#include <QColor>
+
 class FxRoute;
 typedef QVector<FxRoute *> FxRouteVector;
 
@@ -69,6 +71,9 @@ class FxChannel : public ThreadableJob
 
 		bool requiresProcessing() const override { return true; }
 		void unmuteForSolo();
+		
+		QColor m_color;
+		bool m_hasColor;
 
 	
 		std::atomic_int m_dependenciesMet;
