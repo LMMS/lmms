@@ -73,8 +73,8 @@ FxChannel::FxChannel( int idx, Model * _parent ) :
 	m_lock(),
 	m_channelIndex( idx ),
 	m_queued( false ),
-	m_dependenciesMet(0),
-	m_hasColor( false )
+	m_hasColor( false ),
+	m_dependenciesMet(0)
 {
 	BufferManager::clear( m_buffer, Engine::mixer()->framesPerPeriod() );
 }
