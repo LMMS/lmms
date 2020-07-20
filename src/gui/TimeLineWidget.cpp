@@ -130,7 +130,7 @@ void TimeLineWidget::addToolButtons( QToolBar * _tool_bar )
 
 	NStateButton * behaviourAtStop = new NStateButton( _tool_bar );
 	behaviourAtStop->addState( embed::getIconPixmap( "back_to_zero" ),
-					tr( "After stopping go back to begin" )
+					tr( "After stopping go back to beginning" )
 									);
 	behaviourAtStop->addState( embed::getIconPixmap( "back_to_start" ),
 					tr( "After stopping go back to "
@@ -140,6 +140,7 @@ void TimeLineWidget::addToolButtons( QToolBar * _tool_bar )
 					tr( "After stopping keep position" ) );
 	connect( behaviourAtStop, SIGNAL( changedState( int ) ), this,
 					SLOT( toggleBehaviourAtStop( int ) ) );
+	behaviourAtStop->changeState( 2 );
 
 	_tool_bar->addWidget( autoScroll );
 	_tool_bar->addWidget( loopPoints );
