@@ -178,6 +178,7 @@ protected:
 	void resizeEvent( QResizeEvent * re ) override;
 	void wheelEvent( QWheelEvent * we ) override;
 	void focusOutEvent( QFocusEvent * ) override;
+	void focusInEvent( QFocusEvent * ) override;
 
 	int getKey( int y ) const;
 	void drawNoteRect( QPainter & p, int x, int y,
@@ -185,7 +186,7 @@ protected:
 					const QColor & selCol, const int noteOpc, const bool borderless, bool drawNoteName );
 	void removeSelection();
 	void selectAll();
-	NoteVector getSelectedNotes();
+	NoteVector getSelectedNotes() const;
 	void selectNotesOnKey();
 	int xCoordOfTick( int tick );
 
@@ -212,7 +213,7 @@ protected slots:
 	void copySelectedNotes();
 	void cutSelectedNotes();
 	void pasteNotes();
-	void deleteSelectedNotes();
+	bool deleteSelectedNotes();
 
 	void updatePosition(const MidiTime & t );
 	void updatePositionAccompany(const MidiTime & t );
@@ -284,6 +285,7 @@ private:
 
 	QList<int> m_markedSemiTones;
 	QMenu * m_semiToneMarkerMenu; // when you right click on the key area
+	int m_pianoKeySelected;
 
 	PianoRoll();
 	PianoRoll( const PianoRoll & );
@@ -294,7 +296,9 @@ private:
 	MidiTime newNoteLen() const;
 
 	void shiftPos(int amount);
+	void shiftPos(NoteVector notes, int amount);
 	void shiftSemiTone(int amount);
+	void shiftSemiTone(NoteVector notes, int amount);
 	bool isSelection() const;
 	int selectionCount() const;
 	void testPlayNote( Note * n );
@@ -402,6 +406,9 @@ private:
 	MidiTime m_lenOfNewNotes;
 	volume_t m_lastNoteVolume;
 	panning_t m_lastNotePanning;
+
+	//When resizing several notes, we want to calculate a common minimum length
+	MidiTime m_minResizeLen;
 
 	int m_startKey; // first key when drawing
 	int m_lastKey;

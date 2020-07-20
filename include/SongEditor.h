@@ -28,6 +28,7 @@
 #define SONG_EDITOR_H
 
 #include <QVector>
+#include <QLinearGradient>
 
 #include "ActionGroup.h"
 #include "Editor.h"
@@ -47,13 +48,28 @@ class TimeLineWidget;
 
 class positionLine : public QWidget
 {
+	Q_OBJECT
+	Q_PROPERTY ( bool tailGradient READ hasTailGradient WRITE setHasTailGradient )
+	Q_PROPERTY ( QColor lineColor READ lineColor WRITE setLineColor )
 public:
-	positionLine( QWidget * parent );
+	positionLine ( QWidget* parent );
+	
+	// qproperty access functions
+	bool hasTailGradient () const;
+	void setHasTailGradient ( const bool g );
+	QColor lineColor () const;
+	void setLineColor ( const QColor & c );
+
+public slots:
+	void zoomChange (double zoom);
 
 private:
-	void paintEvent( QPaintEvent * pe ) override;
+	void paintEvent( QPaintEvent* pe ) override;
+	
+	bool m_hasTailGradient;
+	QColor m_lineColor;
 
-} ;
+};
 
 
 class SongEditor : public TrackContainerView
@@ -164,6 +180,9 @@ private:
 	bool m_selectRegion;
 
 	friend class SongEditorWindow;
+
+signals:
+	void zoomingValueChanged( double );
 } ;
 
 

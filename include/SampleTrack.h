@@ -29,6 +29,7 @@
 #include <QLayout>
 
 #include "AudioPort.h"
+#include "FadeButton.h"
 #include "FxMixer.h"
 #include "FxLineLcdSpinBox.h"
 #include "Track.h"
@@ -161,6 +162,20 @@ public:
 		return "sampletrack";
 	}
 
+	bool isPlaying()
+	{
+		return m_isPlaying;
+	}
+
+	void setPlaying(bool playing)
+	{
+		if (m_isPlaying != playing) { emit playingChanged(); }
+		m_isPlaying = playing;
+	}
+
+signals:
+	void playingChanged();
+
 public slots:
 	void updateTcos();
 	void setPlayingTcos( bool isPlaying );
@@ -171,6 +186,7 @@ private:
 	FloatModel m_panningModel;
 	IntModel m_effectChannelModel;
 	AudioPort m_audioPort;
+	bool m_isPlaying;
 
 
 
@@ -209,6 +225,7 @@ public:
 
 public slots:
 	void showEffects();
+	void updateIndicator();
 
 
 protected:
@@ -230,9 +247,14 @@ private:
 	SampleTrackWindow * m_window;
 	Knob * m_volumeKnob;
 	Knob * m_panningKnob;
+	FadeButton * m_activityIndicator;
 
 	TrackLabelButton * m_tlb;
 
+	FadeButton * getActivityIndicator()
+	{
+		return m_activityIndicator;
+	}
 
 	friend class SampleTrackWindow;
 

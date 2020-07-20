@@ -46,31 +46,94 @@
 #include "TextFloat.h"
 #include "TimeLineWidget.h"
 #include "ToolTip.h"
-#include "VisualizationWidget.h"
+#include "Oscilloscope.h"
 #include "TimeDisplayWidget.h"
 #include "AudioDevice.h"
 #include "PianoRoll.h"
 #include "Track.h"
 
-positionLine::positionLine( QWidget * parent ) :
-	QWidget( parent )
+positionLine::positionLine( QWidget* parent ) :
+	QWidget( parent ),
+	m_hasTailGradient ( false ),
+	m_lineColor (0, 0, 0, 0)
 {
-	setFixedWidth( 1 );
+	resize( 8, height() );
+	
 	setAttribute( Qt::WA_NoSystemBackground, true );
+	setAttribute( Qt::WA_TransparentForMouseEvents );
 }
 
-
-
-
-void positionLine::paintEvent( QPaintEvent * pe )
+void positionLine::paintEvent( QPaintEvent* pe )
 {
 	QPainter p( this );
-	p.fillRect( rect(), QColor( 255, 255, 255, 153 ) );
+	
+	// If width is 1, we don't need a gradient
+	if (width() == 1)
+	{
+		p.fillRect( rect(),
+			QColor( m_lineColor.red(), m_lineColor.green(), m_lineColor.blue(), 153) );
+	}
+	
+	// If width > 1, we need the gradient
+	else
+	{
+		// Create the gradient trail behind the line
+		QLinearGradient gradient( rect().bottomLeft(), rect().bottomRight() );
+		
+		// If gradient is enabled, we're in focus and we're playing, enable gradient
+		if (Engine::getSong()->isPlaying() && m_hasTailGradient && 
+			Engine::getSong()->playMode() == Song::Mode_PlaySong)
+		{
+			gradient.setColorAt(( ( width() - 1.0 )/width() ),
+				QColor( m_lineColor.red(), m_lineColor.green(), m_lineColor.blue(), 60) );
+		}
+		else
+		{
+			gradient.setColorAt(( ( width() - 1.0 )/width() ),
+				QColor( m_lineColor.red(), m_lineColor.green(), m_lineColor.blue(), 0) );
+		}
+		
+		// Fill in the remaining parts
+		gradient.setColorAt(0,
+			QColor( m_lineColor.red(), m_lineColor.green(), m_lineColor.blue(), 0) );
+		gradient.setColorAt(1,
+			QColor( m_lineColor.red(), m_lineColor.green(), m_lineColor.blue(), 153) );
+		
+		// Fill line
+		p.fillRect( rect(), gradient );
+	}
 }
+
+// QProperty handles
+bool positionLine::hasTailGradient() const
+{ return m_hasTailGradient; }
+
+void positionLine::setHasTailGradient( const bool g )
+{ m_hasTailGradient = g; }
+
+QColor positionLine::lineColor() const
+{ return m_lineColor; }
+
+void positionLine::setLineColor( const QColor & c )
+{ m_lineColor = c; }
+
+// NOTE: the move() implementation fixes a bug where the position line would appear
+// in an unexpected location when positioned at the start of the track
+void positionLine::zoomChange( double zoom )
+{
+	int playHeadPos = x() + width() - 1;
+	
+	resize( 8.0 * zoom, height() );
+	move( playHeadPos - width() + 1, y() );
+	
+	update();
+}
+
+
+
 
 const QVector<double> SongEditor::m_zoomLevels =
 		{ 0.125f, 0.25f, 0.5f, 1.0f, 2.0f, 4.0f, 8.0f, 16.0f };
-
 
 SongEditor::SongEditor( Song * song ) :
 	TrackContainerView( song ),
@@ -111,6 +174,11 @@ SongEditor::SongEditor( Song * song ) :
 
 	m_positionLine = new positionLine( this );
 	static_cast<QVBoxLayout *>( layout() )->insertWidget( 1, m_timeLine );
+	
+	connect( m_song, SIGNAL( playbackStateChanged() ),
+			 m_positionLine, SLOT( update() ) );
+	connect( this, SIGNAL( zoomingValueChanged( double ) ),
+			 m_positionLine, SLOT( zoomChange( double ) ) );
 
 
 	// add some essential widgets to global tool-bar
@@ -210,15 +278,14 @@ SongEditor::SongEditor( Song * song ) :
 
 	gui->mainWindow()->addSpacingToToolBar( 10 );
 
-	// create widget for visualization- and cpu-load-widget
+	// create widget for oscilloscope- and cpu-load-widget
 	QWidget * vc_w = new QWidget( tb );
 	QVBoxLayout * vcw_layout = new QVBoxLayout( vc_w );
 	vcw_layout->setMargin( 0 );
 	vcw_layout->setSpacing( 0 );
 
-	//vcw_layout->addStretch();
-	vcw_layout->addWidget( new VisualizationWidget(
-			embed::getIconPixmap( "output_graph" ), vc_w ) );
+	vcw_layout->addStretch();
+	vcw_layout->addWidget( new Oscilloscope( vc_w ) );
 
 	vcw_layout->addWidget( new CPULoadWidget( vc_w ) );
 	vcw_layout->addStretch();
@@ -251,6 +318,8 @@ SongEditor::SongEditor( Song * song ) :
 			m_zoomingModel->findText( "100%" ) );
 	connect( m_zoomingModel, SIGNAL( dataChanged() ),
 					this, SLOT( zoomingChanged() ) );
+	connect( m_zoomingModel, SIGNAL( dataChanged() ),
+					m_positionLine, SLOT( update() ) );
 
 	//Set up snapping model, 2^i
 	for ( int i = 3; i >= -4; i-- )
@@ -504,7 +573,7 @@ void SongEditor::keyPressEvent( QKeyEvent * ke )
 	{
 		m_song->setPlayPos( 0, Song::Mode_PlaySong );
 	}
-	else if( ke->key() == Qt::Key_Delete )
+	else if( ke->key() == Qt::Key_Delete || ke->key() == Qt::Key_Backspace )
 	{
 		QVector<TrackContentObjectView *> tcoViews;
 		QVector<selectableObject *> so = selectedObjects();
@@ -809,7 +878,7 @@ void SongEditor::updatePosition( const MidiTime & t )
 	if( x >= trackOpWidth + widgetWidth -1 )
 	{
 		m_positionLine->show();
-		m_positionLine->move( x, m_timeLine->height() );
+		m_positionLine->move( x-( m_positionLine->width() - 1 ), m_timeLine->height() );
 	}
 	else
 	{
@@ -838,9 +907,9 @@ void SongEditor::zoomingChanged()
 					setPixelsPerBar( pixelsPerBar() );
 	realignTracks();
 	updateRubberband();
+	
+	emit zoomingValueChanged( m_zoomLevels[m_zoomingModel->value()] );
 }
-
-
 
 
 void SongEditor::selectAllTcos( bool select )
