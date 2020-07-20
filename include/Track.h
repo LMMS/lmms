@@ -680,6 +680,10 @@ public:
 	{
 		return m_backgroundColor;
 	}
+	bool useColor()
+	{
+		return hasColor;
+	}
 	
 	BoolModel* getMutedModel();
 

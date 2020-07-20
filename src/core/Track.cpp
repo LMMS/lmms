@@ -113,6 +113,11 @@ TrackContentObject::TrackContentObject( Track * track ) :
 	if( getTrack() )
 	{
 		getTrack()->addTCO( this );
+		if( getTrack()->useColor() )
+		{
+			m_useStyleColor = false;
+			m_color = getTrack()->backgroundColor();
+		}
 	}
 	setJournalling( false );
 	movePosition( 0 );
@@ -213,6 +218,12 @@ void TrackContentObject::paste()
 		const MidiTime pos = startPosition();
 		restoreState( *( Clipboard::getContent( nodeName() ) ) );
 		movePosition( pos );
+		
+		if( getTrack()->useColor() )
+		{
+			m_useStyleColor = false;
+			m_color = getTrack()->backgroundColor();
+		}
 	}
 	AutomationPattern::resolveAllIDs();
 	GuiApplication::instance()->automationEditor()->m_editor->updateAfterPatternChange();
@@ -648,6 +659,17 @@ void TrackContentObjectView::dropEvent( QDropEvent * de )
 	QDomElement tcos = dataFile.content().firstChildElement( "tcos" );
 	m_tco->restoreState( tcos.firstChildElement().firstChildElement() );
 	m_tco->movePosition( pos );
+	
+	if( m_trackView->getTrack()->useColor() )
+	{
+		m_tco->setUseStyleColor( false );
+		m_tco->setColor( m_trackView->getTrack()->backgroundColor() );
+	}
+	else
+	{
+		m_tco->setUseStyleColor( true );
+	}
+	
 	AutomationPattern::resolveAllIDs();
 	de->accept();
 }
@@ -1703,6 +1725,16 @@ bool TrackContentWidget::pasteSelection( MidiTime tcoPos, QDropEvent * de )
 		if( wasSelection )
 		{
 			tco->selectViewOnCreate( true );
+		}
+		
+		if( t->useColor() )
+		{
+			tco->setUseStyleColor( false );
+			tco->setColor( t->backgroundColor() );
+		}
+		else
+		{
+			tco->setUseStyleColor( true );
 		}
 
 		//check tco name, if the same as source track name dont copy
