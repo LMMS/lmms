@@ -1916,7 +1916,7 @@ TrackOperationsWidget::TrackOperationsWidget( TrackView * parent ) :
 	QWidget( parent ),             /*!< The parent widget */
 	m_trackView( parent ),          /*!< The parent track view */
 	hasColor( false ),
-	gradientNeedsUpdate( false )
+	colorBarNeedsUpdate( false )
 {
 	ToolTip::add( this, tr( "Press <%1> while clicking on move-grip "
 				"to begin a new drag'n'drop action." ).arg(UI_CTRL_KEY) );
@@ -2044,12 +2044,10 @@ void TrackOperationsWidget::paintEvent( QPaintEvent * pe )
 	
 	if( hasColor && ! m_trackView->getTrack()->getMutedModel()->value() ) 
 	{
-		QLinearGradient gradient( rect().bottomLeft(), rect().bottomRight() );
-		gradient.setColorAt( 0, m_backgroundColor );
-		gradient.setColorAt( 0.8, palette().brush(QPalette::Background).color() );
-		gradient.setColorAt( 1, palette().brush(QPalette::Background).color() );
+		QRect coloredRect( 0, 0, 10, m_trackView->getTrack()->getHeight() );
 		
-		p.fillRect( rect(), gradient );
+		p.fillRect( rect(), palette().brush(QPalette::Background) );
+		p.fillRect( coloredRect, m_backgroundColor );
 	}
 	else
 	{
@@ -2071,9 +2069,9 @@ void TrackOperationsWidget::paintEvent( QPaintEvent * pe )
 		p.drawPixmap( 2, 2, *s_grip );
 	}
 		
-	if( gradientNeedsUpdate )
+	if( colorBarNeedsUpdate )
 	{
-		gradientNeedsUpdate = false;
+		colorBarNeedsUpdate = false;
 		update();
 	}
 }
@@ -2148,14 +2146,14 @@ void TrackOperationsWidget::changeTrackColor()
 	m_backgroundColor = new_color;
 	hasColor = true;
 	emit colorChanged( m_backgroundColor );
-	gradientNeedsUpdate = true;
+	colorBarNeedsUpdate = true;
 }
 
 void TrackOperationsWidget::resetTrackColor()
 {
 	hasColor = false;
 	emit colorReset();
-	gradientNeedsUpdate = true;
+	colorBarNeedsUpdate = true;
 }
 
 void TrackOperationsWidget::randomTrackColor()
@@ -2180,7 +2178,7 @@ void TrackOperationsWidget::randomTrackColor()
 	emit colorChanged( m_backgroundColor );
 	
 	hasColor = true;
-	gradientNeedsUpdate = true;
+	colorBarNeedsUpdate = true;
 }
 
 
@@ -2234,7 +2232,7 @@ void TrackOperationsWidget::updateMenu()
 
 void TrackOperationsWidget::updateColorGradient()
 {
-	gradientNeedsUpdate = true;
+	colorBarNeedsUpdate = true;
 	update();
 }
 
@@ -2243,7 +2241,7 @@ void TrackOperationsWidget::loadColorSettings( unsigned int c )
 {
 	m_backgroundColor.setRgb( c );
 	setTrackHasColor( true );
-	gradientNeedsUpdate = true;
+	colorBarNeedsUpdate = true;
 	update();
 }
 

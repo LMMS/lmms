@@ -487,9 +487,6 @@ class TrackOperationsWidget : public QWidget
 public:
 	TrackOperationsWidget( TrackView * parent );
 	~TrackOperationsWidget();
-	
-	/*void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
-	void loadSettings( const QDomElement & _this ) override;*/
 
 	void setBackgroundColor( QColor & );
 	
@@ -535,7 +532,7 @@ private:
 
 	QColor m_backgroundColor;
 	bool hasColor;
-	bool gradientNeedsUpdate;
+	bool colorBarNeedsUpdate;
 
 	friend class TrackView;
 
