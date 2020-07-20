@@ -767,12 +767,16 @@ void Song::startExport()
 			m_exportSongEnd += MidiTime(1,0);
         
 		m_exportSongBegin = MidiTime(0,0);
-		m_exportLoopBegin = m_playPos[Mode_PlaySong].m_timeLine->loopBegin() < m_exportSongEnd && 
-			m_playPos[Mode_PlaySong].m_timeLine->loopEnd() <= m_exportSongEnd ?
-			m_playPos[Mode_PlaySong].m_timeLine->loopBegin() : MidiTime(0,0);
-		m_exportLoopEnd = m_playPos[Mode_PlaySong].m_timeLine->loopBegin() < m_exportSongEnd && 
-			m_playPos[Mode_PlaySong].m_timeLine->loopEnd() <= m_exportSongEnd ?
-			m_playPos[Mode_PlaySong].m_timeLine->loopEnd() : MidiTime(0,0);
+		// FIXME: remove this check once we load timeline in headless mode
+		if (m_playPos[Mode_PlaySong].m_timeLine)
+		{
+			m_exportLoopBegin = m_playPos[Mode_PlaySong].m_timeLine->loopBegin() < m_exportSongEnd &&
+				m_playPos[Mode_PlaySong].m_timeLine->loopEnd() <= m_exportSongEnd ?
+				m_playPos[Mode_PlaySong].m_timeLine->loopBegin() : MidiTime(0,0);
+			m_exportLoopEnd = m_playPos[Mode_PlaySong].m_timeLine->loopBegin() < m_exportSongEnd &&
+				m_playPos[Mode_PlaySong].m_timeLine->loopEnd() <= m_exportSongEnd ?
+				m_playPos[Mode_PlaySong].m_timeLine->loopEnd() : MidiTime(0,0);
+		}
 
 		m_playPos[Mode_PlaySong].setTicks( 0 );
 	}
