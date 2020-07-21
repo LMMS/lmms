@@ -209,6 +209,8 @@ private:
 	AutoScrollStates m_autoScroll;
 	LoopPointStates m_loopPoints;
 	BehaviourAtStopStates m_behaviourAtStop;
+	
+	NStateButton * behaviourAtStopButton;
 
 	bool m_changedPosition;
 

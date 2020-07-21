@@ -141,6 +141,8 @@ void TimeLineWidget::addToolButtons( QToolBar * _tool_bar )
 	connect( behaviourAtStop, SIGNAL( changedState( int ) ), this,
 					SLOT( toggleBehaviourAtStop( int ) ) );
 	behaviourAtStop->changeState( 1 );
+	
+	behaviourAtStopButton = behaviourAtStop;
 
 	_tool_bar->addWidget( autoScroll );
 	_tool_bar->addWidget( loopPoints );
@@ -155,6 +157,7 @@ void TimeLineWidget::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	_this.setAttribute( "lp0pos", (int) loopBegin() );
 	_this.setAttribute( "lp1pos", (int) loopEnd() );
 	_this.setAttribute( "lpstate", m_loopPoints );
+	_this.setAttribute( "stopbehaviour", behaviourAtStopButton->state() );
 }
 
 
@@ -168,6 +171,11 @@ void TimeLineWidget::loadSettings( const QDomElement & _this )
 					_this.attribute( "lpstate" ).toInt() );
 	update();
 	emit loopPointStateLoaded( m_loopPoints );
+	
+	if( _this.hasAttribute( "stopbehaviour" ) )
+	{
+		behaviourAtStopButton->changeState( _this.attribute( "stopbehaviour" ).toInt() );
+	}
 }
 
 
