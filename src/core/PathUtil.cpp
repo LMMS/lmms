@@ -20,7 +20,7 @@ namespace PathUtil
 			case Base::FactorySample    :
 			{
 				QDir fsd = QDir(ConfigManager::inst()->factorySamplesDir());
-				loc = fsd.absolutePath() + "/"; break;
+				loc = fsd.absolutePath(); break;
 			}
 			case Base::UserSample       : loc = ConfigManager::inst()->userSamplesDir(); break;
 			case Base::UserVST          : loc = ConfigManager::inst()->userVstDir(); break;
