@@ -140,7 +140,7 @@ void TimeLineWidget::addToolButtons( QToolBar * _tool_bar )
 					tr( "After stopping keep position" ) );
 	connect( behaviourAtStop, SIGNAL( changedState( int ) ), this,
 					SLOT( toggleBehaviourAtStop( int ) ) );
-	behaviourAtStop->changeState( 2 );
+	behaviourAtStop->changeState( 1 );
 
 	_tool_bar->addWidget( autoScroll );
 	_tool_bar->addWidget( loopPoints );
