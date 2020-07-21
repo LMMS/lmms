@@ -163,6 +163,13 @@ public:
 	{
 		return m_useStyleColor;
 	}
+	
+	bool useCustomClipColor()
+	{
+		return m_useCustomClipColor;
+	}
+	
+	void setUseCustomClipColor( bool b );
 
 	virtual void movePosition( const MidiTime & pos );
 	virtual void changeLength( const MidiTime & length );
@@ -200,7 +207,9 @@ signals:
 	void positionChanged();
 	void destroyedTCO();
 	void trackColorChanged( QColor & );
+	void clipColorChanged( QColor & );
 	void trackColorReset();
+	void clipColorReset();
 
 
 private:
@@ -224,9 +233,9 @@ private:
 
 	bool m_selectViewOnCreate;
 
-	QColor m_bgcolor;
 	QColor m_color;
 	bool m_useStyleColor;
+	bool m_useCustomClipColor;
 
 	friend class TrackContentObjectView;
 
@@ -297,6 +306,7 @@ public slots:
 	void update() override;
 	void changeSelectedColor( QColor & );
 	void disableSelectedColor();
+	void disableClipSelectedColor();
 
 protected:
 	virtual void constructContextMenu( QMenu * )

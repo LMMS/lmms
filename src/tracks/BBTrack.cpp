@@ -74,6 +74,7 @@ void BBTCO::saveSettings( QDomDocument & doc, QDomElement & element )
 	element.setAttribute( "muted", isMuted() );
 	element.setAttribute( "color", color() );
 	element.setAttribute( "stylecolor", useStyleColor() );
+	element.setAttribute( "clipcolor", useCustomClipColor() );
 }
 
 
@@ -98,6 +99,7 @@ void BBTCO::loadSettings( const QDomElement & element )
 		QColor loadedColor;
 		loadedColor.setRgb( element.attribute( "color" ).toUInt() );
 		setUseStyleColor( element.attribute( "stylecolor" ).toUInt() );
+		setUseCustomClipColor( element.attribute( "clipcolor" ).toUInt() );
 		setColor( loadedColor );
 	}
 	
@@ -182,9 +184,9 @@ void BBTCOView::constructContextMenu( QMenu * _cm )
 						tr( "Change name" ),
 						this, SLOT( changeName() ) );
 	_cm->addAction( embed::getIconPixmap( "colorize" ),
-			tr( "Change color" ), this, SLOT( changeColor() ) );
+			tr( "Change clip color" ), this, SLOT( changeClipColor() ) );
 	_cm->addAction( embed::getIconPixmap( "colorize" ),
-			tr( "Reset color to default" ), this, SLOT( resetColor() ) );
+			tr( "Use track color" ), this, SLOT( useTrackColor() ) );
 }
 
 
@@ -317,32 +319,44 @@ void BBTCOView::changeName()
 
 
 
-void BBTCOView::changeColor()
+void BBTCOView::changeClipColor()
 {
-	QColor new_color = QColorDialog::getColor( m_bbTCO->colorObj() );
-	if( ! new_color.isValid() )
+	QColorDialog colorDialog( m_bbTCO->colorObj() );
+	QColor buffer( 0, 0, 0 );
+	
+	for( int i = 0; i < 48; i += 6 )
 	{
-		return;
-	}
-	if( isSelected() )
-	{
-		QVector<selectableObject *> selected =
-				gui->songEditor()->m_editor->selectedObjects();
-		for( QVector<selectableObject *>::iterator it =
-							selected.begin();
-						it != selected.end(); ++it )
+		for( int j = 0; j < 6; j++ )
 		{
-			BBTCOView * bb_tcov = dynamic_cast<BBTCOView *>( *it );
-			if( bb_tcov )
-			{
-				bb_tcov->setColor( new_color );
-			}
+			buffer.setHsl( qMax( 0, 44 * ( i / 6 ) - 1 ), 150 - 20 * j, 150 - 10 * j );
+			colorDialog.setStandardColor( i + j, buffer );
 		}
+		
+	}
+	
+	QColor new_color = colorDialog.getColor( m_bbTCO->colorObj() );
+	if( ! new_color.isValid() )
+	{ return; }
+	
+	setColor( new_color );
+	m_bbTCO->setUseCustomClipColor( true );
+}
+
+
+void BBTCOView::useTrackColor()
+{
+	if( m_bbTCO->getTrack()->useColor() )
+	{
+		setColor( m_bbTCO->getTrack()->backgroundColor() );
+		m_bbTCO->setUseStyleColor( false );
 	}
 	else
 	{
-		setColor( new_color );
+		m_bbTCO->setUseStyleColor( true );
 	}
+	
+	m_bbTCO->setUseCustomClipColor( false );
+	update();
 }
 
 

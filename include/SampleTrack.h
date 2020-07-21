@@ -116,6 +116,8 @@ public:
 public slots:
 	void updateSample();
 
+	void changeClipColor();
+	void useTrackColor();
 	void trackColorChanged( QColor & );
 	void trackColorReset();
 

@@ -108,12 +108,13 @@ TrackContentObject::TrackContentObject( Track * track ) :
 	m_mutedModel( false, this, tr( "Mute" ) ),
 	m_selectViewOnCreate( false ),
 	m_color( 128, 128, 128 ),
-	m_useStyleColor( true )
+	m_useStyleColor( true ),
+	m_useCustomClipColor( false )
 {
 	if( getTrack() )
 	{
 		getTrack()->addTCO( this );
-		if( getTrack()->useColor() )
+		if( getTrack()->useColor() && ! m_useCustomClipColor )
 		{
 			m_useStyleColor = false;
 			m_color = getTrack()->backgroundColor();
@@ -219,7 +220,7 @@ void TrackContentObject::paste()
 		restoreState( *( Clipboard::getContent( nodeName() ) ) );
 		movePosition( pos );
 		
-		if( getTrack()->useColor() )
+		if( getTrack()->useColor() && ! m_useCustomClipColor )
 		{
 			m_useStyleColor = false;
 			m_color = getTrack()->backgroundColor();
@@ -264,18 +265,30 @@ void TrackContentObject::setStartTimeOffset( const MidiTime &startTimeOffset )
 
 void TrackContentObject::setBGColor( QColor & c )
 {
-	m_bgcolor = c;
-	emit trackColorChanged( m_bgcolor );
+	// since this function is called only from track, and track changes override local settings, remove custom clip color
+	m_useCustomClipColor = false;
+	
+	m_color = c;
+	emit trackColorChanged( m_color );
 }
 
 QColor TrackContentObject::BGColor()
 {
-	return m_bgcolor;
+	return m_color;
 }
 
 void TrackContentObject::resetColor()
 {
+	m_useCustomClipColor = false;
 	emit trackColorReset();
+}
+
+
+void TrackContentObject::setUseCustomClipColor( bool b )
+{
+	m_useCustomClipColor = b;
+	b ? emit clipColorChanged( m_color ) : emit clipColorReset();
+		
 }
 
 
@@ -315,7 +328,7 @@ TrackContentObjectView::TrackContentObjectView( TrackContentObject * tco,
 	m_gradient( true ),
 	m_mouseHotspotHand( 0, 0 ),
 	m_cursorSetYet( false ),
-	m_usesCustomSelectedColor( ! m_tco->useStyleColor() ),
+	m_usesCustomSelectedColor( ! m_tco->useStyleColor() | m_tco->useCustomClipColor() ),
 	m_needsUpdate( true )
 {
 	if( s_textFloat == NULL )
@@ -343,6 +356,8 @@ TrackContentObjectView::TrackContentObjectView( TrackContentObject * tco,
 	connect( m_tco, SIGNAL( destroyedTCO() ), this, SLOT( close() ) );
 	connect( m_tco, SIGNAL( trackColorChanged( QColor & ) ), this, SLOT( changeSelectedColor( QColor & ) ) );
 	connect( m_tco, SIGNAL( trackColorReset() ), this, SLOT( disableSelectedColor() ) );
+	connect( m_tco, SIGNAL( clipColorChanged( QColor & ) ), this, SLOT( changeSelectedColor( QColor & ) ) );
+	connect( m_tco, SIGNAL( clipColorReset() ), this, SLOT( disableClipSelectedColor() ) );
 	setModel( m_tco );
 	
 	if( m_usesCustomSelectedColor )
@@ -423,6 +438,19 @@ void TrackContentObjectView::changeSelectedColor( QColor & c )
 void TrackContentObjectView::disableSelectedColor()
 {
 	m_usesCustomSelectedColor = false;
+}
+
+void TrackContentObjectView::disableClipSelectedColor()
+{
+	if( m_trackView->getTrack()->useColor() )
+	{
+		m_customSelectedColor = m_trackView->getTrack()->backgroundColor().darker( 200 );
+		m_usesCustomSelectedColor = true;
+	}
+	else
+	{
+		m_usesCustomSelectedColor = false;
+	}
 }
 
 
@@ -663,7 +691,8 @@ void TrackContentObjectView::dropEvent( QDropEvent * de )
 	if( m_trackView->getTrack()->useColor() )
 	{
 		m_tco->setUseStyleColor( false );
-		m_tco->setColor( m_trackView->getTrack()->backgroundColor() );
+		if( ! dynamic_cast<TrackContentObjectView *>( qwSource )->m_tco->useCustomClipColor() )
+			m_tco->setColor( m_trackView->getTrack()->backgroundColor() );
 	}
 	else
 	{
@@ -721,6 +750,7 @@ DataFile TrackContentObjectView::createTCODataFiles(
 		tcoElement.setAttribute( "trackIndex", trackIndex );
 		tcoElement.setAttribute( "trackType", tcoTrack->type() );
 		tcoElement.setAttribute( "trackName", tcoTrack->name() );
+		tcoElement.setAttribute( "clipColor", ( *it )->m_tco->useCustomClipColor() );
 		( *it )->m_tco->saveState( dataFile, tcoElement );
 		tcoParent.appendChild( tcoElement );
 	}
@@ -1730,7 +1760,9 @@ bool TrackContentWidget::pasteSelection( MidiTime tcoPos, QDropEvent * de )
 		if( t->useColor() )
 		{
 			tco->setUseStyleColor( false );
-			tco->setColor( t->backgroundColor() );
+			
+			if( outerTCOElement.attributeNode( "clipColor" ).value() == "0" )
+				tco->setColor( t->backgroundColor() );
 		}
 		else
 		{

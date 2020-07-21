@@ -83,7 +83,8 @@ protected slots:
 	void openInBBEditor();
 	void resetName();
 	void changeName();
-	void changeColor();
+	void changeClipColor();
+	void useTrackColor();
 	void resetColor();
 	void trackColorChanged( QColor & c );
 

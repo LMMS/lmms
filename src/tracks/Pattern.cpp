@@ -25,6 +25,7 @@
 #include "Pattern.h"
 
 #include <QTimer>
+#include <QColorDialog>
 #include <QMenu>
 #include <QMouseEvent>
 #include <QPainter>
@@ -361,6 +362,7 @@ void Pattern::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	_this.setAttribute( "type", m_patternType );
 	_this.setAttribute( "name", name() );
 	_this.setAttribute( "stylecolor", useStyleColor() );
+	_this.setAttribute( "clipcolor", useCustomClipColor() );
 	_this.setAttribute( "color", color() );
 	// as the target of copied/dragged pattern is always an existing
 	// pattern, we must not store actual position, instead we store -1
@@ -397,6 +399,7 @@ void Pattern::loadSettings( const QDomElement & _this )
 	if( _this.hasAttribute( "stylecolor" ) )
 	{
 		setUseStyleColor( _this.attribute( "stylecolor" ).toInt() );
+		setUseCustomClipColor( _this.attribute( "clipcolor" ).toInt() );
 		setColorRgb( _this.attribute( "color" ).toUInt() );
 	}
 	
@@ -679,6 +682,49 @@ void PatternView::changeName()
 	m_pat->setName( s );
 }
 
+
+void PatternView::changeClipColor()
+{
+	QColorDialog colorDialog( m_pat->colorObj() );
+	QColor buffer( 0, 0, 0 );
+	
+	for( int i = 0; i < 48; i += 6 )
+	{
+		for( int j = 0; j < 6; j++ )
+		{
+			buffer.setHsl( qMax( 0, 44 * ( i / 6 ) - 1 ), 150 - 20 * j, 150 - 10 * j );
+			colorDialog.setStandardColor( i + j, buffer );
+		}
+		
+	}
+	
+	QColor new_color = colorDialog.getColor( m_pat->colorObj() );
+	if( ! new_color.isValid() )
+	{ return; }
+	
+	setColor( new_color );
+	m_pat->setUseCustomClipColor( true );
+}
+
+
+void PatternView::useTrackColor()
+{
+	if( m_pat->getTrack()->useColor() )
+	{
+		setColor( m_pat->getTrack()->backgroundColor() );
+		m_pat->setUseStyleColor( false );
+	}
+	else
+	{
+		m_pat->setUseStyleColor( true );
+	}
+	
+	m_pat->setUseCustomClipColor( false );
+	update();
+}
+
+
+
 void PatternView::setColor( QColor new_color )
 {
 	// change color only if it is different
@@ -761,6 +807,12 @@ void PatternView::constructContextMenu( QMenu * _cm )
 		_cm->addAction( embed::getIconPixmap( "step_btn_duplicate" ),
 			tr( "Clone Steps" ), m_pat, SLOT( cloneSteps() ) );
 	}
+	
+	_cm->addSeparator();
+	_cm->addAction( embed::getIconPixmap( "colorize" ),
+			tr( "Set clip color" ), this, SLOT( changeClipColor() ) );
+	_cm->addAction( embed::getIconPixmap( "colorize" ),
+			tr( "Use track color" ), this, SLOT( useTrackColor() ) );
 }
 
 

@@ -539,6 +539,7 @@ void AutomationPattern::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	_this.setAttribute( "tens", QString::number( getTension() ) );
 	_this.setAttribute( "mute", QString::number( isMuted() ) );
 	_this.setAttribute( "stylecolor", useStyleColor() );
+	_this.setAttribute( "clipcolor", useCustomClipColor() );
 	_this.setAttribute( "color", color() );
 
 	for( timeMap::const_iterator it = m_timeMap.begin();
@@ -599,6 +600,7 @@ void AutomationPattern::loadSettings( const QDomElement & _this )
 	if( _this.hasAttribute( "stylecolor" ) )
 	{
 		setUseStyleColor( _this.attribute( "stylecolor" ).toInt() );
+		setUseCustomClipColor( _this.attribute( "clipcolor" ).toInt() );
 		setColor( _this.attribute( "color" ).toUInt() );
 	}
 

@@ -62,6 +62,8 @@ protected slots:
 	void flipY();
 	void flipX();
 	
+	void changeClipColor();
+	void useTrackColor();
 	void trackColorChanged( QColor & );
 	void trackColorReset();
 

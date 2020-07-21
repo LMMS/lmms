@@ -23,6 +23,7 @@
  */
 #include "AutomationPatternView.h"
 
+#include <QColorDialog>
 #include <QMouseEvent>
 #include <QPainter>
 #include <QPainterPath>
@@ -169,6 +170,47 @@ void AutomationPatternView::flipX()
 }
 
 
+void AutomationPatternView::changeClipColor()
+{
+	QColorDialog colorDialog( m_pat->colorObj() );
+	QColor buffer( 0, 0, 0 );
+	
+	for( int i = 0; i < 48; i += 6 )
+	{
+		for( int j = 0; j < 6; j++ )
+		{
+			buffer.setHsl( qMax( 0, 44 * ( i / 6 ) - 1 ), 150 - 20 * j, 150 - 10 * j );
+			colorDialog.setStandardColor( i + j, buffer );
+		}
+		
+	}
+	
+	QColor new_color = colorDialog.getColor( m_pat->colorObj() );
+	if( ! new_color.isValid() )
+	{ return; }
+	
+	setColor( new_color );
+	m_pat->setUseCustomClipColor( true );
+}
+
+
+void AutomationPatternView::useTrackColor()
+{
+	if( m_pat->getTrack()->useColor() )
+	{
+		setColor( m_pat->getTrack()->backgroundColor() );
+		m_pat->setUseStyleColor( false );
+	}
+	else
+	{
+		m_pat->setUseStyleColor( true );
+	}
+	
+	m_pat->setUseCustomClipColor( false );
+	update();
+}
+
+
 
 void AutomationPatternView::setColor( QColor new_color )
 {
@@ -265,6 +307,10 @@ void AutomationPatternView::constructContextMenu( QMenu * _cm )
 	}
 
 	_cm->addSeparator();
+	_cm->addAction( embed::getIconPixmap( "colorize" ),
+			tr( "Set clip color" ), this, SLOT( changeClipColor() ) );
+	_cm->addAction( embed::getIconPixmap( "colorize" ),
+			tr( "Use track color" ), this, SLOT( useTrackColor() ) );
 }
 
 

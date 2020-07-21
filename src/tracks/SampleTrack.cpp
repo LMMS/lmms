@@ -24,6 +24,7 @@
  */
 #include "SampleTrack.h"
 
+#include <QColorDialog>
 #include <QDropEvent>
 #include <QFileInfo>
 #include <QMenu>
@@ -276,6 +277,7 @@ void SampleTCO::saveSettings( QDomDocument & _doc, QDomElement & _this )
 
 	_this.setAttribute( "sample_rate", m_sampleBuffer->sampleRate());
 	_this.setAttribute( "stylecolor", useStyleColor() );
+	_this.setAttribute( "clipcolor", useCustomClipColor() );
 	_this.setAttribute( "color", color() );
 	// TODO: start- and end-frame
 }
@@ -305,6 +307,7 @@ void SampleTCO::loadSettings( const QDomElement & _this )
 	if( _this.hasAttribute( "stylecolor" ) )
 	{
 		setUseStyleColor( _this.attribute( "stylecolor" ).toInt() );
+		setUseCustomClipColor( _this.attribute( "clipcolor" ).toInt() );
 		setColor( _this.attribute( "color" ).toUInt() );
 	}
 }
@@ -382,6 +385,13 @@ void SampleTCOView::contextMenuEvent( QContextMenuEvent * _cme )
 	/*contextMenu.addAction( embed::getIconPixmap( "record" ),
 				tr( "Set/clear record" ),
 						m_tco, SLOT( toggleRecord() ) );*/
+	
+	contextMenu.addSeparator();
+	contextMenu.addAction( embed::getIconPixmap( "colorize" ),
+			tr( "Set clip color" ), this, SLOT( changeClipColor() ) );
+	contextMenu.addAction( embed::getIconPixmap( "colorize" ),
+			tr( "Use track color" ), this, SLOT( useTrackColor() ) );
+	
 	constructContextMenu( &contextMenu );
 
 	contextMenu.exec( QCursor::pos() );
@@ -594,6 +604,49 @@ void SampleTCOView::paintEvent( QPaintEvent * pe )
 
 	painter.drawPixmap( 0, 0, m_paintPixmap );
 }
+
+
+void SampleTCOView::changeClipColor()
+{
+	QColorDialog colorDialog( m_tco->colorObj() );
+	QColor buffer( 0, 0, 0 );
+	
+	for( int i = 0; i < 48; i += 6 )
+	{
+		for( int j = 0; j < 6; j++ )
+		{
+			buffer.setHsl( qMax( 0, 44 * ( i / 6 ) - 1 ), 150 - 20 * j, 150 - 10 * j );
+			colorDialog.setStandardColor( i + j, buffer );
+		}
+		
+	}
+	
+	QColor new_color = colorDialog.getColor( m_tco->colorObj() );
+	if( ! new_color.isValid() )
+	{ return; }
+	
+	setColor( new_color );
+	m_tco->setUseCustomClipColor( true );
+}
+
+
+void SampleTCOView::useTrackColor()
+{
+	if( m_tco->getTrack()->useColor() )
+	{
+		setColor( m_tco->getTrack()->backgroundColor() );
+		m_tco->setUseStyleColor( false );
+	}
+	else
+	{
+		m_tco->setUseStyleColor( true );
+	}
+	
+	m_tco->setUseCustomClipColor( false );
+	update();
+}
+
+
 
 void SampleTCOView::setColor( QColor new_color )
 {
