@@ -523,7 +523,7 @@ void SampleTCOView::paintEvent( QPaintEvent * pe )
 	QColor c;
 	bool muted = m_tco->getTrack()->isMuted() || m_tco->isMuted();
 
-	// state: selected, muted, normal
+	// state: selected, muted, colored, normal
 	c = isSelected() ? selectedColor() : ( muted ? mutedBackgroundColor()
 		: ( ! m_tco->useStyleColor() ? m_tco->colorObj()
 		: painter.background().color() ) );

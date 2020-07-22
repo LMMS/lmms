@@ -353,9 +353,7 @@ void AutomationPatternView::paintEvent( QPaintEvent * )
 	bool muted = m_pat->getTrack()->isMuted() || m_pat->isMuted();
 	bool current = gui->automationEditor()->currentPattern() == m_pat;
 	
-	// state: selected, muted, normal
-	/*c = isSelected() ? selectedColor() : ( muted ? mutedBackgroundColor() 
-		:	painter.background().color() );*/
+	// state: selected, muted, colored, normal
 	c = isSelected() ? selectedColor() : ( muted ? mutedBackgroundColor()
 		: ( ! m_pat->useStyleColor() ? m_pat->colorObj()
 		: painter.background().color() ) );

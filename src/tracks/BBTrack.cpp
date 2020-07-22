@@ -223,7 +223,7 @@ void BBTCOView::paintEvent( QPaintEvent * )
 	QColor c;
 	bool muted = m_bbTCO->getTrack()->isMuted() || m_bbTCO->isMuted();
 	
-	// state: selected, muted, default, user selected
+	// state: selected, muted, default, colored
 	c = isSelected() ? selectedColor() : ( muted ? mutedBackgroundColor() 
 		: ( m_bbTCO->useStyleColor() ? painter.background().color() 
 		: m_bbTCO->colorObj() ) );
