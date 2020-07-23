@@ -23,7 +23,6 @@
  */
 
  /* TODO
-  * - Carla inline param ui doesn't update.
   * - Flow layout for knobs.
   * - Search other TODO
   */
@@ -423,7 +422,6 @@ void CarlaInstrument::refreshParams(bool init)
 			}
 
 			if (paramInfo->groupName != nullptr){
-				// TODO this is unused for now.
 				m_paramModels[i]->setGroupName(paramInfo->groupName);
 			}
 
@@ -460,10 +458,16 @@ void CarlaInstrument::clearKnobModels(){
 
 void CarlaInstrument::knobModelChanged(uint32_t index)
 { // Update Carla param (LMMS -> Carla)
-	// TODO fDescriptor->ui_set_parameter_value
-	if (fDescriptor->set_parameter_value != nullptr &&
-		!m_paramModels[index]->isOutput()){
-		fDescriptor->set_parameter_value(fHandle, index, m_paramModels[index]->value());
+	if (!m_paramModels[index]->isOutput()){
+		if (fDescriptor->set_parameter_value != nullptr){
+			fDescriptor->set_parameter_value(fHandle, index, m_paramModels[index]->value());
+
+		}
+
+		// TODO? Shouldn't Carla be doing this?
+		if (fDescriptor->ui_set_parameter_value != nullptr){
+			fDescriptor->ui_set_parameter_value(fHandle, index, m_paramModels[index]->value());
+		}
 	}
 }
 
