@@ -58,7 +58,7 @@ CompressorEffect::CompressorEffect(Model* parent, const Descriptor::SubPluginFea
 	m_yL[0] = m_yL[1] = COMP_NOISE_FLOOR;
 
 	// 200 ms
-	m_crestTimeConst = expf(-1.f / (0.2f * m_sampleRate));
+	m_crestTimeConst = exp(-1.f / (0.2f * m_sampleRate));
 
 	connect(&m_compressorControls.m_attackModel, SIGNAL(dataChanged()), this, SLOT(calcAttack()));
 	connect(&m_compressorControls.m_releaseModel, SIGNAL(dataChanged()), this, SLOT(calcRelease()));
@@ -99,7 +99,7 @@ CompressorEffect::~CompressorEffect()
 float CompressorEffect::msToCoeff(float ms)
 {
 	// Convert time in milliseconds to applicable lowpass coefficient
-	return expf(m_coeffPrecalc / ms);
+	return exp(m_coeffPrecalc / ms);
 }
 
 
@@ -180,7 +180,7 @@ void CompressorEffect::calcRange()
 
 void CompressorEffect::resizeRMS()
 {
-	m_rmsTimeConst = expf(-1.f / (m_compressorControls.m_rmsModel.value() * 0.001f * m_sampleRate));
+	m_rmsTimeConst = exp(-1.f / (m_compressorControls.m_rmsModel.value() * 0.001f * m_sampleRate));
 }
 
 void CompressorEffect::calcLookaheadLength()
@@ -224,8 +224,8 @@ void CompressorEffect::calcTiltCoeffs()
 	const float g1 = m_tiltVal > 0 ? -gfactor * m_tiltVal : -m_tiltVal;
 	const float g2 = m_tiltVal > 0 ? m_tiltVal : gfactor * m_tiltVal;
 
-	m_lgain = expf(g1 / amp) - 1;
-	m_hgain = expf(g2 / amp) - 1;
+	m_lgain = exp(g1 / amp) - 1;
+	m_hgain = exp(g2 / amp) - 1;
 
 	const float omega = 2 * F_PI * m_compressorControls.m_tiltFreqModel.value();
 	const float n = 1 / (m_sampleRate * 3 + omega);
@@ -598,7 +598,7 @@ void CompressorEffect::changeSampleRate()
 	m_coeffPrecalc = COMP_LOG / (m_sampleRate * 0.001f);
 
 	// 200 ms
-	m_crestTimeConst = expf(-1.f / (0.2f * m_sampleRate));
+	m_crestTimeConst = exp(-1.f / (0.2f * m_sampleRate));
 
 	// 20 ms
 	m_lookaheadDelayLength = 0.02 * m_sampleRate;
