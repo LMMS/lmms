@@ -34,6 +34,7 @@
 #include <QObject>
 
 #include "Lv2Basics.h"
+#include "Lv2Features.h"
 #include "LinkedModelGroups.h"
 #include "Plugin.h"
 #include "PluginIssue.h"
@@ -156,13 +157,15 @@ private:
 
 	const LilvPlugin* m_plugin;
 	LilvInstance* m_instance;
-	std::vector<LV2_Feature*> m_features;
+	Lv2Features m_features;
 
 	std::vector<std::unique_ptr<Lv2Ports::PortBase>> m_ports;
 	StereoPortRef m_inPorts, m_outPorts;
 
 	//! models for the controls, sorted by port symbols
 	std::map<std::string, AutomatableModel *> m_connectedModels;
+
+	void initPluginSpecificFeatures();
 
 	//! load a file in the plugin, but don't do anything in LMMS
 	void loadFileInternal(const QString &file);
