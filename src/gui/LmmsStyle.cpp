@@ -28,6 +28,7 @@
 #include <QApplication>
 #include <QFrame>
 #include <QPainter>
+#include <QPainterPath>
 #include <QStyleFactory>
 #include <QStyleOption>
 

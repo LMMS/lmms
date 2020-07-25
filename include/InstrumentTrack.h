@@ -237,6 +237,8 @@ public:
 		return m_previewMode;
 	}
 
+	void autoAssignMidiDevice( bool );
+
 signals:
 	void instrumentChanged();
 	void midiNoteOn( const Note& );
@@ -281,6 +283,9 @@ private:
 	IntModel m_baseNoteModel;	//! The "A4" or "440 Hz" key (default 69)
 	IntModel m_firstKeyModel;	//! First key the instrument reacts to
 	IntModel m_lastKeyModel;	//! Last key the instrument reacts to
+
+	bool m_hasAutoMidiDev;
+	static InstrumentTrack *s_autoAssignedTrack;
 
 	NotePlayHandleList m_processHandles;
 

@@ -34,6 +34,7 @@
 #include "InstrumentTrack.h"
 #include "SampleTrack.h"
 #include "BBTrackContainer.h"
+#include "TrackContainer.h" // For TrackContainer::TrackList typedef
 
 FxRoute::FxRoute( FxChannel * from, FxChannel * to, float amount ) :
 	m_from( from ),
@@ -383,13 +384,13 @@ void FxMixer::moveChannelLeft( int index )
 	else if (m_lastSoloed == b) { m_lastSoloed = a; }
 
 	// go through every instrument and adjust for the channel index change
-	QVector<Track *> songTrackList = Engine::getSong()->tracks();
-	QVector<Track *> bbTrackList = Engine::getBBTrackContainer()->tracks();
+	TrackContainer::TrackList songTrackList = Engine::getSong()->tracks();
+	TrackContainer::TrackList bbTrackList = Engine::getBBTrackContainer()->tracks();
 
-	QVector<Track *> trackLists[] = {songTrackList, bbTrackList};
+	TrackContainer::TrackList trackLists[] = {songTrackList, bbTrackList};
 	for(int tl=0; tl<2; ++tl)
 	{
-		QVector<Track *> trackList = trackLists[tl];
+		TrackContainer::TrackList trackList = trackLists[tl];
 		for(int i=0; i<trackList.size(); ++i)
 		{
 			if( trackList[i]->type() == Track::InstrumentTrack )

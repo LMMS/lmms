@@ -57,6 +57,7 @@ protected:
 	void mouseReleaseEvent( QMouseEvent * me ) override;
 	void mouseMoveEvent( QMouseEvent * me ) override;
 	void focusOutEvent( QFocusEvent * _fe ) override;
+	void focusInEvent( QFocusEvent * fe ) override;
 	void resizeEvent( QResizeEvent * _event ) override;
 
 

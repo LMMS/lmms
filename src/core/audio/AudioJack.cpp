@@ -55,6 +55,8 @@ AudioJack::AudioJack( bool & _success_ful, Mixer*  _mixer ) :
 	m_framesDoneInCurBuf( 0 ),
 	m_framesToDoInCurBuf( 0 )
 {
+	m_stopped = true;
+
 	_success_ful = initJackClient();
 	if( _success_ful )
 	{
@@ -200,8 +202,6 @@ bool AudioJack::initJackClient()
 
 void AudioJack::startProcessing()
 {
-	m_stopped = false;
-
 	if( m_active || m_client == NULL )
 	{
 		return;
@@ -244,6 +244,7 @@ void AudioJack::startProcessing()
 		}
 	}
 
+	m_stopped = false;
 	free( ports );
 }
 
@@ -344,8 +345,8 @@ int AudioJack::processCallback( jack_nframes_t _nframes, void * _udata )
 	// add to the following sound processing
 	if( m_midiClient && _nframes > 0 )
 	{
-		m_midiClient->JackMidiRead(_nframes);
-		m_midiClient->JackMidiWrite(_nframes);
+		m_midiClient.load()->JackMidiRead(_nframes);
+		m_midiClient.load()->JackMidiWrite(_nframes);
 	}
 
 	for( int c = 0; c < channels(); ++c )

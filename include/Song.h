@@ -456,7 +456,7 @@ private:
 
 	SaveOptions m_saveOptions;
 
-	QStringList m_errors;
+	QHash<QString, int> m_errors;
 
 	PlayModes m_playMode;
 	PlayPos m_playPos[Mode_Count];

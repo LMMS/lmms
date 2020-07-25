@@ -44,6 +44,7 @@
 #include <QMouseEvent>
 #include <QPainter>
 #include <QStyleOption>
+#include <QVariant>
 
 
 #include "AutomationPattern.h"
@@ -282,6 +283,8 @@ TrackContentObjectView::TrackContentObjectView( TrackContentObject * tco,
 	m_textShadowColor( 0, 0, 0 ),
 	m_BBPatternBackground( 0, 0, 0 ),
 	m_gradient( true ),
+	m_mouseHotspotHand( 0, 0 ),
+	m_cursorSetYet( false ),
 	m_needsUpdate( true )
 {
 	if( s_textFloat == NULL )
@@ -293,7 +296,7 @@ TrackContentObjectView::TrackContentObjectView( TrackContentObject * tco,
 	setAttribute( Qt::WA_OpaquePaintEvent, true );
 	setAttribute( Qt::WA_DeleteOnClose, true );
 	setFocusPolicy( Qt::StrongFocus );
-	setCursor( QCursor( embed::getIconPixmap( "hand" ), 3, 3 ) );
+	setCursor( QCursor( embed::getIconPixmap( "hand" ), m_mouseHotspotHand.width(), m_mouseHotspotHand.height() ) );
 	move( 0, 0 );
 	show();
 
@@ -342,6 +345,12 @@ TrackContentObjectView::~TrackContentObjectView()
  */
 void TrackContentObjectView::update()
 {
+	if( !m_cursorSetYet )
+	{
+		setCursor( QCursor( embed::getIconPixmap( "hand" ), m_mouseHotspotHand.width(), m_mouseHotspotHand.height() ) );
+		m_cursorSetYet = true;
+	}
+
 	if( fixedTCOs() )
 	{
 		updateLength();
@@ -421,6 +430,11 @@ void TrackContentObjectView::setBBPatternBackground( const QColor & c )
 
 void TrackContentObjectView::setGradient( const bool & b )
 { m_gradient = b; }
+
+void TrackContentObjectView::setMouseHotspotHand(const QSize & s)
+{
+	m_mouseHotspotHand = s;
+}
 
 // access needsUpdate member variable
 bool TrackContentObjectView::needsUpdate()
@@ -609,7 +623,7 @@ void TrackContentObjectView::leaveEvent( QEvent * e )
 {
 	if( cursor().shape() != Qt::BitmapCursor )
 	{
-		setCursor( QCursor( embed::getIconPixmap( "hand" ), 3, 3 ) );
+		setCursor( QCursor( embed::getIconPixmap( "hand" ), m_mouseHotspotHand.width(), m_mouseHotspotHand.height() ) );
 	}
 	if( e != NULL )
 	{
@@ -761,12 +775,12 @@ void TrackContentObjectView::mousePressEvent( QMouseEvent * me )
 					m_action = ResizeLeft;
 					setCursor( Qt::SizeHorCursor );
 				}
-				else if( me->x() < width() - RESIZE_GRIP_WIDTH )
+				else if( m_tco->getAutoResize() || me->x() < width() - RESIZE_GRIP_WIDTH )
 				{
 					m_action = Move;
 					setCursor( Qt::SizeAllCursor );
 				}
-				else if( !m_tco->getAutoResize() )
+				else
 				{
 					m_action = Resize;
 					setCursor( Qt::SizeHorCursor );
@@ -1816,10 +1830,6 @@ void TrackContentWidget::setEmbossColor( const QBrush & c )
 // trackOperationsWidget
 // ===========================================================================
 
-
-QPixmap * TrackOperationsWidget::s_grip = NULL;     /*!< grip pixmap */
-
-
 /*! \brief Create a new trackOperationsWidget
  *
  * The trackOperationsWidget is the grip and the mute button of a track.
@@ -1946,17 +1956,11 @@ void TrackOperationsWidget::paintEvent( QPaintEvent * pe )
 
 	if( m_trackView->isMovingTrack() == false )
 	{
-		s_grip = new QPixmap( embed::getIconPixmap(
-							"track_op_grip" ) );
-
-		p.drawPixmap( 2, 2, *s_grip );
+		p.drawPixmap( 2, 2, embed::getIconPixmap("track_op_grip"));
 	}
 	else
 	{
-		s_grip = new QPixmap( embed::getIconPixmap(
-							"track_op_grip_c" ) );
-
-		p.drawPixmap( 2, 2, *s_grip );
+		p.drawPixmap( 2, 2, embed::getIconPixmap("track_op_grip_c"));
 	}
 }
 
@@ -2237,6 +2241,8 @@ void Track::saveSettings( QDomDocument & doc, QDomElement & element )
 	element.setAttribute( "name", name() );
 	m_mutedModel.saveSettings( doc, element, "muted" );
 	m_soloModel.saveSettings( doc, element, "solo" );
+	// Save the mutedBeforeSolo value so we can recover the muted state if any solo was active (issue 5562)
+	element.setAttribute( "mutedBeforeSolo", int(m_mutedBeforeSolo) );
 
 	if( m_height >= MINIMAL_TRACK_HEIGHT )
 	{
@@ -2291,6 +2297,9 @@ void Track::loadSettings( const QDomElement & element )
 
 	m_mutedModel.loadSettings( element, "muted" );
 	m_soloModel.loadSettings( element, "solo" );
+	// Get the mutedBeforeSolo value so we can recover the muted state if any solo was active.
+	// Older project files that didn't have this attribute will set the value to false (issue 5562)
+	m_mutedBeforeSolo = QVariant( element.attribute( "mutedBeforeSolo", "0" ) ).toBool();
 
 	if( m_simpleSerializingMode )
 	{

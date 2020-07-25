@@ -389,7 +389,7 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	m_vstEmbedComboBox = new QComboBox(plugins_tw);
 	m_vstEmbedComboBox->move(XDelta, YDelta * ++counter);
 
-	QStringList embedMethods = ConfigManager::availabeVstEmbedMethods();
+	QStringList embedMethods = ConfigManager::availableVstEmbedMethods();
 	m_vstEmbedComboBox->addItem(tr("No embedding"), "none");
 	if(embedMethods.contains("qt"))
 	{
@@ -677,9 +677,32 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 			this, SLOT(midiInterfaceChanged(const QString &)));
 
 
+	// MIDI autoassign tab.
+	TabWidget * midiAutoAssign_tw = new TabWidget(
+			tr("Automatically assign MIDI controller to selected track"), midi_w);
+	midiAutoAssign_tw->setFixedHeight(56);
+
+	m_assignableMidiDevices = new QComboBox(midiAutoAssign_tw);
+	m_assignableMidiDevices->setGeometry(10, 20, 240, 28);
+	m_assignableMidiDevices->addItem("none");
+	if ( !Engine::mixer()->midiClient()->isRaw() )
+	{
+		m_assignableMidiDevices->addItems(Engine::mixer()->midiClient()->readablePorts());
+	}
+	else
+	{
+		m_assignableMidiDevices->addItem("all");
+	}
+	int current = m_assignableMidiDevices->findText(ConfigManager::inst()->value("midi", "midiautoassign"));
+	if (current >= 0)
+	{
+		m_assignableMidiDevices->setCurrentIndex(current);
+	}
+
 	// MIDI layout ordering.
 	midi_layout->addWidget(midiiface_tw);
 	midi_layout->addWidget(ms_w);
+	midi_layout->addWidget(midiAutoAssign_tw);
 	midi_layout->addStretch();
 
 
@@ -917,6 +940,8 @@ void SetupDialog::accept()
 					QString::number(m_bufferSize));
 	ConfigManager::inst()->setValue("mixer", "mididev",
 					m_midiIfaceNames[m_midiInterfaces->currentText()]);
+	ConfigManager::inst()->setValue("midi", "midiautoassign",
+					m_assignableMidiDevices->currentText());
 
 
 	ConfigManager::inst()->setWorkingDir(QDir::fromNativeSeparators(m_workingDir));

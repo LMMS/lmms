@@ -30,6 +30,7 @@
 
 #include "ComboBox.h"
 #include "GroupBox.h"
+#include "gui_templates.h"
 #include "InstrumentTrack.h"
 #include "LedCheckbox.h"
 
@@ -49,6 +50,7 @@ InstrumentMiscView::InstrumentMiscView(InstrumentTrack *it, QWidget *parent) :
 	masterPitchLayout->setContentsMargins(8, 18, 8, 8);
 
 	QLabel *tlabel = new QLabel(tr("Enables the use of master pitch"));
+	tlabel->setFont(pointSize<8>(tlabel->font()));
 	masterPitchLayout->addWidget(tlabel);
 
 	// Microtuner settings

@@ -118,6 +118,11 @@ QMenu::indicator:selected {
 	background-color: #747474;
 }
 
+positionLine {
+	qproperty-tailGradient: false;
+	qproperty-lineColor: rgb(255, 255, 255);
+}
+
 PianoRoll {
 	background-color: rgb(0, 0, 0);
 	qproperty-backgroundShade: rgba( 255, 255, 255, 10 );
@@ -163,7 +168,6 @@ Oscilloscope {
 	background: none;
 	border: none;
 	qproperty-normalColor: rgb(71, 253, 133);
-	qproperty-warningColor: rgb(255, 192, 64);
 	qproperty-clippingColor: rgb(255, 64, 64);
 }
 
@@ -622,6 +626,8 @@ TrackContentObjectView   {
 	qproperty-textBackgroundColor: rgba(0, 0, 0, 75);
 	qproperty-textShadowColor: rgb( 0, 0, 0 );
 	qproperty-gradient: true; /* boolean property, set true to have a gradient */
+	/* finger tip offset of cursor */
+	qproperty-mouseHotspotHand: 3px 3px;
 	
 	font-size: 11px;
 }

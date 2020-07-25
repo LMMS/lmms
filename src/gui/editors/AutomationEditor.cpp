@@ -35,6 +35,7 @@
 #include <QLayout>
 #include <QMdiArea>
 #include <QPainter>
+#include <QPainterPath>
 #include <QScrollBar>
 #include <QStyleOption>
 #include <QToolTip>
@@ -123,16 +124,9 @@ AutomationEditor::AutomationEditor() :
 	connect( m_tensionModel, SIGNAL( dataChanged() ),
 				this, SLOT( setTension() ) );
 
-	for( int i = 0; i < 7; ++i )
-	{
-		m_quantizeModel.addItem( "1/" + QString::number( 1 << i ) );
+	for (auto q : Quantizations) {
+		m_quantizeModel.addItem(QString("1/%1").arg(q));
 	}
-	for( int i = 0; i < 5; ++i )
-	{
-		m_quantizeModel.addItem( "1/" +
-					QString::number( ( 1 << i ) * 3 ) );
-	}
-	m_quantizeModel.addItem( "1/192" );
 
 	connect( &m_quantizeModel, SIGNAL(dataChanged() ),
 					this, SLOT( setQuantization() ) );
@@ -2159,22 +2153,7 @@ void AutomationEditor::zoomingYChanged()
 
 void AutomationEditor::setQuantization()
 {
-	int quantization = m_quantizeModel.value();
-	if( quantization < 7 )
-	{
-		quantization = 1 << quantization;
-	}
-	else if( quantization < 12 )
-	{
-		quantization = 1 << ( quantization - 7 );
-		quantization *= 3;
-	}
-	else
-	{
-		quantization = DefaultTicksPerBar;
-	}
-	quantization = DefaultTicksPerBar / quantization;
-	AutomationPattern::setQuantization( quantization );
+	AutomationPattern::setQuantization(DefaultTicksPerBar / Quantizations[m_quantizeModel.value()]);
 
 	update();
 }

@@ -175,6 +175,7 @@ private:
 	QComboBox * m_midiInterfaces;
 	MswMap m_midiIfaceSetupWidgets;
 	trMap m_midiIfaceNames;
+	QComboBox * m_assignableMidiDevices;
 
 	// Paths settings widgets.
 	QString m_workingDir;
