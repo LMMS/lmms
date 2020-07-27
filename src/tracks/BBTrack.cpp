@@ -160,8 +160,6 @@ BBTCOView::BBTCOView( TrackContentObject * _tco, TrackView * _tv ) :
 	connect( _tco->getTrack(), SIGNAL( dataChanged() ), 
 			this, SLOT( update() ) );
 	
-	connect( _tco, SIGNAL( trackColorChanged( QColor & ) ),
-			this, SLOT( trackColorChanged( QColor & ) ) );
 	connect( _tco, SIGNAL( trackColorReset() ),
 			this, SLOT( resetColor() ) );
 
@@ -347,7 +345,8 @@ void BBTCOView::useTrackColor()
 {
 	if( m_bbTCO->getTrack()->useColor() )
 	{
-		setColor( m_bbTCO->getTrack()->backgroundColor() );
+		QColor buffer = m_bbTCO->getTrack()->backgroundColor();
+		setColor( buffer );
 		m_bbTCO->setUseStyleColor( false );
 	}
 	else
@@ -372,21 +371,6 @@ void BBTCOView::resetColor()
 	//BBTrack::clearLastTCOColor();
 }
 
-
-
-void BBTCOView::setColor( QColor new_color )
-{
-	if( new_color.rgb() != m_bbTCO->color() )
-	{
-		m_bbTCO->setColor( new_color );
-	}
-	
-	m_bbTCO->setUseStyleColor( false );
-	Engine::getSong()->setModified();
-	update();
-	
-	//BBTrack::setLastTCOColor( new_color );
-}
 
 
 void BBTCOView::update()

@@ -106,12 +106,6 @@ class SampleTCOView : public TrackContentObjectView
 public:
 	SampleTCOView( SampleTCO * _tco, TrackView * _tv );
 	virtual ~SampleTCOView() = default;
-	
-	QColor color() const
-	{
-		return( m_tco->colorObj() );
-	}
-	void setColor( QColor _new_color );
 
 public slots:
 	void updateSample();

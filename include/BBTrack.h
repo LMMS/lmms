@@ -70,11 +70,6 @@ public:
 	BBTCOView( TrackContentObject * _tco, TrackView * _tv );
 	virtual ~BBTCOView() = default;
 
-	QColor color() const
-	{
-		return( m_bbTCO->colorObj() );
-	}
-	void setColor( QColor _new_color );
 
 public slots:
 	void update() override;

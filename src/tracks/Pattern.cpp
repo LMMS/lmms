@@ -599,8 +599,6 @@ PatternView::PatternView( Pattern* pattern, TrackView* parent ) :
 {
 	connect( gui->pianoRoll(), SIGNAL( currentPatternChanged() ),
 			this, SLOT( update() ) );
-	connect( m_pat, SIGNAL( trackColorChanged( QColor & ) ),
-			this, SLOT( trackColorChanged( QColor & ) ) );
 	connect( m_pat, SIGNAL( trackColorReset() ),
 			this, SLOT( trackColorReset() ) );
 
@@ -711,7 +709,8 @@ void PatternView::useTrackColor()
 {
 	if( m_pat->getTrack()->useColor() )
 	{
-		setColor( m_pat->getTrack()->backgroundColor() );
+		QColor buffer = m_pat->getTrack()->backgroundColor();
+		setColor( buffer );
 		m_pat->setUseStyleColor( false );
 	}
 	else
@@ -724,19 +723,6 @@ void PatternView::useTrackColor()
 }
 
 
-
-void PatternView::setColor( QColor new_color )
-{
-	// change color only if it is different
-	if( new_color.rgb() != m_pat->color() )
-	{ m_pat->setColor( new_color ); }
-	
-	// force TCO to use color
-	m_pat->setUseStyleColor( false );
-	Engine::getSong()->setModified();
-	update();
-}
-
 void PatternView::trackColorReset()
 {
 	if( ! m_pat->useStyleColor() )
@@ -745,27 +731,6 @@ void PatternView::trackColorReset()
 		Engine::getSong()->setModified();
 		update();
 	}
-}
-
-void PatternView::trackColorChanged( QColor & c )
-{
-	if( isSelected() )
-	{
-		QVector<selectableObject *> selected =
-				gui->songEditor()->m_editor->selectedObjects();
-		for( QVector<selectableObject *>::iterator it =
-							selected.begin();
-						it != selected.end(); ++it )
-		{
-			PatternView * pcov = dynamic_cast<PatternView *>( *it );
-			if( pcov )
-			{
-				pcov->setColor( c );
-			}
-		}
-	}
-	else
-	{ setColor(c); }
 }
 
 

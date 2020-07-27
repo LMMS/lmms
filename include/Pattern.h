@@ -183,12 +183,6 @@ public:
 	QColor const & getMutedNoteBorderColor() const { return m_mutedNoteBorderColor; }
 	void setMutedNoteBorderColor(QColor const & color) { m_mutedNoteBorderColor = color; }
 
-	QColor color() const
-	{
-		return( m_pat->color() );
-	}
-	void setColor( QColor _new_color );
-
 public slots:
 	void update() override;
 
@@ -202,7 +196,6 @@ protected slots:
 	
 	void changeClipColor();
 	void useTrackColor();
-	void trackColorChanged( QColor & );
 	void trackColorReset();
 
 

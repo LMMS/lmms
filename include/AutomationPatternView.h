@@ -41,12 +41,6 @@ class AutomationPatternView : public TrackContentObjectView
 public:
 	AutomationPatternView( AutomationPattern * _pat, TrackView * _parent );
 	virtual ~AutomationPatternView();
-
-	QColor color() const
-	{
-		return( m_pat->colorObj() );
-	}
-	void setColor( QColor _new_color );
 	
 public slots:
 	/// Opens this view's pattern in the global automation editor

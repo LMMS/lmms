@@ -334,9 +334,6 @@ SampleTCOView::SampleTCOView( SampleTCO * _tco, TrackView * _tv ) :
 	// track future changes of SampleTCO
 	connect( m_tco, SIGNAL( sampleChanged() ),
 			this, SLOT( updateSample() ) );
-	
-	connect( m_tco, SIGNAL( trackColorChanged( QColor & ) ),
-			this, SLOT( trackColorChanged( QColor & ) ) );
 			
 	connect( m_tco, SIGNAL( trackColorReset() ),
 			this, SLOT( trackColorReset() ) );
@@ -634,7 +631,8 @@ void SampleTCOView::useTrackColor()
 {
 	if( m_tco->getTrack()->useColor() )
 	{
-		setColor( m_tco->getTrack()->backgroundColor() );
+		QColor buffer = m_tco->getTrack()->backgroundColor();
+		setColor( buffer );
 		m_tco->setUseStyleColor( false );
 	}
 	else
@@ -647,18 +645,6 @@ void SampleTCOView::useTrackColor()
 }
 
 
-
-void SampleTCOView::setColor( QColor new_color )
-{
-	if( new_color.rgb() != m_tco->color() )
-	{
-		m_tco->setColor( new_color );
-	}
-	
-	m_tco->setUseStyleColor( false );
-	Engine::getSong()->setModified();
-	update();
-}
 
 void SampleTCOView::trackColorReset()
 {

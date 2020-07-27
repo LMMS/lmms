@@ -54,8 +54,6 @@ AutomationPatternView::AutomationPatternView( AutomationPattern * _pattern,
 			this, SLOT( update() ) );
 	connect( gui->automationEditor(), SIGNAL( currentPatternChanged() ),
 			this, SLOT( update() ) );
-	connect( m_pat, SIGNAL( trackColorChanged( QColor & ) ),
-			this, SLOT( trackColorChanged( QColor & ) ) );
 	connect( m_pat, SIGNAL( trackColorReset() ),
 			this, SLOT( trackColorReset() ) );
 
@@ -198,7 +196,8 @@ void AutomationPatternView::useTrackColor()
 {
 	if( m_pat->getTrack()->useColor() )
 	{
-		setColor( m_pat->getTrack()->backgroundColor() );
+		QColor buffer = m_pat->getTrack()->backgroundColor();
+		setColor( buffer );
 		m_pat->setUseStyleColor( false );
 	}
 	else
@@ -211,18 +210,6 @@ void AutomationPatternView::useTrackColor()
 }
 
 
-
-void AutomationPatternView::setColor( QColor new_color )
-{
-	if( new_color.rgb() != m_pat->color() )
-	{
-		m_pat->setColor( new_color );
-	}
-	
-	m_pat->setUseStyleColor( false );
-	Engine::getSong()->setModified();
-	update();
-}
 
 void AutomationPatternView::trackColorReset()
 {

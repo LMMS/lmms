@@ -359,6 +359,7 @@ TrackContentObjectView::TrackContentObjectView( TrackContentObject * tco,
 	connect( m_tco, SIGNAL( clipColorChanged( QColor & ) ), this, SLOT( changeSelectedColor( QColor & ) ) );
 	connect( m_tco, SIGNAL( clipColorReset() ), this, SLOT( disableClipSelectedColor() ) );
 	setModel( m_tco );
+	connect( m_tco, SIGNAL( trackColorChanged( QColor & ) ), this, SLOT( setColor( QColor & ) ) );
 	
 	if( m_usesCustomSelectedColor )
 	{
@@ -611,6 +612,19 @@ void TrackContentObjectView::updatePosition()
 	m_trackView->trackContainerView()->update();
 }
 
+
+
+void TrackContentObjectView::setColor( QColor & new_color )
+{
+	// change color only if it is different
+	if( new_color.rgb() != m_tco->color() )
+	{ m_tco->setColor( new_color ); }
+	
+	// force TCO to use color
+	m_tco->setUseStyleColor( false );
+	Engine::getSong()->setModified();
+	update();
+}
 
 
 /*! \brief Change the trackContentObjectView's display when something
