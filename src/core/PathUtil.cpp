@@ -111,7 +111,7 @@ namespace PathUtil
 	{
 		//First, do no harm to absolute paths
 		QFileInfo inputFileInfo = QFileInfo(input);
-		if (inputFileInfo.isAbsolute()) return input;
+		if (inputFileInfo.isAbsolute()) { return input; }
 		//Next, handle old relative paths with no prefix
 		QString upgraded = input.contains(":") ? input : oldRelativeUpgrade(input);
 
@@ -145,6 +145,4 @@ namespace PathUtil
 		}
 		return basePrefix(shortestBase) + relativeOrAbsolute(absolutePath, shortestBase);
 	}
-
-	// QString toPreferredRelative( QString, std::vector<Base> );
 }
