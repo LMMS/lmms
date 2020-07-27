@@ -221,26 +221,6 @@ void AutomationPatternView::trackColorReset()
 	}
 }
 
-void AutomationPatternView::trackColorChanged( QColor & c )
-{
-	if( isSelected() )
-	{
-		QVector<selectableObject *> selected =
-				gui->songEditor()->m_editor->selectedObjects();
-		for( QVector<selectableObject *>::iterator it =
-							selected.begin();
-						it != selected.end(); ++it )
-		{
-			AutomationPatternView * apcov = dynamic_cast<AutomationPatternView *>( *it );
-			if( apcov )
-			{
-				apcov->setColor( c );
-			}
-		}
-	}
-	else
-	{ setColor(c); }
-}
 
 
 void AutomationPatternView::constructContextMenu( QMenu * _cm )

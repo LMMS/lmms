@@ -380,26 +380,6 @@ void BBTCOView::update()
 	TrackContentObjectView::update();
 }
 
-void BBTCOView::trackColorChanged( QColor & c )
-{
-	if( isSelected() )
-	{
-		QVector<selectableObject *> selected =
-				gui->songEditor()->m_editor->selectedObjects();
-		for( QVector<selectableObject *>::iterator it =
-							selected.begin();
-						it != selected.end(); ++it )
-		{
-			BBTCOView * bb_tcov = dynamic_cast<BBTCOView *>( *it );
-			if( bb_tcov )
-			{
-				bb_tcov->setColor( c );
-			}
-		}
-	}
-	else
-	{ setColor(c); }
-}
 
 QColor * BBTrack::s_lastTCOColor = NULL;
 

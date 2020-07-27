@@ -656,27 +656,6 @@ void SampleTCOView::trackColorReset()
 	}
 }
 
-void SampleTCOView::trackColorChanged( QColor & c )
-{
-	if( isSelected() )
-	{
-		QVector<selectableObject *> selected =
-				gui->songEditor()->m_editor->selectedObjects();
-		for( QVector<selectableObject *>::iterator it =
-							selected.begin();
-						it != selected.end(); ++it )
-		{
-			SampleTCOView * scov = dynamic_cast<SampleTCOView *>( *it );
-			if( scov )
-			{
-				scov->setColor( c );
-			}
-		}
-	}
-	else
-	{ setColor(c); }
-}
-
 
 
 

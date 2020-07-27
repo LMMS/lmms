@@ -81,7 +81,6 @@ protected slots:
 	void changeClipColor();
 	void useTrackColor();
 	void resetColor();
-	void trackColorChanged( QColor & c );
 
 
 protected:
