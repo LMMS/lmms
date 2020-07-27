@@ -28,7 +28,6 @@
 #include <cstdlib>
 #include <ctime>
 
-#include <QColorDialog>
 #include <QGraphicsProxyWidget>
 
 #include "CaptionMenu.h"
@@ -69,7 +68,8 @@ FxLine::FxLine( QWidget * _parent, FxMixerView * _mv, int _channelIndex ) :
 	m_strokeOuterInactive( 0, 0, 0 ),
 	m_strokeInnerActive( 0, 0, 0 ),
 	m_strokeInnerInactive( 0, 0, 0 ),
-	m_inRename( false )
+	m_inRename( false ),
+	m_dialog( QColor( 0, 0, 0 ) )
 {
 	if( !s_sendBgArrow )
 	{
@@ -128,6 +128,18 @@ FxLine::FxLine( QWidget * _parent, FxMixerView * _mv, int _channelIndex ) :
 	connect( &Engine::fxMixer()->effectChannel( m_channelIndex )->m_muteModel, SIGNAL( dataChanged() ), this, SLOT( update() ) );
 	
 	srand( time( 0 ) );
+	
+	QColor buffer;
+	for( int i = 0; i < 48; i += 6 )
+	{
+		for( int j = 0; j < 6; j++ )
+		{
+			buffer.setHsl( qMax( 0, 44 * ( i / 6 ) - 1 ), 150 - 20 * j, 140 - 10 * j );
+			m_dialog.setStandardColor( i + j, buffer );
+		}
+		
+	}
+	
 }
 
 
@@ -155,9 +167,11 @@ void FxLine::setChannelIndex( int index )
 
 void FxLine::drawFxLine( QPainter* p, const FxLine *fxLine, bool isActive, bool sendToThis, bool receiveFromThis )
 {
-	QString name = Engine::fxMixer()->effectChannel( m_channelIndex )->m_name;
-	bool muted = Engine::fxMixer()->effectChannel( m_channelIndex )->m_muteModel.value();
+	auto channel = Engine::fxMixer()->effectChannel( m_channelIndex );
+	bool muted = channel->m_muteModel.value();
+	QString name = channel->m_name;
 	QString elidedName = elideName( name );
+	
 	if( !m_inRename && m_renameLineEdit->text() != elidedName )
 	{
 		m_renameLineEdit->setText( elidedName );
@@ -167,8 +181,8 @@ void FxLine::drawFxLine( QPainter* p, const FxLine *fxLine, bool isActive, bool 
 	int height = fxLine->rect().height();
 
 	QColor color = muted ? ( isActive ? fxLine->backgroundActive().color() : p->background().color() )
-					: ( Engine::fxMixer()->effectChannel( m_channelIndex )->m_hasColor ? ( isActive ? Engine::fxMixer()->effectChannel( m_channelIndex )->m_color.darker( 120 ) 
-					: Engine::fxMixer()->effectChannel( m_channelIndex )->m_color.darker( 150 ) )
+					: ( channel->m_hasColor ? ( isActive ? channel->m_color.darker( 120 ) 
+					: channel->m_color.darker( 150 ) )
 					: ( isActive ? fxLine->backgroundActive().color()
 					: p->background().color() ) );
 
@@ -418,25 +432,14 @@ void FxLine::setStrokeInnerInactive( const QColor & c )
 
 void FxLine::changeColor()
 {
-	QColorDialog colorDialog( Engine::fxMixer()->effectChannel( m_channelIndex )->m_color );
-	QColor buffer( 0, 0, 0 );
+	auto channel = Engine::fxMixer()->effectChannel( m_channelIndex );
 	
-	for( int i = 0; i < 48; i += 6 )
-	{
-		for( int j = 0; j < 6; j++ )
-		{
-			buffer.setHsl( qMax( 0, 44 * ( i / 6 ) - 1 ), 150 - 20 * j, 140 - 10 * j );
-			colorDialog.setStandardColor( i + j, buffer );
-		}
-		
-	}
-	
-	QColor new_color = colorDialog.getColor( Engine::fxMixer()->effectChannel( m_channelIndex )->m_color );
+	QColor new_color = m_dialog.getColor( channel->m_color );
 	if( ! new_color.isValid() )
 	{ return; }
 	
-	Engine::fxMixer()->effectChannel( m_channelIndex )->m_color = new_color;
-	Engine::fxMixer()->effectChannel( m_channelIndex )->m_hasColor = true;
+	channel->m_color = new_color;
+	channel->m_hasColor = true;
 	
 	update();
 }
@@ -449,23 +452,10 @@ void FxLine::resetColor()
 
 void FxLine::randomColor()
 {
-	int index = rand() % 48;
-	QColor buffer( 0, 0, 0 );
+	auto channel = Engine::fxMixer()->effectChannel( m_channelIndex );
 	
-	for( int i = 0; i < 48; i += 6 )
-	{
-		for( int j = 0; j < 6; j++ )
-		{
-			if( i + j + 1 == index )
-			{
-				buffer.setHsl( qMax( 0, 44 * ( i / 6 ) - 1 ), 150 - 20 * j, 140 - 10 * j );	
-				break;
-			}
-		}
-		
-	}
-
-	Engine::fxMixer()->effectChannel( m_channelIndex )->m_color = buffer;
-	Engine::fxMixer()->effectChannel( m_channelIndex )->m_hasColor = true;
+	channel->m_color = m_dialog.standardColor( rand() % 48 );
+	channel->m_hasColor = true;
+	
 	update();
 }

@@ -26,6 +26,7 @@
 #ifndef FX_LINE_H
 #define FX_LINE_H
 
+#include <QColorDialog>
 #include <QGraphicsView>
 #include <QLineEdit>
 #include <QWidget>
@@ -98,6 +99,7 @@ private:
 	bool m_inRename;
 	QLineEdit * m_renameLineEdit;
 	QGraphicsView * m_view;
+	QColorDialog m_dialog;
 
 public slots:
 	void renameChannel();
