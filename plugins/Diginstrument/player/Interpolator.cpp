@@ -3,6 +3,9 @@
 //tmp
 #include <iostream>
 
+using namespace std;
+using namespace Diginstrument;
+
 template <typename T, class S>
 std::vector<Diginstrument::Component<T>> Diginstrument::Interpolator<T, S>::getSpectrum(const std::vector<T> &coordinates)
 {
@@ -98,12 +101,45 @@ S Diginstrument::Interpolator<T, S>::matchSpectra(const S &left, const S &right,
     std::cout<<"matching splines: "<<leftLabel<<", "<<rightLabel<<" @ "<<target<<std::endl;
     //conclusion: matching looks good
 
+    //tmp: if either is empty, return the other
+    if( left.getHarmonics().size()==0 && left.getStochastics().size()==0 ) return right;
+    if( right.getHarmonics().size()==0 && right.getStochastics().size()==0 ) return left;
+
     //bins
     //if they are "close enough", consider them a bin
     //calculate an average frequency
     //accumulate or average amplitude?
 
     //step 1: distinct, constant harmonics
+
+    //tmp: harmonics only
+    //put them in one
+    std::vector<Diginstrument::Component<T>> harmonics;
+    if(right.getHarmonics().size()>left.getHarmonics().size())
+    {
+        harmonics = right.getHarmonics();
+        for(auto h : left.getHarmonics())
+        {
+            harmonics.emplace_back(h);
+        }
+    }else
+    {
+        harmonics = left.getHarmonics();
+        for(auto h : right.getHarmonics())
+        {
+            harmonics.emplace_back(h);
+        }
+    }
+    //sort by frequency
+    std::sort(harmonics.begin(), harmonics.end());
+
+    //tmp: debug
+    cout<<"Components ordered: "<<endl;
+    for(auto h : harmonics)
+    {
+        cout<<h.frequency<<", "<<h.amplitude<<endl;
+    }
+    
 
     //frequency
     //match the peaks

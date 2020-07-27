@@ -9,31 +9,29 @@
 unsigned int Diginstrument::Synthesizer::outSampleRate = DEFAULT_SAMPLE_RATE;
 std::vector<float> Diginstrument::Synthesizer::sinetable(0);
 
-std::vector<float> Diginstrument::Synthesizer::playNote(const std::vector<Diginstrument::Component<double>> & components, const unsigned int frames, const unsigned int offset, const unsigned int & sampleRate)
+std::vector<float> Diginstrument::Synthesizer::playNote(std::vector<Diginstrument::Component<double>> components, const unsigned int frames, const unsigned int offset, const unsigned int & sampleRate)
 {
     std::vector<float> res(frames, 0);
 //tmp
     std::cout<<"components: "<<components.size()<<std::endl;
-    auto copycomponents = components;
     int nextbank = 0;
     bank.resize(components.size());
-    std::sort(copycomponents.begin(), copycomponents.end(), Component<double>::sortByAmplitudeDescending);
-    for(auto & component : copycomponents)
+    //ordering banks by amplitude can be a problem, if amps change close to eachother
+    std::sort(components.begin(), components.end(), Component<double>::sortByAmplitudeDescending);
+    for(auto & component : components)
     {//tmp
         std::cout<<component.frequency<<" "<<component.amplitude<<std::endl;
         //tmp
         if (component.amplitude < 0.001)
             continue;
 
-        const double step = component.frequency * ((double)sinetable.size() / (double)sampleRate);
-        int pos = bank[nextbank];
+        const unsigned int step = std::round(component.frequency * ((double)sinetable.size() / (double)sampleRate));
 
         for (int i = 0; i < frames; i++)
         {
-            res[i]+=component.amplitude * sinetable[pos];
-            pos = (int)std::round((pos + step)) % sinetable.size();
+            res[i]+=component.amplitude * sinetable[bank[nextbank]];
+            bank[nextbank] = (bank[nextbank] + step) % sinetable.size();
         }
-        bank[nextbank] = pos;
         nextbank++;
     }
     return res;
