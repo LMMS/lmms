@@ -1830,10 +1830,6 @@ void TrackContentWidget::setEmbossColor( const QBrush & c )
 // trackOperationsWidget
 // ===========================================================================
 
-
-QPixmap * TrackOperationsWidget::s_grip = NULL;     /*!< grip pixmap */
-
-
 /*! \brief Create a new trackOperationsWidget
  *
  * The trackOperationsWidget is the grip and the mute button of a track.
@@ -1960,17 +1956,11 @@ void TrackOperationsWidget::paintEvent( QPaintEvent * pe )
 
 	if( m_trackView->isMovingTrack() == false )
 	{
-		s_grip = new QPixmap( embed::getIconPixmap(
-							"track_op_grip" ) );
-
-		p.drawPixmap( 2, 2, *s_grip );
+		p.drawPixmap( 2, 2, embed::getIconPixmap("track_op_grip"));
 	}
 	else
 	{
-		s_grip = new QPixmap( embed::getIconPixmap(
-							"track_op_grip_c" ) );
-
-		p.drawPixmap( 2, 2, *s_grip );
+		p.drawPixmap( 2, 2, embed::getIconPixmap("track_op_grip_c"));
 	}
 }
 

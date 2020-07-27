@@ -371,15 +371,9 @@ PianoRoll::PianoRoll() :
 
 	// Set up quantization model
 	m_quantizeModel.addItem( tr( "Note lock" ) );
-	for( int i = 0; i <= NUM_EVEN_LENGTHS; ++i )
-	{
-		m_quantizeModel.addItem( "1/" + QString::number( 1 << i ) );
+	for (auto q : Quantizations) {
+		m_quantizeModel.addItem(QString("1/%1").arg(q));
 	}
-	for( int i = 0; i < NUM_TRIPLET_LENGTHS; ++i )
-	{
-		m_quantizeModel.addItem( "1/" + QString::number( (1 << i) * 3 ) );
-	}
-	m_quantizeModel.addItem( "1/192" );
 	m_quantizeModel.setValue( m_quantizeModel.findText( "1/16" ) );
 
 	connect( &m_quantizeModel, SIGNAL( dataChanged() ),
@@ -4280,8 +4274,7 @@ int PianoRoll::quantization() const
 		}
 	}
 
-	QString text = m_quantizeModel.currentText();
-	return DefaultTicksPerBar / text.right( text.length() - 2 ).toInt();
+	return DefaultTicksPerBar / Quantizations[m_quantizeModel.value() - 1];
 }
 
 
