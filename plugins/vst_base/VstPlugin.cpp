@@ -59,6 +59,7 @@
 #include "LocaleHelper.h"
 #include "MainWindow.h"
 #include "Mixer.h"
+#include "PathUtil.h"
 #include "Song.h"
 #include "FileDialog.h"
 
@@ -121,7 +122,7 @@ private:
 
 
 VstPlugin::VstPlugin( const QString & _plugin ) :
-	m_plugin( _plugin ),
+	m_plugin( PathUtil::toAbsolute(_plugin) ),
 	m_pluginWindowID( 0 ),
 	m_embedMethod( gui
 			? ConfigManager::inst()->vstEmbedMethod()
@@ -129,11 +130,6 @@ VstPlugin::VstPlugin( const QString & _plugin ) :
 	m_version( 0 ),
 	m_currentProgram()
 {
-	if( QDir::isRelativePath( m_plugin ) )
-	{
-		m_plugin = ConfigManager::inst()->vstDir()  + m_plugin;
-	}
-
 	setSplittedChannels( true );
 
 	PE::MachineType machineType;
@@ -804,7 +800,3 @@ QString VstPlugin::embedMethod() const
 {
 	return m_embedMethod;
 }
-
-
-
-
