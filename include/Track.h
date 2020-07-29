@@ -299,6 +299,15 @@ private:
 		ToggleSelected
 	} ;
 
+	enum ContextMenuAction
+	{
+		Remove,
+		Cut,
+		Copy,
+		Paste,
+		Mute
+	};
+
 	static TextFloat * s_textFloat;
 
 	TrackContentObject * m_tco;
@@ -333,6 +342,8 @@ private:
 		m_initialTCOEnd = m_initialTCOPos + m_tco->length();
 	}
 	void setInitialOffsets();
+
+	void contextMenuAction( ContextMenuAction action );
 
 	bool mouseMovedDistance( QMouseEvent * me, int distance );
 	MidiTime draggedTCOPos( QMouseEvent * me );

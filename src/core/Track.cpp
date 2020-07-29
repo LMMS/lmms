@@ -1126,22 +1126,64 @@ void TrackContentObjectView::contextMenuEvent( QContextMenuEvent * cme )
 	{
 		contextMenu.addAction( embed::getIconPixmap( "cancel" ),
 					tr( "Delete (middle mousebutton)" ),
-						this, SLOT( remove() ) );
+						[this](){ contextMenuAction( Remove ); } );
 		contextMenu.addSeparator();
 		contextMenu.addAction( embed::getIconPixmap( "edit_cut" ),
-					tr( "Cut" ), this, SLOT( cut() ) );
+					tr( "Cut" ), [this](){ contextMenuAction( Cut ); } );
 	}
 	contextMenu.addAction( embed::getIconPixmap( "edit_copy" ),
-					tr( "Copy" ), m_tco, SLOT( copy() ) );
+					tr( "Copy" ), [this](){ contextMenuAction( Copy ); } );
 	contextMenu.addAction( embed::getIconPixmap( "edit_paste" ),
-					tr( "Paste" ), m_tco, SLOT( paste() ) );
+					tr( "Paste" ), [this](){ contextMenuAction( Paste ); } );
 	contextMenu.addSeparator();
 	contextMenu.addAction( embed::getIconPixmap( "muted" ),
 				tr( "Mute/unmute (<%1> + middle click)" ).arg(UI_CTRL_KEY),
-						m_tco, SLOT( toggleMute() ) );
+						[this](){ contextMenuAction( Mute ); } );
 	constructContextMenu( &contextMenu );
 
 	contextMenu.exec( QCursor::pos() );
+}
+
+// This method processes the actions from the context menu of the TCO View.
+// We use this method so we can check if there are more selected TCOs to apply
+// some of the actions to all of them.
+void TrackContentObjectView::contextMenuAction( ContextMenuAction action )
+{
+	// TODO: Make it possible to remove, cut, copy and paste multiple selected TCOs through the context menu
+	switch( action )
+	{
+		case Remove:
+			remove();
+			break;
+		case Cut:
+			cut();
+			break;
+		case Copy:
+			getTrackContentObject()->copy();
+			break;
+		case Paste:
+			getTrackContentObject()->paste();
+			break;
+		case Mute:
+			// Checks if there are other selected TCOs and if so mutes them as well
+			QVector<selectableObject *> so = gui->songEditor()->m_editor->selectedObjects();
+
+			if( so.size() > 0 ){
+				for( QVector<selectableObject *>::iterator it = so.begin();
+						it != so.end(); ++it )
+				{
+					TrackContentObjectView *tcov =
+						dynamic_cast<TrackContentObjectView *>( *it );
+
+					tcov->getTrackContentObject()->toggleMute();
+				}
+			}
+			else
+			{
+				getTrackContentObject()->toggleMute();
+			}
+			break;
+	}
 }
 
 
