@@ -45,6 +45,8 @@
 #include <QPainter>
 #include <QStyleOption>
 #include <QVariant>
+#include <QClipboard>
+#include <QDebug>
 
 
 #include "AutomationPattern.h"
@@ -1152,7 +1154,7 @@ void TrackContentObjectView::contextMenuAction( ContextMenuAction action )
 	// List of selected TCOs
 	QVector<selectableObject *> so = gui->songEditor()->m_editor->selectedObjects();
 
-	// TODO: Make it possible to cut, copy and paste multiple selected TCOs through the context menu
+	// TODO: Make it possible to paste multiple selected TCOs through the context menu
 	switch( action )
 	{
 		case Remove:
@@ -1164,7 +1166,10 @@ void TrackContentObjectView::contextMenuAction( ContextMenuAction action )
 					TrackContentObjectView *tcov =
 						dynamic_cast<TrackContentObjectView *>( *it );
 
-					tcov->remove();
+					if( tcov != NULL )
+					{
+						tcov->remove();
+					}
 				}
 			}
 			else
@@ -1173,13 +1178,77 @@ void TrackContentObjectView::contextMenuAction( ContextMenuAction action )
 			}
 			break;
 		case Cut:
-			cut();
+			if( so.size() > 0 ){
+				// List of TCOs to be copied
+				QVector<TrackContentObjectView *> tcoViews;
+
+				for( QVector<selectableObject *>::iterator it = so.begin();
+						it != so.end(); ++it )
+				{
+					TrackContentObjectView *tcov = dynamic_cast<TrackContentObjectView *>( *it );
+					if( tcov != NULL )
+					{
+						tcoViews.push_back( tcov );
+						tcov->remove(); // We are cutting now
+					}
+				}
+
+				// Write the TCOs to a DataFile for copying
+				DataFile dataFile = createTCODataFiles( tcoViews );
+
+				// Copy it to the clipboard
+				QMimeData *tco_content = new QMimeData;
+				tco_content->setData( Clipboard::mimeType(), dataFile.toString().toUtf8() );
+				QApplication::clipboard()->setMimeData( tco_content, QClipboard::Clipboard );
+			}
+			else
+			{
+				cut();
+			}
 			break;
 		case Copy:
-			getTrackContentObject()->copy();
+			if( so.size() > 0 ){
+				// List of TCOs to be copied
+				QVector<TrackContentObjectView *> tcoViews;
+
+				for( QVector<selectableObject *>::iterator it = so.begin();
+						it != so.end(); ++it )
+				{
+					TrackContentObjectView *tcov = dynamic_cast<TrackContentObjectView *>( *it );
+					if( tcov != NULL )
+					{
+						tcoViews.push_back( tcov );
+					}
+				}
+
+				// Write the TCOs to a DataFile for copying
+				DataFile dataFile = createTCODataFiles( tcoViews );
+
+				// Copy it to the clipboard
+				QMimeData *tco_content = new QMimeData;
+				tco_content->setData( Clipboard::mimeType(), dataFile.toString().toUtf8() );
+				QApplication::clipboard()->setMimeData( tco_content, QClipboard::Clipboard );
+			}
+			else
+			{
+				getTrackContentObject()->copy();
+			}
 			break;
 		case Paste:
-			getTrackContentObject()->paste();
+			// NOTE: Because we give preference to the QApplication clipboard over the LMMS Clipboard class, we need to
+			// clear the QApplication Clipboard during the LMMS Clipboard copy operations (Clipboard::copy does that)
+
+			// If we have TCO data on the clipboard paste it. If not, do our regular TCO paste.
+			if( QApplication::clipboard()->mimeData( QClipboard::Clipboard )->hasFormat( Clipboard::mimeType() ) )
+			{
+				// TODO: Implement the actual paste operation
+				qWarning("Context Menu Paste - Data:");
+				qWarning() << QApplication::clipboard()->mimeData( QClipboard::Clipboard )->data( Clipboard::mimeType() );
+			}
+			else
+			{
+				getTrackContentObject()->paste();
+			}
 			break;
 		case Mute:
 			// Checks if there are other selected TCOs and if so mutes them as well
@@ -1190,7 +1259,10 @@ void TrackContentObjectView::contextMenuAction( ContextMenuAction action )
 					TrackContentObjectView *tcov =
 						dynamic_cast<TrackContentObjectView *>( *it );
 
-					tcov->getTrackContentObject()->toggleMute();
+					if( tcov != NULL )
+					{
+						tcov->getTrackContentObject()->toggleMute();
+					}
 				}
 			}
 			else
