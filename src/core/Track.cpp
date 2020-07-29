@@ -1149,11 +1149,28 @@ void TrackContentObjectView::contextMenuEvent( QContextMenuEvent * cme )
 // some of the actions to all of them.
 void TrackContentObjectView::contextMenuAction( ContextMenuAction action )
 {
-	// TODO: Make it possible to remove, cut, copy and paste multiple selected TCOs through the context menu
+	// List of selected TCOs
+	QVector<selectableObject *> so = gui->songEditor()->m_editor->selectedObjects();
+
+	// TODO: Make it possible to cut, copy and paste multiple selected TCOs through the context menu
 	switch( action )
 	{
 		case Remove:
-			remove();
+			// Checks if there are other selected TCOs and if so removes them as well
+			if( so.size() > 0 ){
+				for( QVector<selectableObject *>::iterator it = so.begin();
+						it != so.end(); ++it )
+				{
+					TrackContentObjectView *tcov =
+						dynamic_cast<TrackContentObjectView *>( *it );
+
+					tcov->remove();
+				}
+			}
+			else
+			{
+				remove();
+			}
 			break;
 		case Cut:
 			cut();
@@ -1166,8 +1183,6 @@ void TrackContentObjectView::contextMenuAction( ContextMenuAction action )
 			break;
 		case Mute:
 			// Checks if there are other selected TCOs and if so mutes them as well
-			QVector<selectableObject *> so = gui->songEditor()->m_editor->selectedObjects();
-
 			if( so.size() > 0 ){
 				for( QVector<selectableObject *>::iterator it = so.begin();
 						it != so.end(); ++it )
