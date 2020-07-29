@@ -150,6 +150,11 @@ QMenu::indicator:selected {
 	background-color: #101213;
 }
 
+positionLine {
+	qproperty-tailGradient: true;
+	qproperty-lineColor: rgb(255, 255, 255);
+}
+
 PianoRoll {
 	background-color: #141616;
 	qproperty-backgroundShade: rgba(255, 255, 255, 10);
@@ -195,7 +200,6 @@ Oscilloscope {
 	background: none;
 	border: none;
 	qproperty-normalColor: rgb(71, 253, 133);
-	qproperty-warningColor: rgb(255, 192, 64);
 	qproperty-clippingColor: rgb(255, 64, 64);
 }
 

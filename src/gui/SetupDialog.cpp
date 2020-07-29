@@ -393,7 +393,7 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	m_vstEmbedComboBox = new QComboBox(plugins_tw);
 	m_vstEmbedComboBox->move(XDelta, YDelta * ++counter);
 
-	QStringList embedMethods = ConfigManager::availabeVstEmbedMethods();
+	QStringList embedMethods = ConfigManager::availableVstEmbedMethods();
 	m_vstEmbedComboBox->addItem(tr("No embedding"), "none");
 	if(embedMethods.contains("qt"))
 	{

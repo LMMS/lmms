@@ -24,7 +24,6 @@
 
 #include "SampleBuffer.h"
 
-
 #include <QBuffer>
 #include <QFile>
 #include <QFileInfo>
@@ -55,9 +54,9 @@
 #include "Engine.h"
 #include "GuiApplication.h"
 #include "Mixer.h"
+#include "PathUtil.h"
 
 #include "FileDialog.h"
-
 
 
 SampleBuffer::SampleBuffer() :
@@ -179,7 +178,7 @@ void SampleBuffer::update( bool _keep_settings )
 	}
 	else if( !m_audioFile.isEmpty() )
 	{
-		QString file = tryToMakeAbsolute( m_audioFile );
+		QString file = PathUtil::toAbsolute( m_audioFile );
 		int_sample_t * buf = NULL;
 		sample_t * fbuf = NULL;
 		ch_cnt_t channels = DEFAULT_CHANNELS;
@@ -781,7 +780,7 @@ bool SampleBuffer::play( sampleFrame * _ab, handleState * _state,
 		}
 	}
 
-	if( tmp != NULL ) 
+	if( tmp != NULL )
 	{
 		MM_FREE( tmp );
 	}
@@ -1031,7 +1030,7 @@ QString SampleBuffer::openAudioFile() const
 		{
 			return QString();
 		}
-		return tryToMakeRelative( ofd.selectedFiles()[0] );
+		return PathUtil::toShortestRelative( ofd.selectedFiles()[0] );
 	}
 
 	return QString();
@@ -1222,7 +1221,7 @@ SampleBuffer * SampleBuffer::resample( const sample_rate_t _src_sr,
 
 void SampleBuffer::setAudioFile( const QString & _audio_file )
 {
-	m_audioFile = tryToMakeRelative( _audio_file );
+	m_audioFile = PathUtil::toShortestRelative( _audio_file );
 	update();
 }
 
@@ -1419,60 +1418,6 @@ void SampleBuffer::setReversed( bool _on )
 
 
 
-QString SampleBuffer::tryToMakeRelative( const QString & file )
-{
-	if( QFileInfo( file ).isRelative() == false )
-	{
-		// Normalize the path
-		QString f( QDir::cleanPath( file ) );
-
-		// First, look in factory samples
-		// Isolate "samples/" from "data:/samples/"
-		QString samplesSuffix = ConfigManager::inst()->factorySamplesDir().mid( ConfigManager::inst()->dataDir().length() );
-
-		// Iterate over all valid "data:/" searchPaths
-		for ( const QString & path : QDir::searchPaths( "data" ) )
-		{
-			QString samplesPath = QDir::cleanPath( path + samplesSuffix ) + "/";
-			if ( f.startsWith( samplesPath ) )
-			{
-				return QString( f ).mid( samplesPath.length() );
-			}
-		}
-
-		// Next, look in user samples
-		QString usd = ConfigManager::inst()->userSamplesDir();
-		usd.replace( QDir::separator(), '/' );
-		if( f.startsWith( usd ) )
-		{
-			return QString( f ).mid( usd.length() );
-		}
-	}
-	return file;
-}
-
-
-
-
-QString SampleBuffer::tryToMakeAbsolute(const QString& file)
-{
-	QFileInfo f(file);
-
-	if(f.isRelative())
-	{
-		f = QFileInfo(ConfigManager::inst()->userSamplesDir() + file);
-
-		if(! f.exists())
-		{
-			f = QFileInfo(ConfigManager::inst()->factorySamplesDir() + file);
-		}
-	}
-
-	if (f.exists()) {
-		return f.absoluteFilePath();
-	}
-	return file;
-}
 
 
 
@@ -1488,7 +1433,7 @@ SampleBuffer::handleState::handleState( bool _varying_pitch, int interpolation_m
 {
 	int error;
 	m_interpolationMode = interpolation_mode;
-	
+
 	if( ( m_resamplingData = src_new( interpolation_mode, DEFAULT_CHANNELS, &error ) ) == NULL )
 	{
 		qDebug( "Error: src_new() failed in sample_buffer.cpp!\n" );

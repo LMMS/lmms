@@ -181,6 +181,7 @@ PianoRoll::PianoRoll() :
 	m_lenOfNewNotes( MidiTime( 0, DefaultTicksPerBar/4 ) ),
 	m_lastNoteVolume( DefaultVolume ),
 	m_lastNotePanning( DefaultPanning ),
+	m_minResizeLen( 0 ),
 	m_startKey( INITIAL_START_KEY ),
 	m_lastKey( 0 ),
 	m_editMode( ModeDraw ),
@@ -370,15 +371,9 @@ PianoRoll::PianoRoll() :
 
 	// Set up quantization model
 	m_quantizeModel.addItem( tr( "Note lock" ) );
-	for( int i = 0; i <= NUM_EVEN_LENGTHS; ++i )
-	{
-		m_quantizeModel.addItem( "1/" + QString::number( 1 << i ) );
+	for (auto q : Quantizations) {
+		m_quantizeModel.addItem(QString("1/%1").arg(q));
 	}
-	for( int i = 0; i < NUM_TRIPLET_LENGTHS; ++i )
-	{
-		m_quantizeModel.addItem( "1/" + QString::number( (1 << i) * 3 ) );
-	}
-	m_quantizeModel.addItem( "1/192" );
 	m_quantizeModel.setValue( m_quantizeModel.findText( "1/16" ) );
 
 	connect( &m_quantizeModel, SIGNAL( dataChanged() ),
@@ -1727,9 +1722,21 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 					// then resize the note
 					m_action = ActionResizeNote;
 
+					//Calculate the minimum length we should allow when resizing
+					//each note, and let all notes use the smallest one found
+					m_minResizeLen = quantization();
 					for (Note *note : selectedNotes)
 					{
-					    if (note->oldLength() <= 0) { note->setOldLength(4); }
+						//Notes from the BB editor can have a negative length, so
+						//change their length to the displayed one before resizing
+						if (note->oldLength() <= 0) { note->setOldLength(4); }
+						//Let the note be sized down by quantized increments, stopping
+						//when the next step down would result in a negative length
+						int thisMin = note->oldLength() % quantization();
+						//The initial value for m_minResizeLen is the minimum length of
+						//a note divisible by the current Q. Therefore we ignore notes
+						//where thisMin == 0 when checking for a new minimum
+						if (thisMin > 0 && thisMin < m_minResizeLen) { m_minResizeLen = thisMin; }
 					}
 
 					// set resize-cursor
@@ -2664,7 +2671,7 @@ void PianoRoll::dragNotes( int x, int y, bool alt, bool shift, bool ctrl )
 		// If shift is pressed we resize and rearrange only the selected notes
 		// If shift + ctrl then we also rearrange all posterior notes (sticky)
 		// If shift is pressed but only one note is selected, apply sticky
-		
+
 		auto selectedNotes = getSelectedNotes();
 
 		if (shift)
@@ -2750,11 +2757,12 @@ void PianoRoll::dragNotes( int x, int y, bool alt, bool shift, bool ctrl )
 		else
 		{
 			// shift is not pressed; stretch length of selected notes but not their position
+			int minLength = alt ? 1 : m_minResizeLen.getTicks();
+
 			for (Note *note : selectedNotes)
 			{
-				int newLength = note->oldLength() + off_ticks;
-				newLength = qMax(1, newLength);
-				note->setLength( MidiTime(newLength) );
+				int newLength = qMax(minLength, note->oldLength() + off_ticks);
+				note->setLength(MidiTime(newLength));
 
 				m_lenOfNewNotes = note->length();
 			}
@@ -4266,8 +4274,7 @@ int PianoRoll::quantization() const
 		}
 	}
 
-	QString text = m_quantizeModel.currentText();
-	return DefaultTicksPerBar / text.right( text.length() - 2 ).toInt();
+	return DefaultTicksPerBar / Quantizations[m_quantizeModel.value() - 1];
 }
 
 

@@ -40,24 +40,24 @@
 
 #include <string>
 
-#include "ConfigManager.h"
 #include "BufferManager.h"
 #include "ConfigManager.h"
 #include "Engine.h"
+#include "FileDialog.h"
+#include "GuiApplication.h"
 #include "gui_templates.h"
 #include "InstrumentPlayHandle.h"
 #include "InstrumentTrack.h"
 #include "LocaleHelper.h"
 #include "MainWindow.h"
 #include "Mixer.h"
-#include "GuiApplication.h"
+#include "PathUtil.h"
 #include "PixmapButton.h"
 #include "SampleBuffer.h"
 #include "Song.h"
 #include "StringPairDrag.h"
 #include "TextFloat.h"
 #include "ToolTip.h"
-#include "FileDialog.h"
 
 
 #include "embed.h"
@@ -271,7 +271,7 @@ void vestigeInstrument::reloadPlugin()
 
 void vestigeInstrument::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
-	_this.setAttribute( "plugin", m_pluginDLL );
+	_this.setAttribute( "plugin", PathUtil::toShortestRelative(m_pluginDLL) );
 	m_pluginMutex.lock();
 	if( m_plugin != NULL )
 	{
@@ -338,14 +338,14 @@ void vestigeInstrument::loadFile( const QString & _file )
 
 	// if the same is loaded don't load again (for preview)
 	if (instrumentTrack() != NULL && instrumentTrack()->isPreviewMode() &&
-			m_pluginDLL == SampleBuffer::tryToMakeRelative( _file ))
+			m_pluginDLL == PathUtil::toShortestRelative( _file ))
 		return;
 
 	if ( m_plugin != NULL )
 	{
 		closePlugin();
 	}
-	m_pluginDLL = SampleBuffer::tryToMakeRelative( _file );
+	m_pluginDLL = PathUtil::toShortestRelative( _file );
 	TextFloat * tf = NULL;
 	if( gui )
 	{
@@ -686,7 +686,7 @@ void VestigeInstrumentView::openPlugin()
 
 	if( m_vi->m_pluginDLL != "" )
 	{
-		QString f = SampleBuffer::tryToMakeAbsolute( m_vi->m_pluginDLL );
+		QString f = PathUtil::toAbsolute( m_vi->m_pluginDLL );
 		ofd.setDirectory( QFileInfo( f ).absolutePath() );
 		ofd.selectFile( QFileInfo( f ).fileName() );
 	}
@@ -1233,7 +1233,3 @@ Q_DECL_EXPORT Plugin * lmms_plugin_main( Model *m, void * )
 
 
 }
-
-
-
-

@@ -52,7 +52,7 @@ LcdSpinBox::LcdSpinBox( int numDigits, QWidget* parent, const QString& name ) :
 
 
 LcdSpinBox::LcdSpinBox( int numDigits, const QString& style, QWidget* parent, const QString& name ) :
-	LcdWidget( numDigits, parent, name ),
+	LcdWidget( numDigits, style, parent, name ),
 	IntModelView( new IntModel( 0, 0, 0, NULL, name, true ), this ),
 	m_remainder( 0.f ),
 	m_mouseMoving( false ),
