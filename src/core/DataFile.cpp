@@ -852,7 +852,7 @@ void DataFile::upgrade_1_1_91()
 		// invert the mute LEDs
 		for( int j = 1; j <= 4; ++j ){
 			QString a = QString( "mute%1" ).arg( j );
-			el.setAttribute( a, ( el.attribute( a ) == "0" ) ? "1" : "0" );
+			el.setAttribute( a, el.attribute( a ) == "0" ? "1" : "0" );
 		}
 	}
 

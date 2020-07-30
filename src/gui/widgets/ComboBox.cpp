@@ -230,7 +230,7 @@ void ComboBox::wheelEvent( QWheelEvent* event )
 {
 	if( model() )
 	{
-		model()->setInitValue( model()->value() + ( ( event->delta() < 0 ) ? 1 : -1 ) );
+		model()->setInitValue( model()->value() + ( event->delta() < 0 ? 1 : -1 ) );
 		update();
 		event->accept();
 	}

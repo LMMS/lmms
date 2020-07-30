@@ -164,7 +164,7 @@ void LmmsStyle::drawComplexControl( ComplexControl control,
 			QStyleOptionTitleBar so( *titleBar );
 			so.palette = standardPalette();
 			so.palette.setColor( QPalette::HighlightedText,
-				( titleBar->titleBarState & State_Active ) ?
+				titleBar->titleBarState & State_Active ?
 					QColor( 255, 255, 255 ) :
 						QColor( 192, 192, 192 ) );
 			so.palette.setColor( QPalette::Text,

@@ -390,8 +390,8 @@ void MonstroSynth::renderOutput( fpp_t _frames, sampleFrame * _buf  )
 		}
 
 		// pulse wave osc
-		sample_t O1L = ( absFraction( leftph ) < o1_pw ) ? 1.0f : -1.0f;
-		sample_t O1R = ( absFraction( rightph ) < o1_pw ) ? 1.0f : -1.0f;
+		sample_t O1L = absFraction( leftph ) < o1_pw ? 1.0f : -1.0f;
+		sample_t O1R = absFraction( rightph ) < o1_pw ? 1.0f : -1.0f;
 
 		// check for rise/fall, and sync if appropriate
 		// sync on rise

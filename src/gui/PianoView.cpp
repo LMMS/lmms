@@ -786,7 +786,7 @@ void PianoView::paintEvent( QPaintEvent * )
 
 	p.setPen( Qt::white );
 
-	const int base_key = ( m_piano != NULL ) ?
+	const int base_key = m_piano != NULL ?
 		m_piano->instrumentTrack()->baseNoteModel()->value() : 0;
 
 	QColor baseKeyColor = QApplication::palette().color( QPalette::Active,

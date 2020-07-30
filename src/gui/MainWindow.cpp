@@ -599,7 +599,7 @@ void MainWindow::finalize()
 
 int MainWindow::addWidgetToToolBar( QWidget * _w, int _row, int _col )
 {
-	int col = ( _col == -1 ) ? m_toolBarLayout->columnCount() + 7 : _col;
+	int col = _col == -1 ? m_toolBarLayout->columnCount() + 7 : _col;
 	if( _w->height() > 32 || _row == -1 )
 	{
 		m_toolBarLayout->addWidget( _w, 0, col, 2, 1 );
@@ -780,11 +780,11 @@ void MainWindow::restoreWidgetState( QWidget * _w, const QDomElement & _de )
 		// set the window to its correct minimized/maximized/restored state
 		Qt::WindowStates flags = _w->windowState();
 		flags = _de.attribute( "minimized" ).toInt() ?
-				( flags | Qt::WindowMinimized ) :
-				( flags & ~Qt::WindowMinimized );
+				flags | Qt::WindowMinimized :
+				flags & ~Qt::WindowMinimized;
 		flags = _de.attribute( "maximized" ).toInt() ?
-				( flags | Qt::WindowMaximized ) :
-				( flags & ~Qt::WindowMaximized );
+				flags | Qt::WindowMaximized :
+				flags & ~Qt::WindowMaximized;
 		_w->setWindowState( flags );
 
 		_w->setVisible( _de.attribute( "visible" ).toInt() );

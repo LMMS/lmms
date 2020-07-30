@@ -88,9 +88,9 @@ Plugin::PluginTypes Lv2Proc::check(const LilvPlugin *plugin,
 		for (const PluginIssue& iss : issues) { qDebug() << "  - " << iss; }
 	}
 
-	return (audioChannels[inCount] > 2 || audioChannels[outCount] > 2)
+	return audioChannels[inCount] > 2 || audioChannels[outCount] > 2
 		? Plugin::Undefined
-		: (audioChannels[inCount] > 0)
+		: audioChannels[inCount] > 0
 			? Plugin::Effect
 			: Plugin::Instrument;
 }
@@ -307,7 +307,7 @@ void Lv2Proc::createPort(std::size_t portNum)
 					float stepSize = (meta.m_max - meta.m_min) / 1000.0f;
 
 					// make multiples of 0.01 (or 0.1 for larger values)
-					float minStep = (stepSize >= 1.0f) ? 0.1f : 0.01f;
+					float minStep = stepSize >= 1.0f ? 0.1f : 0.01f;
 					stepSize -= fmodf(stepSize, minStep);
 					stepSize = std::max(stepSize, minStep);
 
@@ -456,7 +456,7 @@ struct ConnectPortVisitor : public Lv2Ports::Visitor
 	void visit(Lv2Ports::Control& ctrl) override { connectPort(&ctrl.m_val); }
 	void visit(Lv2Ports::Audio& audio) override
 	{
-		connectPort((audio.mustBeUsed()) ? audio.m_buffer.data() : nullptr);
+		connectPort(audio.mustBeUsed() ? audio.m_buffer.data() : nullptr);
 	}
 	void visit(Lv2Ports::Unknown&) override { connectPort(nullptr); }
 	~ConnectPortVisitor() override;

@@ -877,7 +877,7 @@ void VestigeInstrumentView::paintEvent( QPaintEvent * )
 
 	p.drawPixmap( 0, 0, *s_artwork );
 
-	QString plugin_name = ( m_vi->m_plugin != NULL ) ?
+	QString plugin_name = m_vi->m_plugin != NULL ?
 				m_vi->m_plugin->name()/* + QString::number(
 						m_plugin->version() )*/
 					:

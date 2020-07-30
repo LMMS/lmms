@@ -125,13 +125,13 @@ public:
 
 	inline const MidiTime & loopBegin() const
 	{
-		return ( m_loopPos[0] < m_loopPos[1] ) ?
+		return m_loopPos[0] < m_loopPos[1] ?
 						m_loopPos[0] : m_loopPos[1];
 	}
 
 	inline const MidiTime & loopEnd() const
 	{
-		return ( m_loopPos[0] > m_loopPos[1] ) ?
+		return m_loopPos[0] > m_loopPos[1] ?
 						m_loopPos[0] : m_loopPos[1];
 	}
 

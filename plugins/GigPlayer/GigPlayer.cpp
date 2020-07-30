@@ -670,7 +670,7 @@ f_cnt_t GigInstrument::getPingPongIndex( f_cnt_t index, f_cnt_t startf, f_cnt_t 
 	const f_cnt_t looplen = endf - startf;
 	const f_cnt_t looppos = ( index - endf ) % ( looplen * 2 );
 
-	return ( looppos < looplen )
+	return looppos < looplen
 		? endf - looppos
 		: startf + ( looppos - looplen );
 }

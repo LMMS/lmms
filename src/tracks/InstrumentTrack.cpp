@@ -1680,7 +1680,7 @@ void InstrumentTrackWindow::saveSettingsBtnClicked()
 
 void InstrumentTrackWindow::updateName()
 {
-	setWindowTitle( m_track->name().length() > 25 ? ( m_track->name().left(24)+"..." ) : m_track->name() );
+	setWindowTitle( m_track->name().length() > 25 ? m_track->name().left(24)+"..." : m_track->name() );
 
 	if( m_nameLineEdit->text() != m_track->name() )
 	{

@@ -319,7 +319,7 @@ void EnvelopeAndLfoParameters::fillLevel( float * _buf, f_cnt_t _frame,
 		else if( ( _frame - _release_begin ) < m_rFrames )
 		{
 			env_level = m_rEnv[_frame - _release_begin] *
-				( ( _release_begin < m_pahdFrames ) ?
+				( _release_begin < m_pahdFrames ?
 				m_pahdEnv[_release_begin] : m_sustainLevel );
 		}
 		else

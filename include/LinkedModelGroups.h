@@ -116,7 +116,7 @@ public:
 	AutomatableModel* getModel(const std::string& s)
 	{
 		auto itr = m_models.find(s);
-		return (itr == m_models.end()) ? nullptr : itr->second.m_model;
+		return itr == m_models.end() ? nullptr : itr->second.m_model;
 	}
 
 	//! Register a further model

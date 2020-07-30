@@ -116,7 +116,7 @@ public:
 
 	static inline sample_t squareSample( const float _sample )
 	{
-		return ( fraction( _sample ) > 0.5f ) ? -1.0f : 1.0f;
+		return fraction( _sample ) > 0.5f ? -1.0f : 1.0f;
 	}
 
 	static inline sample_t moogSawSample( const float _sample )

@@ -166,7 +166,7 @@ void MidiAlsaSeq::processOutEvent( const MidiEvent& event, const MidiTime& time,
 
 	snd_seq_event_t ev;
 	snd_seq_ev_clear( &ev );
-	snd_seq_ev_set_source( &ev, ( m_portIDs[p][1] != -1 ) ?
+	snd_seq_ev_set_source( &ev, m_portIDs[p][1] != -1 ?
 					m_portIDs[p][1] : m_portIDs[p][0] );
 	snd_seq_ev_set_subs( &ev );
 	snd_seq_ev_schedule_tick( &ev, m_queueID, 1, static_cast<int>( time ) );

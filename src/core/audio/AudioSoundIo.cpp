@@ -410,7 +410,7 @@ void AudioSoundIo::setupWidget::updateDevices()
 		SoundIoDevice *device = soundio_get_output_device(m_soundio, i);
 
 		QString raw_text = device->is_raw ? " (raw)" : "";
-		QString default_text = (i == m_defaultOutIndex) ? " (default)" : "";
+		QString default_text = i == m_defaultOutIndex ? " (default)" : "";
 
 		m_deviceModel.addItem(device->name + raw_text + default_text);
 		m_deviceList.append({device->id, device->is_raw});

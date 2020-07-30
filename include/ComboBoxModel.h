@@ -58,7 +58,7 @@ public:
 
 	QString currentText() const
 	{
-		return ( size() > 0 && value() < size() ) ? m_items[value()].first : QString();
+		return size() > 0 && value() < size() ? m_items[value()].first : QString();
 	}
 
 	const PixmapLoader* currentData() const

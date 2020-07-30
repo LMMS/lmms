@@ -199,7 +199,7 @@ void kickerInstrument::playNote( NotePlayHandle * _n,
 		const float desired = desiredReleaseFrames();
 		for( fpp_t f = 0; f < frames; ++f )
 		{
-			const float fac = ( done+f < desired ) ? ( 1.0f - ( ( done+f ) / desired ) ) : 0;
+			const float fac = done+f < desired ? 1.0f - ( ( done+f ) / desired ) : 0;
 			_working_buffer[f+offset][0] *= fac;
 			_working_buffer[f+offset][1] *= fac;
 		}

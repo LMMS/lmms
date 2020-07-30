@@ -1337,7 +1337,7 @@ void SetupDialog::openBackgroundPicFile()
 		}
 	}
 
-	QString dir = (m_backgroundPicFile.isEmpty()) ?
+	QString dir = m_backgroundPicFile.isEmpty() ?
 		m_themeDir :
 		m_backgroundPicFile;
 	QString new_file = FileDialog::getOpenFileName(this,

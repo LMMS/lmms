@@ -333,7 +333,7 @@ void SampleTCOView::updateSample()
 	update();
 	// set tooltip to filename so that user can see what sample this
 	// sample-tco contains
-	ToolTip::add( this, ( m_tco->m_sampleBuffer->audioFile() != "" ) ?
+	ToolTip::add( this, m_tco->m_sampleBuffer->audioFile() != "" ?
 					PathUtil::toAbsolute(m_tco->m_sampleBuffer->audioFile()) :
 					tr( "Double-click to open sample" ) );
 }
@@ -501,8 +501,8 @@ void SampleTCOView::paintEvent( QPaintEvent * pe )
 	bool muted = m_tco->getTrack()->isMuted() || m_tco->isMuted();
 
 	// state: selected, muted, normal
-	c = isSelected() ? selectedColor() : ( muted ? mutedBackgroundColor()
-		: painter.background().color() );
+	c = isSelected() ? selectedColor() : muted ? mutedBackgroundColor()
+		: painter.background().color();
 
 	lingrad.setColorAt( 1, c.darker( 300 ) );
 	lingrad.setColorAt( 0, c );
@@ -1148,7 +1148,7 @@ void SampleTrackView::assignFxLine(int channelIndex)
 
 void SampleTrackWindow::updateName()
 {
-	setWindowTitle(m_track->name().length() > 25 ? (m_track->name().left(24) + "...") : m_track->name());
+	setWindowTitle(m_track->name().length() > 25 ? m_track->name().left(24) + "..." : m_track->name());
 
 	if(m_nameLineEdit->text() != m_track->name())
 	{

@@ -73,7 +73,7 @@ public:
 
 	static inline float expKnobVal( float _val )
 	{
-		return ( ( _val < 0 ) ? -_val : _val ) * _val;
+		return ( _val < 0 ? -_val : _val ) * _val;
 	}
 
 	static LfoInstances * instances()

@@ -93,7 +93,7 @@ Lv2ControlBase::~Lv2ControlBase() {}
 
 LinkedModelGroup *Lv2ControlBase::getGroup(std::size_t idx)
 {
-	return (m_procs.size() > idx) ? m_procs[idx].get() : nullptr;
+	return m_procs.size() > idx ? m_procs[idx].get() : nullptr;
 }
 
 
@@ -101,7 +101,7 @@ LinkedModelGroup *Lv2ControlBase::getGroup(std::size_t idx)
 
 const LinkedModelGroup *Lv2ControlBase::getGroup(std::size_t idx) const
 {
-	return (m_procs.size() > idx) ? m_procs[idx].get() : nullptr;
+	return m_procs.size() > idx ? m_procs[idx].get() : nullptr;
 }
 
 

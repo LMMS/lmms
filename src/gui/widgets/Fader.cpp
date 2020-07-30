@@ -445,7 +445,7 @@ void Fader::paintLinearLevels(QPaintEvent * ev, QPainter & painter)
 
 	if( m_persistentPeak_L > 0.05 )
 	{
-		painter.fillRect( QRect( 2, persistentPeak_L, 7, 1 ), ( m_persistentPeak_L < 1.0 )
+		painter.fillRect( QRect( 2, persistentPeak_L, 7, 1 ), m_persistentPeak_L < 1.0
 			? peakGreen()
 			: peakRed() );
 	}
@@ -456,7 +456,7 @@ void Fader::paintLinearLevels(QPaintEvent * ev, QPainter & painter)
 
 	if( m_persistentPeak_R > 0.05 )
 	{
-		painter.fillRect( QRect( 14, persistentPeak_R, 7, 1 ), ( m_persistentPeak_R < 1.0 )
+		painter.fillRect( QRect( 14, persistentPeak_R, 7, 1 ), m_persistentPeak_R < 1.0
 			? peakGreen()
 			: peakRed() );
 	}

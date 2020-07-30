@@ -72,7 +72,7 @@ void NStateButton::changeState( int _n )
 		m_curState = _n;
 
 		const QString & _tooltip =
-			( m_states[m_curState].second != "" ) ?
+			m_states[m_curState].second != "" ?
 				m_states[m_curState].second :
 					m_generalToolTip;
 		ToolTip::add( this, _tooltip );

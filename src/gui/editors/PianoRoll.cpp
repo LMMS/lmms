@@ -584,7 +584,7 @@ void PianoRoll::markSemiTone( int i )
 
 			const int first = chord->isScale() ? 0 : key;
 			const int last = chord->isScale() ? NumKeys : key + chord->last();
-			const int cap = ( chord->isScale() || chord->last() == 0 ) ? KeysPerOctave : chord->last();
+			const int cap = chord->isScale() || chord->last() == 0 ? KeysPerOctave : chord->last();
 
 			for( int i = first; i <= last; i++ )
 			{
@@ -1147,7 +1147,7 @@ void PianoRoll::shiftPos(NoteVector notes, int amount)
 	m_pattern->addJournalCheckPoint();
 	auto leftMostPos = notes.first()->pos();
 	//Limit leftwards shifts to prevent moving left of pattern start
-	auto shiftAmount = (leftMostPos > -amount) ? amount : -leftMostPos;
+	auto shiftAmount = leftMostPos > -amount ? amount : -leftMostPos;
 	if (shiftAmount == 0) { return; }
 
 	for (Note *note : notes) { note->setPos( note->pos() + shiftAmount ); }
@@ -3373,7 +3373,7 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 	p.drawRect( x + WHITE_KEY_WIDTH, y, w, h );
 
 	// TODO: Get this out of paint event
-	int l = ( hasValidPattern() )? (int) m_pattern->length() : 0;
+	int l = hasValidPattern() ? (int) m_pattern->length() : 0;
 
 	// reset scroll-range
 	if( m_leftRightScroll->maximum() != l )

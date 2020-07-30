@@ -231,8 +231,8 @@ void NotePlayHandle::play( sampleFrame * _working_buffer )
 		m_totalFramesPlayed + framesThisPeriod > m_frames )
 	{
 		noteOff( m_totalFramesPlayed == 0
-			? ( m_frames + offset() ) // if we have noteon and noteoff during the same period, take offset in account for release frame
-			: ( m_frames - m_totalFramesPlayed ) ); // otherwise, the offset is already negated and can be ignored
+			? m_frames + offset() // if we have noteon and noteoff during the same period, take offset in account for release frame
+			: m_frames - m_totalFramesPlayed ); // otherwise, the offset is already negated and can be ignored
 	}
 
 	// under some circumstances we're called even if there's nothing to play

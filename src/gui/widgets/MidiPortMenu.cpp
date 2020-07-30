@@ -86,7 +86,7 @@ void MidiPortMenu::activatedPort( QAction * _item )
 void MidiPortMenu::updateMenu()
 {
 	MidiPort * mp = castModel<MidiPort>();
-	const MidiPort::Map & map = ( m_mode == MidiPort::Input ) ?
+	const MidiPort::Map & map = m_mode == MidiPort::Input ?
 				mp->readablePorts() : mp->writablePorts();
 	clear();
 	for( MidiPort::Map::ConstIterator it = map.begin();

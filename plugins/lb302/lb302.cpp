@@ -227,7 +227,7 @@ void lb302Filter3Pole::envRecalc()
 
 	// e0 is adjusted for Hz and doesn't need ENVINC
 	w = vcf_e0 + vcf_c0;
-	k = (fs->cutoff > 0.975)?0.975:fs->cutoff;
+	k = fs->cutoff > 0.975?0.975:fs->cutoff;
 	kfco = 50.f + (k)*((2300.f-1600.f*(fs->envmod))+(w) *
 	                   (700.f+1500.f*(k)+(1500.f+(k)*(Engine::mixer()->processingSampleRate()/2.f-6000.f)) *
 	                   (fs->envmod)) );
@@ -546,11 +546,11 @@ int lb302Synth::process(sampleFrame *outbuf, const int size)
 				break;
 
 			case SQUARE: // p0: slope of top
-				vco_k = (vco_c<0)?0.5:-0.5;
+				vco_k = vco_c<0?0.5:-0.5;
 				break;
 
 			case ROUND_SQUARE: // p0: width of round
-				vco_k = (vco_c<0)?(sqrtf(1-(vco_c*vco_c*4))-0.5):-0.5;
+				vco_k = vco_c<0?sqrtf(1-(vco_c*vco_c*4))-0.5:-0.5;
 				break;
 
 			case MOOG: // Maybe the fall should be exponential/sinsoidal instead of quadric.

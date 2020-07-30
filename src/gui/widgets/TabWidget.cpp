@@ -125,7 +125,7 @@ int TabWidget::findTabAtPos( const QPoint *pos )
 
 	if( pos->y() > 1 && pos->y() < m_tabbarHeight - 1 )
 	{
-		int cx = ( ( m_caption == "" ) ? 4 : 14 ) + fontMetrics().width( m_caption );
+		int cx = ( m_caption == "" ? 4 : 14 ) + fontMetrics().width( m_caption );
 
 		for( widgetStack::iterator it = m_widgets.begin(); it != m_widgets.end(); ++it )
 		{
@@ -294,7 +294,7 @@ void TabWidget::wheelEvent( QWheelEvent * we )
 	}
 
 	we->accept();
-	int dir = ( we->delta() < 0 ) ? 1 : -1;
+	int dir = we->delta() < 0 ? 1 : -1;
 	int tab = m_activeTab;
 	while( tab > -1 && static_cast<int>( tab ) < m_widgets.count() )
 	{

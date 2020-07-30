@@ -181,7 +181,7 @@ bool AudioJack::initJackClient()
 	for( ch_cnt_t ch = 0; ch < channels(); ++ch )
 	{
 		QString name = QString( "master out " ) +
-				( ( ch % 2 ) ? "R" : "L" ) +
+				( ch % 2 ? "R" : "L" ) +
 				QString::number( ch / 2 + 1 );
 		m_outputPorts.push_back( jack_port_register( m_client,
 						name.toLatin1().constData(),

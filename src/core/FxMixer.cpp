@@ -700,7 +700,7 @@ void FxMixer::clearChannel(fx_ch_t index)
 	ch->m_volumeModel.setValue( 1.0f );
 	ch->m_muteModel.setValue( false );
 	ch->m_soloModel.setValue( false );
-	ch->m_name = ( index == 0 ) ? tr( "Master" ) : tr( "FX %1" ).arg( index );
+	ch->m_name = index == 0 ? tr( "Master" ) : tr( "FX %1" ).arg( index );
 	ch->m_volumeModel.setDisplayName( ch->m_name + ">" + tr( "Volume" ) );
 	ch->m_muteModel.setDisplayName( ch->m_name + ">" + tr( "Mute" ) );
 	ch->m_soloModel.setDisplayName( ch->m_name + ">" + tr( "Solo" ) );

@@ -261,8 +261,8 @@ void AutomationPatternView::paintEvent( QPaintEvent * )
 	bool current = gui->automationEditor()->currentPattern() == m_pat;
 	
 	// state: selected, muted, normal
-	c = isSelected() ? selectedColor() : ( muted ? mutedBackgroundColor() 
-		:	painter.background().color() );
+	c = isSelected() ? selectedColor() : muted ? mutedBackgroundColor() 
+		:	painter.background().color();
 
 	lingrad.setColorAt( 1, c.darker( 300 ) );
 	lingrad.setColorAt( 0, c );

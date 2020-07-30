@@ -300,7 +300,7 @@ void SampleBuffer::convertIntToFloat ( int_sample_t * & _ibuf, f_cnt_t _frames, 
 	// float-samples and does amplifying & reversing
 	const float fac = 1 / OUTPUT_SAMPLE_MULTIPLIER;
 	m_data = MM_ALLOC( sampleFrame, _frames );
-	const int ch = ( _channels > 1 ) ? 1 : 0;
+	const int ch = _channels > 1 ? 1 : 0;
 
 	// if reversing is on, we also reverse when
 	// scaling
@@ -335,7 +335,7 @@ void SampleBuffer::directFloatWrite ( sample_t * & _fbuf, f_cnt_t _frames, int _
 {
 
 	m_data = MM_ALLOC( sampleFrame, _frames );
-	const int ch = ( _channels > 1 ) ? 1 : 0;
+	const int ch = _channels > 1 ? 1 : 0;
 
 	// if reversing is on, we also reverse when
 	// scaling
@@ -927,7 +927,7 @@ f_cnt_t SampleBuffer::getPingPongIndex( f_cnt_t _index, f_cnt_t _startf, f_cnt_t
 	const f_cnt_t looplen = _endf - _startf;
 	const f_cnt_t looppos = ( _index - _endf ) % ( looplen*2 );
 
-	return ( looppos < looplen )
+	return looppos < looplen
 		? _endf - looppos
 		: _startf + ( looppos - looplen );
 }
@@ -1092,9 +1092,9 @@ FLAC__StreamEncoderWriteStatus flacStreamEncoderWriteCallback(
 	{
 		return FLAC__STREAM_ENCODER_WRITE_STATUS_OK;
 	}*/
-	return ( static_cast<QBuffer *>( _client_data )->write(
+	return static_cast<QBuffer *>( _client_data )->write(
 				(const char *) _buffer, _bytes ) ==
-								(int) _bytes ) ?
+								(int) _bytes ?
 				FLAC__STREAM_ENCODER_WRITE_STATUS_OK :
 				FLAC__STREAM_ENCODER_WRITE_STATUS_FATAL_ERROR;
 }

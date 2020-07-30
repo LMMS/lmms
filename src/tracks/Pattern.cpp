@@ -864,9 +864,9 @@ void PatternView::paintEvent( QPaintEvent * )
 	bool beatPattern = m_pat->m_patternType == Pattern::BeatPattern;
 
 	// state: selected, normal, beat pattern, muted
-	QColor c = isSelected() ? selectedColor() : ( ( !muted && !beatPattern )
-		? painter.background().color() : ( beatPattern
-		? BBPatternBackground() : mutedBackgroundColor() ) );
+	QColor c = isSelected() ? selectedColor() : !muted && !beatPattern
+		? painter.background().color() : beatPattern
+		? BBPatternBackground() : mutedBackgroundColor();
 
 	// invert the gradient for the background in the B&B editor
 	QLinearGradient lingrad( 0, 0, 0, height() );

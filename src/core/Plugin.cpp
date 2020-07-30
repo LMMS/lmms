@@ -98,7 +98,7 @@ QString use_this_or(QString this_param, QString or_param)
 QString Plugin::displayName() const
 {
 	return Model::displayName().isEmpty() // currently always empty
-		? (m_descriptor->subPluginFeatures && m_key.isValid())
+		? m_descriptor->subPluginFeatures && m_key.isValid()
 			// get from sub plugin
 			? m_key.displayName()
 			// get from plugin
@@ -111,7 +111,7 @@ QString Plugin::displayName() const
 
 const PixmapLoader* Plugin::logo() const
 {
-	return (m_descriptor->subPluginFeatures && m_key.isValid())
+	return m_descriptor->subPluginFeatures && m_key.isValid()
 		? m_key.logo()
 		: m_descriptor->logo;
 }

@@ -339,7 +339,7 @@ void TimeLineWidget::mousePressEvent( QMouseEvent* event )
 			qSwap( m_loopPos[0], m_loopPos[1] );
 		}
 
-		m_loopPos[( m_action == MoveLoopBegin ) ? 0 : 1] = t;
+		m_loopPos[m_action == MoveLoopBegin ? 0 : 1] = t;
 	}
 
 	if( m_action == MoveLoopBegin || m_action == MoveLoopEnd )

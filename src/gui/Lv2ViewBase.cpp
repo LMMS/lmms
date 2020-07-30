@@ -70,7 +70,7 @@ Lv2ViewProc::Lv2ViewProc(QWidget* parent, Lv2Proc* ctrlBase, int colNum) :
 						m_control = new KnobControl(m_par);
 						break;
 					case PortVis::Integer:
-						m_control = new LcdControl((port.m_max <= 9.0f) ? 1 : 2,
+						m_control = new LcdControl(port.m_max <= 9.0f ? 1 : 2,
 													m_par);
 						break;
 					case PortVis::Enumeration:

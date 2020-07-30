@@ -50,7 +50,7 @@ TabButton * TabBar::addTab( QWidget * _w, const QString & _text, int _id,
 		// then remove it
 		removeTab( _id );
 	}
-	QString caption = ( _text_is_tooltip ) ? QString( "" ) : _text;
+	QString caption = _text_is_tooltip ? QString( "" ) : _text;
 	// create tab-button
 	TabButton * b = new TabButton( caption, _id, this );
 	connect( b, SIGNAL( clicked( int ) ), this, SLOT( tabClicked( int ) ) );

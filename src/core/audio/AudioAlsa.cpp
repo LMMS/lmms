@@ -90,7 +90,7 @@ AudioAlsa::AudioAlsa( bool & _success_ful, Mixer*  _mixer ) :
 	snd_pcm_poll_descriptors( m_handle, ufds, count );
 	for( int i = 0; i < qMax( 3, count ); ++i )
 	{
-		const int fd = ( i >= count ) ? ufds[0].fd+i : ufds[i].fd;
+		const int fd = i >= count ? ufds[0].fd+i : ufds[i].fd;
 		int oldflags = fcntl( fd, F_GETFD, 0 );
 		if( oldflags < 0 )
 			continue;

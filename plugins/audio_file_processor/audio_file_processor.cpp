@@ -1040,8 +1040,8 @@ void AudioFileProcessorWaveView::zoom( const bool _out )
 	const f_cnt_t d_to = m_to - end;
 
 	const f_cnt_t step = qMax( 1, qMax( d_from, d_to ) / 10 );
-	const f_cnt_t step_from = ( _out ? - step : step );
-	const f_cnt_t step_to = ( _out ? step : - step );
+	const f_cnt_t step_from = _out ? - step : step;
+	const f_cnt_t step_to = _out ? step : - step;
 
 	const double comp_ratio = double( qMin( d_from, d_to ) )
 								/ qMax( 1, qMax( d_from, d_to ) );

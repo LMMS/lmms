@@ -1161,7 +1161,7 @@ void RemoteVstPlugin::getParameterDump()
 void RemoteVstPlugin::setParameterDump( const message & _m )
 {
 	const int n = _m.getInt( 0 );
-	const int params = ( n > m_plugin->numParams ) ?
+	const int params = n > m_plugin->numParams ?
 					m_plugin->numParams : n;
 	int p = 0;
 	for( int i = 0; i < params; ++i )

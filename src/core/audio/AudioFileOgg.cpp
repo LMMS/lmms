@@ -107,9 +107,9 @@ bool AudioFileOgg::startEncoding()
 	vorbis_info_init( &m_vi );
 
 	if( vorbis_encode_setup_managed( &m_vi, m_channels, m_rate,
-			( maximumBitrate > 0 )? maximumBitrate * 1000 : -1,
+			maximumBitrate > 0 ? maximumBitrate * 1000 : -1,
 						nominalBitrate() * 1000, 
-			( minimalBitrate > 0 )? minimalBitrate * 1000 : -1 ) )
+			minimalBitrate > 0 ? minimalBitrate * 1000 : -1 ) )
 	{
 		printf( "Mode initialization failed: invalid parameters for "
 								"bitrate\n" );
