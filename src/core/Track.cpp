@@ -2654,7 +2654,7 @@ void Track::toggleSolo()
 			{
 				( *it )->setMuted( false );
 			}
-			else if( ConfigManager::inst()->value("app","sololegacybehavior").toInt() || ( *it )->type() != AutomationTrack )
+			else if( ConfigManager::inst()->value("app","sololegacybehavior", "0").toInt() || ( *it )->type() != AutomationTrack )
 			{
 				( *it )->setMuted( true );
 			}
@@ -2667,7 +2667,7 @@ void Track::toggleSolo()
 		{
 			// Unless we are on the sololegacybehavior mode, only restores the
 			// mute state if the track isn't an Automation Track
-			if( ConfigManager::inst()->value("app","sololegacybehavior").toInt()
+			if( ConfigManager::inst()->value("app","sololegacybehavior", "0").toInt()
 				|| ( *it )->type() != AutomationTrack )
 			{
 				( *it )->setMuted( ( *it )->m_mutedBeforeSolo );

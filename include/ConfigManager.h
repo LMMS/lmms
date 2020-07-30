@@ -268,7 +268,6 @@ private:
 
 	void upgrade_1_1_90();
 	void upgrade_1_1_91();
-	void upgrade_1_3_0();
 	void upgrade();
 
 	QString m_workingDir;

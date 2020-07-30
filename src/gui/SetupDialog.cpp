@@ -103,7 +103,7 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	m_sideBarOnRight(ConfigManager::inst()->value(
 			"ui", "sidebaronright").toInt()),
 	m_soloLegacyBehavior(ConfigManager::inst()->value(
-			"app", "sololegacybehavior").toInt()),
+			"app", "sololegacybehavior", "0").toInt()),
 	m_MMPZ(!ConfigManager::inst()->value(
 			"app", "nommpz").toInt()),
 	m_disableBackup(!ConfigManager::inst()->value(

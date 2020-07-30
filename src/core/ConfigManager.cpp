@@ -123,15 +123,6 @@ void ConfigManager::upgrade_1_1_91()
 }
 
 
-void ConfigManager::upgrade_1_3_0()
-{
-	// Adds the option of using the solo legacy behavior (muting Automation Tracks as well) if
-	// it isn't on the configuration file (safety check + upgrade)
-	if(value("app", "sololegacybehavior").isNull()) {
-		setValue("app", "sololegacybehavior", "0");
-	}
-}
-
 
 void ConfigManager::upgrade()
 {
@@ -153,11 +144,6 @@ void ConfigManager::upgrade()
 		upgrade_1_1_91();
 	}
 
-	if (createdWith.setCompareType(ProjectVersion::Build) < "1.3.0")
-	{
-		upgrade_1_3_0();
-	}
-	
 	// Don't use old themes as they break the UI (i.e. 0.4 != 1.0, etc)
 	if (createdWith.setCompareType(ProjectVersion::Minor) != LMMS_VERSION)
 	{
