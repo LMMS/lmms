@@ -575,7 +575,6 @@ void SongEditor::keyPressEvent( QKeyEvent * ke )
 	}
 	else if( ke->key() == Qt::Key_Delete || ke->key() == Qt::Key_Backspace )
 	{
-		QVector<TrackContentObjectView *> tcoViews;
 		QVector<selectableObject *> so = selectedObjects();
 		for( QVector<selectableObject *>::iterator it = so.begin();
 				it != so.end(); ++it )
