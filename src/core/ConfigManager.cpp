@@ -123,7 +123,6 @@ void ConfigManager::upgrade_1_1_91()
 }
 
 
-
 void ConfigManager::upgrade()
 {
 	// Skip the upgrade if versions match
@@ -143,7 +142,7 @@ void ConfigManager::upgrade()
 	{
 		upgrade_1_1_91();
 	}
-
+	
 	// Don't use old themes as they break the UI (i.e. 0.4 != 1.0, etc)
 	if (createdWith.setCompareType(ProjectVersion::Minor) != LMMS_VERSION)
 	{
