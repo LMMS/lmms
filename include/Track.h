@@ -403,6 +403,13 @@ public slots:
 	void changePosition( const MidiTime & newPos = MidiTime( -1 ) );
 
 protected:
+	enum ContextMenuAction
+	{
+		Paste
+	};
+
+	void contextMenuEvent( QContextMenuEvent * cme ) override;
+	void contextMenuAction( QContextMenuEvent * cme, ContextMenuAction action );
 	void dragEnterEvent( QDragEnterEvent * dee ) override;
 	void dropEvent( QDropEvent * de ) override;
 	void mousePressEvent( QMouseEvent * me ) override;

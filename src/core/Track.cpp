@@ -1972,6 +1972,43 @@ MidiTime TrackContentWidget::endPosition( const MidiTime & posStart )
 	return posStart + static_cast<int>( w * MidiTime::ticksPerBar() / ppb );
 }
 
+void TrackContentWidget::contextMenuEvent( QContextMenuEvent * cme )
+{
+	if( cme->modifiers() )
+	{
+		return;
+	}
+
+	// If we don't have TCO data in the clipboard there's no need to create this menu
+	// since "paste" is the only action at the moment.
+	const QMimeData *md = QApplication::clipboard()->mimeData( QClipboard::Clipboard );
+	if( !md->hasFormat( StringPairDrag::mimeType() )  )
+	{
+		return;
+	}
+
+	QMenu contextMenu( this );
+	QAction *pasteA = contextMenu.addAction( embed::getIconPixmap( "edit_paste" ),
+					tr( "Paste" ), [this, cme](){ contextMenuAction( cme, Paste ); } );
+	// If we can't paste in the current TCW for some reason, disable the action so the user knows
+	pasteA->setEnabled( canPasteSelection( getPosition( cme->x() ), md ) ? true : false );
+
+	contextMenu.exec( QCursor::pos() );
+}
+
+void TrackContentWidget::contextMenuAction( QContextMenuEvent * cme, ContextMenuAction action )
+{
+	switch( action )
+	{
+		case Paste:
+		// Paste the selection on the MidiTime of the context menu click
+		const QMimeData *md = QApplication::clipboard()->mimeData( QClipboard::Clipboard );
+		MidiTime tcoPos = getPosition( cme->x() );
+
+		pasteSelection( tcoPos, md );
+		break;
+	}
+}
 
 
 
