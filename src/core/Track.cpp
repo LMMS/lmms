@@ -1154,7 +1154,6 @@ void TrackContentObjectView::contextMenuAction( ContextMenuAction action )
 	// List of selected TCOs
 	QVector<selectableObject *> so = gui->songEditor()->m_editor->selectedObjects();
 
-	// TODO: Make it possible to paste multiple selected TCOs through the context menu
 	switch( action )
 	{
 		case Remove:
@@ -1189,19 +1188,25 @@ void TrackContentObjectView::contextMenuAction( ContextMenuAction action )
 					if( tcov != NULL )
 					{
 						tcoViews.push_back( tcov );
-						tcov->remove(); // We are cutting now
 					}
 				}
 
 				// Write the TCOs to a DataFile for copying
 				DataFile dataFile = createTCODataFiles( tcoViews );
 
+				// Now that the dataFile is created we can delete the tracks, since we are cutting
+				for( QVector<TrackContentObjectView *>::iterator it = tcoViews.begin();
+					it != tcoViews.end(); ++it )
+				{
+					( *it )->remove();
+				}
+
 				// Add the TCO type as a key to the final string
 				QString finalString = QString( "tco_%1:%2" ).arg( m_tco->getTrack()->type() ).arg( dataFile.toString() );
 
 				// Copy it to the clipboard
 				QMimeData *tco_content = new QMimeData;
-				tco_content->setData( Clipboard::mimeType(), finalString.toUtf8() );
+				tco_content->setData( StringPairDrag::mimeType(), finalString.toUtf8() );
 				QApplication::clipboard()->setMimeData( tco_content, QClipboard::Clipboard );
 			}
 			else
@@ -1232,7 +1237,7 @@ void TrackContentObjectView::contextMenuAction( ContextMenuAction action )
 
 				// Copy it to the clipboard
 				QMimeData *tco_content = new QMimeData;
-				tco_content->setData( Clipboard::mimeType(), finalString.toUtf8() );
+				tco_content->setData( StringPairDrag::mimeType(), finalString.toUtf8() );
 				QApplication::clipboard()->setMimeData( tco_content, QClipboard::Clipboard );
 			}
 			else
@@ -1245,11 +1250,19 @@ void TrackContentObjectView::contextMenuAction( ContextMenuAction action )
 			// clear the QApplication Clipboard during the LMMS Clipboard copy operations (Clipboard::copy does that)
 
 			// If we have TCO data on the clipboard paste it. If not, do our regular TCO paste.
-			if( QApplication::clipboard()->mimeData( QClipboard::Clipboard )->hasFormat( Clipboard::mimeType() ) )
+			if( QApplication::clipboard()->mimeData( QClipboard::Clipboard )->hasFormat( StringPairDrag::mimeType() ) )
 			{
-				// TODO: Implement the actual paste operation
-				qWarning("Context Menu Paste - Data:");
-				qWarning() << QApplication::clipboard()->mimeData( QClipboard::Clipboard )->data( Clipboard::mimeType() );
+				// Paste the selection on the MidiTime of the selected Track
+				const QMimeData *md = QApplication::clipboard()->mimeData( QClipboard::Clipboard );
+				MidiTime tcoPos = MidiTime( m_tco->startPosition() );
+
+				TrackContentWidget *tcw = getTrackView()->getTrackContentWidget();
+
+				if( tcw->pasteSelection( tcoPos, md ) == true )
+				{
+					// If we succeed on the paste we delete the TCO we pasted on
+					remove();
+				}
 			}
 			else
 			{
