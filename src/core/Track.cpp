@@ -1669,14 +1669,9 @@ bool TrackContentWidget::canPasteSelection( MidiTime tcoPos, const QDropEvent* d
 	// Overloaded method to make it possible to call this method without a Drag&Drop event
 	// If the source of the DropEvent is the current instance of LMMS we don't allow pasting in the same bar
 	// If the source of the DropEvent is another instance of LMMS we allow it
-	if( de->source() )
-	{
-		return canPasteSelection( tcoPos, mimeData );
-	}
-	else
-	{
-		return canPasteSelection( tcoPos, mimeData, true );
-	}
+	return de->source()
+		? canPasteSelection( tcoPos, mimeData )
+		: canPasteSelection( tcoPos, mimeData, true );
 }
 
 bool TrackContentWidget::canPasteSelection( MidiTime tcoPos, const QMimeData* md , bool allowSameBar )
@@ -1709,15 +1704,12 @@ bool TrackContentWidget::canPasteSelection( MidiTime tcoPos, const QMimeData* md
 	const TrackContainer::TrackList tracks = t->trackContainer()->tracks();
 	const int currentTrackIndex = tracks.indexOf( t );
 
-	// Don't paste if we're on the same bar
+	// Don't paste if we're on the same bar and allowSameBar is false
 	auto sourceTrackContainerId = metadata.attributeNode( "trackContainerId" ).value().toUInt();
-	if( !allowSameBar )
+	if( !allowSameBar && sourceTrackContainerId == t->trackContainer()->id() &&
+			tcoPos == grabbedTCOBar && currentTrackIndex == initialTrackIndex )
 	{
-		if( sourceTrackContainerId == t->trackContainer()->id() &&
-				tcoPos == grabbedTCOBar && currentTrackIndex == initialTrackIndex )
-		{
-			return false;
-		}
+		return false;
 	}
 
 	// Extract the tco data
@@ -2001,7 +1993,7 @@ void TrackContentWidget::contextMenuAction( QContextMenuEvent * cme, ContextMenu
 	switch( action )
 	{
 		case Paste:
-		// Paste the selection on the MidiTime of the context menu click
+		// Paste the selection on the MidiTime of the context menu event
 		const QMimeData *md = QApplication::clipboard()->mimeData( QClipboard::Clipboard );
 		MidiTime tcoPos = getPosition( cme->x() );
 
