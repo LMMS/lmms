@@ -353,19 +353,19 @@ void SampleTCOView::contextMenuEvent( QContextMenuEvent * _cme )
 	{
 		contextMenu.addAction( embed::getIconPixmap( "cancel" ),
 					tr( "Delete (middle mousebutton)" ),
-						this, SLOT( remove() ) );
+						[this](){ contextMenuAction( Remove ); } );
 		contextMenu.addSeparator();
 		contextMenu.addAction( embed::getIconPixmap( "edit_cut" ),
-					tr( "Cut" ), this, SLOT( cut() ) );
+					tr( "Cut" ), [this](){ contextMenuAction( Cut ); } );
 	}
 	contextMenu.addAction( embed::getIconPixmap( "edit_copy" ),
-					tr( "Copy" ), m_tco, SLOT( copy() ) );
+					tr( "Copy" ), [this](){ contextMenuAction( Copy ); } );
 	contextMenu.addAction( embed::getIconPixmap( "edit_paste" ),
-					tr( "Paste" ), m_tco, SLOT( paste() ) );
+					tr( "Paste" ), [this](){ contextMenuAction( Paste ); } );
 	contextMenu.addSeparator();
 	contextMenu.addAction( embed::getIconPixmap( "muted" ),
 				tr( "Mute/unmute (<%1> + middle click)" ).arg(UI_CTRL_KEY),
-						m_tco, SLOT( toggleMute() ) );
+						[this](){ contextMenuAction( Mute ); } );
 	/*contextMenu.addAction( embed::getIconPixmap( "record" ),
 				tr( "Set/clear record" ),
 						m_tco, SLOT( toggleRecord() ) );*/
