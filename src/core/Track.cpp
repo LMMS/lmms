@@ -46,7 +46,6 @@
 #include <QStyleOption>
 #include <QVariant>
 #include <QClipboard>
-#include <QDebug>
 
 
 #include "AutomationPattern.h"
