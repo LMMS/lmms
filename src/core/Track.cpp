@@ -1648,9 +1648,24 @@ bool TrackContentWidget::canPasteSelection( MidiTime tcoPos, const QDropEvent* d
 {
 	const QMimeData * mimeData = de->mimeData();
 
+	// Overloaded method to make it possible to call this method without a Drag&Drop event
+	// If the source of the DropEvent is the current instance of LMMS we don't allow pasting in the same bar
+	// If the source of the DropEvent is another instance of LMMS we allow it
+	if( de->source() )
+	{
+		return canPasteSelection( tcoPos, mimeData );
+	}
+	else
+	{
+		return canPasteSelection( tcoPos, mimeData, true );
+	}
+}
+
+bool TrackContentWidget::canPasteSelection( MidiTime tcoPos, const QMimeData* md , bool allowSameBar )
+{
 	Track * t = getTrack();
-	QString type = StringPairDrag::decodeMimeKey( mimeData );
-	QString value = StringPairDrag::decodeMimeValue( mimeData );
+	QString type = StringPairDrag::decodeMimeKey( md );
+	QString value = StringPairDrag::decodeMimeValue( md );
 
 	// We can only paste into tracks of the same type
 	if( type != ( "tco_" + QString::number( t->type() ) ) ||
@@ -1678,10 +1693,13 @@ bool TrackContentWidget::canPasteSelection( MidiTime tcoPos, const QDropEvent* d
 
 	// Don't paste if we're on the same bar
 	auto sourceTrackContainerId = metadata.attributeNode( "trackContainerId" ).value().toUInt();
-	if( de->source() && sourceTrackContainerId == t->trackContainer()->id() &&
-			tcoPos == grabbedTCOBar && currentTrackIndex == initialTrackIndex )
+	if( !allowSameBar )
 	{
-		return false;
+		if( sourceTrackContainerId == t->trackContainer()->id() &&
+				tcoPos == grabbedTCOBar && currentTrackIndex == initialTrackIndex )
+		{
+			return false;
+		}
 	}
 
 	// Extract the tco data
@@ -1720,13 +1738,31 @@ bool TrackContentWidget::canPasteSelection( MidiTime tcoPos, const QDropEvent* d
  */
 bool TrackContentWidget::pasteSelection( MidiTime tcoPos, QDropEvent * de )
 {
+	const QMimeData * mimeData = de->mimeData();
+
+	// TODO: If we use this method, we end up calling canPasteSelection twice: Once with a QDropEevnt
+	// and another time with a QMimeData. That's because both can have different results depending
+	// on the source of the QDropEvent (because of that we can't call it only on the other method).
+	// Maybe later we should remove the canPasteSelection from inside this method and change the code
+	// that uses it to call it before.
 	if( canPasteSelection( tcoPos, de ) == false )
 	{
 		return false;
 	}
 
-	QString type = StringPairDrag::decodeKey( de );
-	QString value = StringPairDrag::decodeValue( de );
+	// Overloaded method so we can call it without a Drag&Drop event
+	return pasteSelection( tcoPos, mimeData );
+}
+
+bool TrackContentWidget::pasteSelection( MidiTime tcoPos, const QMimeData * md )
+{
+	if( canPasteSelection( tcoPos, md ) == false )
+	{
+		return false;
+	}
+
+	QString type = StringPairDrag::decodeMimeKey( md );
+	QString value = StringPairDrag::decodeMimeValue( md );
 
 	getTrack()->addJournalCheckPoint();
 

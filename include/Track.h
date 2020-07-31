@@ -381,7 +381,9 @@ public:
 	}
 
 	bool canPasteSelection( MidiTime tcoPos, const QDropEvent *de );
+	bool canPasteSelection( MidiTime tcoPos, const QMimeData *md, bool allowSameBar = false );
 	bool pasteSelection( MidiTime tcoPos, QDropEvent * de );
+	bool pasteSelection( MidiTime tcoPos, const QMimeData * md );
 
 	MidiTime endPosition( const MidiTime & posStart );
 
