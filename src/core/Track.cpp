@@ -1196,9 +1196,12 @@ void TrackContentObjectView::contextMenuAction( ContextMenuAction action )
 				// Write the TCOs to a DataFile for copying
 				DataFile dataFile = createTCODataFiles( tcoViews );
 
+				// Add the TCO type as a key to the final string
+				QString finalString = QString( "tco_%1:%2" ).arg( m_tco->getTrack()->type() ).arg( dataFile.toString() );
+
 				// Copy it to the clipboard
 				QMimeData *tco_content = new QMimeData;
-				tco_content->setData( Clipboard::mimeType(), dataFile.toString().toUtf8() );
+				tco_content->setData( Clipboard::mimeType(), finalString.toUtf8() );
 				QApplication::clipboard()->setMimeData( tco_content, QClipboard::Clipboard );
 			}
 			else
@@ -1224,9 +1227,12 @@ void TrackContentObjectView::contextMenuAction( ContextMenuAction action )
 				// Write the TCOs to a DataFile for copying
 				DataFile dataFile = createTCODataFiles( tcoViews );
 
+				// Add the TCO type as a key to the final string
+				QString finalString = QString( "tco_%1:%2" ).arg( m_tco->getTrack()->type() ).arg( dataFile.toString() );
+
 				// Copy it to the clipboard
 				QMimeData *tco_content = new QMimeData;
-				tco_content->setData( Clipboard::mimeType(), dataFile.toString().toUtf8() );
+				tco_content->setData( Clipboard::mimeType(), finalString.toUtf8() );
 				QApplication::clipboard()->setMimeData( tco_content, QClipboard::Clipboard );
 			}
 			else
