@@ -74,7 +74,7 @@ QVector<QColor> ColorChooser::defaultPalette()
 	{
 		for (int y = 0; y < 6; y++)
 		{
-			result[6 * x + y].setHsl (qMax(0, 44 * x - 1), 300 - 40 * y, 300 - 40 * y);
+			result[6 * x + y].setHsl (qMax(0, 44 * x - 1), 200 - 30 * y, 200 - 30 * y);
 		}
 	}
 	return result;
