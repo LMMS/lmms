@@ -68,8 +68,7 @@ FxLine::FxLine( QWidget * _parent, FxMixerView * _mv, int _channelIndex ) :
 	m_strokeOuterInactive( 0, 0, 0 ),
 	m_strokeInnerActive( 0, 0, 0 ),
 	m_strokeInnerInactive( 0, 0, 0 ),
-	m_inRename( false ),
-	m_dialog( QColor( 0, 0, 0 ) )
+	m_inRename( false )
 {
 	if( !s_sendBgArrow )
 	{
@@ -128,17 +127,6 @@ FxLine::FxLine( QWidget * _parent, FxMixerView * _mv, int _channelIndex ) :
 	connect( &Engine::fxMixer()->effectChannel( m_channelIndex )->m_muteModel, SIGNAL( dataChanged() ), this, SLOT( update() ) );
 	
 	srand( time( 0 ) );
-	
-	QColor buffer;
-	for( int x = 0; x < 8; x++ )
-	{
-		for( int y = 0; y < 6; y++ )
-		{
-			buffer.setHsl( qMax( 0, 44 * x - 1 ), 150 - 20 * y, 140 - 10 * y );
-			m_dialog.setStandardColor( 6 * x + y, buffer );
-		}
-		
-	}
 	
 }
 
@@ -454,7 +442,7 @@ void FxLine::changeColor()
 {
 	auto channel = Engine::fxMixer()->effectChannel( m_channelIndex );
 	
-	QColor new_color = m_dialog.getColor( channel->m_color );
+	auto new_color = ColorChooser( this ).setPaletteAndPoint( ColorChooser::CCPalette::Mixer )->getColor( channel->m_color );
 	if( ! new_color.isValid() )
 	{ return; }
 	
@@ -474,7 +462,7 @@ void FxLine::randomColor()
 {
 	auto channel = Engine::fxMixer()->effectChannel( m_channelIndex );
 	
-	channel->m_color = m_dialog.standardColor( rand() % 48 );
+	channel->m_color = ColorChooser( this ).setPaletteAndPoint( ColorChooser::CCPalette::Mixer )->standardColor( rand() % 48 );
 	channel->m_hasColor = true;
 	
 	update();
