@@ -55,27 +55,12 @@ ColorChooser* ColorChooser::setPaletteAndPoint (const CCPalette palette)
 
 
 
-QVector<QColor> ColorChooser::currentPalette()
+QVector<QColor> ColorChooser::defaultPalette()
 {
 	QVector <QColor> result;
 	for (int i = 0; i < 48; i++)
 	{
 		result.push_back (QColorDialog::standardColor(i));
-	}
-	return result;
-}
-
-
-QVector<QColor> ColorChooser::defaultPalette()
-{
-	QVector <QColor> result;
-	result.resize(48);
-	for (int x = 0; x < 8; x++)
-	{
-		for (int y = 0; y < 6; y++)
-		{
-			result[6 * x + y].setHsl (qMax(0, 44 * x - 1), 200 - 30 * y, 200 - 30 * y);
-		}
 	}
 	return result;
 }
