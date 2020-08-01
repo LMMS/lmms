@@ -735,6 +735,9 @@ void TrackContentObjectView::paintTextLabel(QString const & text, QPainter & pai
  */
 void TrackContentObjectView::mousePressEvent( QMouseEvent * me )
 {
+	// List of selected TCOs
+	QVector<selectableObject *> so = gui->songEditor()->m_editor->selectedObjects();
+
 	setInitialPos( me->pos() );
 	setInitialOffsets();
 	if( !fixedTCOs() && me->button() == Qt::LeftButton )
@@ -827,22 +830,50 @@ void TrackContentObjectView::mousePressEvent( QMouseEvent * me )
 	{
 		if( me->modifiers() & Qt::ControlModifier )
 		{
-			m_tco->toggleMute();
+			if( so.size() > 0 )
+			{
+				toggleMuteSelection( so );
+			}
+			else
+			{
+				m_tco->toggleMute();
+			}
 		}
 		else if( me->modifiers() & Qt::ShiftModifier && !fixedTCOs() )
 		{
-			remove();
+			if( so.size() > 0 )
+			{
+				removeSelection( so );
+			}
+			else
+			{
+				remove();
+			}
 		}
 	}
 	else if( me->button() == Qt::MidButton )
 	{
 		if( me->modifiers() & Qt::ControlModifier )
 		{
-			m_tco->toggleMute();
+			if( so.size() > 0 )
+			{
+				toggleMuteSelection( so );
+			}
+			else
+			{
+				m_tco->toggleMute();
+			}
 		}
 		else if( !fixedTCOs() )
 		{
-			remove();
+			if( so.size() > 0 )
+			{
+				removeSelection( so );
+			}
+			else
+			{
+				remove();
+			}
 		}
 	}
 }
@@ -1154,19 +1185,9 @@ void TrackContentObjectView::contextMenuAction( ContextMenuAction action )
 	switch( action )
 	{
 		case Remove:
-			// Checks if there are other selected TCOs and if so removes them as well
-			if( so.size() > 0 ){
-				for( QVector<selectableObject *>::iterator it = so.begin();
-						it != so.end(); ++it )
-				{
-					TrackContentObjectView *tcov =
-						dynamic_cast<TrackContentObjectView *>( *it );
-
-					if( tcov != NULL )
-					{
-						tcov->remove();
-					}
-				}
+			if( so.size() > 0)
+			{
+				removeSelection( so );
 			}
 			else
 			{
@@ -1175,37 +1196,9 @@ void TrackContentObjectView::contextMenuAction( ContextMenuAction action )
 			break;
 		case Cut:
 			// Checks if there are other selected TCOs and if so cut them as well
-			if( so.size() > 0 ){
-				// List of TCOs to be copied
-				QVector<TrackContentObjectView *> tcoViews;
-
-				for( QVector<selectableObject *>::iterator it = so.begin();
-						it != so.end(); ++it )
-				{
-					TrackContentObjectView *tcov = dynamic_cast<TrackContentObjectView *>( *it );
-					if( tcov != NULL )
-					{
-						tcoViews.push_back( tcov );
-					}
-				}
-
-				// Write the TCOs to a DataFile for copying
-				DataFile dataFile = createTCODataFiles( tcoViews );
-
-				// Now that the dataFile is created we can delete the tracks, since we are cutting
-				for( QVector<TrackContentObjectView *>::iterator it = tcoViews.begin();
-					it != tcoViews.end(); ++it )
-				{
-					( *it )->remove();
-				}
-
-				// Add the TCO type as a key to the final string
-				QString finalString = QString( "tco_%1:%2" ).arg( m_tco->getTrack()->type() ).arg( dataFile.toString() );
-
-				// Copy it to the clipboard
-				QMimeData *tco_content = new QMimeData;
-				tco_content->setData( StringPairDrag::mimeType(), finalString.toUtf8() );
-				QApplication::clipboard()->setMimeData( tco_content, QClipboard::Clipboard );
+			if( so.size() > 0 )
+			{
+				cutSelection( so );
 			}
 			else
 			{
@@ -1214,30 +1207,9 @@ void TrackContentObjectView::contextMenuAction( ContextMenuAction action )
 			break;
 		case Copy:
 			// Checks if there are other selected TCOs and if so copy them as well
-			if( so.size() > 0 ){
-				// List of TCOs to be copied
-				QVector<TrackContentObjectView *> tcoViews;
-
-				for( QVector<selectableObject *>::iterator it = so.begin();
-						it != so.end(); ++it )
-				{
-					TrackContentObjectView *tcov = dynamic_cast<TrackContentObjectView *>( *it );
-					if( tcov != NULL )
-					{
-						tcoViews.push_back( tcov );
-					}
-				}
-
-				// Write the TCOs to a DataFile for copying
-				DataFile dataFile = createTCODataFiles( tcoViews );
-
-				// Add the TCO type as a key to the final string
-				QString finalString = QString( "tco_%1:%2" ).arg( m_tco->getTrack()->type() ).arg( dataFile.toString() );
-
-				// Copy it to the clipboard
-				QMimeData *tco_content = new QMimeData;
-				tco_content->setData( StringPairDrag::mimeType(), finalString.toUtf8() );
-				QApplication::clipboard()->setMimeData( tco_content, QClipboard::Clipboard );
+			if( so.size() > 0 )
+			{
+				copySelection( so );
 			}
 			else
 			{
@@ -1251,17 +1223,7 @@ void TrackContentObjectView::contextMenuAction( ContextMenuAction action )
 			// If we have TCO data on the clipboard paste it. If not, do our regular TCO paste.
 			if( QApplication::clipboard()->mimeData( QClipboard::Clipboard )->hasFormat( StringPairDrag::mimeType() ) )
 			{
-				// Paste the selection on the MidiTime of the selected Track
-				const QMimeData *md = QApplication::clipboard()->mimeData( QClipboard::Clipboard );
-				MidiTime tcoPos = MidiTime( m_tco->startPosition() );
-
-				TrackContentWidget *tcw = getTrackView()->getTrackContentWidget();
-
-				if( tcw->pasteSelection( tcoPos, md ) == true )
-				{
-					// If we succeed on the paste we delete the TCO we pasted on
-					remove();
-				}
+				pasteSelection();
 			}
 			else
 			{
@@ -1270,24 +1232,124 @@ void TrackContentObjectView::contextMenuAction( ContextMenuAction action )
 			break;
 		case Mute:
 			// Checks if there are other selected TCOs and if so mutes them as well
-			if( so.size() > 0 ){
-				for( QVector<selectableObject *>::iterator it = so.begin();
-						it != so.end(); ++it )
-				{
-					TrackContentObjectView *tcov =
-						dynamic_cast<TrackContentObjectView *>( *it );
-
-					if( tcov != NULL )
-					{
-						tcov->getTrackContentObject()->toggleMute();
-					}
-				}
+			if( so.size() > 0 )
+			{
+				toggleMuteSelection( so );
 			}
 			else
 			{
 				getTrackContentObject()->toggleMute();
 			}
 			break;
+	}
+}
+
+void TrackContentObjectView::removeSelection( QVector<selectableObject *> so )
+{
+	// Checks if there are other selected TCOs and if so removes them as well
+	for( QVector<selectableObject *>::iterator it = so.begin();
+			it != so.end(); ++it )
+	{
+		TrackContentObjectView *tcov =
+			dynamic_cast<TrackContentObjectView *>( *it );
+
+		if( tcov != NULL )
+		{
+			tcov->remove();
+		}
+	}
+}
+
+void TrackContentObjectView::copySelection( QVector<selectableObject *> so )
+{
+	// List of TCOs to be copied
+	QVector<TrackContentObjectView *> tcoViews;
+
+	for( QVector<selectableObject *>::iterator it = so.begin();
+			it != so.end(); ++it )
+	{
+		TrackContentObjectView *tcov = dynamic_cast<TrackContentObjectView *>( *it );
+		if( tcov != NULL )
+		{
+			tcoViews.push_back( tcov );
+		}
+	}
+
+	// Write the TCOs to a DataFile for copying
+	DataFile dataFile = createTCODataFiles( tcoViews );
+
+	// Add the TCO type as a key to the final string
+	QString finalString = QString( "tco_%1:%2" ).arg( m_tco->getTrack()->type() ).arg( dataFile.toString() );
+
+	// Copy it to the clipboard
+	QMimeData *tco_content = new QMimeData;
+	tco_content->setData( StringPairDrag::mimeType(), finalString.toUtf8() );
+	QApplication::clipboard()->setMimeData( tco_content, QClipboard::Clipboard );
+}
+
+void TrackContentObjectView::cutSelection( QVector<selectableObject *> so )
+{
+	// List of TCOs to be copied
+	QVector<TrackContentObjectView *> tcoViews;
+
+	for( QVector<selectableObject *>::iterator it = so.begin();
+			it != so.end(); ++it )
+	{
+		TrackContentObjectView *tcov = dynamic_cast<TrackContentObjectView *>( *it );
+		if( tcov != NULL )
+		{
+			tcoViews.push_back( tcov );
+		}
+	}
+
+	// Write the TCOs to a DataFile for copying
+	DataFile dataFile = createTCODataFiles( tcoViews );
+
+	// TODO: Replace with removeSelection( so )?
+	// Now that the dataFile is created we can delete the tracks, since we are cutting
+	for( QVector<TrackContentObjectView *>::iterator it = tcoViews.begin();
+		it != tcoViews.end(); ++it )
+	{
+		( *it )->remove();
+	}
+
+	// Add the TCO type as a key to the final string
+	QString finalString = QString( "tco_%1:%2" ).arg( m_tco->getTrack()->type() ).arg( dataFile.toString() );
+
+	// Copy it to the clipboard
+	QMimeData *tco_content = new QMimeData;
+	tco_content->setData( StringPairDrag::mimeType(), finalString.toUtf8() );
+	QApplication::clipboard()->setMimeData( tco_content, QClipboard::Clipboard );
+}
+
+// TODO: Is it a good name for the method or can it be mistaken with TrackContentWidget::pasteSelection()?
+void TrackContentObjectView::pasteSelection()
+{
+	// Paste the selection on the MidiTime of the selected Track
+	const QMimeData *md = QApplication::clipboard()->mimeData( QClipboard::Clipboard );
+	MidiTime tcoPos = MidiTime( m_tco->startPosition() );
+
+	TrackContentWidget *tcw = getTrackView()->getTrackContentWidget();
+
+	if( tcw->pasteSelection( tcoPos, md ) == true )
+	{
+		// If we succeed on the paste we delete the TCO we pasted on
+		remove();
+	}
+}
+
+void TrackContentObjectView::toggleMuteSelection( QVector<selectableObject *> so )
+{
+	for( QVector<selectableObject *>::iterator it = so.begin();
+			it != so.end(); ++it )
+	{
+		TrackContentObjectView *tcov =
+			dynamic_cast<TrackContentObjectView *>( *it );
+
+		if( tcov != NULL )
+		{
+			tcov->getTrackContentObject()->toggleMute();
+		}
 	}
 }
 

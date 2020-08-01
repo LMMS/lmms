@@ -250,6 +250,13 @@ public:
 	bool needsUpdate();
 	void setNeedsUpdate( bool b );
 
+	// Methods to remove, copy, cut, paste and mute selections of TCO views
+	void removeSelection( QVector<selectableObject *> so );
+	void copySelection( QVector<selectableObject *> so );
+	void cutSelection( QVector<selectableObject *> so );
+	void pasteSelection(); // TODO: Rethink naming?
+	void toggleMuteSelection( QVector<selectableObject *> so );
+
 public slots:
 	virtual bool close();
 	void cut();
