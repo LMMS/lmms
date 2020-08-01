@@ -1146,8 +1146,6 @@ void TrackContentObjectView::contextMenuEvent( QContextMenuEvent * cme )
 }
 
 // This method processes the actions from the context menu of the TCO View.
-// We use this method so we can check if there are more selected TCOs to apply
-// some of the actions to all of them.
 void TrackContentObjectView::contextMenuAction( ContextMenuAction action )
 {
 	// List of selected TCOs
@@ -1176,6 +1174,7 @@ void TrackContentObjectView::contextMenuAction( ContextMenuAction action )
 			}
 			break;
 		case Cut:
+			// Checks if there are other selected TCOs and if so cut them as well
 			if( so.size() > 0 ){
 				// List of TCOs to be copied
 				QVector<TrackContentObjectView *> tcoViews;
@@ -1214,6 +1213,7 @@ void TrackContentObjectView::contextMenuAction( ContextMenuAction action )
 			}
 			break;
 		case Copy:
+			// Checks if there are other selected TCOs and if so copy them as well
 			if( so.size() > 0 ){
 				// List of TCOs to be copied
 				QVector<TrackContentObjectView *> tcoViews;
@@ -1666,14 +1666,14 @@ bool TrackContentWidget::canPasteSelection( MidiTime tcoPos, const QDropEvent* d
 {
 	const QMimeData * mimeData = de->mimeData();
 
-	// Overloaded method to make it possible to call this method without a Drag&Drop event
 	// If the source of the DropEvent is the current instance of LMMS we don't allow pasting in the same bar
-	// If the source of the DropEvent is another instance of LMMS we allow it
+	// if it's another instance of LMMS we allow it
 	return de->source()
 		? canPasteSelection( tcoPos, mimeData )
 		: canPasteSelection( tcoPos, mimeData, true );
 }
 
+// Overloaded method to make it possible to call this method without a Drag&Drop event
 bool TrackContentWidget::canPasteSelection( MidiTime tcoPos, const QMimeData* md , bool allowSameBar )
 {
 	Track * t = getTrack();
@@ -1750,23 +1750,20 @@ bool TrackContentWidget::pasteSelection( MidiTime tcoPos, QDropEvent * de )
 {
 	const QMimeData * mimeData = de->mimeData();
 
-	// TODO: If we use this method, we end up calling canPasteSelection twice: Once with a QDropEevnt
-	// and another time with a QMimeData. That's because both can have different results depending
-	// on the source of the QDropEvent (because of that we can't call it only on the other method).
-	// Maybe later we should remove the canPasteSelection from inside this method and change the code
-	// that uses it to call it before.
 	if( canPasteSelection( tcoPos, de ) == false )
 	{
 		return false;
 	}
 
-	// Overloaded method so we can call it without a Drag&Drop event
-	return pasteSelection( tcoPos, mimeData );
+	// We set skipSafetyCheck to true because we already called canPasteSelection
+	return pasteSelection( tcoPos, mimeData, true );
 }
 
-bool TrackContentWidget::pasteSelection( MidiTime tcoPos, const QMimeData * md )
+// Overloaded method so we can call it without a Drag&Drop event
+bool TrackContentWidget::pasteSelection( MidiTime tcoPos, const QMimeData * md, bool skipSafetyCheck )
 {
-	if( canPasteSelection( tcoPos, md ) == false )
+	// When canPasteSelection was already called before, skipSafetyCheck will skip this
+	if( !skipSafetyCheck && canPasteSelection( tcoPos, md ) == false )
 	{
 		return false;
 	}
