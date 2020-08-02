@@ -251,11 +251,15 @@ public:
 	void setNeedsUpdate( bool b );
 
 	// Methods to remove, copy, cut, paste and mute a QVector of TCO views
-	void removeActive( QVector<TrackContentObjectView *> tcovs );
 	void copyActive( QVector<TrackContentObjectView *> tcovs );
 	void cutActive( QVector<TrackContentObjectView *> tcovs );
 	void pasteSelection(); // TODO: Rethink naming?
-	void toggleMuteActive( QVector<TrackContentObjectView *> tcovs );
+	// removeActive and toggleMuteActive are static because they don't depend
+	// being called from a particular TCO view, but can be called anywhere as long
+	// as a valid TCO view list is given, while copy/cut require an instance for
+	// some metadata to be written to the clipboard.
+	static void removeActive( QVector<TrackContentObjectView *> tcovs );
+	static void toggleMuteActive( QVector<TrackContentObjectView *> tcovs );
 
 public slots:
 	virtual bool close();
