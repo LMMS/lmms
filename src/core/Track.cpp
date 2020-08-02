@@ -284,7 +284,7 @@ void TrackContentObject::resetColor()
 }
 
 
-void TrackContentObject::setUseCustomClipColor( bool b )
+void TrackContentObject::useCustomClipColor( bool b )
 {
 	m_useCustomClipColor = b;
 	b ? emit clipColorChanged( m_color ) : emit clipColorReset();
@@ -328,7 +328,7 @@ TrackContentObjectView::TrackContentObjectView( TrackContentObject * tco,
 	m_gradient( true ),
 	m_mouseHotspotHand( 0, 0 ),
 	m_cursorSetYet( false ),
-	m_usesCustomSelectedColor( ! m_tco->useStyleColor() | m_tco->useCustomClipColor() ),
+	m_usesCustomSelectedColor( ! m_tco->usesStyleColor() | m_tco->usesCustomClipColor() ),
 	m_needsUpdate( true )
 {
 	if( s_textFloat == NULL )
@@ -363,7 +363,7 @@ TrackContentObjectView::TrackContentObjectView( TrackContentObject * tco,
 	
 	if( m_usesCustomSelectedColor )
 	{
-		QColor tcoColor = m_tco->colorObj();
+		QColor tcoColor = m_tco->color();
 		changeSelectedColor( tcoColor );
 	}
 
@@ -617,11 +617,11 @@ void TrackContentObjectView::updatePosition()
 void TrackContentObjectView::setColor( QColor & new_color )
 {
 	// change color only if it is different
-	if( new_color.rgb() != m_tco->color() )
+	if( new_color.rgb() != m_tco->colorRgb() )
 	{ m_tco->setColor( new_color ); }
 	
 	// force TCO to use color
-	m_tco->setUseStyleColor( false );
+	m_tco->useStyleColor( false );
 	Engine::getSong()->setModified();
 	update();
 }
@@ -704,13 +704,13 @@ void TrackContentObjectView::dropEvent( QDropEvent * de )
 	
 	if( m_trackView->getTrack()->useColor() )
 	{
-		m_tco->setUseStyleColor( false );
-		if( ! dynamic_cast<TrackContentObjectView *>( qwSource )->m_tco->useCustomClipColor() )
+		m_tco->useStyleColor( false );
+		if( ! dynamic_cast<TrackContentObjectView *>( qwSource )->m_tco->usesCustomClipColor() )
 			m_tco->setColor( m_trackView->getTrack()->backgroundColor() );
 	}
 	else
 	{
-		m_tco->setUseStyleColor( true );
+		m_tco->useStyleColor( true );
 	}
 	
 	AutomationPattern::resolveAllIDs();
@@ -764,7 +764,7 @@ DataFile TrackContentObjectView::createTCODataFiles(
 		tcoElement.setAttribute( "trackIndex", trackIndex );
 		tcoElement.setAttribute( "trackType", tcoTrack->type() );
 		tcoElement.setAttribute( "trackName", tcoTrack->name() );
-		tcoElement.setAttribute( "clipColor", ( *it )->m_tco->useCustomClipColor() );
+		tcoElement.setAttribute( "clipColor", ( *it )->m_tco->usesCustomClipColor() );
 		( *it )->m_tco->saveState( dataFile, tcoElement );
 		tcoParent.appendChild( tcoElement );
 	}
@@ -1773,14 +1773,14 @@ bool TrackContentWidget::pasteSelection( MidiTime tcoPos, QDropEvent * de )
 		
 		if( t->useColor() )
 		{
-			tco->setUseStyleColor( false );
+			tco->useStyleColor( false );
 			
 			if( outerTCOElement.attributeNode( "clipColor" ).value() == "0" )
 				tco->setColor( t->backgroundColor() );
 		}
 		else
 		{
-			tco->setUseStyleColor( true );
+			tco->useStyleColor( true );
 		}
 
 		//check tco name, if the same as source track name dont copy
@@ -2616,7 +2616,7 @@ void Track::loadSettings( const QDomElement & element )
 TrackContentObject * Track::addTCO( TrackContentObject * tco )
 {
 	tco->setColor( m_backgroundColor );
-	tco->setUseStyleColor( ! hasColor );
+	tco->useStyleColor( ! hasColor );
 	
 	m_trackContentObjects.push_back( tco );
 

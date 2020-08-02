@@ -170,7 +170,7 @@ void AutomationPatternView::flipX()
 
 void AutomationPatternView::changeClipColor()
 {
-	QColorDialog colorDialog( m_pat->colorObj() );
+	QColorDialog colorDialog( m_pat->color() );
 	QColor buffer( 0, 0, 0 );
 	
 	for( int i = 0; i < 48; i += 6 )
@@ -183,12 +183,12 @@ void AutomationPatternView::changeClipColor()
 		
 	}
 	
-	QColor new_color = colorDialog.getColor( m_pat->colorObj() );
+	QColor new_color = colorDialog.getColor( m_pat->color() );
 	if( ! new_color.isValid() )
 	{ return; }
 	
 	setColor( new_color );
-	m_pat->setUseCustomClipColor( true );
+	m_pat->useCustomClipColor( true );
 }
 
 
@@ -198,14 +198,14 @@ void AutomationPatternView::useTrackColor()
 	{
 		QColor buffer = m_pat->getTrack()->backgroundColor();
 		setColor( buffer );
-		m_pat->setUseStyleColor( false );
+		m_pat->useStyleColor( false );
 	}
 	else
 	{
-		m_pat->setUseStyleColor( true );
+		m_pat->useStyleColor( true );
 	}
 	
-	m_pat->setUseCustomClipColor( false );
+	m_pat->useCustomClipColor( false );
 	update();
 }
 
@@ -213,9 +213,9 @@ void AutomationPatternView::useTrackColor()
 
 void AutomationPatternView::trackColorReset()
 {
-	if( ! m_pat->useStyleColor() )
+	if( ! m_pat->usesStyleColor() )
 	{
-		m_pat->setUseStyleColor( true );
+		m_pat->useStyleColor( true );
 		Engine::getSong()->setModified();
 		update();
 	}
@@ -322,7 +322,7 @@ void AutomationPatternView::paintEvent( QPaintEvent * )
 	
 	// state: selected, muted, colored, normal
 	c = isSelected() ? selectedColor() : ( muted ? mutedBackgroundColor()
-		: ( ! m_pat->useStyleColor() ? m_pat->colorObj()
+		: ( ! m_pat->usesStyleColor() ? m_pat->color()
 		: painter.background().color() ) );
 
 	lingrad.setColorAt( 1, c.darker( 300 ) );

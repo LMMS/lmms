@@ -134,12 +134,12 @@ public:
 		return m_autoResize;
 	}
 	
-	unsigned int color() const
+	unsigned int colorRgb() const
 	{
 		return( m_color.rgb() );
 	}
 	
-	QColor colorObj() const
+	QColor color() const
 	{
 		return m_color;
 	}
@@ -154,22 +154,22 @@ public:
 		m_color.setRgb( c );
 	}
 
-	void setUseStyleColor( bool b )
+	void useStyleColor( bool b )
 	{
 		m_useStyleColor = b;
 	}
 	
-	bool useStyleColor()
+	bool usesStyleColor()
 	{
 		return m_useStyleColor;
 	}
 	
-	bool useCustomClipColor()
+	void useCustomClipColor( bool b );
+	
+	bool usesCustomClipColor()
 	{
 		return m_useCustomClipColor;
 	}
-	
-	void setUseCustomClipColor( bool b );
 
 	virtual void movePosition( const MidiTime & pos );
 	virtual void changeLength( const MidiTime & length );
@@ -297,7 +297,7 @@ public:
 	
 	QColor color() const
 	{
-		return( m_tco->color() );
+		return( m_tco->colorRgb() );
 	};
 
 	// access needsUpdate member variable

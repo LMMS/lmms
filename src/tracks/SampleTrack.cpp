@@ -277,9 +277,9 @@ void SampleTCO::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	}
 
 	_this.setAttribute( "sample_rate", m_sampleBuffer->sampleRate());
-	_this.setAttribute( "stylecolor", useStyleColor() );
-	_this.setAttribute( "clipcolor", useCustomClipColor() );
-	_this.setAttribute( "color", color() );
+	_this.setAttribute( "stylecolor", usesStyleColor() );
+	_this.setAttribute( "clipcolor", usesCustomClipColor() );
+	_this.setAttribute( "color", colorRgb() );
 	// TODO: start- and end-frame
 }
 
@@ -307,8 +307,8 @@ void SampleTCO::loadSettings( const QDomElement & _this )
 	
 	if( _this.hasAttribute( "stylecolor" ) )
 	{
-		setUseStyleColor( _this.attribute( "stylecolor" ).toInt() );
-		setUseCustomClipColor( _this.attribute( "clipcolor" ).toInt() );
+		useStyleColor( _this.attribute( "stylecolor" ).toInt() );
+		useCustomClipColor( _this.attribute( "clipcolor" ).toInt() );
 		setColor( _this.attribute( "color" ).toUInt() );
 	}
 }
@@ -523,7 +523,7 @@ void SampleTCOView::paintEvent( QPaintEvent * pe )
 
 	// state: selected, muted, colored, normal
 	c = isSelected() ? selectedColor() : ( muted ? mutedBackgroundColor()
-		: ( ! m_tco->useStyleColor() ? m_tco->colorObj()
+		: ( ! m_tco->usesStyleColor() ? m_tco->color()
 		: painter.background().color() ) );
 
 	lingrad.setColorAt( 1, c.darker( 300 ) );
@@ -605,7 +605,7 @@ void SampleTCOView::paintEvent( QPaintEvent * pe )
 
 void SampleTCOView::changeClipColor()
 {
-	QColorDialog colorDialog( m_tco->colorObj() );
+	QColorDialog colorDialog( m_tco->color() );
 	QColor buffer( 0, 0, 0 );
 	
 	for( int i = 0; i < 48; i += 6 )
@@ -618,12 +618,12 @@ void SampleTCOView::changeClipColor()
 		
 	}
 	
-	QColor new_color = colorDialog.getColor( m_tco->colorObj() );
+	QColor new_color = colorDialog.getColor( m_tco->color() );
 	if( ! new_color.isValid() )
 	{ return; }
 	
 	setColor( new_color );
-	m_tco->setUseCustomClipColor( true );
+	m_tco->useCustomClipColor( true );
 }
 
 
@@ -633,14 +633,14 @@ void SampleTCOView::useTrackColor()
 	{
 		QColor buffer = m_tco->getTrack()->backgroundColor();
 		setColor( buffer );
-		m_tco->setUseStyleColor( false );
+		m_tco->useStyleColor( false );
 	}
 	else
 	{
-		m_tco->setUseStyleColor( true );
+		m_tco->useStyleColor( true );
 	}
 	
-	m_tco->setUseCustomClipColor( false );
+	m_tco->useCustomClipColor( false );
 	update();
 }
 
@@ -648,9 +648,9 @@ void SampleTCOView::useTrackColor()
 
 void SampleTCOView::trackColorReset()
 {
-	if( ! m_tco->useStyleColor() )
+	if( ! m_tco->usesStyleColor() )
 	{
-		m_tco->setUseStyleColor( true );
+		m_tco->useStyleColor( true );
 		Engine::getSong()->setModified();
 		update();
 	}

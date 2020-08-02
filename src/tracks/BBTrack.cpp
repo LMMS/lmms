@@ -72,9 +72,9 @@ void BBTCO::saveSettings( QDomDocument & doc, QDomElement & element )
 	}
 	element.setAttribute( "len", length() );
 	element.setAttribute( "muted", isMuted() );
-	element.setAttribute( "color", color() );
-	element.setAttribute( "stylecolor", useStyleColor() );
-	element.setAttribute( "clipcolor", useCustomClipColor() );
+	element.setAttribute( "color", colorRgb() );
+	element.setAttribute( "stylecolor", usesStyleColor() );
+	element.setAttribute( "clipcolor", usesCustomClipColor() );
 }
 
 
@@ -98,8 +98,8 @@ void BBTCO::loadSettings( const QDomElement & element )
 	{
 		QColor loadedColor;
 		loadedColor.setRgb( element.attribute( "color" ).toUInt() );
-		setUseStyleColor( element.attribute( "stylecolor" ).toUInt() );
-		setUseCustomClipColor( element.attribute( "clipcolor" ).toUInt() );
+		useStyleColor( element.attribute( "stylecolor" ).toUInt() );
+		useCustomClipColor( element.attribute( "clipcolor" ).toUInt() );
 		setColor( loadedColor );
 	}
 	
@@ -114,22 +114,22 @@ void BBTCO::loadSettings( const QDomElement & element )
 		{
 			if( element.attribute( "usestyle" ).toUInt() == 1 ) 
 			{
-				setUseStyleColor( true );
+				useStyleColor( true );
 			}
 			else
 			{
-				setUseStyleColor( false );
+				useStyleColor( false );
 			}
 		}
 		else
 		{
-			if( color() == qRgb( 128, 182, 175 ) || color() == qRgb( 64, 128, 255 ) ) // old or older default color
+			if( colorRgb() == qRgb( 128, 182, 175 ) || colorRgb() == qRgb( 64, 128, 255 ) ) // old or older default color
 			{
-				setUseStyleColor( true );
+				useStyleColor( true );
 			}
 			else
 			{
-				setUseStyleColor( false );
+				useStyleColor( false );
 			}
 		}
 	}
@@ -223,8 +223,8 @@ void BBTCOView::paintEvent( QPaintEvent * )
 	
 	// state: selected, muted, default, colored
 	c = isSelected() ? selectedColor() : ( muted ? mutedBackgroundColor() 
-		: ( m_bbTCO->useStyleColor() ? painter.background().color() 
-		: m_bbTCO->colorObj() ) );
+		: ( m_bbTCO->usesStyleColor() ? painter.background().color() 
+		: m_bbTCO->color() ) );
 	
 	lingrad.setColorAt( 0, c.lighter( 130 ) );
 	lingrad.setColorAt( 1, c.lighter( 70 ) );
@@ -319,7 +319,7 @@ void BBTCOView::changeName()
 
 void BBTCOView::changeClipColor()
 {
-	QColorDialog colorDialog( m_bbTCO->colorObj() );
+	QColorDialog colorDialog( m_bbTCO->color() );
 	QColor buffer( 0, 0, 0 );
 	
 	for( int i = 0; i < 48; i += 6 )
@@ -332,12 +332,12 @@ void BBTCOView::changeClipColor()
 		
 	}
 	
-	QColor new_color = colorDialog.getColor( m_bbTCO->colorObj() );
+	QColor new_color = colorDialog.getColor( m_bbTCO->color() );
 	if( ! new_color.isValid() )
 	{ return; }
 	
 	setColor( new_color );
-	m_bbTCO->setUseCustomClipColor( true );
+	m_bbTCO->useCustomClipColor( true );
 }
 
 
@@ -347,14 +347,14 @@ void BBTCOView::useTrackColor()
 	{
 		QColor buffer = m_bbTCO->getTrack()->backgroundColor();
 		setColor( buffer );
-		m_bbTCO->setUseStyleColor( false );
+		m_bbTCO->useStyleColor( false );
 	}
 	else
 	{
-		m_bbTCO->setUseStyleColor( true );
+		m_bbTCO->useStyleColor( true );
 	}
 	
-	m_bbTCO->setUseCustomClipColor( false );
+	m_bbTCO->useCustomClipColor( false );
 	update();
 }
 
@@ -362,9 +362,9 @@ void BBTCOView::useTrackColor()
 /** \brief Makes the BB pattern use the colour defined in the stylesheet */
 void BBTCOView::resetColor()
 {
-	if( ! m_bbTCO->useStyleColor() )
+	if( ! m_bbTCO->usesStyleColor() )
 	{
-		m_bbTCO->setUseStyleColor( true );
+		m_bbTCO->useStyleColor( true );
 		Engine::getSong()->setModified();
 		update();
 	}
@@ -487,7 +487,7 @@ TrackContentObject * BBTrack::createTCO( const MidiTime & _pos )
 	if( s_lastTCOColor )
 	{
 		bbtco->setColor( *s_lastTCOColor );
-		bbtco->setUseStyleColor( false );
+		bbtco->useStyleColor( false );
 	}
 	return bbtco;
 }

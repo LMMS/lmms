@@ -361,9 +361,9 @@ void Pattern::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
 	_this.setAttribute( "type", m_patternType );
 	_this.setAttribute( "name", name() );
-	_this.setAttribute( "stylecolor", useStyleColor() );
-	_this.setAttribute( "clipcolor", useCustomClipColor() );
-	_this.setAttribute( "color", color() );
+	_this.setAttribute( "stylecolor", usesStyleColor() );
+	_this.setAttribute( "clipcolor", usesCustomClipColor() );
+	_this.setAttribute( "color", colorRgb() );
 	// as the target of copied/dragged pattern is always an existing
 	// pattern, we must not store actual position, instead we store -1
 	// which tells loadSettings() not to mess around with position
@@ -398,8 +398,8 @@ void Pattern::loadSettings( const QDomElement & _this )
 	
 	if( _this.hasAttribute( "stylecolor" ) )
 	{
-		setUseStyleColor( _this.attribute( "stylecolor" ).toInt() );
-		setUseCustomClipColor( _this.attribute( "clipcolor" ).toInt() );
+		useStyleColor( _this.attribute( "stylecolor" ).toInt() );
+		useCustomClipColor( _this.attribute( "clipcolor" ).toInt() );
 		setColorRgb( _this.attribute( "color" ).toUInt() );
 	}
 	
@@ -683,7 +683,7 @@ void PatternView::changeName()
 
 void PatternView::changeClipColor()
 {
-	QColorDialog colorDialog( m_pat->colorObj() );
+	QColorDialog colorDialog( m_pat->color() );
 	QColor buffer( 0, 0, 0 );
 	
 	for( int i = 0; i < 48; i += 6 )
@@ -696,12 +696,12 @@ void PatternView::changeClipColor()
 		
 	}
 	
-	QColor new_color = colorDialog.getColor( m_pat->colorObj() );
+	QColor new_color = colorDialog.getColor( m_pat->color() );
 	if( ! new_color.isValid() )
 	{ return; }
 	
 	setColor( new_color );
-	m_pat->setUseCustomClipColor( true );
+	m_pat->useCustomClipColor( true );
 }
 
 
@@ -711,23 +711,23 @@ void PatternView::useTrackColor()
 	{
 		QColor buffer = m_pat->getTrack()->backgroundColor();
 		setColor( buffer );
-		m_pat->setUseStyleColor( false );
+		m_pat->useStyleColor( false );
 	}
 	else
 	{
-		m_pat->setUseStyleColor( true );
+		m_pat->useStyleColor( true );
 	}
 	
-	m_pat->setUseCustomClipColor( false );
+	m_pat->useCustomClipColor( false );
 	update();
 }
 
 
 void PatternView::trackColorReset()
 {
-	if( ! m_pat->useStyleColor() )
+	if( ! m_pat->usesStyleColor() )
 	{
-		m_pat->setUseStyleColor( true );
+		m_pat->useStyleColor( true );
 		Engine::getSong()->setModified();
 		update();
 	}
@@ -936,10 +936,10 @@ void PatternView::paintEvent( QPaintEvent * )
 	bool beatPattern = m_pat->m_patternType == Pattern::BeatPattern;
 
 	// state: selected, normal, beat pattern, muted, colored
-	QColor c = isSelected() ? selectedColor() : ( ( !muted && m_pat->useStyleColor() && !beatPattern )
+	QColor c = isSelected() ? selectedColor() : ( ( !muted && m_pat->usesStyleColor() && !beatPattern )
 		? painter.background().color() : ( beatPattern
 		? BBPatternBackground() : ( muted
-		? mutedBackgroundColor() : m_pat->colorObj() ) ) );
+		? mutedBackgroundColor() : m_pat->color() ) ) );
 
 	// invert the gradient for the background in the B&B editor
 	QLinearGradient lingrad( 0, 0, 0, height() );
