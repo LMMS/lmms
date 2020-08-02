@@ -35,23 +35,24 @@
 #include <QPainter>
 #include <QPushButton>
 
+#include "BBTrack.h"
+#include "EffectRackView.h"
+#include "embed.h"
+#include "FxMixerView.h"
 #include "gui_templates.h"
 #include "GuiApplication.h"
-#include "Song.h"
-#include "embed.h"
-#include "ToolTip.h"
-#include "BBTrack.h"
-#include "SamplePlayHandle.h"
-#include "SampleRecordHandle.h"
-#include "SongEditor.h"
-#include "StringPairDrag.h"
-#include "TimeLineWidget.h"
 #include "Knob.h"
 #include "MainWindow.h"
 #include "Mixer.h"
-#include "EffectRackView.h"
-#include "FxMixerView.h"
+#include "PathUtil.h"
+#include "SamplePlayHandle.h"
+#include "SampleRecordHandle.h"
+#include "Song.h"
+#include "SongEditor.h"
+#include "StringPairDrag.h"
 #include "TabWidget.h"
+#include "TimeLineWidget.h"
+#include "ToolTip.h"
 #include "TrackLabelButton.h"
 
 SampleTCO::SampleTCO( Track * _track ) :
@@ -347,7 +348,7 @@ void SampleTCOView::updateSample()
 	// set tooltip to filename so that user can see what sample this
 	// sample-tco contains
 	ToolTip::add( this, ( m_tco->m_sampleBuffer->audioFile() != "" ) ?
-					m_tco->m_sampleBuffer->audioFile() :
+					PathUtil::toAbsolute(m_tco->m_sampleBuffer->audioFile()) :
 					tr( "Double-click to open sample" ) );
 }
 
@@ -557,9 +558,8 @@ void SampleTCOView::paintEvent( QPaintEvent * pe )
 			qMax( static_cast<int>( m_tco->sampleLength() * ppb / ticksPerBar ), 1 ), rect().bottom() - 2 * spacing );
 	m_tco->m_sampleBuffer->visualize( p, r, pe->rect() );
 
-	QFileInfo fileInfo(m_tco->m_sampleBuffer->audioFile());
-	QString filename = fileInfo.fileName();
-	paintTextLabel(filename, p);
+	QString name = PathUtil::cleanName(m_tco->m_sampleBuffer->audioFile());
+	paintTextLabel(name, p);
 
 	// disable antialiasing for borders, since its not needed
 	p.setRenderHint( QPainter::Antialiasing, false );

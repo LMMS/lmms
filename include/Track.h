@@ -538,8 +538,6 @@ private slots:
 	}
 
 private:
-	static QPixmap * s_grip;
-
 	TrackView * m_trackView;
 
 	QPushButton * m_trackOps;

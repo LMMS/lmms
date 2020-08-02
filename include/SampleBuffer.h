@@ -84,7 +84,7 @@ public:
 		{
 			m_isBackwards = _backwards;
 		}
-		
+
 		int interpolationMode() const
 		{
 			return m_interpolationMode;
@@ -250,9 +250,6 @@ public:
 	{
 		m_varLock.unlock();
 	}
-
-	static QString tryToMakeRelative( const QString & _file );
-	static QString tryToMakeAbsolute(const QString & file);
 
 
 public slots:
