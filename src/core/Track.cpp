@@ -735,8 +735,6 @@ void TrackContentObjectView::paintTextLabel(QString const & text, QPainter & pai
  */
 void TrackContentObjectView::mousePressEvent( QMouseEvent * me )
 {
-	// List of selected TCOs
-	QVector<selectableObject *> so = gui->songEditor()->m_editor->selectedObjects();
 
 	setInitialPos( me->pos() );
 	setInitialOffsets();
@@ -830,22 +828,22 @@ void TrackContentObjectView::mousePressEvent( QMouseEvent * me )
 	{
 		if( me->modifiers() & Qt::ControlModifier )
 		{
-			toggleMuteSelection( so );
+			toggleMuteSelection();
 		}
 		else if( me->modifiers() & Qt::ShiftModifier && !fixedTCOs() )
 		{
-			removeSelection( so );
+			removeSelection();
 		}
 	}
 	else if( me->button() == Qt::MidButton )
 	{
 		if( me->modifiers() & Qt::ControlModifier )
 		{
-			toggleMuteSelection( so );
+			toggleMuteSelection();
 		}
 		else if( !fixedTCOs() )
 		{
-			removeSelection( so );
+			removeSelection();
 		}
 	}
 }
@@ -1151,19 +1149,16 @@ void TrackContentObjectView::contextMenuEvent( QContextMenuEvent * cme )
 // This method processes the actions from the context menu of the TCO View.
 void TrackContentObjectView::contextMenuAction( ContextMenuAction action )
 {
-	// List of selected TCOs
-	QVector<selectableObject *> so = gui->songEditor()->m_editor->selectedObjects();
-
 	switch( action )
 	{
 		case Remove:
-			removeSelection( so );
+			removeSelection();
 			break;
 		case Cut:
-			cutSelection( so );
+			cutSelection();
 			break;
 		case Copy:
-			copySelection( so );
+			copySelection();
 			break;
 		case Paste:
 			// NOTE: Because we give preference to the QApplication clipboard over the LMMS Clipboard class, we need to
@@ -1180,13 +1175,16 @@ void TrackContentObjectView::contextMenuAction( ContextMenuAction action )
 			}
 			break;
 		case Mute:
-			toggleMuteSelection( so );
+			toggleMuteSelection();
 			break;
 	}
 }
 
-void TrackContentObjectView::removeSelection( QVector<selectableObject *> so )
+void TrackContentObjectView::removeSelection()
 {
+	// List of selected TCOs
+	QVector<selectableObject *> so = gui->songEditor()->m_editor->selectedObjects();
+
 	// Checks if there are other selected TCOs and if so removes them as well
 	if( so.size() > 0 && isSelected() )
 	{
@@ -1208,8 +1206,11 @@ void TrackContentObjectView::removeSelection( QVector<selectableObject *> so )
 	}
 }
 
-void TrackContentObjectView::copySelection( QVector<selectableObject *> so )
+void TrackContentObjectView::copySelection()
 {
+	// List of selected TCOs
+	QVector<selectableObject *> so = gui->songEditor()->m_editor->selectedObjects();
+
 	// Checks if there are other selected TCOs and if so copy them as well
 	if( so.size() > 0 && isSelected() )
 	{
@@ -1243,8 +1244,11 @@ void TrackContentObjectView::copySelection( QVector<selectableObject *> so )
 	}
 }
 
-void TrackContentObjectView::cutSelection( QVector<selectableObject *> so )
+void TrackContentObjectView::cutSelection()
 {
+	// List of selected TCOs
+	QVector<selectableObject *> so = gui->songEditor()->m_editor->selectedObjects();
+
 	// Checks if there are other selected TCOs and if so cut them as well
 	if( so.size() > 0 && isSelected() )
 	{
@@ -1264,13 +1268,8 @@ void TrackContentObjectView::cutSelection( QVector<selectableObject *> so )
 		// Write the TCOs to a DataFile for copying
 		DataFile dataFile = createTCODataFiles( tcoViews );
 
-		// TODO: Replace with removeSelection( so )?
 		// Now that the dataFile is created we can delete the tracks, since we are cutting
-		for( QVector<TrackContentObjectView *>::iterator it = tcoViews.begin();
-			it != tcoViews.end(); ++it )
-		{
-			( *it )->remove();
-		}
+		removeSelection();
 
 		// Add the TCO type as a key to the final string
 		QString finalString = QString( "tco_%1:%2" ).arg( m_tco->getTrack()->type() ).arg( dataFile.toString() );
@@ -1302,8 +1301,11 @@ void TrackContentObjectView::pasteSelection()
 	}
 }
 
-void TrackContentObjectView::toggleMuteSelection( QVector<selectableObject *> so )
+void TrackContentObjectView::toggleMuteSelection()
 {
+	// List of selected TCOs
+	QVector<selectableObject *> so = gui->songEditor()->m_editor->selectedObjects();
+
 	// Checks if there are other selected TCOs and if so mutes them as well
 	if( so.size() > 0 && isSelected() )
 	{
