@@ -102,6 +102,8 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 			"ui", "oneinstrumenttrackwindow").toInt()),
 	m_sideBarOnRight(ConfigManager::inst()->value(
 			"ui", "sidebaronright").toInt()),
+	m_soloLegacyBehavior(ConfigManager::inst()->value(
+			"app", "sololegacybehavior", "0").toInt()),
 	m_MMPZ(!ConfigManager::inst()->value(
 			"app", "nommpz").toInt()),
 	m_disableBackup(!ConfigManager::inst()->value(
@@ -233,6 +235,8 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 		m_oneInstrumentTrackWindow, SLOT(toggleOneInstrumentTrackWindow(bool)), true);
 	addLedCheckBox("Show sidebar on the right-hand side", gui_tw, counter,
 		m_sideBarOnRight, SLOT(toggleSideBarOnRight(bool)), true);
+	addLedCheckBox("Mute automation tracks during solo", gui_tw, counter,
+		m_soloLegacyBehavior, SLOT(toggleSoloLegacyBehavior(bool)), false);
 
 	gui_tw->setFixedHeight(YDelta + YDelta * counter);
 
@@ -389,7 +393,7 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	m_vstEmbedComboBox = new QComboBox(plugins_tw);
 	m_vstEmbedComboBox->move(XDelta, YDelta * ++counter);
 
-	QStringList embedMethods = ConfigManager::availabeVstEmbedMethods();
+	QStringList embedMethods = ConfigManager::availableVstEmbedMethods();
 	m_vstEmbedComboBox->addItem(tr("No embedding"), "none");
 	if(embedMethods.contains("qt"))
 	{
@@ -905,6 +909,8 @@ void SetupDialog::accept()
 					QString::number(m_oneInstrumentTrackWindow));
 	ConfigManager::inst()->setValue("ui", "sidebaronright",
 					QString::number(m_sideBarOnRight));
+	ConfigManager::inst()->setValue("app", "sololegacybehavior",
+					QString::number(m_soloLegacyBehavior));
 	ConfigManager::inst()->setValue("app", "nommpz",
 					QString::number(!m_MMPZ));
 	ConfigManager::inst()->setValue("app", "disablebackup",
@@ -1041,6 +1047,10 @@ void SetupDialog::setLanguage(int lang)
 }
 
 
+void SetupDialog::toggleSoloLegacyBehavior(bool enabled)
+{
+	m_soloLegacyBehavior = enabled;
+}
 
 
 // Performance settings slots.

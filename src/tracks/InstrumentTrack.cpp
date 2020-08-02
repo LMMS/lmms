@@ -22,6 +22,7 @@
  * Boston, MA 02110-1301 USA.
  *
  */
+#include "InstrumentTrack.h"
 
 #include <QDir>
 #include <QQueue>
@@ -37,7 +38,6 @@
 #include <QPainter>
 
 #include "FileDialog.h"
-#include "InstrumentTrack.h"
 #include "AutomationPattern.h"
 #include "BBTrack.h"
 #include "CaptionMenu.h"

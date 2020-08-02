@@ -1123,7 +1123,7 @@ void PatternView::paintEvent( QPaintEvent * )
 
 		// outer border
 		p.setPen( current ? c.lighter( 130 ) : c.darker( 300 ) );
-		p.drawRect( rect() );
+		p.drawRect( 0, 0, rect().right(), rect().bottom() );
 	}
 
 	// draw the 'muted' pixmap only if the pattern was manually muted
