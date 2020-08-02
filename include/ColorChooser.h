@@ -40,7 +40,7 @@ public:
 	//! Set global paletter via enum
 	void setPalette (const CCPalette);
 	//! Set palette via enum, return self pointer for chaining
-	ColorChooser* setPaletteAndPoint (const CCPalette);
+	ColorChooser* withPalette (const CCPalette);
 
 protected:
 	// Forward key events to the parent to prevent stuck notes when the dialog gets focus

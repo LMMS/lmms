@@ -442,7 +442,7 @@ void FxLine::changeColor()
 {
 	auto channel = Engine::fxMixer()->effectChannel( m_channelIndex );
 	
-	auto new_color = ColorChooser( this ).setPaletteAndPoint( ColorChooser::CCPalette::Mixer )->getColor( channel->m_color );
+	auto new_color = ColorChooser( this ).withPalette( ColorChooser::CCPalette::Mixer )->getColor( channel->m_color );
 	if( ! new_color.isValid() )
 	{ return; }
 	
@@ -462,7 +462,7 @@ void FxLine::randomColor()
 {
 	auto channel = Engine::fxMixer()->effectChannel( m_channelIndex );
 	
-	channel->m_color = ColorChooser( this ).setPaletteAndPoint( ColorChooser::CCPalette::Mixer )->standardColor( rand() % 48 );
+	channel->m_color = ColorChooser( this ).withPalette( ColorChooser::CCPalette::Mixer )->standardColor( rand() % 48 );
 	channel->m_hasColor = true;
 	
 	update();

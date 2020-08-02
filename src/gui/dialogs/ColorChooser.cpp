@@ -46,7 +46,7 @@ void ColorChooser::setPalette (const CCPalette palette)
 }
 
 
-ColorChooser* ColorChooser::setPaletteAndPoint (const CCPalette palette)
+ColorChooser* ColorChooser::withPalette (const CCPalette palette)
 {
 	setPalette (palette);
 	return this;
@@ -57,10 +57,10 @@ ColorChooser* ColorChooser::setPaletteAndPoint (const CCPalette palette)
 
 QVector<QColor> ColorChooser::defaultPalette()
 {
-	QVector <QColor> result;
+	QVector <QColor> result (48);
 	for (int i = 0; i < 48; i++)
 	{
-		result.push_back (QColorDialog::standardColor(i));
+		result[i] = (QColorDialog::standardColor(i));
 	}
 	return result;
 }
@@ -68,8 +68,7 @@ QVector<QColor> ColorChooser::defaultPalette()
 
 QVector<QColor> ColorChooser::nicePalette (const int base)
 {
-	QVector <QColor> result;
-	result.resize(48);
+	QVector <QColor> result (48);
 	for (int x = 0; x < 8; x++)
 	{
 		for (int y = 0; y < 6; y++)
