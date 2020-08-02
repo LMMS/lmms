@@ -830,50 +830,22 @@ void TrackContentObjectView::mousePressEvent( QMouseEvent * me )
 	{
 		if( me->modifiers() & Qt::ControlModifier )
 		{
-			if( so.size() > 0 )
-			{
-				toggleMuteSelection( so );
-			}
-			else
-			{
-				m_tco->toggleMute();
-			}
+			toggleMuteSelection( so );
 		}
 		else if( me->modifiers() & Qt::ShiftModifier && !fixedTCOs() )
 		{
-			if( so.size() > 0 )
-			{
-				removeSelection( so );
-			}
-			else
-			{
-				remove();
-			}
+			removeSelection( so );
 		}
 	}
 	else if( me->button() == Qt::MidButton )
 	{
 		if( me->modifiers() & Qt::ControlModifier )
 		{
-			if( so.size() > 0 )
-			{
-				toggleMuteSelection( so );
-			}
-			else
-			{
-				m_tco->toggleMute();
-			}
+			toggleMuteSelection( so );
 		}
 		else if( !fixedTCOs() )
 		{
-			if( so.size() > 0 )
-			{
-				removeSelection( so );
-			}
-			else
-			{
-				remove();
-			}
+			removeSelection( so );
 		}
 	}
 }
@@ -1185,36 +1157,13 @@ void TrackContentObjectView::contextMenuAction( ContextMenuAction action )
 	switch( action )
 	{
 		case Remove:
-			if( so.size() > 0)
-			{
-				removeSelection( so );
-			}
-			else
-			{
-				remove();
-			}
+			removeSelection( so );
 			break;
 		case Cut:
-			// Checks if there are other selected TCOs and if so cut them as well
-			if( so.size() > 0 )
-			{
-				cutSelection( so );
-			}
-			else
-			{
-				cut();
-			}
+			cutSelection( so );
 			break;
 		case Copy:
-			// Checks if there are other selected TCOs and if so copy them as well
-			if( so.size() > 0 )
-			{
-				copySelection( so );
-			}
-			else
-			{
-				getTrackContentObject()->copy();
-			}
+			copySelection( so );
 			break;
 		case Paste:
 			// NOTE: Because we give preference to the QApplication clipboard over the LMMS Clipboard class, we need to
@@ -1231,15 +1180,7 @@ void TrackContentObjectView::contextMenuAction( ContextMenuAction action )
 			}
 			break;
 		case Mute:
-			// Checks if there are other selected TCOs and if so mutes them as well
-			if( so.size() > 0 )
-			{
-				toggleMuteSelection( so );
-			}
-			else
-			{
-				getTrackContentObject()->toggleMute();
-			}
+			toggleMuteSelection( so );
 			break;
 	}
 }
@@ -1247,79 +1188,102 @@ void TrackContentObjectView::contextMenuAction( ContextMenuAction action )
 void TrackContentObjectView::removeSelection( QVector<selectableObject *> so )
 {
 	// Checks if there are other selected TCOs and if so removes them as well
-	for( QVector<selectableObject *>::iterator it = so.begin();
-			it != so.end(); ++it )
+	if( so.size() > 0 && isSelected() )
 	{
-		TrackContentObjectView *tcov =
-			dynamic_cast<TrackContentObjectView *>( *it );
-
-		if( tcov != NULL )
+		for( QVector<selectableObject *>::iterator it = so.begin();
+				it != so.end(); ++it )
 		{
-			tcov->remove();
+			TrackContentObjectView *tcov =
+				dynamic_cast<TrackContentObjectView *>( *it );
+
+			if( tcov != NULL )
+			{
+				tcov->remove();
+			}
 		}
+	}
+	else
+	{
+		remove();
 	}
 }
 
 void TrackContentObjectView::copySelection( QVector<selectableObject *> so )
 {
-	// List of TCOs to be copied
-	QVector<TrackContentObjectView *> tcoViews;
-
-	for( QVector<selectableObject *>::iterator it = so.begin();
-			it != so.end(); ++it )
+	// Checks if there are other selected TCOs and if so copy them as well
+	if( so.size() > 0 && isSelected() )
 	{
-		TrackContentObjectView *tcov = dynamic_cast<TrackContentObjectView *>( *it );
-		if( tcov != NULL )
+		// List of TCOs to be copied
+		QVector<TrackContentObjectView *> tcoViews;
+
+		for( QVector<selectableObject *>::iterator it = so.begin();
+				it != so.end(); ++it )
 		{
-			tcoViews.push_back( tcov );
+			TrackContentObjectView *tcov = dynamic_cast<TrackContentObjectView *>( *it );
+			if( tcov != NULL )
+			{
+				tcoViews.push_back( tcov );
+			}
 		}
+
+		// Write the TCOs to a DataFile for copying
+		DataFile dataFile = createTCODataFiles( tcoViews );
+
+		// Add the TCO type as a key to the final string
+		QString finalString = QString( "tco_%1:%2" ).arg( m_tco->getTrack()->type() ).arg( dataFile.toString() );
+
+		// Copy it to the clipboard
+		QMimeData *tco_content = new QMimeData;
+		tco_content->setData( StringPairDrag::mimeType(), finalString.toUtf8() );
+		QApplication::clipboard()->setMimeData( tco_content, QClipboard::Clipboard );
 	}
-
-	// Write the TCOs to a DataFile for copying
-	DataFile dataFile = createTCODataFiles( tcoViews );
-
-	// Add the TCO type as a key to the final string
-	QString finalString = QString( "tco_%1:%2" ).arg( m_tco->getTrack()->type() ).arg( dataFile.toString() );
-
-	// Copy it to the clipboard
-	QMimeData *tco_content = new QMimeData;
-	tco_content->setData( StringPairDrag::mimeType(), finalString.toUtf8() );
-	QApplication::clipboard()->setMimeData( tco_content, QClipboard::Clipboard );
+	else
+	{
+		getTrackContentObject()->copy();
+	}
 }
 
 void TrackContentObjectView::cutSelection( QVector<selectableObject *> so )
 {
-	// List of TCOs to be copied
-	QVector<TrackContentObjectView *> tcoViews;
-
-	for( QVector<selectableObject *>::iterator it = so.begin();
-			it != so.end(); ++it )
+	// Checks if there are other selected TCOs and if so cut them as well
+	if( so.size() > 0 && isSelected() )
 	{
-		TrackContentObjectView *tcov = dynamic_cast<TrackContentObjectView *>( *it );
-		if( tcov != NULL )
+		// List of TCOs to be copied
+		QVector<TrackContentObjectView *> tcoViews;
+
+		for( QVector<selectableObject *>::iterator it = so.begin();
+				it != so.end(); ++it )
 		{
-			tcoViews.push_back( tcov );
+			TrackContentObjectView *tcov = dynamic_cast<TrackContentObjectView *>( *it );
+			if( tcov != NULL )
+			{
+				tcoViews.push_back( tcov );
+			}
 		}
+
+		// Write the TCOs to a DataFile for copying
+		DataFile dataFile = createTCODataFiles( tcoViews );
+
+		// TODO: Replace with removeSelection( so )?
+		// Now that the dataFile is created we can delete the tracks, since we are cutting
+		for( QVector<TrackContentObjectView *>::iterator it = tcoViews.begin();
+			it != tcoViews.end(); ++it )
+		{
+			( *it )->remove();
+		}
+
+		// Add the TCO type as a key to the final string
+		QString finalString = QString( "tco_%1:%2" ).arg( m_tco->getTrack()->type() ).arg( dataFile.toString() );
+
+		// Copy it to the clipboard
+		QMimeData *tco_content = new QMimeData;
+		tco_content->setData( StringPairDrag::mimeType(), finalString.toUtf8() );
+		QApplication::clipboard()->setMimeData( tco_content, QClipboard::Clipboard );
 	}
-
-	// Write the TCOs to a DataFile for copying
-	DataFile dataFile = createTCODataFiles( tcoViews );
-
-	// TODO: Replace with removeSelection( so )?
-	// Now that the dataFile is created we can delete the tracks, since we are cutting
-	for( QVector<TrackContentObjectView *>::iterator it = tcoViews.begin();
-		it != tcoViews.end(); ++it )
+	else
 	{
-		( *it )->remove();
+		cut();
 	}
-
-	// Add the TCO type as a key to the final string
-	QString finalString = QString( "tco_%1:%2" ).arg( m_tco->getTrack()->type() ).arg( dataFile.toString() );
-
-	// Copy it to the clipboard
-	QMimeData *tco_content = new QMimeData;
-	tco_content->setData( StringPairDrag::mimeType(), finalString.toUtf8() );
-	QApplication::clipboard()->setMimeData( tco_content, QClipboard::Clipboard );
 }
 
 // TODO: Is it a good name for the method or can it be mistaken with TrackContentWidget::pasteSelection()?
@@ -1340,16 +1304,24 @@ void TrackContentObjectView::pasteSelection()
 
 void TrackContentObjectView::toggleMuteSelection( QVector<selectableObject *> so )
 {
-	for( QVector<selectableObject *>::iterator it = so.begin();
-			it != so.end(); ++it )
+	// Checks if there are other selected TCOs and if so mutes them as well
+	if( so.size() > 0 && isSelected() )
 	{
-		TrackContentObjectView *tcov =
-			dynamic_cast<TrackContentObjectView *>( *it );
-
-		if( tcov != NULL )
+		for( QVector<selectableObject *>::iterator it = so.begin();
+				it != so.end(); ++it )
 		{
-			tcov->getTrackContentObject()->toggleMute();
+			TrackContentObjectView *tcov =
+				dynamic_cast<TrackContentObjectView *>( *it );
+
+			if( tcov != NULL )
+			{
+				tcov->getTrackContentObject()->toggleMute();
+			}
 		}
+	}
+	else
+	{
+		getTrackContentObject()->toggleMute();
 	}
 }
 
