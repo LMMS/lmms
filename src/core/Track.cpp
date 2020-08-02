@@ -735,6 +735,24 @@ void TrackContentObjectView::paintTextLabel(QString const & text, QPainter & pai
  */
 void TrackContentObjectView::mousePressEvent( QMouseEvent * me )
 {
+	// Get a list of selected selectableObjects
+	QVector<selectableObject *> sos = gui->songEditor()->m_editor->selectedObjects();
+
+	// Convert to a list of selected TCOVs
+	QVector<TrackContentObjectView *> selection;
+	selection.reserve( sos.size() );
+	for( auto so: sos )
+	{
+		TrackContentObjectView *tcov = dynamic_cast<TrackContentObjectView *> ( so );
+		if( tcov != nullptr )
+		{
+			selection.append( tcov );
+		}
+	}
+
+	// If we clicked part of the selection, affect all selected clips. Otherwise affect the clip we clicked
+	QVector<TrackContentObjectView *> active = selection.contains( this ) ? selection : QVector<TrackContentObjectView *>( 1, this );
+	// active will be later used for the removeActive, copyActive, cutActive or toggleMuteActive methods
 
 	setInitialPos( me->pos() );
 	setInitialOffsets();
@@ -828,22 +846,22 @@ void TrackContentObjectView::mousePressEvent( QMouseEvent * me )
 	{
 		if( me->modifiers() & Qt::ControlModifier )
 		{
-			toggleMuteSelection();
+			toggleMuteActive( active );
 		}
 		else if( me->modifiers() & Qt::ShiftModifier && !fixedTCOs() )
 		{
-			removeSelection();
+			removeActive( active );
 		}
 	}
 	else if( me->button() == Qt::MidButton )
 	{
 		if( me->modifiers() & Qt::ControlModifier )
 		{
-			toggleMuteSelection();
+			toggleMuteActive( active );
 		}
 		else if( !fixedTCOs() )
 		{
-			removeSelection();
+			removeActive( active );
 		}
 	}
 }
@@ -1118,6 +1136,26 @@ void TrackContentObjectView::mouseReleaseEvent( QMouseEvent * me )
  */
 void TrackContentObjectView::contextMenuEvent( QContextMenuEvent * cme )
 {
+	// Depending on whether we right-clicked a selection or an individual TCO we will have
+	// different labels for the actions.
+	// Get a list of selected selectableObjects
+	QVector<selectableObject *> sos = gui->songEditor()->m_editor->selectedObjects();
+
+	// Convert to a list of selected TCOVs
+	QVector<TrackContentObjectView *> selection;
+	selection.reserve( sos.size() );
+	for( auto so: sos )
+	{
+		TrackContentObjectView *tcov = dynamic_cast<TrackContentObjectView *> ( so );
+		if( tcov != nullptr )
+		{
+			selection.append( tcov );
+		}
+	}
+
+	// Individual TCO or selection being right-clicked?
+	bool individualTCO = selection.contains( this ) ? false : true;
+
 	if( cme->modifiers() )
 	{
 		return;
@@ -1127,20 +1165,30 @@ void TrackContentObjectView::contextMenuEvent( QContextMenuEvent * cme )
 	if( fixedTCOs() == false )
 	{
 		contextMenu.addAction( embed::getIconPixmap( "cancel" ),
-					tr( "Delete (middle mousebutton)" ),
+					tr( individualTCO
+						? "Delete (middle mousebutton)"
+						: "Delete selection (middle mousebutton)" ),
 						[this](){ contextMenuAction( Remove ); } );
 		contextMenu.addSeparator();
 		contextMenu.addAction( embed::getIconPixmap( "edit_cut" ),
-					tr( "Cut" ), [this](){ contextMenuAction( Cut ); } );
+					tr( individualTCO
+						? "Cut"
+						: "Cut selection" ),
+						[this](){ contextMenuAction( Cut ); } );
 	}
 	contextMenu.addAction( embed::getIconPixmap( "edit_copy" ),
-					tr( "Copy" ), [this](){ contextMenuAction( Copy ); } );
+					tr( individualTCO
+						? "Copy"
+						: "Copy selection" ),
+						[this](){ contextMenuAction( Copy ); } );
 	contextMenu.addAction( embed::getIconPixmap( "edit_paste" ),
 					tr( "Paste" ), [this](){ contextMenuAction( Paste ); } );
 	contextMenu.addSeparator();
 	contextMenu.addAction( embed::getIconPixmap( "muted" ),
-				tr( "Mute/unmute (<%1> + middle click)" ).arg(UI_CTRL_KEY),
-						[this](){ contextMenuAction( Mute ); } );
+				tr( individualTCO
+					? "Mute/unmute (<%1> + middle click)"
+					: "Mute/unmute selection (<%1> + middle click)" ).arg(UI_CTRL_KEY),
+					[this](){ contextMenuAction( Mute ); } );
 	constructContextMenu( &contextMenu );
 
 	contextMenu.exec( QCursor::pos() );
@@ -1149,16 +1197,35 @@ void TrackContentObjectView::contextMenuEvent( QContextMenuEvent * cme )
 // This method processes the actions from the context menu of the TCO View.
 void TrackContentObjectView::contextMenuAction( ContextMenuAction action )
 {
+	// Get a list of selected selectableObjects
+	QVector<selectableObject *> sos = gui->songEditor()->m_editor->selectedObjects();
+
+	// Convert to a list of selected TCOVs
+	QVector<TrackContentObjectView *> selection;
+	selection.reserve( sos.size() );
+	for( auto so: sos )
+	{
+		TrackContentObjectView *tcov = dynamic_cast<TrackContentObjectView *> ( so );
+		if( tcov != nullptr )
+		{
+			selection.append( tcov );
+		}
+	}
+
+	// If we clicked part of the selection, affect all selected clips. Otherwise affect the clip we clicked
+	QVector<TrackContentObjectView *> active = selection.contains( this ) ? selection : QVector<TrackContentObjectView *>( 1, this );
+	// active will be later used for the removeActive, copyActive, cutActive or toggleMuteActive methods
+
 	switch( action )
 	{
 		case Remove:
-			removeSelection();
+			removeActive( active );
 			break;
 		case Cut:
-			cutSelection();
+			cutActive( active );
 			break;
 		case Copy:
-			copySelection();
+			copyActive( active );
 			break;
 		case Paste:
 			// NOTE: Because we give preference to the QApplication clipboard over the LMMS Clipboard class, we need to
@@ -1175,60 +1242,27 @@ void TrackContentObjectView::contextMenuAction( ContextMenuAction action )
 			}
 			break;
 		case Mute:
-			toggleMuteSelection();
+			toggleMuteActive( active );
 			break;
 	}
 }
 
-void TrackContentObjectView::removeSelection()
+void TrackContentObjectView::removeActive( QVector<TrackContentObjectView *> tcovs )
 {
-	// List of selected TCOs
-	QVector<selectableObject *> so = gui->songEditor()->m_editor->selectedObjects();
-
-	// Checks if there are other selected TCOs and if so removes them as well
-	if( so.size() > 0 && isSelected() )
+	for( auto tcov: tcovs )
 	{
-		for( QVector<selectableObject *>::iterator it = so.begin();
-				it != so.end(); ++it )
-		{
-			TrackContentObjectView *tcov =
-				dynamic_cast<TrackContentObjectView *>( *it );
-
-			if( tcov != NULL )
-			{
-				tcov->remove();
-			}
-		}
-	}
-	else
-	{
-		remove();
+		// No need to check if it's nullptr because we check when building the QVector
+		tcov->remove();
 	}
 }
 
-void TrackContentObjectView::copySelection()
+void TrackContentObjectView::copyActive( QVector<TrackContentObjectView *> tcovs )
 {
-	// List of selected TCOs
-	QVector<selectableObject *> so = gui->songEditor()->m_editor->selectedObjects();
-
 	// Checks if there are other selected TCOs and if so copy them as well
-	if( so.size() > 0 && isSelected() )
+	if( tcovs.size() > 1 )
 	{
-		// List of TCOs to be copied
-		QVector<TrackContentObjectView *> tcoViews;
-
-		for( QVector<selectableObject *>::iterator it = so.begin();
-				it != so.end(); ++it )
-		{
-			TrackContentObjectView *tcov = dynamic_cast<TrackContentObjectView *>( *it );
-			if( tcov != NULL )
-			{
-				tcoViews.push_back( tcov );
-			}
-		}
-
 		// Write the TCOs to a DataFile for copying
-		DataFile dataFile = createTCODataFiles( tcoViews );
+		DataFile dataFile = createTCODataFiles( tcovs );
 
 		// Add the TCO type as a key to the final string
 		QString finalString = QString( "tco_%1:%2" ).arg( m_tco->getTrack()->type() ).arg( dataFile.toString() );
@@ -1240,36 +1274,21 @@ void TrackContentObjectView::copySelection()
 	}
 	else
 	{
-		getTrackContentObject()->copy();
+		tcovs.at(0)->getTrackContentObject()->copy();
 	}
 }
 
-void TrackContentObjectView::cutSelection()
+void TrackContentObjectView::cutActive( QVector<TrackContentObjectView *> tcovs )
 {
-	// List of selected TCOs
-	QVector<selectableObject *> so = gui->songEditor()->m_editor->selectedObjects();
-
 	// Checks if there are other selected TCOs and if so cut them as well
-	if( so.size() > 0 && isSelected() )
+	if( tcovs.size() > 1 )
 	{
-		// List of TCOs to be copied
-		QVector<TrackContentObjectView *> tcoViews;
-
-		for( QVector<selectableObject *>::iterator it = so.begin();
-				it != so.end(); ++it )
-		{
-			TrackContentObjectView *tcov = dynamic_cast<TrackContentObjectView *>( *it );
-			if( tcov != NULL )
-			{
-				tcoViews.push_back( tcov );
-			}
-		}
-
 		// Write the TCOs to a DataFile for copying
-		DataFile dataFile = createTCODataFiles( tcoViews );
+		DataFile dataFile = createTCODataFiles( tcovs );
 
 		// Now that the dataFile is created we can delete the tracks, since we are cutting
-		removeSelection();
+		// TODO: Is it safe to call tcov->remove(); on the current TCOV instance?
+		removeActive( tcovs );
 
 		// Add the TCO type as a key to the final string
 		QString finalString = QString( "tco_%1:%2" ).arg( m_tco->getTrack()->type() ).arg( dataFile.toString() );
@@ -1281,7 +1300,7 @@ void TrackContentObjectView::cutSelection()
 	}
 	else
 	{
-		cut();
+		tcovs.at(0)->cut();
 	}
 }
 
@@ -1301,29 +1320,12 @@ void TrackContentObjectView::pasteSelection()
 	}
 }
 
-void TrackContentObjectView::toggleMuteSelection()
+void TrackContentObjectView::toggleMuteActive( QVector<TrackContentObjectView *> tcovs )
 {
-	// List of selected TCOs
-	QVector<selectableObject *> so = gui->songEditor()->m_editor->selectedObjects();
-
-	// Checks if there are other selected TCOs and if so mutes them as well
-	if( so.size() > 0 && isSelected() )
+	for( auto tcov: tcovs )
 	{
-		for( QVector<selectableObject *>::iterator it = so.begin();
-				it != so.end(); ++it )
-		{
-			TrackContentObjectView *tcov =
-				dynamic_cast<TrackContentObjectView *>( *it );
-
-			if( tcov != NULL )
-			{
-				tcov->getTrackContentObject()->toggleMute();
-			}
-		}
-	}
-	else
-	{
-		getTrackContentObject()->toggleMute();
+		// No need to check for nullptr because we check while building the tcovs QVector
+		tcov->getTrackContentObject()->toggleMute();
 	}
 }
 

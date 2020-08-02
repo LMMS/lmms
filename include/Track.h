@@ -250,12 +250,12 @@ public:
 	bool needsUpdate();
 	void setNeedsUpdate( bool b );
 
-	// Methods to remove, copy, cut, paste and mute either selections of TCO views or individual TCOs
-	void removeSelection();
-	void copySelection();
-	void cutSelection();
+	// Methods to remove, copy, cut, paste and mute a QVector of TCO views
+	void removeActive( QVector<TrackContentObjectView *> tcovs );
+	void copyActive( QVector<TrackContentObjectView *> tcovs );
+	void cutActive( QVector<TrackContentObjectView *> tcovs );
 	void pasteSelection(); // TODO: Rethink naming?
-	void toggleMuteSelection();
+	void toggleMuteActive( QVector<TrackContentObjectView *> tcovs );
 
 public slots:
 	virtual bool close();

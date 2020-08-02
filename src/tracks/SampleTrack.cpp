@@ -343,6 +343,26 @@ void SampleTCOView::updateSample()
 
 void SampleTCOView::contextMenuEvent( QContextMenuEvent * _cme )
 {
+	// Depending on whether we right-clicked a selection or an individual TCO we will have
+	// different labels for the actions.
+	// Get a list of selected selectableObjects
+	QVector<selectableObject *> sos = gui->songEditor()->m_editor->selectedObjects();
+
+	// Convert to a list of selected TCOVs
+	QVector<TrackContentObjectView *> selection;
+	selection.reserve( sos.size() );
+	for( auto so: sos )
+	{
+		TrackContentObjectView *tcov = dynamic_cast<TrackContentObjectView *> ( so );
+		if( tcov != nullptr )
+		{
+			selection.append( tcov );
+		}
+	}
+
+	// Individual TCO or selection being right-clicked?
+	bool individualTCO = selection.contains( this ) ? false : true;
+
 	if( _cme->modifiers() )
 	{
 		return;
@@ -352,20 +372,30 @@ void SampleTCOView::contextMenuEvent( QContextMenuEvent * _cme )
 	if( fixedTCOs() == false )
 	{
 		contextMenu.addAction( embed::getIconPixmap( "cancel" ),
-					tr( "Delete (middle mousebutton)" ),
+					tr( individualTCO
+						? "Delete (middle mousebutton)"
+						: "Delete selection (middle mousebutton)" ),
 						[this](){ contextMenuAction( Remove ); } );
 		contextMenu.addSeparator();
 		contextMenu.addAction( embed::getIconPixmap( "edit_cut" ),
-					tr( "Cut" ), [this](){ contextMenuAction( Cut ); } );
+					tr( individualTCO
+						? "Cut"
+						: "Cut selection" ),
+						[this](){ contextMenuAction( Cut ); } );
 	}
 	contextMenu.addAction( embed::getIconPixmap( "edit_copy" ),
-					tr( "Copy" ), [this](){ contextMenuAction( Copy ); } );
+					tr( individualTCO
+						? "Copy"
+						: "Copy selection" ),
+						[this](){ contextMenuAction( Copy ); } );
 	contextMenu.addAction( embed::getIconPixmap( "edit_paste" ),
 					tr( "Paste" ), [this](){ contextMenuAction( Paste ); } );
 	contextMenu.addSeparator();
 	contextMenu.addAction( embed::getIconPixmap( "muted" ),
-				tr( "Mute/unmute (<%1> + middle click)" ).arg(UI_CTRL_KEY),
-						[this](){ contextMenuAction( Mute ); } );
+				tr( individualTCO
+					? "Mute/unmute (<%1> + middle click)"
+					: "Mute/unmute selection (<%1> + middle click)" ).arg(UI_CTRL_KEY),
+					[this](){ contextMenuAction( Mute ); } );
 	/*contextMenu.addAction( embed::getIconPixmap( "record" ),
 				tr( "Set/clear record" ),
 						m_tco, SLOT( toggleRecord() ) );*/
