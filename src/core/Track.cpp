@@ -1228,18 +1228,7 @@ void TrackContentObjectView::contextMenuAction( ContextMenuAction action )
 			copyActive( active );
 			break;
 		case Paste:
-			// NOTE: Because we give preference to the QApplication clipboard over the LMMS Clipboard class, we need to
-			// clear the QApplication Clipboard during the LMMS Clipboard copy operations (Clipboard::copy does that)
-
-			// If we have TCO data on the clipboard paste it. If not, do our regular TCO paste.
-			if( QApplication::clipboard()->mimeData( QClipboard::Clipboard )->hasFormat( StringPairDrag::mimeType() ) )
-			{
-				pasteSelection();
-			}
-			else
-			{
-				getTrackContentObject()->paste();
-			}
+			paste();
 			break;
 		case Mute:
 			toggleMuteActive( active );
@@ -1304,19 +1293,29 @@ void TrackContentObjectView::cutActive( QVector<TrackContentObjectView *> tcovs 
 	}
 }
 
-// TODO: Is it a good name for the method or can it be mistaken with TrackContentWidget::pasteSelection()?
-void TrackContentObjectView::pasteSelection()
+void TrackContentObjectView::paste()
 {
-	// Paste the selection on the MidiTime of the selected Track
-	const QMimeData *md = QApplication::clipboard()->mimeData( QClipboard::Clipboard );
-	MidiTime tcoPos = MidiTime( m_tco->startPosition() );
+	// NOTE: Because we give preference to the QApplication clipboard over the LMMS Clipboard class, we need to
+	// clear the QApplication Clipboard during the LMMS Clipboard copy operations (Clipboard::copy does that)
 
-	TrackContentWidget *tcw = getTrackView()->getTrackContentWidget();
-
-	if( tcw->pasteSelection( tcoPos, md ) == true )
+	// If we have TCO data on the clipboard paste it. If not, do our regular TCO paste.
+	if( QApplication::clipboard()->mimeData( QClipboard::Clipboard )->hasFormat( StringPairDrag::mimeType() ) )
 	{
-		// If we succeed on the paste we delete the TCO we pasted on
-		remove();
+		// Paste the selection on the MidiTime of the selected Track
+		const QMimeData *md = QApplication::clipboard()->mimeData( QClipboard::Clipboard );
+		MidiTime tcoPos = MidiTime( m_tco->startPosition() );
+
+		TrackContentWidget *tcw = getTrackView()->getTrackContentWidget();
+
+		if( tcw->pasteSelection( tcoPos, md ) == true )
+		{
+			// If we succeed on the paste we delete the TCO we pasted on
+			remove();
+		}
+	}
+	else
+	{
+		getTrackContentObject()->paste();
 	}
 }
 
