@@ -153,6 +153,7 @@ void FxLine::setChannelIndex( int index )
 
 
 
+// Return what color the mixer should be if it is muted
 QColor FxLine::mutedColor( QPainter* p, const FxLine *fxLine, bool isActive )
 {
 	return isActive ? fxLine->backgroundActive().color() : p->background().color();
@@ -161,6 +162,7 @@ QColor FxLine::mutedColor( QPainter* p, const FxLine *fxLine, bool isActive )
 
 
 
+// Return what color the mixer should be if it is not muted
 QColor FxLine::unmutedColor( QPainter* p, const FxLine *fxLine, bool isActive )
 {
 	auto channel = Engine::fxMixer()->effectChannel( m_channelIndex );
@@ -438,6 +440,8 @@ void FxLine::setStrokeInnerInactive( const QColor & c )
 	m_strokeInnerInactive = c;
 }
 
+
+// Ask user for a color, and set it as the mixer line color
 void FxLine::changeColor()
 {
 	auto channel = Engine::fxMixer()->effectChannel( m_channelIndex );
@@ -452,12 +456,16 @@ void FxLine::changeColor()
 	update();
 }
 
+
+// Disable the usage of color on this mixer line
 void FxLine::resetColor()
 {
 	Engine::fxMixer()->effectChannel( m_channelIndex )->m_hasColor = false;
 	update();
 }
 
+
+// Pick a random color from the mixer palette and set it as our color
 void FxLine::randomColor()
 {
 	auto channel = Engine::fxMixer()->effectChannel( m_channelIndex );

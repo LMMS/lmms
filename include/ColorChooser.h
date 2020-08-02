@@ -43,7 +43,7 @@ public:
 	ColorChooser* withPalette (const CCPalette);
 
 protected:
-	// Forward key events to the parent to prevent stuck notes when the dialog gets focus
+	//! Forward key events to the parent to prevent stuck notes when the dialog gets focus
 	void keyReleaseEvent(QKeyEvent *event) override
 	{
 		QKeyEvent ke(*event);
