@@ -11,8 +11,7 @@
 #include "Knob.h"
 #include "TrackContainer.h"
 #include "GroupBox.h"
-
-const int MIDI_CC_MAX_CONTROLLERS = 128;
+#include "Midi.h"
 
 class InstrumentTrack;
 
@@ -42,7 +41,7 @@ private:
 
 	GroupBox *m_midiCCGroupBox; // MIDI CC GroupBox (used to enable disable MIDI CC)
 
-	Knob *m_controllerKnob[MIDI_CC_MAX_CONTROLLERS]; // Holds the knob widgets for each controller
+	Knob *m_controllerKnob[MidiControllerCount]; // Holds the knob widgets for each controller
 
 };
 
