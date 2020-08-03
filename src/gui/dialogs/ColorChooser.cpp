@@ -62,9 +62,9 @@ QVector<QColor> ColorChooser::getPalette (const Palette palette)
 {
 	switch (palette)
 	{
-		case Palette::Default: return defaultPalette();
 		case Palette::Mixer: return nicePalette(140);
 		case Palette::Track: return nicePalette(150);
+		default: return defaultPalette();
 	}
 }
 
