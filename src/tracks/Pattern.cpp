@@ -55,14 +55,13 @@ QPixmap * PatternView::s_stepBtnOffLight = NULL;
 Pattern::Pattern( InstrumentTrack * _instrument_track ) :
 	TrackContentObject( _instrument_track ),
 	m_instrumentTrack( _instrument_track ),
-	m_patternType( MelodyPattern ),
+	m_patternType( BeatPattern ),
 	m_steps( MidiTime::stepsPerBar() )
 {
 	setName( _instrument_track->name() );
 	if( _instrument_track->trackContainer()
 					== Engine::getBBTrackContainer() )
 	{
-		m_patternType = Pattern::BeatPattern;
 		resizeToFirstTrack();
 	}
 	init();
