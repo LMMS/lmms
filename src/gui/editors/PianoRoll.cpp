@@ -4131,7 +4131,7 @@ void PianoRoll::pasteNotes()
 				// the length of copied notes is set to the length of the instruments envelope
 				f_cnt_t envFrames = m_pattern->instrumentTrack()->envFrames();
 				// if notes have zero length due to rounding set the length to a small value
-				tick_t noteLength = qMax(static_cast<float>(1), envFrames / Engine::framesPerTick());
+				tick_t noteLength = static_cast<tick_t>(qMax(1.0f, ceil(envFrames / Engine::framesPerTick())));
 				cur_note.setLength(MidiTime(noteLength));
 			}
 
