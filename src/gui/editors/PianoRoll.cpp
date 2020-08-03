@@ -2059,6 +2059,7 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 	}
 	else if( m_action == ActionResizeNoteEditArea )
 	{
+		// Don't try to show more keys than the full keyboard, bail if trying to
 		if (m_pianoKeysVisible == NumKeys && me->y() > m_moveStartY)
 		{
 			return;
@@ -2679,10 +2680,10 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 
 	if (hasValidPattern())
 	{
-		int pianoArea, partialKeyVisible, topKey, topNote;
-		pianoArea = keyAreaBottom() - keyAreaTop();
-		m_pianoKeysVisible = pianoArea / m_keyLineHeight;
-		partialKeyVisible = pianoArea % m_keyLineHeight;
+		int pianoAreaHeight, partialKeyVisible, topKey, topNote;
+		pianoAreaHeight = keyAreaBottom() - keyAreaTop();
+		m_pianoKeysVisible = pianoAreaHeight / m_keyLineHeight;
+		partialKeyVisible = pianoAreaHeight % m_keyLineHeight;
 		// check if we're below the minimum key area size
 		if (m_pianoKeysVisible * m_keyLineHeight < KEY_AREA_MIN_HEIGHT)
 		{
@@ -2888,7 +2889,7 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 				// draw next white key
 				drawKey(key - 1, grid_line_y + m_keyLineHeight);
 				drawHorizontalLine(key - 1, grid_line_y + m_keyLineHeight);
-				// draw black key over both
+				// draw black key over previous and next white key
 				drawKey(key, grid_line_y);
 				drawHorizontalLine(key, grid_line_y);
 				// drew two grid keys so skip ahead properly
@@ -3298,8 +3299,8 @@ void PianoRoll::updateScrollbars()
 		SCROLLBAR_SIZE,
 		height() - PR_TOP_MARGIN - SCROLLBAR_SIZE
 	);
-	int pianoArea = keyAreaBottom() - PR_TOP_MARGIN;
-	int numKeysVisible = pianoArea / m_keyLineHeight;
+	int pianoAreaHeight = keyAreaBottom() - PR_TOP_MARGIN;
+	int numKeysVisible = pianoAreaHeight / m_keyLineHeight;
 	m_totalKeysToScroll = qMax(0, NumKeys - numKeysVisible);
 	m_topBottomScroll->setRange(0, m_totalKeysToScroll);
 	if (m_startKey > m_totalKeysToScroll)

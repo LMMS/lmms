@@ -178,7 +178,7 @@ PianoRoll {
 	qproperty-whiteKeyInactiveTextColor: #000;
 	qproperty-whiteKeyInactiveTextShadow: #fff;
 	qproperty-whiteKeyInactiveBackground: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #eeeeee, stop:1 #ffffff);
-	qproperty-blackKeyWidth: 64;
+	qproperty-blackKeyWidth: 48;
 	qproperty-blackKeyActiveBackground: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #43e97b, stop:1 #3bcd6c);
 	qproperty-blackKeyInactiveBackground: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #333, stop:1 #000);
 	/* Grid colors */
