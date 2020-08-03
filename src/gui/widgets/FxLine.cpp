@@ -152,33 +152,6 @@ void FxLine::setChannelIndex( int index )
 
 
 
-
-// Return what color the mixer should be if it is muted
-QColor FxLine::mutedColor( QPainter* p, const FxLine *fxLine, bool isActive )
-{
-	return isActive ? fxLine->backgroundActive().color() : p->background().color();
-}
-
-
-
-
-// Return what color the mixer should be if it is not muted
-QColor FxLine::unmutedColor( QPainter* p, const FxLine *fxLine, bool isActive )
-{
-	auto channel = Engine::fxMixer()->effectChannel( m_channelIndex );
-	
-	if( channel->m_hasColor )
-	{
-		return isActive ? channel->m_color.darker( 120 ) : channel->m_color.darker( 150 );
-	}
-	else
-	{
-		return isActive ? fxLine->backgroundActive().color() : p->background().color();
-	}
-}
-
-
-
 void FxLine::drawFxLine( QPainter* p, const FxLine *fxLine, bool isActive, bool sendToThis, bool receiveFromThis )
 {
 	auto channel = Engine::fxMixer()->effectChannel( m_channelIndex );
@@ -193,10 +166,16 @@ void FxLine::drawFxLine( QPainter* p, const FxLine *fxLine, bool isActive, bool 
 
 	int width = fxLine->rect().width();
 	int height = fxLine->rect().height();
-
-	QColor color = muted ? mutedColor( p, fxLine, isActive ) : unmutedColor( p, fxLine, isActive );
-
-	p->fillRect( fxLine->rect(), color );
+	
+	if( channel->m_hasColor && !muted )
+	{
+		p->fillRect( fxLine->rect(), channel->m_color.darker( isActive ? 120 : 150 ) );
+	}
+	else
+	{
+		p->fillRect( fxLine->rect(),
+					 isActive ? fxLine->backgroundActive().color() : p->background().color() );
+	}
 	
 	// inner border
 	p->setPen( isActive ? fxLine->strokeInnerActive() : fxLine->strokeInnerInactive() );
@@ -446,7 +425,7 @@ void FxLine::changeColor()
 {
 	auto channel = Engine::fxMixer()->effectChannel( m_channelIndex );
 	
-	auto new_color = ColorChooser( this ).withPalette( ColorChooser::CCPalette::Mixer )->getColor( channel->m_color );
+	auto new_color = ColorChooser( this ).withPalette( ColorChooser::Palette::Mixer )->getColor( channel->m_color );
 	if( ! new_color.isValid() )
 	{ return; }
 	
@@ -470,7 +449,7 @@ void FxLine::randomColor()
 {
 	auto channel = Engine::fxMixer()->effectChannel( m_channelIndex );
 	
-	channel->m_color = ColorChooser( this ).withPalette( ColorChooser::CCPalette::Mixer )->standardColor( rand() % 48 );
+	channel->m_color = ColorChooser().getPalette( ColorChooser::Palette::Mixer )[ rand() % 48 ];
 	channel->m_hasColor = true;
 	
 	update();

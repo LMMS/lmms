@@ -86,8 +86,6 @@ public:
 private:
 	void drawFxLine( QPainter* p, const FxLine *fxLine, bool isActive, bool sendToThis, bool receiveFromThis );
 	QString elideName( const QString & name );
-	QColor mutedColor( QPainter* p, const FxLine *fxLine, bool isActive );
-	QColor unmutedColor( QPainter* p, const FxLine *fxLine, bool isActive );
 
 	FxMixerView * m_mv;
 	LcdWidget* m_lcd;

@@ -33,14 +33,19 @@ public:
 	ColorChooser(const QColor &initial, QWidget *parent): QColorDialog(initial, parent) {};
 	ColorChooser(QWidget *parent): QColorDialog(parent) {};
 	
-	enum class CCPalette {Default, Track, Mixer};
+	//! For getting a color without having to initialise a color dialog
+	ColorChooser() {};
+	
+	enum class Palette {Default, Track, Mixer};
 	
 	//! Set global palette via array, checking bounds
 	void setPalette (const QVector<QColor>);
 	//! Set global paletter via enum
-	void setPalette (const CCPalette);
+	void setPalette (const Palette);
 	//! Set palette via enum, return self pointer for chaining
-	ColorChooser* withPalette (const CCPalette);
+	ColorChooser* withPalette (const Palette);
+	//! Return a certain palette
+	QVector<QColor> getPalette (const Palette);
 
 protected:
 	//! Forward key events to the parent to prevent stuck notes when the dialog gets focus
