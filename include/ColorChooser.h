@@ -59,5 +59,5 @@ private:
 	//! Copy the current QColorDialog palette into an array
 	QVector<QColor> defaultPalette();
 	//! Generate a nice palette, with adjustable value
-	QVector<QColor> nicePalette (const int);
+	QVector<QColor> nicePalette (int);
 };

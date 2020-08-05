@@ -84,7 +84,7 @@ QVector<QColor> ColorChooser::defaultPalette()
 
 
 //! Generate a nice palette, with adjustable value
-QVector<QColor> ColorChooser::nicePalette (const int base)
+QVector<QColor> ColorChooser::nicePalette (int base)
 {
 	QVector <QColor> result (48);
 	for (int x = 0; x < 8; x++)

@@ -742,7 +742,7 @@ void FxMixer::saveSettings( QDomDocument & _doc, QDomElement & _this )
 		ch->m_soloModel.saveSettings( _doc, fxch, "soloed" );
 		fxch.setAttribute( "num", i );
 		fxch.setAttribute( "name", ch->m_name );
-		if( ch->m_hasColor ) fxch.setAttribute( "color", ch->m_color.rgb() );
+		if( ch->m_hasColor ) fxch.setAttribute( "color", ch->m_color.name() );
 
 		// add the channel sends
 		for( int si = 0; si < ch->m_sends.size(); ++si )
@@ -791,7 +791,7 @@ void FxMixer::loadSettings( const QDomElement & _this )
 		if( fxch.hasAttribute( "color" ) )
 		{
 			m_fxChannels[num]->m_hasColor = true;
-			m_fxChannels[num]->m_color.setRgb( fxch.attribute( "color" ).toUInt() );
+			m_fxChannels[num]->m_color.setNamedColor( fxch.attribute( "color" ) );
 		}
 
 		m_fxChannels[num]->m_fxChain.restoreState( fxch.firstChildElement(
