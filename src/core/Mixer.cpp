@@ -357,7 +357,7 @@ const surroundSampleFrame * Mixer::renderNextBuffer()
 					 currentPlayMode == Song::Mode_PlayBB;
 
 	if( playModeSupportsMetronome && m_metronomeActive && !song->isExporting() &&
-		p != last_metro_pos &&
+		!song->isPaused() && p != last_metro_pos &&
 			// Stop crash with metronome if empty project
 				Engine::getSong()->countTracks() )
 	{
