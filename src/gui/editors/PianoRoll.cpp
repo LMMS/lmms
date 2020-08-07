@@ -36,6 +36,8 @@
 #include <QPointer>
 #include <QScrollBar>
 #include <QStyleOption>
+#include <QMessageBox>
+#include <QCheckBox>
 
 #ifndef __USE_XOPEN
 #define __USE_XOPEN
@@ -63,6 +65,7 @@
 #include "TextFloat.h"
 #include "TimeLineWidget.h"
 #include "StepRecorderWidget.h"
+#include "NStateButton.h"
 
 
 using std::move;
@@ -207,7 +210,9 @@ PianoRoll::PianoRoll() :
 	m_ghostNoteOpacity( 255 ),
 	m_noteBorders( true ),
 	m_ghostNoteBorders( true ),
-	m_backgroundShade( 0, 0, 0 )
+	m_backgroundShade( 0, 0, 0 ),
+	m_captureKeyboard(false),
+	m_captureKeyboardAsk(true)
 {
 	// gui names of edit modes
 	m_nemStr.push_back( tr( "Note Velocity" ) );
@@ -1187,6 +1192,17 @@ int PianoRoll::selectionCount() const // how many notes are selected?
 
 void PianoRoll::keyPressEvent(QKeyEvent* ke)
 {
+	// Just for the capture keyboard feature:
+	if (m_captureKeyboard)
+	{
+		// In that context, escape will turn off the capture keyboard feature (but we don't
+		// consume the event because it also does something inside the piano roll).
+		if (ke->key() == Qt::Key_Escape)
+		{
+			m_captureKeyboardButton->changeState(0); // Disable the capture keyboard
+		}
+	}
+
 	if(m_stepRecorder.isRecording())
 	{
 		bool handled = m_stepRecorder.keyPressEvent(ke);
@@ -4247,6 +4263,55 @@ void PianoRoll::zoomingYChanged()
 	update();
 }
 
+// Toggle capture keyboard variable
+void PianoRoll::toggleCaptureKeyboard(int state)
+{
+	// Message box for confirmation
+	QMessageBox mb(tr("Are you sure you want to capture the keyboard?"),
+			tr("Enabling this feature will capture the keyboard to the piano roll, "
+				"making it unusable on other applications until it's disabled.\n"
+				"Are you sure you want to enable it?\n\n"
+				"Hint: Press Esc to quickly disable the keyboard capture."),
+			QMessageBox::Warning,
+			QMessageBox::Yes,
+			QMessageBox::No,
+			QMessageBox::NoButton,
+			this);
+
+	// Don't ask again checkbox
+	QCheckBox *cb = new QCheckBox("Don't ask me again.");
+	QObject::connect(cb, &QCheckBox::stateChanged, [this](int state){
+		if (state == static_cast<int>(Qt::CheckState::Checked)){
+			m_captureKeyboardAsk = false;
+		}
+	});
+	mb.setCheckBox(cb);
+
+	// State 1 = On. State 0 = Off
+	if (state == 1)
+	{
+		// Answer is Yes if the "Don't ask again" box was ticked
+		int answer = m_captureKeyboardAsk ? mb.exec() : static_cast<int>(QMessageBox::Yes);
+
+		if (answer == static_cast<int>(QMessageBox::Yes))
+		{
+			this->grabKeyboard();
+			m_captureKeyboard = true;
+		}
+		else
+		{
+			m_captureKeyboardButton->changeState(0);
+		}
+	}
+	else
+	{
+		if (m_captureKeyboard == true)
+		{
+			this->releaseKeyboard();
+			m_captureKeyboard = false;
+		}
+	}
+}
 
 void PianoRoll::quantizeChanged()
 {
@@ -4460,6 +4525,17 @@ PianoRollWindow::PianoRollWindow() :
 	DropToolBar *timeLineToolBar = addDropToolBarToTop( tr( "Timeline controls" ) );
 	m_editor->m_timeLine->addToolButtons( timeLineToolBar );
 
+
+	// Add a toolbar with capture keyboard feature
+	DropToolBar *keyboardControlToolBar = addDropToolBarToTop(tr("Keyboard controls"));
+
+	m_editor->m_captureKeyboardButton = new NStateButton(keyboardControlToolBar);
+	m_editor->m_captureKeyboardButton->setGeneralToolTip(tr("Enable/Disable Keyboard Capture"));
+	m_editor->m_captureKeyboardButton->addState(embed::getIconPixmap("capture_keyboard_off"));
+	m_editor->m_captureKeyboardButton->addState(embed::getIconPixmap("capture_keyboard_on"));
+
+	keyboardControlToolBar->addWidget(m_editor->m_captureKeyboardButton);
+	connect(m_editor->m_captureKeyboardButton, SIGNAL(changedState(int)), m_editor, SLOT(toggleCaptureKeyboard(int)));
 
 	addToolBarBreak();
 

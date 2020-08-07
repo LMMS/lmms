@@ -40,6 +40,7 @@
 #include "ToolTip.h"
 #include "StepRecorder.h"
 #include "StepRecorderWidget.h"
+#include "NStateButton.h"
 
 class QPainter;
 class QPixmap;
@@ -236,6 +237,8 @@ protected slots:
 
 	void clearGhostPattern();
 
+	// For toggling the capture keyboard feature
+	void toggleCaptureKeyboard(int state);
 
 signals:
 	void currentPatternChanged();
@@ -458,6 +461,11 @@ private:
 	bool m_noteBorders;
 	bool m_ghostNoteBorders;
 	QColor m_backgroundShade;
+
+	// Capture Keyboard
+	bool m_captureKeyboard;
+	bool m_captureKeyboardAsk; // Enables/Disables the confirmation dialog
+	NStateButton *m_captureKeyboardButton;
 
 signals:
 	void positionChanged( const MidiTime & );
