@@ -27,7 +27,7 @@
 
 
 //! Set global palette via array, checking bounds
-void ColorChooser::setPalette (const QVector<QColor> colors)
+void ColorChooser::setPalette (QVector<QColor> colors)
 {
 	const int max = qMin (colors.size(), 48);
 	for (int i = 0; i < max; i++)
@@ -38,14 +38,9 @@ void ColorChooser::setPalette (const QVector<QColor> colors)
 
 
 //! Set global paletter via enum
-void ColorChooser::setPalette (const Palette palette)
+void ColorChooser::setPalette (Palette palette)
 {
-	switch (palette)
-	{
-		case Palette::Default: setPalette (defaultPalette()); break;
-		case Palette::Mixer: setPalette (nicePalette(140)); break;
-		case Palette::Track: setPalette (nicePalette(150)); break;
-	}
+	setPalette (getPalette (palette));
 }
 
 
@@ -58,7 +53,7 @@ ColorChooser* ColorChooser::withPalette (const Palette palette)
 
 
 //! Return a certain palette
-QVector<QColor> ColorChooser::getPalette (const Palette palette)
+QVector<QColor> ColorChooser::getPalette (Palette palette)
 {
 	switch (palette)
 	{

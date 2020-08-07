@@ -39,13 +39,13 @@ public:
 	enum class Palette {Default, Track, Mixer};
 	
 	//! Set global palette via array, checking bounds
-	void setPalette (const QVector<QColor>);
+	void setPalette (QVector<QColor>);
 	//! Set global paletter via enum
-	void setPalette (const Palette);
+	void setPalette (Palette);
 	//! Set palette via enum, return self pointer for chaining
-	ColorChooser* withPalette (const Palette);
+	ColorChooser* withPalette (Palette);
 	//! Return a certain palette
-	QVector<QColor> getPalette (const Palette);
+	QVector<QColor> getPalette (Palette);
 
 protected:
 	//! Forward key events to the parent to prevent stuck notes when the dialog gets focus
