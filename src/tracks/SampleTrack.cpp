@@ -345,23 +345,7 @@ void SampleTCOView::contextMenuEvent( QContextMenuEvent * _cme )
 {
 	// Depending on whether we right-clicked a selection or an individual TCO we will have
 	// different labels for the actions.
-	// Get a list of selected selectableObjects
-	QVector<selectableObject *> sos = gui->songEditor()->m_editor->selectedObjects();
-
-	// Convert to a list of selected TCOVs
-	QVector<TrackContentObjectView *> selection;
-	selection.reserve( sos.size() );
-	for( auto so: sos )
-	{
-		TrackContentObjectView *tcov = dynamic_cast<TrackContentObjectView *> ( so );
-		if( tcov != nullptr )
-		{
-			selection.append( tcov );
-		}
-	}
-
-	// Individual TCO or selection being right-clicked?
-	bool individualTCO = selection.contains( this ) ? false : true;
+	bool individualTCO = getClickedTCOs().size() <= 1;
 
 	if( _cme->modifiers() )
 	{
