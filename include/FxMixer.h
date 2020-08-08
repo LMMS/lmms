@@ -72,6 +72,8 @@ class FxChannel : public ThreadableJob
 		bool requiresProcessing() const override { return true; }
 		void unmuteForSolo();
 		
+		
+		// TODO C++17 and above: use std::optional insteads
 		QColor m_color;
 		bool m_hasColor;
 

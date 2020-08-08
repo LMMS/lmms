@@ -45,7 +45,7 @@ void ColorChooser::setPalette (Palette palette)
 
 
 //! Set palette via enum, return self pointer for chaining
-ColorChooser* ColorChooser::withPalette (const Palette palette)
+ColorChooser* ColorChooser::withPalette (Palette palette)
 {
 	setPalette (palette);
 	return this;

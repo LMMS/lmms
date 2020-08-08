@@ -126,8 +126,6 @@ FxLine::FxLine( QWidget * _parent, FxMixerView * _mv, int _channelIndex ) :
 	
 	connect( &Engine::fxMixer()->effectChannel( m_channelIndex )->m_muteModel, SIGNAL( dataChanged() ), this, SLOT( update() ) );
 	
-	srand( time( 0 ) );
-	
 }
 
 
@@ -242,7 +240,7 @@ void FxLine::mouseDoubleClickEvent( QMouseEvent * )
 void FxLine::contextMenuEvent( QContextMenuEvent * )
 {
 	QPointer<CaptionMenu> contextMenu = new CaptionMenu( Engine::fxMixer()->effectChannel( m_channelIndex )->m_name, this );
-	if( m_channelIndex != 0 ) // no move-options in master 
+	if( m_channelIndex != 0 ) // no move-options in master
 	{
 		contextMenu->addAction( tr( "Move &left" ),	this, SLOT( moveChannelLeft() ) );
 		contextMenu->addAction( tr( "Move &right" ), this, SLOT( moveChannelRight() ) );
