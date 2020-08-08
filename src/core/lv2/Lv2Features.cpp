@@ -26,6 +26,8 @@
 
 #ifdef LMMS_HAVE_LV2
 
+#include <QtGlobal>
+
 #include "Engine.h"
 #include "Lv2Manager.h"
 
@@ -67,7 +69,7 @@ void Lv2Features::createFeatureVectors()
 	// create vector of features
 	for(std::pair<const char* const, void*>& pr : m_featureByUri)
 	{
-		assert(pr.second != nullptr);
+		Q_ASSERT(pr.second != nullptr);
 		m_features.push_back(LV2_Feature { pr.first, pr.second });
 	}
 
@@ -86,7 +88,7 @@ void Lv2Features::createFeatureVectors()
 void *&Lv2Features::operator[](const char *featName)
 {
 	auto itr = m_featureByUri.find(featName);
-	assert (itr != m_featureByUri.end());
+	Q_ASSERT(itr != m_featureByUri.end());
 	return itr->second;
 }
 
