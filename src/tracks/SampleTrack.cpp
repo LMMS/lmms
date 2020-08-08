@@ -353,33 +353,47 @@ void SampleTCOView::contextMenuEvent( QContextMenuEvent * _cme )
 	}
 
 	QMenu contextMenu( this );
+
 	if( fixedTCOs() == false )
 	{
-		contextMenu.addAction( embed::getIconPixmap( "cancel" ),
-					tr( individualTCO
-						? "Delete (middle mousebutton)"
-						: "Delete selection (middle mousebutton)" ),
-						[this](){ contextMenuAction( Remove ); } );
+		contextMenu.addAction(
+			embed::getIconPixmap( "cancel" ),
+			tr( individualTCO
+				? "Delete (middle mousebutton)"
+				: "Delete selection (middle mousebutton)" ),
+			[this](){ contextMenuAction( Remove ); } );
+
 		contextMenu.addSeparator();
-		contextMenu.addAction( embed::getIconPixmap( "edit_cut" ),
-					tr( individualTCO
-						? "Cut"
-						: "Cut selection" ),
-						[this](){ contextMenuAction( Cut ); } );
+
+		contextMenu.addAction(
+			embed::getIconPixmap( "edit_cut" ),
+			tr( individualTCO
+				? "Cut"
+				: "Cut selection" ),
+			[this](){ contextMenuAction( Cut ); } );
 	}
-	contextMenu.addAction( embed::getIconPixmap( "edit_copy" ),
-					tr( individualTCO
-						? "Copy"
-						: "Copy selection" ),
-						[this](){ contextMenuAction( Copy ); } );
-	contextMenu.addAction( embed::getIconPixmap( "edit_paste" ),
-					tr( "Paste" ), [this](){ contextMenuAction( Paste ); } );
+
+	contextMenu.addAction(
+		embed::getIconPixmap( "edit_copy" ),
+		tr( individualTCO
+			? "Copy"
+			: "Copy selection" ),
+		[this](){ contextMenuAction( Copy ); } );
+
+	contextMenu.addAction(
+		embed::getIconPixmap( "edit_paste" ),
+		tr( "Paste" ),
+		[this](){ contextMenuAction( Paste ); } );
+
 	contextMenu.addSeparator();
-	contextMenu.addAction( embed::getIconPixmap( "muted" ),
-				tr( individualTCO
-					? "Mute/unmute (<%1> + middle click)"
-					: "Mute/unmute selection (<%1> + middle click)" ).arg(UI_CTRL_KEY),
-					[this](){ contextMenuAction( Mute ); } );
+
+	contextMenu.addAction(
+		embed::getIconPixmap( "muted" ),
+		tr( individualTCO
+			? "Mute/unmute (<%1> + middle click)"
+			: "Mute/unmute selection (<%1> + middle click)" ).arg(UI_CTRL_KEY),
+		[this](){ contextMenuAction( Mute ); } );
+
 	/*contextMenu.addAction( embed::getIconPixmap( "record" ),
 				tr( "Set/clear record" ),
 						m_tco, SLOT( toggleRecord() ) );*/

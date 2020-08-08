@@ -735,8 +735,11 @@ void TrackContentObjectView::paintTextLabel(QString const & text, QPainter & pai
  */
 void TrackContentObjectView::mousePressEvent( QMouseEvent * me )
 {
-	QVector<TrackContentObjectView *> active = getClickedTCOs();
-	// active will be later used for the remove, copy, cut or toggleMute methods
+	// Right now, active is only used on right/mid clicks actions, so we use a ternary operator
+	// to avoid the overhead of calling getClickedTCOs when it's not used
+	auto active = me->button() == Qt::LeftButton
+							? QVector<TrackContentObjectView *>()
+							: getClickedTCOs();
 
 	setInitialPos( me->pos() );
 	setInitialOffsets();
@@ -1130,33 +1133,47 @@ void TrackContentObjectView::contextMenuEvent( QContextMenuEvent * cme )
 	}
 
 	QMenu contextMenu( this );
+
 	if( fixedTCOs() == false )
 	{
-		contextMenu.addAction( embed::getIconPixmap( "cancel" ),
-					tr( individualTCO
-						? "Delete (middle mousebutton)"
-						: "Delete selection (middle mousebutton)" ),
-						[this](){ contextMenuAction( Remove ); } );
+		contextMenu.addAction(
+			embed::getIconPixmap( "cancel" ),
+			tr( individualTCO
+				? "Delete (middle mousebutton)"
+				: "Delete selection (middle mousebutton)" ),
+			[this](){ contextMenuAction( Remove ); } );
+
 		contextMenu.addSeparator();
-		contextMenu.addAction( embed::getIconPixmap( "edit_cut" ),
-					tr( individualTCO
-						? "Cut"
-						: "Cut selection" ),
-						[this](){ contextMenuAction( Cut ); } );
+
+		contextMenu.addAction(
+			embed::getIconPixmap( "edit_cut" ),
+			tr( individualTCO
+				? "Cut"
+				: "Cut selection" ),
+			[this](){ contextMenuAction( Cut ); } );
 	}
-	contextMenu.addAction( embed::getIconPixmap( "edit_copy" ),
-					tr( individualTCO
-						? "Copy"
-						: "Copy selection" ),
-						[this](){ contextMenuAction( Copy ); } );
-	contextMenu.addAction( embed::getIconPixmap( "edit_paste" ),
-					tr( "Paste" ), [this](){ contextMenuAction( Paste ); } );
+
+	contextMenu.addAction(
+		embed::getIconPixmap( "edit_copy" ),
+		tr( individualTCO
+			? "Copy"
+			: "Copy selection" ),
+		[this](){ contextMenuAction( Copy ); } );
+
+	contextMenu.addAction(
+		embed::getIconPixmap( "edit_paste" ),
+		tr( "Paste" ),
+		[this](){ contextMenuAction( Paste ); } );
+
 	contextMenu.addSeparator();
-	contextMenu.addAction( embed::getIconPixmap( "muted" ),
-				tr( individualTCO
-					? "Mute/unmute (<%1> + middle click)"
-					: "Mute/unmute selection (<%1> + middle click)" ).arg(UI_CTRL_KEY),
-					[this](){ contextMenuAction( Mute ); } );
+
+	contextMenu.addAction(
+		embed::getIconPixmap( "muted" ),
+		tr( individualTCO
+			? "Mute/unmute (<%1> + middle click)"
+			: "Mute/unmute selection (<%1> + middle click)" ).arg(UI_CTRL_KEY),
+		[this](){ contextMenuAction( Mute ); } );
+
 	constructContextMenu( &contextMenu );
 
 	contextMenu.exec( QCursor::pos() );
