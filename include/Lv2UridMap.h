@@ -42,12 +42,14 @@ class UridMap
 	std::unordered_map<std::string, LV2_URID> m_map;
 	std::vector<const char*> m_unMap;
 
+	//! mutex for both m_map and m_unMap
+	//! the URID map is global, which is why a mutex is required here
+	std::mutex m_MapMutex;
+
 	LV2_URID_Map m_mapFeature;
 	LV2_URID_Unmap m_unmapFeature;
 
 	LV2_URID m_lastUrid = 0;
-
-	std::mutex m_MapMutex;
 
 public:
 	//! constructor; will set up the features

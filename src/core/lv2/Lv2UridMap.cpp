@@ -84,6 +84,8 @@ LV2_URID UridMap::map(const char *uri)
 const char *UridMap::unmap(LV2_URID urid)
 {
 	std::size_t idx = static_cast<std::size_t>(urid) - 1;
+
+	std::lock_guard<std::mutex> guard (m_MapMutex);
 	return (idx < m_unMap.size()) ? m_unMap[idx] : nullptr;
 }
 
