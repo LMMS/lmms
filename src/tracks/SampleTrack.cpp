@@ -33,6 +33,7 @@
 #include <QMdiArea>
 #include <QMdiSubWindow>
 #include <QPainter>
+#include <QPainterPath>
 #include <QPushButton>
 
 #include "BBTrack.h"
@@ -49,6 +50,7 @@
 #include "SampleRecordHandle.h"
 #include "Song.h"
 #include "SongEditor.h"
+#include "stdshims.h"
 #include "StringPairDrag.h"
 #include "TabWidget.h"
 #include "TimeLineWidget.h"
@@ -135,10 +137,29 @@ SampleTCO::~SampleTCO()
 }
 
 
+void SampleTCO::setStartTimeOffset(const TimePos &startTimeOffset)
+{
+	if (startTimeOffset != m_startTimeOffsetOld)
+	{
+		m_sampleBuffer->setTcoStartTime(
+			static_cast<float>(startTimeOffset) * Engine::framesPerTick()
+		);
+		m_startTimeOffsetOld = startTimeOffset;
+	}
+	TrackContentObject::setStartTimeOffset(startTimeOffset);
+}
+
 
 
 void SampleTCO::changeLength( const TimePos & _length )
 {
+	if (_length != m_lenOld)
+	{
+		m_sampleBuffer->setTcoFrameLength(
+			static_cast<float>(_length) * Engine::framesPerTick()
+		);
+		m_lenOld = _length;
+	}
 	TrackContentObject::changeLength( qMax( static_cast<int>( _length ), 1 ) );
 }
 
@@ -283,6 +304,21 @@ void SampleTCO::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	_this.setAttribute( "muted", isMuted() );
 	_this.setAttribute( "src", sampleFile() );
 	_this.setAttribute( "off", startTimeOffset() );
+
+	_this.setAttribute( "leftFaderPos", m_sampleBuffer->leftFaderPos());
+	_this.setAttribute( "rightFaderPos", m_sampleBuffer->rightFaderPos());
+
+	auto saveControlPoint = [&_this](QString s, ControlPoint p)
+	{
+		_this.setAttribute(s + "x", p.x());
+		_this.setAttribute(s + "y", p.y());
+	};
+
+	saveControlPoint("leftP1", m_sampleBuffer->getLeftP1());
+	saveControlPoint("leftP2", m_sampleBuffer->getLeftP2());
+	saveControlPoint("rightP1", m_sampleBuffer->getRightP1());
+	saveControlPoint("rightP2", m_sampleBuffer->getRightP2());
+
 	if( sampleFile() == "" )
 	{
 		QString s;
@@ -301,7 +337,10 @@ void SampleTCO::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	// TODO: start- and end-frame
 }
 
-
+float limitZeroOne(float val)
+{
+	return qBound<float>(0.0f, val, 1.0f);
+}
 
 
 void SampleTCO::loadSettings( const QDomElement & _this )
@@ -334,6 +373,36 @@ void SampleTCO::loadSettings( const QDomElement & _this )
 		m_sampleBuffer->setReversed(true);
 		emit wasReversed(); // tell SampleTCOView to update the view
 	}
+
+	if (_this.hasAttribute("leftP1x") && _this.hasAttribute("leftP1y") &&
+	    _this.hasAttribute("leftP2x") && _this.hasAttribute("leftP2y"))
+	{
+		m_sampleBuffer->setLeftP1(limitZeroOne(_this.attribute("leftP1x").toFloat()),
+		                          limitZeroOne(_this.attribute("leftP1y").toFloat()));
+		m_sampleBuffer->setLeftP2(limitZeroOne(_this.attribute("leftP2x").toFloat()),
+		                          limitZeroOne(_this.attribute("leftP2y").toFloat()));
+	}
+
+	if (_this.hasAttribute("rightP1x") && _this.hasAttribute("rightP1y") &&
+	    _this.hasAttribute("rightP2x") && _this.hasAttribute("rightP2y"))
+	{
+		m_sampleBuffer->setRightP1(limitZeroOne(1.0f-_this.attribute("rightP1x").toFloat()),
+		                           limitZeroOne(_this.attribute("rightP1y").toFloat()));
+		m_sampleBuffer->setRightP2(limitZeroOne(1.0f-_this.attribute("rightP2x").toFloat()),
+		                           limitZeroOne(_this.attribute("rightP2y").toFloat()));
+	}
+
+	if (_this.hasAttribute("leftFaderPos"))
+	{
+		m_sampleBuffer->setLeftFader(limitZeroOne(_this.attribute("leftFaderPos").toFloat()));
+		m_sampleBuffer->checkFadingActive();
+	}
+	if (_this.hasAttribute("rightFaderPos"))
+	{
+		m_sampleBuffer->setRightFader(limitZeroOne(_this.attribute("rightFaderPos").toFloat()));
+		m_sampleBuffer->checkFadingActive();
+	}
+
 }
 
 
@@ -361,6 +430,7 @@ SampleTCOView::SampleTCOView( SampleTCO * _tco, TrackView * _tv ) :
 	connect(m_tco, SIGNAL(wasReversed()), this, SLOT(update()));
 
 	setStyle( QApplication::style() );
+	setAttribute(Qt::WA_Hover, true);
 }
 
 void SampleTCOView::updateSample()
@@ -421,14 +491,24 @@ void SampleTCOView::contextMenuEvent( QContextMenuEvent * _cme )
 		[this](){ contextMenuAction( Paste ); } );
 
 	contextMenu.addSeparator();
-
 	contextMenu.addAction(
 		embed::getIconPixmap( "muted" ),
-		(individualTCO
-			? tr("Mute/unmute (<%1> + middle click)")
-			: tr("Mute/unmute selection (<%1> + middle click)")).arg(UI_CTRL_KEY),
+		tr( individualTCO
+			? "Mute/unmute (<%1> + middle click)"
+			: "Mute/unmute selection (<%1> + middle click)" ).arg(UI_CTRL_KEY),
 		[this](){ contextMenuAction( Mute ); } );
 
+	contextMenu.addSeparator();
+	if (m_leftFadeClicked || m_rightFadeClicked)
+	{
+		QMenu* fadingMenu = contextMenu.addMenu("Fading Shape");
+		fadingMenu->addAction(tr("S-shaped"), this, SLOT(setSFade()));
+		fadingMenu->addAction(tr("Sine"), this, SLOT(setCosFade()));
+		fadingMenu->addAction(tr("Linear"), this, SLOT(setLinearFade()));
+		fadingMenu->addAction(tr("Manual Mode"), this, SLOT(setManualFade()));
+		contextMenu.addMenu(fadingMenu);
+	}
+  
 	/*contextMenu.addAction( embed::getIconPixmap( "record" ),
 				tr( "Set/clear record" ),
 						m_tco, SLOT( toggleRecord() ) );*/
@@ -492,10 +572,81 @@ void SampleTCOView::dropEvent( QDropEvent * _de )
 }
 
 
+void SampleTCOView::checkCornersClicked(const QMouseEvent *e)
+{
+	QPointF currentPos = e->localPos();
+
+	if (m_leftHandle->contains(currentPos))
+	{
+		m_leftCorner = true;
+	}
+	else if (m_rightHandle->contains(currentPos))
+	{
+		m_rightCorner = true;
+	}
+	else if ((m_leftP1 != nullptr) && (m_leftP1->contains(currentPos)))
+	{
+		m_moveLeftP1 = true;
+	}
+	else if ((m_leftP2 != nullptr) && (m_leftP2->contains(currentPos)))
+	{
+		m_moveLeftP2 = true;
+	}
+	else if ((m_rightP1 != nullptr) && (m_rightP1->contains(currentPos)))
+	{
+		m_moveRightP1 = true;
+	}
+	else if ((m_rightP2 != nullptr) && (m_rightP2->contains(currentPos)))
+	{
+		m_moveRightP2 = true;
+	}
+}
+
+
+void SampleTCOView::checkFadesClicked(const QMouseEvent *e)
+{
+	qreal curX = e->localPos().x();
+	qreal curY = e->localPos().y();
+	QPointF curPos = QPointF(curX, curY);
+	QPointF pointMin;
+	qreal qDistMin = pow(static_cast<qreal>(this->width()), 4);
+	qreal clickTol = 10e-4;
+	m_leftFadeClicked = false;
+	m_rightFadeClicked = false;
+	for (auto &point: m_leftPath)
+	{
+		qreal dist = (pow(curPos.x() - point.x(), 2) + pow(curPos.y() - point.y(), 2));
+		if (dist < qDistMin)
+		{
+			qDistMin = dist;
+			if ((qDistMin / (this->width() * this->height())) < clickTol)
+			{
+				m_leftFadeClicked = true;
+				break;
+			}
+		}
+	}
+
+	for (auto &point: m_rightPath)
+	{
+		qreal dist = (pow(curPos.x() - point.x(), 2) + pow(curPos.y() - point.y(), 2));
+		if (dist < qDistMin)
+		{
+			qDistMin = dist;
+			if ((qDistMin / (this->width() * this->height())) < clickTol)
+			{
+				m_rightFadeClicked = true;
+				break;
+			}
+		}
+	}
+}
 
 
 void SampleTCOView::mousePressEvent( QMouseEvent * _me )
 {
+	checkCornersClicked(_me);
+
 	if( _me->button() == Qt::LeftButton &&
 		_me->modifiers() & Qt::ControlModifier &&
 		_me->modifiers() & Qt::ShiftModifier )
@@ -511,6 +662,10 @@ void SampleTCOView::mousePressEvent( QMouseEvent * _me )
 			{
 				sTco->updateTrackTcos();
 			}
+		}
+		if (_me->button() == Qt::RightButton)
+		{
+			checkFadesClicked(_me);
 		}
 		TrackContentObjectView::mousePressEvent( _me );
 	}
@@ -529,6 +684,22 @@ void SampleTCOView::mouseReleaseEvent(QMouseEvent *_me)
 			sTco->playbackPositionChanged();
 		}
 	}
+	if (m_leftCorner || m_rightCorner)
+	{
+		m_leftCorner = false;
+		m_rightCorner = false;
+	}
+	if (m_moveLeftP1 || m_moveLeftP2)
+	{
+		m_moveLeftP1 = false;
+		m_moveLeftP2 = false;
+	}
+	if (m_moveRightP1 || m_moveRightP2)
+	{
+		m_moveRightP1 = false;
+		m_moveRightP2 = false;
+	}
+
 	TrackContentObjectView::mouseReleaseEvent( _me );
 }
 
@@ -553,6 +724,262 @@ void SampleTCOView::mouseDoubleClickEvent( QMouseEvent * )
 }
 
 
+void SampleTCOView::drawFadePoints(bool drawLeft, QVector<QPointF>& pointsLine)
+{
+	float widgetWidth = static_cast<float>(this->width());
+	float widgetHeight = static_cast<float>(this->height());
+	float faderPos = 0.0;
+	if (drawLeft)
+	{
+		faderPos = m_tco->m_sampleBuffer->leftFaderPos() * widgetWidth;
+	}
+	else
+	{
+		faderPos = (1.0 - m_tco->m_sampleBuffer->rightFaderPos()) * widgetWidth;
+	}
+
+	f_cnt_t samples = m_tco->m_sampleBuffer->frames();
+
+	QVector<QPointF> points(1000);
+	for (int i = 0; i < points.size(); ++i)
+	{
+		float xpos = (
+			(points.size() - 1 - i)
+			/ static_cast<float>(points.size() - 1)
+			* (faderPos / widgetWidth)
+		);
+		if (!drawLeft)
+		{
+			xpos = xpos - (faderPos / widgetWidth) + 1.0f;
+		}
+		float ypos = m_tco->m_sampleBuffer->fadingVal(
+			static_cast<f_cnt_t>(roundf(xpos * samples)),
+			drawLeft
+		);
+
+		points[i] = QPointF(
+			xpos * (widgetWidth - 2 * TCO_BORDER_WIDTH) + TCO_BORDER_WIDTH,
+			(1.0f - ypos) * (widgetHeight - m_textLabelHeight - TCO_BORDER_WIDTH) + m_textLabelHeight
+		);
+	}
+	if (drawLeft)
+	{
+		points[0].setY(m_textLabelHeight);
+	}
+	else
+	{
+		points[points.size() - 1].setY(m_textLabelHeight);
+	}
+
+	QPointF endPoint(TCO_BORDER_WIDTH, m_textLabelHeight);
+	if (!drawLeft)
+	{
+		endPoint = QPointF(widgetWidth - TCO_BORDER_WIDTH, m_textLabelHeight);
+	}
+	points.push_back(endPoint);
+
+	QPainterPath shadedPath;
+	QPainterPath solidPath;
+	shadedPath.moveTo(points.last());
+	solidPath.moveTo(points[1]);
+	pointsLine.clear();
+	for (int i = 0; i < points.size(); ++i)
+	{
+		if ((i > 0) && (i < (points.size() - 3)))
+		{
+			solidPath.lineTo(points[i + 1]);
+			pointsLine.push_back(points[i + 1]);
+		}
+		shadedPath.lineTo(points[i]);
+	}
+	QPainter pShader(this);
+	pShader.setPen(QColor(0, 0, 0, 0));
+	pShader.setBrush(QColor(0, 0, 0, 100));
+	pShader.setRenderHint(QPainter::Antialiasing, false);
+	pShader.drawPath(shadedPath);
+	QPainter pLine(this);
+	pLine.setRenderHint(QPainter::Antialiasing, true);
+	pLine.setPen(QColor(0, 0, 0, 255));
+	pLine.drawPath(solidPath);
+}
+
+
+void SampleTCOView::drawFades()
+{
+	drawFadePoints(true, m_leftPath);  // Draw left points
+	drawFadePoints(false, m_rightPath);  // Draw right points
+
+	if (m_inside)
+	{
+		float widgetWidth = static_cast<float>(this->width());
+		float widgetHeight = static_cast<float>(this->height());
+
+		float leftFaderAbsolutePos = m_tco->m_sampleBuffer->leftFaderPos() * widgetWidth;
+		float rightFaderAbsolutePos = m_tco->m_sampleBuffer->rightFaderPos() * widgetWidth;
+		float squareSideLen = qMin(widgetHeight / 6.0f, 7.0f);
+
+		QPainter p(this);
+		QPen pen = QPen(Qt::black);
+		pen.setWidth(1.75);
+		p.setPen(pen);
+		if (leftFaderAbsolutePos + squareSideLen > widgetWidth)
+		{
+			m_leftHandle = make_unique<QRectF>(QRectF(
+				leftFaderAbsolutePos - squareSideLen - 1,
+				m_textLabelHeight,
+				squareSideLen,
+				squareSideLen
+			));
+		}
+		else
+		{
+			m_leftHandle = make_unique<QRectF>(QRectF(
+				leftFaderAbsolutePos,
+				m_textLabelHeight,
+				squareSideLen,
+				squareSideLen
+			));
+		}
+		if ((rightFaderAbsolutePos-squareSideLen-1) < 0)
+		{
+			m_rightHandle = make_unique<QRectF>(QRectF(
+				rightFaderAbsolutePos,
+				m_textLabelHeight,
+				squareSideLen,
+				squareSideLen
+			));
+		}
+		else
+		{
+			m_rightHandle = make_unique<QRectF>(QRectF(
+				rightFaderAbsolutePos - squareSideLen - 1,
+				m_textLabelHeight,
+				squareSideLen,
+				squareSideLen
+			));
+		}
+
+		p.drawRect(*m_leftHandle);
+		p.drawRect(*m_rightHandle);
+
+		auto xPosWidgetLeft = [&](float x)
+		{
+			return x * leftFaderAbsolutePos;
+		};
+
+		auto yPosWidget = [&](float y)
+		{
+			float val = (
+				(1 - y) * (this->height() - m_textLabelHeight - TCO_BORDER_WIDTH)
+				+ m_textLabelHeight
+			);
+			return qMin(val, this->height() - squareSideLen);
+		};
+
+		if (m_leftFadeManual)
+		{
+			const auto p1L = m_tco->m_sampleBuffer->getLeftP1();
+			const auto p2L = m_tco->m_sampleBuffer->getLeftP2();
+			m_leftP1 = make_unique<QRectF>(QRectF(
+				xPosWidgetLeft(p1L.x()),
+				yPosWidget(p1L.y()),
+				squareSideLen,
+				squareSideLen
+			));
+			m_leftP2 = make_unique<QRectF>(QRectF(
+				xPosWidgetLeft(p2L.x()),
+				yPosWidget(p2L.y()),
+				squareSideLen,
+				squareSideLen
+			));
+			p.setRenderHint(QPainter::Antialiasing, true);
+			p.setOpacity(0.35);
+			p.drawLine(
+				QPointF(
+					m_leftP1->x() + m_leftP1->width() / 2,
+					m_leftP1->y() + m_leftP1->height() / 2
+				),
+				QPointF(TCO_BORDER_WIDTH, this->height())
+			);
+			p.drawLine(
+				QPointF(
+					m_leftP2->x() + m_leftP2->width() / 2,
+					m_leftP2->y() + m_leftP2->height() / 2
+				),
+				QPointF(m_leftHandle->x(), m_leftHandle->y())
+			);
+			p.setOpacity(1.0);
+			p.setRenderHint(QPainter::Antialiasing, false);
+		}
+		else
+		{
+			m_leftP1 = nullptr;
+			m_leftP2 = nullptr;
+		}
+
+		auto xPosWidgetRight = [&](float x)
+		{
+			return (
+				(1 - x) * (this->width() - rightFaderAbsolutePos)
+				- squareSideLen + rightFaderAbsolutePos
+			);
+		};
+
+		if (m_rightFadeManual)
+		{
+			const auto p1R = m_tco->m_sampleBuffer->getRightP1();
+			const auto p2R = m_tco->m_sampleBuffer->getRightP2();
+			m_rightP1 = make_unique<QRectF>(QRectF(
+				xPosWidgetRight(p1R.x()),
+				yPosWidget(p1R.y()),
+				squareSideLen,
+				squareSideLen
+			));
+			m_rightP2 = make_unique<QRectF>(QRectF(
+				xPosWidgetRight(p2R.x()),
+				yPosWidget(p2R.y()),
+				squareSideLen,
+				squareSideLen
+			));
+			p.setOpacity(0.35);
+			p.setRenderHint(QPainter::Antialiasing, true);
+			p.drawLine(
+				QPointF(
+					m_rightP1->x() + m_rightP1->width() / 2,
+					m_rightP1->y() + m_rightP1->height() / 2
+				),
+				QPointF(this->width(), this->height())
+			);
+			p.drawLine(
+				QPointF(
+					m_rightP2->x() + m_rightP2->width() / 2,
+					m_rightP2->y() + m_rightP2->height() / 2
+				),
+				QPointF(m_rightHandle->x(), m_rightHandle->y())
+			);
+		}
+		else
+		{
+			m_rightP1 = nullptr;
+			m_rightP2 = nullptr;
+		}
+
+		p.setRenderHint(QPainter::Antialiasing, false);
+		QBrush b(Qt::white);
+		p.setBrush(b);
+		p.setOpacity(1.0);
+		if ((m_leftP1 != nullptr) && (m_leftP2 != nullptr))
+		{
+			p.drawEllipse(*m_leftP1);
+			p.drawEllipse(*m_leftP2);
+		}
+		if ((m_rightP1 != nullptr) && (m_rightP2 != nullptr))
+		{
+			p.drawEllipse(*m_rightP1);
+			p.drawEllipse(*m_rightP2);
+		}
+	}
+}
 
 
 void SampleTCOView::paintEvent( QPaintEvent * pe )
@@ -562,6 +989,7 @@ void SampleTCOView::paintEvent( QPaintEvent * pe )
 	if( !needsUpdate() )
 	{
 		painter.drawPixmap( 0, 0, m_paintPixmap );
+		drawFades();
 		return;
 	}
 
@@ -605,7 +1033,7 @@ void SampleTCOView::paintEvent( QPaintEvent * pe )
 	float den = Engine::getSong()->getTimeSigModel().getDenominator();
 	float ticksPerBar = DefaultTicksPerBar * nom / den;
 
-	float offset =  m_tco->startTimeOffset() / ticksPerBar * pixelsPerBar();
+	float offset = m_tco->startTimeOffset() / ticksPerBar * pixelsPerBar();
 	QRect r = QRect( TCO_BORDER_WIDTH + offset, spacing,
 			qMax( static_cast<int>( m_tco->sampleLength() * ppb / ticksPerBar ), 1 ), rect().bottom() - 2 * spacing );
 	m_tco->m_sampleBuffer->visualize( p, r, pe->rect() );
@@ -652,9 +1080,21 @@ void SampleTCOView::paintEvent( QPaintEvent * pe )
 	p.end();
 
 	painter.drawPixmap( 0, 0, m_paintPixmap );
+	drawFades();
 }
 
 
+void SampleTCOView::enterEvent(QEvent *e)
+{
+	if (e != nullptr) { m_inside = true; }
+}
+
+
+void SampleTCOView::leaveEvent(QEvent *e)
+{
+	if (e != nullptr) { m_inside = false; }
+	TrackContentObjectView::leaveEvent(e);
+}
 
 
 void SampleTCOView::reverseSample()
@@ -665,8 +1105,130 @@ void SampleTCOView::reverseSample()
 }
 
 
+void SampleTCOView::mouseMoveEvent(QMouseEvent* e)
+{
+	if ((e->buttons() & Qt::LeftButton) && (m_leftCorner || m_rightCorner))
+	{
+		float xpos = static_cast<float>(e->localPos().x());
+		float width = static_cast<float>(this->width());
+		float faderPos = qMin(qMax(0.0f, xpos / width), 1.0f);
+		if (m_leftCorner)
+		{
+			m_tco->m_sampleBuffer->setLeftFader(faderPos);
+		}
+		else if (m_rightCorner)
+		{
+			m_tco->m_sampleBuffer->setRightFader(faderPos);
+		}
+		updateSample();
+	}
+	else if ((e->buttons() & Qt::LeftButton) && (m_moveLeftP1 || m_moveLeftP2))
+	{
+		float xpos = e->localPos().x();
+		float ypos = qMin(
+			qMax(e->localPos().y(), static_cast<qreal>(m_textLabelHeight)),
+			static_cast<qreal>(this->height())
+		);
+		float leftFaderAbsolutePos = m_tco->m_sampleBuffer->leftFaderPos() * this->width();
+		float Px = xpos / leftFaderAbsolutePos;
+		float Py = 1 - (ypos - m_textLabelHeight) / (this->height() - m_textLabelHeight);
+		if (m_moveLeftP1)
+		{
+			m_tco->m_sampleBuffer->setLeftP1(Px, Py);
+		}
+		else if (m_moveLeftP2)
+		{
+			m_tco->m_sampleBuffer->setLeftP2(Px, Py);
+		}
+		updateSample();
+	}
+	else if ((e->buttons() & Qt::LeftButton) && (m_moveRightP1 || m_moveRightP2))
+	{
+		float xpos = e->localPos().x();
+		float ypos = e->localPos().y();
+		float rightFaderAbsolutePos = m_tco->m_sampleBuffer->rightFaderPos() * this->width();
+		float Px = (xpos - rightFaderAbsolutePos) / (this->width() - rightFaderAbsolutePos);
+		float Py = 1 - (ypos - m_textLabelHeight) / (this->height() - m_textLabelHeight);
+		if (m_moveRightP1)
+		{
+			m_tco->m_sampleBuffer->setRightP1(Px, Py);
+		}
+		else if (m_moveRightP2)
+		{
+			m_tco->m_sampleBuffer->setRightP2(Px, Py);
+		}
+		updateSample();
+	}
+	else
+	{
+		// This event is only forwarded, when the fades are not currently adjusted, in order
+		// to prevent the SampleTCO from beeing moved around in the timeline when adjusting
+		// the fades.
+		TrackContentObjectView::mouseMoveEvent(e);
+	}
+}
 
 
+void SampleTCOView::setSFade()
+{
+	if (m_leftFadeClicked)
+	{
+		m_leftFadeManual = false;
+		m_tco->m_sampleBuffer->setLeftP1(0.5f, 0.0f);
+		m_tco->m_sampleBuffer->setLeftP2(0.5f, 1.0f);
+	}
+	else if (m_rightFadeClicked)
+	{
+		m_rightFadeManual = false;
+		m_tco->m_sampleBuffer->setRightP1(0.5f, 0.0f);
+		m_tco->m_sampleBuffer->setRightP2(0.5f, 1.0f);
+	}
+	updateSample();
+}
+
+
+void SampleTCOView::setCosFade()
+{
+	if (m_leftFadeClicked)
+	{
+		m_leftFadeManual = false;
+		m_tco->m_sampleBuffer->setLeftP1(0.2f, 0.8f);
+		m_tco->m_sampleBuffer->setLeftP2(0.5f, 1.0f);
+	}
+	else if (m_rightFadeClicked)
+	{
+		m_rightFadeManual = false;
+		m_tco->m_sampleBuffer->setRightP1(0.8f, 0.8f);
+		m_tco->m_sampleBuffer->setRightP2(0.5f, 1.0f);
+	}
+	updateSample();
+}
+
+
+void SampleTCOView::setLinearFade()
+{
+	if (m_leftFadeClicked)
+	{
+		m_leftFadeManual = false;
+		m_tco->m_sampleBuffer->setLeftP1(0.25f, 0.25f);
+		m_tco->m_sampleBuffer->setLeftP2(0.75f, 0.75f);
+	}
+	else if (m_rightFadeClicked)
+	{
+		m_rightFadeManual = false;
+		m_tco->m_sampleBuffer->setRightP1(0.25f, 0.75f);
+		m_tco->m_sampleBuffer->setRightP2(0.75f, 0.25f);
+	}
+	updateSample();
+}
+
+
+void SampleTCOView::setManualFade()
+{
+	if (m_leftFadeClicked) { m_leftFadeManual = true; }
+	else if (m_rightFadeClicked) { m_rightFadeManual = true; }
+	updateSample();
+}
 
 
 SampleTrack::SampleTrack(TrackContainer* tc) :

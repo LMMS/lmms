@@ -156,6 +156,7 @@ protected:
 	}
 
 	float pixelsPerBar();
+	int m_textLabelHeight;
 
 
 	DataFile createTCODataFiles(const QVector<TrackContentObjectView *> & tcos) const;

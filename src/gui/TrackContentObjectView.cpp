@@ -532,7 +532,8 @@ void TrackContentObjectView::paintTextLabel(QString const & text, QPainter & pai
 		elidedPatternName = text.trimmed();
 	}
 
-	painter.fillRect(QRect(0, 0, width(), fontMetrics.height() + 2 * textTop), textBackgroundColor());
+	m_textLabelHeight = fontMetrics.height() + 2 * textTop;
+	painter.fillRect(QRect(0, 0, width(), m_textLabelHeight), textBackgroundColor());
 
 	int const finalTextTop = textTop + fontMetrics.ascent();
 	painter.setPen(textShadowColor());
