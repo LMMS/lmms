@@ -738,8 +738,8 @@ void TrackContentObjectView::mousePressEvent( QMouseEvent * me )
 	// Right now, active is only used on right/mid clicks actions, so we use a ternary operator
 	// to avoid the overhead of calling getClickedTCOs when it's not used
 	auto active = me->button() == Qt::LeftButton
-							? QVector<TrackContentObjectView *>()
-							: getClickedTCOs();
+		? QVector<TrackContentObjectView *>()
+		: getClickedTCOs();
 
 	setInitialPos( me->pos() );
 	setInitialOffsets();
