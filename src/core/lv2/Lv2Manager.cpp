@@ -27,6 +27,7 @@
 #ifdef LMMS_HAVE_LV2
 
 #include <cstdlib>
+#include <cstring>
 #include <lilv/lilv.h>
 #include <lv2.h>
 #include <QDebug>
@@ -50,6 +51,9 @@ Lv2Manager::Lv2Manager()
 
 	m_world = lilv_world_new();
 	lilv_world_load_all(m_world);
+
+	m_supportedFeatureURIs.insert(LV2_URID__map);
+	m_supportedFeatureURIs.insert(LV2_URID__unmap);
 }
 
 
@@ -128,6 +132,22 @@ void Lv2Manager::initPlugins()
 				"  environment variable \"LMMS_LV2_DEBUG\" to nonempty.";
 		}
 	}
+}
+
+
+
+
+bool Lv2Manager::CmpStr::operator()(const char *a, const char *b) const
+{
+	return std::strcmp(a, b) < 0;
+}
+
+
+
+
+bool Lv2Manager::isFeatureSupported(const char *featName) const
+{
+	return m_supportedFeatureURIs.find(featName) != m_supportedFeatureURIs.end();
 }
 
 
