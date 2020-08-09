@@ -1035,7 +1035,7 @@ SongEditorWindow::SongEditorWindow(Song* song) :
 
 	//Set up zooming-stuff
 	m_zoomingComboBox = new ComboBox( m_toolBar );
-	m_zoomingComboBox->setFixedSize( 80, 22 );
+	m_zoomingComboBox->setFixedSize( 80, ComboBox::DEFAULT_HEIGHT );
 	m_zoomingComboBox->move( 580, 4 );
 	m_zoomingComboBox->setModel(m_editor->m_zoomingModel);
 	m_zoomingComboBox->setToolTip(tr("Horizontal zooming"));
@@ -1050,7 +1050,7 @@ SongEditorWindow::SongEditorWindow(Song* song) :
 
 	//Set up quantization/snapping selector
 	m_snappingComboBox = new ComboBox( m_toolBar );
-	m_snappingComboBox->setFixedSize( 80, 22 );
+	m_snappingComboBox->setFixedSize( 80, ComboBox::DEFAULT_HEIGHT );
 	m_snappingComboBox->setModel(m_editor->m_snappingModel);
 	m_snappingComboBox->setToolTip(tr("Clip snapping size"));
 	connect(m_editor->snappingModel(), SIGNAL(dataChanged()), this, SLOT(updateSnapLabel()));

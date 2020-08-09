@@ -403,7 +403,7 @@ malletsInstrumentView::malletsInstrumentView( malletsInstrument * _instrument,
 	changePreset(); // Show widget
 
 	m_presetsCombo = new ComboBox( this, tr( "Instrument" ) );
-	m_presetsCombo->setGeometry( 140, 50, 99, 22 );
+	m_presetsCombo->setGeometry( 140, 50, 99, ComboBox::DEFAULT_HEIGHT );
 	m_presetsCombo->setFont( pointSize<8>( m_presetsCombo->font() ) );
 	
 	connect( &_instrument->m_presetsModel, SIGNAL( dataChanged() ),
