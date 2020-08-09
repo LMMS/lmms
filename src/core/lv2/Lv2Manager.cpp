@@ -147,13 +147,7 @@ bool Lv2Manager::CmpStr::operator()(const char *a, const char *b) const
 
 bool Lv2Manager::isFeatureSupported(const char *featName) const
 {
-	bool found = false;
-	for(const char* supportedFeatName : supportedFeatureURIs())
-	if(!strcmp(featName, supportedFeatName))
-	{
-		found = true; break;
-	}
-	return found;
+	return m_supportedFeatureURIs.find(featName) != m_supportedFeatureURIs.end();
 }
 
 
