@@ -26,7 +26,6 @@
 #include "FxLine.h"
 
 #include <cstdlib>
-#include <ctime>
 
 #include <QGraphicsProxyWidget>
 
