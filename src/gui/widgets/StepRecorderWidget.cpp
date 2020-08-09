@@ -58,6 +58,19 @@ void StepRecorderWidget::setCurrentPosition(MidiTime currentPosition)
 	m_currentPosition = currentPosition;
 }
 
+void StepRecorderWidget::setMargins(const QMargins &qm)
+{
+	m_left = qm.left();
+	m_right = qm.right();
+	m_top = qm.top();
+	m_bottom = qm.bottom();
+}
+
+QMargins StepRecorderWidget::margins()
+{
+	return QMargins(m_left, m_top, m_right, m_bottom);
+}
+
 void StepRecorderWidget::setBottomMargin(const int marginBottom)
 {
 	m_marginBottom = marginBottom;
