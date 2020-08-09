@@ -253,7 +253,7 @@ void Lv2Proc::initPlugin()
 
 	m_instance = lilv_plugin_instantiate(m_plugin,
 		Engine::mixer()->processingSampleRate(),
-		m_features.featurePointers().data());
+		m_features.featurePointers());
 
 	if (m_instance)
 	{
