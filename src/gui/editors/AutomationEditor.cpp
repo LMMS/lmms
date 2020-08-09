@@ -2349,7 +2349,7 @@ AutomationEditorWindow::AutomationEditorWindow() :
 	zoom_x_label->setPixmap( embed::getIconPixmap( "zoom_x" ) );
 
 	m_zoomingXComboBox = new ComboBox( zoomToolBar );
-	m_zoomingXComboBox->setFixedSize( 80, 22 );
+	m_zoomingXComboBox->setFixedSize( 80, ComboBox::DEFAULT_HEIGHT );
 	m_zoomingXComboBox->setToolTip( tr( "Horizontal zooming" ) );
 
 	for( float const & zoomLevel : m_editor->m_zoomXLevels )
@@ -2368,7 +2368,7 @@ AutomationEditorWindow::AutomationEditorWindow() :
 	zoom_y_label->setPixmap( embed::getIconPixmap( "zoom_y" ) );
 
 	m_zoomingYComboBox = new ComboBox( zoomToolBar );
-	m_zoomingYComboBox->setFixedSize( 80, 22 );
+	m_zoomingYComboBox->setFixedSize( 80, ComboBox::DEFAULT_HEIGHT );
 	m_zoomingYComboBox->setToolTip( tr( "Vertical zooming" ) );
 
 	m_editor->m_zoomingYModel.addItem( "Auto" );
@@ -2398,7 +2398,7 @@ AutomationEditorWindow::AutomationEditorWindow() :
 	quantize_lbl->setPixmap( embed::getIconPixmap( "quantize" ) );
 
 	m_quantizeComboBox = new ComboBox( m_toolBar );
-	m_quantizeComboBox->setFixedSize( 60, 22 );
+	m_quantizeComboBox->setFixedSize( 60, ComboBox::DEFAULT_HEIGHT );
 	m_quantizeComboBox->setToolTip( tr( "Quantization" ) );
 
 	m_quantizeComboBox->setModel( &m_editor->m_quantizeModel );
