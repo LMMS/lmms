@@ -55,10 +55,6 @@ protected slots:
 	void toggleRecording();
 	void flipY();
 	void flipX();
-	
-	void changeClipColor();
-	void useTrackColor();
-	void trackColorReset();
 
 protected:
 	void constructContextMenu( QMenu * ) override;

@@ -312,6 +312,10 @@ public slots:
 	void changeSelectedColor( QColor & );
 	void disableSelectedColor();
 	void disableClipSelectedColor();
+	
+	void changeClipColor();
+	void useTrackColor();
+	void trackColorReset();
 	void setColor( QColor & );
 
 protected:

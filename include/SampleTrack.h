@@ -110,10 +110,6 @@ public:
 public slots:
 	void updateSample();
 
-	void changeClipColor();
-	void useTrackColor();
-	void trackColorReset();
-
 protected:
 	void contextMenuEvent( QContextMenuEvent * _cme ) override;
 	void mousePressEvent( QMouseEvent * _me ) override;

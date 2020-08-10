@@ -603,60 +603,6 @@ void SampleTCOView::paintEvent( QPaintEvent * pe )
 }
 
 
-void SampleTCOView::changeClipColor()
-{
-	QColorDialog colorDialog( m_tco->color() );
-	QColor buffer( 0, 0, 0 );
-	
-	for( int i = 0; i < 48; i += 6 )
-	{
-		for( int j = 0; j < 6; j++ )
-		{
-			buffer.setHsl( qMax( 0, 44 * ( i / 6 ) - 1 ), 150 - 20 * j, 150 - 10 * j );
-			colorDialog.setStandardColor( i + j, buffer );
-		}
-		
-	}
-	
-	QColor new_color = colorDialog.getColor( m_tco->color() );
-	if( ! new_color.isValid() )
-	{ return; }
-	
-	setColor( new_color );
-	m_tco->useCustomClipColor( true );
-}
-
-
-void SampleTCOView::useTrackColor()
-{
-	if( m_tco->getTrack()->useColor() )
-	{
-		QColor buffer = m_tco->getTrack()->backgroundColor();
-		setColor( buffer );
-		m_tco->useStyleColor( false );
-	}
-	else
-	{
-		m_tco->useStyleColor( true );
-	}
-	
-	m_tco->useCustomClipColor( false );
-	update();
-}
-
-
-
-void SampleTCOView::trackColorReset()
-{
-	if( ! m_tco->usesStyleColor() )
-	{
-		m_tco->useStyleColor( true );
-		Engine::getSong()->setModified();
-		update();
-	}
-}
-
-
 
 
 SampleTrack::SampleTrack(TrackContainer* tc) :

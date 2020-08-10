@@ -161,7 +161,7 @@ BBTCOView::BBTCOView( TrackContentObject * _tco, TrackView * _tv ) :
 			this, SLOT( update() ) );
 	
 	connect( _tco, SIGNAL( trackColorReset() ),
-			this, SLOT( resetColor() ) );
+			this, SLOT( trackColorReset() ) );
 
 	setStyle( QApplication::style() );
 }
@@ -312,63 +312,6 @@ void BBTCOView::changeName()
 	RenameDialog rename_dlg( s );
 	rename_dlg.exec();
 	m_bbTCO->setName( s );
-}
-
-
-
-
-void BBTCOView::changeClipColor()
-{
-	QColorDialog colorDialog( m_bbTCO->color() );
-	QColor buffer( 0, 0, 0 );
-	
-	for( int i = 0; i < 48; i += 6 )
-	{
-		for( int j = 0; j < 6; j++ )
-		{
-			buffer.setHsl( qMax( 0, 44 * ( i / 6 ) - 1 ), 150 - 20 * j, 150 - 10 * j );
-			colorDialog.setStandardColor( i + j, buffer );
-		}
-		
-	}
-	
-	QColor new_color = colorDialog.getColor( m_bbTCO->color() );
-	if( ! new_color.isValid() )
-	{ return; }
-	
-	setColor( new_color );
-	m_bbTCO->useCustomClipColor( true );
-}
-
-
-void BBTCOView::useTrackColor()
-{
-	if( m_bbTCO->getTrack()->useColor() )
-	{
-		QColor buffer = m_bbTCO->getTrack()->backgroundColor();
-		setColor( buffer );
-		m_bbTCO->useStyleColor( false );
-	}
-	else
-	{
-		m_bbTCO->useStyleColor( true );
-	}
-	
-	m_bbTCO->useCustomClipColor( false );
-	update();
-}
-
-
-/** \brief Makes the BB pattern use the colour defined in the stylesheet */
-void BBTCOView::resetColor()
-{
-	if( ! m_bbTCO->usesStyleColor() )
-	{
-		m_bbTCO->useStyleColor( true );
-		Engine::getSong()->setModified();
-		update();
-	}
-	//BBTrack::clearLastTCOColor();
 }
 
 
