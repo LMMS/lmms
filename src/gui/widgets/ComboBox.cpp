@@ -192,7 +192,7 @@ void ComboBox::paintEvent( QPaintEvent * _pe )
 	// Border
 	QStyleOptionFrame opt;
 	opt.initFrom( this );
-	opt.state = 0;
+	opt.state = QStyle::StateFlag::State_None;
 
 	style()->drawPrimitive( QStyle::PE_Frame, &opt, &p, this );
 
