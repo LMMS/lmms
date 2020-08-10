@@ -74,7 +74,7 @@
 
 
 //#define engine::mixer()->processingSampleRate() 44100.0f
-
+const float sampleRateCutoff = 44100.0f;
 
 extern "C"
 {
@@ -228,8 +228,11 @@ void lb302Filter3Pole::envRecalc()
 	// e0 is adjusted for Hz and doesn't need ENVINC
 	w = vcf_e0 + vcf_c0;
 	k = (fs->cutoff > 0.975)?0.975:fs->cutoff;
+    // sampleRateCutoff should not be changed to anything dynamic that is outside the
+    // scope of lb302 (like e.g. the mixers sample rate) as this changes the filters cutoff
+    // behavior without any modification to its controls.
 	kfco = 50.f + (k)*((2300.f-1600.f*(fs->envmod))+(w) *
-	                   (700.f+1500.f*(k)+(1500.f+(k)*(44100.f/2.f-6000.f)) *
+	                   (700.f+1500.f*(k)+(1500.f+(k)*(sampleRateCutoff/2.f-6000.f)) *
 	                   (fs->envmod)) );
 	//+iacc*(.3+.7*kfco*kenvmod)*kaccent*kaccurve*2000
 
