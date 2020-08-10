@@ -288,13 +288,13 @@ void TabWidget::paintEvent( QPaintEvent * pe )
 // Switch between tabs with mouse wheel
 void TabWidget::wheelEvent( QWheelEvent * we )
 {
-	if( we->y() > m_tabheight )
+	if( we->position().y() > m_tabheight )
 	{
 		return;
 	}
 
 	we->accept();
-	int dir = ( we->delta() < 0 ) ? 1 : -1;
+	int dir = ( we->angleDelta().y() < 0 ) ? 1 : -1;
 	int tab = m_activeTab;
 	while( tab > -1 && static_cast<int>( tab ) < m_widgets.count() )
 	{

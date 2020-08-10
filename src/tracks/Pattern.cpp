@@ -786,11 +786,11 @@ void PatternView::wheelEvent( QWheelEvent * _we )
 {
 	if( m_pat->m_patternType == Pattern::BeatPattern &&
 				( fixedTCOs() || pixelsPerBar() >= 96 ) &&
-				_we->y() > height() - s_stepBtnOff->height() )
+				_we->position().y() > height() - s_stepBtnOff->height() )
 	{
 //	get the step number that was wheeled on and
 //	do calculations in floats to prevent rounding errors...
-		float tmp = ( ( float(_we->x()) - TCO_BORDER_WIDTH ) *
+		float tmp = ( ( float(_we->position().x()) - TCO_BORDER_WIDTH ) *
 				float( m_pat -> m_steps ) ) / float(width() - TCO_BORDER_WIDTH*2);
 
 		int step = int( tmp );
@@ -801,7 +801,7 @@ void PatternView::wheelEvent( QWheelEvent * _we )
 		}
 
 		Note * n = m_pat->noteAtStep( step );
-		if( !n && _we->delta() > 0 )
+		if( !n && _we->angleDelta().y() > 0 )
 		{
 			n = m_pat->addStepNote( step );
 			n->setVolume( 0 );
@@ -810,7 +810,7 @@ void PatternView::wheelEvent( QWheelEvent * _we )
 		{
 			int vol = n->getVolume();
 
-			if( _we->delta() > 0 )
+			if( _we->angleDelta().y() > 0 )
 			{
 				n->setVolume( qMin( 100, vol + 5 ) );
 			}

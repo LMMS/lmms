@@ -265,7 +265,7 @@ void Fader::wheelEvent ( QWheelEvent *ev )
 {
 	ev->accept();
 
-	if ( ev->delta() > 0 )
+	if ( ev->angleDelta().y() > 0 )
 	{
 		model()->incValue( 1 );
 	}

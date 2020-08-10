@@ -3321,13 +3321,13 @@ void PianoRoll::wheelEvent(QWheelEvent * we )
 {
 	we->accept();
 	// handle wheel events for note edit area - for editing note vol/pan with mousewheel
-	if( we->x() > noteEditLeft() && we->x() < noteEditRight()
-	&& we->y() > noteEditTop() && we->y() < noteEditBottom() )
+	if( we->position().x() > noteEditLeft() && we->position().x() < noteEditRight()
+	&& we->position().y() > noteEditTop() && we->position().y() < noteEditBottom() )
 	{
 		if (!hasValidPattern()) {return;}
 		// get values for going through notes
 		int pixel_range = 8;
-		int x = we->x() - m_whiteKeyWidth;
+		int x = we->position().x() - m_whiteKeyWidth;
 		int ticks_start = ( x - pixel_range / 2 ) *
 					MidiTime::ticksPerBar() / m_ppb + m_currentPosition;
 		int ticks_end = ( x + pixel_range / 2 ) *
@@ -3346,7 +3346,7 @@ void PianoRoll::wheelEvent(QWheelEvent * we )
 		}
 		if( nv.size() > 0 )
 		{
-			const int step = we->delta() > 0 ? 1 : -1;
+			const int step = we->angleDelta().y() > 0 ? 1 : -1;
 			if( m_noteEditMode == NoteEditVolume )
 			{
 				for ( Note * n : nv )
@@ -3394,11 +3394,11 @@ void PianoRoll::wheelEvent(QWheelEvent * we )
 	if( we->modifiers() & Qt::ControlModifier && we->modifiers() & Qt::AltModifier )
 	{
 		int q = m_quantizeModel.value();
-		if( we->delta() > 0 )
+		if( (we->angleDelta().x() + we->angleDelta().y()) > 0 ) // alt + scroll becomes horizontal scroll on KDE
 		{
 			q--;
 		}
-		else if( we->delta() < 0 )
+		else if( (we->angleDelta().x() + we->angleDelta().y()) < 0 ) // alt + scroll becomes horizontal scroll on KDE
 		{
 			q++;
 		}
@@ -3408,11 +3408,11 @@ void PianoRoll::wheelEvent(QWheelEvent * we )
 	else if( we->modifiers() & Qt::ControlModifier && we->modifiers() & Qt::ShiftModifier )
 	{
 		int l = m_noteLenModel.value();
-		if( we->delta() > 0 )
+		if( we->angleDelta().y() > 0 )
 		{
 			l--;
 		}
-		else if( we->delta() < 0 )
+		else if( we->angleDelta().y() < 0 )
 		{
 			l++;
 		}
@@ -3422,17 +3422,17 @@ void PianoRoll::wheelEvent(QWheelEvent * we )
 	else if( we->modifiers() & Qt::ControlModifier )
 	{
 		int z = m_zoomingModel.value();
-		if( we->delta() > 0 )
+		if( we->angleDelta().y() > 0 )
 		{
 			z++;
 		}
-		else if( we->delta() < 0 )
+		else if( we->angleDelta().y() < 0 )
 		{
 			z--;
 		}
 		z = qBound( 0, z, m_zoomingModel.size() - 1 );
 
-		int x = (we->x() - m_whiteKeyWidth)* MidiTime::ticksPerBar();
+		int x = (we->position().x() - m_whiteKeyWidth)* MidiTime::ticksPerBar();
 		// ticks based on the mouse x-position where the scroll wheel was used
 		int ticks = x / m_ppb;
 		// what would be the ticks in the new zoom level on the very same mouse x
@@ -3442,16 +3442,22 @@ void PianoRoll::wheelEvent(QWheelEvent * we )
 		// update combobox with zooming-factor
 		m_zoomingModel.setValue( z );
 	}
-	else if( we->modifiers() & Qt::ShiftModifier
-			 || we->orientation() == Qt::Horizontal )
+
+	// FIXME: Reconsider if determining orientation is necessary in Qt6.
+	else if( abs(we->angleDelta().x()) > abs(we->angleDelta().y()) ) // scrolling is horizontal
 	{
 		m_leftRightScroll->setValue( m_leftRightScroll->value() -
-							we->delta() * 2 / 15 );
+							we->angleDelta().x() * 2 / 15 );
+	}
+	else if( we->modifiers() & Qt::ShiftModifier )
+	{
+		m_leftRightScroll->setValue( m_leftRightScroll->value() -
+							we->angleDelta().y() * 2 / 15 );
 	}
 	else
 	{
 		m_topBottomScroll->setValue( m_topBottomScroll->value() -
-							we->delta() / 30 );
+							we->angleDelta().y() / 30 );
 	}
 }
 

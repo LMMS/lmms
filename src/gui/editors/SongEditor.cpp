@@ -527,18 +527,18 @@ void SongEditor::wheelEvent( QWheelEvent * we )
 	{
 		int z = m_zoomingModel->value();
 
-		if( we->delta() > 0 )
+		if( we->angleDelta().y() > 0 )
 		{
 			z++;
 		}
-		else if( we->delta() < 0 )
+		else if( we->angleDelta().y() < 0 )
 		{
 			z--;
 		}
 		z = qBound( 0, z, m_zoomingModel->size() - 1 );
 
 
-		int x = we->x() - m_trackHeadWidth;
+		int x = we->position().x() - m_trackHeadWidth;
 		// bar based on the mouse x-position where the scroll wheel was used
 		int bar = x / pixelsPerBar();
 		// what would be the bar in the new zoom level on the very same mouse x
@@ -555,10 +555,17 @@ void SongEditor::wheelEvent( QWheelEvent * we )
 		// and make sure, all TCO's are resized and relocated
 		realignTracks();
 	}
-	else if( we->modifiers() & Qt::ShiftModifier || we->orientation() == Qt::Horizontal )
+
+	// FIXME: Reconsider if determining orientation is necessary in Qt6.
+	else if( abs(we->angleDelta().x()) > abs(we->angleDelta().y()) ) // scrolling is horizontal
 	{
 		m_leftRightScroll->setValue( m_leftRightScroll->value() -
-							we->delta() / 30 );
+							we->angleDelta().x() /30 );
+	}
+	else if( we->modifiers() & Qt::ShiftModifier )
+	{
+		m_leftRightScroll->setValue( m_leftRightScroll->value() -
+							we->angleDelta().y() / 30 );
 	}
 	else
 	{

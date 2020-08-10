@@ -153,7 +153,7 @@ void LcdSpinBox::wheelEvent( QWheelEvent * _we )
 {
 	_we->accept();
 	model()->setInitValue( model()->value() +
-			( ( _we->delta() > 0 ) ? 1 : -1 ) * model()->step<int>() );
+			( ( _we->angleDelta().y() > 0 ) ? 1 : -1 ) * model()->step<int>() );
 	emit manualChange();
 }
 

@@ -1654,11 +1654,11 @@ void AutomationEditor::wheelEvent(QWheelEvent * we )
 	if( we->modifiers() & Qt::ControlModifier && we->modifiers() & Qt::ShiftModifier )
 	{
 		int y = m_zoomingYModel.value();
-		if( we->delta() > 0 )
+		if( we->angleDelta().y() > 0 )
 		{
 			y++;
 		}
-		else if( we->delta() < 0 )
+		else if( we->angleDelta().y() < 0 )
 		{
 			y--;
 		}
@@ -1668,11 +1668,11 @@ void AutomationEditor::wheelEvent(QWheelEvent * we )
 	else if( we->modifiers() & Qt::ControlModifier && we->modifiers() & Qt::AltModifier )
 	{
 		int q = m_quantizeModel.value();
-		if( we->delta() > 0 )
+		if( (we->angleDelta().x() + we->angleDelta().y()) > 0 ) // alt + scroll becomes horizontal scroll on KDE
 		{
 			q--;
 		}
-		else if( we->delta() < 0 )
+		else if( (we->angleDelta().x() + we->angleDelta().y()) < 0 ) // alt + scroll becomes horizontal scroll on KDE
 		{
 			q++;
 		}
@@ -1683,17 +1683,17 @@ void AutomationEditor::wheelEvent(QWheelEvent * we )
 	else if( we->modifiers() & Qt::ControlModifier )
 	{
 		int x = m_zoomingXModel.value();
-		if( we->delta() > 0 )
+		if( we->angleDelta().y() > 0 )
 		{
 			x++;
 		}
-		else if( we->delta() < 0 )
+		else if( we->angleDelta().y() < 0 )
 		{
 			x--;
 		}
 		x = qBound( 0, x, m_zoomingXModel.size() - 1 );
 
-		int mouseX = (we->x() - VALUES_WIDTH)* MidiTime::ticksPerBar();
+		int mouseX = (we->position().x() - VALUES_WIDTH)* MidiTime::ticksPerBar();
 		// ticks based on the mouse x-position where the scroll wheel was used
 		int ticks = mouseX / m_ppb;
 		// what would be the ticks in the new zoom level on the very same mouse x
@@ -1705,16 +1705,22 @@ void AutomationEditor::wheelEvent(QWheelEvent * we )
 
 		m_zoomingXModel.setValue( x );
 	}
-	else if( we->modifiers() & Qt::ShiftModifier
-			|| we->orientation() == Qt::Horizontal )
+
+	// FIXME: Reconsider if determining orientation is necessary in Qt6.
+	else if( abs(we->angleDelta().x()) > abs(we->angleDelta().y()) ) // scrolling is horizontal
 	{
 		m_leftRightScroll->setValue( m_leftRightScroll->value() -
-							we->delta() * 2 / 15 );
+							we->angleDelta().x() * 2 / 15 );
+	}
+	else if( we->modifiers() & Qt::ShiftModifier )
+	{
+		m_leftRightScroll->setValue( m_leftRightScroll->value() -
+							we->angleDelta().y() * 2 / 15 );
 	}
 	else
 	{
 		m_topBottomScroll->setValue( m_topBottomScroll->value() -
-							we->delta() / 30 );
+							(we->angleDelta().x() + we->angleDelta().y()) / 30 );
 	}
 }
 
