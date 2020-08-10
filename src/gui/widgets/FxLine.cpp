@@ -446,7 +446,7 @@ void FxLine::randomColor()
 {
 	auto channel = Engine::fxMixer()->effectChannel( m_channelIndex );
 	
-	channel->m_color = ColorChooser().getPalette( ColorChooser::Palette::Mixer )[ rand() % 48 ];
+	channel->m_color = ColorChooser::getPalette( ColorChooser::Palette::Mixer )[ rand() % 48 ];
 	channel->m_hasColor = true;
 	
 	update();

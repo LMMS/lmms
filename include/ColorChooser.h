@@ -45,7 +45,7 @@ public:
 	//! Set palette via enum, return self pointer for chaining
 	ColorChooser* withPalette (Palette);
 	//! Return a certain palette
-	QVector<QColor> getPalette (Palette);
+	static QVector<QColor> getPalette (Palette);
 
 protected:
 	//! Forward key events to the parent to prevent stuck notes when the dialog gets focus
@@ -57,7 +57,7 @@ protected:
 	
 private:
 	//! Copy the current QColorDialog palette into an array
-	QVector<QColor> defaultPalette();
+	static QVector<QColor> defaultPalette();
 	//! Generate a nice palette, with adjustable value
-	QVector<QColor> nicePalette (int);
+	static QVector<QColor> nicePalette (int);
 };
