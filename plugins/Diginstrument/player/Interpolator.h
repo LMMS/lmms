@@ -20,40 +20,32 @@ public:
 
   void clear();
 
+  void setDimensions(const std::vector<std::pair<std::string, bool>> & dimensions);
+
   void addSpectrum(const S &spectrum, std::vector<T> coordinates);
   void addSpectra(const std::vector<S> &spectra, std::vector<std::vector<T>> coordinates);
 
-  /*static*/ S linear(const S &left,const S &right, const T &target, const T &leftLabel, const T &rightLabel);
-  /*static*/ S linearShift( S &left, S &right, const T &target, const T &leftLabel, const T &rightLabel);
-
-  //TODO: new matching from scratch, as i confused myself...
-  static S matchSpectra(const S & left, const S & right, const T &target, const T &leftLabel, const T &rightLabel);
+  static S interpolateSpectra(const S & left, const S & right, const T &target, const T &leftLabel, const T &rightLabel, const bool shifting = false);
 
   Interpolator() {}
 
 private:
   MultidimensionalNeighbourMap<T, S> data;
   static constexpr T frequencyStep = 0.001;
+  std::vector<std::pair<std::string, bool>> dimensions;
 };
 
 template <typename T>
 class Interpolator<T, SplineSpectrum<T, 4>>
 {
 public:
-  SplineSpectrum<T, 4> getSpectrum(const std::vector<T> &coordinates);
-
-  void addSpectrum(const SplineSpectrum<T, 4> &spectrum, std::vector<T> coordinates);
-  void addSpectra(const std::vector<SplineSpectrum<T, 4>> &spectra, std::vector<std::vector<T>> coordinates);
-
-  static SplineSpectrum<T, 4> linear(SplineSpectrum<T, 4> left, SplineSpectrum<T, 4> right, const T &target, const T &leftLabel, const T &rightLabel, bool shifting = false);
+  static SplineSpectrum<T, 4> interpolateSpectra(SplineSpectrum<T, 4> left, SplineSpectrum<T, 4> right, const T &target, const T &leftLabel, const T &rightLabel, bool shifting = false);
 
   Interpolator() {}
 
 private:
-  MultidimensionalNeighbourMap<T, SplineSpectrum<T, 4>> data;
   //tmp
   constexpr static double maxFrequencyDistance = 0.2;
-  T frequencyStep = 0;
 
   static BSpline<T, 4> matchPieces(BSpline<T, 4> left, const BSpline<T, 4> right, T rightRatio);
   static PiecewiseBSpline<T, 4> consolidatePieces(PiecewiseBSpline<T, 4> & left, PiecewiseBSpline<T, 4> & right, T rightRatio);

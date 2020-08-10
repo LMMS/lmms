@@ -116,6 +116,16 @@ bool DiginstrumentPlugin::loadInstrumentFile()
 		inst_data.name = inst_data._json["name"];
 		inst_data.type = inst_data._json["spectrum_type"];
 		inst.clear();
+		std::vector<pair<string,bool>> dimensions;
+		std::vector<string> dimension_labels;
+		for(auto d : inst_data._json["dimensions"])
+		{
+			dimensions.emplace_back(d["label"],d["shifting"]);
+			dimension_labels.emplace_back(d["label"]);
+		}
+		inst.setDimensions(dimensions);
+		//TODO: actual dynamic loading/parsing
+		//TODO: actually use "coordinates"
 		for(auto s : inst_data._json["spectra"])
 		{
 			std::vector<Diginstrument::Component<double>> components;
@@ -123,8 +133,14 @@ bool DiginstrumentPlugin::loadInstrumentFile()
 			{
 				components.push_back({c[0], 0, c[1]});
 			}
-			Diginstrument::NoteSpectrum<double> spectrum{s["pitch"], components, {}};
-			inst.addSpectrum(spectrum, {s["pitch"], s["time"]});
+			//TODO: dynamic label
+			Diginstrument::NoteSpectrum<double> spectrum{s[dimension_labels.front()], components, {}};
+			vector<double> spectrum_coordinates;
+			for(string label : dimension_labels)
+			{
+				spectrum_coordinates.emplace_back(s[label]);
+			}
+			inst.addSpectrum(spectrum, spectrum_coordinates);
 		}
 		return true;
 	}

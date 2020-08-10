@@ -31,6 +31,11 @@ class Spectrum
 public:
   virtual std::vector<Component<T>> getComponents(const T quality) const = 0;
   virtual Component<T> operator[](const T frequency) const = 0;
+  virtual bool empty() const = 0;
+
+  Spectrum(const T & label) : label(label){}
+
+  T label;
 };
 
 template <typename T>
@@ -55,17 +60,22 @@ public:
     return /*TODO*/ Component<T>(0,0,0);
   }
 
+  bool empty() const
+  {
+    return harmonics.empty() && stochastics.empty();
+  }
+
+  //TODO: should label be public or getter+setter?
   T getLabel() const
   {
-    return label;
+    return Spectrum<T>::label;
   }
 
   NoteSpectrum(const T &label, const std::vector<Component<T>> &harmonics, const std::vector<Component<T>> &stohastics)
-      : harmonics(harmonics), stochastics(stohastics), label(label) {}
+      :  Spectrum<T>(label), harmonics(harmonics), stochastics(stohastics) {}
 
 private:
   std::vector<Component<T>> harmonics;
   std::vector<Component<T>> stochastics;
-  T label;
 };
 } // namespace Diginstrument

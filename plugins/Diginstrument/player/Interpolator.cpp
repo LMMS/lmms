@@ -9,244 +9,120 @@ using namespace Diginstrument;
 template <typename T, class S>
 std::vector<Diginstrument::Component<T>> Diginstrument::Interpolator<T, S>::getSpectrum(const std::vector<T> &coordinates)
 {
-    //TODO: make this recursive?
-    std::vector<Diginstrument::Component<T>> res;
-    std::vector<std::vector<T>> labels;
-    std::vector<std::vector<S>> possiblePairs = data.getNeighbours(coordinates, labels);
-
-    //tmp
-    std::cout<<"coordinates: "<<coordinates[0]<<", "<<coordinates[1]<<std::endl;
-
-    if (possiblePairs.size() == 0)
-    { /*TODO: exception?*/
-        return std::vector<Diginstrument::Component<T>>{};
-    }
-
-    //track current coordinate
-    unsigned int currentCoordinate = coordinates.size() - 1;
-    //until there is only one possible pair left
-    //which means we interpolated on the last current coordinate
-    while (possiblePairs.size() > 1 || currentCoordinate < 0)
-    {
-        //process all possible pairs into half the amount of possible pairs
-        unsigned int currentNode = 0;
-        std::vector<std::vector<S>> tmp;
-        tmp.reserve(possiblePairs.size() / 2);
-        for (int i = 0; i < possiblePairs.size();)
-        {
-            //if there is no next pair
-            if (i + 1 >= possiblePairs.size())
-            {
-                //the new pair will be a single
-                //if it was a single, we propagate it
-                if (possiblePairs[i].size() == 1)
-                {
-                    tmp.push_back({possiblePairs[i].front()});
-                    currentNode++;
-                }
-                //if it is a pair, we interpolate and make it a new single
-                tmp.push_back({linear(possiblePairs[i].front(), possiblePairs[i].back(), coordinates[currentCoordinate], labels[currentCoordinate][currentNode], labels[currentCoordinate][currentNode + 1])});
-                currentNode += 2;
-                i += 1;
-                continue;
-            }
-            //else, we make a new possible pair from two possible pairs
-            tmp.push_back({});
-            if (possiblePairs[i].size() == 1)
-            {
-                tmp.back().push_back(possiblePairs[i].front());
-                currentNode++;
-            }
-            if (possiblePairs[i].size() == 2)
-            {
-                tmp.back().push_back(linear(possiblePairs[i].front(), possiblePairs[i].back(),
-                                            coordinates[currentCoordinate], labels[currentCoordinate][currentNode], labels[currentCoordinate][currentNode + 1]));
-                currentNode += 2;
-            };
-            if (possiblePairs[i + 1].size() == 1)
-            {
-                tmp.back().push_back(possiblePairs[i + 1].front());
-                currentNode++;
-            }
-            if (possiblePairs[i + 1].size() == 2)
-            {
-                tmp.back().push_back(linear(possiblePairs[i + 1].front(), possiblePairs[i + 1].back(),
-                                            coordinates[currentCoordinate], labels[currentCoordinate][currentNode], labels[currentCoordinate][currentNode + 1]));
-                currentNode += 2;
-            };
-            i += 2;
-        }
-        possiblePairs = std::move(tmp);
-        currentCoordinate -= 1;
-    }
-    //now process the last node, where we interpolate on frequency
-    if (possiblePairs.front().size() == 1)
-    {
-        return possiblePairs.front().front().getComponents(0);
-    }
-    if (possiblePairs.front().size() == 2)
-    {
-        return linearShift(possiblePairs.front().front(), possiblePairs.front().back(),
-                           coordinates.front(), labels[0][0], labels[0][1])
-            .getComponents(0);
-    }
-
-    return std::vector<Diginstrument::Component<T>>{};
+    //TODO: tmp: quality parameter
+    //TODO: use lambda with capture!
+    return data.processIntoRoot(coordinates, interpolateSpectra).getComponents(0);
 }
 
 template <typename T, class S>
-S Diginstrument::Interpolator<T, S>::matchSpectra(const S &left, const S &right, const T &target, const T &leftLabel, const T &rightLabel)
+S Diginstrument::Interpolator<T, S>::interpolateSpectra(const S &left, const S &right, const T &target, const T &leftLabel, const T &rightLabel, const bool shifting)
 {
-    //tmp
-    std::cout<<"matching splines: "<<leftLabel<<", "<<rightLabel<<" @ "<<target<<std::endl;
-    //conclusion: matching looks good
+    //TODO: snare test has two distinct pulses, and goes into negative for some reason
+    //TODO: why am i not using the shifting boolean?
+    //NOTE: we do need to match components to do any meaningful shifting
+    //ex.: a wide peak on left and a sharper, higher-pitched peak on right. Number of components not equal.
+    //TODO: pseudocode:
+    /*
+        1) Match the peaks
+        2) Interpolate the matched ones together, based on weights
+            //move matched peaks to their weighted frequency
+        3) Add the unmatched peaks, modulated amplitude with weights
+        4) Accumulate bins (is this needed, if close ones are matched?)
+            //if they are "close enough", consider them a bin
+            //calculate an average frequency
+            //accumulate or average amplitude?
+    */
 
-    //tmp: if either is empty, return the other
-    if( left.getHarmonics().size()==0 && left.getStochastics().size()==0 ) return right;
-    if( right.getHarmonics().size()==0 && right.getStochastics().size()==0 ) return left;
+    vector<Component<T>> harmonics;
+    //TODO: there should be a more sophisticated way of dealing with unmatched peaks. for example, if the left harmonic series is shorter then the right, just adding those in without shifting will sound terrible
+    vector<unsigned int> unmatchedLeft;
+    vector<unsigned int> unmatchedRight;
 
-    //bins
-    //if they are "close enough", consider them a bin
-    //calculate an average frequency
-    //accumulate or average amplitude?
+    //tmp debug
+    cout<<rightLabel<<" "<<leftLabel<<endl;
 
-    //step 1: distinct, constant harmonics
+    const T rightWeight = target / (rightLabel - leftLabel);
+    const T leftWeight = 1.0f - rightWeight;
+    const T leftRatio = target / leftLabel;
+    const T rightRatio = target / rightLabel;
 
-    //tmp: harmonics only
-    //put them in one
-    std::vector<Diginstrument::Component<T>> harmonics;
-    if(right.getHarmonics().size()>left.getHarmonics().size())
+    const auto leftHarmonics = left.getHarmonics();
+    const auto rightHarmonics = right.getHarmonics();
+    //TODO: acts weird if i hit an exact point (eg. 440)
+    //TODO: acts even weirder with snare test: 4 spectra on same "pitch" and different time coordinates
+
+    if (left.empty())
     {
-        harmonics = right.getHarmonics();
-        for(auto h : left.getHarmonics())
+        //return attenuated right
+        unmatchedRight.resize(rightHarmonics.size());
+        for(int i = 0; i<unmatchedRight.size(); i++)
         {
-            harmonics.emplace_back(h);
-        }
-    }else
-    {
-        harmonics = left.getHarmonics();
-        for(auto h : right.getHarmonics())
-        {
-            harmonics.emplace_back(h);
+            unmatchedRight[i]=i;
         }
     }
-    //sort by frequency
-    std::sort(harmonics.begin(), harmonics.end());
+    else if (right.empty())
+    {
+        //return attenuated left
+        unmatchedLeft.resize(leftHarmonics.size());
+        for(int i = 0; i<unmatchedLeft.size(); i++)
+        {
+            unmatchedLeft[i]=i;
+        }
+    }
+    else
+    {
+        //1) match peaks
+        //TODO: generalize
+        //TODO: refactor
+        auto matches = PeakMatcher::matchPeaks(left.getHarmonics(), right.getHarmonics(), unmatchedLeft, unmatchedRight);
+
+        //debug
+        cout << "number of harmonics: " << leftHarmonics.size() << " " << rightHarmonics.size() << endl;
+        cout << "matches" << endl;
+        for (auto &match : matches)
+        {
+            //tmp:debug
+            std::cout << leftHarmonics[match.left].frequency << " - " << rightHarmonics[match.right].frequency << " : " << match.distance << std::endl;
+            //tmp
+            if (leftHarmonics[match.left].frequency == rightHarmonics[match.right].frequency)
+            {
+                harmonics.emplace_back(leftHarmonics[match.left].frequency, 0, leftHarmonics[match.left].amplitude * leftWeight + rightHarmonics[match.right].amplitude * rightWeight);
+            }
+            else
+            {
+                //TODO: NOTE: this simple method might not work generally, but for the pure sine it does
+                harmonics.emplace_back((leftHarmonics[match.left].frequency * leftRatio + rightHarmonics[match.right].frequency * rightRatio) / 2.0, 0, leftHarmonics[match.left].amplitude * leftWeight + rightHarmonics[match.right].amplitude * rightWeight);
+            }
+        }
+    }
+
+    //tmp TODO: unmatched are still added, but no shifting for now
+    for (auto &unmatched : unmatchedLeft)
+    {
+        harmonics.emplace_back(leftHarmonics[unmatched].frequency, 0, leftHarmonics[unmatched].amplitude * leftWeight);
+    }
+    for (auto &unmatched : unmatchedRight)
+    {
+        harmonics.emplace_back(rightHarmonics[unmatched].frequency, 0, rightHarmonics[unmatched].amplitude * rightWeight);
+    }
 
     //tmp: debug
-    cout<<"Components ordered: "<<endl;
-    for(auto h : harmonics)
+    cout << "unmatched left: ";
+    for (auto e : unmatchedLeft)
     {
-        cout<<h.frequency<<", "<<h.amplitude<<endl;
+        cout << leftHarmonics[e].frequency << " ";
     }
-    
-
-    //frequency
-    //match the peaks
-    //move matched peaks to their weighted frequency
-    //do the bin thing again, or just merge them at the above step?
-    //if a peak has no match, should i leave it or shift it too?
-
-    return Diginstrument::NoteSpectrum<double>(0,{},{});
-}
-
-
-/*tmp: un-commented linearShift and removed const from header*/
-template <typename T, class S>
-S Diginstrument::Interpolator<T, S>::linearShift(S &left, S &right, const T &target, const T &leftLabel, const T &rightLabel)
-{
-    //std::cout << "shifting interpolation: " << target << ", between: " << leftLabel << ", " << rightLabel << std::endl;
-    T rightWeight = target / (rightLabel - leftLabel);
-    T leftWeight = 1.0f - rightWeight;
-    T leftRatio = target / leftLabel;
-    T rightRatio = target / rightLabel;
-    //tmp
-    //TODO: expand to stochastics
-    std::vector<Diginstrument::Component<T>> harmonics;
-    for (auto &h : left.getHarmonics())
+    cout << endl;
+    cout << "unmatched right: ";
+    for (auto e : unmatchedRight)
     {
-        harmonics.push_back({leftRatio * h.frequency, 0, leftWeight * h.amplitude});
+        cout << rightHarmonics[e].frequency << " ";
     }
-    for (auto &h : right.getHarmonics())
-    {
-        harmonics.push_back({rightRatio * h.frequency, 0, leftWeight * h.amplitude});
-    }
+    cout << endl;
 
-    //if one was empty, we dont need to accumulate
-    if (harmonics.size() == left.getHarmonics().size() || harmonics.size() == right.getHarmonics().size())
-    {
-        return S(target, std::move(harmonics), {});
-    }
-    //accumulate energy in frequency-windows
-    std::sort(harmonics.begin(), harmonics.end());
-    std::vector<Diginstrument::Component<T>> accumulated;
-    accumulated.reserve(harmonics.size() / 2);
-    auto it = harmonics.begin();
-    T baseFrequency = it->frequency;
-    while (it != harmonics.end())
-    {
-        T accumulatedAmplitude = 0;
-        while (it != harmonics.end() && it->frequency <= baseFrequency + frequencyStep)
-        {
-            //tmp
-            std::cout<<it->frequency<<" <= "<<baseFrequency + frequencyStep<<std::endl;
-            accumulatedAmplitude += it->amplitude;
-            it++;
-        }
-        accumulated.push_back({baseFrequency, 0, accumulatedAmplitude});
-        //TODO: Debug: Invalid read of size 4
-        baseFrequency = it->frequency;
-    }
-
-    return S(target, std::move(harmonics), {});
-}
-
-//TODO: this is probably totally wrong after the introduction of phase...
-//tmp: uncommented
-template <typename T, class S>
-S Diginstrument::Interpolator<T, S>::linear(const S &left, const S &right, const T &target, const T &leftLabel, const T &rightLabel)
-{
-    //TODO: think about the shifting of splinespectrum
-    //TODO: MAYBE: write separate for differenct spectrum types
-    //std::cout << "interpolation: " << target << ", between: " << leftLabel << ", " << rightLabel << std::endl;
-    T rightWeight = target / (rightLabel - leftLabel);
-    T leftWeight = 1.0f - rightWeight;
-    //TODO: expand to stochastics
-    std::vector<Diginstrument::Component<T>> harmonics;
-    //tmp : 0 phase
-    for (auto &h : left.getHarmonics())
-    {
-        harmonics.emplace_back(h);
-    }
-    for (auto &h : right.getHarmonics())
-    {
-        harmonics.emplace_back(h);
-    }
-
-    //if one was empty, we dont need to accumulate
-    if (harmonics.size() == left.getHarmonics().size() || harmonics.size() == right.getHarmonics().size())
-    {
-        return S(target, std::move(harmonics), {});
-    }
-    //accumulate energy in frequency-windows 
-    std::sort(harmonics.begin(), harmonics.end());
-    std::vector<Diginstrument::Component<T>> accumulated;
-    accumulated.reserve(harmonics.size() / 2);
-    auto it = harmonics.begin();
-    T baseFrequency = it->frequency;
-    while (it != harmonics.end())
-    {
-        T accumulatedAmplitude = 0;
-        while (it != harmonics.end() && it->frequency <= baseFrequency + frequencyStep)
-        {
-            accumulatedAmplitude += it->amplitude;
-            it++;
-        }
-        accumulated.push_back({baseFrequency, 0, accumulatedAmplitude});
-        baseFrequency = it->frequency;
-    }
-
-    return S(target, std::move(harmonics), {});
+    //tmp:debug: so the dimensions get mixed when there is an unary node. Eg: rightLabel: 0, leftLabel: 440
+    cout<<target<<endl;
+    return Diginstrument::NoteSpectrum<double>(target, harmonics, {});
 }
 
 template <typename T, class S>
@@ -260,17 +136,18 @@ template <typename T, class S>
 void Diginstrument::Interpolator<T, S>::clear()
 {
     data.clear();
+    dimensions.clear();
 }
 
-template <typename T>
-void Diginstrument::Interpolator<T, SplineSpectrum<T, 4>>::addSpectrum(const SplineSpectrum<T, 4> &spectrum, std::vector<T> coordinates)
+template <typename T, class S>
+void Diginstrument::Interpolator<T, S>::setDimensions(const std::vector<std::pair<std::string, bool>> &dimensions)
 {
-    //TODO:test, check, better
-    data.insert(spectrum, coordinates);
+    this->dimensions = dimensions;
 }
 
+//TODO: remake with the more generic method
 template <typename T>
-SplineSpectrum<T, 4> Diginstrument::Interpolator<T, SplineSpectrum<T, 4>>::linear(
+SplineSpectrum<T, 4> Diginstrument::Interpolator<T, SplineSpectrum<T, 4>>::interpolateSpectra(
     SplineSpectrum<T, 4> left,
     SplineSpectrum<T, 4> right,
     const T &target,
@@ -284,7 +161,7 @@ SplineSpectrum<T, 4> Diginstrument::Interpolator<T, SplineSpectrum<T, 4>>::linea
     //const T leftDistance = target-leftLabel;
 
     //1) stretch pieces
-    if (shifting /*tmp*/ && left.getSpline().getPeaks().size()>0 && right.getSpline().getPeaks().size()>0)
+    if (shifting /*tmp*/ && left.getSpline().getPeaks().size() > 0 && right.getSpline().getPeaks().size() > 0)
     {
         auto leftComponents = left.getComponents(0);
         auto rightComponents = right.getComponents(0);
@@ -295,12 +172,13 @@ SplineSpectrum<T, 4> Diginstrument::Interpolator<T, SplineSpectrum<T, 4>>::linea
         //tmp: debug
         //std::cout<<"left has: "<<leftComponents.size()<<", right has: "<<rightComponents.size()<<" - matches: "<<matches.size()<<std::endl;
         //TODO: new or dead peaks get  matched to another - multiple targets for a peak
-        for( auto & match : matches)
+        for (auto &match : matches)
         {
             //tmp:debug
             //std::cout<<leftComponents[match.left].frequency<< " - "<<rightComponents[match.right].frequency<<" : "<<match.distance<<std::endl;
             //tmp: limit
-            if(match.distance > 20) continue;
+            if (match.distance > 20)
+                continue;
             auto &l = left.getSpline().getPieces()[match.left];
             auto &r = right.getSpline().getPieces()[match.right];
             const T target = (r.getEnd() - l.getEnd()) * rightRatio + l.getEnd();
@@ -308,9 +186,9 @@ SplineSpectrum<T, 4> Diginstrument::Interpolator<T, SplineSpectrum<T, 4>>::linea
             //std::cout<<r.getBegin()<<", "<<r.getEnd()<<" to "<<target<<std::endl;
             left.getSpline().stretchPieceEndTo(match.left, target);
             right.getSpline().stretchPieceEndTo(match.right, target);
-            //std::cout<<std::endl;    
+            //std::cout<<std::endl;
         }
-        //std::cout<<std::endl;    
+        //std::cout<<std::endl;
     }
     //TODO: splines that cover too short a distance cause problems: zero ratio split, maybe too few points to split?
     //2) consolidate peaks
@@ -351,8 +229,10 @@ PiecewiseBSpline<T, 4> Diginstrument::Interpolator<T, SplineSpectrum<T, 4>>::con
     std::deque<typename PiecewiseBSpline<T, 4>::Piece> leftPieces(left.getPieces().rbegin(), left.getPieces().rend());
     std::deque<typename PiecewiseBSpline<T, 4>::Piece> rightPieces(right.getPieces().rbegin(), right.getPieces().rend());
 
-    if(right.getPieces().size() == 0) return left;
-    if(left.getPieces().size() == 0) return right;
+    if (right.getPieces().size() == 0)
+        return left;
+    if (left.getPieces().size() == 0)
+        return right;
 
     if (leftPieces.back().getBegin() != rightPieces.back().getBegin())
     {
@@ -372,7 +252,7 @@ PiecewiseBSpline<T, 4> Diginstrument::Interpolator<T, SplineSpectrum<T, 4>>::con
         //NOTE: or just move one end directly, maybe even into target?
         //TODO: merge these instead to next piece
         //TODO: note: this discards errors where begin>end as well
-        if(rightPieces.back().getEnd() - rightPieces.back().getBegin() <= maxFrequencyDistance)
+        if (rightPieces.back().getEnd() - rightPieces.back().getBegin() <= maxFrequencyDistance)
         {
             //std::cout<<"discarding from right: "<<rightPieces.back().getBegin()<<" - "<<rightPieces.back().getEnd()<<std::endl;
             //tmp: set opposite piece begin and res latest piece end : could be dangerous if new begin > end
@@ -380,7 +260,7 @@ PiecewiseBSpline<T, 4> Diginstrument::Interpolator<T, SplineSpectrum<T, 4>>::con
             res.getPieces().back().stretchTo(res.getPieces().back().getBegin(), rightPieces.back().getEnd());
             rightPieces.pop_back();
             //step left and right
-            if(!leftPieces.empty())
+            if (!leftPieces.empty())
             {
                 leftEnd = leftPieces.back().getEnd();
                 leftBegin = leftPieces.back().getBegin();
@@ -389,7 +269,7 @@ PiecewiseBSpline<T, 4> Diginstrument::Interpolator<T, SplineSpectrum<T, 4>>::con
             {
                 //TODO
             }
-            if(!rightPieces.empty())
+            if (!rightPieces.empty())
             {
                 rightEnd = rightPieces.back().getEnd();
                 rightBegin = rightPieces.back().getBegin();
@@ -400,7 +280,7 @@ PiecewiseBSpline<T, 4> Diginstrument::Interpolator<T, SplineSpectrum<T, 4>>::con
             }
             continue;
         }
-        if(leftPieces.back().getEnd() - leftPieces.back().getBegin() <= maxFrequencyDistance)
+        if (leftPieces.back().getEnd() - leftPieces.back().getBegin() <= maxFrequencyDistance)
         {
             //std::cout<<"discarding from left: "<<leftPieces.back().getBegin()<<" - "<<leftPieces.back().getEnd()<<std::endl;
             //tmp: set opposite piece begin and res latest piece end : could be dangerous if new begin > end
@@ -408,7 +288,7 @@ PiecewiseBSpline<T, 4> Diginstrument::Interpolator<T, SplineSpectrum<T, 4>>::con
             res.getPieces().back().stretchTo(res.getPieces().back().getBegin(), leftPieces.back().getEnd());
             leftPieces.pop_back();
             //step left and right
-            if(!leftPieces.empty())
+            if (!leftPieces.empty())
             {
                 leftEnd = leftPieces.back().getEnd();
                 leftBegin = leftPieces.back().getBegin();
@@ -417,7 +297,7 @@ PiecewiseBSpline<T, 4> Diginstrument::Interpolator<T, SplineSpectrum<T, 4>>::con
             {
                 //TODO
             }
-            if(!rightPieces.empty())
+            if (!rightPieces.empty())
             {
                 rightEnd = rightPieces.back().getEnd();
                 rightBegin = rightPieces.back().getBegin();
@@ -430,7 +310,7 @@ PiecewiseBSpline<T, 4> Diginstrument::Interpolator<T, SplineSpectrum<T, 4>>::con
         }
         //Note: cases with matching endpoints first, to use epsilon distance
         //matching endpoints
-        if( fabs(leftBegin-rightBegin) <= maxFrequencyDistance && fabs(leftEnd-rightEnd) <= maxFrequencyDistance )
+        if (fabs(leftBegin - rightBegin) <= maxFrequencyDistance && fabs(leftEnd - rightEnd) <= maxFrequencyDistance)
         {
             //add totally matching pieces
             res.add(matchPieces(leftPieces.back().getSpline(), rightPieces.back().getSpline(), rightRatio));
@@ -438,7 +318,7 @@ PiecewiseBSpline<T, 4> Diginstrument::Interpolator<T, SplineSpectrum<T, 4>>::con
             rightPieces.pop_back();
             leftPieces.pop_back();
             //step left and right
-            if(!leftPieces.empty())
+            if (!leftPieces.empty())
             {
                 leftEnd = leftPieces.back().getEnd();
                 leftBegin = leftPieces.back().getBegin();
@@ -447,7 +327,7 @@ PiecewiseBSpline<T, 4> Diginstrument::Interpolator<T, SplineSpectrum<T, 4>>::con
             {
                 //TODO
             }
-            if(!rightPieces.empty())
+            if (!rightPieces.empty())
             {
                 rightEnd = rightPieces.back().getEnd();
                 rightBegin = rightPieces.back().getBegin();
@@ -459,9 +339,9 @@ PiecewiseBSpline<T, 4> Diginstrument::Interpolator<T, SplineSpectrum<T, 4>>::con
             continue;
         }
         //partial overlap, matching start points
-        if( fabs(leftBegin-rightBegin) <= maxFrequencyDistance )
+        if (fabs(leftBegin - rightBegin) <= maxFrequencyDistance)
         {
-            if(leftEnd>rightEnd)
+            if (leftEnd > rightEnd)
             {
                 //split left at right end
                 const T ratio = (rightEnd - leftBegin) / (leftEnd - leftBegin);
@@ -476,7 +356,7 @@ PiecewiseBSpline<T, 4> Diginstrument::Interpolator<T, SplineSpectrum<T, 4>>::con
                 //add split right back
                 leftPieces.push_back(split.second);
             }
-            if(leftEnd<rightEnd)
+            if (leftEnd < rightEnd)
             {
                 //split right at left end
                 const T ratio = (leftEnd - rightBegin) / (rightEnd - rightBegin);
@@ -494,7 +374,7 @@ PiecewiseBSpline<T, 4> Diginstrument::Interpolator<T, SplineSpectrum<T, 4>>::con
                 rightPieces.push_back(split.second);
             }
             //step left and right
-            if(!leftPieces.empty())
+            if (!leftPieces.empty())
             {
                 leftEnd = leftPieces.back().getEnd();
                 leftBegin = leftPieces.back().getBegin();
@@ -503,7 +383,7 @@ PiecewiseBSpline<T, 4> Diginstrument::Interpolator<T, SplineSpectrum<T, 4>>::con
             {
                 //TODO
             }
-            if(!rightPieces.empty())
+            if (!rightPieces.empty())
             {
                 rightEnd = rightPieces.back().getEnd();
                 rightBegin = rightPieces.back().getBegin();
@@ -516,9 +396,9 @@ PiecewiseBSpline<T, 4> Diginstrument::Interpolator<T, SplineSpectrum<T, 4>>::con
         }
         //partial overlap, matching end points
         //TODO: note: might be same as partial overlap with no endpoints...
-        if( fabs(leftEnd-rightEnd) <= maxFrequencyDistance )
+        if (fabs(leftEnd - rightEnd) <= maxFrequencyDistance)
         {
-            if(leftBegin<rightBegin)
+            if (leftBegin < rightBegin)
             {
                 //split left at right begin
                 const T ratio = (rightBegin - leftBegin) / (leftEnd - leftBegin);
@@ -530,7 +410,7 @@ PiecewiseBSpline<T, 4> Diginstrument::Interpolator<T, SplineSpectrum<T, 4>>::con
                 leftPieces.pop_back();
                 leftPieces.push_back(split.second);
                 //step left
-                if(!leftPieces.empty())
+                if (!leftPieces.empty())
                 {
                     leftEnd = leftPieces.back().getEnd();
                     leftBegin = leftPieces.back().getBegin();
@@ -541,7 +421,7 @@ PiecewiseBSpline<T, 4> Diginstrument::Interpolator<T, SplineSpectrum<T, 4>>::con
                 }
                 continue;
             }
-            if(leftBegin>rightBegin)
+            if (leftBegin > rightBegin)
             {
                 //split right at left begin
                 const T ratio = (leftBegin - rightBegin) / (rightEnd - rightBegin);
@@ -553,7 +433,7 @@ PiecewiseBSpline<T, 4> Diginstrument::Interpolator<T, SplineSpectrum<T, 4>>::con
                 rightPieces.pop_back();
                 rightPieces.push_back(split.second);
                 //step right
-                if(!rightPieces.empty())
+                if (!rightPieces.empty())
                 {
                     rightEnd = rightPieces.back().getEnd();
                     rightBegin = rightPieces.back().getBegin();
@@ -566,13 +446,13 @@ PiecewiseBSpline<T, 4> Diginstrument::Interpolator<T, SplineSpectrum<T, 4>>::con
             }
         }
         //no overlap
-        if(leftBegin<rightBegin && leftEnd<rightBegin)
+        if (leftBegin < rightBegin && leftEnd < rightBegin)
         {
             //left only
             res.add(leftPieces.back().getSpline());
             leftPieces.pop_back();
             //step left
-            if(!leftPieces.empty())
+            if (!leftPieces.empty())
             {
                 leftEnd = leftPieces.back().getEnd();
                 leftBegin = leftPieces.back().getBegin();
@@ -583,13 +463,13 @@ PiecewiseBSpline<T, 4> Diginstrument::Interpolator<T, SplineSpectrum<T, 4>>::con
             }
             continue;
         }
-        if(leftBegin>rightBegin && leftBegin>rightEnd)
+        if (leftBegin > rightBegin && leftBegin > rightEnd)
         {
             //right only
             res.add(rightPieces.back().getSpline());
             rightPieces.pop_back();
             //step right
-            if(!rightPieces.empty())
+            if (!rightPieces.empty())
             {
                 rightEnd = rightPieces.back().getEnd();
                 rightBegin = rightPieces.back().getBegin();
@@ -603,7 +483,7 @@ PiecewiseBSpline<T, 4> Diginstrument::Interpolator<T, SplineSpectrum<T, 4>>::con
         //if one encompasses the other
         //TODO?
         //partial overlap, no matching endpoints
-        if(leftBegin>rightBegin && leftBegin<rightEnd && leftEnd>rightEnd)
+        if (leftBegin > rightBegin && leftBegin < rightEnd && leftEnd > rightEnd)
         {
             //split right at left begin
             const T ratio = (leftBegin - rightBegin) / (rightEnd - rightBegin);
@@ -615,7 +495,7 @@ PiecewiseBSpline<T, 4> Diginstrument::Interpolator<T, SplineSpectrum<T, 4>>::con
             rightPieces.pop_back();
             rightPieces.push_back(split.second);
             //step right
-            if(!rightPieces.empty())
+            if (!rightPieces.empty())
             {
                 rightEnd = rightPieces.back().getEnd();
                 rightBegin = rightPieces.back().getBegin();
@@ -626,7 +506,7 @@ PiecewiseBSpline<T, 4> Diginstrument::Interpolator<T, SplineSpectrum<T, 4>>::con
             }
             continue;
         }
-        if(leftBegin<rightBegin && leftEnd>rightBegin && leftEnd<rightEnd)
+        if (leftBegin < rightBegin && leftEnd > rightBegin && leftEnd < rightEnd)
         {
             //split left at right begin
             const T ratio = (rightBegin - leftBegin) / (leftEnd - leftBegin);
@@ -638,7 +518,7 @@ PiecewiseBSpline<T, 4> Diginstrument::Interpolator<T, SplineSpectrum<T, 4>>::con
             leftPieces.pop_back();
             leftPieces.push_back(split.second);
             //step left
-            if(!leftPieces.empty())
+            if (!leftPieces.empty())
             {
                 leftEnd = leftPieces.back().getEnd();
                 leftBegin = leftPieces.back().getBegin();
@@ -727,7 +607,7 @@ BSpline<T, 4> Diginstrument::Interpolator<T, SplineSpectrum<T, 4>>::matchPieces(
         leftBegin[1] * leftRatio + rightBegin[1] * rightRatio,
         //leftBegin[1],
         leftBegin[2] * leftRatio + rightBegin[2] * rightRatio});
-        //TODO: phase: how to interpolate "starting phase"?
+    //TODO: phase: how to interpolate "starting phase"?
     for (int i = 1; i < left.getControlPoints().size() - 1; i++)
     {
         const std::vector<T> leftCP = left.getControlPoints()[i];
@@ -747,97 +627,13 @@ BSpline<T, 4> Diginstrument::Interpolator<T, SplineSpectrum<T, 4>>::matchPieces(
         //OR NEITHER? CUZ FREQUENCY AND PHASE ARE INTERCONNECTED, DUMBASS?????
         //std::min(leftEnd[0], rightEnd[0]),
         leftEnd[0] * leftRatio + rightEnd[0] * rightRatio,
-        leftEnd[1]*leftRatio + rightEnd[1]*rightRatio,
+        leftEnd[1] * leftRatio + rightEnd[1] * rightRatio,
         //Interpolation::Linear(0.0, leftEnd[1],1.0, rightEnd[1],rightRatio), //seems to be the same as linear combination
         leftEnd[2] * leftRatio + rightEnd[2] * rightRatio});
 
     res.setControlPoints(std::move(resCPs));
     res.setKnotVector(std::move(resKnotVector));
     return res;
-}
-
-template <typename T>
-SplineSpectrum<T, 4> Diginstrument::Interpolator<T, SplineSpectrum<T, 4>>::getSpectrum(const std::vector<T> &coordinates)
-{
-    //TODO
-    std::vector<std::vector<T>> labels;
-    std::vector<std::vector<SplineSpectrum<T, 4>>> possiblePairs = data.getNeighbours(coordinates, labels);
-
-    if (possiblePairs.size() == 0)
-    { /*TODO: exception?*/
-        return SplineSpectrum<T, 4>(-1);
-    }
-
-    //track current coordinate
-    unsigned int currentCoordinate = coordinates.size() - 1;
-    //until there is only one possible pair left
-    //which means we interpolated on the last current coordinate
-    while (possiblePairs.size() > 1 || currentCoordinate < 0)
-    {
-        //process all possible pairs into half the amount of possible pairs
-        unsigned int currentNode = 0;
-        std::vector<std::vector<SplineSpectrum<T, 4>>> tmp;
-        tmp.reserve(possiblePairs.size() / 2);
-        for (int i = 0; i < possiblePairs.size();)
-        {
-            //if there is no next pair
-            if (i + 1 >= possiblePairs.size())
-            {
-                //the new pair will be a single
-                //if it was a single, we propagate it
-                if (possiblePairs[i].size() == 1)
-                {
-                    tmp.push_back({possiblePairs[i].front()});
-                    currentNode++;
-                }
-                //if it is a pair, we interpolate and make it a new single
-                tmp.push_back({linear(possiblePairs[i].front(), possiblePairs[i].back(), coordinates[currentCoordinate], labels[currentCoordinate][currentNode], labels[currentCoordinate][currentNode + 1])});
-                currentNode += 2;
-                i += 1;
-                continue;
-            }
-            //else, we make a new possible pair from two possible pairs
-            tmp.push_back({});
-            if (possiblePairs[i].size() == 1)
-            {
-                tmp.back().push_back(possiblePairs[i].front());
-                currentNode++;
-            }
-            if (possiblePairs[i].size() == 2)
-            {
-                tmp.back().push_back(linear(possiblePairs[i].front(), possiblePairs[i].back(),
-                                            coordinates[currentCoordinate], labels[currentCoordinate][currentNode], labels[currentCoordinate][currentNode + 1]));
-                currentNode += 2;
-            };
-            if (possiblePairs[i + 1].size() == 1)
-            {
-                tmp.back().push_back(possiblePairs[i + 1].front());
-                currentNode++;
-            }
-            if (possiblePairs[i + 1].size() == 2)
-            {
-                tmp.back().push_back(linear(possiblePairs[i + 1].front(), possiblePairs[i + 1].back(),
-                                            coordinates[currentCoordinate], labels[currentCoordinate][currentNode], labels[currentCoordinate][currentNode + 1]));
-                currentNode += 2;
-            };
-            i += 2;
-        }
-        possiblePairs = std::move(tmp);
-        currentCoordinate -= 1;
-    }
-    //now process the last node, where we interpolate on frequency
-    //TMP: DEBUG: with splines, shifting interpolation should be on time
-    if (possiblePairs.front().size() == 1)
-    {
-        return possiblePairs.front().front();
-    }
-    if (possiblePairs.front().size() == 2)
-    {
-        return linear(possiblePairs.front().front(), possiblePairs.front().back(),
-                      coordinates[currentCoordinate] /*was .front()*/, labels[/*TMP: was 0*/ currentCoordinate][0], labels[/*TMP: was 0*/ currentCoordinate][1], true);
-    }
-
-    return SplineSpectrum<T, 4>(-1);
 }
 
 template class Diginstrument::Interpolator<double, Diginstrument::NoteSpectrum<double>>;

@@ -33,6 +33,7 @@ class InstrumentData
   public:
     std::string name;
     std::string type;
+    std::vector<std::pair<std::string, bool>> dimensions;
     json _json;
 };
 

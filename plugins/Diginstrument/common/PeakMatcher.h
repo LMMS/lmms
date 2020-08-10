@@ -2,7 +2,7 @@
 
 #include <cmath>
 #include <vector>
-#include <unordered_set>
+#include <set>
 #include <algorithm>
 
 #include "Spectrum.hpp"
@@ -23,7 +23,14 @@ class PeakMatcher
 {
 private:
     static double calculateDistance(const Diginstrument::Component<double> &left, const Diginstrument::Component<double> &right);
+    static std::vector<Match> makeAllSortedMatches(const std::vector<Diginstrument::Component<double>> & leftComponents,
+                                             const std::vector<Diginstrument::Component<double>> & rightComponents);
 public:
-    static std::vector<Match> matchPeaks(const std::vector<Diginstrument::Component<double>> & leftComponents, const std::vector<Diginstrument::Component<double>> & rightComponents);
+    static std::vector<Match> matchPeaks(const std::vector<Diginstrument::Component<double>> & leftComponents,
+                                         const std::vector<Diginstrument::Component<double>> & rightComponents);
+    static std::vector<Match> matchPeaks(const std::vector<Diginstrument::Component<double>> & leftComponents,
+                                         const std::vector<Diginstrument::Component<double>> & rightComponents,
+                                         std::vector<unsigned int> & leftUnmatched,
+                                         std::vector<unsigned int> & rightUnmatched);
 };
 } // namespace Diginstrument

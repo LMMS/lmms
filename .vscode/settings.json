@@ -73,7 +73,9 @@
         "any": "cpp",
         "forward_list": "cpp",
         "valarray": "cpp",
-        "variant": "cpp"
+        "variant": "cpp",
+        "bit": "cpp",
+        "future": "cpp"
     },
     "cmake.configureOnOpen": true
 }

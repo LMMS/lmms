@@ -7,11 +7,11 @@ template <typename T, unsigned int D>
 class SplineSpectrum : public Diginstrument::Spectrum<T>
 {
 public:
-  SplineSpectrum(T label) : spline(), label(label) {}
-  SplineSpectrum(PiecewiseBSpline<T, D> &&spline) : spline(std::move(spline)), label(0) {}
-  SplineSpectrum(const PiecewiseBSpline<T, D> &spline) : spline(spline), label(0) {}
-  SplineSpectrum(PiecewiseBSpline<T, D> &&spline, T label) : spline(std::move(spline)), label(label) {}
-  SplineSpectrum(const PiecewiseBSpline<T, D> &spline, T label) : spline(spline), label(label) {}
+  SplineSpectrum(T label) : Diginstrument::Spectrum<T>(label), spline() {}
+  SplineSpectrum(PiecewiseBSpline<T, D> &&spline) : Diginstrument::Spectrum<T>(0), spline(std::move(spline)) {}
+  SplineSpectrum(const PiecewiseBSpline<T, D> &spline) : Diginstrument::Spectrum<T>(0), spline(spline) {}
+  SplineSpectrum(PiecewiseBSpline<T, D> &&spline, T label) : Diginstrument::Spectrum<T>(label), spline(std::move(spline)) {}
+  SplineSpectrum(const PiecewiseBSpline<T, D> &spline, T label) : Diginstrument::Spectrum<T>(label), spline(spline) {}
 
   std::vector<Diginstrument::Component<T>> getHarmonics() const
   {
@@ -55,6 +55,11 @@ public:
   PiecewiseBSpline<T, D> &getSpline()
   {
     return spline;
+  }
+
+  bool empty() const
+  {
+    return spline.getPeaks().size()==0;
   }
 
 private:
