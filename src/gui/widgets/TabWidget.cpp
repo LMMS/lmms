@@ -31,8 +31,9 @@
 #include <QToolTip>
 #include <QWheelEvent>
 
-#include "gui_templates.h"
+#include "DeprecationHelper.h"
 #include "embed.h"
+#include "gui_templates.h"
 
 TabWidget::TabWidget(const QString & caption, QWidget * parent, bool usePixmap,
 					 bool resizable) :
@@ -76,7 +77,7 @@ void TabWidget::addTab( QWidget * w, const QString & name, const char *pixmap, i
 	}
 
 	// Tab's width when it is a text tab. This isn't correct for artwork tabs, but it's fixed later during the PaintEvent
-	int tab_width = fontMetrics().width( name ) + 10;
+	int tab_width = horizontalAdvance(fontMetrics(), name) + 10;
 
 	// Register new tab
 	widgetDesc d = { w, pixmap, name, tab_width };
@@ -125,7 +126,7 @@ int TabWidget::findTabAtPos( const QPoint *pos )
 
 	if( pos->y() > 1 && pos->y() < m_tabbarHeight - 1 )
 	{
-		int cx = ( ( m_caption == "" ) ? 4 : 14 ) + fontMetrics().width( m_caption );
+		int cx = ((m_caption == "") ? 4 : 14) + horizontalAdvance(fontMetrics(), m_caption);
 
 		for( widgetStack::iterator it = m_widgets.begin(); it != m_widgets.end(); ++it )
 		{
@@ -232,7 +233,7 @@ void TabWidget::paintEvent( QPaintEvent * pe )
 	}
 
 	// Calculate the tabs' x (tabs are painted next to the caption)
-	int tab_x_offset = m_caption.isEmpty() ? 4 : 14 + fontMetrics().width( m_caption );
+	int tab_x_offset = m_caption.isEmpty() ? 4 : 14 + horizontalAdvance(fontMetrics(), m_caption);
 
 	// Compute tabs' width depending on the number of tabs (only applicable for artwork tabs)
 	widgetStack::iterator first = m_widgets.begin();
@@ -288,13 +289,13 @@ void TabWidget::paintEvent( QPaintEvent * pe )
 // Switch between tabs with mouse wheel
 void TabWidget::wheelEvent( QWheelEvent * we )
 {
-	if( we->position().y() > m_tabheight )
+	if(position(we).y() > m_tabheight)
 	{
 		return;
 	}
 
 	we->accept();
-	int dir = ( we->angleDelta().y() < 0 ) ? 1 : -1;
+	int dir = (we->angleDelta().y() < 0) ? 1 : -1;
 	int tab = m_activeTab;
 	while( tab > -1 && static_cast<int>( tab ) < m_widgets.count() )
 	{

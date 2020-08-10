@@ -149,11 +149,10 @@ void LcdSpinBox::mouseReleaseEvent( QMouseEvent* )
 
 
 
-void LcdSpinBox::wheelEvent( QWheelEvent * _we )
+void LcdSpinBox::wheelEvent(QWheelEvent * we)
 {
-	_we->accept();
-	model()->setInitValue( model()->value() +
-			( ( _we->angleDelta().y() > 0 ) ? 1 : -1 ) * model()->step<int>() );
+	we->accept();
+	model()->setInitValue(model()->value() + ((we->angleDelta().y() > 0) ? 1 : -1) * model()->step<int>());
 	emit manualChange();
 }
 

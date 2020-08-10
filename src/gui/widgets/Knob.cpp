@@ -38,6 +38,7 @@
 #include "CaptionMenu.h"
 #include "ConfigManager.h"
 #include "ControllerConnection.h"
+#include "DeprecationHelper.h"
 #include "embed.h"
 #include "gui_templates.h"
 #include "GuiApplication.h"
@@ -168,9 +169,9 @@ void Knob::setLabel( const QString & txt )
 	m_label = txt;
 	if( m_knobPixmap )
 	{
-		setFixedSize( qMax<int>( m_knobPixmap->width(),
-					QFontMetrics( pointSizeF( font(), 6.5) ).width( m_label ) ),
-						m_knobPixmap->height() + 10 );
+		setFixedSize(qMax<int>( m_knobPixmap->width(),
+					horizontalAdvance(QFontMetrics(pointSizeF(font(), 6.5)), m_label)),
+						m_knobPixmap->height() + 10);
 	}
 	update();
 }
@@ -682,20 +683,20 @@ void Knob::paintEvent( QPaintEvent * _me )
 			p.fontMetrics().width( m_label ) / 2 + 1,
 				height() - 1, m_label );*/
 		p.setPen( textColor() );
-		p.drawText( width() / 2 -
-				p.fontMetrics().width( m_label ) / 2,
-				height() - 2, m_label );
+		p.drawText(width() / 2 -
+				horizontalAdvance(p.fontMetrics(), m_label) / 2,
+				height() - 2, m_label);
 	}
 }
 
 
 
 
-void Knob::wheelEvent( QWheelEvent * _we )
+void Knob::wheelEvent(QWheelEvent * we)
 {
-	_we->accept();
+	we->accept();
 	const float stepMult = model()->range() / 2000 / model()->step<float>();
-	const int inc = ( ( _we->angleDelta().y() > 0 ) ? 1 : -1 ) * ( ( stepMult < 1 ) ? 1 : stepMult );
+	const int inc = ((we->angleDelta().y() > 0 ) ? 1 : -1) * ((stepMult < 1 ) ? 1 : stepMult);
 	model()->incValue( inc );
 
 

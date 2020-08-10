@@ -24,7 +24,6 @@
 
 #include "SongEditor.h"
 
-#include <QTimeLine>
 #include <QAction>
 #include <QKeyEvent>
 #include <QLabel>
@@ -32,24 +31,26 @@
 #include <QMdiArea>
 #include <QMdiSubWindow>
 #include <QPainter>
+#include <QTimeLine>
 
+#include "AudioDevice.h"
 #include "AutomatableSlider.h"
 #include "ComboBox.h"
 #include "ConfigManager.h"
 #include "CPULoadWidget.h"
+#include "DeprecationHelper.h"
 #include "embed.h"
 #include "GuiApplication.h"
 #include "LcdSpinBox.h"
 #include "MainWindow.h"
 #include "MeterDialog.h"
 #include "Mixer.h"
+#include "Oscilloscope.h"
+#include "PianoRoll.h"
 #include "TextFloat.h"
+#include "TimeDisplayWidget.h"
 #include "TimeLineWidget.h"
 #include "ToolTip.h"
-#include "Oscilloscope.h"
-#include "TimeDisplayWidget.h"
-#include "AudioDevice.h"
-#include "PianoRoll.h"
 #include "Track.h"
 
 const QVector<double> SongEditor::m_zoomLevels =
@@ -527,18 +528,18 @@ void SongEditor::wheelEvent( QWheelEvent * we )
 	{
 		int z = m_zoomingModel->value();
 
-		if( we->angleDelta().y() > 0 )
+		if(we->angleDelta().y() > 0)
 		{
 			z++;
 		}
-		else if( we->angleDelta().y() < 0 )
+		else if(we->angleDelta().y() < 0)
 		{
 			z--;
 		}
 		z = qBound( 0, z, m_zoomingModel->size() - 1 );
 
 
-		int x = we->position().x() - m_trackHeadWidth;
+		int x = position(we).x() - m_trackHeadWidth;
 		// bar based on the mouse x-position where the scroll wheel was used
 		int bar = x / pixelsPerBar();
 		// what would be the bar in the new zoom level on the very same mouse x
@@ -557,15 +558,15 @@ void SongEditor::wheelEvent( QWheelEvent * we )
 	}
 
 	// FIXME: Reconsider if determining orientation is necessary in Qt6.
-	else if( abs(we->angleDelta().x()) > abs(we->angleDelta().y()) ) // scrolling is horizontal
+	else if(abs(we->angleDelta().x()) > abs(we->angleDelta().y())) // scrolling is horizontal
 	{
-		m_leftRightScroll->setValue( m_leftRightScroll->value() -
-							we->angleDelta().x() /30 );
+		m_leftRightScroll->setValue(m_leftRightScroll->value() -
+							we->angleDelta().x() /30);
 	}
-	else if( we->modifiers() & Qt::ShiftModifier )
+	else if(we->modifiers() & Qt::ShiftModifier)
 	{
-		m_leftRightScroll->setValue( m_leftRightScroll->value() -
-							we->angleDelta().y() / 30 );
+		m_leftRightScroll->setValue(m_leftRightScroll->value() -
+							we->angleDelta().y() / 30);
 	}
 	else
 	{
