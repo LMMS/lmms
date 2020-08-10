@@ -81,6 +81,7 @@ SET(LMMS_SRCS
 	gui/widgets/NStateButton.cpp
 	gui/widgets/Oscilloscope.cpp
 	gui/widgets/PixmapButton.cpp
+	gui/widgets/PositionLine.cpp
 	gui/widgets/ProjectNotes.cpp
 	gui/widgets/RenameDialog.cpp
 	gui/widgets/Rubberband.cpp
