@@ -31,6 +31,7 @@
 #include "AutomatableModel.h"
 #include "ComboBoxModel.h"
 #include "Engine.h"
+#include "Lv2Features.h"
 #include "Lv2Manager.h"
 #include "Lv2Ports.h"
 #include "Mixer.h"
@@ -74,8 +75,12 @@ Plugin::PluginTypes Lv2Proc::check(const LilvPlugin *plugin,
 	AutoLilvNodes reqFeats(lilv_plugin_get_required_features(plugin));
 	LILV_FOREACH (nodes, itr, reqFeats.get())
 	{
-		issues.emplace_back(featureNotSupported,
-			lilv_node_as_string(lilv_nodes_get(reqFeats.get(), itr)));
+		const char* reqFeatName = lilv_node_as_string(
+								lilv_nodes_get(reqFeats.get(), itr));
+		if(!Lv2Features::isFeatureSupported(reqFeatName))
+		{
+			issues.emplace_back(featureNotSupported, reqFeatName);
+		}
 	}
 
 	if (printIssues && issues.size())
@@ -240,11 +245,15 @@ AutomatableModel *Lv2Proc::modelAtPort(const QString &uri)
 
 void Lv2Proc::initPlugin()
 {
+	m_features.initCommon();
+	initPluginSpecificFeatures();
+	m_features.createFeatureVectors();
+
 	createPorts();
 
 	m_instance = lilv_plugin_instantiate(m_plugin,
 		Engine::mixer()->processingSampleRate(),
-		nullptr);
+		m_features.featurePointers());
 
 	if (m_instance)
 	{
@@ -271,6 +280,16 @@ void Lv2Proc::shutdownPlugin()
 	lilv_instance_deactivate(m_instance);
 	lilv_instance_free(m_instance);
 	m_instance = nullptr;
+}
+
+
+
+
+void Lv2Proc::initPluginSpecificFeatures()
+{
+	// nothing yet
+	// it would look like this:
+	// m_features[LV2_URID__map] = m_uridMapFeature
 }
 
 

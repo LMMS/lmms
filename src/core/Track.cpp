@@ -2639,6 +2639,9 @@ void Track::toggleSolo()
 	}
 
 	const bool solo = m_soloModel.value();
+	// Should we use the new behavior of solo or the older/legacy one?
+	const bool soloLegacyBehavior = ConfigManager::inst()->value("app", "sololegacybehavior", "0").toInt();
+
 	for( TrackContainer::TrackList::const_iterator it = tl.begin();
 							it != tl.end(); ++it )
 	{
@@ -2649,7 +2652,15 @@ void Track::toggleSolo()
 			{
 				( *it )->m_mutedBeforeSolo = ( *it )->isMuted();
 			}
-			( *it )->setMuted( *it == this ? false : true );
+			// Don't mute AutomationTracks (keep their original state) unless we are on the sololegacybehavior mode
+			if( *it == this )
+			{
+				( *it )->setMuted( false );
+			}
+			else if( soloLegacyBehavior || ( *it )->type() != AutomationTrack )
+			{
+				( *it )->setMuted( true );
+			}
 			if( *it != this )
 			{
 				( *it )->m_soloModel.setValue( false );
@@ -2657,7 +2668,12 @@ void Track::toggleSolo()
 		}
 		else if( !soloBefore )
 		{
-			( *it )->setMuted( ( *it )->m_mutedBeforeSolo );
+			// Unless we are on the sololegacybehavior mode, only restores the
+			// mute state if the track isn't an Automation Track
+			if( soloLegacyBehavior || ( *it )->type() != AutomationTrack )
+			{
+				( *it )->setMuted( ( *it )->m_mutedBeforeSolo );
+			}
 		}
 	}
 }
