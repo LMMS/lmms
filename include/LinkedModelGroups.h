@@ -42,7 +42,7 @@
 /**
 	Base class for a group of linked models
 
-	See the LinkedModelGroup class for explenations
+	See the LinkedModelGroup class for explanations
 
 	Features:
 	* Models are stored by their QObject::objectName

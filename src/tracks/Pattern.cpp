@@ -24,23 +24,21 @@
  */
 #include "Pattern.h"
 
+#include <QApplication>
 #include <QTimer>
 #include <QMenu>
 #include <QMouseEvent>
 #include <QPainter>
 #include <QPushButton>
 
-#include "InstrumentTrack.h"
-#include "gui_templates.h"
-#include "embed.h"
-#include "GuiApplication.h"
-#include "PianoRoll.h"
-#include "RenameDialog.h"
-#include "SampleBuffer.h"
 #include "AudioSampleRecorder.h"
 #include "BBTrackContainer.h"
-#include "StringPairDrag.h"
-#include "MainWindow.h"
+#include "DeprecationHelper.h"
+#include "embed.h"
+#include "GuiApplication.h"
+#include "InstrumentTrack.h"
+#include "PianoRoll.h"
+#include "RenameDialog.h"
 
 #include <limits>
 
@@ -778,16 +776,16 @@ void PatternView::mouseDoubleClickEvent(QMouseEvent *_me)
 
 
 
-void PatternView::wheelEvent( QWheelEvent * _we )
+void PatternView::wheelEvent(QWheelEvent * we)
 {
-	if( m_pat->m_patternType == Pattern::BeatPattern &&
-				( fixedTCOs() || pixelsPerBar() >= 96 ) &&
-				_we->y() > height() - s_stepBtnOff->height() )
+	if(m_pat->m_patternType == Pattern::BeatPattern &&
+				(fixedTCOs() || pixelsPerBar() >= 96) &&
+				position(we).y() > height() - s_stepBtnOff->height())
 	{
 //	get the step number that was wheeled on and
 //	do calculations in floats to prevent rounding errors...
-		float tmp = ( ( float(_we->x()) - TCO_BORDER_WIDTH ) *
-				float( m_pat -> m_steps ) ) / float(width() - TCO_BORDER_WIDTH*2);
+		float tmp = ((float(position(we).x()) - TCO_BORDER_WIDTH) *
+				float(m_pat -> m_steps)) / float(width() - TCO_BORDER_WIDTH*2);
 
 		int step = int( tmp );
 
@@ -797,7 +795,7 @@ void PatternView::wheelEvent( QWheelEvent * _we )
 		}
 
 		Note * n = m_pat->noteAtStep( step );
-		if( !n && _we->delta() > 0 )
+		if(!n && we->angleDelta().y() > 0)
 		{
 			n = m_pat->addStepNote( step );
 			n->setVolume( 0 );
@@ -806,7 +804,7 @@ void PatternView::wheelEvent( QWheelEvent * _we )
 		{
 			int vol = n->getVolume();
 
-			if( _we->delta() > 0 )
+			if(we->angleDelta().y() > 0)
 			{
 				n->setVolume( qMin( 100, vol + 5 ) );
 			}
@@ -822,11 +820,11 @@ void PatternView::wheelEvent( QWheelEvent * _we )
 				gui->pianoRoll()->update();
 			}
 		}
-		_we->accept();
+		we->accept();
 	}
 	else
 	{
-		TrackContentObjectView::wheelEvent( _we );
+		TrackContentObjectView::wheelEvent(we);
 	}
 }
 

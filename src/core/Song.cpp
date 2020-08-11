@@ -1203,7 +1203,11 @@ void Song::loadProject( const QString & fileName )
 		}
 		else
 		{
+#if (QT_VERSION >= QT_VERSION_CHECK(5,15,0))
+			QTextStream(stderr) << Engine::getSong()->errorSummary() << Qt::endl;
+#else
 			QTextStream(stderr) << Engine::getSong()->errorSummary() << endl;
+#endif
 		}
 	}
 

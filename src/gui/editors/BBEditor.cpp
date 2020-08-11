@@ -75,7 +75,7 @@ BBEditor::BBEditor( BBTrackContainer* tc ) :
 	DropToolBar *beatSelectionToolBar = addDropToolBarToTop(tr("Beat selector"));
 
 	m_bbComboBox = new ComboBox( m_toolBar );
-	m_bbComboBox->setFixedSize( 200, 22 );
+	m_bbComboBox->setFixedSize( 200, ComboBox::DEFAULT_HEIGHT );
 	m_bbComboBox->setModel( &tc->m_bbComboBoxModel );
 
 	beatSelectionToolBar->addWidget( m_bbComboBox );

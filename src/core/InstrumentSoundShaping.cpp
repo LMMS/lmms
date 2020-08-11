@@ -43,16 +43,14 @@ const float RES_PRECISION = 1000.0f;
 
 // names for env- and lfo-targets - first is name being displayed to user
 // and second one is used internally, e.g. for saving/restoring settings
-const QString InstrumentSoundShaping::targetNames[InstrumentSoundShaping::NumTargets][3] =
+const char *const InstrumentSoundShaping::targetNames[InstrumentSoundShaping::NumTargets][3] =
 {
-	{ InstrumentSoundShaping::tr( "VOLUME" ), "vol",
-			InstrumentSoundShaping::tr( "Volume" ) },
-/*	InstrumentSoundShaping::tr( "Pan" ),
-	InstrumentSoundShaping::tr( "Pitch" ),*/
-	{ InstrumentSoundShaping::tr( "CUTOFF" ), "cut",
-			InstrumentSoundShaping::tr( "Cutoff frequency" ) },
-	{ InstrumentSoundShaping::tr( "RESO" ), "res",
-			InstrumentSoundShaping::tr( "Resonance" ) }
+	{ QT_TRANSLATE_NOOP("InstrumentSoundShaping", "VOLUME"), "vol",
+			QT_TRANSLATE_NOOP("InstrumentSoundShaping", "Volume") },
+	{ QT_TRANSLATE_NOOP("InstrumentSoundShaping", "CUTOFF"), "cut",
+			QT_TRANSLATE_NOOP("InstrumentSoundShaping", "Cutoff frequency") },
+	{ QT_TRANSLATE_NOOP("InstrumentSoundShaping", "RESO"), "res",
+			QT_TRANSLATE_NOOP("InstrumentSoundShaping", "Resonance") }
 } ;
  
 
@@ -77,7 +75,7 @@ InstrumentSoundShaping::InstrumentSoundShaping(
 										value_for_zero_amount, 
 										this );
 		m_envLfoParameters[i]->setDisplayName(
-			tr( targetNames[i][2].toUtf8().constData() ) );
+			tr( targetNames[i][2] ) );
 	}
 
 	m_filterModel.addItem( tr( "Low-pass" ), make_unique<PixmapLoader>( "filter_lp" ) );

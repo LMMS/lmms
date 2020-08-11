@@ -35,7 +35,7 @@ Plugin::Descriptor PLUGIN_EXPORT carlarack_plugin_descriptor =
 {
     STRINGIFY( PLUGIN_NAME ),
     "Carla Rack",
-    QT_TRANSLATE_NOOP( "pluginBrowser",
+    QT_TRANSLATE_NOOP( "PluginBrowser",
                        "Carla Rack Instrument" ),
     "falkTX <falktx/at/falktx.com>",
     CARLA_VERSION_HEX,
