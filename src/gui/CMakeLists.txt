@@ -37,6 +37,7 @@ SET(LMMS_SRCS
 
 	gui/dialogs/FileDialog.cpp
 	gui/dialogs/VersionedSaveDialog.cpp
+	gui/dialogs/ColorChooser.cpp
 
 	gui/editors/AutomationEditor.cpp
 	gui/editors/BBEditor.cpp
