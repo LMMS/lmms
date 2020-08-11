@@ -122,7 +122,6 @@ FxLine::FxLine( QWidget * _parent, FxMixerView * _mv, int _channelIndex ) :
 	proxyWidget->setPos( 8, 145 );
 
 	connect( m_renameLineEdit, SIGNAL( editingFinished() ), this, SLOT( renameFinished() ) );
-	
 	connect( &Engine::fxMixer()->effectChannel( m_channelIndex )->m_muteModel, SIGNAL( dataChanged() ), this, SLOT( update() ) );
 	
 }
@@ -155,7 +154,6 @@ void FxLine::drawFxLine( QPainter* p, const FxLine *fxLine, bool isActive, bool 
 	bool muted = channel->m_muteModel.value();
 	QString name = channel->m_name;
 	QString elidedName = elideName( name );
-	
 	if( !m_inRename && m_renameLineEdit->text() != elidedName )
 	{
 		m_renameLineEdit->setText( elidedName );
@@ -253,7 +251,6 @@ void FxLine::contextMenuEvent( QContextMenuEvent * )
 		contextMenu->addSeparator();
 	}
 	contextMenu->addAction( embed::getIconPixmap( "cancel" ), tr( "Remove &unused channels" ), this, SLOT( removeUnusedChannels() ) );
-	
 	contextMenu->addSeparator();
 	contextMenu->addAction( embed::getIconPixmap( "colorize" ), tr( "Set channel color" ), this, SLOT( changeColor() ) );
 	contextMenu->addAction( embed::getIconPixmap( "colorize" ), tr( "Remove channel color" ), this, SLOT( resetColor() ) );
@@ -421,14 +418,11 @@ void FxLine::setStrokeInnerInactive( const QColor & c )
 void FxLine::changeColor()
 {
 	auto channel = Engine::fxMixer()->effectChannel( m_channelIndex );
-	
 	auto new_color = ColorChooser( this ).withPalette( ColorChooser::Palette::Mixer )->getColor( channel->m_color );
 	if( ! new_color.isValid() )
 	{ return; }
-	
 	channel->m_color = new_color;
 	channel->m_hasColor = true;
-	
 	update();
 }
 
@@ -445,9 +439,7 @@ void FxLine::resetColor()
 void FxLine::randomColor()
 {
 	auto channel = Engine::fxMixer()->effectChannel( m_channelIndex );
-	
 	channel->m_color = ColorChooser::getPalette( ColorChooser::Palette::Mixer )[ rand() % 48 ];
 	channel->m_hasColor = true;
-	
 	update();
 }
