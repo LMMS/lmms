@@ -535,17 +535,6 @@ void InstrumentTrack::deleteNotePluginData( NotePlayHandle* n )
 
 void InstrumentTrack::setName( const QString & _new_name )
 {
-	// when changing name of track, also change name of those patterns,
-	// which have the same name as the instrument-track
-	for( int i = 0; i < numOfTCOs(); ++i )
-	{
-		Pattern* p = dynamic_cast<Pattern*>( getTCO( i ) );
-		if( ( p != NULL && p->name() == name() ) || p->name() == "" )
-		{
-			p->setName( _new_name );
-		}
-	}
-
 	Track::setName( _new_name );
 	m_midiPort.setName( name() );
 	m_audioPort.setName( name() );

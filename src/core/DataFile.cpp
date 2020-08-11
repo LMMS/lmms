@@ -1335,6 +1335,35 @@ void DataFile::upgrade_1_3_0()
 	}
 }
 
+void DataFile::upgrade_1_3_0_alpha_1()
+{
+	QDomNodeList tracks = elementsByTagName("track");
+
+	auto clearDefaultNames = [](QDomNodeList clips, QString trackName)
+	{
+		for (int j = 0; !clips.item(j).isNull(); ++j)
+		{
+			QDomElement clip = clips.item(j).toElement();
+			QString clipName = clip.attribute("name", "");
+			if (clipName == trackName){ clip.setAttribute("name", ""); }
+		}
+	};
+
+	for (int i = 0; !tracks.item(i).isNull(); ++i)
+	{
+		QDomElement track = tracks.item(i).toElement();
+		QString trackName = track.attribute("name", "");
+
+		QDomNodeList instClips = elementsByTagName("pattern");
+		QDomNodeList autoClips = elementsByTagName("automationpattern");
+		QDomNodeList bbClips = elementsByTagName("bbtco");
+
+		clearDefaultNames(instClips, trackName);
+		clearDefaultNames(autoClips, trackName);
+		clearDefaultNames(bbClips, trackName);
+	}
+}
+
 
 void DataFile::upgrade()
 {
@@ -1417,6 +1446,7 @@ void DataFile::upgrade()
 		upgrade_1_2_0_rc3();
 		upgrade_1_2_0_rc2_42();
 	}
+	if (version < "1.3.0-alpha-1"){ upgrade_1_3_0_alpha_1(); }
 	if( version < "1.3.0" )
 	{
 		upgrade_1_3_0();
