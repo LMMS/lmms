@@ -75,7 +75,7 @@ void BBTCO::saveSettings( QDomDocument & doc, QDomElement & element )
 	element.setAttribute( "len", length() );
 	element.setAttribute( "muted", isMuted() );
 	element.setAttribute( "color", color() );
-	
+
 	if( m_useStyleColor )
 	{
 		element.setAttribute( "usestyle", 1 );
@@ -106,10 +106,10 @@ void BBTCO::loadSettings( const QDomElement & element )
 	{
 		setColor( QColor( element.attribute( "color" ).toUInt() ) );
 	}
-	
+
 	if( element.hasAttribute( "usestyle" ) )
 	{
-		if( element.attribute( "usestyle" ).toUInt() == 1 ) 
+		if( element.attribute( "usestyle" ).toUInt() == 1 )
 		{
 			m_useStyleColor = true;
 		}
@@ -212,12 +212,12 @@ void BBTCOView::paintEvent( QPaintEvent * )
 	QLinearGradient lingrad( 0, 0, 0, height() );
 	QColor c;
 	bool muted = m_bbTCO->getTrack()->isMuted() || m_bbTCO->isMuted();
-	
+
 	// state: selected, muted, default, user selected
-	c = isSelected() ? selectedColor() : ( muted ? mutedBackgroundColor() 
-		: ( m_bbTCO->m_useStyleColor ? painter.background().color() 
+	c = isSelected() ? selectedColor() : ( muted ? mutedBackgroundColor()
+		: ( m_bbTCO->m_useStyleColor ? painter.background().color()
 		: m_bbTCO->colorObj() ) );
-	
+
 	lingrad.setColorAt( 0, c.lighter( 130 ) );
 	lingrad.setColorAt( 1, c.lighter( 70 ) );
 
@@ -232,7 +232,7 @@ void BBTCOView::paintEvent( QPaintEvent * )
 	{
 		p.fillRect( rect(), c );
 	}
-	
+
 	// bar lines
 	const int lineSize = 3;
 	p.setPen( c.darker( 200 ) );
@@ -256,12 +256,12 @@ void BBTCOView::paintEvent( QPaintEvent * )
 	// inner border
 	p.setPen( c.lighter( 130 ) );
 	p.drawRect( 1, 1, rect().right() - TCO_BORDER_WIDTH,
-		rect().bottom() - TCO_BORDER_WIDTH );	
+		rect().bottom() - TCO_BORDER_WIDTH );
 
 	// outer border
 	p.setPen( c.darker( 300 ) );
 	p.drawRect( 0, 0, rect().right(), rect().bottom() );
-	
+
 	// draw the 'muted' pixmap only if the pattern was manualy muted
 	if( m_bbTCO->isMuted() )
 	{
@@ -270,11 +270,11 @@ void BBTCOView::paintEvent( QPaintEvent * )
 		p.drawPixmap( spacing, height() - ( size + spacing ),
 			embed::getIconPixmap( "muted", size, size ) );
 	}
-	
+
 	p.end();
-	
+
 	painter.drawPixmap( 0, 0, m_paintPixmap );
-	
+
 }
 
 

@@ -135,4 +135,3 @@ const QString LDF_VERSION_STRING = QString::number( LDF_MAJOR_VERSION ) + "." + 
 
 
 #endif
-

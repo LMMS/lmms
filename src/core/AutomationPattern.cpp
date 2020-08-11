@@ -898,8 +898,3 @@ void AutomationPattern::generateTangents( timeMap::const_iterator it,
 		it++;
 	}
 }
-
-
-
-
-

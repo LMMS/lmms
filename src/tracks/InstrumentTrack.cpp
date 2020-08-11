@@ -156,7 +156,7 @@ InstrumentTrack::~InstrumentTrack()
 		autoAssignMidiDevice(false);
 		s_autoAssignedTrack = NULL;
 	}
-	
+
 	// kill all running notes and the iph
 	silenceAllNotes( true );
 
