@@ -72,29 +72,30 @@ AutomationPattern::AutomationPattern( AutomationTrack * _auto_track ) :
 
 
 
-AutomationPattern::AutomationPattern( const AutomationPattern & _pat_to_copy ) :
-	TrackContentObject( _pat_to_copy.m_autoTrack ),
-	m_autoTrack( _pat_to_copy.m_autoTrack ),
-	m_objects( _pat_to_copy.m_objects ),
-	m_tension( _pat_to_copy.m_tension ),
-	m_progressionType( _pat_to_copy.m_progressionType )
+AutomationPattern::AutomationPattern(const AutomationPattern& _pat_to_copy) :
+	TrackContentObject(_pat_to_copy.m_autoTrack),
+	m_autoTrack(_pat_to_copy.m_autoTrack),
+	m_objects(_pat_to_copy.m_objects),
+	m_tension(_pat_to_copy.m_tension),
+	m_progressionType(_pat_to_copy.m_progressionType)
 {
-	for( timeMap::const_iterator it = _pat_to_copy.m_timeMap.begin();
-				it != _pat_to_copy.m_timeMap.end(); ++it )
-	{
-		m_timeMap[it.key()] = it.value();
-		m_tangents[it.key()] = _pat_to_copy.m_tangents[it.key()];
-	}
-	switch( getTrack()->trackContainer()->type() )
+	m_timeMap = timeMap(_pat_to_copy.m_timeMap);
+	m_tangents = timeMap(_pat_to_copy.m_tangents);
+	// Force a deep copy, because the previous implementation did this manually.
+	// TODO: Do we really need to do this?
+	m_timeMap.detach();
+	m_tangents.detach();
+
+	switch (getTrack()->trackContainer()->type())
 	{
 		case TrackContainer::BBContainer:
-			setAutoResize( true );
+			setAutoResize(true);
 			break;
 
 		case TrackContainer::SongContainer:
 			// move down
 		default:
-			setAutoResize( false );
+			setAutoResize(false);
 			break;
 	}
 }
@@ -178,16 +179,10 @@ const AutomationPattern::objectVector& AutomationPattern::objects() const
 
 MidiTime AutomationPattern::timeMapLength() const
 {
-	MidiTime one_bar = MidiTime(1, 0);
-	if (m_timeMap.isEmpty()) { return one_bar; }
-
-	timeMap::const_iterator it = m_timeMap.end();
-	tick_t last_tick = static_cast<tick_t>((it-1).key());
-	// if last_tick is 0 (single item at tick 0)
-	// return length as a whole bar to prevent disappearing TCO
-	if (last_tick == 0) { return one_bar; }
-
-	return MidiTime(last_tick);
+	// Find the time of the last point in the timemap, defaulting to 0 if it's empty
+	tick_t lastTick = static_cast<tick_t>(m_timeMap.isEmpty() ? 0 : m_timeMap.lastKey());
+	// Return one bar if the pattern is empty, or only contains a point at time zero
+	return (lastTick == 0) ? MidiTime(1, 0) : MidiTime(lastTick);
 }
 
 
@@ -530,33 +525,30 @@ void AutomationPattern::flipX( int length )
 
 
 
-void AutomationPattern::saveSettings( QDomDocument & _doc, QDomElement & _this )
+void AutomationPattern::saveSettings(QDomDocument & _doc, QDomElement & _this)
 {
-	_this.setAttribute( "pos", startPosition() );
-	_this.setAttribute( "len", length() );
-	_this.setAttribute( "name", name() );
-	_this.setAttribute( "prog", QString::number( progressionType() ) );
-	_this.setAttribute( "tens", QString::number( getTension() ) );
-	_this.setAttribute( "mute", QString::number( isMuted() ) );
+	_this.setAttribute("pos", startPosition());
+	_this.setAttribute("len", length());
+	_this.setAttribute("name", name());
+	_this.setAttribute("prog", QString::number(progressionType()));
+	_this.setAttribute("tens", QString::number(getTension()));
+	_this.setAttribute("mute", QString::number(isMuted()));
 
-	for( timeMap::const_iterator it = m_timeMap.begin();
-						it != m_timeMap.end(); ++it )
+	for (timeMap::const_iterator it = m_timeMap.begin(); it != m_timeMap.end(); ++it)
 	{
-		QDomElement element = _doc.createElement( "time" );
-		element.setAttribute( "pos", it.key() );
-		element.setAttribute( "value", it.value() );
-		_this.appendChild( element );
+		QDomElement element = _doc.createElement("time");
+		element.setAttribute("pos", it.key());
+		element.setAttribute("value", it.value());
+		_this.appendChild(element);
 	}
 
-	for( objectVector::const_iterator it = m_objects.begin();
-						it != m_objects.end(); ++it )
+	for (const auto model: m_objects)
 	{
-		if( *it )
+		if (!model.isNull())
 		{
-			QDomElement element = _doc.createElement( "object" );
-			element.setAttribute( "id",
-				ProjectJournal::idToSave( ( *it )->id() ) );
-			_this.appendChild( element );
+			QDomElement element = _doc.createElement("object");
+			element.setAttribute("id", ProjectJournal::idToSave(model->id()));
+			_this.appendChild(element);
 		}
 	}
 }
@@ -635,30 +627,26 @@ TrackContentObjectView * AutomationPattern::createView( TrackView * _tv )
 
 
 
-bool AutomationPattern::isAutomated( const AutomatableModel * _m )
+bool AutomationPattern::isAutomated(const AutomatableModel* _m)
 {
-	TrackContainer::TrackList l;
-	l += Engine::getSong()->tracks();
-	l += Engine::getBBTrackContainer()->tracks();
-	l += Engine::getSong()->globalAutomationTrack();
+	TrackContainer::TrackList trackList;
+	trackList += Engine::getSong()->tracks();
+	trackList += Engine::getBBTrackContainer()->tracks();
+	trackList += Engine::getSong()->globalAutomationTrack();
 
-	for( TrackContainer::TrackList::ConstIterator it = l.begin(); it != l.end(); ++it )
+	for (const Track* track: trackList)
 	{
-		if( ( *it )->type() == Track::AutomationTrack ||
-			( *it )->type() == Track::HiddenAutomationTrack )
+		if (track->type() == Track::AutomationTrack ||
+		    track->type() == Track::HiddenAutomationTrack)
 		{
-			const Track::tcoVector & v = ( *it )->getTCOs();
-			for( Track::tcoVector::ConstIterator j = v.begin(); j != v.end(); ++j )
+			const Track::tcoVector& tcoVector = track->getTCOs();
+			for (const TrackContentObject* tco: tcoVector)
 			{
-				const AutomationPattern * a = dynamic_cast<const AutomationPattern *>( *j );
-				if( a && a->hasAutomation() )
+				const AutomationPattern * a = dynamic_cast<const AutomationPattern *>(tco);
+				if (a && a->hasAutomation())
 				{
-					for( objectVector::const_iterator k = a->m_objects.begin(); k != a->m_objects.end(); ++k )
-					{
-						if( *k == _m )
-						{
-							return true;
-						}
+					for (const auto model: a->m_objects) {
+						if(model == _m) { return true; }
 					}
 				}
 			}
@@ -671,42 +659,39 @@ bool AutomationPattern::isAutomated( const AutomatableModel * _m )
 /*! \brief returns a list of all the automation patterns everywhere that are connected to a specific model
  *  \param _m the model we want to look for
  */
-QVector<AutomationPattern *> AutomationPattern::patternsForModel( const AutomatableModel * _m )
+QVector<AutomationPattern *> AutomationPattern::patternsForModel(const AutomatableModel* _m)
 {
-	QVector<AutomationPattern *> patterns;
-	TrackContainer::TrackList l;
-	l += Engine::getSong()->tracks();
-	l += Engine::getBBTrackContainer()->tracks();
-	l += Engine::getSong()->globalAutomationTrack();
+	QVector<AutomationPattern*> patterns;
+	TrackContainer::TrackList trackList;
+	trackList += Engine::getSong()->tracks();
+	trackList += Engine::getBBTrackContainer()->tracks();
+	trackList += Engine::getSong()->globalAutomationTrack();
 
 	// go through all tracks...
-	for( TrackContainer::TrackList::ConstIterator it = l.begin(); it != l.end(); ++it )
+	for (const Track* track: trackList)
 	{
 		// we want only automation tracks...
-		if( ( *it )->type() == Track::AutomationTrack ||
-			( *it )->type() == Track::HiddenAutomationTrack )
+		if (track->type() == Track::AutomationTrack ||
+		    track->type() == Track::HiddenAutomationTrack )
 		{
 			// get patterns in those tracks....
-			const Track::tcoVector & v = ( *it )->getTCOs();
+			const Track::tcoVector& tcoVector = track->getTCOs();
 			// go through all the patterns...
-			for( Track::tcoVector::ConstIterator j = v.begin(); j != v.end(); ++j )
+			for (TrackContentObject* tco: tcoVector)
 			{
-				AutomationPattern * a = dynamic_cast<AutomationPattern *>( *j );
+				auto a = dynamic_cast<AutomationPattern*>(tco);
 				// check that the pattern has automation
-				if( a && a->hasAutomation() )
+				if (a && a->hasAutomation())
 				{
 					// now check is the pattern is connected to the model we want by going through all the connections
 					// of the pattern
 					bool has_object = false;
-					for( objectVector::const_iterator k = a->m_objects.begin(); k != a->m_objects.end(); ++k )
+					for (const auto model: a->m_objects)
 					{
-						if( *k == _m )
-						{
-							has_object = true;
-						}
+						if (model == _m) { has_object = true; }
 					}
 					// if the patterns is connected to the model, add it to the list
-					if( has_object ) { patterns += a; }
+					if (has_object) { patterns += a; }
 				}
 			}
 		}
@@ -716,29 +701,24 @@ QVector<AutomationPattern *> AutomationPattern::patternsForModel( const Automata
 
 
 
-AutomationPattern * AutomationPattern::globalAutomationPattern(
-							AutomatableModel * _m )
+AutomationPattern* AutomationPattern::globalAutomationPattern(AutomatableModel* _m)
 {
-	AutomationTrack * t = Engine::getSong()->globalAutomationTrack();
-	Track::tcoVector v = t->getTCOs();
-	for( Track::tcoVector::const_iterator j = v.begin(); j != v.end(); ++j )
+	AutomationTrack* track = Engine::getSong()->globalAutomationTrack();
+	Track::tcoVector tcoVector = track->getTCOs();
+	for (TrackContentObject* tco: tcoVector)
 	{
-		AutomationPattern * a = dynamic_cast<AutomationPattern *>( *j );
-		if( a )
+		auto a = dynamic_cast<AutomationPattern*>(tco);
+		if (a)
 		{
-			for( objectVector::const_iterator k = a->m_objects.begin();
-												k != a->m_objects.end(); ++k )
+			for (const auto model: a->m_objects)
 			{
-				if( *k == _m )
-				{
-					return a;
-				}
+				if (model == _m) { return a; }
 			}
 		}
 	}
 
-	AutomationPattern * a = new AutomationPattern( t );
-	a->addObject( _m, false );
+	AutomationPattern* a = new AutomationPattern(track);
+	a->addObject(_m, false);
 	return a;
 }
 
@@ -747,51 +727,37 @@ AutomationPattern * AutomationPattern::globalAutomationPattern(
 
 void AutomationPattern::resolveAllIDs()
 {
-	TrackContainer::TrackList l = Engine::getSong()->tracks() +
-				Engine::getBBTrackContainer()->tracks();
-	l += Engine::getSong()->globalAutomationTrack();
-	for( TrackContainer::TrackList::iterator it = l.begin();
-							it != l.end(); ++it )
+	TrackContainer::TrackList trackList = Engine::getSong()->tracks();
+	trackList += Engine::getBBTrackContainer()->tracks();
+	trackList += Engine::getSong()->globalAutomationTrack();
+
+	for (const Track* track: trackList)
 	{
-		if( ( *it )->type() == Track::AutomationTrack ||
-			 ( *it )->type() == Track::HiddenAutomationTrack )
+		if (track->type() == Track::AutomationTrack ||
+		    track->type() == Track::HiddenAutomationTrack)
 		{
-			Track::tcoVector v = ( *it )->getTCOs();
-			for( Track::tcoVector::iterator j = v.begin();
-							j != v.end(); ++j )
+			Track::tcoVector tcoVector = track->getTCOs();
+			for (TrackContentObject* tco: tcoVector)
 			{
-				AutomationPattern * a = dynamic_cast<AutomationPattern *>( *j );
-				if( a )
+				AutomationPattern* a = dynamic_cast<AutomationPattern *>(tco);
+				if (a)
 				{
-					for( QVector<jo_id_t>::Iterator k = a->m_idsToResolve.begin();
-									k != a->m_idsToResolve.end(); ++k )
+					for (const jo_id_t id: a->m_idsToResolve)
 					{
-						JournallingObject * o = Engine::projectJournal()->
-														journallingObject( *k );
-						if( o && dynamic_cast<AutomatableModel *>( o ) )
-						{
-							a->addObject( dynamic_cast<AutomatableModel *>( o ), false );
-						}
-						else
-						{
-							// FIXME: Remove this block once the automation system gets fixed
-							// This is a temporary fix for https://github.com/LMMS/lmms/issues/3781
-							o = Engine::projectJournal()->journallingObject(ProjectJournal::idFromSave(*k));
-							if( o && dynamic_cast<AutomatableModel *>( o ) )
-							{
-								a->addObject( dynamic_cast<AutomatableModel *>( o ), false );
-							}
-							else
-							{
-								// FIXME: Remove this block once the automation system gets fixed
-								// This is a temporary fix for https://github.com/LMMS/lmms/issues/4781
-								o = Engine::projectJournal()->journallingObject(ProjectJournal::idToSave(*k));
-								if( o && dynamic_cast<AutomatableModel *>( o ) )
-								{
-									a->addObject( dynamic_cast<AutomatableModel *>( o ), false );
-								}
-							}
-						}
+						JournallingObject* o = Engine::projectJournal()->
+						                       journallingObject(id);
+						AutomatableModel* am = dynamic_cast<AutomatableModel*>(o);
+						if (o && am) { a->addObject(am, false); continue; }
+
+						// FIXME: Remove this block once the automation system gets fixed
+						// This is a temporary fix for https://github.com/LMMS/lmms/issues/3781
+						o = Engine::projectJournal()->journallingObject(ProjectJournal::idFromSave(id));
+						if (o && am) { a->addObject(am, false); continue; }
+
+						// FIXME: Remove this block once the automation system gets fixed
+						// This is a temporary fix for https://github.com/LMMS/lmms/issues/4781
+						o = Engine::projectJournal()->journallingObject(ProjectJournal::idToSave(id));
+						if (o && am) { a->addObject(am, false); }
 					}
 					a->m_idsToResolve.clear();
 					a->dataChanged();
@@ -843,16 +809,10 @@ void AutomationPattern::objectDestroyed( jo_id_t _id )
 
 void AutomationPattern::cleanObjects()
 {
-	for( objectVector::iterator it = m_objects.begin(); it != m_objects.end(); )
+	for (objectVector::iterator it = m_objects.begin(); it != m_objects.end();)
 	{
-		if( *it )
-		{
-			++it;
-		}
-		else
-		{
-			it = m_objects.erase( it );
-		}
+		if (*it) { ++it; }
+		else { it = m_objects.erase(it); }
 	}
 }
 
@@ -898,8 +858,3 @@ void AutomationPattern::generateTangents( timeMap::const_iterator it,
 		it++;
 	}
 }
-
-
-
-
-
