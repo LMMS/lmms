@@ -1250,7 +1250,7 @@ void TrackContentObjectView::copy( QVector<TrackContentObjectView *> tcovs )
 
 		// Copy it to the clipboard
 		QMimeData *tco_content = new QMimeData;
-		tco_content->setData( StringPairDrag::mimeType(), finalString.toUtf8() );
+		tco_content->setData( Clipboard::mimeType( Clipboard::StringPair ), finalString.toUtf8() );
 		QApplication::clipboard()->setMimeData( tco_content, QClipboard::Clipboard );
 	}
 	else
@@ -1276,7 +1276,7 @@ void TrackContentObjectView::cut( QVector<TrackContentObjectView *> tcovs )
 
 		// Copy it to the clipboard
 		QMimeData *tco_content = new QMimeData;
-		tco_content->setData( StringPairDrag::mimeType(), finalString.toUtf8() );
+		tco_content->setData( Clipboard::mimeType( Clipboard::StringPair ), finalString.toUtf8() );
 		QApplication::clipboard()->setMimeData( tco_content, QClipboard::Clipboard );
 	}
 	else
@@ -1291,7 +1291,7 @@ void TrackContentObjectView::paste()
 	// clear the QApplication Clipboard during the LMMS Clipboard copy operations (Clipboard::copy does that)
 
 	// If we have TCO data on the clipboard paste it. If not, do our regular TCO paste.
-	if( QApplication::clipboard()->mimeData( QClipboard::Clipboard )->hasFormat( StringPairDrag::mimeType() ) )
+	if( QApplication::clipboard()->mimeData( QClipboard::Clipboard )->hasFormat( Clipboard::mimeType( Clipboard::StringPair ) ) )
 	{
 		// Paste the selection on the MidiTime of the selected Track
 		const QMimeData *md = QApplication::clipboard()->mimeData( QClipboard::Clipboard );
@@ -1706,8 +1706,8 @@ bool TrackContentWidget::canPasteSelection( MidiTime tcoPos, const QDropEvent* d
 bool TrackContentWidget::canPasteSelection( MidiTime tcoPos, const QMimeData* md , bool allowSameBar )
 {
 	Track * t = getTrack();
-	QString type = StringPairDrag::decodeMimeKey( md );
-	QString value = StringPairDrag::decodeMimeValue( md );
+	QString type = Clipboard::decodeKey( md, Clipboard::mimeType( Clipboard::StringPair ) );
+	QString value = Clipboard::decodeValue( md, Clipboard::mimeType( Clipboard::StringPair ) );
 
 	// We can only paste into tracks of the same type
 	if( type != ( "tco_" + QString::number( t->type() ) ) ||
@@ -1797,8 +1797,8 @@ bool TrackContentWidget::pasteSelection( MidiTime tcoPos, const QMimeData * md, 
 		return false;
 	}
 
-	QString type = StringPairDrag::decodeMimeKey( md );
-	QString value = StringPairDrag::decodeMimeValue( md );
+	QString type = Clipboard::decodeKey( md, Clipboard::mimeType( Clipboard::StringPair ) );
+	QString value = Clipboard::decodeValue( md, Clipboard::mimeType( Clipboard::StringPair ) );
 
 	getTrack()->addJournalCheckPoint();
 
@@ -2000,7 +2000,7 @@ void TrackContentWidget::contextMenuEvent( QContextMenuEvent * cme )
 	// If we don't have TCO data in the clipboard there's no need to create this menu
 	// since "paste" is the only action at the moment.
 	const QMimeData *md = QApplication::clipboard()->mimeData( QClipboard::Clipboard );
-	if( !md->hasFormat( StringPairDrag::mimeType() )  )
+	if( !md->hasFormat( Clipboard::mimeType( Clipboard::StringPair ) )  )
 	{
 		return;
 	}

@@ -3891,7 +3891,7 @@ void PianoRoll::copyToClipboard( const NoteVector & notes ) const
 	}
 
 	QMimeData * clip_content = new QMimeData;
-	clip_content->setData( Clipboard::mimeType(), dataFile.toString().toUtf8() );
+	clip_content->setData( Clipboard::mimeType( Clipboard::Default ), dataFile.toString().toUtf8() );
 	QApplication::clipboard()->setMimeData( clip_content,
 							QClipboard::Clipboard );
 }
@@ -3953,7 +3953,7 @@ void PianoRoll::pasteNotes()
 
 	QString value = QApplication::clipboard()
 				->mimeData( QClipboard::Clipboard )
-						->data( Clipboard::mimeType() );
+						->data( Clipboard::mimeType( Clipboard::Default ) );
 
 	if( ! value.isEmpty() )
 	{

@@ -24,6 +24,7 @@
 
 #include <QApplication>
 #include <QClipboard>
+#include <QMimeData>
 
 #include "Clipboard.h"
 #include "JournallingObject.h"
@@ -58,3 +59,16 @@ const QDomElement * Clipboard::getContent( const QString & _node_name )
 
 
 
+
+QString Clipboard::decodeKey( const QMimeData * mimeData, const char * mimeType )
+{
+	return( QString::fromUtf8( mimeData->data( mimeType ) ).section( ':', 0, 0 ) );
+}
+
+
+
+
+QString Clipboard::decodeValue( const QMimeData * mimeData, const char * mimeType )
+{
+	return( QString::fromUtf8( mimeData->data( mimeType ) ).section( ':', 1, -1 ) );
+}

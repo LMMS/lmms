@@ -39,7 +39,6 @@
 #include "SampleBuffer.h"
 #include "AudioSampleRecorder.h"
 #include "BBTrackContainer.h"
-#include "StringPairDrag.h"
 #include "MainWindow.h"
 
 #include <limits>

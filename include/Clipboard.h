@@ -34,14 +34,33 @@ class JournallingObject;
 class Clipboard
 {
 public:
+	enum MimeType
+	{
+		StringPair,
+		Default
+	};
+
 	typedef QMap<QString, QDomElement> Map;
 
 	static void copy( JournallingObject * _object );
 	static const QDomElement * getContent( const QString & _node_name );
 
-	static const char * mimeType()
+	// Helper methods for String Pair data
+	static QString decodeKey( const QMimeData * mimeData, const char * mimeType );
+	static QString decodeValue( const QMimeData * mimeData, const char * mimeType );
+
+	static const char * mimeType( MimeType type )
 	{
-		return( "application/x-lmms-clipboard" );
+		switch( type )
+		{
+			case Clipboard::StringPair:
+				return( "application/x-lmms-stringpair" );
+			break;
+			case Clipboard::Default:
+			default:
+				return( "application/x-lmms-clipboard" );
+				break;
+		}
 	}
 
 

@@ -33,6 +33,7 @@
 #include "Lv2SubPluginFeatures.h"
 #include "Mixer.h"
 #include "StringPairDrag.h"
+#include "Clipboard.h"
 
 #include "embed.h"
 #include "plugin_export.h"
@@ -240,10 +241,10 @@ void Lv2InsView::dragEnterEvent(QDragEnterEvent *_dee)
 {
 	void (QDragEnterEvent::*reaction)(void) = &QDragEnterEvent::ignore;
 
-	if (_dee->mimeData()->hasFormat(StringPairDrag::mimeType()))
+	if (_dee->mimeData()->hasFormat( Clipboard::mimeType( Clipboard::StringPair )))
 	{
 		const QString txt =
-			_dee->mimeData()->data(StringPairDrag::mimeType());
+			_dee->mimeData()->data( Clipboard::mimeType( Clipboard::StringPair ) );
 		if (txt.section(':', 0, 0) == "pluginpresetfile") {
 			reaction = &QDragEnterEvent::acceptProposedAction;
 		}

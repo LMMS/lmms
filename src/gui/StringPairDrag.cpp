@@ -32,6 +32,7 @@
 #include "StringPairDrag.h"
 #include "GuiApplication.h"
 #include "MainWindow.h"
+#include "Clipboard.h"
 
 
 StringPairDrag::StringPairDrag( const QString & _key, const QString & _value,
@@ -51,7 +52,7 @@ StringPairDrag::StringPairDrag( const QString & _key, const QString & _value,
 	}
 	QString txt = _key + ":" + _value;
 	QMimeData * m = new QMimeData();
-	m->setData( mimeType(), txt.toUtf8() );
+	m->setData( Clipboard::mimeType( Clipboard::StringPair ), txt.toUtf8() );
 	setMimeData( m );
 	exec( Qt::LinkAction, Qt::LinkAction );
 }
@@ -75,11 +76,11 @@ StringPairDrag::~StringPairDrag()
 bool StringPairDrag::processDragEnterEvent( QDragEnterEvent * _dee,
 						const QString & _allowed_keys )
 {
-	if( !_dee->mimeData()->hasFormat( mimeType() ) )
+	if( !_dee->mimeData()->hasFormat( Clipboard::mimeType( Clipboard::StringPair ) ) )
 	{
 		return( false );
 	}
-	QString txt = _dee->mimeData()->data( mimeType() );
+	QString txt = _dee->mimeData()->data( Clipboard::mimeType( Clipboard::StringPair ) );
 	if( _allowed_keys.split( ',' ).contains( txt.section( ':', 0, 0 ) ) )
 	{
 		_dee->acceptProposedAction();
@@ -92,25 +93,9 @@ bool StringPairDrag::processDragEnterEvent( QDragEnterEvent * _dee,
 
 
 
-QString StringPairDrag::decodeMimeKey( const QMimeData * mimeData )
-{
-	return( QString::fromUtf8( mimeData->data( mimeType() ) ).section( ':', 0, 0 ) );
-}
-
-
-
-
-QString StringPairDrag::decodeMimeValue( const QMimeData * mimeData )
-{
-	return( QString::fromUtf8( mimeData->data( mimeType() ) ).section( ':', 1, -1 ) );
-}
-
-
-
-
 QString StringPairDrag::decodeKey( QDropEvent * _de )
 {
-	return decodeMimeKey( _de->mimeData() );
+	return Clipboard::decodeKey( _de->mimeData(), Clipboard::mimeType( Clipboard::StringPair ) );
 }
 
 
@@ -118,5 +103,5 @@ QString StringPairDrag::decodeKey( QDropEvent * _de )
 
 QString StringPairDrag::decodeValue( QDropEvent * _de )
 {
-	return decodeMimeValue( _de->mimeData() );
+	return Clipboard::decodeValue( _de->mimeData(), Clipboard::mimeType( Clipboard::StringPair ) );
 }
