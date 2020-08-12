@@ -60,15 +60,15 @@ const QDomElement * Clipboard::getContent( const QString & _node_name )
 
 
 
-QString Clipboard::decodeKey( const QMimeData * mimeData, const char * mimeType )
+QString Clipboard::decodeKey( const QMimeData * mimeData )
 {
-	return( QString::fromUtf8( mimeData->data( mimeType ) ).section( ':', 0, 0 ) );
+	return( QString::fromUtf8( mimeData->data( mimeType( StringPair ) ) ).section( ':', 0, 0 ) );
 }
 
 
 
 
-QString Clipboard::decodeValue( const QMimeData * mimeData, const char * mimeType )
+QString Clipboard::decodeValue( const QMimeData * mimeData )
 {
-	return( QString::fromUtf8( mimeData->data( mimeType ) ).section( ':', 1, -1 ) );
+	return( QString::fromUtf8( mimeData->data( mimeType( StringPair ) ) ).section( ':', 1, -1 ) );
 }

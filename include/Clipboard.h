@@ -46,8 +46,8 @@ public:
 	static const QDomElement * getContent( const QString & _node_name );
 
 	// Helper methods for String Pair data
-	static QString decodeKey( const QMimeData * mimeData, const char * mimeType );
-	static QString decodeValue( const QMimeData * mimeData, const char * mimeType );
+	static QString decodeKey( const QMimeData * mimeData );
+	static QString decodeValue( const QMimeData * mimeData );
 
 	static const char * mimeType( MimeType type )
 	{

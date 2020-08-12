@@ -1706,8 +1706,8 @@ bool TrackContentWidget::canPasteSelection( MidiTime tcoPos, const QDropEvent* d
 bool TrackContentWidget::canPasteSelection( MidiTime tcoPos, const QMimeData* md , bool allowSameBar )
 {
 	Track * t = getTrack();
-	QString type = Clipboard::decodeKey( md, Clipboard::mimeType( Clipboard::StringPair ) );
-	QString value = Clipboard::decodeValue( md, Clipboard::mimeType( Clipboard::StringPair ) );
+	QString type = Clipboard::decodeKey( md );
+	QString value = Clipboard::decodeValue( md );
 
 	// We can only paste into tracks of the same type
 	if( type != ( "tco_" + QString::number( t->type() ) ) ||
@@ -1797,8 +1797,8 @@ bool TrackContentWidget::pasteSelection( MidiTime tcoPos, const QMimeData * md, 
 		return false;
 	}
 
-	QString type = Clipboard::decodeKey( md, Clipboard::mimeType( Clipboard::StringPair ) );
-	QString value = Clipboard::decodeValue( md, Clipboard::mimeType( Clipboard::StringPair ) );
+	QString type = Clipboard::decodeKey( md );
+	QString value = Clipboard::decodeValue( md );
 
 	getTrack()->addJournalCheckPoint();
 
