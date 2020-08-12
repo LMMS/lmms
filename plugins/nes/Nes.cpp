@@ -44,7 +44,7 @@ Plugin::Descriptor PLUGIN_EXPORT nes_plugin_descriptor =
 {
 	STRINGIFY( PLUGIN_NAME ),
 	"Nescaline",
-	QT_TRANSLATE_NOOP( "pluginBrowser",
+	QT_TRANSLATE_NOOP( "PluginBrowser",
 				"A NES-like synthesizer" ),
 	"Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>",
 	0x0100,

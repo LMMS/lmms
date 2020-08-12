@@ -41,7 +41,7 @@ Plugin::Descriptor PLUGIN_EXPORT peakcontrollereffect_plugin_descriptor =
 {
 	STRINGIFY( PLUGIN_NAME ),
 	"Peak Controller",
-	QT_TRANSLATE_NOOP( "pluginBrowser",
+	QT_TRANSLATE_NOOP( "PluginBrowser",
 			"Plugin for controlling knobs with sound peaks" ),
 	"Paul Giblock <drfaygo/at/gmail.com>",
 	0x0100,

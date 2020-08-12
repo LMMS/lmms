@@ -374,7 +374,7 @@ manageVSTEffectView::manageVSTEffectView( VstEffect * _eff, VstEffectControls * 
 		{
 			sprintf( paramStr, "%d", i);
 			m_vi->knobFModel[ i ] = new FloatModel( LocaleHelper::toFloat(s_dumpValues.at(2)),
-					0.0f, 1.0f, 0.01f, _eff, tr( paramStr ) );
+					0.0f, 1.0f, 0.01f, _eff, paramStr );
 		}
 
 		FloatModel * model = m_vi->knobFModel[i];

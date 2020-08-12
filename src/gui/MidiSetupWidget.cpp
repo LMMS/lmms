@@ -31,7 +31,7 @@
 
 MidiSetupWidget::MidiSetupWidget(const QString & caption, const QString & configSection,
 	const QString & devName, QWidget * parent) :
-	TabWidget(TabWidget::tr("Settings for %1").arg(tr(caption.toLatin1())), parent),
+	TabWidget(TabWidget::tr("Settings for %1").arg(tr(caption.toUtf8())), parent),
 	m_configSection(configSection),
 	m_device(nullptr)
 {
