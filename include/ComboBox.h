@@ -49,7 +49,7 @@ public:
 		return castModel<ComboBoxModel>();
 	}
 
-	static const int DEFAULT_HEIGHT = 22;
+	static constexpr int DEFAULT_HEIGHT = 22;
 
 public slots:
 	void selectNext();
