@@ -37,6 +37,7 @@ SET(LMMS_SRCS
 
 	gui/dialogs/FileDialog.cpp
 	gui/dialogs/VersionedSaveDialog.cpp
+	gui/dialogs/ColorChooser.cpp
 
 	gui/editors/AutomationEditor.cpp
 	gui/editors/BBEditor.cpp
@@ -81,6 +82,7 @@ SET(LMMS_SRCS
 	gui/widgets/NStateButton.cpp
 	gui/widgets/Oscilloscope.cpp
 	gui/widgets/PixmapButton.cpp
+	gui/widgets/PositionLine.cpp
 	gui/widgets/ProjectNotes.cpp
 	gui/widgets/RenameDialog.cpp
 	gui/widgets/Rubberband.cpp

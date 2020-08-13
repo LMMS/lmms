@@ -45,7 +45,9 @@ public:
 	//API used by PianoRoll
 	void setPixelsPerBar(int ppb);
 	void setCurrentPosition(MidiTime currentPosition);
+	void setMargins(const QMargins &qm);
 	void setBottomMargin(const int marginBottom);
+	QMargins margins();
 
 	//API used by StepRecorder
 	void setStepsLength(MidiTime stepsLength);

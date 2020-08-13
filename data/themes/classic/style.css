@@ -118,7 +118,7 @@ QMenu::indicator:selected {
 	background-color: #747474;
 }
 
-positionLine {
+PositionLine {
 	qproperty-tailGradient: false;
 	qproperty-lineColor: rgb(255, 255, 255);
 }
@@ -138,6 +138,17 @@ PianoRoll {
 	qproperty-ghostNoteBorders: true;
 	qproperty-barColor: #4afd85;
 	qproperty-markedSemitoneColor: rgba( 0, 255, 200, 60 );
+	/* Piano keys */
+	qproperty-whiteKeyWidth: 64;
+	qproperty-whiteKeyActiveTextColor: #000;
+	qproperty-whiteKeyActiveTextShadow: rgb( 240, 240, 240 );
+	qproperty-whiteKeyActiveBackground: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #43e97b, stop:1 #3bcd6c);
+	qproperty-whiteKeyInactiveTextColor: rgb( 128, 128, 128);
+	qproperty-whiteKeyInactiveTextShadow: rgb( 240, 240, 240 );
+	qproperty-whiteKeyInactiveBackground: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #eeeeee, stop:1 #ffffff);
+	qproperty-blackKeyWidth: 48;
+	qproperty-blackKeyActiveBackground: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #43e97b, stop:1 #3bcd6c);
+	qproperty-blackKeyInactiveBackground: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #333, stop:1 #000);
 	/* Grid colors */
 	qproperty-lineColor: rgba( 128, 128, 128, 80 );
 	qproperty-beatLineColor: rgba( 128, 128, 128, 160 );
