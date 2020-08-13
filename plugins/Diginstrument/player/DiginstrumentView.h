@@ -7,7 +7,7 @@
 #include <QLineEdit>
 #include <QFileDialog>
 
-class DiginstrumentView : public InstrumentViewFixedSize /*TMP: fixed size */
+class DiginstrumentView : public InstrumentView
 {
     Q_OBJECT
   public:

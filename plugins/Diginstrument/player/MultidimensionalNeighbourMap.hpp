@@ -80,7 +80,7 @@ class MultidimensionalNeighbourMap
 public:
   std::vector<std::vector<V>> getNeighbours(const std::vector<K> & coordinates);
   std::vector<std::vector<V>> getNeighbours(const std::vector<K> & coordinates, std::vector<std::vector<K>> & labels);
-  V processIntoRoot(const std::vector<K> & coordinates, std::function<V(V, V, K, K, K ,bool)> processor);
+  V processIntoRoot(const std::vector<K> & coordinates, std::function<V(V, V, K, K, K, unsigned int)> processor);
   void insert(const V &value, const std::vector<K> &coordinates);
   unsigned int getDimensions() const { return this->dimensions; }
   void clear();
@@ -93,7 +93,7 @@ private:
   static std::pair<const MultidimensionalNeighbourMapEntry<K, V> *, const MultidimensionalNeighbourMapEntry<K, V> *> findNeighboursOnOneDimension(const std::vector<MultidimensionalNeighbourMapEntry<K, V>> &array, const K &coordinate);
   static void getNeighboursRecursiveCall(const std::vector<MultidimensionalNeighbourMapEntry<K,V>> & array, const std::vector<K> & coordinates, unsigned int level, std::vector<std::vector<V>> & result);
   static void getNeighboursRecursiveCall(const std::vector<MultidimensionalNeighbourMapEntry<K,V>> & array, const std::vector<K> & coordinates, unsigned int level, std::vector<std::vector<V>> & result, std::vector<std::vector<K>> & labels);
-  static V processIntoRootRecursiveCall(const std::vector<MultidimensionalNeighbourMapEntry<K,V>> & array, const std::vector<K> & coordinates, unsigned int level, std::function<V(V, V, K, K, K ,bool)> processor);
+  static V processIntoRootRecursiveCall(const std::vector<MultidimensionalNeighbourMapEntry<K,V>> & array, const std::vector<K> & coordinates, unsigned int level, std::function<V(V, V, K, K, K, unsigned int)> processor);
 
   std::vector<MultidimensionalNeighbourMapEntry<K, V>> data;
   unsigned int dimensions = 0;
@@ -281,14 +281,14 @@ void MultidimensionalNeighbourMap<K, V>::clear()
 }
 
 template <typename K, typename V>
-V MultidimensionalNeighbourMap<K, V>::processIntoRoot(const std::vector<K> & coordinates, std::function<V(V, V, K, K, K, bool)> processor)
+V MultidimensionalNeighbourMap<K, V>::processIntoRoot(const std::vector<K> & coordinates, std::function<V(V, V, K, K, K, unsigned int)> processor)
 {
   //starting from root
   return processIntoRootRecursiveCall(data, coordinates, 0, processor);
 }
 
 template <typename K, typename V>
-V MultidimensionalNeighbourMap<K, V>::processIntoRootRecursiveCall(const std::vector<MultidimensionalNeighbourMapEntry<K,V>> & array, const std::vector<K> & coordinates, unsigned int level, std::function<V(V, V, K, K, K ,bool)> processor)
+V MultidimensionalNeighbourMap<K, V>::processIntoRootRecursiveCall(const std::vector<MultidimensionalNeighbourMapEntry<K,V>> & array, const std::vector<K> & coordinates, unsigned int level, std::function<V(V, V, K, K, K, unsigned int)> processor)
 {
   //TODO: deeper testing, complexity
   auto neighbours = findNeighboursOnOneDimension(array, coordinates[level]);
@@ -296,22 +296,19 @@ V MultidimensionalNeighbourMap<K, V>::processIntoRootRecursiveCall(const std::ve
   {
     if(neighbours.first && neighbours.second)
     {
-      return processor(neighbours.first->getValue(), neighbours.second->getValue(), coordinates[level], neighbours.first->key, neighbours.second->key, /*TODO*/ false);
+      return processor(neighbours.first->getValue(), neighbours.second->getValue(), coordinates[level], neighbours.first->key, neighbours.second->key, level);
     }
     if(neighbours.first) return neighbours.first->getValue();
     if(neighbours.second) return neighbours.second->getValue();
   }
-  else
+  if(neighbours.first && neighbours.second)
   {
-    if(neighbours.first && neighbours.second)
-    {
-      return processor(
-        processIntoRootRecursiveCall(neighbours.first->getNext(), coordinates, level+1, processor),
-        processIntoRootRecursiveCall(neighbours.second->getNext(), coordinates, level+1, processor),
-        coordinates[level], neighbours.first->key, neighbours.second->key, /*TODO*/ false
-      );
-    }
-    if(neighbours.first) return processIntoRootRecursiveCall(neighbours.first->getNext(), coordinates, level+1, processor);
-    if(neighbours.second) return processIntoRootRecursiveCall(neighbours.second->getNext(), coordinates, level+1, processor);
+    return processor(
+      processIntoRootRecursiveCall(neighbours.first->getNext(), coordinates, level+1, processor),
+      processIntoRootRecursiveCall(neighbours.second->getNext(), coordinates, level+1, processor),
+      coordinates[level], neighbours.first->key, neighbours.second->key, level
+    );
   }
+  if(neighbours.first) return processIntoRootRecursiveCall(neighbours.first->getNext(), coordinates, level+1, processor);
+  /*if(neighbours.second)*/ return processIntoRootRecursiveCall(neighbours.second->getNext(), coordinates, level+1, processor);
 }

@@ -10,8 +10,11 @@ template <typename T, class S>
 std::vector<Diginstrument::Component<T>> Diginstrument::Interpolator<T, S>::getSpectrum(const std::vector<T> &coordinates)
 {
     //TODO: tmp: quality parameter
-    //TODO: use lambda with capture!
-    return data.processIntoRoot(coordinates, interpolateSpectra).getComponents(0);
+    return data.processIntoRoot(coordinates,
+        [this](const S &left, const S &right, const T &target, const T &leftLabel, const T &rightLabel, const unsigned int dimension)
+        {
+            return interpolateSpectra(left, right, target, leftLabel, rightLabel, dimensions[dimension].second);
+        }).getComponents(0);
 }
 
 template <typename T, class S>
@@ -38,20 +41,17 @@ S Diginstrument::Interpolator<T, S>::interpolateSpectra(const S &left, const S &
     vector<unsigned int> unmatchedLeft;
     vector<unsigned int> unmatchedRight;
 
-    //tmp debug
-    cout<<rightLabel<<" "<<leftLabel<<endl;
-
     const T rightWeight = target / (rightLabel - leftLabel);
     const T leftWeight = 1.0f - rightWeight;
     const T leftRatio = target / leftLabel;
     const T rightRatio = target / rightLabel;
 
-    const auto leftHarmonics = left.getHarmonics();
-    const auto rightHarmonics = right.getHarmonics();
+    auto leftHarmonics = left.getHarmonics();
+    auto rightHarmonics = right.getHarmonics();
     //TODO: acts weird if i hit an exact point (eg. 440)
     //TODO: acts even weirder with snare test: 4 spectra on same "pitch" and different time coordinates
 
-    if (left.empty())
+    if (left.empty() || !shifting)
     {
         //return attenuated right
         unmatchedRight.resize(rightHarmonics.size());
@@ -60,7 +60,7 @@ S Diginstrument::Interpolator<T, S>::interpolateSpectra(const S &left, const S &
             unmatchedRight[i]=i;
         }
     }
-    else if (right.empty())
+    if (right.empty() || !shifting)
     {
         //return attenuated left
         unmatchedLeft.resize(leftHarmonics.size());
@@ -69,7 +69,7 @@ S Diginstrument::Interpolator<T, S>::interpolateSpectra(const S &left, const S &
             unmatchedLeft[i]=i;
         }
     }
-    else
+    if(shifting && !right.empty() && !left.empty())
     {
         //1) match peaks
         //TODO: generalize
@@ -77,12 +77,12 @@ S Diginstrument::Interpolator<T, S>::interpolateSpectra(const S &left, const S &
         auto matches = PeakMatcher::matchPeaks(left.getHarmonics(), right.getHarmonics(), unmatchedLeft, unmatchedRight);
 
         //debug
-        cout << "number of harmonics: " << leftHarmonics.size() << " " << rightHarmonics.size() << endl;
-        cout << "matches" << endl;
+        //cout << "number of harmonics: " << leftHarmonics.size() << " " << rightHarmonics.size() << endl;
+        //cout << "matches" << endl;
         for (auto &match : matches)
         {
             //tmp:debug
-            std::cout << leftHarmonics[match.left].frequency << " - " << rightHarmonics[match.right].frequency << " : " << match.distance << std::endl;
+            //std::cout << leftHarmonics[match.left].frequency << " - " << rightHarmonics[match.right].frequency << " : " << match.distance << std::endl;
             //tmp
             if (leftHarmonics[match.left].frequency == rightHarmonics[match.right].frequency)
             {
@@ -94,8 +94,20 @@ S Diginstrument::Interpolator<T, S>::interpolateSpectra(const S &left, const S &
                 harmonics.emplace_back((leftHarmonics[match.left].frequency * leftRatio + rightHarmonics[match.right].frequency * rightRatio) / 2.0, 0, leftHarmonics[match.left].amplitude * leftWeight + rightHarmonics[match.right].amplitude * rightWeight);
             }
         }
+        //TODO: idea: unmatched overtones should be shifted up and then attenuated
+        //TODO: TMP: FIXME: this assumes all components are to be shifted
+        //TODO: TMP: FIXME: we assume that the first match is the fundamental frequency
+        for(auto & overtone : unmatchedLeft)
+        {
+            leftHarmonics[overtone].frequency = leftHarmonics[overtone].frequency * (target/leftHarmonics[matches.front().left].frequency);
+        }
+        for(auto & overtone : unmatchedRight)
+        {
+            rightHarmonics[overtone].frequency = rightHarmonics[overtone].frequency * (target/rightHarmonics[matches.front().left].frequency);
+        }
     }
 
+    //TODO: why am i handling unmatched left and right separately?
     //tmp TODO: unmatched are still added, but no shifting for now
     for (auto &unmatched : unmatchedLeft)
     {
@@ -107,7 +119,7 @@ S Diginstrument::Interpolator<T, S>::interpolateSpectra(const S &left, const S &
     }
 
     //tmp: debug
-    cout << "unmatched left: ";
+    /*cout << "unmatched left: ";
     for (auto e : unmatchedLeft)
     {
         cout << leftHarmonics[e].frequency << " ";
@@ -118,10 +130,8 @@ S Diginstrument::Interpolator<T, S>::interpolateSpectra(const S &left, const S &
     {
         cout << rightHarmonics[e].frequency << " ";
     }
-    cout << endl;
+    cout << endl;*/
 
-    //tmp:debug: so the dimensions get mixed when there is an unary node. Eg: rightLabel: 0, leftLabel: 440
-    cout<<target<<endl;
     return Diginstrument::NoteSpectrum<double>(target, harmonics, {});
 }
 

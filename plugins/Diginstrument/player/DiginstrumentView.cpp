@@ -1,7 +1,7 @@
 #include "DiginstrumentView.h"
 
 DiginstrumentView::DiginstrumentView( Instrument * _instrument, QWidget * _parent ) :
-  InstrumentViewFixedSize(_instrument, _parent)
+  InstrumentView(_instrument, _parent)
 {
     /*TODO */
     m_openInstrumentFileButton = new QPushButton( "Load instrument from file", this);

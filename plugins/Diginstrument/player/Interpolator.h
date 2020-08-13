@@ -25,7 +25,7 @@ public:
   void addSpectrum(const S &spectrum, std::vector<T> coordinates);
   void addSpectra(const std::vector<S> &spectra, std::vector<std::vector<T>> coordinates);
 
-  static S interpolateSpectra(const S & left, const S & right, const T &target, const T &leftLabel, const T &rightLabel, const bool shifting = false);
+  S interpolateSpectra(const S & left, const S & right, const T &target, const T &leftLabel, const T &rightLabel, const bool shifting);
 
   Interpolator() {}
 

@@ -1,11 +1,11 @@
 {
-    "name" : "Snare test",
+    "name" : "Bass drum",
     "spectrum_type" : "discrete",
     "dimensions" :
         [ 
             {
-                "label" : "type",
-                "shifting" : false
+               "label" : "pitch",
+               "shifting" : false
             },
             {
                 "label" : "time",
@@ -17,30 +17,30 @@
     "spectra" :
     [
         {
-            "type" : 1,
+            "pitch" : 80,
             "time" : 0,
             "components" :
             []
         },
         {
-            "type" : 1,
-            "time" : 0.12,
+            "pitch" : 80,
+            "time" : 0.05,
             "components" :
             [
-                [210, 1], [360, 0.52], [420, 0.46], [600, 0.4], [750, 0.22], [815, 0.25], [905, 0.22], [1000, 0.2]
+                [ 80, 1]
             ]
         },
         {
-            "type" : 1,
-            "time" : 0.32,
+            "pitch" : 80,
+            "time" : 0.3,
             "components" :
             [
-                [210,0.5], [360, 0.26], [420, 0.2], [600, 0.15], [750, 0.08], [815, 0.1], [905, 0.09], [1000, 0.07]
+                [ 80, 0.2]
             ]
         },
         {
-            "type" : 1,
-            "time" : 1,
+            "pitch" : 80,
+            "time" : 0.5,
             "components" :
             []
         }

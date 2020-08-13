@@ -134,7 +134,7 @@ bool DiginstrumentPlugin::loadInstrumentFile()
 				components.push_back({c[0], 0, c[1]});
 			}
 			//TODO: dynamic label
-			Diginstrument::NoteSpectrum<double> spectrum{s[dimension_labels.front()], components, {}};
+			Diginstrument::NoteSpectrum<double> spectrum{s[dimension_labels.back()], components, {}};
 			vector<double> spectrum_coordinates;
 			for(string label : dimension_labels)
 			{

@@ -9,7 +9,7 @@
         },
         {
             "label" : "time",
-            "shifting" : false
+            "shifting" : true
         }
     ],
     "coordinates" :

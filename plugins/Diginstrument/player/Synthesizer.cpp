@@ -12,15 +12,15 @@ std::vector<float> Diginstrument::Synthesizer::sinetable(0);
 std::vector<float> Diginstrument::Synthesizer::playNote(std::vector<Diginstrument::Component<double>> components, const unsigned int frames, const unsigned int offset, const unsigned int & sampleRate)
 {
     std::vector<float> res(frames, 0);
-//tmp
-    std::cout<<"components: "<<components.size()<<std::endl;
+    //tmp
+    //std::cout<<"components: "<<components.size()<<std::endl;
     int nextbank = 0;
     bank.resize(components.size());
     //ordering banks by amplitude can be a problem, if amps change close to eachother
     std::sort(components.begin(), components.end(), Component<double>::sortByAmplitudeDescending);
     for(auto & component : components)
     {//tmp
-        std::cout<<component.frequency<<" "<<component.amplitude<<std::endl;
+        //std::cout<<component.frequency<<" "<<component.amplitude<<std::endl;
         //tmp
         if (component.amplitude < 0.001)
             continue;
