@@ -62,6 +62,7 @@ QLineEdit {
 	border: 1px;
 	background: #101213;
 	color: #d1d8e4;
+	selection-background-color: #17793b;
 }
 
 QLineEdit:read-only {
