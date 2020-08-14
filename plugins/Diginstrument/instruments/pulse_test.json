@@ -1,0 +1,51 @@
+{
+    "name" : "Pure Sine",
+    "spectrum_type" : "discrete",
+    "coordinates" :
+        [ "pitch", "time"],
+    "data_coordinates" :
+        [ "frequency", "amplitude" ],
+    "spectra" :
+    [
+        {
+            "pitch" : 20,
+            "time" : 0,
+            "components" :
+            [
+                [ 20, 1]
+            ]
+        },
+        {
+            "pitch" : 20,
+            "time" : 0.5,
+            "components" :
+            [
+                [ 20, 0]
+            ]
+        },
+        {
+            "pitch" : 20000,
+            "time" : 0,
+            "components" :
+            [
+                [ 20000, 1]
+            ]
+        },
+        {
+            "pitch" : 20000,
+            "time" : 0.5,
+            "components" :
+            [
+                [ 20000, 0]
+            ]
+        },
+        {
+            "pitch" : 440,
+            "time" : 0,
+            "components" :
+            [
+                [ 440, 1], [455, 1]
+            ]
+        }
+    ]
+}

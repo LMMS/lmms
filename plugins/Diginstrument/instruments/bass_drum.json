@@ -1,0 +1,48 @@
+{
+    "name" : "Bass drum",
+    "spectrum_type" : "discrete",
+    "dimensions" :
+        [ 
+            {
+               "label" : "pitch",
+               "shifting" : false
+            },
+            {
+                "label" : "time",
+                "shifting" : true
+            }
+        ],
+    "coordinates" :
+        [ "frequency", "amplitude" ],
+    "spectra" :
+    [
+        {
+            "pitch" : 80,
+            "time" : 0,
+            "components" :
+            []
+        },
+        {
+            "pitch" : 80,
+            "time" : 0.05,
+            "components" :
+            [
+                [ 80, 1]
+            ]
+        },
+        {
+            "pitch" : 80,
+            "time" : 0.3,
+            "components" :
+            [
+                [ 80, 0.2]
+            ]
+        },
+        {
+            "pitch" : 80,
+            "time" : 0.5,
+            "components" :
+            []
+        }
+    ]
+}

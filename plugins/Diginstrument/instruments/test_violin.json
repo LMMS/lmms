@@ -1,0 +1,72 @@
+{
+    "name" : "Testing violin",
+    "spectrum_type" : "discrete",
+    "dimensions" :
+    [ 
+        {
+           "label" : "pitch",
+           "shifting" : true
+        },
+        {
+            "label" : "time",
+            "shifting" : true
+        }
+    ],
+    "coordinates" :
+        [ "frequency", "amplitude" ],
+    "spectra" :
+    [
+        {
+            "pitch" : 440,
+            "time" : 0,
+            "components" : []
+        },
+        {
+            "pitch" : 20,
+            "time" : 0,
+            "components" : []
+        },
+        {
+            "pitch" : 1500,
+            "time" : 0,
+            "components" : []
+        },
+        {
+            "pitch" : 22000,
+            "time" : 0,
+            "components" : []
+        },
+        {
+            "pitch" : 440,
+            "time" : 0.2,
+            "components" :
+            [
+                [ 440, 1], [880, 0.5], [1320, 0.33], [1760, 0.25], [2200, 0.2]
+            ]
+        },
+        {
+            "pitch" : 20,
+            "time" : 0.2,
+            "components" :
+            [
+                [ 20, 1], [40, 0.55], [60, 0.37], [80, 0.28], [100, 0.19], [120, 0.15], [140, 0.1], [160, 0.04], [180, 0.01]
+            ]
+        },
+        {
+            "pitch" : 1500,
+            "time" : 0.2,
+            "components" :
+            [
+                [ 1498, 1], [3000, 0.55]
+            ]
+        },
+        {
+            "pitch" : 22000,
+            "time" : 0.2,
+            "components" :
+            [
+                [ 22000, 1], [43882, 0.45], [66211, 0.4], [88000, 0.25]
+            ]
+        }
+    ]
+}

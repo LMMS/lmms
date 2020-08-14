@@ -68,6 +68,14 @@
         "jacobi": "cpp",
         "lu": "cpp",
         "qr": "cpp",
-        "svd": "cpp"
-    }
+        "svd": "cpp",
+        "unordered_set": "cpp",
+        "any": "cpp",
+        "forward_list": "cpp",
+        "valarray": "cpp",
+        "variant": "cpp",
+        "bit": "cpp",
+        "future": "cpp"
+    },
+    "cmake.configureOnOpen": true
 }

@@ -1,0 +1,48 @@
+{
+    "name" : "Snare test",
+    "spectrum_type" : "discrete",
+    "dimensions" :
+        [ 
+            {
+                "label" : "type",
+                "shifting" : false
+            },
+            {
+                "label" : "time",
+                "shifting" : true
+            }
+        ],
+    "coordinates" :
+        [ "frequency", "amplitude" ],
+    "spectra" :
+    [
+        {
+            "type" : 1,
+            "time" : 0,
+            "components" :
+            []
+        },
+        {
+            "type" : 1,
+            "time" : 0.12,
+            "components" :
+            [
+                [210, 1], [360, 0.52], [420, 0.46], [600, 0.4], [750, 0.22], [815, 0.25], [905, 0.22], [1000, 0.2]
+            ]
+        },
+        {
+            "type" : 1,
+            "time" : 0.32,
+            "components" :
+            [
+                [210,0.5], [360, 0.26], [420, 0.2], [600, 0.15], [750, 0.08], [815, 0.1], [905, 0.09], [1000, 0.07]
+            ]
+        },
+        {
+            "type" : 1,
+            "time" : 1,
+            "components" :
+            []
+        }
+    ]
+}

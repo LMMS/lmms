@@ -1,7 +1,7 @@
-#include "DiginstrumentView.h"
+#include "AnalyzerView.h"
 
-DiginstrumentView::DiginstrumentView( Instrument * _instrument, QWidget * _parent ) :
-  InstrumentViewFixedSize(_instrument, _parent)
+AnalyzerView::AnalyzerView(ToolPlugin * _parent ) :
+  ToolPluginView(_parent)
 {
     /*TODO */
     m_openAudioFileButton = new QPushButton( "Open file", this);
@@ -20,27 +20,27 @@ DiginstrumentView::DiginstrumentView( Instrument * _instrument, QWidget * _paren
 }
 
 
-DiginstrumentView::~DiginstrumentView()
+AnalyzerView::~AnalyzerView()
 {
 }
 
-void DiginstrumentView::modelChanged( void ){
+void AnalyzerView::modelChanged( void ){
     /*TODO */
 }
 
-void DiginstrumentView::openAudioFile( void )
+void AnalyzerView::openAudioFile( void )
 {
-	QString af = castModel<DiginstrumentPlugin>()->m_sampleBuffer.
+	QString af = castModel<AnalyzerPlugin>()->m_sampleBuffer.
 							openAudioFile();
 	if( af != "" )
 	{
-    std::string res = castModel<DiginstrumentPlugin>()->setAudioFile( af );
+    std::string res = castModel<AnalyzerPlugin>()->setAudioFile( af );
     m_textarea->setPlainText(res.c_str());
 		//Engine::getSong()->setModified();
 		//m_waveView->updateSampleRange();
 	}
 }
 
-void DiginstrumentView::copyTextEditToClipboard(void){
+void AnalyzerView::copyTextEditToClipboard(void){
   m_textarea->copy();
 }

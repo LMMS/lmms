@@ -1,17 +1,17 @@
 #pragma once
 
-#include "InstrumentView.h"
-#include "DiginstrumentPlugin.h"
+#include "ToolPluginView.h"
+#include "AnalyzerPlugin.h"
 
 #include <QPushButton>
 #include <QTextEdit>
 
-class DiginstrumentView : public InstrumentViewFixedSize /*TMP: fixed size */
+class AnalyzerView : public ToolPluginView
 {
     Q_OBJECT
   public:
-    DiginstrumentView( Instrument * _instrument, QWidget * _parent );
-	  virtual ~DiginstrumentView();
+    AnalyzerView( ToolPlugin * _parent );
+	  virtual ~AnalyzerView();
 
     /*TODO*/
 
