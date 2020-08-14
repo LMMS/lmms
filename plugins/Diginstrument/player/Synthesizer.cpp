@@ -6,6 +6,10 @@
 //tmp
 #include <iostream>
 
+//TODO: refactor, trim/remove old code
+//TODO: spline synthesis
+//TODO: how to deal with quality?
+
 unsigned int Diginstrument::Synthesizer::outSampleRate = DEFAULT_SAMPLE_RATE;
 std::vector<float> Diginstrument::Synthesizer::sinetable(0);
 
@@ -37,6 +41,7 @@ std::vector<float> Diginstrument::Synthesizer::playNote(std::vector<Diginstrumen
     return res;
 }
 
+//TODO: refactor spline synthesis
 // std::vector<float> Diginstrument::Synthesizer::playNote(const Spectrum<double> & spectrum, const unsigned int frames, const unsigned int offset, const unsigned int & sampleRate)
 // {
 //     //TODO: banks

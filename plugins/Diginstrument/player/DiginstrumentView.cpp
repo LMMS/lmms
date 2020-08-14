@@ -39,7 +39,6 @@ void DiginstrumentView::openInstrumentFile( void )
 	{
     castModel<DiginstrumentPlugin>()->setInstrumentFile( fileName );
     castModel<DiginstrumentPlugin>()->loadInstrumentFile();
-		//Engine::getSong()->setModified();
-		//m_waveView->updateSampleRange();
+		Engine::getSong()->setModified();
 	}
 }

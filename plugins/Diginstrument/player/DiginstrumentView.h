@@ -7,6 +7,7 @@
 #include <QLineEdit>
 #include <QFileDialog>
 
+//TODO: note visualization with surface
 class DiginstrumentView : public InstrumentView
 {
     Q_OBJECT

@@ -310,5 +310,6 @@ V MultidimensionalNeighbourMap<K, V>::processIntoRootRecursiveCall(const std::ve
     );
   }
   if(neighbours.first) return processIntoRootRecursiveCall(neighbours.first->getNext(), coordinates, level+1, processor);
+  //TODO: FIXME: potential nullptr if no neighbours are found (should only happen on empty maps)
   /*if(neighbours.second)*/ return processIntoRootRecursiveCall(neighbours.second->getNext(), coordinates, level+1, processor);
 }

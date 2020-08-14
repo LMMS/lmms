@@ -92,14 +92,19 @@ void DiginstrumentPlugin::sampleRateChanged()
 	this->synth.setSampleRate(Engine::mixer()->processingSampleRate());
 }
 
-//TMP
 bool DiginstrumentPlugin::setInstrumentFile(const QString & fileName)
 {
-	//tmp
 	this->fileName = fileName.toStdString();
 	return true;
 }
 
+/**
+ * Construct the instrument from the file given with setInstrumentFile()
+ **/
+//TODO: spline spectrum type
+//TODO: what fields to populate, information to display
+//TODO: actually finish discrete type loading
+//TODO: possible refactoring after multiple supported types
 bool DiginstrumentPlugin::loadInstrumentFile()
 {
 	QFile file(QString{fileName.c_str()});

@@ -15,7 +15,6 @@ template <typename T, class S>
 class Interpolator
 {
 public:
-  //TODO: references?/rvalues?
   std::vector<Component<T>> getSpectrum(const std::vector<T> &coordinates);
 
   void clear();
