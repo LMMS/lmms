@@ -24,7 +24,6 @@
  */
 #include "SampleTrack.h"
 
-#include <QColorDialog>
 #include <QDropEvent>
 #include <QFileInfo>
 #include <QMenu>

@@ -41,7 +41,6 @@
 #include <cstdlib>
 #include <ctime>
 
-#include <QColorDialog>
 #include <QLayout>
 #include <QLinearGradient>
 #include <QMenu>
@@ -59,6 +58,7 @@
 #include "BBTrackContainer.h"
 #include "ConfigManager.h"
 #include "Clipboard.h"
+#include "ColorChooser.h"
 #include "embed.h"
 #include "Engine.h"
 #include "GuiApplication.h"
@@ -618,20 +618,7 @@ void TrackContentObjectView::updatePosition()
 
 void TrackContentObjectView::changeClipColor()
 {
-	QColorDialog colorDialog( m_tco->color() );
-	QColor buffer( 0, 0, 0 );
-	
-	for( int i = 0; i < 48; i += 6 )
-	{
-		for( int j = 0; j < 6; j++ )
-		{
-			buffer.setHsl( qMax( 0, 44 * ( i / 6 ) - 1 ), 150 - 20 * j, 150 - 10 * j );
-			colorDialog.setStandardColor( i + j, buffer );
-		}
-		
-	}
-	
-	QColor new_color = colorDialog.getColor( m_tco->color() );
+	QColor new_color = ColorChooser( this ).withPalette( ColorChooser::Palette::Track )->getColor( m_tco->color() );
 	if( ! new_color.isValid() )
 	{ return; }
 	
@@ -2457,20 +2444,7 @@ QColor TrackOperationsWidget::backgroundColor()
 
 void TrackOperationsWidget::changeTrackColor()
 {
-	QColorDialog colorDialog( m_backgroundColor );
-	QColor buffer( 0, 0, 0 );
-	
-	for( int i = 0; i < 48; i += 6 )
-	{
-		for( int j = 0; j < 6; j++ )
-		{
-			buffer.setHsl( qMax( 0, 44 * ( i / 6 ) - 1 ), 150 - 20 * j, 150 - 10 * j );
-			colorDialog.setStandardColor( i + j, buffer );
-		}
-		
-	}
-	
-	QColor new_color = colorDialog.getColor( m_backgroundColor );
+	QColor new_color = ColorChooser( this ).withPalette( ColorChooser::Palette::Track )->getColor( m_backgroundColor );
 	if( ! new_color.isValid() )
 	{ return; }
 	
@@ -2489,21 +2463,7 @@ void TrackOperationsWidget::resetTrackColor()
 
 void TrackOperationsWidget::randomTrackColor()
 {
-	int index = rand() % 48;
-	QColor buffer( 0, 0, 0 );
-	
-	for( int i = 0; i < 48; i += 6 )
-	{
-		for( int j = 0; j < 6; j++ )
-		{
-			if( i + j + 1 == index )
-			{
-				buffer.setHsl( qMax( 0, 44 * ( i / 6 ) - 1 ), 150 - 20 * j, 150 - 10 * j );	
-				break;
-			}
-		}
-		
-	}
+	QColor buffer = ColorChooser::getPalette( ColorChooser::Palette::Track )[ rand() % 48 ];
 
 	m_backgroundColor = buffer;
 	emit colorChanged( m_backgroundColor );

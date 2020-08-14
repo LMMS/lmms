@@ -23,7 +23,6 @@
  */
 #include "AutomationPatternView.h"
 
-#include <QColorDialog>
 #include <QMouseEvent>
 #include <QPainter>
 #include <QPainterPath>

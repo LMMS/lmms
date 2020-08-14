@@ -23,7 +23,6 @@
  */
 #include "BBTrack.h"
 
-#include <QColorDialog>
 #include <QMenu>
 #include <QPainter>
 
@@ -32,8 +31,8 @@
 #include "embed.h"
 #include "Engine.h"
 #include "gui_templates.h"
-#include "MainWindow.h"
 #include "GuiApplication.h"
+#include "MainWindow.h"
 #include "Mixer.h"
 #include "RenameDialog.h"
 #include "Song.h"

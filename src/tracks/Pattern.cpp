@@ -24,25 +24,24 @@
  */
 #include "Pattern.h"
 
-#include <QTimer>
-#include <QColorDialog>
 #include <QMenu>
 #include <QMouseEvent>
 #include <QPainter>
 #include <QPushButton>
+#include <QTimer>
 
-#include "InstrumentTrack.h"
-#include "gui_templates.h"
+#include "AudioSampleRecorder.h"
+#include "BBTrackContainer.h"
 #include "embed.h"
+#include "gui_templates.h"
 #include "GuiApplication.h"
+#include "InstrumentTrack.h"
+#include "MainWindow.h"
 #include "PianoRoll.h"
 #include "RenameDialog.h"
 #include "SampleBuffer.h"
-#include "AudioSampleRecorder.h"
-#include "BBTrackContainer.h"
-#include "StringPairDrag.h"
-#include "MainWindow.h"
 #include "SongEditor.h"
+#include "StringPairDrag.h"
 
 #include <limits>
 
