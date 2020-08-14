@@ -538,9 +538,12 @@ void AutomationPattern::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	_this.setAttribute( "prog", QString::number( progressionType() ) );
 	_this.setAttribute( "tens", QString::number( getTension() ) );
 	_this.setAttribute( "mute", QString::number( isMuted() ) );
-	_this.setAttribute( "stylecolor", usesStyleColor() );
-	_this.setAttribute( "clipcolor", usesCustomClipColor() );
-	_this.setAttribute( "color", colorRgb() );
+	
+	if( ! usesStyleColor() )
+	{
+		_this.setAttribute( "color", color().name() );
+		_this.setAttribute( "isclipcolor", usesCustomClipColor() );
+	}
 
 	for( timeMap::const_iterator it = m_timeMap.begin();
 						it != m_timeMap.end(); ++it )
@@ -597,11 +600,14 @@ void AutomationPattern::loadSettings( const QDomElement & _this )
 		}
 	}
 	
-	if( _this.hasAttribute( "stylecolor" ) )
+	if( _this.hasAttribute( "color" ) )
 	{
-		useStyleColor( _this.attribute( "stylecolor" ).toInt() );
-		useCustomClipColor( _this.attribute( "clipcolor" ).toInt() );
-		setColor( _this.attribute( "color" ).toUInt() );
+		useStyleColor( false );
+		useCustomClipColor( _this.attribute( "isclipcolor" ).toInt() );
+		
+		QColor loadedColor;
+		loadedColor.setNamedColor( _this.attribute( "color" ) );
+		setColor( loadedColor );
 	}
 
 	int len = _this.attribute( "len" ).toInt();

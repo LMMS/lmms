@@ -2738,12 +2738,7 @@ void Track::saveSettings( QDomDocument & doc, QDomElement & element )
 	
 	if( hasColor )
 	{
-		element.setAttribute( "trackbgcolor", m_backgroundColor.rgb() );
-		element.setAttribute( "hascolor", 1 );
-	}
-	else
-	{
-		element.setAttribute( "hascolor", 0 );
+		element.setAttribute( "trackbgcolor", m_backgroundColor.name() );
 	}
 	
 	QDomElement tsDe = doc.createElement( nodeName() );
@@ -2798,15 +2793,10 @@ void Track::loadSettings( const QDomElement & element )
 	// Older project files that didn't have this attribute will set the value to false (issue 5562)
 	m_mutedBeforeSolo = QVariant( element.attribute( "mutedBeforeSolo", "0" ) ).toBool();
 
-	if( element.hasAttribute( "hascolor" ) )
+	if( element.hasAttribute( "trackbgcolor" ) )
 	{
-		unsigned int loadedHasColor = element.attribute( "hascolor" ).toUInt();
-		if( loadedHasColor == 1 )
-		{
-			unsigned int loadedColor = element.attribute( "trackbgcolor" ).toUInt();
-			m_backgroundColor.setRgba( loadedColor );
-			hasColor = true;
-		}
+		m_backgroundColor.setNamedColor( element.attribute( "trackbgcolor" ) );
+		hasColor = true;
 	}
 
 	if( m_simpleSerializingMode )

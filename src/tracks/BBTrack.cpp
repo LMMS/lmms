@@ -71,9 +71,11 @@ void BBTCO::saveSettings( QDomDocument & doc, QDomElement & element )
 	}
 	element.setAttribute( "len", length() );
 	element.setAttribute( "muted", isMuted() );
-	element.setAttribute( "color", colorRgb() );
-	element.setAttribute( "stylecolor", usesStyleColor() );
-	element.setAttribute( "clipcolor", usesCustomClipColor() );
+	if( ! usesStyleColor() )
+	{
+		element.setAttribute( "color", color().name() );
+		element.setAttribute( "isclipcolor", usesCustomClipColor() );
+	}
 }
 
 
@@ -92,17 +94,18 @@ void BBTCO::loadSettings( const QDomElement & element )
 		toggleMute();
 	}
 	
-	// for files saved in 1.3-onwards
-	if( element.hasAttribute( "stylecolor" ) )
+	// for colors saved in 1.3-onwards
+	if( element.hasAttribute( "isclipcolor" ) )
 	{
+		useStyleColor( false );
+		useCustomClipColor( element.attribute( "isclipcolor" ).toInt() );
+		
 		QColor loadedColor;
-		loadedColor.setRgb( element.attribute( "color" ).toUInt() );
-		useStyleColor( element.attribute( "stylecolor" ).toUInt() );
-		useCustomClipColor( element.attribute( "clipcolor" ).toUInt() );
+		loadedColor.setNamedColor( element.attribute( "color" ) );
 		setColor( loadedColor );
 	}
 	
-	// for files saved before 1.3
+	// for colors saved before 1.3
 	else
 	{
 		if( element.hasAttribute( "color" ) )
