@@ -65,7 +65,6 @@ public:
 		return m_sampleBuffer;
 	}
 
-
 	MidiTime sampleLength() const;
 	void setSampleStartFrame( f_cnt_t startFrame );
 	void setSamplePlayLength( f_cnt_t length );
@@ -89,6 +88,7 @@ private:
 	BoolModel m_recordModel;
 	bool m_isPlaying;
 
+
 	friend class SampleTCOView;
 
 
@@ -109,6 +109,8 @@ public:
 
 public slots:
 	void updateSample();
+
+
 
 protected:
 	void contextMenuEvent( QContextMenuEvent * _cme ) override;

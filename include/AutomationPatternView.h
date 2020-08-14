@@ -41,7 +41,7 @@ class AutomationPatternView : public TrackContentObjectView
 public:
 	AutomationPatternView( AutomationPattern * _pat, TrackView * _parent );
 	virtual ~AutomationPatternView();
-	
+
 public slots:
 	/// Opens this view's pattern in the global automation editor
 	void openInAutomationEditor();

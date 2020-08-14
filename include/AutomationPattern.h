@@ -93,6 +93,7 @@ public:
 
 	void applyDragValue();
 
+
 	bool isDragging() const
 	{
 		return m_dragging;
