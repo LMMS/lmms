@@ -297,7 +297,7 @@ public:
 	
 	QColor color() const
 	{
-		return( m_tco->colorRgb() );
+		return m_tco->color();
 	};
 
 	// access needsUpdate member variable

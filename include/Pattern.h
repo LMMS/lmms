@@ -110,9 +110,6 @@ public:
 
 
 	TrackContentObjectView * createView( TrackView * _tv ) override;
-	
-	void setBGColor( QColor & c );
-	QColor BGColor();
 
 	using Model::dataChanged;
 

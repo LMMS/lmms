@@ -310,10 +310,7 @@ void SampleTCO::loadSettings( const QDomElement & _this )
 	{
 		useStyleColor( false );
 		useCustomClipColor( _this.attribute( "isclipcolor" ).toInt() );
-		
-		QColor loadedColor;
-		loadedColor.setNamedColor( _this.attribute( "color" ) );
-		setColor( loadedColor );
+		setColor( _this.attribute( "color" ) );
 	}
 }
 

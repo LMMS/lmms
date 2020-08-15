@@ -99,10 +99,7 @@ void BBTCO::loadSettings( const QDomElement & element )
 	{
 		useStyleColor( false );
 		useCustomClipColor( element.attribute( "isclipcolor" ).toInt() );
-		
-		QColor loadedColor;
-		loadedColor.setNamedColor( element.attribute( "color" ) );
-		setColor( loadedColor );
+		setColor( element.attribute( "color" ) );
 	}
 	
 	// for colors saved before 1.3
