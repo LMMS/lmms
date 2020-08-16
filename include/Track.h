@@ -561,6 +561,7 @@ private slots:
 	void changeTrackColor();
 	void randomTrackColor();
 	void resetTrackColor();
+	void useTrackColor();
 	void toggleRecording(bool on);
 	void recordingOn();
 	void recordingOff();
@@ -590,6 +591,7 @@ private:
 signals:
 	void trackRemovalScheduled( TrackView * t );
 	void colorChanged( QColor & c );
+	void colorParented();
 	void colorReset();
 
 } ;

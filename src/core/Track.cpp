@@ -266,11 +266,11 @@ void TrackContentObject::setStartTimeOffset( const MidiTime &startTimeOffset )
 
 void TrackContentObject::setBGColor( QColor & c )
 {
-	// since this function is called only from track, and track changes override local settings, remove custom clip color
-	m_useCustomClipColor = false;
-	
-	m_color = c;
-	emit trackColorChanged( m_color );
+	if( ! m_useCustomClipColor )
+	{
+		m_color = c;
+		emit trackColorChanged( m_color );
+	}
 }
 
 QColor TrackContentObject::BGColor()
@@ -280,8 +280,7 @@ QColor TrackContentObject::BGColor()
 
 void TrackContentObject::resetColor()
 {
-	m_useCustomClipColor = false;
-	emit trackColorReset();
+	if( ! m_useCustomClipColor ) emit trackColorReset();
 }
 
 
@@ -361,6 +360,7 @@ TrackContentObjectView::TrackContentObjectView( TrackContentObject * tco,
 	connect( m_tco, SIGNAL( clipColorReset() ), this, SLOT( disableClipSelectedColor() ) );
 	setModel( m_tco );
 	connect( m_tco, SIGNAL( trackColorChanged( QColor & ) ), this, SLOT( setColor( QColor & ) ) );
+	connect( m_trackView->getTrackOperationsWidget(), SIGNAL( colorParented() ), this, SLOT( useTrackColor() ) );
 	
 	if( m_usesCustomSelectedColor )
 	{
@@ -649,7 +649,7 @@ void TrackContentObjectView::useTrackColor()
 
 void TrackContentObjectView::trackColorReset()
 {
-	if( ! m_tco->usesStyleColor() )
+	if( ! m_tco->usesStyleColor() && ! m_tco->usesCustomClipColor() )
 	{
 		m_tco->useStyleColor( true );
 		Engine::getSong()->setModified();
@@ -2472,6 +2472,11 @@ void TrackOperationsWidget::randomTrackColor()
 	colorBarNeedsUpdate = true;
 }
 
+void TrackOperationsWidget::useTrackColor()
+{
+	emit colorParented();
+}
+
 
 /*! \brief Update the trackOperationsWidget context menu
  *
@@ -2519,6 +2524,9 @@ void TrackOperationsWidget::updateMenu()
 						tr( "Reset color to default" ), this, SLOT( resetTrackColor() ) );
 	toMenu->addAction( embed::getIconPixmap( "colorize" ),
 						tr( "Set random color" ), this, SLOT( randomTrackColor() ) );
+	toMenu->addSeparator();
+	toMenu->addAction( embed::getIconPixmap( "colorize" ),
+						tr( "Use track color in clips" ), this, SLOT( useTrackColor() ) );
 }
 
 void TrackOperationsWidget::updateColorGradient()
