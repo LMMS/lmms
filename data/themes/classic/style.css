@@ -11,6 +11,11 @@ QMdiArea {
 	background-image: url(resources:background_artwork.png);
 }
 
+Knob {
+	qproperty-lineInactiveColor: rgb(120, 120, 120);
+	qproperty-arcInactiveColor: rgba(120, 120, 120, 70);
+}
+
 AutomationEditor {
 	background-color: rgb(0, 0, 0);
 	color: #e0e0e0;
