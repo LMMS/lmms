@@ -30,36 +30,6 @@
 #include "JournallingObject.h"
 
 
-Clipboard::Map Clipboard::content;
-
-
-void Clipboard::copy( JournallingObject * _obj )
-{
-	QDomDocument doc;
-	QDomElement parent = doc.createElement( "Clipboard" );
-	_obj->saveState( doc, parent );
-	content[_obj->nodeName()] = parent.firstChild().toElement();
-
-	// Clear the QApplication clipboard, so we don't have any conflicts when LMMS has to
-	// decide between the QApplication clipboard and the internal clipboard data
-	QApplication::clipboard()->clear( QClipboard::Clipboard );
-}
-
-
-
-
-const QDomElement * Clipboard::getContent( const QString & _node_name )
-{
-	if( content.find( _node_name ) != content.end() )
-	{
-		return &content[_node_name];
-	}
-	return NULL;
-}
-
-
-
-
 const QMimeData * Clipboard::getMimeData()
 {
 	return QApplication::clipboard()->mimeData( QClipboard::Clipboard );

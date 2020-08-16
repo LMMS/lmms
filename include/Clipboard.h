@@ -29,8 +29,6 @@
 #include <QDomElement>
 
 
-class JournallingObject;
-
 class Clipboard
 {
 public:
@@ -39,11 +37,6 @@ public:
 		StringPair,
 		Default
 	};
-
-	typedef QMap<QString, QDomElement> Map;
-
-	static void copy( JournallingObject * _object );
-	static const QDomElement * getContent( const QString & _node_name );
 
 	// Convenience Methods
 	static const QMimeData * getMimeData();
@@ -70,11 +63,6 @@ public:
 				break;
 		}
 	}
-
-
-private:
-	static Map content;
-
 } ;
 
 #endif

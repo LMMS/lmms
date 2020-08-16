@@ -184,32 +184,27 @@ bool TrackContentObject::comparePosition(const TrackContentObject *a, const Trac
 
 
 
-/*! \brief Copy this TrackContentObject to the clipboard.
+/*! \brief Copies the state of a TrackContentObject to another TrackContentObject
  *
- *  Copies this track content object to the clipboard.
+ *  This method copies the state of a TCO to another TCO
  */
-void TrackContentObject::copy()
+void TrackContentObject::copyStateTo( TrackContentObject *src, TrackContentObject *dst )
 {
-	Clipboard::copy( this );
-}
+	JournallingObject * srcObj = dynamic_cast<JournallingObject *>( src );
+	JournallingObject * dstObj = dynamic_cast<JournallingObject *>( dst );
 
+	QDomDocument doc;
+	QDomElement parent = doc.createElement( "StateCopy" );
+	srcObj->saveState( doc, parent );
 
-
-
-/*! \brief Pastes this TrackContentObject into a track.
- *
- *  Pastes this track content object into a track.
- *
- * \param _je The journal entry to undo
- */
-void TrackContentObject::paste()
-{
-	if( Clipboard::getContent( nodeName() ) != NULL )
+	// If the node names match we copy the state
+	if( srcObj->nodeName() == dstObj->nodeName() )
 	{
-		const MidiTime pos = startPosition();
-		restoreState( *( Clipboard::getContent( nodeName() ) ) );
-		movePosition( pos );
+		const MidiTime pos = dst->startPosition();
+		dst->restoreState( parent.firstChild().toElement() );
+		dst->movePosition( pos );
 	}
+
 	AutomationPattern::resolveAllIDs();
 	GuiApplication::instance()->automationEditor()->m_editor->updateAfterPatternChange();
 }
