@@ -1239,62 +1239,35 @@ void TrackContentObjectView::remove( QVector<TrackContentObjectView *> tcovs )
 
 void TrackContentObjectView::copy( QVector<TrackContentObjectView *> tcovs )
 {
-	// Checks if there are other selected TCOs and if so copy them as well
-	if( tcovs.size() > 1 )
-	{
-		// Write the TCOs to a DataFile for copying
-		DataFile dataFile = createTCODataFiles( tcovs );
+	// Write the TCOs to a DataFile for copying
+	DataFile dataFile = createTCODataFiles( tcovs );
 
-		// Copy the TCO type as a key and the TCO data file to the clipboard
-		Clipboard::copyStringPair( QString( "tco_%1" ).arg( m_tco->getTrack()->type() ),
-			dataFile.toString() );
-	}
-	else
-	{
-		tcovs.at(0)->getTrackContentObject()->copy();
-	}
+	// Copy the TCO type as a key and the TCO data file to the clipboard
+	Clipboard::copyStringPair( QString( "tco_%1" ).arg( m_tco->getTrack()->type() ),
+		dataFile.toString() );
 }
 
 void TrackContentObjectView::cut( QVector<TrackContentObjectView *> tcovs )
 {
-	// Checks if there are other selected TCOs and if so cut them as well
-	if( tcovs.size() > 1 )
-	{
-		// Copy the selected TCOs
-		copy( tcovs );
+	// Copy the selected TCOs
+	copy( tcovs );
 
-		// Now that the TCOs are copied we can delete them, since we are cutting
-		// TODO: Is it safe to call tcov->remove(); on the current TCOV instance?
-		remove( tcovs );
-	}
-	else
-	{
-		tcovs.at(0)->cut();
-	}
+	// Now that the TCOs are copied we can delete them, since we are cutting
+	// TODO: Is it safe to call tcov->remove(); on the current TCOV instance?
+	remove( tcovs );
 }
 
 void TrackContentObjectView::paste()
 {
-	// NOTE: Because we give preference to the QApplication clipboard over the LMMS Clipboard class, we need to
-	// clear the QApplication Clipboard during the LMMS Clipboard copy operations (Clipboard::copy does that)
+	// If possible, paste the selection on the MidiTime of the selected Track and remove it
+	MidiTime tcoPos = MidiTime( m_tco->startPosition() );
 
-	// If we have TCO data on the clipboard paste it. If not, do our regular TCO paste.
-	if( Clipboard::hasFormat( Clipboard::StringPair ) )
+	TrackContentWidget *tcw = getTrackView()->getTrackContentWidget();
+
+	if( tcw->pasteSelection( tcoPos, Clipboard::getMimeData() ) == true )
 	{
-		// Paste the selection on the MidiTime of the selected Track
-		MidiTime tcoPos = MidiTime( m_tco->startPosition() );
-
-		TrackContentWidget *tcw = getTrackView()->getTrackContentWidget();
-
-		if( tcw->pasteSelection( tcoPos, Clipboard::getMimeData() ) == true )
-		{
-			// If we succeed on the paste we delete the TCO we pasted on
-			remove();
-		}
-	}
-	else
-	{
-		getTrackContentObject()->paste();
+		// If we succeed on the paste we delete the TCO we pasted on
+		remove();
 	}
 }
 
