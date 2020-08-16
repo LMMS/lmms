@@ -478,20 +478,6 @@ void TrackContentObjectView::remove()
 
 
 
-/*! \brief Cut this trackContentObjectView from its track to the clipboard.
- *
- *  Perform the 'cut' action of the clipboard - copies the track content
- *  object to the clipboard and then removes it from the track.
- */
-void TrackContentObjectView::cut()
-{
-	m_tco->copy();
-	remove();
-}
-
-
-
-
 /*! \brief Updates a trackContentObjectView's length
  *
  *  If this track content object view has a fixed TCO, then we must

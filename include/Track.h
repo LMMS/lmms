@@ -266,7 +266,6 @@ public:
 
 public slots:
 	virtual bool close();
-	void cut();
 	void remove();
 	void update() override;
 
