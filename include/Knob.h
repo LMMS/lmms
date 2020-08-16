@@ -82,7 +82,7 @@ public:
 	Knob( knobTypes _knob_num, QWidget * _parent = NULL, const QString & _name = QString() );
 	Knob( QWidget * _parent = NULL, const QString & _name = QString() ); //!< default ctor
 	Knob( const Knob& other ) = delete;
-	virtual ~Knob() {};
+	virtual ~Knob() = default;
 
 	// TODO: remove
 	inline void setHintText( const QString & _txt_before,
