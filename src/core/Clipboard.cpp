@@ -60,6 +60,17 @@ const QDomElement * Clipboard::getContent( const QString & _node_name )
 
 
 
+void Clipboard::copyString( const QString & str, MimeType mT )
+{
+	QMimeData *content = new QMimeData;
+
+	content->setData( mimeType( mT ), str.toUtf8() );
+	QApplication::clipboard()->setMimeData( content, QClipboard::Clipboard );
+}
+
+
+
+
 void Clipboard::copyStringPair( const QString & key, const QString & value )
 {
 	QString finalString = key + ":" + value;
