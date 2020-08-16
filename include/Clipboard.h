@@ -46,6 +46,7 @@ public:
 	static const QDomElement * getContent( const QString & _node_name );
 
 	// Helper methods for String Pair data
+	static void copyStringPair( const QString & key, const QString & value );
 	static QString decodeKey( const QMimeData * mimeData );
 	static QString decodeValue( const QMimeData * mimeData );
 

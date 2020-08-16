@@ -1245,13 +1245,9 @@ void TrackContentObjectView::copy( QVector<TrackContentObjectView *> tcovs )
 		// Write the TCOs to a DataFile for copying
 		DataFile dataFile = createTCODataFiles( tcovs );
 
-		// Add the TCO type as a key to the final string
-		QString finalString = QString( "tco_%1:%2" ).arg( m_tco->getTrack()->type() ).arg( dataFile.toString() );
-
-		// Copy it to the clipboard
-		QMimeData *tco_content = new QMimeData;
-		tco_content->setData( Clipboard::mimeType( Clipboard::StringPair ), finalString.toUtf8() );
-		QApplication::clipboard()->setMimeData( tco_content, QClipboard::Clipboard );
+		// Copy the TCO type as a key and the TCO data file to the clipboard
+		Clipboard::copyStringPair( QString( "tco_%1" ).arg( m_tco->getTrack()->type() ),
+			dataFile.toString() );
 	}
 	else
 	{
@@ -1264,20 +1260,12 @@ void TrackContentObjectView::cut( QVector<TrackContentObjectView *> tcovs )
 	// Checks if there are other selected TCOs and if so cut them as well
 	if( tcovs.size() > 1 )
 	{
-		// Write the TCOs to a DataFile for copying
-		DataFile dataFile = createTCODataFiles( tcovs );
+		// Copy the selected TCOs
+		copy( tcovs );
 
-		// Now that the dataFile is created we can delete the tracks, since we are cutting
+		// Now that the TCOs are copied we can delete them, since we are cutting
 		// TODO: Is it safe to call tcov->remove(); on the current TCOV instance?
 		remove( tcovs );
-
-		// Add the TCO type as a key to the final string
-		QString finalString = QString( "tco_%1:%2" ).arg( m_tco->getTrack()->type() ).arg( dataFile.toString() );
-
-		// Copy it to the clipboard
-		QMimeData *tco_content = new QMimeData;
-		tco_content->setData( Clipboard::mimeType( Clipboard::StringPair ), finalString.toUtf8() );
-		QApplication::clipboard()->setMimeData( tco_content, QClipboard::Clipboard );
 	}
 	else
 	{
