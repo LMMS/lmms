@@ -1279,15 +1279,14 @@ void TrackContentObjectView::paste()
 	// clear the QApplication Clipboard during the LMMS Clipboard copy operations (Clipboard::copy does that)
 
 	// If we have TCO data on the clipboard paste it. If not, do our regular TCO paste.
-	if( QApplication::clipboard()->mimeData( QClipboard::Clipboard )->hasFormat( Clipboard::mimeType( Clipboard::StringPair ) ) )
+	if( Clipboard::hasFormat( Clipboard::StringPair ) )
 	{
 		// Paste the selection on the MidiTime of the selected Track
-		const QMimeData *md = QApplication::clipboard()->mimeData( QClipboard::Clipboard );
 		MidiTime tcoPos = MidiTime( m_tco->startPosition() );
 
 		TrackContentWidget *tcw = getTrackView()->getTrackContentWidget();
 
-		if( tcw->pasteSelection( tcoPos, md ) == true )
+		if( tcw->pasteSelection( tcoPos, Clipboard::getMimeData() ) == true )
 		{
 			// If we succeed on the paste we delete the TCO we pasted on
 			remove();
@@ -1987,8 +1986,7 @@ void TrackContentWidget::contextMenuEvent( QContextMenuEvent * cme )
 
 	// If we don't have TCO data in the clipboard there's no need to create this menu
 	// since "paste" is the only action at the moment.
-	const QMimeData *md = QApplication::clipboard()->mimeData( QClipboard::Clipboard );
-	if( !md->hasFormat( Clipboard::mimeType( Clipboard::StringPair ) )  )
+	if( ! Clipboard::hasFormat( Clipboard::StringPair )  )
 	{
 		return;
 	}
@@ -1997,7 +1995,7 @@ void TrackContentWidget::contextMenuEvent( QContextMenuEvent * cme )
 	QAction *pasteA = contextMenu.addAction( embed::getIconPixmap( "edit_paste" ),
 					tr( "Paste" ), [this, cme](){ contextMenuAction( cme, Paste ); } );
 	// If we can't paste in the current TCW for some reason, disable the action so the user knows
-	pasteA->setEnabled( canPasteSelection( getPosition( cme->x() ), md ) ? true : false );
+	pasteA->setEnabled( canPasteSelection( getPosition( cme->x() ), Clipboard::getMimeData() ) ? true : false );
 
 	contextMenu.exec( QCursor::pos() );
 }
@@ -2008,10 +2006,9 @@ void TrackContentWidget::contextMenuAction( QContextMenuEvent * cme, ContextMenu
 	{
 		case Paste:
 		// Paste the selection on the MidiTime of the context menu event
-		const QMimeData *md = QApplication::clipboard()->mimeData( QClipboard::Clipboard );
 		MidiTime tcoPos = getPosition( cme->x() );
 
-		pasteSelection( tcoPos, md );
+		pasteSelection( tcoPos, Clipboard::getMimeData() );
 		break;
 	}
 }

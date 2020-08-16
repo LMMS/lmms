@@ -3948,9 +3948,7 @@ void PianoRoll::pasteNotes()
 		return;
 	}
 
-	QString value = QApplication::clipboard()
-				->mimeData( QClipboard::Clipboard )
-						->data( Clipboard::mimeType( Clipboard::Default ) );
+	QString value = Clipboard::getMimeData()->data( Clipboard::mimeType( Clipboard::Default ) );
 
 	if( ! value.isEmpty() )
 	{

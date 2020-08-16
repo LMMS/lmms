@@ -60,6 +60,22 @@ const QDomElement * Clipboard::getContent( const QString & _node_name )
 
 
 
+const QMimeData * Clipboard::getMimeData()
+{
+	return QApplication::clipboard()->mimeData( QClipboard::Clipboard );
+}
+
+
+
+
+bool Clipboard::hasFormat( MimeType mT )
+{
+	return getMimeData()->hasFormat( mimeType( mT ) );
+}
+
+
+
+
 void Clipboard::copyString( const QString & str, MimeType mT )
 {
 	QMimeData *content = new QMimeData;

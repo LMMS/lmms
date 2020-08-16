@@ -45,6 +45,11 @@ public:
 	static void copy( JournallingObject * _object );
 	static const QDomElement * getContent( const QString & _node_name );
 
+	// Convenience Methods
+	static const QMimeData * getMimeData();
+	static bool hasFormat( MimeType mT );
+
+	// Helper methods for String data
 	static void copyString( const QString & str, MimeType mT );
 
 	// Helper methods for String Pair data
