@@ -309,7 +309,7 @@ void SampleTCO::loadSettings( const QDomElement & _this )
 	if( _this.hasAttribute( "color" ) )
 	{
 		useStyleColor( false );
-		useCustomClipColor( _this.attribute( "isclipcolor" ) == "1" ? true : false );
+		useCustomClipColor( _this.attribute( "isclipcolor" ) == "1" );
 		setColor( _this.attribute( "color" ) );
 	}
 }

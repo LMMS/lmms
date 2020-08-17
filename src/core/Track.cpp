@@ -746,16 +746,19 @@ void TrackContentObjectView::dropEvent( QDropEvent * de )
 	QDomElement tcos = dataFile.content().firstChildElement( "tcos" );
 	m_tco->restoreState( tcos.firstChildElement().firstChildElement() );
 	m_tco->movePosition( pos );
+	auto old_tco = dynamic_cast<TrackContentObjectView *>( qwSource )->m_tco;
 	
-	if( m_trackView->getTrack()->useColor() )
+	if( old_tco->usesCustomClipColor() )
 	{
 		m_tco->useStyleColor( false );
-		if( ! dynamic_cast<TrackContentObjectView *>( qwSource )->m_tco->usesCustomClipColor() )
-			m_tco->setColor( m_trackView->getTrack()->backgroundColor() );
+		m_tco->useCustomClipColor( true );
+		m_tco->setColor( old_tco->color() );
 	}
 	else
 	{
-		m_tco->useStyleColor( true );
+		m_tco->useStyleColor( ! m_trackView->getTrack()->useColor() );
+		m_tco->useCustomClipColor( false );
+		m_tco->setColor( m_trackView->getTrack()->backgroundColor() );
 	}
 	
 	AutomationPattern::resolveAllIDs();
@@ -809,6 +812,8 @@ DataFile TrackContentObjectView::createTCODataFiles(
 		tcoElement.setAttribute( "trackIndex", trackIndex );
 		tcoElement.setAttribute( "trackType", tcoTrack->type() );
 		tcoElement.setAttribute( "trackName", tcoTrack->name() );
+		tcoElement.setAttribute( "color", ( *it )->m_tco->color().name() );
+		tcoElement.setAttribute( "styleColor", ( *it )->m_tco->usesStyleColor() );
 		tcoElement.setAttribute( "clipColor", ( *it )->m_tco->usesCustomClipColor() );
 		( *it )->m_tco->saveState( dataFile, tcoElement );
 		tcoParent.appendChild( tcoElement );
@@ -2016,16 +2021,17 @@ bool TrackContentWidget::pasteSelection( MidiTime tcoPos, const QMimeData * md, 
 			tco->selectViewOnCreate( true );
 		}
 		
-		if( t->useColor() )
+		if( outerTCOElement.attributeNode( "clipColor" ).value() == "1" )
 		{
 			tco->useStyleColor( false );
-			
-			if( outerTCOElement.attributeNode( "clipColor" ).value() == "0" )
-				tco->setColor( t->backgroundColor() );
+			tco->useCustomClipColor( true );
+			tco->setColor( outerTCOElement.attributeNode( "color" ).value() );
 		}
 		else
 		{
-			tco->useStyleColor( true );
+			tco->useStyleColor( ! t->useColor() );
+			tco->useCustomClipColor( false );
+			tco->setColor( t->backgroundColor() );
 		}
 
 		//check tco name, if the same as source track name dont copy

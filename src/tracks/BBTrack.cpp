@@ -98,7 +98,7 @@ void BBTCO::loadSettings( const QDomElement & element )
 	if( element.hasAttribute( "isclipcolor" ) )
 	{
 		useStyleColor( false );
-		useCustomClipColor( element.attribute( "isclipcolor" ) == "1" ? true : false );
+		useCustomClipColor( element.attribute( "isclipcolor" ) == "1" );
 		setColor( element.attribute( "color" ) );
 	}
 	
