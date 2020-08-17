@@ -190,15 +190,12 @@ bool TrackContentObject::comparePosition(const TrackContentObject *a, const Trac
  */
 void TrackContentObject::copyStateTo( TrackContentObject *src, TrackContentObject *dst )
 {
-	JournallingObject * srcObj = dynamic_cast<JournallingObject *>( src );
-	JournallingObject * dstObj = dynamic_cast<JournallingObject *>( dst );
-
 	QDomDocument doc;
 	QDomElement parent = doc.createElement( "StateCopy" );
-	srcObj->saveState( doc, parent );
+	src->saveState( doc, parent );
 
 	// If the node names match we copy the state
-	if( srcObj->nodeName() == dstObj->nodeName() )
+	if( src->nodeName() == dst->nodeName() )
 	{
 		const MidiTime pos = dst->startPosition();
 		dst->restoreState( parent.firstChild().toElement() );
