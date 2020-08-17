@@ -29,6 +29,7 @@
 #include <QInputDialog>
 #include <QMouseEvent>
 #include <QPainter>
+#include <QPixmap>
 
 #ifndef __USE_XOPEN
 #define __USE_XOPEN
@@ -46,6 +47,7 @@
 #include "MainWindow.h"
 #include "ProjectJournal.h"
 #include "Song.h"
+#include "stdshims.h"
 #include "StringPairDrag.h"
 #include "TextFloat.h"
 
@@ -58,7 +60,6 @@ Knob::Knob( knobTypes _knob_num, QWidget * _parent, const QString & _name ) :
 	QWidget( _parent ),
 	FloatModelView( new FloatModel( 0, 0, 0, 1, NULL, _name, true ), this ),
 	m_label( "" ),
-	m_knobPixmap( nullptr ),
 	m_volumeKnob( false ),
 	m_volumeRatio( 100.0, 0.0, 1000000.0 ),
 	m_buttonPressed( false ),
@@ -150,10 +151,10 @@ void Knob::onKnobNumUpdated()
 		}
 
 		// If knobFilename is still empty here we should get the fallback pixmap of size 1x1
-		m_knobPixmap.reset(new QPixmap(embed::getIconPixmap(knobFilename.toUtf8().constData())));
+		m_knobPixmap = make_unique<QPixmap>(QPixmap(embed::getIconPixmap(knobFilename.toUtf8().constData())));
 		if (!this->isEnabled())
 		{
-			convertPixmapToGrayScale(m_knobPixmap);
+			convertPixmapToGrayScale(*m_knobPixmap.get());
 		}
 		setFixedSize( m_knobPixmap->width(), m_knobPixmap->height() );
 	}
@@ -849,9 +850,9 @@ void Knob::changeEvent(QEvent * ev)
 }
 
 
-void convertPixmapToGrayScale(std::unique_ptr<QPixmap> &pixMap)
+void convertPixmapToGrayScale(QPixmap& pixMap)
 {
-	QImage temp = pixMap->toImage().convertToFormat(QImage::Format_ARGB32);
+	QImage temp = pixMap.toImage().convertToFormat(QImage::Format_ARGB32);
 	for (int i = 0; i < temp.height(); ++i)
 	{
 		for (int j = 0; j < temp.width(); ++j)
@@ -862,5 +863,5 @@ void convertPixmapToGrayScale(std::unique_ptr<QPixmap> &pixMap)
 			temp.setPixelColor(i, j, pixGray);
 		}
 	}
-	pixMap->convertFromImage(temp);
+	pixMap.convertFromImage(temp);
 }
