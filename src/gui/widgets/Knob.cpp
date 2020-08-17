@@ -856,12 +856,10 @@ void convertPixmapToGrayScale(std::unique_ptr<QPixmap> &pixMap)
 	{
 		for (int j = 0; j < temp.width(); ++j)
 		{
-			QColor pix;
-			pix = temp.pixelColor(i, j);
-			quint8 gscale = quint8((0.2126*pix.red() + 0.7152*pix.green() + 0.0722*pix.blue()));
-			QRgba64 pix_gray64;
-			pix_gray64 = QRgba64::fromRgba(gscale, gscale, gscale, quint8(pix.alpha()));
-			temp.setPixelColor(i, j, pix_gray64);
+			const auto pix = temp.pixelColor(i, j);
+			const auto gscale = 0.2126 * pix.redF() + 0.7152 * pix.greenF() + 0.0722 * pix.blueF();
+			const auto pixGray = QColor::fromRgbF(gscale, gscale, gscale, pix.alphaF());
+			temp.setPixelColor(i, j, pixGray);
 		}
 	}
 	pixMap->convertFromImage(temp);
