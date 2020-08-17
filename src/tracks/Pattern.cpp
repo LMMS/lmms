@@ -1002,7 +1002,8 @@ void PatternView::paintEvent( QPaintEvent * )
 
 		// set colour based on mute status
 		QColor noteFillColor = muted ? getMutedNoteFillColor() : getNoteFillColor();
-		QColor noteBorderColor = muted ? getMutedNoteBorderColor() : getNoteBorderColor();
+		QColor noteBorderColor = muted ? getMutedNoteBorderColor()
+									   : ( m_pat->usesStyleColor() ? getNoteBorderColor() : c.lighter( 200 ) );
 
 		bool const drawAsLines = height() < 64;
 		if (drawAsLines)
