@@ -46,8 +46,8 @@ S Diginstrument::Interpolator<T, S>::interpolateSpectra(const S &left, const S &
     const T leftRatio = target / leftLabel;
     const T rightRatio = target / rightLabel;
 
-    auto leftHarmonics = left.getHarmonics();
-    auto rightHarmonics = right.getHarmonics();
+    auto leftHarmonics = left.getMatchables();
+    auto rightHarmonics = right.getMatchables();
     //TODO: acts weird if i hit an exact point (eg. 440)
     //TODO: acts even weirder with snare test: 4 spectra on same "pitch" and different time coordinates
 
@@ -74,7 +74,7 @@ S Diginstrument::Interpolator<T, S>::interpolateSpectra(const S &left, const S &
         //1) match peaks
         //TODO: generalize
         //TODO: refactor
-        auto matches = PeakMatcher::matchPeaks(left.getHarmonics(), right.getHarmonics(), unmatchedLeft, unmatchedRight);
+        auto matches = PeakMatcher::matchPeaks(left.getMatchables(), right.getMatchables(), unmatchedLeft, unmatchedRight);
 
         //debug
         //cout << "number of harmonics: " << leftHarmonics.size() << " " << rightHarmonics.size() << endl;

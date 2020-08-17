@@ -13,10 +13,10 @@ public:
   SplineSpectrum(PiecewiseBSpline<T, D> &&spline, T label) : Diginstrument::Spectrum<T>(label), spline(std::move(spline)) {}
   SplineSpectrum(const PiecewiseBSpline<T, D> &spline, T label) : Diginstrument::Spectrum<T>(label), spline(spline) {}
 
-  std::vector<Diginstrument::Component<T>> getHarmonics() const
+  std::vector<Diginstrument::Component<T>> getMatchables() const
   {
-    //TMP
-    std::vector<Diginstrument::Component<T>> res;
+    //TMP: phase is present here; in case if phase is removed
+    std::vector<Diginstrument::Component<T>> res(spline.getPeaks().size());
     for (std::vector<T> peak : spline.getPeaks())
     {
       res.emplace_back(Diginstrument::Component<T>{peak[0], peak[1], peak[2]});
@@ -24,12 +24,20 @@ public:
     return res;
   }
 
+  std::vector<Diginstrument::Component<T>> getUnmatchables() const
+  {
+    //TODO: UNIMPLEMENTED: unmatchables
+    //TMP: unmatchables not yet implemented
+    return {};
+  }
+
   std::vector<Diginstrument::Component<T>> getComponents(const T quality) const
   {
     //harmonics+inbetween
+    //TODO: use quality
     //TODO: how to synthesize the residual signal?
-    //TMP
-    return getHarmonics();
+    //TMP: only matchables; include 'unmatchables' (those that 'cant be shifted and stretched')
+    return getMatchables();
   }
 
   Diginstrument::Component<T> operator[](T x) const

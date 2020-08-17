@@ -8,6 +8,7 @@ namespace Diginstrument
 template <typename T>
 struct  Component{
   T frequency;
+  //TODO: remove phase, or unexpectedly make it work
   T phase;
   T amplitude;
 
@@ -30,7 +31,10 @@ class Spectrum
 {
 public:
   virtual std::vector<Component<T>> getComponents(const T quality) const = 0;
-  virtual Component<T> operator[](const T frequency) const = 0;
+  virtual std::vector<Component<T>> getMatchables() const = 0;
+  virtual std::vector<Component<T>> getUnmatchables() const = 0;
+  //TMP: questionable functionality; is every type of spectrum defined at all frequencies?
+  //virtual Component<T> operator[](const T frequency) const = 0;
   virtual bool empty() const = 0;
 
   Spectrum(const T & label) : label(label){}
@@ -42,40 +46,36 @@ template <typename T>
 class NoteSpectrum : public Spectrum<T>
 {
 public:
-  const std::vector<Component<T>> &getHarmonics() const
+  std::vector<Component<T>> getMatchables() const
   {
-    return harmonics;
+    return components;
   }
-  const std::vector<Component<T>> &getStochastics() const
+  std::vector<Component<T>> getUnmatchables() const
   {
-    return stochastics;
+    return staticComponents;
   }
   std::vector<Component<T>> getComponents(const T quality) const
   {
-    return /*TODO*/ harmonics;
-  }
-
-  Component<T> operator[](const T frequency) const
-  {
-    return /*TODO*/ Component<T>(0,0,0);
+    //TODO: use quality
+    auto res = components;
+    res.reserve(res.size()+staticComponents.size());
+    for(const auto & c : staticComponents)
+    {
+      res.emplace_back(c);
+    }
+    return res;
   }
 
   bool empty() const
   {
-    return harmonics.empty() && stochastics.empty();
+    return components.empty() && staticComponents.empty();
   }
 
-  //TODO: should label be public or getter+setter?
-  T getLabel() const
-  {
-    return Spectrum<T>::label;
-  }
-
-  NoteSpectrum(const T &label, const std::vector<Component<T>> &harmonics, const std::vector<Component<T>> &stohastics)
-      :  Spectrum<T>(label), harmonics(harmonics), stochastics(stohastics) {}
+  NoteSpectrum(const T &label, const std::vector<Component<T>> &components, const std::vector<Component<T>> &staticComponents)
+      :  Spectrum<T>(label), components(components), staticComponents(staticComponents) {}
 
 private:
-  std::vector<Component<T>> harmonics;
-  std::vector<Component<T>> stochastics;
+  std::vector<Component<T>> components;
+  std::vector<Component<T>> staticComponents;
 };
 } // namespace Diginstrument
