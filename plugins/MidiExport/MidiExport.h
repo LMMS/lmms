@@ -28,59 +28,116 @@
 
 #include <QString>
 
+#include "MidiFile.h"
+#include "DataFile.h"
 #include "ExportFilter.h"
-#include "MidiFile.hpp"
 
+using std::pair;
+using std::vector;
 
-const int BUFFER_SIZE = 50*1024;
-typedef MidiFile::MIDITrack<BUFFER_SIZE> MTrack;
+/*---------------------------------------------------------------------------*/
 
-struct MidiNote
+//! MIDI exporting base class
+class MidiExport : public ExportFilter
 {
-	int time;
-	uint8_t pitch;
-	int duration;
-	uint8_t volume;
-
-	inline bool operator<(const MidiNote &b) const
-	{
-		return this->time < b.time;
-	}
-} ;
-
-typedef std::vector<MidiNote> MidiNoteVector;
-typedef std::vector<MidiNote>::iterator MidiNoteIterator;
-
-
-
-class MidiExport: public ExportFilter
-{
-// 	Q_OBJECT
-public:
-	MidiExport();
-	~MidiExport();
-
-	virtual PluginView *instantiateView(QWidget *)
-	{
-		return nullptr;
-	}
-
-	virtual bool tryExport(const TrackContainer::TrackList &tracks,
-				const TrackContainer::TrackList &tracks_BB,
-				int tempo, int masterPitch, const QString &filename);
-	
 private:
-	void writePattern(MidiNoteVector &pat, QDomNode n,
-				int base_pitch, double base_volume, int base_time);
-	void writePatternToTrack(MTrack &mtrack, MidiNoteVector &nv);
-	void writeBBPattern(MidiNoteVector &src, MidiNoteVector &dst,
+	//! A single MIDI note
+	struct Note
+	{
+		//! The pitch (tone), which can be lower or higher
+		uint8_t m_pitch;
+
+		//! Volume (loudness)
+		uint8_t m_volume;
+
+		//! Absolute time (from song start) when the note starts playing
+		int m_time;
+
+		//! For how long the note plays
+		int m_duration;
+
+		//! Sort notes by time
+		inline bool operator<(const Note &b) const
+		{
+			return m_time < b.m_time;
+		}
+	};
+
+	/*-----------------------------------------------------------------------*/
+
+	//! A pattern of MIDI notes
+	class Pattern
+	{
+	private:
+		//! List of actual notes
+		vector<Note> m_notes;
+
+	public:
+		//! Append notes from root node to pattern
+		void write(const QDomNode &root,
+				int basePitch, double baseVolume, int baseTime);
+
+		//! Adjust special duration BB notes by resizing them accordingly
+		void processBbNotes(int cutPos);
+
+		//! Add pattern notes to MIDI file track
+		void writeToTrack(MidiFile::Track &mTrack) const;
+
+		//! Write sorted notes to a explicitly repeating BB pattern
+		void writeToBb(Pattern &bbPat,
 				int len, int base, int start, int end);
-	void ProcessBBNotes(MidiNoteVector &nv, int cutPos);
+	};
 
-	void error();
+	/*-----------------------------------------------------------------------*/
 
+	//! MIDI file object to work with
+	MidiFile *m_file;
 
+	//! Song global tempo
+	int m_tempo;
+
+	//! Song master pitch
+	int m_masterPitch;
+
+	//! Current (incremental) track channel number for non drum tracks
+	uint8_t m_channel = 0;
+
+	//! DataFile to be used by Qt elements
+	DataFile m_dataFile = DataFile(DataFile::SongProject);
+
+	//! Matrix containing (start, end) pairs for BB objects
+	vector<vector<pair<int, int>>> m_plists;
+
+public:
+	//! Explicit constructor for setting plugin descriptor
+	MidiExport();
+
+	//! \brief Export tracks from a project to a .mid extension MIDI file
+	//! \param tracks Normal instrument tracks
+	//! \param tracksBB Beat + Bassline tracks
+	//! \param tempo Song global tempo
+	//! \param masterPitch Song master pitch
+	//! \param filename Name of file to be saved
+	//! \return If operation was successful
+	bool tryExport(const TrackContainer::TrackList &tracks,
+			const TrackContainer::TrackList &tracksBB,
+			int tempo, int masterPitch, const QString &filename);
+
+private:
+	//! Process a given instrument track
+	void processTrack(Track *track, size_t channelID, bool isBB=false);
+
+	//! Build a repeating pattern from a normal one and write to MIDI track
+	void writeBbPattern(Pattern &pat, const QDomElement &patElem,
+			uint8_t channelID, MidiFile::Track &midiTrack);
+
+	//! Process a given BB track
+	void processBbTrack(Track *track);
+
+	//! Necessary for lmms_plugin_main()
+	PluginView *instantiateView(QWidget *) { return nullptr; }
 } ;
 
+/*---------------------------------------------------------------------------*/
 
 #endif
