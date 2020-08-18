@@ -2532,7 +2532,7 @@ void TrackOperationsWidget::updateMenu()
 						tr( "Set random color" ), this, SLOT( randomTrackColor() ) );
 	toMenu->addSeparator();
 	toMenu->addAction( embed::getIconPixmap( "colorize" ),
-						tr( "Use track color in clips" ), this, SLOT( useTrackColor() ) );
+						tr( "Clear clip colors" ), this, SLOT( useTrackColor() ) );
 }
 
 void TrackOperationsWidget::updateColorGradient()
