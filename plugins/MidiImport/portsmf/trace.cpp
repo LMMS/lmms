@@ -15,7 +15,7 @@ void trace(char *format, ...)
     char msg[256];
     va_list args;
     va_start(args, format);
-    _vsnprintf(msg, 256, format, args);
+    _vsnprintf_s(msg, 256, _TRUNCATE, format, args);
     va_end(args);
 #ifdef _DEBUG
     _CrtDbgReport(_CRT_WARN, NULL, NULL, NULL, msg);
