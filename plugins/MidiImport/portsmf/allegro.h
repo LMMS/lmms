@@ -46,11 +46,11 @@
 // Just as serialization uses ser_buf for output, unserialization uses
 // unser_buf for reading. unser_buf is another static member of Alg_track.
 
-#ifndef __ALLEGRO__
-#define __ALLEGRO__
-#include "debug.h"
-
-#include "lmmsconfig.h"
+#ifndef ALLEGRO_H
+#define ALLEGRO_H
+#include <assert.h>
+#include <istream>
+#include <ostream>
 
 #define ALG_EPS 0.000001 // epsilon
 #define ALG_DEFAULT_BPM 100.0 // default tempo
@@ -67,7 +67,7 @@ char *heapify(const char *s); // put a string on the heap
 // the attribute 'tempor' (a real) is stored
 // as 'rtempor'. To get the string name, just
 // use attribute+1.
-typedef char *Alg_attribute;
+typedef const char *Alg_attribute;
 #define alg_attr_name(a) ((a) + 1)
 #define alg_attr_type(a) (*(a))
 
@@ -79,6 +79,19 @@ public:
         maxlen = len = 0;
         atoms = NULL;
     }
+    // Note: the code is possibly more correct and faster without the 
+    // following destructor, which will only run after the program takes 
+    // a normal exit. Cleaning up after the program exit slows down the exit,
+    // and will cause problems if any other destructor tries to reference an
+    // Alg_atom (which will now be freed). The advantage of this code is
+    // that Alg_atoms will not be reported as memory leaks by automation
+    // that doesn't know better. -RBD
+    virtual ~Alg_atoms() {
+        for (int i = 0; i < len; i++) {
+            delete atoms[i];
+        }
+        if (atoms) delete [] atoms;
+    }
     // insert/lookup an atttribute
     Alg_attribute insert_attribute(Alg_attribute attr);
     // insert/lookup attribute by name (without prefixed type)
@@ -86,7 +99,7 @@ public:
 private:
     long maxlen;
     long len;
-    char **atoms;
+    Alg_attribute *atoms;
 
     // insert an Attriubute not in table after moving attr to heap
     Alg_attribute insert_new(const char *name, char attr_type);
@@ -101,18 +114,24 @@ extern Alg_atoms symbol_table;
 // Alg_parameter class
 typedef class Alg_parameter {
 public:
-    ~Alg_parameter();
+    // This constructor guarantees that an Alg_parameter can be
+    // deleted safely without further initialization. It does not
+    // do anything useful, so it is expected that the creator will
+    // set attr and store a value in the appropriate union field.
     Alg_attribute attr;
     union {
         double r;// real
-        char *s; // string
+        const char *s; // string
         long i;  // integer
         bool l;  // logical
-        char *a; // symbol (atom)
+        const char *a; // symbol (atom)
     }; // anonymous union
+
+    Alg_parameter() { attr = "i"; }
+    ~Alg_parameter();
     void copy(Alg_parameter *); // copy from another parameter
-    char attr_type() { return alg_attr_type(attr); }
-    char *attr_name() { return alg_attr_name(attr); }
+    const char attr_type() { return alg_attr_type(attr); }
+    const char *attr_name() { return alg_attr_name(attr); }
     void set_attr(Alg_attribute a) { attr = a; }
     void show();
 } *Alg_parameter_ptr;
@@ -139,15 +158,17 @@ public:
     // attribute. If you have already done the symbol table lookup/insert
     // you can do these operations faster (in which case we should add
     // another set of functions that take attributes as arguments.)
-    static void insert_real(Alg_parameters **list, char *name, double r);
+    static void insert_real(Alg_parameters **list, const char *name, double r);
     // insert string will copy string to heap
-    static void insert_string(Alg_parameters **list, char *name, char *s);
-    static void insert_integer(Alg_parameters **list, char *name, long i);
-    static void insert_logical(Alg_parameters **list, char *name, bool l);
-    static void insert_atom(Alg_parameters **list, char *name, char *s);
+    static void insert_string(Alg_parameters **list, const char *name, 
+                              const char *s);
+    static void insert_integer(Alg_parameters **list, const char *name, long i);
+    static void insert_logical(Alg_parameters **list, const char *name, bool l);
+    static void insert_atom(Alg_parameters **list, const char *name, 
+                            const char *s);
     static Alg_parameters *remove_key(Alg_parameters **list, const char *name);
     // find an attribute/value pair
-    Alg_parameter_ptr find(Alg_attribute *attr);
+    Alg_parameter_ptr find(Alg_attribute attr);
 } *Alg_parameters_ptr;
 
 
@@ -198,11 +219,11 @@ public:
     // attribute (first argument) must agree in type with the second arg.
     // The last letter of the attribute implies the type (see below).
     void set_parameter(Alg_parameter_ptr new_parameter);
-    void set_string_value(char *attr, char *value);
-    void set_real_value(char *attr, double value);
-    void set_logical_value(char *attr, bool value);
-    void set_integer_value(char *attr, long value);
-    void set_atom_value(char *attr, char *atom);
+    void set_string_value(const char *attr, const char *value);
+    void set_real_value(const char *attr, double value);
+    void set_logical_value(const char *attr, bool value);
+    void set_integer_value(const char *attr, long value);
+    void set_atom_value(const char *attr, const char *atom);
 
     // Some note methods. These fail (via assert()) if this is not a note:
     //
@@ -222,17 +243,22 @@ public:
     // types. Attribute names end with a type designation: 's', 'r', 'l',
     // 'i', or 'a'.
     //
-    bool has_attribute(char *attr);      // test if note has attribute/value pair
-    char get_attribute_type(char *attr); // get the associated type: 
+    bool has_attribute(const char *attr);      // test if note has attribute/value pair
+    char get_attribute_type(const char *attr); // get the associated type: 
         // 's' = string, 
         // 'r' = real (double), 'l' = logical (bool), 'i' = integer (long),
         // 'a' = atom (char *), a unique string stored in Alg_seq
-    char *get_string_value(char *attr, char *value = NULL);  // get the string value
-    double get_real_value(char *attr, double value = 0.0);   // get the real value
-    bool get_logical_value(char *attr, bool value = false);  // get the logical value
-    long get_integer_value(char *attr, long value = 0);      // get the integer value
-    char *get_atom_value(char *attr, char *value = NULL);    // get the atom value
-    void delete_attribute(char *attr);   // delete an attribute/value pair
+    // get the string value
+    const char *get_string_value(const char *attr, const char *value = NULL);
+    // get the real value
+    double get_real_value(const char *attr, double value = 0.0);
+    // get the logical value
+    bool get_logical_value(const char *attr, bool value = false);
+    // get the integer value
+    long get_integer_value(const char *attr, long value = 0);
+    // get the atom value
+    const char *get_atom_value(const char *attr, const char *value = NULL);
+    void delete_attribute(const char *attr);   // delete an attribute/value pair
         // (ignore if no matching attribute/value pair exists)
 
     // Some attribute/value methods. These fail if this is not an update.
@@ -243,13 +269,13 @@ public:
     char get_update_type();   // get the update's type: 's' = string, 
         // 'r' = real (double), 'l' = logical (bool), 'i' = integer (long),
         // 'a' = atom (char *), a unique string stored in Alg_seq
-    char *get_string_value(); // get the update's string value
+    const char *get_string_value(); // get the update's string value
         // Notes: Caller does not own the return value. Do not modify.
         // Do not use after underlying Alg_seq is modified.
     double get_real_value();  // get the update's real value
     bool get_logical_value(); // get the update's logical value
     long get_integer_value(); // get the update's integer value
-    char *get_atom_value();   // get the update's atom value
+    const char *get_atom_value();   // get the update's atom value
         // Notes: Caller does not own the return value. Do not modify.
         // The return value's lifetime is forever.
 
@@ -305,6 +331,9 @@ public:
     // creating a new track and adding notes to it. It is *not*
     // updated after uninsert(), so use it with care.
     double last_note_off;
+    // initially false, in_use can be used to mark "do not delete". If an
+    // Alg_events instance is deleted while "in_use", an assertion will fail.
+    bool in_use;
     virtual int length() { return len; }
     Alg_event_ptr &operator[](int i) {
         assert(i >= 0 && i < len);
@@ -314,10 +343,11 @@ public:
         maxlen = len = 0;
         events = NULL;
         last_note_off = 0;
+        in_use = false;
     }
     // destructor deletes the events array, but not the
     // events themselves
-    ~Alg_events();
+    virtual ~Alg_events();
     void set_events(Alg_event_ptr *e, long l, long m) {
         if (events) delete [] events;
         events = e; len = l; maxlen = m; }
@@ -468,8 +498,11 @@ public:
     // you want tracks to be in beat units.
     void insert_beat(double time, double beat);   // add a point to the map
     bool insert_tempo(double tempo, double beat); // insert a tempo change
+    // get the tempo starting at beat
+    double get_tempo(double beat);
     // set the tempo over a region
     bool set_tempo(double tempo, double start_beat, double end_beat);
+    bool stretch_region(double b0, double b1, double dur);
     void cut(double start, double len, bool units_are_seconds);
     void trim(double start, double end, bool units_are_seconds);
     void paste(double start, Alg_track *tr);
@@ -488,20 +521,76 @@ public:
 } *Alg_time_map_ptr;
 
 
-typedef class Serial_buffer {
-private:
+// Serial_buffer is an abstract class with common elements of
+//     Serial_read_buffer and Serial_write_buffer
+class Serial_buffer {
+  protected:
     char *buffer;
     char *ptr;
     long len;
-public:
+  public:
     Serial_buffer() {
         buffer = NULL;
         ptr = NULL;
         len = 0;
     }
-    void init_for_write() { ptr = buffer; }
+    virtual ~Serial_buffer() { }
+
     long get_posn() { return (long) (ptr - buffer); }
     long get_len() { return len; }
+};
+
+
+typedef class Serial_read_buffer : public Serial_buffer {
+public:
+    // note that a Serial_read_buffer is initialized for reading by
+    // setting buffer, but it is not the Serial_read_buffer's responsibility
+    // to delete the buffer (owner might want to reuse it), so the destructor
+    // does nothing.
+    virtual ~Serial_read_buffer() {  }
+#if defined(_WIN32)
+#pragma warning(disable: 546) // cast to int is OK, we only want low 7 bits
+#pragma warning(disable: 4311) // type cast pointer to long warning
+#endif
+    void get_pad() { while (((long) ptr) & 7) ptr++; }
+#if defined(_WIN32)
+#pragma warning(default: 4311 546)
+#endif
+    // Prepare to read n bytes from buf. The caller must manage buf: it is
+    // valid until reading is finished, and it is caller's responsibility
+    // to free buf when it is no longer needed.
+    void init_for_read(void *buf, long n) {
+        buffer = (char *) buf;
+        ptr = (char *) buf;
+        len = n;
+    }
+    char get_char() { return *ptr++; }
+    void unget_chars(int n) { ptr -= n; } // undo n get_char() calls
+    long get_int32() { long i = *((long *) ptr); ptr += 4; return i; }
+    float get_float() { float f = *((float *) ptr); ptr += 4; return f; }
+    double get_double() { double d = *((double *) ptr); ptr += sizeof(double); 
+                          return d; }
+    const char *get_string() { char *s = ptr; char *fence = buffer + len;
+                         assert(ptr < fence);
+                         while (*ptr++) assert(ptr < fence);
+                         get_pad();
+                         return s; }
+    void check_input_buffer(long needed) {
+        assert(get_posn() + needed <= len); }
+} *Serial_read_buffer_ptr;
+
+
+typedef class Serial_write_buffer: public Serial_buffer {
+  public:
+    // Note: allegro.cpp declares one static instance of Serial_buffer to 
+    // reduce large memory (re)allocations when serializing tracks for UNDO.
+    // This destructor will only run when the program exits, which will only
+    // add overhead to the exit process, but it will eliminate an incorrect
+    // report of memory leakage from automation that doesn't know better. -RBD
+    virtual ~Serial_write_buffer() {
+        if (buffer) delete [] buffer;
+    }
+    void init_for_write() { ptr = buffer; }
     // store_long writes a long at a given offset
     void store_long(long offset, long value) {
         assert(offset <= get_posn() - 4);
@@ -509,20 +598,33 @@ public:
         *loc = value;
     }
     void check_buffer(long needed);
-    void set_string(char *s) { 
+    void set_string(const char *s) { 
         char *fence = buffer + len;
         assert(ptr < fence);
+        // two brackets surpress a g++ warning, because this is an
+        // assignment operator inside a test.
         while ((*ptr++ = *s++)) assert(ptr < fence);
-       // assert((char *)(((long) (ptr + 7)) & ~7) <= fence);
+        // 4311 is type cast pointer to long warning
+        // 4312 is type cast long to pointer warning
+#if defined(_WIN32)
+#pragma warning(disable: 4311 4312)
+#endif
+        assert((char *)(((long) (ptr + 7)) & ~7) <= fence);
+#if defined(_WIN32)
+#pragma warning(default: 4311 4312)
+#endif
         pad(); }
     void set_int32(long v) { *((long *) ptr) = v; ptr += 4; }
     void set_double(double v) { *((double *) ptr) = v; ptr += 8; }
     void set_float(float v) { *((float *) ptr) = v; ptr += 4; }
     void set_char(char v) { *ptr++ = v; }
-#ifdef LMMS_BUILD_WIN64
-    void pad() { while (((long long) ptr) & 7) set_char(0); }
-#else
+#if defined(_WIN32)
+#pragma warning(disable: 546) // cast to int is OK, we only want low 7 bits
+#pragma warning(disable: 4311) // type cast pointer to long warning
+#endif
     void pad() { while (((long) ptr) & 7) set_char(0); }
+#if defined(_WIN32)
+#pragma warning(default: 4311 546)
 #endif
     void *to_heap(long *len) {
         *len = get_posn();
@@ -530,29 +632,7 @@ public:
         memcpy(newbuf, buffer, *len);
         return newbuf;
     }
-    void init_for_read(void *buf, long n) {
-        buffer = (char *) buf;
-        ptr = (char *) buf;
-        len = n;
-    }
-    char get_char() { return *ptr++; }
-    long get_int32() { long i = *((long *) ptr); ptr += 4; return i; }
-    float get_float() { float f = *((float *) ptr); ptr += 4; return f; }
-    double get_double() { double d = *((double *) ptr); ptr += sizeof(double); 
-                          return d; }
-    char *get_string() { char *s = ptr; char *fence = buffer + len;
-                         assert(ptr < fence);
-                         while (*ptr++) assert(ptr < fence);
-                         get_pad();
-                         return s; }
-#ifdef LMMS_BUILD_WIN64
-    void get_pad() { while (((long long) ptr) & 7) ptr++; }
-#else
-    void get_pad() { while (((long) ptr) & 7) ptr++; }
-#endif
-    void check_input_buffer(long needed) {
-        assert(get_posn() + needed <= len); }
-} *Serial_buffer_ptr;
+} *Serial_write_buffer_ptr;
 
 typedef class Alg_seq *Alg_seq_ptr;
 
@@ -564,7 +644,8 @@ protected:
     long get_int32(char **p, long *b);
     double get_double(char **p, long *b);
     float get_float(char **p, long *b);
-    static Serial_buffer ser_buf;
+    static Serial_read_buffer ser_read_buf;
+    static Serial_write_buffer ser_write_buf;
     void serialize_parameter(Alg_parameter *parm);
     // *buffer_ptr points to binary data, bytes_ptr points to how many
     // bytes have been used so far, len is length of binary data
@@ -587,7 +668,8 @@ public:
     // copy constructor: event_list is copied, map is installed and referenced
     Alg_track(Alg_event_list_ref event_list, Alg_time_map_ptr map, 
               bool units_are_seconds);
-    virtual ~Alg_track() { set_time_map(NULL); }
+    virtual ~Alg_track() { // note: do not call set_time_map(NULL)!
+        if (time_map) time_map->dereference(); time_map = NULL; }
 
     // Returns a buffer containing a serialization of the
     // file.  It will be an ASCII representation unless text is true.
@@ -726,6 +808,7 @@ public:
     virtual Alg_event_list *find(double t, double len, bool all,
                                  long channel_mask, long event_type_mask);
 
+    virtual void set_in_use(bool flag) { in_use = flag; }
     //
     // MIDI playback
     //
@@ -785,11 +868,15 @@ public:
     void show();
     long length() { return len; }
     int find_beat(double beat);
-    void insert(double beat, double num, double den);
-    void cut(double start, double end); // remove from start to end
+    // get the number of beats per measure starting at beat
+    double get_bar_len(double beat);
+    void insert(double beat, double num, double den, bool force = false);
+    void cut(double start, double end, double dur); // remove from start to end
     void trim(double start, double end); // retain just start to end
     void paste(double start, Alg_seq *seq);
     void insert_beats(double beat, double len); // insert len beats at beat
+    // find the nearest beat (see Alg_seq::nearest_beat) to beat
+    double nearest_beat(double beat);
 };
 
 
@@ -816,18 +903,95 @@ public:
     void append(Alg_track_ptr track);
     void add_track(int track_num, Alg_time_map_ptr time_map, bool seconds);
     void reset();
+    void set_in_use(bool flag); // handy to set in_use flag on all tracks
 } *Alg_tracks_ptr;
 
 
 typedef enum {
     alg_no_error = 0,      // no error reading Allegro or MIDI file
     alg_error_open = -800, // could not open Allegro or MIDI file
-    alg_error_syntax       // something found in the file that could not be parsed;
-    // generally you should ignore syntax errors or look at the printed error messages
-    // because there are some things in standard midi files that we do not handle;
-    // (maybe we should only set alg_error_syntax when there is a real problem with
-    // the file as opposed to when there is some warning message for the user)
+    alg_error_syntax   // something found in the file that could not be parsed;
+    // generally you should ignore syntax errors or look at the printed error 
+    // messages because there are some things in standard midi files that we do
+    // not handle; (maybe we should only set alg_error_syntax when there is a
+    // real problem with the file as opposed to when there is some warning
+    // message for the user)
 } Alg_error;
+
+
+typedef struct Alg_pending_event {
+    void *cookie; // client-provided sequence identifier
+    Alg_events *events; // the array of events
+    long index; // offset of this event
+    bool note_on; // is this a note-on or a note-off (if applicable)?
+    double offset; // time offset for events
+    double time; // time for this event
+} *Alg_pending_event_ptr;
+
+
+typedef class Alg_iterator {
+private:
+    long maxlen;
+    void expand();
+    void expand_to(int new_max);
+    long len;
+    Alg_seq_ptr seq;
+    Alg_pending_event *pending_events;
+    // the next four fields are mainly for request_note_off()
+    Alg_events_ptr events_ptr; // remembers events containing current event
+    long index; // remembers index of current event
+    void *cookie; // remembers the cookie associated with next event
+    double offset;
+    void show();
+    bool earlier(int i, int j);
+    void insert(Alg_events_ptr events, long index, bool note_on, 
+                void *cookie, double offset);
+    // returns the info on the next pending event in the priority queue
+    bool remove_next(Alg_events_ptr &events, long &index, bool &note_on,
+                     void *&cookie, double &offset, double &time);
+public:
+    bool note_off_flag; // remembers if we are iterating over note-off
+                        // events as well as note-on and update events
+    long length() { return len; }
+    Alg_iterator(Alg_seq_ptr s, bool note_off) {
+        seq = s;
+        note_off_flag = note_off;
+        maxlen = len = 0;
+        pending_events = NULL;
+    }
+    // Normally, iteration is over the events in the one sequence used
+    // to instatiate the iterator (see above), but with this method, you
+    // can add more sequences to the iteration. Events are returned in
+    // time order, so effectively sequence events are merged.
+    // The optional offset is added to each event time of sequence s
+    // before merging/sorting. You should call begin_seq() for each
+    // sequence to be included in the iteration unless you call begin()
+    // (see below).
+    void begin_seq(Alg_seq_ptr s, void *cookie = NULL, double offset = 0.0);
+    ~Alg_iterator();
+    // Prepare to enumerate events in order. If note_off_flag is true, then
+    // iteration_next will merge note-off events into the sequence. If you
+    // call begin(), you should not normally call begin_seq(). See above.
+    void begin(void *cookie = NULL) { begin_seq(seq, cookie); }
+    // return next event (or NULL). If iteration_begin was called with
+    // note_off_flag = true, and if note_on is not NULL, then *note_on
+    // is set to true when the result value represents a note-on or update.
+    // (With note_off_flag, each Alg_note event is returned twice, once
+    // at the note-on time, with *note_on == true, and once at the note-off
+    // time, with *note_on == false. If a cookie_ptr is passed, then the
+    // cookie corresponding to the event is stored at that address
+    // If end_time is 0, iterate through the entire sequence, but if
+    // end_time is non_zero, stop iterating at the last event before end_time
+    Alg_event_ptr next(bool *note_on = NULL, void **cookie_ptr = NULL,
+                       double *offset_ptr = NULL, double end_time = 0); 
+    // Sometimes, the caller wants to receive note-off events for a subset
+    // of the notes, typically the notes that are played and need to be
+    // turned off. In this case, when a note is turned on, the client
+    // should call request_note_off(). This will insert a note-off into
+    // the queue for the most recent note returned by next(). 
+    void request_note_off();
+    void end();   // clean up after enumerating events
+} *Alg_iterator_ptr;
 
 
 // An Alg_seq is an array of Alg_events, each a sequence of Alg_event, 
@@ -835,7 +999,7 @@ typedef enum {
 //
 typedef class Alg_seq : public Alg_track {
 protected:
-    long *current; // array of indexes used by iteration methods
+    Alg_iterator_ptr pending; // iterator used internally by Alg_seq methods
     void serialize_seq();
     Alg_error error; // error code set by file readers
     // an internal function used for writing Allegro track names
@@ -860,9 +1024,11 @@ public:
     Alg_seq(Alg_track_ref track) { seq_from_track(track); }
     Alg_seq(Alg_track_ptr track) { seq_from_track(*track); }
     void seq_from_track(Alg_track_ref tr);
-    Alg_seq(std::istream &file, bool smf); // create from file
-    Alg_seq(const char *filename, bool smf); // create from filename
-    ~Alg_seq();
+    // create from file:
+    Alg_seq(std::istream &file, bool smf, double *offset_ptr = NULL);
+    // create from filename
+    Alg_seq(const char *filename, bool smf, double *offset_ptr = NULL);
+    virtual ~Alg_seq();
     int get_read_error() { return error; }
     void serialize(void **buffer, long *bytes);
     void copy_time_sigs_to(Alg_seq *dest); // a utility function
@@ -874,10 +1040,10 @@ public:
     void unserialize_seq();
 
     // write an ascii representation to file
-    void write(std::ostream &file, bool in_secs);
+    void write(std::ostream &file, bool in_secs, double offset = 0.0);
     // returns true on success
-    bool write(const char *filename);
-    void smf_write(std::ofstream &file);
+    bool write(const char *filename, double offset = 0.0);
+    void smf_write(std::ostream &file);
     bool smf_write(const char *filename);
 
     // Returns the number of tracks
@@ -917,23 +1083,34 @@ public:
     // find index of first score event after time
     long seek_time(double time, int track_num);
     bool insert_beat(double time, double beat);
+    // return the time of the beat nearest to time, also returns beat
+    // number through beat. This will correspond to an integer number
+    // of beats from the nearest previous time signature or 0.0, but
+    // since time signatures need not be on integer beat boundaries
+    // the beat location may not be on an integer beat (beat locations
+    // are measured from the beginning which is beat 0.
+    double nearest_beat_time(double time, double *beat);
     // warning: insert_tempo may change representation from seconds to beats
     bool insert_tempo(double bpm, double beat);
-
+    // change the duration from b0 to b1 (beats) to dur (seconds) by
+    // scaling the intervening tempos
+    bool stretch_region(double b0, double b1, double dur);
     // add_event takes a pointer to an event on the heap. The event is not
     // copied, and this Alg_seq becomes the owner and freer of the event.
     void add_event(Alg_event_ptr event, int track_num);
     void add(Alg_event_ptr event) { assert(false); } // call add_event instead
-    // warning: set_tempo may change representation from seconds to beats
+    // get the tempo starting at beat
+    double get_tempo(double beat);
     bool set_tempo(double bpm, double start_beat, double end_beat);
+
+    // get the bar length in beats starting at beat
+    double get_bar_len(double beat);
     void set_time_sig(double beat, double num, double den);
     void beat_to_measure(double beat, long *measure, double *m_beat,
                          double *num, double *den);
     // void set_events(Alg_event_ptr *events, long len, long max);
     void merge_tracks();    // move all track data into one track
-    void iteration_begin(); // prepare to enumerate events in order
-    Alg_event_ptr iteration_next(); // return next event (or NULL)
-    void iteration_end();   // clean up after enumerating events
+    void set_in_use(bool flag); // set in_use flag on all tracks
 } *Alg_seq_ptr, &Alg_seq_ref;
 
 
