@@ -20,8 +20,8 @@ std::vector<Diginstrument::Component<T>> Diginstrument::Interpolator<T, S>::getS
 template <typename T, class S>
 S Diginstrument::Interpolator<T, S>::interpolateSpectra(const S &left, const S &right, const T &target, const T &leftLabel, const T &rightLabel, const bool shifting)
 {
+    //TODO: if not shifting, do we need matching/bin accumulation?
     //TODO: snare test has two distinct pulses, and goes into negative for some reason
-    //TODO: why am i not using the shifting boolean?
     //NOTE: we do need to match components to do any meaningful shifting
     //ex.: a wide peak on left and a sharper, higher-pitched peak on right. Number of components not equal.
     //TODO: pseudocode:
@@ -35,26 +35,18 @@ S Diginstrument::Interpolator<T, S>::interpolateSpectra(const S &left, const S &
             //calculate an average frequency
             //accumulate or average amplitude?
     */
-
-    vector<Component<T>> harmonics;
-    //TODO: there should be a more sophisticated way of dealing with unmatched peaks. for example, if the left harmonic series is shorter then the right, just adding those in without shifting will sound terrible
+    vector<Match> matches;
     vector<unsigned int> unmatchedLeft;
     vector<unsigned int> unmatchedRight;
 
-    const T rightWeight = target / (rightLabel - leftLabel);
-    const T leftWeight = 1.0f - rightWeight;
-    const T leftRatio = target / leftLabel;
-    const T rightRatio = target / rightLabel;
+    //TODO: what IS shifting?
 
-    auto leftHarmonics = left.getMatchables();
-    auto rightHarmonics = right.getMatchables();
-    //TODO: acts weird if i hit an exact point (eg. 440)
-    //TODO: acts even weirder with snare test: 4 spectra on same "pitch" and different time coordinates
-
+    //if either is empty, we can't match
+    //no matching
     if (left.empty() || !shifting)
     {
         //return attenuated right
-        unmatchedRight.resize(rightHarmonics.size());
+        unmatchedRight.resize(right.getMatchables().size());
         for(int i = 0; i<unmatchedRight.size(); i++)
         {
             unmatchedRight[i]=i;
@@ -63,7 +55,7 @@ S Diginstrument::Interpolator<T, S>::interpolateSpectra(const S &left, const S &
     if (right.empty() || !shifting)
     {
         //return attenuated left
-        unmatchedLeft.resize(leftHarmonics.size());
+        unmatchedLeft.resize(left.getMatchables().size());
         for(int i = 0; i<unmatchedLeft.size(); i++)
         {
             unmatchedLeft[i]=i;
@@ -71,68 +63,87 @@ S Diginstrument::Interpolator<T, S>::interpolateSpectra(const S &left, const S &
     }
     if(shifting && !right.empty() && !left.empty())
     {
-        //1) match peaks
-        //TODO: generalize
-        //TODO: refactor
-        auto matches = PeakMatcher::matchPeaks(left.getMatchables(), right.getMatchables(), unmatchedLeft, unmatchedRight);
+        matches = PeakMatcher::matchPeaks(left.getMatchables(), right.getMatchables(), unmatchedLeft, unmatchedRight);
+    }
 
-        //debug
-        //cout << "number of harmonics: " << leftHarmonics.size() << " " << rightHarmonics.size() << endl;
-        //cout << "matches" << endl;
-        for (auto &match : matches)
+    return constructSpectrum(left, right, target, leftLabel, rightLabel, matches, unmatchedLeft, unmatchedRight);
+}
+
+template <typename T, typename S>
+NoteSpectrum<T> Diginstrument::Interpolator<T, S>::constructSpectrum(
+    const NoteSpectrum<T> & left,
+    const NoteSpectrum<T> & right,
+    const T &target, const T &leftLabel, const T &rightLabel,
+    const vector<Match> & matches,
+    const vector<unsigned int> & unmatchedLeft,
+    const vector<unsigned int> & unmatchedRight
+    )
+{
+    //TODO: is unmatchable even neccesary? if its static, it should get matched either way!
+    //TMP: dont use unmatchable
+
+    //calculate shifting metrics
+    const T rightWeight = target / (rightLabel - leftLabel);
+    const T leftWeight = 1.0f - rightWeight;
+    const T leftRatio = target / leftLabel;
+    const T rightRatio = target / rightLabel;
+
+    vector<Component<T>> res;
+    auto leftMatchables = left.getMatchables();
+    auto rightMatchables = right.getMatchables();
+    
+    //TODO: BUGHUNT: violin ~1500hz: negative amplitudes; seems to be common
+    //TODO: BUGHUNT: percussions (bass drum, snare): common negative amplitudes, weird "pulse" and crackling?
+    //TODO: BUGHUNT: might have to rethink what shifting truly means
+
+    //tmp:debug:
+    cout<<"left matchables: "<<leftMatchables.size()<<endl;
+    cout<<"right matchables: "<<rightMatchables.size()<<endl;
+
+    //process matches; each match results in one component
+    for (auto &match : matches)
+    {
+        res.emplace_back((leftMatchables[match.left].frequency * leftRatio + rightMatchables[match.right].frequency * rightRatio) / 2.0, 0, leftMatchables[match.left].amplitude * leftWeight + rightMatchables[match.right].amplitude * rightWeight);
+    }
+    
+    //TMP: we shift all unmatched components as well
+    //TODO: TMP: FIXME: we assume that the first match is the fundamental frequency
+    if(matches.size()>0)
+    {
+        const T leftFF = (target/leftMatchables[matches.front().left].frequency);
+        for(auto & unmatched : unmatchedLeft)
         {
-            //tmp:debug
-            //std::cout << leftHarmonics[match.left].frequency << " - " << rightHarmonics[match.right].frequency << " : " << match.distance << std::endl;
-            //tmp
-            if (leftHarmonics[match.left].frequency == rightHarmonics[match.right].frequency)
-            {
-                harmonics.emplace_back(leftHarmonics[match.left].frequency, 0, leftHarmonics[match.left].amplitude * leftWeight + rightHarmonics[match.right].amplitude * rightWeight);
-            }
-            else
-            {
-                //TODO: NOTE: this simple method might not work generally, but for the pure sine it does
-                harmonics.emplace_back((leftHarmonics[match.left].frequency * leftRatio + rightHarmonics[match.right].frequency * rightRatio) / 2.0, 0, leftHarmonics[match.left].amplitude * leftWeight + rightHarmonics[match.right].amplitude * rightWeight);
-            }
+            res.emplace_back(leftMatchables[unmatched].frequency * leftFF, 0, leftMatchables[unmatched].amplitude * leftWeight);
         }
-        //TODO: idea: unmatched overtones should be shifted up and then attenuated
-        //TODO: TMP: FIXME: this assumes all components are to be shifted
-        //TODO: TMP: FIXME: we assume that the first match is the fundamental frequency
-        for(auto & overtone : unmatchedLeft)
+            //NOTE: :TODO i might incorrectly corrected a left to right here
+        
+        const T rightFF = (target/rightMatchables[matches.front().right].frequency);
+        for(auto & unmatched : unmatchedRight)
         {
-            leftHarmonics[overtone].frequency = leftHarmonics[overtone].frequency * (target/leftHarmonics[matches.front().left].frequency);
+            res.emplace_back(rightMatchables[unmatched].frequency * rightFF, 0, rightMatchables[unmatched].amplitude * rightWeight);
         }
-        for(auto & overtone : unmatchedRight)
+    }
+    //TODO: if we don't match, two components can overlap and amplify/interfere with eachother; how to handle this? maybe do frequency bins?
+    else
+    {
+        //we can't shift; just attenuate them
+        for (const auto &unmatched : unmatchedLeft)
         {
-            rightHarmonics[overtone].frequency = rightHarmonics[overtone].frequency * (target/rightHarmonics[matches.front().left].frequency);
+            res.emplace_back(leftMatchables[unmatched].frequency, 0, leftMatchables[unmatched].amplitude * leftWeight);
+        }
+        for (const auto &unmatched : unmatchedRight)
+        {
+            res.emplace_back(rightMatchables[unmatched].frequency, 0, rightMatchables[unmatched].amplitude * rightWeight);
         }
     }
-
-    //TODO: why am i handling unmatched left and right separately?
-    //tmp TODO: unmatched are still added, but no shifting for now
-    for (auto &unmatched : unmatchedLeft)
+    //tmp:debug
+    std::sort(res.begin(), res.end());
+    cout<<"res:"<<endl;
+    for(auto & c : res)
     {
-        harmonics.emplace_back(leftHarmonics[unmatched].frequency, 0, leftHarmonics[unmatched].amplitude * leftWeight);
+        cout<<c.frequency<<", "<<c.amplitude<<endl;
     }
-    for (auto &unmatched : unmatchedRight)
-    {
-        harmonics.emplace_back(rightHarmonics[unmatched].frequency, 0, rightHarmonics[unmatched].amplitude * rightWeight);
-    }
-
-    //tmp: debug
-    /*cout << "unmatched left: ";
-    for (auto e : unmatchedLeft)
-    {
-        cout << leftHarmonics[e].frequency << " ";
-    }
-    cout << endl;
-    cout << "unmatched right: ";
-    for (auto e : unmatchedRight)
-    {
-        cout << rightHarmonics[e].frequency << " ";
-    }
-    cout << endl;*/
-
-    return Diginstrument::NoteSpectrum<double>(target, harmonics, {});
+    return Diginstrument::NoteSpectrum<T>(target, res, {});
 }
 
 template <typename T, class S>
@@ -184,6 +195,7 @@ SplineSpectrum<T, 4> Diginstrument::Interpolator<T, SplineSpectrum<T, 4>>::inter
         //TODO: new or dead peaks get  matched to another - multiple targets for a peak
         for (auto &match : matches)
         {
+            //NOTE: GENERALIZATION: identical until here; processing matches could be transferred to a method
             //tmp:debug
             //std::cout<<leftComponents[match.left].frequency<< " - "<<rightComponents[match.right].frequency<<" : "<<match.distance<<std::endl;
             //tmp: limit
@@ -202,6 +214,7 @@ SplineSpectrum<T, 4> Diginstrument::Interpolator<T, SplineSpectrum<T, 4>>::inter
     }
     //TODO: splines that cover too short a distance cause problems: zero ratio split, maybe too few points to split?
     //2) consolidate peaks
+    //TODO: NOTE: GENERALIZATION: i THINK this is the "bin accumulation" step
     auto res = consolidatePieces(left.getSpline(), right.getSpline(), rightRatio);
 
     //tmp: visualization

@@ -25,6 +25,15 @@ public:
   void addSpectra(const std::vector<S> &spectra, std::vector<std::vector<T>> coordinates);
 
   S interpolateSpectra(const S & left, const S & right, const T &target, const T &leftLabel, const T &rightLabel, const bool shifting);
+  
+  NoteSpectrum<T> constructSpectrum(
+    const NoteSpectrum<T> & left,
+    const NoteSpectrum<T> & right,
+    const T &target, const T &leftLabel, const T &rightLabel,
+    const std::vector<Match> & matches,
+    const std::vector<unsigned int> & unmatchedLeft,
+    const std::vector<unsigned int> & unmatchedRight
+    );
 
   Interpolator() {}
 
@@ -33,6 +42,20 @@ private:
   static constexpr T frequencyStep = 0.001;
   std::vector<std::pair<std::string, bool>> dimensions;
 };
+
+// template <typename T>
+// class Interpolator<T, NoteSpectrum<T>>
+// {
+// public:
+//   NoteSpectrum<T> constructSpectrum(
+//     const NoteSpectrum<T> & left,
+//     const NoteSpectrum<T> & right,
+//     const T &target, const T &leftLabel, const T &rightLabel,
+//     const std::vector<Match> & matches,
+//     const std::vector<unsigned int> & unmatchedLeft,
+//     const std::vector<unsigned int> & unmatchedRight
+//     );
+// };
 
 template <typename T>
 class Interpolator<T, SplineSpectrum<T, 4>>

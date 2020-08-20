@@ -112,12 +112,12 @@ std::vector<Diginstrument::Match> Diginstrument::PeakMatcher::matchPeaks(const s
         }
         i++;
     }
-    leftUnmatched.reserve(unmatchedLeft.size());
+    leftUnmatched.reserve(unmatchedLeft.size()+leftUnmatched.size());
     for (auto it = unmatchedLeft.begin(); it != unmatchedLeft.end(); )
     {
         leftUnmatched.push_back(std::move(unmatchedLeft.extract(it++).value()));
     }
-    rightUnmatched.reserve(unmatchedRight.size());
+    rightUnmatched.reserve(unmatchedRight.size()+rightUnmatched.size());
     for (auto it = unmatchedRight.begin(); it != unmatchedRight.end(); )
     {
         rightUnmatched.push_back(std::move(unmatchedRight.extract(it++).value()));
