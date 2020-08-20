@@ -67,13 +67,14 @@ public:
 	{
 	private:
 		QString m_name;
+		bool m_isScale;
 		ChordSemiTones m_semiTones;
 		int m_size;
 
 	public:
 		Chord() : m_size( 0 ) {}
 
-		Chord( const char * n, const ChordSemiTones & semi_tones );
+		Chord(QString name, bool is_scale, const ChordSemiTones & semi_tones);
 
 		int size() const
 		{
@@ -82,7 +83,12 @@ public:
 
 		bool isScale() const
 		{
-			return size() > 6;
+			return m_isScale;
+		}
+
+		bool isChord() const
+		{
+			return !m_isScale;
 		}
 
 		bool isEmpty() const
@@ -113,10 +119,12 @@ public:
 	{
 	private:
 		ChordTable();
+		bool loadNotes();
 
 		struct Init
 		{
 			const char * m_name;
+			bool m_isScale;
 			ChordSemiTones m_semiTones;
 		};
 
