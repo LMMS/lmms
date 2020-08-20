@@ -818,7 +818,7 @@ void XpressiveView::usrWaveClicked() {
 }
 
 QString XpressiveHelpView::s_helpText=
-"<b>O1, O2</b> - Two output waves. Panning is controled by PN1 and PN2.<br>"
+"<b>O1, O2</b> - Two output waves. Panning is controlled by PN1 and PN2.<br>"
 "<b>W1, W2, W3</b> - Wave samples evaluated by expression. In these samples, t variable ranges [0,1).<br>"
 "These waves can be used as functions inside the output waves (O1, O2). The wave period is 1.<br>"
 "<h4>Available variables:</h4><br>"
@@ -829,10 +829,10 @@ QString XpressiveHelpView::s_helpText=
 "<b>srate</b> - Sample rate. In wave expression it returns the wave's number of samples.<br>"
 "<b>tempo</b> - Song's Tempo. Available only in the output expressions.<br>"
 "<b>v</b> - Note's volume. Note that the output is already multiplied by the volume. Available only in the output expressions.<br>"
-"<b>rel</b> - Gives 0.0 while the key is holded, and 1.0 after the key release. Available only in the output expressions.<br>"
-"<b>trel</b> - Time after release. While the note is holded, it gives 0.0. Afterwards, it start counting seconds.<br>"
+"<b>rel</b> - Gives 0.0 while the key is held, and 1.0 after the key release. Available only in the output expressions.<br>"
+"<b>trel</b> - Time after release. While the note is held, it gives 0.0. Afterwards, it starts counting seconds.<br>"
 "The time it takes to shift from 0.0 to 1.0 after key release is determined by the REL knob<br>"
-"<b>seed</b> - A random value that remains consistent in the lifetime of a single wave. meant to be used with <b>randsv</b><br>"
+"<b>seed</b> - A random value that remains consistent in the lifetime of a single wave. Meant to be used with <b>randsv</b><br>"
 "<b>A1, A2, A3</b> - General purpose knobs. You can reference them only in O1 and O2. In range [-1,1].<br>"
 "<h4>Available functions:</h4><br>"
 "<b>W1, W2, W3</b> - As mentioned before. You can reference them only in O1 and O2.<br>"
@@ -877,6 +877,11 @@ XpressiveHelpView::XpressiveHelpView():QTextEdit(s_helpText)
 	parentWidget()->setAttribute( Qt::WA_DeleteOnClose, false );
 	parentWidget()->setWindowIcon( PLUGIN_NAME::getIconPixmap( "logo" ) );
 	parentWidget()->setFixedSize( 300, 500);
+	
+	// No maximize button
+	Qt::WindowFlags flags = parentWidget()->windowFlags();
+	flags &= ~Qt::WindowMaximizeButtonHint;
+	parentWidget()->setWindowFlags( flags );
 }
 
 void XpressiveView::helpClicked() {

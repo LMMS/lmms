@@ -150,6 +150,8 @@ public:
 		update();
 	}
 
+	void setXOffset(const int x);
+
 	void addToolButtons(QToolBar* _tool_bar );
 
 
@@ -243,6 +245,7 @@ signals:
 	void positionChanged( const MidiTime & _t );
 	void loopPointStateLoaded( int _n );
 	void positionMarkerMoved();
+	void loadBehaviourAtStop( int _n );
 
 } ;
 

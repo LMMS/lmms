@@ -51,67 +51,32 @@ static inline QString ensureTrailingSlash(const QString & s )
 ConfigManager * ConfigManager::s_instanceOfMe = NULL;
 
 
-ConfigManager::ConfigManager() :
-	m_workingDir(QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation) + "/lmms/"),
-	m_dataDir("data:/"),
-	m_vstDir(m_workingDir + "vst/"),
-	m_sf2Dir(m_workingDir + SF2_PATH),
-	m_gigDir(m_workingDir + GIG_PATH),
-	m_themeDir(defaultThemeDir()),
-	m_lmmsRcFile(QDir::home().absolutePath() +"/.lmmsrc.xml"),
-	m_version(defaultVersion())
+ConfigManager::ConfigManager() : m_version(defaultVersion())
 {
-	// Detect < 1.2.0 working directory as a courtesy
-	if ( QFileInfo( QDir::home().absolutePath() + "/lmms/projects/" ).exists() )
-                m_workingDir = QDir::home().absolutePath() + "/lmms/";
-
-	if (! qgetenv("LMMS_DATA_DIR").isEmpty())
+	if (QFileInfo::exists(qApp->applicationDirPath() + PORTABLE_MODE_FILE))
+	{
+		initPortableWorkingDir();
+	}
+	else
+	{
+		initInstalledWorkingDir();
+	}
+	m_dataDir = "data:/";
+	m_vstDir = m_workingDir + "vst/";
+	m_sf2Dir = m_workingDir + SF2_PATH;
+	m_gigDir = m_workingDir + GIG_PATH;
+	m_themeDir = defaultThemeDir();
+	if (!qgetenv("LMMS_DATA_DIR").isEmpty())
+	{
 		QDir::addSearchPath("data", QString::fromLocal8Bit(qgetenv("LMMS_DATA_DIR")));
-
-	// If we're in development (lmms is not installed) let's get the source and
-	// binary directories by reading the CMake Cache
-	QDir appPath = qApp->applicationDirPath();
-	// If in tests, get parent directory
-	if (appPath.dirName() == "tests") {
-		appPath.cdUp();
 	}
-	QFile cmakeCache(appPath.absoluteFilePath("CMakeCache.txt"));
-	if (cmakeCache.exists()) {
-		cmakeCache.open(QFile::ReadOnly);
-		QTextStream stream(&cmakeCache);
-
-		// Find the lines containing something like lmms_SOURCE_DIR:static=<dir>
-		// and lmms_BINARY_DIR:static=<dir>
-		int done = 0;
-		while(! stream.atEnd())
-		{
-			QString line = stream.readLine();
-
-			if (line.startsWith("lmms_SOURCE_DIR:")) {
-				QString srcDir = line.section('=', -1).trimmed();
-				QDir::addSearchPath("data", srcDir + "/data/");
-				done++;
-			}
-			if (line.startsWith("lmms_BINARY_DIR:")) {
-				m_lmmsRcFile = line.section('=', -1).trimmed() +  QDir::separator() +
-											 ".lmmsrc.xml";
-				done++;
-			}
-			if (done == 2)
-			{
-				break;
-			}
-		}
-
-		cmakeCache.close();
-	}
+	initDevelopmentWorkingDir();
 
 #ifdef LMMS_BUILD_WIN32
 	QDir::addSearchPath("data", qApp->applicationDirPath() + "/data/");
 #else
 	QDir::addSearchPath("data", qApp->applicationDirPath().section('/', 0, -2) + "/share/lmms/");
 #endif
-
 
 }
 
@@ -193,7 +158,7 @@ QString ConfigManager::defaultVersion() const
 	return LMMS_VERSION;
 }
 
-QStringList ConfigManager::availabeVstEmbedMethods()
+QStringList ConfigManager::availableVstEmbedMethods()
 {
 	QStringList methods;
 	methods.append("none");
@@ -215,7 +180,7 @@ QStringList ConfigManager::availabeVstEmbedMethods()
 
 QString ConfigManager::vstEmbedMethod() const
 {
-	QStringList methods = availabeVstEmbedMethods();
+	QStringList methods = availableVstEmbedMethods();
 	QString defaultMethod = *(methods.end() - 1);
 	QString currentMethod = value( "ui", "vstembedmethod", defaultMethod );
 	return methods.contains(currentMethod) ? currentMethod : defaultMethod;
@@ -650,4 +615,61 @@ void ConfigManager::saveConfigFile()
 
 	outfile.write(xml.toUtf8());
 	outfile.close();
+}
+
+void ConfigManager::initPortableWorkingDir()
+{
+	QString applicationPath = qApp->applicationDirPath();
+	m_workingDir = applicationPath + "/lmms-workspace/";
+	m_lmmsRcFile = applicationPath + "/.lmmsrc.xml";
+}
+
+void ConfigManager::initInstalledWorkingDir()
+{
+	m_workingDir = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation) + "/lmms/";
+	m_lmmsRcFile = QDir::home().absolutePath() +"/.lmmsrc.xml";
+	// Detect < 1.2.0 working directory as a courtesy
+	if ( QFileInfo( QDir::home().absolutePath() + "/lmms/projects/" ).exists() )
+		m_workingDir = QDir::home().absolutePath() + "/lmms/";
+}
+
+void ConfigManager::initDevelopmentWorkingDir()
+{
+	// If we're in development (lmms is not installed) let's get the source and
+	// binary directories by reading the CMake Cache
+	QDir appPath = qApp->applicationDirPath();
+	// If in tests, get parent directory
+	if (appPath.dirName() == "tests") {
+		appPath.cdUp();
+	}
+	QFile cmakeCache(appPath.absoluteFilePath("CMakeCache.txt"));
+	if (cmakeCache.exists()) {
+		cmakeCache.open(QFile::ReadOnly);
+		QTextStream stream(&cmakeCache);
+
+		// Find the lines containing something like lmms_SOURCE_DIR:static=<dir>
+		// and lmms_BINARY_DIR:static=<dir>
+		int done = 0;
+		while(! stream.atEnd())
+		{
+			QString line = stream.readLine();
+
+			if (line.startsWith("lmms_SOURCE_DIR:")) {
+				QString srcDir = line.section('=', -1).trimmed();
+				QDir::addSearchPath("data", srcDir + "/data/");
+				done++;
+			}
+			if (line.startsWith("lmms_BINARY_DIR:")) {
+				m_lmmsRcFile = line.section('=', -1).trimmed() +  QDir::separator() +
+							   ".lmmsrc.xml";
+				done++;
+			}
+			if (done == 2)
+			{
+				break;
+			}
+		}
+
+		cmakeCache.close();
+	}
 }

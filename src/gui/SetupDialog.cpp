@@ -102,6 +102,8 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 			"ui", "oneinstrumenttrackwindow").toInt()),
 	m_sideBarOnRight(ConfigManager::inst()->value(
 			"ui", "sidebaronright").toInt()),
+	m_soloLegacyBehavior(ConfigManager::inst()->value(
+			"app", "sololegacybehavior", "0").toInt()),
 	m_MMPZ(!ConfigManager::inst()->value(
 			"app", "nommpz").toInt()),
 	m_disableBackup(!ConfigManager::inst()->value(
@@ -233,6 +235,8 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 		m_oneInstrumentTrackWindow, SLOT(toggleOneInstrumentTrackWindow(bool)), true);
 	addLedCheckBox("Show sidebar on the right-hand side", gui_tw, counter,
 		m_sideBarOnRight, SLOT(toggleSideBarOnRight(bool)), true);
+	addLedCheckBox("Mute automation tracks during solo", gui_tw, counter,
+		m_soloLegacyBehavior, SLOT(toggleSoloLegacyBehavior(bool)), false);
 
 	gui_tw->setFixedHeight(YDelta + YDelta * counter);
 
@@ -389,7 +393,7 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	m_vstEmbedComboBox = new QComboBox(plugins_tw);
 	m_vstEmbedComboBox->move(XDelta, YDelta * ++counter);
 
-	QStringList embedMethods = ConfigManager::availabeVstEmbedMethods();
+	QStringList embedMethods = ConfigManager::availableVstEmbedMethods();
 	m_vstEmbedComboBox->addItem(tr("No embedding"), "none");
 	if(embedMethods.contains("qt"))
 	{
@@ -677,9 +681,32 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 			this, SLOT(midiInterfaceChanged(const QString &)));
 
 
+	// MIDI autoassign tab.
+	TabWidget * midiAutoAssign_tw = new TabWidget(
+			tr("Automatically assign MIDI controller to selected track"), midi_w);
+	midiAutoAssign_tw->setFixedHeight(56);
+
+	m_assignableMidiDevices = new QComboBox(midiAutoAssign_tw);
+	m_assignableMidiDevices->setGeometry(10, 20, 240, 28);
+	m_assignableMidiDevices->addItem("none");
+	if ( !Engine::mixer()->midiClient()->isRaw() )
+	{
+		m_assignableMidiDevices->addItems(Engine::mixer()->midiClient()->readablePorts());
+	}
+	else
+	{
+		m_assignableMidiDevices->addItem("all");
+	}
+	int current = m_assignableMidiDevices->findText(ConfigManager::inst()->value("midi", "midiautoassign"));
+	if (current >= 0)
+	{
+		m_assignableMidiDevices->setCurrentIndex(current);
+	}
+
 	// MIDI layout ordering.
 	midi_layout->addWidget(midiiface_tw);
 	midi_layout->addWidget(ms_w);
+	midi_layout->addWidget(midiAutoAssign_tw);
 	midi_layout->addStretch();
 
 
@@ -882,6 +909,8 @@ void SetupDialog::accept()
 					QString::number(m_oneInstrumentTrackWindow));
 	ConfigManager::inst()->setValue("ui", "sidebaronright",
 					QString::number(m_sideBarOnRight));
+	ConfigManager::inst()->setValue("app", "sololegacybehavior",
+					QString::number(m_soloLegacyBehavior));
 	ConfigManager::inst()->setValue("app", "nommpz",
 					QString::number(!m_MMPZ));
 	ConfigManager::inst()->setValue("app", "disablebackup",
@@ -917,6 +946,8 @@ void SetupDialog::accept()
 					QString::number(m_bufferSize));
 	ConfigManager::inst()->setValue("mixer", "mididev",
 					m_midiIfaceNames[m_midiInterfaces->currentText()]);
+	ConfigManager::inst()->setValue("midi", "midiautoassign",
+					m_assignableMidiDevices->currentText());
 
 
 	ConfigManager::inst()->setWorkingDir(QDir::fromNativeSeparators(m_workingDir));
@@ -1016,6 +1047,10 @@ void SetupDialog::setLanguage(int lang)
 }
 
 
+void SetupDialog::toggleSoloLegacyBehavior(bool enabled)
+{
+	m_soloLegacyBehavior = enabled;
+}
 
 
 // Performance settings slots.

@@ -40,6 +40,7 @@
 #include "ToolTip.h"
 #include "StepRecorder.h"
 #include "StepRecorderWidget.h"
+#include "PositionLine.h"
 
 class QPainter;
 class QPixmap;
@@ -55,25 +56,38 @@ class TimeLineWidget;
 class PianoRoll : public QWidget
 {
 	Q_OBJECT
-	Q_PROPERTY( QColor barLineColor READ barLineColor WRITE setBarLineColor )
-	Q_PROPERTY( QColor beatLineColor READ beatLineColor WRITE setBeatLineColor )
-	Q_PROPERTY( QColor lineColor READ lineColor WRITE setLineColor )
-	Q_PROPERTY( QColor noteModeColor READ noteModeColor WRITE setNoteModeColor )
-	Q_PROPERTY( QColor noteColor READ noteColor WRITE setNoteColor )
-	Q_PROPERTY( QColor ghostNoteColor READ ghostNoteColor WRITE setGhostNoteColor )
-	Q_PROPERTY( QColor noteTextColor READ noteTextColor WRITE setNoteTextColor )
-	Q_PROPERTY( QColor ghostNoteTextColor READ ghostNoteTextColor WRITE setGhostNoteTextColor )
-	Q_PROPERTY( QColor barColor READ barColor WRITE setBarColor )
-	Q_PROPERTY( QColor selectedNoteColor READ selectedNoteColor WRITE setSelectedNoteColor )
-	Q_PROPERTY( QColor textColor READ textColor WRITE setTextColor )
-	Q_PROPERTY( QColor textColorLight READ textColorLight WRITE setTextColorLight )
-	Q_PROPERTY( QColor textShadow READ textShadow WRITE setTextShadow )
-	Q_PROPERTY( QColor markedSemitoneColor READ markedSemitoneColor WRITE setMarkedSemitoneColor )
-	Q_PROPERTY( int noteOpacity READ noteOpacity WRITE setNoteOpacity )
-	Q_PROPERTY( bool noteBorders READ noteBorders WRITE setNoteBorders )
-	Q_PROPERTY( int ghostNoteOpacity READ ghostNoteOpacity WRITE setGhostNoteOpacity )
-	Q_PROPERTY( bool ghostNoteBorders READ ghostNoteBorders WRITE setGhostNoteBorders )
-	Q_PROPERTY( QColor backgroundShade READ backgroundShade WRITE setBackgroundShade )
+	Q_PROPERTY(QColor barLineColor MEMBER m_barLineColor)
+	Q_PROPERTY(QColor beatLineColor MEMBER m_beatLineColor)
+	Q_PROPERTY(QColor lineColor MEMBER m_lineColor)
+	Q_PROPERTY(QColor noteModeColor MEMBER m_noteModeColor)
+	Q_PROPERTY(QColor noteColor MEMBER m_noteColor)
+	Q_PROPERTY(QColor ghostNoteColor MEMBER m_ghostNoteColor)
+	Q_PROPERTY(QColor noteTextColor MEMBER m_noteTextColor)
+	Q_PROPERTY(QColor ghostNoteTextColor MEMBER m_ghostNoteTextColor)
+	Q_PROPERTY(QColor barColor MEMBER m_barColor)
+	Q_PROPERTY(QColor selectedNoteColor MEMBER m_selectedNoteColor)
+	Q_PROPERTY(QColor textColor MEMBER m_textColor)
+	Q_PROPERTY(QColor textColorLight MEMBER m_textColorLight)
+	Q_PROPERTY(QColor textShadow MEMBER m_textShadow)
+	Q_PROPERTY(QColor markedSemitoneColor MEMBER m_markedSemitoneColor)
+	Q_PROPERTY(int noteOpacity MEMBER m_noteOpacity)
+	Q_PROPERTY(bool noteBorders MEMBER m_noteBorders)
+	Q_PROPERTY(int ghostNoteOpacity MEMBER m_ghostNoteOpacity)
+	Q_PROPERTY(bool ghostNoteBorders MEMBER m_ghostNoteBorders)
+	Q_PROPERTY(QColor backgroundShade MEMBER m_backgroundShade)
+
+	/* white key properties */
+	Q_PROPERTY(int whiteKeyWidth MEMBER m_whiteKeyWidth)
+	Q_PROPERTY(QColor whiteKeyInactiveTextColor MEMBER m_whiteKeyInactiveTextColor)
+	Q_PROPERTY(QColor whiteKeyInactiveTextShadow MEMBER m_whiteKeyInactiveTextShadow)
+	Q_PROPERTY(QBrush whiteKeyInactiveBackground MEMBER m_whiteKeyInactiveBackground)
+	Q_PROPERTY(QColor whiteKeyActiveTextColor MEMBER m_whiteKeyActiveTextColor)
+	Q_PROPERTY(QColor whiteKeyActiveTextShadow MEMBER m_whiteKeyActiveTextShadow)
+	Q_PROPERTY(QBrush whiteKeyActiveBackground MEMBER m_whiteKeyActiveBackground)
+	/* black key properties */
+	Q_PROPERTY(int blackKeyWidth MEMBER m_blackKeyWidth)
+	Q_PROPERTY(QBrush blackKeyInactiveBackground MEMBER m_blackKeyInactiveBackground)
+	Q_PROPERTY(QBrush blackKeyActiveBackground MEMBER m_blackKeyActiveBackground)
 public:
 	enum EditModes
 	{
@@ -125,47 +139,6 @@ public:
 
 	int quantization() const;
 
-	// qproperty access functions
-	QColor barLineColor() const;
-	void setBarLineColor( const QColor & c );
-	QColor beatLineColor() const;
-	void setBeatLineColor( const QColor & c );
-	QColor lineColor() const;
-	void setLineColor( const QColor & c );
-	QColor noteModeColor() const;
-	void setNoteModeColor( const QColor & c );
-	QColor noteColor() const;
-	void setNoteColor( const QColor & c );
-	QColor noteTextColor() const;
-	void setNoteTextColor( const QColor & c );
-	QColor barColor() const;
-	void setBarColor( const QColor & c );
-	QColor selectedNoteColor() const;
-	void setSelectedNoteColor( const QColor & c );
-	QColor textColor() const;
-	void setTextColor( const QColor & c );
-	QColor textColorLight() const;
-	void setTextColorLight( const QColor & c );
-	QColor textShadow() const;
-	void setTextShadow( const QColor & c );
-	QColor markedSemitoneColor() const;
-	void setMarkedSemitoneColor( const QColor & c );
-	int noteOpacity() const;
-	void setNoteOpacity( const int i );
-	bool noteBorders() const;
-	void setNoteBorders( const bool b );
-	QColor ghostNoteColor() const;
-	void setGhostNoteColor( const QColor & c );
-	QColor ghostNoteTextColor() const;
-	void setGhostNoteTextColor( const QColor & c );
-	int ghostNoteOpacity() const;
-	void setGhostNoteOpacity( const int i );
-	bool ghostNoteBorders() const;
-	void setGhostNoteBorders( const bool b );
-	QColor backgroundShade() const;
-	void setBackgroundShade( const QColor & c );
-
-
 protected:
 	void keyPressEvent( QKeyEvent * ke ) override;
 	void keyReleaseEvent( QKeyEvent * ke ) override;
@@ -178,6 +151,7 @@ protected:
 	void resizeEvent( QResizeEvent * re ) override;
 	void wheelEvent( QWheelEvent * we ) override;
 	void focusOutEvent( QFocusEvent * ) override;
+	void focusInEvent( QFocusEvent * ) override;
 
 	int getKey( int y ) const;
 	void drawNoteRect( QPainter & p, int x, int y,
@@ -185,9 +159,8 @@ protected:
 					const QColor & selCol, const int noteOpc, const bool borderless, bool drawNoteName );
 	void removeSelection();
 	void selectAll();
-	NoteVector getSelectedNotes();
+	NoteVector getSelectedNotes() const;
 	void selectNotesOnKey();
-	int xCoordOfTick( int tick );
 
 	// for entering values with dblclick in the vol/pan bars
 	void enterValue( NoteVector* nv );
@@ -212,7 +185,7 @@ protected slots:
 	void copySelectedNotes();
 	void cutSelectedNotes();
 	void pasteNotes();
-	void deleteSelectedNotes();
+	bool deleteSelectedNotes();
 
 	void updatePosition(const MidiTime & t );
 	void updatePositionAccompany(const MidiTime & t );
@@ -278,6 +251,8 @@ private:
 		PR_BLACK_KEY
 	};
 
+	PositionLine * m_positionLine;
+
 	QVector<QString> m_nemStr; // gui names of each edit mode
 	QMenu * m_noteEditMenu; // when you right click below the key area
 
@@ -294,7 +269,9 @@ private:
 	MidiTime newNoteLen() const;
 
 	void shiftPos(int amount);
+	void shiftPos(NoteVector notes, int amount);
 	void shiftSemiTone(int amount);
+	void shiftSemiTone(NoteVector notes, int amount);
 	bool isSelection() const;
 	int selectionCount() const;
 	void testPlayNote( Note * n );
@@ -302,6 +279,9 @@ private:
 	void pauseTestNotes(bool pause = true );
 	void playChordNotes(int key, int velocity=-1);
 	void pauseChordNotes(int key);
+
+	void updateScrollbars();
+	void updatePositionLineHeight();
 
 	QList<int> getAllOctavesForKey( int keyToMirror ) const;
 
@@ -317,12 +297,6 @@ private:
 	static const int cm_scrollAmtHoriz = 10;
 	static const int cm_scrollAmtVert = 1;
 
-	static QPixmap * s_whiteKeyBigPm;
-	static QPixmap * s_whiteKeyBigPressedPm;
-	static QPixmap * s_whiteKeySmallPm;
-	static QPixmap * s_whiteKeySmallPressedPm;
-	static QPixmap * s_blackKeyPm;
-	static QPixmap * s_blackKeyPressedPm;
 	static QPixmap * s_toolDraw;
 	static QPixmap * s_toolErase;
 	static QPixmap * s_toolSelect;
@@ -386,10 +360,11 @@ private:
 	int m_moveStartX;
 	int m_moveStartY;
 
-	int m_oldNotesEditHeight;
 	int m_notesEditHeight;
+	int m_userSetNotesEditHeight;
 	int m_ppb;  // pixels per bar
 	int m_totalKeysToScroll;
+	int m_pianoKeysVisible;
 
 	int m_keyLineHeight;
 	int m_octaveHeight;
@@ -402,6 +377,9 @@ private:
 	MidiTime m_lenOfNewNotes;
 	volume_t m_lastNoteVolume;
 	panning_t m_lastNotePanning;
+
+	//When resizing several notes, we want to calculate a common minimum length
+	MidiTime m_minResizeLen;
 
 	int m_startKey; // first key when drawing
 	int m_lastKey;
@@ -452,6 +430,18 @@ private:
 	bool m_noteBorders;
 	bool m_ghostNoteBorders;
 	QColor m_backgroundShade;
+	/* white key properties */
+	int m_whiteKeyWidth;
+	QColor m_whiteKeyActiveTextColor;
+	QColor m_whiteKeyActiveTextShadow;
+	QBrush m_whiteKeyActiveBackground;
+	QColor m_whiteKeyInactiveTextColor;
+	QColor m_whiteKeyInactiveTextShadow;
+	QBrush m_whiteKeyInactiveBackground;
+	/* black key properties */
+	int m_blackKeyWidth;
+	QBrush m_blackKeyActiveBackground;
+	QBrush m_blackKeyInactiveBackground;
 
 signals:
 	void positionChanged( const MidiTime & );
@@ -495,6 +485,7 @@ public:
 	}
 
 	QSize sizeHint() const override;
+	bool hasFocus() const;
 
 signals:
 	void currentPatternChanged();

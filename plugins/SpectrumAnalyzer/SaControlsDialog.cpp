@@ -151,8 +151,8 @@ SaControlsDialog::SaControlsDialog(SaControls *controls, SaProcessor *processor)
 
 	ComboBox *freqRangeCombo = new ComboBox(this, tr("Frequency range"));
 	freqRangeCombo->setToolTip(tr("Frequency range"));
-	freqRangeCombo->setMinimumSize(100, 22);
-	freqRangeCombo->setMaximumSize(200, 22);
+	freqRangeCombo->setMinimumSize(100, ComboBox::DEFAULT_HEIGHT);
+	freqRangeCombo->setMaximumSize(200, ComboBox::DEFAULT_HEIGHT);
 	freqRangeCombo->setModel(&controls->m_freqRangeModel);
 	config_layout->addWidget(freqRangeCombo, 0, 3, 2, 1);
 
@@ -171,8 +171,8 @@ SaControlsDialog::SaControlsDialog(SaControls *controls, SaProcessor *processor)
 
 	ComboBox *ampRangeCombo = new ComboBox(this, tr("Amplitude range"));
 	ampRangeCombo->setToolTip(tr("Amplitude range"));
-	ampRangeCombo->setMinimumSize(100, 22);
-	ampRangeCombo->setMaximumSize(200, 22);
+	ampRangeCombo->setMinimumSize(100, ComboBox::DEFAULT_HEIGHT);
+	ampRangeCombo->setMaximumSize(200, ComboBox::DEFAULT_HEIGHT);
 	ampRangeCombo->setModel(&controls->m_ampRangeModel);
 	config_layout->addWidget(ampRangeCombo, 2, 3, 2, 1);
 
@@ -201,8 +201,8 @@ SaControlsDialog::SaControlsDialog(SaControls *controls, SaProcessor *processor)
 
 	ComboBox *windowCombo = new ComboBox(this, tr("FFT window type"));
 	windowCombo->setToolTip(tr("FFT window type"));
-	windowCombo->setMinimumSize(100, 22);
-	windowCombo->setMaximumSize(200, 22);
+	windowCombo->setMinimumSize(100, ComboBox::DEFAULT_HEIGHT);
+	windowCombo->setMaximumSize(200, ComboBox::DEFAULT_HEIGHT);
 	windowCombo->setModel(&controls->m_windowModel);
 	config_layout->addWidget(windowCombo, 2, 5, 2, 1);
 	processor->rebuildWindow();
