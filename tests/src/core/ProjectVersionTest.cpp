@@ -23,7 +23,6 @@
  */
 
 #include "QTestSuite.h"
-#include <QtCore/QDebug>
 
 #include "ProjectVersion.h"
 
@@ -42,6 +41,8 @@ private slots:
 		QVERIFY( ! ( ProjectVersion("2.5.0", ProjectVersion::Release) < "2.2.5" ) );
 		//A pre-release version has lower precedence than a normal version
 		QVERIFY(ProjectVersion("1.1.0") > "1.1.0-alpha");
+		//But higher precedence than the previous version
+		QVERIFY(ProjectVersion("1.1.0-alpha") > "1.0.0");
 		//Identifiers with letters or hyphens are compare lexically in ASCII sort order
 		QVERIFY(ProjectVersion("1.1.0-alpha") < "1.1.0-beta");
 		QVERIFY(ProjectVersion("1.2.0-rc1") < "1.2.0-rc2");
@@ -51,7 +52,12 @@ private slots:
 		QVERIFY(ProjectVersion("1.0.0-alpha.1") < "1.0.0-alpha.beta");
 		QVERIFY(ProjectVersion("1.0.0-alpha.beta") < "1.0.0-beta");
 		QVERIFY(ProjectVersion("1.0.0-beta.2") < "1.0.0-beta.11");
-
+		//Test workaround for old, nonstandard version numbers
+		QVERIFY(ProjectVersion("1.2.2.42") == "1.2.3-42");
+		QVERIFY(ProjectVersion("1.2.2.42") > "1.2.2.21");
+		//Ensure that newer versions of the same format aren't upgraded
+		//in order to discourage use of incorrect versioning
+		QVERIFY(ProjectVersion("1.2.3.42") == "1.2.3");
 	}
 } ProjectVersionTests;
 

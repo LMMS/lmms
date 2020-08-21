@@ -49,6 +49,17 @@ ProjectVersion::ProjectVersion(QString version, CompareType c) :
 
 	// Any # of optional pre-release identifiers may follow, separated by '.'s
 	if (mainAndLabels.size() >= 2){ m_labels = mainAndLabels.at(1).split("."); }
+
+	// HACK: Handle old (1.2.2 and earlier), non-standard versions of the form
+	// MAJOR.MINOR.PATCH.COMMITS, used for non-release builds from source.
+	if (mainVersion.size() >= 4 && m_major <= 1 && m_minor <= 2 && m_patch <= 2){
+		// Drop the standard version identifiers. erase(a, b) removes [a,b)
+		mainVersion.erase(mainVersion.begin(), mainVersion.begin() + 3);
+		// Prepend the remaining identifiers as prerelease versions
+		m_labels = mainVersion + m_labels;
+		// Bump the patch version. x.y.z-a < x.y.z, but we want x.y.z.a > x.y.z
+		m_patch += 1;
+	}
 }
 
 
@@ -70,7 +81,7 @@ int ProjectVersion::compare(const ProjectVersion & a, const ProjectVersion & b, 
 	if (c >= 2){ aMin = a.getMinor(); bMin = b.getMinor(); }
 	if (c >= 3){ aPat = a.getPatch(); bPat = b.getPatch(); }
 
-	// Then compare as if we care about every identifiers
+	// Then compare as if we care about every identifier
 	if(aMaj != bMaj){ return aMaj - bMaj; }
 	if(aMin != bMin){ return aMin - bMin; }
 	if(aPat != bPat){ return aPat - bPat; }
