@@ -76,7 +76,8 @@ private:
   /*TMP*/
   Diginstrument::Synthesizer synth;
   //TODO: make inst spectrum type work - discrete only for now
-  //Diginstrument::Interpolator<double, SplineSpectrum<double, 4>> inst;
+  //TODO: TMP: separate instruments; rethink this template
+  Diginstrument::Interpolator<double, SplineSpectrum<double, 4>> spline_inst;
   Diginstrument::Interpolator<double, Diginstrument::NoteSpectrum<double>> inst;
   std::string fileName;
   InstrumentData inst_data;

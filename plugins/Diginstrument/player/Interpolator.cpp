@@ -89,19 +89,19 @@ NoteSpectrum<T> Diginstrument::Interpolator<T, S>::constructSpectrum(
     const T rightRatio = target / rightLabel;
 
     vector<Component<T>> res;
-    auto leftMatchables = left.getMatchables();
-    auto rightMatchables = right.getMatchables();
+    const auto leftMatchables = left.getMatchables();
+    const auto rightMatchables = right.getMatchables();
     
     //TODO: BUGHUNT: violin ~1500hz: negative amplitudes; seems to be common
     //TODO: BUGHUNT: percussions (bass drum, snare): common negative amplitudes, weird "pulse" and crackling?
     //TODO: BUGHUNT: might have to rethink what shifting truly means
 
     //tmp:debug:
-    cout<<"left matchables: "<<leftMatchables.size()<<endl;
-    cout<<"right matchables: "<<rightMatchables.size()<<endl;
+    //cout<<"left matchables: "<<leftMatchables.size()<<endl;
+    //cout<<"right matchables: "<<rightMatchables.size()<<endl;
 
     //process matches; each match results in one component
-    for (auto &match : matches)
+    for (const auto &match : matches)
     {
         res.emplace_back((leftMatchables[match.left].frequency * leftRatio + rightMatchables[match.right].frequency * rightRatio) / 2.0, 0, leftMatchables[match.left].amplitude * leftWeight + rightMatchables[match.right].amplitude * rightWeight);
     }
@@ -111,14 +111,12 @@ NoteSpectrum<T> Diginstrument::Interpolator<T, S>::constructSpectrum(
     if(matches.size()>0)
     {
         const T leftFF = (target/leftMatchables[matches.front().left].frequency);
-        for(auto & unmatched : unmatchedLeft)
+        for(const auto & unmatched : unmatchedLeft)
         {
             res.emplace_back(leftMatchables[unmatched].frequency * leftFF, 0, leftMatchables[unmatched].amplitude * leftWeight);
         }
-            //NOTE: :TODO i might incorrectly corrected a left to right here
-        
         const T rightFF = (target/rightMatchables[matches.front().right].frequency);
-        for(auto & unmatched : unmatchedRight)
+        for(const auto & unmatched : unmatchedRight)
         {
             res.emplace_back(rightMatchables[unmatched].frequency * rightFF, 0, rightMatchables[unmatched].amplitude * rightWeight);
         }
@@ -137,13 +135,27 @@ NoteSpectrum<T> Diginstrument::Interpolator<T, S>::constructSpectrum(
         }
     }
     //tmp:debug
-    std::sort(res.begin(), res.end());
+    /*std::sort(res.begin(), res.end());
     cout<<"res:"<<endl;
     for(auto & c : res)
     {
         cout<<c.frequency<<", "<<c.amplitude<<endl;
-    }
+    }*/
     return Diginstrument::NoteSpectrum<T>(target, res, {});
+}
+
+template <typename T, typename S>
+SplineSpectrum<T, 4> Diginstrument::Interpolator<T, S>::constructSpectrum(
+    const SplineSpectrum<T, 4> & left,
+    const SplineSpectrum<T, 4> & right,
+    const T &target, const T &leftLabel, const T &rightLabel,
+    const std::vector<Match> & matches,
+    const std::vector<unsigned int> & unmatchedLeft,
+    const std::vector<unsigned int> & unmatchedRight
+    )
+{
+    //TODO
+    return SplineSpectrum<T, 4>({});
 }
 
 template <typename T, class S>
@@ -167,85 +179,85 @@ void Diginstrument::Interpolator<T, S>::setDimensions(const std::vector<std::pai
 }
 
 //TODO: remake with the more generic method
-template <typename T>
-SplineSpectrum<T, 4> Diginstrument::Interpolator<T, SplineSpectrum<T, 4>>::interpolateSpectra(
-    SplineSpectrum<T, 4> left,
-    SplineSpectrum<T, 4> right,
-    const T &target,
-    const T &leftLabel,
-    const T &rightLabel,
-    bool shifting)
-{
-    //TODO
-    //TODO: if split has <D+1 CPs
-    const T rightRatio = (target - leftLabel) / (rightLabel - leftLabel);
-    //const T leftDistance = target-leftLabel;
+// template <typename T>
+// SplineSpectrum<T, 4> Diginstrument::Interpolator<T, SplineSpectrum<T, 4>>::interpolateSpectra(
+//     SplineSpectrum<T, 4> left,
+//     SplineSpectrum<T, 4> right,
+//     const T &target,
+//     const T &leftLabel,
+//     const T &rightLabel,
+//     bool shifting)
+// {
+//     //TODO
+//     //TODO: if split has <D+1 CPs
+//     const T rightRatio = (target - leftLabel) / (rightLabel - leftLabel);
+//     //const T leftDistance = target-leftLabel;
 
-    //1) stretch pieces
-    if (shifting /*tmp*/ && left.getSpline().getPeaks().size() > 0 && right.getSpline().getPeaks().size() > 0)
-    {
-        auto leftComponents = left.getComponents(0);
-        auto rightComponents = right.getComponents(0);
-        auto matches = PeakMatcher::matchPeaks(leftComponents, rightComponents);
+//     //1) stretch pieces
+//     if (shifting /*tmp*/ && left.getSpline().getPeaks().size() > 0 && right.getSpline().getPeaks().size() > 0)
+//     {
+//         auto leftComponents = left.getComponents(0);
+//         auto rightComponents = right.getComponents(0);
+//         auto matches = PeakMatcher::matchPeaks(leftComponents, rightComponents);
 
-        //TODO: process matches
-        //TODO: test
-        //tmp: debug
-        //std::cout<<"left has: "<<leftComponents.size()<<", right has: "<<rightComponents.size()<<" - matches: "<<matches.size()<<std::endl;
-        //TODO: new or dead peaks get  matched to another - multiple targets for a peak
-        for (auto &match : matches)
-        {
-            //NOTE: GENERALIZATION: identical until here; processing matches could be transferred to a method
-            //tmp:debug
-            //std::cout<<leftComponents[match.left].frequency<< " - "<<rightComponents[match.right].frequency<<" : "<<match.distance<<std::endl;
-            //tmp: limit
-            if (match.distance > 20)
-                continue;
-            auto &l = left.getSpline().getPieces()[match.left];
-            auto &r = right.getSpline().getPieces()[match.right];
-            const T target = (r.getEnd() - l.getEnd()) * rightRatio + l.getEnd();
-            //std::cout<<l.getBegin()<<", "<<l.getEnd()<<" to "<<target<<std::endl;
-            //std::cout<<r.getBegin()<<", "<<r.getEnd()<<" to "<<target<<std::endl;
-            left.getSpline().stretchPieceEndTo(match.left, target);
-            right.getSpline().stretchPieceEndTo(match.right, target);
-            //std::cout<<std::endl;
-        }
-        //std::cout<<std::endl;
-    }
-    //TODO: splines that cover too short a distance cause problems: zero ratio split, maybe too few points to split?
-    //2) consolidate peaks
-    //TODO: NOTE: GENERALIZATION: i THINK this is the "bin accumulation" step
-    auto res = consolidatePieces(left.getSpline(), right.getSpline(), rightRatio);
+//         //TODO: process matches
+//         //TODO: test
+//         //tmp: debug
+//         //std::cout<<"left has: "<<leftComponents.size()<<", right has: "<<rightComponents.size()<<" - matches: "<<matches.size()<<std::endl;
+//         //TODO: new or dead peaks get  matched to another - multiple targets for a peak
+//         for (auto &match : matches)
+//         {
+//             //NOTE: GENERALIZATION: identical until here; processing matches could be transferred to a method
+//             //tmp:debug
+//             //std::cout<<leftComponents[match.left].frequency<< " - "<<rightComponents[match.right].frequency<<" : "<<match.distance<<std::endl;
+//             //tmp: limit
+//             if (match.distance > 20)
+//                 continue;
+//             auto &l = left.getSpline().getPieces()[match.left];
+//             auto &r = right.getSpline().getPieces()[match.right];
+//             const T target = (r.getEnd() - l.getEnd()) * rightRatio + l.getEnd();
+//             //std::cout<<l.getBegin()<<", "<<l.getEnd()<<" to "<<target<<std::endl;
+//             //std::cout<<r.getBegin()<<", "<<r.getEnd()<<" to "<<target<<std::endl;
+//             left.getSpline().stretchPieceEndTo(match.left, target);
+//             right.getSpline().stretchPieceEndTo(match.right, target);
+//             //std::cout<<std::endl;
+//         }
+//         //std::cout<<std::endl;
+//     }
+//     //TODO: splines that cover too short a distance cause problems: zero ratio split, maybe too few points to split?
+//     //2) consolidate peaks
+//     //TODO: NOTE: GENERALIZATION: i THINK this is the "bin accumulation" step
+//     auto res = consolidatePieces(left.getSpline(), right.getSpline(), rightRatio);
 
-    //tmp: visualization
-    /*for(double i = 20; i<20000; i+=20)
-    {
-        std::cout<<std::fixed<<"("<<i<<","<<left[i].amplitude<<"),";
-    }
-    std::cout<<std::endl<<std::endl<<std::endl<<std::endl;
-    for(double i = 20; i<20000; i+=20)
-    {
-        std::cout<<std::fixed<<"("<<i<<","<<right[i].amplitude<<"),";
-    }
-    std::cout<<std::endl<<std::endl<<std::endl<<std::endl;
-    for(double i = 20; i<20000; i+=20)
-    {
-        std::cout<<std::fixed<<"("<<i<<","<<res[i][2]<<"),";
-    }*/
+//     //tmp: visualization
+//     /*for(double i = 20; i<20000; i+=20)
+//     {
+//         std::cout<<std::fixed<<"("<<i<<","<<left[i].amplitude<<"),";
+//     }
+//     std::cout<<std::endl<<std::endl<<std::endl<<std::endl;
+//     for(double i = 20; i<20000; i+=20)
+//     {
+//         std::cout<<std::fixed<<"("<<i<<","<<right[i].amplitude<<"),";
+//     }
+//     std::cout<<std::endl<<std::endl<<std::endl<<std::endl;
+//     for(double i = 20; i<20000; i+=20)
+//     {
+//         std::cout<<std::fixed<<"("<<i<<","<<res[i][2]<<"),";
+//     }*/
 
-    //tmp:debug:
-    /*std::cout<<"RES: "<<std::endl;
-    for(auto & c : SplineSpectrum<T, 4>(res).getComponents(0))
-    {
-        std::cout<<std::fixed<<c.frequency<<" : "<<c.amplitude<<std::endl;
-    }
-    std::cout<<std::endl<<std::endl;*/
+//     //tmp:debug:
+//     /*std::cout<<"RES: "<<std::endl;
+//     for(auto & c : SplineSpectrum<T, 4>(res).getComponents(0))
+//     {
+//         std::cout<<std::fixed<<c.frequency<<" : "<<c.amplitude<<std::endl;
+//     }
+//     std::cout<<std::endl<<std::endl;*/
 
-    return SplineSpectrum<T, 4>(std::move(res));
-}
+//     return SplineSpectrum<T, 4>(std::move(res));
+// }
 
-template <typename T>
-PiecewiseBSpline<T, 4> Diginstrument::Interpolator<T, SplineSpectrum<T, 4>>::consolidatePieces(PiecewiseBSpline<T, 4> &left, PiecewiseBSpline<T, 4> &right, T rightRatio)
+template <typename T, typename S>
+PiecewiseBSpline<T, 4> Diginstrument::Interpolator<T, S>::consolidatePieces(PiecewiseBSpline<T, 4> &left, PiecewiseBSpline<T, 4> &right, T rightRatio)
 {
     PiecewiseBSpline<T, 4> res;
     //use deque as stack, as stack has no iterator initialization and has deque as underlying structure anyway
@@ -556,8 +568,8 @@ PiecewiseBSpline<T, 4> Diginstrument::Interpolator<T, SplineSpectrum<T, 4>>::con
     return res;
 }
 
-template <typename T>
-BSpline<T, 4> Diginstrument::Interpolator<T, SplineSpectrum<T, 4>>::matchPieces(BSpline<T, 4> left, BSpline<T, 4> right, T rightRatio)
+template <typename T, typename S>
+BSpline<T, 4> Diginstrument::Interpolator<T, S>::matchPieces(BSpline<T, 4> left, BSpline<T, 4> right, T rightRatio)
 {
     BSpline<T, 4> res;
     constexpr unsigned int D = 4;

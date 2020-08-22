@@ -57,9 +57,19 @@ void DiginstrumentPlugin::playNote(NotePlayHandle *noteHandle,
 								   sampleFrame *_working_buf)
 {
 	/*TMP*/
+	//TMP: TODO: BAD spectrum type selection, BAD!
 	const double startTime = noteHandle->totalFramesPlayed() / (double)Engine::mixer()->processingSampleRate();
-	const auto spectrum = inst.getSpectrum({noteHandle->frequency(), startTime});
-	auto audioData = this->synth.playNote(spectrum, noteHandle->framesLeftForCurrentPeriod(), noteHandle->totalFramesPlayed(), /*tmp*/ 44100);
+	vector<float> audioData;
+	if(inst_data.type == "discrete")
+	{
+		auto spectrum = inst.getSpectrum({noteHandle->frequency(), startTime});
+		audioData = this->synth.playNote(spectrum, noteHandle->framesLeftForCurrentPeriod(), noteHandle->totalFramesPlayed(), /*tmp*/ 44100);
+	}
+	else
+	{
+		auto spectrum = spline_inst.getSpectrum({noteHandle->frequency(), startTime});
+		audioData = this->synth.playNote(spectrum, noteHandle->framesLeftForCurrentPeriod(), noteHandle->totalFramesPlayed(), /*tmp*/ 44100);
+	}
 	/*tmp: stereo*/
 	unsigned int counter = 0;
 	unsigned int offset = noteHandle->noteOffset();

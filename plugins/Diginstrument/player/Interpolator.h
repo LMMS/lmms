@@ -35,10 +35,26 @@ public:
     const std::vector<unsigned int> & unmatchedRight
     );
 
+SplineSpectrum<T, 4> constructSpectrum(
+    const SplineSpectrum<T, 4> & left,
+    const SplineSpectrum<T, 4> & right,
+    const T &target, const T &leftLabel, const T &rightLabel,
+    const std::vector<Match> & matches,
+    const std::vector<unsigned int> & unmatchedLeft,
+    const std::vector<unsigned int> & unmatchedRight
+    );
+
   Interpolator() {}
 
 private:
+
+  static BSpline<T, 4> matchPieces(BSpline<T, 4> left, const BSpline<T, 4> right, T rightRatio);
+  static PiecewiseBSpline<T, 4> consolidatePieces(PiecewiseBSpline<T, 4> & left, PiecewiseBSpline<T, 4> & right, T rightRatio);
+  
   MultidimensionalNeighbourMap<T, S> data;
+  
+  //tmp
+  constexpr static double maxFrequencyDistance = 0.2;
   static constexpr T frequencyStep = 0.001;
   std::vector<std::pair<std::string, bool>> dimensions;
 };
@@ -57,19 +73,19 @@ private:
 //     );
 // };
 
-template <typename T>
-class Interpolator<T, SplineSpectrum<T, 4>>
-{
-public:
-  static SplineSpectrum<T, 4> interpolateSpectra(SplineSpectrum<T, 4> left, SplineSpectrum<T, 4> right, const T &target, const T &leftLabel, const T &rightLabel, bool shifting = false);
+// template <typename T>
+// class Interpolator<T, SplineSpectrum<T, 4>>
+// {
+// public:
+//   static SplineSpectrum<T, 4> interpolateSpectra(SplineSpectrum<T, 4> left, SplineSpectrum<T, 4> right, const T &target, const T &leftLabel, const T &rightLabel, bool shifting = false);
 
-  Interpolator() {}
+//   Interpolator() {}
 
-private:
-  //tmp
-  constexpr static double maxFrequencyDistance = 0.2;
+// private:
+//   //tmp
+//   constexpr static double maxFrequencyDistance = 0.2;
 
-  static BSpline<T, 4> matchPieces(BSpline<T, 4> left, const BSpline<T, 4> right, T rightRatio);
-  static PiecewiseBSpline<T, 4> consolidatePieces(PiecewiseBSpline<T, 4> & left, PiecewiseBSpline<T, 4> & right, T rightRatio);
-};
+//   static BSpline<T, 4> matchPieces(BSpline<T, 4> left, const BSpline<T, 4> right, T rightRatio);
+//   static PiecewiseBSpline<T, 4> consolidatePieces(PiecewiseBSpline<T, 4> & left, PiecewiseBSpline<T, 4> & right, T rightRatio);
+// };
 }; // namespace Diginstrument
