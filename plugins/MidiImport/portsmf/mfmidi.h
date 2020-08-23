@@ -81,10 +81,11 @@ private:
     int egetc();
     int msgleng();
 
-    int readmt(char*,int);
+    int readmt(const char*,int);
     long to32bit(int,int,int,int);
     int to16bit(int,int);
     void mferror(char *);
+    void mferror(const char *);
     void badbyte(int);
     void metaevent(int);
     void msgadd(int);
