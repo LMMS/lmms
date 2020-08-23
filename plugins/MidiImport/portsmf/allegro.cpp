@@ -30,7 +30,7 @@ using namespace std;
 // 4311 is type cast ponter to long warning
 // 4996 is warning against strcpy
 // 4267 is size_t to long warning
-#pragma warning(disable: 4311 4996 4267)
+//#pragma warning(disable: 4311 4996 4267)
 Alg_atoms symbol_table;
 Serial_read_buffer Alg_track::ser_read_buf; // declare the static variables
 Serial_write_buffer Alg_track::ser_write_buf; 
@@ -720,7 +720,7 @@ Alg_event_list::Alg_event_list(Alg_track *owner)
 }
 
 
-Alg_event_ptr &Alg_event_list::operator [](int i) 
+Alg_event_ptr const &Alg_event_list::operator [](int i) 
 {
     assert(i >= 0 && i < len);
     return events[i];
@@ -739,8 +739,8 @@ void Alg_event_list::set_start_time(Alg_event *event, double t)
     // For Alg_track, change the time and move the event to the right place
     // For Alg_seq, find the track and do the update there
     
-    long index, i;
-    Alg_track_ptr track_ptr;
+    long index = 0, i;
+    Alg_track_ptr track_ptr = nullptr;
     if (type == 'e') { // this is an Alg_event_list
         // make sure the owner has not changed its event set
         assert(events_owner && 
@@ -1522,7 +1522,7 @@ Alg_track *Alg_track::unserialize(void *buffer, long len)
     bool alg = ser_read_buf.get_char() == 'A' &&
                ser_read_buf.get_char() == 'L' &&
                ser_read_buf.get_char() == 'G';
-    assert(alg);
+    assert(alg); (void)alg; // unused variable
     char c = ser_read_buf.get_char();
     if (c == 'S') {
         Alg_seq *seq = new Alg_seq;
@@ -1539,7 +1539,7 @@ Alg_track *Alg_track::unserialize(void *buffer, long len)
 }
 
 
-#pragma warning(disable: 4800) // long to bool performance warning
+//#pragma warning(disable: 4800) // long to bool performance warning
 
 /* Note: this Alg_seq must have a default initialized Alg_time_map.
  * It will be filled in with data from the ser_read_buf buffer.
@@ -1551,9 +1551,9 @@ void Alg_seq::unserialize_seq()
                 (ser_read_buf.get_char() == 'L') &&
                 (ser_read_buf.get_char() == 'G') &&
                 (ser_read_buf.get_char() == 'S');
-    assert(algs);
+    assert(algs); (void)algs; // unused variable
     long len = ser_read_buf.get_int32();
-    assert(ser_read_buf.get_len() >= len);
+    assert(ser_read_buf.get_len() >= len); (void)len; // unused variable
     channel_offset_per_track = ser_read_buf.get_int32();
     units_are_seconds = ser_read_buf.get_int32() != 0;
     beat_dur = ser_read_buf.get_double();
@@ -1599,10 +1599,10 @@ void Alg_track::unserialize_track()
                 (ser_read_buf.get_char() == 'L') &&
                 (ser_read_buf.get_char() == 'G') &&
                 (ser_read_buf.get_char() == 'T');
-    assert(algt);
+    assert(algt); (void)algt; // unused variable
     long offset = ser_read_buf.get_posn(); // stored length does not include 'ALGT'
     long bytes = ser_read_buf.get_int32();
-    assert(bytes <= ser_read_buf.get_len() - offset);
+    assert(bytes <= ser_read_buf.get_len() - offset); (void)offset; (void)bytes; // unused variable
     units_are_seconds = (bool) ser_read_buf.get_int32();
     beat_dur = ser_read_buf.get_double();
     real_dur = ser_read_buf.get_double();
@@ -1672,7 +1672,7 @@ void Alg_track::unserialize_parameter(Alg_parameter_ptr parm_ptr)
     }
 }
 
-#pragma warning(default: 4800)
+//#pragma warning(default: 4800)
 
 void Alg_track::set_time_map(Alg_time_map *map)
 {
@@ -1840,6 +1840,7 @@ void Alg_track::paste(double t, Alg_event_list *seq)
     bool prev_units_are_seconds;
     if (seq->get_type() == 'e') {
         assert(seq->get_owner()->get_units_are_seconds() == units_are_seconds);
+        prev_units_are_seconds = seq->get_owner()->get_units_are_seconds();
     } else { // make it match
         Alg_track_ptr tr = (Alg_track_ptr) seq;
         prev_units_are_seconds = tr->get_units_are_seconds();
@@ -2381,14 +2382,14 @@ void Alg_time_sigs::paste(double start, Alg_seq *seq)
     double num_of_insert = 4.0;
     double den_of_insert = 4.0;
     double beat_of_insert = 0.0;
-    int first_from_index = 0; // where to start copying from
+    /* int first_from_index = 0; // where to start copying from  TODO: LMMS commented out unused variable */
     if (from.length() > 0 && from[0].beat < ALG_EPS) {
         // there is an initial time signature in "from"
         num_of_insert = from[0].num;
         den_of_insert = from[0].den;
         // since we are handling the first time signature in from,
         // we can start copying at index == 1:
-        first_from_index = 1;
+        /* first_from_index = 1; TODO: LMMS commented out unused variable */
     }
     // compare time signatures to see if we need a change at start:
     if (num_before_splice != num_of_insert ||
@@ -2431,14 +2432,14 @@ void Alg_time_sigs::paste(double start, Alg_seq *seq)
     double measures = (start - beat_after_splice) / beats_per_measure;
     // Measures might be slightly negative due to rounding. Use max()
     // to eliminate any negative rounding error:
-    int imeasures = int(max(measures, 0.0));
+    int imeasures = int(MAX(measures, 0.0));
     double old_bar_loc = beat_after_splice + (imeasures * beats_per_measure);
     if (old_bar_loc < start) old_bar_loc += beats_per_measure;
     // now old_bar_loc is the original first bar position after start
     // Do similar calculation for position after end after the insertion:
     // beats_per_measure already calculated because signatures match
     measures = (start + dur - beat_of_insert) / beats_per_measure;
-    imeasures = int(max(measures, 0.0));
+    imeasures = int(MAX(measures, 0.0));
     double new_bar_loc = beat_of_insert + (imeasures * beats_per_measure);
     if (new_bar_loc < start + dur) new_bar_loc += beats_per_measure;
     // old_bar_loc should be shifted by dur:
@@ -2864,9 +2865,9 @@ Alg_track_ptr Alg_seq::track(int i)
     return &(track_list[i]);
 }
 
-#pragma warning(disable: 4715) // ok not to return a value here
+//#pragma warning(disable: 4715) // ok not to return a value here
 
-Alg_event_ptr &Alg_seq::operator[](int i) 
+Alg_event_ptr const &Alg_seq::operator[](int i) 
 {
     int ntracks = track_list.length();
     int tr = 0;
@@ -2880,8 +2881,9 @@ Alg_event_ptr &Alg_seq::operator[](int i)
         tr++;
     }
     assert(false); // out of bounds
+    return NULL;
 }
-#pragma warning(default: 4715)
+//#pragma warning(default: 4715)
 
 
 void Alg_seq::convert_to_beats()
@@ -3044,7 +3046,7 @@ void Alg_seq::insert_silence(double t, double len)
     // Final duration is defined to be t + len + whatever was
     // in the sequence after t (if any). This translates to
     // t + len + max(dur - t, 0)
-    set_dur(t + len + max(get_dur() - t, 0.0));
+    set_dur(t + len + MAX(get_dur() - t, 0.0));
 }
 
 

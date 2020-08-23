@@ -35,7 +35,7 @@ void Midifile_reader::midifile()
     while (ntrks-- > 0 && !midifile_error) readtrack();
 }
 
-int Midifile_reader::readmt(char *s, int skip)
+int Midifile_reader::readmt(const char *s, int skip)
     /* read through the "MThd" or "MTrk" header string */
     /* if skip == 1, we attempt to skip initial garbage. */
 {
@@ -44,7 +44,7 @@ int Midifile_reader::readmt(char *s, int skip)
     char b[4];
     char buff[32];
     int c;
-    char *errmsg = "expecting ";
+    const char *errmsg = "expecting ";
 
     retry:
     while ( nread<4 ) {
@@ -68,10 +68,10 @@ int Midifile_reader::readmt(char *s, int skip)
         goto retry;
     }
     err:
-#pragma warning(disable: 4996) // strcpy is safe since strings have known lengths
+//#pragma warning(disable: 4996) // strcpy is safe since strings have known lengths
     (void) strcpy(buff,errmsg);
     (void) strcat(buff,s);
-#pragma warning(default: 4996) // turn it back on
+//#pragma warning(default: 4996) // turn it back on
     mferror(buff);
     return(0);
 }
@@ -257,9 +257,9 @@ void Midifile_reader::readtrack()
 void Midifile_reader::badbyte(int c)
 {
     char buff[32];
-#pragma warning(disable: 4996) // safe in this case
+//#pragma warning(disable: 4996) // safe in this case
     (void) sprintf(buff,"unexpected byte: 0x%02x",c);
-#pragma warning(default: 4996)
+//#pragma warning(default: 4996)
     mferror(buff);
 }
 
@@ -418,6 +418,11 @@ void Midifile_reader::mferror(char *s)
 {
     Mf_error(s);
     midifile_error = 1;
+}
+
+void Midifile_reader::mferror(const char *s)
+{
+    mferror(const_cast<char *>(s));
 }
 
 /* The code below allows collection of a system exclusive message of */

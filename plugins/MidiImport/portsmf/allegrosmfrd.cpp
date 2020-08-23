@@ -75,6 +75,7 @@ protected:
     void Mf_portprefix(int port);
     void Mf_eot();
     void Mf_error(char *);
+    void Mf_error(const char *);
     void Mf_header(int,int,int);
     void Mf_on(int,int,int);
     void Mf_off(int,int,int);
@@ -174,14 +175,19 @@ void Alg_midifile_reader::Mf_error(char *msg)
     fprintf(stdout, "Midifile reader error: %s\n", msg);
 }
 
+void Alg_midifile_reader::Mf_error(const char *msg)
+{
+    Mf_error(const_cast<char*>(msg));
+}
+
 
 void Alg_midifile_reader::Mf_header(int format, int ntrks, int division)
 {
     if (format > 1) {
         char msg[80];
-#pragma warning(disable: 4996) // msg is long enough
+//#pragma warning(disable: 4996) // msg is long enough
         sprintf(msg, "file format %d not implemented", format);
-#pragma warning(default: 4996)
+//#pragma warning(default: 4996)
         Mf_error(msg);
     }
     divisions = division;
@@ -268,9 +274,9 @@ void Alg_midifile_reader::Mf_controller(int chan, int control, int val)
 {
     Alg_parameter parameter;
     char name[32];
-#pragma warning(disable: 4996) // name is long enough
+//#pragma warning(disable: 4996) // name is long enough
     sprintf(name, "control%dr", control);
-#pragma warning(default: 4996)
+//#pragma warning(default: 4996)
     parameter.set_attr(symbol_table.insert_string(name));
     parameter.r = val / 127.0;
     update(chan, -1, &parameter);
@@ -314,9 +320,9 @@ void Alg_midifile_reader::binary_msg(int len, unsigned char *msg,
     Alg_parameter parameter;
     char *hexstr = new char[len * 2 + 1];
     for (int i = 0; i < len; i++) {
-#pragma warning(disable: 4996) // hexstr is long enough
+//#pragma warning(disable: 4996) // hexstr is long enough
         sprintf(hexstr + 2 * i, "%02x", (0xFF & msg[i]));
-#pragma warning(default: 4996)
+//#pragma warning(default: 4996)
     }
     parameter.s = hexstr;
     parameter.set_attr(symbol_table.insert_string(attr_string));
@@ -340,9 +346,9 @@ void Alg_midifile_reader::Mf_arbitrary(int len, unsigned char *msg)
 void Alg_midifile_reader::Mf_metamisc(int type, int len, unsigned char *msg)
 {
     char text[128];
-#pragma warning(disable: 4996) // text is long enough
+//#pragma warning(disable: 4996) // text is long enough
     sprintf(text, "metamsic data, type 0x%x, ignored", type);
-#pragma warning(default: 4996)
+//#pragma warning(default: 4996)
     Mf_error(text);
 }
 
@@ -353,7 +359,7 @@ void Alg_midifile_reader::Mf_seqnum(int n)
 }
 
 
-static char *fpsstr[4] = {"24", "25", "29.97", "30"};
+static const char *fpsstr[4] = {"24", "25", "29.97", "30"};
 
 void Alg_midifile_reader::Mf_smpte(int hours, int mins, int secs,
                                    int frames, int subframes)
@@ -363,10 +369,10 @@ void Alg_midifile_reader::Mf_smpte(int hours, int mins, int secs,
     char text[32];
     int fps = (hours >> 6) & 3;
     hours &= 0x1F;
-#pragma warning(disable: 4996) // text is long enough
+//#pragma warning(disable: 4996) // text is long enough
     sprintf(text, "%sfps:%02dh:%02dm:%02ds:%02d.%02df", 
             fpsstr[fps], hours, mins, secs, frames, subframes);
-#pragma warning(default: 4996)
+//#pragma warning(default: 4996)
     Alg_parameter smpteoffset;
     smpteoffset.s = heapify(text);
     smpteoffset.set_attr(symbol_table.insert_string("smpteoffsets"));

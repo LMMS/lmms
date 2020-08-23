@@ -391,7 +391,7 @@ public:
     // When applied to an Alg_seq, events are enumerated track
     // by track with increasing indices. This operation is not
     // particularly fast on an Alg_seq.
-    virtual Alg_event_ptr &operator[](int i);
+    virtual Alg_event_ptr const &operator[](int i);
     Alg_event_list() { sequence_number = 0; 
         beat_dur = 0.0; real_dur = 0.0; events_owner = NULL; type = 'e'; }
     Alg_event_list(Alg_track *owner);
@@ -549,12 +549,12 @@ public:
     // does nothing.
     virtual ~Serial_read_buffer() {  }
 #if defined(_WIN32)
-#pragma warning(disable: 546) // cast to int is OK, we only want low 7 bits
-#pragma warning(disable: 4311) // type cast pointer to long warning
+//#pragma warning(disable: 546) // cast to int is OK, we only want low 7 bits
+//#pragma warning(disable: 4311) // type cast pointer to long warning
 #endif
-    void get_pad() { while (((long) ptr) & 7) ptr++; }
+    void get_pad() { while ((intptr_t) ptr & 7) ptr++; }
 #if defined(_WIN32)
-#pragma warning(default: 4311 546)
+//#pragma warning(default: 4311 546)
 #endif
     // Prepare to read n bytes from buf. The caller must manage buf: it is
     // valid until reading is finished, and it is caller's responsibility
@@ -571,7 +571,7 @@ public:
     double get_double() { double d = *((double *) ptr); ptr += sizeof(double); 
                           return d; }
     const char *get_string() { char *s = ptr; char *fence = buffer + len;
-                         assert(ptr < fence);
+                         assert(ptr < fence); (void)fence; // unused variable
                          while (*ptr++) assert(ptr < fence);
                          get_pad();
                          return s; }
@@ -600,18 +600,18 @@ typedef class Serial_write_buffer: public Serial_buffer {
     void check_buffer(long needed);
     void set_string(const char *s) { 
         char *fence = buffer + len;
-        assert(ptr < fence);
+        assert(ptr < fence); (void)fence; // unused variable
         // two brackets surpress a g++ warning, because this is an
         // assignment operator inside a test.
         while ((*ptr++ = *s++)) assert(ptr < fence);
         // 4311 is type cast pointer to long warning
         // 4312 is type cast long to pointer warning
 #if defined(_WIN32)
-#pragma warning(disable: 4311 4312)
+//#pragma warning(disable: 4311 4312)
 #endif
         assert((char *)(((long) (ptr + 7)) & ~7) <= fence);
 #if defined(_WIN32)
-#pragma warning(default: 4311 4312)
+//#pragma warning(default: 4311 4312)
 #endif
         pad(); }
     void set_int32(long v) { *((long *) ptr) = v; ptr += 4; }
@@ -619,12 +619,12 @@ typedef class Serial_write_buffer: public Serial_buffer {
     void set_float(float v) { *((float *) ptr) = v; ptr += 4; }
     void set_char(char v) { *ptr++ = v; }
 #if defined(_WIN32)
-#pragma warning(disable: 546) // cast to int is OK, we only want low 7 bits
-#pragma warning(disable: 4311) // type cast pointer to long warning
+//#pragma warning(disable: 546) // cast to int is OK, we only want low 7 bits
+//#pragma warning(disable: 4311) // type cast pointer to long warning
 #endif
-    void pad() { while (((long) ptr) & 7) set_char(0); }
+    void pad() { while ((intptr_t) ptr & 7) set_char(0); }
 #if defined(_WIN32)
-#pragma warning(default: 4311 546)
+//#pragma warning(default: 4311 546)
 #endif
     void *to_heap(long *len) {
         *len = get_posn();
@@ -653,7 +653,7 @@ protected:
 public:
     void serialize_track();
     void unserialize_track();
-    virtual Alg_event_ptr &operator[](int i) {
+    virtual Alg_event_ptr const &operator[](int i) {
         assert(i >= 0 && i < len);
         return events[i];
     }
@@ -669,7 +669,8 @@ public:
     Alg_track(Alg_event_list_ref event_list, Alg_time_map_ptr map, 
               bool units_are_seconds);
     virtual ~Alg_track() { // note: do not call set_time_map(NULL)!
-        if (time_map) time_map->dereference(); time_map = NULL; }
+        if (time_map) time_map->dereference();
+        time_map = NULL; }
 
     // Returns a buffer containing a serialization of the
     // file.  It will be an ASCII representation unless text is true.
@@ -1058,7 +1059,7 @@ public:
     // caller must not delete the result.
     Alg_track_ptr track(int);
 
-    virtual Alg_event_ptr &operator[](int i);
+    virtual Alg_event_ptr const &operator[](int i);
 
     virtual void convert_to_seconds();
     virtual void convert_to_beats();
