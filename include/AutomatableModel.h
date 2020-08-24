@@ -28,7 +28,6 @@
 #include <QtCore/QMap>
 #include <QtCore/QMutex>
 
-
 #include "JournallingObject.h"
 #include "Model.h"
 #include "MidiTime.h"
