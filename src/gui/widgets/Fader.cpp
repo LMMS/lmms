@@ -46,6 +46,8 @@
 
 #include "Fader.h"
 
+#include <QApplication>
+#include <QClipboard>
 #include <QInputDialog>
 #include <QMouseEvent>
 #include <QPainter>
@@ -151,6 +153,7 @@ void Fader::contextMenuEvent( QContextMenuEvent * _ev )
 {
 	CaptionMenu contextMenu( windowTitle() );
 	addDefaultActions( &contextMenu );
+	patchDefaultActions( &contextMenu );
 	contextMenu.exec( QCursor::pos() );
 	_ev->accept();
 }
@@ -491,4 +494,68 @@ void Fader::setPeakRed( const QColor & c )
 void Fader::setPeakYellow( const QColor & c )
 {
 	m_peakYellow = c;
+}
+
+
+#define CONTEXT_MENU_RESET_INDEX     1
+#define CONTEXT_MENU_COPY_INDEX      3
+#define CONTEXT_MENU_PASTE_INDEX     4
+
+/*!
+ *  @brief Function to patch the default actions of the context menu for a fader.
+ *
+ *  Replace the text labels of the reset/copy actions take into account the conversion to % if needed.
+ *  Mainly for the faders in FxMixer which have a value from 0.0 to 1.0 but are displayed as 0 to 100%.
+ *
+ *  Rewire the triggered() signal for the copy and paste operation to also take into account the conversion
+ *  to % if needed.
+ */
+void Fader::patchDefaultActions( QMenu* contextMenu )
+{
+	if( contextMenu->actions().size() > CONTEXT_MENU_PASTE_INDEX )
+	{
+		// Reset action
+		QAction * resetAction = contextMenu->actions()[CONTEXT_MENU_RESET_INDEX];
+		resetAction->setText(
+			AutomatableModel::tr( "&Reset (%1%2)" ).
+			arg( model()->displayValue( m_displayConversion ? model()->initValue() * 100 : model()->initValue() ) ).
+			arg( m_unit ) );
+
+		// Copy action
+		QAction * copyAction = contextMenu->actions()[CONTEXT_MENU_COPY_INDEX];
+		copyAction->setText(
+			AutomatableModel::tr( "&Copy value (%1%2)" ).
+			arg( model()->displayValue( m_displayConversion ? model()->value() * 100 : model()->value() ) ).
+			arg( m_unit ) );
+
+		disconnect( copyAction, SIGNAL( triggered() ), nullptr, nullptr );
+		connect( copyAction, SIGNAL(triggered() ), this, SLOT( copyToClipboard() ) );
+
+		// Paste action
+		QAction * pasteAction = contextMenu->actions()[CONTEXT_MENU_PASTE_INDEX];
+		if( pasteAction->isEnabled() )
+		{
+			disconnect( pasteAction, SIGNAL( triggered() ), nullptr, nullptr );
+			connect( pasteAction, SIGNAL( triggered() ), this, SLOT( pasteFromClipboard() ) );
+		}
+	}
+}
+
+void Fader::copyToClipboard()
+{
+	QApplication::clipboard()->setText( QString::number( m_displayConversion ? model()->value() * 100 : model()->value() ) );
+}
+
+void Fader::pasteFromClipboard()
+{
+	bool isNumber = false;
+	const float number = floatFromClipboard( &isNumber );
+	if( isNumber ) {
+		model()->setValue( m_displayConversion ? number * 0.01 : number );
+	}
+}
+
+float Fader::floatFromClipboard(bool* ok)
+{
+	return QApplication::clipboard()->text().toFloat( ok );
 }

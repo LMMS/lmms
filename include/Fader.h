@@ -166,6 +166,14 @@ private:
 	QColor m_peakGreen;
 	QColor m_peakRed;
 	QColor m_peakYellow;
+
+	void patchDefaultActions( QMenu* contextMenu );
+	float floatFromClipboard(bool* ok);
+
+private slots:
+	void copyToClipboard();
+	void pasteFromClipboard();
+
 } ;
 
 
