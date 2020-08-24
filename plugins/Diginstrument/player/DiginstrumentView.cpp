@@ -15,6 +15,9 @@ DiginstrumentView::DiginstrumentView( Instrument * _instrument, QWidget * _paren
     m_typeField = new QLineEdit("Spectrum type", this);
     m_typeField->setReadOnly(true);
     m_typeField->move(2,45);
+
+    //WIP: sruface graph
+    graph = new QtDataVisualization::Q3DSurface();
 }
 
 

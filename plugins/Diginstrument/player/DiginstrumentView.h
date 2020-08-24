@@ -6,6 +6,7 @@
 #include <QPushButton>
 #include <QLineEdit>
 #include <QFileDialog>
+#include <QtDataVisualization/Q3DSurface>
 
 //TODO: note visualization with surface
 class DiginstrumentView : public InstrumentView
@@ -27,4 +28,6 @@ class DiginstrumentView : public InstrumentView
     QLineEdit * m_nameField;
     QLineEdit * m_typeField;
     /*TODO*/
+    //WIP: surface graph
+    QtDataVisualization::Q3DSurface *graph;
 };
