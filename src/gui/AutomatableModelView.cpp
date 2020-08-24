@@ -34,6 +34,7 @@
 #include "embed.h"
 #include "GuiApplication.h"
 #include "MainWindow.h"
+#include "Song.h"
 #include "StringPairDrag.h"
 
 #include "AutomationEditor.h"
@@ -185,12 +186,17 @@ void AutomatableModelViewSlots::execConnectionDialog()
 			// Update
 			if( m->controllerConnection() )
 			{
+				if (m->controllerConnection()->isControllerMidi() &&
+						!(d.chosenController()->type() == Controller::MidiController))
+				{
+					disconnectStopSignalMidi(m);
+				}
 				m->controllerConnection()->setController( d.chosenController() );
 			}
 			// New
 			else
 			{
-				ControllerConnection* cc = new ControllerConnection( d.chosenController() );
+				ControllerConnection* cc = new ControllerConnection(d.chosenController(), m);
 				m->setControllerConnection( cc );
 				//cc->setTargetName( m->displayName() );
 			}
@@ -212,8 +218,13 @@ void AutomatableModelViewSlots::removeConnection()
 
 	if( m->controllerConnection() )
 	{
+		if (m->controllerConnection()->isControllerMidi())
+		{
+			disconnectStopSignalMidi(m);
+		}
 		delete m->controllerConnection();
 		m->setControllerConnection( NULL );
+		emit m->dataChanged();
 	}
 }
 
@@ -255,6 +266,11 @@ void AutomatableModelViewSlots::pasteFromClipboard()
 	}
 }
 
+void AutomatableModelViewSlots::disconnectStopSignalMidi(AutomatableModel * autmod)
+{
+	disconnect(Engine::getSong(), SIGNAL(stopped()),
+		   autmod, SLOT(setAndEmitControllerValue()));
+}
 
 /// Attempt to parse a float from the clipboard
 static float floatFromClipboard(bool* ok)

@@ -464,6 +464,8 @@ private:
 	MidiTime m_exportSongEnd;
 	MidiTime m_exportEffectiveLength;
 
+	AutomatedValueMap m_oldAutomatedValues;
+
 	friend class LmmsCore;
 	friend class SongEditor;
 	friend class mainWindow;

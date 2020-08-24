@@ -90,7 +90,8 @@ Song::Song() :
 	m_elapsedTicks( 0 ),
 	m_elapsedBars( 0 ),
 	m_loopRenderCount(1),
-	m_loopRenderRemaining(1)
+	m_loopRenderRemaining(1),
+	m_oldAutomatedValues()
 {
 	for(int i = 0; i < Mode_Count; ++i) m_elapsedMilliSeconds[i] = 0;
 	connect( &m_tempoModel, SIGNAL( dataChanged() ),
@@ -467,12 +468,31 @@ void Song::processAutomations(const TrackList &tracklist, MidiTime timeStart, fp
 		}
 	}
 
+	if (!m_oldAutomatedValues.isEmpty())
+	{
+		for (auto it = m_oldAutomatedValues.begin(); it != m_oldAutomatedValues.end(); it++)
+		{
+			AutomatableModel * am = it.key();
+			if (am->controllerConnection() &&
+				am->controllerConnection()->isControllerMidi() &&
+				!values.contains(am))
+			{
+				am->setAndEmitControllerValue();
+			}
+		}
+	}
+	m_oldAutomatedValues = values;
+
 	// Apply values
 	for (auto it = values.begin(); it != values.end(); it++)
 	{
 		if (! recordedModels.contains(it.key()))
 		{
 			it.key()->setAutomatedValue(it.value());
+		}
+		else if (!it.key()->isControllerValue())
+		{
+			it.key()->setAndEmitControllerValue();
 		}
 	}
 }

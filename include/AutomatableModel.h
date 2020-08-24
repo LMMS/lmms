@@ -28,12 +28,14 @@
 #include <QtCore/QMap>
 #include <QtCore/QMutex>
 
+
 #include "JournallingObject.h"
 #include "Model.h"
 #include "MidiTime.h"
 #include "ValueBuffer.h"
 #include "MemoryManager.h"
 #include "ModelVisitor.h"
+#include "ControllerConnection.h"
 
 // simple way to map a property of a view to a model
 #define mapPropertyFromModelPtr(type,getfunc,setfunc,modelname)	\
@@ -148,7 +150,18 @@ public:
 	template<class T>
 	inline T value( int frameOffset = 0 ) const
 	{
-		if( hasLinkedModels() || m_controllerConnection != NULL )
+		if (m_controllerConnection)
+		{
+			if (m_controllerConnection->isControllerMidi() && !m_controllerValue)
+			{
+				return castValue<T>(m_value);
+			}
+			else
+			{
+				return castValue<T>(controllerValue(frameOffset));
+			}
+		}
+		else if (hasLinkedModels())
 		{
 			return castValue<T>( controllerValue( frameOffset ) );
 		}
@@ -298,9 +311,19 @@ public:
 		s_periodCounter = 0;
 	}
 
+	bool isControllerValue()
+	{
+		return m_controllerValue;
+	}
+	void setControllerValue(bool b)
+	{
+		m_controllerValue = b;
+	}
+
 public slots:
 	virtual void reset();
 	void unlinkControllerConnection();
+	void setAndEmitControllerValue();
 
 
 protected:
@@ -394,6 +417,8 @@ private:
 
 	// prevent several threads from attempting to write the same vb at the same time
 	QMutex m_valueBufferMutex;
+
+	bool m_controllerValue;
 
 signals:
 	void initValueChanged( float val );
