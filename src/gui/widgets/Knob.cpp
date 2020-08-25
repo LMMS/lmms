@@ -29,7 +29,6 @@
 #include <QInputDialog>
 #include <QMouseEvent>
 #include <QPainter>
-#include <QPixmap>
 
 #ifndef __USE_XOPEN
 #define __USE_XOPEN
@@ -307,35 +306,6 @@ void Knob::setOuterColor( const QColor & c )
 
 
 
-QColor Knob::lineColor() const
-{
-	return m_lineColor;
-}
-
-
-
-void Knob::setlineColor( const QColor & c )
-{
-	m_lineColor = c;
-}
-
-
-
-QColor Knob::arcColor() const
-{
-	return m_arcColor;
-}
-
-
-
-void Knob::setarcColor( const QColor & c )
-{
-	m_arcColor = c;
-}
-
-
-
-
 QColor Knob::textColor() const
 {
 	return m_textColor;
@@ -383,8 +353,8 @@ bool Knob::updateAngle()
 void Knob::drawKnob( QPainter * _p )
 {
 	bool enabled = this->isEnabled();
-	setarcColor(enabled ? m_arcActiveColor : m_arcInactiveColor);
-	setlineColor(enabled ? m_lineActiveColor : m_lineInactiveColor);
+	QColor currentArcColor = enabled ? m_arcActiveColor : m_arcInactiveColor;
+	QColor currentLineColor = enabled ? m_lineActiveColor : m_lineInactiveColor;
 
 	if( updateAngle() == false && !m_cache.isNull() )
 	{
@@ -444,10 +414,10 @@ void Knob::drawKnob( QPainter * _p )
 	const int arcLineWidth = 2;
 	const int arcRectSize = m_knobPixmap->width() - arcLineWidth;
 
-	p.setPen(QPen(arcColor(), 2));
+	p.setPen(QPen(currentArcColor, 2));
 	p.drawArc( mid.x() - arcRectSize/2, 1, arcRectSize, arcRectSize, 315*16, 16*m_totalAngle );
 
-	p.setPen(QPen(lineColor(), 2));
+	p.setPen(QPen(currentLineColor, 2));
 	switch( m_knobNum )
 	{
 		case knobSmall_17:

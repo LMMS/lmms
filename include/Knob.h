@@ -27,6 +27,7 @@
 #define KNOB_H
 
 #include <memory>
+#include <QPixmap>
 #include <QWidget>
 #include <QtCore/QPoint>
 
@@ -60,8 +61,6 @@ class LMMS_EXPORT Knob : public QWidget, public FloatModelView
 	// Unfortunately, the gradient syntax doesn't create our gradient
 	// correctly so we need to do this:
 	Q_PROPERTY(QColor outerColor READ outerColor WRITE setOuterColor)
-	Q_PROPERTY(QColor lineColor READ lineColor WRITE setlineColor)
-	Q_PROPERTY(QColor arcColor READ arcColor WRITE setarcColor)
 
 	Q_PROPERTY(QColor lineActiveColor MEMBER m_lineActiveColor)
 	Q_PROPERTY(QColor lineInactiveColor MEMBER m_lineInactiveColor)
@@ -115,10 +114,6 @@ public:
 
 	QColor outerColor() const;
 	void setOuterColor( const QColor & c );
-	QColor lineColor() const;
-	void setlineColor( const QColor & c );
-	QColor arcColor() const;
-	void setarcColor( const QColor & c );
 	
 	QColor textColor() const;
 	void setTextColor( const QColor & c );
@@ -195,8 +190,6 @@ private:
 	float m_outerRadius;
 	float m_lineWidth;
 	QColor m_outerColor;
-	QColor m_lineColor; //!< unused yet
-	QColor m_arcColor; //!< unused yet
 
 	QColor m_lineActiveColor;
 	QColor m_lineInactiveColor;
