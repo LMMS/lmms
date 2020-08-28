@@ -530,13 +530,6 @@ public:
 	TrackOperationsWidget( TrackView * parent );
 	~TrackOperationsWidget();
 
-	void setBackgroundColor( QColor & );
-	
-	void setTrackHasColor( bool b )
-	{
-		m_hasColor = b;
-	}
-
 
 protected:
 	void mousePressEvent( QMouseEvent * me ) override;
@@ -557,11 +550,6 @@ private slots:
 	void clearTrack();
 	
 	void updateColorGradient();
-	QColor backgroundColor();
-	bool trackHasColor()
-	{
-		return m_hasColor;
-	}
 
 private:
 	TrackView * m_trackView;
@@ -569,9 +557,7 @@ private:
 	QPushButton * m_trackOps;
 	PixmapButton * m_muteBtn;
 	PixmapButton * m_soloBtn;
-
-	QColor m_color;
-	bool m_hasColor;
+	
 	bool colorBarNeedsUpdate;
 
 	friend class TrackView;
@@ -714,7 +700,7 @@ public:
 		return m_processingLock.tryLock();
 	}
 	
-	QColor backgroundColor()
+	QColor color()
 	{
 		return m_color;
 	}

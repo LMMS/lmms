@@ -117,7 +117,7 @@ TrackContentObject::TrackContentObject( Track * track ) :
 		if( getTrack()->useColor() && ! m_useCustomClipColor )
 		{
 			m_useStyleColor = false;
-			m_color = getTrack()->backgroundColor();
+			m_color = getTrack()->color();
 		}
 	}
 	setJournalling( false );
@@ -223,7 +223,7 @@ void TrackContentObject::paste()
 		if( getTrack()->useColor() && ! m_useCustomClipColor )
 		{
 			m_useStyleColor = false;
-			m_color = getTrack()->backgroundColor();
+			m_color = getTrack()->color();
 		}
 	}
 	AutomationPattern::resolveAllIDs();
@@ -609,7 +609,7 @@ void TrackContentObjectView::useTrackColor()
 {
 	if( m_tco->getTrack()->useColor() )
 	{
-		QColor buffer = m_tco->getTrack()->backgroundColor();
+		QColor buffer = m_tco->getTrack()->color();
 		setColor( buffer );
 		m_tco->useStyleColor( false );
 	}
@@ -737,7 +737,7 @@ void TrackContentObjectView::dropEvent( QDropEvent * de )
 	{
 		m_tco->useStyleColor( ! m_trackView->getTrack()->useColor() );
 		m_tco->useCustomClipColor( false );
-		m_tco->setColor( m_trackView->getTrack()->backgroundColor() );
+		m_tco->setColor( m_trackView->getTrack()->color() );
 	}
 	
 	AutomationPattern::resolveAllIDs();
@@ -2010,7 +2010,7 @@ bool TrackContentWidget::pasteSelection( MidiTime tcoPos, const QMimeData * md, 
 		{
 			tco->useStyleColor( ! t->useColor() );
 			tco->useCustomClipColor( false );
-			tco->setColor( t->backgroundColor() );
+			tco->setColor( t->color() );
 		}
 
 		//check tco name, if the same as source track name dont copy
@@ -2224,7 +2224,6 @@ void TrackContentWidget::setEmbossColor( const QBrush & c )
 TrackOperationsWidget::TrackOperationsWidget( TrackView * parent ) :
 	QWidget( parent ),             /*!< The parent widget */
 	m_trackView( parent ),          /*!< The parent track view */
-	m_hasColor( false ),
 	colorBarNeedsUpdate( false )
 {
 	ToolTip::add( this, tr( "Press <%1> while clicking on move-grip "
@@ -2280,13 +2279,6 @@ TrackOperationsWidget::TrackOperationsWidget( TrackView * parent ) :
 	
 	connect( m_trackView->getTrack()->getMutedModel(), SIGNAL( dataChanged() ),
 			this, SLOT( updateColorGradient() ) );
-	
-	m_color = m_trackView->getTrack()->backgroundColor();
-	
-	if( m_color != QColor( 0, 0, 0 ) )
-	{
-		m_hasColor = true;
-	}
 	
 }
 
@@ -2351,11 +2343,11 @@ void TrackOperationsWidget::paintEvent( QPaintEvent * pe )
 	
 	p.fillRect( rect(), palette().brush(QPalette::Background) );
 	
-	if( m_hasColor && ! m_trackView->getTrack()->getMutedModel()->value() ) 
+	if( m_trackView->getTrack()->useColor() && ! m_trackView->getTrack()->getMutedModel()->value() ) 
 	{
 		QRect coloredRect( 0, 0, 10, m_trackView->getTrack()->getHeight() );
 		
-		p.fillRect( coloredRect, m_color );
+		p.fillRect( coloredRect, m_trackView->getTrack()->color() );
 	}
 
 	if( m_trackView->isMovingTrack() == false )
@@ -2417,26 +2409,20 @@ void TrackOperationsWidget::removeTrack()
 	emit trackRemovalScheduled( m_trackView );
 }
 
-void TrackOperationsWidget::setBackgroundColor( QColor & c )
-{ m_color = c; }
-QColor TrackOperationsWidget::backgroundColor()
-{ return m_color; }
-
 void TrackOperationsWidget::changeTrackColor()
 {
-	QColor new_color = ColorChooser( this ).withPalette( ColorChooser::Palette::Track )->getColor( m_color );
+	QColor new_color = ColorChooser( this ).withPalette( ColorChooser::Palette::Track )-> \
+		getColor( m_trackView->getTrack()->color() );
+	
 	if( ! new_color.isValid() )
 	{ return; }
-	
-	m_color = new_color;
-	m_hasColor = true;
-	emit colorChanged( m_color );
+
+	emit colorChanged( new_color );
 	colorBarNeedsUpdate = true;
 }
 
 void TrackOperationsWidget::resetTrackColor()
 {
-	m_hasColor = false;
 	emit colorReset();
 	colorBarNeedsUpdate = true;
 }
@@ -2445,10 +2431,7 @@ void TrackOperationsWidget::randomTrackColor()
 {
 	QColor buffer = ColorChooser::getPalette( ColorChooser::Palette::Track )[ rand() % 48 ];
 
-	m_color = buffer;
-	emit colorChanged( m_color );
-	
-	m_hasColor = true;
+	emit colorChanged( buffer );
 	colorBarNeedsUpdate = true;
 }
 
