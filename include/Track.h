@@ -323,7 +323,6 @@ public slots:
 	void cut();
 	void remove();
 	void update() override;
-	void changeSelectedColor( QColor & );
 	void disableSelectedColor();
 	void disableClipSelectedColor();
 	
@@ -545,7 +544,7 @@ public:
 	
 	void setTrackHasColor( bool b )
 	{
-		hasColor = b;
+		m_hasColor = b;
 	}
 
 
@@ -567,12 +566,11 @@ private slots:
 	void recordingOff();
 	void clearTrack();
 	
-	void loadColorSettings( unsigned int );
 	void updateColorGradient();
 	QColor backgroundColor();
 	bool trackHasColor()
 	{
-		return hasColor;
+		return m_hasColor;
 	}
 
 private:
@@ -582,8 +580,8 @@ private:
 	PixmapButton * m_muteBtn;
 	PixmapButton * m_soloBtn;
 
-	QColor m_backgroundColor;
-	bool hasColor;
+	QColor m_color;
+	bool m_hasColor;
 	bool colorBarNeedsUpdate;
 
 	friend class TrackView;
@@ -728,11 +726,11 @@ public:
 	
 	QColor backgroundColor()
 	{
-		return m_backgroundColor;
+		return m_color;
 	}
 	bool useColor()
 	{
-		return hasColor;
+		return m_hasColor;
 	}
 	
 	BoolModel* getMutedModel();
@@ -767,8 +765,8 @@ private:
 
 	QMutex m_processingLock;
 	
-	QColor m_backgroundColor;
-	bool hasColor;
+	QColor m_color;
+	bool m_hasColor;
 
 	friend class TrackView;
 
@@ -777,10 +775,6 @@ signals:
 	void destroyedTrack();
 	void nameChanged();
 	void trackContentObjectAdded( TrackContentObject * );
-	void loadedColorSettings( unsigned int );
-
-	QColor requestTrackBGColor();
-	bool requestTrackHasColor();
 } ;
 
 

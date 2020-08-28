@@ -39,7 +39,6 @@
 
 #include <assert.h>
 #include <cstdlib>
-#include <ctime>
 
 #include <QLayout>
 #include <QLinearGradient>
@@ -321,14 +320,13 @@ TrackContentObjectView::TrackContentObjectView( TrackContentObject * tco,
 	m_hint( NULL ),
 	m_mutedColor( 0, 0, 0 ),
 	m_mutedBackgroundColor( 0, 0, 0 ),
-	m_selectedColor( 0, 0, 0 ),
 	m_textColor( 0, 0, 0 ),
 	m_textShadowColor( 0, 0, 0 ),
 	m_BBPatternBackground( 0, 0, 0 ),
 	m_gradient( true ),
 	m_mouseHotspotHand( 0, 0 ),
 	m_cursorSetYet( false ),
-	m_usesCustomSelectedColor( ! m_tco->usesStyleColor() || m_tco->usesCustomClipColor() ),
+	m_usesCustomSelectedColor( ! m_tco->usesStyleColor() ),
 	m_needsUpdate( true )
 {
 	if( s_textFloat == NULL )
@@ -354,19 +352,11 @@ TrackContentObjectView::TrackContentObjectView( TrackContentObject * tco,
 	connect( m_tco, SIGNAL( positionChanged() ),
 			this, SLOT( updatePosition() ) );
 	connect( m_tco, SIGNAL( destroyedTCO() ), this, SLOT( close() ) );
-	connect( m_tco, SIGNAL( trackColorChanged( QColor & ) ), this, SLOT( changeSelectedColor( QColor & ) ) );
 	connect( m_tco, SIGNAL( trackColorReset() ), this, SLOT( disableSelectedColor() ) );
-	connect( m_tco, SIGNAL( clipColorChanged( QColor & ) ), this, SLOT( changeSelectedColor( QColor & ) ) );
 	connect( m_tco, SIGNAL( clipColorReset() ), this, SLOT( disableClipSelectedColor() ) );
 	setModel( m_tco );
 	connect( m_tco, SIGNAL( trackColorChanged( QColor & ) ), this, SLOT( setColor( QColor & ) ) );
 	connect( m_trackView->getTrackOperationsWidget(), SIGNAL( colorParented() ), this, SLOT( useTrackColor() ) );
-	
-	if( m_usesCustomSelectedColor )
-	{
-		QColor tcoColor = m_tco->color();
-		changeSelectedColor( tcoColor );
-	}
 
 	m_trackView->getTrackContentWidget()->addTCOView( this );
 	updateLength();
@@ -431,28 +421,15 @@ bool TrackContentObjectView::fixedTCOs()
 }
 
 
-void TrackContentObjectView::changeSelectedColor( QColor & c )
-{
-	m_customSelectedColor = c.darker( 200 );
-	m_usesCustomSelectedColor = true;
-}
-
 void TrackContentObjectView::disableSelectedColor()
 {
 	m_usesCustomSelectedColor = false;
 }
 
+
 void TrackContentObjectView::disableClipSelectedColor()
 {
-	if( m_trackView->getTrack()->useColor() )
-	{
-		m_customSelectedColor = m_trackView->getTrack()->backgroundColor().darker( 200 );
-		m_usesCustomSelectedColor = true;
-	}
-	else
-	{
-		m_usesCustomSelectedColor = false;
-	}
+	m_usesCustomSelectedColor = m_trackView->getTrack()->useColor();
 }
 
 
@@ -466,7 +443,7 @@ QColor TrackContentObjectView::mutedBackgroundColor() const
 { return m_mutedBackgroundColor; }
 
 QColor TrackContentObjectView::selectedColor() const
-{ return ( m_usesCustomSelectedColor ? m_customSelectedColor : m_selectedColor ); }
+{ return ( m_usesCustomSelectedColor ? color().darker(200) : m_selectedColor ); }
 
 QColor TrackContentObjectView::textColor() const
 { return m_textColor; }
@@ -667,6 +644,8 @@ void TrackContentObjectView::setColor( QColor & new_color )
 	
 	// force TCO to use color
 	m_tco->useStyleColor( false );
+	m_usesCustomSelectedColor = true;
+	
 	Engine::getSong()->setModified();
 	update();
 }
@@ -2245,7 +2224,7 @@ void TrackContentWidget::setEmbossColor( const QBrush & c )
 TrackOperationsWidget::TrackOperationsWidget( TrackView * parent ) :
 	QWidget( parent ),             /*!< The parent widget */
 	m_trackView( parent ),          /*!< The parent track view */
-	hasColor( false ),
+	m_hasColor( false ),
 	colorBarNeedsUpdate( false )
 {
 	ToolTip::add( this, tr( "Press <%1> while clicking on move-grip "
@@ -2302,14 +2281,12 @@ TrackOperationsWidget::TrackOperationsWidget( TrackView * parent ) :
 	connect( m_trackView->getTrack()->getMutedModel(), SIGNAL( dataChanged() ),
 			this, SLOT( updateColorGradient() ) );
 	
-	m_backgroundColor = m_trackView->getTrack()->backgroundColor();
+	m_color = m_trackView->getTrack()->backgroundColor();
 	
-	if( m_backgroundColor != QColor( 0, 0, 0 ) )
+	if( m_color != QColor( 0, 0, 0 ) )
 	{
-		hasColor = true;
+		m_hasColor = true;
 	}
-	
-	srand( time( 0 ) );
 	
 }
 
@@ -2372,16 +2349,13 @@ void TrackOperationsWidget::paintEvent( QPaintEvent * pe )
 {
 	QPainter p( this );
 	
-	if( hasColor && ! m_trackView->getTrack()->getMutedModel()->value() ) 
+	p.fillRect( rect(), palette().brush(QPalette::Background) );
+	
+	if( m_hasColor && ! m_trackView->getTrack()->getMutedModel()->value() ) 
 	{
 		QRect coloredRect( 0, 0, 10, m_trackView->getTrack()->getHeight() );
 		
-		p.fillRect( rect(), palette().brush(QPalette::Background) );
-		p.fillRect( coloredRect, m_backgroundColor );
-	}
-	else
-	{
-		p.fillRect( rect(), palette().brush(QPalette::Background) );
+		p.fillRect( coloredRect, m_color );
 	}
 
 	if( m_trackView->isMovingTrack() == false )
@@ -2444,25 +2418,25 @@ void TrackOperationsWidget::removeTrack()
 }
 
 void TrackOperationsWidget::setBackgroundColor( QColor & c )
-{ m_backgroundColor = c; }
+{ m_color = c; }
 QColor TrackOperationsWidget::backgroundColor()
-{ return m_backgroundColor; }
+{ return m_color; }
 
 void TrackOperationsWidget::changeTrackColor()
 {
-	QColor new_color = ColorChooser( this ).withPalette( ColorChooser::Palette::Track )->getColor( m_backgroundColor );
+	QColor new_color = ColorChooser( this ).withPalette( ColorChooser::Palette::Track )->getColor( m_color );
 	if( ! new_color.isValid() )
 	{ return; }
 	
-	m_backgroundColor = new_color;
-	hasColor = true;
-	emit colorChanged( m_backgroundColor );
+	m_color = new_color;
+	m_hasColor = true;
+	emit colorChanged( m_color );
 	colorBarNeedsUpdate = true;
 }
 
 void TrackOperationsWidget::resetTrackColor()
 {
-	hasColor = false;
+	m_hasColor = false;
 	emit colorReset();
 	colorBarNeedsUpdate = true;
 }
@@ -2471,10 +2445,10 @@ void TrackOperationsWidget::randomTrackColor()
 {
 	QColor buffer = ColorChooser::getPalette( ColorChooser::Palette::Track )[ rand() % 48 ];
 
-	m_backgroundColor = buffer;
-	emit colorChanged( m_backgroundColor );
+	m_color = buffer;
+	emit colorChanged( m_color );
 	
-	hasColor = true;
+	m_hasColor = true;
 	colorBarNeedsUpdate = true;
 }
 
@@ -2542,15 +2516,6 @@ void TrackOperationsWidget::updateColorGradient()
 }
 
 
-void TrackOperationsWidget::loadColorSettings( unsigned int c )
-{
-	m_backgroundColor.setRgb( c );
-	setTrackHasColor( true );
-	colorBarNeedsUpdate = true;
-	update();
-}
-
-
 void TrackOperationsWidget::toggleRecording( bool on )
 {
 	AutomationTrackView * atv = dynamic_cast<AutomationTrackView *>( m_trackView );
@@ -2603,8 +2568,8 @@ Track::Track( TrackTypes type, TrackContainer * tc ) :
 					/*!< For controlling track soloing */
 	m_simpleSerializingMode( false ),
 	m_trackContentObjects(),        /*!< The track content objects (segments) */
-	m_backgroundColor( 0, 0, 0 ),
-	hasColor( false )
+	m_color( 0, 0, 0 ),
+	m_hasColor( false )
 {
 	m_trackContainer->addTrack( this );
 	m_height = -1;
@@ -2750,9 +2715,9 @@ void Track::saveSettings( QDomDocument & doc, QDomElement & element )
 		element.setAttribute( "trackheight", m_height );
 	}
 	
-	if( hasColor )
+	if( m_hasColor )
 	{
-		element.setAttribute( "trackbgcolor", m_backgroundColor.name() );
+		element.setAttribute( "trackbgcolor", m_color.name() );
 	}
 	
 	QDomElement tsDe = doc.createElement( nodeName() );
@@ -2809,8 +2774,8 @@ void Track::loadSettings( const QDomElement & element )
 
 	if( element.hasAttribute( "trackbgcolor" ) )
 	{
-		m_backgroundColor.setNamedColor( element.attribute( "trackbgcolor" ) );
-		hasColor = true;
+		m_color.setNamedColor( element.attribute( "trackbgcolor" ) );
+		m_hasColor = true;
 	}
 
 	if( m_simpleSerializingMode )
@@ -2874,8 +2839,8 @@ void Track::loadSettings( const QDomElement & element )
  */
 TrackContentObject * Track::addTCO( TrackContentObject * tco )
 {
-	tco->setColor( m_backgroundColor );
-	tco->useStyleColor( ! hasColor );
+	tco->setColor( m_color );
+	tco->useStyleColor( ! m_hasColor );
 	
 	m_trackContentObjects.push_back( tco );
 
@@ -3199,8 +3164,8 @@ void Track::trackColorChanged( QColor & c )
 	{
 		m_trackContentObjects[i]->setBGColor(c);
 	}
-	hasColor = true;
-	m_backgroundColor = c;
+	m_hasColor = true;
+	m_color = c;
 }
 
 void Track::trackColorReset()
@@ -3209,7 +3174,7 @@ void Track::trackColorReset()
 	{
 		m_trackContentObjects[i]->resetColor();
 	}
-	hasColor = false;
+	m_hasColor = false;
 }
 
 
@@ -3287,15 +3252,6 @@ TrackView::TrackView( Track * track, TrackContainerView * tcv ) :
 			
 	connect( &m_trackOperationsWidget, SIGNAL( colorReset() ),
 			m_track, SLOT( trackColorReset() ) );
-	
-	connect( m_track, SIGNAL( loadedColorSettings( unsigned int ) ),
-			&m_trackOperationsWidget, SLOT( loadColorSettings( unsigned int ) ) );
-			
-	connect( m_track, SIGNAL( requestTrackBGColor() ),
-			&m_trackOperationsWidget, SLOT( backgroundColor() ) );
-			
-	connect( m_track, SIGNAL( requestTrackHasColor() ),
-			&m_trackOperationsWidget, SLOT( trackHasColor() ) );
 			
 	// create views for already existing TCOs
 	for( Track::tcoVector::iterator it =

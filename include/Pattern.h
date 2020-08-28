@@ -111,6 +111,7 @@ public:
 
 	TrackContentObjectView * createView( TrackView * _tv ) override;
 
+
 	using Model::dataChanged;
 
 
