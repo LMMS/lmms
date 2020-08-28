@@ -412,8 +412,9 @@ void SampleTCOView::contextMenuEvent( QContextMenuEvent * _cme )
 	/*contextMenu.addAction( embed::getIconPixmap( "record" ),
 				tr( "Set/clear record" ),
 						m_tco, SLOT( toggleRecord() ) );*/
-	
+
 	contextMenu.addSeparator();
+
 	contextMenu.addAction( embed::getIconPixmap( "colorize" ),
 			tr( "Set clip color" ), this, SLOT( changeClipColor() ) );
 	contextMenu.addAction( embed::getIconPixmap( "colorize" ),

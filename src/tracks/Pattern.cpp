@@ -722,12 +722,6 @@ void PatternView::constructContextMenu( QMenu * _cm )
 		_cm->addAction( embed::getIconPixmap( "step_btn_duplicate" ),
 			tr( "Clone Steps" ), m_pat, SLOT( cloneSteps() ) );
 	}
-	
-	_cm->addSeparator();
-	_cm->addAction( embed::getIconPixmap( "colorize" ),
-			tr( "Set clip color" ), this, SLOT( changeClipColor() ) );
-	_cm->addAction( embed::getIconPixmap( "colorize" ),
-			tr( "Use track color" ), this, SLOT( useTrackColor() ) );
 }
 
 

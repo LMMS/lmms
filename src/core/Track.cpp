@@ -709,9 +709,10 @@ void TrackContentObjectView::dropEvent( QDropEvent * de )
 	QDomElement tcos = dataFile.content().firstChildElement( "tcos" );
 	m_tco->restoreState( tcos.firstChildElement().firstChildElement() );
 	m_tco->movePosition( pos );
+	
 	auto old_tco = dynamic_cast<TrackContentObjectView *>( qwSource )->m_tco;
 	
-	if( old_tco->usesCustomClipColor() )
+	if( old_tco->usesCustomClipColor() && qwSource != NULL )
 	{
 		m_tco->useStyleColor( false );
 		m_tco->useCustomClipColor( true );
@@ -1291,6 +1292,13 @@ void TrackContentObjectView::contextMenuEvent( QContextMenuEvent * cme )
 			? "Mute/unmute (<%1> + middle click)"
 			: "Mute/unmute selection (<%1> + middle click)" ).arg(UI_CTRL_KEY),
 		[this](){ contextMenuAction( Mute ); } );
+
+	contextMenu.addSeparator();
+
+	contextMenu.addAction( embed::getIconPixmap( "colorize" ),
+			tr( "Set clip color" ), this, SLOT( changeClipColor() ) );
+	contextMenu.addAction( embed::getIconPixmap( "colorize" ),
+			tr( "Use track color" ), this, SLOT( useTrackColor() ) );
 
 	constructContextMenu( &contextMenu );
 

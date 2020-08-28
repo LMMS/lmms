@@ -217,12 +217,6 @@ void AutomationPatternView::constructContextMenu( QMenu * _cm )
 				this, SLOT( disconnectObject( QAction * ) ) );
 		_cm->addMenu( m );
 	}
-
-	_cm->addSeparator();
-	_cm->addAction( embed::getIconPixmap( "colorize" ),
-			tr( "Set clip color" ), this, SLOT( changeClipColor() ) );
-	_cm->addAction( embed::getIconPixmap( "colorize" ),
-			tr( "Use track color" ), this, SLOT( useTrackColor() ) );
 }
 
 

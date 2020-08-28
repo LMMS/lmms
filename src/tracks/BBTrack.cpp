@@ -165,10 +165,6 @@ void BBTCOView::constructContextMenu( QMenu * _cm )
 	_cm->addAction( embed::getIconPixmap( "edit_rename" ),
 						tr( "Change name" ),
 						this, SLOT( changeName() ) );
-	_cm->addAction( embed::getIconPixmap( "colorize" ),
-			tr( "Change clip color" ), this, SLOT( changeClipColor() ) );
-	_cm->addAction( embed::getIconPixmap( "colorize" ),
-			tr( "Use track color" ), this, SLOT( useTrackColor() ) );
 }
 
 
