@@ -106,30 +106,15 @@ void BBTCO::loadSettings( const QDomElement & element )
 	else
 	{
 		if( element.hasAttribute( "color" ) )
-		{
-			setColor( QColor( element.attribute( "color" ).toUInt() ) );
-		}
+		{ setColor( QColor( element.attribute( "color" ).toUInt() ) ); }
+		
 		if( element.hasAttribute( "usestyle" ) )
-		{
-			if( element.attribute( "usestyle" ).toUInt() == 1 ) 
-			{
-				useStyleColor( true );
-			}
-			else
-			{
-				useStyleColor( false );
-			}
-		}
+		{ useStyleColor ( element.attribute( "usestyle" ).toUInt() == 1 ); }
+		
 		else
 		{
-			if( colorRgb() == qRgb( 128, 182, 175 ) || colorRgb() == qRgb( 64, 128, 255 ) ) // old or older default color
-			{
-				useStyleColor( true );
-			}
-			else
-			{
-				useStyleColor( false );
-			}
+			useStyleColor( color().rgb() == qRgb( 128, 182, 175 )
+						|| color().rgb() == qRgb( 64, 128, 255 ) ); // old or older default color
 		}
 	}
 }

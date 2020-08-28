@@ -639,7 +639,7 @@ void TrackContentObjectView::trackColorReset()
 void TrackContentObjectView::setColor( QColor & new_color )
 {
 	// change color only if it is different
-	if( new_color.rgb() != m_tco->colorRgb() )
+	if( new_color.rgb() != m_tco->color().rgb() )
 	{ m_tco->setColor( new_color ); }
 	
 	// force TCO to use color

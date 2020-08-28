@@ -134,11 +134,6 @@ public:
 		return m_autoResize;
 	}
 	
-	unsigned int colorRgb() const
-	{
-		return( m_color.rgb() );
-	}
-	
 	QColor color() const
 	{
 		return m_color;
@@ -147,11 +142,6 @@ public:
 	void setColor( const QColor & c )
 	{
 		m_color = QColor( c );
-	}
-	
-	void setColorRgb( const unsigned int & c )
-	{
-		m_color.setRgb( c );
 	}
 
 	void useStyleColor( bool b )
