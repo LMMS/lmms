@@ -188,6 +188,7 @@ public slots:
 protected slots:
 	void openInPianoRoll();
 	void setGhostInPianoRoll();
+
 	void resetName();
 	void changeName();
 
