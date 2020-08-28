@@ -326,7 +326,6 @@ TrackContentObjectView::TrackContentObjectView( TrackContentObject * tco,
 	m_gradient( true ),
 	m_mouseHotspotHand( 0, 0 ),
 	m_cursorSetYet( false ),
-	m_usesCustomSelectedColor( ! m_tco->usesStyleColor() ),
 	m_needsUpdate( true )
 {
 	if( s_textFloat == NULL )
@@ -352,8 +351,6 @@ TrackContentObjectView::TrackContentObjectView( TrackContentObject * tco,
 	connect( m_tco, SIGNAL( positionChanged() ),
 			this, SLOT( updatePosition() ) );
 	connect( m_tco, SIGNAL( destroyedTCO() ), this, SLOT( close() ) );
-	connect( m_tco, SIGNAL( trackColorReset() ), this, SLOT( disableSelectedColor() ) );
-	connect( m_tco, SIGNAL( clipColorReset() ), this, SLOT( disableClipSelectedColor() ) );
 	setModel( m_tco );
 	connect( m_tco, SIGNAL( trackColorChanged( QColor & ) ), this, SLOT( setColor( QColor & ) ) );
 	connect( m_trackView->getTrackOperationsWidget(), SIGNAL( colorParented() ), this, SLOT( useTrackColor() ) );
@@ -421,18 +418,6 @@ bool TrackContentObjectView::fixedTCOs()
 }
 
 
-void TrackContentObjectView::disableSelectedColor()
-{
-	m_usesCustomSelectedColor = false;
-}
-
-
-void TrackContentObjectView::disableClipSelectedColor()
-{
-	m_usesCustomSelectedColor = m_trackView->getTrack()->useColor();
-}
-
-
 
 // qproperty access functions, to be inherited & used by TCOviews
 //! \brief CSS theming qproperty access method
@@ -443,7 +428,7 @@ QColor TrackContentObjectView::mutedBackgroundColor() const
 { return m_mutedBackgroundColor; }
 
 QColor TrackContentObjectView::selectedColor() const
-{ return ( m_usesCustomSelectedColor ? color().darker(200) : m_selectedColor ); }
+{ return ( m_tco->usesStyleColor() ? m_selectedColor : color().darker( 200 ) ); }
 
 QColor TrackContentObjectView::textColor() const
 { return m_textColor; }
@@ -644,7 +629,6 @@ void TrackContentObjectView::setColor( QColor & new_color )
 	
 	// force TCO to use color
 	m_tco->useStyleColor( false );
-	m_usesCustomSelectedColor = true;
 	
 	Engine::getSong()->setModified();
 	update();

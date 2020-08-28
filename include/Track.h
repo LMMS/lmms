@@ -313,8 +313,6 @@ public slots:
 	void cut();
 	void remove();
 	void update() override;
-	void disableSelectedColor();
-	void disableClipSelectedColor();
 	
 	void changeClipColor();
 	void useTrackColor();
@@ -399,8 +397,6 @@ private:
 	bool m_gradient;
 	QSize m_mouseHotspotHand; // QSize must be used because QPoint isn't supported by property system
 	bool m_cursorSetYet;
-
-	bool m_usesCustomSelectedColor;
 
 	bool m_needsUpdate;
 	inline void setInitialPos( QPoint pos )
