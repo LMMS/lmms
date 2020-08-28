@@ -98,7 +98,7 @@ public:
 
 	void setDisplayConversion( bool b )
 	{
-		m_displayConversion = b;
+		m_conversionFactor = b ? 100.0 : 1.0;
 	}
 
 	inline void setHintText( const QString & _txt_before,
@@ -154,8 +154,7 @@ private:
 	QPixmap * m_back;
 	QPixmap * m_leds;
 	QPixmap * m_knob;
-	
-	bool m_displayConversion;
+
 	bool m_levelsDisplayedInDBFS;
 
 	int m_moveStartPoint;

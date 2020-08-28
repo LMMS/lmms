@@ -72,7 +72,6 @@ Fader::Fader( FloatModel * _model, const QString & _name, QWidget * _parent ) :
 	m_persistentPeak_R( 0.0 ),
 	m_fMinPeak( 0.01f ),
 	m_fMaxPeak( 1.1 ),
-	m_displayConversion( true ),
 	m_levelsDisplayedInDBFS(false),
 	m_moveStartPoint( -1 ),
 	m_startValue( 0 ),
@@ -102,6 +101,8 @@ Fader::Fader( FloatModel * _model, const QString & _name, QWidget * _parent ) :
 	m_knob = s_knob;
 
 	init(_model, _name);
+
+	m_conversionFactor = 100.0;
 }
 
 
@@ -114,7 +115,6 @@ Fader::Fader( FloatModel * model, const QString & name, QWidget * parent, QPixma
 	m_persistentPeak_R( 0.0 ),
 	m_fMinPeak( 0.01f ),
 	m_fMaxPeak( 1.1 ),
-	m_displayConversion( false ),
 	m_levelsDisplayedInDBFS(false),
 	m_moveStartPoint( -1 ),
 	m_startValue( 0 ),
@@ -217,26 +217,13 @@ void Fader::mouseDoubleClickEvent( QMouseEvent* mouseEvent )
 	bool ok;
 	float newValue;
 	// TODO: dbV handling
-	if( m_displayConversion )
-	{
-		newValue = QInputDialog::getDouble( this, tr( "Set value" ),
-					tr( "Please enter a new value between %1 and %2:" ).
-							arg( model()->minValue() * 100 ).
-							arg( model()->maxValue() * 100 ),
-						model()->getRoundedValue() * 100,
-						model()->minValue() * 100,
-						model()->maxValue() * 100, model()->getDigitCount(), &ok ) * 0.01f;
-	}
-	else
-	{
-		newValue = QInputDialog::getDouble( this, tr( "Set value" ),
-					tr( "Please enter a new value between %1 and %2:" ).
-							arg( model()->minValue() ).
-							arg( model()->maxValue() ),
-						model()->getRoundedValue(),
-						model()->minValue(),
-						model()->maxValue(), model()->getDigitCount(), &ok );
-	}
+	newValue = QInputDialog::getDouble( this, tr( "Set value" ),
+				tr( "Please enter a new value between %1 and %2:" ).
+						arg( model()->minValue() * m_conversionFactor ).
+						arg( model()->maxValue() * m_conversionFactor ),
+					model()->getRoundedValue() * m_conversionFactor,
+					model()->minValue() * m_conversionFactor,
+					model()->maxValue() * m_conversionFactor, model()->getDigitCount(), &ok ) / m_conversionFactor;
 
 	if( ok )
 	{
@@ -330,14 +317,14 @@ void Fader::setPeak_R( float fPeak )
 // update tooltip showing value and adjust position while changing fader value
 void Fader::updateTextFloat()
 {
-	if( ConfigManager::inst()->value( "app", "displaydbfs" ).toInt() && m_displayConversion )
+	if( ConfigManager::inst()->value( "app", "displaydbfs" ).toInt() && ( m_conversionFactor == 100.0 ) )
 	{
 		s_textFloat->setText( QString("Volume: %1 dBFS").
 				arg( ampToDbfs( model()->value() ), 3, 'f', 2 ) );
 	}
 	else
 	{
-		s_textFloat->setText( m_description + " " + QString("%1 ").arg( m_displayConversion ? model()->value() * 100 : model()->value() ) + " " + m_unit );
+		s_textFloat->setText( m_description + " " + QString("%1 ").arg( model()->value() * m_conversionFactor ) + " " + m_unit );
 	}
 	s_textFloat->moveGlobal( this, QPoint( width() - ( *m_knob ).width() - 5, knobPosY() - 46 ) );
 }
