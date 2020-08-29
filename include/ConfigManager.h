@@ -219,6 +219,10 @@ public:
 		return m_version;
 	}
 
+	// Returns m_configVersion if present in the configuration file. If it's not present
+	// gets the right configVersion from a LMMS version for backwards compatibility.
+	const int configVersion();
+
 	QString defaultVersion() const;
 
 
@@ -266,8 +270,8 @@ private:
 	ConfigManager(const ConfigManager & _c);
 	~ConfigManager();
 
-	void upgrade_1_1_90();
-	void upgrade_1_1_91();
+	void upgrade_0();
+	void upgrade_1();
 	void upgrade();
 
 	QString m_workingDir;
@@ -286,6 +290,7 @@ private:
 	QString m_backgroundPicFile;
 	QString m_lmmsRcFile;
 	QString m_version;
+	int m_configVersion;
 	QStringList m_recentlyOpenedProjects;
 
 	typedef QVector<QPair<QString, QString> > stringPairVector;

@@ -51,7 +51,9 @@ static inline QString ensureTrailingSlash(const QString & s )
 ConfigManager * ConfigManager::s_instanceOfMe = NULL;
 
 
-ConfigManager::ConfigManager() : m_version(defaultVersion())
+ConfigManager::ConfigManager() :
+	m_version(defaultVersion()),
+	m_configVersion( -1 )
 {
 	if (QFileInfo::exists(qApp->applicationDirPath() + PORTABLE_MODE_FILE))
 	{
@@ -89,7 +91,7 @@ ConfigManager::~ConfigManager()
 }
 
 
-void ConfigManager::upgrade_1_1_90()
+void ConfigManager::upgrade_0()
 {
 	// Remove trailing " (bad latency!)" string which was once saved with PulseAudio
 	if(value("mixer", "audiodev").startsWith("PulseAudio ("))
@@ -113,7 +115,7 @@ void ConfigManager::upgrade_1_1_90()
 }
 
 	
-void ConfigManager::upgrade_1_1_91()
+void ConfigManager::upgrade_1()
 {		
 	// rename displaydbv to displaydbfs
 	if (!value("app", "displaydbv").isNull()) {
@@ -131,17 +133,17 @@ void ConfigManager::upgrade()
 		return;
 	}
 
+	if( configVersion() < 1 )
+	{
+		upgrade_0();
+	}
+	
+	if( configVersion() < 2 )
+	{
+		upgrade_1();
+	}
+
 	ProjectVersion createdWith = m_version;
-	
-	if (createdWith.setCompareType(ProjectVersion::Build) < "1.1.90")
-	{
-		upgrade_1_1_90();
-	}
-	
-	if (createdWith.setCompareType(ProjectVersion::Build) < "1.1.91")
-	{
-		upgrade_1_1_91();
-	}
 	
 	// Don't use old themes as they break the UI (i.e. 0.4 != 1.0, etc)
 	if (createdWith.setCompareType(ProjectVersion::Minor) != LMMS_VERSION)
@@ -151,6 +153,7 @@ void ConfigManager::upgrade()
 
 	// Bump the version, now that we are upgraded
 	m_version = LMMS_VERSION;
+	// No need to bump the m_configVersion, because it gets bumped in the configVersion() method
 }
 
 QString ConfigManager::defaultVersion() const
@@ -400,9 +403,19 @@ void ConfigManager::loadConfigFile(const QString & configFile)
 
 			QDomNode node = root.firstChild();
 
-			// Cache the config version for upgrade()
+			// Cache LMMS version
 			if (!root.attribute("version").isNull()) {
 				m_version = root.attribute("version");
+			}
+
+			// Get the version of the configuration file (for upgrade purposes)
+			if( root.attribute("configversion").isNull() )
+			{
+				m_configVersion = -1; // No configversion attribute found
+			} else {
+				bool success;
+				m_configVersion = root.attribute("configversion").toInt(&success);
+				if( !success ) qWarning("Config Version conversion failure.");
 			}
 
 			// create the settings-map out of the DOM
@@ -565,6 +578,7 @@ void ConfigManager::saveConfigFile()
 
 	QDomElement lmms_config = doc.createElement("lmms");
 	lmms_config.setAttribute("version", m_version);
+	lmms_config.setAttribute("configversion", configVersion());
 	doc.appendChild(lmms_config);
 
 	for(settingsMap::iterator it = m_settings.begin();
@@ -672,4 +686,29 @@ void ConfigManager::initDevelopmentWorkingDir()
 
 		cmakeCache.close();
 	}
+}
+
+const int ConfigManager::configVersion()
+{
+	if( m_configVersion < 0 )
+	{
+		// If configversion is not present, we will convert the LMMS version to the appropriate
+		// configuration file version for backwards compatibility.
+		ProjectVersion createdWith = m_version;
+
+		if( createdWith.setCompareType(ProjectVersion::Build) < "1.1.90" )
+		{
+			m_configVersion = 0;
+		}
+		else if( createdWith.setCompareType(ProjectVersion::Build) < "1.1.91" )
+		{
+			m_configVersion = 1;
+		}
+		else
+		{
+			m_configVersion = 2;
+		}
+	}
+
+	return m_configVersion;
 }
