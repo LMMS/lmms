@@ -1,5 +1,7 @@
 #include "DiginstrumentPlugin.h"
 
+using namespace QtDataVisualization;
+
 extern "C"
 {
 
@@ -160,4 +162,36 @@ bool DiginstrumentPlugin::loadInstrumentFile()
 		return true;
 	}
 	else return false;
+}
+
+QtDataVisualization::QSurfaceDataArray * DiginstrumentPlugin::getInstrumentSurfaceData(float minTime, float maxTime, float minFreq, float maxFreq, int timeSamples, int freqSamples)
+{
+	//TODO: this is the discrete version
+	//tmp: TODO: coordinates
+	const float freq = 400;
+
+	const float stepX = (maxFreq - minFreq) / float(freqSamples - 1);
+    const float stepZ = (maxTime - minTime) / float(timeSamples - 1);
+
+	QSurfaceDataArray * data = new QSurfaceDataArray;
+	data->reserve(timeSamples);
+	for(int i = 0; i<timeSamples;i++)
+	{
+		QSurfaceDataRow *dataRow = new QSurfaceDataRow(freqSamples);
+		float z = qMin(maxTime, (i * stepZ + minTime));
+		//initialize row to zeroes
+        int index = 0;
+        for (int j = 0; j < freqSamples; j++) {
+            float x = qMin(maxFreq, (j * stepX + minFreq));
+            (*dataRow)[index++].setPosition(QVector3D(x, 0, z));
+        }
+		//project components into the row based on frequency
+		for(const auto & c : inst.getSpectrum({freq, z}))
+		{
+			(*dataRow)[std::round((c.frequency-minFreq)/((maxFreq-minFreq)/(float)freqSamples))].setPosition(QVector3D(c.frequency,c.amplitude, z));
+		}
+		*data<<dataRow;
+	}
+
+	return data;
 }

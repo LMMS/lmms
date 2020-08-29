@@ -12,13 +12,15 @@
                 "/usr/include/x86_64-linux-gnu/qt5/QtCore",
                 "/usr/include/x86_64-linux-gnu/qt5/QtGui",
                 "/usr/include/x86_64-linux-gnu/qt5/QtWidgets",
-                "/usr/include/x86_64-linux-gnu/qt5/QtXml"
+                "/usr/include/x86_64-linux-gnu/qt5/QtXml",
+                "/usr/include/x86_64-linux-gnu/qt5/QtDataVisualization"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/gcc",
             "cStandard": "c11",
             "cppStandard": "c++17",
-            "intelliSenseMode": "gcc-x64"
+            "intelliSenseMode": "gcc-x64",
+            "configurationProvider": "ms-vscode.cmake-tools"
         }
     ],
     "version": 4

@@ -6,7 +6,8 @@
 #include <QPushButton>
 #include <QLineEdit>
 #include <QFileDialog>
-#include <QtDataVisualization/Q3DSurface>
+#include <QtDataVisualization>
+#include <QtWidgets>
 
 //TODO: note visualization with surface
 class DiginstrumentView : public InstrumentView
@@ -19,12 +20,14 @@ class DiginstrumentView : public InstrumentView
     /*TODO*/
 
   protected slots:
+    void showInstumentVisualization();
     void openInstrumentFile();
 
   private:
 	  virtual void modelChanged( void );
 
     QPushButton * m_openInstrumentFileButton;
+    QPushButton * m_openInstrumentVisualizationButton;
     QLineEdit * m_nameField;
     QLineEdit * m_typeField;
     /*TODO*/

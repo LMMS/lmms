@@ -75,7 +75,9 @@
         "valarray": "cpp",
         "variant": "cpp",
         "bit": "cpp",
-        "future": "cpp"
+        "future": "cpp",
+        "qfiledialog": "cpp",
+        "qtdatavisualization": "cpp"
     },
     "cmake.configureOnOpen": true
 }
