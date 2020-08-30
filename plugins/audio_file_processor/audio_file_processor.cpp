@@ -55,7 +55,7 @@ Plugin::Descriptor PLUGIN_EXPORT audiofileprocessor_plugin_descriptor =
 {
 	STRINGIFY( PLUGIN_NAME ),
 	"AudioFileProcessor",
-	QT_TRANSLATE_NOOP( "pluginBrowser",
+	QT_TRANSLATE_NOOP( "PluginBrowser",
 				"Simple sampler with various settings for "
 				"using samples (e.g. drums) in an "
 				"instrument-track" ),

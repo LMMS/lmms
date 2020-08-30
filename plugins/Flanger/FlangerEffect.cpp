@@ -35,7 +35,7 @@ Plugin::Descriptor PLUGIN_EXPORT flanger_plugin_descriptor =
 {
 	STRINGIFY( PLUGIN_NAME ),
 	"Flanger",
-	QT_TRANSLATE_NOOP( "pluginBrowser", "A native flanger plugin" ),
+	QT_TRANSLATE_NOOP( "PluginBrowser", "A native flanger plugin" ),
 	"Dave French <contact/dot/dave/dot/french3/at/googlemail/dot/com>",
 	0x0100,
 	Plugin::Effect,
