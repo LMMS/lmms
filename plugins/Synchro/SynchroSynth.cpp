@@ -24,7 +24,7 @@
 
 #include "SynchroSynth.h"
 //Standard headers
-#include <math.h>
+#include <cmath>
 //QT headers
 #include <QDomDocument>
 //LMMS headers
@@ -56,6 +56,15 @@ extern "C"
 	{
 		return new SynchroSynth(static_cast<InstrumentTrack *>(m));
 	}
+}
+
+//Keeps a phase value between 0 and 360
+static inline float wrapPhase(float phase) {
+	//Make sure phase is always between 0 and 2PI
+	while (phase >= F_2PI) { phase -= F_2PI; }
+	//Extra check since phase modulation can push it below 0
+	while (phase < 0) { phase += F_2PI; }
+	return phase;
 }
 
 //Triangle waveform generator
@@ -127,22 +136,21 @@ SynchroNote::SynchroNote(NotePlayHandle * nph) :
 
 }
 
-void SynchroNote::nextStringSample(sampleFrame &outputSample, sample_rate_t sample_rate,
-	const float & modulationStrength, const float & modulationAmount, const float & harmonics,
+void SynchroNote::nextSample(sampleFrame &outputSample, sample_rate_t sample_rate,
+	const float modulationStrength, const float modulationAmount, const float harmonics,
 	const SynchroOscillatorSettings & carrier, const SynchroOscillatorSettings & modulator)
 {
 	float freqToSampleStep = F_2PI / sample_rate;
 	//How long (in frames) this note has been playing
-	float NoteTime = nph->totalFramesPlayed();
+	float noteTime = nph->totalFramesPlayed() * SYNCHRO_OVERSAMPLE;
 
 	//Modulator is calculated first because it is used by the carrier
 	//Find position in modulator waveform
-	modulatorSampleIndex += freqToSampleStep * DetuneOctaves(nph->frequency(), modulator.Detune);
-	//Make sure phase is always between 0 and 2PI
-	while (modulatorSampleIndex >= F_2PI) { modulatorSampleIndex -= F_2PI; }
+	m_ModulatorSampleIndex += freqToSampleStep * DetuneOctaves(nph->frequency(), modulator.Detune);
+	m_ModulatorSampleIndex = wrapPhase(m_ModulatorSampleIndex);
 
 	//Get modulator waveform at position
-	float modulatorSample = SynchroWaveform(modulatorSampleIndex,
+	float modulatorSample = SynchroWaveform(m_ModulatorSampleIndex,
 		modulator.Drive, modulator.Sync, modulator.Chop, harmonics) * (modulationStrength * modulationAmount);
 
 	//Modulator envelope
@@ -151,15 +159,15 @@ void SynchroNote::nextStringSample(sampleFrame &outputSample, sample_rate_t samp
 	float modulatorAtk = modulator.Attack * 0.001 * Engine::mixer()->processingSampleRate();
 	float modulatorDec = modulator.Decay * 0.001 * Engine::mixer()->processingSampleRate();
 	float modulatorRel = modulator.Release * 0.001 * Engine::mixer()->processingSampleRate();
-	if (NoteTime < modulatorAtk) //Attack
+	if (noteTime < modulatorAtk) //Attack
 	{
 		//Linear attack sounds better
-		modulatorEnvelope = lerp(0, 1, NoteTime / modulatorAtk);
+		modulatorEnvelope = lerp(0, 1, noteTime / modulatorAtk);
 	}
-	else if (NoteTime <= modulatorAtk + modulatorDec) //Decay
+	else if (noteTime <= modulatorAtk + modulatorDec) //Decay
 	{
 		//But decay needs to be exponential
-		modulatorEnvelope = expInterpol(1, modulator.Sustain, NoteTime / (modulatorAtk + modulatorDec));
+		modulatorEnvelope = expInterpol(1, modulator.Sustain, noteTime / (modulatorAtk + modulatorDec));
 	}
 	else //Sustain
 	{
@@ -175,23 +183,20 @@ void SynchroNote::nextStringSample(sampleFrame &outputSample, sample_rate_t samp
 	float pmSample = modulatorSample * modulatorEnvelope * SYNCHRO_PM_CONST;
 
 	//Find position in carrier waveform
-	carrierSampleIndex += freqToSampleStep * DetuneOctaves(nph->frequency(), carrier.Detune);
-	//Make sure phase is always between 0 and 2PI
-	while (carrierSampleIndex >= F_2PI) { carrierSampleIndex -= F_2PI; }
-	//Extra check since phase modulation can push it below 0
-	while (carrierSampleIndex < 0) { carrierSampleIndex += F_2PI; }
+	m_CarrierSampleIndex += freqToSampleStep * DetuneOctaves(nph->frequency(), carrier.Detune);
+	m_CarrierSampleIndex = wrapPhase(m_CarrierSampleIndex);
 	//Carrier envelope
 	float carrierEnvelope;
 	float carrierAtk = carrier.Attack * 0.001 * Engine::mixer()->processingSampleRate();
 	float carrierDec = carrier.Decay * 0.001 * Engine::mixer()->processingSampleRate();
 	float carrierRel = carrier.Release * 0.001 * Engine::mixer()->processingSampleRate();
-	if (NoteTime < carrierAtk) //Attack
+	if (noteTime < carrierAtk) //Attack
 	{
-		carrierEnvelope = lerp(0, 1, NoteTime / carrierAtk);
+		carrierEnvelope = lerp(0, 1, noteTime / carrierAtk);
 	}
-	else if (NoteTime <= carrierAtk + carrierDec) //Decay
+	else if (noteTime <= carrierAtk + carrierDec) //Decay
 	{
-		carrierEnvelope = expInterpol(1, carrier.Sustain, NoteTime / (carrierAtk + carrierDec));
+		carrierEnvelope = expInterpol(1, carrier.Sustain, noteTime / (carrierAtk + carrierDec));
 	}
 	else //Sustain
 	{
@@ -203,7 +208,7 @@ void SynchroNote::nextStringSample(sampleFrame &outputSample, sample_rate_t samp
 	}
 
 	//Get carrier waveform at position, accounting for modulation
-	outputSample[0] = SynchroWaveform(carrierSampleIndex + pmSample, carrier.Drive, carrier.Sync, carrier.Chop, 0)
+	outputSample[0] = SynchroWaveform(m_CarrierSampleIndex + pmSample, carrier.Drive, carrier.Sync, carrier.Chop, 0)
 		* carrierEnvelope * SYNCHRO_VOLUME_CONST;
 
 	//Output result
@@ -439,7 +444,7 @@ void SynchroSynth::playNote(NotePlayHandle * n, sampleFrame * working_buffer)
 			float strength = modStrBuf ? modStrBuf->value(frame) : m_modulationStrength.value();
 			float amount = modBuf ? modBuf->value(frame) : m_modulation.value();
 
-			ps->nextStringSample(tempSample, Engine::mixer()->processingSampleRate() * SYNCHRO_OVERSAMPLE,
+			ps->nextSample(tempSample, Engine::mixer()->processingSampleRate() * SYNCHRO_OVERSAMPLE,
 				strength, amount, m_harmonics.value(), carrier, modulator);
 			outputSample[0] += tempSample[0];
 			outputSample[1] += tempSample[1];
@@ -457,7 +462,7 @@ void SynchroSynth::playNote(NotePlayHandle * n, sampleFrame * working_buffer)
 //Tells LMMS how much extra time Synchro needs at the end of a note to finish our envelopes
 f_cnt_t SynchroSynth::desiredReleaseFrames() const
 {
-	return (f_cnt_t)(m_carrierRelease.value() * 0.001 * Engine::mixer()->processingSampleRate());
+	return static_cast<f_cnt_t>(m_carrierRelease.value() * 0.001 * Engine::mixer()->processingSampleRate());
 }
 
 void SynchroSynth::saveSettings(QDomDocument & doc, QDomElement & thisElement)
@@ -520,7 +525,7 @@ void SynchroSynth::carrierChanged()
 {
 	for (int i = 0; i < SYNCHRO_GRAPH_SAMPLES; ++i)
 	{
-		float phase = (float)i / (float)SYNCHRO_GRAPH_SAMPLES * F_2PI;
+		float phase = i * F_2PI / SYNCHRO_GRAPH_SAMPLES;
 		m_carrierGraph.setSampleAt(i, SynchroWaveform(phase, m_carrierDrive.value(), m_carrierSync.value(),
 			m_carrierChop.value(), 0));
 	}
@@ -533,7 +538,7 @@ void SynchroSynth::modulatorChanged()
 {
 	for (int i = 0; i < SYNCHRO_GRAPH_SAMPLES; ++i)
 	{
-		float phase = (float)i / (float)SYNCHRO_GRAPH_SAMPLES * F_2PI;
+		float phase = i * F_2PI / SYNCHRO_GRAPH_SAMPLES;
 		m_modulatorGraph.setSampleAt(i, SynchroWaveform(phase, m_modulatorDrive.value(), m_modulatorSync.value(),
 			m_modulatorChop.value(), m_harmonics.value()));
 	}
@@ -549,7 +554,7 @@ void SynchroSynth::generalChanged()
 		int octaveDiff = m_carrierDetune.value() - m_modulatorDetune.value();
 		float pitchDifference = powf(2, octaveDiff);
 
-		float phase = (float)i / (float)SYNCHRO_GRAPH_SAMPLES * F_2PI;
+		float phase = i * F_2PI / SYNCHRO_GRAPH_SAMPLES;
 		while (phase >= F_2PI) { phase -= F_2PI; }
 
 		float phaseMod = SynchroWaveform(phase, m_modulatorDrive.value(), m_modulatorSync.value(),

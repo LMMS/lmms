@@ -59,13 +59,13 @@ public:
 	//Constructor
 	SynchroNote(NotePlayHandle * nph);
 	//Renders a single sample of audio
-	void nextStringSample(sampleFrame &outputSample, sample_rate_t sample_rate,
-		const float & modulationStrength, const float & modulationAmount, const float & harmonics,
+	void nextSample(sampleFrame &outputSample, sample_rate_t sample_rate,
+		const float modulationStrength, const float modulationAmount, const float harmonics,
 		const SynchroOscillatorSettings & carrier, const SynchroOscillatorSettings & modulator);
 private:
 	NotePlayHandle * nph;
-	float carrierSampleIndex = 0; //The index (or phase) of the carrier oscillator
-	float modulatorSampleIndex = 0; //The index (or phase) of the modulator oscillator
+	float m_CarrierSampleIndex = 0; //The index (or phase) of the carrier oscillator
+	float m_ModulatorSampleIndex = 0; //The index (or phase) of the modulator oscillator
 };
 
 //Synth GUI
@@ -77,7 +77,7 @@ public:
 	QSize sizeHint() const override { return QSize(448, 250); } //~3px wider than the artwork
 protected slots:
 private:
-	virtual void modelChanged();
+	void modelChanged() override;
 	Knob * m_harmonicsKnob;
 	Knob * m_modulationStrengthKnob;
 	Knob * m_modulationKnob;
@@ -111,13 +111,13 @@ class SynchroSynth : public Instrument
 	Q_OBJECT
 public:
 	SynchroSynth(InstrumentTrack * instrument_track);
-	virtual void playNote(NotePlayHandle * n, sampleFrame * working_buffer);
-	virtual f_cnt_t desiredReleaseFrames() const;
-	virtual void saveSettings(QDomDocument & doc, QDomElement & parent);
-	virtual void loadSettings(const QDomElement & thisElement);
-	virtual QString nodeName() const;
-	virtual PluginView * instantiateView(QWidget * parent) { return new SynchroSynthView(this, parent); };
-	virtual void deleteNotePluginData(NotePlayHandle * n) { delete static_cast<SynchroNote *>(n->m_pluginData); };
+	void playNote(NotePlayHandle * n, sampleFrame * working_buffer) override;
+	f_cnt_t desiredReleaseFrames() const override;
+	void saveSettings(QDomDocument & doc, QDomElement & parent) override;
+	void loadSettings(const QDomElement & thisElement) override;
+	QString nodeName() const override;
+	PluginView * instantiateView(QWidget * parent) { return new SynchroSynthView(this, parent); } override;
+	void deleteNotePluginData(NotePlayHandle * n) { delete static_cast<SynchroNote *>(n->m_pluginData); } override;
 protected slots:
 	void carrierChanged();
 	void modulatorChanged();
