@@ -116,8 +116,8 @@ public:
 	void saveSettings(QDomDocument & doc, QDomElement & parent) override;
 	void loadSettings(const QDomElement & thisElement) override;
 	QString nodeName() const override;
-	PluginView * instantiateView(QWidget * parent) { return new SynchroSynthView(this, parent); } override;
-	void deleteNotePluginData(NotePlayHandle * n) { delete static_cast<SynchroNote *>(n->m_pluginData); } override;
+	PluginView * instantiateView(QWidget * parent) override { return new SynchroSynthView(this, parent); };
+	void deleteNotePluginData(NotePlayHandle * n) override { delete static_cast<SynchroNote *>(n->m_pluginData); };
 protected slots:
 	void carrierChanged();
 	void modulatorChanged();
