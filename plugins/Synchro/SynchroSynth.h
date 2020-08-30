@@ -57,13 +57,13 @@ class SynchroNote
 	MM_OPERATORS
 public:
 	//Constructor
-	SynchroNote(NotePlayHandle * nph);
+	SynchroNote(NotePlayHandle * notePlayHandle);
 	//Renders a single sample of audio
 	void nextSample(sampleFrame &outputSample, sample_rate_t sample_rate,
 		const float modulationStrength, const float modulationAmount, const float harmonics,
 		const SynchroOscillatorSettings & carrier, const SynchroOscillatorSettings & modulator);
 private:
-	NotePlayHandle * nph;
+	NotePlayHandle * m_nph;
 	float m_CarrierSampleIndex = 0; //The index (or phase) of the carrier oscillator
 	float m_ModulatorSampleIndex = 0; //The index (or phase) of the modulator oscillator
 };

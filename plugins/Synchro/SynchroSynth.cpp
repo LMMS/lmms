@@ -43,7 +43,7 @@ extern "C"
 	{
 		STRINGIFY(PLUGIN_NAME),
 		"Synchro",
-		QT_TRANSLATE_NOOP("pluginBrowser", "2-oscillator PM synth"),
+		QT_TRANSLATE_NOOP("PluginBrowser", "2-oscillator PM synth"),
 		"Ian Sannar <ian/dot/sannar/at/gmail/dot/com>",
 		0x0100, //What does this do?
 		Plugin::Instrument,
@@ -130,8 +130,8 @@ static inline float SynchroWaveform(float x, float drive, float sync, float chop
 }
 
 //SynchroNote empty constructor
-SynchroNote::SynchroNote(NotePlayHandle * nph) :
-	nph(nph)
+SynchroNote::SynchroNote(NotePlayHandle * notePlayHandle) :
+	m_nph(notePlayHandle)
 {
 
 }
@@ -142,11 +142,11 @@ void SynchroNote::nextSample(sampleFrame &outputSample, sample_rate_t sample_rat
 {
 	float freqToSampleStep = F_2PI / sample_rate;
 	//How long (in frames) this note has been playing
-	float noteTime = nph->totalFramesPlayed() * SYNCHRO_OVERSAMPLE;
+	float noteTime = m_nph->totalFramesPlayed() * SYNCHRO_OVERSAMPLE;
 
 	//Modulator is calculated first because it is used by the carrier
 	//Find position in modulator waveform
-	m_ModulatorSampleIndex += freqToSampleStep * DetuneOctaves(nph->frequency(), modulator.Detune);
+	m_ModulatorSampleIndex += freqToSampleStep * DetuneOctaves(m_nph->frequency(), modulator.Detune);
 	m_ModulatorSampleIndex = wrapPhase(m_ModulatorSampleIndex);
 
 	//Get modulator waveform at position
@@ -173,9 +173,9 @@ void SynchroNote::nextSample(sampleFrame &outputSample, sample_rate_t sample_rat
 	{
 		modulatorEnvelope = modulator.Sustain;
 	}
-	if (nph->isReleased()) //Release is done separately so the volume doesn't jump when released prematurely
+	if m_nph->isReleased()) //Release is done separately so the volume doesn't jump when released prematurely
 	{
-		float releaseProgress = (nph->releaseFramesDone() < modulatorRel) ? nph->releaseFramesDone() : modulatorRel;
+		float releaseProgress = (m_nph->releaseFramesDone() < modulatorRel) ? m_nph->releaseFramesDone() : modulatorRel;
 		modulatorEnvelope *= expInterpol(1, 0, releaseProgress / modulatorRel);
 	}
 
@@ -183,7 +183,7 @@ void SynchroNote::nextSample(sampleFrame &outputSample, sample_rate_t sample_rat
 	float pmSample = modulatorSample * modulatorEnvelope * SYNCHRO_PM_CONST;
 
 	//Find position in carrier waveform
-	m_CarrierSampleIndex += freqToSampleStep * DetuneOctaves(nph->frequency(), carrier.Detune);
+	m_CarrierSampleIndex += freqToSampleStep * DetuneOctaves(m_nph->frequency(), carrier.Detune);
 	m_CarrierSampleIndex = wrapPhase(m_CarrierSampleIndex);
 	//Carrier envelope
 	float carrierEnvelope;
@@ -202,8 +202,8 @@ void SynchroNote::nextSample(sampleFrame &outputSample, sample_rate_t sample_rat
 	{
 		carrierEnvelope = carrier.Sustain;
 	}
-	if (nph->isReleased()) { //Release
-		float releaseProgress = (nph->releaseFramesDone() < carrierRel) ? nph->releaseFramesDone() : carrierRel;
+	if (m_nph->isReleased()) { //Release
+		float releaseProgress = (m_nph->releaseFramesDone() < carrierRel) ? m_nph->releaseFramesDone() : carrierRel;
 		carrierEnvelope *= expInterpol(1, 0, releaseProgress / carrierRel);
 	}
 
