@@ -39,6 +39,8 @@
 
 class LmmsCore;
 
+// Configuration file version
+const int CONFIG_VERSION = 2;
 
 const QString PROJECTS_PATH = "projects/";
 const QString TEMPLATE_PATH = "templates/";
@@ -219,9 +221,9 @@ public:
 		return m_version;
 	}
 
-	// Returns m_configVersion if present in the configuration file. If it's not present
-	// gets the right configVersion from a LMMS version for backwards compatibility.
-	const int configVersion();
+	// Used when the configversion attribute is not present in a configuration file.
+	// Returns the appropriate config file version based on the LMMS version.
+	const int legacyConfigVersion();
 
 	QString defaultVersion() const;
 

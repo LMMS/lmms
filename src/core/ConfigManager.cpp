@@ -53,7 +53,7 @@ ConfigManager * ConfigManager::s_instanceOfMe = NULL;
 
 ConfigManager::ConfigManager() :
 	m_version(defaultVersion()),
-	m_configVersion( -1 )
+	m_configVersion( CONFIG_VERSION )
 {
 	if (QFileInfo::exists(qApp->applicationDirPath() + PORTABLE_MODE_FILE))
 	{
@@ -133,16 +133,14 @@ void ConfigManager::upgrade()
 		return;
 	}
 
-	if( configVersion() < 1 )
+	switch( m_configVersion )
 	{
-		upgrade_0();
+		case 0:
+			upgrade_0();
+		case 1:
+			upgrade_1();
 	}
 	
-	if( configVersion() < 2 )
-	{
-		upgrade_1();
-	}
-
 	ProjectVersion createdWith = m_version;
 	
 	// Don't use old themes as they break the UI (i.e. 0.4 != 1.0, etc)
@@ -153,7 +151,7 @@ void ConfigManager::upgrade()
 
 	// Bump the version, now that we are upgraded
 	m_version = LMMS_VERSION;
-	// No need to bump the m_configVersion, because it gets bumped in the configVersion() method
+	m_configVersion = CONFIG_VERSION;
 }
 
 QString ConfigManager::defaultVersion() const
@@ -411,8 +409,10 @@ void ConfigManager::loadConfigFile(const QString & configFile)
 			// Get the version of the configuration file (for upgrade purposes)
 			if( root.attribute("configversion").isNull() )
 			{
-				m_configVersion = -1; // No configversion attribute found
-			} else {
+				m_configVersion = legacyConfigVersion(); // No configversion attribute found
+			}
+			else
+			{
 				bool success;
 				m_configVersion = root.attribute("configversion").toInt(&success);
 				if( !success ) qWarning("Config Version conversion failure.");
@@ -578,7 +578,7 @@ void ConfigManager::saveConfigFile()
 
 	QDomElement lmms_config = doc.createElement("lmms");
 	lmms_config.setAttribute("version", m_version);
-	lmms_config.setAttribute("configversion", configVersion());
+	lmms_config.setAttribute("configversion", m_configVersion);
 	doc.appendChild(lmms_config);
 
 	for(settingsMap::iterator it = m_settings.begin();
@@ -688,27 +688,24 @@ void ConfigManager::initDevelopmentWorkingDir()
 	}
 }
 
-const int ConfigManager::configVersion()
+// If configversion is not present, we will convert the LMMS version to the appropriate
+// configuration file version for backwards compatibility.
+const int ConfigManager::legacyConfigVersion()
 {
-	if( m_configVersion < 0 )
+	ProjectVersion createdWith = m_version;
+
+	createdWith.setCompareType(ProjectVersion::Build);
+
+	if( createdWith < "1.1.90" )
 	{
-		// If configversion is not present, we will convert the LMMS version to the appropriate
-		// configuration file version for backwards compatibility.
-		ProjectVersion createdWith = m_version;
-
-		if( createdWith.setCompareType(ProjectVersion::Build) < "1.1.90" )
-		{
-			m_configVersion = 0;
-		}
-		else if( createdWith.setCompareType(ProjectVersion::Build) < "1.1.91" )
-		{
-			m_configVersion = 1;
-		}
-		else
-		{
-			m_configVersion = 2;
-		}
+		return 0;
 	}
-
-	return m_configVersion;
+	else if( createdWith < "1.1.91" )
+	{
+		return 1;
+	}
+	else
+	{
+		return 2;
+	}
 }
