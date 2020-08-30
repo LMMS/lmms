@@ -173,7 +173,7 @@ void SynchroNote::nextSample(sampleFrame &outputSample, sample_rate_t sample_rat
 	{
 		modulatorEnvelope = modulator.Sustain;
 	}
-	if m_nph->isReleased()) //Release is done separately so the volume doesn't jump when released prematurely
+	if (m_nph->isReleased()) //Release is done separately so the volume doesn't jump when released prematurely
 	{
 		float releaseProgress = (m_nph->releaseFramesDone() < modulatorRel) ? m_nph->releaseFramesDone() : modulatorRel;
 		modulatorEnvelope *= expInterpol(1, 0, releaseProgress / modulatorRel);
