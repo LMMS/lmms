@@ -40,7 +40,7 @@
 class LmmsCore;
 
 // Configuration file version
-const int CONFIG_VERSION = 2;
+const unsigned int CONFIG_VERSION = 2;
 
 const QString PROJECTS_PATH = "projects/";
 const QString TEMPLATE_PATH = "templates/";
@@ -223,7 +223,7 @@ public:
 
 	// Used when the configversion attribute is not present in a configuration file.
 	// Returns the appropriate config file version based on the LMMS version.
-	const int legacyConfigVersion();
+	const unsigned int legacyConfigVersion();
 
 	QString defaultVersion() const;
 
@@ -292,7 +292,7 @@ private:
 	QString m_backgroundPicFile;
 	QString m_lmmsRcFile;
 	QString m_version;
-	int m_configVersion;
+	unsigned int m_configVersion;
 	QStringList m_recentlyOpenedProjects;
 
 	typedef QVector<QPair<QString, QString> > stringPairVector;

@@ -414,7 +414,7 @@ void ConfigManager::loadConfigFile(const QString & configFile)
 			else
 			{
 				bool success;
-				m_configVersion = root.attribute("configversion").toInt(&success);
+				m_configVersion = root.attribute("configversion").toUInt(&success);
 				if( !success ) qWarning("Config Version conversion failure.");
 			}
 
@@ -690,7 +690,7 @@ void ConfigManager::initDevelopmentWorkingDir()
 
 // If configversion is not present, we will convert the LMMS version to the appropriate
 // configuration file version for backwards compatibility.
-const int ConfigManager::legacyConfigVersion()
+const unsigned int ConfigManager::legacyConfigVersion()
 {
 	ProjectVersion createdWith = m_version;
 
