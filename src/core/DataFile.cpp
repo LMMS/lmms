@@ -49,6 +49,15 @@
 static void findIds(const QDomElement& elem, QList<jo_id_t>& idList);
 
 
+// Vector with all the upgrade methods
+const std::vector<void(DataFile::*)()> DataFile::m_upgradeMethods = {
+	&DataFile::upgrade_0_2_1_20070501, &DataFile::upgrade_0_2_1_20070508, &DataFile::upgrade_0_3_0_rc2,
+	&DataFile::upgrade_0_3_0, &DataFile::upgrade_0_4_0_20080104, &DataFile::upgrade_0_4_0_20080118,
+	&DataFile::upgrade_0_4_0_20080129, &DataFile::upgrade_0_4_0_20080409, &DataFile::upgrade_0_4_0_20080607,
+	&DataFile::upgrade_0_4_0_20080622, &DataFile::upgrade_0_4_0_beta1, &DataFile::upgrade_0_4_0_rc2,
+	&DataFile::upgrade_1_0_99, &DataFile::upgrade_1_1_0, &DataFile::upgrade_1_1_91, &DataFile::upgrade_1_2_0_rc3,
+	&DataFile::upgrade_1_3_0
+};
 
 
 DataFile::typeDescStruct
@@ -1339,18 +1348,8 @@ void DataFile::upgrade()
 {
 	using upgradeMethod = void(DataFile::*)();
 
-	// Vector with all the upgrade methods
-	std::vector<upgradeMethod> upgradeMethods = {
-		&DataFile::upgrade_0_2_1_20070501, &DataFile::upgrade_0_2_1_20070508, &DataFile::upgrade_0_3_0_rc2,
-		&DataFile::upgrade_0_3_0, &DataFile::upgrade_0_4_0_20080104, &DataFile::upgrade_0_4_0_20080118,
-		&DataFile::upgrade_0_4_0_20080129, &DataFile::upgrade_0_4_0_20080409, &DataFile::upgrade_0_4_0_20080607,
-		&DataFile::upgrade_0_4_0_20080622, &DataFile::upgrade_0_4_0_beta1, &DataFile::upgrade_0_4_0_rc2,
-		&DataFile::upgrade_1_0_99, &DataFile::upgrade_1_1_0, &DataFile::upgrade_1_1_91, &DataFile::upgrade_1_2_0_rc3,
-		&DataFile::upgrade_1_3_0
-	};
-
 	// Runs all necessary upgrade methods
-	std::for_each( upgradeMethods.begin() + m_fileVersion, upgradeMethods.end(),
+	std::for_each( m_upgradeMethods.begin() + m_fileVersion, m_upgradeMethods.end(),
 		[this](upgradeMethod um)
 		{
 			(this->*um)();
@@ -1359,7 +1358,7 @@ void DataFile::upgrade()
 
 	// Bump the file version (which should be the size of the upgrade methods vector)
 	// Safety check
-	if( FILE_VERSION != upgradeMethods.size() )
+	if( FILE_VERSION != m_upgradeMethods.size() )
 	{
 		qFatal( "File Version does not correspond to the number of upgrades!" );
 	}

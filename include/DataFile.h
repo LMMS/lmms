@@ -111,6 +111,9 @@ private:
 	void upgrade_1_2_0_rc3();
 	void upgrade_1_3_0();
 
+	// List of all upgrade methods (created on DataFile::upgrade)
+	static const std::vector<void(DataFile::*)()> m_upgradeMethods;
+
 	void upgrade();
 
 	void loadData( const QByteArray & _data, const QString & _sourceFile );
