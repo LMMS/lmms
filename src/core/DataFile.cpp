@@ -92,7 +92,7 @@ DataFile::DataFile( Type type ) :
 	m_content(),
 	m_head(),
 	m_type( type ),
-	m_fileVersion( FILE_VERSION )
+	m_fileVersion( m_upgradeMethods.size() )
 {
 	appendChild( createProcessingInstruction("xml", "version=\"1.0\""));
 	QDomElement root = createElement( "lmms-project" );
@@ -117,7 +117,7 @@ DataFile::DataFile( const QString & _fileName ) :
 	QDomDocument(),
 	m_content(),
 	m_head(),
-	m_fileVersion( FILE_VERSION )
+	m_fileVersion( m_upgradeMethods.size() )
 {
 	QFile inFile( _fileName );
 	if( !inFile.open( QIODevice::ReadOnly ) )
@@ -1368,12 +1368,7 @@ void DataFile::upgrade()
 	);
 
 	// Bump the file version (which should be the size of the upgrade methods vector)
-	// Safety check
-	if( FILE_VERSION != m_upgradeMethods.size() )
-	{
-		qFatal( "File Version does not correspond to the number of upgrades!" );
-	}
-	m_fileVersion = FILE_VERSION;
+	m_fileVersion = m_upgradeMethods.size();
 
 	// update document meta data
 	documentElement().setAttribute( "version", m_fileVersion );
@@ -1449,10 +1444,6 @@ void DataFile::loadData( const QByteArray & _data, const QString & _sourceFile )
 			m_fileVersion = root.attribute( "version" ).toUInt( &success );
 			if( !success ) qWarning("File Version conversion failure.");
 		}
-	}
-	else
-	{
-		qFatal( "No \"version\" attribute found on loaded file." );
 	}
 
 	if( root.hasAttribute( "creatorversion" ) )

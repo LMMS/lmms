@@ -134,9 +134,5 @@ private:
 } ;
 
 
-// Version of the file being loaded, for upgrade purposes
-const unsigned int FILE_VERSION = 17;
-
-
 #endif
 
