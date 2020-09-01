@@ -2,6 +2,7 @@
 
 #include "InstrumentView.h"
 #include "DiginstrumentPlugin.h"
+#include "../common/InstrumentVisualizationWindow.h"
 
 #include <QPushButton>
 #include <QLineEdit>
@@ -9,7 +10,6 @@
 #include <QtDataVisualization>
 #include <QtWidgets>
 
-//TODO: note visualization with surface
 class DiginstrumentView : public InstrumentView
 {
     Q_OBJECT
@@ -22,6 +22,7 @@ class DiginstrumentView : public InstrumentView
   protected slots:
     void showInstumentVisualization();
     void openInstrumentFile();
+    void updateVisualizationData(float minTime, float maxTime, float minFreq, float maxFreq, int timeSamples, int freqSamples);
 
   private:
 	  virtual void modelChanged( void );
@@ -30,7 +31,6 @@ class DiginstrumentView : public InstrumentView
     QPushButton * m_openInstrumentVisualizationButton;
     QLineEdit * m_nameField;
     QLineEdit * m_typeField;
-    /*TODO*/
-    //WIP: surface graph
-    QtDataVisualization::Q3DSurface *graph;
+    
+    Diginstrument::InstrumentVisualizationWindow * visualization;
 };

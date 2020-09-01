@@ -188,6 +188,7 @@ QtDataVisualization::QSurfaceDataArray * DiginstrumentPlugin::getInstrumentSurfa
 		//project components into the row based on frequency
 		for(const auto & c : inst.getSpectrum({freq, z}))
 		{
+			if(c.frequency<minFreq || c.frequency>maxFreq) continue;
 			(*dataRow)[std::round((c.frequency-minFreq)/((maxFreq-minFreq)/(float)freqSamples))].setPosition(QVector3D(c.frequency,c.amplitude, z));
 		}
 		*data<<dataRow;

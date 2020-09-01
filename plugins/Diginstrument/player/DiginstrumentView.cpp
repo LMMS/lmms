@@ -28,7 +28,7 @@ DiginstrumentView::DiginstrumentView( Instrument * _instrument, QWidget * _paren
 
     this->setLayout(layout);
 
-    graph = new QtDataVisualization::Q3DSurface();
+    visualization = new Diginstrument::InstrumentVisualizationWindow(this);
 }
 
 
@@ -60,34 +60,16 @@ void DiginstrumentView::openInstrumentFile( void )
 
 void DiginstrumentView::showInstumentVisualization()
 {
-  QWidget *container = QWidget::createWindowContainer(graph);
+  //TODO: couple and use parameters
+  //TODO: use all coordinates (not just freq)
+  //TODO: defaults/saving
+  updateVisualizationData(0,3000,20,22000,100,100);
+  visualization->show();
+  //is this even useful?
+  visualization->adjustSize();
+}
 
-  QSurface3DSeries *series = new QSurface3DSeries;
-  //Debug
-  auto data = castModel<DiginstrumentPlugin>()->getInstrumentSurfaceData(0,3,20,22000,100,200);
-
-  series->dataProxy()->resetArray(data);
-  series->setDrawMode(QSurface3DSeries::DrawSurface);
-  graph->addSeries(series);
-  //tmp
-  graph->axisX()->setRange(20, 22000);
-  graph->axisX()->setFormatter(new QLogValue3DAxisFormatter);
-  graph->axisY()->setRange(0, 1.2);
-  graph->axisZ()->setRange(0, 3);
-  graph->setAspectRatio(1.0);
-  graph->setHorizontalAspectRatio(1.0);
-
-  QLinearGradient gr;
-  gr.setColorAt(-0.01, Qt::red);
-  //TODO:maybe transparent?
-  gr.setColorAt(0.0, Qt::black);
-  gr.setColorAt(0.33, Qt::blue);
-  gr.setColorAt(0.67, Qt::green);
-  gr.setColorAt(1.0, Qt::green);
-  gr.setColorAt(1.01, Qt::red);
-
-  graph->seriesList().at(0)->setBaseGradient(gr);
-  graph->seriesList().at(0)->setColorStyle(Q3DTheme::ColorStyleRangeGradient);
-
-  container->show();
+void DiginstrumentView::updateVisualizationData(float minTime, float maxTime, float minFreq, float maxFreq, int timeSamples, int freqSamples)
+{
+  visualization->setSurfaceData(castModel<DiginstrumentPlugin>()->getInstrumentSurfaceData(minTime/1000.0f,maxTime/1000.0f,minFreq,maxFreq,timeSamples,freqSamples));
 }
