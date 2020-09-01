@@ -51,11 +51,22 @@ static void findIds(const QDomElement& elem, QList<jo_id_t>& idList);
 
 // Vector with all the upgrade methods
 const std::vector<void(DataFile::*)()> DataFile::m_upgradeMethods = {
-	&DataFile::upgrade_0_2_1_20070501, &DataFile::upgrade_0_2_1_20070508, &DataFile::upgrade_0_3_0_rc2,
-	&DataFile::upgrade_0_3_0, &DataFile::upgrade_0_4_0_20080104, &DataFile::upgrade_0_4_0_20080118,
-	&DataFile::upgrade_0_4_0_20080129, &DataFile::upgrade_0_4_0_20080409, &DataFile::upgrade_0_4_0_20080607,
-	&DataFile::upgrade_0_4_0_20080622, &DataFile::upgrade_0_4_0_beta1, &DataFile::upgrade_0_4_0_rc2,
-	&DataFile::upgrade_1_0_99, &DataFile::upgrade_1_1_0, &DataFile::upgrade_1_1_91, &DataFile::upgrade_1_2_0_rc3,
+	&DataFile::upgrade_0_2_1_20070501,
+	&DataFile::upgrade_0_2_1_20070508,
+	&DataFile::upgrade_0_3_0_rc2,
+	&DataFile::upgrade_0_3_0,
+	&DataFile::upgrade_0_4_0_20080104,
+	&DataFile::upgrade_0_4_0_20080118,
+	&DataFile::upgrade_0_4_0_20080129,
+	&DataFile::upgrade_0_4_0_20080409,
+	&DataFile::upgrade_0_4_0_20080607,
+	&DataFile::upgrade_0_4_0_20080622,
+	&DataFile::upgrade_0_4_0_beta1,
+	&DataFile::upgrade_0_4_0_rc2,
+	&DataFile::upgrade_1_0_99,
+	&DataFile::upgrade_1_1_0,
+	&DataFile::upgrade_1_1_91,
+	&DataFile::upgrade_1_2_0_rc3,
 	&DataFile::upgrade_1_3_0
 };
 
@@ -1511,10 +1522,25 @@ const unsigned int DataFile::legacyFileVersion()
 		replace( "svn", "" );
 
 	// Vector of all versions that have upgrade routines.
-	std::vector<QString> upgradeVersions = { "0.2.1-20070501", "0.2.1-20070508", "0.3.0-rc2",
-		"0.3.0", "0.4.0-20080104", "0.4.0-20080118", "0.4.0-20080129", "0.4.0-20080409",
-		"0.4.0-20080607", "0.4.0-20080622", "0.4.0-beta1", "0.4.0-rc2", "1.0.99-0",
-		"1.1.0-0", "1.1.91-0", "1.2.0-rc3", "1.3.0" };
+	std::vector<QString> upgradeVersions = {
+		"0.2.1-20070501",
+		"0.2.1-20070508",
+		"0.3.0-rc2",
+		"0.3.0",
+		"0.4.0-20080104",
+		"0.4.0-20080118",
+		"0.4.0-20080129",
+		"0.4.0-20080409",
+		"0.4.0-20080607",
+		"0.4.0-20080622",
+		"0.4.0-beta1",
+		"0.4.0-rc2",
+		"1.0.99-0",
+		"1.1.0-0",
+		"1.1.91-0",
+		"1.2.0-rc3",
+		"1.3.0"
+	};
 
 	// Get an iterator pointing at the first upgrade we need to run (or at upgrades.end() if there is no such upgrade)
 	auto firstRequiredUpgrade = std::find_if( upgradeVersions.begin(), upgradeVersions.end(),

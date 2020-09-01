@@ -272,8 +272,8 @@ private:
 	ConfigManager(const ConfigManager & _c);
 	~ConfigManager();
 
-	void upgrade_0();
-	void upgrade_1();
+	void upgrade_1_1_90();
+	void upgrade_1_1_91();
 	void upgrade();
 
 	QString m_workingDir;

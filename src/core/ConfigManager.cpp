@@ -91,7 +91,7 @@ ConfigManager::~ConfigManager()
 }
 
 
-void ConfigManager::upgrade_0()
+void ConfigManager::upgrade_1_1_90()
 {
 	// Remove trailing " (bad latency!)" string which was once saved with PulseAudio
 	if(value("mixer", "audiodev").startsWith("PulseAudio ("))
@@ -115,7 +115,7 @@ void ConfigManager::upgrade_0()
 }
 
 	
-void ConfigManager::upgrade_1()
+void ConfigManager::upgrade_1_1_91()
 {		
 	// rename displaydbv to displaydbfs
 	if (!value("app", "displaydbv").isNull()) {
@@ -136,9 +136,9 @@ void ConfigManager::upgrade()
 	switch( m_configVersion )
 	{
 		case 0:
-			upgrade_0();
+			upgrade_1_1_90();
 		case 1:
-			upgrade_1();
+			upgrade_1_1_91();
 	}
 	
 	ProjectVersion createdWith = m_version;
