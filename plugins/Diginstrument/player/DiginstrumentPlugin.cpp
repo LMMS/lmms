@@ -130,7 +130,9 @@ bool DiginstrumentPlugin::loadInstrumentFile()
 		inst_data._json = json::parse(arr.toStdString());
 		inst_data.name = inst_data._json["name"];
 		inst_data.type = inst_data._json["spectrum_type"];
+		//TODO: better spectrum type separation!
 		inst.clear();
+		spline_inst.clear();
 		std::vector<pair<string,bool>> dimensions;
 		std::vector<string> dimension_labels;
 		for(auto d : inst_data._json["dimensions"])
@@ -138,24 +140,56 @@ bool DiginstrumentPlugin::loadInstrumentFile()
 			dimensions.emplace_back(d["label"],d["shifting"]);
 			dimension_labels.emplace_back(d["label"]);
 		}
+		//TODO: better spectrum type separation!
 		inst.setDimensions(dimensions);
+		spline_inst.setDimensions(dimensions);
 		//TODO: actual dynamic loading/parsing
 		//TODO: actually use "coordinates"
+		//TODO: better spline/discrete separation PLEASE!
 		for(auto s : inst_data._json["spectra"])
 		{
-			std::vector<Diginstrument::Component<double>> components;
-			for(auto c : s["components"])
-			{
-				components.push_back({c[0], 0, c[1]});
-			}
-			//TODO: dynamic label
-			Diginstrument::NoteSpectrum<double> spectrum{s[dimension_labels.back()], components, {}};
 			vector<double> spectrum_coordinates;
 			for(string label : dimension_labels)
 			{
 				spectrum_coordinates.emplace_back(s[label]);
 			}
-			inst.addSpectrum(spectrum, spectrum_coordinates);
+			if(inst_data.type == "discrete")
+			{
+				std::vector<Diginstrument::Component<double>> components;
+				for(auto c : s["components"])
+				{
+					components.push_back({c[0], 0, c[1]});
+				}
+				//TODO: dynamic label
+				Diginstrument::NoteSpectrum<double> spectrum{s[dimension_labels.back()], components, {}};
+				inst.addSpectrum(spectrum, spectrum_coordinates);
+			}
+			if(inst_data.type == "spline")
+			{
+				PiecewiseBSpline<double, 4> piecewise;
+				for(auto piece : s["pieces"])
+					{
+					std::vector<std::vector<double>> controlPoints;
+					controlPoints.reserve(piece["control_points"].size());
+					std::vector<double> knotVector;
+					knotVector.reserve(piece["knot_vector"].size());
+					for( auto cp : piece["control_points"] )
+					{
+						controlPoints.push_back(cp);
+					}
+					for( auto knot : piece["knot_vector"] )
+					{
+						knotVector.push_back(knot);
+					}
+					BSpline<double, 4> spline;
+					spline.setKnotVector(knotVector);
+					spline.setControlPoints(controlPoints);
+					piecewise.add(spline);
+				}
+				SplineSpectrum<double, 4> spectrum{piecewise, s[dimension_labels.back()]};
+				spline_inst.addSpectrum(spectrum, spectrum_coordinates);
+			}
+
 		}
 		return true;
 	}

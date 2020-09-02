@@ -24,26 +24,6 @@ public:
   void addSpectrum(const S &spectrum, std::vector<T> coordinates);
   void addSpectra(const std::vector<S> &spectra, std::vector<std::vector<T>> coordinates);
 
-  S interpolateSpectra(const S & left, const S & right, const T &target, const T &leftLabel, const T &rightLabel, const bool shifting);
-  
-  NoteSpectrum<T> constructSpectrum(
-    const NoteSpectrum<T> & left,
-    const NoteSpectrum<T> & right,
-    const T &target, const T &leftLabel, const T &rightLabel,
-    const std::vector<Match> & matches,
-    const std::vector<unsigned int> & unmatchedLeft,
-    const std::vector<unsigned int> & unmatchedRight
-    );
-
-SplineSpectrum<T, 4> constructSpectrum(
-    const SplineSpectrum<T, 4> & left,
-    const SplineSpectrum<T, 4> & right,
-    const T &target, const T &leftLabel, const T &rightLabel,
-    const std::vector<Match> & matches,
-    const std::vector<unsigned int> & unmatchedLeft,
-    const std::vector<unsigned int> & unmatchedRight
-    );
-
   Interpolator() {}
 
 private:
@@ -57,35 +37,25 @@ private:
   constexpr static double maxFrequencyDistance = 0.2;
   static constexpr T frequencyStep = 0.001;
   std::vector<std::pair<std::string, bool>> dimensions;
+
+  S interpolateSpectra(const S & left, const S & right, const T &target, const T &leftLabel, const T &rightLabel, const bool shifting);
+  
+  NoteSpectrum<T> constructSpectrum(
+    const NoteSpectrum<T> & left,
+    const NoteSpectrum<T> & right,
+    const T &target, const T &leftLabel, const T &rightLabel,
+    const std::vector<Match> & matches,
+    const std::vector<unsigned int> & unmatchedLeft,
+    const std::vector<unsigned int> & unmatchedRight
+    );
+
+  SplineSpectrum<T, 4> constructSpectrum(
+    const SplineSpectrum<T, 4> & left,
+    const SplineSpectrum<T, 4> & right,
+    const T &target, const T &leftLabel, const T &rightLabel,
+    const std::vector<Match> & matches,
+    const std::vector<unsigned int> & unmatchedLeft,
+    const std::vector<unsigned int> & unmatchedRight
+    );
 };
-
-// template <typename T>
-// class Interpolator<T, NoteSpectrum<T>>
-// {
-// public:
-//   NoteSpectrum<T> constructSpectrum(
-//     const NoteSpectrum<T> & left,
-//     const NoteSpectrum<T> & right,
-//     const T &target, const T &leftLabel, const T &rightLabel,
-//     const std::vector<Match> & matches,
-//     const std::vector<unsigned int> & unmatchedLeft,
-//     const std::vector<unsigned int> & unmatchedRight
-//     );
-// };
-
-// template <typename T>
-// class Interpolator<T, SplineSpectrum<T, 4>>
-// {
-// public:
-//   static SplineSpectrum<T, 4> interpolateSpectra(SplineSpectrum<T, 4> left, SplineSpectrum<T, 4> right, const T &target, const T &leftLabel, const T &rightLabel, bool shifting = false);
-
-//   Interpolator() {}
-
-// private:
-//   //tmp
-//   constexpr static double maxFrequencyDistance = 0.2;
-
-//   static BSpline<T, 4> matchPieces(BSpline<T, 4> left, const BSpline<T, 4> right, T rightRatio);
-//   static PiecewiseBSpline<T, 4> consolidatePieces(PiecewiseBSpline<T, 4> & left, PiecewiseBSpline<T, 4> & right, T rightRatio);
-// };
 }; // namespace Diginstrument

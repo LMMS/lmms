@@ -15,11 +15,12 @@ public:
 
   std::vector<Diginstrument::Component<T>> getMatchables() const
   {
-    //TMP: phase is present here; in case if phase is removed
-    std::vector<Diginstrument::Component<T>> res(spline.getPeaks().size());
+    //TMP: phase was present here; in case if phase is removed
+    std::vector<Diginstrument::Component<T>> res;
+    res.reserve(spline.getPeaks().size());
     for (std::vector<T> peak : spline.getPeaks())
     {
-      res.emplace_back(Diginstrument::Component<T>{peak[0], peak[1], peak[2]});
+      res.emplace_back(Diginstrument::Component<T>{peak[0], 0, peak[1]});
     }
     return res;
   }

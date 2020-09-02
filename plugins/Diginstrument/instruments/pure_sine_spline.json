@@ -1,0 +1,82 @@
+{
+    "name" : "Pure Sine",
+    "spectrum_type" : "spline",
+    "dimensions" :
+        [ 
+            {
+               "label" : "pitch",
+               "shifting" : true
+            },
+            {
+                "label" : "time",
+                "shifting" : false
+            }
+        ],
+    "coordinates" :
+        [ "frequency", "amplitude" ],
+    "spectra" :
+    [
+        {
+            "pitch" : 20,
+            "time" : 0,
+            "pieces":
+            [
+                {
+                    "control_points" :
+                    [
+                        [ 10, 0],
+                        [ 11, 0],
+                        [ 16, 0],
+                        [ 18, 0.1],
+                        [ 20, 1]
+                    ],
+                    "knot_vector" :
+                    [ 0,0,0,0,0,1,1,1,1,1 ]
+                },
+                {
+                    "control_points" :
+                    [
+                        [ 20, 1],
+                        [ 400, 0.2],
+                        [ 500, 0],
+                        [ 6000, 0],
+                        [ 22000, 0]
+                    ],
+                    "knot_vector" :
+                    [ 0,0,0,0,0,1,1,1,1,1 ]
+                }
+            ]
+        },
+        {
+            "pitch" : 20000,
+            "time" : 0,
+            "pieces":
+            [
+                {
+                    "control_points" :
+                    [
+                        [ 20, 0],
+                        [ 400, 0.2],
+                        [ 500, 0],
+                        [ 6000, 0],
+                        [ 22000, 1]
+                    ],
+                    "knot_vector" :
+                    [ 0,0,0,0,0,1,1,1,1,1 ]
+                },
+                {
+                    "control_points" :
+                    [
+                        [ 22000, 1],
+                        [ 22400, 0],
+                        [ 26000, 0],
+                        [ 26001, 0],
+                        [ 26002, 0]
+                    ],
+                    "knot_vector" :
+                    [ 0,0,0,0,0,1,1,1,1,1 ]
+                }
+            ]
+        }
+    ]
+}
