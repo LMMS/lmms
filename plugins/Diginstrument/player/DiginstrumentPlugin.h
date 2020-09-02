@@ -24,9 +24,11 @@
 #include "../common/Spectrum.hpp"
 #include <nlohmann/json.hpp>
 #include <iostream>
+#include <QtDataVisualization>
 
 using json = nlohmann::json;
 
+//TMP
 class InstrumentData
 {
   //todo
@@ -70,6 +72,8 @@ public:
   {
     return true;
   }
+
+  QtDataVisualization::QSurfaceDataArray * getInstrumentSurfaceData(float minTime, float maxTime, float minFreq, float maxFreq, int timeSamples, int freqSamples);
 
 private:
   friend class DiginstrumentView;

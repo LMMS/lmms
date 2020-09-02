@@ -2,12 +2,14 @@
 
 #include "InstrumentView.h"
 #include "DiginstrumentPlugin.h"
+#include "../common/InstrumentVisualizationWindow.h"
 
 #include <QPushButton>
 #include <QLineEdit>
 #include <QFileDialog>
+#include <QtDataVisualization>
+#include <QtWidgets>
 
-//TODO: note visualization with surface
 class DiginstrumentView : public InstrumentView
 {
     Q_OBJECT
@@ -18,13 +20,17 @@ class DiginstrumentView : public InstrumentView
     /*TODO*/
 
   protected slots:
+    void showInstumentVisualization();
     void openInstrumentFile();
+    void updateVisualizationData(float minTime, float maxTime, float minFreq, float maxFreq, int timeSamples, int freqSamples);
 
   private:
 	  virtual void modelChanged( void );
 
     QPushButton * m_openInstrumentFileButton;
+    QPushButton * m_openInstrumentVisualizationButton;
     QLineEdit * m_nameField;
     QLineEdit * m_typeField;
-    /*TODO*/
+    
+    Diginstrument::InstrumentVisualizationWindow * visualization;
 };
