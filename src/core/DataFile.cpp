@@ -51,22 +51,14 @@ static void findIds(const QDomElement& elem, QList<jo_id_t>& idList);
 
 // Vector with all the upgrade methods
 const std::vector<void(DataFile::*)()> DataFile::m_upgradeMethods = {
-	&DataFile::upgrade_0_2_1_20070501,
-	&DataFile::upgrade_0_2_1_20070508,
-	&DataFile::upgrade_0_3_0_rc2,
-	&DataFile::upgrade_0_3_0,
-	&DataFile::upgrade_0_4_0_20080104,
-	&DataFile::upgrade_0_4_0_20080118,
-	&DataFile::upgrade_0_4_0_20080129,
-	&DataFile::upgrade_0_4_0_20080409,
-	&DataFile::upgrade_0_4_0_20080607,
-	&DataFile::upgrade_0_4_0_20080622,
-	&DataFile::upgrade_0_4_0_beta1,
-	&DataFile::upgrade_0_4_0_rc2,
-	&DataFile::upgrade_1_0_99,
-	&DataFile::upgrade_1_1_0,
-	&DataFile::upgrade_1_1_91,
-	&DataFile::upgrade_1_2_0_rc3,
+	&DataFile::upgrade_0_2_1_20070501   ,   &DataFile::upgrade_0_2_1_20070508,
+	&DataFile::upgrade_0_3_0_rc2        ,   &DataFile::upgrade_0_3_0,
+	&DataFile::upgrade_0_4_0_20080104   ,   &DataFile::upgrade_0_4_0_20080118,
+	&DataFile::upgrade_0_4_0_20080129   ,   &DataFile::upgrade_0_4_0_20080409,
+	&DataFile::upgrade_0_4_0_20080607   ,   &DataFile::upgrade_0_4_0_20080622,
+	&DataFile::upgrade_0_4_0_beta1      ,   &DataFile::upgrade_0_4_0_rc2,
+	&DataFile::upgrade_1_0_99           ,   &DataFile::upgrade_1_1_0,
+	&DataFile::upgrade_1_1_91           ,   &DataFile::upgrade_1_2_0_rc3,
 	&DataFile::upgrade_1_3_0
 };
 
@@ -386,6 +378,7 @@ void DataFile::cleanMetaNodes( QDomElement _de )
 
 void DataFile::upgrade_0_2_1_20070501()
 {
+qWarning("DATAFILE: upgrade_0_2_1_20070501");
 	// Upgrade to version 0.2.1-20070501
 	QDomNodeList list = elementsByTagName( "arpandchords" );
 	for( int i = 0; !list.item( i ).isNull(); ++i )
@@ -504,6 +497,7 @@ void DataFile::upgrade_0_2_1_20070501()
 
 void DataFile::upgrade_0_2_1_20070508()
 {
+qWarning("DATAFILE: upgrade_0_2_1_20070508");
 	// Upgrade to version 0.2.1-20070508 from some version greater than or equal to 0.2.1-20070501
 	QDomNodeList list = elementsByTagName( "arpandchords" );
 	for( int i = 0; !list.item( i ).isNull(); ++i )
@@ -566,6 +560,7 @@ void DataFile::upgrade_0_2_1_20070508()
 
 void DataFile::upgrade_0_3_0_rc2()
 {
+qWarning("DATAFILE: upgrade_0_3_0_rc2");
 	// Upgrade to version 0.3.0-rc2 from some version greater than or equal to 0.2.1-20070508
 	QDomNodeList list = elementsByTagName( "arpandchords" );
 	for( int i = 0; !list.item( i ).isNull(); ++i )
@@ -582,6 +577,7 @@ void DataFile::upgrade_0_3_0_rc2()
 
 void DataFile::upgrade_0_3_0()
 {
+qWarning("DATAFILE: upgrade_0_3_0");
 	// Upgrade to version 0.3.0 (final) from some version greater than or equal to 0.3.0-rc2
 	QDomNodeList list;
 	while( !( list = elementsByTagName(
@@ -609,6 +605,7 @@ void DataFile::upgrade_0_3_0()
 
 void DataFile::upgrade_0_4_0_20080104()
 {
+qWarning("DATAFILE: upgrade_0_4_0_20080104");
 	// Upgrade to version 0.4.0-20080104 from some version greater than or equal to 0.3.0 (final)
 	QDomNodeList list = elementsByTagName( "fx" );
 	for( int i = 0; !list.item( i ).isNull(); ++i )
@@ -625,6 +622,7 @@ void DataFile::upgrade_0_4_0_20080104()
 
 void DataFile::upgrade_0_4_0_20080118()
 {
+qWarning("DATAFILE: upgrade_0_4_0_20080118");
 	// Upgrade to version 0.4.0-20080118 from some version greater than or equal to 0.4.0-20080104
 	QDomNodeList list;
 	while( !( list = elementsByTagName( "fx" ) ).isEmpty() )
@@ -647,6 +645,7 @@ void DataFile::upgrade_0_4_0_20080118()
 
 void DataFile::upgrade_0_4_0_20080129()
 {
+qWarning("DATAFILE: upgrade_0_4_0_20080129");
 	// Upgrade to version 0.4.0-20080129 from some version greater than or equal to 0.4.0-20080118
 	QDomNodeList list;
 	while( !( list =
@@ -663,6 +662,7 @@ void DataFile::upgrade_0_4_0_20080129()
 
 void DataFile::upgrade_0_4_0_20080409()
 {
+qWarning("DATAFILE: upgrade_0_4_0_20080409");
 	// Upgrade to version 0.4.0-20080409 from some version greater than or equal to 0.4.0-20080129
 	QStringList s;
 	s << "note" << "pattern" << "bbtco" << "sampletco" << "time";
@@ -692,6 +692,7 @@ void DataFile::upgrade_0_4_0_20080409()
 
 void DataFile::upgrade_0_4_0_20080607()
 {
+qWarning("DATAFILE: upgrade_0_4_0_20080607");
 	// Upgrade to version 0.4.0-20080607 from some version greater than or equal to 0.3.0-20080409
 	QDomNodeList list;
 	while( !( list = elementsByTagName( "midi" ) ).isEmpty() )
@@ -704,6 +705,7 @@ void DataFile::upgrade_0_4_0_20080607()
 
 void DataFile::upgrade_0_4_0_20080622()
 {
+qWarning("DATAFILE: upgrade_0_4_0_20080622");
 	// Upgrade to version 0.4.0-20080622 from some version greater than or equal to 0.3.0-20080607
 	QDomNodeList list;
 	while( !( list = elementsByTagName(
@@ -727,6 +729,7 @@ void DataFile::upgrade_0_4_0_20080622()
 
 void DataFile::upgrade_0_4_0_beta1()
 {
+qWarning("DATAFILE: upgrade_0_4_0_beta1");
 	// Upgrade to version 0.4.0-beta1 from some version greater than or equal to 0.4.0-20080622
 	// convert binary effect-key-blobs to XML
 	QDomNodeList list;
@@ -766,6 +769,7 @@ void DataFile::upgrade_0_4_0_beta1()
 
 void DataFile::upgrade_0_4_0_rc2()
 {
+qWarning("DATAFILE: upgrade_0_4_0_rc2");
 	// Upgrade to version 0.4.0-rc2 from some version greater than or equal to 0.4.0-beta1
 	QDomNodeList list = elementsByTagName( "audiofileprocessor" );
 	for( int i = 0; !list.item( i ).isNull(); ++i )
@@ -793,6 +797,7 @@ void DataFile::upgrade_0_4_0_rc2()
 
 void DataFile::upgrade_1_0_99()
 {
+qWarning("DATAFILE: upgrade_1_0_99");
 	jo_id_t last_assigned_id = 0;
 	
 	QList<jo_id_t> idList;
@@ -834,6 +839,7 @@ void DataFile::upgrade_1_0_99()
 
 void DataFile::upgrade_1_1_0()
 {
+qWarning("DATAFILE: upgrade_1_1_0");
 	QDomNodeList list = elementsByTagName("fxchannel");
 	for (int i = 1; !list.item(i).isNull(); ++i)
 	{
@@ -848,6 +854,7 @@ void DataFile::upgrade_1_1_0()
 
 void DataFile::upgrade_1_1_91()
 {
+qWarning("DATAFILE: upgrade_1_1_91");
 	// Upgrade to version 1.1.91 from some version less than 1.1.91
 	QDomNodeList list = elementsByTagName( "audiofileprocessor" );
 	for( int i = 0; !list.item( i ).isNull(); ++i )
@@ -929,6 +936,7 @@ static void upgradeElement_1_2_0_rc2_42( QDomElement & el )
 
 void DataFile::upgrade_1_2_0_rc3()
 {
+qWarning("DATAFILE: upgrade_1_2_0_rc3 (and upgrade_1_2_0_rc2_42)");
 	// Upgrade from earlier bbtrack beat note behaviour of adding
 	// steps if a note is placed after the last step.
 	QDomNodeList bbtracks = elementsByTagName( "bbtrack" );
@@ -1023,6 +1031,7 @@ QDebug operator<<(QDebug dbg, const QDomNode& node)
 
 void DataFile::upgrade_1_3_0()
 {
+qWarning("DATAFILE: upgrade_1_3_0");
 	QDomNodeList list = elementsByTagName( "instrument" );
 	for( int i = 0; !list.item( i ).isNull(); ++i )
 	{
@@ -1369,6 +1378,7 @@ void DataFile::upgrade()
 
 	// Bump the file version (which should be the size of the upgrade methods vector)
 	m_fileVersion = m_upgradeMethods.size();
+qWarning("DATAFILE: Current fileVersion = %u", m_fileVersion);
 
 	// update document meta data
 	documentElement().setAttribute( "version", m_fileVersion );
@@ -1514,23 +1524,12 @@ const unsigned int DataFile::legacyFileVersion()
 
 	// Vector of all versions that have upgrade routines.
 	std::vector<QString> upgradeVersions = {
-		"0.2.1-20070501",
-		"0.2.1-20070508",
-		"0.3.0-rc2",
-		"0.3.0",
-		"0.4.0-20080104",
-		"0.4.0-20080118",
-		"0.4.0-20080129",
-		"0.4.0-20080409",
-		"0.4.0-20080607",
-		"0.4.0-20080622",
-		"0.4.0-beta1",
-		"0.4.0-rc2",
-		"1.0.99-0",
-		"1.1.0-0",
-		"1.1.91-0",
-		"1.2.0-rc3",
-		"1.3.0"
+		"0.2.1-20070501"   ,   "0.2.1-20070508"   ,   "0.3.0-rc2",
+		"0.3.0"            ,   "0.4.0-20080104"   ,   "0.4.0-20080118",
+		"0.4.0-20080129"   ,   "0.4.0-20080409"   ,   "0.4.0-20080607",
+		"0.4.0-20080622"   ,   "0.4.0-beta1"      ,   "0.4.0-rc2",
+		"1.0.99-0"         ,   "1.1.0-0"          ,   "1.1.91-0",
+		"1.2.0-rc3"        ,   "1.3.0"
 	};
 
 	// Get an iterator pointing at the first upgrade we need to run (or at upgrades.end() if there is no such upgrade)
