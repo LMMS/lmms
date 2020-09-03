@@ -33,8 +33,7 @@ public:
   virtual std::vector<Component<T>> getComponents(const T quality) const = 0;
   virtual std::vector<Component<T>> getMatchables() const = 0;
   virtual std::vector<Component<T>> getUnmatchables() const = 0;
-  //TMP: questionable functionality; is every type of spectrum defined at all frequencies?
-  //virtual Component<T> operator[](const T frequency) const = 0;
+  virtual Component<T> operator[](const T frequency) const = 0;
   virtual bool empty() const = 0;
 
   Spectrum(const T & label) : label(label){}
@@ -64,6 +63,12 @@ public:
       res.emplace_back(c);
     }
     return res;
+  }
+
+  Component<T> operator[](const T frequency) const
+  {
+    //TODO: tmp: dummy; not really needed for discrete
+    return Component<T>{frequency, 0, 0};
   }
 
   bool empty() const

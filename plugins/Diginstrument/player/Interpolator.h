@@ -15,7 +15,7 @@ template <typename T, class S>
 class Interpolator
 {
 public:
-  std::vector<Component<T>> getSpectrum(const std::vector<T> &coordinates);
+  S getSpectrum(const std::vector<T> &coordinates);
 
   void clear();
 
@@ -28,7 +28,7 @@ public:
 
 private:
 
-  static BSpline<T, 4> matchPieces(BSpline<T, 4> left, const BSpline<T, 4> right, T rightRatio);
+  static BSpline<T, 4> mergePieces(BSpline<T, 4> left, const BSpline<T, 4> right, T rightRatio);
   static PiecewiseBSpline<T, 4> consolidatePieces(PiecewiseBSpline<T, 4> & left, PiecewiseBSpline<T, 4> & right, T rightRatio);
   
   MultidimensionalNeighbourMap<T, S> data;

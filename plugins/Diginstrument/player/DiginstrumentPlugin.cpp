@@ -65,12 +65,13 @@ void DiginstrumentPlugin::playNote(NotePlayHandle *noteHandle,
 	if(inst_data.type == "discrete")
 	{
 		auto spectrum = inst.getSpectrum({noteHandle->frequency(), startTime});
-		audioData = this->synth.playNote(spectrum, noteHandle->framesLeftForCurrentPeriod(), noteHandle->totalFramesPlayed(), /*tmp*/ 44100);
+		//TODO: maybe should pass spectrum, not the components
+		audioData = this->synth.playNote(spectrum.getComponents(0), noteHandle->framesLeftForCurrentPeriod(), noteHandle->totalFramesPlayed(), /*tmp*/ 44100);
 	}
 	else
 	{
 		auto spectrum = spline_inst.getSpectrum({noteHandle->frequency(), startTime});
-		audioData = this->synth.playNote(spectrum, noteHandle->framesLeftForCurrentPeriod(), noteHandle->totalFramesPlayed(), /*tmp*/ 44100);
+		audioData = this->synth.playNote(spectrum.getComponents(0), noteHandle->framesLeftForCurrentPeriod(), noteHandle->totalFramesPlayed(), /*tmp*/ 44100);
 	}
 	/*tmp: stereo*/
 	unsigned int counter = 0;
@@ -200,8 +201,8 @@ bool DiginstrumentPlugin::loadInstrumentFile()
 
 QtDataVisualization::QSurfaceDataArray * DiginstrumentPlugin::getInstrumentSurfaceData(float minTime, float maxTime, float minFreq, float maxFreq, int timeSamples, int freqSamples)
 {
-	//TODO: this is the discrete version
 	//tmp: TODO: coordinates
+	//TODO: better/refactoring
 	const float freq = 400;
 
 	const float stepX = (maxFreq - minFreq) / float(freqSamples - 1);
@@ -213,17 +214,34 @@ QtDataVisualization::QSurfaceDataArray * DiginstrumentPlugin::getInstrumentSurfa
 	{
 		QSurfaceDataRow *dataRow = new QSurfaceDataRow(freqSamples);
 		float z = qMin(maxTime, (i * stepZ + minTime));
-		//initialize row to zeroes
-        int index = 0;
-        for (int j = 0; j < freqSamples; j++) {
-            float x = qMin(maxFreq, (j * stepX + minFreq));
-            (*dataRow)[index++].setPosition(QVector3D(x, 0, z));
-        }
-		//project components into the row based on frequency
-		for(const auto & c : inst.getSpectrum({freq, z}))
+
+		//TODO: better spectrum type distinction, please!
+		//discrete instrument
+		if(inst_data.type == "discrete")
 		{
-			if(c.frequency<minFreq || c.frequency>maxFreq) continue;
-			(*dataRow)[std::round((c.frequency-minFreq)/((maxFreq-minFreq)/(float)freqSamples))].setPosition(QVector3D(c.frequency,c.amplitude, z));
+			//initialize row to zeroes
+			int index = 0;
+			for (int j = 0; j < freqSamples; j++) {
+				float x = qMin(maxFreq, (j * stepX + minFreq));
+				(*dataRow)[index++].setPosition(QVector3D(x, 0, z));
+			}
+			//project components into the row based on frequency
+			for(const auto & c : inst.getSpectrum({freq, z}).getComponents(0))
+			{
+				if(c.frequency<minFreq || c.frequency>maxFreq) continue;
+				(*dataRow)[std::round((c.frequency-minFreq)/((maxFreq-minFreq)/(float)freqSamples))].setPosition(QVector3D(c.frequency,c.amplitude, z));
+			}
+		}
+		//spline instrument
+		if(inst_data.type == "spline")
+		{
+			int index = 0;
+			const auto spectrum = spline_inst.getSpectrum({freq, z});
+			for (int j = 0; j < freqSamples; j++) {
+				float x = qMin(maxFreq, (j * stepX + minFreq));
+				(*dataRow)[index++].setPosition(QVector3D(x, spectrum[x].amplitude, z));
+			}
+			//TODO: should i visualize peaks explicitly? (similarly to discrete above)
 		}
 		*data<<dataRow;
 	}
