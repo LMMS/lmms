@@ -152,8 +152,16 @@ void LcdSpinBox::mouseReleaseEvent( QMouseEvent* )
 void LcdSpinBox::wheelEvent( QWheelEvent * _we )
 {
 	_we->accept();
-	model()->setInitValue( model()->value() +
-			( ( _we->delta() > 0 ) ? 1 : -1 ) * model()->step<int>() );
+	int delta = ( _we->delta() > 0 ? 1 : -1 ) * model()->step<int>();
+
+#if QT_VERSION >= 0x050700
+	if( _we->inverted() ) {
+		// handle "natural" scrolling
+		delta = -delta;
+	}
+#endif
+
+	model()->setInitValue( model()->value() + delta );
 	emit manualChange();
 }
 
