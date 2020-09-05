@@ -664,9 +664,10 @@ void PianoRoll::glueNotes()
 
 		while (note != end && nextNote != end)
 		{
-			// key and position match for glue
+			// key and position match for glue. The notes are already
+			// sorted so we don't need to test that nextNote is the same
+			// position or next in sequence.
 			if ((*note)->key() == (*nextNote)->key()
-				&& (*nextNote)->pos() >= (*note)->pos()
 				&& (*nextNote)->pos() <= (*note)->pos()
 				+ qMax(MidiTime(0), (*note)->length()))
 			{
