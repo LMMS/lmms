@@ -58,6 +58,20 @@ private slots:
 		//Ensure that newer versions of the same format aren't upgraded
 		//in order to discourage use of incorrect versioning
 		QVERIFY(ProjectVersion("1.2.3.42") == "1.2.3");
+		//CompareVersion "All" should compare every identifier
+		QVERIFY(
+			ProjectVersion("1.0.0-a.b.c.d.e.f.g.h.i.j.k.l", ProjectVersion::All)
+			< "1.0.0-a.b.c.d.e.f.g.h.i.j.k.m"
+		);
+		//Prerelease identifiers may contain hyphens
+		QVERIFY(ProjectVersion("1.0.0-Alpha-1.2") > "1.0.0-Alpha-1.1");
+		//We shouldn't crash on invalid versions
+		QVERIFY(ProjectVersion("1-invalid") == "1.0.0-invalid");
+		QVERIFY(ProjectVersion("") == "0.0.0");
+		//Numeric identifiers are smaller than non-numeric identiiers
+		QVERIFY(ProjectVersion("1.0.0-alpha") > "1.0.0-1");
+		//An identifier of the form "-x" is non-numeric, not negative
+		QVERIFY(ProjectVersion("1.0.0-alpha.-1") > "1.0.0-alpha.1");
 	}
 } ProjectVersionTests;
 

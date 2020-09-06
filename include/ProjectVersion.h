@@ -30,6 +30,8 @@
 #include <QtCore/QString>
 #include <QtCore/QStringList>
 
+#include <limits>
+
 /*! \brief Version number parsing and comparison
  *
  *  Parses and compares version information.  i.e. "1.0.3" < "1.0.10"
@@ -37,10 +39,11 @@
 class ProjectVersion
 {
 public:
-	enum CompareType { Major=1, Minor=2, Release=3, Stage=4, Build=5 };
+	enum CompareType : int { None = 0, Major=1, Minor=2, Release=3, Stage=4, Build=5, All = std::numeric_limits<int>::max() };
 
-	ProjectVersion(QString version, CompareType c = Build);
-	ProjectVersion(const char * version, CompareType c = Build);
+
+	ProjectVersion(QString version, CompareType c = All);
+	ProjectVersion(const char * version, CompareType c = All);
 
 	int getMajor() const { return m_major; }
 	int getMinor() const { return m_minor; }
@@ -49,7 +52,7 @@ public:
 	CompareType getCompareType() const { return m_compareType; }
 	ProjectVersion setCompareType(CompareType compareType) { m_compareType = compareType; return * this; }
 
-	static int compare(const ProjectVersion& a, const ProjectVersion& b, int c);
+	static int compare(const ProjectVersion& a, const ProjectVersion& b, CompareType c);
 	static int compare(ProjectVersion v1, ProjectVersion v2);
 
 private:
