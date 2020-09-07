@@ -59,9 +59,8 @@ public:
 	//Constructor
 	SynchroNote(NotePlayHandle * notePlayHandle);
 	//Renders a single sample of audio
-	void nextSample(sampleFrame &outputSample, sample_rate_t sample_rate,
-		const float modulationStrength, const float modulationAmount, const float harmonics,
-		const SynchroOscillatorSettings & carrier, const SynchroOscillatorSettings & modulator);
+	void nextSample(sampleFrame &outputSample, const float modulationStrength, const float modulationAmount,
+		const float harmonics, const SynchroOscillatorSettings & carrier, const SynchroOscillatorSettings & modulator);
 private:
 	NotePlayHandle * m_nph;
 	float m_CarrierSampleIndex = 0; //The index (or phase) of the carrier oscillator

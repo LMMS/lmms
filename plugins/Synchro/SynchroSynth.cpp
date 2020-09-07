@@ -164,11 +164,10 @@ SynchroNote::SynchroNote(NotePlayHandle * notePlayHandle) :
 
 }
 
-void SynchroNote::nextSample(sampleFrame &outputSample, sample_rate_t sample_rate,
-	const float modulationStrength, const float modulationAmount, const float harmonics,
-	const SynchroOscillatorSettings & carrier, const SynchroOscillatorSettings & modulator)
+void SynchroNote::nextSample(sampleFrame &outputSample, const float modulationStrength, const float modulationAmount,
+	const float harmonics, const SynchroOscillatorSettings & carrier, const SynchroOscillatorSettings & modulator)
 {
-	float freqToSampleStep = F_2PI / sample_rate;
+	float freqToSampleStep = F_2PI / (Engine::mixer()->processingSampleRate() * SYNCHRO_OVERSAMPLE);
 
 	//Modulator is calculated first because it is used by the carrier
 	//Find position in modulator waveform
@@ -180,8 +179,6 @@ void SynchroNote::nextSample(sampleFrame &outputSample, sample_rate_t sample_rat
 		modulator.Drive, modulator.Sync, modulator.Chop, harmonics) * (modulationStrength * modulationAmount);
 
 	//Modulator envelope
-
-	//Using sample_rate here gives an incorrect envelope length for some reason
 	float modulatorEnvelope = ADSR(modulator.Attack, modulator.Decay, modulator.Sustain, modulator.Release,
 		m_nph->totalFramesPlayed(), m_nph->isReleased(), m_nph->releaseFramesDone());
 	//The final sample Synchro uses for phase modulation
@@ -431,8 +428,7 @@ void SynchroSynth::playNote(NotePlayHandle * n, sampleFrame * working_buffer)
 			float strength = modStrBuf ? modStrBuf->value(frame) : m_modulationStrength.value();
 			float amount = modBuf ? modBuf->value(frame) : m_modulation.value();
 
-			ps->nextSample(tempSample, Engine::mixer()->processingSampleRate(),
-				strength, amount, m_harmonics.value(), carrier, modulator);
+			ps->nextSample(tempSample, strength, amount, m_harmonics.value(), carrier, modulator);
 			outputSample[0] += tempSample[0];
 			outputSample[1] += tempSample[1];
 		}
