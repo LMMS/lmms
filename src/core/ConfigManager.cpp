@@ -38,6 +38,11 @@
 #include "lmmsversion.h"
 
 
+// Vector with all the upgrade methods
+const std::vector<void(ConfigManager::*)()> ConfigManager::m_upgradeMethods = {
+	&ConfigManager::upgrade_1_1_90    ,    &ConfigManager::upgrade_1_1_91
+};
+
 static inline QString ensureTrailingSlash(const QString & s )
 {
 	if(! s.isEmpty() && !s.endsWith('/') && !s.endsWith('\\'))
@@ -53,7 +58,7 @@ ConfigManager * ConfigManager::s_instanceOfMe = NULL;
 
 ConfigManager::ConfigManager() :
 	m_version(defaultVersion()),
-	m_configVersion( CONFIG_VERSION )
+	m_configVersion( m_upgradeMethods.size() )
 {
 	if (QFileInfo::exists(qApp->applicationDirPath() + PORTABLE_MODE_FILE))
 	{
@@ -135,13 +140,15 @@ void ConfigManager::upgrade()
 		return;
 	}
 
-	switch( m_configVersion )
-	{
-		case 0:
-			upgrade_1_1_90();
-		case 1:
-			upgrade_1_1_91();
-	}
+	using upgradeMethod = void(ConfigManager::*)();
+
+	// Runs all necessary upgrade methods
+	std::for_each( m_upgradeMethods.begin() + m_configVersion, m_upgradeMethods.end(),
+		[this](upgradeMethod um)
+		{
+			(this->*um)();
+		}
+	);
 	
 	ProjectVersion createdWith = m_version;
 	
@@ -153,7 +160,7 @@ void ConfigManager::upgrade()
 
 	// Bump the version, now that we are upgraded
 	m_version = LMMS_VERSION;
-	m_configVersion = CONFIG_VERSION;
+	m_configVersion = m_upgradeMethods.size();
 qWarning("CONFIGMANAGER: current configVersion = %u", m_configVersion);
 }
 

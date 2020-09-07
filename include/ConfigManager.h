@@ -39,9 +39,6 @@
 
 class LmmsCore;
 
-// Configuration file version
-const unsigned int CONFIG_VERSION = 2;
-
 const QString PROJECTS_PATH = "projects/";
 const QString TEMPLATE_PATH = "templates/";
 const QString PRESETS_PATH = "presets/";
@@ -275,6 +272,9 @@ private:
 	void upgrade_1_1_90();
 	void upgrade_1_1_91();
 	void upgrade();
+
+	// List of all upgrade methods
+	static const std::vector<void(ConfigManager::*)()> m_upgradeMethods;
 
 	QString m_workingDir;
 	QString m_dataDir;
