@@ -67,34 +67,6 @@ static inline float wrapPhase(float phase) {
 	return phase;
 }
 
-//Envelope function
-static inline float ADSR(float attack, float decay, float sustain, float release, float time, bool isReleased, float releaseFramesDone) {
-	float envelope;
-	float a = attack * 0.001 * Engine::mixer()->processingSampleRate();
-	float d = decay * 0.001 * Engine::mixer()->processingSampleRate();
-	float r = release * 0.001 * Engine::mixer()->processingSampleRate();
-	if (noteTime < a) //Attack
-	{
-		//Linear attack sounds better
-		envelope = lerp(0, 1, time / a);
-	}
-	else if (time <= a + d) //Decay
-	{
-		//But decay needs to be exponential
-		envelope = expInterpol(1, sustain, time / (a + d));
-	}
-	else //Sustain
-	{
-		envelope = sustain;
-	}
-	if (isReleased) //Release is done separately so the volume doesn't jump when released prematurely
-	{
-		float releaseProgress = (releaseFramesDone < r) ? releaseFramesDone : r;
-		envelope *= expInterpol(1, 0, releaseProgress / r);
-	}
-	return envelope;
-}
-
 //Triangle waveform generator
 //x: the phase of the waveform
 static inline float tri(float x)
@@ -155,6 +127,34 @@ static inline float fastTanh(const float x)
 static inline float SynchroWaveform(float x, float drive, float sync, float chop, float harmonic)
 {
 	return fastTanh(trih(F_PI_2 + x * sync, harmonic) * drive / powf(F_2PI / (F_2PI - x), chop));
+}
+
+//Envelope function
+static inline float ADSR(float attack, float decay, float sustain, float release, float time, bool isReleased, float releaseFramesDone) {
+	float envelope;
+	float a = attack * 0.001 * Engine::mixer()->processingSampleRate();
+	float d = decay * 0.001 * Engine::mixer()->processingSampleRate();
+	float r = release * 0.001 * Engine::mixer()->processingSampleRate();
+	if (time < a) //Attack
+	{
+		//Linear attack sounds better
+		envelope = lerp(0, 1, time / a);
+	}
+	else if (time <= a + d) //Decay
+	{
+		//But decay needs to be exponential
+		envelope = expInterpol(1, sustain, time / (a + d));
+	}
+	else //Sustain
+	{
+		envelope = sustain;
+	}
+	if (isReleased) //Release is done separately so the volume doesn't jump when released prematurely
+	{
+		float releaseProgress = (releaseFramesDone < r) ? releaseFramesDone : r;
+		envelope *= expInterpol(1, 0, releaseProgress / r);
+	}
+	return envelope;
 }
 
 //SynchroNote empty constructor
