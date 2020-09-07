@@ -67,6 +67,34 @@ static inline float wrapPhase(float phase) {
 	return phase;
 }
 
+//Envelope function
+static inline float ADSR(float attack, float decay, float sustain, float release, float time, bool isReleased, float releaseFramesDone) {
+	float envelope;
+	float a = attack * 0.001 * Engine::mixer()->processingSampleRate();
+	float d = decay * 0.001 * Engine::mixer()->processingSampleRate();
+	float r = release * 0.001 * Engine::mixer()->processingSampleRate();
+	if (noteTime < a) //Attack
+	{
+		//Linear attack sounds better
+		envelope = lerp(0, 1, time / a);
+	}
+	else if (time <= a + d) //Decay
+	{
+		//But decay needs to be exponential
+		envelope = expInterpol(1, sustain, time / (a + d));
+	}
+	else //Sustain
+	{
+		envelope = sustain;
+	}
+	if (isReleased) //Release is done separately so the volume doesn't jump when released prematurely
+	{
+		float releaseProgress = (releaseFramesDone < r) ? releaseFramesDone : r;
+		envelope *= expInterpol(1, 0, releaseProgress / r);
+	}
+	return envelope;
+}
+
 //Triangle waveform generator
 //x: the phase of the waveform
 static inline float tri(float x)
@@ -141,8 +169,6 @@ void SynchroNote::nextSample(sampleFrame &outputSample, sample_rate_t sample_rat
 	const SynchroOscillatorSettings & carrier, const SynchroOscillatorSettings & modulator)
 {
 	float freqToSampleStep = F_2PI / sample_rate;
-	//How long (in frames) this note has been playing
-	float noteTime = m_nph->totalFramesPlayed() * SYNCHRO_OVERSAMPLE;
 
 	//Modulator is calculated first because it is used by the carrier
 	//Find position in modulator waveform
@@ -154,31 +180,10 @@ void SynchroNote::nextSample(sampleFrame &outputSample, sample_rate_t sample_rat
 		modulator.Drive, modulator.Sync, modulator.Chop, harmonics) * (modulationStrength * modulationAmount);
 
 	//Modulator envelope
-	//Using sample_rate here gives an incorrect envelope length for some reason
-	float modulatorEnvelope;
-	float modulatorAtk = modulator.Attack * 0.001 * Engine::mixer()->processingSampleRate();
-	float modulatorDec = modulator.Decay * 0.001 * Engine::mixer()->processingSampleRate();
-	float modulatorRel = modulator.Release * 0.001 * Engine::mixer()->processingSampleRate();
-	if (noteTime < modulatorAtk) //Attack
-	{
-		//Linear attack sounds better
-		modulatorEnvelope = lerp(0, 1, noteTime / modulatorAtk);
-	}
-	else if (noteTime <= modulatorAtk + modulatorDec) //Decay
-	{
-		//But decay needs to be exponential
-		modulatorEnvelope = expInterpol(1, modulator.Sustain, noteTime / (modulatorAtk + modulatorDec));
-	}
-	else //Sustain
-	{
-		modulatorEnvelope = modulator.Sustain;
-	}
-	if (m_nph->isReleased()) //Release is done separately so the volume doesn't jump when released prematurely
-	{
-		float releaseProgress = (m_nph->releaseFramesDone() < modulatorRel) ? m_nph->releaseFramesDone() : modulatorRel;
-		modulatorEnvelope *= expInterpol(1, 0, releaseProgress / modulatorRel);
-	}
 
+	//Using sample_rate here gives an incorrect envelope length for some reason
+	float modulatorEnvelope = ADSR(modulator.Attack, modulator.Decay, modulator.Sustain, modulator.Release,
+		m_nph->totalFramesPlayed(), m_nph->isReleased(), m_nph->releaseFramesDone());
 	//The final sample Synchro uses for phase modulation
 	float pmSample = modulatorSample * modulatorEnvelope * SYNCHRO_PM_CONST;
 
@@ -186,26 +191,8 @@ void SynchroNote::nextSample(sampleFrame &outputSample, sample_rate_t sample_rat
 	m_CarrierSampleIndex += freqToSampleStep * DetuneOctaves(m_nph->frequency(), carrier.Detune);
 	m_CarrierSampleIndex = wrapPhase(m_CarrierSampleIndex);
 	//Carrier envelope
-	float carrierEnvelope;
-	float carrierAtk = carrier.Attack * 0.001 * Engine::mixer()->processingSampleRate();
-	float carrierDec = carrier.Decay * 0.001 * Engine::mixer()->processingSampleRate();
-	float carrierRel = carrier.Release * 0.001 * Engine::mixer()->processingSampleRate();
-	if (noteTime < carrierAtk) //Attack
-	{
-		carrierEnvelope = lerp(0, 1, noteTime / carrierAtk);
-	}
-	else if (noteTime <= carrierAtk + carrierDec) //Decay
-	{
-		carrierEnvelope = expInterpol(1, carrier.Sustain, noteTime / (carrierAtk + carrierDec));
-	}
-	else //Sustain
-	{
-		carrierEnvelope = carrier.Sustain;
-	}
-	if (m_nph->isReleased()) { //Release
-		float releaseProgress = (m_nph->releaseFramesDone() < carrierRel) ? m_nph->releaseFramesDone() : carrierRel;
-		carrierEnvelope *= expInterpol(1, 0, releaseProgress / carrierRel);
-	}
+	float carrierEnvelope = ADSR(carrier.Attack, carrier.Decay, carrier.Sustain, carrier.Release,
+		m_nph->totalFramesPlayed(), m_nph->isReleased(), m_nph->releaseFramesDone());
 
 	//Get carrier waveform at position, accounting for modulation
 	outputSample[0] = SynchroWaveform(m_CarrierSampleIndex + pmSample, carrier.Drive, carrier.Sync, carrier.Chop, 0)
@@ -444,7 +431,7 @@ void SynchroSynth::playNote(NotePlayHandle * n, sampleFrame * working_buffer)
 			float strength = modStrBuf ? modStrBuf->value(frame) : m_modulationStrength.value();
 			float amount = modBuf ? modBuf->value(frame) : m_modulation.value();
 
-			ps->nextSample(tempSample, Engine::mixer()->processingSampleRate() * SYNCHRO_OVERSAMPLE,
+			ps->nextSample(tempSample, Engine::mixer()->processingSampleRate(),
 				strength, amount, m_harmonics.value(), carrier, modulator);
 			outputSample[0] += tempSample[0];
 			outputSample[1] += tempSample[1];
@@ -548,12 +535,12 @@ void SynchroSynth::modulatorChanged()
 
 void SynchroSynth::generalChanged()
 {
+	//Difference between the octaves of the two oscillators determines the optimal period for the waveform view
+	const int octaveDiff = m_carrierDetune.value() - m_modulatorDetune.value();
+	const float pitchDifference = powf(2, octaveDiff);
+
 	for (int i = 0; i < SYNCHRO_GRAPH_SAMPLES; ++i)
 	{
-		//Difference between the octaves of the two oscillators determines the optimal period for the waveform view
-		int octaveDiff = m_carrierDetune.value() - m_modulatorDetune.value();
-		float pitchDifference = powf(2, octaveDiff);
-
 		float phase = i * F_2PI / SYNCHRO_GRAPH_SAMPLES;
 		while (phase >= F_2PI) { phase -= F_2PI; }
 
