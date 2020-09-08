@@ -21,9 +21,11 @@ LabeledFieldSlider::LabeledFieldSlider(int min, int max, int value)
 void LabeledFieldSlider::syncToSlider()
 {
     field->setText(std::to_string(slider->value()).c_str());
+    emit valueChanged(slider->value());
 }
 
 void LabeledFieldSlider::syncToField()
 {
     slider->setValue(field->text().toInt());
+    emit valueChanged(field->text().toInt());
 }

@@ -21,6 +21,9 @@ class LabeledFieldSlider : public QWidget
 
         LabeledFieldSlider(int min, int max, int value);
 
+    signals:
+        void valueChanged(int value);
+
     protected slots:
         void syncToField();
         void syncToSlider();

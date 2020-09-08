@@ -21,7 +21,8 @@ class InstrumentVisualizationWindow : public QWidget
   signals:
     void requestDataUpdate(float minTime, float maxTime, float minFreq, float maxFreq, int timeSamples, int freqSamples, std::vector<double> coordinates = {});
   private slots:
-    void refreshButtonPressed();
+    void refresh();
+    void slidersChanged();
 
   private:
     QtDataVisualization::Q3DSurface *graph;
@@ -30,9 +31,10 @@ class InstrumentVisualizationWindow : public QWidget
     //UI elements
     //TODO: TMP: only one coordinate
     //TODO: log-scale toggle
-    LabeledFieldSlider * freqSlider, *startTimeSlider, *endTimeSlider, *startFreqSlider, *endFreqSlider;
+    LabeledFieldSlider *startTimeSlider, *endTimeSlider, *startFreqSlider, *endFreqSlider;
     QLineEdit * timeSamples, *frequencySamples;
     std::vector<LabeledFieldSlider*> coordinateSliders;
     QWidget * coordinateSliderContainer;
+    QCheckBox * autoRefreshCheckbox;
 };
 };

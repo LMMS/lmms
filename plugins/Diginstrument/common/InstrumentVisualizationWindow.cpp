@@ -64,7 +64,15 @@ Diginstrument::InstrumentVisualizationWindow::InstrumentVisualizationWindow(QObj
     QPushButton * refreshButton = new QPushButton("Refresh");
     controlsLayout->addWidget(refreshButton);
     connect( refreshButton, SIGNAL( clicked() ),
-            this, SLOT( refreshButtonPressed() ));
+            this, SLOT( refresh() ));
+    QWidget * autoRefreshContainer = new QWidget;
+    QHBoxLayout * autoRefreshLayout = new QHBoxLayout;
+    autoRefreshLayout->addWidget(new QLabel("Auto-refresh"));
+    autoRefreshContainer->setLayout(autoRefreshLayout);
+    autoRefreshCheckbox = new QCheckBox;
+    autoRefreshCheckbox->setChecked(false);
+    autoRefreshLayout->addWidget(autoRefreshCheckbox);
+    controlsLayout->addWidget(autoRefreshContainer);
 
     this->setLayout(outerLayout);
 
@@ -91,6 +99,11 @@ Diginstrument::InstrumentVisualizationWindow::InstrumentVisualizationWindow(QObj
     series->setDrawMode(QSurface3DSeries::DrawSurface);
     //TODO: use slices
     //graph->setSelectionMode(QAbstract3DGraph::SelectionItemAndRow | QAbstract3DGraph::SelectionSlice);
+
+    connect(startTimeSlider, SIGNAL(valueChanged(int)), this, SLOT(slidersChanged()));
+    connect(endTimeSlider, SIGNAL(valueChanged(int)), this, SLOT(slidersChanged()));
+    connect(startFreqSlider, SIGNAL(valueChanged(int)), this, SLOT(slidersChanged()));
+    connect(endFreqSlider, SIGNAL(valueChanged(int)), this, SLOT(slidersChanged()));
 }
 
 Diginstrument::InstrumentVisualizationWindow::~InstrumentVisualizationWindow()
@@ -98,7 +111,7 @@ Diginstrument::InstrumentVisualizationWindow::~InstrumentVisualizationWindow()
     delete container;
 }
 
-void Diginstrument::InstrumentVisualizationWindow::refreshButtonPressed()
+void Diginstrument::InstrumentVisualizationWindow::refresh()
 {
     std::vector<double> coordinates;
     coordinates.reserve(coordinateSliders.size());
@@ -124,7 +137,13 @@ void Diginstrument::InstrumentVisualizationWindow::setDimensions(std::vector<Dim
         if(d.name == "time") continue;
         coordinateSliderContainer->layout()->addWidget(new QLabel(d.name.c_str()));
         LabeledFieldSlider * slider = new LabeledFieldSlider(d.min, d.max, 400 /*TMP*/);
+        connect(slider, SIGNAL(valueChanged(int)), this, SLOT(slidersChanged()));
         coordinateSliders.push_back(slider);
         coordinateSliderContainer->layout()->addWidget(slider);
     }
+}
+
+void  Diginstrument::InstrumentVisualizationWindow::slidersChanged()
+{
+    if(autoRefreshCheckbox->isChecked()) refresh();
 }

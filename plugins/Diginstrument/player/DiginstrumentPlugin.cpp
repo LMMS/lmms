@@ -229,6 +229,7 @@ QtDataVisualization::QSurfaceDataArray * DiginstrumentPlugin::getInstrumentSurfa
 			for(const auto & c : inst.getSpectrum(coordinates).getComponents(0))
 			{
 				if(c.frequency<minFreq || c.frequency>maxFreq) continue;
+				//TODO: BUG: while sliding towards the end, this can be out of range
 				(*dataRow)[std::round((c.frequency-minFreq)/((maxFreq-minFreq)/(float)freqSamples))].setPosition(QVector3D(c.frequency,c.amplitude, z));
 			}
 		}
