@@ -22,6 +22,7 @@
 #include "../common/PiecewiseBSpline.hpp"
 #include "../common/SplineSpectrum.hpp"
 #include "../common/Spectrum.hpp"
+#include "../common/Dimension.h"
 #include <nlohmann/json.hpp>
 #include <iostream>
 #include <QtDataVisualization>
@@ -35,7 +36,7 @@ class InstrumentData
   public:
     std::string name;
     std::string type;
-    std::vector<std::pair<std::string, bool>> dimensions;
+    std::vector<Diginstrument::Dimension> dimensions;
     json _json;
 };
 
@@ -73,7 +74,7 @@ public:
     return true;
   }
 
-  QtDataVisualization::QSurfaceDataArray * getInstrumentSurfaceData(float minTime, float maxTime, float minFreq, float maxFreq, int timeSamples, int freqSamples);
+  QtDataVisualization::QSurfaceDataArray * getInstrumentSurfaceData(float minTime, float maxTime, float minFreq, float maxFreq, int timeSamples, int freqSamples, std::vector<double> coordinates);
 
 private:
   friend class DiginstrumentView;

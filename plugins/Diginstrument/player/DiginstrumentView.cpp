@@ -63,13 +63,24 @@ void DiginstrumentView::showInstumentVisualization()
   //TODO: couple and use parameters
   //TODO: use all coordinates (not just freq)
   //TODO: defaults/saving
-  updateVisualizationData(0,3000,20,22000,100,100);
+  //TODO: TMP: rethink dimension/coordinate coupling
+  //TODO: TMP: better spectrum type distinction!!!
+  
+  if(castModel<DiginstrumentPlugin>()->inst_data.type == "discrete")
+  {
+    visualization->setDimensions(castModel<DiginstrumentPlugin>()->inst.getDimensions());
+  }
+  if(castModel<DiginstrumentPlugin>()->inst_data.type == "spline")
+  {
+    visualization->setDimensions(castModel<DiginstrumentPlugin>()->spline_inst.getDimensions());
+  }
+  updateVisualizationData(0,3000,20,22000,100,100, /*TMP*/ {400});
   visualization->show();
   //is this even useful?
-  visualization->adjustSize();
+  //visualization->adjustSize();
 }
 
-void DiginstrumentView::updateVisualizationData(float minTime, float maxTime, float minFreq, float maxFreq, int timeSamples, int freqSamples)
+void DiginstrumentView::updateVisualizationData(float minTime, float maxTime, float minFreq, float maxFreq, int timeSamples, int freqSamples, std::vector<double> coordinates)
 {
-  visualization->setSurfaceData(castModel<DiginstrumentPlugin>()->getInstrumentSurfaceData(minTime/1000.0f,maxTime/1000.0f,minFreq,maxFreq,timeSamples,freqSamples));
+  visualization->setSurfaceData(castModel<DiginstrumentPlugin>()->getInstrumentSurfaceData(minTime/1000.0f,maxTime/1000.0f,minFreq,maxFreq,timeSamples,freqSamples, coordinates));
 }

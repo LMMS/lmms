@@ -3,6 +3,9 @@
 #include <QtWidgets>
 #include <QtDataVisualization>
 
+#include "Qt/LabeledFieldSlider.h"
+#include "Dimension.h"
+
 namespace Diginstrument
 {
 class InstrumentVisualizationWindow : public QWidget
@@ -10,12 +13,13 @@ class InstrumentVisualizationWindow : public QWidget
   Q_OBJECT
   public:
     void setSurfaceData(QtDataVisualization::QSurfaceDataArray * data);
+    void setDimensions(std::vector<Dimension> dimensions);
 
     InstrumentVisualizationWindow(QObject * dataProvider);
     ~InstrumentVisualizationWindow();
 
   signals:
-    void requestDataUpdate(float minTime, float maxTime, float minFreq, float maxFreq, int timeSamples, int freqSamples);
+    void requestDataUpdate(float minTime, float maxTime, float minFreq, float maxFreq, int timeSamples, int freqSamples, std::vector<double> coordinates = {});
   private slots:
     void refreshButtonPressed();
 
@@ -25,7 +29,10 @@ class InstrumentVisualizationWindow : public QWidget
     QtDataVisualization::QSurface3DSeries *series;
     //UI elements
     //TODO: TMP: only one coordinate
-    QSlider * freqSlider, *startTimeSlider, *endTimeSlider, *startFreqSlider, *endFreqSlider;
+    //TODO: log-scale toggle
+    LabeledFieldSlider * freqSlider, *startTimeSlider, *endTimeSlider, *startFreqSlider, *endFreqSlider;
     QLineEdit * timeSamples, *frequencySamples;
+    std::vector<LabeledFieldSlider*> coordinateSliders;
+    QWidget * coordinateSliderContainer;
 };
 };

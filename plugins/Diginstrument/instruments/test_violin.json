@@ -5,11 +5,15 @@
     [ 
         {
            "label" : "pitch",
+           "min" : 20,
+           "max" : 22000,
            "shifting" : true
         },
         {
             "label" : "time",
-            "shifting" : true
+            "min" : 0,
+            "max" : 15000,
+            "shifting" : false
         }
     ],
     "coordinates" :

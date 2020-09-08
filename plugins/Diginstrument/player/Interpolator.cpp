@@ -13,7 +13,7 @@ S Diginstrument::Interpolator<T, S>::getSpectrum(const std::vector<T> &coordinat
     return data.processIntoRoot(coordinates,
         [this](const S &left, const S &right, const T &target, const T &leftLabel, const T &rightLabel, const unsigned int dimension)
         {
-            return interpolateSpectra(left, right, target, leftLabel, rightLabel, dimensions[dimension].second);
+            return interpolateSpectra(left, right, target, leftLabel, rightLabel, dimensions[dimension].shifting);
         });
 }
 
@@ -147,7 +147,7 @@ SplineSpectrum<T, 4> Diginstrument::Interpolator<T, S>::constructSpectrum(
     const std::vector<unsigned int> & unmatchedRight
     )
 {
-
+    //TODO: test stretching more, maybe it does introduce unacceptable distortion; suspiciously narrow slope if we stretch back (22000 to 400) - could be just the log scale tho!
     //OLD metrics
     const T rightRatio = (target - leftLabel) / (rightLabel - leftLabel);
     //const T leftDistance = target-leftLabel;
@@ -204,9 +204,15 @@ void Diginstrument::Interpolator<T, S>::clear()
 }
 
 template <typename T, class S>
-void Diginstrument::Interpolator<T, S>::setDimensions(const std::vector<std::pair<std::string, bool>> &dimensions)
+void Diginstrument::Interpolator<T, S>::setDimensions(const std::vector<Diginstrument::Dimension> &dimensions)
 {
     this->dimensions = dimensions;
+}
+
+template <typename T, class S>
+const std::vector<Dimension> & Diginstrument::Interpolator<T, S>::getDimensions() const
+{
+    return this->dimensions;
 }
 
 template <typename T, typename S>
@@ -243,10 +249,10 @@ PiecewiseBSpline<T, 4> Diginstrument::Interpolator<T, S>::consolidatePieces(Piec
         //TODO: note: this discards errors where begin>end as well
 
         //debug:
-        cout<<"consolidating ("<<leftPieces.back().getBegin()<<", "<<leftPieces.back().getEnd()<<") - ("<<rightPieces.back().getBegin()<<", "<<rightPieces.back().getEnd()<<")"<<endl;
+        //cout<<"consolidating ("<<leftPieces.back().getBegin()<<", "<<leftPieces.back().getEnd()<<") - ("<<rightPieces.back().getBegin()<<", "<<rightPieces.back().getEnd()<<")"<<endl;
         if (rightPieces.back().getEnd() - rightPieces.back().getBegin() <= maxFrequencyDistance)
         {
-            std::cout<<"discarding from right: "<<rightPieces.back().getBegin()<<" - "<<rightPieces.back().getEnd()<<std::endl;
+            //std::cout<<"discarding from right: "<<rightPieces.back().getBegin()<<" - "<<rightPieces.back().getEnd()<<std::endl;
             //tmp: set opposite piece begin and res latest piece end : could be dangerous if new begin > end
             leftPieces.back().stretchTo(rightPieces.back().getEnd(), leftPieces.back().getEnd());
             res.getPieces().back().stretchTo(res.getPieces().back().getBegin(), rightPieces.back().getEnd());
@@ -272,9 +278,13 @@ PiecewiseBSpline<T, 4> Diginstrument::Interpolator<T, S>::consolidatePieces(Piec
             }
             continue;
         }
+        //TODO: multiple dimensions seems to break interpolation here? infinite loop!
+        //got a shifted left, boxiness 0, and a shifted boxiness, where only the first one was shifted? (c: 2000, 12k, 20k)
+        //leftBegin is just straight up wrong, but cps are all right
+        //changing shifting to true had no effect
         if (leftPieces.back().getEnd() - leftPieces.back().getBegin() <= maxFrequencyDistance)
         {
-            std::cout<<"discarding from left: "<<leftPieces.back().getBegin()<<" - "<<leftPieces.back().getEnd()<<std::endl;
+            //std::cout<<"discarding from left: "<<leftPieces.back().getBegin()<<" - "<<leftPieces.back().getEnd()<<std::endl;
             //tmp: set opposite piece begin and res latest piece end : could be dangerous if new begin > end
             rightPieces.back().stretchTo(leftPieces.back().getEnd(), rightPieces.back().getEnd());
             res.getPieces().back().stretchTo(res.getPieces().back().getBegin(), leftPieces.back().getEnd());
@@ -338,7 +348,7 @@ PiecewiseBSpline<T, 4> Diginstrument::Interpolator<T, S>::consolidatePieces(Piec
                 //split left at right end
                 const T ratio = (rightEnd - leftBegin) / (leftEnd - leftBegin);
                 //tmp:
-                std::cout<<"splitting left @ "<<ratio<<std::endl;
+                //std::cout<<"splitting left @ "<<ratio<<std::endl;
                 auto split = leftPieces.back().getSpline().split(ratio);
                 //match split first with right
                 res.add(mergePieces(split.first, rightPieces.back().getSpline(), rightRatio));
@@ -353,10 +363,10 @@ PiecewiseBSpline<T, 4> Diginstrument::Interpolator<T, S>::consolidatePieces(Piec
                 //split right at left end
                 const T ratio = (leftEnd - rightBegin) / (rightEnd - rightBegin);
                 //tmp:
-                std::cout<<"splitting right @ "<<ratio<<std::endl;
+                //std::cout<<"splitting right @ "<<ratio<<std::endl;
                 auto split = rightPieces.back().getSpline().split(ratio);
                 //tmp:
-                std::cout<<"split ("<<rightPieces.back().getBegin()<<", "<<rightPieces.back().getEnd()<<") into ("<<split.first.getControlPoints().front()[0]<<" , "<<split.first.getControlPoints().back()[0]<<") - ("<<split.second.getControlPoints().front()[0]<<", "<<split.second.getControlPoints().back()[0]<<")"<<std::endl;
+                //std::cout<<"split ("<<rightPieces.back().getBegin()<<", "<<rightPieces.back().getEnd()<<") into ("<<split.first.getControlPoints().front()[0]<<" , "<<split.first.getControlPoints().back()[0]<<") - ("<<split.second.getControlPoints().front()[0]<<", "<<split.second.getControlPoints().back()[0]<<")"<<std::endl;
                 //match split first with right
                 res.add(mergePieces(leftPieces.back().getSpline(), split.first, rightRatio));
                 //remove matched and split pieces
@@ -395,7 +405,7 @@ PiecewiseBSpline<T, 4> Diginstrument::Interpolator<T, S>::consolidatePieces(Piec
                 //split left at right begin
                 const T ratio = (rightBegin - leftBegin) / (leftEnd - leftBegin);
                 //tmp:
-                std::cout<<"splitting left @ "<<ratio<<std::endl;
+                //std::cout<<"splitting left @ "<<ratio<<std::endl;
                 auto split = leftPieces.back().getSpline().split(ratio);
                 //add split part that had no everlap
                 res.add(split.first);
@@ -418,7 +428,7 @@ PiecewiseBSpline<T, 4> Diginstrument::Interpolator<T, S>::consolidatePieces(Piec
                 //split right at left begin
                 const T ratio = (leftBegin - rightBegin) / (rightEnd - rightBegin);
                 //tmp:
-                std::cout<<"splitting right @ "<<ratio<<std::endl;
+                //std::cout<<"splitting right @ "<<ratio<<std::endl;
                 auto split = rightPieces.back().getSpline().split(ratio);
                 //add split part that had no everlap
                 res.add(split.first);
@@ -480,7 +490,7 @@ PiecewiseBSpline<T, 4> Diginstrument::Interpolator<T, S>::consolidatePieces(Piec
             //split right at left begin
             const T ratio = (leftBegin - rightBegin) / (rightEnd - rightBegin);
             //tmp:
-            std::cout<<"splitting right @ "<<ratio<<std::endl;
+            //std::cout<<"splitting right @ "<<ratio<<std::endl;
             auto split = rightPieces.back().getSpline().split(ratio);
             //add split part that had no everlap
             res.add(split.first);
@@ -503,7 +513,7 @@ PiecewiseBSpline<T, 4> Diginstrument::Interpolator<T, S>::consolidatePieces(Piec
             //split left at right begin
             const T ratio = (rightBegin - leftBegin) / (leftEnd - leftBegin);
             //tmp:
-            std::cout<<"splitting left @ "<<ratio<<std::endl;
+            //std::cout<<"splitting left @ "<<ratio<<std::endl;
             auto split = leftPieces.back().getSpline().split(ratio);
             //add split part that had no everlap
             res.add(split.first);
@@ -597,12 +607,14 @@ BSpline<T, 4> Diginstrument::Interpolator<T, S>::mergePieces(BSpline<T, 4> left,
     //do first point
     const std::vector<T> leftBegin = left.getControlPoints().front();
     const std::vector<T> rightBegin = right.getControlPoints().front();
+    //TMP: all phase removed, only 2 coordinates (1 is amp)
 
     resCPs.emplace_back(std::vector<T>{
         std::min(leftBegin[0], rightBegin[0]),
-        leftBegin[1] * leftRatio + rightBegin[1] * rightRatio,
+        leftBegin[1] * leftRatio + rightBegin[1] * rightRatio
         //leftBegin[1],
-        leftBegin[2] * leftRatio + rightBegin[2] * rightRatio});
+        //leftBegin[2] * leftRatio + rightBegin[2] * rightRatio
+        });
     //TODO: phase: how to interpolate "starting phase"?
     for (int i = 1; i < left.getControlPoints().size() - 1; i++)
     {
@@ -611,9 +623,10 @@ BSpline<T, 4> Diginstrument::Interpolator<T, S>::mergePieces(BSpline<T, 4> left,
         //linear interpolation
         resCPs.emplace_back(std::vector<T>{
             (leftCP)[0] * leftRatio + (rightCP)[0] * rightRatio,
-            (leftCP)[1] * leftRatio + (rightCP)[1] * rightRatio,
+            (leftCP)[1] * leftRatio + (rightCP)[1] * rightRatio
             //leftCP[1],
-            (leftCP)[2] * leftRatio + (rightCP)[2] * rightRatio});
+            //(leftCP)[2] * leftRatio + (rightCP)[2] * rightRatio
+            });
     }
     //do last point
     const std::vector<T> leftEnd = left.getControlPoints().back();
@@ -623,9 +636,10 @@ BSpline<T, 4> Diginstrument::Interpolator<T, S>::mergePieces(BSpline<T, 4> left,
         //OR NEITHER? CUZ FREQUENCY AND PHASE ARE INTERCONNECTED, DUMBASS?????
         //std::min(leftEnd[0], rightEnd[0]),
         leftEnd[0] * leftRatio + rightEnd[0] * rightRatio,
-        leftEnd[1] * leftRatio + rightEnd[1] * rightRatio,
+        leftEnd[1] * leftRatio + rightEnd[1] * rightRatio
         //Interpolation::Linear(0.0, leftEnd[1],1.0, rightEnd[1],rightRatio), //seems to be the same as linear combination
-        leftEnd[2] * leftRatio + rightEnd[2] * rightRatio});
+        //leftEnd[2] * leftRatio + rightEnd[2] * rightRatio
+        });
 
     res.setControlPoints(std::move(resCPs));
     res.setKnotVector(std::move(resKnotVector));

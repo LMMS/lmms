@@ -284,6 +284,12 @@ template <typename K, typename V>
 V MultidimensionalNeighbourMap<K, V>::processIntoRoot(const std::vector<K> & coordinates, std::function<V(V, V, K, K, K, unsigned int)> processor)
 {
   //starting from root
+  if(coordinates.size() < dimensions)
+  {
+    //TODO: exception handling
+    //TMP
+    return V();
+  }
   return processIntoRootRecursiveCall(data, coordinates, 0, processor);
 }
 

@@ -2,16 +2,20 @@
     "name" : "Bass drum",
     "spectrum_type" : "discrete",
     "dimensions" :
-        [ 
-            {
-               "label" : "pitch",
-               "shifting" : false
-            },
-            {
-                "label" : "time",
-                "shifting" : true
-            }
-        ],
+    [ 
+        {
+           "label" : "pitch",
+           "min" : 20,
+           "max" : 22000,
+           "shifting" : true
+        },
+        {
+            "label" : "time",
+            "min" : 0,
+            "max" : 15000,
+            "shifting" : false
+        }
+    ],
     "coordinates" :
         [ "frequency", "amplitude" ],
     "spectra" :

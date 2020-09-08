@@ -7,6 +7,7 @@ template <typename T, unsigned int D>
 class SplineSpectrum : public Diginstrument::Spectrum<T>
 {
 public:
+  SplineSpectrum() : Diginstrument::Spectrum<T>(0) {}
   SplineSpectrum(T label) : Diginstrument::Spectrum<T>(label), spline() {}
   SplineSpectrum(PiecewiseBSpline<T, D> &&spline) : Diginstrument::Spectrum<T>(0), spline(std::move(spline)) {}
   SplineSpectrum(const PiecewiseBSpline<T, D> &spline) : Diginstrument::Spectrum<T>(0), spline(spline) {}
@@ -43,12 +44,18 @@ public:
 
   Diginstrument::Component<T> operator[](T x) const
   {
+    //TMP: check if includes phase
+    //TODO: probably not a good solution, should rethink phase/arbitary number of dimensions
     const auto p = spline[x];
-    if (p.size() < 3)
+    if (p.size() < 2)
     {
       return Diginstrument::Component<T>(0, 0, 0);
     }
-    return Diginstrument::Component<T>(spline[x][0], spline[x][1], spline[x][2]);
+    if (p.size() == 2)
+    {
+      return Diginstrument::Component<T>(p[0], 0, p[1]);
+    }
+    return Diginstrument::Component<T>(p[0], p[1], p[2]);
   }
 
   const T getBegin() const

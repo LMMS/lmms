@@ -136,11 +136,11 @@ bool DiginstrumentPlugin::loadInstrumentFile()
 		//TODO: better spectrum type separation!
 		inst.clear();
 		spline_inst.clear();
-		std::vector<pair<string,bool>> dimensions;
+		std::vector<Diginstrument::Dimension> dimensions;
 		std::vector<string> dimension_labels;
 		for(auto d : inst_data._json["dimensions"])
 		{
-			dimensions.emplace_back(d["label"],d["shifting"]);
+			dimensions.emplace_back(d["label"],d["min"],d["max"],d["shifting"]);
 			dimension_labels.emplace_back(d["label"]);
 		}
 		//TODO: better spectrum type separation!
@@ -199,11 +199,10 @@ bool DiginstrumentPlugin::loadInstrumentFile()
 	else return false;
 }
 
-QtDataVisualization::QSurfaceDataArray * DiginstrumentPlugin::getInstrumentSurfaceData(float minTime, float maxTime, float minFreq, float maxFreq, int timeSamples, int freqSamples)
+QtDataVisualization::QSurfaceDataArray * DiginstrumentPlugin::getInstrumentSurfaceData(float minTime, float maxTime, float minFreq, float maxFreq, int timeSamples, int freqSamples, std::vector<double> coordinates)
 {
-	//tmp: TODO: coordinates
 	//TODO: better/refactoring
-	const float freq = 400;
+	coordinates.push_back(0);
 
 	const float stepX = (maxFreq - minFreq) / float(freqSamples - 1);
     const float stepZ = (maxTime - minTime) / float(timeSamples - 1);
@@ -214,6 +213,7 @@ QtDataVisualization::QSurfaceDataArray * DiginstrumentPlugin::getInstrumentSurfa
 	{
 		QSurfaceDataRow *dataRow = new QSurfaceDataRow(freqSamples);
 		float z = qMin(maxTime, (i * stepZ + minTime));
+		coordinates.back() = z;
 
 		//TODO: better spectrum type distinction, please!
 		//discrete instrument
@@ -226,7 +226,7 @@ QtDataVisualization::QSurfaceDataArray * DiginstrumentPlugin::getInstrumentSurfa
 				(*dataRow)[index++].setPosition(QVector3D(x, 0, z));
 			}
 			//project components into the row based on frequency
-			for(const auto & c : inst.getSpectrum({freq, z}).getComponents(0))
+			for(const auto & c : inst.getSpectrum(coordinates).getComponents(0))
 			{
 				if(c.frequency<minFreq || c.frequency>maxFreq) continue;
 				(*dataRow)[std::round((c.frequency-minFreq)/((maxFreq-minFreq)/(float)freqSamples))].setPosition(QVector3D(c.frequency,c.amplitude, z));
@@ -236,10 +236,16 @@ QtDataVisualization::QSurfaceDataArray * DiginstrumentPlugin::getInstrumentSurfa
 		if(inst_data.type == "spline")
 		{
 			int index = 0;
-			const auto spectrum = spline_inst.getSpectrum({freq, z});
+			const auto spectrum = spline_inst.getSpectrum(coordinates);
 			for (int j = 0; j < freqSamples; j++) {
 				float x = qMin(maxFreq, (j * stepX + minFreq));
 				(*dataRow)[index++].setPosition(QVector3D(x, spectrum[x].amplitude, z));
+			}
+			//tmp: identical to discrete
+			for(const auto & c : spectrum.getComponents(0))
+			{
+				if(c.frequency<=minFreq || c.frequency>=maxFreq) continue;
+				(*dataRow)[std::round((c.frequency-minFreq)/((maxFreq-minFreq)/(float)freqSamples))].setPosition(QVector3D(c.frequency,c.amplitude, z));
 			}
 			//TODO: should i visualize peaks explicitly? (similarly to discrete above)
 		}

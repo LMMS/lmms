@@ -79,6 +79,8 @@ public:
   NoteSpectrum(const T &label, const std::vector<Component<T>> &components, const std::vector<Component<T>> &staticComponents)
       :  Spectrum<T>(label), components(components), staticComponents(staticComponents) {}
 
+  NoteSpectrum() : Spectrum<T>(0) {}
+
 private:
   std::vector<Component<T>> components;
   std::vector<Component<T>> staticComponents;

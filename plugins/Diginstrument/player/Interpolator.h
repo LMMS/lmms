@@ -5,6 +5,7 @@
 #include "../common/SplineSpectrum.hpp"
 #include "../common/Interpolation.hpp"
 #include "../common/PeakMatcher.h"
+#include "../common/Dimension.h"
 
 #include <deque>
 #include <algorithm>
@@ -19,7 +20,8 @@ public:
 
   void clear();
 
-  void setDimensions(const std::vector<std::pair<std::string, bool>> & dimensions);
+  void setDimensions(const std::vector<Dimension> & dimensions);
+  const std::vector<Dimension> & getDimensions() const;
 
   void addSpectrum(const S &spectrum, std::vector<T> coordinates);
   void addSpectra(const std::vector<S> &spectra, std::vector<std::vector<T>> coordinates);
@@ -36,7 +38,7 @@ private:
   //tmp
   constexpr static double maxFrequencyDistance = 0.2;
   static constexpr T frequencyStep = 0.001;
-  std::vector<std::pair<std::string, bool>> dimensions;
+  std::vector<Dimension> dimensions;
 
   S interpolateSpectra(const S & left, const S & right, const T &target, const T &leftLabel, const T &rightLabel, const bool shifting);
   

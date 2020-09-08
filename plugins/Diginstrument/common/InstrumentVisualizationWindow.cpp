@@ -10,7 +10,7 @@ void Diginstrument::InstrumentVisualizationWindow::setSurfaceData(QSurfaceDataAr
 Diginstrument::InstrumentVisualizationWindow::InstrumentVisualizationWindow(QObject * dataProvider)
 {   
     //TODO: clear data when closed? lotsa memory
-    connect(this, SIGNAL( requestDataUpdate(float, float, float, float, int, int) ), dataProvider, SLOT( updateVisualizationData(float, float, float, float, int, int) ));
+    connect(this, SIGNAL( requestDataUpdate(float, float, float, float, int, int, std::vector<double>) ), dataProvider, SLOT( updateVisualizationData(float, float, float, float, int, int, std::vector<double>) ));
 
     graph = new QtDataVisualization::Q3DSurface();
     container = QWidget::createWindowContainer(graph);
@@ -31,32 +31,23 @@ Diginstrument::InstrumentVisualizationWindow::InstrumentVisualizationWindow(QObj
     outerLayout->addWidget(controlsContainer);
     controlsContainerLayout->addWidget(controls);
 
-    controlsContainer->setMaximumWidth(200);
+    controlsContainer->setMaximumWidth(300);
     //todo:layout
-    //todo: slider limits
-    //todo:labels
-    //todo:alignments
-    //todo:default values
+    //todo:default values/limits
     //tmp
     controlsLayout->addWidget(new QLabel(QString("Coordinates")));
-    freqSlider = new QSlider(Qt::Horizontal);
-    freqSlider->setRange(20, 22000);
-    controlsLayout->addWidget(freqSlider);
+    coordinateSliderContainer = new QWidget;
+    coordinateSliderContainer->setLayout(new QVBoxLayout);
+    controlsLayout->addWidget(coordinateSliderContainer);
 
     controlsLayout->addWidget(new QLabel(QString("Limits")));
-    startTimeSlider = new QSlider(Qt::Horizontal);
-    startTimeSlider->setRange(0, 5000);
+    startTimeSlider = new LabeledFieldSlider(0, 5000, 0);
     controlsLayout->addWidget(startTimeSlider);
-    endTimeSlider = new QSlider(Qt::Horizontal);
-    endTimeSlider->setRange(0, 5000);
-    endTimeSlider->setValue(5000);
+    endTimeSlider = new LabeledFieldSlider(0,5000, 5000);
     controlsLayout->addWidget(endTimeSlider);
-    startFreqSlider = new QSlider(Qt::Horizontal);
-    startFreqSlider->setRange(20, 22000);
+    startFreqSlider = new LabeledFieldSlider(20, 22000, 20);
     controlsLayout->addWidget(startFreqSlider);
-    endFreqSlider = new QSlider(Qt::Horizontal);
-    endFreqSlider->setRange(20, 22000);
-    endFreqSlider->setValue(22000);
+    endFreqSlider = new LabeledFieldSlider(20, 22000, 22000);
     controlsLayout->addWidget(endFreqSlider);
 
     controlsLayout->addWidget(new QLabel(QString("Sample sizes")));
@@ -109,7 +100,31 @@ Diginstrument::InstrumentVisualizationWindow::~InstrumentVisualizationWindow()
 
 void Diginstrument::InstrumentVisualizationWindow::refreshButtonPressed()
 {
-    emit requestDataUpdate(startTimeSlider->value(),endTimeSlider->value(),startFreqSlider->value(),endFreqSlider->value(),timeSamples->text().toInt(),frequencySamples->text().toInt());
+    std::vector<double> coordinates;
+    coordinates.reserve(coordinateSliders.size());
+    for(auto * slider : coordinateSliders)
+    {
+        coordinates.push_back((double)slider->value());
+    }
+    emit requestDataUpdate(startTimeSlider->value(),endTimeSlider->value(),startFreqSlider->value(),endFreqSlider->value(),timeSamples->text().toInt(),frequencySamples->text().toInt(), coordinates);
     graph->axisX()->setRange(startFreqSlider->value(), endFreqSlider->value());
     graph->axisZ()->setRange(startTimeSlider->value()/1000.0f, endTimeSlider->value()/1000.0f);
+}
+
+void Diginstrument::InstrumentVisualizationWindow::setDimensions(std::vector<Dimension> dimensions)
+{
+    for(auto * s : coordinateSliders)
+    {
+        delete s;
+    }
+
+    for(auto & d : dimensions)
+    {
+        //TMP: bad solution to exclude time
+        if(d.name == "time") continue;
+        coordinateSliderContainer->layout()->addWidget(new QLabel(d.name.c_str()));
+        LabeledFieldSlider * slider = new LabeledFieldSlider(d.min, d.max, 400 /*TMP*/);
+        coordinateSliders.push_back(slider);
+        coordinateSliderContainer->layout()->addWidget(slider);
+    }
 }
