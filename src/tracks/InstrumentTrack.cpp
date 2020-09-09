@@ -122,6 +122,11 @@ InstrumentTrack::InstrumentTrack( TrackContainer* tc ) :
 	}
 
 
+	// IMPORTANT NOTE: We have to create the MIDI CC models before calling setName, because the latter
+	// will trigger a trackRenamed signal on the track container, which will then call
+	// MidiCCRackView::updateTracksComboBox, which itself calls MidiCCRackView::updateKnobsModels. That
+	// last method expects the Tracks CC Enable and Knob models to be created already.
+
 	// Initialize the m_midiCCEnabled variable, but it's actually going to be connected
 	// to a LedButton
 	m_midiCCEnable = new BoolModel( false, NULL, "Enable/Disable MIDI CC" );
@@ -408,7 +413,9 @@ void InstrumentTrack::processInEvent( const MidiEvent& event, const MidiTime& ti
 			break;
 	}
 
-	if( eventHandled == false && instrument()->handleMidiEvent( event, time, offset ) == false )
+	// If the event wasn't handled, check if there's a loaded instrument and if so send the
+	// event to it. If it returns false means the instrument didn't handle the event, so we trigger a warning.
+	if( eventHandled == false && instrument() && instrument()->handleMidiEvent( event, time, offset ) == false )
 	{
 		qWarning( "InstrumentTrack: unhandled MIDI event %d", event.type() );
 	}
@@ -848,11 +855,12 @@ void InstrumentTrack::loadTrackSpecificSettings( const QDomElement & thisElement
 	m_baseNoteModel.loadSettings( thisElement, "basenote" );
 	m_useMasterPitchModel.loadSettings( thisElement, "usemasterpitch");
 
-	// Load MIDI CC stuff
-	m_midiCCEnable->loadSettings( thisElement, "enablecc" );
-
 	// clear effect-chain just in case we load an old preset without FX-data
 	m_audioPort.effects()->clear();
+
+	// We set MIDI CC enable to false so the knobs don't trigger MIDI CC events while
+	// they are being loaded. After all knobs are loaded we load the right value of m_midiCCEnable.
+	m_midiCCEnable->setValue(false);
 
 	QDomNode node = thisElement.firstChild();
 	while( !node.isNull() )
@@ -925,6 +933,10 @@ void InstrumentTrack::loadTrackSpecificSettings( const QDomElement & thisElement
 		}
 		node = node.nextSibling();
 	}
+
+	// Load the right value of m_midiCCEnable
+	m_midiCCEnable->loadSettings( thisElement, "enablecc" );
+
 	updatePitchRange();
 	unlock();
 }
