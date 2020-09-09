@@ -1,7 +1,8 @@
 /*
- * carlapatchbay.cpp - Carla for LMMS (Patchbay)
+ * PositionLine.h - declaration of class PositionLine, a simple widget that
+ *                  draws a line, mainly works with TimeLineWidget
  *
- * Copyright (C) 2014-2018 Filipe Coelho <falktx@falktx.com>
+ * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -22,32 +23,27 @@
  *
  */
 
-#include "carla.h"
+#ifndef POSITION_LINE_H
+#define POSITION_LINE_H
 
-#include "embed.h"
-#include "plugin_export.h"
-#include "InstrumentTrack.h"
+#include <QWidget>
 
-extern "C"
+class PositionLine : public QWidget
 {
+	Q_OBJECT
+	Q_PROPERTY(bool tailGradient MEMBER m_hasTailGradient)
+	Q_PROPERTY(QColor lineColor MEMBER m_lineColor)
+public:
+	PositionLine(QWidget* parent);
 
-Plugin::Descriptor PLUGIN_EXPORT carlapatchbay_plugin_descriptor =
-{
-    STRINGIFY( PLUGIN_NAME ),
-    "Carla Patchbay",
-    QT_TRANSLATE_NOOP( "PluginBrowser",
-                       "Carla Patchbay Instrument" ),
-    "falkTX <falktx/at/falktx.com>",
-    CARLA_VERSION_HEX,
-    Plugin::Instrument,
-    new PluginPixmapLoader( "logo" ),
-    NULL,
-    NULL
-} ;
+public slots:
+	void zoomChange(double zoom);
 
-PLUGIN_EXPORT Plugin* lmms_plugin_main(Model* m, void*)
-{
-    return new CarlaInstrument(static_cast<InstrumentTrack*>(m), &carlapatchbay_plugin_descriptor, true);
-}
+private:
+	void paintEvent(QPaintEvent* pe) override;
 
-}
+	bool m_hasTailGradient;
+	QColor m_lineColor;
+};
+
+#endif

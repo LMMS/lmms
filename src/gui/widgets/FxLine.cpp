@@ -25,6 +25,8 @@
 
 #include "FxLine.h"
 
+#include <cstdlib>
+
 #include <QGraphicsProxyWidget>
 
 #include "CaptionMenu.h"
@@ -120,6 +122,8 @@ FxLine::FxLine( QWidget * _parent, FxMixerView * _mv, int _channelIndex ) :
 	proxyWidget->setPos( 8, 145 );
 
 	connect( m_renameLineEdit, SIGNAL( editingFinished() ), this, SLOT( renameFinished() ) );
+	connect( &Engine::fxMixer()->effectChannel( m_channelIndex )->m_muteModel, SIGNAL( dataChanged() ), this, SLOT( update() ) );
+	
 }
 
 
@@ -144,10 +148,11 @@ void FxLine::setChannelIndex( int index )
 
 
 
-
 void FxLine::drawFxLine( QPainter* p, const FxLine *fxLine, bool isActive, bool sendToThis, bool receiveFromThis )
 {
-	QString name = Engine::fxMixer()->effectChannel( m_channelIndex )->m_name;
+	auto channel = Engine::fxMixer()->effectChannel( m_channelIndex );
+	bool muted = channel->m_muteModel.value();
+	QString name = channel->m_name;
 	QString elidedName = elideName( name );
 	if( !m_inRename && m_renameLineEdit->text() != elidedName )
 	{
@@ -156,8 +161,16 @@ void FxLine::drawFxLine( QPainter* p, const FxLine *fxLine, bool isActive, bool 
 
 	int width = fxLine->rect().width();
 	int height = fxLine->rect().height();
-
-	p->fillRect( fxLine->rect(), isActive ? fxLine->backgroundActive() : p->background() );
+	
+	if( channel->m_hasColor && !muted )
+	{
+		p->fillRect( fxLine->rect(), channel->m_color.darker( isActive ? 120 : 150 ) );
+	}
+	else
+	{
+		p->fillRect( fxLine->rect(),
+					 isActive ? fxLine->backgroundActive().color() : p->background().color() );
+	}
 	
 	// inner border
 	p->setPen( isActive ? fxLine->strokeInnerActive() : fxLine->strokeInnerInactive() );
@@ -224,7 +237,7 @@ void FxLine::mouseDoubleClickEvent( QMouseEvent * )
 void FxLine::contextMenuEvent( QContextMenuEvent * )
 {
 	QPointer<CaptionMenu> contextMenu = new CaptionMenu( Engine::fxMixer()->effectChannel( m_channelIndex )->m_name, this );
-	if( m_channelIndex != 0 ) // no move-options in master 
+	if( m_channelIndex != 0 ) // no move-options in master
 	{
 		contextMenu->addAction( tr( "Move &left" ),	this, SLOT( moveChannelLeft() ) );
 		contextMenu->addAction( tr( "Move &right" ), this, SLOT( moveChannelRight() ) );
@@ -238,6 +251,10 @@ void FxLine::contextMenuEvent( QContextMenuEvent * )
 		contextMenu->addSeparator();
 	}
 	contextMenu->addAction( embed::getIconPixmap( "cancel" ), tr( "Remove &unused channels" ), this, SLOT( removeUnusedChannels() ) );
+	contextMenu->addSeparator();
+	contextMenu->addAction( embed::getIconPixmap( "colorize" ), tr( "Set channel color" ), this, SLOT( changeColor() ) );
+	contextMenu->addAction( embed::getIconPixmap( "colorize" ), tr( "Remove channel color" ), this, SLOT( resetColor() ) );
+	contextMenu->addAction( embed::getIconPixmap( "colorize" ), tr( "Pick random channel color" ), this, SLOT( randomColor() ) );
 	contextMenu->exec( QCursor::pos() );
 	delete contextMenu;
 }
@@ -394,4 +411,35 @@ QColor FxLine::strokeInnerInactive() const
 void FxLine::setStrokeInnerInactive( const QColor & c )
 {
 	m_strokeInnerInactive = c;
+}
+
+
+// Ask user for a color, and set it as the mixer line color
+void FxLine::changeColor()
+{
+	auto channel = Engine::fxMixer()->effectChannel( m_channelIndex );
+	auto new_color = ColorChooser( this ).withPalette( ColorChooser::Palette::Mixer )->getColor( channel->m_color );
+	if( ! new_color.isValid() )
+	{ return; }
+	channel->m_color = new_color;
+	channel->m_hasColor = true;
+	update();
+}
+
+
+// Disable the usage of color on this mixer line
+void FxLine::resetColor()
+{
+	Engine::fxMixer()->effectChannel( m_channelIndex )->m_hasColor = false;
+	update();
+}
+
+
+// Pick a random color from the mixer palette and set it as our color
+void FxLine::randomColor()
+{
+	auto channel = Engine::fxMixer()->effectChannel( m_channelIndex );
+	channel->m_color = ColorChooser::getPalette( ColorChooser::Palette::Mixer )[ rand() % 48 ];
+	channel->m_hasColor = true;
+	update();
 }

@@ -320,7 +320,7 @@ void AutomationEditor::updateAfterPatternChange()
 	m_minLevel = m_pattern->firstObject()->minValue<float>();
 	m_maxLevel = m_pattern->firstObject()->maxValue<float>();
 	m_step = m_pattern->firstObject()->step<float>();
-	m_scrollLevel = ( m_minLevel + m_maxLevel ) / 2;
+	centerTopBottomScroll();
 
 	m_tensionModel->setValue( m_pattern->getTension() );
 
@@ -1595,12 +1595,36 @@ void AutomationEditor::drawLevelTick(QPainter & p, int tick, float value)
 
 		p.fillRect( x, y_start, rect_width, rect_height, currentColor );
 	}
-
+#ifdef LMMS_DEBUG
 	else
 	{
 		printf("not in range\n");
 	}
+#endif
+}
 
+
+
+
+// center the vertical scroll position on the first object's value
+void AutomationEditor::centerTopBottomScroll()
+{
+	// default to the m_scrollLevel position
+	int pos = static_cast<int>(m_scrollLevel);
+	// If a pattern exists...
+	if (m_pattern)
+	{
+		// get time map of current pattern
+		timeMap & time_map = m_pattern->getTimeMap();
+		// If time_map is not empty...
+		if (!time_map.empty())
+		{
+			// set the position to the inverted value ((max + min) - value)
+			// If we set just (max - value), we're off by m_pattern's minimum
+			pos = m_pattern->getMax() + m_pattern->getMin() - static_cast<int>(time_map.begin().value());
+		}
+	}
+	m_topBottomScroll->setValue(pos);
 }
 
 
@@ -1632,8 +1656,7 @@ void AutomationEditor::resizeEvent(QResizeEvent * re)
 		m_topBottomScroll->setRange( (int) m_scrollLevel,
 							(int) m_scrollLevel );
 	}
-
-	m_topBottomScroll->setValue( (int) m_scrollLevel );
+	centerTopBottomScroll();
 
 	if( Engine::getSong() )
 	{
@@ -2326,7 +2349,7 @@ AutomationEditorWindow::AutomationEditorWindow() :
 	zoom_x_label->setPixmap( embed::getIconPixmap( "zoom_x" ) );
 
 	m_zoomingXComboBox = new ComboBox( zoomToolBar );
-	m_zoomingXComboBox->setFixedSize( 80, 22 );
+	m_zoomingXComboBox->setFixedSize( 80, ComboBox::DEFAULT_HEIGHT );
 	m_zoomingXComboBox->setToolTip( tr( "Horizontal zooming" ) );
 
 	for( float const & zoomLevel : m_editor->m_zoomXLevels )
@@ -2345,7 +2368,7 @@ AutomationEditorWindow::AutomationEditorWindow() :
 	zoom_y_label->setPixmap( embed::getIconPixmap( "zoom_y" ) );
 
 	m_zoomingYComboBox = new ComboBox( zoomToolBar );
-	m_zoomingYComboBox->setFixedSize( 80, 22 );
+	m_zoomingYComboBox->setFixedSize( 80, ComboBox::DEFAULT_HEIGHT );
 	m_zoomingYComboBox->setToolTip( tr( "Vertical zooming" ) );
 
 	m_editor->m_zoomingYModel.addItem( "Auto" );
@@ -2375,7 +2398,7 @@ AutomationEditorWindow::AutomationEditorWindow() :
 	quantize_lbl->setPixmap( embed::getIconPixmap( "quantize" ) );
 
 	m_quantizeComboBox = new ComboBox( m_toolBar );
-	m_quantizeComboBox->setFixedSize( 60, 22 );
+	m_quantizeComboBox->setFixedSize( 60, ComboBox::DEFAULT_HEIGHT );
 	m_quantizeComboBox->setToolTip( tr( "Quantization" ) );
 
 	m_quantizeComboBox->setModel( &m_editor->m_quantizeModel );

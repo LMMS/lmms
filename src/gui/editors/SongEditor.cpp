@@ -52,86 +52,6 @@
 #include "PianoRoll.h"
 #include "Track.h"
 
-positionLine::positionLine( QWidget* parent ) :
-	QWidget( parent ),
-	m_hasTailGradient ( false ),
-	m_lineColor (0, 0, 0, 0)
-{
-	resize( 8, height() );
-	
-	setAttribute( Qt::WA_NoSystemBackground, true );
-	setAttribute( Qt::WA_TransparentForMouseEvents );
-}
-
-void positionLine::paintEvent( QPaintEvent* pe )
-{
-	QPainter p( this );
-	
-	// If width is 1, we don't need a gradient
-	if (width() == 1)
-	{
-		p.fillRect( rect(),
-			QColor( m_lineColor.red(), m_lineColor.green(), m_lineColor.blue(), 153) );
-	}
-	
-	// If width > 1, we need the gradient
-	else
-	{
-		// Create the gradient trail behind the line
-		QLinearGradient gradient( rect().bottomLeft(), rect().bottomRight() );
-		
-		// If gradient is enabled, we're in focus and we're playing, enable gradient
-		if (Engine::getSong()->isPlaying() && m_hasTailGradient && 
-			Engine::getSong()->playMode() == Song::Mode_PlaySong)
-		{
-			gradient.setColorAt(( ( width() - 1.0 )/width() ),
-				QColor( m_lineColor.red(), m_lineColor.green(), m_lineColor.blue(), 60) );
-		}
-		else
-		{
-			gradient.setColorAt(( ( width() - 1.0 )/width() ),
-				QColor( m_lineColor.red(), m_lineColor.green(), m_lineColor.blue(), 0) );
-		}
-		
-		// Fill in the remaining parts
-		gradient.setColorAt(0,
-			QColor( m_lineColor.red(), m_lineColor.green(), m_lineColor.blue(), 0) );
-		gradient.setColorAt(1,
-			QColor( m_lineColor.red(), m_lineColor.green(), m_lineColor.blue(), 153) );
-		
-		// Fill line
-		p.fillRect( rect(), gradient );
-	}
-}
-
-// QProperty handles
-bool positionLine::hasTailGradient() const
-{ return m_hasTailGradient; }
-
-void positionLine::setHasTailGradient( const bool g )
-{ m_hasTailGradient = g; }
-
-QColor positionLine::lineColor() const
-{ return m_lineColor; }
-
-void positionLine::setLineColor( const QColor & c )
-{ m_lineColor = c; }
-
-// NOTE: the move() implementation fixes a bug where the position line would appear
-// in an unexpected location when positioned at the start of the track
-void positionLine::zoomChange( double zoom )
-{
-	int playHeadPos = x() + width() - 1;
-	
-	resize( 8.0 * zoom, height() );
-	move( playHeadPos - width() + 1, y() );
-	
-	update();
-}
-
-
-
-
 const QVector<double> SongEditor::m_zoomLevels =
 		{ 0.125f, 0.25f, 0.5f, 1.0f, 2.0f, 4.0f, 8.0f, 16.0f };
 
@@ -172,7 +92,7 @@ SongEditor::SongEditor( Song * song ) :
 	connect( m_timeLine, SIGNAL( selectionFinished() ),
 			 this, SLOT( stopRubberBand() ) );
 
-	m_positionLine = new positionLine( this );
+	m_positionLine = new PositionLine(this);
 	static_cast<QVBoxLayout *>( layout() )->insertWidget( 1, m_timeLine );
 	
 	connect( m_song, SIGNAL( playbackStateChanged() ),
@@ -1035,7 +955,7 @@ SongEditorWindow::SongEditorWindow(Song* song) :
 
 	//Set up zooming-stuff
 	m_zoomingComboBox = new ComboBox( m_toolBar );
-	m_zoomingComboBox->setFixedSize( 80, 22 );
+	m_zoomingComboBox->setFixedSize( 80, ComboBox::DEFAULT_HEIGHT );
 	m_zoomingComboBox->move( 580, 4 );
 	m_zoomingComboBox->setModel(m_editor->m_zoomingModel);
 	m_zoomingComboBox->setToolTip(tr("Horizontal zooming"));
@@ -1050,7 +970,7 @@ SongEditorWindow::SongEditorWindow(Song* song) :
 
 	//Set up quantization/snapping selector
 	m_snappingComboBox = new ComboBox( m_toolBar );
-	m_snappingComboBox->setFixedSize( 80, 22 );
+	m_snappingComboBox->setFixedSize( 80, ComboBox::DEFAULT_HEIGHT );
 	m_snappingComboBox->setModel(m_editor->m_snappingModel);
 	m_snappingComboBox->setToolTip(tr("Clip snapping size"));
 	connect(m_editor->snappingModel(), SIGNAL(dataChanged()), this, SLOT(updateSnapLabel()));

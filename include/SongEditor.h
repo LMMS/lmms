@@ -33,6 +33,7 @@
 #include "ActionGroup.h"
 #include "Editor.h"
 #include "TrackContainerView.h"
+#include "PositionLine.h"
 
 class QLabel;
 class QScrollBar;
@@ -45,31 +46,6 @@ class MeterDialog;
 class Song;
 class TextFloat;
 class TimeLineWidget;
-
-class positionLine : public QWidget
-{
-	Q_OBJECT
-	Q_PROPERTY ( bool tailGradient READ hasTailGradient WRITE setHasTailGradient )
-	Q_PROPERTY ( QColor lineColor READ lineColor WRITE setLineColor )
-public:
-	positionLine ( QWidget* parent );
-	
-	// qproperty access functions
-	bool hasTailGradient () const;
-	void setHasTailGradient ( const bool g );
-	QColor lineColor () const;
-	void setLineColor ( const QColor & c );
-
-public slots:
-	void zoomChange (double zoom);
-
-private:
-	void paintEvent( QPaintEvent* pe ) override;
-	
-	bool m_hasTailGradient;
-	QColor m_lineColor;
-
-};
 
 
 class SongEditor : public TrackContainerView
@@ -156,7 +132,7 @@ private:
 	TextFloat * m_mvsStatus;
 	TextFloat * m_mpsStatus;
 
-	positionLine * m_positionLine;
+	PositionLine * m_positionLine;
 
 	ComboBoxModel* m_zoomingModel;
 	ComboBoxModel* m_snappingModel;

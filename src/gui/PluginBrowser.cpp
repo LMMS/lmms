@@ -205,7 +205,9 @@ PluginDescWidget::PluginDescWidget(const PluginKey &_pk,
 	setFixedHeight( DEFAULT_HEIGHT );
 	setMouseTracking( true );
 	setCursor( Qt::PointingHandCursor );
-	setToolTip(_pk.description());
+	setToolTip(_pk.desc->subPluginFeatures
+		? _pk.description()
+		: tr(_pk.desc->description));
 }
 
 
