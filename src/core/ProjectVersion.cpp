@@ -93,20 +93,20 @@ int ProjectVersion::compare(const ProjectVersion & a, const ProjectVersion & b, 
 	if(aPat != bPat){ return aPat - bPat; }
 
 	// Decide how many optional identifiers we care about
-	int numLabels = qMax(0, limit - 3);
-	auto aLabels = a.getLabels().mid(0, numLabels);
-	auto bLabels = b.getLabels().mid(0, numLabels);
+	const int maxLabels = qMax(0, limit - 3);
+	const auto aLabels = a.getLabels().mid(0, maxLabels);
+	const auto bLabels = b.getLabels().mid(0, maxLabels);
 
 	// We can only compare identifiers if both versions have them
-	int commonLabels = qMin(aLabels.size(), bLabels.size());
+	const int commonLabels = qMin(aLabels.size(), bLabels.size());
 	// If one version has optional labels and the other doesn't,
 	// the one without them is bigger
 	if (commonLabels == 0){ return bLabels.size() - aLabels.size(); }
 
 	// Otherwise, compare as many labels as we can
 	for (int i = 0; i < commonLabels; i++){
-		QString labelA = aLabels.at(i);
-		QString labelB = bLabels.at(i);
+		const QString& labelA = aLabels.at(i);
+		const QString& labelB = bLabels.at(i);
 		// If both labels are the same, skip
 		if (labelA == labelB){ continue; }
 		// Numeric and non-numeric identifiers compare differently
