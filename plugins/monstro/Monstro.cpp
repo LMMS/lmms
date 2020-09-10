@@ -45,7 +45,7 @@ Plugin::Descriptor PLUGIN_EXPORT monstro_plugin_descriptor =
 {
 	STRINGIFY( PLUGIN_NAME ),
 	"Monstro",
-	QT_TRANSLATE_NOOP( "pluginBrowser",
+	QT_TRANSLATE_NOOP( "PluginBrowser",
 				"Monstrous 3-oscillator synth with modulation matrix" ),
 	"Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>",
 	0x0100,

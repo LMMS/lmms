@@ -45,7 +45,7 @@ Plugin::Descriptor PLUGIN_EXPORT kicker_plugin_descriptor =
 {
 	STRINGIFY( PLUGIN_NAME ),
 	"Kicker",
-	QT_TRANSLATE_NOOP( "pluginBrowser",
+	QT_TRANSLATE_NOOP( "PluginBrowser",
 				"Versatile drum synthesizer" ),
 	"Tobias Doerffel <tobydox/at/users.sf.net>",
 	0x0100,

@@ -50,7 +50,7 @@ Plugin::Descriptor PLUGIN_EXPORT malletsstk_plugin_descriptor =
 {
 	STRINGIFY( PLUGIN_NAME ),
 	"Mallets",
-	QT_TRANSLATE_NOOP( "pluginBrowser",
+	QT_TRANSLATE_NOOP( "PluginBrowser",
 				"Tuneful things to bang on" ),
 	"Danny McRae <khjklujn/at/users.sf.net>",
 	0x0100,

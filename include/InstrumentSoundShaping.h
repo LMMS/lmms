@@ -74,7 +74,7 @@ private:
 	FloatModel m_filterCutModel;
 	FloatModel m_filterResModel;
 
-	static const QString targetNames[InstrumentSoundShaping::NumTargets][3];
+	static const char *const targetNames[InstrumentSoundShaping::NumTargets][3];
 
 
 	friend class InstrumentSoundShapingView;

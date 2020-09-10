@@ -49,7 +49,7 @@ public:
 
 	inline static QString name( void )
 	{
-		return QT_TRANSLATE_NOOP( "setupWidget", "sndio" );
+		return QT_TRANSLATE_NOOP( "AudioDeviceSetupWidget", "sndio" );
 	}
 
 	class setupWidget : public AudioDeviceSetupWidget
