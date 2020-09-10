@@ -31,12 +31,16 @@
 
 #include "lmms_export.h"
 #include "MemoryManager.h"
+#include "ProjectVersion.h"
 
 class QTextStream;
 
 class LMMS_EXPORT DataFile : public QDomDocument
 {
 	MM_OPERATORS
+
+	using UpgradeMethod = void(DataFile::*)();
+
 public:
 	enum Types
 	{
@@ -84,7 +88,7 @@ public:
 		return m_type;
 	}
 
-	const unsigned int legacyFileVersion();
+	unsigned int legacyFileVersion();
 
 private:
 	static Type type( const QString& typeName );
@@ -112,7 +116,9 @@ private:
 	void upgrade_1_3_0();
 
 	// List of all upgrade methods
-	static const std::vector<void(DataFile::*)()> m_upgradeMethods;
+	static const std::vector<UpgradeMethod> UPGRADE_METHODS;
+	// List of ProjectVersions for the legacyFileVersion method
+	static const std::vector<ProjectVersion> UPGRADE_VERSIONS;
 
 	void upgrade();
 

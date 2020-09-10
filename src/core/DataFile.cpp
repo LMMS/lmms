@@ -50,7 +50,7 @@ static void findIds(const QDomElement& elem, QList<jo_id_t>& idList);
 
 
 // Vector with all the upgrade methods
-const std::vector<void(DataFile::*)()> DataFile::m_upgradeMethods = {
+const std::vector<void(DataFile::*)()> DataFile::UPGRADE_METHODS = {
 	&DataFile::upgrade_0_2_1_20070501   ,   &DataFile::upgrade_0_2_1_20070508,
 	&DataFile::upgrade_0_3_0_rc2        ,   &DataFile::upgrade_0_3_0,
 	&DataFile::upgrade_0_4_0_20080104   ,   &DataFile::upgrade_0_4_0_20080118,
@@ -62,6 +62,15 @@ const std::vector<void(DataFile::*)()> DataFile::m_upgradeMethods = {
 	&DataFile::upgrade_1_3_0
 };
 
+// Vector of all versions that have upgrade routines.
+const std::vector<ProjectVersion> DataFile::UPGRADE_VERSIONS = {
+	"0.2.1-20070501"   ,   "0.2.1-20070508"   ,   "0.3.0-rc2",
+	"0.3.0"            ,   "0.4.0-20080104"   ,   "0.4.0-20080118",
+	"0.4.0-20080129"   ,   "0.4.0-20080409"   ,   "0.4.0-20080607",
+	"0.4.0-20080622"   ,   "0.4.0-beta1"      ,   "0.4.0-rc2",
+	"1.0.99-0"         ,   "1.1.0-0"          ,   "1.1.91-0",
+	"1.2.0-rc3"        ,   "1.3.0"
+};
 
 DataFile::typeDescStruct
 		DataFile::s_types[DataFile::TypeCount] =
@@ -84,7 +93,7 @@ DataFile::DataFile( Type type ) :
 	m_content(),
 	m_head(),
 	m_type( type ),
-	m_fileVersion( m_upgradeMethods.size() )
+	m_fileVersion( UPGRADE_METHODS.size() )
 {
 	appendChild( createProcessingInstruction("xml", "version=\"1.0\""));
 	QDomElement root = createElement( "lmms-project" );
@@ -109,7 +118,7 @@ DataFile::DataFile( const QString & _fileName ) :
 	QDomDocument(),
 	m_content(),
 	m_head(),
-	m_fileVersion( m_upgradeMethods.size() )
+	m_fileVersion( UPGRADE_METHODS.size() )
 {
 	QFile inFile( _fileName );
 	if( !inFile.open( QIODevice::ReadOnly ) )
@@ -1366,18 +1375,16 @@ qWarning("DATAFILE: upgrade_1_3_0");
 
 void DataFile::upgrade()
 {
-	using upgradeMethod = void(DataFile::*)();
-
 	// Runs all necessary upgrade methods
-	std::for_each( m_upgradeMethods.begin() + m_fileVersion, m_upgradeMethods.end(),
-		[this](upgradeMethod um)
+	std::for_each( UPGRADE_METHODS.begin() + m_fileVersion, UPGRADE_METHODS.end(),
+		[this](UpgradeMethod um)
 		{
 			(this->*um)();
 		}
 	);
 
 	// Bump the file version (which should be the size of the upgrade methods vector)
-	m_fileVersion = m_upgradeMethods.size();
+	m_fileVersion = UPGRADE_METHODS.size();
 qWarning("DATAFILE: Current fileVersion = %u", m_fileVersion);
 
 	// update document meta data
@@ -1515,28 +1522,16 @@ void findIds(const QDomElement& elem, QList<jo_id_t>& idList)
 	}
 }
 
-const unsigned int DataFile::legacyFileVersion()
+unsigned int DataFile::legacyFileVersion()
 {
 	// Version of LMMs that created this project
 	ProjectVersion creator =
 		documentElement().attribute( "creatorversion" ).
 		replace( "svn", "" );
 
-	// Vector of all versions that have upgrade routines.
-	std::vector<QString> upgradeVersions = {
-		"0.2.1-20070501"   ,   "0.2.1-20070508"   ,   "0.3.0-rc2",
-		"0.3.0"            ,   "0.4.0-20080104"   ,   "0.4.0-20080118",
-		"0.4.0-20080129"   ,   "0.4.0-20080409"   ,   "0.4.0-20080607",
-		"0.4.0-20080622"   ,   "0.4.0-beta1"      ,   "0.4.0-rc2",
-		"1.0.99-0"         ,   "1.1.0-0"          ,   "1.1.91-0",
-		"1.2.0-rc3"        ,   "1.3.0"
-	};
-
-	// Get an iterator pointing at the first upgrade we need to run (or at upgrades.end() if there is no such upgrade)
-	auto firstRequiredUpgrade = std::find_if( upgradeVersions.begin(), upgradeVersions.end(),
-		[creator](QString version){ return creator < version; }
-	);
+	// Get an iterator pointing at the first upgrade we need to run (or at the end if there is no such upgrade)
+	auto firstRequiredUpgrade = std::upper_bound( UPGRADE_VERSIONS.begin(), UPGRADE_VERSIONS.end(), creator );
 
 	// Convert the iterator to an index, which is our file version (starting at 0)
-	return std::distance( upgradeVersions.begin(), firstRequiredUpgrade );
+	return std::distance( UPGRADE_VERSIONS.begin(), firstRequiredUpgrade );
 }

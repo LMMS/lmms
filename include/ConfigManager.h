@@ -54,6 +54,9 @@ const QString PORTABLE_MODE_FILE = "/portable_mode.txt";
 class LMMS_EXPORT ConfigManager : public QObject
 {
 	Q_OBJECT
+
+	using UpgradeMethod = void(ConfigManager::*)();
+
 public:
 	static inline ConfigManager * inst()
 	{
@@ -220,7 +223,7 @@ public:
 
 	// Used when the configversion attribute is not present in a configuration file.
 	// Returns the appropriate config file version based on the LMMS version.
-	const unsigned int legacyConfigVersion();
+	unsigned int legacyConfigVersion();
 
 	QString defaultVersion() const;
 
@@ -274,7 +277,7 @@ private:
 	void upgrade();
 
 	// List of all upgrade methods
-	static const std::vector<void(ConfigManager::*)()> m_upgradeMethods;
+	static const std::vector<UpgradeMethod> UPGRADE_METHODS;
 
 	QString m_workingDir;
 	QString m_dataDir;
