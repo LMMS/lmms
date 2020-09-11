@@ -2215,8 +2215,7 @@ void TrackContentWidget::setEmbossColor( const QBrush & c )
  */
 TrackOperationsWidget::TrackOperationsWidget( TrackView * parent ) :
 	QWidget( parent ),             /*!< The parent widget */
-	m_trackView( parent ),          /*!< The parent track view */
-	colorBarNeedsUpdate( false )
+	m_trackView( parent )          /*!< The parent track view */
 {
 	ToolTip::add( this, tr( "Press <%1> while clicking on move-grip "
 				"to begin a new drag'n'drop action." ).arg(UI_CTRL_KEY) );
@@ -2350,12 +2349,6 @@ void TrackOperationsWidget::paintEvent( QPaintEvent * pe )
 	{
 		p.drawPixmap( 2, 2, embed::getIconPixmap("track_op_grip_c"));
 	}
-		
-	if( colorBarNeedsUpdate )
-	{
-		colorBarNeedsUpdate = false;
-		update();
-	}
 }
 
 
@@ -2410,13 +2403,13 @@ void TrackOperationsWidget::changeTrackColor()
 	{ return; }
 
 	emit colorChanged( new_color );
-	colorBarNeedsUpdate = true;
+	update();
 }
 
 void TrackOperationsWidget::resetTrackColor()
 {
 	emit colorReset();
-	colorBarNeedsUpdate = true;
+	update();
 }
 
 void TrackOperationsWidget::randomTrackColor()
@@ -2424,7 +2417,7 @@ void TrackOperationsWidget::randomTrackColor()
 	QColor buffer = ColorChooser::getPalette( ColorChooser::Palette::Track )[ rand() % 48 ];
 
 	emit colorChanged( buffer );
-	colorBarNeedsUpdate = true;
+	update();
 }
 
 void TrackOperationsWidget::useTrackColor()
@@ -2486,7 +2479,6 @@ void TrackOperationsWidget::updateMenu()
 
 void TrackOperationsWidget::updateColorGradient()
 {
-	colorBarNeedsUpdate = true;
 	update();
 }
 

@@ -553,8 +553,6 @@ private:
 	QPushButton * m_trackOps;
 	PixmapButton * m_muteBtn;
 	PixmapButton * m_soloBtn;
-	
-	bool colorBarNeedsUpdate;
 
 	friend class TrackView;
 
