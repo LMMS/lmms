@@ -710,13 +710,13 @@ void TrackContentObjectView::dropEvent( QDropEvent * de )
 	m_tco->restoreState( tcos.firstChildElement().firstChildElement() );
 	m_tco->movePosition( pos );
 	
-	auto old_tco = dynamic_cast<TrackContentObjectView *>( qwSource )->m_tco;
+	auto old_tcov = dynamic_cast<TrackContentObjectView *>( qwSource );
 	
-	if( old_tco->usesCustomClipColor() && qwSource != NULL )
+	if( old_tcov && old_tcov->m_tco->usesCustomClipColor() )
 	{
 		m_tco->useStyleColor( false );
 		m_tco->useCustomClipColor( true );
-		m_tco->setColor( old_tco->color() );
+		m_tco->setColor( old_tcov->color() );
 	}
 	else
 	{
