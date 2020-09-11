@@ -70,7 +70,7 @@ void DiginstrumentPlugin::playNote(NotePlayHandle *noteHandle,
 	}
 	else
 	{
-		auto spectrum = spline_inst.getSpectrum({noteHandle->frequency(), startTime});
+		auto spectrum = spline_inst.getSpectrum({noteHandle->frequency(),400/*TMP: new coord test*/, startTime});
 		audioData = this->synth.playNote(spectrum.getComponents(0), noteHandle->framesLeftForCurrentPeriod(), noteHandle->totalFramesPlayed(), /*tmp*/ 44100);
 	}
 	/*tmp: stereo*/

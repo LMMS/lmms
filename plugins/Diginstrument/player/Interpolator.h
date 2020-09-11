@@ -34,10 +34,6 @@ private:
   static PiecewiseBSpline<T, 4> consolidatePieces(PiecewiseBSpline<T, 4> & left, PiecewiseBSpline<T, 4> & right, T rightRatio);
   
   MultidimensionalNeighbourMap<T, S> data;
-  
-  //tmp
-  constexpr static double maxFrequencyDistance = 0.2;
-  static constexpr T frequencyStep = 0.001;
   std::vector<Dimension> dimensions;
 
   S interpolateSpectra(const S & left, const S & right, const T &target, const T &leftLabel, const T &rightLabel, const bool shifting);
