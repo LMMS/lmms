@@ -10,6 +10,8 @@ SET(MACOSX_BUNDLE_MIMETYPE_ICON         "project.icns")
 SET(MACOSX_BUNDLE_MIMETYPE_ID           "io.lmms")
 SET(MACOSX_BUNDLE_PROJECT_URL           "${PROJECT_URL}")
 
+FILE(COPY icon.icns DESTINATION .)
+FILE(COPY project.icns DESTINATION .)
 CONFIGURE_FILE("lmms.plist.in"          "${CMAKE_BINARY_DIR}/Info.plist")
 CONFIGURE_FILE("install_apple.sh.in"    "${CMAKE_BINARY_DIR}/install_apple.sh" @ONLY)
 CONFIGURE_FILE("package_apple.json.in"  "${CMAKE_BINARY_DIR}/package_apple.json" @ONLY)
@@ -20,11 +22,10 @@ FILE(REMOVE "${DMG_FILE}")
 ADD_CUSTOM_TARGET(removedmg
 	COMMAND touch "\"${DMG_FILE}\"" && rm "\"${DMG_FILE}\""
 	COMMENT "Removing old DMG")
-ADD_CUSTOM_TARGET(dmg 
+ADD_CUSTOM_TARGET(dmg
 	COMMAND appdmg "\"${CMAKE_BINARY_DIR}/package_apple.json\"" "\"${DMG_FILE}\""
 	DEPENDS "${CMAKE_BINARY_DIR}/package_apple.json"
 	COMMENT "Generating DMG")
 ADD_DEPENDENCIES(dmg removedmg)
 
 # see also ../postinstall/CMakeLists.txt
-

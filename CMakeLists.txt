@@ -611,11 +611,11 @@ ENDIF()
 include(CompileCache)
 
 # make sub-directories
+ADD_SUBDIRECTORY(data)
 ADD_SUBDIRECTORY(cmake)
 ADD_SUBDIRECTORY(src)
 ADD_SUBDIRECTORY(plugins)
 ADD_SUBDIRECTORY(tests)
-ADD_SUBDIRECTORY(data)
 ADD_SUBDIRECTORY(doc)
 
 # install tasks
