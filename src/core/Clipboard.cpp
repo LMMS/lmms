@@ -57,6 +57,14 @@ void Clipboard::copyString( const QString & str, MimeType mT )
 
 
 
+QString Clipboard::getString( MimeType mT )
+{
+	return QString( getMimeData()->data( mimeType( mT ) ) );
+}
+
+
+
+
 void Clipboard::copyStringPair( const QString & key, const QString & value )
 {
 	QString finalString = key + ":" + value;

@@ -190,20 +190,19 @@ bool TrackContentObject::comparePosition(const TrackContentObject *a, const Trac
  */
 void TrackContentObject::copyStateTo( TrackContentObject *src, TrackContentObject *dst )
 {
-	QDomDocument doc;
-	QDomElement parent = doc.createElement( "StateCopy" );
-	src->saveState( doc, parent );
-
 	// If the node names match we copy the state
-	if( src->nodeName() == dst->nodeName() )
-	{
+	if( src->nodeName() == dst->nodeName() ){
+		QDomDocument doc;
+		QDomElement parent = doc.createElement( "StateCopy" );
+		src->saveState( doc, parent );
+
 		const MidiTime pos = dst->startPosition();
 		dst->restoreState( parent.firstChild().toElement() );
 		dst->movePosition( pos );
-	}
 
-	AutomationPattern::resolveAllIDs();
-	GuiApplication::instance()->automationEditor()->m_editor->updateAfterPatternChange();
+		AutomationPattern::resolveAllIDs();
+		GuiApplication::instance()->automationEditor()->m_editor->updateAfterPatternChange();
+	}
 }
 
 
@@ -1231,7 +1230,6 @@ void TrackContentObjectView::cut( QVector<TrackContentObjectView *> tcovs )
 	copy( tcovs );
 
 	// Now that the TCOs are copied we can delete them, since we are cutting
-	// TODO: Is it safe to call tcov->remove(); on the current TCOV instance?
 	remove( tcovs );
 }
 
@@ -1242,7 +1240,7 @@ void TrackContentObjectView::paste()
 
 	TrackContentWidget *tcw = getTrackView()->getTrackContentWidget();
 
-	if( tcw->pasteSelection( tcoPos, Clipboard::getMimeData() ) == true )
+	if( tcw->pasteSelection( tcoPos, Clipboard::getMimeData() ) )
 	{
 		// If we succeed on the paste we delete the TCO we pasted on
 		remove();

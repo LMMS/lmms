@@ -44,6 +44,7 @@ public:
 
 	// Helper methods for String data
 	static void copyString( const QString & str, MimeType mT );
+	static QString getString( MimeType mT );
 
 	// Helper methods for String Pair data
 	static void copyStringPair( const QString & key, const QString & value );
@@ -55,11 +56,11 @@ public:
 		switch( type )
 		{
 			case Clipboard::StringPair:
-				return( "application/x-lmms-stringpair" );
+				return "application/x-lmms-stringpair";
 			break;
 			case Clipboard::Default:
 			default:
-				return( "application/x-lmms-clipboard" );
+				return "application/x-lmms-clipboard";
 				break;
 		}
 	}
