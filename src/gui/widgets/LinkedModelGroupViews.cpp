@@ -42,6 +42,11 @@ LinkedModelGroupView::LinkedModelGroupView(QWidget* parent,
 	m_colNum(colNum),
 	m_layout(new ControlLayout(this))
 {
+	// This is required to remove the focus of the line edit
+	// when e.g. another spin box is being clicked.
+	// Removing the focus is wanted because in many cases, the user wants to
+	// quickly play notes on the virtual keyboard.
+	setFocusPolicy( Qt::StrongFocus );
 }
 
 
@@ -139,6 +144,14 @@ void LinkedModelGroupView::removeControl(const QString& key)
 		// repaint immediately, so we don't have dangling model views
 		m_layout->update();
 	}
+}
+
+
+
+
+void LinkedModelGroupView::removeFocusFromSearchBar()
+{
+	m_layout->removeFocusFromSearchBar();
 }
 
 

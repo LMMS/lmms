@@ -61,7 +61,7 @@ public:
 
 	inline static QString name()
 	{
-		return QT_TRANSLATE_NOOP( "setupWidget", "soundio" );
+		return QT_TRANSLATE_NOOP( "AudioDeviceSetupWidget", "soundio" );
 	}
 
 	class setupWidget : public AudioDeviceSetupWidget

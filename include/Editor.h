@@ -28,6 +28,12 @@
 #include <QMainWindow>
 #include <QToolBar>
 
+static const int Quantizations[] = {
+	1, 2, 4, 8, 16, 32, 64,
+	3, 6, 12, 24, 48, 96, 192
+};
+
+
 class QAction;
 
 class DropToolBar;
@@ -58,6 +64,11 @@ protected slots:
 private slots:
 	/// Called by pressing the space key. Plays or stops.
 	void togglePlayStop();
+	
+	/// Called by pressing shift+space. Toggles pause state.
+	void togglePause();
+
+	void toggleMaximize();
 
 signals:
 

@@ -64,7 +64,7 @@ Plugin::Descriptor PLUGIN_EXPORT midiimport_plugin_descriptor =
 {
 	STRINGIFY( PLUGIN_NAME ),
 	"MIDI Import",
-	QT_TRANSLATE_NOOP( "pluginBrowser",
+	QT_TRANSLATE_NOOP( "PluginBrowser",
 				"Filter for importing MIDI-files into LMMS" ),
 	"Tobias Doerffel <tobydox/at/users/dot/sf/dot/net>",
 	0x0100,
@@ -217,8 +217,7 @@ public:
 		p( NULL ),
 		it_inst( NULL ),
 		isSF2( false ),
-		hasNotes( false ),
-		lastEnd( 0 )
+		hasNotes( false )
 	{ }
 	
 	InstrumentTrack * it;
@@ -226,7 +225,6 @@ public:
 	Instrument * it_inst;
 	bool isSF2; 
 	bool hasNotes;
-	MidiTime lastEnd;
 	QString trackName;
 	
 	smfMidiChannel * create( TrackContainer* tc, QString tn )
@@ -257,9 +255,11 @@ public:
 			if( trackName != "") {
 				it->setName( tn );
 			}
-			lastEnd = 0;
 			// General MIDI default
 			it->pitchRangeModel()->setInitValue( 2 );
+
+			// Create a default pattern
+			p = dynamic_cast<Pattern*>(it->createTCO(0));
 		}
 		return this;
 	}
@@ -267,16 +267,37 @@ public:
 
 	void addNote( Note & n )
 	{
-		if( !p || n.pos() > lastEnd + DefaultTicksPerBar )
+		if (!p)
 		{
-			MidiTime pPos = MidiTime( n.pos().getBar(), 0 );
-			p = dynamic_cast<Pattern*>( it->createTCO( 0 ) );
-			p->movePosition( pPos );
+			p = dynamic_cast<Pattern*>(it->createTCO(0));
 		}
+		p->addNote(n, false);
 		hasNotes = true;
-		lastEnd = n.pos() + n.length();
-		n.setPos( n.pos( p->startPosition() ) );
-		p->addNote( n, false );
+	}
+
+	void splitPatterns()
+	{
+		Pattern * newPattern = nullptr;
+		MidiTime lastEnd(0);
+
+		p->rearrangeAllNotes();
+		for (auto n : p->notes())
+		{
+			if (!newPattern || n->pos() > lastEnd + DefaultTicksPerBar)
+			{
+				MidiTime pPos = MidiTime(n->pos().getBar(), 0);
+				newPattern = dynamic_cast<Pattern*>(it->createTCO(0));
+				newPattern->movePosition(pPos);
+			}
+			lastEnd = n->pos() + n->length();
+
+			Note newNote(*n);
+			newNote.setPos(n->pos(newPattern->startPosition()));
+			newPattern->addNote(newNote, false);
+		}
+
+		delete p;
+		p = nullptr;
 	}
 
 };
@@ -539,7 +560,11 @@ bool MidiImport::readSMF( TrackContainer* tc )
 	
 	for( int c=0; c < 256; ++c )
 	{
-		if( !chs[c].hasNotes && chs[c].it )
+		if (chs[c].hasNotes)
+		{
+			chs[c].splitPatterns();
+		}
+		else if (chs[c].it)
 		{
 			printf(" Should remove empty track\n");
 			// must delete trackView first - but where is it?

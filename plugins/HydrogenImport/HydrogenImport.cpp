@@ -29,7 +29,7 @@ Plugin::Descriptor PLUGIN_EXPORT hydrogenimport_plugin_descriptor =
 {
 	STRINGIFY( PLUGIN_NAME ),
 	"Hydrogen Import",
-	QT_TRANSLATE_NOOP( "pluginBrowser",
+	QT_TRANSLATE_NOOP( "PluginBrowser",
 				"Filter for importing Hydrogen files into LMMS" ),
 	"frank mather",
 	0x0100,
@@ -202,13 +202,19 @@ bool HydrogenImport::readSong()
 			else 
 			{
 				unsigned nLayer = 0;
-				QDomNode layerNode = instrumentNode.firstChildElement( "layer" );
+				QDomNode instrumentComponentNode = instrumentNode.firstChildElement("instrumentComponent");
+				if (instrumentComponentNode.isNull())
+				{
+					instrumentComponentNode = instrumentNode;
+				}
+
+				QDomNode layerNode = instrumentComponentNode.firstChildElement( "layer" );
 				while (  ! layerNode.isNull()  ) 
 				{
 					if ( nLayer >= MAX_LAYERS ) 
 					{
-						printf( "nLayer >= MAX_LAYERS" );
-						continue;
+						printf("nLayer >= MAX_LAYERS\n");
+						break;
 					}
 					QString sFilename = LocalFileMng::readXmlString( layerNode, "filename", "" );
 					QString sMode = LocalFileMng::readXmlString( layerNode, "smode", "forward" );

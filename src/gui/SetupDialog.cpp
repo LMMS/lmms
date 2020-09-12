@@ -31,12 +31,14 @@
 #include <QMessageBox>
 #include <QScrollArea>
 
+#include "AudioDeviceSetupWidget.h"
 #include "debug.h"
 #include "embed.h"
 #include "Engine.h"
 #include "FileDialog.h"
 #include "gui_templates.h"
 #include "MainWindow.h"
+#include "MidiSetupWidget.h"
 #include "Mixer.h"
 #include "ProjectJournal.h"
 #include "SetupDialog.h"
@@ -100,6 +102,10 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 			"ui", "compacttrackbuttons").toInt()),
 	m_oneInstrumentTrackWindow(ConfigManager::inst()->value(
 			"ui", "oneinstrumenttrackwindow").toInt()),
+	m_sideBarOnRight(ConfigManager::inst()->value(
+			"ui", "sidebaronright").toInt()),
+	m_soloLegacyBehavior(ConfigManager::inst()->value(
+			"app", "sololegacybehavior", "0").toInt()),
 	m_MMPZ(!ConfigManager::inst()->value(
 			"app", "nommpz").toInt()),
 	m_disableBackup(!ConfigManager::inst()->value(
@@ -192,14 +198,14 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 
 
 	auto addLedCheckBox = [&XDelta, &YDelta, this](
-		const char* ledText,
+		const QString &ledText,
 		TabWidget* tw,
 		int& counter,
 		bool initialState,
 		const char* toggledSlot,
 		bool showRestartWarning
 	){
-		LedCheckBox * checkBox = new LedCheckBox(tr(ledText), tw);
+		LedCheckBox * checkBox = new LedCheckBox(ledText, tw);
 		counter++;
 		checkBox->move(XDelta, YDelta * counter);
 		checkBox->setChecked(initialState);
@@ -218,18 +224,22 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 			tr("Graphical user interface (GUI)"), general_w);
 
 
-	addLedCheckBox("Display volume as dBFS ", gui_tw, counter,
+	addLedCheckBox(tr("Display volume as dBFS "), gui_tw, counter,
 		m_displaydBFS, SLOT(toggleDisplaydBFS(bool)), true);
-	addLedCheckBox("Enable tooltips", gui_tw, counter,
+	addLedCheckBox(tr("Enable tooltips"), gui_tw, counter,
 		m_tooltips, SLOT(toggleTooltips(bool)), true);
-	addLedCheckBox("Enable master oscilloscope by default", gui_tw, counter,
+	addLedCheckBox(tr("Enable master oscilloscope by default"), gui_tw, counter,
 		m_displayWaveform, SLOT(toggleDisplayWaveform(bool)), true);
-	addLedCheckBox("Enable all note labels in piano roll", gui_tw, counter,
+	addLedCheckBox(tr("Enable all note labels in piano roll"), gui_tw, counter,
 		m_printNoteLabels, SLOT(toggleNoteLabels(bool)), false);
-	addLedCheckBox("Enable compact track buttons", gui_tw, counter,
+	addLedCheckBox(tr("Enable compact track buttons"), gui_tw, counter,
 		m_compactTrackButtons, SLOT(toggleCompactTrackButtons(bool)), true);
-	addLedCheckBox("Enable one instrument-track-window mode", gui_tw, counter,
+	addLedCheckBox(tr("Enable one instrument-track-window mode"), gui_tw, counter,
 		m_oneInstrumentTrackWindow, SLOT(toggleOneInstrumentTrackWindow(bool)), true);
+	addLedCheckBox(tr("Show sidebar on the right-hand side"), gui_tw, counter,
+		m_sideBarOnRight, SLOT(toggleSideBarOnRight(bool)), true);
+	addLedCheckBox(tr("Mute automation tracks during solo"), gui_tw, counter,
+		m_soloLegacyBehavior, SLOT(toggleSoloLegacyBehavior(bool)), false);
 
 	gui_tw->setFixedHeight(YDelta + YDelta * counter);
 
@@ -241,11 +251,11 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 			tr("Projects"), general_w);
 
 
-	addLedCheckBox("Compress project files by default", projects_tw, counter,
+	addLedCheckBox(tr("Compress project files by default"), projects_tw, counter,
 		m_MMPZ, SLOT(toggleMMPZ(bool)), true);
-	addLedCheckBox("Create a backup file when saving a project", projects_tw, counter,
+	addLedCheckBox(tr("Create a backup file when saving a project"), projects_tw, counter,
 		m_disableBackup, SLOT(toggleDisableBackup(bool)), false);
-	addLedCheckBox("Reopen last project on startup", projects_tw, counter,
+	addLedCheckBox(tr("Reopen last project on startup"), projects_tw, counter,
 		m_openLastProject, SLOT(toggleOpenLastProject(bool)), false);
 
 	projects_tw->setFixedHeight(YDelta + YDelta * counter);
@@ -365,9 +375,9 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	TabWidget * ui_fx_tw = new TabWidget(
 			tr("User interface (UI) effects vs. performance"), performance_w);
 
-	addLedCheckBox("Smooth scroll in song editor", ui_fx_tw, counter,
+	addLedCheckBox(tr("Smooth scroll in song editor"), ui_fx_tw, counter,
 		m_smoothScroll, SLOT(toggleSmoothScroll(bool)), false);
-	addLedCheckBox("Display playback cursor in AudioFileProcessor", ui_fx_tw, counter,
+	addLedCheckBox(tr("Display playback cursor in AudioFileProcessor"), ui_fx_tw, counter,
 		m_animateAFP, SLOT(toggleAnimateAFP(bool)), false);
 
 	ui_fx_tw->setFixedHeight(YDelta + YDelta * counter);
@@ -386,7 +396,7 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	m_vstEmbedComboBox = new QComboBox(plugins_tw);
 	m_vstEmbedComboBox->move(XDelta, YDelta * ++counter);
 
-	QStringList embedMethods = ConfigManager::availabeVstEmbedMethods();
+	QStringList embedMethods = ConfigManager::availableVstEmbedMethods();
 	m_vstEmbedComboBox->addItem(tr("No embedding"), "none");
 	if(embedMethods.contains("qt"))
 	{
@@ -414,10 +424,10 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	connect(m_vstAlwaysOnTopCheckBox, SIGNAL(toggled(bool)),
 			this, SLOT(toggleVSTAlwaysOnTop(bool)));
 
-	addLedCheckBox("Sync VST plugins to host playback", plugins_tw, counter,
+	addLedCheckBox(tr("Sync VST plugins to host playback"), plugins_tw, counter,
 		m_syncVSTPlugins, SLOT(toggleSyncVSTPlugins(bool)), false);
 
-	addLedCheckBox("Keep effects running even without input", plugins_tw, counter,
+	addLedCheckBox(tr("Keep effects running even without input"), plugins_tw, counter,
 		m_disableAutoQuit, SLOT(toggleDisableAutoQuit(bool)), false);
 
 	plugins_tw->setFixedHeight(YDelta + YDelta * counter);
@@ -504,7 +514,7 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 		it != m_audioIfaceSetupWidgets.end(); ++it)
 	{
 		m_audioIfaceNames[
-			tr(it.key().toLatin1())] = it.key();
+			AudioDeviceSetupWidget::tr(it.key().toUtf8())] = it.key();
 	}
 	for(trMap::iterator it = m_audioIfaceNames.begin();
 		it != m_audioIfaceNames.end(); ++it)
@@ -650,7 +660,7 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 		it != m_midiIfaceSetupWidgets.end(); ++it)
 	{
 		m_midiIfaceNames[
-			tr(it.key().toLatin1())] = it.key();
+			MidiSetupWidget::tr(it.key().toUtf8())] = it.key();
 	}
 	for(trMap::iterator it = m_midiIfaceNames.begin();
 		it != m_midiIfaceNames.end(); ++it)
@@ -674,9 +684,32 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 			this, SLOT(midiInterfaceChanged(const QString &)));
 
 
+	// MIDI autoassign tab.
+	TabWidget * midiAutoAssign_tw = new TabWidget(
+			tr("Automatically assign MIDI controller to selected track"), midi_w);
+	midiAutoAssign_tw->setFixedHeight(56);
+
+	m_assignableMidiDevices = new QComboBox(midiAutoAssign_tw);
+	m_assignableMidiDevices->setGeometry(10, 20, 240, 28);
+	m_assignableMidiDevices->addItem("none");
+	if ( !Engine::mixer()->midiClient()->isRaw() )
+	{
+		m_assignableMidiDevices->addItems(Engine::mixer()->midiClient()->readablePorts());
+	}
+	else
+	{
+		m_assignableMidiDevices->addItem("all");
+	}
+	int current = m_assignableMidiDevices->findText(ConfigManager::inst()->value("midi", "midiautoassign"));
+	if (current >= 0)
+	{
+		m_assignableMidiDevices->setCurrentIndex(current);
+	}
+
 	// MIDI layout ordering.
 	midi_layout->addWidget(midiiface_tw);
 	midi_layout->addWidget(ms_w);
+	midi_layout->addWidget(midiAutoAssign_tw);
 	midi_layout->addStretch();
 
 
@@ -706,14 +739,14 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	QVBoxLayout * pathSelectorsLayout = new QVBoxLayout;
 	pathSelectorsLayout->setSpacing(10);
 
-	auto addPathEntry = [&](const char* caption,
+	auto addPathEntry = [&](const QString &caption,
 		const QString& content,
 		const char* setSlot,
 		const char* openSlot,
 		QLineEdit*& lineEdit,
 		const char* pixmap = "project_open")
 	{
-		TabWidget * newTw = new TabWidget(tr(caption),
+		TabWidget * newTw = new TabWidget(caption,
 					pathSelectors);
 		newTw->setFixedHeight(48);
 
@@ -733,15 +766,15 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 		pathSelectorsLayout->addSpacing(10);
 	};
 
-	addPathEntry("LMMS working directory", m_workingDir,
+	addPathEntry(tr("LMMS working directory"), m_workingDir,
 		SLOT(setWorkingDir(const QString &)),
 		SLOT(openWorkingDir()),
 		m_workingDirLineEdit);
-	addPathEntry("VST plugins directory", m_vstDir,
+	addPathEntry(tr("VST plugins directory"), m_vstDir,
 		SLOT(setVSTDir(const QString &)),
 		SLOT(openVSTDir()),
 		m_vstDirLineEdit);
-	addPathEntry("LADSPA plugins directories", m_ladspaDir,
+	addPathEntry(tr("LADSPA plugins directories"), m_ladspaDir,
 		SLOT(setLADSPADir(const QString &)),
 		SLOT(openLADSPADir()),
 		m_ladspaDirLineEdit, "add_folder");
@@ -749,25 +782,25 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 		SLOT(setSPADir(const QString &)),
 		SLOT(openSPADir()),
 		m_spaLineEdit, "add_folder");
-	addPathEntry("SF2 directory", m_sf2Dir,
+	addPathEntry(tr("SF2 directory"), m_sf2Dir,
 		SLOT(setSF2Dir(const QString &)),
 		SLOT(openSF2Dir()),
 		m_sf2DirLineEdit);
 #ifdef LMMS_HAVE_FLUIDSYNTH
-	addPathEntry("Default SF2", m_sf2File,
+	addPathEntry(tr("Default SF2"), m_sf2File,
 		SLOT(setSF2File(const QString &)),
 		SLOT(openSF2File()),
 		m_sf2FileLineEdit);
 #endif
-	addPathEntry("GIG directory", m_gigDir,
+	addPathEntry(tr("GIG directory"), m_gigDir,
 		SLOT(setGIGDir(const QString &)),
 		SLOT(openGIGDir()),
 		m_gigDirLineEdit);
-	addPathEntry("Theme directory", m_themeDir,
+	addPathEntry(tr("Theme directory"), m_themeDir,
 		SLOT(setThemeDir(const QString &)),
 		SLOT(openThemeDir()),
 		m_themeDirLineEdit);
-	addPathEntry("Background artwork", m_backgroundPicFile,
+	addPathEntry(tr("Background artwork"), m_backgroundPicFile,
 		SLOT(setBackgroundPicFile(const QString &)),
 		SLOT(openBackgroundPicFile()),
 		m_backgroundPicFileLineEdit);
@@ -881,6 +914,10 @@ void SetupDialog::accept()
 					QString::number(m_compactTrackButtons));
 	ConfigManager::inst()->setValue("ui", "oneinstrumenttrackwindow",
 					QString::number(m_oneInstrumentTrackWindow));
+	ConfigManager::inst()->setValue("ui", "sidebaronright",
+					QString::number(m_sideBarOnRight));
+	ConfigManager::inst()->setValue("app", "sololegacybehavior",
+					QString::number(m_soloLegacyBehavior));
 	ConfigManager::inst()->setValue("app", "nommpz",
 					QString::number(!m_MMPZ));
 	ConfigManager::inst()->setValue("app", "disablebackup",
@@ -916,6 +953,8 @@ void SetupDialog::accept()
 					QString::number(m_bufferSize));
 	ConfigManager::inst()->setValue("mixer", "mididev",
 					m_midiIfaceNames[m_midiInterfaces->currentText()]);
+	ConfigManager::inst()->setValue("midi", "midiautoassign",
+					m_assignableMidiDevices->currentText());
 
 
 	ConfigManager::inst()->setWorkingDir(QDir::fromNativeSeparators(m_workingDir));
@@ -986,6 +1025,12 @@ void SetupDialog::toggleOneInstrumentTrackWindow(bool enabled)
 }
 
 
+void SetupDialog::toggleSideBarOnRight(bool enabled)
+{
+	m_sideBarOnRight = enabled;
+}
+
+
 void SetupDialog::toggleMMPZ(bool enabled)
 {
 	m_MMPZ = enabled;
@@ -1010,6 +1055,10 @@ void SetupDialog::setLanguage(int lang)
 }
 
 
+void SetupDialog::toggleSoloLegacyBehavior(bool enabled)
+{
+	m_soloLegacyBehavior = enabled;
+}
 
 
 // Performance settings slots.

@@ -51,6 +51,8 @@ ComboBox::ComboBox( QWidget * _parent, const QString & _name ) :
 	m_menu( this ),
 	m_pressed( false )
 {
+	setFixedHeight( ComboBox::DEFAULT_HEIGHT );
+
 	if( s_background == NULL )
 	{
 		s_background = new QPixmap( embed::getIconPixmap( "combobox_bg" ) );

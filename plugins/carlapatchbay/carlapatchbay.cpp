@@ -25,6 +25,7 @@
 #include "carla.h"
 
 #include "embed.h"
+#include "plugin_export.h"
 #include "InstrumentTrack.h"
 
 extern "C"
@@ -34,7 +35,7 @@ Plugin::Descriptor PLUGIN_EXPORT carlapatchbay_plugin_descriptor =
 {
     STRINGIFY( PLUGIN_NAME ),
     "Carla Patchbay",
-    QT_TRANSLATE_NOOP( "pluginBrowser",
+    QT_TRANSLATE_NOOP( "PluginBrowser",
                        "Carla Patchbay Instrument" ),
     "falkTX <falktx/at/falktx.com>",
     CARLA_VERSION_HEX,

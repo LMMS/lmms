@@ -357,7 +357,7 @@ const surroundSampleFrame * Mixer::renderNextBuffer()
 					 currentPlayMode == Song::Mode_PlayBB;
 
 	if( playModeSupportsMetronome && m_metronomeActive && !song->isExporting() &&
-		p != last_metro_pos &&
+		!song->isPaused() && p != last_metro_pos &&
 			// Stop crash with metronome if empty project
 				Engine::getSong()->countTracks() )
 	{
@@ -1207,8 +1207,18 @@ MidiClient * Mixer::tryMidiClients()
     printf( "midi apple didn't work: client_name=%s\n", client_name.toUtf8().constData());
 #endif
 
-	printf( "Couldn't create MIDI-client, neither with ALSA nor with "
-		"OSS. Will use dummy-MIDI-client.\n" );
+	if(client_name != MidiDummy::name())
+	{
+		if (client_name.isEmpty())
+		{
+			printf("Unknown MIDI-client. ");
+		}
+		else
+		{
+			printf("Couldn't create %s MIDI-client. ", client_name.toUtf8().constData());
+		}
+		printf("Will use dummy-MIDI-client.\n");
+	}
 
 	m_midiClientName = MidiDummy::name();
 

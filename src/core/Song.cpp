@@ -69,6 +69,7 @@ Song::Song() :
 	m_oldTicksPerBar( DefaultTicksPerBar ),
 	m_masterVolumeModel( 100, 0, 200, this, tr( "Master volume" ) ),
 	m_masterPitchModel( 0, -12, 12, this, tr( "Master pitch" ) ),
+	m_nLoadingTrack( 0 ),
 	m_fileName(),
 	m_oldFileName(),
 	m_modified( false ),
@@ -79,6 +80,7 @@ Song::Song() :
 	m_renderBetweenMarkers( false ),
 	m_playing( false ),
 	m_paused( false ),
+	m_savingProject( false ),
 	m_loadingProject( false ),
 	m_isCancelled( false ),
 	m_playMode( Mode_None ),
@@ -610,16 +612,14 @@ void Song::updateLength()
 {
 	m_length = 0;
 	m_tracksMutex.lockForRead();
-	for( TrackList::const_iterator it = tracks().begin();
-						it != tracks().end(); ++it )
+	for (auto track : tracks())
 	{
-		if( Engine::getSong()->isExporting() &&
-				( *it )->isMuted() )
+		if (m_exporting && track->isMuted())
 		{
 			continue;
 		}
 
-		const bar_t cur = ( *it )->length();
+		const bar_t cur = track->length();
 		if( cur > m_length )
 		{
 			m_length = cur;
@@ -742,6 +742,10 @@ void Song::stop()
 void Song::startExport()
 {
 	stop();
+
+	m_exporting = true;
+	updateLength();
+
 	if (m_renderBetweenMarkers)
 	{
 		m_exportSongBegin = m_exportLoopBegin = m_playPos[Mode_PlaySong].m_timeLine->loopBegin();
@@ -763,12 +767,16 @@ void Song::startExport()
 			m_exportSongEnd += MidiTime(1,0);
         
 		m_exportSongBegin = MidiTime(0,0);
-		m_exportLoopBegin = m_playPos[Mode_PlaySong].m_timeLine->loopBegin() < m_exportSongEnd && 
-			m_playPos[Mode_PlaySong].m_timeLine->loopEnd() <= m_exportSongEnd ?
-			m_playPos[Mode_PlaySong].m_timeLine->loopBegin() : MidiTime(0,0);
-		m_exportLoopEnd = m_playPos[Mode_PlaySong].m_timeLine->loopBegin() < m_exportSongEnd && 
-			m_playPos[Mode_PlaySong].m_timeLine->loopEnd() <= m_exportSongEnd ?
-			m_playPos[Mode_PlaySong].m_timeLine->loopEnd() : MidiTime(0,0);
+		// FIXME: remove this check once we load timeline in headless mode
+		if (m_playPos[Mode_PlaySong].m_timeLine)
+		{
+			m_exportLoopBegin = m_playPos[Mode_PlaySong].m_timeLine->loopBegin() < m_exportSongEnd &&
+				m_playPos[Mode_PlaySong].m_timeLine->loopEnd() <= m_exportSongEnd ?
+				m_playPos[Mode_PlaySong].m_timeLine->loopBegin() : MidiTime(0,0);
+			m_exportLoopEnd = m_playPos[Mode_PlaySong].m_timeLine->loopBegin() < m_exportSongEnd &&
+				m_playPos[Mode_PlaySong].m_timeLine->loopEnd() <= m_exportSongEnd ?
+				m_playPos[Mode_PlaySong].m_timeLine->loopEnd() : MidiTime(0,0);
+		}
 
 		m_playPos[Mode_PlaySong].setTicks( 0 );
 	}
@@ -778,8 +786,6 @@ void Song::startExport()
 	m_loopRenderRemaining = m_loopRenderCount;
 
 	playSong();
-
-	m_exporting = true;
 
 	m_vstSyncController.setPlaybackState( true );
 }
@@ -791,7 +797,6 @@ void Song::stopExport()
 {
 	stop();
 	m_exporting = false;
-	m_exportLoop = false;
 
 	m_vstSyncController.setPlaybackState( m_playing );
 }
@@ -1420,21 +1425,34 @@ void Song::clearErrors()
 
 void Song::collectError( const QString error )
 {
-	m_errors.append( error );
+	if (!m_errors.contains(error)) { m_errors[error] = 1; }
+	else { m_errors[ error ]++; }
 }
 
 
 
 bool Song::hasErrors()
 {
-	return ( m_errors.length() > 0 );
+	return !(m_errors.isEmpty());
 }
 
 
 
 QString Song::errorSummary()
 {
-	QString errors = m_errors.join("\n") + '\n';
+	QString errors;
+
+	auto i = m_errors.constBegin();
+	while (i != m_errors.constEnd())
+	{
+		errors.append( i.key() );
+		if( i.value() > 1 )
+		{
+			errors.append( tr(" (repeated %1 times)").arg( i.value() ) );
+		}
+		errors.append("\n");
+		++i;
+	}
 
 	errors.prepend( "\n\n" );
 	errors.prepend( tr( "The following errors occurred while loading: " ) );

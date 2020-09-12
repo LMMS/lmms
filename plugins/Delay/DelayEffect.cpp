@@ -35,7 +35,7 @@ Plugin::Descriptor PLUGIN_EXPORT delay_plugin_descriptor =
 {
 	STRINGIFY( PLUGIN_NAME ),
 	"Delay",
-	QT_TRANSLATE_NOOP( "pluginBrowser", "A native delay plugin" ),
+	QT_TRANSLATE_NOOP( "PluginBrowser", "A native delay plugin" ),
 	"Dave French <contact/dot/dave/dot/french3/at/googlemail/dot/com>",
 	0x0100,
 	Plugin::Effect,

@@ -50,7 +50,7 @@ const QString LADSPA_PATH ="plugins/ladspa/";
 const QString DEFAULT_THEME_PATH = "themes/default/";
 const QString TRACK_ICON_PATH = "track_icons/";
 const QString LOCALE_PATH = "locale/";
-
+const QString PORTABLE_MODE_FILE = "/portable_mode.txt";
 
 class LMMS_EXPORT ConfigManager : public QObject
 {
@@ -70,6 +70,12 @@ public:
 	{
 		return m_workingDir;
 	}
+
+	void initPortableWorkingDir();
+
+	void initInstalledWorkingDir();
+
+	void initDevelopmentWorkingDir();
 
 	const QString & dataDir() const
 	{
@@ -222,7 +228,7 @@ public:
 	QString defaultVersion() const;
 
 
-	static QStringList availabeVstEmbedMethods();
+	static QStringList availableVstEmbedMethods();
 	QString vstEmbedMethod() const;
 
 	// Returns true if the working dir (e.g. ~/lmms) exists on disk.

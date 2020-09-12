@@ -1,6 +1,6 @@
 language: cpp
 compiler: gcc
-dist: trusty
+dist: xenial
 sudo: required
 cache:
     directories:
@@ -31,17 +31,3 @@ script: ${TRAVIS_BUILD_DIR}/.travis/script.sh
 after_script: ${TRAVIS_BUILD_DIR}/.travis/after_script.sh
 before_deploy:
     - if [ "$TARGET_OS" != debian-sid ]; then make package; fi
-deploy:
-    provider: releases
-    api_key:
-        secure: d4a+x4Gugpss7JK2DcHjyBZDmEFFh4iVfKDfITSD50T6Mc6At4LMgojvEu+6qT6IyOY2vm3UVT6fhyeuWDTRDwW9tfFlaHVA0h8aTRD+eAXOA7pQ8rEMwQO3+WCKuKTfEqUkpL4wxhww8dpkv54tqeIs0S4TBqz9tk8UhzU7XbE=
-    file_glob: true
-    file:
-        - lmms-${TRAVIS_TAG:1}-$TARGET_OS.exe
-        - /var/cache/pbuilder/result/lmms_*.tar.xz
-    skip_cleanup: true
-    on:
-        tags: true
-        all_branches: true
-        condition: '"$TARGET_DEPLOY" = True'
-    repo: LMMS/lmms

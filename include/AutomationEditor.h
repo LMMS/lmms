@@ -70,7 +70,7 @@ public:
 
 	inline bool validPattern() const
 	{
-		return m_pattern != nullptr;
+		return m_pattern != nullptr && m_pattern->hasAutomation();
 	}
 
 	void saveSettings(QDomDocument & doc, QDomElement & parent) override;
@@ -209,6 +209,7 @@ private:
 	float m_bottomLevel;
 	float m_topLevel;
 
+	void centerTopBottomScroll();
 	void updateTopBottomLevels();
 
 	QScrollBar * m_leftRightScroll;
@@ -240,6 +241,7 @@ private:
 
 	EditModes m_editMode;
 
+	bool m_mouseDownLeft;
 	bool m_mouseDownRight; //true if right click is being held down
 
 	TimeLineWidget * m_timeLine;
