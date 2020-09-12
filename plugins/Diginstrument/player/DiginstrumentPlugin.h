@@ -76,6 +76,9 @@ public:
 
   QtDataVisualization::QSurfaceDataArray * getInstrumentSurfaceData(float minTime, float maxTime, float minFreq, float maxFreq, int timeSamples, int freqSamples, std::vector<double> coordinates);
 
+protected:
+  std::vector<double> coordinates;
+
 private:
   friend class DiginstrumentView;
   /*TMP*/

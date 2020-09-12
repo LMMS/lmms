@@ -62,15 +62,22 @@ void DiginstrumentPlugin::playNote(NotePlayHandle *noteHandle,
 	//TMP: TODO: BAD spectrum type selection, BAD!
 	const double startTime = noteHandle->totalFramesPlayed() / (double)Engine::mixer()->processingSampleRate();
 	vector<float> audioData;
+	vector<double> coordinates = {noteHandle->frequency()};
+	coordinates.reserve(this->coordinates.size()+2);
+	for(auto c : this->coordinates)
+	{
+		coordinates.emplace_back(c);
+	}
+	coordinates.emplace_back(startTime);
 	if(inst_data.type == "discrete")
 	{
-		auto spectrum = inst.getSpectrum({noteHandle->frequency(), startTime});
+		auto spectrum = inst.getSpectrum(coordinates);
 		//TODO: maybe should pass spectrum, not the components
 		audioData = this->synth.playNote(spectrum.getComponents(0), noteHandle->framesLeftForCurrentPeriod(), noteHandle->totalFramesPlayed(), /*tmp*/ 44100);
 	}
 	else
 	{
-		auto spectrum = spline_inst.getSpectrum({noteHandle->frequency(),400/*TMP: new coord test*/, startTime});
+		auto spectrum = spline_inst.getSpectrum(coordinates);
 		audioData = this->synth.playNote(spectrum.getComponents(0), noteHandle->framesLeftForCurrentPeriod(), noteHandle->totalFramesPlayed(), /*tmp*/ 44100);
 	}
 	/*tmp: stereo*/
@@ -140,7 +147,14 @@ bool DiginstrumentPlugin::loadInstrumentFile()
 		std::vector<string> dimension_labels;
 		for(auto d : inst_data._json["dimensions"])
 		{
-			dimensions.emplace_back(d["label"],d["min"],d["max"],d["shifting"]);
+			if(!d["default"].is_null())
+			{
+				dimensions.emplace_back(d["label"],d["min"],d["max"],d["shifting"], d["default"]);
+			}
+			else
+			{
+				dimensions.emplace_back(d["label"],d["min"],d["max"],d["shifting"]);
+			}
 			dimension_labels.emplace_back(d["label"]);
 		}
 		//TODO: better spectrum type separation!

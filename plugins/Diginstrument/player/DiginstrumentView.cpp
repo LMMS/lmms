@@ -17,18 +17,27 @@ DiginstrumentView::DiginstrumentView( Instrument * _instrument, QWidget * _paren
     m_nameField->setReadOnly(true);
     m_typeField = new QLineEdit("Spectrum type", this);
     m_typeField->setReadOnly(true);
-    
+
+    QWidget * infoContainer = new QWidget;
+    infoContainer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+    QGridLayout * infoLayout = new QGridLayout;
+    infoContainer->setLayout(infoLayout);
+    infoLayout->addWidget(m_nameField, 0, 0, 1, 1);
+    infoLayout->addWidget(m_typeField, 1, 0, 1, 1);
+    infoLayout->addWidget(m_openInstrumentFileButton, 0, 1, 1, 2);
+    infoLayout->addWidget(m_openInstrumentVisualizationButton, 1, 1, 1, 2);
+
+    coordinateSliderContainer = new QWidget;
+    coordinateSliderContainer->setLayout(new QVBoxLayout);
 
     QVBoxLayout *layout = new QVBoxLayout;
-
-    layout->addWidget(m_openInstrumentFileButton);
-    layout->addWidget(m_nameField);
-    layout->addWidget(m_typeField);
-    layout->addWidget(m_openInstrumentVisualizationButton);
-
+    layout->addWidget(infoContainer);
+    layout->addWidget(coordinateSliderContainer);
     this->setLayout(layout);
 
     visualization = new Diginstrument::InstrumentVisualizationWindow(this);
+    setDimensions();
+    updateCoordinates();
 }
 
 
@@ -55,6 +64,8 @@ void DiginstrumentView::openInstrumentFile( void )
     castModel<DiginstrumentPlugin>()->setInstrumentFile( fileName );
     castModel<DiginstrumentPlugin>()->loadInstrumentFile();
 		Engine::getSong()->setModified();
+    setDimensions();
+    updateCoordinates();
 	}
 }
 
@@ -74,7 +85,7 @@ void DiginstrumentView::showInstumentVisualization()
   {
     visualization->setDimensions(castModel<DiginstrumentPlugin>()->spline_inst.getDimensions());
   }
-  updateVisualizationData(0,3000,20,22000,100,100, /*TMP*/ {400});
+  updateVisualizationData(0,3000,20,22000,100,100, /*TODO: TMP*/ {400});
   visualization->show();
   //is this even useful?
   //visualization->adjustSize();
@@ -83,4 +94,35 @@ void DiginstrumentView::showInstumentVisualization()
 void DiginstrumentView::updateVisualizationData(float minTime, float maxTime, float minFreq, float maxFreq, int timeSamples, int freqSamples, std::vector<double> coordinates)
 {
   visualization->setSurfaceData(castModel<DiginstrumentPlugin>()->getInstrumentSurfaceData(minTime/1000.0f,maxTime/1000.0f,minFreq,maxFreq,timeSamples,freqSamples, coordinates));
+}
+
+void DiginstrumentView::setDimensions()
+{
+  const auto dimensions = castModel<DiginstrumentPlugin>()->inst.getDimensions();
+  for(auto * s : coordinateSliders)
+  {
+      delete s;
+  }
+
+  for(auto & d : dimensions)
+  {
+      //TMP: bad solution to exclude time
+      if(d.name == "time" || d.name == "pitch" || d.name == "frequency" ) continue;
+      coordinateSliderContainer->layout()->addWidget(new QLabel(d.name.c_str()));
+      LabeledFieldSlider * slider = new LabeledFieldSlider(d.min, d.max, d.currentValue);
+      connect(slider, SIGNAL(valueChanged(int)), this, SLOT(updateCoordinates()));
+      coordinateSliders.push_back(slider);
+      coordinateSliderContainer->layout()->addWidget(slider);
+  }
+}
+
+void DiginstrumentView::updateCoordinates()
+{
+  auto & coordinates = castModel<DiginstrumentPlugin>()->coordinates;
+  coordinates.clear();
+  coordinates.reserve(coordinateSliders.size());
+  for(auto * slider : coordinateSliders)
+  {
+    coordinates.push_back(slider->value());
+  }
 }
