@@ -35,7 +35,7 @@ Plugin::Descriptor PLUGIN_EXPORT stereomatrix_plugin_descriptor =
 {
 	STRINGIFY( PLUGIN_NAME ),
 	"Stereo Matrix",
-	QT_TRANSLATE_NOOP( "pluginBrowser",
+	QT_TRANSLATE_NOOP( "PluginBrowser",
 				"Plugin for freely manipulating stereo output" ),
 	"Paul Giblock <drfaygo/at/gmail.com>",
 	0x0100,

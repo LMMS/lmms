@@ -72,7 +72,7 @@ Plugin::Descriptor Q_DECL_EXPORT  vestige_plugin_descriptor =
 {
 	STRINGIFY( PLUGIN_NAME ),
 	"VeSTige",
-	QT_TRANSLATE_NOOP( "pluginBrowser",
+	QT_TRANSLATE_NOOP( "PluginBrowser",
 			"VST-host for using VST(i)-plugins within LMMS" ),
 	"Tobias Doerffel <tobydox/at/users.sf.net>",
 	0x0100,
@@ -992,7 +992,7 @@ manageVestigeInstrumentView::manageVestigeInstrumentView( Instrument * _instrume
 		{
 			sprintf( paramStr, "%d", i);
 			m_vi->knobFModel[ i ] = new FloatModel( LocaleHelper::toFloat(s_dumpValues.at(2)),
-				0.0f, 1.0f, 0.01f, castModel<vestigeInstrument>(), tr( paramStr ) );
+				0.0f, 1.0f, 0.01f, castModel<vestigeInstrument>(), paramStr );
 		}
 
 		FloatModel * model = m_vi->knobFModel[i];

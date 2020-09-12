@@ -35,6 +35,7 @@ QLineEdit {
 	border: 2px inset rgba(91,101,113,128);
 	background: #49515b;
 	color: #e0e0e0;
+	selection-background-color: #202020;
 }
 
 

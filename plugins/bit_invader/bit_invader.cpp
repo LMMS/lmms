@@ -51,7 +51,7 @@ Plugin::Descriptor PLUGIN_EXPORT bitinvader_plugin_descriptor =
 {
 	STRINGIFY( PLUGIN_NAME ),
 	"BitInvader",
-	QT_TRANSLATE_NOOP( "pluginBrowser",
+	QT_TRANSLATE_NOOP( "PluginBrowser",
 				"Customizable wavetable synthesizer" ),
 	"Andreas Brandmaier <andreas/at/brandmaier/dot/de>",
 	0x0100,

@@ -4339,7 +4339,7 @@ PianoRollWindow::PianoRollWindow() :
 
 	m_zoomingComboBox = new ComboBox( m_toolBar );
 	m_zoomingComboBox->setModel( &m_editor->m_zoomingModel );
-	m_zoomingComboBox->setFixedSize( 64, 22 );
+	m_zoomingComboBox->setFixedSize( 64, ComboBox::DEFAULT_HEIGHT );
 	m_zoomingComboBox->setToolTip( tr( "Horizontal zooming") );
 
 	QLabel * zoom_y_lbl = new QLabel(m_toolBar);
@@ -4347,7 +4347,7 @@ PianoRollWindow::PianoRollWindow() :
 
 	m_zoomingYComboBox = new ComboBox(m_toolBar);
 	m_zoomingYComboBox->setModel(&m_editor->m_zoomingYModel);
-	m_zoomingYComboBox->setFixedSize(64, 22);
+	m_zoomingYComboBox->setFixedSize(64, ComboBox::DEFAULT_HEIGHT);
 	m_zoomingYComboBox->setToolTip(tr("Vertical zooming"));
 
 	// setup quantize-stuff
@@ -4356,7 +4356,7 @@ PianoRollWindow::PianoRollWindow() :
 
 	m_quantizeComboBox = new ComboBox( m_toolBar );
 	m_quantizeComboBox->setModel( &m_editor->m_quantizeModel );
-	m_quantizeComboBox->setFixedSize( 64, 22 );
+	m_quantizeComboBox->setFixedSize( 64, ComboBox::DEFAULT_HEIGHT );
 	m_quantizeComboBox->setToolTip( tr( "Quantization") );
 
 	// setup note-len-stuff
@@ -4365,7 +4365,7 @@ PianoRollWindow::PianoRollWindow() :
 
 	m_noteLenComboBox = new ComboBox( m_toolBar );
 	m_noteLenComboBox->setModel( &m_editor->m_noteLenModel );
-	m_noteLenComboBox->setFixedSize( 105, 22 );
+	m_noteLenComboBox->setFixedSize( 105, ComboBox::DEFAULT_HEIGHT );
 	m_noteLenComboBox->setToolTip( tr( "Note length") );
 
 	// setup scale-stuff
@@ -4374,7 +4374,7 @@ PianoRollWindow::PianoRollWindow() :
 
 	m_scaleComboBox = new ComboBox( m_toolBar );
 	m_scaleComboBox->setModel( &m_editor->m_scaleModel );
-	m_scaleComboBox->setFixedSize( 105, 22 );
+	m_scaleComboBox->setFixedSize( 105, ComboBox::DEFAULT_HEIGHT );
 	m_scaleComboBox->setToolTip( tr( "Scale") );
 
 	// setup chord-stuff
@@ -4383,7 +4383,7 @@ PianoRollWindow::PianoRollWindow() :
 
 	m_chordComboBox = new ComboBox( m_toolBar );
 	m_chordComboBox->setModel( &m_editor->m_chordModel );
-	m_chordComboBox->setFixedSize( 105, 22 );
+	m_chordComboBox->setFixedSize( 105, ComboBox::DEFAULT_HEIGHT );
 	m_chordComboBox->setToolTip( tr( "Chord" ) );
 
 	// -- Clear ghost pattern button

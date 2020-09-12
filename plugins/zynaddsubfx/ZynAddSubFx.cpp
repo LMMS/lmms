@@ -59,7 +59,7 @@ Plugin::Descriptor PLUGIN_EXPORT zynaddsubfx_plugin_descriptor =
 {
 	STRINGIFY( PLUGIN_NAME ),
 	"ZynAddSubFX",
-	QT_TRANSLATE_NOOP( "pluginBrowser",
+	QT_TRANSLATE_NOOP( "PluginBrowser",
 			"Embedded ZynAddSubFX" ),
 	"Tobias Doerffel <tobydox/at/users.sf.net>",
 	0x0100,

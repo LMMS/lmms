@@ -34,7 +34,7 @@ Plugin::Descriptor PLUGIN_EXPORT multitapecho_plugin_descriptor =
 {
 	STRINGIFY( PLUGIN_NAME ),
 	"Multitap Echo",
-	QT_TRANSLATE_NOOP( "pluginBrowser", "A multitap echo delay plugin" ),
+	QT_TRANSLATE_NOOP( "PluginBrowser", "A multitap echo delay plugin" ),
 	"Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>",
 	0x0100,
 	Plugin::Effect,

@@ -55,7 +55,7 @@ Plugin::Descriptor PLUGIN_EXPORT patman_plugin_descriptor =
 {
 	STRINGIFY( PLUGIN_NAME ),
 	"PatMan",
-	QT_TRANSLATE_NOOP( "pluginBrowser",
+	QT_TRANSLATE_NOOP( "PluginBrowser",
 				"GUS-compatible patch instrument" ),
 	"Javier Serrano Polo <jasp00/at/users.sourceforge.net>",
 	0x0100,
