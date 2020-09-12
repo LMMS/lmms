@@ -39,7 +39,7 @@
 
 
 // Vector with all the upgrade methods
-const std::vector<void(ConfigManager::*)()> ConfigManager::UPGRADE_METHODS = {
+const std::vector<ConfigManager::UpgradeMethod> ConfigManager::UPGRADE_METHODS = {
 	&ConfigManager::upgrade_1_1_90    ,    &ConfigManager::upgrade_1_1_91
 };
 

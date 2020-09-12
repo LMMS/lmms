@@ -50,7 +50,7 @@ static void findIds(const QDomElement& elem, QList<jo_id_t>& idList);
 
 
 // Vector with all the upgrade methods
-const std::vector<void(DataFile::*)()> DataFile::UPGRADE_METHODS = {
+const std::vector<DataFile::UpgradeMethod> DataFile::UPGRADE_METHODS = {
 	&DataFile::upgrade_0_2_1_20070501   ,   &DataFile::upgrade_0_2_1_20070508,
 	&DataFile::upgrade_0_3_0_rc2        ,   &DataFile::upgrade_0_3_0,
 	&DataFile::upgrade_0_4_0_20080104   ,   &DataFile::upgrade_0_4_0_20080118,
