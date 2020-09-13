@@ -52,7 +52,7 @@ class PluginIssue;
 
 	This class would usually be a Model subclass. However, Qt doesn't allow
 	this:
-	* inhertiting only from Model will cause diamond inheritance for QObject,
+	* inheriting only from Model will cause diamond inheritance for QObject,
 	  which will cause errors with Q_OBJECT
 	* making this a direct subclass of Instrument resp. EffectControls would
 	  require CRTP, which would make this class a template class, which would

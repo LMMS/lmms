@@ -483,6 +483,8 @@ struct ConnectPortVisitor : public Lv2Ports::Visitor
 
 ConnectPortVisitor::~ConnectPortVisitor() {}
 
+// !This function must be realtime safe!
+// use createPort to create any port before connecting
 void Lv2Proc::connectPort(std::size_t num)
 {
 	ConnectPortVisitor connect;
