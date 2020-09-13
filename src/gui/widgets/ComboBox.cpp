@@ -51,6 +51,8 @@ ComboBox::ComboBox( QWidget * _parent, const QString & _name ) :
 	m_menu( this ),
 	m_pressed( false )
 {
+	setFixedHeight( ComboBox::DEFAULT_HEIGHT );
+
 	if( s_background == NULL )
 	{
 		s_background = new QPixmap( embed::getIconPixmap( "combobox_bg" ) );
@@ -192,7 +194,7 @@ void ComboBox::paintEvent( QPaintEvent * _pe )
 	// Border
 	QStyleOptionFrame opt;
 	opt.initFrom( this );
-	opt.state = 0;
+	opt.state = QStyle::StateFlag::State_None;
 
 	style()->drawPrimitive( QStyle::PE_Frame, &opt, &p, this );
 
@@ -230,7 +232,7 @@ void ComboBox::wheelEvent( QWheelEvent* event )
 {
 	if( model() )
 	{
-		model()->setInitValue( model()->value() + ( ( event->delta() < 0 ) ? 1 : -1 ) );
+		model()->setInitValue(model()->value() + ((event->angleDelta().y() < 0) ? 1 : -1));
 		update();
 		event->accept();
 	}

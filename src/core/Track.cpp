@@ -1257,26 +1257,26 @@ void TrackContentObjectView::contextMenuEvent( QContextMenuEvent * cme )
 	{
 		contextMenu.addAction(
 			embed::getIconPixmap( "cancel" ),
-			tr( individualTCO
-				? "Delete (middle mousebutton)"
-				: "Delete selection (middle mousebutton)" ),
+			individualTCO
+				? tr("Delete (middle mousebutton)")
+				: tr("Delete selection (middle mousebutton)"),
 			[this](){ contextMenuAction( Remove ); } );
 
 		contextMenu.addSeparator();
 
 		contextMenu.addAction(
 			embed::getIconPixmap( "edit_cut" ),
-			tr( individualTCO
-				? "Cut"
-				: "Cut selection" ),
+			individualTCO
+				? tr("Cut")
+				: tr("Cut selection"),
 			[this](){ contextMenuAction( Cut ); } );
 	}
 
 	contextMenu.addAction(
 		embed::getIconPixmap( "edit_copy" ),
-		tr( individualTCO
-			? "Copy"
-			: "Copy selection" ),
+		individualTCO
+			? tr("Copy")
+			: tr("Copy selection"),
 		[this](){ contextMenuAction( Copy ); } );
 
 	contextMenu.addAction(
@@ -1288,9 +1288,9 @@ void TrackContentObjectView::contextMenuEvent( QContextMenuEvent * cme )
 
 	contextMenu.addAction(
 		embed::getIconPixmap( "muted" ),
-		tr( individualTCO
-			? "Mute/unmute (<%1> + middle click)"
-			: "Mute/unmute selection (<%1> + middle click)" ).arg(UI_CTRL_KEY),
+		(individualTCO
+			? tr("Mute/unmute (<%1> + middle click)")
+			: tr("Mute/unmute selection (<%1> + middle click)")).arg(UI_CTRL_KEY),
 		[this](){ contextMenuAction( Mute ); } );
 
 	contextMenu.addSeparator();

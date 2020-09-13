@@ -49,7 +49,7 @@ Plugin::Descriptor PLUGIN_EXPORT ladspabrowser_plugin_descriptor =
 {
 	STRINGIFY( PLUGIN_NAME ),
 	"LADSPA Plugin Browser",
-	QT_TRANSLATE_NOOP( "pluginBrowser",
+	QT_TRANSLATE_NOOP( "PluginBrowser",
 				"List installed LADSPA plugins" ),
 	"Danny McRae <khjklujn/at/users.sourceforge.net>",
 	0x0100,

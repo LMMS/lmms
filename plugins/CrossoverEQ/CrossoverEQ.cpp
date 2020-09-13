@@ -36,7 +36,7 @@ Plugin::Descriptor PLUGIN_EXPORT crossovereq_plugin_descriptor =
 {
 	STRINGIFY( PLUGIN_NAME ),
 	"Crossover Equalizer",
-	QT_TRANSLATE_NOOP( "pluginBrowser", "A 4-band Crossover Equalizer" ),
+	QT_TRANSLATE_NOOP( "PluginBrowser", "A 4-band Crossover Equalizer" ),
 	"Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>",
 	0x0100,
 	Plugin::Effect,

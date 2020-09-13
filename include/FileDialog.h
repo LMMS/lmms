@@ -46,8 +46,7 @@ public:
 									const QString &caption = QString(),
 									const QString &directory = QString(),
 									const QString &filter = QString(),
-									QString *selectedFilter = 0,
-									QFileDialog::Options options = 0);
+									QString *selectedFilter = 0);
 	void clearSelection();
 };
 
