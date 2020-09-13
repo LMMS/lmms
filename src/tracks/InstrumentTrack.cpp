@@ -415,7 +415,7 @@ void InstrumentTrack::processInEvent( const MidiEvent& event, const MidiTime& ti
 
 	// If the event wasn't handled, check if there's a loaded instrument and if so send the
 	// event to it. If it returns false means the instrument didn't handle the event, so we trigger a warning.
-	if( eventHandled == false && instrument() && instrument()->handleMidiEvent( event, time, offset ) == false )
+	if( eventHandled == false && !( instrument() && instrument()->handleMidiEvent( event, time, offset ) ) )
 	{
 		qWarning( "InstrumentTrack: unhandled MIDI event %d", event.type() );
 	}
