@@ -55,7 +55,7 @@ class LMMS_EXPORT SubWindow : public QMdiSubWindow
 	Q_PROPERTY( QColor borderColor READ borderColor WRITE setBorderColor )
 
 public:
-	SubWindow( QWidget *parent = NULL, Qt::WindowFlags windowFlags = 0 );
+	SubWindow( QWidget *parent = NULL, Qt::WindowFlags windowFlags = QFlag(0) );
 	// same as QWidet::normalGeometry, but works properly under X11 (see https://bugreports.qt.io/browse/QTBUG-256)
 	QRect getTrueNormalGeometry() const;
 	QBrush activeColor() const;

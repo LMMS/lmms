@@ -868,7 +868,7 @@ void AudioFileProcessorWaveView::mouseMoveEvent( QMouseEvent * _me )
 
 void AudioFileProcessorWaveView::wheelEvent( QWheelEvent * _we )
 {
-	zoom( _we->delta() > 0 );
+	zoom( _we->angleDelta().y() > 0 );
 	update();
 }
 
