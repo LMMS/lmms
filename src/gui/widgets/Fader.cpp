@@ -265,7 +265,7 @@ void Fader::wheelEvent ( QWheelEvent *ev )
 {
 	ev->accept();
 
-	if ( ev->delta() > 0 )
+	if (ev->angleDelta().y() > 0)
 	{
 		model()->incValue( 1 );
 	}
@@ -282,7 +282,7 @@ void Fader::wheelEvent ( QWheelEvent *ev )
 ///
 /// Set peak value (0.0 .. 1.0)
 ///
-void Fader::setPeak( float fPeak, float &targetPeak, float &persistentPeak, QTime &lastPeakTime )
+void Fader::setPeak( float fPeak, float &targetPeak, float &persistentPeak, QElapsedTimer &lastPeakTimer )
 {
 	if( fPeak <  m_fMinPeak )
 	{
@@ -299,12 +299,12 @@ void Fader::setPeak( float fPeak, float &targetPeak, float &persistentPeak, QTim
 		if( targetPeak >= persistentPeak )
 		{
 			persistentPeak = targetPeak;
-			lastPeakTime.restart();
+			lastPeakTimer.restart();
 		}
 		update();
 	}
 
-	if( persistentPeak > 0 && lastPeakTime.elapsed() > 1500 )
+	if( persistentPeak > 0 && lastPeakTimer.elapsed() > 1500 )
 	{
 		persistentPeak = qMax<float>( 0, persistentPeak-0.05 );
 		update();
@@ -315,14 +315,14 @@ void Fader::setPeak( float fPeak, float &targetPeak, float &persistentPeak, QTim
 
 void Fader::setPeak_L( float fPeak )
 {
-	setPeak( fPeak, m_fPeakValue_L, m_persistentPeak_L, m_lastPeakTime_L );
+	setPeak( fPeak, m_fPeakValue_L, m_persistentPeak_L, m_lastPeakTimer_L );
 }
 
 
 
 void Fader::setPeak_R( float fPeak )
 {
-	setPeak( fPeak, m_fPeakValue_R, m_persistentPeak_R, m_lastPeakTime_R );
+	setPeak( fPeak, m_fPeakValue_R, m_persistentPeak_R, m_lastPeakTimer_R );
 }
 
 

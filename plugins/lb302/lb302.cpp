@@ -433,8 +433,11 @@ QString lb302Synth::nodeName() const
 // OBSOLETE. Break apart once we get Q_OBJECT to work. >:[
 void lb302Synth::recalcFilter()
 {
+#if (QT_VERSION >= QT_VERSION_CHECK(5,14,0))
+	vcf.loadRelaxed()->recalc();
+#else
 	vcf.load()->recalc();
-
+#endif
 	// THIS IS OLD 3pole/24dB code, I may reintegrate it.  Don't need it
 	// right now.   Should be toggled by LB_24_RES_TRICK at the moment.
 
@@ -683,7 +686,11 @@ void lb302Synth::initNote( lb302Note *n)
 
 	if(n->dead ==0){
 		// Swap next two blocks??
+#if (QT_VERSION >= QT_VERSION_CHECK(5,14,0))
+		vcf.loadRelaxed()->playNote();
+#else
 		vcf.load()->playNote();
+#endif
 		// Ensure envelope is recalculated
 		vcf_envpos = ENVINC;
 
