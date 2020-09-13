@@ -389,7 +389,6 @@ private:
 	QColor m_mutedColor;
 	QColor m_mutedBackgroundColor;
 	QColor m_selectedColor;
-	QColor m_customSelectedColor;
 	QColor m_textColor;
 	QColor m_textBackgroundColor;
 	QColor m_textShadowColor;

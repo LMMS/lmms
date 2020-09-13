@@ -428,7 +428,7 @@ QColor TrackContentObjectView::mutedBackgroundColor() const
 { return m_mutedBackgroundColor; }
 
 QColor TrackContentObjectView::selectedColor() const
-{ return ( m_tco->usesStyleColor() ? m_selectedColor : color().darker( 200 ) ); }
+{ return m_selectedColor; }
 
 QColor TrackContentObjectView::textColor() const
 { return m_textColor; }

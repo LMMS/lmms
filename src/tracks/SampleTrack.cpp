@@ -552,9 +552,29 @@ void SampleTCOView::paintEvent( QPaintEvent * pe )
 	bool muted = m_tco->getTrack()->isMuted() || m_tco->isMuted();
 
 	// state: selected, muted, colored, normal
-	c = isSelected() ? selectedColor() : ( muted ? mutedBackgroundColor()
-		: ( ! m_tco->usesStyleColor() ? m_tco->color()
-		: painter.background().color() ) );
+	if( isSelected() )
+	{
+		c = m_tco->usesStyleColor()
+			? selectedColor()
+			: ( muted
+				? m_tco->color().darker( 300 )
+				: m_tco->color().darker( 150 ) );
+	}
+	else
+	{
+		if( muted )
+		{
+			c = m_tco->usesStyleColor()
+				? mutedBackgroundColor()
+				: m_tco->color().darker( 200 );
+		}
+		else
+		{
+			c = ! m_tco->usesStyleColor()
+				? m_tco->color()
+				: painter.background().color();
+		}
+	}
 
 	lingrad.setColorAt( 1, c.darker( 300 ) );
 	lingrad.setColorAt( 0, c );

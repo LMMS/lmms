@@ -202,9 +202,28 @@ void BBTCOView::paintEvent( QPaintEvent * )
 	bool muted = m_bbTCO->getTrack()->isMuted() || m_bbTCO->isMuted();
 	
 	// state: selected, muted, default, colored
-	c = isSelected() ? selectedColor() : ( muted ? mutedBackgroundColor() 
-		: ( m_bbTCO->usesStyleColor() ? painter.background().color() 
-		: m_bbTCO->color() ) );
+	if( isSelected() )
+	{
+		c = m_bbTCO->usesStyleColor()
+			? selectedColor()
+			: ( muted ? m_bbTCO->color().darker( 300 )
+				: m_bbTCO->color().darker( 150 ) );
+	}
+	else
+	{
+		if( muted )
+		{
+			c = m_bbTCO->usesStyleColor()
+				? mutedBackgroundColor()
+				: m_bbTCO->color().darker( 200 );
+		}
+		else
+		{
+			c = m_bbTCO->usesStyleColor()
+				? painter.background().color() 
+				: m_bbTCO->color();
+		}
+	}
 	
 	lingrad.setColorAt( 0, c.lighter( 130 ) );
 	lingrad.setColorAt( 1, c.lighter( 70 ) );
