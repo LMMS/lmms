@@ -21,7 +21,7 @@
 #ifndef STEP_RECORDER_H
 #define STEP_RECORDER_H
 
-#include <QTime>
+#include <QElapsedTimer>
 #include <QTimer>
 #include <QObject>
 #include <QKeyEvent>
@@ -130,7 +130,7 @@ class StepRecorder : public QObject
 
 		private:
 		bool m_pressed;
-		QTime releasedTimer;
+		QElapsedTimer releasedTimer;
 	} ;
 
 	QVector<StepNote*> m_curStepNotes; // contains the current recorded step notes (i.e. while user still press the notes; before they are applied to the pattern)

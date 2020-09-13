@@ -1303,7 +1303,7 @@ void SetupDialog::openGIGDir()
 {
 	QString new_dir = FileDialog::getExistingDirectory(this,
 		tr("Choose your GIG directory"), m_gigDir);
-	if(new_dir != QString::null)
+	if(!new_dir.isEmpty())
 	{
 		m_gigDirLineEdit->setText(new_dir);
 	}
@@ -1320,7 +1320,7 @@ void SetupDialog::openThemeDir()
 {
 	QString new_dir = FileDialog::getExistingDirectory(this,
 		tr("Choose your theme directory"), m_themeDir);
-	if(new_dir != QString::null)
+	if(!new_dir.isEmpty())
 	{
 		m_themeDirLineEdit->setText(new_dir);
 	}
@@ -1355,7 +1355,7 @@ void SetupDialog::openBackgroundPicFile()
 	QString new_file = FileDialog::getOpenFileName(this,
 		tr("Choose your background picture"), dir, "Picture files (" + fileTypes + ")");
 
-	if(new_file != QString::null)
+	if(!new_file.isEmpty())
 	{
 		m_backgroundPicFileLineEdit->setText(new_file);
 	}

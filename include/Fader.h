@@ -48,9 +48,10 @@
 #ifndef FADER_H
 #define FADER_H
 
-#include <QtCore/QTime>
-#include <QWidget>
+#include <QElapsedTimer>
 #include <QPixmap>
+#include <QWidget>
+
 
 #include "AutomatableModelView.h"
 
@@ -130,7 +131,7 @@ private:
 		return height() - ( ( height() - m_knob->height() ) * ( realVal / fRange ) );
 	}
 
-	void setPeak( float fPeak, float &targetPeak, float &persistentPeak, QTime &lastPeakTime );
+	void setPeak( float fPeak, float &targetPeak, float &persistentPeak, QElapsedTimer &lastPeakTimer );
 	int calculateDisplayPeak( float fPeak );
 
 	void updateTextFloat();
@@ -144,8 +145,8 @@ private:
 	float m_fMinPeak;
 	float m_fMaxPeak;
 
-	QTime m_lastPeakTime_L;
-	QTime m_lastPeakTime_R;
+	QElapsedTimer m_lastPeakTimer_L;
+	QElapsedTimer m_lastPeakTimer_R;
 
 	static QPixmap * s_back;
 	static QPixmap * s_leds;
