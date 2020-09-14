@@ -141,6 +141,31 @@ void AutomatableModelView::setModel( Model* model, bool isOldModelValid )
 
 
 
+// Unsets the current model by setting a dummy empty model. The dummy model is marked as
+// "defaultConstructed", so the next call to setModel will delete it.
+void AutomatableModelView::unsetModel()
+{
+	if( dynamic_cast<FloatModelView*>( this ) )
+	{
+		setModel( new FloatModel( 0, 0, 0, 1, NULL, QString(), true ) );
+	}
+	else if( dynamic_cast<IntModelView*>( this ) )
+	{
+		setModel( new IntModel( 0, 0, 0, NULL, QString(), true ) );
+	}
+	else if( dynamic_cast<BoolModelView*>( this ) )
+	{
+		setModel( new BoolModel( false, NULL, QString(), true ) );
+	}
+	else
+	{
+		ModelView::unsetModel();
+	}
+}
+
+
+
+
 void AutomatableModelView::mousePressEvent( QMouseEvent* event )
 {
 	if( event->button() == Qt::LeftButton && event->modifiers() & Qt::ControlModifier )

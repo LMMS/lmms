@@ -215,4 +215,8 @@ void GuiApplication::childDestroyed(QObject *obj)
 	{
 		m_controllerRackView = nullptr;
 	}
+	else if (obj == m_midiCCRackView)
+	{
+		m_midiCCRackView = nullptr;
+	}
 }

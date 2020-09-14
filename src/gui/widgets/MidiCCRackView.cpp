@@ -190,6 +190,9 @@ void MidiCCRackView::updateTracksComboBox()
 
 void MidiCCRackView::updateKnobsModels()
 {
+	// Disconnect the model views from any model first
+	unsetModels();
+
 	if( m_tracks.size() > 0 )
 	{
 		InstrumentTrack *selectedTrack = dynamic_cast<InstrumentTrack *>( m_tracks[ m_trackComboBoxModel->value() ] );
@@ -208,6 +211,16 @@ void MidiCCRackView::updateKnobsModels()
 				m_controllerKnob[i]->setModel( selectedTrack->m_midiCCModel[i] );
 			}
 		}
+	}
+}
+
+void MidiCCRackView::unsetModels()
+{
+	m_midiCCGroupBox->unsetModel();
+
+	for( int i = 0; i < MidiControllerCount; ++i )
+	{
+		m_controllerKnob[i]->unsetModel();
 	}
 }
 

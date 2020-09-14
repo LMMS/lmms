@@ -33,6 +33,7 @@ public:
 public slots:
 	void updateTracksComboBox();
 	void updateKnobsModels();
+	void unsetModels();
 
 private:
 	ComboBox *m_trackComboBox;
