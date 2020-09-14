@@ -36,6 +36,11 @@ public:
   virtual Component<T> operator[](const T frequency) const = 0;
   virtual bool empty() const = 0;
 
+  T getLabel() const
+  {
+    return label;
+  }
+
   Spectrum(const T & label) : label(label){}
 
   T label;

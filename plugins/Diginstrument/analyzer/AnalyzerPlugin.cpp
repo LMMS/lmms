@@ -53,7 +53,7 @@ QString AnalyzerPlugin::fullDisplayName() const
 std::string AnalyzerPlugin::setAudioFile(const QString &_audio_file)
 {
 	m_sampleBuffer.setAudioFile(_audio_file);
-	/*std::vector<double> sample(m_sampleBuffer.frames());
+	std::vector<double> sample(m_sampleBuffer.frames());
 	for (int i = 0; i < sample.size(); i++)
 	{
 		//tmp: left only
@@ -61,29 +61,27 @@ std::string AnalyzerPlugin::setAudioFile(const QString &_audio_file)
 	}
 	const int level =24;
 	CWT transform("morlet", 6, level);
-	transform(sample);*/
+	transform(sample);
 
-	//tmp: outputs
-	//TODO
-	std::ostringstream oss;
-	std::ofstream raw;
-	std::ofstream peaks;
-	std::ofstream spline;
+	//tmp: statistics
+	int rejected = 0;
+	int noComponents = 0;
+	int incomplete = 0;
+	int emptySplines = 0;
+	int goodBeginBadEnd = 0;
+	int badBedginGoodEnd = 0;
 
-	raw.open("raw.txt");
-	peaks.open("peaks.txt");
+	auto test = SplineSpectrum<float, 4>(PiecewiseBSpline<float, 4>(), 12);
 
-	//TMP: static label for frequency
-	const double label = 440;
-	const double transformStep = 0.001*(double)m_sampleBuffer.sampleRate();
+	std::ofstream output;
 
-	//inst = Analyzer::Interpolator<double, SplineSpectrum<double, 4>>();
-	//add empty spectrum to end
-	//inst.addSpectrum(SplineSpectrum<double, 4>((double)m_sampleBuffer.frames() / (double)m_sampleBuffer.sampleRate()), {label, (double)m_sampleBuffer.frames() / (double)m_sampleBuffer.sampleRate()});
-	//SpectrumFitter<double, 4> fitter(1.25);
+	output.open("raw.txt");
+
+	const double transformStep = 0.01*(double)m_sampleBuffer.sampleRate();
+	SpectrumFitter<double, 4> fitter(1.25);
 
 	//new loop
-	/*for (int i = 0; i<m_sampleBuffer.frames(); i+=transformStep)
+	for (int i = 0; i<m_sampleBuffer.frames(); i+=transformStep)
 	{
 		const auto momentarySpectrum = transform[i];
 		std::vector<std::vector<double>> rawSpectrum;
@@ -106,7 +104,7 @@ std::string AnalyzerPlugin::setAudioFile(const QString &_audio_file)
 			else{ rawSpectrum.emplace_back(std::vector<double>{frequency, phase, 0}); }
 
 			//tmp: raw output
-			raw<<std::fixed<<(double)i/(double)m_sampleBuffer.sampleRate()<<" "<<frequency<<" "<<mag<<std::endl;
+			//raw<<std::fixed<<(double)i/(double)m_sampleBuffer.sampleRate()<<" "<<frequency<<" "<<mag<<std::endl;
 		}
 
 		//tmp: note: no checks ,just rvalue insert
@@ -120,11 +118,10 @@ std::string AnalyzerPlugin::setAudioFile(const QString &_audio_file)
 			if(p.pointType==Extrema::Differential::CriticalPoint::PointType::maximum)
 			{
 				auto Y = Interpolation::CubicLagrange(rawSpectrum[p.index-1][0], rawSpectrum[p.index-1][2], rawSpectrum[p.index][0], rawSpectrum[p.index][2], rawSpectrum[p.index+1][0], rawSpectrum[p.index+1][2], rawSpectrum[p.index+2][0], rawSpectrum[p.index+2][2], p.x);
-				peaks<<std::fixed<<(double)i/(double)m_sampleBuffer.sampleRate()<<" "<<p.x<<" "<<Y<<std::endl;
 			}
 		}
-		const auto spline = fitter.peakValleyFit(rawSpectrum, peaksAndValleys);
-		inst.addSpectrum(
+		auto spline = fitter.peakValleyFit(rawSpectrum, peaksAndValleys);
+		/*inst.addSpectrum(
 			SplineSpectrum(
 				//spline
 				spline,
@@ -134,30 +131,23 @@ std::string AnalyzerPlugin::setAudioFile(const QString &_audio_file)
 			//coordinates: {pitch, time}
 			//tmp: fix frequency label
 			, {label, (double)i / (double)m_sampleBuffer.sampleRate()}
-		);
-	}*/
-
-	// int rejected = 0;
-	// int noComponents = 0;
-	// int incomplete = 0;
-	// int emptySplines = 0;
-	// int goodBeginBadEnd = 0;
-	// int badBedginGoodEnd = 0;
-	// 	//only add "valid" splines
-	// 	if (spline.getPieces().size() > 0 /*&& spline.getBegin() <= 12 && spline.getEnd() > 21000*/)
-	// 	{
-	// 		inst.addSpectrum(SplineSpectrum(std::move(spline), (double)i/(double)m_sampleBuffer.sampleRate()), {label, (double)i / (double)m_sampleBuffer.sampleRate()});
-	// 	}
-	// 	else
-	// 	{
-	// 		if(spline.getPeaks().size()==0 && spline.getEnd()>0) {noComponents++;}
-	// 		if(spline.getPieces().size()==0) {emptySplines++;}
-	// 		if((spline.getBegin() > 12 && spline.getBegin()>0) || (spline.getEnd() < 21000 && spline.getEnd()>0)) {incomplete++;}
-	// 		if(spline.getBegin()<12 && spline.getEnd()<21000 && spline.getBegin()>0 && spline.getEnd()>0) { goodBeginBadEnd++; }
-	// 		if(spline.getBegin()>12 && spline.getEnd()>21000 && spline.getBegin()>0 && spline.getEnd()>0) { badBedginGoodEnd++; }
-	// 		rejected++;
-	// 	}
-	// }
+		);*/
+		//only add "valid" splines
+		if (spline.getPieces().size() > 0 /*&& spline.getBegin() <= 12 && spline.getEnd() > 21000*/)
+		{
+			//inst.addSpectrum(SplineSpectrum(std::move(spline), (double)i/(double)m_sampleBuffer.sampleRate()), {label, (double)i / (double)m_sampleBuffer.sampleRate()});
+			spectra.emplace_back(std::move(spline), (double)i/(double)m_sampleBuffer.sampleRate());
+		}
+		else
+		{
+			if(spline.getPeaks().size()==0 && spline.getEnd()>0) {noComponents++;}
+			if(spline.getPieces().size()==0) {emptySplines++;}
+			if((spline.getBegin() > 12 && spline.getBegin()>0) || (spline.getEnd() < 21000 && spline.getEnd()>0)) {incomplete++;}
+			if(spline.getBegin()<12 && spline.getEnd()<21000 && spline.getBegin()>0 && spline.getEnd()>0) { goodBeginBadEnd++; }
+			if(spline.getBegin()>12 && spline.getEnd()>21000 && spline.getBegin()>0 && spline.getEnd()>0) { badBedginGoodEnd++; }
+			rejected++;
+		}
+	}
 	
 	//TMP: output the synthesised signal and the inverse-CWT of the signal for comparison
 	/*auto icwt = transform.inverseTransform();
@@ -167,26 +157,24 @@ std::string AnalyzerPlugin::setAudioFile(const QString &_audio_file)
 		auto rec = synth.playNote(inst.getSpectrum({label, time}), 1 ,i, (double)m_sampleBuffer.sampleRate());
 		oss << std::fixed << rec.front() << " " << icwt[i] << std::endl;
 	}*/
-	/*std::cout<<"rejected splines: "<<rejected<<"/"<<spectra.size()/transformStep<<" ("<<100*rejected/(spectra.size()/transformStep)<<"%)"<<std::endl;
+	std::cout<<"rejected splines: "<<rejected<<std::endl;
 	if(rejected>0){
 	std::cout<<"cause: no peaks: "<<noComponents<<"/"<<rejected<<" ("<<100*noComponents/rejected<<"%)"<<std::endl;
 	std::cout<<"cause: empty spline: "<<emptySplines<<"/"<<rejected<<" ("<<100*emptySplines/rejected<<"%)"<<std::endl;
 	std::cout<<"cause: incomplete: "<<incomplete<<"/"<<rejected<<" ("<<100*incomplete/rejected<<"%)"<<std::endl;
 	std::cout<<"cause: good begin, bad end: "<<goodBeginBadEnd<<"/"<<rejected<<" ("<<100*goodBeginBadEnd/rejected<<"%)"<<std::endl;
 	std::cout<<"cause: good end, bad begin: "<<badBedginGoodEnd<<"/"<<rejected<<" ("<<100*badBedginGoodEnd/rejected<<"%)"<<std::endl;
-	}*/
+	}
 
 	//TODO: trim spectrum?
 	//TODO: how to mix the output with consistent levels without clipping
 
 	//tmp
-	std::cout << oss.str() << std::endl;
 
 	//TODO: get rid of beégetett 4
 
 	//tmp: close files
-	raw.close();
-	peaks.close();
+	output.close();
 
-	return oss.str();
+	return "TODO";
 }

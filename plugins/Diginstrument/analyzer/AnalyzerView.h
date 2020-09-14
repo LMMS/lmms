@@ -2,6 +2,7 @@
 
 #include "ToolPluginView.h"
 #include "AnalyzerPlugin.h"
+#include "../common/InstrumentVisualizationWindow.h"
 
 #include <QPushButton>
 #include <QTextEdit>
@@ -25,5 +26,7 @@ class AnalyzerView : public ToolPluginView
     QPushButton * m_openAudioFileButton;
     QPushButton * m_copyToClipboardButton;
     QTextEdit * m_textarea;
+
+    Diginstrument::InstrumentVisualizationWindow * visualization;
     /*TODO*/
 };

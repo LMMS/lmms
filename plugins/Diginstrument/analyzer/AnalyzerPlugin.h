@@ -12,19 +12,20 @@
 #include "Song.h"
 
 /*tmp*/
-//#include "CWT.hpp"
-//#include "Extrema.hpp"
+#include "CWT.hpp"
+#include "Extrema.hpp"
 #include "../common/Approximation.hpp"
 #include "../common/Interpolation.hpp"
-//#include "SplineFitter.hpp"
+#include "SplineFitter.hpp"
 #include "../common/PiecewiseBSpline.hpp"
-//#include "SpectrumFitter.hpp"
+#include "SpectrumFitter.hpp"
 #include "../common/SplineSpectrum.hpp"
-//#include "PeakApproximation.h"
+#include "PeakApproximation.h"
 #include <string>
 #include <sstream>
 #include <iostream>
 #include <fstream>
+#include "../common/InstrumentVisualizationWindow.h"
 
 class AnalyzerPlugin : public ToolPlugin
 {
@@ -48,6 +49,8 @@ private:
   typedef SampleBuffer::handleState handleState;
   SampleBuffer m_sampleBuffer;
   std::string setAudioFile(const QString &_audio_file);
+
+  std::vector<SplineSpectrum<double, 4>> spectra;
 
 private slots:
   //void sampleRateChanged();

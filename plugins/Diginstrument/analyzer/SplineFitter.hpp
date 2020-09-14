@@ -5,7 +5,7 @@
 
 #include <Eigen/Dense>
 
-#include "BSpline.hpp"
+#include "../common/BSpline.hpp"
 
 /*Approximation by least square fitting of D-degree B-Spline.*/
 template <typename T, unsigned int D>

@@ -4,10 +4,10 @@
 
 #include "SplineFitter.hpp"
 #include "PointSelector.hpp"
-#include "PiecewiseBSpline.hpp"
 #include "Extrema.hpp"
-#include "Spectrum.hpp"
-#include "Interpolation.hpp"
+#include "../common/PiecewiseBSpline.hpp"
+#include "../common/Spectrum.hpp"
+#include "../common/Interpolation.hpp"
 
 //tmp
 #include <iostream>

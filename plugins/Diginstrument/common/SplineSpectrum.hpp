@@ -80,5 +80,4 @@ public:
 
 private:
   PiecewiseBSpline<T, D> spline;
-  T label;
 };
