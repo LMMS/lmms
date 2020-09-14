@@ -265,10 +265,10 @@ PiecewiseBSpline<T, 4> Diginstrument::Interpolator<T, S>::consolidatePieces(Piec
             //split left at right end
             const T ratio = (rightPieces.back().getEnd() - leftPieces.back().getBegin()) / (leftPieces.back().getEnd() - leftPieces.back().getBegin());
             auto split = leftPieces.back().getSpline().split(ratio);
-            auto test = left[60];
             //TMP: TODO: FIXME: must adjust splitpoint, as it is inaccurate for some reason (See TODO in BSpline::split)
             //NOTES: the problem seems to stem from these hugely long pieces, where of course the resolution will be smeared
             //Maybe the CPs dont even need to be equidistant (arc length in paper) and/or dont really need uniform knot vector, if the resolution is high enough?
+            //EXPERIMENT results: if the CPs are symmetric and the knotvector uniform, the mapping should be accurate
             split.first.stretchTo(leftPieces.back().getBegin(), rightPieces.back().getEnd());
             split.second.stretchTo(rightPieces.back().getEnd(), leftPieces.back().getEnd());
             //match split first with right

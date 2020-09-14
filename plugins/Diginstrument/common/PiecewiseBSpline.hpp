@@ -144,6 +144,7 @@ bool PiecewiseBSpline<T, D>::add(const BSpline<T, D> &spline)
     return true;
 }
 
+//NOTE: spline must be symmetric and have an uniform knotvector for the mapping to be precise
 template <typename T, unsigned int D>
 std::vector<T> PiecewiseBSpline<T, D>::operator[](T x) const
 {   

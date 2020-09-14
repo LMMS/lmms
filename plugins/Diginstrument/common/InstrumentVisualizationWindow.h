@@ -29,7 +29,6 @@ class InstrumentVisualizationWindow : public QWidget
     QWidget * container;
     QtDataVisualization::QSurface3DSeries *series;
     //UI elements
-    //TODO: TMP: only one coordinate
     //TODO: log-scale toggle
     LabeledFieldSlider *startTimeSlider, *endTimeSlider, *startFreqSlider, *endFreqSlider;
     QLineEdit * timeSamples, *frequencySamples;
