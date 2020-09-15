@@ -32,7 +32,7 @@
 class Clipboard
 {
 public:
-	enum MimeType
+	enum class MimeType
 	{
 		StringPair,
 		Default
@@ -55,10 +55,10 @@ public:
 	{
 		switch( type )
 		{
-			case Clipboard::StringPair:
+			case Clipboard::MimeType::StringPair:
 				return "application/x-lmms-stringpair";
 			break;
-			case Clipboard::Default:
+			case Clipboard::MimeType::Default:
 			default:
 				return "application/x-lmms-clipboard";
 				break;

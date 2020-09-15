@@ -1935,7 +1935,7 @@ void TrackContentWidget::contextMenuEvent( QContextMenuEvent * cme )
 
 	// If we don't have TCO data in the clipboard there's no need to create this menu
 	// since "paste" is the only action at the moment.
-	if( ! Clipboard::hasFormat( Clipboard::StringPair )  )
+	if( ! Clipboard::hasFormat( Clipboard::MimeType::StringPair )  )
 	{
 		return;
 	}

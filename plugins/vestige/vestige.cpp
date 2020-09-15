@@ -834,10 +834,10 @@ void VestigeInstrumentView::noteOffAll( void )
 
 void VestigeInstrumentView::dragEnterEvent( QDragEnterEvent * _dee )
 {
-	if( _dee->mimeData()->hasFormat( Clipboard::mimeType( Clipboard::StringPair ) ) )
+	if( _dee->mimeData()->hasFormat( Clipboard::mimeType( Clipboard::MimeType::StringPair ) ) )
 	{
 		QString txt = _dee->mimeData()->data(
-						Clipboard::mimeType( Clipboard::StringPair ) );
+						Clipboard::mimeType( Clipboard::MimeType::StringPair ) );
 		if( txt.section( ':', 0, 0 ) == "vstplugin" )
 		{
 			_dee->acceptProposedAction();
@@ -1176,10 +1176,10 @@ void manageVestigeInstrumentView::syncParameterText()
 
 void manageVestigeInstrumentView::dragEnterEvent( QDragEnterEvent * _dee )
 {
-	if( _dee->mimeData()->hasFormat( Clipboard::mimeType( Clipboard::StringPair ) ) )
+	if( _dee->mimeData()->hasFormat( Clipboard::mimeType( Clipboard::MimeType::StringPair ) ) )
 	{
 		QString txt = _dee->mimeData()->data(
-						Clipboard::mimeType( Clipboard::StringPair ) );
+						Clipboard::mimeType( Clipboard::MimeType::StringPair ) );
 		if( txt.section( ':', 0, 0 ) == "vstplugin" )
 		{
 			_dee->acceptProposedAction();

@@ -241,10 +241,10 @@ void Lv2InsView::dragEnterEvent(QDragEnterEvent *_dee)
 {
 	void (QDragEnterEvent::*reaction)(void) = &QDragEnterEvent::ignore;
 
-	if (_dee->mimeData()->hasFormat( Clipboard::mimeType( Clipboard::StringPair )))
+	if (_dee->mimeData()->hasFormat( Clipboard::mimeType( Clipboard::MimeType::StringPair )))
 	{
 		const QString txt =
-			_dee->mimeData()->data( Clipboard::mimeType( Clipboard::StringPair ) );
+			_dee->mimeData()->data( Clipboard::mimeType( Clipboard::MimeType::StringPair ) );
 		if (txt.section(':', 0, 0) == "pluginpresetfile") {
 			reaction = &QDragEnterEvent::acceptProposedAction;
 		}

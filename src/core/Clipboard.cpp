@@ -70,7 +70,7 @@ void Clipboard::copyStringPair( const QString & key, const QString & value )
 	QString finalString = key + ":" + value;
 
 	QMimeData *content = new QMimeData;
-	content->setData( mimeType( StringPair ), finalString.toUtf8() );
+	content->setData( mimeType( MimeType::StringPair ), finalString.toUtf8() );
 	QApplication::clipboard()->setMimeData( content, QClipboard::Clipboard );
 }
 
@@ -79,7 +79,7 @@ void Clipboard::copyStringPair( const QString & key, const QString & value )
 
 QString Clipboard::decodeKey( const QMimeData * mimeData )
 {
-	return( QString::fromUtf8( mimeData->data( mimeType( StringPair ) ) ).section( ':', 0, 0 ) );
+	return( QString::fromUtf8( mimeData->data( mimeType( MimeType::StringPair ) ) ).section( ':', 0, 0 ) );
 }
 
 
@@ -87,5 +87,5 @@ QString Clipboard::decodeKey( const QMimeData * mimeData )
 
 QString Clipboard::decodeValue( const QMimeData * mimeData )
 {
-	return( QString::fromUtf8( mimeData->data( mimeType( StringPair ) ) ).section( ':', 1, -1 ) );
+	return( QString::fromUtf8( mimeData->data( mimeType( MimeType::StringPair ) ) ).section( ':', 1, -1 ) );
 }

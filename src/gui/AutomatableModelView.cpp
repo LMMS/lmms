@@ -242,7 +242,7 @@ void AutomatableModelViewSlots::unlinkAllModels()
 
 void AutomatableModelViewSlots::copyToClipboard()
 {
-	Clipboard::copyString( QString::number(m_amv->value<float>()), Clipboard::Default );
+	Clipboard::copyString( QString::number(m_amv->value<float>()), Clipboard::MimeType::Default );
 }
 
 void AutomatableModelViewSlots::pasteFromClipboard()
@@ -258,6 +258,6 @@ void AutomatableModelViewSlots::pasteFromClipboard()
 /// Attempt to parse a float from the clipboard
 static float floatFromClipboard(bool* ok)
 {
-	return Clipboard::getString( Clipboard::Default ).toFloat(ok);
+	return Clipboard::getString( Clipboard::MimeType::Default ).toFloat(ok);
 }
 

@@ -52,7 +52,7 @@ StringPairDrag::StringPairDrag( const QString & _key, const QString & _value,
 	}
 	QString txt = _key + ":" + _value;
 	QMimeData * m = new QMimeData();
-	m->setData( Clipboard::mimeType( Clipboard::StringPair ), txt.toUtf8() );
+	m->setData( Clipboard::mimeType( Clipboard::MimeType::StringPair ), txt.toUtf8() );
 	setMimeData( m );
 	exec( Qt::LinkAction, Qt::LinkAction );
 }
@@ -76,11 +76,11 @@ StringPairDrag::~StringPairDrag()
 bool StringPairDrag::processDragEnterEvent( QDragEnterEvent * _dee,
 						const QString & _allowed_keys )
 {
-	if( !_dee->mimeData()->hasFormat( Clipboard::mimeType( Clipboard::StringPair ) ) )
+	if( !_dee->mimeData()->hasFormat( Clipboard::mimeType( Clipboard::MimeType::StringPair ) ) )
 	{
 		return( false );
 	}
-	QString txt = _dee->mimeData()->data( Clipboard::mimeType( Clipboard::StringPair ) );
+	QString txt = _dee->mimeData()->data( Clipboard::mimeType( Clipboard::MimeType::StringPair ) );
 	if( _allowed_keys.split( ',' ).contains( txt.section( ':', 0, 0 ) ) )
 	{
 		_dee->acceptProposedAction();

@@ -569,10 +569,10 @@ AudioFileProcessorView::~AudioFileProcessorView()
 
 void AudioFileProcessorView::dragEnterEvent( QDragEnterEvent * _dee )
 {
-	if( _dee->mimeData()->hasFormat( Clipboard::mimeType( Clipboard::StringPair ) ) )
+	if( _dee->mimeData()->hasFormat( Clipboard::mimeType( Clipboard::MimeType::StringPair ) ) )
 	{
 		QString txt = _dee->mimeData()->data(
-						Clipboard::mimeType( Clipboard::StringPair ) );
+						Clipboard::mimeType( Clipboard::MimeType::StringPair ) );
 		if( txt.section( ':', 0, 0 ) == QString( "tco_%1" ).arg(
 							Track::SampleTrack ) )
 		{

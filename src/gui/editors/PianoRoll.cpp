@@ -3897,7 +3897,7 @@ void PianoRoll::copyToClipboard( const NoteVector & notes ) const
 		clip_note.saveState( dataFile, note_list );
 	}
 
-	Clipboard::copyString( dataFile.toString(), Clipboard::Default );
+	Clipboard::copyString( dataFile.toString(), Clipboard::MimeType::Default );
 }
 
 
@@ -3955,7 +3955,7 @@ void PianoRoll::pasteNotes()
 		return;
 	}
 
-	QString value = Clipboard::getString( Clipboard::Default );
+	QString value = Clipboard::getString( Clipboard::MimeType::Default );
 
 	if( ! value.isEmpty() )
 	{
