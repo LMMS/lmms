@@ -198,15 +198,17 @@ void BBTCOView::paintEvent( QPaintEvent * )
 	QPainter p( &m_paintPixmap );
 
 	QLinearGradient lingrad( 0, 0, 0, height() );
-	QColor c;
+	QColor c, mutedCustomColor;
 	bool muted = m_bbTCO->getTrack()->isMuted() || m_bbTCO->isMuted();
+	mutedCustomColor = m_bbTCO->color();
+	mutedCustomColor.setHsv( mutedCustomColor.hsvHue(), mutedCustomColor.hsvSaturation() / 4, mutedCustomColor.value() );
 	
 	// state: selected, muted, default, colored
 	if( isSelected() )
 	{
 		c = m_bbTCO->usesStyleColor()
 			? selectedColor()
-			: ( muted ? m_bbTCO->color().darker( 300 )
+			: ( muted ? mutedCustomColor.darker( 300 )
 				: m_bbTCO->color().darker( 150 ) );
 	}
 	else
@@ -215,7 +217,7 @@ void BBTCOView::paintEvent( QPaintEvent * )
 		{
 			c = m_bbTCO->usesStyleColor()
 				? mutedBackgroundColor()
-				: m_bbTCO->color().darker( 200 );
+				: mutedCustomColor.darker( 200 );
 		}
 		else
 		{

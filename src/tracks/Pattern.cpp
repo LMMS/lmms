@@ -874,17 +874,19 @@ void PatternView::paintEvent( QPaintEvent * )
 
 	QPainter p( &m_paintPixmap );
 
-	QColor c;
+	QColor c, mutedCustomColor;
 	bool const muted = m_pat->getTrack()->isMuted() || m_pat->isMuted();
 	bool current = gui->pianoRoll()->currentPattern() == m_pat;
 	bool beatPattern = m_pat->m_patternType == Pattern::BeatPattern;
+	mutedCustomColor = m_pat->color();
+	mutedCustomColor.setHsv( mutedCustomColor.hsvHue(), mutedCustomColor.hsvSaturation() / 4, mutedCustomColor.value() );
 
 	// state: selected, normal, beat pattern, muted, colored
 	if( isSelected() )
 	{
 		c = m_pat->usesStyleColor()
 			? selectedColor()
-			: ( muted ? m_pat->color().darker( 300 ) : m_pat->color().darker( 150 ) );
+			: ( muted ? mutedCustomColor.darker( 300 ) : m_pat->color().darker( 150 ) );
 	}
 	else
 	{
@@ -898,7 +900,7 @@ void PatternView::paintEvent( QPaintEvent * )
 			{
 				c = m_pat->usesStyleColor()
 					? mutedBackgroundColor()
-					: m_pat->color().darker( 200 );
+					: mutedCustomColor.darker( 200 );
 			}
 			else
 			{
