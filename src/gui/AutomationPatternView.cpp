@@ -267,7 +267,7 @@ void AutomationPatternView::paintEvent( QPaintEvent * )
 		c = m_pat->usesStyleColor()
 			? selectedColor()
 			: ( muted
-				? mutedCustomColor.darker( 300 )
+				? mutedCustomColor.darker( 350 )
 				: m_pat->color().darker( 150 ) );
 	}
 	else
@@ -276,7 +276,7 @@ void AutomationPatternView::paintEvent( QPaintEvent * )
 		{
 			c = m_pat->usesStyleColor()
 				? mutedBackgroundColor()
-				: mutedCustomColor.darker( 200 );
+				: mutedCustomColor.darker( 250 );
 		}
 		else
 		{

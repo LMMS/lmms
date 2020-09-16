@@ -559,7 +559,7 @@ void SampleTCOView::paintEvent( QPaintEvent * pe )
 		c = m_tco->usesStyleColor()
 			? selectedColor()
 			: ( muted
-				? mutedCustomColor.darker( 300 )
+				? mutedCustomColor.darker( 350 )
 				: m_tco->color().darker( 150 ) );
 	}
 	else
@@ -568,7 +568,7 @@ void SampleTCOView::paintEvent( QPaintEvent * pe )
 		{
 			c = m_tco->usesStyleColor()
 				? mutedBackgroundColor()
-				: mutedCustomColor.darker( 200 );
+				: mutedCustomColor.darker( 250 );
 		}
 		else
 		{

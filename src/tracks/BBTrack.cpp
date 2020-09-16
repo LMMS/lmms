@@ -208,7 +208,7 @@ void BBTCOView::paintEvent( QPaintEvent * )
 	{
 		c = m_bbTCO->usesStyleColor()
 			? selectedColor()
-			: ( muted ? mutedCustomColor.darker( 300 )
+			: ( muted ? mutedCustomColor.darker( 350 )
 				: m_bbTCO->color().darker( 150 ) );
 	}
 	else
@@ -217,7 +217,7 @@ void BBTCOView::paintEvent( QPaintEvent * )
 		{
 			c = m_bbTCO->usesStyleColor()
 				? mutedBackgroundColor()
-				: mutedCustomColor.darker( 200 );
+				: mutedCustomColor.darker( 250 );
 		}
 		else
 		{
