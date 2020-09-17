@@ -48,7 +48,7 @@ public:
 	int getMajor() const { return m_major; }
 	int getMinor() const { return m_minor; }
 	int getPatch() const { return m_patch; }
-	const QStringList& getLabels() const { return m_labels;}
+	const QStringList& getLabels() const { return m_labels; }
 	CompareType getCompareType() const { return m_compareType; }
 	ProjectVersion setCompareType(CompareType compareType) { m_compareType = compareType; return * this; }
 
@@ -60,7 +60,7 @@ private:
 	int m_major = 0;
 	int m_minor = 0;
 	int m_patch = 0;
-	QStringList m_labels = QStringList();
+	QStringList m_labels;
 	CompareType m_compareType;
 } ;
 
