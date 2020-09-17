@@ -239,12 +239,15 @@ Lv2InsView::Lv2InsView(Lv2Instrument *_instrument, QWidget *_parent) :
 
 void Lv2InsView::dragEnterEvent(QDragEnterEvent *_dee)
 {
+	// For mimeType() and MimeType enum class
+	using namespace Clipboard;
+
 	void (QDragEnterEvent::*reaction)(void) = &QDragEnterEvent::ignore;
 
-	if (_dee->mimeData()->hasFormat( Clipboard::mimeType( Clipboard::MimeType::StringPair )))
+	if (_dee->mimeData()->hasFormat( mimeType( MimeType::StringPair )))
 	{
 		const QString txt =
-			_dee->mimeData()->data( Clipboard::mimeType( Clipboard::MimeType::StringPair ) );
+			_dee->mimeData()->data( mimeType( MimeType::StringPair ) );
 		if (txt.section(':', 0, 0) == "pluginpresetfile") {
 			reaction = &QDragEnterEvent::acceptProposedAction;
 		}

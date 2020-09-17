@@ -30,62 +30,65 @@
 #include "JournallingObject.h"
 
 
-const QMimeData * Clipboard::getMimeData()
+namespace Clipboard
 {
-	return QApplication::clipboard()->mimeData( QClipboard::Clipboard );
-}
+	const QMimeData * getMimeData()
+	{
+		return QApplication::clipboard()->mimeData( QClipboard::Clipboard );
+	}
 
 
 
 
-bool Clipboard::hasFormat( MimeType mT )
-{
-	return getMimeData()->hasFormat( mimeType( mT ) );
-}
+	bool hasFormat( MimeType mT )
+	{
+		return getMimeData()->hasFormat( mimeType( mT ) );
+	}
 
 
 
 
-void Clipboard::copyString( const QString & str, MimeType mT )
-{
-	QMimeData *content = new QMimeData;
+	void copyString( const QString & str, MimeType mT )
+	{
+		QMimeData *content = new QMimeData;
 
-	content->setData( mimeType( mT ), str.toUtf8() );
-	QApplication::clipboard()->setMimeData( content, QClipboard::Clipboard );
-}
-
-
-
-
-QString Clipboard::getString( MimeType mT )
-{
-	return QString( getMimeData()->data( mimeType( mT ) ) );
-}
+		content->setData( mimeType( mT ), str.toUtf8() );
+		QApplication::clipboard()->setMimeData( content, QClipboard::Clipboard );
+	}
 
 
 
 
-void Clipboard::copyStringPair( const QString & key, const QString & value )
-{
-	QString finalString = key + ":" + value;
-
-	QMimeData *content = new QMimeData;
-	content->setData( mimeType( MimeType::StringPair ), finalString.toUtf8() );
-	QApplication::clipboard()->setMimeData( content, QClipboard::Clipboard );
-}
+	QString getString( MimeType mT )
+	{
+		return QString( getMimeData()->data( mimeType( mT ) ) );
+	}
 
 
 
 
-QString Clipboard::decodeKey( const QMimeData * mimeData )
-{
-	return( QString::fromUtf8( mimeData->data( mimeType( MimeType::StringPair ) ) ).section( ':', 0, 0 ) );
-}
+	void copyStringPair( const QString & key, const QString & value )
+	{
+		QString finalString = key + ":" + value;
+
+		QMimeData *content = new QMimeData;
+		content->setData( mimeType( MimeType::StringPair ), finalString.toUtf8() );
+		QApplication::clipboard()->setMimeData( content, QClipboard::Clipboard );
+	}
 
 
 
 
-QString Clipboard::decodeValue( const QMimeData * mimeData )
-{
-	return( QString::fromUtf8( mimeData->data( mimeType( MimeType::StringPair ) ) ).section( ':', 1, -1 ) );
+	QString decodeKey( const QMimeData * mimeData )
+	{
+		return( QString::fromUtf8( mimeData->data( mimeType( MimeType::StringPair ) ) ).section( ':', 0, 0 ) );
+	}
+
+
+
+
+	QString decodeValue( const QMimeData * mimeData )
+	{
+		return( QString::fromUtf8( mimeData->data( mimeType( MimeType::StringPair ) ) ).section( ':', 1, -1 ) );
+	}
 }

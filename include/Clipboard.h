@@ -29,9 +29,8 @@
 #include <QDomElement>
 
 
-class Clipboard
+namespace Clipboard
 {
-public:
 	enum class MimeType
 	{
 		StringPair,
@@ -39,26 +38,26 @@ public:
 	};
 
 	// Convenience Methods
-	static const QMimeData * getMimeData();
-	static bool hasFormat( MimeType mT );
+	const QMimeData * getMimeData();
+	bool hasFormat( MimeType mT );
 
 	// Helper methods for String data
-	static void copyString( const QString & str, MimeType mT );
-	static QString getString( MimeType mT );
+	void copyString( const QString & str, MimeType mT );
+	QString getString( MimeType mT );
 
 	// Helper methods for String Pair data
-	static void copyStringPair( const QString & key, const QString & value );
-	static QString decodeKey( const QMimeData * mimeData );
-	static QString decodeValue( const QMimeData * mimeData );
+	void copyStringPair( const QString & key, const QString & value );
+	QString decodeKey( const QMimeData * mimeData );
+	QString decodeValue( const QMimeData * mimeData );
 
-	static const char * mimeType( MimeType type )
+	inline const char * mimeType( MimeType type )
 	{
 		switch( type )
 		{
-			case Clipboard::MimeType::StringPair:
+			case MimeType::StringPair:
 				return "application/x-lmms-stringpair";
 			break;
-			case Clipboard::MimeType::Default:
+			case MimeType::Default:
 			default:
 				return "application/x-lmms-clipboard";
 				break;

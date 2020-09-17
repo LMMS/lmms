@@ -1216,11 +1216,14 @@ void TrackContentObjectView::remove( QVector<TrackContentObjectView *> tcovs )
 
 void TrackContentObjectView::copy( QVector<TrackContentObjectView *> tcovs )
 {
+	// For copyStringPair()
+	using namespace Clipboard;
+
 	// Write the TCOs to a DataFile for copying
 	DataFile dataFile = createTCODataFiles( tcovs );
 
 	// Copy the TCO type as a key and the TCO data file to the clipboard
-	Clipboard::copyStringPair( QString( "tco_%1" ).arg( m_tco->getTrack()->type() ),
+	copyStringPair( QString( "tco_%1" ).arg( m_tco->getTrack()->type() ),
 		dataFile.toString() );
 }
 
@@ -1235,12 +1238,15 @@ void TrackContentObjectView::cut( QVector<TrackContentObjectView *> tcovs )
 
 void TrackContentObjectView::paste()
 {
+	// For getMimeData()
+	using namespace Clipboard;
+
 	// If possible, paste the selection on the MidiTime of the selected Track and remove it
 	MidiTime tcoPos = MidiTime( m_tco->startPosition() );
 
 	TrackContentWidget *tcw = getTrackView()->getTrackContentWidget();
 
-	if( tcw->pasteSelection( tcoPos, Clipboard::getMimeData() ) )
+	if( tcw->pasteSelection( tcoPos, getMimeData() ) )
 	{
 		// If we succeed on the paste we delete the TCO we pasted on
 		remove();
@@ -1641,9 +1647,12 @@ bool TrackContentWidget::canPasteSelection( MidiTime tcoPos, const QDropEvent* d
 // Overloaded method to make it possible to call this method without a Drag&Drop event
 bool TrackContentWidget::canPasteSelection( MidiTime tcoPos, const QMimeData* md , bool allowSameBar )
 {
+	// For decodeKey() and decodeValue()
+	using namespace Clipboard;
+
 	Track * t = getTrack();
-	QString type = Clipboard::decodeKey( md );
-	QString value = Clipboard::decodeValue( md );
+	QString type = decodeKey( md );
+	QString value = decodeValue( md );
 
 	// We can only paste into tracks of the same type
 	if( type != ( "tco_" + QString::number( t->type() ) ) ||
@@ -1727,14 +1736,17 @@ bool TrackContentWidget::pasteSelection( MidiTime tcoPos, QDropEvent * de )
 // Overloaded method so we can call it without a Drag&Drop event
 bool TrackContentWidget::pasteSelection( MidiTime tcoPos, const QMimeData * md, bool skipSafetyCheck )
 {
+	// For decodeKey() and decodeValue()
+	using namespace Clipboard;
+
 	// When canPasteSelection was already called before, skipSafetyCheck will skip this
 	if( !skipSafetyCheck && canPasteSelection( tcoPos, md ) == false )
 	{
 		return false;
 	}
 
-	QString type = Clipboard::decodeKey( md );
-	QString value = Clipboard::decodeValue( md );
+	QString type = decodeKey( md );
+	QString value = decodeValue( md );
 
 	getTrack()->addJournalCheckPoint();
 
@@ -1928,6 +1940,9 @@ MidiTime TrackContentWidget::endPosition( const MidiTime & posStart )
 
 void TrackContentWidget::contextMenuEvent( QContextMenuEvent * cme )
 {
+	// For hasFormat(), MimeType enum class and getMimeData()
+	using namespace Clipboard;
+
 	if( cme->modifiers() )
 	{
 		return;
@@ -1935,7 +1950,7 @@ void TrackContentWidget::contextMenuEvent( QContextMenuEvent * cme )
 
 	// If we don't have TCO data in the clipboard there's no need to create this menu
 	// since "paste" is the only action at the moment.
-	if( ! Clipboard::hasFormat( Clipboard::MimeType::StringPair )  )
+	if( ! hasFormat( MimeType::StringPair )  )
 	{
 		return;
 	}
@@ -1944,20 +1959,23 @@ void TrackContentWidget::contextMenuEvent( QContextMenuEvent * cme )
 	QAction *pasteA = contextMenu.addAction( embed::getIconPixmap( "edit_paste" ),
 					tr( "Paste" ), [this, cme](){ contextMenuAction( cme, Paste ); } );
 	// If we can't paste in the current TCW for some reason, disable the action so the user knows
-	pasteA->setEnabled( canPasteSelection( getPosition( cme->x() ), Clipboard::getMimeData() ) ? true : false );
+	pasteA->setEnabled( canPasteSelection( getPosition( cme->x() ), getMimeData() ) ? true : false );
 
 	contextMenu.exec( QCursor::pos() );
 }
 
 void TrackContentWidget::contextMenuAction( QContextMenuEvent * cme, ContextMenuAction action )
 {
+	// For getMimeData()
+	using namespace Clipboard;
+
 	switch( action )
 	{
 		case Paste:
 		// Paste the selection on the MidiTime of the context menu event
 		MidiTime tcoPos = getPosition( cme->x() );
 
-		pasteSelection( tcoPos, Clipboard::getMimeData() );
+		pasteSelection( tcoPos, getMimeData() );
 		break;
 	}
 }

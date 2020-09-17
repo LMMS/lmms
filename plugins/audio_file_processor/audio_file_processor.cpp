@@ -569,10 +569,13 @@ AudioFileProcessorView::~AudioFileProcessorView()
 
 void AudioFileProcessorView::dragEnterEvent( QDragEnterEvent * _dee )
 {
-	if( _dee->mimeData()->hasFormat( Clipboard::mimeType( Clipboard::MimeType::StringPair ) ) )
+	// For mimeType() and MimeType enum class
+	using namespace Clipboard;
+
+	if( _dee->mimeData()->hasFormat( mimeType( MimeType::StringPair ) ) )
 	{
 		QString txt = _dee->mimeData()->data(
-						Clipboard::mimeType( Clipboard::MimeType::StringPair ) );
+						mimeType( MimeType::StringPair ) );
 		if( txt.section( ':', 0, 0 ) == QString( "tco_%1" ).arg(
 							Track::SampleTrack ) )
 		{

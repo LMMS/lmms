@@ -39,6 +39,9 @@ StringPairDrag::StringPairDrag( const QString & _key, const QString & _value,
 					const QPixmap & _icon, QWidget * _w ) :
 	QDrag( _w )
 {
+	// For mimeType() and MimeType enum class
+	using namespace Clipboard;
+
 	if( _icon.isNull() && _w )
 	{
 		setPixmap( _w->grab().scaled(
@@ -52,7 +55,7 @@ StringPairDrag::StringPairDrag( const QString & _key, const QString & _value,
 	}
 	QString txt = _key + ":" + _value;
 	QMimeData * m = new QMimeData();
-	m->setData( Clipboard::mimeType( Clipboard::MimeType::StringPair ), txt.toUtf8() );
+	m->setData( mimeType( MimeType::StringPair ), txt.toUtf8() );
 	setMimeData( m );
 	exec( Qt::LinkAction, Qt::LinkAction );
 }
@@ -76,11 +79,14 @@ StringPairDrag::~StringPairDrag()
 bool StringPairDrag::processDragEnterEvent( QDragEnterEvent * _dee,
 						const QString & _allowed_keys )
 {
-	if( !_dee->mimeData()->hasFormat( Clipboard::mimeType( Clipboard::MimeType::StringPair ) ) )
+	// For mimeType() and MimeType enum class
+	using namespace Clipboard;
+
+	if( !_dee->mimeData()->hasFormat( mimeType( MimeType::StringPair ) ) )
 	{
 		return( false );
 	}
-	QString txt = _dee->mimeData()->data( Clipboard::mimeType( Clipboard::MimeType::StringPair ) );
+	QString txt = _dee->mimeData()->data( mimeType( MimeType::StringPair ) );
 	if( _allowed_keys.split( ',' ).contains( txt.section( ':', 0, 0 ) ) )
 	{
 		_dee->acceptProposedAction();

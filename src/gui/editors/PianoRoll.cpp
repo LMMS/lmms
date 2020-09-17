@@ -3885,6 +3885,9 @@ void PianoRoll::updateYScroll()
 
 void PianoRoll::copyToClipboard( const NoteVector & notes ) const
 {
+	// For copyString() and MimeType enum class
+	using namespace Clipboard;
+
 	DataFile dataFile( DataFile::ClipboardData );
 	QDomElement note_list = dataFile.createElement( "note-list" );
 	dataFile.content().appendChild( note_list );
@@ -3897,7 +3900,7 @@ void PianoRoll::copyToClipboard( const NoteVector & notes ) const
 		clip_note.saveState( dataFile, note_list );
 	}
 
-	Clipboard::copyString( dataFile.toString(), Clipboard::MimeType::Default );
+	copyString( dataFile.toString(), MimeType::Default );
 }
 
 
@@ -3950,12 +3953,15 @@ void PianoRoll::cutSelectedNotes()
 
 void PianoRoll::pasteNotes()
 {
+	// For getString() and MimeType enum class
+	using namespace Clipboard;
+
 	if( ! hasValidPattern() )
 	{
 		return;
 	}
 
-	QString value = Clipboard::getString( Clipboard::MimeType::Default );
+	QString value = getString( MimeType::Default );
 
 	if( ! value.isEmpty() )
 	{
