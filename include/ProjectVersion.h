@@ -28,6 +28,9 @@
 #define PROJECT_VERSION_H
 
 #include <QtCore/QString>
+#include <QtCore/QStringList>
+
+#include <limits>
 
 /*! \brief Version number parsing and comparison
  *
@@ -36,16 +39,16 @@
 class ProjectVersion
 {
 public:
-	enum CompareType { Major, Minor, Release, Stage, Build };
+	enum CompareType : int { None = 0, Major=1, Minor=2, Release=3, Stage=4, Build=5, All = std::numeric_limits<int>::max() };
 
-	ProjectVersion(QString version, CompareType c = Build);
-	ProjectVersion(const char * version, CompareType c = Build);
+
+	ProjectVersion(QString version, CompareType c = All);
+	ProjectVersion(const char * version, CompareType c = All);
 
 	int getMajor() const { return m_major; }
 	int getMinor() const { return m_minor; }
-	int getRelease() const { return m_release; }
-	QString getStage() const { return m_stage; }
-	int getBuild() const { return m_build; }
+	int getPatch() const { return m_patch; }
+	const QStringList& getLabels() const { return m_labels; }
 	CompareType getCompareType() const { return m_compareType; }
 	ProjectVersion setCompareType(CompareType compareType) { m_compareType = compareType; return * this; }
 
@@ -54,11 +57,10 @@ public:
 
 private:
 	QString m_version;
-	int m_major;
-	int m_minor;
-	int m_release;
-	QString m_stage;
-	int m_build;
+	int m_major = 0;
+	int m_minor = 0;
+	int m_patch = 0;
+	QStringList m_labels;
 	CompareType m_compareType;
 } ;
 
