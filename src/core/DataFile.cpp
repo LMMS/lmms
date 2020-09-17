@@ -772,10 +772,10 @@ void DataFile::upgrade_0_4_0_rc2()
 void DataFile::upgrade_1_0_99()
 {
 	jo_id_t last_assigned_id = 0;
-	
+
 	QList<jo_id_t> idList;
 	findIds(documentElement(), idList);
-	
+
 	QDomNodeList list = elementsByTagName("ladspacontrols");
 	for(int i = 0; !list.item(i).isNull(); ++i)
 	{
@@ -791,22 +791,22 @@ void DataFile::upgrade_1_0_99()
 					QDomElement me = createElement("data");
 					me.setAttribute("value", el.attribute("data"));
 					me.setAttribute("scale_type", "log");
-					
+
 					jo_id_t id;
 					for(id = last_assigned_id + 1;
 						idList.contains(id); id++)
 					{
 					}
-					
+
 					last_assigned_id = id;
 					idList.append(id);
 					me.setAttribute("id", id);
 					el.appendChild(me);
-					
+
 				}
 			}
 		}
-	}	
+	}
 }
 
 
@@ -1047,7 +1047,7 @@ void DataFile::upgrade_1_3_0()
 
 					QDomElement attribute = attributes.item( k ).toElement();
 					if( attribute.attribute( "name" ) == "file" &&
-							( attribute.attribute( "value" ) == "calf" || 
+							( attribute.attribute( "value" ) == "calf" ||
 							attribute.attribute( "value" ) == "calf.so" ) )
 					{
 						attribute.setAttribute( "value", "veal" );
@@ -1311,7 +1311,7 @@ void DataFile::upgrade_1_3_0()
 						};
 						iterate_ladspa_ports(effect, fn);
 					}
-					
+
 					if( attribute.attribute( "name" ) == "plugin" &&
 						attribute.attribute( "value" ) == "StereoTools" )
 					{
@@ -1486,15 +1486,14 @@ void DataFile::loadData( const QByteArray & _data, const QString & _sourceFile )
 
 	if( root.hasAttribute( "creatorversion" ) )
 	{
-		// compareType defaults to Build,so it doesn't have to be set here
+		// compareType defaults to All, so it doesn't have to be set here
 		ProjectVersion createdWith = root.attribute( "creatorversion" );
 		ProjectVersion openedWith = LMMS_VERSION;
 
 		if ( createdWith != openedWith )
 		{
-			// only one compareType needs to be set, and we can compare on one line because setCompareType returns ProjectVersion
-			if( createdWith.setCompareType( ProjectVersion::Minor )
-								!= openedWith )
+			if( createdWith.setCompareType( ProjectVersion::Minor ) !=
+				openedWith.setCompareType( ProjectVersion::Minor ) )
 			{
 				if( gui != nullptr && root.attribute( "type" ) == "song" )
 				{
@@ -1536,7 +1535,7 @@ void findIds(const QDomElement& elem, QList<jo_id_t>& idList)
 		idList.append(elem.attribute("id").toInt());
 	}
 	QDomElement child = elem.firstChildElement();
-	while(!child.isNull()) 
+	while(!child.isNull())
 	{
 		findIds(child, idList);
 		child = child.nextSiblingElement();
