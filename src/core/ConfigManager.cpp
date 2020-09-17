@@ -98,7 +98,6 @@ ConfigManager::~ConfigManager()
 
 void ConfigManager::upgrade_1_1_90()
 {
-qWarning("CONFIGMANAGER: upgrade_1_1_90");
 	// Remove trailing " (bad latency!)" string which was once saved with PulseAudio
 	if(value("mixer", "audiodev").startsWith("PulseAudio ("))
 	{
@@ -123,7 +122,6 @@ qWarning("CONFIGMANAGER: upgrade_1_1_90");
 	
 void ConfigManager::upgrade_1_1_91()
 {
-qWarning("CONFIGMANAGER: upgrade_1_1_91");
 	// rename displaydbv to displaydbfs
 	if (!value("app", "displaydbv").isNull()) {
 		setValue("app", "displaydbfs", value("app", "displaydbv"));
@@ -159,7 +157,6 @@ void ConfigManager::upgrade()
 	// Bump the version, now that we are upgraded
 	m_version = LMMS_VERSION;
 	m_configVersion = UPGRADE_METHODS.size();
-qWarning("CONFIGMANAGER: current configVersion = %u", m_configVersion);
 }
 
 QString ConfigManager::defaultVersion() const
