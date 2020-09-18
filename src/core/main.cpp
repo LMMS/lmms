@@ -40,7 +40,9 @@
 #include <QTextStream>
 
 #ifdef LMMS_BUILD_WIN32
+#ifndef NOMINMAX
 #define NOMINMAX
+#endif
 #include <windows.h>
 #endif
 
