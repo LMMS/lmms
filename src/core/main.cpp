@@ -40,6 +40,7 @@
 #include <QTextStream>
 
 #ifdef LMMS_BUILD_WIN32
+#define NOMINMAX
 #include <windows.h>
 #endif
 
@@ -437,7 +438,7 @@ int main( int argc, char * * argv )
 			{
 				return noInputFileError();
 			}
-			
+
 			QFile f( QString::fromLocal8Bit( argv[i] ) );
 			f.open( QIODevice::ReadOnly );
 			QByteArray d = qCompress( f.readAll() ) ;
