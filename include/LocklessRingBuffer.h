@@ -33,79 +33,33 @@
 #include "../src/3rdparty/ringbuffer/include/ringbuffer/ringbuffer.h"
 
 
-//! A convenience layer for a realtime-safe and thread-safe multi-reader ring buffer library.
+//! A convenience layer for a realtime-safe and thread-safe multi-reader ringbuffer
 template <class T>
-class LocklessRingBufferBase
+class LocklessRingBuffer
 {
 	template<class _T>
 	friend class LocklessRingBufferReader;
 public:
-	LocklessRingBufferBase(std::size_t sz) : m_buffer(sz)
+	LocklessRingBuffer(std::size_t sz) : m_buffer(sz)
 	{
 		m_buffer.touch();	// reserve storage space before realtime operation starts
 	}
-	~LocklessRingBufferBase() {};
+	~LocklessRingBuffer() {};
 
 	std::size_t capacity() const {return m_buffer.maximum_eventual_write_space();}
 	std::size_t free() const {return m_buffer.write_space();}
 	void wakeAll() {m_notifier.wakeAll();}
+	std::size_t write(const sampleFrame *src, std::size_t cnt, bool notify = false)
+	{
+		std::size_t written = LocklessRingBuffer<T>::m_buffer.write(src, cnt);
+		// Let all waiting readers know new data are available.
+		if (notify) {LocklessRingBuffer<T>::m_notifier.wakeAll();}
+		return written;
+	}
 
 protected:
 	ringbuffer_t<T> m_buffer;
 	QWaitCondition m_notifier;
-};
-
-
-// The SampleFrameCopier is required because sampleFrame is just a two-element
-// array and therefore does not have a copy constructor needed by std::copy.
-class SampleFrameCopier
-{
-	const sampleFrame* m_src;
-public:
-	SampleFrameCopier(const sampleFrame* src) : m_src(src) {}
-	void operator()(std::size_t src_offset, std::size_t count, sampleFrame* dest)
-	{
-		for (std::size_t i = src_offset; i < src_offset + count; i++, dest++)
-		{
-			(*dest)[0] = m_src[i][0];
-			(*dest)[1] = m_src[i][1];
-		}
-	}
-};
-
-
-//! Standard ring buffer template for data types with copy constructor.
-template <class T>
-class LocklessRingBuffer : public LocklessRingBufferBase<T>
-{
-public:
-	LocklessRingBuffer(std::size_t sz) : LocklessRingBufferBase<T>(sz) {};
-
-	std::size_t write(const sampleFrame *src, std::size_t cnt, bool notify = false)
-	{
-		std::size_t written = LocklessRingBufferBase<T>::m_buffer.write(src, cnt);
-		// Let all waiting readers know new data are available.
-		if (notify) {LocklessRingBufferBase<T>::m_notifier.wakeAll();}
-		return written;
-	}
-};
-
-
-//! Specialized ring buffer template with write function modified to support sampleFrame.
-template <>
-class LocklessRingBuffer<sampleFrame> : public LocklessRingBufferBase<sampleFrame>
-{
-public:
-	LocklessRingBuffer(std::size_t sz) : LocklessRingBufferBase<sampleFrame>(sz) {};
-
-	std::size_t write(const sampleFrame *src, std::size_t cnt, bool notify = false)
-	{
-		SampleFrameCopier copier(src);
-		std::size_t written = LocklessRingBufferBase<sampleFrame>::m_buffer.write_func<SampleFrameCopier>(copier, cnt);
-		// Let all waiting readers know new data are available.
-		if (notify) {LocklessRingBufferBase<sampleFrame>::m_notifier.wakeAll();}
-		return written;
-	}
 };
 
 
