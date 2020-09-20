@@ -194,7 +194,7 @@ fpp_t AudioDevice::resample( const surroundSampleFrame * _src,
 	}
 	m_srcData.input_frames = _frames;
 	m_srcData.output_frames = _frames;
-	m_srcData.data_in = (float *) _src[0].data ();
+	m_srcData.data_in = _src[0].data ();
 	m_srcData.data_out = _dst[0].data ();
 	m_srcData.src_ratio = (double) _dst_sr / _src_sr;
 	m_srcData.end_of_input = 0;
