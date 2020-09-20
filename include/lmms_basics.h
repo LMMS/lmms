@@ -35,6 +35,7 @@
 #include <array>
 #endif
 
+
 typedef int32_t bar_t;
 typedef int32_t tick_t;
 typedef uint8_t volume_t;
@@ -127,9 +128,8 @@ const ch_cnt_t SURROUND_CHANNELS =
 
 
 
-typedef std::array<sample_t, DEFAULT_CHANNELS> sampleFrame;
-
-typedef std::array<sample_t, SURROUND_CHANNELS> surroundSampleFrame;
+using         sampleFrame = std::array<sample_t,  DEFAULT_CHANNELS>;
+using surroundSampleFrame = std::array<sample_t, SURROUND_CHANNELS>;
 #define ALIGN_SIZE 16
 
 
