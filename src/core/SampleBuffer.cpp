@@ -1197,8 +1197,8 @@ SampleBuffer * SampleBuffer::resample( const sample_rate_t _src_sr,
 		SRC_DATA src_data;
 		src_data.end_of_input = 1;
 		src_data.data_in = data->data ();
-		src_data.data_out = dst_buf->data (); // @recording => !!!
-		src_data.input_frames = frames; // @recording => !!!
+		src_data.data_out = dst_buf->data ();
+		src_data.input_frames = frames;
 		src_data.output_frames = dst_frames;
 		src_data.src_ratio = (double) _dst_sr / _src_sr;
 		if( ( error = src_process( state, &src_data ) ) )
