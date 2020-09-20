@@ -1365,7 +1365,7 @@ void DataFile::upgrade_noHiddenClipNames()
 		{
 			QDomElement clip = clips.item(j).toElement();
 			QString clipName = clip.attribute("name", "");
-			if (clipName == trackName){ clip.setAttribute("name", ""); }
+			if (clipName == trackName) { clip.setAttribute("name", ""); }
 		}
 	};
 
@@ -1474,45 +1474,32 @@ void DataFile::loadData( const QByteArray & _data, const QString & _sourceFile )
 		}
 	}
 
-	if( root.hasAttribute( "creatorversion" ) )
+	if(root.hasAttribute("creatorversion"))
 	{
 		// compareType defaults to All, so it doesn't have to be set here
-		ProjectVersion createdWith = root.attribute( "creatorversion" );
+		ProjectVersion createdWith = root.attribute("creatorversion");
 		ProjectVersion openedWith = LMMS_VERSION;
 
-		if ( createdWith != openedWith )
-		{
-			if( createdWith.setCompareType( ProjectVersion::Minor ) !=
-				openedWith.setCompareType( ProjectVersion::Minor ) )
-			{
-				if( gui != nullptr && root.attribute( "type" ) == "song" )
-				{
-					TextFloat::displayMessage(
-						SongEditor::tr( "Version difference" ),
-						SongEditor::tr(
-							"This %1 was created with "
-							"LMMS %2."
-						).arg(
-							_sourceFile.endsWith( ".mpt" ) ?
-								SongEditor::tr( "template" ) :
-								SongEditor::tr( "project" )
-						)
-						.arg( root.attribute( "creatorversion" ) ),
-						embed::getIconPixmap( "whatsthis", 24, 24 ),
-						2500
-					);
-				}
-			}
+		if (createdWith < openedWith) { upgrade(); }
 
-			// the upgrade needs to happen after the warning as it updates the project version.
-			if( createdWith.setCompareType( ProjectVersion::All ) <
-				openedWith.setCompareType( ProjectVersion::All ) )
-			{ upgrade(); }
+		if (createdWith.setCompareType(ProjectVersion::Minor)
+		 !=  openedWith.setCompareType(ProjectVersion::Minor)
+		 && gui != nullptr && root.attribute("type") == "song"
+		){
+			auto projectType = _sourceFile.endsWith(".mpt") ?
+				SongEditor::tr("template") : SongEditor::tr("project");
+
+			TextFloat::displayMessage(
+				SongEditor::tr("Version difference"),
+				SongEditor::tr("This %1 was created with LMMS %2")
+				.arg(projectType).arg(createdWith.getVersion()),
+				embed::getIconPixmap("whatsthis", 24, 24),
+				2500
+			);
 		}
 	}
 
-	m_content = root.elementsByTagName( typeName( m_type ) ).
-							item( 0 ).toElement();
+	m_content = root.elementsByTagName(typeName(m_type)).item(0).toElement();
 }
 
 

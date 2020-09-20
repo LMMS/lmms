@@ -184,7 +184,7 @@ private:
 	ProgressionTypes m_progressionType;
 
 	bool m_dragging;
-
+ 
 	bool m_isRecording;
 	float m_lastRecordedValue;
 
