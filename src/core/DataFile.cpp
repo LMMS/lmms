@@ -1361,7 +1361,7 @@ void DataFile::upgrade_noHiddenClipNames()
 
 	auto clearDefaultNames = [](QDomNodeList clips, QString trackName)
 	{
-		for (int j = 0; !clips.item(j).isNull(); ++j)
+		for (int j = 0; j < clips.size(); ++j)
 		{
 			QDomElement clip = clips.item(j).toElement();
 			QString clipName = clip.attribute("name", "");
@@ -1369,7 +1369,7 @@ void DataFile::upgrade_noHiddenClipNames()
 		}
 	};
 
-	for (int i = 0; !tracks.item(i).isNull(); ++i)
+	for (int i = 0; i < tracks.size(); ++i)
 	{
 		QDomElement track = tracks.item(i).toElement();
 		QString trackName = track.attribute("name", "");
