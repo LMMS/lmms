@@ -39,7 +39,6 @@
 
 class LmmsCore;
 
-
 const QString PROJECTS_PATH = "projects/";
 const QString TEMPLATE_PATH = "templates/";
 const QString PRESETS_PATH = "presets/";
@@ -55,6 +54,9 @@ const QString PORTABLE_MODE_FILE = "/portable_mode.txt";
 class LMMS_EXPORT ConfigManager : public QObject
 {
 	Q_OBJECT
+
+	using UpgradeMethod = void(ConfigManager::*)();
+
 public:
 	static inline ConfigManager * inst()
 	{
@@ -219,6 +221,10 @@ public:
 		return m_version;
 	}
 
+	// Used when the configversion attribute is not present in a configuration file.
+	// Returns the appropriate config file version based on the LMMS version.
+	unsigned int legacyConfigVersion();
+
 	QString defaultVersion() const;
 
 
@@ -270,6 +276,9 @@ private:
 	void upgrade_1_1_91();
 	void upgrade();
 
+	// List of all upgrade methods
+	static const std::vector<UpgradeMethod> UPGRADE_METHODS;
+
 	QString m_workingDir;
 	QString m_dataDir;
 	QString m_vstDir;
@@ -286,6 +295,7 @@ private:
 	QString m_backgroundPicFile;
 	QString m_lmmsRcFile;
 	QString m_version;
+	unsigned int m_configVersion;
 	QStringList m_recentlyOpenedProjects;
 
 	typedef QVector<QPair<QString, QString> > stringPairVector;
