@@ -50,7 +50,7 @@ AudioSoundIo::AudioSoundIo( bool & outSuccessful, Mixer * _mixer ) :
 	m_outBufFrameIndex = 0;
 	m_outBufFramesTotal = 0;
 	m_stopped = true;
-	m_started = false;
+	m_outstreamStarted = false;
 
 	m_soundio = soundio_create();
 	if (!m_soundio)
@@ -220,7 +220,7 @@ void AudioSoundIo::startProcessing()
 
 	m_outBuf = new surroundSampleFrame[m_outBufSize];
 
-	if (! m_started)
+	if (! m_outstreamStarted)
 	{
 		if ((err = soundio_outstream_start(m_outstream)))
 		{
@@ -228,7 +228,7 @@ void AudioSoundIo::startProcessing()
 				"AudioSoundIo::startProcessing() :: soundio unable to start stream: %s\n", 
 				soundio_strerror(err));
 		} else {
-			m_started = true;
+			m_outstreamStarted = true;
 		}
 	}
 
@@ -238,18 +238,24 @@ void AudioSoundIo::startProcessing()
 	{
 		m_stopped = true;
 		fprintf(stderr, 
-			"AudioSoundIo::startProcessing() :: resuming result: %s\n", 
+			"AudioSoundIo::startProcessing() :: resuming result error: %s\n", 
 			soundio_strerror(err));
 	}
 }
 
 void AudioSoundIo::stopProcessing()
 {
+	int err;
+	
 	m_stopped = true;
 	if (m_outstream)
 	{
-		fprintf(stderr, "AudioSoundIo::stopProcessing() :: pausing result: %s\n",
-			soundio_strerror(soundio_outstream_pause(m_outstream, true)));
+		if (err = soundio_outstream_pause(m_outstream, true))
+		{
+			fprintf(stderr, 
+				"AudioSoundIo::stopProcessing() :: pausing result error: %s\n",
+				soundio_strerror(err));
+		}
 	}
 
 	if (m_outBuf)
