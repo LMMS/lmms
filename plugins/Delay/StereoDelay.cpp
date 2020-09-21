@@ -55,7 +55,7 @@ StereoDelay::~StereoDelay()
 
 
 
-void StereoDelay::tick( sampleFrame frame )
+void StereoDelay::tick( sampleFrame& frame )
 {
 	m_writeIndex = ( m_writeIndex + 1 ) % ( int )m_maxLength;
 	int readIndex = m_writeIndex - m_length;
