@@ -114,6 +114,7 @@ private:
 	void upgrade_1_1_91();
 	void upgrade_1_2_0_rc3();
 	void upgrade_1_3_0();
+	void upgrade_noHiddenClipNames();
 
 	// List of all upgrade methods
 	static const std::vector<UpgradeMethod> UPGRADE_METHODS;
@@ -141,4 +142,3 @@ private:
 
 
 #endif
-

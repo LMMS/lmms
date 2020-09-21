@@ -59,7 +59,7 @@ const std::vector<DataFile::UpgradeMethod> DataFile::UPGRADE_METHODS = {
 	&DataFile::upgrade_0_4_0_beta1      ,   &DataFile::upgrade_0_4_0_rc2,
 	&DataFile::upgrade_1_0_99           ,   &DataFile::upgrade_1_1_0,
 	&DataFile::upgrade_1_1_91           ,   &DataFile::upgrade_1_2_0_rc3,
-	&DataFile::upgrade_1_3_0
+	&DataFile::upgrade_1_3_0            ,   &DataFile::upgrade_noHiddenClipNames
 };
 
 // Vector of all versions that have upgrade routines.
@@ -1355,6 +1355,35 @@ void DataFile::upgrade_1_3_0()
 	}
 }
 
+void DataFile::upgrade_noHiddenClipNames()
+{
+	QDomNodeList tracks = elementsByTagName("track");
+
+	auto clearDefaultNames = [](QDomNodeList clips, QString trackName)
+	{
+		for (int j = 0; j < clips.size(); ++j)
+		{
+			QDomElement clip = clips.item(j).toElement();
+			QString clipName = clip.attribute("name", "");
+			if (clipName == trackName) { clip.setAttribute("name", ""); }
+		}
+	};
+
+	for (int i = 0; i < tracks.size(); ++i)
+	{
+		QDomElement track = tracks.item(i).toElement();
+		QString trackName = track.attribute("name", "");
+
+		QDomNodeList instClips = track.elementsByTagName("pattern");
+		QDomNodeList autoClips = track.elementsByTagName("automationpattern");
+		QDomNodeList bbClips = track.elementsByTagName("bbtco");
+
+		clearDefaultNames(instClips, trackName);
+		clearDefaultNames(autoClips, trackName);
+		clearDefaultNames(bbClips, trackName);
+	}
+}
+
 
 void DataFile::upgrade()
 {
@@ -1430,62 +1459,45 @@ void DataFile::loadData( const QByteArray & _data, const QString & _sourceFile )
 	m_type = type( root.attribute( "type" ) );
 	m_head = root.elementsByTagName( "head" ).item( 0 ).toElement();
 
-	if( root.hasAttribute( "version" ) )
+	if (!root.hasAttribute("version") || root.attribute("version")=="1.0")
 	{
-		if( root.attribute( "version" ) == "1.0" ){
-			// The file versioning is now a unsigned int, not maj.min, so we use
-			// legacyFileVersion() to retrieve the appropriate version
-			m_fileVersion = legacyFileVersion();
-		}
-		else
-		{
-			bool success;
-			m_fileVersion = root.attribute( "version" ).toUInt( &success );
-			if( !success ) qWarning("File Version conversion failure.");
-		}
+		// The file versioning is now a unsigned int, not maj.min, so we use
+		// legacyFileVersion() to retrieve the appropriate version
+		m_fileVersion = legacyFileVersion();
+	}
+	else
+	{
+		bool success;
+		m_fileVersion = root.attribute( "version" ).toUInt( &success );
+		if( !success ) qWarning("File Version conversion failure.");
 	}
 
-	if( root.hasAttribute( "creatorversion" ) )
+	if (root.hasAttribute("creatorversion"))
 	{
 		// compareType defaults to All, so it doesn't have to be set here
-		ProjectVersion createdWith = root.attribute( "creatorversion" );
+		ProjectVersion createdWith = root.attribute("creatorversion");
 		ProjectVersion openedWith = LMMS_VERSION;
 
-		if ( createdWith != openedWith )
-		{
-			if( createdWith.setCompareType( ProjectVersion::Minor ) !=
-				openedWith.setCompareType( ProjectVersion::Minor ) )
-			{
-				if( gui != nullptr && root.attribute( "type" ) == "song" )
-				{
-					TextFloat::displayMessage(
-						SongEditor::tr( "Version difference" ),
-						SongEditor::tr(
-							"This %1 was created with "
-							"LMMS %2."
-						).arg(
-							_sourceFile.endsWith( ".mpt" ) ?
-								SongEditor::tr( "template" ) :
-								SongEditor::tr( "project" )
-						)
-						.arg( root.attribute( "creatorversion" ) ),
-						embed::getIconPixmap( "whatsthis", 24, 24 ),
-						2500
-					);
-				}
-			}
+		if (createdWith < openedWith) { upgrade(); }
 
-			// the upgrade needs to happen after the warning as it updates the project version.
-			if( createdWith.setCompareType( ProjectVersion::Build )
-								< openedWith )
-			{
-				upgrade();
-			}
+		if (createdWith.setCompareType(ProjectVersion::Minor)
+		 !=  openedWith.setCompareType(ProjectVersion::Minor)
+		 && gui != nullptr && root.attribute("type") == "song"
+		){
+			auto projectType = _sourceFile.endsWith(".mpt") ?
+				SongEditor::tr("template") : SongEditor::tr("project");
+
+			TextFloat::displayMessage(
+				SongEditor::tr("Version difference"),
+				SongEditor::tr("This %1 was created with LMMS %2")
+				.arg(projectType).arg(createdWith.getVersion()),
+				embed::getIconPixmap("whatsthis", 24, 24),
+				2500
+			);
 		}
 	}
 
-	m_content = root.elementsByTagName( typeName( m_type ) ).
-							item( 0 ).toElement();
+	m_content = root.elementsByTagName(typeName(m_type)).item(0).toElement();
 }
 
 
