@@ -1374,9 +1374,9 @@ void DataFile::upgrade_noHiddenClipNames()
 		QDomElement track = tracks.item(i).toElement();
 		QString trackName = track.attribute("name", "");
 
-		QDomNodeList instClips = elementsByTagName("pattern");
-		QDomNodeList autoClips = elementsByTagName("automationpattern");
-		QDomNodeList bbClips = elementsByTagName("bbtco");
+		QDomNodeList instClips = track.elementsByTagName("pattern");
+		QDomNodeList autoClips = track.elementsByTagName("automationpattern");
+		QDomNodeList bbClips = track.elementsByTagName("bbtco");
 
 		clearDefaultNames(instClips, trackName);
 		clearDefaultNames(autoClips, trackName);
@@ -1459,22 +1459,20 @@ void DataFile::loadData( const QByteArray & _data, const QString & _sourceFile )
 	m_type = type( root.attribute( "type" ) );
 	m_head = root.elementsByTagName( "head" ).item( 0 ).toElement();
 
-	if( root.hasAttribute( "version" ) )
+	if (!root.hasAttribute("version") || root.attribute("version")=="1.0")
 	{
-		if( root.attribute( "version" ) == "1.0" ){
-			// The file versioning is now a unsigned int, not maj.min, so we use
-			// legacyFileVersion() to retrieve the appropriate version
-			m_fileVersion = legacyFileVersion();
-		}
-		else
-		{
-			bool success;
-			m_fileVersion = root.attribute( "version" ).toUInt( &success );
-			if( !success ) qWarning("File Version conversion failure.");
-		}
+		// The file versioning is now a unsigned int, not maj.min, so we use
+		// legacyFileVersion() to retrieve the appropriate version
+		m_fileVersion = legacyFileVersion();
+	}
+	else
+	{
+		bool success;
+		m_fileVersion = root.attribute( "version" ).toUInt( &success );
+		if( !success ) qWarning("File Version conversion failure.");
 	}
 
-	if(root.hasAttribute("creatorversion"))
+	if (root.hasAttribute("creatorversion"))
 	{
 		// compareType defaults to All, so it doesn't have to be set here
 		ProjectVersion createdWith = root.attribute("creatorversion");
