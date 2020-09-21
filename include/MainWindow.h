@@ -156,7 +156,6 @@ public slots:
 	void togglePianoRollWin();
 	void toggleControllerRack();
 	void toggleFullscreen();
-	void toggleMidiCCRack();
 
 	void updatePlayPauseIcons();
 

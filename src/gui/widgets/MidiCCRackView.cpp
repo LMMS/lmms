@@ -49,8 +49,9 @@
 #include "BBEditor.h"
 
 
-MidiCCRackView::MidiCCRackView() :
-	QWidget()
+MidiCCRackView::MidiCCRackView( InstrumentTrack * track ) :
+	QWidget(),
+	m_track( track )
 {
 	setWindowIcon( embed::getIconPixmap( "midi_cc_rack" ) );
 	setWindowTitle( tr("MIDI CC Rack") );
@@ -77,15 +78,9 @@ MidiCCRackView::MidiCCRackView() :
 	// We use a widget to be able to make this layout have a fixed height
 	QWidget *trackToolBar = new QWidget();
 	QHBoxLayout *trackToolBarLayout = new QHBoxLayout( trackToolBar );
-	QLabel *trackLabel = new QLabel( tr("Track: ") );
-	m_trackComboBox = new ComboBox();
-	m_trackComboBoxModel = new ComboBoxModel();
-	m_trackComboBox->setModel(m_trackComboBoxModel);
+	m_trackLabel = new QLabel( QString( tr( "Track: %1" ) ).arg( m_track->name() ) );
 
-	trackToolBarLayout->addWidget(trackLabel);
-	trackToolBarLayout->addWidget(m_trackComboBox);
-	trackToolBarLayout->setStretchFactor( trackLabel, 1 );
-	trackToolBarLayout->setStretchFactor( m_trackComboBox, 2 );
+	trackToolBarLayout->addWidget(m_trackLabel);
 	trackToolBar->setFixedHeight(40);
 
 	// Knobs GroupBox - Here we have the MIDI CC controller knobs for the selected track
@@ -115,31 +110,22 @@ MidiCCRackView::MidiCCRackView() :
 		knobsAreaLayout->addWidget( m_controllerKnob[i], i/3, i%3 );
 	}
 
-	// Connections are made to make sure the track ComboBox is updated when tracks are
-	// added, removed or renamed
-	// On the song editor:
-	connect( Engine::getSong() , SIGNAL( trackAdded(Track *) ),
-		this, SLOT( updateTracksComboBox() ) );
-	connect( Engine::getSong() , SIGNAL( trackRemoved() ),
-		this, SLOT( updateTracksComboBox() ) );
-	connect( Engine::getSong() , SIGNAL( trackRenamed() ),
-		this, SLOT( updateTracksComboBox() ) );
-	// On the BB editor:
-	connect( Engine::getBBTrackContainer() , SIGNAL( trackAdded(Track *) ),
-		this, SLOT( updateTracksComboBox() ) );
-	connect( Engine::getBBTrackContainer() , SIGNAL( trackRemoved() ),
-		this, SLOT( updateTracksComboBox() ) );
-	connect( Engine::getBBTrackContainer() , SIGNAL( trackRenamed() ),
-		this, SLOT( updateTracksComboBox() ) );
-	// Also when tracks are moved on the song editor and BB editor
-	connect( gui->songEditor()->m_editor, SIGNAL( movedTrackView() ),
-		this, SLOT( updateTracksComboBox() ) );
-	connect( gui->getBBEditor()->trackContainerView(), SIGNAL( movedTrackView() ),
-		this, SLOT( updateTracksComboBox() ) );
+	// Set all the models
+	// Set the LED button to enable/disable the track midi cc
+	m_midiCCGroupBox->setModel( m_track->m_midiCCEnable );
 
-	// Connection to update the knobs when the ComboBox selects another track
-	connect( m_trackComboBoxModel, SIGNAL( dataChanged() ),
-		this, SLOT( updateKnobsModels() ));
+	// Set the model for each Knob
+	for( int i = 0; i < MidiControllerCount; ++i ){
+		m_controllerKnob[i]->setModel( m_track->m_midiCCModel[i] );
+	}
+
+	// Connection made to make sure the rack is destroyed if the track is destroyed
+	connect( m_track, SIGNAL( destroyedTrack() ),
+		this, SLOT( destroyRack() ) );
+
+	// Connection to update the name of the track on the label
+	connect( m_track, SIGNAL( nameChanged() ),
+		this, SLOT( renameLabel() ) );
 
 	// Adding everything to the main layout
 	mainLayout->addWidget(trackToolBar);
@@ -150,68 +136,15 @@ MidiCCRackView::~MidiCCRackView()
 {
 }
 
-void MidiCCRackView::updateTracksComboBox()
+void MidiCCRackView::destroyRack()
 {
-	// Reset the combo box model to fill it with instrument tracks from the song/BB editors
-	m_trackComboBoxModel->clear();
-
-	// Reset our list with pointers to the tracks
-	m_tracks.clear();
-
-	TrackContainer::TrackList songEditorTracks;
-	songEditorTracks = Engine::getSong()->tracks();
-	int songEditorID = 1;
-
-	TrackContainer::TrackList bbEditorTracks;
-	bbEditorTracks = Engine::getBBTrackContainer()->tracks();
-	int bbEditorID = 1;
-
-	for(Track *t: songEditorTracks)
-	{
-		if( t->type() == Track::InstrumentTrack )
-		{
-			m_trackComboBoxModel->addItem("SongEditor: " + QString::number(songEditorID) + ". " + t->name());
-			m_tracks += t;
-			++songEditorID;
-		}
-	}
-	for(Track *t: bbEditorTracks)
-	{
-		if( t->type() == Track::InstrumentTrack )
-		{
-			m_trackComboBoxModel->addItem("BBEditor: " + QString::number(bbEditorID) + ". " + t->name());
-			m_tracks += t;
-			++bbEditorID;
-		}
-	}
-
-	updateKnobsModels();
+	unsetModels();
+	parentWidget()->close();
 }
 
-void MidiCCRackView::updateKnobsModels()
+void MidiCCRackView::renameLabel()
 {
-	// Disconnect the model views from any model first
-	unsetModels();
-
-	if( m_tracks.size() > 0 )
-	{
-		InstrumentTrack *selectedTrack = dynamic_cast<InstrumentTrack *>( m_tracks[ m_trackComboBoxModel->value() ] );
-
-		// TODO: I need to figure out why this line is necessary. Without it I get a segfault because at
-		// LMMS's startup sometimes m_tracks will hold tracks that have type() == Tracks::InstrumentTracks
-		// but casting the to InstrumentTrack * returns a nullptr. Meaning maybe the constructor wasn't
-		// executed yet.
-		if( selectedTrack )
-		{
-			// Set the LED button to enable/disable the track midi cc
-			m_midiCCGroupBox->setModel( selectedTrack->m_midiCCEnable );
-
-			// Set the model for each Knob
-			for( int i = 0; i < MidiControllerCount; ++i ){
-				m_controllerKnob[i]->setModel( selectedTrack->m_midiCCModel[i] );
-			}
-		}
-	}
+	m_trackLabel->setText( QString( tr( "Track: %1" ) ).arg( m_track->name() ) );
 }
 
 void MidiCCRackView::unsetModels()

@@ -42,7 +42,6 @@
 #include "AutomationEditor.h"
 #include "BBEditor.h"
 #include "ControllerRackView.h"
-#include "MidiCCRackView.h"
 #include "embed.h"
 #include "Engine.h"
 #include "ExportProjectDialog.h"
@@ -538,14 +537,6 @@ void MainWindow::finalize()
 								m_toolBar );
 	project_notes_window->setShortcut( Qt::CTRL + Qt::Key_7 );
 
-	ToolButton * midi_cc_rack_window = new ToolButton(
-					embed::getIconPixmap( "midi_cc_rack" ),
-					tr( "Show/hide MIDI CC rack") +
-								" (Ctrl+8)",
-					this, SLOT( toggleMidiCCRack() ),
-								m_toolBar );
-	midi_cc_rack_window->setShortcut( Qt::CTRL + Qt::Key_8 );
-
 	m_toolBarLayout->addWidget( song_editor_window, 1, 1 );
 	m_toolBarLayout->addWidget( bb_editor_window, 1, 2 );
 	m_toolBarLayout->addWidget( piano_roll_window, 1, 3 );
@@ -553,7 +544,6 @@ void MainWindow::finalize()
 	m_toolBarLayout->addWidget( fx_mixer_window, 1, 5 );
 	m_toolBarLayout->addWidget( controllers_window, 1, 6 );
 	m_toolBarLayout->addWidget( project_notes_window, 1, 7 );
-	m_toolBarLayout->addWidget( midi_cc_rack_window, 1, 8 );
 	m_toolBarLayout->setColumnStretch( 100, 1 );
 
 	// setup-dialog opened before?
@@ -1148,10 +1138,6 @@ void MainWindow::updateViewMenu()
 			      tr( "Project Notes" ) + "\tCtrl+7",
 			      this, SLOT( toggleProjectNotesWin() )
 		);
-	m_viewMenu->addAction(embed::getIconPixmap( "midi_cc_rack" ),
-			      tr( "MIDI CC Rack" ) + "\tCtrl+8",
-			      this, SLOT( toggleMidiCCRack() )
-		);
 
 	m_viewMenu->addSeparator();
 	
@@ -1252,14 +1238,6 @@ void MainWindow::onToggleMetronome()
 void MainWindow::toggleControllerRack()
 {
 	toggleWindow( gui->getControllerRackView() );
-}
-
-
-
-
-void MainWindow::toggleMidiCCRack()
-{
-	toggleWindow( gui->getMidiCCRackView() );
 }
 
 

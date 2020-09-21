@@ -122,11 +122,6 @@ InstrumentTrack::InstrumentTrack( TrackContainer* tc ) :
 	}
 
 
-	// IMPORTANT NOTE: We have to create the MIDI CC models before calling setName, because the latter
-	// will trigger a trackRenamed signal on the track container, which will then call
-	// MidiCCRackView::updateTracksComboBox, which itself calls MidiCCRackView::updateKnobsModels. That
-	// last method expects the Tracks CC Enable and Knob models to be created already.
-
 	// Initialize the m_midiCCEnabled variable, but it's actually going to be connected
 	// to a LedButton
 	m_midiCCEnable = new BoolModel( false, NULL, "Enable/Disable MIDI CC" );
@@ -164,26 +159,13 @@ int InstrumentTrack::baseNote() const
 
 InstrumentTrack::~InstrumentTrack()
 {
-	// Delete models from the MIDI CC
-	// First unset the models from the MIDI CC rack in case ours are being used
-	// 	OBS: We need to check if getMidiCCRackView() is not nullptr because the track might be
-	// 	destroyed during LMMS being closed, where the editors and racks could have been destroyed
-	// 	already.
-	if( GuiApplication::instance()->getMidiCCRackView() )
-	{
-		GuiApplication::instance()->getMidiCCRackView()->unsetModels();
-	}
-
-	// Remove the models
+	// Remove the MIDI CC models
 	delete m_midiCCEnable;
 
 	for( int i = 0; i < MidiControllerCount; ++i )
 	{
 		delete m_midiCCModel[i];
 	}
-
-	// We don't need to call gui->getMidiCCRackView()->updateKnobsModels() because it will be called
-	// automatically when the trackRemoved signal is triggered.
 
 	// De-assign midi device
 	if (m_hasAutoMidiDev)
@@ -1093,10 +1075,12 @@ InstrumentTrackView::InstrumentTrackView( InstrumentTrack * _it, TrackContainerV
 	m_panningKnob = new Knob( knobSmall_17, getTrackSettingsWidget(),
 							tr( "Panning" ) );
 	m_panningKnob->setModel( &_it->m_panningModel );
-    m_panningKnob->setHintText( tr( "Panning:" ), "%" );
+	m_panningKnob->setHintText( tr( "Panning:" ), "%" );
 	m_panningKnob->move( widgetWidth-24, 2 );
 	m_panningKnob->setLabel( tr( "PAN" ) );
 	m_panningKnob->show();
+
+	m_midiCCRackView = new MidiCCRackView( _it );
 
 	m_midiMenu = new QMenu( tr( "MIDI" ), this );
 
@@ -1133,6 +1117,10 @@ InstrumentTrackView::InstrumentTrackView( InstrumentTrack * _it, TrackContainerV
 	m_midiInputAction->setText( tr( "Input" ) );
 	m_midiOutputAction->setText( tr( "Output" ) );
 
+	QAction *midiRackAction = m_midiMenu->addAction( "Open/Close MIDI CC Rack" );
+	connect( midiRackAction, SIGNAL( triggered() ),
+		this, SLOT( toggleMidiCCRack() ) );
+
 	m_activityIndicator = new FadeButton( QApplication::palette().color( QPalette::Active,
 							QPalette::Background),
 						QApplication::palette().color( QPalette::Active,
@@ -1164,6 +1152,22 @@ InstrumentTrackView::~InstrumentTrackView()
 
 	delete model()->m_midiPort.m_readablePortsMenu;
 	delete model()->m_midiPort.m_writablePortsMenu;
+}
+
+
+
+
+void InstrumentTrackView::toggleMidiCCRack()
+{
+	if( m_midiCCRackView->parentWidget()->isVisible() )
+	{
+		m_midiCCRackView->parentWidget()->hide();
+	}
+	else
+	{
+		m_midiCCRackView->parentWidget()->show();
+		m_midiCCRackView->show();
+	}
 }
 
 

@@ -39,6 +39,7 @@
 #include "Plugin.h"
 #include "Track.h"
 #include "Midi.h"
+#include "MidiCCRackView.h"
 
 
 
@@ -345,6 +346,7 @@ protected:
 
 private slots:
 	void toggleInstrumentWindow( bool _on );
+	void toggleMidiCCRack();
 	void activityIndicatorPressed();
 	void activityIndicatorReleased();
 
@@ -371,6 +373,8 @@ private:
 
 	QAction * m_midiInputAction;
 	QAction * m_midiOutputAction;
+
+	MidiCCRackView * m_midiCCRackView;
 
 	QPoint m_lastPos;
 

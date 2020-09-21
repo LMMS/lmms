@@ -2,6 +2,7 @@
 #define MIDI_CC_RACK_VIEW_H
 
 #include <QWidget>
+#include <QLabel>
 #include <QCloseEvent>
 
 #include "SerializingObject.h"
@@ -19,7 +20,7 @@ class MidiCCRackView : public QWidget, public SerializingObject
 {
 	Q_OBJECT
 public:
-	MidiCCRackView();
+	MidiCCRackView( InstrumentTrack * track );
 	virtual ~MidiCCRackView();
 
 	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
@@ -31,14 +32,14 @@ public:
 	}
 
 public slots:
-	void updateTracksComboBox();
-	void updateKnobsModels();
 	void unsetModels();
+	void destroyRack();
+	void renameLabel();
 
 private:
-	ComboBox *m_trackComboBox;
-	ComboBoxModel *m_trackComboBoxModel;
-	TrackContainer::TrackList m_tracks; // List with pointers to the ComboBox tracks themselfs
+	QLabel *m_trackLabel;
+
+	InstrumentTrack *m_track;
 
 	GroupBox *m_midiCCGroupBox; // MIDI CC GroupBox (used to enable disable MIDI CC)
 

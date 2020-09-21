@@ -38,7 +38,6 @@
 #include "PianoRoll.h"
 #include "ProjectNotes.h"
 #include "SongEditor.h"
-#include "MidiCCRackView.h"
 
 #include <QApplication>
 #include <QDir>
@@ -152,10 +151,6 @@ GuiApplication::GuiApplication()
 	m_automationEditor = new AutomationEditorWindow;
 	connect(m_automationEditor, SIGNAL(destroyed(QObject*)), this, SLOT(childDestroyed(QObject*)));
 
-	displayInitProgress(tr("Preparing MIDI CC rack"));
-	m_midiCCRackView = new MidiCCRackView;
-	connect(m_midiCCRackView, SIGNAL(destroyed(QObject*)), this, SLOT(childDestroyed(QObject*)));
-
 	splashScreen.finish(m_mainWindow);
 	m_mainWindow->finalize();
 
@@ -214,9 +209,5 @@ void GuiApplication::childDestroyed(QObject *obj)
 	else if (obj == m_controllerRackView)
 	{
 		m_controllerRackView = nullptr;
-	}
-	else if (obj == m_midiCCRackView)
-	{
-		m_midiCCRackView = nullptr;
 	}
 }
