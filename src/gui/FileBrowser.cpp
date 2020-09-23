@@ -373,13 +373,13 @@ void FileBrowserTreeWidget::keyPressEvent(QKeyEvent * ke )
 	const auto key = ke->key();
 	const bool vertical = key == Qt::Key_Up || key == Qt::Key_Down;
 	const bool horizontal = key == Qt::Key_Left || key == Qt::Key_Right;
-	
-	if (vertical || horizontal){ stopPreview(); }
 		
 	// We hijack left/right for preview/add, so don't let them navigate the tree
 	if (!horizontal){ QTreeWidget::keyPressEvent(ke); }
 	// We don't want to spam previews or track addition when a key is held
-	if (ke->isAutoRepeat()){ return; }	
+	if (ke->isAutoRepeat()){ return; }
+	// We should stop previews before we do anything new
+	if (vertical || horizontal){ stopPreview(); }
 	
 	// The currently selected file item
 	FileItem * file = dynamic_cast<FileItem *>(currentItem());
@@ -397,8 +397,10 @@ void FileBrowserTreeWidget::keyPressEvent(QKeyEvent * ke )
 	if (key == Qt::Key_Right)
 	{
 		bool songEditor = !(ke->modifiers() & Qt::ControlModifier);
-		if (ke->modifiers() & Qt::ShiftModifier){ openInNewSampleTrack(file, songEditor); }
-		else { openInNewInstrumentTrack(file, songEditor); }
+		bool sampleTrack = ke->modifiers() & Qt::ShiftModifier;
+		//We can only send to sample tracks in the song editor
+		if (sampleTrack && songEditor){ openInNewSampleTrack(file); }
+		else if (!sampleTrack){ openInNewInstrumentTrack(file, songEditor); }
 	}
 
 	//On left arrow pressed, start previewing the item
@@ -429,16 +431,6 @@ void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent * e )
 		connect(toActiveInstrument, &QAction::triggered,
 			[=]{ sendToActiveInstrumentTrack(file); });
 		contextMenu.addAction( toActiveInstrument );
-
-		QAction* songEditorHeader = new QAction( tr("Song Editor") );
-		songEditorHeader->setDisabled(true);
-		contextMenu.addAction( songEditorHeader );
-		contextMenu.addActions( getContextActions(file, true) );
-
-		QAction* bbEditorHeader = new QAction( tr("BB Editor") );
-		bbEditorHeader->setDisabled(true);
-		contextMenu.addAction( bbEditorHeader );
-		contextMenu.addActions( getContextActions(file, false) );
 		
 		contextMenu.addSeparator();
 
@@ -449,6 +441,16 @@ void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent * e )
 		connect(openFolder, &QAction::triggered,
 			[=]{ openContainingFolder(file); });
 		contextMenu.addAction(openFolder);
+
+		QAction* songEditorHeader = new QAction( tr("Song Editor") );
+		songEditorHeader->setDisabled(true);
+		contextMenu.addAction( songEditorHeader );
+		contextMenu.addActions( getContextActions(file, true) );
+
+		QAction* bbEditorHeader = new QAction( tr("BB Editor") );
+		bbEditorHeader->setDisabled(true);
+		contextMenu.addAction( bbEditorHeader );
+		contextMenu.addActions( getContextActions(file, false) );
 
 		//If all we have is the first action + two headers, the item isn't
 		//valid, so we shouldn't show the menu
@@ -463,9 +465,9 @@ void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent * e )
 QList<QAction*> FileBrowserTreeWidget::getContextActions(FileItem* file, bool songEditor)
 {
 	QList<QAction*> result = QList<QAction*>();
+	const bool fileIsSample = file->type() == FileItem::SampleFile;
 	
-	QString destination = (file->type() == FileItem::SampleFile) ?
-		"AFP Instance" : "Instrument Track";
+	QString destination = fileIsSample ? "AFP Instance" : "Instrument Track";
 	QString shortcutMod = songEditor ? "" : "Ctrl + ";
 	
 	QAction* toInstrument = new QAction(
@@ -473,6 +475,14 @@ QList<QAction*> FileBrowserTreeWidget::getContextActions(FileItem* file, bool so
 	connect(toInstrument, &QAction::triggered,
 		[=]{ openInNewInstrumentTrack(file, songEditor); });
 	result.append(toInstrument);
+	
+	if(songEditor && fileIsSample){
+		QAction* toSampleTrack = new QAction(
+			tr("Send to new Sample Track (Shift + Right Arrow)"));
+		connect(toSampleTrack, &QAction::triggered,
+		[=]{ openInNewSampleTrack(file); });
+		result.append(toSampleTrack);
+	}
 	
 	return result;
 }
@@ -772,18 +782,14 @@ void FileBrowserTreeWidget::openInNewInstrumentTrack(FileItem* item, bool songEd
 
 
 
-bool FileBrowserTreeWidget::openInNewSampleTrack(FileItem* item, bool songEditor)
+bool FileBrowserTreeWidget::openInNewSampleTrack(FileItem* item)
 {
 	// Can't add non-samples to a sample track
 	if (item->type() != FileItem::SampleFile){ return false; }
-	if (!songEditor){  }
-	
-	TrackContainer* trackContainer = Engine::getSong();
-	if (!songEditor){ trackContainer = Engine::getBBTrackContainer(); }
 	
 	// Create a new sample track for this sample
 	SampleTrack* sampleTrack = dynamic_cast<SampleTrack*>(
-		Track::create(Track::SampleTrack, trackContainer));
+		Track::create(Track::SampleTrack, Engine::getSong()));
 	
 	// Add the sample clip to the track
 	Engine::mixer()->requestChangeInModel();
