@@ -368,46 +368,48 @@ QList<QString> FileBrowserTreeWidget::expandedDirs( QTreeWidgetItem * item ) con
 
 void FileBrowserTreeWidget::keyPressEvent(QKeyEvent * ke )
 {
-	auto selection = currentItem();
-	FileItem * file = dynamic_cast<FileItem *>( selection );
-
-	switch( ke->key() ){
-		case Qt::Key_Up:
-			{
-				QTreeWidget::keyPressEvent(ke);
-				file = dynamic_cast<FileItem *>( currentItem() );
-				if (file != NULL && !ke->isAutoRepeat())
-				{ previewFileItem(file); }
-				break;
-			}
-		case Qt::Key_Down:
-			{
-				QTreeWidget::keyPressEvent(ke);
-				file = dynamic_cast<FileItem *>( currentItem() );
-				if (file != NULL && !ke->isAutoRepeat())
-				{ previewFileItem(file); }
-				break;
-			}
-		case Qt::Key_Right:
-		{
-			if (!ke->isAutoRepeat() && file != NULL){
-				if (!ke->modifiers())
-					{ openInNewInstrumentTrackSE(file); }
-				else if (ke->modifiers() & Qt::ControlModifier)
-					{ openInNewInstrumentTrackBBE(file); }
-			}
-			break;
-		}
-		case Qt::Key_Left:
-		{
-			if (file != NULL && !ke->isAutoRepeat())
-			{ previewFileItem(file); }
-		}
-		default:
-			if (!ke->isAutoRepeat() && ke->key() != Qt::Key_Left)//!ke->matches(QKeySequence::MoveToPreviousChar))
-			{ QTreeWidget::keyPressEvent(ke); }
+	// Convenient things to check
+	const auto key = ke->key();
+	const bool vertical = key == Qt::Key_Up || key == Qt::Key_Down;
+	const bool horizontal = key == Qt::Key_Left || key == Qt::Key_Right;
+	
+	if (vertical || horizontal){ stopPreview(); }
+		
+	// We hijack left/right for preview/add, so don't let them navigate the tree
+	if (!horizontal){ QTreeWidget::keyPressEvent(ke); }
+	// We don't want to spam previews or track addition when a key is held
+	if (ke->isAutoRepeat()){ return; }	
+	
+	// The currently selected file item
+	FileItem * file = dynamic_cast<FileItem *>(currentItem());
+	// If it's null, there's nothing for us to do
+	if (file == NULL){ return; }
+	
+	// On navigation up/down, preview samples
+	// Don't automatically preview presets, because they can play forever
+	if (vertical && file->type() == FileItem::SampleFile)
+	{
+		previewFileItem(file);
+	}
+	
+	//On right arrow pressed, add the item
+	if (key == Qt::Key_Right)
+	{
+		bool songEditor = !(ke->modifiers() & Qt::ControlModifier);
+		openInNewInstrumentTrack(file, songEditor);
 	}
 
+	//On left arrow pressed, start previewing the item
+	if (key == Qt::Key_Left) { previewFileItem(file); }
+}
+
+
+
+
+void FileBrowserTreeWidget::keyReleaseEvent(QKeyEvent * ke )
+{
+	//Cancel previews when the left key is released
+	if (ke->key() == Qt::Key_Left && !ke->isAutoRepeat()){ stopPreview(); }
 }
 
 
@@ -429,12 +431,12 @@ void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent * e )
 		QAction* songEditorHeader = new QAction( tr("Song Editor") );
 		songEditorHeader->setDisabled(true);
 		contextMenu.addAction( songEditorHeader );
-		contextMenu.addActions( getContextActionsSE(file) );
+		contextMenu.addActions( getContextActions(file, true) );
 
 		QAction* bbEditorHeader = new QAction( tr("BB Editor") );
 		bbEditorHeader->setDisabled(true);
 		contextMenu.addAction( bbEditorHeader );
-		contextMenu.addActions( getContextActionsBBE(file) );
+		contextMenu.addActions( getContextActions(file, false) );
 		
 		contextMenu.addSeparator();
 
@@ -456,48 +458,20 @@ void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent * e )
 
 
 
-QList<QAction*> FileBrowserTreeWidget::getContextActionsSE(FileItem* file)
+QList<QAction*> FileBrowserTreeWidget::getContextActions(FileItem* file, bool songEditor)
 {
 	QList<QAction*> result = QList<QAction*>();
-	if (file->type() == FileItem::SampleFile)
-	{
-		QAction* toAFP = new QAction(
-			tr("Send to new AFP Instance (Right Arrow)") );
-		connect(toAFP, &QAction::triggered,
-			[=]{ openInNewInstrumentTrackSE(file); });
-		result.append(toAFP);
-	}
-	else {
-		QAction* toInstrument = new QAction(
-			tr("Send to new Instrument Track (Right Arrow)") );
-		connect(toInstrument, &QAction::triggered,
-			[=]{ openInNewInstrumentTrackSE(file); });
-		result.append(toInstrument);
-	}
-	return result;
-}
-
-
-
-
-QList<QAction*> FileBrowserTreeWidget::getContextActionsBBE(FileItem* file)
-{
-	QList<QAction*> result = QList<QAction*>();
-	if (file->type() == FileItem::SampleFile)
-	{
-		QAction* toAFP = new QAction(
-			tr("Send to new AFP Instance (Ctrl + Right Arrow)") );
-		connect(toAFP, &QAction::triggered,
-			[=]{ openInNewInstrumentTrackBBE(file); });
-		result.append(toAFP);
-	}
-	else {
-		QAction* toInstrument = new QAction(
-			tr("Send to new Instrument Track (Ctrl + Right Arrow)") );
-		connect(toInstrument, &QAction::triggered,
-			[=]{ openInNewInstrumentTrackBBE(file); });
-		result.append(toInstrument);
-	}
+	
+	QString destination = (file->type() == FileItem::SampleFile) ?
+		"AFP Instance" : "Instrument Track";
+	QString shortcutMod = songEditor ? "" : "Ctrl + ";
+	
+	QAction* toInstrument = new QAction(
+		tr("Send to new %1 (%2Right Arrow)").arg(destination, shortcutMod));
+	connect(toInstrument, &QAction::triggered,
+		[=]{ openInNewInstrumentTrack(file, songEditor); });
+	result.append(toInstrument);
+	
 	return result;
 }
 
@@ -506,14 +480,13 @@ QList<QAction*> FileBrowserTreeWidget::getContextActionsBBE(FileItem* file)
 
 void FileBrowserTreeWidget::mousePressEvent(QMouseEvent * me )
 {
-	QTreeWidget::mousePressEvent( me );
-	if( me->button() != Qt::LeftButton )
-	{
-		return;
-	}
+	// Forward the event
+	QTreeWidget::mousePressEvent(me);
+	// QTreeWidget handles right clicks for us, so we only care about left clicks
+	if(me->button() != Qt::LeftButton){ return; }
 
-	QTreeWidgetItem * i = itemAt( me->pos() );
-	if ( i )
+	QTreeWidgetItem * i = itemAt(me->pos());
+	if (i)
 	{
 		// TODO: Restrict to visible selection
 //		if ( _me->x() > header()->cellPos( header()->mapToActual( 0 ) )
@@ -527,11 +500,8 @@ void FileBrowserTreeWidget::mousePressEvent(QMouseEvent * me )
 //		}
 	}
 
-	FileItem * f = dynamic_cast<FileItem *>( i );
-	if( f != NULL )
-	{
-		previewFileItem(f);
-	}
+	FileItem * f = dynamic_cast<FileItem *>(i);
+	if(f != NULL){ previewFileItem(f); }
 }
 
 
@@ -540,61 +510,72 @@ void FileBrowserTreeWidget::mousePressEvent(QMouseEvent * me )
 void FileBrowserTreeWidget::previewFileItem(FileItem* file)
 {
 	m_pphMutex.lock();
-	if( m_previewPlayHandle != NULL )
-	{
-		Engine::mixer()->removePlayHandle(
-						m_previewPlayHandle );
-		m_previewPlayHandle = NULL;
-	}
+	//If something is already playing, stop it
+	stopPreview();
 
 	// in special case of sample-files we do not care about
 	// handling() rather than directly creating a SamplePlayHandle
-	if( file->type() == FileItem::SampleFile )
+	if(file->type() == FileItem::SampleFile)
 	{
 		TextFloat * tf = TextFloat::displayMessage(
-				tr( "Loading sample" ),
-				tr( "Please wait, loading sample for "
-							"preview..." ),
-				embed::getIconPixmap( "sample_file",
-							24, 24 ), 0 );
-		qApp->processEvents(
-				QEventLoop::ExcludeUserInputEvents );
-		SamplePlayHandle * s = new SamplePlayHandle( file->fullName() );
-		s->setDoneMayReturnTrue( false );
+				tr("Loading sample"),
+				tr("Please wait, loading sample for preview..."),
+				embed::getIconPixmap("sample_file", 24, 24), 0);
+		qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
+		SamplePlayHandle * s = new SamplePlayHandle(file->fullName());
+		s->setDoneMayReturnTrue(false);
 		m_previewPlayHandle = s;
 		delete tf;
 	}
 	else if(
-		( file->extension ()== "xiz" || file->extension() == "sf2" ||
-		  file->extension() == "sf3" || file->extension() == "gig" ||
-		  file ->extension() == "pat" ) &&
-		! pluginFactory->pluginSupportingExtension(file->extension()).info.isNull() )
+		(file->extension() == "xiz" || file->extension() == "sf2" ||
+		 file->extension() == "sf3" || file->extension() == "gig" ||
+		 file ->extension() == "pat") &&
+		!pluginFactory->pluginSupportingExtension(file->extension()).info.isNull())
 	{
 		m_previewPlayHandle = new PresetPreviewPlayHandle(
-			file->fullName(), file->handling() == FileItem::LoadByPlugin );
+			file->fullName(), file->handling() == FileItem::LoadByPlugin);
 	}
-	else if( file->type() != FileItem::VstPluginFile && file->isTrack() )
+	else if(file->type() != FileItem::VstPluginFile && file->isTrack())
 	{
-		DataFile dataFile( file->fullName() );
-		if( !dataFile.validate( file->extension() ) )
+		DataFile dataFile(file->fullName());
+		if(!dataFile.validate(file->extension()))
 		{
-			QMessageBox::warning( 0, tr ( "Error" ),
-				tr( "%1 does not appear to be a valid %2 file" ).arg( file->fullName(), file->extension() ),
-				QMessageBox::Ok, QMessageBox::NoButton );
+			QMessageBox::warning(0, tr ("Error"),
+				tr("%1 does not appear to be a valid %2 file")
+				.arg(file->fullName(), file->extension()),
+				QMessageBox::Ok, QMessageBox::NoButton);
 			m_pphMutex.unlock();
 			return;
 		}
-		m_previewPlayHandle = new PresetPreviewPlayHandle( file->fullName(), file->handling() == FileItem::LoadByPlugin, &dataFile );
+		m_previewPlayHandle = new PresetPreviewPlayHandle(
+			file->fullName(), file->handling() == FileItem::LoadByPlugin, &dataFile
+		);
 	}
-	if( m_previewPlayHandle != NULL )
+	if(m_previewPlayHandle != NULL)
 	{
-		if( !Engine::mixer()->addPlayHandle(
-						m_previewPlayHandle ) )
+		if(!Engine::mixer()->addPlayHandle(m_previewPlayHandle))
 		{
 			m_previewPlayHandle = NULL;
 		}
 	}
 	m_pphMutex.unlock();
+}
+
+
+
+
+bool FileBrowserTreeWidget::stopPreview()
+{
+	if (m_previewPlayHandle != NULL)
+	{
+		m_pphMutex.lock();
+		Engine::mixer()->removePlayHandle(m_previewPlayHandle);
+		m_previewPlayHandle = NULL;
+		m_pphMutex.unlock();
+		return true;
+	}
+	else { return false; }
 }
 
 
@@ -661,26 +642,24 @@ void FileBrowserTreeWidget::mouseReleaseEvent(QMouseEvent * me )
 	m_mousePressed = false;
 
 	m_pphMutex.lock();
-	if( m_previewPlayHandle != NULL )
+	if(m_previewPlayHandle != NULL)
 	{
 		// if there're samples shorter than 3 seconds, we don't
 		// stop them if the user releases mouse-button...
-		if( m_previewPlayHandle->type() == PlayHandle::TypeSamplePlayHandle )
+		if(m_previewPlayHandle->type() == PlayHandle::TypeSamplePlayHandle)
 		{
-			SamplePlayHandle * s = dynamic_cast<SamplePlayHandle *>(
-							m_previewPlayHandle );
-			if( s && s->totalFrames() - s->framesDone() <=
-				static_cast<f_cnt_t>( Engine::mixer()->
-						processingSampleRate() * 3 ) )
+			SamplePlayHandle * s = dynamic_cast<SamplePlayHandle *>(m_previewPlayHandle);
+			if(s && s->totalFrames() - s->framesDone() <=
+				static_cast<f_cnt_t>(Engine::mixer()->
+						processingSampleRate() * 3))
 			{
-				s->setDoneMayReturnTrue( true );
+				s->setDoneMayReturnTrue(true);
 				m_previewPlayHandle = NULL;
 				m_pphMutex.unlock();
 				return;
 			}
 		}
-		Engine::mixer()->removePlayHandle( m_previewPlayHandle );
-		m_previewPlayHandle = NULL;
+		else { stopPreview(); }
 	}
 	m_pphMutex.unlock();
 }
@@ -780,18 +759,14 @@ void FileBrowserTreeWidget::openInNewInstrumentTrack( TrackContainer* tc, FileIt
 
 
 
-void FileBrowserTreeWidget::openInNewInstrumentTrackBBE( FileItem* item )
+void FileBrowserTreeWidget::openInNewInstrumentTrack(FileItem* item, bool songEditor)
 {
-	openInNewInstrumentTrack( Engine::getBBTrackContainer(), item );
+	//Ternary doesn't compile here so do it the long way
+	TrackContainer* tc = Engine::getSong();
+	if (!songEditor) { tc = Engine::getBBTrackContainer(); }
+	openInNewInstrumentTrack(tc, item);
 }
 
-
-
-
-void FileBrowserTreeWidget::openInNewInstrumentTrackSE( FileItem* item )
-{
-	openInNewInstrumentTrack( Engine::getSong(), item );
-}
 
 
 

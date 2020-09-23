@@ -101,7 +101,6 @@ public:
 
 	void tryAddSEInstrumentTrack(FileItem* file);
 	void tryAddBBInstrumentTrack(FileItem* file);
-	void previewFileItem(FileItem* file);
 
 
 protected:
@@ -112,7 +111,13 @@ protected:
 
 
 private:
+	//Preview a file
+	void previewFileItem(FileItem* file);
+	//If a preview is playing, stop it and return true. Otherwise return false
+	bool stopPreview();
+	
 	void keyPressEvent( QKeyEvent * ke ) override;
+	void keyReleaseEvent( QKeyEvent * ke ) override;
 
 	void handleFile( FileItem * fi, InstrumentTrack * it );
 	void openInNewInstrumentTrack( TrackContainer* tc, FileItem* item );
@@ -124,14 +129,12 @@ private:
 	PlayHandle* m_previewPlayHandle;
 	QMutex m_pphMutex;
 
-	QList<QAction*> getContextActionsSE(FileItem* item);
-	QList<QAction*> getContextActionsBBE(FileItem* item);
+	QList<QAction*> getContextActions(FileItem* item, bool songEditor);
 
 
 private slots:
 	void activateListItem( QTreeWidgetItem * item, int column );
-	void openInNewInstrumentTrackBBE( FileItem* item );
-	void openInNewInstrumentTrackSE( FileItem* item );
+	void openInNewInstrumentTrack( FileItem* item, bool songEditor );
 	void openInNewSampleTrack( FileItem* item );
 	void sendToActiveInstrumentTrack( FileItem* item );
 	void updateDirectory( QTreeWidgetItem * item );
