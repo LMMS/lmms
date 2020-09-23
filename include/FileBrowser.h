@@ -135,7 +135,7 @@ private:
 private slots:
 	void activateListItem( QTreeWidgetItem * item, int column );
 	void openInNewInstrumentTrack( FileItem* item, bool songEditor );
-	void openInNewSampleTrack( FileItem* item );
+	bool openInNewSampleTrack( FileItem* item, bool songEditor );
 	void sendToActiveInstrumentTrack( FileItem* item );
 	void updateDirectory( QTreeWidgetItem * item );
 	void openContainingFolder( FileItem* item );

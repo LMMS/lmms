@@ -50,6 +50,7 @@
 #include "PluginFactory.h"
 #include "PresetPreviewPlayHandle.h"
 #include "SamplePlayHandle.h"
+#include "SampleTrack.h"
 #include "Song.h"
 #include "StringPairDrag.h"
 #include "TextFloat.h"
@@ -396,7 +397,8 @@ void FileBrowserTreeWidget::keyPressEvent(QKeyEvent * ke )
 	if (key == Qt::Key_Right)
 	{
 		bool songEditor = !(ke->modifiers() & Qt::ControlModifier);
-		openInNewInstrumentTrack(file, songEditor);
+		if (ke->modifiers() & Qt::ShiftModifier){ openInNewSampleTrack(file, songEditor); }
+		else { openInNewInstrumentTrack(file, songEditor); }
 	}
 
 	//On left arrow pressed, start previewing the item
@@ -668,7 +670,7 @@ void FileBrowserTreeWidget::mouseReleaseEvent(QMouseEvent * me )
 
 
 
-void FileBrowserTreeWidget::handleFile(FileItem * f, InstrumentTrack * it )
+void FileBrowserTreeWidget::handleFile(FileItem * f, InstrumentTrack * it)
 {
 	Engine::mixer()->requestChangeInModel();
 	switch( f->handling() )
@@ -746,13 +748,13 @@ void FileBrowserTreeWidget::activateListItem(QTreeWidgetItem * item,
 
 
 
-void FileBrowserTreeWidget::openInNewInstrumentTrack( TrackContainer* tc, FileItem* item )
+void FileBrowserTreeWidget::openInNewInstrumentTrack(TrackContainer* tc, FileItem* item)
 {
-	if( item->isTrack() )
+	if(item->isTrack())
 	{
 		InstrumentTrack * it = dynamic_cast<InstrumentTrack *>(
-				Track::create( Track::InstrumentTrack, tc ) );
-		handleFile( item, it );
+				Track::create(Track::InstrumentTrack, tc));
+		handleFile(item, it);
 	}
 }
 
@@ -761,10 +763,34 @@ void FileBrowserTreeWidget::openInNewInstrumentTrack( TrackContainer* tc, FileIt
 
 void FileBrowserTreeWidget::openInNewInstrumentTrack(FileItem* item, bool songEditor)
 {
-	//Ternary doesn't compile here so do it the long way
+	//Get the correcy TrackContainer, ternary doesn't compile here so do it the long way
 	TrackContainer* tc = Engine::getSong();
-	if (!songEditor) { tc = Engine::getBBTrackContainer(); }
+	if (!songEditor){ tc = Engine::getBBTrackContainer(); }
 	openInNewInstrumentTrack(tc, item);
+}
+
+
+
+
+bool FileBrowserTreeWidget::openInNewSampleTrack(FileItem* item, bool songEditor)
+{
+	// Can't add non-samples to a sample track
+	if (item->type() != FileItem::SampleFile){ return false; }
+	if (!songEditor){  }
+	
+	TrackContainer* trackContainer = Engine::getSong();
+	if (!songEditor){ trackContainer = Engine::getBBTrackContainer(); }
+	
+	// Create a new sample track for this sample
+	SampleTrack* sampleTrack = dynamic_cast<SampleTrack*>(
+		Track::create(Track::SampleTrack, trackContainer));
+	
+	// Add the sample clip to the track
+	Engine::mixer()->requestChangeInModel();
+	SampleTCO* clip = dynamic_cast<SampleTCO*>(sampleTrack->createTCO(0));
+	clip->setSampleFile(item->fullName());
+	Engine::mixer()->doneChangeInModel();
+	return true;
 }
 
 
@@ -780,13 +806,6 @@ void FileBrowserTreeWidget::openContainingFolder(FileItem* item)
 	// functionality that's already available in Qt.
 	QFileInfo fileInfo(item->fullName());
 	QDesktopServices::openUrl(QUrl::fromLocalFile(fileInfo.dir().path()));
-}
-
-
-
-void FileBrowserTreeWidget::openInNewSampleTrack( FileItem* item )
-{
-
 }
 
 
