@@ -438,10 +438,13 @@ void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent * e )
 		
 		contextMenu.addSeparator();
 
-		contextMenu.addAction(QIcon(embed::getIconPixmap("folder")),
-					tr("Open containing folder"),
-					this,
-					SLOT(openContainingFolder()));
+		QAction* openFolder = new QAction(
+			QIcon(embed::getIconPixmap("folder")),
+			tr("Open containing folder")
+		);
+		connect(openFolder, &QAction::triggered,
+			[=]{ openContainingFolder(file); });
+		contextMenu.addAction(openFolder);
 
 		//If all we have is the first action + two headers, the item isn't
 		//valid, so we shouldn't show the menu
@@ -792,19 +795,16 @@ void FileBrowserTreeWidget::openInNewInstrumentTrackSE( FileItem* item )
 
 
 
-void FileBrowserTreeWidget::openContainingFolder()
+void FileBrowserTreeWidget::openContainingFolder(FileItem* item)
 {
-	if (m_contextMenuItem)
-	{
-		// Delegate to QDesktopServices::openUrl with the directory of the selected file. Please note that
-		// this will only open the directory but not select the file as this is much more complicated due
-		// to different implementations that are needed for different platforms (Linux/Windows/MacOS).
+	// Delegate to QDesktopServices::openUrl with the directory of the selected file. Please note that
+	// this will only open the directory but not select the file as this is much more complicated due
+	// to different implementations that are needed for different platforms (Linux/Windows/MacOS).
 
-		// Using QDesktopServices::openUrl seems to be the most simple cross platform way which uses
-		// functionality that's already available in Qt.
-		QFileInfo fileInfo(m_contextMenuItem->fullName());
-		QDesktopServices::openUrl(QUrl::fromLocalFile(fileInfo.dir().path()));
-	}
+	// Using QDesktopServices::openUrl seems to be the most simple cross platform way which uses
+	// functionality that's already available in Qt.
+	QFileInfo fileInfo(item->fullName());
+	QDesktopServices::openUrl(QUrl::fromLocalFile(fileInfo.dir().path()));
 }
 
 
