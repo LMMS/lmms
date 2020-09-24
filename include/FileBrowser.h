@@ -99,9 +99,6 @@ public:
 	//! that are expanded in the tree.
 	QList<QString> expandedDirs( QTreeWidgetItem * item = nullptr ) const;
 
-	void tryAddSEInstrumentTrack(FileItem* file);
-	void tryAddBBInstrumentTrack(FileItem* file);
-
 
 protected:
 	void contextMenuEvent( QContextMenuEvent * e ) override;
@@ -111,9 +108,9 @@ protected:
 
 
 private:
-	//Preview a file
+	//! Start a preview of a file item
 	void previewFileItem(FileItem* file);
-	//If a preview is playing, stop it and return true. Otherwise return false
+	//! If a preview is playing, stop it. Returns false if nothing was playing
 	bool stopPreview();
 	
 	void keyPressEvent( QKeyEvent * ke ) override;
