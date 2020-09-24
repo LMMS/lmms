@@ -147,3 +147,13 @@ void  Diginstrument::InstrumentVisualizationWindow::slidersChanged()
 {
     if(autoRefreshCheckbox->isChecked()) refresh();
 }
+
+int Diginstrument::InstrumentVisualizationWindow::addCustomItem(QtDataVisualization::QCustom3DItem *item)
+{
+    graph->addCustomItem(item);
+}
+
+void Diginstrument::InstrumentVisualizationWindow::removeCustomItems()
+{
+    graph->removeCustomItems();
+}

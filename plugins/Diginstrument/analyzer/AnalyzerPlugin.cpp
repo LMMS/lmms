@@ -1,5 +1,7 @@
 #include "AnalyzerPlugin.h"
 
+using namespace QtDataVisualization;
+
 extern "C"
 {
 
@@ -52,6 +54,18 @@ QString AnalyzerPlugin::fullDisplayName() const
 //TMP
 std::string AnalyzerPlugin::setAudioFile(const QString &_audio_file)
 {
+	//tmp
+	visualization = new Diginstrument::InstrumentVisualizationWindow(this);
+	std::vector<QVector3D> extremaVisualization;
+	QImage colorRed = QImage(2, 2, QImage::Format_RGB32);
+	colorRed.fill(Qt::red);
+	QImage colorBlue = QImage(2, 2, QImage::Format_RGB32);
+	colorBlue.fill(Qt::blue);
+	QImage colorGreen = QImage(2, 2, QImage::Format_RGB32);
+	colorGreen.fill(Qt::green);
+	QImage colorOrange = QImage(2, 2, QImage::Format_RGB32);
+	colorOrange.fill(Qt::darkYellow);
+
 	m_sampleBuffer.setAudioFile(_audio_file);
 	std::vector<double> sample(m_sampleBuffer.frames());
 	for (int i = 0; i < sample.size(); i++)
@@ -80,12 +94,20 @@ std::string AnalyzerPlugin::setAudioFile(const QString &_audio_file)
 	const double transformStep = 0.01*(double)m_sampleBuffer.sampleRate();
 	SpectrumFitter<double, 4> fitter(1.25);
 
+	//tmp
+	QSurfaceDataArray * data = new QSurfaceDataArray;
+	data->reserve(m_sampleBuffer.frames()/transformStep);
+
 	//new loop
 	for (int i = 0; i<m_sampleBuffer.frames(); i+=transformStep)
 	{
 		const auto momentarySpectrum = transform[i];
 		std::vector<std::vector<double>> rawSpectrum;
 		rawSpectrum.reserve(level * 11);
+		//tmp
+		QSurfaceDataRow *dataRow = new QSurfaceDataRow(level * 11);
+		int index = 0;
+
 		//process the complex result of the CWT into "amplitude and phase spectrum"
 		for (int j = momentarySpectrum.size() - 1; j >= 0; j--)
 		{
@@ -98,14 +120,16 @@ std::string AnalyzerPlugin::setAudioFile(const QString &_audio_file)
 			//tmp: to reduce oscillations in tiny peaks, set magnitude treshold
 			//TODO: add with 0, or just leave out?
 			//tmp: amp
-			//const double amp = (sqrt( (frequency * component.amplitude) / (double)sampleRate));
-			if(mag>0.0001){rawSpectrum.emplace_back(std::vector<double>{frequency, phase, mag}); }
-			//if(amp>0.001){rawSpectrum.emplace_back(std::vector<double>{frequency, phase, amp}); }
+			const double amp = (sqrt( (frequency * mag) / (double)m_sampleBuffer.sampleRate()));
+			//if(mag>0.0001){rawSpectrum.emplace_back(std::vector<double>{frequency, phase, mag}); }
+			if(amp>0.001){rawSpectrum.emplace_back(std::vector<double>{frequency, phase, amp}); }
 			else{ rawSpectrum.emplace_back(std::vector<double>{frequency, phase, 0}); }
-
 			//tmp: raw output
-			//raw<<std::fixed<<(double)i/(double)m_sampleBuffer.sampleRate()<<" "<<frequency<<" "<<mag<<std::endl;
+			(*dataRow)[index].setPosition(QVector3D(frequency,amp /*TMP*/, (double)i/(double)m_sampleBuffer.sampleRate()));
+			index++;
 		}
+
+		*data << dataRow;
 
 		//tmp: note: no checks ,just rvalue insert
 		//tmp: no peak approximation
@@ -119,21 +143,46 @@ std::string AnalyzerPlugin::setAudioFile(const QString &_audio_file)
 			{
 				auto Y = Interpolation::CubicLagrange(rawSpectrum[p.index-1][0], rawSpectrum[p.index-1][2], rawSpectrum[p.index][0], rawSpectrum[p.index][2], rawSpectrum[p.index+1][0], rawSpectrum[p.index+1][2], rawSpectrum[p.index+2][0], rawSpectrum[p.index+2][2], p.x);
 			}
+			//tmp: extrema visualization
+			if(p.pointType==Extrema::Differential::CriticalPoint::PointType::maximum)
+			{
+				//TODO: relative path
+				visualization->addCustomItem(new QCustom3DItem("/home/mate/projects/lmms/plugins/Diginstrument/analyzer/resources/marker_mesh.obj",
+											QVector3D(rawSpectrum[p.index][0], rawSpectrum[p.index][2],(double)i/(double)m_sampleBuffer.sampleRate()),
+											QVector3D(0.025f, 0.025f, 0.025f),
+											QQuaternion::fromAxisAndAngle(0.0f, 1.0f, 0.0f, 45.0f),
+											colorRed));
+			}
+			if(p.pointType==Extrema::Differential::CriticalPoint::PointType::minimum)
+			{
+				visualization->addCustomItem(new QCustom3DItem("/home/mate/projects/lmms/plugins/Diginstrument/analyzer/resources/marker_mesh.obj",
+											QVector3D(rawSpectrum[p.index][0], rawSpectrum[p.index][2],(double)i/(double)m_sampleBuffer.sampleRate()),
+											QVector3D(0.025f, 0.025f, 0.025f),
+											QQuaternion::fromAxisAndAngle(0.0f, 1.0f, 0.0f, 45.0f),
+											colorBlue));
+			}
+			if(p.pointType==Extrema::Differential::CriticalPoint::PointType::rising)
+			{
+				visualization->addCustomItem(new QCustom3DItem("/home/mate/projects/lmms/plugins/Diginstrument/analyzer/resources/marker_mesh.obj",
+											QVector3D(rawSpectrum[p.index][0], rawSpectrum[p.index][2],(double)i/(double)m_sampleBuffer.sampleRate()),
+											QVector3D(0.025f, 0.025f, 0.025f),
+											QQuaternion::fromAxisAndAngle(0.0f, 1.0f, 0.0f, 45.0f),
+											colorGreen));
+			}
+			if(p.pointType==Extrema::Differential::CriticalPoint::PointType::falling)
+			{
+				visualization->addCustomItem(new QCustom3DItem("/home/mate/projects/lmms/plugins/Diginstrument/analyzer/resources/marker_mesh.obj",
+											QVector3D(rawSpectrum[p.index][0], rawSpectrum[p.index][2],(double)i/(double)m_sampleBuffer.sampleRate()),
+											QVector3D(0.025f, 0.025f, 0.025f),
+											QQuaternion::fromAxisAndAngle(0.0f, 1.0f, 0.0f, 45.0f),
+											colorOrange));
+			}
+			
 		}
+		//NOTE: there is no true peak approximation yet!
 		auto spline = fitter.peakValleyFit(rawSpectrum, peaksAndValleys);
-		/*inst.addSpectrum(
-			SplineSpectrum(
-				//spline
-				spline,
-				//spline label (time)
-				(double)i/(double)m_sampleBuffer.sampleRate()
-			)
-			//coordinates: {pitch, time}
-			//tmp: fix frequency label
-			, {label, (double)i / (double)m_sampleBuffer.sampleRate()}
-		);*/
 		//only add "valid" splines
-		if (spline.getPieces().size() > 0 /*&& spline.getBegin() <= 12 && spline.getEnd() > 21000*/)
+		if (spline.getPieces().size() > 0 /* TMP: i want at least SOMETHING in; && spline.getBegin() <= 12 && spline.getEnd() > 21000*/)
 		{
 			//inst.addSpectrum(SplineSpectrum(std::move(spline), (double)i/(double)m_sampleBuffer.sampleRate()), {label, (double)i / (double)m_sampleBuffer.sampleRate()});
 			spectra.emplace_back(std::move(spline), (double)i/(double)m_sampleBuffer.sampleRate());
@@ -157,7 +206,7 @@ std::string AnalyzerPlugin::setAudioFile(const QString &_audio_file)
 		auto rec = synth.playNote(inst.getSpectrum({label, time}), 1 ,i, (double)m_sampleBuffer.sampleRate());
 		oss << std::fixed << rec.front() << " " << icwt[i] << std::endl;
 	}*/
-	std::cout<<"rejected splines: "<<rejected<<std::endl;
+	if(spectra.size()>0) std::cout<<"rejected splines: "<<rejected<<"/"<<spectra.size()<<" ("<<100*rejected/spectra.size()<<"%)"<<std::endl;
 	if(rejected>0){
 	std::cout<<"cause: no peaks: "<<noComponents<<"/"<<rejected<<" ("<<100*noComponents/rejected<<"%)"<<std::endl;
 	std::cout<<"cause: empty spline: "<<emptySplines<<"/"<<rejected<<" ("<<100*emptySplines/rejected<<"%)"<<std::endl;
@@ -175,6 +224,44 @@ std::string AnalyzerPlugin::setAudioFile(const QString &_audio_file)
 
 	//tmp: close files
 	output.close();
+	visualization->setSurfaceData(data);
+	visualization->show();
 
 	return "TODO";
+}
+
+QtDataVisualization::QSurfaceDataArray * AnalyzerPlugin::getSurfaceData(float minTime, float maxTime, float minFreq, float maxFreq, int timeSamples, int freqSamples)
+{
+	const float stepX = (maxFreq - minFreq) / float(freqSamples - 1);
+    const float stepZ = (maxTime - minTime) / float(timeSamples - 1);
+
+	QSurfaceDataArray * data = new QSurfaceDataArray;
+	data->reserve(timeSamples);
+	for(int i = 0; i<timeSamples;i++)
+	{
+		QSurfaceDataRow *dataRow = new QSurfaceDataRow(freqSamples);
+		float z = qMin(maxTime, (i * stepZ + minTime));
+		int index = 0;
+		auto it = std::lower_bound(spectra.begin(), spectra.end(), z);
+		//TMP
+		if(it == spectra.end()) break;
+		const auto spectrum = *it; /*TMP; TODO*/
+		for (int j = 0; j < freqSamples; j++) {
+			float x = qMin(maxFreq, (j * stepX + minFreq));
+			(*dataRow)[index++].setPosition(QVector3D(x, spectrum[x].amplitude, /*z*/ spectrum.getLabel()));
+			//TMP: components only
+			//(*dataRow)[index++].setPosition(QVector3D(x, 0, z ));
+		}
+		//tmp: identical to discrete
+		for(const auto & c : spectrum.getComponents(0))
+		{
+			//TMP: BUGHUNT: missing inbetween piece causes segfault
+			if(c.frequency<=minFreq || c.frequency>=maxFreq) continue;
+			//(*dataRow)[std::round((c.frequency-minFreq)/((maxFreq-minFreq)/(float)freqSamples))].setPosition(QVector3D(c.frequency,c.amplitude, spectrum.getLabel()));
+		}
+		
+		*data<<dataRow;
+	}
+
+	return data;
 }

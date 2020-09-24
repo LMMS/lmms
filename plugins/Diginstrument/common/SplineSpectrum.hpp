@@ -78,6 +78,11 @@ public:
     return spline.getPeaks().size()==0;
   }
 
+  bool operator<(const SplineSpectrum<T, D> & other) const
+  {
+    return this->getLabel()<other.getLabel();
+  }
+
 private:
   PiecewiseBSpline<T, D> spline;
 };

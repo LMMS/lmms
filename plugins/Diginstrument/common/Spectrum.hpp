@@ -41,6 +41,11 @@ public:
     return label;
   }
 
+  bool operator<(const Spectrum<T> & other) const
+  {
+    return label<other.label;
+  }
+
   Spectrum(const T & label) : label(label){}
 
   T label;

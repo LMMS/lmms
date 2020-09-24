@@ -19,14 +19,16 @@ class AnalyzerView : public ToolPluginView
   protected slots:
     void openAudioFile();
     void copyTextEditToClipboard();
+    void showVisualization();
+    void updateVisualizationData(float minTime, float maxTime, float minFreq, float maxFreq, int timeSamples, int freqSamples, std::vector<double> coordinates);
 
   private:
 	  virtual void modelChanged( void );
 
     QPushButton * m_openAudioFileButton;
-    QPushButton * m_copyToClipboardButton;
-    QTextEdit * m_textarea;
-
+    QPushButton * m_openVisualizationButton;
+    QLineEdit * m_nameField;
+    
     Diginstrument::InstrumentVisualizationWindow * visualization;
     /*TODO*/
 };

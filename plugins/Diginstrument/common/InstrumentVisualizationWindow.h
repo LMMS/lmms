@@ -14,6 +14,8 @@ class InstrumentVisualizationWindow : public QWidget
   public:
     void setSurfaceData(QtDataVisualization::QSurfaceDataArray * data);
     void setDimensions(std::vector<Dimension> dimensions);
+    int addCustomItem(QtDataVisualization::QCustom3DItem *item);
+    void removeCustomItems();
 
     InstrumentVisualizationWindow(QObject * dataProvider);
     ~InstrumentVisualizationWindow();

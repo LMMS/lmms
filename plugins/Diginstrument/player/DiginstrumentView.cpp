@@ -71,10 +71,7 @@ void DiginstrumentView::openInstrumentFile( void )
 
 void DiginstrumentView::showInstumentVisualization()
 {
-  //TODO: couple and use parameters
-  //TODO: use all coordinates (not just freq)
   //TODO: defaults/saving
-  //TODO: TMP: rethink dimension/coordinate coupling
   //TODO: TMP: better spectrum type distinction!!!
   
   if(castModel<DiginstrumentPlugin>()->inst_data.type == "discrete")
@@ -85,7 +82,7 @@ void DiginstrumentView::showInstumentVisualization()
   {
     visualization->setDimensions(castModel<DiginstrumentPlugin>()->spline_inst.getDimensions());
   }
-  updateVisualizationData(0,3000,20,22000,100,100, /*TODO: TMP*/ {400});
+  updateVisualizationData(0,3000,20,22000,100,100, /*TODO: Default values TMP*/ {400});
   visualization->show();
   //is this even useful?
   //visualization->adjustSize();

@@ -26,11 +26,16 @@
 #include <iostream>
 #include <fstream>
 #include "../common/InstrumentVisualizationWindow.h"
+#include <QtDataVisualization>
 
 class AnalyzerPlugin : public ToolPlugin
 {
   Q_OBJECT
 public:
+  //tmp: raw visualization
+  Diginstrument::InstrumentVisualizationWindow * visualization;
+  
+
   AnalyzerPlugin();
   virtual ~AnalyzerPlugin();
 
@@ -46,10 +51,11 @@ public:
 private:
   friend class AnalyzerView;
 
+  std::string setAudioFile(const QString &_audio_file);
+  QtDataVisualization::QSurfaceDataArray * getSurfaceData(float minTime, float maxTime, float minFreq, float maxFreq, int timeSamples, int freqSamples);
+
   typedef SampleBuffer::handleState handleState;
   SampleBuffer m_sampleBuffer;
-  std::string setAudioFile(const QString &_audio_file);
-
   std::vector<SplineSpectrum<double, 4>> spectra;
 
 private slots:
