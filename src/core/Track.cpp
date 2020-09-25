@@ -614,7 +614,6 @@ void TrackContentObjectView::trackColorReset()
 	if( ! m_tco->usesStyleColor() && ! m_tco->usesCustomClipColor() )
 	{
 		m_tco->useStyleColor( true );
-		Engine::getSong()->setModified();
 		update();
 	}
 }
@@ -629,8 +628,6 @@ void TrackContentObjectView::setColor( QColor & new_color )
 	
 	// force TCO to use color
 	m_tco->useStyleColor( false );
-	
-	Engine::getSong()->setModified();
 	update();
 }
 
@@ -2396,12 +2393,15 @@ void TrackOperationsWidget::changeTrackColor()
 	{ return; }
 
 	emit colorChanged( new_color );
+	
+	Engine::getSong()->setModified();
 	update();
 }
 
 void TrackOperationsWidget::resetTrackColor()
 {
 	emit colorReset();
+	Engine::getSong()->setModified();
 	update();
 }
 
@@ -2410,12 +2410,14 @@ void TrackOperationsWidget::randomTrackColor()
 	QColor buffer = ColorChooser::getPalette( ColorChooser::Palette::Track )[ rand() % 48 ];
 
 	emit colorChanged( buffer );
+	Engine::getSong()->setModified();
 	update();
 }
 
 void TrackOperationsWidget::useTrackColor()
 {
 	emit colorParented();
+	Engine::getSong()->setModified();
 }
 
 
