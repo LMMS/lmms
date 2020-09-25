@@ -59,6 +59,8 @@ LadspaManager::LadspaManager()
 	for( QStringList::iterator it = ladspaDirectories.begin(); 
 			 		   it != ladspaDirectories.end(); ++it )
 	{
+		// Skip empty entries as QDir will interpret it as the working directory
+		if ((*it).isEmpty()) { continue; }
 		QDir directory( ( *it ) );
 		QFileInfoList list = directory.entryInfoList();
 		for( QFileInfoList::iterator file = list.begin();

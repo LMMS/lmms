@@ -271,13 +271,6 @@ void Lv2InsView::dropEvent(QDropEvent *_de)
 
 
 
-void Lv2InsView::toggleUI()
-{
-}
-
-
-
-
 void Lv2InsView::modelChanged()
 {
 	Lv2ViewBase::modelChanged(castModel<Lv2Instrument>());

@@ -1990,7 +1990,7 @@ bool TrackContentWidget::pasteSelection( MidiTime tcoPos, const QMimeData * md, 
 		if( wasSelection )
 		{
 			tco->selectViewOnCreate( true );
-		}
+    }
 		
 		if( outerTCOElement.attributeNode( "clipColor" ).value() == "1" )
 		{
@@ -2003,13 +2003,6 @@ bool TrackContentWidget::pasteSelection( MidiTime tcoPos, const QMimeData * md, 
 			tco->useStyleColor( ! t->useColor() );
 			tco->useCustomClipColor( false );
 			tco->setColor( t->color() );
-		}
-
-		//check tco name, if the same as source track name dont copy
-		QString sourceTrackName = outerTCOElement.attributeNode( "trackName" ).value();
-		if( tco->name() == sourceTrackName )
-		{
-			tco->setName( "" );
 		}
 	}
 

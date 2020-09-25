@@ -69,12 +69,16 @@ public:
 
 	void addDefaultActions( QMenu* menu );
 
+	void setConversionFactor( float factor );
+	float getConversionFactor();
+
 
 protected:
 	virtual void mousePressEvent( QMouseEvent* event );
 
 	QString m_description;
 	QString m_unit;
+	float m_conversionFactor; // Factor to be applied when the m_model->value is displayed
 } ;
 
 

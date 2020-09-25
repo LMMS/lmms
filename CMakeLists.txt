@@ -44,7 +44,7 @@ IF(VERSION_STAGE)
 	SET(VERSION     "${VERSION}-${VERSION_STAGE}")
 ENDIF()
 IF(VERSION_BUILD)
-	SET(VERSION     "${VERSION}.${VERSION_BUILD}")
+	SET(VERSION     "${VERSION}-${VERSION_BUILD}")
 ENDIF()
 
 # Override version information for non-base builds

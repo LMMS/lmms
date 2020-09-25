@@ -58,7 +58,6 @@ Pattern::Pattern( InstrumentTrack * _instrument_track ) :
 	m_patternType( BeatPattern ),
 	m_steps( MidiTime::stepsPerBar() )
 {
-	setName( _instrument_track->name() );
 	if( _instrument_track->trackContainer()
 					== Engine::getBBTrackContainer() )
 	{
@@ -666,10 +665,7 @@ void PatternView::setGhostInPianoRoll()
 
 
 
-void PatternView::resetName()
-{
-	m_pat->setName( m_pat->m_instrumentTrack->name() );
-}
+void PatternView::resetName() { m_pat->setName(""); }
 
 
 
@@ -928,8 +924,8 @@ void PatternView::paintEvent( QPaintEvent * )
 
 	// Check whether we will paint a text box and compute its potential height
 	// This is needed so we can paint the notes underneath it.
-	bool const isDefaultName = m_pat->name() == m_pat->instrumentTrack()->name();
-	bool const drawTextBox = !beatPattern && !isDefaultName;
+	bool const drawName = !m_pat->name().isEmpty();
+	bool const drawTextBox = !beatPattern && drawName;
 
 	// TODO Warning! This might cause problems if TrackContentObjectView::paintTextLabel changes
 	int textBoxHeight = 0;
