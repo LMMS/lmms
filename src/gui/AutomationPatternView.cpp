@@ -255,36 +255,9 @@ void AutomationPatternView::paintEvent( QPaintEvent * )
 	QPainter p( &m_paintPixmap );
 
 	QLinearGradient lingrad( 0, 0, 0, height() );
-	QColor c, mutedCustomColor;
+	QColor c = getColorForDisplay( painter.background().color() );
 	bool muted = m_pat->getTrack()->isMuted() || m_pat->isMuted();
 	bool current = gui->automationEditor()->currentPattern() == m_pat;
-	mutedCustomColor = m_pat->color();
-	mutedCustomColor.setHsv( mutedCustomColor.hsvHue(), mutedCustomColor.hsvSaturation() / 4, mutedCustomColor.value() );
-	
-	// state: selected, muted, colored, normal
-	if( isSelected() )
-	{
-		c = m_pat->usesStyleColor()
-			? selectedColor()
-			: ( muted
-				? mutedCustomColor.darker( 350 )
-				: m_pat->color().darker( 150 ) );
-	}
-	else
-	{
-		if( muted )
-		{
-			c = m_pat->usesStyleColor()
-				? mutedBackgroundColor()
-				: mutedCustomColor.darker( 250 );
-		}
-		else
-		{
-			c = ! m_pat->usesStyleColor()
-				? m_pat->color()
-				: painter.background().color();
-		}
-	}
 
 	lingrad.setColorAt( 1, c.darker( 300 ) );
 	lingrad.setColorAt( 0, c );

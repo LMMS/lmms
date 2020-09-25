@@ -548,35 +548,8 @@ void SampleTCOView::paintEvent( QPaintEvent * pe )
 	QPainter p( &m_paintPixmap );
 
 	QLinearGradient lingrad( 0, 0, 0, height() );
-	QColor c, mutedCustomColor;
+	QColor c = getColorForDisplay( painter.background().color() );
 	bool muted = m_tco->getTrack()->isMuted() || m_tco->isMuted();
-	mutedCustomColor = m_tco->color();
-	mutedCustomColor.setHsv( mutedCustomColor.hsvHue(), mutedCustomColor.hsvSaturation() / 4, mutedCustomColor.value() );
-
-	// state: selected, muted, colored, normal
-	if( isSelected() )
-	{
-		c = m_tco->usesStyleColor()
-			? selectedColor()
-			: ( muted
-				? mutedCustomColor.darker( 350 )
-				: m_tco->color().darker( 150 ) );
-	}
-	else
-	{
-		if( muted )
-		{
-			c = m_tco->usesStyleColor()
-				? mutedBackgroundColor()
-				: mutedCustomColor.darker( 250 );
-		}
-		else
-		{
-			c = ! m_tco->usesStyleColor()
-				? m_tco->color()
-				: painter.background().color();
-		}
-	}
 
 	lingrad.setColorAt( 1, c.darker( 300 ) );
 	lingrad.setColorAt( 0, c );

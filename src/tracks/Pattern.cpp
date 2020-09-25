@@ -870,39 +870,18 @@ void PatternView::paintEvent( QPaintEvent * )
 
 	QPainter p( &m_paintPixmap );
 
-	QColor c, mutedCustomColor;
+	QColor c;
 	bool const muted = m_pat->getTrack()->isMuted() || m_pat->isMuted();
 	bool current = gui->pianoRoll()->currentPattern() == m_pat;
 	bool beatPattern = m_pat->m_patternType == Pattern::BeatPattern;
-	mutedCustomColor = m_pat->color();
-	mutedCustomColor.setHsv( mutedCustomColor.hsvHue(), mutedCustomColor.hsvSaturation() / 4, mutedCustomColor.value() );
-
-	// state: selected, normal, beat pattern, muted, colored
-	if( isSelected() )
+	
+	if( beatPattern )
 	{
-		c = m_pat->usesStyleColor()
-			? selectedColor()
-			: ( muted ? mutedCustomColor.darker( 350 ) : m_pat->color().darker( 150 ) );
+		c = BBPatternBackground();
 	}
 	else
 	{
-		if( !muted && m_pat->usesStyleColor() && !beatPattern )
-		{
-			c = painter.background().color();
-		}
-		else
-		{
-			if( muted )
-			{
-				c = m_pat->usesStyleColor()
-					? mutedBackgroundColor()
-					: mutedCustomColor.darker( 250 );
-			}
-			else
-			{
-				c = m_pat->color();
-			}
-		}
+		c = getColorForDisplay( painter.background().color() );
 	}
 
 	// invert the gradient for the background in the B&B editor
@@ -1121,6 +1100,15 @@ void PatternView::paintEvent( QPaintEvent * )
 				p.drawPixmap( x, y, stepoff );
 			}
 		} // end for loop
+
+		// NOTE FOR REVIEWERS: is this worth adding?
+		// draw a transparent rectangle over colored patterns
+		/*if ( !m_pat->usesStyleColor() )
+		{
+			p.setBrush( m_pat->color() );
+			p.setOpacity( 0.25 );
+			p.drawRect( 0, 0, width(), height() );
+		}*/
 
 		// draw a transparent rectangle over muted patterns
 		if ( muted )
