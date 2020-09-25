@@ -278,8 +278,15 @@ void SampleTCO::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	_this.setAttribute( "sample_rate", m_sampleBuffer->sampleRate());
 	if( ! usesStyleColor() )
 	{
-		_this.setAttribute( "color", color().name() );
-		_this.setAttribute( "isclipcolor", usesCustomClipColor() );
+		if( usesCustomClipColor() )
+		{
+			_this.setAttribute( "color", color().name() );
+			_this.setAttribute( "usesclipcolor", true );
+		}
+		else
+		{
+			_this.setAttribute( "usesclipcolor", false );
+		}
 	}
 	// TODO: start- and end-frame
 }
@@ -302,15 +309,18 @@ void SampleTCO::loadSettings( const QDomElement & _this )
 	setMuted( _this.attribute( "muted" ).toInt() );
 	setStartTimeOffset( _this.attribute( "off" ).toInt() );
 
-	if (_this.hasAttribute("sample_rate")) {
-		m_sampleBuffer->setSampleRate(_this.attribute("sample_rate").toInt());
+	if ( _this.hasAttribute( "sample_rate" ) ) {
+		m_sampleBuffer->setSampleRate( _this.attribute( "sample_rate" ).toInt() );
 	}
 	
-	if( _this.hasAttribute( "color" ) )
+	if( _this.hasAttribute( "usesclipcolor" ) )
 	{
 		useStyleColor( false );
-		useCustomClipColor( _this.attribute( "isclipcolor" ) == "1" );
-		setColor( _this.attribute( "color" ) );
+		useCustomClipColor( _this.attribute( "usesclipcolor" ) == "1" );
+		if( usesCustomClipColor() )
+		{
+			setColor( _this.attribute( "color" ) );
+		}
 	}
 }
 

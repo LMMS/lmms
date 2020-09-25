@@ -263,18 +263,13 @@ void TrackContentObject::setStartTimeOffset( const MidiTime &startTimeOffset )
 	m_startTimeOffset = startTimeOffset;
 }
 
-void TrackContentObject::setBGColor( QColor & c )
+void TrackContentObject::updateColor()
 {
 	if( ! m_useCustomClipColor )
 	{
-		m_color = c;
-		emit trackColorChanged( m_color );
+		m_useStyleColor = false;
+		emit trackColorChanged();
 	}
-}
-
-QColor TrackContentObject::BGColor()
-{
-	return m_color;
 }
 
 void TrackContentObject::resetColor()
@@ -352,7 +347,7 @@ TrackContentObjectView::TrackContentObjectView( TrackContentObject * tco,
 			this, SLOT( updatePosition() ) );
 	connect( m_tco, SIGNAL( destroyedTCO() ), this, SLOT( close() ) );
 	setModel( m_tco );
-	connect( m_tco, SIGNAL( trackColorChanged( QColor & ) ), this, SLOT( setColor( QColor & ) ) );
+	connect( m_tco, SIGNAL( trackColorChanged() ), this, SLOT( update() ) );
 	connect( m_trackView->getTrackOperationsWidget(), SIGNAL( colorParented() ), this, SLOT( useTrackColor() ) );
 
 	m_trackView->getTrackContentWidget()->addTCOView( this );
@@ -1537,9 +1532,15 @@ MidiTime TrackContentObjectView::draggedTCOPos( QMouseEvent * me )
 
 QColor TrackContentObjectView::getColorForDisplay( QColor defaultColor )
 {
+	auto tcoColor = m_tco->usesStyleColor()
+					? defaultColor
+					: m_tco->usesCustomClipColor()
+						? m_tco->color()
+						: m_tco->getTrack()->color();
+
 	QColor c, mutedCustomColor;
 	bool muted = m_tco->getTrack()->isMuted() || m_tco->isMuted();
-	mutedCustomColor = m_tco->color();
+	mutedCustomColor = tcoColor;
 	mutedCustomColor.setHsv( mutedCustomColor.hsvHue(), mutedCustomColor.hsvSaturation() / 4, mutedCustomColor.value() );
 
 	// state: selected, muted, colored, normal
@@ -1549,7 +1550,7 @@ QColor TrackContentObjectView::getColorForDisplay( QColor defaultColor )
 			? selectedColor()
 			: ( muted
 				? mutedCustomColor.darker( 350 )
-				: m_tco->color().darker( 150 ) );
+				: tcoColor.darker( 150 ) );
 	}
 	else
 	{
@@ -1561,9 +1562,7 @@ QColor TrackContentObjectView::getColorForDisplay( QColor defaultColor )
 		}
 		else
 		{
-			c = ! m_tco->usesStyleColor()
-				? m_tco->color()
-				: defaultColor;
+			c = tcoColor;
 		}
 	}
 	
@@ -3161,7 +3160,7 @@ void Track::trackColorChanged( QColor & c )
 {
 	for (int i = 0; i < numOfTCOs(); i++)
 	{
-		m_trackContentObjects[i]->setBGColor(c);
+		m_trackContentObjects[i]->updateColor();
 	}
 	m_hasColor = true;
 	m_color = c;

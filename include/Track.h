@@ -182,8 +182,7 @@ public:
 	MidiTime startTimeOffset() const;
 	void setStartTimeOffset( const MidiTime &startTimeOffset );
 	
-	void setBGColor( QColor & c );
-	QColor BGColor();
+	void updateColor();
 	void resetColor();
 
 public slots:
@@ -196,7 +195,7 @@ signals:
 	void lengthChanged();
 	void positionChanged();
 	void destroyedTCO();
-	void trackColorChanged( QColor & );
+	void trackColorChanged();
 	void clipColorChanged( QColor & );
 	void trackColorReset();
 	void clipColorReset();

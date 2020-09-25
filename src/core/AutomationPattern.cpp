@@ -541,8 +541,15 @@ void AutomationPattern::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	
 	if( ! usesStyleColor() )
 	{
-		_this.setAttribute( "color", color().name() );
-		_this.setAttribute( "isclipcolor", usesCustomClipColor() );
+		if( usesCustomClipColor() )
+		{
+			_this.setAttribute( "color", color().name() );
+			_this.setAttribute( "usesclipcolor", true );
+		}
+		else
+		{
+			_this.setAttribute( "usesclipcolor", false );
+		}
 	}
 
 	for( timeMap::const_iterator it = m_timeMap.begin();
@@ -600,11 +607,14 @@ void AutomationPattern::loadSettings( const QDomElement & _this )
 		}
 	}
 	
-	if( _this.hasAttribute( "color" ) )
+	if( _this.hasAttribute( "usesclipcolor" ) )
 	{
 		useStyleColor( false );
-		useCustomClipColor( _this.attribute( "isclipcolor" ) == "1" );
-		setColor( _this.attribute( "color" ) );
+		useCustomClipColor( _this.attribute( "usesclipcolor" ) == "1" );
+		if( usesCustomClipColor() )
+		{
+			setColor( _this.attribute( "color" ) );
+		}
 	}
 
 	int len = _this.attribute( "len" ).toInt();
