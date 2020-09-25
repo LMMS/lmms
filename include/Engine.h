@@ -35,7 +35,6 @@
 #include "lmms_basics.h"
 
 class BBTrackContainer;
-class DummyTrackContainer;
 class FxMixer;
 class ProjectJournal;
 class Mixer;
@@ -100,11 +99,6 @@ public:
 		return s_ladspaManager;
 	}
 
-	static DummyTrackContainer * dummyTrackContainer()
-	{
-		return s_dummyTC;
-	}
-
 	static float framesPerTick()
 	{
 		return s_framesPerTick;
@@ -149,7 +143,6 @@ private:
 	static Song * s_song;
 	static BBTrackContainer * s_bbTrackContainer;
 	static ProjectJournal * s_projectJournal;
-	static DummyTrackContainer * s_dummyTC;
 
 #ifdef LMMS_HAVE_LV2
 	static class Lv2Manager* s_lv2Manager;
