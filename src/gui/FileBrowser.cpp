@@ -372,6 +372,7 @@ void FileBrowserTreeWidget::keyPressEvent(QKeyEvent * ke )
 	// Shorter names for some commonly used properties of the event
 	const auto key = ke->key();
 	const bool vertical = key == Qt::Key_Up || key == Qt::Key_Down;
+	const bool horizontal = key == Qt::Key_Left || key == Qt::Key_Right;
 	const bool preview = key == Qt::Key_Space;
 	const bool insert = key == Qt::Key_Enter || key == Qt::Key_Return;
 
@@ -380,7 +381,7 @@ void FileBrowserTreeWidget::keyPressEvent(QKeyEvent * ke )
 	// Then, ignore all autorepeats (they would spam new tracks or previews)
 	if (ke->isAutoRepeat()){ return; }
 	// We should stop any running previews before we do anything new
-	else if (vertical || preview || insert){ stopPreview(); }
+	else if (vertical || horizontal || preview || insert){ stopPreview(); }
 
 	// Try to get the currently selected item as a FileItem
 	FileItem * file = dynamic_cast<FileItem *>(currentItem());
