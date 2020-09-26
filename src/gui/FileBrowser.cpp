@@ -604,7 +604,7 @@ void FileBrowserTreeWidget::mouseMoveEvent( QMouseEvent * me )
 					QApplication::startDragDistance() )
 	{
 		// make sure any playback is stopped
-		mouseReleaseEvent( NULL );
+		mouseReleaseEvent( nullptr );
 
 		FileItem * f = dynamic_cast<FileItem *>( itemAt( m_pressPos ) );
 		if( f != nullptr )
