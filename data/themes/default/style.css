@@ -76,6 +76,11 @@ QLineEdit:focus {
 	border: 1px solid #0bd556;
 }
 
+/* SpinBoxes used in QInputDialogs */
+
+QDoubleSpinBox, QSpinBox{
+	selection-background-color: #17793b;
+}
 
 QToolTip {
 	border-radius: 4px;
