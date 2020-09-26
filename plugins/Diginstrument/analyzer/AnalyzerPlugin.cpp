@@ -116,14 +116,15 @@ std::string AnalyzerPlugin::setAudioFile(const QString &_audio_file)
 			const double frequency = (double)m_sampleBuffer.sampleRate() / (momentarySpectrum[j].first);
 			const double mag = (re*re + im*im);
 			//TODO: maybe: do I need phase?
-			const double phase = atan2(im, re);
+			//const double phase = atan2(im, re);
 			//tmp: to reduce oscillations in tiny peaks, set magnitude treshold
 			//TODO: add with 0, or just leave out?
 			//tmp: amp
 			const double amp = (sqrt( (frequency * mag) / (double)m_sampleBuffer.sampleRate()));
 			//if(mag>0.0001){rawSpectrum.emplace_back(std::vector<double>{frequency, phase, mag}); }
-			if(amp>0.001){rawSpectrum.emplace_back(std::vector<double>{frequency, phase, amp}); }
-			else{ rawSpectrum.emplace_back(std::vector<double>{frequency, phase, 0}); }
+			//if(amp>0.001){rawSpectrum.emplace_back(std::vector<double>{frequency, phase, amp}); }
+			if(amp>0.001){rawSpectrum.emplace_back(std::vector<double>{frequency, amp}); }
+			else{ rawSpectrum.emplace_back(std::vector<double>{frequency, 0}); }
 			//tmp: raw output
 			(*dataRow)[index].setPosition(QVector3D(frequency,amp /*TMP*/, (double)i/(double)m_sampleBuffer.sampleRate()));
 			index++;
@@ -132,23 +133,25 @@ std::string AnalyzerPlugin::setAudioFile(const QString &_audio_file)
 		*data << dataRow;
 
 		//tmp: note: no checks ,just rvalue insert
-		//tmp: no peak approximation
+		//tmp: TODO: no true peak approximation
+		//TODO: tf is this?
 		//const auto peaksAndValleys = Analyzer::PeakAndValleyApproximation(Extrema::Differential::intermixed(rawSpectrum.begin(), rawSpectrum.end()));
-		const auto peaksAndValleys = Extrema::Differential::intermixed(rawSpectrum.begin(), rawSpectrum.end());
+		//const auto peaksAndValleys = Extrema::Differential::intermixed(rawSpectrum.begin(), rawSpectrum.end());
+		const auto peaks = Extrema::Differential::maxima(rawSpectrum.begin(), rawSpectrum.end());
 		//tmp: peak output
-		for (auto p : peaksAndValleys)
+		for (auto p : peaks)
 		{
-			//tmp
+			//tmp: why is this here?
 			if(p.pointType==Extrema::Differential::CriticalPoint::PointType::maximum)
 			{
-				auto Y = Interpolation::CubicLagrange(rawSpectrum[p.index-1][0], rawSpectrum[p.index-1][2], rawSpectrum[p.index][0], rawSpectrum[p.index][2], rawSpectrum[p.index+1][0], rawSpectrum[p.index+1][2], rawSpectrum[p.index+2][0], rawSpectrum[p.index+2][2], p.x);
+				//auto Y = Interpolation::CubicLagrange(rawSpectrum[p.index-1][0], rawSpectrum[p.index-1][2], rawSpectrum[p.index][0], rawSpectrum[p.index][2], rawSpectrum[p.index+1][0], rawSpectrum[p.index+1][2], rawSpectrum[p.index+2][0], rawSpectrum[p.index+2][2], p.x);
 			}
 			//tmp: extrema visualization
 			if(p.pointType==Extrema::Differential::CriticalPoint::PointType::maximum)
 			{
 				//TODO: relative path
 				visualization->addCustomItem(new QCustom3DItem("/home/mate/projects/lmms/plugins/Diginstrument/analyzer/resources/marker_mesh.obj",
-											QVector3D(rawSpectrum[p.index][0], rawSpectrum[p.index][2],(double)i/(double)m_sampleBuffer.sampleRate()),
+											QVector3D(rawSpectrum[p.index][0], rawSpectrum[p.index][1],(double)i/(double)m_sampleBuffer.sampleRate()),
 											QVector3D(0.025f, 0.025f, 0.025f),
 											QQuaternion::fromAxisAndAngle(0.0f, 1.0f, 0.0f, 45.0f),
 											colorRed));
@@ -156,7 +159,7 @@ std::string AnalyzerPlugin::setAudioFile(const QString &_audio_file)
 			if(p.pointType==Extrema::Differential::CriticalPoint::PointType::minimum)
 			{
 				visualization->addCustomItem(new QCustom3DItem("/home/mate/projects/lmms/plugins/Diginstrument/analyzer/resources/marker_mesh.obj",
-											QVector3D(rawSpectrum[p.index][0], rawSpectrum[p.index][2],(double)i/(double)m_sampleBuffer.sampleRate()),
+											QVector3D(rawSpectrum[p.index][0], rawSpectrum[p.index][1],(double)i/(double)m_sampleBuffer.sampleRate()),
 											QVector3D(0.025f, 0.025f, 0.025f),
 											QQuaternion::fromAxisAndAngle(0.0f, 1.0f, 0.0f, 45.0f),
 											colorBlue));
@@ -164,7 +167,7 @@ std::string AnalyzerPlugin::setAudioFile(const QString &_audio_file)
 			if(p.pointType==Extrema::Differential::CriticalPoint::PointType::rising)
 			{
 				visualization->addCustomItem(new QCustom3DItem("/home/mate/projects/lmms/plugins/Diginstrument/analyzer/resources/marker_mesh.obj",
-											QVector3D(rawSpectrum[p.index][0], rawSpectrum[p.index][2],(double)i/(double)m_sampleBuffer.sampleRate()),
+											QVector3D(rawSpectrum[p.index][0], rawSpectrum[p.index][1],(double)i/(double)m_sampleBuffer.sampleRate()),
 											QVector3D(0.025f, 0.025f, 0.025f),
 											QQuaternion::fromAxisAndAngle(0.0f, 1.0f, 0.0f, 45.0f),
 											colorGreen));
@@ -172,7 +175,7 @@ std::string AnalyzerPlugin::setAudioFile(const QString &_audio_file)
 			if(p.pointType==Extrema::Differential::CriticalPoint::PointType::falling)
 			{
 				visualization->addCustomItem(new QCustom3DItem("/home/mate/projects/lmms/plugins/Diginstrument/analyzer/resources/marker_mesh.obj",
-											QVector3D(rawSpectrum[p.index][0], rawSpectrum[p.index][2],(double)i/(double)m_sampleBuffer.sampleRate()),
+											QVector3D(rawSpectrum[p.index][0], rawSpectrum[p.index][1],(double)i/(double)m_sampleBuffer.sampleRate()),
 											QVector3D(0.025f, 0.025f, 0.025f),
 											QQuaternion::fromAxisAndAngle(0.0f, 1.0f, 0.0f, 45.0f),
 											colorOrange));
@@ -180,7 +183,7 @@ std::string AnalyzerPlugin::setAudioFile(const QString &_audio_file)
 			
 		}
 		//NOTE: there is no true peak approximation yet!
-		auto spline = fitter.peakValleyFit(rawSpectrum, peaksAndValleys);
+		auto spline = fitter.peakFit(rawSpectrum, peaks);
 		//only add "valid" splines
 		if (spline.getPieces().size() > 0 /* TMP: i want at least SOMETHING in; && spline.getBegin() <= 12 && spline.getEnd() > 21000*/)
 		{

@@ -78,7 +78,6 @@ BSpline<T, D> SplineFitter<T, D>::fit(const std::vector<std::vector<T>> &points,
     resPoints.back() = points.back();
     for (int i = 1; i < resPoints.size() - 1; i++)
     {
-        //TODO: use all dimesnions in result
         std::vector<T> resPoint(pointDimension,0);
         for(int j = 0; j<pointDimension;j++)
         {

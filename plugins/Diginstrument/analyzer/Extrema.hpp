@@ -6,12 +6,9 @@
 
 #include "../common/Intersection.hpp"
 
-//tmp
-#include <iostream>
-
 namespace Extrema
 {
-
+/**DEPRECATED**/
 /*Returns the indices of both local minima and maxima in an array*/
 /*The minimumDifference is the minimum distance from both neighbours to be considered an extrema*/
 /*O(n)*/
@@ -109,45 +106,64 @@ public:
         CriticalPoint(const CriticalPoint & other) : pointType(other.pointType), x(other.x), index(other.index) {}
     };
 
-    /* Find approximations of first and second order critical points (extrema and inflexion points)
-        The result contains both orders, ordered by x */
     template <class Iterator>
-    static std::vector<CriticalPoint> intermixed(Iterator begin, Iterator end)
+    static std::vector<std::pair<double, double>> makeFirstDerivative(Iterator begin, Iterator end)
     {
-        std::vector<std::pair<double, double>> d1;
-        d1.reserve(std::distance(begin,end)-2);
-        std::vector<std::pair<double, double>> d2;
-        d2.reserve(std::distance(begin,end)-2);
-        //calculate first and second derivatives
+        std::vector<std::pair<double, double>> res;
+        res.reserve(std::distance(begin,end)-2);
+        Iterator fn = begin+1;
+        while(fn != end-1)
+        {
+            const auto & nL = *(fn-1);
+            const auto & nR = *(fn+1);
+            res.emplace_back( std::make_pair((*fn)[0], (nR[1]-nL[1]) / ((nR[0]-nL[0]))) );
+            fn++;
+        }
+        return res;
+    }
+
+    template <class Iterator>
+    static std::vector<std::pair<double, double>> makeSecondDerivative(Iterator begin, Iterator end)
+    {
+        std::vector<std::pair<double, double>> res;
+        res.reserve(std::distance(begin,end)-2);
         Iterator fn = begin+1;
         while(fn != end-1)
         {
             const auto & nL = *(fn-1);
             const auto & nR = *(fn+1);
             //TODO: deltaT is non-uniform!
-            d1.emplace_back( std::make_pair((*fn)[0], (nR[2]-nL[2]) / ((nR[0]-nL[0]))) );
             const auto deltaTSquare = (((nR[0]-nL[0])) * ((nR[0]-nL[0])))/4.0;
-            d2.emplace_back( std::make_pair((*fn)[0], (nR[2]-2*((*fn)[2])+nL[2]) / deltaTSquare ) );
+            res.emplace_back( std::make_pair((*fn)[0], (nR[1]-2*((*fn)[1])+nL[1]) / deltaTSquare ) );
             fn++;
         }
-/*
-        for(auto it = begin;it!=end;it++)
+        return res;
+    }
+
+    template <class Iterator>
+    static std::vector<CriticalPoint> maxima(Iterator begin, Iterator end)
+    {
+        std::vector<std::pair<double, double>> d1 = makeFirstDerivative(begin, end);
+        std::vector<CriticalPoint> res;
+        for(int i = 0; i<d1.size()-1; i++)
         {
-            std::cout<<std::fixed<<"("<<(*it)[0]<<","<<(*it)[2]<<"),";
+            if(d1[i].second > 0 && d1[i+1].second < 0)
+            {
+                //local maximum
+                const double x = Intersection::X<double>(d1[i].first, d1[i].second, d1[i+1].first, d1[i+1].second);
+                res.emplace_back(CriticalPoint::PointType::maximum, x, i+1);
+            }
         }
-        std::cout<<std::endl;
-        //tmp: debug derivatives
-        for(auto & n : d1)
-        {
-            std::cout<<std::fixed<<"("<<n.first<<","<<n.second<<"),";
-        }
-        std::cout<<std::endl;
-        for(auto & n : d2)
-        {
-            std::cout<<std::fixed<<"("<<n.first<<","<<n.second<<"),";
-        }
-        std::cout<<std::endl;
-*/
+        return res;
+    }
+
+    /* Find approximations of first and second order critical points (extrema and inflexion points)
+        The result contains both orders, ordered by x */
+    template <class Iterator>
+    static std::vector<CriticalPoint> intermixed(Iterator begin, Iterator end, int order = 1)
+    {
+        std::vector<std::pair<double, double>> d1 = makeFirstDerivative(begin, end);
+        std::vector<std::pair<double, double>> d2 = makeSecondDerivative(begin, end);
         std::vector<CriticalPoint> res;
         //search for local extrema
         for(int i = 0; i<d1.size()-1; i++)
@@ -161,26 +177,29 @@ public:
             }
             if(d1[i].second < 0 && d1[i+1].second > 0)
             {
-                //local maximum
+                //local minimum
                 const double x = Intersection::X<double>(d1[i].first, d1[i].second, d1[i+1].first, d1[i+1].second);
                 res.emplace_back(CriticalPoint::PointType::minimum, x, i+1);
                 continue;
             }
         }
         //search for inflexion points
-        for(int i = 0; i<d2.size()-1; i++)
+        if(order>1)
         {
-            if(d2[i].second > 0 && d2[i+1].second < 0)
+            for(int i = 0; i<d2.size()-1; i++)
             {
-                //rising point
-                const double x = Intersection::X<double>(d2[i].first, d2[i].second, d2[i+1].first, d2[i+1].second);
-                res.emplace_back(CriticalPoint::PointType::rising, x, i+1);
-            }
-            if(d2[i].second < 0 && d2[i+1].second > 0)
-            {
-                //falling point
-                const double x = Intersection::X<double>(d2[i].first, d2[i].second, d2[i+1].first, d2[i+1].second);
-                res.emplace_back(CriticalPoint::PointType::falling, x, i+1);
+                if(d2[i].second > 0 && d2[i+1].second < 0)
+                {
+                    //rising point
+                    const double x = Intersection::X<double>(d2[i].first, d2[i].second, d2[i+1].first, d2[i+1].second);
+                    res.emplace_back(CriticalPoint::PointType::rising, x, i+1);
+                }
+                if(d2[i].second < 0 && d2[i+1].second > 0)
+                {
+                    //falling point
+                    const double x = Intersection::X<double>(d2[i].first, d2[i].second, d2[i+1].first, d2[i+1].second);
+                    res.emplace_back(CriticalPoint::PointType::falling, x, i+1);
+                }
             }
         }
         //sort by x

@@ -9,10 +9,6 @@
 #include "../common/Spectrum.hpp"
 #include "../common/Interpolation.hpp"
 
-//tmp
-#include <iostream>
-
-//TODO: maybe: merge pieces for fitting if they are not long enough
 /* Fits a PiecewiseBSpline of degree D to a set of points using the least squares method.*/
 template <typename T, unsigned int D>
 class SpectrumFitter
@@ -29,7 +25,7 @@ public:
     PiecewiseBSpline<T, D> fit(const std::vector<std::vector<T>> & spectrum, const std::pair<std::vector<unsigned int>, std::vector<unsigned int>> & extrema);
 
     //TODO
-    PiecewiseBSpline<T, D> peakValleyFit(const std::vector<std::vector<T>> & spectrum, const std::vector<Extrema::Differential::CriticalPoint> & extrema);
+    PiecewiseBSpline<T, D> peakFit(const std::vector<std::vector<T>> & spectrum, const std::vector<Extrema::Differential::CriticalPoint> & maxima);
 
     //TODO
     std::vector<PiecewiseBSpline<T, D>> fit(const std::vector<std::vector<std::vector<T>>> & spectra,
@@ -42,6 +38,8 @@ public:
 };
 
 /*Fit to one spectrum with pre-calculated extrema*/
+//TODO: refactor: why is there two fits? Whats different from peak-valley?
+/** DEPRECATED **/
 template <typename T, unsigned int D>
 PiecewiseBSpline<T, D> SpectrumFitter<T, D>::fit(const std::vector<std::vector<T>> & spectrum, const std::pair<std::vector<unsigned int>, std::vector<unsigned int>> & extrema)
 {    
@@ -125,115 +123,64 @@ std::vector<std::vector<T>> SpectrumFitter<T, D>::addEndpointsToVector(const std
     return res;
 }
 
-
 template <typename T, unsigned int D>
-PiecewiseBSpline<T, D> SpectrumFitter<T, D>::peakValleyFit(const std::vector<std::vector<T>> & spectrum, const std::vector<Extrema::Differential::CriticalPoint> & extrema)
+PiecewiseBSpline<T, D> SpectrumFitter<T, D>::peakFit(const std::vector<std::vector<T>> & spectrum, const std::vector<Extrema::Differential::CriticalPoint> & maxima)
 {
-    //TODO: re-think possible patterns and their continuity
-    //TODO: too few or mismatched extrema (e.g. one minimum only)
-    using PointType = Extrema::Differential::CriticalPoint::PointType;
+    //TODO: did we hangle overlapping peaks anywhere? (rising-falling-rising or something like that)
+    //TODO: should probably select points based on spline length and stuff
+    //TODO:TMP:FIXME: we fit with as many CPs as data points
+    //wait, maybe i should fit to all points, but not with points.size() cps?
+
     PiecewiseBSpline<T, D> res;
-    //tmp
-    if(extrema.size()==0) return res;
-    auto it = extrema.begin();
-    //accumulate segments where points.size()<D
+    //no peaks: return empty spline
+    if(maxima.size()==0) return res;
+    //accumulate too short segments
+    //TODO: FIXME: this approach discards a peak if its segment was too short. However, this will rarely happen, and even rarer near significant peaks.
+    //Could be a problem once we can detect overlapping peaks!
     std::vector<std::vector<T>> points;
-    //is first minimum or maximum?
-    if(it->pointType == PointType::maximum)
+    auto it = maxima.begin();
+
+    //begin - first peak
+    points = std::vector<std::vector<T>>(spectrum.begin(), spectrum.begin()+(maxima.begin()->index)+1);
+    //add interpolated first peak
+    points.push_back({it->x, Interpolation::CubicLagrange(spectrum[it->index-1][0], spectrum[it->index-1][1], spectrum[it->index][0], spectrum[it->index][1], spectrum[it->index+1][0], spectrum[it->index+1][1], spectrum[it->index+2][0], spectrum[it->index+2][1], it->x)});
+    //fit to points
+    if(points.size()>=D)
     {
-        //fit to [first, max]
-        points = std::vector<std::vector<T>>(spectrum.begin(), spectrum.begin()+(it->index)+1);
-        const auto Y = Interpolation::CubicLagrange(spectrum[it->index-1][0], spectrum[it->index-1][2], spectrum[it->index][0], spectrum[it->index][2], spectrum[it->index+1][0], spectrum[it->index+1][2], spectrum[it->index+2][0], spectrum[it->index+2][2], it->x);
-        points.push_back({it->x, 0, Y});
-        if(points.size()>D){
-            res.add(SplineFitter<T, D>::fit(points, points.size()));
-            points.clear();
-        }
+        res.add(SplineFitter<T, D>::fit(points, /*TMP: we use all points*/ points.size()));
+        points.clear();
     }
-    else
+    //peak - peak
+    while(it!=maxima.end()-1)
     {
-        //fit to [first, min, max]
-        //tmp: disregard min
-        //tmp: check
-        if(extrema.size()>1)
-            {
-            points = std::vector<std::vector<T>>(spectrum.begin(), spectrum.begin()+((it+1)->index)+1);
-            const auto Y = Interpolation::CubicLagrange(spectrum[(it+1)->index-1][0], spectrum[(it+1)->index-1][2], spectrum[(it+1)->index][0], spectrum[(it+1)->index][2], spectrum[(it+1)->index+1][0], spectrum[(it+1)->index+1][2], spectrum[(it+1)->index+2][0], spectrum[(it+1)->index+2][2], (it+1)->x);
-            points.push_back({(it+1)->x, 0, Y});
-            if(points.size()>D){
-                res.add(SplineFitter<T, D>::fit(points, points.size()));
-                points.clear();
-            }
-            it++;
-            }
-    }
-    //TODO
-    //TMP: no point selection, all points and set CPs
-    while(it<extrema.end()-1)
-    {
-        //fit to [max, max]
-        if(it->pointType == PointType::maximum && (it+1)->pointType == PointType::maximum)
-        {
-            //TODO
-            //TODO: rethink accumulation. big problems can be caused here, like if i put in a point twice, the whole spline was useless
-            const auto Y1 = Interpolation::CubicLagrange(spectrum[it->index-1][0], spectrum[it->index-1][2], spectrum[it->index][0], spectrum[it->index][2], spectrum[it->index+1][0], spectrum[it->index+1][2], spectrum[it->index+2][0], spectrum[it->index+2][2], it->x);
-            const auto Y2 = Interpolation::CubicLagrange(spectrum[(it+1)->index-1][0], spectrum[(it+1)->index-1][2], spectrum[(it+1)->index][0], spectrum[(it+1)->index][2], spectrum[(it+1)->index+1][0], spectrum[(it+1)->index+1][2], spectrum[(it+1)->index+2][0], spectrum[(it+1)->index+2][2], (it+1)->x);
-            points.reserve(3-it->index+(it+1)->index);
-            if(points.size()==0) points.push_back({it->x, 0, Y1});
-            for(int i = it->index+1; i<=(it+1)->index; i++)
-            {
-                points.emplace_back(spectrum[i]);
-            }
-            points.push_back({(it+1)->x, 0, Y2});
-            if(points.size()>D){
-                res.add(SplineFitter<T, D>::fit(points, points.size()));
-                points.clear();
-            }
-            it++;
-            continue;
-        }
-        //fit to [max, min, max]
-        if(it->pointType == PointType::maximum && (it+2)->pointType == PointType::maximum && (it+1)->pointType == PointType::minimum)
-        {
-            //TODO
-            //tmp: disregard min
-            const auto Y1 = Interpolation::CubicLagrange(spectrum[it->index-1][0], spectrum[it->index-1][2], spectrum[it->index][0], spectrum[it->index][2], spectrum[it->index+1][0], spectrum[it->index+1][2], spectrum[it->index+2][0], spectrum[it->index+2][2], it->x);
-            const auto Y2 = Interpolation::CubicLagrange(spectrum[(it+2)->index-1][0], spectrum[(it+2)->index-1][2], spectrum[(it+2)->index][0], spectrum[(it+2)->index][2], spectrum[(it+2)->index+1][0], spectrum[(it+2)->index+1][2], spectrum[(it+2)->index+2][0], spectrum[(it+2)->index+2][2], (it+2)->x);
-            points.reserve(3-it->index+(it+2)->index);
-            if(points.size()==0) points.push_back({it->x, 0, Y1});
-            for(int i = it->index+1; i<=(it+2)->index; i++)
-            {
-                points.emplace_back(spectrum[i]);
-            }
-            points.push_back({(it+2)->x, 0, Y2});
-            if(points.size()>D){
-                res.add(SplineFitter<T, D>::fit(points, points.size()));
-                points.clear();
-            }
-            it+=2;
-            continue;
-        }
-        it++;
-    }
-    //is last minimum or maximum?
-    if(extrema.back().pointType == PointType::maximum)
-    {
-        //fit to [max, end]
-        const auto Y = Interpolation::CubicLagrange(spectrum[it->index-1][0], spectrum[it->index-1][2], spectrum[it->index][0], spectrum[it->index][2], spectrum[it->index+1][0], spectrum[it->index+1][2], spectrum[it->index+2][0], spectrum[it->index+2][2], it->x);
-        points.reserve(spectrum.size()-it->index+1);
-        if(points.size()==0) points.push_back({it->x, 0, Y});
-        for(int i = it->index+1; i<spectrum.size(); i++)
+        points.reserve(3-it->index+(it+1)->index + points.size());
+        //if the previous segment was successfully fitted, add first peak again
+        if(points.size()==0) points.push_back({it->x, Interpolation::CubicLagrange(spectrum[it->index-1][0], spectrum[it->index-1][1], spectrum[it->index][0], spectrum[it->index][1], spectrum[it->index+1][0], spectrum[it->index+1][1], spectrum[it->index+2][0], spectrum[it->index+2][1], it->x)});
+        //add inbetween points
+        for(int i = it->index+1; i<=(it+1)->index; i++)
         {
             points.emplace_back(spectrum[i]);
         }
-        if(points.size()>D){ res.add(SplineFitter<T, D>::fit(points, points.size())); }
+        //add second peak
+        points.push_back({(it+1)->x, Interpolation::CubicLagrange(spectrum[(it+1)->index-1][0], spectrum[(it+1)->index-1][1], spectrum[(it+1)->index][0], spectrum[(it+1)->index][1], spectrum[(it+1)->index+1][0], spectrum[(it+1)->index+1][1], spectrum[(it+1)->index+2][0], spectrum[(it+1)->index+2][1], (it+1)->x)});
+        //fit to points
+        if(points.size()>=D)
+        {
+            res.add(SplineFitter<T, D>::fit(points, /*TMP: we use all points*/ points.size()));
+            points.clear();
+        }
+        it++;
     }
-    else
+    //last peak - end
+    //if the previous segment was successfully fitted, add first peak again
+    if(points.size()==0) points.push_back({it->x, Interpolation::CubicLagrange(spectrum[it->index-1][0], spectrum[it->index-1][1], spectrum[it->index][0], spectrum[it->index][1], spectrum[it->index+1][0], spectrum[it->index+1][1], spectrum[it->index+2][0], spectrum[it->index+2][1], it->x)});
+    points.reserve(spectrum.size()-it->index+1);
+    for(int i = it->index+1; i<spectrum.size(); i++)
     {
-        //fit to [max, min, end]
-        //TODO: is this correct?
-        std::cout<<"UNINPLEMENTED: max,min,end - "<<(it-1)->x<<" "<<(it)->x<<" "<<spectrum.back().front()<<std::endl;
+        points.emplace_back(spectrum[i]);
     }
-    
+    //fit to points
+    if(points.size()>=D) res.add(SplineFitter<T, D>::fit(points, /*TMP: we use all points*/ points.size()));
+
     return res;
 }
