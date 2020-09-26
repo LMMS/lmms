@@ -55,7 +55,7 @@
 #include "StringPairDrag.h"
 #include "TextFloat.h"
 
-#include <QDebug>
+
 
 enum TreeWidgetItemTypes
 {
@@ -372,19 +372,15 @@ void FileBrowserTreeWidget::keyPressEvent(QKeyEvent * ke )
 	// Shorter names for some commonly used properties of the event
 	const auto key = ke->key();
 	const bool vertical = key == Qt::Key_Up || key == Qt::Key_Down;
-	const bool horizontal = key == Qt::Key_Left || key == Qt::Key_Right;
+	const bool preview = key == Qt::Key_Space;
+	const bool insert = key == Qt::Key_Enter || key == Qt::Key_Return;
 
-	// First of all, forward all keypresses except left/right. Since we use them
-	// for preview & add, we have to ensure that they don't navigate in the tree
-	if (!horizontal){ QTreeWidget::keyPressEvent(ke); }
+	// First of all, forward all keypresses
+	QTreeWidget::keyPressEvent(ke);
 	// Then, ignore all autorepeats (they would spam new tracks or previews)
 	if (ke->isAutoRepeat()){ return; }
-
-	// Now add keys to expand/collapse folders, since we hijacked left/right
-	if (key == Qt::Key_Return || key == Qt::Key_Enter || key == Qt::Key_Space)
-	{ currentItem()->setExpanded(!currentItem()->isExpanded()); }
 	// We should stop any running previews before we do anything new
-	else if (vertical || horizontal){ stopPreview(); }
+	else if (vertical || preview || insert){ stopPreview(); }
 
 	// Try to get the currently selected item as a FileItem
 	FileItem * file = dynamic_cast<FileItem *>(currentItem());
@@ -397,21 +393,21 @@ void FileBrowserTreeWidget::keyPressEvent(QKeyEvent * ke )
 		previewFileItem(file);
 	}
 
-	// When right arrow is pressed, add the selected item...
-	if (key == Qt::Key_Right)
+	// When enter is pressed, add the selected item...
+	if (insert)
 	{
 		// ...to the song editor by default, or to the BB editor if ctrl is held
 		bool songEditor = !(ke->modifiers() & Qt::ControlModifier);
 		// If shift is held, we send the item to a new sample track...
 		bool sampleTrack = ke->modifiers() & Qt::ShiftModifier;
-		// ...but only in the song editor. So, ctrl+shift+right does nothing
+		// ...but only in the song editor. So, ctrl+shift enter does nothing
 		if (sampleTrack && songEditor){ openInNewSampleTrack(file); }
 		// Otherwise we send the item as a new instrument track
 		else if (!sampleTrack){ openInNewInstrumentTrack(file, songEditor); }
 	}
 
-	// When left arrow is pressed, start a preview of the selected item
-	if (key == Qt::Key_Left){ previewFileItem(file); }
+	// When space is pressed, start a preview of the selected item
+	if (preview){ previewFileItem(file); }
 }
 
 
@@ -419,8 +415,8 @@ void FileBrowserTreeWidget::keyPressEvent(QKeyEvent * ke )
 
 void FileBrowserTreeWidget::keyReleaseEvent(QKeyEvent * ke )
 {
-	// Cancel previews when the left key is released
-	if (ke->key() == Qt::Key_Left && !ke->isAutoRepeat()){ stopPreview(); }
+	// Cancel previews when the space key is released
+	if (ke->key() == Qt::Key_Space && !ke->isAutoRepeat()){ stopPreview(); }
 }
 
 
@@ -470,10 +466,10 @@ QList<QAction*> FileBrowserTreeWidget::getContextActions(FileItem* file, bool so
 	const bool fileIsSample = file->type() == FileItem::SampleFile;
 
 	QString destination = fileIsSample ? "AFP Instance" : "Instrument Track";
-	QString shortcutMod = songEditor ? "" : "Ctrl + ";
+	QString shortcutMod = songEditor ? "" : "Ctrl +";
 
 	QAction* toInstrument = new QAction(
-		tr("Send to new %1 (%2Right Arrow)")
+		tr("Send to new %1 (%2 Enter)")
 		.arg(destination, shortcutMod),
 		nullptr
 	);
@@ -483,7 +479,7 @@ QList<QAction*> FileBrowserTreeWidget::getContextActions(FileItem* file, bool so
 
 	if (songEditor && fileIsSample){
 		QAction* toSampleTrack = new QAction(
-			tr("Send to new Sample Track (Shift + Right Arrow)"),
+			tr("Send to new Sample Track (Shift + Enter)"),
 			nullptr
 		);
 		connect(toSampleTrack, &QAction::triggered,
