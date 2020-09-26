@@ -63,9 +63,9 @@ public:
 
 private slots:
 	void reloadTree( void );
-	void expandItems( QTreeWidgetItem * item=NULL, QList<QString> expandedDirs = QList<QString>() );
+	void expandItems( QTreeWidgetItem * item=nullptr, QList<QString> expandedDirs = QList<QString>() );
 	// call with item=NULL to filter the entire tree
-	bool filterItems( const QString & filter, QTreeWidgetItem * item=NULL );
+	bool filterItems( const QString & filter, QTreeWidgetItem * item=nullptr );
 	void giveFocusToFilter();
 
 private:
@@ -112,7 +112,7 @@ private:
 	void previewFileItem(FileItem* file);
 	//! If a preview is playing, stop it. Returns false if nothing was playing
 	bool stopPreview();
-	
+
 	void keyPressEvent( QKeyEvent * ke ) override;
 	void keyReleaseEvent( QKeyEvent * ke ) override;
 

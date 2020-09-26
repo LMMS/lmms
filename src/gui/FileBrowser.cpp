@@ -174,7 +174,7 @@ void FileBrowser::reloadTree( void )
 	{
 		addItems( *it );
 	}
-	expandItems(NULL, expandedDirs);
+	expandItems(nullptr, expandedDirs);
 	m_filterEdit->setText( text );
 	filterItems( text );
 }
@@ -241,7 +241,7 @@ void FileBrowser::addItems(const QString & path )
 			{
 				Directory * d = dynamic_cast<Directory *>(
 						m_fileBrowserTreeWidget->topLevelItem( i ) );
-				if( d == NULL || cur_file < d->text( 0 ) )
+				if( d == nullptr || cur_file < d->text( 0 ) )
 				{
 					// insert before item, we're done
 					Directory *dd = new Directory( cur_file, path,
@@ -321,7 +321,7 @@ FileBrowserTreeWidget::FileBrowserTreeWidget(QWidget * parent ) :
 	QTreeWidget( parent ),
 	m_mousePressed( false ),
 	m_pressPos(),
-	m_previewPlayHandle( NULL ),
+	m_previewPlayHandle( nullptr ),
 	m_pphMutex( QMutex::Recursive )
 {
 	setColumnCount( 1 );
@@ -371,10 +371,10 @@ void FileBrowserTreeWidget::keyPressEvent(QKeyEvent * ke )
 {
 	// Shorter names for some commonly used properties of the event
 	const auto key = ke->key();
-	const bool vertical = key == Qt::Key_Up || key == Qt::Key_Down;
-	const bool horizontal = key == Qt::Key_Left || key == Qt::Key_Right;
-	const bool preview = key == Qt::Key_Space;
-	const bool insert = key == Qt::Key_Enter || key == Qt::Key_Return;
+	const bool vertical   = (key == Qt::Key_Up    || key == Qt::Key_Down);
+	const bool horizontal = (key == Qt::Key_Left  || key == Qt::Key_Right);
+	const bool insert     = (key == Qt::Key_Enter || key == Qt::Key_Return);
+	const bool preview    = (key == Qt::Key_Space);
 
 	// First of all, forward all keypresses
 	QTreeWidget::keyPressEvent(ke);
@@ -386,7 +386,7 @@ void FileBrowserTreeWidget::keyPressEvent(QKeyEvent * ke )
 	// Try to get the currently selected item as a FileItem
 	FileItem * file = dynamic_cast<FileItem *>(currentItem());
 	// If it's null (folder, separator, etc.), there's nothing left for us to do
-	if (file == NULL){ return; }
+	if (file == nullptr){ return; }
 
 	// When moving to a new sound, preview it. Skip presets, they can play forever
 	if (vertical && file->type() == FileItem::SampleFile)
@@ -426,7 +426,7 @@ void FileBrowserTreeWidget::keyReleaseEvent(QKeyEvent * ke )
 void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent * e )
 {
 	FileItem * file = dynamic_cast<FileItem *>( itemAt( e->pos() ) );
-	if( file != NULL && file->isTrack() )
+	if( file != nullptr && file->isTrack() )
 	{
 		QMenu contextMenu( this );
 
@@ -517,7 +517,7 @@ void FileBrowserTreeWidget::mousePressEvent(QMouseEvent * me )
 	}
 
 	FileItem * f = dynamic_cast<FileItem *>(i);
-	if(f != NULL){ previewFileItem(f); }
+	if(f != nullptr){ previewFileItem(f); }
 }
 
 
@@ -547,7 +547,7 @@ void FileBrowserTreeWidget::previewFileItem(FileItem* file)
 		(file->extension() == "xiz" || file->extension() == "sf2" ||
 		 file->extension() == "sf3" || file->extension() == "gig" ||
 		 file ->extension() == "pat") &&
-		!pluginFactory->pluginSupportingExtension(file->extension()).info.isNull())
+		!pluginFactory->pluginSupportingExtension(file->extension()).isNull())
 	{
 		m_previewPlayHandle = new PresetPreviewPlayHandle(
 			file->fullName(), file->handling() == FileItem::LoadByPlugin);
@@ -568,11 +568,11 @@ void FileBrowserTreeWidget::previewFileItem(FileItem* file)
 			file->fullName(), file->handling() == FileItem::LoadByPlugin, &dataFile
 		);
 	}
-	if(m_previewPlayHandle != NULL)
+	if(m_previewPlayHandle != nullptr)
 	{
 		if(!Engine::mixer()->addPlayHandle(m_previewPlayHandle))
 		{
-			m_previewPlayHandle = NULL;
+			m_previewPlayHandle = nullptr;
 		}
 	}
 	m_pphMutex.unlock();
@@ -583,11 +583,11 @@ void FileBrowserTreeWidget::previewFileItem(FileItem* file)
 
 bool FileBrowserTreeWidget::stopPreview()
 {
-	if (m_previewPlayHandle != NULL)
+	if (m_previewPlayHandle != nullptr)
 	{
 		m_pphMutex.lock();
 		Engine::mixer()->removePlayHandle(m_previewPlayHandle);
-		m_previewPlayHandle = NULL;
+		m_previewPlayHandle = nullptr;
 		m_pphMutex.unlock();
 		return true;
 	}
@@ -607,7 +607,7 @@ void FileBrowserTreeWidget::mouseMoveEvent( QMouseEvent * me )
 		mouseReleaseEvent( NULL );
 
 		FileItem * f = dynamic_cast<FileItem *>( itemAt( m_pressPos ) );
-		if( f != NULL )
+		if( f != nullptr )
 		{
 			switch( f->type() )
 			{
@@ -658,7 +658,7 @@ void FileBrowserTreeWidget::mouseReleaseEvent(QMouseEvent * me )
 	m_mousePressed = false;
 
 	m_pphMutex.lock();
-	if(m_previewPlayHandle != NULL)
+	if(m_previewPlayHandle != nullptr)
 	{
 		// if there're samples shorter than 3 seconds, we don't
 		// stop them if the user releases mouse-button...
@@ -670,7 +670,7 @@ void FileBrowserTreeWidget::mouseReleaseEvent(QMouseEvent * me )
 						processingSampleRate() * 3))
 			{
 				s->setDoneMayReturnTrue(true);
-				m_previewPlayHandle = NULL;
+				m_previewPlayHandle = nullptr;
 				m_pphMutex.unlock();
 				return;
 			}
@@ -700,7 +700,7 @@ void FileBrowserTreeWidget::handleFile(FileItem * f, InstrumentTrack * it)
 		{
 			const QString e = f->extension();
 			Instrument * i = it->instrument();
-			if( i == NULL ||
+			if( i == nullptr ||
 				!i->descriptor()->supportsFileType( e ) )
 			{
 				PluginFactory::PluginInfoAndKey piakn =
@@ -740,7 +740,7 @@ void FileBrowserTreeWidget::activateListItem(QTreeWidgetItem * item,
 								int column )
 {
 	FileItem * f = dynamic_cast<FileItem *>( item );
-	if( f == NULL )
+	if( f == nullptr )
 	{
 		return;
 	}
@@ -748,7 +748,7 @@ void FileBrowserTreeWidget::activateListItem(QTreeWidgetItem * item,
 	if( f->handling() == FileItem::LoadAsProject ||
 		f->handling() == FileItem::ImportAsProject )
 	{
-		handleFile( f, NULL );
+		handleFile( f, nullptr );
 	}
 	else if( f->handling() != FileItem::NotSupported )
 	{
@@ -836,7 +836,7 @@ void FileBrowserTreeWidget::sendToActiveInstrumentTrack( FileItem* item )
 		InstrumentTrackWindow * itw =
 			dynamic_cast<InstrumentTrackWindow *>(
 						w.previous()->widget() );
-		if( itw != NULL && itw->isHidden() == false )
+		if( itw != nullptr && itw->isHidden() == false )
 		{
 			handleFile( item, itw->model() );
 			break;
@@ -850,7 +850,7 @@ void FileBrowserTreeWidget::sendToActiveInstrumentTrack( FileItem* item )
 void FileBrowserTreeWidget::updateDirectory(QTreeWidgetItem * item )
 {
 	Directory * dir = dynamic_cast<Directory *>( item );
-	if( dir != NULL )
+	if( dir != nullptr )
 	{
 		dir->update();
 	}
@@ -861,9 +861,9 @@ void FileBrowserTreeWidget::updateDirectory(QTreeWidgetItem * item )
 
 
 
-QPixmap * Directory::s_folderPixmap = NULL;
-QPixmap * Directory::s_folderOpenedPixmap = NULL;
-QPixmap * Directory::s_folderLockedPixmap = NULL;
+QPixmap * Directory::s_folderPixmap = nullptr;
+QPixmap * Directory::s_folderOpenedPixmap = nullptr;
+QPixmap * Directory::s_folderLockedPixmap = nullptr;
 
 
 Directory::Directory(const QString & filename, const QString & path,
@@ -892,19 +892,19 @@ Directory::Directory(const QString & filename, const QString & path,
 
 void Directory::initPixmaps( void )
 {
-	if( s_folderPixmap == NULL )
+	if( s_folderPixmap == nullptr )
 	{
 		s_folderPixmap = new QPixmap(
 					embed::getIconPixmap( "folder" ) );
 	}
 
-	if( s_folderOpenedPixmap == NULL )
+	if( s_folderOpenedPixmap == nullptr )
 	{
 		s_folderOpenedPixmap = new QPixmap(
 				embed::getIconPixmap( "folder_opened" ) );
 	}
 
-	if( s_folderLockedPixmap == NULL )
+	if( s_folderLockedPixmap == nullptr )
 	{
 		s_folderLockedPixmap = new QPixmap(
 				embed::getIconPixmap( "folder_locked" ) );
@@ -982,7 +982,7 @@ bool Directory::addItems(const QString & path )
 			{
 				Directory * d = dynamic_cast<Directory *>(
 								child( i ) );
-				if( d == NULL || cur_file < d->text( 0 ) )
+				if( d == nullptr || cur_file < d->text( 0 ) )
 				{
 					// insert before item, we're done
 					insertChild( i, new Directory( cur_file,
@@ -1040,13 +1040,13 @@ bool Directory::addItems(const QString & path )
 
 
 
-QPixmap * FileItem::s_projectFilePixmap = NULL;
-QPixmap * FileItem::s_presetFilePixmap = NULL;
-QPixmap * FileItem::s_sampleFilePixmap = NULL;
-QPixmap * FileItem::s_soundfontFilePixmap = NULL;
-QPixmap * FileItem::s_vstPluginFilePixmap = NULL;
-QPixmap * FileItem::s_midiFilePixmap = NULL;
-QPixmap * FileItem::s_unknownFilePixmap = NULL;
+QPixmap * FileItem::s_projectFilePixmap = nullptr;
+QPixmap * FileItem::s_presetFilePixmap = nullptr;
+QPixmap * FileItem::s_sampleFilePixmap = nullptr;
+QPixmap * FileItem::s_soundfontFilePixmap = nullptr;
+QPixmap * FileItem::s_vstPluginFilePixmap = nullptr;
+QPixmap * FileItem::s_midiFilePixmap = nullptr;
+QPixmap * FileItem::s_unknownFilePixmap = nullptr;
 
 
 FileItem::FileItem(QTreeWidget * parent, const QString & name,
@@ -1074,43 +1074,43 @@ FileItem::FileItem(const QString & name, const QString & path ) :
 
 void FileItem::initPixmaps( void )
 {
-	if( s_projectFilePixmap == NULL )
+	if( s_projectFilePixmap == nullptr )
 	{
 		s_projectFilePixmap = new QPixmap( embed::getIconPixmap(
 						"project_file", 16, 16 ) );
 	}
 
-	if( s_presetFilePixmap == NULL )
+	if( s_presetFilePixmap == nullptr )
 	{
 		s_presetFilePixmap = new QPixmap( embed::getIconPixmap(
 						"preset_file", 16, 16 ) );
 	}
 
-	if( s_sampleFilePixmap == NULL )
+	if( s_sampleFilePixmap == nullptr )
 	{
 		s_sampleFilePixmap = new QPixmap( embed::getIconPixmap(
 						"sample_file", 16, 16 ) );
 	}
 
-	if ( s_soundfontFilePixmap == NULL )
+	if ( s_soundfontFilePixmap == nullptr )
 	{
 		s_soundfontFilePixmap = new QPixmap( embed::getIconPixmap(
 						"soundfont_file", 16, 16 ) );
 	}
 
-	if ( s_vstPluginFilePixmap == NULL )
+	if ( s_vstPluginFilePixmap == nullptr )
 	{
 		s_vstPluginFilePixmap = new QPixmap( embed::getIconPixmap(
 						"vst_plugin_file", 16, 16 ) );
 	}
 
-	if( s_midiFilePixmap == NULL )
+	if( s_midiFilePixmap == nullptr )
 	{
 		s_midiFilePixmap = new QPixmap( embed::getIconPixmap(
 							"midi_file", 16, 16 ) );
 	}
 
-	if( s_unknownFilePixmap == NULL )
+	if( s_unknownFilePixmap == nullptr )
 	{
 		s_unknownFilePixmap = new QPixmap( embed::getIconPixmap(
 							"unknown_file" ) );
