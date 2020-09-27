@@ -37,7 +37,15 @@ class Lv2UridCache
 public:
 	enum class Id //!< ID for m_uridCache array
 	{
+		// keep it alphabetically
+		atom_Float,
+		atom_Int,
+		bufsz_minBlockLength,
+		bufsz_maxBlockLength,
+		bufsz_nominalBlockLength,
+		bufsz_sequenceSize,
 		midi_MidiEvent,
+		param_sampleRate,
 		size
 	};
 	//! Return URID for a cache ID
