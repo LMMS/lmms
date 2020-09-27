@@ -36,7 +36,11 @@ namespace PathUtil
 		return QDir::cleanPath(loc) + "/";
 	}
 
-	QDir baseQDir (const Base base) { return QDir(baseLocation(base)); }
+	QDir baseQDir (const Base base)
+	{
+		if (base == Base::Absolute){ return QDir::root(); }
+		return QDir(baseLocation(base));
+	}
 
 	QString basePrefix(const Base base)
 	{
