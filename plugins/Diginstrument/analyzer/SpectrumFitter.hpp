@@ -145,7 +145,7 @@ PiecewiseBSpline<T, D> SpectrumFitter<T, D>::peakFit(const std::vector<std::vect
     //add interpolated first peak
     points.push_back({it->x, Interpolation::CubicLagrange(spectrum[it->index-1][0], spectrum[it->index-1][1], spectrum[it->index][0], spectrum[it->index][1], spectrum[it->index+1][0], spectrum[it->index+1][1], spectrum[it->index+2][0], spectrum[it->index+2][1], it->x)});
     //fit to points
-    if(points.size()>=D)
+    if(points.size()>D)
     {
         res.add(SplineFitter<T, D>::fit(points, /*TMP: we use all points*/ points.size()));
         points.clear();
@@ -164,7 +164,7 @@ PiecewiseBSpline<T, D> SpectrumFitter<T, D>::peakFit(const std::vector<std::vect
         //add second peak
         points.push_back({(it+1)->x, Interpolation::CubicLagrange(spectrum[(it+1)->index-1][0], spectrum[(it+1)->index-1][1], spectrum[(it+1)->index][0], spectrum[(it+1)->index][1], spectrum[(it+1)->index+1][0], spectrum[(it+1)->index+1][1], spectrum[(it+1)->index+2][0], spectrum[(it+1)->index+2][1], (it+1)->x)});
         //fit to points
-        if(points.size()>=D)
+        if(points.size()>D)
         {
             res.add(SplineFitter<T, D>::fit(points, /*TMP: we use all points*/ points.size()));
             points.clear();
@@ -180,7 +180,7 @@ PiecewiseBSpline<T, D> SpectrumFitter<T, D>::peakFit(const std::vector<std::vect
         points.emplace_back(spectrum[i]);
     }
     //fit to points
-    if(points.size()>=D) res.add(SplineFitter<T, D>::fit(points, /*TMP: we use all points*/ points.size()));
+    if(points.size()>D) res.add(SplineFitter<T, D>::fit(points, /*TMP: we use all points*/ points.size()));
 
     return res;
 }

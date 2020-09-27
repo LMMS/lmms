@@ -85,12 +85,6 @@ std::string AnalyzerPlugin::setAudioFile(const QString &_audio_file)
 	int goodBeginBadEnd = 0;
 	int badBedginGoodEnd = 0;
 
-	auto test = SplineSpectrum<float, 4>(PiecewiseBSpline<float, 4>(), 12);
-
-	std::ofstream output;
-
-	output.open("raw.txt");
-
 	const double transformStep = 0.01*(double)m_sampleBuffer.sampleRate();
 	SpectrumFitter<double, 4> fitter(1.25);
 
@@ -108,23 +102,19 @@ std::string AnalyzerPlugin::setAudioFile(const QString &_audio_file)
 		QSurfaceDataRow *dataRow = new QSurfaceDataRow(level * 11);
 		int index = 0;
 
-		//process the complex result of the CWT into "amplitude and phase spectrum"
+		//process the complex result of the CWT into a magnitude spectrum
 		for (int j = momentarySpectrum.size() - 1; j >= 0; j--)
 		{
 			const double & re = momentarySpectrum[j].second.first;
 			const double & im = momentarySpectrum[j].second.second;
 			const double frequency = (double)m_sampleBuffer.sampleRate() / (momentarySpectrum[j].first);
 			const double mag = (re*re + im*im);
-			//TODO: maybe: do I need phase?
 			//const double phase = atan2(im, re);
 			//tmp: to reduce oscillations in tiny peaks, set magnitude treshold
-			//TODO: add with 0, or just leave out?
+			if(mag>0.01){rawSpectrum.emplace_back(std::vector<double>{frequency, mag}); }
+			else{ rawSpectrum.emplace_back(std::vector<double>{frequency, 0}); }
 			//tmp: amp
 			const double amp = (sqrt( (frequency * mag) / (double)m_sampleBuffer.sampleRate()));
-			//if(mag>0.0001){rawSpectrum.emplace_back(std::vector<double>{frequency, phase, mag}); }
-			//if(amp>0.001){rawSpectrum.emplace_back(std::vector<double>{frequency, phase, amp}); }
-			if(amp>0.001){rawSpectrum.emplace_back(std::vector<double>{frequency, amp}); }
-			else{ rawSpectrum.emplace_back(std::vector<double>{frequency, 0}); }
 			//tmp: raw output
 			(*dataRow)[index].setPosition(QVector3D(frequency,amp /*TMP*/, (double)i/(double)m_sampleBuffer.sampleRate()));
 			index++;
@@ -132,21 +122,24 @@ std::string AnalyzerPlugin::setAudioFile(const QString &_audio_file)
 
 		*data << dataRow;
 
-		//tmp: note: no checks ,just rvalue insert
-		//tmp: TODO: no true peak approximation
-		//TODO: tf is this?
-		//const auto peaksAndValleys = Analyzer::PeakAndValleyApproximation(Extrema::Differential::intermixed(rawSpectrum.begin(), rawSpectrum.end()));
-		//const auto peaksAndValleys = Extrema::Differential::intermixed(rawSpectrum.begin(), rawSpectrum.end());
-		const auto peaks = Extrema::Differential::maxima(rawSpectrum.begin(), rawSpectrum.end());
-		//tmp: peak output
+		//seek critical points with discrete differential, then approximate hidden/overlapping peaks and filter to only include maxima
+		const auto peaks = Diginstrument::PeakApproximation(Extrema::Differential::intermixed(rawSpectrum.begin(), rawSpectrum.end()));
+		//approximate true peaks
 		for (auto p : peaks)
 		{
-			//tmp: why is this here?
-			if(p.pointType==Extrema::Differential::CriticalPoint::PointType::maximum)
-			{
-				//auto Y = Interpolation::CubicLagrange(rawSpectrum[p.index-1][0], rawSpectrum[p.index-1][2], rawSpectrum[p.index][0], rawSpectrum[p.index][2], rawSpectrum[p.index+1][0], rawSpectrum[p.index+1][2], rawSpectrum[p.index+2][0], rawSpectrum[p.index+2][2], p.x);
-			}
-			//tmp: extrema visualization
+			auto truePeak = Approximation::Parabolic(rawSpectrum[p.index-1][0], rawSpectrum[p.index-1][1], rawSpectrum[p.index][0], rawSpectrum[p.index][1], rawSpectrum[p.index+1][0], rawSpectrum[p.index+1][1]);
+			rawSpectrum[p.index][0] = truePeak.first;
+			rawSpectrum[p.index][1] = truePeak.second;
+		}
+		//TODO: is this the best place to convert to amp?
+		//after determining peaks, convert magnitude to amplitude
+		for(auto & p : rawSpectrum)
+		{
+			p[1] = (sqrt( (p[0] * p[1]) / (double)m_sampleBuffer.sampleRate()));
+		}
+		//tmp: peak visualization
+		for(auto p : peaks)
+		{
 			if(p.pointType==Extrema::Differential::CriticalPoint::PointType::maximum)
 			{
 				//TODO: relative path
@@ -156,40 +149,15 @@ std::string AnalyzerPlugin::setAudioFile(const QString &_audio_file)
 											QQuaternion::fromAxisAndAngle(0.0f, 1.0f, 0.0f, 45.0f),
 											colorRed));
 			}
-			if(p.pointType==Extrema::Differential::CriticalPoint::PointType::minimum)
-			{
-				visualization->addCustomItem(new QCustom3DItem("/home/mate/projects/lmms/plugins/Diginstrument/analyzer/resources/marker_mesh.obj",
-											QVector3D(rawSpectrum[p.index][0], rawSpectrum[p.index][1],(double)i/(double)m_sampleBuffer.sampleRate()),
-											QVector3D(0.025f, 0.025f, 0.025f),
-											QQuaternion::fromAxisAndAngle(0.0f, 1.0f, 0.0f, 45.0f),
-											colorBlue));
-			}
-			if(p.pointType==Extrema::Differential::CriticalPoint::PointType::rising)
-			{
-				visualization->addCustomItem(new QCustom3DItem("/home/mate/projects/lmms/plugins/Diginstrument/analyzer/resources/marker_mesh.obj",
-											QVector3D(rawSpectrum[p.index][0], rawSpectrum[p.index][1],(double)i/(double)m_sampleBuffer.sampleRate()),
-											QVector3D(0.025f, 0.025f, 0.025f),
-											QQuaternion::fromAxisAndAngle(0.0f, 1.0f, 0.0f, 45.0f),
-											colorGreen));
-			}
-			if(p.pointType==Extrema::Differential::CriticalPoint::PointType::falling)
-			{
-				visualization->addCustomItem(new QCustom3DItem("/home/mate/projects/lmms/plugins/Diginstrument/analyzer/resources/marker_mesh.obj",
-											QVector3D(rawSpectrum[p.index][0], rawSpectrum[p.index][1],(double)i/(double)m_sampleBuffer.sampleRate()),
-											QVector3D(0.025f, 0.025f, 0.025f),
-											QQuaternion::fromAxisAndAngle(0.0f, 1.0f, 0.0f, 45.0f),
-											colorOrange));
-			}
-			
 		}
-		//NOTE: there is no true peak approximation yet!
+		//fit spline to raw spectrum
 		auto spline = fitter.peakFit(rawSpectrum, peaks);
 		//only add "valid" splines
-		if (spline.getPieces().size() > 0 /* TMP: i want at least SOMETHING in; && spline.getBegin() <= 12 && spline.getEnd() > 21000*/)
+		if (spline.getPieces().size() > 0 && spline.getBegin() <= 12 && spline.getEnd() > 21000)
 		{
-			//inst.addSpectrum(SplineSpectrum(std::move(spline), (double)i/(double)m_sampleBuffer.sampleRate()), {label, (double)i / (double)m_sampleBuffer.sampleRate()});
 			spectra.emplace_back(std::move(spline), (double)i/(double)m_sampleBuffer.sampleRate());
 		}
+		//TMP: rejection statistics
 		else
 		{
 			if(spline.getPeaks().size()==0 && spline.getEnd()>0) {noComponents++;}
@@ -201,32 +169,18 @@ std::string AnalyzerPlugin::setAudioFile(const QString &_audio_file)
 		}
 	}
 	
-	//TMP: output the synthesised signal and the inverse-CWT of the signal for comparison
-	/*auto icwt = transform.inverseTransform();
-	for (int i = 0; i < icwt.size()-1; i++)
-	{
-		const double time = (double)i / (double)m_sampleBuffer.sampleRate();
-		auto rec = synth.playNote(inst.getSpectrum({label, time}), 1 ,i, (double)m_sampleBuffer.sampleRate());
-		oss << std::fixed << rec.front() << " " << icwt[i] << std::endl;
-	}*/
+	//tmp: debug
 	if(spectra.size()>0) std::cout<<"rejected splines: "<<rejected<<"/"<<spectra.size()<<" ("<<100*rejected/spectra.size()<<"%)"<<std::endl;
 	if(rejected>0){
-	std::cout<<"cause: no peaks: "<<noComponents<<"/"<<rejected<<" ("<<100*noComponents/rejected<<"%)"<<std::endl;
-	std::cout<<"cause: empty spline: "<<emptySplines<<"/"<<rejected<<" ("<<100*emptySplines/rejected<<"%)"<<std::endl;
-	std::cout<<"cause: incomplete: "<<incomplete<<"/"<<rejected<<" ("<<100*incomplete/rejected<<"%)"<<std::endl;
-	std::cout<<"cause: good begin, bad end: "<<goodBeginBadEnd<<"/"<<rejected<<" ("<<100*goodBeginBadEnd/rejected<<"%)"<<std::endl;
-	std::cout<<"cause: good end, bad begin: "<<badBedginGoodEnd<<"/"<<rejected<<" ("<<100*badBedginGoodEnd/rejected<<"%)"<<std::endl;
+		std::cout<<"cause: no peaks: "<<noComponents<<"/"<<rejected<<" ("<<100*noComponents/rejected<<"%)"<<std::endl;
+		std::cout<<"cause: empty spline: "<<emptySplines<<"/"<<rejected<<" ("<<100*emptySplines/rejected<<"%)"<<std::endl;
+		std::cout<<"cause: incomplete: "<<incomplete<<"/"<<rejected<<" ("<<100*incomplete/rejected<<"%)"<<std::endl;
+		std::cout<<"cause: good begin, bad end: "<<goodBeginBadEnd<<"/"<<rejected<<" ("<<100*goodBeginBadEnd/rejected<<"%)"<<std::endl;
+		std::cout<<"cause: good end, bad begin: "<<badBedginGoodEnd<<"/"<<rejected<<" ("<<100*badBedginGoodEnd/rejected<<"%)"<<std::endl;
 	}
 
-	//TODO: trim spectrum?
-	//TODO: how to mix the output with consistent levels without clipping
-
-	//tmp
-
 	//TODO: get rid of beégetett 4
-
-	//tmp: close files
-	output.close();
+	//tmp: show raw visualization
 	visualization->setSurfaceData(data);
 	visualization->show();
 
@@ -252,15 +206,13 @@ QtDataVisualization::QSurfaceDataArray * AnalyzerPlugin::getSurfaceData(float mi
 		for (int j = 0; j < freqSamples; j++) {
 			float x = qMin(maxFreq, (j * stepX + minFreq));
 			(*dataRow)[index++].setPosition(QVector3D(x, spectrum[x].amplitude, /*z*/ spectrum.getLabel()));
-			//TMP: components only
-			//(*dataRow)[index++].setPosition(QVector3D(x, 0, z ));
 		}
 		//tmp: identical to discrete
 		for(const auto & c : spectrum.getComponents(0))
 		{
-			//TMP: BUGHUNT: missing inbetween piece causes segfault
+			//NOTE: BUGHUNT: missing inbetween piece causes segfault
 			if(c.frequency<=minFreq || c.frequency>=maxFreq) continue;
-			//(*dataRow)[std::round((c.frequency-minFreq)/((maxFreq-minFreq)/(float)freqSamples))].setPosition(QVector3D(c.frequency,c.amplitude, spectrum.getLabel()));
+			(*dataRow)[std::round((c.frequency-minFreq)/((maxFreq-minFreq)/(float)freqSamples))].setPosition(QVector3D(c.frequency,c.amplitude, spectrum.getLabel()));
 		}
 		
 		*data<<dataRow;

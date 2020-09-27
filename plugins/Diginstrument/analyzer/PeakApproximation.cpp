@@ -13,7 +13,35 @@ std::vector<Extrema::Differential::CriticalPoint> Diginstrument::PeakAndValleyAp
         {
             res.emplace_back(*it);
         }
-        //tmp: hidden peak approximation
+        //tmp: hidden peak approximation, very rough: x is not correct
+        //TODO: do i need the inverse?
+        if(
+            (it-1)->pointType == Extrema::Differential::CriticalPoint::PointType::falling
+            && (it)->pointType == Extrema::Differential::CriticalPoint::PointType::rising
+            && (it+1)->pointType == Extrema::Differential::CriticalPoint::PointType::falling
+        )
+        {
+            res.emplace_back(Extrema::Differential::CriticalPoint::PointType::maximum, it->x, it->index);
+        }
+        it++;
+    }
+    return res;
+}
+
+std::vector<Extrema::Differential::CriticalPoint> Diginstrument::PeakApproximation(const std::vector<Extrema::Differential::CriticalPoint> & cps)
+{
+    std::vector<Extrema::Differential::CriticalPoint> res;
+    //TODO: is this even needed?
+    if(cps.begin()->pointType == Extrema::Differential::CriticalPoint::PointType::maximum) res.emplace_back(*(cps.begin()));
+    auto it = cps.begin()+1;
+    while(it<cps.end()-1)
+    {
+        if(it->pointType == Extrema::Differential::CriticalPoint::PointType::maximum)
+        {
+            res.emplace_back(*it);
+        }
+        //tmp: hidden peak approximation, very rough: x is not correct
+        //TODO: do i need the inverse?
         if(
             (it-1)->pointType == Extrema::Differential::CriticalPoint::PointType::falling
             && (it)->pointType == Extrema::Differential::CriticalPoint::PointType::rising
