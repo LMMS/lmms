@@ -235,21 +235,26 @@ void ControllerRackView::dropEvent( QDropEvent *de )
 	QString val = StringPairDrag::decodeValue( de );
 	// qDebug() << "DROP: type/val:" << type << ", " << val;
 
+	// dragging on the rack view - i.e. not on a controller,
+	// but away from any controller - shall remove the connection
 	if( type == "automatable_model" )
 	{
 		AutomatableModel* mod =
 		Engine::getAutomatableModel( val,
-			de->mimeData()->hasFormat( "application/x-osc-stringpair" ));
+			!de->mimeData()->hasFormat(StringPairDrag::mimeType()));
 
-		de->acceptProposedAction();
-
-		if( mod->controllerConnection() )
+		if (mod)
 		{
-			delete mod->controllerConnection();
-			mod->setControllerConnection( nullptr );
-		}
+			de->acceptProposedAction();
 
-		delete mod;
+			if( mod->controllerConnection() )
+			{
+				delete mod->controllerConnection();
+				mod->setControllerConnection( nullptr );
+			}
+
+			delete mod;
+		}
 	}
 }
 

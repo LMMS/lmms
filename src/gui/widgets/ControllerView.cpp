@@ -175,17 +175,20 @@ void ControllerView::dropEvent(QDropEvent *de)
 {
 	QString type = StringPairDrag::decodeKey( de );
 	QString val = StringPairDrag::decodeValue( de );
-	// qDebug() << "DROP: type/val:" << type << ", " << val;
 
+	// drop on a controller shall connect the drag source to this controller
 	if( type == "automatable_model" )
 	{
 		AutomatableModel * mod = Engine::getAutomatableModel( val,
-			de->mimeData()->hasFormat( "application/x-osc-stringpair") );
+			!de->mimeData()->hasFormat(StringPairDrag::mimeType()) );
 
-		mod->setControllerConnection( new ControllerConnection( getController() ) );
+		if(mod)
+		{
+			mod->setControllerConnection( new ControllerConnection( getController() ) );
 
-		// tell the source app that the drop did succeed
-		de->acceptProposedAction();
+			// tell the source app that the drop did succeed
+			de->acceptProposedAction();
+		}
 	}
 
 	update();
