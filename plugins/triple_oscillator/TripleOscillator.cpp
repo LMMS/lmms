@@ -104,22 +104,22 @@ OscillatorObject::OscillatorObject( Model * _parent, int _idx ) :
 	updateVolume();
 
 	connect( &m_coarseModel, SIGNAL( dataChanged() ),
-				this, SLOT( updateDetuningLeft() ) );
+				this, SLOT( updateDetuningLeft() ), Qt::DirectConnection );
 	connect( &m_coarseModel, SIGNAL( dataChanged() ),
-				this, SLOT( updateDetuningRight() ) );
+				this, SLOT( updateDetuningRight() ), Qt::DirectConnection );
 	connect( &m_fineLeftModel, SIGNAL( dataChanged() ),
-				this, SLOT( updateDetuningLeft() ) );
+				this, SLOT( updateDetuningLeft() ), Qt::DirectConnection );
 	connect( &m_fineRightModel, SIGNAL( dataChanged() ),
-				this, SLOT( updateDetuningRight() ) );
+				this, SLOT( updateDetuningRight() ), Qt::DirectConnection );
 	updateDetuningLeft();
 	updateDetuningRight();
 
 	connect( &m_phaseOffsetModel, SIGNAL( dataChanged() ),
-			this, SLOT( updatePhaseOffsetLeft() ) );
+			this, SLOT( updatePhaseOffsetLeft() ), Qt::DirectConnection );
 	connect( &m_phaseOffsetModel, SIGNAL( dataChanged() ),
-			this, SLOT( updatePhaseOffsetRight() ) );
+			this, SLOT( updatePhaseOffsetRight() ), Qt::DirectConnection );
 	connect( &m_stereoPhaseDetuningModel, SIGNAL( dataChanged() ),
-			this, SLOT( updatePhaseOffsetLeft() ) );
+			this, SLOT( updatePhaseOffsetLeft() ), Qt::DirectConnection );
 	updatePhaseOffsetLeft();
 	updatePhaseOffsetRight();
 
