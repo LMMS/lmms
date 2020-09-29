@@ -115,6 +115,7 @@ private:
 
 	void keyPressEvent( QKeyEvent * ke ) override;
 	void keyReleaseEvent( QKeyEvent * ke ) override;
+	void hideEvent( QHideEvent * he ) override;
 
 	void handleFile( FileItem * fi, InstrumentTrack * it );
 	void openInNewInstrumentTrack( TrackContainer* tc, FileItem* item );
@@ -123,9 +124,9 @@ private:
 	bool m_mousePressed;
 	QPoint m_pressPos;
 
+	//! This should only be accessed or modified when m_pphMutex is held
 	PlayHandle* m_previewPlayHandle;
 	QMutex m_pphMutex;
-	FileItem* m_previewFileItem;
 
 	QList<QAction*> getContextActions(FileItem* item, bool songEditor);
 
