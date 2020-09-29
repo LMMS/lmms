@@ -125,8 +125,9 @@ namespace PathUtil
 
 	QString relativeOrAbsolute(const QString & input, const Base base)
 	{
-		if (input.isEmpty() || base == Base::Absolute) { return input; }
+		if (input.isEmpty()) { return input; }
 		QString absolutePath = toAbsolute(input);
+		if (base == Base::Absolute) { return absolutePath; }
 		QString relativePath = baseQDir(base).relativeFilePath(absolutePath);
 		return relativePath.startsWith("..") ? absolutePath : relativePath;
 	}
