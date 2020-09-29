@@ -539,7 +539,7 @@ void AutomationPattern::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	_this.setAttribute( "tens", QString::number( getTension() ) );
 	_this.setAttribute( "mute", QString::number( isMuted() ) );
 	
-	if( ! usesStyleColor() )
+	if( hasColor() )
 	{
 		if( usesCustomClipColor() )
 		{
@@ -609,7 +609,6 @@ void AutomationPattern::loadSettings( const QDomElement & _this )
 	
 	if( _this.hasAttribute( "usesclipcolor" ) )
 	{
-		useStyleColor( false );
 		useCustomClipColor( _this.attribute( "usesclipcolor" ) == "1" );
 		if( usesCustomClipColor() )
 		{

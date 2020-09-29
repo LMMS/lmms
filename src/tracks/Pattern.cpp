@@ -359,7 +359,7 @@ void Pattern::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	_this.setAttribute( "type", m_patternType );
 	_this.setAttribute( "name", name() );
 	
-	if( ! usesStyleColor() )
+	if( hasColor() )
 	{
 		if( usesCustomClipColor() )
 		{
@@ -405,7 +405,6 @@ void Pattern::loadSettings( const QDomElement & _this )
 	
 	if( _this.hasAttribute( "usesclipcolor" ) )
 	{
-		useStyleColor( false );
 		useCustomClipColor( _this.attribute( "usesclipcolor" ) == "1" );
 		if( usesCustomClipColor() )
 		{
@@ -1005,7 +1004,7 @@ void PatternView::paintEvent( QPaintEvent * )
 		// set colour based on mute status
 		QColor noteFillColor = muted ? getMutedNoteFillColor() : getNoteFillColor();
 		QColor noteBorderColor = muted ? getMutedNoteBorderColor()
-									   : ( m_pat->usesStyleColor() ? getNoteBorderColor() : c.lighter( 200 ) );
+									   : ( m_pat->hasColor() ? c.lighter( 200 ) : getNoteBorderColor() );
 
 		bool const drawAsLines = height() < 64;
 		if (drawAsLines)

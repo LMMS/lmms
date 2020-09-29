@@ -276,7 +276,7 @@ void SampleTCO::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	}
 
 	_this.setAttribute( "sample_rate", m_sampleBuffer->sampleRate());
-	if( ! usesStyleColor() )
+	if( hasColor() )
 	{
 		if( usesCustomClipColor() )
 		{
@@ -315,7 +315,6 @@ void SampleTCO::loadSettings( const QDomElement & _this )
 	
 	if( _this.hasAttribute( "usesclipcolor" ) )
 	{
-		useStyleColor( false );
 		useCustomClipColor( _this.attribute( "usesclipcolor" ) == "1" );
 		if( usesCustomClipColor() )
 		{

@@ -71,7 +71,7 @@ void BBTCO::saveSettings( QDomDocument & doc, QDomElement & element )
 	}
 	element.setAttribute( "len", length() );
 	element.setAttribute( "muted", isMuted() );
-	if( ! usesStyleColor() )
+	if( hasColor() )
 	{
 		if( usesCustomClipColor() )
 		{
@@ -104,7 +104,6 @@ void BBTCO::loadSettings( const QDomElement & element )
 	// for colors saved in 1.3-onwards
 	if( element.hasAttribute( "usesclipcolor" ) )
 	{
-		useStyleColor( false );
 		useCustomClipColor( element.attribute( "usesclipcolor" ) == "1" );
 		if( usesCustomClipColor() )
 		{
@@ -118,14 +117,7 @@ void BBTCO::loadSettings( const QDomElement & element )
 		if( element.hasAttribute( "color" ) )
 		{ setColor( QColor( element.attribute( "color" ).toUInt() ) ); }
 		
-		if( element.hasAttribute( "usestyle" ) )
-		{ useStyleColor ( element.attribute( "usestyle" ).toUInt() == 1 ); }
-		
-		else
-		{
-			useStyleColor( color().rgb() == qRgb( 128, 182, 175 )
-						|| color().rgb() == qRgb( 64, 128, 255 ) ); // old or older default color
-		}
+		// usestyle attribute is no longer used
 	}
 }
 
@@ -411,7 +403,6 @@ TrackContentObject * BBTrack::createTCO( const MidiTime & _pos )
 	if( s_lastTCOColor )
 	{
 		bbtco->setColor( *s_lastTCOColor );
-		bbtco->useStyleColor( false );
 	}
 	return bbtco;
 }

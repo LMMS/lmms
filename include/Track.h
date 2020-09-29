@@ -143,16 +143,8 @@ public:
 	{
 		m_color = QColor( c );
 	}
-
-	void useStyleColor( bool b )
-	{
-		m_useStyleColor = b;
-	}
 	
-	bool usesStyleColor()
-	{
-		return m_useStyleColor;
-	}
+	bool hasColor();
 	
 	void useCustomClipColor( bool b );
 	
@@ -223,7 +215,6 @@ private:
 	bool m_selectViewOnCreate;
 
 	QColor m_color;
-	bool m_useStyleColor;
 	bool m_useCustomClipColor;
 
 	friend class TrackContentObjectView;
