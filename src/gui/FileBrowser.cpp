@@ -322,7 +322,8 @@ FileBrowserTreeWidget::FileBrowserTreeWidget(QWidget * parent ) :
 	m_mousePressed( false ),
 	m_pressPos(),
 	m_previewPlayHandle( nullptr ),
-	m_pphMutex( QMutex::Recursive )
+	m_pphMutex( QMutex::Recursive ),
+	m_previewFileItem( nullptr )
 {
 	setColumnCount( 1 );
 	headerItem()->setHidden( true );
@@ -525,34 +526,41 @@ void FileBrowserTreeWidget::mousePressEvent(QMouseEvent * me )
 
 void FileBrowserTreeWidget::previewFileItem(FileItem* file)
 {
-	m_pphMutex.lock();
+	// Lock the preview mutex
+	QMutexLocker locker(&m_pphMutex);
 	// If something is already playing, stop it before we continue
 	stopPreview();
+	// Let it be known that we're intend to preview this file
+	m_previewFileItem = file;
+	// Then unlock, since we don't need to touch the shared data for a while
+	locker.unlock();
+
+	PlayHandle* newHandle = nullptr;
 
 	// In special case of sample-files we do not care about
 	// handling() rather than directly creating a SamplePlayHandle
-	if(file->type() == FileItem::SampleFile)
+	if (file->type() == FileItem::SampleFile)
 	{
 		TextFloat * tf = TextFloat::displayMessage(
-				tr("Loading sample"),
-				tr("Please wait, loading sample for preview..."),
-				embed::getIconPixmap("sample_file", 24, 24), 0);
+			tr("Loading sample"),
+			tr("Please wait, loading sample for preview..."),
+			embed::getIconPixmap("sample_file", 24, 24), 0);
 		qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
-		SamplePlayHandle * s = new SamplePlayHandle(file->fullName());
+		SamplePlayHandle* s = new SamplePlayHandle(file->fullName());
 		s->setDoneMayReturnTrue(false);
-		m_previewPlayHandle = s;
+		newHandle = s;
 		delete tf;
 	}
-	else if(
+	else if (
 		(file->extension() == "xiz" || file->extension() == "sf2" ||
 		 file->extension() == "sf3" || file->extension() == "gig" ||
 		 file ->extension() == "pat") &&
 		!pluginFactory->pluginSupportingExtension(file->extension()).isNull())
 	{
-		m_previewPlayHandle = new PresetPreviewPlayHandle(
+		newHandle = new PresetPreviewPlayHandle(
 			file->fullName(), file->handling() == FileItem::LoadByPlugin);
 	}
-	else if(file->type() != FileItem::VstPluginFile && file->isTrack())
+	else if (file->type() != FileItem::VstPluginFile && file->isTrack())
 	{
 		DataFile dataFile(file->fullName());
 		if(!dataFile.validate(file->extension()))
@@ -561,21 +569,24 @@ void FileBrowserTreeWidget::previewFileItem(FileItem* file)
 				tr("%1 does not appear to be a valid %2 file")
 				.arg(file->fullName(), file->extension()),
 				QMessageBox::Ok, QMessageBox::NoButton);
-			m_pphMutex.unlock();
 			return;
 		}
-		m_previewPlayHandle = new PresetPreviewPlayHandle(
-			file->fullName(), file->handling() == FileItem::LoadByPlugin, &dataFile
-		);
+		newHandle = new PresetPreviewPlayHandle(
+			file->fullName(), file->handling() == FileItem::LoadByPlugin, &dataFile);
 	}
-	if(m_previewPlayHandle != nullptr)
+
+	// Lock the preview mutex since we're about to access shared data again
+	locker.relock();
+	// If someone else changed the item to be previewed, or if our handle is
+	// null, we shouldn't start a new preview.
+	if (m_previewFileItem == file && newHandle != nullptr)
 	{
-		if(!Engine::mixer()->addPlayHandle(m_previewPlayHandle))
+		if (Engine::mixer()->addPlayHandle(newHandle))
 		{
-			m_previewPlayHandle = nullptr;
+			m_previewPlayHandle = newHandle;
 		}
+		else { m_previewPlayHandle = nullptr; }
 	}
-	m_pphMutex.unlock();
 }
 
 
@@ -583,12 +594,12 @@ void FileBrowserTreeWidget::previewFileItem(FileItem* file)
 
 bool FileBrowserTreeWidget::stopPreview()
 {
+	QMutexLocker locker(&m_pphMutex);
+	m_previewFileItem = nullptr;
 	if (m_previewPlayHandle != nullptr)
 	{
-		m_pphMutex.lock();
 		Engine::mixer()->removePlayHandle(m_previewPlayHandle);
 		m_previewPlayHandle = nullptr;
-		m_pphMutex.unlock();
 		return true;
 	}
 	else { return false; }
@@ -657,27 +668,23 @@ void FileBrowserTreeWidget::mouseReleaseEvent(QMouseEvent * me )
 {
 	m_mousePressed = false;
 
-	m_pphMutex.lock();
-	if(m_previewPlayHandle != nullptr)
+	QMutexLocker locker(&m_pphMutex);
+
+	if (m_previewPlayHandle != nullptr)
 	{
 		// if there're samples shorter than 3 seconds, we don't
 		// stop them if the user releases mouse-button...
-		if(m_previewPlayHandle->type() == PlayHandle::TypeSamplePlayHandle)
+		if (m_previewPlayHandle->type() == PlayHandle::TypeSamplePlayHandle)
 		{
-			SamplePlayHandle * s = dynamic_cast<SamplePlayHandle *>(m_previewPlayHandle);
-			if(s && s->totalFrames() - s->framesDone() <=
-				static_cast<f_cnt_t>(Engine::mixer()->
-						processingSampleRate() * 3))
+			SamplePlayHandle* s = dynamic_cast<SamplePlayHandle*>(m_previewPlayHandle);
+			auto second = static_cast<f_cnt_t>(Engine::mixer()->processingSampleRate());
+			if (s && s->totalFrames() - s->framesDone() <= second * 3)
 			{
 				s->setDoneMayReturnTrue(true);
-				m_previewPlayHandle = nullptr;
-				m_pphMutex.unlock();
-				return;
 			}
 		}
 		else { stopPreview(); }
 	}
-	m_pphMutex.unlock();
 }
 
 

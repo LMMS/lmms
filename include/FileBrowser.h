@@ -125,6 +125,7 @@ private:
 
 	PlayHandle* m_previewPlayHandle;
 	QMutex m_pphMutex;
+	FileItem* m_previewFileItem;
 
 	QList<QAction*> getContextActions(FileItem* item, bool songEditor);
 
