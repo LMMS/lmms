@@ -38,7 +38,7 @@ namespace PathUtil
 
 	QDir baseQDir (const Base base)
 	{
-		if (base == Base::Absolute){ return QDir::root(); }
+		if (base == Base::Absolute) { return QDir::root(); }
 		return QDir(baseLocation(base));
 	}
 
