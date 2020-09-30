@@ -1109,15 +1109,6 @@ void PatternView::paintEvent( QPaintEvent * )
 			}
 		} // end for loop
 
-		// NOTE FOR REVIEWERS: is this worth adding?
-		// draw a transparent rectangle over colored patterns
-		/*if ( !m_pat->usesStyleColor() )
-		{
-			p.setBrush( m_pat->color() );
-			p.setOpacity( 0.25 );
-			p.drawRect( 0, 0, width(), height() );
-		}*/
-
 		// draw a transparent rectangle over muted patterns
 		if ( muted )
 		{
