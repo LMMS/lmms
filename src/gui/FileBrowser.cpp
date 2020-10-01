@@ -535,7 +535,7 @@ void FileBrowserTreeWidget::mousePressEvent(QMouseEvent * me )
 
 
 void FileBrowserTreeWidget::previewFileItem(FileItem* file)
-{
+{	// TODO: We should do this work outside the event thread
 	// Lock the preview mutex
 	QMutexLocker previewLocker(&m_pphMutex);
 	// If something is already playing, stop it before we continue
@@ -553,6 +553,7 @@ void FileBrowserTreeWidget::previewFileItem(FileItem* file)
 			tr("Loading sample"),
 			tr("Please wait, loading sample for preview..."),
 			embed::getIconPixmap("sample_file", 24, 24), 0);
+		// TODO: this can be removed once we do this outside the event thread
 		qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
 		SamplePlayHandle* s = new SamplePlayHandle(fileName);
 		s->setDoneMayReturnTrue(false);
