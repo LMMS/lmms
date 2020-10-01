@@ -31,7 +31,8 @@ std::vector<Extrema::Differential::CriticalPoint> Diginstrument::PeakAndValleyAp
 std::vector<Extrema::Differential::CriticalPoint> Diginstrument::PeakApproximation(const std::vector<Extrema::Differential::CriticalPoint> & cps)
 {
     std::vector<Extrema::Differential::CriticalPoint> res;
-    //TODO: is this even needed?
+    if(cps.size()==0) return res;
+    //check first point
     if(cps.begin()->pointType == Extrema::Differential::CriticalPoint::PointType::maximum) res.emplace_back(*(cps.begin()));
     auto it = cps.begin()+1;
     while(it<cps.end()-1)
@@ -52,5 +53,7 @@ std::vector<Extrema::Differential::CriticalPoint> Diginstrument::PeakApproximati
         }
         it++;
     }
+    //check last point
+    if(cps.back().pointType == Extrema::Differential::CriticalPoint::PointType::maximum) res.emplace_back(cps.back());
     return res;
 }

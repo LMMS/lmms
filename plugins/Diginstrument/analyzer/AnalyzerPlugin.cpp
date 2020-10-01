@@ -124,32 +124,27 @@ std::string AnalyzerPlugin::setAudioFile(const QString &_audio_file)
 
 		//seek critical points with discrete differential, then approximate hidden/overlapping peaks and filter to only include maxima
 		const auto peaks = Diginstrument::PeakApproximation(Extrema::Differential::intermixed(rawSpectrum.begin(), rawSpectrum.end()));
-		//approximate true peaks
-		for (auto p : peaks)
-		{
-			auto truePeak = Approximation::Parabolic(rawSpectrum[p.index-1][0], rawSpectrum[p.index-1][1], rawSpectrum[p.index][0], rawSpectrum[p.index][1], rawSpectrum[p.index+1][0], rawSpectrum[p.index+1][1]);
-			rawSpectrum[p.index][0] = truePeak.first;
-			rawSpectrum[p.index][1] = truePeak.second;
-		}
 		//TODO: is this the best place to convert to amp?
 		//after determining peaks, convert magnitude to amplitude
 		for(auto & p : rawSpectrum)
 		{
 			p[1] = (sqrt( (p[0] * p[1]) / (double)m_sampleBuffer.sampleRate()));
 		}
-		//tmp: peak visualization
-		for(auto p : peaks)
+		//tmp: visualize peaks
+		for (auto p : peaks)
 		{
+			const auto Y = Interpolation::CubicLagrange(rawSpectrum[p.index-1][0], rawSpectrum[p.index-1][1], rawSpectrum[p.index][0], rawSpectrum[p.index][1], rawSpectrum[p.index+1][0], rawSpectrum[p.index+1][1], rawSpectrum[p.index+2][0], rawSpectrum[p.index+2][1], p.x);
 			if(p.pointType==Extrema::Differential::CriticalPoint::PointType::maximum)
 			{
 				//TODO: relative path
 				visualization->addCustomItem(new QCustom3DItem("/home/mate/projects/lmms/plugins/Diginstrument/analyzer/resources/marker_mesh.obj",
-											QVector3D(rawSpectrum[p.index][0], rawSpectrum[p.index][1],(double)i/(double)m_sampleBuffer.sampleRate()),
+											QVector3D(p.x, Y,(double)i/(double)m_sampleBuffer.sampleRate()),
 											QVector3D(0.025f, 0.025f, 0.025f),
 											QQuaternion::fromAxisAndAngle(0.0f, 1.0f, 0.0f, 45.0f),
 											colorRed));
 			}
 		}
+	
 		//fit spline to raw spectrum
 		auto spline = fitter.peakFit(rawSpectrum, peaks);
 		//only add "valid" splines
