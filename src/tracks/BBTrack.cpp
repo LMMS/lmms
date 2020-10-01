@@ -71,17 +71,9 @@ void BBTCO::saveSettings( QDomDocument & doc, QDomElement & element )
 	}
 	element.setAttribute( "len", length() );
 	element.setAttribute( "muted", isMuted() );
-	if( hasColor() )
+	if( hasColor() && usesCustomClipColor() )
 	{
-		if( usesCustomClipColor() )
-		{
-			element.setAttribute( "color", color().name() );
-			element.setAttribute( "usesclipcolor", true );
-		}
-		else
-		{
-			element.setAttribute( "usesclipcolor", false );
-		}
+		element.setAttribute( "color", color().name() );
 	}
 }
 
@@ -102,13 +94,10 @@ void BBTCO::loadSettings( const QDomElement & element )
 	}
 	
 	// for colors saved in 1.3-onwards
-	if( element.hasAttribute( "usesclipcolor" ) )
+	if( element.hasAttribute( "color" ) && !element.hasAttribute( "usestyle" ) )
 	{
-		useCustomClipColor( element.attribute( "usesclipcolor" ) == "1" );
-		if( usesCustomClipColor() )
-		{
-			setColor( element.attribute( "color" ) );
-		}
+		useCustomClipColor( true );
+		setColor( element.attribute( "color" ) );
 	}
 	
 	// for colors saved before 1.3

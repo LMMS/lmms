@@ -539,17 +539,9 @@ void AutomationPattern::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	_this.setAttribute( "tens", QString::number( getTension() ) );
 	_this.setAttribute( "mute", QString::number( isMuted() ) );
 	
-	if( hasColor() )
+	if( hasColor() && usesCustomClipColor() )
 	{
-		if( usesCustomClipColor() )
-		{
-			_this.setAttribute( "color", color().name() );
-			_this.setAttribute( "usesclipcolor", true );
-		}
-		else
-		{
-			_this.setAttribute( "usesclipcolor", false );
-		}
+		_this.setAttribute( "color", color().name() );
 	}
 
 	for( timeMap::const_iterator it = m_timeMap.begin();
@@ -607,13 +599,10 @@ void AutomationPattern::loadSettings( const QDomElement & _this )
 		}
 	}
 	
-	if( _this.hasAttribute( "usesclipcolor" ) )
+	if( _this.hasAttribute( "color" ) )
 	{
-		useCustomClipColor( _this.attribute( "usesclipcolor" ) == "1" );
-		if( usesCustomClipColor() )
-		{
-			setColor( _this.attribute( "color" ) );
-		}
+		useCustomClipColor( true );
+		setColor( _this.attribute( "color" ) );
 	}
 
 	int len = _this.attribute( "len" ).toInt();

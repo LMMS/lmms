@@ -276,17 +276,9 @@ void SampleTCO::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	}
 
 	_this.setAttribute( "sample_rate", m_sampleBuffer->sampleRate());
-	if( hasColor() )
+	if( hasColor() && usesCustomClipColor() )
 	{
-		if( usesCustomClipColor() )
-		{
-			_this.setAttribute( "color", color().name() );
-			_this.setAttribute( "usesclipcolor", true );
-		}
-		else
-		{
-			_this.setAttribute( "usesclipcolor", false );
-		}
+		_this.setAttribute( "color", color().name() );
 	}
 	// TODO: start- and end-frame
 }
@@ -313,13 +305,10 @@ void SampleTCO::loadSettings( const QDomElement & _this )
 		m_sampleBuffer->setSampleRate( _this.attribute( "sample_rate" ).toInt() );
 	}
 	
-	if( _this.hasAttribute( "usesclipcolor" ) )
+	if( _this.hasAttribute( "color" ) )
 	{
-		useCustomClipColor( _this.attribute( "usesclipcolor" ) == "1" );
-		if( usesCustomClipColor() )
-		{
-			setColor( _this.attribute( "color" ) );
-		}
+		useCustomClipColor( true );
+		setColor( _this.attribute( "color" ) );
 	}
 }
 

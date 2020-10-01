@@ -359,17 +359,9 @@ void Pattern::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	_this.setAttribute( "type", m_patternType );
 	_this.setAttribute( "name", name() );
 	
-	if( hasColor() )
+	if( hasColor() && usesCustomClipColor() )
 	{
-		if( usesCustomClipColor() )
-		{
-			_this.setAttribute( "color", color().name() );
-			_this.setAttribute( "usesclipcolor", true );
-		}
-		else
-		{
-			_this.setAttribute( "usesclipcolor", false );
-		}
+		_this.setAttribute( "color", color().name() );
 	}
 	// as the target of copied/dragged pattern is always an existing
 	// pattern, we must not store actual position, instead we store -1
@@ -403,13 +395,10 @@ void Pattern::loadSettings( const QDomElement & _this )
 								).toInt() );
 	setName( _this.attribute( "name" ) );
 	
-	if( _this.hasAttribute( "usesclipcolor" ) )
+	if( _this.hasAttribute( "color" ) )
 	{
-		useCustomClipColor( _this.attribute( "usesclipcolor" ) == "1" );
-		if( usesCustomClipColor() )
-		{
-			setColor( _this.attribute( "color" ) );
-		}
+		useCustomClipColor( true );
+		setColor( _this.attribute( "color" ) );
 	}
 	
 	if( _this.attribute( "pos" ).toInt() >= 0 )
