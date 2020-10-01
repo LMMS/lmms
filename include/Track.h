@@ -141,7 +141,7 @@ public:
 
 	void setColor( const QColor & c )
 	{
-		m_color = QColor( c );
+		m_color = c;
 	}
 	
 	bool hasColor();
@@ -175,7 +175,6 @@ public:
 	void setStartTimeOffset( const MidiTime &startTimeOffset );
 	
 	void updateColor();
-	void resetColor();
 
 public slots:
 	void copy();
@@ -188,9 +187,7 @@ signals:
 	void positionChanged();
 	void destroyedTCO();
 	void trackColorChanged();
-	void clipColorChanged( QColor & );
 	void trackColorReset();
-	void clipColorReset();
 
 
 private:

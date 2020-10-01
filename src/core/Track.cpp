@@ -113,10 +113,6 @@ TrackContentObject::TrackContentObject( Track * track ) :
 	if( getTrack() )
 	{
 		getTrack()->addTCO( this );
-		if( getTrack()->useColor() && ! m_useCustomClipColor )
-		{
-			m_color = getTrack()->color();
-		}
 	}
 	setJournalling( false );
 	movePosition( 0 );
@@ -217,11 +213,6 @@ void TrackContentObject::paste()
 		const MidiTime pos = startPosition();
 		restoreState( *( Clipboard::getContent( nodeName() ) ) );
 		movePosition( pos );
-		
-		if( getTrack()->useColor() && ! m_useCustomClipColor )
-		{
-			m_color = getTrack()->color();
-		}
 	}
 	AutomationPattern::resolveAllIDs();
 	GuiApplication::instance()->automationEditor()->m_editor->updateAfterPatternChange();
@@ -268,17 +259,11 @@ void TrackContentObject::updateColor()
 	}
 }
 
-void TrackContentObject::resetColor()
-{
-	if( ! m_useCustomClipColor ) emit trackColorReset();
-}
-
 
 void TrackContentObject::useCustomClipColor( bool b )
 {
 	m_useCustomClipColor = b;
-	b ? emit clipColorChanged( m_color ) : emit clipColorReset();
-		
+	updateColor();
 }
 
 
@@ -589,12 +574,6 @@ void TrackContentObjectView::changeClipColor()
 
 void TrackContentObjectView::useTrackColor()
 {
-	if( m_tco->getTrack()->useColor() )
-	{
-		QColor buffer = m_tco->getTrack()->color();
-		setColor( buffer );
-	}
-	
 	m_tco->useCustomClipColor( false );
 	update();
 }
@@ -613,9 +592,7 @@ void TrackContentObjectView::trackColorReset()
 
 void TrackContentObjectView::setColor( QColor & new_color )
 {
-	// change color only if it is different
-	if( new_color.rgb() != m_tco->color().rgb() )
-	{ m_tco->setColor( new_color ); }
+	m_tco->setColor( new_color );
 	update();
 }
 
@@ -2704,7 +2681,7 @@ void Track::saveSettings( QDomDocument & doc, QDomElement & element )
 	
 	if( m_hasColor )
 	{
-		element.setAttribute( "trackbgcolor", m_color.name() );
+		element.setAttribute( "color", m_color.name() );
 	}
 	
 	QDomElement tsDe = doc.createElement( nodeName() );
@@ -2759,9 +2736,9 @@ void Track::loadSettings( const QDomElement & element )
 	// Older project files that didn't have this attribute will set the value to false (issue 5562)
 	m_mutedBeforeSolo = QVariant( element.attribute( "mutedBeforeSolo", "0" ) ).toBool();
 
-	if( element.hasAttribute( "trackbgcolor" ) )
+	if( element.hasAttribute( "color" ) )
 	{
-		m_color.setNamedColor( element.attribute( "trackbgcolor" ) );
+		m_color.setNamedColor( element.attribute( "color" ) );
 		m_hasColor = true;
 	}
 
@@ -2826,8 +2803,6 @@ void Track::loadSettings( const QDomElement & element )
  */
 TrackContentObject * Track::addTCO( TrackContentObject * tco )
 {
-	tco->setColor( m_color );
-	
 	m_trackContentObjects.push_back( tco );
 
 	emit trackContentObjectAdded( tco );
@@ -3158,7 +3133,7 @@ void Track::trackColorReset()
 {
 	for (int i = 0; i < numOfTCOs(); i++)
 	{
-		m_trackContentObjects[i]->resetColor();
+		m_trackContentObjects[i]->updateColor();
 	}
 	m_hasColor = false;
 }
