@@ -476,12 +476,13 @@ QList<QAction*> FileBrowserTreeWidget::getContextActions(FileItem* file, bool so
 	QList<QAction*> result = QList<QAction*>();
 	const bool fileIsSample = file->type() == FileItem::SampleFile;
 
-	QString destination = fileIsSample ? "AFP Instance" : "Instrument Track";
-	QString shortcutMod = songEditor ? "" : "Ctrl +";
+	QString instrumentAction = fileIsSample ?
+		tr("Send to new AudioFileProcessor instance") :
+		tr("Send to new instrument track");
+	QString shortcutMod = songEditor ? "" : UI_CTRL_KEY + QString(" + ");
 
 	QAction* toInstrument = new QAction(
-		tr("Send to new %1 (%2 Enter)")
-		.arg(destination, shortcutMod),
+		instrumentAction + tr(" (%2Enter)").arg(shortcutMod),
 		nullptr
 	);
 	connect(toInstrument, &QAction::triggered,
@@ -490,7 +491,7 @@ QList<QAction*> FileBrowserTreeWidget::getContextActions(FileItem* file, bool so
 
 	if (songEditor && fileIsSample){
 		QAction* toSampleTrack = new QAction(
-			tr("Send to new Sample Track (Shift + Enter)"),
+			tr("Send to new sample track (Shift + Enter)"),
 			nullptr
 		);
 		connect(toSampleTrack, &QAction::triggered,
@@ -596,16 +597,14 @@ void FileBrowserTreeWidget::previewFileItem(FileItem* file)
 
 
 
-bool FileBrowserTreeWidget::stopPreview()
+void FileBrowserTreeWidget::stopPreview()
 {
 	QMutexLocker previewLocker(&m_pphMutex);
 	if (m_previewPlayHandle != nullptr)
 	{
 		Engine::mixer()->removePlayHandle(m_previewPlayHandle);
 		m_previewPlayHandle = nullptr;
-		return true;
 	}
-	else { return false; }
 }
 
 
@@ -685,8 +684,8 @@ void FileBrowserTreeWidget::mouseReleaseEvent(QMouseEvent * me )
 			{
 				s->setDoneMayReturnTrue(true);
 			}
+			else { stopPreview(); }
 		}
-		else { stopPreview(); }
 	}
 }
 
@@ -802,7 +801,7 @@ bool FileBrowserTreeWidget::openInNewSampleTrack(FileItem* item)
 	if (item->type() != FileItem::SampleFile){ return false; }
 
 	// Create a new sample track for this sample
-	SampleTrack* sampleTrack = dynamic_cast<SampleTrack*>(
+	SampleTrack* sampleTrack = static_cast<SampleTrack*>(
 		Track::create(Track::SampleTrack, Engine::getSong()));
 
 	// Add the sample clip to the track

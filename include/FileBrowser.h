@@ -111,7 +111,7 @@ private:
 	//! Start a preview of a file item
 	void previewFileItem(FileItem* file);
 	//! If a preview is playing, stop it. Returns false if nothing was playing
-	bool stopPreview();
+	void stopPreview();
 
 	void keyPressEvent( QKeyEvent * ke ) override;
 	void keyReleaseEvent( QKeyEvent * ke ) override;
