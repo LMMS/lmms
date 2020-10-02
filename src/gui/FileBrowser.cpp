@@ -379,14 +379,14 @@ void FileBrowserTreeWidget::keyPressEvent(QKeyEvent * ke )
 	// First of all, forward all keypresses
 	QTreeWidget::keyPressEvent(ke);
 	// Then, ignore all autorepeats (they would spam new tracks or previews)
-	if (ke->isAutoRepeat()){ return; }
+	if (ke->isAutoRepeat()) { return; }
 	// We should stop any running previews before we do anything new
-	else if (vertical || horizontal || preview || insert){ stopPreview(); }
+	else if (vertical || horizontal || preview || insert) { stopPreview(); }
 
 	// Try to get the currently selected item as a FileItem
 	FileItem * file = dynamic_cast<FileItem *>(currentItem());
 	// If it's null (folder, separator, etc.), there's nothing left for us to do
-	if (file == nullptr){ return; }
+	if (file == nullptr) { return; }
 
 	// When moving to a new sound, preview it. Skip presets, they can play forever
 	if (vertical && file->type() == FileItem::SampleFile)
@@ -408,7 +408,7 @@ void FileBrowserTreeWidget::keyPressEvent(QKeyEvent * ke )
 	}
 
 	// When space is pressed, start a preview of the selected item
-	if (preview){ previewFileItem(file); }
+	if (preview) { previewFileItem(file); }
 }
 
 
@@ -417,7 +417,7 @@ void FileBrowserTreeWidget::keyPressEvent(QKeyEvent * ke )
 void FileBrowserTreeWidget::keyReleaseEvent(QKeyEvent* ke)
 {
 	// Cancel previews when the space key is released
-	if (ke->key() == Qt::Key_Space && !ke->isAutoRepeat()){ stopPreview(); }
+	if (ke->key() == Qt::Key_Space && !ke->isAutoRepeat()) { stopPreview(); }
 }
 
 
@@ -464,7 +464,7 @@ void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent * e )
 		contextMenu.addActions( getContextActions(file, false) );
 
 		// We should only show the menu if it contains items
-		if (!contextMenu.isEmpty()){ contextMenu.exec( e->globalPos() ); }
+		if (!contextMenu.isEmpty()) { contextMenu.exec( e->globalPos() ); }
 	}
 }
 
@@ -489,7 +489,8 @@ QList<QAction*> FileBrowserTreeWidget::getContextActions(FileItem* file, bool so
 		[=]{ openInNewInstrumentTrack(file, songEditor); });
 	result.append(toInstrument);
 
-	if (songEditor && fileIsSample){
+	if (songEditor && fileIsSample)
+	{
 		QAction* toSampleTrack = new QAction(
 			tr("Send to new sample track (Shift + Enter)"),
 			nullptr
@@ -510,7 +511,7 @@ void FileBrowserTreeWidget::mousePressEvent(QMouseEvent * me )
 	// Forward the event
 	QTreeWidget::mousePressEvent(me);
 	// QTreeWidget handles right clicks for us, so we only care about left clicks
-	if(me->button() != Qt::LeftButton){ return; }
+	if(me->button() != Qt::LeftButton) { return; }
 
 	QTreeWidgetItem * i = itemAt(me->pos());
 	if (i)
@@ -528,7 +529,7 @@ void FileBrowserTreeWidget::mousePressEvent(QMouseEvent * me )
 	}
 
 	FileItem * f = dynamic_cast<FileItem *>(i);
-	if(f != nullptr){ previewFileItem(f); }
+	if(f != nullptr) { previewFileItem(f); }
 }
 
 
@@ -693,7 +694,6 @@ void FileBrowserTreeWidget::mouseReleaseEvent(QMouseEvent * me )
 
 
 
-
 void FileBrowserTreeWidget::handleFile(FileItem * f, InstrumentTrack * it)
 {
 	Engine::mixer()->requestChangeInModel();
@@ -789,7 +789,7 @@ void FileBrowserTreeWidget::openInNewInstrumentTrack(FileItem* item, bool songEd
 {
 	// Get the correct TrackContainer. Ternary doesn't compile here
 	TrackContainer* tc = Engine::getSong();
-	if (!songEditor){ tc = Engine::getBBTrackContainer(); }
+	if (!songEditor) { tc = Engine::getBBTrackContainer(); }
 	openInNewInstrumentTrack(tc, item);
 }
 
@@ -799,7 +799,7 @@ void FileBrowserTreeWidget::openInNewInstrumentTrack(FileItem* item, bool songEd
 bool FileBrowserTreeWidget::openInNewSampleTrack(FileItem* item)
 {
 	// Can't add non-samples to a sample track
-	if (item->type() != FileItem::SampleFile){ return false; }
+	if (item->type() != FileItem::SampleFile) { return false; }
 
 	// Create a new sample track for this sample
 	SampleTrack* sampleTrack = static_cast<SampleTrack*>(

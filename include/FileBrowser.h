@@ -105,6 +105,9 @@ protected:
 	void mousePressEvent( QMouseEvent * me ) override;
 	void mouseMoveEvent( QMouseEvent * me ) override;
 	void mouseReleaseEvent( QMouseEvent * me ) override;
+	void keyPressEvent( QKeyEvent * ke ) override;
+	void keyReleaseEvent( QKeyEvent * ke ) override;
+	void hideEvent( QHideEvent * he ) override;
 
 
 private:
@@ -112,10 +115,6 @@ private:
 	void previewFileItem(FileItem* file);
 	//! If a preview is playing, stop it. Returns false if nothing was playing
 	void stopPreview();
-
-	void keyPressEvent( QKeyEvent * ke ) override;
-	void keyReleaseEvent( QKeyEvent * ke ) override;
-	void hideEvent( QHideEvent * he ) override;
 
 	void handleFile( FileItem * fi, InstrumentTrack * it );
 	void openInNewInstrumentTrack( TrackContainer* tc, FileItem* item );
