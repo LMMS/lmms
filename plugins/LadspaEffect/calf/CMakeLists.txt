@@ -1,8 +1,6 @@
 # Note:
 # 	The last version of Calf that was LADSPA-capable is version 0.0.18.2
 
-SET(CMAKE_CXX_STANDARD 11)
-
 # Parse version info from autoconf
 FILE(READ veal/configure.ac VERSION_FILE)
 STRING(REPLACE "[" ";" VERSION_FILE ${VERSION_FILE} )

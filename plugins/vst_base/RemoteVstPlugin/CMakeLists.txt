@@ -55,7 +55,7 @@ if(WIN32)
 endif()
 
 if(IS_MINGW)
-	SET(CMAKE_REQUIRED_FLAGS "-std=c++11")
+	SET(CMAKE_REQUIRED_FLAGS "-std=c++14")
 
 	CHECK_CXX_SOURCE_COMPILES("
 	#include <mutex>
