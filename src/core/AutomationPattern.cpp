@@ -539,7 +539,7 @@ void AutomationPattern::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	_this.setAttribute( "tens", QString::number( getTension() ) );
 	_this.setAttribute( "mute", QString::number( isMuted() ) );
 	
-	if( hasColor() && usesCustomClipColor() )
+	if( usesCustomClipColor() )
 	{
 		_this.setAttribute( "color", color().name() );
 	}

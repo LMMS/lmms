@@ -187,7 +187,6 @@ signals:
 	void positionChanged();
 	void destroyedTCO();
 	void trackColorChanged();
-	void trackColorReset();
 
 
 private:
@@ -306,7 +305,6 @@ public slots:
 	void changeClipColor();
 	void useTrackColor();
 	void trackColorReset();
-	void setColor( QColor & );
 
 protected:
 	enum ContextMenuAction
@@ -532,8 +530,6 @@ private slots:
 	void recordingOn();
 	void recordingOff();
 	void clearTrack();
-	
-	void updateColorGradient();
 
 private:
 	TrackView * m_trackView;

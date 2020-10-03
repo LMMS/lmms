@@ -71,7 +71,7 @@ void BBTCO::saveSettings( QDomDocument & doc, QDomElement & element )
 	}
 	element.setAttribute( "len", length() );
 	element.setAttribute( "muted", isMuted() );
-	if( hasColor() && usesCustomClipColor() )
+	if( usesCustomClipColor() )
 	{
 		element.setAttribute( "color", color().name() );
 	}
@@ -135,8 +135,8 @@ BBTCOView::BBTCOView( TrackContentObject * _tco, TrackView * _tv ) :
 	connect( _tco->getTrack(), SIGNAL( dataChanged() ), 
 			this, SLOT( update() ) );
 	
-	connect( _tco, SIGNAL( trackColorReset() ),
-			this, SLOT( trackColorReset() ) );
+	/*connect( _tco, SIGNAL( trackColorReset() ),
+			this, SLOT( trackColorReset() ) );*/
 
 	setStyle( QApplication::style() );
 }

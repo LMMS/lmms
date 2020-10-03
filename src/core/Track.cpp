@@ -566,8 +566,9 @@ void TrackContentObjectView::changeClipColor()
 	if( ! new_color.isValid() )
 	{ return; }
 	
-	setColor( new_color );
+	m_tco->setColor( new_color );
 	m_tco->useCustomClipColor( true );
+	update();
 }
 
 
@@ -590,11 +591,6 @@ void TrackContentObjectView::trackColorReset()
 
 
 
-void TrackContentObjectView::setColor( QColor & new_color )
-{
-	m_tco->setColor( new_color );
-	update();
-}
 
 
 /*! \brief Change the trackContentObjectView's display when something
@@ -2261,7 +2257,7 @@ TrackOperationsWidget::TrackOperationsWidget( TrackView * parent ) :
 							Qt::QueuedConnection );
 	
 	connect( m_trackView->getTrack()->getMutedModel(), SIGNAL( dataChanged() ),
-			this, SLOT( updateColorGradient() ) );
+			this, SLOT( update() ) );
 	
 }
 
@@ -2472,11 +2468,6 @@ void TrackOperationsWidget::updateMenu()
 	toMenu->addSeparator();
 	toMenu->addAction( embed::getIconPixmap( "colorize" ),
 						tr( "Clear clip colors" ), this, SLOT( useTrackColor() ) );
-}
-
-void TrackOperationsWidget::updateColorGradient()
-{
-	update();
 }
 
 

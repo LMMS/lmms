@@ -276,7 +276,7 @@ void SampleTCO::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	}
 
 	_this.setAttribute( "sample_rate", m_sampleBuffer->sampleRate());
-	if( hasColor() && usesCustomClipColor() )
+	if( usesCustomClipColor() )
 	{
 		_this.setAttribute( "color", color().name() );
 	}
@@ -335,8 +335,8 @@ SampleTCOView::SampleTCOView( SampleTCO * _tco, TrackView * _tv ) :
 	connect( m_tco, SIGNAL( sampleChanged() ),
 			this, SLOT( updateSample() ) );
 			
-	connect( m_tco, SIGNAL( trackColorReset() ),
-			this, SLOT( trackColorReset() ) );
+	/*connect( m_tco, SIGNAL( trackColorReset() ),
+			this, SLOT( trackColorReset() ) );*/
 
 	setStyle( QApplication::style() );
 }

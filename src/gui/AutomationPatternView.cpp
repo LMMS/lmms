@@ -53,8 +53,8 @@ AutomationPatternView::AutomationPatternView( AutomationPattern * _pattern,
 			this, SLOT( update() ) );
 	connect( gui->automationEditor(), SIGNAL( currentPatternChanged() ),
 			this, SLOT( update() ) );
-	connect( m_pat, SIGNAL( trackColorReset() ),
-			this, SLOT( trackColorReset() ) );
+	/*connect( m_pat, SIGNAL( trackColorReset() ),
+			this, SLOT( trackColorReset() ) );*/
 
 	setAttribute( Qt::WA_OpaquePaintEvent, true );
 
