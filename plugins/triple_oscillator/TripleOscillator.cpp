@@ -98,9 +98,9 @@ OscillatorObject::OscillatorObject( Model * _parent, int _idx ) :
 {
 	// Connect knobs with Oscillators' inputs
 	connect( &m_volumeModel, SIGNAL( dataChanged() ),
-					this, SLOT( updateVolume() ) );
+					this, SLOT( updateVolume() ), Qt::DirectConnection );
 	connect( &m_panModel, SIGNAL( dataChanged() ),
-					this, SLOT( updateVolume() ) );
+					this, SLOT( updateVolume() ), Qt::DirectConnection );
 	updateVolume();
 
 	connect( &m_coarseModel, SIGNAL( dataChanged() ),
