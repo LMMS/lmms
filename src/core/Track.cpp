@@ -658,19 +658,6 @@ void TrackContentObjectView::dropEvent( QDropEvent * de )
 	m_tco->restoreState( tcos.firstChildElement().firstChildElement() );
 	m_tco->movePosition( pos );
 	
-	auto old_tcov = dynamic_cast<TrackContentObjectView *>( qwSource );
-	
-	if( old_tcov && old_tcov->m_tco->usesCustomClipColor() )
-	{
-		m_tco->useCustomClipColor( true );
-		m_tco->setColor( old_tcov->color() );
-	}
-	else
-	{
-		m_tco->useCustomClipColor( false );
-		m_tco->setColor( m_trackView->getTrack()->color() );
-	}
-	
 	AutomationPattern::resolveAllIDs();
 	de->accept();
 }
@@ -1977,18 +1964,7 @@ bool TrackContentWidget::pasteSelection( MidiTime tcoPos, const QMimeData * md, 
 		if( wasSelection )
 		{
 			tco->selectViewOnCreate( true );
-    }
-		
-		if( outerTCOElement.attributeNode( "clipColor" ).value() == "1" )
-		{
-			tco->useCustomClipColor( true );
-			tco->setColor( outerTCOElement.attributeNode( "color" ).value() );
-		}
-		else
-		{
-			tco->useCustomClipColor( false );
-			tco->setColor( t->color() );
-		}
+    	}
 	}
 
 	AutomationPattern::resolveAllIDs();
