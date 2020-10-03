@@ -955,6 +955,13 @@ SongEditorWindow::SongEditorWindow(Song* song) :
 	DropToolBar *timeLineToolBar = addDropToolBarToTop(tr("Timeline controls"));
 	m_editor->m_timeLine->addToolButtons(timeLineToolBar);
 
+	DropToolBar *insertActionsToolBar = addDropToolBarToTop(tr("Bar insert controls"));
+	m_insertBarAction = new QAction(embed::getIconPixmap("insert_bar"), tr("Insert bar"), this);
+	m_removeBarAction = new QAction(embed::getIconPixmap("remove_bar"), tr("Remove bar"), this);
+	insertActionsToolBar->addAction( m_insertBarAction );
+	insertActionsToolBar->addAction( m_removeBarAction );
+	connect(m_insertBarAction, SIGNAL(triggered()), song, SLOT(insertBar()));
+	connect(m_removeBarAction, SIGNAL(triggered()), song, SLOT(removeBar()));
 
 	DropToolBar *zoomToolBar = addDropToolBarToTop(tr("Zoom controls"));
 

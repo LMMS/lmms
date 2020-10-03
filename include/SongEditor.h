@@ -210,6 +210,9 @@ private:
 	ComboBox * m_zoomingComboBox;
 	ComboBox * m_snappingComboBox;
 	QLabel* m_snapSizeLabel;
+
+	QAction* m_insertBarAction;
+	QAction* m_removeBarAction;
 };
 
 #endif
