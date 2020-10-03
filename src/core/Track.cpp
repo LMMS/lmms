@@ -581,16 +581,6 @@ void TrackContentObjectView::useTrackColor()
 
 
 
-void TrackContentObjectView::trackColorReset()
-{
-	if( m_tco->hasColor() && ! m_tco->usesCustomClipColor() )
-	{
-		update();
-	}
-}
-
-
-
 
 
 /*! \brief Change the trackContentObjectView's display when something

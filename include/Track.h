@@ -304,7 +304,6 @@ public slots:
 	
 	void changeClipColor();
 	void useTrackColor();
-	void trackColorReset();
 
 protected:
 	enum ContextMenuAction
