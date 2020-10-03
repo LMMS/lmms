@@ -113,7 +113,7 @@ protected:
 private:
 	//! Start a preview of a file item
 	void previewFileItem(FileItem* file);
-	//! If a preview is playing, stop it. Returns false if nothing was playing
+	//! If a preview is playing, stop it.
 	void stopPreview();
 
 	void handleFile( FileItem * fi, InstrumentTrack * it );

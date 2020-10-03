@@ -688,6 +688,7 @@ void FileBrowserTreeWidget::mouseReleaseEvent(QMouseEvent * me )
 			}
 			else { stopPreview(); }
 		}
+		else { stopPreview(); }
 	}
 }
 
@@ -807,7 +808,7 @@ bool FileBrowserTreeWidget::openInNewSampleTrack(FileItem* item)
 
 	// Add the sample clip to the track
 	Engine::mixer()->requestChangeInModel();
-	SampleTCO* clip = dynamic_cast<SampleTCO*>(sampleTrack->createTCO(0));
+	SampleTCO* clip = static_cast<SampleTCO*>(sampleTrack->createTCO(0));
 	clip->setSampleFile(item->fullName());
 	Engine::mixer()->doneChangeInModel();
 	return true;
