@@ -46,7 +46,6 @@
 #include <QStyleOption>
 #include <QVariant>
 #include <QClipboard>
-#include <QDebug>
 
 
 #include "AutomationPattern.h"
@@ -71,6 +70,7 @@
 #include "StringPairDrag.h"
 #include "TextFloat.h"
 #include "Pattern.h"
+#include "Note.h"
 
 
 /*! The width of the resize grip in pixels
@@ -1376,7 +1376,6 @@ void TrackContentObjectView::toggleMute( QVector<TrackContentObjectView *> tcovs
 
 void TrackContentObjectView::mergeTCOs( QVector<TrackContentObjectView *> tcovs )
 {
-	qWarning("Merging!");
 	// Get the track that we are merging TCOs in
 	InstrumentTrack *track = dynamic_cast<InstrumentTrack *>(tcovs.at(0)->getTrackView()->getTrack());
 
@@ -1435,9 +1434,13 @@ void TrackContentObjectView::mergeTCOs( QVector<TrackContentObjectView *> tcovs 
 		tcov->remove();
 	}
 
-	// Because we might have moved notes beyond the current pattern length
+	// Update length since we might have moved notes beyond the end of the pattern length
 	newPattern->updateLength();
-	newPattern->dataChanged();
+	// Rearrange notes because we might have moved them
+	newPattern->rearrangeAllNotes();
+	// Update engine
+	Engine::getSong()->setModified();
+	gui->songEditor()->update();
 }
 
 
