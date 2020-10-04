@@ -479,6 +479,9 @@ TrackContentObject * BBTrack::createTCO( const MidiTime & _pos )
 		bbtco->setColor( *s_lastTCOColor );
 		bbtco->setUseStyleColor( false );
 	}
+
+	bbtco->movePosition( _pos );
+
 	return bbtco;
 }
 

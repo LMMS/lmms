@@ -193,8 +193,7 @@ public:
 		{
 			MidiTime pPos = MidiTime( time.getBar(), 0 );
 			ap = dynamic_cast<AutomationPattern*>(
-				at->createTCO(0) );
-			ap->movePosition( pPos );
+				at->createTCO( pPos ) );
 			ap->addObject( objModel );
 		}
 
@@ -287,8 +286,7 @@ public:
 			if (!newPattern || n->pos() > lastEnd + DefaultTicksPerBar)
 			{
 				MidiTime pPos = MidiTime(n->pos().getBar(), 0);
-				newPattern = dynamic_cast<Pattern*>(it->createTCO(0));
-				newPattern->movePosition(pPos);
+				newPattern = dynamic_cast<Pattern*>(it->createTCO( pPos ));
 			}
 			lastEnd = n->pos() + n->length();
 

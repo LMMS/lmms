@@ -1860,7 +1860,7 @@ bool TrackContentWidget::pasteSelection( MidiTime tcoPos, const QMimeData * md, 
 
 		TrackContentObject * tco = t->createTCO( pos );
 		tco->restoreState( tcoElement );
-		tco->movePosition( pos );
+		tco->movePosition( pos ); // Because we restored the state, we need to move the TCO again.
 		if( wasSelection )
 		{
 			tco->selectViewOnCreate( true );
@@ -1914,11 +1914,7 @@ void TrackContentWidget::mousePressEvent( QMouseEvent * me )
 		getTrack()->addJournalCheckPoint();
 		const MidiTime pos = getPosition( me->x() ).getBar() *
 						MidiTime::ticksPerBar();
-		TrackContentObject * tco = getTrack()->createTCO( pos );
-
-		tco->saveJournallingState( false );
-		tco->movePosition( pos );
-		tco->restoreJournallingState();
+		getTrack()->createTCO( pos );
 	}
 }
 
@@ -2570,8 +2566,6 @@ void Track::loadSettings( const QDomElement & element )
 				TrackContentObject * tco = createTCO(
 								MidiTime( 0 ) );
 				tco->restoreState( node.toElement() );
-				saveJournallingState( false );
-				restoreJournallingState();
 			}
 		}
 		node = node.nextSibling();
@@ -2759,7 +2753,6 @@ void Track::createTCOsForBB( int bb )
 	{
 		MidiTime position = MidiTime( numOfTCOs(), 0 );
 		TrackContentObject * tco = createTCO( position );
-		tco->movePosition( position );
 		tco->changeLength( MidiTime( 1, 0 ) );
 	}
 }
