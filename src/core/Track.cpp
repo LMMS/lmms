@@ -709,9 +709,6 @@ DataFile TrackContentObjectView::createTCODataFiles(
 		tcoElement.setAttribute( "trackIndex", trackIndex );
 		tcoElement.setAttribute( "trackType", tcoTrack->type() );
 		tcoElement.setAttribute( "trackName", tcoTrack->name() );
-		tcoElement.setAttribute( "color", ( *it )->m_tco->color().name() );
-		tcoElement.setAttribute( "styleColor", ! ( *it )->m_tco->hasColor() );
-		tcoElement.setAttribute( "clipColor", ( *it )->m_tco->usesCustomClipColor() );
 		( *it )->m_tco->saveState( dataFile, tcoElement );
 		tcoParent.appendChild( tcoElement );
 	}
