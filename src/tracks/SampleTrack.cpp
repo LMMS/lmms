@@ -334,9 +334,6 @@ SampleTCOView::SampleTCOView( SampleTCO * _tco, TrackView * _tv ) :
 	// track future changes of SampleTCO
 	connect( m_tco, SIGNAL( sampleChanged() ),
 			this, SLOT( updateSample() ) );
-			
-	/*connect( m_tco, SIGNAL( trackColorReset() ),
-			this, SLOT( trackColorReset() ) );*/
 
 	setStyle( QApplication::style() );
 }
@@ -624,6 +621,8 @@ void SampleTCOView::paintEvent( QPaintEvent * pe )
 
 	painter.drawPixmap( 0, 0, m_paintPixmap );
 }
+
+
 
 
 

@@ -532,6 +532,7 @@ private:
 	PixmapButton * m_muteBtn;
 	PixmapButton * m_soloBtn;
 
+
 	friend class TrackView;
 
 signals:
@@ -769,8 +770,6 @@ public:
 	{
 		return m_action == MoveTrack;
 	}
-	
-	
 
 	virtual void update();
 
@@ -822,8 +821,8 @@ private:
 
 	Track * m_track;
 	TrackContainerView * m_trackContainerView;
+
 	TrackOperationsWidget m_trackOperationsWidget;
-	
 	QWidget m_trackSettingsWidget;
 	TrackContentWidget m_trackContentWidget;
 

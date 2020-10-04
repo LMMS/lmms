@@ -49,6 +49,7 @@
 #include <QVariant>
 #include <QClipboard>
 
+
 #include "AutomationPattern.h"
 #include "AutomationTrack.h"
 #include "AutomationEditor.h"
@@ -302,6 +303,7 @@ TrackContentObjectView::TrackContentObjectView( TrackContentObject * tco,
 	m_hint( NULL ),
 	m_mutedColor( 0, 0, 0 ),
 	m_mutedBackgroundColor( 0, 0, 0 ),
+	m_selectedColor( 0, 0, 0),
 	m_textColor( 0, 0, 0 ),
 	m_textShadowColor( 0, 0, 0 ),
 	m_BBPatternBackground( 0, 0, 0 ),
@@ -657,7 +659,6 @@ void TrackContentObjectView::dropEvent( QDropEvent * de )
 	QDomElement tcos = dataFile.content().firstChildElement( "tcos" );
 	m_tco->restoreState( tcos.firstChildElement().firstChildElement() );
 	m_tco->movePosition( pos );
-	
 	AutomationPattern::resolveAllIDs();
 	de->accept();
 }
@@ -2233,6 +2234,8 @@ TrackOperationsWidget::TrackOperationsWidget( TrackView * parent ) :
 TrackOperationsWidget::~TrackOperationsWidget()
 {
 }
+
+
 
 
 /*! \brief Respond to trackOperationsWidget mouse events

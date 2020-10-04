@@ -597,8 +597,6 @@ PatternView::PatternView( Pattern* pattern, TrackView* parent ) :
 {
 	connect( gui->pianoRoll(), SIGNAL( currentPatternChanged() ),
 			this, SLOT( update() ) );
-	/*connect( m_pat, SIGNAL( trackColorReset() ),
-			this, SLOT( trackColorReset() ) );*/
 
 	if( s_stepBtnOn0 == NULL )
 	{
@@ -674,6 +672,8 @@ void PatternView::changeName()
 	rename_dlg.exec();
 	m_pat->setName( s );
 }
+
+
 
 
 void PatternView::constructContextMenu( QMenu * _cm )
