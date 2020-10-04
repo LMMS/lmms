@@ -1961,7 +1961,7 @@ bool TrackContentWidget::pasteSelection( MidiTime tcoPos, const QMimeData * md, 
 		if( wasSelection )
 		{
 			tco->selectViewOnCreate( true );
-    	}
+		}
 	}
 
 	AutomationPattern::resolveAllIDs();
