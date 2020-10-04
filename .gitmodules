@@ -3,7 +3,7 @@
 	url = https://github.com/Lukas-W/qt5-x11embed.git
 [submodule "src/3rdparty/rpmalloc/rpmalloc"]
 	path = src/3rdparty/rpmalloc/rpmalloc
-	url = https://github.com/mjansson/rpmalloc.git
+	url = https://github.com/JohannesLorenz/rpmalloc.git
 [submodule "plugins/zynaddsubfx/zynaddsubfx"]
 	path = plugins/zynaddsubfx/zynaddsubfx
 	url = https://github.com/lmms/zynaddsubfx.git
