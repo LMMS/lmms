@@ -270,11 +270,6 @@ public:
 	void setBBPatternBackground( const QColor & c );
 	void setGradient( const bool & b );
 	void setMouseHotspotHand(const QSize & s);
-	
-	QColor color() const
-	{
-		return m_tco->color();
-	};
 
 	// access needsUpdate member variable
 	bool needsUpdate();
