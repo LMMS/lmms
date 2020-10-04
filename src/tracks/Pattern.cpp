@@ -613,6 +613,17 @@ PatternView::PatternView( Pattern* pattern, TrackView* parent ) :
 	setStyle( QApplication::style() );
 }
 
+
+
+
+Pattern * PatternView::getPattern()
+{
+	return m_pat;
+}
+
+
+
+
 void PatternView::update()
 {
 	ToolTip::add(this, m_pat->name());

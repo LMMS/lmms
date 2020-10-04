@@ -263,6 +263,7 @@ public:
 	// some metadata to be written to the clipboard.
 	static void remove( QVector<TrackContentObjectView *> tcovs );
 	static void toggleMute( QVector<TrackContentObjectView *> tcovs );
+	static void mergeTCOs( QVector<TrackContentObjectView *> tcovs );
 
 public slots:
 	virtual bool close();
@@ -277,7 +278,8 @@ protected:
 		Cut,
 		Copy,
 		Paste,
-		Mute
+		Mute,
+		Merge
 	};
 
 	virtual void constructContextMenu( QMenu * )

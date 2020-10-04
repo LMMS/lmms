@@ -46,6 +46,7 @@
 #include <QStyleOption>
 #include <QVariant>
 #include <QClipboard>
+#include <QDebug>
 
 
 #include "AutomationPattern.h"
@@ -69,6 +70,7 @@
 #include "SongEditor.h"
 #include "StringPairDrag.h"
 #include "TextFloat.h"
+#include "Pattern.h"
 
 
 /*! The width of the resize grip in pixels
@@ -1123,9 +1125,11 @@ void TrackContentObjectView::mouseReleaseEvent( QMouseEvent * me )
  */
 void TrackContentObjectView::contextMenuEvent( QContextMenuEvent * cme )
 {
+	QVector<TrackContentObjectView *> selectedTCOs = getClickedTCOs();
+
 	// Depending on whether we right-clicked a selection or an individual TCO we will have
 	// different labels for the actions.
-	bool individualTCO = getClickedTCOs().size() <= 1;
+	bool individualTCO = selectedTCOs.size() <= 1;
 
 	if( cme->modifiers() )
 	{
@@ -1133,6 +1137,45 @@ void TrackContentObjectView::contextMenuEvent( QContextMenuEvent * cme )
 	}
 
 	QMenu contextMenu( this );
+
+	// We can only merge InstrumentTrack's TCOs, so check if we only have those in the selection,
+	// and also if they all belong to the same track
+	bool canMergeTCOs = false;
+	if( !individualTCO )
+	{
+		// We can only merge if we have more then one TCO, so first set to true
+		canMergeTCOs = true;
+
+		// Variable to check if all TCOs belong to the same track
+		TrackView *previousOwnerTrackView = nullptr;
+
+		// Then we check every selected TCO to see if all of them are InstrumentTrack's TCOs.
+		// If any isn't, we set canMergeTCOs to false and quit the loop.
+		for( auto tcov: selectedTCOs )
+		{
+			TrackView *ownerTrackView = tcov->getTrackView();
+
+			// Set the previousOwnerTrackView to the first TrackView
+			if( !previousOwnerTrackView )
+			{
+				previousOwnerTrackView = ownerTrackView;
+			}
+
+			// Are all TCOs from the same track?
+			if( ownerTrackView != previousOwnerTrackView )
+			{
+				canMergeTCOs = false;
+				break;
+			}
+
+			// Is the TCO from an InstrumentTrack?
+			if( ! dynamic_cast<InstrumentTrackView *>(ownerTrackView) )
+			{
+				canMergeTCOs = false;
+				break;
+			}
+		}
+	}
 
 	if( fixedTCOs() == false )
 	{
@@ -1151,6 +1194,14 @@ void TrackContentObjectView::contextMenuEvent( QContextMenuEvent * cme )
 				? tr("Cut")
 				: tr("Cut selection"),
 			[this](){ contextMenuAction( Cut ); } );
+
+		if( canMergeTCOs )
+		{
+			contextMenu.addAction(
+				embed::getIconPixmap( "edit_cut" ),
+				tr("Merge Selection"),
+				[this](){ contextMenuAction( Merge ); } );
+		}
 	}
 
 	contextMenu.addAction(
@@ -1201,6 +1252,9 @@ void TrackContentObjectView::contextMenuAction( ContextMenuAction action )
 			break;
 		case Mute:
 			toggleMute( active );
+			break;
+		case Merge:
+			mergeTCOs( active );
 			break;
 	}
 }
@@ -1320,6 +1374,71 @@ void TrackContentObjectView::toggleMute( QVector<TrackContentObjectView *> tcovs
 	}
 }
 
+void TrackContentObjectView::mergeTCOs( QVector<TrackContentObjectView *> tcovs )
+{
+	qWarning("Merging!");
+	// Get the track that we are merging TCOs in
+	InstrumentTrack *track = dynamic_cast<InstrumentTrack *>(tcovs.at(0)->getTrackView()->getTrack());
+
+	if( !track )
+	{
+		qWarning("Warning: Couldn't retrieve InstrumentTrack in mergeTCOs()");
+		return;
+	}
+
+	// Find the earliest position of all the selected TCOVs
+	MidiTime earliestPos = tcovs.at(0)->getTrackContentObject()->startPosition();
+	MidiTime currentPos = earliestPos;
+
+	for( auto tcov: tcovs )
+	{
+		currentPos = tcov->getTrackContentObject()->startPosition();
+		if( currentPos < earliestPos )
+		{
+			earliestPos = currentPos;
+		}
+	}
+
+	// Create a pattern where all notes will be added
+	Pattern * newPattern = dynamic_cast<Pattern *>( track->createTCO( earliestPos ) );
+	if( !newPattern )
+	{
+		qWarning("Warning: Failed to convert TCO to Pattern on mergeTCOs");
+		return;
+	}
+
+	newPattern->movePosition( earliestPos ); // Kinda weird we need to call this even though we already give the Pos on the constructor right?
+
+	// Add the notes and remove the TCOs that are being merged
+	for( auto tcov: tcovs )
+	{
+		// Convert TCOV to PatternView
+		PatternView *pView = dynamic_cast<PatternView *>( tcov );
+
+		if( !pView )
+		{
+			qWarning("Warning: Non-pattern TCO on InstrumentTrack");
+			continue;
+		}
+
+		NoteVector currentTCONotes = pView->getPattern()->notes();
+		MidiTime pViewPos = pView->getPattern()->startPosition();
+
+		for( Note *note: currentTCONotes )
+		{
+			Note *newNote = newPattern->addNote( *note, false );
+			MidiTime originalNotePos = newNote->pos();
+			newNote->setPos( originalNotePos + ( pViewPos - earliestPos ) );
+		}
+
+		// No need to check for nullptr because we check while building the tcovs QVector
+		tcov->remove();
+	}
+
+	// Because we might have moved notes beyond the current pattern length
+	newPattern->updateLength();
+	newPattern->dataChanged();
+}
 
 
 
