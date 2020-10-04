@@ -38,6 +38,10 @@ const char *PluginIssue::msgFor(const PluginIssueType &it)
 			return "too many audio input channels";
 		case tooManyOutputChannels:
 			return "too many audio output channels";
+		case tooManyMidiInputChannels:
+			return "too many MIDI input channels";
+		case tooManyMidiOutputChannels:
+			return "too many MIDI output channels";
 		case noOutputChannel:
 			return "no audio output channel";
 		case portHasNoDef:
