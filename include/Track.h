@@ -265,6 +265,9 @@ public:
 	static void toggleMute( QVector<TrackContentObjectView *> tcovs );
 	static void mergeTCOs( QVector<TrackContentObjectView *> tcovs );
 
+	// Returns true if selection can be merged and false if not
+	static bool canMergeSelection( QVector<TrackContentObjectView *> tcovs );
+
 public slots:
 	virtual bool close();
 	void cut();
