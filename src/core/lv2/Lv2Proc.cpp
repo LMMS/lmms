@@ -56,8 +56,7 @@ Plugin::PluginTypes Lv2Proc::check(const LilvPlugin *plugin,
 		bool portMustBeUsed =
 			!portIsSideChain(plugin,
 							lilv_plugin_get_port_by_index(plugin, portNum)) &&
-			!portIsOptional(plugin,
-							lilv_plugin_get_port_by_index(plugin, portNum));
+			!meta.m_optional;
 		if (meta.m_type == Lv2Ports::Type::Audio && portMustBeUsed)
 			++audioChannels[meta.m_flow == Lv2Ports::Flow::Output
 				? outCount : inCount];
@@ -381,8 +380,7 @@ void Lv2Proc::createPort(std::size_t portNum)
 				new Lv2Ports::Audio(
 						static_cast<std::size_t>(
 							Engine::mixer()->framesPerPeriod()),
-						portIsSideChain(m_plugin, lilvPort),
-						portIsOptional(m_plugin, lilvPort)
+						portIsSideChain(m_plugin, lilvPort)
 					);
 			port = audio;
 			break;

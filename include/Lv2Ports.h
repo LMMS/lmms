@@ -162,7 +162,7 @@ struct Cv : public VisitablePort<Cv, ControlPortBase>
 
 struct Audio : public VisitablePort<Audio, PortBase>
 {
-	Audio(std::size_t bufferSize, bool isSidechain, bool isOptional);
+	Audio(std::size_t bufferSize, bool isSidechain);
 
 	//! Copy buffer passed by LMMS into our ports
 	//! @param channel channel index into each sample frame
