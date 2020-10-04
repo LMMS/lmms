@@ -16,7 +16,7 @@ FILE(WRITE ${CMAKE_BINARY_DIR}/src/ringbuffer_export.h
 # Enable MLOCK support for ringbuffer if available
 INCLUDE(CheckIncludeFiles)
 CHECK_INCLUDE_FILES(sys/mman.h HAVE_SYS_MMAN)
-IF(HAVE_SYS_MMAN)
+IF(HAVE_SYS_MMAN AND NOT CMAKE_SYSTEM_NAME MATCHES "Haiku")
     SET(USE_MLOCK ON)
 ELSE()
     SET(USE_MLOCK OFF)
