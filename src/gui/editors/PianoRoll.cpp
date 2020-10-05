@@ -340,7 +340,7 @@ PianoRoll::PianoRoll() :
 					this, SLOT(zoomingYChanged()));
 
 	// Set up quantization model
-	m_quantizeModel.addItem( tr( "Note lock" ) );
+	m_quantizeModel.addItem(tr("Same as note"));
 	for (auto q : Quantizations) {
 		m_quantizeModel.addItem(QString("1/%1").arg(q));
 	}
@@ -4322,7 +4322,7 @@ PianoRollWindow::PianoRollWindow() :
 
 	connect( editModeGroup, SIGNAL( triggered( int ) ), m_editor, SLOT( setEditMode( int ) ) );
 
-	QAction* quantizeAction = new QAction(embed::getIconPixmap( "quantize" ), tr( "Quantize" ), this );
+	QAction* quantizeAction = new QAction(embed::getIconPixmap("snap"), tr("Snap notes to grid"), this);
 	connect( quantizeAction, SIGNAL( triggered() ), m_editor, SLOT( quantizeNotes() ) );
 
 	notesActionsToolBar->addAction( drawAction );
@@ -4384,12 +4384,12 @@ PianoRollWindow::PianoRollWindow() :
 
 	// setup quantize-stuff
 	QLabel * quantize_lbl = new QLabel( m_toolBar );
-	quantize_lbl->setPixmap( embed::getIconPixmap( "quantize" ) );
+	quantize_lbl->setPixmap(embed::getIconPixmap("grid_size"));
 
 	m_quantizeComboBox = new ComboBox( m_toolBar );
 	m_quantizeComboBox->setModel( &m_editor->m_quantizeModel );
 	m_quantizeComboBox->setFixedSize( 64, ComboBox::DEFAULT_HEIGHT );
-	m_quantizeComboBox->setToolTip( tr( "Quantization") );
+	m_quantizeComboBox->setToolTip(tr("Grid size"));
 
 	// setup note-len-stuff
 	QLabel * note_len_lbl = new QLabel( m_toolBar );

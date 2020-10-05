@@ -981,7 +981,7 @@ SongEditorWindow::SongEditorWindow(Song* song) :
 
 	DropToolBar *snapToolBar = addDropToolBarToTop(tr("Snap controls"));
 	QLabel * snap_lbl = new QLabel( m_toolBar );
-	snap_lbl->setPixmap( embed::getIconPixmap( "quantize" ) );
+	snap_lbl->setPixmap(embed::getIconPixmap("grid_snap_size"));
 
 	//Set up quantization/snapping selector
 	m_snappingComboBox = new ComboBox( m_toolBar );
@@ -998,6 +998,7 @@ SongEditorWindow::SongEditorWindow(Song* song) :
 	connect(m_setProportionalSnapAction, SIGNAL(triggered()), this, SLOT(updateSnapLabel()) );
 
 	snapToolBar->addWidget( snap_lbl );
+	snapToolBar->addSeparator();
 	snapToolBar->addWidget( m_snappingComboBox );
 	snapToolBar->addSeparator();
 	snapToolBar->addAction( m_setProportionalSnapAction );
