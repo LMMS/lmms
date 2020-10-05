@@ -133,27 +133,6 @@ public:
 		m_disabledTracks.removeAll( _track );
 	}
 
-	static void setLastTCOColor( const QColor & c )
-	{
-		if( ! s_lastTCOColor )
-		{
-			s_lastTCOColor = new QColor( c );
-		}
-		else
-		{
-			*s_lastTCOColor = QColor( c );
-		}
-	}
-	
-	static void clearLastTCOColor()
-	{
-		if( s_lastTCOColor )
-		{
-			delete s_lastTCOColor;
-		}
-		s_lastTCOColor = NULL;
-	}
-
 protected:
 	inline QString nodeName() const override
 	{
@@ -166,8 +145,6 @@ private:
 
 	typedef QMap<BBTrack *, int> infoMap;
 	static infoMap s_infoMap;
-
-	static QColor * s_lastTCOColor;
 
 	friend class BBTrackView;
 
