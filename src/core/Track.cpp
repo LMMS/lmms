@@ -303,7 +303,7 @@ TrackContentObjectView::TrackContentObjectView( TrackContentObject * tco,
 	m_hint( NULL ),
 	m_mutedColor( 0, 0, 0 ),
 	m_mutedBackgroundColor( 0, 0, 0 ),
-	m_selectedColor( 0, 0, 0),
+	m_selectedColor( 0, 0, 0 ),
 	m_textColor( 0, 0, 0 ),
 	m_textShadowColor( 0, 0, 0 ),
 	m_BBPatternBackground( 0, 0, 0 ),
@@ -2450,6 +2450,7 @@ void TrackOperationsWidget::toggleRecording( bool on )
 		atv->update();
 	}
 }
+
 
 
 void TrackOperationsWidget::recordingOn()

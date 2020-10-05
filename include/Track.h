@@ -724,6 +724,7 @@ signals:
 	void destroyedTrack();
 	void nameChanged();
 	void trackContentObjectAdded( TrackContentObject * );
+
 } ;
 
 
