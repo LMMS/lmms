@@ -24,6 +24,8 @@
 
 #include "SampleBuffer.h"
 
+#include <algorithm>
+
 #include <QBuffer>
 #include <QFile>
 #include <QFileInfo>
@@ -1412,7 +1414,12 @@ void SampleBuffer::setAmplification( float _a )
 void SampleBuffer::setReversed( bool _on )
 {
 	m_reversed = _on;
-	update( true );
+	Engine::mixer()->requestChangeInModel();
+	m_varLock.lockForWrite();
+	std::reverse(m_data, m_data + m_frames);
+	m_varLock.unlock();
+	Engine::mixer()->doneChangeInModel();
+	emit sampleUpdated();
 }
 
 
