@@ -56,8 +56,7 @@ Plugin::PluginTypes Lv2Proc::check(const LilvPlugin *plugin,
 		bool portMustBeUsed =
 			!portIsSideChain(plugin,
 							lilv_plugin_get_port_by_index(plugin, portNum)) &&
-			!portIsOptional(plugin,
-							lilv_plugin_get_port_by_index(plugin, portNum));
+			!meta.m_optional;
 		if (meta.m_type == Lv2Ports::Type::Audio && portMustBeUsed)
 			++audioChannels[meta.m_flow == Lv2Ports::Flow::Output
 				? outCount : inCount];
@@ -311,78 +310,83 @@ void Lv2Proc::createPort(std::size_t portNum)
 	const LilvPort* lilvPort = lilv_plugin_get_port_by_index(m_plugin,
 								static_cast<uint32_t>(portNum));
 	Lv2Ports::PortBase* port;
-	if (meta.m_type == Lv2Ports::Type::Control)
+
+	switch (meta.m_type)
 	{
-		Lv2Ports::Control* ctrl = new Lv2Ports::Control;
-		if (meta.m_flow == Lv2Ports::Flow::Input)
+		case Lv2Ports::Type::Control:
 		{
-			AutoLilvNode node(lilv_port_get_name(m_plugin, lilvPort));
-			QString dispName = lilv_node_as_string(node.get());
-			switch (meta.m_vis)
+			Lv2Ports::Control* ctrl = new Lv2Ports::Control;
+			if (meta.m_flow == Lv2Ports::Flow::Input)
 			{
-				case Lv2Ports::Vis::None:
+				AutoLilvNode node(lilv_port_get_name(m_plugin, lilvPort));
+				QString dispName = lilv_node_as_string(node.get());
+				switch (meta.m_vis)
 				{
-					// allow ~1000 steps
-					float stepSize = (meta.m_max - meta.m_min) / 1000.0f;
-
-					// make multiples of 0.01 (or 0.1 for larger values)
-					float minStep = (stepSize >= 1.0f) ? 0.1f : 0.01f;
-					stepSize -= fmodf(stepSize, minStep);
-					stepSize = std::max(stepSize, minStep);
-
-					ctrl->m_connectedModel.reset(
-						new FloatModel(meta.m_def, meta.m_min, meta.m_max,
-										stepSize, nullptr, dispName));
-					break;
-				}
-				case Lv2Ports::Vis::Integer:
-					ctrl->m_connectedModel.reset(
-						new IntModel(static_cast<int>(meta.m_def),
-										static_cast<int>(meta.m_min),
-										static_cast<int>(meta.m_max),
-										nullptr, dispName));
-					break;
-				case Lv2Ports::Vis::Enumeration:
-				{
-					ComboBoxModel* comboModel
-						= new ComboBoxModel(
-							nullptr, dispName);
-					LilvScalePoints* sps =
-						lilv_port_get_scale_points(m_plugin, lilvPort);
-					LILV_FOREACH(scale_points, i, sps)
+					case Lv2Ports::Vis::None:
 					{
-						const LilvScalePoint* sp = lilv_scale_points_get(sps, i);
-						ctrl->m_scalePointMap.push_back(lilv_node_as_float(
-										lilv_scale_point_get_value(sp)));
-						comboModel->addItem(
-							lilv_node_as_string(
-								lilv_scale_point_get_label(sp)));
+						// allow ~1000 steps
+						float stepSize = (meta.m_max - meta.m_min) / 1000.0f;
+
+						// make multiples of 0.01 (or 0.1 for larger values)
+						float minStep = (stepSize >= 1.0f) ? 0.1f : 0.01f;
+						stepSize -= fmodf(stepSize, minStep);
+						stepSize = std::max(stepSize, minStep);
+
+						ctrl->m_connectedModel.reset(
+							new FloatModel(meta.m_def, meta.m_min, meta.m_max,
+											stepSize, nullptr, dispName));
+						break;
 					}
-					lilv_scale_points_free(sps);
-					ctrl->m_connectedModel.reset(comboModel);
-					break;
+					case Lv2Ports::Vis::Integer:
+						ctrl->m_connectedModel.reset(
+							new IntModel(static_cast<int>(meta.m_def),
+											static_cast<int>(meta.m_min),
+											static_cast<int>(meta.m_max),
+											nullptr, dispName));
+						break;
+					case Lv2Ports::Vis::Enumeration:
+					{
+						ComboBoxModel* comboModel
+							= new ComboBoxModel(
+								nullptr, dispName);
+						LilvScalePoints* sps =
+							lilv_port_get_scale_points(m_plugin, lilvPort);
+						LILV_FOREACH(scale_points, i, sps)
+						{
+							const LilvScalePoint* sp = lilv_scale_points_get(sps, i);
+							ctrl->m_scalePointMap.push_back(lilv_node_as_float(
+											lilv_scale_point_get_value(sp)));
+							comboModel->addItem(
+								lilv_node_as_string(
+									lilv_scale_point_get_label(sp)));
+						}
+						lilv_scale_points_free(sps);
+						ctrl->m_connectedModel.reset(comboModel);
+						break;
+					}
+					case Lv2Ports::Vis::Toggled:
+						ctrl->m_connectedModel.reset(
+							new BoolModel(static_cast<bool>(meta.m_def),
+											nullptr, dispName));
+						break;
 				}
-				case Lv2Ports::Vis::Toggled:
-					ctrl->m_connectedModel.reset(
-						new BoolModel(static_cast<bool>(meta.m_def),
-										nullptr, dispName));
-					break;
 			}
+			port = ctrl;
+			break;
 		}
-		port = ctrl;
-	}
-	else if (meta.m_type == Lv2Ports::Type::Audio)
-	{
-		Lv2Ports::Audio* audio =
-			new Lv2Ports::Audio(
-					static_cast<std::size_t>(
-						Engine::mixer()->framesPerPeriod()),
-					portIsSideChain(m_plugin, lilvPort),
-					portIsOptional(m_plugin, lilvPort)
-				);
-		port = audio;
-	} else {
-		port = new Lv2Ports::Unknown;
+		case Lv2Ports::Type::Audio:
+		{
+			Lv2Ports::Audio* audio =
+				new Lv2Ports::Audio(
+						static_cast<std::size_t>(
+							Engine::mixer()->framesPerPeriod()),
+						portIsSideChain(m_plugin, lilvPort)
+					);
+			port = audio;
+			break;
+		}
+		default:
+			port = new Lv2Ports::Unknown;
 	}
 
 	// `meta` is of class `Lv2Ports::Meta` and `port` is of a child class

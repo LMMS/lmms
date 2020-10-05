@@ -31,7 +31,6 @@
 #include "Engine.h"
 #include "Lv2Manager.h"
 #include "Lv2Proc.h"
-#include "stdshims.h"
 
 
 
@@ -54,7 +53,7 @@ Lv2ControlBase::Lv2ControlBase(Model* that, const QString &uri) :
 		int channelsLeft = DEFAULT_CHANNELS; // LMMS plugins are stereo
 		while (channelsLeft > 0)
 		{
-			std::unique_ptr<Lv2Proc> newOne = make_unique<Lv2Proc>(m_plugin, that);
+			std::unique_ptr<Lv2Proc> newOne = std::make_unique<Lv2Proc>(m_plugin, that);
 			if (newOne->isValid())
 			{
 				channelsLeft -= std::max(

@@ -42,7 +42,8 @@
 static float floatFromClipboard(bool* ok=nullptr);
 
 AutomatableModelView::AutomatableModelView( ::Model* model, QWidget* _this ) :
-	ModelView( model, _this )
+	ModelView( model, _this ),
+	m_conversionFactor( 1.0 )
 {
 	widget()->setAcceptDrops( true );
 	widget()->setCursor( QCursor( embed::getIconPixmap( "hand" ), 3, 3 ) );
@@ -56,14 +57,14 @@ void AutomatableModelView::addDefaultActions( QMenu* menu )
 
 	menu->addAction( embed::getIconPixmap( "reload" ),
 						AutomatableModel::tr( "&Reset (%1%2)" ).
-							arg( model->displayValue( model->initValue<float>() ) ).
+							arg( model->initValue<float>() * m_conversionFactor ).
 							arg( m_unit ),
 						model, SLOT( reset() ) );
 
 	menu->addSeparator();
 	menu->addAction( embed::getIconPixmap( "edit_copy" ),
 						AutomatableModel::tr( "&Copy value (%1%2)" ).
-							arg( model->displayValue( model->value<float>() ) ).
+							arg( model->value<float>() * m_conversionFactor ).
 							arg( m_unit ),
 						amvSlots, SLOT( copyToClipboard() ) );
 
@@ -71,7 +72,7 @@ void AutomatableModelView::addDefaultActions( QMenu* menu )
 	const float valueToPaste = floatFromClipboard(&canPaste);
 	const QString pasteDesc = canPaste ?
 					AutomatableModel::tr( "&Paste value (%1%2)").
-						arg( model->displayValue( valueToPaste ) ).
+						arg( valueToPaste ).
 						arg( m_unit )
 					: AutomatableModel::tr( "&Paste value");
 	QAction* pasteAction = menu->addAction( embed::getIconPixmap( "edit_paste" ),
@@ -155,7 +156,19 @@ void AutomatableModelView::mousePressEvent( QMouseEvent* event )
 }
 
 
+void AutomatableModelView::setConversionFactor( float factor )
+{
+	if( factor != 0.0 )
+	{
+		m_conversionFactor = factor;
+	}
+}
 
+
+float AutomatableModelView::getConversionFactor()
+{
+	return m_conversionFactor;
+}
 
 
 AutomatableModelViewSlots::AutomatableModelViewSlots( AutomatableModelView* amv, QObject* parent ) :
@@ -245,7 +258,7 @@ void AutomatableModelViewSlots::copyToClipboard()
 	// For copyString() and MimeType enum class
 	using namespace Clipboard;
 
-	copyString( QString::number(m_amv->value<float>()), MimeType::Default );
+	copyString( QString::number( m_amv->value<float>() * m_amv->getConversionFactor() ), MimeType::Default );
 }
 
 void AutomatableModelViewSlots::pasteFromClipboard()
@@ -253,7 +266,7 @@ void AutomatableModelViewSlots::pasteFromClipboard()
 	bool isNumber = false;
 	const float number = floatFromClipboard(&isNumber);
 	if (isNumber) {
-		m_amv->modelUntyped()->setValue(number);
+		m_amv->modelUntyped()->setValue(number / m_amv->getConversionFactor());
 	}
 }
 

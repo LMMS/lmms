@@ -125,6 +125,7 @@ std::vector<PluginIssue> Meta::get(const LilvPlugin *plugin,
 
 	m_def = .0f; m_min = .0f; m_max = .0f;
 
+	m_type = Type::Unknown;
 	if (isA(LV2_CORE__ControlPort))
 	{
 		m_type = Type::Control;
@@ -162,14 +163,17 @@ std::vector<PluginIssue> Meta::get(const LilvPlugin *plugin,
 		}
 	}
 	else if (isA(LV2_CORE__AudioPort)) { m_type = Type::Audio; }
-	else if (isA(LV2_CORE__CVPort)) {
+	else if (isA(LV2_CORE__CVPort))
+	{
 		issue(badPortType, "cvPort");
 		m_type = Type::Cv;
-	} else {
+	}
+
+	if(m_type == Type::Unknown)
+	{
 		if (m_optional) { m_used = false; }
 		else {
 			issue(PluginIssueType::unknownPortType, portName);
-			m_type = Type::Unknown;
 		}
 	}
 
@@ -197,8 +201,8 @@ QString PortBase::uri() const
 
 
 
-Audio::Audio(std::size_t bufferSize, bool isSidechain, bool isOptional)
-	: m_buffer(bufferSize), m_sidechain(isSidechain), m_optional(isOptional)
+Audio::Audio(std::size_t bufferSize, bool isSidechain)
+	: m_buffer(bufferSize), m_sidechain(isSidechain)
 {
 }
 

@@ -1813,13 +1813,6 @@ bool TrackContentWidget::pasteSelection( MidiTime tcoPos, const QMimeData * md, 
 		{
 			tco->selectViewOnCreate( true );
 		}
-
-		//check tco name, if the same as source track name dont copy
-		QString sourceTrackName = outerTCOElement.attributeNode( "trackName" ).value();
-		if( tco->name() == sourceTrackName )
-		{
-			tco->setName( "" );
-		}
 	}
 
 	AutomationPattern::resolveAllIDs();

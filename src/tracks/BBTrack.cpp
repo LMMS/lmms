@@ -290,10 +290,7 @@ void BBTCOView::openInBBEditor()
 
 
 
-void BBTCOView::resetName()
-{
-	m_bbTCO->setName( m_bbTCO->getTrack()->name() );
-}
+void BBTCOView::resetName() { m_bbTCO->setName(""); }
 
 
 
