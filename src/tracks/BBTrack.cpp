@@ -284,8 +284,6 @@ void BBTCOView::update()
 
 
 
-QColor * BBTrack::s_lastTCOColor = NULL;
-
 BBTrack::BBTrack( TrackContainer* tc ) :
 	Track( Track::BBTrack, tc )
 {
@@ -387,10 +385,6 @@ TrackView * BBTrack::createView( TrackContainerView* tcv )
 TrackContentObject * BBTrack::createTCO( const MidiTime & _pos )
 {
 	BBTCO * bbtco = new BBTCO( this );
-	if( s_lastTCOColor )
-	{
-		bbtco->setColor( *s_lastTCOColor );
-	}
 	return bbtco;
 }
 
