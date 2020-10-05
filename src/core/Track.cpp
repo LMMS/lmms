@@ -1161,7 +1161,7 @@ void TrackContentObjectView::contextMenuEvent( QContextMenuEvent * cme )
 		if( canMergeTCOs )
 		{
 			contextMenu.addAction(
-				embed::getIconPixmap( "edit_cut" ),
+				embed::getIconPixmap( "edit_merge" ),
 				tr("Merge Selection"),
 				[this](){ contextMenuAction( Merge ); } );
 		}
