@@ -59,8 +59,8 @@ TrackView * AutomationTrack::createView( TrackContainerView* tcv )
 
 TrackContentObject * AutomationTrack::createTCO( const MidiTime & _pos )
 {
-	AutomationPattern *p = new AutomationPattern( this );
-	p->movePosition( _pos );
+	AutomationPattern *p = new AutomationPattern(this);
+	p->movePosition(_pos);
 	return p;
 }
 

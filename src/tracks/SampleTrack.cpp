@@ -748,8 +748,8 @@ TrackView * SampleTrack::createView( TrackContainerView* tcv )
 
 TrackContentObject * SampleTrack::createTCO(const MidiTime & _pos)
 {
-	SampleTCO * sTco = new SampleTCO( this );
-	sTco->movePosition( _pos );
+	SampleTCO * sTco = new SampleTCO(this);
+	sTco->movePosition(_pos);
 	return sTco;
 }
 
