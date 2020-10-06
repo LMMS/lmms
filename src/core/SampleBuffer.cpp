@@ -1413,10 +1413,10 @@ void SampleBuffer::setAmplification( float _a )
 
 void SampleBuffer::setReversed( bool _on )
 {
-	m_reversed = _on;
 	Engine::mixer()->requestChangeInModel();
 	m_varLock.lockForWrite();
-	std::reverse(m_data, m_data + m_frames);
+	if (m_reversed != _on) { std::reverse(m_data, m_data + m_frames); }
+	m_reversed = _on;
 	m_varLock.unlock();
 	Engine::mixer()->doneChangeInModel();
 	emit sampleUpdated();
