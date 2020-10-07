@@ -92,14 +92,14 @@ EnvelopeAndLfoParameters::EnvelopeAndLfoParameters(
 	m_used( false ),
     
  
-//  m_predelayModel( val, min, max, incr,  this, tr( ">info<" ) )   
-	m_predelayModel( 0.0, 0.0, 2.0, 0.001, this, tr( "Env pre-delay" ) ),
+	m_predelayModel( val, min, max, incr,  this, tr( ">info<" ) )   
+    m_predelayModel( 0.0, 0.0, 2.0, 0.001, this, tr( "Env pre-delay" ) ),
 	m_attackModel( 0.025, 0.0, 2.0, 0.001, this, tr( "Env attack" ) ),
 	m_holdModel( 0.0, 0.0, 2.0, 0.001,     this, tr( "Env hold" ) ),
 	m_decayModel( 0.6, 0.0, 2.0, 0.001,    this, tr( "Env decay" ) ),
 	m_sustainModel( 0.0, 0.0, 1.0, 0.001,  this, tr( "Env sustain" ) ),
 	m_releaseModel( 0.2, 0.0, 2.0, 0.001,  this, tr( "Env release" ) ),
-	m_amountModel( 1.0, -1.0, 1.0, 0.005,  this, tr( "Env mod amount" ) ), //AMP 
+	m_amountModel( 0.0, -1.0, 1.0, 0.005,  this, tr( "Env mod amount" ) ), //AMP -Must be OFF (0.0) because AFP presets uses a default stub
 	m_valueForZeroAmount( _value_for_zero_amount ),
 	m_pahdFrames( 0 ),
 	m_rFrames( 0 ),
