@@ -471,16 +471,16 @@ TrackView * BBTrack::createView( TrackContainerView* tcv )
 
 
 
-TrackContentObject * BBTrack::createTCO( const MidiTime & _pos )
+TrackContentObject * BBTrack::createTCO(const MidiTime & _pos)
 {
-	BBTCO * bbtco = new BBTCO( this );
-	if( s_lastTCOColor )
+	BBTCO * bbtco = new BBTCO(this);
+	if(s_lastTCOColor)
 	{
-		bbtco->setColor( *s_lastTCOColor );
-		bbtco->setUseStyleColor( false );
+		bbtco->setColor(*s_lastTCOColor);
+		bbtco->setUseStyleColor(false);
 	}
 
-	bbtco->movePosition( _pos );
+	bbtco->movePosition(_pos);
 
 	return bbtco;
 }
