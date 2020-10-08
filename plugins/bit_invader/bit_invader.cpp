@@ -149,7 +149,7 @@ bitInvader::bitInvader( InstrumentTrack * _instrument_track ) :
 	m_graph.setWaveToSine();
 
 	connect( &m_sampleLength, SIGNAL( dataChanged( ) ),
-			this, SLOT( lengthChanged( ) ) );
+			this, SLOT( lengthChanged( ) ), Qt::DirectConnection );
 
 	connect( &m_graph, SIGNAL( samplesChanged( int, int ) ),
 			this, SLOT( samplesChanged( int, int ) ) );
