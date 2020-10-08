@@ -24,6 +24,8 @@ public:
   const std::vector<Dimension> & getDimensions() const;
 
   void addSpectrum(const S &spectrum, std::vector<T> coordinates);
+  //TODO: the order of coordinates might not be consistent!
+  void addSpectra(const std::vector<S> &spectra);
   void addSpectra(const std::vector<S> &spectra, std::vector<std::vector<T>> coordinates);
 
   Interpolator() {}

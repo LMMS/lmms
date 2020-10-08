@@ -36,19 +36,21 @@ public:
   virtual Component<T> operator[](const T frequency) const = 0;
   virtual bool empty() const = 0;
 
-  T getLabel() const
+  std::vector<std::pair<std::string, T>> getLabels() const
   {
-    return label;
+    return labels;
   }
 
   bool operator<(const Spectrum<T> & other) const
   {
-    return label<other.label;
+    if(labels.size()==0) return true;
+    if(other.labels.size()==0) return false;
+    return labels.front().second<other.labels.front().second;
   }
 
-  Spectrum(const T & label) : label(label){}
+  Spectrum(const std::vector<std::pair<std::string, T>> & labels) : labels(labels){}
 
-  T label;
+  std::vector<std::pair<std::string, T>> labels;
 };
 
 template <typename T>
@@ -86,10 +88,11 @@ public:
     return components.empty() && staticComponents.empty();
   }
 
-  NoteSpectrum(const T &label, const std::vector<Component<T>> &components, const std::vector<Component<T>> &staticComponents)
-      :  Spectrum<T>(label), components(components), staticComponents(staticComponents) {}
-
-  NoteSpectrum() : Spectrum<T>(0) {}
+  NoteSpectrum(const std::vector<std::pair<std::string, T>> &labels, const std::vector<Component<T>> &components, const std::vector<Component<T>> &staticComponents)
+      :  Spectrum<T>(labels), components(components), staticComponents(staticComponents) {}
+  NoteSpectrum(const std::vector<Component<T>> &components, const std::vector<Component<T>> &staticComponents)
+      :  Spectrum<T>({}), components(components), staticComponents(staticComponents) {}
+  NoteSpectrum() : Spectrum<T>({}) {}
 
 private:
   std::vector<Component<T>> components;

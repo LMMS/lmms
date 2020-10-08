@@ -126,7 +126,7 @@ NoteSpectrum<T> Diginstrument::Interpolator<T, S>::constructSpectrum(
             res.emplace_back(rightMatchables[unmatched].frequency, 0, rightMatchables[unmatched].amplitude * rightWeight);
         }
     }
-    return Diginstrument::NoteSpectrum<T>(target, res, {});
+    return Diginstrument::NoteSpectrum<T>(res, {});
 }
 
 template <typename T, typename S>
@@ -152,7 +152,8 @@ SplineSpectrum<T, 4> Diginstrument::Interpolator<T, S>::constructSpectrum(
     //TODO: is stretching unmatched the desired behaviour?
     //TODO: TMP: FIXME: we assume that the first match is the fundamental frequency
     //TMP: TODO: FIXME: this "dumb stretching" could potentially cause pieces to overlap, if the shift target is > nextPiece.end or < piece.begin
-    if(matches.size()>0)
+    //TMP:disabled unmatched shifting
+    /*if(matches.size()>0)
     {
         const T leftFF = (target/leftCopy.getMatchables()[matches.front().left].frequency);
         for(const auto & unmatched : unmatchedLeft)
@@ -173,7 +174,7 @@ SplineSpectrum<T, 4> Diginstrument::Interpolator<T, S>::constructSpectrum(
             piece.stretchTo(piece.getBegin(), target);
             nextPiece.stretchTo(target, nextPiece.getEnd());
         }
-    }
+    }*/
     
     //stretch matched peaks to target
     for(auto & match : matches)
@@ -197,6 +198,22 @@ void Diginstrument::Interpolator<T, S>::addSpectrum(const S &spectrum, std::vect
     //TODO:test, check, better
     data.insert(spectrum, coordinates);
 }
+
+template <typename T, class S>
+void Diginstrument::Interpolator<T, S>::addSpectra(const std::vector<S> &spectra)
+{
+    //TODO:test, check, better
+    for(const auto & s : spectra)
+    {
+        vector<T> labels;
+        for(const auto & l : s.getLabels())
+        {
+            labels.push_back(l.second);
+        }
+        data.insert(s, labels);
+    }
+}
+
 
 template <typename T, class S>
 void Diginstrument::Interpolator<T, S>::clear()
@@ -248,8 +265,8 @@ PiecewiseBSpline<T, 4> Diginstrument::Interpolator<T, S>::consolidatePieces(Piec
             const T ratio = (leftPieces.back().getEnd() - rightPieces.back().getBegin()) / (rightPieces.back().getEnd() - rightPieces.back().getBegin());
             auto split = rightPieces.back().getSpline().split(ratio);
             //TMP: TODO: FIXME: BUGHUNT: must adjust splitpoint, as it is inaccurate for some reason (See TODO in BSpline::split)
-            split.first.stretchTo(rightPieces.back().getBegin(), leftPieces.back().getEnd());
-            split.second.stretchTo(leftPieces.back().getEnd(), rightPieces.back().getEnd());
+            //split.first.stretchTo(rightPieces.back().getBegin(), leftPieces.back().getEnd());
+            //split.second.stretchTo(leftPieces.back().getEnd(), rightPieces.back().getEnd());
             //match left with split first
             res.add(mergePieces(leftPieces.back().getSpline(), split.first, rightRatio));
             //remove matched and split pieces
@@ -269,8 +286,8 @@ PiecewiseBSpline<T, 4> Diginstrument::Interpolator<T, S>::consolidatePieces(Piec
             //NOTES: the problem seems to stem from these hugely long pieces, where of course the resolution will be smeared
             //Maybe the CPs dont even need to be equidistant (arc length in paper) and/or dont really need uniform knot vector, if the resolution is high enough?
             //EXPERIMENT results: if the CPs are symmetric and the knotvector uniform, the mapping should be accurate
-            split.first.stretchTo(leftPieces.back().getBegin(), rightPieces.back().getEnd());
-            split.second.stretchTo(rightPieces.back().getEnd(), leftPieces.back().getEnd());
+            //split.first.stretchTo(leftPieces.back().getBegin(), rightPieces.back().getEnd());
+            //split.second.stretchTo(rightPieces.back().getEnd(), leftPieces.back().getEnd());
             //match split first with right
             res.add(mergePieces(split.first, rightPieces.back().getSpline(), rightRatio));
             //remove matched and split pieces

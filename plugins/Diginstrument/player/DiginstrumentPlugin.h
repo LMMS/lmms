@@ -23,6 +23,7 @@
 #include "../common/SplineSpectrum.hpp"
 #include "../common/Spectrum.hpp"
 #include "../common/Dimension.h"
+#include "../common/Instrument.hpp"
 #include <nlohmann/json.hpp>
 #include <iostream>
 #include <QtDataVisualization>
@@ -89,6 +90,8 @@ private:
   Diginstrument::Interpolator<double, Diginstrument::NoteSpectrum<double>> inst;
   std::string fileName;
   InstrumentData inst_data;
+  //TODO: maybe "reroute" spectra so that they wont be duplicated in interpolator and instrument
+  Diginstrument::Instrument<double> instrument;
 
   bool setInstrumentFile(const QString & fileName);
   bool loadInstrumentFile();

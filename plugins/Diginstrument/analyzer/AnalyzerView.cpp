@@ -45,7 +45,7 @@ void AnalyzerView::openAudioFile( void )
 							openAudioFile();
 	if( af != "" )
 	{
-    std::string res = castModel<AnalyzerPlugin>()->setAudioFile( af );
+    std::string res = castModel<AnalyzerPlugin>()->setAudioFile( af , /*TMP:TEST:*/ {make_pair("pitch",440)});
 		//Engine::getSong()->setModified();
 		//m_waveView->updateSampleRange();
 	}

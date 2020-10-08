@@ -52,8 +52,10 @@ QString AnalyzerPlugin::fullDisplayName() const
 }
 
 //TMP
-std::string AnalyzerPlugin::setAudioFile(const QString &_audio_file)
+std::string AnalyzerPlugin::setAudioFile(const QString &_audio_file, vector<pair<string, double>> coordinates)
 {
+	//TMP: keep for visualization
+	spectra.clear();
 	//tmp
 	visualization = new Diginstrument::InstrumentVisualizationWindow(this);
 	std::vector<QVector3D> extremaVisualization;
@@ -152,7 +154,14 @@ std::string AnalyzerPlugin::setAudioFile(const QString &_audio_file)
 		//only add "valid" splines
 		if (spline.getPieces().size() > 0 && spline.getBegin() <= 12 && spline.getEnd() > 21000)
 		{
-			spectra.emplace_back(std::move(spline), (double)i/(double)m_sampleBuffer.sampleRate());
+			//TMP: keep for visualization
+			spectra.emplace_back(spline,std::vector<std::pair<std::string, double>>{std::make_pair("time",(double)i/(double)m_sampleBuffer.sampleRate())});
+			auto coordinatesCopy = coordinates;
+			coordinatesCopy.emplace_back("time",(double)i/(double)m_sampleBuffer.sampleRate());
+			inst.add(SplineSpectrum<double, 4>(
+				std::move(spline),
+				std::move(coordinatesCopy)
+				));
 		}
 		//TMP: rejection statistics
 		else
@@ -167,7 +176,7 @@ std::string AnalyzerPlugin::setAudioFile(const QString &_audio_file)
 	}
 	
 	//tmp: debug
-	if(spectra.size()>0) std::cout<<"rejected splines: "<<rejected<<"/"<<spectra.size()<<" ("<<100*rejected/spectra.size()<<"%)"<<std::endl;
+	//if(spectra.size()>0) std::cout<<"rejected splines: "<<rejected<<"/"<<spectra.size()<<" ("<<100*rejected/spectra.size()<<"%)"<<std::endl;
 	if(rejected>0){
 		std::cout<<"cause: no peaks: "<<noComponents<<"/"<<rejected<<" ("<<100*noComponents/rejected<<"%)"<<std::endl;
 		std::cout<<"cause: empty spline: "<<emptySplines<<"/"<<rejected<<" ("<<100*emptySplines/rejected<<"%)"<<std::endl;
@@ -181,35 +190,42 @@ std::string AnalyzerPlugin::setAudioFile(const QString &_audio_file)
 	visualization->setSurfaceData(data);
 	visualization->show();
 
+	//tmp:
+	inst.dimensions.emplace_back("pitch",20,22000);
+	inst.dimensions.emplace_back("time",0,((double)m_sampleBuffer.frames()/(double)m_sampleBuffer.sampleRate())*1000);
+	writeInstrumentToFile("test2.json");
+
 	return "TODO";
 }
 
-QtDataVisualization::QSurfaceDataArray * AnalyzerPlugin::getSurfaceData(float minTime, float maxTime, float minFreq, float maxFreq, int timeSamples, int freqSamples)
+QtDataVisualization::QSurfaceDataArray * AnalyzerPlugin::getSurfaceData(double minTime, double maxTime, double minFreq, double maxFreq, int timeSamples, int freqSamples)
 {
-	const float stepX = (maxFreq - minFreq) / float(freqSamples - 1);
-    const float stepZ = (maxTime - minTime) / float(timeSamples - 1);
+	const double stepX = (maxFreq - minFreq) / double(freqSamples - 1);
+    const double stepZ = (maxTime - minTime) / double(timeSamples - 1);
 
 	QSurfaceDataArray * data = new QSurfaceDataArray;
 	data->reserve(timeSamples);
 	for(int i = 0; i<timeSamples;i++)
 	{
 		QSurfaceDataRow *dataRow = new QSurfaceDataRow(freqSamples);
-		float z = qMin(maxTime, (i * stepZ + minTime));
+		double z = qMin(maxTime, (i * stepZ + minTime));
 		int index = 0;
-		auto it = std::lower_bound(spectra.begin(), spectra.end(), z);
+		//TODO: new instrument model invalidated this: needs coordinates now
+		auto it = std::lower_bound(spectra.begin(), spectra.end(), SplineSpectrum<double, 4>(std::vector<std::pair<std::string, double>>{std::make_pair("time", z)}));
 		//TMP
 		if(it == spectra.end()) break;
-		const auto spectrum = *it; /*TMP; TODO*/
+		//TMP
+		const auto spectrum = *it;
 		for (int j = 0; j < freqSamples; j++) {
-			float x = qMin(maxFreq, (j * stepX + minFreq));
-			(*dataRow)[index++].setPosition(QVector3D(x, spectrum[x].amplitude, /*z*/ spectrum.getLabel()));
+			double x = qMin(maxFreq, (j * stepX + minFreq));
+			(*dataRow)[index++].setPosition(QVector3D(x, spectrum[x].amplitude, z));
 		}
 		//tmp: identical to discrete
 		for(const auto & c : spectrum.getComponents(0))
 		{
 			//NOTE: BUGHUNT: missing inbetween piece causes segfault
 			if(c.frequency<=minFreq || c.frequency>=maxFreq) continue;
-			(*dataRow)[std::round((c.frequency-minFreq)/((maxFreq-minFreq)/(float)freqSamples))].setPosition(QVector3D(c.frequency,c.amplitude, spectrum.getLabel()));
+			(*dataRow)[std::round((c.frequency-minFreq)/((maxFreq-minFreq)/(double)freqSamples))].setPosition(QVector3D(c.frequency,c.amplitude, z));
 		}
 		
 		*data<<dataRow;
@@ -217,3 +233,15 @@ QtDataVisualization::QSurfaceDataArray * AnalyzerPlugin::getSurfaceData(float mi
 
 	return data;
 }
+
+void AnalyzerPlugin::writeInstrumentToFile(std::string filename)
+{
+	ofstream file(filename);
+	if(file.is_open())
+	{
+		//TMP: pretty printed
+		file<<fixed<<inst.toString(4);
+		file.close();
+	}
+}
+

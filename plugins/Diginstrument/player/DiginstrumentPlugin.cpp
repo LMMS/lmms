@@ -137,15 +137,15 @@ bool DiginstrumentPlugin::loadInstrumentFile()
 		//TODO: label
 		//TODO: separate into loading from file and loading saved
 		//TODO: catch?
-		inst_data._json = json::parse(arr.toStdString());
-		inst_data.name = inst_data._json["name"];
-		inst_data.type = inst_data._json["spectrum_type"];
+		instrument = Diginstrument::Instrument<double>::fromJSON(json::parse(arr.toStdString()));
+		//tmp:
+		spline_inst.addSpectra(instrument.getSpectra());
 		//TODO: better spectrum type separation!
-		inst.clear();
-		spline_inst.clear();
-		std::vector<Diginstrument::Dimension> dimensions;
-		std::vector<string> dimension_labels;
-		for(auto d : inst_data._json["dimensions"])
+		//inst.clear();
+		//spline_inst.clear();
+		//std::vector<Diginstrument::Dimension> dimensions;
+		//std::vector<string> dimension_labels;
+		/*for(auto d : inst_data._json["dimensions"])
 		{
 			if(!d["default"].is_null())
 			{
@@ -156,14 +156,14 @@ bool DiginstrumentPlugin::loadInstrumentFile()
 				dimensions.emplace_back(d["label"],d["min"],d["max"],d["shifting"]);
 			}
 			dimension_labels.emplace_back(d["label"]);
-		}
+		}*/
 		//TODO: better spectrum type separation!
-		inst.setDimensions(dimensions);
-		spline_inst.setDimensions(dimensions);
+		inst.setDimensions(instrument.dimensions);
+		spline_inst.setDimensions(instrument.dimensions);
 		//TODO: actual dynamic loading/parsing
 		//TODO: actually use "coordinates"
 		//TODO: better spline/discrete separation PLEASE!
-		for(auto s : inst_data._json["spectra"])
+		/*for(auto s : inst_data._json["spectra"])
 		{
 			vector<double> spectrum_coordinates;
 			for(string label : dimension_labels)
@@ -207,7 +207,7 @@ bool DiginstrumentPlugin::loadInstrumentFile()
 				spline_inst.addSpectrum(spectrum, spectrum_coordinates);
 			}
 
-		}
+		}*/
 		return true;
 	}
 	else return false;

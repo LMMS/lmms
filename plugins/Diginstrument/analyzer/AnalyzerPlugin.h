@@ -20,6 +20,7 @@
 #include "../common/PiecewiseBSpline.hpp"
 #include "SpectrumFitter.hpp"
 #include "../common/SplineSpectrum.hpp"
+#include "../common/Instrument.hpp"
 #include "PeakApproximation.h"
 #include <string>
 #include <sstream>
@@ -48,15 +49,19 @@ public:
 
   virtual QString fullDisplayName() const;
 
+  void writeInstrumentToFile(std::string filename);
+
 private:
   friend class AnalyzerView;
 
-  std::string setAudioFile(const QString &_audio_file);
-  QtDataVisualization::QSurfaceDataArray * getSurfaceData(float minTime, float maxTime, float minFreq, float maxFreq, int timeSamples, int freqSamples);
+  std::string setAudioFile(const QString &_audio_file, vector<pair<string, double>> coordinates);
+  QtDataVisualization::QSurfaceDataArray * getSurfaceData(double minTime, double maxTime, double minFreq, double maxFreq, int timeSamples, int freqSamples);
 
   typedef SampleBuffer::handleState handleState;
   SampleBuffer m_sampleBuffer;
-  std::vector<SplineSpectrum<double, 4>> spectra;
+  Diginstrument::Instrument<double> inst;
+  //TMP: keep for visualization
+  std::vector<SplineSpectrum<double,4>> spectra;
 
 private slots:
   //void sampleRateChanged();
