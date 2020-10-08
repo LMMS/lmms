@@ -54,6 +54,7 @@ std::vector<Extrema::Differential::CriticalPoint> Diginstrument::PeakApproximati
         it++;
     }
     //check last point
-    if(cps.back().pointType == Extrema::Differential::CriticalPoint::PointType::maximum) res.emplace_back(cps.back());
+    //TODO: FIXME: i dont understand how, but this causes incredible oscillations right after a high peak (sweep, 440)
+    //if(cps.back().pointType == Extrema::Differential::CriticalPoint::PointType::maximum) res.emplace_back(cps.back());
     return res;
 }

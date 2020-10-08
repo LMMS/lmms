@@ -123,7 +123,9 @@ std::string AnalyzerPlugin::setAudioFile(const QString &_audio_file)
 		*data << dataRow;
 
 		//seek critical points with discrete differential, then approximate hidden/overlapping peaks and filter to only include maxima
-		const auto peaks = Diginstrument::PeakApproximation(Extrema::Differential::intermixed(rawSpectrum.begin(), rawSpectrum.end()));
+		//const auto peaks = Diginstrument::PeakApproximation(Extrema::Differential::intermixed(rawSpectrum.begin(), rawSpectrum.end()));
+		//tmp: trying to fix weird interpolation problem, just use maxima for now, as hidden peaks are still primitive
+		const auto peaks = Extrema::Differential::maxima(rawSpectrum.begin(), rawSpectrum.end());
 		//TODO: is this the best place to convert to amp?
 		//after determining peaks, convert magnitude to amplitude
 		for(auto & p : rawSpectrum)
