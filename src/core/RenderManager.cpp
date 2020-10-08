@@ -29,7 +29,6 @@
 #include "Song.h"
 #include "BBTrackContainer.h"
 #include "BBTrack.h"
-#include "stdshims.h"
 
 
 RenderManager::RenderManager(
@@ -140,7 +139,7 @@ void RenderManager::renderProject()
 
 void RenderManager::render(QString outputPath)
 {
-	m_activeRenderer = make_unique<ProjectRenderer>(
+	m_activeRenderer = std::make_unique<ProjectRenderer>(
 			m_qualitySettings,
 			m_outputSettings,
 			m_format,

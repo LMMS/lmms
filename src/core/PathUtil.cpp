@@ -36,7 +36,11 @@ namespace PathUtil
 		return QDir::cleanPath(loc) + "/";
 	}
 
-	QDir baseQDir (const Base base) { return QDir(baseLocation(base)); }
+	QDir baseQDir (const Base base)
+	{
+		if (base == Base::Absolute) { return QDir::root(); }
+		return QDir(baseLocation(base));
+	}
 
 	QString basePrefix(const Base base)
 	{
@@ -123,6 +127,7 @@ namespace PathUtil
 	{
 		if (input.isEmpty()) { return input; }
 		QString absolutePath = toAbsolute(input);
+		if (base == Base::Absolute) { return absolutePath; }
 		QString relativePath = baseQDir(base).relativeFilePath(absolutePath);
 		return relativePath.startsWith("..") ? absolutePath : relativePath;
 	}
