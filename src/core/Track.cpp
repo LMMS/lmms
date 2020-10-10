@@ -184,34 +184,25 @@ bool TrackContentObject::comparePosition(const TrackContentObject *a, const Trac
 
 
 
-/*! \brief Copy this TrackContentObject to the clipboard.
+/*! \brief Copies the state of a TrackContentObject to another TrackContentObject
  *
- *  Copies this track content object to the clipboard.
+ *  This method copies the state of a TCO to another TCO
  */
-void TrackContentObject::copy()
+void TrackContentObject::copyStateTo( TrackContentObject *src, TrackContentObject *dst )
 {
-	Clipboard::copy( this );
-}
+	// If the node names match we copy the state
+	if( src->nodeName() == dst->nodeName() ){
+		QDomDocument doc;
+		QDomElement parent = doc.createElement( "StateCopy" );
+		src->saveState( doc, parent );
 
+		const MidiTime pos = dst->startPosition();
+		dst->restoreState( parent.firstChild().toElement() );
+		dst->movePosition( pos );
 
-
-
-/*! \brief Pastes this TrackContentObject into a track.
- *
- *  Pastes this track content object into a track.
- *
- * \param _je The journal entry to undo
- */
-void TrackContentObject::paste()
-{
-	if( Clipboard::getContent( nodeName() ) != NULL )
-	{
-		const MidiTime pos = startPosition();
-		restoreState( *( Clipboard::getContent( nodeName() ) ) );
-		movePosition( pos );
+		AutomationPattern::resolveAllIDs();
+		GuiApplication::instance()->automationEditor()->m_editor->updateAfterPatternChange();
 	}
-	AutomationPattern::resolveAllIDs();
-	GuiApplication::instance()->automationEditor()->m_editor->updateAfterPatternChange();
 }
 
 
@@ -473,20 +464,6 @@ void TrackContentObjectView::remove()
 	// delete ourself
 	close();
 	m_tco->deleteLater();
-}
-
-
-
-
-/*! \brief Cut this trackContentObjectView from its track to the clipboard.
- *
- *  Perform the 'cut' action of the clipboard - copies the track content
- *  object to the clipboard and then removes it from the track.
- */
-void TrackContentObjectView::cut()
-{
-	m_tco->copy();
-	remove();
 }
 
 
@@ -1239,75 +1216,40 @@ void TrackContentObjectView::remove( QVector<TrackContentObjectView *> tcovs )
 
 void TrackContentObjectView::copy( QVector<TrackContentObjectView *> tcovs )
 {
-	// Checks if there are other selected TCOs and if so copy them as well
-	if( tcovs.size() > 1 )
-	{
-		// Write the TCOs to a DataFile for copying
-		DataFile dataFile = createTCODataFiles( tcovs );
+	// For copyStringPair()
+	using namespace Clipboard;
 
-		// Add the TCO type as a key to the final string
-		QString finalString = QString( "tco_%1:%2" ).arg( m_tco->getTrack()->type() ).arg( dataFile.toString() );
+	// Write the TCOs to a DataFile for copying
+	DataFile dataFile = createTCODataFiles( tcovs );
 
-		// Copy it to the clipboard
-		QMimeData *tco_content = new QMimeData;
-		tco_content->setData( StringPairDrag::mimeType(), finalString.toUtf8() );
-		QApplication::clipboard()->setMimeData( tco_content, QClipboard::Clipboard );
-	}
-	else
-	{
-		tcovs.at(0)->getTrackContentObject()->copy();
-	}
+	// Copy the TCO type as a key and the TCO data file to the clipboard
+	copyStringPair( QString( "tco_%1" ).arg( m_tco->getTrack()->type() ),
+		dataFile.toString() );
 }
 
 void TrackContentObjectView::cut( QVector<TrackContentObjectView *> tcovs )
 {
-	// Checks if there are other selected TCOs and if so cut them as well
-	if( tcovs.size() > 1 )
-	{
-		// Write the TCOs to a DataFile for copying
-		DataFile dataFile = createTCODataFiles( tcovs );
+	// Copy the selected TCOs
+	copy( tcovs );
 
-		// Now that the dataFile is created we can delete the tracks, since we are cutting
-		// TODO: Is it safe to call tcov->remove(); on the current TCOV instance?
-		remove( tcovs );
-
-		// Add the TCO type as a key to the final string
-		QString finalString = QString( "tco_%1:%2" ).arg( m_tco->getTrack()->type() ).arg( dataFile.toString() );
-
-		// Copy it to the clipboard
-		QMimeData *tco_content = new QMimeData;
-		tco_content->setData( StringPairDrag::mimeType(), finalString.toUtf8() );
-		QApplication::clipboard()->setMimeData( tco_content, QClipboard::Clipboard );
-	}
-	else
-	{
-		tcovs.at(0)->cut();
-	}
+	// Now that the TCOs are copied we can delete them, since we are cutting
+	remove( tcovs );
 }
 
 void TrackContentObjectView::paste()
 {
-	// NOTE: Because we give preference to the QApplication clipboard over the LMMS Clipboard class, we need to
-	// clear the QApplication Clipboard during the LMMS Clipboard copy operations (Clipboard::copy does that)
+	// For getMimeData()
+	using namespace Clipboard;
 
-	// If we have TCO data on the clipboard paste it. If not, do our regular TCO paste.
-	if( QApplication::clipboard()->mimeData( QClipboard::Clipboard )->hasFormat( StringPairDrag::mimeType() ) )
+	// If possible, paste the selection on the MidiTime of the selected Track and remove it
+	MidiTime tcoPos = MidiTime( m_tco->startPosition() );
+
+	TrackContentWidget *tcw = getTrackView()->getTrackContentWidget();
+
+	if( tcw->pasteSelection( tcoPos, getMimeData() ) )
 	{
-		// Paste the selection on the MidiTime of the selected Track
-		const QMimeData *md = QApplication::clipboard()->mimeData( QClipboard::Clipboard );
-		MidiTime tcoPos = MidiTime( m_tco->startPosition() );
-
-		TrackContentWidget *tcw = getTrackView()->getTrackContentWidget();
-
-		if( tcw->pasteSelection( tcoPos, md ) == true )
-		{
-			// If we succeed on the paste we delete the TCO we pasted on
-			remove();
-		}
-	}
-	else
-	{
-		getTrackContentObject()->paste();
+		// If we succeed on the paste we delete the TCO we pasted on
+		remove();
 	}
 }
 
@@ -1705,9 +1647,12 @@ bool TrackContentWidget::canPasteSelection( MidiTime tcoPos, const QDropEvent* d
 // Overloaded method to make it possible to call this method without a Drag&Drop event
 bool TrackContentWidget::canPasteSelection( MidiTime tcoPos, const QMimeData* md , bool allowSameBar )
 {
+	// For decodeKey() and decodeValue()
+	using namespace Clipboard;
+
 	Track * t = getTrack();
-	QString type = StringPairDrag::decodeMimeKey( md );
-	QString value = StringPairDrag::decodeMimeValue( md );
+	QString type = decodeKey( md );
+	QString value = decodeValue( md );
 
 	// We can only paste into tracks of the same type
 	if( type != ( "tco_" + QString::number( t->type() ) ) ||
@@ -1791,14 +1736,17 @@ bool TrackContentWidget::pasteSelection( MidiTime tcoPos, QDropEvent * de )
 // Overloaded method so we can call it without a Drag&Drop event
 bool TrackContentWidget::pasteSelection( MidiTime tcoPos, const QMimeData * md, bool skipSafetyCheck )
 {
+	// For decodeKey() and decodeValue()
+	using namespace Clipboard;
+
 	// When canPasteSelection was already called before, skipSafetyCheck will skip this
 	if( !skipSafetyCheck && canPasteSelection( tcoPos, md ) == false )
 	{
 		return false;
 	}
 
-	QString type = StringPairDrag::decodeMimeKey( md );
-	QString value = StringPairDrag::decodeMimeValue( md );
+	QString type = decodeKey( md );
+	QString value = decodeValue( md );
 
 	getTrack()->addJournalCheckPoint();
 
@@ -1985,6 +1933,9 @@ MidiTime TrackContentWidget::endPosition( const MidiTime & posStart )
 
 void TrackContentWidget::contextMenuEvent( QContextMenuEvent * cme )
 {
+	// For hasFormat(), MimeType enum class and getMimeData()
+	using namespace Clipboard;
+
 	if( cme->modifiers() )
 	{
 		return;
@@ -1992,8 +1943,7 @@ void TrackContentWidget::contextMenuEvent( QContextMenuEvent * cme )
 
 	// If we don't have TCO data in the clipboard there's no need to create this menu
 	// since "paste" is the only action at the moment.
-	const QMimeData *md = QApplication::clipboard()->mimeData( QClipboard::Clipboard );
-	if( !md->hasFormat( StringPairDrag::mimeType() )  )
+	if( ! hasFormat( MimeType::StringPair )  )
 	{
 		return;
 	}
@@ -2002,21 +1952,23 @@ void TrackContentWidget::contextMenuEvent( QContextMenuEvent * cme )
 	QAction *pasteA = contextMenu.addAction( embed::getIconPixmap( "edit_paste" ),
 					tr( "Paste" ), [this, cme](){ contextMenuAction( cme, Paste ); } );
 	// If we can't paste in the current TCW for some reason, disable the action so the user knows
-	pasteA->setEnabled( canPasteSelection( getPosition( cme->x() ), md ) ? true : false );
+	pasteA->setEnabled( canPasteSelection( getPosition( cme->x() ), getMimeData() ) ? true : false );
 
 	contextMenu.exec( QCursor::pos() );
 }
 
 void TrackContentWidget::contextMenuAction( QContextMenuEvent * cme, ContextMenuAction action )
 {
+	// For getMimeData()
+	using namespace Clipboard;
+
 	switch( action )
 	{
 		case Paste:
 		// Paste the selection on the MidiTime of the context menu event
-		const QMimeData *md = QApplication::clipboard()->mimeData( QClipboard::Clipboard );
 		MidiTime tcoPos = getPosition( cme->x() );
 
-		pasteSelection( tcoPos, md );
+		pasteSelection( tcoPos, getMimeData() );
 		break;
 	}
 }
