@@ -155,9 +155,10 @@ public:
 	MidiTime startTimeOffset() const;
 	void setStartTimeOffset( const MidiTime &startTimeOffset );
 
+	// Will copy the state of a TCO to another TCO
+	static void copyStateTo( TrackContentObject *src, TrackContentObject *dst );
+
 public slots:
-	void copy();
-	void paste();
 	void toggleMute();
 
 
@@ -266,7 +267,6 @@ public:
 
 public slots:
 	virtual bool close();
-	void cut();
 	void remove();
 	void update() override;
 
