@@ -1324,6 +1324,10 @@ void TrackContentObjectView::mergeTCOs( QVector<TrackContentObjectView *> tcovs 
 		return;
 	}
 
+	// For Undo/Redo
+	track->addJournalCheckPoint();
+	track->saveJournallingState( false );
+
 	// Find the earliest position of all the selected TCOVs
 	MidiTime earliestPos = tcovs.at(0)->getTrackContentObject()->startPosition();
 	MidiTime currentPos = earliestPos;
@@ -1345,6 +1349,7 @@ void TrackContentObjectView::mergeTCOs( QVector<TrackContentObjectView *> tcovs 
 		return;
 	}
 
+	newPattern->saveJournallingState( false );
 	newPattern->movePosition( earliestPos ); // TODO: Won't be necessary once #5699 is merged!
 
 	// Add the notes and remove the TCOs that are being merged
@@ -1369,14 +1374,23 @@ void TrackContentObjectView::mergeTCOs( QVector<TrackContentObjectView *> tcovs 
 			newNote->setPos( originalNotePos + ( pViewPos - earliestPos ) );
 		}
 
+		// We disable the journalling system before removing, so the
+		// removal doesn't get added to the undo/redo history
+		tcov->getTrackContentObject()->saveJournallingState( false );
 		// No need to check for nullptr because we check while building the tcovs QVector
 		tcov->remove();
+		// TODO: Is it a good idea to restore the journalling state after remove()
+		// or is the next line completely unnecessary?
+		tcov->getTrackContentObject()->restoreJournallingState();
 	}
 
 	// Update length since we might have moved notes beyond the end of the pattern length
 	newPattern->updateLength();
 	// Rearrange notes because we might have moved them
 	newPattern->rearrangeAllNotes();
+	// Restore journalling states now that the operation is finished
+	track->restoreJournallingState();
+	newPattern->restoreJournallingState();
 	// Update engine
 	Engine::getSong()->setModified();
 	gui->songEditor()->update();
