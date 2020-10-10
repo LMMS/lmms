@@ -33,7 +33,6 @@ class DiginstrumentView : public InstrumentView
     QPushButton * m_openInstrumentFileButton;
     QPushButton * m_openInstrumentVisualizationButton;
     QLineEdit * m_nameField;
-    QLineEdit * m_typeField;
     std::vector<LabeledFieldSlider*> coordinateSliders;
     QWidget * coordinateSliderContainer;
     

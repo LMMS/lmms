@@ -15,15 +15,12 @@ DiginstrumentView::DiginstrumentView( Instrument * _instrument, QWidget * _paren
             this, SLOT( showInstumentVisualization() ) );
     m_nameField = new QLineEdit("Name", this);
     m_nameField->setReadOnly(true);
-    m_typeField = new QLineEdit("Spectrum type", this);
-    m_typeField->setReadOnly(true);
 
     QWidget * infoContainer = new QWidget;
     infoContainer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
     QGridLayout * infoLayout = new QGridLayout;
     infoContainer->setLayout(infoLayout);
     infoLayout->addWidget(m_nameField, 0, 0, 1, 1);
-    infoLayout->addWidget(m_typeField, 1, 0, 1, 1);
     infoLayout->addWidget(m_openInstrumentFileButton, 0, 1, 1, 2);
     infoLayout->addWidget(m_openInstrumentVisualizationButton, 1, 1, 1, 2);
 
@@ -50,8 +47,7 @@ void DiginstrumentView::modelChanged( void ){
     //tmp
     if(castModel<DiginstrumentPlugin>()->fileName != "")
     {
-      m_nameField->setText(castModel<DiginstrumentPlugin>()->inst_data.name.c_str());
-      m_typeField->setText(castModel<DiginstrumentPlugin>()->inst_data.type.c_str());
+      m_nameField->setText(castModel<DiginstrumentPlugin>()->instrument.name.c_str());
     }
 }
 
@@ -72,16 +68,9 @@ void DiginstrumentView::openInstrumentFile( void )
 void DiginstrumentView::showInstumentVisualization()
 {
   //TODO: defaults/saving
-  //TODO: TMP: better spectrum type distinction!!!
-  
-  if(castModel<DiginstrumentPlugin>()->inst_data.type == "discrete")
-  {
-    visualization->setDimensions(castModel<DiginstrumentPlugin>()->inst.getDimensions());
-  }
-  if(castModel<DiginstrumentPlugin>()->inst_data.type == "spline")
-  {
-    visualization->setDimensions(castModel<DiginstrumentPlugin>()->spline_inst.getDimensions());
-  }
+  //TODO: this may not properly give the dimensions!
+  visualization->setDimensions(castModel<DiginstrumentPlugin>()->instrument.dimensions);
+
   updateVisualizationData(0,3000,20,22000,100,100, /*TODO: Default values TMP*/ {400});
   visualization->show();
   //is this even useful?
@@ -95,7 +84,8 @@ void DiginstrumentView::updateVisualizationData(float minTime, float maxTime, fl
 
 void DiginstrumentView::setDimensions()
 {
-  const auto dimensions = castModel<DiginstrumentPlugin>()->inst.getDimensions();
+  //TODO: this may not properly give the dimensions!
+  const auto dimensions = castModel<DiginstrumentPlugin>()->instrument.dimensions;
   for(auto * s : coordinateSliders)
   {
       delete s;
