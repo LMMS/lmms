@@ -113,12 +113,14 @@ std::string AnalyzerPlugin::setAudioFile(const QString &_audio_file, vector<pair
 			const double mag = (re*re + im*im);
 			//const double phase = atan2(im, re);
 			//tmp: to reduce oscillations in tiny peaks, set magnitude treshold
+			//tmp: magnitude spectrogram
 			if(mag>0.01){rawSpectrum.emplace_back(std::vector<double>{frequency, mag}); }
 			else{ rawSpectrum.emplace_back(std::vector<double>{frequency, 0}); }
 			//tmp: amp
-			const double amp = (sqrt( (frequency * mag) / (double)m_sampleBuffer.sampleRate()));
+			//const double amp = (sqrt( (frequency * mag) / (double)m_sampleBuffer.sampleRate()));
 			//tmp: raw output
-			(*dataRow)[index].setPosition(QVector3D(frequency,amp /*TMP*/, (double)i/(double)m_sampleBuffer.sampleRate()));
+			///tmp: magnitude spectrogram
+			(*dataRow)[index].setPosition(QVector3D(frequency,mag /*TMP amp*/, (double)i/(double)m_sampleBuffer.sampleRate()));
 			index++;
 		}
 
@@ -130,13 +132,16 @@ std::string AnalyzerPlugin::setAudioFile(const QString &_audio_file, vector<pair
 		const auto peaks = Extrema::Differential::maxima(rawSpectrum.begin(), rawSpectrum.end());
 		//TODO: is this the best place to convert to amp?
 		//after determining peaks, convert magnitude to amplitude
-		for(auto & p : rawSpectrum)
+		//TMP: magnitude spectrogram
+		//TMP: fit to magnitude!
+		/*for(auto & p : rawSpectrum)
 		{
 			p[1] = (sqrt( (p[0] * p[1]) / (double)m_sampleBuffer.sampleRate()));
-		}
+		}*/
 		//tmp: visualize peaks
 		for (auto p : peaks)
 		{
+			cout<<p.x<<endl;
 			const auto Y = Interpolation::CubicLagrange(rawSpectrum[p.index-1][0], rawSpectrum[p.index-1][1], rawSpectrum[p.index][0], rawSpectrum[p.index][1], rawSpectrum[p.index+1][0], rawSpectrum[p.index+1][1], rawSpectrum[p.index+2][0], rawSpectrum[p.index+2][1], p.x);
 			if(p.pointType==Extrema::Differential::CriticalPoint::PointType::maximum)
 			{

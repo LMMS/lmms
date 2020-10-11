@@ -30,6 +30,8 @@ std::vector<float> Diginstrument::Synthesizer::playNote(std::vector<Diginstrumen
             continue;
 
         const unsigned int step = std::round(component.frequency * ((double)sinetable.size() / (double)sampleRate));
+        //tmp: magnitude spectrogram: moved conversion from magnitude to amplitude here
+        component.amplitude = sqrt( (component.frequency * component.amplitude) / (double)sampleRate);
 
         for (int i = 0; i < frames; i++)
         {

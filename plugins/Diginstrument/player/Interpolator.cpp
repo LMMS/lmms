@@ -241,6 +241,8 @@ const std::vector<Dimension> & Diginstrument::Interpolator<T, S>::getDimensions(
 template <typename T, typename S>
 PiecewiseBSpline<T, 4> Diginstrument::Interpolator<T, S>::consolidatePieces(PiecewiseBSpline<T, 4> &left, PiecewiseBSpline<T, 4> &right, T rightRatio)
 {
+    //TMP: TODO: max distance of ends
+    const T maxDistance = 0.01;
     //TODO: padding
     //TODO: FIXME: if we have a very short piece, splitting it could result in a ratio of 0
     PiecewiseBSpline<T, 4> res;
@@ -252,7 +254,7 @@ PiecewiseBSpline<T, 4> Diginstrument::Interpolator<T, S>::consolidatePieces(Piec
     while (!leftPieces.empty() && !rightPieces.empty())
     {
         //matched pieces
-        if(leftPieces.back().getEnd() == rightPieces.back().getEnd())
+        if( abs(leftPieces.back().getEnd() - rightPieces.back().getEnd()) <= maxDistance )
         {
             res.add(mergePieces(leftPieces.back().getSpline(), rightPieces.back().getSpline(), rightRatio));
             leftPieces.pop_back();
@@ -265,8 +267,8 @@ PiecewiseBSpline<T, 4> Diginstrument::Interpolator<T, S>::consolidatePieces(Piec
             const T ratio = (leftPieces.back().getEnd() - rightPieces.back().getBegin()) / (rightPieces.back().getEnd() - rightPieces.back().getBegin());
             auto split = rightPieces.back().getSpline().split(ratio);
             //TMP: TODO: FIXME: BUGHUNT: must adjust splitpoint, as it is inaccurate for some reason (See TODO in BSpline::split)
-            //split.first.stretchTo(rightPieces.back().getBegin(), leftPieces.back().getEnd());
-            //split.second.stretchTo(leftPieces.back().getEnd(), rightPieces.back().getEnd());
+            split.first.stretchTo(rightPieces.back().getBegin(), leftPieces.back().getEnd());
+            split.second.stretchTo(leftPieces.back().getEnd(), rightPieces.back().getEnd());
             //match left with split first
             res.add(mergePieces(leftPieces.back().getSpline(), split.first, rightRatio));
             //remove matched and split pieces
@@ -286,8 +288,8 @@ PiecewiseBSpline<T, 4> Diginstrument::Interpolator<T, S>::consolidatePieces(Piec
             //NOTES: the problem seems to stem from these hugely long pieces, where of course the resolution will be smeared
             //Maybe the CPs dont even need to be equidistant (arc length in paper) and/or dont really need uniform knot vector, if the resolution is high enough?
             //EXPERIMENT results: if the CPs are symmetric and the knotvector uniform, the mapping should be accurate
-            //split.first.stretchTo(leftPieces.back().getBegin(), rightPieces.back().getEnd());
-            //split.second.stretchTo(rightPieces.back().getEnd(), leftPieces.back().getEnd());
+            split.first.stretchTo(leftPieces.back().getBegin(), rightPieces.back().getEnd());
+            split.second.stretchTo(rightPieces.back().getEnd(), leftPieces.back().getEnd());
             //match split first with right
             res.add(mergePieces(split.first, rightPieces.back().getSpline(), rightRatio));
             //remove matched and split pieces

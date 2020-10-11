@@ -79,7 +79,8 @@ Diginstrument::InstrumentVisualizationWindow::InstrumentVisualizationWindow(QObj
     //tmp: graph style
     graph->axisX()->setRange(20, 22000);
     graph->axisX()->setFormatter(new QLogValue3DAxisFormatter);
-    graph->axisY()->setRange(0, 1.2);
+    //tmp: magnitude spectrogram
+    //graph->axisY()->setRange(0, 1.2);
     graph->axisZ()->setRange(0, 3);
     graph->setAspectRatio(1.0);
     graph->setHorizontalAspectRatio(1.0);
