@@ -23,8 +23,7 @@ std::vector<float> Diginstrument::Synthesizer::playNote(std::vector<Diginstrumen
     //ordering banks by amplitude can be a problem, if amps change close to eachother
     std::sort(components.begin(), components.end(), Component<double>::sortByAmplitudeDescending);
     for(auto & component : components)
-    {//tmp
-        //std::cout<<component.frequency<<" "<<component.amplitude<<std::endl;
+    {
         //tmp
         if (component.amplitude < 0.001)
             continue;

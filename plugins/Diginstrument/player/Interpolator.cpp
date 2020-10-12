@@ -153,6 +153,9 @@ SplineSpectrum<T, 4> Diginstrument::Interpolator<T, S>::constructSpectrum(
     //TODO: TMP: FIXME: we assume that the first match is the fundamental frequency
     //TMP: TODO: FIXME: this "dumb stretching" could potentially cause pieces to overlap, if the shift target is > nextPiece.end or < piece.begin
     //TMP:disabled unmatched shifting
+    //TODO: bughunt: this made the spline version of 440 die, because it shifted a low component even lower, causing the dumb stretching to have a end(0.07)<begin(10) schenario
+    //TODO: consider if shifting unmatched components is even desireable.
+    //      -> when can we get unmatched?
     /*if(matches.size()>0)
     {
         const T leftFF = (target/leftCopy.getMatchables()[matches.front().left].frequency);

@@ -141,7 +141,6 @@ std::string AnalyzerPlugin::setAudioFile(const QString &_audio_file, vector<pair
 		//tmp: visualize peaks
 		for (auto p : peaks)
 		{
-			cout<<p.x<<endl;
 			const auto Y = Interpolation::CubicLagrange(rawSpectrum[p.index-1][0], rawSpectrum[p.index-1][1], rawSpectrum[p.index][0], rawSpectrum[p.index][1], rawSpectrum[p.index+1][0], rawSpectrum[p.index+1][1], rawSpectrum[p.index+2][0], rawSpectrum[p.index+2][1], p.x);
 			if(p.pointType==Extrema::Differential::CriticalPoint::PointType::maximum)
 			{
@@ -179,6 +178,10 @@ std::string AnalyzerPlugin::setAudioFile(const QString &_audio_file, vector<pair
 			rejected++;
 		}
 	}
+	//tmp: add an empty spline at the end for silence
+	auto coordinatesCopy = coordinates;
+	coordinatesCopy.emplace_back("time",((double)m_sampleBuffer.frames()/(double)m_sampleBuffer.sampleRate()));
+	inst.add(SplineSpectrum<double, 4>(PiecewiseBSpline<double, 4>(),coordinatesCopy));
 	
 	//tmp: debug
 	//if(spectra.size()>0) std::cout<<"rejected splines: "<<rejected<<"/"<<spectra.size()<<" ("<<100*rejected/spectra.size()<<"%)"<<std::endl;
