@@ -471,7 +471,7 @@ TrackView * BBTrack::createView( TrackContainerView* tcv )
 
 
 
-TrackContentObject * BBTrack::createTCO(const MidiTime & _pos)
+TrackContentObject * BBTrack::createTCO(const MidiTime & pos)
 {
 	BBTCO * bbtco = new BBTCO(this);
 	if(s_lastTCOColor)
@@ -480,7 +480,7 @@ TrackContentObject * BBTrack::createTCO(const MidiTime & _pos)
 		bbtco->setUseStyleColor(false);
 	}
 
-	bbtco->movePosition(_pos);
+	bbtco->movePosition(pos);
 
 	return bbtco;
 }
