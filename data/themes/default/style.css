@@ -61,8 +61,6 @@ QLineEdit {
 	border-radius: 4px;
 	border: 1px;
 	background: #101213;
-	color: #d1d8e4;
-	selection-background-color: #17793b;
 }
 
 QLineEdit:read-only {
@@ -76,9 +74,11 @@ QLineEdit:focus {
 	border: 1px solid #0bd556;
 }
 
-/* SpinBoxes used in QInputDialogs */
+/* Set color and selection background color for various inputs.
+   SpinBoxes are used in QInputDialogs */
 
-QDoubleSpinBox, QSpinBox{
+QTextEdit, QLineEdit, QComboBox, QSpinBox, QDoubleSpinBox {
+	color: #d1d8e4;
 	selection-background-color: #17793b;
 }
 
