@@ -44,6 +44,7 @@
 #include "Song.h"
 #include "StringPairDrag.h"
 #include "ToolTip.h"
+#include "Clipboard.h"
 
 #include "embed.h"
 #include "plugin_export.h"
@@ -87,17 +88,17 @@ audioFileProcessor::audioFileProcessor( InstrumentTrack * _instrument_track ) :
 	m_nextPlayBackwards( false )
 {
 	connect( &m_reverseModel, SIGNAL( dataChanged() ),
-				this, SLOT( reverseModelChanged() ) );
+				this, SLOT( reverseModelChanged() ), Qt::DirectConnection );
 	connect( &m_ampModel, SIGNAL( dataChanged() ),
-				this, SLOT( ampModelChanged() ) );
+				this, SLOT( ampModelChanged() ), Qt::DirectConnection );
 	connect( &m_startPointModel, SIGNAL( dataChanged() ),
-				this, SLOT( startPointChanged() ) );
+				this, SLOT( startPointChanged() ), Qt::DirectConnection );
 	connect( &m_endPointModel, SIGNAL( dataChanged() ),
-				this, SLOT( endPointChanged() ) );
+				this, SLOT( endPointChanged() ), Qt::DirectConnection );
 	connect( &m_loopPointModel, SIGNAL( dataChanged() ),
-				this, SLOT( loopPointChanged() ) );
+				this, SLOT( loopPointChanged() ), Qt::DirectConnection );
 	connect( &m_stutterModel, SIGNAL( dataChanged() ),
-	    		this, SLOT( stutterModelChanged() ) );
+				this, SLOT( stutterModelChanged() ), Qt::DirectConnection );
 
 //interpolation modes
 	m_interpolationModel.addItem( tr( "None" ) );
@@ -568,10 +569,13 @@ AudioFileProcessorView::~AudioFileProcessorView()
 
 void AudioFileProcessorView::dragEnterEvent( QDragEnterEvent * _dee )
 {
-	if( _dee->mimeData()->hasFormat( StringPairDrag::mimeType() ) )
+	// For mimeType() and MimeType enum class
+	using namespace Clipboard;
+
+	if( _dee->mimeData()->hasFormat( mimeType( MimeType::StringPair ) ) )
 	{
 		QString txt = _dee->mimeData()->data(
-						StringPairDrag::mimeType() );
+						mimeType( MimeType::StringPair ) );
 		if( txt.section( ':', 0, 0 ) == QString( "tco_%1" ).arg(
 							Track::SampleTrack ) )
 		{
