@@ -528,7 +528,7 @@ void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 					( it+1==time_map.end() ||
 						pos_ticks <= (it+1).key() ) &&
 		( pos_ticks<= it.key() + MidiTime::ticksPerBar() *4 / m_ppb ) &&
-		( level == it.value() || mouseEvent->button() == Qt::RightButton ) )
+		( level == it.value().getValue() || mouseEvent->button() == Qt::RightButton ) )
 				{
 					break;
 				}
@@ -807,7 +807,7 @@ void AutomationEditor::mouseMoveEvent(QMouseEvent * mouseEvent )
 				if( pos_ticks >= it.key() &&
 					( it+1==time_map.end() ||
 						pos_ticks <= (it+1).key() ) &&
-							level <= it.value() )
+							level <= it.value().getValue() )
 				{
 					break;
 				}
@@ -996,9 +996,9 @@ void AutomationEditor::mouseMoveEvent(QMouseEvent * mouseEvent )
 				}
 				new_selValuesForMove[
 					m_pattern->putValue( new_value_pos,
-						it.value () + level_diff,
+						it.value().getValue() + level_diff,
 									false )]
-						= it.value() + level_diff;
+						= it.value().getValue() + level_diff;
 			}
 			m_selValuesForMove = new_selValuesForMove;
 
@@ -1122,7 +1122,7 @@ inline void AutomationEditor::drawCross( QPainter & p )
 inline void AutomationEditor::drawAutomationPoint( QPainter & p, timeMap::iterator it )
 {
 	int x = xCoordOfTick( it.key() );
-	int y = yCoordOfLevel( it.value() );
+	int y = yCoordOfLevel( it.value().getValue() );
 	const int outerRadius = qBound( 3, ( m_ppb * AutomationPattern::quantization() ) / 576, 5 ); // man, getting this calculation right took forever
 	p.setPen( QPen( vertexColor().lighter( 200 ) ) );
 	p.setBrush( QBrush( vertexColor() ) );
@@ -1390,8 +1390,8 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 						is_selected = true;
 					}
 				}
-				else if( it.value() >= selLevel_start &&
-					it.value() <= selLevel_end &&
+				else if( it.value().getValue() >= selLevel_start &&
+					it.value().getValue() <= selLevel_end &&
 					it.key() >= sel_pos_start &&
 					it.key() + len_ticks <= sel_pos_end )
 				{
@@ -1403,11 +1403,11 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 				float nextValue;
 				if( m_pattern->progressionType() == AutomationPattern::DiscreteProgression )
 				{
-					nextValue = it.value();
+					nextValue = it.value().getValue();
 				}
 				else
 				{
-					nextValue = ( it + 1 ).value();
+					nextValue = ( it + 1 ).value().getValue();
 				}
 
 				p.setRenderHints( QPainter::Antialiasing, true );
@@ -1438,7 +1438,7 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 				// TODO: Find out if the section after the last control
 				// point is able to be selected and if so set this
 				// boolean correctly
-				drawLevelTick( p, i, it.value()); ////NEEDS Change in CSS:, false );
+				drawLevelTick( p, i, it.value().getValue()); ////NEEDS Change in CSS:, false );
 			}
 			// Draw circle(the last one)
 			drawAutomationPoint(p, it);
@@ -1622,7 +1622,7 @@ void AutomationEditor::centerTopBottomScroll()
 		{
 			// set the position to the inverted value ((max + min) - value)
 			// If we set just (max - value), we're off by m_pattern's minimum
-			pos = m_pattern->getMax() + m_pattern->getMin() - static_cast<int>(time_map.begin().value());
+			pos = m_pattern->getMax() + m_pattern->getMin() - static_cast<int>(time_map.begin().value().getValue());
 		}
 	}
 	m_topBottomScroll->setValue(pos);
@@ -1940,12 +1940,12 @@ void AutomationEditor::selectAll()
 	timeMap::iterator it = time_map.begin();
 	m_selectStartTick = 0;
 	m_selectedTick = m_pattern->length();
-	m_selectStartLevel = it.value();
+	m_selectStartLevel = it.value().getValue();
 	m_selectedLevels = 1;
 
 	while( ++it != time_map.end() )
 	{
-		const float level = it.value();
+		const float level = it.value().getValue();
 		if( level < m_selectStartLevel )
 		{
 			// if we move start-level down, we have to add
@@ -1996,7 +1996,7 @@ void AutomationEditor::getSelectedValues( timeMap & selected_values )
 		//TODO: Add constant
 		tick_t len_ticks = MidiTime::ticksPerBar() / 16;
 
-		float level = it.value();
+		float level = it.value().getValue();
 		tick_t pos_ticks = it.key();
 
 		if( level >= selLevel_start && level <= selLevel_end &&
@@ -2023,7 +2023,7 @@ void AutomationEditor::copySelectedValues()
 		for( timeMap::iterator it = selected_values.begin();
 			it != selected_values.end(); ++it )
 		{
-			m_valuesToCopy[it.key()] = it.value();
+			m_valuesToCopy[it.key()] = AutomationNode( it.value().getValue() ) ;
 		}
 		TextFloat::displayMessage( tr( "Values copied" ),
 				tr( "All selected values were copied to the "
@@ -2056,7 +2056,7 @@ void AutomationEditor::cutSelectedValues()
 		for( timeMap::iterator it = selected_values.begin();
 					it != selected_values.end(); ++it )
 		{
-			m_valuesToCopy[it.key()] = it.value();
+			m_valuesToCopy[it.key()] = AutomationNode( it.value().getValue() );
 			m_pattern->removeValue( it.key() );
 		}
 	}
@@ -2078,7 +2078,7 @@ void AutomationEditor::pasteValues()
 					it != m_valuesToCopy.end(); ++it )
 		{
 			m_pattern->putValue( it.key() + m_currentPosition,
-								it.value() );
+								it.value().getValue() );
 		}
 
 		// we only have to do the following lines if we pasted at

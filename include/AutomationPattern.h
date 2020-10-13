@@ -38,6 +38,43 @@ class MidiTime;
 
 
 
+class AutomationNode
+{
+public:
+	AutomationNode();
+	AutomationNode( float value );
+
+	inline float getValue()
+	{
+		return m_value;
+	}
+	inline const float getValue() const
+	{
+		return m_value;
+	}
+	inline void setValue( float value )
+	{
+		m_value = value;
+	}
+
+	inline float getTangent()
+	{
+		return m_tangent;
+	}
+	inline const float getTangent() const
+	{
+		return m_tangent;
+	}
+	inline void setTangent( float tangent )
+	{
+		m_tangent = tangent;
+	}
+
+private:
+	float m_value;
+	float m_tangent; // slope at each point for calculating spline
+} ;
+
 class LMMS_EXPORT AutomationPattern : public TrackContentObject
 {
 	Q_OBJECT
@@ -49,7 +86,7 @@ public:
 		CubicHermiteProgression
 	} ;
 
-	typedef QMap<int, float> timeMap;
+	typedef QMap<int, AutomationNode> timeMap;
 	typedef QVector<QPointer<AutomatableModel> > objectVector;
 
 	AutomationPattern( AutomationTrack * _auto_track );
@@ -109,16 +146,6 @@ public:
 		return m_timeMap;
 	}
 
-	inline const timeMap & getTangents() const
-	{
-		return m_tangents;
-	}
-
-	inline timeMap & getTangents()
-	{
-		return m_tangents;
-	}
-
 	inline float getMin() const
 	{
 		return firstObject()->minValue<float>();
@@ -170,7 +197,7 @@ public slots:
 private:
 	void cleanObjects();
 	void generateTangents();
-	void generateTangents( timeMap::const_iterator it, int numToGenerate );
+	void generateTangents( timeMap::iterator it, int numToGenerate );
 	float valueAt( timeMap::const_iterator v, int offset ) const;
 
 	AutomationTrack * m_autoTrack;
@@ -178,7 +205,6 @@ private:
 	objectVector m_objects;
 	timeMap m_timeMap;	// actual values
 	timeMap m_oldTimeMap;	// old values for storing the values before setDragValue() is called.
-	timeMap m_tangents;	// slope at each point for calculating spline
 	float m_tension;
 	bool m_hasAutomation;
 	ProgressionTypes m_progressionType;

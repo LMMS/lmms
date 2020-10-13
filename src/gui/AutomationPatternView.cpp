@@ -317,11 +317,11 @@ void AutomationPatternView::paintEvent( QPaintEvent * )
 			if( x1 > ( width() - TCO_BORDER_WIDTH ) ) break;
 			if( gradient() )
 			{
-				p.fillRect( QRectF( x1, 0.0f, x2 - x1, it.value() ), lin2grad );
+				p.fillRect( QRectF( x1, 0.0f, x2 - x1, it.value().getValue() ), lin2grad );
 			}
 			else
 			{
-				p.fillRect( QRectF( x1, 0.0f, x2 - x1, it.value() ), col );
+				p.fillRect( QRectF( x1, 0.0f, x2 - x1, it.value().getValue() ), col );
 			}
 			break;
 		}
@@ -331,11 +331,11 @@ void AutomationPatternView::paintEvent( QPaintEvent * )
 		float nextValue;
 		if( m_pat->progressionType() == AutomationPattern::DiscreteProgression )
 		{
-			nextValue = it.value();
+			nextValue = it.value().getValue();
 		}
 		else
 		{
-			nextValue = ( it + 1 ).value();
+			nextValue = ( it + 1 ).value().getValue();
 		}
 
 		QPainterPath path;
@@ -483,15 +483,15 @@ void AutomationPatternView::scaleTimemapToFit( float oldMin, float oldMax )
 	for( AutomationPattern::timeMap::iterator it = m_pat->m_timeMap.begin();
 		it != m_pat->m_timeMap.end(); ++it )
 	{
-		if( *it < oldMin )
+		if( it.value().getValue() < oldMin )
 		{
-			*it = oldMin;
+			it.value().setValue( oldMin );
 		}
-		else if( *it > oldMax )
+		else if( it.value().getValue() > oldMax )
 		{
-			*it = oldMax;
+			it.value().setValue( oldMax );
 		}
-		*it = (*it-oldMin)*(newMax-newMin)/(oldMax-oldMin)+newMin;
+		it.value().setValue( (it.value().getValue()-oldMin)*(newMax-newMin)/(oldMax-oldMin)+newMin );
 	}
 
 	m_pat->generateTangents();

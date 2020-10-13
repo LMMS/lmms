@@ -57,8 +57,8 @@ public:
 			// of model which is going to be saved anyways
 			if( isAtInitValue() &&
 				m_autoPattern->getTimeMap().size() == 1 &&
-				m_autoPattern->getTimeMap().keys().first() == 0 &&
-				m_autoPattern->getTimeMap().values().first() == value() )
+				m_autoPattern->getTimeMap().begin().key() == 0 &&
+				m_autoPattern->getTimeMap().begin().value().getValue() == value() )
 			{
 				return false;
 			}

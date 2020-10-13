@@ -921,7 +921,7 @@ void PianoRoll::drawDetuningInfo( QPainter & _p, const Note * _n, int _x,
 		int pos_ticks = it.key();
 		int pos_x = _x + pos_ticks * m_ppb / MidiTime::ticksPerBar();
 
-		const float level = it.value();
+		const float level = it.value().getValue();
 
 		int pos_y = middle_y - level * m_keyLineHeight;
 

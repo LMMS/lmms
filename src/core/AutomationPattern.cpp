@@ -82,8 +82,8 @@ AutomationPattern::AutomationPattern( const AutomationPattern & _pat_to_copy ) :
 	for( timeMap::const_iterator it = _pat_to_copy.m_timeMap.begin();
 				it != _pat_to_copy.m_timeMap.end(); ++it )
 	{
-		m_timeMap[it.key()] = it.value();
-		m_tangents[it.key()] = _pat_to_copy.m_tangents[it.key()];
+		// Copies the automation node (value and tangent)
+		m_timeMap[ it.key() ] = it.value();
 	}
 	switch( getTrack()->trackContainer()->type() )
 	{
@@ -213,8 +213,18 @@ MidiTime AutomationPattern::putValue( const MidiTime & time,
 				Note::quantized( time, quantization() ) :
 				time;
 
-	m_timeMap[ newTime ] = value;
-	timeMap::const_iterator it = m_timeMap.find( newTime );
+	// If we do have a node for that midi time, set its value
+	if( m_timeMap.contains( newTime ) )
+	{
+		m_timeMap[ newTime ].setValue( value );
+	}
+	// If we don't have a node, create one
+	else
+	{
+		m_timeMap[ newTime ] = AutomationNode( value );
+	}
+
+	timeMap::iterator it = m_timeMap.find( newTime );
 
 	// Remove control points that are covered by the new points
 	// quantization value. Control Key to override
@@ -246,8 +256,7 @@ void AutomationPattern::removeValue( const MidiTime & time )
 	cleanObjects();
 
 	m_timeMap.remove( time );
-	m_tangents.remove( time );
-	timeMap::const_iterator it = m_timeMap.lowerBound( time );
+	timeMap::iterator it = m_timeMap.lowerBound( time );
 	if( it != m_timeMap.begin() )
 	{
 		--it;
@@ -304,7 +313,7 @@ MidiTime AutomationPattern::setDragValue( const MidiTime & time,
 	//Restore to the state before it the point were being dragged
 	m_timeMap = m_oldTimeMap;
 
-	for( timeMap::const_iterator it = m_timeMap.begin(); it != m_timeMap.end(); ++it )
+	for( timeMap::iterator it = m_timeMap.begin(); it != m_timeMap.end(); ++it )
 	{
 		generateTangents( it, 3 );
 	}
@@ -334,14 +343,15 @@ float AutomationPattern::valueAt( const MidiTime & _time ) const
 		return 0;
 	}
 
+	// If we have a node at that time, just return its value
 	if( m_timeMap.contains( _time ) )
 	{
-		return m_timeMap[_time];
+		return m_timeMap[_time].getValue();
 	}
 
 	// lowerBound returns next value with greater key, therefore we take
 	// the previous element to get the current value
-	timeMap::ConstIterator v = m_timeMap.lowerBound( _time );
+	timeMap::const_iterator v = m_timeMap.lowerBound( _time );
 
 	if( v == m_timeMap.begin() )
 	{
@@ -349,7 +359,7 @@ float AutomationPattern::valueAt( const MidiTime & _time ) const
 	}
 	if( v == m_timeMap.end() )
 	{
-		return (v-1).value();
+		return (v-1).value().getValue();
 	}
 
 	return valueAt( v-1, _time - (v-1).key() );
@@ -362,13 +372,13 @@ float AutomationPattern::valueAt( timeMap::const_iterator v, int offset ) const
 {
 	if( m_progressionType == DiscreteProgression || v == m_timeMap.end() )
 	{
-		return v.value();
+		return v.value().getValue();
 	}
 	else if( m_progressionType == LinearProgression )
 	{
-		float slope = ((v+1).value() - v.value()) /
+		float slope = ((v+1).value().getValue() - v.value().getValue()) /
 							((v+1).key() - v.key());
-		return v.value() + offset * slope;
+		return v.value().getValue() + offset * slope;
 	}
 	else /* CubicHermiteProgression */
 	{
@@ -382,12 +392,12 @@ float AutomationPattern::valueAt( timeMap::const_iterator v, int offset ) const
 		// tangents _m1 and _m2
 		int numValues = ((v+1).key() - v.key());
 		float t = (float) offset / (float) numValues;
-		float m1 = (m_tangents[v.key()]) * numValues * m_tension;
-		float m2 = (m_tangents[(v+1).key()]) * numValues * m_tension;
+		float m1 = v.value().getTangent() * numValues * m_tension;
+		float m2 = (v+1).value().getTangent() * numValues * m_tension;
 
-		return ( 2*pow(t,3) - 3*pow(t,2) + 1 ) * v.value()
+		return ( 2*pow(t,3) - 3*pow(t,2) + 1 ) * v.value().getValue()
 				+ ( pow(t,3) - 2*pow(t,2) + t) * m1
-				+ ( -2*pow(t,3) + 3*pow(t,2) ) * (v+1).value()
+				+ ( -2*pow(t,3) + 3*pow(t,2) ) * (v+1).value().getValue()
 				+ ( pow(t,3) - pow(t,2) ) * m2;
 	}
 }
@@ -397,7 +407,7 @@ float AutomationPattern::valueAt( timeMap::const_iterator v, int offset ) const
 
 float *AutomationPattern::valuesAfter( const MidiTime & _time ) const
 {
-	timeMap::ConstIterator v = m_timeMap.lowerBound( _time );
+	timeMap::const_iterator v = m_timeMap.lowerBound( _time );
 	if( v == m_timeMap.end() || (v+1) == m_timeMap.end() )
 	{
 		return NULL;
@@ -420,11 +430,13 @@ float *AutomationPattern::valuesAfter( const MidiTime & _time ) const
 void AutomationPattern::flipY( int min, int max )
 {
 	timeMap tempMap = m_timeMap;
-	timeMap::ConstIterator iterate = m_timeMap.lowerBound(0);
+	timeMap::const_iterator iterate = m_timeMap.lowerBound(0);
 	float tempValue = 0;
 
 	int numPoints = 0;
 
+	// TODO: This loop looks really odd. Is there a particular case where iterate+i+1 != m_timeMap.end()
+	// will be true but iterate + 1 != m_timeMap.end() will be false?
 	for( int i = 0; ( iterate + i + 1 ) != m_timeMap.end() && ( iterate + i ) != m_timeMap.end() ; i++)
 	{
 		numPoints++;
@@ -464,10 +476,11 @@ void AutomationPattern::flipX( int length )
 {
 	timeMap tempMap;
 
-	timeMap::ConstIterator iterate = m_timeMap.lowerBound(0);
+	timeMap::const_iterator iterate = m_timeMap.lowerBound(0);
 	float tempValue = 0;
 	int numPoints = 0;
 
+	// TODO: Same as the comment on AutomationPattern::flipY
 	for( int i = 0; ( iterate + i + 1 ) != m_timeMap.end() && ( iterate + i ) != m_timeMap.end() ; i++)
 	{
 		numPoints++;
@@ -486,7 +499,10 @@ void AutomationPattern::flipX( int length )
 			{
 				tempValue = valueAt( ( iterate + i ).key() );
 				MidiTime newTime = MidiTime( length - ( iterate + i ).key() );
-				tempMap[newTime] = tempValue;
+				// TODO: Can we be sure newTime will never repeat its value?
+				// If not we need to check first if the key already has an object
+				// and just set its value if it does.
+				tempMap[newTime] = AutomationNode( tempValue );
 			}
 		}
 		else
@@ -504,7 +520,10 @@ void AutomationPattern::flipX( int length )
 				{
 					newTime = MidiTime( ( iterate + i ).key() );
 				}
-				tempMap[newTime] = tempValue;
+				// TODO: Can we be sure newTime will never repeat its value?
+				// If not we need to check first if the key already has an object
+				// and just set its value if it does.
+				tempMap[newTime] = AutomationNode( tempValue );
 			}
 		}
 	}
@@ -515,7 +534,10 @@ void AutomationPattern::flipX( int length )
 			tempValue = valueAt( ( iterate + i ).key() );
 			cleanObjects();
 			MidiTime newTime = MidiTime( realLength - ( iterate + i ).key() );
-			tempMap[newTime] = tempValue;
+			// TODO: Can we be sure newTime will never repeat its value?
+			// If not we need to check first if the key already has an object
+			// and just set its value if it does.
+			tempMap[newTime] = AutomationNode( tempValue );
 		}
 	}
 
@@ -544,7 +566,7 @@ void AutomationPattern::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	{
 		QDomElement element = _doc.createElement( "time" );
 		element.setAttribute( "pos", it.key() );
-		element.setAttribute( "value", it.value() );
+		element.setAttribute( "value", it.value().getValue() );
 		_this.appendChild( element );
 	}
 
@@ -585,8 +607,17 @@ void AutomationPattern::loadSettings( const QDomElement & _this )
 		}
 		if( element.tagName() == "time" )
 		{
-			m_timeMap[element.attribute( "pos" ).toInt()]
-				= LocaleHelper::toFloat(element.attribute("value"));
+			int timeMapPos = element.attribute("pos").toInt();
+			float timeMapValue = LocaleHelper::toFloat(element.attribute("value"));
+			// If we already have an automation node just set its value
+			if( m_timeMap.contains( timeMapPos ) )
+			{
+				m_timeMap[timeMapPos].setValue( timeMapValue );
+			}
+			else
+			{
+				m_timeMap[timeMapPos] = AutomationNode( timeMapValue );
+			}
 		}
 		else if( element.tagName() == "object" )
 		{
@@ -807,7 +838,6 @@ void AutomationPattern::resolveAllIDs()
 void AutomationPattern::clear()
 {
 	m_timeMap.clear();
-	m_tangents.clear();
 
 	emit dataChanged();
 }
@@ -867,12 +897,12 @@ void AutomationPattern::generateTangents()
 
 
 
-void AutomationPattern::generateTangents( timeMap::const_iterator it,
+void AutomationPattern::generateTangents( timeMap::iterator it,
 							int numToGenerate )
 {
 	if( m_timeMap.size() < 2 && numToGenerate > 0 )
 	{
-		m_tangents[it.key()] = 0;
+		it.value().setTangent( 0 );
 		return;
 	}
 
@@ -880,20 +910,22 @@ void AutomationPattern::generateTangents( timeMap::const_iterator it,
 	{
 		if( it == m_timeMap.begin() )
 		{
-			m_tangents[it.key()] =
-					( (it+1).value() - (it).value() ) /
-						( (it+1).key() - (it).key() );
+			it.value().setTangent(
+				( (it+1).value().getValue() - (it).value().getValue() ) /
+					( (it+1).key() - (it).key() )
+				);
 		}
 		else if( it+1 == m_timeMap.end() )
 		{
-			m_tangents[it.key()] = 0;
+			it.value().setTangent( 0 );
 			return;
 		}
 		else
 		{
-			m_tangents[it.key()] =
-					( (it+1).value() - (it-1).value() ) /
-						( (it+1).key() - (it-1).key() );
+			it.value().setTangent(
+				( (it+1).value().getValue() - (it-1).value().getValue() ) /
+					( (it+1).key() - (it-1).key() )
+				);
 		}
 		it++;
 	}
@@ -902,4 +934,14 @@ void AutomationPattern::generateTangents( timeMap::const_iterator it,
 
 
 
+AutomationNode::AutomationNode() :
+	m_value( 0 ),
+	m_tangent( 0 )
+{
+}
 
+AutomationNode::AutomationNode( float value ) :
+	m_value( value ),
+	m_tangent( 0 )
+{
+}
