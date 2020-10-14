@@ -58,7 +58,8 @@ public:
 			if( isAtInitValue() &&
 				m_autoPattern->getTimeMap().size() == 1 &&
 				m_autoPattern->getTimeMap().begin().key() == 0 &&
-				m_autoPattern->getTimeMap().begin().value().getValue() == value() )
+				// TODO: Do we really care about outValue if we only have one node? I'm assuming no.
+				m_autoPattern->getTimeMap().begin().value().getInValue() == value() )
 			{
 				return false;
 			}

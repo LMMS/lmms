@@ -82,7 +82,7 @@ AutomationPattern::AutomationPattern( const AutomationPattern & _pat_to_copy ) :
 	for( timeMap::const_iterator it = _pat_to_copy.m_timeMap.begin();
 				it != _pat_to_copy.m_timeMap.end(); ++it )
 	{
-		// Copies the automation node (value and tangent)
+		// Copies the automation node (in/out values and in/out tangents)
 		m_timeMap[ it.key() ] = it.value();
 	}
 	switch( getTrack()->trackContainer()->type() )
@@ -202,6 +202,8 @@ void AutomationPattern::updateLength()
 
 
 
+// For now, when creating a node, the inValue and outValue will match. After the node is
+// created, the user will then be able to drag the outValue to make discrete jumps
 MidiTime AutomationPattern::putValue( const MidiTime & time,
 					const float value,
 					const bool quantPos,
@@ -216,7 +218,8 @@ MidiTime AutomationPattern::putValue( const MidiTime & time,
 	// If we do have a node for that midi time, set its value
 	if( m_timeMap.contains( newTime ) )
 	{
-		m_timeMap[ newTime ].setValue( value );
+		m_timeMap[ newTime ].setInValue( value );
+		m_timeMap[ newTime ].setOutValue( value );
 	}
 	// If we don't have a node, create one
 	else
@@ -346,7 +349,8 @@ float AutomationPattern::valueAt( const MidiTime & _time ) const
 	// If we have a node at that time, just return its value
 	if( m_timeMap.contains( _time ) )
 	{
-		return m_timeMap[_time].getValue();
+		// When the time is exactly the node's time, we want the inValue
+		return m_timeMap[_time].getInValue();
 	}
 
 	// lowerBound returns next value with greater key, therefore we take
@@ -359,7 +363,8 @@ float AutomationPattern::valueAt( const MidiTime & _time ) const
 	}
 	if( v == m_timeMap.end() )
 	{
-		return (v-1).value().getValue();
+		// When the time is after the last node, we want the outValue of it
+		return (v-1).value().getOutValue();
 	}
 
 	return valueAt( v-1, _time - (v-1).key() );
@@ -368,17 +373,25 @@ float AutomationPattern::valueAt( const MidiTime & _time ) const
 
 
 
+// This method will get the value at a offset from a node, so we use the outValue of
+// that node and the inValue of the next node to the calculations. This assumes that offset
+// will not be zero, because when the midi time given to AutomationPattern::valueAt(MidiTime)
+// matches a node's position, that node's value will be returned and this method won't be even
+// called.
+// TODO: If in the future we want to be able to call this method manually with offset = 0, we
+// need to account for that with a simple conditional at the beginning that just returns the
+// node's inValue.
 float AutomationPattern::valueAt( timeMap::const_iterator v, int offset ) const
 {
 	if( m_progressionType == DiscreteProgression || v == m_timeMap.end() )
 	{
-		return v.value().getValue();
+		return v.value().getOutValue();
 	}
 	else if( m_progressionType == LinearProgression )
 	{
-		float slope = ((v+1).value().getValue() - v.value().getValue()) /
+		float slope = ((v+1).value().getInValue() - v.value().getOutValue()) /
 							((v+1).key() - v.key());
-		return v.value().getValue() + offset * slope;
+		return v.value().getOutValue() + offset * slope;
 	}
 	else /* CubicHermiteProgression */
 	{
@@ -392,12 +405,12 @@ float AutomationPattern::valueAt( timeMap::const_iterator v, int offset ) const
 		// tangents _m1 and _m2
 		int numValues = ((v+1).key() - v.key());
 		float t = (float) offset / (float) numValues;
-		float m1 = v.value().getTangent() * numValues * m_tension;
-		float m2 = (v+1).value().getTangent() * numValues * m_tension;
+		float m1 = v.value().getOutTangent() * numValues * m_tension;
+		float m2 = (v+1).value().getInTangent() * numValues * m_tension;
 
-		return ( 2*pow(t,3) - 3*pow(t,2) + 1 ) * v.value().getValue()
+		return ( 2*pow(t,3) - 3*pow(t,2) + 1 ) * v.value().getOutValue()
 				+ ( pow(t,3) - 2*pow(t,2) + t) * m1
-				+ ( -2*pow(t,3) + 3*pow(t,2) ) * (v+1).value().getValue()
+				+ ( -2*pow(t,3) + 3*pow(t,2) ) * (v+1).value().getInValue()
 				+ ( pow(t,3) - pow(t,2) ) * m2;
 	}
 }
@@ -427,6 +440,11 @@ float *AutomationPattern::valuesAfter( const MidiTime & _time ) const
 
 
 
+// TODO: Because putValue sets both the inValue and outValue to the same value, flipping
+// the pattern will ignore outValues that are different (meaning discrete jumps will be lost).
+// If we want them to be kept we need to update the logic so they are accounted for. For now
+// this behavior is acceptable (discrete jumps will likely lose their meaning on a flipped
+// pattern anyways)
 void AutomationPattern::flipY( int min, int max )
 {
 	timeMap tempMap = m_timeMap;
@@ -472,6 +490,11 @@ void AutomationPattern::flipY()
 
 
 
+// TODO: This method sets both the inValue and outValue of the new timeMap to the same value,
+// so flipping the pattern will ignore outValues that are different (meaning discrete jumps will be lost).
+// If we want them to be kept we need to update the logic so they are accounted for. For now
+// this behavior is acceptable (discrete jumps will likely lose their meaning on a flipped
+// pattern anyways)
 void AutomationPattern::flipX( int length )
 {
 	timeMap tempMap;
@@ -499,9 +522,6 @@ void AutomationPattern::flipX( int length )
 			{
 				tempValue = valueAt( ( iterate + i ).key() );
 				MidiTime newTime = MidiTime( length - ( iterate + i ).key() );
-				// TODO: Can we be sure newTime will never repeat its value?
-				// If not we need to check first if the key already has an object
-				// and just set its value if it does.
 				tempMap[newTime] = AutomationNode( tempValue );
 			}
 		}
@@ -520,9 +540,6 @@ void AutomationPattern::flipX( int length )
 				{
 					newTime = MidiTime( ( iterate + i ).key() );
 				}
-				// TODO: Can we be sure newTime will never repeat its value?
-				// If not we need to check first if the key already has an object
-				// and just set its value if it does.
 				tempMap[newTime] = AutomationNode( tempValue );
 			}
 		}
@@ -534,9 +551,6 @@ void AutomationPattern::flipX( int length )
 			tempValue = valueAt( ( iterate + i ).key() );
 			cleanObjects();
 			MidiTime newTime = MidiTime( realLength - ( iterate + i ).key() );
-			// TODO: Can we be sure newTime will never repeat its value?
-			// If not we need to check first if the key already has an object
-			// and just set its value if it does.
 			tempMap[newTime] = AutomationNode( tempValue );
 		}
 	}
@@ -566,7 +580,9 @@ void AutomationPattern::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	{
 		QDomElement element = _doc.createElement( "time" );
 		element.setAttribute( "pos", it.key() );
-		element.setAttribute( "value", it.value().getValue() );
+		// TODO: Requires project file upgrade!!!
+		element.setAttribute( "inValue", it.value().getInValue() );
+		element.setAttribute( "outValue", it.value().getOutValue() );
 		_this.appendChild( element );
 	}
 
@@ -608,16 +624,11 @@ void AutomationPattern::loadSettings( const QDomElement & _this )
 		if( element.tagName() == "time" )
 		{
 			int timeMapPos = element.attribute("pos").toInt();
-			float timeMapValue = LocaleHelper::toFloat(element.attribute("value"));
-			// If we already have an automation node just set its value
-			if( m_timeMap.contains( timeMapPos ) )
-			{
-				m_timeMap[timeMapPos].setValue( timeMapValue );
-			}
-			else
-			{
-				m_timeMap[timeMapPos] = AutomationNode( timeMapValue );
-			}
+			// TODO: Requires project file upgrade!!!
+			float timeMapInValue = LocaleHelper::toFloat(element.attribute("inValue"));
+			float timeMapOutValue = LocaleHelper::toFloat(element.attribute("outValue"));
+
+			m_timeMap[timeMapPos] = AutomationNode( timeMapInValue, timeMapOutValue );
 		}
 		else if( element.tagName() == "object" )
 		{
@@ -897,12 +908,17 @@ void AutomationPattern::generateTangents()
 
 
 
+// We have two tangents, one for the left side of the node and one for the right side
+// of the node (in case we have discrete value jumps in the middle of a curve).
+// If the inValue and outValue of a node are the same, consequently the inTangent and
+// outTangent values of the node will be the same too.
 void AutomationPattern::generateTangents( timeMap::iterator it,
 							int numToGenerate )
 {
 	if( m_timeMap.size() < 2 && numToGenerate > 0 )
 	{
-		it.value().setTangent( 0 );
+		it.value().setInTangent( 0 );
+		it.value().setOutTangent( 0 );
 		return;
 	}
 
@@ -910,22 +926,48 @@ void AutomationPattern::generateTangents( timeMap::iterator it,
 	{
 		if( it == m_timeMap.begin() )
 		{
-			it.value().setTangent(
-				( (it+1).value().getValue() - (it).value().getValue() ) /
-					( (it+1).key() - (it).key() )
-				);
+			// On the first node there's no curve behind it, so we will only calculate the outTangent
+			// and inTangent will be set to 0.
+			float tangent = ( (it+1).value().getInValue() - (it).value().getOutValue() ) /
+				( (it+1).key() - (it).key() );
+			it.value().setInTangent( 0 );
+			it.value().setOutTangent( tangent );
 		}
 		else if( it+1 == m_timeMap.end() )
 		{
-			it.value().setTangent( 0 );
+			// Previously, the last value's tangent was always set to 0. That logic was kept for both tangents
+			// of the last node
+			it.value().setInTangent( 0 );
+			it.value().setOutTangent( 0 );
 			return;
 		}
 		else
 		{
-			it.value().setTangent(
-				( (it+1).value().getValue() - (it-1).value().getValue() ) /
-					( (it+1).key() - (it-1).key() )
-				);
+			// When we are in a node that is in the middle of two other nodes, we need to check if we
+			// have a discrete jump at this node. If we do not, then we can calculate the tangents normally.
+			// If we do have a discrete jump, then we have to calculate the tangents differently for each side
+			// of the curve.
+			float inTangent;
+			float outTangent;
+			if( it.value().getInValue() == it.value().getOutValue() )
+			{
+				inTangent = ( (it+1).value().getInValue() - (it-1).value().getOutValue() ) /
+					( (it+1).key() - (it-1).key() );
+				it.value().setInTangent( inTangent );
+				// inTangent == outTangent in this case
+				it.value().setOutTangent( inTangent );
+			}
+			else
+			{
+				// Calculate the left side of the curve
+				inTangent = ( (it).value().getInValue() - (it-1).value().getOutValue() ) /
+					( (it).key() - (it-1).key() );
+				// Calculate the right side of the curve
+				outTangent = ( (it+1).value().getInValue() - (it).value().getOutValue() ) /
+					( (it+1).key() - (it).key() );
+				it.value().setInTangent( inTangent );
+				it.value().setOutTangent( outTangent );
+			}
 		}
 		it++;
 	}
@@ -935,13 +977,25 @@ void AutomationPattern::generateTangents( timeMap::iterator it,
 
 
 AutomationNode::AutomationNode() :
-	m_value( 0 ),
-	m_tangent( 0 )
+	m_inValue( 0 ),
+	m_outValue( 0 ),
+	m_inTangent( 0 ),
+	m_outTangent( 0 )
 {
 }
 
 AutomationNode::AutomationNode( float value ) :
-	m_value( value ),
-	m_tangent( 0 )
+	m_inValue( value ),
+	m_outValue( value ),
+	m_inTangent( 0 ),
+	m_outTangent( 0 )
+{
+}
+
+AutomationNode::AutomationNode( float inValue, float outValue ) :
+	m_inValue( inValue ),
+	m_outValue( outValue ),
+	m_inTangent( 0 ),
+	m_outTangent( 0 )
 {
 }

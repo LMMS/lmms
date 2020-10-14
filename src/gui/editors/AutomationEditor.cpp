@@ -524,11 +524,16 @@ void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 			{
 				// and check whether the user clicked on an
 				// existing value
+				// When handling nodes on the editor, we consider their inValue
+				// TODO: This logic doesn't look good. It only considers that we clicked a node if
+				// we click between the position of the node and 4 pixels ahead, and EXACTLY
+				// on the node's level. Is that what we want? We don't notice it because later
+				// another node is created on the same position and we start handling it instead.
 				if( pos_ticks >= it.key() &&
 					( it+1==time_map.end() ||
 						pos_ticks <= (it+1).key() ) &&
 		( pos_ticks<= it.key() + MidiTime::ticksPerBar() *4 / m_ppb ) &&
-		( level == it.value().getValue() || mouseEvent->button() == Qt::RightButton ) )
+		( level == it.value().getInValue() || mouseEvent->button() == Qt::RightButton ) )
 				{
 					break;
 				}
@@ -804,10 +809,14 @@ void AutomationEditor::mouseMoveEvent(QMouseEvent * mouseEvent )
 			{
 				// and check whether the cursor is over an
 				// existing value
+				// When handling nodes on the editor, we consider their inValue
+				// TODO: That logic looks bad too. It just checks whether the mouse is between
+				// two nodes, and in the same level as the first one. You can see it's different
+				// from the last similar code.
 				if( pos_ticks >= it.key() &&
 					( it+1==time_map.end() ||
 						pos_ticks <= (it+1).key() ) &&
-							level <= it.value().getValue() )
+							level <= it.value().getInValue() )
 				{
 					break;
 				}
@@ -994,11 +1003,14 @@ void AutomationEditor::mouseMoveEvent(QMouseEvent * mouseEvent )
 					new_value_pos = MidiTime( value_bar,
 							value_ticks );
 				}
+				// When moving selections (is that feature finished?) the outValue will
+				// be discarded.
+				// TODO: Maybe account for the outValue when moving selections?
 				new_selValuesForMove[
 					m_pattern->putValue( new_value_pos,
-						it.value().getValue() + level_diff,
+						it.value().getInValue() + level_diff,
 									false )]
-						= it.value().getValue() + level_diff;
+						= it.value().getInValue() + level_diff;
 			}
 			m_selValuesForMove = new_selValuesForMove;
 
@@ -1122,10 +1134,17 @@ inline void AutomationEditor::drawCross( QPainter & p )
 inline void AutomationEditor::drawAutomationPoint( QPainter & p, timeMap::iterator it )
 {
 	int x = xCoordOfTick( it.key() );
-	int y = yCoordOfLevel( it.value().getValue() );
+	int y = yCoordOfLevel( it.value().getInValue() );
 	const int outerRadius = qBound( 3, ( m_ppb * AutomationPattern::quantization() ) / 576, 5 ); // man, getting this calculation right took forever
 	p.setPen( QPen( vertexColor().lighter( 200 ) ) );
 	p.setBrush( QBrush( vertexColor() ) );
+	p.drawEllipse( x - outerRadius, y - outerRadius, outerRadius * 2, outerRadius * 2 );
+
+	// Draws another ellipse for the outValue
+	// TODO: Use some color defined on the Automation Editor class. This is just for testing purposes
+	y = yCoordOfLevel( it.value().getOutValue() );
+	p.setPen( QPen( QColor( 255, 0, 0, 80 ).lighter( 200 ) ) );
+	p.setBrush( QBrush( QColor( 255, 0, 0, 80 ) ) );
 	p.drawEllipse( x - outerRadius, y - outerRadius, outerRadius * 2, outerRadius * 2 );
 }
 
@@ -1390,8 +1409,8 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 						is_selected = true;
 					}
 				}
-				else if( it.value().getValue() >= selLevel_start &&
-					it.value().getValue() <= selLevel_end &&
+				else if( it.value().getInValue() >= selLevel_start &&
+					it.value().getInValue() <= selLevel_end &&
 					it.key() >= sel_pos_start &&
 					it.key() + len_ticks <= sel_pos_end )
 				{
@@ -1400,24 +1419,30 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 
 				float *values = m_pattern->valuesAfter( it.key() );
 
+				// We are creating a path to draw a polygon representing the values between two
+				// nodes. When we have two nodes with discrete progression, we will basically have
+				// a rectangle with the outValue of the first node (that's why nextValue will match
+				// the outValue of the current node). When we have nodes with linear or cubic progression
+				// the value of the end of the shape between the two nodes will be the inValue of
+				// the next node.
 				float nextValue;
 				if( m_pattern->progressionType() == AutomationPattern::DiscreteProgression )
 				{
-					nextValue = it.value().getValue();
+					nextValue = it.value().getOutValue();
 				}
 				else
 				{
-					nextValue = ( it + 1 ).value().getValue();
+					nextValue = ( it + 1 ).value().getInValue();
 				}
 
 				p.setRenderHints( QPainter::Antialiasing, true );
 				QPainterPath path;
 				path.moveTo( QPointF( xCoordOfTick( it.key() ), yCoordOfLevel( 0 ) ) );
 				for( int i = 0; i < ( it + 1 ).key() - it.key(); i++ )
-				{	path.lineTo( QPointF( xCoordOfTick( it.key() + i ), yCoordOfLevel( values[i] ) ) );
+				{
+					path.lineTo( QPointF( xCoordOfTick( it.key() + i ), yCoordOfLevel( values[i] ) ) );
 					//NEEDS Change in CSS
 					//drawLevelTick( p, it.key() + i, values[i], is_selected );
-
 				}
 				path.lineTo( QPointF( xCoordOfTick( ( it + 1 ).key() ), yCoordOfLevel( nextValue ) ) );
 				path.lineTo( QPointF( xCoordOfTick( ( it + 1 ).key() ), yCoordOfLevel( 0 ) ) );
@@ -1435,10 +1460,12 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 			for( int i = it.key(), x = xCoordOfTick( i ); x <= width();
 							i++, x = xCoordOfTick( i ) )
 			{
+				// Draws the rectangle representing the value after the last node (for
+				// that reason we use outValue).
 				// TODO: Find out if the section after the last control
 				// point is able to be selected and if so set this
 				// boolean correctly
-				drawLevelTick( p, i, it.value().getValue()); ////NEEDS Change in CSS:, false );
+				drawLevelTick( p, i, it.value().getOutValue()); ////NEEDS Change in CSS:, false );
 			}
 			// Draw circle(the last one)
 			drawAutomationPoint(p, it);
@@ -1607,7 +1634,7 @@ void AutomationEditor::drawLevelTick(QPainter & p, int tick, float value)
 
 
 
-// center the vertical scroll position on the first object's value
+// Center the vertical scroll position on the first object's inValue
 void AutomationEditor::centerTopBottomScroll()
 {
 	// default to the m_scrollLevel position
@@ -1622,7 +1649,7 @@ void AutomationEditor::centerTopBottomScroll()
 		{
 			// set the position to the inverted value ((max + min) - value)
 			// If we set just (max - value), we're off by m_pattern's minimum
-			pos = m_pattern->getMax() + m_pattern->getMin() - static_cast<int>(time_map.begin().value().getValue());
+			pos = m_pattern->getMax() + m_pattern->getMin() - static_cast<int>(time_map.begin().value().getInValue());
 		}
 	}
 	m_topBottomScroll->setValue(pos);
@@ -1927,6 +1954,9 @@ void AutomationEditor::setTension()
 
 
 
+// The real node value is inValue, so that's what we care about when creating
+// a selection that spans several nodes. If the selected area covers a node's
+// inValue it is part of the selection.
 void AutomationEditor::selectAll()
 {
 	QMutexLocker m( &m_patternMutex );
@@ -1940,12 +1970,12 @@ void AutomationEditor::selectAll()
 	timeMap::iterator it = time_map.begin();
 	m_selectStartTick = 0;
 	m_selectedTick = m_pattern->length();
-	m_selectStartLevel = it.value().getValue();
+	m_selectStartLevel = it.value().getInValue();
 	m_selectedLevels = 1;
 
 	while( ++it != time_map.end() )
 	{
-		const float level = it.value().getValue();
+		const float level = it.value().getInValue();
 		if( level < m_selectStartLevel )
 		{
 			// if we move start-level down, we have to add
@@ -1996,14 +2026,16 @@ void AutomationEditor::getSelectedValues( timeMap & selected_values )
 		//TODO: Add constant
 		tick_t len_ticks = MidiTime::ticksPerBar() / 16;
 
-		float level = it.value().getValue();
+		float level = it.value().getInValue();
 		tick_t pos_ticks = it.key();
 
 		if( level >= selLevel_start && level <= selLevel_end &&
 				pos_ticks >= sel_pos_start &&
 				pos_ticks + len_ticks <= sel_pos_end )
 		{
-			selected_values[it.key()] = level;
+			// Adds an automation node to our selection timeMap with the selected node's
+			// inValue (outValue is ignored)
+			selected_values[it.key()] = AutomationNode( level );
 		}
 	}
 }
@@ -2023,7 +2055,8 @@ void AutomationEditor::copySelectedValues()
 		for( timeMap::iterator it = selected_values.begin();
 			it != selected_values.end(); ++it )
 		{
-			m_valuesToCopy[it.key()] = AutomationNode( it.value().getValue() ) ;
+			// Copies the AutomationNode from our selected_values timeMap to m_valuesToCopy
+			m_valuesToCopy[it.key()] = it.value();
 		}
 		TextFloat::displayMessage( tr( "Values copied" ),
 				tr( "All selected values were copied to the "
@@ -2056,7 +2089,9 @@ void AutomationEditor::cutSelectedValues()
 		for( timeMap::iterator it = selected_values.begin();
 					it != selected_values.end(); ++it )
 		{
-			m_valuesToCopy[it.key()] = AutomationNode( it.value().getValue() );
+			// Copies the AutomationNode from our selected_values timeMap to m_valuesToCopy
+			// and then remove it from the pattern.
+			m_valuesToCopy[it.key()] = it.value();
 			m_pattern->removeValue( it.key() );
 		}
 	}
@@ -2077,8 +2112,9 @@ void AutomationEditor::pasteValues()
 		for( timeMap::iterator it = m_valuesToCopy.begin();
 					it != m_valuesToCopy.end(); ++it )
 		{
+			// When pasting we ignore the outValue (which was also ignored during the copy/cut process)
 			m_pattern->putValue( it.key() + m_currentPosition,
-								it.value().getValue() );
+								it.value().getInValue() );
 		}
 
 		// we only have to do the following lines if we pasted at

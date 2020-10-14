@@ -315,27 +315,34 @@ void AutomationPatternView::paintEvent( QPaintEvent * )
 			const float x1 = x_base + it.key() * ppTick;
 			const float x2 = (float)( width() - TCO_BORDER_WIDTH );
 			if( x1 > ( width() - TCO_BORDER_WIDTH ) ) break;
+			// We are drawing the space after the last node, so we use the outValue
 			if( gradient() )
 			{
-				p.fillRect( QRectF( x1, 0.0f, x2 - x1, it.value().getValue() ), lin2grad );
+				p.fillRect( QRectF( x1, 0.0f, x2 - x1, it.value().getOutValue() ), lin2grad );
 			}
 			else
 			{
-				p.fillRect( QRectF( x1, 0.0f, x2 - x1, it.value().getValue() ), col );
+				p.fillRect( QRectF( x1, 0.0f, x2 - x1, it.value().getOutValue() ), col );
 			}
 			break;
 		}
 
 		float *values = m_pat->valuesAfter( it.key() );
 
+		// We are creating a path to draw a polygon representing the values between two
+		// nodes. When we have two nodes with discrete progression, we will basically have
+		// a rectangle with the outValue of the first node (that's why nextValue will match
+		// the outValue of the current node). When we have nodes with linear or cubic progression
+		// the value of the end of the shape between the two nodes will be the inValue of
+		// the next node.
 		float nextValue;
 		if( m_pat->progressionType() == AutomationPattern::DiscreteProgression )
 		{
-			nextValue = it.value().getValue();
+			nextValue = it.value().getOutValue();
 		}
 		else
 		{
-			nextValue = ( it + 1 ).value().getValue();
+			nextValue = ( it + 1 ).value().getInValue();
 		}
 
 		QPainterPath path;
@@ -480,18 +487,27 @@ void AutomationPatternView::scaleTimemapToFit( float oldMin, float oldMax )
 		return;
 	}
 
+	// TODO: Currently when rescaling the timeMap values to fit the new range of values (newMin and newMax)
+	// only the inValue is being considered and the outValue is being reset to the inValue (so discrete jumps
+	// are discarded). Possibly later we will want discrete jumps to be maintained so we will need to upgrade
+	// the logic to account for them.
 	for( AutomationPattern::timeMap::iterator it = m_pat->m_timeMap.begin();
 		it != m_pat->m_timeMap.end(); ++it )
 	{
-		if( it.value().getValue() < oldMin )
+		// If the values are out of the previous range, fix them so they are
+		// between oldMin and oldMax.
+		if( it.value().getInValue() < oldMin )
 		{
-			it.value().setValue( oldMin );
+			it.value().setInValue( oldMin );
 		}
-		else if( it.value().getValue() > oldMax )
+		else if( it.value().getInValue() > oldMax )
 		{
-			it.value().setValue( oldMax );
+			it.value().setInValue( oldMax );
 		}
-		it.value().setValue( (it.value().getValue()-oldMin)*(newMax-newMin)/(oldMax-oldMin)+newMin );
+		// Calculate what the value would be proportionally in the new range
+		it.value().setInValue( (it.value().getInValue()-oldMin)*(newMax-newMin)/(oldMax-oldMin)+newMin );
+		// Read earlier TODO comment: For now I'm discarding the discrete jumps during the rescaling
+		it.value().setOutValue( it.value().getInValue() );
 	}
 
 	m_pat->generateTangents();

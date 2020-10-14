@@ -43,36 +43,70 @@ class AutomationNode
 public:
 	AutomationNode();
 	AutomationNode( float value );
+	AutomationNode( float inValue, float outValue );
 
-	inline float getValue()
+	inline float getInValue()
 	{
-		return m_value;
+		return m_inValue;
 	}
-	inline const float getValue() const
+	inline const float getInValue() const
 	{
-		return m_value;
+		return m_inValue;
 	}
-	inline void setValue( float value )
+	inline void setInValue( float value )
 	{
-		m_value = value;
+		m_inValue = value;
 	}
 
-	inline float getTangent()
+	inline float getOutValue()
 	{
-		return m_tangent;
+		return m_outValue;
 	}
-	inline const float getTangent() const
+	inline const float getOutValue() const
 	{
-		return m_tangent;
+		return m_outValue;
 	}
-	inline void setTangent( float tangent )
+	inline void setOutValue( float value )
 	{
-		m_tangent = tangent;
+		m_outValue = value;
+	}
+
+	inline float getInTangent()
+	{
+		return m_inTangent;
+	}
+	inline const float getInTangent() const
+	{
+		return m_inTangent;
+	}
+	inline void setInTangent( float tangent )
+	{
+		m_inTangent = tangent;
+	}
+
+	inline float getOutTangent()
+	{
+		return m_outTangent;
+	}
+	inline const float getOutTangent() const
+	{
+		return m_outTangent;
+	}
+	inline void setOutTangent( float tangent )
+	{
+		m_outTangent = tangent;
 	}
 
 private:
-	float m_value;
-	float m_tangent; // slope at each point for calculating spline
+	float m_inValue;
+	float m_outValue;
+
+	// Slope at each point for calculating spline
+	// We might have discrete jumps between curves, so we possibly have
+	// two different tangents for each side of the curve. If inValue and
+	// outValue are equal, inTangent and outTangent are equal too.
+	float m_inTangent;
+	float m_outTangent;
 } ;
 
 class LMMS_EXPORT AutomationPattern : public TrackContentObject
