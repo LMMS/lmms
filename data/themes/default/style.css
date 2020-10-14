@@ -77,7 +77,7 @@ QLineEdit:focus {
 /* Set color and selection background color for various inputs.
    SpinBoxes are used in QInputDialogs */
 
-QTextEdit, QLineEdit, QComboBox, QSpinBox, QDoubleSpinBox {
+QTextEdit, QLineEdit:focus, QComboBox:focus, QSpinBox:focus, QDoubleSpinBox:focus {
 	color: #d1d8e4;
 	selection-background-color: #17793b;
 }
