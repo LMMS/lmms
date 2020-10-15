@@ -131,6 +131,10 @@ protected:
 	void selectAll();
 	void getSelectedValues(timeMap & selected_values );
 
+	// Returns the an iterator pointing to the AutomationNode on a radius of
+	// r pixels of the x,y mouse coordinates, or timeMap.end() if there are none.
+	timeMap::iterator getNodeAt( int x, int y, int r = 5 );
+
 	void drawLine( int x0, float y0, int x1, float y1 );
 	void removePoints( int x0, int x1 );
 
@@ -167,6 +171,7 @@ private:
 	{
 		NONE,
 		MOVE_VALUE,
+		DRAW_LINE,
 		SELECT_VALUES,
 		MOVE_SELECTION
 	} ;
