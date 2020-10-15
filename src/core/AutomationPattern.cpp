@@ -215,17 +215,8 @@ MidiTime AutomationPattern::putValue( const MidiTime & time,
 				Note::quantized( time, quantization() ) :
 				time;
 
-	// If we do have a node for that midi time, set its value
-	if( m_timeMap.contains( newTime ) )
-	{
-		m_timeMap[ newTime ].setInValue( value );
-		m_timeMap[ newTime ].setOutValue( value );
-	}
-	// If we don't have a node, create one
-	else
-	{
-		m_timeMap[ newTime ] = AutomationNode( value );
-	}
+	// Create a node or replace the existing one on newTime
+	m_timeMap[ newTime ] = AutomationNode( value );
 
 	timeMap::iterator it = m_timeMap.find( newTime );
 
