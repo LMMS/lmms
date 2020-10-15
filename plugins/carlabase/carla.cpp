@@ -141,17 +141,15 @@ CarlaInstrument::CarlaInstrument(InstrumentTrack* const instrumentTrack, const D
     fHost.uiParentId  = 0;
 
     // carla/resources contains PyQt scripts required for launch
-    QString dllName(carla_get_library_filename());
-    QString resourcesPath;
-    QDir path = QFileInfo(dllName).dir();
+    QDir path = QFileInfo(carla_get_library_folder()).absoluteDir();
 #if defined(CARLA_OS_LINUX)
     // parse prefix from dll filename
     path.cdUp();
     path.cdUp();
-    resourcesPath = path.absolutePath() + "/share/carla/resources";
+    QString resourcesPath = path.absolutePath() + "/share/carla/resources";
 #else
     // parse prefix from dll filename
-    resourcesPath = path.absolutePath() + "/resources";
+    QString resourcesPath = path.absolutePath() + "/resources";
 #endif
     fHost.resourceDir            = strdup(resourcesPath.toUtf8().constData());
     fHost.get_buffer_size        = host_get_buffer_size;
@@ -506,7 +504,7 @@ void CarlaInstrumentView::toggleUI(bool visible)
 #if defined(CARLA_OS_WIN32) || defined(CARLA_OS_WIN64)
         if (visible) {
             QString backupDir = QDir::currentPath();
-            QDir::setCurrent(QFileInfo(carla_get_library_filename()).dir().absolutePath());
+            QDir::setCurrent(carla_get_library_folder());
             fDescriptor->ui_show(fHandle, true);
             QDir::setCurrent(backupDir);
             return;
