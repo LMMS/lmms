@@ -143,15 +143,14 @@ CarlaInstrument::CarlaInstrument(InstrumentTrack* const instrumentTrack, const D
     // carla/resources contains PyQt scripts required for launch
     QString dllName(carla_get_library_filename());
     QString resourcesPath;
+    QDir path = QFileInfo(dllName).dir();
 #if defined(CARLA_OS_LINUX)
     // parse prefix from dll filename
-    QDir path = QFileInfo(dllName).dir();
     path.cdUp();
     path.cdUp();
     resourcesPath = path.absolutePath() + "/share/carla/resources";
-#elif defined(CARLA_OS_MAC) || defined(CARLA_OS_WIN32) || defined(CARLA_OS_WIN64)
+#else
     // parse prefix from dll filename
-    QDir path = QFileInfo(dllName).dir();
     resourcesPath = path.absolutePath() + "/resources";
 #endif
     fHost.resourceDir            = strdup(resourcesPath.toUtf8().constData());
@@ -501,8 +500,20 @@ CarlaInstrumentView::~CarlaInstrumentView()
 
 void CarlaInstrumentView::toggleUI(bool visible)
 {
-    if (fHandle != NULL && fDescriptor->ui_show != NULL)
+    if (fHandle != NULL && fDescriptor->ui_show != NULL) {
+// TODO: remove when fixed upstream
+// change working path to location of carla.dll to avoid conflict with lmms
+#if defined(CARLA_OS_WIN32) || defined(CARLA_OS_WIN64)
+        if (visible) {
+            QString backupDir = QDir::currentPath();
+            QDir::setCurrent(QFileInfo(carla_get_library_filename()).dir().absolutePath());
+            fDescriptor->ui_show(fHandle, true);
+            QDir::setCurrent(backupDir);
+            return;
+        }
+#endif
         fDescriptor->ui_show(fHandle, visible);
+    }
 }
 
 void CarlaInstrumentView::uiClosed()
