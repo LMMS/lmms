@@ -149,12 +149,10 @@ CarlaInstrument::CarlaInstrument(InstrumentTrack* const instrumentTrack, const D
     path.cdUp();
     path.cdUp();
     resourcesPath = path.absolutePath() + "/share/carla/resources";
-#elif defined(CARLA_OS_MAC)
+#elif defined(CARLA_OS_MAC) || defined(CARLA_OS_WIN32) || defined(CARLA_OS_WIN64)
     // parse prefix from dll filename
     QDir path = QFileInfo(dllName).dir();
     resourcesPath = path.absolutePath() + "/resources";
-#elif defined(CARLA_OS_WIN32) || defined(CARLA_OS_WIN64)
-    // not yet supported
 #endif
     fHost.resourceDir            = strdup(resourcesPath.toUtf8().constData());
     fHost.get_buffer_size        = host_get_buffer_size;
