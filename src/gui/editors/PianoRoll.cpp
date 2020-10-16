@@ -918,7 +918,7 @@ void PianoRoll::drawDetuningInfo( QPainter & _p, const Note * _n, int _x,
 	int old_y = 0;
 
 	timeMap & map = _n->detuning()->automationPattern()->getTimeMap();
-	for( timeMap::const_iterator it = map.begin(); it != map.end(); ++it )
+	for (timeMap::const_iterator it = map.begin(); it != map.end(); ++it)
 	{
 		// Current node values
 		int cur_ticks = it.key();
@@ -927,10 +927,10 @@ void PianoRoll::drawDetuningInfo( QPainter & _p, const Note * _n, int _x,
 		int cur_y = middle_y - cur_level * m_keyLineHeight;
 
 		// First line to represent the inValue of the first node
-		if( it == map.begin() )
+		if (it == map.begin())
 		{
-			_p.drawLine( cur_x - 1, cur_y, cur_x + 1, cur_y );
-			_p.drawLine( cur_x, cur_y - 1, cur_x, cur_y + 1 );
+			_p.drawLine(cur_x - 1, cur_y, cur_x + 1, cur_y);
+			_p.drawLine(cur_x, cur_y - 1, cur_x, cur_y + 1);
 		}
 		// All subsequent lines will take the outValue of the previous node
 		// and the inValue of the current node. It will also draw a vertical
@@ -939,38 +939,38 @@ void PianoRoll::drawDetuningInfo( QPainter & _p, const Note * _n, int _x,
 		{
 			// Previous node values (based on outValue). We just calculate
 			// the y level because the x will be the same as old_x.
-			const float pre_level = (it-1).value().getOutValue();
+			const float pre_level = (it - 1).value().getOutValue();
 			int pre_y = middle_y - pre_level * m_keyLineHeight;
 
 			// Draws the line representing the discrete jump if there's one
-			if( old_y != pre_y )
+			if (old_y != pre_y)
 			{
-				_p.drawLine( old_x, old_y, old_x, pre_y );
+				_p.drawLine(old_x, old_y, old_x, pre_y);
 			}
 
 			// Now draw the lines representing the actual progression from one
 			// node to the other
-			switch( _n->detuning()->automationPattern()->progressionType() )
+			switch (_n->detuning()->automationPattern()->progressionType())
 			{
 				case AutomationPattern::DiscreteProgression:
-					_p.drawLine( old_x, pre_y, cur_x, pre_y );
-					_p.drawLine( cur_x, pre_y, cur_x, cur_y );
+					_p.drawLine(old_x, pre_y, cur_x, pre_y);
+					_p.drawLine(cur_x, pre_y, cur_x, cur_y);
 					break;
 				case AutomationPattern::CubicHermiteProgression: /* TODO */
 				case AutomationPattern::LinearProgression:
-					_p.drawLine( old_x, pre_y, cur_x, cur_y );
+					_p.drawLine(old_x, pre_y, cur_x, cur_y);
 					break;
 			}
 
 			// If we are in the last node and there's a discrete jump, we draw a
 			// vertical line representing it
-			if( (it+1) == map.end() )
+			if ((it + 1) == map.end())
 			{
 				const float last_level = it.value().getOutValue();
-				if( cur_level != last_level )
+				if (cur_level != last_level)
 				{
 					int last_y = middle_y - last_level * m_keyLineHeight;
-					_p.drawLine( cur_x, cur_y, cur_x, last_y );
+					_p.drawLine(cur_x, cur_y, cur_x, last_y);
 				}
 			}
 		}

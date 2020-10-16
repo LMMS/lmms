@@ -1402,7 +1402,7 @@ void DataFile::upgrade_automationNodes()
 		{
 			QDomElement el = times.item(j).toElement();
 
-			float value = LocaleHelper::toFloat( el.attribute("value") );
+			float value = LocaleHelper::toFloat(el.attribute("value"));
 
 			// Set both inValue and outValue of the nodes to the value on that time
 			el.setAttribute("inValue", value);

@@ -55,11 +55,10 @@ public:
 		{
 			// prevent saving inline automation if there's just one value which equals value
 			// of model which is going to be saved anyways
-			if( isAtInitValue() &&
+			if (isAtInitValue() &&
 				m_autoPattern->getTimeMap().size() == 1 &&
 				m_autoPattern->getTimeMap().begin().key() == 0 &&
-				// TODO: Do we really care about outValue if we only have one node? I'm assuming no.
-				m_autoPattern->getTimeMap().begin().value().getInValue() == value() )
+				m_autoPattern->getTimeMap().begin().value().getInValue() == value())
 			{
 				return false;
 			}

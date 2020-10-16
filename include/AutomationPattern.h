@@ -79,11 +79,11 @@ public:
 	MidiTime timeMapLength() const;
 	void updateLength();
 
-	MidiTime putValue( const MidiTime & time,
+	MidiTime putValue(const MidiTime & time,
 				const float value,
 				const bool quantPos = true,
 				const bool ignoreSurroundingPoints = true,
-				const float outValueOffset = 0 );
+				const float outValueOffset = 0);
 
 	void removeValue( const MidiTime & time );
 
@@ -163,7 +163,7 @@ public slots:
 private:
 	void cleanObjects();
 	void generateTangents();
-	void generateTangents( timeMap::iterator it, int numToGenerate );
+	void generateTangents(timeMap::iterator it, int numToGenerate);
 	float valueAt( timeMap::const_iterator v, int offset ) const;
 
 	AutomationTrack * m_autoTrack;

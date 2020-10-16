@@ -318,11 +318,11 @@ void AutomationPatternView::paintEvent( QPaintEvent * )
 			// We are drawing the space after the last node, so we use the outValue
 			if( gradient() )
 			{
-				p.fillRect( QRectF( x1, 0.0f, x2 - x1, it.value().getOutValue() ), lin2grad );
+				p.fillRect(QRectF(x1, 0.0f, x2 - x1, it.value().getOutValue()), lin2grad);
 			}
 			else
 			{
-				p.fillRect( QRectF( x1, 0.0f, x2 - x1, it.value().getOutValue() ), col );
+				p.fillRect(QRectF(x1, 0.0f, x2 - x1, it.value().getOutValue()), col);
 			}
 			break;
 		}
@@ -342,7 +342,7 @@ void AutomationPatternView::paintEvent( QPaintEvent * )
 		}
 		else
 		{
-			nextValue = ( it + 1 ).value().getInValue();
+			nextValue = (it + 1).value().getInValue();
 		}
 
 		QPainterPath path;
@@ -496,18 +496,18 @@ void AutomationPatternView::scaleTimemapToFit( float oldMin, float oldMax )
 	{
 		// If the values are out of the previous range, fix them so they are
 		// between oldMin and oldMax.
-		if( it.value().getInValue() < oldMin )
+		if (it.value().getInValue() < oldMin)
 		{
-			it.value().setInValue( oldMin );
+			it.value().setInValue(oldMin);
 		}
-		else if( it.value().getInValue() > oldMax )
+		else if (it.value().getInValue() > oldMax)
 		{
-			it.value().setInValue( oldMax );
+			it.value().setInValue(oldMax);
 		}
 		// Calculate what the value would be proportionally in the new range
-		it.value().setInValue( (it.value().getInValue()-oldMin)*(newMax-newMin)/(oldMax-oldMin)+newMin );
+		it.value().setInValue((it.value().getInValue() - oldMin) * (newMax - newMin) / (oldMax - oldMin) + newMin);
 		// Read earlier TODO comment: For now I'm discarding the discrete jumps during the rescaling
-		it.value().setOutValue( it.value().getInValue() );
+		it.value().setOutValue(it.value().getInValue());
 	}
 
 	m_pat->generateTangents();
