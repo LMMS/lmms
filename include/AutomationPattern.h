@@ -176,6 +176,7 @@ private:
 	ProgressionTypes m_progressionType;
 
 	bool m_dragging;
+	float m_dragOutValueOffset;	// Offset between inValue and outValue when we want to keep it
 	
 	bool m_isRecording;
 	float m_lastRecordedValue;

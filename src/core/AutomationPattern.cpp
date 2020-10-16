@@ -301,6 +301,17 @@ MidiTime AutomationPattern::setDragValue( const MidiTime & time,
 		MidiTime newTime = quantPos  ?
 				Note::quantized( time, quantization() ) :
 							time;
+
+		m_dragOutValueOffset = 0;
+
+		// Check if we already have a node on the position we are dragging
+		// and if we do, store the valueOffset so the discrete jump can be kept
+		timeMap::iterator it = m_timeMap.find(newTime);
+		if (it != m_timeMap.end())
+		{
+			m_dragOutValueOffset = it.value().getValueOffset();
+		}
+
 		this->removeValue( newTime );
 		m_oldTimeMap = m_timeMap;
 		m_dragging = true;
@@ -311,7 +322,7 @@ MidiTime AutomationPattern::setDragValue( const MidiTime & time,
 
 	generateTangents();
 
-	return this->putValue( time, value, quantPos, controlKey );
+	return this->putValue( time, value, quantPos, controlKey, m_dragOutValueOffset );
 
 }
 
