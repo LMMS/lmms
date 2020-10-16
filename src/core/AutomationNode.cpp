@@ -30,36 +30,36 @@
 
 // Dummy constructor for the QMap
 AutomationNode::AutomationNode() :
-	m_pattern( nullptr ),
-	m_key( 0 ),
-	m_inValue( 0 ),
-	m_outValue( 0 ),
-	m_inTangent( 0 ),
-	m_outTangent( 0 )
+	m_pattern(nullptr),
+	m_key(0),
+	m_inValue(0),
+	m_outValue(0),
+	m_inTangent(0),
+	m_outTangent(0)
 {
 }
 
-AutomationNode::AutomationNode( AutomationPattern * pat, float value, int key ) :
-	m_pattern( pat ),
-	m_key( key ),
-	m_inValue( value ),
-	m_outValue( value ),
-	m_inTangent( 0 ),
-	m_outTangent( 0 )
+AutomationNode::AutomationNode(AutomationPattern* pat, float value, int key) :
+	m_pattern(pat),
+	m_key(key),
+	m_inValue(value),
+	m_outValue(value),
+	m_inTangent(0),
+	m_outTangent(0)
 {
 }
 
-AutomationNode::AutomationNode( AutomationPattern * pat, float inValue, float outValue, int key ) :
-	m_pattern( pat ),
-	m_key( key ),
-	m_inValue( inValue ),
-	m_outValue( outValue ),
-	m_inTangent( 0 ),
-	m_outTangent( 0 )
+AutomationNode::AutomationNode(AutomationPattern* pat, float inValue, float outValue, int key) :
+	m_pattern(pat),
+	m_key(key),
+	m_inValue(inValue),
+	m_outValue(outValue),
+	m_inTangent(0),
+	m_outTangent(0)
 {
 }
 
-void AutomationNode::setInValue( float value )
+void AutomationNode::setInValue(float value)
 {
 	m_inValue = value;
 
@@ -67,9 +67,9 @@ void AutomationNode::setInValue( float value )
 	AutomationPattern::timeMap & tm = m_pattern->getTimeMap();
 
 	// Get an iterator pointing to this node
-	AutomationPattern::timeMap::iterator it = tm.lowerBound( m_key );
+	AutomationPattern::timeMap::iterator it = tm.lowerBound(m_key);
 	// If it's not the first node, get the one immediately behind it
-	if( it != tm.begin() )
+	if (it != tm.begin())
 	{
 		--it;
 	}
@@ -78,7 +78,7 @@ void AutomationNode::setInValue( float value )
 	m_pattern->generateTangents(it, 3);
 }
 
-void AutomationNode::setOutValue( float value )
+void AutomationNode::setOutValue(float value)
 {
 	m_outValue = value;
 
@@ -86,9 +86,9 @@ void AutomationNode::setOutValue( float value )
 	AutomationPattern::timeMap & tm = m_pattern->getTimeMap();
 
 	// Get an iterator pointing to this node
-	AutomationPattern::timeMap::iterator it = tm.lowerBound( m_key );
+	AutomationPattern::timeMap::iterator it = tm.lowerBound(m_key);
 	// If it's not the first node, get the one immediately behind it
-	if( it != tm.begin() )
+	if (it != tm.begin())
 	{
 		--it;
 	}

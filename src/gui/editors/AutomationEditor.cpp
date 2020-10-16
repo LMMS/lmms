@@ -478,17 +478,10 @@ void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 		// Check if we are clicking over a node (it will be tm.end() if not)
 		timeMap::iterator clickedNode = getNodeAt(mouseEvent->x(), mouseEvent->y());
 
-		if (mouseEvent->button() == Qt::LeftButton)
-		{
-			m_mouseDownLeft = true;
-		}
-		if( mouseEvent->button() == Qt::RightButton )
-		{
-			m_mouseDownRight = true;
-		}
+		m_mouseDownLeft = (mouseEvent->button() == Qt::LeftButton);
+		m_mouseDownRight = (mouseEvent->button() == Qt::RightButton);
 
-		if( mouseEvent->button() == Qt::LeftButton &&
-						m_editMode == DRAW )
+		if( m_mouseDownLeft && m_editMode == DRAW )
 		{
 			m_pattern->addJournalCheckPoint();
 
@@ -572,23 +565,47 @@ void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 
 			Engine::getSong()->setModified();
 		}
-		else if( ( mouseEvent->button() == Qt::RightButton &&
-						m_editMode == DRAW ) ||
+		else if( ( m_mouseDownRight && m_editMode == DRAW ) ||
 				m_editMode == ERASE )
 		{
 			m_pattern->addJournalCheckPoint();
 
-			// Update the last clicked position if we draw a line later
-			m_drawLastTick = posTicks;
-
-			// If we right-clicked a node, remove it
-			if( clickedNode != tm.end() )
+			// If Alt+Right clicking or Alt+clicking on erase mode, we want
+			// to reset the outValues
+			if( mouseEvent->modifiers() & Qt::AltModifier )
 			{
-				m_pattern->removeValue( clickedNode.key() );
-				Engine::getSong()->setModified();
-			}
+				// So we actually don't care if we clicked the node itself, but if we clicked
+				// the node representing its outValue
+				clickedNode = getNodeAt(mouseEvent->x(), mouseEvent->y(), true);
 
-			m_action = NONE;
+				// If we clicked an outValue reset it
+				if( clickedNode != tm.end() )
+				{
+					clickedNode.value().setOutValue(
+						clickedNode.value().getInValue() );
+				}
+
+				// Update the last clicked position so we reset all outValues from
+				// that point up to the point we release the mouse button
+				m_drawLastTick = posTicks;
+
+				m_action = RESET_OUTVALUES;
+			}
+			else // If Alt is not pressed, we want the regular erase
+			{
+				// Update the last clicked position so we remove all nodes from
+				// that point up to the point we release the mouse button
+				m_drawLastTick = posTicks;
+
+				// If we right-clicked a node, remove it
+				if( clickedNode != tm.end() )
+				{
+					m_pattern->removeValue( clickedNode.key() );
+					Engine::getSong()->setModified();
+				}
+
+				m_action = ERASE_VALUES;
+			}
 		}
 
 		update();
@@ -635,32 +652,66 @@ void AutomationEditor::mouseReleaseEvent(QMouseEvent * mouseEvent )
 
 
 
-void AutomationEditor::removePoints( int x0, int x1 )
+void AutomationEditor::removeNodes( int tick0, int tick1 )
 {
-	int deltax = qAbs( x1 - x0 );
-	int x = x0;
-	int xstep;
-
-	if( deltax < 1 )
+	if( tick0 == tick1 )
 	{
 		return;
 	}
 
-	if( x0 < x1 )
+	MidiTime start = MidiTime( qMin(tick0, tick1) );
+	MidiTime end = MidiTime( qMax(tick0, tick1) );
+
+	timeMap & tm = m_pattern->getTimeMap();
+	timeMap::iterator it = tm.lowerBound( start );
+
+	// Make a list of MidiTimes with nodes to be removed
+	// because we can't simply remove the nodes from
+	// the timeMap while we are iterating it.
+	QVector<MidiTime> nodesToRemove;
+
+	while( it != tm.end() )
 	{
-		xstep = 1;
-	}
-	else
-	{
-		xstep = -1;
+		if( it.key() > end )
+		{
+			break;
+		}
+
+		nodesToRemove.append( it.key() );
+		++it;
 	}
 
-	int i = 0;
-	while( i <= deltax )
+	for( int c = 0; c < nodesToRemove.size(); ++c )
 	{
-		m_pattern->removeValue( MidiTime( x ) );
-		x += xstep;
-		i += 1;
+		m_pattern->removeValue( nodesToRemove[c] );
+	}
+}
+
+
+
+
+void AutomationEditor::resetNodes( int tick0, int tick1 )
+{
+	if( tick0 == tick1 )
+	{
+		return;
+	}
+
+	MidiTime start = MidiTime( qMin(tick0, tick1) );
+	MidiTime end = MidiTime( qMax(tick0, tick1) );
+
+	timeMap & tm = m_pattern->getTimeMap();
+	timeMap::iterator it = tm.lowerBound( start );
+
+	while( it != tm.end() )
+	{
+		if( it.key() > end )
+		{
+			return;
+		}
+
+		it.value().setOutValue( it.value().getInValue() );
+		++it;
 	}
 }
 
@@ -700,19 +751,14 @@ void AutomationEditor::mouseMoveEvent(QMouseEvent * mouseEvent )
 			if( m_action == MOVE_VALUE )
 			{
 				// If we moved the mouse past the beginning correct the position in ticks
-				if( posTicks < 0 )
-				{
-					posTicks = 0;
-				}
+				posTicks = qMax( posTicks, 0 );
 
 				m_drawLastTick = posTicks;
 				m_drawLastLevel = level;
 
 				// Updates the drag value of the moved node
 				m_pattern->setDragValue( MidiTime( posTicks ),
-								level, true,
-							mouseEvent->modifiers() &
-								Qt::ControlModifier );
+					level, true, mouseEvent->modifiers() & Qt::ControlModifier );
 
 				Engine::getSong()->setModified();
 			}
@@ -735,23 +781,30 @@ void AutomationEditor::mouseMoveEvent(QMouseEvent * mouseEvent )
 				// until the button is released
 			}
 		}
-		else if( ( mouseEvent->buttons() & Qt::RightButton &&
-						m_editMode == DRAW ) ||
-				( mouseEvent->buttons() & Qt::LeftButton &&
-						m_editMode == ERASE ) )
+		else if( ( m_mouseDownRight && m_editMode == DRAW ) ||
+				( m_mouseDownLeft && m_editMode == ERASE ) )
 		{
-			// Removing automation nodes
-
 			// If we moved the mouse past the beginning correct the position in ticks
-			if( posTicks < 0 )
+			posTicks = qMax( posTicks, 0 );
+
+			if( m_action == ERASE_VALUES )
 			{
-				posTicks = 0;
+				// Removing automation nodes
+
+				// Removes all values from the last clicked tick up to the current position tick
+				removeNodes( m_drawLastTick, posTicks );
+
+				Engine::getSong()->setModified();
 			}
+			else if( m_action == RESET_OUTVALUES )
+			{
+				// Reseting outValues
 
-			// Removes all values from the last clicked tick up to the current position tick
-			removePoints( m_drawLastTick, posTicks );
+				// Resets all values from the last clicked tick up to the current position tick
+				resetNodes( m_drawLastTick, posTicks );
 
-			Engine::getSong()->setModified();
+				Engine::getSong()->setModified();
+			}
 		}
 		// TODO: This is actually not called because we don't have mouseTracking enabled
 		// for this widget. So we need to either fix or remove that.

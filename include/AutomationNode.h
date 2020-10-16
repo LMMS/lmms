@@ -34,8 +34,8 @@ class AutomationNode
 {
 public:
 	AutomationNode(); // Dummy constructor for the QMap
-	AutomationNode( AutomationPattern * pat, float value, int key );
-	AutomationNode( AutomationPattern * pat, float inValue, float outValue, int key );
+	AutomationNode(AutomationPattern* pat, float value, int key);
+	AutomationNode(AutomationPattern* pat, float inValue, float outValue, int key);
 
 	inline float getInValue()
 	{
@@ -45,7 +45,7 @@ public:
 	{
 		return m_inValue;
 	}
-	void setInValue( float value );
+	void setInValue(float value);
 
 	inline float getOutValue()
 	{
@@ -55,7 +55,7 @@ public:
 	{
 		return m_outValue;
 	}
-	void setOutValue( float value );
+	void setOutValue(float value);
 
 	// Get the offset between inValue and outValue
 	inline float getValueOffset()
@@ -75,7 +75,7 @@ public:
 	{
 		return m_inTangent;
 	}
-	inline void setInTangent( float tangent )
+	inline void setInTangent(float tangent)
 	{
 		m_inTangent = tangent;
 	}
@@ -88,14 +88,14 @@ public:
 	{
 		return m_outTangent;
 	}
-	inline void setOutTangent( float tangent )
+	inline void setOutTangent(float tangent)
 	{
 		m_outTangent = tangent;
 	}
 
 private:
 	// Pattern that this node belongs to
-	AutomationPattern * m_pattern;
+	AutomationPattern* m_pattern;
 
 	// Time position of this node
 	int m_key;
