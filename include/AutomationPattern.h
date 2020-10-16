@@ -185,6 +185,7 @@ private:
 	static const float DEFAULT_MAX_VALUE;
 
 	friend class AutomationPatternView;
+	friend class AutomationNode;
 
 } ;
 

@@ -26,7 +26,10 @@
 #include "AutomationNode.h"
 
 
+// Dummy constructor for the QMap
 AutomationNode::AutomationNode() :
+	m_pattern( nullptr ),
+	m_key( 0 ),
 	m_inValue( 0 ),
 	m_outValue( 0 ),
 	m_inTangent( 0 ),
@@ -34,7 +37,9 @@ AutomationNode::AutomationNode() :
 {
 }
 
-AutomationNode::AutomationNode( float value ) :
+AutomationNode::AutomationNode( AutomationPattern * pat, float value, int key ) :
+	m_pattern( pat ),
+	m_key( key ),
 	m_inValue( value ),
 	m_outValue( value ),
 	m_inTangent( 0 ),
@@ -42,7 +47,9 @@ AutomationNode::AutomationNode( float value ) :
 {
 }
 
-AutomationNode::AutomationNode( float inValue, float outValue ) :
+AutomationNode::AutomationNode( AutomationPattern * pat, float inValue, float outValue, int key ) :
+	m_pattern( pat ),
+	m_key( key ),
 	m_inValue( inValue ),
 	m_outValue( outValue ),
 	m_inTangent( 0 ),

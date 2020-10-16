@@ -27,12 +27,15 @@
 #define AUTOMATION_NODE_H
 
 
+class AutomationPattern;
+
+
 class AutomationNode
 {
 public:
-	AutomationNode();
-	AutomationNode( float value );
-	AutomationNode( float inValue, float outValue );
+	AutomationNode(); // Dummy constructor for the QMap
+	AutomationNode( AutomationPattern * pat, float value, int key );
+	AutomationNode( AutomationPattern * pat, float inValue, float outValue, int key );
 
 	inline float getInValue()
 	{
@@ -87,6 +90,13 @@ public:
 	}
 
 private:
+	// Pattern that this node belongs to
+	AutomationPattern * m_pattern;
+
+	// Time position of this node
+	int m_key;
+
+	// Values of this node
 	float m_inValue;
 	float m_outValue;
 

@@ -980,7 +980,7 @@ void AutomationEditor::mouseMoveEvent(QMouseEvent * mouseEvent )
 			for( timeMap::iterator it = m_selValuesForMove.begin();
 					it != m_selValuesForMove.end(); ++it )
 			{
-				MidiTime new_value_pos;
+				MidiTime newValuePos;
 				if( it.key() )
 				{
 					int valueBar =	( it.key() / MidiTime::ticksPerBar() )
@@ -996,17 +996,15 @@ void AutomationEditor::mouseMoveEvent(QMouseEvent * mouseEvent )
 							MidiTime::ticksPerBar();
 					}
 					m_pattern->removeValue( it.key() );
-					new_value_pos = MidiTime( valueBar,
+					newValuePos = MidiTime( valueBar,
 							valueTicks );
 				}
 				// When moving selections (is that feature finished?) the outValue will
 				// be discarded.
 				// TODO: Maybe account for the outValue when moving selections?
-				new_selValuesForMove[
-					m_pattern->putValue( new_value_pos,
-						it.value().getInValue() + levelDiff,
-									false )]
-						= it.value().getInValue() + levelDiff;
+				MidiTime finalTime = m_pattern->putValue( newValuePos, it.value().getInValue() + levelDiff, false );
+				new_selValuesForMove[finalTime] =
+					AutomationNode(m_pattern, it.value().getInValue() + levelDiff, finalTime);
 			}
 			m_selValuesForMove = new_selValuesForMove;
 
@@ -2030,7 +2028,7 @@ void AutomationEditor::getSelectedValues( timeMap & selected_values )
 		{
 			// Adds an automation node to our selection timeMap with the selected node's
 			// inValue (outValue is ignored)
-			selected_values[it.key()] = AutomationNode( level );
+			selected_values[it.key()] = AutomationNode( m_pattern, level, it.key() );
 		}
 	}
 }

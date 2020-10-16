@@ -217,7 +217,7 @@ MidiTime AutomationPattern::putValue( const MidiTime & time,
 				time;
 
 	// Create a node or replace the existing one on newTime
-	m_timeMap[ newTime ] = AutomationNode( value );
+	m_timeMap[ newTime ] = AutomationNode( this, value, newTime );
 
 	timeMap::iterator it = m_timeMap.find( newTime );
 
@@ -511,7 +511,7 @@ void AutomationPattern::flipX( int length )
 			{
 				tempValue = valueAt( ( iterate + i ).key() );
 				MidiTime newTime = MidiTime( length - ( iterate + i ).key() );
-				tempMap[newTime] = AutomationNode( tempValue );
+				tempMap[newTime] = AutomationNode( this, tempValue, newTime );
 			}
 		}
 		else
@@ -529,7 +529,7 @@ void AutomationPattern::flipX( int length )
 				{
 					newTime = MidiTime( ( iterate + i ).key() );
 				}
-				tempMap[newTime] = AutomationNode( tempValue );
+				tempMap[newTime] = AutomationNode( this, tempValue, newTime );
 			}
 		}
 	}
@@ -540,7 +540,7 @@ void AutomationPattern::flipX( int length )
 			tempValue = valueAt( ( iterate + i ).key() );
 			cleanObjects();
 			MidiTime newTime = MidiTime( realLength - ( iterate + i ).key() );
-			tempMap[newTime] = AutomationNode( tempValue );
+			tempMap[newTime] = AutomationNode( this, tempValue, newTime );
 		}
 	}
 
@@ -617,7 +617,7 @@ void AutomationPattern::loadSettings( const QDomElement & _this )
 			float timeMapInValue = LocaleHelper::toFloat(element.attribute("inValue"));
 			float timeMapOutValue = LocaleHelper::toFloat(element.attribute("outValue"));
 
-			m_timeMap[timeMapPos] = AutomationNode( timeMapInValue, timeMapOutValue );
+			m_timeMap[timeMapPos] = AutomationNode( this, timeMapInValue, timeMapOutValue, timeMapPos );
 		}
 		else if( element.tagName() == "object" )
 		{
