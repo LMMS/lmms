@@ -454,37 +454,32 @@ float *AutomationPattern::valuesAfter( const MidiTime & _time ) const
 
 
 
-void AutomationPattern::flipY( int min, int max )
+void AutomationPattern::flipY(int min, int max)
 {
-	timeMap tempMap = m_timeMap;
-	timeMap::const_iterator iterate = m_timeMap.lowerBound(0);
+	timeMap::const_iterator it = m_timeMap.lowerBound(0);
+	if (it == m_timeMap.end() )
+	{
+		return;
+	}
+
 	float tempValue = 0;
 	float outValueOffset = 0;
 
-	int numPoints = 0;
-
-	// TODO: This loop looks really odd. Is there a particular case where iterate+i+1 != m_timeMap.end()
-	// will be true but iterate + 1 != m_timeMap.end() will be false?
-	for( int i = 0; ( iterate + i + 1 ) != m_timeMap.end() && ( iterate + i ) != m_timeMap.end() ; i++)
+	while (it != m_timeMap.end())
 	{
-		numPoints++;
-	}
-
-	for( int i = 0; i <= numPoints; i++ )
-	{
-
-		if ( min < 0 )
+		if (min < 0)
 		{
-			tempValue = valueAt( ( iterate + i ).key() ) * -1;
-			outValueOffset = (iterate + i).value().getValueOffset() * -1;
-			putValue(MidiTime((iterate + i).key()) , tempValue, false, true, outValueOffset);
+			tempValue = valueAt(it.key()) * -1;
+			outValueOffset = it.value().getValueOffset() * -1;
+			putValue(MidiTime(it.key()) , tempValue, false, true, outValueOffset);
 		}
 		else
 		{
-			tempValue = max - valueAt( ( iterate + i ).key() );
-			outValueOffset = (iterate + i).value().getValueOffset() * -1;
-			putValue(MidiTime((iterate + i).key()) , tempValue, false, true, outValueOffset);
+			tempValue = max - valueAt(it.key());
+			outValueOffset = it.value().getValueOffset() * -1;
+			putValue(MidiTime(it.key()) , tempValue, false, true, outValueOffset);
 		}
+		++it;
 	}
 
 	generateTangents();
@@ -502,74 +497,84 @@ void AutomationPattern::flipY()
 
 
 
-void AutomationPattern::flipX( int length )
+void AutomationPattern::flipX(int length)
 {
-	timeMap tempMap;
-
-	timeMap::const_iterator iterate = m_timeMap.lowerBound(0);
-	float tempValue = 0;
-	float tempOutValue = 0;
-	int numPoints = 0;
-
-	// TODO: Same as the comment on AutomationPattern::flipY
-	for( int i = 0; ( iterate + i + 1 ) != m_timeMap.end() && ( iterate + i ) != m_timeMap.end() ; i++)
+	timeMap::const_iterator it = m_timeMap.lowerBound(0);
+	if(it == m_timeMap.end())
 	{
-		numPoints++;
+		return;
 	}
 
-	float realLength = ( iterate + numPoints ).key();
+	// Temporary map where we will store the flipped version
+	// of our pattern
+	timeMap tempMap;
 
-	if ( length != -1 && length != realLength)
+	float tempValue = 0;
+	float tempOutValue = 0;
+
+	// We know the QMap isn't empty, making this safe:
+	float realLength = m_timeMap.lastKey();
+
+	// If we have a positive length, we want to flip the area covered by that
+	// length, even if it goes beyond the pattern. A negative length means that
+	// we just want to flip the nodes we have
+	if (length >= 0 && length != realLength)
 	{
 		// If length to be flipped is bigger than the real length
-		if ( realLength < length )
+		if (realLength < length)
 		{
-			// Adds a node to the end of the region being flipped because the region flipped goes
-			// further than the last node
-			tempValue = valueAt( ( iterate + numPoints ).key() );
-			putValue( MidiTime( length ) , tempValue, false);
-			numPoints++;
+			// We are flipping an area that goes beyond the last node. So we add a node to the
+			// beginning of the flipped timeMap representing the value of the end of the area
+			tempValue = valueAt(realLength);
+			tempMap[0] = AutomationNode(this, tempValue, 0);
 
-			for( int i = 0; i <= numPoints; i++ )
+			// Now flip the nodes we have in relation to the length
+			while (it != m_timeMap.end())
 			{
-				tempValue = valueAt( ( iterate + i ).key() );
-				tempOutValue = (iterate + i).value().getOutValue();
-				MidiTime newTime = MidiTime( length - ( iterate + i ).key() );
+				tempValue = valueAt(it.key());
+				tempOutValue = it.value().getOutValue();
+				MidiTime newTime = MidiTime(length - it.key());
 
 				tempMap[newTime] = AutomationNode(this, tempValue, tempOutValue, newTime);
+
+				++it;
 			}
 		}
 		else // If the length to be flipped is smaller than the real length
 		{
-			for( int i = 0; i <= numPoints; i++ )
+			while (it != m_timeMap.end())
 			{
-				tempValue = valueAt( ( iterate + i ).key() );
-				tempOutValue = (iterate + i).value().getOutValue();
+				tempValue = valueAt(it.key());
+				tempOutValue = it.value().getOutValue();
 				MidiTime newTime;
 
 				// Only flips the length to be flipped and keep the remaining values in place
-				if ( ( iterate + i ).key() <= length )
+				if (it.key() <= length)
 				{
-					newTime = MidiTime( length - ( iterate + i ).key() );
+					newTime = MidiTime(length - it.key());
 				}
 				else
 				{
-					newTime = MidiTime( ( iterate + i ).key() );
+					newTime = MidiTime(it.key());
 				}
 
 				tempMap[newTime] = AutomationNode(this, tempValue, tempOutValue, newTime);
+
+				++it;
 			}
 		}
 	}
 	else // Length to be flipped is the same as the real length
 	{
-		for( int i = 0; i <= numPoints; i++ )
+		while (it != m_timeMap.end())
 		{
-			tempValue = valueAt( ( iterate + i ).key() );
-			tempOutValue = (iterate + i).value().getOutValue();
+			tempValue = valueAt(it.key());
+			tempOutValue = it.value().getOutValue();
 
-			MidiTime newTime = MidiTime( realLength - ( iterate + i ).key() );
+			MidiTime newTime = MidiTime(realLength - it.key());
 			tempMap[newTime] = AutomationNode(this, tempValue, tempOutValue, newTime);
+
+			++it;
 		}
 	}
 
