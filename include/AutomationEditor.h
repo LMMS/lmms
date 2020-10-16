@@ -105,6 +105,7 @@ public:
 	{
 		DRAW,
 		ERASE,
+		DRAW_OUTVALUES
 	};
 
 public slots:
@@ -191,6 +192,7 @@ private:
 
 	static QPixmap * s_toolDraw;
 	static QPixmap * s_toolErase;
+	static QPixmap * s_toolDrawOut;
 	static QPixmap * s_toolMove;
 	static QPixmap * s_toolYFlip;
 	static QPixmap * s_toolXFlip;

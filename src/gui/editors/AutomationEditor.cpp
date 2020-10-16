@@ -66,6 +66,7 @@
 
 QPixmap * AutomationEditor::s_toolDraw = NULL;
 QPixmap * AutomationEditor::s_toolErase = NULL;
+QPixmap * AutomationEditor::s_toolDrawOut = NULL;
 QPixmap * AutomationEditor::s_toolMove = NULL;
 QPixmap * AutomationEditor::s_toolYFlip = NULL;
 QPixmap * AutomationEditor::s_toolXFlip = NULL;
@@ -176,6 +177,11 @@ AutomationEditor::AutomationEditor() :
 	{
 		s_toolErase= new QPixmap( embed::getIconPixmap(
 							"edit_erase" ) );
+	}
+	if (s_toolDrawOut == NULL)
+	{
+		s_toolDrawOut = new QPixmap(embed::getIconPixmap(
+							"edit_draw"));
 	}
 	if( s_toolMove == NULL )
 	{
@@ -488,130 +494,180 @@ void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 		m_mouseDownLeft = (mouseEvent->button() == Qt::LeftButton);
 		m_mouseDownRight = (mouseEvent->button() == Qt::RightButton);
 
-		if (m_mouseDownLeft && m_editMode == DRAW)
+		switch(m_editMode)
 		{
-			m_pattern->addJournalCheckPoint();
-
-			// If we are pressing shift, make a line of nodes from the last draw position
-			// to where we clicked
-			if (mouseEvent->modifiers() & Qt::ShiftModifier)
+			case DRAW:
 			{
-				drawLine(m_drawLastTick,
-						m_drawLastLevel,
-						posTicks, level);
+				m_pattern->addJournalCheckPoint();
 
-				// Beginning of the line of nodes
-				m_drawLastTick = posTicks;
-				m_drawLastLevel = level;
-
-				// Changes the action to drawing a line of nodes
-				m_action = DRAW_LINE;
-			}
-			else if (mouseEvent->modifiers() & Qt::AltModifier)
-			{
-				// If we are pressing alt, we want to drag the outValue of a node
-
-				// So we actually don't care if we clicked the node itself, but if we clicked
-				// the node representing its outValue
-				clickedNode = getNodeAt(mouseEvent->x(), mouseEvent->y(), true);
-
-				// If we clicked an outValue
-				if (clickedNode != tm.end())
+				if (m_mouseDownLeft)
 				{
-					m_draggedOutValueKey = clickedNode.key();
+					// If we are pressing shift, make a line of nodes from the last
+					// clicked position to this position
+					if (mouseEvent->modifiers() & Qt::ShiftModifier)
+					{
+						drawLine(m_drawLastTick, m_drawLastLevel,
+							posTicks, level);
 
-					clickedNode.value().setOutValue(level);
+						// Update the last clicked position for the next time
+						m_drawLastTick = posTicks;
+						m_drawLastLevel = level;
 
-					m_action = MOVE_OUTVALUE;
-				}
-			}
-			else // If we are not pressing shift or alt, we are just creating/moving a node
-			{
-				// If the place we clicked had no nodes
-				if (clickedNode == tm.end())
-				{
-					// We create a new node and start dragging it
-					MidiTime valuePos(posTicks);
+						// Changes the action to drawing a line of nodes
+						m_action = DRAW_LINE;
+					}
+					else // No shift, we are just creating/moving nodes
+					{
+						// If the place we clicked had no nodes
+						if (clickedNode == tm.end())
+						{
+							// We create a new node and start dragging it
+							MidiTime valuePos(posTicks);
 
-					// Starts actually moving/draging the node
-					MidiTime newTime = m_pattern->setDragValue(valuePos,
-						level, true, mouseEvent->modifiers() & Qt::ControlModifier);
+							// Starts actually moving/draging the node
+							MidiTime newTime = m_pattern->setDragValue(valuePos,
+								level, true, mouseEvent->modifiers() & Qt::ControlModifier);
 
-					// Set the iterator to our newly created node so we can use it later
-					// for the m_moveXOffset calculation
-					clickedNode = tm.find(newTime);
-				}
-				else // If we clicked over an existing node
-				{
-					// Simply start moving/draging it
-					MidiTime newTime = m_pattern->setDragValue(MidiTime(clickedNode.key()),
-						level, true, mouseEvent->modifiers() & Qt::ControlModifier);
+							// Set the iterator to our newly created node so we can use it later
+							// for the m_moveXOffset calculation
+							clickedNode = tm.find(newTime);
+						}
+						else // If we clicked over an existing node
+						{
+							// Simply start moving/draging it
+							MidiTime newTime = m_pattern->setDragValue(MidiTime(clickedNode.key()),
+								level, true, mouseEvent->modifiers() & Qt::ControlModifier);
 
-					// We need to update our iterator because setDragValue removes the node that
-					// is being dragged, so if we don't update it we have a bogus iterator
-					clickedNode = tm.find(newTime);
-				}
+							// We need to update our iterator because setDragValue removes the node that
+							// is being dragged, so if we don't update it we have a bogus iterator
+							clickedNode = tm.find(newTime);
+						}
 
-				// Set the action to MOVE_VALUE so moveMouseEvent() knows we are moving a node
-				m_action = MOVE_VALUE;
+						// Set the action to MOVE_VALUE so moveMouseEvent() knows we are moving a node
+						m_action = MOVE_VALUE;
 
-				// Calculate the offset from the place the mouse click happened in comparison
-				// to the center of the node
-				int alignedX = (int) ((float) ((clickedNode.key() - m_currentPosition) * m_ppb) /
-							MidiTime::ticksPerBar());
-				m_moveXOffset = x - alignedX - 1;
+						// Calculate the offset from the place the mouse click happened in comparison
+						// to the center of the node
+						int alignedX = (int) ((float) ((clickedNode.key() - m_currentPosition) * m_ppb) /
+									MidiTime::ticksPerBar());
+						m_moveXOffset = x - alignedX - 1;
 
-				// Set move-cursor
-				QCursor c(Qt::SizeAllCursor);
-				QApplication::setOverrideCursor(c);
+						// Set move-cursor
+						QCursor c(Qt::SizeAllCursor);
+						QApplication::setOverrideCursor(c);
 
-				// Update the last clicked position so it can be used if we draw a line later
-				m_drawLastTick = posTicks;
-				m_drawLastLevel = level;
-			}
+						// Update the last clicked position so it can be used if we draw a line later
+						m_drawLastTick = posTicks;
+						m_drawLastLevel = level;
+					}
 
-			Engine::getSong()->setModified();
-		}
-		else if ((m_mouseDownRight && m_editMode == DRAW) ||
-				m_editMode == ERASE)
-		{
-			m_pattern->addJournalCheckPoint();
-
-			// If Alt+Right clicking or Alt+clicking on erase mode, we want
-			// to reset the outValues
-			if (mouseEvent->modifiers() & Qt::AltModifier)
-			{
-				// So we actually don't care if we clicked the node itself, but if we clicked
-				// the node representing its outValue
-				clickedNode = getNodeAt(mouseEvent->x(), mouseEvent->y(), true);
-
-				// If we clicked an outValue reset it
-				if (clickedNode != tm.end())
-				{
-					clickedNode.value().setOutValue(
-						clickedNode.value().getInValue());
-				}
-
-				// Update the last clicked position so we reset all outValues from
-				// that point up to the point we release the mouse button
-				m_drawLastTick = posTicks;
-
-				m_action = RESET_OUTVALUES;
-			}
-			else // If Alt is not pressed, we want the regular erase
-			{
-				// Update the last clicked position so we remove all nodes from
-				// that point up to the point we release the mouse button
-				m_drawLastTick = posTicks;
-
-				// If we right-clicked a node, remove it
-				if (clickedNode != tm.end())
-				{
-					m_pattern->removeValue(clickedNode.key());
 					Engine::getSong()->setModified();
 				}
+				else if (m_mouseDownRight) // Right click on DRAW mode erases values
+				{
+					// Update the last clicked position so we remove all nodes from
+					// that point up to the point we release the mouse button
+					m_drawLastTick = posTicks;
 
-				m_action = ERASE_VALUES;
+					// If we right-clicked a node, remove it
+					if (clickedNode != tm.end())
+					{
+						m_pattern->removeValue(clickedNode.key());
+						Engine::getSong()->setModified();
+					}
+
+					m_action = ERASE_VALUES;
+				}
+			break;
+			}
+			case ERASE:
+			{
+				m_pattern->addJournalCheckPoint();
+
+				// On erase mode, left click removes nodes
+				if(m_mouseDownLeft)
+				{
+					// Update the last clicked position so we remove all nodes from
+					// that point up to the point we release the mouse button
+					m_drawLastTick = posTicks;
+
+					// If we right-clicked a node, remove it
+					if (clickedNode != tm.end())
+					{
+						m_pattern->removeValue(clickedNode.key());
+						Engine::getSong()->setModified();
+					}
+
+					m_action = ERASE_VALUES;
+				}
+				else if(m_mouseDownRight) // And right click resets outValues
+				{
+					// So we actually don't care if we clicked the node itself, but if we clicked
+					// the node representing its outValue
+					clickedNode = getNodeAt(mouseEvent->x(), mouseEvent->y(), true);
+
+					// If we clicked an outValue reset it
+					if (clickedNode != tm.end())
+					{
+						clickedNode.value().setOutValue(
+							clickedNode.value().getInValue());
+						Engine::getSong()->setModified();
+					}
+
+					// Update the last clicked position so we reset all outValues from
+					// that point up to the point we release the mouse button
+					m_drawLastTick = posTicks;
+
+					m_action = RESET_OUTVALUES;
+				}
+			break;
+			}
+			case DRAW_OUTVALUES:
+			{
+				m_pattern->addJournalCheckPoint();
+
+				// On this mode, left click sets the outValue
+				if (m_mouseDownLeft)
+				{
+					// If we are pressing alt, we want to drag the outValue of a node
+
+					// So we actually don't care if we clicked the node itself, but if we clicked
+					// the node representing its outValue
+					clickedNode = getNodeAt(mouseEvent->x(), mouseEvent->y(), true);
+
+					// If we clicked an outValue
+					if (clickedNode != tm.end())
+					{
+						m_draggedOutValueKey = clickedNode.key();
+
+						clickedNode.value().setOutValue(level);
+
+						m_action = MOVE_OUTVALUE;
+
+						Engine::getSong()->setModified();
+					}
+				}
+				else if (m_mouseDownRight) // Right click resets outValues
+				{
+					// So we actually don't care if we clicked the node itself, but if we clicked
+					// the node representing its outValue
+					clickedNode = getNodeAt(mouseEvent->x(), mouseEvent->y(), true);
+
+					// If we clicked an outValue reset it
+					if (clickedNode != tm.end())
+					{
+						clickedNode.value().setOutValue(
+							clickedNode.value().getInValue());
+						Engine::getSong()->setModified();
+					}
+
+					// Update the last clicked position so we reset all outValues from
+					// that point up to the point we release the mouse button
+					m_drawLastTick = posTicks;
+
+					m_action = RESET_OUTVALUES;
+				}
+			break;
 			}
 		}
 
@@ -749,118 +805,126 @@ void AutomationEditor::mouseMoveEvent(QMouseEvent * mouseEvent )
 		// Get the viewport X position where the mouse is at
 		int x = mouseEvent->x() - VALUES_WIDTH;
 
-		// If we are moving a value, we account for the offset from the node we
-		// had when clicking it in the first place (user might not have clicked exactly
-		// in the middle of the node)
-		if (m_action == MOVE_VALUE)
-		{
-			x -= m_moveXOffset;
-		}
-
 		// Get the X position in ticks
 		int posTicks = (x * MidiTime::ticksPerBar()/m_ppb) + m_currentPosition;
 
-		// If we are in DRAW mode and the left mouse is down
-		if (m_mouseDownLeft && m_editMode == DRAW)
+		switch(m_editMode)
 		{
-			if (m_action == MOVE_VALUE)
+			case DRAW:
+			{
+				// We are dragging a node
+				if (m_mouseDownLeft)
+				{
+					if (m_action == MOVE_VALUE)
+					{
+						// When we clicked the node, we might have clicked slightly off
+						// so we account for that offset for a smooth drag
+						x -= m_moveXOffset;
+						posTicks = (x * MidiTime::ticksPerBar()/m_ppb) + m_currentPosition;
+
+						// If we moved the mouse past the beginning correct the position in ticks
+						posTicks = qMax(posTicks, 0);
+
+						m_drawLastTick = posTicks;
+						m_drawLastLevel = level;
+
+						// Updates the drag value of the moved node
+						m_pattern->setDragValue(MidiTime(posTicks),
+							level, true, mouseEvent->modifiers() & Qt::ControlModifier);
+
+						Engine::getSong()->setModified();
+					}
+					else if (m_action == DRAW_LINE)
+					{
+						// We are drawing a line. For now do nothing (as before), but later logic
+						// could be added here so the line is updated according to the new mouse position
+						// until the button is released
+					}
+				}
+				else if (m_mouseDownRight) // We are removing nodes
+				{
+					if (m_action == ERASE_VALUES)
+					{
+						// If we moved the mouse past the beginning correct the position in ticks
+						posTicks = qMax(posTicks, 0);
+
+						// Removing automation nodes
+
+						// Removes all values from the last clicked tick up to the current position tick
+						removeNodes(m_drawLastTick, posTicks);
+
+						Engine::getSong()->setModified();
+					}
+				}
+			break;
+			}
+			case ERASE:
 			{
 				// If we moved the mouse past the beginning correct the position in ticks
 				posTicks = qMax(posTicks, 0);
 
-				m_drawLastTick = posTicks;
-				m_drawLastLevel = level;
-
-				// Updates the drag value of the moved node
-				m_pattern->setDragValue(MidiTime(posTicks),
-					level, true, mouseEvent->modifiers() & Qt::ControlModifier);
-
-				Engine::getSong()->setModified();
-			}
-			else if (m_action == MOVE_OUTVALUE)
-			{
-				// We are moving the outValue of the node
-				timeMap & tm = m_pattern->getTimeMap();
-
-				timeMap::iterator it = tm.find(m_draggedOutValueKey);
-				// Safety check
-				if (it != tm.end())
+				// Left button removes nodes
+				if (m_mouseDownLeft)
 				{
-					it.value().setOutValue(level);
-				}
-			}
-			else if (m_action == DRAW_LINE)
-			{
-				// We are drawing a line. For now do nothing (as before), but later logic
-				// could be added here so the line is updated according to the new mouse position
-				// until the button is released
-			}
-		}
-		else if ((m_mouseDownRight && m_editMode == DRAW) ||
-				(m_mouseDownLeft && m_editMode == ERASE))
-		{
-			// If we moved the mouse past the beginning correct the position in ticks
-			posTicks = qMax(posTicks, 0);
-
-			if (m_action == ERASE_VALUES)
-			{
-				// Removing automation nodes
-
-				// Removes all values from the last clicked tick up to the current position tick
-				removeNodes(m_drawLastTick, posTicks);
-
-				Engine::getSong()->setModified();
-			}
-			else if (m_action == RESET_OUTVALUES)
-			{
-				// Reseting outValues
-
-				// Resets all values from the last clicked tick up to the current position tick
-				resetNodes(m_drawLastTick, posTicks);
-
-				Engine::getSong()->setModified();
-			}
-		}
-		// TODO: This is actually not called because we don't have mouseTracking enabled
-		// for this widget. So we need to either fix or remove that.
-		else if (mouseEvent->buttons() & Qt::NoButton && m_editMode == DRAW)
-		{
-			// set move- or resize-cursor
-
-			// Get time map of current pattern
-			timeMap & tm = m_pattern->getTimeMap();
-
-			// Check if we have a node on the current mouse position
-			timeMap::iterator it = getNodeAt(mouseEvent->x(), mouseEvent->y());
-
-			// If our mouse is hovering over a node, change the cursor
-			if (it != tm.end())
-			{
-				if (QApplication::overrideCursor())
-				{
-					if (QApplication::overrideCursor()->shape() != Qt::SizeAllCursor)
+					if (m_action == ERASE_VALUES)
 					{
-						while (QApplication::overrideCursor() != NULL)
-						{
-							QApplication::restoreOverrideCursor();
-						}
+						// Removing automation nodes
 
-						QCursor c(Qt::SizeAllCursor);
-						QApplication::setOverrideCursor(c);
+						// Removes all values from the last clicked tick up to the current position tick
+						removeNodes(m_drawLastTick, posTicks);
+
+						Engine::getSong()->setModified();
 					}
 				}
-				else
+				else if (m_mouseDownRight) // Right button resets outValues
 				{
-					QCursor c(Qt::SizeAllCursor);
-					QApplication::setOverrideCursor(c);
+					if (m_action == RESET_OUTVALUES)
+					{
+						// Reseting outValues
+
+						// Resets all values from the last clicked tick up to the current position tick
+						resetNodes(m_drawLastTick, posTicks);
+
+						Engine::getSong()->setModified();
+					}
 				}
+			break;
 			}
-			else // If not, restore cursor
+			case DRAW_OUTVALUES:
 			{
-				while (QApplication::overrideCursor() != NULL)
+				// If we moved the mouse past the beginning correct the position in ticks
+				posTicks = qMax(posTicks, 0);
+
+				// Left button moves outValues
+				if (m_mouseDownLeft)
 				{
-					QApplication::restoreOverrideCursor();
+					if (m_action == MOVE_OUTVALUE)
+					{
+						// We are moving the outValue of the node
+						timeMap & tm = m_pattern->getTimeMap();
+
+						timeMap::iterator it = tm.find(m_draggedOutValueKey);
+						// Safety check
+						if (it != tm.end())
+						{
+							it.value().setOutValue(level);
+							Engine::getSong()->setModified();
+						}
+					}
 				}
+				else if (m_mouseDownRight) // Right button resets them
+				{
+					if (m_action == RESET_OUTVALUES)
+					{
+						// Reseting outValues
+
+						// Resets all values from the last clicked tick up to the current position tick
+						resetNodes(m_drawLastTick, posTicks);
+
+						Engine::getSong()->setModified();
+					}
+				}
+			break;
 			}
 		}
 	}
@@ -1242,11 +1306,11 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 	switch( m_editMode )
 	{
 		case DRAW:
-			if( m_mouseDownRight )
+			if (m_action == ERASE_VALUES)
 			{
 				cursor = s_toolErase;
 			}
-			else if( m_action == MOVE_VALUE )
+			else if (m_action == MOVE_VALUE)
 			{
 				cursor = s_toolMove;
 			}
@@ -1256,7 +1320,22 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 			}
 
 			break;
-		case ERASE: cursor = s_toolErase; break;
+		case ERASE:
+			cursor = s_toolErase;
+			break;
+		case DRAW_OUTVALUES:
+			if (m_action == RESET_OUTVALUES)
+			{
+				cursor = s_toolErase;
+			}
+			else if (m_action == MOVE_OUTVALUE)
+			{
+				cursor = s_toolMove;
+			}
+			else
+			{
+				cursor = s_toolDrawOut;
+			}
 	}
 	QPoint mousePosition = mapFromGlobal( QCursor::pos() );
 	if( cursor != NULL && mousePosition.y() > TOP_MARGIN + SCROLLBAR_SIZE)
@@ -1842,6 +1921,9 @@ AutomationEditorWindow::AutomationEditorWindow() :
 	QAction* eraseAction = editModeGroup->addAction(embed::getIconPixmap("edit_erase"), tr("Erase mode (Shift+E)"));
 	eraseAction->setShortcut(Qt::SHIFT | Qt::Key_E);
 
+	QAction* drawOutAction = editModeGroup->addAction(embed::getIconPixmap("edit_draw"), tr("Draw outValues mode (Shift+C)"));
+	drawOutAction->setShortcut(Qt::SHIFT | Qt::Key_C);
+
 	m_flipYAction = new QAction(embed::getIconPixmap("flip_y"), tr("Flip vertically"), this);
 	m_flipXAction = new QAction(embed::getIconPixmap("flip_x"), tr("Flip horizontally"), this);
 
@@ -1849,6 +1931,7 @@ AutomationEditorWindow::AutomationEditorWindow() :
 
 	editActionsToolBar->addAction(drawAction);
 	editActionsToolBar->addAction(eraseAction);
+	editActionsToolBar->addAction(drawOutAction);
 	editActionsToolBar->addAction(m_flipXAction);
 	editActionsToolBar->addAction(m_flipYAction);
 
