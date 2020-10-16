@@ -659,6 +659,10 @@ void AutomationEditor::mouseReleaseEvent(QMouseEvent * mouseEvent )
 
 
 
+/* @brief Removes all automation nodes between the given ticks
+ * @param Int first tick of the range
+ * @param Int second tick of the range
+ */
 void AutomationEditor::removeNodes(int tick0, int tick1)
 {
 	if (tick0 == tick1)
@@ -697,6 +701,10 @@ void AutomationEditor::removeNodes(int tick0, int tick1)
 
 
 
+/* @brief Resets the outValues of all automation nodes between the given ticks
+ * @param Int first tick of the range
+ * @param Int second tick of the range
+ */
 void AutomationEditor::resetNodes(int tick0, int tick1)
 {
 	if (tick0 == tick1)
@@ -1756,9 +1764,17 @@ void AutomationEditor::updateTopBottomLevels()
 
 
 
-// Get an iterator pointing to the node on a radius of r pixels from mouse position x,y
-// Returns timeMap.end() if none is found.
-// If outValue is true, check in relation to the outValue sphere.
+/* @brief Given a mouse coordinate, returns a timeMap::iterator that points to
+ *        the latest node that is inside a square of side "r" pixels from those
+ *        coordinates. In simpler terms, returns the automation node that was
+ *        clicked.
+ * @param Int X coordinate
+ * @param Int Y coordinate
+ * @param Boolean. True to check if the outValue of the node was clicked instead
+ *        (defaults to false)
+ * @param Int R distance in pixels
+ * @return timeMap::iterator with the clicked node, or timeMap.end() if none was clicked.
+ */
 AutomationEditor::timeMap::iterator AutomationEditor::getNodeAt(int x, int y, bool outValue /* = false */, int r /* = 5 */)
 {
 	// Remove the VALUES_WIDTH from the x position, so we have the actual viewport x

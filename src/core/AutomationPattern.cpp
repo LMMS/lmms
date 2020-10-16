@@ -203,8 +203,16 @@ void AutomationPattern::updateLength()
 
 
 
-// Puts a node on the timeMap with the given value. The outValue will be equal to
-// the value + outValueOffset, which defaults to 0.
+/* @brief Puts an automation node on the timeMap with the given value.
+ *        If an outValueOffset is given, the outValue will be set to
+ *        value + outValueOffset.
+ * @param MidiTime time to add the node to
+ * @param Float inValue of the node
+ * @param Boolean True to quantize the position (defaults to true)
+ * @param Boolean True to ignore unquantized surrounding nodes (defaults to true)
+ * @param Float offset from inValue to outValue (defaults to 0)
+ * @return MidiTime of the recently added automation node
+ */
 MidiTime AutomationPattern::putValue(const MidiTime & time,
 					const float value,
 					const bool quantPos,
@@ -284,12 +292,13 @@ void AutomationPattern::recordValue(MidiTime time, float value)
 
 /**
  * @brief Set the position of the point that is being dragged.
- *        Calling this function will also automatically set m_dragging to true,
- *        which applyDragValue() have to be called to m_dragging.
- * @param the time(x position) of the point being dragged
- * @param the value(y position) of the point being dragged
- * @param true to snip x position
- * @return
+ *        Calling this function will also automatically set m_dragging to true.
+ *        When applyDragValue() is called to m_dragging is set back to false.
+ * @param MidiTime of the node being dragged
+ * @param Float with the value to assign to the point being dragged
+ * @param Boolean. True to snip x position
+ * @param Boolean. True to ignore unquantized surrounding nodes
+ * @return MidiTime with current time of the dragged value
  */
 MidiTime AutomationPattern::setDragValue( const MidiTime & time,
 						const float value,
@@ -379,11 +388,15 @@ float AutomationPattern::valueAt( const MidiTime & _time ) const
 // will not be zero, because when the midi time given to AutomationPattern::valueAt(MidiTime)
 // matches a node's position, that node's value will be returned and this method won't be even
 // called.
-// TODO: If in the future we want to be able to call this method manually with offset = 0, we
-// need to account for that with a simple conditional at the beginning that just returns the
-// node's inValue.
 float AutomationPattern::valueAt( timeMap::const_iterator v, int offset ) const
 {
+	// We never use it with offset 0, but doesn't hurt to return a correct
+	// value if we do
+	if (offset == 0)
+	{
+		return v.value().getInValue();
+	}
+
 	if( m_progressionType == DiscreteProgression || v == m_timeMap.end() )
 	{
 		return v.value().getOutValue();

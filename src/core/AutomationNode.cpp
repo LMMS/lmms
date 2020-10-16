@@ -59,6 +59,10 @@ AutomationNode::AutomationNode(AutomationPattern* pat, float inValue, float outV
 {
 }
 
+/**
+ * @brief Sets the inValue of an automation node
+ * @param Float value to be assigned
+*/
 void AutomationNode::setInValue(float value)
 {
 	m_inValue = value;
@@ -78,6 +82,10 @@ void AutomationNode::setInValue(float value)
 	m_pattern->generateTangents(it, 3);
 }
 
+/**
+ * @brief Sets the outValue of an automation node
+ * @param Float value to be assigned
+*/
 void AutomationNode::setOutValue(float value)
 {
 	m_outValue = value;

@@ -57,7 +57,10 @@ public:
 	}
 	void setOutValue(float value);
 
-	// Get the offset between inValue and outValue
+	/**
+	 * @brief Gets the offset between inValue and outValue
+	 * @return Float representing the offset between inValue and outValue
+	 */
 	inline float getValueOffset()
 	{
 		return m_outValue - m_inValue;
@@ -67,6 +70,10 @@ public:
 		return m_outValue - m_inValue;
 	}
 
+	/**
+	 * @brief Gets the tangent of the left side of the node
+	 * @return Float with the tangent from the inValue side
+	 */
 	inline float getInTangent()
 	{
 		return m_inTangent;
@@ -75,11 +82,20 @@ public:
 	{
 		return m_inTangent;
 	}
+
+	/**
+	 * @brief Sets the tangent of the left side of the node
+	 * @param Float with the tangent for the inValue side
+	 */
 	inline void setInTangent(float tangent)
 	{
 		m_inTangent = tangent;
 	}
 
+	/**
+	 * @brief Gets the tangent of the right side of the node
+	 * @return Float with the tangent from the outValue side
+	 */
 	inline float getOutTangent()
 	{
 		return m_outTangent;
@@ -88,6 +104,11 @@ public:
 	{
 		return m_outTangent;
 	}
+
+	/**
+	 * @brief Sets the tangent of the right side of the node
+	 * @param Float with the tangent for the outValue side
+	 */
 	inline void setOutTangent(float tangent)
 	{
 		m_outTangent = tangent;
