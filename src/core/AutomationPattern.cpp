@@ -307,10 +307,7 @@ MidiTime AutomationPattern::setDragValue( const MidiTime & time,
 	//Restore to the state before it the point were being dragged
 	m_timeMap = m_oldTimeMap;
 
-	for( timeMap::iterator it = m_timeMap.begin(); it != m_timeMap.end(); ++it )
-	{
-		generateTangents( it, 3 );
-	}
+	generateTangents();
 
 	return this->putValue( time, value, quantPos, controlKey );
 
