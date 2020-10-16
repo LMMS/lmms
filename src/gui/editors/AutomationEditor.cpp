@@ -544,7 +544,25 @@ void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 				// Changes the action to drawing a line of nodes
 				m_action = DRAW_LINE;
 			}
-			else // If we are not pressing shift, we are just creating/moving a node
+			else if( mouseEvent->modifiers() & Qt::AltModifier )
+			{
+				// If we are pressing alt, we want to drag the outValue of a node
+
+				// So we actually don't care if we clicked the node itself, but if we clicked
+				// the node representing its outValue
+				clickedNode = getNodeAt(mouseEvent->x(), mouseEvent->y(), true);
+
+				// If we clicked an outValue
+				if( clickedNode != tm.end() )
+				{
+					m_draggedOutValueKey = clickedNode.key();
+
+					clickedNode.value().setOutValue( level );
+
+					m_action = MOVE_OUTVALUE;
+				}
+			}
+			else // If we are not pressing shift or alt, we are just creating/moving a node
 			{
 				// If the place we clicked had no nodes
 				if( clickedNode == tm.end() )
@@ -671,11 +689,6 @@ void AutomationEditor::mouseReleaseEvent(QMouseEvent * mouseEvent )
 		mustRepaint = true;
 	}
 
-	if( mouseEvent->button() == Qt::LeftButton )
-	{
-		mustRepaint = true;
-	}
-
 	if( m_editMode == DRAW )
 	{
 		if( m_action == MOVE_VALUE )
@@ -683,6 +696,7 @@ void AutomationEditor::mouseReleaseEvent(QMouseEvent * mouseEvent )
 			// Actually apply the value of the node being dragged
 			m_pattern->applyDragValue();
 		}
+
 		QApplication::restoreOverrideCursor();
 	}
 
@@ -777,6 +791,18 @@ void AutomationEditor::mouseMoveEvent(QMouseEvent * mouseEvent )
 								Qt::ControlModifier );
 
 				Engine::getSong()->setModified();
+			}
+			else if( m_action == MOVE_OUTVALUE )
+			{
+				// We are moving the outValue of the node
+				timeMap & tm = m_pattern->getTimeMap();
+
+				timeMap::iterator it = tm.find( m_draggedOutValueKey );
+				// Safety check
+				if( it != tm.end() )
+				{
+					it.value().setOutValue( level );
+				}
 			}
 			else if( m_action == DRAW_LINE )
 			{
@@ -2244,7 +2270,8 @@ void AutomationEditor::updateTopBottomLevels()
 
 // Get an iterator pointing to the node on a radius of r pixels from mouse position x,y
 // Returns timeMap.end() if none is found.
-AutomationEditor::timeMap::iterator AutomationEditor::getNodeAt( int x, int y, int r /* = 5 */ )
+// If outValue is true, check in relation to the outValue sphere.
+AutomationEditor::timeMap::iterator AutomationEditor::getNodeAt( int x, int y, bool outValue /* = false */, int r /* = 5 */ )
 {
 	// Remove the VALUES_WIDTH from the x position, so we have the actual viewport x
 	x -= VALUES_WIDTH;
@@ -2267,7 +2294,11 @@ AutomationEditor::timeMap::iterator AutomationEditor::getNodeAt( int x, int y, i
 		if( posTicks >= it.key() - ticksOffset && posTicks <= it.key() + ticksOffset )
 		{
 			// The y position of the node
-			float valueY = yCoordOfLevel(it.value().getInValue());
+			float valueY = yCoordOfLevel(
+				outValue
+					? it.value().getOutValue()
+					: it.value().getInValue()
+				);
 			// If the y coordinate is within "r" pixels of the node's value
 			if( y >= (valueY - r) && y <= (valueY + r) )
 			{
@@ -2279,11 +2310,6 @@ AutomationEditor::timeMap::iterator AutomationEditor::getNodeAt( int x, int y, i
 
 	return node;
 }
-
-
-
-
-
 
 
 
