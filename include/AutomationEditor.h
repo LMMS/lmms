@@ -55,7 +55,8 @@ class AutomationEditor : public QWidget, public JournallingObject
 	Q_PROPERTY(QColor barLineColor READ barLineColor WRITE setBarLineColor)
 	Q_PROPERTY(QColor beatLineColor READ beatLineColor WRITE setBeatLineColor)
 	Q_PROPERTY(QColor lineColor READ lineColor WRITE setLineColor)
-	Q_PROPERTY(QColor vertexColor READ vertexColor WRITE setVertexColor)
+	Q_PROPERTY(QColor nodeInValueColor READ nodeInValueColor WRITE setNodeInValueColor)
+	Q_PROPERTY(QColor nodeOutValueColor READ nodeOutValueColor WRITE setNodeOutValueColor)
 	Q_PROPERTY(QBrush scaleColor READ scaleColor WRITE setScaleColor)
 	Q_PROPERTY(QBrush graphColor READ graphColor WRITE setGraphColor)
 	Q_PROPERTY(QColor crossColor READ crossColor WRITE setCrossColor)
@@ -89,8 +90,10 @@ public:
 	void setLineColor(const QColor & c);
 	QBrush graphColor() const;
 	void setGraphColor(const QBrush & c);
-	QColor vertexColor() const;
-	void setVertexColor(const QColor & c);
+	QColor nodeInValueColor() const;
+	void setNodeInValueColor(const QColor & c);
+	QColor nodeOutValueColor() const;
+	void setNodeOutValueColor(const QColor & c);
 	QBrush scaleColor() const;
 	void setScaleColor(const QBrush & c);
 	QColor crossColor() const;
@@ -247,7 +250,8 @@ private:
 	QColor m_beatLineColor;
 	QColor m_lineColor;
 	QBrush m_graphColor;
-	QColor m_vertexColor;
+	QColor m_nodeInValueColor;
+	QColor m_nodeOutValueColor;
 	QBrush m_scaleColor;
 	QColor m_crossColor;
 	QColor m_backgroundShade;

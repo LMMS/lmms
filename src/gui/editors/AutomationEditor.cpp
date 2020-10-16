@@ -103,7 +103,8 @@ AutomationEditor::AutomationEditor() :
 	m_beatLineColor( 0, 0, 0 ),
 	m_lineColor( 0, 0, 0 ),
 	m_graphColor( Qt::SolidPattern ),
-	m_vertexColor( 0,0,0 ),
+	m_nodeInValueColor(0, 0, 0),
+	m_nodeOutValueColor(0, 0, 0),
 	m_scaleColor( Qt::SolidPattern ),
 	m_crossColor( 0, 0, 0 ),
 	m_backgroundShade( 0, 0, 0 )
@@ -268,11 +269,17 @@ QBrush AutomationEditor::graphColor() const
 void AutomationEditor::setGraphColor( const QBrush & c )
 { m_graphColor = c; }
 
-QColor AutomationEditor::vertexColor() const
-{ return m_vertexColor; }
+QColor AutomationEditor::nodeInValueColor() const
+{ return m_nodeInValueColor; }
 
-void AutomationEditor::setVertexColor( const QColor & c )
-{ m_vertexColor = c; }
+void AutomationEditor::setNodeInValueColor(const QColor & c)
+{ m_nodeInValueColor = c; }
+
+QColor AutomationEditor::nodeOutValueColor() const
+{ return m_nodeOutValueColor; }
+
+void AutomationEditor::setNodeOutValueColor(const QColor & c)
+{ m_nodeOutValueColor = c; }
 
 QBrush AutomationEditor::scaleColor() const
 { return m_scaleColor; }
@@ -895,20 +902,19 @@ inline void AutomationEditor::drawCross( QPainter & p )
 
 
 
-inline void AutomationEditor::drawAutomationPoint( QPainter & p, timeMap::iterator it )
+inline void AutomationEditor::drawAutomationPoint(QPainter & p, timeMap::iterator it)
 {
-	int x = xCoordOfTick( it.key() );
+	int x = xCoordOfTick(it.key());
 	int y = yCoordOfLevel(it.value().getInValue());
-	const int outerRadius = qBound( 3, ( m_ppb * AutomationPattern::quantization() ) / 576, 5 ); // man, getting this calculation right took forever
-	p.setPen( QPen( vertexColor().lighter( 200 ) ) );
-	p.setBrush( QBrush( vertexColor() ) );
-	p.drawEllipse( x - outerRadius, y - outerRadius, outerRadius * 2, outerRadius * 2 );
+	const int outerRadius = qBound(3, (m_ppb * AutomationPattern::quantization()) / 576, 5); // man, getting this calculation right took forever
+	p.setPen(QPen(nodeInValueColor().lighter(200)));
+	p.setBrush(QBrush(nodeInValueColor()));
+	p.drawEllipse(x - outerRadius, y - outerRadius, outerRadius * 2, outerRadius * 2);
 
 	// Draws another ellipse for the outValue
-	// TODO: Use some color defined on the Automation Editor class. This is just for testing purposes
 	y = yCoordOfLevel(it.value().getOutValue());
-	p.setPen(QPen(QColor(255, 0, 0, 80).lighter(200)));
-	p.setBrush(QBrush(QColor(255, 0, 0, 80)));
+	p.setPen(QPen(nodeOutValueColor().lighter(200)));
+	p.setBrush(QBrush(nodeOutValueColor()));
 	p.drawEllipse(x - outerRadius, y - outerRadius, outerRadius * 2, outerRadius * 2);
 }
 
