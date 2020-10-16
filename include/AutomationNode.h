@@ -45,10 +45,7 @@ public:
 	{
 		return m_inValue;
 	}
-	inline void setInValue( float value )
-	{
-		m_inValue = value;
-	}
+	void setInValue( float value );
 
 	inline float getOutValue()
 	{
@@ -58,10 +55,7 @@ public:
 	{
 		return m_outValue;
 	}
-	inline void setOutValue( float value )
-	{
-		m_outValue = value;
-	}
+	void setOutValue( float value );
 
 	inline float getInTangent()
 	{
