@@ -57,6 +57,16 @@ public:
 	}
 	void setOutValue( float value );
 
+	// Get the offset between inValue and outValue
+	inline float getValueOffset()
+	{
+		return m_outValue - m_inValue;
+	}
+	inline const float getValueOffset() const
+	{
+		return m_outValue - m_inValue;
+	}
+
 	inline float getInTangent()
 	{
 		return m_inTangent;

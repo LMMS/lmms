@@ -203,12 +203,13 @@ void AutomationPattern::updateLength()
 
 
 
-// For now, when creating a node, the inValue and outValue will match. After the node is
-// created, the user will then be able to drag the outValue to make discrete jumps
+// Puts a node on the timeMap with the given value. The outValue will be equal to
+// the value + outValueOffset, which defaults to 0.
 MidiTime AutomationPattern::putValue( const MidiTime & time,
 					const float value,
 					const bool quantPos,
-					const bool ignoreSurroundingPoints )
+					const bool ignoreSurroundingPoints,
+					const float outValueOffset )
 {
 	cleanObjects();
 
@@ -217,7 +218,7 @@ MidiTime AutomationPattern::putValue( const MidiTime & time,
 				time;
 
 	// Create a node or replace the existing one on newTime
-	m_timeMap[ newTime ] = AutomationNode( this, value, newTime );
+	m_timeMap[ newTime ] = AutomationNode( this, value, value + outValueOffset, newTime );
 
 	timeMap::iterator it = m_timeMap.find( newTime );
 
@@ -429,16 +430,12 @@ float *AutomationPattern::valuesAfter( const MidiTime & _time ) const
 
 
 
-// TODO: Because putValue sets both the inValue and outValue to the same value, flipping
-// the pattern will ignore outValues that are different (meaning discrete jumps will be lost).
-// If we want them to be kept we need to update the logic so they are accounted for. For now
-// this behavior is acceptable (discrete jumps will likely lose their meaning on a flipped
-// pattern anyways)
 void AutomationPattern::flipY( int min, int max )
 {
 	timeMap tempMap = m_timeMap;
 	timeMap::const_iterator iterate = m_timeMap.lowerBound(0);
 	float tempValue = 0;
+	float outValueOffset = 0;
 
 	int numPoints = 0;
 
@@ -455,12 +452,14 @@ void AutomationPattern::flipY( int min, int max )
 		if ( min < 0 )
 		{
 			tempValue = valueAt( ( iterate + i ).key() ) * -1;
-			putValue( MidiTime( (iterate + i).key() ) , tempValue, false);
+			outValueOffset = ( iterate + i ).value().getValueOffset() * -1;
+			putValue( MidiTime( (iterate + i).key() ) , tempValue, false, true, outValueOffset );
 		}
 		else
 		{
 			tempValue = max - valueAt( ( iterate + i ).key() );
-			putValue( MidiTime( (iterate + i).key() ) , tempValue, false);
+			outValueOffset = ( iterate + i ).value().getValueOffset() * -1;
+			putValue( MidiTime( (iterate + i).key() ) , tempValue, false, true, outValueOffset );
 		}
 	}
 
@@ -479,17 +478,13 @@ void AutomationPattern::flipY()
 
 
 
-// TODO: This method sets both the inValue and outValue of the new timeMap to the same value,
-// so flipping the pattern will ignore outValues that are different (meaning discrete jumps will be lost).
-// If we want them to be kept we need to update the logic so they are accounted for. For now
-// this behavior is acceptable (discrete jumps will likely lose their meaning on a flipped
-// pattern anyways)
 void AutomationPattern::flipX( int length )
 {
 	timeMap tempMap;
 
 	timeMap::const_iterator iterate = m_timeMap.lowerBound(0);
 	float tempValue = 0;
+	float tempOutValue = 0;
 	int numPoints = 0;
 
 	// TODO: Same as the comment on AutomationPattern::flipY
@@ -502,25 +497,33 @@ void AutomationPattern::flipX( int length )
 
 	if ( length != -1 && length != realLength)
 	{
+		// If length to be flipped is bigger than the real length
 		if ( realLength < length )
 		{
+			// Adds a node to the end of the region being flipped because the region flipped goes
+			// further than the last node
 			tempValue = valueAt( ( iterate + numPoints ).key() );
 			putValue( MidiTime( length ) , tempValue, false);
 			numPoints++;
+
 			for( int i = 0; i <= numPoints; i++ )
 			{
 				tempValue = valueAt( ( iterate + i ).key() );
+				tempOutValue = ( iterate + i ).value().getOutValue();
 				MidiTime newTime = MidiTime( length - ( iterate + i ).key() );
-				tempMap[newTime] = AutomationNode( this, tempValue, newTime );
+
+				tempMap[newTime] = AutomationNode( this, tempValue, tempOutValue, newTime );
 			}
 		}
-		else
+		else // If the length to be flipped is smaller than the real length
 		{
 			for( int i = 0; i <= numPoints; i++ )
 			{
 				tempValue = valueAt( ( iterate + i ).key() );
+				tempOutValue = ( iterate + i ).value().getOutValue();
 				MidiTime newTime;
 
+				// Only flips the length to be flipped and keep the remaining values in place
 				if ( ( iterate + i ).key() <= length )
 				{
 					newTime = MidiTime( length - ( iterate + i ).key() );
@@ -529,24 +532,28 @@ void AutomationPattern::flipX( int length )
 				{
 					newTime = MidiTime( ( iterate + i ).key() );
 				}
-				tempMap[newTime] = AutomationNode( this, tempValue, newTime );
+
+				tempMap[newTime] = AutomationNode( this, tempValue, tempOutValue, newTime );
 			}
 		}
 	}
-	else
+	else // Length to be flipped is the same as the real length
 	{
 		for( int i = 0; i <= numPoints; i++ )
 		{
 			tempValue = valueAt( ( iterate + i ).key() );
-			cleanObjects();
+			tempOutValue = ( iterate + i ).value().getOutValue();
+
 			MidiTime newTime = MidiTime( realLength - ( iterate + i ).key() );
-			tempMap[newTime] = AutomationNode( this, tempValue, newTime );
+			tempMap[newTime] = AutomationNode( this, tempValue, tempOutValue, newTime );
 		}
 	}
 
 	m_timeMap.clear();
 
 	m_timeMap = tempMap;
+
+	cleanObjects();
 
 	generateTangents();
 	emit dataChanged();
