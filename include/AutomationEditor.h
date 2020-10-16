@@ -102,8 +102,6 @@ public:
 	{
 		DRAW,
 		ERASE,
-		SELECT,
-		MOVE
 	};
 
 public slots:
@@ -127,9 +125,6 @@ protected:
 	int xCoordOfTick( int tick );
 	float yCoordOfLevel( float level );
 	inline void drawLevelTick( QPainter & p, int tick, float value);// bool is_selected ); //NEEDS Change in CSS
-	void removeSelection();
-	void selectAll();
-	void getSelectedValues(timeMap & selected_values );
 
 	// Returns the an iterator pointing to the AutomationNode on a radius of
 	// r pixels of the x,y mouse coordinates, or timeMap.end() if there are none.
@@ -154,11 +149,6 @@ protected slots:
 	void setProgressionType(int type);
 	void setTension();
 
-	void copySelectedValues();
-	void cutSelectedValues();
-	void pasteValues();
-	void deleteSelectedValues();
-
 	void updatePosition( const MidiTime & t );
 
 	void zoomingXChanged();
@@ -175,8 +165,6 @@ private:
 		MOVE_VALUE,
 		MOVE_OUTVALUE,
 		DRAW_LINE,
-		SELECT_VALUES,
-		MOVE_SELECTION
 	} ;
 
 	// some constants...
@@ -195,7 +183,6 @@ private:
 
 	static QPixmap * s_toolDraw;
 	static QPixmap * s_toolErase;
-	static QPixmap * s_toolSelect;
 	static QPixmap * s_toolMove;
 	static QPixmap * s_toolYFlip;
 	static QPixmap * s_toolXFlip;
@@ -227,13 +214,6 @@ private:
 
 	Actions m_action;
 
-	tick_t m_selectStartTick;
-	tick_t m_selectedTick;
-	float m_selectStartLevel;
-	float m_selectedLevels;
-
-	float m_moveStartLevel;
-	tick_t m_moveStartTick;
 	int m_moveXOffset;
 
 	float m_drawLastLevel;
@@ -242,9 +222,6 @@ private:
 	int m_ppb;
 	int m_y_delta;
 	bool m_y_auto;
-
-	timeMap m_valuesToCopy;
-	timeMap m_selValuesForMove;
 
 	// Time position (key) of automation node whose's outValue is being dragged
 	int m_draggedOutValueKey;
