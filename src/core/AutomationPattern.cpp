@@ -33,6 +33,7 @@
 #include "ProjectJournal.h"
 #include "BBTrackContainer.h"
 #include "Song.h"
+#include "AutomationNode.h"
 
 #include <cmath>
 
@@ -964,26 +965,3 @@ void AutomationPattern::generateTangents( timeMap::iterator it,
 
 
 
-AutomationNode::AutomationNode() :
-	m_inValue( 0 ),
-	m_outValue( 0 ),
-	m_inTangent( 0 ),
-	m_outTangent( 0 )
-{
-}
-
-AutomationNode::AutomationNode( float value ) :
-	m_inValue( value ),
-	m_outValue( value ),
-	m_inTangent( 0 ),
-	m_outTangent( 0 )
-{
-}
-
-AutomationNode::AutomationNode( float inValue, float outValue ) :
-	m_inValue( inValue ),
-	m_outValue( outValue ),
-	m_inTangent( 0 ),
-	m_outTangent( 0 )
-{
-}

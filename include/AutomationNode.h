@@ -1,0 +1,102 @@
+/*
+ * AutomationNode.h - Declaration of class AutomationNode, which contains
+ *                       all information about an automation node
+ *
+ * Copyright (c) 2020 Ian Caio <iancaio_dev/at/hotmail.com>
+ *
+ * This file is part of LMMS - https://lmms.io
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public
+ * License along with this program (see COPYING); if not, write to the
+ * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ * Boston, MA 02110-1301 USA.
+ *
+ */
+
+#ifndef AUTOMATION_NODE_H
+#define AUTOMATION_NODE_H
+
+
+class AutomationNode
+{
+public:
+	AutomationNode();
+	AutomationNode( float value );
+	AutomationNode( float inValue, float outValue );
+
+	inline float getInValue()
+	{
+		return m_inValue;
+	}
+	inline const float getInValue() const
+	{
+		return m_inValue;
+	}
+	inline void setInValue( float value )
+	{
+		m_inValue = value;
+	}
+
+	inline float getOutValue()
+	{
+		return m_outValue;
+	}
+	inline const float getOutValue() const
+	{
+		return m_outValue;
+	}
+	inline void setOutValue( float value )
+	{
+		m_outValue = value;
+	}
+
+	inline float getInTangent()
+	{
+		return m_inTangent;
+	}
+	inline const float getInTangent() const
+	{
+		return m_inTangent;
+	}
+	inline void setInTangent( float tangent )
+	{
+		m_inTangent = tangent;
+	}
+
+	inline float getOutTangent()
+	{
+		return m_outTangent;
+	}
+	inline const float getOutTangent() const
+	{
+		return m_outTangent;
+	}
+	inline void setOutTangent( float tangent )
+	{
+		m_outTangent = tangent;
+	}
+
+private:
+	float m_inValue;
+	float m_outValue;
+
+	// Slope at each point for calculating spline
+	// We might have discrete jumps between curves, so we possibly have
+	// two different tangents for each side of the curve. If inValue and
+	// outValue are equal, inTangent and outTangent are equal too.
+	float m_inTangent;
+	float m_outTangent;
+} ;
+
+
+#endif

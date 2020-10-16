@@ -61,6 +61,7 @@
 #include "TextFloat.h"
 #include "TimeLineWidget.h"
 #include "ToolTip.h"
+#include "AutomationNode.h"
 
 
 QPixmap * AutomationEditor::s_toolDraw = NULL;

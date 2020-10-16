@@ -31,6 +31,7 @@
 #include <QtCore/QPointer>
 
 #include "Track.h"
+#include "AutomationNode.h"
 
 
 class AutomationTrack;
@@ -38,76 +39,6 @@ class MidiTime;
 
 
 
-class AutomationNode
-{
-public:
-	AutomationNode();
-	AutomationNode( float value );
-	AutomationNode( float inValue, float outValue );
-
-	inline float getInValue()
-	{
-		return m_inValue;
-	}
-	inline const float getInValue() const
-	{
-		return m_inValue;
-	}
-	inline void setInValue( float value )
-	{
-		m_inValue = value;
-	}
-
-	inline float getOutValue()
-	{
-		return m_outValue;
-	}
-	inline const float getOutValue() const
-	{
-		return m_outValue;
-	}
-	inline void setOutValue( float value )
-	{
-		m_outValue = value;
-	}
-
-	inline float getInTangent()
-	{
-		return m_inTangent;
-	}
-	inline const float getInTangent() const
-	{
-		return m_inTangent;
-	}
-	inline void setInTangent( float tangent )
-	{
-		m_inTangent = tangent;
-	}
-
-	inline float getOutTangent()
-	{
-		return m_outTangent;
-	}
-	inline const float getOutTangent() const
-	{
-		return m_outTangent;
-	}
-	inline void setOutTangent( float tangent )
-	{
-		m_outTangent = tangent;
-	}
-
-private:
-	float m_inValue;
-	float m_outValue;
-
-	// Slope at each point for calculating spline
-	// We might have discrete jumps between curves, so we possibly have
-	// two different tangents for each side of the curve. If inValue and
-	// outValue are equal, inTangent and outTangent are equal too.
-	float m_inTangent;
-	float m_outTangent;
-} ;
 
 class LMMS_EXPORT AutomationPattern : public TrackContentObject
 {
