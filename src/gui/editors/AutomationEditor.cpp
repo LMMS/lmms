@@ -602,8 +602,7 @@ void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 				}
 				else if(m_mouseDownRight) // And right click resets outValues
 				{
-					// So we actually don't care if we clicked the node itself, but if we clicked
-					// the node representing its outValue
+					// We check if we clicked a sphere representing an outValue
 					clickedNode = getNodeAt(mouseEvent->x(), mouseEvent->y(), true);
 
 					// If we clicked an outValue reset it
@@ -629,10 +628,7 @@ void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 				// On this mode, left click sets the outValue
 				if (m_mouseDownLeft)
 				{
-					// If we are pressing alt, we want to drag the outValue of a node
-
-					// So we actually don't care if we clicked the node itself, but if we clicked
-					// the node representing its outValue
+					// We check if we clicked a sphere representing an outValue
 					clickedNode = getNodeAt(mouseEvent->x(), mouseEvent->y(), true);
 
 					// If we clicked an outValue
@@ -646,11 +642,29 @@ void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 
 						Engine::getSong()->setModified();
 					}
+					else // If we didn't click an outValue
+					{
+						// We check if the quantized position of the time we clicked has a
+						// node and set its outValue
+						MidiTime quantizedPos = Note::quantized(MidiTime(posTicks),
+										m_pattern->quantization());
+
+						clickedNode = tm.find(quantizedPos);
+
+						if (clickedNode != tm.end())
+						{
+							m_draggedOutValueKey = clickedNode.key();
+							clickedNode.value().setOutValue(level);
+
+							m_action = MOVE_OUTVALUE;
+
+							Engine::getSong()->setModified();
+						}
+					}
 				}
 				else if (m_mouseDownRight) // Right click resets outValues
 				{
-					// So we actually don't care if we clicked the node itself, but if we clicked
-					// the node representing its outValue
+					// We check if we clicked a sphere representing an outValue
 					clickedNode = getNodeAt(mouseEvent->x(), mouseEvent->y(), true);
 
 					// If we clicked an outValue reset it
