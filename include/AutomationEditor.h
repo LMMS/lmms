@@ -205,7 +205,10 @@ private:
 
 	FloatModel * m_tensionModel;
 
-	QMutex m_patternMutex;
+	// Mutex for making automation editor methods thread safe
+	// Mutable so we can lock it from const objects
+	mutable QMutex m_patternEditorMutex;
+
 	AutomationPattern * m_pattern;
 	float m_minLevel;
 	float m_maxLevel;

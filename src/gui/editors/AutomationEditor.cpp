@@ -81,7 +81,7 @@ AutomationEditor::AutomationEditor() :
 	m_zoomingXModel(),
 	m_zoomingYModel(),
 	m_quantizeModel(),
-	m_patternMutex( QMutex::Recursive ),
+	m_patternEditorMutex( QMutex::Recursive ),
 	m_pattern( NULL ),
 	m_minLevel( 0 ),
 	m_maxLevel( 0 ),
@@ -201,6 +201,8 @@ AutomationEditor::AutomationEditor() :
 
 AutomationEditor::~AutomationEditor()
 {
+	QMutexLocker m( &m_patternEditorMutex );
+
 	m_zoomingXModel.disconnect();
 	m_zoomingYModel.disconnect();
 	m_quantizeModel.disconnect();
@@ -214,14 +216,14 @@ AutomationEditor::~AutomationEditor()
 
 void AutomationEditor::setCurrentPattern(AutomationPattern * new_pattern )
 {
+	QMutexLocker m( &m_patternEditorMutex );
+
 	if (m_pattern)
 	{
 		m_pattern->disconnect(this);
 	}
 
-	m_patternMutex.lock();
 	m_pattern = new_pattern;
-	m_patternMutex.unlock();
 
 	if (m_pattern != nullptr)
 	{
@@ -236,6 +238,8 @@ void AutomationEditor::setCurrentPattern(AutomationPattern * new_pattern )
 
 void AutomationEditor::saveSettings(QDomDocument & doc, QDomElement & dom_parent)
 {
+	QMutexLocker m( &m_patternEditorMutex );
+
 	MainWindow::saveWidgetState( parentWidget(), dom_parent );
 }
 
@@ -244,6 +248,8 @@ void AutomationEditor::saveSettings(QDomDocument & doc, QDomElement & dom_parent
 
 void AutomationEditor::loadSettings( const QDomElement & dom_parent)
 {
+	QMutexLocker m( &m_patternEditorMutex );
+
 	MainWindow::restoreWidgetState(parentWidget(), dom_parent);
 }
 
@@ -252,65 +258,65 @@ void AutomationEditor::loadSettings( const QDomElement & dom_parent)
 // qproperty access methods
 
 QColor AutomationEditor::barLineColor() const
-{ return m_barLineColor; }
+{ QMutexLocker m( &m_patternEditorMutex ); return m_barLineColor; }
 
 void AutomationEditor::setBarLineColor( const QColor & c )
-{ m_barLineColor = c; }
+{ QMutexLocker m( &m_patternEditorMutex ); m_barLineColor = c; }
 
 QColor AutomationEditor::beatLineColor() const
-{ return m_beatLineColor; }
+{ QMutexLocker m( &m_patternEditorMutex ); return m_beatLineColor; }
 
 void AutomationEditor::setBeatLineColor( const QColor & c )
-{ m_beatLineColor = c; }
+{ QMutexLocker m( &m_patternEditorMutex ); m_beatLineColor = c; }
 
 QColor AutomationEditor::lineColor() const
-{ return m_lineColor; }
+{ QMutexLocker m( &m_patternEditorMutex ); return m_lineColor; }
 
 void AutomationEditor::setLineColor( const QColor & c )
-{ m_lineColor = c; }
+{ QMutexLocker m( &m_patternEditorMutex ); m_lineColor = c; }
 
 QBrush AutomationEditor::graphColor() const
-{ return m_graphColor; }
+{ QMutexLocker m( &m_patternEditorMutex ); return m_graphColor; }
 
 void AutomationEditor::setGraphColor( const QBrush & c )
-{ m_graphColor = c; }
+{ QMutexLocker m( &m_patternEditorMutex ); m_graphColor = c; }
 
 QColor AutomationEditor::nodeInValueColor() const
-{ return m_nodeInValueColor; }
+{ QMutexLocker m( &m_patternEditorMutex ); return m_nodeInValueColor; }
 
 void AutomationEditor::setNodeInValueColor(const QColor & c)
-{ m_nodeInValueColor = c; }
+{ QMutexLocker m( &m_patternEditorMutex ); m_nodeInValueColor = c; }
 
 QColor AutomationEditor::nodeOutValueColor() const
-{ return m_nodeOutValueColor; }
+{ QMutexLocker m( &m_patternEditorMutex ); return m_nodeOutValueColor; }
 
 void AutomationEditor::setNodeOutValueColor(const QColor & c)
-{ m_nodeOutValueColor = c; }
+{ QMutexLocker m( &m_patternEditorMutex ); m_nodeOutValueColor = c; }
 
 QBrush AutomationEditor::scaleColor() const
-{ return m_scaleColor; }
+{ QMutexLocker m( &m_patternEditorMutex ); return m_scaleColor; }
 
 void AutomationEditor::setScaleColor( const QBrush & c )
-{ m_scaleColor = c; }
+{ QMutexLocker m( &m_patternEditorMutex ); m_scaleColor = c; }
 
 QColor AutomationEditor::crossColor() const
-{ return m_crossColor; }
+{ QMutexLocker m( &m_patternEditorMutex ); return m_crossColor; }
 
 void AutomationEditor::setCrossColor( const QColor & c )
-{ m_crossColor = c; }
+{ QMutexLocker m( &m_patternEditorMutex ); m_crossColor = c; }
 
 QColor AutomationEditor::backgroundShade() const
-{ return m_backgroundShade; }
+{ QMutexLocker m( &m_patternEditorMutex ); return m_backgroundShade; }
 
 void AutomationEditor::setBackgroundShade( const QColor & c )
-{ m_backgroundShade = c; }
+{ QMutexLocker m( &m_patternEditorMutex ); m_backgroundShade = c; }
 
 
 
 
 void AutomationEditor::updateAfterPatternChange()
 {
-	QMutexLocker m( &m_patternMutex );
+	QMutexLocker m( &m_patternEditorMutex );
 
 	m_currentPosition = 0;
 
@@ -341,9 +347,10 @@ void AutomationEditor::updateAfterPatternChange()
 
 void AutomationEditor::update()
 {
+	QMutexLocker m( &m_patternEditorMutex );
+
 	QWidget::update();
 
-	QMutexLocker m( &m_patternMutex );
 	// Note detuning?
 	if( m_pattern && !m_pattern->getTrack() )
 	{
@@ -356,6 +363,8 @@ void AutomationEditor::update()
 
 void AutomationEditor::keyPressEvent(QKeyEvent * ke )
 {
+	QMutexLocker m( &m_patternEditorMutex );
+
 	switch( ke->key() )
 	{
 		case Qt::Key_Up:
@@ -401,6 +410,8 @@ void AutomationEditor::keyPressEvent(QKeyEvent * ke )
 
 void AutomationEditor::leaveEvent(QEvent * e )
 {
+	QMutexLocker m( &m_patternEditorMutex );
+
 	while( QApplication::overrideCursor() != NULL )
 	{
 		QApplication::restoreOverrideCursor();
@@ -412,6 +423,8 @@ void AutomationEditor::leaveEvent(QEvent * e )
 
 void AutomationEditor::drawLine( int x0In, float y0, int x1In, float y1 )
 {
+	// No need for a mutex here since no member variables are accessed/modified
+
 	int x0 = Note::quantized( x0In, AutomationPattern::quantization() );
 	int x1 = Note::quantized( x1In, AutomationPattern::quantization() );
 	int deltax = qAbs( x1 - x0 );
@@ -468,7 +481,7 @@ void AutomationEditor::drawLine( int x0In, float y0, int x1In, float y1 )
 
 void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 {
-	QMutexLocker m( &m_patternMutex );
+	QMutexLocker m( &m_patternEditorMutex );
 	if( !validPattern() )
 	{
 		return;
@@ -694,6 +707,8 @@ void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 
 void AutomationEditor::mouseReleaseEvent(QMouseEvent * mouseEvent )
 {
+	QMutexLocker m( &m_patternEditorMutex );
+
 	bool mustRepaint = false;
 
 	if (mouseEvent->button() == Qt::LeftButton)
@@ -735,6 +750,8 @@ void AutomationEditor::mouseReleaseEvent(QMouseEvent * mouseEvent )
  */
 void AutomationEditor::removeNodes(int tick0, int tick1)
 {
+	QMutexLocker m( &m_patternEditorMutex );
+
 	if (tick0 == tick1)
 	{
 		return;
@@ -777,6 +794,8 @@ void AutomationEditor::removeNodes(int tick0, int tick1)
  */
 void AutomationEditor::resetNodes(int tick0, int tick1)
 {
+	QMutexLocker m( &m_patternEditorMutex );
+
 	if (tick0 == tick1)
 	{
 		return;
@@ -805,7 +824,7 @@ void AutomationEditor::resetNodes(int tick0, int tick1)
 
 void AutomationEditor::mouseMoveEvent(QMouseEvent * mouseEvent )
 {
-	QMutexLocker m( &m_patternMutex );
+	QMutexLocker m( &m_patternEditorMutex );
 	if( !validPattern() )
 	{
 		update();
@@ -955,6 +974,8 @@ void AutomationEditor::mouseMoveEvent(QMouseEvent * mouseEvent )
 
 inline void AutomationEditor::drawCross( QPainter & p )
 {
+	QMutexLocker m( &m_patternEditorMutex );
+
 	QPoint mouse_pos = mapFromGlobal( QCursor::pos() );
 	int grid_bottom = height() - SCROLLBAR_SIZE - 1;
 	float level = getLevel( mouse_pos.y() );
@@ -990,6 +1011,8 @@ inline void AutomationEditor::drawCross( QPainter & p )
 
 inline void AutomationEditor::drawAutomationPoint(QPainter & p, timeMap::iterator it)
 {
+	QMutexLocker m( &m_patternEditorMutex );
+
 	int x = xCoordOfTick(it.key());
 	int y = yCoordOfLevel(it.value().getInValue());
 	const int outerRadius = qBound(3, (m_ppb * AutomationPattern::quantization()) / 576, 5); // man, getting this calculation right took forever
@@ -1009,7 +1032,7 @@ inline void AutomationEditor::drawAutomationPoint(QPainter & p, timeMap::iterato
 
 void AutomationEditor::paintEvent(QPaintEvent * pe )
 {
-	QMutexLocker m( &m_patternMutex );
+	QMutexLocker m( &m_patternEditorMutex );
 
 	QStyleOption opt;
 	opt.initFrom( this );
@@ -1363,6 +1386,8 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 
 int AutomationEditor::xCoordOfTick(int tick )
 {
+	QMutexLocker m( &m_patternEditorMutex );
+
 	return VALUES_WIDTH + ( ( tick - m_currentPosition )
 		* m_ppb / MidiTime::ticksPerBar() );
 }
@@ -1372,6 +1397,8 @@ int AutomationEditor::xCoordOfTick(int tick )
 
 float AutomationEditor::yCoordOfLevel(float level )
 {
+	QMutexLocker m( &m_patternEditorMutex );
+
 	int grid_bottom = height() - SCROLLBAR_SIZE - 1;
 	if( m_y_auto )
 	{
@@ -1390,6 +1417,8 @@ float AutomationEditor::yCoordOfLevel(float level )
 void AutomationEditor::drawLevelTick(QPainter & p, int tick, float value)
 				//			bool is_selected )
 {
+	QMutexLocker m( &m_patternEditorMutex );
+
 	int grid_bottom = height() - SCROLLBAR_SIZE - 1;
 	const int x = xCoordOfTick( tick );
 	int rect_width = xCoordOfTick( tick+1 ) - x;
@@ -1434,6 +1463,8 @@ void AutomationEditor::drawLevelTick(QPainter & p, int tick, float value)
 // Center the vertical scroll position on the first object's inValue
 void AutomationEditor::centerTopBottomScroll()
 {
+	QMutexLocker m( &m_patternEditorMutex );
+
 	// default to the m_scrollLevel position
 	int pos = static_cast<int>(m_scrollLevel);
 	// If a pattern exists...
@@ -1458,6 +1489,8 @@ void AutomationEditor::centerTopBottomScroll()
 // responsible for moving/resizing scrollbars after window-resizing
 void AutomationEditor::resizeEvent(QResizeEvent * re)
 {
+	QMutexLocker m( &m_patternEditorMutex );
+
 	m_leftRightScroll->setGeometry( VALUES_WIDTH, height() - SCROLLBAR_SIZE,
 							width() - VALUES_WIDTH,
 							SCROLLBAR_SIZE );
@@ -1496,8 +1529,11 @@ void AutomationEditor::resizeEvent(QResizeEvent * re)
 
 
 
+// TODO: Move this method up so it's closer to the other mouse events
 void AutomationEditor::wheelEvent(QWheelEvent * we )
 {
+	QMutexLocker m( &m_patternEditorMutex );
+
 	we->accept();
 	if( we->modifiers() & Qt::ControlModifier && we->modifiers() & Qt::ShiftModifier )
 	{
@@ -1577,6 +1613,8 @@ void AutomationEditor::wheelEvent(QWheelEvent * we )
 
 float AutomationEditor::getLevel(int y )
 {
+	QMutexLocker m( &m_patternEditorMutex );
+
 	int level_line_y = height() - SCROLLBAR_SIZE - 1;
 	// pressed level
 	float level = roundf( ( m_bottomLevel + ( m_y_auto ?
@@ -1594,7 +1632,8 @@ float AutomationEditor::getLevel(int y )
 
 inline bool AutomationEditor::inBBEditor()
 {
-	QMutexLocker m( &m_patternMutex );
+	QMutexLocker m( &m_patternEditorMutex );
+
 	return( validPattern() &&
 				m_pattern->getTrack()->trackContainer() == Engine::getBBTrackContainer() );
 }
@@ -1604,7 +1643,7 @@ inline bool AutomationEditor::inBBEditor()
 
 void AutomationEditor::play()
 {
-	QMutexLocker m( &m_patternMutex );
+	QMutexLocker m( &m_patternEditorMutex );
 
 	if( !validPattern() )
 	{
@@ -1649,7 +1688,7 @@ void AutomationEditor::play()
 
 void AutomationEditor::stop()
 {
-	QMutexLocker m( &m_patternMutex );
+	QMutexLocker m( &m_patternEditorMutex );
 
 	if( !validPattern() )
 	{
@@ -1671,6 +1710,8 @@ void AutomationEditor::stop()
 
 void AutomationEditor::horScrolled(int new_pos )
 {
+	QMutexLocker m( &m_patternEditorMutex );
+
 	m_currentPosition = new_pos;
 	emit positionChanged( m_currentPosition );
 	update();
@@ -1681,6 +1722,8 @@ void AutomationEditor::horScrolled(int new_pos )
 
 void AutomationEditor::verScrolled(int new_pos )
 {
+	QMutexLocker m( &m_patternEditorMutex );
+
 	m_scrollLevel = new_pos;
 	updateTopBottomLevels();
 	update();
@@ -1691,6 +1734,8 @@ void AutomationEditor::verScrolled(int new_pos )
 
 void AutomationEditor::setEditMode(AutomationEditor::EditModes mode)
 {
+	QMutexLocker m( &m_patternEditorMutex );
+
 	if (m_editMode == mode)
 		return;
 
@@ -1712,10 +1757,11 @@ void AutomationEditor::setEditMode(int mode)
 
 void AutomationEditor::setProgressionType(AutomationPattern::ProgressionTypes type)
 {
+	QMutexLocker m( &m_patternEditorMutex );
+
 	if (validPattern())
 	{
 		m_pattern->addJournalCheckPoint();
-		QMutexLocker m(&m_patternMutex);
 		m_pattern->setProgressionType(type);
 		Engine::getSong()->setModified();
 		update();
@@ -1732,6 +1778,8 @@ void AutomationEditor::setProgressionType(int type)
 
 void AutomationEditor::setTension()
 {
+	QMutexLocker m( &m_patternEditorMutex );
+
 	if ( m_pattern )
 	{
 		m_pattern->setTension( QString::number( m_tensionModel->value() ) );
@@ -1744,6 +1792,8 @@ void AutomationEditor::setTension()
 
 void AutomationEditor::updatePosition(const MidiTime & t )
 {
+	QMutexLocker m( &m_patternEditorMutex );
+
 	if( ( Engine::getSong()->isPlaying() &&
 			Engine::getSong()->playMode() ==
 					Song::Mode_PlayAutomationPattern ) ||
@@ -1771,6 +1821,8 @@ void AutomationEditor::updatePosition(const MidiTime & t )
 
 void AutomationEditor::zoomingXChanged()
 {
+	QMutexLocker m( &m_patternEditorMutex );
+
 	m_ppb = m_zoomXLevels[m_zoomingXModel.value()] * DEFAULT_PPB;
 
 	assert( m_ppb > 0 );
@@ -1784,6 +1836,8 @@ void AutomationEditor::zoomingXChanged()
 
 void AutomationEditor::zoomingYChanged()
 {
+	QMutexLocker m( &m_patternEditorMutex );
+
 	const QString & zfac = m_zoomingYModel.currentText();
 	m_y_auto = zfac == "Auto";
 	if( !m_y_auto )
@@ -1812,6 +1866,8 @@ void AutomationEditor::setQuantization()
 
 void AutomationEditor::updateTopBottomLevels()
 {
+	QMutexLocker m( &m_patternEditorMutex );
+
 	if( m_y_auto )
 	{
 		m_bottomLevel = m_minLevel;
@@ -1870,6 +1926,8 @@ void AutomationEditor::updateTopBottomLevels()
  */
 AutomationEditor::timeMap::iterator AutomationEditor::getNodeAt(int x, int y, bool outValue /* = false */, int r /* = 5 */)
 {
+	QMutexLocker m( &m_patternEditorMutex );
+
 	// Remove the VALUES_WIDTH from the x position, so we have the actual viewport x
 	x -= VALUES_WIDTH;
 	// Convert the x position to the position in ticks

@@ -44,6 +44,7 @@ const float AutomationPattern::DEFAULT_MAX_VALUE = 1;
 
 AutomationPattern::AutomationPattern( AutomationTrack * _auto_track ) :
 	TrackContentObject( _auto_track ),
+	m_patternMutex( QMutex::Recursive ),
 	m_autoTrack( _auto_track ),
 	m_objects(),
 	m_tension( 1.0 ),
@@ -75,6 +76,7 @@ AutomationPattern::AutomationPattern( AutomationTrack * _auto_track ) :
 
 AutomationPattern::AutomationPattern( const AutomationPattern & _pat_to_copy ) :
 	TrackContentObject( _pat_to_copy.m_autoTrack ),
+	m_patternMutex( QMutex::Recursive ),
 	m_autoTrack( _pat_to_copy.m_autoTrack ),
 	m_objects( _pat_to_copy.m_objects ),
 	m_tension( _pat_to_copy.m_tension ),
@@ -102,6 +104,8 @@ AutomationPattern::AutomationPattern( const AutomationPattern & _pat_to_copy ) :
 
 bool AutomationPattern::addObject( AutomatableModel * _obj, bool _search_dup )
 {
+	QMutexLocker m( &m_patternMutex );
+
 	if( _search_dup && m_objects.contains(_obj) )
 	{
 		return false;
@@ -131,6 +135,8 @@ bool AutomationPattern::addObject( AutomatableModel * _obj, bool _search_dup )
 void AutomationPattern::setProgressionType(
 					ProgressionTypes _new_progression_type )
 {
+	QMutexLocker m( &m_patternMutex );
+
 	if ( _new_progression_type == DiscreteProgression ||
 		_new_progression_type == LinearProgression ||
 		_new_progression_type == CubicHermiteProgression )
@@ -145,6 +151,8 @@ void AutomationPattern::setProgressionType(
 
 void AutomationPattern::setTension( QString _new_tension )
 {
+	QMutexLocker m( &m_patternMutex );
+
 	bool ok;
 	float nt = LocaleHelper::toFloat(_new_tension, & ok);
 
@@ -159,18 +167,22 @@ void AutomationPattern::setTension( QString _new_tension )
 
 const AutomatableModel * AutomationPattern::firstObject() const
 {
-	AutomatableModel * m;
-	if( !m_objects.isEmpty() && ( m = m_objects.first() ) != NULL )
+	QMutexLocker m( &m_patternMutex );
+
+	AutomatableModel * model;
+	if( !m_objects.isEmpty() && ( model = m_objects.first() ) != NULL )
 	{
-		return m;
+		return model;
 	}
 
-	static FloatModel _fm( 0, DEFAULT_MIN_VALUE, DEFAULT_MAX_VALUE, 0.001 );
-	return &_fm;
+	static FloatModel fm( 0, DEFAULT_MIN_VALUE, DEFAULT_MAX_VALUE, 0.001 );
+	return &fm;
 }
 
 const AutomationPattern::objectVector& AutomationPattern::objects() const
 {
+	QMutexLocker m( &m_patternMutex );
+
 	return m_objects;
 }
 
@@ -179,6 +191,8 @@ const AutomationPattern::objectVector& AutomationPattern::objects() const
 
 MidiTime AutomationPattern::timeMapLength() const
 {
+	QMutexLocker m( &m_patternMutex );
+
 	MidiTime one_bar = MidiTime(1, 0);
 	if (m_timeMap.isEmpty()) { return one_bar; }
 
@@ -219,6 +233,8 @@ MidiTime AutomationPattern::putValue(const MidiTime & time,
 					const bool ignoreSurroundingPoints,
 					const float outValueOffset)
 {
+	QMutexLocker m( &m_patternMutex );
+
 	cleanObjects();
 
 	MidiTime newTime = quantPos ?
@@ -257,6 +273,8 @@ MidiTime AutomationPattern::putValue(const MidiTime & time,
 
 void AutomationPattern::removeValue( const MidiTime & time )
 {
+	QMutexLocker m( &m_patternMutex );
+
 	cleanObjects();
 
 	m_timeMap.remove( time );
@@ -276,6 +294,8 @@ void AutomationPattern::removeValue( const MidiTime & time )
 
 void AutomationPattern::recordValue(MidiTime time, float value)
 {
+	QMutexLocker m( &m_patternMutex );
+
 	if( value != m_lastRecordedValue )
 	{
 		putValue( time, value, true );
@@ -305,6 +325,8 @@ MidiTime AutomationPattern::setDragValue( const MidiTime & time,
 						const bool quantPos,
 						const bool controlKey )
 {
+	QMutexLocker m( &m_patternMutex );
+
 	if( m_dragging == false )
 	{
 		MidiTime newTime = quantPos  ?
@@ -343,6 +365,8 @@ MidiTime AutomationPattern::setDragValue( const MidiTime & time,
  */
 void AutomationPattern::applyDragValue()
 {
+	QMutexLocker m( &m_patternMutex );
+
 	m_dragging = false;
 }
 
@@ -351,6 +375,8 @@ void AutomationPattern::applyDragValue()
 
 float AutomationPattern::valueAt( const MidiTime & _time ) const
 {
+	QMutexLocker m( &m_patternMutex );
+
 	if( m_timeMap.isEmpty() )
 	{
 		return 0;
@@ -390,6 +416,8 @@ float AutomationPattern::valueAt( const MidiTime & _time ) const
 // called.
 float AutomationPattern::valueAt( timeMap::const_iterator v, int offset ) const
 {
+	QMutexLocker m( &m_patternMutex );
+
 	// We never use it with offset 0, but doesn't hurt to return a correct
 	// value if we do
 	if (offset == 0)
@@ -434,6 +462,8 @@ float AutomationPattern::valueAt( timeMap::const_iterator v, int offset ) const
 
 float *AutomationPattern::valuesAfter( const MidiTime & _time ) const
 {
+	QMutexLocker m( &m_patternMutex );
+
 	timeMap::const_iterator v = m_timeMap.lowerBound(_time);
 	if( v == m_timeMap.end() || (v+1) == m_timeMap.end() )
 	{
@@ -456,6 +486,8 @@ float *AutomationPattern::valuesAfter( const MidiTime & _time ) const
 
 void AutomationPattern::flipY(int min, int max)
 {
+	QMutexLocker m( &m_patternMutex );
+
 	timeMap::const_iterator it = m_timeMap.lowerBound(0);
 	if (it == m_timeMap.end() )
 	{
@@ -499,6 +531,8 @@ void AutomationPattern::flipY()
 
 void AutomationPattern::flipX(int length)
 {
+	QMutexLocker m( &m_patternMutex );
+
 	timeMap::const_iterator it = m_timeMap.lowerBound(0);
 	if(it == m_timeMap.end())
 	{
@@ -593,6 +627,8 @@ void AutomationPattern::flipX(int length)
 
 void AutomationPattern::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
+	QMutexLocker m( &m_patternMutex );
+
 	_this.setAttribute( "pos", startPosition() );
 	_this.setAttribute( "len", length() );
 	_this.setAttribute( "name", name() );
@@ -628,6 +664,8 @@ void AutomationPattern::saveSettings( QDomDocument & _doc, QDomElement & _this )
 
 void AutomationPattern::loadSettings( const QDomElement & _this )
 {
+	QMutexLocker m( &m_patternMutex );
+
 	clear();
 
 	movePosition( _this.attribute( "pos" ).toInt() );
@@ -677,6 +715,8 @@ void AutomationPattern::loadSettings( const QDomElement & _this )
 
 const QString AutomationPattern::name() const
 {
+	QMutexLocker m( &m_patternMutex );
+
 	if( !TrackContentObject::name().isEmpty() )
 	{
 		return TrackContentObject::name();
@@ -693,6 +733,8 @@ const QString AutomationPattern::name() const
 
 TrackContentObjectView * AutomationPattern::createView( TrackView * _tv )
 {
+	QMutexLocker m( &m_patternMutex );
+
 	return new AutomationPatternView( this, _tv );
 }
 
@@ -871,6 +913,8 @@ void AutomationPattern::resolveAllIDs()
 
 void AutomationPattern::clear()
 {
+	QMutexLocker m( &m_patternMutex );
+
 	m_timeMap.clear();
 
 	emit dataChanged();
@@ -881,6 +925,8 @@ void AutomationPattern::clear()
 
 void AutomationPattern::objectDestroyed( jo_id_t _id )
 {
+	QMutexLocker m( &m_patternMutex );
+
 	// TODO: distict between temporary removal (e.g. LADSPA controls
 	// when switching samplerate) and real deletions because in the latter
 	// case we had to remove ourselves if we're the global automation
@@ -907,6 +953,8 @@ void AutomationPattern::objectDestroyed( jo_id_t _id )
 
 void AutomationPattern::cleanObjects()
 {
+	QMutexLocker m( &m_patternMutex );
+
 	for( objectVector::iterator it = m_objects.begin(); it != m_objects.end(); )
 	{
 		if( *it )
@@ -937,6 +985,8 @@ void AutomationPattern::generateTangents()
 // outTangent values of the node will be the same too.
 void AutomationPattern::generateTangents(timeMap::iterator it, int numToGenerate)
 {
+	QMutexLocker m( &m_patternMutex );
+
 	if( m_timeMap.size() < 2 && numToGenerate > 0 )
 	{
 		it.value().setInTangent(0);

@@ -166,6 +166,10 @@ private:
 	void generateTangents(timeMap::iterator it, int numToGenerate);
 	float valueAt( timeMap::const_iterator v, int offset ) const;
 
+	// Mutex to make methods involving automation patterns thread safe
+	// Mutable so we can lock it from const objects
+	mutable QMutex m_patternMutex;
+
 	AutomationTrack * m_autoTrack;
 	QVector<jo_id_t> m_idsToResolve;
 	objectVector m_objects;
