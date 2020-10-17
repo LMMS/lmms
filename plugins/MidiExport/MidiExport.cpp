@@ -47,7 +47,7 @@ Plugin::Descriptor PLUGIN_EXPORT midiexport_plugin_descriptor =
 {
 	STRINGIFY( PLUGIN_NAME ),
 	"MIDI Export",
-	QT_TRANSLATE_NOOP( "pluginBrowser",
+	QT_TRANSLATE_NOOP( "PluginBrowser",
 				"Filter for exporting MIDI-files from LMMS" ),
 	"Mohamed Abdel Maksoud <mohamed at amaksoud.com> and "
 	"Hyunjin Song <tteu.ingog/at/gmail.com>",

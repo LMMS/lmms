@@ -79,11 +79,6 @@
 #include "TrackLabelButton.h"
 
 
-const char * volume_help = QT_TRANSLATE_NOOP( "InstrumentTrack",
-						"With this knob you can set "
-						"the volume of the opened "
-						"channel.");
-
 const int INSTRUMENT_WIDTH	= 254;
 const int INSTRUMENT_HEIGHT	= INSTRUMENT_WIDTH;
 const int PIANO_HEIGHT		= 80;
@@ -167,7 +162,7 @@ InstrumentTrack::~InstrumentTrack()
 		autoAssignMidiDevice(false);
 		s_autoAssignedTrack = NULL;
 	}
-	
+
 	// kill all running notes and the iph
 	silenceAllNotes( true );
 
@@ -547,17 +542,6 @@ void InstrumentTrack::deleteNotePluginData( NotePlayHandle* n )
 
 void InstrumentTrack::setName( const QString & _new_name )
 {
-	// when changing name of track, also change name of those patterns,
-	// which have the same name as the instrument-track
-	for( int i = 0; i < numOfTCOs(); ++i )
-	{
-		Pattern* p = dynamic_cast<Pattern*>( getTCO( i ) );
-		if( ( p != NULL && p->name() == name() ) || p->name() == "" )
-		{
-			p->setName( _new_name );
-		}
-	}
-
 	Track::setName( _new_name );
 	m_midiPort.setName( name() );
 	m_audioPort.setName( name() );

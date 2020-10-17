@@ -33,7 +33,6 @@
 #include "Instrument.h"
 #include "InstrumentTrack.h"
 #include "Mixer.h"
-#include "stdshims.h"
 
 
 const float CUT_FREQ_MULTIPLIER = 6000.0f;
@@ -43,16 +42,14 @@ const float RES_PRECISION = 1000.0f;
 
 // names for env- and lfo-targets - first is name being displayed to user
 // and second one is used internally, e.g. for saving/restoring settings
-const QString InstrumentSoundShaping::targetNames[InstrumentSoundShaping::NumTargets][3] =
+const char *const InstrumentSoundShaping::targetNames[InstrumentSoundShaping::NumTargets][3] =
 {
-	{ InstrumentSoundShaping::tr( "VOLUME" ), "vol",
-			InstrumentSoundShaping::tr( "Volume" ) },
-/*	InstrumentSoundShaping::tr( "Pan" ),
-	InstrumentSoundShaping::tr( "Pitch" ),*/
-	{ InstrumentSoundShaping::tr( "CUTOFF" ), "cut",
-			InstrumentSoundShaping::tr( "Cutoff frequency" ) },
-	{ InstrumentSoundShaping::tr( "RESO" ), "res",
-			InstrumentSoundShaping::tr( "Resonance" ) }
+	{ QT_TRANSLATE_NOOP("InstrumentSoundShaping", "VOLUME"), "vol",
+			QT_TRANSLATE_NOOP("InstrumentSoundShaping", "Volume") },
+	{ QT_TRANSLATE_NOOP("InstrumentSoundShaping", "CUTOFF"), "cut",
+			QT_TRANSLATE_NOOP("InstrumentSoundShaping", "Cutoff frequency") },
+	{ QT_TRANSLATE_NOOP("InstrumentSoundShaping", "RESO"), "res",
+			QT_TRANSLATE_NOOP("InstrumentSoundShaping", "Resonance") }
 } ;
  
 
@@ -77,31 +74,31 @@ InstrumentSoundShaping::InstrumentSoundShaping(
 										value_for_zero_amount, 
 										this );
 		m_envLfoParameters[i]->setDisplayName(
-			tr( targetNames[i][2].toUtf8().constData() ) );
+			tr( targetNames[i][2] ) );
 	}
 
-	m_filterModel.addItem( tr( "Low-pass" ), make_unique<PixmapLoader>( "filter_lp" ) );
-	m_filterModel.addItem( tr( "Hi-pass" ), make_unique<PixmapLoader>( "filter_hp" ) );
-	m_filterModel.addItem( tr( "Band-pass csg" ), make_unique<PixmapLoader>( "filter_bp" ) );
-	m_filterModel.addItem( tr( "Band-pass czpg" ), make_unique<PixmapLoader>( "filter_bp" ) );
-	m_filterModel.addItem( tr( "Notch" ), make_unique<PixmapLoader>( "filter_notch" ) );
-	m_filterModel.addItem( tr( "All-pass" ), make_unique<PixmapLoader>( "filter_ap" ) );
-	m_filterModel.addItem( tr( "Moog" ), make_unique<PixmapLoader>( "filter_lp" ) );
-	m_filterModel.addItem( tr( "2x Low-pass" ), make_unique<PixmapLoader>( "filter_2lp" ) );
-	m_filterModel.addItem( tr( "RC Low-pass 12 dB/oct" ), make_unique<PixmapLoader>( "filter_lp" ) );
-	m_filterModel.addItem( tr( "RC Band-pass 12 dB/oct" ), make_unique<PixmapLoader>( "filter_bp" ) );
-	m_filterModel.addItem( tr( "RC High-pass 12 dB/oct" ), make_unique<PixmapLoader>( "filter_hp" ) );
-	m_filterModel.addItem( tr( "RC Low-pass 24 dB/oct" ), make_unique<PixmapLoader>( "filter_lp" ) );
-	m_filterModel.addItem( tr( "RC Band-pass 24 dB/oct" ), make_unique<PixmapLoader>( "filter_bp" ) );
-	m_filterModel.addItem( tr( "RC High-pass 24 dB/oct" ), make_unique<PixmapLoader>( "filter_hp" ) );
-	m_filterModel.addItem( tr( "Vocal Formant" ), make_unique<PixmapLoader>( "filter_hp" ) );
-	m_filterModel.addItem( tr( "2x Moog" ), make_unique<PixmapLoader>( "filter_2lp" ) );
-	m_filterModel.addItem( tr( "SV Low-pass" ), make_unique<PixmapLoader>( "filter_lp" ) );
-	m_filterModel.addItem( tr( "SV Band-pass" ), make_unique<PixmapLoader>( "filter_bp" ) );
-	m_filterModel.addItem( tr( "SV High-pass" ), make_unique<PixmapLoader>( "filter_hp" ) );
-	m_filterModel.addItem( tr( "SV Notch" ), make_unique<PixmapLoader>( "filter_notch" ) );
-	m_filterModel.addItem( tr( "Fast Formant" ), make_unique<PixmapLoader>( "filter_hp" ) );
-	m_filterModel.addItem( tr( "Tripole" ), make_unique<PixmapLoader>( "filter_lp" ) );
+	m_filterModel.addItem( tr( "Low-pass" ), std::make_unique<PixmapLoader>( "filter_lp" ) );
+	m_filterModel.addItem( tr( "Hi-pass" ), std::make_unique<PixmapLoader>( "filter_hp" ) );
+	m_filterModel.addItem( tr( "Band-pass csg" ), std::make_unique<PixmapLoader>( "filter_bp" ) );
+	m_filterModel.addItem( tr( "Band-pass czpg" ), std::make_unique<PixmapLoader>( "filter_bp" ) );
+	m_filterModel.addItem( tr( "Notch" ), std::make_unique<PixmapLoader>( "filter_notch" ) );
+	m_filterModel.addItem( tr( "All-pass" ), std::make_unique<PixmapLoader>( "filter_ap" ) );
+	m_filterModel.addItem( tr( "Moog" ), std::make_unique<PixmapLoader>( "filter_lp" ) );
+	m_filterModel.addItem( tr( "2x Low-pass" ), std::make_unique<PixmapLoader>( "filter_2lp" ) );
+	m_filterModel.addItem( tr( "RC Low-pass 12 dB/oct" ), std::make_unique<PixmapLoader>( "filter_lp" ) );
+	m_filterModel.addItem( tr( "RC Band-pass 12 dB/oct" ), std::make_unique<PixmapLoader>( "filter_bp" ) );
+	m_filterModel.addItem( tr( "RC High-pass 12 dB/oct" ), std::make_unique<PixmapLoader>( "filter_hp" ) );
+	m_filterModel.addItem( tr( "RC Low-pass 24 dB/oct" ), std::make_unique<PixmapLoader>( "filter_lp" ) );
+	m_filterModel.addItem( tr( "RC Band-pass 24 dB/oct" ), std::make_unique<PixmapLoader>( "filter_bp" ) );
+	m_filterModel.addItem( tr( "RC High-pass 24 dB/oct" ), std::make_unique<PixmapLoader>( "filter_hp" ) );
+	m_filterModel.addItem( tr( "Vocal Formant" ), std::make_unique<PixmapLoader>( "filter_hp" ) );
+	m_filterModel.addItem( tr( "2x Moog" ), std::make_unique<PixmapLoader>( "filter_2lp" ) );
+	m_filterModel.addItem( tr( "SV Low-pass" ), std::make_unique<PixmapLoader>( "filter_lp" ) );
+	m_filterModel.addItem( tr( "SV Band-pass" ), std::make_unique<PixmapLoader>( "filter_bp" ) );
+	m_filterModel.addItem( tr( "SV High-pass" ), std::make_unique<PixmapLoader>( "filter_hp" ) );
+	m_filterModel.addItem( tr( "SV Notch" ), std::make_unique<PixmapLoader>( "filter_notch" ) );
+	m_filterModel.addItem( tr( "Fast Formant" ), std::make_unique<PixmapLoader>( "filter_hp" ) );
+	m_filterModel.addItem( tr( "Tripole" ), std::make_unique<PixmapLoader>( "filter_lp" ) );
 }
 
 
@@ -163,7 +160,7 @@ void InstrumentSoundShaping::processAudioBuffer( sampleFrame* buffer,
 
 		if( n->m_filter == nullptr )
 		{
-			n->m_filter = make_unique<BasicFilters<>>( Engine::mixer()->processingSampleRate() );
+			n->m_filter = std::make_unique<BasicFilters<>>( Engine::mixer()->processingSampleRate() );
 		}
 		n->m_filter->setFilterType( m_filterModel.value() );
 

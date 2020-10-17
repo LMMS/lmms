@@ -45,21 +45,22 @@
 #endif
 
 #include "ActionGroup.h"
-#include "SongEditor.h"
-#include "MainWindow.h"
+#include "BBTrackContainer.h"
+#include "ComboBox.h"
+#include "debug.h"
+#include "DeprecationHelper.h"
 #include "GuiApplication.h"
+#include "MainWindow.h"
 #include "embed.h"
 #include "Engine.h"
 #include "gui_templates.h"
+#include "PianoRoll.h"
+#include "ProjectJournal.h"
+#include "SongEditor.h"
+#include "StringPairDrag.h"
+#include "TextFloat.h"
 #include "TimeLineWidget.h"
 #include "ToolTip.h"
-#include "TextFloat.h"
-#include "ComboBox.h"
-#include "BBTrackContainer.h"
-#include "PianoRoll.h"
-#include "debug.h"
-#include "StringPairDrag.h"
-#include "ProjectJournal.h"
 
 
 QPixmap * AutomationEditor::s_toolDraw = NULL;
@@ -320,7 +321,7 @@ void AutomationEditor::updateAfterPatternChange()
 	m_minLevel = m_pattern->firstObject()->minValue<float>();
 	m_maxLevel = m_pattern->firstObject()->maxValue<float>();
 	m_step = m_pattern->firstObject()->step<float>();
-	m_scrollLevel = ( m_minLevel + m_maxLevel ) / 2;
+	centerTopBottomScroll();
 
 	m_tensionModel->setValue( m_pattern->getTension() );
 
@@ -1595,12 +1596,36 @@ void AutomationEditor::drawLevelTick(QPainter & p, int tick, float value)
 
 		p.fillRect( x, y_start, rect_width, rect_height, currentColor );
 	}
-
+#ifdef LMMS_DEBUG
 	else
 	{
 		printf("not in range\n");
 	}
+#endif
+}
 
+
+
+
+// center the vertical scroll position on the first object's value
+void AutomationEditor::centerTopBottomScroll()
+{
+	// default to the m_scrollLevel position
+	int pos = static_cast<int>(m_scrollLevel);
+	// If a pattern exists...
+	if (m_pattern)
+	{
+		// get time map of current pattern
+		timeMap & time_map = m_pattern->getTimeMap();
+		// If time_map is not empty...
+		if (!time_map.empty())
+		{
+			// set the position to the inverted value ((max + min) - value)
+			// If we set just (max - value), we're off by m_pattern's minimum
+			pos = m_pattern->getMax() + m_pattern->getMin() - static_cast<int>(time_map.begin().value());
+		}
+	}
+	m_topBottomScroll->setValue(pos);
 }
 
 
@@ -1632,8 +1657,7 @@ void AutomationEditor::resizeEvent(QResizeEvent * re)
 		m_topBottomScroll->setRange( (int) m_scrollLevel,
 							(int) m_scrollLevel );
 	}
-
-	m_topBottomScroll->setValue( (int) m_scrollLevel );
+	centerTopBottomScroll();
 
 	if( Engine::getSong() )
 	{
@@ -1654,11 +1678,11 @@ void AutomationEditor::wheelEvent(QWheelEvent * we )
 	if( we->modifiers() & Qt::ControlModifier && we->modifiers() & Qt::ShiftModifier )
 	{
 		int y = m_zoomingYModel.value();
-		if( we->delta() > 0 )
+		if(we->angleDelta().y() > 0)
 		{
 			y++;
 		}
-		else if( we->delta() < 0 )
+		else if(we->angleDelta().y() < 0)
 		{
 			y--;
 		}
@@ -1668,11 +1692,11 @@ void AutomationEditor::wheelEvent(QWheelEvent * we )
 	else if( we->modifiers() & Qt::ControlModifier && we->modifiers() & Qt::AltModifier )
 	{
 		int q = m_quantizeModel.value();
-		if( we->delta() > 0 )
+		if((we->angleDelta().x() + we->angleDelta().y()) > 0) // alt + scroll becomes horizontal scroll on KDE
 		{
 			q--;
 		}
-		else if( we->delta() < 0 )
+		else if((we->angleDelta().x() + we->angleDelta().y()) < 0) // alt + scroll becomes horizontal scroll on KDE
 		{
 			q++;
 		}
@@ -1683,17 +1707,17 @@ void AutomationEditor::wheelEvent(QWheelEvent * we )
 	else if( we->modifiers() & Qt::ControlModifier )
 	{
 		int x = m_zoomingXModel.value();
-		if( we->delta() > 0 )
+		if(we->angleDelta().y() > 0)
 		{
 			x++;
 		}
-		else if( we->delta() < 0 )
+		else if(we->angleDelta().y() < 0)
 		{
 			x--;
 		}
 		x = qBound( 0, x, m_zoomingXModel.size() - 1 );
 
-		int mouseX = (we->x() - VALUES_WIDTH)* MidiTime::ticksPerBar();
+		int mouseX = (position( we ).x() - VALUES_WIDTH)* MidiTime::ticksPerBar();
 		// ticks based on the mouse x-position where the scroll wheel was used
 		int ticks = mouseX / m_ppb;
 		// what would be the ticks in the new zoom level on the very same mouse x
@@ -1705,16 +1729,22 @@ void AutomationEditor::wheelEvent(QWheelEvent * we )
 
 		m_zoomingXModel.setValue( x );
 	}
-	else if( we->modifiers() & Qt::ShiftModifier
-			|| we->orientation() == Qt::Horizontal )
+
+	// FIXME: Reconsider if determining orientation is necessary in Qt6.
+	else if(abs(we->angleDelta().x()) > abs(we->angleDelta().y())) // scrolling is horizontal
 	{
-		m_leftRightScroll->setValue( m_leftRightScroll->value() -
-							we->delta() * 2 / 15 );
+		m_leftRightScroll->setValue(m_leftRightScroll->value() -
+							we->angleDelta().x() * 2 / 15);
+	}
+	else if(we->modifiers() & Qt::ShiftModifier)
+	{
+		m_leftRightScroll->setValue(m_leftRightScroll->value() -
+							we->angleDelta().y() * 2 / 15);
 	}
 	else
 	{
-		m_topBottomScroll->setValue( m_topBottomScroll->value() -
-							we->delta() / 30 );
+		m_topBottomScroll->setValue(m_topBottomScroll->value() -
+							(we->angleDelta().x() + we->angleDelta().y()) / 30);
 	}
 }
 
@@ -2326,7 +2356,7 @@ AutomationEditorWindow::AutomationEditorWindow() :
 	zoom_x_label->setPixmap( embed::getIconPixmap( "zoom_x" ) );
 
 	m_zoomingXComboBox = new ComboBox( zoomToolBar );
-	m_zoomingXComboBox->setFixedSize( 80, 22 );
+	m_zoomingXComboBox->setFixedSize( 80, ComboBox::DEFAULT_HEIGHT );
 	m_zoomingXComboBox->setToolTip( tr( "Horizontal zooming" ) );
 
 	for( float const & zoomLevel : m_editor->m_zoomXLevels )
@@ -2345,7 +2375,7 @@ AutomationEditorWindow::AutomationEditorWindow() :
 	zoom_y_label->setPixmap( embed::getIconPixmap( "zoom_y" ) );
 
 	m_zoomingYComboBox = new ComboBox( zoomToolBar );
-	m_zoomingYComboBox->setFixedSize( 80, 22 );
+	m_zoomingYComboBox->setFixedSize( 80, ComboBox::DEFAULT_HEIGHT );
 	m_zoomingYComboBox->setToolTip( tr( "Vertical zooming" ) );
 
 	m_editor->m_zoomingYModel.addItem( "Auto" );
@@ -2375,7 +2405,7 @@ AutomationEditorWindow::AutomationEditorWindow() :
 	quantize_lbl->setPixmap( embed::getIconPixmap( "quantize" ) );
 
 	m_quantizeComboBox = new ComboBox( m_toolBar );
-	m_quantizeComboBox->setFixedSize( 60, 22 );
+	m_quantizeComboBox->setFixedSize( 60, ComboBox::DEFAULT_HEIGHT );
 	m_quantizeComboBox->setToolTip( tr( "Quantization" ) );
 
 	m_quantizeComboBox->setModel( &m_editor->m_quantizeModel );

@@ -202,6 +202,13 @@ Lv2ViewBase::~Lv2ViewBase() {
 
 
 
+void Lv2ViewBase::toggleUI()
+{
+}
+
+
+
+
 void Lv2ViewBase::toggleHelp(bool visible)
 {
 	if (m_helpWindow)

@@ -1,29 +1,56 @@
 FIND_PACKAGE(Git)
 IF(GIT_FOUND AND NOT FORCE_VERSION)
-	# Look for git tag information (e.g. Tagged: "v1.0.0", Non-tagged: "v1.0.0-123-a1b2c3d")
+	SET(MAJOR_VERSION 0)
+	SET(MINOR_VERSION 0)
+	SET(PATCH_VERSION 0)
+	# Look for git tag information (e.g. Tagged: "v1.0.0", Untagged: "v1.0.0-123-a1b2c3d")
+	# Untagged format: [latest tag]-[number of commits]-[latest commit hash]
 	EXECUTE_PROCESS(
 		COMMAND "${GIT_EXECUTABLE}" describe --tags --match v[0-9].[0-9].[0-9]*
 		OUTPUT_VARIABLE GIT_TAG
 		WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
 		TIMEOUT 10
 		OUTPUT_STRIP_TRAILING_WHITESPACE)
+	# Read: TAG_LIST = GIT_TAG.split("-")
 	STRING(REPLACE "-" ";" TAG_LIST "${GIT_TAG}")
+	# Read: TAG_LIST_LENGTH = TAG_LIST.length()
 	LIST(LENGTH TAG_LIST TAG_LIST_LENGTH)
+	# Untagged versions contain at least 2 dashes, giving 3 strings on split.
+	# Hence, for untagged versions TAG_LIST_LENGTH = [dashes in latest tag] + 3.
+	# Corollary: if TAG_LIST_LENGTH <= 2, the version must be tagged.
 	IF(TAG_LIST_LENGTH GREATER 0)
+		# Set FORCE_VERSION to TAG_LIST[0], strip any 'v's to get MAJ.MIN.PAT
 		LIST(GET TAG_LIST 0 FORCE_VERSION)
 		STRING(REPLACE "v" "" FORCE_VERSION "${FORCE_VERSION}")
+		# Split FORCE_VERSION on '.' and populate MAJOR/MINOR/PATCH_VERSION
+		STRING(REPLACE "." ";" MAJ_MIN_PAT "${FORCE_VERSION}")
+		LIST(GET MAJ_MIN_PAT 0 MAJOR_VERSION)
+		LIST(GET MAJ_MIN_PAT 1 MINOR_VERSION)
+		LIST(GET MAJ_MIN_PAT 2 PATCH_VERSION)
 	ENDIF()
+	# 1 dash total: Dash in latest tag, no additional commits => pre-release
 	IF(TAG_LIST_LENGTH EQUAL 2)
 		LIST(GET TAG_LIST 1 VERSION_STAGE)
 		SET(FORCE_VERSION "${FORCE_VERSION}-${VERSION_STAGE}")
+	# 2 dashes: Assume untagged with no dashes in latest tag name => stable + commits
 	ELSEIF(TAG_LIST_LENGTH EQUAL 3)
+		# Get the number of commits and latest commit hash
 		LIST(GET TAG_LIST 1 EXTRA_COMMITS)
-		SET(FORCE_VERSION "${FORCE_VERSION}.${EXTRA_COMMITS}")
+		LIST(GET TAG_LIST 2 COMMIT_HASH)
+		# Bump the patch version
+		MATH(EXPR PATCH_VERSION "${PATCH_VERSION}+1")
+		# Set the version to MAJOR.MINOR.PATCH-EXTRA_COMMITS+COMMIT_HASH
+		SET(FORCE_VERSION "${MAJOR_VERSION}.${MINOR_VERSION}.${PATCH_VERSION}")
+		SET(FORCE_VERSION "${FORCE_VERSION}-${EXTRA_COMMITS}+${COMMIT_HASH}")
+	# 3 dashes: Assume untagged with 1 dash in latest tag name => pre-release + commits
 	ELSEIF(TAG_LIST_LENGTH EQUAL 4)
+		# Get pre-release stage, number of commits, and latest commit hash
 		LIST(GET TAG_LIST 1 VERSION_STAGE)
 		LIST(GET TAG_LIST 2 EXTRA_COMMITS)
-		SET(FORCE_VERSION
-			"${FORCE_VERSION}-${VERSION_STAGE}.${EXTRA_COMMITS}")
+		LIST(GET TAG_LIST 3 COMMIT_HASH)
+		# Set the version to MAJOR.MINOR.PATCH-VERSION_STAGE.EXTRA_COMMITS+COMMIT_HASH
+		SET(FORCE_VERSION "${FORCE_VERSION}-${VERSION_STAGE}")
+		SET(FORCE_VERSION "${FORCE_VERSION}.${EXTRA_COMMITS}+${COMMIT_HASH}")
 	ENDIF()
 ENDIF()
 
@@ -74,4 +101,3 @@ MESSAGE("\n"
 	"*   Override version:           -DFORCE_VERSION=x.x.x-x\n"
 	"*   Ignore Git information:     -DFORCE_VERSION=internal\n"
 )
-

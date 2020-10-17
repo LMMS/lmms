@@ -34,23 +34,24 @@
 #include <QPainter>
 #include <QPushButton>
 
+#include "BBTrack.h"
+#include "EffectRackView.h"
+#include "embed.h"
+#include "FxMixerView.h"
 #include "gui_templates.h"
 #include "GuiApplication.h"
-#include "Song.h"
-#include "embed.h"
-#include "ToolTip.h"
-#include "BBTrack.h"
-#include "SamplePlayHandle.h"
-#include "SampleRecordHandle.h"
-#include "SongEditor.h"
-#include "StringPairDrag.h"
-#include "TimeLineWidget.h"
 #include "Knob.h"
 #include "MainWindow.h"
 #include "Mixer.h"
-#include "EffectRackView.h"
-#include "FxMixerView.h"
+#include "PathUtil.h"
+#include "SamplePlayHandle.h"
+#include "SampleRecordHandle.h"
+#include "Song.h"
+#include "SongEditor.h"
+#include "StringPairDrag.h"
 #include "TabWidget.h"
+#include "TimeLineWidget.h"
+#include "ToolTip.h"
 #include "TrackLabelButton.h"
 
 SampleTCO::SampleTCO( Track * _track ) :
@@ -333,7 +334,7 @@ void SampleTCOView::updateSample()
 	// set tooltip to filename so that user can see what sample this
 	// sample-tco contains
 	ToolTip::add( this, ( m_tco->m_sampleBuffer->audioFile() != "" ) ?
-					m_tco->m_sampleBuffer->audioFile() :
+					PathUtil::toAbsolute(m_tco->m_sampleBuffer->audioFile()) :
 					tr( "Double-click to open sample" ) );
 }
 
@@ -342,29 +343,57 @@ void SampleTCOView::updateSample()
 
 void SampleTCOView::contextMenuEvent( QContextMenuEvent * _cme )
 {
+	// Depending on whether we right-clicked a selection or an individual TCO we will have
+	// different labels for the actions.
+	bool individualTCO = getClickedTCOs().size() <= 1;
+
 	if( _cme->modifiers() )
 	{
 		return;
 	}
 
 	QMenu contextMenu( this );
+
 	if( fixedTCOs() == false )
 	{
-		contextMenu.addAction( embed::getIconPixmap( "cancel" ),
-					tr( "Delete (middle mousebutton)" ),
-						this, SLOT( remove() ) );
+		contextMenu.addAction(
+			embed::getIconPixmap( "cancel" ),
+			individualTCO
+				? tr("Delete (middle mousebutton)")
+				: tr("Delete selection (middle mousebutton)"),
+			[this](){ contextMenuAction( Remove ); } );
+
 		contextMenu.addSeparator();
-		contextMenu.addAction( embed::getIconPixmap( "edit_cut" ),
-					tr( "Cut" ), this, SLOT( cut() ) );
+
+		contextMenu.addAction(
+			embed::getIconPixmap( "edit_cut" ),
+			individualTCO
+				? tr("Cut")
+				: tr("Cut selection"),
+			[this](){ contextMenuAction( Cut ); } );
 	}
-	contextMenu.addAction( embed::getIconPixmap( "edit_copy" ),
-					tr( "Copy" ), m_tco, SLOT( copy() ) );
-	contextMenu.addAction( embed::getIconPixmap( "edit_paste" ),
-					tr( "Paste" ), m_tco, SLOT( paste() ) );
+
+	contextMenu.addAction(
+		embed::getIconPixmap( "edit_copy" ),
+		individualTCO
+			? tr("Copy")
+			: tr("Copy selection"),
+		[this](){ contextMenuAction( Copy ); } );
+
+	contextMenu.addAction(
+		embed::getIconPixmap( "edit_paste" ),
+		tr( "Paste" ),
+		[this](){ contextMenuAction( Paste ); } );
+
 	contextMenu.addSeparator();
-	contextMenu.addAction( embed::getIconPixmap( "muted" ),
-				tr( "Mute/unmute (<%1> + middle click)" ).arg(UI_CTRL_KEY),
-						m_tco, SLOT( toggleMute() ) );
+
+	contextMenu.addAction(
+		embed::getIconPixmap( "muted" ),
+		(individualTCO
+			? tr("Mute/unmute (<%1> + middle click)")
+			: tr("Mute/unmute selection (<%1> + middle click)")).arg(UI_CTRL_KEY),
+		[this](){ contextMenuAction( Mute ); } );
+
 	/*contextMenu.addAction( embed::getIconPixmap( "record" ),
 				tr( "Set/clear record" ),
 						m_tco, SLOT( toggleRecord() ) );*/
@@ -535,9 +564,8 @@ void SampleTCOView::paintEvent( QPaintEvent * pe )
 			qMax( static_cast<int>( m_tco->sampleLength() * ppb / ticksPerBar ), 1 ), rect().bottom() - 2 * spacing );
 	m_tco->m_sampleBuffer->visualize( p, r, pe->rect() );
 
-	QFileInfo fileInfo(m_tco->m_sampleBuffer->audioFile());
-	QString filename = fileInfo.fileName();
-	paintTextLabel(filename, p);
+	QString name = PathUtil::cleanName(m_tco->m_sampleBuffer->audioFile());
+	paintTextLabel(name, p);
 
 	// disable antialiasing for borders, since its not needed
 	p.setRenderHint( QPainter::Antialiasing, false );
@@ -646,7 +674,7 @@ bool SampleTrack::play( const MidiTime & _start, const fpp_t _frames,
 
 			if( _start >= sTco->startPosition() && _start < sTco->endPosition() )
 			{
-				if( sTco->isPlaying() == false && _start > sTco->startPosition() + sTco->startTimeOffset() )
+				if( sTco->isPlaying() == false && _start >= (sTco->startPosition() + sTco->startTimeOffset()) )
 				{
 					auto bufferFramesPerTick = Engine::framesPerTick (sTco->sampleBuffer ()->sampleRate ());
 					f_cnt_t sampleStart = bufferFramesPerTick * ( _start - sTco->startPosition() - sTco->startTimeOffset() );

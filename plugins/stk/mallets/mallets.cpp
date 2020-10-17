@@ -50,7 +50,7 @@ Plugin::Descriptor PLUGIN_EXPORT malletsstk_plugin_descriptor =
 {
 	STRINGIFY( PLUGIN_NAME ),
 	"Mallets",
-	QT_TRANSLATE_NOOP( "pluginBrowser",
+	QT_TRANSLATE_NOOP( "PluginBrowser",
 				"Tuneful things to bang on" ),
 	"Danny McRae <khjklujn/at/users.sf.net>",
 	0x0100,
@@ -403,7 +403,7 @@ malletsInstrumentView::malletsInstrumentView( malletsInstrument * _instrument,
 	changePreset(); // Show widget
 
 	m_presetsCombo = new ComboBox( this, tr( "Instrument" ) );
-	m_presetsCombo->setGeometry( 140, 50, 99, 22 );
+	m_presetsCombo->setGeometry( 140, 50, 99, ComboBox::DEFAULT_HEIGHT );
 	m_presetsCombo->setFont( pointSize<8>( m_presetsCombo->font() ) );
 	
 	connect( &_instrument->m_presetsModel, SIGNAL( dataChanged() ),

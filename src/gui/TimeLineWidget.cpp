@@ -109,6 +109,14 @@ TimeLineWidget::~TimeLineWidget()
 
 
 
+void TimeLineWidget::setXOffset(const int x)
+{
+	m_xOffset = x;
+	if (s_posMarkerPixmap != nullptr) { m_xOffset -= s_posMarkerPixmap->width() / 2; }
+}
+
+
+
 
 void TimeLineWidget::addToolButtons( QToolBar * _tool_bar )
 {

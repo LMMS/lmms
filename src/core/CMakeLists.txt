@@ -48,6 +48,7 @@ set(LMMS_SRCS
 	core/Note.cpp
 	core/NotePlayHandle.cpp
 	core/Oscillator.cpp
+	core/PathUtil.cpp
 	core/PeakController.cpp
 	core/PerfLog.cpp
 	core/Piano.cpp
@@ -95,10 +96,12 @@ set(LMMS_SRCS
 
 	core/lv2/Lv2Basics.cpp
 	core/lv2/Lv2ControlBase.cpp
+	core/lv2/Lv2Features.cpp
 	core/lv2/Lv2Ports.cpp
 	core/lv2/Lv2Proc.cpp
 	core/lv2/Lv2Manager.cpp
 	core/lv2/Lv2SubPluginFeatures.cpp
+	core/lv2/Lv2UridMap.cpp
 
 	core/midi/MidiAlsaRaw.cpp
 	core/midi/MidiAlsaSeq.cpp

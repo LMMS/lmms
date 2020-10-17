@@ -155,9 +155,10 @@ public:
 	MidiTime startTimeOffset() const;
 	void setStartTimeOffset( const MidiTime &startTimeOffset );
 
+	// Will copy the state of a TCO to another TCO
+	static void copyStateTo( TrackContentObject *src, TrackContentObject *dst );
+
 public slots:
-	void copy();
-	void paste();
 	void toggleMute();
 
 
@@ -250,18 +251,41 @@ public:
 	bool needsUpdate();
 	void setNeedsUpdate( bool b );
 
+	// Method to get a QVector of TCOs to be affected by a context menu action
+	QVector<TrackContentObjectView *> getClickedTCOs();
+
+	// Methods to remove, copy, cut, paste and mute a QVector of TCO views
+	void copy( QVector<TrackContentObjectView *> tcovs );
+	void cut( QVector<TrackContentObjectView *> tcovs );
+	void paste();
+	// remove and toggleMute are static because they don't depend
+	// being called from a particular TCO view, but can be called anywhere as long
+	// as a valid TCO view list is given, while copy/cut require an instance for
+	// some metadata to be written to the clipboard.
+	static void remove( QVector<TrackContentObjectView *> tcovs );
+	static void toggleMute( QVector<TrackContentObjectView *> tcovs );
+
 public slots:
 	virtual bool close();
-	void cut();
 	void remove();
 	void update() override;
 
 protected:
+	enum ContextMenuAction
+	{
+		Remove,
+		Cut,
+		Copy,
+		Paste,
+		Mute
+	};
+
 	virtual void constructContextMenu( QMenu * )
 	{
 	}
 
 	void contextMenuEvent( QContextMenuEvent * cme ) override;
+	void contextMenuAction( ContextMenuAction action );
 	void dragEnterEvent( QDragEnterEvent * dee ) override;
 	void dropEvent( QDropEvent * de ) override;
 	void leaveEvent( QEvent * e ) override;
@@ -370,7 +394,9 @@ public:
 	}
 
 	bool canPasteSelection( MidiTime tcoPos, const QDropEvent *de );
+	bool canPasteSelection( MidiTime tcoPos, const QMimeData *md, bool allowSameBar = false );
 	bool pasteSelection( MidiTime tcoPos, QDropEvent * de );
+	bool pasteSelection( MidiTime tcoPos, const QMimeData * md, bool skipSafetyCheck = false );
 
 	MidiTime endPosition( const MidiTime & posStart );
 
@@ -391,6 +417,13 @@ public slots:
 	void changePosition( const MidiTime & newPos = MidiTime( -1 ) );
 
 protected:
+	enum ContextMenuAction
+	{
+		Paste
+	};
+
+	void contextMenuEvent( QContextMenuEvent * cme ) override;
+	void contextMenuAction( QContextMenuEvent * cme, ContextMenuAction action );
 	void dragEnterEvent( QDragEnterEvent * dee ) override;
 	void dropEvent( QDropEvent * de ) override;
 	void mousePressEvent( QMouseEvent * me ) override;

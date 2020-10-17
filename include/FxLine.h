@@ -26,10 +26,12 @@
 #ifndef FX_LINE_H
 #define FX_LINE_H
 
+#include <QColorDialog>
 #include <QGraphicsView>
 #include <QLineEdit>
 #include <QWidget>
 
+#include "ColorChooser.h"
 #include "Knob.h"
 #include "LcdWidget.h"
 #include "SendButtonIndicator.h"
@@ -101,6 +103,9 @@ private:
 
 public slots:
 	void renameChannel();
+	void resetColor();
+	void changeColor();
+	void randomColor();
 
 private slots:
 	void renameFinished();

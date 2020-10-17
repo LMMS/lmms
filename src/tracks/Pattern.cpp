@@ -24,23 +24,21 @@
  */
 #include "Pattern.h"
 
+#include <QApplication>
 #include <QTimer>
 #include <QMenu>
 #include <QMouseEvent>
 #include <QPainter>
 #include <QPushButton>
 
-#include "InstrumentTrack.h"
-#include "gui_templates.h"
-#include "embed.h"
-#include "GuiApplication.h"
-#include "PianoRoll.h"
-#include "RenameDialog.h"
-#include "SampleBuffer.h"
 #include "AudioSampleRecorder.h"
 #include "BBTrackContainer.h"
-#include "StringPairDrag.h"
-#include "MainWindow.h"
+#include "DeprecationHelper.h"
+#include "embed.h"
+#include "GuiApplication.h"
+#include "InstrumentTrack.h"
+#include "PianoRoll.h"
+#include "RenameDialog.h"
 
 #include <limits>
 
@@ -58,7 +56,6 @@ Pattern::Pattern( InstrumentTrack * _instrument_track ) :
 	m_patternType( BeatPattern ),
 	m_steps( MidiTime::stepsPerBar() )
 {
-	setName( _instrument_track->name() );
 	if( _instrument_track->trackContainer()
 					== Engine::getBBTrackContainer() )
 	{
@@ -649,10 +646,7 @@ void PatternView::setGhostInPianoRoll()
 
 
 
-void PatternView::resetName()
-{
-	m_pat->setName( m_pat->m_instrumentTrack->name() );
-}
+void PatternView::resetName() { m_pat->setName(""); }
 
 
 
@@ -782,16 +776,16 @@ void PatternView::mouseDoubleClickEvent(QMouseEvent *_me)
 
 
 
-void PatternView::wheelEvent( QWheelEvent * _we )
+void PatternView::wheelEvent(QWheelEvent * we)
 {
-	if( m_pat->m_patternType == Pattern::BeatPattern &&
-				( fixedTCOs() || pixelsPerBar() >= 96 ) &&
-				_we->y() > height() - s_stepBtnOff->height() )
+	if(m_pat->m_patternType == Pattern::BeatPattern &&
+				(fixedTCOs() || pixelsPerBar() >= 96) &&
+				position(we).y() > height() - s_stepBtnOff->height())
 	{
 //	get the step number that was wheeled on and
 //	do calculations in floats to prevent rounding errors...
-		float tmp = ( ( float(_we->x()) - TCO_BORDER_WIDTH ) *
-				float( m_pat -> m_steps ) ) / float(width() - TCO_BORDER_WIDTH*2);
+		float tmp = ((float(position(we).x()) - TCO_BORDER_WIDTH) *
+				float(m_pat -> m_steps)) / float(width() - TCO_BORDER_WIDTH*2);
 
 		int step = int( tmp );
 
@@ -801,7 +795,7 @@ void PatternView::wheelEvent( QWheelEvent * _we )
 		}
 
 		Note * n = m_pat->noteAtStep( step );
-		if( !n && _we->delta() > 0 )
+		if(!n && we->angleDelta().y() > 0)
 		{
 			n = m_pat->addStepNote( step );
 			n->setVolume( 0 );
@@ -810,7 +804,7 @@ void PatternView::wheelEvent( QWheelEvent * _we )
 		{
 			int vol = n->getVolume();
 
-			if( _we->delta() > 0 )
+			if(we->angleDelta().y() > 0)
 			{
 				n->setVolume( qMin( 100, vol + 5 ) );
 			}
@@ -826,11 +820,11 @@ void PatternView::wheelEvent( QWheelEvent * _we )
 				gui->pianoRoll()->update();
 			}
 		}
-		_we->accept();
+		we->accept();
 	}
 	else
 	{
-		TrackContentObjectView::wheelEvent( _we );
+		TrackContentObjectView::wheelEvent(we);
 	}
 }
 
@@ -887,8 +881,8 @@ void PatternView::paintEvent( QPaintEvent * )
 
 	// Check whether we will paint a text box and compute its potential height
 	// This is needed so we can paint the notes underneath it.
-	bool const isDefaultName = m_pat->name() == m_pat->instrumentTrack()->name();
-	bool const drawTextBox = !beatPattern && !isDefaultName;
+	bool const drawName = !m_pat->name().isEmpty();
+	bool const drawTextBox = !beatPattern && drawName;
 
 	// TODO Warning! This might cause problems if TrackContentObjectView::paintTextLabel changes
 	int textBoxHeight = 0;

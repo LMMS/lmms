@@ -111,10 +111,6 @@ protected:
 	void dragEnterEvent(QDragEnterEvent *_dee) override;
 	void dropEvent(QDropEvent *_de) override;
 
-private slots:
-	void reloadPlugin();
-	void toggleUI();
-
 private:
 	void modelChanged() override;
 };

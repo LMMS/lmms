@@ -49,7 +49,28 @@
 static void findIds(const QDomElement& elem, QList<jo_id_t>& idList);
 
 
+// Vector with all the upgrade methods
+const std::vector<DataFile::UpgradeMethod> DataFile::UPGRADE_METHODS = {
+	&DataFile::upgrade_0_2_1_20070501   ,   &DataFile::upgrade_0_2_1_20070508,
+	&DataFile::upgrade_0_3_0_rc2        ,   &DataFile::upgrade_0_3_0,
+	&DataFile::upgrade_0_4_0_20080104   ,   &DataFile::upgrade_0_4_0_20080118,
+	&DataFile::upgrade_0_4_0_20080129   ,   &DataFile::upgrade_0_4_0_20080409,
+	&DataFile::upgrade_0_4_0_20080607   ,   &DataFile::upgrade_0_4_0_20080622,
+	&DataFile::upgrade_0_4_0_beta1      ,   &DataFile::upgrade_0_4_0_rc2,
+	&DataFile::upgrade_1_0_99           ,   &DataFile::upgrade_1_1_0,
+	&DataFile::upgrade_1_1_91           ,   &DataFile::upgrade_1_2_0_rc3,
+	&DataFile::upgrade_1_3_0            ,   &DataFile::upgrade_noHiddenClipNames
+};
 
+// Vector of all versions that have upgrade routines.
+const std::vector<ProjectVersion> DataFile::UPGRADE_VERSIONS = {
+	"0.2.1-20070501"   ,   "0.2.1-20070508"   ,   "0.3.0-rc2",
+	"0.3.0"            ,   "0.4.0-20080104"   ,   "0.4.0-20080118",
+	"0.4.0-20080129"   ,   "0.4.0-20080409"   ,   "0.4.0-20080607",
+	"0.4.0-20080622"   ,   "0.4.0-beta1"      ,   "0.4.0-rc2",
+	"1.0.99-0"         ,   "1.1.0-0"          ,   "1.1.91-0",
+	"1.2.0-rc3"        ,   "1.3.0"
+};
 
 DataFile::typeDescStruct
 		DataFile::s_types[DataFile::TypeCount] =
@@ -71,11 +92,12 @@ DataFile::DataFile( Type type ) :
 	QDomDocument( "lmms-project" ),
 	m_content(),
 	m_head(),
-	m_type( type )
+	m_type( type ),
+	m_fileVersion( UPGRADE_METHODS.size() )
 {
 	appendChild( createProcessingInstruction("xml", "version=\"1.0\""));
 	QDomElement root = createElement( "lmms-project" );
-	root.setAttribute( "version", LDF_VERSION_STRING );
+	root.setAttribute( "version", m_fileVersion );
 	root.setAttribute( "type", typeName( type ) );
 	root.setAttribute( "creator", "LMMS" );
 	root.setAttribute( "creatorversion", LMMS_VERSION );
@@ -95,7 +117,8 @@ DataFile::DataFile( Type type ) :
 DataFile::DataFile( const QString & _fileName ) :
 	QDomDocument(),
 	m_content(),
-	m_head()
+	m_head(),
+	m_fileVersion( UPGRADE_METHODS.size() )
 {
 	QFile inFile( _fileName );
 	if( !inFile.open( QIODevice::ReadOnly ) )
@@ -772,10 +795,10 @@ void DataFile::upgrade_0_4_0_rc2()
 void DataFile::upgrade_1_0_99()
 {
 	jo_id_t last_assigned_id = 0;
-	
+
 	QList<jo_id_t> idList;
 	findIds(documentElement(), idList);
-	
+
 	QDomNodeList list = elementsByTagName("ladspacontrols");
 	for(int i = 0; !list.item(i).isNull(); ++i)
 	{
@@ -791,22 +814,22 @@ void DataFile::upgrade_1_0_99()
 					QDomElement me = createElement("data");
 					me.setAttribute("value", el.attribute("data"));
 					me.setAttribute("scale_type", "log");
-					
+
 					jo_id_t id;
 					for(id = last_assigned_id + 1;
 						idList.contains(id); id++)
 					{
 					}
-					
+
 					last_assigned_id = id;
 					idList.append(id);
 					me.setAttribute("id", id);
 					el.appendChild(me);
-					
+
 				}
 			}
 		}
-	}	
+	}
 }
 
 
@@ -873,31 +896,6 @@ void DataFile::upgrade_1_1_91()
 }
 
 
-void DataFile::upgrade_1_2_0_rc3()
-{
-	// Upgrade from earlier bbtrack beat note behaviour of adding
-	// steps if a note is placed after the last step.
-	QDomNodeList bbtracks = elementsByTagName( "bbtrack" );
-	for( int i = 0; !bbtracks.item( i ).isNull(); ++i )
-	{
-		QDomNodeList patterns = bbtracks.item( i
-				).toElement().elementsByTagName(
-								"pattern" );
-		for( int j = 0; !patterns.item( j ).isNull(); ++j )
-		{
-			int patternLength, steps;
-			QDomElement el = patterns.item( j ).toElement();
-			if( el.attribute( "len" ) != "" )
-			{
-				patternLength = el.attribute( "len" ).toInt();
-				steps = patternLength / 12;
-				el.setAttribute( "steps", steps );
-			}
-		}
-	}
-}
-
-
 static void upgradeElement_1_2_0_rc2_42( QDomElement & el )
 {
 	if( el.hasAttribute( "syncmode" ) )
@@ -930,8 +928,30 @@ static void upgradeElement_1_2_0_rc2_42( QDomElement & el )
 }
 
 
-void DataFile::upgrade_1_2_0_rc2_42()
+void DataFile::upgrade_1_2_0_rc3()
 {
+	// Upgrade from earlier bbtrack beat note behaviour of adding
+	// steps if a note is placed after the last step.
+	QDomNodeList bbtracks = elementsByTagName( "bbtrack" );
+	for( int i = 0; !bbtracks.item( i ).isNull(); ++i )
+	{
+		QDomNodeList patterns = bbtracks.item( i
+				).toElement().elementsByTagName(
+								"pattern" );
+		for( int j = 0; !patterns.item( j ).isNull(); ++j )
+		{
+			int patternLength, steps;
+			QDomElement el = patterns.item( j ).toElement();
+			if( el.attribute( "len" ) != "" )
+			{
+				patternLength = el.attribute( "len" ).toInt();
+				steps = patternLength / 12;
+				el.setAttribute( "steps", steps );
+			}
+		}
+	}
+
+	// DataFile::upgrade_1_2_0_rc2_42
 	QDomElement el = firstChildElement();
 	while ( !el.isNull() )
 	{
@@ -1059,7 +1079,7 @@ void DataFile::upgrade_1_3_0()
 
 					QDomElement attribute = attributes.item( k ).toElement();
 					if( attribute.attribute( "name" ) == "file" &&
-							( attribute.attribute( "value" ) == "calf" || 
+							( attribute.attribute( "value" ) == "calf" ||
 							attribute.attribute( "value" ) == "calf.so" ) )
 					{
 						attribute.setAttribute( "value", "veal" );
@@ -1323,7 +1343,7 @@ void DataFile::upgrade_1_3_0()
 						};
 						iterate_ladspa_ports(effect, fn);
 					}
-					
+
 					if( attribute.attribute( "name" ) == "plugin" &&
 						attribute.attribute( "value" ) == "StereoTools" )
 					{
@@ -1347,95 +1367,51 @@ void DataFile::upgrade_1_3_0()
 	}
 }
 
+void DataFile::upgrade_noHiddenClipNames()
+{
+	QDomNodeList tracks = elementsByTagName("track");
+
+	auto clearDefaultNames = [](QDomNodeList clips, QString trackName)
+	{
+		for (int j = 0; j < clips.size(); ++j)
+		{
+			QDomElement clip = clips.item(j).toElement();
+			QString clipName = clip.attribute("name", "");
+			if (clipName == trackName) { clip.setAttribute("name", ""); }
+		}
+	};
+
+	for (int i = 0; i < tracks.size(); ++i)
+	{
+		QDomElement track = tracks.item(i).toElement();
+		QString trackName = track.attribute("name", "");
+
+		QDomNodeList instClips = track.elementsByTagName("pattern");
+		QDomNodeList autoClips = track.elementsByTagName("automationpattern");
+		QDomNodeList bbClips = track.elementsByTagName("bbtco");
+
+		clearDefaultNames(instClips, trackName);
+		clearDefaultNames(autoClips, trackName);
+		clearDefaultNames(bbClips, trackName);
+	}
+}
+
 
 void DataFile::upgrade()
 {
-	ProjectVersion version =
-		documentElement().attribute( "creatorversion" ).
-							replace( "svn", "" );
+	// Runs all necessary upgrade methods
+	std::for_each( UPGRADE_METHODS.begin() + m_fileVersion, UPGRADE_METHODS.end(),
+		[this](UpgradeMethod um)
+		{
+			(this->*um)();
+		}
+	);
 
-	if( version < "0.2.1-20070501" )
-	{
-		upgrade_0_2_1_20070501();
-	}
-
-	if( version < "0.2.1-20070508" )
-	{
-		upgrade_0_2_1_20070508();
-	}
-
-	if( version < "0.3.0-rc2" )
-	{
-		upgrade_0_3_0_rc2();
-	}
-
-	if( version < "0.3.0" )
-	{
-		upgrade_0_3_0();
-	}
-
-	if( version < "0.4.0-20080104" )
-	{
-		upgrade_0_4_0_20080104();
-	}
-
-	if( version < "0.4.0-20080118" )
-	{
-		upgrade_0_4_0_20080118();
-	}
-
-	if( version < "0.4.0-20080129" )
-	{
-		upgrade_0_4_0_20080129();
-	}
-
-	if( version < "0.4.0-20080409" )
-	{
-		upgrade_0_4_0_20080409();
-	}
-
-	if( version < "0.4.0-20080607" )
-	{
-		upgrade_0_4_0_20080607();
-	}
-
-	if( version < "0.4.0-20080622" )
-	{
-		upgrade_0_4_0_20080622();
-	}
-
-	if( version < "0.4.0-beta1" )
-	{
-		upgrade_0_4_0_beta1();
-	}
-	if( version < "0.4.0-rc2" )
-	{
-		upgrade_0_4_0_rc2();
-	}
-	if( version < "1.0.99-0" )
-	{
-		upgrade_1_0_99();
-	}
-	if( version < "1.1.0-0" )
-	{
-		upgrade_1_1_0();
-	}
-	if( version < "1.1.91-0" )
-	{
-		upgrade_1_1_91();
-	}
-	if( version < "1.2.0-rc3" )
-	{
-		upgrade_1_2_0_rc3();
-		upgrade_1_2_0_rc2_42();
-	}
-	if( version < "1.3.0" )
-	{
-		upgrade_1_3_0();
-	}
+	// Bump the file version (which should be the size of the upgrade methods vector)
+	m_fileVersion = UPGRADE_METHODS.size();
 
 	// update document meta data
-	documentElement().setAttribute( "version", LDF_VERSION_STRING );
+	documentElement().setAttribute( "version", m_fileVersion );
 	documentElement().setAttribute( "type", typeName( type() ) );
 	documentElement().setAttribute( "creator", "LMMS" );
 	documentElement().setAttribute( "creatorversion", LMMS_VERSION );
@@ -1495,49 +1471,45 @@ void DataFile::loadData( const QByteArray & _data, const QString & _sourceFile )
 	m_type = type( root.attribute( "type" ) );
 	m_head = root.elementsByTagName( "head" ).item( 0 ).toElement();
 
-
-	if( root.hasAttribute( "creatorversion" ) )
+	if (!root.hasAttribute("version") || root.attribute("version")=="1.0")
 	{
-		// compareType defaults to Build,so it doesn't have to be set here
-		ProjectVersion createdWith = root.attribute( "creatorversion" );
+		// The file versioning is now a unsigned int, not maj.min, so we use
+		// legacyFileVersion() to retrieve the appropriate version
+		m_fileVersion = legacyFileVersion();
+	}
+	else
+	{
+		bool success;
+		m_fileVersion = root.attribute( "version" ).toUInt( &success );
+		if( !success ) qWarning("File Version conversion failure.");
+	}
+
+	if (root.hasAttribute("creatorversion"))
+	{
+		// compareType defaults to All, so it doesn't have to be set here
+		ProjectVersion createdWith = root.attribute("creatorversion");
 		ProjectVersion openedWith = LMMS_VERSION;
 
-		if ( createdWith != openedWith )
-		{
-			// only one compareType needs to be set, and we can compare on one line because setCompareType returns ProjectVersion
-			if( createdWith.setCompareType( ProjectVersion::Minor )
-								!= openedWith )
-			{
-				if( gui != nullptr && root.attribute( "type" ) == "song" )
-				{
-					TextFloat::displayMessage(
-						SongEditor::tr( "Version difference" ),
-						SongEditor::tr(
-							"This %1 was created with "
-							"LMMS %2."
-						).arg(
-							_sourceFile.endsWith( ".mpt" ) ?
-								SongEditor::tr( "template" ) :
-								SongEditor::tr( "project" )
-						)
-						.arg( root.attribute( "creatorversion" ) ),
-						embed::getIconPixmap( "whatsthis", 24, 24 ),
-						2500
-					);
-				}
-			}
+		if (createdWith < openedWith) { upgrade(); }
 
-			// the upgrade needs to happen after the warning as it updates the project version.
-			if( createdWith.setCompareType( ProjectVersion::Build )
-								< openedWith )
-			{
-				upgrade();
-			}
+		if (createdWith.setCompareType(ProjectVersion::Minor)
+		 !=  openedWith.setCompareType(ProjectVersion::Minor)
+		 && gui != nullptr && root.attribute("type") == "song"
+		){
+			auto projectType = _sourceFile.endsWith(".mpt") ?
+				SongEditor::tr("template") : SongEditor::tr("project");
+
+			TextFloat::displayMessage(
+				SongEditor::tr("Version difference"),
+				SongEditor::tr("This %1 was created with LMMS %2")
+				.arg(projectType).arg(createdWith.getVersion()),
+				embed::getIconPixmap("whatsthis", 24, 24),
+				2500
+			);
 		}
 	}
 
-	m_content = root.elementsByTagName( typeName( m_type ) ).
-							item( 0 ).toElement();
+	m_content = root.elementsByTagName(typeName(m_type)).item(0).toElement();
 }
 
 
@@ -1548,9 +1520,23 @@ void findIds(const QDomElement& elem, QList<jo_id_t>& idList)
 		idList.append(elem.attribute("id").toInt());
 	}
 	QDomElement child = elem.firstChildElement();
-	while(!child.isNull()) 
+	while(!child.isNull())
 	{
 		findIds(child, idList);
 		child = child.nextSiblingElement();
 	}
+}
+
+unsigned int DataFile::legacyFileVersion()
+{
+	// Version of LMMs that created this project
+	ProjectVersion creator =
+		documentElement().attribute( "creatorversion" ).
+		replace( "svn", "" );
+
+	// Get an iterator pointing at the first upgrade we need to run (or at the end if there is no such upgrade)
+	auto firstRequiredUpgrade = std::upper_bound( UPGRADE_VERSIONS.begin(), UPGRADE_VERSIONS.end(), creator );
+
+	// Convert the iterator to an index, which is our file version (starting at 0)
+	return std::distance( UPGRADE_VERSIONS.begin(), firstRequiredUpgrade );
 }

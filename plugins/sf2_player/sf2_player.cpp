@@ -23,6 +23,8 @@
  *
  */
 
+#include "sf2_player.h"
+
 #include <QDebug>
 #include <QLayout>
 #include <QLabel>
@@ -30,14 +32,14 @@
 
 #include "ConfigManager.h"
 #include "FileDialog.h"
-#include "sf2_player.h"
 #include "ConfigManager.h"
 #include "Engine.h"
 #include "InstrumentTrack.h"
 #include "InstrumentPlayHandle.h"
+#include "Knob.h"
 #include "Mixer.h"
 #include "NotePlayHandle.h"
-#include "Knob.h"
+#include "PathUtil.h"
 #include "SampleBuffer.h"
 #include "Song.h"
 
@@ -55,7 +57,7 @@ Plugin::Descriptor PLUGIN_EXPORT sf2player_plugin_descriptor =
 {
 	STRINGIFY( PLUGIN_NAME ),
 	"Sf2 Player",
-	QT_TRANSLATE_NOOP( "pluginBrowser", "Player for SoundFont files" ),
+	QT_TRANSLATE_NOOP( "PluginBrowser", "Player for SoundFont files" ),
 	"Paul Giblock <drfaygo/at/gmail/dot/com>",
 	0x0100,
 	Plugin::Instrument,
@@ -372,8 +374,8 @@ void sf2Instrument::openFile( const QString & _sf2File, bool updateTrackName )
 	emit fileLoading();
 
 	// Used for loading file
-	char * sf2Ascii = qstrdup( qPrintable( SampleBuffer::tryToMakeAbsolute( _sf2File ) ) );
-	QString relativePath = SampleBuffer::tryToMakeRelative( _sf2File );
+	char * sf2Ascii = qstrdup( qPrintable( PathUtil::toAbsolute( _sf2File ) ) );
+	QString relativePath = PathUtil::toShortestRelative( _sf2File );
 
 	// free reference to soundfont if one is selected
 	freeFont();
@@ -435,7 +437,7 @@ void sf2Instrument::openFile( const QString & _sf2File, bool updateTrackName )
 
 	if( updateTrackName || instrumentTrack()->displayName() == displayName() )
 	{
-		instrumentTrack()->setName( QFileInfo( _sf2File ).baseName() );
+		instrumentTrack()->setName( PathUtil::cleanName( _sf2File ) );
 	}
 }
 
@@ -1145,7 +1147,7 @@ void sf2InstrumentView::showFileDialog()
 
 	if( k->m_filename != "" )
 	{
-		QString f = SampleBuffer::tryToMakeAbsolute( k->m_filename );
+		QString f = PathUtil::toAbsolute( k->m_filename );
 		ofd.setDirectory( QFileInfo( f ).absolutePath() );
 		ofd.selectFile( QFileInfo( f ).fileName() );
 	}

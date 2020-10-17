@@ -68,7 +68,7 @@ Plugin::Descriptor PLUGIN_EXPORT opulenz_plugin_descriptor =
 {
         STRINGIFY( PLUGIN_NAME ),
         "OpulenZ",
-        QT_TRANSLATE_NOOP( "pluginBrowser",
+        QT_TRANSLATE_NOOP( "PluginBrowser",
 			   "2-operator FM Synth" ),
         "Raine M. Ekman <raine/at/iki/fi>",
         0x0100,

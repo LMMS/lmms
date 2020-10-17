@@ -32,6 +32,7 @@
 #include <QStyleOptionFrameV2>
 
 #include "LcdWidget.h"
+#include "DeprecationHelper.h"
 #include "embed.h"
 #include "gui_templates.h"
 #include "MainWindow.h"
@@ -79,14 +80,14 @@ LcdWidget::~LcdWidget()
 
 
 
-void LcdWidget::setValue( int value )
+void LcdWidget::setValue(int value)
 {
 	QString s = m_textForValue[value];
 	if (s.isEmpty())
 	{
-		s = QString::number( value );
+		s = QString::number(value);
 		if (m_leadingZero) {
-			while (s.length() < m_numDigits) { s = "0" + s; }
+			while (s.length() < m_numDigits) {s = "0" + s;}
 		}
 	}
 
@@ -208,13 +209,13 @@ void LcdWidget::paintEvent( QPaintEvent* )
 	{
 		p.setFont( pointSizeF( p.font(), 6.5 ) );
 		p.setPen( textShadowColor() );
-		p.drawText( width() / 2 -
-				p.fontMetrics().width( m_label ) / 2 + 1,
-						height(), m_label );
+		p.drawText(width() / 2 -
+				horizontalAdvance(p.fontMetrics(), m_label) / 2 + 1,
+						height(), m_label);
 		p.setPen( textColor() );
-		p.drawText( width() / 2 -
-				p.fontMetrics().width( m_label ) / 2,
-						height() - 1, m_label );
+		p.drawText(width() / 2 -
+				horizontalAdvance(p.fontMetrics(), m_label) / 2,
+						height() - 1, m_label);
 	}
 
 }
@@ -251,10 +252,10 @@ void LcdWidget::updateSize()
 				m_cellHeight + (2 * margin_y));
 	}
 	else {
-		setFixedSize( qMax<int>(
+		setFixedSize(qMax<int>(
 				m_cellWidth * m_numDigits + margin_x1 + margin_x2,
-				QFontMetrics( pointSizeF( font(), 6.5 ) ).width( m_label ) ),
-				m_cellHeight + (2 * margin_y) + 9 );
+				horizontalAdvance(QFontMetrics(pointSizeF(font(), 6.5)), m_label)),
+				m_cellHeight + (2 * margin_y) + 9);
 	}
 
 	update();

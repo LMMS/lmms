@@ -30,9 +30,11 @@
 #ifdef LMMS_HAVE_LV2
 
 #include <map>
+#include <set>
 #include <lilv/lilv.h>
 
 #include "Lv2Basics.h"
+#include "Lv2UridMap.h"
 #include "Plugin.h"
 
 
@@ -114,10 +116,31 @@ public:
 	Iterator begin() { return m_lv2InfoMap.begin(); }
 	Iterator end() { return m_lv2InfoMap.end(); }
 
+	//! strcmp based key comparator for std::set and std::map
+	struct CmpStr
+	{
+		bool operator()(char const *a, char const *b) const;
+	};
+
+	UridMap& uridMap() { return m_uridMap; }
+	//! Return all
+	const std::set<const char*, CmpStr>& supportedFeatureURIs() const
+	{
+		return m_supportedFeatureURIs;
+	}
+	bool isFeatureSupported(const char* featName) const;
+
 private:
+	// general data
 	bool m_debug; //!< if set, debug output will be printed
 	LilvWorld* m_world;
 	Lv2InfoMap m_lv2InfoMap;
+	std::set<const char*, CmpStr> m_supportedFeatureURIs;
+
+	// feature data that are common for all Lv2Proc
+	UridMap m_uridMap;
+
+	// functions
 	bool isSubclassOf(const LilvPluginClass *clvss, const char *uriStr);
 };
 

@@ -290,10 +290,7 @@ void BBTCOView::openInBBEditor()
 
 
 
-void BBTCOView::resetName()
-{
-	m_bbTCO->setName( m_bbTCO->getTrack()->name() );
-}
+void BBTCOView::resetName() { m_bbTCO->setName(""); }
 
 
 
@@ -528,8 +525,8 @@ void BBTrack::loadTrackSpecificSettings( const QDomElement & _this )
 		for( TrackContainer::TrackList::iterator it = tl.begin();
 							it != tl.end(); ++it )
 		{
-			( *it )->getTCO( src )->copy();
-			( *it )->getTCO( dst )->paste();
+			TrackContentObject::copyStateTo( ( *it )->getTCO( src ),
+				( *it )->getTCO( dst ) );
 		}
 		setName( tr( "Clone of %1" ).arg(
 					_this.parentNode().toElement().attribute( "name" ) ) );
