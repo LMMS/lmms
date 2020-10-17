@@ -10,7 +10,7 @@
         </tripleoscillator>
       </instrument>
       <eldata fcut="323" fwet="1" ftype="1" fres="0.84">
-        <elvol x100="0" sustain="1" ctlenvamt="0" lspd_syncmode="0" lspd="0.1" lpdel="0" pdel="0" hold="0" lspd_denominator="4" userwavefile="" rel="0.1" latt="0" lspd_numerator="4" dec="0.5" lamt="0" att="0" lshp="0" amt="1"/>
+        <elvol x100="0" sustain="1" ctlenvamt="0" lspd_syncmode="0" lspd="0.1" lpdel="0" pdel="0" hold="0" lspd_denominator="4" userwavefile="" rel="0.1" latt="0" lspd_numerator="4" dec="0.5" lamt="0" att="0.01" lshp="0" amt="1"/>
         <elcut x100="0" sustain="0.5" ctlenvamt="0" lspd_syncmode="0" lspd="0.1" lpdel="0" pdel="0" hold="0.5" lspd_denominator="4" userwavefile="" rel="0.1" latt="0" lspd_numerator="4" dec="0.5" lamt="0" att="0.5" lshp="0" amt="0"/>
         <elres x100="0" sustain="0.5" ctlenvamt="0" lspd_syncmode="0" lspd="0.1" lpdel="0" pdel="0" hold="0.5" lspd_denominator="4" userwavefile="" rel="0.1" latt="0" lspd_numerator="4" dec="0.5" lamt="0" att="0.5" lshp="0" amt="0"/>
       </eldata>
