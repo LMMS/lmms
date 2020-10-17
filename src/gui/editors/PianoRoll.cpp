@@ -2678,8 +2678,8 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 	f.setPixelSize(m_keyLineHeight * 0.8);
 	p.setFont(f); // font size doesn't change without this for some reason
 	QFontMetrics fontMetrics(p.font());
-	 // G4 is one of the widest
-	QRect const boundingRect = fontMetrics.boundingRect(QString("G4"));
+	// G-1 is one of the widest; plus one pixel for the shadow
+	QRect const boundingRect = fontMetrics.boundingRect(QString("G-1") + 1);
 
 	// Order of drawing
 	// - vertical quantization lines
