@@ -252,6 +252,7 @@ void TrackContentObject::setStartTimeOffset( const MidiTime &startTimeOffset )
 	m_startTimeOffset = startTimeOffset;
 }
 
+// Update TCO color if it follows the track color
 void TrackContentObject::updateColor()
 {
 	if( ! m_useCustomClipColor )
@@ -564,10 +565,12 @@ void TrackContentObjectView::updatePosition()
 
 void TrackContentObjectView::changeClipColor()
 {
+	// Get a color from the user
 	QColor new_color = ColorChooser( this ).withPalette( ColorChooser::Palette::Track )->getColor( m_tco->color() );
 	if( ! new_color.isValid() )
 	{ return; }
 	
+	// Use that color
 	m_tco->setColor( new_color );
 	m_tco->useCustomClipColor( true );
 	update();
@@ -1469,20 +1472,23 @@ MidiTime TrackContentObjectView::draggedTCOPos( QMouseEvent * me )
 }
 
 
+// Return the color that the TCO's background should be
 QColor TrackContentObjectView::getColorForDisplay( QColor defaultColor )
 {
+	// Get the pure TCO color
 	auto tcoColor = m_tco->hasColor()
 					? m_tco->usesCustomClipColor()
 						? m_tco->color()
 						: m_tco->getTrack()->color()
 					: defaultColor;
 
+	// Set variables
 	QColor c, mutedCustomColor;
 	bool muted = m_tco->getTrack()->isMuted() || m_tco->isMuted();
 	mutedCustomColor = tcoColor;
 	mutedCustomColor.setHsv( mutedCustomColor.hsvHue(), mutedCustomColor.hsvSaturation() / 4, mutedCustomColor.value() );
 
-	// state: selected, muted, colored, normal
+	// Change the pure color by state: selected, muted, colored, normal
 	if( isSelected() )
 	{
 		c = m_tco->hasColor()
@@ -1505,6 +1511,7 @@ QColor TrackContentObjectView::getColorForDisplay( QColor defaultColor )
 		}
 	}
 	
+	// Return color to caller
 	return c;
 }
 

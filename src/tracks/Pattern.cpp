@@ -874,6 +874,7 @@ void PatternView::paintEvent( QPaintEvent * )
 	
 	if( beatPattern )
 	{
+		// Do not paint BBTCOs how we paint pattern TCOs
 		c = BBPatternBackground();
 	}
 	else
