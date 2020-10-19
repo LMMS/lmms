@@ -148,12 +148,13 @@ void LcdWidget::paintEvent( QPaintEvent* )
 	{
 		p.translate(margin, margin);
 		// Left Margin
-		p.drawPixmap( cellRect, *m_lcdPixmap,
-				QRect( QPoint( charsPerPixmap*m_cellWidth,
-					isEnabled()?0:m_cellHeight ),
-				cellSize ) );
+		p.drawPixmap(
+			cellRect,
+			*m_lcdPixmap,
+			QRect(QPoint(charsPerPixmap * m_cellWidth, isEnabled() ? 0 : m_cellHeight),	cellSize)
+		);
 
-		p.translate( m_marginWidth, 0 );
+		p.translate(m_marginWidth, 0);
 	}
 
 	// Padding
@@ -194,12 +195,12 @@ void LcdWidget::paintEvent( QPaintEvent* )
 	if (!m_seamlessLeft && !m_seamlessRight)
 	{
 		QStyleOptionFrame opt;
-		opt.initFrom( this );
+		opt.initFrom(this);
 		opt.state = QStyle::State_Sunken;
-		opt.rect = QRect( 0, 0, m_cellWidth * m_numDigits + (margin+m_marginWidth)*2 - 1,
-				m_cellHeight + (margin*2) );
+		opt.rect = QRect(0, 0, m_cellWidth * m_numDigits + (margin + m_marginWidth) * 2 - 1,
+			m_cellHeight + (margin * 2));
 
-		style()->drawPrimitive( QStyle::PE_Frame, &opt, &p, this );
+		style()->drawPrimitive(QStyle::PE_Frame, &opt, &p, this);
 	}
 
 	p.resetTransform();
@@ -247,15 +248,22 @@ void LcdWidget::updateSize()
 	int margin_x1 = m_seamlessLeft ? 0 : 1 + m_marginWidth;
 	int margin_x2 = m_seamlessRight ? 0 : 1 + m_marginWidth;
 	int margin_y = 1;
-	if (m_label.isEmpty()) {
-		setFixedSize(m_cellWidth * m_numDigits + margin_x1 + margin_x2,
-				m_cellHeight + (2 * margin_y));
+	if (m_label.isEmpty())
+	{
+		setFixedSize(
+			m_cellWidth * m_numDigits + margin_x1 + margin_x2,
+			m_cellHeight + (2 * margin_y)
+		);
 	}
-	else {
-		setFixedSize(qMax<int>(
+	else
+	{
+		setFixedSize(
+			qMax<int>(
 				m_cellWidth * m_numDigits + margin_x1 + margin_x2,
-				horizontalAdvance(QFontMetrics(pointSizeF(font(), 6.5)), m_label)),
-				m_cellHeight + (2 * margin_y) + 9);
+				horizontalAdvance(QFontMetrics(pointSizeF(font(), 6.5)), m_label)
+			),
+			m_cellHeight + (2 * margin_y) + 9
+		);
 	}
 
 	update();

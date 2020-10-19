@@ -743,7 +743,7 @@ void PianoRoll::setCurrentPattern( Pattern* newPattern )
 
 	connect(m_pattern->instrumentTrack()->microtuner()->keymapModel(), SIGNAL(dataChanged()), this, SLOT(update()));
 	connect(m_pattern->instrumentTrack()->microtuner()->keyRangeImportModel(), SIGNAL(dataChanged()),
-				this, SLOT(update()));
+		this, SLOT(update()));
 
 	update();
 	emit currentPatternChanged();
@@ -2845,12 +2845,38 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 			{
 			case PR_WHITE_KEY_SMALL:
 			case PR_WHITE_KEY_BIG:
-				if (mapped) {p.setBrush(pressed ? m_whiteKeyActiveBackground : m_whiteKeyInactiveBackground);}
-				else {p.setBrush(m_whiteKeyDisabledBackground);}
+				if (mapped)
+				{
+					if (pressed)
+					{
+						p.setBrush(m_whiteKeyActiveBackground);
+					}
+					else
+					{
+						p.setBrush(m_whiteKeyInactiveBackground);
+					}
+				}
+				else
+				{
+					p.setBrush(m_whiteKeyDisabledBackground);
+				}
 				break;
 			case PR_BLACK_KEY:
-				if (mapped) {p.setBrush(pressed ? m_blackKeyActiveBackground : m_blackKeyInactiveBackground);}
-				else {p.setBrush(m_blackKeyDisabledBackground);}
+				if (mapped)
+				{
+					if (pressed)
+					{
+						p.setBrush(m_blackKeyActiveBackground);
+					}
+					else
+					{
+						p.setBrush(m_blackKeyInactiveBackground);
+					}
+				}
+				else
+				{
+					p.setBrush(m_blackKeyDisabledBackground);
+				}
 			}
 			// draw key
 			p.drawRect(PIANO_X, yt, kw, kh);

@@ -47,13 +47,13 @@
 
 MicrotunerConfig::MicrotunerConfig() :
 	QWidget(),
-	m_scaleComboModel(NULL, tr("Selected scale")),
-	m_keymapComboModel(NULL, tr("Selected keymap")),
-	m_firstKeyModel(0, 0, NumKeys - 1, NULL, tr("First key")),
-	m_lastKeyModel(NumKeys - 1, 0, NumKeys - 1, NULL, tr("Last key")),
-	m_middleKeyModel(DefaultMiddleKey, 0, NumKeys - 1, NULL, tr("Middle key")),
-	m_baseKeyModel(DefaultBaseKey, 0, NumKeys - 1, NULL, tr("Base key")),
-	m_baseFreqModel(DefaultBaseFreq, 0.1f, 9999.999f, 0.001f, NULL, tr("Base note frequency"))
+	m_scaleComboModel(nullptr, tr("Selected scale")),
+	m_keymapComboModel(nullptr, tr("Selected keymap")),
+	m_firstKeyModel(0, 0, NumKeys - 1, nullptr, tr("First key")),
+	m_lastKeyModel(NumKeys - 1, 0, NumKeys - 1, nullptr, tr("Last key")),
+	m_middleKeyModel(DefaultMiddleKey, 0, NumKeys - 1, nullptr, tr("Middle key")),
+	m_baseKeyModel(DefaultBaseKey, 0, NumKeys - 1, nullptr, tr("Base key")),
+	m_baseFreqModel(DefaultBaseFreq, 0.1f, 9999.999f, 0.001f, nullptr, tr("Base note frequency"))
 {
 	setWindowIcon(embed::getIconPixmap("microtuner"));
 	setWindowTitle(tr("Microtuner"));
@@ -137,31 +137,31 @@ MicrotunerConfig::MicrotunerConfig() :
 	QGridLayout *keymapRangeLayout = new QGridLayout();
 	microtunerLayout->addLayout(keymapRangeLayout, 5, 2, 1, 2, Qt::AlignCenter | Qt::AlignTop);
 
-	LcdSpinBox *firstKeySpin = new LcdSpinBox(3, NULL, tr("First key"));
+	LcdSpinBox *firstKeySpin = new LcdSpinBox(3, nullptr, tr("First key"));
 	firstKeySpin->setLabel(tr("FIRST"));
 	firstKeySpin->setToolTip(tr("First MIDI key that will be mapped"));
 	firstKeySpin->setModel(&m_firstKeyModel);
 	keymapRangeLayout->addWidget(firstKeySpin, 0, 0);
 
-	LcdSpinBox *lastKeySpin = new LcdSpinBox(3, NULL, tr("Last key"));
+	LcdSpinBox *lastKeySpin = new LcdSpinBox(3, nullptr, tr("Last key"));
 	lastKeySpin->setLabel(tr("LAST"));
 	lastKeySpin->setToolTip(tr("Last MIDI key that will be mapped"));
 	lastKeySpin->setModel(&m_lastKeyModel);
 	keymapRangeLayout->addWidget(lastKeySpin, 0, 1);
 
-	LcdSpinBox *middleKeySpin = new LcdSpinBox(3, NULL, tr("Middle key"));
+	LcdSpinBox *middleKeySpin = new LcdSpinBox(3, nullptr, tr("Middle key"));
 	middleKeySpin->setLabel(tr("MIDDLE"));
 	middleKeySpin->setToolTip(tr("First line in the keymap refers to this MIDI key"));
 	middleKeySpin->setModel(&m_middleKeyModel);
 	keymapRangeLayout->addWidget(middleKeySpin, 0, 2);
 
-	LcdSpinBox *baseKeySpin = new LcdSpinBox(3, NULL, tr("Base key"));
+	LcdSpinBox *baseKeySpin = new LcdSpinBox(3, nullptr, tr("Base key"));
 	baseKeySpin->setLabel(tr("BASE N."));
 	baseKeySpin->setToolTip(tr("Base note frequency will be assigned to this MIDI key"));
 	baseKeySpin->setModel(&m_baseKeyModel);
 	keymapRangeLayout->addWidget(baseKeySpin, 1, 0);
 
-	LcdFloatSpinBox *baseFreqSpin = new LcdFloatSpinBox(4, 3, NULL, tr("Base note frequency"));
+	LcdFloatSpinBox *baseFreqSpin = new LcdFloatSpinBox(4, 3, nullptr, tr("Base note frequency"));
 	baseFreqSpin->setLabel(tr("BASE NOTE FREQ"));
 	baseFreqSpin->setModel(&m_baseFreqModel);
 	baseFreqSpin->setToolTip(tr("Base note frequency"));
@@ -246,7 +246,7 @@ void MicrotunerConfig::updateKeymapList(int index)
 void MicrotunerConfig::updateScaleForm()
 {
 	Song *song = Engine::getSong();
-	if (song == NULL) {return;}
+	if (song == nullptr) {return;}
 
 	auto newScale = song->getScale(m_scaleComboModel.value());
 
@@ -272,7 +272,7 @@ void MicrotunerConfig::updateScaleForm()
 void MicrotunerConfig::updateKeymapForm()
 {
 	Song *song = Engine::getSong();
-	if (song == NULL) {return;}
+	if (song == nullptr) {return;}
 
 	auto newMap = song->getKeymap(m_keymapComboModel.value());
 
@@ -408,7 +408,7 @@ bool MicrotunerConfig::applyScale()
 	}
 
 	Song *song = Engine::getSong();
-	if (song == NULL) {return false;}
+	if (song == nullptr) {return false;}
 
 	auto newScale = std::make_shared<Scale>(m_scaleNameEdit->text(), newIntervals);
 	song->setScale(m_scaleComboModel.value(), newScale);
@@ -442,7 +442,7 @@ bool MicrotunerConfig::applyKeymap()
 	}
 
 	Song *song = Engine::getSong();
-	if (song == NULL) {return false;}
+	if (song == nullptr) {return false;}
 
 	auto newKeymap = std::make_shared<Keymap>(
 		m_keymapNameEdit->text(),
@@ -562,7 +562,7 @@ bool MicrotunerConfig::saveScaleToFile()
 		return false;
 	}
 	Song *song = Engine::getSong();
-	if (song == NULL) {return false;}
+	if (song == nullptr) {return false;}
 
 	QTextStream stream(&file);
 	stream << "! " << QFileInfo(fileName).fileName() << "\n";
@@ -598,7 +598,7 @@ bool MicrotunerConfig::saveKeymapToFile()
 		return false;
 	}
 	Song *song = Engine::getSong();
-	if (song == NULL) {return false;}
+	if (song == nullptr) {return false;}
 
 	QTextStream stream(&file);
 	stream << "! " << QFileInfo(fileName).fileName() << "\n";
