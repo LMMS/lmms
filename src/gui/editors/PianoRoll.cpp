@@ -31,6 +31,7 @@
 #include <QKeyEvent>
 #include <QLabel>
 #include <QLayout>
+#include <QMargins>
 #include <QMdiArea>
 #include <QPainter>
 #include <QPointer>
@@ -2678,8 +2679,8 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 	f.setPixelSize(m_keyLineHeight * 0.8);
 	p.setFont(f); // font size doesn't change without this for some reason
 	QFontMetrics fontMetrics(p.font());
-	// G-1 is one of the widest; plus one pixel for the shadow
-	QRect const boundingRect = fontMetrics.boundingRect(QString("G-1") + 1);
+	// G-1 is one of the widest; plus one pixel margin for the shadow
+	QRect const boundingRect = fontMetrics.boundingRect(QString("G-1")) + QMargins(0, 0, 1, 0);
 
 	// Order of drawing
 	// - vertical quantization lines
