@@ -44,7 +44,8 @@
 
 
 
-Lv2Manager::Lv2Manager()
+Lv2Manager::Lv2Manager() :
+	m_uridCache(m_uridMap)
 {
 	const char* dbgStr = getenv("LMMS_LV2_DEBUG");
 	m_debug = (dbgStr && *dbgStr);
