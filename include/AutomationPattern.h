@@ -52,7 +52,7 @@ public:
 	} ;
 
 	typedef QMap<int, AutomationNode> timeMap;
-	typedef QVector<QPointer<AutomatableModel> > objectVector;
+	typedef QVector<QPointer<AutomatableModel>> objectVector;
 
 	AutomationPattern( AutomationTrack * _auto_track );
 	AutomationPattern( const AutomationPattern & _pat_to_copy );
