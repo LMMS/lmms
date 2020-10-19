@@ -3,12 +3,12 @@
 <lmms-project version="1.0" creator="LMMS" creatorversion="1.0.2" type="instrumenttracksettings">
   <head/>
   <instrumenttracksettings muted="0" type="0" name="Broken Toy" solo="0">
-    <instrumenttrack pan="0" fxch="0" pitchrange="1" pitch="0" basenote="57" vol="75">
+    <instrumenttrack pan="0" fxch="0" pitchrange="1" pitch="0" basenote="57" vol="100">
       <instrument name="tripleoscillator">
-        <tripleoscillator phoffset2="0" userwavefile0="" finer0="0" userwavefile1="" finer1="0" userwavefile2="" finer2="0" coarse0="12" coarse1="0" coarse2="0" finel0="0" finel1="0" modalgo1="2" modalgo2="4" finel2="0" pan0="0" modalgo3="2" pan1="0" stphdetun0="0" pan2="0" stphdetun1="0" wavetype0="5" stphdetun2="0" wavetype1="0" wavetype2="3" vol0="33" vol1="33" phoffset0="0" phoffset1="0" vol2="10"/>
+        <tripleoscillator phoffset2="0" finer0="0" finer1="0" finer2="0" coarse0="12" coarse1="0" coarse2="0" finel0="0" finel1="0" modalgo1="2" modalgo2="4" finel2="0" pan0="0" modalgo3="2" pan1="0" stphdetun0="0" pan2="0" stphdetun1="0" wavetype0="5" stphdetun2="0" wavetype1="0" wavetype2="3" vol0="33" vol1="33" phoffset0="0" phoffset1="0" vol2="10"/>
       </instrument>
       <eldata fres="0.18" ftype="0" fcut="141" fwet="1">
-        <elvol lspd_denominator="4" sustain="0.63" pdel="0" userwavefile="" dec="0.58" lamt="0" syncmode="0" latt="0" rel="0.27" amt="1" x100="0" att="0" lpdel="0" hold="0" lshp="0" lspd="0.1" ctlenvamt="0" lspd_numerator="4"/>
+        <elvol lspd_denominator="4" sustain="0.63" pdel="0" userwavefile="" dec="0.58" lamt="0" syncmode="0" latt="0" rel="0.27" amt="1" x100="0" att="0.03" lpdel="0" hold="0" lshp="0" lspd="0.1" ctlenvamt="0" lspd_numerator="4"/>
         <elcut lspd_denominator="4" sustain="0.26" pdel="0.049" userwavefile="" dec="1" lamt="0" syncmode="0" latt="0" rel="0.72" amt="1" x100="0" att="0" lpdel="0" hold="0" lshp="0" lspd="0.1" ctlenvamt="0" lspd_numerator="4"/>
         <elres lspd_denominator="4" sustain="0.94" pdel="0" userwavefile="" dec="0" lamt="0" syncmode="0" latt="0" rel="0.55" amt="0" x100="0" att="0.52" lpdel="0" hold="0" lshp="0" lspd="0.1" ctlenvamt="0" lspd_numerator="4"/>
       </eldata>

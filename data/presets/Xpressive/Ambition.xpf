@@ -10,7 +10,7 @@
         </xpressive>
       </instrument>
       <eldata ftype="0" fres="0.5" fwet="1" fcut="14000">
-        <elvol lspd_numerator="4" lshp="0" att="0" ctlenvamt="0" dec="0.803409" amt="1" lspd_denominator="4" x100="0" hold="0.203666" pdel="0" lspd="0.1" userwavefile="" sustain="0.212332" latt="0" lspd_syncmode="0" rel="0.573501" lpdel="0" lamt="0"/>
+        <elvol lspd_numerator="4" lshp="0" att="0.03" ctlenvamt="0" dec="0.803409" amt="1" lspd_denominator="4" x100="0" hold="0.203666" pdel="0" lspd="0.1" userwavefile="" sustain="0.212332" latt="0" lspd_syncmode="0" rel="0.573501" lpdel="0" lamt="0"/>
         <elcut lspd_numerator="4" lshp="0" att="0" ctlenvamt="0" dec="0.5" amt="0" lspd_denominator="4" x100="0" hold="0.5" pdel="0" lspd="0.1" userwavefile="" sustain="0.5" latt="0" lspd_syncmode="0" rel="0.1" lpdel="0" lamt="0"/>
         <elres lspd_numerator="4" lshp="0" att="0" ctlenvamt="0" dec="0.5" amt="0" lspd_denominator="4" x100="0" hold="0.5" pdel="0" lspd="0.1" userwavefile="" sustain="0.5" latt="0" lspd_syncmode="0" rel="0.1" lpdel="0" lamt="0"/>
       </eldata>
