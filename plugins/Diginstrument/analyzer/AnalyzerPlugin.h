@@ -63,6 +63,9 @@ private:
   //TMP: keep for visualization
   std::vector<SplineSpectrum<double,4>> spectra;
 
+  void analyze(const std::vector<double> & signal, vector<pair<string, double>> coordinates);
+  void subtractiveAnalysis(std::vector<double> & signal, unsigned int sampleRate);
+
 private slots:
   //void sampleRateChanged();
 };

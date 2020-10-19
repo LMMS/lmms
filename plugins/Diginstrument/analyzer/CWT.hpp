@@ -32,28 +32,29 @@ private:
     std::string wavelet;
     const std::string type = "pow";
     double waveletParameter;
-    const double sampleRate = 1;
+    double dt = 1.0/44100.0;
     unsigned int level;
     const unsigned int octaves = 11;
     unsigned int signalLength;
 
 public:
-    bool setWavelet(const std::string &name, const double &parameter, unsigned int level)
+    bool setWavelet(const std::string &name, const double &parameter, unsigned int level, unsigned int sampleRate)
     {
         this->wavelet = name;
         this->waveletParameter = parameter;
         this->level = level;
+        this->dt = 1.0/(double)sampleRate;
         return true;
     }
 
     void operator()(const std::vector<double> &signal)
     {
-        double s0 = 2 * this->sampleRate;   //Smallest scale. Typically s0 <= 2 * dt
+        double s0 = 2 * this->dt;   //Smallest scale. Typically s0 <= 2 * dt
         double dj = 1.0f / ((double)level); //Separation between Scales.
         int totalScales = octaves * level;
         signalLength = signal.size();
 
-        wt = cwt_init(this->wavelet.c_str(), this->waveletParameter, signalLength, this->sampleRate, totalScales);
+        wt = cwt_init(this->wavelet.c_str(), this->waveletParameter, signalLength, this->dt, totalScales);
         setCWTScales(wt, s0, dj, this->type.c_str(), 2);
         cwt(wt, &signal[0]);
     }
@@ -78,9 +79,24 @@ public:
         return res;
     }
 
-    CWT(const std::string &name, const double &parameter, unsigned int level)
+    static std::vector<std::pair<double, double>> singleScaleCWT(const std::vector<double> & signal, double scale, unsigned int sampleRate, std::string waveletName = "morlet", int waveletParameter = 6)
     {
-        setWavelet(name, parameter, level);
+        cwt_object wt = cwt_init(waveletName.c_str(), waveletParameter, signal.size(), 1.0/(double)sampleRate, 1);
+        setCWTScales(wt, scale, 0, "lin", 0);
+        cwt(wt, &signal[0]);
+        std::vector<std::pair<double, double>> res;
+        res.reserve(signal.size());
+        for(int i = 0; i<signal.size(); i++)
+        {
+            res.emplace_back(std::make_pair(wt->output[i].re, wt->output[i].im));
+        }
+        cwt_free(wt);
+        return res;
+    }
+
+    CWT(const std::string &name, const double &parameter, unsigned int level, unsigned int sampleRate)
+    {
+        setWavelet(name, parameter, level, sampleRate);
     }
 
     ~CWT()
