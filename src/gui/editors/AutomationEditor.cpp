@@ -1013,16 +1013,19 @@ inline void AutomationEditor::drawAutomationPoint(QPainter & p, timeMap::iterato
 	QMutexLocker m(&m_patternEditorMutex);
 
 	int x = xCoordOfTick(it.key());
-	int y = yCoordOfLevel(it.value().getInValue());
+	int y;
 	const int outerRadius = qBound(3, (m_ppb * AutomationPattern::quantization()) / 576, 5); // man, getting this calculation right took forever
-	p.setPen(QPen(nodeInValueColor().lighter(200)));
-	p.setBrush(QBrush(nodeInValueColor()));
-	p.drawEllipse(x - outerRadius, y - outerRadius, outerRadius * 2, outerRadius * 2);
 
-	// Draws another ellipse for the outValue
+	// Draws an ellipse for the outValue
 	y = yCoordOfLevel(it.value().getOutValue());
 	p.setPen(QPen(nodeOutValueColor().lighter(200)));
 	p.setBrush(QBrush(nodeOutValueColor()));
+	p.drawEllipse(x - outerRadius, y - outerRadius, outerRadius * 2, outerRadius * 2);
+
+	// Draws an ellipse for the inValue
+	y = yCoordOfLevel(it.value().getInValue());
+	p.setPen(QPen(nodeInValueColor().lighter(200)));
+	p.setBrush(QBrush(nodeInValueColor()));
 	p.drawEllipse(x - outerRadius, y - outerRadius, outerRadius * 2, outerRadius * 2);
 }
 
