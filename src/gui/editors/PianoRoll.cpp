@@ -2915,14 +2915,8 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 			case PR_WHITE_KEY_BIG:
 				if (mapped)
 				{
-					if (pressed)
-					{
-						p.setBrush(m_whiteKeyActiveBackground);
-					}
-					else
-					{
-						p.setBrush(m_whiteKeyInactiveBackground);
-					}
+					if (pressed) { p.setBrush(m_whiteKeyActiveBackground); }
+					else { p.setBrush(m_whiteKeyInactiveBackground); }
 				}
 				else
 				{
