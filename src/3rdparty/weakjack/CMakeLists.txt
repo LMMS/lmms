@@ -7,6 +7,6 @@ IF(LMMS_HAVE_WEAKJACK)
 	
 	# Library stub for AppImages running on systems without jack
 	ADD_LIBRARY(weakjack MODULE weakjack/weak_libjack.c weakjack/weak_libjack.h)
-	TARGET_INCLUDE_DIRECTORIES(weakjack PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/weakjack ${CMAKE_CURRENT_SOURCE_DIR}/../jack2/common ${JACK_INCLUDE_DIRS})
+	TARGET_INCLUDE_DIRECTORIES(weakjack PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/weakjack ${JACK_INCLUDE_DIRS})
 	INSTALL(TARGETS weakjack LIBRARY DESTINATION "${PLUGIN_DIR}/optional")
 ENDIF()
