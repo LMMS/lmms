@@ -434,7 +434,7 @@ IF(WANT_JACK)
 	IF(WANT_WEAKJACK)
 		SET(LMMS_HAVE_WEAKJACK TRUE)
 		SET(WEAKJACK_INCLUDE_DIRS ${CMAKE_SOURCE_DIR}/src/3rdparty/weakjack/weakjack)
-		SET(JACK_INCLUDE_DIRS ${CMAKE_SOURCE_DIR}/src/3rdparty/jackaudio)
+		SET(JACK_INCLUDE_DIRS ${CMAKE_SOURCE_DIR}/src/3rdparty/jack2/common)
 		SET(STATUS_JACK "OK (weak linking enabled)")
 		# use dlsym instead
 		SET(JACK_LIBRARIES ${CMAKE_DL_LIBS})

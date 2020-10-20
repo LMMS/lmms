@@ -40,6 +40,6 @@
 [submodule "plugins/carlabase/carla"]
 	path = plugins/carlabase/carla
 	url = https://github.com/falktx/carla
-[submodule "src/3rdparty/jackaudio/jack"]
-	path = src/3rdparty/jackaudio/jack
-	url = https://github.com/jackaudio/headers
+[submodule "src/3rdparty/jack2"]
+	path = src/3rdparty/jack2
+	url = https://github.com/jackaudio/jack2
