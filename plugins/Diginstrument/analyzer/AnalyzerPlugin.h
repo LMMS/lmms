@@ -28,6 +28,7 @@
 #include <fstream>
 #include "../common/InstrumentVisualizationWindow.h"
 #include <QtDataVisualization>
+#include "Phase.hpp"
 
 class AnalyzerPlugin : public ToolPlugin
 {

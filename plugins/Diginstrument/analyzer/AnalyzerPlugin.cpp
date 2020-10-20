@@ -263,29 +263,46 @@ void AnalyzerPlugin::subtractiveAnalysis(std::vector<double> & signal, unsigned 
 	QImage colorRed = QImage(2, 2, QImage::Format_RGB32);
 	colorRed.fill(Qt::red);
 
-	//test:
-	vector<double> freqs{92.3,138.46,184.615,231.53,278,324.6   ,   /*418, 465, 511.53, 559.61, 606.92, 654.61,*/   702.69, 751.15, 798.84, 848.46, 897.69, 946.92, 996.53, 1046.54, 1096.92,   /*1301.54, 1310, 1353.85, 1405.77, 1459.23, 1512.69, 1566.54,*/  1944.23};
-	//vector<double> freqs{50,500,440};
-	for(auto fr : freqs)
-	{
-		double scale = (6+sqrt(2+36)) / (4*M_PI*fr);
-		auto cfs = CWT::singleScaleCWT(signal, scale,  sampleRate);
+	//TMP: piano partials by hand
+	vector<double> freqs{92.3,138.46,184.615,231.53,278,324.6   /*,   418, 465, 511.53, 559.61, 606.92, 654.61,   702.69, 751.15, 798.84, 848.46, 897.69, 946.92, 996.53, 1046.54, 1096.92,   1301.54, 1310, 1353.85, 1405.77, 1459.23, 1512.69, 1566.54,   1944.23*/};
+	
+	vector<vector<double>> phases;
+	vector<vector<double>> amps;
+	//for each selected frequency
+	for(const auto fr : freqs)
+	{	
+		//TODO: tie wavelet parameters together
+		constexpr double parameter = 6;
+		const double scale = (parameter+sqrt(2+parameter*parameter)) / (4*M_PI*fr);
+		//perform a single center frequency CWT
+		const auto cfs = CWT::singleScaleCWT(signal, scale, sampleRate);
+		phases.push_back(vector<double>(signal.size(),0));
+		amps.push_back(vector<double>(signal.size(),0));
+		//for each instance in time
 		for(int i = 0; i<cfs.size(); i++)
 		{
+			//process the complex coefficient
 			const auto & c = cfs[i];
-			double mag = sqrt(c.first*c.first + c.second*c.second);
-			//TODO: this imperfect amplitude leaves in quite a bit of residue
-			//BUGHUNT: this has been the most successful equation, as it resulted in the same amp for both components in 440+50.wav
-			double amp = (mag / (sqrt(scale*sampleRate))) * 1.067158515;
-			double phase = atan2(c.first, c.second);
-			//for some reason, here its sin instead of cos
-			signal[i]-=sin(phase)*amp;
+			const double mag = sqrt(c.first*c.first + c.second*c.second);
+			//TODO: this has been the most successful equation, as it resulted in the same amp for both components in 440+50.wav
+			//I have no idea where the constant comes from; probably ties into the wavelet parameter
+			amps.back()[i] = (mag / (sqrt(scale*sampleRate))) * 1.067158515;
+			phases.back()[i] = atan2(c.first, c.second);
+		}
+		//unwrap phase
+		Diginstrument::Phase::unwrapInPlace(phases.back());
+		for(int i = 0; i<signal.size(); i++)
+		{
+			//subtract extracted partial to get residual signal
+			signal[i]-=sin(phases.back()[i])*amps.back()[i];
 			//tmp: visualization
-			if(i%441 == 0)
+			if(i%440 == 1 && amps.back()[i]>0.001)
 			{
+				//calculate freq for visualization from diff of phase
+				const double freq = abs(((phases.back()[i] - phases.back()[i-1]) * m_sampleBuffer.sampleRate()) / (2*M_PI));
 				visualization->addCustomItem(new QCustom3DItem("/home/mate/projects/lmms/plugins/Diginstrument/analyzer/resources/marker_mesh.obj",
-												QVector3D(fr, amp,(double)i/(double)sampleRate),
-												QVector3D(0.025f, 0.025f, 0.025f),
+												QVector3D(freq, amps.back()[i],(double)i/(double)sampleRate),
+												QVector3D(0.01f, 0.01f, 0.01f),
 												QQuaternion::fromAxisAndAngle(0.0f, 1.0f, 0.0f, 45.0f),
 												colorRed));
 			}
