@@ -140,6 +140,13 @@ public:
 	int quantization() const;
 
 protected:
+	enum QuantizeActions
+	{
+		QuantizeBoth,
+		QuantizePos,
+		QuantizeLength
+	};
+
 	void keyPressEvent( QKeyEvent * ke ) override;
 	void keyReleaseEvent( QKeyEvent * ke ) override;
 	void leaveEvent( QEvent * e ) override;
@@ -196,7 +203,7 @@ protected slots:
 	void quantizeChanged();
 	void noteLengthChanged();
 	void keyChanged();
-	void quantizeNotes();
+	void quantizeNotes(QuantizeActions mode = QuantizeBoth);
 
 	void updateSemiToneMarkerMenu();
 

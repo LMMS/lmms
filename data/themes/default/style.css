@@ -496,6 +496,18 @@ QToolButton:checked {
 	background-image: url(resources:shadow_p.png);
 }
 
+/* buttons with menu */
+
+QToolButton[popupMode="1"] {
+	padding-right: 15px;
+}
+
+QToolButton::menu-button {
+	border-top-right-radius: 1px;
+	border-bottom-right-radius: 1px;
+	width: 15px;
+}
+
 /* track label buttons - the part that contains the icon and track title */
 
 TrackLabelButton {
