@@ -1,5 +1,7 @@
 INCLUDE(BuildPlugin)
 
+INCLUDE_DIRECTORIES(resid)
+
 BUILD_PLUGIN(sid
 	sid_instrument.cpp
 	sid_instrument.h
