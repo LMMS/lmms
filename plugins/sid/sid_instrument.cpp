@@ -247,7 +247,7 @@ f_cnt_t sidInstrument::desiredReleaseFrames() const
 
 
 
-static int sid_fillbuffer(unsigned char* sidreg, cSID *sid, int tdelta, short *ptr, int samples)
+static int sid_fillbuffer(unsigned char* sidreg, SID *sid, int tdelta, short *ptr, int samples)
 {
   int tdelta2;
   int result;
@@ -312,7 +312,7 @@ void sidInstrument::playNote( NotePlayHandle * _n,
 
 	if ( tfp == 0 )
 	{
-		cSID *sid = new cSID();
+		SID *sid = new SID();
 		sid->set_sampling_parameters( clockrate, SAMPLE_FAST, samplerate );
 		sid->set_chip_model( MOS8580 );
 		sid->enable_filter( true );
@@ -322,7 +322,7 @@ void sidInstrument::playNote( NotePlayHandle * _n,
 	const fpp_t frames = _n->framesLeftForCurrentPeriod();
 	const f_cnt_t offset = _n->noteOffset();
 
-	cSID *sid = static_cast<cSID *>( _n->m_pluginData );
+	SID *sid = static_cast<SID *>( _n->m_pluginData );
 	int delta_t = clockrate * frames / samplerate + 4;
 	// avoid variable length array for msvc compat
 	short* buf = reinterpret_cast<short*>(_working_buffer + offset);
@@ -448,7 +448,7 @@ void sidInstrument::playNote( NotePlayHandle * _n,
 
 void sidInstrument::deleteNotePluginData( NotePlayHandle * _n )
 {
-	delete static_cast<cSID *>( _n->m_pluginData );
+	delete static_cast<SID *>( _n->m_pluginData );
 }
 
 
