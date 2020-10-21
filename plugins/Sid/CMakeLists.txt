@@ -3,8 +3,8 @@ INCLUDE(BuildPlugin)
 INCLUDE_DIRECTORIES(resid)
 
 BUILD_PLUGIN(sid
-	sid_instrument.cpp
-	sid_instrument.h
+	SidInstrument.cpp
+	SidInstrument.h
 	resid/envelope.h
 	resid/extfilt.h
 	resid/filter.h
@@ -30,7 +30,7 @@ BUILD_PLUGIN(sid
 	resid/wave8580_P_T.cc
 	resid/wave8580__ST.cc
 	resid/wave.cc
-	MOCFILES sid_instrument.h
+	MOCFILES SidInstrument.h
 	EMBEDDED_RESOURCES *.png)
 
 # Parse VERSION
