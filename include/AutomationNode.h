@@ -34,8 +34,8 @@ class AutomationNode
 {
 public:
 	AutomationNode(); // Dummy constructor for the QMap
-	AutomationNode(AutomationPattern* pat, float value, int key);
-	AutomationNode(AutomationPattern* pat, float inValue, float outValue, int key);
+	AutomationNode(AutomationPattern* pat, float value, int pos);
+	AutomationNode(AutomationPattern* pat, float inValue, float outValue, int pos);
 
 	inline float getInValue()
 	{
@@ -118,8 +118,8 @@ private:
 	// Pattern that this node belongs to
 	AutomationPattern* m_pattern;
 
-	// Time position of this node
-	int m_key;
+	// Time position of this node (matches the timeMap key)
+	int m_pos;
 
 	// Values of this node
 	float m_inValue;

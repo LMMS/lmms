@@ -1016,13 +1016,13 @@ inline void AutomationEditor::drawAutomationPoint(QPainter & p, timeMap::iterato
 	int y;
 	const int outerRadius = qBound(3, (m_ppb * AutomationPattern::quantization()) / 576, 5); // man, getting this calculation right took forever
 
-	// Draws an ellipse for the outValue
+	// Draw a circle for the outValue
 	y = yCoordOfLevel(it.value().getOutValue());
 	p.setPen(QPen(nodeOutValueColor().lighter(200)));
 	p.setBrush(QBrush(nodeOutValueColor()));
 	p.drawEllipse(x - outerRadius, y - outerRadius, outerRadius * 2, outerRadius * 2);
 
-	// Draws an ellipse for the inValue
+	// Draw a circle for the inValue
 	y = yCoordOfLevel(it.value().getInValue());
 	p.setPen(QPen(nodeInValueColor().lighter(200)));
 	p.setBrush(QBrush(nodeInValueColor()));
@@ -1403,9 +1403,7 @@ float AutomationEditor::yCoordOfLevel(float level )
 
 
 
-//NEEDS Change in CSS
 void AutomationEditor::drawLevelTick(QPainter & p, int tick, float value)
-				//			bool is_selected )
 {
 	QMutexLocker m(&m_patternEditorMutex);
 
@@ -1904,9 +1902,9 @@ void AutomationEditor::updateTopBottomLevels()
 
 
 /* @brief Given a mouse coordinate, returns a timeMap::iterator that points to
- *        the latest node that is inside a square of side "r" pixels from those
- *        coordinates. In simpler terms, returns the automation node that was
- *        clicked.
+ *        the latest node inside a square of side "r" pixels from those
+ *        coordinates. In simpler terms, returns the automation node on those
+ *        coordinates.
  * @param Int X coordinate
  * @param Int Y coordinate
  * @param Boolean. True to check if the outValue of the node was clicked instead

@@ -130,10 +130,6 @@ protected:
 	float yCoordOfLevel( float level );
 	inline void drawLevelTick( QPainter & p, int tick, float value);// bool is_selected ); //NEEDS Change in CSS
 
-	// Returns the an iterator pointing to the AutomationNode on a radius of
-	// r pixels of the x,y mouse coordinates, or timeMap.end() if there are none.
-	// If outValue is true, we will check if the coordinates in relation to the
-	// outValue sphere instead of the inValue.
 	timeMap::iterator getNodeAt(int x, int y, bool outValue = false, int r = 5);
 
 	void drawLine( int x0, float y0, int x1, float y1 );
@@ -236,7 +232,7 @@ private:
 	int m_y_delta;
 	bool m_y_auto;
 
-	// Time position (key) of automation node whose's outValue is being dragged
+	// Time position (key) of automation node whose outValue is being dragged
 	int m_draggedOutValueKey;
 
 	EditModes m_editMode;

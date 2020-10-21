@@ -169,7 +169,7 @@ const AutomatableModel * AutomationPattern::firstObject() const
 {
 	QMutexLocker m(&m_patternMutex);
 
-	AutomatableModel * model;
+	AutomatableModel* model;
 	if (!m_objects.isEmpty() && (model = m_objects.first()) != nullptr)
 	{
 		return model;
@@ -409,7 +409,7 @@ float AutomationPattern::valueAt( const MidiTime & _time ) const
 
 
 
-// This method will get the value at a offset from a node, so we use the outValue of
+// This method will get the value at an offset from a node, so we use the outValue of
 // that node and the inValue of the next node to the calculations. This assumes that offset
 // will not be zero, because when the midi time given to AutomationPattern::valueAt(MidiTime)
 // matches a node's position, that node's value will be returned and this method won't be even

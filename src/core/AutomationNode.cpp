@@ -31,7 +31,7 @@
 // Dummy constructor for the QMap
 AutomationNode::AutomationNode() :
 	m_pattern(nullptr),
-	m_key(0),
+	m_pos(0),
 	m_inValue(0),
 	m_outValue(0),
 	m_inTangent(0),
@@ -39,9 +39,9 @@ AutomationNode::AutomationNode() :
 {
 }
 
-AutomationNode::AutomationNode(AutomationPattern* pat, float value, int key) :
+AutomationNode::AutomationNode(AutomationPattern* pat, float value, int pos) :
 	m_pattern(pat),
-	m_key(key),
+	m_pos(pos),
 	m_inValue(value),
 	m_outValue(value),
 	m_inTangent(0),
@@ -49,9 +49,9 @@ AutomationNode::AutomationNode(AutomationPattern* pat, float value, int key) :
 {
 }
 
-AutomationNode::AutomationNode(AutomationPattern* pat, float inValue, float outValue, int key) :
+AutomationNode::AutomationNode(AutomationPattern* pat, float inValue, float outValue, int pos) :
 	m_pattern(pat),
-	m_key(key),
+	m_pos(pos),
 	m_inValue(inValue),
 	m_outValue(outValue),
 	m_inTangent(0),
@@ -71,7 +71,7 @@ void AutomationNode::setInValue(float value)
 	AutomationPattern::timeMap & tm = m_pattern->getTimeMap();
 
 	// Get an iterator pointing to this node
-	AutomationPattern::timeMap::iterator it = tm.lowerBound(m_key);
+	AutomationPattern::timeMap::iterator it = tm.lowerBound(m_pos);
 	// If it's not the first node, get the one immediately behind it
 	if (it != tm.begin())
 	{
@@ -94,7 +94,7 @@ void AutomationNode::setOutValue(float value)
 	AutomationPattern::timeMap & tm = m_pattern->getTimeMap();
 
 	// Get an iterator pointing to this node
-	AutomationPattern::timeMap::iterator it = tm.lowerBound(m_key);
+	AutomationPattern::timeMap::iterator it = tm.lowerBound(m_pos);
 	// If it's not the first node, get the one immediately behind it
 	if (it != tm.begin())
 	{
