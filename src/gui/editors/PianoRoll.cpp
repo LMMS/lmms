@@ -4322,7 +4322,7 @@ PianoRollWindow::PianoRollWindow() :
 
 	connect( editModeGroup, SIGNAL( triggered( int ) ), m_editor, SLOT( setEditMode( int ) ) );
 
-	QAction* quantizeAction = new QAction(embed::getIconPixmap("snap"), tr("Snap notes to grid"), this);
+	QAction* quantizeAction = new QAction(embed::getIconPixmap( "quantize" ), tr( "Quantize" ), this );
 	connect( quantizeAction, SIGNAL( triggered() ), m_editor, SLOT( quantizeNotes() ) );
 
 	notesActionsToolBar->addAction( drawAction );
@@ -4389,7 +4389,7 @@ PianoRollWindow::PianoRollWindow() :
 	m_quantizeComboBox = new ComboBox( m_toolBar );
 	m_quantizeComboBox->setModel( &m_editor->m_quantizeModel );
 	m_quantizeComboBox->setFixedSize( 64, ComboBox::DEFAULT_HEIGHT );
-	m_quantizeComboBox->setToolTip(tr("Grid size"));
+	m_quantizeComboBox->setToolTip( tr( "Quantization") );
 
 	// setup note-len-stuff
 	QLabel * note_len_lbl = new QLabel( m_toolBar );
