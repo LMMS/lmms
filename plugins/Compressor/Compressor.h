@@ -106,7 +106,7 @@ private:
 
 	float m_coeffPrecalc;
 
-	sampleFrame m_maxLookaheadVal = {0};
+	sampleFrame m_maxLookaheadVal = {0, 0};
 	int m_maxLookaheadTimer[2] = {1, 1};
 	
 	float m_rmsTimeConst;
