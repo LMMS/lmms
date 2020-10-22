@@ -443,17 +443,19 @@ void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 		// Get the time map of current pattern
 		timeMap & tm = m_pattern->getTimeMap();
 
-		// Check if we are clicking over a node (it will be tm.end() if not)
-		timeMap::iterator clickedNode = getNodeAt(mouseEvent->x(), mouseEvent->y());
-
 		m_mouseDownLeft = (mouseEvent->button() == Qt::LeftButton);
 		m_mouseDownRight = (mouseEvent->button() == Qt::RightButton);
+
+		timeMap::iterator clickedNode;
 
 		switch(m_editMode)
 		{
 			case DRAW:
 			{
 				m_pattern->addJournalCheckPoint();
+
+				// Check if we are clicking over a node's inValue (it will be tm.end() if not)
+				clickedNode = getNodeAt(mouseEvent->x(), mouseEvent->y());
 
 				if (m_mouseDownLeft)
 				{
@@ -542,6 +544,9 @@ void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 				// On erase mode, left click removes nodes
 				if (m_mouseDownLeft)
 				{
+					// Check if we are clicking over a node's inValue
+					clickedNode = getNodeAt(mouseEvent->x(), mouseEvent->y());
+
 					// Update the last clicked position so we remove all nodes from
 					// that point up to the point we release the mouse button
 					m_drawLastTick = posTicks;
@@ -1844,7 +1849,7 @@ void AutomationEditor::updateTopBottomLevels()
 
 
 /* @brief Given a mouse coordinate, returns a timeMap::iterator that points to
- *        the latest node inside a square of side "r" pixels from those
+ *        the first node inside a square of side "r" pixels from those
  *        coordinates. In simpler terms, returns the automation node on those
  *        coordinates.
  * @param Int X coordinate
@@ -1867,33 +1872,37 @@ AutomationEditor::timeMap::iterator AutomationEditor::getNodeAt(int x, int y, bo
 	timeMap & tm = m_pattern->getTimeMap();
 	timeMap::iterator it = tm.begin();
 
-	// If there's a node that is inside those coordinates we will store it here
-	timeMap::iterator node = tm.end();
-
 	// ticksOffset is the number of ticks that match "r" pixels
 	int ticksOffset = MidiTime::ticksPerBar() * r / m_ppb;
 
 	while (it != tm.end())
 	{
 		// If the x coordinate is within "r" pixels of the node's position
-		if (posTicks >= it.key() - ticksOffset && posTicks <= it.key() + ticksOffset)
+		if (posTicks >= it.key() - ticksOffset)
 		{
-			// The y position of the node
-			float valueY = yCoordOfLevel(
-				outValue
-					? it.value().getOutValue()
-					: it.value().getInValue()
-				);
-			// If the y coordinate is within "r" pixels of the node's value
-			if (y >= (valueY - r) && y <= (valueY + r))
+			if (posTicks <= it.key() + ticksOffset)
 			{
-				node = it;
+				// The y position of the node
+				float valueY = yCoordOfLevel(
+					outValue
+						? it.value().getOutValue()
+						: it.value().getInValue()
+					);
+				// If the y coordinate is within "r" pixels of the node's value
+				if (y >= (valueY - r) && y <= (valueY + r))
+				{
+					return it;
+				}
 			}
+		}
+		else // The node we are checking is past the coordinates already, so the others will be too
+		{
+			break;
 		}
 		++it;
 	}
 
-	return node;
+	return tm.end();
 }
 
 
