@@ -106,7 +106,9 @@ private:
 
 	float m_coeffPrecalc;
 
-	sampleFrame m_maxLookaheadVal = {0, 0};
+	// Using an equal sign here causes a crash for some compilers due to a bug
+	sampleFrame m_maxLookaheadVal {0};
+
 	int m_maxLookaheadTimer[2] = {1, 1};
 	
 	float m_rmsTimeConst;
