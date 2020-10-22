@@ -488,7 +488,7 @@ void AutomationPattern::flipY(int min, int max)
 {
 	QMutexLocker m(&m_patternMutex);
 
-	timeMap::const_iterator it = m_timeMap.lowerBound(0);
+	timeMap::iterator it = m_timeMap.lowerBound(0);
 
 	if (it == m_timeMap.end()) return;
 
@@ -499,14 +499,12 @@ void AutomationPattern::flipY(int min, int max)
 	{
 		if (min < 0)
 		{
-			tempValue = valueAt(it.key()) * -1;
-			outValueOffset = it.value().getValueOffset() * -1;
-			putValue(MidiTime(it.key()) , tempValue, false, true, outValueOffset);
+			it.value() *= -1.0;
 		}
 		else
 		{
 			tempValue = max - valueAt(it.key());
-			outValueOffset = it.value().getValueOffset() * -1;
+			outValueOffset = it.value().getValueOffset() * -1.0;
 			putValue(MidiTime(it.key()) , tempValue, false, true, outValueOffset);
 		}
 		++it;

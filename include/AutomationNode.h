@@ -37,6 +37,31 @@ public:
 	AutomationNode(AutomationPattern* pat, float value, int pos);
 	AutomationNode(AutomationPattern* pat, float inValue, float outValue, int pos);
 
+	AutomationNode& operator+=(float f)
+	{
+		m_inValue += f;
+		m_outValue += f;
+		return *this;
+	}
+	AutomationNode& operator-=(float f)
+	{
+		m_inValue -= f;
+		m_outValue -= f;
+		return *this;
+	}
+	AutomationNode& operator*=(float f)
+	{
+		m_inValue *= f;
+		m_outValue *= f;
+		return *this;
+	}
+	AutomationNode& operator/=(float f)
+	{
+		m_inValue/=f;
+		m_outValue/=f;
+		return *this;
+	}
+
 	inline float getInValue()
 	{
 		return m_inValue;
