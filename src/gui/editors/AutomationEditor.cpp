@@ -446,16 +446,21 @@ void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 		m_mouseDownLeft = (mouseEvent->button() == Qt::LeftButton);
 		m_mouseDownRight = (mouseEvent->button() == Qt::RightButton);
 
-		timeMap::iterator clickedNode;
+		// Some actions require that we know if we clicked the inValue of
+		// a node, while others require that we know if we clicked the outValue
+		// of a node.
+		bool editingOutValue = (
+			m_editMode == DRAW_OUTVALUES
+			|| (m_editMode == ERASE && m_mouseDownRight)
+		);
+
+		timeMap::iterator clickedNode = getNodeAt(mouseEvent->x(), mouseEvent->y(), editingOutValue);
 
 		switch(m_editMode)
 		{
 			case DRAW:
 			{
 				m_pattern->addJournalCheckPoint();
-
-				// Check if we are clicking over a node's inValue (it will be tm.end() if not)
-				clickedNode = getNodeAt(mouseEvent->x(), mouseEvent->y());
 
 				if (m_mouseDownLeft)
 				{
@@ -544,9 +549,6 @@ void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 				// On erase mode, left click removes nodes
 				if (m_mouseDownLeft)
 				{
-					// Check if we are clicking over a node's inValue
-					clickedNode = getNodeAt(mouseEvent->x(), mouseEvent->y());
-
 					// Update the last clicked position so we remove all nodes from
 					// that point up to the point we release the mouse button
 					m_drawLastTick = posTicks;
@@ -562,9 +564,6 @@ void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 				}
 				else if(m_mouseDownRight) // And right click resets outValues
 				{
-					// We check if we clicked a sphere representing an outValue
-					clickedNode = getNodeAt(mouseEvent->x(), mouseEvent->y(), true);
-
 					// If we clicked an outValue reset it
 					if (clickedNode != tm.end())
 					{
@@ -584,9 +583,6 @@ void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 			case DRAW_OUTVALUES:
 			{
 				m_pattern->addJournalCheckPoint();
-
-				// We check if we clicked a sphere representing an outValue
-				clickedNode = getNodeAt(mouseEvent->x(), mouseEvent->y(), true);
 
 				// On this mode, left click sets the outValue
 				if (m_mouseDownLeft)
