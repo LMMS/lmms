@@ -304,7 +304,7 @@ void SampleTCO::loadSettings( const QDomElement & _this )
 	if ( _this.hasAttribute( "sample_rate" ) ) {
 		m_sampleBuffer->setSampleRate( _this.attribute( "sample_rate" ).toInt() );
 	}
-	
+
 	if( _this.hasAttribute( "color" ) )
 	{
 		useCustomClipColor( true );
@@ -414,7 +414,7 @@ void SampleTCOView::contextMenuEvent( QContextMenuEvent * _cme )
 			tr( "Set clip color" ), this, SLOT( changeClipColor() ) );
 	contextMenu.addAction( embed::getIconPixmap( "colorize" ),
 			tr( "Use track color" ), this, SLOT( useTrackColor() ) );
-	
+
 	constructContextMenu( &contextMenu );
 
 	contextMenu.exec( QCursor::pos() );
