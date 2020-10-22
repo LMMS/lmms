@@ -29,7 +29,6 @@
 #include "plugin_export.h"
 #include "interpolation.h"
 
-
 extern "C"
 {
 
@@ -374,9 +373,14 @@ bool CompressorEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 
 			if (t > m_yL[i])// Attack phase
 			{
+				// Lowest possible value of m_crestFactorVal[i] is 2, given by a sine wave.
+				// So, we pull this minimum value down to 0, and multiply it by the percentage of
+				// automatic attack control that is applied.  We then add 2 back to it.
+				float crestFactorValTemp = ((m_crestFactorVal[i] - 2.f) * m_autoAttVal) + 2.f;
+
 				// Calculate attack value depending on crest factor
 				const float att = m_autoAttVal
-					? msToCoeff(2.f * m_compressorControls.m_attackModel.value() / ((m_crestFactorVal[i] - 1) * m_autoAttVal + 1))
+					? msToCoeff(2.f * m_compressorControls.m_attackModel.value() / (crestFactorValTemp))
 					: m_attCoeff;
 
 				m_yL[i] = m_yL[i] * att + (1 - att) * t;
@@ -384,9 +388,10 @@ bool CompressorEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 			}
 			else// Release phase
 			{
-				// Calculate release value depending on crest factor
+				float crestFactorValTemp = ((m_crestFactorVal[i] - 2.f) * m_autoRelVal) + 2.f;
+
 				const float rel = m_autoRelVal
-					? msToCoeff(2.f * m_compressorControls.m_releaseModel.value() / ((m_crestFactorVal[i] - 1) * m_autoRelVal + 1))
+					? msToCoeff(2.f * m_compressorControls.m_releaseModel.value() / (crestFactorValTemp))
 					: m_relCoeff;
 
 				if (m_holdTimer[i])// Don't change peak if hold is being applied
