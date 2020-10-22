@@ -56,6 +56,9 @@ CompressorEffect::CompressorEffect(Model* parent, const Descriptor::SubPluginFea
 
 	m_yL[0] = m_yL[1] = COMP_NOISE_FLOOR;
 
+	m_maxLookaheadVal[0] = 0;
+	m_maxLookaheadVal[1] = 0;
+
 	// 200 ms
 	m_crestTimeConst = exp(-1.f / (0.2f * m_sampleRate));
 
@@ -373,8 +376,9 @@ bool CompressorEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 
 			if (t > m_yL[i])// Attack phase
 			{
-				// Lowest possible value of m_crestFactorVal[i] is 2, given by a sine wave.
-				// So, we pull this minimum value down to 0, and multiply it by the percentage of
+				// We want the "resting value" of our crest factor to be with a sine wave,
+				// which with this variable has a value of 2.
+				// So, we pull this value down to 0, and multiply it by the percentage of
 				// automatic attack control that is applied.  We then add 2 back to it.
 				float crestFactorValTemp = ((m_crestFactorVal[i] - 2.f) * m_autoAttVal) + 2.f;
 
