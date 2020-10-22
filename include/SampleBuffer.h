@@ -109,6 +109,9 @@ public:
 	SampleBuffer( const QString & _audio_file, bool _is_base64_data = false );
 	SampleBuffer( const sampleFrame * _data, const f_cnt_t _frames );
 	explicit SampleBuffer( const f_cnt_t _frames );
+	SampleBuffer( const SampleBuffer& orig );
+
+	SampleBuffer& operator= ( const SampleBuffer& that );
 
 	virtual ~SampleBuffer();
 
