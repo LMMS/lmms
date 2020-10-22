@@ -183,7 +183,7 @@ void AnalyzerPlugin::analyze(const std::vector<double> & signal, vector<pair<str
 		//seek critical points with discrete differential, then approximate hidden/overlapping peaks and filter to only include maxima
 		//const auto peaks = Diginstrument::PeakApproximation(Extrema::Differential::intermixed(rawSpectrum.begin(), rawSpectrum.end()));
 		//tmp: trying to fix weird interpolation problem, just use maxima for now, as hidden peaks are still primitive
-		const auto peaks = Extrema::Differential::maxima(rawSpectrum.begin(), rawSpectrum.end());
+		const auto peaks = Extrema::Differential::maxima(rawSpectrum.begin(), rawSpectrum.end(), 0.001);
 		//TODO: is this the best place to convert to amp?
 		//after determining peaks, convert magnitude to amplitude
 		//TMP: magnitude spectrogram
@@ -271,37 +271,32 @@ void AnalyzerPlugin::subtractiveAnalysis(std::vector<double> & signal, unsigned 
 	QImage colorBlue = QImage(2, 2, QImage::Format_RGB32);
 	colorBlue.fill(Qt::blue);
 
+	//TODO: avg energy to detect broad-changing frequencies
+	//calculate FFT magnitudes of the signal
 	Diginstrument::FFT fft(signal.size());
-	auto mags = fft(signal, m_sampleBuffer.sampleRate());
-	//tmp
-	auto maxima = Extrema::Differential::maxima(mags.begin(), mags.end());
+	const auto mags = fft(signal, m_sampleBuffer.sampleRate());
+	//find peaks in FFT, indicating areas of significance
+	//TODO: make parameters variable
+	const auto maxima = Extrema::Differential::maxima(mags.begin(), mags.end(), 0.002, 2);
+	//TMP: visualize found frequencies
 	for(auto p : maxima)
 	{
-		if(mags[p.index].second>0.001)
-		{
-			cout<<p.x<<": ("<<mags[p.index].first<<", "<<mags[p.index].second<<")"<<endl;
-		}
-	}
-	//auto extrema = Extrema::Differential::maxima(mags.begin(), mags.end());
-	//TMP: visualize FFT
-	for(int i = 0; i<mags.size(); i++)
-	{
-		if( mags[i].second<0.001 ) continue;
+		//tmp: debug
+		//cout<<p.x<<": ("<<mags[p.index].first<<", "<<mags[p.index].second<<")"<<endl;
+		const auto Y = Interpolation::CubicLagrange(mags[p.index-1].first, mags[p.index-1].second, mags[p.index].first, mags[p.index].second, mags[p.index+1].first, mags[p.index+1].second, mags[p.index+2].first, mags[p.index+2].second, p.x);
 		visualization->addCustomItem(new QCustom3DItem("/home/mate/projects/lmms/plugins/Diginstrument/analyzer/resources/marker_mesh.obj",
-												QVector3D(mags[i].first, mags[i].second, 0),
+												QVector3D(p.x, Y, 0),
 												QVector3D(0.025f, 0.025f, 0.025f),
 												QQuaternion::fromAxisAndAngle(0.0f, 1.0f, 0.0f, 45.0f),
 												colorBlue));
 	}
 
-	//TMP: piano partials by hand
-	vector<double> freqs{92.3,138.46,184.615,231.53,278,324.6   /*,   418, 465, 511.53, 559.61, 606.92, 654.61,   702.69, 751.15, 798.84, 848.46, 897.69, 946.92, 996.53, 1046.54, 1096.92,   1301.54, 1310, 1353.85, 1405.77, 1459.23, 1512.69, 1566.54,   1944.23*/};
-
 	vector<vector<double>> phases;
 	vector<vector<double>> amps;
 	//for each selected frequency
-	for(const auto fr : freqs)
+	for(const auto & m : maxima)
 	{	
+		const double fr = m.x;
 		//TODO: tie wavelet parameters together
 		constexpr double parameter = 6;
 		const double scale = (parameter+sqrt(2+parameter*parameter)) / (4*M_PI*fr);
