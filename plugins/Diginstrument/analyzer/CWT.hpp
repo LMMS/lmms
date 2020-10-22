@@ -4,6 +4,7 @@
 
 #include <string>
 #include <vector>
+#include <complex>
 
 //Interface for wavelib: https://github.com/rafat/wavelib
 
@@ -38,6 +39,14 @@ private:
     unsigned int signalLength;
 
 public:
+    class TimeInstance
+    {
+      public:
+        const double scale, period;
+        const std::complex<double> value;
+        TimeInstance(double scale, double period, double re, double im) : scale(scale), period(period), value(re, im) {}
+    };
+
     bool setWavelet(const std::string &name, const double &parameter, unsigned int level, unsigned int sampleRate)
     {
         this->wavelet = name;
@@ -59,15 +68,15 @@ public:
         cwt(wt, &signal[0]);
     }
 
-    std::vector<std::pair<double, std::pair<double, double>>> operator[](unsigned int time)
+    std::vector<TimeInstance> operator[](unsigned int time)
     {
         unsigned int totalScales = octaves * level;
-        std::vector<std::pair<double, std::pair<double, double>>> res;
+        std::vector<TimeInstance> res;
         res.reserve(octaves * level);
         for (int k = 0; k < totalScales; ++k)
         {
             int i = time + k * signalLength;
-            res.emplace_back(wt->period[k], std::make_pair(wt->output[i].re, wt->output[i].im));
+            res.emplace_back(wt->scale[k] ,wt->period[k], wt->output[i].re, wt->output[i].im);
         }
         return res;
     }
@@ -79,16 +88,16 @@ public:
         return res;
     }
 
-    static std::vector<std::pair<double, double>> singleScaleCWT(const std::vector<double> & signal, double scale, unsigned int sampleRate, std::string waveletName = "morlet", int waveletParameter = 6)
+    static std::vector<std::complex<double>> singleScaleCWT(const std::vector<double> & signal, double scale, unsigned int sampleRate, std::string waveletName = "morlet", int waveletParameter = 6)
     {
         cwt_object wt = cwt_init(waveletName.c_str(), waveletParameter, signal.size(), 1.0/(double)sampleRate, 1);
         setCWTScales(wt, scale, 0, "lin", 0);
         cwt(wt, &signal[0]);
-        std::vector<std::pair<double, double>> res;
+        std::vector<std::complex<double>> res;
         res.reserve(signal.size());
         for(int i = 0; i<signal.size(); i++)
         {
-            res.emplace_back(std::make_pair(wt->output[i].re, wt->output[i].im));
+            res.emplace_back(wt->output[i].re, wt->output[i].im);
         }
         cwt_free(wt);
         return res;

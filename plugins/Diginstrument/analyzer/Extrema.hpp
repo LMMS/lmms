@@ -107,7 +107,7 @@ public:
     };
 
     template <class Iterator>
-    static std::vector<std::pair<double, double>> makeFirstDerivative(Iterator begin, Iterator end)
+    static std::vector<std::pair<double, double>> makeFirstCentralDerivative(Iterator begin, Iterator end)
     {
         std::vector<std::pair<double, double>> res;
         res.reserve(std::distance(begin,end)-2);
@@ -116,7 +116,24 @@ public:
         {
             const auto & nL = *(fn-1);
             const auto & nR = *(fn+1);
-            res.emplace_back( std::make_pair((*fn)[0], (nR[1]-nL[1]) / ((nR[0]-nL[0]))) );
+            res.emplace_back( std::make_pair((*fn).first, (nR.second-nL.second) / ((nR.first-nL.first))) );
+            fn++;
+        }
+        return res;
+    }
+
+    //TODO: changed from central; might have messed up peak detection
+    template <class Iterator>
+    static std::vector<std::pair<double, double>> makeFirstDerivative(Iterator begin, Iterator end)
+    {
+        std::vector<std::pair<double, double>> res;
+        res.reserve(std::distance(begin,end)-1);
+        Iterator fn = begin;
+        while(fn != end-1)
+        {
+            const auto & nL = *(fn);
+            const auto & nR = *(fn+1);
+            res.emplace_back( std::make_pair(nL.first, nR.second-nL.second));
             fn++;
         }
         return res;
@@ -133,8 +150,8 @@ public:
             const auto & nL = *(fn-1);
             const auto & nR = *(fn+1);
             //TODO: deltaT is non-uniform!
-            const auto deltaTSquare = (((nR[0]-nL[0])) * ((nR[0]-nL[0])))/4.0;
-            res.emplace_back( std::make_pair((*fn)[0], (nR[1]-2*((*fn)[1])+nL[1]) / deltaTSquare ) );
+            const auto deltaTSquare = (((nR.first-nL.first)) * ((nR.first-nL.first)))/4.0;
+            res.emplace_back( std::make_pair((*fn).first, (nR.second-2*((*fn).second)+nL.second) / deltaTSquare ) );
             fn++;
         }
         return res;

@@ -143,7 +143,15 @@ PiecewiseBSpline<T, D> SpectrumFitter<T, D>::peakFit(const std::vector<std::vect
     //begin - first peak
     points = std::vector<std::vector<T>>(spectrum.begin(), spectrum.begin()+(maxima.begin()->index)+1);
     //add interpolated first peak
-    points.push_back({it->x, Interpolation::CubicLagrange(spectrum[it->index-1][0], spectrum[it->index-1][1], spectrum[it->index][0], spectrum[it->index][1], spectrum[it->index+1][0], spectrum[it->index+1][1], spectrum[it->index+2][0], spectrum[it->index+2][1], it->x)});
+    //TMP: FIXME: if there are not enough points for cubic lagrange, just do linear
+    if(it->index==0 || (it)->index+2 > spectrum.size()-1)
+    {
+        points.push_back({(it)->x, Interpolation::Linear(spectrum[(it)->index][0], spectrum[(it)->index][1], spectrum[(it)->index+1][0], spectrum[(it)->index+1][1], (it)->x)});
+    }
+    else
+    {
+        points.push_back({it->x, Interpolation::CubicLagrange(spectrum[it->index-1][0], spectrum[it->index-1][1], spectrum[it->index][0], spectrum[it->index][1], spectrum[it->index+1][0], spectrum[it->index+1][1], spectrum[it->index+2][0], spectrum[it->index+2][1], it->x)});
+    }
     //fit to points
     if(points.size()>D)
     {
@@ -155,14 +163,33 @@ PiecewiseBSpline<T, D> SpectrumFitter<T, D>::peakFit(const std::vector<std::vect
     {
         points.reserve(3-it->index+(it+1)->index + points.size());
         //if the previous segment was successfully fitted, add first peak again
-        if(points.size()==0) points.push_back({it->x, Interpolation::CubicLagrange(spectrum[it->index-1][0], spectrum[it->index-1][1], spectrum[it->index][0], spectrum[it->index][1], spectrum[it->index+1][0], spectrum[it->index+1][1], spectrum[it->index+2][0], spectrum[it->index+2][1], it->x)});
+        if(points.size()==0)
+        {
+            //TMP: FIXME: if there are not enough points for cubic lagrange, just do linear
+            if((it)->index+2 > spectrum.size()-1)
+            {
+                points.push_back({(it)->x, Interpolation::Linear(spectrum[(it)->index][0], spectrum[(it)->index][1], spectrum[(it)->index+1][0], spectrum[(it)->index+1][1], (it)->x)});
+            }
+            else
+            {
+                points.push_back({it->x, Interpolation::CubicLagrange(spectrum[it->index-1][0], spectrum[it->index-1][1], spectrum[it->index][0], spectrum[it->index][1], spectrum[it->index+1][0], spectrum[it->index+1][1], spectrum[it->index+2][0], spectrum[it->index+2][1], it->x)});
+            }
+        }
         //add inbetween points
         for(int i = it->index+1; i<=(it+1)->index; i++)
         {
             points.emplace_back(spectrum[i]);
         }
         //add second peak
-        points.push_back({(it+1)->x, Interpolation::CubicLagrange(spectrum[(it+1)->index-1][0], spectrum[(it+1)->index-1][1], spectrum[(it+1)->index][0], spectrum[(it+1)->index][1], spectrum[(it+1)->index+1][0], spectrum[(it+1)->index+1][1], spectrum[(it+1)->index+2][0], spectrum[(it+1)->index+2][1], (it+1)->x)});
+        //TMP: FIXME: if there are not enough points for cubic lagrange, just do linear
+        if((it+1)->index+2 > spectrum.size()-1)
+        {
+            points.push_back({(it+1)->x, Interpolation::Linear(spectrum[(it+1)->index][0], spectrum[(it+1)->index][1], spectrum[(it+1)->index+1][0], spectrum[(it+1)->index+1][1], (it+1)->x)});
+        }
+        else 
+        {
+            points.push_back({(it+1)->x, Interpolation::CubicLagrange(spectrum[(it+1)->index-1][0], spectrum[(it+1)->index-1][1], spectrum[(it+1)->index][0], spectrum[(it+1)->index][1], spectrum[(it+1)->index+1][0], spectrum[(it+1)->index+1][1], spectrum[(it+1)->index+2][0], spectrum[(it+1)->index+2][1], (it+1)->x)});
+        }
         //fit to points
         if(points.size()>D)
         {
@@ -172,8 +199,19 @@ PiecewiseBSpline<T, D> SpectrumFitter<T, D>::peakFit(const std::vector<std::vect
         it++;
     }
     //last peak - end
-    //if the previous segment was successfully fitted, add first peak again
-    if(points.size()==0) points.push_back({it->x, Interpolation::CubicLagrange(spectrum[it->index-1][0], spectrum[it->index-1][1], spectrum[it->index][0], spectrum[it->index][1], spectrum[it->index+1][0], spectrum[it->index+1][1], spectrum[it->index+2][0], spectrum[it->index+2][1], it->x)});
+    //if the previous segment was successfully fitted, add second peak again
+    if(points.size()==0)
+    {
+        //TMP: FIXME: if there are not enough points for cubic lagrange, just do linear
+        if((it)->index+2 > spectrum.size()-1)
+        {
+            points.push_back({(it)->x, Interpolation::Linear(spectrum[(it)->index][0], spectrum[(it)->index][1], spectrum[(it)->index+1][0], spectrum[(it)->index+1][1], (it)->x)});
+        }
+        else
+        {
+            points.push_back({it->x, Interpolation::CubicLagrange(spectrum[it->index-1][0], spectrum[it->index-1][1], spectrum[it->index][0], spectrum[it->index][1], spectrum[it->index+1][0], spectrum[it->index+1][1], spectrum[it->index+2][0], spectrum[it->index+2][1], it->x)});
+        }
+    }
     points.reserve(spectrum.size()-it->index+1);
     for(int i = it->index+1; i<spectrum.size(); i++)
     {

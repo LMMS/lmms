@@ -68,7 +68,7 @@ std::string AnalyzerPlugin::setAudioFile(const QString &_audio_file, vector<pair
 	//tmp:visualization
 	visualization = new Diginstrument::InstrumentVisualizationWindow(this);
 
-	//TMP: single scale test
+	//TMP: incomplete analysis
 	subtractiveAnalysis(sample, m_sampleBuffer.sampleRate());
 	analyze(sample, coordinates);
 
@@ -127,7 +127,7 @@ void AnalyzerPlugin::writeInstrumentToFile(std::string filename)
 
 void AnalyzerPlugin::analyze(const std::vector<double> & signal, vector<pair<string, double>> coordinates)
 {
-	const int level =12;
+	const int level = 18;
 	CWT transform("morlet", 6, level, m_sampleBuffer.sampleRate());
 	transform(signal);
 
@@ -154,7 +154,7 @@ void AnalyzerPlugin::analyze(const std::vector<double> & signal, vector<pair<str
 	for (int i = 0; i<m_sampleBuffer.frames(); i+=transformStep)
 	{
 		const auto momentarySpectrum = transform[i];
-		std::vector<std::vector<double>> rawSpectrum;
+		std::vector<std::pair<double, double>> rawSpectrum;
 		rawSpectrum.reserve(level * 11);
 		//tmp
 		QSurfaceDataRow *dataRow = new QSurfaceDataRow(level * 11);
@@ -163,22 +163,22 @@ void AnalyzerPlugin::analyze(const std::vector<double> & signal, vector<pair<str
 		//process the complex result of the CWT into a magnitude spectrum
 		for (int j = momentarySpectrum.size() - 1; j >= 0; j--)
 		{
-			const double & re = momentarySpectrum[j].second.first;
-			const double & im = momentarySpectrum[j].second.second;
+			const auto & timeInstance = momentarySpectrum[j];
 			//1/period
-			const double frequency = 1.0 / (momentarySpectrum[j].first);
-			//my weird equation uses mag*mag anyway
-			const double mag = (re*re + im*im);
-			//const double phase = atan2(im, re);
+			const double frequency = 1.0 / (timeInstance.period);
+			const double mag = std::abs(timeInstance.value);
+			//const double phase = std::ang(timeInstance.value);
 			//tmp: amp
-			const double amp = (sqrt( (frequency * mag) / (double)m_sampleBuffer.sampleRate()));
-			rawSpectrum.emplace_back(std::vector<double>{frequency, amp});
+			const double amp = (mag / (sqrt(timeInstance.scale*m_sampleBuffer.sampleRate()))) * 1.067158515;
+			rawSpectrum.emplace_back(frequency, amp);
 			///tmp: visualization
 			(*dataRow)[index].setPosition(QVector3D(frequency, amp, (double)i/(double)m_sampleBuffer.sampleRate()));
 			index++;
 		}
 
 		*data << dataRow;
+
+		//TODO: fix and reintroduce peaks?
 
 		//seek critical points with discrete differential, then approximate hidden/overlapping peaks and filter to only include maxima
 		//const auto peaks = Diginstrument::PeakApproximation(Extrema::Differential::intermixed(rawSpectrum.begin(), rawSpectrum.end()));
@@ -195,7 +195,7 @@ void AnalyzerPlugin::analyze(const std::vector<double> & signal, vector<pair<str
 		//tmp: visualize peaks
 		/*for (auto p : peaks)
 		{
-			const auto Y = Interpolation::CubicLagrange(rawSpectrum[p.index-1][0], rawSpectrum[p.index-1][1], rawSpectrum[p.index][0], rawSpectrum[p.index][1], rawSpectrum[p.index+1][0], rawSpectrum[p.index+1][1], rawSpectrum[p.index+2][0], rawSpectrum[p.index+2][1], p.x);
+			const auto Y = Interpolation::CubicLagrange(rawSpectrum[p.index-1].first, rawSpectrum[p.index-1].second, rawSpectrum[p.index].first, rawSpectrum[p.index].second, rawSpectrum[p.index+1].first, rawSpectrum[p.index+1].second, rawSpectrum[p.index+2].first, rawSpectrum[p.index+2].second, p.x);
 			if(p.pointType==Extrema::Differential::CriticalPoint::PointType::maximum)
 			{
 				//TODO: relative path
@@ -208,21 +208,27 @@ void AnalyzerPlugin::analyze(const std::vector<double> & signal, vector<pair<str
 		}*/
 	
 		//fit spline to raw spectrum
-		auto spline = fitter.peakFit(rawSpectrum, peaks);
+		//tmp: just conver pairs back into vectors
+		/*vector<vector<double>> convertedRawSpectrum;
+		for(auto & p : rawSpectrum)
+		{
+			convertedRawSpectrum.push_back({p.first, p.second});
+		}
+		auto spline = fitter.peakFit(convertedRawSpectrum, peaks);*/
 		//only add "valid" splines
-		if (spline.getPieces().size() > 0 && spline.getBegin() <= 12 && spline.getEnd() > 21000)
+		/*if (spline.getPieces().size() > 0 && spline.getBegin() <= 12 && spline.getEnd() > 21000)
 		{
 			//TMP: keep for visualization
-			spectra.emplace_back(spline,std::vector<std::pair<std::string, double>>{std::make_pair("time",(double)i/(double)m_sampleBuffer.sampleRate())});
+			//spectra.emplace_back(spline,std::vector<std::pair<std::string, double>>{std::make_pair("time",(double)i/(double)m_sampleBuffer.sampleRate())});
 			auto coordinatesCopy = coordinates;
 			coordinatesCopy.emplace_back("time",(double)i/(double)m_sampleBuffer.sampleRate());
 			inst.add(SplineSpectrum<double, 4>(
 				std::move(spline),
 				std::move(coordinatesCopy)
 				));
-		}
+		}*/
 		//TMP: rejection statistics
-		else
+		/*else
 		{
 			if(spline.getPeaks().size()==0 && spline.getEnd()>0) {noComponents++;}
 			if(spline.getPieces().size()==0) {emptySplines++;}
@@ -230,7 +236,7 @@ void AnalyzerPlugin::analyze(const std::vector<double> & signal, vector<pair<str
 			if(spline.getBegin()<12 && spline.getEnd()<21000 && spline.getBegin()>0 && spline.getEnd()>0) { goodBeginBadEnd++; }
 			if(spline.getBegin()>12 && spline.getEnd()>21000 && spline.getBegin()>0 && spline.getEnd()>0) { badBedginGoodEnd++; }
 			rejected++;
-		}
+		}*/
 	}
 	//tmp: add an empty spline at the end for silence
 	auto coordinatesCopy = coordinates;
@@ -262,10 +268,35 @@ void AnalyzerPlugin::subtractiveAnalysis(std::vector<double> & signal, unsigned 
 	//tmp:visualization
 	QImage colorRed = QImage(2, 2, QImage::Format_RGB32);
 	colorRed.fill(Qt::red);
+	QImage colorBlue = QImage(2, 2, QImage::Format_RGB32);
+	colorBlue.fill(Qt::blue);
+
+	Diginstrument::FFT fft(signal.size());
+	auto mags = fft(signal, m_sampleBuffer.sampleRate());
+	//tmp
+	auto maxima = Extrema::Differential::maxima(mags.begin(), mags.end());
+	for(auto p : maxima)
+	{
+		if(mags[p.index].second>0.001)
+		{
+			cout<<p.x<<": ("<<mags[p.index].first<<", "<<mags[p.index].second<<")"<<endl;
+		}
+	}
+	//auto extrema = Extrema::Differential::maxima(mags.begin(), mags.end());
+	//TMP: visualize FFT
+	for(int i = 0; i<mags.size(); i++)
+	{
+		if( mags[i].second<0.001 ) continue;
+		visualization->addCustomItem(new QCustom3DItem("/home/mate/projects/lmms/plugins/Diginstrument/analyzer/resources/marker_mesh.obj",
+												QVector3D(mags[i].first, mags[i].second, 0),
+												QVector3D(0.025f, 0.025f, 0.025f),
+												QQuaternion::fromAxisAndAngle(0.0f, 1.0f, 0.0f, 45.0f),
+												colorBlue));
+	}
 
 	//TMP: piano partials by hand
 	vector<double> freqs{92.3,138.46,184.615,231.53,278,324.6   /*,   418, 465, 511.53, 559.61, 606.92, 654.61,   702.69, 751.15, 798.84, 848.46, 897.69, 946.92, 996.53, 1046.54, 1096.92,   1301.54, 1310, 1353.85, 1405.77, 1459.23, 1512.69, 1566.54,   1944.23*/};
-	
+
 	vector<vector<double>> phases;
 	vector<vector<double>> amps;
 	//for each selected frequency
@@ -283,18 +314,18 @@ void AnalyzerPlugin::subtractiveAnalysis(std::vector<double> & signal, unsigned 
 		{
 			//process the complex coefficient
 			const auto & c = cfs[i];
-			const double mag = sqrt(c.first*c.first + c.second*c.second);
+			const double mag = std::abs(c);
 			//TODO: this has been the most successful equation, as it resulted in the same amp for both components in 440+50.wav
 			//I have no idea where the constant comes from; probably ties into the wavelet parameter
 			amps.back()[i] = (mag / (sqrt(scale*sampleRate))) * 1.067158515;
-			phases.back()[i] = atan2(c.first, c.second);
+			phases.back()[i] = std::arg(c);
 		}
 		//unwrap phase
 		Diginstrument::Phase::unwrapInPlace(phases.back());
 		for(int i = 0; i<signal.size(); i++)
 		{
 			//subtract extracted partial to get residual signal
-			signal[i]-=sin(phases.back()[i])*amps.back()[i];
+			signal[i]-=cos(phases.back()[i])*amps.back()[i];
 			//tmp: visualization
 			if(i%440 == 1 && amps.back()[i]>0.001)
 			{
