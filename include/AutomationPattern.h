@@ -82,8 +82,13 @@ public:
 	MidiTime putValue(const MidiTime & time,
 				const float value,
 				const bool quantPos = true,
-				const bool ignoreSurroundingPoints = true,
-				const float outValueOffset = 0);
+				const bool ignoreSurroundingPoints = true);
+
+	MidiTime putValues(const MidiTime & time,
+				const float inValue,
+				const float outValue,
+				const bool quantPos = true,
+				const bool ignoreSurroundingPoints = true);
 
 	void removeValue( const MidiTime & time );
 
@@ -180,8 +185,9 @@ private:
 	ProgressionTypes m_progressionType;
 
 	bool m_dragging;
-	float m_dragOutValueOffset;	// Offset between inValue and outValue when we want to keep it
-	
+	bool m_dragKeepOutValue; // Should we keep the current dragged node's outValue?
+	float m_dragOutValue; // The outValue of the dragged node's
+
 	bool m_isRecording;
 	float m_lastRecordedValue;
 

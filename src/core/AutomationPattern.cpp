@@ -218,20 +218,17 @@ void AutomationPattern::updateLength()
 
 
 /* @brief Puts an automation node on the timeMap with the given value.
- *        If an outValueOffset is given, the outValue will be set to
- *        value + outValueOffset.
+ *        The inValue and outValue of the created node will be the same.
  * @param MidiTime time to add the node to
- * @param Float inValue of the node
+ * @param Float inValue and outValue of the node
  * @param Boolean True to quantize the position (defaults to true)
  * @param Boolean True to ignore unquantized surrounding nodes (defaults to true)
- * @param Float offset from inValue to outValue (defaults to 0)
  * @return MidiTime of the recently added automation node
  */
 MidiTime AutomationPattern::putValue(const MidiTime & time,
 					const float value,
 					const bool quantPos,
-					const bool ignoreSurroundingPoints,
-					const float outValueOffset)
+					const bool ignoreSurroundingPoints)
 {
 	QMutexLocker m(&m_patternMutex);
 
@@ -242,7 +239,60 @@ MidiTime AutomationPattern::putValue(const MidiTime & time,
 				time;
 
 	// Create a node or replace the existing one on newTime
-	m_timeMap[newTime] = AutomationNode(this, value, value + outValueOffset, newTime);
+	m_timeMap[newTime] = AutomationNode(this, value, newTime);
+
+	timeMap::iterator it = m_timeMap.find(newTime);
+
+	// Remove control points that are covered by the new points
+	// quantization value. Control Key to override
+	if( ! ignoreSurroundingPoints )
+	{
+		for( int i = newTime + 1; i < newTime + quantization(); ++i )
+		{
+			AutomationPattern::removeValue( i );
+		}
+	}
+	if( it != m_timeMap.begin() )
+	{
+		--it;
+	}
+	generateTangents( it, 3 );
+
+	updateLength();
+
+	emit dataChanged();
+
+	return newTime;
+}
+
+
+
+
+/* @brief Puts an automation node on the timeMap with the given inValue
+ *        and outValue.
+ * @param MidiTime time to add the node to
+ * @param Float inValue of the node
+ * @param Float outValue of the node
+ * @param Boolean True to quantize the position (defaults to true)
+ * @param Boolean True to ignore unquantized surrounding nodes (defaults to true)
+ * @return MidiTime of the recently added automation node
+ */
+MidiTime AutomationPattern::putValues(const MidiTime & time,
+					const float inValue,
+					const float outValue,
+					const bool quantPos,
+					const bool ignoreSurroundingPoints)
+{
+	QMutexLocker m(&m_patternMutex);
+
+	cleanObjects();
+
+	MidiTime newTime = quantPos ?
+				Note::quantized( time, quantization() ) :
+				time;
+
+	// Create a node or replace the existing one on newTime
+	m_timeMap[newTime] = AutomationNode(this, inValue, outValue, newTime);
 
 	timeMap::iterator it = m_timeMap.find(newTime);
 
@@ -320,30 +370,36 @@ void AutomationPattern::recordValue(MidiTime time, float value)
  * @param Boolean. True to ignore unquantized surrounding nodes
  * @return MidiTime with current time of the dragged value
  */
-MidiTime AutomationPattern::setDragValue( const MidiTime & time,
+MidiTime AutomationPattern::setDragValue(const MidiTime & time,
 						const float value,
 						const bool quantPos,
-						const bool controlKey )
+						const bool controlKey)
 {
 	QMutexLocker m(&m_patternMutex);
 
-	if( m_dragging == false )
+	if (m_dragging == false)
 	{
 		MidiTime newTime = quantPos  ?
-				Note::quantized( time, quantization() ) :
+				Note::quantized(time, quantization()) :
 							time;
 
-		m_dragOutValueOffset = 0;
+		// We will keep the same outValue only if it's different from the
+		// inValue
+		m_dragKeepOutValue = false;
 
 		// Check if we already have a node on the position we are dragging
 		// and if we do, store the valueOffset so the discrete jump can be kept
 		timeMap::iterator it = m_timeMap.find(newTime);
 		if (it != m_timeMap.end())
 		{
-			m_dragOutValueOffset = it.value().getValueOffset();
+			if (it.value().getValueOffset() != 0)
+			{
+				m_dragKeepOutValue = true;
+				m_dragOutValue = it.value().getOutValue();
+			}
 		}
 
-		this->removeValue( newTime );
+		this->removeValue(newTime);
 		m_oldTimeMap = m_timeMap;
 		m_dragging = true;
 	}
@@ -353,7 +409,14 @@ MidiTime AutomationPattern::setDragValue( const MidiTime & time,
 
 	generateTangents();
 
-	return this->putValue(time, value, quantPos, controlKey, m_dragOutValueOffset);
+	if (m_dragKeepOutValue)
+	{
+		return this->putValues(time, value, m_dragOutValue, quantPos, controlKey);
+	}
+	else
+	{
+		return this->putValue(time, value, quantPos, controlKey);
+	}
 
 }
 
@@ -505,7 +568,7 @@ void AutomationPattern::flipY(int min, int max)
 		{
 			tempValue = max - valueAt(it.key());
 			outValueOffset = it.value().getValueOffset() * -1.0;
-			putValue(MidiTime(it.key()) , tempValue, false, true, outValueOffset);
+			putValues(MidiTime(it.key()), tempValue, tempValue + outValueOffset, false, true);
 		}
 		++it;
 	} while (it != m_timeMap.end());
