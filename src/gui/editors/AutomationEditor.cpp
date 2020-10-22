@@ -100,15 +100,15 @@ AutomationEditor::AutomationEditor() :
 	m_mouseDownLeft(false),
 	m_mouseDownRight( false ),
 	m_scrollBack( false ),
-	m_barLineColor( 0, 0, 0 ),
-	m_beatLineColor( 0, 0, 0 ),
-	m_lineColor( 0, 0, 0 ),
-	m_graphColor( Qt::SolidPattern ),
+	m_barLineColor(0, 0, 0),
+	m_beatLineColor(0, 0, 0),
+	m_lineColor(0, 0, 0),
+	m_graphColor(Qt::SolidPattern),
 	m_nodeInValueColor(0, 0, 0),
 	m_nodeOutValueColor(0, 0, 0),
-	m_scaleColor( Qt::SolidPattern ),
-	m_crossColor( 0, 0, 0 ),
-	m_backgroundShade( 0, 0, 0 )
+	m_scaleColor(Qt::SolidPattern),
+	m_crossColor(0, 0, 0),
+	m_backgroundShade(0, 0, 0)
 {
 	connect( this, SIGNAL( currentPatternChanged() ),
 				this, SLOT( updateAfterPatternChange() ),
@@ -252,64 +252,6 @@ void AutomationEditor::loadSettings( const QDomElement & dom_parent)
 
 	MainWindow::restoreWidgetState(parentWidget(), dom_parent);
 }
-
-
-
-// qproperty access methods
-
-QColor AutomationEditor::barLineColor() const
-{ QMutexLocker m(&m_patternEditorMutex); return m_barLineColor; }
-
-void AutomationEditor::setBarLineColor( const QColor & c )
-{ QMutexLocker m(&m_patternEditorMutex); m_barLineColor = c; }
-
-QColor AutomationEditor::beatLineColor() const
-{ QMutexLocker m(&m_patternEditorMutex); return m_beatLineColor; }
-
-void AutomationEditor::setBeatLineColor( const QColor & c )
-{ QMutexLocker m(&m_patternEditorMutex); m_beatLineColor = c; }
-
-QColor AutomationEditor::lineColor() const
-{ QMutexLocker m(&m_patternEditorMutex); return m_lineColor; }
-
-void AutomationEditor::setLineColor( const QColor & c )
-{ QMutexLocker m(&m_patternEditorMutex); m_lineColor = c; }
-
-QBrush AutomationEditor::graphColor() const
-{ QMutexLocker m(&m_patternEditorMutex); return m_graphColor; }
-
-void AutomationEditor::setGraphColor( const QBrush & c )
-{ QMutexLocker m(&m_patternEditorMutex); m_graphColor = c; }
-
-QColor AutomationEditor::nodeInValueColor() const
-{ QMutexLocker m(&m_patternEditorMutex); return m_nodeInValueColor; }
-
-void AutomationEditor::setNodeInValueColor(const QColor & c)
-{ QMutexLocker m(&m_patternEditorMutex); m_nodeInValueColor = c; }
-
-QColor AutomationEditor::nodeOutValueColor() const
-{ QMutexLocker m(&m_patternEditorMutex); return m_nodeOutValueColor; }
-
-void AutomationEditor::setNodeOutValueColor(const QColor & c)
-{ QMutexLocker m(&m_patternEditorMutex); m_nodeOutValueColor = c; }
-
-QBrush AutomationEditor::scaleColor() const
-{ QMutexLocker m(&m_patternEditorMutex); return m_scaleColor; }
-
-void AutomationEditor::setScaleColor( const QBrush & c )
-{ QMutexLocker m(&m_patternEditorMutex); m_scaleColor = c; }
-
-QColor AutomationEditor::crossColor() const
-{ QMutexLocker m(&m_patternEditorMutex); return m_crossColor; }
-
-void AutomationEditor::setCrossColor( const QColor & c )
-{ QMutexLocker m(&m_patternEditorMutex); m_crossColor = c; }
-
-QColor AutomationEditor::backgroundShade() const
-{ QMutexLocker m(&m_patternEditorMutex); return m_backgroundShade; }
-
-void AutomationEditor::setBackgroundShade( const QColor & c )
-{ QMutexLocker m(&m_patternEditorMutex); m_backgroundShade = c; }
 
 
 
@@ -984,7 +926,7 @@ inline void AutomationEditor::drawCross( QPainter & p )
 				/ (float)( m_maxLevel - m_minLevel ) ) :
 		grid_bottom - ( level - m_bottomLevel ) * m_y_delta;
 
-	p.setPen( crossColor() );
+	p.setPen(m_crossColor);
 	p.drawLine( VALUES_WIDTH, (int) cross_y, width(), (int) cross_y );
 	p.drawLine( mouse_pos.x(), TOP_MARGIN, mouse_pos.x(), height() - SCROLLBAR_SIZE );
 
@@ -1018,14 +960,14 @@ inline void AutomationEditor::drawAutomationPoint(QPainter & p, timeMap::iterato
 
 	// Draw a circle for the outValue
 	y = yCoordOfLevel(it.value().getOutValue());
-	p.setPen(QPen(nodeOutValueColor().lighter(200)));
-	p.setBrush(QBrush(nodeOutValueColor()));
+	p.setPen(QPen(m_nodeOutValueColor.lighter(200)));
+	p.setBrush(QBrush(m_nodeOutValueColor));
 	p.drawEllipse(x - outerRadius, y - outerRadius, outerRadius * 2, outerRadius * 2);
 
 	// Draw a circle for the inValue
 	y = yCoordOfLevel(it.value().getInValue());
-	p.setPen(QPen(nodeInValueColor().lighter(200)));
-	p.setBrush(QBrush(nodeInValueColor()));
+	p.setPen(QPen(m_nodeInValueColor.lighter(200)));
+	p.setBrush(QBrush(m_nodeInValueColor));
 	p.drawEllipse(x - outerRadius, y - outerRadius, outerRadius * 2, outerRadius * 2);
 }
 
@@ -1055,8 +997,8 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 	// start drawing at the bottom
 	int grid_bottom = height() - SCROLLBAR_SIZE - 1;
 
-	p.fillRect( 0, TOP_MARGIN, VALUES_WIDTH, height() - TOP_MARGIN,
-						scaleColor() );
+	p.fillRect(0, TOP_MARGIN, VALUES_WIDTH, height() - TOP_MARGIN,
+						m_scaleColor);
 
 	// print value numbers
 	int font_height = p.fontMetrics().height();
@@ -1153,14 +1095,14 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 			 x<=width();
 			 tick += q, x = xCoordOfTick( tick ) )
 		{
-			p.setPen( lineColor() );
+			p.setPen(m_lineColor);
 			p.drawLine( x, grid_bottom, x, x_line_end );
 		}
 
 		/// \todo move this horizontal line drawing code into the same loop as the value ticks?
 		if( m_y_auto )
 		{
-			QPen pen( beatLineColor() );
+			QPen pen(m_beatLineColor);
 			pen.setStyle( Qt::DotLine );
 			p.setPen( pen );
 			float y_delta = ( grid_bottom - TOP_MARGIN ) / 8.0f;
@@ -1178,11 +1120,11 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 				y =  yCoordOfLevel( (float)level );
 				if( level % 10 == 0 )
 				{
-					p.setPen( beatLineColor() );
+					p.setPen(m_beatLineColor);
 				}
 				else
 				{
-					p.setPen( lineColor() );
+					p.setPen(m_lineColor);
 				}
 				// draw level line
 				p.drawLine( VALUES_WIDTH, (int) y, width(), (int) y );
@@ -1202,8 +1144,8 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 		{
 			if( ( barCount + leftBars )  % 2 != 0 )
 			{
-				p.fillRect( x - m_currentPosition * zoomFactor / timeSignature, TOP_MARGIN, m_ppb,
-					height() - ( SCROLLBAR_SIZE + TOP_MARGIN ), backgroundShade() );
+				p.fillRect(x - m_currentPosition * zoomFactor / timeSignature, TOP_MARGIN, m_ppb,
+					height() - (SCROLLBAR_SIZE + TOP_MARGIN), m_backgroundShade);
 			}
 		}
 
@@ -1216,7 +1158,7 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 			 x<=width();
 			 tick += ticksPerBeat, x = xCoordOfTick( tick ) )
 		{
-			p.setPen( beatLineColor() );
+			p.setPen(m_beatLineColor);
 			p.drawLine( x, grid_bottom, x, x_line_end );
 		}
 
@@ -1226,7 +1168,7 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 			 x<=width();
 			 tick += MidiTime::ticksPerBar(), x = xCoordOfTick( tick ) )
 		{
-			p.setPen( barLineColor() );
+			p.setPen(m_barLineColor);
 			p.drawLine( x, grid_bottom, x, x_line_end );
 		}
 	}
@@ -1290,7 +1232,7 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 				path.lineTo( QPointF( xCoordOfTick( ( it + 1 ).key() ), yCoordOfLevel( nextValue ) ) );
 				path.lineTo( QPointF( xCoordOfTick( ( it + 1 ).key() ), yCoordOfLevel( 0 ) ) );
 				path.lineTo( QPointF( xCoordOfTick( it.key() ), yCoordOfLevel( 0 ) ) );
-				p.fillPath( path, graphColor() );
+				p.fillPath(path, m_graphColor);
 				p.setRenderHints( QPainter::Antialiasing, false );
 				delete [] values;
 
@@ -1433,7 +1375,7 @@ void AutomationEditor::drawLevelTick(QPainter & p, int tick, float value)
 			rect_height = (int)( value * m_y_delta );
 		}
 
-		QBrush currentColor = graphColor();
+		QBrush currentColor = m_graphColor;
 
 		p.fillRect( x, y_start, rect_width, rect_height, currentColor );
 	}

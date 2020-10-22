@@ -52,15 +52,15 @@ class TimeLineWidget;
 class AutomationEditor : public QWidget, public JournallingObject
 {
 	Q_OBJECT
-	Q_PROPERTY(QColor barLineColor READ barLineColor WRITE setBarLineColor)
-	Q_PROPERTY(QColor beatLineColor READ beatLineColor WRITE setBeatLineColor)
-	Q_PROPERTY(QColor lineColor READ lineColor WRITE setLineColor)
-	Q_PROPERTY(QColor nodeInValueColor READ nodeInValueColor WRITE setNodeInValueColor)
-	Q_PROPERTY(QColor nodeOutValueColor READ nodeOutValueColor WRITE setNodeOutValueColor)
-	Q_PROPERTY(QBrush scaleColor READ scaleColor WRITE setScaleColor)
-	Q_PROPERTY(QBrush graphColor READ graphColor WRITE setGraphColor)
-	Q_PROPERTY(QColor crossColor READ crossColor WRITE setCrossColor)
-	Q_PROPERTY(QColor backgroundShade READ backgroundShade WRITE setBackgroundShade)
+	Q_PROPERTY(QColor barLineColor MEMBER m_barLineColor)
+	Q_PROPERTY(QColor beatLineColor MEMBER m_beatLineColor)
+	Q_PROPERTY(QColor lineColor MEMBER m_lineColor)
+	Q_PROPERTY(QColor nodeInValueColor MEMBER m_nodeInValueColor)
+	Q_PROPERTY(QColor nodeOutValueColor MEMBER m_nodeOutValueColor)
+	Q_PROPERTY(QBrush scaleColor MEMBER m_scaleColor)
+	Q_PROPERTY(QBrush graphColor MEMBER m_graphColor)
+	Q_PROPERTY(QColor crossColor MEMBER m_crossColor)
+	Q_PROPERTY(QColor backgroundShade MEMBER m_backgroundShade)
 public:
 	void setCurrentPattern(AutomationPattern * new_pattern);
 
@@ -80,26 +80,6 @@ public:
 	{
 		return "automationeditor";
 	}
-
-	// qproperty access methods
-	QColor barLineColor() const;
-	void setBarLineColor(const QColor & c);
-	QColor beatLineColor() const;
-	void setBeatLineColor(const QColor & c);
-	QColor lineColor() const;
-	void setLineColor(const QColor & c);
-	QBrush graphColor() const;
-	void setGraphColor(const QBrush & c);
-	QColor nodeInValueColor() const;
-	void setNodeInValueColor(const QColor & c);
-	QColor nodeOutValueColor() const;
-	void setNodeOutValueColor(const QColor & c);
-	QBrush scaleColor() const;
-	void setScaleColor(const QBrush & c);
-	QColor crossColor() const;
-	void setCrossColor(const QColor & c);
-	QColor backgroundShade() const;
-	void setBackgroundShade(const QColor & c);
 
 	enum EditModes
 	{
