@@ -181,7 +181,7 @@ AutomationEditor::AutomationEditor() :
 	if (s_toolDrawOut == nullptr)
 	{
 		s_toolDrawOut = new QPixmap(embed::getIconPixmap(
-							"edit_draw"));
+							"edit_draw_outvalue"));
 	}
 	if (s_toolMove == nullptr)
 	{
@@ -1928,7 +1928,7 @@ AutomationEditorWindow::AutomationEditorWindow() :
 	QAction* eraseAction = editModeGroup->addAction(embed::getIconPixmap("edit_erase"), tr("Erase mode (Shift+E)"));
 	eraseAction->setShortcut(Qt::SHIFT | Qt::Key_E);
 
-	QAction* drawOutAction = editModeGroup->addAction(embed::getIconPixmap("edit_draw"), tr("Draw outValues mode (Shift+C)"));
+	QAction* drawOutAction = editModeGroup->addAction(embed::getIconPixmap("edit_draw_outvalue"), tr("Draw outValues mode (Shift+C)"));
 	drawOutAction->setShortcut(Qt::SHIFT | Qt::Key_C);
 
 	m_flipYAction = new QAction(embed::getIconPixmap("flip_y"), tr("Flip vertically"), this);
