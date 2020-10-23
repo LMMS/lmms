@@ -30,6 +30,7 @@
 #include <QtDataVisualization>
 #include "Phase.hpp"
 #include "FFT.hpp"
+#include "../common/Qt/ColorPalette.hpp"
 
 class AnalyzerPlugin : public ToolPlugin
 {

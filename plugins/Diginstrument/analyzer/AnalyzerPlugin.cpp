@@ -269,11 +269,9 @@ void AnalyzerPlugin::analyze(const std::vector<double> & signal, vector<pair<str
 //TODO: maybe reduce samples by excluding places of linear phase? and linear mag?
 std::vector<std::vector<Diginstrument::Component<double>>> AnalyzerPlugin::subtractiveAnalysis(std::vector<double> & signal, unsigned int sampleRate)
 {
-	//tmp:visualization
-	QImage colorRed = QImage(2, 2, QImage::Format_RGB32);
-	colorRed.fill(Qt::red);
+	//tmp: FFT visualization
 	QImage colorBlue = QImage(2, 2, QImage::Format_RGB32);
-	colorBlue.fill(Qt::blue);
+	colorBlue.fill(Qt::black);
 
 	//TODO: avg energy to detect broad-changing frequencies
 	//calculate FFT magnitudes of the signal
@@ -298,10 +296,12 @@ std::vector<std::vector<Diginstrument::Component<double>>> AnalyzerPlugin::subtr
 	vector<vector<double>> phases;
 	vector<vector<double>> amps;
 	std::vector<std::vector<Diginstrument::Component<double>>> res(signal.size());
+	//tmp: visualization
+	const auto palette = Diginstrument::ColorPalette::generatePaletteTextures(maxima.size());
 	//for each selected frequency
-	for(const auto & m : maxima)
+	for(int j = 0; j<maxima.size(); j++)
 	{
-		const double fr = m.x;
+		const double fr = maxima[j].x;
 		//TODO: tie wavelet parameters together
 		constexpr double parameter = 6;
 		const double scale = (parameter+sqrt(2+parameter*parameter)) / (4*M_PI*fr);
@@ -339,7 +339,7 @@ std::vector<std::vector<Diginstrument::Component<double>>> AnalyzerPlugin::subtr
 												QVector3D(freq, amps.back()[i],(double)i/(double)sampleRate),
 												QVector3D(0.01f, 0.01f, 0.01f),
 												QQuaternion::fromAxisAndAngle(0.0f, 1.0f, 0.0f, 45.0f),
-												colorRed));
+												palette[j]));
 			}
 		}
 	}
