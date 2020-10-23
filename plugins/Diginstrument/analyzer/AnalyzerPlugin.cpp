@@ -69,7 +69,7 @@ std::string AnalyzerPlugin::setAudioFile(const QString &_audio_file, vector<pair
 	visualization = new Diginstrument::InstrumentVisualizationWindow(this);
 
 	//TMP: incomplete analysis
-	subtractiveAnalysis(sample, m_sampleBuffer.sampleRate());
+	auto partials = subtractiveAnalysis(sample, m_sampleBuffer.sampleRate());
 	analyze(sample, coordinates);
 
 	//tmp: show raw visualization
@@ -263,7 +263,11 @@ void AnalyzerPlugin::analyze(const std::vector<double> & signal, vector<pair<str
 	//writeInstrumentToFile("test2.json");
 }
 
-void AnalyzerPlugin::subtractiveAnalysis(std::vector<double> & signal, unsigned int sampleRate)
+//TODO: current output: spectra over time
+//problems: FULL output = samples*partials
+//phase + magnitude
+//TODO: maybe reduce samples by excluding places of linear phase? and linear mag?
+std::vector<std::vector<Diginstrument::Component<double>>> AnalyzerPlugin::subtractiveAnalysis(std::vector<double> & signal, unsigned int sampleRate)
 {
 	//tmp:visualization
 	QImage colorRed = QImage(2, 2, QImage::Format_RGB32);
@@ -293,9 +297,10 @@ void AnalyzerPlugin::subtractiveAnalysis(std::vector<double> & signal, unsigned 
 
 	vector<vector<double>> phases;
 	vector<vector<double>> amps;
+	std::vector<std::vector<Diginstrument::Component<double>>> res(signal.size());
 	//for each selected frequency
 	for(const auto & m : maxima)
-	{	
+	{
 		const double fr = m.x;
 		//TODO: tie wavelet parameters together
 		constexpr double parameter = 6;
@@ -312,8 +317,10 @@ void AnalyzerPlugin::subtractiveAnalysis(std::vector<double> & signal, unsigned 
 			const double mag = std::abs(c);
 			//TODO: this has been the most successful equation, as it resulted in the same amp for both components in 440+50.wav
 			//I have no idea where the constant comes from; probably ties into the wavelet parameter
-			amps.back()[i] = (mag / (sqrt(scale*sampleRate))) * 1.067158515;
+			const double amp = (mag / (sqrt(scale*sampleRate))) * 1.067158515;
+			amps.back()[i] = amp;
 			phases.back()[i] = std::arg(c);
+			
 		}
 		//unwrap phase
 		Diginstrument::Phase::unwrapInPlace(phases.back());
@@ -321,6 +328,8 @@ void AnalyzerPlugin::subtractiveAnalysis(std::vector<double> & signal, unsigned 
 		{
 			//subtract extracted partial to get residual signal
 			signal[i]-=cos(phases.back()[i])*amps.back()[i];
+			//TODO: rethink output
+			res[i].emplace_back(fr, phases.back()[i], amps.back()[i]);
 			//tmp: visualization
 			if(i%440 == 1 && amps.back()[i]>0.001)
 			{
@@ -334,4 +343,5 @@ void AnalyzerPlugin::subtractiveAnalysis(std::vector<double> & signal, unsigned 
 			}
 		}
 	}
+	return res;
 }
