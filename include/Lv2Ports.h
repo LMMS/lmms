@@ -37,6 +37,7 @@
 #include "PluginIssue.h"
 
 struct ConnectPortVisitor;
+typedef struct LV2_Evbuf_Impl LV2_Evbuf;
 
 namespace Lv2Ports {
 
@@ -53,7 +54,7 @@ enum class Type {
 	Unknown,
 	Control,
 	Audio,
-	Event, //!< TODO: unused, describe
+	AtomSeq,
 	Cv //!< TODO: unused, describe
 };
 
@@ -74,6 +75,7 @@ struct ControlPortBase;
 struct Control;
 struct Audio;
 struct Cv;
+struct AtomSeq;
 struct Unknown;
 
 struct ConstVisitor
@@ -82,6 +84,7 @@ struct ConstVisitor
 	virtual void visit(const Lv2Ports::Control& ) {}
 	virtual void visit(const Lv2Ports::Audio& ) {}
 	virtual void visit(const Lv2Ports::Cv& ) {}
+	virtual void visit(const Lv2Ports::AtomSeq& ) {}
 	virtual void visit(const Lv2Ports::Unknown& ) {}
 
 	virtual ~ConstVisitor();
@@ -93,6 +96,7 @@ struct Visitor
 	virtual void visit(Lv2Ports::Control& ) {}
 	virtual void visit(Lv2Ports::Audio& ) {}
 	virtual void visit(Lv2Ports::Cv& ) {}
+	virtual void visit(Lv2Ports::AtomSeq& ) {}
 	virtual void visit(Lv2Ports::Unknown& ) {}
 
 	virtual ~Visitor();
@@ -190,6 +194,23 @@ private:
 
 	// the only case when data of m_buffer may be referenced:
 	friend struct ::ConnectPortVisitor;
+};
+
+struct AtomSeq : public VisitablePort<AtomSeq, PortBase>
+{
+	enum FlagType
+	{
+		None = 0,
+		Midi = 1
+	};
+	unsigned flags = FlagType::None;
+
+	struct Lv2EvbufDeleter
+	{
+		void operator()(LV2_Evbuf* n);
+	};
+	using AutoLv2Evbuf = std::unique_ptr<LV2_Evbuf, Lv2EvbufDeleter>;
+	AutoLv2Evbuf m_buf;
 };
 
 struct Unknown : public VisitablePort<Unknown, PortBase>

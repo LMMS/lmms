@@ -27,9 +27,10 @@
 
 #include <QStaticText>
 
+#include "AutomationPattern.h"
+#include "Song.h"
+#include "SongEditor.h"
 #include "Track.h"
-
-class AutomationPattern;
 
 
 class AutomationPatternView : public TrackContentObjectView

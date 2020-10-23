@@ -131,11 +131,9 @@ void Lv2Instrument::loadFile(const QString &file)
 bool Lv2Instrument::handleMidiEvent(
 	const MidiEvent &event, const MidiTime &time, f_cnt_t offset)
 {
-	// this function can be called from GUI threads while the plugin is running,
-	// so this requires caching, e.g. in ringbuffers
-	(void)time;
-	(void)offset;
-	(void)event;
+	// this function can be called from GUI threads while the plugin is running
+	// handleMidiInputEvent will use a thread-safe ringbuffer
+	handleMidiInputEvent(event, time, offset);
 	return true;
 }
 #endif
@@ -161,6 +159,7 @@ void Lv2Instrument::play(sampleFrame *buf)
 
 	run(fpp);
 
+	copyModelsToLmms();
 	copyBuffersToLmms(buf, fpp);
 
 	instrumentTrack()->processAudioBuffer(buf, fpp, nullptr);
