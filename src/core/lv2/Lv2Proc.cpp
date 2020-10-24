@@ -396,9 +396,12 @@ void Lv2Proc::initPlugin()
 
 void Lv2Proc::shutdownPlugin()
 {
-	lilv_instance_deactivate(m_instance);
-	lilv_instance_free(m_instance);
-	m_instance = nullptr;
+	if (m_valid)
+	{
+		lilv_instance_deactivate(m_instance);
+		lilv_instance_free(m_instance);
+		m_instance = nullptr;
+	}
 }
 
 

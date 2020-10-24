@@ -190,7 +190,6 @@ private:
 	//! the buffer where Lv2 reads/writes the data from/to
 	std::vector<float> m_buffer;
 	bool m_sidechain;
-	bool m_optional;
 
 	// the only case when data of m_buffer may be referenced:
 	friend struct ::ConnectPortVisitor;
