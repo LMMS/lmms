@@ -713,9 +713,9 @@ bool InstrumentTrack::play( const MidiTime & _start, const fpp_t _frames,
 
 
 
-TrackContentObject * InstrumentTrack::createTCO(const MidiTime & pos)
+TrackContentObject* InstrumentTrack::createTCO(const MidiTime & pos)
 {
-	Pattern *p = new Pattern(this);
+	Pattern* p = new Pattern(this);
 	p->movePosition(pos);
 	return p;
 }

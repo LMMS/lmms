@@ -314,7 +314,7 @@ bool HydrogenImport::readSong()
 
 			int i = pattern_id[patId]+song_num_tracks;
 			Track *t = ( BBTrack * ) s->tracks().at( i );
-			t->createTCO( pos );
+			t->createTCO(pos);
 
 			if ( pattern_length[patId] > best_length ) 
 			{
