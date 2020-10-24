@@ -41,6 +41,9 @@
 
 
 
+extern "C"
+{
+
 Plugin::Descriptor PLUGIN_EXPORT lv2instrument_plugin_descriptor =
 {
 	STRINGIFY(PLUGIN_NAME),
@@ -54,6 +57,8 @@ Plugin::Descriptor PLUGIN_EXPORT lv2instrument_plugin_descriptor =
 	nullptr,
 	new Lv2SubPluginFeatures(Plugin::Instrument)
 };
+
+}
 
 
 
@@ -221,7 +226,7 @@ Lv2InsView::Lv2InsView(Lv2Instrument *_instrument, QWidget *_parent) :
 	setAutoFillBackground(true);
 	if (m_reloadPluginButton) {
 		connect(m_reloadPluginButton, &QPushButton::clicked,
-			this, [this](){ castModel<Lv2Instrument>()->reloadPlugin();} );
+			this, [this](){ this->castModel<Lv2Instrument>()->reloadPlugin();} );
 	}
 	if (m_toggleUIButton) {
 		connect(m_toggleUIButton, &QPushButton::toggled,
