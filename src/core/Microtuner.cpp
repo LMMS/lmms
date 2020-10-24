@@ -152,7 +152,10 @@ float Microtuner::keyToFreq(int key, float detune) const
 	if (keymapDegree == -1) {return 0;}						// key is not mapped, abort
 	const int keymapOctave = keymap->getOctave(key);		// how many times did the keymap repeat
 	const int octaveDegree = intervals.size() - 1;			// index of the interval with octave ratio
-	const int scaleOctave = keymapDegree >= 0 ? keymapDegree / octaveDegree : keymapDegree / octaveDegree - 1;
+	if (octaveDegree == 0) {								// octave interval is 1/1, i.e. constant base frequency
+		return keymap->getBaseFreq() * powf(2.f, detune / (100 * 12.f));	// → return detuned baseFreq directly
+	}
+	const int scaleOctave = keymapDegree / octaveDegree;
 
 	// which interval should be used according to the scale and keymap together
 	const int degree_rem = keymapDegree % octaveDegree;
@@ -163,8 +166,7 @@ float Microtuner::keyToFreq(int key, float detune) const
 	const int baseKeymapDegree = keymap->getDegree(baseNote);
 	if (baseKeymapDegree == -1) {return 0;}					// base key is not mapped, umm...
 	const int baseKeymapOctave = keymap->getOctave(baseNote);
-	const int baseScaleOctave = baseKeymapDegree >= 0 ?
-		baseKeymapDegree / octaveDegree : baseKeymapDegree / octaveDegree - 1;
+	const int baseScaleOctave = baseKeymapDegree / octaveDegree;
 
 	const int baseDegree_rem = baseKeymapDegree % octaveDegree;
 	const int baseScaleDegree = baseDegree_rem >= 0 ? baseDegree_rem : baseDegree_rem + octaveDegree;
