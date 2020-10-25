@@ -553,8 +553,8 @@ bool CompressorEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 		}
 
 		// Calculate wet/dry value results
-		const float temp1 = trueDrySignal[0] / m_inGainVal;
-		const float temp2 = trueDrySignal[1] / m_inGainVal;
+		const float temp1 = buf[f][0];
+		const float temp2 = buf[f][1];
 		buf[f][0] = d * temp1 + w * s[0];
 		buf[f][1] = d * temp2 + w * s[1];
 		buf[f][0] = (1 - m_mixVal) * temp1 + m_mixVal * buf[f][0];

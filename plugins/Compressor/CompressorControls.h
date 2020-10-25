@@ -48,7 +48,7 @@ public:
 
 	int controlCount() override
 	{
-		return 31;
+		return 28;
 	}
 
 	EffectControlDialog* createView() override
