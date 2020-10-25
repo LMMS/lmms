@@ -38,6 +38,7 @@
 #include "CaptionMenu.h"
 #include "ConfigManager.h"
 #include "ControllerConnection.h"
+#include "DeprecationHelper.h"
 #include "embed.h"
 #include "gui_templates.h"
 #include "GuiApplication.h"
@@ -168,9 +169,9 @@ void Knob::setLabel( const QString & txt )
 	m_label = txt;
 	if( m_knobPixmap )
 	{
-		setFixedSize( qMax<int>( m_knobPixmap->width(),
-					QFontMetrics( pointSizeF( font(), 6.5) ).width( m_label ) ),
-						m_knobPixmap->height() + 10 );
+		setFixedSize(qMax<int>( m_knobPixmap->width(),
+					horizontalAdvance(QFontMetrics(pointSizeF(font(), 6.5)), m_label)),
+						m_knobPixmap->height() + 10);
 	}
 	update();
 }
@@ -496,8 +497,8 @@ float Knob::getValue( const QPoint & _p )
 {
 	float value;
 
-	// arcane mathemagicks for calculating knob movement
-	value = ( ( _p.y() + _p.y() * qMin( qAbs( _p.y() / 2.5f ), 6.0f ) ) ) / 12.0f;
+	// knob value increase is linear to mouse movement
+	value = .4f * _p.y();
 
 	// if shift pressed we want slower movement
 	if( gui->mainWindow()->isShiftPressed() )
@@ -585,13 +586,11 @@ void Knob::mousePressEvent( QMouseEvent * _me )
 		}
 
 		const QPoint & p = _me->pos();
-		m_origMousePos = p;
-		m_mouseOffset = QPoint(0, 0);
+		m_lastMousePos = p;
 		m_leftOver = 0.0f;
 
 		emit sliderPressed();
 
-		QApplication::setOverrideCursor( Qt::BlankCursor );
 		s_textFloat->setText( displayValue() );
 		s_textFloat->moveGlobal( this,
 				QPoint( width() + 2, 0 ) );
@@ -616,12 +615,13 @@ void Knob::mousePressEvent( QMouseEvent * _me )
 
 void Knob::mouseMoveEvent( QMouseEvent * _me )
 {
-	if( m_buttonPressed && _me->pos() != m_origMousePos )
+	if( m_buttonPressed && _me->pos() != m_lastMousePos )
 	{
-		m_mouseOffset = _me->pos() - m_origMousePos;
-		setPosition( m_mouseOffset );
+		// knob position is changed depending on last mouse position
+		setPosition( _me->pos() - m_lastMousePos );
 		emit sliderMoved( model()->value() );
-		QCursor::setPos( mapToGlobal( m_origMousePos ) );
+		// original position for next time is current position
+		m_lastMousePos = _me->pos();
 	}
 	s_textFloat->setText( displayValue() );
 }
@@ -683,19 +683,20 @@ void Knob::paintEvent( QPaintEvent * _me )
 			p.fontMetrics().width( m_label ) / 2 + 1,
 				height() - 1, m_label );*/
 		p.setPen( textColor() );
-		p.drawText( width() / 2 -
-				p.fontMetrics().width( m_label ) / 2,
-				height() - 2, m_label );
+		p.drawText(width() / 2 -
+				horizontalAdvance(p.fontMetrics(), m_label) / 2,
+				height() - 2, m_label);
 	}
 }
 
 
 
 
-void Knob::wheelEvent( QWheelEvent * _we )
+void Knob::wheelEvent(QWheelEvent * we)
 {
-	_we->accept();
-	const int inc = ( _we->delta() > 0 ) ? 1 : -1;
+	we->accept();
+	const float stepMult = model()->range() / 2000 / model()->step<float>();
+	const int inc = ((we->angleDelta().y() > 0 ) ? 1 : -1) * ((stepMult < 1 ) ? 1 : stepMult);
 	model()->incValue( inc );
 
 

@@ -50,7 +50,7 @@ public:
 
 	inline static QString name()
 	{
-		return QT_TRANSLATE_NOOP( "setupWidget", "PulseAudio" );
+		return QT_TRANSLATE_NOOP( "AudioDeviceSetupWidget", "PulseAudio" );
 	}
 
 	static QString probeDevice();

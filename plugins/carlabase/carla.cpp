@@ -29,6 +29,7 @@
 #include "gui_templates.h"
 #include "InstrumentPlayHandle.h"
 #include "InstrumentTrack.h"
+#include "MidiEventToByteSeq.h"
 #include "Mixer.h"
 
 #include <QApplication>
@@ -372,69 +373,9 @@ bool CarlaInstrument::handleMidiEvent(const MidiEvent& event, const MidiTime&, f
 
     nEvent.port    = 0;
     nEvent.time    = offset;
-    nEvent.data[0] = event.type() | (event.channel() & 0x0F);
-
-    switch (event.type())
-    {
-    case MidiNoteOn:
-        if (event.velocity() > 0)
-        {
-            if (event.key() < 0 || event.key() > MidiMaxKey)
-                break;
-
-            nEvent.data[1] = event.key();
-            nEvent.data[2] = event.velocity();
-            nEvent.size    = 3;
-            break;
-        }
-        else
-        {
-            nEvent.data[0] = MidiNoteOff | (event.channel() & 0x0F);
-            // nobreak
-        }
-
-    case MidiNoteOff:
-        if (event.key() < 0 || event.key() > MidiMaxKey)
-            break;
-
-        nEvent.data[1] = event.key();
-        nEvent.data[2] = event.velocity();
-        nEvent.size    = 3;
-        break;
-
-    case MidiKeyPressure:
-        nEvent.data[1] = event.key();
-        nEvent.data[2] = event.velocity();
-        nEvent.size    = 3;
-        break;
-
-    case MidiControlChange:
-        nEvent.data[1] = event.controllerNumber();
-        nEvent.data[2] = event.controllerValue();
-        nEvent.size    = 3;
-        break;
-
-    case MidiProgramChange:
-        nEvent.data[1] = event.program();
-        nEvent.size    = 2;
-        break;
-
-    case MidiChannelPressure:
-        nEvent.data[1] = event.channelPressure();
-        nEvent.size    = 2;
-        break;
-
-    case MidiPitchBend:
-        nEvent.data[1] = event.pitchBend() & 0x7f;
-        nEvent.data[2] = event.pitchBend() >> 7;
-        nEvent.size    = 3;
-        break;
-
-    default:
-        // unhandled
-        --fMidiEventCount;
-        break;
-    }
+    std::size_t written = writeToByteSeq(event, nEvent.data, sizeof(NativeMidiEvent::data));
+    if(written) { nEvent.size = written; }
+    else { --fMidiEventCount; }
 
     return true;
 }

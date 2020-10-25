@@ -24,7 +24,6 @@
 
 #include "SongEditor.h"
 
-#include <QTimeLine>
 #include <QAction>
 #include <QKeyEvent>
 #include <QLabel>
@@ -32,45 +31,30 @@
 #include <QMdiArea>
 #include <QMdiSubWindow>
 #include <QPainter>
+#include <QTimeLine>
 
+#include "AudioDevice.h"
 #include "AutomatableSlider.h"
 #include "ComboBox.h"
 #include "ConfigManager.h"
 #include "CPULoadWidget.h"
+#include "DeprecationHelper.h"
 #include "embed.h"
 #include "GuiApplication.h"
 #include "LcdSpinBox.h"
 #include "MainWindow.h"
 #include "MeterDialog.h"
 #include "Mixer.h"
+#include "Oscilloscope.h"
+#include "PianoRoll.h"
 #include "TextFloat.h"
+#include "TimeDisplayWidget.h"
 #include "TimeLineWidget.h"
 #include "ToolTip.h"
-#include "VisualizationWidget.h"
-#include "TimeDisplayWidget.h"
-#include "AudioDevice.h"
-#include "PianoRoll.h"
 #include "Track.h"
-
-positionLine::positionLine( QWidget * parent ) :
-	QWidget( parent )
-{
-	setFixedWidth( 1 );
-	setAttribute( Qt::WA_NoSystemBackground, true );
-}
-
-
-
-
-void positionLine::paintEvent( QPaintEvent * pe )
-{
-	QPainter p( this );
-	p.fillRect( rect(), QColor( 255, 255, 255, 153 ) );
-}
 
 const QVector<double> SongEditor::m_zoomLevels =
 		{ 0.125f, 0.25f, 0.5f, 1.0f, 2.0f, 4.0f, 8.0f, 16.0f };
-
 
 SongEditor::SongEditor( Song * song ) :
 	TrackContainerView( song ),
@@ -109,8 +93,13 @@ SongEditor::SongEditor( Song * song ) :
 	connect( m_timeLine, SIGNAL( selectionFinished() ),
 			 this, SLOT( stopRubberBand() ) );
 
-	m_positionLine = new positionLine( this );
+	m_positionLine = new PositionLine(this);
 	static_cast<QVBoxLayout *>( layout() )->insertWidget( 1, m_timeLine );
+	
+	connect( m_song, SIGNAL( playbackStateChanged() ),
+			 m_positionLine, SLOT( update() ) );
+	connect( this, SIGNAL( zoomingValueChanged( double ) ),
+			 m_positionLine, SLOT( zoomChange( double ) ) );
 
 
 	// add some essential widgets to global tool-bar
@@ -210,15 +199,14 @@ SongEditor::SongEditor( Song * song ) :
 
 	gui->mainWindow()->addSpacingToToolBar( 10 );
 
-	// create widget for visualization- and cpu-load-widget
+	// create widget for oscilloscope- and cpu-load-widget
 	QWidget * vc_w = new QWidget( tb );
 	QVBoxLayout * vcw_layout = new QVBoxLayout( vc_w );
 	vcw_layout->setMargin( 0 );
 	vcw_layout->setSpacing( 0 );
 
-	//vcw_layout->addStretch();
-	vcw_layout->addWidget( new VisualizationWidget(
-			embed::getIconPixmap( "output_graph" ), vc_w ) );
+	vcw_layout->addStretch();
+	vcw_layout->addWidget( new Oscilloscope( vc_w ) );
 
 	vcw_layout->addWidget( new CPULoadWidget( vc_w ) );
 	vcw_layout->addStretch();
@@ -251,6 +239,8 @@ SongEditor::SongEditor( Song * song ) :
 			m_zoomingModel->findText( "100%" ) );
 	connect( m_zoomingModel, SIGNAL( dataChanged() ),
 					this, SLOT( zoomingChanged() ) );
+	connect( m_zoomingModel, SIGNAL( dataChanged() ),
+					m_positionLine, SLOT( update() ) );
 
 	//Set up snapping model, 2^i
 	for ( int i = 3; i >= -4; i-- )
@@ -504,9 +494,8 @@ void SongEditor::keyPressEvent( QKeyEvent * ke )
 	{
 		m_song->setPlayPos( 0, Song::Mode_PlaySong );
 	}
-	else if( ke->key() == Qt::Key_Delete )
+	else if( ke->key() == Qt::Key_Delete || ke->key() == Qt::Key_Backspace )
 	{
-		QVector<TrackContentObjectView *> tcoViews;
 		QVector<selectableObject *> so = selectedObjects();
 		for( QVector<selectableObject *>::iterator it = so.begin();
 				it != so.end(); ++it )
@@ -539,18 +528,18 @@ void SongEditor::wheelEvent( QWheelEvent * we )
 	{
 		int z = m_zoomingModel->value();
 
-		if( we->delta() > 0 )
+		if(we->angleDelta().y() > 0)
 		{
 			z++;
 		}
-		else if( we->delta() < 0 )
+		else if(we->angleDelta().y() < 0)
 		{
 			z--;
 		}
 		z = qBound( 0, z, m_zoomingModel->size() - 1 );
 
 
-		int x = we->x() - m_trackHeadWidth;
+		int x = position(we).x() - m_trackHeadWidth;
 		// bar based on the mouse x-position where the scroll wheel was used
 		int bar = x / pixelsPerBar();
 		// what would be the bar in the new zoom level on the very same mouse x
@@ -567,10 +556,17 @@ void SongEditor::wheelEvent( QWheelEvent * we )
 		// and make sure, all TCO's are resized and relocated
 		realignTracks();
 	}
-	else if( we->modifiers() & Qt::ShiftModifier || we->orientation() == Qt::Horizontal )
+
+	// FIXME: Reconsider if determining orientation is necessary in Qt6.
+	else if(abs(we->angleDelta().x()) > abs(we->angleDelta().y())) // scrolling is horizontal
 	{
-		m_leftRightScroll->setValue( m_leftRightScroll->value() -
-							we->delta() / 30 );
+		m_leftRightScroll->setValue(m_leftRightScroll->value() -
+							we->angleDelta().x() /30);
+	}
+	else if(we->modifiers() & Qt::ShiftModifier)
+	{
+		m_leftRightScroll->setValue(m_leftRightScroll->value() -
+							we->angleDelta().y() / 30);
 	}
 	else
 	{
@@ -809,7 +805,7 @@ void SongEditor::updatePosition( const MidiTime & t )
 	if( x >= trackOpWidth + widgetWidth -1 )
 	{
 		m_positionLine->show();
-		m_positionLine->move( x, m_timeLine->height() );
+		m_positionLine->move( x-( m_positionLine->width() - 1 ), m_timeLine->height() );
 	}
 	else
 	{
@@ -838,9 +834,9 @@ void SongEditor::zoomingChanged()
 					setPixelsPerBar( pixelsPerBar() );
 	realignTracks();
 	updateRubberband();
+	
+	emit zoomingValueChanged( m_zoomLevels[m_zoomingModel->value()] );
 }
-
-
 
 
 void SongEditor::selectAllTcos( bool select )
@@ -959,6 +955,13 @@ SongEditorWindow::SongEditorWindow(Song* song) :
 	DropToolBar *timeLineToolBar = addDropToolBarToTop(tr("Timeline controls"));
 	m_editor->m_timeLine->addToolButtons(timeLineToolBar);
 
+	DropToolBar *insertActionsToolBar = addDropToolBarToTop(tr("Bar insert controls"));
+	m_insertBarAction = new QAction(embed::getIconPixmap("insert_bar"), tr("Insert bar"), this);
+	m_removeBarAction = new QAction(embed::getIconPixmap("remove_bar"), tr("Remove bar"), this);
+	insertActionsToolBar->addAction( m_insertBarAction );
+	insertActionsToolBar->addAction( m_removeBarAction );
+	connect(m_insertBarAction, SIGNAL(triggered()), song, SLOT(insertBar()));
+	connect(m_removeBarAction, SIGNAL(triggered()), song, SLOT(removeBar()));
 
 	DropToolBar *zoomToolBar = addDropToolBarToTop(tr("Zoom controls"));
 
@@ -967,7 +970,7 @@ SongEditorWindow::SongEditorWindow(Song* song) :
 
 	//Set up zooming-stuff
 	m_zoomingComboBox = new ComboBox( m_toolBar );
-	m_zoomingComboBox->setFixedSize( 80, 22 );
+	m_zoomingComboBox->setFixedSize( 80, ComboBox::DEFAULT_HEIGHT );
 	m_zoomingComboBox->move( 580, 4 );
 	m_zoomingComboBox->setModel(m_editor->m_zoomingModel);
 	m_zoomingComboBox->setToolTip(tr("Horizontal zooming"));
@@ -982,7 +985,7 @@ SongEditorWindow::SongEditorWindow(Song* song) :
 
 	//Set up quantization/snapping selector
 	m_snappingComboBox = new ComboBox( m_toolBar );
-	m_snappingComboBox->setFixedSize( 80, 22 );
+	m_snappingComboBox->setFixedSize( 80, ComboBox::DEFAULT_HEIGHT );
 	m_snappingComboBox->setModel(m_editor->m_snappingModel);
 	m_snappingComboBox->setToolTip(tr("Clip snapping size"));
 	connect(m_editor->snappingModel(), SIGNAL(dataChanged()), this, SLOT(updateSnapLabel()));

@@ -59,6 +59,7 @@
 #include "LocaleHelper.h"
 #include "MainWindow.h"
 #include "Mixer.h"
+#include "PathUtil.h"
 #include "Song.h"
 #include "FileDialog.h"
 
@@ -121,7 +122,7 @@ private:
 
 
 VstPlugin::VstPlugin( const QString & _plugin ) :
-	m_plugin( _plugin ),
+	m_plugin( PathUtil::toAbsolute(_plugin) ),
 	m_pluginWindowID( 0 ),
 	m_embedMethod( gui
 			? ConfigManager::inst()->vstEmbedMethod()
@@ -129,11 +130,6 @@ VstPlugin::VstPlugin( const QString & _plugin ) :
 	m_version( 0 ),
 	m_currentProgram()
 {
-	if( QDir::isRelativePath( m_plugin ) )
-	{
-		m_plugin = ConfigManager::inst()->vstDir()  + m_plugin;
-	}
-
 	setSplittedChannels( true );
 
 	PE::MachineType machineType;
@@ -438,6 +434,14 @@ bool VstPlugin::processMessage( const message & _m )
 			m_allProgramNames = _m.getQString();
 			break;
 
+		case IdVstParameterLabels:
+			m_allParameterLabels = _m.getQString();
+			break;
+
+		case IdVstParameterDisplays:
+			m_allParameterDisplays = _m.getQString();
+			break;
+
 		case IdVstPluginUniqueID:
 			// TODO: display graphically in case of failure
 			printf("unique ID: %s\n", _m.getString().c_str() );
@@ -531,10 +535,32 @@ void VstPlugin::loadProgramNames()
 
 
 
+void VstPlugin::loadParameterLabels()
+{
+	lock();
+	sendMessage( message( IdVstParameterLabels ) );
+	waitForMessage( IdVstParameterLabels, true );
+	unlock();
+}
+
+
+
+
+void VstPlugin::loadParameterDisplays()
+{
+	lock();
+	sendMessage( message( IdVstParameterDisplays ) );
+	waitForMessage( IdVstParameterDisplays, true );
+	unlock();
+}
+
+
+
+
 void VstPlugin::savePreset( )
 {
 	QString presName = currentProgramName().isEmpty() ? tr(": default") : currentProgramName();
-	presName.replace(tr("\""), tr("'")); // QFileDialog unable to handle double quotes properly
+	presName.replace("\"", "'"); // QFileDialog unable to handle double quotes properly
 
 	FileDialog sfd( NULL, tr( "Save Preset" ), presName.section(": ", 1, 1) + tr(".fxp"),
 		tr( "Vst Plugin Preset (*.fxp *.fxb)" ) );
@@ -774,7 +800,3 @@ QString VstPlugin::embedMethod() const
 {
 	return m_embedMethod;
 }
-
-
-
-

@@ -26,7 +26,7 @@
 
 
 AudioDeviceSetupWidget::AudioDeviceSetupWidget(const QString & caption, QWidget * parent) :
-	TabWidget(TabWidget::tr("Settings for %1").arg(TabWidget::tr(caption.toLatin1())), parent)
+	TabWidget(TabWidget::tr("Settings for %1").arg(tr(caption.toUtf8())), parent)
 {
 }
 

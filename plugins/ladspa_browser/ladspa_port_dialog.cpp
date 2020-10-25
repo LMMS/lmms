@@ -65,7 +65,7 @@ ladspaPortDialog::ladspaPortDialog( const ladspa_key_t & _key )
 		for( int col = 0; col < 7; ++col )
 		{
 			QTableWidgetItem * item = new QTableWidgetItem;
-			item->setFlags( 0 );
+			item->setFlags(QFlag(0));
 			settings->setItem( row, col, item );
 		}
 

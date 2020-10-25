@@ -34,6 +34,7 @@
 #include "InstrumentTrack.h"
 #include "SampleTrack.h"
 #include "BBTrackContainer.h"
+#include "TrackContainer.h" // For TrackContainer::TrackList typedef
 
 FxRoute::FxRoute( FxChannel * from, FxChannel * to, float amount ) :
 	m_from( from ),
@@ -72,6 +73,7 @@ FxChannel::FxChannel( int idx, Model * _parent ) :
 	m_lock(),
 	m_channelIndex( idx ),
 	m_queued( false ),
+	m_hasColor( false ),
 	m_dependenciesMet(0)
 {
 	BufferManager::clear( m_buffer, Engine::mixer()->framesPerPeriod() );
@@ -383,13 +385,13 @@ void FxMixer::moveChannelLeft( int index )
 	else if (m_lastSoloed == b) { m_lastSoloed = a; }
 
 	// go through every instrument and adjust for the channel index change
-	QVector<Track *> songTrackList = Engine::getSong()->tracks();
-	QVector<Track *> bbTrackList = Engine::getBBTrackContainer()->tracks();
+	TrackContainer::TrackList songTrackList = Engine::getSong()->tracks();
+	TrackContainer::TrackList bbTrackList = Engine::getBBTrackContainer()->tracks();
 
-	QVector<Track *> trackLists[] = {songTrackList, bbTrackList};
+	TrackContainer::TrackList trackLists[] = {songTrackList, bbTrackList};
 	for(int tl=0; tl<2; ++tl)
 	{
-		QVector<Track *> trackList = trackLists[tl];
+		TrackContainer::TrackList trackList = trackLists[tl];
 		for(int i=0; i<trackList.size(); ++i)
 		{
 			if( trackList[i]->type() == Track::InstrumentTrack )
@@ -740,6 +742,7 @@ void FxMixer::saveSettings( QDomDocument & _doc, QDomElement & _this )
 		ch->m_soloModel.saveSettings( _doc, fxch, "soloed" );
 		fxch.setAttribute( "num", i );
 		fxch.setAttribute( "name", ch->m_name );
+		if( ch->m_hasColor ) fxch.setAttribute( "color", ch->m_color.name() );
 
 		// add the channel sends
 		for( int si = 0; si < ch->m_sends.size(); ++si )
@@ -785,6 +788,11 @@ void FxMixer::loadSettings( const QDomElement & _this )
 		m_fxChannels[num]->m_muteModel.loadSettings( fxch, "muted" );
 		m_fxChannels[num]->m_soloModel.loadSettings( fxch, "soloed" );
 		m_fxChannels[num]->m_name = fxch.attribute( "name" );
+		if( fxch.hasAttribute( "color" ) )
+		{
+			m_fxChannels[num]->m_hasColor = true;
+			m_fxChannels[num]->m_color.setNamedColor( fxch.attribute( "color" ) );
+		}
 
 		m_fxChannels[num]->m_fxChain.restoreState( fxch.firstChildElement(
 			m_fxChannels[num]->m_fxChain.nodeName() ) );

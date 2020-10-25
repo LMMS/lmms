@@ -38,7 +38,7 @@ Plugin::Descriptor PLUGIN_EXPORT dynamicsprocessor_plugin_descriptor =
 {
 	STRINGIFY( PLUGIN_NAME ),
 	"Dynamics Processor",
-	QT_TRANSLATE_NOOP( "pluginBrowser",
+	QT_TRANSLATE_NOOP( "PluginBrowser",
 				"plugin for processing dynamics in a flexible way" ),
 	"Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>",
 	0x0100,
@@ -215,10 +215,10 @@ bool dynProcEffect::processAudioBuffer( sampleFrame * _buf,
 		s[0] *= outputGain;
 		s[1] *= outputGain;
 
-		out_sum += _buf[f][0]*_buf[f][0] + _buf[f][1]*_buf[f][1];
 // mix wet/dry signals
 		_buf[f][0] = d * _buf[f][0] + w * s[0];
 		_buf[f][1] = d * _buf[f][1] + w * s[1];
+		out_sum += _buf[f][0] * _buf[f][0] + _buf[f][1] * _buf[f][1];
 	}
 
 	checkGate( out_sum / _frames );

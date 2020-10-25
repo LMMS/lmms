@@ -38,12 +38,16 @@
 #include "Track.h"
 
 #include <assert.h>
+#include <cstdlib>
 
 #include <QLayout>
+#include <QLinearGradient>
 #include <QMenu>
 #include <QMouseEvent>
 #include <QPainter>
 #include <QStyleOption>
+#include <QVariant>
+#include <QClipboard>
 
 
 #include "AutomationPattern.h"
@@ -54,6 +58,7 @@
 #include "BBTrackContainer.h"
 #include "ConfigManager.h"
 #include "Clipboard.h"
+#include "ColorChooser.h"
 #include "embed.h"
 #include "Engine.h"
 #include "GuiApplication.h"
@@ -102,7 +107,9 @@ TrackContentObject::TrackContentObject( Track * track ) :
 	m_startPosition(),
 	m_length(),
 	m_mutedModel( false, this, tr( "Mute" ) ),
-	m_selectViewOnCreate( false )
+	m_selectViewOnCreate( false ),
+	m_color( 128, 128, 128 ),
+	m_useCustomClipColor( false )
 {
 	if( getTrack() )
 	{
@@ -182,34 +189,25 @@ bool TrackContentObject::comparePosition(const TrackContentObject *a, const Trac
 
 
 
-/*! \brief Copy this TrackContentObject to the clipboard.
+/*! \brief Copies the state of a TrackContentObject to another TrackContentObject
  *
- *  Copies this track content object to the clipboard.
+ *  This method copies the state of a TCO to another TCO
  */
-void TrackContentObject::copy()
+void TrackContentObject::copyStateTo( TrackContentObject *src, TrackContentObject *dst )
 {
-	Clipboard::copy( this );
-}
+	// If the node names match we copy the state
+	if( src->nodeName() == dst->nodeName() ){
+		QDomDocument doc;
+		QDomElement parent = doc.createElement( "StateCopy" );
+		src->saveState( doc, parent );
 
+		const MidiTime pos = dst->startPosition();
+		dst->restoreState( parent.firstChild().toElement() );
+		dst->movePosition( pos );
 
-
-
-/*! \brief Pastes this TrackContentObject into a track.
- *
- *  Pastes this track content object into a track.
- *
- * \param _je The journal entry to undo
- */
-void TrackContentObject::paste()
-{
-	if( Clipboard::getContent( nodeName() ) != NULL )
-	{
-		const MidiTime pos = startPosition();
-		restoreState( *( Clipboard::getContent( nodeName() ) ) );
-		movePosition( pos );
+		AutomationPattern::resolveAllIDs();
+		GuiApplication::instance()->automationEditor()->m_editor->updateAfterPatternChange();
 	}
-	AutomationPattern::resolveAllIDs();
-	GuiApplication::instance()->automationEditor()->m_editor->updateAfterPatternChange();
 }
 
 
@@ -245,7 +243,27 @@ void TrackContentObject::setStartTimeOffset( const MidiTime &startTimeOffset )
 	m_startTimeOffset = startTimeOffset;
 }
 
+// Update TCO color if it follows the track color
+void TrackContentObject::updateColor()
+{
+	if( ! m_useCustomClipColor )
+	{
+		emit trackColorChanged();
+	}
+}
 
+
+void TrackContentObject::useCustomClipColor( bool b )
+{
+	m_useCustomClipColor = b;
+	updateColor();
+}
+
+
+bool TrackContentObject::hasColor()
+{
+	return usesCustomClipColor() || getTrack()->useColor();
+}
 
 
 
@@ -282,6 +300,8 @@ TrackContentObjectView::TrackContentObjectView( TrackContentObject * tco,
 	m_textShadowColor( 0, 0, 0 ),
 	m_BBPatternBackground( 0, 0, 0 ),
 	m_gradient( true ),
+	m_mouseHotspotHand( 0, 0 ),
+	m_cursorSetYet( false ),
 	m_needsUpdate( true )
 {
 	if( s_textFloat == NULL )
@@ -293,7 +313,7 @@ TrackContentObjectView::TrackContentObjectView( TrackContentObject * tco,
 	setAttribute( Qt::WA_OpaquePaintEvent, true );
 	setAttribute( Qt::WA_DeleteOnClose, true );
 	setFocusPolicy( Qt::StrongFocus );
-	setCursor( QCursor( embed::getIconPixmap( "hand" ), 3, 3 ) );
+	setCursor( QCursor( embed::getIconPixmap( "hand" ), m_mouseHotspotHand.width(), m_mouseHotspotHand.height() ) );
 	move( 0, 0 );
 	show();
 
@@ -308,6 +328,8 @@ TrackContentObjectView::TrackContentObjectView( TrackContentObject * tco,
 			this, SLOT( updatePosition() ) );
 	connect( m_tco, SIGNAL( destroyedTCO() ), this, SLOT( close() ) );
 	setModel( m_tco );
+	connect( m_tco, SIGNAL( trackColorChanged() ), this, SLOT( update() ) );
+	connect( m_trackView->getTrackOperationsWidget(), SIGNAL( colorParented() ), this, SLOT( useTrackColor() ) );
 
 	m_trackView->getTrackContentWidget()->addTCOView( this );
 	updateLength();
@@ -342,6 +364,12 @@ TrackContentObjectView::~TrackContentObjectView()
  */
 void TrackContentObjectView::update()
 {
+	if( !m_cursorSetYet )
+	{
+		setCursor( QCursor( embed::getIconPixmap( "hand" ), m_mouseHotspotHand.width(), m_mouseHotspotHand.height() ) );
+		m_cursorSetYet = true;
+	}
+
 	if( fixedTCOs() )
 	{
 		updateLength();
@@ -422,6 +450,11 @@ void TrackContentObjectView::setBBPatternBackground( const QColor & c )
 void TrackContentObjectView::setGradient( const bool & b )
 { m_gradient = b; }
 
+void TrackContentObjectView::setMouseHotspotHand(const QSize & s)
+{
+	m_mouseHotspotHand = s;
+}
+
 // access needsUpdate member variable
 bool TrackContentObjectView::needsUpdate()
 { return m_needsUpdate; }
@@ -458,20 +491,6 @@ void TrackContentObjectView::remove()
 	// delete ourself
 	close();
 	m_tco->deleteLater();
-}
-
-
-
-
-/*! \brief Cut this trackContentObjectView from its track to the clipboard.
- *
- *  Perform the 'cut' action of the clipboard - copies the track content
- *  object to the clipboard and then removes it from the track.
- */
-void TrackContentObjectView::cut()
-{
-	m_tco->copy();
-	remove();
 }
 
 
@@ -517,6 +536,32 @@ void TrackContentObjectView::updatePosition()
 	// therefore we update the track-container
 	m_trackView->trackContainerView()->update();
 }
+
+
+
+
+void TrackContentObjectView::changeClipColor()
+{
+	// Get a color from the user
+	QColor new_color = ColorChooser( this ).withPalette( ColorChooser::Palette::Track )->getColor( m_tco->color() );
+	if( ! new_color.isValid() )
+	{ return; }
+	
+	// Use that color
+	m_tco->setColor( new_color );
+	m_tco->useCustomClipColor( true );
+	update();
+}
+
+
+
+void TrackContentObjectView::useTrackColor()
+{
+	m_tco->useCustomClipColor( false );
+	update();
+}
+
+
 
 
 
@@ -609,7 +654,7 @@ void TrackContentObjectView::leaveEvent( QEvent * e )
 {
 	if( cursor().shape() != Qt::BitmapCursor )
 	{
-		setCursor( QCursor( embed::getIconPixmap( "hand" ), 3, 3 ) );
+		setCursor( QCursor( embed::getIconPixmap( "hand" ), m_mouseHotspotHand.width(), m_mouseHotspotHand.height() ) );
 	}
 	if( e != NULL )
 	{
@@ -720,6 +765,12 @@ void TrackContentObjectView::paintTextLabel(QString const & text, QPainter & pai
  */
 void TrackContentObjectView::mousePressEvent( QMouseEvent * me )
 {
+	// Right now, active is only used on right/mid clicks actions, so we use a ternary operator
+	// to avoid the overhead of calling getClickedTCOs when it's not used
+	auto active = me->button() == Qt::LeftButton
+		? QVector<TrackContentObjectView *>()
+		: getClickedTCOs();
+
 	setInitialPos( me->pos() );
 	setInitialOffsets();
 	if( !fixedTCOs() && me->button() == Qt::LeftButton )
@@ -761,12 +812,12 @@ void TrackContentObjectView::mousePressEvent( QMouseEvent * me )
 					m_action = ResizeLeft;
 					setCursor( Qt::SizeHorCursor );
 				}
-				else if( me->x() < width() - RESIZE_GRIP_WIDTH )
+				else if( m_tco->getAutoResize() || me->x() < width() - RESIZE_GRIP_WIDTH )
 				{
 					m_action = Move;
 					setCursor( Qt::SizeAllCursor );
 				}
-				else if( !m_tco->getAutoResize() )
+				else
 				{
 					m_action = Resize;
 					setCursor( Qt::SizeHorCursor );
@@ -812,22 +863,22 @@ void TrackContentObjectView::mousePressEvent( QMouseEvent * me )
 	{
 		if( me->modifiers() & Qt::ControlModifier )
 		{
-			m_tco->toggleMute();
+			toggleMute( active );
 		}
 		else if( me->modifiers() & Qt::ShiftModifier && !fixedTCOs() )
 		{
-			remove();
+			remove( active );
 		}
 	}
 	else if( me->button() == Qt::MidButton )
 	{
 		if( me->modifiers() & Qt::ControlModifier )
 		{
-			m_tco->toggleMute();
+			toggleMute( active );
 		}
 		else if( !fixedTCOs() )
 		{
-			remove();
+			remove( active );
 		}
 	}
 }
@@ -1102,32 +1153,173 @@ void TrackContentObjectView::mouseReleaseEvent( QMouseEvent * me )
  */
 void TrackContentObjectView::contextMenuEvent( QContextMenuEvent * cme )
 {
+	// Depending on whether we right-clicked a selection or an individual TCO we will have
+	// different labels for the actions.
+	bool individualTCO = getClickedTCOs().size() <= 1;
+
 	if( cme->modifiers() )
 	{
 		return;
 	}
 
 	QMenu contextMenu( this );
+
 	if( fixedTCOs() == false )
 	{
-		contextMenu.addAction( embed::getIconPixmap( "cancel" ),
-					tr( "Delete (middle mousebutton)" ),
-						this, SLOT( remove() ) );
+		contextMenu.addAction(
+			embed::getIconPixmap( "cancel" ),
+			individualTCO
+				? tr("Delete (middle mousebutton)")
+				: tr("Delete selection (middle mousebutton)"),
+			[this](){ contextMenuAction( Remove ); } );
+
 		contextMenu.addSeparator();
-		contextMenu.addAction( embed::getIconPixmap( "edit_cut" ),
-					tr( "Cut" ), this, SLOT( cut() ) );
+
+		contextMenu.addAction(
+			embed::getIconPixmap( "edit_cut" ),
+			individualTCO
+				? tr("Cut")
+				: tr("Cut selection"),
+			[this](){ contextMenuAction( Cut ); } );
 	}
-	contextMenu.addAction( embed::getIconPixmap( "edit_copy" ),
-					tr( "Copy" ), m_tco, SLOT( copy() ) );
-	contextMenu.addAction( embed::getIconPixmap( "edit_paste" ),
-					tr( "Paste" ), m_tco, SLOT( paste() ) );
+
+	contextMenu.addAction(
+		embed::getIconPixmap( "edit_copy" ),
+		individualTCO
+			? tr("Copy")
+			: tr("Copy selection"),
+		[this](){ contextMenuAction( Copy ); } );
+
+	contextMenu.addAction(
+		embed::getIconPixmap( "edit_paste" ),
+		tr( "Paste" ),
+		[this](){ contextMenuAction( Paste ); } );
+
 	contextMenu.addSeparator();
-	contextMenu.addAction( embed::getIconPixmap( "muted" ),
-				tr( "Mute/unmute (<%1> + middle click)" ).arg(UI_CTRL_KEY),
-						m_tco, SLOT( toggleMute() ) );
+
+	contextMenu.addAction(
+		embed::getIconPixmap( "muted" ),
+		(individualTCO
+			? tr("Mute/unmute (<%1> + middle click)")
+			: tr("Mute/unmute selection (<%1> + middle click)")).arg(UI_CTRL_KEY),
+		[this](){ contextMenuAction( Mute ); } );
+
+	contextMenu.addSeparator();
+
+	contextMenu.addAction( embed::getIconPixmap( "colorize" ),
+			tr( "Set clip color" ), this, SLOT( changeClipColor() ) );
+	contextMenu.addAction( embed::getIconPixmap( "colorize" ),
+			tr( "Use track color" ), this, SLOT( useTrackColor() ) );
+
 	constructContextMenu( &contextMenu );
 
 	contextMenu.exec( QCursor::pos() );
+}
+
+// This method processes the actions from the context menu of the TCO View.
+void TrackContentObjectView::contextMenuAction( ContextMenuAction action )
+{
+	QVector<TrackContentObjectView *> active = getClickedTCOs();
+	// active will be later used for the remove, copy, cut or toggleMute methods
+
+	switch( action )
+	{
+		case Remove:
+			remove( active );
+			break;
+		case Cut:
+			cut( active );
+			break;
+		case Copy:
+			copy( active );
+			break;
+		case Paste:
+			paste();
+			break;
+		case Mute:
+			toggleMute( active );
+			break;
+	}
+}
+
+QVector<TrackContentObjectView *> TrackContentObjectView::getClickedTCOs()
+{
+	// Get a list of selected selectableObjects
+	QVector<selectableObject *> sos = gui->songEditor()->m_editor->selectedObjects();
+
+	// Convert to a list of selected TCOVs
+	QVector<TrackContentObjectView *> selection;
+	selection.reserve( sos.size() );
+	for( auto so: sos )
+	{
+		TrackContentObjectView *tcov = dynamic_cast<TrackContentObjectView *> ( so );
+		if( tcov != nullptr )
+		{
+			selection.append( tcov );
+		}
+	}
+
+	// If we clicked part of the selection, affect all selected clips. Otherwise affect the clip we clicked
+	return selection.contains(this)
+		? selection
+		: QVector<TrackContentObjectView *>( 1, this );
+}
+
+void TrackContentObjectView::remove( QVector<TrackContentObjectView *> tcovs )
+{
+	for( auto tcov: tcovs )
+	{
+		// No need to check if it's nullptr because we check when building the QVector
+		tcov->remove();
+	}
+}
+
+void TrackContentObjectView::copy( QVector<TrackContentObjectView *> tcovs )
+{
+	// For copyStringPair()
+	using namespace Clipboard;
+
+	// Write the TCOs to a DataFile for copying
+	DataFile dataFile = createTCODataFiles( tcovs );
+
+	// Copy the TCO type as a key and the TCO data file to the clipboard
+	copyStringPair( QString( "tco_%1" ).arg( m_tco->getTrack()->type() ),
+		dataFile.toString() );
+}
+
+void TrackContentObjectView::cut( QVector<TrackContentObjectView *> tcovs )
+{
+	// Copy the selected TCOs
+	copy( tcovs );
+
+	// Now that the TCOs are copied we can delete them, since we are cutting
+	remove( tcovs );
+}
+
+void TrackContentObjectView::paste()
+{
+	// For getMimeData()
+	using namespace Clipboard;
+
+	// If possible, paste the selection on the MidiTime of the selected Track and remove it
+	MidiTime tcoPos = MidiTime( m_tco->startPosition() );
+
+	TrackContentWidget *tcw = getTrackView()->getTrackContentWidget();
+
+	if( tcw->pasteSelection( tcoPos, getMimeData() ) )
+	{
+		// If we succeed on the paste we delete the TCO we pasted on
+		remove();
+	}
+}
+
+void TrackContentObjectView::toggleMute( QVector<TrackContentObjectView *> tcovs )
+{
+	for( auto tcov: tcovs )
+	{
+		// No need to check for nullptr because we check while building the tcovs QVector
+		tcov->getTrackContentObject()->toggleMute();
+	}
 }
 
 
@@ -1220,6 +1412,51 @@ MidiTime TrackContentObjectView::draggedTCOPos( QMouseEvent * me )
 	}
 	return newPos;
 }
+
+
+// Return the color that the TCO's background should be
+QColor TrackContentObjectView::getColorForDisplay( QColor defaultColor )
+{
+	// Get the pure TCO color
+	auto tcoColor = m_tco->hasColor()
+					? m_tco->usesCustomClipColor()
+						? m_tco->color()
+						: m_tco->getTrack()->color()
+					: defaultColor;
+
+	// Set variables
+	QColor c, mutedCustomColor;
+	bool muted = m_tco->getTrack()->isMuted() || m_tco->isMuted();
+	mutedCustomColor = tcoColor;
+	mutedCustomColor.setHsv( mutedCustomColor.hsvHue(), mutedCustomColor.hsvSaturation() / 4, mutedCustomColor.value() );
+
+	// Change the pure color by state: selected, muted, colored, normal
+	if( isSelected() )
+	{
+		c = m_tco->hasColor()
+			? ( muted
+				? mutedCustomColor.darker( 350 )
+				: tcoColor.darker( 150 ) )
+			: selectedColor();
+	}
+	else
+	{
+		if( muted )
+		{
+			c = m_tco->hasColor()
+				? mutedCustomColor.darker( 250 )
+				: mutedBackgroundColor();
+		}
+		else
+		{
+			c = tcoColor;
+		}
+	}
+	
+	// Return color to caller
+	return c;
+}
+
 
 
 
@@ -1505,9 +1742,22 @@ bool TrackContentWidget::canPasteSelection( MidiTime tcoPos, const QDropEvent* d
 {
 	const QMimeData * mimeData = de->mimeData();
 
+	// If the source of the DropEvent is the current instance of LMMS we don't allow pasting in the same bar
+	// if it's another instance of LMMS we allow it
+	return de->source()
+		? canPasteSelection( tcoPos, mimeData )
+		: canPasteSelection( tcoPos, mimeData, true );
+}
+
+// Overloaded method to make it possible to call this method without a Drag&Drop event
+bool TrackContentWidget::canPasteSelection( MidiTime tcoPos, const QMimeData* md , bool allowSameBar )
+{
+	// For decodeKey() and decodeValue()
+	using namespace Clipboard;
+
 	Track * t = getTrack();
-	QString type = StringPairDrag::decodeMimeKey( mimeData );
-	QString value = StringPairDrag::decodeMimeValue( mimeData );
+	QString type = decodeKey( md );
+	QString value = decodeValue( md );
 
 	// We can only paste into tracks of the same type
 	if( type != ( "tco_" + QString::number( t->type() ) ) ||
@@ -1533,9 +1783,9 @@ bool TrackContentWidget::canPasteSelection( MidiTime tcoPos, const QDropEvent* d
 	const TrackContainer::TrackList tracks = t->trackContainer()->tracks();
 	const int currentTrackIndex = tracks.indexOf( t );
 
-	// Don't paste if we're on the same bar
+	// Don't paste if we're on the same bar and allowSameBar is false
 	auto sourceTrackContainerId = metadata.attributeNode( "trackContainerId" ).value().toUInt();
-	if( de->source() && sourceTrackContainerId == t->trackContainer()->id() &&
+	if( !allowSameBar && sourceTrackContainerId == t->trackContainer()->id() &&
 			tcoPos == grabbedTCOBar && currentTrackIndex == initialTrackIndex )
 	{
 		return false;
@@ -1577,13 +1827,31 @@ bool TrackContentWidget::canPasteSelection( MidiTime tcoPos, const QDropEvent* d
  */
 bool TrackContentWidget::pasteSelection( MidiTime tcoPos, QDropEvent * de )
 {
+	const QMimeData * mimeData = de->mimeData();
+
 	if( canPasteSelection( tcoPos, de ) == false )
 	{
 		return false;
 	}
 
-	QString type = StringPairDrag::decodeKey( de );
-	QString value = StringPairDrag::decodeValue( de );
+	// We set skipSafetyCheck to true because we already called canPasteSelection
+	return pasteSelection( tcoPos, mimeData, true );
+}
+
+// Overloaded method so we can call it without a Drag&Drop event
+bool TrackContentWidget::pasteSelection( MidiTime tcoPos, const QMimeData * md, bool skipSafetyCheck )
+{
+	// For decodeKey() and decodeValue()
+	using namespace Clipboard;
+
+	// When canPasteSelection was already called before, skipSafetyCheck will skip this
+	if( !skipSafetyCheck && canPasteSelection( tcoPos, md ) == false )
+	{
+		return false;
+	}
+
+	QString type = decodeKey( md );
+	QString value = decodeValue( md );
 
 	getTrack()->addJournalCheckPoint();
 
@@ -1649,13 +1917,6 @@ bool TrackContentWidget::pasteSelection( MidiTime tcoPos, QDropEvent * de )
 		if( wasSelection )
 		{
 			tco->selectViewOnCreate( true );
-		}
-
-		//check tco name, if the same as source track name dont copy
-		QString sourceTrackName = outerTCOElement.attributeNode( "trackName" ).value();
-		if( tco->name() == sourceTrackName )
-		{
-			tco->setName( "" );
 		}
 	}
 
@@ -1775,6 +2036,47 @@ MidiTime TrackContentWidget::endPosition( const MidiTime & posStart )
 	return posStart + static_cast<int>( w * MidiTime::ticksPerBar() / ppb );
 }
 
+void TrackContentWidget::contextMenuEvent( QContextMenuEvent * cme )
+{
+	// For hasFormat(), MimeType enum class and getMimeData()
+	using namespace Clipboard;
+
+	if( cme->modifiers() )
+	{
+		return;
+	}
+
+	// If we don't have TCO data in the clipboard there's no need to create this menu
+	// since "paste" is the only action at the moment.
+	if( ! hasFormat( MimeType::StringPair )  )
+	{
+		return;
+	}
+
+	QMenu contextMenu( this );
+	QAction *pasteA = contextMenu.addAction( embed::getIconPixmap( "edit_paste" ),
+					tr( "Paste" ), [this, cme](){ contextMenuAction( cme, Paste ); } );
+	// If we can't paste in the current TCW for some reason, disable the action so the user knows
+	pasteA->setEnabled( canPasteSelection( getPosition( cme->x() ), getMimeData() ) ? true : false );
+
+	contextMenu.exec( QCursor::pos() );
+}
+
+void TrackContentWidget::contextMenuAction( QContextMenuEvent * cme, ContextMenuAction action )
+{
+	// For getMimeData()
+	using namespace Clipboard;
+
+	switch( action )
+	{
+		case Paste:
+		// Paste the selection on the MidiTime of the context menu event
+		MidiTime tcoPos = getPosition( cme->x() );
+
+		pasteSelection( tcoPos, getMimeData() );
+		break;
+	}
+}
 
 
 
@@ -1815,10 +2117,6 @@ void TrackContentWidget::setEmbossColor( const QBrush & c )
 // ===========================================================================
 // trackOperationsWidget
 // ===========================================================================
-
-
-QPixmap * TrackOperationsWidget::s_grip = NULL;     /*!< grip pixmap */
-
 
 /*! \brief Create a new trackOperationsWidget
  *
@@ -1880,6 +2178,10 @@ TrackOperationsWidget::TrackOperationsWidget( TrackView * parent ) :
 			m_trackView->trackContainerView(),
 				SLOT( deleteTrackView( TrackView * ) ),
 							Qt::QueuedConnection );
+	
+	connect( m_trackView->getTrack()->getMutedModel(), SIGNAL( dataChanged() ),
+			this, SLOT( update() ) );
+	
 }
 
 
@@ -1942,21 +2244,23 @@ void TrackOperationsWidget::mousePressEvent( QMouseEvent * me )
 void TrackOperationsWidget::paintEvent( QPaintEvent * pe )
 {
 	QPainter p( this );
+	
 	p.fillRect( rect(), palette().brush(QPalette::Background) );
+	
+	if( m_trackView->getTrack()->useColor() && ! m_trackView->getTrack()->getMutedModel()->value() ) 
+	{
+		QRect coloredRect( 0, 0, 10, m_trackView->getTrack()->getHeight() );
+		
+		p.fillRect( coloredRect, m_trackView->getTrack()->color() );
+	}
 
 	if( m_trackView->isMovingTrack() == false )
 	{
-		s_grip = new QPixmap( embed::getIconPixmap(
-							"track_op_grip" ) );
-
-		p.drawPixmap( 2, 2, *s_grip );
+		p.drawPixmap( 2, 2, embed::getIconPixmap("track_op_grip"));
 	}
 	else
 	{
-		s_grip = new QPixmap( embed::getIconPixmap(
-							"track_op_grip_c" ) );
-
-		p.drawPixmap( 2, 2, *s_grip );
+		p.drawPixmap( 2, 2, embed::getIconPixmap("track_op_grip_c"));
 	}
 }
 
@@ -2003,7 +2307,41 @@ void TrackOperationsWidget::removeTrack()
 	emit trackRemovalScheduled( m_trackView );
 }
 
+void TrackOperationsWidget::changeTrackColor()
+{
+	QColor new_color = ColorChooser( this ).withPalette( ColorChooser::Palette::Track )-> \
+		getColor( m_trackView->getTrack()->color() );
+	
+	if( ! new_color.isValid() )
+	{ return; }
 
+	emit colorChanged( new_color );
+	
+	Engine::getSong()->setModified();
+	update();
+}
+
+void TrackOperationsWidget::resetTrackColor()
+{
+	emit colorReset();
+	Engine::getSong()->setModified();
+	update();
+}
+
+void TrackOperationsWidget::randomTrackColor()
+{
+	QColor buffer = ColorChooser::getPalette( ColorChooser::Palette::Track )[ rand() % 48 ];
+
+	emit colorChanged( buffer );
+	Engine::getSong()->setModified();
+	update();
+}
+
+void TrackOperationsWidget::useTrackColor()
+{
+	emit colorParented();
+	Engine::getSong()->setModified();
+}
 
 
 /*! \brief Update the trackOperationsWidget context menu
@@ -2044,6 +2382,17 @@ void TrackOperationsWidget::updateMenu()
 		toMenu->addAction( tr( "Turn all recording on" ), this, SLOT( recordingOn() ) );
 		toMenu->addAction( tr( "Turn all recording off" ), this, SLOT( recordingOff() ) );
 	}
+	
+	toMenu->addSeparator();
+	toMenu->addAction( embed::getIconPixmap( "colorize" ),
+						tr( "Change color" ), this, SLOT( changeTrackColor() ) );
+	toMenu->addAction( embed::getIconPixmap( "colorize" ),
+						tr( "Reset color to default" ), this, SLOT( resetTrackColor() ) );
+	toMenu->addAction( embed::getIconPixmap( "colorize" ),
+						tr( "Set random color" ), this, SLOT( randomTrackColor() ) );
+	toMenu->addSeparator();
+	toMenu->addAction( embed::getIconPixmap( "colorize" ),
+						tr( "Clear clip colors" ), this, SLOT( useTrackColor() ) );
 }
 
 
@@ -2099,7 +2448,9 @@ Track::Track( TrackTypes type, TrackContainer * tc ) :
 	m_soloModel( false, this, tr( "Solo" ) ),
 					/*!< For controlling track soloing */
 	m_simpleSerializingMode( false ),
-	m_trackContentObjects()         /*!< The track content objects (segments) */
+	m_trackContentObjects(),        /*!< The track content objects (segments) */
+	m_color( 0, 0, 0 ),
+	m_hasColor( false )
 {
 	m_trackContainer->addTrack( this );
 	m_height = -1;
@@ -2237,12 +2588,19 @@ void Track::saveSettings( QDomDocument & doc, QDomElement & element )
 	element.setAttribute( "name", name() );
 	m_mutedModel.saveSettings( doc, element, "muted" );
 	m_soloModel.saveSettings( doc, element, "solo" );
+	// Save the mutedBeforeSolo value so we can recover the muted state if any solo was active (issue 5562)
+	element.setAttribute( "mutedBeforeSolo", int(m_mutedBeforeSolo) );
 
 	if( m_height >= MINIMAL_TRACK_HEIGHT )
 	{
 		element.setAttribute( "trackheight", m_height );
 	}
-
+	
+	if( m_hasColor )
+	{
+		element.setAttribute( "color", m_color.name() );
+	}
+	
 	QDomElement tsDe = doc.createElement( nodeName() );
 	// let actual track (InstrumentTrack, bbTrack, sampleTrack etc.) save
 	// its settings
@@ -2291,6 +2649,15 @@ void Track::loadSettings( const QDomElement & element )
 
 	m_mutedModel.loadSettings( element, "muted" );
 	m_soloModel.loadSettings( element, "solo" );
+	// Get the mutedBeforeSolo value so we can recover the muted state if any solo was active.
+	// Older project files that didn't have this attribute will set the value to false (issue 5562)
+	m_mutedBeforeSolo = QVariant( element.attribute( "mutedBeforeSolo", "0" ) ).toBool();
+
+	if( element.hasAttribute( "color" ) )
+	{
+		m_color.setNamedColor( element.attribute( "color" ) );
+		m_hasColor = true;
+	}
 
 	if( m_simpleSerializingMode )
 	{
@@ -2630,6 +2997,9 @@ void Track::toggleSolo()
 	}
 
 	const bool solo = m_soloModel.value();
+	// Should we use the new behavior of solo or the older/legacy one?
+	const bool soloLegacyBehavior = ConfigManager::inst()->value("app", "sololegacybehavior", "0").toInt();
+
 	for( TrackContainer::TrackList::const_iterator it = tl.begin();
 							it != tl.end(); ++it )
 	{
@@ -2640,7 +3010,15 @@ void Track::toggleSolo()
 			{
 				( *it )->m_mutedBeforeSolo = ( *it )->isMuted();
 			}
-			( *it )->setMuted( *it == this ? false : true );
+			// Don't mute AutomationTracks (keep their original state) unless we are on the sololegacybehavior mode
+			if( *it == this )
+			{
+				( *it )->setMuted( false );
+			}
+			else if( soloLegacyBehavior || ( *it )->type() != AutomationTrack )
+			{
+				( *it )->setMuted( true );
+			}
 			if( *it != this )
 			{
 				( *it )->m_soloModel.setValue( false );
@@ -2648,12 +3026,34 @@ void Track::toggleSolo()
 		}
 		else if( !soloBefore )
 		{
-			( *it )->setMuted( ( *it )->m_mutedBeforeSolo );
+			// Unless we are on the sololegacybehavior mode, only restores the
+			// mute state if the track isn't an Automation Track
+			if( soloLegacyBehavior || ( *it )->type() != AutomationTrack )
+			{
+				( *it )->setMuted( ( *it )->m_mutedBeforeSolo );
+			}
 		}
 	}
 }
 
+void Track::trackColorChanged( QColor & c )
+{
+	for (int i = 0; i < numOfTCOs(); i++)
+	{
+		m_trackContentObjects[i]->updateColor();
+	}
+	m_hasColor = true;
+	m_color = c;
+}
 
+void Track::trackColorReset()
+{
+	for (int i = 0; i < numOfTCOs(); i++)
+	{
+		m_trackContentObjects[i]->updateColor();
+	}
+	m_hasColor = false;
+}
 
 
 BoolModel *Track::getMutedModel()
@@ -2724,6 +3124,13 @@ TrackView::TrackView( Track * track, TrackContainerView * tcv ) :
 
 	connect( &m_track->m_soloModel, SIGNAL( dataChanged() ),
 			m_track, SLOT( toggleSolo() ), Qt::DirectConnection );
+			
+	connect( &m_trackOperationsWidget, SIGNAL( colorChanged( QColor & ) ),
+			m_track, SLOT( trackColorChanged( QColor & ) ) );
+			
+	connect( &m_trackOperationsWidget, SIGNAL( colorReset() ),
+			m_track, SLOT( trackColorReset() ) );
+			
 	// create views for already existing TCOs
 	for( Track::tcoVector::iterator it =
 					m_track->m_trackContentObjects.begin();

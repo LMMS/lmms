@@ -1,8 +1,3 @@
-set(CMAKE_C_FLAGS "")
-set(CMAKE_CXX_FLAGS "")
-set(CMAKE_C_FLAGS_DEBUG "")
-set(CMAKE_CXX_FLAGS_DEBUG "")
-
 IF(LMMS_BUILD_LINUX AND WANT_VST)
 	set(BUILD_SHARED_LIBS OFF)
 	add_subdirectory(qt5-x11embed)
@@ -21,7 +16,7 @@ FILE(WRITE ${CMAKE_BINARY_DIR}/src/ringbuffer_export.h
 # Enable MLOCK support for ringbuffer if available
 INCLUDE(CheckIncludeFiles)
 CHECK_INCLUDE_FILES(sys/mman.h HAVE_SYS_MMAN)
-IF(HAVE_SYS_MMAN)
+IF(HAVE_SYS_MMAN AND NOT CMAKE_SYSTEM_NAME MATCHES "Haiku")
     SET(USE_MLOCK ON)
 ELSE()
     SET(USE_MLOCK OFF)

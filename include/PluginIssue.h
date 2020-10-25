@@ -36,6 +36,8 @@ enum PluginIssueType
 	unknownPortType,
 	tooManyInputChannels,
 	tooManyOutputChannels,
+	tooManyMidiInputChannels,
+	tooManyMidiOutputChannels,
 	noOutputChannel,
 	portHasNoDef,
 	portHasNoMin,

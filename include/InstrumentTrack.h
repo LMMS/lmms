@@ -214,6 +214,12 @@ public:
 
 	void setPreviewMode( const bool );
 
+	bool isPreviewMode() const
+	{
+		return m_previewMode;
+	}
+
+	void autoAssignMidiDevice( bool );
 
 signals:
 	void instrumentChanged();
@@ -229,6 +235,9 @@ protected:
 	{
 		return "instrumenttrack";
 	}
+
+	// get the name of the instrument in the saved data
+	QString getSavedInstrumentName(const QDomElement & thisElement) const;
 
 
 protected slots:
@@ -252,6 +261,9 @@ private:
 	bool m_silentBuffersProcessed;
 
 	bool m_previewMode;
+
+	bool m_hasAutoMidiDev;
+	static InstrumentTrack *s_autoAssignedTrack;
 
 	IntModel m_baseNoteModel;
 

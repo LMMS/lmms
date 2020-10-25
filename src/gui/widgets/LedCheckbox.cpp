@@ -27,6 +27,7 @@
 #include <QPainter>
 
 #include "LedCheckbox.h"
+#include "DeprecationHelper.h"
 #include "embed.h"
 #include "gui_templates.h"
 
@@ -120,7 +121,9 @@ void LedCheckBox::initUi( LedColors _color )
 
 void LedCheckBox::onTextUpdated()
 {
-	setFixedSize( m_ledOffPixmap->width() + 5 + QFontMetrics( font() ).width( text() ), m_ledOffPixmap->height() );
+	setFixedSize(m_ledOffPixmap->width() + 5 + horizontalAdvance(QFontMetrics(font()),
+				text()),
+				m_ledOffPixmap->height());
 }
 
 

@@ -22,6 +22,7 @@
  * Boston, MA 02110-1301 USA.
  *
  */
+#include "InstrumentTrack.h"
 
 #include <QDir>
 #include <QQueue>
@@ -37,7 +38,6 @@
 #include <QPainter>
 
 #include "FileDialog.h"
-#include "InstrumentTrack.h"
 #include "AutomationPattern.h"
 #include "BBTrack.h"
 #include "CaptionMenu.h"
@@ -76,11 +76,6 @@
 #include "TrackLabelButton.h"
 
 
-const char * volume_help = QT_TRANSLATE_NOOP( "InstrumentTrack",
-						"With this knob you can set "
-						"the volume of the opened "
-						"channel.");
-
 const int INSTRUMENT_WIDTH	= 254;
 const int INSTRUMENT_HEIGHT	= INSTRUMENT_WIDTH;
 const int PIANO_HEIGHT		= 80;
@@ -97,6 +92,7 @@ InstrumentTrack::InstrumentTrack( TrackContainer* tc ) :
 	m_sustainPedalPressed( false ),
 	m_silentBuffersProcessed( false ),
 	m_previewMode( false ),
+	m_hasAutoMidiDev( false ),
 	m_baseNoteModel( 0, 0, KeysPerOctave * NumOctaves - 1, this,
 							tr( "Base note" ) ),
 	m_volumeModel( DefaultVolume, MinVolume, MaxVolume, 0.1f, this, tr( "Volume" ) ),
@@ -149,6 +145,13 @@ int InstrumentTrack::baseNote() const
 
 InstrumentTrack::~InstrumentTrack()
 {
+	// De-assign midi device
+	if (m_hasAutoMidiDev)
+	{
+		autoAssignMidiDevice(false);
+		s_autoAssignedTrack = NULL;
+	}
+
 	// kill all running notes and the iph
 	silenceAllNotes( true );
 
@@ -393,6 +396,12 @@ void InstrumentTrack::processOutEvent( const MidiEvent& event, const MidiTime& t
 	const MidiEvent transposedEvent = applyMasterKey( event );
 	const int key = transposedEvent.key();
 
+	// If we have a selected output midi channel between 1-16, we will use that channel to handle the midi event.
+	// But if our selected midi output channel is 0 ("--"), we will use the event channel instead.
+	const auto handleEventOutputChannel = midiPort()->outputChannel() == 0
+		? event.channel()
+		: midiPort()->realOutputChannel();
+
 	switch( event.type() )
 	{
 		case MidiNoteOn:
@@ -403,10 +412,10 @@ void InstrumentTrack::processOutEvent( const MidiEvent& event, const MidiTime& t
 			{
 				if( m_runningMidiNotes[key] > 0 )
 				{
-					m_instrument->handleMidiEvent( MidiEvent( MidiNoteOff, midiPort()->realOutputChannel(), key, 0 ), time, offset );
+					m_instrument->handleMidiEvent( MidiEvent( MidiNoteOff, handleEventOutputChannel, key, 0 ), time, offset );
 				}
 				++m_runningMidiNotes[key];
-				m_instrument->handleMidiEvent( MidiEvent( MidiNoteOn, midiPort()->realOutputChannel(), key, event.velocity() ), time, offset );
+				m_instrument->handleMidiEvent( MidiEvent( MidiNoteOn, handleEventOutputChannel, key, event.velocity() ), time, offset );
 
 			}
 			m_midiNotesMutex.unlock();
@@ -419,7 +428,7 @@ void InstrumentTrack::processOutEvent( const MidiEvent& event, const MidiTime& t
 
 			if( key >= 0 && key < NumKeys && --m_runningMidiNotes[key] <= 0 )
 			{
-				m_instrument->handleMidiEvent( MidiEvent( MidiNoteOff, midiPort()->realOutputChannel(), key, 0 ), time, offset );
+				m_instrument->handleMidiEvent( MidiEvent( MidiNoteOff, handleEventOutputChannel, key, 0 ), time, offset );
 			}
 			m_midiNotesMutex.unlock();
 			emit endNote();
@@ -521,17 +530,6 @@ void InstrumentTrack::deleteNotePluginData( NotePlayHandle* n )
 
 void InstrumentTrack::setName( const QString & _new_name )
 {
-	// when changing name of track, also change name of those patterns,
-	// which have the same name as the instrument-track
-	for( int i = 0; i < numOfTCOs(); ++i )
-	{
-		Pattern* p = dynamic_cast<Pattern*>( getTCO( i ) );
-		if( ( p != NULL && p->name() == name() ) || p->name() == "" )
-		{
-			p->setName( _new_name );
-		}
-	}
-
 	Track::setName( _new_name );
 	m_midiPort.setName( name() );
 	m_audioPort.setName( name() );
@@ -760,7 +758,13 @@ void InstrumentTrack::saveTrackSpecificSettings( QDomDocument& doc, QDomElement 
 	if (Engine::getSong()->isSavingProject()
 		&& !Engine::getSong()->getSaveOptions().discardMIDIConnections.value())
 	{
+		// Don't save auto assigned midi device connection
+		bool hasAuto = m_hasAutoMidiDev;
+		autoAssignMidiDevice(false);
+
 		m_midiPort.saveState( doc, thisElement );
+
+		autoAssignMidiDevice(hasAuto);
 	}
 
 	m_audioPort.effects()->saveState( doc, thisElement );
@@ -771,7 +775,11 @@ void InstrumentTrack::saveTrackSpecificSettings( QDomDocument& doc, QDomElement 
 
 void InstrumentTrack::loadTrackSpecificSettings( const QDomElement & thisElement )
 {
-	silenceAllNotes( true );
+	// don't delete instrument in preview mode if it's the same
+	// we can't do this for other situations due to some issues with linked models
+	bool reuseInstrument = m_previewMode && m_instrument && m_instrument->nodeName() == getSavedInstrumentName(thisElement);
+	// remove the InstrumentPlayHandle if and only if we need to delete the instrument
+	silenceAllNotes(!reuseInstrument);
 
 	lock();
 
@@ -815,33 +823,39 @@ void InstrumentTrack::loadTrackSpecificSettings( const QDomElement & thisElement
 			{
 				m_audioPort.effects()->restoreState( node.toElement() );
 			}
-			else if( node.nodeName() == "instrument" )
+			else if(node.nodeName() == "instrument")
 			{
 				typedef Plugin::Descriptor::SubPluginFeatures::Key PluginKey;
-				PluginKey key( node.toElement().elementsByTagName( "key" ).item( 0 ).toElement() );
+				PluginKey key(node.toElement().elementsByTagName("key").item(0).toElement());
 
-				delete m_instrument;
-				m_instrument = NULL;
-				m_instrument = Instrument::instantiate(
-					node.toElement().attribute( "name" ), this, &key);
-				m_instrument->restoreState( node.firstChildElement() );
-
-				emit instrumentChanged();
+				if (reuseInstrument)
+				{
+					m_instrument->restoreState(node.firstChildElement());
+				}
+				else
+				{
+					delete m_instrument;
+					m_instrument = NULL;
+					m_instrument = Instrument::instantiate(
+						node.toElement().attribute("name"), this, &key);
+					m_instrument->restoreState(node.firstChildElement());
+					emit instrumentChanged();
+				}
 			}
 			// compat code - if node-name doesn't match any known
 			// one, we assume that it is an instrument-plugin
 			// which we'll try to load
-			else if( AutomationPattern::classNodeName() != node.nodeName() &&
+			else if(AutomationPattern::classNodeName() != node.nodeName() &&
 					ControllerConnection::classNodeName() != node.nodeName() &&
-					!node.toElement().hasAttribute( "id" ) )
+					!node.toElement().hasAttribute( "id" ))
 			{
 				delete m_instrument;
 				m_instrument = NULL;
 				m_instrument = Instrument::instantiate(
 					node.nodeName(), this, nullptr, true);
-				if( m_instrument->nodeName() == node.nodeName() )
+				if (m_instrument->nodeName() == node.nodeName())
 				{
-					m_instrument->restoreState( node.toElement() );
+					m_instrument->restoreState(node.toElement());
 				}
 				emit instrumentChanged();
 			}
@@ -858,6 +872,19 @@ void InstrumentTrack::loadTrackSpecificSettings( const QDomElement & thisElement
 void InstrumentTrack::setPreviewMode( const bool value )
 {
 	m_previewMode = value;
+}
+
+
+
+
+QString InstrumentTrack::getSavedInstrumentName(const QDomElement &thisElement) const
+{
+	QDomElement elem = thisElement.firstChildElement("instrument");
+	if (!elem.isNull())
+	{
+		return elem.attribute("name");
+	}
+	return "";
 }
 
 
@@ -884,6 +911,38 @@ Instrument * InstrumentTrack::loadInstrument(const QString & _plugin_name,
 }
 
 
+
+InstrumentTrack *InstrumentTrack::s_autoAssignedTrack = NULL;
+
+/*! \brief Automatically assign a midi controller to this track, based on the midiautoassign setting
+ *
+ *  \param assign set to true to connect the midi device, set to false to disconnect
+ */
+void InstrumentTrack::autoAssignMidiDevice(bool assign)
+{
+	if (assign)
+	{
+		if (s_autoAssignedTrack)
+		{
+			s_autoAssignedTrack->autoAssignMidiDevice(false);
+		}
+		s_autoAssignedTrack = this;
+	}
+
+	const QString &device = ConfigManager::inst()->value("midi", "midiautoassign");
+	if ( Engine::mixer()->midiClient()->isRaw() && device != "none" )
+	{
+		m_midiPort.setReadable( assign );
+		return;
+	}
+
+	// Check if the device exists
+	if ( Engine::mixer()->midiClient()->readablePorts().indexOf(device) >= 0 )
+	{
+		m_midiPort.subscribeReadablePort(device, assign);
+		m_hasAutoMidiDev = assign;
+	}
+}
 
 
 

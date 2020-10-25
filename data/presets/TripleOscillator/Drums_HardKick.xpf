@@ -94,7 +94,7 @@
             <port01 link="1" data="1"/>
             <port02 link="1" data="0"/>
             <port10 data="0"/>
-            <port11 data="1"/>
+            <port11 data="0.5"/>
             <port12 data="0"/>
           </ladspacontrols>
           <key>

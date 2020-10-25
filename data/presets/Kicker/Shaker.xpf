@@ -8,7 +8,7 @@
         <kicker click="0.95" endnote="1" version="1" decay="2000" noise="0.65" slope="1" dist="7.4" env="0.737" startnote="1" startfreq="150" endfreq="132" gain="1"/>
       </instrument>
       <eldata fres="0.5" ftype="1" fcut="3085" fwet="1">
-        <elvol lspd_denominator="4" sustain="0.5" userwavefile="" pdel="0" dec="0.5" lamt="0" syncmode="0" latt="0" rel="0.1" amt="0" x100="0" att="0" lpdel="0" hold="0.5" lshp="0" lspd="0.1" ctlenvamt="0" lspd_numerator="4"/>
+        <elvol lspd_denominator="4" sustain="1" userwavefile="" pdel="0" dec="0" lamt="0" syncmode="0" latt="0" rel="0.05" amt="1" x100="0" att="0.05" lpdel="0" hold="0" lshp="0" lspd="0.1" ctlenvamt="0" lspd_numerator="4"/>
         <elcut lspd_denominator="4" sustain="0.5" userwavefile="" pdel="0" dec="0.5" lamt="0" syncmode="0" latt="0" rel="0.1" amt="0" x100="0" att="0" lpdel="0" hold="0.5" lshp="0" lspd="0.1" ctlenvamt="0" lspd_numerator="4"/>
         <elres lspd_denominator="4" sustain="0.5" userwavefile="" pdel="0" dec="0.5" lamt="0" syncmode="0" latt="0" rel="0.1" amt="0" x100="0" att="0" lpdel="0" hold="0.5" lshp="0" lspd="0.1" ctlenvamt="0" lspd_numerator="4"/>
       </eldata>
