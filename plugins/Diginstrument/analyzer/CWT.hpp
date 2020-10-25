@@ -33,12 +33,13 @@ private:
     std::string wavelet;
     const std::string type = "pow";
     double waveletParameter;
-    double dt = 1.0/44100.0;
+    double dt;
     unsigned int level;
-    const unsigned int octaves = 11;
     unsigned int signalLength;
 
 public:
+    static constexpr unsigned int octaves = 11;
+
     class TimeInstance
     {
       public:
@@ -101,6 +102,12 @@ public:
         }
         cwt_free(wt);
         return res;
+    }
+
+    //TODO: not actually correct; only works if the parameter = 6
+    static double calculateMagnitudeNormalizationConstant(double waveletParameter)
+    {
+        return pow((4*M_PI) / (waveletParameter+sqrt(waveletParameter*waveletParameter+2)), 2);
     }
 
     CWT(const std::string &name, const double &parameter, unsigned int level, unsigned int sampleRate)

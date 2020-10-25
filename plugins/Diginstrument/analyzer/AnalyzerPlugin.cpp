@@ -68,9 +68,7 @@ std::string AnalyzerPlugin::setAudioFile(const QString &_audio_file, vector<pair
 	//tmp:visualization
 	visualization = new Diginstrument::InstrumentVisualizationWindow(this);
 
-	//TMP: incomplete analysis
-	auto partials = subtractiveAnalysis(sample, m_sampleBuffer.sampleRate());
-	analyze(sample, coordinates);
+	analyze(sample, subtractiveAnalysis(sample, m_sampleBuffer.sampleRate()), coordinates);
 
 	//tmp: show raw visualization
 	visualization->show();
@@ -125,8 +123,9 @@ void AnalyzerPlugin::writeInstrumentToFile(std::string filename)
 	}
 }
 
-void AnalyzerPlugin::analyze(const std::vector<double> & signal, vector<pair<string, double>> coordinates)
+void AnalyzerPlugin::analyze(const std::vector<double> & signal, std::vector<std::vector<Diginstrument::Component<double>>> partials, vector<pair<string, double>> coordinates)
 {
+	//do CWT
 	const int level = 18;
 	CWT transform("morlet", 6, level, m_sampleBuffer.sampleRate());
 	transform(signal);
@@ -150,30 +149,33 @@ void AnalyzerPlugin::analyze(const std::vector<double> & signal, vector<pair<str
 	QSurfaceDataArray * data = new QSurfaceDataArray;
 	data->reserve(m_sampleBuffer.frames()/transformStep);
 
-	//new loop
+	//for each instance in time
 	for (int i = 0; i<m_sampleBuffer.frames(); i+=transformStep)
 	{
+		//get the coefficients in time
 		const auto momentarySpectrum = transform[i];
 		std::vector<std::pair<double, double>> rawSpectrum;
+		//TODO: concretize number of octaves = 11
 		rawSpectrum.reserve(level * 11);
-		//tmp
+		//tmp: visualization
 		QSurfaceDataRow *dataRow = new QSurfaceDataRow(level * 11);
-		int index = 0;
+		int dataRowIndex = 0;
 
-		//process the complex result of the CWT into a magnitude spectrum
+		//process the complex coefficients of the momentary CWT into a magnitude spectrum
 		for (int j = momentarySpectrum.size() - 1; j >= 0; j--)
 		{
 			const auto & timeInstance = momentarySpectrum[j];
-			//1/period
 			const double frequency = 1.0 / (timeInstance.period);
-			const double mag = std::abs(timeInstance.value);
+			const double rawMag = std::abs(timeInstance.value);
+			//TODO: is phase needed in residual?
 			//const double phase = std::ang(timeInstance.value);
-			//tmp: amp
-			const double amp = (mag / (sqrt(timeInstance.scale*m_sampleBuffer.sampleRate()))) * 1.067158515;
-			rawSpectrum.emplace_back(frequency, amp);
+			//normalize magnitude
+			//TODO: source of constant?
+			const double mag = (rawMag / (sqrt(timeInstance.scale*m_sampleBuffer.sampleRate()))) * 1.067158515;
+			rawSpectrum.emplace_back(frequency, mag);
 			///tmp: visualization
-			(*dataRow)[index].setPosition(QVector3D(frequency, amp, (double)i/(double)m_sampleBuffer.sampleRate()));
-			index++;
+			(*dataRow)[dataRowIndex].setPosition(QVector3D(frequency, mag, (double)i/(double)m_sampleBuffer.sampleRate()));
+			dataRowIndex++;
 		}
 
 		*data << dataRow;
@@ -183,7 +185,8 @@ void AnalyzerPlugin::analyze(const std::vector<double> & signal, vector<pair<str
 		//seek critical points with discrete differential, then approximate hidden/overlapping peaks and filter to only include maxima
 		//const auto peaks = Diginstrument::PeakApproximation(Extrema::Differential::intermixed(rawSpectrum.begin(), rawSpectrum.end()));
 		//tmp: trying to fix weird interpolation problem, just use maxima for now, as hidden peaks are still primitive
-		const auto peaks = Extrema::Differential::maxima(rawSpectrum.begin(), rawSpectrum.end(), 0.001);
+		//const auto peaks = Extrema::Differential::maxima(rawSpectrum.begin(), rawSpectrum.end(), 0.001);
+		const auto currentPartials = partials[i];
 		//TODO: is this the best place to convert to amp?
 		//after determining peaks, convert magnitude to amplitude
 		//TMP: magnitude spectrogram
@@ -214,9 +217,9 @@ void AnalyzerPlugin::analyze(const std::vector<double> & signal, vector<pair<str
 		{
 			convertedRawSpectrum.push_back({p.first, p.second});
 		}
-		auto spline = fitter.peakFit(convertedRawSpectrum, peaks);*/
+		auto spline = fitter.peakFit(convertedRawSpectrum, peaks);
 		//only add "valid" splines
-		/*if (spline.getPieces().size() > 0 && spline.getBegin() <= 12 && spline.getEnd() > 21000)
+		if (spline.getPieces().size() > 0 && spline.getBegin() <= 12 && spline.getEnd() > 21000)
 		{
 			//TMP: keep for visualization
 			//spectra.emplace_back(spline,std::vector<std::pair<std::string, double>>{std::make_pair("time",(double)i/(double)m_sampleBuffer.sampleRate())});
@@ -226,9 +229,9 @@ void AnalyzerPlugin::analyze(const std::vector<double> & signal, vector<pair<str
 				std::move(spline),
 				std::move(coordinatesCopy)
 				));
-		}*/
+		}
 		//TMP: rejection statistics
-		/*else
+		else
 		{
 			if(spline.getPeaks().size()==0 && spline.getEnd()>0) {noComponents++;}
 			if(spline.getPieces().size()==0) {emptySplines++;}
@@ -266,7 +269,7 @@ void AnalyzerPlugin::analyze(const std::vector<double> & signal, vector<pair<str
 //TODO: current output: spectra over time
 //problems: FULL output = samples*partials
 //phase + magnitude
-//TODO: maybe reduce samples by excluding places of linear phase? and linear mag?
+//TODO: maybe reduce samples by excluding places of linear phase? and linear mag? then i will need to include time? possibly useless? only zero magnitude?
 std::vector<std::vector<Diginstrument::Component<double>>> AnalyzerPlugin::subtractiveAnalysis(std::vector<double> & signal, unsigned int sampleRate)
 {
 	//tmp: FFT visualization
@@ -298,12 +301,14 @@ std::vector<std::vector<Diginstrument::Component<double>>> AnalyzerPlugin::subtr
 	std::vector<std::vector<Diginstrument::Component<double>>> res(signal.size());
 	//tmp: visualization
 	const auto palette = Diginstrument::ColorPalette::generatePaletteTextures(maxima.size());
+
+	constexpr double parameter = 6;
+	const double normalizationConstant = CWT::calculateMagnitudeNormalizationConstant(parameter);
 	//for each selected frequency
 	for(int j = 0; j<maxima.size(); j++)
 	{
 		const double fr = maxima[j].x;
 		//TODO: tie wavelet parameters together
-		constexpr double parameter = 6;
 		const double scale = (parameter+sqrt(2+parameter*parameter)) / (4*M_PI*fr);
 		//perform a single center frequency CWT
 		const auto cfs = CWT::singleScaleCWT(signal, scale, sampleRate);
@@ -314,10 +319,9 @@ std::vector<std::vector<Diginstrument::Component<double>>> AnalyzerPlugin::subtr
 		{
 			//process the complex coefficient
 			const auto & c = cfs[i];
-			const double mag = std::abs(c);
 			//TODO: this has been the most successful equation, as it resulted in the same amp for both components in 440+50.wav
 			//I have no idea where the constant comes from; probably ties into the wavelet parameter
-			const double amp = (mag / (sqrt(scale*sampleRate))) * 1.067158515;
+			const double amp = (std::abs(normalizationConstant*c) / (sqrt(scale*sampleRate)));
 			amps.back()[i] = amp;
 			phases.back()[i] = std::arg(c);
 			
