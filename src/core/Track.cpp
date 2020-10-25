@@ -2554,12 +2554,15 @@ Track * Track::create( const QDomElement & element, TrackContainer * tc )
 /*! \brief Clone a track from this track
  *
  */
-Track * Track::clone()
+Track* Track::clone()
 {
 	QDomDocument doc;
-	QDomElement parent = doc.createElement( "clone" );
-	saveState( doc, parent );
-	return create( parent.firstChild().toElement(), m_trackContainer );
+	QDomElement parent = doc.createElement("clone");
+	saveState(doc, parent);
+	Track* t = create(parent.firstChild().toElement(), m_trackContainer);
+
+	AutomationPattern::resolveAllIDs();
+	return t;
 }
 
 
