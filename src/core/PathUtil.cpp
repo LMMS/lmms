@@ -5,11 +5,14 @@
 #include <QFileInfo>
 
 #include "ConfigManager.h"
+#include "Engine.h"
+#include "Song.h"
 
 namespace PathUtil
 {
 	Base relativeBases[] = { Base::ProjectDir, Base::FactorySample, Base::UserSample, Base::UserVST, Base::Preset,
-		Base::UserLADSPA, Base::DefaultLADSPA, Base::UserSoundfont, Base::DefaultSoundfont, Base::UserGIG, Base::DefaultGIG };
+		Base::UserLADSPA, Base::DefaultLADSPA, Base::UserSoundfont, Base::DefaultSoundfont, Base::UserGIG, Base::DefaultGIG,
+		Base::LocalDir };
 
 	QString baseLocation(const Base base)
 	{
@@ -31,6 +34,21 @@ namespace PathUtil
 			case Base::DefaultSoundfont : loc = ConfigManager::inst()->userSf2Dir(); break;
 			case Base::UserGIG          : loc = ConfigManager::inst()->gigDir(); break;
 			case Base::DefaultGIG       : loc = ConfigManager::inst()->userGigDir(); break;
+			case Base::LocalDir    :
+			{
+				Song* s = Engine::getSong();
+				if (s)
+				{
+					QString projectPath = s->projectFileName();
+					loc = QFileInfo(projectPath).path();
+				}
+				else
+				{
+					qWarning("PathUtil: No song loaded!");
+					return QString("");
+				}
+				break;
+			}
 			default                   : return QString("");
 		}
 		return QDir::cleanPath(loc) + "/";
@@ -57,7 +75,8 @@ namespace PathUtil
 			case Base::DefaultSoundfont : return QStringLiteral("defaultsoundfont:");
 			case Base::UserGIG          : return QStringLiteral("usergig:");
 			case Base::DefaultGIG       : return QStringLiteral("defaultgig:");
-			default                   : return QStringLiteral("");
+			case Base::LocalDir         : return QStringLiteral("local:");
+			default                     : return QStringLiteral("");
 		}
 	}
 
