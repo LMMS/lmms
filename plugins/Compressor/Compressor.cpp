@@ -517,7 +517,7 @@ bool CompressorEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 			s[1] = drySignal[1];
 		}
 
-		float trueDrySignal[2] = {s[0], s[1]};
+		float delayedDrySignal[2] = {s[0], s[1]};
 		
 		if (midside)// Convert left/right to mid/side
 		{
@@ -543,8 +543,8 @@ bool CompressorEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 		// Negate wet signal from dry signal
 		if (audition)
 		{
-			s[0] = -s[0] + trueDrySignal[0];
-			s[1] = -s[1] + trueDrySignal[1];
+			s[0] = -s[0] + delayedDrySignal[0];
+			s[1] = -s[1] + delayedDrySignal[1];
 		}
 		else if (autoMakeup)
 		{
