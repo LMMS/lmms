@@ -404,6 +404,28 @@ int main( int argc, char * * argv )
 
 			return EXIT_SUCCESS;
 		}
+		else if (arg == "makeBundle" || arg == "--makeBundle")
+		{
+			++i;
+
+			if (i == argc)
+			{
+				return noInputFileError();
+			}
+
+			DataFile dataFile(QString::fromLocal8Bit(argv[i]));
+
+			if (argc > i+1) // Output file given
+			{
+				printf("Making bundle\n");
+				dataFile.writeBundle(QString::fromLocal8Bit(argv[i+1]));
+				return EXIT_SUCCESS;
+			}
+			else
+			{
+				return usageError("No output file specified.");
+			}
+		}
 		else if( arg == "--allowroot" )
 		{
 			// Ignore, processed earlier

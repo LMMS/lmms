@@ -31,6 +31,7 @@
 #include <QDebug>
 #include <QFile>
 #include <QFileInfo>
+#include <QDir>
 #include <QMessageBox>
 
 #include "base64.h"
@@ -322,6 +323,82 @@ bool DataFile::writeFile( const QString& filename )
 
 	return false;
 }
+
+
+
+
+// TODO: Remove qWarnings
+bool DataFile::writeBundle(const QString& filename)
+{
+	const QString fullName = nameWithExtension(filename);
+	const QString fullNameTemp = fullName + ".new";
+	const QString resourcesDirName = QFileInfo(fullName).path() + "/resources";
+	qWarning() << "Fullname: " << fullName;
+	qWarning() << "Resources: " << resourcesDirName;
+
+	QFile outfile(fullNameTemp);
+
+	if (!outfile.open(QIODevice::WriteOnly | QIODevice::Truncate))
+	{
+		if (gui)
+		{
+			QMessageBox::critical(NULL,
+				SongEditor::tr("Could not write file"),
+				SongEditor::tr("Could not open %1 for writing. You probably are not permitted to "
+								"write to this file. Please make sure you have write-access to "
+								"the file and try again.").arg(fullName));
+		}
+		qWarning() << "Failed to create bundle file!";
+		return false;
+	}
+
+	// Creates resources folder
+	if (QDir(resourcesDirName).exists())
+	{
+		qWarning() << "Resources dir already exists";
+	}
+	else
+	{
+		if(!QDir().mkdir(resourcesDirName))
+		{
+			qWarning() << "Failed to create resources dir!";
+			return false;
+		}
+	}
+
+	// Manipulates the DataFile to have local paths
+	// TODO
+
+	// Writes the final DataFile
+	if (fullName.section('.', -1) == "mmpz")
+	{
+		QString xml;
+		QTextStream ts(&xml);
+		write(ts);
+		outfile.write(qCompress(xml.toUtf8()));
+	}
+	else
+	{
+		QTextStream ts(&outfile);
+		write(ts);
+	}
+
+	outfile.close();
+
+	// Make sure the file has been written correctly
+	if (QFileInfo(outfile.fileName()).size() > 0)
+	{
+		// Remove current file if there's one
+		QFile::remove(fullName);
+		// Move temporary file to current file
+		QFile::rename(fullNameTemp, fullName);
+
+		return true;
+	}
+
+	return false;
+}
+
 
 
 

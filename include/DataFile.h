@@ -72,6 +72,7 @@ public:
 
 	void write( QTextStream& strm );
 	bool writeFile( const QString& fn );
+	bool writeBundle(const QString& fn);
 
 	QDomElement& content()
 	{
