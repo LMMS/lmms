@@ -375,6 +375,10 @@ bool DataFile::writeBundle(const QString& filename)
 		}
 	}
 
+	// Files will be named by the counter number + file extension
+	// to avoid name conflicts
+	unsigned int resCounter = 1;
+
 	// Manipulates the DataFile to have local paths
 	// TODO
 	// For now just lists resources
@@ -391,11 +395,22 @@ bool DataFile::writeBundle(const QString& filename)
 			std::vector<QString>::const_iterator res = it->second.begin();
 			while(res != it->second.end())
 			{
-				qWarning() << "looking for attribute: " << *res;
+				qWarning() << "Attribute: " << *res;
 				if(el.hasAttribute(*res))
 				{
-					qWarning() << "Value: " << el.attribute(*res);
-					qWarning() << "Absolute Value: " << PathUtil::toAbsolute(el.attribute(*res));
+					// Get absolute path to resource
+					QString resPath = PathUtil::toAbsolute(el.attribute(*res));
+					qWarning() << "Resource: " << resPath;
+					QString finalFileName = QString::number(resCounter) + "." + resPath.section('.',-1);
+					QString finalPath = resourcesDirName + "/" + finalFileName;
+					qWarning() << "Resource Destination: " << finalPath;
+					// Copy resource to the resources folder
+					if(!QFile::copy(resPath, finalPath)) { qWarning("Error copying File"); }
+					// Update attribute path to point to the bundle file
+					QString newAtt = "local:resources/" + finalFileName;
+					qWarning() << "New Attribute: " << newAtt;
+					el.setAttribute(*res, newAtt);
+					++resCounter;
 				}
 				++res;
 			}
