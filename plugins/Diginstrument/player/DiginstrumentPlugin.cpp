@@ -68,8 +68,7 @@ void DiginstrumentPlugin::playNote(NotePlayHandle *noteHandle,
 	}
 	coordinates.emplace_back(startTime);
 	auto spectrum = interpolator.getSpectrum(coordinates);
-	//TMP: disabled synthesis
-	//vector<float> audioData = this->synth.playNote(spectrum, noteHandle->framesLeftForCurrentPeriod(), noteHandle->totalFramesPlayed(), /*tmp*/ 44100);
+	vector<float> audioData = this->synth.playNote(spectrum, noteHandle->framesLeftForCurrentPeriod(), noteHandle->totalFramesPlayed(), /*tmp*/ 44100);
 
 	/*tmp: stereo*/
 	unsigned int counter = 0;
