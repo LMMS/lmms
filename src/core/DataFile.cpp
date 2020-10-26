@@ -339,11 +339,14 @@ bool DataFile::writeFile( const QString& filename )
 // TODO: Remove qWarnings
 bool DataFile::writeBundle(const QString& filename)
 {
+	qWarning() << "Write Bundle DEBUG:";
+
 	const QString fullName = nameWithExtension(filename);
 	const QString fullNameTemp = fullName + ".new";
 	const QString resourcesDirName = QFileInfo(fullName).path() + "/resources";
-	qWarning() << "Fullname: " << fullName;
-	qWarning() << "Resources: " << resourcesDirName;
+
+	qWarning() << "Destination File: " << fullName;
+	qWarning() << "Resources Folder: " << resourcesDirName;
 
 	QFile outfile(fullNameTemp);
 
@@ -357,20 +360,20 @@ bool DataFile::writeBundle(const QString& filename)
 								"write to this file. Please make sure you have write-access to "
 								"the file and try again.").arg(fullName));
 		}
-		qWarning() << "Failed to create bundle file!";
+		qWarning() << "ERROR: Failed to create bundle file!";
 		return false;
 	}
 
 	// Creates resources folder
 	if (QDir(resourcesDirName).exists())
 	{
-		qWarning() << "Resources dir already exists";
+		qWarning() << "Warning: Resources dir already exists. Proceeding anyways.";
 	}
 	else
 	{
 		if(!QDir().mkdir(resourcesDirName))
 		{
-			qWarning() << "Failed to create resources dir!";
+			qWarning() << "ERROR: Failed to create resources dir!";
 			return false;
 		}
 	}
@@ -379,37 +382,51 @@ bool DataFile::writeBundle(const QString& filename)
 	// to avoid name conflicts
 	unsigned int resCounter = 1;
 
-	// Manipulates the DataFile to have local paths
-	// TODO
-	// For now just lists resources
 	std::map<QString,std::vector<QString>>::const_iterator it = ELEMENTS_WITH_RESOURCES.begin();
+
+	// Copy resources and manipulate the DataFile to have local paths to them
 	while(it != ELEMENTS_WITH_RESOURCES.end())
 	{
-		qWarning() << "Tagname: " << it->first;
+		qWarning() << "Looking for resources on: " << it->first;
 		QDomNodeList list = elementsByTagName(it->first);
 
+		// Go through all elements with the tagname from our map
 		for (int i = 0; !list.item(i).isNull(); ++i)
 		{
 			QDomElement el = list.item(i).toElement();
 
 			std::vector<QString>::const_iterator res = it->second.begin();
+
+			// Search for attributes that point to resources
 			while(res != it->second.end())
 			{
 				qWarning() << "Attribute: " << *res;
+				// If the element has that attribute
 				if(el.hasAttribute(*res))
 				{
 					// Get absolute path to resource
 					QString resPath = PathUtil::toAbsolute(el.attribute(*res));
-					qWarning() << "Resource: " << resPath;
+					// The new file name is the counter number + the file extension
 					QString finalFileName = QString::number(resCounter) + "." + resPath.section('.',-1);
+					// Final path is our resources dir + the new file name
 					QString finalPath = resourcesDirName + "/" + finalFileName;
+
+					qWarning() << "Original Resource: " << resPath;
 					qWarning() << "Resource Destination: " << finalPath;
-					// Copy resource to the resources folder
-					if(!QFile::copy(resPath, finalPath)) { qWarning("Error copying File"); }
+
+					// Copy resource file to the resources folder
+					if(!QFile::copy(resPath, finalPath))
+					{
+						qWarning("ERROR: Failed to copy resource");
+						return false;
+					}
+
 					// Update attribute path to point to the bundle file
 					QString newAtt = "local:resources/" + finalFileName;
-					qWarning() << "New Attribute: " << newAtt;
 					el.setAttribute(*res, newAtt);
+
+					qWarning() << "New Path: " << newAtt;
+					// Increases file counter
 					++resCounter;
 				}
 				++res;
