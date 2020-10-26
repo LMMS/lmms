@@ -68,7 +68,7 @@ std::string AnalyzerPlugin::setAudioFile(const QString &_audio_file, vector<pair
 	//tmp:visualization
 	visualization = new Diginstrument::InstrumentVisualizationWindow(this);
 
-	analyze(sample, subtractiveAnalysis(sample, m_sampleBuffer.sampleRate()), coordinates);
+	analyze(sample, subtractiveAnalysis(sample, m_sampleBuffer.sampleRate(), coordinates), coordinates);
 
 	//tmp: show raw visualization
 	visualization->show();
@@ -128,7 +128,11 @@ void AnalyzerPlugin::analyze(const std::vector<double> & signal, std::vector<std
 	//do CWT
 	const int level = 18;
 	CWT transform("morlet", 6, level, m_sampleBuffer.sampleRate());
+	const double normalizationConstant = CWT::calculateMagnitudeNormalizationConstant(6);
 	transform(signal);
+
+	const double transformStep = 0.01*(double)m_sampleBuffer.sampleRate();
+	SpectrumFitter<double, 4> fitter(1.25);
 
 	//tmp: statistics
 	int rejected = 0;
@@ -136,16 +140,11 @@ void AnalyzerPlugin::analyze(const std::vector<double> & signal, std::vector<std
 	int incomplete = 0;
 	int emptySplines = 0;
 	int goodBeginBadEnd = 0;
-	int badBedginGoodEnd = 0;
+	int badBedginGoodEnd = 0;	
 
-	//tmp
+	//tmp: visualization
 	QImage colorRed = QImage(2, 2, QImage::Format_RGB32);
 	colorRed.fill(Qt::red);
-
-	const double transformStep = 0.01*(double)m_sampleBuffer.sampleRate();
-	SpectrumFitter<double, 4> fitter(1.25);
-
-	//tmp
 	QSurfaceDataArray * data = new QSurfaceDataArray;
 	data->reserve(m_sampleBuffer.frames()/transformStep);
 
@@ -155,10 +154,9 @@ void AnalyzerPlugin::analyze(const std::vector<double> & signal, std::vector<std
 		//get the coefficients in time
 		const auto momentarySpectrum = transform[i];
 		std::vector<std::pair<double, double>> rawSpectrum;
-		//TODO: concretize number of octaves = 11
-		rawSpectrum.reserve(level * 11);
+		rawSpectrum.reserve(level * CWT::octaves);
 		//tmp: visualization
-		QSurfaceDataRow *dataRow = new QSurfaceDataRow(level * 11);
+		QSurfaceDataRow *dataRow = new QSurfaceDataRow(level * CWT::octaves);
 		int dataRowIndex = 0;
 
 		//process the complex coefficients of the momentary CWT into a magnitude spectrum
@@ -166,18 +164,17 @@ void AnalyzerPlugin::analyze(const std::vector<double> & signal, std::vector<std
 		{
 			const auto & timeInstance = momentarySpectrum[j];
 			const double frequency = 1.0 / (timeInstance.period);
-			const double rawMag = std::abs(timeInstance.value);
 			//TODO: is phase needed in residual?
 			//const double phase = std::ang(timeInstance.value);
 			//normalize magnitude
 			//TODO: source of constant?
-			const double mag = (rawMag / (sqrt(timeInstance.scale*m_sampleBuffer.sampleRate()))) * 1.067158515;
+			const double mag = (std::abs(timeInstance.value*normalizationConstant) / (sqrt(timeInstance.scale*m_sampleBuffer.sampleRate())));
 			rawSpectrum.emplace_back(frequency, mag);
 			///tmp: visualization
 			(*dataRow)[dataRowIndex].setPosition(QVector3D(frequency, mag, (double)i/(double)m_sampleBuffer.sampleRate()));
 			dataRowIndex++;
 		}
-
+		//tmp:: visualization
 		*data << dataRow;
 
 		//TODO: fix and reintroduce peaks?
@@ -217,9 +214,11 @@ void AnalyzerPlugin::analyze(const std::vector<double> & signal, std::vector<std
 		{
 			convertedRawSpectrum.push_back({p.first, p.second});
 		}
-		auto spline = fitter.peakFit(convertedRawSpectrum, peaks);
+		auto spline = fitter.peakFit(convertedRawSpectrum, peaks);*/
+		//auto spline = fitter.fitToPartials(rawSpectrum, currentPartials);
 		//only add "valid" splines
-		if (spline.getPieces().size() > 0 && spline.getBegin() <= 12 && spline.getEnd() > 21000)
+		//inst.add(Diginstrument::TimeSlice<double, 4>(currentPartials, std::vector<std::pair<std::string, double>>{std::make_pair("time",(double)i/(double)m_sampleBuffer.sampleRate())}));
+		/*if (spline.getPieces().size() > 0 && spline.getBegin() <= 12 && spline.getEnd() > 21000)
 		{
 			//TMP: keep for visualization
 			//spectra.emplace_back(spline,std::vector<std::pair<std::string, double>>{std::make_pair("time",(double)i/(double)m_sampleBuffer.sampleRate())});
@@ -229,9 +228,9 @@ void AnalyzerPlugin::analyze(const std::vector<double> & signal, std::vector<std
 				std::move(spline),
 				std::move(coordinatesCopy)
 				));
-		}
+		}*/
 		//TMP: rejection statistics
-		else
+		/*else
 		{
 			if(spline.getPeaks().size()==0 && spline.getEnd()>0) {noComponents++;}
 			if(spline.getPieces().size()==0) {emptySplines++;}
@@ -263,14 +262,14 @@ void AnalyzerPlugin::analyze(const std::vector<double> & signal, std::vector<std
 	//tmp:
 	inst.dimensions.emplace_back("pitch",20,22000);
 	inst.dimensions.emplace_back("time",0,((double)m_sampleBuffer.frames()/(double)m_sampleBuffer.sampleRate())*1000);
-	//writeInstrumentToFile("test2.json");
+	writeInstrumentToFile("test2.json");
 }
 
 //TODO: current output: spectra over time
 //problems: FULL output = samples*partials
 //phase + magnitude
 //TODO: maybe reduce samples by excluding places of linear phase? and linear mag? then i will need to include time? possibly useless? only zero magnitude?
-std::vector<std::vector<Diginstrument::Component<double>>> AnalyzerPlugin::subtractiveAnalysis(std::vector<double> & signal, unsigned int sampleRate)
+std::vector<std::vector<Diginstrument::Component<double>>> AnalyzerPlugin::subtractiveAnalysis(std::vector<double> & signal, unsigned int sampleRate, vector<pair<string, double>> coordinates)
 {
 	//tmp: FFT visualization
 	QImage colorBlue = QImage(2, 2, QImage::Format_RGB32);
@@ -298,6 +297,7 @@ std::vector<std::vector<Diginstrument::Component<double>>> AnalyzerPlugin::subtr
 
 	vector<vector<double>> phases;
 	vector<vector<double>> amps;
+	std::vector<std::vector<Diginstrument::Component<double>>> partials;
 	std::vector<std::vector<Diginstrument::Component<double>>> res(signal.size());
 	//tmp: visualization
 	const auto palette = Diginstrument::ColorPalette::generatePaletteTextures(maxima.size());
@@ -328,8 +328,13 @@ std::vector<std::vector<Diginstrument::Component<double>>> AnalyzerPlugin::subtr
 		}
 		//unwrap phase
 		Diginstrument::Phase::unwrapInPlace(phases.back());
+		//partial initialization
+		vector<Diginstrument::Component<double>> partial;
+		partial.reserve(amps.size());
 		for(int i = 0; i<signal.size(); i++)
 		{
+			//tmp: add partial to instrument
+			partial.emplace_back(fr, phases.back()[i], amps.back()[i]);
 			//subtract extracted partial to get residual signal
 			signal[i]-=cos(phases.back()[i])*amps.back()[i];
 			//TODO: rethink output
@@ -346,6 +351,12 @@ std::vector<std::vector<Diginstrument::Component<double>>> AnalyzerPlugin::subtr
 												palette[j]));
 			}
 		}
+		//add partial to set
+		partials.push_back(std::move(partial));
 	}
+	//add partial set to instrument
+	//TODO: checks
+	inst.add(PartialSet<double>(std::move(partials), std::move(coordinates)));
+
 	return res;
 }

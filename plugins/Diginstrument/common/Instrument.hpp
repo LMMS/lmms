@@ -1,21 +1,27 @@
 #pragma once
 
 #include "SplineSpectrum.hpp"
+#include "PartialSet.hpp"
 #include "toJSON.hpp"
 #include "Dimension.h"
 
 namespace Diginstrument
 {
-template <typename T>
+template <typename S, typename T>
 class Instrument
 {
   public:
-    void add(SplineSpectrum<T, 4> && spectrum)
+    void add(S && spectrum)
     {
         spectra.push_back(std::move(spectrum));
     }
 
-    const vector<SplineSpectrum<double, 4>> & getSpectra()
+    void add(PartialSet<double> && partialSet)
+    {
+        partialSets.push_back(std::move(partialSet));
+    }
+
+    const vector<S> & getSpectra()
     {
         return spectra;
     }
@@ -32,22 +38,28 @@ class Instrument
 
     std::string toString(unsigned int spaces)
     {
-        return Diginstrument::JSONConverter::toJSON(name, dimensions, spectra).dump(spaces);
+        return Diginstrument::JSONConverter::toJSON(name, dimensions, spectra, partialSets).dump(spaces);
     }
 
-    static Diginstrument::Instrument<double> fromJSON(json object)
+    static Diginstrument::Instrument<S, T> fromJSON(json object)
     {
-        Diginstrument::Instrument<double> res;
+        Diginstrument::Instrument<S, T> res;
         res.name = object["name"];
         res.dimensions.reserve(object["dimensions"].size());
         for(const auto & d : object["dimensions"])
         {
             res.dimensions.push_back(Diginstrument::JSONConverter::dimensionFromJSON(d));
         }
+        
         res.reserve(object["spectra"].size());
         for(const auto & s : object["spectra"])
         {
-            res.add(Diginstrument::JSONConverter::spectrumFromJSON(s));
+            res.add(Diginstrument::JSONConverter::splineFromJSON(s));
+        }
+        res.reserve(object["partial_sets"].size());
+        for(const auto & p : object["partial_sets"])
+        {
+            res.add(Diginstrument::JSONConverter::partialSetFromJSON(p));
         }
         return res;
     }
@@ -56,6 +68,7 @@ class Instrument
     std::vector<Diginstrument::Dimension> dimensions;
 
   private:
-    std::vector<SplineSpectrum<T, 4>> spectra;
+    std::vector<S> spectra;
+    std::vector<PartialSet<T>> partialSets;
 };
 };

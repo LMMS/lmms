@@ -417,5 +417,22 @@ BSpline<T, 4> Diginstrument::Interpolator<T, S>::mergePieces(BSpline<T, 4> left,
     return res;
 }
 
+template <typename T, typename S>
+
+TimeSlice<T, 4> Diginstrument::Interpolator<T, S>::constructSpectrum(
+    const TimeSlice<T, 4> & left,
+    const TimeSlice<T, 4> & right,
+    const T &target, const T &leftLabel, const T &rightLabel,
+    const std::vector<Match> & matches,
+    const std::vector<unsigned int> & unmatchedLeft,
+    const std::vector<unsigned int> & unmatchedRight
+    )
+{
+    //TODO
+
+    return TimeSlice<T, 4>({},{});
+}
+
 template class Diginstrument::Interpolator<double, Diginstrument::NoteSpectrum<double>>;
 template class Diginstrument::Interpolator<double, SplineSpectrum<double, 4>>;
+template class Diginstrument::Interpolator<double, TimeSlice<double, 4>>;

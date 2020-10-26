@@ -62,12 +62,12 @@ private:
 
   typedef SampleBuffer::handleState handleState;
   SampleBuffer m_sampleBuffer;
-  Diginstrument::Instrument<double> inst;
+  Diginstrument::Instrument<SplineSpectrum<double,4>, double> inst;
   //TMP: keep for visualization
   std::vector<SplineSpectrum<double,4>> spectra;
 
   void analyze(const std::vector<double> & signal, std::vector<std::vector<Diginstrument::Component<double>>> partials, vector<pair<string, double>> coordinates);
-  std::vector<std::vector<Diginstrument::Component<double>>> subtractiveAnalysis(std::vector<double> & signal, unsigned int sampleRate);
+  std::vector<std::vector<Diginstrument::Component<double>>> subtractiveAnalysis(std::vector<double> & signal, unsigned int sampleRate, vector<pair<string, double>> coordinates);
 
 private slots:
   //void sampleRateChanged();

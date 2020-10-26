@@ -9,6 +9,11 @@
 #include "../common/Spectrum.hpp"
 #include "../common/Interpolation.hpp"
 
+//tmp
+#include <iostream>
+
+using namespace std;
+
 /* Fits a PiecewiseBSpline of degree D to a set of points using the least squares method.*/
 template <typename T, unsigned int D>
 class SpectrumFitter
@@ -26,6 +31,9 @@ public:
 
     //TODO
     PiecewiseBSpline<T, D> peakFit(const std::vector<std::vector<T>> & spectrum, const std::vector<Extrema::Differential::CriticalPoint> & maxima);
+
+    //TODO
+    PiecewiseBSpline<T, D> fitToPartials(const std::vector<std::pair<T, T>> & spectrum, const std::vector<Diginstrument::Component<T>> & partials);
 
     //TODO
     std::vector<PiecewiseBSpline<T, D>> fit(const std::vector<std::vector<std::vector<T>>> & spectra,
@@ -220,5 +228,35 @@ PiecewiseBSpline<T, D> SpectrumFitter<T, D>::peakFit(const std::vector<std::vect
     //fit to points
     if(points.size()>D) res.add(SplineFitter<T, D>::fit(points, /*TMP: we use all points*/ points.size()));
 
+    return res;
+}
+
+template <typename T, unsigned int D>
+PiecewiseBSpline<T, D> SpectrumFitter<T, D>::fitToPartials(const std::vector<std::pair<T, T>> & spectrum, const std::vector<Diginstrument::Component<T>> & partials)
+{
+    PiecewiseBSpline<T, D> res;
+    if(partials.size()==0) return res; //TODO: fit to whole
+
+    auto startPoint = spectrum.begin();
+    for(const auto & partial : partials)
+    {
+        auto it = std::upper_bound(startPoint, spectrum.end(), partial,
+            [](const Diginstrument::Component<T> & component, const std::pair<T, T> & pair)->bool
+            {return component.frequency<pair.first;});
+        //TODO: what if end?
+        auto endPoint = it-1;
+        cout<<partial.frequency<<" - "<<startPoint->first<<" "<<endPoint->first<<": "<<distance(startPoint, endPoint)+1<<" points"<<endl;
+        //TODO: very rough algorithm, for now we just fit to whole
+        if(distance(startPoint, endPoint)>D) startPoint = it;
+    }
+    //tmp
+    vector<vector<double>> convertedRawSpectrum;
+    convertedRawSpectrum.reserve(spectrum.size());
+    for(auto & p : spectrum)
+    {
+        convertedRawSpectrum.push_back({p.first, p.second});
+    }
+    res.add(SplineFitter<T, D>::fit(convertedRawSpectrum, /*TMP: we use half of all points*/ convertedRawSpectrum.size()/2));
+    //TODO: data reduction; areas of zeros or idk
     return res;
 }

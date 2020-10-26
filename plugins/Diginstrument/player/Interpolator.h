@@ -3,6 +3,7 @@
 #include "MultidimensionalNeighbourMap.hpp"
 #include "../common/Spectrum.hpp"
 #include "../common/SplineSpectrum.hpp"
+#include "../common/TimeSlice.hpp"
 #include "../common/Interpolation.hpp"
 #include "../common/PeakMatcher.h"
 #include "../common/Dimension.h"
@@ -52,6 +53,15 @@ private:
   SplineSpectrum<T, 4> constructSpectrum(
     const SplineSpectrum<T, 4> & left,
     const SplineSpectrum<T, 4> & right,
+    const T &target, const T &leftLabel, const T &rightLabel,
+    const std::vector<Match> & matches,
+    const std::vector<unsigned int> & unmatchedLeft,
+    const std::vector<unsigned int> & unmatchedRight
+    );
+
+  TimeSlice<T, 4> constructSpectrum(
+    const TimeSlice<T, 4> & left,
+    const TimeSlice<T, 4> & right,
     const T &target, const T &leftLabel, const T &rightLabel,
     const std::vector<Match> & matches,
     const std::vector<unsigned int> & unmatchedLeft,

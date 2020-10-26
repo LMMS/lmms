@@ -20,7 +20,7 @@
 #include "../common/Approximation.hpp"
 #include "../common/Interpolation.hpp"
 #include "../common/PiecewiseBSpline.hpp"
-#include "../common/SplineSpectrum.hpp"
+#include "../common/TimeSlice.hpp"
 #include "../common/Spectrum.hpp"
 #include "../common/Dimension.h"
 #include "../common/Instrument.hpp"
@@ -85,7 +85,7 @@ private:
   Diginstrument::Synthesizer synth;
   Diginstrument::Interpolator<double, SplineSpectrum<double, 4>> interpolator;
   //TODO: maybe "reroute" spectra so that they wont be duplicated in interpolator and instrument
-  Diginstrument::Instrument<double> instrument;
+  Diginstrument::Instrument<SplineSpectrum<double, 4>, double> instrument;
 
   bool setInstrumentFile(const QString & fileName);
   bool loadInstrumentFile();

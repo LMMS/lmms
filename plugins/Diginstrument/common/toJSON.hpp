@@ -33,6 +33,34 @@ class JSONConverter
         return res;
     }
 
+    static json toJSON(const PartialSet<double> & partialSet)
+    {
+        json res;
+        for(auto & c : partialSet.getLabels())
+        {
+            res[c.first] = c.second;
+        }
+
+        res["partials"] = json::array();
+        for(const auto & p : partialSet.get())
+        {
+            json partialObject;
+            vector<double> phases, amps;
+            partialObject["frequency"] = p.front().frequency;
+            phases.reserve(p.size());
+            amps.reserve(p.size());
+            for(const auto & c : p)
+            {
+                phases.push_back(c.phase);
+                amps.push_back(c.amplitude);
+            }
+            partialObject["phases"] = phases;
+            partialObject["magnitudes"] = amps;
+            res["partials"].push_back(std::move(partialObject));
+        }
+        return res;
+    }
+
     static json toJSON(const Diginstrument::Dimension & dimension)
     {
         json res;
@@ -44,7 +72,11 @@ class JSONConverter
         return res;
     }
 
-    static json toJSON(std::string name, const std::vector<Diginstrument::Dimension> & dimensions, const std::vector<SplineSpectrum<double, 4>> & spectra)
+    static json toJSON(
+        std::string name,
+        const std::vector<Diginstrument::Dimension> & dimensions,
+        const std::vector<SplineSpectrum<double, 4>> & spectra,
+        const std::vector<PartialSet<double>> & partials)
     {
         //TODO: "coordinates" not included, as they are not used anywhere anyway
         json res;
@@ -61,13 +93,19 @@ class JSONConverter
            res["dimensions"].push_back(toJSON(d));
         }
 
-        res["spectrum_type"] = "spline";
+        res["partial_sets"] = json::array();
+        for(const auto & p : partials)
+        {
+           res["partial_sets"].push_back(toJSON(p));
+        }
+
+        res["spectrum_type"] = "partials";
         res["name"] = name;
 
         return res;
     }
 
-    static SplineSpectrum<double, 4> spectrumFromJSON(json object)
+    static SplineSpectrum<double, 4> splineFromJSON(json object)
     {
         PiecewiseBSpline<double, 4> piecewise;
         vector<pair<string, double>> labels;
@@ -83,6 +121,27 @@ class JSONConverter
             if(e.value().is_number()) labels.emplace_back(e.key(), e.value());
         }
         return SplineSpectrum<double, 4>(std::move(piecewise), std::move(labels));
+    }
+
+    static PartialSet<double> partialSetFromJSON(json object)
+    {
+        vector<vector<Diginstrument::Component<double>>> partials;
+        vector<pair<string, double>> labels;
+        for(auto & p : object["partials"])
+        {
+            std::vector<Diginstrument::Component<double>> partial;
+            partial.reserve(p["magnitudes"].size());
+            for(int i = 0; i<p["magnitudes"].size(); i++)
+            {
+                partial.emplace_back(p["frequency"], p["phases"][i], p["magnitudes"][i]);
+            }
+            partials.push_back(std::move(partial));
+        }
+        for(auto & e : object.items())
+        {
+            if(e.value().is_number()) labels.emplace_back(e.key(), e.value());
+        }
+        return PartialSet<double>(std::move(partials), std::move(labels));
     }
 
     static Diginstrument::Dimension dimensionFromJSON(json object)

@@ -60,7 +60,6 @@ void DiginstrumentPlugin::playNote(NotePlayHandle *noteHandle,
 {
 	/*TMP*/
 	const double startTime = noteHandle->totalFramesPlayed() / (double)Engine::mixer()->processingSampleRate();
-	vector<float> audioData;
 	vector<double> coordinates = {noteHandle->frequency()};
 	coordinates.reserve(this->coordinates.size()+2);
 	for(auto c : this->coordinates)
@@ -69,7 +68,8 @@ void DiginstrumentPlugin::playNote(NotePlayHandle *noteHandle,
 	}
 	coordinates.emplace_back(startTime);
 	auto spectrum = interpolator.getSpectrum(coordinates);
-	audioData = this->synth.playNote(spectrum.getComponents(0), noteHandle->framesLeftForCurrentPeriod(), noteHandle->totalFramesPlayed(), /*tmp*/ 44100);
+	//TMP: disabled synthesis
+	//vector<float> audioData = this->synth.playNote(spectrum, noteHandle->framesLeftForCurrentPeriod(), noteHandle->totalFramesPlayed(), /*tmp*/ 44100);
 
 	/*tmp: stereo*/
 	unsigned int counter = 0;
@@ -122,7 +122,7 @@ bool DiginstrumentPlugin::loadInstrumentFile()
 		file.close();
 		//TODO: separate into loading from file and loading saved
 		//TODO: catch?
-		instrument = Diginstrument::Instrument<double>::fromJSON(json::parse(arr.toStdString()));
+		instrument = Diginstrument::Instrument<SplineSpectrum<double, 4>, double>::fromJSON(json::parse(arr.toStdString()));
 		//tmp:
 		interpolator.clear();
 		interpolator.addSpectra(instrument.getSpectra());
