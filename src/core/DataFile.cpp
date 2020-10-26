@@ -27,6 +27,7 @@
 #include "DataFile.h"
 
 #include <math.h>
+#include <map>
 
 #include <QDebug>
 #include <QFile>
@@ -44,11 +45,19 @@
 #include "ProjectVersion.h"
 #include "SongEditor.h"
 #include "TextFloat.h"
+#include "PathUtil.h"
 
 #include "lmmsversion.h"
 
 static void findIds(const QDomElement& elem, QList<jo_id_t>& idList);
 
+
+// QMap with the DOM elements that access file resources
+const std::map<QString, std::vector<QString>> DataFile::ELEMENTS_WITH_RESOURCES = {
+{ "sampletco", {"src"} },
+{ "audiofileprocessor", {"src"} },
+{ "vestige", {"plugin"} }
+};
 
 // Vector with all the upgrade methods
 const std::vector<DataFile::UpgradeMethod> DataFile::UPGRADE_METHODS = {
@@ -368,6 +377,31 @@ bool DataFile::writeBundle(const QString& filename)
 
 	// Manipulates the DataFile to have local paths
 	// TODO
+	// For now just lists resources
+	std::map<QString,std::vector<QString>>::const_iterator it = ELEMENTS_WITH_RESOURCES.begin();
+	while(it != ELEMENTS_WITH_RESOURCES.end())
+	{
+		qWarning() << "Tagname: " << it->first;
+		QDomNodeList list = elementsByTagName(it->first);
+
+		for (int i = 0; !list.item(i).isNull(); ++i)
+		{
+			QDomElement el = list.item(i).toElement();
+
+			std::vector<QString>::const_iterator res = it->second.begin();
+			while(res != it->second.end())
+			{
+				qWarning() << "looking for attribute: " << *res;
+				if(el.hasAttribute(*res))
+				{
+					qWarning() << "Value: " << el.attribute(*res);
+					qWarning() << "Absolute Value: " << PathUtil::toAbsolute(el.attribute(*res));
+				}
+				++res;
+			}
+		}
+		++it;
+	}
 
 	// Writes the final DataFile
 	if (fullName.section('.', -1) == "mmpz")

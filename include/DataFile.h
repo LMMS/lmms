@@ -27,6 +27,7 @@
 #ifndef DATA_FILE_H
 #define DATA_FILE_H
 
+#include <map>
 #include <QDomDocument>
 
 #include "lmms_export.h"
@@ -121,6 +122,9 @@ private:
 	static const std::vector<UpgradeMethod> UPGRADE_METHODS;
 	// List of ProjectVersions for the legacyFileVersion method
 	static const std::vector<ProjectVersion> UPGRADE_VERSIONS;
+
+	// Map with DOM elements that access resources (for making bundles)
+	static const std::map<QString, std::vector<QString>> ELEMENTS_WITH_RESOURCES;
 
 	void upgrade();
 
