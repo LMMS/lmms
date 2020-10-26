@@ -60,6 +60,7 @@ PhaserEffect::PhaserEffect(Model* parent, const Descriptor::SubPluginFeatures::K
 	m_phaserControls(this)
 {
 	m_currentPeak[0] = m_currentPeak[1] = PHA_NOISE_FLOOR;
+	m_realCutoff[0] = m_realCutoff[1] = 0;
 
 	m_lfo = new QuadratureLfo(Engine::mixer()->processingSampleRate());
 

@@ -90,7 +90,7 @@ private:
 
 	float m_sampAvg[2] = {0};
 
-	sampleFrame m_realCutoff = {0, 0};
+	sampleFrame m_realCutoff;
 
 	friend class PhaserControls;
 
