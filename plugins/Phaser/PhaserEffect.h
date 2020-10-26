@@ -30,7 +30,6 @@
 #include "PhaserControls.h"
 #include "ValueBuffer.h"
 #include "../Flanger/QuadratureLfo.h"
-#include "RmsHelper.h"
 
 class PhaserEffect : public Effect
 {
@@ -75,8 +74,6 @@ private:
 	int m_filtFeedbackLoc = 0;
 
 	QuadratureLfo * m_lfo;
-
-	RmsHelper * m_rms [2];
 
 	float m_twoPiOverSr;
 

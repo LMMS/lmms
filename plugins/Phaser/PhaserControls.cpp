@@ -51,7 +51,7 @@ PhaserControls::PhaserControls(PhaserEffect* effect) :
 	m_enableLFOModel(true , this, tr("Enable LFO")),
 	m_phaseModel(180.0f, 0.f, 360.0f, 0.01f, this, tr("Phase")),
 	m_inFollowModel(0.f, -30.f, 30.0f, 0.01f, this, tr("Input Follow")),
-	m_attackModel(500.0f, 0.0f, 2000.0f, 1.0f, this, tr("Attack")),
+	m_attackModel(200.0f, 0.0f, 2000.0f, 1.0f, this, tr("Attack")),
 	m_releaseModel(500.0f, 0.0f, 2000.0f, 1.0f, this, tr("Release")),
 	m_distortionModel(0.0f, 0.0f, 100.0f, 0.001f, this, tr("Distortion")),
 	m_outGainModel(0.0, -60.0, 20.0, 0.01, this, tr("Output gain")),

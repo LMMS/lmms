@@ -63,9 +63,6 @@ PhaserEffect::PhaserEffect(Model* parent, const Descriptor::SubPluginFeatures::K
 
 	m_lfo = new QuadratureLfo(Engine::mixer()->processingSampleRate());
 
-	m_rms[0] = new RmsHelper(64 * Engine::mixer()->processingSampleRate() / 44100);
-	m_rms[1] = new RmsHelper(64 * Engine::mixer()->processingSampleRate() / 44100);
-
 	m_lfo->setFrequency(1.0 / m_phaserControls.m_rateModel.value());
 
 	changeSampleRate();
@@ -97,9 +94,6 @@ PhaserEffect::PhaserEffect(Model* parent, const Descriptor::SubPluginFeatures::K
 PhaserEffect::~PhaserEffect()
 {
 	delete m_lfo;
-
-	delete m_rms[0];
-	delete m_rms[1];
 }
 
 
@@ -223,17 +217,17 @@ bool PhaserEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 		const bool wetIsolate = wetBuf ? wetBuf->value(f) : m_phaserControls.m_wetModel.value();
 
 		// Calculate input follower values
-		const double rmsResult[2] = {m_rms[0]->update(s[0]), m_rms[1]->update(s[1])};
+		const double sAbs[2] = {abs(s[0]), abs(s[1])};
 		for (int i = 0; i < 2; i++)
 		{
-			if (rmsResult[i] > m_currentPeak[i])
+			if (sAbs[i] > m_currentPeak[i])
 			{
-				m_currentPeak[i] = qMin(m_currentPeak[i] * m_attCoeff, rmsResult[i]);
+				m_currentPeak[i] = qMin(m_currentPeak[i] * m_attCoeff, sAbs[i]);
 			}
 			else
-			if (rmsResult[i] < m_currentPeak[i])
+			if (sAbs[i] < m_currentPeak[i])
 			{
-				m_currentPeak[i] = qMax(m_currentPeak[i] * m_relCoeff, rmsResult[i]);
+				m_currentPeak[i] = qMax(m_currentPeak[i] * m_relCoeff, sAbs[i]);
 			}
 
 			m_currentPeak[i] = qBound(PHA_NOISE_FLOOR, m_currentPeak[i], 10.0f);
@@ -422,9 +416,6 @@ void PhaserEffect::changeSampleRate()
 		m_delayBufSize = Engine::mixer()->processingSampleRate() * 0.03 + 1;
 		m_filtDelayBuf[b].resize(m_delayBufSize);
 	}
-
-	m_rms[0]->setSize(64 * Engine::mixer()->processingSampleRate() / 44100);
-	m_rms[1]->setSize(64 * Engine::mixer()->processingSampleRate() / 44100);
 }
 
 
