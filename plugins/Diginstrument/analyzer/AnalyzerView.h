@@ -3,6 +3,7 @@
 #include "ToolPluginView.h"
 #include "AnalyzerPlugin.h"
 #include "../common/InstrumentVisualizationWindow.h"
+#include "../common/Qt/DimensionField.hpp"
 
 #include <QPushButton>
 #include <QTextEdit>
@@ -18,8 +19,11 @@ class AnalyzerView : public ToolPluginView
 
   protected slots:
     void openAudioFile();
+    void writeInstrumentToFile();
     void copyTextEditToClipboard();
     void showVisualization();
+    void addDimension();
+    void deleteDimensionField(DimensionField * field);
     void updateVisualizationData(float minTime, float maxTime, float minFreq, float maxFreq, int timeSamples, int freqSamples, std::vector<double> coordinates);
 
   private:
@@ -27,9 +31,12 @@ class AnalyzerView : public ToolPluginView
 
     QPushButton * m_openAudioFileButton;
     QPushButton * m_openVisualizationButton;
-    QPushButton * addCoordinateButton;
+    QPushButton * m_addDimensionButton;
     QLineEdit * m_nameField;
-    std::vector<std::pair<QLineEdit*, QLineEdit*>> coordinateFields;
+    QList<DimensionField*> dimensionFields;
+    QWidget * dimensionFieldsContainer;
+    QLineEdit * m_fileNameField;
+    QPushButton * m_saveToFileButton;
     
     Diginstrument::InstrumentVisualizationWindow * visualization;
     /*TODO*/

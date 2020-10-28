@@ -57,7 +57,7 @@ public:
 private:
   friend class AnalyzerView;
 
-  std::string setAudioFile(const QString &_audio_file, vector<pair<string, double>> coordinates);
+  std::string analyzeSample(const QString &_audio_file, vector<pair<string, double>> coordinates);
   QtDataVisualization::QSurfaceDataArray * getSurfaceData(double minTime, double maxTime, double minFreq, double maxFreq, int timeSamples, int freqSamples);
 
   typedef SampleBuffer::handleState handleState;

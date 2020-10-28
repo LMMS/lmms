@@ -52,7 +52,7 @@ QString AnalyzerPlugin::fullDisplayName() const
 }
 
 //TMP
-std::string AnalyzerPlugin::setAudioFile(const QString &_audio_file, vector<pair<string, double>> coordinates)
+std::string AnalyzerPlugin::analyzeSample(const QString &_audio_file, vector<pair<string, double>> coordinates)
 {
 	//TMP: keep for visualization
 	spectra.clear();
@@ -258,11 +258,6 @@ void AnalyzerPlugin::analyze(const std::vector<double> & signal, std::vector<std
 	//TODO: get rid of beégetett 4
 	//tmp: set raw visualization data
 	visualization->setSurfaceData(data);
-
-	//tmp:
-	inst.dimensions.emplace_back("pitch",20,22000);
-	inst.dimensions.emplace_back("time",0,((double)m_sampleBuffer.frames()/(double)m_sampleBuffer.sampleRate())*1000);
-	writeInstrumentToFile("test2.json");
 }
 
 //TODO: current output: spectra over time

@@ -8,7 +8,7 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 BUILD_PLUGIN(diginstrument_spectral_analyzer
  PeakApproximation.cpp ../common/PeakMatcher.cpp AnalyzerPlugin.cpp AnalyzerView.cpp  ../common/InstrumentVisualizationWindow.cpp ../common/Qt/LabeledSlider.cpp ../common/Qt/LabeledFieldSlider.cpp
- CWT.hpp Extrema.hpp SpectrumFitter.hpp SplineFitter.hpp ../common/SplineSpectrum.hpp ../common/Spectrum.hpp ../common/Spectrum.hpp ../common/Instrument.hpp
+ CWT.hpp Extrema.hpp SpectrumFitter.hpp SplineFitter.hpp ../common/SplineSpectrum.hpp ../common/Spectrum.hpp ../common/Spectrum.hpp ../common/Instrument.hpp ../common/Qt/DimensionField.hpp
  AnalyzerPlugin.h AnalyzerView.h ../common/InstrumentVisualizationWindow.h ../common/Qt/LabeledSlider.h ../common/Qt/LabeledFieldSlider.h
  MOCFILES AnalyzerPlugin.h AnalyzerView.h EMBEDDED_RESOURCES *.png)
 set_property(TARGET diginstrument_spectral_analyzer PROPERTY CXX_STANDARD 17)
