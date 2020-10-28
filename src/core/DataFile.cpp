@@ -53,7 +53,7 @@ static void findIds(const QDomElement& elem, QList<jo_id_t>& idList);
 
 
 // QMap with the DOM elements that access file resources
-const std::map<QString, std::vector<QString>> DataFile::ELEMENTS_WITH_RESOURCES = {
+const DataFile::ResourcesMap DataFile::ELEMENTS_WITH_RESOURCES = {
 { "sampletco", {"src"} },
 { "audiofileprocessor", {"src"} },
 { "vestige", {"plugin"} }
@@ -337,16 +337,44 @@ bool DataFile::writeFile( const QString& filename )
 
 
 // TODO: Remove qWarnings
-bool DataFile::writeBundle(const QString& filename)
+bool DataFile::writeBundle(const QString& name)
 {
 	qWarning() << "Write Bundle DEBUG:";
 
-	const QString fullName = nameWithExtension(filename);
+	QString bundlesFolder = ConfigManager::inst()->userBundlesDir();
+
+	// If the bundles folder doesn't exist we abort
+	if (!QDir(bundlesFolder).exists())
+	{
+		qWarning() << "ERROR: Bundle folder doesn't exist!";
+		return false;
+	}
+
+	// Get the path to the project file and resources folder
+	const QString fullName = nameWithExtension(bundlesFolder + name + "/project");
 	const QString fullNameTemp = fullName + ".new";
 	const QString resourcesDirName = QFileInfo(fullName).path() + "/resources";
 
+	qWarning() << "Bundle Folder: " << bundlesFolder + name;
 	qWarning() << "Destination File: " << fullName;
 	qWarning() << "Resources Folder: " << resourcesDirName;
+
+	// Check if there's a bundle with the same name already, if so abort
+	if (QDir(bundlesFolder + name).exists())
+	{
+		// TODO: Allow overwriting bundles?
+		qWarning() << "ERROR: There's a bundle with that name already!";
+		return false;
+	}
+	else
+	{
+		// Create this bundle's folder
+		if (!QDir().mkdir(bundlesFolder + name))
+		{
+			qWarning() << "ERROR: Failed to create this bundle's folder!";
+			return false;
+		}
+	}
 
 	QFile outfile(fullNameTemp);
 
@@ -365,24 +393,17 @@ bool DataFile::writeBundle(const QString& filename)
 	}
 
 	// Creates resources folder
-	if (QDir(resourcesDirName).exists())
+	if (!QDir().mkdir(resourcesDirName))
 	{
-		qWarning() << "Warning: Resources dir already exists. Proceeding anyways.";
-	}
-	else
-	{
-		if(!QDir().mkdir(resourcesDirName))
-		{
-			qWarning() << "ERROR: Failed to create resources dir!";
-			return false;
-		}
+		qWarning() << "ERROR: Failed to create resources dir!";
+		return false;
 	}
 
 	// Files will be named by the counter number + file extension
 	// to avoid name conflicts
 	unsigned int resCounter = 1;
 
-	std::map<QString,std::vector<QString>>::const_iterator it = ELEMENTS_WITH_RESOURCES.begin();
+	ResourcesMap::const_iterator it = ELEMENTS_WITH_RESOURCES.begin();
 
 	// Copy resources and manipulate the DataFile to have local paths to them
 	while(it != ELEMENTS_WITH_RESOURCES.end())

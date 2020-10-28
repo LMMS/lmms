@@ -73,7 +73,7 @@ public:
 
 	void write( QTextStream& strm );
 	bool writeFile( const QString& fn );
-	bool writeBundle(const QString& fn);
+	bool writeBundle(const QString& name);
 
 	QDomElement& content()
 	{
@@ -124,7 +124,8 @@ private:
 	static const std::vector<ProjectVersion> UPGRADE_VERSIONS;
 
 	// Map with DOM elements that access resources (for making bundles)
-	static const std::map<QString, std::vector<QString>> ELEMENTS_WITH_RESOURCES;
+	typedef std::map<QString, std::vector<QString>> ResourcesMap;
+	static const ResourcesMap ELEMENTS_WITH_RESOURCES;
 
 	void upgrade();
 

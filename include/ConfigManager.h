@@ -40,6 +40,7 @@
 class LmmsCore;
 
 const QString PROJECTS_PATH = "projects/";
+const QString BUNDLES_PATH = "projectbundles/";
 const QString TEMPLATE_PATH = "templates/";
 const QString PRESETS_PATH = "presets/";
 const QString SAMPLES_PATH = "samples/";
@@ -108,6 +109,11 @@ public:
 	QString userProjectsDir() const
 	{
 		return workingDir() + PROJECTS_PATH;
+	}
+
+	QString userBundlesDir() const
+	{
+		return workingDir() + BUNDLES_PATH;
 	}
 
 	QString userTemplateDir() const

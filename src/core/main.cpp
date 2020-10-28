@@ -415,7 +415,7 @@ int main( int argc, char * * argv )
 
 			DataFile dataFile(QString::fromLocal8Bit(argv[i]));
 
-			if (argc > i+1) // Output file given
+			if (argc > i+1) // Bundle name given
 			{
 				printf("Making bundle\n");
 				dataFile.writeBundle(QString::fromLocal8Bit(argv[i+1]));
@@ -423,7 +423,7 @@ int main( int argc, char * * argv )
 			}
 			else
 			{
-				return usageError("No output file specified.");
+				return usageError("No bundle name specified.");
 			}
 		}
 		else if( arg == "--allowroot" )
