@@ -100,6 +100,7 @@ DataFile::typeDescStruct
 
 DataFile::DataFile( Type type ) :
 	QDomDocument( "lmms-project" ),
+	m_fileName(""),
 	m_content(),
 	m_head(),
 	m_type( type ),
@@ -126,6 +127,7 @@ DataFile::DataFile( Type type ) :
 
 DataFile::DataFile( const QString & _fileName ) :
 	QDomDocument(),
+	m_fileName(_fileName),
 	m_content(),
 	m_head(),
 	m_fileVersion( UPGRADE_METHODS.size() )
@@ -155,6 +157,7 @@ DataFile::DataFile( const QString & _fileName ) :
 
 DataFile::DataFile( const QByteArray & _data ) :
 	QDomDocument(),
+	m_fileName(""),
 	m_content(),
 	m_head()
 {
@@ -427,6 +430,14 @@ bool DataFile::writeBundle(const QString& name)
 				{
 					// Get absolute path to resource
 					QString resPath = PathUtil::toAbsolute(el.attribute(*res));
+					// If we are running from CLI (without the project loaded), "local:" base
+					// prefixes aren't converted properly, so we need to convert it ourselves
+					if (PathUtil::baseLookup(resPath) == PathUtil::Base::LocalDir)
+					{
+						resPath = QFileInfo(m_fileName).path() + "/" + resPath.remove(0,
+							PathUtil::basePrefix(PathUtil::Base::LocalDir).length());
+					}
+
 					// The new file name is the counter number + the file extension
 					QString finalFileName = QString::number(resCounter) + "." + resPath.section('.',-1);
 					// Final path is our resources dir + the new file name
