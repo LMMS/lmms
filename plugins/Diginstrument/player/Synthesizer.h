@@ -6,6 +6,7 @@
 #include <set>
 
 #include "../common/Spectrum.hpp"
+#include "../common/PartialSet.hpp"
 #include "../common/Interpolation.hpp"
 #include "../common/PeakMatcher.h"
 
@@ -28,6 +29,8 @@ public:
 //TODO: is sample rate supposed to be provided here?
   std::vector<float> playNote(std::vector<Diginstrument::Component<double>> components, const unsigned int frames, const unsigned int offset, const unsigned int & sampleRate);
   std::vector<float> playNote(const Spectrum<double> & spectrum, const unsigned int frames, const unsigned int offset, const unsigned int & sampleRate);
+  //tmp: new synthesis from scratch
+  std::vector<float> playNote(const PartialSet<double> & slice, const unsigned int frames, const unsigned int offset, const unsigned int & sampleRate);
 
   void static setSampleRate(const unsigned int sampleRate);
 

@@ -12,11 +12,53 @@ using namespace Diginstrument;
 template <typename T, class S>
 S Diginstrument::Interpolator<T, S>::getSpectrum(const std::vector<T> &coordinates)
 {
-    return data.processIntoRoot(coordinates,
-        [this](const S &left, const S &right, const T &target, const T &leftLabel, const T &rightLabel, const unsigned int dimension)
+    return residual.processIntoRoot(coordinates,
+        [this](const S &left, const S &right, const T &target, const T &leftLabel, const T &rightLabel, const unsigned int dimension)->S
         {
             return interpolateSpectra(left, right, target, leftLabel, rightLabel, dimensions[dimension].shifting);
-        });
+        },
+        [](const S &single)->S
+        {
+            return single;
+        }
+        );
+}
+
+/**
+ * Interpolate a time-slice of the partials corresponding to the given coordinates, frame offset and amount of frames
+ */
+template <typename T, class S>
+PartialSet<T> Diginstrument::Interpolator<T, S>::getPartials(const std::vector<T> &coordinates, unsigned int startFrame, unsigned int frames)
+{
+    return partials.processIntoRoot(coordinates,
+            [this, startFrame, frames](const PartialSet<T> &left, const PartialSet<T> &right, const T &target, const T &leftLabel, const T &rightLabel, const unsigned int dimension)
+            ->PartialSet<T>
+            {
+                //TODO: better slicing detection
+                if(left.get().size()>0 && left.get().front().size()>frames)
+                {
+                    return interpolatePartialSet(left.getSlice(startFrame, frames), right.getSlice(startFrame, frames), target, leftLabel, rightLabel, dimensions[dimension].shifting);
+                }
+                return interpolatePartialSet(left, right, target, leftLabel, rightLabel, dimensions[dimension].shifting);
+            },
+            [startFrame, frames](const PartialSet<T> & single)->PartialSet<T> 
+            {
+                if(single.get().size()>0 && single.get().front().size()>frames)
+                {
+                    return single.getSlice(startFrame, frames);
+                }
+                return single;
+            }
+    );
+}
+
+template <typename T, class S>
+PartialSet<T> Diginstrument::Interpolator<T, S>::interpolatePartialSet(const PartialSet<T> &left, const PartialSet<T> &right, const T &target, const T &leftLabel, const T &rightLabel, const bool shifting)
+{
+    //TODO
+    //tmp: unimplemented warning
+    cout<<"reached interpolation"<<endl;
+    return left;
 }
 
 /**
@@ -199,7 +241,7 @@ template <typename T, class S>
 void Diginstrument::Interpolator<T, S>::addSpectrum(const S &spectrum, std::vector<T> coordinates)
 {
     //TODO:test, check, better
-    data.insert(spectrum, coordinates);
+    residual.insert(spectrum, coordinates);
 }
 
 template <typename T, class S>
@@ -213,7 +255,22 @@ void Diginstrument::Interpolator<T, S>::addSpectra(const std::vector<S> &spectra
         {
             labels.push_back(l.second);
         }
-        data.insert(s, labels);
+        residual.insert(s, labels);
+    }
+}
+
+template <typename T, class S>
+void Diginstrument::Interpolator<T, S>::addPartialSets(const std::vector<PartialSet<T>> & partialSets)
+{
+    //TODO:test, check, better
+    for(const auto & p : partialSets)
+    {
+        vector<T> labels;
+        for(const auto & l : p.getLabels())
+        {
+            labels.push_back(l.second);
+        }
+        partials.insert(p, labels);
     }
 }
 
@@ -221,7 +278,8 @@ void Diginstrument::Interpolator<T, S>::addSpectra(const std::vector<S> &spectra
 template <typename T, class S>
 void Diginstrument::Interpolator<T, S>::clear()
 {
-    data.clear();
+    partials.clear();
+    residual.clear();
     dimensions.clear();
 }
 
@@ -417,22 +475,5 @@ BSpline<T, 4> Diginstrument::Interpolator<T, S>::mergePieces(BSpline<T, 4> left,
     return res;
 }
 
-template <typename T, typename S>
-
-TimeSlice<T, 4> Diginstrument::Interpolator<T, S>::constructSpectrum(
-    const TimeSlice<T, 4> & left,
-    const TimeSlice<T, 4> & right,
-    const T &target, const T &leftLabel, const T &rightLabel,
-    const std::vector<Match> & matches,
-    const std::vector<unsigned int> & unmatchedLeft,
-    const std::vector<unsigned int> & unmatchedRight
-    )
-{
-    //TODO
-
-    return TimeSlice<T, 4>({},{});
-}
-
 template class Diginstrument::Interpolator<double, Diginstrument::NoteSpectrum<double>>;
 template class Diginstrument::Interpolator<double, SplineSpectrum<double, 4>>;
-template class Diginstrument::Interpolator<double, TimeSlice<double, 4>>;

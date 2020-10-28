@@ -356,7 +356,7 @@ std::vector<std::vector<Diginstrument::Component<double>>> AnalyzerPlugin::subtr
 	}
 	//add partial set to instrument
 	//TODO: checks
-	inst.add(PartialSet<double>(std::move(partials), std::move(coordinates)));
+	inst.add(PartialSet<double>(std::move(partials), std::move(coordinates), m_sampleBuffer.sampleRate()));
 
 	return res;
 }

@@ -41,6 +41,8 @@ class JSONConverter
             res[c.first] = c.second;
         }
 
+        res["sample_rate"] = partialSet.getSampleRate();
+
         res["partials"] = json::array();
         for(const auto & p : partialSet.get())
         {
@@ -139,9 +141,9 @@ class JSONConverter
         }
         for(auto & e : object.items())
         {
-            if(e.value().is_number()) labels.emplace_back(e.key(), e.value());
+            if(e.value().is_number() && e.key()!="sample_rate") labels.emplace_back(e.key(), e.value());
         }
-        return PartialSet<double>(std::move(partials), std::move(labels));
+        return PartialSet<double>(std::move(partials), std::move(labels), object["sample_rate"]);
     }
 
     static Diginstrument::Dimension dimensionFromJSON(json object)

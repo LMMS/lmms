@@ -27,7 +27,9 @@ class AnalyzerView : public ToolPluginView
 
     QPushButton * m_openAudioFileButton;
     QPushButton * m_openVisualizationButton;
+    QPushButton * addCoordinateButton;
     QLineEdit * m_nameField;
+    std::vector<std::pair<QLineEdit*, QLineEdit*>> coordinateFields;
     
     Diginstrument::InstrumentVisualizationWindow * visualization;
     /*TODO*/

@@ -61,14 +61,16 @@ void DiginstrumentPlugin::playNote(NotePlayHandle *noteHandle,
 	/*TMP*/
 	const double startTime = noteHandle->totalFramesPlayed() / (double)Engine::mixer()->processingSampleRate();
 	vector<double> coordinates = {noteHandle->frequency()};
+	//TODO: first coordinate is freq, might not be correct?
 	coordinates.reserve(this->coordinates.size()+2);
 	for(auto c : this->coordinates)
 	{
 		coordinates.emplace_back(c);
 	}
+	auto partials = interpolator.getPartials(coordinates, noteHandle->totalFramesPlayed(), noteHandle->framesLeftForCurrentPeriod());
 	coordinates.emplace_back(startTime);
 	auto spectrum = interpolator.getSpectrum(coordinates);
-	vector<float> audioData = this->synth.playNote(spectrum, noteHandle->framesLeftForCurrentPeriod(), noteHandle->totalFramesPlayed(), /*tmp*/ 44100);
+	vector<float> audioData = this->synth.playNote(partials, noteHandle->framesLeftForCurrentPeriod(), noteHandle->totalFramesPlayed(), /*TMP*/ 44100);
 
 	/*tmp: stereo*/
 	unsigned int counter = 0;
@@ -125,6 +127,7 @@ bool DiginstrumentPlugin::loadInstrumentFile()
 		//tmp:
 		interpolator.clear();
 		interpolator.addSpectra(instrument.getSpectra());
+		interpolator.addPartialSets(instrument.getPartialSets());
 		interpolator.setDimensions(instrument.dimensions);
 		return true;
 	}

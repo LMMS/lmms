@@ -21,9 +21,14 @@ class Instrument
         partialSets.push_back(std::move(partialSet));
     }
 
-    const vector<S> & getSpectra()
+    const vector<S> & getSpectra() const
     {
         return spectra;
+    }
+
+    const vector<PartialSet<T>> & getPartialSets() const
+    {
+        return partialSets;
     }
 
     void reserve(unsigned int n)

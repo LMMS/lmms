@@ -20,7 +20,6 @@
 #include "../common/Approximation.hpp"
 #include "../common/Interpolation.hpp"
 #include "../common/PiecewiseBSpline.hpp"
-#include "../common/TimeSlice.hpp"
 #include "../common/Spectrum.hpp"
 #include "../common/Dimension.h"
 #include "../common/Instrument.hpp"
