@@ -26,6 +26,7 @@
 
 #ifdef LMMS_HAVE_LV2
 
+#include <algorithm>
 #include <QtGlobal>
 
 #include "Engine.h"
@@ -113,6 +114,14 @@ void Lv2ControlBase::copyModelsFromLmms() {
 
 
 
+void Lv2ControlBase::copyModelsToLmms() const
+{
+	for (auto& c : m_procs) { c->copyModelsToCore(); }
+}
+
+
+
+
 void Lv2ControlBase::copyBuffersFromLmms(const sampleFrame *buf, fpp_t frames) {
 	unsigned firstChan = 0; // tell the procs which channels they shall read from
 	for (auto& c : m_procs) {
@@ -182,6 +191,24 @@ std::size_t Lv2ControlBase::controlCount() const {
 	std::size_t res = 0;
 	for (const auto& c : m_procs) { res += c->controlCount(); }
 	return res;
+}
+
+
+
+
+bool Lv2ControlBase::hasNoteInput() const
+{
+	return std::any_of(m_procs.begin(), m_procs.end(),
+		[](const auto& c) { return c->hasNoteInput(); });
+}
+
+
+
+
+void Lv2ControlBase::handleMidiInputEvent(const MidiEvent &event,
+	const MidiTime &time, f_cnt_t offset)
+{
+	for (auto& c : m_procs) { c->handleMidiInputEvent(event, time, offset); }
 }
 
 

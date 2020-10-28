@@ -38,8 +38,10 @@
 #include "Track.h"
 
 #include <assert.h>
+#include <cstdlib>
 
 #include <QLayout>
+#include <QLinearGradient>
 #include <QMenu>
 #include <QMouseEvent>
 #include <QPainter>
@@ -56,6 +58,7 @@
 #include "BBTrackContainer.h"
 #include "ConfigManager.h"
 #include "Clipboard.h"
+#include "ColorChooser.h"
 #include "embed.h"
 #include "Engine.h"
 #include "GuiApplication.h"
@@ -106,7 +109,9 @@ TrackContentObject::TrackContentObject( Track * track ) :
 	m_startPosition(),
 	m_length(),
 	m_mutedModel( false, this, tr( "Mute" ) ),
-	m_selectViewOnCreate( false )
+	m_selectViewOnCreate( false ),
+	m_color( 128, 128, 128 ),
+	m_useCustomClipColor( false )
 {
 	if( getTrack() )
 	{
@@ -240,7 +245,27 @@ void TrackContentObject::setStartTimeOffset( const MidiTime &startTimeOffset )
 	m_startTimeOffset = startTimeOffset;
 }
 
+// Update TCO color if it follows the track color
+void TrackContentObject::updateColor()
+{
+	if( ! m_useCustomClipColor )
+	{
+		emit trackColorChanged();
+	}
+}
 
+
+void TrackContentObject::useCustomClipColor( bool b )
+{
+	m_useCustomClipColor = b;
+	updateColor();
+}
+
+
+bool TrackContentObject::hasColor()
+{
+	return usesCustomClipColor() || getTrack()->useColor();
+}
 
 
 
@@ -305,6 +330,8 @@ TrackContentObjectView::TrackContentObjectView( TrackContentObject * tco,
 			this, SLOT( updatePosition() ) );
 	connect( m_tco, SIGNAL( destroyedTCO() ), this, SLOT( close() ) );
 	setModel( m_tco );
+	connect( m_tco, SIGNAL( trackColorChanged() ), this, SLOT( update() ) );
+	connect( m_trackView->getTrackOperationsWidget(), SIGNAL( colorParented() ), this, SLOT( useTrackColor() ) );
 
 	m_trackView->getTrackContentWidget()->addTCOView( this );
 	updateLength();
@@ -511,6 +538,32 @@ void TrackContentObjectView::updatePosition()
 	// therefore we update the track-container
 	m_trackView->trackContainerView()->update();
 }
+
+
+
+
+void TrackContentObjectView::changeClipColor()
+{
+	// Get a color from the user
+	QColor new_color = ColorChooser( this ).withPalette( ColorChooser::Palette::Track )->getColor( m_tco->color() );
+	if( ! new_color.isValid() )
+	{ return; }
+	
+	// Use that color
+	m_tco->setColor( new_color );
+	m_tco->useCustomClipColor( true );
+	update();
+}
+
+
+
+void TrackContentObjectView::useTrackColor()
+{
+	m_tco->useCustomClipColor( false );
+	update();
+}
+
+
 
 
 
@@ -1165,6 +1218,13 @@ void TrackContentObjectView::contextMenuEvent( QContextMenuEvent * cme )
 			: tr("Mute/unmute selection (<%1> + middle click)")).arg(UI_CTRL_KEY),
 		[this](){ contextMenuAction( Mute ); } );
 
+	contextMenu.addSeparator();
+
+	contextMenu.addAction( embed::getIconPixmap( "colorize" ),
+			tr( "Set clip color" ), this, SLOT( changeClipColor() ) );
+	contextMenu.addAction( embed::getIconPixmap( "colorize" ),
+			tr( "Use track color" ), this, SLOT( useTrackColor() ) );
+
 	constructContextMenu( &contextMenu );
 
 	contextMenu.exec( QCursor::pos() );
@@ -1485,6 +1545,51 @@ MidiTime TrackContentObjectView::draggedTCOPos( QMouseEvent * me )
 	}
 	return newPos;
 }
+
+
+// Return the color that the TCO's background should be
+QColor TrackContentObjectView::getColorForDisplay( QColor defaultColor )
+{
+	// Get the pure TCO color
+	auto tcoColor = m_tco->hasColor()
+					? m_tco->usesCustomClipColor()
+						? m_tco->color()
+						: m_tco->getTrack()->color()
+					: defaultColor;
+
+	// Set variables
+	QColor c, mutedCustomColor;
+	bool muted = m_tco->getTrack()->isMuted() || m_tco->isMuted();
+	mutedCustomColor = tcoColor;
+	mutedCustomColor.setHsv( mutedCustomColor.hsvHue(), mutedCustomColor.hsvSaturation() / 4, mutedCustomColor.value() );
+
+	// Change the pure color by state: selected, muted, colored, normal
+	if( isSelected() )
+	{
+		c = m_tco->hasColor()
+			? ( muted
+				? mutedCustomColor.darker( 350 )
+				: tcoColor.darker( 150 ) )
+			: selectedColor();
+	}
+	else
+	{
+		if( muted )
+		{
+			c = m_tco->hasColor()
+				? mutedCustomColor.darker( 250 )
+				: mutedBackgroundColor();
+		}
+		else
+		{
+			c = tcoColor;
+		}
+	}
+	
+	// Return color to caller
+	return c;
+}
+
 
 
 
@@ -2206,6 +2311,10 @@ TrackOperationsWidget::TrackOperationsWidget( TrackView * parent ) :
 			m_trackView->trackContainerView(),
 				SLOT( deleteTrackView( TrackView * ) ),
 							Qt::QueuedConnection );
+	
+	connect( m_trackView->getTrack()->getMutedModel(), SIGNAL( dataChanged() ),
+			this, SLOT( update() ) );
+	
 }
 
 
@@ -2268,7 +2377,15 @@ void TrackOperationsWidget::mousePressEvent( QMouseEvent * me )
 void TrackOperationsWidget::paintEvent( QPaintEvent * pe )
 {
 	QPainter p( this );
+	
 	p.fillRect( rect(), palette().brush(QPalette::Background) );
+	
+	if( m_trackView->getTrack()->useColor() && ! m_trackView->getTrack()->getMutedModel()->value() ) 
+	{
+		QRect coloredRect( 0, 0, 10, m_trackView->getTrack()->getHeight() );
+		
+		p.fillRect( coloredRect, m_trackView->getTrack()->color() );
+	}
 
 	if( m_trackView->isMovingTrack() == false )
 	{
@@ -2323,7 +2440,41 @@ void TrackOperationsWidget::removeTrack()
 	emit trackRemovalScheduled( m_trackView );
 }
 
+void TrackOperationsWidget::changeTrackColor()
+{
+	QColor new_color = ColorChooser( this ).withPalette( ColorChooser::Palette::Track )-> \
+		getColor( m_trackView->getTrack()->color() );
+	
+	if( ! new_color.isValid() )
+	{ return; }
 
+	emit colorChanged( new_color );
+	
+	Engine::getSong()->setModified();
+	update();
+}
+
+void TrackOperationsWidget::resetTrackColor()
+{
+	emit colorReset();
+	Engine::getSong()->setModified();
+	update();
+}
+
+void TrackOperationsWidget::randomTrackColor()
+{
+	QColor buffer = ColorChooser::getPalette( ColorChooser::Palette::Track )[ rand() % 48 ];
+
+	emit colorChanged( buffer );
+	Engine::getSong()->setModified();
+	update();
+}
+
+void TrackOperationsWidget::useTrackColor()
+{
+	emit colorParented();
+	Engine::getSong()->setModified();
+}
 
 
 /*! \brief Update the trackOperationsWidget context menu
@@ -2364,6 +2515,17 @@ void TrackOperationsWidget::updateMenu()
 		toMenu->addAction( tr( "Turn all recording on" ), this, SLOT( recordingOn() ) );
 		toMenu->addAction( tr( "Turn all recording off" ), this, SLOT( recordingOff() ) );
 	}
+	
+	toMenu->addSeparator();
+	toMenu->addAction( embed::getIconPixmap( "colorize" ),
+						tr( "Change color" ), this, SLOT( changeTrackColor() ) );
+	toMenu->addAction( embed::getIconPixmap( "colorize" ),
+						tr( "Reset color to default" ), this, SLOT( resetTrackColor() ) );
+	toMenu->addAction( embed::getIconPixmap( "colorize" ),
+						tr( "Set random color" ), this, SLOT( randomTrackColor() ) );
+	toMenu->addSeparator();
+	toMenu->addAction( embed::getIconPixmap( "colorize" ),
+						tr( "Clear clip colors" ), this, SLOT( useTrackColor() ) );
 }
 
 
@@ -2419,7 +2581,9 @@ Track::Track( TrackTypes type, TrackContainer * tc ) :
 	m_soloModel( false, this, tr( "Solo" ) ),
 					/*!< For controlling track soloing */
 	m_simpleSerializingMode( false ),
-	m_trackContentObjects()         /*!< The track content objects (segments) */
+	m_trackContentObjects(),        /*!< The track content objects (segments) */
+	m_color( 0, 0, 0 ),
+	m_hasColor( false )
 {
 	m_trackContainer->addTrack( this );
 	m_height = -1;
@@ -2564,7 +2728,12 @@ void Track::saveSettings( QDomDocument & doc, QDomElement & element )
 	{
 		element.setAttribute( "trackheight", m_height );
 	}
-
+	
+	if( m_hasColor )
+	{
+		element.setAttribute( "color", m_color.name() );
+	}
+	
 	QDomElement tsDe = doc.createElement( nodeName() );
 	// let actual track (InstrumentTrack, bbTrack, sampleTrack etc.) save
 	// its settings
@@ -2616,6 +2785,12 @@ void Track::loadSettings( const QDomElement & element )
 	// Get the mutedBeforeSolo value so we can recover the muted state if any solo was active.
 	// Older project files that didn't have this attribute will set the value to false (issue 5562)
 	m_mutedBeforeSolo = QVariant( element.attribute( "mutedBeforeSolo", "0" ) ).toBool();
+
+	if( element.hasAttribute( "color" ) )
+	{
+		m_color.setNamedColor( element.attribute( "color" ) );
+		m_hasColor = true;
+	}
 
 	if( m_simpleSerializingMode )
 	{
@@ -2994,7 +3169,24 @@ void Track::toggleSolo()
 	}
 }
 
+void Track::trackColorChanged( QColor & c )
+{
+	for (int i = 0; i < numOfTCOs(); i++)
+	{
+		m_trackContentObjects[i]->updateColor();
+	}
+	m_hasColor = true;
+	m_color = c;
+}
 
+void Track::trackColorReset()
+{
+	for (int i = 0; i < numOfTCOs(); i++)
+	{
+		m_trackContentObjects[i]->updateColor();
+	}
+	m_hasColor = false;
+}
 
 
 BoolModel *Track::getMutedModel()
@@ -3065,6 +3257,13 @@ TrackView::TrackView( Track * track, TrackContainerView * tcv ) :
 
 	connect( &m_track->m_soloModel, SIGNAL( dataChanged() ),
 			m_track, SLOT( toggleSolo() ), Qt::DirectConnection );
+			
+	connect( &m_trackOperationsWidget, SIGNAL( colorChanged( QColor & ) ),
+			m_track, SLOT( trackColorChanged( QColor & ) ) );
+			
+	connect( &m_trackOperationsWidget, SIGNAL( colorReset() ),
+			m_track, SLOT( trackColorReset() ) );
+			
 	// create views for already existing TCOs
 	for( Track::tcoVector::iterator it =
 					m_track->m_trackContentObjects.begin();

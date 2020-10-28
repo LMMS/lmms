@@ -100,8 +100,12 @@ protected:
 	/*
 		utils for the run thread
 	*/
-	//! Copy values from all connected models into the respective ports
+	//! Copy values from the LMMS core (connected models, MIDI events, ...) into
+	//! the respective ports
 	void copyModelsFromLmms();
+	//! Bring values from all ports to the LMMS core
+	void copyModelsToLmms() const;
+
 	//! Copy buffer passed by LMMS into our ports
 	void copyBuffersFromLmms(const sampleFrame *buf, fpp_t frames);
 	//! Copy our ports into buffers passed by LMMS
@@ -123,6 +127,9 @@ protected:
 	*/
 	std::size_t controlCount() const;
 	QString nodeName() const { return "lv2controls"; }
+	bool hasNoteInput() const;
+	void handleMidiInputEvent(const class MidiEvent &event,
+		const class MidiTime &time, f_cnt_t offset);
 
 private:
 	//! Return the DataFile settings type

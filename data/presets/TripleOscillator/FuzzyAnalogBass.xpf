@@ -1,21 +1,30 @@
 <?xml version="1.0"?>
 <!DOCTYPE lmms-project>
-<lmms-project version="1.0" creator="LMMS" creatorversion="1.0.2" type="instrumenttracksettings">
+<lmms-project version="1.0" creatorversion="1.2.1.698" creator="LMMS" type="instrumenttracksettings">
   <head/>
-  <instrumenttracksettings muted="0" type="0" name="Fuzzy Analog Bass" solo="0">
-    <instrumenttrack pan="0" fxch="0" pitchrange="1" pitch="0" basenote="69" vol="44">
+  <instrumenttracksettings solo="0" type="0" muted="0" name="Fuzzy Analog Bass">
+    <instrumenttrack pan="0" usemasterpitch="1" pitch="0" basenote="69" fxch="0" pitchrange="1" vol="44">
       <instrument name="tripleoscillator">
-        <tripleoscillator phoffset2="0" userwavefile0="samples/empty.wav" finer0="0" userwavefile1="samples/empty.wav" finer1="0" userwavefile2="samples/empty.wav" finer2="0" coarse0="-12" coarse1="0" coarse2="0" finel0="0" finel1="0" modalgo1="2" modalgo2="2" finel2="0" pan0="0" modalgo3="0" pan1="0" stphdetun0="247" pan2="0" stphdetun1="0" wavetype0="5" stphdetun2="120" wavetype1="2" wavetype2="4" vol0="100" vol1="100" phoffset0="101" phoffset1="0" vol2="100"/>
+        <tripleoscillator modalgo1="2" modalgo2="2" modalgo3="0" stphdetun0="0" stphdetun1="0" wavetype0="5" wavetype1="2" stphdetun2="0" wavetype2="4" vol0="100" phoffset0="101" vol1="100" phoffset1="0" vol2="100" pan0="0" phoffset2="0" pan1="0" pan2="0" finel0="0" finer0="0" finel1="0" finer1="0" finel2="0" finer2="0" coarse0="-12" coarse1="0" coarse2="0" userwavefile0="" userwavefile1="" userwavefile2="">
+          <key/>
+        </tripleoscillator>
       </instrument>
-      <eldata fres="0.5" ftype="0" fcut="2839" fwet="1">
-        <elvol lspd_denominator="1" sustain="0.296" pdel="0" userwavefile="" dec="0.281" lamt="0" syncmode="0" latt="0" rel="0.239" amt="1" x100="0" att="0" lpdel="0" hold="0" lshp="0" lspd="0.0917" ctlenvamt="0" lspd_numerator="1"/>
-        <elcut lspd_denominator="1" sustain="0" pdel="0" userwavefile="" dec="0.165" lamt="0.83" syncmode="0" latt="0" rel="0.1" amt="1" x100="0" att="0" lpdel="0" hold="0" lshp="0" lspd="0.7263" ctlenvamt="0" lspd_numerator="1"/>
-        <elres lspd_denominator="1" sustain="0.5" pdel="0" userwavefile="" dec="0.5" lamt="0" syncmode="0" latt="0" rel="0.1" amt="0" x100="0" att="0" lpdel="0" hold="0" lshp="1" lspd="1" ctlenvamt="0" lspd_numerator="1"/>
+      <eldata fcut="2839" fwet="1" ftype="0" fres="0.5">
+        <elvol x100="0" sustain="0.296" ctlenvamt="0" lspd_syncmode="0" lspd="0.0917" lpdel="0" pdel="0" hold="0" lspd_denominator="1" userwavefile="" rel="0.239" latt="0" lspd_numerator="1" dec="0.281" lamt="0" att="0" lshp="0" amt="1"/>
+        <elcut x100="0" sustain="0" ctlenvamt="0" lspd_syncmode="0" lspd="0.7263" lpdel="0" pdel="0" hold="0" lspd_denominator="1" userwavefile="" rel="0.1" latt="0" lspd_numerator="1" dec="0.165" lamt="0.83" att="0" lshp="0" amt="1"/>
+        <elres x100="0" sustain="0.5" ctlenvamt="0" lspd_syncmode="0" lspd="1" lpdel="0" pdel="0" hold="0" lspd_denominator="1" userwavefile="" rel="0.1" latt="0" lspd_numerator="1" dec="0.5" lamt="0" att="0" lshp="1" amt="0"/>
       </eldata>
-      <chordcreator chord="0" chordrange="1" chord-enabled="1"/>
-      <arpeggiator arptime="100" arprange="3" arptime_denominator="1" syncmode="0" arpmode="0" arp-enabled="0" arp="0" arptime_numerator="1" arpdir="0" arpgate="100"/>
-      <midiport inputcontroller="0" fixedoutputvelocity="-1" inputchannel="0" outputcontroller="0" writable="0" outputchannel="1" fixedinputvelocity="-1" fixedoutputnote="-1" outputprogram="1" basevelocity="127" readable="0"/>
-      <fxchain numofeffects="0" enabled="0"/>
+      <chordcreator chordrange="1" chord-enabled="1" chord="0"/>
+      <arpeggiator arp-enabled="0" arptime_denominator="1" arpcycle="0" arp="0" arpmiss="0" arpmode="0" arpskip="0" arptime="100" arprange="3" arptime_numerator="1" arpdir="0" arptime_syncmode="0" arpgate="100"/>
+      <fxchain numofeffects="1" enabled="1">
+        <effect autoquit_numerator="4" autoquit_denominator="4" autoquit_syncmode="0" wet="1" autoquit="1" on="1" gate="0" name="ladspaeffect">
+          <ladspacontrols link="1" ports="0"/>
+          <key>
+            <attribute value="dc_remove_1207" name="file"/>
+            <attribute value="dcRemove" name="plugin"/>
+          </key>
+        </effect>
+      </fxchain>
     </instrumenttrack>
   </instrumenttracksettings>
 </lmms-project>

@@ -133,6 +133,25 @@ public:
 	{
 		return m_autoResize;
 	}
+	
+	QColor color() const
+	{
+		return m_color;
+	}
+
+	void setColor( const QColor & c )
+	{
+		m_color = c;
+	}
+	
+	bool hasColor();
+	
+	void useCustomClipColor( bool b );
+	
+	bool usesCustomClipColor()
+	{
+		return m_useCustomClipColor;
+	}
 
 	virtual void movePosition( const MidiTime & pos );
 	virtual void changeLength( const MidiTime & length );
@@ -154,6 +173,8 @@ public:
 
 	MidiTime startTimeOffset() const;
 	void setStartTimeOffset( const MidiTime &startTimeOffset );
+	
+	void updateColor();
 
 	// Will copy the state of a TCO to another TCO
 	static void copyStateTo( TrackContentObject *src, TrackContentObject *dst );
@@ -166,6 +187,7 @@ signals:
 	void lengthChanged();
 	void positionChanged();
 	void destroyedTCO();
+	void trackColorChanged();
 
 
 private:
@@ -188,6 +210,9 @@ private:
 	bool m_autoResize;
 
 	bool m_selectViewOnCreate;
+
+	QColor m_color;
+	bool m_useCustomClipColor;
 
 	friend class TrackContentObjectView;
 
@@ -268,11 +293,16 @@ public:
 
 	// Returns true if selection can be merged and false if not
 	static bool canMergeSelection( QVector<TrackContentObjectView *> tcovs );
+	
+	QColor getColorForDisplay( QColor );
 
 public slots:
 	virtual bool close();
 	void remove();
 	void update() override;
+	
+	void changeClipColor();
+	void useTrackColor();
 
 protected:
 	enum ContextMenuAction
@@ -491,6 +521,10 @@ private slots:
 	void cloneTrack();
 	void removeTrack();
 	void updateMenu();
+	void changeTrackColor();
+	void randomTrackColor();
+	void resetTrackColor();
+	void useTrackColor();
 	void toggleRecording(bool on);
 	void recordingOn();
 	void recordingOff();
@@ -508,6 +542,9 @@ private:
 
 signals:
 	void trackRemovalScheduled( TrackView * t );
+	void colorChanged( QColor & c );
+	void colorParented();
+	void colorReset();
 
 } ;
 
@@ -640,7 +677,16 @@ public:
 	{
 		return m_processingLock.tryLock();
 	}
-
+	
+	QColor color()
+	{
+		return m_color;
+	}
+	bool useColor()
+	{
+		return m_hasColor;
+	}
+	
 	BoolModel* getMutedModel();
 
 public slots:
@@ -652,6 +698,8 @@ public slots:
 
 	void toggleSolo();
 
+	void trackColorChanged( QColor & c );
+	void trackColorReset();
 
 private:
 	TrackContainer* m_trackContainer;
@@ -670,6 +718,9 @@ private:
 	tcoVector m_trackContentObjects;
 
 	QMutex m_processingLock;
+	
+	QColor m_color;
+	bool m_hasColor;
 
 	friend class TrackView;
 
