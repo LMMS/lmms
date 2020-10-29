@@ -34,6 +34,7 @@
 #include <QFileInfo>
 #include <QDir>
 #include <QMessageBox>
+#include <QRegExp>
 
 #include "base64.h"
 #include "ConfigManager.h"
@@ -350,6 +351,14 @@ bool DataFile::writeBundle(const QString& name)
 	if (!QDir(bundlesFolder).exists())
 	{
 		qWarning() << "ERROR: Bundle folder doesn't exist!";
+		return false;
+	}
+
+	// Check if the name is valid (starts with a letter/digit, can have letters, digits, whitespaces and hyphens)
+	QRegExp rx("^\\w+[\\w- ]*\\w+$|^\\w$");
+	if (!rx.exactMatch(name))
+	{
+		qWarning() << "ERROR: Invalid bundle name!";
 		return false;
 	}
 
