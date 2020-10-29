@@ -18,6 +18,10 @@ IF(COMMAND CMAKE_POLICY)
 	CMAKE_POLICY(SET CMP0057 NEW)
 ENDIF(COMMAND CMAKE_POLICY)
 
+
+# Import of windows.h breaks min()/max()
+ADD_DEFINITIONS(-DNOMINMAX)
+
 INCLUDE(PluginList)
 INCLUDE(CheckSubmodules)
 INCLUDE(AddFileDependencies)

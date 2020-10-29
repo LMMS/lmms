@@ -40,10 +40,6 @@
 
 #ifdef LMMS_BUILD_LINUX
 
-#ifndef NOMINMAX
-#define NOMINMAX
-#endif
-
 #ifndef O_BINARY
 #define O_BINARY 0
 #endif
