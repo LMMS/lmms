@@ -307,20 +307,41 @@ bool DataFile::writeFile(const QString& filename, bool withResources)
 	// If we are saving with resources
 	if (withResources)
 	{
-		// Creates resources folder. First check if there's one in the same
-		// folder already, if so abort
+		// First check if there's a resources folder in the same
+		// path already. If so, warns user that we can't create a
+		// project bundle in the same folder as another.
 		if (QDir(resourcesDir).exists())
 		{
-			// TODO: Allow overwriting project bundles?
-			qWarning() << "ERROR: There's a project bundle in this folder already!";
+			if (gui)
+			{
+				QMessageBox mb;
+				mb.setWindowTitle(SongEditor::tr("Operation denied"));
+				mb.setText(SongEditor::tr("A resources folder already exists on the "
+					"selected path. Can't create a project bundle in the same folder "
+					"as another one. Please select a different path."));
+				mb.setIcon(QMessageBox::Warning);
+				mb.setStandardButtons(QMessageBox::Ok);
+
+				mb.exec();
+			}
+			else
+			{
+				qWarning() << SongEditor::tr("ERROR: A resources folder already exists on the "
+					"selected path. Can't create a project bundle in the same folder "
+					"as another one. Please select a different path.");
+			}
+
 			return false;
 		}
-		else if (!QDir().mkdir(resourcesDir))
+
+		// Create resources folder
+		if (!QDir().mkdir(resourcesDir))
 		{
 			qWarning() << "ERROR: Failed to create resources dir!";
 			return false;
 		}
 
+		// Copy resources to folder and update paths
 		if (!copyResources(resourcesDir))
 		{
 			qWarning() << "ERROR: Failed to copy resources!";
