@@ -1217,8 +1217,8 @@ void Song::loadProject( const QString & fileName )
 }
 
 
-// only save current song as _filename and do nothing else
-bool Song::saveProjectFile( const QString & filename )
+// only save current song as filename and do nothing else
+bool Song::saveProjectFile(const QString & filename, bool withResources)
 {
 	DataFile dataFile( DataFile::SongProject );
 	m_savingProject = true;
@@ -1245,7 +1245,7 @@ bool Song::saveProjectFile( const QString & filename )
 
 	m_savingProject = false;
 
-	return dataFile.writeFile( filename );
+	return dataFile.writeFile(filename, withResources);
 }
 
 
@@ -1257,7 +1257,9 @@ bool Song::guiSaveProject()
 	QString fileNameWithExtension = dataFile.nameWithExtension( m_fileName );
 	setProjectFileName(fileNameWithExtension);
 
-	bool const saveResult = saveProjectFile( m_fileName );
+	bool withResources = m_saveOptions.saveAsProjectBundle.value();
+
+	bool const saveResult = saveProjectFile(m_fileName, withResources);
 
 	if( saveResult )
 	{
@@ -1271,11 +1273,11 @@ bool Song::guiSaveProject()
 
 
 // Save the current song with the given filename
-bool Song::guiSaveProjectAs( const QString & _file_name )
+bool Song::guiSaveProjectAs(const QString & filename)
 {
 	QString o = m_oldFileName;
 	m_oldFileName = m_fileName;
-	setProjectFileName(_file_name);
+	setProjectFileName(filename);
 
 	bool saveResult = guiSaveProject();
 	// After saving as, restore default save options.
