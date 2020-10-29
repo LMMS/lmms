@@ -34,7 +34,6 @@
 #include <QFileInfo>
 #include <QDir>
 #include <QMessageBox>
-#include <QRegExp>
 
 #include "base64.h"
 #include "ConfigManager.h"
