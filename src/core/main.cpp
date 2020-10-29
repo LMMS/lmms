@@ -415,15 +415,15 @@ int main( int argc, char * * argv )
 
 			DataFile dataFile(QString::fromLocal8Bit(argv[i]));
 
-			if (argc > i+1) // Bundle name given
+			if (argc > i+1) // Project bundle file name given
 			{
 				printf("Making bundle\n");
-				dataFile.writeBundle(QString::fromLocal8Bit(argv[i+1]));
+				dataFile.writeFile(QString::fromLocal8Bit(argv[i+1]), true);
 				return EXIT_SUCCESS;
 			}
 			else
 			{
-				return usageError("No bundle name specified.");
+				return usageError("No project bundle file name given.");
 			}
 		}
 		else if( arg == "--allowroot" )

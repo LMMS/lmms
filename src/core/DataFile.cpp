@@ -276,11 +276,17 @@ void DataFile::write( QTextStream & _strm )
 
 
 
-bool DataFile::writeFile( const QString& filename )
+bool DataFile::writeFile(const QString& filename, bool withResources)
 {
+	qWarning() << "Write Bundle DEBUG:";
+
 	const QString fullName = nameWithExtension( filename );
 	const QString fullNameTemp = fullName + ".new";
 	const QString fullNameBak = fullName + ".bak";
+	const QString resourcesDir = QFileInfo(fullName).path() + "/resources";
+
+	qWarning() << "Destination File: " << fullName;
+	qWarning() << "Resources Folder: " << resourcesDir;
 
 	QFile outfile( fullNameTemp );
 
@@ -296,6 +302,30 @@ bool DataFile::writeFile( const QString& filename )
 		}
 
 		return false;
+	}
+
+	// If we are saving with resources
+	if (withResources)
+	{
+		// Creates resources folder. First check if there's one in the same
+		// folder already, if so abort
+		if (QDir(resourcesDir).exists())
+		{
+			// TODO: Allow overwriting project bundles?
+			qWarning() << "ERROR: There's a project bundle in this folder already!";
+			return false;
+		}
+		else if (!QDir().mkdir(resourcesDir))
+		{
+			qWarning() << "ERROR: Failed to create resources dir!";
+			return false;
+		}
+
+		if (!copyResources(resourcesDir))
+		{
+			qWarning() << "ERROR: Failed to copy resources!";
+			return false;
+		}
 	}
 
 	if( fullName.section( '.', -1 ) == "mmpz" )
@@ -340,77 +370,8 @@ bool DataFile::writeFile( const QString& filename )
 
 
 
-// TODO: Remove qWarnings
-bool DataFile::writeBundle(const QString& name)
+bool DataFile::copyResources(const QString& resourcesDir)
 {
-	qWarning() << "Write Bundle DEBUG:";
-
-	QString bundlesFolder = ConfigManager::inst()->userBundlesDir();
-
-	// If the bundles folder doesn't exist we abort
-	if (!QDir(bundlesFolder).exists())
-	{
-		qWarning() << "ERROR: Bundle folder doesn't exist!";
-		return false;
-	}
-
-	// Check if the name is valid (starts with a letter/digit, can have letters, digits, whitespaces and hyphens)
-	QRegExp rx("^\\w+[\\w- ]*\\w+$|^\\w$");
-	if (!rx.exactMatch(name))
-	{
-		qWarning() << "ERROR: Invalid bundle name!";
-		return false;
-	}
-
-	// Get the path to the project file and resources folder
-	const QString fullName = nameWithExtension(bundlesFolder + name + "/project");
-	const QString fullNameTemp = fullName + ".new";
-	const QString resourcesDirName = QFileInfo(fullName).path() + "/resources";
-
-	qWarning() << "Bundle Folder: " << bundlesFolder + name;
-	qWarning() << "Destination File: " << fullName;
-	qWarning() << "Resources Folder: " << resourcesDirName;
-
-	// Check if there's a bundle with the same name already, if so abort
-	if (QDir(bundlesFolder + name).exists())
-	{
-		// TODO: Allow overwriting bundles?
-		qWarning() << "ERROR: There's a bundle with that name already!";
-		return false;
-	}
-	else
-	{
-		// Create this bundle's folder
-		if (!QDir().mkdir(bundlesFolder + name))
-		{
-			qWarning() << "ERROR: Failed to create this bundle's folder!";
-			return false;
-		}
-	}
-
-	QFile outfile(fullNameTemp);
-
-	if (!outfile.open(QIODevice::WriteOnly | QIODevice::Truncate))
-	{
-		if (gui)
-		{
-			QMessageBox::critical(NULL,
-				SongEditor::tr("Could not write file"),
-				SongEditor::tr("Could not open %1 for writing. You probably are not permitted to "
-								"write to this file. Please make sure you have write-access to "
-								"the file and try again.").arg(fullName));
-		}
-		qWarning() << "ERROR: Failed to create bundle file!";
-		return false;
-	}
-
-	// Creates resources folder
-	if (!QDir().mkdir(resourcesDirName))
-	{
-		qWarning() << "ERROR: Failed to create resources dir!";
-		return false;
-	}
-
 	// Files will be named by the counter number + file extension
 	// to avoid name conflicts
 	unsigned int resCounter = 1;
@@ -450,7 +411,7 @@ bool DataFile::writeBundle(const QString& name)
 					// The new file name is the counter number + the file extension
 					QString finalFileName = QString::number(resCounter) + "." + resPath.section('.',-1);
 					// Final path is our resources dir + the new file name
-					QString finalPath = resourcesDirName + "/" + finalFileName;
+					QString finalPath = resourcesDir + "/" + finalFileName;
 
 					qWarning() << "Original Resource: " << resPath;
 					qWarning() << "Resource Destination: " << finalPath;
@@ -476,36 +437,8 @@ bool DataFile::writeBundle(const QString& name)
 		++it;
 	}
 
-	// Writes the final DataFile
-	if (fullName.section('.', -1) == "mmpz")
-	{
-		QString xml;
-		QTextStream ts(&xml);
-		write(ts);
-		outfile.write(qCompress(xml.toUtf8()));
-	}
-	else
-	{
-		QTextStream ts(&outfile);
-		write(ts);
-	}
-
-	outfile.close();
-
-	// Make sure the file has been written correctly
-	if (QFileInfo(outfile.fileName()).size() > 0)
-	{
-		// Remove current file if there's one
-		QFile::remove(fullName);
-		// Move temporary file to current file
-		QFile::rename(fullNameTemp, fullName);
-
-		return true;
-	}
-
-	return false;
+	return true;
 }
-
 
 
 

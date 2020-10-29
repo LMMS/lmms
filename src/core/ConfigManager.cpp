@@ -279,7 +279,6 @@ void ConfigManager::createWorkingDir()
 	QDir().mkpath(m_workingDir);
 
 	QDir().mkpath(userProjectsDir());
-	QDir().mkpath(userBundlesDir());
 	QDir().mkpath(userTemplateDir());
 	QDir().mkpath(userSamplesDir());
 	QDir().mkpath(userPresetsDir());

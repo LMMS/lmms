@@ -72,8 +72,8 @@ public:
 	QString nameWithExtension( const QString& fn ) const;
 
 	void write( QTextStream& strm );
-	bool writeFile( const QString& fn );
-	bool writeBundle(const QString& name);
+	bool writeFile(const QString& fn, bool withResources = false);
+	bool copyResources(const QString& resourcesDir);
 
 	QDomElement& content()
 	{
