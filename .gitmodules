@@ -40,3 +40,6 @@
 [submodule "plugins/carlabase/carla"]
 	path = plugins/carlabase/carla
 	url = https://github.com/falktx/carla
+[submodule "plugins/sid/resid"]
+	path = plugins/Sid/resid
+	url = https://github.com/simonowen/resid
