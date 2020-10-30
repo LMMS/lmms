@@ -43,3 +43,6 @@
 [submodule "plugins/sid/resid"]
 	path = plugins/Sid/resid
 	url = https://github.com/simonowen/resid
+[submodule "src/3rdparty/jack2"]
+	path = src/3rdparty/jack2
+	url = https://github.com/jackaudio/jack2
