@@ -250,7 +250,7 @@ void AudioSoundIo::stopProcessing()
 	m_stopped = true;
 	if (m_outstream)
 	{
-		if (err = soundio_outstream_pause(m_outstream, true))
+		if ((err = soundio_outstream_pause(m_outstream, true)))
 		{
 			fprintf(stderr, 
 				"AudioSoundIo::stopProcessing() :: pausing result error: %s\n",
