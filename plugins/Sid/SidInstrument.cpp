@@ -1,5 +1,5 @@
 /*
- * sid_instrument.cpp - ResID based software-synthesizer
+ * SidInstrument.cpp - ResID based software-synthesizer
  *
  * Copyright (c) 2008 Csaba Hruska <csaba.hruska/at/gmail.com>
  *                    Attila Herman <attila589/at/gmail.com>
@@ -32,7 +32,7 @@
 
 #include "sid.h"
 
-#include "sid_instrument.h"
+#include "SidInstrument.h"
 #include "Engine.h"
 #include "InstrumentTrack.h"
 #include "Knob.h"
@@ -119,7 +119,7 @@ voiceObject::~voiceObject()
 }
 
 
-sidInstrument::sidInstrument( InstrumentTrack * _instrument_track ) :
+SidInstrument::SidInstrument( InstrumentTrack * _instrument_track ) :
 	Instrument( _instrument_track, &sid_plugin_descriptor ),
 	// filter	
 	m_filterFCModel( 1024.0f, 0.0f, 2047.0f, 1.0f, this, tr( "Cutoff frequency" ) ),
@@ -138,12 +138,12 @@ sidInstrument::sidInstrument( InstrumentTrack * _instrument_track ) :
 }
 
 
-sidInstrument::~sidInstrument()
+SidInstrument::~SidInstrument()
 {
 }
 
 
-void sidInstrument::saveSettings( QDomDocument & _doc,
+void SidInstrument::saveSettings( QDomDocument & _doc,
 							QDomElement & _this )
 {
 	// voices
@@ -189,7 +189,7 @@ void sidInstrument::saveSettings( QDomDocument & _doc,
 
 
 
-void sidInstrument::loadSettings( const QDomElement & _this )
+void SidInstrument::loadSettings( const QDomElement & _this )
 {
 	// voices
 	for( int i = 0; i < 3; ++i )
@@ -223,7 +223,7 @@ void sidInstrument::loadSettings( const QDomElement & _this )
 
 
 
-QString sidInstrument::nodeName() const
+QString SidInstrument::nodeName() const
 {
 	return( sid_plugin_descriptor.name );
 }
@@ -231,7 +231,7 @@ QString sidInstrument::nodeName() const
 
 
 
-f_cnt_t sidInstrument::desiredReleaseFrames() const
+f_cnt_t SidInstrument::desiredReleaseFrames() const
 {
 	const float samplerate = Engine::mixer()->processingSampleRate();
 	int maxrel = 0;
@@ -247,7 +247,7 @@ f_cnt_t sidInstrument::desiredReleaseFrames() const
 
 
 
-static int sid_fillbuffer(unsigned char* sidreg, cSID *sid, int tdelta, short *ptr, int samples)
+static int sid_fillbuffer(unsigned char* sidreg, SID *sid, int tdelta, short *ptr, int samples)
 {
   int tdelta2;
   int result;
@@ -302,7 +302,7 @@ static int sid_fillbuffer(unsigned char* sidreg, cSID *sid, int tdelta, short *p
 
 
 
-void sidInstrument::playNote( NotePlayHandle * _n,
+void SidInstrument::playNote( NotePlayHandle * _n,
 						sampleFrame * _working_buffer )
 {
 	const f_cnt_t tfp = _n->totalFramesPlayed();
@@ -312,7 +312,7 @@ void sidInstrument::playNote( NotePlayHandle * _n,
 
 	if ( tfp == 0 )
 	{
-		cSID *sid = new cSID();
+		SID *sid = new SID();
 		sid->set_sampling_parameters( clockrate, SAMPLE_FAST, samplerate );
 		sid->set_chip_model( MOS8580 );
 		sid->enable_filter( true );
@@ -322,7 +322,7 @@ void sidInstrument::playNote( NotePlayHandle * _n,
 	const fpp_t frames = _n->framesLeftForCurrentPeriod();
 	const f_cnt_t offset = _n->noteOffset();
 
-	cSID *sid = static_cast<cSID *>( _n->m_pluginData );
+	SID *sid = static_cast<SID *>( _n->m_pluginData );
 	int delta_t = clockrate * frames / samplerate + 4;
 	// avoid variable length array for msvc compat
 	short* buf = reinterpret_cast<short*>(_working_buffer + offset);
@@ -446,17 +446,17 @@ void sidInstrument::playNote( NotePlayHandle * _n,
 
 
 
-void sidInstrument::deleteNotePluginData( NotePlayHandle * _n )
+void SidInstrument::deleteNotePluginData( NotePlayHandle * _n )
 {
-	delete static_cast<cSID *>( _n->m_pluginData );
+	delete static_cast<SID *>( _n->m_pluginData );
 }
 
 
 
 
-PluginView * sidInstrument::instantiateView( QWidget * _parent )
+PluginView * SidInstrument::instantiateView( QWidget * _parent )
 {
-	return( new sidInstrumentView( this, _parent ) );
+	return( new SidInstrumentView( this, _parent ) );
 }
 
 
@@ -481,7 +481,7 @@ public:
 
 
 
-sidInstrumentView::sidInstrumentView( Instrument * _instrument,
+SidInstrumentView::SidInstrumentView( Instrument * _instrument,
 							QWidget * _parent ) :
 	InstrumentViewFixedSize( _instrument, _parent )
 {
@@ -657,13 +657,13 @@ sidInstrumentView::sidInstrumentView( Instrument * _instrument,
 }
 
 
-sidInstrumentView::~sidInstrumentView()
+SidInstrumentView::~SidInstrumentView()
 {
 }
 
-void sidInstrumentView::updateKnobHint()
+void SidInstrumentView::updateKnobHint()
 {
-	sidInstrument * k = castModel<sidInstrument>();
+	SidInstrument * k = castModel<SidInstrument>();
 
 	for( int i = 0; i < 3; ++i )
 	{
@@ -702,9 +702,9 @@ void sidInstrumentView::updateKnobHint()
 
 
 
-void sidInstrumentView::updateKnobToolTip()
+void SidInstrumentView::updateKnobToolTip()
 {
-	sidInstrument * k = castModel<sidInstrument>();
+	SidInstrument * k = castModel<SidInstrument>();
 	for( int i = 0; i < 3; ++i )
 	{
 		ToolTip::add( m_voiceKnobs[i].m_sustKnob,
@@ -722,9 +722,9 @@ void sidInstrumentView::updateKnobToolTip()
 
 
 
-void sidInstrumentView::modelChanged()
+void SidInstrumentView::modelChanged()
 {
-	sidInstrument * k = castModel<sidInstrument>();
+	SidInstrument * k = castModel<SidInstrument>();
 
 	m_volKnob->setModel( &k->m_volumeModel );
 	m_resKnob->setModel( &k->m_filterResonanceModel );
@@ -796,7 +796,7 @@ extern "C"
 // necessary for getting instance out of shared lib
 PLUGIN_EXPORT Plugin * lmms_plugin_main( Model *m, void * )
 {
-	return( new sidInstrument( static_cast<InstrumentTrack *>( m ) ) );
+	return( new SidInstrument( static_cast<InstrumentTrack *>( m ) ) );
 }
 
 
