@@ -33,6 +33,7 @@
 
 #include "DataFile.h"
 #include "LinkedModelGroups.h"
+#include "lmms_export.h"
 #include "Plugin.h"
 
 class Lv2Proc;
@@ -65,7 +66,7 @@ class PluginIssue;
 	* this class can not override virtuals of Instrument or EffectControls, so
 	  it will offer functions that must be called by virtuals in its child class
 */
-class Lv2ControlBase : public LinkedModelGroups
+class LMMS_EXPORT Lv2ControlBase : public LinkedModelGroups
 {
 public:
 	static Plugin::PluginTypes check(const LilvPlugin* m_plugin,
@@ -87,7 +88,11 @@ protected:
 	//!   this is the same pointer as this, but a different type
 	//! @param uri the Lv2 URI telling this class what plugin to construct
 	Lv2ControlBase(class Model *that, const QString& uri);
+	Lv2ControlBase(const Lv2ControlBase&) = delete;
 	~Lv2ControlBase() override;
+
+	Lv2ControlBase& operator=(const Lv2ControlBase&) = delete;
+
 	//! Must be checked after ctor or reload
 	bool isValid() const { return m_valid; }
 
