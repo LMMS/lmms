@@ -1060,52 +1060,7 @@ void Song::loadProject( const QString & fileName )
 	{
 		// We check if VST plugins contain local paths to prevent malicious code being
 		// added to project bundles and loaded with "local:" paths
-		QDomNodeList list;
-		bool localPlugin = false;
-
-		// First check Vestige plugins
-		list = dataFile.elementsByTagName("vestige");
-
-		for (int i = 0; !list.item(i).isNull() && localPlugin == false; ++i)
-		{
-			QDomElement el = list.item(i).toElement();
-
-			if (el.attribute("plugin").startsWith("local:"))
-			{
-				localPlugin = true;
-			}
-		}
-
-		// Then check effect plugins
-		list = dataFile.elementsByTagName("effect");
-
-		for (int i = 0; !list.item(i).isNull() && localPlugin == false; ++i)
-		{
-			QDomElement el = list.item(i).toElement();
-
-			// Check for the key node which contains attributes, one of which is the file
-			QDomNodeList keys = el.elementsByTagName("key");
-			for (int j = 0; !keys.item(j).isNull() && localPlugin == false; ++j)
-			{
-				QDomElement key = list.item(j).toElement();
-
-				// Now loop through attributes
-				QDomNodeList attributes = key.elementsByTagName("attribute");
-
-				for (int k = 0; !attributes.item(k).isNull() && localPlugin == false; ++k)
-				{
-					QDomElement attr = list.item(k).toElement();
-
-					if (attr.attribute("name") == "file" &&
-						attr.attribute("value").startsWith("local:"))
-					{
-						localPlugin = true;
-					}
-				}
-			}
-		}
-
-		if (localPlugin)
+		if (dataFile.hasLocalPlugins())
 		{
 			cantLoadProject = true;
 			QMessageBox::critical(NULL, tr("Aborting project load"),

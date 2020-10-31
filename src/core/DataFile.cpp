@@ -462,6 +462,58 @@ bool DataFile::copyResources(const QString& resourcesDir)
 
 
 
+bool DataFile::hasLocalPlugins()
+{
+	QDomNodeList list;
+
+	// First check Vestige plugins
+	list = elementsByTagName("vestige");
+
+	for (int i = 0; !list.item(i).isNull(); ++i)
+	{
+		QDomElement el = list.item(i).toElement();
+
+		if (el.attribute("plugin").startsWith("local:"))
+		{
+			return true;
+		}
+	}
+
+	// Then check effect plugins
+	list = elementsByTagName("effect");
+
+	for (int i = 0; !list.item(i).isNull(); ++i)
+	{
+		QDomElement el = list.item(i).toElement();
+
+		// Check for the key node which contains attributes, one of which is the file
+		QDomNodeList keys = el.elementsByTagName("key");
+		for (int j = 0; !keys.item(j).isNull(); ++j)
+		{
+			QDomElement key = list.item(j).toElement();
+
+			// Now loop through attributes
+			QDomNodeList attributes = key.elementsByTagName("attribute");
+
+			for (int k = 0; !attributes.item(k).isNull(); ++k)
+			{
+				QDomElement attr = list.item(k).toElement();
+
+				if (attr.attribute("name") == "file" &&
+					attr.attribute("value").startsWith("local:"))
+				{
+					return true;
+				}
+			}
+		}
+	}
+
+	return false;
+}
+
+
+
+
 DataFile::Type DataFile::type( const QString& typeName )
 {
 	for( int i = 0; i < TypeCount; ++i )
