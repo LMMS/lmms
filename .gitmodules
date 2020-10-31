@@ -46,3 +46,6 @@
 [submodule "src/3rdparty/jack2"]
 	path = src/3rdparty/jack2
 	url = https://github.com/jackaudio/jack2
+[submodule "plugins/LadspaEffect/cmt/cmt"]
+	path = plugins/LadspaEffect/cmt/cmt
+	url = https://github.com/lmms/cmt
