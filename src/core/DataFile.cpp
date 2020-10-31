@@ -56,7 +56,6 @@ static void findIds(const QDomElement& elem, QList<jo_id_t>& idList);
 const DataFile::ResourcesMap DataFile::ELEMENTS_WITH_RESOURCES = {
 { "sampletco", {"src"} },
 { "audiofileprocessor", {"src"} },
-{ "vestige", {"plugin"} }
 };
 
 // Vector with all the upgrade methods
@@ -399,7 +398,7 @@ bool DataFile::copyResources(const QString& resourcesDir)
 	ResourcesMap::const_iterator it = ELEMENTS_WITH_RESOURCES.begin();
 
 	// Copy resources and manipulate the DataFile to have local paths to them
-	while(it != ELEMENTS_WITH_RESOURCES.end())
+	while (it != ELEMENTS_WITH_RESOURCES.end())
 	{
 		qWarning() << "Looking for resources on: " << it->first;
 		QDomNodeList list = elementsByTagName(it->first);
@@ -412,11 +411,11 @@ bool DataFile::copyResources(const QString& resourcesDir)
 			std::vector<QString>::const_iterator res = it->second.begin();
 
 			// Search for attributes that point to resources
-			while(res != it->second.end())
+			while (res != it->second.end())
 			{
 				qWarning() << "Attribute: " << *res;
 				// If the element has that attribute
-				if(el.hasAttribute(*res))
+				if (el.hasAttribute(*res))
 				{
 					// Get absolute path to resource
 					QString resPath = PathUtil::toAbsolute(el.attribute(*res));
