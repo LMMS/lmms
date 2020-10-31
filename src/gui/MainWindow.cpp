@@ -149,7 +149,7 @@ MainWindow::MainWindow() :
 
 
 	QStringList root_paths;
-	QString title = tr( "Root directory" );
+	QString title = tr( "Root Directory" );
 	bool dirs_as_items = false;
 
 #ifdef LMMS_BUILD_APPLE
