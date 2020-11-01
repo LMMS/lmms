@@ -9,9 +9,6 @@
 /plugins/zynaddsubfx/zynaddsubfx/doc/Makefile
 /plugins/zynaddsubfx/zynaddsubfx/doc/gen/Makefile
 /data/locale/*.qm
-
 .vs/
-
 CMakeSettings.json
-
 out/
