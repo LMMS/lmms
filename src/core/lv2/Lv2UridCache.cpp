@@ -34,6 +34,11 @@
 
 #include "Lv2UridMap.h"
 
+// support newer URIs on old systems
+#ifndef LV2_BUF_SIZE__nominalBlockLength
+#define LV2_BUF_SIZE__nominalBlockLength LV2_BUF_SIZE_PREFIX "nominalBlockLength"
+#endif
+
 uint32_t Lv2UridCache::operator[](Lv2UridCache::Id id) const
 {
 	Q_ASSERT(id != Id::size);
