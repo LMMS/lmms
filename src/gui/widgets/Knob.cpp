@@ -22,6 +22,7 @@
  *
  */
 
+#include <memory>
 #include <QApplication>
 #include <QBitmap>
 #include <QFontMetrics>
@@ -46,6 +47,7 @@
 #include "MainWindow.h"
 #include "ProjectJournal.h"
 #include "Song.h"
+#include "stdshims.h"
 #include "StringPairDrag.h"
 #include "TextFloat.h"
 
@@ -58,7 +60,6 @@ Knob::Knob( knobTypes _knob_num, QWidget * _parent, const QString & _name ) :
 	QWidget( _parent ),
 	FloatModelView( new FloatModel( 0, 0, 0, 1, NULL, _name, true ), this ),
 	m_label( "" ),
-	m_knobPixmap( NULL ),
 	m_volumeKnob( false ),
 	m_volumeRatio( 100.0, 0.0, 1000000.0 ),
 	m_buttonPressed( false ),
@@ -105,10 +106,16 @@ void Knob::initUi( const QString & _name )
 	case knobSmall_17:
 	case knobBright_26:
 	case knobDark_28:
-		setlineColor(QApplication::palette().color( QPalette::Active, QPalette::WindowText ));
+		m_lineActiveColor = QApplication::palette().color(QPalette::Active, QPalette::WindowText);
+		m_arcActiveColor = QColor(QApplication::palette().color(
+									QPalette::Active, QPalette::WindowText));
+		m_arcActiveColor.setAlpha(70);
 		break;
 	case knobVintage_32:
-		setlineColor(QApplication::palette().color( QPalette::Active, QPalette::Shadow ));
+		m_lineActiveColor = QApplication::palette().color(QPalette::Active, QPalette::Shadow);
+		m_arcActiveColor = QColor(QApplication::palette().color(
+									QPalette::Active, QPalette::Shadow));
+		m_arcActiveColor.setAlpha(70);
 		break;
 	default:
 		break;
@@ -144,20 +151,12 @@ void Knob::onKnobNumUpdated()
 		}
 
 		// If knobFilename is still empty here we should get the fallback pixmap of size 1x1
-		m_knobPixmap = new QPixmap( embed::getIconPixmap( knobFilename.toUtf8().constData() ) );
-
+		m_knobPixmap = make_unique<QPixmap>(QPixmap(embed::getIconPixmap(knobFilename.toUtf8().constData())));
+		if (!this->isEnabled())
+		{
+			convertPixmapToGrayScale(*m_knobPixmap.get());
+		}
 		setFixedSize( m_knobPixmap->width(), m_knobPixmap->height() );
-	}
-}
-
-
-
-
-Knob::~Knob()
-{
-	if( m_knobPixmap )
-	{
-		delete m_knobPixmap;
 	}
 }
 
@@ -308,35 +307,6 @@ void Knob::setOuterColor( const QColor & c )
 
 
 
-QColor Knob::lineColor() const
-{
-	return m_lineColor;
-}
-
-
-
-void Knob::setlineColor( const QColor & c )
-{
-	m_lineColor = c;
-}
-
-
-
-QColor Knob::arcColor() const
-{
-	return m_arcColor;
-}
-
-
-
-void Knob::setarcColor( const QColor & c )
-{
-	m_arcColor = c;
-}
-
-
-
-
 QColor Knob::textColor() const
 {
 	return m_textColor;
@@ -383,6 +353,10 @@ bool Knob::updateAngle()
 
 void Knob::drawKnob( QPainter * _p )
 {
+	bool enabled = this->isEnabled();
+	QColor currentArcColor = enabled ? m_arcActiveColor : m_arcInactiveColor;
+	QColor currentLineColor = enabled ? m_lineActiveColor : m_lineInactiveColor;
+
 	if( updateAngle() == false && !m_cache.isNull() )
 	{
 		_p->drawImage( 0, 0, m_cache );
@@ -441,33 +415,24 @@ void Knob::drawKnob( QPainter * _p )
 	const int arcLineWidth = 2;
 	const int arcRectSize = m_knobPixmap->width() - arcLineWidth;
 
-	QColor col;
-	if( m_knobNum == knobVintage_32 )
-	{	col = QApplication::palette().color( QPalette::Active, QPalette::Shadow ); }
-	else
-	{	col = QApplication::palette().color( QPalette::Active, QPalette::WindowText ); }
-	col.setAlpha( 70 );
-
-	p.setPen( QPen( col, 2 ) );
+	p.setPen(QPen(currentArcColor, 2));
 	p.drawArc( mid.x() - arcRectSize/2, 1, arcRectSize, arcRectSize, 315*16, 16*m_totalAngle );
 
+	p.setPen(QPen(currentLineColor, 2));
 	switch( m_knobNum )
 	{
 		case knobSmall_17:
 		{
-			p.setPen( QPen( lineColor(), 2 ) );
 			p.drawLine( calculateLine( mid, radius-2 ) );
 			break;
 		}
 		case knobBright_26:
 		{
-			p.setPen( QPen( lineColor(), 2 ) );
 			p.drawLine( calculateLine( mid, radius-5 ) );
 			break;
 		}
 		case knobDark_28:
 		{
-			p.setPen( QPen( lineColor(), 2 ) );
 			const float rb = qMax<float>( ( radius - 10 ) / 3.0,
 									0.0 );
 			const float re = qMax<float>( ( radius - 4 ), 0.0 );
@@ -478,7 +443,6 @@ void Knob::drawKnob( QPainter * _p )
 		}
 		case knobVintage_32:
 		{
-			p.setPen( QPen( lineColor(), 2 ) );
 			p.drawLine( calculateLine( mid, radius-2, 2 ) );
 			break;
 		}
@@ -839,4 +803,36 @@ void Knob::doConnections()
 		QObject::connect( model(), SIGNAL( propertiesChanged() ),
 						this, SLOT( update() ) );
 	}
+}
+
+
+void Knob::changeEvent(QEvent * ev)
+{
+	if (ev->type() == QEvent::EnabledChange)
+	{
+		onKnobNumUpdated();
+		if (!m_label.isEmpty())
+		{
+			setLabel(m_label);
+		}
+		m_cache = QImage();
+		update();
+	}
+}
+
+
+void convertPixmapToGrayScale(QPixmap& pixMap)
+{
+	QImage temp = pixMap.toImage().convertToFormat(QImage::Format_ARGB32);
+	for (int i = 0; i < temp.height(); ++i)
+	{
+		for (int j = 0; j < temp.width(); ++j)
+		{
+			const auto pix = temp.pixelColor(i, j);
+			const auto gscale = 0.2126 * pix.redF() + 0.7152 * pix.greenF() + 0.0722 * pix.blueF();
+			const auto pixGray = QColor::fromRgbF(gscale, gscale, gscale, pix.alphaF());
+			temp.setPixelColor(i, j, pixGray);
+		}
+	}
+	pixMap.convertFromImage(temp);
 }

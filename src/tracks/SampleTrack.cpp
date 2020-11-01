@@ -275,7 +275,11 @@ void SampleTCO::saveSettings( QDomDocument & _doc, QDomElement & _this )
 		_this.setAttribute( "data", m_sampleBuffer->toBase64( s ) );
 	}
 
-	_this.setAttribute ("sample_rate", m_sampleBuffer->sampleRate());
+	_this.setAttribute( "sample_rate", m_sampleBuffer->sampleRate());
+	if( usesCustomClipColor() )
+	{
+		_this.setAttribute( "color", color().name() );
+	}
 	// TODO: start- and end-frame
 }
 
@@ -297,8 +301,14 @@ void SampleTCO::loadSettings( const QDomElement & _this )
 	setMuted( _this.attribute( "muted" ).toInt() );
 	setStartTimeOffset( _this.attribute( "off" ).toInt() );
 
-	if (_this.hasAttribute("sample_rate")) {
-		m_sampleBuffer->setSampleRate(_this.attribute("sample_rate").toInt());
+	if ( _this.hasAttribute( "sample_rate" ) ) {
+		m_sampleBuffer->setSampleRate( _this.attribute( "sample_rate" ).toInt() );
+	}
+	
+	if( _this.hasAttribute( "color" ) )
+	{
+		useCustomClipColor( true );
+		setColor( _this.attribute( "color" ) );
 	}
 }
 
@@ -397,6 +407,14 @@ void SampleTCOView::contextMenuEvent( QContextMenuEvent * _cme )
 	/*contextMenu.addAction( embed::getIconPixmap( "record" ),
 				tr( "Set/clear record" ),
 						m_tco, SLOT( toggleRecord() ) );*/
+
+	contextMenu.addSeparator();
+
+	contextMenu.addAction( embed::getIconPixmap( "colorize" ),
+			tr( "Set clip color" ), this, SLOT( changeClipColor() ) );
+	contextMenu.addAction( embed::getIconPixmap( "colorize" ),
+			tr( "Use track color" ), this, SLOT( useTrackColor() ) );
+	
 	constructContextMenu( &contextMenu );
 
 	contextMenu.exec( QCursor::pos() );
@@ -525,12 +543,8 @@ void SampleTCOView::paintEvent( QPaintEvent * pe )
 	QPainter p( &m_paintPixmap );
 
 	QLinearGradient lingrad( 0, 0, 0, height() );
-	QColor c;
+	QColor c = getColorForDisplay( painter.background().color() );
 	bool muted = m_tco->getTrack()->isMuted() || m_tco->isMuted();
-
-	// state: selected, muted, normal
-	c = isSelected() ? selectedColor() : ( muted ? mutedBackgroundColor()
-		: painter.background().color() );
 
 	lingrad.setColorAt( 1, c.darker( 300 ) );
 	lingrad.setColorAt( 0, c );
@@ -571,12 +585,12 @@ void SampleTCOView::paintEvent( QPaintEvent * pe )
 	p.setRenderHint( QPainter::Antialiasing, false );
 
 	// inner border
-	p.setPen( c.lighter( 160 ) );
+	p.setPen( c.lighter( 135 ) );
 	p.drawRect( 1, 1, rect().right() - TCO_BORDER_WIDTH,
 		rect().bottom() - TCO_BORDER_WIDTH );
 
 	// outer border
-	p.setPen( c.darker( 300 ) );
+	p.setPen( c.darker( 200 ) );
 	p.drawRect( 0, 0, rect().right(), rect().bottom() );
 
 	// draw the 'muted' pixmap only if the pattern was manualy muted

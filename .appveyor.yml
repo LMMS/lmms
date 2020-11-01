@@ -8,7 +8,11 @@ environment:
   matrix:
     - compiler: msvc
 install:
-  - vcpkg install --triplet %PLATFORM%-windows --recurse fftw3 libsamplerate libsndfile sdl2
+  - cd C:\Tools\vcpkg
+  - git pull
+  - .\bootstrap-vcpkg.bat
+  - cd %APPVEYOR_BUILD_FOLDER%
+  - vcpkg install --triplet %PLATFORM%-windows --recurse fftw3 libsamplerate libsndfile lilv lv2 sdl2
   - nuget install clcache -Version 4.1.0
 build_script:
   - cd %APPVEYOR_BUILD_FOLDER%

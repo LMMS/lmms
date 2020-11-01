@@ -30,11 +30,13 @@
 #include <QMouseEvent>
 #include <QPainter>
 #include <QPushButton>
+#include <QTimer>
 
 #include "AudioSampleRecorder.h"
 #include "BBTrackContainer.h"
 #include "DeprecationHelper.h"
 #include "embed.h"
+#include "gui_templates.h"
 #include "GuiApplication.h"
 #include "InstrumentTrack.h"
 #include "PianoRoll.h"
@@ -356,6 +358,11 @@ void Pattern::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
 	_this.setAttribute( "type", m_patternType );
 	_this.setAttribute( "name", name() );
+	
+	if( usesCustomClipColor() )
+	{
+		_this.setAttribute( "color", color().name() );
+	}
 	// as the target of copied/dragged pattern is always an existing
 	// pattern, we must not store actual position, instead we store -1
 	// which tells loadSettings() not to mess around with position
@@ -387,6 +394,13 @@ void Pattern::loadSettings( const QDomElement & _this )
 	m_patternType = static_cast<PatternTypes>( _this.attribute( "type"
 								).toInt() );
 	setName( _this.attribute( "name" ) );
+	
+	if( _this.hasAttribute( "color" ) )
+	{
+		useCustomClipColor( true );
+		setColor( _this.attribute( "color" ) );
+	}
+	
 	if( _this.attribute( "pos" ).toInt() >= 0 )
 	{
 		movePosition( _this.attribute( "pos" ).toInt() );
@@ -853,14 +867,20 @@ void PatternView::paintEvent( QPaintEvent * )
 
 	QPainter p( &m_paintPixmap );
 
+	QColor c;
 	bool const muted = m_pat->getTrack()->isMuted() || m_pat->isMuted();
 	bool current = gui->pianoRoll()->currentPattern() == m_pat;
 	bool beatPattern = m_pat->m_patternType == Pattern::BeatPattern;
-
-	// state: selected, normal, beat pattern, muted
-	QColor c = isSelected() ? selectedColor() : ( ( !muted && !beatPattern )
-		? painter.background().color() : ( beatPattern
-		? BBPatternBackground() : mutedBackgroundColor() ) );
+	
+	if( beatPattern )
+	{
+		// Do not paint BBTCOs how we paint pattern TCOs
+		c = BBPatternBackground();
+	}
+	else
+	{
+		c = getColorForDisplay( painter.background().color() );
+	}
 
 	// invert the gradient for the background in the B&B editor
 	QLinearGradient lingrad( 0, 0, 0, height() );
@@ -973,7 +993,8 @@ void PatternView::paintEvent( QPaintEvent * )
 
 		// set colour based on mute status
 		QColor noteFillColor = muted ? getMutedNoteFillColor() : getNoteFillColor();
-		QColor noteBorderColor = muted ? getMutedNoteBorderColor() : getNoteBorderColor();
+		QColor noteBorderColor = muted ? getMutedNoteBorderColor()
+									   : ( m_pat->hasColor() ? c.lighter( 200 ) : getNoteBorderColor() );
 
 		bool const drawAsLines = height() < 64;
 		if (drawAsLines)

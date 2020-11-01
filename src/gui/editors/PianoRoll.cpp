@@ -37,6 +37,7 @@
 #include <QScrollBar>
 #include <QStyleOption>
 #include <QtMath>
+#include <QToolButton>
 
 #ifndef __USE_XOPEN
 #define __USE_XOPEN
@@ -641,6 +642,73 @@ void PianoRoll::clearGhostPattern()
 	setGhostPattern( nullptr );
 	emit ghostPatternSet( false );
 	update();
+}
+
+
+void PianoRoll::glueNotes()
+{
+	if (hasValidPattern())
+	{
+		NoteVector selectedNotes = getSelectedNotes();
+		if (selectedNotes.empty())
+		{
+			TextFloat::displayMessage( tr( "Glue notes failed" ),
+					tr( "Please select notes to glue first." ),
+					embed::getIconPixmap( "glue", 24, 24 ),
+					3000 );
+			return;
+		}
+
+		// Make undo possible
+		m_pattern->addJournalCheckPoint();
+
+		// Sort notes on key and then pos.
+		std::sort(selectedNotes.begin(), selectedNotes.end(),
+			[](const Note * note, const Note * compareNote) -> bool
+			{
+				if (note->key() == compareNote->key())
+				{
+					return note->pos() < compareNote->pos();
+				}
+				return note->key() < compareNote->key();
+			});
+
+		QList<Note *> noteToRemove;
+
+		NoteVector::iterator note = selectedNotes.begin();
+		auto nextNote = note+1;
+		NoteVector::iterator end = selectedNotes.end();
+
+		while (note != end && nextNote != end)
+		{
+			// key and position match for glue. The notes are already
+			// sorted so we don't need to test that nextNote is the same
+			// position or next in sequence.
+			if ((*note)->key() == (*nextNote)->key()
+				&& (*nextNote)->pos() <= (*note)->pos()
+				+ qMax(MidiTime(0), (*note)->length()))
+			{
+				(*note)->setLength(qMax((*note)->length(),
+					MidiTime((*nextNote)->endPos() - (*note)->pos())));
+				noteToRemove.push_back(*nextNote);
+				++nextNote;
+			}
+			// key or position doesn't match
+			else
+			{
+				note = nextNote;
+				nextNote = note+1;
+			}
+		}
+
+		// Remove old notes
+		for (int i = 0; i < noteToRemove.count(); ++i)
+		{
+			m_pattern->removeNote(noteToRemove[i]);
+		}
+
+		update();
+	}
 }
 
 
@@ -3901,6 +3969,9 @@ void PianoRoll::updateYScroll()
 
 void PianoRoll::copyToClipboard( const NoteVector & notes ) const
 {
+	// For copyString() and MimeType enum class
+	using namespace Clipboard;
+
 	DataFile dataFile( DataFile::ClipboardData );
 	QDomElement note_list = dataFile.createElement( "note-list" );
 	dataFile.content().appendChild( note_list );
@@ -3913,10 +3984,7 @@ void PianoRoll::copyToClipboard( const NoteVector & notes ) const
 		clip_note.saveState( dataFile, note_list );
 	}
 
-	QMimeData * clip_content = new QMimeData;
-	clip_content->setData( Clipboard::mimeType(), dataFile.toString().toUtf8() );
-	QApplication::clipboard()->setMimeData( clip_content,
-							QClipboard::Clipboard );
+	copyString( dataFile.toString(), MimeType::Default );
 }
 
 
@@ -3969,14 +4037,15 @@ void PianoRoll::cutSelectedNotes()
 
 void PianoRoll::pasteNotes()
 {
+	// For getString() and MimeType enum class
+	using namespace Clipboard;
+
 	if( ! hasValidPattern() )
 	{
 		return;
 	}
 
-	QString value = QApplication::clipboard()
-				->mimeData( QClipboard::Clipboard )
-						->data( Clipboard::mimeType() );
+	QString value = getString( MimeType::Default );
 
 	if( ! value.isEmpty() )
 	{
@@ -4360,6 +4429,21 @@ PianoRollWindow::PianoRollWindow() :
 	DropToolBar *timeLineToolBar = addDropToolBarToTop( tr( "Timeline controls" ) );
 	m_editor->m_timeLine->addToolButtons( timeLineToolBar );
 
+	// -- Note modifier tools
+	// Toolbar
+	QToolButton * noteToolsButton = new QToolButton(m_toolBar);
+	noteToolsButton->setIcon(embed::getIconPixmap("tool"));
+	noteToolsButton->setPopupMode(QToolButton::InstantPopup);
+
+	// Glue
+	QAction * glueAction = new QAction(embed::getIconPixmap("glue"),
+				tr("Glue"), noteToolsButton);
+	connect(glueAction, SIGNAL(triggered()), m_editor, SLOT(glueNotes()));
+	glueAction->setShortcut( Qt::SHIFT | Qt::Key_G );
+
+	noteToolsButton->addAction(glueAction);
+
+	notesActionsToolBar->addWidget(noteToolsButton);
 
 	addToolBarBreak();
 
