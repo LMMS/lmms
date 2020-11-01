@@ -4549,7 +4549,7 @@ Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <source>The Operators view contains all the operators. These include both audible operators (oscillators) and inaudible operators, or modulators: Low-frequency oscillators and Envelopes. 
+        <source>The Operators view contains all the operators. These include both audible operators (oscillators) and inaudible operators, or modulators: Low-frequency oscillators and Envelopes.
 
 Knobs and other widgets in the Operators view have their own what&apos;s this -texts, so you can get more specific help for them that way. </source>
         <translation type="unfinished"/>
@@ -4559,9 +4559,9 @@ Knobs and other widgets in the Operators view have their own what&apos;s this -t
         <translation type="unfinished"/>
     </message>
     <message>
-        <source>The Matrix view contains the modulation matrix. Here you can define the modulation relationships between the various operators: Each audible operator (oscillators 1-3) has 3-4 properties that can be modulated by any of the modulators. Using more modulations consumes more CPU power. 
+        <source>The Matrix view contains the modulation matrix. Here you can define the modulation relationships between the various operators: Each audible operator (oscillators 1-3) has 3-4 properties that can be modulated by any of the modulators. Using more modulations consumes more CPU power.
 
-The view is divided to modulation targets, grouped by the target oscillator. Available targets are volume, pitch, phase, pulse width and sub-osc ratio. Note: some targets are specific to one oscillator only. 
+The view is divided to modulation targets, grouped by the target oscillator. Available targets are volume, pitch, phase, pulse width and sub-osc ratio. Note: some targets are specific to one oscillator only.
 
 Each modulation target has 4 knobs, one for each modulator. By default the knobs are at 0, which means no modulation. Turning a knob to 1 causes that modulator to affect the modulation target as much as possible. Turning it to -1 does the same, but the modulation is inversed. </source>
         <translation type="unfinished"/>
@@ -4639,36 +4639,36 @@ Each modulation target has 4 knobs, one for each modulator. By default the knobs
         <translation type="unfinished"/>
     </message>
     <message>
-        <source>In addition to dedicated modulators, Monstro allows oscillator 3 to be modulated by the output of oscillator 2. 
+        <source>In addition to dedicated modulators, Monstro allows oscillator 3 to be modulated by the output of oscillator 2.
 
 Mix mode means no modulation: the outputs of the oscillators are simply mixed together. </source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <source>In addition to dedicated modulators, Monstro allows oscillator 3 to be modulated by the output of oscillator 2. 
+        <source>In addition to dedicated modulators, Monstro allows oscillator 3 to be modulated by the output of oscillator 2.
 
 AM means amplitude modulation: Oscillator 3&apos;s amplitude (volume) is modulated by oscillator 2. </source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <source>In addition to dedicated modulators, Monstro allows oscillator 3 to be modulated by the output of oscillator 2. 
+        <source>In addition to dedicated modulators, Monstro allows oscillator 3 to be modulated by the output of oscillator 2.
 
 FM means frequency modulation: Oscillator 3&apos;s frequency (pitch) is modulated by oscillator 2. The frequency modulation is implemented as phase modulation, which gives a more stable overall pitch than &quot;pure&quot; frequency modulation. </source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <source>In addition to dedicated modulators, Monstro allows oscillator 3 to be modulated by the output of oscillator 2. 
+        <source>In addition to dedicated modulators, Monstro allows oscillator 3 to be modulated by the output of oscillator 2.
 
 PM means phase modulation: Oscillator 3&apos;s phase is modulated by oscillator 2. It differs from frequency modulation in that the phase changes are not cumulative. </source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <source>Select the waveform for LFO 1. 
+        <source>Select the waveform for LFO 1.
 &quot;Random&quot; and &quot;Random smooth&quot; are special waveforms: they produce random output, where the rate of the LFO controls how often the state of the LFO changes. The smooth version interpolates between these states with cosine interpolation. These random modes can be used to give &quot;life&quot; to your presets - add some of that analog unpredictability... </source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <source>Select the waveform for LFO 2. 
+        <source>Select the waveform for LFO 2.
 &quot;Random&quot; and &quot;Random smooth&quot; are special waveforms: they produce random output, where the rate of the LFO controls how often the state of the LFO changes. The smooth version interpolates between these states with cosine interpolation. These random modes can be used to give &quot;life&quot; to your presets - add some of that analog unpredictability... </source>
         <translation type="unfinished"/>
     </message>

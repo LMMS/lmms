@@ -19,13 +19,13 @@ QTreeWidget::item {
 QTreeWidget::item:hover,
 QTreeWidget::branch:hover {
 	background-color: #3C444E;
-	padding-left: 0px;
+	padding-left: 0;
 }
 
 QTreeWidget::item:selected,
 QTreeWidget::branch:selected {
 	background-color: #17793b;
-	padding-left: 0px;
+	padding-left: 0;
 }
 
 QTreeView::branch:has-children:open {
@@ -105,13 +105,13 @@ QMenu::separator {
 	height: 1.0px;
 	background: #323940;
 	margin-left: 0x;
-	margin-right: 0px;
+	margin-right: 0;
 }
 
 QMenu::item {
 	color: #d1d8e4;
 	padding: 2px 35px 2px 23px;
-	margin: 3px 0px 3px 0px;
+	margin: 3px 0;
 }
 
 QMenu::item:selected {
@@ -228,13 +228,13 @@ QScrollBar:horizontal {
 	border-top: 3px solid #262b30;
 	background: #262b30;
 	height: 12px;
-	margin: 0px 12px;
+	margin: 0 12px;
 }
 QScrollBar:vertical {
 	border-left: 3px solid #262b30;
 	background: #262b30;
 	width: 12px;
-	margin: 12px 0px;
+	margin: 12px 0;
 }
 
 /* scrollbar: trough clicky things */
@@ -291,7 +291,7 @@ QScrollBar::handle:horizontal:disabled, QScrollBar::handle:vertical:disabled  {
 
 QScrollBar::add-line, QScrollBar::sub-line {
 	background: #262b30;
-	border-radius: 0px;
+	border-radius: 0;
 	border: none;
 	subcontrol-origin: margin;
 }
@@ -402,7 +402,7 @@ AutomatableSlider::groove:vertical {
 	border: none;
 	border-radius: 2px;
 	width: 2px;
-	margin: 2px 2px;
+	margin: 2px;
 }
 
 AutomatableSlider::handle:vertical {
@@ -466,7 +466,7 @@ QToolBar::separator {
 
 QToolButton {
 	margin: 1px;
-	padding: 2px 2px 2px 2px;
+	padding: 2px;
 	border-top: 1px solid #778394;
 	border-bottom: 1px solid #1e2226;
 	border-radius: 2px;
@@ -586,7 +586,7 @@ PluginDescWidget {
 	background-color: qlineargradient(spread:reflect, x1:0, y1:0, x2:0, y2:1, stop:0 #2E343B, stop:1 #1E2326);
 	color: #d1d8e4;
 	font-weight: bold;
-	margin: 0px;
+	margin: 0;
 }
 
 PluginDescWidget:hover {
@@ -728,7 +728,7 @@ SubWindow > QLabel {
 /* SubWindow titlebar button */
 SubWindow > QPushButton {
 	background-color: rgba( 255, 255, 255, 0% );
-	border-width: 0px;
+	border-width: 0;
 	border-color: none;
 	border-style: none;
 }

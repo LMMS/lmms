@@ -4082,7 +4082,7 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     <message>
         <location filename="../../src/gui/widgets/InstrumentSoundShapingView.cpp" line="61"/>
         <source>These tabs contain envelopes. They&apos;re very important for modifying a sound, in that they are almost always necessary for substractive synthesis. For example if you have a volume envelope, you can set when the sound should have a specific volume. If you want to create some soft strings then your sound has to fade in and out very softly. This can be done by setting large attack and release times. It&apos;s the same for other envelope targets like panning, cutoff frequency for the used filter and so on. Just monkey around with it! You can really make cool sounds out of a saw-wave with just some envelopes...!</source>
-        <translation>Ця вкладка дозволяє вам налаштувати обвідні. Вони дуже важливі для налаштування звучання. 
+        <translation>Ця вкладка дозволяє вам налаштувати обвідні. Вони дуже важливі для налаштування звучання.
 Наприклад, за допомогою обвідної гучності ви можете задати залежність гучності звучання від часу. Якщо вам знадобиться емулювати м&apos;які струнні, просто задайте більше часу наростання і зникнення звуку. За допомогою обвідних і низькочастотного осциллятора (LFO) ви в кілька кліків миші зможете створити просто неймовірні звуки!</translation>
     </message>
     <message>
@@ -5907,7 +5907,7 @@ Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
     </message>
     <message>
         <location filename="../../plugins/monstro/Monstro.cpp" line="1468"/>
-        <source>The Operators view contains all the operators. These include both audible operators (oscillators) and inaudible operators, or modulators: Low-frequency oscillators and Envelopes. 
+        <source>The Operators view contains all the operators. These include both audible operators (oscillators) and inaudible operators, or modulators: Low-frequency oscillators and Envelopes.
 
 Knobs and other widgets in the Operators view have their own what&apos;s this -texts, so you can get more specific help for them that way. </source>
         <translation>Операторський вид містить всі оператори. Вони включають і оператори що звучать (осциллятори) і беззвучні оператори або модулятори: Низько-частотні осциллятори і обвідні.
@@ -5921,9 +5921,9 @@ Knobs and other widgets in the Operators view have their own what&apos;s this -t
     </message>
     <message>
         <location filename="../../plugins/monstro/Monstro.cpp" line="1479"/>
-        <source>The Matrix view contains the modulation matrix. Here you can define the modulation relationships between the various operators: Each audible operator (oscillators 1-3) has 3-4 properties that can be modulated by any of the modulators. Using more modulations consumes more CPU power. 
+        <source>The Matrix view contains the modulation matrix. Here you can define the modulation relationships between the various operators: Each audible operator (oscillators 1-3) has 3-4 properties that can be modulated by any of the modulators. Using more modulations consumes more CPU power.
 
-The view is divided to modulation targets, grouped by the target oscillator. Available targets are volume, pitch, phase, pulse width and sub-osc ratio. Note: some targets are specific to one oscillator only. 
+The view is divided to modulation targets, grouped by the target oscillator. Available targets are volume, pitch, phase, pulse width and sub-osc ratio. Note: some targets are specific to one oscillator only.
 
 Each modulation target has 4 knobs, one for each modulator. By default the knobs are at 0, which means no modulation. Turning a knob to 1 causes that modulator to affect the modulation target as much as possible. Turning it to -1 does the same, but the modulation is inversed. </source>
         <translation>Матричний вид містить матрицю модуляції. Тут можна визначити модуляційні відношення між різними операторами. Кожен чутний оператор (осциллятори 1-3) мають 3-4 властивості, які можна модулювати будь-якими модуляторами. Використовуючи більше модуляцій збільшується навантаження на процесор.
@@ -6193,7 +6193,7 @@ Each modulation target has 4 knobs, one for each modulator. By default the knobs
     </message>
     <message>
         <location filename="../../plugins/monstro/Monstro.cpp" line="1835"/>
-        <source>In addition to dedicated modulators, Monstro allows oscillator 3 to be modulated by the output of oscillator 2. 
+        <source>In addition to dedicated modulators, Monstro allows oscillator 3 to be modulated by the output of oscillator 2.
 
 Mix mode means no modulation: the outputs of the oscillators are simply mixed together. </source>
         <translation>На додаток до виділених модуляторів Монстро дозволяє виходу осциллятора 2 модулювати осцллятор 3.
@@ -6202,7 +6202,7 @@ Mix mode means no modulation: the outputs of the oscillators are simply mixed to
     </message>
     <message>
         <location filename="../../plugins/monstro/Monstro.cpp" line="1838"/>
-        <source>In addition to dedicated modulators, Monstro allows oscillator 3 to be modulated by the output of oscillator 2. 
+        <source>In addition to dedicated modulators, Monstro allows oscillator 3 to be modulated by the output of oscillator 2.
 
 AM means amplitude modulation: Oscillator 3&apos;s amplitude (volume) is modulated by oscillator 2. </source>
         <translation>На додаток до виділених модуляторів Монстро дозволяє виходу осциллятора 2 модулювати осцллятор 3.
@@ -6211,7 +6211,7 @@ AM режим значить Амплітуда Модуляції: Осцилл
     </message>
     <message>
         <location filename="../../plugins/monstro/Monstro.cpp" line="1841"/>
-        <source>In addition to dedicated modulators, Monstro allows oscillator 3 to be modulated by the output of oscillator 2. 
+        <source>In addition to dedicated modulators, Monstro allows oscillator 3 to be modulated by the output of oscillator 2.
 
 FM means frequency modulation: Oscillator 3&apos;s frequency (pitch) is modulated by oscillator 2. The frequency modulation is implemented as phase modulation, which gives a more stable overall pitch than &quot;pure&quot; frequency modulation. </source>
         <translation>На додаток до виділених модуляторів Монстро дозволяє виходу осциллятора 2 модулювати осцллятор 3.
@@ -6220,7 +6220,7 @@ FM (ЧМ) режим означає Частотна Модуляція: осц�
     </message>
     <message>
         <location filename="../../plugins/monstro/Monstro.cpp" line="1846"/>
-        <source>In addition to dedicated modulators, Monstro allows oscillator 3 to be modulated by the output of oscillator 2. 
+        <source>In addition to dedicated modulators, Monstro allows oscillator 3 to be modulated by the output of oscillator 2.
 
 PM means phase modulation: Oscillator 3&apos;s phase is modulated by oscillator 2. It differs from frequency modulation in that the phase changes are not cumulative. </source>
         <translation>На додаток до виділених модуляторів Монстро дозволяє виходу осциллятора 2 модулювати осцллятор 3.
@@ -6229,7 +6229,7 @@ PM (ФМ) режим означає Фазова Модуляція: Осцил�
     </message>
     <message>
         <location filename="../../plugins/monstro/Monstro.cpp" line="1850"/>
-        <source>Select the waveform for LFO 1. 
+        <source>Select the waveform for LFO 1.
 &quot;Random&quot; and &quot;Random smooth&quot; are special waveforms: they produce random output, where the rate of the LFO controls how often the state of the LFO changes. The smooth version interpolates between these states with cosine interpolation. These random modes can be used to give &quot;life&quot; to your presets - add some of that analog unpredictability... </source>
         <translation>Виберіть форму хвилі для LFO 1 (НизькоЧастотнийГенератор).
 &quot;Random&quot; (Випадково) і &quot;Random-smooth&quot; (випадкове згладжування) - це спеціальні хвилі: вони створюють випадковий сигнал, де частота LFO контролює як часто змінюється стан генератора (LFO).
@@ -6237,7 +6237,7 @@ PM (ФМ) режим означає Фазова Модуляція: Осцил�
     </message>
     <message>
         <location filename="../../plugins/monstro/Monstro.cpp" line="1856"/>
-        <source>Select the waveform for LFO 2. 
+        <source>Select the waveform for LFO 2.
 &quot;Random&quot; and &quot;Random smooth&quot; are special waveforms: they produce random output, where the rate of the LFO controls how often the state of the LFO changes. The smooth version interpolates between these states with cosine interpolation. These random modes can be used to give &quot;life&quot; to your presets - add some of that analog unpredictability... </source>
         <translation>Виберіть форму хвилі для LFO 2 (НизкоЧастотнийГенератор).
 &quot;Random&quot; (Випадково) і &quot;Random-smooth&quot; (випадкове згладжування) - це спеціальні хвилі: вони створюють випадковий сигнал, де частота LFO контролює як часто змінюється стан генератора (LFO).
