@@ -126,24 +126,24 @@ MainWindow::MainWindow() :
 				confMgr->userProjectsDir() + "*" +
 				confMgr->factoryProjectsDir(),
 					"*.mmp *.mmpz *.xml *.mid",
-							tr( "My Projects" ),
+							tr( "Projects" ),
 					embed::getIconPixmap( "project_file" ).transformed( QTransform().rotate( 90 ) ),
 							splitter, false, true ) );
 	sideBar->appendTab( new FileBrowser(
 				confMgr->userSamplesDir() + "*" +
 				confMgr->factorySamplesDir(),
-					"*", tr( "My Samples" ),
+					"*", tr( "Samples" ),
 					embed::getIconPixmap( "sample_file" ).transformed( QTransform().rotate( 90 ) ),
 							splitter, false, true ) );
 	sideBar->appendTab( new FileBrowser(
 				confMgr->userPresetsDir() + "*" +
 				confMgr->factoryPresetsDir(),
 					"*.xpf *.cs.xml *.xiz *.lv2",
-					tr( "My Presets" ),
+					tr( "Presets" ),
 					embed::getIconPixmap( "preset_file" ).transformed( QTransform().rotate( 90 ) ),
 							splitter , false, true  ) );
 	sideBar->appendTab( new FileBrowser( QDir::homePath(), "*",
-							tr( "My Home" ),
+							tr( "Home" ),
 					embed::getIconPixmap( "home" ).transformed( QTransform().rotate( 90 ) ),
 							splitter, false, false ) );
 
