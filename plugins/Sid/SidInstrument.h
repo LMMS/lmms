@@ -1,5 +1,5 @@
 /*
- * sid_Instrument.h - ResID based software-synthesizer
+ * SidInstrument.h - ResID based software-synthesizer
  *
  * Copyright (c) 2008 Csaba Hruska <csaba.hruska/at/gmail.com>
  *                    Attila Herman <attila589/at/gmail.com>
@@ -33,7 +33,7 @@
 #include "Knob.h"
 
 
-class sidInstrumentView;
+class SidInstrumentView;
 class NotePlayHandle;
 class automatableButtonGroup;
 class PixmapButton;
@@ -67,11 +67,11 @@ private:
 	BoolModel m_filteredModel;
 	BoolModel m_testModel;
 
-	friend class sidInstrument;
-	friend class sidInstrumentView;
+	friend class SidInstrument;
+	friend class SidInstrumentView;
 } ;
 
-class sidInstrument : public Instrument
+class SidInstrument : public Instrument
 {
 	Q_OBJECT
 public:
@@ -89,8 +89,8 @@ public:
 	};
 
 
-	sidInstrument( InstrumentTrack * _instrument_track );
-	virtual ~sidInstrument();
+	SidInstrument( InstrumentTrack * _instrument_track );
+	virtual ~SidInstrument();
 
 	virtual void playNote( NotePlayHandle * _n,
 						sampleFrame * _working_buffer );
@@ -126,18 +126,18 @@ private:
 
 	IntModel m_chipModel;
 
-	friend class sidInstrumentView;
+	friend class SidInstrumentView;
 
 } ;
 
 
 
-class sidInstrumentView : public InstrumentViewFixedSize
+class SidInstrumentView : public InstrumentViewFixedSize
 {
 	Q_OBJECT
 public:
-	sidInstrumentView( Instrument * _instrument, QWidget * _parent );
-	virtual ~sidInstrumentView();
+	SidInstrumentView( Instrument * _instrument, QWidget * _parent );
+	virtual ~SidInstrumentView();
 
 private:
 	virtual void modelChanged();
