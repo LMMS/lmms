@@ -685,6 +685,11 @@ void FileBrowserTreeWidget::mouseReleaseEvent(QMouseEvent * me )
 			if (s && s->totalFrames() - s->framesDone() <= second * 3)
 			{
 				s->setDoneMayReturnTrue(true);
+				// TODO: This means we can't interrupt this preview, so if a new one 
+				// starts before this one ends they will overlap. Removing this line
+				// leads to a crash (see https://github.com/LMMS/lmms/issues/5736)
+				// right now, but with some fixes to Mixer it should be safe to do.
+				m_previewPlayHandle = NULL;
 			}
 			else { stopPreview(); }
 		}
