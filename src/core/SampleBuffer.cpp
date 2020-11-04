@@ -957,13 +957,27 @@ void SampleBuffer::visualize( QPainter & _p, const QRect & _dr,
 	const int xb = _dr.x();
 	const int first = focus_on_range ? _from_frame : 0;
 	const int last = focus_on_range ? _to_frame : m_frames;
-	for( int frame = first; frame < last; frame += fpp )
+	if( m_reversed )
 	{
-		l[n] = QPointF( xb + ( (frame - first) * double( w ) / nb_frames ),
-			( yb - ( m_data[frame][0] * y_space * m_amplification ) ) );
-		r[n] = QPointF( xb + ( (frame - first) * double( w ) / nb_frames ),
-			( yb - ( m_data[frame][1] * y_space * m_amplification ) ) );
-		++n;
+		for( int frame = last; frame > first; frame -= fpp )
+		{
+			l[n] = QPointF( xb + ( (frame - first) * double( w ) / nb_frames ),
+				( yb - ( m_data[frame][0] * y_space * m_amplification ) ) );
+			r[n] = QPointF( xb + ( (frame - first) * double( w ) / nb_frames ),
+				( yb - ( m_data[frame][1] * y_space * m_amplification ) ) );
+			++n;
+		}
+	}
+	else
+	{
+		for( int frame = first; frame < last; frame += fpp )
+		{
+			l[n] = QPointF( xb + ( (frame - first) * double( w ) / nb_frames ),
+				( yb - ( m_data[frame][0] * y_space * m_amplification ) ) );
+			r[n] = QPointF( xb + ( (frame - first) * double( w ) / nb_frames ),
+				( yb - ( m_data[frame][1] * y_space * m_amplification ) ) );
+			++n;
+		}
 	}
 	_p.setRenderHint( QPainter::Antialiasing );
 	_p.drawPolyline( l, nb_frames / fpp );
