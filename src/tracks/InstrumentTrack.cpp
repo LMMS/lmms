@@ -1506,9 +1506,7 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 	m_tabWidget->addTab( m_miscView, tr( "Miscellaneous" ), "misc_tab", 5 );
 	adjustTabSize(m_ssView);
 	adjustTabSize(instrumentFunctions);
-	adjustTabSize(m_effectView);
-	// stupid bugfix, no one knows why
-	m_effectView->resize(INSTRUMENT_WIDTH - 4, INSTRUMENT_HEIGHT - 4 - 1);
+	m_effectView->resize(EffectRackView::DEFAULT_WIDTH, INSTRUMENT_HEIGHT - 4 - 1);
 	adjustTabSize(m_midiView);
 	adjustTabSize(m_miscView);
 
