@@ -69,14 +69,14 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 
 	m_autoQuit = new TempoSyncKnob( knobBright_26, this );
 	m_autoQuit->setLabel( tr( "DECAY" ) );
-	m_autoQuit->move( 80 - m_autoQuit->width() / 2, 5 );
+	m_autoQuit->move( 78 - m_autoQuit->width() / 2, 5 );
 	m_autoQuit->setEnabled( isEnabled && !effect()->m_autoQuitDisabled );
 	m_autoQuit->setHintText( tr( "Time:" ), "ms" );
 
 
 	m_gate = new Knob( knobBright_26, this );
 	m_gate->setLabel( tr( "GATE" ) );
-	m_gate->move( 120 - m_gate->width() / 2, 5 );
+	m_gate->move( 116 - m_gate->width() / 2, 5 );
 	m_gate->setEnabled( isEnabled && !effect()->m_autoQuitDisabled );
 	m_gate->setHintText( tr( "Gate:" ), "" );
 
@@ -219,7 +219,7 @@ void EffectView::paintEvent( QPaintEvent * )
 	f.setBold( true );
 	p.setFont( f );
 
-	QString elidedText = p.fontMetrics().elidedText( model()->displayName(), Qt::ElideRight, width() - 20 );
+	QString elidedText = p.fontMetrics().elidedText( model()->displayName(), Qt::ElideRight, width() - 22 );
 
 	p.setPen( palette().shadow().color() );
 	p.drawText( 6, 55, elidedText );
