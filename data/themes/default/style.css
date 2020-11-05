@@ -40,6 +40,11 @@ QMdiArea {
 	background-color: #111314;
 }
 
+Knob {
+	qproperty-lineInactiveColor: rgb(120, 120, 120);
+	qproperty-arcInactiveColor: rgba(120, 120, 120, 70);
+}
+
 AutomationEditor {
 	color: #ffffff;
 	background-color: #141616;
@@ -61,8 +66,6 @@ QLineEdit {
 	border-radius: 4px;
 	border: 1px;
 	background: #101213;
-	color: #d1d8e4;
-	selection-background-color: #17793b;
 }
 
 QLineEdit:read-only {
@@ -76,6 +79,13 @@ QLineEdit:focus {
 	border: 1px solid #0bd556;
 }
 
+/* Set color and selection background color for various inputs.
+   SpinBoxes are used in QInputDialogs */
+
+QTextEdit, QLineEdit:focus, QComboBox:focus, QSpinBox:focus, QDoubleSpinBox:focus {
+	color: #d1d8e4;
+	selection-background-color: #17793b;
+}
 
 QToolTip {
 	border-radius: 4px;

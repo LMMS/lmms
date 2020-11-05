@@ -14,13 +14,22 @@ if(LMMS_HAVE_WEAKCARLA)
     ${CMAKE_CURRENT_SOURCE_DIR}/carla/source/utils
     ${CMAKE_CURRENT_SOURCE_DIR}/carla/source/backend
   )
-  ADD_LIBRARY(carla_native-plugin SHARED DummyCarla.cpp)
-  TARGET_INCLUDE_DIRECTORIES(carla_native-plugin PUBLIC ${CARLA_INCLUDE_DIRS})
-  INSTALL(TARGETS carla_native-plugin
+
+  IF(LMMS_BUILD_WIN32)
+      # use carla.dll
+      SET(CMAKE_SHARED_LIBRARY_PREFIX "")
+      SET(CARLA_NATIVE_LIB carla)
+  ELSE()
+      # use libcarla_native-plugin
+      SET(CARLA_NATIVE_LIB carla_native-plugin)
+  ENDIF()
+  ADD_LIBRARY(${CARLA_NATIVE_LIB} SHARED DummyCarla.cpp)
+  TARGET_INCLUDE_DIRECTORIES(${CARLA_NATIVE_LIB} PUBLIC ${CARLA_INCLUDE_DIRS})
+  INSTALL(TARGETS ${CARLA_NATIVE_LIB}
     LIBRARY DESTINATION "${PLUGIN_DIR}/optional"
     RUNTIME DESTINATION "${PLUGIN_DIR}/optional"
   )
-  SET(CARLA_LIBRARIES carla_native-plugin)
+  SET(CARLA_LIBRARIES ${CARLA_NATIVE_LIB})
   # Set parent scope variables so carlarack and carlapatchbay can see them
   SET(CARLA_LIBRARIES ${CARLA_LIBRARIES} PARENT_SCOPE)
 endif()
@@ -45,6 +54,6 @@ if(LMMS_HAVE_CARLA OR LMMS_HAVE_WEAKCARLA)
                 INSTALL_RPATH_USE_LINK_PATH TRUE
                 INSTALL_RPATH "${CARLA_RPATH}")
         IF(LMMS_HAVE_WEAKCARLA)
-                ADD_DEPENDENCIES(carlabase carla_native-plugin)
+                ADD_DEPENDENCIES(carlabase ${CARLA_NATIVE_LIB})
         ENDIF()
 endif()
