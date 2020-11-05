@@ -32,6 +32,7 @@
 #include <lv2/lv2plug.in/ns/ext/options/options.h>
 #include <lv2/lv2plug.in/ns/ext/urid/urid.h>
 #include <map>
+#include <memory>
 #include <set>
 #include <vector>
 
@@ -53,15 +54,12 @@ class Lv2Options
 {
 public:
 	//! Initialize an option
-	template<class T>
 	void initOption(LV2_URID key,
+		uint32_t size,
 		LV2_URID type,
-		const T* value,
-		LV2_Options_Context context = LV2_Options_Context::LV2_OPTIONS_INSTANCE,
-		uint32_t subject = 0)
-	{
-		initOption(key, sizeof(T), type, value, context, subject);
-	}
+		const void* value,
+		LV2_Options_Context context = LV2_OPTIONS_INSTANCE,
+		uint32_t subject = 0);
 	//! Fill m_options and m_optionPointers with all options
 	void createOptionVectors();
 	//! Return the feature
@@ -70,26 +68,25 @@ public:
 		return m_options.data();
 	}
 
-
-	//! Return if a option is supported by LMMS
+	//! Return if an option is supported by LMMS
 	static bool isOptionSupported(LV2_URID key);
 	//! Mark option as supported
 	static void supportOption(LV2_URID key);
 
 private:
-	void initOption(LV2_URID key,
-		uint32_t size,
-		LV2_URID type,
-		const void* value,
-		LV2_Options_Context context,
-		uint32_t subject);
-
 	//! options that are supported by every processor
 	static std::set<LV2_URID> s_supportedOptions;
 	//! options + data, ordered by URID
 	std::map<LV2_URID, LV2_Options_Option> m_optionByUrid;
 	//! option storage
 	std::vector<LV2_Options_Option> m_options;
+
+	struct VoidArrayDeleter
+	{
+		void operator()(void* n) { delete[] static_cast<char*>(n); }
+	};
+	//! option value storage
+	std::map<LV2_URID, std::unique_ptr<void, VoidArrayDeleter>> m_optionValues;
 };
 
 #endif // LMMS_HAVE_LV2

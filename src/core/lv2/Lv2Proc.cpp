@@ -461,15 +461,15 @@ void Lv2Proc::initMOptions()
 	int32_t sequenceSize = defaultEvbufSize();
 
 	m_options.initOption(cache[Lv2UridCache::Id::param_sampleRate],
-		atom_Float, &sampleRate);
+		sizeof(sampleRate), atom_Float, &sampleRate);
 	m_options.initOption(cache[Lv2UridCache::Id::bufsz_maxBlockLength],
-		atom_Int, &blockLength);
+		sizeof(blockLength), atom_Int, &blockLength);
 	m_options.initOption(cache[Lv2UridCache::Id::bufsz_minBlockLength],
-		atom_Int, &blockLength);
+		sizeof(blockLength), atom_Int, &blockLength);
 	m_options.initOption(cache[Lv2UridCache::Id::bufsz_nominalBlockLength],
-		atom_Int, &blockLength);
+		sizeof(blockLength), atom_Int, &blockLength);
 	m_options.initOption(cache[Lv2UridCache::Id::bufsz_sequenceSize],
-		atom_Int, &sequenceSize);
+		sizeof(sequenceSize), atom_Int, &sequenceSize);
 	m_options.createOptionVectors();
 }
 
