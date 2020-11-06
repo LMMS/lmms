@@ -29,6 +29,7 @@
 
 #ifdef LMMS_HAVE_LV2
 
+#include <cstdint>
 #include <lv2/lv2plug.in/ns/ext/options/options.h>
 #include <lv2/lv2plug.in/ns/ext/urid/urid.h>
 #include <map>
@@ -83,7 +84,7 @@ private:
 
 	struct VoidArrayDeleter
 	{
-		void operator()(void* n) { delete[] static_cast<char*>(n); }
+		void operator()(void* n) { delete[] static_cast<uint8_t*>(n); }
 	};
 	//! option value storage
 	std::map<LV2_URID, std::unique_ptr<void, VoidArrayDeleter>> m_optionValues;

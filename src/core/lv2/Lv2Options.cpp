@@ -83,8 +83,8 @@ void Lv2Options::initOption(LV2_URID key, uint32_t size, LV2_URID type,
 	opt.type = type;
 
 	std::unique_ptr<void, VoidArrayDeleter> dataPtr;
-	dataPtr.reset(new char[size]);
-	std::copy((char*)value, (char*)value + size, (char*)dataPtr.get());
+	dataPtr.reset(new uint8_t[size]);
+	std::copy((uint8_t*)value, (uint8_t*)value + size, (uint8_t*)dataPtr.get());
 	opt.value = dataPtr.get();
 
 	Q_ASSERT(m_optionByUrid.find(key) == m_optionByUrid.end());
