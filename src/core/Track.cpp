@@ -1906,10 +1906,8 @@ bool TrackContentWidget::pasteSelection( MidiTime tcoPos, const QMimeData * md, 
 
 		if(pos < leftmostPos) { leftmostPos = pos; }
 	}
-	if((leftmostPos + offset) < 0)
-	{
-		offset = -leftmostPos;
-	}
+	// Fix offset if it sets the left most TCO to a negative position
+	offset = std::max(offset.getTicks(), -leftmostPos.getTicks());
 
 	for( int i = 0; i<tcoNodes.length(); i++ )
 	{
