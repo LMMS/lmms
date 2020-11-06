@@ -32,6 +32,7 @@
 #include <QMoveEvent>
 #include <QPainter>
 #include <QScrollBar>
+#include <QMenu>
 
 #include "embed.h"
 
@@ -93,6 +94,12 @@ SubWindow::SubWindow( QWidget *parent, Qt::WindowFlags windowFlags ) :
 		Qt::WindowSystemMenuHint | Qt::WindowCloseButtonHint |
 		Qt::CustomizeWindowHint );
 	connect( mdiArea(), SIGNAL( subWindowActivated( QMdiSubWindow* ) ), this, SLOT( focusChanged( QMdiSubWindow* ) ) );
+
+	// alter the default systemMenu
+	m_systemMenu = systemMenu();
+	m_closeOthersAction = new QAction();
+	m_systemMenu->addAction(m_closeOthersAction);
+	setSystemMenu(m_systemMenu);
 }
 
 
