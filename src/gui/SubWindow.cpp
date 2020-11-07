@@ -95,10 +95,16 @@ SubWindow::SubWindow( QWidget *parent, Qt::WindowFlags windowFlags ) :
 		Qt::CustomizeWindowHint );
 	connect( mdiArea(), SIGNAL( subWindowActivated( QMdiSubWindow* ) ), this, SLOT( focusChanged( QMdiSubWindow* ) ) );
 
-	// alter the default systemMenu
+	// get the default systemMenu
 	m_systemMenu = systemMenu();
+	// create 'close all but this' action
 	m_closeOthersAction = new QAction();
+	m_closeOthersAction->setText("Close all but this");
+	m_closeOthersAction->setShortcut(QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_W));
+	connect(m_closeOthersAction, &QAction::triggered, this, this->close());
+	// add action to systemMenu
 	m_systemMenu->addAction(m_closeOthersAction);
+	// update systemMenu
 	setSystemMenu(m_systemMenu);
 }
 
