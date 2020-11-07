@@ -433,6 +433,16 @@ void FileBrowserTreeWidget::hideEvent(QHideEvent* he)
 
 
 
+void FileBrowserTreeWidget::focusOutEvent(QFocusEvent* fe)
+{
+	// Cancel previews when the user clicks outside the browser
+	stopPreview();
+	QTreeWidget::focusOutEvent(fe);
+}
+
+
+
+
 void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent * e )
 {
 	FileItem * file = dynamic_cast<FileItem *>( itemAt( e->pos() ) );
@@ -674,27 +684,8 @@ void FileBrowserTreeWidget::mouseReleaseEvent(QMouseEvent * me )
 
 	QMutexLocker previewLocker(&m_pphMutex);
 
-	if (m_previewPlayHandle != nullptr)
-	{
-		// If less than 3 seconds remain of the sample, we don't
-		// stop them if the user releases mouse-button...
-		if (m_previewPlayHandle->type() == PlayHandle::TypeSamplePlayHandle)
-		{
-			SamplePlayHandle* s = dynamic_cast<SamplePlayHandle*>(m_previewPlayHandle);
-			auto second = static_cast<f_cnt_t>(Engine::mixer()->processingSampleRate());
-			if (s && s->totalFrames() - s->framesDone() <= second * 3)
-			{
-				s->setDoneMayReturnTrue(true);
-				// TODO: This means we can't interrupt this preview, so if a new one 
-				// starts before this one ends they will overlap. Removing this line
-				// leads to a crash (see https://github.com/LMMS/lmms/issues/5736)
-				// right now, but with some fixes to Mixer it should be safe to do.
-				m_previewPlayHandle = NULL;
-			}
-			else { stopPreview(); }
-		}
-		else { stopPreview(); }
-	}
+	//TODO: User setting to allow samples to play until completion instead
+	if (m_previewPlayHandle != nullptr) { stopPreview(); }
 }
 
 
