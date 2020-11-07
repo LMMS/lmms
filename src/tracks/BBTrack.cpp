@@ -382,9 +382,10 @@ TrackView * BBTrack::createView( TrackContainerView* tcv )
 
 
 
-TrackContentObject * BBTrack::createTCO( const MidiTime & _pos )
+TrackContentObject* BBTrack::createTCO(const MidiTime & pos)
 {
-	BBTCO * bbtco = new BBTCO( this );
+	BBTCO* bbtco = new BBTCO(this);
+	bbtco->movePosition(pos);
 	return bbtco;
 }
 
