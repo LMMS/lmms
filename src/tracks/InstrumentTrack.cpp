@@ -711,11 +711,8 @@ bool InstrumentTrack::play( const MidiTime & _start, const fpp_t _frames,
 }
 
 
-
-
-TrackContentObject * InstrumentTrack::createTCO( const MidiTime & )
-{
-	return new Pattern( this );
+TrackContentObject *InstrumentTrack::unsafeCreateTCO(const MidiTime &) {
+	return new Pattern(this);
 }
 
 

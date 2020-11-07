@@ -46,7 +46,7 @@ public:
 	}
 
 	TrackView * createView( TrackContainerView* ) override;
-	TrackContentObject * createTCO( const MidiTime & _pos ) override;
+	TrackContentObject * unsafeCreateTCO( const MidiTime & _pos ) override;
 
 	virtual void saveTrackSpecificSettings( QDomDocument & _doc,
 							QDomElement & _parent ) override;

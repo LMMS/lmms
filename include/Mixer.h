@@ -69,7 +69,47 @@ class MixerWorkerThread;
 class LMMS_EXPORT Mixer : public QObject
 {
 	Q_OBJECT
+
 public:
+	/**
+	 * @brief RAII helper for requestChangesInModel.
+	 * Used by Mixer::requestChangesGuard.
+	 */
+	class RequestChangesGuard {
+		friend class Mixer;
+
+	private:
+		RequestChangesGuard(Mixer *mixer)
+			: m_mixer{mixer}
+		{
+			m_mixer->requestChangeInModel();
+		}
+	public:
+
+		RequestChangesGuard()
+			: m_mixer{nullptr}
+		{
+		}
+
+		RequestChangesGuard(RequestChangesGuard &&other)
+			: RequestChangesGuard()
+		{
+			std::swap(other.m_mixer, m_mixer);
+		}
+
+		// Disallow copy.
+		RequestChangesGuard(const RequestChangesGuard&) = delete;
+		RequestChangesGuard& operator =(const RequestChangesGuard&) = delete;
+
+		~RequestChangesGuard() {
+			if (m_mixer)
+				m_mixer->doneChangeInModel();
+		}
+
+	private:
+		Mixer *m_mixer;
+	};
+
 	struct qualitySettings
 	{
 		enum Mode
@@ -318,6 +358,11 @@ public:
 	//! Block until a change in model can be done (i.e. wait for audio thread)
 	void requestChangeInModel();
 	void doneChangeInModel();
+
+	RequestChangesGuard requestChangesGuard()
+	{
+		return RequestChangesGuard{this};
+	}
 
 	static bool isAudioDevNameValid(QString name);
 	static bool isMidiDevNameValid(QString name);
