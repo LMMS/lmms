@@ -297,6 +297,12 @@ QScrollBar::handle:horizontal:disabled, QScrollBar::handle:vertical:disabled  {
 	border: none;
 }
 
+EffectRackView QScrollBar::handle:vertical:disabled  {
+	background: #3f4750;
+	border: none;
+	border-radius: 4px;
+}
+
 /* arrow buttons */
 
 QScrollBar::add-line, QScrollBar::sub-line {
@@ -349,6 +355,8 @@ QScrollBar::left-arrow:horizontal:disabled { background-image: url(resources:sba
 QScrollBar::right-arrow:horizontal:disabled { background-image: url(resources:sbarrow_right_d.png);}
 QScrollBar::up-arrow:vertical:disabled { background-image: url(resources:sbarrow_up_d.png);}
 QScrollBar::down-arrow:vertical:disabled { background-image: url(resources:sbarrow_down_d.png);}
+EffectRackView QScrollBar::up-arrow:vertical:disabled { background-image: url(resources:sbarrow_up.png);}
+EffectRackView QScrollBar::down-arrow:vertical:disabled { background-image: url(resources:sbarrow_down.png);}
 
 /* background for song editor and bb-editor */
 
