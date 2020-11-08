@@ -116,6 +116,18 @@ void LmmsCore::destroy()
 	delete ConfigManager::inst();
 }
 
+
+
+
+bool LmmsCore::ignorePluginBlacklist()
+{
+	const char* envVar = getenv("LMMS_IGNORE_BLACKLIST");
+	return (envVar && *envVar);
+}
+
+
+
+
 float LmmsCore::framesPerTick(sample_rate_t sampleRate)
 {
 	return sampleRate * 60.0f * 4 /

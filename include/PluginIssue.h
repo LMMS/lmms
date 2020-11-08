@@ -44,6 +44,7 @@ enum PluginIssueType
 	portHasNoMax,
 	featureNotSupported, //!< plugin requires functionality LMMS can't offer
 	badPortType, //!< port type not supported
+	blacklisted,
 	noIssue
 };
 
@@ -60,6 +61,7 @@ public:
 		: m_issueType(it), m_info(msg)
 	{
 	}
+	PluginIssueType type() const { return m_issueType; }
 	friend QDebug operator<<(QDebug stream, const PluginIssue& iss);
 };
 
