@@ -48,6 +48,9 @@
 
 const std::set<const char*, Lv2Manager::CmpStr> Lv2Manager::pluginBlacklist =
 {
+	// github.com/calf-studio-gear/calf, #278
+	"http://calf.sourceforge.net/plugins/Analyzer",
+	"http://calf.sourceforge.net/plugins/BassEnhancer"
 };
 
 
