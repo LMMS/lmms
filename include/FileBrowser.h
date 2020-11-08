@@ -108,6 +108,7 @@ protected:
 	void keyPressEvent( QKeyEvent * ke ) override;
 	void keyReleaseEvent( QKeyEvent * ke ) override;
 	void hideEvent( QHideEvent * he ) override;
+	void focusOutEvent( QFocusEvent * fe ) override;
 
 
 private:
