@@ -55,8 +55,6 @@
 #include "StringPairDrag.h"
 #include "TextFloat.h"
 
-
-
 enum TreeWidgetItemTypes
 {
 	TypeFileItem = QTreeWidgetItem::UserType,
@@ -335,6 +333,11 @@ FileBrowserTreeWidget::FileBrowserTreeWidget(QWidget * parent ) :
 	connect( this, SIGNAL( itemExpanded( QTreeWidgetItem * ) ),
 				SLOT( updateDirectory( QTreeWidgetItem * ) ) );
 
+#ifdef LMMS_BUILD_WIN32
+	// Set the font for the QTreeWidget to the Windows System font to make sure that
+	// truncated (elided) items use the same font as non-truncated items.
+	setFont( GuiApplication::getWin32SystemFont() );
+#endif
 }
 
 
