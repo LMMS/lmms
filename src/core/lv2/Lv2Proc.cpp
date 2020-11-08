@@ -65,6 +65,19 @@ Plugin::PluginTypes Lv2Proc::check(const LilvPlugin *plugin,
 	unsigned audioChannels[maxCount] = { 0, 0 }; // audio input and output count
 	unsigned midiChannels[maxCount] = { 0, 0 }; // MIDI input and output count
 
+	const char* pluginUri = lilv_node_as_uri(lilv_plugin_get_uri(plugin));
+	//qDebug() << "Checking plugin" << pluginUri << "...";
+
+	// TODO: manage a global blacklist outside of the code
+	//       for now, this will help
+	//       this is only a fix for the meantime
+	const auto& pluginBlacklist = Lv2Manager::getPluginBlacklist();
+	if (!Engine::ignorePluginBlacklist() &&
+		pluginBlacklist.find(pluginUri) != pluginBlacklist.end())
+	{
+		issues.emplace_back(blacklisted);
+	}
+
 	for (unsigned portNum = 0; portNum < maxPorts; ++portNum)
 	{
 		Lv2Ports::Meta meta;
