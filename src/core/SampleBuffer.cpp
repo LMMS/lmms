@@ -306,27 +306,13 @@ void SampleBuffer::convertIntToFloat ( int_sample_t * & _ibuf, f_cnt_t _frames, 
 
 	// if reversing is on, we also reverse when
 	// scaling
-	if( m_reversed )
+	int idx = m_reversed ? ( _frames - 1 ) * _channels : 0;
+	for( f_cnt_t frame = 0; frame < _frames;
+					++frame )
 	{
-		int idx = ( _frames - 1 ) * _channels;
-		for( f_cnt_t frame = 0; frame < _frames;
-						++frame )
-		{
-			m_data[frame][0] = _ibuf[idx+0] * fac;
-			m_data[frame][1] = _ibuf[idx+ch] * fac;
-			idx -= _channels;
-		}
-	}
-	else
-	{
-		int idx = 0;
-		for( f_cnt_t frame = 0; frame < _frames;
-						++frame )
-		{
-			m_data[frame][0] = _ibuf[idx+0] * fac;
-			m_data[frame][1] = _ibuf[idx+ch] * fac;
-			idx += _channels;
-		}
+		m_data[frame][0] = _ibuf[idx+0] * fac;
+		m_data[frame][1] = _ibuf[idx+ch] * fac;
+		m_reversed ? idx -= _channels : idx += _channels;
 	}
 
 	delete[] _ibuf;
@@ -341,27 +327,13 @@ void SampleBuffer::directFloatWrite ( sample_t * & _fbuf, f_cnt_t _frames, int _
 
 	// if reversing is on, we also reverse when
 	// scaling
-	if( m_reversed )
+	int idx = m_reversed ? ( _frames - 1 ) * _channels : 0;
+	for( f_cnt_t frame = 0; frame < _frames;
+					++frame )
 	{
-		int idx = ( _frames - 1 ) * _channels;
-		for( f_cnt_t frame = 0; frame < _frames;
-						++frame )
-		{
-			m_data[frame][0] = _fbuf[idx+0];
-			m_data[frame][1] = _fbuf[idx+ch];
-			idx -= _channels;
-		}
-	}
-	else
-	{
-		int idx = 0;
-		for( f_cnt_t frame = 0; frame < _frames;
-						++frame )
-		{
-			m_data[frame][0] = _fbuf[idx+0];
-			m_data[frame][1] = _fbuf[idx+ch];
-			idx += _channels;
-		}
+		m_data[frame][0] = _fbuf[idx+0];
+		m_data[frame][1] = _fbuf[idx+ch];
+		m_reversed ? idx -= _channels : idx += _channels;
 	}
 
 	delete[] _fbuf;
@@ -957,27 +929,17 @@ void SampleBuffer::visualize( QPainter & _p, const QRect & _dr,
 	const int xb = _dr.x();
 	const int first = focus_on_range ? _from_frame : 0;
 	const int last = focus_on_range ? _to_frame : m_frames;
-	if( m_reversed )
+
+	auto start = m_reversed ? last : first;
+	auto offset = m_reversed ? first : last;
+	for ( int frame = start; m_reversed ? frame > offset : frame < offset;
+		  m_reversed ? frame -= fpp : frame += fpp )
 	{
-		for( int frame = last; frame > first; frame -= fpp )
-		{
-			l[n] = QPointF( xb + ( (frame - first) * double( w ) / nb_frames ),
-				( yb - ( m_data[frame][0] * y_space * m_amplification ) ) );
-			r[n] = QPointF( xb + ( (frame - first) * double( w ) / nb_frames ),
-				( yb - ( m_data[frame][1] * y_space * m_amplification ) ) );
-			++n;
-		}
-	}
-	else
-	{
-		for( int frame = first; frame < last; frame += fpp )
-		{
-			l[n] = QPointF( xb + ( (frame - first) * double( w ) / nb_frames ),
-				( yb - ( m_data[frame][0] * y_space * m_amplification ) ) );
-			r[n] = QPointF( xb + ( (frame - first) * double( w ) / nb_frames ),
-				( yb - ( m_data[frame][1] * y_space * m_amplification ) ) );
-			++n;
-		}
+		l[n] = QPointF( xb + ( (frame - first) * double( w ) / nb_frames ),
+			( yb - ( m_data[frame][0] * y_space * m_amplification ) ) );
+		r[n] = QPointF( xb + ( (frame - first) * double( w ) / nb_frames ),
+			( yb - ( m_data[frame][1] * y_space * m_amplification ) ) );
+		++n;
 	}
 	_p.setRenderHint( QPainter::Antialiasing );
 	_p.drawPolyline( l, nb_frames / fpp );
