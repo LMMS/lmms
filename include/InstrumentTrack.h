@@ -324,10 +324,6 @@ public:
 		return m_midiMenu;
 	}
 
-	void freeInstrumentTrackWindow();
-
-	static void cleanupWindowCache();
-
 	// Create a menu for assigning/creating channels for this track
 	QMenu * createFxMenu( QString title, QString newFxLabel ) override;
 
@@ -349,11 +345,11 @@ private slots:
 	void assignFxLine( int channelIndex );
 	void createFxLine();
 
+	void handleConfigChange(QString cls, QString attr, QString value);
+
 
 private:
 	InstrumentTrackWindow * m_window;
-
-	static QQueue<InstrumentTrackWindow *> s_windowCache;
 
 	// widgets in track-settings-widget
 	TrackLabelButton * m_tlb;
@@ -482,6 +478,7 @@ private:
 	PianoView * m_pianoView;
 
 	friend class InstrumentView;
+	friend class InstrumentTrackView;
 
 } ;
 
