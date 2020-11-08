@@ -54,6 +54,8 @@ const char *PluginIssue::msgFor(const PluginIssueType &it)
 			return "required feature not supported";
 		case badPortType:
 			return "unsupported port type";
+		case blacklisted:
+			return "blacklisted plugin";
 		case noIssue:
 			return nullptr;
 	}
