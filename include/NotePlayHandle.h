@@ -349,6 +349,7 @@ public:
 					NotePlayHandle::Origin origin = NotePlayHandle::OriginPattern );
 	static void release( NotePlayHandle * nph );
 	static void extend( int i );
+	static void free();
 
 private:
 	static NotePlayHandle ** s_available;

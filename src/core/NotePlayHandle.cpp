@@ -623,3 +623,8 @@ void NotePlayHandleManager::extend( int c )
 		++n;
 	}
 }
+
+void NotePlayHandleManager::free()
+{
+	MM_FREE(s_available);
+}
