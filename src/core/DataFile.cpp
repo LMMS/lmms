@@ -158,7 +158,8 @@ DataFile::DataFile( const QByteArray & _data ) :
 	QDomDocument(),
 	m_fileName(""),
 	m_content(),
-	m_head()
+	m_head(),
+	m_fileVersion( UPGRADE_METHODS.size() )
 {
 	loadData( _data, "<internal data>" );
 }

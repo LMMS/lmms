@@ -33,9 +33,10 @@
 
 #include <lilv/lilv.h>
 
+#include "lmms_export.h"
 #include "Plugin.h"
 
-class Lv2SubPluginFeatures : public Plugin::Descriptor::SubPluginFeatures
+class LMMS_EXPORT Lv2SubPluginFeatures : public Plugin::Descriptor::SubPluginFeatures
 {
 private:
 	static const LilvPlugin *getPlugin(const Key &k);
