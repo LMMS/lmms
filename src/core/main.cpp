@@ -1009,5 +1009,8 @@ int main( int argc, char * * argv )
 	}
 #endif
 
+
+	NotePlayHandleManager::free();
+
 	return ret;
 }
