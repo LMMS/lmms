@@ -713,9 +713,11 @@ bool InstrumentTrack::play( const MidiTime & _start, const fpp_t _frames,
 
 
 
-TrackContentObject * InstrumentTrack::createTCO( const MidiTime & )
+TrackContentObject* InstrumentTrack::createTCO(const MidiTime & pos)
 {
-	return new Pattern( this );
+	Pattern* p = new Pattern(this);
+	p->movePosition(pos);
+	return p;
 }
 
 
@@ -1506,9 +1508,7 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 	m_tabWidget->addTab( m_miscView, tr( "Miscellaneous" ), "misc_tab", 5 );
 	adjustTabSize(m_ssView);
 	adjustTabSize(instrumentFunctions);
-	adjustTabSize(m_effectView);
-	// stupid bugfix, no one knows why
-	m_effectView->resize(INSTRUMENT_WIDTH - 4, INSTRUMENT_HEIGHT - 4 - 1);
+	m_effectView->resize(EffectRackView::DEFAULT_WIDTH, INSTRUMENT_HEIGHT - 4 - 1);
 	adjustTabSize(m_midiView);
 	adjustTabSize(m_miscView);
 
