@@ -1172,7 +1172,7 @@ void SampleTrackView::createFxLine()
 	auto channel = Engine::fxMixer()->effectChannel(channelIndex);
 
 	channel->m_name = getTrack()->name();
-	if (getTrack()->useColor()) channel->setColor (getTrack()->color());
+	if (getTrack()->useColor()) { channel->setColor (getTrack()->color()); }
 
 	assignFxLine(channelIndex);
 }
