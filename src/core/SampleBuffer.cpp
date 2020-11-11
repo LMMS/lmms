@@ -930,10 +930,9 @@ void SampleBuffer::visualize( QPainter & _p, const QRect & _dr,
 	const bool isReversed = m_reversed;
 
 	auto startFrame = isReversed ? last : first;
-	auto endFrame = isReversed ? first : last;
-	auto nextFrame = isReversed ? -fpp : fpp;
-	for (int frame = startFrame; isReversed ? frame > endFrame : frame < endFrame;
-		 frame += nextFrame)
+	auto count = (last - first) / fpp + 1;
+	auto step = isReversed ? -fpp : fpp;
+	for (int frame = startFrame, i = 0; i < count; frame += step, i++)
 	{
 		l[n] = QPointF (xb + ((frame - first) * double(w) / nb_frames),
 			(yb - (m_data[frame][0] * y_space * m_amplification)));
