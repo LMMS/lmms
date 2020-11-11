@@ -422,7 +422,7 @@ void SampleTCOView::contextMenuEvent( QContextMenuEvent * _cme )
 				tr( "Set/clear record" ),
 						m_tco, SLOT( toggleRecord() ) );*/
 
-	contextMenu.addAction( embed::getIconPixmap( "colorize" ),
+	contextMenu.addAction( embed::getIconPixmap( "flip_x" ),
 			tr( "Reverse sample" ), this, SLOT( reverseSample() ) );
 
 	contextMenu.addSeparator();
