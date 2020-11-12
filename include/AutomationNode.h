@@ -57,25 +57,17 @@ public:
 	}
 	AutomationNode& operator/=(float f)
 	{
-		m_inValue/=f;
-		m_outValue/=f;
+		m_inValue /= f;
+		m_outValue /= f;
 		return *this;
 	}
 
-	inline float getInValue()
-	{
-		return m_inValue;
-	}
 	inline const float getInValue() const
 	{
 		return m_inValue;
 	}
 	void setInValue(float value);
 
-	inline float getOutValue()
-	{
-		return m_outValue;
-	}
 	inline const float getOutValue() const
 	{
 		return m_outValue;
@@ -86,10 +78,6 @@ public:
 	 * @brief Gets the offset between inValue and outValue
 	 * @return Float representing the offset between inValue and outValue
 	 */
-	inline float getValueOffset()
-	{
-		return m_outValue - m_inValue;
-	}
 	inline const float getValueOffset() const
 	{
 		return m_outValue - m_inValue;
@@ -99,10 +87,6 @@ public:
 	 * @brief Gets the tangent of the left side of the node
 	 * @return Float with the tangent from the inValue side
 	 */
-	inline float getInTangent()
-	{
-		return m_inTangent;
-	}
 	inline const float getInTangent() const
 	{
 		return m_inTangent;
@@ -121,10 +105,6 @@ public:
 	 * @brief Gets the tangent of the right side of the node
 	 * @return Float with the tangent from the outValue side
 	 */
-	inline float getOutTangent()
-	{
-		return m_outTangent;
-	}
 	inline const float getOutTangent() const
 	{
 		return m_outTangent;
