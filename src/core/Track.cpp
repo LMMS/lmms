@@ -151,10 +151,11 @@ TrackContentObject::~TrackContentObject()
  */
 void TrackContentObject::movePosition( const MidiTime & pos )
 {
-	if( m_startPosition != pos )
+	MidiTime newPos = qMax(0, pos.getTicks());
+	if (m_startPosition != newPos)
 	{
 		Engine::mixer()->requestChangeInModel();
-		m_startPosition = pos;
+		m_startPosition = newPos;
 		Engine::mixer()->doneChangeInModel();
 		Engine::getSong()->updateLength();
 		emit positionChanged();
@@ -955,9 +956,8 @@ void TrackContentObjectView::mouseMoveEvent( QMouseEvent * me )
 	{
 		MidiTime newPos = draggedTCOPos( me );
 
-		// Don't go left of bar zero
-		newPos = max( 0, newPos.getTicks() );
-		m_tco->movePosition( newPos );
+		m_tco->movePosition(newPos);
+		newPos = m_tco->startPosition(); // Get the real position the TCO was dragged to for the label
 		m_trackView->getTrackContentWidget()->changePosition();
 		s_textFloat->setText( QString( "%1:%2" ).
 				arg( newPos.getBar() + 1 ).
@@ -1073,7 +1073,6 @@ void TrackContentObjectView::mouseMoveEvent( QMouseEvent * me )
 				if( m_tco->length() + ( oldPos - t ) >= 1 )
 				{
 					m_tco->movePosition( t );
-					m_trackView->getTrackContentWidget()->changePosition();
 					m_tco->changeLength( m_tco->length() + ( oldPos - t ) );
 					sTco->setStartTimeOffset( sTco->startTimeOffset() + ( oldPos - t ) );
 				}
@@ -1896,6 +1895,20 @@ bool TrackContentWidget::pasteSelection( MidiTime tcoPos, const QMimeData * md, 
 	// The offset is quantized (rather than the positions) to preserve fine adjustments
 	offset = offset.quantize(snapSize);
 
+	// Get the leftmost TCO and fix the offset if it reaches below bar 0
+	MidiTime leftmostPos = grabbedTCOPos;
+	for(int i = 0; i < tcoNodes.length(); ++i)
+	{
+		QDomElement outerTCOElement = tcoNodes.item(i).toElement();
+		QDomElement tcoElement = outerTCOElement.firstChildElement();
+
+		MidiTime pos = tcoElement.attributeNode("pos").value().toInt();
+
+		if(pos < leftmostPos) { leftmostPos = pos; }
+	}
+	// Fix offset if it sets the left most TCO to a negative position
+	offset = std::max(offset.getTicks(), -leftmostPos.getTicks());
+
 	for( int i = 0; i<tcoNodes.length(); i++ )
 	{
 		QDomElement outerTCOElement = tcoNodes.item( i ).toElement();
@@ -1913,7 +1926,7 @@ bool TrackContentWidget::pasteSelection( MidiTime tcoPos, const QMimeData * md, 
 
 		TrackContentObject * tco = t->createTCO( pos );
 		tco->restoreState( tcoElement );
-		tco->movePosition( pos );
+		tco->movePosition(pos); // Because we restored the state, we need to move the TCO again.
 		if( wasSelection )
 		{
 			tco->selectViewOnCreate( true );
@@ -1967,11 +1980,7 @@ void TrackContentWidget::mousePressEvent( QMouseEvent * me )
 		getTrack()->addJournalCheckPoint();
 		const MidiTime pos = getPosition( me->x() ).getBar() *
 						MidiTime::ticksPerBar();
-		TrackContentObject * tco = getTrack()->createTCO( pos );
-
-		tco->saveJournallingState( false );
-		tco->movePosition( pos );
-		tco->restoreJournallingState();
+		getTrack()->createTCO(pos);
 	}
 }
 
@@ -2697,8 +2706,6 @@ void Track::loadSettings( const QDomElement & element )
 				TrackContentObject * tco = createTCO(
 								MidiTime( 0 ) );
 				tco->restoreState( node.toElement() );
-				saveJournallingState( false );
-				restoreJournallingState();
 			}
 		}
 		node = node.nextSibling();
@@ -2886,7 +2893,6 @@ void Track::createTCOsForBB( int bb )
 	{
 		MidiTime position = MidiTime( numOfTCOs(), 0 );
 		TrackContentObject * tco = createTCO( position );
-		tco->movePosition( position );
 		tco->changeLength( MidiTime( 1, 0 ) );
 	}
 }
@@ -2932,8 +2938,7 @@ void Track::removeBar( const MidiTime & pos )
 	{
 		if( ( *it )->startPosition() >= pos )
 		{
-			( *it )->movePosition( qMax( ( *it )->startPosition() -
-						MidiTime::ticksPerBar(), 0 ) );
+			(*it)->movePosition((*it)->startPosition() - MidiTime::ticksPerBar());
 		}
 	}
 }
