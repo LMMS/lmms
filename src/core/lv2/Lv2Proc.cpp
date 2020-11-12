@@ -455,12 +455,13 @@ void Lv2Proc::createPort(std::size_t portNum)
 			{
 				AutoLilvNode node(lilv_port_get_name(m_plugin, lilvPort));
 				QString dispName = lilv_node_as_string(node.get());
+				sample_rate_t sr = Engine::mixer()->processingSampleRate();
 				switch (meta.m_vis)
 				{
 					case Lv2Ports::Vis::None:
 					{
 						// allow ~1000 steps
-						float stepSize = (meta.m_max - meta.m_min) / 1000.0f;
+						float stepSize = (meta.max(sr) - meta.min(sr)) / 1000.0f;
 
 						// make multiples of 0.01 (or 0.1 for larger values)
 						float minStep = (stepSize >= 1.0f) ? 0.1f : 0.01f;
@@ -468,15 +469,15 @@ void Lv2Proc::createPort(std::size_t portNum)
 						stepSize = std::max(stepSize, minStep);
 
 						ctrl->m_connectedModel.reset(
-							new FloatModel(meta.m_def, meta.m_min, meta.m_max,
+							new FloatModel(meta.def(), meta.min(sr), meta.max(sr),
 											stepSize, nullptr, dispName));
 						break;
 					}
 					case Lv2Ports::Vis::Integer:
 						ctrl->m_connectedModel.reset(
-							new IntModel(static_cast<int>(meta.m_def),
-											static_cast<int>(meta.m_min),
-											static_cast<int>(meta.m_max),
+							new IntModel(static_cast<int>(meta.def()),
+											static_cast<int>(meta.min(sr)),
+											static_cast<int>(meta.max(sr)),
 											nullptr, dispName));
 						break;
 					case Lv2Ports::Vis::Enumeration:
@@ -501,7 +502,7 @@ void Lv2Proc::createPort(std::size_t portNum)
 					}
 					case Lv2Ports::Vis::Toggled:
 						ctrl->m_connectedModel.reset(
-							new BoolModel(static_cast<bool>(meta.m_def),
+							new BoolModel(static_cast<bool>(meta.def()),
 											nullptr, dispName));
 						break;
 				}
@@ -735,9 +736,10 @@ void Lv2Proc::dumpPort(std::size_t num)
 	qDebug() << "  visualization: " << Lv2Ports::toStr(port.m_vis);
 	if (port.m_type == Lv2Ports::Type::Control || port.m_type == Lv2Ports::Type::Cv)
 	{
-		qDebug() << "  default:" << port.m_def;
-		qDebug() << "  min:" << port.m_min;
-		qDebug() << "  max:" << port.m_max;
+		sample_rate_t sr = Engine::mixer()->processingSampleRate();
+		qDebug() << "  default:" << port.def();
+		qDebug() << "  min:" << port.min(sr);
+		qDebug() << "  max:" << port.max(sr);
 	}
 	qDebug() << "  optional: " << port.m_optional;
 	qDebug() << "  => USED: " << port.m_used;
