@@ -155,6 +155,7 @@ std::vector<PluginIssue> Meta::get(const LilvPlugin *plugin,
 			{
 				takeRangeValue(min.get(), m_min, portHasNoMin);
 				takeRangeValue(max.get(), m_max, portHasNoMax);
+				if (hasProperty(LV2_CORE__sampleRate)) { m_sampleRate = true; }
 
 				if (m_max - m_min > 15.0f)
 				{
