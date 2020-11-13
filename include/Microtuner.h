@@ -38,7 +38,6 @@ class LMMS_EXPORT Microtuner : public Model, public JournallingObject
 	Q_OBJECT
 public:
 	explicit Microtuner(InstrumentTrack *parent);
-	~Microtuner();
 
 	bool enabled() const {return m_enabledModel.value();}
 	bool keyRangeImport() const {return m_keyRangeImportModel.value();}

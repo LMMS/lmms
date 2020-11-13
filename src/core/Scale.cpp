@@ -27,6 +27,20 @@
 #include <QDomElement>
 
 
+void Interval::saveSettings(QDomDocument &document, QDomElement &element)
+{
+	element.setAttribute("num", QString::number(m_numerator));
+	element.setAttribute("den", QString::number(m_denominator));
+}
+
+
+void Interval::loadSettings(const QDomElement &element)
+{
+	m_numerator = element.attribute("num").toDouble();
+	m_denominator = element.attribute("den").toULong();
+}
+
+
 Scale::Scale() :
 	m_description(tr("empty"))
 {
@@ -49,20 +63,6 @@ QString Scale::getDescription() const
 void Scale::setDescription(QString description)
 {
 	m_description = description;
-}
-
-
-void Interval::saveSettings(QDomDocument &document, QDomElement &element)
-{
-	element.setAttribute("num", QString::number(m_numerator));
-	element.setAttribute("den", QString::number(m_denominator));
-}
-
-
-void Interval::loadSettings(const QDomElement &element)
-{
-	m_numerator = element.attribute("num").toDouble();
-	m_denominator = element.attribute("den").toULong();
 }
 
 

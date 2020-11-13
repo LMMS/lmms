@@ -57,11 +57,6 @@ Microtuner::Microtuner(InstrumentTrack *parent) :
 }
 
 
-Microtuner::~Microtuner()
-{
-}
-
-
 /** \brief Return first mapped key, based on currently selected keymap or user selection.
  *  \return Number ranging from 0 to NumKeys -1
  */

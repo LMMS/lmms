@@ -54,7 +54,6 @@ InstrumentMiscView::InstrumentMiscView(InstrumentTrack *it, QWidget *parent) :
 	masterPitchLayout->addWidget(tlabel);
 
 	// Microtuner settings
-	int comboHeight = 22;	// using the same constant as zoom combo in SongEditor
 	m_microtunerGroupBox = new GroupBox(tr("MICROTUNER"));
 	m_microtunerGroupBox->setModel(it->m_microtuner.enabledModel());
 	layout->addWidget(m_microtunerGroupBox);
@@ -67,7 +66,6 @@ InstrumentMiscView::InstrumentMiscView(InstrumentTrack *it, QWidget *parent) :
 
 	m_scaleCombo = new ComboBox();
 	m_scaleCombo->setModel(it->m_microtuner.scaleModel());
-	m_scaleCombo->setFixedHeight(comboHeight);
 	microtunerLayout->addWidget(m_scaleCombo);
 
 	QLabel *keymapLabel = new QLabel(tr("Active keymap:"));
@@ -75,7 +73,6 @@ InstrumentMiscView::InstrumentMiscView(InstrumentTrack *it, QWidget *parent) :
 
 	m_keymapCombo = new ComboBox();
 	m_keymapCombo->setModel(it->m_microtuner.keymapModel());
-	m_keymapCombo->setFixedHeight(comboHeight);
 	microtunerLayout->addWidget(m_keymapCombo);
 
 	m_rangeImportCheckbox = new LedCheckBox(tr("Import note ranges from keymap"), this);
@@ -86,9 +83,4 @@ InstrumentMiscView::InstrumentMiscView(InstrumentTrack *it, QWidget *parent) :
 
 	// Fill remaining space
 	layout->addStretch();
-}
-
-InstrumentMiscView::~InstrumentMiscView()
-{
-
 }

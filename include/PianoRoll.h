@@ -372,7 +372,6 @@ private:
 	int m_pianoKeysVisible;
 
 	int m_keyLineHeight;
-	int m_octaveHeight;
 	int m_whiteKeySmallHeight;
 	int m_whiteKeyBigHeight;
 	int m_blackKeyHeight;

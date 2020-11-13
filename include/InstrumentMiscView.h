@@ -41,7 +41,6 @@ class InstrumentMiscView : public QWidget
 	Q_OBJECT
 public:
 	InstrumentMiscView(InstrumentTrack *it, QWidget *parent);
-	~InstrumentMiscView();
 
 	GroupBox *pitchGroupBox() {return m_pitchGroupBox;}
 	GroupBox *microtunerGroupBox() {return m_microtunerGroupBox;}

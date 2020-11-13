@@ -541,10 +541,10 @@ void MainWindow::finalize()
 	ToolButton * microtuner_window = new ToolButton(
 					embed::getIconPixmap( "microtuner" ),
 					tr( "Microtuner configuration" ) +
-								" (F12)",
+								" (Ctrl+8)",
 					this, SLOT( toggleMicrotunerWin() ),
 								m_toolBar );
-	microtuner_window->setShortcut( Qt::Key_F12 );
+	microtuner_window->setShortcut( Qt::CTRL + Qt::Key_8 );
 
 	m_toolBarLayout->addWidget( song_editor_window, 1, 1 );
 	m_toolBarLayout->addWidget( bb_editor_window, 1, 2 );

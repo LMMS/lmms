@@ -58,8 +58,6 @@ MicrotunerConfig::MicrotunerConfig() :
 	setWindowIcon(embed::getIconPixmap("microtuner"));
 	setWindowTitle(tr("Microtuner"));
 
-	int comboHeight = 22;	// using the same constant as zoom combo in SongEditor
-
 	// Organize into 2 main columns: scales and keymaps
 	QGridLayout *microtunerLayout = new QGridLayout();
 	microtunerLayout->setSpacing(2);
@@ -75,7 +73,6 @@ MicrotunerConfig::MicrotunerConfig() :
 		m_scaleComboModel.addItem(QString::number(i) + ": " + Engine::getSong()->getScale(i)->getDescription());
 	}
 	ComboBox *scaleCombo = new ComboBox();
-	scaleCombo->setFixedHeight(comboHeight);
 	scaleCombo->setModel(&m_scaleComboModel);
 	microtunerLayout->addWidget(scaleCombo, 1, 0, 1, 2);
 	connect(&m_scaleComboModel, &ComboBoxModel::dataChanged, [=] {updateScaleForm();});
@@ -112,7 +109,6 @@ MicrotunerConfig::MicrotunerConfig() :
 		m_keymapComboModel.addItem(QString::number(i) + ": " + Engine::getSong()->getKeymap(i)->getDescription());
 	}
 	ComboBox *keymapCombo = new ComboBox();
-	keymapCombo->setFixedHeight(comboHeight);
 	keymapCombo->setModel(&m_keymapComboModel);
 	microtunerLayout->addWidget(keymapCombo, 1, 2, 1, 2);
 	connect(&m_keymapComboModel, &ComboBoxModel::dataChanged, [=] {updateKeymapForm();});
@@ -255,7 +251,7 @@ void MicrotunerConfig::updateScaleForm()
 	// fill in the intervals
 	m_scaleTextEdit->setPlainText("");
 	const std::vector<Interval> &intervals = newScale->getIntervals();
-	for (unsigned int i = 1; i < intervals.size(); i++)
+	for (std::size_t i = 1; i < intervals.size(); i++)
 	{
 		m_scaleTextEdit->appendPlainText(intervals[i].getString());
 	}
@@ -280,7 +276,7 @@ void MicrotunerConfig::updateKeymapForm()
 
 	m_keymapTextEdit->setPlainText("");
 	const std::vector<int> &map = newMap->getMap();
-	for (unsigned int i = 0; i < map.size(); i++)
+	for (std::size_t i = 0; i < map.size(); i++)
 	{
 		if (map[i] >= 0) {m_keymapTextEdit->appendPlainText(QString::number(map[i]));}
 		else {m_keymapTextEdit->appendPlainText("x");}
@@ -314,7 +310,7 @@ bool MicrotunerConfig::validateScaleForm()
 	QStringList input = m_scaleTextEdit->toPlainText().split('\n', QString::SkipEmptyParts);
 	for (auto &line: input)
 	{
-		if (line.size() == 0) {continue;}
+		if (line.isEmpty()) {continue;}
 		if (line[0] == '!') {continue;}		// comment
 		QString firstSection = line.section(QRegExp("\\s+|/"), 0, 0, QString::SectionSkipEmpty);
 		if (firstSection.contains('.'))		// cent mode
@@ -358,7 +354,7 @@ bool MicrotunerConfig::validateKeymapForm()
 	QStringList input = m_keymapTextEdit->toPlainText().split('\n', QString::SkipEmptyParts);
 	for (auto &line: input)
 	{
-		if (line.size() == 0) {continue;}
+		if (line.isEmpty()) {continue;}
 		if (line[0] == '!') {continue;}			// comment
 		QString firstSection = line.section(QRegExp("\\s+"), 0, 0, QString::SectionSkipEmpty);
 		if (firstSection == "x") {continue;}	// not mapped
@@ -388,7 +384,7 @@ bool MicrotunerConfig::applyScale()
 	QStringList input = m_scaleTextEdit->toPlainText().split('\n', QString::SkipEmptyParts);
 	for (auto &line: input)
 	{
-		if (line.size() == 0) {continue;}
+		if (line.isEmpty()) {continue;}
 		if (line[0] == '!') {continue;}		// comment
 		QString firstSection = line.section(QRegExp("\\s+|/"), 0, 0, QString::SectionSkipEmpty);
 		if (firstSection.contains('.'))		// cent mode
@@ -430,7 +426,7 @@ bool MicrotunerConfig::applyKeymap()
 	QStringList input = m_keymapTextEdit->toPlainText().split('\n', QString::SkipEmptyParts);
 	for (auto &line: input)
 	{
-		if (line.size() == 0) {continue;}
+		if (line.isEmpty()) {continue;}
 		if (line[0] == '!') {continue;}			// comment
 		QString firstSection = line.section(QRegExp("\\s+"), 0, 0, QString::SectionSkipEmpty);
 		if (firstSection == "x")

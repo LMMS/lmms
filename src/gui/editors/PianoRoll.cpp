@@ -171,7 +171,6 @@ PianoRoll::PianoRoll() :
 	m_userSetNotesEditHeight(100),
 	m_ppb( DEFAULT_PR_PPB ),
 	m_keyLineHeight(DEFAULT_KEY_LINE_HEIGHT),
-	m_octaveHeight(m_keyLineHeight * KeysPerOctave),
 	m_whiteKeySmallHeight(qFloor(m_keyLineHeight * 1.5)),
 	m_whiteKeyBigHeight(m_keyLineHeight * 2),
 	m_blackKeyHeight(m_keyLineHeight),
@@ -4225,7 +4224,6 @@ void PianoRoll::zoomingChanged()
 void PianoRoll::zoomingYChanged()
 {
 	m_keyLineHeight = m_zoomYLevels[m_zoomingYModel.value()] * DEFAULT_KEY_LINE_HEIGHT;
-	m_octaveHeight = m_keyLineHeight * KeysPerOctave;
 	m_whiteKeySmallHeight = qFloor(m_keyLineHeight * 1.5);
 	m_whiteKeyBigHeight = m_keyLineHeight * 2;
 	m_blackKeyHeight = m_keyLineHeight; //round(m_keyLineHeight * 1.3333);
