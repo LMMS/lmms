@@ -1391,7 +1391,7 @@ void DataFile::upgrade_automationNodes()
 	QDomNodeList autoPatterns = elementsByTagName("automationpattern");
 
 	// Go through all automation patterns
-	for(int i = 0; i < autoPatterns.size(); ++i)
+	for (int i = 0; i < autoPatterns.size(); ++i)
 	{
 		QDomElement autoPattern = autoPatterns.item(i).toElement();
 
@@ -1399,7 +1399,7 @@ void DataFile::upgrade_automationNodes()
 		QDomNodeList times = autoPattern.elementsByTagName("time");
 
 		// Loop through all <time> elements and change what we need
-		for(int j=0; j < times.size(); ++j)
+		for (int j=0; j < times.size(); ++j)
 		{
 			QDomElement el = times.item(j).toElement();
 

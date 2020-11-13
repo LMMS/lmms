@@ -170,23 +170,19 @@ AutomationEditor::AutomationEditor() :
 	// init pixmaps
 	if (s_toolDraw == nullptr)
 	{
-		s_toolDraw = new QPixmap( embed::getIconPixmap(
-							"edit_draw" ) );
+		s_toolDraw = new QPixmap(embed::getIconPixmap("edit_draw"));
 	}
 	if (s_toolErase == nullptr)
 	{
-		s_toolErase= new QPixmap( embed::getIconPixmap(
-							"edit_erase" ) );
+		s_toolErase= new QPixmap(embed::getIconPixmap("edit_erase"));
 	}
 	if (s_toolDrawOut == nullptr)
 	{
-		s_toolDrawOut = new QPixmap(embed::getIconPixmap(
-							"edit_draw_outvalue"));
+		s_toolDrawOut = new QPixmap(embed::getIconPixmap("edit_draw_outvalue"));
 	}
 	if (s_toolMove == nullptr)
 	{
-		s_toolMove = new QPixmap( embed::getIconPixmap(
-							"edit_move" ) );
+		s_toolMove = new QPixmap(embed::getIconPixmap("edit_move"));
 	}
 
 	setCurrentPattern(nullptr);
@@ -686,7 +682,8 @@ void AutomationEditor::mouseReleaseEvent(QMouseEvent * mouseEvent )
 
 
 
-/* @brief Removes all automation nodes between the given ticks
+/**
+ * @brief Removes all automation nodes between the given ticks
  * @param Int first tick of the range
  * @param Int second tick of the range
  */
@@ -730,7 +727,8 @@ void AutomationEditor::removeNodes(int tick0, int tick1)
 
 
 
-/* @brief Resets the outValues of all automation nodes between the given ticks
+/**
+ * @brief Resets the outValues of all automation nodes between the given ticks
  * @param Int first tick of the range
  * @param Int second tick of the range
  */
@@ -738,10 +736,7 @@ void AutomationEditor::resetNodes(int tick0, int tick1)
 {
 	QMutexLocker m(&m_patternEditorMutex);
 
-	if (tick0 == tick1)
-	{
-		return;
-	}
+	if (tick0 == tick1) { return; }
 
 	MidiTime start = MidiTime(qMin(tick0, tick1));
 	MidiTime end = MidiTime(qMax(tick0, tick1));
@@ -751,10 +746,7 @@ void AutomationEditor::resetNodes(int tick0, int tick1)
 
 	while (it != tm.end())
 	{
-		if (it.key() > end)
-		{
-			return;
-		}
+		if (it.key() > end) { return; }
 
 		it.value().setOutValue(it.value().getInValue());
 		++it;
@@ -998,8 +990,7 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 	// start drawing at the bottom
 	int grid_bottom = height() - SCROLLBAR_SIZE - 1;
 
-	p.fillRect(0, TOP_MARGIN, VALUES_WIDTH, height() - TOP_MARGIN,
-						m_scaleColor);
+	p.fillRect(0, TOP_MARGIN, VALUES_WIDTH, height() - TOP_MARGIN, m_scaleColor);
 
 	// print value numbers
 	int font_height = p.fontMetrics().height();
@@ -1119,14 +1110,10 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 			for( int level = (int)m_bottomLevel; level <= m_topLevel; level++)
 			{
 				y =  yCoordOfLevel( (float)level );
-				if( level % 10 == 0 )
-				{
-					p.setPen(m_beatLineColor);
-				}
-				else
-				{
-					p.setPen(m_lineColor);
-				}
+
+				if (level % 10 == 0) { p.setPen(m_beatLineColor); }
+				else { p.setPen(m_lineColor); }
+
 				// draw level line
 				p.drawLine( VALUES_WIDTH, (int) y, width(), (int) y );
 			}
@@ -1145,8 +1132,13 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 		{
 			if( ( barCount + leftBars )  % 2 != 0 )
 			{
-				p.fillRect(x - m_currentPosition * zoomFactor / timeSignature, TOP_MARGIN, m_ppb,
-					height() - (SCROLLBAR_SIZE + TOP_MARGIN), m_backgroundShade);
+				p.fillRect(
+					x - m_currentPosition * zoomFactor / timeSignature,
+					TOP_MARGIN,
+					m_ppb,
+					height() - (SCROLLBAR_SIZE + TOP_MARGIN),
+					m_backgroundShade
+				);
 			}
 		}
 
@@ -1844,7 +1836,8 @@ void AutomationEditor::updateTopBottomLevels()
 
 
 
-/* @brief Given a mouse coordinate, returns a timeMap::iterator that points to
+/**
+ * @brief Given a mouse coordinate, returns a timeMap::iterator that points to
  *        the first node inside a square of side "r" pixels from those
  *        coordinates. In simpler terms, returns the automation node on those
  *        coordinates.
@@ -1862,7 +1855,7 @@ AutomationEditor::timeMap::iterator AutomationEditor::getNodeAt(int x, int y, bo
 	// Remove the VALUES_WIDTH from the x position, so we have the actual viewport x
 	x -= VALUES_WIDTH;
 	// Convert the x position to the position in ticks
-	int posTicks = (x * MidiTime::ticksPerBar()/m_ppb) + m_currentPosition;
+	int posTicks = (x * MidiTime::ticksPerBar() / m_ppb) + m_currentPosition;
 
 	// Get our pattern timeMap and create a iterator so we can check the nodes
 	timeMap & tm = m_pattern->getTimeMap();

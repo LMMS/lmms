@@ -217,7 +217,8 @@ void AutomationPattern::updateLength()
 
 
 
-/* @brief Puts an automation node on the timeMap with the given value.
+/**
+ * @brief Puts an automation node on the timeMap with the given value.
  *        The inValue and outValue of the created node will be the same.
  * @param MidiTime time to add the node to
  * @param Float inValue and outValue of the node
@@ -234,9 +235,7 @@ MidiTime AutomationPattern::putValue(const MidiTime & time,
 
 	cleanObjects();
 
-	MidiTime newTime = quantPos ?
-				Note::quantized( time, quantization() ) :
-				time;
+	MidiTime newTime = quantPos ? Note::quantized(time, quantization()) : time;
 
 	// Create a node or replace the existing one on newTime
 	m_timeMap[newTime] = AutomationNode(this, value, newTime);
@@ -245,18 +244,18 @@ MidiTime AutomationPattern::putValue(const MidiTime & time,
 
 	// Remove control points that are covered by the new points
 	// quantization value. Control Key to override
-	if( ! ignoreSurroundingPoints )
+	if (!ignoreSurroundingPoints)
 	{
-		for( int i = newTime + 1; i < newTime + quantization(); ++i )
+		for (int i = newTime + 1; i < newTime + quantization(); ++i)
 		{
-			AutomationPattern::removeValue( i );
+			AutomationPattern::removeValue(i);
 		}
 	}
-	if( it != m_timeMap.begin() )
+	if (it != m_timeMap.begin())
 	{
 		--it;
 	}
-	generateTangents( it, 3 );
+	generateTangents(it, 3);
 
 	updateLength();
 
@@ -268,7 +267,8 @@ MidiTime AutomationPattern::putValue(const MidiTime & time,
 
 
 
-/* @brief Puts an automation node on the timeMap with the given inValue
+/**
+ * @brief Puts an automation node on the timeMap with the given inValue
  *        and outValue.
  * @param MidiTime time to add the node to
  * @param Float inValue of the node
@@ -287,9 +287,7 @@ MidiTime AutomationPattern::putValues(const MidiTime & time,
 
 	cleanObjects();
 
-	MidiTime newTime = quantPos ?
-				Note::quantized( time, quantization() ) :
-				time;
+	MidiTime newTime = quantPos ? Note::quantized(time, quantization()) : time;
 
 	// Create a node or replace the existing one on newTime
 	m_timeMap[newTime] = AutomationNode(this, inValue, outValue, newTime);
@@ -298,18 +296,18 @@ MidiTime AutomationPattern::putValues(const MidiTime & time,
 
 	// Remove control points that are covered by the new points
 	// quantization value. Control Key to override
-	if( ! ignoreSurroundingPoints )
+	if (!ignoreSurroundingPoints)
 	{
-		for( int i = newTime + 1; i < newTime + quantization(); ++i )
+		for (int i = newTime + 1; i < newTime + quantization(); ++i)
 		{
-			AutomationPattern::removeValue( i );
+			AutomationPattern::removeValue(i);
 		}
 	}
-	if( it != m_timeMap.begin() )
+	if (it != m_timeMap.begin())
 	{
 		--it;
 	}
-	generateTangents( it, 3 );
+	generateTangents(it, 3);
 
 	updateLength();
 
@@ -379,9 +377,7 @@ MidiTime AutomationPattern::setDragValue(const MidiTime & time,
 
 	if (m_dragging == false)
 	{
-		MidiTime newTime = quantPos  ?
-				Note::quantized(time, quantization()) :
-							time;
+		MidiTime newTime = quantPos ? Note::quantized(time, quantization()) : time;
 
 		// We will keep the same outValue only if it's different from the
 		// inValue
@@ -413,11 +409,8 @@ MidiTime AutomationPattern::setDragValue(const MidiTime & time,
 	{
 		return this->putValues(time, value, m_dragOutValue, quantPos, controlKey);
 	}
-	else
-	{
-		return this->putValue(time, value, quantPos, controlKey);
-	}
-
+	// else
+	return this->putValue(time, value, quantPos, controlKey);
 }
 
 
@@ -494,8 +487,10 @@ float AutomationPattern::valueAt( timeMap::const_iterator v, int offset ) const
 	}
 	else if( m_progressionType == LinearProgression )
 	{
-		float slope = ((v + 1).value().getInValue() - v.value().getOutValue()) /
-							((v + 1).key() - v.key());
+		float slope =
+			((v + 1).value().getInValue() - v.value().getOutValue()) /
+			((v + 1).key() - v.key());
+
 		return v.value().getOutValue() + offset * slope;
 	}
 	else /* CubicHermiteProgression */
@@ -514,9 +509,9 @@ float AutomationPattern::valueAt( timeMap::const_iterator v, int offset ) const
 		float m2 = (v + 1).value().getInTangent() * numValues * m_tension;
 
 		return (2 * pow(t,3) - 3 * pow(t,2) + 1) * v.value().getOutValue()
-				+ (pow(t,3) - 2 * pow(t,2) + t) * m1
-				+ (-2 * pow(t,3) + 3 * pow(t,2)) * (v + 1).value().getInValue()
-				+ (pow(t,3) - pow(t,2)) * m2;
+			+ (pow(t,3) - 2 * pow(t,2) + t) * m1
+			+ (-2 * pow(t,3) + 3 * pow(t,2)) * (v + 1).value().getInValue()
+			+ (pow(t,3) - pow(t,2)) * m2;
 	}
 }
 
@@ -640,14 +635,7 @@ void AutomationPattern::flipX(int length)
 				MidiTime newTime;
 
 				// Only flips the length to be flipped and keep the remaining values in place
-				if (it.key() <= length)
-				{
-					newTime = MidiTime(length - it.key());
-				}
-				else
-				{
-					newTime = MidiTime(it.key());
-				}
+				newTime = MidiTime(it.key() <= length ? length - it.key() : it.key());
 
 				tempMap[newTime] = AutomationNode(this, tempValue, tempOutValue, newTime);
 
@@ -843,8 +831,9 @@ bool AutomationPattern::isAutomated( const AutomatableModel * _m )
 }
 
 
-/*! \brief returns a list of all the automation patterns everywhere that are connected to a specific model
- *  \param _m the model we want to look for
+/**
+ * @brief returns a list of all the automation patterns everywhere that are connected to a specific model
+ * @param _m the model we want to look for
  */
 QVector<AutomationPattern *> AutomationPattern::patternsForModel( const AutomatableModel * _m )
 {
