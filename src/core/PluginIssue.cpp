@@ -50,6 +50,8 @@ const char *PluginIssue::msgFor(const PluginIssueType &it)
 			return "port is missing min value";
 		case portHasNoMax:
 			return "port is missing max value";
+		case defaultValueNotInRange:
+			return "default value is not in range [min, max]";
 		case featureNotSupported:
 			return "required feature not supported";
 		case badPortType:

@@ -42,6 +42,7 @@ enum PluginIssueType
 	portHasNoDef,
 	portHasNoMin,
 	portHasNoMax,
+	defaultValueNotInRange,
 	featureNotSupported, //!< plugin requires functionality LMMS can't offer
 	badPortType, //!< port type not supported
 	blacklisted,
