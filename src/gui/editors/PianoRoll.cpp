@@ -989,9 +989,9 @@ void PianoRoll::drawDetuningInfo( QPainter & _p, const Note * _n, int _x,
 	for (timeMap::const_iterator it = map.begin(); it != map.end(); ++it)
 	{
 		// Current node values
-		int cur_ticks = it.key();
+		int cur_ticks = POS(it);
 		int cur_x = _x + cur_ticks * m_ppb / MidiTime::ticksPerBar();
-		const float cur_level = it.value().getInValue();
+		const float cur_level = INVAL(it);
 		int cur_y = middle_y - cur_level * m_keyLineHeight;
 
 		// First line to represent the inValue of the first node
@@ -1007,7 +1007,7 @@ void PianoRoll::drawDetuningInfo( QPainter & _p, const Note * _n, int _x,
 		{
 			// Previous node values (based on outValue). We just calculate
 			// the y level because the x will be the same as old_x.
-			const float pre_level = (it - 1).value().getOutValue();
+			const float pre_level = OUTVAL(it - 1);
 			int pre_y = middle_y - pre_level * m_keyLineHeight;
 
 			// Draws the line representing the discrete jump if there's one
@@ -1034,7 +1034,7 @@ void PianoRoll::drawDetuningInfo( QPainter & _p, const Note * _n, int _x,
 			// vertical line representing it
 			if ((it + 1) == map.end())
 			{
-				const float last_level = it.value().getOutValue();
+				const float last_level = OUTVAL(it);
 				if (cur_level != last_level)
 				{
 					int last_y = middle_y - last_level * m_keyLineHeight;

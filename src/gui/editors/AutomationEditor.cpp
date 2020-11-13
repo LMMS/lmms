@@ -493,7 +493,7 @@ void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 						else // If we clicked over an existing node
 						{
 							// Simply start moving/draging it
-							MidiTime newTime = m_pattern->setDragValue(MidiTime(clickedNode.key()),
+							MidiTime newTime = m_pattern->setDragValue(MidiTime(POS(clickedNode)),
 								level, true, mouseEvent->modifiers() & Qt::ControlModifier);
 
 							// We need to update our iterator because setDragValue removes the node that
@@ -506,7 +506,7 @@ void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 
 						// Calculate the offset from the place the mouse click happened in comparison
 						// to the center of the node
-						int alignedX = (int) ((float) ((clickedNode.key() - m_currentPosition) * m_ppb) /
+						int alignedX = (int) ((float) ((POS(clickedNode) - m_currentPosition) * m_ppb) /
 									MidiTime::ticksPerBar());
 						m_moveXOffset = x - alignedX - 1;
 
@@ -530,7 +530,7 @@ void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 					// If we right-clicked a node, remove it
 					if (clickedNode != tm.end())
 					{
-						m_pattern->removeValue(clickedNode.key());
+						m_pattern->removeValue(POS(clickedNode));
 						Engine::getSong()->setModified();
 					}
 
@@ -552,7 +552,7 @@ void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 					// If we right-clicked a node, remove it
 					if (clickedNode != tm.end())
 					{
-						m_pattern->removeValue(clickedNode.key());
+						m_pattern->removeValue(POS(clickedNode));
 						Engine::getSong()->setModified();
 					}
 
@@ -563,8 +563,7 @@ void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 					// If we clicked an outValue reset it
 					if (clickedNode != tm.end())
 					{
-						clickedNode.value().setOutValue(
-							clickedNode.value().getInValue());
+						clickedNode.value().setOutValue(INVAL(clickedNode));
 						Engine::getSong()->setModified();
 					}
 
@@ -586,7 +585,7 @@ void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 					// If we clicked an outValue
 					if (clickedNode != tm.end())
 					{
-						m_draggedOutValueKey = clickedNode.key();
+						m_draggedOutValueKey = POS(clickedNode);
 
 						clickedNode.value().setOutValue(level);
 
@@ -607,7 +606,7 @@ void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 
 						if (clickedNode != tm.end())
 						{
-							m_draggedOutValueKey = clickedNode.key();
+							m_draggedOutValueKey = POS(clickedNode);
 							clickedNode.value().setOutValue(level);
 
 							m_action = MOVE_OUTVALUE;
@@ -621,8 +620,7 @@ void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 					// If we clicked an outValue reset it
 					if (clickedNode != tm.end())
 					{
-						clickedNode.value().setOutValue(
-							clickedNode.value().getInValue());
+						clickedNode.value().setOutValue(INVAL(clickedNode));
 						Engine::getSong()->setModified();
 					}
 
@@ -691,10 +689,7 @@ void AutomationEditor::removeNodes(int tick0, int tick1)
 {
 	QMutexLocker m(&m_patternEditorMutex);
 
-	if (tick0 == tick1)
-	{
-		return;
-	}
+	if (tick0 == tick1) { return; }
 
 	MidiTime start = MidiTime(qMin(tick0, tick1));
 	MidiTime end = MidiTime(qMax(tick0, tick1));
@@ -709,12 +704,9 @@ void AutomationEditor::removeNodes(int tick0, int tick1)
 
 	while (it != tm.end())
 	{
-		if (it.key() > end)
-		{
-			break;
-		}
+		if (POS(it) > end) { break; }
 
-		nodesToRemove.append(it.key());
+		nodesToRemove.append(POS(it));
 		++it;
 	}
 
@@ -746,9 +738,9 @@ void AutomationEditor::resetNodes(int tick0, int tick1)
 
 	while (it != tm.end())
 	{
-		if (it.key() > end) { return; }
+		if (POS(it) > end) { return; }
 
-		it.value().setOutValue(it.value().getInValue());
+		it.value().setOutValue(INVAL(it));
 		++it;
 	}
 }
@@ -947,18 +939,18 @@ inline void AutomationEditor::drawAutomationPoint(QPainter & p, timeMap::iterato
 {
 	QMutexLocker m(&m_patternEditorMutex);
 
-	int x = xCoordOfTick(it.key());
+	int x = xCoordOfTick(POS(it));
 	int y;
 	const int outerRadius = qBound(3, (m_ppb * AutomationPattern::quantization()) / 576, 5); // man, getting this calculation right took forever
 
 	// Draw a circle for the outValue
-	y = yCoordOfLevel(it.value().getOutValue());
+	y = yCoordOfLevel(OUTVAL(it));
 	p.setPen(QPen(m_nodeOutValueColor.lighter(200)));
 	p.setBrush(QBrush(m_nodeOutValueColor));
 	p.drawEllipse(x - outerRadius, y - outerRadius, outerRadius * 2, outerRadius * 2);
 
 	// Draw a circle for the inValue
-	y = yCoordOfLevel(it.value().getInValue());
+	y = yCoordOfLevel(INVAL(it));
 	p.setPen(QPen(m_nodeInValueColor.lighter(200)));
 	p.setBrush(QBrush(m_nodeInValueColor));
 	p.drawEllipse(x - outerRadius, y - outerRadius, outerRadius * 2, outerRadius * 2);
@@ -1184,20 +1176,20 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 			{
 				// skip this section if it occurs completely before the
 				// visible area
-				int next_x = xCoordOfTick( (it+1).key() );
+				int next_x = xCoordOfTick(POS(it+1));
 				if( next_x < 0 )
 				{
 					++it;
 					continue;
 				}
 
-				int x = xCoordOfTick( it.key() );
+				int x = xCoordOfTick(POS(it));
 				if( x > width() )
 				{
 					break;
 				}
 
-				float *values = m_pattern->valuesAfter( it.key() );
+				float *values = m_pattern->valuesAfter(POS(it));
 
 				// We are creating a path to draw a polygon representing the values between two
 				// nodes. When we have two nodes with discrete progression, we will basically have
@@ -1208,23 +1200,23 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 				float nextValue;
 				if( m_pattern->progressionType() == AutomationPattern::DiscreteProgression )
 				{
-					nextValue = it.value().getOutValue();
+					nextValue = OUTVAL(it);
 				}
 				else
 				{
-					nextValue = (it + 1).value().getInValue();
+					nextValue = INVAL(it + 1);
 				}
 
 				p.setRenderHints( QPainter::Antialiasing, true );
 				QPainterPath path;
-				path.moveTo( QPointF( xCoordOfTick( it.key() ), yCoordOfLevel( 0 ) ) );
-				for( int i = 0; i < ( it + 1 ).key() - it.key(); i++ )
+				path.moveTo(QPointF(xCoordOfTick(POS(it)), yCoordOfLevel(0)));
+				for (int i = 0; i < POS(it + 1) - POS(it); i++)
 				{
-					path.lineTo(QPointF(xCoordOfTick(it.key() + i), yCoordOfLevel(values[i])));
+					path.lineTo(QPointF(xCoordOfTick(POS(it) + i), yCoordOfLevel(values[i])));
 				}
-				path.lineTo( QPointF( xCoordOfTick( ( it + 1 ).key() ), yCoordOfLevel( nextValue ) ) );
-				path.lineTo( QPointF( xCoordOfTick( ( it + 1 ).key() ), yCoordOfLevel( 0 ) ) );
-				path.lineTo( QPointF( xCoordOfTick( it.key() ), yCoordOfLevel( 0 ) ) );
+				path.lineTo(QPointF(xCoordOfTick(POS(it + 1)), yCoordOfLevel(nextValue)));
+				path.lineTo(QPointF(xCoordOfTick(POS(it + 1)), yCoordOfLevel(0)));
+				path.lineTo(QPointF(xCoordOfTick(POS(it)), yCoordOfLevel(0)));
 				p.fillPath(path, m_graphColor);
 				p.setRenderHints( QPainter::Antialiasing, false );
 				delete [] values;
@@ -1235,12 +1227,12 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 				++it;
 			}
 
-			for( int i = it.key(), x = xCoordOfTick( i ); x <= width();
-							i++, x = xCoordOfTick( i ) )
+			for (int i = POS(it), x = xCoordOfTick(i); x <= width();
+							i++, x = xCoordOfTick(i))
 			{
 				// Draws the rectangle representing the value after the last node (for
 				// that reason we use outValue).
-				drawLevelTick(p, i, it.value().getOutValue());
+				drawLevelTick(p, i, OUTVAL(it));
 			}
 			// Draw circle(the last one)
 			drawAutomationPoint(p, it);
@@ -1400,7 +1392,7 @@ void AutomationEditor::centerTopBottomScroll()
 		{
 			// set the position to the inverted value ((max + min) - value)
 			// If we set just (max - value), we're off by m_pattern's minimum
-			pos = m_pattern->getMax() + m_pattern->getMin() - static_cast<int>(time_map.begin().value().getInValue());
+			pos = m_pattern->getMax() + m_pattern->getMin() - static_cast<int>(INVAL(time_map.begin()));
 		}
 	}
 	m_topBottomScroll->setValue(pos);
@@ -1867,15 +1859,15 @@ AutomationEditor::timeMap::iterator AutomationEditor::getNodeAt(int x, int y, bo
 	while (it != tm.end())
 	{
 		// If the x coordinate is within "r" pixels of the node's position
-		if (posTicks >= it.key() - ticksOffset)
+		if (posTicks >= POS(it) - ticksOffset)
 		{
-			if (posTicks <= it.key() + ticksOffset)
+			if (posTicks <= POS(it) + ticksOffset)
 			{
 				// The y position of the node
 				float valueY = yCoordOfLevel(
 					outValue
-					? it.value().getOutValue()
-					: it.value().getInValue()
+					? OUTVAL(it)
+					: INVAL(it)
 				);
 				// If the y coordinate is within "r" pixels of the node's value
 				if (y >= (valueY - r) && y <= (valueY + r))
