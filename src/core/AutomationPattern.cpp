@@ -409,7 +409,7 @@ MidiTime AutomationPattern::setDragValue(const MidiTime & time,
 	{
 		return this->putValues(time, value, m_dragOutValue, quantPos, controlKey);
 	}
-	// else
+
 	return this->putValue(time, value, quantPos, controlKey);
 }
 

@@ -1874,9 +1874,9 @@ AutomationEditor::timeMap::iterator AutomationEditor::getNodeAt(int x, int y, bo
 				// The y position of the node
 				float valueY = yCoordOfLevel(
 					outValue
-						? it.value().getOutValue()
-						: it.value().getInValue()
-					);
+					? it.value().getOutValue()
+					: it.value().getInValue()
+				);
 				// If the y coordinate is within "r" pixels of the node's value
 				if (y >= (valueY - r) && y <= (valueY + r))
 				{
