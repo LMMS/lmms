@@ -26,6 +26,10 @@
 #ifndef AUTOMATION_NODE_H
 #define AUTOMATION_NODE_H
 
+// MACROs to help handling automation nodes
+#define INVAL(x) ((x).value().getInValue())
+#define OUTVAL(x) ((x).value().getOutValue())
+#define POS(x) ((x).key())
 
 class AutomationPattern;
 

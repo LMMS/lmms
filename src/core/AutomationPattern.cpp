@@ -86,7 +86,7 @@ AutomationPattern::AutomationPattern( const AutomationPattern & _pat_to_copy ) :
 				it != _pat_to_copy.m_timeMap.end(); ++it )
 	{
 		// Copies the automation node (in/out values and in/out tangents)
-		m_timeMap[it.key()] = it.value();
+		m_timeMap[POS(it)] = it.value();
 	}
 	switch( getTrack()->trackContainer()->type() )
 	{
@@ -197,7 +197,7 @@ MidiTime AutomationPattern::timeMapLength() const
 	if (m_timeMap.isEmpty()) { return one_bar; }
 
 	timeMap::const_iterator it = m_timeMap.end();
-	tick_t last_tick = static_cast<tick_t>((it-1).key());
+	tick_t last_tick = static_cast<tick_t>(POS(it - 1));
 	// if last_tick is 0 (single item at tick 0)
 	// return length as a whole bar to prevent disappearing TCO
 	if (last_tick == 0) { return one_bar; }
@@ -391,7 +391,7 @@ MidiTime AutomationPattern::setDragValue(const MidiTime & time,
 			if (it.value().getValueOffset() != 0)
 			{
 				m_dragKeepOutValue = true;
-				m_dragOutValue = it.value().getOutValue();
+				m_dragOutValue = OUTVAL(it);
 			}
 		}
 
@@ -456,10 +456,10 @@ float AutomationPattern::valueAt( const MidiTime & _time ) const
 	if( v == m_timeMap.end() )
 	{
 		// When the time is after the last node, we want the outValue of it
-		return (v - 1).value().getOutValue();
+		return OUTVAL(v - 1);
 	}
 
-	return valueAt( v-1, _time - (v-1).key() );
+	return valueAt(v - 1, _time - POS(v - 1));
 }
 
 
@@ -478,20 +478,20 @@ float AutomationPattern::valueAt( timeMap::const_iterator v, int offset ) const
 	// value if we do
 	if (offset == 0)
 	{
-		return v.value().getInValue();
+		return INVAL(v);
 	}
 
 	if( m_progressionType == DiscreteProgression || v == m_timeMap.end() )
 	{
-		return v.value().getOutValue();
+		return OUTVAL(v);
 	}
 	else if( m_progressionType == LinearProgression )
 	{
 		float slope =
-			((v + 1).value().getInValue() - v.value().getOutValue()) /
-			((v + 1).key() - v.key());
+			(INVAL(v + 1) - OUTVAL(v)) /
+			(POS(v + 1) - POS(v));
 
-		return v.value().getOutValue() + offset * slope;
+		return OUTVAL(v) + offset * slope;
 	}
 	else /* CubicHermiteProgression */
 	{
@@ -503,14 +503,14 @@ float AutomationPattern::valueAt( timeMap::const_iterator v, int offset ) const
 		// value: y.  To make this work we map the values of x that this
 		// segment spans to values of t for t = 0.0 -> 1.0 and scale the
 		// tangents _m1 and _m2
-		int numValues = ((v+1).key() - v.key());
+		int numValues = (POS(v + 1) - POS(v));
 		float t = (float) offset / (float) numValues;
 		float m1 = v.value().getOutTangent() * numValues * m_tension;
 		float m2 = (v + 1).value().getInTangent() * numValues * m_tension;
 
-		return (2 * pow(t,3) - 3 * pow(t,2) + 1) * v.value().getOutValue()
+		return (2 * pow(t,3) - 3 * pow(t,2) + 1) * OUTVAL(v)
 			+ (pow(t,3) - 2 * pow(t,2) + t) * m1
-			+ (-2 * pow(t,3) + 3 * pow(t,2)) * (v + 1).value().getInValue()
+			+ (-2 * pow(t,3) + 3 * pow(t,2)) * INVAL(v + 1)
 			+ (pow(t,3) - pow(t,2)) * m2;
 	}
 }
@@ -528,7 +528,7 @@ float *AutomationPattern::valuesAfter( const MidiTime & _time ) const
 		return NULL;
 	}
 
-	int numValues = (v+1).key() - v.key();
+	int numValues = POS(v + 1) - POS(v);
 	float *ret = new float[numValues];
 
 	for( int i = 0; i < numValues; i++ )
@@ -561,9 +561,9 @@ void AutomationPattern::flipY(int min, int max)
 		}
 		else
 		{
-			tempValue = max - valueAt(it.key());
+			tempValue = max - valueAt(POS(it));
 			outValueOffset = it.value().getValueOffset() * -1.0;
-			putValues(MidiTime(it.key()), tempValue, tempValue + outValueOffset, false, true);
+			putValues(MidiTime(POS(it)), tempValue, tempValue + outValueOffset, false, true);
 		}
 		++it;
 	} while (it != m_timeMap.end());
@@ -617,9 +617,9 @@ void AutomationPattern::flipX(int length)
 			// Now flip the nodes we have in relation to the length
 			do
 			{
-				tempValue = valueAt(it.key());
-				tempOutValue = it.value().getOutValue();
-				MidiTime newTime = MidiTime(length - it.key());
+				tempValue = valueAt(POS(it));
+				tempOutValue = OUTVAL(it);
+				MidiTime newTime = MidiTime(length - POS(it));
 
 				tempMap[newTime] = AutomationNode(this, tempValue, tempOutValue, newTime);
 
@@ -630,12 +630,12 @@ void AutomationPattern::flipX(int length)
 		{
 			do
 			{
-				tempValue = valueAt(it.key());
-				tempOutValue = it.value().getOutValue();
+				tempValue = valueAt(POS(it));
+				tempOutValue = OUTVAL(it);
 				MidiTime newTime;
 
 				// Only flips the length to be flipped and keep the remaining values in place
-				newTime = MidiTime(it.key() <= length ? length - it.key() : it.key());
+				newTime = MidiTime(POS(it) <= length ? length - POS(it) : POS(it));
 
 				tempMap[newTime] = AutomationNode(this, tempValue, tempOutValue, newTime);
 
@@ -647,10 +647,10 @@ void AutomationPattern::flipX(int length)
 	{
 		do
 		{
-			tempValue = valueAt(it.key());
-			tempOutValue = it.value().getOutValue();
+			tempValue = valueAt(POS(it));
+			tempOutValue = OUTVAL(it);
 
-			MidiTime newTime = MidiTime(realLength - it.key());
+			MidiTime newTime = MidiTime(realLength - POS(it));
 			tempMap[newTime] = AutomationNode(this, tempValue, tempOutValue, newTime);
 
 			++it;
@@ -690,9 +690,9 @@ void AutomationPattern::saveSettings( QDomDocument & _doc, QDomElement & _this )
 						it != m_timeMap.end(); ++it )
 	{
 		QDomElement element = _doc.createElement( "time" );
-		element.setAttribute( "pos", it.key() );
-		element.setAttribute("inValue", it.value().getInValue());
-		element.setAttribute("outValue", it.value().getOutValue());
+		element.setAttribute("pos", POS(it));
+		element.setAttribute("inValue", INVAL(it));
+		element.setAttribute("outValue", OUTVAL(it));
 		_this.appendChild( element );
 	}
 
@@ -1057,8 +1057,8 @@ void AutomationPattern::generateTangents(timeMap::iterator it, int numToGenerate
 		{
 			// On the first node there's no curve behind it, so we will only calculate the outTangent
 			// and inTangent will be set to 0.
-			float tangent = ((it + 1).value().getInValue() - (it).value().getOutValue()) /
-				((it + 1).key() - (it).key());
+			float tangent = (INVAL(it + 1) - OUTVAL(it)) /
+				(POS(it + 1) - POS(it));
 			it.value().setInTangent(0);
 			it.value().setOutTangent(tangent);
 		}
@@ -1078,10 +1078,10 @@ void AutomationPattern::generateTangents(timeMap::iterator it, int numToGenerate
 			// of the curve.
 			float inTangent;
 			float outTangent;
-			if (it.value().getInValue() == it.value().getOutValue())
+			if (INVAL(it) == OUTVAL(it))
 			{
-				inTangent = ((it + 1).value().getInValue() - (it - 1).value().getOutValue()) /
-					((it + 1).key() - (it - 1).key());
+				inTangent = (INVAL(it + 1) - OUTVAL(it - 1)) /
+					(POS(it + 1) - POS(it - 1));
 				it.value().setInTangent(inTangent);
 				// inTangent == outTangent in this case
 				it.value().setOutTangent(inTangent);
@@ -1089,11 +1089,11 @@ void AutomationPattern::generateTangents(timeMap::iterator it, int numToGenerate
 			else
 			{
 				// Calculate the left side of the curve
-				inTangent = ((it).value().getInValue() - (it - 1).value().getOutValue()) /
-					((it).key() - (it - 1).key());
+				inTangent = (INVAL(it) - OUTVAL(it - 1)) /
+					(POS(it) - POS(it - 1));
 				// Calculate the right side of the curve
-				outTangent = ((it + 1).value().getInValue() - (it).value().getOutValue()) /
-					((it + 1).key() - (it).key());
+				outTangent = (INVAL(it + 1) - OUTVAL(it)) /
+					(POS(it + 1) - POS(it));
 				it.value().setInTangent(inTangent);
 				it.value().setOutTangent(outTangent);
 			}
@@ -1101,7 +1101,3 @@ void AutomationPattern::generateTangents(timeMap::iterator it, int numToGenerate
 		it++;
 	}
 }
-
-
-
-
