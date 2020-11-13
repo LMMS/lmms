@@ -54,7 +54,7 @@ public:
 	int getBaseKey() const {return m_baseKey;}
 	float getBaseFreq() const {return m_baseFreq;}
 
-	int getSize() const {return m_map.size();}
+	std::size_t getSize() const {return m_map.size();}
 	int getDegree(int key) const;
 	int getOctave(int key) const;
 	const std::vector<int> &getMap() const {return m_map;}

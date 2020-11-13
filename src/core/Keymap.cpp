@@ -48,7 +48,7 @@ Keymap::Keymap(
 	float newBaseFreq
 ) :
 	m_description(description),
-	m_map(newMap),
+	m_map(std::move(newMap)),
 	m_firstKey(newFirst),
 	m_lastKey(newLast),
 	m_middleKey(newMiddle),

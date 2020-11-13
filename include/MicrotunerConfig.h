@@ -41,7 +41,6 @@ class LMMS_EXPORT MicrotunerConfig : public QWidget, public SerializingObject
 	Q_OBJECT
 public:
 	MicrotunerConfig();
-	virtual ~MicrotunerConfig() {};
 
 	void saveSettings(QDomDocument &document, QDomElement &element) override;
 	void loadSettings(const QDomElement &element) override;

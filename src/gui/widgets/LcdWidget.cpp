@@ -87,7 +87,7 @@ void LcdWidget::setValue(int value)
 	{
 		s = QString::number(value);
 		if (m_leadingZero) {
-			while (s.length() < m_numDigits) {s = "0" + s;}
+			s = s.rightJustified(m_numDigits, '0');
 		}
 	}
 
@@ -290,7 +290,6 @@ void LcdWidget::initUi(const QString& name , const QString& style)
 
 	updateSize();
 }
-
 
 
 

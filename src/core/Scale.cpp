@@ -35,7 +35,7 @@ Scale::Scale() :
 
 Scale::Scale(QString description, std::vector<Interval> intervals) :
 	m_description(description),
-	m_intervals(intervals)
+	m_intervals(std::move(intervals))
 {
 }
 
@@ -70,10 +70,10 @@ void Scale::saveSettings(QDomDocument &document, QDomElement &element)
 {
 	element.setAttribute("description", m_description);
 
-    for (auto it = m_intervals.begin(); it != m_intervals.end(); it++)
-    {
-        (*it).saveState(document, element);
-    }
+	for (auto& interval : m_intervals)
+	{
+		interval.saveState(document, element);
+	}
 
 }
 

@@ -76,9 +76,9 @@ private:
 	Piano * m_piano;
 
 	QScrollBar * m_pianoScroll;
-	int m_startKey;					//! first key when drawing
-	int m_lastKey;					//! previously pressed key
-	IntModel *m_movedNoteModel;		//! note marker which is being moved
+	int m_startKey;					//!< first key when drawing
+	int m_lastKey;					//!< previously pressed key
+	IntModel *m_movedNoteModel;		//!< note marker which is being moved
 
 
 
@@ -93,4 +93,3 @@ signals:
 
 
 #endif
-

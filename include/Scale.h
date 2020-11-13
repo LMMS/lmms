@@ -36,7 +36,7 @@ class Interval : public SerializingObject
 {
 public:
 	Interval() : m_numerator(1), m_denominator(1) {};
-	Interval(double cents) : m_numerator(cents), m_denominator(0) {};
+	explicit Interval(double cents) : m_numerator(cents), m_denominator(0) {};
 	Interval(unsigned long numerator, unsigned long denominator) :
 		m_numerator(numerator),
 		m_denominator(denominator > 0 ? denominator : 1) {};
@@ -76,7 +76,7 @@ public:
 	void setDescription(QString description);
 
 	const std::vector<Interval> &getIntervals() const {return m_intervals;}
-	void setIntervals(std::vector<Interval> input) {m_intervals = input;}
+	void setIntervals(std::vector<Interval> input) {m_intervals = std::move(input);}
 
 	void saveSettings(QDomDocument &doc, QDomElement &element) override;
 	void loadSettings(const QDomElement &element) override;

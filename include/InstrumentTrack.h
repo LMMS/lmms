@@ -280,9 +280,9 @@ private:
 
 	bool m_previewMode;
 
-	IntModel m_baseNoteModel;	//! The "A4" or "440 Hz" key (default 69)
-	IntModel m_firstKeyModel;	//! First key the instrument reacts to
-	IntModel m_lastKeyModel;	//! Last key the instrument reacts to
+	IntModel m_baseNoteModel;	//!< The "A4" or "440 Hz" key (default 69)
+	IntModel m_firstKeyModel;	//!< First key the instrument reacts to
+	IntModel m_lastKeyModel;	//!< Last key the instrument reacts to
 
 	bool m_hasAutoMidiDev;
 	static InstrumentTrack *s_autoAssignedTrack;

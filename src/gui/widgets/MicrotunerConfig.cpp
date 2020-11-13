@@ -173,10 +173,10 @@ MicrotunerConfig::MicrotunerConfig() :
 
 	updateScaleForm();
 	updateKeymapForm();
-	connect(Engine::getSong(), SIGNAL(scaleListChanged(int)), this, SLOT(updateScaleList(int)), Qt::DirectConnection);
-	connect(Engine::getSong(), SIGNAL(scaleListChanged(int)), this, SLOT(updateScaleForm()), Qt::DirectConnection);
-	connect(Engine::getSong(), SIGNAL(keymapListChanged(int)), this, SLOT(updateKeymapList(int)), Qt::DirectConnection);
-	connect(Engine::getSong(), SIGNAL(keymapListChanged(int)), this, SLOT(updateKeymapForm()), Qt::DirectConnection);
+	connect(Engine::getSong(), SIGNAL(scaleListChanged(int)), this, SLOT(updateScaleList(int)));
+	connect(Engine::getSong(), SIGNAL(scaleListChanged(int)), this, SLOT(updateScaleForm()));
+	connect(Engine::getSong(), SIGNAL(keymapListChanged(int)), this, SLOT(updateKeymapList(int)));
+	connect(Engine::getSong(), SIGNAL(keymapListChanged(int)), this, SLOT(updateKeymapForm()));
 
 	microtunerLayout->setRowStretch(4, 10);
 	this->setLayout(microtunerLayout);
@@ -410,7 +410,7 @@ bool MicrotunerConfig::applyScale()
 	Song *song = Engine::getSong();
 	if (song == nullptr) {return false;}
 
-	auto newScale = std::make_shared<Scale>(m_scaleNameEdit->text(), newIntervals);
+	auto newScale = std::make_shared<Scale>(m_scaleNameEdit->text(), std::move(newIntervals));
 	song->setScale(m_scaleComboModel.value(), newScale);
 
 	return true;
@@ -446,7 +446,7 @@ bool MicrotunerConfig::applyKeymap()
 
 	auto newKeymap = std::make_shared<Keymap>(
 		m_keymapNameEdit->text(),
-		newMap,
+		std::move(newMap),
 		m_firstKeyModel.value(),
 		m_lastKeyModel.value(),
 		m_middleKeyModel.value(),
@@ -620,7 +620,7 @@ bool MicrotunerConfig::saveKeymapToFile()
 	stream << m_baseKeyModel.value() << "\n";
 	stream << "! Base frequency:\n";
 	stream << m_baseFreqModel.value() << "\n";
-	stream << "! Octave degree (always using the last scale degre):\n";
+	stream << "! Octave degree (always using the last scale degree):\n";
 	stream << "0\n";
 	stream << "!\n";
 	stream << "! Key mappings:\n";

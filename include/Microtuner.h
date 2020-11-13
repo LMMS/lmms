@@ -37,7 +37,7 @@ class LMMS_EXPORT Microtuner : public Model, public JournallingObject
 {
 	Q_OBJECT
 public:
-	Microtuner(InstrumentTrack *parent);
+	explicit Microtuner(InstrumentTrack *parent);
 	~Microtuner();
 
 	bool enabled() const {return m_enabledModel.value();}

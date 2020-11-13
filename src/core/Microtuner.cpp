@@ -52,8 +52,8 @@ Microtuner::Microtuner(InstrumentTrack *parent) :
 	{
 		m_keymapModel.addItem(QString::number(i) + ": " + Engine::getSong()->getKeymap(i)->getDescription());
 	}
-	connect(Engine::getSong(), SIGNAL(scaleListChanged(int)), this, SLOT(updateScaleList(int)), Qt::DirectConnection);
-	connect(Engine::getSong(), SIGNAL(keymapListChanged(int)), this, SLOT(updateKeymapList(int)), Qt::DirectConnection);
+	connect(Engine::getSong(), SIGNAL(scaleListChanged(int)), this, SLOT(updateScaleList(int)));
+	connect(Engine::getSong(), SIGNAL(keymapListChanged(int)), this, SLOT(updateKeymapList(int)));
 }
 
 
@@ -135,7 +135,7 @@ float Microtuner::keyToFreq(int key, float detune) const
 {
 	if (key < firstKey() || key > lastKey()) {return 0;}
 	Song *song = Engine::getSong();
-	if (song == NULL) {return 0;}
+	if (!song) {return 0;}
 
 	// Get keymap and scale selected at this moment
 	const unsigned int keymap_id = m_keymapModel.value();
