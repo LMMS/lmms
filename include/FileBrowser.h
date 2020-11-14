@@ -26,6 +26,7 @@
 #ifndef FILE_BROWSER_H
 #define FILE_BROWSER_H
 
+#include <QCheckBox>
 #include <QtCore/QDir>
 #include <QtCore/QMutex>
 #include <QTreeWidget>
@@ -58,7 +59,10 @@ public:
 	*/
 	FileBrowser( const QString & directories, const QString & filter,
 			const QString & title, const QPixmap & pm,
-			QWidget * parent, bool dirs_as_items = false, bool recurse = false );
+			QWidget * parent, bool dirs_as_items = false, bool recurse = false,
+			const QString& userDir = "",
+			const QString& factoryDir = "");
+
 	virtual ~FileBrowser() = default;
 
 private slots:
@@ -83,6 +87,11 @@ private:
 	bool m_dirsAsItems;
 	bool m_recurse;
 
+	void addContentCheckBox(void);
+	QCheckBox* m_showUserContent = nullptr;
+	QCheckBox* m_showFactoryContent = nullptr;
+	const QString m_userDir;
+	const QString m_factoryDir;
 } ;
 
 

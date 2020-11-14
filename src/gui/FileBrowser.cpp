@@ -65,16 +65,50 @@ enum TreeWidgetItemTypes
 
 
 
+void FileBrowser::addContentCheckBox(void)
+{
+	auto filterWidget = new QWidget(contentParent());
+	filterWidget->setFixedHeight(24);
+	auto filterWidgetLayout = new QHBoxLayout(filterWidget);
+	filterWidgetLayout->setMargin(0);
+	filterWidgetLayout->setSpacing(0);
+
+	auto configCheckBox = [this, &filterWidgetLayout](QCheckBox* box)
+	{
+		box->setStyleSheet("QCheckBox {color: white; font-size: 10px}");
+		box->setCheckState(Qt::Checked);
+		connect(box, SIGNAL(stateChanged(int)), this, SLOT(reloadTree()));
+		filterWidgetLayout->addWidget(box);
+	};
+
+	m_showUserContent = new QCheckBox("User content");
+	configCheckBox(m_showUserContent);
+	m_showFactoryContent = new QCheckBox("Factory content");
+	configCheckBox(m_showFactoryContent);
+
+	addContentWidget(filterWidget);
+};
+
+
 FileBrowser::FileBrowser(const QString & directories, const QString & filter,
 			const QString & title, const QPixmap & pm,
-			QWidget * parent, bool dirs_as_items, bool recurse ) :
+			QWidget * parent, bool dirs_as_items, bool recurse,
+			const QString& userDir,
+			const QString& factoryDir):
 	SideBarWidget( title, pm, parent ),
 	m_directories( directories ),
 	m_filter( filter ),
 	m_dirsAsItems( dirs_as_items ),
-	m_recurse( recurse )
+	m_recurse( recurse ),
+	m_userDir(userDir),
+	m_factoryDir(factoryDir)
 {
 	setWindowTitle( tr( "Browser" ) );
+
+	if ((userDir != "") && (factoryDir != ""))
+	{
+		addContentCheckBox();
+	}
 
 	QWidget * searchWidget = new QWidget( contentParent() );
 	searchWidget->setFixedHeight( 24 );
@@ -162,6 +196,30 @@ bool FileBrowser::filterItems( const QString & filter, QTreeWidgetItem * item )
 }
 
 
+void filterDirectories(QString& dirstring, const QString& filterstring, bool checked)
+{
+	if (!checked)
+	{
+		dirstring = dirstring.replace(filterstring, "");
+	}
+	else
+	{
+		if (!dirstring.contains(filterstring))
+		{
+			dirstring += "*" + filterstring;
+		}
+	}
+	dirstring = dirstring.replace("**", "*");
+	if ((dirstring.length() > 0) && (*dirstring.begin() == '*'))
+	{
+		dirstring = dirstring.remove(0, 1);
+	}
+	if ((dirstring.length() > 0) && (*(dirstring.end()-1) == '*'))
+	{
+		dirstring = dirstring.remove(dirstring.length()-1, 1);
+	}
+}
+
 
 void FileBrowser::reloadTree( void )
 {
@@ -169,10 +227,21 @@ void FileBrowser::reloadTree( void )
 	const QString text = m_filterEdit->text();
 	m_filterEdit->clear();
 	m_fileBrowserTreeWidget->clear();
-	QStringList paths = m_directories.split( '*' );
-	for( QStringList::iterator it = paths.begin(); it != paths.end(); ++it )
+	if ((m_showUserContent != nullptr) && (m_showFactoryContent != nullptr))
 	{
-		addItems( *it );
+		filterDirectories(m_directories, m_userDir,
+						  m_showUserContent->isChecked());
+		filterDirectories(m_directories, m_factoryDir,
+						  m_showFactoryContent->isChecked());
+	}
+
+	if (m_directories.length() > 0)
+	{
+		QStringList paths = m_directories.split( '*' );
+		for( QStringList::iterator it = paths.begin(); it != paths.end(); ++it )
+		{
+			addItems( *it );
+		}
 	}
 	expandItems(nullptr, expandedDirs);
 	m_filterEdit->setText( text );
