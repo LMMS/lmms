@@ -237,10 +237,10 @@ void FileBrowser::reloadTree( void )
 
 	if (m_directories.length() > 0)
 	{
-		QStringList paths = m_directories.split( '*' );
-		for( QStringList::iterator it = paths.begin(); it != paths.end(); ++it )
+		QStringList paths = m_directories.split('*');
+		for (QStringList::iterator it = paths.begin(); it != paths.end(); ++it)
 		{
-			addItems( *it );
+			addItems(*it);
 		}
 	}
 	expandItems(nullptr, expandedDirs);
