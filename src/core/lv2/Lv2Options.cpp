@@ -44,8 +44,8 @@ bool Lv2Options::isOptionSupported(LV2_URID key)
 
 void Lv2Options::supportOption(LV2_URID key)
 {
-	Q_ASSERT(s_supportedOptions.find(key) == s_supportedOptions.end());
-	s_supportedOptions.insert(key);
+	const auto result = s_supportedOptions.insert(key);
+	Q_ASSERT(result.second);
 }
 
 
@@ -87,12 +87,11 @@ void Lv2Options::initOption(LV2_URID key, uint32_t size, LV2_URID type,
 	std::copy((uint8_t*)value, (uint8_t*)value + size, (uint8_t*)dataPtr.get());
 	opt.value = dataPtr.get();
 
-	Q_ASSERT(m_optionByUrid.find(key) == m_optionByUrid.end());
-	Q_ASSERT(m_optionValues.find(key) == m_optionValues.end());
-	m_optionByUrid.emplace(key, opt);
-	m_optionValues.emplace(key, std::move(dataPtr));
+	const auto optResult = m_optionByUrid.emplace(key, opt);
+	const auto valResult = m_optionValues.emplace(key, std::move(dataPtr));
+	Q_ASSERT(optResult.second);
+	Q_ASSERT(valResult.second);
 }
 
 
 #endif // LMMS_HAVE_LV2
-
