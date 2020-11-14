@@ -686,10 +686,11 @@ void FileBrowserTreeWidget::mouseMoveEvent( QMouseEvent * me )
 void FileBrowserTreeWidget::mouseReleaseEvent(QMouseEvent * me )
 {
 	m_mousePressed = false;
+	// Depending on the user's configuration, we may not want to stop previews
+	bool cont = ConfigManager::inst()->value("ui", "letpreviewsfinish").toInt();
+	if (cont) { return; }
 
 	QMutexLocker previewLocker(&m_pphMutex);
-
-	//TODO: User setting to allow samples to play until completion instead
 	if (m_previewPlayHandle != nullptr) { stopPreview(); }
 }
 
