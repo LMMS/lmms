@@ -55,8 +55,6 @@
 #include "StringPairDrag.h"
 #include "TextFloat.h"
 
-
-
 enum TreeWidgetItemTypes
 {
 	TypeFileItem = QTreeWidgetItem::UserType,
@@ -335,6 +333,13 @@ FileBrowserTreeWidget::FileBrowserTreeWidget(QWidget * parent ) :
 	connect( this, SIGNAL( itemExpanded( QTreeWidgetItem * ) ),
 				SLOT( updateDirectory( QTreeWidgetItem * ) ) );
 
+#if QT_VERSION < QT_VERSION_CHECK(5, 12, 2) && defined LMMS_BUILD_WIN32
+	// Set the font for the QTreeWidget to the Windows System font to make sure that
+	// truncated (elided) items use the same font as non-truncated items.
+	// This is a workaround for this qt bug, fixed in 5.12.2: https://bugreports.qt.io/browse/QTBUG-29232
+	// TODO: remove this when all builds use a recent enough version of qt.
+	setFont( GuiApplication::getWin32SystemFont() );
+#endif
 }
 
 
