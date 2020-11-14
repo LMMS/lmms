@@ -37,7 +37,7 @@ class Lv2UridCache
 public:
 	enum class Id //!< ID for m_uridCache array
 	{
-		// keep it alphabetically
+		// keep it alphabetically (except "size" at the end)
 		atom_Float,
 		atom_Int,
 		bufsz_minBlockLength,
@@ -46,6 +46,7 @@ public:
 		bufsz_sequenceSize,
 		midi_MidiEvent,
 		param_sampleRate,
+		// exception to alphabetic ordering - keep at the end:
 		size
 	};
 	//! Return URID for a cache ID
