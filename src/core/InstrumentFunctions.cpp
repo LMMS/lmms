@@ -375,7 +375,7 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 
 	// number of frames that every note should be played
 	const f_cnt_t arp_frames = (f_cnt_t)( m_arpTimeModel.value() / 1000.0f * Engine::mixer()->processingSampleRate() );
-	const f_cnt_t gated_frames = (f_cnt_t)( m_arpGateModel.value() * arp_frames * m_arpRepeatsModel.value() / 100.0f );
+	const f_cnt_t gated_frames = (f_cnt_t)( m_arpGateModel.value() * arp_frames / 100.0f );
 
 	// used for calculating remaining frames for arp-note, we have to add
 	// arp_frames-1, otherwise the first arp-note will not be setup
