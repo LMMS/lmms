@@ -105,7 +105,7 @@ FileBrowser::FileBrowser(const QString & directories, const QString & filter,
 {
 	setWindowTitle( tr( "Browser" ) );
 
-	if ((userDir != "") && (factoryDir != ""))
+	if (!userDir.isEmpty() && !factoryDir.isEmpty())
 	{
 		addContentCheckBox();
 	}
