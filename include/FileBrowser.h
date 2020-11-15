@@ -90,8 +90,8 @@ private:
 	void addContentCheckBox(void);
 	QCheckBox* m_showUserContent = nullptr;
 	QCheckBox* m_showFactoryContent = nullptr;
-	const QString m_userDir;
-	const QString m_factoryDir;
+	QString m_userDir;
+	QString m_factoryDir;
 } ;
 
 
