@@ -87,7 +87,7 @@ private:
 	bool m_dirsAsItems;
 	bool m_recurse;
 
-	void addContentCheckBox(void);
+	void addContentCheckBox();
 	QCheckBox* m_showUserContent = nullptr;
 	QCheckBox* m_showFactoryContent = nullptr;
 	QString m_userDir;
