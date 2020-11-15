@@ -69,7 +69,7 @@ enum TreeWidgetItemTypes
 void FileBrowser::addContentCheckBox()
 {
 	auto filterWidget = new QWidget(contentParent());
-	filterWidget->setFixedHeight(24);
+	filterWidget->setFixedHeight(15);
 	auto filterWidgetLayout = new QHBoxLayout(filterWidget);
 	filterWidgetLayout->setMargin(0);
 	filterWidgetLayout->setSpacing(0);
