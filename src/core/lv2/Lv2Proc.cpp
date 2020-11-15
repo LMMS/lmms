@@ -456,6 +456,16 @@ void Lv2Proc::createPort(std::size_t portNum)
 				AutoLilvNode node(lilv_port_get_name(m_plugin, lilvPort));
 				QString dispName = lilv_node_as_string(node.get());
 				sample_rate_t sr = Engine::mixer()->processingSampleRate();
+				if(meta.def() < meta.min(sr) || meta.def() > meta.max(sr))
+				{
+					qWarning()	<< "Warning: Plugin"
+								<< qStringFromPluginNode(m_plugin, lilv_plugin_get_name)
+								<< "(URI:"
+								<< lilv_node_as_uri(lilv_plugin_get_uri(m_plugin))
+								<< ") has a default value for port"
+								<< dispName
+								<< "which is not in range [min, max].";
+				}
 				switch (meta.m_vis)
 				{
 					case Lv2Ports::Vis::None:
@@ -498,6 +508,7 @@ void Lv2Proc::createPort(std::size_t portNum)
 						}
 						lilv_scale_points_free(sps);
 						ctrl->m_connectedModel.reset(comboModel);
+						// TODO: use default value on comboModel, too?
 						break;
 					}
 					case Lv2Ports::Vis::Toggled:
