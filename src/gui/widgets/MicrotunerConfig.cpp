@@ -324,12 +324,12 @@ bool MicrotunerConfig::validateScaleForm()
 			bool ok = true;
 			int num = 1, den = 1;
 			num = firstSection.toInt(&ok);
-			if (!ok) {fail(tr("Denominator of an interval defined as a ratio cannot be converted to a number")); return false;}
+			if (!ok) {fail(tr("Numerator of an interval defined as a ratio cannot be converted to a number")); return false;}
 			if (line.contains('/'))
 			{
 				den = line.split('/').at(1).section(QRegExp("\\s+"), 0, 0, QString::SectionSkipEmpty).toInt(&ok);
 			}
-			if (!ok) {fail(tr("Numerator of an interval defined as a ratio cannot be converted to a number")); return false;}
+			if (!ok) {fail(tr("Denominator of an interval defined as a ratio cannot be converted to a number")); return false;}
 			if (num * den < 0) {fail(tr("Interval defined as a ratio cannot be negative")); return false;}
 		}
 	}

@@ -83,7 +83,7 @@ int Keymap::getDegree(int key) const
 int Keymap::getOctave(int key) const
 {
 	// The keymap wraparound cannot cause an octave transition if a key isn't mapped or the map is empty → return 0
-	if (key < m_firstKey || key > m_lastKey || m_map.size() == 0 || getDegree(key) == -1) {return 0;}
+	if (m_map.empty() || getDegree(key) == -1) {return 0;}
 
 	const int keyOffset = key - m_middleKey;
 	if (keyOffset >= 0)
