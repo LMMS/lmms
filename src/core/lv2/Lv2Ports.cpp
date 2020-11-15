@@ -28,6 +28,7 @@
 #ifdef LMMS_HAVE_LV2
 
 #include <lv2/lv2plug.in/ns/ext/atom/atom.h>
+#include <lv2/lv2plug.in/ns/ext/port-props/port-props.h>
 
 #include "Engine.h"
 #include "Lv2Basics.h"
@@ -126,75 +127,106 @@ std::vector<PluginIssue> Meta::get(const LilvPlugin *plugin,
 		issue(unknownPortFlow, portName);
 	}
 
-	m_def = .0f; m_min = .0f; m_max = .0f;
+	m_def = .0f;
+	m_min = std::numeric_limits<decltype(m_min)>::lowest();
+	m_max = std::numeric_limits<decltype(m_max)>::max();
+	auto m_min_set = [this]{ return m_min != std::numeric_limits<decltype(m_min)>::lowest(); };
+	auto m_max_set = [this]{ return m_max != std::numeric_limits<decltype(m_max)>::max(); };
 
 	m_type = Type::Unknown;
-	if (isA(LV2_CORE__ControlPort))
+	if (isA(LV2_CORE__ControlPort) || isA(LV2_CORE__CVPort))
 	{
-		m_type = Type::Control;
+		// Read metadata for control ports
+		// CV ports are mostly the same as control ports, so we take
+		// mostly the same metadata
 
-		if (m_flow == Flow::Input)
+		if (isA(LV2_CORE__CVPort))
 		{
-			bool isToggle = m_vis == Vis::Toggled;
+			// currently not supported, but we can still check the metadata
+			issue(badPortType, "cvPort");
+		}
 
-			LilvNode * defN, * minN = nullptr, * maxN = nullptr;
-			lilv_port_get_range(plugin, lilvPort, &defN,
-					isToggle ? nullptr : &minN,
-					isToggle ? nullptr : &maxN);
-			AutoLilvNode def(defN), min(minN), max(maxN);
+		m_type = isA(LV2_CORE__CVPort) ? Type::Cv : Type::Control;
 
-			auto takeRangeValue = [&](LilvNode* node,
-				float& storeHere, PluginIssueType it)
-			{
-				if (node) { storeHere = lilv_node_as_float(node); }
-				else { issue(it, portName); }
-			};
+		bool isToggle = m_vis == Vis::Toggled;
 
-			takeRangeValue(def.get(), m_def, portHasNoDef);
-			if (isToggle)
-			{
-				m_min = .0f;
-				m_max = 1.f;
-				if(def.get() && m_def != m_min && m_def != m_max)
-				{
-					issue(defaultValueNotInRange, portName);
-				}
-			}
+		LilvNode * defN, * minN = nullptr, * maxN = nullptr;
+		lilv_port_get_range(plugin, lilvPort, &defN,
+				isToggle ? nullptr : &minN,
+				isToggle ? nullptr : &maxN);
+		AutoLilvNode def(defN), min(minN), max(maxN);
+
+		auto takeRangeValue = [&](LilvNode* node,
+			float& storeHere, PluginIssueType it)
+		{
+			if (node) { storeHere = lilv_node_as_float(node); }
 			else
 			{
-				takeRangeValue(min.get(), m_min, portHasNoMin);
-				takeRangeValue(max.get(), m_max, portHasNoMax);
-				if (hasProperty(LV2_CORE__sampleRate)) { m_sampleRate = true; }
-
-				if (def.get())
+				// CV ports do not require ranges
+				if(m_flow == Flow::Input && m_type != Type::Cv)
 				{
-					if (m_def < m_min) { issue(defaultValueNotInRange, portName); }
-					else if (m_def > m_max)
+					issue(it, portName);
+				}
+			}
+		};
+
+		takeRangeValue(def.get(), m_def, portHasNoDef);
+		if (isToggle)
+		{
+			m_min = .0f;
+			m_max = 1.f;
+			if(def.get() && m_def != m_min && m_def != m_max)
+			{
+				issue(defaultValueNotInRange, portName);
+			}
+		}
+		else
+		{
+			// take min/max
+			takeRangeValue(min.get(), m_min, portHasNoMin);
+			takeRangeValue(max.get(), m_max, portHasNoMax);
+			if(m_type == Type::Cv)
+			{
+				// no range is allowed and bashed to [-1,+1],
+				// but only min or only max does not make sense
+				if(!m_min_set() && !m_max_set())
+				{
+					m_min = -1.f;
+					m_max = +1.f;
+				}
+				else if(!m_min_set()) { issue(portHasNoMin, portName); }
+				else if(!m_max_set()) { issue(portHasNoMax, portName); }
+			}
+			if(m_min > m_max) { issue(minGreaterMax, portName); }
+
+			// sampleRate
+			if (hasProperty(LV2_CORE__sampleRate)) { m_sampleRate = true; }
+
+			// default value
+			if (def.get())
+			{
+				if (m_def < m_min) { issue(defaultValueNotInRange, portName); }
+				else if (m_def > m_max)
+				{
+					if(m_sampleRate)
 					{
-						if(m_sampleRate)
-						{
-							// multiplying with sample rate will hopefully lead us
-							// to a good default value
-						}
-						else { issue(defaultValueNotInRange, portName); }
+						// multiplying with sample rate will hopefully lead us
+						// to a good default value
 					}
+					else { issue(defaultValueNotInRange, portName); }
 				}
+			}
 
-				if (m_max - m_min > 15.0f)
-				{
-					// range too large for spinbox visualisation, use knobs
-					// e.g. 0...15 would be OK
-					m_vis = Vis::None;
-				}
+			// visualization
+			if (m_max - m_min > 15.0f)
+			{
+				// range too large for spinbox visualisation, use knobs
+				// e.g. 0...15 would be OK
+				m_vis = Vis::None;
 			}
 		}
 	}
 	else if (isA(LV2_CORE__AudioPort)) { m_type = Type::Audio; }
-	else if (isA(LV2_CORE__CVPort))
-	{
-		issue(badPortType, "cvPort");
-		m_type = Type::Cv;
-	}
 	else if (isA(LV2_ATOM__AtomPort))
 	{
 		AutoLilvNode uriAtomSequence(Engine::getLv2Manager()->uri(LV2_ATOM__Sequence));
@@ -219,6 +251,27 @@ std::vector<PluginIssue> Meta::get(const LilvPlugin *plugin,
 		else {
 			issue(PluginIssueType::unknownPortType, portName);
 		}
+	}
+
+	if (hasProperty(LV2_PORT_PROPS__logarithmic))
+	{
+		// check min/max available
+		// we requre them anyways, but this will detect plugins that will
+		// be non-Lv2-conforming
+		if(m_min == std::numeric_limits<decltype(m_min)>::lowest())
+		{
+			issue(PluginIssueType::logScaleMinMissing, portName);
+		}
+		if(m_max == std::numeric_limits<decltype(m_max)>::max())
+		{
+			issue(PluginIssueType::logScaleMaxMissing, portName);
+		}
+		// forbid min < 0 < max
+		if(m_min < 0.f && m_max > 0.f)
+		{
+			issue(PluginIssueType::logScaleMinMaxDifferentSigns, portName);
+		}
+		m_logarithmic = true;
 	}
 
 	return portIssues;

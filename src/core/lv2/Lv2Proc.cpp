@@ -520,7 +520,12 @@ void Lv2Proc::createPort(std::size_t portNum)
 											nullptr, dispName));
 						break;
 				}
-			}
+				if(meta.m_logarithmic)
+				{
+					ctrl->m_connectedModel->setScaleLogarithmic();
+				}
+
+			} // if m_flow == Input
 			port = ctrl;
 			break;
 		}
