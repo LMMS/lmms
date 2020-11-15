@@ -280,9 +280,9 @@ void SampleTCO::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	{
 		_this.setAttribute( "color", color().name() );
 	}
-	if( m_sampleBuffer->reversed() )
+	if(m_sampleBuffer->reversed())
 	{
-		_this.setAttribute( "reversed", "true" );
+		_this.setAttribute("reversed", "true");
 	}
 	// TODO: start- and end-frame
 }
@@ -315,9 +315,9 @@ void SampleTCO::loadSettings( const QDomElement & _this )
 		setColor( _this.attribute( "color" ) );
 	}
 
-	if( _this.hasAttribute( "reversed" ) )
+	if(_this.hasAttribute("reversed"))
 	{
-		m_sampleBuffer->setReversed( true );
+		m_sampleBuffer->setReversed(true);
 		emit wasReversed();		// tell SampleTCOView to update the view
 	}
 }
@@ -346,8 +346,8 @@ SampleTCOView::SampleTCOView( SampleTCO * _tco, TrackView * _tv ) :
 	connect( m_tco, SIGNAL( sampleChanged() ),
 			this, SLOT( updateSample() ) );
 
-	connect( m_tco, SIGNAL( wasReversed() ),
-			this, SLOT( update() ) );
+	connect(m_tco, SIGNAL(wasReversed()),
+			this, SLOT(update()));
 
 	setStyle( QApplication::style() );
 }
@@ -422,8 +422,8 @@ void SampleTCOView::contextMenuEvent( QContextMenuEvent * _cme )
 				tr( "Set/clear record" ),
 						m_tco, SLOT( toggleRecord() ) );*/
 
-	contextMenu.addAction( embed::getIconPixmap( "flip_x" ),
-			tr( "Reverse sample" ), this, SLOT( reverseSample() ) );
+	contextMenu.addAction(embed::getIconPixmap("flip_x"),
+			tr("Reverse sample"), this, SLOT(reverseSample()));
 
 	contextMenu.addSeparator();
 
@@ -644,7 +644,7 @@ void SampleTCOView::paintEvent( QPaintEvent * pe )
 
 void SampleTCOView::reverseSample()
 {
-	m_tco->sampleBuffer()->setReversed( !m_tco->sampleBuffer()->reversed() );
+	m_tco->sampleBuffer()->setReversed(!m_tco->sampleBuffer()->reversed());
 	Engine::getSong()->setModified();
 	update();
 }

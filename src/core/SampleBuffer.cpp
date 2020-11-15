@@ -296,44 +296,43 @@ void SampleBuffer::update( bool _keep_settings )
 }
 
 
-void SampleBuffer::convertIntToFloat (int_sample_t * & _ibuf, f_cnt_t _frames, int _channels)
+void SampleBuffer::convertIntToFloat (int_sample_t * & ibuf, f_cnt_t frames, int channels)
 {
-	// following code transforms int-samples into
-	// float-samples and does amplifying & reversing
+	// following code transforms int-samples into float-samples and does amplifying & reversing
 	const float fac = 1 / OUTPUT_SAMPLE_MULTIPLIER;
-	m_data = MM_ALLOC (sampleFrame, _frames);
-	const int ch = (_channels > 1) ? 1 : 0;
+	m_data = MM_ALLOC(sampleFrame, frames);
+	const int ch = (channels > 1) ? 1 : 0;
 
-	// if reversing is on, we also reverse when
-	// scaling
-	int idx = m_reversed ? (_frames - 1) * _channels : 0;
-	for (f_cnt_t frame = 0; frame < _frames; ++frame)
+	// if reversing is on, we also reverse when scaling
+	bool isReversed = m_reversed;
+	int idx = isReversed ? (frames - 1) * channels : 0;
+	for (f_cnt_t frame = 0; frame < frames; ++frame)
 	{
-		m_data[frame][0] = _ibuf[idx+0] * fac;
-		m_data[frame][1] = _ibuf[idx+ch] * fac;
-		idx += m_reversed ? -_channels : _channels;
+		m_data[frame][0] = ibuf[idx+0] * fac;
+		m_data[frame][1] = ibuf[idx+ch] * fac;
+		idx += isReversed ? -channels : channels;
 	}
 
-	delete[] _ibuf;
+	delete[] ibuf;
 }
 
-void SampleBuffer::directFloatWrite (sample_t * & _fbuf, f_cnt_t _frames, int _channels)
+void SampleBuffer::directFloatWrite (sample_t * & fbuf, f_cnt_t frames, int channels)
 {
 
-	m_data = MM_ALLOC (sampleFrame, _frames);
-	const int ch = (_channels > 1) ? 1 : 0;
+	m_data = MM_ALLOC(sampleFrame, frames);
+	const int ch = (channels > 1) ? 1 : 0;
 
-	// if reversing is on, we also reverse when
-	// scaling
-	int idx = m_reversed ? (_frames - 1) * _channels : 0;
-	for (f_cnt_t frame = 0; frame < _frames; ++frame)
+	// if reversing is on, we also reverse when scaling
+	bool isReversed = m_reversed;
+	int idx = isReversed ? (frames - 1) * channels : 0;
+	for (f_cnt_t frame = 0; frame < frames; ++frame)
 	{
-		m_data[frame][0] = _fbuf[idx+0];
-		m_data[frame][1] = _fbuf[idx+ch];
-		idx += m_reversed ? -_channels : _channels;
+		m_data[frame][0] = fbuf[idx+0];
+		m_data[frame][1] = fbuf[idx+ch];
+		idx += isReversed ? -channels : channels;
 	}
 
-	delete[] _fbuf;
+	delete[] fbuf;
 }
 
 
