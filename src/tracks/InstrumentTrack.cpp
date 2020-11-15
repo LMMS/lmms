@@ -273,7 +273,7 @@ void InstrumentTrack::processInEvent( const MidiEvent& event, const MidiTime& ti
 			if( event.velocity() > 0 )
 			{
 				// play a note only if it is not already playing and if it is within configured bounds
-				if (m_notes[event.key()] == NULL && event.key() >= firstKey() && event.key() <= lastKey())
+				if (m_notes[event.key()] == nullptr && event.key() >= firstKey() && event.key() <= lastKey())
 				{
 					NotePlayHandle* nph =
 						NotePlayHandleManager::acquire(

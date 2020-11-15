@@ -186,7 +186,7 @@ bool Microtuner::isKeyMapped(int key) const
 	if (!enabled()) {return true;}
 
 	Song *song = Engine::getSong();
-	if (song == NULL) {return false;}
+	if (!song) {return false;}
 
 	return song->getKeymap(m_keymapModel.value())->getDegree(key) != -1;
 }

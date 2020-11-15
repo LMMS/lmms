@@ -31,13 +31,15 @@ void Interval::saveSettings(QDomDocument &document, QDomElement &element)
 {
 	element.setAttribute("num", QString::number(m_numerator));
 	element.setAttribute("den", QString::number(m_denominator));
+	element.setAttribute("cents", QString::number(m_cents));
 }
 
 
 void Interval::loadSettings(const QDomElement &element)
 {
-	m_numerator = element.attribute("num").toDouble();
+	m_numerator = element.attribute("num").toULong();
 	m_denominator = element.attribute("den").toULong();
+	m_cents = element.attribute("cents").toDouble();
 }
 
 

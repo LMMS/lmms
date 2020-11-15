@@ -65,12 +65,12 @@ Keys WhiteKeys[] =
 } ;
 
 
-QPixmap * PianoView::s_whiteKeyPm = NULL;           /*!< A white key released */
-QPixmap * PianoView::s_blackKeyPm = NULL;           /*!< A black key released */
-QPixmap * PianoView::s_whiteKeyPressedPm = NULL;    /*!< A white key pressed */
-QPixmap * PianoView::s_blackKeyPressedPm = NULL;    /*!< A black key pressed */
-QPixmap * PianoView::s_whiteKeyDisabledPm = NULL;   /*!< A white key disabled */
-QPixmap * PianoView::s_blackKeyDisabledPm = NULL;   /*!< A black key disabled */
+QPixmap * PianoView::s_whiteKeyPm = nullptr;           /*!< A white key released */
+QPixmap * PianoView::s_blackKeyPm = nullptr;           /*!< A black key released */
+QPixmap * PianoView::s_whiteKeyPressedPm = nullptr;    /*!< A white key pressed */
+QPixmap * PianoView::s_blackKeyPressedPm = nullptr;    /*!< A black key pressed */
+QPixmap * PianoView::s_whiteKeyDisabledPm = nullptr;   /*!< A white key disabled */
+QPixmap * PianoView::s_blackKeyDisabledPm = nullptr;   /*!< A black key disabled */
 
 
 const int PIANO_BASE = 11;          /*!< The height of the root note display */
@@ -88,35 +88,35 @@ const int LABEL_TEXT_SIZE = 7;      /*!< The height of the key label text */
  *  \param _parent the parent instrument plugin window
  *  \todo are the descriptions of the m_startkey and m_lastkey properties correct?
  */
-PianoView::PianoView( QWidget * _parent ) :
-	QWidget( _parent ),             /*!< Our parent */
-	ModelView( NULL, this ),        /*!< Our view Model */
-	m_piano( NULL ),                /*!< Our piano Model */
-	m_startKey( Key_C + Octave_3*KeysPerOctave ), /*!< The first key displayed? */
-	m_lastKey(-1),                  /*!< The last key displayed? */
-	m_movedNoteModel(NULL)          /*!< Key marker which is being moved */
+PianoView::PianoView(QWidget *parent) :
+	QWidget(parent),                 /*!< Our parent */
+	ModelView(nullptr, this),        /*!< Our view Model */
+	m_piano(nullptr),                /*!< Our piano Model */
+	m_startKey(Key_C + Octave_3*KeysPerOctave), /*!< The first key displayed? */
+	m_lastKey(-1),                   /*!< The last key displayed? */
+	m_movedNoteModel(nullptr)        /*!< Key marker which is being moved */
 {
-	if( s_whiteKeyPm == NULL )
+	if (s_whiteKeyPm == nullptr)
 	{
-		s_whiteKeyPm = new QPixmap( embed::getIconPixmap( "white_key" ) );
+		s_whiteKeyPm = new QPixmap(embed::getIconPixmap("white_key"));
 	}
-	if( s_blackKeyPm == NULL )
+	if (s_blackKeyPm == nullptr)
 	{
-		s_blackKeyPm = new QPixmap( embed::getIconPixmap( "black_key" ) );
+		s_blackKeyPm = new QPixmap(embed::getIconPixmap("black_key"));
 	}
-	if( s_whiteKeyPressedPm == NULL )
+	if (s_whiteKeyPressedPm == nullptr)
 	{
-		s_whiteKeyPressedPm = new QPixmap( embed::getIconPixmap( "white_key_pressed" ) );
+		s_whiteKeyPressedPm = new QPixmap(embed::getIconPixmap("white_key_pressed"));
 	}
-	if ( s_blackKeyPressedPm == NULL )
+	if (s_blackKeyPressedPm == nullptr)
 	{
-		s_blackKeyPressedPm = new QPixmap( embed::getIconPixmap( "black_key_pressed" ) );
+		s_blackKeyPressedPm = new QPixmap(embed::getIconPixmap("black_key_pressed"));
 	}
-	if (s_whiteKeyDisabledPm == NULL)
+	if (s_whiteKeyDisabledPm == nullptr)
 	{
 		s_whiteKeyDisabledPm = new QPixmap(embed::getIconPixmap("white_key_disabled"));
 	}
-	if (s_blackKeyDisabledPm == NULL)
+	if (s_blackKeyDisabledPm == nullptr)
 	{
 		s_blackKeyDisabledPm = new QPixmap(embed::getIconPixmap("black_key_disabled"));
 	}
@@ -297,7 +297,7 @@ int PianoView::getKeyFromKeyEvent( QKeyEvent * _ke )
 void PianoView::modelChanged()
 {
 	m_piano = castModel<Piano>();
-	if (m_piano != NULL)
+	if (m_piano != nullptr)
 	{
 		connect(m_piano->instrumentTrack()->baseNoteModel(), SIGNAL(dataChanged()), this, SLOT(update()));
 		connect(m_piano->instrumentTrack()->firstKeyModel(), SIGNAL(dataChanged()), this, SLOT(update()));
@@ -404,7 +404,7 @@ void PianoView::pianoScrolled( int _new_pos )
  */
 void PianoView::contextMenuEvent(QContextMenuEvent *me)
 {
-	if (me->pos().y() > PIANO_BASE || m_piano == NULL ||
+	if (me->pos().y() > PIANO_BASE || m_piano == nullptr ||
 		(m_piano->instrumentTrack()->microtuner()->enabled() &&
 		 m_piano->instrumentTrack()->microtuner()->keyRangeImport()))
 	{
@@ -465,7 +465,7 @@ void PianoView::contextMenuEvent(QContextMenuEvent *me)
  */
 void PianoView::mousePressEvent(QMouseEvent *me)
 {
-	if (me->button() == Qt::LeftButton && m_piano != NULL)
+	if (me->button() == Qt::LeftButton && m_piano != nullptr)
 	{
 		// get pressed key
 		int key_num = getKeyFromMouse(me->pos());
@@ -525,7 +525,7 @@ void PianoView::mousePressEvent(QMouseEvent *me)
 		}
 		else
 		{
-			m_movedNoteModel = NULL;
+			m_movedNoteModel = nullptr;
 		}
 
 		// and let the user see that he pressed a key... :)
@@ -548,7 +548,7 @@ void PianoView::mouseReleaseEvent( QMouseEvent * )
 {
 	if( m_lastKey != -1 )
 	{
-		if( m_piano != NULL )
+		if( m_piano != nullptr )
 		{
 			m_piano->midiEventProcessor()->processInEvent( MidiEvent( MidiNoteOff, -1, m_lastKey, 0 ) );
 			m_piano->setKeyState( m_lastKey, false );
@@ -558,7 +558,7 @@ void PianoView::mouseReleaseEvent( QMouseEvent * )
 		update();
 
 		m_lastKey = -1;
-		m_movedNoteModel = NULL;
+		m_movedNoteModel = nullptr;
 	}
 }
 
@@ -581,7 +581,7 @@ void PianoView::mouseReleaseEvent( QMouseEvent * )
  */
 void PianoView::mouseMoveEvent( QMouseEvent * _me )
 {
-	if( m_piano == NULL )
+	if( m_piano == nullptr )
 	{
 		return;
 	}
@@ -624,7 +624,7 @@ void PianoView::mouseMoveEvent( QMouseEvent * _me )
 				m_piano->setKeyState( key_num, true );
 				m_lastKey = key_num;
 			}
-			else if (m_movedNoteModel != NULL)
+			else if (m_movedNoteModel != nullptr)
 			{
 				// upper section, move the base / first / last note marker
 				m_movedNoteModel->setInitValue(static_cast<float>(key_num));
@@ -658,7 +658,7 @@ void PianoView::keyPressEvent( QKeyEvent * _ke )
 
 	if( _ke->isAutoRepeat() == false && key_num > -1 )
 	{
-		if( m_piano != NULL )
+		if( m_piano != nullptr )
 		{
 			m_piano->handleKeyPress( key_num );
 			_ke->accept();
@@ -686,7 +686,7 @@ void PianoView::keyReleaseEvent( QKeyEvent * _ke )
 				( DefaultOctave - 1 ) * KeysPerOctave;
 	if( _ke->isAutoRepeat() == false && key_num > -1 )
 	{
-		if( m_piano != NULL )
+		if( m_piano != nullptr )
 		{
 			m_piano->handleKeyRelease( key_num );
 			_ke->accept();
@@ -710,7 +710,7 @@ void PianoView::keyReleaseEvent( QKeyEvent * _ke )
  */
 void PianoView::focusOutEvent( QFocusEvent * )
 {
-	if( m_piano == NULL )
+	if( m_piano == nullptr )
 	{
 		return;
 	}
@@ -718,7 +718,7 @@ void PianoView::focusOutEvent( QFocusEvent * )
 	// focus just switched to another control inside the instrument track
 	// window we live in?
 	if( parentWidget()->parentWidget()->focusWidget() != this &&
-		parentWidget()->parentWidget()->focusWidget() != NULL &&
+		parentWidget()->parentWidget()->focusWidget() != nullptr &&
 		!(parentWidget()->parentWidget()->
 				focusWidget()->inherits( "QLineEdit" ) ||
 		parentWidget()->parentWidget()->
@@ -857,7 +857,7 @@ void PianoView::paintEvent( QPaintEvent * )
 	p.setPen( Qt::white );
 
 	// Controls for first / last / base key models are shown only if microtuner or its key range import are disabled
-	if (m_piano != NULL && (!m_piano->instrumentTrack()->microtuner()->enabled() ||
+	if (m_piano != nullptr && (!m_piano->instrumentTrack()->microtuner()->enabled() ||
 		!m_piano->instrumentTrack()->microtuner()->keyRangeImport()))
 	{
 		// Draw the base note marker and first / last note boundary markers

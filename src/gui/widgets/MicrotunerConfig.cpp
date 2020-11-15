@@ -547,7 +547,7 @@ bool MicrotunerConfig::loadKeymapFromFile()
  */
 bool MicrotunerConfig::saveScaleToFile()
 {
-	if (!validateScaleForm()) {return false;}
+	if (!applyScale()) {return false;}
 	QString fileName = FileDialog::getSaveFileName(this, tr("Save scale"), "", tr("Scala scale definition (*.scl)"));
 	if (fileName == "") {return false;}
 	if (QFileInfo(fileName).suffix() != "scl") {fileName = fileName + ".scl";}
@@ -583,7 +583,7 @@ bool MicrotunerConfig::saveScaleToFile()
  */
 bool MicrotunerConfig::saveKeymapToFile()
 {
-	if (!validateKeymapForm()) {return false;}
+	if (!applyKeymap()) {return false;}
 	QString fileName = FileDialog::getSaveFileName(this, tr("Save keymap"), "", tr("Scala keymap definition (*.kbm)"));
 	if (fileName == "") {return false;}
 	if (QFileInfo(fileName).suffix() != "kbm") {fileName = fileName + ".kbm";}

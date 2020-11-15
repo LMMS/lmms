@@ -45,7 +45,7 @@
 
 
 LcdFloatSpinBox::LcdFloatSpinBox(int numWhole, int numFrac, QWidget* parent, const QString& name) :
-	FloatModelView(new FloatModel(0, 0, 0, 0, NULL, name, true), this),
+	FloatModelView(new FloatModel(0, 0, 0, 0, nullptr, name, true), this),
 	m_wholeDisplay(numWhole, parent, name, false),
 	m_fractionDisplay(numFrac, parent, name, true),
 	m_mouseMoving(false),
@@ -58,7 +58,7 @@ LcdFloatSpinBox::LcdFloatSpinBox(int numWhole, int numFrac, QWidget* parent, con
 
 
 LcdFloatSpinBox::LcdFloatSpinBox(int numWhole, int numFrac, const QString& style, QWidget* parent, const QString& name) :
-	FloatModelView(new FloatModel(0, 0, 0, 0, NULL, name, true), this),
+	FloatModelView(new FloatModel(0, 0, 0, 0, nullptr, name, true), this),
 	m_wholeDisplay(numWhole, style, parent, name, false),
 	m_fractionDisplay(numFrac, style, parent, name, true),
 	m_mouseMoving(false),
@@ -118,7 +118,7 @@ void LcdFloatSpinBox::contextMenuEvent(QContextMenuEvent* event)
 	// button, the context-menu appears while mouse-cursor is still hidden
 	// and it isn't shown again until user does something which causes
 	// an QApplication::restoreOverrideCursor()-call...
-	mouseReleaseEvent(NULL);
+	mouseReleaseEvent(nullptr);
 
 	CaptionMenu contextMenu(model()->displayName());
 	addDefaultActions(&contextMenu);

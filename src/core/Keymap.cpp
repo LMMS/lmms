@@ -66,7 +66,7 @@ Keymap::Keymap(
 int Keymap::getDegree(int key) const
 {
 	if (key < m_firstKey || key > m_lastKey) {return -1;}
-	if (m_map.size() == 0) {return key;}	// exception: empty mapping table means linear (1:1) mapping
+	if (m_map.empty()) {return key;}	// exception: empty mapping table means linear (1:1) mapping
 
 	const int keyOffset = key - m_middleKey;								// -127..127
 	const int key_rem = keyOffset % static_cast<int>(m_map.size());			// remainder

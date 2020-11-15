@@ -26,6 +26,7 @@
 #define SCALE_H
 
 #include <cmath>
+#include <cstdint>
 #include <vector>
 #include <QObject>
 #include <QString>
@@ -35,22 +36,23 @@
 class Interval : public SerializingObject
 {
 public:
-	Interval() : m_numerator(1), m_denominator(1) {};
-	explicit Interval(double cents) : m_numerator(cents), m_denominator(0) {};
-	Interval(unsigned long numerator, unsigned long denominator) :
+	Interval() : m_numerator(1), m_denominator(1), m_cents(0) {};
+	explicit Interval(float cents) : m_numerator(0), m_denominator(0), m_cents(cents) {};
+	Interval(uint32_t numerator, uint32_t denominator) :
 		m_numerator(numerator),
-		m_denominator(denominator > 0 ? denominator : 1) {};
+		m_denominator(denominator > 0 ? denominator : 1),
+		m_cents(0) {};
 
 	float getRatio() const
 	{
 		if (m_denominator) {return m_numerator / m_denominator;}
-		else {return powf(2.f, m_numerator / 1200.f);}
+		else {return powf(2.f, m_cents / 1200.f);}
 	}
 
 	QString getString() const
 	{
 		if (m_denominator) {return QString::number(m_numerator) + "/" + QString::number(m_denominator);}
-		else {return QString().sprintf("%0.1f", m_numerator);}
+		else {return QString().sprintf("%.4f", m_cents);}
 	}
 
 	void saveSettings(QDomDocument &doc, QDomElement &element) override;
@@ -58,10 +60,10 @@ public:
 	inline QString nodeName() const override {return "interval";}
 
 private:
-	// Scala specifies that numerators and denominators should go at least up to 2147483647;
-	// that is 10 significant digits (→ needs double) and 32 bits signed (→ needs long).
-	double m_numerator;				//!< numerator of the interval fraction
-	unsigned long m_denominator;	//!< denominator of the interval fraction
+	// Scala specifies that numerators and denominators should go at least up to 2147483647 → use uint32_t.
+	uint32_t m_numerator;	//!< numerator of the interval fraction
+	uint32_t m_denominator;	//!< denominator of the interval fraction
+	float m_cents;			//!< interval defined in cents (used when denominator is set to zero)
 };
 
 
