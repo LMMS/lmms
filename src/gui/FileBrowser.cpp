@@ -81,9 +81,9 @@ void FileBrowser::addContentCheckBox(void)
 		filterWidgetLayout->addWidget(box);
 	};
 
-	m_showUserContent = new QCheckBox("User content");
+	m_showUserContent = new QCheckBox(tr("User content"));
 	configCheckBox(m_showUserContent);
-	m_showFactoryContent = new QCheckBox("Factory content");
+	m_showFactoryContent = new QCheckBox(tr("Factory content"));
 	configCheckBox(m_showFactoryContent);
 
 	addContentWidget(filterWidget);
