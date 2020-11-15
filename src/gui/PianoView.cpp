@@ -414,27 +414,7 @@ void PianoView::contextMenuEvent(QContextMenuEvent *me)
 
 	// check which control element is closest to the mouse and open the approptiate menu
 	QString title;
-	IntModel *noteModel;
-	int key = getKeyFromMouse(me->pos());
-	int base = m_piano->instrumentTrack()->baseNote();
-	int first = m_piano->instrumentTrack()->firstKey();
-	int last = m_piano->instrumentTrack()->lastKey();
-
-	if (abs(key - base) < abs(key - first) && abs(key - base) < abs(key - last))
-	{
-		title = tr("Base note");
-		noteModel = m_piano->instrumentTrack()->baseNoteModel();
-	}
-	else if (abs(key - first) < abs(key - last))
-	{
-		title = tr("First note");
-		noteModel = m_piano->instrumentTrack()->firstKeyModel();
-	}
-	else
-	{
-		title = tr("Last note");
-		noteModel = m_piano->instrumentTrack()->lastKeyModel();
-	}
+	IntModel *noteModel = getNearestMarker(getKeyFromMouse(me->pos()), &title);
 
 	CaptionMenu contextMenu(title);
 	AutomatableModelView amv(noteModel, &contextMenu);
@@ -493,24 +473,8 @@ void PianoView::mousePressEvent(QMouseEvent *me)
 		else if (!m_piano->instrumentTrack()->microtuner()->enabled() ||
 				 !m_piano->instrumentTrack()->microtuner()->keyRangeImport())
 		{
-			// upper section, move or drag the base / first / last note marker
-			int base = m_piano->instrumentTrack()->baseNote();
-			int first = m_piano->instrumentTrack()->firstKey();
-			int last = m_piano->instrumentTrack()->lastKey();
-
-			// move the model whose marker is closest to the pressed key
-			if (abs(key_num - base) < abs(key_num - first) && abs(key_num - base) < abs(key_num - last))
-			{
-				m_movedNoteModel = m_piano->instrumentTrack()->baseNoteModel();
-			}
-			else if (abs(key_num - first) < abs(key_num - last))
-			{
-				m_movedNoteModel = m_piano->instrumentTrack()->firstKeyModel();
-			}
-			else
-			{
-				m_movedNoteModel = m_piano->instrumentTrack()->lastKeyModel();
-			}
+			// upper section, select which marker (base / first / last note) will be moved
+			m_movedNoteModel = getNearestMarker(key_num);
 
 			if (me->modifiers() & Qt::ControlModifier)
 			{
@@ -761,7 +725,7 @@ void PianoView::resizeEvent(QResizeEvent* event)
 {
 	QWidget::resizeEvent(event);
 	m_pianoScroll->setRange(0, WhiteKeysPerOctave * (NumKeys + 1) / KeysPerOctave -
-					static_cast<int>(ceil(static_cast<float>(width()) / PW_WHITE_KEY_WIDTH)));
+					static_cast<int>(floor(static_cast<float>(width()) / PW_WHITE_KEY_WIDTH)));
 }
 
 
@@ -827,6 +791,32 @@ int PianoView::getKeyWidth(int key_num) const
 {
 	if (Piano::isWhiteKey(key_num)) {return PW_WHITE_KEY_WIDTH;}
 	else {return PW_BLACK_KEY_WIDTH;}
+}
+
+
+/*! \brief Return model and title of the marker closest to the given key
+ */
+IntModel* PianoView::getNearestMarker(int key, QString* title)
+{
+	const int base = m_piano->instrumentTrack()->baseNote();
+	const int first = m_piano->instrumentTrack()->firstKey();
+	const int last = m_piano->instrumentTrack()->lastKey();
+
+	if (abs(key - base) < abs(key - first) && abs(key - base) < abs(key - last))
+	{
+		if (title) {*title = tr("Base note");}
+		return m_piano->instrumentTrack()->baseNoteModel();
+	}
+	else if (abs(key - first) < abs(key - last))
+	{
+		if (title) {*title = tr("First note");}
+		return m_piano->instrumentTrack()->firstKeyModel();
+	}
+	else
+	{
+		if (title) {*title = tr("Last note");}
+		return m_piano->instrumentTrack()->lastKeyModel();
+	}
 }
 
 

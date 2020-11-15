@@ -25,6 +25,7 @@
 #ifndef COMBOBOX_MODEL_H
 #define COMBOBOX_MODEL_H
 
+#include <cassert>
 #include <memory>
 #include <utility>
 #include <vector>

@@ -65,6 +65,7 @@ private:
 	int getKeyFromMouse( const QPoint & _p ) const;
 	int getKeyX( int _key_num ) const;
 	int getKeyWidth(int key_num) const;
+	IntModel *getNearestMarker(int key, QString* title = nullptr);
 
 	static QPixmap * s_whiteKeyPm;
 	static QPixmap * s_blackKeyPm;
