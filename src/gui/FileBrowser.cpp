@@ -34,6 +34,7 @@
 #include <QMdiSubWindow>
 #include <QMessageBox>
 #include <QShortcut>
+#include <QStringList>
 
 #include "FileBrowser.h"
 #include "BBTrackContainer.h"
@@ -196,48 +197,24 @@ bool FileBrowser::filterItems( const QString & filter, QTreeWidgetItem * item )
 }
 
 
-void filterDirectories(QString& dirstring, const QString& filterstring, bool checked)
-{
-	if (!checked)
-	{
-		dirstring = dirstring.replace(filterstring, "");
-	}
-	else
-	{
-		if (!dirstring.contains(filterstring))
-		{
-			dirstring += "*" + filterstring;
-		}
-	}
-	dirstring = dirstring.replace("**", "*");
-	if ((dirstring.length() > 0) && (*dirstring.begin() == '*'))
-	{
-		dirstring = dirstring.remove(0, 1);
-	}
-	if ((dirstring.length() > 0) && (*(dirstring.end()-1) == '*'))
-	{
-		dirstring = dirstring.remove(dirstring.length()-1, 1);
-	}
-}
-
-
 void FileBrowser::reloadTree( void )
 {
 	QList<QString> expandedDirs = m_fileBrowserTreeWidget->expandedDirs();
 	const QString text = m_filterEdit->text();
 	m_filterEdit->clear();
 	m_fileBrowserTreeWidget->clear();
-	if ((m_showUserContent != nullptr) && (m_showFactoryContent != nullptr))
+	QStringList paths = m_directories.split('*');
+	if (m_showUserContent && !m_showUserContent->isChecked())
 	{
-		filterDirectories(m_directories, m_userDir,
-						  m_showUserContent->isChecked());
-		filterDirectories(m_directories, m_factoryDir,
-						  m_showFactoryContent->isChecked());
+		paths.removeAll(m_userDir);
+	}
+	if (m_showFactoryContent && !m_showFactoryContent->isChecked())
+	{
+		paths.removeAll(m_factoryDir);
 	}
 
-	if (m_directories.length() > 0)
+	if (!paths.isEmpty())
 	{
-		QStringList paths = m_directories.split('*');
 		for (QStringList::iterator it = paths.begin(); it != paths.end(); ++it)
 		{
 			addItems(*it);
