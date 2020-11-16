@@ -62,7 +62,7 @@ public:
 	{
 		MM_OPERATORS
 	public:
-		handleState( bool _varying_pitch = false, int interpolation_mode = SRC_LINEAR );
+		handleState(bool varyingPitch = false, int interpolationMode = SRC_LINEAR);
 		virtual ~handleState();
 
 		const f_cnt_t frameIndex() const
@@ -70,9 +70,9 @@ public:
 			return m_frameIndex;
 		}
 
-		void setFrameIndex( f_cnt_t _index )
+		void setFrameIndex(f_cnt_t index)
 		{
-			m_frameIndex = _index;
+			m_frameIndex = index;
 		}
 
 		bool isBackwards() const
@@ -80,9 +80,9 @@ public:
 			return m_isBackwards;
 		}
 
-		void setBackwards( bool _backwards )
+		void setBackwards(bool backwards)
 		{
-			m_isBackwards = _backwards;
+			m_isBackwards = backwards;
 		}
 
 		int interpolationMode() const
@@ -106,16 +106,17 @@ public:
 	SampleBuffer();
 	// constructor which either loads sample _audio_file or decodes
 	// base64-data out of string
-	SampleBuffer( const QString & _audio_file, bool _is_base64_data = false );
-	SampleBuffer( const sampleFrame * _data, const f_cnt_t _frames );
-	explicit SampleBuffer( const f_cnt_t _frames );
+	SampleBuffer(const QString & audioFile, bool isBase64Data = false);
+	SampleBuffer(const sampleFrame * data, const f_cnt_t frames);
+	explicit SampleBuffer(const f_cnt_t frames);
 
 	virtual ~SampleBuffer();
 
-	bool play( sampleFrame * _ab, handleState * _state,
-				const fpp_t _frames,
-				const float _freq,
-				const LoopMode _loopmode = LoopOff );
+	bool play(sampleFrame * ab,
+		handleState * state,
+		const fpp_t frames,
+		const float freq,
+		const LoopMode loopMode = LoopOff);
 
 	void visualize( QPainter & _p, const QRect & _dr, const QRect & _clip, f_cnt_t _from_frame = 0, f_cnt_t _to_frame = 0 );
 	inline void visualize( QPainter & _p, const QRect & _dr, f_cnt_t _from_frame = 0, f_cnt_t _to_frame = 0 )
@@ -220,11 +221,9 @@ public:
 
 	// protect calls from the GUI to this function with dataReadLock() and
 	// dataUnlock()
-	SampleBuffer * resample( const sample_rate_t _src_sr,
-						const sample_rate_t _dst_sr );
+	SampleBuffer * resample(const sample_rate_t srcSR, const sample_rate_t dstSR);
 
-	void normalizeSampleRate( const sample_rate_t _src_sr,
-						bool _keep_settings = false );
+	void normalizeSampleRate(const sample_rate_t srcSR, bool keepSettings = false);
 
 	// protect calls from the GUI to this function with dataReadLock() and
 	// dataUnlock(), out of loops for efficiency
@@ -264,22 +263,25 @@ public slots:
 private:
 	static sample_rate_t mixerSampleRate();
 
-	void update( bool _keep_settings = false );
+	void update(bool keepSettings = false);
 
-	void convertIntToFloat ( int_sample_t * & _ibuf, f_cnt_t _frames, int _channels);
-	void directFloatWrite ( sample_t * & _fbuf, f_cnt_t _frames, int _channels);
+	void convertIntToFloat(int_sample_t * & ibuf, f_cnt_t frames, int channels);
+	void directFloatWrite(sample_t * & fbuf, f_cnt_t frames, int channels);
 
-	f_cnt_t decodeSampleSF( QString _f, sample_t * & _buf,
-						ch_cnt_t & _channels,
-						sample_rate_t & _sample_rate );
+	f_cnt_t decodeSampleSF(QString fileName,
+		sample_t * & buf,
+		ch_cnt_t & channels,
+		sample_rate_t & samplerate);
 #ifdef LMMS_HAVE_OGGVORBIS
-	f_cnt_t decodeSampleOGGVorbis( QString _f, int_sample_t * & _buf,
-						ch_cnt_t & _channels,
-						sample_rate_t & _sample_rate );
+	f_cnt_t decodeSampleOGGVorbis(QString fileName,
+		int_sample_t * & buf,
+		ch_cnt_t & channels,
+		sample_rate_t & samplerate);
 #endif
-	f_cnt_t decodeSampleDS( QString _f, int_sample_t * & _buf,
-						ch_cnt_t & _channels,
-						sample_rate_t & _sample_rate );
+	f_cnt_t decodeSampleDS(QString fileName,
+		int_sample_t * & buf,
+		ch_cnt_t & channels,
+		sample_rate_t & samplerate);
 
 	QString m_audioFile;
 	sampleFrame * m_origData;
@@ -296,13 +298,17 @@ private:
 	float m_frequency;
 	sample_rate_t m_sampleRate;
 
-	sampleFrame * getSampleFragment( f_cnt_t _index, f_cnt_t _frames,
-						LoopMode _loopmode,
-						sampleFrame * * _tmp,
-						bool * _backwards, f_cnt_t _loopstart, f_cnt_t _loopend,
-						f_cnt_t _end ) const;
-	f_cnt_t getLoopedIndex( f_cnt_t _index, f_cnt_t _startf, f_cnt_t _endf  ) const;
-	f_cnt_t getPingPongIndex( f_cnt_t _index, f_cnt_t _startf, f_cnt_t _endf  ) const;
+	sampleFrame * getSampleFragment(f_cnt_t index,
+		f_cnt_t frames,
+		LoopMode loopMode,
+		sampleFrame * * tmp,
+		bool * backwards,
+		f_cnt_t loopStart,
+		f_cnt_t loopEnd,
+		f_cnt_t end) const;
+
+	f_cnt_t getLoopedIndex(f_cnt_t index, f_cnt_t startf, f_cnt_t endf) const;
+	f_cnt_t getPingPongIndex(f_cnt_t index, f_cnt_t startf, f_cnt_t endf) const;
 
 
 signals:
