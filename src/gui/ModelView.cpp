@@ -78,7 +78,7 @@ void ModelView::setModel( Model* model, bool isOldModelValid )
 // "defaultConstructed", so the next call to setModel will delete it.
 void ModelView::unsetModel()
 {
-	setModel( new Model( NULL, QString(), true ) );
+	setModel(new Model(nullptr, QString(), true));
 }
 
 

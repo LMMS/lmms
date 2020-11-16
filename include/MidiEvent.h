@@ -33,30 +33,30 @@
 class MidiEvent
 {
 public:
-	MidiEvent( MidiEventTypes type = MidiActiveSensing,
+	MidiEvent(MidiEventTypes type = MidiActiveSensing,
 				int8_t channel = 0,
 				int16_t param1 = 0,
 				int16_t param2 = 0,
-				const void* sourcePort = NULL,
-				bool fromHardware = true ) :
+				const void* sourcePort = nullptr,
+				bool ignoreOnExport = true) :
 		m_type( type ),
 		m_metaEvent( MidiMetaInvalid ),
 		m_channel( channel ),
 		m_sysExData( NULL ),
-		m_sourcePort( sourcePort ),
-		m_fromHardware( fromHardware )
+		m_sourcePort(sourcePort),
+		m_ignoreOnExport(ignoreOnExport)
 	{
 		m_data.m_param[0] = param1;
 		m_data.m_param[1] = param2;
 	}
 
-	MidiEvent( MidiEventTypes type, const char* sysExData, int dataLen, bool fromHardware = true ) :
+	MidiEvent(MidiEventTypes type, const char* sysExData, int dataLen, bool ignoreOnExport = true) :
 		m_type( type ),
 		m_metaEvent( MidiMetaInvalid ),
 		m_channel( 0 ),
 		m_sysExData( sysExData ),
-		m_sourcePort( NULL ),
-		m_fromHardware( fromHardware )
+		m_sourcePort(nullptr),
+		m_ignoreOnExport(ignoreOnExport)
 	{
 		m_data.m_sysExDataLen = dataLen;
 	}
@@ -67,8 +67,8 @@ public:
 		m_channel( other.m_channel ),
 		m_data( other.m_data ),
 		m_sysExData( other.m_sysExData ),
-		m_sourcePort( other.m_sourcePort ),
-		m_fromHardware( other.m_fromHardware )
+		m_sourcePort(other.m_sourcePort),
+		m_ignoreOnExport(other.m_ignoreOnExport)
 	{
 	}
 
@@ -194,14 +194,14 @@ public:
 		setParam( 0, pitchBend );
 	}
 
-	bool fromHardware() const
+	bool ignoreOnExport() const
 	{
-		return m_fromHardware;
+		return m_ignoreOnExport;
 	}
 
-	void setHardware( bool value )
+	void setIgnoreOnExport(bool value)
 	{
-		m_fromHardware = value;
+		m_ignoreOnExport = value;
 	}
 
 
@@ -218,8 +218,9 @@ private:
 
 	const char* m_sysExData;
 	const void* m_sourcePort;
-	bool m_fromHardware;	// Should the event be treated as originated from a physical controller?
-
+	bool m_ignoreOnExport;	// Should we ignore this MIDI event when exporting a project?
+				// This helps us ignoring MIDI events that shouldn't be processed
+				// during a project export, like physical controller events.
 } ;
 
 #endif

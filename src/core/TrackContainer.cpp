@@ -182,8 +182,8 @@ void TrackContainer::addTrack( Track * _track )
 		_track->unlock();
 		emit trackAdded( _track );
 
-		connect( _track, SIGNAL( nameChanged() ),
-			this, SIGNAL( trackRenamed() ) );
+		connect(_track, SIGNAL(nameChanged()),
+			this, SIGNAL(trackRenamed()));
 	}
 }
 

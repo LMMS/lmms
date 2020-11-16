@@ -145,17 +145,17 @@ void AutomatableModelView::setModel( Model* model, bool isOldModelValid )
 // "defaultConstructed", so the next call to setModel will delete it.
 void AutomatableModelView::unsetModel()
 {
-	if( dynamic_cast<FloatModelView*>( this ) )
+	if (dynamic_cast<FloatModelView*>(this))
 	{
-		setModel( new FloatModel( 0, 0, 0, 1, NULL, QString(), true ) );
+		setModel(new FloatModel( 0, 0, 0, 1, nullptr, QString(), true));
 	}
-	else if( dynamic_cast<IntModelView*>( this ) )
+	else if (dynamic_cast<IntModelView*>(this))
 	{
-		setModel( new IntModel( 0, 0, 0, NULL, QString(), true ) );
+		setModel(new IntModel(0, 0, 0, nullptr, QString(), true));
 	}
-	else if( dynamic_cast<BoolModelView*>( this ) )
+	else if (dynamic_cast<BoolModelView*>(this))
 	{
-		setModel( new BoolModel( false, NULL, QString(), true ) );
+		setModel(new BoolModel(false, nullptr, QString(), true));
 	}
 	else
 	{

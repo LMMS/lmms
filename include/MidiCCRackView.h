@@ -20,11 +20,11 @@ class MidiCCRackView : public QWidget, public SerializingObject
 {
 	Q_OBJECT
 public:
-	MidiCCRackView( InstrumentTrack * track );
+	MidiCCRackView(InstrumentTrack * track);
 	virtual ~MidiCCRackView();
 
-	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
-	void loadSettings( const QDomElement & _this ) override;
+	void saveSettings(QDomDocument & doc, QDomElement & parent) override;
+	void loadSettings(const QDomElement &) override;
 
 	inline QString nodeName() const override
 	{
