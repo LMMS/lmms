@@ -129,7 +129,7 @@ QMenu::indicator:selected {
 	background-color: #747474;
 }
 
-QCheckBox[accessibleName="FileBrowserFilterCheckBox"]
+QCheckBox[objectName="FileBrowserFilterCheckBox"]
 {
 	font-size: 10px;
 	color: white;
