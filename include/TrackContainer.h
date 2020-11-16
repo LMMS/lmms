@@ -97,8 +97,6 @@ public:
 
 signals:
 	void trackAdded( Track * _track );
-	void trackRemoved();
-	void trackRenamed();
 
 protected:
 	static AutomatedValueMap automatedValuesFromTracks(const TrackList &tracks, MidiTime timeStart, int tcoNum = -1);

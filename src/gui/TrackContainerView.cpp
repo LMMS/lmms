@@ -175,8 +175,6 @@ void TrackContainerView::moveTrackView( TrackView * trackView, int indexTo )
 	m_trackViews.move( indexFrom, indexTo );
 
 	realignTracks();
-
-	emit movedTrackView();
 }
 
 

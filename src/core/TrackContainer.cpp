@@ -181,9 +181,6 @@ void TrackContainer::addTrack( Track * _track )
 		m_tracksMutex.unlock();
 		_track->unlock();
 		emit trackAdded( _track );
-
-		connect(_track, SIGNAL(nameChanged()),
-			this, SIGNAL(trackRenamed()));
 	}
 }
 
@@ -210,8 +207,6 @@ void TrackContainer::removeTrack( Track * _track )
 		{
 			Engine::getSong()->setModified();
 		}
-
-		emit trackRemoved();
 	}
 }
 
