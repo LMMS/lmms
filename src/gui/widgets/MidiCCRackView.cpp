@@ -65,7 +65,10 @@ MidiCCRackView::MidiCCRackView(InstrumentTrack * track) :
 
 	// Adjust window attributes, sizing and position
 	subWin->setAttribute(Qt::WA_DeleteOnClose, false);
-	subWin->move(780, 50);
+	subWin->move(
+		rand() % 731 + 50, // X is choosen randomly from 50 to 780
+		rand() % 331 + 50 // Y is choosen randomly from 50 to 380
+	);
 	subWin->resize(350, 300);
 	subWin->setFixedWidth(350);
 	subWin->setMinimumHeight(300);
