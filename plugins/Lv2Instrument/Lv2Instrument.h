@@ -63,7 +63,7 @@ public:
 	/*
 		realtime funcs
 	*/
-	bool hasNoteInput() const override { return false; /* not supported yet */ }
+	bool hasNoteInput() const override { return Lv2ControlBase::hasNoteInput(); }
 #ifdef LV2_INSTRUMENT_USE_MIDI
 	bool handleMidiEvent(const MidiEvent &event,
 		const MidiTime &time = MidiTime(), f_cnt_t offset = 0) override;
@@ -110,10 +110,6 @@ public:
 protected:
 	void dragEnterEvent(QDragEnterEvent *_dee) override;
 	void dropEvent(QDropEvent *_de) override;
-
-private slots:
-	void reloadPlugin();
-	void toggleUI();
 
 private:
 	void modelChanged() override;

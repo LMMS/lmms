@@ -204,6 +204,7 @@ void AudioJack::startProcessing()
 {
 	if( m_active || m_client == NULL )
 	{
+		m_stopped = false;
 		return;
 	}
 

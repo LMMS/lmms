@@ -45,6 +45,7 @@ public:
 	ProjectVersion(QString version, CompareType c = All);
 	ProjectVersion(const char * version, CompareType c = All);
 
+	const QString& getVersion() const { return m_version; }
 	int getMajor() const { return m_major; }
 	int getMinor() const { return m_minor; }
 	int getPatch() const { return m_patch; }

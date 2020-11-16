@@ -37,6 +37,7 @@
 #include <QScrollBar>
 #include <QStyleOption>
 #include <QtMath>
+#include <QToolButton>
 
 #ifndef __USE_XOPEN
 #define __USE_XOPEN
@@ -61,7 +62,6 @@
 #include "MainWindow.h"
 #include "Pattern.h"
 #include "SongEditor.h"
-#include "stdshims.h"
 #include "StepRecorderWidget.h"
 #include "TextFloat.h"
 #include "TimeLineWidget.h"
@@ -352,7 +352,7 @@ PianoRoll::PianoRoll() :
 
 	// Set up note length model
 	m_noteLenModel.addItem( tr( "Last note" ),
-					make_unique<PixmapLoader>( "edit_draw" ) );
+					std::make_unique<PixmapLoader>( "edit_draw" ) );
 	const QString pixmaps[] = { "whole", "half", "quarter", "eighth",
 						"sixteenth", "thirtysecond", "triplethalf",
 						"tripletquarter", "tripleteighth",
@@ -360,12 +360,12 @@ PianoRoll::PianoRoll() :
 
 	for( int i = 0; i < NUM_EVEN_LENGTHS; ++i )
 	{
-		auto loader = make_unique<PixmapLoader>( "note_" + pixmaps[i] );
+		auto loader = std::make_unique<PixmapLoader>( "note_" + pixmaps[i] );
 		m_noteLenModel.addItem( "1/" + QString::number( 1 << i ), ::move(loader) );
 	}
 	for( int i = 0; i < NUM_TRIPLET_LENGTHS; ++i )
 	{
-		auto loader = make_unique<PixmapLoader>( "note_" + pixmaps[i+NUM_EVEN_LENGTHS] );
+		auto loader = std::make_unique<PixmapLoader>( "note_" + pixmaps[i+NUM_EVEN_LENGTHS] );
 		m_noteLenModel.addItem( "1/" + QString::number( (1 << i) * 3 ), ::move(loader) );
 	}
 	m_noteLenModel.setValue( 0 );
@@ -373,6 +373,13 @@ PianoRoll::PianoRoll() :
 	// Note length change can cause a redraw if Q is set to lock
 	connect( &m_noteLenModel, SIGNAL( dataChanged() ),
 					this, SLOT( noteLengthChanged() ) );
+
+	// Set up key selection dropdown
+	m_keyModel.addItem(tr("No key"));
+	// Use piano roll note strings for key dropdown
+	for (int i = 0; i < 12; i++) { m_keyModel.addItem(s_noteStrings[i]); }
+	m_keyModel.setValue(0); // start with "No key"
+	connect(&m_keyModel, &ComboBoxModel::dataChanged, this, &PianoRoll::keyChanged);
 
 	// Set up scale model
 	const InstrumentFunctionNoteStacking::ChordTable& chord_table =
@@ -388,6 +395,8 @@ PianoRoll::PianoRoll() :
 	}
 
 	m_scaleModel.setValue( 0 );
+	// connect scale change to key change so it auto-highlights with scale as well
+	connect(&m_scaleModel, &ComboBoxModel::dataChanged, this, &PianoRoll::keyChanged);
 	// change can update m_semiToneMarkerMenu
 	connect( &m_scaleModel, SIGNAL( dataChanged() ),
 						this, SLOT( updateSemiToneMarkerMenu() ) );
@@ -485,10 +494,16 @@ void PianoRoll::changeNoteEditMode( int i )
 }
 
 
-void PianoRoll::markSemiTone( int i )
+void PianoRoll::markSemiTone(int i, bool fromMenu)
 {
-	const int key = m_pianoKeySelected;
+	const int key = fromMenu
+		? getKey(mapFromGlobal(m_semiToneMarkerMenu->pos()).y())
+		: m_keyModel.value() - 1;
 	const InstrumentFunctionNoteStacking::Chord * chord = nullptr;
+
+	// if "No key" is selected, key is -1, unmark all semitones
+	// or if scale changed from toolbar to "No scale", unmark all semitones
+	if (!fromMenu && (key < 0 || m_scaleModel.value() == 0)) { i = stmaUnmarkAll; }
 
 	switch( static_cast<SemiToneMarkerAction>( i ) )
 	{
@@ -578,6 +593,8 @@ void PianoRoll::markSemiTone( int i )
 	std::sort( m_markedSemiTones.begin(), m_markedSemiTones.end(), std::greater<int>() );
 	QList<int>::iterator new_end = std::unique( m_markedSemiTones.begin(), m_markedSemiTones.end() );
 	m_markedSemiTones.erase( new_end, m_markedSemiTones.end() );
+	// until we move the mouse the window won't update, force redraw
+	update();
 }
 
 
@@ -625,6 +642,73 @@ void PianoRoll::clearGhostPattern()
 	setGhostPattern( nullptr );
 	emit ghostPatternSet( false );
 	update();
+}
+
+
+void PianoRoll::glueNotes()
+{
+	if (hasValidPattern())
+	{
+		NoteVector selectedNotes = getSelectedNotes();
+		if (selectedNotes.empty())
+		{
+			TextFloat::displayMessage( tr( "Glue notes failed" ),
+					tr( "Please select notes to glue first." ),
+					embed::getIconPixmap( "glue", 24, 24 ),
+					3000 );
+			return;
+		}
+
+		// Make undo possible
+		m_pattern->addJournalCheckPoint();
+
+		// Sort notes on key and then pos.
+		std::sort(selectedNotes.begin(), selectedNotes.end(),
+			[](const Note * note, const Note * compareNote) -> bool
+			{
+				if (note->key() == compareNote->key())
+				{
+					return note->pos() < compareNote->pos();
+				}
+				return note->key() < compareNote->key();
+			});
+
+		QList<Note *> noteToRemove;
+
+		NoteVector::iterator note = selectedNotes.begin();
+		auto nextNote = note+1;
+		NoteVector::iterator end = selectedNotes.end();
+
+		while (note != end && nextNote != end)
+		{
+			// key and position match for glue. The notes are already
+			// sorted so we don't need to test that nextNote is the same
+			// position or next in sequence.
+			if ((*note)->key() == (*nextNote)->key()
+				&& (*nextNote)->pos() <= (*note)->pos()
+				+ qMax(MidiTime(0), (*note)->length()))
+			{
+				(*note)->setLength(qMax((*note)->length(),
+					MidiTime((*nextNote)->endPos() - (*note)->pos())));
+				noteToRemove.push_back(*nextNote);
+				++nextNote;
+			}
+			// key or position doesn't match
+			else
+			{
+				note = nextNote;
+				nextNote = note+1;
+			}
+		}
+
+		// Remove old notes
+		for (int i = 0; i < noteToRemove.count(); ++i)
+		{
+			m_pattern->removeNote(noteToRemove[i]);
+		}
+
+		update();
+	}
 }
 
 
@@ -3885,6 +3969,9 @@ void PianoRoll::updateYScroll()
 
 void PianoRoll::copyToClipboard( const NoteVector & notes ) const
 {
+	// For copyString() and MimeType enum class
+	using namespace Clipboard;
+
 	DataFile dataFile( DataFile::ClipboardData );
 	QDomElement note_list = dataFile.createElement( "note-list" );
 	dataFile.content().appendChild( note_list );
@@ -3897,10 +3984,7 @@ void PianoRoll::copyToClipboard( const NoteVector & notes ) const
 		clip_note.saveState( dataFile, note_list );
 	}
 
-	QMimeData * clip_content = new QMimeData;
-	clip_content->setData( Clipboard::mimeType(), dataFile.toString().toUtf8() );
-	QApplication::clipboard()->setMimeData( clip_content,
-							QClipboard::Clipboard );
+	copyString( dataFile.toString(), MimeType::Default );
 }
 
 
@@ -3953,14 +4037,15 @@ void PianoRoll::cutSelectedNotes()
 
 void PianoRoll::pasteNotes()
 {
+	// For getString() and MimeType enum class
+	using namespace Clipboard;
+
 	if( ! hasValidPattern() )
 	{
 		return;
 	}
 
-	QString value = QApplication::clipboard()
-				->mimeData( QClipboard::Clipboard )
-						->data( Clipboard::mimeType() );
+	QString value = getString( MimeType::Default );
 
 	if( ! value.isEmpty() )
 	{
@@ -4139,6 +4224,10 @@ void PianoRoll::noteLengthChanged()
 	update();
 }
 
+void PianoRoll::keyChanged()
+{
+	markSemiTone(stmaMarkCurrentScale, false);
+}
 
 int PianoRoll::quantization() const
 {
@@ -4340,6 +4429,21 @@ PianoRollWindow::PianoRollWindow() :
 	DropToolBar *timeLineToolBar = addDropToolBarToTop( tr( "Timeline controls" ) );
 	m_editor->m_timeLine->addToolButtons( timeLineToolBar );
 
+	// -- Note modifier tools
+	// Toolbar
+	QToolButton * noteToolsButton = new QToolButton(m_toolBar);
+	noteToolsButton->setIcon(embed::getIconPixmap("tool"));
+	noteToolsButton->setPopupMode(QToolButton::InstantPopup);
+
+	// Glue
+	QAction * glueAction = new QAction(embed::getIconPixmap("glue"),
+				tr("Glue"), noteToolsButton);
+	connect(glueAction, SIGNAL(triggered()), m_editor, SLOT(glueNotes()));
+	glueAction->setShortcut( Qt::SHIFT | Qt::Key_G );
+
+	noteToolsButton->addAction(glueAction);
+
+	notesActionsToolBar->addWidget(noteToolsButton);
 
 	addToolBarBreak();
 
@@ -4380,6 +4484,12 @@ PianoRollWindow::PianoRollWindow() :
 	m_noteLenComboBox->setFixedSize( 105, ComboBox::DEFAULT_HEIGHT );
 	m_noteLenComboBox->setToolTip( tr( "Note length") );
 
+	// setup key-stuff
+	m_keyComboBox = new ComboBox(m_toolBar);
+	m_keyComboBox->setModel(&m_editor->m_keyModel);
+	m_keyComboBox->setFixedSize(72, ComboBox::DEFAULT_HEIGHT);
+	m_keyComboBox->setToolTip(tr("Key"));
+
 	// setup scale-stuff
 	QLabel * scale_lbl = new QLabel( m_toolBar );
 	scale_lbl->setPixmap( embed::getIconPixmap( "scale" ) );
@@ -4406,27 +4516,61 @@ PianoRollWindow::PianoRollWindow() :
 	connect( m_clearGhostButton, SIGNAL( clicked() ), m_editor, SLOT( clearGhostPattern() ) );
 	connect( m_editor, SIGNAL( ghostPatternSet( bool ) ), this, SLOT( ghostPatternSet( bool ) ) );
 
-	zoomAndNotesToolBar->addWidget( zoom_lbl );
-	zoomAndNotesToolBar->addWidget( m_zoomingComboBox );
+	// Wrap label icons and comboboxes in a single widget so when
+	// the window is resized smaller in width it hides both
+	QWidget * zoom_widget = new QWidget();
+	QHBoxLayout * zoom_hbox = new QHBoxLayout();
+	zoom_hbox->setContentsMargins(0, 0, 0, 0);
+	zoom_hbox->addWidget(zoom_lbl);
+	zoom_hbox->addWidget(m_zoomingComboBox);
+	zoom_widget->setLayout(zoom_hbox);
+	zoomAndNotesToolBar->addWidget(zoom_widget);
 
-	zoomAndNotesToolBar->addWidget(zoom_y_lbl);
-	zoomAndNotesToolBar->addWidget(m_zoomingYComboBox);
+	QWidget * zoomY_widget = new QWidget();
+	QHBoxLayout * zoomY_hbox = new QHBoxLayout();
+	zoomY_hbox->setContentsMargins(0, 0, 0, 0);
+	zoomY_hbox->addWidget(zoom_y_lbl);
+	zoomY_hbox->addWidget(m_zoomingYComboBox);
+	zoomY_widget->setLayout(zoomY_hbox);
+	zoomAndNotesToolBar->addWidget(zoomY_widget);
 
+	QWidget * quantize_widget = new QWidget();
+	QHBoxLayout * quantize_hbox = new QHBoxLayout();
+	quantize_hbox->setContentsMargins(0, 0, 0, 0);
+	quantize_hbox->addWidget(quantize_lbl);
+	quantize_hbox->addWidget(m_quantizeComboBox);
+	quantize_widget->setLayout(quantize_hbox);
 	zoomAndNotesToolBar->addSeparator();
-	zoomAndNotesToolBar->addWidget( quantize_lbl );
-	zoomAndNotesToolBar->addWidget( m_quantizeComboBox );
+	zoomAndNotesToolBar->addWidget(quantize_widget);
 
+	QWidget * note_widget = new QWidget();
+	QHBoxLayout * note_hbox = new QHBoxLayout();
+	note_hbox->setContentsMargins(0, 0, 0, 0);
+	note_hbox->addWidget(note_len_lbl);
+	note_hbox->addWidget(m_noteLenComboBox);
+	note_widget->setLayout(note_hbox);
 	zoomAndNotesToolBar->addSeparator();
-	zoomAndNotesToolBar->addWidget( note_len_lbl );
-	zoomAndNotesToolBar->addWidget( m_noteLenComboBox );
+	zoomAndNotesToolBar->addWidget(note_widget);
 
+	QWidget * scale_widget = new QWidget();
+	QHBoxLayout * scale_hbox = new QHBoxLayout();
+	scale_hbox->setContentsMargins(0, 0, 0, 0);
+	scale_hbox->addWidget(scale_lbl);
+	// Add the key selection between scale label and key
+	scale_hbox->addWidget(m_keyComboBox);
+	scale_hbox->addWidget(m_scaleComboBox);
+	scale_widget->setLayout(scale_hbox);
 	zoomAndNotesToolBar->addSeparator();
-	zoomAndNotesToolBar->addWidget( scale_lbl );
-	zoomAndNotesToolBar->addWidget( m_scaleComboBox );
+	zoomAndNotesToolBar->addWidget(scale_widget);
 
+	QWidget * chord_widget = new QWidget();
+	QHBoxLayout * chord_hbox = new QHBoxLayout();
+	chord_hbox->setContentsMargins(0, 0, 0, 0);
+	chord_hbox->addWidget(chord_lbl);
+	chord_hbox->addWidget(m_chordComboBox);
+	chord_widget->setLayout(chord_hbox);
 	zoomAndNotesToolBar->addSeparator();
-	zoomAndNotesToolBar->addWidget( chord_lbl );
-	zoomAndNotesToolBar->addWidget( m_chordComboBox );
+	zoomAndNotesToolBar->addWidget(chord_widget);
 
 	zoomAndNotesToolBar->addSeparator();
 	zoomAndNotesToolBar->addWidget( m_clearGhostButton );

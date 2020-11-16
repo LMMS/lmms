@@ -56,7 +56,7 @@ SET(LMMS_PLUGIN_LIST
 	ReverbSC
 	sf2_player
 	sfxr
-	sid
+	Sid
 	SpectrumAnalyzer
 	stereo_enhancer
 	stereo_matrix

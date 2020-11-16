@@ -26,12 +26,12 @@
 
 #ifdef LMMS_HAVE_LV2
 
+#include <algorithm>
 #include <QtGlobal>
 
 #include "Engine.h"
 #include "Lv2Manager.h"
 #include "Lv2Proc.h"
-#include "stdshims.h"
 
 
 
@@ -54,7 +54,7 @@ Lv2ControlBase::Lv2ControlBase(Model* that, const QString &uri) :
 		int channelsLeft = DEFAULT_CHANNELS; // LMMS plugins are stereo
 		while (channelsLeft > 0)
 		{
-			std::unique_ptr<Lv2Proc> newOne = make_unique<Lv2Proc>(m_plugin, that);
+			std::unique_ptr<Lv2Proc> newOne = std::make_unique<Lv2Proc>(m_plugin, that);
 			if (newOne->isValid())
 			{
 				channelsLeft -= std::max(
@@ -109,6 +109,14 @@ const LinkedModelGroup *Lv2ControlBase::getGroup(std::size_t idx) const
 
 void Lv2ControlBase::copyModelsFromLmms() {
 	for (auto& c : m_procs) { c->copyModelsFromCore(); }
+}
+
+
+
+
+void Lv2ControlBase::copyModelsToLmms() const
+{
+	for (auto& c : m_procs) { c->copyModelsToCore(); }
 }
 
 
@@ -183,6 +191,24 @@ std::size_t Lv2ControlBase::controlCount() const {
 	std::size_t res = 0;
 	for (const auto& c : m_procs) { res += c->controlCount(); }
 	return res;
+}
+
+
+
+
+bool Lv2ControlBase::hasNoteInput() const
+{
+	return std::any_of(m_procs.begin(), m_procs.end(),
+		[](const auto& c) { return c->hasNoteInput(); });
+}
+
+
+
+
+void Lv2ControlBase::handleMidiInputEvent(const MidiEvent &event,
+	const MidiTime &time, f_cnt_t offset)
+{
+	for (auto& c : m_procs) { c->handleMidiInputEvent(event, time, offset); }
 }
 
 

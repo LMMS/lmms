@@ -24,6 +24,8 @@
 
 #include "SampleBuffer.h"
 
+#include <algorithm>
+
 #include <QBuffer>
 #include <QFile>
 #include <QFileInfo>
@@ -693,8 +695,8 @@ bool SampleBuffer::play( sampleFrame * _ab, handleState * _state,
 		// Generate output
 		src_data.data_in =
 			getSampleFragment( play_frame, fragment_size, _loopmode, &tmp, &is_backwards,
-			loopStartFrame, loopEndFrame, endFrame )[0];
-		src_data.data_out = _ab[0];
+			loopStartFrame, loopEndFrame, endFrame )->data ();
+		src_data.data_out = _ab->data ();
 		src_data.input_frames = fragment_size;
 		src_data.output_frames = _frames;
 		src_data.src_ratio = 1.0 / freq_factor;
@@ -1196,8 +1198,8 @@ SampleBuffer * SampleBuffer::resample( const sample_rate_t _src_sr,
 	{
 		SRC_DATA src_data;
 		src_data.end_of_input = 1;
-		src_data.data_in = data[0];
-		src_data.data_out = dst_buf[0];
+		src_data.data_in = data->data ();
+		src_data.data_out = dst_buf->data ();
 		src_data.input_frames = frames;
 		src_data.output_frames = dst_frames;
 		src_data.src_ratio = (double) _dst_sr / _src_sr;
@@ -1411,8 +1413,13 @@ void SampleBuffer::setAmplification( float _a )
 
 void SampleBuffer::setReversed( bool _on )
 {
+	Engine::mixer()->requestChangeInModel();
+	m_varLock.lockForWrite();
+	if (m_reversed != _on) { std::reverse(m_data, m_data + m_frames); }
 	m_reversed = _on;
-	update( true );
+	m_varLock.unlock();
+	Engine::mixer()->doneChangeInModel();
+	emit sampleUpdated();
 }
 
 

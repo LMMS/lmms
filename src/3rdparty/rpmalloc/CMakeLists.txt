@@ -21,6 +21,12 @@ if (NOT LMMS_BUILD_WIN32)
 	)
 endif()
 
+if(MINGW)
+	target_compile_definitions(rpmalloc
+		PRIVATE -D_WIN32_WINNT=0x600
+	)
+endif()
+
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
 	# rpmalloc uses GCC builtin "__builtin_umull_overflow" with ENABLE_VALIDATE_ARGS,
 	# which is only available starting with GCC 5

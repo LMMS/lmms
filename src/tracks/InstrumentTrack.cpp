@@ -173,7 +173,7 @@ InstrumentTrack::~InstrumentTrack()
 		autoAssignMidiDevice(false);
 		s_autoAssignedTrack = NULL;
 	}
-	
+
 	// kill all running notes and the iph
 	silenceAllNotes( true );
 
@@ -572,17 +572,6 @@ void InstrumentTrack::deleteNotePluginData( NotePlayHandle* n )
 
 void InstrumentTrack::setName( const QString & _new_name )
 {
-	// when changing name of track, also change name of those patterns,
-	// which have the same name as the instrument-track
-	for( int i = 0; i < numOfTCOs(); ++i )
-	{
-		Pattern* p = dynamic_cast<Pattern*>( getTCO( i ) );
-		if( ( p != NULL && p->name() == name() ) || p->name() == "" )
-		{
-			p->setName( _new_name );
-		}
-	}
-
 	Track::setName( _new_name );
 	m_midiPort.setName( name() );
 	m_audioPort.setName( name() );
@@ -766,9 +755,11 @@ bool InstrumentTrack::play( const MidiTime & _start, const fpp_t _frames,
 
 
 
-TrackContentObject * InstrumentTrack::createTCO( const MidiTime & )
+TrackContentObject* InstrumentTrack::createTCO(const MidiTime & pos)
 {
-	return new Pattern( this );
+	Pattern* p = new Pattern(this);
+	p->movePosition(pos);
+	return p;
 }
 
 
@@ -1195,8 +1186,10 @@ InstrumentTrackWindow * InstrumentTrackView::topLevelInstrumentTrackWindow()
 void InstrumentTrackView::createFxLine()
 {
 	int channelIndex = gui->fxMixerView()->addNewChannel();
+	auto channel = Engine::fxMixer()->effectChannel(channelIndex);
 
-	Engine::fxMixer()->effectChannel( channelIndex )->m_name = getTrack()->name();
+	channel->m_name = getTrack()->name();
+	if (getTrack()->useColor()) { channel->setColor (getTrack()->color()); }
 
 	assignFxLine(channelIndex);
 }
@@ -1605,9 +1598,7 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 	m_tabWidget->addTab( m_miscView, tr( "Miscellaneous" ), "misc_tab", 5 );
 	adjustTabSize(m_ssView);
 	adjustTabSize(instrumentFunctions);
-	adjustTabSize(m_effectView);
-	// stupid bugfix, no one knows why
-	m_effectView->resize(INSTRUMENT_WIDTH - 4, INSTRUMENT_HEIGHT - 4 - 1);
+	m_effectView->resize(EffectRackView::DEFAULT_WIDTH, INSTRUMENT_HEIGHT - 4 - 1);
 	adjustTabSize(m_midiView);
 	adjustTabSize(m_miscView);
 
