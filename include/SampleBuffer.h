@@ -118,10 +118,10 @@ public:
 		const float freq,
 		const LoopMode loopMode = LoopOff);
 
-	void visualize( QPainter & _p, const QRect & _dr, const QRect & _clip, f_cnt_t _from_frame = 0, f_cnt_t _to_frame = 0 );
-	inline void visualize( QPainter & _p, const QRect & _dr, f_cnt_t _from_frame = 0, f_cnt_t _to_frame = 0 )
+	void visualize(QPainter & p, const QRect & dr, const QRect & clip, f_cnt_t fromFrame = 0, f_cnt_t toFrame = 0);
+	inline void visualize(QPainter & p, const QRect & dr, f_cnt_t fromFrame = 0, f_cnt_t toFrame = 0)
 	{
-		visualize( _p, _dr, _dr, _from_frame, _to_frame );
+		visualize(p, dr, dr, fromFrame, toFrame);
 	}
 
 	inline const QString & audioFile() const

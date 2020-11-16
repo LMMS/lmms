@@ -627,7 +627,7 @@ bool SampleBuffer::play(sampleFrame * ab,
 	handleState * state,
 	const fpp_t frames,
 	const float freq,
-	const LoopMode loopMode )
+	const LoopMode loopMode)
 {
 	f_cnt_t startFrame = m_startFrame;
 	f_cnt_t endFrame = m_endFrame;
@@ -929,39 +929,42 @@ f_cnt_t SampleBuffer::getPingPongIndex(f_cnt_t index, f_cnt_t startf, f_cnt_t en
 }
 
 
-void SampleBuffer::visualize( QPainter & _p, const QRect & _dr,
-							const QRect & _clip, f_cnt_t _from_frame, f_cnt_t _to_frame )
+void SampleBuffer::visualize(QPainter & p,
+	const QRect & dr,
+	const QRect & clip,
+	f_cnt_t fromFrame,
+	f_cnt_t toFrame)
 {
-	if( m_frames == 0 ) return;
+	if (m_frames == 0) { return; }
 
-	const bool focus_on_range = _to_frame <= m_frames
-					&& 0 <= _from_frame && _from_frame < _to_frame;
+	const bool focusOnRange = toFrame <= m_frames
+					&& 0 <= fromFrame && fromFrame < toFrame;
 	//_p.setClipRect( _clip );
-	const int w = _dr.width();
-	const int h = _dr.height();
+	const int w = dr.width();
+	const int h = dr.height();
 
-	const int yb = h / 2 + _dr.y();
-	const float y_space = h*0.5f;
-	const int nb_frames = focus_on_range ? _to_frame - _from_frame : m_frames;
+	const int yb = h / 2 + dr.y();
+	const float ySpace = h * 0.5f;
+	const int nbFrames = focusOnRange ? toFrame - fromFrame : m_frames;
 
-	const int fpp = qBound<int>( 1, nb_frames / w, 20 );
-	QPointF * l = new QPointF[nb_frames / fpp + 1];
-	QPointF * r = new QPointF[nb_frames / fpp + 1];
+	const int fpp = qBound<int>(1, nbFrames / w, 20);
+	QPointF * l = new QPointF[nbFrames / fpp + 1];
+	QPointF * r = new QPointF[nbFrames / fpp + 1];
 	int n = 0;
-	const int xb = _dr.x();
-	const int first = focus_on_range ? _from_frame : 0;
-	const int last = focus_on_range ? _to_frame : m_frames;
-	for( int frame = first; frame < last; frame += fpp )
+	const int xb = dr.x();
+	const int first = focusOnRange ? fromFrame : 0;
+	const int last = focusOnRange ? toFrame : m_frames;
+	for (int frame = first; frame < last; frame += fpp)
 	{
-		l[n] = QPointF( xb + ( (frame - first) * double( w ) / nb_frames ),
-			( yb - ( m_data[frame][0] * y_space * m_amplification ) ) );
-		r[n] = QPointF( xb + ( (frame - first) * double( w ) / nb_frames ),
-			( yb - ( m_data[frame][1] * y_space * m_amplification ) ) );
+		l[n] = QPointF(xb + ((frame - first) * double(w) / nbFrames),
+			(yb - (m_data[frame][0] * ySpace * m_amplification)));
+		r[n] = QPointF(xb + ((frame - first) * double(w) / nbFrames),
+			(yb - (m_data[frame][1] * ySpace * m_amplification)));
 		++n;
 	}
-	_p.setRenderHint( QPainter::Antialiasing );
-	_p.drawPolyline( l, nb_frames / fpp );
-	_p.drawPolyline( r, nb_frames / fpp );
+	p.setRenderHint(QPainter::Antialiasing);
+	p.drawPolyline(l, nbFrames / fpp);
+	p.drawPolyline(r, nbFrames / fpp);
 	delete[] l;
 	delete[] r;
 }
@@ -971,62 +974,62 @@ void SampleBuffer::visualize( QPainter & _p, const QRect & _dr,
 
 QString SampleBuffer::openAudioFile() const
 {
-	FileDialog ofd( NULL, tr( "Open audio file" ) );
+	FileDialog ofd(nullptr, tr("Open audio file"));
 
 	QString dir;
-	if( !m_audioFile.isEmpty() )
+	if (!m_audioFile.isEmpty())
 	{
 		QString f = m_audioFile;
-		if( QFileInfo( f ).isRelative() )
+		if (QFileInfo(f).isRelative())
 		{
 			f = ConfigManager::inst()->userSamplesDir() + f;
-			if( QFileInfo( f ).exists() == false )
+			if (QFileInfo(f).exists() == false)
 			{
 				f = ConfigManager::inst()->factorySamplesDir() +
 								m_audioFile;
 			}
 		}
-		dir = QFileInfo( f ).absolutePath();
+		dir = QFileInfo(f).absolutePath();
 	}
 	else
 	{
 		dir = ConfigManager::inst()->userSamplesDir();
 	}
 	// change dir to position of previously opened file
-	ofd.setDirectory( dir );
-	ofd.setFileMode( FileDialog::ExistingFiles );
+	ofd.setDirectory(dir);
+	ofd.setFileMode(FileDialog::ExistingFiles);
 
 	// set filters
 	QStringList types;
-	types << tr( "All Audio-Files (*.wav *.ogg *.ds *.flac *.spx *.voc "
-					"*.aif *.aiff *.au *.raw)" )
-		<< tr( "Wave-Files (*.wav)" )
-		<< tr( "OGG-Files (*.ogg)" )
-		<< tr( "DrumSynth-Files (*.ds)" )
-		<< tr( "FLAC-Files (*.flac)" )
-		<< tr( "SPEEX-Files (*.spx)" )
-		//<< tr( "MP3-Files (*.mp3)" )
-		//<< tr( "MIDI-Files (*.mid)" )
-		<< tr( "VOC-Files (*.voc)" )
-		<< tr( "AIFF-Files (*.aif *.aiff)" )
-		<< tr( "AU-Files (*.au)" )
-		<< tr( "RAW-Files (*.raw)" )
-		//<< tr( "MOD-Files (*.mod)" )
+	types << tr("All Audio-Files (*.wav *.ogg *.ds *.flac *.spx *.voc "
+					"*.aif *.aiff *.au *.raw)")
+		<< tr("Wave-Files (*.wav)")
+		<< tr("OGG-Files (*.ogg)")
+		<< tr("DrumSynth-Files (*.ds)")
+		<< tr("FLAC-Files (*.flac)")
+		<< tr("SPEEX-Files (*.spx)")
+		//<< tr("MP3-Files (*.mp3)")
+		//<< tr("MIDI-Files (*.mid)")
+		<< tr("VOC-Files (*.voc)")
+		<< tr("AIFF-Files (*.aif *.aiff)")
+		<< tr("AU-Files (*.au)")
+		<< tr("RAW-Files (*.raw)")
+		//<< tr("MOD-Files (*.mod)")
 		;
-	ofd.setNameFilters( types );
-	if( !m_audioFile.isEmpty() )
+	ofd.setNameFilters(types);
+	if (!m_audioFile.isEmpty())
 	{
 		// select previously opened file
-		ofd.selectFile( QFileInfo( m_audioFile ).fileName() );
+		ofd.selectFile(QFileInfo(m_audioFile).fileName());
 	}
 
-	if( ofd.exec () == QDialog::Accepted )
+	if (ofd.exec () == QDialog::Accepted)
 	{
-		if( ofd.selectedFiles().isEmpty() )
+		if (ofd.selectedFiles().isEmpty())
 		{
 			return QString();
 		}
-		return PathUtil::toShortestRelative( ofd.selectedFiles()[0] );
+		return PathUtil::toShortestRelative(ofd.selectedFiles()[0]);
 	}
 
 	return QString();
@@ -1041,7 +1044,7 @@ QString SampleBuffer::openAndSetAudioFile()
 
 	if(!fileName.isEmpty())
 	{
-		this->setAudioFile( fileName );
+		this->setAudioFile(fileName);
 	}
 
 	return fileName;
@@ -1050,16 +1053,16 @@ QString SampleBuffer::openAndSetAudioFile()
 
 QString SampleBuffer::openAndSetWaveformFile()
 {
-	if( m_audioFile.isEmpty() )
+	if (m_audioFile.isEmpty())
 	{
 		m_audioFile = ConfigManager::inst()->factorySamplesDir() + "waveforms/10saw.flac";
 	}
 
 	QString fileName = this->openAudioFile();
 
-	if(!fileName.isEmpty())
+	if (!fileName.isEmpty())
 	{
-		this->setAudioFile( fileName );
+		this->setAudioFile(fileName);
 	}
 	else
 	{
