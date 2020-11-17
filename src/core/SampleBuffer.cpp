@@ -903,28 +903,28 @@ f_cnt_t SampleBuffer::getPingPongIndex( f_cnt_t _index, f_cnt_t _startf, f_cnt_t
 }
 
 
-void SampleBuffer::visualize( QPainter & _p, const QRect & _dr,
-							const QRect & _clip, f_cnt_t _from_frame, f_cnt_t _to_frame )
+void SampleBuffer::visualize( QPainter & p, const QRect & dr,
+							const QRect & clip, f_cnt_t from_frame, f_cnt_t to_frame )
 {
 	if( m_frames == 0 ) return;
 
-	const bool focus_on_range = _to_frame <= m_frames
-					&& 0 <= _from_frame && _from_frame < _to_frame;
-	//_p.setClipRect( _clip );
-	const int w = _dr.width();
-	const int h = _dr.height();
+	const bool focus_on_range = to_frame <= m_frames
+					&& 0 <= from_frame && from_frame < to_frame;
+	//p.setClipRect( clip );
+	const int w = dr.width();
+	const int h = dr.height();
 
-	const int yb = h / 2 + _dr.y();
+	const int yb = h / 2 + dr.y();
 	const float y_space = h*0.5f;
-	const int nb_frames = focus_on_range ? _to_frame - _from_frame : m_frames;
+	const int nb_frames = focus_on_range ? to_frame - from_frame : m_frames;
 
 	const int fpp = qBound<int>( 1, nb_frames / w, 20 );
 	QPointF * l = new QPointF[nb_frames / fpp + 1];
 	QPointF * r = new QPointF[nb_frames / fpp + 1];
 	int n = 0;
-	const int xb = _dr.x();
-	const int first = focus_on_range ? _from_frame : 0;
-	const int last = focus_on_range ? _to_frame : m_frames;
+	const int xb = dr.x();
+	const int first = focus_on_range ? from_frame : 0;
+	const int last = focus_on_range ? to_frame : m_frames;
 	
 	const bool isReversed = m_reversed;
 
@@ -939,9 +939,9 @@ void SampleBuffer::visualize( QPainter & _p, const QRect & _dr,
 			(yb - (m_data[frame][1] * y_space * m_amplification)));
 		++n;
 	}
-	_p.setRenderHint( QPainter::Antialiasing );
-	_p.drawPolyline( l, nb_frames / fpp );
-	_p.drawPolyline( r, nb_frames / fpp );
+	p.setRenderHint( QPainter::Antialiasing );
+	p.drawPolyline( l, nb_frames / fpp );
+	p.drawPolyline( r, nb_frames / fpp );
 	delete[] l;
 	delete[] r;
 }
