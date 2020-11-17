@@ -923,21 +923,18 @@ void SampleBuffer::visualize (QPainter & p, const QRect & dr,
 	int n = 0;
 	const int xb = dr.x();
 	const int first = focus_on_range ? from_frame : 0;
-	const int last = focus_on_range ? to_frame : m_frames;
-	
-	const bool isReversed = m_reversed;
+	const int last = focus_on_range ? to_frame - 1 : m_frames - 1;
 
-	auto startFrame = isReversed ? last : first;
-	auto count = (last - first) / fpp + 1;
-	auto step = isReversed ? -fpp : fpp;
-	for (int frame = startFrame, i = 0; i < count; frame += step, i++)
+	for (int frame = first; frame <= last; frame += fpp)
 	{
-		l[n] = QPointF (xb + ((frame - first) * double(w) / nb_frames),
-			(yb - (m_data[frame][0] * y_space * m_amplification)));
-		r[n] = QPointF (xb + ((frame - first) * double(w) / nb_frames),
-			(yb - (m_data[frame][1] * y_space * m_amplification)));
+		auto x = xb + ((frame - first) * double(w) / nb_frames);
+		// Partial Y calculation
+		auto py = y_space * m_amplification;
+		l[n] = QPointF(x, (yb - (m_data[frame][0] * py)));
+		r[n] = QPointF(x, (yb - (m_data[frame][1] * py)));
 		++n;
 	}
+
 	p.setRenderHint( QPainter::Antialiasing );
 	p.drawPolyline( l, nb_frames / fpp );
 	p.drawPolyline( r, nb_frames / fpp );
