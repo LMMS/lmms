@@ -1225,30 +1225,28 @@ void SampleBuffer::setAudioFile(const QString & audioFile)
 
 struct flacStreamDecoderClientData
 {
-	QBuffer * read_buffer;
-	QBuffer * write_buffer;
+	QBuffer * readBuffer;
+	QBuffer * writeBuffer;
 } ;
 
 
 
 FLAC__StreamDecoderReadStatus flacStreamDecoderReadCallback(
-					const FLAC__StreamDecoder *
-								/*_decoder*/,
-					FLAC__byte * _buffer,
-					unsigned int * _bytes,
-					void * _client_data )
+	const FLAC__StreamDecoder * /*decoder*/,
+	FLAC__byte * buffer,
+	unsigned int * bytes,
+	void * clientData)
 {
 	int res = static_cast<flacStreamDecoderClientData *>(
-					_client_data )->read_buffer->read(
-						(char *) _buffer, *_bytes );
+		clientData)->readBuffer->read((char *) buffer, *bytes);
 
-	if( res > 0 )
+	if (res > 0)
 	{
-		*_bytes = res;
+		*bytes = res;
 		return FLAC__STREAM_DECODER_READ_STATUS_CONTINUE;
-
 	}
-	*_bytes = 0;
+
+	*bytes = 0;
 	return FLAC__STREAM_DECODER_READ_STATUS_END_OF_STREAM;
 }
 
@@ -1256,58 +1254,55 @@ FLAC__StreamDecoderReadStatus flacStreamDecoderReadCallback(
 
 
 FLAC__StreamDecoderWriteStatus flacStreamDecoderWriteCallback(
-					const FLAC__StreamDecoder *
-								/*_decoder*/,
-					const FLAC__Frame * _frame,
-					const FLAC__int32 * const _buffer[],
-					void * _client_data )
+	const FLAC__StreamDecoder * /*decoder*/,
+	const FLAC__Frame * frame,
+	const FLAC__int32 * const buffer[],
+	void * clientData)
 {
-	if( _frame->header.channels != 2 )
+	if (frame->header.channels != 2)
 	{
-		printf( "channels != 2 in "
-					"flacStreamDecoderWriteCallback()\n" );
+		printf("channels != 2 in flacStreamDecoderWriteCallback()\n");
 		return FLAC__STREAM_DECODER_WRITE_STATUS_ABORT;
 	}
 
-	if( _frame->header.bits_per_sample != 16 )
+	if (frame->header.bits_per_sample != 16)
 	{
-		printf( "bits_per_sample != 16 in "
-					"flacStreamDecoderWriteCallback()\n" );
+		printf("bits_per_sample != 16 in flacStreamDecoderWriteCallback()\n");
 		return FLAC__STREAM_DECODER_WRITE_STATUS_ABORT;
 	}
 
-	const f_cnt_t frames = _frame->header.blocksize;
-	for( f_cnt_t frame = 0; frame < frames; ++frame )
+	const f_cnt_t numberOfFrames = frame->header.blocksize;
+	for (f_cnt_t f = 0; f < numberOfFrames; ++f)
 	{
-		sampleFrame sframe = { _buffer[0][frame] /
-						OUTPUT_SAMPLE_MULTIPLIER,
-					_buffer[1][frame] /
-						OUTPUT_SAMPLE_MULTIPLIER
-					} ;
+		sampleFrame sframe = { buffer[0][f] / OUTPUT_SAMPLE_MULTIPLIER,
+					buffer[1][f] / OUTPUT_SAMPLE_MULTIPLIER
+		} ;
 		static_cast<flacStreamDecoderClientData *>(
-					_client_data )->write_buffer->write(
-				(const char *) sframe, sizeof( sframe ) );
+					clientData )->writeBuffer->write(
+				(const char *) sframe, sizeof(sframe));
 	}
 	return FLAC__STREAM_DECODER_WRITE_STATUS_CONTINUE;
 }
 
 
-void flacStreamDecoderMetadataCallback( const FLAC__StreamDecoder *,
-					const FLAC__StreamMetadata *,
-					void * /*_client_data*/ )
+void flacStreamDecoderMetadataCallback(
+	const FLAC__StreamDecoder *,
+	const FLAC__StreamMetadata *,
+	void * /*clientData*/ )
 {
 	printf("stream decoder metadata callback\n");
-/*	QBuffer * b = static_cast<QBuffer *>( _client_data );
-	b->seek( 0 );
-	b->write( (const char *) _metadata, sizeof( *_metadata ) );*/
+/*	QBuffer * b = static_cast<QBuffer *>(clientData);
+	b->seek(0);
+	b->write((const char *) metadata, sizeof(*metadata));*/
 }
 
 
-void flacStreamDecoderErrorCallback( const FLAC__StreamDecoder *,
-					FLAC__StreamDecoderErrorStatus _status,
-					void * /*_client_data*/ )
+void flacStreamDecoderErrorCallback(
+	const FLAC__StreamDecoder *,
+	FLAC__StreamDecoderErrorStatus status,
+	void * /*clientData*/ )
 {
-	printf("error callback! %d\n", _status);
+	printf("error callback! %d\n", status);
 	// what to do now??
 }
 
