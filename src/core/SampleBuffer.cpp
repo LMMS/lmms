@@ -1309,58 +1309,58 @@ void flacStreamDecoderErrorCallback(
 #endif
 
 
-void SampleBuffer::loadFromBase64( const QString & _data )
+void SampleBuffer::loadFromBase64(const QString & data)
 {
-	char * dst = NULL;
+	char * dst = nullptr;
 	int dsize = 0;
-	base64::decode( _data, &dst, &dsize );
+	base64::decode(data, &dst, &dsize);
 
 #ifdef LMMS_HAVE_FLAC_STREAM_DECODER_H
 
-	QByteArray orig_data = QByteArray::fromRawData( dst, dsize );
-	QBuffer ba_reader( &orig_data );
-	ba_reader.open( QBuffer::ReadOnly );
+	QByteArray origData = QByteArray::fromRawData(dst, dsize);
+	QBuffer baReader(&origData);
+	baReader.open(QBuffer::ReadOnly);
 
-	QBuffer ba_writer;
-	ba_writer.open( QBuffer::WriteOnly );
+	QBuffer baWriter;
+	baWriter.open(QBuffer::WriteOnly);
 
-	flacStreamDecoderClientData cdata = { &ba_reader, &ba_writer } ;
+	flacStreamDecoderClientData cdata = { &baReader, &baWriter } ;
 
-	FLAC__StreamDecoder * flac_dec = FLAC__stream_decoder_new();
+	FLAC__StreamDecoder * flacDec = FLAC__stream_decoder_new();
 
-	FLAC__stream_decoder_set_read_callback( flac_dec,
-					flacStreamDecoderReadCallback );
-	FLAC__stream_decoder_set_write_callback( flac_dec,
-					flacStreamDecoderWriteCallback );
-	FLAC__stream_decoder_set_error_callback( flac_dec,
-					flacStreamDecoderErrorCallback );
-	FLAC__stream_decoder_set_metadata_callback( flac_dec,
-					flacStreamDecoderMetadataCallback );
-	FLAC__stream_decoder_set_client_data( flac_dec, &cdata );
+	FLAC__stream_decoder_set_read_callback(flacDec,
+		flacStreamDecoderReadCallback);
+	FLAC__stream_decoder_set_write_callback(flacDec,
+		flacStreamDecoderWriteCallback);
+	FLAC__stream_decoder_set_error_callback(flacDec,
+		flacStreamDecoderErrorCallback);
+	FLAC__stream_decoder_set_metadata_callback(flacDec,
+		flacStreamDecoderMetadataCallback);
+	FLAC__stream_decoder_set_client_data(flacDec, &cdata);
 
-	FLAC__stream_decoder_init( flac_dec );
+	FLAC__stream_decoder_init(flacDec);
 
-	FLAC__stream_decoder_process_until_end_of_stream( flac_dec );
+	FLAC__stream_decoder_process_until_end_of_stream(flacDec);
 
-	FLAC__stream_decoder_finish( flac_dec );
-	FLAC__stream_decoder_delete( flac_dec );
+	FLAC__stream_decoder_finish(flacDec);
+	FLAC__stream_decoder_delete(flacDec);
 
-	ba_reader.close();
+	baReader.close();
 
-	orig_data = ba_writer.buffer();
-	printf("%d\n", (int) orig_data.size() );
+	origData = baWriter.buffer();
+	printf("%d\n", (int) origData.size());
 
-	m_origFrames = orig_data.size() / sizeof( sampleFrame );
-	MM_FREE( m_origData );
-	m_origData = MM_ALLOC( sampleFrame, m_origFrames );
-	memcpy( m_origData, orig_data.data(), orig_data.size() );
+	m_origFrames = origData.size() / sizeof(sampleFrame);
+	MM_FREE(m_origData);
+	m_origData = MM_ALLOC(sampleFrame, m_origFrames);
+	memcpy(m_origData, origData.data(), origData.size());
 
 #else /* LMMS_HAVE_FLAC_STREAM_DECODER_H */
 
-	m_origFrames = dsize / sizeof( sampleFrame );
-	MM_FREE( m_origData );
-	m_origData = MM_ALLOC( sampleFrame, m_origFrames );
-	memcpy( m_origData, dst, dsize );
+	m_origFrames = dsize / sizeof(sampleFrame);
+	MM_FREE(m_origData);
+	m_origData = MM_ALLOC(sampleFrame, m_origFrames);
+	memcpy(m_origData, dst, dsize);
 
 #endif
 
@@ -1373,37 +1373,37 @@ void SampleBuffer::loadFromBase64( const QString & _data )
 
 
 
-void SampleBuffer::setStartFrame( const f_cnt_t _s )
+void SampleBuffer::setStartFrame(const f_cnt_t s)
 {
-	m_startFrame = _s;
+	m_startFrame = s;
 }
 
 
 
 
-void SampleBuffer::setEndFrame( const f_cnt_t _e )
+void SampleBuffer::setEndFrame(const f_cnt_t e)
 {
-	m_endFrame = _e;
+	m_endFrame = e;
 }
 
 
 
 
-void SampleBuffer::setAmplification( float _a )
+void SampleBuffer::setAmplification(float a)
 {
-	m_amplification = _a;
+	m_amplification = a;
 	emit sampleUpdated();
 }
 
 
 
 
-void SampleBuffer::setReversed( bool _on )
+void SampleBuffer::setReversed(bool on)
 {
 	Engine::mixer()->requestChangeInModel();
 	m_varLock.lockForWrite();
-	if (m_reversed != _on) { std::reverse(m_data, m_data + m_frames); }
-	m_reversed = _on;
+	if (m_reversed != on) { std::reverse(m_data, m_data + m_frames); }
+	m_reversed = on;
 	m_varLock.unlock();
 	Engine::mixer()->doneChangeInModel();
 	emit sampleUpdated();

@@ -149,22 +149,22 @@ public:
 		return m_loopEndFrame;
 	}
 
-	void setLoopStartFrame( f_cnt_t _start )
+	void setLoopStartFrame(f_cnt_t start)
 	{
-		m_loopStartFrame = _start;
+		m_loopStartFrame = start;
 	}
 
-	void setLoopEndFrame( f_cnt_t _end )
+	void setLoopEndFrame(f_cnt_t end)
 	{
-		m_loopEndFrame = _end;
+		m_loopEndFrame = end;
 	}
 
-	void setAllPointFrames( f_cnt_t _start, f_cnt_t _end, f_cnt_t _loopstart, f_cnt_t _loopend )
+	void setAllPointFrames(f_cnt_t start, f_cnt_t end, f_cnt_t loopStart, f_cnt_t loopEnd)
 	{
-		m_startFrame = _start;
-		m_endFrame = _end;
-		m_loopStartFrame = _loopstart;
-		m_loopEndFrame = _loopend;
+		m_startFrame = start;
+		m_endFrame = end;
+		m_loopStartFrame = loopStart;
+		m_loopEndFrame = loopEnd;
 	}
 
 	inline f_cnt_t frames() const
@@ -194,17 +194,17 @@ public:
 
 	int sampleLength() const
 	{
-		return double( m_endFrame - m_startFrame ) / m_sampleRate * 1000;
+		return double(m_endFrame - m_startFrame) / m_sampleRate * 1000;
 	}
 
-	inline void setFrequency( float _freq )
+	inline void setFrequency(float freq)
 	{
-		m_frequency = _freq;
+		m_frequency = freq;
 	}
 
-	inline void setSampleRate( sample_rate_t _rate )
+	inline void setSampleRate(sample_rate_t rate)
 	{
-		m_sampleRate = _rate;
+		m_sampleRate = rate;
 	}
 
 	inline const sampleFrame * data() const
@@ -227,17 +227,17 @@ public:
 
 	// protect calls from the GUI to this function with dataReadLock() and
 	// dataUnlock(), out of loops for efficiency
-	inline sample_t userWaveSample( const float _sample ) const
+	inline sample_t userWaveSample(const float sample) const
 	{
 		f_cnt_t frames = m_frames;
 		sampleFrame * data = m_data;
-		const float frame = _sample * frames;
-		f_cnt_t f1 = static_cast<f_cnt_t>( frame ) % frames;
-		if( f1 < 0 )
+		const float frame = sample * frames;
+		f_cnt_t f1 = static_cast<f_cnt_t>(frame) % frames;
+		if (f1 < 0)
 		{
 			f1 += frames;
 		}
-		return linearInterpolate( data[f1][0], data[ (f1 + 1) % frames ][0], fraction( frame ) );
+		return linearInterpolate(data[f1][0], data[(f1 + 1) % frames][0], fraction(frame));
 	}
 
 	void dataReadLock()
@@ -253,11 +253,11 @@ public:
 
 public slots:
 	void setAudioFile(const QString & audioFile);
-	void loadFromBase64( const QString & _data );
-	void setStartFrame( const f_cnt_t _s );
-	void setEndFrame( const f_cnt_t _e );
-	void setAmplification( float _a );
-	void setReversed( bool _on );
+	void loadFromBase64(const QString & data);
+	void setStartFrame(const f_cnt_t s);
+	void setEndFrame(const f_cnt_t e);
+	void setAmplification(float a);
+	void setReversed(bool on);
 	void sampleRateChanged();
 
 private:
