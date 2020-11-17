@@ -26,6 +26,7 @@
 
 #ifdef LMMS_HAVE_LV2
 
+#include <algorithm>
 #include <cstdlib>
 #include <cstring>
 #include <lilv/lilv.h>
@@ -36,10 +37,21 @@
 #include <QElapsedTimer>
 
 #include "ConfigManager.h"
+#include "Engine.h"
 #include "Plugin.h"
 #include "PluginFactory.h"
 #include "Lv2ControlBase.h"
 #include "PluginIssue.h"
+
+
+
+
+const std::set<const char*, Lv2Manager::CmpStr> Lv2Manager::pluginBlacklist =
+{
+	// github.com/calf-studio-gear/calf, #278
+	"http://calf.sourceforge.net/plugins/Analyzer",
+	"http://calf.sourceforge.net/plugins/BassEnhancer"
+};
 
 
 
@@ -100,6 +112,7 @@ void Lv2Manager::initPlugins()
 	QElapsedTimer timer;
 	timer.start();
 
+	unsigned blacklisted = 0;
 	LILV_FOREACH(plugins, itr, plugins)
 	{
 		const LilvPlugin* curPlug = lilv_plugins_get(plugins, itr);
@@ -111,6 +124,15 @@ void Lv2Manager::initPlugins()
 		m_lv2InfoMap[lilv_node_as_uri(lilv_plugin_get_uri(curPlug))]
 			= std::move(info);
 		if(issues.empty()) { ++pluginsLoaded; }
+		else
+		{
+			if(std::any_of(issues.begin(), issues.end(),
+				[](const PluginIssue& iss) {
+				return iss.type() == PluginIssueType::blacklisted; }))
+			{
+				++blacklisted;
+			}
+		}
 		++pluginCount;
 	}
 
@@ -132,6 +154,22 @@ void Lv2Manager::initPlugins()
 				"For details about not loaded plugins, please set\n"
 				"  environment variable \"LMMS_LV2_DEBUG\" to nonempty.";
 		}
+	}
+
+	// TODO: might be better in the LMMS core
+	if(Engine::ignorePluginBlacklist())
+	{
+		qWarning() <<
+			"WARNING! Plugin blacklist disabled! If you want to use the blacklist,\n"
+			"  please set environment variable \"LMMS_IGNORE_BLACKLIST\" to empty or\n"
+			"  do not set it.";
+	}
+	else if(blacklisted > 0)
+	{
+		qDebug() <<
+			"Lv2 Plugins blacklisted:" << blacklisted << "of" << pluginCount << "\n"
+			"  If you want to ignore the blacklist (dangerous!), please set\n"
+			"  environment variable \"LMMS_IGNORE_BLACKLIST\" to nonempty.";
 	}
 }
 
