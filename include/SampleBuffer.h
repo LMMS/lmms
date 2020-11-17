@@ -216,7 +216,7 @@ public:
 	QString openAndSetAudioFile();
 	QString openAndSetWaveformFile();
 
-	QString & toBase64( QString & _dst ) const;
+	QString & toBase64(QString & dst) const;
 
 
 	// protect calls from the GUI to this function with dataReadLock() and
@@ -252,7 +252,7 @@ public:
 
 
 public slots:
-	void setAudioFile( const QString & _audio_file );
+	void setAudioFile(const QString & audioFile);
 	void loadFromBase64( const QString & _data );
 	void setStartFrame( const f_cnt_t _s );
 	void setEndFrame( const f_cnt_t _e );

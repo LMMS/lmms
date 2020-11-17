@@ -1079,99 +1079,98 @@ QString SampleBuffer::openAndSetWaveformFile()
 
 #ifdef LMMS_HAVE_FLAC_STREAM_ENCODER_H
 FLAC__StreamEncoderWriteStatus flacStreamEncoderWriteCallback(
-					const FLAC__StreamEncoder *
-								/*_encoder*/,
-					const FLAC__byte _buffer[],
-					unsigned int/* _samples*/,
-					unsigned int _bytes,
-					unsigned int/* _current_frame*/,
-					void * _client_data )
+	const FLAC__StreamEncoder * /*encoder*/,
+	const FLAC__byte buffer[],
+	unsigned int /*samples*/,
+	unsigned int bytes,
+	unsigned int /*currentFrame*/,
+	void * clientData)
 {
-/*	if( _bytes == 0 )
+/*	if (bytes == 0)
 	{
 		return FLAC__STREAM_ENCODER_WRITE_STATUS_OK;
 	}*/
-	return ( static_cast<QBuffer *>( _client_data )->write(
-				(const char *) _buffer, _bytes ) ==
-								(int) _bytes ) ?
-				FLAC__STREAM_ENCODER_WRITE_STATUS_OK :
-				FLAC__STREAM_ENCODER_WRITE_STATUS_FATAL_ERROR;
+	return (static_cast<QBuffer *>(clientData)->write(
+				(const char *) buffer, bytes) == (int) bytes)
+		? FLAC__STREAM_ENCODER_WRITE_STATUS_OK
+		: FLAC__STREAM_ENCODER_WRITE_STATUS_FATAL_ERROR;
 }
 
 
-void flacStreamEncoderMetadataCallback( const FLAC__StreamEncoder *,
-					const FLAC__StreamMetadata * _metadata,
-					void * _client_data )
+void flacStreamEncoderMetadataCallback(
+	const FLAC__StreamEncoder *,
+	const FLAC__StreamMetadata * metadata,
+	void * clientData)
 {
-	QBuffer * b = static_cast<QBuffer *>( _client_data );
-	b->seek( 0 );
-	b->write( (const char *) _metadata, sizeof( *_metadata ) );
+	QBuffer * b = static_cast<QBuffer *>(clientData);
+	b->seek(0);
+	b->write((const char *) metadata, sizeof(*metadata));
 }
 
 #endif
 
 
 
-QString & SampleBuffer::toBase64( QString & _dst ) const
+QString & SampleBuffer::toBase64(QString & dst) const
 {
 #ifdef LMMS_HAVE_FLAC_STREAM_ENCODER_H
 	const f_cnt_t FRAMES_PER_BUF = 1152;
 
-	FLAC__StreamEncoder * flac_enc = FLAC__stream_encoder_new();
-	FLAC__stream_encoder_set_channels( flac_enc, DEFAULT_CHANNELS );
-	FLAC__stream_encoder_set_blocksize( flac_enc, FRAMES_PER_BUF );
-/*	FLAC__stream_encoder_set_do_exhaustive_model_search( flac_enc, true );
-	FLAC__stream_encoder_set_do_mid_side_stereo( flac_enc, true );*/
-	FLAC__stream_encoder_set_sample_rate( flac_enc,
-					Engine::mixer()->sampleRate() );
-	QBuffer ba_writer;
-	ba_writer.open( QBuffer::WriteOnly );
+	FLAC__StreamEncoder * flacEnc = FLAC__stream_encoder_new();
+	FLAC__stream_encoder_set_channels(flacEnc, DEFAULT_CHANNELS);
+	FLAC__stream_encoder_set_blocksize(flacEnc, FRAMES_PER_BUF);
+/*	FLAC__stream_encoder_set_do_exhaustive_model_search(flacEnc, true);
+	FLAC__stream_encoder_set_do_mid_side_stereo(flacEnc, true);*/
+	FLAC__stream_encoder_set_sample_rate(flacEnc,
+		Engine::mixer()->sampleRate());
 
-	FLAC__stream_encoder_set_write_callback( flac_enc,
-					flacStreamEncoderWriteCallback );
-	FLAC__stream_encoder_set_metadata_callback( flac_enc,
-					flacStreamEncoderMetadataCallback );
-	FLAC__stream_encoder_set_client_data( flac_enc, &ba_writer );
-	if( FLAC__stream_encoder_init( flac_enc ) != FLAC__STREAM_ENCODER_OK )
+	QBuffer baWriter;
+	baWriter.open(QBuffer::WriteOnly);
+
+	FLAC__stream_encoder_set_write_callback(flacEnc,
+		flacStreamEncoderWriteCallback);
+	FLAC__stream_encoder_set_metadata_callback(flacEnc,
+		flacStreamEncoderMetadataCallback);
+	FLAC__stream_encoder_set_client_data(flacEnc, &baWriter);
+
+	if (FLAC__stream_encoder_init(flacEnc) != FLAC__STREAM_ENCODER_OK)
 	{
-		printf( "error within FLAC__stream_encoder_init()!\n" );
+		printf("Error within FLAC__stream_encoder_init()!\n");
 	}
-	f_cnt_t frame_cnt = 0;
-	while( frame_cnt < m_frames )
+
+	f_cnt_t frameCnt = 0;
+
+	while (frameCnt < m_frames)
 	{
-		f_cnt_t remaining = qMin<f_cnt_t>( FRAMES_PER_BUF,
-							m_frames - frame_cnt );
+		f_cnt_t remaining = qMin<f_cnt_t>(FRAMES_PER_BUF, m_frames - frameCnt);
 		FLAC__int32 buf[FRAMES_PER_BUF * DEFAULT_CHANNELS];
-		for( f_cnt_t f = 0; f < remaining; ++f )
+		for (f_cnt_t f = 0; f < remaining; ++f)
 		{
-			for( ch_cnt_t ch = 0; ch < DEFAULT_CHANNELS; ++ch )
+			for (ch_cnt_t ch = 0; ch < DEFAULT_CHANNELS; ++ch)
 			{
 				buf[f*DEFAULT_CHANNELS+ch] = (FLAC__int32)(
-					Mixer::clip( m_data[f+frame_cnt][ch] ) *
-						OUTPUT_SAMPLE_MULTIPLIER );
+					Mixer::clip(m_data[f+frameCnt][ch]) *
+						OUTPUT_SAMPLE_MULTIPLIER);
 			}
 		}
-		FLAC__stream_encoder_process_interleaved( flac_enc, buf,
-								remaining );
-		frame_cnt += remaining;
+		FLAC__stream_encoder_process_interleaved(flacEnc, buf, remaining);
+		frameCnt += remaining;
 	}
-	FLAC__stream_encoder_finish( flac_enc );
-	FLAC__stream_encoder_delete( flac_enc );
-	printf("%d %d\n", frame_cnt, (int)ba_writer.size() );
-	ba_writer.close();
+	FLAC__stream_encoder_finish(flacEnc);
+	FLAC__stream_encoder_delete(flacEnc);
+	printf("%d %d\n", frameCnt, (int)baWriter.size());
+	baWriter.close();
 
-	base64::encode( ba_writer.buffer().data(), ba_writer.buffer().size(),
-									_dst );
-
+	base64::encode(baWriter.buffer().data(), baWriter.buffer().size(), dst);
 
 #else	/* LMMS_HAVE_FLAC_STREAM_ENCODER_H */
 
-	base64::encode( (const char *) m_data,
-					m_frames * sizeof( sampleFrame ), _dst );
+	base64::encode((const char *) m_data,
+		m_frames * sizeof(sampleFrame), dst);
 
 #endif	/* LMMS_HAVE_FLAC_STREAM_ENCODER_H */
 
-	return _dst;
+	return dst;
 }
 
 
@@ -1181,7 +1180,7 @@ SampleBuffer * SampleBuffer::resample(const sample_rate_t srcSR, const sample_ra
 {
 	sampleFrame * data = m_data;
 	const f_cnt_t frames = m_frames;
-	const f_cnt_t dstFrames = static_cast<f_cnt_t>((frames / (float) srcSR) * (float) dstSR );
+	const f_cnt_t dstFrames = static_cast<f_cnt_t>((frames / (float) srcSR) * (float) dstSR);
 	SampleBuffer * dstSB = new SampleBuffer(dstFrames);
 	sampleFrame * dstBuf = dstSB->m_origData;
 
@@ -1214,9 +1213,9 @@ SampleBuffer * SampleBuffer::resample(const sample_rate_t srcSR, const sample_ra
 
 
 
-void SampleBuffer::setAudioFile( const QString & _audio_file )
+void SampleBuffer::setAudioFile(const QString & audioFile)
 {
-	m_audioFile = PathUtil::toShortestRelative( _audio_file );
+	m_audioFile = PathUtil::toShortestRelative(audioFile);
 	update();
 }
 
