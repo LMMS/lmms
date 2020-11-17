@@ -686,12 +686,17 @@ void FileBrowserTreeWidget::mouseMoveEvent( QMouseEvent * me )
 void FileBrowserTreeWidget::mouseReleaseEvent(QMouseEvent * me )
 {
 	m_mousePressed = false;
-	// Depending on the user's configuration, we may not want to stop previews
-	bool cont = ConfigManager::inst()->value("ui", "letpreviewsfinish").toInt();
-	if (cont) { return; }
 
+	// If a preview is running, we may need to stop it. Otherwise, we're done
 	QMutexLocker previewLocker(&m_pphMutex);
-	if (m_previewPlayHandle != nullptr) { stopPreview(); }
+	if (m_previewPlayHandle == nullptr) { return; }
+
+	// Only sample previews may continue after mouse up. Is this a sample preview?
+	bool isSample = m_previewPlayHandle->type() == PlayHandle::TypeSamplePlayHandle;
+	// Even sample previews should only continue if the user wants them to. Do they?
+	bool shouldContinue = ConfigManager::inst()->value("ui", "letpreviewsfinish").toInt();
+	// If both are true the preview may continue, otherwise we stop it
+	if (!(isSample && shouldContinue)) { stopPreview(); }
 }
 
 
