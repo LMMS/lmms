@@ -112,14 +112,27 @@ public:
 
 	virtual ~SampleBuffer();
 
-	bool play(sampleFrame * ab,
+	bool play(
+		sampleFrame * ab,
 		handleState * state,
 		const fpp_t frames,
 		const float freq,
-		const LoopMode loopMode = LoopOff);
+		const LoopMode loopMode = LoopOff
+	);
 
-	void visualize(QPainter & p, const QRect & dr, const QRect & clip, f_cnt_t fromFrame = 0, f_cnt_t toFrame = 0);
-	inline void visualize(QPainter & p, const QRect & dr, f_cnt_t fromFrame = 0, f_cnt_t toFrame = 0)
+	void visualize(
+		QPainter & p,
+		const QRect & dr,
+		const QRect & clip,
+		f_cnt_t fromFrame = 0,
+		f_cnt_t toFrame = 0
+	);
+	inline void visualize(
+		QPainter & p,
+		const QRect & dr,
+		f_cnt_t fromFrame = 0,
+		f_cnt_t toFrame = 0
+	)
 	{
 		visualize(p, dr, dr, fromFrame, toFrame);
 	}
@@ -159,7 +172,12 @@ public:
 		m_loopEndFrame = end;
 	}
 
-	void setAllPointFrames(f_cnt_t start, f_cnt_t end, f_cnt_t loopStart, f_cnt_t loopEnd)
+	void setAllPointFrames(
+		f_cnt_t start,
+		f_cnt_t end,
+		f_cnt_t loopStart,
+		f_cnt_t loopEnd
+	)
 	{
 		m_startFrame = start;
 		m_endFrame = end;
@@ -268,20 +286,26 @@ private:
 	void convertIntToFloat(int_sample_t * & ibuf, f_cnt_t frames, int channels);
 	void directFloatWrite(sample_t * & fbuf, f_cnt_t frames, int channels);
 
-	f_cnt_t decodeSampleSF(QString fileName,
+	f_cnt_t decodeSampleSF(
+		QString fileName,
 		sample_t * & buf,
 		ch_cnt_t & channels,
-		sample_rate_t & samplerate);
+		sample_rate_t & samplerate
+	);
 #ifdef LMMS_HAVE_OGGVORBIS
-	f_cnt_t decodeSampleOGGVorbis(QString fileName,
+	f_cnt_t decodeSampleOGGVorbis(
+		QString fileName,
 		int_sample_t * & buf,
 		ch_cnt_t & channels,
-		sample_rate_t & samplerate);
+		sample_rate_t & samplerate
+	);
 #endif
-	f_cnt_t decodeSampleDS(QString fileName,
+	f_cnt_t decodeSampleDS(
+		QString fileName,
 		int_sample_t * & buf,
 		ch_cnt_t & channels,
-		sample_rate_t & samplerate);
+		sample_rate_t & samplerate
+	);
 
 	QString m_audioFile;
 	sampleFrame * m_origData;
@@ -298,14 +322,16 @@ private:
 	float m_frequency;
 	sample_rate_t m_sampleRate;
 
-	sampleFrame * getSampleFragment(f_cnt_t index,
+	sampleFrame * getSampleFragment(
+		f_cnt_t index,
 		f_cnt_t frames,
 		LoopMode loopMode,
 		sampleFrame * * tmp,
 		bool * backwards,
 		f_cnt_t loopStart,
 		f_cnt_t loopEnd,
-		f_cnt_t end) const;
+		f_cnt_t end
+	) const;
 
 	f_cnt_t getLoopedIndex(f_cnt_t index, f_cnt_t startf, f_cnt_t endf) const;
 	f_cnt_t getPingPongIndex(f_cnt_t index, f_cnt_t startf, f_cnt_t endf) const;

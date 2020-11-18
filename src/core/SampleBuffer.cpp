@@ -396,10 +396,12 @@ void SampleBuffer::normalizeSampleRate(const sample_rate_t srcSR, bool keepSetti
 
 
 
-f_cnt_t SampleBuffer::decodeSampleSF(QString fileName,
+f_cnt_t SampleBuffer::decodeSampleSF(
+	QString fileName,
 	sample_t * & buf,
 	ch_cnt_t & channels,
-	sample_rate_t & samplerate)
+	sample_rate_t & samplerate
+)
 {
 	SNDFILE * sndFile;
 	SF_INFO sfInfo;
@@ -503,10 +505,12 @@ long qfileTellCallback(void * udata)
 
 
 
-f_cnt_t SampleBuffer::decodeSampleOGGVorbis(QString fileName,
+f_cnt_t SampleBuffer::decodeSampleOGGVorbis(
+	QString fileName,
 	int_sample_t * & buf,
 	ch_cnt_t & channels,
-	sample_rate_t & samplerate)
+	sample_rate_t & samplerate
+)
 {
 	static ov_callbacks callbacks =
 	{
@@ -603,10 +607,12 @@ f_cnt_t SampleBuffer::decodeSampleOGGVorbis(QString fileName,
 
 
 
-f_cnt_t SampleBuffer::decodeSampleDS(QString fileName,
+f_cnt_t SampleBuffer::decodeSampleDS(
+	QString fileName,
 	int_sample_t * & buf,
 	ch_cnt_t & channels,
-	sample_rate_t & samplerate)
+	sample_rate_t & samplerate
+)
 {
 	DrumSynth ds;
 	f_cnt_t frames = ds.GetDSFileSamples(fileName, buf, channels, samplerate);
@@ -623,11 +629,13 @@ f_cnt_t SampleBuffer::decodeSampleDS(QString fileName,
 
 
 
-bool SampleBuffer::play(sampleFrame * ab,
+bool SampleBuffer::play(
+	sampleFrame * ab,
 	handleState * state,
 	const fpp_t frames,
 	const float freq,
-	const LoopMode loopMode)
+	const LoopMode loopMode
+)
 {
 	f_cnt_t startFrame = m_startFrame;
 	f_cnt_t endFrame = m_endFrame;
@@ -793,14 +801,16 @@ bool SampleBuffer::play(sampleFrame * ab,
 
 
 
-sampleFrame * SampleBuffer::getSampleFragment(f_cnt_t index,
+sampleFrame * SampleBuffer::getSampleFragment(
+	f_cnt_t index,
 	f_cnt_t frames,
 	LoopMode loopMode,
 	sampleFrame * * tmp,
 	bool * backwards,
 	f_cnt_t loopStart,
 	f_cnt_t loopEnd,
-	f_cnt_t end) const
+	f_cnt_t end
+) const
 {
 	if (loopMode == LoopOff)
 	{
@@ -929,11 +939,13 @@ f_cnt_t SampleBuffer::getPingPongIndex(f_cnt_t index, f_cnt_t startf, f_cnt_t en
 }
 
 
-void SampleBuffer::visualize(QPainter & p,
+void SampleBuffer::visualize(
+	QPainter & p,
 	const QRect & dr,
 	const QRect & clip,
 	f_cnt_t fromFrame,
-	f_cnt_t toFrame)
+	f_cnt_t toFrame
+)
 {
 	if (m_frames == 0) { return; }
 
@@ -1084,7 +1096,8 @@ FLAC__StreamEncoderWriteStatus flacStreamEncoderWriteCallback(
 	unsigned int /*samples*/,
 	unsigned int bytes,
 	unsigned int /*currentFrame*/,
-	void * clientData)
+	void * clientData
+)
 {
 /*	if (bytes == 0)
 	{
@@ -1100,7 +1113,8 @@ FLAC__StreamEncoderWriteStatus flacStreamEncoderWriteCallback(
 void flacStreamEncoderMetadataCallback(
 	const FLAC__StreamEncoder *,
 	const FLAC__StreamMetadata * metadata,
-	void * clientData)
+	void * clientData
+)
 {
 	QBuffer * b = static_cast<QBuffer *>(clientData);
 	b->seek(0);
@@ -1235,7 +1249,8 @@ FLAC__StreamDecoderReadStatus flacStreamDecoderReadCallback(
 	const FLAC__StreamDecoder * /*decoder*/,
 	FLAC__byte * buffer,
 	unsigned int * bytes,
-	void * clientData)
+	void * clientData
+)
 {
 	int res = static_cast<flacStreamDecoderClientData *>(
 		clientData)->readBuffer->read((char *) buffer, *bytes);
@@ -1257,7 +1272,8 @@ FLAC__StreamDecoderWriteStatus flacStreamDecoderWriteCallback(
 	const FLAC__StreamDecoder * /*decoder*/,
 	const FLAC__Frame * frame,
 	const FLAC__int32 * const buffer[],
-	void * clientData)
+	void * clientData
+)
 {
 	if (frame->header.channels != 2)
 	{
@@ -1288,7 +1304,8 @@ FLAC__StreamDecoderWriteStatus flacStreamDecoderWriteCallback(
 void flacStreamDecoderMetadataCallback(
 	const FLAC__StreamDecoder *,
 	const FLAC__StreamMetadata *,
-	void * /*clientData*/ )
+	void * /*clientData*/
+)
 {
 	printf("stream decoder metadata callback\n");
 /*	QBuffer * b = static_cast<QBuffer *>(clientData);
@@ -1300,7 +1317,8 @@ void flacStreamDecoderMetadataCallback(
 void flacStreamDecoderErrorCallback(
 	const FLAC__StreamDecoder *,
 	FLAC__StreamDecoderErrorStatus status,
-	void * /*clientData*/ )
+	void * /*clientData*/
+)
 {
 	printf("error callback! %d\n", status);
 	// what to do now??
@@ -1408,13 +1426,6 @@ void SampleBuffer::setReversed(bool on)
 	Engine::mixer()->doneChangeInModel();
 	emit sampleUpdated();
 }
-
-
-
-
-
-
-
 
 
 
