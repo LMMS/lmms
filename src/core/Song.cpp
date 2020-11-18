@@ -240,7 +240,7 @@ void Song::processNextBuffer()
 	// If the playback position is outside of the range [begin, end), move it to
 	// begin and inform interested parties.
 	// Returns true if the playback position was moved, else false.
-	const auto enforceLoop = [=](const MidiTime& begin, const MidiTime& end)
+	const auto enforceLoop = [this](const MidiTime& begin, const MidiTime& end)
 	{
 		if (getPlayPos() < begin || getPlayPos() >= end)
 		{
@@ -268,20 +268,20 @@ void Song::processNextBuffer()
 	const auto framesPerTick = Engine::framesPerTick();
 	const auto framesPerPeriod = Engine::mixer()->framesPerPeriod();
 
-	f_cnt_t frameOfPeriod = 0;
+	f_cnt_t frameOffsetInPeriod = 0;
 
-	while (frameOfPeriod < framesPerPeriod)
+	while (frameOffsetInPeriod < framesPerPeriod)
 	{
-		auto frameOfTick = getPlayPos().currentFrame();
+		auto frameOffsetInTick = getPlayPos().currentFrame();
 
 		// If a whole tick has elapsed, update the frame and tick count, and check any loops
-		if (frameOfTick >= framesPerTick)
+		if (frameOffsetInTick >= framesPerTick)
 		{
 			// Transfer any whole ticks from the frame count to the tick count
-			const auto elapsedTicks = static_cast<int>(frameOfTick / framesPerTick);
+			const auto elapsedTicks = static_cast<int>(frameOffsetInTick / framesPerTick);
 			getPlayPos().setTicks(getPlayPos().getTicks() + elapsedTicks);
-			frameOfTick -= elapsedTicks * framesPerTick;
-			getPlayPos().setCurrentFrame(frameOfTick);
+			frameOffsetInTick -= elapsedTicks * framesPerTick;
+			getPlayPos().setCurrentFrame(frameOffsetInTick);
 
 			// If we are playing a BB track, or a pattern with no loop enabled,
 			// loop back to the beginning when we reach the end
@@ -313,13 +313,13 @@ void Song::processNextBuffer()
 			}
 		}
 
-		const f_cnt_t framesUntilNextPeriod = framesPerPeriod - frameOfPeriod;
-		const f_cnt_t framesUntilNextTick = static_cast<f_cnt_t>(std::ceil(framesPerTick - frameOfTick));
+		const f_cnt_t framesUntilNextPeriod = framesPerPeriod - frameOffsetInPeriod;
+		const f_cnt_t framesUntilNextTick = static_cast<f_cnt_t>(std::ceil(framesPerTick - frameOffsetInTick));
 
 		// We want to proceed to the next buffer or tick, whichever is closer
 		const auto framesToPlay = std::min(framesUntilNextPeriod, framesUntilNextTick);
 
-		if (frameOfPeriod == 0)
+		if (frameOffsetInPeriod == 0)
 		{
 			// First frame of buffer: update VST sync position.
 			// This must be done after we've corrected the frame/tick count,
@@ -329,20 +329,20 @@ void Song::processNextBuffer()
 			m_vstSyncController.update();
 		}
 
-		if (static_cast<f_cnt_t>(frameOfTick) == 0)
+		if (static_cast<f_cnt_t>(frameOffsetInTick) == 0)
 		{
 			// First frame of tick: process automation and play tracks
 			processAutomations(trackList, getPlayPos(), framesToPlay);
 			for (const auto track : trackList)
 			{
-				track->play(getPlayPos(), framesToPlay, frameOfPeriod, clipNum);
+				track->play(getPlayPos(), framesToPlay, frameOffsetInPeriod, clipNum);
 			}
 		}
 
 		// Update frame counters
-		frameOfPeriod += framesToPlay;
-		frameOfTick += framesToPlay;
-		getPlayPos().setCurrentFrame(frameOfTick);
+		frameOffsetInPeriod += framesToPlay;
+		frameOffsetInTick += framesToPlay;
+		getPlayPos().setCurrentFrame(frameOffsetInTick);
 		m_elapsedMilliSeconds[m_playMode] += MidiTime::ticksToMilliseconds(framesToPlay / framesPerTick, getTempo());
 		m_elapsedBars = m_playPos[Mode_PlaySong].getBar();
 		m_elapsedTicks = (m_playPos[Mode_PlaySong].getTicks() % ticksPerBar()) / 48;
