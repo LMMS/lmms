@@ -111,6 +111,7 @@ public:
 	explicit SampleBuffer( const f_cnt_t _frames );
 	SampleBuffer( const SampleBuffer& orig );
 
+	friend void swap( SampleBuffer& first, SampleBuffer& second ) noexcept;
 	SampleBuffer& operator= ( const SampleBuffer& that );
 
 	virtual ~SampleBuffer();

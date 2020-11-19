@@ -51,6 +51,8 @@ public:
 	SampleTCO( const SampleTCO& orig );
 	virtual ~SampleTCO();
 
+	SampleTCO& operator= ( const SampleTCO& that ) = delete;
+
 	void changeLength( const MidiTime & _length ) override;
 	const QString & sampleFile() const;
 
