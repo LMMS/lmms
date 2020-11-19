@@ -76,7 +76,6 @@ void FileBrowser::addContentCheckBox()
 
 	auto configCheckBox = [this, &filterWidgetLayout](QCheckBox* box)
 	{
-		box->setObjectName("FileBrowserFilterCheckBox");
 		box->setCheckState(Qt::Checked);
 		connect(box, SIGNAL(stateChanged(int)), this, SLOT(reloadTree()));
 		filterWidgetLayout->addWidget(box);

@@ -40,7 +40,7 @@ QMdiArea {
 	background-color: #111314;
 }
 
-QCheckBox[objectName="FileBrowserFilterCheckBox"]
+FileBrowser QCheckBox
 {
 	font-size: 10px;
 	color: white;
