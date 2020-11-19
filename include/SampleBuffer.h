@@ -117,10 +117,10 @@ public:
 				const float _freq,
 				const LoopMode _loopmode = LoopOff );
 
-	void visualize( QPainter & _p, const QRect & _dr, const QRect & _clip, f_cnt_t _from_frame = 0, f_cnt_t _to_frame = 0 );
-	inline void visualize( QPainter & _p, const QRect & _dr, f_cnt_t _from_frame = 0, f_cnt_t _to_frame = 0 )
+	void visualize (QPainter & p, const QRect & dr, const QRect & clip, f_cnt_t from_frame = 0, f_cnt_t to_frame = 0);
+	inline void visualize (QPainter & p, const QRect & dr, f_cnt_t from_frame = 0, f_cnt_t to_frame = 0)
 	{
-		visualize( _p, _dr, _dr, _from_frame, _to_frame );
+		visualize(p, dr, dr, from_frame, to_frame);
 	}
 
 	inline const QString & audioFile() const
@@ -266,8 +266,8 @@ private:
 
 	void update( bool _keep_settings = false );
 
-	void convertIntToFloat ( int_sample_t * & _ibuf, f_cnt_t _frames, int _channels);
-	void directFloatWrite ( sample_t * & _fbuf, f_cnt_t _frames, int _channels);
+	void convertIntToFloat (int_sample_t * & ibuf, f_cnt_t frames, int channels);
+	void directFloatWrite (sample_t * & fbuf, f_cnt_t frames, int channels);
 
 	f_cnt_t decodeSampleSF( QString _f, sample_t * & _buf,
 						ch_cnt_t & _channels,

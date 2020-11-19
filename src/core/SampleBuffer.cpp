@@ -296,7 +296,10 @@ void SampleBuffer::update( bool _keep_settings )
 }
 
 
-void SampleBuffer::convertIntToFloat (int_sample_t * & ibuf, f_cnt_t frames, int channels)
+void SampleBuffer::convertIntToFloat(
+	int_sample_t * & ibuf,
+	f_cnt_t frames,
+	int channels)
 {
 	// following code transforms int-samples into float-samples and does amplifying & reversing
 	const float fac = 1 / OUTPUT_SAMPLE_MULTIPLIER;
@@ -316,7 +319,10 @@ void SampleBuffer::convertIntToFloat (int_sample_t * & ibuf, f_cnt_t frames, int
 	delete[] ibuf;
 }
 
-void SampleBuffer::directFloatWrite (sample_t * & fbuf, f_cnt_t frames, int channels)
+void SampleBuffer::directFloatWrite(
+	sample_t * & fbuf,
+	f_cnt_t frames,
+	int channels)
 {
 
 	m_data = MM_ALLOC(sampleFrame, frames);
@@ -903,10 +909,14 @@ f_cnt_t SampleBuffer::getPingPongIndex( f_cnt_t _index, f_cnt_t _startf, f_cnt_t
 }
 
 
-void SampleBuffer::visualize (QPainter & p, const QRect & dr,
-							  const QRect & clip, f_cnt_t from_frame, f_cnt_t to_frame)
+void SampleBuffer::visualize(
+	QPainter & p,
+	const QRect & dr,
+	const QRect & clip,
+	f_cnt_t from_frame,
+	f_cnt_t to_frame)
 {
-	if(m_frames == 0) return;
+	if (m_frames == 0) { return; }
 
 	const bool focus_on_range = to_frame <= m_frames && 0 <= from_frame && from_frame < to_frame;
 	//p.setClipRect( clip );
@@ -935,9 +945,9 @@ void SampleBuffer::visualize (QPainter & p, const QRect & dr,
 		++n;
 	}
 
-	p.setRenderHint( QPainter::Antialiasing );
-	p.drawPolyline( l, nb_frames / fpp );
-	p.drawPolyline( r, nb_frames / fpp );
+	p.setRenderHint(QPainter::Antialiasing);
+	p.drawPolyline(l, nb_frames / fpp);
+	p.drawPolyline(r, nb_frames / fpp);
 	delete[] l;
 	delete[] r;
 }
