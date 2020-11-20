@@ -282,7 +282,7 @@ void SampleTCO::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	}
 	if (m_sampleBuffer->reversed())
 	{
-		_this.setAttribute ("reversed", "true");
+		_this.setAttribute("reversed", "true");
 	}
 	// TODO: start- and end-frame
 }
