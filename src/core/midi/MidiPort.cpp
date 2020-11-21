@@ -175,6 +175,7 @@ void MidiPort::saveSettings( QDomDocument& doc, QDomElement& thisElement )
 	m_inputChannelModel.saveSettings( doc, thisElement, "inputchannel" );
 	m_outputChannelModel.saveSettings( doc, thisElement, "outputchannel" );
 	m_inputControllerModel.saveSettings( doc, thisElement, "inputcontroller" );
+	m_inputControllerEventTypeModel.saveSettings( doc, thisElement, "inputctrleventtype" );
 	m_outputControllerModel.saveSettings( doc, thisElement, "outputcontroller" );
 	m_fixedInputVelocityModel.saveSettings( doc, thisElement, "fixedinputvelocity" );
 	m_fixedOutputVelocityModel.saveSettings( doc, thisElement, "fixedoutputvelocity" );
@@ -229,6 +230,7 @@ void MidiPort::loadSettings( const QDomElement& thisElement )
 	m_inputChannelModel.loadSettings( thisElement, "inputchannel" );
 	m_outputChannelModel.loadSettings( thisElement, "outputchannel" );
 	m_inputControllerModel.loadSettings( thisElement, "inputcontroller" );
+	m_inputControllerEventTypeModel.loadSettings( thisElement, "inputctrleventtype" );
 	m_outputControllerModel.loadSettings( thisElement, "outputcontroller" );
 	m_fixedInputVelocityModel.loadSettings( thisElement, "fixedinputvelocity" );
 	m_fixedOutputVelocityModel.loadSettings( thisElement, "fixedoutputvelocity" );

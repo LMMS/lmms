@@ -83,19 +83,76 @@ void MidiController::updateName()
 void MidiController::processInEvent( const MidiEvent& event, const MidiTime& time, f_cnt_t offset )
 {
 	unsigned char controllerNum;
+	int expectedChannel = m_midiPort.inputChannel();
+	MidiPortEventModel::Values portEvent
+			= m_midiPort.inputControllerEventType();
+	if (expectedChannel != event.channel() + 1  && expectedChannel != 0)
+	{
+		return;
+	}
 	switch( event.type() )
 	{
 		case MidiControlChange:
 			controllerNum = event.controllerNumber();
 
-			if( m_midiPort.inputController() == controllerNum + 1 &&
-					( m_midiPort.inputChannel() == event.channel() + 1 ||
-					  m_midiPort.inputChannel() == 0 ) )
+			if(portEvent == MidiPortEventModel::EventControlChange &&
+				m_midiPort.inputController() == controllerNum + 1)
 			{
 				unsigned char val = event.controllerValue();
 				m_previousValue = m_lastValue;
 				m_lastValue = (float)( val ) / 127.0f;
-				emit valueChanged();
+				if (m_previousValue != m_lastValue)
+				{
+					emit valueChanged();
+				}
+
+			}
+			break;
+
+		case MidiNoteOn:
+			controllerNum = event.key();
+			if (portEvent == MidiPortEventModel::EventNoteOn &&
+				m_midiPort.inputController() == controllerNum + 1)
+			{
+				m_previousValue = m_lastValue;
+				if (m_lastValue == 0)
+				{
+					m_lastValue = 1.0;
+				}
+				else
+				{
+					m_lastValue = 0.0;
+				}
+				if (m_previousValue != m_lastValue)
+				{
+					emit valueChanged();
+				}
+			}
+			if (portEvent == MidiPortEventModel::EventNoteOnOff &&
+				m_midiPort.inputController() == controllerNum + 1)
+			{
+				m_previousValue = m_lastValue;
+				m_lastValue = 1.0;
+				if (m_previousValue != m_lastValue)
+				{
+					emit valueChanged();
+				}
+
+			}
+			break;
+
+		case MidiNoteOff:
+			controllerNum = event.key();
+			if (portEvent == MidiPortEventModel::EventNoteOnOff &&
+				m_midiPort.inputController() == controllerNum + 1)
+			{
+				m_previousValue = m_lastValue;
+				m_lastValue = 0.0;
+				if (m_previousValue != m_lastValue)
+				{
+					emit valueChanged();
+				}
+
 			}
 			break;
 

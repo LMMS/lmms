@@ -176,21 +176,21 @@ void MidiAlsaSeq::processOutEvent( const MidiEvent& event, const MidiTime& time,
 		case MidiNoteOn:
 			snd_seq_ev_set_noteon( &ev,
 						event.channel(),
-						event.key() + KeysPerOctave,
+						event.key(),
 						event.velocity() );
 			break;
 
 		case MidiNoteOff:
 			snd_seq_ev_set_noteoff( &ev,
 						event.channel(),
-						event.key() + KeysPerOctave,
+						event.key(),
 						event.velocity() );
 			break;
 
 		case MidiKeyPressure:
 			snd_seq_ev_set_keypress( &ev,
 						event.channel(),
-						event.key() + KeysPerOctave,
+						event.key(),
 						event.velocity() );
 			break;
 
@@ -531,8 +531,7 @@ void MidiAlsaSeq::run()
 				case SND_SEQ_EVENT_NOTEON:
 					dest->processInEvent( MidiEvent( MidiNoteOn,
 								ev->data.note.channel,
-								ev->data.note.note -
-								KeysPerOctave,
+								ev->data.note.note,
 								ev->data.note.velocity,
 								source
 								),
@@ -542,8 +541,7 @@ void MidiAlsaSeq::run()
 				case SND_SEQ_EVENT_NOTEOFF:
 					dest->processInEvent( MidiEvent( MidiNoteOff,
 								ev->data.note.channel,
-								ev->data.note.note -
-								KeysPerOctave,
+								ev->data.note.note,
 								ev->data.note.velocity,
 								source
 								),
@@ -554,8 +552,7 @@ void MidiAlsaSeq::run()
 					dest->processInEvent( MidiEvent(
 									MidiKeyPressure,
 								ev->data.note.channel,
-								ev->data.note.note -
-								KeysPerOctave,
+								ev->data.note.note,
 								ev->data.note.velocity,
 								source
 								), MidiTime() );
