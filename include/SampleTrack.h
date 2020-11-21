@@ -253,7 +253,7 @@ private:
 
 	TrackLabelButton * m_tlb;
 
-	FadeButton * getActivityIndicator()
+	FadeButton * getActivityIndicator() override
 	{
 		return m_activityIndicator;
 	}
