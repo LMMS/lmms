@@ -70,7 +70,7 @@ class LMMS_EXPORT Lv2ControlBase : public LinkedModelGroups
 {
 public:
 	static Plugin::PluginTypes check(const LilvPlugin* m_plugin,
-		std::vector<PluginIssue> &issues, bool printIssues = false);
+		std::vector<PluginIssue> &issues);
 
 	const LilvPlugin* getPlugin() const { return m_plugin; }
 

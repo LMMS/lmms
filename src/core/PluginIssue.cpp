@@ -67,6 +67,24 @@ const char *PluginIssue::msgFor(const PluginIssueType &it)
 
 
 
+bool PluginIssue::operator==(const PluginIssue &other) const
+{
+	return (m_issueType == other.m_issueType) && (m_info == other.m_info);
+}
+
+
+
+
+bool PluginIssue::operator<(const PluginIssue &other) const
+{
+	return (m_issueType != other.m_issueType)
+			? m_issueType < other.m_issueType
+			: m_info < other.m_info;
+}
+
+
+
+
 QDebug operator<<(QDebug stream, const PluginIssue &iss)
 {
 	stream << PluginIssue::msgFor(iss.m_issueType);

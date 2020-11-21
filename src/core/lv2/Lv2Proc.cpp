@@ -58,7 +58,7 @@ struct MidiInputEvent
 
 
 Plugin::PluginTypes Lv2Proc::check(const LilvPlugin *plugin,
-	std::vector<PluginIssue>& issues, bool printIssues)
+	std::vector<PluginIssue>& issues)
 {
 	unsigned maxPorts = lilv_plugin_get_num_ports(plugin);
 	enum { inCount, outCount, maxCount };
@@ -126,16 +126,6 @@ Plugin::PluginTypes Lv2Proc::check(const LilvPlugin *plugin,
 		{
 			issues.emplace_back(featureNotSupported, reqFeatName);
 		}
-	}
-
-	if (printIssues && issues.size())
-	{
-		qDebug() << "Lv2 plugin"
-			<< qStringFromPluginNode(plugin, lilv_plugin_get_name)
-			<< "(URI:"
-			<< lilv_node_as_uri(lilv_plugin_get_uri(plugin))
-			<< ") can not be loaded:";
-		for (const PluginIssue& iss : issues) { qDebug() << "  - " << iss; }
 	}
 
 	return (audioChannels[inCount] > 2 || audioChannels[outCount] > 2)

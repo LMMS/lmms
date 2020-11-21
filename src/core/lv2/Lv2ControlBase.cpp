@@ -37,10 +37,10 @@
 
 
 Plugin::PluginTypes Lv2ControlBase::check(const LilvPlugin *plugin,
-	std::vector<PluginIssue> &issues, bool printIssues)
+	std::vector<PluginIssue> &issues)
 {
 	// for some reason, all checks can be done by one processor...
-	return Lv2Proc::check(plugin, issues, printIssues);
+	return Lv2Proc::check(plugin, issues);
 }
 
 
