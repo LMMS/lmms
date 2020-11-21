@@ -94,6 +94,7 @@ private:
 
 signals:
 	void sampleChanged();
+	void wasReversed();
 
 } ;
 
@@ -109,6 +110,7 @@ public:
 
 public slots:
 	void updateSample();
+	void reverseSample();
 
 
 
