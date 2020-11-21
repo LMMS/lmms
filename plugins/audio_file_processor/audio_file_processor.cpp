@@ -83,7 +83,7 @@ audioFileProcessor::audioFileProcessor( InstrumentTrack * _instrument_track ) :
 	m_startPointModel( 0, 0, 1, 0.0000001f, this, tr( "Start of sample" ) ),
 	m_endPointModel( 1, 0, 1, 0.0000001f, this, tr( "End of sample" ) ),
 	m_loopPointModel(0, 0, 1, 0.0000001f, this, tr("Loopback start point")),
-	m_loopEndPointModel(0, 0, 1, 0.0000001f, this, tr("Loopback end point")),
+	m_loopEndPointModel(1, 0, 1, 0.0000001f, this, tr("Loopback end point")),
 	m_reverseModel( false, this, tr( "Reverse sample" ) ),
 	m_loopModel( 0, 0, 2, this, tr( "Loop mode" ) ),
 	m_stutterModel( false, this, tr( "Stutter" ) ),
