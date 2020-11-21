@@ -29,6 +29,7 @@
 
 #ifdef LMMS_HAVE_LV2
 
+#include <QtGlobal>
 #include <cstdint>
 
 //! Cached URIDs for fast access (for use in real-time code)
@@ -52,7 +53,12 @@ public:
 	//! Return URID for a cache ID
 	uint32_t operator[](Id id) const;
 
+	// get URID by type
+	uint32_t uridForType(const int32_t*) const { return operator[](Id::atom_Int); }
+	uint32_t uridForType(const float*) const { return operator[](Id::atom_Float); }
+
 	Lv2UridCache(class UridMap& mapper);
+
 private:
 	uint32_t m_cache[static_cast<int>(Id::size)];
 };

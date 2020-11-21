@@ -70,7 +70,7 @@ void Lv2Options::createOptionVectors()
 
 
 void Lv2Options::initOption(LV2_URID key, uint32_t size, LV2_URID type,
-	const void *value,
+	std::shared_ptr<void> value,
 	LV2_Options_Context context, uint32_t subject)
 {
 	Q_ASSERT(isOptionSupported(key));
@@ -82,13 +82,8 @@ void Lv2Options::initOption(LV2_URID key, uint32_t size, LV2_URID type,
 	opt.size = size;
 	opt.type = type;
 
-	std::unique_ptr<void, VoidArrayDeleter> dataPtr;
-	dataPtr.reset(new uint8_t[size]);
-	std::copy((uint8_t*)value, (uint8_t*)value + size, (uint8_t*)dataPtr.get());
-	opt.value = dataPtr.get();
-
 	const auto optResult = m_optionByUrid.emplace(key, opt);
-	const auto valResult = m_optionValues.emplace(key, std::move(dataPtr));
+	const auto valResult = m_optionValues.emplace(key, std::move(value));
 	Q_ASSERT(optResult.second);
 	Q_ASSERT(valResult.second);
 }
