@@ -391,7 +391,7 @@ f_cnt_t SampleBuffer::decodeSampleSF(QString _f,
 	SF_INFO sf_info;
 	sf_info.format = 0;
 	f_cnt_t frames = 0;
-	bool sf_rr = false;
+	sf_count_t sfFramesRead;
 
 
 	// Use QFile to handle unicode file names on Windows
@@ -402,9 +402,9 @@ f_cnt_t SampleBuffer::decodeSampleSF(QString _f,
 		frames = sf_info.frames;
 
 		_buf = new sample_t[sf_info.channels * frames];
-		sf_rr = sf_read_float( snd_file, _buf, sf_info.channels * frames );
+		sfFramesRead = sf_read_float(snd_file, _buf, sf_info.channels * frames);
 
-		if( sf_rr < sf_info.channels * frames )
+		if (sfFramesRead < sf_info.channels * frames)
 		{
 #ifdef DEBUG_LMMS
 			qDebug( "SampleBuffer::decodeSampleSF(): could not read"
