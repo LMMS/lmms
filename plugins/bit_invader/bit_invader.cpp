@@ -140,12 +140,12 @@ sample_t bSynth::nextStringSample( float sample_length )
 
 bitInvader::bitInvader( InstrumentTrack * _instrument_track ) :
 	Instrument( _instrument_track, &bitinvader_plugin_descriptor ),
-	m_sampleLength( 128, 4, WAVETABLE_SIZE, 1, this, tr( "Sample length" ) ),
-	m_graph( -1.0f, 1.0f, WAVETABLE_SIZE, this ),
+	m_sampleLength(128, 4, WAVETABLE_SIZE, 1, this, tr("Sample length")),
+	m_graph(-1.0f, 1.0f, WAVETABLE_SIZE, this),
 	m_interpolation( false, this ),
 	m_normalize( false, this )
 {
-		
+
 	lengthChanged();
 
 	m_graph.setWaveToSine();
@@ -179,8 +179,8 @@ void bitInvader::saveSettings( QDomDocument & _doc, QDomElement & _this )
 
 	// Save sample shape base64-encoded
 	QString sampleString;
-	base64::encode( (const char *)m_graph.samples(),
-		WAVETABLE_SIZE * sizeof(float), sampleString );
+	base64::encode((const char *)m_graph.samples(),
+		WAVETABLE_SIZE * sizeof(float), sampleString);
 	_this.setAttribute( "sampleShape", sampleString );
 	
 
@@ -196,6 +196,12 @@ void bitInvader::saveSettings( QDomDocument & _doc, QDomElement & _this )
 
 void bitInvader::loadSettings( const QDomElement & _this )
 {
+	// Clear wavetable before loading a new
+	for (int i = 0; i < WAVETABLE_SIZE; i++)
+	{
+		m_graph.setSampleAt(i, 0.f);
+	}
+
 	// Load sample length
 	m_sampleLength.loadSettings( _this, "sampleLength" );
 
