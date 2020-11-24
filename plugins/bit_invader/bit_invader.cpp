@@ -240,7 +240,7 @@ void bitInvader::samplesChanged( int _begin, int _end )
 void bitInvader::normalize()
 {
 	// analyze
-	float max = 0;
+	float max = 0.0001f;
 	const float* samples = m_graph.samples();
 	for(int i=0; i < m_graph.length(); i++)
 	{
