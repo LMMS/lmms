@@ -44,7 +44,7 @@
 
 #include "plugin_export.h"
 
-static const size_t wavetableSize = 200;
+static const int wavetableSize = 200;
 
 extern "C"
 {
