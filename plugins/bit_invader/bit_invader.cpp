@@ -197,10 +197,7 @@ void bitInvader::saveSettings( QDomDocument & _doc, QDomElement & _this )
 void bitInvader::loadSettings( const QDomElement & _this )
 {
 	// Clear wavetable before loading a new
-	for (int i = 0; i < WAVETABLE_SIZE; i++)
-	{
-		m_graph.setSampleAt(i, 0.f);
-	}
+	m_graph.clear();
 
 	// Load sample length
 	m_sampleLength.loadSettings( _this, "sampleLength" );
