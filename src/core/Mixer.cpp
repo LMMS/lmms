@@ -600,21 +600,6 @@ void Mixer::doSetAudioDevice( AudioDevice * _dev )
 
 
 
-void Mixer::setAudioDevice( AudioDevice * _dev,
-			    bool startNow )
-{
-	stopProcessing();
-
-	doSetAudioDevice( _dev );
-
-	emit sampleRateChanged();
-
-	if (startNow) {startProcessing();}
-}
-
-
-
-
 void Mixer::setAudioDevice(AudioDevice * _dev,
 				const struct qualitySettings & _qs,
 				bool _needs_fifo,

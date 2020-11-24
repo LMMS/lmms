@@ -94,6 +94,7 @@ private:
 
 signals:
 	void sampleChanged();
+	void wasReversed();
 
 } ;
 
@@ -109,6 +110,7 @@ public:
 
 public slots:
 	void updateSample();
+	void reverseSample();
 
 
 
@@ -251,7 +253,7 @@ private:
 
 	TrackLabelButton * m_tlb;
 
-	FadeButton * getActivityIndicator()
+	FadeButton * getActivityIndicator() override
 	{
 		return m_activityIndicator;
 	}

@@ -292,67 +292,48 @@ void SampleBuffer::update(bool keepSettings)
 }
 
 
-void SampleBuffer::convertIntToFloat(int_sample_t * & ibuf, f_cnt_t frames, int channels)
+void SampleBuffer::convertIntToFloat(
+	int_sample_t * & ibuf,
+	f_cnt_t frames,
+	int channels
+)
 {
-	// following code transforms int-samples into
-	// float-samples and does amplifying & reversing
+	// following code transforms int-samples into float-samples and does amplifying & reversing
 	const float fac = 1 / OUTPUT_SAMPLE_MULTIPLIER;
 	m_data = MM_ALLOC(sampleFrame, frames);
 	const int ch = (channels > 1) ? 1 : 0;
 
-	// if reversing is on, we also reverse when
-	// scaling
-	if (m_reversed)
+	// if reversing is on, we also reverse when scaling
+	bool isReversed = m_reversed;
+	int idx = isReversed ? (frames - 1) * channels : 0;
+	for (f_cnt_t frame = 0; frame < frames; ++frame)
 	{
-		int idx = (frames - 1) * channels;
-		for (f_cnt_t frame = 0; frame < frames; ++frame)
-		{
-			m_data[frame][0] = ibuf[idx+0] * fac;
-			m_data[frame][1] = ibuf[idx+ch] * fac;
-			idx -= channels;
-		}
-	}
-	else
-	{
-		int idx = 0;
-		for (f_cnt_t frame = 0; frame < frames; ++frame)
-		{
-			m_data[frame][0] = ibuf[idx+0] * fac;
-			m_data[frame][1] = ibuf[idx+ch] * fac;
-			idx += channels;
-		}
+		m_data[frame][0] = ibuf[idx+0] * fac;
+		m_data[frame][1] = ibuf[idx+ch] * fac;
+		idx += isReversed ? -channels : channels;
 	}
 
 	delete[] ibuf;
 }
 
-void SampleBuffer::directFloatWrite(sample_t * & fbuf, f_cnt_t frames, int channels)
+void SampleBuffer::directFloatWrite(
+	sample_t * & fbuf,
+	f_cnt_t frames,
+	int channels
+)
 {
 
 	m_data = MM_ALLOC(sampleFrame, frames);
 	const int ch = (channels > 1) ? 1 : 0;
 
-	// if reversing is on, we also reverse when
-	// scaling
-	if (m_reversed)
+	// if reversing is on, we also reverse when scaling
+	bool isReversed = m_reversed;
+	int idx = isReversed ? (frames - 1) * channels : 0;
+	for (f_cnt_t frame = 0; frame < frames; ++frame)
 	{
-		int idx = (frames - 1) * channels;
-		for (f_cnt_t frame = 0; frame < frames; ++frame)
-		{
-			m_data[frame][0] = fbuf[idx+0];
-			m_data[frame][1] = fbuf[idx+ch];
-			idx -= channels;
-		}
-	}
-	else
-	{
-		int idx = 0;
-		for(f_cnt_t frame = 0; frame < frames; ++frame)
-		{
-			m_data[frame][0] = fbuf[idx+0];
-			m_data[frame][1] = fbuf[idx+ch];
-			idx += channels;
-		}
+		m_data[frame][0] = fbuf[idx+0];
+		m_data[frame][1] = fbuf[idx+ch];
+		idx += isReversed ? -channels : channels;
 	}
 
 	delete[] fbuf;
@@ -949,9 +930,8 @@ void SampleBuffer::visualize(
 {
 	if (m_frames == 0) { return; }
 
-	const bool focusOnRange = toFrame <= m_frames
-					&& 0 <= fromFrame && fromFrame < toFrame;
-	//_p.setClipRect( _clip );
+	const bool focusOnRange = toFrame <= m_frames && 0 <= fromFrame && fromFrame < toFrame;
+	//p.setClipRect(clip);
 	const int w = dr.width();
 	const int h = dr.height();
 
@@ -965,18 +945,22 @@ void SampleBuffer::visualize(
 	int n = 0;
 	const int xb = dr.x();
 	const int first = focusOnRange ? fromFrame : 0;
-	const int last = focusOnRange ? toFrame : m_frames;
-	for (int frame = first; frame < last; frame += fpp)
+	const int last = focusOnRange ? toFrame - 1 : m_frames - 1;
+
+	for (int frame = first; frame <= last; frame += fpp)
 	{
-		l[n] = QPointF(xb + ((frame - first) * double(w) / nbFrames),
-			(yb - (m_data[frame][0] * ySpace * m_amplification)));
-		r[n] = QPointF(xb + ((frame - first) * double(w) / nbFrames),
-			(yb - (m_data[frame][1] * ySpace * m_amplification)));
+		auto x = xb + ((frame - first) * double(w) / nbFrames);
+		// Partial Y calculation
+		auto py = ySpace * m_amplification;
+		l[n] = QPointF(x, (yb - (m_data[frame][0] * py)));
+		r[n] = QPointF(x, (yb - (m_data[frame][1] * py)));
 		++n;
 	}
+
 	p.setRenderHint(QPainter::Antialiasing);
 	p.drawPolyline(l, nbFrames / fpp);
 	p.drawPolyline(r, nbFrames / fpp);
+
 	delete[] l;
 	delete[] r;
 }

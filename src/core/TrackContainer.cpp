@@ -331,16 +331,3 @@ AutomatedValueMap TrackContainer::automatedValuesFromTracks(const TrackList &tra
 	return valueMap;
 };
 
-
-
-DummyTrackContainer::DummyTrackContainer() :
-	TrackContainer(),
-	m_dummyInstrumentTrack( NULL )
-{
-	setJournalling( false );
-	m_dummyInstrumentTrack = dynamic_cast<InstrumentTrack *>(
-				Track::create( Track::InstrumentTrack,
-							this ) );
-	m_dummyInstrumentTrack->setJournalling( false );
-}
-
