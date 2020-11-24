@@ -130,7 +130,11 @@ InstrumentTrack::InstrumentTrack( TrackContainer* tc ) :
 	// the midi cc events
 	for (int i = 0; i < MidiControllerCount; ++i)
 	{
-		m_midiCCModel[i] = new FloatModel(0.0f, 0.0f, 127.0f, 1.0f, NULL, QString("CC Controller ") + QString::number(i));
+		m_midiCCModel[i] = new FloatModel(
+			0.0f, 0.0f, 127.0f, 1.0f,
+			nullptr, QString("CC Controller ") + QString::number(i)
+		);
+
 		connect(m_midiCCModel[i], &FloatModel::dataChanged,
 			this, [this, i]{ processCCEvent(i); }, Qt::DirectConnection);
 	}
@@ -286,7 +290,7 @@ void InstrumentTrack::processCCEvent(int controller)
 
 void InstrumentTrack::processInEvent( const MidiEvent& event, const MidiTime& time, f_cnt_t offset )
 {
-	if(Engine::getSong()->isExporting() && event.ignoreOnExport())
+	if (Engine::getSong()->isExporting() && event.ignoreOnExport())
 	{
 		return;
 	}
@@ -417,7 +421,7 @@ void InstrumentTrack::processInEvent( const MidiEvent& event, const MidiTime& ti
 
 	// If the event wasn't handled, check if there's a loaded instrument and if so send the
 	// event to it. If it returns false means the instrument didn't handle the event, so we trigger a warning.
-	if(eventHandled == false && !(instrument() && instrument()->handleMidiEvent(event, time, offset)))
+	if (eventHandled == false && !(instrument() && instrument()->handleMidiEvent(event, time, offset)))
 	{
 		qWarning("InstrumentTrack: unhandled MIDI event %d", event.type());
 	}
@@ -1065,7 +1069,7 @@ InstrumentTrackView::InstrumentTrackView( InstrumentTrack * _it, TrackContainerV
 	m_panningKnob = new Knob( knobSmall_17, getTrackSettingsWidget(),
 							tr( "Panning" ) );
 	m_panningKnob->setModel( &_it->m_panningModel );
-	m_panningKnob->setHintText( tr( "Panning:" ), "%" );
+	m_panningKnob->setHintText(tr("Panning:"), "%");
 	m_panningKnob->move( widgetWidth-24, 2 );
 	m_panningKnob->setLabel( tr( "PAN" ) );
 	m_panningKnob->show();

@@ -218,9 +218,10 @@ private:
 
 	const char* m_sysExData;
 	const void* m_sourcePort;
-	bool m_ignoreOnExport;	// Should we ignore this MIDI event when exporting a project?
-				// This helps us ignoring MIDI events that shouldn't be processed
-				// during a project export, like physical controller events.
+
+	// This helps us ignore MIDI events that shouldn't be processed
+	// during a project export, like physical controller events.
+	bool m_ignoreOnExport;
 } ;
 
 #endif

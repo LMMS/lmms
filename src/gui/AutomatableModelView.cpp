@@ -148,7 +148,7 @@ void AutomatableModelView::unsetModel()
 {
 	if (dynamic_cast<FloatModelView*>(this))
 	{
-		setModel(new FloatModel( 0, 0, 0, 1, nullptr, QString(), true));
+		setModel(new FloatModel(0, 0, 0, 1, nullptr, QString(), true));
 	}
 	else if (dynamic_cast<IntModelView*>(this))
 	{
