@@ -532,11 +532,11 @@ void ConfigManager::loadConfigFile(const QString & configFile)
 		// Look for bundled raw waves first
 		m_stkDir = qApp->applicationDirPath() + "/../share/stk/rawwaves/";
 		// Try system installations if not exists
-		if (!QDir(m_stkDir.exists()))
+		if (!QDir(m_stkDir).exists())
 		{
 			m_stkDir = "/usr/local/share/stk/rawwaves/";
 		}
-		if (!QDir(m_stkDir.exists()))
+		if (!QDir(m_stkDir).exists())
 		{
 			m_stkDir = "/usr/share/stk/rawwaves/";
 		}
