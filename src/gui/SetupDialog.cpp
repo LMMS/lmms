@@ -104,6 +104,8 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 			"ui", "oneinstrumenttrackwindow").toInt()),
 	m_sideBarOnRight(ConfigManager::inst()->value(
 			"ui", "sidebaronright").toInt()),
+	m_letPreviewsFinish(ConfigManager::inst()->value(
+			"ui", "letpreviewsfinish").toInt()),
 	m_soloLegacyBehavior(ConfigManager::inst()->value(
 			"app", "sololegacybehavior", "0").toInt()),
 	m_MMPZ(!ConfigManager::inst()->value(
@@ -237,6 +239,8 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 		m_oneInstrumentTrackWindow, SLOT(toggleOneInstrumentTrackWindow(bool)), true);
 	addLedCheckBox(tr("Show sidebar on the right-hand side"), gui_tw, counter,
 		m_sideBarOnRight, SLOT(toggleSideBarOnRight(bool)), true);
+	addLedCheckBox(tr("Let sample previews continue when mouse is released"), gui_tw, counter,
+		m_letPreviewsFinish, SLOT(toggleLetPreviewsFinish(bool)), false);
 	addLedCheckBox(tr("Mute automation tracks during solo"), gui_tw, counter,
 		m_soloLegacyBehavior, SLOT(toggleSoloLegacyBehavior(bool)), false);
 
@@ -466,7 +470,7 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	as_w_layout->setMargin(0);
 
 #ifdef LMMS_HAVE_JACK
-	m_audioIfaceSetupWidgets[AudioJack::name()] = 
+	m_audioIfaceSetupWidgets[AudioJack::name()] =
 			new AudioJack::setupWidget(as_w);
 #endif
 
@@ -911,6 +915,8 @@ void SetupDialog::accept()
 					QString::number(m_oneInstrumentTrackWindow));
 	ConfigManager::inst()->setValue("ui", "sidebaronright",
 					QString::number(m_sideBarOnRight));
+	ConfigManager::inst()->setValue("ui", "letpreviewsfinish",
+					QString::number(m_letPreviewsFinish));
 	ConfigManager::inst()->setValue("app", "sololegacybehavior",
 					QString::number(m_soloLegacyBehavior));
 	ConfigManager::inst()->setValue("app", "nommpz",
@@ -1022,6 +1028,12 @@ void SetupDialog::toggleOneInstrumentTrackWindow(bool enabled)
 void SetupDialog::toggleSideBarOnRight(bool enabled)
 {
 	m_sideBarOnRight = enabled;
+}
+
+
+void SetupDialog::toggleLetPreviewsFinish(bool enabled)
+{
+	m_letPreviewsFinish = enabled;
 }
 
 
