@@ -44,6 +44,8 @@
 
 #include "plugin_export.h"
 
+#define WAVETABLE_SIZE 200
+
 extern "C"
 {
 
@@ -72,8 +74,8 @@ bSynth::bSynth( float * _shape, NotePlayHandle * _nph, bool _interpolation,
 	sample_rate( _sample_rate ),
 	interpolation( _interpolation)
 {
-	sample_shape = new float[200];
-	for (int i=0; i < 200; ++i)
+	sample_shape = new float[WAVETABLE_SIZE];
+	for (int i=0; i < WAVETABLE_SIZE; ++i)
 	{
 		sample_shape[i] = _shape[i] * _factor;
 	}
@@ -138,8 +140,8 @@ sample_t bSynth::nextStringSample( float sample_length )
 
 bitInvader::bitInvader( InstrumentTrack * _instrument_track ) :
 	Instrument( _instrument_track, &bitinvader_plugin_descriptor ),
-	m_sampleLength( 128, 4, 200, 1, this, tr( "Sample length" ) ),
-	m_graph( -1.0f, 1.0f, 200, this ),
+	m_sampleLength( 128, 4, WAVETABLE_SIZE, 1, this, tr( "Sample length" ) ),
+	m_graph( -1.0f, 1.0f, WAVETABLE_SIZE, this ),
 	m_interpolation( false, this ),
 	m_normalize( false, this )
 {
