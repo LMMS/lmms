@@ -1223,9 +1223,6 @@ void InstrumentTrackView::freeInstrumentTrackWindow()
 			model()->setHook( NULL );
 			m_window->setInstrumentTrackView( NULL );
 			m_window->parentWidget()->hide();
-			//m_window->setModel(
-			//	engine::dummyTrackContainer()->
-			//			dummyInstrumentTrack() );
 			m_window->updateInstrumentView();
 			s_windowCache << m_window;
 		}

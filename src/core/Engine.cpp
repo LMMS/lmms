@@ -47,7 +47,6 @@ Lv2Manager * LmmsCore::s_lv2Manager = nullptr;
 #endif
 Ladspa2LMMS * LmmsCore::s_ladspaManager = NULL;
 void* LmmsCore::s_dndPluginKey = nullptr;
-DummyTrackContainer * LmmsCore::s_dummyTC = NULL;
 
 
 
@@ -79,7 +78,6 @@ void LmmsCore::init( bool renderOnly )
 	s_mixer->initDevices();
 
 	PresetPreviewPlayHandle::init();
-	s_dummyTC = new DummyTrackContainer;
 
 	emit engine->initProgress(tr("Launching mixer threads"));
 	s_mixer->startProcessing();
@@ -98,7 +96,6 @@ void LmmsCore::destroy()
 	s_song->clearProject();
 
 	deleteHelper( &s_bbTrackContainer );
-	deleteHelper( &s_dummyTC );
 
 	deleteHelper( &s_fxMixer );
 	deleteHelper( &s_mixer );
