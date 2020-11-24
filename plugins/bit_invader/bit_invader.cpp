@@ -180,7 +180,7 @@ void bitInvader::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	// Save sample shape base64-encoded
 	QString sampleString;
 	base64::encode( (const char *)m_graph.samples(),
-		m_graph.length() * sizeof(float), sampleString );
+		WAVETABLE_SIZE * sizeof(float), sampleString );
 	_this.setAttribute( "sampleShape", sampleString );
 	
 
