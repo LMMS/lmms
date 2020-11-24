@@ -130,7 +130,7 @@ MainWindow::MainWindow() :
 					embed::getIconPixmap( "project_file" ).transformed( QTransform().rotate( 90 ) ),
 							splitter, false, true,
 				confMgr->userProjectsDir(),
-				confMgr->factoryProjectsDir() ) );
+				confMgr->factoryProjectsDir()));
 	sideBar->appendTab( new FileBrowser(
 				confMgr->userSamplesDir() + "*" +
 				confMgr->factorySamplesDir(),
@@ -147,7 +147,7 @@ MainWindow::MainWindow() :
 					embed::getIconPixmap( "preset_file" ).transformed( QTransform().rotate( 90 ) ),
 							splitter , false, true,
 				confMgr->userPresetsDir(),
-				confMgr->factoryPresetsDir()) );
+				confMgr->factoryPresetsDir()));
 	sideBar->appendTab( new FileBrowser( QDir::homePath(), "*",
 							tr( "My Home" ),
 					embed::getIconPixmap( "home" ).transformed( QTransform().rotate( 90 ) ),
