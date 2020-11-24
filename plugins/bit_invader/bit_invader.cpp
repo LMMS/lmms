@@ -44,7 +44,7 @@
 
 #include "plugin_export.h"
 
-#define WAVETABLE_SIZE 200
+static const size_t wavetableSize = 200;
 
 extern "C"
 {
@@ -74,8 +74,8 @@ bSynth::bSynth( float * _shape, NotePlayHandle * _nph, bool _interpolation,
 	sample_rate( _sample_rate ),
 	interpolation( _interpolation)
 {
-	sample_shape = new float[WAVETABLE_SIZE];
-	for (int i=0; i < WAVETABLE_SIZE; ++i)
+	sample_shape = new float[wavetableSize];
+	for (int i=0; i < wavetableSize; ++i)
 	{
 		sample_shape[i] = _shape[i] * _factor;
 	}
@@ -140,8 +140,8 @@ sample_t bSynth::nextStringSample( float sample_length )
 
 bitInvader::bitInvader( InstrumentTrack * _instrument_track ) :
 	Instrument( _instrument_track, &bitinvader_plugin_descriptor ),
-	m_sampleLength(128, 4, WAVETABLE_SIZE, 1, this, tr("Sample length")),
-	m_graph(-1.0f, 1.0f, WAVETABLE_SIZE, this),
+	m_sampleLength(128, 4, wavetableSize, 1, this, tr("Sample length")),
+	m_graph(-1.0f, 1.0f, wavetableSize, this),
 	m_interpolation( false, this ),
 	m_normalize( false, this )
 {
@@ -180,7 +180,7 @@ void bitInvader::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	// Save sample shape base64-encoded
 	QString sampleString;
 	base64::encode((const char *)m_graph.samples(),
-		WAVETABLE_SIZE * sizeof(float), sampleString);
+		wavetableSize * sizeof(float), sampleString);
 	_this.setAttribute( "sampleShape", sampleString );
 	
 
@@ -245,7 +245,7 @@ void bitInvader::samplesChanged( int _begin, int _end )
 void bitInvader::normalize()
 {
 	// analyze
-	float max = 0.0001f;
+	float max = std::numeric_limits<float>::epsilon();
 	const float* samples = m_graph.samples();
 	for(int i=0; i < m_graph.length(); i++)
 	{
