@@ -34,6 +34,7 @@
 #include "Track.h"
 #include "JournallingObject.h"
 #include "InstrumentTrack.h"
+#include "Rubberband.h"
 
 
 class QVBoxLayout;

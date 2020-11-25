@@ -26,8 +26,10 @@
 #ifndef BB_EDITOR_H
 #define BB_EDITOR_H
 
+
 #include "Editor.h"
 #include "TrackContainerView.h"
+#include "TrackContentObjectView.h"
 
 
 class BBTrackContainer;

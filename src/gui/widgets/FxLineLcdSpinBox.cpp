@@ -28,6 +28,7 @@
 #include "FxMixerView.h"
 #include "GuiApplication.h"
 #include "Track.h"
+#include "TrackView.h"
 
 void FxLineLcdSpinBox::setTrackView(TrackView * tv)
 {

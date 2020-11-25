@@ -31,7 +31,8 @@
 #include <QtCore/QMap>
 #include <QStaticText>
 
-#include "Track.h"
+#include "TrackContentObjectView.h"
+#include "TrackView.h"
 
 class TrackLabelButton;
 class TrackContainer;

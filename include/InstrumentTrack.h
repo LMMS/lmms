@@ -38,6 +38,7 @@
 #include "Pitch.h"
 #include "Plugin.h"
 #include "Track.h"
+#include "TrackView.h"
 
 
 

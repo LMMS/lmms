@@ -34,16 +34,10 @@
 
 
 #include "Note.h"
-#include "Track.h"
+#include "TrackContentObjectView.h"
 
-
-class QAction;
-class QProgressBar;
-class QPushButton;
 
 class InstrumentTrack;
-class SampleBuffer;
-
 
 
 class LMMS_EXPORT Pattern : public TrackContentObject
