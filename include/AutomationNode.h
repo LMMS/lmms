@@ -30,6 +30,8 @@
 #define INVAL(x) ((x).value().getInValue())
 #define OUTVAL(x) ((x).value().getOutValue())
 #define OFFSET(x) ((x).value().getValueOffset())
+#define INTAN(x) ((x).value().getInTangent())
+#define OUTTAN(x) ((x).value().getOutTangent())
 #define POS(x) ((x).key())
 
 class AutomationPattern;

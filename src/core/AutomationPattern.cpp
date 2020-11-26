@@ -506,8 +506,8 @@ float AutomationPattern::valueAt( timeMap::const_iterator v, int offset ) const
 		// tangents _m1 and _m2
 		int numValues = (POS(v + 1) - POS(v));
 		float t = (float) offset / (float) numValues;
-		float m1 = v.value().getOutTangent() * numValues * m_tension;
-		float m2 = (v + 1).value().getInTangent() * numValues * m_tension;
+		float m1 = OUTTAN(v) * numValues * m_tension;
+		float m2 = INTAN(v + 1) * numValues * m_tension;
 
 		auto t2 = pow(t, 2);
 		auto t3 = pow(t, 3);
