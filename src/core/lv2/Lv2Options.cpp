@@ -81,6 +81,7 @@ void Lv2Options::initOption(LV2_URID key, uint32_t size, LV2_URID type,
 	opt.subject = subject;
 	opt.size = size;
 	opt.type = type;
+	opt.value = value.get();
 
 	const auto optResult = m_optionByUrid.emplace(key, opt);
 	const auto valResult = m_optionValues.emplace(key, std::move(value));
