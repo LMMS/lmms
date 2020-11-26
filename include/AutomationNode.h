@@ -29,6 +29,7 @@
 // MACROs to help handling automation nodes
 #define INVAL(x) ((x).value().getInValue())
 #define OUTVAL(x) ((x).value().getOutValue())
+#define OFFSET(x) ((x).value().getValueOffset())
 #define POS(x) ((x).key())
 
 class AutomationPattern;
@@ -85,6 +86,14 @@ public:
 	inline const float getValueOffset() const
 	{
 		return m_outValue - m_inValue;
+	}
+
+	/**
+	 * @brief Resets the outValue so it matches inValue
+	 */
+	inline void resetOutValue()
+	{
+		m_outValue = m_inValue;
 	}
 
 	/**

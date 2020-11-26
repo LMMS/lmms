@@ -558,7 +558,7 @@ void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 
 					m_action = ERASE_VALUES;
 				}
-				else if(m_mouseDownRight) // And right click resets outValues
+				else if (m_mouseDownRight) // And right click resets outValues
 				{
 					// If we clicked an outValue reset it
 					if (clickedNode != tm.end())
@@ -620,7 +620,7 @@ void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 					// If we clicked an outValue reset it
 					if (clickedNode != tm.end())
 					{
-						clickedNode.value().setOutValue(INVAL(clickedNode));
+						clickedNode.value().resetOutValue();
 						Engine::getSong()->setModified();
 					}
 
@@ -740,7 +740,7 @@ void AutomationEditor::resetNodes(int tick0, int tick1)
 	{
 		if (POS(it) > end) { return; }
 
-		it.value().setOutValue(INVAL(it));
+		it.value().resetOutValue();
 		++it;
 	}
 }
@@ -779,7 +779,7 @@ void AutomationEditor::mouseMoveEvent(QMouseEvent * mouseEvent )
 						// When we clicked the node, we might have clicked slightly off
 						// so we account for that offset for a smooth drag
 						x -= m_moveXOffset;
-						posTicks = (x * MidiTime::ticksPerBar()/m_ppb) + m_currentPosition;
+						posTicks = (x * MidiTime::ticksPerBar() / m_ppb) + m_currentPosition;
 
 						// If we moved the mouse past the beginning correct the position in ticks
 						posTicks = qMax(posTicks, 0);

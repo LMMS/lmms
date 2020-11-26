@@ -26,6 +26,7 @@
 #define INLINE_AUTOMATION_H
 
 #include "AutomationPattern.h"
+#include "AutomationNode.h"
 #include "shared_object.h"
 
 
@@ -53,12 +54,17 @@ public:
 	{
 		if( m_autoPattern != NULL && m_autoPattern->getTimeMap().isEmpty() == false )
 		{
-			// prevent saving inline automation if there's just one value which equals value
-			// of model which is going to be saved anyways
+			// Prevent saving inline automation if there's just one node at the beginning of
+			// the pattern, which has a InValue equal to the value of model (which is going
+			// to be saved anyways) and no offset between the InValue and OutValue
+			AutomationPattern::timeMap::const_iterator firstNode =
+				m_autoPattern->getTimeMap().begin();
+
 			if (isAtInitValue() &&
 				m_autoPattern->getTimeMap().size() == 1 &&
-				m_autoPattern->getTimeMap().begin().key() == 0 &&
-				m_autoPattern->getTimeMap().begin().value().getInValue() == value())
+				POS(firstNode) == 0 &&
+				INVAL(firstNode) == value() &&
+				OFFSET(firstNode) == 0)
 			{
 				return false;
 			}

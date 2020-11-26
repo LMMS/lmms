@@ -246,6 +246,9 @@ MidiTime AutomationPattern::putValue(const MidiTime & time,
 	// quantization value. Control Key to override
 	if (!ignoreSurroundingPoints)
 	{
+		// TODO: This loop can be optimized by going through the nodes
+		// between the quantized times instead of calling removeValue
+		// for each tick even when there are no nodes there.
 		for (int i = newTime + 1; i < newTime + quantization(); ++i)
 		{
 			AutomationPattern::removeValue(i);
@@ -298,6 +301,9 @@ MidiTime AutomationPattern::putValues(const MidiTime & time,
 	// quantization value. Control Key to override
 	if (!ignoreSurroundingPoints)
 	{
+		// TODO: This loop can be optimized by going through the nodes
+		// between the quantized times instead of calling removeValue
+		// for each tick even when there are no nodes there.
 		for (int i = newTime + 1; i < newTime + quantization(); ++i)
 		{
 			AutomationPattern::removeValue(i);
@@ -388,7 +394,7 @@ MidiTime AutomationPattern::setDragValue(const MidiTime & time,
 		timeMap::iterator it = m_timeMap.find(newTime);
 		if (it != m_timeMap.end())
 		{
-			if (it.value().getValueOffset() != 0)
+			if (OFFSET(it) != 0)
 			{
 				m_dragKeepOutValue = true;
 				m_dragOutValue = OUTVAL(it);
@@ -445,8 +451,9 @@ float AutomationPattern::valueAt( const MidiTime & _time ) const
 		return m_timeMap[_time].getInValue();
 	}
 
-	// lowerBound returns next value with greater key, therefore we take
-	// the previous element to get the current value
+	// lowerBound returns next value with equal or greater key. Since we already
+	// checked if the key contains a node, we know the returned node has a greater
+	// key than _time. Therefore we take the previous element to calculate the current value
 	timeMap::const_iterator v = m_timeMap.lowerBound(_time);
 
 	if( v == m_timeMap.begin() )
@@ -466,10 +473,7 @@ float AutomationPattern::valueAt( const MidiTime & _time ) const
 
 
 // This method will get the value at an offset from a node, so we use the outValue of
-// that node and the inValue of the next node to the calculations. This assumes that offset
-// will not be zero, because when the midi time given to AutomationPattern::valueAt(MidiTime)
-// matches a node's position, that node's value will be returned and this method won't be even
-// called.
+// that node and the inValue of the next node for the calculations.
 float AutomationPattern::valueAt( timeMap::const_iterator v, int offset ) const
 {
 	QMutexLocker m(&m_patternMutex);
@@ -481,7 +485,7 @@ float AutomationPattern::valueAt( timeMap::const_iterator v, int offset ) const
 		return INVAL(v);
 	}
 
-	if( m_progressionType == DiscreteProgression || v == m_timeMap.end() )
+	if (m_progressionType == DiscreteProgression)
 	{
 		return OUTVAL(v);
 	}
@@ -548,7 +552,7 @@ void AutomationPattern::flipY(int min, int max)
 
 	timeMap::iterator it = m_timeMap.lowerBound(0);
 
-	if (it == m_timeMap.end()) return;
+	if (it == m_timeMap.end()) { return; }
 
 	float tempValue = 0;
 	float outValueOffset = 0;
@@ -562,7 +566,7 @@ void AutomationPattern::flipY(int min, int max)
 		else
 		{
 			tempValue = max - valueAt(POS(it));
-			outValueOffset = it.value().getValueOffset() * -1.0;
+			outValueOffset = OFFSET(it) * -1.0;
 			putValues(MidiTime(POS(it)), tempValue, tempValue + outValueOffset, false, true);
 		}
 		++it;
@@ -589,7 +593,7 @@ void AutomationPattern::flipX(int length)
 
 	timeMap::const_iterator it = m_timeMap.lowerBound(0);
 
-	if (it == m_timeMap.end()) return;
+	if (it == m_timeMap.end()) { return; }
 
 	// Temporary map where we will store the flipped version
 	// of our pattern
@@ -611,13 +615,13 @@ void AutomationPattern::flipX(int length)
 		{
 			// We are flipping an area that goes beyond the last node. So we add a node to the
 			// beginning of the flipped timeMap representing the value of the end of the area
-			tempValue = valueAt(realLength);
+			tempValue = valueAt(length);
 			tempMap[0] = AutomationNode(this, tempValue, 0);
 
 			// Now flip the nodes we have in relation to the length
 			do
 			{
-				tempValue = valueAt(POS(it));
+				tempValue = INVAL(it);
 				tempOutValue = OUTVAL(it);
 				MidiTime newTime = MidiTime(length - POS(it));
 
@@ -630,7 +634,7 @@ void AutomationPattern::flipX(int length)
 		{
 			do
 			{
-				tempValue = valueAt(POS(it));
+				tempValue = INVAL(it);
 				tempOutValue = OUTVAL(it);
 				MidiTime newTime;
 
@@ -647,7 +651,7 @@ void AutomationPattern::flipX(int length)
 	{
 		do
 		{
-			tempValue = valueAt(POS(it));
+			tempValue = INVAL(it);
 			tempOutValue = OUTVAL(it);
 
 			MidiTime newTime = MidiTime(realLength - POS(it));
@@ -832,7 +836,7 @@ bool AutomationPattern::isAutomated( const AutomatableModel * _m )
 
 
 /**
- * @brief returns a list of all the automation patterns everywhere that are connected to a specific model
+ * @brief returns a list of all the automation patterns that are connected to a specific model
  * @param _m the model we want to look for
  */
 QVector<AutomationPattern *> AutomationPattern::patternsForModel( const AutomatableModel * _m )
