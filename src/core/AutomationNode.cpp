@@ -24,7 +24,6 @@
  */
 
 #include "AutomationNode.h"
-
 #include "AutomationPattern.h"
 
 
@@ -73,10 +72,7 @@ void AutomationNode::setInValue(float value)
 	// Get an iterator pointing to this node
 	AutomationPattern::timeMap::iterator it = tm.lowerBound(m_pos);
 	// If it's not the first node, get the one immediately behind it
-	if (it != tm.begin())
-	{
-		--it;
-	}
+	if (it != tm.begin()) { --it; }
 
 	// Generate tangents from the previously, current and next nodes
 	m_pattern->generateTangents(it, 3);
@@ -96,10 +92,7 @@ void AutomationNode::setOutValue(float value)
 	// Get an iterator pointing to this node
 	AutomationPattern::timeMap::iterator it = tm.lowerBound(m_pos);
 	// If it's not the first node, get the one immediately behind it
-	if (it != tm.begin())
-	{
-		--it;
-	}
+	if (it != tm.begin()) { --it; }
 
 	// Generate tangents from the previously, current and next nodes
 	m_pattern->generateTangents(it, 3);

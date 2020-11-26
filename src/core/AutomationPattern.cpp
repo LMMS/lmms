@@ -226,10 +226,12 @@ void AutomationPattern::updateLength()
  * @param Boolean True to ignore unquantized surrounding nodes (defaults to true)
  * @return MidiTime of the recently added automation node
  */
-MidiTime AutomationPattern::putValue(const MidiTime & time,
-					const float value,
-					const bool quantPos,
-					const bool ignoreSurroundingPoints)
+MidiTime AutomationPattern::putValue(
+	const MidiTime & time,
+	const float value,
+	const bool quantPos,
+	const bool ignoreSurroundingPoints
+)
 {
 	QMutexLocker m(&m_patternMutex);
 
@@ -254,10 +256,7 @@ MidiTime AutomationPattern::putValue(const MidiTime & time,
 			AutomationPattern::removeValue(i);
 		}
 	}
-	if (it != m_timeMap.begin())
-	{
-		--it;
-	}
+	if (it != m_timeMap.begin()) { --it; }
 	generateTangents(it, 3);
 
 	updateLength();
@@ -280,11 +279,13 @@ MidiTime AutomationPattern::putValue(const MidiTime & time,
  * @param Boolean True to ignore unquantized surrounding nodes (defaults to true)
  * @return MidiTime of the recently added automation node
  */
-MidiTime AutomationPattern::putValues(const MidiTime & time,
-					const float inValue,
-					const float outValue,
-					const bool quantPos,
-					const bool ignoreSurroundingPoints)
+MidiTime AutomationPattern::putValues(
+	const MidiTime & time,
+	const float inValue,
+	const float outValue,
+	const bool quantPos,
+	const bool ignoreSurroundingPoints
+)
 {
 	QMutexLocker m(&m_patternMutex);
 
@@ -309,10 +310,7 @@ MidiTime AutomationPattern::putValues(const MidiTime & time,
 			AutomationPattern::removeValue(i);
 		}
 	}
-	if (it != m_timeMap.begin())
-	{
-		--it;
-	}
+	if (it != m_timeMap.begin()) { --it; }
 	generateTangents(it, 3);
 
 	updateLength();
@@ -374,10 +372,12 @@ void AutomationPattern::recordValue(MidiTime time, float value)
  * @param Boolean. True to ignore unquantized surrounding nodes
  * @return MidiTime with current time of the dragged value
  */
-MidiTime AutomationPattern::setDragValue(const MidiTime & time,
-						const float value,
-						const bool quantPos,
-						const bool controlKey)
+MidiTime AutomationPattern::setDragValue(
+	const MidiTime & time,
+	const float value,
+	const bool quantPos,
+	const bool controlKey
+)
 {
 	QMutexLocker m(&m_patternMutex);
 
@@ -480,10 +480,7 @@ float AutomationPattern::valueAt( timeMap::const_iterator v, int offset ) const
 
 	// We never use it with offset 0, but doesn't hurt to return a correct
 	// value if we do
-	if (offset == 0)
-	{
-		return INVAL(v);
-	}
+	if (offset == 0) { return INVAL(v); }
 
 	if (m_progressionType == DiscreteProgression)
 	{
@@ -512,10 +509,12 @@ float AutomationPattern::valueAt( timeMap::const_iterator v, int offset ) const
 		float m1 = v.value().getOutTangent() * numValues * m_tension;
 		float m2 = (v + 1).value().getInTangent() * numValues * m_tension;
 
-		return (2 * pow(t,3) - 3 * pow(t,2) + 1) * OUTVAL(v)
-			+ (pow(t,3) - 2 * pow(t,2) + t) * m1
-			+ (-2 * pow(t,3) + 3 * pow(t,2)) * INVAL(v + 1)
-			+ (pow(t,3) - pow(t,2)) * m2;
+		auto t2 = pow(t, 2);
+		auto t3 = pow(t, 3);
+		return (2 * t3 - 3 * t2 + 1) * OUTVAL(v)
+			+ (t3 - 2 * t2 + t) * m1
+			+ (-2 * t3 + 3 * t2) * INVAL(v + 1)
+			+ (t3 - t2) * m2;
 	}
 }
 
@@ -1061,8 +1060,7 @@ void AutomationPattern::generateTangents(timeMap::iterator it, int numToGenerate
 		{
 			// On the first node there's no curve behind it, so we will only calculate the outTangent
 			// and inTangent will be set to 0.
-			float tangent = (INVAL(it + 1) - OUTVAL(it)) /
-				(POS(it + 1) - POS(it));
+			float tangent = (INVAL(it + 1) - OUTVAL(it)) / (POS(it + 1) - POS(it));
 			it.value().setInTangent(0);
 			it.value().setOutTangent(tangent);
 		}
@@ -1084,8 +1082,7 @@ void AutomationPattern::generateTangents(timeMap::iterator it, int numToGenerate
 			float outTangent;
 			if (INVAL(it) == OUTVAL(it))
 			{
-				inTangent = (INVAL(it + 1) - OUTVAL(it - 1)) /
-					(POS(it + 1) - POS(it - 1));
+				inTangent = (INVAL(it + 1) - OUTVAL(it - 1)) / (POS(it + 1) - POS(it - 1));
 				it.value().setInTangent(inTangent);
 				// inTangent == outTangent in this case
 				it.value().setOutTangent(inTangent);
@@ -1093,11 +1090,9 @@ void AutomationPattern::generateTangents(timeMap::iterator it, int numToGenerate
 			else
 			{
 				// Calculate the left side of the curve
-				inTangent = (INVAL(it) - OUTVAL(it - 1)) /
-					(POS(it) - POS(it - 1));
+				inTangent = (INVAL(it) - OUTVAL(it - 1)) / (POS(it) - POS(it - 1));
 				// Calculate the right side of the curve
-				outTangent = (INVAL(it + 1) - OUTVAL(it)) /
-					(POS(it + 1) - POS(it));
+				outTangent = (INVAL(it + 1) - OUTVAL(it)) / (POS(it + 1) - POS(it));
 				it.value().setInTangent(inTangent);
 				it.value().setOutTangent(outTangent);
 			}

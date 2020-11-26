@@ -149,7 +149,7 @@ private:
 	// outValue are equal, inTangent and outTangent are equal too.
 	float m_inTangent;
 	float m_outTangent;
-} ;
+};
 
 
 #endif

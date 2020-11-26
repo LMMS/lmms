@@ -60,11 +60,11 @@ public:
 			AutomationPattern::timeMap::const_iterator firstNode =
 				m_autoPattern->getTimeMap().begin();
 
-			if (isAtInitValue() &&
-				m_autoPattern->getTimeMap().size() == 1 &&
-				POS(firstNode) == 0 &&
-				INVAL(firstNode) == value() &&
-				OFFSET(firstNode) == 0)
+			if (isAtInitValue()
+				&& m_autoPattern->getTimeMap().size() == 1
+				&& POS(firstNode) == 0
+				&& INVAL(firstNode) == value()
+				&& OFFSET(firstNode) == 0)
 			{
 				return false;
 			}

@@ -434,7 +434,7 @@ void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 		int x = mouseEvent->x() - VALUES_WIDTH;
 
 		// Get tick in which the user clicked
-		int posTicks = (x * MidiTime::ticksPerBar()/m_ppb) + m_currentPosition;
+		int posTicks = (x * MidiTime::ticksPerBar() / m_ppb) + m_currentPosition;
 
 		// Get the time map of current pattern
 		timeMap & tm = m_pattern->getTimeMap();
@@ -483,8 +483,12 @@ void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 							MidiTime valuePos(posTicks);
 
 							// Starts actually moving/draging the node
-							MidiTime newTime = m_pattern->setDragValue(valuePos,
-								level, true, mouseEvent->modifiers() & Qt::ControlModifier);
+							MidiTime newTime = m_pattern->setDragValue(
+								valuePos,
+								level,
+								true,
+								mouseEvent->modifiers() & Qt::ControlModifier
+							);
 
 							// Set the iterator to our newly created node so we can use it later
 							// for the m_moveXOffset calculation
@@ -493,8 +497,12 @@ void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 						else // If we clicked over an existing node
 						{
 							// Simply start moving/draging it
-							MidiTime newTime = m_pattern->setDragValue(MidiTime(POS(clickedNode)),
-								level, true, mouseEvent->modifiers() & Qt::ControlModifier);
+							MidiTime newTime = m_pattern->setDragValue(
+								MidiTime(POS(clickedNode)),
+								level,
+								true,
+								mouseEvent->modifiers() & Qt::ControlModifier
+							);
 
 							// We need to update our iterator because setDragValue removes the node that
 							// is being dragged, so if we don't update it we have a bogus iterator
@@ -506,8 +514,7 @@ void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 
 						// Calculate the offset from the place the mouse click happened in comparison
 						// to the center of the node
-						int alignedX = (int) ((float) ((POS(clickedNode) - m_currentPosition) * m_ppb) /
-									MidiTime::ticksPerBar());
+						int alignedX = (POS(clickedNode) - m_currentPosition) * m_ppb / MidiTime::ticksPerBar();
 						m_moveXOffset = x - alignedX - 1;
 
 						// Set move-cursor
@@ -671,10 +678,7 @@ void AutomationEditor::mouseReleaseEvent(QMouseEvent * mouseEvent )
 
 	m_action = NONE;
 
-	if (mustRepaint)
-	{
-		repaint();
-	}
+	if (mustRepaint) { repaint(); }
 }
 
 
@@ -765,7 +769,7 @@ void AutomationEditor::mouseMoveEvent(QMouseEvent * mouseEvent )
 		int x = mouseEvent->x() - VALUES_WIDTH;
 
 		// Get the X position in ticks
-		int posTicks = (x * MidiTime::ticksPerBar()/m_ppb) + m_currentPosition;
+		int posTicks = (x * MidiTime::ticksPerBar() / m_ppb) + m_currentPosition;
 
 		switch(m_editMode)
 		{
@@ -788,8 +792,12 @@ void AutomationEditor::mouseMoveEvent(QMouseEvent * mouseEvent )
 						m_drawLastLevel = level;
 
 						// Updates the drag value of the moved node
-						m_pattern->setDragValue(MidiTime(posTicks),
-							level, true, mouseEvent->modifiers() & Qt::ControlModifier);
+						m_pattern->setDragValue(
+							MidiTime(posTicks),
+							level,
+							true,
+							mouseEvent->modifiers() & Qt::ControlModifier
+						);
 
 						Engine::getSong()->setModified();
 					}
