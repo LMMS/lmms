@@ -59,7 +59,8 @@ const std::vector<DataFile::UpgradeMethod> DataFile::UPGRADE_METHODS = {
 	&DataFile::upgrade_0_4_0_beta1      ,   &DataFile::upgrade_0_4_0_rc2,
 	&DataFile::upgrade_1_0_99           ,   &DataFile::upgrade_1_1_0,
 	&DataFile::upgrade_1_1_91           ,   &DataFile::upgrade_1_2_0_rc3,
-	&DataFile::upgrade_1_3_0            ,   &DataFile::upgrade_noHiddenClipNames
+	&DataFile::upgrade_1_3_0            ,   &DataFile::upgrade_noHiddenClipNames,
+	&DataFile::upgrade_extendedNoteRange
 };
 
 // Vector of all versions that have upgrade routines.
@@ -1048,18 +1049,6 @@ void DataFile::upgrade_1_3_0()
 				child.setTagName( "opulenz" );
 			}
 		}
-		else if (
-			el.attribute("name") == "zynaddsubfx" ||
-			el.attribute("name") == "vestige" ||
-			el.attribute("name") == "carlapatchbay" ||
-			el.attribute("name") == "carlarack")
-		{
-			// LMMS note range has been extended to match MIDI spec. -> base note changed from 57 to 69.
-			// Affects all MIDI-based instruments except OpulenZ.
-			el.parentNode().toElement().setAttribute(
-				"basenote",
-				el.parentNode().toElement().attribute("basenote").toInt() + 12);
-		}
 	}
 
 	list = elementsByTagName( "effect" );
@@ -1393,6 +1382,43 @@ void DataFile::upgrade_noHiddenClipNames()
 		clearDefaultNames(instClips, trackName);
 		clearDefaultNames(autoClips, trackName);
 		clearDefaultNames(bbClips, trackName);
+	}
+}
+
+
+/** \brief Note range has been extended to match MIDI specification
+ *
+ * Default base note number changed from 57 to 69. To ensure that patterns
+ * copied to a new instrument instance sound correctly, the adjusment is
+ * are adjusted instead of just shifting the instrument base note.
+ * Affects all MIDI-based instruments except OpulenZ.
+ */
+void DataFile::upgrade_extendedNoteRange()
+{
+	QDomNodeList tracks = elementsByTagName("track");
+	for (int i = 0; !tracks.item(i).isNull(); i++)
+	{
+		QDomNodeList instruments = tracks.item(i).toElement().elementsByTagName("instrument");
+		if (instruments.isEmpty()) {continue;}
+		QDomElement instrument = instruments.item(0).toElement();
+		if (instrument.attribute("name") == "zynaddsubfx" ||
+			instrument.attribute("name") == "vestige" ||
+			instrument.attribute("name") == "carlapatchbay" ||
+			instrument.attribute("name") == "carlarack")
+		{
+			QDomNodeList patterns = tracks.item(i).toElement().elementsByTagName("pattern");
+			for (int i = 0; !patterns.item(i).isNull(); i++)
+			{
+				QDomNodeList notes = patterns.item(i).toElement().elementsByTagName("note");
+				for (int i = 0; !notes.item(i).isNull(); i++)
+				{
+					notes.item(i).toElement().setAttribute(
+						"key",
+						notes.item(i).toElement().attribute("key").toInt() - 12
+					);
+				}
+			}
+		}
 	}
 }
 
