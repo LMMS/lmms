@@ -209,8 +209,9 @@ void bitInvader::loadSettings( const QDomElement & _this )
 	char * dst = 0;
 	base64::decode( _this.attribute( "sampleShape"), &dst, &size );
 
-	m_graph.setLength( sampleLength );
-	m_graph.setSamples( (float*) dst );
+	m_graph.setLength(size / sizeof(float));
+	m_graph.setSamples(reinterpret_cast<float*>(dst));
+	m_graph.setLength(sampleLength);
 	delete[] dst;
 
 	// Load LED normalize 
