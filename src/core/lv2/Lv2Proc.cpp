@@ -441,8 +441,6 @@ bool Lv2Proc::hasNoteInput() const
 
 void Lv2Proc::initMOptions()
 {
-	const Lv2UridCache& cache = Engine::getLv2Manager()->uridCache();
-
 	/*
 		sampleRate:
 		LMMS can in theory inform plugins of a new sample rate.
@@ -457,16 +455,12 @@ void Lv2Proc::initMOptions()
 	int32_t blockLength = Engine::mixer()->framesPerPeriod();
 	int32_t sequenceSize = defaultEvbufSize();
 
-	m_options.initOption<float>(cache, Lv2UridCache::Id::param_sampleRate,
-		sampleRate);
-	m_options.initOption<int32_t>(cache, Lv2UridCache::Id::bufsz_maxBlockLength,
-		blockLength);
-	m_options.initOption<int32_t>(cache, Lv2UridCache::Id::bufsz_minBlockLength,
-		blockLength);
-	m_options.initOption<int32_t>(cache, Lv2UridCache::Id::bufsz_nominalBlockLength,
-		blockLength);
-	m_options.initOption<int32_t>(cache, Lv2UridCache::Id::bufsz_sequenceSize,
-		sequenceSize);
+	using Id = Lv2UridCache::Id;
+	m_options.initOption<float>(Id::param_sampleRate, sampleRate);
+	m_options.initOption<int32_t>(Id::bufsz_maxBlockLength, blockLength);
+	m_options.initOption<int32_t>(Id::bufsz_minBlockLength, blockLength);
+	m_options.initOption<int32_t>(Id::bufsz_nominalBlockLength, blockLength);
+	m_options.initOption<int32_t>(Id::bufsz_sequenceSize, sequenceSize);
 	m_options.createOptionVectors();
 }
 

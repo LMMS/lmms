@@ -37,6 +37,8 @@
 #include <set>
 #include <vector>
 
+#include "Engine.h"
+#include "Lv2Manager.h"
 #include "Lv2UridCache.h"
 
 /**
@@ -63,11 +65,12 @@ public:
 
 	//! Initialize an option
 	template<typename Opt, typename Arg>
-	void initOption(const Lv2UridCache& cache, Lv2UridCache::Id key, Arg&& value,
+	void initOption(Lv2UridCache::Id key, Arg&& value,
 			LV2_Options_Context context = LV2_OPTIONS_INSTANCE,
 			std::uint32_t subject = 0)
 	{
 		using OptPtr = Opt*;
+		const Lv2UridCache& cache = Engine::getLv2Manager()->uridCache();
 		initOption(cache[key], sizeof(Opt), cache.uridForType(OptPtr()),
 			std::make_shared<Opt>(std::forward<Arg>(value)), context, subject);
 	}
