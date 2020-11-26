@@ -3595,13 +3595,14 @@ void PianoRoll::focusOutEvent( QFocusEvent * )
 	update();
 }
 
-void PianoRoll::focusInEvent( QFocusEvent * )
+void PianoRoll::focusInEvent( QFocusEvent * ev )
 {
 	if ( hasValidPattern() )
 	{
 		// Assign midi device
 		m_pattern->instrumentTrack()->autoAssignMidiDevice(true);
 	}
+	QWidget::focusInEvent(ev);
 }
 
 

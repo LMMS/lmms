@@ -55,8 +55,6 @@
 #include "StringPairDrag.h"
 #include "TextFloat.h"
 
-
-
 enum TreeWidgetItemTypes
 {
 	TypeFileItem = QTreeWidgetItem::UserType,
@@ -335,6 +333,13 @@ FileBrowserTreeWidget::FileBrowserTreeWidget(QWidget * parent ) :
 	connect( this, SIGNAL( itemExpanded( QTreeWidgetItem * ) ),
 				SLOT( updateDirectory( QTreeWidgetItem * ) ) );
 
+#if QT_VERSION < QT_VERSION_CHECK(5, 12, 2) && defined LMMS_BUILD_WIN32
+	// Set the font for the QTreeWidget to the Windows System font to make sure that
+	// truncated (elided) items use the same font as non-truncated items.
+	// This is a workaround for this qt bug, fixed in 5.12.2: https://bugreports.qt.io/browse/QTBUG-29232
+	// TODO: remove this when all builds use a recent enough version of qt.
+	setFont( GuiApplication::getWin32SystemFont() );
+#endif
 }
 
 
@@ -682,10 +687,16 @@ void FileBrowserTreeWidget::mouseReleaseEvent(QMouseEvent * me )
 {
 	m_mousePressed = false;
 
+	// If a preview is running, we may need to stop it. Otherwise, we're done
 	QMutexLocker previewLocker(&m_pphMutex);
+	if (m_previewPlayHandle == nullptr) { return; }
 
-	//TODO: User setting to allow samples to play until completion instead
-	if (m_previewPlayHandle != nullptr) { stopPreview(); }
+	// Only sample previews may continue after mouse up. Is this a sample preview?
+	bool isSample = m_previewPlayHandle->type() == PlayHandle::TypeSamplePlayHandle;
+	// Even sample previews should only continue if the user wants them to. Do they?
+	bool shouldContinue = ConfigManager::inst()->value("ui", "letpreviewsfinish").toInt();
+	// If both are true the preview may continue, otherwise we stop it
+	if (!(isSample && shouldContinue)) { stopPreview(); }
 }
 
 

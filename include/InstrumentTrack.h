@@ -368,7 +368,7 @@ private:
 
 	QPoint m_lastPos;
 
-	FadeButton * getActivityIndicator()
+	FadeButton * getActivityIndicator() override
 	{
 		return m_activityIndicator;
 	}

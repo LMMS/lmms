@@ -1098,8 +1098,10 @@ InstrumentTrackWindow * InstrumentTrackView::topLevelInstrumentTrackWindow()
 void InstrumentTrackView::createFxLine()
 {
 	int channelIndex = gui->fxMixerView()->addNewChannel();
+	auto channel = Engine::fxMixer()->effectChannel(channelIndex);
 
-	Engine::fxMixer()->effectChannel( channelIndex )->m_name = getTrack()->name();
+	channel->m_name = getTrack()->name();
+	if (getTrack()->useColor()) { channel->setColor (getTrack()->color()); }
 
 	assignFxLine(channelIndex);
 }
@@ -1133,9 +1135,6 @@ void InstrumentTrackView::freeInstrumentTrackWindow()
 			model()->setHook( NULL );
 			m_window->setInstrumentTrackView( NULL );
 			m_window->parentWidget()->hide();
-			//m_window->setModel(
-			//	engine::dummyTrackContainer()->
-			//			dummyInstrumentTrack() );
 			m_window->updateInstrumentView();
 			s_windowCache << m_window;
 		}
