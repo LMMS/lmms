@@ -139,7 +139,7 @@ Mixer::Mixer( bool renderOnly ) :
 	int outputBufferSize = m_framesPerPeriod * sizeof( surroundSampleFrame );
 	m_outputBufferRead =
 		( surroundSampleFrame* )MemoryHelper::alignedMalloc( outputBufferSize );
-	m_outputBufferWrite = 
+	m_outputBufferWrite =
 		( surroundSampleFrame* )MemoryHelper::alignedMalloc( outputBufferSize );
 
 	BufferManager::clear( m_outputBufferRead, m_framesPerPeriod );
@@ -467,7 +467,7 @@ void Mixer::handleMetronome()
 	bool metronomeSupported = currentPlayMode == Song::Mode_PlayPattern ||
 					 currentPlayMode == Song::Mode_PlaySong ||
 					 currentPlayMode == Song::Mode_PlayBB;
-	
+
 	if( !metronomeSupported || !m_metronomeActive || song->isExporting() )
 	{
 		return;
@@ -480,7 +480,7 @@ void Mixer::handleMetronome()
 	}
 
 	tick_t ticks = song->getPlayPos( currentPlayMode ).getTicks();
-	tick_t ticksPerTact = MidiTime::ticksPerTact();
+	tick_t ticksPerBar = MidiTime::ticksPerBar();
 	int numerator = song->getTimeSigModel().getNumerator();
 
 	if( ticks == lastMetroTicks )
@@ -488,11 +488,11 @@ void Mixer::handleMetronome()
 		return;
 	}
 
-	if( ticks % ( ticksPerTact / 1 ) == 0 )
+	if( ticks % ( ticksPerBar / 1 ) == 0 )
 	{
 		addPlayHandle( new SamplePlayHandle( "misc/metronome02.ogg" ) );
 	}
-	else if( ticks % ( ticksPerTact / numerator ) == 0 )
+	else if( ticks % ( ticksPerBar / numerator ) == 0 )
 	{
 		addPlayHandle( new SamplePlayHandle( "misc/metronome01.ogg" ) );
 	}
@@ -619,14 +619,14 @@ void Mixer::setAudioDevice(AudioDevice * _dev,
 {
 	stopProcessing();
 
-	m_qualitySettings = qs;
+	m_qualitySettings = _qs;
 
 	doSetAudioDevice( _dev );
 
 	emit qualitySettingsChanged();
 	emit sampleRateChanged();
 
-	if (startNow) {startProcessing( needsFifo );}
+	if (startNow) {startProcessing( _needs_fifo );}
 }
 
 
