@@ -277,6 +277,15 @@ private:
 	//	gridFree
 	};
 
+	enum PianoRollArea
+	{
+		Keys,
+		Notes,
+		NoteProperties,
+		EditMode,
+		EditAreaResize
+	};
+
 	PositionLine * m_positionLine;
 
 	QVector<QString> m_nemStr; // gui names of each edit mode
@@ -345,6 +354,8 @@ private:
 	ComboBoxModel m_scaleModel;
 	ComboBoxModel m_chordModel;
 	ComboBoxModel m_snapModel;
+
+	static QString m_lastChordName;
 
 	static const QVector<float> m_zoomLevels;
 	static const QVector<float> m_zoomYLevels;
@@ -434,6 +445,8 @@ private:
 	// turn a selection rectangle into selected notes
 	void computeSelectedNotes( bool shift );
 	void clearSelectedNotes();
+
+	PianoRollArea getPianoRollAreaIn(const int x, const int y);
 
 	// did we start a mouseclick with shift pressed
 	bool m_startedWithShift;
