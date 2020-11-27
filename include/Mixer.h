@@ -363,6 +363,8 @@ private:
 
 	const surroundSampleFrame * renderNextBuffer();
 
+	void handleMetronome();
+
 	void clearInternal();
 
 	//! Called by the audio thread to give control to other threads,
