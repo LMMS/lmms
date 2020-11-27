@@ -108,11 +108,17 @@ struct Meta
 	Flow m_flow = Flow::Unknown;
 	Vis m_vis = Vis::None;
 
-	float m_def = .0f, m_min = .0f, m_max = .0f;
 	bool m_optional = false;
 	bool m_used = true;
 
 	std::vector<PluginIssue> get(const LilvPlugin* plugin, std::size_t portNum);
+
+	float def() const { return m_def; }
+	float min(sample_rate_t sr) const { return m_sampleRate ? sr * m_min : m_min; }
+	float max(sample_rate_t sr) const { return m_sampleRate ? sr * m_max : m_max; }
+private:
+	float m_def = .0f, m_min = .0f, m_max = .0f;
+	bool m_sampleRate = false;
 };
 
 struct PortBase : public Meta

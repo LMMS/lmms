@@ -131,6 +131,11 @@ public:
 	}
 	bool isFeatureSupported(const char* featName) const;
 
+	static const std::set<const char*, Lv2Manager::CmpStr>& getPluginBlacklist()
+	{
+		return pluginBlacklist;
+	}
+
 private:
 	// general data
 	bool m_debug; //!< if set, debug output will be printed
@@ -143,6 +148,9 @@ private:
 
 	// URID cache for fast URID access
 	Lv2UridCache m_uridCache;
+
+	// static
+	static const std::set<const char*, Lv2Manager::CmpStr> pluginBlacklist;
 
 	// functions
 	bool isSubclassOf(const LilvPluginClass *clvss, const char *uriStr);

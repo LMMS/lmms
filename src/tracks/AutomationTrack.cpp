@@ -57,9 +57,11 @@ TrackView * AutomationTrack::createView( TrackContainerView* tcv )
 
 
 
-TrackContentObject * AutomationTrack::createTCO( const MidiTime & )
+TrackContentObject* AutomationTrack::createTCO(const MidiTime & pos)
 {
-	return new AutomationPattern( this );
+	AutomationPattern* p = new AutomationPattern(this);
+	p->movePosition(pos);
+	return p;
 }
 
 
@@ -133,7 +135,6 @@ void AutomationTrackView::dropEvent( QDropEvent * _de )
 			TrackContentObject * tco = getTrack()->createTCO( pos );
 			AutomationPattern * pat = dynamic_cast<AutomationPattern *>( tco );
 			pat->addObject( mod );
-			pat->movePosition( pos );
 		}
 	}
 
