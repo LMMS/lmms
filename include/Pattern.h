@@ -128,7 +128,7 @@ protected slots:
 
 
 private:
-	MidiTime beatPatternLength() const;
+	TimePos beatPatternLength() const;
 
 	void setType( PatternTypes _new_pattern_type );
 	void checkType();

@@ -134,7 +134,7 @@ protected:
 	QString nodeName() const { return "lv2controls"; }
 	bool hasNoteInput() const;
 	void handleMidiInputEvent(const class MidiEvent &event,
-		const class MidiTime &time, f_cnt_t offset);
+		const class TimePos &time, f_cnt_t offset);
 
 private:
 	//! Return the DataFile settings type

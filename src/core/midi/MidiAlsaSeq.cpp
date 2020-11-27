@@ -157,7 +157,7 @@ QString MidiAlsaSeq::probeDevice()
 
 
 
-void MidiAlsaSeq::processOutEvent( const MidiEvent& event, const MidiTime& time, const MidiPort* port )
+void MidiAlsaSeq::processOutEvent( const MidiEvent& event, const TimePos& time, const MidiPort* port )
 {
 	// HACK!!! - need a better solution which isn't that easy since we
 	// cannot store const-ptrs in our map because we need to call non-const
@@ -536,7 +536,7 @@ void MidiAlsaSeq::run()
 								ev->data.note.velocity,
 								source
 								),
-							MidiTime( ev->time.tick ) );
+							TimePos( ev->time.tick ) );
 					break;
 
 				case SND_SEQ_EVENT_NOTEOFF:
@@ -547,7 +547,7 @@ void MidiAlsaSeq::run()
 								ev->data.note.velocity,
 								source
 								),
-							MidiTime( ev->time.tick) );
+							TimePos( ev->time.tick) );
 					break;
 
 				case SND_SEQ_EVENT_KEYPRESS:
@@ -558,7 +558,7 @@ void MidiAlsaSeq::run()
 								KeysPerOctave,
 								ev->data.note.velocity,
 								source
-								), MidiTime() );
+								), TimePos() );
 					break;
 
 				case SND_SEQ_EVENT_CONTROLLER:
@@ -567,7 +567,7 @@ void MidiAlsaSeq::run()
 							ev->data.control.channel,
 							ev->data.control.param,
 							ev->data.control.value, source ),
-									MidiTime() );
+									TimePos() );
 					break;
 
 				case SND_SEQ_EVENT_PGMCHANGE:
@@ -576,7 +576,7 @@ void MidiAlsaSeq::run()
 							ev->data.control.channel,
 							ev->data.control.value,	0,
 							source ),
-								MidiTime() );
+								TimePos() );
 					break;
 
 				case SND_SEQ_EVENT_CHANPRESS:
@@ -585,14 +585,14 @@ void MidiAlsaSeq::run()
 							ev->data.control.channel,
 							ev->data.control.param,
 							ev->data.control.value, source ),
-									MidiTime() );
+									TimePos() );
 					break;
 
 				case SND_SEQ_EVENT_PITCHBEND:
 					dest->processInEvent( MidiEvent( MidiPitchBend,
 							ev->data.control.channel,
 							ev->data.control.value + 8192, 0, source ),
-									MidiTime() );
+									TimePos() );
 					break;
 
 				case SND_SEQ_EVENT_SENSING:

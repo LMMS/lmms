@@ -37,10 +37,10 @@
 #include "Lv2Features.h"
 #include "LinkedModelGroups.h"
 #include "MidiEvent.h"
-#include "MidiTime.h"
 #include "Plugin.h"
 #include "PluginIssue.h"
 #include "../src/3rdparty/ringbuffer/include/ringbuffer/ringbuffer.h"
+#include "TimePos.h"
 
 // forward declare port structs/enums
 namespace Lv2Ports
@@ -144,7 +144,7 @@ public:
 	void run(fpp_t frames);
 
 	void handleMidiInputEvent(const class MidiEvent &event,
-		const MidiTime &time, f_cnt_t offset);
+		const TimePos &time, f_cnt_t offset);
 
 	/*
 		misc
