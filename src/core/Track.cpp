@@ -1167,7 +1167,7 @@ void TrackContentObjectView::contextMenuEvent( QContextMenuEvent * cme )
 
 	QMenu contextMenu( this );
 
-	bool canMergeTCOs = individualTCO ? false : canMergeSelection( selectedTCOs );
+	bool canMergeTCOs = individualTCO ? false : canMergeSelection(selectedTCOs);
 
 	if( fixedTCOs() == false )
 	{
@@ -1187,12 +1187,13 @@ void TrackContentObjectView::contextMenuEvent( QContextMenuEvent * cme )
 				: tr("Cut selection"),
 			[this](){ contextMenuAction( Cut ); } );
 
-		if( canMergeTCOs )
+		if (canMergeTCOs)
 		{
 			contextMenu.addAction(
-				embed::getIconPixmap( "edit_merge" ),
+				embed::getIconPixmap("edit_merge"),
 				tr("Merge Selection"),
-				[this](){ contextMenuAction( Merge ); } );
+				[this](){ contextMenuAction(Merge); }
+			);
 		}
 	}
 
@@ -1253,7 +1254,7 @@ void TrackContentObjectView::contextMenuAction( ContextMenuAction action )
 			toggleMute( active );
 			break;
 		case Merge:
-			mergeTCOs( active );
+			mergeTCOs(active);
 			break;
 	}
 }
@@ -1338,7 +1339,7 @@ void TrackContentObjectView::toggleMute( QVector<TrackContentObjectView *> tcovs
 	}
 }
 
-bool TrackContentObjectView::canMergeSelection( QVector<TrackContentObjectView *> tcovs )
+bool TrackContentObjectView::canMergeSelection(QVector<TrackContentObjectView *> tcovs)
 {
 	// We can only merge InstrumentTrack's TCOs, so check if we only have those in the selection,
 	// and also if they all belong to the same track
@@ -1347,22 +1348,24 @@ bool TrackContentObjectView::canMergeSelection( QVector<TrackContentObjectView *
 	bool canMerge = true;
 
 	// Variable to check if all TCOs belong to the same track
-	TrackView *previousOwnerTrackView = nullptr;
+	TrackView * previousOwnerTrackView = nullptr;
 
 	// Then we check every selected TCO to see if all of them are InstrumentTrack's TCOs.
 	// If any isn't, we set canMerge to false and quit the loop.
-	for( auto tcov: tcovs )
+	for (auto tcov: tcovs)
 	{
-		TrackView *ownerTrackView = tcov->getTrackView();
+		TrackView * ownerTrackView = tcov->getTrackView();
 
 		// Set the previousOwnerTrackView to the first TrackView
-		if( !previousOwnerTrackView )
+		if (!previousOwnerTrackView)
 		{
 			previousOwnerTrackView = ownerTrackView;
 		}
 
-		// If there are TCOs from different tracks or TCOs from tracks other than an InstrumentTrack, can't merge them
-		if( ownerTrackView != previousOwnerTrackView || !dynamic_cast<InstrumentTrackView *>(ownerTrackView) )
+		// If there are TCOs from different tracks or TCOs from tracks
+		// other than an InstrumentTrack, can't merge them
+		if (ownerTrackView != previousOwnerTrackView
+			|| !dynamic_cast<InstrumentTrackView *>(ownerTrackView))
 		{
 			canMerge = false;
 			break;
@@ -1372,12 +1375,13 @@ bool TrackContentObjectView::canMergeSelection( QVector<TrackContentObjectView *
 	return canMerge;
 }
 
-void TrackContentObjectView::mergeTCOs( QVector<TrackContentObjectView *> tcovs )
+void TrackContentObjectView::mergeTCOs(QVector<TrackContentObjectView *> tcovs)
 {
 	// Get the track that we are merging TCOs in
-	InstrumentTrack *track = dynamic_cast<InstrumentTrack *>(tcovs.at(0)->getTrackView()->getTrack());
+	InstrumentTrack * track =
+		dynamic_cast<InstrumentTrack *>(tcovs.at(0)->getTrackView()->getTrack());
 
-	if( !track )
+	if (!track)
 	{
 		qWarning("Warning: Couldn't retrieve InstrumentTrack in mergeTCOs()");
 		return;
@@ -1385,39 +1389,38 @@ void TrackContentObjectView::mergeTCOs( QVector<TrackContentObjectView *> tcovs 
 
 	// For Undo/Redo
 	track->addJournalCheckPoint();
-	track->saveJournallingState( false );
+	track->saveJournallingState(false);
 
 	// Find the earliest position of all the selected TCOVs
 	MidiTime earliestPos = tcovs.at(0)->getTrackContentObject()->startPosition();
 	MidiTime currentPos = earliestPos;
 
-	for( auto tcov: tcovs )
+	for (auto tcov: tcovs)
 	{
 		currentPos = tcov->getTrackContentObject()->startPosition();
-		if( currentPos < earliestPos )
+		if (currentPos < earliestPos)
 		{
 			earliestPos = currentPos;
 		}
 	}
 
 	// Create a pattern where all notes will be added
-	Pattern * newPattern = dynamic_cast<Pattern *>( track->createTCO( earliestPos ) );
-	if( !newPattern )
+	Pattern * newPattern = dynamic_cast<Pattern *>(track->createTCO(earliestPos));
+	if (!newPattern)
 	{
 		qWarning("Warning: Failed to convert TCO to Pattern on mergeTCOs");
 		return;
 	}
 
-	newPattern->saveJournallingState( false );
-	newPattern->movePosition( earliestPos ); // TODO: Won't be necessary once #5699 is merged!
+	newPattern->saveJournallingState(false);
 
 	// Add the notes and remove the TCOs that are being merged
-	for( auto tcov: tcovs )
+	for (auto tcov: tcovs)
 	{
 		// Convert TCOV to PatternView
-		PatternView *pView = dynamic_cast<PatternView *>( tcov );
+		PatternView * pView = dynamic_cast<PatternView *>(tcov);
 
-		if( !pView )
+		if (!pView)
 		{
 			qWarning("Warning: Non-pattern TCO on InstrumentTrack");
 			continue;
@@ -1426,16 +1429,16 @@ void TrackContentObjectView::mergeTCOs( QVector<TrackContentObjectView *> tcovs 
 		NoteVector currentTCONotes = pView->getPattern()->notes();
 		MidiTime pViewPos = pView->getPattern()->startPosition();
 
-		for( Note *note: currentTCONotes )
+		for (Note * note: currentTCONotes)
 		{
-			Note *newNote = newPattern->addNote( *note, false );
+			Note * newNote = newPattern->addNote(*note, false);
 			MidiTime originalNotePos = newNote->pos();
-			newNote->setPos( originalNotePos + ( pViewPos - earliestPos ) );
+			newNote->setPos(originalNotePos + (pViewPos - earliestPos));
 		}
 
 		// We disable the journalling system before removing, so the
 		// removal doesn't get added to the undo/redo history
-		tcov->getTrackContentObject()->saveJournallingState( false );
+		tcov->getTrackContentObject()->saveJournallingState(false);
 		// No need to check for nullptr because we check while building the tcovs QVector
 		tcov->remove();
 		// TODO: Is it a good idea to restore the journalling state after remove()
