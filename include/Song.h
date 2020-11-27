@@ -248,6 +248,10 @@ public:
 	{
 		return m_playPos[pm];
 	}
+	inline PlayPos & getPlayPos()
+	{
+		return getPlayPos(m_playMode);
+	}
 	inline const PlayPos & getPlayPos() const
 	{
 		return getPlayPos(m_playMode);
