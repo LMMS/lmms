@@ -61,7 +61,7 @@ public:
 
 	virtual f_cnt_t desiredReleaseFrames() const
 	{
-		return 128;
+		return m_desiredReleaseFrames;
 	}
 
 	virtual PluginView * instantiateView( QWidget * _parent );
@@ -75,6 +75,7 @@ private slots:
 	void reverseModelChanged();
 	void ampModelChanged();
 	void loopPointChanged();
+	void loopEndPointChanged();
 	void startPointChanged();
 	void endPointChanged();
 	void pointChanged();
@@ -94,6 +95,7 @@ private:
 	FloatModel m_startPointModel;
 	FloatModel m_endPointModel;
 	FloatModel m_loopPointModel;
+	FloatModel m_loopEndPointModel;
 	BoolModel m_reverseModel;
 	IntModel m_loopModel;
 	BoolModel m_stutterModel;
@@ -101,6 +103,10 @@ private:
 
 	f_cnt_t m_nextPlayStartPoint;
 	bool m_nextPlayBackwards;
+
+	void checkInnerPoints(FloatModel&);
+	f_cnt_t m_desiredReleaseFrames = 128;
+	f_cnt_t m_loopStartFrame;
 
 	friend class AudioFileProcessorView;
 
@@ -140,6 +146,7 @@ private:
 	Knob * m_startKnob;
 	Knob * m_endKnob;
 	Knob * m_loopKnob;
+	Knob* m_loopEndKnob;
 
 	PixmapButton * m_openAudioFileButton;
 	PixmapButton * m_reverseButton;
@@ -169,7 +176,8 @@ public:
 	{
 		start,
 		end,
-		loop
+		loop,
+		loopEnd
 	} ;
 
 	class knob : public ::Knob
@@ -184,7 +192,7 @@ public:
 			m_waveView( 0 ),
 			m_relatedKnob( 0 )
 		{
-			setFixedSize( 37, 47 );
+			setFixedSize(30, 47);
 		}
 
 		void setWaveView( const AudioFileProcessorWaveView * _wv )
@@ -232,7 +240,8 @@ private:
 		wave,
 		sample_start,
 		sample_end,
-		sample_loop
+		sample_loop,
+		sample_loopEnd
 	} ;
 
 	SampleBuffer& m_sampleBuffer;
@@ -245,9 +254,11 @@ private:
 	knob * m_startKnob;
 	knob * m_endKnob;
 	knob * m_loopKnob;
+	knob* m_loopEndKnob;
 	f_cnt_t m_startFrameX;
 	f_cnt_t m_endFrameX;
 	f_cnt_t m_loopFrameX;
+	f_cnt_t m_loopEndFrameX;
 	bool m_isDragging;
 	QPoint m_draggingLastPoint;
 	draggingType m_draggingType;
@@ -257,7 +268,7 @@ private:
 
 public:
 	AudioFileProcessorWaveView( QWidget * _parent, int _w, int _h, SampleBuffer& buf );
-	void setKnobs(knob *_start, knob *_end, knob *_loop );
+	void setKnobs(knob *_start, knob *_end, knob *_loop, knob* _loopEnd);
 
 
 	void updateSampleRange();
