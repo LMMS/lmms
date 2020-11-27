@@ -528,17 +528,16 @@ void ConfigManager::loadConfigFile(const QString & configFile)
 	{
 #if defined(LMMS_BUILD_WIN32)
 		m_stkDir = m_dataDir + "stk/rawwaves/";
-#elif defined(LMMS_BUILD_APPLE)
-		m_stkDir = qApp->applicationDirPath() + "/../share/stk/rawwaves/";
 #else
-		if ( qApp->applicationDirPath().startsWith("/tmp/") )
+		// Look for bundled raw waves first
+		m_stkDir = qApp->applicationDirPath() + "/../share/stk/rawwaves/";
+		// Try system installations if not exists
+		if (!QDir(m_stkDir).exists())
 		{
-			// Assume AppImage bundle
-			m_stkDir = qApp->applicationDirPath() + "/../share/stk/rawwaves/";
+			m_stkDir = "/usr/local/share/stk/rawwaves/";
 		}
-		else
+		if (!QDir(m_stkDir).exists())
 		{
-			// Fallback to system provided location
 			m_stkDir = "/usr/share/stk/rawwaves/";
 		}
 #endif
