@@ -529,17 +529,13 @@ void Mixer::clearNewPlayHandles()
 void Mixer::clearInternal()
 {
 	// TODO: m_midiClient->noteOffAll();
-	PlayHandleList::Iterator it = m_playHandles.begin();
-	while( it != m_playHandles.end() )
+	for (auto ph : m_playHandles)
 	{
-		// we must not delete instrument-play-handles as they exist
-		// during the whole lifetime of an instrument
-		if( ( *it )->type() != PlayHandle::TypeInstrumentPlayHandle )
+		if (ph->type() != PlayHandle::TypeInstrumentPlayHandle)
 		{
-			m_playHandlesToRemove.push_back( *it );
+			m_playHandlesToRemove.push_back(ph);
 		}
 
-		++it;
 	}
 }
 
