@@ -1517,13 +1517,13 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 	m_pianoView->setMaximumHeight( PIANO_HEIGHT );
 
 	vlayout->addWidget( generalSettingsWidget );
-	vlayout->addWidget( m_tabWidget, 1 );
+	// Use QWidgetItem explicitly to make the size hint change on instrument changes
+	// QLayout::addWidget() uses QWidgetItemV2 with size hint caching
+	vlayout->insertItem(1, new QWidgetItem(m_tabWidget));
 	vlayout->addWidget( m_pianoView );
 	setModel( _itv->model() );
 
 	updateInstrumentView();
-
-	resize( sizeHint() );
 
 	QMdiSubWindow* subWin = gui->mainWindow()->addWindowedWidget( this );
 	Qt::WindowFlags flags = subWin->windowFlags();
@@ -1691,6 +1691,15 @@ void InstrumentTrackWindow::updateInstrumentView()
 
 		adjustTabSize(m_instrumentView);
 		m_pianoView->setVisible(m_track->m_instrument->hasNoteInput());
+		// adjust window size
+		layout()->invalidate();
+		resize(sizeHint());
+		if (parentWidget())
+		{
+			parentWidget()->resize(parentWidget()->sizeHint());
+		}
+		update();
+		m_instrumentView->update();
 	}
 }
 
