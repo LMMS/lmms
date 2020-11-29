@@ -27,27 +27,44 @@
 
 #include <QtCore/QMap>
 #include <QDomElement>
+class QMimeData;
 
 
-class JournallingObject;
-
-class Clipboard
+namespace Clipboard
 {
-public:
-	typedef QMap<QString, QDomElement> Map;
-
-	static void copy( JournallingObject * _object );
-	static const QDomElement * getContent( const QString & _node_name );
-
-	static const char * mimeType()
+	enum class MimeType
 	{
-		return( "application/x-lmms-clipboard" );
+		StringPair,
+		Osc,
+		Default
+	};
+
+	// Convenience Methods
+	const QMimeData * getMimeData();
+	bool hasFormat( MimeType mT );
+
+	// Helper methods for String data
+	void copyString( const QString & str, MimeType mT );
+	QString getString( MimeType mT );
+
+	// Helper methods for String Pair data
+	void copyStringPair( const QString & key, const QString & value );
+	QString decodeKey( const QMimeData * mimeData );
+	QString decodeValue( const QMimeData * mimeData );
+
+	inline const char * mimeType( MimeType type )
+	{
+		switch( type )
+		{
+			case MimeType::StringPair:
+				return "application/x-lmms-stringpair";
+			case MimeType::Osc:
+				return "application/x-osc-stringpair";
+			case MimeType::Default:
+			default:
+				return "application/x-lmms-clipboard";
+		}
 	}
-
-
-private:
-	static Map content;
-
 } ;
 
 #endif

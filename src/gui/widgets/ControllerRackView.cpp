@@ -36,6 +36,7 @@
 #include "GuiApplication.h"
 #include "MainWindow.h"
 #include "GroupBox.h"
+#include "Clipboard.h"
 #include "ControllerConnection.h"
 #include "ControllerRackView.h"
 #include "ControllerView.h"
@@ -241,7 +242,7 @@ void ControllerRackView::dropEvent( QDropEvent *de )
 	{
 		AutomatableModel* mod =
 		Engine::getAutomatableModel( val,
-			!de->mimeData()->hasFormat(StringPairDrag::mimeType()));
+			!de->mimeData()->hasFormat(Clipboard::mimeType(Clipboard::MimeType::StringPair)));
 
 		if (mod)
 		{

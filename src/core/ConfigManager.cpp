@@ -38,6 +38,11 @@
 #include "lmmsversion.h"
 
 
+// Vector with all the upgrade methods
+const std::vector<ConfigManager::UpgradeMethod> ConfigManager::UPGRADE_METHODS = {
+	&ConfigManager::upgrade_1_1_90    ,    &ConfigManager::upgrade_1_1_91
+};
+
 static inline QString ensureTrailingSlash(const QString & s )
 {
 	if(! s.isEmpty() && !s.endsWith('/') && !s.endsWith('\\'))
@@ -51,7 +56,9 @@ static inline QString ensureTrailingSlash(const QString & s )
 ConfigManager * ConfigManager::s_instanceOfMe = NULL;
 
 
-ConfigManager::ConfigManager() : m_version(defaultVersion())
+ConfigManager::ConfigManager() :
+	m_version(defaultVersion()),
+	m_configVersion( UPGRADE_METHODS.size() )
 {
 	if (QFileInfo::exists(qApp->applicationDirPath() + PORTABLE_MODE_FILE))
 	{
@@ -114,7 +121,7 @@ void ConfigManager::upgrade_1_1_90()
 
 	
 void ConfigManager::upgrade_1_1_91()
-{		
+{
 	// rename displaydbv to displaydbfs
 	if (!value("app", "displaydbv").isNull()) {
 		setValue("app", "displaydbfs", value("app", "displaydbv"));
@@ -131,17 +138,15 @@ void ConfigManager::upgrade()
 		return;
 	}
 
+	// Runs all necessary upgrade methods
+	std::for_each( UPGRADE_METHODS.begin() + m_configVersion, UPGRADE_METHODS.end(),
+		[this](UpgradeMethod um)
+		{
+			(this->*um)();
+		}
+	);
+	
 	ProjectVersion createdWith = m_version;
-	
-	if (createdWith.setCompareType(ProjectVersion::Build) < "1.1.90")
-	{
-		upgrade_1_1_90();
-	}
-	
-	if (createdWith.setCompareType(ProjectVersion::Build) < "1.1.91")
-	{
-		upgrade_1_1_91();
-	}
 	
 	// Don't use old themes as they break the UI (i.e. 0.4 != 1.0, etc)
 	if (createdWith.setCompareType(ProjectVersion::Minor) != LMMS_VERSION)
@@ -151,6 +156,7 @@ void ConfigManager::upgrade()
 
 	// Bump the version, now that we are upgraded
 	m_version = LMMS_VERSION;
+	m_configVersion = UPGRADE_METHODS.size();
 }
 
 QString ConfigManager::defaultVersion() const
@@ -408,9 +414,21 @@ void ConfigManager::loadConfigFile(const QString & configFile)
 
 			QDomNode node = root.firstChild();
 
-			// Cache the config version for upgrade()
+			// Cache LMMS version
 			if (!root.attribute("version").isNull()) {
 				m_version = root.attribute("version");
+			}
+
+			// Get the version of the configuration file (for upgrade purposes)
+			if( root.attribute("configversion").isNull() )
+			{
+				m_configVersion = legacyConfigVersion(); // No configversion attribute found
+			}
+			else
+			{
+				bool success;
+				m_configVersion = root.attribute("configversion").toUInt(&success);
+				if( !success ) qWarning("Config Version conversion failure.");
 			}
 
 			// create the settings-map out of the DOM
@@ -518,17 +536,16 @@ void ConfigManager::loadConfigFile(const QString & configFile)
 	{
 #if defined(LMMS_BUILD_WIN32)
 		m_stkDir = m_dataDir + "stk/rawwaves/";
-#elif defined(LMMS_BUILD_APPLE)
-		m_stkDir = qApp->applicationDirPath() + "/../share/stk/rawwaves/";
 #else
-		if ( qApp->applicationDirPath().startsWith("/tmp/") )
+		// Look for bundled raw waves first
+		m_stkDir = qApp->applicationDirPath() + "/../share/stk/rawwaves/";
+		// Try system installations if not exists
+		if (!QDir(m_stkDir).exists())
 		{
-			// Assume AppImage bundle
-			m_stkDir = qApp->applicationDirPath() + "/../share/stk/rawwaves/";
+			m_stkDir = "/usr/local/share/stk/rawwaves/";
 		}
-		else
+		if (!QDir(m_stkDir).exists())
 		{
-			// Fallback to system provided location
 			m_stkDir = "/usr/share/stk/rawwaves/";
 		}
 #endif
@@ -573,6 +590,7 @@ void ConfigManager::saveConfigFile()
 
 	QDomElement lmms_config = doc.createElement("lmms");
 	lmms_config.setAttribute("version", m_version);
+	lmms_config.setAttribute("configversion", m_configVersion);
 	doc.appendChild(lmms_config);
 
 	for(settingsMap::iterator it = m_settings.begin();
@@ -679,5 +697,27 @@ void ConfigManager::initDevelopmentWorkingDir()
 		}
 
 		cmakeCache.close();
+	}
+}
+
+// If configversion is not present, we will convert the LMMS version to the appropriate
+// configuration file version for backwards compatibility.
+unsigned int ConfigManager::legacyConfigVersion()
+{
+	ProjectVersion createdWith = m_version;
+
+	createdWith.setCompareType(ProjectVersion::Build);
+
+	if( createdWith < "1.1.90" )
+	{
+		return 0;
+	}
+	else if( createdWith < "1.1.91" )
+	{
+		return 1;
+	}
+	else
+	{
+		return 2;
 	}
 }

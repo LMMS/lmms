@@ -94,6 +94,7 @@ private:
 
 signals:
 	void sampleChanged();
+	void wasReversed();
 
 } ;
 
@@ -109,6 +110,7 @@ public:
 
 public slots:
 	void updateSample();
+	void reverseSample();
 
 
 
@@ -140,7 +142,7 @@ public:
 	virtual bool play( const MidiTime & _start, const fpp_t _frames,
 						const f_cnt_t _frame_base, int _tco_num = -1 ) override;
 	TrackView * createView( TrackContainerView* tcv ) override;
-	TrackContentObject * createTCO( const MidiTime & _pos ) override;
+	TrackContentObject* createTCO(const MidiTime & pos) override;
 
 
 	virtual void saveTrackSpecificSettings( QDomDocument & _doc,
@@ -251,7 +253,7 @@ private:
 
 	TrackLabelButton * m_tlb;
 
-	FadeButton * getActivityIndicator()
+	FadeButton * getActivityIndicator() override
 	{
 		return m_activityIndicator;
 	}

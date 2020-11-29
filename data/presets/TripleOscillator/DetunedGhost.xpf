@@ -9,8 +9,7 @@
       </instrument>
       <eldata fres="0.5" ftype="0" fwet="1">
         <fcut value="12819" id="5593744"/>
-        <elvol userwavefile="" sustain="0" lpdel="0" lspd_denominator="4" ctlenvamt="0" rel="0.14" amt="1" lspd_numerator="4" syncmode="0" latt="0" pdel="0" att="0" lspd="0.1" lamt="0" x100="0" lshp="0" hold="0.08">
-          <dec value="0.445" id="2519228"/>
+        <elvol userwavefile="" sustain="0" lpdel="0" lspd_denominator="4" ctlenvamt="0" rel="0.14" amt="1" lspd_numerator="4" syncmode="0" latt="0" pdel="0" att="0.02" lspd="0.1" lamt="0" x100="0" lshp="0" hold="0.08" dec="0.445">
         </elvol>
         <elcut lspd_denominator="4" sustain="0" pdel="0" userwavefile="" dec="0.14" lamt="0" syncmode="0" latt="0" rel="0.06" amt="0" x100="1" att="0.13" lpdel="0" hold="0" lshp="0" lspd="0.1" ctlenvamt="0" lspd_numerator="4"/>
         <elres lspd_denominator="4" sustain="0.5" pdel="0" userwavefile="" dec="0.5" lamt="0" syncmode="0" latt="0" rel="0.1" amt="0" x100="0" att="0" lpdel="0" hold="0.5" lshp="0" lspd="0.1" ctlenvamt="0" lspd_numerator="4"/>

@@ -437,7 +437,7 @@ int main( int argc, char * * argv )
 			{
 				return noInputFileError();
 			}
-			
+
 			QFile f( QString::fromLocal8Bit( argv[i] ) );
 			f.open( QIODevice::ReadOnly );
 			QByteArray d = qCompress( f.readAll() ) ;
@@ -1008,6 +1008,9 @@ int main( int argc, char * * argv )
 		FreeConsole();
 	}
 #endif
+
+
+	NotePlayHandleManager::free();
 
 	return ret;
 }

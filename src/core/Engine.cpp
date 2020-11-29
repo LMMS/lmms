@@ -54,7 +54,6 @@ SpaManager * LmmsCore::s_spaManager = nullptr;
 #endif
 void* LmmsCore::s_dndPluginKey = nullptr;
 QMap<unsigned, class Plugin*> LmmsCore::s_pluginsByPort;
-DummyTrackContainer * LmmsCore::s_dummyTC = NULL;
 
 
 
@@ -88,7 +87,6 @@ void LmmsCore::init( bool renderOnly )
 	s_mixer->initDevices();
 
 	PresetPreviewPlayHandle::init();
-	s_dummyTC = new DummyTrackContainer;
 
 	emit engine->initProgress(tr("Launching mixer threads"));
 	s_mixer->startProcessing();
@@ -107,7 +105,6 @@ void LmmsCore::destroy()
 	s_song->clearProject();
 
 	deleteHelper( &s_bbTrackContainer );
-	deleteHelper( &s_dummyTC );
 
 	deleteHelper( &s_fxMixer );
 	deleteHelper( &s_mixer );
@@ -127,6 +124,18 @@ void LmmsCore::destroy()
 
 	delete ConfigManager::inst();
 }
+
+
+
+
+bool LmmsCore::ignorePluginBlacklist()
+{
+	const char* envVar = getenv("LMMS_IGNORE_BLACKLIST");
+	return (envVar && *envVar);
+}
+
+
+
 
 float LmmsCore::framesPerTick(sample_rate_t sampleRate)
 {

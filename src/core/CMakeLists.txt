@@ -98,17 +98,20 @@ set(LMMS_SRCS
 
 	core/lv2/Lv2Basics.cpp
 	core/lv2/Lv2ControlBase.cpp
+	core/lv2/Lv2Evbuf.cpp
 	core/lv2/Lv2Features.cpp
 	core/lv2/Lv2Ports.cpp
 	core/lv2/Lv2Proc.cpp
 	core/lv2/Lv2Manager.cpp
 	core/lv2/Lv2SubPluginFeatures.cpp
+	core/lv2/Lv2UridCache.cpp
 	core/lv2/Lv2UridMap.cpp
 
 	core/midi/MidiAlsaRaw.cpp
 	core/midi/MidiAlsaSeq.cpp
 	core/midi/MidiClient.cpp
 	core/midi/MidiController.cpp
+	core/midi/MidiEventToByteSeq.cpp
 	core/midi/MidiJack.cpp
 	core/midi/MidiOss.cpp
 	core/midi/MidiSndio.cpp

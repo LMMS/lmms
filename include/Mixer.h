@@ -173,8 +173,6 @@ public:
 
 	//! Set new audio device. Old device will be deleted,
 	//! unless it's stored using storeAudioDevice
-	void setAudioDevice( AudioDevice * _dev , bool startNow );
-	//! See overloaded function
 	void setAudioDevice( AudioDevice * _dev,
 				const struct qualitySettings & _qs,
 				bool _needs_fifo,

@@ -24,37 +24,74 @@
 
 #include <QApplication>
 #include <QClipboard>
+#include <QDebug>
+#include <QMimeData>
 
 #include "Clipboard.h"
 #include "JournallingObject.h"
 
 
-Clipboard::Map Clipboard::content;
-
-
-void Clipboard::copy( JournallingObject * _obj )
+namespace Clipboard
 {
-	QDomDocument doc;
-	QDomElement parent = doc.createElement( "Clipboard" );
-	_obj->saveState( doc, parent );
-	content[_obj->nodeName()] = parent.firstChild().toElement();
-
-	// Clear the QApplication clipboard, so we don't have any conflicts when LMMS has to
-	// decide between the QApplication clipboard and the internal clipboard data
-	QApplication::clipboard()->clear( QClipboard::Clipboard );
-}
-
-
-
-
-const QDomElement * Clipboard::getContent( const QString & _node_name )
-{
-	if( content.find( _node_name ) != content.end() )
+	const QMimeData * getMimeData()
 	{
-		return &content[_node_name];
+		return QApplication::clipboard()->mimeData( QClipboard::Clipboard );
 	}
-	return NULL;
+
+
+
+
+	bool hasFormat( MimeType mT )
+	{
+		return getMimeData()->hasFormat( mimeType( mT ) );
+	}
+
+
+
+
+	void copyString( const QString & str, MimeType mT )
+	{
+		QMimeData *content = new QMimeData;
+
+		content->setData( mimeType( mT ), str.toUtf8() );
+		QApplication::clipboard()->setMimeData( content, QClipboard::Clipboard );
+	}
+
+
+
+
+	QString getString( MimeType mT )
+	{
+		return QString( getMimeData()->data( mimeType( mT ) ) );
+	}
+
+
+
+
+	void copyStringPair( const QString & key, const QString & value )
+	{
+		QString finalString = key + ":" + value;
+
+		QMimeData *content = new QMimeData;
+		content->setData( mimeType( MimeType::StringPair ), finalString.toUtf8() );
+		QApplication::clipboard()->setMimeData( content, QClipboard::Clipboard );
+	}
+
+
+
+
+	QString decodeKey( const QMimeData * mimeData )
+	{
+		bool hasMt = (mimeData->hasFormat(mimeType(MimeType::StringPair)));
+		return( QString::fromUtf8( mimeData->data( mimeType( hasMt ? MimeType::StringPair : MimeType::Osc ) ) ).section( ':', 0, 0 ) );
+	}
+
+
+
+
+	QString decodeValue( const QMimeData * mimeData )
+	{
+		bool hasMt = (mimeData->hasFormat(mimeType(MimeType::StringPair)));
+		return( QString::fromUtf8( mimeData->data( mimeType( hasMt ? MimeType::StringPair : MimeType::Osc ) ) ).section( ':', 1, -1 ) );
+	}
 }
-
-
-

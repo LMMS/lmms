@@ -110,6 +110,7 @@ private:
 	fpp_t m_outBufFrameIndex;
 
 	bool m_stopped;
+	bool m_outstreamStarted;
 
 	int m_disconnectErr;
 	void onBackendDisconnect(int err);

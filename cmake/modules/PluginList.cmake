@@ -56,7 +56,7 @@ SET(LMMS_PLUGIN_LIST
 	ReverbSC
 	sf2_player
 	sfxr
-	sid
+	Sid
 	SpaEffect
 	SpaInstrument
 	SpectrumAnalyzer

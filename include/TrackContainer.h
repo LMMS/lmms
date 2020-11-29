@@ -115,30 +115,4 @@ private:
 } ;
 
 
-class DummyTrackContainer : public TrackContainer
-{
-public:
-	DummyTrackContainer();
-
-	virtual ~DummyTrackContainer()
-	{
-	}
-
-	QString nodeName() const override
-	{
-		return "DummyTrackContainer";
-	}
-
-	InstrumentTrack * dummyInstrumentTrack()
-	{
-		return m_dummyInstrumentTrack;
-	}
-
-
-private:
-	InstrumentTrack * m_dummyInstrumentTrack;
-
-} ;
-
-
 #endif

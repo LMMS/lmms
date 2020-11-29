@@ -35,6 +35,7 @@
 #include "ControllerView.h"
 
 #include "CaptionMenu.h"
+#include "Clipboard.h"
 #include "ControllerConnection.h"
 #include "ControllerDialog.h"
 #include "gui_templates.h"
@@ -180,7 +181,7 @@ void ControllerView::dropEvent(QDropEvent *de)
 	if( type == "automatable_model" )
 	{
 		AutomatableModel * mod = Engine::getAutomatableModel( val,
-			!de->mimeData()->hasFormat(StringPairDrag::mimeType()) );
+			!de->mimeData()->hasFormat(Clipboard::mimeType(Clipboard::MimeType::StringPair)) );
 
 		if(mod)
 		{

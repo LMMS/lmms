@@ -136,7 +136,7 @@ public:
 	TrackView * createView( TrackContainerView* tcv ) override;
 
 	// create new track-content-object = pattern
-	TrackContentObject * createTCO( const MidiTime & _pos ) override;
+	TrackContentObject* createTCO(const MidiTime & pos) override;
 
 
 	// called by track
@@ -368,7 +368,7 @@ private:
 
 	QPoint m_lastPos;
 
-	FadeButton * getActivityIndicator()
+	FadeButton * getActivityIndicator() override
 	{
 		return m_activityIndicator;
 	}

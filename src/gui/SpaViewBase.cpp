@@ -27,7 +27,9 @@
 #ifdef LMMS_HAVE_SPA
 
 #include <QDebug>
+#include <QDragEnterEvent>
 #include <QGridLayout>
+#include <QMimeData>
 #include <QPushButton>
 
 #include "Controls.h"
@@ -38,6 +40,7 @@
 #include "SpaOscModel.h"
 #include "SpaProc.h"
 #include "StringPairDrag.h"
+#include "Clipboard.h"
 #include "LedCheckbox.h"
 
 SpaViewBase::SpaViewBase(QWidget* meAsWidget, SpaControlBase *ctrlBase)
@@ -274,18 +277,18 @@ void SpaViewProc::dragEnterEvent(QDragEnterEvent *dev)
 {
 	void (QDragEnterEvent::*reaction)(void) = &QDragEnterEvent::ignore;
 
-	if (dev->mimeData()->hasFormat(StringPairDrag::mimeType()))
+	if (dev->mimeData()->hasFormat(Clipboard::mimeType(Clipboard::MimeType::StringPair)))
 	{
 		const QString txt =
-			dev->mimeData()->data(StringPairDrag::mimeType());
+			dev->mimeData()->data(Clipboard::mimeType(Clipboard::MimeType::StringPair));
 		if (txt.section(':', 0, 0) == "pluginpresetfile") {
 			reaction = &QDragEnterEvent::acceptProposedAction;
 		}
 	}
-	else if (dev->mimeData()->hasFormat(StringPairDrag::mimeTypeOsc()))
+	else if (dev->mimeData()->hasFormat(Clipboard::mimeType(Clipboard::MimeType::Osc)))
 	{
 		const QString txt =
-			dev->mimeData()->data(StringPairDrag::mimeTypeOsc());
+			dev->mimeData()->data(Clipboard::mimeType(Clipboard::MimeType::Osc));
 		if (txt.section(':', 0, 0) == "automatable_model") {
 			reaction = &QDragEnterEvent::acceptProposedAction;
 		}

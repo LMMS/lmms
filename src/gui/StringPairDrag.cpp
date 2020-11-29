@@ -33,12 +33,16 @@
 #include "StringPairDrag.h"
 #include "GuiApplication.h"
 #include "MainWindow.h"
+#include "Clipboard.h"
 
 
 StringPairDrag::StringPairDrag( const QString & _key, const QString & _value,
 					const QPixmap & _icon, QWidget * _w ) :
 	QDrag( _w )
 {
+	// For mimeType() and MimeType enum class
+	using namespace Clipboard;
+
 	if( _icon.isNull() && _w )
 	{
 		setPixmap( _w->grab().scaled(
@@ -52,7 +56,7 @@ StringPairDrag::StringPairDrag( const QString & _key, const QString & _value,
 	}
 	QString txt = _key + ":" + _value;
 	QMimeData * m = new QMimeData();
-	m->setData( mimeType(), txt.toUtf8() );
+	m->setData( mimeType( MimeType::StringPair ), txt.toUtf8() );
 	setMimeData( m );
 	exec( Qt::LinkAction, Qt::LinkAction );
 }
@@ -76,25 +80,26 @@ StringPairDrag::~StringPairDrag()
 bool StringPairDrag::processDragEnterEvent( QDragEnterEvent * _dee,
 						const QString & _allowed_keys )
 {
-	if( !_dee->mimeData()->hasFormat( mimeType() ) &&
-		!_dee->mimeData()->hasFormat( mimeTypeOsc() ) )
+	// For mimeType() and MimeType enum class
+	using namespace Clipboard;
+
+	if( !_dee->mimeData()->hasFormat( mimeType( MimeType::StringPair ) ) &&
+		!_dee->mimeData()->hasFormat( mimeType( MimeType::Osc ) ) )
 	{
-		qDebug() << "will reject: bad mimetype:"
-			<< (_dee->mimeData()->formats().empty()
-				? "none"
-				: _dee->mimeData()->formats().front().
-					toUtf8().data());
+		qDebug()	<< "will reject: bad mimetype:"
+					<< (_dee->mimeData()->formats().empty()
+						? "none"
+						: _dee->mimeData()->formats().front().toUtf8().data());
 		return false;
 	}
-	QString txt = _dee->mimeData()->data( mimeType() );
+	QString txt = _dee->mimeData()->data( mimeType( MimeType::StringPair ) );
 	if( _allowed_keys.split( ',' ).contains( txt.section( ':', 0, 0 ) ) )
 	{
 		_dee->acceptProposedAction();
-		qDebug() << "will accept DnD";
 		return true;
 	}
 	else {
-		QString txtOsc = _dee->mimeData()->data( mimeTypeOsc() );
+		QString txtOsc = _dee->mimeData()->data( mimeType( MimeType::Osc ) );
 		if( _allowed_keys.split( ',' ).contains( txtOsc.section( ':', 0, 0 ) ) )
 		{
 			_dee->acceptProposedAction();
@@ -103,7 +108,7 @@ bool StringPairDrag::processDragEnterEvent( QDragEnterEvent * _dee,
 		}
 		else
 			qDebug() << "will reject DnD: cannot drop"
-				<< txt << "or" << txtOsc <<  "here";
+					<< txt << "or" << txtOsc <<  "here";
 	}
 	_dee->ignore();
 	return false;
@@ -112,31 +117,9 @@ bool StringPairDrag::processDragEnterEvent( QDragEnterEvent * _dee,
 
 
 
-QString StringPairDrag::decodeMimeKey( const QMimeData * mimeData )
-{
-	bool hasMt = (mimeData->hasFormat(mimeType()));
-	return	QString::fromUtf8( mimeData->data(
-		hasMt ? mimeType() : mimeTypeOsc() ) ).section( ':', 0, 0 );
-}
-
-
-
-
-QString StringPairDrag::decodeMimeValue( const QMimeData * mimeData )
-{
-	const char* myMimeType = (mimeData->hasFormat(mimeType()))
-			? mimeType()
-			: mimeTypeOsc();
-	return	QString::fromUtf8( mimeData->data( myMimeType ) ).
-		section( ':', 1, -1 );
-}
-
-
-
-
 QString StringPairDrag::decodeKey( QDropEvent * _de )
 {
-	return decodeMimeKey( _de->mimeData() );
+	return Clipboard::decodeKey( _de->mimeData() );
 }
 
 
@@ -144,5 +127,5 @@ QString StringPairDrag::decodeKey( QDropEvent * _de )
 
 QString StringPairDrag::decodeValue( QDropEvent * _de )
 {
-	return decodeMimeValue( _de->mimeData() );
+	return Clipboard::decodeValue( _de->mimeData() );
 }

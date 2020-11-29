@@ -216,8 +216,6 @@ void AutomationPatternView::constructContextMenu( QMenu * _cm )
 				this, SLOT( disconnectObject( QAction * ) ) );
 		_cm->addMenu( m );
 	}
-
-	_cm->addSeparator();
 }
 
 
@@ -256,13 +254,9 @@ void AutomationPatternView::paintEvent( QPaintEvent * )
 	QPainter p( &m_paintPixmap );
 
 	QLinearGradient lingrad( 0, 0, 0, height() );
-	QColor c;
+	QColor c = getColorForDisplay( painter.background().color() );
 	bool muted = m_pat->getTrack()->isMuted() || m_pat->isMuted();
 	bool current = gui->automationEditor()->currentPattern() == m_pat;
-	
-	// state: selected, muted, normal
-	c = isSelected() ? selectedColor() : ( muted ? mutedBackgroundColor() 
-		:	painter.background().color() );
 
 	lingrad.setColorAt( 1, c.darker( 300 ) );
 	lingrad.setColorAt( 0, c );

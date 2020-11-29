@@ -43,7 +43,7 @@ class patchesDialog : public QDialog, private Ui::patchesDialog
 public:
 
 	// Constructor.
-	patchesDialog(QWidget *pParent = 0, Qt::WindowFlags wflags = 0);
+	patchesDialog(QWidget *pParent = 0, Qt::WindowFlags wflags = QFlag(0));
 
 	// Destructor.
 	virtual ~patchesDialog();

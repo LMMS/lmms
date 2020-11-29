@@ -38,6 +38,10 @@ const char *PluginIssue::msgFor(const PluginIssueType &it)
 			return "too many audio input channels";
 		case tooManyOutputChannels:
 			return "too many audio output channels";
+		case tooManyMidiInputChannels:
+			return "too many MIDI input channels";
+		case tooManyMidiOutputChannels:
+			return "too many MIDI output channels";
 		case noOutputChannel:
 			return "no audio output channel";
 		case portHasNoDef:
@@ -46,10 +50,14 @@ const char *PluginIssue::msgFor(const PluginIssueType &it)
 			return "port is missing min value";
 		case portHasNoMax:
 			return "port is missing max value";
+		case defaultValueNotInRange:
+			return "default value is not in range [min, max]";
 		case featureNotSupported:
 			return "required feature not supported";
 		case badPortType:
 			return "unsupported port type";
+		case blacklisted:
+			return "blacklisted plugin";
 		case noIssue:
 			return nullptr;
 	}
