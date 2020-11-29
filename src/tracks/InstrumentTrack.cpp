@@ -124,7 +124,7 @@ InstrumentTrack::InstrumentTrack( TrackContainer* tc ) :
 
 	// Initialize the m_midiCCEnabled variable, but it's actually going to be connected
 	// to a LedButton
-	m_midiCCEnable = new BoolModel(false, nullptr, "Enable/Disable MIDI CC");
+	m_midiCCEnable = new BoolModel(false, nullptr, tr("Enable/Disable MIDI CC"));
 
 	// Initialize the MIDI CC controller models and connect them to the method that processes
 	// the midi cc events
@@ -132,7 +132,7 @@ InstrumentTrack::InstrumentTrack( TrackContainer* tc ) :
 	{
 		m_midiCCModel[i] = new FloatModel(
 			0.0f, 0.0f, 127.0f, 1.0f,
-			nullptr, QString("CC Controller ") + QString::number(i)
+			nullptr, tr("CC Controller %1").arg(i)
 		);
 
 		connect(m_midiCCModel[i], &FloatModel::dataChanged,
@@ -1111,7 +1111,7 @@ InstrumentTrackView::InstrumentTrackView( InstrumentTrack * _it, TrackContainerV
 	m_midiInputAction->setText( tr( "Input" ) );
 	m_midiOutputAction->setText( tr( "Output" ) );
 
-	QAction *midiRackAction = m_midiMenu->addAction("Open/Close MIDI CC Rack");
+	QAction *midiRackAction = m_midiMenu->addAction(tr("Open/Close MIDI CC Rack"));
 	connect(midiRackAction, SIGNAL(triggered()),
 		this, SLOT(toggleMidiCCRack()));
 

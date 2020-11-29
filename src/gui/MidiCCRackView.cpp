@@ -101,7 +101,7 @@ MidiCCRackView::MidiCCRackView(InstrumentTrack * track) :
 	for (int i = 0; i < MidiControllerCount; ++i)
 	{
 		m_controllerKnob[i] = new Knob(knobBright_26);
-		m_controllerKnob[i]->setLabel(QString("CC %1").arg(QString::number(i)));
+		m_controllerKnob[i]->setLabel(tr("CC %1").arg(i));
 		knobsAreaLayout->addWidget(m_controllerKnob[i], i/4, i%4);
 	}
 
