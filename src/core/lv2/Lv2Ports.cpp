@@ -77,7 +77,7 @@ const char *toStr(Vis pv)
 		case Vis::Toggled: return "toggled";
 		case Vis::Enumeration: return "enumeration";
 		case Vis::Integer: return "integer";
-		case Vis::None: return "none";
+		case Vis::Generic: return "none";
 	}
 	return "";
 }
@@ -118,7 +118,7 @@ std::vector<PluginIssue> Meta::get(const LilvPlugin *plugin,
 		? Vis::Enumeration
 		: hasProperty(LV2_CORE__toggled)
 		? Vis::Toggled
-		: Vis::None;
+		: Vis::Generic;
 
 	if (isA(LV2_CORE__InputPort)) { m_flow = Flow::Input; }
 	else if (isA(LV2_CORE__OutputPort)) { m_flow = Flow::Output; }
@@ -218,11 +218,14 @@ std::vector<PluginIssue> Meta::get(const LilvPlugin *plugin,
 			}
 
 			// visualization
-			if (m_max - m_min > 15.0f)
+			if (!m_min_set() ||
+				!m_max_set() ||
+				// if we get here, min and max are set, so max-min should not overflow:
+				(m_vis == Vis::Integer && m_max - m_min > 15.0f))
 			{
 				// range too large for spinbox visualisation, use knobs
 				// e.g. 0...15 would be OK
-				m_vis = Vis::None;
+				m_vis = Vis::Generic;
 			}
 		}
 	}
