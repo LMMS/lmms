@@ -118,7 +118,20 @@ void Lv2Manager::initPlugins()
 		const LilvPlugin* curPlug = lilv_plugins_get(plugins, itr);
 
 		std::vector<PluginIssue> issues;
-		Plugin::PluginTypes type = Lv2ControlBase::check(curPlug, issues, m_debug);
+		Plugin::PluginTypes type = Lv2ControlBase::check(curPlug, issues);
+		std::sort(issues.begin(), issues.end());
+		auto last = std::unique(issues.begin(), issues.end());
+		issues.erase(last, issues.end());
+		if (m_debug && issues.size())
+		{
+			qDebug() << "Lv2 plugin"
+				<< qStringFromPluginNode(curPlug, lilv_plugin_get_name)
+				<< "(URI:"
+				<< lilv_node_as_uri(lilv_plugin_get_uri(curPlug))
+				<< ") can not be loaded:";
+			for (const PluginIssue& iss : issues) { qDebug() << "  - " << iss; }
+		}
+
 		Lv2Info info(curPlug, type, issues.empty());
 
 		m_lv2InfoMap[lilv_node_as_uri(lilv_plugin_get_uri(curPlug))]

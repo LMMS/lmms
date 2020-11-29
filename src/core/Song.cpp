@@ -30,6 +30,8 @@
 #include <QFileInfo>
 #include <QMessageBox>
 
+#include <algorithm>
+#include <cmath>
 #include <functional>
 
 #include "AutomationTrack.h"
@@ -191,226 +193,159 @@ void Song::savePos()
 
 void Song::processNextBuffer()
 {
-	m_vstSyncController.setPlaybackJumped( false );
+	m_vstSyncController.setPlaybackJumped(false);
 
-	// if not playing, nothing to do
-	if( m_playing == false )
+	// If nothing is playing, there is nothing to do
+	if (!m_playing) { return; }
+
+	// At the beginning of the song, we have to reset the LFOs
+	if (m_playMode == Mode_PlaySong && getPlayPos() == 0)
 	{
-		return;
+		EnvelopeAndLfoParameters::instances()->reset();
 	}
 
 	TrackList trackList;
-	int tcoNum = -1; // track content object number
+	int clipNum = -1; // The number of the clip that will be played
 
-	// determine the list of tracks to play and the track content object
-	// (TCO) number
-	switch( m_playMode )
+	// Determine the list of tracks to play and the clip number
+	switch (m_playMode)
 	{
 		case Mode_PlaySong:
 			trackList = tracks();
-			// at song-start we have to reset the LFOs
-			if( m_playPos[Mode_PlaySong] == 0 )
-			{
-				EnvelopeAndLfoParameters::instances()->reset();
-			}
 			break;
 
 		case Mode_PlayBB:
-			if( Engine::getBBTrackContainer()->numOfBBs() > 0 )
+			if (Engine::getBBTrackContainer()->numOfBBs() > 0)
 			{
-				tcoNum = Engine::getBBTrackContainer()->
-								currentBB();
-				trackList.push_back( BBTrack::findBBTrack(
-								tcoNum ) );
+				clipNum = Engine::getBBTrackContainer()->currentBB();
+				trackList.push_back(BBTrack::findBBTrack(clipNum));
 			}
 			break;
 
 		case Mode_PlayPattern:
-			if( m_patternToPlay != NULL )
+			if (m_patternToPlay)
 			{
-				tcoNum = m_patternToPlay->getTrack()->
-						getTCONum( m_patternToPlay );
-				trackList.push_back(
-						m_patternToPlay->getTrack() );
+				clipNum = m_patternToPlay->getTrack()->getTCONum(m_patternToPlay);
+				trackList.push_back(m_patternToPlay->getTrack());
 			}
 			break;
 
 		default:
 			return;
-
 	}
 
-	// if we have no tracks to play, nothing to do
-	if( trackList.empty() == true )
-	{
-		return;
-	}
+	// If we have no tracks to play, there is nothing to do
+	if (trackList.empty()) { return; }
 
-	// check for looping-mode and act if necessary
-	TimeLineWidget * tl = m_playPos[m_playMode].m_timeLine;
-	bool checkLoop =
-		tl != NULL && m_exporting == false && tl->loopPointsEnabled();
-
-	if( checkLoop )
+	// If the playback position is outside of the range [begin, end), move it to
+	// begin and inform interested parties.
+	// Returns true if the playback position was moved, else false.
+	const auto enforceLoop = [this](const MidiTime& begin, const MidiTime& end)
 	{
-		// if looping-mode is enabled and we are outside of the looping
-		// range, go to the beginning of the range
-		if( m_playPos[m_playMode] < tl->loopBegin() ||
-					m_playPos[m_playMode] >= tl->loopEnd() )
+		if (getPlayPos() < begin || getPlayPos() >= end)
 		{
-			setToTime(tl->loopBegin());
-			m_playPos[m_playMode].setTicks(
-						tl->loopBegin().getTicks() );
-
-			m_vstSyncController.setPlaybackJumped( true );
-
+			setToTime(begin);
+			m_vstSyncController.setPlaybackJumped(true);
 			emit updateSampleTracks();
+			return true;
 		}
+		return false;
+	};
+
+	const auto timeline = getPlayPos().m_timeLine;
+	const auto loopEnabled = !m_exporting && timeline && timeline->loopPointsEnabled();
+
+	// Ensure playback begins within the loop if it is enabled
+	if (loopEnabled) { enforceLoop(timeline->loopBegin(), timeline->loopEnd()); }
+
+	// Inform VST plugins if the user moved the play head
+	if (getPlayPos().jumped())
+	{
+		m_vstSyncController.setPlaybackJumped(true);
+		getPlayPos().setJumped(false);
 	}
 
-	if( m_playPos[m_playMode].jumped() )
+	const auto framesPerTick = Engine::framesPerTick();
+	const auto framesPerPeriod = Engine::mixer()->framesPerPeriod();
+
+	f_cnt_t frameOffsetInPeriod = 0;
+
+	while (frameOffsetInPeriod < framesPerPeriod)
 	{
-		m_vstSyncController.setPlaybackJumped( true );
-		m_playPos[m_playMode].setJumped( false );
-	}
+		auto frameOffsetInTick = getPlayPos().currentFrame();
 
-	f_cnt_t framesPlayed = 0;
-	const float framesPerTick = Engine::framesPerTick();
-
-	while( framesPlayed < Engine::mixer()->framesPerPeriod() )
-	{
-		m_vstSyncController.update();
-
-		float currentFrame = m_playPos[m_playMode].currentFrame();
-		// did we play a tick?
-		if( currentFrame >= framesPerTick )
+		// If a whole tick has elapsed, update the frame and tick count, and check any loops
+		if (frameOffsetInTick >= framesPerTick)
 		{
-			int ticks = m_playPos[m_playMode].getTicks() +
-				( int )( currentFrame / framesPerTick );
+			// Transfer any whole ticks from the frame count to the tick count
+			const auto elapsedTicks = static_cast<int>(frameOffsetInTick / framesPerTick);
+			getPlayPos().setTicks(getPlayPos().getTicks() + elapsedTicks);
+			frameOffsetInTick -= elapsedTicks * framesPerTick;
+			getPlayPos().setCurrentFrame(frameOffsetInTick);
 
-			// did we play a whole bar?
-			if( ticks >= MidiTime::ticksPerBar() )
+			// If we are playing a BB track, or a pattern with no loop enabled,
+			// loop back to the beginning when we reach the end
+			if (m_playMode == Mode_PlayBB)
 			{
-				// per default we just continue playing even if
-				// there's no more stuff to play
-				// (song-play-mode)
-				int maxBar = m_playPos[m_playMode].getBar()
-									+ 2;
-
-				// then decide whether to go over to next bar
-				// or to loop back to first bar
-				if( m_playMode == Mode_PlayBB )
-				{
-					maxBar = Engine::getBBTrackContainer()
-							->lengthOfCurrentBB();
-				}
-				else if( m_playMode == Mode_PlayPattern &&
-					m_loopPattern == true &&
-					tl != NULL &&
-					tl->loopPointsEnabled() == false )
-				{
-					maxBar = m_patternToPlay->length()
-								.getBar();
-				}
-
-				// end of played object reached?
-				if( m_playPos[m_playMode].getBar() + 1
-								>= maxBar )
-				{
-					// then start from beginning and keep
-					// offset
-					ticks %= ( maxBar * MidiTime::ticksPerBar() );
-
-					// wrap milli second counter
-					setToTimeByTicks(ticks);
-
-					m_vstSyncController.setPlaybackJumped( true );
-				}
+				enforceLoop(MidiTime{0}, MidiTime{Engine::getBBTrackContainer()->lengthOfCurrentBB(), 0});
 			}
-			m_playPos[m_playMode].setTicks( ticks );
+			else if (m_playMode == Mode_PlayPattern && m_loopPattern && !loopEnabled)
+			{
+				enforceLoop(MidiTime{0}, m_patternToPlay->length());
+			}
 
-			if (checkLoop || m_loopRenderRemaining > 1)
+			// Handle loop points, and inform VST plugins of the loop status
+			if (loopEnabled || m_loopRenderRemaining > 1)
 			{
 				m_vstSyncController.startCycle(
-					tl->loopBegin().getTicks(), tl->loopEnd().getTicks() );
+					timeline->loopBegin().getTicks(), timeline->loopEnd().getTicks());
 
-				// if looping-mode is enabled and we have got
-				// past the looping range, return to the
-				// beginning of the range
-				if( m_playPos[m_playMode] >= tl->loopEnd() )
+				// Loop if necessary, and decrement the remaining loops if we did
+				if (enforceLoop(timeline->loopBegin(), timeline->loopEnd())
+					&& m_loopRenderRemaining > 1)
 				{
-					if (m_loopRenderRemaining > 1) 
-						m_loopRenderRemaining--;
-					ticks = tl->loopBegin().getTicks();
-					m_playPos[m_playMode].setTicks( ticks );
-					setToTime(tl->loopBegin());
-
-					m_vstSyncController.setPlaybackJumped( true );
-
-					emit updateSampleTracks();
+					m_loopRenderRemaining--;
 				}
 			}
 			else
 			{
 				m_vstSyncController.stopCycle();
 			}
-
-			currentFrame = fmodf( currentFrame, framesPerTick );
-			m_playPos[m_playMode].setCurrentFrame( currentFrame );
 		}
 
-		if( framesPlayed == 0 )
+		const f_cnt_t framesUntilNextPeriod = framesPerPeriod - frameOffsetInPeriod;
+		const f_cnt_t framesUntilNextTick = static_cast<f_cnt_t>(std::ceil(framesPerTick - frameOffsetInTick));
+
+		// We want to proceed to the next buffer or tick, whichever is closer
+		const auto framesToPlay = std::min(framesUntilNextPeriod, framesUntilNextTick);
+
+		if (frameOffsetInPeriod == 0)
 		{
-			// update VST sync position after we've corrected frame/
-			// tick count but before actually playing any frames
-			m_vstSyncController.setAbsolutePosition(
-				m_playPos[m_playMode].getTicks()
-				+ m_playPos[m_playMode].currentFrame()
-				/ (double) framesPerTick );
+			// First frame of buffer: update VST sync position.
+			// This must be done after we've corrected the frame/tick count,
+			// but before actually playing any frames.
+			m_vstSyncController.setAbsolutePosition(getPlayPos().getTicks()
+				+ getPlayPos().currentFrame() / static_cast<double>(framesPerTick));
+			m_vstSyncController.update();
 		}
 
-		f_cnt_t framesToPlay = 
-			Engine::mixer()->framesPerPeriod() - framesPlayed;
-
-		f_cnt_t framesLeft = ( f_cnt_t )framesPerTick -
-						( f_cnt_t )currentFrame;
-		// skip last frame fraction
-		if( framesLeft == 0 )
+		if (static_cast<f_cnt_t>(frameOffsetInTick) == 0)
 		{
-			++framesPlayed;
-			m_playPos[m_playMode].setCurrentFrame( currentFrame
-								+ 1.0f );
-			continue;
-		}
-		// do we have samples left in this tick but these are less
-		// than samples we have to play?
-		if( framesLeft < framesToPlay )
-		{
-			// then set framesToPlay to remaining samples, the
-			// rest will be played in next loop
-			framesToPlay = framesLeft;
-		}
-
-		if( ( f_cnt_t ) currentFrame == 0 )
-		{
-			processAutomations(trackList, m_playPos[m_playMode], framesToPlay);
-
-			// loop through all tracks and play them
-			for( int i = 0; i < trackList.size(); ++i )
+			// First frame of tick: process automation and play tracks
+			processAutomations(trackList, getPlayPos(), framesToPlay);
+			for (const auto track : trackList)
 			{
-				trackList[i]->play( m_playPos[m_playMode],
-						framesToPlay,
-						framesPlayed, tcoNum );
+				track->play(getPlayPos(), framesToPlay, frameOffsetInPeriod, clipNum);
 			}
 		}
 
-		// update frame-counters
-		framesPlayed += framesToPlay;
-		m_playPos[m_playMode].setCurrentFrame( framesToPlay +
-								currentFrame );
+		// Update frame counters
+		frameOffsetInPeriod += framesToPlay;
+		frameOffsetInTick += framesToPlay;
+		getPlayPos().setCurrentFrame(frameOffsetInTick);
 		m_elapsedMilliSeconds[m_playMode] += MidiTime::ticksToMilliseconds(framesToPlay / framesPerTick, getTempo());
 		m_elapsedBars = m_playPos[Mode_PlaySong].getBar();
-		m_elapsedTicks = ( m_playPos[Mode_PlaySong].getTicks() % ticksPerBar() ) / 48;
+		m_elapsedTicks = (m_playPos[Mode_PlaySong].getTicks() % ticksPerBar()) / 48;
 	}
 }
 

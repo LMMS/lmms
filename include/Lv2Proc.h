@@ -61,7 +61,7 @@ class Lv2Proc : public LinkedModelGroup
 {
 public:
 	static Plugin::PluginTypes check(const LilvPlugin* plugin,
-		std::vector<PluginIssue> &issues, bool printIssues = false);
+		std::vector<PluginIssue> &issues);
 
 	/*
 		ctor/dtor
