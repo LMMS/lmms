@@ -285,7 +285,7 @@ void AutomationPatternView::paintEvent( QPaintEvent * )
 
 	const float y_scale = max - min;
 	const float h = ( height() - 2 * TCO_BORDER_WIDTH ) / y_scale;
-	const float ppTick  = ppb / MidiTime::ticksPerBar();
+	const float ppTick  = ppb / TimePos::ticksPerBar();
 
 	p.translate( 0.0f, max * height() / y_scale - TCO_BORDER_WIDTH );
 	p.scale( 1.0f, -h );

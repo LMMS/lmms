@@ -708,7 +708,7 @@ void AutomatableModel::reset()
 
 
 
-float AutomatableModel::globalAutomationValueAt( const MidiTime& time )
+float AutomatableModel::globalAutomationValueAt( const TimePos& time )
 {
 	// get patterns that connect to this model
 	QVector<AutomationPattern *> patterns = AutomationPattern::patternsForModel( this );
@@ -720,7 +720,7 @@ float AutomatableModel::globalAutomationValueAt( const MidiTime& time )
 	else
 	{
 		// of those patterns:
-		// find the patterns which overlap with the miditime position
+		// find the patterns which overlap with the time position
 		QVector<AutomationPattern *> patternsInRange;
 		for( QVector<AutomationPattern *>::ConstIterator it = patterns.begin(); it != patterns.end(); it++ )
 		{
@@ -738,7 +738,7 @@ float AutomatableModel::globalAutomationValueAt( const MidiTime& time )
 			latestPattern = patternsInRange[0];
 		}
 		else
-		// if we find no patterns at the exact miditime, we need to search for the last pattern before time and use that
+		// if we find no patterns at the exact time, we need to search for the last pattern before time and use that
 		{
 			int latestPosition = 0;
 

@@ -206,7 +206,7 @@ bool Lv2ControlBase::hasNoteInput() const
 
 
 void Lv2ControlBase::handleMidiInputEvent(const MidiEvent &event,
-	const MidiTime &time, f_cnt_t offset)
+	const TimePos &time, f_cnt_t offset)
 {
 	for (auto& c : m_procs) { c->handleMidiInputEvent(event, time, offset); }
 }

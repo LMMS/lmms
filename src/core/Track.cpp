@@ -149,9 +149,9 @@ TrackContentObject::~TrackContentObject()
  *
  * \param _pos The new position of the track content object.
  */
-void TrackContentObject::movePosition( const MidiTime & pos )
+void TrackContentObject::movePosition( const TimePos & pos )
 {
-	MidiTime newPos = qMax(0, pos.getTicks());
+	TimePos newPos = qMax(0, pos.getTicks());
 	if (m_startPosition != newPos)
 	{
 		Engine::mixer()->requestChangeInModel();
@@ -172,7 +172,7 @@ void TrackContentObject::movePosition( const MidiTime & pos )
  *
  * \param _length The new length of the track content object.
  */
-void TrackContentObject::changeLength( const MidiTime & length )
+void TrackContentObject::changeLength( const TimePos & length )
 {
 	m_length = length;
 	Engine::getSong()->updateLength();
@@ -202,7 +202,7 @@ void TrackContentObject::copyStateTo( TrackContentObject *src, TrackContentObjec
 		QDomElement parent = doc.createElement( "StateCopy" );
 		src->saveState( doc, parent );
 
-		const MidiTime pos = dst->startPosition();
+		const TimePos pos = dst->startPosition();
 		dst->restoreState( parent.firstChild().toElement() );
 		dst->movePosition( pos );
 
@@ -231,7 +231,7 @@ void TrackContentObject::toggleMute()
 
 
 
-MidiTime TrackContentObject::startTimeOffset() const
+TimePos TrackContentObject::startTimeOffset() const
 {
 	return m_startTimeOffset;
 }
@@ -239,7 +239,7 @@ MidiTime TrackContentObject::startTimeOffset() const
 
 
 
-void TrackContentObject::setStartTimeOffset( const MidiTime &startTimeOffset )
+void TrackContentObject::setStartTimeOffset( const TimePos &startTimeOffset )
 {
 	m_startTimeOffset = startTimeOffset;
 }
@@ -290,9 +290,9 @@ TrackContentObjectView::TrackContentObjectView( TrackContentObject * tco,
 	m_action( NoAction ),
 	m_initialMousePos( QPoint( 0, 0 ) ),
 	m_initialMouseGlobalPos( QPoint( 0, 0 ) ),
-	m_initialTCOPos( MidiTime(0) ),
-	m_initialTCOEnd( MidiTime(0) ),
-	m_initialOffsets( QVector<MidiTime>() ),
+	m_initialTCOPos( TimePos(0) ),
+	m_initialTCOEnd( TimePos(0) ),
+	m_initialOffsets( QVector<TimePos>() ),
 	m_hint( NULL ),
 	m_mutedColor( 0, 0, 0 ),
 	m_mutedBackgroundColor( 0, 0, 0 ),
@@ -514,7 +514,7 @@ void TrackContentObjectView::updateLength()
 	{
 		setFixedWidth(
 		static_cast<int>( m_tco->length() * pixelsPerBar() /
-					MidiTime::ticksPerBar() ) + 1 /*+
+					TimePos::ticksPerBar() ) + 1 /*+
 						TCO_BORDER_WIDTH * 2-1*/ );
 	}
 	m_trackView->trackContainerView()->update();
@@ -577,7 +577,7 @@ void TrackContentObjectView::useTrackColor()
 void TrackContentObjectView::dragEnterEvent( QDragEnterEvent * dee )
 {
 	TrackContentWidget * tcw = getTrackView()->getTrackContentWidget();
-	MidiTime tcoPos = MidiTime( m_tco->startPosition() );
+	TimePos tcoPos = TimePos( m_tco->startPosition() );
 
 	if( tcw->canPasteSelection( tcoPos, dee ) == false )
 	{
@@ -617,7 +617,7 @@ void TrackContentObjectView::dropEvent( QDropEvent * de )
 	if( m_trackView->trackContainerView()->allowRubberband() == true )
 	{
 		TrackContentWidget * tcw = getTrackView()->getTrackContentWidget();
-		MidiTime tcoPos = MidiTime( m_tco->startPosition() );
+		TimePos tcoPos = TimePos( m_tco->startPosition() );
 
 		if( tcw->pasteSelection( tcoPos, de ) == true )
 		{
@@ -636,7 +636,7 @@ void TrackContentObjectView::dropEvent( QDropEvent * de )
 
 	// Copy state into existing tco
 	DataFile dataFile( value.toUtf8() );
-	MidiTime pos = m_tco->startPosition();
+	TimePos pos = m_tco->startPosition();
 	QDomElement tcos = dataFile.content().firstChildElement( "tcos" );
 	m_tco->restoreState( tcos.firstChildElement().firstChildElement() );
 	m_tco->movePosition( pos );
@@ -830,7 +830,7 @@ void TrackContentObjectView::mousePressEvent( QMouseEvent * me )
 					s_textFloat->setText( QString( "%1:%2" ).
 						arg( m_tco->startPosition().getBar() + 1 ).
 						arg( m_tco->startPosition().getTicks() %
-								MidiTime::ticksPerBar() ) );
+								TimePos::ticksPerBar() ) );
 				}
 				else if( m_action == Resize || m_action == ResizeLeft )
 				{
@@ -838,13 +838,13 @@ void TrackContentObjectView::mousePressEvent( QMouseEvent * me )
 					s_textFloat->setText( tr( "%1:%2 (%3:%4 to %5:%6)" ).
 							arg( m_tco->length().getBar() ).
 							arg( m_tco->length().getTicks() %
-									MidiTime::ticksPerBar() ).
+									TimePos::ticksPerBar() ).
 							arg( m_tco->startPosition().getBar() + 1 ).
 							arg( m_tco->startPosition().getTicks() %
-									MidiTime::ticksPerBar() ).
+									TimePos::ticksPerBar() ).
 							arg( m_tco->endPosition().getBar() + 1 ).
 							arg( m_tco->endPosition().getTicks() %
-									MidiTime::ticksPerBar() ) );
+									TimePos::ticksPerBar() ) );
 				}
 				// s_textFloat->reparent( this );
 				// setup text-float as if TCO was already moved/resized
@@ -954,7 +954,7 @@ void TrackContentObjectView::mouseMoveEvent( QMouseEvent * me )
 	const float ppb = m_trackView->trackContainerView()->pixelsPerBar();
 	if( m_action == Move )
 	{
-		MidiTime newPos = draggedTCOPos( me );
+		TimePos newPos = draggedTCOPos( me );
 
 		m_tco->movePosition(newPos);
 		newPos = m_tco->startPosition(); // Get the real position the TCO was dragged to for the label
@@ -962,13 +962,13 @@ void TrackContentObjectView::mouseMoveEvent( QMouseEvent * me )
 		s_textFloat->setText( QString( "%1:%2" ).
 				arg( newPos.getBar() + 1 ).
 				arg( newPos.getTicks() %
-						MidiTime::ticksPerBar() ) );
+						TimePos::ticksPerBar() ) );
 		s_textFloat->moveGlobal( this, QPoint( width() + 2, height() + 2 ) );
 	}
 	else if( m_action == MoveSelection )
 	{
 		// 1: Find the position we want to move the grabbed TCO to
-		MidiTime newPos = draggedTCOPos( me );
+		TimePos newPos = draggedTCOPos( me );
 
 		// 2: Handle moving the other selected TCOs the same distance
 		QVector<selectableObject *> so =
@@ -1002,12 +1002,12 @@ void TrackContentObjectView::mouseMoveEvent( QMouseEvent * me )
 		const bool unquantized = (me->modifiers() & Qt::ControlModifier) || (me->modifiers() & Qt::AltModifier);
 		const float snapSize = gui->songEditor()->m_editor->getSnapSize();
 		// Length in ticks of one snap increment
-		const MidiTime snapLength = MidiTime( (int)(snapSize * MidiTime::ticksPerBar()) );
+		const TimePos snapLength = TimePos( (int)(snapSize * TimePos::ticksPerBar()) );
 
 		if( m_action == Resize )
 		{
 			// The clip's new length
-			MidiTime l = static_cast<int>( me->x() * MidiTime::ticksPerBar() / ppb );
+			TimePos l = static_cast<int>( me->x() * TimePos::ticksPerBar() / ppb );
 
 			if ( unquantized )
 			{	// We want to preserve this adjusted offset,
@@ -1018,18 +1018,18 @@ void TrackContentObjectView::mouseMoveEvent( QMouseEvent * me )
 			}
 			else if ( me->modifiers() & Qt::ShiftModifier )
 			{	// If shift is held, quantize clip's end position
-				MidiTime end = MidiTime( m_initialTCOPos + l ).quantize( snapSize );
+				TimePos end = TimePos( m_initialTCOPos + l ).quantize( snapSize );
 				// The end position has to be after the clip's start
-				MidiTime min = m_initialTCOPos.quantize( snapSize );
+				TimePos min = m_initialTCOPos.quantize( snapSize );
 				if ( min <= m_initialTCOPos ) min += snapLength;
 				m_tco->changeLength( qMax<int>(min - m_initialTCOPos, end - m_initialTCOPos) );
 			}
 			else
 			{	// Otherwise, resize in fixed increments
-				MidiTime initialLength = m_initialTCOEnd - m_initialTCOPos;
-				MidiTime offset = MidiTime( l - initialLength ).quantize( snapSize );
+				TimePos initialLength = m_initialTCOEnd - m_initialTCOPos;
+				TimePos offset = TimePos( l - initialLength ).quantize( snapSize );
 				// Don't resize to less than 1 tick
-				MidiTime min = MidiTime( initialLength % snapLength );
+				TimePos min = TimePos( initialLength % snapLength );
 				if (min < 1) min += snapLength;
 				m_tco->changeLength( qMax<int>( min, initialLength + offset) );
 			}
@@ -1041,9 +1041,9 @@ void TrackContentObjectView::mouseMoveEvent( QMouseEvent * me )
 			{
 				const int x = mapToParent( me->pos() ).x() - m_initialMousePos.x();
 
-				MidiTime t = qMax( 0, (int)
+				TimePos t = qMax( 0, (int)
 									m_trackView->trackContainerView()->currentPosition() +
-									static_cast<int>( x * MidiTime::ticksPerBar() / ppb ) );
+									static_cast<int>( x * TimePos::ticksPerBar() / ppb ) );
 
 				if( unquantized )
 				{	// We want to preserve this adjusted offset,
@@ -1055,21 +1055,21 @@ void TrackContentObjectView::mouseMoveEvent( QMouseEvent * me )
 				else if( me->modifiers() & Qt::ShiftModifier )
 				{	// If shift is held, quantize clip's start position
 					// Don't let the start position move past the end position
-					MidiTime max = m_initialTCOEnd.quantize( snapSize );
+					TimePos max = m_initialTCOEnd.quantize( snapSize );
 					if ( max >= m_initialTCOEnd ) max -= snapLength;
 					t = qMin<int>( max, t.quantize( snapSize ) );
 				}
 				else
 				{	// Otherwise, resize in fixed increments
 					// Don't resize to less than 1 tick
-					MidiTime initialLength = m_initialTCOEnd - m_initialTCOPos;
-					MidiTime minLength = MidiTime( initialLength % snapLength );
+					TimePos initialLength = m_initialTCOEnd - m_initialTCOPos;
+					TimePos minLength = TimePos( initialLength % snapLength );
 					if (minLength < 1) minLength += snapLength;
-					MidiTime offset = MidiTime(t - m_initialTCOPos).quantize( snapSize );
+					TimePos offset = TimePos(t - m_initialTCOPos).quantize( snapSize );
 					t = qMin<int>( m_initialTCOEnd - minLength, m_initialTCOPos + offset );
 				}
 
-				MidiTime oldPos = m_tco->startPosition();
+				TimePos oldPos = m_tco->startPosition();
 				if( m_tco->length() + ( oldPos - t ) >= 1 )
 				{
 					m_tco->movePosition( t );
@@ -1081,13 +1081,13 @@ void TrackContentObjectView::mouseMoveEvent( QMouseEvent * me )
 		s_textFloat->setText( tr( "%1:%2 (%3:%4 to %5:%6)" ).
 				arg( m_tco->length().getBar() ).
 				arg( m_tco->length().getTicks() %
-						MidiTime::ticksPerBar() ).
+						TimePos::ticksPerBar() ).
 				arg( m_tco->startPosition().getBar() + 1 ).
 				arg( m_tco->startPosition().getTicks() %
-						MidiTime::ticksPerBar() ).
+						TimePos::ticksPerBar() ).
 				arg( m_tco->endPosition().getBar() + 1 ).
 				arg( m_tco->endPosition().getTicks() %
-						MidiTime::ticksPerBar() ) );
+						TimePos::ticksPerBar() ) );
 		s_textFloat->moveGlobal( this, QPoint( width() + 2, height() + 2) );
 	}
 	else
@@ -1300,8 +1300,8 @@ void TrackContentObjectView::paste()
 	// For getMimeData()
 	using namespace Clipboard;
 
-	// If possible, paste the selection on the MidiTime of the selected Track and remove it
-	MidiTime tcoPos = MidiTime( m_tco->startPosition() );
+	// If possible, paste the selection on the TimePos of the selected Track and remove it
+	TimePos tcoPos = TimePos( m_tco->startPosition() );
 
 	TrackContentWidget *tcw = getTrackView()->getTrackContentWidget();
 
@@ -1338,7 +1338,7 @@ float TrackContentObjectView::pixelsPerBar()
 void TrackContentObjectView::setInitialOffsets()
 {
 	QVector<selectableObject *> so = m_trackView->trackContainerView()->selectedObjects();
-	QVector<MidiTime> offsets;
+	QVector<TimePos> offsets;
 	for( QVector<selectableObject *>::iterator it = so.begin();
 						it != so.end(); ++it )
 	{
@@ -1376,14 +1376,14 @@ bool TrackContentObjectView::mouseMovedDistance( QMouseEvent * me, int distance 
  *
  * \param me The QMouseEvent
  */
-MidiTime TrackContentObjectView::draggedTCOPos( QMouseEvent * me )
+TimePos TrackContentObjectView::draggedTCOPos( QMouseEvent * me )
 {
 	//Pixels per bar
 	const float ppb = m_trackView->trackContainerView()->pixelsPerBar();
 	// The pixel distance that the mouse has moved
 	const int mouseOff = mapToGlobal(me->pos()).x() - m_initialMouseGlobalPos.x();
-	MidiTime newPos = m_initialTCOPos + mouseOff * MidiTime::ticksPerBar() / ppb;
-	MidiTime offset = newPos - m_initialTCOPos;
+	TimePos newPos = m_initialTCOPos + mouseOff * TimePos::ticksPerBar() / ppb;
+	TimePos offset = newPos - m_initialTCOPos;
 	// If the user is holding alt, or pressed ctrl after beginning the drag, don't quantize
 	if (    me->button() != Qt::NoButton
 		|| (me->modifiers() & Qt::ControlModifier)
@@ -1396,9 +1396,9 @@ MidiTime TrackContentObjectView::draggedTCOPos( QMouseEvent * me )
 	else if ( me->modifiers() & Qt::ShiftModifier )
 	{	// If shift is held, quantize position (Default in 1.2.0 and earlier)
 		// or end position, whichever is closest to the actual position
-		MidiTime startQ = newPos.quantize( gui->songEditor()->m_editor->getSnapSize() );
+		TimePos startQ = newPos.quantize( gui->songEditor()->m_editor->getSnapSize() );
 		// Find start position that gives snapped clip end position
-		MidiTime endQ = ( newPos + m_tco->length() );
+		TimePos endQ = ( newPos + m_tco->length() );
 		endQ = endQ.quantize( gui->songEditor()->m_editor->getSnapSize() );
 		endQ = endQ - m_tco->length();
 		// Select the position closest to actual position
@@ -1482,8 +1482,8 @@ TrackContentWidget::TrackContentWidget( TrackView * parent ) :
 	setAcceptDrops( true );
 
 	connect( parent->trackContainerView(),
-			SIGNAL( positionChanged( const MidiTime & ) ),
-			this, SLOT( changePosition( const MidiTime & ) ) );
+			SIGNAL( positionChanged( const TimePos & ) ),
+			this, SLOT( changePosition( const TimePos & ) ) );
 
 	setStyle( QApplication::style() );
 
@@ -1611,7 +1611,7 @@ void TrackContentWidget::update()
  *
  * \param newPos The MIDI time to move to.
  */
-void TrackContentWidget::changePosition( const MidiTime & newPos )
+void TrackContentWidget::changePosition( const TimePos & newPos )
 {
 	if( m_trackView->trackContainerView() == gui->getBBEditor()->trackContainerView() )
 	{
@@ -1648,7 +1648,7 @@ void TrackContentWidget::changePosition( const MidiTime & newPos )
 		return;
 	}
 
-	MidiTime pos = newPos;
+	TimePos pos = newPos;
 	if( pos < 0 )
 	{
 		pos = m_trackView->trackContainerView()->currentPosition();
@@ -1674,7 +1674,7 @@ void TrackContentWidget::changePosition( const MidiTime & newPos )
 			( ts <= begin && te >= end ) )
 		{
 			tcov->move( static_cast<int>( ( ts - begin ) * ppb /
-						MidiTime::ticksPerBar() ),
+						TimePos::ticksPerBar() ),
 								tcov->y() );
 			if( !tcov->isVisible() )
 			{
@@ -1699,12 +1699,12 @@ void TrackContentWidget::changePosition( const MidiTime & newPos )
  *
  * \param mouseX the mouse's current X position in pixels.
  */
-MidiTime TrackContentWidget::getPosition( int mouseX )
+TimePos TrackContentWidget::getPosition( int mouseX )
 {
 	TrackContainerView * tv = m_trackView->trackContainerView();
-	return MidiTime( tv->currentPosition() +
+	return TimePos( tv->currentPosition() +
 					 mouseX *
-					 MidiTime::ticksPerBar() /
+					 TimePos::ticksPerBar() /
 					 static_cast<int>( tv->pixelsPerBar() ) );
 }
 
@@ -1717,7 +1717,7 @@ MidiTime TrackContentWidget::getPosition( int mouseX )
  */
 void TrackContentWidget::dragEnterEvent( QDragEnterEvent * dee )
 {
-	MidiTime tcoPos = getPosition( dee->pos().x() );
+	TimePos tcoPos = getPosition( dee->pos().x() );
   if( canPasteSelection( tcoPos, dee ) == false )
 	{
 		dee->ignore();
@@ -1737,7 +1737,7 @@ void TrackContentWidget::dragEnterEvent( QDragEnterEvent * dee )
  * \param tcoPos the position of the TCO slot being pasted on
  * \param de the DropEvent generated
  */
-bool TrackContentWidget::canPasteSelection( MidiTime tcoPos, const QDropEvent* de )
+bool TrackContentWidget::canPasteSelection( TimePos tcoPos, const QDropEvent* de )
 {
 	const QMimeData * mimeData = de->mimeData();
 
@@ -1749,7 +1749,7 @@ bool TrackContentWidget::canPasteSelection( MidiTime tcoPos, const QDropEvent* d
 }
 
 // Overloaded method to make it possible to call this method without a Drag&Drop event
-bool TrackContentWidget::canPasteSelection( MidiTime tcoPos, const QMimeData* md , bool allowSameBar )
+bool TrackContentWidget::canPasteSelection( TimePos tcoPos, const QMimeData* md , bool allowSameBar )
 {
 	// For decodeKey() and decodeValue()
 	using namespace Clipboard;
@@ -1771,8 +1771,8 @@ bool TrackContentWidget::canPasteSelection( MidiTime tcoPos, const QMimeData* md
 	// Extract the metadata and which TCO was grabbed
 	QDomElement metadata = dataFile.content().firstChildElement( "copyMetadata" );
 	QDomAttr tcoPosAttr = metadata.attributeNode( "grabbedTCOPos" );
-	MidiTime grabbedTCOPos = tcoPosAttr.value().toInt();
-	MidiTime grabbedTCOBar = MidiTime( grabbedTCOPos.getBar(), 0 );
+	TimePos grabbedTCOPos = tcoPosAttr.value().toInt();
+	TimePos grabbedTCOBar = TimePos( grabbedTCOPos.getBar(), 0 );
 
 	// Extract the track index that was originally clicked
 	QDomAttr tiAttr = metadata.attributeNode( "initialTrackIndex" );
@@ -1824,7 +1824,7 @@ bool TrackContentWidget::canPasteSelection( MidiTime tcoPos, const QMimeData* md
  * \param tcoPos the position of the TCO slot being pasted on
  * \param de the DropEvent generated
  */
-bool TrackContentWidget::pasteSelection( MidiTime tcoPos, QDropEvent * de )
+bool TrackContentWidget::pasteSelection( TimePos tcoPos, QDropEvent * de )
 {
 	const QMimeData * mimeData = de->mimeData();
 
@@ -1838,7 +1838,7 @@ bool TrackContentWidget::pasteSelection( MidiTime tcoPos, QDropEvent * de )
 }
 
 // Overloaded method so we can call it without a Drag&Drop event
-bool TrackContentWidget::pasteSelection( MidiTime tcoPos, const QMimeData * md, bool skipSafetyCheck )
+bool TrackContentWidget::pasteSelection( TimePos tcoPos, const QMimeData * md, bool skipSafetyCheck )
 {
 	// For decodeKey() and decodeValue()
 	using namespace Clipboard;
@@ -1866,7 +1866,7 @@ bool TrackContentWidget::pasteSelection( MidiTime tcoPos, const QMimeData * md, 
 	QDomAttr tiAttr = metadata.attributeNode( "initialTrackIndex" );
 	int initialTrackIndex = tiAttr.value().toInt();
 	QDomAttr tcoPosAttr = metadata.attributeNode( "grabbedTCOPos" );
-	MidiTime grabbedTCOPos = tcoPosAttr.value().toInt();
+	TimePos grabbedTCOPos = tcoPosAttr.value().toInt();
 
 	// Snap the mouse position to the beginning of the dropped bar, in ticks
 	const TrackContainer::TrackList tracks = getTrack()->trackContainer()->tracks();
@@ -1889,20 +1889,20 @@ bool TrackContentWidget::pasteSelection( MidiTime tcoPos, const QMimeData * md, 
 
 	float snapSize = gui->songEditor()->m_editor->getSnapSize();
 	// All patterns should be offset the same amount as the grabbed pattern
-	MidiTime offset = MidiTime(tcoPos - grabbedTCOPos);
+	TimePos offset = TimePos(tcoPos - grabbedTCOPos);
 	// Users expect clips to "fall" backwards, so bias the offset
-	offset = offset - MidiTime::ticksPerBar() * snapSize / 2;
+	offset = offset - TimePos::ticksPerBar() * snapSize / 2;
 	// The offset is quantized (rather than the positions) to preserve fine adjustments
 	offset = offset.quantize(snapSize);
 
 	// Get the leftmost TCO and fix the offset if it reaches below bar 0
-	MidiTime leftmostPos = grabbedTCOPos;
+	TimePos leftmostPos = grabbedTCOPos;
 	for(int i = 0; i < tcoNodes.length(); ++i)
 	{
 		QDomElement outerTCOElement = tcoNodes.item(i).toElement();
 		QDomElement tcoElement = outerTCOElement.firstChildElement();
 
-		MidiTime pos = tcoElement.attributeNode("pos").value().toInt();
+		TimePos pos = tcoElement.attributeNode("pos").value().toInt();
 
 		if(pos < leftmostPos) { leftmostPos = pos; }
 	}
@@ -1919,9 +1919,9 @@ bool TrackContentWidget::pasteSelection( MidiTime tcoPos, const QMimeData * md, 
 		Track * t = tracks.at( finalTrackIndex );
 
 		// The new position is the old position plus the offset.
-		MidiTime pos = tcoElement.attributeNode( "pos" ).value().toInt() + offset;
+		TimePos pos = tcoElement.attributeNode( "pos" ).value().toInt() + offset;
 		// If we land on ourselves, offset by one snap
-		MidiTime shift = MidiTime::ticksPerBar() * gui->songEditor()->m_editor->getSnapSize();
+		TimePos shift = TimePos::ticksPerBar() * gui->songEditor()->m_editor->getSnapSize();
 		if (offset == 0) { pos += shift; }
 
 		TrackContentObject * tco = t->createTCO( pos );
@@ -1945,7 +1945,7 @@ bool TrackContentWidget::pasteSelection( MidiTime tcoPos, const QMimeData * md, 
  */
 void TrackContentWidget::dropEvent( QDropEvent * de )
 {
-	MidiTime tcoPos = MidiTime( getPosition( de->pos().x() ) );
+	TimePos tcoPos = TimePos( getPosition( de->pos().x() ) );
 	if( pasteSelection( tcoPos, de ) == true )
 	{
 		de->accept();
@@ -1978,8 +1978,8 @@ void TrackContentWidget::mousePressEvent( QMouseEvent * me )
 			so.at( i )->setSelected( false);
 		}
 		getTrack()->addJournalCheckPoint();
-		const MidiTime pos = getPosition( me->x() ).getBar() *
-						MidiTime::ticksPerBar();
+		const TimePos pos = getPosition( me->x() ).getBar() *
+						TimePos::ticksPerBar();
 		getTrack()->createTCO(pos);
 	}
 }
@@ -2038,11 +2038,11 @@ Track * TrackContentWidget::getTrack()
  *
  * \param posStart the starting position of the Widget (from getPosition())
  */
-MidiTime TrackContentWidget::endPosition( const MidiTime & posStart )
+TimePos TrackContentWidget::endPosition( const TimePos & posStart )
 {
 	const float ppb = m_trackView->trackContainerView()->pixelsPerBar();
 	const int w = width();
-	return posStart + static_cast<int>( w * MidiTime::ticksPerBar() / ppb );
+	return posStart + static_cast<int>( w * TimePos::ticksPerBar() / ppb );
 }
 
 void TrackContentWidget::contextMenuEvent( QContextMenuEvent * cme )
@@ -2079,8 +2079,8 @@ void TrackContentWidget::contextMenuAction( QContextMenuEvent * cme, ContextMenu
 	switch( action )
 	{
 		case Paste:
-		// Paste the selection on the MidiTime of the context menu event
-		MidiTime tcoPos = getPosition( cme->x() );
+		// Paste the selection on the TimePos of the context menu event
+		TimePos tcoPos = getPosition( cme->x() );
 
 		pasteSelection( tcoPos, getMimeData() );
 		break;
@@ -2707,7 +2707,7 @@ void Track::loadSettings( const QDomElement & element )
 			&& !node.toElement().attribute( "metadata" ).toInt() )
 			{
 				TrackContentObject * tco = createTCO(
-								MidiTime( 0 ) );
+								TimePos( 0 ) );
 				tco->restoreState( node.toElement() );
 			}
 		}
@@ -2803,7 +2803,7 @@ TrackContentObject * Track::getTCO( int tcoNum )
 	}
 	printf( "called Track::getTCO( %d ), "
 			"but TCO %d doesn't exist\n", tcoNum, tcoNum );
-	return createTCO( tcoNum * MidiTime::ticksPerBar() );
+	return createTCO( tcoNum * TimePos::ticksPerBar() );
 
 }
 
@@ -2847,8 +2847,8 @@ int Track::getTCONum( const TrackContentObject * tco )
  *  \param start The MIDI start time of the range.
  *  \param end   The MIDI endi time of the range.
  */
-void Track::getTCOsInRange( tcoVector & tcoV, const MidiTime & start,
-							const MidiTime & end )
+void Track::getTCOsInRange( tcoVector & tcoV, const TimePos & start,
+							const TimePos & end )
 {
 	for( TrackContentObject* tco : m_trackContentObjects )
 	{
@@ -2880,7 +2880,7 @@ void Track::swapPositionOfTCOs( int tcoNum1, int tcoNum2 )
 	qSwap( m_trackContentObjects[tcoNum1],
 					m_trackContentObjects[tcoNum2] );
 
-	const MidiTime pos = m_trackContentObjects[tcoNum1]->startPosition();
+	const TimePos pos = m_trackContentObjects[tcoNum1]->startPosition();
 
 	m_trackContentObjects[tcoNum1]->movePosition(
 			m_trackContentObjects[tcoNum2]->startPosition() );
@@ -2894,9 +2894,9 @@ void Track::createTCOsForBB( int bb )
 {
 	while( numOfTCOs() < bb + 1 )
 	{
-		MidiTime position = MidiTime( numOfTCOs(), 0 );
+		TimePos position = TimePos( numOfTCOs(), 0 );
 		TrackContentObject * tco = createTCO( position );
-		tco->changeLength( MidiTime( 1, 0 ) );
+		tco->changeLength( TimePos( 1, 0 ) );
 	}
 }
 
@@ -2910,7 +2910,7 @@ void Track::createTCOsForBB( int bb )
  *    in ascending order by TCO time, once we hit a TCO that was earlier
  *    than the insert time, we could fall out of the loop early.
  */
-void Track::insertBar( const MidiTime & pos )
+void Track::insertBar( const TimePos & pos )
 {
 	// we'll increase the position of every TCO, positioned behind pos, by
 	// one bar
@@ -2920,7 +2920,7 @@ void Track::insertBar( const MidiTime & pos )
 		if( ( *it )->startPosition() >= pos )
 		{
 			( *it )->movePosition( (*it)->startPosition() +
-						MidiTime::ticksPerBar() );
+						TimePos::ticksPerBar() );
 		}
 	}
 }
@@ -2932,7 +2932,7 @@ void Track::insertBar( const MidiTime & pos )
  *
  *  \param pos The time at which we want to remove the bar.
  */
-void Track::removeBar( const MidiTime & pos )
+void Track::removeBar( const TimePos & pos )
 {
 	// we'll decrease the position of every TCO, positioned behind pos, by
 	// one bar
@@ -2941,7 +2941,7 @@ void Track::removeBar( const MidiTime & pos )
 	{
 		if( ( *it )->startPosition() >= pos )
 		{
-			(*it)->movePosition((*it)->startPosition() - MidiTime::ticksPerBar());
+			(*it)->movePosition((*it)->startPosition() - TimePos::ticksPerBar());
 		}
 	}
 }
@@ -2975,7 +2975,7 @@ bar_t Track::length() const
 		}
 	}
 
-	return last / MidiTime::ticksPerBar();
+	return last / TimePos::ticksPerBar();
 }
 
 

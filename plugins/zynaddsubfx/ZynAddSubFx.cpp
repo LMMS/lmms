@@ -351,7 +351,7 @@ void ZynAddSubFxInstrument::play( sampleFrame * _buf )
 
 
 
-bool ZynAddSubFxInstrument::handleMidiEvent( const MidiEvent& event, const MidiTime& time, f_cnt_t offset )
+bool ZynAddSubFxInstrument::handleMidiEvent( const MidiEvent& event, const TimePos& time, f_cnt_t offset )
 {
 	// do not forward external MIDI Control Change events if the according
 	// LED is not checked
