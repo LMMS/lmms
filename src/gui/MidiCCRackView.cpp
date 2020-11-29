@@ -115,10 +115,6 @@ MidiCCRackView::MidiCCRackView(InstrumentTrack * track) :
 		m_controllerKnob[i]->setModel(m_track->m_midiCCModel[i].get());
 	}
 
-	// Connection made to make sure the rack is destroyed if the track is destroyed
-	connect(m_track, SIGNAL(destroyedTrack()),
-		this, SLOT(destroyRack()));
-
 	// Connection to update the name of the track on the label
 	connect(m_track, SIGNAL(nameChanged()),
 		this, SLOT(renameWindow()));
@@ -129,27 +125,16 @@ MidiCCRackView::MidiCCRackView(InstrumentTrack * track) :
 
 MidiCCRackView::~MidiCCRackView()
 {
-}
-
-void MidiCCRackView::destroyRack()
-{
-	unsetModels();
-	parentWidget()->close();
+	if(parentWidget())
+	{
+		parentWidget()->hide();
+		parentWidget()->deleteLater();
+	}
 }
 
 void MidiCCRackView::renameWindow()
 {
 	setWindowTitle(tr("MIDI CC Rack - %1").arg(m_track->name()));
-}
-
-void MidiCCRackView::unsetModels()
-{
-	m_midiCCGroupBox->unsetModel();
-
-	for (int i = 0; i < MidiControllerCount; ++i)
-	{
-		m_controllerKnob[i]->unsetModel();
-	}
 }
 
 void MidiCCRackView::saveSettings(QDomDocument & doc, QDomElement & parent)

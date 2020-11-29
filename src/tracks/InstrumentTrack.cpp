@@ -1070,7 +1070,7 @@ InstrumentTrackView::InstrumentTrackView( InstrumentTrack * _it, TrackContainerV
 	m_panningKnob->setLabel( tr( "PAN" ) );
 	m_panningKnob->show();
 
-	m_midiCCRackView = new MidiCCRackView(_it);
+	m_midiCCRackView = std::unique_ptr<MidiCCRackView>(new MidiCCRackView(_it));
 
 	m_midiMenu = new QMenu( tr( "MIDI" ), this );
 

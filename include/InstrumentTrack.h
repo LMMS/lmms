@@ -374,7 +374,7 @@ private:
 	QAction * m_midiInputAction;
 	QAction * m_midiOutputAction;
 
-	MidiCCRackView * m_midiCCRackView;
+	std::unique_ptr<MidiCCRackView> m_midiCCRackView;
 
 	QPoint m_lastPos;
 

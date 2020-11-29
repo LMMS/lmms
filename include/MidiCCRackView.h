@@ -32,8 +32,6 @@ public:
 	}
 
 public slots:
-	void unsetModels();
-	void destroyRack();
 	void renameWindow();
 
 private:
