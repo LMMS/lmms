@@ -55,7 +55,7 @@ public:
 	struct IdForType;
 
 	template<typename T>
-	static constexpr Id IdForType_v = IdForType<T>::value;
+	static constexpr auto IdForType_v = IdForType<T>::value;
 
 	//! Return URID for a cache ID
 	uint32_t operator[](Id id) const;
