@@ -107,12 +107,12 @@ MidiCCRackView::MidiCCRackView(InstrumentTrack * track) :
 
 	// Set all the models
 	// Set the LED button to enable/disable the track midi cc
-	m_midiCCGroupBox->setModel(m_track->m_midiCCEnable);
+	m_midiCCGroupBox->setModel(m_track->m_midiCCEnable.get());
 
 	// Set the model for each Knob
 	for (int i = 0; i < MidiControllerCount; ++i)
 	{
-		m_controllerKnob[i]->setModel(m_track->m_midiCCModel[i]);
+		m_controllerKnob[i]->setModel(m_track->m_midiCCModel[i].get());
 	}
 
 	// Connection made to make sure the rack is destroyed if the track is destroyed

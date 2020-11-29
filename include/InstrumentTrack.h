@@ -223,9 +223,6 @@ public:
 
 	void autoAssignMidiDevice( bool );
 
-	BoolModel *m_midiCCEnable;
-	FloatModel *m_midiCCModel[MidiControllerCount];
-
 signals:
 	void instrumentChanged();
 	void midiNoteOn( const Note& );
@@ -294,11 +291,14 @@ private:
 
 	Piano m_piano;
 
+	std::unique_ptr<BoolModel> m_midiCCEnable;
+	std::unique_ptr<FloatModel> m_midiCCModel[MidiControllerCount];
 
 	friend class InstrumentTrackView;
 	friend class InstrumentTrackWindow;
 	friend class NotePlayHandle;
 	friend class InstrumentMiscView;
+	friend class MidiCCRackView;
 
 } ;
 

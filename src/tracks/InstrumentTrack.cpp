@@ -124,18 +124,22 @@ InstrumentTrack::InstrumentTrack( TrackContainer* tc ) :
 
 	// Initialize the m_midiCCEnabled variable, but it's actually going to be connected
 	// to a LedButton
-	m_midiCCEnable = new BoolModel(false, nullptr, tr("Enable/Disable MIDI CC"));
+	m_midiCCEnable = std::unique_ptr<BoolModel>(
+		new BoolModel(false, nullptr, tr("Enable/Disable MIDI CC"))
+	);
 
 	// Initialize the MIDI CC controller models and connect them to the method that processes
 	// the midi cc events
 	for (int i = 0; i < MidiControllerCount; ++i)
 	{
-		m_midiCCModel[i] = new FloatModel(
-			0.0f, 0.0f, 127.0f, 1.0f,
-			nullptr, tr("CC Controller %1").arg(i)
+		m_midiCCModel[i] = std::unique_ptr<FloatModel>(
+			new FloatModel(
+				0.0f, 0.0f, 127.0f, 1.0f,
+				nullptr, tr("CC Controller %1").arg(i)
+			)
 		);
 
-		connect(m_midiCCModel[i], &FloatModel::dataChanged,
+		connect(m_midiCCModel[i].get(), &FloatModel::dataChanged,
 			this, [this, i]{ processCCEvent(i); }, Qt::DirectConnection);
 	}
 
@@ -163,14 +167,6 @@ int InstrumentTrack::baseNote() const
 
 InstrumentTrack::~InstrumentTrack()
 {
-	// Remove the MIDI CC models
-	delete m_midiCCEnable;
-
-	for (int i = 0; i < MidiControllerCount; ++i)
-	{
-		delete m_midiCCModel[i];
-	}
-
 	// De-assign midi device
 	if (m_hasAutoMidiDev)
 	{
