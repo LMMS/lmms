@@ -108,6 +108,8 @@ struct Meta
 	Flow m_flow = Flow::Unknown;
 	Vis m_vis = Vis::None;
 
+	bool m_logarithmic = false;
+
 	bool m_optional = false;
 	bool m_used = true;
 

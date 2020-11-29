@@ -40,6 +40,12 @@ QMdiArea {
 	background-color: #111314;
 }
 
+FileBrowser QCheckBox
+{
+	font-size: 10px;
+	color: white;
+}
+
 Knob {
 	qproperty-lineInactiveColor: rgb(120, 120, 120);
 	qproperty-arcInactiveColor: rgba(120, 120, 120, 70);
