@@ -150,7 +150,7 @@ private:
 	QPoint m_scrollPos;
 	QPoint m_mousePos;
 	int m_rubberBandStartTrackview;
-	TimePos m_rubberbandStartMidipos;
+	TimePos m_rubberbandStartTimePos;
 	int m_currentZoomingValue;
 	int m_trackHeadWidth;
 	bool m_selectRegion;

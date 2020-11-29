@@ -24,8 +24,8 @@
  */
 
 
-#ifndef MIDI_TIME_H
-#define MIDI_TIME_H
+#ifndef TIME_POS_H
+#define TIME_POS_H
 
 #include <QtGlobal>
 
@@ -40,13 +40,15 @@ const int DefaultBeatsPerBar = DefaultTicksPerBar / DefaultStepsPerBar;
 
 class MeterModel;
 
+/**
+	Represents a time signature, in which the numerator is the number of beats
+	in a bar, while the denominator is the type of note representing a beat.
+
+	Example: 6/8 means 6 beats in a bar with each beat having a duration of one 8th-note.
+*/
 class LMMS_EXPORT TimeSig
 {
 public:
-	// in a time signature,
-	// the numerator represents the number of beats in a measure.
-	// the denominator indicates which type of note represents a beat.
-	// example: 6/8 means 6 beats in a measure, where each beat has duration equal to one 8th-note.
 	TimeSig( int num, int denom );
 	TimeSig( const MeterModel &model );
 	int numerator() const;
@@ -57,6 +59,9 @@ private:
 };
 
 
+/**
+	Represents a position in time or length of a note or event, in ticks, beats, and bars
+*/
 class LMMS_EXPORT TimePos
 {
 public:

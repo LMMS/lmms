@@ -69,7 +69,7 @@ SongEditor::SongEditor( Song * song ) :
 	m_scrollPos(),
 	m_mousePos(),
 	m_rubberBandStartTrackview(0),
-	m_rubberbandStartMidipos(0),
+	m_rubberbandStartTimePos(0),
 	m_currentZoomingValue(m_zoomingModel->value()),
 	m_trackHeadWidth(ConfigManager::inst()->value("ui", "compacttrackbuttons").toInt()==1
 					 ? DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT + TRACK_OP_WIDTH_COMPACT
@@ -363,7 +363,7 @@ void SongEditor::selectRegionFromPixels(int xStart, int xEnd)
 		m_currentZoomingValue = zoomingModel()->value();
 
 		//calculate the song position where the mouse was clicked
-		m_rubberbandStartMidipos = TimePos((xStart - m_trackHeadWidth)
+		m_rubberbandStartTimePos = TimePos((xStart - m_trackHeadWidth)
 											/ pixelsPerBar() * TimePos::ticksPerBar())
 											+ m_currentPosition;
 		m_rubberBandStartTrackview = 0;
@@ -414,7 +414,7 @@ void SongEditor::updateRubberband()
 		int rubberBandTrackview = trackIndexFromSelectionPoint(m_mousePos.y());
 
 		//the time position the mouse is hover
-		TimePos rubberbandMidipos = TimePos((qMin(m_mousePos.x(), width()) - m_trackHeadWidth)
+		TimePos rubberbandTimePos = TimePos((qMin(m_mousePos.x(), width()) - m_trackHeadWidth)
 											  / pixelsPerBar() * TimePos::ticksPerBar())
 											  + m_currentPosition;
 
@@ -427,9 +427,9 @@ void SongEditor::updateRubberband()
 				auto indexOfTrackView = trackViews().indexOf(tco->getTrackView());
 				bool isBeetweenRubberbandViews = indexOfTrackView >= qMin(m_rubberBandStartTrackview, rubberBandTrackview)
 											  && indexOfTrackView <= qMax(m_rubberBandStartTrackview, rubberBandTrackview);
-				bool isBeetweenRubberbandMidiPos = tco->getTrackContentObject()->endPosition() >= qMin(m_rubberbandStartMidipos, rubberbandMidipos)
-											  && tco->getTrackContentObject()->startPosition() <= qMax(m_rubberbandStartMidipos, rubberbandMidipos);
-				it->setSelected(isBeetweenRubberbandViews && isBeetweenRubberbandMidiPos);
+				bool isBeetweenRubberbandTimePos = tco->getTrackContentObject()->endPosition() >= qMin(m_rubberbandStartTimePos, rubberbandTimePos)
+											  && tco->getTrackContentObject()->startPosition() <= qMax(m_rubberbandStartTimePos, rubberbandTimePos);
+				it->setSelected(isBeetweenRubberbandViews && isBeetweenRubberbandTimePos);
 			}
 		}
 	}
@@ -610,7 +610,7 @@ void SongEditor::mousePressEvent(QMouseEvent *me)
 
 		//the trackView(index) and the time position where the mouse was clicked
 		m_rubberBandStartTrackview = trackIndexFromSelectionPoint(me->y());
-		m_rubberbandStartMidipos = TimePos((me->x() - m_trackHeadWidth)
+		m_rubberbandStartTimePos = TimePos((me->x() - m_trackHeadWidth)
 											/ pixelsPerBar() * TimePos::ticksPerBar())
 											+ m_currentPosition;
 	}
