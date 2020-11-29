@@ -50,18 +50,24 @@ public:
 		// exception to alphabetic ordering - keep at the end:
 		size
 	};
+
+	template<typename T>
+	struct IdForType;
+
+	template<typename T>
+	static constexpr auto IdForType_v = IdForType<T>::value;
+
 	//! Return URID for a cache ID
 	uint32_t operator[](Id id) const;
-
-	// get URID by type
-	uint32_t uridForType(const int32_t*) const { return operator[](Id::atom_Int); }
-	uint32_t uridForType(const float*) const { return operator[](Id::atom_Float); }
 
 	Lv2UridCache(class UridMap& mapper);
 
 private:
 	uint32_t m_cache[static_cast<int>(Id::size)];
 };
+
+template<> struct Lv2UridCache::IdForType<float> { static constexpr auto value = Id::atom_Float; };
+template<> struct Lv2UridCache::IdForType<std::int32_t> { static constexpr auto value = Id::atom_Int; };
 
 #endif // LMMS_HAVE_LV2
 #endif // LV2URIDCACHE_H

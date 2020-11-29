@@ -69,9 +69,8 @@ public:
 			LV2_Options_Context context = LV2_OPTIONS_INSTANCE,
 			std::uint32_t subject = 0)
 	{
-		using OptPtr = Opt*;
 		const Lv2UridCache& cache = Engine::getLv2Manager()->uridCache();
-		initOption(cache[key], sizeof(Opt), cache.uridForType(OptPtr()),
+		initOption(cache[key], sizeof(Opt), cache[Lv2UridCache::IdForType_v<Opt>],
 			std::make_shared<Opt>(std::forward<Arg>(value)), context, subject);
 	}
 	//! Fill m_options and m_optionPointers with all options
