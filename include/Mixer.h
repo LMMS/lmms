@@ -208,9 +208,6 @@ public:
 	}
 
 
-	void changeTempo( bpm_t tempo );
-
-
 	// play-handle stuff
 	bool addPlayHandle( PlayHandle* handle );
 
