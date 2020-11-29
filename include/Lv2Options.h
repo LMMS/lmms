@@ -70,7 +70,7 @@ public:
 			std::uint32_t subject = 0)
 	{
 		const Lv2UridCache& cache = Engine::getLv2Manager()->uridCache();
-		initOption(cache[key], sizeof(Opt), cache[Lv2UridCache::IdForType_v<Opt>],
+		initOption(cache[key], sizeof(Opt), cache[Lv2UridCache::IdForType<Opt>::value],
 			std::make_shared<Opt>(std::forward<Arg>(value)), context, subject);
 	}
 	//! Fill m_options and m_optionPointers with all options
