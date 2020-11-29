@@ -480,7 +480,7 @@ void Mixer::handleMetronome()
 	}
 
 	tick_t ticks = song->getPlayPos( currentPlayMode ).getTicks();
-	tick_t ticksPerBar = MidiTime::ticksPerBar();
+	tick_t ticksPerBar = TimePos::ticksPerBar();
 	int numerator = song->getTimeSigModel().getNumerator();
 
 	if( ticks == lastMetroTicks )
