@@ -22,6 +22,7 @@ SET(LMMS_SRCS
 	gui/Lv2ViewBase.cpp
 	gui/MainApplication.cpp
 	gui/MainWindow.cpp
+	gui/MidiCCRackView.cpp
 	gui/MidiSetupWidget.cpp
 	gui/ModelView.cpp
 	gui/PeakControllerDialog.cpp
@@ -78,7 +79,6 @@ SET(LMMS_SRCS
 	gui/widgets/ControlLayout.cpp
 	gui/widgets/LinkedModelGroupViews.cpp
 	gui/widgets/MeterDialog.cpp
-	gui/widgets/MidiCCRackView.cpp
 	gui/widgets/MidiPortMenu.cpp
 	gui/widgets/NStateButton.cpp
 	gui/widgets/Oscilloscope.cpp
