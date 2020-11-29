@@ -26,7 +26,9 @@
 #ifndef NOTE_PLAY_HANDLE_H
 #define NOTE_PLAY_HANDLE_H
 
-#include "AtomicInt.h"
+#include <memory>
+
+#include "BasicFilters.h"
 #include "Note.h"
 #include "PlayHandle.h"
 #include "Track.h"
@@ -36,17 +38,19 @@ class QReadWriteLock;
 class InstrumentTrack;
 class NotePlayHandle;
 
-template<ch_cnt_t=DEFAULT_CHANNELS> class BasicFilters;
 typedef QList<NotePlayHandle *> NotePlayHandleList;
 typedef QList<const NotePlayHandle *> ConstNotePlayHandleList;
 
 
-class EXPORT NotePlayHandle : public PlayHandle, public Note
+class LMMS_EXPORT NotePlayHandle : public PlayHandle, public Note
 {
 	MM_OPERATORS
 public:
 	void * m_pluginData;
-	BasicFilters<> * m_filter;
+	std::unique_ptr<BasicFilters<>> m_filter;
+
+	// length of the declicking fade in
+	fpp_t m_fadeInLength;
 
 	// specifies origin of NotePlayHandle
 	enum Origins
@@ -73,8 +77,8 @@ public:
 		return p;
 	}
 
-	virtual void setVolume( volume_t volume );
-	virtual void setPanning( panning_t panning );
+	void setVolume( volume_t volume ) override;
+	void setPanning( panning_t panning ) override;
 
 	int midiKey() const;
 	int midiChannel() const
@@ -104,10 +108,10 @@ public:
 	}
 
 	/*! Renders one chunk using the attached instrument into the buffer */
-	virtual void play( sampleFrame* buffer );
+	void play( sampleFrame* buffer ) override;
 
 	/*! Returns whether playback of note is finished and thus handle can be deleted */
-	virtual bool isFinished() const
+	bool isFinished() const override
 	{
 		return m_released && framesLeft() <= 0;
 	}
@@ -119,7 +123,7 @@ public:
 	fpp_t framesLeftForCurrentPeriod() const;
 
 	/*! Returns whether the play handle plays on a certain track */
-	virtual bool isFromTrack( const Track* _track ) const;
+	bool isFromTrack( const Track* _track ) const override;
 
 	/*! Releases the note (and plays release frames */
 	void noteOff( const f_cnt_t offset = 0 );
@@ -345,11 +349,12 @@ public:
 					NotePlayHandle::Origin origin = NotePlayHandle::OriginPattern );
 	static void release( NotePlayHandle * nph );
 	static void extend( int i );
+	static void free();
 
 private:
 	static NotePlayHandle ** s_available;
 	static QReadWriteLock s_mutex;
-	static AtomicInt s_availableIndex;
+	static std::atomic_int s_availableIndex;
 	static int s_size;
 };
 

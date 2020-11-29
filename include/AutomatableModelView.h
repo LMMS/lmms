@@ -1,5 +1,6 @@
 /*
- * AutomatableModelView.h - class AutomatableModelView
+ * AutomatableModelView.h - provides AutomatableModelView base class and
+ * provides BoolModelView, FloatModelView, IntModelView subclasses.
  *
  * Copyright (c) 2008-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
@@ -31,11 +32,11 @@
 class QMenu;
 class QMouseEvent;
 
-class EXPORT AutomatableModelView : public ModelView
+class LMMS_EXPORT AutomatableModelView : public ModelView
 {
 public:
 	AutomatableModelView( Model* model, QWidget* _this );
-	virtual ~AutomatableModelView();
+	virtual ~AutomatableModelView() = default;
 
 	// some basic functions for convenience
 	AutomatableModel* modelUntyped()
@@ -48,7 +49,7 @@ public:
 		return castModel<AutomatableModel>();
 	}
 
-	virtual void setModel( Model* model, bool isOldModelValid = true );
+	void setModel( Model* model, bool isOldModelValid = true ) override;
 
 	template<typename T>
 	inline T value() const
@@ -68,13 +69,16 @@ public:
 
 	void addDefaultActions( QMenu* menu );
 
+	void setConversionFactor( float factor );
+	float getConversionFactor();
+
 
 protected:
 	virtual void mousePressEvent( QMouseEvent* event );
 
 	QString m_description;
 	QString m_unit;
-
+	float m_conversionFactor; // Factor to be applied when the m_model->value is displayed
 } ;
 
 
@@ -93,6 +97,11 @@ public slots:
 	void unlinkAllModels();
 	void removeSongGlobalAutomation();
 
+private slots:
+	/// Copy the model's value to the clipboard.
+	void copyToClipboard();
+	/// Paste the model's value from the clipboard.
+	void pasteFromClipboard();
 
 protected:
 	AutomatableModelView* m_amv;
@@ -101,32 +110,26 @@ protected:
 
 
 
+template <typename ModelType> class LMMS_EXPORT TypedModelView : public AutomatableModelView
+{
+public:
+	TypedModelView( Model* model, QWidget* _this) :
+		AutomatableModelView( model, _this )
+	{}
 
-#define generateTypedModelView(type)							\
-class EXPORT type##ModelView : public AutomatableModelView		\
-{																\
-public:															\
-	type##ModelView( Model* model, QWidget* _this ) :			\
-		AutomatableModelView( model, _this )					\
-	{															\
-	}															\
-																\
-	type##Model* model()										\
-	{															\
-		return castModel<type##Model>();						\
-	}															\
-																\
-	const type##Model* model() const							\
-	{															\
-		return castModel<type##Model>();						\
-	}															\
-}
+	ModelType* model()
+	{
+		return castModel<ModelType>();
+	}
+	const ModelType* model() const
+	{
+		return castModel<ModelType>();
+	}
+};
 
-
-generateTypedModelView(Float);
-generateTypedModelView(Int);
-generateTypedModelView(Bool);
-
+using FloatModelView = TypedModelView<FloatModel>;
+using IntModelView = TypedModelView<IntModel>;
+using BoolModelView = TypedModelView<BoolModel>;
 
 #endif
 

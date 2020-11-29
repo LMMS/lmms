@@ -31,7 +31,7 @@
 
 #include <samplerate.h>
 
-#include "export.h"
+#include "lmms_export.h"
 #include "interpolation.h"
 #include "lmms_basics.h"
 #include "lmms_math.h"
@@ -48,7 +48,7 @@ class QRect;
 // may need to be higher - conversely, to optimize, some may work with lower values
 const f_cnt_t MARGIN[] = { 64, 64, 64, 4, 4 };
 
-class EXPORT SampleBuffer : public QObject, public sharedObject
+class LMMS_EXPORT SampleBuffer : public QObject, public sharedObject
 {
 	Q_OBJECT
 	MM_OPERATORS
@@ -58,7 +58,7 @@ public:
 		LoopOn,
 		LoopPingPong
 	};
-	class EXPORT handleState
+	class LMMS_EXPORT handleState
 	{
 		MM_OPERATORS
 	public:
@@ -84,7 +84,7 @@ public:
 		{
 			m_isBackwards = _backwards;
 		}
-		
+
 		int interpolationMode() const
 		{
 			return m_interpolationMode;
@@ -103,12 +103,12 @@ public:
 	} ;
 
 
+	SampleBuffer();
 	// constructor which either loads sample _audio_file or decodes
 	// base64-data out of string
-	SampleBuffer( const QString & _audio_file = QString(),
-						bool _is_base64_data = false );
+	SampleBuffer( const QString & _audio_file, bool _is_base64_data = false );
 	SampleBuffer( const sampleFrame * _data, const f_cnt_t _frames );
-	SampleBuffer( const f_cnt_t _frames );
+	explicit SampleBuffer( const f_cnt_t _frames );
 
 	virtual ~SampleBuffer();
 
@@ -117,10 +117,10 @@ public:
 				const float _freq,
 				const LoopMode _loopmode = LoopOff );
 
-	void visualize( QPainter & _p, const QRect & _dr, const QRect & _clip, f_cnt_t _from_frame = 0, f_cnt_t _to_frame = 0 );
-	inline void visualize( QPainter & _p, const QRect & _dr, f_cnt_t _from_frame = 0, f_cnt_t _to_frame = 0 )
+	void visualize(QPainter & p, const QRect & dr, const QRect & clip, f_cnt_t from_frame = 0, f_cnt_t to_frame = 0);
+	inline void visualize(QPainter & p, const QRect & dr, f_cnt_t from_frame = 0, f_cnt_t to_frame = 0)
 	{
-		visualize( _p, _dr, _dr, _from_frame, _to_frame );
+		visualize(p, dr, dr, from_frame, to_frame);
 	}
 
 	inline const QString & audioFile() const
@@ -251,9 +251,6 @@ public:
 		m_varLock.unlock();
 	}
 
-	static QString tryToMakeRelative( const QString & _file );
-	static QString tryToMakeAbsolute(const QString & file);
-
 
 public slots:
 	void setAudioFile( const QString & _audio_file );
@@ -269,8 +266,8 @@ private:
 
 	void update( bool _keep_settings = false );
 
-	void convertIntToFloat ( int_sample_t * & _ibuf, f_cnt_t _frames, int _channels);
-	void directFloatWrite ( sample_t * & _fbuf, f_cnt_t _frames, int _channels);
+	void convertIntToFloat(int_sample_t * & ibuf, f_cnt_t frames, int channels);
+	void directFloatWrite(sample_t * & fbuf, f_cnt_t frames, int channels);
 
 	f_cnt_t decodeSampleSF( QString _f, sample_t * & _buf,
 						ch_cnt_t & _channels,

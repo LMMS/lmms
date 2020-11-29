@@ -44,7 +44,7 @@ AboutDialog::AboutDialog(QWidget* parent) :
 					arg( PLATFORM ).
 					arg( MACHINE ).
 					arg( QT_VERSION_STR ).
-					arg( GCC_VERSION ) );
+					arg( COMPILER_VERSION ) );
 	versionLabel->setTextInteractionFlags(
 					versionLabel->textInteractionFlags() |
 					Qt::TextSelectableByMouse );

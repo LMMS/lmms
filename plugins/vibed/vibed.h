@@ -82,7 +82,7 @@ private:
 
 
 
-class vibedView : public InstrumentView
+class vibedView : public InstrumentViewFixedSize
 {
 	Q_OBJECT
 public:
@@ -93,7 +93,6 @@ public:
 public slots:
 	void showString( int _string );
 	void contextMenuEvent( QContextMenuEvent * );
-	void displayHelp();
 
 protected slots:
 	void sinWaveClicked();

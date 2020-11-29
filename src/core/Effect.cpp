@@ -36,9 +36,8 @@
 Effect::Effect( const Plugin::Descriptor * _desc,
 			Model * _parent,
 			const Descriptor::SubPluginFeatures::Key * _key ) :
-	Plugin( _desc, _parent ),
+	Plugin( _desc, _parent, _key ),
 	m_parent( NULL ),
-	m_key( _key ? *_key : Descriptor::SubPluginFeatures::Key()  ),
 	m_processors( 1 ),
 	m_okay( true ),
 	m_noRun( false ),
@@ -117,7 +116,7 @@ Effect * Effect::instantiate( const QString& pluginName,
 				Model * _parent,
 				Descriptor::SubPluginFeatures::Key * _key )
 {
-	Plugin * p = Plugin::instantiate( pluginName, _parent, _key );
+	Plugin * p = Plugin::instantiateWithKey( pluginName, _parent, _key );
 	// check whether instantiated plugin is an effect
 	if( dynamic_cast<Effect *>( p ) != NULL )
 	{
@@ -204,8 +203,8 @@ void Effect::resample( int _i, const sampleFrame * _src_buf,
 	}
 	m_srcData[_i].input_frames = _frames;
 	m_srcData[_i].output_frames = Engine::mixer()->framesPerPeriod();
-	m_srcData[_i].data_in = (float *) _src_buf[0];
-	m_srcData[_i].data_out = _dst_buf[0];
+	m_srcData[_i].data_in = const_cast<float*>(_src_buf[0].data());
+	m_srcData[_i].data_out = _dst_buf[0].data ();
 	m_srcData[_i].src_ratio = (double) _dst_sr / _src_sr;
 	m_srcData[_i].end_of_input = 0;
 	int error;

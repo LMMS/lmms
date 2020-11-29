@@ -17,6 +17,7 @@ Build-Depends:
  libfluidsynth-dev,
  libgig-dev,
  libjack-jackd2-dev,
+ liblist-moreutils-perl,
  libmp3lame-dev,
  libpulse-dev,
  libqt5x11extras5-dev,
@@ -27,24 +28,38 @@ Build-Depends:
  libsoundio-dev,
  libstk0-dev,
  libvorbis-dev,
+ libx11-xcb-dev,
  libxcb-keysyms1-dev,
  libxcb-util0-dev,
+ libxml-perl,
+ libxml2-utils,
  portaudio19-dev,
  qtbase5-private-dev,
  qttools5-dev,
- wine32-tools [i386]
+ wine64-tools [amd64] | wine32-tools [i386]
 Standards-Version: 4.2.1.4
-Homepage: http://lmms.io/
+Homepage: https://lmms.io/
 Vcs-Browser: https://salsa.debian.org/debian-edu-pkg-team/lmms.git
 
 Package: lmms-bin
 Architecture: any
-Depends: lmms-common (>= ${source:Version}), ${shlibs:Depends}, ${misc:Depends},
- stk
-Recommends: calf-ladspa, tap-plugins, caps,
- lmms-vst-server:i386 (>= ${source:Version})
-Suggests: fil-plugins, mcp-plugins, omins, freepats, fluid-soundfont-gm,
- ladspa-plugin
+Depends:
+ lmms-common (>= ${source:Version}),
+ ${shlibs:Depends},
+ ${misc:Depends},
+ stk,
+Recommends:
+ caps,
+ lmms-vst-server:i386 (>= ${source:Version}),
+ lmms-vst-server:amd64 (>= ${source:Version}),
+ tap-plugins,
+Suggests:
+ fil-plugins,
+ fluid-soundfont-gm,
+ freepats,
+ ladspa-plugin,
+ mcp-plugins,
+ omins,
 Replaces: lmms-common (<< 1.0.0-1)
 Breaks: lmms-common (<< 1.0.0-1)
 Multi-Arch: allowed
@@ -63,7 +78,9 @@ Description: Linux Multimedia Studio - minimal installation
 
 Package: lmms
 Architecture: any
-Depends: calf-ladspa, lmms-bin, ${misc:Depends}
+Depends:
+ lmms-bin,
+ ${misc:Depends},
 Description: Linux Multimedia Studio
  LMMS aims to be a free alternative to popular (but commercial and closed-
  source) programs like FruityLoops, Cubase and Logic giving you the ability of
@@ -79,7 +96,10 @@ Description: Linux Multimedia Studio
 
 Package: lmms-common
 Architecture: all
-Depends: zynaddsubfx-data, ${shlibs:Depends}, ${misc:Depends}
+Depends:
+ ${shlibs:Depends},
+ ${misc:Depends},
+ zynaddsubfx-data,
 Pre-Depends: ${misc:Pre-Depends}
 Description: Linux Multimedia Studio - common files
  LMMS aims to be a free alternative to popular (but commercial and closed-
@@ -96,23 +116,11 @@ Description: Linux Multimedia Studio - common files
  and some example projects.
 
 Package: lmms-vst-server
-Architecture: i386
-# Order matters to avoid wine64
-Depends: wine32, wine, ${shlibs:Depends}, ${misc:Depends}
+Architecture: amd64 i386
+Depends:
+ wine64 [amd64] | wine64-development [amd64] | wine32 [i386] | wine32-development [i386],
+ ${shlibs:Depends},
+ ${misc:Depends},
 Recommends: lmms-bin:any
 Description: Linux Multimedia Studio - VST server
  This package contains a helper application that loads VST plugins.
-
-Package: calf-ladspa
-Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}
-Replaces: calf-plugins (<< 0.0.19)
-Provides: ladspa-plugin
-Description: Linux Multimedia Studio - Calf LADSPA plugins
- Calf is a pack of audio plugins - effects and instruments. The goal is to
- create a set of plugins using decent algorithms and parameter settings,
- available in a form which is compatible with as many open source applications
- as possible.
- .
- These plugins are distributed as part of Linux Multimedia Studio, but may be
- used by other applications.

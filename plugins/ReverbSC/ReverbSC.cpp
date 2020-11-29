@@ -23,7 +23,8 @@
 #include <math.h>
 #include "ReverbSC.h"
 
-#include "embed.cpp"
+#include "embed.h"
+#include "plugin_export.h"
 
 #define DB2LIN(X) pow(10, X / 20.0f);
 
@@ -34,7 +35,7 @@ Plugin::Descriptor PLUGIN_EXPORT reverbsc_plugin_descriptor =
 {
 	STRINGIFY( PLUGIN_NAME ),
 	"ReverbSC",
-	QT_TRANSLATE_NOOP( "pluginBrowser", "Reverb algorithm by Sean Costello" ),
+	QT_TRANSLATE_NOOP( "PluginBrowser", "Reverb algorithm by Sean Costello" ),
 	"Paul Batchelor",
 	0x0123,
 	Plugin::Effect,
@@ -151,7 +152,7 @@ extern "C"
 {
 
 // necessary for getting instance out of shared lib
-Plugin * PLUGIN_EXPORT lmms_plugin_main( Model* parent, void* data )
+PLUGIN_EXPORT Plugin * lmms_plugin_main( Model* parent, void* data )
 {
 	return new ReverbSCEffect( 
 		parent, 

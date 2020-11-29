@@ -29,18 +29,18 @@
 
 #include <QtGlobal>
 
-#include "export.h"
+#include "lmms_export.h"
 #include "lmms_basics.h"
 
-// note: 1 "Tact" = 1 Measure
-const int DefaultTicksPerTact = 192;
-const int DefaultStepsPerTact = 16;
-const int DefaultBeatsPerTact = DefaultTicksPerTact / DefaultStepsPerTact;
+// note: a bar was erroneously called "tact" in older versions of LMMS
+const int DefaultTicksPerBar = 192;
+const int DefaultStepsPerBar = 16;
+const int DefaultBeatsPerBar = DefaultTicksPerBar / DefaultStepsPerBar;
 
 
 class MeterModel;
 
-class EXPORT TimeSig
+class LMMS_EXPORT TimeSig
 {
 public:
 	// in a time signature,
@@ -57,22 +57,22 @@ private:
 };
 
 
-class EXPORT MidiTime
+class LMMS_EXPORT MidiTime
 {
 public:
-	MidiTime( const tact_t tact, const tick_t ticks );
+	MidiTime( const bar_t bar, const tick_t ticks );
 	MidiTime( const tick_t ticks = 0 );
 
-	MidiTime toNearestTact() const;
-	MidiTime toAbsoluteTact() const;
+	MidiTime quantize(float) const;
+	MidiTime toAbsoluteBar() const;
 
 	MidiTime& operator+=( const MidiTime& time );
 	MidiTime& operator-=( const MidiTime& time );
 
-	// return the tact, rounded down and 0-based
-	tact_t getTact() const;
-	// return the tact, rounded up and 0-based
-	tact_t nextFullTact() const;
+	// return the bar, rounded down and 0-based
+	bar_t getBar() const;
+	// return the bar, rounded up and 0-based
+	bar_t nextFullBar() const;
 
 	void setTicks( tick_t ticks );
 	tick_t getTicks() const;
@@ -90,20 +90,23 @@ public:
 	// calculate number of frame that are needed this time
 	f_cnt_t frames( const float framesPerTick ) const;
 
+	double getTimeInMilliseconds( bpm_t beatsPerMinute ) const;
+
 	static MidiTime fromFrames( const f_cnt_t frames, const float framesPerTick );
-	static tick_t ticksPerTact();
-	static tick_t ticksPerTact( const TimeSig &sig );
-	static int stepsPerTact();
-	static void setTicksPerTact( tick_t tpt );
+	static tick_t ticksPerBar();
+	static tick_t ticksPerBar( const TimeSig &sig );
+	static int stepsPerBar();
+	static void setTicksPerBar( tick_t tpt );
 	static MidiTime stepPosition( int step );
+	static double ticksToMilliseconds( tick_t ticks, bpm_t beatsPerMinute );
+	static double ticksToMilliseconds( double ticks, bpm_t beatsPerMinute );
 
 private:
 	tick_t m_ticks;
 
-	static tick_t s_ticksPerTact;
+	static tick_t s_ticksPerBar;
 
 } ;
 
 
 #endif
-

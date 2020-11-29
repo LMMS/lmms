@@ -99,16 +99,6 @@ AutomationPattern::AutomationPattern( const AutomationPattern & _pat_to_copy ) :
 	}
 }
 
-
-
-
-AutomationPattern::~AutomationPattern()
-{
-}
-
-
-
-
 bool AutomationPattern::addObject( AutomatableModel * _obj, bool _search_dup )
 {
 	if( _search_dup && m_objects.contains(_obj) )
@@ -188,9 +178,16 @@ const AutomationPattern::objectVector& AutomationPattern::objects() const
 
 MidiTime AutomationPattern::timeMapLength() const
 {
-	if( m_timeMap.isEmpty() ) return 0;
+	MidiTime one_bar = MidiTime(1, 0);
+	if (m_timeMap.isEmpty()) { return one_bar; }
+
 	timeMap::const_iterator it = m_timeMap.end();
-	return MidiTime( MidiTime( (it-1).key() ).nextFullTact(), 0 );
+	tick_t last_tick = static_cast<tick_t>((it-1).key());
+	// if last_tick is 0 (single item at tick 0)
+	// return length as a whole bar to prevent disappearing TCO
+	if (last_tick == 0) { return one_bar; }
+
+	return MidiTime(last_tick);
 }
 
 
@@ -198,7 +195,8 @@ MidiTime AutomationPattern::timeMapLength() const
 
 void AutomationPattern::updateLength()
 {
-	changeLength( timeMapLength() );
+	// Do not resize down in case user manually extended up
+	changeLength(qMax(length(), timeMapLength()));
 }
 
 
@@ -233,12 +231,7 @@ MidiTime AutomationPattern::putValue( const MidiTime & time,
 	}
 	generateTangents( it, 3 );
 
-	// we need to maximize our length in case we're part of a hidden
-	// automation track as the user can't resize this pattern
-	if( getTrack() && getTrack()->type() == Track::HiddenAutomationTrack )
-	{
-		updateLength();
-	}
+	updateLength();
 
 	emit dataChanged();
 
@@ -261,10 +254,7 @@ void AutomationPattern::removeValue( const MidiTime & time )
 	}
 	generateTangents(it, 3);
 
-	if( getTrack() && getTrack()->type() == Track::HiddenAutomationTrack )
-	{
-		updateLength();
-	}
+	updateLength();
 
 	emit dataChanged();
 }
@@ -548,6 +538,11 @@ void AutomationPattern::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	_this.setAttribute( "prog", QString::number( progressionType() ) );
 	_this.setAttribute( "tens", QString::number( getTension() ) );
 	_this.setAttribute( "mute", QString::number( isMuted() ) );
+	
+	if( usesCustomClipColor() )
+	{
+		_this.setAttribute( "color", color().name() );
+	}
 
 	for( timeMap::const_iterator it = m_timeMap.begin();
 						it != m_timeMap.end(); ++it )
@@ -603,6 +598,12 @@ void AutomationPattern::loadSettings( const QDomElement & _this )
 			m_idsToResolve << element.attribute( "id" ).toInt();
 		}
 	}
+	
+	if( _this.hasAttribute( "color" ) )
+	{
+		useCustomClipColor( true );
+		setColor( _this.attribute( "color" ) );
+	}
 
 	int len = _this.attribute( "len" ).toInt();
 	if( len <= 0 )
@@ -630,12 +631,7 @@ const QString AutomationPattern::name() const
 	{
 		return m_objects.first()->fullDisplayName();
 	}
-	return tr( "Drag a control while pressing <%1>" ).arg(
-	#ifdef LMMS_BUILD_APPLE
-		"⌘");
-	#else
-		"Ctrl");
-	#endif
+	return tr( "Drag a control while pressing <%1>" ).arg(UI_CTRL_KEY);
 }
 
 

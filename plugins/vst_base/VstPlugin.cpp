@@ -24,6 +24,9 @@
 
 #include "VstPlugin.h"
 
+#include "communication.h"
+
+#include <QtCore/QtEndian>
 #include <QtCore/QDebug>
 #include <QDir>
 #include <QFileInfo>
@@ -35,17 +38,10 @@
 
 #ifdef LMMS_BUILD_LINUX
 #	include <QX11Info>
-#	if QT_VERSION < 0x050000
-#		include <QX11EmbedContainer>
-#	else
-#		include "X11EmbedContainer.h"
-#		include <QWindow>
-#	endif
+#	include "X11EmbedContainer.h"
 #endif
 
-#if QT_VERSION >= 0x050000
-#	include <QWindow>
-#endif
+#include <QWindow>
 
 #include <QDomDocument>
 
@@ -59,35 +55,100 @@
 #include "LocaleHelper.h"
 #include "MainWindow.h"
 #include "Mixer.h"
+#include "PathUtil.h"
 #include "Song.h"
-#include "templates.h"
 #include "FileDialog.h"
 
 #ifdef LMMS_BUILD_LINUX
 #	include <X11/Xlib.h>
 #endif
 
+namespace PE
+{
+// Utilities for reading PE file machine type
+// See specification at https://msdn.microsoft.com/library/windows/desktop/ms680547(v=vs.85).aspx
+
+// Work around name conflict
+#ifdef i386
+#	undef i386
+#endif
+
+enum class MachineType : uint16_t
+{
+	unknown = 0x0,
+	amd64 = 0x8664,
+	i386 = 0x14c,
+};
+
+class FileInfo
+{
+public:
+	FileInfo(QString filePath)
+		: m_file(filePath)
+	{
+		m_file.open(QFile::ReadOnly);
+		m_map = m_file.map(0, m_file.size());
+		if (m_map == nullptr) {
+			throw std::runtime_error("Cannot map file");
+		}
+	}
+	~FileInfo()
+	{
+		m_file.unmap(m_map);
+	}
+
+	MachineType machineType()
+	{
+		int32_t peOffset = qFromLittleEndian(* reinterpret_cast<int32_t*>(m_map + 0x3C));
+		uchar* peSignature = m_map + peOffset;
+		if (memcmp(peSignature, "PE\0\0", 4)) {
+			throw std::runtime_error("Invalid PE file");
+		}
+		uchar * coffHeader = peSignature + 4;
+		uint16_t machineType = qFromLittleEndian(* reinterpret_cast<uint16_t*>(coffHeader));
+		return static_cast<MachineType>(machineType);
+	}
+
+private:
+	QFile m_file;
+	uchar* m_map;
+};
+
+}
+
 
 VstPlugin::VstPlugin( const QString & _plugin ) :
-	m_plugin( _plugin ),
+	m_plugin( PathUtil::toAbsolute(_plugin) ),
 	m_pluginWindowID( 0 ),
 	m_embedMethod( gui
 			? ConfigManager::inst()->vstEmbedMethod()
 			: "headless" ),
-	m_badDllFormat( false ),
 	m_version( 0 ),
 	m_currentProgram()
 {
 	setSplittedChannels( true );
 
-	tryLoad( REMOTE_VST_PLUGIN_FILEPATH );
-#ifdef LMMS_BUILD_WIN64
-	if( m_badDllFormat )
-	{
-		m_badDllFormat = false;
-		tryLoad( "32/RemoteVstPlugin32" );
+	PE::MachineType machineType;
+	try {
+		PE::FileInfo peInfo(m_plugin);
+		machineType = peInfo.machineType();
+	} catch (std::runtime_error& e) {
+		qCritical() << "Error while determining PE file's machine type: " << e.what();
+		machineType = PE::MachineType::unknown;
 	}
-#endif
+
+	switch(machineType)
+	{
+	case PE::MachineType::amd64:
+		tryLoad( REMOTE_VST_PLUGIN_FILEPATH_64 ); // Default: RemoteVstPlugin64
+		break;
+	case PE::MachineType::i386:
+		tryLoad( REMOTE_VST_PLUGIN_FILEPATH_32 ); // Default: 32/RemoteVstPlugin32
+		break;
+	default:
+		m_failed = true;
+		return;
+	}
 
 	setTempo( Engine::getSong()->getTempo() );
 
@@ -137,16 +198,7 @@ void VstPlugin::tryLoad( const QString &remoteVstPluginExecutable )
 		default: break;
 	}
 	sendMessage( message( IdVstSetLanguage ).addInt( hlang ) );
-
-
-	QString p = m_plugin;
-		if( QFileInfo( p ).dir().isRelative() )
-		{
-			p = ConfigManager::inst()->vstDir()  + p;
-		}
-
-
-	sendMessage( message( IdVstLoadPlugin ).addString( QSTR_TO_STDSTR( p ) ) );
+	sendMessage( message( IdVstLoadPlugin ).addString( QSTR_TO_STDSTR( m_plugin ) ) );
 
 	waitForInitDone();
 
@@ -323,10 +375,6 @@ bool VstPlugin::processMessage( const message & _m )
 {
 	switch( _m.id )
 	{
-	case IdVstBadDllFormat:
-		m_badDllFormat = true;
-		break;
-
 	case IdVstPluginWindowID:
 		m_pluginWindowID = _m.getInt();
 		if( m_embedMethod == "none"
@@ -380,6 +428,14 @@ bool VstPlugin::processMessage( const message & _m )
 
 		case IdVstProgramNames:
 			m_allProgramNames = _m.getQString();
+			break;
+
+		case IdVstParameterLabels:
+			m_allParameterLabels = _m.getQString();
+			break;
+
+		case IdVstParameterDisplays:
+			m_allParameterDisplays = _m.getQString();
 			break;
 
 		case IdVstPluginUniqueID:
@@ -475,10 +531,32 @@ void VstPlugin::loadProgramNames()
 
 
 
+void VstPlugin::loadParameterLabels()
+{
+	lock();
+	sendMessage( message( IdVstParameterLabels ) );
+	waitForMessage( IdVstParameterLabels, true );
+	unlock();
+}
+
+
+
+
+void VstPlugin::loadParameterDisplays()
+{
+	lock();
+	sendMessage( message( IdVstParameterDisplays ) );
+	waitForMessage( IdVstParameterDisplays, true );
+	unlock();
+}
+
+
+
+
 void VstPlugin::savePreset( )
 {
 	QString presName = currentProgramName().isEmpty() ? tr(": default") : currentProgramName();
-	presName.replace(tr("\""), tr("'")); // QFileDialog unable to handle double quotes properly
+	presName.replace("\"", "'"); // QFileDialog unable to handle double quotes properly
 
 	FileDialog sfd( NULL, tr( "Save Preset" ), presName.section(": ", 1, 1) + tr(".fxp"),
 		tr( "Vst Plugin Preset (*.fxp *.fxb)" ) );
@@ -718,7 +796,3 @@ QString VstPlugin::embedMethod() const
 {
 	return m_embedMethod;
 }
-
-
-
-

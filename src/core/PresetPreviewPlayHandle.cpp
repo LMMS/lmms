@@ -22,7 +22,6 @@
  *
  */
 
-#include <QAtomicPointer>
 #include <QFileInfo>
 
 #include "PresetPreviewPlayHandle.h"
@@ -34,7 +33,7 @@
 #include "ProjectJournal.h"
 #include "TrackContainer.h"
 
-
+#include <atomic>
 
 // invisible track-container which is needed as parent for preview-channels
 class PreviewTrackContainer : public TrackContainer
@@ -55,7 +54,7 @@ public:
 	{
 	}
 
-	virtual QString nodeName() const
+	QString nodeName() const override
 	{
 		return "previewtrackcontainer";
 	}
@@ -67,25 +66,17 @@ public:
 
 	NotePlayHandle* previewNote()
 	{
-	#if QT_VERSION >= 0x050000
-		return m_previewNote.loadAcquire();
-	#else
-		return m_previewNote;
-	#endif
+		return m_previewNote.load(std::memory_order_acquire);
 	}
 
 	void setPreviewNote( NotePlayHandle * _note )
 	{
-	#if QT_VERSION >= 0x050000
-		m_previewNote.storeRelease( _note );
-	#else
-		m_previewNote = _note;
-	#endif
+		m_previewNote.store(_note, std::memory_order_release);
 	}
 
 	bool testAndSetPreviewNote( NotePlayHandle * expectedVal, NotePlayHandle * newVal )
 	{
-		return m_previewNote.testAndSetOrdered( expectedVal, newVal );
+		return m_previewNote.compare_exchange_strong(expectedVal, newVal);
 	}
 
 	void lockData()
@@ -111,7 +102,7 @@ public:
 
 private:
 	InstrumentTrack* m_previewInstrumentTrack;
-	QAtomicPointer<NotePlayHandle> m_previewNote;
+	std::atomic<NotePlayHandle*> m_previewNote;
 	QMutex m_dataMutex;
 
 	friend class PresetPreviewPlayHandle;
@@ -125,7 +116,7 @@ PreviewTrackContainer * PresetPreviewPlayHandle::s_previewTC;
 
 PresetPreviewPlayHandle::PresetPreviewPlayHandle( const QString & _preset_file, bool _load_by_plugin, DataFile *dataFile ) :
 	PlayHandle( TypePresetPreviewHandle ),
-	m_previewNote( NULL )
+	m_previewNote(nullptr)
 {
 	setUsesBuffer( false );
 
@@ -146,8 +137,10 @@ PresetPreviewPlayHandle::PresetPreviewPlayHandle( const QString & _preset_file, 
 							suffix().toLower();
 		if( i == NULL || !i->descriptor()->supportsFileType( ext ) )
 		{
+			const PluginFactory::PluginInfoAndKey& infoAndKey =
+				pluginFactory->pluginSupportingExtension(ext);
 			i = s_previewTC->previewInstrumentTrack()->
-				loadInstrument(pluginFactory->pluginSupportingExtension(ext).name());
+				loadInstrument(infoAndKey.info.name(), &infoAndKey.key);
 		}
 		if( i != NULL )
 		{
@@ -163,19 +156,9 @@ PresetPreviewPlayHandle::PresetPreviewPlayHandle( const QString & _preset_file, 
 			dataFileCreated = true;
 		}
 
-		// vestige previews are bug prone; fallback on 3xosc with volume of 0
-		// without an instrument in preview track, it will segfault
-		if(dataFile->content().elementsByTagName( "vestige" ).length() == 0 )
-		{
-			s_previewTC->previewInstrumentTrack()->
-					loadTrackSpecificSettings(
-						dataFile->content().firstChild().toElement() );
-		}
-		else
-		{
-			s_previewTC->previewInstrumentTrack()->loadInstrument("tripleoscillator");
-			s_previewTC->previewInstrumentTrack()->setVolume( 0 );
-		}
+		s_previewTC->previewInstrumentTrack()->loadTrackSpecificSettings(
+					dataFile->content().firstChild().toElement());
+
 		if( dataFileCreated )
 		{
 			delete dataFile;

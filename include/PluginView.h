@@ -31,7 +31,7 @@
 #include "ModelView.h"
 
 
-class EXPORT PluginView  : public QWidget, public ModelView
+class LMMS_EXPORT PluginView  : public QWidget, public ModelView
 {
 public:
 	PluginView( Plugin * _plugin, QWidget * _parent ) :

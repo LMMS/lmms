@@ -25,8 +25,8 @@
 
 #include "Amplifier.h"
 
-#include "embed.cpp"
-
+#include "embed.h"
+#include "plugin_export.h"
 
 extern "C"
 {
@@ -35,11 +35,11 @@ Plugin::Descriptor PLUGIN_EXPORT amplifier_plugin_descriptor =
 {
 	STRINGIFY( PLUGIN_NAME ),
 	"Amplifier",
-	QT_TRANSLATE_NOOP( "pluginBrowser", "A native amplifier plugin" ),
+	QT_TRANSLATE_NOOP( "PluginBrowser", "A native amplifier plugin" ),
 	"Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>",
 	0x0100,
 	Plugin::Effect,
-	new PluginPixmapLoader( "logo" ),
+	new PluginPixmapLoader("logo"),
 	NULL,
 	NULL
 } ;
@@ -83,7 +83,6 @@ bool AmplifierEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames )
 	for( fpp_t f = 0; f < frames; ++f )
 	{
 //		qDebug( "offset %d, value %f", f, m_ampControls.m_volumeModel.value( f ) );
-		outSum += buf[f][0]*buf[f][0] + buf[f][1]*buf[f][1];
 	
 		sample_t s[2] = { buf[f][0], buf[f][1] };
 
@@ -123,6 +122,7 @@ bool AmplifierEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames )
 
 		buf[f][0] = d * buf[f][0] + w * s[0];
 		buf[f][1] = d * buf[f][1] + w * s[1];
+		outSum += buf[f][0] * buf[f][0] + buf[f][1] * buf[f][1];
 	}
 
 	checkGate( outSum / frames );
@@ -138,7 +138,7 @@ extern "C"
 {
 
 // necessary for getting instance out of shared lib
-Plugin * PLUGIN_EXPORT lmms_plugin_main( Model* parent, void* data )
+PLUGIN_EXPORT Plugin * lmms_plugin_main( Model* parent, void* data )
 {
 	return new AmplifierEffect( parent, static_cast<const Plugin::Descriptor::SubPluginFeatures::Key *>( data ) );
 }

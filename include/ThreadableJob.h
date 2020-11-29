@@ -25,16 +25,15 @@
 #ifndef THREADABLE_JOB_H
 #define THREADABLE_JOB_H
 
-#include "AtomicInt.h"
-
 #include "lmms_basics.h"
 
+#include <atomic>
 
 class ThreadableJob
 {
 public:
 
-	enum ProcessingState
+	enum class ProcessingState : int
 	{
 		Unstarted,
 		Queued,
@@ -43,36 +42,37 @@ public:
 	};
 
 	ThreadableJob() :
-		m_state( ThreadableJob::Unstarted )
+		m_state(ProcessingState::Unstarted)
 	{
 	}
 
 	inline ProcessingState state() const
 	{
-		return static_cast<ProcessingState>( (int) m_state );
+		return m_state.load();
 	}
 
 	inline void reset()
 	{
-		m_state = Unstarted;
+		m_state = ProcessingState::Unstarted;
 	}
 
 	inline void queue()
 	{
-		m_state = Queued;
+		m_state = ProcessingState::Queued;
 	}
 	
 	inline void done()
 	{
-		m_state = Done;
+		m_state = ProcessingState::Done;
 	}
 
 	void process()
 	{
-		if( m_state.testAndSetOrdered( Queued, InProgress ) )
+		auto expected = ProcessingState::Queued;
+		if (m_state.compare_exchange_strong(expected, ProcessingState::InProgress))
 		{
 			doProcessing();
-			m_state = Done;
+			m_state = ProcessingState::Done;
 		}
 	}
 
@@ -82,8 +82,7 @@ public:
 protected:
 	virtual void doProcessing() = 0;
 
-	AtomicInt m_state;
-
+	std::atomic<ProcessingState> m_state;
 } ;
 
 #endif

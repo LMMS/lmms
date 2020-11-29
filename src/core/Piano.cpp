@@ -70,19 +70,6 @@ Piano::Piano( InstrumentTrack* track ) :
 
 }
 
-
-
-
-/*! \brief Destroy this new keyboard display
- *
- */
-Piano::~Piano()
-{
-}
-
-
-
-
 /*! \brief Turn a key on or off
  *
  *  \param key the key number to change

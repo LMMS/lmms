@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
-brew update
+set -e
 
-# appdmg doesn't work with old versions of Node.js
-nvm install --lts
+brew update
+# Python 2 may cause conflicts on dependency installation
+brew unlink python@2 || true

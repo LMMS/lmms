@@ -4,7 +4,7 @@ if(LMMS_HAVE_GIG)
 
 	# Disable C++11 on Clang until gig.h is patched
 	IF(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-		REMOVE_DEFINITIONS(-std=c++0x)
+		SET(CMAKE_CXX_STANDARD 98)
 	ENDIF()
 
 	# Required for not crashing loading files with libgig

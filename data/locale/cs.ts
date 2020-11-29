@@ -1771,12 +1771,12 @@ Klepnutí pravým tlačítkem myši vyvolá kontextovou nabídku, kde můžete m
     <message>
         <location filename="../../src/core/EnvelopeAndLfoParameters.cpp" line="97"/>
         <source>Decay</source>
-        <translation>Pokles</translation>
+        <translation>Útlum</translation>
     </message>
     <message>
         <location filename="../../src/core/EnvelopeAndLfoParameters.cpp" line="98"/>
         <source>Sustain</source>
-        <translation>Držení</translation>
+        <translation>Vydržení</translation>
     </message>
     <message>
         <location filename="../../src/core/EnvelopeAndLfoParameters.cpp" line="99"/>
@@ -1861,12 +1861,12 @@ Klepnutí pravým tlačítkem myši vyvolá kontextovou nabídku, kde můžete m
     <message>
         <location filename="../../src/gui/widgets/EnvelopeAndLfoView.cpp" line="119"/>
         <source>HOLD</source>
-        <translation>ZADR</translation>
+        <translation>DRŽ</translation>
     </message>
     <message>
         <location filename="../../src/gui/widgets/EnvelopeAndLfoView.cpp" line="121"/>
         <source>Hold:</source>
-        <translation>Zadržení:</translation>
+        <translation>Držení:</translation>
     </message>
     <message>
         <location filename="../../src/gui/widgets/EnvelopeAndLfoView.cpp" line="123"/>
@@ -1876,12 +1876,12 @@ Klepnutí pravým tlačítkem myši vyvolá kontextovou nabídku, kde můžete m
     <message>
         <location filename="../../src/gui/widgets/EnvelopeAndLfoView.cpp" line="129"/>
         <source>DEC</source>
-        <translation>POK</translation>
+        <translation>ÚTL</translation>
     </message>
     <message>
         <location filename="../../src/gui/widgets/EnvelopeAndLfoView.cpp" line="131"/>
         <source>Decay:</source>
-        <translation>Pokles:</translation>
+        <translation>Útlum:</translation>
     </message>
     <message>
         <location filename="../../src/gui/widgets/EnvelopeAndLfoView.cpp" line="133"/>
@@ -1891,7 +1891,7 @@ Klepnutí pravým tlačítkem myši vyvolá kontextovou nabídku, kde můžete m
     <message>
         <location filename="../../src/gui/widgets/EnvelopeAndLfoView.cpp" line="141"/>
         <source>SUST</source>
-        <translation>DRŽE</translation>
+        <translation>VYD</translation>
     </message>
     <message>
         <location filename="../../src/gui/widgets/EnvelopeAndLfoView.cpp" line="143"/>
@@ -1906,12 +1906,12 @@ Klepnutí pravým tlačítkem myši vyvolá kontextovou nabídku, kde můžete m
     <message>
         <location filename="../../src/gui/widgets/EnvelopeAndLfoView.cpp" line="152"/>
         <source>REL</source>
-        <translation>DOZ</translation>
+        <translation>UVOL</translation>
     </message>
     <message>
         <location filename="../../src/gui/widgets/EnvelopeAndLfoView.cpp" line="154"/>
         <source>Release:</source>
-        <translation>Doznění:</translation>
+        <translation>Uvolnění:</translation>
     </message>
     <message>
         <location filename="../../src/gui/widgets/EnvelopeAndLfoView.cpp" line="156"/>
@@ -2607,6 +2607,65 @@ Ověřte si prosím, zda máte povolen zápis do souboru a do složky, ve které
         <source>Rendering: %1%</source>
         <translation>Renderuji: %1%</translation>
     </message>
+    <message>
+        <source>Compression level:</source>
+        <translation>Úroveň komprese:</translation>
+    </message>
+    <message>
+        <source>(fastest)</source>
+        <translation>(nejrychlejší)</translation>
+    </message>
+    <message>
+        <source>(default)</source>
+        <translation>(výchozí)</translation>
+    </message>
+    <message>
+        <source>(smallest)</source>
+        <translation>(nejmenší)</translation>
+    </message>
+</context>
+<context>
+    <name>Expressive</name>
+    <message>
+        <source>Selected graph</source>
+        <translation>Zvolený graf</translation>
+    </message>
+    <message>
+        <source>A1</source>
+        <translation>A1</translation>
+    </message>
+    <message>
+        <source>A2</source>
+        <translation>A2</translation>
+    </message>
+    <message>
+        <source>A3</source>
+        <translation>A3</translation>
+    </message>
+    <message>
+        <source>W1 smoothing</source>
+        <translation>W1 vyhlazování</translation>
+    </message>
+    <message>
+        <source>W2 smoothing</source>
+        <translation>W2 vyhlazování</translation>
+    </message>
+    <message>
+        <source>W3 smoothing</source>
+        <translation>W3 vyhlazování</translation>
+    </message>
+    <message>
+        <source>PAN1</source>
+        <translation>PAN1</translation>
+    </message>
+    <message>
+        <source>PAN2</source>
+        <translation>PAN2</translation>
+    </message>
+    <message>
+        <source>REL TRANS</source>
+        <translation type="unfinished"/>
+    </message>
 </context>
 <context>
     <name>Fader</name>
@@ -2623,6 +2682,14 @@ Ověřte si prosím, zda máte povolen zápis do souboru a do složky, ve které
         <location filename="../../src/gui/FileBrowser.cpp" line="75"/>
         <source>Browser</source>
         <translation>Prohlížeč</translation>
+    </message>
+    <message>
+        <source>Search</source>
+        <translation>Hledat</translation>
+    </message>
+    <message>
+        <source>Refresh list</source>
+        <translation>Obnovit seznam</translation>
     </message>
 </context>
 <context>
@@ -2672,6 +2739,9 @@ Ověřte si prosím, zda máte povolen zápis do souboru a do složky, ve které
         <source>--- Factory files ---</source>
         <translation>--- Tovární soubory ---</translation>
     </message>
+</context>
+<context>
+    <name>FileBrowserTreeWidget</name>
 </context>
 <context>
     <name>FlangerControls</name>
@@ -4048,7 +4118,7 @@ Efektové kanály můžete odstranit nebo přesunout v kontextové nabídce, kte
     <message>
         <location filename="../../src/gui/widgets/InstrumentSoundShapingView.cpp" line="114"/>
         <source>RESO</source>
-        <translation>REZON</translation>
+        <translation>REZO</translation>
     </message>
     <message>
         <location filename="../../src/gui/widgets/InstrumentSoundShapingView.cpp" line="116"/>
@@ -7419,6 +7489,10 @@ Důvod: &quot;%2&quot;</translation>
         <translation>Komprimovaný OGG soubor (*.ogg)</translation>
     </message>
     <message>
+        <source>FLAC-File (*.flac)</source>
+        <translation>Soubor FLAC (*.flac)</translation>
+    </message>
+    <message>
         <location filename="../../src/core/ProjectRenderer.cpp" line="55"/>
         <source>Compressed MP3-File (*.mp3)</source>
         <translation>Komprimovaný soubor MP3 (*.mp3)</translation>
@@ -8993,7 +9067,7 @@ Přesvědčte se prosím, že máte právo ke čtení tohoto souboru a příslu�
     <message>
         <location filename="../../plugins/triple_oscillator/TripleOscillator.cpp" line="687"/>
         <source>Use a square-wave for current oscillator.</source>
-        <translation>Klepněte sem pro pravoúhlou vlnu.</translation>
+        <translation>Použít pravoúhlou vlnu pro aktuální oscilátor.</translation>
     </message>
     <message>
         <location filename="../../plugins/triple_oscillator/TripleOscillator.cpp" line="698"/>
@@ -10028,12 +10102,12 @@ Přesvědčte se prosím, že máte právo ke čtení tohoto souboru a příslu�
     <message>
         <location filename="../../plugins/dynamics_processor/dynamics_processor_control_dialog.cpp" line="85"/>
         <source>RELEASE</source>
-        <translation>DOZNĚNÍ</translation>
+        <translation>UVOLNĚNÍ</translation>
     </message>
     <message>
         <location filename="../../plugins/dynamics_processor/dynamics_processor_control_dialog.cpp" line="86"/>
         <source>Peak release time:</source>
-        <translation>Délka doznění špičky:</translation>
+        <translation>Délka uvolnění špičky:</translation>
     </message>
     <message>
         <location filename="../../plugins/dynamics_processor/dynamics_processor_control_dialog.cpp" line="90"/>
@@ -10456,7 +10530,7 @@ Poklepáním na kterýkoliv modul se zobrazí informace o portech.</translation>
     <message>
         <location filename="../../plugins/lb302/lb302.cpp" line="280"/>
         <source>VCF Envelope Decay</source>
-        <translation>VCF pokles obálky</translation>
+        <translation>VCF útlum obálky</translation>
     </message>
     <message>
         <location filename="../../plugins/lb302/lb302.cpp" line="281"/>
@@ -10471,7 +10545,7 @@ Poklepáním na kterýkoliv modul se zobrazí informace o portech.</translation>
     <message>
         <location filename="../../plugins/lb302/lb302.cpp" line="283"/>
         <source>Slide Decay</source>
-        <translation>Pokles sklouznutí</translation>
+        <translation>Útlum sklouznutí</translation>
     </message>
     <message>
         <location filename="../../plugins/lb302/lb302.cpp" line="284"/>
@@ -10514,7 +10588,7 @@ Poklepáním na kterýkoliv modul se zobrazí informace o portech.</translation>
     <message>
         <location filename="../../plugins/lb302/lb302.cpp" line="847"/>
         <source>Decay:</source>
-        <translation>Pokles:</translation>
+        <translation>Útlum:</translation>
     </message>
     <message>
         <location filename="../../plugins/lb302/lb302.cpp" line="862"/>
@@ -10524,7 +10598,7 @@ Poklepáním na kterýkoliv modul se zobrazí informace o portech.</translation>
     <message>
         <location filename="../../plugins/lb302/lb302.cpp" line="868"/>
         <source>Slide Decay:</source>
-        <translation>Pokles sklouznutí:</translation>
+        <translation>Útlum sklouznutí:</translation>
     </message>
     <message>
         <location filename="../../plugins/lb302/lb302.cpp" line="873"/>
@@ -11183,7 +11257,7 @@ Poklepáním na kterýkoliv modul se zobrazí informace o portech.</translation>
         <location filename="../../plugins/opl2/opl2instrument.cpp" line="805"/>
         <location filename="../../plugins/opl2/opl2instrument.cpp" line="807"/>
         <source>Decay</source>
-        <translation>Pokles</translation>
+        <translation>Útlum</translation>
     </message>
     <message>
         <location filename="../../plugins/opl2/opl2instrument.cpp" line="809"/>
@@ -11276,7 +11350,7 @@ Poklepáním na kterýkoliv modul se zobrazí informace o portech.</translation>
     </message>
 </context>
 <context>
-    <name>papuInstrument</name>
+    <name>FreeBoyInstrument</name>
     <message>
         <location filename="../../plugins/papu/papu_instrument.cpp" line="67"/>
         <source>Sweep time</source>
@@ -11296,7 +11370,7 @@ Poklepáním na kterýkoliv modul se zobrazí informace o portech.</translation>
         <location filename="../../plugins/papu/papu_instrument.cpp" line="72"/>
         <location filename="../../plugins/papu/papu_instrument.cpp" line="81"/>
         <source>Wave Pattern Duty</source>
-        <translation>Pracovní cyklus vlnového vzorce</translation>
+        <translation>Pracovní cyklus vlnového patternu</translation>
     </message>
     <message>
         <location filename="../../plugins/papu/papu_instrument.cpp" line="74"/>
@@ -11399,7 +11473,7 @@ Poklepáním na kterýkoliv modul se zobrazí informace o portech.</translation>
     </message>
 </context>
 <context>
-    <name>papuInstrumentView</name>
+    <name>FreeBoyInstrumentView</name>
     <message>
         <location filename="../../plugins/papu/papu_instrument.cpp" line="462"/>
         <source>Sweep Time:</source>
@@ -11434,12 +11508,12 @@ Poklepáním na kterýkoliv modul se zobrazí informace o portech.</translation>
         <location filename="../../plugins/papu/papu_instrument.cpp" line="477"/>
         <location filename="../../plugins/papu/papu_instrument.cpp" line="502"/>
         <source>Wave pattern duty:</source>
-        <translation>Pracovní cyklus vlnového vzorce:</translation>
+        <translation>Pracovní cyklus vlnového patternu:</translation>
     </message>
     <message>
         <location filename="../../plugins/papu/papu_instrument.cpp" line="480"/>
         <source>Wave Pattern Duty</source>
-        <translation>Pracovní cyklus vlnového vzorce</translation>
+        <translation>Pracovní cyklus vlnového patternu</translation>
     </message>
     <message>
         <location filename="../../plugins/papu/papu_instrument.cpp" line="481"/>
@@ -11482,7 +11556,7 @@ Poklepáním na kterýkoliv modul se zobrazí informace o portech.</translation>
     <message>
         <location filename="../../plugins/papu/papu_instrument.cpp" line="505"/>
         <source>Wave pattern duty</source>
-        <translation>Pracovní cyklus vlnového vzorce</translation>
+        <translation>Pracovní cyklus vlnového patternu</translation>
     </message>
     <message>
         <location filename="../../plugins/papu/papu_instrument.cpp" line="511"/>
@@ -11619,7 +11693,7 @@ Poklepáním na kterýkoliv modul se zobrazí informace o portech.</translation>
     <message>
         <location filename="../../plugins/papu/papu_instrument.cpp" line="688"/>
         <source>Wave Pattern</source>
-        <translation>Vlnový vzorec</translation>
+        <translation>Vlnový pattern</translation>
     </message>
     <message>
         <location filename="../../plugins/papu/papu_instrument.cpp" line="689"/>
@@ -11899,6 +11973,10 @@ Tento čip byl používán v počítačích Commodore 64.</translation>
         <source>Embedded ZynAddSubFX</source>
         <translation>Vestavěný ZynAddSubFX</translation>
     </message>
+    <message>
+        <source>Mathematical expression parser</source>
+        <translation>Parser matematických výrazů</translation>
+    </message>
 </context>
 <context>
     <name>sf2Instrument</name>
@@ -12170,7 +12248,7 @@ Tento čip byl používán v počítačích Commodore 64.</translation>
         <location filename="../../plugins/sid/sid_instrument.cpp" line="558"/>
         <location filename="../../plugins/sid/sid_instrument.cpp" line="704"/>
         <source>Decay:</source>
-        <translation>Pokles:</translation>
+        <translation>Útlum:</translation>
     </message>
     <message>
         <location filename="../../plugins/sid/sid_instrument.cpp" line="560"/>
@@ -12180,7 +12258,7 @@ Tento čip byl používán v počítačích Commodore 64.</translation>
     <message>
         <location filename="../../plugins/sid/sid_instrument.cpp" line="564"/>
         <source>Sustain:</source>
-        <translation>Držení:</translation>
+        <translation>Vydržení:</translation>
     </message>
     <message>
         <location filename="../../plugins/sid/sid_instrument.cpp" line="566"/>
@@ -12191,7 +12269,7 @@ Tento čip byl používán v počítačích Commodore 64.</translation>
         <location filename="../../plugins/sid/sid_instrument.cpp" line="570"/>
         <location filename="../../plugins/sid/sid_instrument.cpp" line="710"/>
         <source>Release:</source>
-        <translation>Doznění:</translation>
+        <translation>Uvolnění:</translation>
     </message>
     <message>
         <location filename="../../plugins/sid/sid_instrument.cpp" line="572"/>
@@ -12620,7 +12698,7 @@ LED v pravém dolním rohu editoru vlny určuje, jestli bude struna v aktuální
     <message>
         <location filename="../../plugins/vibed/vibed.cpp" line="599"/>
         <source>Use a square-wave for current oscillator.</source>
-        <translation>Klepněte sem pro pravoúhlou vlnu.</translation>
+        <translation>Použít pravoúhlou vlnu pro aktuální oscilátor.</translation>
     </message>
     <message>
         <location filename="../../plugins/vibed/vibed.cpp" line="605"/>
@@ -12678,17 +12756,17 @@ LED v pravém dolním rohu editoru vlny určuje, jestli bude struna v aktuální
     <message>
         <location filename="../../plugins/sid/sid_instrument.cpp" line="98"/>
         <source>Voice %1 decay</source>
-        <translation>Hlas %1 pokles</translation>
+        <translation>Hlas %1 útlum</translation>
     </message>
     <message>
         <location filename="../../plugins/sid/sid_instrument.cpp" line="100"/>
         <source>Voice %1 sustain</source>
-        <translation>Hlas %1 držení</translation>
+        <translation>Hlas %1 vydržení</translation>
     </message>
     <message>
         <location filename="../../plugins/sid/sid_instrument.cpp" line="102"/>
         <source>Voice %1 release</source>
-        <translation>Hlas %1 doznění</translation>
+        <translation>Hlas %1 uvolnění</translation>
     </message>
     <message>
         <location filename="../../plugins/sid/sid_instrument.cpp" line="104"/>

@@ -29,7 +29,7 @@
 class QDataStream;
 class QString;
 
-#include "export.h"
+#include "lmms_export.h"
 #include "interpolation.h"
 #include "lmms_basics.h"
 #include "lmms_math.h"
@@ -82,7 +82,7 @@ QDataStream& operator>> ( QDataStream &in, WaveMipMap &waveMipMap );
 
 
 
-class EXPORT BandLimitedWave
+class LMMS_EXPORT BandLimitedWave
 {
 public:
 	enum Waveforms
@@ -125,48 +125,9 @@ public:
 	 */
 	static inline sample_t oscillate( float _ph, float _wavelen, Waveforms _wave )
 	{
-		// high wavelen/ low freq
-		if( _wavelen > TLENS[ MAXTBL ] )
-		{
-			const int t = MAXTBL;
-			const int tlen = TLENS[t];
-			const float ph = fraction( _ph );
-			const float lookupf = ph * static_cast<float>( tlen );
-			const int lookup = static_cast<int>( lookupf );
-			const float ip = fraction( lookupf );
-
-			const sample_t s1 = s_waveforms[ _wave ].sampleAt( t, lookup );
-			const sample_t s2 = s_waveforms[ _wave ].sampleAt( t, ( lookup + 1 ) % tlen );
-			const int lm = lookup == 0 ? tlen - 1 : lookup - 1;
-			const sample_t s0 = s_waveforms[ _wave ].sampleAt( t, lm );
-			const sample_t s3 = s_waveforms[ _wave ].sampleAt( t, ( lookup + 2 ) % tlen );
-			const sample_t sr = optimal4pInterpolate( s0, s1, s2, s3, ip );
-
-			return sr;
-		}
-		// low wavelen/ high freq
-		if( _wavelen < 3.0f )
-		{
-			const int t = 0;
-			const int tlen = TLENS[t];
-			const float ph = fraction( _ph );
-			const float lookupf = ph * static_cast<float>( tlen );
-			const int lookup = static_cast<int>( lookupf );
-			const float ip = fraction( lookupf );
-
-			const sample_t s1 = s_waveforms[ _wave ].sampleAt( t, lookup );
-			const sample_t s2 = s_waveforms[ _wave ].sampleAt( t, ( lookup + 1 ) % tlen );
-			const int lm = lookup == 0 ? tlen - 1 : lookup - 1;
-			const sample_t s0 = s_waveforms[ _wave ].sampleAt( t, lm );
-			const sample_t s3 = s_waveforms[ _wave ].sampleAt( t, ( lookup + 2 ) % tlen );
-			const sample_t sr = optimal4pInterpolate( s0, s1, s2, s3, ip );
-
-			return sr;
-		}
-
 		// get the next higher tlen
-		int t = MAXTBL - 1;
-		while( _wavelen < TLENS[t] ) { t--; }
+		int t = 0;
+		while( t < MAXTBL && _wavelen >= TLENS[t+1] ) { t++; }
 
 		int tlen = TLENS[t];
 		const float ph = fraction( _ph );

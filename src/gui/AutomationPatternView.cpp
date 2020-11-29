@@ -25,6 +25,7 @@
 
 #include <QMouseEvent>
 #include <QPainter>
+#include <QPainterPath>
 #include <QMenu>
 
 #include "AutomationEditor.h"
@@ -55,8 +56,7 @@ AutomationPatternView::AutomationPatternView( AutomationPattern * _pattern,
 
 	setAttribute( Qt::WA_OpaquePaintEvent, true );
 
-	ToolTip::add( this, tr( "double-click to open this pattern in "
-						"automation editor" ) );
+	ToolTip::add(this, m_pat->name());
 	setStyle( QApplication::style() );
 	
 	if( s_pat_rec == NULL ) { s_pat_rec = new QPixmap( embed::getIconPixmap(
@@ -81,11 +81,18 @@ void AutomationPatternView::openInAutomationEditor()
 }
 
 
+void AutomationPatternView::update()
+{
+	ToolTip::add(this, m_pat->name());
+
+	TrackContentObjectView::update();
+}
+
 
 
 void AutomationPatternView::resetName()
 {
-	m_pat->setName( QString::null );
+	m_pat->setName( QString() );
 }
 
 
@@ -112,7 +119,7 @@ void AutomationPatternView::disconnectObject( QAction * _a )
 		float oldMin = m_pat->getMin();
 		float oldMax = m_pat->getMax();
 
-		m_pat->m_objects.erase( qFind( m_pat->m_objects.begin(),
+		m_pat->m_objects.erase( std::find( m_pat->m_objects.begin(),
 					m_pat->m_objects.end(),
 				dynamic_cast<AutomatableModel *>( j ) ) );
 		update();
@@ -209,8 +216,6 @@ void AutomationPatternView::constructContextMenu( QMenu * _cm )
 				this, SLOT( disconnectObject( QAction * ) ) );
 		_cm->addMenu( m );
 	}
-
-	_cm->addSeparator();
 }
 
 
@@ -241,19 +246,17 @@ void AutomationPatternView::paintEvent( QPaintEvent * )
 
 	setNeedsUpdate( false );
 
-	m_paintPixmap = m_paintPixmap.isNull() == true || m_paintPixmap.size() != size()
-		? QPixmap( size() ) : m_paintPixmap;
+	if (m_paintPixmap.isNull() || m_paintPixmap.size() != size())
+	{
+		m_paintPixmap = QPixmap(size());
+	}
 
 	QPainter p( &m_paintPixmap );
 
 	QLinearGradient lingrad( 0, 0, 0, height() );
-	QColor c;
+	QColor c = getColorForDisplay( painter.background().color() );
 	bool muted = m_pat->getTrack()->isMuted() || m_pat->isMuted();
 	bool current = gui->automationEditor()->currentPattern() == m_pat;
-	
-	// state: selected, muted, normal
-	c = isSelected() ? selectedColor() : ( muted ? mutedBackgroundColor() 
-		:	painter.background().color() );
 
 	lingrad.setColorAt( 1, c.darker( 300 ) );
 	lingrad.setColorAt( 0, c );
@@ -270,10 +273,10 @@ void AutomationPatternView::paintEvent( QPaintEvent * )
 		p.fillRect( rect(), c );
 	}
 	
-	const float ppt = fixedTCOs() ?
+	const float ppb = fixedTCOs() ?
 			( parentWidget()->width() - 2 * TCO_BORDER_WIDTH )
-				/ (float) m_pat->timeMapLength().getTact() :
-								pixelsPerTact();
+				/ (float) m_pat->timeMapLength().getBar() :
+								pixelsPerBar();
 
 	const int x_base = TCO_BORDER_WIDTH;
 	
@@ -282,7 +285,7 @@ void AutomationPatternView::paintEvent( QPaintEvent * )
 
 	const float y_scale = max - min;
 	const float h = ( height() - 2 * TCO_BORDER_WIDTH ) / y_scale;
-	const float ppTick  = ppt / MidiTime::ticksPerTact();
+	const float ppTick  = ppb / MidiTime::ticksPerBar();
 
 	p.translate( 0.0f, max * height() / y_scale - TCO_BORDER_WIDTH );
 	p.scale( 1.0f, -h );
@@ -358,15 +361,15 @@ void AutomationPatternView::paintEvent( QPaintEvent * )
 	}
 
 	p.setRenderHints( QPainter::Antialiasing, false );
-	p.resetMatrix();
+	p.resetTransform();
 	
 	// bar lines
 	const int lineSize = 3;
 	p.setPen( c.darker( 300 ) );
 
-	for( tact_t t = 1; t < width() - TCO_BORDER_WIDTH; ++t )
+	for( bar_t t = 1; t < width() - TCO_BORDER_WIDTH; ++t )
 	{
-		const int tx = x_base + static_cast<int>( ppt * t ) - 2;
+		const int tx = x_base + static_cast<int>( ppb * t ) - 2;
 		p.drawLine( tx, TCO_BORDER_WIDTH, tx, TCO_BORDER_WIDTH + lineSize );
 		p.drawLine( tx,	rect().bottom() - ( lineSize + TCO_BORDER_WIDTH ),
 					tx, rect().bottom() - TCO_BORDER_WIDTH );
@@ -380,25 +383,7 @@ void AutomationPatternView::paintEvent( QPaintEvent * )
 	}
 	
 	// pattern name
-	p.setRenderHint( QPainter::TextAntialiasing );
-	
-	if(  m_staticTextName.text() != m_pat->name() )
-	{
-		m_staticTextName.setText( m_pat->name() );
-	}
-	
-	QFont font;
-	font.setHintingPreference( QFont::PreferFullHinting );
-	font.setPointSize( 8 );
-	p.setFont( font );
-	
-	const int textTop = TCO_BORDER_WIDTH + 1;
-	const int textLeft = TCO_BORDER_WIDTH + 1;
-	
-	p.setPen( textShadowColor() );
-	p.drawStaticText( textLeft + 1, textTop + 1, m_staticTextName );
-	p.setPen( textColor() );
-	p.drawStaticText( textLeft, textTop, m_staticTextName );
+	paintTextLabel(m_pat->name(), p);
 	
 	// inner border
 	p.setPen( c.lighter( current ? 160 : 130 ) );

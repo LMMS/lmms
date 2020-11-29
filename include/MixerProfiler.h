@@ -27,6 +27,7 @@
 
 #include <QFile>
 
+#include "lmms_basics.h"
 #include "MicroTimer.h"
 
 class MixerProfiler

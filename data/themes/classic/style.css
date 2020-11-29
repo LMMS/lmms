@@ -11,6 +11,11 @@ QMdiArea {
 	background-image: url(resources:background_artwork.png);
 }
 
+Knob {
+	qproperty-lineInactiveColor: rgb(120, 120, 120);
+	qproperty-arcInactiveColor: rgba(120, 120, 120, 70);
+}
+
 AutomationEditor {
 	background-color: rgb(0, 0, 0);
 	color: #e0e0e0;
@@ -34,7 +39,6 @@ QLineEdit {
 	border-radius: 4px;
 	border: 2px inset rgba(91,101,113,128);
 	background: #49515b;
-	color: #e0e0e0;
 }
 
 
@@ -49,6 +53,13 @@ QLineEdit:focus {
 	border: 1px solid rgba(0,0,0, 128);
 }
 
+/* Set color and selection background color for various inputs.
+   SpinBoxes are used in QInputDialogs */
+
+QTextEdit, QLineEdit:focus, QComboBox:focus, QSpinBox:focus, QDoubleSpinBox:focus {
+	color: #e0e0e0;
+	selection-background-color: #202020;
+}
 
 QToolTip {
 	border-radius: 4px;
@@ -118,16 +129,43 @@ QMenu::indicator:selected {
 	background-color: #747474;
 }
 
+FileBrowser QCheckBox
+{
+	font-size: 10px;
+	color: white;
+}
+
+PositionLine {
+	qproperty-tailGradient: false;
+	qproperty-lineColor: rgb(255, 255, 255);
+}
+
 PianoRoll {
 	background-color: rgb(0, 0, 0);
 	qproperty-backgroundShade: rgba( 255, 255, 255, 10 );
 	qproperty-noteModeColor: rgb( 255, 255, 255 );
 	qproperty-noteColor: rgb( 119, 199, 216 );
+	qproperty-noteTextColor: rgb( 255, 255, 255 );
 	qproperty-noteOpacity: 128;
 	qproperty-noteBorders: true; /* boolean property, set false to have borderless notes */
 	qproperty-selectedNoteColor: rgb( 0, 125, 255 );
+	qproperty-ghostNoteColor: #000000;
+	qproperty-ghostNoteTextColor: #ffffff;
+	qproperty-ghostNoteOpacity: 50;
+	qproperty-ghostNoteBorders: true;
 	qproperty-barColor: #4afd85;
 	qproperty-markedSemitoneColor: rgba( 0, 255, 200, 60 );
+	/* Piano keys */
+	qproperty-whiteKeyWidth: 64;
+	qproperty-whiteKeyActiveTextColor: #000;
+	qproperty-whiteKeyActiveTextShadow: rgb( 240, 240, 240 );
+	qproperty-whiteKeyActiveBackground: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #43e97b, stop:1 #3bcd6c);
+	qproperty-whiteKeyInactiveTextColor: rgb( 128, 128, 128);
+	qproperty-whiteKeyInactiveTextShadow: rgb( 240, 240, 240 );
+	qproperty-whiteKeyInactiveBackground: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #eeeeee, stop:1 #ffffff);
+	qproperty-blackKeyWidth: 48;
+	qproperty-blackKeyActiveBackground: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #43e97b, stop:1 #3bcd6c);
+	qproperty-blackKeyInactiveBackground: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #333, stop:1 #000);
 	/* Grid colors */
 	qproperty-lineColor: rgba( 128, 128, 128, 80 );
 	qproperty-beatLineColor: rgba( 128, 128, 128, 160 );
@@ -154,11 +192,10 @@ GroupBox {
 
 /* main toolbar oscilloscope - can have transparent bg now */
 
-VisualizationWidget  {
+Oscilloscope {
 	background: none;
 	border: none;
 	qproperty-normalColor: rgb(71, 253, 133);
-	qproperty-warningColor: rgb(255, 192, 64);
 	qproperty-clippingColor: rgb(255, 64, 64);
 }
 
@@ -323,7 +360,7 @@ TrackOperationsWidget > QPushButton {
 	min-height: 26px;
 	min-width: 26px;
 	background: none;
-	border:none;
+	border: none;
 }
 
 TrackOperationsWidget > QPushButton::menu-indicator {
@@ -331,20 +368,18 @@ TrackOperationsWidget > QPushButton::menu-indicator {
 	subcontrol-origin: padding;
 	subcontrol-position: center;
 	position: relative;
-	top: 2px;
+	top: 1px;
 }
 
 TrackOperationsWidget > QPushButton::menu-indicator:hover {
 	image: url(resources:trackop_h.png);
 }
 
-
 TrackOperationsWidget > QPushButton::menu-indicator:pressed,
-TrackOperationsWidget > QPushButton::menu-indicator:checked
- {
+TrackOperationsWidget > QPushButton::menu-indicator:checked {
 	image: url(resources:trackop_c.png);
 	position: relative;
-	top: 3px;
+	top: 2px;
 }
 
 /* actually has no effect yet so disabled */
@@ -616,14 +651,24 @@ TrackContentObjectView   {
 	qproperty-selectedColor: rgb( 0, 125, 255 );
 	qproperty-BBPatternBackground: rgb( 80, 80, 80 );
 	qproperty-textColor: rgb( 255, 255, 255 );
+	qproperty-textBackgroundColor: rgba(0, 0, 0, 75);
 	qproperty-textShadowColor: rgb( 0, 0, 0 );
 	qproperty-gradient: true; /* boolean property, set true to have a gradient */
+	/* finger tip offset of cursor */
+	qproperty-mouseHotspotHand: 3px 3px;
+	
+	font-size: 11px;
 }
 
 /* instrument pattern */
 PatternView {
 	background-color: rgb( 119, 199, 216 );
 	color: rgb( 187, 227, 236 );
+
+	qproperty-noteFillColor: rgb( 187, 227, 236 );
+	qproperty-noteBorderColor: rgb( 119, 199, 216 );
+	qproperty-mutedNoteFillColor: rgb( 128, 128, 128 );
+	qproperty-mutedNoteBorderColor: rgb( 80, 80, 80 );
 }
 
 /* sample track pattern */
@@ -886,7 +931,4 @@ LmmsPalette {
 	qproperty-brightText: #4afd85;
 	qproperty-highlight: #202020;
 	qproperty-highlightedText: #ffffff;
-	/* the next two are used for whatsthis dialogs */
-	qproperty-toolTipText: #000;
-	qproperty-toolTipBase: #c9c9c9;
 }

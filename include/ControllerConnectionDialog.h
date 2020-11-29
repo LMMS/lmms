@@ -66,6 +66,7 @@ public slots:
 	void selectController();
 	void midiToggled();
 	void userToggled();
+	void userSelected();
 	void autoDetectToggled();
 	void enableAutoDetect( QAction * _a );
 

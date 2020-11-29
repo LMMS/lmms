@@ -32,7 +32,7 @@
 #include <jack/jack.h>
 #include <jack/midiport.h>
 #else
-#include "AudioWeakJack.h"
+#include "weak_libjack.h"
 #endif
 
 #include <QtCore/QThread>

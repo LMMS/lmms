@@ -37,11 +37,11 @@ class TimeDisplayWidget : public QWidget
 	Q_OBJECT
 public:
 	TimeDisplayWidget();
-	virtual ~TimeDisplayWidget();
+	virtual ~TimeDisplayWidget() = default;
 
 
 protected:
-	virtual void mousePressEvent( QMouseEvent* mouseEvent );
+	void mousePressEvent( QMouseEvent* mouseEvent ) override;
 
 
 private slots:

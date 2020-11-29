@@ -26,7 +26,7 @@
 #ifndef LMMS_MATH_H
 #define LMMS_MATH_H
 
-#include <stdint.h>
+#include <cstdint>
 #include "lmms_constants.h"
 #include "lmmsconfig.h"
 #include <QtCore/QtGlobal>
@@ -34,47 +34,49 @@
 #include <cmath>
 using namespace std;
 
-#ifndef __GLIBC__
-#ifndef isnanf
-#define isnanf(x)	isnan(x)
-#endif
-#ifndef isinff
-#define isinff(x)	isinf(x)
-#endif
-#ifndef _isnanf
-#define _isnanf(x) isnan(x)
-#endif
-#ifndef _isinff
-#define _isinff(x) isinf(x)
-#endif
 #ifndef exp10
-#define exp10(x) pow( 10.0, x )
-#endif
-#ifndef exp10f
-#define exp10f(x) powf( 10.0f, x )
-#endif
+#define exp10(x) std::pow( 10.0, x )
 #endif
 
 #ifdef __INTEL_COMPILER
 
 static inline float absFraction( const float _x )
 {
-	return( _x - ( _x >= 0.0f ? floorf( _x ) : floorf( _x ) - 1 ) );
+	return( _x - floorf( _x ) );
 }
 
 static inline float fraction( const float _x )
 {
-	return( _x - floorf( _x ) );
+	return( _x - floorf( _x ) - ( _x >= 0.0f ? 0.0 : 1.0 ) );
 }
 
 #else
 
+/*!
+ * @brief Returns the wrapped fractional part of a float, a value between 0.0f and 1.0f.
+ *
+ * absFraction( 2.3) =>  0.3
+ * absFraction(-2.3) =>  0.7
+ *
+ * Note that this not the same as the absolute value of the fraction (as the function name suggests).
+ * If the result is interpreted as a phase of an oscillator, it makes that negative phases are
+ * converted to positive phases.
+ */
 static inline float absFraction( const float _x )
 {
 	return( _x - ( _x >= 0.0f ? static_cast<int>( _x ) :
 						static_cast<int>( _x ) - 1 ) );
 }
 
+/*!
+ * @brief Returns the fractional part of a float, a value between -1.0f and 1.0f.
+ *
+ * fraction( 2.3) =>  0.3
+ * fraction(-2.3) => -0.3
+ *
+ * Note that if the return value is used as a phase of an oscillator, that the oscillator must support
+ * negative phases.
+ */
 static inline float fraction( const float _x )
 {
 	return( _x - static_cast<int>( _x ) );
@@ -260,9 +262,9 @@ static inline float safeAmpToDbfs( float amp )
 //! @return Linear amplitude
 static inline float safeDbfsToAmp( float dbfs )
 {
-	return isinff( dbfs )
+	return isinf( dbfs )
 		? 0.0f
-		: exp10f( dbfs * 0.05f );
+		: exp10( dbfs * 0.05f );
 }
 
 
@@ -280,7 +282,7 @@ static inline float ampToDbfs( float amp )
 //! @return Linear amplitude
 static inline float dbfsToAmp( float dbfs )
 {
-	return exp10f( dbfs * 0.05f );
+	return exp10( dbfs * 0.05f );
 }
 
 

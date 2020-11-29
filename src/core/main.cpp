@@ -29,6 +29,7 @@
 
 #include "denormals.h"
 
+#include <QDebug>
 #include <QFileInfo>
 #include <QLocale>
 #include <QTimer>
@@ -71,6 +72,33 @@
 #include "Song.h"
 #include "SetupDialog.h"
 
+#ifdef LMMS_DEBUG_FPE
+#include <fenv.h> // For feenableexcept
+#include <execinfo.h> // For backtrace and backtrace_symbols_fd
+#include <unistd.h> // For STDERR_FILENO
+#include <csignal> // To register the signal handler
+#endif
+
+
+#ifdef LMMS_DEBUG_FPE
+void signalHandler( int signum ) {
+
+	// Get a back trace
+	void *array[10];
+	size_t size;
+
+	// get void*'s for all entries on the stack
+	size = backtrace(array, 10);
+
+	backtrace_symbols_fd(array, size, STDERR_FILENO);
+
+	// cleanup and close up stuff here
+	// terminate program
+
+	exit(signum);
+}
+#endif
+
 static inline QString baseName( const QString & file )
 {
 	return QFileInfo( file ).absolutePath() + "/" +
@@ -78,6 +106,21 @@ static inline QString baseName( const QString & file )
 }
 
 
+#ifdef LMMS_BUILD_WIN32
+// Workaround for old MinGW
+#ifdef __MINGW32__
+extern "C" _CRTIMP errno_t __cdecl freopen_s(FILE** _File,
+	const char *_Filename, const char *_Mode, FILE *_Stream);
+#endif
+
+// For qInstallMessageHandler
+void consoleMessageHandler(QtMsgType type,
+	const QMessageLogContext &context, const QString &msg)
+{
+    QByteArray localMsg = msg.toLocal8Bit();
+    fprintf(stderr, "%s\n", localMsg.constData());
+}
+#endif
 
 
 inline void loadTranslation( const QString & tname,
@@ -86,9 +129,10 @@ inline void loadTranslation( const QString & tname,
 	QTranslator * t = new QTranslator( QCoreApplication::instance() );
 	QString name = tname + ".qm";
 
-	t->load( name, dir );
-
-	QCoreApplication::instance()->installTranslator( t );
+	if (t->load(name, dir))
+	{
+		QCoreApplication::instance()->installTranslator(t);
+	}
 }
 
 
@@ -103,7 +147,7 @@ void printVersion( char *executableName )
 		"License as published by the Free Software Foundation; either\n"
 		"version 2 of the License, or (at your option) any later version.\n\n"
 		"Try \"%s --help\" for more information.\n\n", LMMS_VERSION,
-		PLATFORM, MACHINE, QT_VERSION_STR, GCC_VERSION,
+		PLATFORM, MACHINE, QT_VERSION_STR, COMPILER_VERSION,
 		LMMS_PROJECT_COPYRIGHT, executableName );
 }
 
@@ -118,11 +162,12 @@ void printHelp()
 		"Actions:\n"
 		"  <no action> [options...] [<project>]  Start LMMS in normal GUI mode\n"
 		"  dump <in>                             Dump XML of compressed file <in>\n"
+		"  compress <in>                         Compress file <in>\n"
 		"  render <project> [options...]         Render given project file\n"
 		"  rendertracks <project> [options...]   Render each track to a different file\n"
 		"  upgrade <in> [out]                    Upgrade file <in> and save as <out>\n"
 		"                                        Standard out is used if no output file\n"
-		"                                        is specifed\n"
+		"                                        is specified\n"
 		"\nGlobal options:\n"
 		"      --allowroot                Bypass root user startup check (use with\n"
 		"          caution).\n"
@@ -189,11 +234,60 @@ void fileCheck( QString &file )
 	}
 }
 
+int usageError(const QString& message)
+{
+	qCritical().noquote() << QString("\n%1.\n\nTry \"%2 --help\" for more information.\n\n")
+				   .arg( message ).arg( qApp->arguments()[0] );
+	return EXIT_FAILURE;
+}
 
+int noInputFileError()
+{
+	return usageError( "No input file specified" );
+}
 
 
 int main( int argc, char * * argv )
 {
+#ifdef LMMS_DEBUG_FPE
+	// Enable exceptions for certain floating point results
+	feenableexcept( FE_INVALID   |
+			FE_DIVBYZERO |
+			FE_OVERFLOW  |
+			FE_UNDERFLOW);
+
+	// Install the trap handler
+	// register signal SIGFPE and signal handler
+	signal(SIGFPE, signalHandler);
+#endif
+
+#ifdef LMMS_BUILD_WIN32
+	// Don't touch redirected streams here
+	// GetStdHandle should be called before AttachConsole
+	HANDLE hStdIn = GetStdHandle(STD_INPUT_HANDLE);
+	HANDLE hStdOut = GetStdHandle(STD_OUTPUT_HANDLE);
+	HANDLE hStdErr = GetStdHandle(STD_ERROR_HANDLE);
+	FILE *fIn, *fOut, *fErr;
+	// Enable console output if available
+	if (AttachConsole(ATTACH_PARENT_PROCESS))
+	{
+		if (!hStdIn)
+		{
+			freopen_s(&fIn, "CONIN$", "r", stdin);
+		}
+		if (!hStdOut)
+		{
+			freopen_s(&fOut, "CONOUT$", "w", stdout);
+		}
+		if (!hStdErr)
+		{
+			freopen_s(&fErr, "CONOUT$", "w", stderr);
+		}
+	}
+	// Make Qt's debug message handlers work
+	qInstallMessageHandler(consoleMessageHandler);
+#endif
+
 	// initialize memory managers
 	NotePlayHandleManager::init();
 
@@ -250,7 +344,7 @@ int main( int argc, char * * argv )
 	{
 		printf( "LMMS cannot be run as root.\nUse \"--allowroot\" to override.\n\n" );
 		return EXIT_FAILURE;
-	}	
+	}
 #endif
 #ifdef LMMS_BUILD_LINUX
 	// don't let OS steal the menu bar. FIXME: only effective on Qt4
@@ -288,9 +382,7 @@ int main( int argc, char * * argv )
 
 			if( i == argc )
 			{
-				printf( "\nNo input file specified.\n\n"
-	"Try \"%s --help\" for more information.\n\n", argv[0] );
-				return EXIT_FAILURE;
+				return noInputFileError();
 			}
 
 
@@ -318,7 +410,7 @@ int main( int argc, char * * argv )
 				printf( "\nOption \"--allowroot\" will be ignored on this platform.\n\n" );
 			}
 #endif
-			
+
 		}
 		else if( arg == "dump" || arg == "--dump" || arg  == "-d" )
 		{
@@ -326,9 +418,7 @@ int main( int argc, char * * argv )
 
 			if( i == argc )
 			{
-				printf( "\nNo input file specified.\n\n"
-	"Try \"%s --help\" for more information.\n\n", argv[0] );
-				return EXIT_FAILURE;
+				return noInputFileError();
 			}
 
 
@@ -339,6 +429,22 @@ int main( int argc, char * * argv )
 
 			return EXIT_SUCCESS;
 		}
+		else if( arg == "compress" || arg == "--compress" )
+		{
+			++i;
+
+			if( i == argc )
+			{
+				return noInputFileError();
+			}
+
+			QFile f( QString::fromLocal8Bit( argv[i] ) );
+			f.open( QIODevice::ReadOnly );
+			QByteArray d = qCompress( f.readAll() ) ;
+			fwrite( d.constData(), sizeof(char), d.size(), stdout );
+
+			return EXIT_SUCCESS;
+		}
 		else if( arg == "render" || arg == "--render" || arg == "-r" ||
 			arg == "rendertracks" || arg == "--rendertracks" )
 		{
@@ -346,9 +452,7 @@ int main( int argc, char * * argv )
 
 			if( i == argc )
 			{
-				printf( "\nNo input file specified.\n\n"
-	"Try \"%s --help\" for more information.\n\n", argv[0] );
-				return EXIT_FAILURE;
+				return noInputFileError();
 			}
 
 
@@ -365,9 +469,7 @@ int main( int argc, char * * argv )
 
 			if( i == argc )
 			{
-				printf( "\nNo output file specified.\n\n"
-	"Try \"%s --help\" for more information.\n\n", argv[0] );
-				return EXIT_FAILURE;
+				return usageError( "No output file specified" );
 			}
 
 
@@ -379,9 +481,7 @@ int main( int argc, char * * argv )
 
 			if( i == argc )
 			{
-				printf( "\nNo output format specified.\n\n"
-	"Try \"%s --help\" for more information.\n\n", argv[0] );
-				return EXIT_FAILURE;
+				return usageError( "No output format specified" );
 			}
 
 
@@ -403,11 +503,13 @@ int main( int argc, char * * argv )
 				eff = ProjectRenderer::MP3File;
 			}
 #endif
+			else if (ext == "flac")
+			{
+				eff = ProjectRenderer::FlacFile;
+			}
 			else
 			{
-				printf( "\nInvalid output format %s.\n\n"
-	"Try \"%s --help\" for more information.\n\n", argv[i], argv[0] );
-				return EXIT_FAILURE;
+				return usageError( QString( "Invalid output format %1" ).arg( argv[i] ) );
 			}
 		}
 		else if( arg == "--samplerate" || arg == "-s" )
@@ -416,9 +518,7 @@ int main( int argc, char * * argv )
 
 			if( i == argc )
 			{
-				printf( "\nNo samplerate specified.\n\n"
-	"Try \"%s --help\" for more information.\n\n", argv[0] );
-				return EXIT_FAILURE;
+				return usageError( "No samplerate specified" );
 			}
 
 
@@ -429,9 +529,7 @@ int main( int argc, char * * argv )
 			}
 			else
 			{
-				printf( "\nInvalid samplerate %s.\n\n"
-	"Try \"%s --help\" for more information.\n\n", argv[i], argv[0] );
-				return EXIT_FAILURE;
+				return usageError( QString( "Invalid samplerate %1" ).arg( argv[i] ) );
 			}
 		}
 		else if( arg == "--bitrate" || arg == "-b" )
@@ -440,9 +538,7 @@ int main( int argc, char * * argv )
 
 			if( i == argc )
 			{
-				printf( "\nNo bitrate specified.\n\n"
-	"Try \"%s --help\" for more information.\n\n", argv[0] );
-				return EXIT_FAILURE;
+				return usageError( "No bitrate specified" );
 			}
 
 
@@ -456,9 +552,7 @@ int main( int argc, char * * argv )
 			}
 			else
 			{
-				printf( "\nInvalid bitrate %s.\n\n"
-	"Try \"%s --help\" for more information.\n\n", argv[i], argv[0] );
-				return EXIT_FAILURE;
+				return usageError( QString( "Invalid bitrate %1" ).arg( argv[i] ) );
 			}
 		}
 		else if( arg == "--mode" || arg == "-m" )
@@ -467,9 +561,7 @@ int main( int argc, char * * argv )
 
 			if( i == argc )
 			{
-				printf( "\nNo stereo mode specified.\n\n"
-	"Try \"%s --help\" for more information.\n\n", argv[0] );
-				return EXIT_FAILURE;
+				return usageError( "No stereo mode specified" );
 			}
 
 			QString const mode( argv[i] );
@@ -488,9 +580,7 @@ int main( int argc, char * * argv )
 			}
 			else
 			{
-				printf( "\nInvalid stereo mode %s.\n\n"
-	"Try \"%s --help\" for more information.\n\n", argv[i], argv[0] );
-				return EXIT_FAILURE;
+				return usageError( QString( "Invalid stereo mode %1" ).arg( argv[i] ) );
 			}
 		}
 		else if( arg =="--float" || arg == "-a" )
@@ -503,9 +593,7 @@ int main( int argc, char * * argv )
 
 			if( i == argc )
 			{
-				printf( "\nNo interpolation method specified.\n\n"
-	"Try \"%s --help\" for more information.\n\n", argv[0] );
-				return EXIT_FAILURE;
+				return usageError( "No interpolation method specified" );
 			}
 
 
@@ -529,9 +617,7 @@ int main( int argc, char * * argv )
 			}
 			else
 			{
-				printf( "\nInvalid interpolation method %s.\n\n"
-	"Try \"%s --help\" for more information.\n\n", argv[i], argv[0] );
-				return EXIT_FAILURE;
+				return usageError( QString( "Invalid interpolation method %1" ).arg( argv[i] ) );
 			}
 		}
 		else if( arg == "--oversampling" || arg == "-x" )
@@ -540,9 +626,7 @@ int main( int argc, char * * argv )
 
 			if( i == argc )
 			{
-				printf( "\nNo oversampling specified.\n\n"
-	"Try \"%s --help\" for more information.\n\n", argv[0] );
-				return EXIT_FAILURE;
+				return usageError( "No oversampling specified" );
 			}
 
 
@@ -563,9 +647,7 @@ int main( int argc, char * * argv )
 		qs.oversampling = Mixer::qualitySettings::Oversampling_8x;
 		break;
 				default:
-				printf( "\nInvalid oversampling %s.\n\n"
-	"Try \"%s --help\" for more information.\n\n", argv[i], argv[0] );
-				return EXIT_FAILURE;
+				return usageError( QString( "Invalid oversampling %1" ).arg( argv[i] ) );
 			}
 		}
 		else if( arg == "--import" )
@@ -574,11 +656,8 @@ int main( int argc, char * * argv )
 
 			if( i == argc )
 			{
-				printf( "\nNo file specified for importing.\n\n"
-	"Try \"%s --help\" for more information.\n\n", argv[0] );
-				return EXIT_FAILURE;
+				return usageError( "No file specified for importing" );
 			}
-
 
 			fileToImport = QString::fromLocal8Bit( argv[i] );
 
@@ -595,9 +674,7 @@ int main( int argc, char * * argv )
 
 			if( i == argc )
 			{
-				printf( "\nNo profile specified.\n\n"
-	"Try \"%s --help\" for more information.\n\n", argv[0] );
-				return EXIT_FAILURE;
+				return usageError( "No profile specified" );
 			}
 
 
@@ -609,9 +686,7 @@ int main( int argc, char * * argv )
 
 			if( i == argc )
 			{
-				printf( "\nNo configuration file specified.\n\n"
-	"Try \"%s --help\" for more information.\n\n", argv[0] );
-				return EXIT_FAILURE;
+				return usageError( "No configuration file specified" );
 			}
 
 			configFile = QString::fromLocal8Bit( argv[i] );
@@ -620,9 +695,7 @@ int main( int argc, char * * argv )
 		{
 			if( argv[i][0] == '-' )
 			{
-				printf( "\nInvalid option %s.\n\n"
-	"Try \"%s --help\" for more information.\n\n", argv[i], argv[0] );
-				return EXIT_FAILURE;
+				return usageError( QString( "Invalid option %1" ).arg( argv[i] ) );
 			}
 			fileToLoad = QString::fromLocal8Bit( argv[i] );
 		}
@@ -651,22 +724,20 @@ int main( int argc, char * * argv )
 		pos = QLocale::system().name().left( 2 );
 	}
 
-#ifdef LMMS_BUILD_WIN32
-#undef QT_TRANSLATIONS_DIR
-#define QT_TRANSLATIONS_DIR ConfigManager::inst()->localeDir()
-#endif
-
-#ifdef QT_TRANSLATIONS_DIR
-	// load translation for Qt-widgets/-dialogs
-	loadTranslation( QString( "qt_" ) + pos,
-					QString( QT_TRANSLATIONS_DIR ) );
-#endif
 	// load actual translation for LMMS
 	loadTranslation( pos );
 
+	// load translation for Qt-widgets/-dialogs
+#ifdef QT_TRANSLATIONS_DIR
+	// load from the original path first
+	loadTranslation(QString("qt_") + pos, QT_TRANSLATIONS_DIR);
+#endif
+	// override it with bundled/custom one, if exists
+	loadTranslation(QString("qt_") + pos, ConfigManager::inst()->localeDir());
+
 
 	// try to set realtime priority
-#ifdef LMMS_BUILD_LINUX
+#if defined(LMMS_BUILD_LINUX) || defined(LMMS_BUILD_FREEBSD)
 #ifdef LMMS_HAVE_SCHED_H
 #ifndef __OpenBSD__
 	struct sched_param sparam;
@@ -808,28 +879,18 @@ int main( int argc, char * * argv )
 			QPushButton * recover;
 			QPushButton * discard;
 			QPushButton * exit;
-			
-			#if QT_VERSION >= 0x050000
-				// setting all buttons to the same roles allows us 
-				// to have a custom layout
-				discard = mb.addButton( MainWindow::tr( "Discard" ),
-									QMessageBox::AcceptRole );
-				recover = mb.addButton( MainWindow::tr( "Recover" ),
-									QMessageBox::AcceptRole );
 
-			# else 
-				// in qt4 the button order is reversed
-				recover = mb.addButton( MainWindow::tr( "Recover" ),
-									QMessageBox::AcceptRole );
-				discard = mb.addButton( MainWindow::tr( "Discard" ),
-									QMessageBox::AcceptRole );
+			// setting all buttons to the same roles allows us
+			// to have a custom layout
+			discard = mb.addButton( MainWindow::tr( "Discard" ),
+								QMessageBox::AcceptRole );
+			recover = mb.addButton( MainWindow::tr( "Recover" ),
+								QMessageBox::AcceptRole );
 
-			#endif
-			
 			// have a hidden exit button
 			exit = mb.addButton( "", QMessageBox::RejectRole);
 			exit->setVisible(false);
-			
+
 			// set icons
 			recover->setIcon( embed::getIconPixmap( "recover" ) );
 			discard->setIcon( embed::getIconPixmap( "discard" ) );
@@ -849,7 +910,7 @@ int main( int argc, char * * argv )
 			}
 			else // Exit
 			{
-				return 0;
+				return EXIT_SUCCESS;
 			}
 		}
 
@@ -937,6 +998,19 @@ int main( int argc, char * * argv )
 	{
 		printf( "\n" );
 	}
+
+#ifdef LMMS_BUILD_WIN32
+	// Cleanup console
+	HWND hConsole = GetConsoleWindow();
+	if (hConsole)
+	{
+		SendMessage(hConsole, WM_CHAR, (WPARAM)VK_RETURN, (LPARAM)0);
+		FreeConsole();
+	}
+#endif
+
+
+	NotePlayHandleManager::free();
 
 	return ret;
 }

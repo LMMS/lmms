@@ -37,11 +37,11 @@
 
 
 struct pollfd;
-class QLineEdit;
 
 
-class MidiAlsaRaw : public MidiClientRaw , public QThread
+class MidiAlsaRaw : public QThread, public MidiClientRaw
 {
+	Q_OBJECT
 public:
 	MidiAlsaRaw();
 	virtual ~MidiAlsaRaw();
@@ -62,8 +62,8 @@ public:
 
 
 protected:
-	virtual void sendByte( const unsigned char c );
-	virtual void run();
+	void sendByte( const unsigned char c ) override;
+	void run() override;
 
 
 private:

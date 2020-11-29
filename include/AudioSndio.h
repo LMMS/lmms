@@ -40,15 +40,16 @@ class LcdSpinBox;
 class QLineEdit;
 
 
-class AudioSndio : public AudioDevice, public QThread
+class AudioSndio : public QThread, public AudioDevice
 {
+	Q_OBJECT
 public:
 	AudioSndio( bool & _success_ful, Mixer * _mixer );
 	virtual ~AudioSndio();
 
 	inline static QString name( void )
 	{
-		return QT_TRANSLATE_NOOP( "setupWidget", "sndio" );
+		return QT_TRANSLATE_NOOP( "AudioDeviceSetupWidget", "sndio" );
 	}
 
 	class setupWidget : public AudioDeviceSetupWidget
@@ -57,7 +58,7 @@ public:
 		setupWidget( QWidget * _parent );
 		virtual ~setupWidget();
 
-		virtual void saveSettings( void );
+		void saveSettings( void ) override;
 
 	private:
 		QLineEdit * m_device;
@@ -65,10 +66,10 @@ public:
 	} ;
 
 private:
-	virtual void startProcessing( void );
-	virtual void stopProcessing( void );
-	virtual void applyQualitySettings( void );
-	virtual void run( void );
+	void startProcessing( void ) override;
+	void stopProcessing( void ) override;
+	void applyQualitySettings( void ) override;
+	void run( void ) override;
 
 	struct sio_hdl *m_hdl;
 	struct sio_par m_par;

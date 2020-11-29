@@ -28,6 +28,12 @@
 #include <QMainWindow>
 #include <QToolBar>
 
+static const int Quantizations[] = {
+	1, 2, 4, 8, 16, 32, 64,
+	3, 6, 12, 24, 48, 96, 192
+};
+
+
 class QAction;
 
 class DropToolBar;
@@ -47,16 +53,22 @@ protected:
 	DropToolBar * addDropToolBar(Qt::ToolBarArea whereToAdd, QString const & windowTitle);
 	DropToolBar * addDropToolBar(QWidget * parent, Qt::ToolBarArea whereToAdd, QString const & windowTitle);
 
-	virtual void closeEvent( QCloseEvent * _ce );
+	void closeEvent( QCloseEvent * _ce ) override;
 protected slots:
 	virtual void play() {}
 	virtual void record() {}
 	virtual void recordAccompany() {}
+	virtual void toggleStepRecording() {}
 	virtual void stop() {}
 
 private slots:
 	/// Called by pressing the space key. Plays or stops.
 	void togglePlayStop();
+	
+	/// Called by pressing shift+space. Toggles pause state.
+	void togglePause();
+
+	void toggleMaximize();
 
 signals:
 
@@ -65,7 +77,7 @@ protected:
 	///
 	/// \param	record	If set true, the editor's toolbar will contain record
 	///					buttons in addition to the play and stop buttons.
-	Editor(bool record = false);
+	Editor(bool record = false, bool record_step = false);
 	virtual ~Editor();
 
 
@@ -74,6 +86,7 @@ protected:
 	QAction* m_playAction;
 	QAction* m_recordAction;
 	QAction* m_recordAccompanyAction;
+	QAction* m_toggleStepRecordingAction;
 	QAction* m_stopAction;
 };
 
@@ -90,8 +103,8 @@ signals:
 	void dropped(QDropEvent* event);
 
 protected:
-	void dragEnterEvent(QDragEnterEvent* event);
-	void dropEvent(QDropEvent* event);
+	void dragEnterEvent(QDragEnterEvent* event) override;
+	void dropEvent(QDropEvent* event) override;
 };
 
 

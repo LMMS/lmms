@@ -111,7 +111,7 @@ private:
 class AudioFileProcessorWaveView;
 
 
-class AudioFileProcessorView : public InstrumentView
+class AudioFileProcessorView : public InstrumentViewFixedSize
 {
 	Q_OBJECT
 public:

@@ -29,6 +29,7 @@
 #include <QLayout>
 
 #include "ComboBox.h"
+#include "BBTrack.h"
 #include "BBTrackContainer.h"
 #include "embed.h"
 #include "MainWindow.h"
@@ -69,20 +70,12 @@ BBEditor::BBEditor( BBTrackContainer* tc ) :
 	m_playAction->setToolTip(tr( "Play/pause current beat/bassline (Space)" ));
 	m_stopAction->setToolTip(tr( "Stop playback of current beat/bassline (Space)" ));
 
-	m_playAction->setWhatsThis(
-		tr( "Click here to play the current "
-			"beat/bassline.  The beat/bassline is automatically "
-			"looped when its end is reached." ) );
-	m_stopAction->setWhatsThis(
-		tr( "Click here to stop playing of current "
-							"beat/bassline." ) );
-
 
 	// Beat selector
 	DropToolBar *beatSelectionToolBar = addDropToolBarToTop(tr("Beat selector"));
 
 	m_bbComboBox = new ComboBox( m_toolBar );
-	m_bbComboBox->setFixedSize( 200, 22 );
+	m_bbComboBox->setFixedSize( 200, ComboBox::DEFAULT_HEIGHT );
 	m_bbComboBox->setModel( &tc->m_bbComboBoxModel );
 
 	beatSelectionToolBar->addWidget( m_bbComboBox );
@@ -94,6 +87,8 @@ BBEditor::BBEditor( BBTrackContainer* tc ) :
 
 	trackAndStepActionsToolBar->addAction(embed::getIconPixmap("add_bb_track"), tr("Add beat/bassline"),
 						 Engine::getSong(), SLOT(addBBTrack()));
+	trackAndStepActionsToolBar->addAction(embed::getIconPixmap("clone_bb_track_pattern"), tr("Clone beat/bassline pattern"),
+						 m_trackContainerView, SLOT(clonePattern()));
 	trackAndStepActionsToolBar->addAction(
 				embed::getIconPixmap("add_sample_track"),
 				tr("Add sample-track"), m_trackContainerView,
@@ -318,4 +313,23 @@ void BBTrackContainerView::makeSteps( bool clone )
 			}
 		}
 	}
+}
+
+// Creates a clone of the current BB track with the same pattern, but no TCOs in the song editor
+// TODO: Avoid repeated code from cloneTrack and clearTrack in TrackOperationsWidget somehow
+void BBTrackContainerView::clonePattern()
+{
+	// Get the current BBTrack id
+	BBTrackContainer *bbtc = static_cast<BBTrackContainer*>(model());
+	const int cur_bb = bbtc->currentBB();
+
+	BBTrack *bbt = BBTrack::findBBTrack(cur_bb);
+
+	// Clone the track
+	Track *newTrack = bbt->clone();
+
+	// Track still have the TCOs which is undesirable in this case, clear the track
+	newTrack->lock();
+	newTrack->deleteTCOs();
+	newTrack->unlock();
 }

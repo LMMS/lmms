@@ -30,19 +30,19 @@
 #include <QLayout>
 #include <QWidget>
 
-#include "export.h"
+#include "lmms_export.h"
 
 
 class TabButton;
 
 
-class EXPORT TabBar : public QWidget
+class LMMS_EXPORT TabBar : public QWidget
 {
 	Q_OBJECT
 public:
 	TabBar( QWidget * _parent,
 			QBoxLayout::Direction _dir = QBoxLayout::LeftToRight );
-	virtual ~TabBar();
+	virtual ~TabBar() = default;
 
 	TabButton * addTab( QWidget * _w, const QString & _text,
 					int _id, bool _add_stretch = false,

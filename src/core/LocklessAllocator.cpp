@@ -24,11 +24,14 @@
 
 #include "LocklessAllocator.h"
 
+#include <algorithm>
 #include <stdio.h>
-#include <strings.h>
 
 #include "lmmsconfig.h"
 
+#ifndef LMMS_BUILD_WIN32
+#include <strings.h>
+#endif
 
 static const size_t SIZEOF_SET = sizeof( int ) * 8;
 
@@ -53,9 +56,11 @@ LocklessAllocator::LocklessAllocator( size_t nmemb, size_t size )
 	m_pool = new char[m_capacity * m_elementSize];
 
 	m_freeStateSets = m_capacity / SIZEOF_SET;
-	m_freeState = new AtomicInt[m_freeStateSets];
+	m_freeState = new std::atomic_int[m_freeStateSets];
+	std::fill(m_freeState, m_freeState + m_freeStateSets, 0);
 
 	m_available = m_capacity;
+	m_startIndex = 0;
 }
 
 
@@ -99,27 +104,27 @@ static int ffs( int i )
 
 void * LocklessAllocator::alloc()
 {
-	int available;
+	// Some of these CAS loops could probably use relaxed atomics, as discussed
+	// in http://en.cppreference.com/w/cpp/atomic/atomic/compare_exchange.
+	// Let's use sequentially-consistent ops to be safe for now.
+	int available = m_available.load();
 	do
 	{
-		available = m_available;
 		if( !available )
 		{
 			fprintf( stderr, "LocklessAllocator: No free space\n" );
 			return NULL;
 		}
 	}
-	while( !m_available.testAndSetOrdered( available, available - 1 ) );
+	while (!m_available.compare_exchange_weak(available, available - 1));
 
-	size_t startIndex = m_startIndex.fetchAndAddOrdered( 1 )
-							% m_freeStateSets;
-	for( size_t set = startIndex;; set = ( set + 1 ) % m_freeStateSets )
+	const size_t startIndex = m_startIndex++ % m_freeStateSets;
+	for (size_t set = startIndex;; set = ( set + 1 ) % m_freeStateSets)
 	{
-		for( int freeState = m_freeState[set]; freeState != -1;
-						freeState = m_freeState[set] )
+		for (int freeState = m_freeState[set]; freeState != -1;)
 		{
 			int bit = ffs( ~freeState ) - 1;
-			if( m_freeState[set].testAndSetOrdered( freeState,
+			if (m_freeState[set].compare_exchange_weak(freeState,
 							freeState | 1 << bit ) )
 			{
 				return m_pool + ( SIZEOF_SET * set + bit )
@@ -149,11 +154,11 @@ invalid:
 	size_t set = offset / SIZEOF_SET;
 	int bit = offset % SIZEOF_SET;
 	int mask = 1 << bit;
-	int prevState = m_freeState[set].fetchAndAndOrdered( ~mask );
+	int prevState = m_freeState[set].fetch_and(~mask);
 	if ( !( prevState & mask ) )
 	{
 		fprintf( stderr, "LocklessAllocator: Block not in use\n" );
 		return;
 	}
-	m_available.fetchAndAddOrdered( 1 );
+	++m_available;
 }

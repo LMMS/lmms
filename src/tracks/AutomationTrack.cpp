@@ -40,16 +40,6 @@ AutomationTrack::AutomationTrack( TrackContainer* tc, bool _hidden ) :
 	setName( tr( "Automation track" ) );
 }
 
-
-
-
-AutomationTrack::~AutomationTrack()
-{
-}
-
-
-
-
 bool AutomationTrack::play( const MidiTime & time_start, const fpp_t _frames,
 							const f_cnt_t _frame_base, int _tco_num )
 {
@@ -67,9 +57,11 @@ TrackView * AutomationTrack::createView( TrackContainerView* tcv )
 
 
 
-TrackContentObject * AutomationTrack::createTCO( const MidiTime & )
+TrackContentObject* AutomationTrack::createTCO(const MidiTime & pos)
 {
-	return new AutomationPattern( this );
+	AutomationPattern* p = new AutomationPattern(this);
+	p->movePosition(pos);
+	return p;
 }
 
 
@@ -108,16 +100,6 @@ AutomationTrackView::AutomationTrackView( AutomationTrack * _at, TrackContainerV
 	setModel( _at );
 }
 
-
-
-
-AutomationTrackView::~AutomationTrackView()
-{
-}
-
-
-
-
 void AutomationTrackView::dragEnterEvent( QDragEnterEvent * _dee )
 {
 	StringPairDrag::processDragEnterEvent( _dee, "automatable_model" );
@@ -141,9 +123,9 @@ void AutomationTrackView::dropEvent( QDropEvent * _de )
 							currentPosition() +
 				( _de->pos().x() -
 					getTrackContentWidget()->x() ) *
-						MidiTime::ticksPerTact() /
-		static_cast<int>( trackContainerView()->pixelsPerTact() ) )
-				.toAbsoluteTact();
+						MidiTime::ticksPerBar() /
+		static_cast<int>( trackContainerView()->pixelsPerBar() ) )
+				.toAbsoluteBar();
 
 			if( pos.getTicks() < 0 )
 			{
@@ -153,7 +135,6 @@ void AutomationTrackView::dropEvent( QDropEvent * _de )
 			TrackContentObject * tco = getTrack()->createTCO( pos );
 			AutomationPattern * pat = dynamic_cast<AutomationPattern *>( tco );
 			pat->addObject( mod );
-			pat->movePosition( pos );
 		}
 	}
 

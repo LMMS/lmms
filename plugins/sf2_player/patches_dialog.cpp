@@ -75,11 +75,7 @@ patchesDialog::patchesDialog( QWidget *pParent, Qt::WindowFlags wflags )
 //	pHeader->setResizeMode(QHeaderView::Custom);
 	pHeader->setDefaultAlignment(Qt::AlignLeft);
 //	pHeader->setDefaultSectionSize(200);
-#if QT_VERSION >= 0x050000
 	pHeader->setSectionsMovable(false);
-#else
-	pHeader->setMovable(false);
-#endif
 	pHeader->setStretchLastSection(true);
 
 	m_progListView->resizeColumnToContents(0);	// Prog.

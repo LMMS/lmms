@@ -31,27 +31,27 @@
 #include "SideBarWidget.h"
 #include "Plugin.h"
 
+class QLineEdit;
+class QTreeWidget;
+
 
 class PluginBrowser : public SideBarWidget
 {
 	Q_OBJECT
 public:
 	PluginBrowser( QWidget * _parent );
-	virtual ~PluginBrowser();
+	virtual ~PluginBrowser() = default;
 
+private slots:
+	void onFilterChanged( const QString & filter );
 
 private:
+	void addPlugins();
+	void updateRootVisibility( int index );
+	void updateRootVisibilities();
+
 	QWidget * m_view;
-};
-
-
-
-
-class PluginDescList : public QWidget
-{
-	Q_OBJECT
-public:
-	PluginDescList(QWidget* parent);
+	QTreeWidget * m_descTree;
 };
 
 
@@ -61,30 +61,24 @@ class PluginDescWidget : public QWidget
 {
 	Q_OBJECT
 public:
-	PluginDescWidget( const Plugin::Descriptor & _pd, QWidget * _parent );
-	virtual ~PluginDescWidget();
+	typedef Plugin::Descriptor::SubPluginFeatures::Key PluginKey;
+	PluginDescWidget( const PluginKey & _pk, QWidget * _parent );
+	QString name() const;
 
 
 protected:
-	virtual void enterEvent( QEvent * _e );
-	virtual void leaveEvent( QEvent * _e );
-	virtual void mousePressEvent( QMouseEvent * _me );
-	virtual void paintEvent( QPaintEvent * _pe );
-
-
-private slots:
-	void updateHeight();
-
+	void enterEvent( QEvent * _e ) override;
+	void leaveEvent( QEvent * _e ) override;
+	void mousePressEvent( QMouseEvent * _me ) override;
+	void paintEvent( QPaintEvent * _pe ) override;
 
 private:
-	QTimer m_updateTimer;
+	constexpr static int DEFAULT_HEIGHT{24};
 
-	const Plugin::Descriptor & m_pluginDescriptor;
+	PluginKey m_pluginKey;
 	QPixmap m_logo;
 
 	bool m_mouseOver;
-	int m_targetHeight;
-
 };
 
 

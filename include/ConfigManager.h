@@ -34,10 +34,10 @@
 #include <QtCore/QVector>
 #include <QtCore/QObject>
 
-#include "export.h"
+#include "lmms_export.h"
+
 
 class LmmsCore;
-
 
 const QString PROJECTS_PATH = "projects/";
 const QString TEMPLATE_PATH = "templates/";
@@ -49,69 +49,39 @@ const QString LADSPA_PATH ="plugins/ladspa/";
 const QString DEFAULT_THEME_PATH = "themes/default/";
 const QString TRACK_ICON_PATH = "track_icons/";
 const QString LOCALE_PATH = "locale/";
+const QString PORTABLE_MODE_FILE = "/portable_mode.txt";
 
-
-class EXPORT ConfigManager : public QObject
+class LMMS_EXPORT ConfigManager : public QObject
 {
 	Q_OBJECT
+
+	using UpgradeMethod = void(ConfigManager::*)();
+
 public:
 	static inline ConfigManager * inst()
 	{
-		if( s_instanceOfMe == NULL )
+		if(s_instanceOfMe == NULL )
 		{
 			s_instanceOfMe = new ConfigManager();
 		}
 		return s_instanceOfMe;
 	}
 
-	const QString & dataDir() const
-	{
-		return m_dataDir;
-	}
 
 	const QString & workingDir() const
 	{
 		return m_workingDir;
 	}
 
-	QString userProjectsDir() const
-	{
-		return workingDir() + PROJECTS_PATH;
-	}
+	void initPortableWorkingDir();
 
-	QString userTemplateDir() const
-	{
-		return workingDir() + TEMPLATE_PATH;
-	}
+	void initInstalledWorkingDir();
 
-	QString userPresetsDir() const
-	{
-		return workingDir() + PRESETS_PATH;
-	}
+	void initDevelopmentWorkingDir();
 
-	QString userSamplesDir() const
+	const QString & dataDir() const
 	{
-		return workingDir() + SAMPLES_PATH;
-	}
-
-	QString userGigDir() const
-	{
-		return workingDir() + GIG_PATH;
-	}
-
-	QString userSf2Dir() const
-	{
-		return workingDir() + SF2_PATH;
-	}
-
-	QString userLadspaDir() const
-	{
-		return workingDir() + LADSPA_PATH;
-	}
-
-	QString userVstDir() const
-	{
-		return m_vstDir;
+		return m_dataDir;
 	}
 
 	QString factoryProjectsDir() const
@@ -134,37 +104,27 @@ public:
 		return dataDir() + SAMPLES_PATH;
 	}
 
-	QString defaultVersion() const;
 
-	QString defaultArtworkDir() const
+	QString userProjectsDir() const
 	{
-		return m_dataDir + DEFAULT_THEME_PATH;
+		return workingDir() + PROJECTS_PATH;
 	}
 
-	QString artworkDir() const
+	QString userTemplateDir() const
 	{
-		return m_artworkDir;
+		return workingDir() + TEMPLATE_PATH;
 	}
 
-	QString trackIconsDir() const
+	QString userPresetsDir() const
 	{
-		return m_dataDir + TRACK_ICON_PATH;
+		return workingDir() + PRESETS_PATH;
 	}
 
-	QString localeDir() const
+	QString userSamplesDir() const
 	{
-		return m_dataDir + LOCALE_PATH;
+		return workingDir() + SAMPLES_PATH;
 	}
 
-	const QString & gigDir() const
-	{
-		return m_gigDir;
-	}
-
-	const QString & sf2Dir() const
-	{
-		return m_sf2Dir;
-	}
 
 	const QString & vstDir() const
 	{
@@ -173,18 +133,20 @@ public:
 
 	const QString & ladspaDir() const
 	{
-		return m_ladDir;
+		return m_ladspaDir;
 	}
 
-	const QString recoveryFile() const
+	const QString & sf2Dir() const
 	{
-		return m_workingDir + "recover.mmp";
+		return m_sf2Dir;
 	}
-	
-	const QString & version() const
+
+#ifdef LMMS_HAVE_FLUIDSYNTH
+	const QString & sf2File() const
 	{
-		return m_version;
+		return m_sf2File;
 	}
+#endif
 
 #ifdef LMMS_HAVE_STK
 	const QString & stkDir() const
@@ -193,16 +155,55 @@ public:
 	}
 #endif
 
-#ifdef LMMS_HAVE_FLUIDSYNTH
-	const QString & defaultSoundfont() const
+	const QString & gigDir() const
 	{
-		return m_defaultSoundfont;
+		return m_gigDir;
 	}
-#endif
 
-	const QString & backgroundArtwork() const
+
+	QString userVstDir() const
 	{
-		return m_backgroundArtwork;
+		return m_vstDir;
+	}
+
+	QString userLadspaDir() const
+	{
+		return workingDir() + LADSPA_PATH;
+	}
+
+	QString userSf2Dir() const
+	{
+		return workingDir() + SF2_PATH;
+	}
+
+	QString userGigDir() const
+	{
+		return workingDir() + GIG_PATH;
+	}
+
+	QString defaultThemeDir() const
+	{
+		return m_dataDir + DEFAULT_THEME_PATH;
+	}
+
+	QString themeDir() const
+	{
+		return m_themeDir;
+	}
+
+	const QString & backgroundPicFile() const
+	{
+		return m_backgroundPicFile;
+	}
+
+	QString trackIconsDir() const
+	{
+		return m_dataDir + TRACK_ICON_PATH;
+	}
+
+	const QString recoveryFile() const
+	{
+		return m_workingDir + "recover.mmp";
 	}
 
 	inline const QStringList & recentlyOpenedProjects() const
@@ -210,39 +211,55 @@ public:
 		return m_recentlyOpenedProjects;
 	}
 
-	static QStringList availabeVstEmbedMethods();
+	QString localeDir() const
+	{
+		return m_dataDir + LOCALE_PATH;
+	}
+
+	const QString & version() const
+	{
+		return m_version;
+	}
+
+	// Used when the configversion attribute is not present in a configuration file.
+	// Returns the appropriate config file version based on the LMMS version.
+	unsigned int legacyConfigVersion();
+
+	QString defaultVersion() const;
+
+
+	static QStringList availableVstEmbedMethods();
 	QString vstEmbedMethod() const;
 
-	// returns true if the working dir (e.g. ~/lmms) exists on disk
+	// Returns true if the working dir (e.g. ~/lmms) exists on disk.
 	bool hasWorkingDir() const;
 
-	void addRecentlyOpenedProject( const QString & _file );
+	void addRecentlyOpenedProject(const QString & _file);
 
-	const QString & value( const QString & cls,
-					const QString & attribute ) const;
-	const QString & value( const QString & cls,
+	const QString & value(const QString & cls,
+					const QString & attribute) const;
+	const QString & value(const QString & cls,
 					const QString & attribute,
-					const QString & defaultVal ) const;
-	void setValue( const QString & cls, const QString & attribute,
-						const QString & value );
-	void deleteValue( const QString & cls, const QString & attribute);
+					const QString & defaultVal) const;
+	void setValue(const QString & cls, const QString & attribute,
+						const QString & value);
+	void deleteValue(const QString & cls, const QString & attribute);
 
-	void loadConfigFile( const QString & configFile = "" );
+	void loadConfigFile(const QString & configFile = "");
 	void saveConfigFile();
 
 
-	void setWorkingDir( const QString & _wd );
-	void setVSTDir( const QString & _vd );
-	void setArtworkDir( const QString & _ad );
-	void setLADSPADir( const QString & _fd );
-	void setVersion( const QString & _cv );
-	void setSTKDir( const QString & _fd );
-	void setDefaultSoundfont( const QString & _sf );
-	void setBackgroundArtwork( const QString & _ba );
-	void setGIGDir( const QString & gd );
-	void setSF2Dir( const QString & sfd );
+	void setWorkingDir(const QString & workingDir);
+	void setVSTDir(const QString & vstDir);
+	void setLADSPADir(const QString & ladspaDir);
+	void setSF2Dir(const QString & sf2Dir);
+	void setSF2File(const QString & sf2File);
+	void setSTKDir(const QString & stkDir);
+	void setGIGDir(const QString & gigDir);
+	void setThemeDir(const QString & themeDir);
+	void setBackgroundPicFile(const QString & backgroundPicFile);
 
-	// creates the working directory & subdirectories on disk.
+	// Creates the working directory & subdirectories on disk.
 	void createWorkingDir();
 
 signals:
@@ -252,29 +269,33 @@ private:
 	static ConfigManager * s_instanceOfMe;
 
 	ConfigManager();
-	ConfigManager( const ConfigManager & _c );
+	ConfigManager(const ConfigManager & _c);
 	~ConfigManager();
 
 	void upgrade_1_1_90();
 	void upgrade_1_1_91();
 	void upgrade();
 
-	QString m_lmmsRcFile;
+	// List of all upgrade methods
+	static const std::vector<UpgradeMethod> UPGRADE_METHODS;
+
 	QString m_workingDir;
 	QString m_dataDir;
-	QString m_artworkDir;
 	QString m_vstDir;
-	QString m_ladDir;
-	QString m_gigDir;
+	QString m_ladspaDir;
 	QString m_sf2Dir;
-	QString m_version;
+#ifdef LMMS_HAVE_FLUIDSYNTH
+	QString m_sf2File;
+#endif
 #ifdef LMMS_HAVE_STK
 	QString m_stkDir;
 #endif
-#ifdef LMMS_HAVE_FLUIDSYNTH
-	QString m_defaultSoundfont;
-#endif
-	QString m_backgroundArtwork;
+	QString m_gigDir;
+	QString m_themeDir;
+	QString m_backgroundPicFile;
+	QString m_lmmsRcFile;
+	QString m_version;
+	unsigned int m_configVersion;
 	QStringList m_recentlyOpenedProjects;
 
 	typedef QVector<QPair<QString, QString> > stringPairVector;
@@ -283,7 +304,5 @@ private:
 
 
 	friend class LmmsCore;
-
-} ;
-
+};
 #endif

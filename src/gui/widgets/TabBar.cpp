@@ -41,16 +41,6 @@ TabBar::TabBar( QWidget * _parent, QBoxLayout::Direction _dir ) :
 	setLayout( m_layout );
 }
 
-
-
-
-TabBar::~TabBar()
-{
-}
-
-
-
-
 TabButton * TabBar::addTab( QWidget * _w, const QString & _text, int _id,
 				bool _add_stretch, bool _text_is_tooltip )
 {

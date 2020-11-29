@@ -34,10 +34,6 @@
 
 #include "RemotePlugin.h"
 
-#ifdef LMMS_HAVE_PTHREAD_H
-#include <pthread.h>
-#endif
-
 #ifdef LMMS_HAVE_FCNTL_H
 #include <fcntl.h>
 #endif
@@ -63,11 +59,19 @@
 #define USE_WS_PREFIX
 #include <windows.h>
 
+#ifdef USE_MINGW_THREADS_REPLACEMENT
+#	include <mingw.mutex.h>
+#else
+#	include <mutex>
+#endif
+
 #include <algorithm>
 #include <vector>
 #include <queue>
 #include <string>
 #include <iostream>
+#include <string>
+#include <cstring>
 
 #include <aeffectx.h>
 
@@ -121,6 +125,25 @@ RemoteVstPlugin * __plugin = NULL;
 HWND __MessageHwnd = NULL;
 DWORD __processingThreadId = 0;
 
+
+//Returns the last Win32 error, in string format. Returns an empty string if there is no error.
+std::string GetErrorAsString(DWORD errorMessageID)
+{
+	//Get the error message, if any.
+	if(errorMessageID == 0)
+		return std::string(); //No error message has been recorded
+
+	LPSTR messageBuffer = nullptr;
+	size_t size = FormatMessageA(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+								 NULL, errorMessageID, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPSTR)&messageBuffer, 0, NULL);
+
+	std::string message(messageBuffer, size);
+
+	//Free the buffer.
+	LocalFree(messageBuffer);
+
+	return message;
+}
 
 
 class RemoteVstPlugin : public RemotePluginClient
@@ -202,6 +225,10 @@ public:
 	// determine name of current program
 	const char * programName();
 
+	void getParameterDisplays();
+
+	void getParameterLabels();
+
 	// send name of current program back to host
 	void sendCurrentProgramName();
 
@@ -257,17 +284,17 @@ public:
 
 	inline void lockShm()
 	{
-		pthread_mutex_lock( &m_shmLock );
+		m_shmLock.lock();
 	}
 
 	inline bool tryLockShm()
 	{
-		return pthread_mutex_trylock( &m_shmLock ) == 0;
+		return m_shmLock.try_lock();
 	}
 
 	inline void unlockShm()
 	{
-		pthread_mutex_unlock( &m_shmLock );
+		m_shmLock.unlock();
 	}
 
 	inline bool isShmValid()
@@ -342,7 +369,7 @@ private:
 	};
 
 	// callback used by plugin for being able to communicate with it's host
-	static intptr_t hostCallback( AEffect * _effect, int32_t _opcode,
+	static intptr_t VST_CALL_CONV hostCallback( AEffect * _effect, int32_t _opcode,
 					int32_t _index, intptr_t _value,
 					void * _ptr, float _opt );
 
@@ -382,7 +409,7 @@ private:
 	float * * m_inputs;
 	float * * m_outputs;
 
-	pthread_mutex_t m_shmLock;
+	std::mutex m_shmLock;
 	bool m_shmValid;
 
 	typedef std::vector<VstMidiEvent> VstMidiEventList;
@@ -430,7 +457,6 @@ RemoteVstPlugin::RemoteVstPlugin( const char * socketPath ) :
 	m_shouldGiveIdle( false ),
 	m_inputs( NULL ),
 	m_outputs( NULL ),
-	m_shmLock(),
 	m_shmValid( false ),
 	m_midiEvents(),
 	m_bpm( 0 ),
@@ -440,8 +466,6 @@ RemoteVstPlugin::RemoteVstPlugin( const char * socketPath ) :
 	m_shmID( -1 ),
 	m_vstSyncData( NULL )
 {
-	pthread_mutex_init( &m_shmLock, NULL );
-
 	__plugin = this;
 
 #ifndef USE_QT_SHMEM
@@ -533,8 +557,6 @@ RemoteVstPlugin::~RemoteVstPlugin()
 
 	delete[] m_inputs;
 	delete[] m_outputs;
-
-	pthread_mutex_destroy( &m_shmLock );
 }
 
 
@@ -644,6 +666,14 @@ bool RemoteVstPlugin::processMessage( const message & _m )
 			//sendMessage( IdVstSetParameter );
 			break;
 
+		case IdVstParameterDisplays:
+			getParameterDisplays();
+			break;
+
+		case IdVstParameterLabels:
+			getParameterLabels();
+			break;
+
 
 		case IdVstIdleUpdate:
 		{
@@ -718,9 +748,10 @@ void RemoteVstPlugin::init( const std::string & _plugin_file )
 
 static void close_check( FILE* fp )
 {
+	if (!fp) {return;}
 	if( fclose( fp ) )
 	{
-		perror( "close" );
+		perror( "fclose" );
 	}
 }
 
@@ -826,15 +857,12 @@ bool RemoteVstPlugin::load( const std::string & _plugin_file )
 {
 	if( ( m_libInst = LoadLibraryW( toWString(_plugin_file).c_str() ) ) == NULL )
 	{
-		// give VstPlugin class a chance to start 32 bit version of RemoteVstPlugin
-		if( GetLastError() == ERROR_BAD_EXE_FORMAT )
-		{
-			sendMessage( IdVstBadDllFormat );
-		}
+		DWORD error = GetLastError();
+		debugMessage( "LoadLibrary failed: " + GetErrorAsString(error) );
 		return false;
 	}
 
-	typedef AEffect * ( __stdcall * mainEntryPointer )
+	typedef AEffect * ( VST_CALL_CONV * mainEntryPointer )
 						( audioMasterCallback );
 	mainEntryPointer mainEntry = (mainEntryPointer)
 				GetProcAddress( m_libInst, "VSTPluginMain" );
@@ -1054,6 +1082,49 @@ const char * RemoteVstPlugin::programName()
 
 
 
+// join the ParameterDisplays (stringified values without units) and send them to host
+void RemoteVstPlugin::getParameterDisplays()
+{
+	std::string paramDisplays;
+	static char buf[9]; // buffer for getting string
+	for (int i=0; i< m_plugin->numParams; ++i)
+	{
+		memset( buf, 0, sizeof( buf ) ); // fill with '\0' because got string may not to be ended with '\0'
+		pluginDispatch( effGetParamDisplay, i, 0, buf );
+		buf[8] = 0;
+
+		// each field shaped like: [length:number][content:string]
+		paramDisplays += '0' + strlen(buf); // add length descriptor (length is up to 8)
+		paramDisplays += buf;
+	}
+
+	sendMessage( message( IdVstParameterDisplays ).addString( paramDisplays.c_str() ) );
+}
+
+
+
+// join the ParameterLabels (units) and send them to host
+void RemoteVstPlugin::getParameterLabels()
+{
+	std::string paramLabels;
+	static char buf[9]; // buffer for getting string
+	for (int i=0; i< m_plugin->numParams; ++i)
+	{
+		memset( buf, 0, sizeof( buf ) ); // fill with '\0' because got string may not to be ended with '\0'
+		pluginDispatch( effGetParamLabel, i, 0, buf );
+		buf[8] = 0;
+
+		// each field shaped like: [length:number][content:string]
+		paramLabels += '0' + strlen(buf); // add length descriptor (length is up to 8)
+		paramLabels += buf;
+	}
+
+	sendMessage( message( IdVstParameterLabels ).addString( paramLabels.c_str() ) );
+}
+
+
+
+
 void RemoteVstPlugin::sendCurrentProgramName()
 {
 	char presName[64];
@@ -1071,7 +1142,7 @@ void RemoteVstPlugin::getParameterDump()
 
 	for( int i = 0; i < m_plugin->numParams; ++i )
 	{
-		char paramName[32];
+		char paramName[256];
 		memset( paramName, 0, sizeof( paramName ) );
 		pluginDispatch( effGetParamName, i, 0, paramName );
 		paramName[sizeof(paramName)-1] = 0;
@@ -1115,6 +1186,12 @@ void RemoteVstPlugin::saveChunkToFile( const std::string & _file )
 		if( len > 0 )
 		{
 			FILE* fp = F_OPEN_UTF8( _file, "wb" );
+			if (!fp)
+			{
+				fprintf( stderr,
+					"Error opening file for saving chunk.\n" );
+				return;
+			}
 			if ( fwrite( chunk, 1, len, fp ) != len )
 			{
 				fprintf( stderr,
@@ -1279,7 +1356,13 @@ void RemoteVstPlugin::savePreset( const std::string & _file )
 	if (!isPreset &&!chunky) uIntToFile = (unsigned int) m_plugin->numPrograms;
 	pBank->numPrograms = endian_swap( uIntToFile );
 
-	FILE * stream = F_OPEN_UTF8( _file, "w" );
+	FILE * stream = F_OPEN_UTF8( _file, "wb" );
+	if (!stream)
+	{
+		fprintf( stderr,
+			"Error opening file for saving preset.\n" );
+		return;
+	}
 	fwrite ( pBank, 1, 28, stream );
 	fwrite ( progName, 1, isPreset ? 28 : 128, stream );
 	if ( chunky ) {
@@ -1331,7 +1414,13 @@ void RemoteVstPlugin::loadPresetFile( const std::string & _file )
 	unsigned int * pLen = new unsigned int[ 1 ];
 	unsigned int len = 0;
 	sBank * pBank = (sBank*) new char[ sizeof( sBank ) ];
-	FILE * stream = F_OPEN_UTF8( _file, "r" );
+	FILE * stream = F_OPEN_UTF8( _file, "rb" );
+	if (!stream)
+	{
+		fprintf( stderr,
+			"Error opening file for loading preset.\n" );
+		return;
+	}
 	if ( fread ( pBank, 1, 56, stream ) != 56 )
 	{
 		fprintf( stderr, "Error loading preset file.\n" );
@@ -1433,6 +1522,12 @@ void RemoteVstPlugin::loadChunkFromFile( const std::string & _file, int _len )
 	char * chunk = new char[_len];
 
 	FILE* fp = F_OPEN_UTF8( _file, "rb" );
+	if (!fp)
+	{
+		fprintf( stderr,
+			"Error opening file for loading chunk.\n" );
+		return;
+	}
 	if ( fread( chunk, 1, _len, fp ) != _len )
 	{
 		fprintf( stderr, "Error loading chunk from file.\n" );
@@ -1640,11 +1735,7 @@ intptr_t RemoteVstPlugin::hostCallback( AEffect * _effect, int32_t _opcode,
 			}
 			__plugin->m_in->m_lastFlags = _timeInfo.flags;
 
-#ifdef LMMS_BUILD_WIN64
-			return (long long) &_timeInfo;
-#else
-			return (long) &_timeInfo;
-#endif
+			return (intptr_t) &_timeInfo;
 
 		case audioMasterProcessEvents:
 			SHOW_CALLBACK( "amc: audioMasterProcessEvents\n" );
@@ -2080,15 +2171,6 @@ int main( int _argc, char * * _argv )
 	}
 
 	OleInitialize(nullptr);
-
-#ifdef LMMS_BUILD_WIN32
-#ifndef __WINPTHREADS_VERSION
-	// (non-portable) initialization of statically linked pthread library
-	pthread_win32_process_attach_np();
-	pthread_win32_thread_attach_np();
-#endif
-#endif
-
 #ifdef LMMS_BUILD_LINUX
 #ifdef LMMS_HAVE_SCHED_H
 	// try to set realtime-priority
@@ -2197,14 +2279,6 @@ int main( int _argc, char * * _argv )
 	delete __plugin;
 
 	OleUninitialize();
-
-#ifdef LMMS_BUILD_WIN32
-#ifndef __WINPTHREADS_VERSION
-	pthread_win32_thread_detach_np();
-	pthread_win32_process_detach_np();
-#endif
-#endif
-
 	return 0;
 
 }

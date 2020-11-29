@@ -28,15 +28,15 @@
 #include "Monstro.h"
 #include "Engine.h"
 #include "InstrumentTrack.h"
-#include "templates.h"
 #include "gui_templates.h"
 #include "ToolTip.h"
 #include "Song.h"
 #include "lmms_math.h"
 #include "interpolation.h"
 
-#include "embed.cpp"
+#include "embed.h"
 
+#include "plugin_export.h"
 
 extern "C"
 {
@@ -45,7 +45,7 @@ Plugin::Descriptor PLUGIN_EXPORT monstro_plugin_descriptor =
 {
 	STRINGIFY( PLUGIN_NAME ),
 	"Monstro",
-	QT_TRANSLATE_NOOP( "pluginBrowser",
+	QT_TRANSLATE_NOOP( "PluginBrowser",
 				"Monstrous 3-oscillator synth with modulation matrix" ),
 	"Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>",
 	0x0100,
@@ -99,6 +99,11 @@ MonstroSynth::MonstroSynth( MonstroInstrument * _i, NotePlayHandle * _nph ) :
 	m_counter2r = 0;
 	m_counter3l = 0;
 	m_counter3r = 0;
+
+	m_lfo[0].resize( m_parent->m_fpp );
+	m_lfo[1].resize( m_parent->m_fpp );
+	m_env[0].resize( m_parent->m_fpp );
+	m_env[1].resize( m_parent->m_fpp );
 }
 
 
@@ -113,31 +118,31 @@ void MonstroSynth::renderOutput( fpp_t _frames, sampleFrame * _buf  )
 // macros for modulating with env/lfos
 #define modulatefreq( car, mod ) \
 		modtmp = 0.0f; \
-		if( mod##_e1 != 0.0f ) modtmp += env[0][f] * mod##_e1; \
-		if( mod##_e2 != 0.0f ) modtmp += env[1][f] * mod##_e2; \
-		if( mod##_l1 != 0.0f ) modtmp += lfo[0][f] * mod##_l1; \
-		if( mod##_l2 != 0.0f ) modtmp += lfo[1][f] * mod##_l2; \
+		if( mod##_e1 != 0.0f ) modtmp += m_env[0][f] * mod##_e1; \
+		if( mod##_e2 != 0.0f ) modtmp += m_env[1][f] * mod##_e2; \
+		if( mod##_l1 != 0.0f ) modtmp += m_lfo[0][f] * mod##_l1; \
+		if( mod##_l2 != 0.0f ) modtmp += m_lfo[1][f] * mod##_l2; \
 		car = qBound( MIN_FREQ, car * powf( 2.0f, modtmp ), MAX_FREQ );
 
 #define modulateabs( car, mod ) \
-		if( mod##_e1 != 0.0f ) car += env[0][f] * mod##_e1; \
-		if( mod##_e2 != 0.0f ) car += env[1][f] * mod##_e2; \
-		if( mod##_l1 != 0.0f ) car += lfo[0][f] * mod##_l1; \
-		if( mod##_l2 != 0.0f ) car += lfo[1][f] * mod##_l2;
+		if( mod##_e1 != 0.0f ) car += m_env[0][f] * mod##_e1; \
+		if( mod##_e2 != 0.0f ) car += m_env[1][f] * mod##_e2; \
+		if( mod##_l1 != 0.0f ) car += m_lfo[0][f] * mod##_l1; \
+		if( mod##_l2 != 0.0f ) car += m_lfo[1][f] * mod##_l2;
 
 #define modulatephs( car, mod ) \
-		if( mod##_e1 != 0.0f ) car += env[0][f] * mod##_e1; \
-		if( mod##_e2 != 0.0f ) car += env[1][f] * mod##_e2; \
-		if( mod##_l1 != 0.0f ) car += lfo[0][f] * mod##_l1; \
-		if( mod##_l2 != 0.0f ) car += lfo[1][f] * mod##_l2;
+		if( mod##_e1 != 0.0f ) car += m_env[0][f] * mod##_e1; \
+		if( mod##_e2 != 0.0f ) car += m_env[1][f] * mod##_e2; \
+		if( mod##_l1 != 0.0f ) car += m_lfo[0][f] * mod##_l1; \
+		if( mod##_l2 != 0.0f ) car += m_lfo[1][f] * mod##_l2;
 
 #define modulatevol( car, mod ) \
-		if( mod##_e1 > 0.0f ) car *= ( 1.0f - mod##_e1 + mod##_e1 * env[0][f] ); \
-		if( mod##_e1 < 0.0f ) car *= ( 1.0f + mod##_e1 * env[0][f] );	\
-		if( mod##_e2 > 0.0f ) car *= ( 1.0f - mod##_e2 + mod##_e2 * env[1][f] );	\
-		if( mod##_e2 < 0.0f ) car *= ( 1.0f + mod##_e2 * env[1][f] );	\
-		if( mod##_l1 != 0.0f ) car *= ( 1.0f + mod##_l1 * lfo[0][f] ); \
-		if( mod##_l2 != 0.0f ) car *= ( 1.0f + mod##_l2 * lfo[1][f] ); \
+		if( mod##_e1 > 0.0f ) car *= ( 1.0f - mod##_e1 + mod##_e1 * m_env[0][f] ); \
+		if( mod##_e1 < 0.0f ) car *= ( 1.0f + mod##_e1 * m_env[0][f] );	\
+		if( mod##_e2 > 0.0f ) car *= ( 1.0f - mod##_e2 + mod##_e2 * m_env[1][f] );	\
+		if( mod##_e2 < 0.0f ) car *= ( 1.0f + mod##_e2 * m_env[1][f] );	\
+		if( mod##_l1 != 0.0f ) car *= ( 1.0f + mod##_l1 * m_lfo[0][f] ); \
+		if( mod##_l2 != 0.0f ) car *= ( 1.0f + mod##_l2 * m_lfo[1][f] ); \
 		car = qBound( -MODCLIP, car, MODCLIP );
 
 
@@ -323,7 +328,7 @@ void MonstroSynth::renderOutput( fpp_t _frames, sampleFrame * _buf  )
 	float o1l_f;
 	float o1r_f;
 	float o1l_p = m_osc1l_phase + o1lpo; // we add phase offset here so we don't have to do it every frame
-	float o1r_p = m_osc1r_phase + o1rpo; // then substract it again after loop...
+	float o1r_p = m_osc1r_phase + o1rpo; // then subtract it again after loop...
 	float o1_pw;
 
 	// osc2 vars
@@ -339,12 +344,8 @@ void MonstroSynth::renderOutput( fpp_t _frames, sampleFrame * _buf  )
 	float o3r_p = m_osc3r_phase + o3rpo;
 	float sub;
 
-	// modulators
-	float lfo[2][ m_parent->m_fpp ];
-	float env[2][ m_parent->m_fpp ];
-	
 	// render modulators: envelopes, lfos
-	updateModulators( &env[0][0], &env[1][0], &lfo[0][0], &lfo[1][0], _frames );
+	updateModulators( m_env[0].data(), m_env[1].data(), m_lfo[0].data(), m_lfo[1].data(), _frames );
 
 	// begin for loop
 	for( f_cnt_t f = 0; f < _frames; ++f )
@@ -828,120 +829,120 @@ inline sample_t MonstroSynth::calcSlope( int slope, sample_t s )
 MonstroInstrument::MonstroInstrument( InstrumentTrack * _instrument_track ) :
 		Instrument( _instrument_track, &monstro_plugin_descriptor ),
 
-		m_osc1Vol( 33.0, 0.0, 200.0, 0.1, this, tr( "Osc 1 Volume" ) ),
-		m_osc1Pan( 0.0, -100.0, 100.0, 0.1, this, tr( "Osc 1 Panning" ) ),
-		m_osc1Crs( 0.0, -24.0, 24.0, 1.0, this, tr( "Osc 1 Coarse detune" ) ),
-		m_osc1Ftl( 0.0, -100.0, 100.0, 1.0, this, tr( "Osc 1 Fine detune left" ) ),
-		m_osc1Ftr( 0.0, -100.0, 100.0, 1.0, this, tr( "Osc 1 Fine detune right" ) ),
-		m_osc1Spo( 0.0, -180.0, 180.0, 0.1, this, tr( "Osc 1 Stereo phase offset" ) ),
-		m_osc1Pw( 50.0, PW_MIN, PW_MAX, 0.01, this, tr( "Osc 1 Pulse width" ) ),
-		m_osc1SSR( false, this, tr( "Osc 1 Sync send on rise" ) ),
-		m_osc1SSF( false, this, tr( "Osc 1 Sync send on fall" ) ),
+		m_osc1Vol( 33.0, 0.0, 200.0, 0.1, this, tr( "Osc 1 volume" ) ),
+		m_osc1Pan( 0.0, -100.0, 100.0, 0.1, this, tr( "Osc 1 panning" ) ),
+		m_osc1Crs( 0.0, -24.0, 24.0, 1.0, this, tr( "Osc 1 coarse detune" ) ),
+		m_osc1Ftl( 0.0, -100.0, 100.0, 1.0, this, tr( "Osc 1 fine detune left" ) ),
+		m_osc1Ftr( 0.0, -100.0, 100.0, 1.0, this, tr( "Osc 1 fine detune right" ) ),
+		m_osc1Spo( 0.0, -180.0, 180.0, 0.1, this, tr( "Osc 1 stereo phase offset" ) ),
+		m_osc1Pw( 50.0, PW_MIN, PW_MAX, 0.01, this, tr( "Osc 1 pulse width" ) ),
+		m_osc1SSR( false, this, tr( "Osc 1 sync send on rise" ) ),
+		m_osc1SSF( false, this, tr( "Osc 1 sync send on fall" ) ),
 
-		m_osc2Vol( 33.0, 0.0, 200.0, 0.1, this, tr( "Osc 2 Volume" ) ),
-		m_osc2Pan( 0.0, -100.0, 100.0, 0.1, this, tr( "Osc 2 Panning" ) ),
-		m_osc2Crs( 0.0, -24.0, 24.0, 1.0, this, tr( "Osc 2 Coarse detune" ) ),
-		m_osc2Ftl( 0.0, -100.0, 100.0, 1.0, this, tr( "Osc 2 Fine detune left" ) ),
-		m_osc2Ftr( 0.0, -100.0, 100.0, 1.0, this, tr( "Osc 2 Fine detune right" ) ),
-		m_osc2Spo( 0.0, -180.0, 180.0, 0.1, this, tr( "Osc 2 Stereo phase offset" ) ),
-		m_osc2Wave( this, tr( "Osc 2 Waveform" ) ),
-		m_osc2SyncH( false, this, tr( "Osc 2 Sync Hard" ) ),
-		m_osc2SyncR( false, this, tr( "Osc 2 Sync Reverse" ) ),
+		m_osc2Vol( 33.0, 0.0, 200.0, 0.1, this, tr( "Osc 2 volume" ) ),
+		m_osc2Pan( 0.0, -100.0, 100.0, 0.1, this, tr( "Osc 2 panning" ) ),
+		m_osc2Crs( 0.0, -24.0, 24.0, 1.0, this, tr( "Osc 2 coarse detune" ) ),
+		m_osc2Ftl( 0.0, -100.0, 100.0, 1.0, this, tr( "Osc 2 fine detune left" ) ),
+		m_osc2Ftr( 0.0, -100.0, 100.0, 1.0, this, tr( "Osc 2 fine detune right" ) ),
+		m_osc2Spo( 0.0, -180.0, 180.0, 0.1, this, tr( "Osc 2 stereo phase offset" ) ),
+		m_osc2Wave( this, tr( "Osc 2 waveform" ) ),
+		m_osc2SyncH( false, this, tr( "Osc 2 sync hard" ) ),
+		m_osc2SyncR( false, this, tr( "Osc 2 sync reverse" ) ),
 
-		m_osc3Vol( 33.0, 0.0, 200.0, 0.1, this, tr( "Osc 3 Volume" ) ),
-		m_osc3Pan( 0.0, -100.0, 100.0, 0.1, this, tr( "Osc 3 Panning" ) ),
-		m_osc3Crs( 0.0, -24.0, 24.0, 1.0, this, tr( "Osc 3 Coarse detune" ) ),
+		m_osc3Vol( 33.0, 0.0, 200.0, 0.1, this, tr( "Osc 3 volume" ) ),
+		m_osc3Pan( 0.0, -100.0, 100.0, 0.1, this, tr( "Osc 3 panning" ) ),
+		m_osc3Crs( 0.0, -24.0, 24.0, 1.0, this, tr( "Osc 3 coarse detune" ) ),
 		m_osc3Spo( 0.0, -180.0, 180.0, 0.1, this, tr( "Osc 3 Stereo phase offset" ) ),
-		m_osc3Sub( 0.0, -100.0, 100.0, 0.1, this, tr( "Osc 3 Sub-oscillator mix" ) ),
-		m_osc3Wave1( this, tr( "Osc 3 Waveform 1" ) ),
-		m_osc3Wave2( this, tr( "Osc 3 Waveform 2" ) ),
-		m_osc3SyncH( false, this, tr( "Osc 3 Sync Hard" ) ),
-		m_osc3SyncR( false, this, tr( "Osc 3 Sync Reverse" ) ),
+		m_osc3Sub( 0.0, -100.0, 100.0, 0.1, this, tr( "Osc 3 sub-oscillator mix" ) ),
+		m_osc3Wave1( this, tr( "Osc 3 waveform 1" ) ),
+		m_osc3Wave2( this, tr( "Osc 3 waveform 2" ) ),
+		m_osc3SyncH( false, this, tr( "Osc 3 sync hard" ) ),
+		m_osc3SyncR( false, this, tr( "Osc 3 Sync reverse" ) ),
 
-		m_lfo1Wave( this, tr( "LFO 1 Waveform" ) ),
-		m_lfo1Att( 0.0f, 0.0f, 2000.0f, 1.0f, 2000.0f, this, tr( "LFO 1 Attack" ) ),
-		m_lfo1Rate( 1.0f, 0.1, 10000.0, 0.1, 10000.0f, this, tr( "LFO 1 Rate" ) ),
-		m_lfo1Phs( 0.0, -180.0, 180.0, 0.1, this, tr( "LFO 1 Phase" ) ),
+		m_lfo1Wave( this, tr( "LFO 1 waveform" ) ),
+		m_lfo1Att( 0.0f, 0.0f, 2000.0f, 1.0f, 2000.0f, this, tr( "LFO 1 attack" ) ),
+		m_lfo1Rate( 1.0f, 0.1, 10000.0, 0.1, 10000.0f, this, tr( "LFO 1 rate" ) ),
+		m_lfo1Phs( 0.0, -180.0, 180.0, 0.1, this, tr( "LFO 1 phase" ) ),
 
-		m_lfo2Wave( this, tr( "LFO 2 Waveform" ) ),
-		m_lfo2Att( 0.0f, 0.0f, 2000.0f, 1.0f, 2000.0f, this, tr( "LFO 2 Attack" ) ),
-		m_lfo2Rate( 1.0f, 0.1, 10000.0, 0.1, 10000.0f, this, tr( "LFO 2 Rate" ) ),
-		m_lfo2Phs( 0.0, -180.0, 180.0, 0.1, this, tr( "LFO 2 Phase" ) ),
+		m_lfo2Wave( this, tr( "LFO 2 waveform" ) ),
+		m_lfo2Att( 0.0f, 0.0f, 2000.0f, 1.0f, 2000.0f, this, tr( "LFO 2 attack" ) ),
+		m_lfo2Rate( 1.0f, 0.1, 10000.0, 0.1, 10000.0f, this, tr( "LFO 2 rate" ) ),
+		m_lfo2Phs( 0.0, -180.0, 180.0, 0.1, this, tr( "LFO 2 phase" ) ),
 
-		m_env1Pre( 0.0f, 0.0f, 2000.0f, 1.0f, 2000.0f, this, tr( "Env 1 Pre-delay" ) ),
-		m_env1Att( 0.0f, 0.0f, 2000.0f, 1.0f, 2000.0f, this, tr( "Env 1 Attack" ) ),
-		m_env1Hold( 0.0f, 0.0f, 4000.0f, 1.0f, 4000.0f, this, tr( "Env 1 Hold" ) ),
-		m_env1Dec( 0.0f, 0.0f, 4000.0f, 1.0f, 4000.0f, this, tr( "Env 1 Decay" ) ),
-		m_env1Sus( 1.0f, 0.0f, 1.0f, 0.001f, this, tr( "Env 1 Sustain" ) ),
-		m_env1Rel( 0.0f, 0.0f, 4000.0f, 1.0f, 4000.0f, this, tr( "Env 1 Release" ) ),
-		m_env1Slope( 0.0f, -1.0f, 1.0f, 0.001f, this, tr( "Env 1 Slope" ) ),
+		m_env1Pre( 0.0f, 0.0f, 2000.0f, 1.0f, 2000.0f, this, tr( "Env 1 pre-delay" ) ),
+		m_env1Att( 0.0f, 0.0f, 2000.0f, 1.0f, 2000.0f, this, tr( "Env 1 attack" ) ),
+		m_env1Hold( 0.0f, 0.0f, 4000.0f, 1.0f, 4000.0f, this, tr( "Env 1 hold" ) ),
+		m_env1Dec( 0.0f, 0.0f, 4000.0f, 1.0f, 4000.0f, this, tr( "Env 1 decay" ) ),
+		m_env1Sus( 1.0f, 0.0f, 1.0f, 0.001f, this, tr( "Env 1 sustain" ) ),
+		m_env1Rel( 0.0f, 0.0f, 4000.0f, 1.0f, 4000.0f, this, tr( "Env 1 release" ) ),
+		m_env1Slope( 0.0f, -1.0f, 1.0f, 0.001f, this, tr( "Env 1 slope" ) ),
 
-		m_env2Pre( 0.0f, 0.0f, 2000.0f, 1.0f, 2000.0f, this, tr( "Env 2 Pre-delay" ) ),
-		m_env2Att( 0.0f, 0.0f, 2000.0f, 1.0f, 2000.0f, this, tr( "Env 2 Attack" ) ),
-		m_env2Hold( 0.0f, 0.0f, 4000.0f, 1.0f, 4000.0f, this, tr( "Env 2 Hold" ) ),
-		m_env2Dec( 0.0f, 0.0f, 4000.0f, 1.0f, 4000.0f, this, tr( "Env 2 Decay" ) ),
-		m_env2Sus( 1.0f, 0.0f, 1.0f, 0.001f, this, tr( "Env 2 Sustain" ) ),
-		m_env2Rel( 0.0f, 0.0f, 4000.0f, 1.0f, 4000.0f, this, tr( "Env 2 Release" ) ),
-		m_env2Slope( 0.0f, -1.0f, 1.0f, 0.001f, this, tr( "Env 2 Slope" ) ),
+		m_env2Pre( 0.0f, 0.0f, 2000.0f, 1.0f, 2000.0f, this, tr( "Env 2 pre-delay" ) ),
+		m_env2Att( 0.0f, 0.0f, 2000.0f, 1.0f, 2000.0f, this, tr( "Env 2 attack" ) ),
+		m_env2Hold( 0.0f, 0.0f, 4000.0f, 1.0f, 4000.0f, this, tr( "Env 2 hold" ) ),
+		m_env2Dec( 0.0f, 0.0f, 4000.0f, 1.0f, 4000.0f, this, tr( "Env 2 decay" ) ),
+		m_env2Sus( 1.0f, 0.0f, 1.0f, 0.001f, this, tr( "Env 2 sustain" ) ),
+		m_env2Rel( 0.0f, 0.0f, 4000.0f, 1.0f, 4000.0f, this, tr( "Env 2 release" ) ),
+		m_env2Slope( 0.0f, -1.0f, 1.0f, 0.001f, this, tr( "Env 2 slope" ) ),
 
-		m_o23Mod( 0, 0, NUM_MODS - 1, this, tr( "Osc2-3 modulation" ) ),
+		m_o23Mod( 0, 0, NUM_MODS - 1, this, tr( "Osc 2+3 modulation" ) ),
 
 		m_selectedView( 0, 0, 1, this, tr( "Selected view" ) ),
 
-		m_vol1env1( 0.0f, -1.0f, 1.0f, 0.001f, this, tr( "Vol1-Env1" ) ),
-		m_vol1env2( 0.0f, -1.0f, 1.0f, 0.001f, this, tr( "Vol1-Env2" ) ),
-		m_vol1lfo1( 0.0f, -1.0f, 1.0f, 0.001f, this, tr( "Vol1-LFO1" ) ),
-		m_vol1lfo2( 0.0f, -1.0f, 1.0f, 0.001f, this, tr( "Vol1-LFO2" ) ),
+		m_vol1env1( 0.0f, -1.0f, 1.0f, 0.001f, this, tr( "Osc 1 - Vol env 1" ) ),
+		m_vol1env2( 0.0f, -1.0f, 1.0f, 0.001f, this, tr( "Osc 1 - Vol env 2" ) ),
+		m_vol1lfo1( 0.0f, -1.0f, 1.0f, 0.001f, this, tr( "Osc 1 - Vol LFO 1" ) ),
+		m_vol1lfo2( 0.0f, -1.0f, 1.0f, 0.001f, this, tr( "Osc 1 - Vol LFO 2" ) ),
 
-		m_vol2env1( 0.0f, -1.0f, 1.0f, 0.001f, this, tr( "Vol2-Env1" ) ),
-		m_vol2env2( 0.0f, -1.0f, 1.0f, 0.001f, this, tr( "Vol2-Env2" ) ),
-		m_vol2lfo1( 0.0f, -1.0f, 1.0f, 0.001f, this, tr( "Vol2-LFO1" ) ),
-		m_vol2lfo2( 0.0f, -1.0f, 1.0f, 0.001f, this, tr( "Vol2-LFO2" ) ),
+		m_vol2env1( 0.0f, -1.0f, 1.0f, 0.001f, this, tr( "Osc 2 - Vol env 1" ) ),
+		m_vol2env2( 0.0f, -1.0f, 1.0f, 0.001f, this, tr( "Osc 2 - Vol env 2" ) ),
+		m_vol2lfo1( 0.0f, -1.0f, 1.0f, 0.001f, this, tr( "Osc 2 - Vol LFO 1" ) ),
+		m_vol2lfo2( 0.0f, -1.0f, 1.0f, 0.001f, this, tr( "Osc 2 - Vol LFO 2" ) ),
 
-		m_vol3env1( 0.0f, -1.0f, 1.0f, 0.001f, this, tr( "Vol3-Env1" ) ),
-		m_vol3env2( 0.0f, -1.0f, 1.0f, 0.001f, this, tr( "Vol3-Env2" ) ),
-		m_vol3lfo1( 0.0f, -1.0f, 1.0f, 0.001f, this, tr( "Vol3-LFO1" ) ),
-		m_vol3lfo2( 0.0f, -1.0f, 1.0f, 0.001f, this, tr( "Vol3-LFO2" ) ),
+		m_vol3env1( 0.0f, -1.0f, 1.0f, 0.001f, this, tr( "Osc 3 - Vol env 1" ) ),
+		m_vol3env2( 0.0f, -1.0f, 1.0f, 0.001f, this, tr( "Osc 3 - Vol env 2" ) ),
+		m_vol3lfo1( 0.0f, -1.0f, 1.0f, 0.001f, this, tr( "Osc 3 - Vol LFO 1" ) ),
+		m_vol3lfo2( 0.0f, -1.0f, 1.0f, 0.001f, this, tr( "Osc 3 - Vol LFO 2" ) ),
 
-		m_phs1env1( 0.0f, -1.0f, 1.0f, 0.001f, this, tr( "Phs1-Env1" ) ),
-		m_phs1env2( 0.0f, -1.0f, 1.0f, 0.001f, this, tr( "Phs1-Env2" ) ),
-		m_phs1lfo1( 0.0f, -1.0f, 1.0f, 0.001f, this, tr( "Phs1-LFO1" ) ),
-		m_phs1lfo2( 0.0f, -1.0f, 1.0f, 0.001f, this, tr( "Phs1-LFO2" ) ),
+		m_phs1env1( 0.0f, -1.0f, 1.0f, 0.001f, this, tr( "Osc 1 - Phs env 1" ) ),
+		m_phs1env2( 0.0f, -1.0f, 1.0f, 0.001f, this, tr( "Osc 1 - Phs env 2" ) ),
+		m_phs1lfo1( 0.0f, -1.0f, 1.0f, 0.001f, this, tr( "Osc 1 - Phs LFO 1" ) ),
+		m_phs1lfo2( 0.0f, -1.0f, 1.0f, 0.001f, this, tr( "Osc 1 - Phs LFO 2" ) ),
 
-		m_phs2env1( 0.0f, -1.0f, 1.0f, 0.001f, this, tr( "Phs2-Env1" ) ),
-		m_phs2env2( 0.0f, -1.0f, 1.0f, 0.001f, this, tr( "Phs2-Env2" ) ),
-		m_phs2lfo1( 0.0f, -1.0f, 1.0f, 0.001f, this, tr( "Phs2-LFO1" ) ),
-		m_phs2lfo2( 0.0f, -1.0f, 1.0f, 0.001f, this, tr( "Phs2-LFO2" ) ),
+		m_phs2env1( 0.0f, -1.0f, 1.0f, 0.001f, this, tr( "Osc 2 - Phs env 1" ) ),
+		m_phs2env2( 0.0f, -1.0f, 1.0f, 0.001f, this, tr( "Osc 2 - Phs env 2" ) ),
+		m_phs2lfo1( 0.0f, -1.0f, 1.0f, 0.001f, this, tr( "Osc 2 - Phs LFO 1" ) ),
+		m_phs2lfo2( 0.0f, -1.0f, 1.0f, 0.001f, this, tr( "Osc 2 - Phs LFO 2" ) ),
 
-		m_phs3env1( 0.0f, -1.0f, 1.0f, 0.001f, this, tr( "Phs3-Env1" ) ),
-		m_phs3env2( 0.0f, -1.0f, 1.0f, 0.001f, this, tr( "Phs3-Env2" ) ),
-		m_phs3lfo1( 0.0f, -1.0f, 1.0f, 0.001f, this, tr( "Phs3-LFO1" ) ),
-		m_phs3lfo2( 0.0f, -1.0f, 1.0f, 0.001f, this, tr( "Phs3-LFO2" ) ),
+		m_phs3env1( 0.0f, -1.0f, 1.0f, 0.001f, this, tr( "Osc 3 - Phs env 1" ) ),
+		m_phs3env2( 0.0f, -1.0f, 1.0f, 0.001f, this, tr( "Osc 3 - Phs env 2" ) ),
+		m_phs3lfo1( 0.0f, -1.0f, 1.0f, 0.001f, this, tr( "Osc 3 - Phs LFO 1" ) ),
+		m_phs3lfo2( 0.0f, -1.0f, 1.0f, 0.001f, this, tr( "Osc 3 - Phs LFO 2" ) ),
 
-		m_pit1env1( 0.0f, -1.0f, 1.0f, 0.001f, this, tr( "Pit1-Env1" ) ),
-		m_pit1env2( 0.0f, -1.0f, 1.0f, 0.001f, this, tr( "Pit1-Env2" ) ),
-		m_pit1lfo1( 0.0f, -1.0f, 1.0f, 0.001f, this, tr( "Pit1-LFO1" ) ),
-		m_pit1lfo2( 0.0f, -1.0f, 1.0f, 0.001f, this, tr( "Pit1-LFO2" ) ),
+		m_pit1env1( 0.0f, -1.0f, 1.0f, 0.001f, this, tr( "Osc 1 - Pit env 1" ) ),
+		m_pit1env2( 0.0f, -1.0f, 1.0f, 0.001f, this, tr( "Osc 1 - Pit env 2" ) ),
+		m_pit1lfo1( 0.0f, -1.0f, 1.0f, 0.001f, this, tr( "Osc 1 - Pit LFO 1" ) ),
+		m_pit1lfo2( 0.0f, -1.0f, 1.0f, 0.001f, this, tr( "Osc 1 - Pit LFO 2" ) ),
 
-		m_pit2env1( 0.0f, -1.0f, 1.0f, 0.001f, this, tr( "Pit2-Env1" ) ),
-		m_pit2env2( 0.0f, -1.0f, 1.0f, 0.001f, this, tr( "Pit2-Env2" ) ),
-		m_pit2lfo1( 0.0f, -1.0f, 1.0f, 0.001f, this, tr( "Pit2-LFO1" ) ),
-		m_pit2lfo2( 0.0f, -1.0f, 1.0f, 0.001f, this, tr( "Pit2-LFO2" ) ),
+		m_pit2env1( 0.0f, -1.0f, 1.0f, 0.001f, this, tr( "Osc 2 - Pit env 1" ) ),
+		m_pit2env2( 0.0f, -1.0f, 1.0f, 0.001f, this, tr( "Osc 2 - Pit env 2" ) ),
+		m_pit2lfo1( 0.0f, -1.0f, 1.0f, 0.001f, this, tr( "Osc 2 - Pit LFO 1" ) ),
+		m_pit2lfo2( 0.0f, -1.0f, 1.0f, 0.001f, this, tr( "Osc 2 - Pit LFO 2" ) ),
 
-		m_pit3env1( 0.0f, -1.0f, 1.0f, 0.001f, this, tr( "Pit3-Env1" ) ),
-		m_pit3env2( 0.0f, -1.0f, 1.0f, 0.001f, this, tr( "Pit3-Env2" ) ),
-		m_pit3lfo1( 0.0f, -1.0f, 1.0f, 0.001f, this, tr( "Pit3-LFO1" ) ),
-		m_pit3lfo2( 0.0f, -1.0f, 1.0f, 0.001f, this, tr( "Pit3-LFO2" ) ),
+		m_pit3env1( 0.0f, -1.0f, 1.0f, 0.001f, this, tr( "Osc 3 - Pit env 1" ) ),
+		m_pit3env2( 0.0f, -1.0f, 1.0f, 0.001f, this, tr( "Osc 3 - Pit env 2" ) ),
+		m_pit3lfo1( 0.0f, -1.0f, 1.0f, 0.001f, this, tr( "Osc 3 - Pit LFO 1" ) ),
+		m_pit3lfo2( 0.0f, -1.0f, 1.0f, 0.001f, this, tr( "Osc 3 - Pit LFO 2" ) ),
 
-		m_pw1env1( 0.0f, -1.0f, 1.0f, 0.001f, this, tr( "PW1-Env1" ) ),
-		m_pw1env2( 0.0f, -1.0f, 1.0f, 0.001f, this, tr( "PW1-Env2" ) ),
-		m_pw1lfo1( 0.0f, -1.0f, 1.0f, 0.001f, this, tr( "PW1-LFO1" ) ),
-		m_pw1lfo2( 0.0f, -1.0f, 1.0f, 0.001f, this, tr( "PW1-LFO2" ) ),
+		m_pw1env1( 0.0f, -1.0f, 1.0f, 0.001f, this, tr( "Osc 1 - PW env 1" ) ),
+		m_pw1env2( 0.0f, -1.0f, 1.0f, 0.001f, this, tr( "Osc 1 - PW env 2" ) ),
+		m_pw1lfo1( 0.0f, -1.0f, 1.0f, 0.001f, this, tr( "Osc 1 - PW LFO 1" ) ),
+		m_pw1lfo2( 0.0f, -1.0f, 1.0f, 0.001f, this, tr( "Osc 1 - PW LFO 2" ) ),
 
-		m_sub3env1( 0.0f, -1.0f, 1.0f, 0.001f, this, tr( "Sub3-Env1" ) ),
-		m_sub3env2( 0.0f, -1.0f, 1.0f, 0.001f, this, tr( "Sub3-Env2" ) ),
-		m_sub3lfo1( 0.0f, -1.0f, 1.0f, 0.001f, this, tr( "Sub3-LFO1" ) ),
-		m_sub3lfo2( 0.0f, -1.0f, 1.0f, 0.001f, this, tr( "Sub3-LFO2" ) )
+		m_sub3env1( 0.0f, -1.0f, 1.0f, 0.001f, this, tr( "Osc 3 - Sub env 1" ) ),
+		m_sub3env2( 0.0f, -1.0f, 1.0f, 0.001f, this, tr( "Osc 3 - Sub env 2" ) ),
+		m_sub3lfo1( 0.0f, -1.0f, 1.0f, 0.001f, this, tr( "Osc 3 - Sub LFO 1" ) ),
+		m_sub3lfo2( 0.0f, -1.0f, 1.0f, 0.001f, this, tr( "Osc 3 - Sub LFO 2" ) )
 
 {
 
@@ -956,52 +957,52 @@ MonstroInstrument::MonstroInstrument( InstrumentTrack * _instrument_track ) :
 
 // updateVolumes
 
-	connect( &m_osc1Vol, SIGNAL( dataChanged() ), this, SLOT( updateVolume1() ) );
-	connect( &m_osc1Pan, SIGNAL( dataChanged() ), this, SLOT( updateVolume1() ) );
-	connect( &m_osc2Vol, SIGNAL( dataChanged() ), this, SLOT( updateVolume2() ) );
-	connect( &m_osc2Pan, SIGNAL( dataChanged() ), this, SLOT( updateVolume2() ) );
-	connect( &m_osc3Vol, SIGNAL( dataChanged() ), this, SLOT( updateVolume3() ) );
-	connect( &m_osc3Pan, SIGNAL( dataChanged() ), this, SLOT( updateVolume3() ) );
+	connect( &m_osc1Vol, SIGNAL( dataChanged() ), this, SLOT( updateVolume1() ), Qt::DirectConnection );
+	connect( &m_osc1Pan, SIGNAL( dataChanged() ), this, SLOT( updateVolume1() ), Qt::DirectConnection );
+	connect( &m_osc2Vol, SIGNAL( dataChanged() ), this, SLOT( updateVolume2() ), Qt::DirectConnection );
+	connect( &m_osc2Pan, SIGNAL( dataChanged() ), this, SLOT( updateVolume2() ), Qt::DirectConnection );
+	connect( &m_osc3Vol, SIGNAL( dataChanged() ), this, SLOT( updateVolume3() ), Qt::DirectConnection );
+	connect( &m_osc3Pan, SIGNAL( dataChanged() ), this, SLOT( updateVolume3() ), Qt::DirectConnection );
 
 // updateFreq
 
-	connect( &m_osc1Crs, SIGNAL( dataChanged() ), this, SLOT( updateFreq1() ) );
-	connect( &m_osc2Crs, SIGNAL( dataChanged() ), this, SLOT( updateFreq2() ) );
-	connect( &m_osc3Crs, SIGNAL( dataChanged() ), this, SLOT( updateFreq3() ) );
+	connect( &m_osc1Crs, SIGNAL( dataChanged() ), this, SLOT( updateFreq1() ), Qt::DirectConnection );
+	connect( &m_osc2Crs, SIGNAL( dataChanged() ), this, SLOT( updateFreq2() ), Qt::DirectConnection );
+	connect( &m_osc3Crs, SIGNAL( dataChanged() ), this, SLOT( updateFreq3() ), Qt::DirectConnection );
 
-	connect( &m_osc1Ftl, SIGNAL( dataChanged() ), this, SLOT( updateFreq1() ) );
-	connect( &m_osc2Ftl, SIGNAL( dataChanged() ), this, SLOT( updateFreq2() ) );
+	connect( &m_osc1Ftl, SIGNAL( dataChanged() ), this, SLOT( updateFreq1() ), Qt::DirectConnection );
+	connect( &m_osc2Ftl, SIGNAL( dataChanged() ), this, SLOT( updateFreq2() ), Qt::DirectConnection );
 
-	connect( &m_osc1Ftr, SIGNAL( dataChanged() ), this, SLOT( updateFreq1() ) );
-	connect( &m_osc2Ftr, SIGNAL( dataChanged() ), this, SLOT( updateFreq2() ) );
+	connect( &m_osc1Ftr, SIGNAL( dataChanged() ), this, SLOT( updateFreq1() ), Qt::DirectConnection );
+	connect( &m_osc2Ftr, SIGNAL( dataChanged() ), this, SLOT( updateFreq2() ), Qt::DirectConnection );
 
 // updatePO
-	connect( &m_osc1Spo, SIGNAL( dataChanged() ), this, SLOT( updatePO1() ) );
-	connect( &m_osc2Spo, SIGNAL( dataChanged() ), this, SLOT( updatePO2() ) );
-	connect( &m_osc3Spo, SIGNAL( dataChanged() ), this, SLOT( updatePO3() ) );
+	connect( &m_osc1Spo, SIGNAL( dataChanged() ), this, SLOT( updatePO1() ), Qt::DirectConnection );
+	connect( &m_osc2Spo, SIGNAL( dataChanged() ), this, SLOT( updatePO2() ), Qt::DirectConnection );
+	connect( &m_osc3Spo, SIGNAL( dataChanged() ), this, SLOT( updatePO3() ), Qt::DirectConnection );
 
 // updateEnvelope1
 
-	connect( &m_env1Pre, SIGNAL( dataChanged() ), this, SLOT( updateEnvelope1() ) );
-	connect( &m_env1Att, SIGNAL( dataChanged() ), this, SLOT( updateEnvelope1() ) );
-	connect( &m_env1Hold, SIGNAL( dataChanged() ), this, SLOT( updateEnvelope1() ) );
-	connect( &m_env1Dec, SIGNAL( dataChanged() ), this, SLOT( updateEnvelope1() ) );
-	connect( &m_env1Rel, SIGNAL( dataChanged() ), this, SLOT( updateEnvelope1() ) );
-	connect( &m_env1Slope, SIGNAL( dataChanged() ), this, SLOT( updateSlope1() ) );
+	connect( &m_env1Pre, SIGNAL( dataChanged() ), this, SLOT( updateEnvelope1() ), Qt::DirectConnection );
+	connect( &m_env1Att, SIGNAL( dataChanged() ), this, SLOT( updateEnvelope1() ), Qt::DirectConnection );
+	connect( &m_env1Hold, SIGNAL( dataChanged() ), this, SLOT( updateEnvelope1() ), Qt::DirectConnection );
+	connect( &m_env1Dec, SIGNAL( dataChanged() ), this, SLOT( updateEnvelope1() ), Qt::DirectConnection );
+	connect( &m_env1Rel, SIGNAL( dataChanged() ), this, SLOT( updateEnvelope1() ), Qt::DirectConnection );
+	connect( &m_env1Slope, SIGNAL( dataChanged() ), this, SLOT( updateSlope1() ), Qt::DirectConnection );
 
 // updateEnvelope2
 
-	connect( &m_env2Pre, SIGNAL( dataChanged() ), this, SLOT( updateEnvelope2() ) );
-	connect( &m_env2Att, SIGNAL( dataChanged() ), this, SLOT( updateEnvelope2() ) );
-	connect( &m_env2Hold, SIGNAL( dataChanged() ), this, SLOT( updateEnvelope2() ) );
-	connect( &m_env2Dec, SIGNAL( dataChanged() ), this, SLOT( updateEnvelope2() ) );
-	connect( &m_env2Rel, SIGNAL( dataChanged() ), this, SLOT( updateEnvelope2() ) );
-	connect( &m_env2Slope, SIGNAL( dataChanged() ), this, SLOT( updateSlope2() ) );
+	connect( &m_env2Pre, SIGNAL( dataChanged() ), this, SLOT( updateEnvelope2() ), Qt::DirectConnection );
+	connect( &m_env2Att, SIGNAL( dataChanged() ), this, SLOT( updateEnvelope2() ), Qt::DirectConnection );
+	connect( &m_env2Hold, SIGNAL( dataChanged() ), this, SLOT( updateEnvelope2() ), Qt::DirectConnection );
+	connect( &m_env2Dec, SIGNAL( dataChanged() ), this, SLOT( updateEnvelope2() ), Qt::DirectConnection );
+	connect( &m_env2Rel, SIGNAL( dataChanged() ), this, SLOT( updateEnvelope2() ), Qt::DirectConnection );
+	connect( &m_env2Slope, SIGNAL( dataChanged() ), this, SLOT( updateSlope2() ), Qt::DirectConnection );
 
 // updateLFOAtts
 
-	connect( &m_lfo1Att, SIGNAL( dataChanged() ), this, SLOT( updateLFOAtts() ) );
-	connect( &m_lfo2Att, SIGNAL( dataChanged() ), this, SLOT( updateLFOAtts() ) );
+	connect( &m_lfo1Att, SIGNAL( dataChanged() ), this, SLOT( updateLFOAtts() ), Qt::DirectConnection );
+	connect( &m_lfo2Att, SIGNAL( dataChanged() ), this, SLOT( updateLFOAtts() ), Qt::DirectConnection );
 
 // updateSampleRate
 
@@ -1433,20 +1434,20 @@ void MonstroInstrument::updateSamplerate()
 void MonstroInstrument::updateSlope1()
 {
 	const float slope = m_env1Slope.value();
-	m_slope[0] = exp10f( slope * -1.0f );
+	m_slope[0] = exp10( slope * -1.0f );
 }
 
 
 void MonstroInstrument::updateSlope2()
 {
 	const float slope = m_env2Slope.value();
-	m_slope[1] = exp10f( slope * -1.0f );
+	m_slope[1] = exp10( slope * -1.0f );
 }
 
 
 MonstroView::MonstroView( Instrument * _instrument,
 					QWidget * _parent ) :
-					InstrumentView( _instrument, _parent )
+					InstrumentViewFixedSize( _instrument, _parent )
 {
 	m_operatorsView = setupOperatorsView( this );
 	setWidgetBackground( m_operatorsView, "artwork_op" );
@@ -1465,29 +1466,12 @@ MonstroView::MonstroView( Instrument * _instrument,
 	m_opViewButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "opview_active" ) );
 	m_opViewButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "opview_inactive" ) );
 	ToolTip::add( m_opViewButton, tr( "Operators view" ) );
-	m_opViewButton -> setWhatsThis( tr( "The Operators view contains all the operators. These include both audible "
-										"operators (oscillators) and inaudible operators, or modulators: "
-										"Low-frequency oscillators and Envelopes. \n\n"
-										"Knobs and other widgets in the Operators view have their own what's this -texts, "
-										"so you can get more specific help for them that way. " ) );
 
 	PixmapButton * m_matViewButton = new PixmapButton( this, NULL );
 	m_matViewButton -> move( 125,0 );
 	m_matViewButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "matview_active" ) );
 	m_matViewButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "matview_inactive" ) );
 	ToolTip::add( m_matViewButton, tr( "Matrix view" ) );
-	m_matViewButton -> setWhatsThis( tr( "The Matrix view contains the modulation matrix. Here you can define "
-										"the modulation relationships between the various operators: Each "
-										"audible operator (oscillators 1-3) has 3-4 properties that can be "
-										"modulated by any of the modulators. Using more modulations consumes "
-										"more CPU power. \n\n"
-										"The view is divided to modulation targets, grouped by the target oscillator. "
-										"Available targets are volume, pitch, phase, pulse width and sub-osc ratio. "
-										"Note: some targets are specific to one oscillator only. \n\n"
-										"Each modulation target has 4 knobs, one for each modulator. By default "
-										"the knobs are at 0, which means no modulation. Turning a knob to 1 causes "
-										"that modulator to affect the modulation target as much as possible. Turning "
-										"it to -1 does the same, but the modulation is inversed. " ) );
 
 	m_selectedViewGroup = new automatableButtonGroup( this );
 	m_selectedViewGroup -> addButton( m_opViewButton );
@@ -1660,8 +1644,8 @@ QWidget * MonstroView::setupOperatorsView( QWidget * _parent )
 	makeknob( m_osc1VolKnob, KNOBCOL1, O1ROW, tr( "Volume" ), "%", "osc1Knob" )
 	makeknob( m_osc1PanKnob, KNOBCOL2, O1ROW, tr( "Panning" ), "", "osc1Knob" )
 	makeknob( m_osc1CrsKnob, KNOBCOL3, O1ROW, tr( "Coarse detune" ), tr( " semitones" ), "osc1Knob" )
-	makeknob( m_osc1FtlKnob, KNOBCOL4, O1ROW, tr( "Finetune left" ), tr( " cents" ), "osc1Knob" )
-	makeknob( m_osc1FtrKnob, KNOBCOL5, O1ROW, tr( "Finetune right" ), tr( " cents" ), "osc1Knob" )
+	makeknob( m_osc1FtlKnob, KNOBCOL4, O1ROW, tr( "Fine tune left" ), tr( " cents" ), "osc1Knob" )
+	makeknob( m_osc1FtrKnob, KNOBCOL5, O1ROW, tr( "Fine tune right" ), tr( " cents" ), "osc1Knob" )
 	makeknob( m_osc1SpoKnob, KNOBCOL6, O1ROW, tr( "Stereo phase offset" ), tr( " deg" ), "osc1Knob" )
 	makeknob( m_osc1PwKnob,  KNOBCOL7, O1ROW, tr( "Pulse width" ), "%", "osc1Knob" )
 
@@ -1673,14 +1657,14 @@ QWidget * MonstroView::setupOperatorsView( QWidget * _parent )
 	makeknob( m_osc2VolKnob, KNOBCOL1, O2ROW, tr( "Volume" ), "%", "osc2Knob" )
 	makeknob( m_osc2PanKnob, KNOBCOL2, O2ROW, tr( "Panning" ), "", "osc2Knob" )
 	makeknob( m_osc2CrsKnob, KNOBCOL3, O2ROW, tr( "Coarse detune" ), tr( " semitones" ), "osc2Knob" )
-	makeknob( m_osc2FtlKnob, KNOBCOL4, O2ROW, tr( "Finetune left" ), tr( " cents" ), "osc2Knob" )
-	makeknob( m_osc2FtrKnob, KNOBCOL5, O2ROW, tr( "Finetune right" ), tr( " cents" ), "osc2Knob" )
+	makeknob( m_osc2FtlKnob, KNOBCOL4, O2ROW, tr( "Fine tune left" ), tr( " cents" ), "osc2Knob" )
+	makeknob( m_osc2FtrKnob, KNOBCOL5, O2ROW, tr( "Fine tune right" ), tr( " cents" ), "osc2Knob" )
 	makeknob( m_osc2SpoKnob, KNOBCOL6, O2ROW, tr( "Stereo phase offset" ), tr( " deg" ), "osc2Knob" )
 
 	m_osc2VolKnob -> setVolumeKnob( true );
 
 	m_osc2WaveBox = new ComboBox( view );
-	m_osc2WaveBox -> setGeometry( 204, O2ROW + 7, 42, 22 );
+	m_osc2WaveBox -> setGeometry( 204, O2ROW + 7, 42, ComboBox::DEFAULT_HEIGHT );
 	m_osc2WaveBox->setFont( pointSize<8>( m_osc2WaveBox->font() ) );
 
 	maketinyled( m_osc2SyncHButton, 212, O2ROW - 3, tr( "Hard sync oscillator 2" ) )
@@ -1695,18 +1679,18 @@ QWidget * MonstroView::setupOperatorsView( QWidget * _parent )
 	m_osc3VolKnob -> setVolumeKnob( true );
 
 	m_osc3Wave1Box = new ComboBox( view );
-	m_osc3Wave1Box -> setGeometry( 160, O3ROW + 7, 42, 22 );
+	m_osc3Wave1Box -> setGeometry( 160, O3ROW + 7, 42, ComboBox::DEFAULT_HEIGHT );
 	m_osc3Wave1Box->setFont( pointSize<8>( m_osc3Wave1Box->font() ) );
 
 	m_osc3Wave2Box = new ComboBox( view );
-	m_osc3Wave2Box -> setGeometry( 204, O3ROW + 7, 42, 22 );
+	m_osc3Wave2Box -> setGeometry( 204, O3ROW + 7, 42, ComboBox::DEFAULT_HEIGHT );
 	m_osc3Wave2Box->setFont( pointSize<8>( m_osc3Wave2Box->font() ) );
 
 	maketinyled( m_osc3SyncHButton, 212, O3ROW - 3, tr( "Hard sync oscillator 3" ) )
 	maketinyled( m_osc3SyncRButton, 191, O3ROW - 3, tr( "Reverse sync oscillator 3" ) )
 
 	m_lfo1WaveBox = new ComboBox( view );
-	m_lfo1WaveBox -> setGeometry( 2, LFOROW + 7, 42, 22 );
+	m_lfo1WaveBox -> setGeometry( 2, LFOROW + 7, 42, ComboBox::DEFAULT_HEIGHT );
 	m_lfo1WaveBox->setFont( pointSize<8>( m_lfo1WaveBox->font() ) );
 
 	maketsknob( m_lfo1AttKnob, LFOCOL1, LFOROW, tr( "Attack" ), " ms", "lfoKnob" )
@@ -1714,7 +1698,7 @@ QWidget * MonstroView::setupOperatorsView( QWidget * _parent )
 	makeknob( m_lfo1PhsKnob, LFOCOL3, LFOROW, tr( "Phase" ), tr( " deg" ), "lfoKnob" )
 
 	m_lfo2WaveBox = new ComboBox( view );
-	m_lfo2WaveBox -> setGeometry( 127, LFOROW + 7, 42, 22 );
+	m_lfo2WaveBox -> setGeometry( 127, LFOROW + 7, 42, ComboBox::DEFAULT_HEIGHT );
 	m_lfo2WaveBox->setFont( pointSize<8>( m_lfo2WaveBox->font() ) );
 
 	maketsknob( m_lfo2AttKnob, LFOCOL4, LFOROW, tr( "Attack" ), " ms", "lfoKnob" )
@@ -1742,25 +1726,25 @@ QWidget * MonstroView::setupOperatorsView( QWidget * _parent )
 	m_mixButton -> move( 225, 185 );
 	m_mixButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "mix_active" ) );
 	m_mixButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "mix_inactive" ) );
-	ToolTip::add( m_mixButton, tr( "Mix Osc2 with Osc3" ) );
+	ToolTip::add( m_mixButton, tr( "Mix osc 2 with osc 3" ) );
 
 	PixmapButton * m_amButton = new PixmapButton( view, NULL );
 	m_amButton -> move( 225, 185 + 15 );
 	m_amButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "am_active" ) );
 	m_amButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "am_inactive" ) );
-	ToolTip::add( m_amButton, tr( "Modulate amplitude of Osc3 with Osc2" ) );
+	ToolTip::add( m_amButton, tr( "Modulate amplitude of osc 3 by osc 2" ) );
 
 	PixmapButton * m_fmButton = new PixmapButton( view, NULL );
 	m_fmButton -> move( 225, 185 + 15*2 );
 	m_fmButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "fm_active" ) );
 	m_fmButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "fm_inactive" ) );
-	ToolTip::add( m_fmButton, tr( "Modulate frequency of Osc3 with Osc2" ) );
+	ToolTip::add( m_fmButton, tr( "Modulate frequency of osc 3 by osc 2" ) );
 
 	PixmapButton * m_pmButton = new PixmapButton( view, NULL );
 	m_pmButton -> move( 225, 185 + 15*3 );
 	m_pmButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "pm_active" ) );
 	m_pmButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "pm_inactive" ) );
-	ToolTip::add( m_pmButton, tr( "Modulate phase of Osc3 with Osc2" ) );
+	ToolTip::add( m_pmButton, tr( "Modulate phase of osc 3 by osc 2" ) );
 
 	m_o23ModGroup = new automatableButtonGroup( view );
 	m_o23ModGroup-> addButton( m_mixButton );
@@ -1770,128 +1754,6 @@ QWidget * MonstroView::setupOperatorsView( QWidget * _parent )
 
 
 
-////////////////////////////////////
-//                                //
-// whatsthis-information strings  //
-//                                //
-////////////////////////////////////
-
-	m_osc1CrsKnob -> setWhatsThis( tr( "The CRS knob changes the tuning of oscillator 1 in semitone steps. " ) );
-	m_osc2CrsKnob -> setWhatsThis( tr( "The CRS knob changes the tuning of oscillator 2 in semitone steps. " ) );
-	m_osc3CrsKnob -> setWhatsThis( tr( "The CRS knob changes the tuning of oscillator 3 in semitone steps. " ) );
-	m_osc1FtlKnob -> setWhatsThis( tr( "FTL and FTR change the finetuning of the oscillator for left and right "
-										"channels respectively. These can add stereo-detuning to the oscillator "
-										"which widens the stereo image and causes an illusion of space. " ) );
-	m_osc1FtrKnob -> setWhatsThis( tr( "FTL and FTR change the finetuning of the oscillator for left and right "
-										"channels respectively. These can add stereo-detuning to the oscillator "
-										"which widens the stereo image and causes an illusion of space. " ) );
-	m_osc2FtlKnob -> setWhatsThis( tr( "FTL and FTR change the finetuning of the oscillator for left and right "
-										"channels respectively. These can add stereo-detuning to the oscillator "
-										"which widens the stereo image and causes an illusion of space. " ) );
-	m_osc2FtrKnob -> setWhatsThis( tr( "FTL and FTR change the finetuning of the oscillator for left and right "
-										"channels respectively. These can add stereo-detuning to the oscillator "
-										"which widens the stereo image and causes an illusion of space. " ) );
-	m_osc1SpoKnob -> setWhatsThis( tr( "The SPO knob modifies the difference in phase between left and right "
-										"channels. Higher difference creates a wider stereo image. " ) );
-	m_osc2SpoKnob -> setWhatsThis( tr( "The SPO knob modifies the difference in phase between left and right "
-										"channels. Higher difference creates a wider stereo image. " ) );
-	m_osc3SpoKnob -> setWhatsThis( tr( "The SPO knob modifies the difference in phase between left and right "
-										"channels. Higher difference creates a wider stereo image. " ) );
-	m_osc1PwKnob -> setWhatsThis( tr( "The PW knob controls the pulse width, also known as duty cycle, "
-										"of oscillator 1. Oscillator 1 is a digital pulse wave oscillator, "
-										"it doesn't produce bandlimited output, which means that you can "
-										"use it as an audible oscillator but it will cause aliasing. You can "
-										"also use it as an inaudible source of a sync signal, which can be "
-										"used to synchronize oscillators 2 and 3. " ) );
-	m_osc1SSRButton -> setWhatsThis( tr( "Send Sync on Rise: When enabled, the Sync signal is sent every time "
-										"the state of oscillator 1 changes from low to high, ie. when the amplitude "
-										"changes from -1 to 1. "
-										"Oscillator 1's pitch, phase and pulse width may affect the timing of syncs, "
-										"but its volume has no effect on them. Sync signals are sent independently "
-										"for both left and right channels. " ) );
-	m_osc1SSFButton -> setWhatsThis( tr( "Send Sync on Fall: When enabled, the Sync signal is sent every time "
-										"the state of oscillator 1 changes from high to low, ie. when the amplitude "
-										"changes from 1 to -1. "
-										"Oscillator 1's pitch, phase and pulse width may affect the timing of syncs, "
-										"but its volume has no effect on them. Sync signals are sent independently "
-										"for both left and right channels. " ) );
-	m_osc2SyncHButton -> setWhatsThis( tr( "Hard sync: Every time the oscillator receives a sync signal from oscillator 1, "
-											"its phase is reset to 0 + whatever its phase offset is. " ) );
-	m_osc3SyncHButton -> setWhatsThis( tr( "Hard sync: Every time the oscillator receives a sync signal from oscillator 1, "
-											"its phase is reset to 0 + whatever its phase offset is. " ) );
-	m_osc2SyncRButton -> setWhatsThis( tr( "Reverse sync: Every time the oscillator receives a sync signal from oscillator 1, "
-											"the amplitude of the oscillator gets inverted. " ) );
-	m_osc3SyncRButton -> setWhatsThis( tr( "Reverse sync: Every time the oscillator receives a sync signal from oscillator 1, "
-											"the amplitude of the oscillator gets inverted. " ) );
-	m_osc2WaveBox -> setWhatsThis( tr( "Choose waveform for oscillator 2. " ) );
-	m_osc3Wave1Box -> setWhatsThis( tr( "Choose waveform for oscillator 3's first sub-osc. "
-										"Oscillator 3 can smoothly interpolate between two different waveforms. " ) );
-	m_osc3Wave2Box -> setWhatsThis( tr( "Choose waveform for oscillator 3's second sub-osc. "
-										"Oscillator 3 can smoothly interpolate between two different waveforms. " ) );
-	m_osc3SubKnob -> setWhatsThis( tr( "The SUB knob changes the mixing ratio of the two sub-oscs of oscillator 3. "
-										"Each sub-osc can be set to produce a different waveform, and oscillator 3 "
-										"can smoothly interpolate between them. All incoming modulations to oscillator 3 are applied "
-										"to both sub-oscs/waveforms in the exact same way. " ) );
-	m_mixButton -> setWhatsThis( tr( "In addition to dedicated modulators, Monstro allows oscillator 3 to be modulated by "
-									"the output of oscillator 2. \n\n"
-									"Mix mode means no modulation: the outputs of the oscillators are simply mixed together. " ) );
-	m_amButton -> setWhatsThis( tr( "In addition to dedicated modulators, Monstro allows oscillator 3 to be modulated by "
-									"the output of oscillator 2. \n\n"
-									"AM means amplitude modulation: Oscillator 3's amplitude (volume) is modulated by oscillator 2. " ) );
-	m_fmButton -> setWhatsThis( tr( "In addition to dedicated modulators, Monstro allows oscillator 3 to be modulated by "
-									"the output of oscillator 2. \n\n"
-									"FM means frequency modulation: Oscillator 3's frequency (pitch) is modulated by oscillator 2. "
-									"The frequency modulation is implemented as phase modulation, which gives a more stable overall pitch "
-									"than \"pure\" frequency modulation. " ) );
-	m_pmButton -> setWhatsThis( tr( "In addition to dedicated modulators, Monstro allows oscillator 3 to be modulated by "
-									"the output of oscillator 2. \n\n"
-									"PM means phase modulation: Oscillator 3's phase is modulated by oscillator 2. "
-									"It differs from frequency modulation in that the phase changes are not cumulative. " ) );
-	m_lfo1WaveBox -> setWhatsThis( tr( "Select the waveform for LFO 1. \n"
-										"\"Random\" and \"Random smooth\" are special waveforms: "
-										"they produce random output, where the rate of the LFO controls how often "
-										"the state of the LFO changes. The smooth version interpolates between these "
-										"states with cosine interpolation. These random modes can be used to give "
-										"\"life\" to your presets - add some of that analog unpredictability... " ) );
-	m_lfo2WaveBox -> setWhatsThis( tr( "Select the waveform for LFO 2. \n"
-										"\"Random\" and \"Random smooth\" are special waveforms: "
-										"they produce random output, where the rate of the LFO controls how often "
-										"the state of the LFO changes. The smooth version interpolates between these "
-										"states with cosine interpolation. These random modes can be used to give "
-										"\"life\" to your presets - add some of that analog unpredictability... " ) );
-	m_lfo1AttKnob -> setWhatsThis( tr( "Attack causes the LFO to come on gradually from the start of the note. " ) );
-	m_lfo2AttKnob -> setWhatsThis( tr( "Attack causes the LFO to come on gradually from the start of the note. " ) );
-	m_lfo1RateKnob -> setWhatsThis( tr( "Rate sets the speed of the LFO, measured in milliseconds per cycle. Can be synced to tempo. " ) );
-	m_lfo2RateKnob -> setWhatsThis( tr( "Rate sets the speed of the LFO, measured in milliseconds per cycle. Can be synced to tempo. " ) );
-	m_lfo1PhsKnob -> setWhatsThis( tr( "PHS controls the phase offset of the LFO. " ) );
-	m_lfo2PhsKnob -> setWhatsThis( tr( "PHS controls the phase offset of the LFO. " ) );
-
-	m_env1PreKnob -> setWhatsThis( tr( "PRE, or pre-delay, delays the start of the envelope from the start of the note. 0 means no delay. " ) );
-	m_env2PreKnob -> setWhatsThis( tr( "PRE, or pre-delay, delays the start of the envelope from the start of the note. 0 means no delay. " ) );
-	m_env1AttKnob -> setWhatsThis( tr( "ATT, or attack, controls how fast the envelope ramps up at start, measured in milliseconds. "
-										"A value of 0 means instant. " ) );
-	m_env2AttKnob -> setWhatsThis( tr( "ATT, or attack, controls how fast the envelope ramps up at start, measured in milliseconds. "
-										"A value of 0 means instant. " ) );
-	m_env1HoldKnob -> setWhatsThis( tr( "HOLD controls how long the envelope stays at peak after the attack phase. " ) );
-	m_env2HoldKnob -> setWhatsThis( tr( "HOLD controls how long the envelope stays at peak after the attack phase. " ) );
-	m_env1DecKnob -> setWhatsThis( tr( "DEC, or decay, controls how fast the envelope falls off from its peak, measured in milliseconds "
-										"it would take to go from peak to zero. The actual decay may be shorter if sustain is used. ") );
-	m_env2DecKnob -> setWhatsThis( tr( "DEC, or decay, controls how fast the envelope falls off from its peak, measured in milliseconds "
-										"it would take to go from peak to zero. The actual decay may be shorter if sustain is used. ") );
-	m_env1SusKnob -> setWhatsThis( tr( "SUS, or sustain, controls the sustain level of the envelope. The decay phase will not go below this level "
-										"as long as the note is held. " ) );
-	m_env2SusKnob -> setWhatsThis( tr( "SUS, or sustain, controls the sustain level of the envelope. The decay phase will not go below this level "
-										"as long as the note is held. " ) );
-	m_env1RelKnob -> setWhatsThis( tr( "REL, or release, controls how long the release is for the note, measured in how long it would take to "
-										"fall from peak to zero. Actual release may be shorter, depending on at what phase the note is released. ") );
-	m_env2RelKnob -> setWhatsThis( tr( "REL, or release, controls how long the release is for the note, measured in how long it would take to "
-										"fall from peak to zero. Actual release may be shorter, depending on at what phase the note is released. ") );
-	m_env1SlopeKnob -> setWhatsThis( tr( "The slope knob controls the curve or shape of the envelope. A value of 0 creates straight rises and falls. "
-											"Negative values create curves that start slowly, peak quickly and fall of slowly again. "
-											"Positive values create curves that start and end quickly, and stay longer near the peaks. " ) );
-	m_env2SlopeKnob -> setWhatsThis( tr( "The slope knob controls the curve or shape of the envelope. A value of 0 creates straight rises and falls. "
-											"Negative values create curves that start slowly, peak quickly and fall of slowly again. "
-											"Positive values create curves that start and end quickly, and stay longer near the peaks. " ) );
 	return( view );
 }
 
@@ -1965,9 +1827,9 @@ extern "C"
 {
 
 // necessary for getting instance out of shared lib
-Plugin * PLUGIN_EXPORT lmms_plugin_main( Model *, void * _data )
+PLUGIN_EXPORT Plugin * lmms_plugin_main( Model *m, void * )
 {
-	return new MonstroInstrument( static_cast<InstrumentTrack *>( _data ) );
+	return new MonstroInstrument( static_cast<InstrumentTrack *>( m ) );
 }
 
 

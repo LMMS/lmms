@@ -130,19 +130,6 @@ PianoView::PianoView( QWidget * _parent ) :
 
 }
 
-
-
-
-/*! \brief Destroy this piano display view
- *
- */
-PianoView::~PianoView()
-{
-}
-
-
-
-
 /*! \brief Map a keyboard key being pressed to a note in our keyboard view
  *
  *  \param _k The keyboard scan code of the key being pressed.
@@ -200,7 +187,7 @@ int PianoView::getKeyFromKeyEvent( QKeyEvent * _ke )
 		case 27: return 31; // ]
 	}
 #endif
-#if defined(LMMS_BUILD_LINUX) || defined(LMMS_BUILD_OPENBSD)
+#if defined(LMMS_BUILD_LINUX) || defined(LMMS_BUILD_OPENBSD) || defined(LMMS_BUILD_FREEBSD)
 	switch( k )
 	{
 		case 52: return 0; // Z  = C
@@ -368,7 +355,7 @@ int PianoView::getKeyFromMouse( const QPoint & _p ) const
 	}
 
 	// some range-checking-stuff
-	return tLimit( key_num, 0, NumKeys - 1 );
+	return qBound( 0, key_num, NumKeys - 1 );
 }
 
 
@@ -686,9 +673,16 @@ void PianoView::focusOutEvent( QFocusEvent * )
 		m_piano->midiEventProcessor()->processInEvent( MidiEvent( MidiNoteOff, -1, i, 0 ) );
 		m_piano->setKeyState( i, false );
 	}
+
+
 	update();
 }
 
+
+void PianoView::focusInEvent( QFocusEvent * )
+{
+	m_piano->instrumentTrack()->autoAssignMidiDevice(true);
+}
 
 
 

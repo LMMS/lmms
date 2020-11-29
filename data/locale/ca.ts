@@ -8756,7 +8756,7 @@ Fent doble clic a qualsevol connector mostrarà informació sobre els ports.</tr
     </message>
 </context>
 <context>
-    <name>papuInstrument</name>
+    <name>FreeBoyInstrument</name>
     <message>
         <source>Sweep time</source>
         <translation type="unfinished"/>
@@ -8851,7 +8851,7 @@ Fent doble clic a qualsevol connector mostrarà informació sobre els ports.</tr
     </message>
 </context>
 <context>
-    <name>papuInstrumentView</name>
+    <name>FreeBoyInstrumentView</name>
     <message>
         <source>Sweep Time:</source>
         <translation type="unfinished"/>

@@ -40,7 +40,7 @@
 LadspaManager::LadspaManager()
 {
 	// Make sure plugin search paths are set up
-	PluginFactory::instance();
+	PluginFactory::setupSearchPaths();
 
 	QStringList ladspaDirectories = QString( getenv( "LADSPA_PATH" ) ).
 								split( LADSPA_PATH_SEPERATOR );
@@ -59,6 +59,8 @@ LadspaManager::LadspaManager()
 	for( QStringList::iterator it = ladspaDirectories.begin(); 
 			 		   it != ladspaDirectories.end(); ++it )
 	{
+		// Skip empty entries as QDir will interpret it as the working directory
+		if ((*it).isEmpty()) { continue; }
 		QDir directory( ( *it ) );
 		QFileInfoList list = directory.entryInfoList();
 		for( QFileInfoList::iterator file = list.begin();
@@ -103,7 +105,7 @@ LadspaManager::LadspaManager()
 	{
 		m_sortedPlugins.append( qMakePair( getName( *it ), *it ) );
 	}
-	qSort( m_sortedPlugins );
+	std::sort( m_sortedPlugins.begin(), m_sortedPlugins.end() );
 }
 
 
@@ -235,6 +237,26 @@ uint16_t LadspaManager::getPluginOutputs(
 	return outputs;
 }
 
+const LADSPA_PortDescriptor* LadspaManager::getPortDescriptor(const ladspa_key_t &_plugin, uint32_t _port)
+{
+	const LADSPA_Descriptor * descriptor = getDescriptor( _plugin );
+	if( descriptor && _port < getPortCount( _plugin ) )
+	{
+		return( & descriptor->PortDescriptors[_port] );
+	}
+	return( NULL );
+}
+
+const LADSPA_PortRangeHint *LadspaManager::getPortRangeHint(const ladspa_key_t &_plugin, uint32_t _port)
+{
+	const LADSPA_Descriptor * descriptor = getDescriptor( _plugin );
+	if( descriptor && _port < getPortCount( _plugin ) )
+	{
+		return( & descriptor->PortRangeHints[_port] );
+	}
+	return( NULL );
+}
+
 
 
 
@@ -248,19 +270,8 @@ l_sortable_plugin_t LadspaManager::getSortedPlugins()
 
 QString LadspaManager::getLabel( const ladspa_key_t & _plugin )
 {
-	if( m_ladspaManagerMap.contains( _plugin ) )
-	{
-		LADSPA_Descriptor_Function descriptorFunction =
-			m_ladspaManagerMap[_plugin]->descriptorFunction;
-		const LADSPA_Descriptor * descriptor = 
-				descriptorFunction(
-					m_ladspaManagerMap[_plugin]->index );
-		return( QString( descriptor->Label ) );
-	}
-	else
-	{
-		return( QString( "" ) );
-	}
+	const LADSPA_Descriptor * descriptor = getDescriptor( _plugin );
+	return( descriptor ? descriptor->Label : "" );
 }
 
 
@@ -269,19 +280,9 @@ QString LadspaManager::getLabel( const ladspa_key_t & _plugin )
 bool LadspaManager::hasRealTimeDependency(
 					const ladspa_key_t &  _plugin )
 {
-	if( m_ladspaManagerMap.contains( _plugin ) )
-	{
-		LADSPA_Descriptor_Function descriptorFunction =
-			m_ladspaManagerMap[_plugin]->descriptorFunction;
-		const LADSPA_Descriptor * descriptor =
-				descriptorFunction(
-					m_ladspaManagerMap[_plugin]->index );
-		return( LADSPA_IS_REALTIME( descriptor->Properties ) );
-	}
-	else
-	{
-		return( false );
-	}
+	const LADSPA_Descriptor * descriptor = getDescriptor( _plugin );
+	return( descriptor ? LADSPA_IS_REALTIME( descriptor->Properties )
+					   : false );
 }
 
 
@@ -289,19 +290,9 @@ bool LadspaManager::hasRealTimeDependency(
 
 bool LadspaManager::isInplaceBroken( const ladspa_key_t &  _plugin )
 {
-	if( m_ladspaManagerMap.contains( _plugin ) )
-	{
-		LADSPA_Descriptor_Function descriptorFunction =
-			m_ladspaManagerMap[_plugin]->descriptorFunction;
-		const LADSPA_Descriptor * descriptor =
-				descriptorFunction(
-					m_ladspaManagerMap[_plugin]->index );
-		return( LADSPA_IS_INPLACE_BROKEN( descriptor->Properties ) );
-	}
-	else
-	{
-		return( false );
-	}
+	const LADSPA_Descriptor * descriptor = getDescriptor( _plugin );
+	return( descriptor ? LADSPA_IS_INPLACE_BROKEN( descriptor->Properties )
+					   : false );
 }
 
 
@@ -310,19 +301,9 @@ bool LadspaManager::isInplaceBroken( const ladspa_key_t &  _plugin )
 bool LadspaManager::isRealTimeCapable(
 					const ladspa_key_t &  _plugin )
 {
-	if( m_ladspaManagerMap.contains( _plugin ) )
-	{
-		LADSPA_Descriptor_Function descriptorFunction =
-			m_ladspaManagerMap[_plugin]->descriptorFunction;
-		const LADSPA_Descriptor * descriptor =
-				descriptorFunction(
-					m_ladspaManagerMap[_plugin]->index );
-		return( LADSPA_IS_HARD_RT_CAPABLE( descriptor->Properties ) );
-	}
-	else
-	{
-		return( false );
-	}
+	const LADSPA_Descriptor * descriptor = getDescriptor( _plugin );
+	return( descriptor ? LADSPA_IS_HARD_RT_CAPABLE( descriptor->Properties )
+					   : false );
 }
 
 
@@ -330,19 +311,8 @@ bool LadspaManager::isRealTimeCapable(
 
 QString LadspaManager::getName( const ladspa_key_t & _plugin )
 {
-	if( m_ladspaManagerMap.contains( _plugin ) )
-	{
-		LADSPA_Descriptor_Function descriptorFunction =
-			m_ladspaManagerMap[_plugin]->descriptorFunction;
-		const LADSPA_Descriptor * descriptor =
-				descriptorFunction(
-					m_ladspaManagerMap[_plugin]->index );
-		return( QString( descriptor->Name ) );
-	}
-	else
-	{
-		return( QString( "" ) );
-	}
+	const LADSPA_Descriptor * descriptor = getDescriptor( _plugin );
+	return( descriptor ? descriptor->Name : "" );
 }
 
 
@@ -350,19 +320,8 @@ QString LadspaManager::getName( const ladspa_key_t & _plugin )
 
 QString LadspaManager::getMaker( const ladspa_key_t & _plugin )
 {
-	if( m_ladspaManagerMap.contains( _plugin ) )
-	{
-		LADSPA_Descriptor_Function descriptorFunction =
-			m_ladspaManagerMap[_plugin]->descriptorFunction;
-		const LADSPA_Descriptor * descriptor =
-				descriptorFunction(
-					m_ladspaManagerMap[_plugin]->index );
-		return( QString( descriptor->Maker ) );
-	}
-	else
-	{
-		return( QString( "" ) );
-	}
+	const LADSPA_Descriptor * descriptor = getDescriptor( _plugin );
+	return( descriptor ? descriptor->Maker : "" );
 }
 
 
@@ -370,19 +329,8 @@ QString LadspaManager::getMaker( const ladspa_key_t & _plugin )
 
 QString LadspaManager::getCopyright( const ladspa_key_t & _plugin )
 {
-	if( m_ladspaManagerMap.contains( _plugin ) )
-	{
-		LADSPA_Descriptor_Function descriptorFunction =
-			m_ladspaManagerMap[_plugin]->descriptorFunction;
-		const LADSPA_Descriptor * descriptor =
-				descriptorFunction(
-					m_ladspaManagerMap[_plugin]->index );
-		return( QString( descriptor->Copyright ) );
-	}
-	else
-	{
-		return( QString( "" ) );
-	}
+	const LADSPA_Descriptor * descriptor = getDescriptor( _plugin );
+	return( descriptor ? descriptor->Copyright : "" );
 }
 
 
@@ -390,19 +338,8 @@ QString LadspaManager::getCopyright( const ladspa_key_t & _plugin )
 
 uint32_t LadspaManager::getPortCount( const ladspa_key_t & _plugin )
 {
-	if( m_ladspaManagerMap.contains( _plugin ) )
-	{
-		LADSPA_Descriptor_Function descriptorFunction =
-			m_ladspaManagerMap[_plugin]->descriptorFunction;
-		const LADSPA_Descriptor * descriptor =
-				descriptorFunction(
-					m_ladspaManagerMap[_plugin]->index );
-		return( descriptor->PortCount );
-	}
-	else
-	{
-		return( 0 );
-	}
+	const LADSPA_Descriptor * descriptor = getDescriptor( _plugin );
+	return( descriptor ? descriptor->PortCount : 0 );
 }
 
 
@@ -411,22 +348,8 @@ uint32_t LadspaManager::getPortCount( const ladspa_key_t & _plugin )
 bool LadspaManager::isPortInput( const ladspa_key_t & _plugin,
 								uint32_t _port )
 {
-	if( m_ladspaManagerMap.contains( _plugin ) 
-		&& _port < getPortCount( _plugin ) )
-	{
-		LADSPA_Descriptor_Function descriptorFunction =
-			m_ladspaManagerMap[_plugin]->descriptorFunction;
-		const LADSPA_Descriptor * descriptor =
-				descriptorFunction(
-					m_ladspaManagerMap[_plugin]->index );
-		
-		return( LADSPA_IS_PORT_INPUT
-				( descriptor->PortDescriptors[_port] ) );
-	}
-	else
-	{
-		return( false );
-	}
+	const auto * descriptor = getPortDescriptor( _plugin, _port );
+	return( descriptor && LADSPA_IS_PORT_INPUT( * descriptor ) );
 }
 
 
@@ -435,22 +358,8 @@ bool LadspaManager::isPortInput( const ladspa_key_t & _plugin,
 bool LadspaManager::isPortOutput( const ladspa_key_t & _plugin,
 								uint32_t _port )
 {
-	if( m_ladspaManagerMap.contains( _plugin ) 
-		   && _port < getPortCount( _plugin ) )
-	{
-		LADSPA_Descriptor_Function descriptorFunction =
-			m_ladspaManagerMap[_plugin]->descriptorFunction;
-		const LADSPA_Descriptor * descriptor =
-				descriptorFunction(
-					m_ladspaManagerMap[_plugin]->index );
-		
-		return( LADSPA_IS_PORT_OUTPUT
-				( descriptor->PortDescriptors[_port] ) );
-	}
-	else
-	{
-		return( false );
-	}
+	const auto * descriptor = getPortDescriptor( _plugin, _port );
+	return( descriptor && LADSPA_IS_PORT_OUTPUT( * descriptor ) );
 }
 
 
@@ -459,22 +368,8 @@ bool LadspaManager::isPortOutput( const ladspa_key_t & _plugin,
 bool LadspaManager::isPortAudio( const ladspa_key_t & _plugin,
 								uint32_t _port )
 {
-	if( m_ladspaManagerMap.contains( _plugin ) 
-		   && _port < getPortCount( _plugin ) )
-	{
-		LADSPA_Descriptor_Function descriptorFunction =
-			m_ladspaManagerMap[_plugin]->descriptorFunction;
-		const LADSPA_Descriptor * descriptor =
-				descriptorFunction(
-					m_ladspaManagerMap[_plugin]->index );
-		
-		return( LADSPA_IS_PORT_AUDIO
-				( descriptor->PortDescriptors[_port] ) );
-	}
-	else
-	{
-		return( false );
-	}
+	const auto * descriptor = getPortDescriptor( _plugin, _port );
+	return( descriptor && LADSPA_IS_PORT_AUDIO( * descriptor ) );
 }
 
 
@@ -483,22 +378,8 @@ bool LadspaManager::isPortAudio( const ladspa_key_t & _plugin,
 bool LadspaManager::isPortControl( const ladspa_key_t & _plugin,
 								uint32_t _port )
 {
-	if( m_ladspaManagerMap.contains( _plugin ) 
-		   && _port < getPortCount( _plugin ) )
-	{
-		LADSPA_Descriptor_Function descriptorFunction =
-			m_ladspaManagerMap[_plugin]->descriptorFunction;
-		const LADSPA_Descriptor * descriptor =
-				descriptorFunction(
-					m_ladspaManagerMap[_plugin]->index );
-		
-		return( LADSPA_IS_PORT_CONTROL
-				( descriptor->PortDescriptors[_port] ) );
-	}
-	else
-	{
-		return( false );
-	}
+	const auto * descriptor = getPortDescriptor( _plugin, _port );
+	return( descriptor && LADSPA_IS_PORT_CONTROL( * descriptor ) );
 }
 
 
@@ -508,22 +389,8 @@ bool LadspaManager::areHintsSampleRateDependent(
 						const ladspa_key_t & _plugin, 
 								uint32_t _port )
 {
-	if( m_ladspaManagerMap.contains( _plugin ) 
-		   && _port < getPortCount( _plugin ) )
-	{
-		LADSPA_Descriptor_Function descriptorFunction =
-			m_ladspaManagerMap[_plugin]->descriptorFunction;
-		const LADSPA_Descriptor * descriptor =
-				descriptorFunction(
-					m_ladspaManagerMap[_plugin]->index );
-		LADSPA_PortRangeHintDescriptor hintDescriptor =
-			descriptor->PortRangeHints[_port].HintDescriptor;
-		return( LADSPA_IS_HINT_SAMPLE_RATE ( hintDescriptor ) );
-	}
-	else
-	{
-		return( false );
-	}
+	const auto* portRangeHint = getPortRangeHint( _plugin, _port );
+	return portRangeHint && LADSPA_IS_HINT_SAMPLE_RATE( portRangeHint->HintDescriptor );
 }
 
 
@@ -532,59 +399,26 @@ bool LadspaManager::areHintsSampleRateDependent(
 float LadspaManager::getLowerBound( const ladspa_key_t & _plugin,
 								uint32_t _port )
 {
-	if( m_ladspaManagerMap.contains( _plugin ) 
-		   && _port < getPortCount( _plugin ) )
+	const auto* portRangeHint = getPortRangeHint( _plugin, _port );
+	if( portRangeHint && LADSPA_IS_HINT_BOUNDED_BELOW( portRangeHint->HintDescriptor ) )
 	{
-		LADSPA_Descriptor_Function descriptorFunction =
-			m_ladspaManagerMap[_plugin]->descriptorFunction;
-		const LADSPA_Descriptor * descriptor =
-				descriptorFunction(
-					m_ladspaManagerMap[_plugin]->index );
-		LADSPA_PortRangeHintDescriptor hintDescriptor =
-			descriptor->PortRangeHints[_port].HintDescriptor;
-		if( LADSPA_IS_HINT_BOUNDED_BELOW( hintDescriptor ) )
-		{
-			return( descriptor->PortRangeHints[_port].LowerBound );
-		}
-		else
-		{
-			return( NOHINT );
-		}
+		return( portRangeHint->LowerBound );
 	}
-	else
-	{
-		return( NOHINT );
-	}
+	return( NOHINT );
 }
 
 
 
 
-float LadspaManager::getUpperBound( const ladspa_key_t & _plugin,									uint32_t _port )
+float LadspaManager::getUpperBound( const ladspa_key_t & _plugin,
+									uint32_t _port )
 {
-	if( m_ladspaManagerMap.contains( _plugin ) 
-		   && _port < getPortCount( _plugin ) )
+	const auto* portRangeHint = getPortRangeHint( _plugin, _port );
+	if( portRangeHint && LADSPA_IS_HINT_BOUNDED_ABOVE( portRangeHint->HintDescriptor ) )
 	{
-		LADSPA_Descriptor_Function descriptorFunction =
-			m_ladspaManagerMap[_plugin]->descriptorFunction;
-		const LADSPA_Descriptor * descriptor =
-				descriptorFunction(
-					m_ladspaManagerMap[_plugin]->index );
-		LADSPA_PortRangeHintDescriptor hintDescriptor =
-			descriptor->PortRangeHints[_port].HintDescriptor;
-		if( LADSPA_IS_HINT_BOUNDED_ABOVE( hintDescriptor ) )
-		{
-			return( descriptor->PortRangeHints[_port].UpperBound );
-		}
-		else
-		{
-			return( NOHINT );
-		}
+		return( portRangeHint->UpperBound );
 	}
-	else
-	{
-		return( NOHINT );
-	}
+	return( NOHINT );
 }
 
 
@@ -593,22 +427,8 @@ float LadspaManager::getUpperBound( const ladspa_key_t & _plugin,									uint32
 bool LadspaManager::isPortToggled( const ladspa_key_t & _plugin,
 								uint32_t _port )
 {
-	if( m_ladspaManagerMap.contains( _plugin ) 
-		   && _port < getPortCount( _plugin ) )
-	{
-		LADSPA_Descriptor_Function descriptorFunction =
-			m_ladspaManagerMap[_plugin]->descriptorFunction;
-		const LADSPA_Descriptor * descriptor =
-				descriptorFunction(
-					m_ladspaManagerMap[_plugin]->index );
-		LADSPA_PortRangeHintDescriptor hintDescriptor =
-			descriptor->PortRangeHints[_port].HintDescriptor;
-		return( LADSPA_IS_HINT_TOGGLED( hintDescriptor ) );
-	}
-	else
-	{
-		return( false );
-	}
+	const auto* portRangeHint = getPortRangeHint( _plugin, _port );
+	return( portRangeHint && LADSPA_IS_HINT_TOGGLED( portRangeHint->HintDescriptor ) );
 }
 
 
@@ -617,69 +437,54 @@ bool LadspaManager::isPortToggled( const ladspa_key_t & _plugin,
 float LadspaManager::getDefaultSetting( const ladspa_key_t & _plugin,
 							uint32_t _port )
 {
-	if( m_ladspaManagerMap.contains( _plugin ) 
-		   && _port < getPortCount( _plugin ) )
+	const auto* portRangeHint = getPortRangeHint( _plugin, _port );
+	if( portRangeHint )
 	{
-		LADSPA_Descriptor_Function descriptorFunction =
-			m_ladspaManagerMap[_plugin]->descriptorFunction;
-		const LADSPA_Descriptor * descriptor =
-				descriptorFunction(
-					m_ladspaManagerMap[_plugin]->index );
-		LADSPA_PortRangeHintDescriptor hintDescriptor =
-			descriptor->PortRangeHints[_port].HintDescriptor;
+		LADSPA_PortRangeHintDescriptor hintDescriptor = portRangeHint->HintDescriptor;
 		switch( hintDescriptor & LADSPA_HINT_DEFAULT_MASK ) 
 		{
 			case LADSPA_HINT_DEFAULT_NONE:
 				return( NOHINT );
 			case LADSPA_HINT_DEFAULT_MINIMUM:
-				return( descriptor->PortRangeHints[_port].
-								LowerBound );
+				return( portRangeHint->LowerBound );
 			case LADSPA_HINT_DEFAULT_LOW:
 				if( LADSPA_IS_HINT_LOGARITHMIC
 							( hintDescriptor ) )
 				{
-					return( exp( log( descriptor->PortRangeHints[_port].LowerBound ) 
-						* 0.75
-						+ log( descriptor->PortRangeHints[_port].UpperBound ) 
-						* 0.25 ) );
+					return( exp( log( portRangeHint->LowerBound ) * 0.75 +
+								 log( portRangeHint->UpperBound ) * 0.25 ) );
 				}
 				else 
 				{
-					return( descriptor->PortRangeHints[_port].LowerBound
-						* 0.75
-						+ descriptor->PortRangeHints[_port].UpperBound
-						* 0.25 );
+					return( portRangeHint->LowerBound * 0.75 +
+							portRangeHint->UpperBound * 0.25 );
 				}
 			case LADSPA_HINT_DEFAULT_MIDDLE:
 				if( LADSPA_IS_HINT_LOGARITHMIC
 						( hintDescriptor ) ) 
 				{
-					return( sqrt( descriptor->PortRangeHints[_port].LowerBound
-						* descriptor->PortRangeHints[_port].UpperBound ) );
+					return( sqrt( portRangeHint->LowerBound
+								  * portRangeHint->UpperBound ) );
 				}
 				else 
 				{
-					return( 0.5 * ( descriptor->PortRangeHints[_port].LowerBound
-							+ descriptor->PortRangeHints[_port].UpperBound ) );
+					return( 0.5 * ( portRangeHint->LowerBound
+							+ portRangeHint->UpperBound ) );
 				}
 			case LADSPA_HINT_DEFAULT_HIGH:
 				if( LADSPA_IS_HINT_LOGARITHMIC
 						( hintDescriptor ) ) 
 				{
-					return( exp( log( descriptor->PortRangeHints[_port].LowerBound ) 
-						* 0.25
-						+ log( descriptor->PortRangeHints[_port].UpperBound ) 
-						* 0.75 ) );
+					return( exp( log( portRangeHint->LowerBound ) * 0.25 +
+								 log( portRangeHint->UpperBound ) * 0.75 ) );
 				}
 				else 
 				{
-					return( descriptor->PortRangeHints[_port].LowerBound
-						* 0.25
-						+ descriptor->PortRangeHints[_port].UpperBound
-						* 0.75 );
+					return( portRangeHint->LowerBound * 0.25 +
+							portRangeHint->UpperBound * 0.75 );
 				}
 			case LADSPA_HINT_DEFAULT_MAXIMUM:
-				return( descriptor->PortRangeHints[_port].UpperBound );
+				return( portRangeHint->UpperBound );
 			case LADSPA_HINT_DEFAULT_0:
 				return( 0.0 );
 			case LADSPA_HINT_DEFAULT_1:
@@ -704,22 +509,8 @@ float LadspaManager::getDefaultSetting( const ladspa_key_t & _plugin,
 bool LadspaManager::isLogarithmic( const ladspa_key_t & _plugin,
 								uint32_t _port )
 {
-	if( m_ladspaManagerMap.contains( _plugin ) 
-		   && _port < getPortCount( _plugin ) )
-	{
-		LADSPA_Descriptor_Function descriptorFunction =
-			m_ladspaManagerMap[_plugin]->descriptorFunction;
-		const LADSPA_Descriptor * descriptor =
-				descriptorFunction(
-					m_ladspaManagerMap[_plugin]->index );
-		LADSPA_PortRangeHintDescriptor hintDescriptor =
-			descriptor->PortRangeHints[_port].HintDescriptor;
-		return( LADSPA_IS_HINT_LOGARITHMIC( hintDescriptor ) );
-	}
-	else
-	{
-		return( false );
-	}
+	const auto* portRangeHint = getPortRangeHint( _plugin, _port );
+	return( portRangeHint && LADSPA_IS_HINT_LOGARITHMIC( portRangeHint->HintDescriptor ) );
 }
 
 
@@ -728,7 +519,16 @@ bool LadspaManager::isLogarithmic( const ladspa_key_t & _plugin,
 bool LadspaManager::isInteger( const ladspa_key_t & _plugin,
 								uint32_t _port )
 {
-	if( m_ladspaManagerMap.contains( _plugin ) 
+	const auto* portRangeHint = getPortRangeHint( _plugin, _port );
+	return( portRangeHint && LADSPA_IS_HINT_INTEGER( portRangeHint->HintDescriptor ) );
+}
+
+
+
+
+bool LadspaManager::isEnum( const ladspa_key_t & _plugin, uint32_t _port )
+{
+	if( m_ladspaManagerMap.contains( _plugin )
 		   && _port < getPortCount( _plugin ) )
 	{
 		LADSPA_Descriptor_Function descriptorFunction =
@@ -738,7 +538,9 @@ bool LadspaManager::isInteger( const ladspa_key_t & _plugin,
 					m_ladspaManagerMap[_plugin]->index );
 		LADSPA_PortRangeHintDescriptor hintDescriptor =
 			descriptor->PortRangeHints[_port].HintDescriptor;
-		return( LADSPA_IS_HINT_INTEGER( hintDescriptor ) );
+		// This is an LMMS extension to ladspa
+		return( LADSPA_IS_HINT_INTEGER( hintDescriptor ) &&
+			LADSPA_IS_HINT_TOGGLED( hintDescriptor ) );
 	}
 	else
 	{
@@ -752,21 +554,8 @@ bool LadspaManager::isInteger( const ladspa_key_t & _plugin,
 QString LadspaManager::getPortName( const ladspa_key_t & _plugin,
 								uint32_t _port )
 {
-	if( m_ladspaManagerMap.contains( _plugin ) &&
-					_port < getPortCount( _plugin ) )
-	{
-		LADSPA_Descriptor_Function descriptorFunction =
-			m_ladspaManagerMap[_plugin]->descriptorFunction;
-		const LADSPA_Descriptor * descriptor =
-				descriptorFunction(
-					m_ladspaManagerMap[_plugin]->index );
-
-		return( QString( descriptor->PortNames[_port] ) );
-	}
-	else
-	{
-		return( QString( "" ) );
-	}
+	const LADSPA_Descriptor * descriptor = getDescriptor( _plugin );
+	return( descriptor ? descriptor->PortNames[_port] : QString( "" ) );
 }
 
 
@@ -775,19 +564,8 @@ QString LadspaManager::getPortName( const ladspa_key_t & _plugin,
 const void * LadspaManager::getImplementationData(
 						const ladspa_key_t & _plugin )
 {
-	if( m_ladspaManagerMap.contains( _plugin ) )
-	{
-		LADSPA_Descriptor_Function descriptorFunction =
-			m_ladspaManagerMap[_plugin]->descriptorFunction;
-		const LADSPA_Descriptor * descriptor =
-				descriptorFunction(
-					m_ladspaManagerMap[_plugin]->index );
-		return( descriptor->ImplementationData );
-	}
-	else
-	{
-		return( NULL );
-	}
+	const LADSPA_Descriptor * descriptor = getDescriptor( _plugin );
+	return( descriptor ? descriptor->ImplementationData : NULL );
 }
 
 
@@ -818,20 +596,10 @@ LADSPA_Handle LadspaManager::instantiate(
 					const ladspa_key_t & _plugin, 
 							uint32_t _sample_rate )
 {
-	if( m_ladspaManagerMap.contains( _plugin ) )
-	{
-		LADSPA_Descriptor_Function descriptorFunction =
-			m_ladspaManagerMap[_plugin]->descriptorFunction;
-		const LADSPA_Descriptor * descriptor =
-				descriptorFunction(
-					m_ladspaManagerMap[_plugin]->index );
-		return( ( descriptor->instantiate )
-						( descriptor, _sample_rate ) );
-	}
-	else
-	{
-		return( NULL );
-	}
+	const LADSPA_Descriptor * descriptor = getDescriptor( _plugin );
+	return( descriptor ?
+				( descriptor->instantiate )( descriptor, _sample_rate ) :
+				NULL );
 }
 
 
@@ -842,20 +610,13 @@ bool LadspaManager::connectPort( const ladspa_key_t & _plugin,
 						uint32_t _port,
 						LADSPA_Data * _data_location )
 {
-	if( m_ladspaManagerMap.contains( _plugin ) 
-		&& _port < getPortCount( _plugin ) )
+	const LADSPA_Descriptor * descriptor = getDescriptor( _plugin );
+	if( descriptor && descriptor->connect_port != NULL &&
+			_port < getPortCount( _plugin ) )
 	{
-		LADSPA_Descriptor_Function descriptorFunction =
-			m_ladspaManagerMap[_plugin]->descriptorFunction;
-		const LADSPA_Descriptor * descriptor =
-				descriptorFunction(
-					m_ladspaManagerMap[_plugin]->index );
-		if( descriptor->connect_port != NULL )
-		{
-			( descriptor->connect_port )
-					( _instance, _port, _data_location );
-			return( true );
-		}
+		( descriptor->connect_port )
+				( _instance, _port, _data_location );
+		return( true );
 	}
 	return( false );
 }
@@ -866,18 +627,11 @@ bool LadspaManager::connectPort( const ladspa_key_t & _plugin,
 bool LadspaManager::activate( const ladspa_key_t & _plugin,
 					LADSPA_Handle _instance )
 {
-	if( m_ladspaManagerMap.contains( _plugin ) )
+	const LADSPA_Descriptor * descriptor = getDescriptor( _plugin );
+	if( descriptor && descriptor->activate != NULL )
 	{
-		LADSPA_Descriptor_Function descriptorFunction =
-			m_ladspaManagerMap[_plugin]->descriptorFunction;
-		const LADSPA_Descriptor * descriptor =
-				descriptorFunction(
-					m_ladspaManagerMap[_plugin]->index );
-		if( descriptor->activate != NULL )
-		{
-			( descriptor->activate ) ( _instance );
-			return( true );
-		}
+		( descriptor->activate ) ( _instance );
+		return( true );
 	}
 	return( false );
 }
@@ -889,18 +643,11 @@ bool LadspaManager::run( const ladspa_key_t & _plugin,
 							LADSPA_Handle _instance,
 							uint32_t _sample_count )
 {
-	if( m_ladspaManagerMap.contains( _plugin ) )
+	const LADSPA_Descriptor * descriptor = getDescriptor( _plugin );
+	if( descriptor && descriptor->run!= NULL )
 	{
-		LADSPA_Descriptor_Function descriptorFunction =
-			m_ladspaManagerMap[_plugin]->descriptorFunction;
-		const LADSPA_Descriptor * descriptor =
-				descriptorFunction(
-					m_ladspaManagerMap[_plugin]->index );
-		if( descriptor->run != NULL )
-		{
-			( descriptor->run ) ( _instance, _sample_count );
-			return( true );
-		}
+		( descriptor->run ) ( _instance, _sample_count );
+		return( true );
 	}
 	return( false );
 }
@@ -912,19 +659,12 @@ bool LadspaManager::runAdding( const ladspa_key_t & _plugin,
 						LADSPA_Handle _instance,
 						uint32_t _sample_count )
 {
-	if( m_ladspaManagerMap.contains( _plugin ) )
+	const LADSPA_Descriptor * descriptor = getDescriptor( _plugin );
+	if( descriptor && descriptor->run_adding!= NULL
+			&& descriptor->set_run_adding_gain != NULL )
 	{
-		LADSPA_Descriptor_Function descriptorFunction =
-			m_ladspaManagerMap[_plugin]->descriptorFunction;
-		const LADSPA_Descriptor * descriptor =
-				descriptorFunction(
-					m_ladspaManagerMap[_plugin]->index );
-		if( descriptor->run_adding != NULL &&
-			  	descriptor->set_run_adding_gain != NULL )
-		{
-			( descriptor->run_adding ) ( _instance, _sample_count );
-			return( true );
-		}
+		( descriptor->run_adding ) ( _instance, _sample_count );
+		return( true );
 	}
 	return( false );
 }
@@ -936,20 +676,12 @@ bool LadspaManager::setRunAddingGain( const ladspa_key_t & _plugin,
 						LADSPA_Handle _instance,
 						LADSPA_Data _gain )
 {
-	if( m_ladspaManagerMap.contains( _plugin ) )
+	const LADSPA_Descriptor * descriptor = getDescriptor( _plugin );
+	if( descriptor && descriptor->run_adding!= NULL
+			&& descriptor->set_run_adding_gain != NULL )
 	{
-		LADSPA_Descriptor_Function descriptorFunction =
-			m_ladspaManagerMap[_plugin]->descriptorFunction;
-		const LADSPA_Descriptor * descriptor =
-				descriptorFunction(
-					m_ladspaManagerMap[_plugin]->index );
-		if( descriptor->run_adding != NULL &&
-				  descriptor->set_run_adding_gain != NULL )
-		{
-			( descriptor->set_run_adding_gain )
-							( _instance, _gain );
-			return( true );
-		}
+		( descriptor->set_run_adding_gain ) ( _instance, _gain );
+		return( true );
 	}
 	return( false );
 }
@@ -960,18 +692,11 @@ bool LadspaManager::setRunAddingGain( const ladspa_key_t & _plugin,
 bool LadspaManager::deactivate( const ladspa_key_t & _plugin,
 						LADSPA_Handle _instance )
 {
-	if( m_ladspaManagerMap.contains( _plugin ) )
+	const LADSPA_Descriptor * descriptor = getDescriptor( _plugin );
+	if( descriptor && descriptor->deactivate!= NULL )
 	{
-		LADSPA_Descriptor_Function descriptorFunction =
-			m_ladspaManagerMap[_plugin]->descriptorFunction;
-		const LADSPA_Descriptor * descriptor =
-				descriptorFunction(
-					m_ladspaManagerMap[_plugin]->index );
-		if( descriptor->deactivate != NULL )
-		{
-			( descriptor->deactivate ) ( _instance );
-			return( true );
-		}
+		( descriptor->deactivate ) ( _instance );
+		return( true );
 	}
 	return( false );
 }
@@ -982,18 +707,11 @@ bool LadspaManager::deactivate( const ladspa_key_t & _plugin,
 bool LadspaManager::cleanup( const ladspa_key_t & _plugin,
 						LADSPA_Handle _instance )
 {
-	if( m_ladspaManagerMap.contains( _plugin ) )
+	const LADSPA_Descriptor * descriptor = getDescriptor( _plugin );
+	if( descriptor && descriptor->cleanup!= NULL )
 	{
-		LADSPA_Descriptor_Function descriptorFunction =
-			m_ladspaManagerMap[_plugin]->descriptorFunction;
-		const LADSPA_Descriptor * descriptor =
-				descriptorFunction(
-					m_ladspaManagerMap[_plugin]->index );
-		if( descriptor->cleanup != NULL )
-		{
-			( descriptor->cleanup ) ( _instance );
-			return( true );
-		}
+		( descriptor->cleanup ) ( _instance );
+		return( true );
 	}
 	return( false );
 }

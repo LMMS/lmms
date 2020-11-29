@@ -33,6 +33,7 @@
 #include "MidiTime.h"
 #include "ValueBuffer.h"
 #include "MemoryManager.h"
+#include "ModelVisitor.h"
 
 // simple way to map a property of a view to a model
 #define mapPropertyFromModelPtr(type,getfunc,setfunc,modelname)	\
@@ -59,15 +60,21 @@
 				modelname.setValue( (float) val );				\
 			}
 
+// use this to make subclasses visitable
+#define MODEL_IS_VISITABLE \
+	void accept(ModelVisitor& v) override { v.visit(*this); } \
+	void accept(ConstModelVisitor& v) const override { v.visit(*this); }
+
 
 
 class ControllerConnection;
 
-class EXPORT AutomatableModel : public Model, public JournallingObject
+class LMMS_EXPORT AutomatableModel : public Model, public JournallingObject
 {
 	Q_OBJECT
 	MM_OPERATORS
 public:
+
 	typedef QVector<AutomatableModel *> AutoModelVector;
 
 	enum ScaleType
@@ -77,28 +84,37 @@ public:
 		Decibel
 	};
 
-	enum DataType
-	{
-		Float,
-		Integer,
-		Bool
-	} ;
-
-	AutomatableModel( DataType type,
-						const float val = 0,
-						const float min = 0,
-						const float max = 0,
-						const float step = 0,
-						Model* parent = NULL,
-						const QString& displayName = QString(),
-						bool defaultConstructed = false );
 
 	virtual ~AutomatableModel();
 
+	// Implement those by using the MODEL_IS_VISITABLE macro
+	virtual void accept(ModelVisitor& v) = 0;
+	virtual void accept(ConstModelVisitor& v) const = 0;
 
-	static float copiedValue()
+public:
+	/**
+	   @brief Return this class casted to Target
+	   @test AutomatableModelTest.cpp
+	   @param doThrow throw an assertion if the cast fails, instead of
+	     returning a nullptr
+	   @return the casted class if Target is the exact or a base class of
+	     *this, nullptr otherwise
+	*/
+	template<class Target>
+	Target* dynamicCast(bool doThrow = false)
 	{
-		return s_copiedValue;
+		DCastVisitor<Target> vis; accept(vis);
+		if (doThrow && !vis.result) { Q_ASSERT(false); }
+		return vis.result;
+	}
+
+	//! const overload, see overloaded function
+	template<class Target>
+	const Target* dynamicCast(bool doThrow = false) const
+	{
+		ConstDCastVisitor<Target> vis; accept(vis);
+		if (doThrow && !vis.result) { Q_ASSERT(false); }
+		return vis.result;
 	}
 
 	bool isAutomated() const;
@@ -132,7 +148,7 @@ public:
 	template<class T>
 	inline T value( int frameOffset = 0 ) const
 	{
-		if( unlikely( m_hasLinkedModels || m_controllerConnection != NULL ) )
+		if( hasLinkedModels() || m_controllerConnection != NULL )
 		{
 			return castValue<T>( controllerValue( frameOffset ) );
 		}
@@ -220,6 +236,7 @@ public:
 		m_centerValue = centerVal;
 	}
 
+	//! link @p m1 and @p m2, let @p m1 take the values of @p m2
 	static void linkModels( AutomatableModel* m1, AutomatableModel* m2 );
 	static void unlinkModels( AutomatableModel* m1, AutomatableModel* m2 );
 
@@ -239,16 +256,16 @@ public:
 				specified DOM element using <name> as attribute/node name */
 	virtual void loadSettings( const QDomElement& element, const QString& name );
 
-	virtual QString nodeName() const
+	QString nodeName() const override
 	{
 		return "automatablemodel";
 	}
 
-	QString displayValue( const float val ) const;
+	virtual QString displayValue( const float val ) const = 0;
 
 	bool hasLinkedModels() const
 	{
-		return m_hasLinkedModels;
+		return !m_linkedModels.empty();
 	}
 
 	// a way to track changed values in the model and avoid using signals/slots - useful for speed-critical code.
@@ -265,11 +282,6 @@ public:
 	}
 
 	float globalAutomationValueAt( const MidiTime& time );
-
-	bool hasStrictStepSize() const
-	{
-		return m_hasStrictStepSize;
-	}
 
 	void setStrictStepSize( const bool b )
 	{
@@ -288,12 +300,18 @@ public:
 
 public slots:
 	virtual void reset();
-	virtual void copyValue();
-	virtual void pasteValue();
 	void unlinkControllerConnection();
 
 
 protected:
+	AutomatableModel(
+						const float val = 0,
+						const float min = 0,
+						const float max = 0,
+						const float step = 0,
+						Model* parent = NULL,
+						const QString& displayName = QString(),
+						bool defaultConstructed = false );
 	//! returns a value which is in range between min() and
 	//! max() and aligned according to the step size (step size 0.05 -> value
 	//! 0.12345 becomes 0.10 etc.). You should always call it at the end after
@@ -302,12 +320,30 @@ protected:
 
 
 private:
-	virtual void saveSettings( QDomDocument& doc, QDomElement& element )
+	// dynamicCast implementation
+	template<class Target>
+	struct DCastVisitor : public ModelVisitor
+	{
+		Target* result = nullptr;
+		void visit(Target& tar) { result = &tar; }
+	};
+
+	// dynamicCast implementation
+	template<class Target>
+	struct ConstDCastVisitor : public ConstModelVisitor
+	{
+		const Target* result = nullptr;
+		void visit(const Target& tar) { result = &tar; }
+	};
+
+	static bool mustQuoteName(const QString &name);
+
+	void saveSettings( QDomDocument& doc, QDomElement& element ) override
 	{
 		saveSettings( doc, element, "value" );
 	}
 
-	virtual void loadSettings( const QDomElement& element )
+	void loadSettings( const QDomElement& element ) override
 	{
 		loadSettings( element, "value" );
 	}
@@ -324,8 +360,7 @@ private:
 	template<class T> void roundAt( T &value, const T &where ) const;
 
 
-	DataType m_dataType;
-	ScaleType m_scaleType; //! scale type, linear by default
+	ScaleType m_scaleType; //!< scale type, linear by default
 	float m_value;
 	float m_initValue;
 	float m_minValue;
@@ -345,14 +380,11 @@ private:
 	bool m_hasStrictStepSize;
 
 	AutoModelVector m_linkedModels;
-	bool m_hasLinkedModels;
 
 
 	//! NULL if not appended to controller, otherwise connection info
 	ControllerConnection* m_controllerConnection;
 
-
-	static float s_copiedValue;
 
 	ValueBuffer m_valueBuffer;
 	long m_lastUpdatedPeriod;
@@ -372,77 +404,81 @@ signals:
 
 
 
+template <typename T> class LMMS_EXPORT TypedAutomatableModel : public AutomatableModel
+{
+public:
+	using AutomatableModel::AutomatableModel;
+	T value( int frameOffset = 0 ) const
+	{
+		return AutomatableModel::value<T>( frameOffset );
+	}
 
-#define defaultTypedMethods(type)								\
-	type value( int frameOffset = 0 ) const						\
-	{															\
-		return AutomatableModel::value<type>( frameOffset );	\
-	}															\
-																\
-	type initValue() const										\
-	{															\
-		return AutomatableModel::initValue<type>();				\
-	}															\
-																\
-	type minValue() const										\
-	{															\
-		return AutomatableModel::minValue<type>();				\
-	}															\
-																\
-	type maxValue() const										\
-	{															\
-		return AutomatableModel::maxValue<type>();				\
-	}															\
+	T initValue() const
+	{
+		return AutomatableModel::initValue<T>();
+	}
+
+	T minValue() const
+	{
+		return AutomatableModel::minValue<T>();
+	}
+
+	T maxValue() const
+	{
+		return AutomatableModel::maxValue<T>();
+	}
+};
 
 
 // some typed AutomatableModel-definitions
 
-class FloatModel : public AutomatableModel
+class LMMS_EXPORT FloatModel : public TypedAutomatableModel<float>
 {
+	Q_OBJECT
+	MODEL_IS_VISITABLE
 public:
 	FloatModel( float val = 0, float min = 0, float max = 0, float step = 0,
 				Model * parent = NULL,
 				const QString& displayName = QString(),
 				bool defaultConstructed = false ) :
-		AutomatableModel( Float, val, min, max, step, parent, displayName, defaultConstructed )
+		TypedAutomatableModel( val, min, max, step, parent, displayName, defaultConstructed )
 	{
 	}
 	float getRoundedValue() const;
 	int getDigitCount() const;
-	defaultTypedMethods(float);
-
+	QString displayValue( const float val ) const override;
 } ;
 
 
-class IntModel : public AutomatableModel
+class LMMS_EXPORT IntModel : public TypedAutomatableModel<int>
 {
+	Q_OBJECT
+	MODEL_IS_VISITABLE
 public:
 	IntModel( int val = 0, int min = 0, int max = 0,
 				Model* parent = NULL,
 				const QString& displayName = QString(),
 				bool defaultConstructed = false ) :
-		AutomatableModel( Integer, val, min, max, 1, parent, displayName, defaultConstructed )
+		TypedAutomatableModel( val, min, max, 1, parent, displayName, defaultConstructed )
 	{
 	}
-
-	defaultTypedMethods(int);
-
+	QString displayValue( const float val ) const override;
 } ;
 
 
-class BoolModel : public AutomatableModel
+class LMMS_EXPORT BoolModel : public TypedAutomatableModel<bool>
 {
+	Q_OBJECT
+	MODEL_IS_VISITABLE
 public:
 	BoolModel( const bool val = false,
 				Model* parent = NULL,
 				const QString& displayName = QString(),
 				bool defaultConstructed = false ) :
-		AutomatableModel( Bool, val, false, true, 1, parent, displayName, defaultConstructed )
+		TypedAutomatableModel( val, false, true, 1, parent, displayName, defaultConstructed )
 	{
 	}
-
-	defaultTypedMethods(bool);
-
+	QString displayValue( const float val ) const override;
 } ;
 
 typedef QMap<AutomatableModel*, float> AutomatedValueMap;

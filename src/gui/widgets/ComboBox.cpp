@@ -42,15 +42,17 @@ QPixmap * ComboBox::s_background = NULL;
 QPixmap * ComboBox::s_arrow = NULL;
 QPixmap * ComboBox::s_arrowSelected = NULL;
 
-const int CB_ARROW_BTN_WIDTH = 20;
+const int CB_ARROW_BTN_WIDTH = 18;
 
 
 ComboBox::ComboBox( QWidget * _parent, const QString & _name ) :
 	QWidget( _parent ),
-	IntModelView( new ComboBoxModel( NULL, QString::null, true ), this ),
+	IntModelView( new ComboBoxModel( NULL, QString(), true ), this ),
 	m_menu( this ),
 	m_pressed( false )
 {
+	setFixedHeight( ComboBox::DEFAULT_HEIGHT );
+
 	if( s_background == NULL )
 	{
 		s_background = new QPixmap( embed::getIconPixmap( "combobox_bg" ) );
@@ -192,13 +194,13 @@ void ComboBox::paintEvent( QPaintEvent * _pe )
 	// Border
 	QStyleOptionFrame opt;
 	opt.initFrom( this );
-	opt.state = 0;
+	opt.state = QStyle::StateFlag::State_None;
 
 	style()->drawPrimitive( QStyle::PE_Frame, &opt, &p, this );
 
 	QPixmap * arrow = m_pressed ? s_arrowSelected : s_arrow;
 
-	p.drawPixmap( width() - CB_ARROW_BTN_WIDTH + 5, 4, *arrow );
+	p.drawPixmap( width() - CB_ARROW_BTN_WIDTH + 3, 4, *arrow );
 
 	if( model() && model()->size() > 0 )
 	{
@@ -230,7 +232,7 @@ void ComboBox::wheelEvent( QWheelEvent* event )
 {
 	if( model() )
 	{
-		model()->setInitValue( model()->value() + ( ( event->delta() < 0 ) ? 1 : -1 ) );
+		model()->setInitValue(model()->value() + ((event->angleDelta().y() < 0) ? 1 : -1));
 		update();
 		event->accept();
 	}
@@ -246,7 +248,6 @@ void ComboBox::setItem( QAction* item )
 		model()->setInitValue( item->data().toInt() );
 	}
 }
-
 
 
 

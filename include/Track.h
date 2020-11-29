@@ -29,7 +29,7 @@
 #include <QtCore/QVector>
 #include <QtCore/QList>
 #include <QWidget>
-#include <QSignalMapper>
+#include <QSize>
 #include <QColor>
 #include <QMimeData>
 
@@ -40,6 +40,7 @@
 #include "AutomatableModel.h"
 #include "ModelView.h"
 #include "DataFile.h"
+#include "FadeButton.h"
 
 
 class QMenu;
@@ -72,8 +73,10 @@ const int DEFAULT_TRACK_HEIGHT = 32;
 
 const int TCO_BORDER_WIDTH = 2;
 
+char const *const FILENAME_FILTER = "[\\0000-\x1f\"*/:<>?\\\\|\x7f]";
 
-class TrackContentObject : public Model, public JournallingObject
+
+class LMMS_EXPORT TrackContentObject : public Model, public JournallingObject
 {
 	Q_OBJECT
 	MM_OPERATORS
@@ -99,7 +102,7 @@ public:
 		emit dataChanged();
 	}
 
-	virtual QString displayName() const
+	QString displayName() const override
 	{
 		return name();
 	}
@@ -130,6 +133,25 @@ public:
 	{
 		return m_autoResize;
 	}
+	
+	QColor color() const
+	{
+		return m_color;
+	}
+
+	void setColor( const QColor & c )
+	{
+		m_color = c;
+	}
+	
+	bool hasColor();
+	
+	void useCustomClipColor( bool b );
+	
+	bool usesCustomClipColor()
+	{
+		return m_useCustomClipColor;
+	}
 
 	virtual void movePosition( const MidiTime & pos );
 	virtual void changeLength( const MidiTime & length );
@@ -149,9 +171,15 @@ public:
 	/// Returns true if and only if a->startPosition() < b->startPosition()
 	static bool comparePosition(const TrackContentObject* a, const TrackContentObject* b);
 
+	MidiTime startTimeOffset() const;
+	void setStartTimeOffset( const MidiTime &startTimeOffset );
+	
+	void updateColor();
+
+	// Will copy the state of a TCO to another TCO
+	static void copyStateTo( TrackContentObject *src, TrackContentObject *dst );
+
 public slots:
-	void copy();
-	void paste();
 	void toggleMute();
 
 
@@ -159,6 +187,7 @@ signals:
 	void lengthChanged();
 	void positionChanged();
 	void destroyedTCO();
+	void trackColorChanged();
 
 
 private:
@@ -174,12 +203,16 @@ private:
 
 	MidiTime m_startPosition;
 	MidiTime m_length;
+	MidiTime m_startTimeOffset;
 
 	BoolModel m_mutedModel;
 	BoolModel m_soloModel;
 	bool m_autoResize;
 
 	bool m_selectViewOnCreate;
+
+	QColor m_color;
+	bool m_useCustomClipColor;
 
 	friend class TrackContentObjectView;
 
@@ -196,9 +229,13 @@ class TrackContentObjectView : public selectableObject, public ModelView
 	Q_PROPERTY( QColor mutedBackgroundColor READ mutedBackgroundColor WRITE setMutedBackgroundColor )
 	Q_PROPERTY( QColor selectedColor READ selectedColor WRITE setSelectedColor )
 	Q_PROPERTY( QColor textColor READ textColor WRITE setTextColor )
+	Q_PROPERTY( QColor textBackgroundColor READ textBackgroundColor WRITE setTextBackgroundColor )
 	Q_PROPERTY( QColor textShadowColor READ textShadowColor WRITE setTextShadowColor )
 	Q_PROPERTY( QColor BBPatternBackground READ BBPatternBackground WRITE setBBPatternBackground )
 	Q_PROPERTY( bool gradient READ gradient WRITE setGradient )
+	// We have to use a QSize here because using QPoint isn't supported.
+	// width -> x, height -> y
+	Q_PROPERTY( QSize mouseHotspotHand WRITE setMouseHotspotHand )
 
 public:
 	TrackContentObjectView( TrackContentObject * tco, TrackView * tv );
@@ -210,11 +247,18 @@ public:
 	{
 		return m_tco;
 	}
+
+	inline TrackView * getTrackView()
+	{
+		return m_trackView;
+	}
+
 	// qproperty access func
 	QColor mutedColor() const;
 	QColor mutedBackgroundColor() const;
 	QColor selectedColor() const;
 	QColor textColor() const;
+	QColor textBackgroundColor() const;
 	QColor textShadowColor() const;
 	QColor BBPatternBackground() const;
 	bool gradient() const;
@@ -222,46 +266,74 @@ public:
 	void setMutedBackgroundColor( const QColor & c );
 	void setSelectedColor( const QColor & c );
 	void setTextColor( const QColor & c );
+	void setTextBackgroundColor( const QColor & c );
 	void setTextShadowColor( const QColor & c );
 	void setBBPatternBackground( const QColor & c );
 	void setGradient( const bool & b );
+	void setMouseHotspotHand(const QSize & s);
 
 	// access needsUpdate member variable
 	bool needsUpdate();
 	void setNeedsUpdate( bool b );
+
+	// Method to get a QVector of TCOs to be affected by a context menu action
+	QVector<TrackContentObjectView *> getClickedTCOs();
+
+	// Methods to remove, copy, cut, paste and mute a QVector of TCO views
+	void copy( QVector<TrackContentObjectView *> tcovs );
+	void cut( QVector<TrackContentObjectView *> tcovs );
+	void paste();
+	// remove and toggleMute are static because they don't depend
+	// being called from a particular TCO view, but can be called anywhere as long
+	// as a valid TCO view list is given, while copy/cut require an instance for
+	// some metadata to be written to the clipboard.
+	static void remove( QVector<TrackContentObjectView *> tcovs );
+	static void toggleMute( QVector<TrackContentObjectView *> tcovs );
 	
+	QColor getColorForDisplay( QColor );
+
 public slots:
 	virtual bool close();
-	void cut();
 	void remove();
-	virtual void update();
+	void update() override;
+	
+	void changeClipColor();
+	void useTrackColor();
 
 protected:
+	enum ContextMenuAction
+	{
+		Remove,
+		Cut,
+		Copy,
+		Paste,
+		Mute
+	};
+
 	virtual void constructContextMenu( QMenu * )
 	{
 	}
 
-	virtual void contextMenuEvent( QContextMenuEvent * cme );
-	virtual void dragEnterEvent( QDragEnterEvent * dee );
-	virtual void dropEvent( QDropEvent * de );
-	virtual void leaveEvent( QEvent * e );
-	virtual void mousePressEvent( QMouseEvent * me );
-	virtual void mouseMoveEvent( QMouseEvent * me );
-	virtual void mouseReleaseEvent( QMouseEvent * me );
-	virtual void resizeEvent( QResizeEvent * re )
+	void contextMenuEvent( QContextMenuEvent * cme ) override;
+	void contextMenuAction( ContextMenuAction action );
+	void dragEnterEvent( QDragEnterEvent * dee ) override;
+	void dropEvent( QDropEvent * de ) override;
+	void leaveEvent( QEvent * e ) override;
+	void mousePressEvent( QMouseEvent * me ) override;
+	void mouseMoveEvent( QMouseEvent * me ) override;
+	void mouseReleaseEvent( QMouseEvent * me ) override;
+	void resizeEvent( QResizeEvent * re ) override
 	{
 		m_needsUpdate = true;
 		selectableObject::resizeEvent( re );
 	}
 
-	float pixelsPerTact();
+	float pixelsPerBar();
 
-	inline TrackView * getTrackView()
-	{
-		return m_trackView;
-	}
 
 	DataFile createTCODataFiles(const QVector<TrackContentObjectView *> & tcos) const;
+
+	virtual void paintTextLabel(QString const & text, QPainter & painter);
 
 
 protected slots:
@@ -276,6 +348,7 @@ private:
 		Move,
 		MoveSelection,
 		Resize,
+		ResizeLeft,
 		CopySelection,
 		ToggleSelected
 	} ;
@@ -287,6 +360,9 @@ private:
 	Actions m_action;
 	QPoint m_initialMousePos;
 	QPoint m_initialMouseGlobalPos;
+	MidiTime m_initialTCOPos;
+	MidiTime m_initialTCOEnd;
+	QVector<MidiTime> m_initialOffsets;
 
 	TextFloat * m_hint;
 
@@ -295,19 +371,25 @@ private:
 	QColor m_mutedBackgroundColor;
 	QColor m_selectedColor;
 	QColor m_textColor;
+	QColor m_textBackgroundColor;
 	QColor m_textShadowColor;
 	QColor m_BBPatternBackground;
 	bool m_gradient;
+	QSize m_mouseHotspotHand; // QSize must be used because QPoint isn't supported by property system
+	bool m_cursorSetYet;
 
- 	bool m_needsUpdate;
-	inline void setInitialMousePos( QPoint pos )
+	bool m_needsUpdate;
+	inline void setInitialPos( QPoint pos )
 	{
 		m_initialMousePos = pos;
 		m_initialMouseGlobalPos = mapToGlobal( pos );
+		m_initialTCOPos = m_tco->startPosition();
+		m_initialTCOEnd = m_initialTCOPos + m_tco->length();
 	}
+	void setInitialOffsets();
 
 	bool mouseMovedDistance( QMouseEvent * me, int distance );
-
+	MidiTime draggedTCOPos( QMouseEvent * me );
 } ;
 
 
@@ -342,7 +424,9 @@ public:
 	}
 
 	bool canPasteSelection( MidiTime tcoPos, const QDropEvent *de );
+	bool canPasteSelection( MidiTime tcoPos, const QMimeData *md, bool allowSameBar = false );
 	bool pasteSelection( MidiTime tcoPos, QDropEvent * de );
+	bool pasteSelection( MidiTime tcoPos, const QMimeData * md, bool skipSafetyCheck = false );
 
 	MidiTime endPosition( const MidiTime & posStart );
 
@@ -362,26 +446,32 @@ public slots:
 	void update();
 	void changePosition( const MidiTime & newPos = MidiTime( -1 ) );
 
-
 protected:
-	virtual void dragEnterEvent( QDragEnterEvent * dee );
-	virtual void dropEvent( QDropEvent * de );
-	virtual void mousePressEvent( QMouseEvent * me );
-	virtual void paintEvent( QPaintEvent * pe );
-	virtual void resizeEvent( QResizeEvent * re );
+	enum ContextMenuAction
+	{
+		Paste
+	};
 
-	virtual QString nodeName() const
+	void contextMenuEvent( QContextMenuEvent * cme ) override;
+	void contextMenuAction( QContextMenuEvent * cme, ContextMenuAction action );
+	void dragEnterEvent( QDragEnterEvent * dee ) override;
+	void dropEvent( QDropEvent * de ) override;
+	void mousePressEvent( QMouseEvent * me ) override;
+	void paintEvent( QPaintEvent * pe ) override;
+	void resizeEvent( QResizeEvent * re ) override;
+
+	QString nodeName() const override
 	{
 		return "trackcontentwidget";
 	}
 
-	virtual void saveSettings( QDomDocument& doc, QDomElement& element )
+	void saveSettings( QDomDocument& doc, QDomElement& element ) override
 	{
 		Q_UNUSED(doc)
 		Q_UNUSED(element)
 	}
 
-	virtual void loadSettings( const QDomElement& element )
+	void loadSettings( const QDomElement& element ) override
 	{
 		Q_UNUSED(element)
 	}
@@ -418,21 +508,24 @@ public:
 
 
 protected:
-	virtual void mousePressEvent( QMouseEvent * me );
-	virtual void paintEvent( QPaintEvent * pe );
+	void mousePressEvent( QMouseEvent * me ) override;
+	void paintEvent( QPaintEvent * pe ) override;
 
 
 private slots:
 	void cloneTrack();
 	void removeTrack();
 	void updateMenu();
+	void changeTrackColor();
+	void randomTrackColor();
+	void resetTrackColor();
+	void useTrackColor();
+	void toggleRecording(bool on);
 	void recordingOn();
 	void recordingOff();
 	void clearTrack();
 
 private:
-	static QPixmap * s_grip;
-
 	TrackView * m_trackView;
 
 	QPushButton * m_trackOps;
@@ -444,6 +537,9 @@ private:
 
 signals:
 	void trackRemovalScheduled( TrackView * t );
+	void colorChanged( QColor & c );
+	void colorParented();
+	void colorReset();
 
 } ;
 
@@ -452,7 +548,7 @@ signals:
 
 
 // base-class for all tracks
-class EXPORT Track : public Model, public JournallingObject
+class LMMS_EXPORT Track : public Model, public JournallingObject
 {
 	Q_OBJECT
 	MM_OPERATORS
@@ -500,8 +596,8 @@ public:
 	virtual void loadTrackSpecificSettings( const QDomElement & element ) = 0;
 
 
-	virtual void saveSettings( QDomDocument & doc, QDomElement & element );
-	virtual void loadSettings( const QDomElement & element );
+	void saveSettings( QDomDocument & doc, QDomElement & element ) override;
+	void loadSettings( const QDomElement & element ) override;
 
 	void setSimpleSerializing()
 	{
@@ -529,10 +625,10 @@ public:
 	void createTCOsForBB( int bb );
 
 
-	void insertTact( const MidiTime & pos );
-	void removeTact( const MidiTime & pos );
+	void insertBar( const MidiTime & pos );
+	void removeBar( const MidiTime & pos );
 
-	tact_t length() const;
+	bar_t length() const;
 
 
 	inline TrackContainer* trackContainer() const
@@ -546,20 +642,20 @@ public:
 		return m_name;
 	}
 
-	virtual QString displayName() const
+	QString displayName() const override
 	{
 		return name();
 	}
 
 	using Model::dataChanged;
 
-	inline int getHeight() 
+	inline int getHeight()
 	{
 		return m_height >= MINIMAL_TRACK_HEIGHT
-			? m_height 
+			? m_height
 			: DEFAULT_TRACK_HEIGHT;
 	}
-	inline void setHeight( int height ) 
+	inline void setHeight( int height )
 	{
 		m_height = height;
 	}
@@ -576,7 +672,16 @@ public:
 	{
 		return m_processingLock.tryLock();
 	}
-
+	
+	QColor color()
+	{
+		return m_color;
+	}
+	bool useColor()
+	{
+		return m_hasColor;
+	}
+	
 	BoolModel* getMutedModel();
 
 public slots:
@@ -588,6 +693,8 @@ public slots:
 
 	void toggleSolo();
 
+	void trackColorChanged( QColor & c );
+	void trackColorReset();
 
 private:
 	TrackContainer* m_trackContainer;
@@ -606,6 +713,9 @@ private:
 	tcoVector m_trackContentObjects;
 
 	QMutex m_processingLock;
+	
+	QColor m_color;
+	bool m_hasColor;
 
 	friend class TrackView;
 
@@ -664,38 +774,42 @@ public:
 
 	virtual void update();
 
+	// Create a menu for assigning/creating channels for this track
+	// Currently instrument track and sample track supports it
+	virtual QMenu * createFxMenu(QString title, QString newFxLabel);
+
 
 public slots:
 	virtual bool close();
 
 
 protected:
-	virtual void modelChanged();
+	void modelChanged() override;
 
-	virtual void saveSettings( QDomDocument& doc, QDomElement& element )
+	void saveSettings( QDomDocument& doc, QDomElement& element ) override
 	{
 		Q_UNUSED(doc)
 		Q_UNUSED(element)
 	}
 
-	virtual void loadSettings( const QDomElement& element )
+	void loadSettings( const QDomElement& element ) override
 	{
 		Q_UNUSED(element)
 	}
 
-	virtual QString nodeName() const
+	QString nodeName() const override
 	{
 		return "trackview";
 	}
 
 
-	virtual void dragEnterEvent( QDragEnterEvent * dee );
-	virtual void dropEvent( QDropEvent * de );
-	virtual void mousePressEvent( QMouseEvent * me );
-	virtual void mouseMoveEvent( QMouseEvent * me );
-	virtual void mouseReleaseEvent( QMouseEvent * me );
-	virtual void paintEvent( QPaintEvent * pe );
-	virtual void resizeEvent( QResizeEvent * re );
+	void dragEnterEvent( QDragEnterEvent * dee ) override;
+	void dropEvent( QDropEvent * de ) override;
+	void mousePressEvent( QMouseEvent * me ) override;
+	void mouseMoveEvent( QMouseEvent * me ) override;
+	void mouseReleaseEvent( QMouseEvent * me ) override;
+	void paintEvent( QPaintEvent * pe ) override;
+	void resizeEvent( QResizeEvent * re ) override;
 
 
 private:
@@ -715,12 +829,19 @@ private:
 
 	Actions m_action;
 
+	virtual FadeButton * getActivityIndicator()
+	{
+		return nullptr;
+	}
+
+	void setIndicatorMute(FadeButton* indicator, bool muted);
 
 	friend class TrackLabelButton;
 
 
 private slots:
 	void createTCOView( TrackContentObject * tco );
+	void muteChanged();
 
 } ;
 

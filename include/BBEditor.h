@@ -42,7 +42,7 @@ public:
 	BBEditor( BBTrackContainer * _tc );
 	~BBEditor();
 
-	QSize sizeHint() const;
+	QSize sizeHint() const override;
 
 	const BBTrackContainerView* trackContainerView() const {
 		return m_trackContainerView;
@@ -54,8 +54,8 @@ public:
 	void removeBBView( int bb );
 
 public slots:
-	void play();
-	void stop();
+	void play() override;
+	void stop() override;
 
 private:
 	BBTrackContainerView* m_trackContainerView;
@@ -70,15 +70,15 @@ class BBTrackContainerView : public TrackContainerView
 public:
 	BBTrackContainerView(BBTrackContainer* tc);
 
-	bool fixedTCOs() const
+	bool fixedTCOs() const override
 	{
 		return true;
 	}
 
 	void removeBBView(int bb);
 
-	void saveSettings(QDomDocument& doc, QDomElement& element);
-	void loadSettings(const QDomElement& element);
+	void saveSettings(QDomDocument& doc, QDomElement& element) override;
+	void loadSettings(const QDomElement& element) override;
 
 public slots:
 	void addSteps();
@@ -86,9 +86,10 @@ public slots:
 	void removeSteps();
 	void addSampleTrack();
 	void addAutomationTrack();
+	void clonePattern();
 
 protected slots:
-	void dropEvent(QDropEvent * de );
+	void dropEvent(QDropEvent * de ) override;
 	void updatePosition();
 
 private:

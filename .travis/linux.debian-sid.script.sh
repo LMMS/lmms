@@ -1,7 +1,7 @@
-#!/bin/sh
+#!/bin/bash
 set -e
 
-: ${TARGET_ARCH:=amd64}
+: "${TARGET_ARCH:=amd64}"
 
 BASETGZ="$HOME/pbuilder-bases/debian-sid-$TARGET_ARCH.tgz"
 MIRROR=http://cdn-fastly.deb.debian.org/debian
@@ -60,7 +60,7 @@ sync_version() {
 	esac
 
 	sed "1 s/@VERSION@/$VERSION/" -i debian/changelog
-	echo Set Debian version to $VERSION
+	echo "Set Debian version to $VERSION"
 }
 
 sync_version

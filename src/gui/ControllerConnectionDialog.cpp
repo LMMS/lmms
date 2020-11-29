@@ -63,7 +63,7 @@ public:
 	}
 
 
-	virtual void processInEvent( const MidiEvent& event, const MidiTime& time, f_cnt_t offset = 0 )
+	void processInEvent( const MidiEvent& event, const MidiTime& time, f_cnt_t offset = 0 ) override
 	{
 		if( event.type() == MidiControlChange &&
 			( m_midiPort.inputChannel() == 0 || m_midiPort.inputChannel() == event.channel() + 1 ) )
@@ -187,14 +187,16 @@ ControllerConnectionDialog::ControllerConnectionDialog( QWidget * _parent,
 			this, SLOT( userToggled() ) );
 
 	m_userController = new ComboBox( m_userGroupBox, "Controller" );
-	m_userController->setGeometry( 10, 24, 200, 22 );
-
-	for( int i = 0; i < Engine::getSong()->controllers().size(); ++i )
+	m_userController->setGeometry( 10, 24, 200, ComboBox::DEFAULT_HEIGHT );
+	for (Controller * c : Engine::getSong()->controllers())
 	{
-		Controller * c = Engine::getSong()->controllers().at( i );
 		m_userController->model()->addItem( c->name() );
 	}
-	
+	connect( m_userController->model(), SIGNAL( dataUnchanged() ),
+			this, SLOT( userSelected() ) );
+	connect( m_userController->model(), SIGNAL( dataChanged() ),
+			this, SLOT( userSelected() ) );
+
 
 	// Mapping functions
 	m_mappingBox = new TabWidget( tr( "MAPPING FUNCTION" ), this );
@@ -390,8 +392,15 @@ void ControllerConnectionDialog::userToggled()
 	{
 		m_midiGroupBox->model()->setValue( 0 );
 	}
+}
 
-	m_userController->setEnabled( enabled );
+
+
+
+void ControllerConnectionDialog::userSelected()
+{
+	m_userGroupBox->model()->setValue( 1 );
+	userToggled();
 }
 
 

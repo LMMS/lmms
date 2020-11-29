@@ -40,8 +40,8 @@
 #include "InstrumentTrack.h"
 #include "Mixer.h"
 
-#include "embed.cpp"
-
+#include "embed.h"
+#include "plugin_export.h"
 
 extern "C"
 {
@@ -50,7 +50,7 @@ Plugin::Descriptor PLUGIN_EXPORT malletsstk_plugin_descriptor =
 {
 	STRINGIFY( PLUGIN_NAME ),
 	"Mallets",
-	QT_TRANSLATE_NOOP( "pluginBrowser",
+	QT_TRANSLATE_NOOP( "PluginBrowser",
 				"Tuneful things to bang on" ),
 	"Danny McRae <khjklujn/at/users.sf.net>",
 	0x0100,
@@ -67,13 +67,13 @@ malletsInstrument::malletsInstrument( InstrumentTrack * _instrument_track ):
 	Instrument( _instrument_track, &malletsstk_plugin_descriptor ),
 	m_hardnessModel(64.0f, 0.0f, 128.0f, 0.1f, this, tr( "Hardness" )),
 	m_positionModel(64.0f, 0.0f, 64.0f, 0.1f, this, tr( "Position" )),
-	m_vibratoGainModel(0.0f, 0.0f, 128.0f, 0.1f, this, tr( "Vibrato Gain" )),
-	m_vibratoFreqModel(0.0f, 0.0f, 128.0f, 0.1f, this, tr( "Vibrato Freq" )),
-	m_stickModel(0.0f, 0.0f, 128.0f, 0.1f, this, tr( "Stick Mix" )),
+	m_vibratoGainModel(0.0f, 0.0f, 128.0f, 0.1f, this, tr( "Vibrato gain" )),
+	m_vibratoFreqModel(0.0f, 0.0f, 128.0f, 0.1f, this, tr( "Vibrato frequency" )),
+	m_stickModel(0.0f, 0.0f, 128.0f, 0.1f, this, tr( "Stick mix" )),
 	m_modulatorModel(64.0f, 0.0f, 128.0f, 0.1f, this, tr( "Modulator" )),
 	m_crossfadeModel(64.0f, 0.0f, 128.0f, 0.1f, this, tr( "Crossfade" )),
-	m_lfoSpeedModel(64.0f, 0.0f, 128.0f, 0.1f, this, tr( "LFO Speed" )),
-	m_lfoDepthModel(64.0f, 0.0f, 128.0f, 0.1f, this, tr( "LFO Depth" )),
+	m_lfoSpeedModel(64.0f, 0.0f, 128.0f, 0.1f, this, tr( "LFO speed" )),
+	m_lfoDepthModel(64.0f, 0.0f, 128.0f, 0.1f, this, tr( "LFO depth" )),
 	m_adsrModel(64.0f, 0.0f, 128.0f, 0.1f, this, tr( "ADSR" )),
 	m_pressureModel(64.0f, 0.1f, 128.0f, 0.1f, this, tr( "Pressure" )),
 	m_motionModel(64.0f, 0.0f, 128.0f, 0.1f, this, tr( "Motion" )),
@@ -94,31 +94,31 @@ malletsInstrument::malletsInstrument( InstrumentTrack * _instrument_track ):
 	m_scalers.append( 4.0 );
 	m_presetsModel.addItem( tr( "Agogo" ) );
 	m_scalers.append( 5.0 );
-	m_presetsModel.addItem( tr( "Wood1" ) );
+	m_presetsModel.addItem( tr( "Wood 1" ) );
 	m_scalers.append( 4.0 );
 	m_presetsModel.addItem( tr( "Reso" ) );
 	m_scalers.append( 2.5 );
-	m_presetsModel.addItem( tr( "Wood2" ) );
+	m_presetsModel.addItem( tr( "Wood 2" ) );
 	m_scalers.append( 5.0 );
 	m_presetsModel.addItem( tr( "Beats" ) );
 	m_scalers.append( 20.0 );
-	m_presetsModel.addItem( tr( "Two Fixed" ) );
+	m_presetsModel.addItem( tr( "Two fixed" ) );
 	m_scalers.append( 5.0 );
 	m_presetsModel.addItem( tr( "Clump" ) );
 	m_scalers.append( 4.0 );
 	
 	// TubeBell
-	m_presetsModel.addItem( tr( "Tubular Bells" ) );
+	m_presetsModel.addItem( tr( "Tubular bells" ) );
 	m_scalers.append( 1.8 );
 	
 	// BandedWG
-	m_presetsModel.addItem( tr( "Uniform Bar" ) );
+	m_presetsModel.addItem( tr( "Uniform bar" ) );
 	m_scalers.append( 25.0 );
-	m_presetsModel.addItem( tr( "Tuned Bar" ) );
+	m_presetsModel.addItem( tr( "Tuned bar" ) );
 	m_scalers.append( 10.0 );
 	m_presetsModel.addItem( tr( "Glass" ) );
 	m_scalers.append( 16.0 );
-	m_presetsModel.addItem( tr( "Tibetan Bowl" ) );
+	m_presetsModel.addItem( tr( "Tibetan bowl" ) );
 	m_scalers.append( 7.0 );
 }
 
@@ -338,6 +338,7 @@ void malletsInstrument::playNote( NotePlayHandle * _n,
 				Engine::mixer()->processingSampleRate() );
 		}
 		m.unlock();
+		static_cast<malletsSynth *>(_n->m_pluginData)->setPresetIndex(p);
 	}
 
 	const fpp_t frames = _n->framesLeftForCurrentPeriod();
@@ -345,6 +346,7 @@ void malletsInstrument::playNote( NotePlayHandle * _n,
 
 	malletsSynth * ps = static_cast<malletsSynth *>( _n->m_pluginData );
 	ps->setFrequency( freq );
+	p = ps->presetIndex();
 
 	sample_t add_scale = 0.0f;
 	if( p == 10 && m_isOldVersionModel.value() == true )
@@ -355,9 +357,9 @@ void malletsInstrument::playNote( NotePlayHandle * _n,
 	for( fpp_t frame = offset; frame < frames + offset; ++frame )
 	{
 		_working_buffer[frame][0] = ps->nextSampleLeft() *
-				( m_scalers[m_presetsModel.value()] + add_scale );
+				( m_scalers[p] + add_scale );
 		_working_buffer[frame][1] = ps->nextSampleRight() *
-				( m_scalers[m_presetsModel.value()] + add_scale );
+				( m_scalers[p] + add_scale );
 	}
 
 	instrumentTrack()->processAudioBuffer( _working_buffer, frames + offset, _n );
@@ -384,7 +386,7 @@ PluginView * malletsInstrument::instantiateView( QWidget * _parent )
 
 malletsInstrumentView::malletsInstrumentView( malletsInstrument * _instrument,
 							QWidget * _parent ) :
-	InstrumentView( _instrument, _parent )
+        InstrumentViewFixedSize( _instrument, _parent )
 {
 	m_modalBarWidget = setupModalBarControls( this );
 	setWidgetBackground( m_modalBarWidget, "artwork" );
@@ -401,7 +403,7 @@ malletsInstrumentView::malletsInstrumentView( malletsInstrument * _instrument,
 	changePreset(); // Show widget
 
 	m_presetsCombo = new ComboBox( this, tr( "Instrument" ) );
-	m_presetsCombo->setGeometry( 140, 50, 99, 22 );
+	m_presetsCombo->setGeometry( 140, 50, 99, ComboBox::DEFAULT_HEIGHT );
 	m_presetsCombo->setFont( pointSize<8>( m_presetsCombo->font() ) );
 	
 	connect( &_instrument->m_presetsModel, SIGNAL( dataChanged() ),
@@ -460,19 +462,19 @@ QWidget * malletsInstrumentView::setupModalBarControls( QWidget * _parent )
 	m_positionKnob->setHintText( tr( "Position:" ), "" );
 
 	m_vibratoGainKnob = new Knob( knobVintage_32, widget );
-	m_vibratoGainKnob->setLabel( tr( "Vib Gain" ) );
+	m_vibratoGainKnob->setLabel( tr( "Vibrato gain" ) );
 	m_vibratoGainKnob->move( 30, 140 );
-	m_vibratoGainKnob->setHintText( tr( "Vib Gain:" ), "" );
+	m_vibratoGainKnob->setHintText( tr( "Vibrato gain:" ), "" );
 
 	m_vibratoFreqKnob = new Knob( knobVintage_32, widget );
-	m_vibratoFreqKnob->setLabel( tr( "Vib Freq" ) );
+	m_vibratoFreqKnob->setLabel( tr( "Vibrato frequency" ) );
 	m_vibratoFreqKnob->move( 110, 140 );
-	m_vibratoFreqKnob->setHintText( tr( "Vib Freq:" ), "" );
+	m_vibratoFreqKnob->setHintText( tr( "Vibrato frequency:" ), "" );
 
 	m_stickKnob = new Knob( knobVintage_32, widget );
-	m_stickKnob->setLabel( tr( "Stick Mix" ) );
+	m_stickKnob->setLabel( tr( "Stick mix" ) );
 	m_stickKnob->move( 190, 90 );
-	m_stickKnob->setHintText( tr( "Stick Mix:" ), "" );
+	m_stickKnob->setHintText( tr( "Stick mix:" ), "" );
 	
 	return( widget );
 }
@@ -496,14 +498,14 @@ QWidget * malletsInstrumentView::setupTubeBellControls( QWidget * _parent )
 	m_crossfadeKnob->setHintText( tr( "Crossfade:" ), "" );
 	
 	m_lfoSpeedKnob = new Knob( knobVintage_32, widget );
-	m_lfoSpeedKnob->setLabel( tr( "LFO Speed" ) );
+	m_lfoSpeedKnob->setLabel( tr( "LFO speed" ) );
 	m_lfoSpeedKnob->move( 30, 140 );
-	m_lfoSpeedKnob->setHintText( tr( "LFO Speed:" ), "" );
+	m_lfoSpeedKnob->setHintText( tr( "LFO speed:" ), "" );
 	
 	m_lfoDepthKnob = new Knob( knobVintage_32, widget );
-	m_lfoDepthKnob->setLabel( tr( "LFO Depth" ) );
+	m_lfoDepthKnob->setLabel( tr( "LFO depth" ) );
 	m_lfoDepthKnob->move( 110, 140 );
-	m_lfoDepthKnob->setHintText( tr( "LFO Depth:" ), "" );
+	m_lfoDepthKnob->setHintText( tr( "LFO depth:" ), "" );
 	
 	m_adsrKnob = new Knob( knobVintage_32, widget );
 	m_adsrKnob->setLabel( tr( "ADSR" ) );
@@ -579,7 +581,6 @@ void malletsInstrumentView::modelChanged()
 void malletsInstrumentView::changePreset()
 {
 	malletsInstrument * inst = castModel<malletsInstrument>();
-	inst->instrumentTrack()->silenceAllNotes();
 	int _preset = inst->m_presetsModel.value();
 
 	if( _preset < 9 )
@@ -614,7 +615,8 @@ malletsSynth::malletsSynth( const StkFloat _pitch,
 				const StkFloat _control11,
 				const int _control16,
 				const uint8_t _delay,
-				const sample_rate_t _sample_rate )
+				const sample_rate_t _sample_rate ) :
+	m_presetIndex(0)
 {
 	try
 	{
@@ -664,7 +666,8 @@ malletsSynth::malletsSynth( const StkFloat _pitch,
 				const StkFloat _control11,
 				const StkFloat _control128,
 				const uint8_t _delay,
-				const sample_rate_t _sample_rate )
+				const sample_rate_t _sample_rate ) :
+	m_presetIndex(0)
 {
 	try
 	{
@@ -712,7 +715,8 @@ malletsSynth::malletsSynth( const StkFloat _pitch,
 				const StkFloat _control64,
 				const StkFloat _control128,
 				const uint8_t _delay,
-				const sample_rate_t _sample_rate )
+				const sample_rate_t _sample_rate ) :
+	m_presetIndex(0)
 {
 	try
 	{
@@ -756,9 +760,9 @@ extern "C"
 {
 
 // necessary for getting instance out of shared lib
-Plugin * PLUGIN_EXPORT lmms_plugin_main( Model *, void * _data )
+PLUGIN_EXPORT Plugin * lmms_plugin_main( Model * m, void * )
 {
-	return new malletsInstrument( static_cast<InstrumentTrack *>( _data ) );
+	return new malletsInstrument( static_cast<InstrumentTrack *>( m ) );
 }
 
 

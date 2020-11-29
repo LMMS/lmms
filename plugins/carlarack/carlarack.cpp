@@ -24,7 +24,9 @@
 
 #include "carla.h"
 
-#include "embed.cpp"
+#include "embed.h"
+#include "plugin_export.h"
+#include "InstrumentTrack.h"
 
 extern "C"
 {
@@ -33,7 +35,7 @@ Plugin::Descriptor PLUGIN_EXPORT carlarack_plugin_descriptor =
 {
     STRINGIFY( PLUGIN_NAME ),
     "Carla Rack",
-    QT_TRANSLATE_NOOP( "pluginBrowser",
+    QT_TRANSLATE_NOOP( "PluginBrowser",
                        "Carla Rack Instrument" ),
     "falkTX <falktx/at/falktx.com>",
     CARLA_VERSION_HEX,
@@ -43,9 +45,9 @@ Plugin::Descriptor PLUGIN_EXPORT carlarack_plugin_descriptor =
     NULL
 } ;
 
-Plugin* PLUGIN_EXPORT lmms_plugin_main(Model*, void* data)
+PLUGIN_EXPORT Plugin* lmms_plugin_main(Model* m, void*)
 {
-    return new CarlaInstrument(static_cast<InstrumentTrack*>(data), &carlarack_plugin_descriptor, false);
+    return new CarlaInstrument(static_cast<InstrumentTrack*>(m), &carlarack_plugin_descriptor, false);
 }
 
 }

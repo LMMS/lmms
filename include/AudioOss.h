@@ -39,15 +39,16 @@ class LcdSpinBox;
 class QLineEdit;
 
 
-class AudioOss : public AudioDevice, public QThread
+class AudioOss : public QThread, public AudioDevice
 {
+	Q_OBJECT
 public:
 	AudioOss( bool & _success_ful, Mixer* mixer );
 	virtual ~AudioOss();
 
 	inline static QString name()
 	{
-		return QT_TRANSLATE_NOOP( "setupWidget", "OSS (Open Sound System)" );
+		return QT_TRANSLATE_NOOP( "AudioDeviceSetupWidget", "OSS (Open Sound System)" );
 	}
 
 	static QString probeDevice();
@@ -59,7 +60,7 @@ public:
 		setupWidget( QWidget * _parent );
 		virtual ~setupWidget();
 
-		virtual void saveSettings();
+		void saveSettings() override;
 
 	private:
 		QLineEdit * m_device;
@@ -69,10 +70,10 @@ public:
 
 
 private:
-	virtual void startProcessing();
-	virtual void stopProcessing();
-	virtual void applyQualitySettings();
-	virtual void run();
+	void startProcessing() override;
+	void stopProcessing() override;
+	void applyQualitySettings() override;
+	void run() override;
 
 	int m_audioFD;
 

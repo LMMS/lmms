@@ -28,14 +28,14 @@
 #include "base64.h"
 #include "Engine.h"
 #include "InstrumentTrack.h"
-#include "templates.h"
 #include "ToolTip.h"
 #include "Song.h"
 #include "lmms_math.h"
 #include "Mixer.h"
 #include "interpolation.h"
 
-#include "embed.cpp"
+#include "embed.h"
+#include "plugin_export.h"
 
 extern "C"
 {
@@ -44,7 +44,7 @@ Plugin::Descriptor PLUGIN_EXPORT watsyn_plugin_descriptor =
 {
 	STRINGIFY( PLUGIN_NAME ),
 	"Watsyn",
-	QT_TRANSLATE_NOOP( "pluginBrowser",
+	QT_TRANSLATE_NOOP( "PluginBrowser",
 				"4-oscillator modulatable wavetable synth" ),
 	"Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>",
 	0x0100,
@@ -666,7 +666,7 @@ void WatsynInstrument::updateWaveB2()
 
 WatsynView::WatsynView( Instrument * _instrument,
 					QWidget * _parent ) :
-	InstrumentView( _instrument, _parent )
+	InstrumentViewFixedSize( _instrument, _parent )
 {
 	setAutoFillBackground( true );
 	QPalette pal;
@@ -765,19 +765,19 @@ WatsynView::WatsynView( Instrument * _instrument,
 	amod_amButton -> move( 4, 66 );
 	amod_amButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "aam_active" ) );
 	amod_amButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "aam_inactive" ) );
-	ToolTip::add( amod_amButton, tr( "Modulate amplitude of A1 with output of A2" ) );
+	ToolTip::add( amod_amButton, tr( "Modulate amplitude of A1 by output of A2" ) );
 
 	PixmapButton * amod_rmButton = new PixmapButton( this, NULL );
 	amod_rmButton -> move( 4, 82 );
 	amod_rmButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "arm_active" ) );
 	amod_rmButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "arm_inactive" ) );
-	ToolTip::add( amod_rmButton, tr( "Ring-modulate A1 and A2" ) );
+	ToolTip::add( amod_rmButton, tr( "Ring modulate A1 and A2" ) );
 
 	PixmapButton * amod_pmButton = new PixmapButton( this, NULL );
 	amod_pmButton -> move( 4, 98 );
 	amod_pmButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "apm_active" ) );
 	amod_pmButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "apm_inactive" ) );
-	ToolTip::add( amod_pmButton, tr( "Modulate phase of A1 with output of A2" ) );
+	ToolTip::add( amod_pmButton, tr( "Modulate phase of A1 by output of A2" ) );
 
 	m_aModGroup = new automatableButtonGroup( this );
 	m_aModGroup -> addButton( amod_mixButton );
@@ -796,19 +796,19 @@ WatsynView::WatsynView( Instrument * _instrument,
 	bmod_amButton -> move( 44, 66 );
 	bmod_amButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "bam_active" ) );
 	bmod_amButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "bam_inactive" ) );
-	ToolTip::add( bmod_amButton, tr( "Modulate amplitude of B1 with output of B2" ) );
+	ToolTip::add( bmod_amButton, tr( "Modulate amplitude of B1 by output of B2" ) );
 
 	PixmapButton * bmod_rmButton = new PixmapButton( this, NULL );
 	bmod_rmButton -> move( 44, 82 );
 	bmod_rmButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "brm_active" ) );
 	bmod_rmButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "brm_inactive" ) );
-	ToolTip::add( bmod_rmButton, tr( "Ring-modulate B1 and B2" ) );
+	ToolTip::add( bmod_rmButton, tr( "Ring modulate B1 and B2" ) );
 
 	PixmapButton * bmod_pmButton = new PixmapButton( this, NULL );
 	bmod_pmButton -> move( 44, 98 );
 	bmod_pmButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "bpm_active" ) );
 	bmod_pmButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "bpm_inactive" ) );
-	ToolTip::add( bmod_pmButton, tr( "Modulate phase of B1 with output of B2" ) );
+	ToolTip::add( bmod_pmButton, tr( "Modulate phase of B1 by output of B2" ) );
 
 	m_bModGroup = new automatableButtonGroup( this );
 	m_bModGroup -> addButton( bmod_mixButton );
@@ -860,38 +860,38 @@ WatsynView::WatsynView( Instrument * _instrument,
 	m_loadButton -> move ( 173, 121 );
 	m_loadButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "load_active" ) );
 	m_loadButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "load_inactive" ) );
-	ToolTip::add( m_loadButton, tr( "Click to load a waveform from a sample file" ) );
+	ToolTip::add( m_loadButton, tr( "Load a waveform from a sample file" ) );
 
 	m_phaseLeftButton = new PixmapButton( this, tr( "Phase left" ) );
 	m_phaseLeftButton -> move ( 193, 121 );
 	m_phaseLeftButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "phl_active" ) );
 	m_phaseLeftButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "phl_inactive" ) );
-	ToolTip::add( m_phaseLeftButton, tr( "Click to shift phase by -15 degrees" ) );
+	ToolTip::add( m_phaseLeftButton, tr( "Shift phase by -15 degrees" ) );
 
 	m_phaseRightButton = new PixmapButton( this, tr( "Phase right" ) );
 	m_phaseRightButton -> move ( 210, 121 );
 	m_phaseRightButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "phr_active" ) );
 	m_phaseRightButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "phr_inactive" ) );
-	ToolTip::add( m_phaseRightButton, tr( "Click to shift phase by +15 degrees" ) );
+	ToolTip::add( m_phaseRightButton, tr( "Shift phase by +15 degrees" ) );
 
 	m_normalizeButton = new PixmapButton( this, tr( "Normalize" ) );
 	m_normalizeButton -> move ( 230, 121 );
 	m_normalizeButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "norm_active" ) );
 	m_normalizeButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "norm_inactive" ) );
-	ToolTip::add( m_normalizeButton, tr( "Click to normalize" ) );
+	ToolTip::add( m_normalizeButton, tr( "Normalize" ) );
 
 
 	m_invertButton = new PixmapButton( this, tr( "Invert" ) );
 	m_invertButton -> move ( 230, 138 );
 	m_invertButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "inv_active" ) );
 	m_invertButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "inv_inactive" ) );
-	ToolTip::add( m_invertButton, tr( "Click to invert" ) );
+	ToolTip::add( m_invertButton, tr( "Invert" ) );
 
 	m_smoothButton = new PixmapButton( this, tr( "Smooth" ) );
 	m_smoothButton -> move ( 230, 155 );
 	m_smoothButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "smooth_active" ) );
 	m_smoothButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "smooth_inactive" ) );
-	ToolTip::add( m_smoothButton, tr( "Click to smooth" ) );
+	ToolTip::add( m_smoothButton, tr( "Smooth" ) );
 
 // waveforms
 
@@ -899,25 +899,25 @@ WatsynView::WatsynView( Instrument * _instrument,
 	m_sinWaveButton -> move ( 230, 176 );
 	m_sinWaveButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "sin_active" ) );
 	m_sinWaveButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "sin_inactive" ) );
-	ToolTip::add( m_sinWaveButton, tr( "Click for sine wave" ) );
+	ToolTip::add( m_sinWaveButton, tr( "Sine wave" ) );
 
 	m_triWaveButton = new PixmapButton( this, tr( "Triangle wave" ) );
 	m_triWaveButton -> move ( 230, 194 );
 	m_triWaveButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "tri_active" ) );
 	m_triWaveButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "tri_inactive" ) );
-	ToolTip::add( m_triWaveButton, tr( "Click for triangle wave" ) );
+	ToolTip::add( m_triWaveButton, tr( "Triangle wave" ) );
 
 	m_sawWaveButton = new PixmapButton( this, tr( "Triangle wave" ) );
 	m_sawWaveButton -> move ( 230, 212 );
 	m_sawWaveButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "saw_active" ) );
 	m_sawWaveButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "saw_inactive" ) );
-	ToolTip::add( m_sawWaveButton, tr( "Click for saw wave" ) );
+	ToolTip::add( m_sawWaveButton, tr( "Saw wave" ) );
 
 	m_sqrWaveButton = new PixmapButton( this, tr( "Square wave" ) );
 	m_sqrWaveButton -> move ( 230, 230 );
 	m_sqrWaveButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "sqr_active" ) );
 	m_sqrWaveButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "sqr_inactive" ) );
-	ToolTip::add( m_sqrWaveButton, tr( "Click for square wave" ) );
+	ToolTip::add( m_sqrWaveButton, tr( "Square wave" ) );
 
 
 
@@ -1278,9 +1278,9 @@ extern "C"
 {
 
 // necessary for getting instance out of shared lib
-Plugin * PLUGIN_EXPORT lmms_plugin_main( Model *, void * _data )
+PLUGIN_EXPORT Plugin * lmms_plugin_main( Model *m, void * )
 {
-	return( new WatsynInstrument( static_cast<InstrumentTrack *>( _data ) ) );
+	return( new WatsynInstrument( static_cast<InstrumentTrack *>( m ) ) );
 }
 
 

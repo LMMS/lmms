@@ -30,9 +30,10 @@
 
 class QAction;
 
-class EXPORT TempoSyncKnobModel : public FloatModel
+class LMMS_EXPORT TempoSyncKnobModel : public FloatModel
 {
 	Q_OBJECT
+	MODEL_IS_VISITABLE
 public:
 	enum TempoSyncMode
 	{
@@ -51,10 +52,10 @@ public:
 				const float _max, const float _step,
 				const float _scale, Model * _parent,
 				const QString & _display_name = QString() );
-	virtual ~TempoSyncKnobModel();
+	~TempoSyncKnobModel() override;
 
-	void saveSettings( QDomDocument & _doc, QDomElement & _this, const QString& name );
-	void loadSettings( const QDomElement & _this, const QString& name );
+	void saveSettings( QDomDocument & _doc, QDomElement & _this, const QString& name ) override;
+	void loadSettings( const QDomElement & _this, const QString& name ) override;
 
 	TempoSyncMode syncMode() const
 	{

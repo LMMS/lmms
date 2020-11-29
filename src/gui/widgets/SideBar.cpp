@@ -41,16 +41,15 @@ public:
 		m_orientation( _orientation )
 	{
 	}
-	virtual ~SideBarButton()
-	{
-	}
+
+	virtual ~SideBarButton() = default;
 
 	Qt::Orientation orientation() const
 	{
 		return m_orientation;
 	}
 
-	virtual QSize sizeHint() const
+	QSize sizeHint() const override
 	{
 		QSize s = QToolButton::sizeHint();
 		s.setWidth( s.width() + 8 );
@@ -63,7 +62,7 @@ public:
 
 
 protected:
-	virtual void paintEvent( QPaintEvent * )
+	void paintEvent( QPaintEvent * ) override
 	{
 		QStylePainter p( this );
 		QStyleOptionToolButton opt;
@@ -122,6 +121,9 @@ void SideBar::appendTab( SideBarWidget *widget )
 	widget->setMinimumWidth( 200 );
 
 	ToolTip::add( button, widget->title() );
+
+	connect(widget, &SideBarWidget::closeButtonClicked,
+		[=]() { button->click(); });
 }
 
 

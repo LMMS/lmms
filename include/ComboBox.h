@@ -32,9 +32,7 @@
 #include "ComboBoxModel.h"
 #include "AutomatableModelView.h"
 
-
-
-class EXPORT ComboBox : public QWidget, public IntModelView
+class LMMS_EXPORT ComboBox : public QWidget, public IntModelView
 {
 	Q_OBJECT
 public:
@@ -51,16 +49,18 @@ public:
 		return castModel<ComboBoxModel>();
 	}
 
+	static constexpr int DEFAULT_HEIGHT = 22;
+
 public slots:
 	void selectNext();
 	void selectPrevious();
 
 
 protected:
-	virtual void contextMenuEvent( QContextMenuEvent* event );
-	virtual void mousePressEvent( QMouseEvent* event );
-	virtual void paintEvent( QPaintEvent* event );
-	virtual void wheelEvent( QWheelEvent* event );
+	void contextMenuEvent( QContextMenuEvent* event ) override;
+	void mousePressEvent( QMouseEvent* event ) override;
+	void paintEvent( QPaintEvent* event ) override;
+	void wheelEvent( QWheelEvent* event ) override;
 
 
 private:

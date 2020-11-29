@@ -28,6 +28,7 @@
  *
  */
 
+#include "GigPlayer.h"
 
 #include <cstring>
 #include <QDebug>
@@ -35,25 +36,25 @@
 #include <QLabel>
 #include <QDomDocument>
 
-#include "FileDialog.h"
-#include "GigPlayer.h"
-#include "Engine.h"
-#include "InstrumentTrack.h"
-#include "InstrumentPlayHandle.h"
-#include "Mixer.h"
-#include "NotePlayHandle.h"
-#include "Knob.h"
-#include "SampleBuffer.h"
-#include "Song.h"
 #include "ConfigManager.h"
 #include "endian_handling.h"
+#include "Engine.h"
+#include "FileDialog.h"
+#include "InstrumentTrack.h"
+#include "InstrumentPlayHandle.h"
+#include "Knob.h"
+#include "Mixer.h"
+#include "NotePlayHandle.h"
+#include "PathUtil.h"
+#include "SampleBuffer.h"
+#include "Song.h"
 
 #include "PatchesDialog.h"
 #include "ToolTip.h"
 #include "LcdSpinBox.h"
 
-#include "embed.cpp"
-
+#include "embed.h"
+#include "plugin_export.h"
 
 extern "C"
 {
@@ -62,7 +63,7 @@ Plugin::Descriptor PLUGIN_EXPORT gigplayer_plugin_descriptor =
 {
 	STRINGIFY( PLUGIN_NAME ),
 	"GIG Player",
-	QT_TRANSLATE_NOOP( "pluginBrowser", "Player for GIG files" ),
+	QT_TRANSLATE_NOOP( "PluginBrowser", "Player for GIG files" ),
 	"Garrett Wilson <g/at/floft/dot/net>",
 	0x0100,
 	Plugin::Instrument,
@@ -211,8 +212,8 @@ void GigInstrument::openFile( const QString & _gigFile, bool updateTrackName )
 
 		try
 		{
-			m_instance = new GigInstance( SampleBuffer::tryToMakeAbsolute( _gigFile ) );
-			m_filename = SampleBuffer::tryToMakeRelative( _gigFile );
+			m_instance = new GigInstance( PathUtil::toAbsolute( _gigFile ) );
+			m_filename = PathUtil::toShortestRelative( _gigFile );
 		}
 		catch( ... )
 		{
@@ -225,7 +226,7 @@ void GigInstrument::openFile( const QString & _gigFile, bool updateTrackName )
 
 	if( updateTrackName == true )
 	{
-		instrumentTrack()->setName( QFileInfo( _gigFile ).baseName() );
+		instrumentTrack()->setName(PathUtil::cleanName( _gigFile ) );
 		updatePatch();
 	}
 }
@@ -922,7 +923,7 @@ public:
 
 
 GigInstrumentView::GigInstrumentView( Instrument * _instrument, QWidget * _parent ) :
-	InstrumentView( _instrument, _parent )
+        InstrumentViewFixedSize( _instrument, _parent )
 {
 	GigInstrument * k = castModel<GigInstrument>();
 
@@ -938,9 +939,7 @@ GigInstrumentView::GigInstrumentView( Instrument * _instrument, QWidget * _paren
 
 	connect( m_fileDialogButton, SIGNAL( clicked() ), this, SLOT( showFileDialog() ) );
 
-	ToolTip::add( m_fileDialogButton, tr( "Open other GIG file" ) );
-
-	m_fileDialogButton->setWhatsThis( tr( "Click here to open another GIG file" ) );
+	ToolTip::add( m_fileDialogButton, tr( "Open GIG file" ) );
 
 	// Patch Button
 	m_patchDialogButton = new PixmapButton( this );
@@ -952,9 +951,7 @@ GigInstrumentView::GigInstrumentView( Instrument * _instrument, QWidget * _paren
 
 	connect( m_patchDialogButton, SIGNAL( clicked() ), this, SLOT( showPatchDialog() ) );
 
-	ToolTip::add( m_patchDialogButton, tr( "Choose the patch" ) );
-
-	m_patchDialogButton->setWhatsThis( tr( "Click here to change which patch of the GIG file to use" ) );
+	ToolTip::add( m_patchDialogButton, tr( "Choose patch" ) );
 
 	// LCDs
 	m_bankNumLcd = new LcdSpinBox( 3, "21pink", this );
@@ -963,23 +960,16 @@ GigInstrumentView::GigInstrumentView( Instrument * _instrument, QWidget * _paren
 	m_patchNumLcd = new LcdSpinBox( 3, "21pink", this );
 	m_patchNumLcd->move( 161, 150 );
 
-	m_bankNumLcd->setWhatsThis( tr( "Change which instrument of the GIG file is being played" ) );
-	m_patchNumLcd->setWhatsThis( tr( "Change which instrument of the GIG file is being played" ) );
-
 	// Next row
 	m_filenameLabel = new QLabel( this );
 	m_filenameLabel->setGeometry( 61, 70, 156, 14 );
 	m_patchLabel = new QLabel( this );
 	m_patchLabel->setGeometry( 61, 94, 156, 14 );
 
-	m_filenameLabel->setWhatsThis( tr( "Which GIG file is currently being used" ) );
-	m_patchLabel->setWhatsThis( tr( "Which patch of the GIG file is currently being used" ) );
-
 	// Gain
 	m_gainKnob = new gigKnob( this );
-	m_gainKnob->setHintText( tr( "Gain" ) + " ", "" );
+	m_gainKnob->setHintText( tr( "Gain:" ) + " ", "" );
 	m_gainKnob->move( 32, 140 );
-	m_gainKnob->setWhatsThis( tr( "Factor to multiply samples by" ) );
 
 	setAutoFillBackground( true );
 	QPalette pal;
@@ -1068,7 +1058,7 @@ void GigInstrumentView::showFileDialog()
 
 	if( k->m_filename != "" )
 	{
-		QString f = SampleBuffer::tryToMakeAbsolute( k->m_filename );
+		QString f = PathUtil::toAbsolute( k->m_filename );
 		ofd.setDirectory( QFileInfo( f ).absolutePath() );
 		ofd.selectFile( QFileInfo( f ).fileName() );
 	}
@@ -1401,9 +1391,9 @@ extern "C"
 {
 
 // necessary for getting instance out of shared lib
-Plugin * PLUGIN_EXPORT lmms_plugin_main( Model *, void * _data )
+PLUGIN_EXPORT Plugin * lmms_plugin_main( Model *m, void * )
 {
-	return new GigInstrument( static_cast<InstrumentTrack *>( _data ) );
+	return new GigInstrument( static_cast<InstrumentTrack *>( m ) );
 }
 
 }

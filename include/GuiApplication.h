@@ -27,7 +27,8 @@
 
 #include <QtCore/QObject>
 
-#include "export.h"
+#include "lmms_export.h"
+#include "lmmsconfig.h"
 
 class QLabel;
 
@@ -40,7 +41,7 @@ class PianoRollWindow;
 class ProjectNotes;
 class SongEditorWindow;
 
-class EXPORT GuiApplication : public QObject
+class LMMS_EXPORT GuiApplication : public QObject
 {
 	Q_OBJECT;
 public:
@@ -48,6 +49,9 @@ public:
 	~GuiApplication();
 
 	static GuiApplication* instance();
+#ifdef LMMS_BUILD_WIN32
+	static QFont getWin32SystemFont();
+#endif
 
 	MainWindow* mainWindow() { return m_mainWindow; }
 	FxMixerView* fxMixerView() { return m_fxMixerView; }

@@ -1,10 +1,12 @@
-﻿/*
+/*
  * SubWindow.cpp - Implementation of QMdiSubWindow that correctly tracks
  *   the geometry that windows should be restored to.
  *   Workaround for https://bugreports.qt.io/browse/QTBUG-256
+ *   This implementation adds a custom themed title bar to
+ *   the subwindow.
  *
  * Copyright (c) 2015 Colin Wallace <wallace.colin.a@gmail.com>
- *
+ * Copyright (c) 2016 Steffen Baranowsky <baramgb@freenet.de>
  * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -28,6 +30,7 @@
 
 #include <QMdiArea>
 #include <QMoveEvent>
+#include <QPainter>
 #include <QScrollBar>
 
 #include "embed.h"
@@ -37,7 +40,8 @@
 SubWindow::SubWindow( QWidget *parent, Qt::WindowFlags windowFlags ) :
 	QMdiSubWindow( parent, windowFlags ),
 	m_buttonSize( 17, 17 ),
-	m_titleBarHeight( 24 )
+	m_titleBarHeight( 24 ),
+	m_hasFocus( false )
 {
 	// initialize the tracked geometry to whatever Qt thinks the normal geometry currently is.
 	// this should always work, since QMdiSubWindows will not start as maximized
@@ -49,7 +53,7 @@ SubWindow::SubWindow( QWidget *parent, Qt::WindowFlags windowFlags ) :
 	m_borderColor = Qt::black;
 
 	// close, maximize and restore (after maximizing) buttons
-	m_closeBtn = new QPushButton( embed::getIconPixmap( "close" ), QString::null, this );
+	m_closeBtn = new QPushButton( embed::getIconPixmap( "close" ), QString(), this );
 	m_closeBtn->resize( m_buttonSize );
 	m_closeBtn->setFocusPolicy( Qt::NoFocus );
 	m_closeBtn->setCursor( Qt::ArrowCursor );
@@ -57,7 +61,7 @@ SubWindow::SubWindow( QWidget *parent, Qt::WindowFlags windowFlags ) :
 	m_closeBtn->setToolTip( tr( "Close" ) );
 	connect( m_closeBtn, SIGNAL( clicked( bool ) ), this, SLOT( close() ) );
 
-	m_maximizeBtn = new QPushButton( embed::getIconPixmap( "maximize" ), QString::null, this );
+	m_maximizeBtn = new QPushButton( embed::getIconPixmap( "maximize" ), QString(), this );
 	m_maximizeBtn->resize( m_buttonSize );
 	m_maximizeBtn->setFocusPolicy( Qt::NoFocus );
 	m_maximizeBtn->setCursor( Qt::ArrowCursor );
@@ -65,7 +69,7 @@ SubWindow::SubWindow( QWidget *parent, Qt::WindowFlags windowFlags ) :
 	m_maximizeBtn->setToolTip( tr( "Maximize" ) );
 	connect( m_maximizeBtn, SIGNAL( clicked( bool ) ), this, SLOT( showMaximized() ) );
 
-	m_restoreBtn = new QPushButton( embed::getIconPixmap( "restore" ), QString::null, this );
+	m_restoreBtn = new QPushButton( embed::getIconPixmap( "restore" ), QString(), this );
 	m_restoreBtn->resize( m_buttonSize );
 	m_restoreBtn->setFocusPolicy( Qt::NoFocus );
 	m_restoreBtn->setCursor( Qt::ArrowCursor );
@@ -88,11 +92,18 @@ SubWindow::SubWindow( QWidget *parent, Qt::WindowFlags windowFlags ) :
 	setWindowFlags( Qt::SubWindow | Qt::WindowMaximizeButtonHint |
 		Qt::WindowSystemMenuHint | Qt::WindowCloseButtonHint |
 		Qt::CustomizeWindowHint );
+	connect( mdiArea(), SIGNAL( subWindowActivated( QMdiSubWindow* ) ), this, SLOT( focusChanged( QMdiSubWindow* ) ) );
 }
 
 
 
 
+/**
+ * @brief SubWindow::paintEvent
+ * 
+ *  This draws our new title bar with custom colors
+ *  and draws a window icon on the left upper corner.
+ */
 void SubWindow::paintEvent( QPaintEvent * )
 {
 	QPainter p( this );
@@ -123,6 +134,12 @@ void SubWindow::paintEvent( QPaintEvent * )
 
 
 
+/**
+ * @brief SubWindow::changeEvent
+ * 
+ * Triggers if the window title changes and calls adjustTitleBar().
+ * @param event
+ */
 void SubWindow::changeEvent( QEvent *event )
 {
 	QMdiSubWindow::changeEvent( event );
@@ -137,6 +154,16 @@ void SubWindow::changeEvent( QEvent *event )
 
 
 
+/**
+ * @brief SubWindow::elideText
+ * 
+ *  Stores the given text into the given label.
+ *  Shorts the text if it's too big for the labels width
+ *  ans adds three dots (...)
+ * 
+ * @param label - holds a pointer to the QLabel
+ * @param text  - the text which will be stored (and if needed breaked down) into the QLabel.
+ */
 void SubWindow::elideText( QLabel *label, QString text )
 {
 	QFontMetrics metrix( label->font() );
@@ -148,6 +175,12 @@ void SubWindow::elideText( QLabel *label, QString text )
 
 
 
+/**
+ * @brief SubWindow::getTrueNormalGeometry
+ * 
+ *  same as QWidet::normalGeometry, but works properly under X11
+ *  see https://bugreports.qt.io/browse/QTBUG-256
+ */
 QRect SubWindow::getTrueNormalGeometry() const
 {
 	return m_trackedNormalGeom;
@@ -203,7 +236,15 @@ void SubWindow::setBorderColor( const QColor &c )
 
 
 
-
+/**
+ * @brief SubWindow::moveEvent
+ * 
+ *  overides the QMdiSubWindow::moveEvent() for saving the position
+ *  of the subwindow into m_trackedNormalGeom. This position
+ *  will be saved with the project because of an Qt bug wich doesn't
+ *  save the right position. look at: https://bugreports.qt.io/browse/QTBUG-256
+ * @param event
+ */
 void SubWindow::moveEvent( QMoveEvent * event )
 {
 	QMdiSubWindow::moveEvent( event );
@@ -218,6 +259,14 @@ void SubWindow::moveEvent( QMoveEvent * event )
 
 
 
+/**
+ * @brief SubWindow::adjustTitleBar
+ * 
+ *  Our title bar needs buttons for maximize/restore and close in the right upper corner.
+ *  We check if the subwindow is maximizable and put the buttons on the right positions.
+ *  At next we calculate the width of the title label and call elideText() for adding
+ *  the window title to m_windowTitle (which is a QLabel)
+ */
 void SubWindow::adjustTitleBar()
 {
 	// button adjustments
@@ -282,7 +331,36 @@ void SubWindow::adjustTitleBar()
 
 
 
+void SubWindow::focusChanged( QMdiSubWindow *subWindow )
+{
+	if( m_hasFocus && subWindow != this )
+	{
+		m_hasFocus = false;
+		emit focusLost();
+	}
+	else if( subWindow == this )
+	{
+		m_hasFocus = true;
+	}
+}
 
+
+
+
+/**
+ * @brief SubWindow::resizeEvent
+ * 
+ *  At first we give the event to QMdiSubWindow::resizeEvent() which handles
+ *  the event on its behavior.
+ *
+ *  On every resize event we have to adjust our title label.
+ * 
+ *  At last we store the current size into m_trackedNormalGeom. This size
+ *  will be saved with the project because of an Qt bug wich doesn't
+ *  save the right size. look at: https://bugreports.qt.io/browse/QTBUG-256
+ * 
+ * @param event
+ */
 void SubWindow::resizeEvent( QResizeEvent * event )
 {
 	// When the parent QMdiArea gets resized, maximized subwindows also gets resized, if any.

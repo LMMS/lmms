@@ -24,6 +24,7 @@
  */
 
 
+#include <QtCore/QVarLengthArray>
 #include <QMessageBox>
 
 #include "LadspaEffect.h"
@@ -41,8 +42,9 @@
 #include "ValueBuffer.h"
 #include "Song.h"
 
-#include "embed.cpp"
+#include "embed.h"
 
+#include "plugin_export.h"
 
 extern "C"
 {
@@ -51,13 +53,13 @@ Plugin::Descriptor PLUGIN_EXPORT ladspaeffect_plugin_descriptor =
 {
 	STRINGIFY( PLUGIN_NAME ),
 	"LADSPA",
-	QT_TRANSLATE_NOOP( "pluginBrowser",
+	QT_TRANSLATE_NOOP( "PluginBrowser",
 				"plugin for using arbitrary LADSPA-effects "
 				"inside LMMS." ),
 	"Danny McRae <khjklujn/at/users.sourceforge.net>",
 	0x0100,
 	Plugin::Effect,
-	new PluginPixmapLoader( "logo" ),
+	new PluginPixmapLoader("logo"),
 	NULL,
 	new LadspaSubPluginFeatures( Plugin::Effect )
 } ;
@@ -138,12 +140,12 @@ bool LadspaEffect::processAudioBuffer( sampleFrame * _buf,
 
 	int frames = _frames;
 	sampleFrame * o_buf = NULL;
-	sampleFrame sBuf [_frames];
+	QVarLengthArray<sample_t> sBuf(_frames * DEFAULT_CHANNELS);
 
 	if( m_maxSampleRate < Engine::mixer()->processingSampleRate() )
 	{
 		o_buf = _buf;
-		_buf = &sBuf[0];
+		_buf = reinterpret_cast<sampleFrame*>(sBuf.data());
 		sampleDown( o_buf, _buf, m_maxSampleRate );
 		frames = _frames * m_maxSampleRate /
 				Engine::mixer()->processingSampleRate();
@@ -367,7 +369,11 @@ void LadspaEffect::pluginInstantiation()
 			}
 
 			p->scale = 1.0f;
-			if( manager->isPortToggled( m_key, port ) )
+			if( manager->isEnum( m_key, port ) )
+			{
+				p->data_type = ENUM;
+			}
+			else if( manager->isPortToggled( m_key, port ) )
 			{
 				p->data_type = TOGGLED;
 			}
@@ -590,7 +596,7 @@ extern "C"
 {
 
 // necessary for getting instance out of shared lib
-Plugin * PLUGIN_EXPORT lmms_plugin_main( Model * _parent, void * _data )
+PLUGIN_EXPORT Plugin * lmms_plugin_main( Model * _parent, void * _data )
 {
 	return new LadspaEffect( _parent,
 		static_cast<const Plugin::Descriptor::SubPluginFeatures::Key *>(

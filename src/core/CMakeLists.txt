@@ -1,9 +1,6 @@
-IF(LMMS_HAVE_WEAKJACK)
-	set(WEAKJACK core/audio/AudioWeakJack.c)
-ENDIF()
-	
 set(LMMS_SRCS
 	${LMMS_SRCS}
+
 	core/AutomatableModel.cpp
 	core/AutomationPattern.cpp
 	core/BandLimitedWave.cpp
@@ -34,22 +31,28 @@ set(LMMS_SRCS
 	core/LadspaControl.cpp
 	core/LadspaManager.cpp
 	core/LfoController.cpp
+	core/LinkedModelGroups.cpp
 	core/LocklessAllocator.cpp
 	core/MemoryHelper.cpp
 	core/MemoryManager.cpp
 	core/MeterModel.cpp
+	core/MicroTimer.cpp
 	core/Mixer.cpp
 	core/MixerProfiler.cpp
 	core/MixerWorkerThread.cpp
 	core/MixHelpers.cpp
 	core/Model.cpp
+	core/ModelVisitor.cpp
 	core/Note.cpp
 	core/NotePlayHandle.cpp
 	core/Oscillator.cpp
+	core/PathUtil.cpp
 	core/PeakController.cpp
+	core/PerfLog.cpp
 	core/Piano.cpp
 	core/PlayHandle.cpp
 	core/Plugin.cpp
+	core/PluginIssue.cpp
 	core/PluginFactory.cpp
 	core/PresetPreviewPlayHandle.cpp
 	core/ProjectJournal.cpp
@@ -69,14 +72,15 @@ set(LMMS_SRCS
 	core/TrackContainer.cpp
 	core/ValueBuffer.cpp
 	core/VstSyncController.cpp
+	core/StepRecorder.cpp
 
 	core/audio/AudioAlsa.cpp
 	core/audio/AudioDevice.cpp
 	core/audio/AudioFileDevice.cpp
 	core/audio/AudioFileMP3.cpp
 	core/audio/AudioFileOgg.cpp
+	core/audio/AudioFileFlac.cpp
 	core/audio/AudioFileWave.cpp
-	${WEAKJACK}
 	core/audio/AudioJack.cpp
 	core/audio/AudioOss.cpp
 	core/audio/AudioSndio.cpp
@@ -87,10 +91,22 @@ set(LMMS_SRCS
 	core/audio/AudioSampleRecorder.cpp
 	core/audio/AudioSdl.cpp
 
+	core/lv2/Lv2Basics.cpp
+	core/lv2/Lv2ControlBase.cpp
+	core/lv2/Lv2Evbuf.cpp
+	core/lv2/Lv2Features.cpp
+	core/lv2/Lv2Ports.cpp
+	core/lv2/Lv2Proc.cpp
+	core/lv2/Lv2Manager.cpp
+	core/lv2/Lv2SubPluginFeatures.cpp
+	core/lv2/Lv2UridCache.cpp
+	core/lv2/Lv2UridMap.cpp
+
 	core/midi/MidiAlsaRaw.cpp
 	core/midi/MidiAlsaSeq.cpp
 	core/midi/MidiClient.cpp
 	core/midi/MidiController.cpp
+	core/midi/MidiEventToByteSeq.cpp
 	core/midi/MidiJack.cpp
 	core/midi/MidiOss.cpp
 	core/midi/MidiSndio.cpp

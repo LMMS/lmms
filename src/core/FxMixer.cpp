@@ -32,7 +32,9 @@
 #include "Song.h"
 
 #include "InstrumentTrack.h"
+#include "SampleTrack.h"
 #include "BBTrackContainer.h"
+#include "TrackContainer.h" // For TrackContainer::TrackList typedef
 
 FxRoute::FxRoute( FxChannel * from, FxChannel * to, float amount ) :
 	m_from( from ),
@@ -71,7 +73,8 @@ FxChannel::FxChannel( int idx, Model * _parent ) :
 	m_lock(),
 	m_channelIndex( idx ),
 	m_queued( false ),
-	m_dependenciesMet( 0 )
+	m_hasColor( false ),
+	m_dependenciesMet(0)
 {
 	BufferManager::clear( m_buffer, Engine::mixer()->framesPerPeriod() );
 }
@@ -98,7 +101,7 @@ inline void FxChannel::processed()
 
 void FxChannel::incrementDeps()
 {
-	int i = m_dependenciesMet.fetchAndAddOrdered( 1 ) + 1;
+	int i = m_dependenciesMet++ + 1;
 	if( i >= m_receives.size() && ! m_queued )
 	{
 		m_queued = true;
@@ -170,11 +173,9 @@ void FxChannel::doProcessing()
 
 		m_stillRunning = m_fxChain.processAudioBuffer( m_buffer, fpp, m_hasInput );
 
-		float peakLeft = 0.;
-		float peakRight = 0.;
-		Engine::mixer()->getPeakValues( m_buffer, fpp, peakLeft, peakRight );
-		m_peakLeft = qMax( m_peakLeft, peakLeft * v );
-		m_peakRight = qMax( m_peakRight, peakRight * v );
+		Mixer::StereoSample peakSamples = Engine::mixer()->getPeakValues(m_buffer, fpp);
+		m_peakLeft = qMax( m_peakLeft, peakSamples.left * v );
+		m_peakRight = qMax( m_peakRight, peakSamples.right * v );
 	}
 	else
 	{
@@ -307,6 +308,22 @@ void FxMixer::deleteChannel( int index )
 				inst->effectChannelModel()->setValue(val-1);
 			}
 		}
+		else if( t->type() == Track::SampleTrack )
+		{
+			SampleTrack* strk = dynamic_cast<SampleTrack *>( t );
+			int val = strk->effectChannelModel()->value(0);
+			if( val == index )
+			{
+				// we are deleting this track's fx send
+				// send to master
+				strk->effectChannelModel()->setValue(0);
+			}
+			else if( val > index )
+			{
+				// subtract 1 to make up for the missing channel
+				strk->effectChannelModel()->setValue(val-1);
+			}
+		}
 	}
 
 	FxChannel * ch = m_fxChannels[index];
@@ -320,6 +337,11 @@ void FxMixer::deleteChannel( int index )
 	{
 		deleteChannelSend( ch->m_receives.first() );
 	}
+
+	// if m_lastSoloed was our index, reset it
+	if (m_lastSoloed == index) { m_lastSoloed = -1; }
+	// if m_lastSoloed is > delete index, it will move left
+	else if (m_lastSoloed > index) { --m_lastSoloed; }
 
 	// actually delete the channel
 	m_fxChannels.remove(index);
@@ -358,14 +380,18 @@ void FxMixer::moveChannelLeft( int index )
 	// channels to swap
 	int a = index - 1, b = index;
 
-	// go through every instrument and adjust for the channel index change
-	QVector<Track *> songTrackList = Engine::getSong()->tracks();
-	QVector<Track *> bbTrackList = Engine::getBBTrackContainer()->tracks();
+	// check if m_lastSoloed is one of our swaps
+	if (m_lastSoloed == a) { m_lastSoloed = b; }
+	else if (m_lastSoloed == b) { m_lastSoloed = a; }
 
-	QVector<Track *> trackLists[] = {songTrackList, bbTrackList};
+	// go through every instrument and adjust for the channel index change
+	TrackContainer::TrackList songTrackList = Engine::getSong()->tracks();
+	TrackContainer::TrackList bbTrackList = Engine::getBBTrackContainer()->tracks();
+
+	TrackContainer::TrackList trackLists[] = {songTrackList, bbTrackList};
 	for(int tl=0; tl<2; ++tl)
 	{
-		QVector<Track *> trackList = trackLists[tl];
+		TrackContainer::TrackList trackList = trackLists[tl];
 		for(int i=0; i<trackList.size(); ++i)
 		{
 			if( trackList[i]->type() == Track::InstrumentTrack )
@@ -379,6 +405,19 @@ void FxMixer::moveChannelLeft( int index )
 				else if( val == b )
 				{
 					inst->effectChannelModel()->setValue(a);
+				}
+			}
+			else if( trackList[i]->type() == Track::SampleTrack )
+			{
+				SampleTrack * strk = (SampleTrack *) trackList[i];
+				int val = strk->effectChannelModel()->value(0);
+				if( val == a )
+				{
+					strk->effectChannelModel()->setValue(b);
+				}
+				else if( val == b )
+				{
+					strk->effectChannelModel()->setValue(a);
 				}
 			}
 		}
@@ -589,14 +628,14 @@ void FxMixer::masterMix( sampleFrame * _buf )
 			MixerWorkerThread::addJob( ch );
 		}
 	}
-	while( m_fxChannels[0]->state() != ThreadableJob::Done )
+	while (m_fxChannels[0]->state() != ThreadableJob::ProcessingState::Done)
 	{
 		bool found = false;
 		for( FxChannel * ch : m_fxChannels )
 		{
-			int s = ch->state();
-			if( s == ThreadableJob::Queued
-				|| s == ThreadableJob::InProgress )
+			const auto s = ch->state();
+			if (s == ThreadableJob::ProcessingState::Queued
+				|| s == ThreadableJob::ProcessingState::InProgress)
 			{
 				found = true;
 				break;
@@ -703,6 +742,7 @@ void FxMixer::saveSettings( QDomDocument & _doc, QDomElement & _this )
 		ch->m_soloModel.saveSettings( _doc, fxch, "soloed" );
 		fxch.setAttribute( "num", i );
 		fxch.setAttribute( "name", ch->m_name );
+		if( ch->m_hasColor ) fxch.setAttribute( "color", ch->m_color.name() );
 
 		// add the channel sends
 		for( int si = 0; si < ch->m_sends.size(); ++si )
@@ -748,6 +788,11 @@ void FxMixer::loadSettings( const QDomElement & _this )
 		m_fxChannels[num]->m_muteModel.loadSettings( fxch, "muted" );
 		m_fxChannels[num]->m_soloModel.loadSettings( fxch, "soloed" );
 		m_fxChannels[num]->m_name = fxch.attribute( "name" );
+		if( fxch.hasAttribute( "color" ) )
+		{
+			m_fxChannels[num]->m_hasColor = true;
+			m_fxChannels[num]->m_color.setNamedColor( fxch.attribute( "color" ) );
+		}
 
 		m_fxChannels[num]->m_fxChain.restoreState( fxch.firstChildElement(
 			m_fxChannels[num]->m_fxChain.nodeName() ) );
@@ -782,4 +827,3 @@ void FxMixer::validateChannelName( int index, int oldIndex )
 		m_fxChannels[index]->m_name = tr( "FX %1" ).arg( index );
 	}
 }
-

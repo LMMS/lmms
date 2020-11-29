@@ -64,7 +64,7 @@
 typedef LocklessList<PlayHandle *>::Element LocklessListElement;
 
 
-static __thread bool s_renderingThread;
+static thread_local bool s_renderingThread;
 
 
 
@@ -357,16 +357,16 @@ const surroundSampleFrame * Mixer::renderNextBuffer()
 					 currentPlayMode == Song::Mode_PlayBB;
 
 	if( playModeSupportsMetronome && m_metronomeActive && !song->isExporting() &&
-		p != last_metro_pos &&
+		!song->isPaused() && p != last_metro_pos &&
 			// Stop crash with metronome if empty project
 				Engine::getSong()->countTracks() )
 	{
-		tick_t ticksPerTact = MidiTime::ticksPerTact();
-		if ( p.getTicks() % (ticksPerTact / 1 ) == 0 )
+		tick_t ticksPerBar = MidiTime::ticksPerBar();
+		if ( p.getTicks() % ( ticksPerBar / 1 ) == 0 )
 		{
 			addPlayHandle( new SamplePlayHandle( "misc/metronome02.ogg" ) );
 		}
-		else if ( p.getTicks() % (ticksPerTact /
+		else if ( p.getTicks() % ( ticksPerBar /
 			song->getTimeSigModel().getNumerator() ) == 0 )
 		{
 			addPlayHandle( new SamplePlayHandle( "misc/metronome01.ogg" ) );
@@ -393,7 +393,7 @@ const surroundSampleFrame * Mixer::renderNextBuffer()
 	ConstPlayHandleList::Iterator it_rem = m_playHandlesToRemove.begin();
 	while( it_rem != m_playHandlesToRemove.end() )
 	{
-		PlayHandleList::Iterator it = qFind( m_playHandles.begin(), m_playHandles.end(), *it_rem );
+		PlayHandleList::Iterator it = std::find( m_playHandles.begin(), m_playHandles.end(), *it_rem );
 
 		if( it != m_playHandles.end() )
 		{
@@ -534,10 +534,10 @@ void Mixer::clearInternal()
 
 
 
-void Mixer::getPeakValues( sampleFrame * _ab, const f_cnt_t _frames, float & peakLeft, float & peakRight ) const
+Mixer::StereoSample Mixer::getPeakValues(sampleFrame * _ab, const f_cnt_t _frames) const
 {
-	peakLeft = 0.0f;
-	peakRight = 0.0f;
+	sample_t peakLeft = 0.0f;
+	sample_t peakRight = 0.0f;
 
 	for( f_cnt_t f = 0; f < _frames; ++f )
 	{
@@ -553,6 +553,8 @@ void Mixer::getPeakValues( sampleFrame * _ab, const f_cnt_t _frames, float & pea
 			peakRight = absRight;
 		}
 	}
+
+	return StereoSample(peakLeft, peakRight);
 }
 
 
@@ -593,21 +595,6 @@ void Mixer::doSetAudioDevice( AudioDevice * _dev )
 					"Trying any working audio-device\n" );
 		m_audioDev = tryAudioDevices();
 	}
-}
-
-
-
-
-void Mixer::setAudioDevice( AudioDevice * _dev,
-			    bool startNow )
-{
-	stopProcessing();
-
-	doSetAudioDevice( _dev );
-
-	emit sampleRateChanged();
-
-	if (startNow) {startProcessing();}
 }
 
 
@@ -665,7 +652,7 @@ void Mixer::restoreAudioDevice()
 void Mixer::removeAudioPort( AudioPort * _port )
 {
 	requestChangeInModel();
-	QVector<AudioPort *>::Iterator it = qFind( m_audioPorts.begin(),
+	QVector<AudioPort *>::Iterator it = std::find( m_audioPorts.begin(),
 							m_audioPorts.end(),
 							_port );
 	if( it != m_audioPorts.end() )
@@ -726,7 +713,7 @@ void Mixer::removePlayHandle( PlayHandle * _ph )
 			}
 		}
 		// Now check m_playHandles
-		PlayHandleList::Iterator it = qFind( m_playHandles.begin(),
+		PlayHandleList::Iterator it = std::find( m_playHandles.begin(),
 					m_playHandles.end(), _ph );
 		if( it != m_playHandles.end() )
 		{
@@ -829,7 +816,9 @@ void Mixer::runChangesInModel()
 	if( m_changesSignal )
 	{
 		m_waitChangesMutex.lock();
+		// allow changes in the model from other threads ...
 		m_changesRequestCondition.wakeOne();
+		// ... and wait until they are done
 		m_changesMixerCondition.wait( &m_waitChangesMutex );
 		m_waitChangesMutex.unlock();
 	}
@@ -1203,8 +1192,18 @@ MidiClient * Mixer::tryMidiClients()
     printf( "midi apple didn't work: client_name=%s\n", client_name.toUtf8().constData());
 #endif
 
-	printf( "Couldn't create MIDI-client, neither with ALSA nor with "
-		"OSS. Will use dummy-MIDI-client.\n" );
+	if(client_name != MidiDummy::name())
+	{
+		if (client_name.isEmpty())
+		{
+			printf("Unknown MIDI-client. ");
+		}
+		else
+		{
+			printf("Couldn't create %s MIDI-client. ", client_name.toUtf8().constData());
+		}
+		printf("Will use dummy-MIDI-client.\n");
+	}
 
 	m_midiClientName = MidiDummy::name();
 
@@ -1224,6 +1223,7 @@ Mixer::fifoWriter::fifoWriter( Mixer* mixer, fifo * _fifo ) :
 	m_fifo( _fifo ),
 	m_writing( true )
 {
+	setObjectName("Mixer::fifoWriter");
 }
 
 
@@ -1242,7 +1242,7 @@ void Mixer::fifoWriter::run()
 	disable_denormals();
 
 #if 0
-#ifdef LMMS_BUILD_LINUX
+#if defined(LMMS_BUILD_LINUX) || defined(LMMS_BUILD_FREEBSD)
 #ifdef LMMS_HAVE_SCHED_H
 	cpu_set_t mask;
 	CPU_ZERO( &mask );
@@ -1282,6 +1282,4 @@ void Mixer::fifoWriter::write( surroundSampleFrame * buffer )
 	m_mixer->m_waitingForWrite = false;
 	m_mixer->m_doChangesMutex.unlock();
 }
-
-
 

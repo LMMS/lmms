@@ -33,14 +33,14 @@
 #include "debug.h"
 #include "ConfigManager.h"
 #include "gui_templates.h"
-#include "templates.h"
 #include "ComboBox.h"
 #include "Mixer.h"
 
 AudioSoundIo::AudioSoundIo( bool & outSuccessful, Mixer * _mixer ) :
-	AudioDevice( tLimit<ch_cnt_t>(
-		ConfigManager::inst()->value( "audiosoundio", "channels" ).toInt(), DEFAULT_CHANNELS, SURROUND_CHANNELS ),
-								_mixer )
+	AudioDevice( qBound<ch_cnt_t>(
+		DEFAULT_CHANNELS,
+		ConfigManager::inst()->value( "audiosoundio", "channels" ).toInt(),
+		SURROUND_CHANNELS ), _mixer )
 {
 	outSuccessful = false;
 	m_soundio = NULL;
@@ -50,6 +50,7 @@ AudioSoundIo::AudioSoundIo( bool & outSuccessful, Mixer * _mixer ) :
 	m_outBufFrameIndex = 0;
 	m_outBufFramesTotal = 0;
 	m_stopped = true;
+	m_outstreamStarted = false;
 
 	m_soundio = soundio_create();
 	if (!m_soundio)
@@ -196,6 +197,12 @@ void AudioSoundIo::onBackendDisconnect(int err)
 AudioSoundIo::~AudioSoundIo()
 {
 	stopProcessing();
+	
+	if (m_outstream)
+	{
+		soundio_outstream_destroy(m_outstream);
+	}
+	
 	if (m_soundio)
 	{
 		soundio_destroy(m_soundio);
@@ -205,28 +212,50 @@ AudioSoundIo::~AudioSoundIo()
 
 void AudioSoundIo::startProcessing()
 {
+	int err;
+	
 	m_outBufFrameIndex = 0;
 	m_outBufFramesTotal = 0;
 	m_outBufSize = mixer()->framesPerPeriod();
 
 	m_outBuf = new surroundSampleFrame[m_outBufSize];
 
+	if (! m_outstreamStarted)
+	{
+		if ((err = soundio_outstream_start(m_outstream)))
+		{
+			fprintf(stderr, 
+				"AudioSoundIo::startProcessing() :: soundio unable to start stream: %s\n", 
+				soundio_strerror(err));
+		} else {
+			m_outstreamStarted = true;
+		}
+	}
+
 	m_stopped = false;
-	int err;
-	if ((err = soundio_outstream_start(m_outstream)))
+
+	if ((err = soundio_outstream_pause(m_outstream, false)))
 	{
 		m_stopped = true;
-		fprintf(stderr, "soundio unable to start stream: %s\n", soundio_strerror(err));
+		fprintf(stderr, 
+			"AudioSoundIo::startProcessing() :: resuming result error: %s\n", 
+			soundio_strerror(err));
 	}
 }
 
 void AudioSoundIo::stopProcessing()
 {
+	int err;
+	
 	m_stopped = true;
 	if (m_outstream)
 	{
-		soundio_outstream_destroy(m_outstream);
-		m_outstream = NULL;
+		if ((err = soundio_outstream_pause(m_outstream, true)))
+		{
+			fprintf(stderr, 
+				"AudioSoundIo::stopProcessing() :: pausing result error: %s\n",
+				soundio_strerror(err));
+		}
 	}
 
 	if (m_outBuf)
@@ -426,14 +455,14 @@ AudioSoundIo::setupWidget::setupWidget( QWidget * _parent ) :
 	m_backend = new ComboBox( this, "BACKEND" );
 	m_backend->setGeometry( 64, 15, 260, 20 );
 
-	QLabel * backend_lbl = new QLabel( tr( "BACKEND" ), this );
+	QLabel * backend_lbl = new QLabel( tr( "Backend" ), this );
 	backend_lbl->setFont( pointSize<7>( backend_lbl->font() ) );
 	backend_lbl->move( 8, 18 );
 
 	m_device = new ComboBox( this, "DEVICE" );
 	m_device->setGeometry( 64, 35, 260, 20 );
 
-	QLabel * dev_lbl = new QLabel( tr( "DEVICE" ), this );
+	QLabel * dev_lbl = new QLabel( tr( "Device" ), this );
 	dev_lbl->setFont( pointSize<7>( dev_lbl->font() ) );
 	dev_lbl->move( 8, 38 );
 

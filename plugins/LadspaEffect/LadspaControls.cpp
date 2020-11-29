@@ -155,6 +155,9 @@ void LadspaControls::linkPort( int _port, bool _state )
 		{
 			first->unlinkControls( m_controls[proc][_port] );
 		}
+
+		// m_stereoLinkModel.setValue() will call updateLinkStatesFromGlobal()
+		// m_noLink will make sure that this will not unlink any other ports
 		m_noLink = true;
 		m_stereoLinkModel.setValue( false );
 	}

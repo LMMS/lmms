@@ -16,6 +16,7 @@ DESKTOPFILE="${APPDIR}usr/share/applications/lmms.desktop"
 STRIP=""
 
 # Don't strip for Debug|RelWithDebInfo builds
+# shellcheck disable=SC2193
 if [[ "@CMAKE_BUILD_TYPE@" == *"Deb"* ]]; then
 	STRIP="-no-strip"
 fi
@@ -52,30 +53,32 @@ fi
 echo -e "\nWriting verbose output to \"${LOGFILE}\""
 
 # Ensure linuxdeployqt uses the same qmake version as cmake
-export PATH="$(pwd -P)/squashfs-root/usr/bin:$(dirname "@QT_QMAKE_EXECUTABLE@")":$PATH
+PATH="$(pwd -P)/squashfs-root/usr/bin:$(dirname "@QT_QMAKE_EXECUTABLE@")":$PATH
+export PATH
 
-# Fetch portable linuxdeployqt if cache is older than $DAYSOLD
+# Fetch portable linuxdeployqt if not in PATH
 APPIMAGETOOL="squashfs-root/usr/bin/appimagetool"
 echo -e "\nDownloading linuxdeployqt to ${LINUXDEPLOYQT}..."
-mkdir -p "$HOME/bin"
-DAYSOLD=2
 if env -i which linuxdeployqt > /dev/null 2>&1; then
 	skipped "System already provides this utility"
-elif ! find "$LINUXDEPLOYQT" -mtime -$DAYSOLD 2>/dev/null|grep -q "." > /dev/null 2>&1; then
-	url="https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-$(uname -p).AppImage"
-	echo "   [.......] Couldn't find linuxdeployqt newer than $DAYSOLD days old"
+else
+	filename="linuxdeployqt-continuous-$(uname -p).AppImage"
+	url="https://github.com/probonopd/linuxdeployqt/releases/download/continuous/$filename"
+	down_file="$(pwd)/$filename"
+	if [ ! -f "$LINUXDEPLOYQT" ]; then
+		ln -s "$down_file" "$LINUXDEPLOYQT"
+	fi
 	echo "   [.......] Downloading ($(uname -p)): ${url}"
-	wget "$url" -O "$LINUXDEPLOYQT" -q || (rm "$LINUXDEPLOYQT" && false)
+	wget -N -q "$url" || (rm "$filename" && false)
 	chmod +x "$LINUXDEPLOYQT"
-	touch "$LINUXDEPLOYQT"
 	success "Downloaded $LINUXDEPLOYQT"
-	"$LINUXDEPLOYQT" --appimage-extract > /dev/null 2>&1
-	# We need to set LD_LIBRARY_PATH, but linuxdepoyqt's AppRun unsets it
+	# Extract AppImage and replace LINUXDEPLOYQT variable with extracted binary
+	# to support systems without fuse
+	# Also, we need to set LD_LIBRARY_PATH, but linuxdepoyqt's AppRun unsets it
 	# See https://github.com/probonopd/linuxdeployqt/pull/370/
+	"$LINUXDEPLOYQT" --appimage-extract > /dev/null 2>&1
 	LINUXDEPLOYQT="squashfs-root/usr/bin/linuxdeployqt"
 	success "Extracted $APPIMAGETOOL"
-else
-	skipped "$LINUXDEPLOYQT is less than $DAYSOLD days old"
 fi
 
 # Make skeleton AppDir
@@ -96,56 +99,39 @@ cp -R /usr/share/stk/rawwaves/ "${APPDIR}usr/share/stk/"
 
 # Create a wrapper script which calls the lmms executable
 mv "${APPDIR}usr/bin/lmms" "${APPDIR}usr/bin/lmms.real"
-# shellcheck disable=SC1083
-cat >"${APPDIR}usr/bin/lmms" <<EOL
-#!/usr/bin/env bash
-DIR="\$( cd "\$( dirname "\${BASH_SOURCE[0]}" )" && pwd )"
-export PATH="$PATH:/sbin"
-if which carla > /dev/null 2>&1; then
-   CARLAPATH="\$(which carla)"
-   CARLAPREFIX="\${CARLAPATH%/bin*}"
-   echo "Carla appears to be installed on this system at \$CARLAPREFIX/lib[64]/carla so we'll use it."
-   export LD_LIBRARY_PATH=\$CARLAPREFIX/lib/carla:\$CARLAPREFIX/lib64/carla:\$LD_LIBRARY_PATH
-else
-   echo "Carla does not appear to be installed.  That's OK, please ignore any related library errors."
-fi
-export LD_LIBRARY_PATH=\$DIR/usr/lib/:\$DIR/usr/lib/lmms:\$LD_LIBRARY_PATH
-# Prevent segfault on VirualBox
-if lsmod |grep vboxguest > /dev/null 2>&1; then
-   echo "VirtualBox detected.  Forcing libgl software rendering."
-   export LIBGL_ALWAYS_SOFTWARE=1;
-fi
-if ldconfig -p | grep libjack.so.0 > /dev/null 2>&1; then
-   echo "Jack appears to be installed on this system, so we'll use it."
-else
-   echo "Jack does not appear to be installed.  That's OK, we'll use a dummy version instead."
-   export LD_LIBRARY_PATH=\$DIR/usr/lib/lmms/optional:\$LD_LIBRARY_PATH
-fi
-QT_X11_NO_NATIVE_MENUBAR=1 \$DIR/usr/bin/lmms.real "\$@"
-EOL
+
+cp "@CMAKE_CURRENT_SOURCE_DIR@/launch_lmms.sh" "${APPDIR}usr/bin/lmms"
 
 chmod +x "${APPDIR}usr/bin/lmms"
 
-# Per https://github.com/probonopd/linuxdeployqt/issues/129 
+# Per https://github.com/probonopd/linuxdeployqt/issues/129
 unset LD_LIBRARY_PATH
 
 # Ensure linuxdeployqt can find shared objects
-export LD_LIBRARY_PATH="${APPDIR}usr/lib/lmms/":$LD_LIBRARY_PATH
-
-# Handle wine linking
-if [ -d "@WINE_LIBRARY_FIX@" ]; then
-   export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:@WINE_LIBRARY_FIX@:@WINE_LIBRARY_FIX@wine/
-fi
+export LD_LIBRARY_PATH="${APPDIR}"usr/lib/lmms/:"${APPDIR}"usr/lib/lmms/optional:"$LD_LIBRARY_PATH"
 
 # Move executables so linuxdeployqt can find them
 ZYNLIB="${APPDIR}usr/lib/lmms/RemoteZynAddSubFx"
-VSTLIB="${APPDIR}usr/lib/lmms/RemoteVstPlugin.exe.so"
+VSTLIB32="${APPDIR}usr/lib/lmms/32/RemoteVstPlugin32.exe.so"
+VSTLIB64="${APPDIR}usr/lib/lmms/RemoteVstPlugin64.exe.so"
 
 ZYNBIN="${APPDIR}usr/bin/RemoteZynAddSubFx"
-VSTBIN="${APPDIR}usr/bin/RemoteVstPlugin.exe.so"
+VSTBIN32="${APPDIR}usr/bin/RemoteVstPlugin32.exe.so"
+VSTBIN64="${APPDIR}usr/bin/RemoteVstPlugin64.exe.so"
 
 mv "$ZYNLIB" "$ZYNBIN"
-mv "$VSTLIB" "$VSTBIN"
+mv "$VSTLIB32" "$VSTBIN32" || true
+mv "$VSTLIB64" "$VSTBIN64" || true
+
+# Handle wine linking
+if [ -d "@WINE_32_LIBRARY_DIR@" ] && \
+		ldd "$VSTBIN32" | grep "libwine\.so" | grep "not found"; then
+   export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:"@WINE_32_LIBRARY_DIRS@"
+fi
+if [ -d "@WINE_64_LIBRARY_DIR@" ] && \
+		ldd "$VSTBIN64" | grep "libwine\.so" | grep "not found"; then
+   export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:"@WINE_64_LIBRARY_DIRS@"
+fi
 
 # Patch the desktop file
 sed -i 's/.*Exec=.*/Exec=lmms.real/' "$DESKTOPFILE"
@@ -156,7 +142,8 @@ for file in "${APPDIR}usr/lib/lmms/"*.so; do
    executables="${executables} -executable=$thisfile"
 done
 executables="${executables} -executable=${ZYNBIN}"
-executables="${executables} -executable=${VSTBIN}"
+executables="${executables} -executable=${VSTBIN32}"
+executables="${executables} -executable=${VSTBIN64}"
 executables="${executables} -executable=${APPDIR}usr/lib/lmms/ladspa/imp_1199.so"
 executables="${executables} -executable=${APPDIR}usr/lib/lmms/ladspa/imbeq_1197.so"
 executables="${executables} -executable=${APPDIR}usr/lib/lmms/ladspa/pitch_scale_1193.so"
@@ -165,19 +152,22 @@ executables="${executables} -executable=${APPDIR}usr/lib/lmms/ladspa/pitch_scale
 # Bundle both qt and non-qt dependencies into appimage format
 echo -e "\nBundling and relinking system dependencies..."
 echo -e ">>>>> linuxdeployqt" > "$LOGFILE"
+
 # shellcheck disable=SC2086
 "$LINUXDEPLOYQT" "$DESKTOPFILE" $executables -bundle-non-qt-libs -verbose=$VERBOSITY $STRIP >> "$LOGFILE" 2>&1
 success "Bundled and relinked dependencies"
 
 # Link to original location so lmms can find them
 ln -sr  "$ZYNBIN" "$ZYNLIB"
-ln -sr  "$VSTBIN" "$VSTLIB"
+ln -sr  "$VSTBIN32" "$VSTLIB32" || true
+ln -sr  "$VSTBIN64" "$VSTLIB64" || true
 
 # Remove wine library conflict
 rm -f "${APPDIR}/usr/lib/libwine.so.1"
 
 # Use system-provided carla
 rm -f "${APPDIR}usr/lib/"libcarla*.so
+rm -f "${APPDIR}usr/lib/lmms/optional/"libcarla*.so
 
 # Remove bundled jack in LD_LIBRARY_PATH if exists
 if [ -e "${APPDIR}/usr/lib/libjack.so.0" ]; then

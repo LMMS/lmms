@@ -1,44 +1,61 @@
-ADD_DEFINITIONS(-DFFTW3)
-INCLUDE_DIRECTORIES("${CMAKE_SOURCE_DIR}/include"
-                    "${CMAKE_CURRENT_SOURCE_DIR}"
-                    ${FFTW3F_INCLUDE_DIRS}
-                    "${CMAKE_BINARY_DIR}")
-LINK_DIRECTORIES(${FFTW3F_LIBRARY_DIRS})
-FILE(GLOB PLUGIN_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/*.c")
-LIST(SORT PLUGIN_SOURCES)
+# Create blank config.h
+FILE(WRITE ladspa/config.h "")
 
-SET(COMPILE_FLAGS "${COMPILE_FLAGS} -O3 -Wall -fomit-frame-pointer  -funroll-loops -ffast-math -fno-strict-aliasing")
-IF(NOT LMMS_BUILD_WIN32)
-	SET(COMPILE_FLAGS "${COMPILE_FLAGS} -fPIC -DPIC")
+# Precompiler PIC Macro
+IF(LMMS_BUILD_WIN32)
+	SET(PIC_FLAGS "")
+ELSE()
+	SET(PIC_FLAGS "-fPIC -DPIC")
 ENDIF()
 
-FOREACH(_item ${PLUGIN_SOURCES})
-	GET_FILENAME_COMPONENT(_plugin "${_item}" NAME_WE)
+# Additional compile flags
+SET(COMPILE_FLAGS "${COMPILE_FLAGS} -O3 -Wall")
+SET(COMPILE_FLAGS "${COMPILE_FLAGS} -fomit-frame-pointer -funroll-loops -ffast-math -c -fno-strict-aliasing")
+SET(COMPILE_FLAGS "${COMPILE_FLAGS} ${PIC_FLAGS}")
 
-	ADD_LIBRARY("${_plugin}" MODULE "${_item}")
-	# vocoder_1337 does not use fftw3f
+# Loop over every XML file
+FILE(GLOB XML_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/ladspa/*.xml")
+LIST(SORT XML_SOURCES)
+FOREACH(_item ${XML_SOURCES})
+	# Get library name and (soon to be) C file
+	GET_FILENAME_COMPONENT(_plugin "${_item}" NAME_WE)
+	SET(_out_file "${CMAKE_CURRENT_SOURCE_DIR}/ladspa/${_plugin}.c")
+
+	# Coerce XML source file to C
+	ADD_CUSTOM_COMMAND(
+		OUTPUT "${_out_file}"
+		COMMAND ./makestub.pl "${_item}" > "${_out_file}"
+		DEPENDS "${_item}"
+		WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/ladspa"
+		VERBATIM
+	)
+
+	# Add a library target for this C file, which depends on success of makestup.pl
+	ADD_LIBRARY("${_plugin}" MODULE "${_out_file}")
+
+	# Vocoder does not use fftw
 	IF(NOT ("${_plugin}" STREQUAL "vocoder_1337"))
-		TARGET_LINK_LIBRARIES("${_plugin}" -lfftw3f)
+		TARGET_LINK_LIBRARIES("${_plugin}" ${FFTW3F_LIBRARIES})
 	ENDIF()
 	IF(NOT MSVC)
 		TARGET_LINK_LIBRARIES("${_plugin}" m)
 	ENDIF()
-	INSTALL(TARGETS "${_plugin}" LIBRARY DESTINATION "${PLUGIN_DIR}/ladspa")
+
 	SET_TARGET_PROPERTIES("${_plugin}" PROPERTIES PREFIX "")
-	IF(LMMS_BUILD_WIN32)
-		ADD_CUSTOM_COMMAND(TARGET "${_plugin}" POST_BUILD COMMAND "${STRIP}" \"$<TARGET_FILE:${_plugin}>\")
-	ENDIF()
 	SET_TARGET_PROPERTIES("${_plugin}" PROPERTIES COMPILE_FLAGS "${COMPILE_FLAGS}")
-ENDFOREACH(_item ${PLUGIN_SOURCES})
+	SET_TARGET_PROPERTIES("${_plugin}" PROPERTIES LINK_FLAGS "${LINK_FLAGS}")
+	INSTALL(TARGETS "${_plugin}" LIBRARY DESTINATION "${PLUGIN_DIR}/ladspa")
+ENDFOREACH()
 
+ADD_DEFINITIONS(-DFFTW3)
+INCLUDE_DIRECTORIES(
+	"${CMAKE_SOURCE_DIR}/include"
+	"${CMAKE_CURRENT_SOURCE_DIR}/ladspa"
+	"${FFTW3F_INCLUDE_DIRS}"
+	"${CMAKE_BINARY_DIR}"
+)
 
-IF(LMMS_BUILD_WIN32)
-	SET(PIC_FLAGS "")
-ELSE(LMMS_BUILD_WIN32)
-	SET(PIC_FLAGS "-fPIC")
-ENDIF(LMMS_BUILD_WIN32)
-
-ADD_LIBRARY(iir STATIC util/iir.c)
+ADD_LIBRARY(iir STATIC ladspa/util/iir.c)
 SET_TARGET_PROPERTIES(iir PROPERTIES COMPILE_FLAGS "${PIC_FLAGS}")
 TARGET_LINK_LIBRARIES(bandpass_a_iir_1893 iir)
 TARGET_LINK_LIBRARIES(bandpass_iir_1892 iir)
@@ -47,24 +64,24 @@ TARGET_LINK_LIBRARIES(highpass_iir_1890 iir)
 TARGET_LINK_LIBRARIES(lowpass_iir_1891 iir)
 TARGET_LINK_LIBRARIES(notch_iir_1894 iir)
 
-FILE(GLOB GSM_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/gsm/*.c")
+FILE(GLOB GSM_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/ladspa/gsm/*.c")
 LIST(SORT GSM_SOURCES)
 ADD_LIBRARY(gsm STATIC ${GSM_SOURCES})
 SET_TARGET_PROPERTIES(gsm PROPERTIES COMPILE_FLAGS "${PIC_FLAGS}")
 TARGET_LINK_LIBRARIES(gsm_1215 gsm)
 
-ADD_LIBRARY(gverb STATIC gverb/gverb.c gverb/gverbdsp.c)
+ADD_LIBRARY(gverb STATIC ladspa/gverb/gverb.c ladspa/gverb/gverbdsp.c)
 SET_TARGET_PROPERTIES(gverb PROPERTIES COMPILE_FLAGS "${PIC_FLAGS}")
 TARGET_LINK_LIBRARIES(gverb_1216 gverb)
 
-ADD_LIBRARY(blo STATIC util/blo.c)
+ADD_LIBRARY(blo STATIC ladspa/util/blo.c)
 SET_TARGET_PROPERTIES(blo PROPERTIES COMPILE_FLAGS "${PIC_FLAGS}")
 TARGET_LINK_LIBRARIES(analogue_osc_1416 blo)
 TARGET_LINK_LIBRARIES(fm_osc_1415 blo)
 TARGET_LINK_LIBRARIES(hermes_filter_1200 blo)
 
-ADD_LIBRARY(rms STATIC util/rms.c)
-ADD_LIBRARY(db STATIC util/db.c)
+ADD_LIBRARY(rms STATIC ladspa/util/rms.c)
+ADD_LIBRARY(db STATIC ladspa/util/db.c)
 SET_TARGET_PROPERTIES(rms PROPERTIES COMPILE_FLAGS "${PIC_FLAGS}")
 SET_TARGET_PROPERTIES(db PROPERTIES COMPILE_FLAGS "${PIC_FLAGS}")
 TARGET_LINK_LIBRARIES(sc1_1425 rms db)
@@ -74,7 +91,7 @@ TARGET_LINK_LIBRARIES(sc4_1882 rms db)
 TARGET_LINK_LIBRARIES(sc4m_1916 rms db)
 TARGET_LINK_LIBRARIES(se4_1883 rms db)
 
-ADD_LIBRARY(pitchscale STATIC util/pitchscale.c)
+ADD_LIBRARY(pitchscale STATIC ladspa/util/pitchscale.c)
 SET_TARGET_PROPERTIES(pitchscale PROPERTIES COMPILE_FLAGS "${PIC_FLAGS}")
 TARGET_LINK_LIBRARIES(pitchscale -lfftw3f)
 TARGET_LINK_LIBRARIES(pitch_scale_1193 pitchscale)

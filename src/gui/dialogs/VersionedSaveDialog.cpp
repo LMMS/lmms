@@ -28,13 +28,16 @@
 #include <QLineEdit>
 #include <QMessageBox>
 #include <QPushButton>
+#include <QGroupBox>
+#include <QLabel>
 
+#include "DeprecationHelper.h"
 #include "VersionedSaveDialog.h"
-
-
+#include "LedCheckbox.h"
 
 
 VersionedSaveDialog::VersionedSaveDialog( QWidget *parent,
+										  QWidget *saveOptionsWidget,
 										  const QString &caption,
 										  const QString &directory,
 										  const QString &filter ) :
@@ -48,8 +51,8 @@ VersionedSaveDialog::VersionedSaveDialog( QWidget *parent,
 	plusButton->setToolTip( tr( "Increment version number" ) );
 	QPushButton *minusButton( new QPushButton( "-", this ) );
 	minusButton->setToolTip( tr( "Decrement version number" ) );
-	plusButton->setFixedWidth( plusButton->fontMetrics().width( "+" ) + 30 );
-	minusButton->setFixedWidth( minusButton->fontMetrics().width( "+" ) + 30 );
+	plusButton->setFixedWidth(horizontalAdvance(plusButton->fontMetrics(), "+") + 30);
+	minusButton->setFixedWidth(horizontalAdvance(minusButton->fontMetrics(), "+") + 30);
 
 	// Add buttons to grid layout. For doing this, remove the lineEdit and
 	// replace it with a HBox containing lineEdit and the buttons.
@@ -62,6 +65,17 @@ VersionedSaveDialog::VersionedSaveDialog( QWidget *parent,
 	hLayout->addWidget( plusButton );
 	hLayout->addWidget( minusButton );
 	layout->addLayout( hLayout, 2, 1 );
+
+	if (saveOptionsWidget) {
+		auto groupBox = new QGroupBox(tr("Save Options"));
+		auto optionsLayout = new QGridLayout;
+
+		optionsLayout->addWidget(saveOptionsWidget, 0, 0, Qt::AlignLeft);
+
+		groupBox->setLayout(optionsLayout);
+
+		layout->addWidget(groupBox, layout->rowCount() + 1, 0, 1, -1);
+	}
 
 	// Connect + and - buttons
 	connect( plusButton, SIGNAL( clicked() ), this, SLOT( incrementVersion() ));
@@ -98,7 +112,7 @@ bool VersionedSaveDialog::changeFileNameVersion(QString &fileName, bool incremen
 		Q_ASSERT( ok );
 
 		// Can't decrement 0
-		if ( !increment and version == 0 )
+		if ( !increment && version == 0 )
 			return false;
 		// Replace version number
 		version = increment ? version + 1 : version - 1;
@@ -159,4 +173,15 @@ bool VersionedSaveDialog::fileExistsQuery( QString FileName, QString WindowTitle
 		}
 	}
 	return fileExists;
+}
+
+SaveOptionsWidget::SaveOptionsWidget(Song::SaveOptions &saveOptions) {
+	auto *layout = new QVBoxLayout();
+
+	m_discardMIDIConnectionsCheckbox = new LedCheckBox(nullptr);
+	m_discardMIDIConnectionsCheckbox->setText(tr("Discard MIDI connections"));
+	m_discardMIDIConnectionsCheckbox->setModel(&saveOptions.discardMIDIConnections);
+	layout->addWidget(m_discardMIDIConnectionsCheckbox);
+
+	setLayout(layout);
 }

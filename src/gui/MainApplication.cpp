@@ -35,7 +35,7 @@ MainApplication::MainApplication(int& argc, char** argv) :
 	QApplication(argc, argv),
 	m_queuedFile()
 {
-#if defined(LMMS_BUILD_WIN32) && QT_VERSION >= 0x050000
+#if defined(LMMS_BUILD_WIN32)
 	installNativeEventFilter(this);
 #endif
 }
@@ -92,7 +92,6 @@ bool MainApplication::winEventFilter(MSG* msg, long* result)
 	}
 }
 
-#if QT_VERSION >= 0x050000
 bool MainApplication::nativeEventFilter(const QByteArray& eventType,
 					void* message, long* result)
 {
@@ -102,5 +101,4 @@ bool MainApplication::nativeEventFilter(const QByteArray& eventType,
 	}
 	return false;
 }
-#endif
 #endif

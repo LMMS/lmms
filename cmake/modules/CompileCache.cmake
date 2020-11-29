@@ -1,0 +1,25 @@
+option(USE_COMPILE_CACHE "Use ccache or clcache for compilation" OFF)
+
+# Compatibility for old option name
+if(USE_CCACHE)
+	set(USE_COMPILE_CACHE ON)
+endif()
+
+if(USE_COMPILE_CACHE)
+	if(MSVC)
+		set(CACHE_TOOL_NAME clcache)
+	elseif(CMAKE_CXX_COMPILER_ID MATCHES "(GNU|AppleClang|Clang)")
+		set(CACHE_TOOL_NAME ccache)
+	else()
+		message(WARNING "Compile cache only available with MSVC or GNU")
+	endif()
+
+	find_program(CACHE_TOOL ${CACHE_TOOL_NAME})
+	if (CACHE_TOOL)
+		message(STATUS "Using ${CACHE_TOOL} found for caching")
+		set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE ${CACHE_TOOL})
+		set_property(GLOBAL PROPERTY RULE_LAUNCH_LINK ${CACHE_TOOL})
+	else()
+		message(WARNING "USE_COMPILE_CACHE enabled, but no ${CACHE_TOOL_NAME} found")
+	endif()
+endif()

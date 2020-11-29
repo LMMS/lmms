@@ -26,6 +26,7 @@
 #ifndef MONSTRO_H
 #define MONSTRO_H
 
+#include <vector>
 
 #include "Instrument.h"
 #include "InstrumentView.h"
@@ -298,6 +299,9 @@ private:
 	int m_counter2r;
 	int m_counter3l;
 	int m_counter3r;
+
+	std::vector<float> m_lfo[2];
+	std::vector<float> m_env[2];
 };
 
 class MonstroInstrument : public Instrument
@@ -305,35 +309,35 @@ class MonstroInstrument : public Instrument
 	Q_OBJECT
 
 #define setwavemodel( name ) 												\
-		name .addItem( tr( "Sine wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "sin" ) ) );		\
-		name .addItem( tr( "Bandlimited Triangle wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "tri" ) ) );	\
-		name .addItem( tr( "Bandlimited Saw wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "saw" ) ) );			\
-		name .addItem( tr( "Bandlimited Ramp wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "ramp" ) ) );		\
-		name .addItem( tr( "Bandlimited Square wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "sqr" ) ) );		\
-		name .addItem( tr( "Bandlimited Moog saw wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "moog" ) ) );	\
-		name .addItem( tr( "Soft square wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "sqrsoft" ) ) );		\
-		name .addItem( tr( "Absolute sine wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "sinabs" ) ) );		\
-		name .addItem( tr( "Exponential wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "exp" ) ) );	\
-		name .addItem( tr( "White noise" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "noise" ) ) );	\
-		name .addItem( tr( "Digital Triangle wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "tri" ) ) );	\
-		name .addItem( tr( "Digital Saw wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "saw" ) ) );			\
-		name .addItem( tr( "Digital Ramp wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "ramp" ) ) );		\
-		name .addItem( tr( "Digital Square wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "sqr" ) ) );		\
-		name .addItem( tr( "Digital Moog saw wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "moog" ) ) );
+		name .addItem( tr( "Sine wave" ), std::make_unique<PluginPixmapLoader>( "sin" ) );		\
+		name .addItem( tr( "Bandlimited Triangle wave" ), std::make_unique<PluginPixmapLoader>( "tri" ) );	\
+		name .addItem( tr( "Bandlimited Saw wave" ), std::make_unique<PluginPixmapLoader>( "saw" ) );			\
+		name .addItem( tr( "Bandlimited Ramp wave" ), std::make_unique<PluginPixmapLoader>( "ramp" ) );		\
+		name .addItem( tr( "Bandlimited Square wave" ), std::make_unique<PluginPixmapLoader>( "sqr" ) );		\
+		name .addItem( tr( "Bandlimited Moog saw wave" ), std::make_unique<PluginPixmapLoader>( "moog" ) );	\
+		name .addItem( tr( "Soft square wave" ), std::make_unique<PluginPixmapLoader>( "sqrsoft" ) );		\
+		name .addItem( tr( "Absolute sine wave" ), std::make_unique<PluginPixmapLoader>( "sinabs" ) );		\
+		name .addItem( tr( "Exponential wave" ), std::make_unique<PluginPixmapLoader>( "exp" ) );	\
+		name .addItem( tr( "White noise" ), std::make_unique<PluginPixmapLoader>( "noise" ) );	\
+		name .addItem( tr( "Digital Triangle wave" ), std::make_unique<PluginPixmapLoader>( "tri" ) );	\
+		name .addItem( tr( "Digital Saw wave" ), std::make_unique<PluginPixmapLoader>( "saw" ) );			\
+		name .addItem( tr( "Digital Ramp wave" ), std::make_unique<PluginPixmapLoader>( "ramp" ) );		\
+		name .addItem( tr( "Digital Square wave" ), std::make_unique<PluginPixmapLoader>( "sqr" ) );		\
+		name .addItem( tr( "Digital Moog saw wave" ), std::make_unique<PluginPixmapLoader>( "moog" ) );
 
 
 #define setlfowavemodel( name ) 												\
-		name .addItem( tr( "Sine wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "sin" ) ) );		\
-		name .addItem( tr( "Triangle wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "tri" ) ) );	\
-		name .addItem( tr( "Saw wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "saw" ) ) );			\
-		name .addItem( tr( "Ramp wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "ramp" ) ) );		\
-		name .addItem( tr( "Square wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "sqr" ) ) );		\
-		name .addItem( tr( "Moog saw wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "moog" ) ) );	\
-		name .addItem( tr( "Soft square wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "sqrsoft" ) ) );		\
-		name .addItem( tr( "Abs. sine wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "sinabs" ) ) );		\
-		name .addItem( tr( "Exponential wave" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "exp" ) ) );	\
-		name .addItem( tr( "Random" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "rand" ) ) );	\
-		name .addItem( tr( "Random smooth" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "rand" ) ) );
+		name .addItem( tr( "Sine wave" ), std::make_unique<PluginPixmapLoader>( "sin" ) );		\
+		name .addItem( tr( "Triangle wave" ), std::make_unique<PluginPixmapLoader>( "tri" ) );	\
+		name .addItem( tr( "Saw wave" ), std::make_unique<PluginPixmapLoader>( "saw" ) );			\
+		name .addItem( tr( "Ramp wave" ), std::make_unique<PluginPixmapLoader>( "ramp" ) );		\
+		name .addItem( tr( "Square wave" ), std::make_unique<PluginPixmapLoader>( "sqr" ) );		\
+		name .addItem( tr( "Moog saw wave" ), std::make_unique<PluginPixmapLoader>( "moog" ) );	\
+		name .addItem( tr( "Soft square wave" ), std::make_unique<PluginPixmapLoader>( "sqrsoft" ) );		\
+		name .addItem( tr( "Abs. sine wave" ), std::make_unique<PluginPixmapLoader>( "sinabs" ) );		\
+		name .addItem( tr( "Exponential wave" ), std::make_unique<PluginPixmapLoader>( "exp" ) );	\
+		name .addItem( tr( "Random" ), std::make_unique<PluginPixmapLoader>( "rand" ) );	\
+		name .addItem( tr( "Random smooth" ), std::make_unique<PluginPixmapLoader>( "rand" ) );
 
 public:
 	MonstroInstrument( InstrumentTrack * _instrument_track );
@@ -564,7 +568,7 @@ private:
 
 };
 
-class MonstroView : public InstrumentView
+class MonstroView : public InstrumentViewFixedSize
 {
 	Q_OBJECT
 public:

@@ -48,16 +48,17 @@
 #ifndef FADER_H
 #define FADER_H
 
-#include <QtCore/QTime>
-#include <QWidget>
+#include <QElapsedTimer>
 #include <QPixmap>
+#include <QWidget>
+
 
 #include "AutomatableModelView.h"
 
 class TextFloat;
 
 
-class EXPORT Fader : public QWidget, public FloatModelView
+class LMMS_EXPORT Fader : public QWidget, public FloatModelView
 {
 	Q_OBJECT
 public:
@@ -68,7 +69,7 @@ public:
 
 	Fader( FloatModel * _model, const QString & _name, QWidget * _parent );
 	Fader( FloatModel * _model, const QString & _name, QWidget * _parent, QPixmap * back, QPixmap * leds, QPixmap * knob );
-	virtual ~Fader();
+	virtual ~Fader() = default;
 
 	void init(FloatModel * model, QString const & name);
 
@@ -98,7 +99,7 @@ public:
 
 	void setDisplayConversion( bool b )
 	{
-		m_displayConversion = b;
+		m_conversionFactor = b ? 100.0 : 1.0;
 	}
 
 	inline void setHintText( const QString & _txt_before,
@@ -109,13 +110,13 @@ public:
 	}
 
 private:
-	virtual void contextMenuEvent( QContextMenuEvent * _me );
-	virtual void mousePressEvent( QMouseEvent *ev );
-	virtual void mouseDoubleClickEvent( QMouseEvent* mouseEvent );
-	virtual void mouseMoveEvent( QMouseEvent *ev );
-	virtual void mouseReleaseEvent( QMouseEvent * _me );
-	virtual void wheelEvent( QWheelEvent *ev );
-	virtual void paintEvent( QPaintEvent *ev );
+	void contextMenuEvent( QContextMenuEvent * _me ) override;
+	void mousePressEvent( QMouseEvent *ev ) override;
+	void mouseDoubleClickEvent( QMouseEvent* mouseEvent ) override;
+	void mouseMoveEvent( QMouseEvent *ev ) override;
+	void mouseReleaseEvent( QMouseEvent * _me ) override;
+	void wheelEvent( QWheelEvent *ev ) override;
+	void paintEvent( QPaintEvent *ev ) override;
 
 	inline bool clips(float const & value) const { return value >= 1.0f; }
 
@@ -130,7 +131,7 @@ private:
 		return height() - ( ( height() - m_knob->height() ) * ( realVal / fRange ) );
 	}
 
-	void setPeak( float fPeak, float &targetPeak, float &persistentPeak, QTime &lastPeakTime );
+	void setPeak( float fPeak, float &targetPeak, float &persistentPeak, QElapsedTimer &lastPeakTimer );
 	int calculateDisplayPeak( float fPeak );
 
 	void updateTextFloat();
@@ -144,8 +145,8 @@ private:
 	float m_fMinPeak;
 	float m_fMaxPeak;
 
-	QTime m_lastPeakTime_L;
-	QTime m_lastPeakTime_R;
+	QElapsedTimer m_lastPeakTimer_L;
+	QElapsedTimer m_lastPeakTimer_R;
 
 	static QPixmap * s_back;
 	static QPixmap * s_leds;
@@ -154,8 +155,7 @@ private:
 	QPixmap * m_back;
 	QPixmap * m_leds;
 	QPixmap * m_knob;
-	
-	bool m_displayConversion;
+
 	bool m_levelsDisplayedInDBFS;
 
 	int m_moveStartPoint;

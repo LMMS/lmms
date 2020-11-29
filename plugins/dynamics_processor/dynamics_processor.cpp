@@ -28,7 +28,8 @@
 #include "lmms_math.h"
 #include "interpolation.h"
 
-#include "embed.cpp"
+#include "embed.h"
+#include "plugin_export.h"
 
 extern "C"
 {
@@ -37,12 +38,12 @@ Plugin::Descriptor PLUGIN_EXPORT dynamicsprocessor_plugin_descriptor =
 {
 	STRINGIFY( PLUGIN_NAME ),
 	"Dynamics Processor",
-	QT_TRANSLATE_NOOP( "pluginBrowser",
+	QT_TRANSLATE_NOOP( "PluginBrowser",
 				"plugin for processing dynamics in a flexible way" ),
 	"Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>",
 	0x0100,
 	Plugin::Effect,
-	new PluginPixmapLoader( "logo" ),
+	new PluginPixmapLoader("logo"),
 	NULL,
 	NULL
 } ;
@@ -214,10 +215,10 @@ bool dynProcEffect::processAudioBuffer( sampleFrame * _buf,
 		s[0] *= outputGain;
 		s[1] *= outputGain;
 
-		out_sum += _buf[f][0]*_buf[f][0] + _buf[f][1]*_buf[f][1];
 // mix wet/dry signals
 		_buf[f][0] = d * _buf[f][0] + w * s[0];
 		_buf[f][1] = d * _buf[f][1] + w * s[1];
+		out_sum += _buf[f][0] * _buf[f][0] + _buf[f][1] * _buf[f][1];
 	}
 
 	checkGate( out_sum / _frames );
@@ -233,7 +234,7 @@ extern "C"
 {
 
 // necessary for getting instance out of shared lib
-Plugin * PLUGIN_EXPORT lmms_plugin_main( Model * _parent, void * _data )
+PLUGIN_EXPORT Plugin * lmms_plugin_main( Model * _parent, void * _data )
 {
 	return( new dynProcEffect( _parent,
 		static_cast<const Plugin::Descriptor::SubPluginFeatures::Key *>(

@@ -69,18 +69,18 @@ DualFilterControlDialog::DualFilterControlDialog( DualFilterControls* controls )
 
 	enabled1Toggle -> move( 12, 11 );
 	enabled1Toggle -> setModel( &controls -> m_enabled1Model );
-	ToolTip::add( enabled1Toggle, tr( "Click to enable/disable Filter 1" ) );
+	ToolTip::add( enabled1Toggle, tr( "Enable/disable filter 1" ) );
 	enabled2Toggle -> move( 210, 11 );
 	enabled2Toggle -> setModel( &controls -> m_enabled2Model );
-	ToolTip::add( enabled2Toggle, tr( "Click to enable/disable Filter 2" ) );
+	ToolTip::add( enabled2Toggle, tr( "Enable/disable filter 2" ) );
 
 	ComboBox * m_filter1ComboBox = new ComboBox( this );
-	m_filter1ComboBox->setGeometry( 19, 70, 137, 22 );
+	m_filter1ComboBox->setGeometry( 19, 70, 137, ComboBox::DEFAULT_HEIGHT );
 	m_filter1ComboBox->setFont( pointSize<8>( m_filter1ComboBox->font() ) );
 	m_filter1ComboBox->setModel( &controls->m_filter1Model );
 
 	ComboBox * m_filter2ComboBox = new ComboBox( this );
-	m_filter2ComboBox->setGeometry( 217, 70, 137, 22 );
+	m_filter2ComboBox->setGeometry( 217, 70, 137, ComboBox::DEFAULT_HEIGHT );
 	m_filter2ComboBox->setFont( pointSize<8>( m_filter2ComboBox->font() ) );
 	m_filter2ComboBox->setModel( &controls->m_filter2Model );
 }

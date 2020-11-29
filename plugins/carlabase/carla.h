@@ -26,8 +26,9 @@
 #define CARLA_H
 
 #include <QtCore/QMutex>
+#include "carlabase_export.h"
 
-#define REAL_BUILD // FIXME this shouldn't be needed
+#include "CarlaNative.h"
 #if CARLA_VERSION_HEX >= 0x010911
     #include "CarlaNativePlugin.h"
 #else
@@ -46,7 +47,7 @@
 
 class QPushButton;
 
-class PLUGIN_EXPORT CarlaInstrument : public Instrument
+class CARLABASE_EXPORT CarlaInstrument : public Instrument
 {
     Q_OBJECT
 
@@ -97,7 +98,7 @@ private:
     friend class CarlaInstrumentView;
 };
 
-class CarlaInstrumentView : public InstrumentView
+class CarlaInstrumentView : public InstrumentViewFixedSize
 {
     Q_OBJECT
 

@@ -26,11 +26,10 @@
 #ifndef BUFFER_MANAGER_H
 #define BUFFER_MANAGER_H
 
-#include "AtomicInt.h"
-#include "export.h"
+#include "lmms_export.h"
 #include "lmms_basics.h"
 
-class EXPORT BufferManager
+class LMMS_EXPORT BufferManager
 {
 public:
 	static void init( fpp_t framesPerPeriod );

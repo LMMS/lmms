@@ -43,7 +43,7 @@ public:
 
 
 protected:
-	virtual void paintEvent( QPaintEvent * _ev );
+	void paintEvent( QPaintEvent * _ev ) override;
 
 
 protected slots:

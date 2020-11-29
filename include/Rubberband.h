@@ -79,13 +79,13 @@ public:
 	virtual ~RubberBand();
 
 	QVector<selectableObject *> selectedObjects() const;
+	QVector<selectableObject *> selectableObjects() const;
 
 
 protected:
-	virtual void resizeEvent( QResizeEvent * _re );
+	void resizeEvent( QResizeEvent * _re ) override;
 
 private:
-	QVector<selectableObject *> selectableObjects() const;
 
 };
 
