@@ -1070,8 +1070,6 @@ InstrumentTrackView::InstrumentTrackView( InstrumentTrack * _it, TrackContainerV
 	m_panningKnob->setLabel( tr( "PAN" ) );
 	m_panningKnob->show();
 
-	m_midiCCRackView = std::unique_ptr<MidiCCRackView>(new MidiCCRackView(_it));
-
 	m_midiMenu = new QMenu( tr( "MIDI" ), this );
 
 	// sequenced MIDI?
@@ -1149,6 +1147,13 @@ InstrumentTrackView::~InstrumentTrackView()
 
 void InstrumentTrackView::toggleMidiCCRack()
 {
+	// Lazy creation: midiCCRackView is only created when accessed the first time.
+	// this->model() returns pointer to the InstrumentTrack who owns this InstrumentTrackView.
+	if (!m_midiCCRackView)
+	{
+		m_midiCCRackView = std::unique_ptr<MidiCCRackView>(new MidiCCRackView(this->model()));
+	}
+
 	if (m_midiCCRackView->parentWidget()->isVisible())
 	{
 		m_midiCCRackView->parentWidget()->hide();
