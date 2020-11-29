@@ -46,7 +46,7 @@ public:
 
 	// to be implemented by sub-classes
 	virtual void processOutEvent( const MidiEvent & _me,
-						const MidiTime & _time,
+						const TimePos & _time,
 						const MidiPort * _port ) = 0;
 
 	// inheriting classes can re-implement this for being able to update
@@ -141,7 +141,7 @@ protected:
 private:
 	// this does MIDI-event-process
 	void processParsedEvent();
-	void processOutEvent( const MidiEvent& event, const MidiTime& time, const MidiPort* port ) override;
+	void processOutEvent( const MidiEvent& event, const TimePos& time, const MidiPort* port ) override;
 
 	// small helper function returning length of a certain event - this
 	// is necessary for parsing raw-MIDI-data

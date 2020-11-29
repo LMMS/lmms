@@ -1671,7 +1671,7 @@ void MainWindow::onSongStopped()
 				{
 					if(songEditor && ( tl->autoScroll() == TimeLineWidget::AutoScrollEnabled ) )
 					{
-						songEditor->m_editor->updatePosition( MidiTime(tl->savedPos().getTicks() ) );
+						songEditor->m_editor->updatePosition( TimePos(tl->savedPos().getTicks() ) );
 					}
 					tl->savePos( -1 );
 				}

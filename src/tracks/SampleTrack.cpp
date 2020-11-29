@@ -123,7 +123,7 @@ SampleTCO::~SampleTCO()
 
 
 
-void SampleTCO::changeLength( const MidiTime & _length )
+void SampleTCO::changeLength( const TimePos & _length )
 {
 	TrackContentObject::changeLength( qMax( static_cast<int>( _length ), 1 ) );
 }
@@ -231,7 +231,7 @@ void SampleTCO::updateLength()
 
 
 
-MidiTime SampleTCO::sampleLength() const
+TimePos SampleTCO::sampleLength() const
 {
 	return (int)( m_sampleBuffer->frames() / Engine::framesPerTick() );
 }
@@ -681,7 +681,7 @@ SampleTrack::~SampleTrack()
 
 
 
-bool SampleTrack::play( const MidiTime & _start, const fpp_t _frames,
+bool SampleTrack::play( const TimePos & _start, const fpp_t _frames,
 					const f_cnt_t _offset, int _tco_num )
 {
 	m_audioPort.effects()->startRunning();
@@ -788,7 +788,7 @@ TrackView * SampleTrack::createView( TrackContainerView* tcv )
 
 
 
-TrackContentObject * SampleTrack::createTCO(const MidiTime & pos)
+TrackContentObject * SampleTrack::createTCO(const TimePos & pos)
 {
 	SampleTCO * sTco = new SampleTCO(this);
 	sTco->movePosition(pos);
@@ -1023,10 +1023,10 @@ void SampleTrackView::dropEvent(QDropEvent *de)
 				? trackHeadWidth
 				: de->pos().x();
 
-		MidiTime tcoPos = trackContainerView()->fixedTCOs()
-				? MidiTime(0)
-				: MidiTime(((xPos - trackHeadWidth) / trackContainerView()->pixelsPerBar()
-							* MidiTime::ticksPerBar()) + trackContainerView()->currentPosition()
+		TimePos tcoPos = trackContainerView()->fixedTCOs()
+				? TimePos(0)
+				: TimePos(((xPos - trackHeadWidth) / trackContainerView()->pixelsPerBar()
+							* TimePos::ticksPerBar()) + trackContainerView()->currentPosition()
 						).quantize(1.0);
 
 		SampleTCO * sTco = static_cast<SampleTCO*>(getTrack()->createTCO(tcoPos));

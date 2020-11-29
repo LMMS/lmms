@@ -244,7 +244,7 @@ MidiEvent InstrumentTrack::applyMasterKey( const MidiEvent& event )
 
 
 
-void InstrumentTrack::processInEvent( const MidiEvent& event, const MidiTime& time, f_cnt_t offset )
+void InstrumentTrack::processInEvent( const MidiEvent& event, const TimePos& time, f_cnt_t offset )
 {
 	if( Engine::getSong()->isExporting() )
 	{
@@ -267,7 +267,7 @@ void InstrumentTrack::processInEvent( const MidiEvent& event, const MidiTime& ti
 						NotePlayHandleManager::acquire(
 								this, offset,
 								typeInfo<f_cnt_t>::max() / 2,
-								Note( MidiTime(), MidiTime(), event.key(), event.volume( midiPort()->baseVelocity() ) ),
+								Note( TimePos(), TimePos(), event.key(), event.volume( midiPort()->baseVelocity() ) ),
 								NULL, event.channel(),
 								NotePlayHandle::OriginMidiInput );
 					m_notes[event.key()] = nph;
@@ -332,7 +332,7 @@ void InstrumentTrack::processInEvent( const MidiEvent& event, const MidiTime& ti
 								nph->OriginMidiInput)
 							{
 								nph->setLength(
-									MidiTime( static_cast<f_cnt_t>(
+									TimePos( static_cast<f_cnt_t>(
 									nph->totalFramesPlayed() /
 									Engine::framesPerTick() ) ) );
 								midiNoteOff( *nph );
@@ -385,7 +385,7 @@ void InstrumentTrack::processInEvent( const MidiEvent& event, const MidiTime& ti
 
 
 
-void InstrumentTrack::processOutEvent( const MidiEvent& event, const MidiTime& time, f_cnt_t offset )
+void InstrumentTrack::processOutEvent( const MidiEvent& event, const TimePos& time, f_cnt_t offset )
 {
 	// do nothing if we do not have an instrument instance (e.g. when loading settings)
 	if( m_instrument == NULL )
@@ -608,7 +608,7 @@ void InstrumentTrack::removeMidiPortNode( DataFile & _dataFile )
 
 
 
-bool InstrumentTrack::play( const MidiTime & _start, const fpp_t _frames,
+bool InstrumentTrack::play( const TimePos & _start, const fpp_t _frames,
 							const f_cnt_t _offset, int _tco_num )
 {
 	if( ! m_instrument || ! tryLock() )
@@ -638,7 +638,7 @@ bool InstrumentTrack::play( const MidiTime & _start, const fpp_t _frames,
 	for( NotePlayHandleList::Iterator it = m_processHandles.begin();
 					it != m_processHandles.end(); ++it )
 	{
-		( *it )->processMidiTime( _start );
+		( *it )->processTimePos( _start );
 	}
 
 	if ( tcos.size() == 0 )
@@ -660,7 +660,7 @@ bool InstrumentTrack::play( const MidiTime & _start, const fpp_t _frames,
 		{
 			continue;
 		}
-		MidiTime cur_start = _start;
+		TimePos cur_start = _start;
 		if( _tco_num < 0 )
 		{
 			cur_start -= p->startPosition();
@@ -713,7 +713,7 @@ bool InstrumentTrack::play( const MidiTime & _start, const fpp_t _frames,
 
 
 
-TrackContentObject* InstrumentTrack::createTCO(const MidiTime & pos)
+TrackContentObject* InstrumentTrack::createTCO(const TimePos & pos)
 {
 	Pattern* p = new Pattern(this);
 	p->movePosition(pos);
