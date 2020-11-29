@@ -80,6 +80,7 @@ const int INSTRUMENT_WIDTH	= 254;
 const int INSTRUMENT_HEIGHT	= INSTRUMENT_WIDTH;
 const int PIANO_HEIGHT		= 80;
 const int INSTRUMENT_WINDOW_CACHE_SIZE = 8;
+const int BANK_NONE             = -1;
 
 
 // #### IT:
@@ -106,7 +107,10 @@ InstrumentTrack::InstrumentTrack( TrackContainer* tc ) :
 	m_soundShaping( this ),
 	m_arpeggio( this ),
 	m_noteStacking( this ),
-	m_piano( this )
+	m_piano( this ),
+	m_programNumber(0),
+	m_programBankMSB(BANK_NONE),
+	m_programBankLSB(BANK_NONE)
 {
 	m_pitchModel.setCenterValue( 0 );
 	m_panningModel.setCenterValue( DefaultPanning );
@@ -316,8 +320,9 @@ void InstrumentTrack::processInEvent( const MidiEvent& event, const MidiTime& ti
 			break;
 
 		case MidiControlChange:
-			if( event.controllerNumber() == MidiControllerSustain )
+			switch (event.controllerNumber())
 			{
+			case MidiControllerSustain:
 				if( event.controllerValue() > MidiMaxControllerValue/2 )
 				{
 					m_sustainPedalPressed = true;
@@ -342,15 +347,31 @@ void InstrumentTrack::processInEvent( const MidiEvent& event, const MidiTime& ti
 					m_sustainedNotes.clear();
 					m_sustainPedalPressed = false;
 				}
-			}
-			if( event.controllerNumber() == MidiControllerAllSoundOff ||
-				event.controllerNumber() == MidiControllerAllNotesOff ||
-				event.controllerNumber() == MidiControllerOmniOn ||
-				event.controllerNumber() == MidiControllerOmniOff ||
-				event.controllerNumber() == MidiControllerMonoOn ||
-				event.controllerNumber() == MidiControllerPolyOn )
-			{
+				break;
+
+			case MidiControllerAllSoundOff:
+			case MidiControllerAllNotesOff:
+			case MidiControllerOmniOn:
+			case MidiControllerOmniOff:
+			case MidiControllerMonoOn:
+			case MidiControllerPolyOn:
 				silenceAllNotes();
+				break;
+
+			case MidiControllerBankSelectMSB:
+			case MidiControllerBankSelectLSB:
+				if (processPresetSelectEvents(event))
+				{
+					changePreset();
+				}
+				break;
+			}
+			break;
+
+		case MidiProgramChange:
+			if (processPresetSelectEvents(event))
+			{
+				changePreset();
 			}
 			break;
 
@@ -913,6 +934,85 @@ Instrument * InstrumentTrack::loadInstrument(const QString & _plugin_name,
 }
 
 
+bool InstrumentTrack::processPresetSelectEvents(const MidiEvent& event)
+{
+	if (m_midiPort.m_captureProgramChangeModel.value() == 0)
+	{
+		return false;
+	}
+
+	MidiPort::PresetSelectPolicy policy =
+		static_cast<MidiPort::PresetSelectPolicy>(
+				m_midiPort.m_presetSelectPolicyModel.value());
+
+	if (event.type() == MidiProgramChange)
+	{
+		m_programNumber = event.key();
+
+		if (policy == MidiPort::BankSelectIgnore)
+		{
+			m_programBankMSB = BANK_NONE;
+			m_programBankLSB = 0;
+		}
+		return true;
+	}
+
+	else if (event.type() == MidiControlChange &&
+			event.controllerNumber() == MidiControllerBankSelectMSB)
+	{
+		switch (policy)
+		{
+		case MidiPort::BankSelectIgnore:
+			return false;
+		case MidiPort::BankSelectMSB:
+			/* Only MSB is meaningful and is the only bank select
+			 * message, so it should be actually treated as LSB.
+			 * MSB should be set to zero. */
+			m_programBankMSB = 0;
+			m_programBankLSB = event.controllerValue();
+			return true;
+		case MidiPort::BankSelectBoth:
+			/* Both MSB and LSB are meaningful, so don't touch
+			 * LSB here. */
+			m_programBankMSB = event.controllerValue();
+			return true;
+		}
+	}
+
+	else if (event.type() == MidiControlChange &&
+			event.controllerNumber() == MidiControllerBankSelectLSB)
+	{
+		switch (policy)
+		{
+		case MidiPort::BankSelectIgnore:
+		case MidiPort::BankSelectMSB:
+			return false;
+		case MidiPort::BankSelectBoth:
+			m_programBankLSB = event.controllerValue();
+			return true;
+		}
+	}
+
+	return false;
+}
+
+
+void InstrumentTrack::changePreset()
+{
+	if (m_instrument)
+	{
+		if (m_programBankMSB != -1)
+		{
+			m_instrument->changePreset(
+				(m_programBankMSB << 7) | m_programBankLSB,
+				m_programNumber);
+		}
+		else
+		{
+			m_instrument->changePreset(-1, m_programNumber);
+		}
+	}
+}
 
 InstrumentTrack *InstrumentTrack::s_autoAssignedTrack = NULL;
 

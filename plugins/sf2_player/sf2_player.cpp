@@ -885,6 +885,36 @@ PluginView * sf2Instrument::instantiateView( QWidget * _parent )
 
 
 
+bool sf2Instrument::presetChangeSupported()
+{
+	return true;
+}
+
+
+
+void sf2Instrument::changePreset(int bank, unsigned int preset)
+{
+	bool presetChanged = false;
+	if (bank != -1)
+	{
+		if (m_bankNum.value() != bank)
+		{
+			m_bankNum.setValue(bank);
+			presetChanged = true;
+		}
+	}
+	if (m_patchNum.value() != preset)
+	{
+		m_patchNum.setValue(preset);
+		presetChanged = true;
+	}
+
+	if (presetChanged)
+	{
+		emit patchChanged();
+	}
+
+}
 
 
 
@@ -1082,9 +1112,9 @@ void sf2InstrumentView::modelChanged()
 	m_chorusDepthKnob->setModel( &k->m_chorusDepth );
 
 
-	connect( k, SIGNAL( fileChanged() ), this, SLOT( updateFilename() ) );
-
-	connect( k, SIGNAL( fileLoading() ), this, SLOT( invalidateFile() ) );
+	connect(k, SIGNAL(fileChanged()), this, SLOT(updateFilename()));
+	connect(k, SIGNAL(fileLoading()), this, SLOT(invalidateFile()));
+	connect(k, SIGNAL(patchChanged()), this, SLOT(updatePatchName()));
 
 	updateFilename();
 }

@@ -33,6 +33,7 @@
 #include "Midi.h"
 #include "MidiTime.h"
 #include "AutomatableModel.h"
+#include "ComboBoxModel.h"
 
 
 class MidiClient;
@@ -160,13 +161,22 @@ private:
 	IntModel m_baseVelocityModel;
 	BoolModel m_readableModel;
 	BoolModel m_writableModel;
+	BoolModel m_captureProgramChangeModel;
+
+	enum PresetSelectPolicy
+	{
+		BankSelectIgnore,
+		BankSelectMSB,
+		BankSelectBoth
+	};
+	ComboBoxModel m_presetSelectPolicyModel;
 
 	Map m_readablePorts;
 	Map m_writablePorts;
 
-
 	friend class ControllerConnectionDialog;
 	friend class InstrumentMidiIOView;
+	friend class InstrumentTrack;
 
 
 signals:

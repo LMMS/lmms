@@ -68,8 +68,13 @@ public:
 	}
 
 	virtual bool handleMidiEvent( const MidiEvent& event, const MidiTime& time, f_cnt_t offset = 0 );
+	virtual bool presetChangeSupported();
+	virtual void changePreset(int bank, unsigned int preset) override;
 
 	virtual PluginView * instantiateView( QWidget * _parent );
+
+signals:
+	void presetChanged();
 
 protected slots:
 	void setParameter( Model * action );
@@ -150,6 +155,7 @@ protected slots:
 	void savePreset( void );
 	void nextProgram();
 	void previousProgram();
+	void changedProgram();
 	void selPreset( void );
 	void toggleGUI( void );
 	void noteOffAll( void );
@@ -176,6 +182,7 @@ private:
 	PixmapButton * m_rolRPresetButton;
 	QPushButton * m_selPresetButton;
 	QPushButton * m_toggleGUIButton;
+	QPushButton * m_panicButton;
 	PixmapButton * m_managePluginButton;
 	PixmapButton * m_savePresetButton;
 

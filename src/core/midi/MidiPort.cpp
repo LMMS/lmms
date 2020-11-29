@@ -30,6 +30,9 @@
 #include "MidiDummy.h"
 #include "Note.h"
 #include "Song.h"
+#include "ComboBoxModel.h"
+#include "Instrument.h"
+#include "InstrumentTrack.h"
 
 static MidiDummy s_dummyClient;
 
@@ -56,7 +59,9 @@ MidiPort::MidiPort( const QString& name,
 	m_outputProgramModel( 1, 1, MidiProgramCount, this, tr( "Output MIDI program" ) ),
 	m_baseVelocityModel( MidiMaxVelocity/2, 1, MidiMaxVelocity, this, tr( "Base velocity" ) ),
 	m_readableModel( false, this, tr( "Receive MIDI-events" ) ),
-	m_writableModel( false, this, tr( "Send MIDI-events" ) )
+	m_writableModel( false, this, tr( "Send MIDI-events" ) ),
+	m_captureProgramChangeModel(false, this, tr("Capture Program Change events")),
+	m_presetSelectPolicyModel(this, tr("Preset select policy"))
 {
 	m_midiClient->addPort( this );
 
@@ -82,6 +87,10 @@ MidiPort::MidiPort( const QString& name,
 		m_midiClient->connectRPChanged( this, SLOT( updateReadablePorts() ) );
 		m_midiClient->connectWPChanged( this, SLOT( updateWritablePorts() ) );
 	}
+
+	m_presetSelectPolicyModel.addItem(tr("Ignore Bank Select"));
+	m_presetSelectPolicyModel.addItem(tr("Use Bank Select MSB only"));
+	m_presetSelectPolicyModel.addItem(tr("Use Bank Select MSB and LSB"));
 
 	updateMidiPortMode();
 }
@@ -181,6 +190,8 @@ void MidiPort::saveSettings( QDomDocument& doc, QDomElement& thisElement )
 	m_fixedOutputNoteModel.saveSettings( doc, thisElement, "fixedoutputnote" );
 	m_outputProgramModel.saveSettings( doc, thisElement, "outputprogram" );
 	m_baseVelocityModel.saveSettings( doc, thisElement, "basevelocity" );
+	m_captureProgramChangeModel.saveSettings(doc, thisElement, "captureprogramchange");
+	m_presetSelectPolicyModel.saveSettings(doc, thisElement, "presetselectpolicy");
 	m_readableModel.saveSettings( doc, thisElement, "readable" );
 	m_writableModel.saveSettings( doc, thisElement, "writable" );
 
@@ -234,6 +245,8 @@ void MidiPort::loadSettings( const QDomElement& thisElement )
 	m_fixedOutputVelocityModel.loadSettings( thisElement, "fixedoutputvelocity" );
 	m_outputProgramModel.loadSettings( thisElement, "outputprogram" );
 	m_baseVelocityModel.loadSettings( thisElement, "basevelocity" );
+	m_captureProgramChangeModel.loadSettings(thisElement, "captureprogramchange");
+	m_presetSelectPolicyModel.loadSettings(thisElement, "presetselectpolicy");
 	m_readableModel.loadSettings( thisElement, "readable" );
 	m_writableModel.loadSettings( thisElement, "writable" );
 

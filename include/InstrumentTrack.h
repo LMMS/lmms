@@ -214,6 +214,7 @@ public:
 
 	void setPreviewMode( const bool );
 
+	bool processPresetSelectEvents(const MidiEvent& event);
 	bool isPreviewMode() const
 	{
 		return m_previewMode;
@@ -248,6 +249,9 @@ protected slots:
 
 
 private:
+
+	void changePreset();
+
 	MidiPort m_midiPort;
 
 	NotePlayHandle* m_notes[NumKeys];
@@ -287,6 +291,9 @@ private:
 
 	Piano m_piano;
 
+	int m_programNumber;
+	int m_programBankMSB;
+	int m_programBankLSB;
 
 	friend class InstrumentTrackView;
 	friend class InstrumentTrackWindow;
