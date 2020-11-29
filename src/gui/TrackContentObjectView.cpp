@@ -331,7 +331,7 @@ void TrackContentObjectView::changeClipColor()
 	QColor new_color = ColorChooser( this ).withPalette( ColorChooser::Palette::Track )->getColor( m_tco->color() );
 	if( ! new_color.isValid() )
 	{ return; }
-	
+
 	// Use that color
 	m_tco->setColor( new_color );
 	m_tco->useCustomClipColor( true );
@@ -1235,7 +1235,7 @@ QColor TrackContentObjectView::getColorForDisplay( QColor defaultColor )
 			c = tcoColor;
 		}
 	}
-	
+
 	// Return color to caller
 	return c;
 }

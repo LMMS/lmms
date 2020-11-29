@@ -104,10 +104,10 @@ TrackOperationsWidget::TrackOperationsWidget( TrackView * parent ) :
 			m_trackView->trackContainerView(),
 				SLOT( deleteTrackView( TrackView * ) ),
 							Qt::QueuedConnection );
-	
+
 	connect( m_trackView->getTrack()->getMutedModel(), SIGNAL( dataChanged() ),
 			this, SLOT( update() ) );
-	
+
 }
 
 
@@ -170,9 +170,9 @@ void TrackOperationsWidget::mousePressEvent( QMouseEvent * me )
 void TrackOperationsWidget::paintEvent( QPaintEvent * pe )
 {
 	QPainter p( this );
-	
+
 	p.fillRect( rect(), palette().brush(QPalette::Background) );
-	
+
 	if( m_trackView->getTrack()->useColor() && ! m_trackView->getTrack()->getMutedModel()->value() ) 
 	{
 		QRect coloredRect( 0, 0, 10, m_trackView->getTrack()->getHeight() );
@@ -237,12 +237,12 @@ void TrackOperationsWidget::changeTrackColor()
 {
 	QColor new_color = ColorChooser( this ).withPalette( ColorChooser::Palette::Track )-> \
 		getColor( m_trackView->getTrack()->color() );
-	
+
 	if( ! new_color.isValid() )
 	{ return; }
 
 	emit colorChanged( new_color );
-	
+
 	Engine::getSong()->setModified();
 	update();
 }
@@ -308,7 +308,7 @@ void TrackOperationsWidget::updateMenu()
 		toMenu->addAction( tr( "Turn all recording on" ), this, SLOT( recordingOn() ) );
 		toMenu->addAction( tr( "Turn all recording off" ), this, SLOT( recordingOff() ) );
 	}
-	
+
 	toMenu->addSeparator();
 	toMenu->addAction( embed::getIconPixmap( "colorize" ),
 						tr( "Change color" ), this, SLOT( changeTrackColor() ) );

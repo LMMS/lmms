@@ -111,14 +111,14 @@ public:
 	// some metadata to be written to the clipboard.
 	static void remove( QVector<TrackContentObjectView *> tcovs );
 	static void toggleMute( QVector<TrackContentObjectView *> tcovs );
-	
+
 	QColor getColorForDisplay( QColor );
 
 public slots:
 	virtual bool close();
 	void remove();
 	void update() override;
-	
+
 	void changeClipColor();
 	void useTrackColor();
 

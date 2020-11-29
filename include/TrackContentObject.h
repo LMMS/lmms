@@ -107,7 +107,7 @@ public:
 	{
 		return m_autoResize;
 	}
-	
+
 	QColor color() const
 	{
 		return m_color;
@@ -117,11 +117,11 @@ public:
 	{
 		m_color = c;
 	}
-	
+
 	bool hasColor();
-	
+
 	void useCustomClipColor( bool b );
-	
+
 	bool usesCustomClipColor()
 	{
 		return m_useCustomClipColor;
@@ -147,7 +147,7 @@ public:
 
 	TimePos startTimeOffset() const;
 	void setStartTimeOffset( const TimePos &startTimeOffset );
-	
+
 	void updateColor();
 
 	// Will copy the state of a TCO to another TCO
