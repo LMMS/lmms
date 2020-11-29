@@ -34,11 +34,9 @@ public:
 public slots:
 	void unsetModels();
 	void destroyRack();
-	void renameLabel();
+	void renameWindow();
 
 private:
-	QLabel *m_trackLabel;
-
 	InstrumentTrack *m_track;
 
 	GroupBox *m_midiCCGroupBox; // MIDI CC GroupBox (used to enable disable MIDI CC)

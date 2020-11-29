@@ -54,7 +54,7 @@ MidiCCRackView::MidiCCRackView(InstrumentTrack * track) :
 	m_track(track)
 {
 	setWindowIcon(embed::getIconPixmap("midi_cc_rack"));
-	setWindowTitle(tr("MIDI CC Rack"));
+	setWindowTitle(tr("MIDI CC Rack - %1").arg(m_track->name()));
 
 	QMdiSubWindow * subWin = gui->mainWindow()->addWindowedWidget(this);
 
@@ -76,15 +76,6 @@ MidiCCRackView::MidiCCRackView(InstrumentTrack * track) :
 
 	// Main window layout
 	QVBoxLayout *mainLayout = new QVBoxLayout(this);
-
-	// Track name label layout
-	// We use a widget to be able to make this layout have a fixed height
-	QWidget *trackToolBar = new QWidget();
-	QHBoxLayout *trackToolBarLayout = new QHBoxLayout(trackToolBar);
-	m_trackLabel = new QLabel(QString(tr("Track: %1")).arg(m_track->name()));
-
-	trackToolBarLayout->addWidget(m_trackLabel);
-	trackToolBar->setFixedHeight(40);
 
 	// Knobs GroupBox - Here we have the MIDI CC controller knobs for the selected track
 	m_midiCCGroupBox = new GroupBox(tr("MIDI CC Knobs:"));
@@ -111,7 +102,7 @@ MidiCCRackView::MidiCCRackView(InstrumentTrack * track) :
 	{
 		m_controllerKnob[i] = new Knob(knobBright_26);
 		m_controllerKnob[i]->setLabel(QString("CC %1").arg(QString::number(i)));
-		knobsAreaLayout->addWidget(m_controllerKnob[i], i/3, i%3);
+		knobsAreaLayout->addWidget(m_controllerKnob[i], i/4, i%4);
 	}
 
 	// Set all the models
@@ -130,10 +121,9 @@ MidiCCRackView::MidiCCRackView(InstrumentTrack * track) :
 
 	// Connection to update the name of the track on the label
 	connect(m_track, SIGNAL(nameChanged()),
-		this, SLOT(renameLabel()));
+		this, SLOT(renameWindow()));
 
 	// Adding everything to the main layout
-	mainLayout->addWidget(trackToolBar);
 	mainLayout->addWidget(m_midiCCGroupBox);
 }
 
@@ -147,9 +137,9 @@ void MidiCCRackView::destroyRack()
 	parentWidget()->close();
 }
 
-void MidiCCRackView::renameLabel()
+void MidiCCRackView::renameWindow()
 {
-	m_trackLabel->setText(QString(tr("Track: %1")).arg(m_track->name()));
+	setWindowTitle(tr("MIDI CC Rack - %1").arg(m_track->name()));
 }
 
 void MidiCCRackView::unsetModels()
