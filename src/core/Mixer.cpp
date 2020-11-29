@@ -446,12 +446,12 @@ const surroundSampleFrame * Mixer::renderNextBuffer()
 
 void Mixer::swapBuffers()
 {
-	m_inputBufferWrite = ( m_inputBufferWrite + 1 ) % 2;
-	m_inputBufferRead =  ( m_inputBufferRead + 1 ) % 2;
-	m_inputBufferFrames[ m_inputBufferWrite ] = 0;
+	m_inputBufferWrite = (m_inputBufferWrite + 1) % 2;
+	m_inputBufferRead = (m_inputBufferRead + 1) % 2;
+	m_inputBufferFrames[m_inputBufferWrite] = 0;
 
-	std::swap( m_outputBufferRead, m_outputBufferWrite );
-	BufferManager::clear( m_outputBufferWrite, m_framesPerPeriod );
+	std::swap(m_outputBufferRead, m_outputBufferWrite);
+	BufferManager::clear(m_outputBufferWrite, m_framesPerPeriod);
 }
 
 
@@ -461,40 +461,40 @@ void Mixer::handleMetronome()
 {
 	static tick_t lastMetroTicks = -1;
 
-	Song *song = Engine::getSong();
+	Song * song = Engine::getSong();
 	Song::PlayModes currentPlayMode = song->playMode();
 
 	bool metronomeSupported = currentPlayMode == Song::Mode_PlayPattern ||
 					 currentPlayMode == Song::Mode_PlaySong ||
 					 currentPlayMode == Song::Mode_PlayBB;
 
-	if( !metronomeSupported || !m_metronomeActive || song->isExporting() )
+	if (!metronomeSupported || !m_metronomeActive || song->isExporting())
 	{
 		return;
 	}
 
 	// stop crash with metronome if empty project
-	if( song->countTracks() == 0 )
+	if (song->countTracks() == 0)
 	{
 		return;
 	}
 
-	tick_t ticks = song->getPlayPos( currentPlayMode ).getTicks();
+	tick_t ticks = song->getPlayPos(currentPlayMode).getTicks();
 	tick_t ticksPerBar = TimePos::ticksPerBar();
 	int numerator = song->getTimeSigModel().getNumerator();
 
-	if( ticks == lastMetroTicks )
+	if (ticks == lastMetroTicks)
 	{
 		return;
 	}
 
-	if( ticks % ( ticksPerBar / 1 ) == 0 )
+	if (ticks % (ticksPerBar / 1) == 0)
 	{
-		addPlayHandle( new SamplePlayHandle( "misc/metronome02.ogg" ) );
+		addPlayHandle(new SamplePlayHandle("misc/metronome02.ogg"));
 	}
-	else if( ticks % ( ticksPerBar / numerator ) == 0 )
+	else if (ticks % (ticksPerBar / numerator) == 0)
 	{
-		addPlayHandle( new SamplePlayHandle( "misc/metronome01.ogg" ) );
+		addPlayHandle(new SamplePlayHandle("misc/metronome01.ogg"));
 	}
 
 	lastMetroTicks = ticks;
