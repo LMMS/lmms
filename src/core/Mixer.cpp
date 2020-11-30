@@ -736,7 +736,7 @@ void Mixer::removePlayHandle( PlayHandle * ph )
 			{
 				NotePlayHandleManager::release(dynamic_cast<NotePlayHandle*>(ph));
 			}
-			else delete ph;
+			else { delete ph; }
 		}
 	}
 	else
