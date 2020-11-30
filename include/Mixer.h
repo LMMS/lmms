@@ -118,9 +118,9 @@ public:
 			}
 		}
 
-		qualitySettings( Interpolation i, Oversampling o ) :
-			interpolation( i ),
-			oversampling( o )
+		qualitySettings(Interpolation i, Oversampling o) :
+			interpolation(i),
+			oversampling(o)
 		{
 		}
 
