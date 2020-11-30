@@ -731,7 +731,7 @@ void Mixer::removePlayHandle( PlayHandle * ph )
 		// (See tobydox's 2008 commit 4583e48)
 		if ( removedFromList )
 		{
-			if( ph->type() == PlayHandle::TypeNotePlayHandle )
+			if (ph->type() == PlayHandle::TypeNotePlayHandle)
 			{
 				NotePlayHandleManager::release(dynamic_cast<NotePlayHandle*>(ph));
 			}
