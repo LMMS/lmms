@@ -137,8 +137,8 @@ Mixer::Mixer( bool renderOnly ) :
 	BufferManager::init( m_framesPerPeriod );
 
 	int outputBufferSize = m_framesPerPeriod * sizeof(surroundSampleFrame);
-	m_outputBufferRead = (surroundSampleFrame*)MemoryHelper::alignedMalloc(outputBufferSize);
-	m_outputBufferWrite = (surroundSampleFrame*)MemoryHelper::alignedMalloc(outputBufferSize);
+	m_outputBufferRead = static_cast<surroundSampleFrame *>(MemoryHelper::alignedMalloc(outputBufferSize));
+	m_outputBufferWrite = static_cast<surroundSampleFrame *>(MemoryHelper::alignedMalloc(outputBufferSize));
 
 	BufferManager::clear(m_outputBufferRead, m_framesPerPeriod);
 	BufferManager::clear(m_outputBufferWrite, m_framesPerPeriod);
