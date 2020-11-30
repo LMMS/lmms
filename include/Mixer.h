@@ -218,7 +218,7 @@ public:
 		return m_playHandles;
 	}
 
-	void removePlayHandlesOfTypes( Track * track, const quint8 types );
+	void removePlayHandlesOfTypes(Track * track, const quint8 types);
 
 
 	// methods providing information for other classes
