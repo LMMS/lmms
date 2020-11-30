@@ -98,7 +98,7 @@ public:
 		Interpolation interpolation;
 		Oversampling oversampling;
 
-		qualitySettings( Mode m )
+		qualitySettings(Mode m)
 		{
 			switch( m )
 			{
