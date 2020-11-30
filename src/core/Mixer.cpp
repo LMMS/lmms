@@ -140,8 +140,8 @@ Mixer::Mixer( bool renderOnly ) :
 	m_outputBufferRead = (surroundSampleFrame*)MemoryHelper::alignedMalloc(outputBufferSize);
 	m_outputBufferWrite = (surroundSampleFrame*)MemoryHelper::alignedMalloc(outputBufferSize);
 
-	BufferManager::clear( m_outputBufferRead, m_framesPerPeriod );
-	BufferManager::clear( m_outputBufferWrite, m_framesPerPeriod );
+	BufferManager::clear(m_outputBufferRead, m_framesPerPeriod);
+	BufferManager::clear(m_outputBufferWrite, m_framesPerPeriod);
 
 	for( int i = 0; i < m_numWorkers+1; ++i )
 	{
