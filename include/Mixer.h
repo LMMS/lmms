@@ -353,7 +353,7 @@ private:
 	Mixer( bool renderOnly );
 	virtual ~Mixer();
 
-	void startProcessing( bool needsFifo = true );
+	void startProcessing(bool needsFifo = true);
 	void stopProcessing();
 
 
