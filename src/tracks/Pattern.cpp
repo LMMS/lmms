@@ -56,7 +56,7 @@ Pattern::Pattern( InstrumentTrack * _instrument_track ) :
 	TrackContentObject( _instrument_track ),
 	m_instrumentTrack( _instrument_track ),
 	m_patternType( BeatPattern ),
-	m_steps( MidiTime::stepsPerBar() )
+	m_steps( TimePos::stepsPerBar() )
 {
 	if( _instrument_track->trackContainer()
 					== Engine::getBBTrackContainer() )
@@ -160,7 +160,7 @@ void Pattern::updateLength()
 		return;
 	}
 
-	tick_t max_length = MidiTime::ticksPerBar();
+	tick_t max_length = TimePos::ticksPerBar();
 
 	for( NoteVector::ConstIterator it = m_notes.begin();
 						it != m_notes.end(); ++it )
@@ -171,17 +171,17 @@ void Pattern::updateLength()
 							( *it )->endPos() );
 		}
 	}
-	changeLength( MidiTime( max_length ).nextFullBar() *
-						MidiTime::ticksPerBar() );
+	changeLength( TimePos( max_length ).nextFullBar() *
+						TimePos::ticksPerBar() );
 	updateBBTrack();
 }
 
 
 
 
-MidiTime Pattern::beatPatternLength() const
+TimePos Pattern::beatPatternLength() const
 {
-	tick_t max_length = MidiTime::ticksPerBar();
+	tick_t max_length = TimePos::ticksPerBar();
 
 	for( NoteVector::ConstIterator it = m_notes.begin();
 						it != m_notes.end(); ++it )
@@ -193,13 +193,13 @@ MidiTime Pattern::beatPatternLength() const
 		}
 	}
 
-	if( m_steps != MidiTime::stepsPerBar() )
+	if( m_steps != TimePos::stepsPerBar() )
 	{
-		max_length = m_steps * MidiTime::ticksPerBar() /
-						MidiTime::stepsPerBar();
+		max_length = m_steps * TimePos::ticksPerBar() /
+						TimePos::stepsPerBar();
 	}
 
-	return MidiTime( max_length ).nextFullBar() * MidiTime::ticksPerBar();
+	return TimePos( max_length ).nextFullBar() * TimePos::ticksPerBar();
 }
 
 
@@ -258,7 +258,7 @@ Note * Pattern::noteAtStep( int _step )
 	for( NoteVector::Iterator it = m_notes.begin(); it != m_notes.end();
 									++it )
 	{
-		if( ( *it )->pos() == MidiTime::stepPosition( _step )
+		if( ( *it )->pos() == TimePos::stepPosition( _step )
 						&& ( *it )->length() < 0 )
 		{
 			return *it;
@@ -297,8 +297,8 @@ void Pattern::clearNotes()
 
 Note * Pattern::addStepNote( int step )
 {
-	return addNote( Note( MidiTime( -DefaultTicksPerBar ),
-				MidiTime::stepPosition( step ) ), false );
+	return addNote( Note( TimePos( -DefaultTicksPerBar ),
+				TimePos::stepPosition( step ) ), false );
 }
 
 
@@ -428,7 +428,7 @@ void Pattern::loadSettings( const QDomElement & _this )
 	m_steps = _this.attribute( "steps" ).toInt();
 	if( m_steps == 0 )
 	{
-		m_steps = MidiTime::stepsPerBar();
+		m_steps = TimePos::stepsPerBar();
 	}
 
 	checkType();
@@ -477,7 +477,7 @@ void Pattern::clear()
 
 void Pattern::addSteps()
 {
-	m_steps += MidiTime::stepsPerBar();
+	m_steps += TimePos::stepsPerBar();
 	updateLength();
 	emit dataChanged();
 }
@@ -508,7 +508,7 @@ void Pattern::cloneSteps()
 
 void Pattern::removeSteps()
 {
-	int n = MidiTime::stepsPerBar();
+	int n = TimePos::stepsPerBar();
 	if( n < m_steps )
 	{
 		for( int i = m_steps - n; i < m_steps; ++i )
@@ -566,19 +566,19 @@ bool Pattern::empty()
 
 void Pattern::changeTimeSignature()
 {
-	MidiTime last_pos = MidiTime::ticksPerBar() - 1;
+	TimePos last_pos = TimePos::ticksPerBar() - 1;
 	for( NoteVector::ConstIterator cit = m_notes.begin();
 						cit != m_notes.end(); ++cit )
 	{
 		if( ( *cit )->length() < 0 && ( *cit )->pos() > last_pos )
 		{
-			last_pos = ( *cit )->pos()+MidiTime::ticksPerBar() /
-						MidiTime::stepsPerBar();
+			last_pos = ( *cit )->pos()+TimePos::ticksPerBar() /
+						TimePos::stepsPerBar();
 		}
 	}
-	last_pos = last_pos.nextFullBar() * MidiTime::ticksPerBar();
-	m_steps = qMax<tick_t>( MidiTime::stepsPerBar(),
-				last_pos.getBar() * MidiTime::stepsPerBar() );
+	last_pos = last_pos.nextFullBar() * TimePos::ticksPerBar();
+	m_steps = qMax<tick_t>( TimePos::stepsPerBar(),
+				last_pos.getBar() * TimePos::stepsPerBar() );
 	updateLength();
 }
 
@@ -923,7 +923,7 @@ void PatternView::paintEvent( QPaintEvent * )
 
 	// Length of one bar/beat in the [0,1] x [0,1] coordinate system
 	const float barLength = 1. / m_pat->length().getBar();
-	const float tickLength = barLength / MidiTime::ticksPerBar();
+	const float tickLength = barLength / TimePos::ticksPerBar();
 
 	const int x_base = TCO_BORDER_WIDTH;
 

@@ -52,7 +52,7 @@ BBTCO::BBTCO( Track * _track ) :
 	if( t > 0 )
 	{
 		saveJournallingState( false );
-		changeLength( MidiTime( t, 0 ) );
+		changeLength( TimePos( t, 0 ) );
 		restoreJournallingState();
 	}
 	setAutoResize( false );
@@ -208,7 +208,7 @@ void BBTCOView::paintEvent( QPaintEvent * )
 	p.setPen( c.darker( 200 ) );
 
 	bar_t t = Engine::getBBTrackContainer()->lengthOfBB( m_bbTCO->bbTrackIndex() );
-	if( m_bbTCO->length() > MidiTime::ticksPerBar() && t > 0 )
+	if( m_bbTCO->length() > TimePos::ticksPerBar() && t > 0 )
 	{
 		for( int x = static_cast<int>( t * pixelsPerBar() );
 								x < width() - 2;
@@ -331,7 +331,7 @@ BBTrack::~BBTrack()
 
 
 // play _frames frames of given TCO within starting with _start
-bool BBTrack::play( const MidiTime & _start, const fpp_t _frames,
+bool BBTrack::play( const TimePos & _start, const fpp_t _frames,
 					const f_cnt_t _offset, int _tco_num )
 {
 	if( isMuted() )
@@ -352,8 +352,8 @@ bool BBTrack::play( const MidiTime & _start, const fpp_t _frames,
 		return false;
 	}
 
-	MidiTime lastPosition;
-	MidiTime lastLen;
+	TimePos lastPosition;
+	TimePos lastLen;
 	for( tcoVector::iterator it = tcos.begin(); it != tcos.end(); ++it )
 	{
 		if( !( *it )->isMuted() &&
@@ -382,7 +382,7 @@ TrackView * BBTrack::createView( TrackContainerView* tcv )
 
 
 
-TrackContentObject* BBTrack::createTCO(const MidiTime & pos)
+TrackContentObject* BBTrack::createTCO(const TimePos & pos)
 {
 	BBTCO* bbtco = new BBTCO(this);
 	bbtco->movePosition(pos);
