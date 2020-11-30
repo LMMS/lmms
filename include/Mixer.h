@@ -333,7 +333,7 @@ private:
 	class fifoWriter : public QThread
 	{
 	public:
-		fifoWriter( Mixer * mixer, fifo * _fifo );
+		fifoWriter(Mixer * mixer, fifo * _fifo);
 
 		void finish();
 
