@@ -211,7 +211,7 @@ void Mixer::initDevices()
 
 
 
-void Mixer::startProcessing( bool needsFifo )
+void Mixer::startProcessing(bool needsFifo)
 {
 	if (needsFifo)
 	{
