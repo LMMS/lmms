@@ -255,7 +255,7 @@ public:
 		return m_masterGain;
 	}
 
-	inline void setMasterGain( const float mo )
+	inline void setMasterGain(const float mo)
 	{
 		m_masterGain = mo;
 	}
