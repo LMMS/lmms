@@ -689,7 +689,7 @@ bool Mixer::addPlayHandle( PlayHandle* handle )
 }
 
 
-void Mixer::removePlayHandle( PlayHandle * ph )
+void Mixer::removePlayHandle(PlayHandle * ph)
 {
 	requestChangeInModel();
 	// check thread affinity as we must not delete play-handles
