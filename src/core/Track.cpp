@@ -1392,8 +1392,8 @@ void TrackContentObjectView::mergeTCOs(QVector<TrackContentObjectView *> tcovs)
 	track->saveJournallingState(false);
 
 	// Find the earliest position of all the selected TCOVs
-	MidiTime earliestPos = tcovs.at(0)->getTrackContentObject()->startPosition();
-	MidiTime currentPos = earliestPos;
+	TimePos earliestPos = tcovs.at(0)->getTrackContentObject()->startPosition();
+	TimePos currentPos = earliestPos;
 
 	for (auto tcov: tcovs)
 	{
@@ -1427,12 +1427,12 @@ void TrackContentObjectView::mergeTCOs(QVector<TrackContentObjectView *> tcovs)
 		}
 
 		NoteVector currentTCONotes = pView->getPattern()->notes();
-		MidiTime pViewPos = pView->getPattern()->startPosition();
+		TimePos pViewPos = pView->getPattern()->startPosition();
 
 		for (Note * note: currentTCONotes)
 		{
 			Note * newNote = newPattern->addNote(*note, false);
-			MidiTime originalNotePos = newNote->pos();
+			TimePos originalNotePos = newNote->pos();
 			newNote->setPos(originalNotePos + (pViewPos - earliestPos));
 		}
 
