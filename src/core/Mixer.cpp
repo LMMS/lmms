@@ -787,7 +787,7 @@ void Mixer::requestChangeInModel()
 
 	m_doChangesMutex.lock();
 	m_waitChangesMutex.lock();
-	if( m_isProcessing && !m_waitingForWrite && !m_changesSignal )
+	if (m_isProcessing && !m_waitingForWrite && !m_changesSignal)
 	{
 		m_changesSignal = true;
 		m_changesRequestCondition.wait( &m_waitChangesMutex );
@@ -1289,4 +1289,3 @@ void Mixer::fifoWriter::write( surroundSampleFrame * buffer )
 	m_mixer->m_waitingForWrite = false;
 	m_mixer->m_doChangesMutex.unlock();
 }
-
