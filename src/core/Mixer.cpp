@@ -703,7 +703,7 @@ void Mixer::removePlayHandle( PlayHandle * ph )
 		for( LocklessListElement * e = m_newPlayHandles.first(),
 				* ePrev = NULL; e; ePrev = e, e = e->next )
 		{
-			if( e->value == ph )
+			if (e->value == ph)
 			{
 				if( ePrev )
 				{
