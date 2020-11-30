@@ -696,7 +696,7 @@ void Mixer::removePlayHandle(PlayHandle * ph)
 	// which were created in a thread different than mixer thread
 	if (ph->affinityMatters() && ph->affinity() == QThread::currentThread())
 	{
-		ph->audioPort()->removePlayHandle( ph );
+		ph->audioPort()->removePlayHandle(ph);
 		bool removedFromList = false;
 		// Check m_newPlayHandles first because doing it the other way around
 		// creates a race condition
