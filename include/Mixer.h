@@ -100,7 +100,7 @@ public:
 
 		qualitySettings(Mode m)
 		{
-			switch( m )
+			switch (m)
 			{
 				case Mode_Draft:
 					interpolation = Interpolation_Linear;
