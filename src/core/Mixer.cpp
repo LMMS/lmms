@@ -749,7 +749,7 @@ void Mixer::removePlayHandle( PlayHandle * ph )
 
 
 
-void Mixer::removePlayHandlesOfTypes( Track * track, const quint8 types )
+void Mixer::removePlayHandlesOfTypes(Track * track, const quint8 types)
 {
 	requestChangeInModel();
 	PlayHandleList::Iterator it = m_playHandles.begin();
