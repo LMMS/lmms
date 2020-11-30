@@ -425,7 +425,7 @@ const surroundSampleFrame * Mixer::renderNextBuffer()
 	fxMixer->masterMix( m_outputBufferWrite );
 
 
-	emit nextAudioBuffer( m_outputBufferRead );
+	emit nextAudioBuffer(m_outputBufferRead);
 
 	runChangesInModel();
 
