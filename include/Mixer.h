@@ -193,7 +193,7 @@ public:
 		doneChangeInModel();
 	}
 
-	void removeAudioPort( AudioPort * port );
+	void removeAudioPort(AudioPort * port);
 
 
 	// MIDI-client-stuff
