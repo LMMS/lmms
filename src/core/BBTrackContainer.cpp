@@ -65,9 +65,9 @@ bool BBTrackContainer::play(TimePos start, fpp_t frames, f_cnt_t offset, int tco
 	start = start % (lengthOfBB(tcoNum) * TimePos::ticksPerBar());
 
 	TrackList tl = tracks();
-	for (TrackList::iterator it = tl.begin(); it != tl.end(); ++it)
+	for (Track * t : tl)
 	{
-		if ((*it)->play(start, frames, offset, tcoNum))
+		if (t->play(start, frames, offset, tcoNum))
 		{
 			notePlayed = true;
 		}
@@ -95,7 +95,7 @@ bar_t BBTrackContainer::lengthOfBB(int bb) const
 	TimePos maxLength = TimePos::ticksPerBar();
 
 	const TrackList & tl = tracks();
-	for (Track* t : tl)
+	for (Track * t : tl)
 	{
 		// Don't create TCOs here if they don't exist
 		if (bb < t->numOfTCOs())
@@ -121,10 +121,10 @@ int BBTrackContainer::numOfBBs() const
 void BBTrackContainer::removeBB(int bb)
 {
 	TrackList tl = tracks();
-	for (TrackList::iterator it = tl.begin(); it != tl.end(); ++it)
+	for (Track * t : tl)
 	{
-		delete (*it)->getTCO(bb);
-		(*it)->removeBar(bb * DefaultTicksPerBar);
+		delete t->getTCO(bb);
+		t->removeBar(bb * DefaultTicksPerBar);
 	}
 	if (bb <= currentBB())
 	{
@@ -138,9 +138,9 @@ void BBTrackContainer::removeBB(int bb)
 void BBTrackContainer::swapBB(int bb1, int bb2)
 {
 	TrackList tl = tracks();
-	for (TrackList::iterator it = tl.begin(); it != tl.end(); ++it)
+	for (Track * t : tl)
 	{
-		(*it)->swapPositionOfTCOs(bb1, bb2);
+		t->swapPositionOfTCOs(bb1, bb2);
 	}
 	updateComboBox();
 }
@@ -163,11 +163,11 @@ void BBTrackContainer::updateBBTrack(TrackContentObject * tco)
 void BBTrackContainer::fixIncorrectPositions()
 {
 	TrackList tl = tracks();
-	for (TrackList::iterator it = tl.begin(); it != tl.end(); ++it)
+	for (Track * t : tl)
 	{
 		for (int i = 0; i < numOfBBs(); ++i)
 		{
-			(*it)->getTCO(i)->movePosition(TimePos(i, 0));
+			t->getTCO(i)->movePosition(TimePos(i, 0));
 		}
 	}
 }
@@ -219,11 +219,11 @@ void BBTrackContainer::currentBBChanged()
 {
 	// now update all track-labels (the current one has to become white, the others gray)
 	TrackList tl = Engine::getSong()->tracks();
-	for (TrackList::iterator it = tl.begin(); it != tl.end(); ++it)
+	for (Track * t : tl)
 	{
-		if ((*it)->type() == Track::BBTrack)
+		if (t->type() == Track::BBTrack)
 		{
-			(*it)->dataChanged();
+			t->dataChanged();
 		}
 	}
 }
@@ -234,9 +234,9 @@ void BBTrackContainer::currentBBChanged()
 void BBTrackContainer::createTCOsForBB(int bb)
 {
 	TrackList tl = tracks();
-	for (int i = 0; i < tl.size(); ++i)
+	for (Track * t : tl)
 	{
-		tl[i]->createTCOsForBB(bb);
+		t->createTCOsForBB(bb);
 	}
 }
 
