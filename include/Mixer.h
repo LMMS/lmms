@@ -186,7 +186,7 @@ public:
 
 
 	// audio-port-stuff
-	inline void addAudioPort( AudioPort * port )
+	inline void addAudioPort(AudioPort * port)
 	{
 		requestChangeInModel();
 		m_audioPorts.push_back( port );
