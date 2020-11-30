@@ -189,7 +189,7 @@ public:
 	inline void addAudioPort(AudioPort * port)
 	{
 		requestChangeInModel();
-		m_audioPorts.push_back( port );
+		m_audioPorts.push_back(port);
 		doneChangeInModel();
 	}
 
