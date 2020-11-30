@@ -567,7 +567,7 @@ Mixer::StereoSample Mixer::getPeakValues(sampleFrame * ab, const f_cnt_t frames)
 
 
 
-void Mixer::changeQuality( const struct qualitySettings & qs )
+void Mixer::changeQuality(const struct qualitySettings & qs)
 {
 	// don't delete the audio-device
 	stopProcessing();
