@@ -244,19 +244,19 @@ public:
 	}
 
 	/*! Process note detuning automation */
-	void processMidiTime( const MidiTime& time );
+	void processTimePos( const TimePos& time );
 
 	/*! Updates total length (m_frames) depending on a new tempo */
 	void resize( const bpm_t newTempo );
 
 	/*! Set song-global offset (relative to containing pattern) in order to properly perform the note detuning */
-	void setSongGlobalParentOffset( const MidiTime& offset )
+	void setSongGlobalParentOffset( const TimePos& offset )
 	{
 		m_songGlobalParentOffset = offset;
 	}
 
 	/*! Returns song-global offset */
-	const MidiTime& songGlobalParentOffset() const
+	const TimePos& songGlobalParentOffset() const
 	{
 		return m_songGlobalParentOffset;
 	}
@@ -323,7 +323,7 @@ private:
 	float m_unpitchedFrequency;
 
 	BaseDetuning* m_baseDetuning;
-	MidiTime m_songGlobalParentOffset;
+	TimePos m_songGlobalParentOffset;
 
 	int m_midiChannel;
 	Origin m_origin;

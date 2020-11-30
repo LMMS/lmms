@@ -44,6 +44,8 @@
 
 #include "plugin_export.h"
 
+static const int wavetableSize = 200;
+
 extern "C"
 {
 
@@ -72,8 +74,8 @@ bSynth::bSynth( float * _shape, NotePlayHandle * _nph, bool _interpolation,
 	sample_rate( _sample_rate ),
 	interpolation( _interpolation)
 {
-	sample_shape = new float[200];
-	for (int i=0; i < 200; ++i)
+	sample_shape = new float[wavetableSize];
+	for (int i=0; i < wavetableSize; ++i)
 	{
 		sample_shape[i] = _shape[i] * _factor;
 	}
@@ -138,12 +140,12 @@ sample_t bSynth::nextStringSample( float sample_length )
 
 bitInvader::bitInvader( InstrumentTrack * _instrument_track ) :
 	Instrument( _instrument_track, &bitinvader_plugin_descriptor ),
-	m_sampleLength( 128, 4, 200, 1, this, tr( "Sample length" ) ),
-	m_graph( -1.0f, 1.0f, 200, this ),
+	m_sampleLength(128, 4, wavetableSize, 1, this, tr("Sample length")),
+	m_graph(-1.0f, 1.0f, wavetableSize, this),
 	m_interpolation( false, this ),
 	m_normalize( false, this )
 {
-		
+
 	lengthChanged();
 
 	m_graph.setWaveToSine();
@@ -177,8 +179,8 @@ void bitInvader::saveSettings( QDomDocument & _doc, QDomElement & _this )
 
 	// Save sample shape base64-encoded
 	QString sampleString;
-	base64::encode( (const char *)m_graph.samples(),
-		m_graph.length() * sizeof(float), sampleString );
+	base64::encode((const char *)m_graph.samples(),
+		wavetableSize * sizeof(float), sampleString);
 	_this.setAttribute( "sampleShape", sampleString );
 	
 
@@ -194,6 +196,9 @@ void bitInvader::saveSettings( QDomDocument & _doc, QDomElement & _this )
 
 void bitInvader::loadSettings( const QDomElement & _this )
 {
+	// Clear wavetable before loading a new
+	m_graph.clear();
+
 	// Load sample length
 	m_sampleLength.loadSettings( _this, "sampleLength" );
 
@@ -204,8 +209,9 @@ void bitInvader::loadSettings( const QDomElement & _this )
 	char * dst = 0;
 	base64::decode( _this.attribute( "sampleShape"), &dst, &size );
 
-	m_graph.setLength( sampleLength );
-	m_graph.setSamples( (float*) dst );
+	m_graph.setLength(size / sizeof(float));
+	m_graph.setSamples(reinterpret_cast<float*>(dst));
+	m_graph.setLength(sampleLength);
 	delete[] dst;
 
 	// Load LED normalize 
@@ -240,7 +246,7 @@ void bitInvader::samplesChanged( int _begin, int _end )
 void bitInvader::normalize()
 {
 	// analyze
-	float max = 0;
+	float max = std::numeric_limits<float>::epsilon();
 	const float* samples = m_graph.samples();
 	for(int i=0; i < m_graph.length(); i++)
 	{

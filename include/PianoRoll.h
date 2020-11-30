@@ -187,9 +187,9 @@ protected slots:
 	void pasteNotes();
 	bool deleteSelectedNotes();
 
-	void updatePosition(const MidiTime & t );
-	void updatePositionAccompany(const MidiTime & t );
-	void updatePositionStepRecording(const MidiTime & t );
+	void updatePosition(const TimePos & t );
+	void updatePositionAccompany(const TimePos & t );
+	void updatePositionStepRecording(const TimePos & t );
 
 	void zoomingChanged();
 	void zoomingYChanged();
@@ -266,9 +266,9 @@ private:
 	PianoRoll( const PianoRoll & );
 	virtual ~PianoRoll();
 
-	void autoScroll(const MidiTime & t );
+	void autoScroll(const TimePos & t );
 
-	MidiTime newNoteLen() const;
+	TimePos newNoteLen() const;
 
 	void shiftPos(int amount);
 	void shiftPos(NoteVector notes, int amount);
@@ -331,7 +331,7 @@ private:
 	QScrollBar * m_leftRightScroll;
 	QScrollBar * m_topBottomScroll;
 
-	MidiTime m_currentPosition;
+	TimePos m_currentPosition;
 	bool m_recording;
 	QList<Note> m_recordingNotes;
 
@@ -377,12 +377,12 @@ private:
 
 	// remember these values to use them
 	// for the next note that is set
-	MidiTime m_lenOfNewNotes;
+	TimePos m_lenOfNewNotes;
 	volume_t m_lastNoteVolume;
 	panning_t m_lastNotePanning;
 
 	//When resizing several notes, we want to calculate a common minimum length
-	MidiTime m_minResizeLen;
+	TimePos m_minResizeLen;
 
 	int m_startKey; // first key when drawing
 	int m_lastKey;
@@ -447,7 +447,7 @@ private:
 	QBrush m_blackKeyInactiveBackground;
 
 signals:
-	void positionChanged( const MidiTime & );
+	void positionChanged( const TimePos & );
 } ;
 
 

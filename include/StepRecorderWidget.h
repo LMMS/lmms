@@ -44,15 +44,15 @@ public:
 
 	//API used by PianoRoll
 	void setPixelsPerBar(int ppb);
-	void setCurrentPosition(MidiTime currentPosition);
+	void setCurrentPosition(TimePos currentPosition);
 	void setMargins(const QMargins &qm);
 	void setBottomMargin(const int marginBottom);
 	QMargins margins();
 
 	//API used by StepRecorder
-	void setStepsLength(MidiTime stepsLength);
-	void setStartPosition(MidiTime pos);
-	void setEndPosition(MidiTime pos);
+	void setStepsLength(TimePos stepsLength);
+	void setStartPosition(TimePos pos);
+	void setEndPosition(TimePos pos);
 
 	void showHint();
 
@@ -62,16 +62,16 @@ private:
 	int xCoordOfTick(int tick);
 
 	void drawVerLine(QPainter* painter, int x, const QColor& color, int top, int bottom);
-	void drawVerLine(QPainter* painter, const MidiTime& pos, const QColor& color, int top, int bottom);
+	void drawVerLine(QPainter* painter, const TimePos& pos, const QColor& color, int top, int bottom);
 
 	void updateBoundaries();
 
-	MidiTime m_stepsLength;
-	MidiTime m_curStepStartPos;
-	MidiTime m_curStepEndPos;
+	TimePos m_stepsLength;
+	TimePos m_curStepStartPos;
+	TimePos m_curStepEndPos;
 
 	int m_ppb; // pixels per bar
-	MidiTime m_currentPosition; // current position showed by on PianoRoll
+	TimePos m_currentPosition; // current position showed by on PianoRoll
 
 	QColor m_colorLineStart;
 	QColor m_colorLineEnd;
@@ -88,7 +88,7 @@ private:
 	const int m_marginRight;
 
 signals:
-	void positionChanged(const MidiTime & t);
+	void positionChanged(const TimePos & t);
 } ;
 
 #endif //STEP_RECOREDER_WIDGET_H

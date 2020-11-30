@@ -355,7 +355,7 @@ void CarlaInstrument::play(sampleFrame* workingBuffer)
     instrumentTrack()->processAudioBuffer(workingBuffer, bufsize, NULL);
 }
 
-bool CarlaInstrument::handleMidiEvent(const MidiEvent& event, const MidiTime&, f_cnt_t offset)
+bool CarlaInstrument::handleMidiEvent(const MidiEvent& event, const TimePos&, f_cnt_t offset)
 {
     const QMutexLocker ml(&fMutex);
 

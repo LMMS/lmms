@@ -72,7 +72,7 @@ public:
     virtual void saveSettings(QDomDocument& doc, QDomElement& parent);
     virtual void loadSettings(const QDomElement& elem);
     virtual void play(sampleFrame* workingBuffer);
-    virtual bool handleMidiEvent(const MidiEvent& event, const MidiTime& time, f_cnt_t offset);
+    virtual bool handleMidiEvent(const MidiEvent& event, const TimePos& time, f_cnt_t offset);
     virtual PluginView* instantiateView(QWidget* parent);
 
 signals:
