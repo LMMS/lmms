@@ -2,17 +2,11 @@
 #define MIDI_CC_RACK_VIEW_H
 
 #include <QWidget>
-#include <QLabel>
-#include <QCloseEvent>
 
-#include "SerializingObject.h"
-#include "lmms_basics.h"
-#include "ComboBox.h"
-#include "ComboBoxModel.h"
-#include "Knob.h"
-#include "TrackContainer.h"
 #include "GroupBox.h"
+#include "Knob.h"
 #include "Midi.h"
+#include "SerializingObject.h"
 
 class InstrumentTrack;
 

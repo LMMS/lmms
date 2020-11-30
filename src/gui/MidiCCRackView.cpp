@@ -23,30 +23,21 @@
  */
 
 
-#include <QWidget>
-#include <QMdiSubWindow>
-#include <QHBoxLayout>
-#include <QVBoxLayout>
-#include <QGridLayout>
-#include <QLabel>
-#include <QScrollArea>
-
 #include "MidiCCRackView.h"
-#include "GuiApplication.h"
-#include "MainWindow.h"
+
+#include <QGridLayout>
+#include <QMdiSubWindow>
+#include <QScrollArea>
+#include <QVBoxLayout>
+#include <QWidget>
+
 #include "embed.h"
-#include "ComboBox.h"
-#include "ComboBoxModel.h"
 #include "GroupBox.h"
-#include "Knob.h"
-#include "Track.h"
+#include "GuiApplication.h"
 #include "InstrumentTrack.h"
-#include "TrackContainer.h"
-#include "BBTrackContainer.h"
-#include "Engine.h"
-#include "Song.h"
-#include "SongEditor.h"
-#include "BBEditor.h"
+#include "Knob.h"
+#include "MainWindow.h"
+#include "Track.h"
 
 
 MidiCCRackView::MidiCCRackView(InstrumentTrack * track) :

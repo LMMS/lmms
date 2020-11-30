@@ -30,6 +30,8 @@
 #include "GroupBox.h"
 #include "InstrumentFunctions.h"
 #include "InstrumentSoundShaping.h"
+#include "Midi.h"
+#include "MidiCCRackView.h"
 #include "MidiEventProcessor.h"
 #include "MidiPort.h"
 #include "NotePlayHandle.h"
@@ -38,8 +40,6 @@
 #include "Pitch.h"
 #include "Plugin.h"
 #include "Track.h"
-#include "Midi.h"
-#include "MidiCCRackView.h"
 
 
 
