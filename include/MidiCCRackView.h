@@ -21,7 +21,7 @@ class MidiCCRackView : public QWidget, public SerializingObject
 	Q_OBJECT
 public:
 	MidiCCRackView(InstrumentTrack * track);
-	virtual ~MidiCCRackView();
+	~MidiCCRackView() override;
 
 	void saveSettings(QDomDocument & doc, QDomElement & parent) override;
 	void loadSettings(const QDomElement &) override;
@@ -31,7 +31,7 @@ public:
 		return "MidiCCRackView";
 	}
 
-public slots:
+private slots:
 	void renameWindow();
 
 private:

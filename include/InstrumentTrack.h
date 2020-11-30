@@ -231,9 +231,6 @@ signals:
 	void newNote();
 	void endNote();
 
-public slots:
-	void processCCEvent(int controller);
-
 protected:
 	QString nodeName() const override
 	{
@@ -252,6 +249,8 @@ protected slots:
 
 
 private:
+	void processCCEvent(int controller);
+
 	MidiPort m_midiPort;
 
 	NotePlayHandle* m_notes[NumKeys];
