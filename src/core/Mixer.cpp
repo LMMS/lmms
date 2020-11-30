@@ -656,7 +656,7 @@ void Mixer::restoreAudioDevice()
 
 
 
-void Mixer::removeAudioPort( AudioPort * port )
+void Mixer::removeAudioPort(AudioPort * port)
 {
 	requestChangeInModel();
 	QVector<AudioPort *>::Iterator it = std::find( m_audioPorts.begin(),
