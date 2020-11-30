@@ -1106,6 +1106,7 @@ InstrumentTrackView::InstrumentTrackView( InstrumentTrack * _it, TrackContainerV
 	m_midiOutputAction->setText( tr( "Output" ) );
 
 	QAction *midiRackAction = m_midiMenu->addAction(tr("Open/Close MIDI CC Rack"));
+	midiRackAction->setIcon(embed::getIconPixmap("midi_cc_rack"));
 	connect(midiRackAction, SIGNAL(triggered()),
 		this, SLOT(toggleMidiCCRack()));
 
