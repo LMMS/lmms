@@ -25,7 +25,6 @@
 #include "InstrumentTrack.h"
 
 #include <QDir>
-#include <QQueue>
 #include <QApplication>
 #include <QCloseEvent>
 #include <QLabel>

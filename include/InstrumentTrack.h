@@ -42,7 +42,6 @@
 
 
 class QLineEdit;
-template<class T> class QQueue;
 class InstrumentFunctionArpeggioView;
 class InstrumentFunctionNoteStackingView;
 class EffectRackView;
