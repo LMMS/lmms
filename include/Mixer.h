@@ -267,7 +267,7 @@ public:
 		{
 			return 1.0f;
 		}
-		else if( s < -1.0f )
+		else if (s < -1.0f)
 		{
 			return -1.0f;
 		}
