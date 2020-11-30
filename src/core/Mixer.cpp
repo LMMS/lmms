@@ -755,7 +755,7 @@ void Mixer::removePlayHandlesOfTypes( Track * track, const quint8 types )
 	PlayHandleList::Iterator it = m_playHandles.begin();
 	while( it != m_playHandles.end() )
 	{
-		if( ( *it )->isFromTrack( track ) && ( ( *it )->type() & types ) )
+		if ((*it)->isFromTrack(track) && ((*it)->type() & types))
 		{
 			( *it )->audioPort()->removePlayHandle( ( *it ) );
 			if( ( *it )->type() == PlayHandle::TypeNotePlayHandle )
