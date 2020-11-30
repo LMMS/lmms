@@ -694,7 +694,7 @@ void Mixer::removePlayHandle(PlayHandle * ph)
 	requestChangeInModel();
 	// check thread affinity as we must not delete play-handles
 	// which were created in a thread different than mixer thread
-	if( ph->affinityMatters() && ph->affinity() == QThread::currentThread() )
+	if (ph->affinityMatters() && ph->affinity() == QThread::currentThread())
 	{
 		ph->audioPort()->removePlayHandle( ph );
 		bool removedFromList = false;
