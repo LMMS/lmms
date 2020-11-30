@@ -741,7 +741,7 @@ void Mixer::removePlayHandle( PlayHandle * ph )
 	}
 	else
 	{
-		m_playHandlesToRemove.push_back( ph );
+		m_playHandlesToRemove.push_back(ph);
 	}
 	doneChangeInModel();
 }
