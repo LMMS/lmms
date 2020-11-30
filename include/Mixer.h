@@ -263,7 +263,7 @@ public:
 
 	static inline sample_t clip(const sample_t s)
 	{
-		if( s > 1.0f )
+		if (s > 1.0f)
 		{
 			return 1.0f;
 		}
