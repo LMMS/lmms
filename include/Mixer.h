@@ -261,7 +261,7 @@ public:
 	}
 
 
-	static inline sample_t clip( const sample_t s )
+	static inline sample_t clip(const sample_t s)
 	{
 		if( s > 1.0f )
 		{
