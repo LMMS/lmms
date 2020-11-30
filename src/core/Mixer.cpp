@@ -420,7 +420,7 @@ const surroundSampleFrame * Mixer::renderNextBuffer()
 
 
 	// STAGE 3: do master mix in FX mixer
-	fxMixer->masterMix( m_outputBufferWrite );
+	fxMixer->masterMix(m_outputBufferWrite);
 
 
 	emit nextAudioBuffer(m_outputBufferRead);
