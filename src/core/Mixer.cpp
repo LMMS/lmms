@@ -659,12 +659,11 @@ void Mixer::restoreAudioDevice()
 void Mixer::removeAudioPort(AudioPort * port)
 {
 	requestChangeInModel();
-	QVector<AudioPort *>::Iterator it = std::find( m_audioPorts.begin(),
-							m_audioPorts.end(),
-							port );
-	if( it != m_audioPorts.end() )
+
+	QVector<AudioPort *>::Iterator it = std::find(m_audioPorts.begin(), m_audioPorts.end(), port);
+	if (it != m_audioPorts.end())
 	{
-		m_audioPorts.erase( it );
+		m_audioPorts.erase(it);
 	}
 	doneChangeInModel();
 }
@@ -719,11 +718,10 @@ void Mixer::removePlayHandle(PlayHandle * ph)
 			}
 		}
 		// Now check m_playHandles
-		PlayHandleList::Iterator it = std::find( m_playHandles.begin(),
-					m_playHandles.end(), ph );
-		if( it != m_playHandles.end() )
+		PlayHandleList::Iterator it = std::find(m_playHandles.begin(), m_playHandles.end(), ph);
+		if (it != m_playHandles.end())
 		{
-			m_playHandles.erase( it );
+			m_playHandles.erase(it);
 			removedFromList = true;
 		}
 		// Only deleting PlayHandles that were actually found in the list
