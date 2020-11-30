@@ -182,8 +182,8 @@ Mixer::~Mixer()
 	delete m_midiClient;
 	delete m_audioDev;
 
-	MemoryHelper::alignedFree( m_outputBufferRead );
-	MemoryHelper::alignedFree( m_outputBufferWrite );
+	MemoryHelper::alignedFree(m_outputBufferRead);
+	MemoryHelper::alignedFree(m_outputBufferWrite);
 
 	for( int i = 0; i < 2; ++i )
 	{
