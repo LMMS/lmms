@@ -546,7 +546,7 @@ Mixer::StereoSample Mixer::getPeakValues(sampleFrame * ab, const f_cnt_t frames)
 	sample_t peakLeft = 0.0f;
 	sample_t peakRight = 0.0f;
 
-	for( f_cnt_t f = 0; f < frames; ++f )
+	for (f_cnt_t f = 0; f < frames; ++f)
 	{
 		float const absLeft = qAbs(ab[f][0]);
 		float const absRight = qAbs(ab[f][1]);
