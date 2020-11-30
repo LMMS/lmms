@@ -970,9 +970,8 @@ InstrumentTrackView::InstrumentTrackView( InstrumentTrack * _it, TrackContainerV
 	connect( _it, SIGNAL( nameChanged() ),
 			m_tlb, SLOT( update() ) );
 
-	connect( ConfigManager::inst(), SIGNAL( valueChanged( QString, QString, QString ) ),
-			this, SLOT( handleConfigChange( QString, QString, QString ) ),
-			Qt::QueuedConnection );
+	connect(ConfigManager::inst(), SIGNAL(valueChanged(QString, QString, QString)),
+			this, SLOT(handleConfigChange(QString, QString, QString)));
 
 	// creation of widgets for track-settings-widget
 	int widgetWidth;
