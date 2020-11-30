@@ -213,7 +213,7 @@ void Mixer::initDevices()
 
 void Mixer::startProcessing( bool needsFifo )
 {
-	if( needsFifo )
+	if (needsFifo)
 	{
 		m_fifoWriter = new fifoWriter( this, m_fifo );
 		m_fifoWriter->start( QThread::HighPriority );
