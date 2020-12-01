@@ -150,6 +150,7 @@ SampleBuffer::SampleBuffer(SampleBuffer& orig):
 	//Deep copy m_origData and m_data from original
 	memcpy(m_origData, orig.m_origData, m_origFrames* BYTES_PER_FRAME);
 	memcpy(m_data, orig.m_data, m_frames* BYTES_PER_FRAME);
+	orig.m_varLock.unlock();
 }
 
 
