@@ -8,6 +8,11 @@ SET(CMAKE_CXX_STANDARD 14)
 
 SET(CMAKE_AUTOMOC ON)
 
+# FIXME: remove this once we export include directories for LMMS
+IF(LMMS_BUILD_APPLE)
+INCLUDE_DIRECTORIES("/usr/local/include")
+ENDIF()
+
 ADD_EXECUTABLE(tests
 	EXCLUDE_FROM_ALL
 	main.cpp
