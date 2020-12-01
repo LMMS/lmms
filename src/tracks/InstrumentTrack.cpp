@@ -25,7 +25,6 @@
 #include "InstrumentTrack.h"
 
 #include <QDir>
-#include <QQueue>
 #include <QApplication>
 #include <QCloseEvent>
 #include <QLabel>
@@ -79,7 +78,6 @@
 const int INSTRUMENT_WIDTH	= 254;
 const int INSTRUMENT_HEIGHT	= INSTRUMENT_WIDTH;
 const int PIANO_HEIGHT		= 80;
-const int INSTRUMENT_WINDOW_CACHE_SIZE = 8;
 
 
 // #### IT:
@@ -951,9 +949,6 @@ void InstrumentTrack::autoAssignMidiDevice(bool assign)
 // #### ITV:
 
 
-QQueue<InstrumentTrackWindow *> InstrumentTrackView::s_windowCache;
-
-
 
 InstrumentTrackView::InstrumentTrackView( InstrumentTrack * _it, TrackContainerView* tcv ) :
 	TrackView( _it, tcv ),
@@ -974,6 +969,9 @@ InstrumentTrackView::InstrumentTrackView( InstrumentTrack * _it, TrackContainerV
 
 	connect( _it, SIGNAL( nameChanged() ),
 			m_tlb, SLOT( update() ) );
+
+	connect(ConfigManager::inst(), SIGNAL(valueChanged(QString, QString, QString)),
+			this, SLOT(handleConfigChange(QString, QString, QString)));
 
 	// creation of widgets for track-settings-widget
 	int widgetWidth;
@@ -1066,7 +1064,8 @@ InstrumentTrackView::InstrumentTrackView( InstrumentTrack * _it, TrackContainerV
 
 InstrumentTrackView::~InstrumentTrackView()
 {
-	freeInstrumentTrackWindow();
+	delete m_window;
+	m_window = nullptr;
 
 	delete model()->m_midiPort.m_readablePortsMenu;
 	delete model()->m_midiPort.m_writablePortsMenu;
@@ -1119,88 +1118,25 @@ void InstrumentTrackView::assignFxLine(int channelIndex)
 
 
 
-// TODO: Add windows to free list on freeInstrumentTrackWindow.
-// But, don't NULL m_window or disconnect signals.  This will allow windows
-// that are being show/hidden frequently to stay connected.
-void InstrumentTrackView::freeInstrumentTrackWindow()
-{
-	if( m_window != NULL )
-	{
-		m_lastPos = m_window->parentWidget()->pos();
-
-		if( ConfigManager::inst()->value( "ui",
-										"oneinstrumenttrackwindow" ).toInt() ||
-						s_windowCache.count() < INSTRUMENT_WINDOW_CACHE_SIZE )
-		{
-			model()->setHook( NULL );
-			m_window->setInstrumentTrackView( NULL );
-			m_window->parentWidget()->hide();
-			m_window->updateInstrumentView();
-			s_windowCache << m_window;
-		}
-		else
-		{
-			delete m_window;
-		}
-
-		m_window = NULL;
-	}
-}
-
-
-
-
-void InstrumentTrackView::cleanupWindowCache()
-{
-	while( !s_windowCache.isEmpty() )
-	{
-		delete s_windowCache.dequeue();
-	}
-}
-
-
-
-
 InstrumentTrackWindow * InstrumentTrackView::getInstrumentTrackWindow()
 {
-	if( m_window != NULL )
+	if (!m_window)
 	{
-	}
-	else if( !s_windowCache.isEmpty() )
-	{
-		m_window = s_windowCache.dequeue();
-
-		m_window->setInstrumentTrackView( this );
-		m_window->setModel( model() );
-		m_window->updateInstrumentView();
-		model()->setHook( m_window );
-
-		if( ConfigManager::inst()->
-							value( "ui", "oneinstrumenttrackwindow" ).toInt() )
-		{
-			s_windowCache << m_window;
-		}
-		else if( m_lastPos.x() > 0 || m_lastPos.y() > 0 )
-		{
-			m_window->parentWidget()->move( m_lastPos );
-		}
-	}
-	else
-	{
-		m_window = new InstrumentTrackWindow( this );
-		if( ConfigManager::inst()->
-							value( "ui", "oneinstrumenttrackwindow" ).toInt() )
-		{
-			// first time, an InstrumentTrackWindow is opened
-			s_windowCache << m_window;
-		}
+		m_window = new InstrumentTrackWindow(this);
 	}
 
 	return m_window;
 }
 
-
-
+void InstrumentTrackView::handleConfigChange(QString cls, QString attr, QString value)
+{
+	// When one instrument track window mode is turned on,
+	// close windows except last opened one.
+	if (cls == "ui" && attr == "oneinstrumenttrackwindow" && value.toInt())
+	{
+		m_tlb->setChecked(m_window && m_window == topLevelInstrumentTrackWindow());
+	}
+}
 
 void InstrumentTrackView::dragEnterEvent( QDragEnterEvent * _dee )
 {
@@ -1225,12 +1161,15 @@ void InstrumentTrackView::dropEvent( QDropEvent * _de )
 
 void InstrumentTrackView::toggleInstrumentWindow( bool _on )
 {
-	getInstrumentTrackWindow()->toggleVisibility( _on );
-
-	if( !_on )
+	if (_on && ConfigManager::inst()->value("ui", "oneinstrumenttrackwindow").toInt())
 	{
-		freeInstrumentTrackWindow();
+		if (topLevelInstrumentTrackWindow())
+		{
+			topLevelInstrumentTrackWindow()->m_itv->m_tlb->setChecked(false);
+		}
 	}
+
+	getInstrumentTrackWindow()->toggleVisibility( _on );
 }
 
 
@@ -1547,11 +1486,9 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 
 InstrumentTrackWindow::~InstrumentTrackWindow()
 {
-	InstrumentTrackView::s_windowCache.removeAll( this );
-
 	delete m_instrumentView;
 
-	if( gui->mainWindow()->workspace() )
+	if (parentWidget())
 	{
 		parentWidget()->hide();
 		parentWidget()->deleteLater();
