@@ -295,7 +295,7 @@ void Song::processNextBuffer()
 			}
 
 			// Handle loop points, and inform VST plugins of the loop status
-			if (loopEnabled || m_loopRenderRemaining > 1)
+			if (loopEnabled || (m_loopRenderRemaining > 1 && getPlayPos() >= timeline->loopBegin()))
 			{
 				m_vstSyncController.startCycle(
 					timeline->loopBegin().getTicks(), timeline->loopEnd().getTicks());
