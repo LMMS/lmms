@@ -32,18 +32,29 @@
 //! LMMS Plugins should use this to indicate errors
 enum PluginIssueType
 {
+	// port flow & type
 	unknownPortFlow,
 	unknownPortType,
+	// channel count
 	tooManyInputChannels,
 	tooManyOutputChannels,
 	tooManyMidiInputChannels,
 	tooManyMidiOutputChannels,
 	noOutputChannel,
+	// port metadata
 	portHasNoDef,
 	portHasNoMin,
 	portHasNoMax,
+	minGreaterMax,
+	defaultValueNotInRange,
+	logScaleMinMissing,
+	logScaleMaxMissing,
+	logScaleMinMaxDifferentSigns,
+	// features
 	featureNotSupported, //!< plugin requires functionality LMMS can't offer
+	// misc
 	badPortType, //!< port type not supported
+	blacklisted,
 	noIssue
 };
 
@@ -60,6 +71,9 @@ public:
 		: m_issueType(it), m_info(msg)
 	{
 	}
+	PluginIssueType type() const { return m_issueType; }
+	bool operator==(const PluginIssue& other) const;
+	bool operator<(const PluginIssue& other) const;
 	friend QDebug operator<<(QDebug stream, const PluginIssue& iss);
 };
 

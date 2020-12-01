@@ -34,7 +34,7 @@
 #include <QMimeData>
 
 #include "lmms_basics.h"
-#include "MidiTime.h"
+#include "TimePos.h"
 #include "Rubberband.h"
 #include "JournallingObject.h"
 #include "AutomatableModel.h"
@@ -108,18 +108,18 @@ public:
 	}
 
 
-	inline const MidiTime & startPosition() const
+	inline const TimePos & startPosition() const
 	{
 		return m_startPosition;
 	}
 
-	inline MidiTime endPosition() const
+	inline TimePos endPosition() const
 	{
 		const int sp = m_startPosition;
 		return sp + m_length;
 	}
 
-	inline const MidiTime & length() const
+	inline const TimePos & length() const
 	{
 		return m_length;
 	}
@@ -133,9 +133,28 @@ public:
 	{
 		return m_autoResize;
 	}
+	
+	QColor color() const
+	{
+		return m_color;
+	}
 
-	virtual void movePosition( const MidiTime & pos );
-	virtual void changeLength( const MidiTime & length );
+	void setColor( const QColor & c )
+	{
+		m_color = c;
+	}
+	
+	bool hasColor();
+	
+	void useCustomClipColor( bool b );
+	
+	bool usesCustomClipColor()
+	{
+		return m_useCustomClipColor;
+	}
+
+	virtual void movePosition( const TimePos & pos );
+	virtual void changeLength( const TimePos & length );
 
 	virtual TrackContentObjectView * createView( TrackView * tv ) = 0;
 
@@ -152,8 +171,10 @@ public:
 	/// Returns true if and only if a->startPosition() < b->startPosition()
 	static bool comparePosition(const TrackContentObject* a, const TrackContentObject* b);
 
-	MidiTime startTimeOffset() const;
-	void setStartTimeOffset( const MidiTime &startTimeOffset );
+	TimePos startTimeOffset() const;
+	void setStartTimeOffset( const TimePos &startTimeOffset );
+	
+	void updateColor();
 
 	// Will copy the state of a TCO to another TCO
 	static void copyStateTo( TrackContentObject *src, TrackContentObject *dst );
@@ -166,6 +187,7 @@ signals:
 	void lengthChanged();
 	void positionChanged();
 	void destroyedTCO();
+	void trackColorChanged();
 
 
 private:
@@ -179,15 +201,18 @@ private:
 	Track * m_track;
 	QString m_name;
 
-	MidiTime m_startPosition;
-	MidiTime m_length;
-	MidiTime m_startTimeOffset;
+	TimePos m_startPosition;
+	TimePos m_length;
+	TimePos m_startTimeOffset;
 
 	BoolModel m_mutedModel;
 	BoolModel m_soloModel;
 	bool m_autoResize;
 
 	bool m_selectViewOnCreate;
+
+	QColor m_color;
+	bool m_useCustomClipColor;
 
 	friend class TrackContentObjectView;
 
@@ -264,11 +289,16 @@ public:
 	// some metadata to be written to the clipboard.
 	static void remove( QVector<TrackContentObjectView *> tcovs );
 	static void toggleMute( QVector<TrackContentObjectView *> tcovs );
+	
+	QColor getColorForDisplay( QColor );
 
 public slots:
 	virtual bool close();
 	void remove();
 	void update() override;
+	
+	void changeClipColor();
+	void useTrackColor();
 
 protected:
 	enum ContextMenuAction
@@ -330,9 +360,9 @@ private:
 	Actions m_action;
 	QPoint m_initialMousePos;
 	QPoint m_initialMouseGlobalPos;
-	MidiTime m_initialTCOPos;
-	MidiTime m_initialTCOEnd;
-	QVector<MidiTime> m_initialOffsets;
+	TimePos m_initialTCOPos;
+	TimePos m_initialTCOEnd;
+	QVector<TimePos> m_initialOffsets;
 
 	TextFloat * m_hint;
 
@@ -359,7 +389,7 @@ private:
 	void setInitialOffsets();
 
 	bool mouseMovedDistance( QMouseEvent * me, int distance );
-	MidiTime draggedTCOPos( QMouseEvent * me );
+	TimePos draggedTCOPos( QMouseEvent * me );
 } ;
 
 
@@ -393,12 +423,12 @@ public:
 		}
 	}
 
-	bool canPasteSelection( MidiTime tcoPos, const QDropEvent *de );
-	bool canPasteSelection( MidiTime tcoPos, const QMimeData *md, bool allowSameBar = false );
-	bool pasteSelection( MidiTime tcoPos, QDropEvent * de );
-	bool pasteSelection( MidiTime tcoPos, const QMimeData * md, bool skipSafetyCheck = false );
+	bool canPasteSelection( TimePos tcoPos, const QDropEvent *de );
+	bool canPasteSelection( TimePos tcoPos, const QMimeData *md, bool allowSameBar = false );
+	bool pasteSelection( TimePos tcoPos, QDropEvent * de );
+	bool pasteSelection( TimePos tcoPos, const QMimeData * md, bool skipSafetyCheck = false );
 
-	MidiTime endPosition( const MidiTime & posStart );
+	TimePos endPosition( const TimePos & posStart );
 
 	// qproperty access methods
 
@@ -414,7 +444,7 @@ public:
 
 public slots:
 	void update();
-	void changePosition( const MidiTime & newPos = MidiTime( -1 ) );
+	void changePosition( const TimePos & newPos = TimePos( -1 ) );
 
 protected:
 	enum ContextMenuAction
@@ -449,7 +479,7 @@ protected:
 
 private:
 	Track * getTrack();
-	MidiTime getPosition( int mouseX );
+	TimePos getPosition( int mouseX );
 
 	TrackView * m_trackView;
 
@@ -486,6 +516,10 @@ private slots:
 	void cloneTrack();
 	void removeTrack();
 	void updateMenu();
+	void changeTrackColor();
+	void randomTrackColor();
+	void resetTrackColor();
+	void useTrackColor();
 	void toggleRecording(bool on);
 	void recordingOn();
 	void recordingOff();
@@ -503,6 +537,9 @@ private:
 
 signals:
 	void trackRemovalScheduled( TrackView * t );
+	void colorChanged( QColor & c );
+	void colorParented();
+	void colorReset();
 
 } ;
 
@@ -547,12 +584,12 @@ public:
 		return m_type;
 	}
 
-	virtual bool play( const MidiTime & start, const fpp_t frames,
+	virtual bool play( const TimePos & start, const fpp_t frames,
 						const f_cnt_t frameBase, int tcoNum = -1 ) = 0;
 
 
 	virtual TrackView * createView( TrackContainerView * view ) = 0;
-	virtual TrackContentObject * createTCO( const MidiTime & pos ) = 0;
+	virtual TrackContentObject * createTCO( const TimePos & pos ) = 0;
 
 	virtual void saveTrackSpecificSettings( QDomDocument & doc,
 						QDomElement & parent ) = 0;
@@ -581,15 +618,15 @@ public:
 	{
 		return m_trackContentObjects;
 	}
-	void getTCOsInRange( tcoVector & tcoV, const MidiTime & start,
-							const MidiTime & end );
+	void getTCOsInRange( tcoVector & tcoV, const TimePos & start,
+							const TimePos & end );
 	void swapPositionOfTCOs( int tcoNum1, int tcoNum2 );
 
 	void createTCOsForBB( int bb );
 
 
-	void insertBar( const MidiTime & pos );
-	void removeBar( const MidiTime & pos );
+	void insertBar( const TimePos & pos );
+	void removeBar( const TimePos & pos );
 
 	bar_t length() const;
 
@@ -635,7 +672,16 @@ public:
 	{
 		return m_processingLock.tryLock();
 	}
-
+	
+	QColor color()
+	{
+		return m_color;
+	}
+	bool useColor()
+	{
+		return m_hasColor;
+	}
+	
 	BoolModel* getMutedModel();
 
 public slots:
@@ -647,6 +693,8 @@ public slots:
 
 	void toggleSolo();
 
+	void trackColorChanged( QColor & c );
+	void trackColorReset();
 
 private:
 	TrackContainer* m_trackContainer;
@@ -665,6 +713,9 @@ private:
 	tcoVector m_trackContentObjects;
 
 	QMutex m_processingLock;
+	
+	QColor m_color;
+	bool m_hasColor;
 
 	friend class TrackView;
 

@@ -43,7 +43,6 @@
 
 
 class QLineEdit;
-template<class T> class QQueue;
 class InstrumentFunctionArpeggioView;
 class InstrumentFunctionNoteStackingView;
 class EffectRackView;
@@ -81,8 +80,8 @@ public:
 
 	MidiEvent applyMasterKey( const MidiEvent& event );
 
-	void processInEvent( const MidiEvent& event, const MidiTime& time = MidiTime(), f_cnt_t offset = 0 ) override;
-	void processOutEvent( const MidiEvent& event, const MidiTime& time = MidiTime(), f_cnt_t offset = 0 ) override;
+	void processInEvent( const MidiEvent& event, const TimePos& time = TimePos(), f_cnt_t offset = 0 ) override;
+	void processOutEvent( const MidiEvent& event, const TimePos& time = TimePos(), f_cnt_t offset = 0 ) override;
 	// silence all running notes played by this track
 	void silenceAllNotes( bool removeIPH = false );
 
@@ -131,13 +130,13 @@ public:
 	}
 
 	// play everything in given frame-range - creates note-play-handles
-	virtual bool play( const MidiTime & _start, const fpp_t _frames,
+	virtual bool play( const TimePos & _start, const fpp_t _frames,
 						const f_cnt_t _frame_base, int _tco_num = -1 ) override;
 	// create new view for me
 	TrackView * createView( TrackContainerView* tcv ) override;
 
 	// create new track-content-object = pattern
-	TrackContentObject * createTCO( const MidiTime & _pos ) override;
+	TrackContentObject* createTCO(const TimePos & pos) override;
 
 
 	// called by track
@@ -344,10 +343,6 @@ public:
 		return m_midiMenu;
 	}
 
-	void freeInstrumentTrackWindow();
-
-	static void cleanupWindowCache();
-
 	// Create a menu for assigning/creating channels for this track
 	QMenu * createFxMenu( QString title, QString newFxLabel ) override;
 
@@ -369,11 +364,11 @@ private slots:
 	void assignFxLine( int channelIndex );
 	void createFxLine();
 
+	void handleConfigChange(QString cls, QString attr, QString value);
+
 
 private:
 	InstrumentTrackWindow * m_window;
-
-	static QQueue<InstrumentTrackWindow *> s_windowCache;
 
 	// widgets in track-settings-widget
 	TrackLabelButton * m_tlb;
@@ -388,7 +383,7 @@ private:
 
 	QPoint m_lastPos;
 
-	FadeButton * getActivityIndicator()
+	FadeButton * getActivityIndicator() override
 	{
 		return m_activityIndicator;
 	}
@@ -502,6 +497,7 @@ private:
 	PianoView * m_pianoView;
 
 	friend class InstrumentView;
+	friend class InstrumentTrackView;
 
 } ;
 

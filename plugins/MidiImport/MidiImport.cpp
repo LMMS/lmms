@@ -43,7 +43,7 @@
 #include "Instrument.h"
 #include "GuiApplication.h"
 #include "MainWindow.h"
-#include "MidiTime.h"
+#include "TimePos.h"
 #include "debug.h"
 #include "Song.h"
 
@@ -160,7 +160,7 @@ public:
 	
 	AutomationTrack * at;
 	AutomationPattern * ap;
-	MidiTime lastPos;
+	TimePos lastPos;
 	
 	smfMidiCC & create( TrackContainer* tc, QString tn )
 	{
@@ -187,21 +187,20 @@ public:
 	}
 
 
-	smfMidiCC & putValue( MidiTime time, AutomatableModel * objModel, float value )
+	smfMidiCC & putValue( TimePos time, AutomatableModel * objModel, float value )
 	{
 		if( !ap || time > lastPos + DefaultTicksPerBar )
 		{
-			MidiTime pPos = MidiTime( time.getBar(), 0 );
+			TimePos pPos = TimePos( time.getBar(), 0 );
 			ap = dynamic_cast<AutomationPattern*>(
-				at->createTCO(0) );
-			ap->movePosition( pPos );
+				at->createTCO(pPos));
 			ap->addObject( objModel );
 		}
 
 		lastPos = time;
 		time = time - ap->startPosition();
 		ap->putValue( time, value, false );
-		ap->changeLength( MidiTime( time.getBar() + 1, 0 ) ); 
+		ap->changeLength( TimePos( time.getBar() + 1, 0 ) ); 
 
 		return *this;
 	}
@@ -279,16 +278,15 @@ public:
 	void splitPatterns()
 	{
 		Pattern * newPattern = nullptr;
-		MidiTime lastEnd(0);
+		TimePos lastEnd(0);
 
 		p->rearrangeAllNotes();
 		for (auto n : p->notes())
 		{
 			if (!newPattern || n->pos() > lastEnd + DefaultTicksPerBar)
 			{
-				MidiTime pPos = MidiTime(n->pos().getBar(), 0);
-				newPattern = dynamic_cast<Pattern*>(it->createTCO(0));
-				newPattern->movePosition(pPos);
+				TimePos pPos = TimePos(n->pos().getBar(), 0);
+				newPattern = dynamic_cast<Pattern*>(it->createTCO(pPos));
 			}
 			lastEnd = n->pos() + n->length();
 

@@ -27,9 +27,13 @@
 
 #ifdef LMMS_HAVE_LV2
 
+#include <lv2/lv2plug.in/ns/ext/atom/atom.h>
+#include <lv2/lv2plug.in/ns/ext/port-props/port-props.h>
+
 #include "Engine.h"
 #include "Lv2Basics.h"
 #include "Lv2Manager.h"
+#include "Lv2Evbuf.h"
 
 namespace Lv2Ports {
 
@@ -57,7 +61,7 @@ const char *toStr(Type pt)
 		case Type::Unknown: return "unknown";
 		case Type::Control: return "control";
 		case Type::Audio: return "audio";
-		case Type::Event: return "event";
+		case Type::AtomSeq: return "atom-sequence";
 		case Type::Cv: return "cv";
 	}
 	return "";
@@ -123,50 +127,122 @@ std::vector<PluginIssue> Meta::get(const LilvPlugin *plugin,
 		issue(unknownPortFlow, portName);
 	}
 
-	m_def = .0f; m_min = .0f; m_max = .0f;
+	m_def = .0f;
+	m_min = std::numeric_limits<decltype(m_min)>::lowest();
+	m_max = std::numeric_limits<decltype(m_max)>::max();
+	auto m_min_set = [this]{ return m_min != std::numeric_limits<decltype(m_min)>::lowest(); };
+	auto m_max_set = [this]{ return m_max != std::numeric_limits<decltype(m_max)>::max(); };
 
 	m_type = Type::Unknown;
-	if (isA(LV2_CORE__ControlPort))
+	if (isA(LV2_CORE__ControlPort) || isA(LV2_CORE__CVPort))
 	{
-		m_type = Type::Control;
+		// Read metadata for control ports
+		// CV ports are mostly the same as control ports, so we take
+		// mostly the same metadata
 
-		if (m_flow == Flow::Input)
+		if (isA(LV2_CORE__CVPort))
 		{
-			bool isToggle = m_vis == Vis::Toggled;
+			// currently not supported, but we can still check the metadata
+			issue(badPortType, "cvPort");
+		}
 
-			LilvNode * defN, * minN = nullptr, * maxN = nullptr;
-			lilv_port_get_range(plugin, lilvPort, &defN,
-					isToggle ? nullptr : &minN,
-					isToggle ? nullptr : &maxN);
-			AutoLilvNode def(defN), min(minN), max(maxN);
+		m_type = isA(LV2_CORE__CVPort) ? Type::Cv : Type::Control;
 
-			auto takeRangeValue = [&](LilvNode* node,
-				float& storeHere, PluginIssueType it)
+		bool isToggle = m_vis == Vis::Toggled;
+
+		LilvNode * defN, * minN = nullptr, * maxN = nullptr;
+		lilv_port_get_range(plugin, lilvPort, &defN,
+				isToggle ? nullptr : &minN,
+				isToggle ? nullptr : &maxN);
+		AutoLilvNode def(defN), min(minN), max(maxN);
+
+		auto takeRangeValue = [&](LilvNode* node,
+			float& storeHere, PluginIssueType it)
+		{
+			if (node) { storeHere = lilv_node_as_float(node); }
+			else
 			{
-				if (node) { storeHere = lilv_node_as_float(node); }
-				else { issue(it, portName); }
-			};
-
-			takeRangeValue(def.get(), m_def, portHasNoDef);
-			if (!isToggle)
-			{
-				takeRangeValue(min.get(), m_min, portHasNoMin);
-				takeRangeValue(max.get(), m_max, portHasNoMax);
-
-				if (m_max - m_min > 15.0f)
+				// CV ports do not require ranges
+				if(m_flow == Flow::Input && m_type != Type::Cv)
 				{
-					// range too large for spinbox visualisation, use knobs
-					// e.g. 0...15 would be OK
-					m_vis = Vis::None;
+					issue(it, portName);
 				}
+			}
+		};
+
+		takeRangeValue(def.get(), m_def, portHasNoDef);
+		if (isToggle)
+		{
+			m_min = .0f;
+			m_max = 1.f;
+			if(def.get() && m_def != m_min && m_def != m_max)
+			{
+				issue(defaultValueNotInRange, portName);
+			}
+		}
+		else
+		{
+			// take min/max
+			takeRangeValue(min.get(), m_min, portHasNoMin);
+			takeRangeValue(max.get(), m_max, portHasNoMax);
+			if(m_type == Type::Cv)
+			{
+				// no range is allowed and bashed to [-1,+1],
+				// but only min or only max does not make sense
+				if(!m_min_set() && !m_max_set())
+				{
+					m_min = -1.f;
+					m_max = +1.f;
+				}
+				else if(!m_min_set()) { issue(portHasNoMin, portName); }
+				else if(!m_max_set()) { issue(portHasNoMax, portName); }
+			}
+			if(m_min > m_max) { issue(minGreaterMax, portName); }
+
+			// sampleRate
+			if (hasProperty(LV2_CORE__sampleRate)) { m_sampleRate = true; }
+
+			// default value
+			if (def.get())
+			{
+				if (m_def < m_min) { issue(defaultValueNotInRange, portName); }
+				else if (m_def > m_max)
+				{
+					if(m_sampleRate)
+					{
+						// multiplying with sample rate will hopefully lead us
+						// to a good default value
+					}
+					else { issue(defaultValueNotInRange, portName); }
+				}
+			}
+
+			// visualization
+			if (m_max - m_min > 15.0f)
+			{
+				// range too large for spinbox visualisation, use knobs
+				// e.g. 0...15 would be OK
+				m_vis = Vis::None;
 			}
 		}
 	}
 	else if (isA(LV2_CORE__AudioPort)) { m_type = Type::Audio; }
-	else if (isA(LV2_CORE__CVPort))
+	else if (isA(LV2_ATOM__AtomPort))
 	{
-		issue(badPortType, "cvPort");
-		m_type = Type::Cv;
+		AutoLilvNode uriAtomSequence(Engine::getLv2Manager()->uri(LV2_ATOM__Sequence));
+		AutoLilvNode uriAtomBufferType(Engine::getLv2Manager()->uri(LV2_ATOM__bufferType));
+		AutoLilvNodes bufferTypes(lilv_port_get_value(plugin, lilvPort, uriAtomBufferType.get()));
+
+		if (lilv_nodes_contains(bufferTypes.get(), uriAtomSequence.get()))
+		{
+			// we accept all kinds of atom sequence ports, even if they take or
+			// offer atom types that we do not support:
+			// * atom input ports only say what *can* be input, but not what is
+			//   required as input
+			// * atom output ports only say what *can* be output, but not what must
+			//   be evaluated
+			m_type = Type::AtomSeq;
+		}
 	}
 
 	if(m_type == Type::Unknown)
@@ -175,6 +251,27 @@ std::vector<PluginIssue> Meta::get(const LilvPlugin *plugin,
 		else {
 			issue(PluginIssueType::unknownPortType, portName);
 		}
+	}
+
+	if (hasProperty(LV2_PORT_PROPS__logarithmic))
+	{
+		// check min/max available
+		// we requre them anyways, but this will detect plugins that will
+		// be non-Lv2-conforming
+		if(m_min == std::numeric_limits<decltype(m_min)>::lowest())
+		{
+			issue(PluginIssueType::logScaleMinMissing, portName);
+		}
+		if(m_max == std::numeric_limits<decltype(m_max)>::max())
+		{
+			issue(PluginIssueType::logScaleMaxMissing, portName);
+		}
+		// forbid min < 0 < max
+		if(m_min < 0.f && m_max > 0.f)
+		{
+			issue(PluginIssueType::logScaleMinMaxDifferentSigns, portName);
+		}
+		m_logarithmic = true;
 	}
 
 	return portIssues;
@@ -241,6 +338,11 @@ void Audio::copyBuffersToCore(sampleFrame *lmmsBuf,
 		lmmsBuf[f][channel] = m_buffer[f];
 	}
 }
+
+
+
+
+void AtomSeq::Lv2EvbufDeleter::operator()(LV2_Evbuf *n) { lv2_evbuf_free(n); }
 
 
 

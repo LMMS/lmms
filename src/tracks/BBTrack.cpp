@@ -23,7 +23,6 @@
  */
 #include "BBTrack.h"
 
-#include <QColorDialog>
 #include <QMenu>
 #include <QPainter>
 
@@ -32,8 +31,8 @@
 #include "embed.h"
 #include "Engine.h"
 #include "gui_templates.h"
-#include "MainWindow.h"
 #include "GuiApplication.h"
+#include "MainWindow.h"
 #include "Mixer.h"
 #include "RenameDialog.h"
 #include "Song.h"
@@ -47,15 +46,13 @@ BBTrack::infoMap BBTrack::s_infoMap;
 
 
 BBTCO::BBTCO( Track * _track ) :
-	TrackContentObject( _track ),
-	m_color( 128, 128, 128 ),
-	m_useStyleColor( true )
+	TrackContentObject( _track )
 {
 	bar_t t = Engine::getBBTrackContainer()->lengthOfBB( bbTrackIndex() );
 	if( t > 0 )
 	{
 		saveJournallingState( false );
-		changeLength( MidiTime( t, 0 ) );
+		changeLength( TimePos( t, 0 ) );
 		restoreJournallingState();
 	}
 	setAutoResize( false );
@@ -74,15 +71,9 @@ void BBTCO::saveSettings( QDomDocument & doc, QDomElement & element )
 	}
 	element.setAttribute( "len", length() );
 	element.setAttribute( "muted", isMuted() );
-	element.setAttribute( "color", color() );
-	
-	if( m_useStyleColor )
+	if( usesCustomClipColor() )
 	{
-		element.setAttribute( "usestyle", 1 );
-	}
-	else
-	{
-		element.setAttribute( "usestyle", 0 );
+		element.setAttribute( "color", color().name() );
 	}
 }
 
@@ -101,33 +92,21 @@ void BBTCO::loadSettings( const QDomElement & element )
 	{
 		toggleMute();
 	}
-
-	if( element.hasAttribute( "color" ) )
+	
+	// for colors saved in 1.3-onwards
+	if( element.hasAttribute( "color" ) && !element.hasAttribute( "usestyle" ) )
 	{
-		setColor( QColor( element.attribute( "color" ).toUInt() ) );
+		useCustomClipColor( true );
+		setColor( element.attribute( "color" ) );
 	}
 	
-	if( element.hasAttribute( "usestyle" ) )
-	{
-		if( element.attribute( "usestyle" ).toUInt() == 1 ) 
-		{
-			m_useStyleColor = true;
-		}
-		else
-		{
-			m_useStyleColor = false;
-		}
-	}
+	// for colors saved before 1.3
 	else
 	{
-		if( m_color.rgb() == qRgb( 128, 182, 175 ) || m_color.rgb() == qRgb( 64, 128, 255 ) ) // old or older default color
-		{
-			m_useStyleColor = true;
-		}
-		else
-		{
-			m_useStyleColor = false;
-		}
+		if( element.hasAttribute( "color" ) )
+		{ setColor( QColor( element.attribute( "color" ).toUInt() ) ); }
+		
+		// usestyle attribute is no longer used
 	}
 }
 
@@ -153,7 +132,8 @@ BBTCOView::BBTCOView( TrackContentObject * _tco, TrackView * _tv ) :
 	m_bbTCO( dynamic_cast<BBTCO *>( _tco ) ),
 	m_paintPixmap()
 {
-	connect( _tco->getTrack(), SIGNAL( dataChanged() ), this, SLOT( update() ) );
+	connect( _tco->getTrack(), SIGNAL( dataChanged() ), 
+			this, SLOT( update() ) );
 
 	setStyle( QApplication::style() );
 }
@@ -173,10 +153,6 @@ void BBTCOView::constructContextMenu( QMenu * _cm )
 	_cm->addAction( embed::getIconPixmap( "edit_rename" ),
 						tr( "Change name" ),
 						this, SLOT( changeName() ) );
-	_cm->addAction( embed::getIconPixmap( "colorize" ),
-			tr( "Change color" ), this, SLOT( changeColor() ) );
-	_cm->addAction( embed::getIconPixmap( "colorize" ),
-			tr( "Reset color to default" ), this, SLOT( resetColor() ) );
 }
 
 
@@ -210,13 +186,7 @@ void BBTCOView::paintEvent( QPaintEvent * )
 	QPainter p( &m_paintPixmap );
 
 	QLinearGradient lingrad( 0, 0, 0, height() );
-	QColor c;
-	bool muted = m_bbTCO->getTrack()->isMuted() || m_bbTCO->isMuted();
-	
-	// state: selected, muted, default, user selected
-	c = isSelected() ? selectedColor() : ( muted ? mutedBackgroundColor() 
-		: ( m_bbTCO->m_useStyleColor ? painter.background().color() 
-		: m_bbTCO->colorObj() ) );
+	QColor c = getColorForDisplay( painter.background().color() );
 	
 	lingrad.setColorAt( 0, c.lighter( 130 ) );
 	lingrad.setColorAt( 1, c.lighter( 70 ) );
@@ -238,7 +208,7 @@ void BBTCOView::paintEvent( QPaintEvent * )
 	p.setPen( c.darker( 200 ) );
 
 	bar_t t = Engine::getBBTrackContainer()->lengthOfBB( m_bbTCO->bbTrackIndex() );
-	if( m_bbTCO->length() > MidiTime::ticksPerBar() && t > 0 )
+	if( m_bbTCO->length() > TimePos::ticksPerBar() && t > 0 )
 	{
 		for( int x = static_cast<int>( t * pixelsPerBar() );
 								x < width() - 2;
@@ -305,63 +275,6 @@ void BBTCOView::changeName()
 
 
 
-
-void BBTCOView::changeColor()
-{
-	QColor new_color = QColorDialog::getColor( m_bbTCO->m_color );
-	if( ! new_color.isValid() )
-	{
-		return;
-	}
-	if( isSelected() )
-	{
-		QVector<selectableObject *> selected =
-				gui->songEditor()->m_editor->selectedObjects();
-		for( QVector<selectableObject *>::iterator it =
-							selected.begin();
-						it != selected.end(); ++it )
-		{
-			BBTCOView * bb_tcov = dynamic_cast<BBTCOView *>( *it );
-			if( bb_tcov )
-			{
-				bb_tcov->setColor( new_color );
-			}
-		}
-	}
-	else
-	{
-		setColor( new_color );
-	}
-}
-
-
-/** \brief Makes the BB pattern use the colour defined in the stylesheet */
-void BBTCOView::resetColor()
-{
-	if( ! m_bbTCO->m_useStyleColor )
-	{
-		m_bbTCO->m_useStyleColor = true;
-		Engine::getSong()->setModified();
-		update();
-	}
-	BBTrack::clearLastTCOColor();
-}
-
-
-
-void BBTCOView::setColor( QColor new_color )
-{
-	if( new_color.rgb() != m_bbTCO->color() )
-	{
-		m_bbTCO->setColor( new_color );
-		m_bbTCO->m_useStyleColor = false;
-		Engine::getSong()->setModified();
-		update();
-	}
-	BBTrack::setLastTCOColor( new_color );
-}
-
-
 void BBTCOView::update()
 {
 	ToolTip::add(this, m_bbTCO->name());
@@ -370,8 +283,6 @@ void BBTCOView::update()
 }
 
 
-
-QColor * BBTrack::s_lastTCOColor = NULL;
 
 BBTrack::BBTrack( TrackContainer* tc ) :
 	Track( Track::BBTrack, tc )
@@ -420,7 +331,7 @@ BBTrack::~BBTrack()
 
 
 // play _frames frames of given TCO within starting with _start
-bool BBTrack::play( const MidiTime & _start, const fpp_t _frames,
+bool BBTrack::play( const TimePos & _start, const fpp_t _frames,
 					const f_cnt_t _offset, int _tco_num )
 {
 	if( isMuted() )
@@ -441,8 +352,8 @@ bool BBTrack::play( const MidiTime & _start, const fpp_t _frames,
 		return false;
 	}
 
-	MidiTime lastPosition;
-	MidiTime lastLen;
+	TimePos lastPosition;
+	TimePos lastLen;
 	for( tcoVector::iterator it = tcos.begin(); it != tcos.end(); ++it )
 	{
 		if( !( *it )->isMuted() &&
@@ -471,14 +382,10 @@ TrackView * BBTrack::createView( TrackContainerView* tcv )
 
 
 
-TrackContentObject * BBTrack::createTCO( const MidiTime & _pos )
+TrackContentObject* BBTrack::createTCO(const TimePos & pos)
 {
-	BBTCO * bbtco = new BBTCO( this );
-	if( s_lastTCOColor )
-	{
-		bbtco->setColor( *s_lastTCOColor );
-		bbtco->setUseStyleColor( false );
-	}
+	BBTCO* bbtco = new BBTCO(this);
+	bbtco->movePosition(pos);
 	return bbtco;
 }
 

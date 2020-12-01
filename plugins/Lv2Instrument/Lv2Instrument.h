@@ -63,10 +63,10 @@ public:
 	/*
 		realtime funcs
 	*/
-	bool hasNoteInput() const override { return false; /* not supported yet */ }
+	bool hasNoteInput() const override { return Lv2ControlBase::hasNoteInput(); }
 #ifdef LV2_INSTRUMENT_USE_MIDI
 	bool handleMidiEvent(const MidiEvent &event,
-		const MidiTime &time = MidiTime(), f_cnt_t offset = 0) override;
+		const TimePos &time = TimePos(), f_cnt_t offset = 0) override;
 #else
 	void playNote(NotePlayHandle *nph, sampleFrame *) override;
 #endif

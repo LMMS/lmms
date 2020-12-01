@@ -50,6 +50,7 @@ float frnd(float range)
 #include "Song.h"
 #include "MidiEvent.h"
 #include "MidiTime.h"
+#include "Mixer.h"
 
 #include "embed.h"
 

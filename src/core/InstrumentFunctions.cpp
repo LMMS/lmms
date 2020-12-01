@@ -388,8 +388,10 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 	while( frames_processed < Engine::mixer()->framesPerPeriod() )
 	{
 		const f_cnt_t remaining_frames_for_cur_arp = arp_frames - ( cur_frame % arp_frames );
-		// does current arp-note fill whole audio-buffer?
-		if( remaining_frames_for_cur_arp > Engine::mixer()->framesPerPeriod() )
+		// does current arp-note fill whole audio-buffer or is the remaining time just
+		// a short bit that we can discard?
+		if( remaining_frames_for_cur_arp > Engine::mixer()->framesPerPeriod() ||
+			_n->frames() - _n->totalFramesPlayed() < arp_frames / 5 )
 		{
 			// then we don't have to do something!
 			break;
@@ -504,7 +506,7 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 				NotePlayHandleManager::acquire( _n->instrumentTrack(),
 							frames_processed,
 							gated_frames,
-							Note( MidiTime( 0 ), MidiTime( 0 ), sub_note_key, _n->getVolume(),
+							Note( TimePos( 0 ), TimePos( 0 ), sub_note_key, _n->getVolume(),
 									_n->getPanning(), _n->detuning() ),
 							_n, -1, NotePlayHandle::OriginArpeggio )
 				);

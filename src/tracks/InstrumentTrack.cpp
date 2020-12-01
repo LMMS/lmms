@@ -25,7 +25,6 @@
 #include "InstrumentTrack.h"
 
 #include <QDir>
-#include <QQueue>
 #include <QApplication>
 #include <QCloseEvent>
 #include <QLabel>
@@ -82,7 +81,6 @@
 const int INSTRUMENT_WIDTH	= 254;
 const int INSTRUMENT_HEIGHT	= INSTRUMENT_WIDTH;
 const int PIANO_HEIGHT		= 80;
-const int INSTRUMENT_WINDOW_CACHE_SIZE = 8;
 
 
 // #### IT:
@@ -255,7 +253,7 @@ MidiEvent InstrumentTrack::applyMasterKey( const MidiEvent& event )
 
 
 
-void InstrumentTrack::processInEvent( const MidiEvent& event, const MidiTime& time, f_cnt_t offset )
+void InstrumentTrack::processInEvent( const MidiEvent& event, const TimePos& time, f_cnt_t offset )
 {
 	if( Engine::getSong()->isExporting() )
 	{
@@ -279,7 +277,7 @@ void InstrumentTrack::processInEvent( const MidiEvent& event, const MidiTime& ti
 						NotePlayHandleManager::acquire(
 								this, offset,
 								typeInfo<f_cnt_t>::max() / 2,
-								Note( MidiTime(), MidiTime(), event.key(), event.volume( midiPort()->baseVelocity() ) ),
+								Note( TimePos(), TimePos(), event.key(), event.volume( midiPort()->baseVelocity() ) ),
 								NULL, event.channel(),
 								NotePlayHandle::OriginMidiInput );
 					m_notes[event.key()] = nph;
@@ -344,7 +342,7 @@ void InstrumentTrack::processInEvent( const MidiEvent& event, const MidiTime& ti
 								nph->OriginMidiInput)
 							{
 								nph->setLength(
-									MidiTime( static_cast<f_cnt_t>(
+									TimePos( static_cast<f_cnt_t>(
 									nph->totalFramesPlayed() /
 									Engine::framesPerTick() ) ) );
 								midiNoteOff( *nph );
@@ -397,7 +395,7 @@ void InstrumentTrack::processInEvent( const MidiEvent& event, const MidiTime& ti
 
 
 
-void InstrumentTrack::processOutEvent( const MidiEvent& event, const MidiTime& time, f_cnt_t offset )
+void InstrumentTrack::processOutEvent( const MidiEvent& event, const TimePos& time, f_cnt_t offset )
 {
 	// do nothing if we do not have an instrument instance (e.g. when loading settings)
 	if( m_instrument == NULL )
@@ -620,7 +618,7 @@ void InstrumentTrack::removeMidiPortNode( DataFile & _dataFile )
 
 
 
-bool InstrumentTrack::play( const MidiTime & _start, const fpp_t _frames,
+bool InstrumentTrack::play( const TimePos & _start, const fpp_t _frames,
 							const f_cnt_t _offset, int _tco_num )
 {
 	if( ! m_instrument || ! tryLock() )
@@ -650,7 +648,7 @@ bool InstrumentTrack::play( const MidiTime & _start, const fpp_t _frames,
 	for( NotePlayHandleList::Iterator it = m_processHandles.begin();
 					it != m_processHandles.end(); ++it )
 	{
-		( *it )->processMidiTime( _start );
+		( *it )->processTimePos( _start );
 	}
 
 	if ( tcos.size() == 0 )
@@ -672,7 +670,7 @@ bool InstrumentTrack::play( const MidiTime & _start, const fpp_t _frames,
 		{
 			continue;
 		}
-		MidiTime cur_start = _start;
+		TimePos cur_start = _start;
 		if( _tco_num < 0 )
 		{
 			cur_start -= p->startPosition();
@@ -725,9 +723,11 @@ bool InstrumentTrack::play( const MidiTime & _start, const fpp_t _frames,
 
 
 
-TrackContentObject * InstrumentTrack::createTCO( const MidiTime & )
+TrackContentObject* InstrumentTrack::createTCO(const TimePos & pos)
 {
-	return new Pattern( this );
+	Pattern* p = new Pattern(this);
+	p->movePosition(pos);
+	return p;
 }
 
 
@@ -962,9 +962,6 @@ void InstrumentTrack::autoAssignMidiDevice(bool assign)
 // #### ITV:
 
 
-QQueue<InstrumentTrackWindow *> InstrumentTrackView::s_windowCache;
-
-
 
 InstrumentTrackView::InstrumentTrackView( InstrumentTrack * _it, TrackContainerView* tcv ) :
 	TrackView( _it, tcv ),
@@ -985,6 +982,9 @@ InstrumentTrackView::InstrumentTrackView( InstrumentTrack * _it, TrackContainerV
 
 	connect( _it, SIGNAL( nameChanged() ),
 			m_tlb, SLOT( update() ) );
+
+	connect(ConfigManager::inst(), SIGNAL(valueChanged(QString, QString, QString)),
+			this, SLOT(handleConfigChange(QString, QString, QString)));
 
 	// creation of widgets for track-settings-widget
 	int widgetWidth;
@@ -1077,7 +1077,8 @@ InstrumentTrackView::InstrumentTrackView( InstrumentTrack * _it, TrackContainerV
 
 InstrumentTrackView::~InstrumentTrackView()
 {
-	freeInstrumentTrackWindow();
+	delete m_window;
+	m_window = nullptr;
 
 	delete model()->m_midiPort.m_readablePortsMenu;
 	delete model()->m_midiPort.m_writablePortsMenu;
@@ -1109,8 +1110,10 @@ InstrumentTrackWindow * InstrumentTrackView::topLevelInstrumentTrackWindow()
 void InstrumentTrackView::createFxLine()
 {
 	int channelIndex = gui->fxMixerView()->addNewChannel();
+	auto channel = Engine::fxMixer()->effectChannel(channelIndex);
 
-	Engine::fxMixer()->effectChannel( channelIndex )->m_name = getTrack()->name();
+	channel->m_name = getTrack()->name();
+	if (getTrack()->useColor()) { channel->setColor (getTrack()->color()); }
 
 	assignFxLine(channelIndex);
 }
@@ -1128,91 +1131,25 @@ void InstrumentTrackView::assignFxLine(int channelIndex)
 
 
 
-// TODO: Add windows to free list on freeInstrumentTrackWindow.
-// But, don't NULL m_window or disconnect signals.  This will allow windows
-// that are being show/hidden frequently to stay connected.
-void InstrumentTrackView::freeInstrumentTrackWindow()
-{
-	if( m_window != NULL )
-	{
-		m_lastPos = m_window->parentWidget()->pos();
-
-		if( ConfigManager::inst()->value( "ui",
-										"oneinstrumenttrackwindow" ).toInt() ||
-						s_windowCache.count() < INSTRUMENT_WINDOW_CACHE_SIZE )
-		{
-			model()->setHook( NULL );
-			m_window->setInstrumentTrackView( NULL );
-			m_window->parentWidget()->hide();
-			//m_window->setModel(
-			//	engine::dummyTrackContainer()->
-			//			dummyInstrumentTrack() );
-			m_window->updateInstrumentView();
-			s_windowCache << m_window;
-		}
-		else
-		{
-			delete m_window;
-		}
-
-		m_window = NULL;
-	}
-}
-
-
-
-
-void InstrumentTrackView::cleanupWindowCache()
-{
-	while( !s_windowCache.isEmpty() )
-	{
-		delete s_windowCache.dequeue();
-	}
-}
-
-
-
-
 InstrumentTrackWindow * InstrumentTrackView::getInstrumentTrackWindow()
 {
-	if( m_window != NULL )
+	if (!m_window)
 	{
-	}
-	else if( !s_windowCache.isEmpty() )
-	{
-		m_window = s_windowCache.dequeue();
-
-		m_window->setInstrumentTrackView( this );
-		m_window->setModel( model() );
-		m_window->updateInstrumentView();
-		model()->setHook( m_window );
-
-		if( ConfigManager::inst()->
-							value( "ui", "oneinstrumenttrackwindow" ).toInt() )
-		{
-			s_windowCache << m_window;
-		}
-		else if( m_lastPos.x() > 0 || m_lastPos.y() > 0 )
-		{
-			m_window->parentWidget()->move( m_lastPos );
-		}
-	}
-	else
-	{
-		m_window = new InstrumentTrackWindow( this );
-		if( ConfigManager::inst()->
-							value( "ui", "oneinstrumenttrackwindow" ).toInt() )
-		{
-			// first time, an InstrumentTrackWindow is opened
-			s_windowCache << m_window;
-		}
+		m_window = new InstrumentTrackWindow(this);
 	}
 
 	return m_window;
 }
 
-
-
+void InstrumentTrackView::handleConfigChange(QString cls, QString attr, QString value)
+{
+	// When one instrument track window mode is turned on,
+	// close windows except last opened one.
+	if (cls == "ui" && attr == "oneinstrumenttrackwindow" && value.toInt())
+	{
+		m_tlb->setChecked(m_window && m_window == topLevelInstrumentTrackWindow());
+	}
+}
 
 void InstrumentTrackView::dragEnterEvent( QDragEnterEvent * _dee )
 {
@@ -1237,12 +1174,15 @@ void InstrumentTrackView::dropEvent( QDropEvent * _de )
 
 void InstrumentTrackView::toggleInstrumentWindow( bool _on )
 {
-	getInstrumentTrackWindow()->toggleVisibility( _on );
-
-	if( !_on )
+	if (_on && ConfigManager::inst()->value("ui", "oneinstrumenttrackwindow").toInt())
 	{
-		freeInstrumentTrackWindow();
+		if (topLevelInstrumentTrackWindow())
+		{
+			topLevelInstrumentTrackWindow()->m_itv->m_tlb->setChecked(false);
+		}
 	}
+
+	getInstrumentTrackWindow()->toggleVisibility( _on );
 }
 
 
@@ -1519,9 +1459,7 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 	m_tabWidget->addTab( m_miscView, tr( "Miscellaneous" ), "misc_tab", 5 );
 	adjustTabSize(m_ssView);
 	adjustTabSize(instrumentFunctions);
-	adjustTabSize(m_effectView);
-	// stupid bugfix, no one knows why
-	m_effectView->resize(INSTRUMENT_WIDTH - 4, INSTRUMENT_HEIGHT - 4 - 1);
+	m_effectView->resize(EffectRackView::DEFAULT_WIDTH, INSTRUMENT_HEIGHT - 4 - 1);
 	adjustTabSize(m_midiView);
 	adjustTabSize(m_miscView);
 
@@ -1531,13 +1469,13 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 	m_pianoView->setMaximumHeight( PIANO_HEIGHT );
 
 	vlayout->addWidget( generalSettingsWidget );
-	vlayout->addWidget( m_tabWidget, 1 );
+	// Use QWidgetItem explicitly to make the size hint change on instrument changes
+	// QLayout::addWidget() uses QWidgetItemV2 with size hint caching
+	vlayout->insertItem(1, new QWidgetItem(m_tabWidget));
 	vlayout->addWidget( m_pianoView );
 	setModel( _itv->model() );
 
 	updateInstrumentView();
-
-	resize( sizeHint() );
 
 	QMdiSubWindow* subWin = gui->mainWindow()->addWindowedWidget( this );
 	Qt::WindowFlags flags = subWin->windowFlags();
@@ -1561,11 +1499,9 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 
 InstrumentTrackWindow::~InstrumentTrackWindow()
 {
-	InstrumentTrackView::s_windowCache.removeAll( this );
-
 	delete m_instrumentView;
 
-	if( gui->mainWindow()->workspace() )
+	if (parentWidget())
 	{
 		parentWidget()->hide();
 		parentWidget()->deleteLater();
@@ -1719,6 +1655,15 @@ void InstrumentTrackWindow::updateInstrumentView()
 
 		adjustTabSize(m_instrumentView);
 		m_pianoView->setVisible(m_track->m_instrument->hasNoteInput());
+		// adjust window size
+		layout()->invalidate();
+		resize(sizeHint());
+		if (parentWidget())
+		{
+			parentWidget()->resize(parentWidget()->sizeHint());
+		}
+		update();
+		m_instrumentView->update();
 	}
 }
 
