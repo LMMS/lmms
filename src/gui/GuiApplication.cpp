@@ -163,7 +163,6 @@ GuiApplication::GuiApplication()
 
 GuiApplication::~GuiApplication()
 {
-	InstrumentTrackView::cleanupWindowCache();
 	s_instance = nullptr;
 }
 
