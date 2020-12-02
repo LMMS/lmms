@@ -33,6 +33,7 @@
 #include "AutomationTrack.h"
 #include "ColorChooser.h"
 #include "ConfigManager.h"
+#include "DataFile.h"
 #include "embed.h"
 #include "Engine.h"
 #include "gui_templates.h"

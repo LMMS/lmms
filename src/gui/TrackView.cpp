@@ -38,6 +38,7 @@
 #include "BBEditor.h" //XXX: build errors if removed
 #include "ConfigManager.h"
 #include "ColorChooser.h" //XXX: build errors if removed
+#include "DataFile.h"
 #include "Engine.h"
 #include "FadeButton.h"
 #include "Mixer.h"

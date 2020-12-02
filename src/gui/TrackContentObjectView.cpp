@@ -31,6 +31,7 @@
 #include "AutomationPattern.h"
 #include "Clipboard.h"
 #include "ColorChooser.h"
+#include "DataFile.h"
 #include "embed.h"
 #include "GuiApplication.h"
 #include "SampleTrack.h"

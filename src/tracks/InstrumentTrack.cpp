@@ -43,6 +43,7 @@
 #include "CaptionMenu.h"
 #include "ConfigManager.h"
 #include "ControllerConnection.h"
+#include "DataFile.h"
 #include "EffectChain.h"
 #include "EffectRackView.h"
 #include "embed.h"

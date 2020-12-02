@@ -33,6 +33,7 @@
 #include "BBEditor.h"
 #include "BBTrackContainer.h"
 #include "Clipboard.h"
+#include "DataFile.h"
 #include "Engine.h"
 #include "GuiApplication.h"
 #include "Song.h"

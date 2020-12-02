@@ -26,9 +26,9 @@
 #define TRACK_CONTENT_OBJECT_H
 
 #include <QColor>
+#include <QDomElement>
 
 #include "AutomatableModel.h"
-#include "DataFile.h"
 #include "lmms_basics.h"
 
 
