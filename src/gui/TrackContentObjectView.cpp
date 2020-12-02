@@ -26,7 +26,6 @@
 
 #include <QMenu>
 #include <QMouseEvent>
-#include <QMouseEvent>
 #include <QPainter>
 
 #include "AutomationPattern.h"

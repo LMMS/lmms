@@ -25,7 +25,6 @@
 #ifndef TRACK_CONTENT_WIDGET_H
 #define TRACK_CONTENT_WIDGET_H
 
-#include <QMimeData>
 #include <QWidget>
 
 #include "JournallingObject.h"
@@ -33,6 +32,7 @@
 
 
 class QMenu;
+class QMimeData;
 
 class Track;
 class TrackContentObjectView;

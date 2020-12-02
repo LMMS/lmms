@@ -40,9 +40,6 @@
 #include <assert.h>
 #include <cstdlib>
 
-#include <QMenu>
-#include <QMouseEvent>
-#include <QPainter>
 #include <QVariant>
 
 

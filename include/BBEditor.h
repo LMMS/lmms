@@ -29,7 +29,6 @@
 
 #include "Editor.h"
 #include "TrackContainerView.h"
-#include "TrackContentObjectView.h"
 
 
 class BBTrackContainer;

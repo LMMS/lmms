@@ -1,6 +1,5 @@
 /*
- * Track.h - declaration of classes concerning tracks -> necessary for all
- *           track-like objects (beat/bassline, sample-track...)
+ * Track.h - declaration of Track class
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
@@ -28,16 +27,14 @@
 
 
 #include <QtCore/QVector>
-#include <QWidget>
-#include <QSize>
 #include <QColor>
 
 #include "AutomatableModel.h"
 #include "JournallingObject.h"
 #include "lmms_basics.h"
-#include "TimePos.h"
 
 
+class TimePos;
 class TrackContainer;
 class TrackContainerView;
 class TrackContentObject;
@@ -55,7 +52,7 @@ const int DEFAULT_TRACK_HEIGHT = 32;
 char const *const FILENAME_FILTER = "[\\0000-\x1f\"*/:<>?\\\\|\x7f]";
 
 
-// base-class for all tracks
+//! Base-class for all tracks
 class LMMS_EXPORT Track : public Model, public JournallingObject
 {
 	Q_OBJECT

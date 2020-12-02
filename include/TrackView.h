@@ -31,7 +31,7 @@
 
 #include "JournallingObject.h"
 #include "ModelView.h"
-#include "Track.h"
+#include "Track.h" //XXX: build erros if removed
 #include "TrackContentWidget.h"
 #include "TrackOperationsWidget.h"
 

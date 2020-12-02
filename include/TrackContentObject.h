@@ -29,24 +29,14 @@
 
 #include "AutomatableModel.h"
 #include "DataFile.h"
-#include "FadeButton.h"
-#include "JournallingObject.h"
 #include "lmms_basics.h"
-#include "Model.h"
-#include "Rubberband.h"
-#include "TimePos.h"
 
-
-class QMenu;
-class QPushButton;
 
 class PixmapButton;
 class TextFloat;
 class Track;
 class TrackContentObjectView;
 class TrackContainer;
-class TrackContainerView;
-class TrackContentWidget;
 class TrackView;
 
 

@@ -39,6 +39,7 @@
 #include "SongEditor.h"
 #include "StringPairDrag.h"
 #include "TrackContainerView.h"
+#include "TrackContentObjectView.h"
 #include "TrackView.h"
 
 

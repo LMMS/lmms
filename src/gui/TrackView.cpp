@@ -29,37 +29,21 @@
 #include <cstdlib>
 
 #include <QLayout>
-#include <QLinearGradient>
 #include <QMenu>
 #include <QMouseEvent>
 #include <QPainter>
 #include <QStyleOption>
-#include <QVariant>
-#include <QClipboard>
 
 
-#include "AutomationPattern.h"
-#include "AutomationTrack.h"
-#include "AutomationEditor.h"
-#include "BBEditor.h"
-#include "BBTrack.h"
-#include "BBTrackContainer.h"
+#include "BBEditor.h" //XXX: build errors if removed
 #include "ConfigManager.h"
-#include "Clipboard.h"
-#include "ColorChooser.h"
-#include "embed.h"
+#include "ColorChooser.h" //XXX: build errors if removed
 #include "Engine.h"
-#include "GuiApplication.h"
-#include "FxMixerView.h"
-#include "gui_templates.h"
-#include "MainWindow.h"
+#include "FadeButton.h"
 #include "Mixer.h"
-#include "ProjectJournal.h"
-#include "SampleTrack.h"
-#include "Song.h"
-#include "SongEditor.h"
 #include "StringPairDrag.h"
-#include "TextFloat.h"
+#include "ToolTip.h"
+#include "TrackContentObjectView.h"
 
 
 /*! \brief Create a new track View.

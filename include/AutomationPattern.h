@@ -30,7 +30,6 @@
 #include <QtCore/QMap>
 #include <QtCore/QPointer>
 
-#include "Track.h"
 #include "TrackContentObject.h"
 
 
