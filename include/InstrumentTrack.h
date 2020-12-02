@@ -30,6 +30,8 @@
 #include "GroupBox.h"
 #include "InstrumentFunctions.h"
 #include "InstrumentSoundShaping.h"
+#include "Midi.h"
+#include "MidiCCRackView.h"
 #include "MidiEventProcessor.h"
 #include "MidiPort.h"
 #include "NotePlayHandle.h"
@@ -228,7 +230,6 @@ signals:
 	void newNote();
 	void endNote();
 
-
 protected:
 	QString nodeName() const override
 	{
@@ -247,6 +248,8 @@ protected slots:
 
 
 private:
+	void processCCEvent(int controller);
+
 	MidiPort m_midiPort;
 
 	NotePlayHandle* m_notes[NumKeys];
@@ -286,11 +289,14 @@ private:
 
 	Piano m_piano;
 
+	std::unique_ptr<BoolModel> m_midiCCEnable;
+	std::unique_ptr<FloatModel> m_midiCCModel[MidiControllerCount];
 
 	friend class InstrumentTrackView;
 	friend class InstrumentTrackWindow;
 	friend class NotePlayHandle;
 	friend class InstrumentMiscView;
+	friend class MidiCCRackView;
 
 } ;
 
@@ -334,6 +340,7 @@ protected:
 
 private slots:
 	void toggleInstrumentWindow( bool _on );
+	void toggleMidiCCRack();
 	void activityIndicatorPressed();
 	void activityIndicatorReleased();
 
@@ -360,6 +367,8 @@ private:
 
 	QAction * m_midiInputAction;
 	QAction * m_midiOutputAction;
+
+	std::unique_ptr<MidiCCRackView> m_midiCCRackView;
 
 	QPoint m_lastPos;
 

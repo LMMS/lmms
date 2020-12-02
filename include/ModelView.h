@@ -36,6 +36,7 @@ public:
 	virtual ~ModelView();
 
 	virtual void setModel( Model* model, bool isOldModelValid = true );
+	virtual void unsetModel();
 
 	Model* model()
 	{
