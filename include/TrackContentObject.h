@@ -26,14 +26,11 @@
 #define TRACK_CONTENT_OBJECT_H
 
 #include <QColor>
-#include <QDomElement>
 
 #include "AutomatableModel.h"
 #include "lmms_basics.h"
 
 
-class PixmapButton;
-class TextFloat;
 class Track;
 class TrackContentObjectView;
 class TrackContainer;

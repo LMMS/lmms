@@ -37,11 +37,7 @@
 
 #include "Track.h"
 
-#include <assert.h>
-#include <cstdlib>
-
 #include <QVariant>
-
 
 #include "AutomationPattern.h"
 #include "AutomationTrack.h"

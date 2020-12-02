@@ -31,12 +31,16 @@
 
 #include "JournallingObject.h"
 #include "ModelView.h"
-#include "Track.h" //XXX: build erros if removed
 #include "TrackContentWidget.h"
 #include "TrackOperationsWidget.h"
 
 
+class QMenu;
+
 class FadeButton;
+class Track;
+class TrackContainerView;
+class TrackContentObject;
 
 
 const int DEFAULT_SETTINGS_WIDGET_WIDTH = 224;

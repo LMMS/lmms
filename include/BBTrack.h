@@ -32,6 +32,7 @@
 #include <QStaticText>
 
 #include "TrackContentObjectView.h"
+#include "Track.h"
 #include "TrackView.h"
 
 class TrackLabelButton;

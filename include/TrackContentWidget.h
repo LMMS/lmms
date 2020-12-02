@@ -31,7 +31,6 @@
 #include "TimePos.h"
 
 
-class QMenu;
 class QMimeData;
 
 class Track;

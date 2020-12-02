@@ -25,25 +25,23 @@
 
 #include "TrackView.h"
 
-#include <assert.h>
-#include <cstdlib>
-
-#include <QLayout>
+#include <QApplication>
+#include <QHBoxLayout>
 #include <QMenu>
 #include <QMouseEvent>
 #include <QPainter>
 #include <QStyleOption>
+#include <QtGlobal>
 
 
-#include "BBEditor.h" //XXX: build errors if removed
 #include "ConfigManager.h"
-#include "ColorChooser.h" //XXX: build errors if removed
 #include "DataFile.h"
 #include "Engine.h"
 #include "FadeButton.h"
 #include "Mixer.h"
 #include "StringPairDrag.h"
 #include "ToolTip.h"
+#include "TrackContainerView.h"
 #include "TrackContentObjectView.h"
 
 
@@ -202,7 +200,7 @@ bool TrackView::close()
 void TrackView::modelChanged()
 {
 	m_track = castModel<Track>();
-	assert( m_track != NULL );
+	Q_ASSERT( m_track != NULL );
 	connect( m_track, SIGNAL( destroyedTrack() ), this, SLOT( close() ) );
 	m_trackOperationsWidget.m_muteBtn->setModel( &m_track->m_mutedModel );
 	m_trackOperationsWidget.m_soloBtn->setModel( &m_track->m_soloModel );

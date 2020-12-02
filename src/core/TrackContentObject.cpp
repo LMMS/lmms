@@ -24,6 +24,8 @@
 
 #include "TrackContentObject.h"
 
+#include <QDomDocument>
+
 #include "AutomationEditor.h"
 #include "AutomationPattern.h"
 #include "Engine.h"
