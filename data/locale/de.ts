@@ -4747,10 +4747,10 @@ Please make sure you have write permission to the file and the directory contain
         <translation>Operator-Ansicht</translation>
     </message>
     <message>
-        <source>The Operators view contains all the operators. These include both audible operators (oscillators) and inaudible operators, or modulators: Low-frequency oscillators and Envelopes.
+        <source>The Operators view contains all the operators. These include both audible operators (oscillators) and inaudible operators, or modulators: Low-frequency oscillators and Envelopes. 
 
 Knobs and other widgets in the Operators view have their own what&apos;s this -texts, so you can get more specific help for them that way. </source>
-        <translation>Die Operator-Ansicht enthält alle Operatoren. Diese beinhalten beide, hörbare Operatoren (Oszillatoren) und nicht hörbare Operatoren oder Modulatoren: Niedrig-Frequenz-Oszillatoren und Hüllkurven.
+        <translation>Die Operator-Ansicht enthält alle Operatoren. Diese beinhalten beide, hörbare Operatoren (Oszillatoren) und nicht hörbare Operatoren oder Modulatoren: Niedrig-Frequenz-Oszillatoren und Hüllkurven. 
 
 Regler und andere Dinge in der Operator-Ansicht haben ihren eigenen »Was ist das?« Texte, sodass Sie auf diese Weise spezifischere Hilfe für diese bekommen können. </translation>
     </message>
@@ -4759,14 +4759,14 @@ Regler und andere Dinge in der Operator-Ansicht haben ihren eigenen »Was ist da
         <translation>Matrix-Ansicht</translation>
     </message>
     <message>
-        <source>The Matrix view contains the modulation matrix. Here you can define the modulation relationships between the various operators: Each audible operator (oscillators 1-3) has 3-4 properties that can be modulated by any of the modulators. Using more modulations consumes more CPU power.
+        <source>The Matrix view contains the modulation matrix. Here you can define the modulation relationships between the various operators: Each audible operator (oscillators 1-3) has 3-4 properties that can be modulated by any of the modulators. Using more modulations consumes more CPU power. 
 
-The view is divided to modulation targets, grouped by the target oscillator. Available targets are volume, pitch, phase, pulse width and sub-osc ratio. Note: some targets are specific to one oscillator only.
+The view is divided to modulation targets, grouped by the target oscillator. Available targets are volume, pitch, phase, pulse width and sub-osc ratio. Note: some targets are specific to one oscillator only. 
 
 Each modulation target has 4 knobs, one for each modulator. By default the knobs are at 0, which means no modulation. Turning a knob to 1 causes that modulator to affect the modulation target as much as possible. Turning it to -1 does the same, but the modulation is inversed. </source>
-        <translation>Die Matrix-Ansicht enthält die Modulationsmatrix. Hier können Sie die Modulationsverhältnisse zwischen den verschiedenen Operatoren definieren: Jeder hörbare Oberator (Oszillatorern 1-3) hat 3-4 Einstellungen, die durch jeden der Modulatoren moduliert werden können. Mehr Modulation braucht mehr Rechenleistung.
+        <translation>Die Matrix-Ansicht enthält die Modulationsmatrix. Hier können Sie die Modulationsverhältnisse zwischen den verschiedenen Operatoren definieren: Jeder hörbare Oberator (Oszillatorern 1-3) hat 3-4 Einstellungen, die durch jeden der Modulatoren moduliert werden können. Mehr Modulation braucht mehr Rechenleistung. 
 
-Die Ansicht ist in Modulationsziele, gruppiert nach dem Zieloszillator, eingeteilt. Verfügbare Ziele sind Lautstärke, Tonhöhe, Phase, Pulsweite und Unter-Oszillator Rate. Hinweis: einige Ziele sind speziell für einen Oszillator.
+Die Ansicht ist in Modulationsziele, gruppiert nach dem Zieloszillator, eingeteilt. Verfügbare Ziele sind Lautstärke, Tonhöhe, Phase, Pulsweite und Unter-Oszillator Rate. Hinweis: einige Ziele sind speziell für einen Oszillator. 
 
 Jedes Modulationsziel hat 4 Regler, einen für jeden Modulator. Standardmäßig sind alle Regler bei 0, was keine Modulation bedeutet. Wenn der Regler auf 1 gestellt wird, wird das Modulationsziel vom Modulator so viel wie möglich beeinflusst. Wenn er auf -1 gestellt wird, passiert das gleiche, aber die Modulation ist invertiert. </translation>
     </message>
@@ -4843,47 +4843,47 @@ Jedes Modulationsziel hat 4 Regler, einen für jeden Modulator. Standardmäßig 
         <translation>Der SUB Regler ändert das Mischverhältnis der beiden Unter-Oszillatoren von Oszillator 3. Jeder Unter-Oszillator kann auf eine andere Wellenform eingestellt werden und Oszillator 3 kann zwischen diesen gleitend interpolieren. Alle eingehenden Modulationen zu Oszillator 3 werden auf beide Unter-Oszillator/Wellenformen auf gleiche Weise angewandt. </translation>
     </message>
     <message>
-        <source>In addition to dedicated modulators, Monstro allows oscillator 3 to be modulated by the output of oscillator 2.
+        <source>In addition to dedicated modulators, Monstro allows oscillator 3 to be modulated by the output of oscillator 2. 
 
 Mix mode means no modulation: the outputs of the oscillators are simply mixed together. </source>
-        <translation>Zusätzlich zu fest zugeordneten Modulatoren, ermöglicht Monstro es Oszillator 3 mit der Ausgabe von Oszillator 2 zu modulieren.
+        <translation>Zusätzlich zu fest zugeordneten Modulatoren, ermöglicht Monstro es Oszillator 3 mit der Ausgabe von Oszillator 2 zu modulieren. 
 
 Mix-Modus bedeutet keine Modulation: Die Ausgaben der Oszillatoren werden einfach zusammengemischt. </translation>
     </message>
     <message>
-        <source>In addition to dedicated modulators, Monstro allows oscillator 3 to be modulated by the output of oscillator 2.
+        <source>In addition to dedicated modulators, Monstro allows oscillator 3 to be modulated by the output of oscillator 2. 
 
 AM means amplitude modulation: Oscillator 3&apos;s amplitude (volume) is modulated by oscillator 2. </source>
-        <translation>Zusätzlich zu fest zugeordneten Modulatoren, ermöglicht Monstro es Oszillator 3 mit der Ausgabe von Oszillator 2 zu modulieren.
+        <translation>Zusätzlich zu fest zugeordneten Modulatoren, ermöglicht Monstro es Oszillator 3 mit der Ausgabe von Oszillator 2 zu modulieren. 
 
 AM bedeutet Amplituden-Modulation: Die Amplitude (Lautstärke) von Oszillator 3 wird durch Oszillator 2 moduliert. </translation>
     </message>
     <message>
-        <source>In addition to dedicated modulators, Monstro allows oscillator 3 to be modulated by the output of oscillator 2.
+        <source>In addition to dedicated modulators, Monstro allows oscillator 3 to be modulated by the output of oscillator 2. 
 
 FM means frequency modulation: Oscillator 3&apos;s frequency (pitch) is modulated by oscillator 2. The frequency modulation is implemented as phase modulation, which gives a more stable overall pitch than &quot;pure&quot; frequency modulation. </source>
-        <translation>Zusätzlich zu fest zugeordneten Modulatoren, ermöglicht Monstro es Oszillator 3 mit der Ausgabe von Oszillator 2 zu modulieren.
+        <translation>Zusätzlich zu fest zugeordneten Modulatoren, ermöglicht Monstro es Oszillator 3 mit der Ausgabe von Oszillator 2 zu modulieren. 
 
 FM bedeutet Frequenz-Modulation: Die Frequenz (Tonhöhe) von Oszillator 3 wird durch Oszillator 2 Moduliert. Die Frequenz-Modulation ist als Phasen-Modulation implementiert, was eine stabielere Gesamttonhöhe erzeugt, als »reine« Frequenz-Modulation. </translation>
     </message>
     <message>
-        <source>In addition to dedicated modulators, Monstro allows oscillator 3 to be modulated by the output of oscillator 2.
+        <source>In addition to dedicated modulators, Monstro allows oscillator 3 to be modulated by the output of oscillator 2. 
 
 PM means phase modulation: Oscillator 3&apos;s phase is modulated by oscillator 2. It differs from frequency modulation in that the phase changes are not cumulative. </source>
-        <translation>Zusätzlich zu fest zugeordneten Modulatoren, ermöglicht Monstro es Oszillator 3 mit der Ausgabe von Oszillator 2 zu modulieren.
+        <translation>Zusätzlich zu fest zugeordneten Modulatoren, ermöglicht Monstro es Oszillator 3 mit der Ausgabe von Oszillator 2 zu modulieren. 
 
 PM bedeutet Phasen-Modulation: Die Phase von Oszillator 3 wird durch Oszillator 2 moduliert. Es unterscheidet sich von der Frequenz-Modulation dadurch, dass die Phasenänderungen nicht zunehmend sind. </translation>
     </message>
     <message>
-        <source>Select the waveform for LFO 1.
+        <source>Select the waveform for LFO 1. 
 &quot;Random&quot; and &quot;Random smooth&quot; are special waveforms: they produce random output, where the rate of the LFO controls how often the state of the LFO changes. The smooth version interpolates between these states with cosine interpolation. These random modes can be used to give &quot;life&quot; to your presets - add some of that analog unpredictability... </source>
-        <translation>Die Wellenform für LFO 1 auswählen.
+        <translation>Die Wellenform für LFO 1 auswählen. 
 »Zufällig« und »Zufällig gleitend« sind spzielle Wellenformen: Sie erzeugen zufällige Ausgabe, wobei die Rate des LFO kontrolliert, wie oft sich der Zustand des LFO ändert. Die gleitende Version intrpoliert zwischen diesen Zuständen mit Cosinus-Interpolation. Diese zufälligen Modi können benutzt werden um Ihren Presets »Leben« zu geben - Etwas von der analogen Unberechenbarkeit hinzuzufügen… </translation>
     </message>
     <message>
-        <source>Select the waveform for LFO 2.
+        <source>Select the waveform for LFO 2. 
 &quot;Random&quot; and &quot;Random smooth&quot; are special waveforms: they produce random output, where the rate of the LFO controls how often the state of the LFO changes. The smooth version interpolates between these states with cosine interpolation. These random modes can be used to give &quot;life&quot; to your presets - add some of that analog unpredictability... </source>
-        <translation>Die Wellenform für LFO 2 auswählen.
+        <translation>Die Wellenform für LFO 2 auswählen. 
 »Zufällig« und »Zufällig gleitend« sind spzielle Wellenformen: Sie erzeugen zufällige Ausgabe, wobei die Rate des LFO kontrolliert, wie oft sich der Zustand des LFO ändert. Die gleitende Version intrpoliert zwischen diesen Zuständen mit Cosinus-Interpolation. Diese zufälligen Modi können benutzt werden um Ihren Presets »Leben« zu geben - Etwas von der analogen Unberechenbarkeit hinzuzufügen… </translation>
     </message>
     <message>

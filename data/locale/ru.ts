@@ -1732,7 +1732,7 @@ Right clicking will bring up a context menu where you can change the order in wh
 
 Регулятор (wet / dry) насыщенности определяет баланс между входящим сигналом и сигналом после эффекта, который становится выходным сигналом эффекта. Входной сигнал каждого фильтра является выходом предыдущего, так что доля чистого сигнала при прохождении по цепочке постоянно падает.
 
-Регулятор (decay) затихания определяет время, которое будет действовать фильтр после того как ноты были отпущены.
+Регулятор (decay) затихания определяет время, которое будет действовать фильтр после того как ноты были отпущены. 
 Эффект перестанет обрабатывать сигналы, когда грмокость упадёт ниже порога для заданной длины времени. Эта ручка (Knob) устанавливает &quot;заданную длину времени&quot; Чем меньше значение, тем меньше требования к ЦП, поэтому лучше ставить это число низким для большинства эффектов. однако это может вызвать обрезку звука при использовании эффектов с длительными периодами тишины, типа задержки.
 
 Регулятор шлюза служит для указания порога сигнала для авто-отключения эффекта, отсчёт для &quot;заданной длины времени&quot; начнётся как только обрабатываемый сигнал упадёт ниже указанного этим регулятором уровня.
@@ -4702,7 +4702,7 @@ Please make sure you have write permission to the file and the directory contain
     <message>
         <location filename="../../src/core/main.cpp" line="791"/>
         <source>There is a recovery file present. It looks like the last session did not end properly or another instance of LMMS is already running. Do you want to recover the project of this session?</source>
-        <translation>Остался файл для восстановления. Похоже последняя сессия не была нормально завершена или запущен ещё один процесс LMMS.
+        <translation>Остался файл для восстановления. Похоже последняя сессия не была нормально завершена или запущен ещё один процесс LMMS. 
 Хотите восстановить проект из этой сессии? </translation>
     </message>
     <message>
@@ -4957,7 +4957,7 @@ Please make sure you have write permission to the file and the directory contain
     <message>
         <location filename="../../src/gui/MainWindow.cpp" line="490"/>
         <source>By pressing this button, you can show or hide the Song-Editor. With the help of the Song-Editor you can edit song-playlist and specify when which track should be played. You can also insert and move samples (e.g. rap samples) directly into the playlist.</source>
-        <translation>Сим запускается или скрывается музыкальный редактор. С его помощью вы можете редактировать композицию и задавать время воспроизведения каждой дорожки.
+        <translation>Сим запускается или скрывается музыкальный редактор. С его помощью вы можете редактировать композицию и задавать время воспроизведения каждой дорожки. 
 Также вы можете вставлять и передвигать записи прямо в списке воспроизведения.</translation>
     </message>
     <message>
@@ -5211,7 +5211,7 @@ Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
     <message>
         <location filename="../../plugins/MidiImport/MidiImport.cpp" line="108"/>
         <source>You do not have set up a default soundfont in the settings dialog (Edit-&gt;Settings). Therefore no sound will be played back after importing this MIDI file. You should download a General MIDI soundfont, specify it in settings dialog and try again.</source>
-        <translation>Вы не установили SoundFont по умолчанию в параметрах (Правка-&gt;Настройки), поэтому после импорта миди файла звук воспроизводиться не будет.
+        <translation>Вы не установили SoundFont по умолчанию в параметрах (Правка-&gt;Настройки), поэтому после импорта миди файла звук воспроизводиться не будет. 
 Вам следует загрузить основной MiDi SoundFont, указать его в параметрах и попробовать снова.</translation>
     </message>
     <message>
@@ -5911,7 +5911,7 @@ Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
     </message>
     <message>
         <location filename="../../plugins/monstro/Monstro.cpp" line="1468"/>
-        <source>The Operators view contains all the operators. These include both audible operators (oscillators) and inaudible operators, or modulators: Low-frequency oscillators and Envelopes.
+        <source>The Operators view contains all the operators. These include both audible operators (oscillators) and inaudible operators, or modulators: Low-frequency oscillators and Envelopes. 
 
 Knobs and other widgets in the Operators view have their own what&apos;s this -texts, so you can get more specific help for them that way. </source>
         <translation>Операторский вид содержит все операторы. Они включают и звучащие операторы (осцилляторы) и беззвучные операторы или модуляторы: Низко-частотные осцилляторы и огибающие.
@@ -5925,9 +5925,9 @@ Knobs and other widgets in the Operators view have their own what&apos;s this -t
     </message>
     <message>
         <location filename="../../plugins/monstro/Monstro.cpp" line="1479"/>
-        <source>The Matrix view contains the modulation matrix. Here you can define the modulation relationships between the various operators: Each audible operator (oscillators 1-3) has 3-4 properties that can be modulated by any of the modulators. Using more modulations consumes more CPU power.
+        <source>The Matrix view contains the modulation matrix. Here you can define the modulation relationships between the various operators: Each audible operator (oscillators 1-3) has 3-4 properties that can be modulated by any of the modulators. Using more modulations consumes more CPU power. 
 
-The view is divided to modulation targets, grouped by the target oscillator. Available targets are volume, pitch, phase, pulse width and sub-osc ratio. Note: some targets are specific to one oscillator only.
+The view is divided to modulation targets, grouped by the target oscillator. Available targets are volume, pitch, phase, pulse width and sub-osc ratio. Note: some targets are specific to one oscillator only. 
 
 Each modulation target has 4 knobs, one for each modulator. By default the knobs are at 0, which means no modulation. Turning a knob to 1 causes that modulator to affect the modulation target as much as possible. Turning it to -1 does the same, but the modulation is inversed. </source>
         <translation>Матричный вид содержит матрицу модуляции. Здесь можно определить модуляционное отношение между разными операторами. Каждый слышимый оператор (осцилляторы 1-3) имеют 3-4 свойства, которые можно модулировать любыми модуляторами. Используя больше модуляций увеличивается нагрузка на процессор.
@@ -6154,13 +6154,13 @@ Each modulation target has 4 knobs, one for each modulator. By default the knobs
     <message>
         <location filename="../../plugins/monstro/Monstro.cpp" line="1806"/>
         <source>Send Sync on Rise: When enabled, the Sync signal is sent every time the state of oscillator 1 changes from low to high, ie. when the amplitude changes from -1 to 1. Oscillator 1&apos;s pitch, phase and pulse width may affect the timing of syncs, but its volume has no effect on them. Sync signals are sent independently for both left and right channels. </source>
-        <translation>Посылать синхронизацию при повышении: при включении, сигнал синхронизации посылается каждый раз когда состояние осциллятора 1 меняется с низкого на высокое, т.е. когда амплитуда меняется от -1 до 1.
+        <translation>Посылать синхронизацию при повышении: при включении, сигнал синхронизации посылается каждый раз когда состояние осциллятора 1 меняется с низкого на высокое, т.е. когда амплитуда меняется от -1 до 1. 
 Тон осциллятора 1, фаза и ширина пульсаций может влиять на время синхронизации, но громкость не имеет эффекта. Сигнал синхронизации посылается независимо для левого и правого каналов.</translation>
     </message>
     <message>
         <location filename="../../plugins/monstro/Monstro.cpp" line="1812"/>
         <source>Send Sync on Fall: When enabled, the Sync signal is sent every time the state of oscillator 1 changes from high to low, ie. when the amplitude changes from 1 to -1. Oscillator 1&apos;s pitch, phase and pulse width may affect the timing of syncs, but its volume has no effect on them. Sync signals are sent independently for both left and right channels. </source>
-        <translation>Посылать синхронизацию при падении: при включении, сигнал синхронизации посылается каждый раз когда состояние осциллятора 1 меняется с выского на низкое, т.е. когда амплитуда меняется от 1 до -1.
+        <translation>Посылать синхронизацию при падении: при включении, сигнал синхронизации посылается каждый раз когда состояние осциллятора 1 меняется с выского на низкое, т.е. когда амплитуда меняется от 1 до -1. 
 Тон осциллятора 1, фаза и ширина пульсаций может влиять на время синхронизации, но громкость не имеет эффекта. Сигнал синхронизации посылается независимо для левого и правого каналов.</translation>
     </message>
     <message>
@@ -6197,7 +6197,7 @@ Each modulation target has 4 knobs, one for each modulator. By default the knobs
     </message>
     <message>
         <location filename="../../plugins/monstro/Monstro.cpp" line="1835"/>
-        <source>In addition to dedicated modulators, Monstro allows oscillator 3 to be modulated by the output of oscillator 2.
+        <source>In addition to dedicated modulators, Monstro allows oscillator 3 to be modulated by the output of oscillator 2. 
 
 Mix mode means no modulation: the outputs of the oscillators are simply mixed together. </source>
         <translation>В дополнение к выделенным модуляторам Монстро позволяет выходу осциллятора 2 модулировать осцллятор 3.
@@ -6206,7 +6206,7 @@ Mix mode means no modulation: the outputs of the oscillators are simply mixed to
     </message>
     <message>
         <location filename="../../plugins/monstro/Monstro.cpp" line="1838"/>
-        <source>In addition to dedicated modulators, Monstro allows oscillator 3 to be modulated by the output of oscillator 2.
+        <source>In addition to dedicated modulators, Monstro allows oscillator 3 to be modulated by the output of oscillator 2. 
 
 AM means amplitude modulation: Oscillator 3&apos;s amplitude (volume) is modulated by oscillator 2. </source>
         <translation>В дополнение к выделенным модуляторам Монстро позволяет выходу осциллятора 2 модулировать осцллятор 3.
@@ -6215,7 +6215,7 @@ AM режим значит Амплитуда Модуляции: Осцилля
     </message>
     <message>
         <location filename="../../plugins/monstro/Monstro.cpp" line="1841"/>
-        <source>In addition to dedicated modulators, Monstro allows oscillator 3 to be modulated by the output of oscillator 2.
+        <source>In addition to dedicated modulators, Monstro allows oscillator 3 to be modulated by the output of oscillator 2. 
 
 FM means frequency modulation: Oscillator 3&apos;s frequency (pitch) is modulated by oscillator 2. The frequency modulation is implemented as phase modulation, which gives a more stable overall pitch than &quot;pure&quot; frequency modulation. </source>
         <translation>В дополнение к выделенным модуляторам Монстро позволяет выходу осциллятора 2 модулировать осцллятор 3.
@@ -6224,7 +6224,7 @@ FM (ЧМ) режим значит Частотная Модуляция: Осц�
     </message>
     <message>
         <location filename="../../plugins/monstro/Monstro.cpp" line="1846"/>
-        <source>In addition to dedicated modulators, Monstro allows oscillator 3 to be modulated by the output of oscillator 2.
+        <source>In addition to dedicated modulators, Monstro allows oscillator 3 to be modulated by the output of oscillator 2. 
 
 PM means phase modulation: Oscillator 3&apos;s phase is modulated by oscillator 2. It differs from frequency modulation in that the phase changes are not cumulative. </source>
         <translation>В дополнение к выделенным модуляторам Монстро позволяет выходу осциллятора 2 модулировать осцллятор 3.
@@ -6233,7 +6233,7 @@ PM (ФМ) режим значит фазовая модуляция: Осцил�
     </message>
     <message>
         <location filename="../../plugins/monstro/Monstro.cpp" line="1850"/>
-        <source>Select the waveform for LFO 1.
+        <source>Select the waveform for LFO 1. 
 &quot;Random&quot; and &quot;Random smooth&quot; are special waveforms: they produce random output, where the rate of the LFO controls how often the state of the LFO changes. The smooth version interpolates between these states with cosine interpolation. These random modes can be used to give &quot;life&quot; to your presets - add some of that analog unpredictability... </source>
         <translation>Выберите форму волны для LFO 1 (НизкоЧастотныйГенератор).
 &quot;Random&quot; (Случайно) и &quot;Random-smooth&quot; (случайное сглаживание) - это специальные волны: они создают случаный сигнал, где частота LFO контролирует как часто изменяется состояние генератора (LFO).
@@ -6241,7 +6241,7 @@ PM (ФМ) режим значит фазовая модуляция: Осцил�
     </message>
     <message>
         <location filename="../../plugins/monstro/Monstro.cpp" line="1856"/>
-        <source>Select the waveform for LFO 2.
+        <source>Select the waveform for LFO 2. 
 &quot;Random&quot; and &quot;Random smooth&quot; are special waveforms: they produce random output, where the rate of the LFO controls how often the state of the LFO changes. The smooth version interpolates between these states with cosine interpolation. These random modes can be used to give &quot;life&quot; to your presets - add some of that analog unpredictability... </source>
         <translation>Выберите форму волны для LFO 2 (НизкоЧастотныйГенератор).
 &quot;Random&quot; (Случайно) и &quot;Random-smooth&quot; (случайное сглаживание) - это специальные волны: они создают случаный сигнал, где частота LFO контролирует как часто изменяется состояние генератора (LFO).
@@ -12743,7 +12743,7 @@ The waveform can also be drawn in the graph.
 The 'S' button will smooth the waveform.
 
 The &apos;N&apos; button will normalize the waveform.</source>
-        <translation>Редактор формы позволяет явно указать профиль струны в начальный момент времени, либо её начальный импульс (в заисимости от состояния переключателя „Imp“).
+        <translation>Редактор формы позволяет явно указать профиль струны в начальный момент времени, либо её начальный импульс (в заисимости от состояния переключателя „Imp“). 
 Кнопки справа от рисунка позволяют задавать некоторые стандартные формы, причём кнопка &apos;?&apos; служит для задания формы из произвольного звукового файла (загружаются первые 128 элементов выборки).
 
 Также форма сигнала может быть просто нарисована с помощью мыши.

@@ -5905,7 +5905,7 @@ Navštivte prosím stránku s dokumentací k LMMS na adrese http://lmms.sf.net/w
     </message>
     <message>
         <location filename="../../plugins/monstro/Monstro.cpp" line="1468"/>
-        <source>The Operators view contains all the operators. These include both audible operators (oscillators) and inaudible operators, or modulators: Low-frequency oscillators and Envelopes.
+        <source>The Operators view contains all the operators. These include both audible operators (oscillators) and inaudible operators, or modulators: Low-frequency oscillators and Envelopes. 
 
 Knobs and other widgets in the Operators view have their own what&apos;s this -texts, so you can get more specific help for them that way. </source>
         <translation>Zobrazení operátorů obsahuje všechny operátory. Toto společně zahrnuje jak přímo slyšitelné operátory (oscilátory), tak i neslyšitelné operátory nebo modulátory: generátory nízkých kmitů (LFO) a obálek.
@@ -5919,9 +5919,9 @@ Otočné ovladače a další ovládací prvky v Zobrazení operátorů mají sv�
     </message>
     <message>
         <location filename="../../plugins/monstro/Monstro.cpp" line="1479"/>
-        <source>The Matrix view contains the modulation matrix. Here you can define the modulation relationships between the various operators: Each audible operator (oscillators 1-3) has 3-4 properties that can be modulated by any of the modulators. Using more modulations consumes more CPU power.
+        <source>The Matrix view contains the modulation matrix. Here you can define the modulation relationships between the various operators: Each audible operator (oscillators 1-3) has 3-4 properties that can be modulated by any of the modulators. Using more modulations consumes more CPU power. 
 
-The view is divided to modulation targets, grouped by the target oscillator. Available targets are volume, pitch, phase, pulse width and sub-osc ratio. Note: some targets are specific to one oscillator only.
+The view is divided to modulation targets, grouped by the target oscillator. Available targets are volume, pitch, phase, pulse width and sub-osc ratio. Note: some targets are specific to one oscillator only. 
 
 Each modulation target has 4 knobs, one for each modulator. By default the knobs are at 0, which means no modulation. Turning a knob to 1 causes that modulator to affect the modulation target as much as possible. Turning it to -1 does the same, but the modulation is inversed. </source>
         <translation>Zobrazení matrice obsahuje modulační matrici. Zde můžete nadefinovat modulační vazby mezi různými operátory: každý slyšitelný operátor (oscilátory 1–3) má 3–4 vlastnosti, které mohou být modulovány dalšími modulátory. Použití více modulací spotřebovává více výkonu procesoru.
@@ -6189,7 +6189,7 @@ Každý cíl modulace má 4 otočné ovladače, jeden pro každý modulátor. V�
     </message>
     <message>
         <location filename="../../plugins/monstro/Monstro.cpp" line="1835"/>
-        <source>In addition to dedicated modulators, Monstro allows oscillator 3 to be modulated by the output of oscillator 2.
+        <source>In addition to dedicated modulators, Monstro allows oscillator 3 to be modulated by the output of oscillator 2. 
 
 Mix mode means no modulation: the outputs of the oscillators are simply mixed together. </source>
         <translation>Kromě vyhrazených modulátorů Monstro umožňuje oscilátor 3 modulovat výstupem oscilátoru 2.
@@ -6198,7 +6198,7 @@ Režim směšování znamená bez modulace: výstupy oscilátorů se jednoduše 
     </message>
     <message>
         <location filename="../../plugins/monstro/Monstro.cpp" line="1838"/>
-        <source>In addition to dedicated modulators, Monstro allows oscillator 3 to be modulated by the output of oscillator 2.
+        <source>In addition to dedicated modulators, Monstro allows oscillator 3 to be modulated by the output of oscillator 2. 
 
 AM means amplitude modulation: Oscillator 3&apos;s amplitude (volume) is modulated by oscillator 2. </source>
         <translation>Kromě vyhrazených modulátorů Monstro umožňuje oscilátor 3 modulovat výstupem oscilátoru 2.
@@ -6207,7 +6207,7 @@ AM znamená amplitudovou modulaci: Amplituda (hlasitost) oscilátoru 3 je modulo
     </message>
     <message>
         <location filename="../../plugins/monstro/Monstro.cpp" line="1841"/>
-        <source>In addition to dedicated modulators, Monstro allows oscillator 3 to be modulated by the output of oscillator 2.
+        <source>In addition to dedicated modulators, Monstro allows oscillator 3 to be modulated by the output of oscillator 2. 
 
 FM means frequency modulation: Oscillator 3&apos;s frequency (pitch) is modulated by oscillator 2. The frequency modulation is implemented as phase modulation, which gives a more stable overall pitch than &quot;pure&quot; frequency modulation. </source>
         <translation>Kromě vyhrazených modulátorů Monstro umožňuje oscilátor 3 modulovat výstupem oscilátoru 2.
@@ -6216,7 +6216,7 @@ FM znamená frekvenční modulaci: frekvence (výška) oscilátoru 3 je modulov�
     </message>
     <message>
         <location filename="../../plugins/monstro/Monstro.cpp" line="1846"/>
-        <source>In addition to dedicated modulators, Monstro allows oscillator 3 to be modulated by the output of oscillator 2.
+        <source>In addition to dedicated modulators, Monstro allows oscillator 3 to be modulated by the output of oscillator 2. 
 
 PM means phase modulation: Oscillator 3&apos;s phase is modulated by oscillator 2. It differs from frequency modulation in that the phase changes are not cumulative. </source>
         <translation>Kromě vyhrazených modulátorů Monstro umožňuje oscilátor 3 modulovat výstupem oscilátoru 2.
@@ -6225,14 +6225,14 @@ PM znamená fázovou modulaci: fáze oscilátoru 3 je modulována oscilátorem 2
     </message>
     <message>
         <location filename="../../plugins/monstro/Monstro.cpp" line="1850"/>
-        <source>Select the waveform for LFO 1.
+        <source>Select the waveform for LFO 1. 
 &quot;Random&quot; and &quot;Random smooth&quot; are special waveforms: they produce random output, where the rate of the LFO controls how often the state of the LFO changes. The smooth version interpolates between these states with cosine interpolation. These random modes can be used to give &quot;life&quot; to your presets - add some of that analog unpredictability... </source>
         <translation>Vyberte tvar vlny pro LFO 1.
 &quot;Náhodná&quot; a &quot;Vyhlazená náhodná&quot; jsou speciální vlny: produkují náhodný výstup, kde rychlost LFO řídí, jak často se mění stav LFO. Vyhlazená verze interpoluje mezi těmito stavy kosinovou interpolací. Tyto náhodné režimy mohou být použity k oživení vašich předvoleb – přidávají něco z analogové nepředvídatelnosti...</translation>
     </message>
     <message>
         <location filename="../../plugins/monstro/Monstro.cpp" line="1856"/>
-        <source>Select the waveform for LFO 2.
+        <source>Select the waveform for LFO 2. 
 &quot;Random&quot; and &quot;Random smooth&quot; are special waveforms: they produce random output, where the rate of the LFO controls how often the state of the LFO changes. The smooth version interpolates between these states with cosine interpolation. These random modes can be used to give &quot;life&quot; to your presets - add some of that analog unpredictability... </source>
         <translation>Vyberte tvar vlny pro LFO 2.
 &quot;Náhodná&quot; a &quot;Vyhlazená náhodná&quot; jsou speciální vlny: produkují náhodný výstup, kde rychlost LFO řídí, jak často se mění stav LFO. Vyhlazená verze interpoluje mezi těmito stavy kosinovou interpolací. Tyto náhodné režimy mohou být použity k oživení vašich předvoleb – přidávají něco z analogové nepředvídatelnosti...</translation>

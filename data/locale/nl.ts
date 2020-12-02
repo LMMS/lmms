@@ -1390,7 +1390,7 @@ De aan/uit-schakelaar laat u toe om een bepaalde plugin op elk moment te omzeile
 
 De wet/dry-knop bedient de balans tussen het invoersignaal en het effectsignaal dat de resulterende uitvoer is van het effect. De invoer voor het stadium is de uitvoer van het vorige stadium. Dus, het droog (&apos;dry&apos;) signaal voor effecten lager in de ketting bevat alle vorige effecten.
 
-De decay-knop bedient hoe lang het signaal zal blijven verwerkt worden nadat de noten vrijgelaten zijn. Het effect zal stoppen met verwerken van signalen wanneer het volume onder een bepaalde grens gezakt is voor een bepaalde tijd. Deze knop stelt de &apos;bepaalde tijd&apos; in. Langere tijden zullen meer cpu vereisen, dus dit getal wordt voor de meeste effecten best laag ingesteld. Het moet verhoogd worden voor effecten die lange periodes van stilte produceren, bijvoorbeeld delays.
+De decay-knop bedient hoe lang het signaal zal blijven verwerkt worden nadat de noten vrijgelaten zijn. Het effect zal stoppen met verwerken van signalen wanneer het volume onder een bepaalde grens gezakt is voor een bepaalde tijd. Deze knop stelt de &apos;bepaalde tijd&apos; in. Langere tijden zullen meer cpu vereisen, dus dit getal wordt voor de meeste effecten best laag ingesteld. Het moet verhoogd worden voor effecten die lange periodes van stilte produceren, bijvoorbeeld delays. 
 
 De gate-knop bedient de &apos;bepaalde grens&apos; voor het automatisch afsluiten van het effect. De klok voor de &apos;bepaalde tijd&apos; zal beginnen zodra het niveau van het verwerkte signaal onder het niveau komt dat opgegeven wordt met deze knop.
 
@@ -4747,7 +4747,7 @@ Zorg ervoor dat u schrijfbevoegdheid heeft voor het bestand en voor de map die h
         <translation>Operatorweergave</translation>
     </message>
     <message>
-        <source>The Operators view contains all the operators. These include both audible operators (oscillators) and inaudible operators, or modulators: Low-frequency oscillators and Envelopes.
+        <source>The Operators view contains all the operators. These include both audible operators (oscillators) and inaudible operators, or modulators: Low-frequency oscillators and Envelopes. 
 
 Knobs and other widgets in the Operators view have their own what&apos;s this -texts, so you can get more specific help for them that way. </source>
         <translation>De operatorweergave bevat alle operators. Deze bevatten hoorbare operators (oscillators) en onhoorbare operators of modulators: laag-frequente oscillators en envelopes.
@@ -4759,12 +4759,12 @@ Knoppen en andere widgets in de operatorweergave hebben hun eigen &quot;wat is d
         <translation>Matrixweergave</translation>
     </message>
     <message>
-        <source>The Matrix view contains the modulation matrix. Here you can define the modulation relationships between the various operators: Each audible operator (oscillators 1-3) has 3-4 properties that can be modulated by any of the modulators. Using more modulations consumes more CPU power.
+        <source>The Matrix view contains the modulation matrix. Here you can define the modulation relationships between the various operators: Each audible operator (oscillators 1-3) has 3-4 properties that can be modulated by any of the modulators. Using more modulations consumes more CPU power. 
 
-The view is divided to modulation targets, grouped by the target oscillator. Available targets are volume, pitch, phase, pulse width and sub-osc ratio. Note: some targets are specific to one oscillator only.
+The view is divided to modulation targets, grouped by the target oscillator. Available targets are volume, pitch, phase, pulse width and sub-osc ratio. Note: some targets are specific to one oscillator only. 
 
 Each modulation target has 4 knobs, one for each modulator. By default the knobs are at 0, which means no modulation. Turning a knob to 1 causes that modulator to affect the modulation target as much as possible. Turning it to -1 does the same, but the modulation is inversed. </source>
-        <translation>De matrixweergave bevat de modulatiematrix. Hier kunt u de modulatie-relaties tussen de verschillende operators opgeven. Elke hoorbare operator (oscillators 1 - 3) heeft 3 à 4 eigenschappen die gemoduleerd kunnen worden door elk van de modulators. Gebruik van meer modulaties verbruikt meer CPU-kracht.
+        <translation>De matrixweergave bevat de modulatiematrix. Hier kunt u de modulatie-relaties tussen de verschillende operators opgeven. Elke hoorbare operator (oscillators 1 - 3) heeft 3 à 4 eigenschappen die gemoduleerd kunnen worden door elk van de modulators. Gebruik van meer modulaties verbruikt meer CPU-kracht. 
 
 De weergave is verdeeld in modulatie-doelen, gegroepeerd per doel-oscillator. Beschikbare doelen zijn volume, toonhoogte, fase, pulsbreedte en sub-osc-ratio. Opmerking: een aantal doelen zijn specifiek voor slechts een oscillator.
 
@@ -4845,7 +4845,7 @@ De toonhoogte, fase en pulsbreedte van oscillator 1 kunnen de timing van syncs b
         <translation>De SUB-knop verandert de mixverhouding tussen de twee sub-oscs van oscillator 3. Elk sub-osc kan worden ingesteld om een andere golfvorm te produceren, en oscillator 3 kan er vloeiend tussen interpoleren. Alle binnenkomende modulaties bij oscillator 3 worden op dezelfde manier toegepast op beide sub-oscs/golfvormen.</translation>
     </message>
     <message>
-        <source>In addition to dedicated modulators, Monstro allows oscillator 3 to be modulated by the output of oscillator 2.
+        <source>In addition to dedicated modulators, Monstro allows oscillator 3 to be modulated by the output of oscillator 2. 
 
 Mix mode means no modulation: the outputs of the oscillators are simply mixed together. </source>
         <translation>In aanvulling op toegewijde modulators laat Monstro toe dat oscillator 3 gemoduleerd wordt door de uitvoer van oscillator 2.
@@ -4853,7 +4853,7 @@ Mix mode means no modulation: the outputs of the oscillators are simply mixed to
 Mix-modus betekent geen modulatie: de uitvoer van de oscillators wordt gewoonweg samengemixt.</translation>
     </message>
     <message>
-        <source>In addition to dedicated modulators, Monstro allows oscillator 3 to be modulated by the output of oscillator 2.
+        <source>In addition to dedicated modulators, Monstro allows oscillator 3 to be modulated by the output of oscillator 2. 
 
 AM means amplitude modulation: Oscillator 3&apos;s amplitude (volume) is modulated by oscillator 2. </source>
         <translation>In aanvulling op toegewijde modulators laat Monstro toe dat oscillator 3 gemoduleerd wordt door de uitvoer van oscillator 2.
@@ -4861,7 +4861,7 @@ AM means amplitude modulation: Oscillator 3&apos;s amplitude (volume) is modulat
 AM betekent amplitudemodulatie: de amplitude (het volume) van oscillator 3 wordt gemoduleerd door oscillator 2.</translation>
     </message>
     <message>
-        <source>In addition to dedicated modulators, Monstro allows oscillator 3 to be modulated by the output of oscillator 2.
+        <source>In addition to dedicated modulators, Monstro allows oscillator 3 to be modulated by the output of oscillator 2. 
 
 FM means frequency modulation: Oscillator 3&apos;s frequency (pitch) is modulated by oscillator 2. The frequency modulation is implemented as phase modulation, which gives a more stable overall pitch than &quot;pure&quot; frequency modulation. </source>
         <translation>In aanvulling op toegewijde modulators laat Monstro toe dat oscillator 3 gemoduleerd wordt door de uitvoer van oscillator 2.
@@ -4869,7 +4869,7 @@ FM means frequency modulation: Oscillator 3&apos;s frequency (pitch) is modulate
 FM betekent frequentiemodulatie: de frequentie (toonhoogte, pitch) van oscillator 3 wordt gemoduleerd door oscillator 2. De frequentiemodulatie wordt geïmplementeerd als fasemodulatie, wat een stabielere algemene toonhoogte produceert dan een &quot;pure&quot; frequentiemodulatie.</translation>
     </message>
     <message>
-        <source>In addition to dedicated modulators, Monstro allows oscillator 3 to be modulated by the output of oscillator 2.
+        <source>In addition to dedicated modulators, Monstro allows oscillator 3 to be modulated by the output of oscillator 2. 
 
 PM means phase modulation: Oscillator 3&apos;s phase is modulated by oscillator 2. It differs from frequency modulation in that the phase changes are not cumulative. </source>
         <translation>In aanvulling op toegewijde modulators laat Monstro toe dat oscillator 3 gemoduleerd wordt door de uitvoer van oscillator 2.
@@ -4877,15 +4877,15 @@ PM means phase modulation: Oscillator 3&apos;s phase is modulated by oscillator 
 PM betekent fasemodulatie: de fase van oscillator 3 wordt gemoduleerd door oscillator 2. Het verschilt van frequentie modulatie omdat de veranderingen in fase niet cumulatief zijn.</translation>
     </message>
     <message>
-        <source>Select the waveform for LFO 1.
+        <source>Select the waveform for LFO 1. 
 &quot;Random&quot; and &quot;Random smooth&quot; are special waveforms: they produce random output, where the rate of the LFO controls how often the state of the LFO changes. The smooth version interpolates between these states with cosine interpolation. These random modes can be used to give &quot;life&quot; to your presets - add some of that analog unpredictability... </source>
-        <translation>Selecteer de golfvorm voor LFO 1.
+        <translation>Selecteer de golfvorm voor LFO 1. 
 &quot;Willekeurig&quot; en &quot;willekeurig zacht&quot; zijn speciale golfvormen: ze produceren een willekeurige uitvoer, waar de ratio van de LFO bepaalt hoe dikwijls de status van de LFO verandert. De zachte versie interpoleert tussen deze statussen met cosinus-interpolatie. Deze willekeurige modussen kunnen gebruikt worden om &quot;leven&quot; te geven aan uw presets - wat analoge onvoorspelbaarheid toevoegen...</translation>
     </message>
     <message>
-        <source>Select the waveform for LFO 2.
+        <source>Select the waveform for LFO 2. 
 &quot;Random&quot; and &quot;Random smooth&quot; are special waveforms: they produce random output, where the rate of the LFO controls how often the state of the LFO changes. The smooth version interpolates between these states with cosine interpolation. These random modes can be used to give &quot;life&quot; to your presets - add some of that analog unpredictability... </source>
-        <translation>Selecteer de golfvorm voor LFO 2.
+        <translation>Selecteer de golfvorm voor LFO 2. 
 &quot;Willekeurig&quot; en &quot;willekeurig zacht&quot; zijn speciale golfvormen: ze produceren een willekeurige uitvoer, waar de ratio van de LFO bepaalt hoe dikwijls de status van de LFO verandert. De zachte versie interpoleert tussen deze statussen met cosinus-interpolatie. Deze willekeurige modussen kunnen gebruikt worden om &quot;leven&quot; te geven aan uw presets - wat analoge onvoorspelbaarheid toevoegen...</translation>
     </message>
     <message>

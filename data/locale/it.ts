@@ -4744,7 +4744,7 @@ Si prega di controllare i permessi di scrittura sul file e la cartella che lo co
         <translation>Vista operatori</translation>
     </message>
     <message>
-        <source>The Operators view contains all the operators. These include both audible operators (oscillators) and inaudible operators, or modulators: Low-frequency oscillators and Envelopes.
+        <source>The Operators view contains all the operators. These include both audible operators (oscillators) and inaudible operators, or modulators: Low-frequency oscillators and Envelopes. 
 
 Knobs and other widgets in the Operators view have their own what&apos;s this -texts, so you can get more specific help for them that way. </source>
         <translation>La vista operatori contiene tutti gli operatori. Vi sono sia operatori udibili (oscillatori), che silenziosi, o modulatori: LFO e inviluppi.
@@ -4756,9 +4756,9 @@ Usa il &quot;Cos&apos;è questo?&quot; su tutte le manopole di questa vista per 
         <translation>Vista Matrice</translation>
     </message>
     <message>
-        <source>The Matrix view contains the modulation matrix. Here you can define the modulation relationships between the various operators: Each audible operator (oscillators 1-3) has 3-4 properties that can be modulated by any of the modulators. Using more modulations consumes more CPU power.
+        <source>The Matrix view contains the modulation matrix. Here you can define the modulation relationships between the various operators: Each audible operator (oscillators 1-3) has 3-4 properties that can be modulated by any of the modulators. Using more modulations consumes more CPU power. 
 
-The view is divided to modulation targets, grouped by the target oscillator. Available targets are volume, pitch, phase, pulse width and sub-osc ratio. Note: some targets are specific to one oscillator only.
+The view is divided to modulation targets, grouped by the target oscillator. Available targets are volume, pitch, phase, pulse width and sub-osc ratio. Note: some targets are specific to one oscillator only. 
 
 Each modulation target has 4 knobs, one for each modulator. By default the knobs are at 0, which means no modulation. Turning a knob to 1 causes that modulator to affect the modulation target as much as possible. Turning it to -1 does the same, but the modulation is inversed. </source>
         <translation>La vista matrice contiene la matrice di modulazione. Qui puoi definire le relazioni di modulazione tra i vari operatori: ogni operatore udibile (gli oscillatori da 1 a 3) ha 3-4 proprietà che possono essere modulate da qualsiasi modulatore. L&apos;utilizzo eccessivo di modulazioni può appesantire la CPU.
@@ -4840,7 +4840,7 @@ Ogni proprietà modulabile ha 4 manopole, una per ogni modulatore. Sono tutti a 
         <translation>La manopola SUB cambia le qualtità per la miscela tra i due sub-oscillatori.</translation>
     </message>
     <message>
-        <source>In addition to dedicated modulators, Monstro allows oscillator 3 to be modulated by the output of oscillator 2.
+        <source>In addition to dedicated modulators, Monstro allows oscillator 3 to be modulated by the output of oscillator 2. 
 
 Mix mode means no modulation: the outputs of the oscillators are simply mixed together. </source>
         <translation>Oltre ai modulatori dedicati, Monstro permette di modulare l&apos;Osc3 tramite l&apos;output dell&apos;Osc2.
@@ -4848,7 +4848,7 @@ Mix mode means no modulation: the outputs of the oscillators are simply mixed to
 La modalità Mix non produce nessuna modulazione: i due oscillatori sono semplicemente miscelati tra di loro.</translation>
     </message>
     <message>
-        <source>In addition to dedicated modulators, Monstro allows oscillator 3 to be modulated by the output of oscillator 2.
+        <source>In addition to dedicated modulators, Monstro allows oscillator 3 to be modulated by the output of oscillator 2. 
 
 AM means amplitude modulation: Oscillator 3&apos;s amplitude (volume) is modulated by oscillator 2. </source>
         <translation>Oltre ai modulatori dedicati, Monstro permette di modulare l&apos;Osc3 tramite l&apos;output dell&apos;Osc2.
@@ -4856,7 +4856,7 @@ AM means amplitude modulation: Oscillator 3&apos;s amplitude (volume) is modulat
 AM vuol dire modulazione di amplificazione: quella dell&apos;Osc3 (il suo volume) è modulata dall&apos;output dell&apos;Osc2.</translation>
     </message>
     <message>
-        <source>In addition to dedicated modulators, Monstro allows oscillator 3 to be modulated by the output of oscillator 2.
+        <source>In addition to dedicated modulators, Monstro allows oscillator 3 to be modulated by the output of oscillator 2. 
 
 FM means frequency modulation: Oscillator 3&apos;s frequency (pitch) is modulated by oscillator 2. The frequency modulation is implemented as phase modulation, which gives a more stable overall pitch than &quot;pure&quot; frequency modulation. </source>
         <translation>Oltre ai modulatori dedicati, Monstro permette di modulare l&apos;Osc3 tramite l&apos;output dell&apos;Osc2.
@@ -4864,7 +4864,7 @@ FM means frequency modulation: Oscillator 3&apos;s frequency (pitch) is modulate
 FM vuol dire modulazione di frequenza: quella dell&apos;Osc3 (la sua altezza) è modulata dall&apos;Osc2. Questa modulazione è implementata come una modulazione di fase, in modo da avere una frequenza risultate più stabile di una FM pura.</translation>
     </message>
     <message>
-        <source>In addition to dedicated modulators, Monstro allows oscillator 3 to be modulated by the output of oscillator 2.
+        <source>In addition to dedicated modulators, Monstro allows oscillator 3 to be modulated by the output of oscillator 2. 
 
 PM means phase modulation: Oscillator 3&apos;s phase is modulated by oscillator 2. It differs from frequency modulation in that the phase changes are not cumulative. </source>
         <translation>Oltre ai modulatori dedicati, Monstro permette di modulare l&apos;Osc3 tramite l&apos;outpit dell&apos;Osc2.
@@ -4872,13 +4872,13 @@ PM means phase modulation: Oscillator 3&apos;s phase is modulated by oscillator 
 PM è la modulazione di fase: quella dell&apos;Osc3 è modulata dall&apos;Osc2. La differenza con la modulazione di frequenza consiste nel fatto che in quella i cambiamenti di fase non sono cumulativi.</translation>
     </message>
     <message>
-        <source>Select the waveform for LFO 1.
+        <source>Select the waveform for LFO 1. 
 &quot;Random&quot; and &quot;Random smooth&quot; are special waveforms: they produce random output, where the rate of the LFO controls how often the state of the LFO changes. The smooth version interpolates between these states with cosine interpolation. These random modes can be used to give &quot;life&quot; to your presets - add some of that analog unpredictability... </source>
         <translation>Selezioa la forma d&apos;onda per l&apos;LFO 1.
 Vi sono due forme speciali: &quot;Random&quot; e &quot;Random morbido&quot; sono onde speciali che producono un aoutup randomico, dove il rate dell&apos;LFO controlla quanto spesso lo stato dell&apos;LFO cambia. La versione morbila interpola tra questi stati con una interpolazione a coseno. Queste modalità possono essere usate per ridare &quot;vita&quot; ai toi preset o aggiungere un po&apos; di quella imprevedibilità degli stumenti analogici...</translation>
     </message>
     <message>
-        <source>Select the waveform for LFO 2.
+        <source>Select the waveform for LFO 2. 
 &quot;Random&quot; and &quot;Random smooth&quot; are special waveforms: they produce random output, where the rate of the LFO controls how often the state of the LFO changes. The smooth version interpolates between these states with cosine interpolation. These random modes can be used to give &quot;life&quot; to your presets - add some of that analog unpredictability... </source>
         <translation>Selezioa la forma d&apos;onda per l&apos;LFO 2.
 Vi sono due forme speciali: &quot;Random&quot; e &quot;Random morbido&quot; sono onde speciali che producono un aoutup randomico, dove il rate dell&apos;LFO controlla quanto spesso lo stato dell&apos;LFO cambia. La versione morbila interpola tra questi stati con una interpolazione a coseno. Queste modalità possono essere usate per ridare &quot;vita&quot; ai toi preset o aggiungere un po&apos; di quella imprevedibilità degli stumenti analogici...</translation>
