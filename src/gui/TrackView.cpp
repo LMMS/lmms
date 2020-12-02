@@ -39,8 +39,10 @@
 #include "Engine.h"
 #include "FadeButton.h"
 #include "Mixer.h"
+#include "PixmapButton.h"
 #include "StringPairDrag.h"
 #include "ToolTip.h"
+#include "Track.h"
 #include "TrackContainerView.h"
 #include "TrackContentObjectView.h"
 

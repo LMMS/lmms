@@ -23,6 +23,7 @@
  */
 #include "BBTrack.h"
 
+#include <QDomElement>
 #include <QMenu>
 #include <QPainter>
 

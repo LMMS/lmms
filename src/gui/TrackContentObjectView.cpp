@@ -31,6 +31,7 @@
 #include "AutomationPattern.h"
 #include "Clipboard.h"
 #include "ColorChooser.h"
+#include "ComboBoxModel.h"
 #include "DataFile.h"
 #include "embed.h"
 #include "GuiApplication.h"
@@ -768,7 +769,7 @@ void TrackContentObjectView::mouseMoveEvent( QMouseEvent * me )
 			if( tcov == NULL ) { continue; }
 			tcos.push_back( tcov->m_tco );
 			int index = std::distance( so.begin(), it );
-			leftmost = min (leftmost, m_initialOffsets[index].getTicks() );
+			leftmost = std::min(leftmost, m_initialOffsets[index].getTicks());
 		}
 		// Make sure the leftmost clip doesn't get moved to a negative position
 		if ( newPos.getTicks() + leftmost < 0 ) { newPos = -leftmost; }
