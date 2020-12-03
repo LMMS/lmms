@@ -35,8 +35,14 @@ if (CMAKE_BUILD_TYPE STREQUAL "Debug")
 	else ()
 		set(ENABLE_VALIDATE_ARGS ON)
 	endif()
+	# The rpmalloc asserts are too noisy when debugging with option WANT_DEBUG_FPE.
+	if(WANT_DEBUG_FPE)
+		SET(ENABLE_ASSERTS 0)
+	else()
+		set(ENABLE_ASSERTS 1)
+	endif()
 	target_compile_definitions(rpmalloc
-		PRIVATE -DENABLE_ASSERTS=1 -DENABLE_VALIDATE_ARGS=${ENABLE_VALIDATE_ARGS}
+		PRIVATE -DENABLE_ASSERTS=${ENABLE_ASSERTS} -DENABLE_VALIDATE_ARGS=${ENABLE_VALIDATE_ARGS}
 	)
 endif()
 
