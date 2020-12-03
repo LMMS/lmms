@@ -1,6 +1,5 @@
 /*
- * Track.cpp - implementation of classes concerning tracks -> necessary for
- *             all track-like objects (beat/bassline, sample-track...)
+ * Track.cpp - implementation of Track class
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
@@ -24,16 +23,9 @@
  */
 
 /** \file Track.cpp
- *  \brief All classes concerning tracks and track-like objects
+ *  \brief Implementation of Track class
  */
 
-/*
- * \mainpage Track classes
- *
- * \section introduction Introduction
- *
- * \todo fill this out
- */
 
 #include "Track.h"
 
@@ -65,10 +57,8 @@ Track::Track( TrackTypes type, TrackContainer * tc ) :
 	m_trackContainer( tc ),        /*!< The track container object */
 	m_type( type ),                /*!< The track type */
 	m_name(),                       /*!< The track's name */
-	m_mutedModel( false, this, tr( "Mute" ) ),
-					 /*!< For controlling track muting */
-	m_soloModel( false, this, tr( "Solo" ) ),
-					/*!< For controlling track soloing */
+	m_mutedModel( false, this, tr( "Mute" ) ), /*!< For controlling track muting */
+	m_soloModel( false, this, tr( "Solo" ) ), /*!< For controlling track soloing */
 	m_simpleSerializingMode( false ),
 	m_trackContentObjects(),        /*!< The track content objects (segments) */
 	m_color( 0, 0, 0 ),
