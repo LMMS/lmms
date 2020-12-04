@@ -37,7 +37,7 @@ if (CMAKE_BUILD_TYPE STREQUAL "Debug")
 	endif()
 	# The rpmalloc asserts are too noisy when debugging with option WANT_DEBUG_FPE.
 	if(WANT_DEBUG_FPE)
-		SET(ENABLE_ASSERTS 0)
+		set(ENABLE_ASSERTS 0)
 	else()
 		set(ENABLE_ASSERTS 1)
 	endif()
