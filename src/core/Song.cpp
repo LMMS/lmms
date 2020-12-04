@@ -48,6 +48,8 @@
 #include "FxMixerView.h"
 #include "GuiApplication.h"
 #include "ExportFilter.h"
+#include "InstrumentTrack.h"
+#include "NotePlayHandle.h"
 #include "Pattern.h"
 #include "PianoRoll.h"
 #include "ProjectJournal.h"
