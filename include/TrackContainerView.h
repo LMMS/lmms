@@ -31,12 +31,15 @@
 #include <QWidget>
 #include <QThread>
 
-#include "Track.h"
 #include "JournallingObject.h"
-#include "InstrumentTrack.h"
+#include "ModelView.h"
+#include "Rubberband.h"
+#include "TrackView.h"
 
 
 class QVBoxLayout;
+
+class InstrumentTrack;
 class TrackContainer;
 
 

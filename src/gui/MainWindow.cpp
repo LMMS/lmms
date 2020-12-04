@@ -32,6 +32,7 @@
 #include <QMdiArea>
 #include <QMenuBar>
 #include <QMessageBox>
+#include <QScrollBar>
 #include <QShortcut>
 #include <QLibrary>
 #include <QSplitter>
@@ -50,6 +51,7 @@
 #include "FxMixerView.h"
 #include "GuiApplication.h"
 #include "ImportFilter.h"
+#include "InstrumentTrack.h"
 #include "PianoRoll.h"
 #include "PluginBrowser.h"
 #include "PluginFactory.h"
@@ -70,6 +72,7 @@
 #include "VersionedSaveDialog.h"
 
 #include "lmmsversion.h"
+
 
 #if !defined(LMMS_BUILD_WIN32) && !defined(LMMS_BUILD_APPLE) && !defined(LMMS_BUILD_HAIKU)
 //Work around an issue on KDE5 as per https://bugs.kde.org/show_bug.cgi?id=337491#c21

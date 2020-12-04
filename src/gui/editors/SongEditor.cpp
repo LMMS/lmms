@@ -31,6 +31,7 @@
 #include <QMdiArea>
 #include <QMdiSubWindow>
 #include <QPainter>
+#include <QScrollBar>
 #include <QTimeLine>
 
 #include "AudioDevice.h"
@@ -293,7 +294,7 @@ float SongEditor::getSnapSize() const
 	{
 		val = val - m_zoomingModel->value() + 3;
 	}
-	val = max(val, -6); // -6 gives 1/64th bar snapping. Lower values cause crashing.
+	val = std::max(val, -6); // -6 gives 1/64th bar snapping. Lower values cause crashing.
 
 	if ( val >= 0 ){
 		return 1 << val;
@@ -307,7 +308,7 @@ QString SongEditor::getSnapSizeString() const
 {
 	int val = -m_snappingModel->value() + 3;
 	val = val - m_zoomingModel->value() + 3;
-	val = max(val, -6); // -6 gives 1/64th bar snapping. Lower values cause crashing.
+	val = std::max(val, -6); // -6 gives 1/64th bar snapping. Lower values cause crashing.
 
 	if ( val >= 0 ){
 		int bars = 1 << val;

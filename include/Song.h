@@ -29,6 +29,8 @@
 
 #include <QtCore/QSharedMemory>
 #include <QtCore/QVector>
+#include <QHash>
+#include <QString>
 
 #include "TrackContainer.h"
 #include "Controller.h"

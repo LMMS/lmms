@@ -28,6 +28,7 @@
 #define AUTOMATION_TRACK_H
 
 #include "Track.h"
+#include "TrackView.h"
 
 
 class AutomationTrack : public Track

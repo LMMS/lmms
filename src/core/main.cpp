@@ -59,6 +59,7 @@
 
 #include "MainApplication.h"
 #include "ConfigManager.h"
+#include "DataFile.h"
 #include "NotePlayHandle.h"
 #include "embed.h"
 #include "Engine.h"
