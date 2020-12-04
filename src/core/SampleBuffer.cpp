@@ -131,7 +131,7 @@ SampleBuffer::SampleBuffer( const f_cnt_t _frames )
 
 
 
-SampleBuffer::SampleBuffer(SampleBuffer& orig):
+SampleBuffer::SampleBuffer(const SampleBuffer& orig):
 	m_audioFile(orig.m_audioFile),
 	m_origData(MM_ALLOC(sampleFrame, orig.m_origFrames)),
 	m_origFrames(orig.m_origFrames),
@@ -195,11 +195,9 @@ void swap(SampleBuffer& first, SampleBuffer& second) noexcept
 
 
 
-SampleBuffer& SampleBuffer::operator=(SampleBuffer& that)
+SampleBuffer& SampleBuffer::operator=(SampleBuffer that)
 {
-	SampleBuffer* temp = new SampleBuffer(that);
-	swap(*this, *temp);
-
+	swap(*this, that);
 	return *this;
 }
 
