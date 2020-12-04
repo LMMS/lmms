@@ -160,10 +160,18 @@ void swap(SampleBuffer& first, SampleBuffer& second) noexcept
 {
 	using std::swap;
 
-	// Lock both buffers for writing
-	// TODO: No guaranteed ordering, risk of deadlock?
-	first.m_varLock.lockForWrite();
-	second.m_varLock.lockForWrite();
+	// Lock both buffers for writing, with address as lock ordering
+	if (&first == &second) { return; }
+	else if (&first > &second)
+	{
+		first.m_varLock.lockForWrite();
+		second.m_varLock.lockForWrite();
+	}
+	else
+	{
+		second.m_varLock.lockForWrite();
+		first.m_varLock.lockForWrite();
+	}
 
 	first.m_audioFile.swap(second.m_audioFile);
 	swap(first.m_origData, second.m_origData);
