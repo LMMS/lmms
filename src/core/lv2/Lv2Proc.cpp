@@ -50,7 +50,7 @@
 struct MidiInputEvent
 {
 	MidiEvent ev;
-	MidiTime time;
+	TimePos time;
 	f_cnt_t offset;
 };
 
@@ -58,12 +58,25 @@ struct MidiInputEvent
 
 
 Plugin::PluginTypes Lv2Proc::check(const LilvPlugin *plugin,
-	std::vector<PluginIssue>& issues, bool printIssues)
+	std::vector<PluginIssue>& issues)
 {
 	unsigned maxPorts = lilv_plugin_get_num_ports(plugin);
 	enum { inCount, outCount, maxCount };
 	unsigned audioChannels[maxCount] = { 0, 0 }; // audio input and output count
 	unsigned midiChannels[maxCount] = { 0, 0 }; // MIDI input and output count
+
+	const char* pluginUri = lilv_node_as_uri(lilv_plugin_get_uri(plugin));
+	//qDebug() << "Checking plugin" << pluginUri << "...";
+
+	// TODO: manage a global blacklist outside of the code
+	//       for now, this will help
+	//       this is only a fix for the meantime
+	const auto& pluginBlacklist = Lv2Manager::getPluginBlacklist();
+	if (!Engine::ignorePluginBlacklist() &&
+		pluginBlacklist.find(pluginUri) != pluginBlacklist.end())
+	{
+		issues.emplace_back(blacklisted);
+	}
 
 	for (unsigned portNum = 0; portNum < maxPorts; ++portNum)
 	{
@@ -113,16 +126,6 @@ Plugin::PluginTypes Lv2Proc::check(const LilvPlugin *plugin,
 		{
 			issues.emplace_back(featureNotSupported, reqFeatName);
 		}
-	}
-
-	if (printIssues && issues.size())
-	{
-		qDebug() << "Lv2 plugin"
-			<< qStringFromPluginNode(plugin, lilv_plugin_get_name)
-			<< "(URI:"
-			<< lilv_node_as_uri(lilv_plugin_get_uri(plugin))
-			<< ") can not be loaded:";
-		for (const PluginIssue& iss : issues) { qDebug() << "  - " << iss; }
 	}
 
 	return (audioChannels[inCount] > 2 || audioChannels[outCount] > 2)
@@ -317,7 +320,7 @@ void Lv2Proc::run(fpp_t frames)
 // in case there will be a PR which removes this callback and instead adds a
 // `ringbuffer_t<MidiEvent + time info>` to `class Instrument`, this
 // function (and the ringbuffer and its reader in `Lv2Proc`) will simply vanish
-void Lv2Proc::handleMidiInputEvent(const MidiEvent &event, const MidiTime &time, f_cnt_t offset)
+void Lv2Proc::handleMidiInputEvent(const MidiEvent &event, const TimePos &time, f_cnt_t offset)
 {
 	if(m_midiIn)
 	{
@@ -396,9 +399,12 @@ void Lv2Proc::initPlugin()
 
 void Lv2Proc::shutdownPlugin()
 {
-	lilv_instance_deactivate(m_instance);
-	lilv_instance_free(m_instance);
-	m_instance = nullptr;
+	if (m_valid)
+	{
+		lilv_instance_deactivate(m_instance);
+		lilv_instance_free(m_instance);
+		m_instance = nullptr;
+	}
 }
 
 
@@ -452,12 +458,23 @@ void Lv2Proc::createPort(std::size_t portNum)
 			{
 				AutoLilvNode node(lilv_port_get_name(m_plugin, lilvPort));
 				QString dispName = lilv_node_as_string(node.get());
+				sample_rate_t sr = Engine::mixer()->processingSampleRate();
+				if(meta.def() < meta.min(sr) || meta.def() > meta.max(sr))
+				{
+					qWarning()	<< "Warning: Plugin"
+								<< qStringFromPluginNode(m_plugin, lilv_plugin_get_name)
+								<< "(URI:"
+								<< lilv_node_as_uri(lilv_plugin_get_uri(m_plugin))
+								<< ") has a default value for port"
+								<< dispName
+								<< "which is not in range [min, max].";
+				}
 				switch (meta.m_vis)
 				{
-					case Lv2Ports::Vis::None:
+					case Lv2Ports::Vis::Generic:
 					{
 						// allow ~1000 steps
-						float stepSize = (meta.m_max - meta.m_min) / 1000.0f;
+						float stepSize = (meta.max(sr) - meta.min(sr)) / 1000.0f;
 
 						// make multiples of 0.01 (or 0.1 for larger values)
 						float minStep = (stepSize >= 1.0f) ? 0.1f : 0.01f;
@@ -465,15 +482,15 @@ void Lv2Proc::createPort(std::size_t portNum)
 						stepSize = std::max(stepSize, minStep);
 
 						ctrl->m_connectedModel.reset(
-							new FloatModel(meta.m_def, meta.m_min, meta.m_max,
+							new FloatModel(meta.def(), meta.min(sr), meta.max(sr),
 											stepSize, nullptr, dispName));
 						break;
 					}
 					case Lv2Ports::Vis::Integer:
 						ctrl->m_connectedModel.reset(
-							new IntModel(static_cast<int>(meta.m_def),
-											static_cast<int>(meta.m_min),
-											static_cast<int>(meta.m_max),
+							new IntModel(static_cast<int>(meta.def()),
+											static_cast<int>(meta.min(sr)),
+											static_cast<int>(meta.max(sr)),
 											nullptr, dispName));
 						break;
 					case Lv2Ports::Vis::Enumeration:
@@ -494,15 +511,21 @@ void Lv2Proc::createPort(std::size_t portNum)
 						}
 						lilv_scale_points_free(sps);
 						ctrl->m_connectedModel.reset(comboModel);
+						// TODO: use default value on comboModel, too?
 						break;
 					}
 					case Lv2Ports::Vis::Toggled:
 						ctrl->m_connectedModel.reset(
-							new BoolModel(static_cast<bool>(meta.m_def),
+							new BoolModel(static_cast<bool>(meta.def()),
 											nullptr, dispName));
 						break;
 				}
-			}
+				if(meta.m_logarithmic)
+				{
+					ctrl->m_connectedModel->setScaleLogarithmic();
+				}
+
+			} // if m_flow == Input
 			port = ctrl;
 			break;
 		}
@@ -732,9 +755,10 @@ void Lv2Proc::dumpPort(std::size_t num)
 	qDebug() << "  visualization: " << Lv2Ports::toStr(port.m_vis);
 	if (port.m_type == Lv2Ports::Type::Control || port.m_type == Lv2Ports::Type::Cv)
 	{
-		qDebug() << "  default:" << port.m_def;
-		qDebug() << "  min:" << port.m_min;
-		qDebug() << "  max:" << port.m_max;
+		sample_rate_t sr = Engine::mixer()->processingSampleRate();
+		qDebug() << "  default:" << port.def();
+		qDebug() << "  min:" << port.min(sr);
+		qDebug() << "  max:" << port.max(sr);
 	}
 	qDebug() << "  optional: " << port.m_optional;
 	qDebug() << "  => USED: " << port.m_used;

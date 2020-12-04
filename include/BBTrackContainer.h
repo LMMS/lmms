@@ -38,7 +38,7 @@ public:
 	BBTrackContainer();
 	virtual ~BBTrackContainer();
 
-	virtual bool play( MidiTime _start, const fpp_t _frames,
+	virtual bool play( TimePos _start, const fpp_t _frames,
 						const f_cnt_t _frame_base, int _tco_num = -1 );
 
 	void updateAfterTrackAdd() override;
@@ -62,7 +62,7 @@ public:
 	void fixIncorrectPositions();
 	void createTCOsForBB( int _bb );
 
-	AutomatedValueMap automatedValuesAt(MidiTime time, int tcoNum) const override;
+	AutomatedValueMap automatedValuesAt(TimePos time, int tcoNum) const override;
 
 public slots:
 	void play();

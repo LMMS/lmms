@@ -51,7 +51,7 @@ AutomationPattern::AutomationPattern( AutomationTrack * _auto_track ) :
 	m_isRecording( false ),
 	m_lastRecordedValue( 0 )
 {
-	changeLength( MidiTime( 1, 0 ) );
+	changeLength( TimePos( 1, 0 ) );
 	if( getTrack() )
 	{
 		switch( getTrack()->trackContainer()->type() )
@@ -110,7 +110,7 @@ bool AutomationPattern::addObject( AutomatableModel * _obj, bool _search_dup )
 	if( m_objects.isEmpty() && hasAutomation() == false )
 	{
 		// then initialize first value
-		putValue( MidiTime(0), _obj->inverseScaledValue( _obj->value<float>() ), false );
+		putValue( TimePos(0), _obj->inverseScaledValue( _obj->value<float>() ), false );
 	}
 
 	m_objects += _obj;
@@ -176,9 +176,9 @@ const AutomationPattern::objectVector& AutomationPattern::objects() const
 
 
 
-MidiTime AutomationPattern::timeMapLength() const
+TimePos AutomationPattern::timeMapLength() const
 {
-	MidiTime one_bar = MidiTime(1, 0);
+	TimePos one_bar = TimePos(1, 0);
 	if (m_timeMap.isEmpty()) { return one_bar; }
 
 	timeMap::const_iterator it = m_timeMap.end();
@@ -187,7 +187,7 @@ MidiTime AutomationPattern::timeMapLength() const
 	// return length as a whole bar to prevent disappearing TCO
 	if (last_tick == 0) { return one_bar; }
 
-	return MidiTime(last_tick);
+	return TimePos(last_tick);
 }
 
 
@@ -202,14 +202,14 @@ void AutomationPattern::updateLength()
 
 
 
-MidiTime AutomationPattern::putValue( const MidiTime & time,
+TimePos AutomationPattern::putValue( const TimePos & time,
 					const float value,
 					const bool quantPos,
 					const bool ignoreSurroundingPoints )
 {
 	cleanObjects();
 
-	MidiTime newTime = quantPos ?
+	TimePos newTime = quantPos ?
 				Note::quantized( time, quantization() ) :
 				time;
 
@@ -241,7 +241,7 @@ MidiTime AutomationPattern::putValue( const MidiTime & time,
 
 
 
-void AutomationPattern::removeValue( const MidiTime & time )
+void AutomationPattern::removeValue( const TimePos & time )
 {
 	cleanObjects();
 
@@ -261,7 +261,7 @@ void AutomationPattern::removeValue( const MidiTime & time )
 
 
 
-void AutomationPattern::recordValue(MidiTime time, float value)
+void AutomationPattern::recordValue(TimePos time, float value)
 {
 	if( value != m_lastRecordedValue )
 	{
@@ -286,14 +286,14 @@ void AutomationPattern::recordValue(MidiTime time, float value)
  * @param true to snip x position
  * @return
  */
-MidiTime AutomationPattern::setDragValue( const MidiTime & time,
+TimePos AutomationPattern::setDragValue( const TimePos & time,
 						const float value,
 						const bool quantPos,
 						const bool controlKey )
 {
 	if( m_dragging == false )
 	{
-		MidiTime newTime = quantPos  ?
+		TimePos newTime = quantPos  ?
 				Note::quantized( time, quantization() ) :
 							time;
 		this->removeValue( newTime );
@@ -327,7 +327,7 @@ void AutomationPattern::applyDragValue()
 
 
 
-float AutomationPattern::valueAt( const MidiTime & _time ) const
+float AutomationPattern::valueAt( const TimePos & _time ) const
 {
 	if( m_timeMap.isEmpty() )
 	{
@@ -395,7 +395,7 @@ float AutomationPattern::valueAt( timeMap::const_iterator v, int offset ) const
 
 
 
-float *AutomationPattern::valuesAfter( const MidiTime & _time ) const
+float *AutomationPattern::valuesAfter( const TimePos & _time ) const
 {
 	timeMap::ConstIterator v = m_timeMap.lowerBound( _time );
 	if( v == m_timeMap.end() || (v+1) == m_timeMap.end() )
@@ -436,12 +436,12 @@ void AutomationPattern::flipY( int min, int max )
 		if ( min < 0 )
 		{
 			tempValue = valueAt( ( iterate + i ).key() ) * -1;
-			putValue( MidiTime( (iterate + i).key() ) , tempValue, false);
+			putValue( TimePos( (iterate + i).key() ) , tempValue, false);
 		}
 		else
 		{
 			tempValue = max - valueAt( ( iterate + i ).key() );
-			putValue( MidiTime( (iterate + i).key() ) , tempValue, false);
+			putValue( TimePos( (iterate + i).key() ) , tempValue, false);
 		}
 	}
 
@@ -480,12 +480,12 @@ void AutomationPattern::flipX( int length )
 		if ( realLength < length )
 		{
 			tempValue = valueAt( ( iterate + numPoints ).key() );
-			putValue( MidiTime( length ) , tempValue, false);
+			putValue( TimePos( length ) , tempValue, false);
 			numPoints++;
 			for( int i = 0; i <= numPoints; i++ )
 			{
 				tempValue = valueAt( ( iterate + i ).key() );
-				MidiTime newTime = MidiTime( length - ( iterate + i ).key() );
+				TimePos newTime = TimePos( length - ( iterate + i ).key() );
 				tempMap[newTime] = tempValue;
 			}
 		}
@@ -494,15 +494,15 @@ void AutomationPattern::flipX( int length )
 			for( int i = 0; i <= numPoints; i++ )
 			{
 				tempValue = valueAt( ( iterate + i ).key() );
-				MidiTime newTime;
+				TimePos newTime;
 
 				if ( ( iterate + i ).key() <= length )
 				{
-					newTime = MidiTime( length - ( iterate + i ).key() );
+					newTime = TimePos( length - ( iterate + i ).key() );
 				}
 				else
 				{
-					newTime = MidiTime( ( iterate + i ).key() );
+					newTime = TimePos( ( iterate + i ).key() );
 				}
 				tempMap[newTime] = tempValue;
 			}
@@ -514,7 +514,7 @@ void AutomationPattern::flipX( int length )
 		{
 			tempValue = valueAt( ( iterate + i ).key() );
 			cleanObjects();
-			MidiTime newTime = MidiTime( realLength - ( iterate + i ).key() );
+			TimePos newTime = TimePos( realLength - ( iterate + i ).key() );
 			tempMap[newTime] = tempValue;
 		}
 	}

@@ -44,6 +44,7 @@
 #include "Lv2Proc.h"
 #include "Lv2Ports.h"
 #include "MainWindow.h"
+#include "Mixer.h"
 #include "SubWindow.h"
 
 
@@ -66,13 +67,16 @@ Lv2ViewProc::Lv2ViewProc(QWidget* parent, Lv2Proc* ctrlBase, int colNum) :
 
 				switch (port.m_vis)
 				{
-					case PortVis::None:
+					case PortVis::Generic:
 						m_control = new KnobControl(m_par);
 						break;
 					case PortVis::Integer:
-						m_control = new LcdControl((port.m_max <= 9.0f) ? 1 : 2,
+					{
+						sample_rate_t sr = Engine::mixer()->processingSampleRate();
+						m_control = new LcdControl((port.max(sr) <= 9.0f) ? 1 : 2,
 													m_par);
 						break;
+					}
 					case PortVis::Enumeration:
 						m_control = new ComboControl(m_par);
 						break;
