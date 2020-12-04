@@ -165,24 +165,18 @@ void swap(SampleBuffer& first, SampleBuffer& second) noexcept
 	first.m_varLock.lockForWrite();
 	second.m_varLock.lockForWrite();
 
-	// QString: built in swap method
 	first.m_audioFile.swap(second.m_audioFile);
-	// sampleFrame*: std::swap
 	swap(first.m_origData, second.m_origData);
 	swap(first.m_data, second.m_data);
-	// f_cnt_t: std::swap
 	swap(first.m_origFrames, second.m_origFrames);
 	swap(first.m_frames, second.m_frames);
 	swap(first.m_startFrame, second.m_startFrame);
 	swap(first.m_endFrame, second.m_endFrame);
 	swap(first.m_loopStartFrame, second.m_loopStartFrame);
 	swap(first.m_loopEndFrame, second.m_loopEndFrame);
-	// float: std::swap
 	swap(first.m_amplification, second.m_amplification);
 	swap(first.m_frequency, second.m_frequency);
-	// bool: std::swap
 	swap(first.m_reversed, second.m_reversed);
-	// sample_rate_t: std::swap
 	swap(first.m_sampleRate, second.m_sampleRate);
 
 	// Unlock again
