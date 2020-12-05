@@ -361,7 +361,7 @@ const surroundSampleFrame * Mixer::renderNextBuffer()
 			// Stop crash with metronome if empty project
 				Engine::getSong()->countTracks() )
 	{
-		tick_t ticksPerBar = MidiTime::ticksPerBar();
+		tick_t ticksPerBar = TimePos::ticksPerBar();
 		if ( p.getTicks() % ( ticksPerBar / 1 ) == 0 )
 		{
 			addPlayHandle( new SamplePlayHandle( "misc/metronome02.ogg" ) );

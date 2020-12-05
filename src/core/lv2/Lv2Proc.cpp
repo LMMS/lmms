@@ -50,7 +50,7 @@
 struct MidiInputEvent
 {
 	MidiEvent ev;
-	MidiTime time;
+	TimePos time;
 	f_cnt_t offset;
 };
 
@@ -58,7 +58,7 @@ struct MidiInputEvent
 
 
 Plugin::PluginTypes Lv2Proc::check(const LilvPlugin *plugin,
-	std::vector<PluginIssue>& issues, bool printIssues)
+	std::vector<PluginIssue>& issues)
 {
 	unsigned maxPorts = lilv_plugin_get_num_ports(plugin);
 	enum { inCount, outCount, maxCount };
@@ -126,16 +126,6 @@ Plugin::PluginTypes Lv2Proc::check(const LilvPlugin *plugin,
 		{
 			issues.emplace_back(featureNotSupported, reqFeatName);
 		}
-	}
-
-	if (printIssues && issues.size())
-	{
-		qDebug() << "Lv2 plugin"
-			<< qStringFromPluginNode(plugin, lilv_plugin_get_name)
-			<< "(URI:"
-			<< lilv_node_as_uri(lilv_plugin_get_uri(plugin))
-			<< ") can not be loaded:";
-		for (const PluginIssue& iss : issues) { qDebug() << "  - " << iss; }
 	}
 
 	return (audioChannels[inCount] > 2 || audioChannels[outCount] > 2)
@@ -330,7 +320,7 @@ void Lv2Proc::run(fpp_t frames)
 // in case there will be a PR which removes this callback and instead adds a
 // `ringbuffer_t<MidiEvent + time info>` to `class Instrument`, this
 // function (and the ringbuffer and its reader in `Lv2Proc`) will simply vanish
-void Lv2Proc::handleMidiInputEvent(const MidiEvent &event, const MidiTime &time, f_cnt_t offset)
+void Lv2Proc::handleMidiInputEvent(const MidiEvent &event, const TimePos &time, f_cnt_t offset)
 {
 	if(m_midiIn)
 	{
@@ -481,7 +471,7 @@ void Lv2Proc::createPort(std::size_t portNum)
 				}
 				switch (meta.m_vis)
 				{
-					case Lv2Ports::Vis::None:
+					case Lv2Ports::Vis::Generic:
 					{
 						// allow ~1000 steps
 						float stepSize = (meta.max(sr) - meta.min(sr)) / 1000.0f;
@@ -530,7 +520,12 @@ void Lv2Proc::createPort(std::size_t portNum)
 											nullptr, dispName));
 						break;
 				}
-			}
+				if(meta.m_logarithmic)
+				{
+					ctrl->m_connectedModel->setScaleLogarithmic();
+				}
+
+			} // if m_flow == Input
 			port = ctrl;
 			break;
 		}

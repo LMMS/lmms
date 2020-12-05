@@ -150,10 +150,10 @@ AutomationEditor::AutomationEditor() :
 					Song::Mode_PlayAutomationPattern ),
 					m_currentPosition,
 					Song::Mode_PlayAutomationPattern, this );
-	connect( this, SIGNAL( positionChanged( const MidiTime & ) ),
-		m_timeLine, SLOT( updatePosition( const MidiTime & ) ) );
-	connect( m_timeLine, SIGNAL( positionChanged( const MidiTime & ) ),
-			this, SLOT( updatePosition( const MidiTime & ) ) );
+	connect( this, SIGNAL( positionChanged( const TimePos & ) ),
+		m_timeLine, SLOT( updatePosition( const TimePos & ) ) );
+	connect( m_timeLine, SIGNAL( positionChanged( const TimePos & ) ),
+			this, SLOT( updatePosition( const TimePos & ) ) );
 
 	// init scrollbars
 	m_leftRightScroll = new QScrollBar( Qt::Horizontal, this );
@@ -409,8 +409,8 @@ void AutomationEditor::drawLine( int x0In, float y0, int x1In, float y1 )
 
 		x += xstep;
 		i += 1;
-		m_pattern->removeValue( MidiTime( x ) );
-		m_pattern->putValue( MidiTime( x ), y );
+		m_pattern->removeValue( TimePos( x ) );
+		m_pattern->putValue( TimePos( x ), y );
 	}
 }
 
@@ -434,7 +434,7 @@ void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 		int x = mouseEvent->x() - VALUES_WIDTH;
 
 		// Get tick in which the user clicked
-		int posTicks = (x * MidiTime::ticksPerBar() / m_ppb) + m_currentPosition;
+		int posTicks = (x * TimePos::ticksPerBar() / m_ppb) + m_currentPosition;
 
 		// Get the time map of current pattern
 		timeMap & tm = m_pattern->getTimeMap();
@@ -480,10 +480,10 @@ void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 						if (clickedNode == tm.end())
 						{
 							// We create a new node and start dragging it
-							MidiTime valuePos(posTicks);
+							TimePos valuePos(posTicks);
 
 							// Starts actually moving/draging the node
-							MidiTime newTime = m_pattern->setDragValue(
+							TimePos newTime = m_pattern->setDragValue(
 								valuePos,
 								level,
 								true,
@@ -497,8 +497,8 @@ void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 						else // If we clicked over an existing node
 						{
 							// Simply start moving/draging it
-							MidiTime newTime = m_pattern->setDragValue(
-								MidiTime(POS(clickedNode)),
+							TimePos newTime = m_pattern->setDragValue(
+								TimePos(POS(clickedNode)),
 								level,
 								true,
 								mouseEvent->modifiers() & Qt::ControlModifier
@@ -514,7 +514,7 @@ void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 
 						// Calculate the offset from the place the mouse click happened in comparison
 						// to the center of the node
-						int alignedX = (POS(clickedNode) - m_currentPosition) * m_ppb / MidiTime::ticksPerBar();
+						int alignedX = (POS(clickedNode) - m_currentPosition) * m_ppb / TimePos::ticksPerBar();
 						m_moveXOffset = x - alignedX - 1;
 
 						// Set move-cursor
@@ -604,8 +604,8 @@ void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 					{
 						// We check if the quantized position of the time we clicked has a
 						// node and set its outValue
-						MidiTime quantizedPos = Note::quantized(
-							MidiTime(posTicks),
+						TimePos quantizedPos = Note::quantized(
+							TimePos(posTicks),
 							m_pattern->quantization()
 						);
 
@@ -695,16 +695,16 @@ void AutomationEditor::removeNodes(int tick0, int tick1)
 
 	if (tick0 == tick1) { return; }
 
-	MidiTime start = MidiTime(qMin(tick0, tick1));
-	MidiTime end = MidiTime(qMax(tick0, tick1));
+	TimePos start = TimePos(qMin(tick0, tick1));
+	TimePos end = TimePos(qMax(tick0, tick1));
 
 	timeMap & tm = m_pattern->getTimeMap();
 	timeMap::iterator it = tm.lowerBound(start);
 
-	// Make a list of MidiTimes with nodes to be removed
+	// Make a list of TimePoss with nodes to be removed
 	// because we can't simply remove the nodes from
 	// the timeMap while we are iterating it.
-	QVector<MidiTime> nodesToRemove;
+	QVector<TimePos> nodesToRemove;
 
 	while (it != tm.end())
 	{
@@ -734,8 +734,8 @@ void AutomationEditor::resetNodes(int tick0, int tick1)
 
 	if (tick0 == tick1) { return; }
 
-	MidiTime start = MidiTime(qMin(tick0, tick1));
-	MidiTime end = MidiTime(qMax(tick0, tick1));
+	TimePos start = TimePos(qMin(tick0, tick1));
+	TimePos end = TimePos(qMax(tick0, tick1));
 
 	timeMap & tm = m_pattern->getTimeMap();
 	timeMap::iterator it = tm.lowerBound(start);
@@ -769,7 +769,7 @@ void AutomationEditor::mouseMoveEvent(QMouseEvent * mouseEvent )
 		int x = mouseEvent->x() - VALUES_WIDTH;
 
 		// Get the X position in ticks
-		int posTicks = (x * MidiTime::ticksPerBar() / m_ppb) + m_currentPosition;
+		int posTicks = (x * TimePos::ticksPerBar() / m_ppb) + m_currentPosition;
 
 		switch(m_editMode)
 		{
@@ -783,7 +783,7 @@ void AutomationEditor::mouseMoveEvent(QMouseEvent * mouseEvent )
 						// When we clicked the node, we might have clicked slightly off
 						// so we account for that offset for a smooth drag
 						x -= m_moveXOffset;
-						posTicks = (x * MidiTime::ticksPerBar() / m_ppb) + m_currentPosition;
+						posTicks = (x * TimePos::ticksPerBar() / m_ppb) + m_currentPosition;
 
 						// If we moved the mouse past the beginning correct the position in ticks
 						posTicks = qMax(posTicks, 0);
@@ -793,7 +793,7 @@ void AutomationEditor::mouseMoveEvent(QMouseEvent * mouseEvent )
 
 						// Updates the drag value of the moved node
 						m_pattern->setDragValue(
-							MidiTime(posTicks),
+							TimePos(posTicks),
 							level,
 							true,
 							mouseEvent->modifiers() & Qt::ControlModifier
@@ -1125,7 +1125,7 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 				/ static_cast<float>( Engine::getSong()->getTimeSigModel().getDenominator() );
 		float zoomFactor = m_zoomXLevels[m_zoomingXModel.value()];
 		//the bars which disappears at the left side by scrolling
-		int leftBars = m_currentPosition * zoomFactor / MidiTime::ticksPerBar();
+		int leftBars = m_currentPosition * zoomFactor / TimePos::ticksPerBar();
 
 		//iterates the visible bars and draw the shading on uneven bars
 		for( int x = VALUES_WIDTH, barCount = leftBars; x < width() + m_currentPosition * zoomFactor / timeSignature; x += m_ppb, ++barCount )
@@ -1156,10 +1156,10 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 		}
 
 		// and finally bars
-		for( tick = m_currentPosition - m_currentPosition % MidiTime::ticksPerBar(),
+		for( tick = m_currentPosition - m_currentPosition % TimePos::ticksPerBar(),
 				 x = xCoordOfTick( tick );
 			 x<=width();
-			 tick += MidiTime::ticksPerBar(), x = xCoordOfTick( tick ) )
+			 tick += TimePos::ticksPerBar(), x = xCoordOfTick( tick ) )
 		{
 			p.setPen(m_barLineColor);
 			p.drawLine( x, grid_bottom, x, x_line_end );
@@ -1314,7 +1314,7 @@ int AutomationEditor::xCoordOfTick(int tick )
 	QMutexLocker m(&m_patternEditorMutex);
 
 	return VALUES_WIDTH + ( ( tick - m_currentPosition )
-		* m_ppb / MidiTime::ticksPerBar() );
+		* m_ppb / TimePos::ticksPerBar() );
 }
 
 
@@ -1500,7 +1500,7 @@ void AutomationEditor::wheelEvent(QWheelEvent * we )
 		}
 		x = qBound( 0, x, m_zoomingXModel.size() - 1 );
 
-		int mouseX = (position( we ).x() - VALUES_WIDTH)* MidiTime::ticksPerBar();
+		int mouseX = (position( we ).x() - VALUES_WIDTH)* TimePos::ticksPerBar();
 		// ticks based on the mouse x-position where the scroll wheel was used
 		int ticks = mouseX / m_ppb;
 		// what would be the ticks in the new zoom level on the very same mouse x
@@ -1713,7 +1713,7 @@ void AutomationEditor::setTension()
 
 
 
-void AutomationEditor::updatePosition(const MidiTime & t )
+void AutomationEditor::updatePosition(const TimePos & t )
 {
 	QMutexLocker m(&m_patternEditorMutex);
 
@@ -1723,17 +1723,17 @@ void AutomationEditor::updatePosition(const MidiTime & t )
 							m_scrollBack == true )
 	{
 		const int w = width() - VALUES_WIDTH;
-		if( t > m_currentPosition + w * MidiTime::ticksPerBar() / m_ppb )
+		if( t > m_currentPosition + w * TimePos::ticksPerBar() / m_ppb )
 		{
 			m_leftRightScroll->setValue( t.getBar() *
-							MidiTime::ticksPerBar() );
+							TimePos::ticksPerBar() );
 		}
 		else if( t < m_currentPosition )
 		{
-			MidiTime t_ = qMax( t - w * MidiTime::ticksPerBar() *
-					MidiTime::ticksPerBar() / m_ppb, 0 );
+			TimePos t_ = qMax( t - w * TimePos::ticksPerBar() *
+					TimePos::ticksPerBar() / m_ppb, 0 );
 			m_leftRightScroll->setValue( t_.getBar() *
-							MidiTime::ticksPerBar() );
+							TimePos::ticksPerBar() );
 		}
 		m_scrollBack = false;
 	}
@@ -1855,14 +1855,14 @@ AutomationEditor::timeMap::iterator AutomationEditor::getNodeAt(int x, int y, bo
 	// Remove the VALUES_WIDTH from the x position, so we have the actual viewport x
 	x -= VALUES_WIDTH;
 	// Convert the x position to the position in ticks
-	int posTicks = (x * MidiTime::ticksPerBar() / m_ppb) + m_currentPosition;
+	int posTicks = (x * TimePos::ticksPerBar() / m_ppb) + m_currentPosition;
 
 	// Get our pattern timeMap and create a iterator so we can check the nodes
 	timeMap & tm = m_pattern->getTimeMap();
 	timeMap::iterator it = tm.begin();
 
 	// ticksOffset is the number of ticks that match "r" pixels
-	int ticksOffset = MidiTime::ticksPerBar() * r / m_ppb;
+	int ticksOffset = TimePos::ticksPerBar() * r / m_ppb;
 
 	while (it != tm.end())
 	{

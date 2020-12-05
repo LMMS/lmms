@@ -30,8 +30,8 @@
 #include "lmms_export.h"
 #include "lmms_basics.h"
 #include "MemoryManager.h"
-#include "MidiTime.h"
 #include "Plugin.h"
+#include "TimePos.h"
 
 
 // forward-declarations
@@ -105,7 +105,7 @@ public:
 
 	// sub-classes can re-implement this for receiving all incoming
 	// MIDI-events
-	inline virtual bool handleMidiEvent( const MidiEvent&, const MidiTime& = MidiTime(), f_cnt_t offset = 0 )
+	inline virtual bool handleMidiEvent( const MidiEvent&, const TimePos& = TimePos(), f_cnt_t offset = 0 )
 	{
 		return true;
 	}

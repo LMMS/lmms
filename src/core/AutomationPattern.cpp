@@ -53,7 +53,7 @@ AutomationPattern::AutomationPattern( AutomationTrack * _auto_track ) :
 	m_isRecording( false ),
 	m_lastRecordedValue( 0 )
 {
-	changeLength( MidiTime( 1, 0 ) );
+	changeLength( TimePos( 1, 0 ) );
 	if( getTrack() )
 	{
 		switch( getTrack()->trackContainer()->type() )
@@ -115,7 +115,7 @@ bool AutomationPattern::addObject( AutomatableModel * _obj, bool _search_dup )
 	if( m_objects.isEmpty() && hasAutomation() == false )
 	{
 		// then initialize first value
-		putValue( MidiTime(0), _obj->inverseScaledValue( _obj->value<float>() ), false );
+		putValue( TimePos(0), _obj->inverseScaledValue( _obj->value<float>() ), false );
 	}
 
 	m_objects += _obj;
@@ -189,11 +189,11 @@ const AutomationPattern::objectVector& AutomationPattern::objects() const
 
 
 
-MidiTime AutomationPattern::timeMapLength() const
+TimePos AutomationPattern::timeMapLength() const
 {
 	QMutexLocker m(&m_patternMutex);
 
-	MidiTime one_bar = MidiTime(1, 0);
+	TimePos one_bar = TimePos(1, 0);
 	if (m_timeMap.isEmpty()) { return one_bar; }
 
 	timeMap::const_iterator it = m_timeMap.end();
@@ -202,7 +202,7 @@ MidiTime AutomationPattern::timeMapLength() const
 	// return length as a whole bar to prevent disappearing TCO
 	if (last_tick == 0) { return one_bar; }
 
-	return MidiTime(last_tick);
+	return TimePos(last_tick);
 }
 
 
@@ -220,14 +220,14 @@ void AutomationPattern::updateLength()
 /**
  * @brief Puts an automation node on the timeMap with the given value.
  *        The inValue and outValue of the created node will be the same.
- * @param MidiTime time to add the node to
+ * @param TimePos time to add the node to
  * @param Float inValue and outValue of the node
  * @param Boolean True to quantize the position (defaults to true)
  * @param Boolean True to ignore unquantized surrounding nodes (defaults to true)
- * @return MidiTime of the recently added automation node
+ * @return TimePos of the recently added automation node
  */
-MidiTime AutomationPattern::putValue(
-	const MidiTime & time,
+TimePos AutomationPattern::putValue(
+	const TimePos & time,
 	const float value,
 	const bool quantPos,
 	const bool ignoreSurroundingPoints
@@ -237,7 +237,7 @@ MidiTime AutomationPattern::putValue(
 
 	cleanObjects();
 
-	MidiTime newTime = quantPos ? Note::quantized(time, quantization()) : time;
+	TimePos newTime = quantPos ? Note::quantized(time, quantization()) : time;
 
 	// Create a node or replace the existing one on newTime
 	m_timeMap[newTime] = AutomationNode(this, value, newTime);
@@ -272,15 +272,15 @@ MidiTime AutomationPattern::putValue(
 /**
  * @brief Puts an automation node on the timeMap with the given inValue
  *        and outValue.
- * @param MidiTime time to add the node to
+ * @param TimePos time to add the node to
  * @param Float inValue of the node
  * @param Float outValue of the node
  * @param Boolean True to quantize the position (defaults to true)
  * @param Boolean True to ignore unquantized surrounding nodes (defaults to true)
- * @return MidiTime of the recently added automation node
+ * @return TimePos of the recently added automation node
  */
-MidiTime AutomationPattern::putValues(
-	const MidiTime & time,
+TimePos AutomationPattern::putValues(
+	const TimePos & time,
 	const float inValue,
 	const float outValue,
 	const bool quantPos,
@@ -291,7 +291,7 @@ MidiTime AutomationPattern::putValues(
 
 	cleanObjects();
 
-	MidiTime newTime = quantPos ? Note::quantized(time, quantization()) : time;
+	TimePos newTime = quantPos ? Note::quantized(time, quantization()) : time;
 
 	// Create a node or replace the existing one on newTime
 	m_timeMap[newTime] = AutomationNode(this, inValue, outValue, newTime);
@@ -323,7 +323,7 @@ MidiTime AutomationPattern::putValues(
 
 
 
-void AutomationPattern::removeValue( const MidiTime & time )
+void AutomationPattern::removeValue( const TimePos & time )
 {
 	QMutexLocker m(&m_patternMutex);
 
@@ -344,7 +344,7 @@ void AutomationPattern::removeValue( const MidiTime & time )
 
 
 
-void AutomationPattern::recordValue(MidiTime time, float value)
+void AutomationPattern::recordValue(TimePos time, float value)
 {
 	QMutexLocker m(&m_patternMutex);
 
@@ -366,14 +366,14 @@ void AutomationPattern::recordValue(MidiTime time, float value)
  * @brief Set the position of the point that is being dragged.
  *        Calling this function will also automatically set m_dragging to true.
  *        When applyDragValue() is called to m_dragging is set back to false.
- * @param MidiTime of the node being dragged
+ * @param TimePos of the node being dragged
  * @param Float with the value to assign to the point being dragged
  * @param Boolean. True to snip x position
  * @param Boolean. True to ignore unquantized surrounding nodes
- * @return MidiTime with current time of the dragged value
+ * @return TimePos with current time of the dragged value
  */
-MidiTime AutomationPattern::setDragValue(
-	const MidiTime & time,
+TimePos AutomationPattern::setDragValue(
+	const TimePos & time,
 	const float value,
 	const bool quantPos,
 	const bool controlKey
@@ -383,7 +383,7 @@ MidiTime AutomationPattern::setDragValue(
 
 	if (m_dragging == false)
 	{
-		MidiTime newTime = quantPos ? Note::quantized(time, quantization()) : time;
+		TimePos newTime = quantPos ? Note::quantized(time, quantization()) : time;
 
 		// We will keep the same outValue only if it's different from the
 		// inValue
@@ -435,7 +435,7 @@ void AutomationPattern::applyDragValue()
 
 
 
-float AutomationPattern::valueAt( const MidiTime & _time ) const
+float AutomationPattern::valueAt( const TimePos & _time ) const
 {
 	QMutexLocker m(&m_patternMutex);
 
@@ -521,7 +521,7 @@ float AutomationPattern::valueAt( timeMap::const_iterator v, int offset ) const
 
 
 
-float *AutomationPattern::valuesAfter( const MidiTime & _time ) const
+float *AutomationPattern::valuesAfter( const TimePos & _time ) const
 {
 	QMutexLocker m(&m_patternMutex);
 
@@ -566,7 +566,7 @@ void AutomationPattern::flipY(int min, int max)
 		{
 			tempValue = max - valueAt(POS(it));
 			outValueOffset = OFFSET(it) * -1.0;
-			putValues(MidiTime(POS(it)), tempValue, tempValue + outValueOffset, false, true);
+			putValues(TimePos(POS(it)), tempValue, tempValue + outValueOffset, false, true);
 		}
 		++it;
 	} while (it != m_timeMap.end());
@@ -622,7 +622,7 @@ void AutomationPattern::flipX(int length)
 			{
 				tempValue = INVAL(it);
 				tempOutValue = OUTVAL(it);
-				MidiTime newTime = MidiTime(length - POS(it));
+				TimePos newTime = TimePos(length - POS(it));
 
 				tempMap[newTime] = AutomationNode(this, tempValue, tempOutValue, newTime);
 
@@ -635,10 +635,10 @@ void AutomationPattern::flipX(int length)
 			{
 				tempValue = INVAL(it);
 				tempOutValue = OUTVAL(it);
-				MidiTime newTime;
+				TimePos newTime;
 
 				// Only flips the length to be flipped and keep the remaining values in place
-				newTime = MidiTime(POS(it) <= length ? length - POS(it) : POS(it));
+				newTime = TimePos(POS(it) <= length ? length - POS(it) : POS(it));
 
 				tempMap[newTime] = AutomationNode(this, tempValue, tempOutValue, newTime);
 
@@ -653,7 +653,7 @@ void AutomationPattern::flipX(int length)
 			tempValue = INVAL(it);
 			tempOutValue = OUTVAL(it);
 
-			MidiTime newTime = MidiTime(realLength - POS(it));
+			TimePos newTime = TimePos(realLength - POS(it));
 			tempMap[newTime] = AutomationNode(this, tempValue, tempOutValue, newTime);
 
 			++it;

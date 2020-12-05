@@ -30,13 +30,12 @@
 #include <QtCore/QMap>
 #include <QtCore/QPointer>
 
-#include "Track.h"
 #include "AutomationNode.h"
+#include "TrackContentObject.h"
 
 
 class AutomationTrack;
-class MidiTime;
-
+class TimePos;
 
 
 
@@ -76,29 +75,29 @@ public:
 	}
 	void setTension( QString _new_tension );
 
-	MidiTime timeMapLength() const;
+	TimePos timeMapLength() const;
 	void updateLength();
 
-	MidiTime putValue(
-		const MidiTime & time,
+	TimePos putValue(
+		const TimePos & time,
 		const float value,
 		const bool quantPos = true,
 		const bool ignoreSurroundingPoints = true
 	);
 
-	MidiTime putValues(
-		const MidiTime & time,
+	TimePos putValues(
+		const TimePos & time,
 		const float inValue,
 		const float outValue,
 		const bool quantPos = true,
 		const bool ignoreSurroundingPoints = true
 	);
 
-	void removeValue( const MidiTime & time );
+	void removeValue( const TimePos & time );
 
-	void recordValue(MidiTime time, float value);
+	void recordValue(TimePos time, float value);
 
-	MidiTime setDragValue( const MidiTime & time,
+	TimePos setDragValue( const TimePos & time,
 				const float value,
 				const bool quantPos = true,
 				const bool controlKey = false );
@@ -136,8 +135,8 @@ public:
 		return m_timeMap.isEmpty() == false;
 	}
 
-	float valueAt( const MidiTime & _time ) const;
-	float *valuesAfter( const MidiTime & _time ) const;
+	float valueAt( const TimePos & _time ) const;
+	float *valuesAfter( const TimePos & _time ) const;
 
 	const QString name() const;
 

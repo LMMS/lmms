@@ -70,7 +70,7 @@ class LMMS_EXPORT Lv2ControlBase : public LinkedModelGroups
 {
 public:
 	static Plugin::PluginTypes check(const LilvPlugin* m_plugin,
-		std::vector<PluginIssue> &issues, bool printIssues = false);
+		std::vector<PluginIssue> &issues);
 
 	const LilvPlugin* getPlugin() const { return m_plugin; }
 
@@ -134,7 +134,7 @@ protected:
 	QString nodeName() const { return "lv2controls"; }
 	bool hasNoteInput() const;
 	void handleMidiInputEvent(const class MidiEvent &event,
-		const class MidiTime &time, f_cnt_t offset);
+		const class TimePos &time, f_cnt_t offset);
 
 private:
 	//! Return the DataFile settings type

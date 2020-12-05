@@ -34,7 +34,7 @@
 
 #include "lmms_basics.h"
 #include "JournallingObject.h"
-#include "MidiTime.h"
+#include "TimePos.h"
 #include "AutomationPattern.h"
 #include "ComboBoxModel.h"
 #include "Knob.h"
@@ -132,7 +132,7 @@ protected slots:
 	void setProgressionType(int type);
 	void setTension();
 
-	void updatePosition( const MidiTime & t );
+	void updatePosition( const TimePos & t );
 
 	void zoomingXChanged();
 	void zoomingYChanged();
@@ -199,7 +199,7 @@ private:
 	QScrollBar * m_leftRightScroll;
 	QScrollBar * m_topBottomScroll;
 
-	MidiTime m_currentPosition;
+	TimePos m_currentPosition;
 
 	Actions m_action;
 
@@ -242,7 +242,7 @@ private:
 
 signals:
 	void currentPatternChanged();
-	void positionChanged( const MidiTime & );
+	void positionChanged( const TimePos & );
 } ;
 
 
