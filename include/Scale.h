@@ -45,7 +45,7 @@ public:
 
 	float getRatio() const
 	{
-		if (m_denominator) {return m_numerator / m_denominator;}
+		if (m_denominator) {return static_cast<float>(m_numerator) / m_denominator;}
 		else {return powf(2.f, m_cents / 1200.f);}
 	}
 
