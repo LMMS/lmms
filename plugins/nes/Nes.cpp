@@ -44,7 +44,7 @@ Plugin::Descriptor PLUGIN_EXPORT nes_plugin_descriptor =
 {
 	STRINGIFY( PLUGIN_NAME ),
 	"Nescaline",
-	QT_TRANSLATE_NOOP( "pluginBrowser",
+	QT_TRANSLATE_NOOP( "PluginBrowser",
 				"A NES-like synthesizer" ),
 	"Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>",
 	0x0100,
@@ -537,9 +537,9 @@ NesInstrument::NesInstrument( InstrumentTrack * instrumentTrack ) :
 	m_masterVol( 1.0f, 0.0f, 2.0f, 0.01f, this, tr( "Master volume" ) ),
 	m_vibrato( 0.0f, 0.0f, 15.0f, 1.0f, this, tr( "Vibrato" ) )
 {
-	connect( &m_ch1Crs, SIGNAL( dataChanged() ), this, SLOT( updateFreq1() ) );
-	connect( &m_ch2Crs, SIGNAL( dataChanged() ), this, SLOT( updateFreq2() ) );
-	connect( &m_ch3Crs, SIGNAL( dataChanged() ), this, SLOT( updateFreq3() ) );
+	connect( &m_ch1Crs, SIGNAL( dataChanged() ), this, SLOT( updateFreq1() ), Qt::DirectConnection );
+	connect( &m_ch2Crs, SIGNAL( dataChanged() ), this, SLOT( updateFreq2() ), Qt::DirectConnection );
+	connect( &m_ch3Crs, SIGNAL( dataChanged() ), this, SLOT( updateFreq3() ), Qt::DirectConnection );
 	
 	updateFreq1();
 	updateFreq2();

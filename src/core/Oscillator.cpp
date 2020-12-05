@@ -566,8 +566,7 @@ inline void Oscillator::recalcPhase()
 		m_phaseOffset = m_ext_phaseOffset;
 		m_phase += m_phaseOffset;
 	}
-	m_phase = absFraction( m_phase )+2;	// make sure we're not running
-						// negative when doing PM
+	m_phase = absFraction( m_phase );
 }
 
 

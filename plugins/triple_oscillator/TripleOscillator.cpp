@@ -49,7 +49,7 @@ Plugin::Descriptor PLUGIN_EXPORT tripleoscillator_plugin_descriptor =
 {
 	STRINGIFY( PLUGIN_NAME ),
 	"TripleOscillator",
-	QT_TRANSLATE_NOOP( "pluginBrowser",
+	QT_TRANSLATE_NOOP( "PluginBrowser",
 				"Three powerful oscillators you can modulate "
 				"in several ways" ),
 	"Tobias Doerffel <tobydox/at/users.sf.net>",
@@ -100,30 +100,31 @@ OscillatorObject::OscillatorObject( Model * _parent, int _idx ) :
 {
 	// Connect knobs with Oscillators' inputs
 	connect( &m_volumeModel, SIGNAL( dataChanged() ),
-					this, SLOT( updateVolume() ) );
+					this, SLOT( updateVolume() ), Qt::DirectConnection );
 	connect( &m_panModel, SIGNAL( dataChanged() ),
-					this, SLOT( updateVolume() ) );
+					this, SLOT( updateVolume() ), Qt::DirectConnection );
 	updateVolume();
 
 	connect( &m_coarseModel, SIGNAL( dataChanged() ),
-				this, SLOT( updateDetuningLeft() ) );
+				this, SLOT( updateDetuningLeft() ), Qt::DirectConnection );
 	connect( &m_coarseModel, SIGNAL( dataChanged() ),
-				this, SLOT( updateDetuningRight() ) );
+				this, SLOT( updateDetuningRight() ), Qt::DirectConnection );
 	connect( &m_fineLeftModel, SIGNAL( dataChanged() ),
-				this, SLOT( updateDetuningLeft() ) );
+				this, SLOT( updateDetuningLeft() ), Qt::DirectConnection );
 	connect( &m_fineRightModel, SIGNAL( dataChanged() ),
-				this, SLOT( updateDetuningRight() ) );
+				this, SLOT( updateDetuningRight() ), Qt::DirectConnection );
 	updateDetuningLeft();
 	updateDetuningRight();
 
 	connect( &m_phaseOffsetModel, SIGNAL( dataChanged() ),
-			this, SLOT( updatePhaseOffsetLeft() ) );
+			this, SLOT( updatePhaseOffsetLeft() ), Qt::DirectConnection );
 	connect( &m_phaseOffsetModel, SIGNAL( dataChanged() ),
-			this, SLOT( updatePhaseOffsetRight() ) );
+			this, SLOT( updatePhaseOffsetRight() ), Qt::DirectConnection );
 	connect( &m_stereoPhaseDetuningModel, SIGNAL( dataChanged() ),
-			this, SLOT( updatePhaseOffsetLeft() ) );
+			this, SLOT( updatePhaseOffsetLeft() ), Qt::DirectConnection );
 	connect ( &m_useWaveTableModel, SIGNAL(dataChanged()),
 			this, SLOT( updateUseWaveTable()));
+
 	updatePhaseOffsetLeft();
 	updatePhaseOffsetRight();
 

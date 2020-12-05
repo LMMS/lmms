@@ -61,7 +61,7 @@ public:
 	void addSpacingToToolBar( int _size );
 
 	// wrap the widget with a window decoration and add it to the workspace
-	LMMS_EXPORT SubWindow* addWindowedWidget(QWidget *w, Qt::WindowFlags windowFlags=0);
+	LMMS_EXPORT SubWindow* addWindowedWidget(QWidget *w, Qt::WindowFlags windowFlags = QFlag(0));
 
 
 	///
@@ -155,6 +155,7 @@ public slots:
 	void toggleFxMixerWin();
 	void togglePianoRollWin();
 	void toggleControllerRack();
+	void toggleFullscreen();
 
 	void updatePlayPauseIcons();
 
@@ -224,6 +225,8 @@ private:
 	ToolButton * m_metronomeToggle;
 
 	SessionState m_session;
+	
+	bool maximized;
 
 private slots:
 	void browseHelp();

@@ -44,10 +44,10 @@ public:
 	virtual ~MidiController();
 
 	virtual void processInEvent( const MidiEvent & _me,
-					const MidiTime & _time, f_cnt_t offset = 0 ) override;
+					const TimePos & _time, f_cnt_t offset = 0 ) override;
 
 	virtual void processOutEvent( const MidiEvent& _me,
-					const MidiTime & _time, f_cnt_t offset = 0 ) override
+					const TimePos & _time, f_cnt_t offset = 0 ) override
 	{
 		// No output yet
 	}

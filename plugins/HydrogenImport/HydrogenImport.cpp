@@ -29,7 +29,7 @@ Plugin::Descriptor PLUGIN_EXPORT hydrogenimport_plugin_descriptor =
 {
 	STRINGIFY( PLUGIN_NAME ),
 	"Hydrogen Import",
-	QT_TRANSLATE_NOOP( "pluginBrowser",
+	QT_TRANSLATE_NOOP( "PluginBrowser",
 				"Filter for importing Hydrogen files into LMMS" ),
 	"frank mather",
 	0x0100,
@@ -314,10 +314,8 @@ bool HydrogenImport::readSong()
 
 			int i = pattern_id[patId]+song_num_tracks;
 			Track *t = ( BBTrack * ) s->tracks().at( i );
- 			TrackContentObject *tco = t->createTCO( pos );      
-			tco->movePosition( pos );
+			t->createTCO(pos);
 
-			
 			if ( pattern_length[patId] > best_length ) 
 			{
 				best_length = pattern_length[patId];

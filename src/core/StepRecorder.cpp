@@ -43,7 +43,7 @@ void StepRecorder::initialize()
 	connect(&m_updateReleasedTimer, SIGNAL(timeout()), this, SLOT(removeNotesReleasedForTooLong()));
 }
 
-void StepRecorder::start(const MidiTime& currentPosition, const MidiTime& stepLength)
+void StepRecorder::start(const TimePos& currentPosition, const TimePos& stepLength)
 {
 	m_isRecording = true;
 
@@ -53,7 +53,7 @@ void StepRecorder::start(const MidiTime& currentPosition, const MidiTime& stepLe
 	const int q = m_pianoRoll.quantization();
 	const int curPosTicks = currentPosition.getTicks();
 	const int QuantizedPosTicks = (curPosTicks / q) * q;
-	const MidiTime& QuantizedPos = MidiTime(QuantizedPosTicks);
+	const TimePos& QuantizedPos = TimePos(QuantizedPosTicks);
 
 	m_curStepStartPos = QuantizedPos;
 	m_curStepLength = 0;
@@ -154,7 +154,7 @@ bool StepRecorder::keyPressEvent(QKeyEvent* ke)
 	return event_handled;
 }
 
-void StepRecorder::setStepsLength(const MidiTime& newLength)
+void StepRecorder::setStepsLength(const TimePos& newLength)
 {
 	if(m_isStepInProgress)
 	{
@@ -319,7 +319,7 @@ void StepRecorder::removeNotesReleasedForTooLong()
 	}
 }
 
-MidiTime StepRecorder::getCurStepEndPos()
+TimePos StepRecorder::getCurStepEndPos()
 {
 	return m_curStepStartPos + m_curStepLength;
 }

@@ -51,7 +51,7 @@ Plugin::Descriptor PLUGIN_EXPORT organic_plugin_descriptor =
 {
 	STRINGIFY( PLUGIN_NAME ),
 	"Organic",
-	QT_TRANSLATE_NOOP( "pluginBrowser",
+	QT_TRANSLATE_NOOP( "PluginBrowser",
 				"Additive Synthesizer for organ-like sounds" ),
 	"Andreas Brandmaier <andreas/at/brandmaier.de>",
 	0x0100,

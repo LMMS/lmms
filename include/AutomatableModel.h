@@ -30,7 +30,7 @@
 
 #include "JournallingObject.h"
 #include "Model.h"
-#include "MidiTime.h"
+#include "TimePos.h"
 #include "ValueBuffer.h"
 #include "MemoryManager.h"
 #include "ModelVisitor.h"
@@ -148,7 +148,7 @@ public:
 	template<class T>
 	inline T value( int frameOffset = 0 ) const
 	{
-		if( unlikely( hasLinkedModels() || m_controllerConnection != NULL ) )
+		if( hasLinkedModels() || m_controllerConnection != NULL )
 		{
 			return castValue<T>( controllerValue( frameOffset ) );
 		}
@@ -281,7 +281,7 @@ public:
 		return false;
 	}
 
-	float globalAutomationValueAt( const MidiTime& time );
+	float globalAutomationValueAt( const TimePos& time );
 
 	void setStrictStepSize( const bool b )
 	{

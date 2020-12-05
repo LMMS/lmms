@@ -49,7 +49,7 @@ MidiWinMM::~MidiWinMM()
 
 
 
-void MidiWinMM::processOutEvent( const MidiEvent& event, const MidiTime& time, const MidiPort* port )
+void MidiWinMM::processOutEvent( const MidiEvent& event, const TimePos& time, const MidiPort* port )
 {
 	const DWORD shortMsg = ( event.type() + event.channel() ) +
 				( ( event.param( 0 ) & 0xff ) << 8 ) +

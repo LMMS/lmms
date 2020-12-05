@@ -33,6 +33,7 @@
 #include "Lv2SubPluginFeatures.h"
 #include "Mixer.h"
 #include "StringPairDrag.h"
+#include "Clipboard.h"
 
 #include "embed.h"
 #include "plugin_export.h"
@@ -40,11 +41,14 @@
 
 
 
+extern "C"
+{
+
 Plugin::Descriptor PLUGIN_EXPORT lv2instrument_plugin_descriptor =
 {
 	STRINGIFY(PLUGIN_NAME),
 	"LV2",
-	QT_TRANSLATE_NOOP("pluginBrowser",
+	QT_TRANSLATE_NOOP("PluginBrowser",
 		"plugin for using arbitrary LV2 instruments inside LMMS."),
 	"Johannes Lorenz <jlsf2013$$$users.sourceforge.net, $$$=@>",
 	0x0100,
@@ -53,6 +57,8 @@ Plugin::Descriptor PLUGIN_EXPORT lv2instrument_plugin_descriptor =
 	nullptr,
 	new Lv2SubPluginFeatures(Plugin::Instrument)
 };
+
+}
 
 
 
@@ -128,13 +134,11 @@ void Lv2Instrument::loadFile(const QString &file)
 
 #ifdef LV2_INSTRUMENT_USE_MIDI
 bool Lv2Instrument::handleMidiEvent(
-	const MidiEvent &event, const MidiTime &time, f_cnt_t offset)
+	const MidiEvent &event, const TimePos &time, f_cnt_t offset)
 {
-	// this function can be called from GUI threads while the plugin is running,
-	// so this requires caching, e.g. in ringbuffers
-	(void)time;
-	(void)offset;
-	(void)event;
+	// this function can be called from GUI threads while the plugin is running
+	// handleMidiInputEvent will use a thread-safe ringbuffer
+	handleMidiInputEvent(event, time, offset);
 	return true;
 }
 #endif
@@ -160,6 +164,7 @@ void Lv2Instrument::play(sampleFrame *buf)
 
 	run(fpp);
 
+	copyModelsToLmms();
 	copyBuffersToLmms(buf, fpp);
 
 	instrumentTrack()->processAudioBuffer(buf, fpp, nullptr);
@@ -221,7 +226,7 @@ Lv2InsView::Lv2InsView(Lv2Instrument *_instrument, QWidget *_parent) :
 	setAutoFillBackground(true);
 	if (m_reloadPluginButton) {
 		connect(m_reloadPluginButton, &QPushButton::clicked,
-			this, [this](){ castModel<Lv2Instrument>()->reloadPlugin();} );
+			this, [this](){ this->castModel<Lv2Instrument>()->reloadPlugin();} );
 	}
 	if (m_toggleUIButton) {
 		connect(m_toggleUIButton, &QPushButton::toggled,
@@ -238,12 +243,15 @@ Lv2InsView::Lv2InsView(Lv2Instrument *_instrument, QWidget *_parent) :
 
 void Lv2InsView::dragEnterEvent(QDragEnterEvent *_dee)
 {
+	// For mimeType() and MimeType enum class
+	using namespace Clipboard;
+
 	void (QDragEnterEvent::*reaction)(void) = &QDragEnterEvent::ignore;
 
-	if (_dee->mimeData()->hasFormat(StringPairDrag::mimeType()))
+	if (_dee->mimeData()->hasFormat( mimeType( MimeType::StringPair )))
 	{
 		const QString txt =
-			_dee->mimeData()->data(StringPairDrag::mimeType());
+			_dee->mimeData()->data( mimeType( MimeType::StringPair ) );
 		if (txt.section(':', 0, 0) == "pluginpresetfile") {
 			reaction = &QDragEnterEvent::acceptProposedAction;
 		}
@@ -266,13 +274,6 @@ void Lv2InsView::dropEvent(QDropEvent *_de)
 		return;
 	}
 	_de->ignore();
-}
-
-
-
-
-void Lv2InsView::toggleUI()
-{
 }
 
 

@@ -29,6 +29,7 @@
 #include "gui_templates.h"
 #include "InstrumentPlayHandle.h"
 #include "InstrumentTrack.h"
+#include "MidiEventToByteSeq.h"
 #include "Mixer.h"
 
 #include <QApplication>
@@ -141,20 +142,14 @@ CarlaInstrument::CarlaInstrument(InstrumentTrack* const instrumentTrack, const D
     fHost.uiParentId  = 0;
 
     // carla/resources contains PyQt scripts required for launch
-    QString dllName(carla_get_library_filename());
-    QString resourcesPath;
+    QDir path(carla_get_library_folder());
 #if defined(CARLA_OS_LINUX)
-    // parse prefix from dll filename
-    QDir path = QFileInfo(dllName).dir();
     path.cdUp();
     path.cdUp();
-    resourcesPath = path.absolutePath() + "/share/carla/resources";
-#elif defined(CARLA_OS_MAC)
+    QString resourcesPath = path.absolutePath() + "/share/carla/resources";
+#else
     // parse prefix from dll filename
-    QDir path = QFileInfo(dllName).dir();
-    resourcesPath = path.absolutePath() + "/resources";
-#elif defined(CARLA_OS_WIN32) || defined(CARLA_OS_WIN64)
-    // not yet supported
+    QString resourcesPath = path.absolutePath() + "/resources";
 #endif
     fHost.resourceDir            = strdup(resourcesPath.toUtf8().constData());
     fHost.get_buffer_size        = host_get_buffer_size;
@@ -360,7 +355,7 @@ void CarlaInstrument::play(sampleFrame* workingBuffer)
     instrumentTrack()->processAudioBuffer(workingBuffer, bufsize, NULL);
 }
 
-bool CarlaInstrument::handleMidiEvent(const MidiEvent& event, const MidiTime&, f_cnt_t offset)
+bool CarlaInstrument::handleMidiEvent(const MidiEvent& event, const TimePos&, f_cnt_t offset)
 {
     const QMutexLocker ml(&fMutex);
 
@@ -372,69 +367,9 @@ bool CarlaInstrument::handleMidiEvent(const MidiEvent& event, const MidiTime&, f
 
     nEvent.port    = 0;
     nEvent.time    = offset;
-    nEvent.data[0] = event.type() | (event.channel() & 0x0F);
-
-    switch (event.type())
-    {
-    case MidiNoteOn:
-        if (event.velocity() > 0)
-        {
-            if (event.key() < 0 || event.key() > MidiMaxKey)
-                break;
-
-            nEvent.data[1] = event.key();
-            nEvent.data[2] = event.velocity();
-            nEvent.size    = 3;
-            break;
-        }
-        else
-        {
-            nEvent.data[0] = MidiNoteOff | (event.channel() & 0x0F);
-            // nobreak
-        }
-
-    case MidiNoteOff:
-        if (event.key() < 0 || event.key() > MidiMaxKey)
-            break;
-
-        nEvent.data[1] = event.key();
-        nEvent.data[2] = event.velocity();
-        nEvent.size    = 3;
-        break;
-
-    case MidiKeyPressure:
-        nEvent.data[1] = event.key();
-        nEvent.data[2] = event.velocity();
-        nEvent.size    = 3;
-        break;
-
-    case MidiControlChange:
-        nEvent.data[1] = event.controllerNumber();
-        nEvent.data[2] = event.controllerValue();
-        nEvent.size    = 3;
-        break;
-
-    case MidiProgramChange:
-        nEvent.data[1] = event.program();
-        nEvent.size    = 2;
-        break;
-
-    case MidiChannelPressure:
-        nEvent.data[1] = event.channelPressure();
-        nEvent.size    = 2;
-        break;
-
-    case MidiPitchBend:
-        nEvent.data[1] = event.pitchBend() & 0x7f;
-        nEvent.data[2] = event.pitchBend() >> 7;
-        nEvent.size    = 3;
-        break;
-
-    default:
-        // unhandled
-        --fMidiEventCount;
-        break;
-    }
+    std::size_t written = writeToByteSeq(event, nEvent.data, sizeof(NativeMidiEvent::data));
+    if(written) { nEvent.size = written; }
+    else { --fMidiEventCount; }
 
     return true;
 }
@@ -503,8 +438,20 @@ CarlaInstrumentView::~CarlaInstrumentView()
 
 void CarlaInstrumentView::toggleUI(bool visible)
 {
-    if (fHandle != NULL && fDescriptor->ui_show != NULL)
+    if (fHandle != NULL && fDescriptor->ui_show != NULL) {
+// TODO: remove when fixed upstream
+// change working path to location of carla.dll to avoid conflict with lmms
+#if defined(CARLA_OS_WIN32) || defined(CARLA_OS_WIN64)
+        if (visible) {
+            QString backupDir = QDir::currentPath();
+            QDir::setCurrent(carla_get_library_folder());
+            fDescriptor->ui_show(fHandle, true);
+            QDir::setCurrent(backupDir);
+            return;
+        }
+#endif
         fDescriptor->ui_show(fHandle, visible);
+    }
 }
 
 void CarlaInstrumentView::uiClosed()

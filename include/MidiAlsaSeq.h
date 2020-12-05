@@ -66,7 +66,7 @@ public:
 
 
 	virtual void processOutEvent( const MidiEvent & _me,
-						const MidiTime & _time,
+						const TimePos & _time,
 						const MidiPort * _port ) override;
 
 	void applyPortMode( MidiPort * _port ) override;

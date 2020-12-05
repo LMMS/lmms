@@ -34,16 +34,20 @@
 #include <QObject>
 
 #include "Lv2Basics.h"
+#include "Lv2Features.h"
 #include "LinkedModelGroups.h"
+#include "MidiEvent.h"
 #include "Plugin.h"
 #include "PluginIssue.h"
-
+#include "../src/3rdparty/ringbuffer/include/ringbuffer/ringbuffer.h"
+#include "TimePos.h"
 
 // forward declare port structs/enums
 namespace Lv2Ports
 {
 	struct Audio;
 	struct PortBase;
+	struct AtomSeq;
 
 	enum class Type;
 	enum class Flow;
@@ -57,7 +61,7 @@ class Lv2Proc : public LinkedModelGroup
 {
 public:
 	static Plugin::PluginTypes check(const LilvPlugin* plugin,
-		std::vector<PluginIssue> &issues, bool printIssues = false);
+		std::vector<PluginIssue> &issues);
 
 	/*
 		ctor/dtor
@@ -105,8 +109,11 @@ public:
 	/*
 		utils for the run thread
 	*/
-	//! Copy values from all connected models into the respective ports
+	//! Copy values from the LMMS core (connected models, MIDI events, ...) into
+	//! the respective ports
 	void copyModelsFromCore();
+	//! Bring values from all ports to the LMMS core
+	void copyModelsToCore();
 	/**
 	 * Copy buffer passed by the core into our ports
 	 * @param buf buffer of sample frames, each sample frame is something like
@@ -136,11 +143,15 @@ public:
 	//! Run the Lv2 plugin instance for @param frames frames
 	void run(fpp_t frames);
 
+	void handleMidiInputEvent(const class MidiEvent &event,
+		const TimePos &time, f_cnt_t offset);
+
 	/*
 		misc
 	 */
 	class AutomatableModel *modelAtPort(const QString &uri); // unused currently
 	std::size_t controlCount() const { return LinkedModelGroup::modelNum(); }
+	bool hasNoteInput() const;
 
 protected:
 	/*
@@ -156,12 +167,32 @@ private:
 
 	const LilvPlugin* m_plugin;
 	LilvInstance* m_instance;
+	Lv2Features m_features;
 
+	// full list of ports
 	std::vector<std::unique_ptr<Lv2Ports::PortBase>> m_ports;
+	// quick reference to specific, unique ports
 	StereoPortRef m_inPorts, m_outPorts;
+	Lv2Ports::AtomSeq *m_midiIn = nullptr, *m_midiOut = nullptr;
+
+	// MIDI
+	// many things here may be moved into the `Instrument` class
+	constexpr const static std::size_t m_maxMidiInputEvents = 1024;
+	//! spinlock for the MIDI ringbuffer (for MIDI events going to the plugin)
+	std::atomic_flag m_ringLock = ATOMIC_FLAG_INIT;
+
+	//! MIDI ringbuffer (for MIDI events going to the plugin)
+	ringbuffer_t<struct MidiInputEvent> m_midiInputBuf;
+	//! MIDI ringbuffer reader
+	ringbuffer_reader_t<struct MidiInputEvent> m_midiInputReader;
+
+	// other
+	static std::size_t minimumEvbufSize() { return 1 << 15; /* ardour uses this*/ }
 
 	//! models for the controls, sorted by port symbols
 	std::map<std::string, AutomatableModel *> m_connectedModels;
+
+	void initPluginSpecificFeatures();
 
 	//! load a file in the plugin, but don't do anything in LMMS
 	void loadFileInternal(const QString &file);

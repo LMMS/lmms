@@ -67,7 +67,7 @@ public:
 		return IsSingleStreamed | IsMidiBased;
 	}
 
-	virtual bool handleMidiEvent( const MidiEvent& event, const MidiTime& time, f_cnt_t offset = 0 );
+	virtual bool handleMidiEvent( const MidiEvent& event, const TimePos& time, f_cnt_t offset = 0 );
 
 	virtual PluginView * instantiateView( QWidget * _parent );
 

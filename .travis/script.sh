@@ -13,7 +13,7 @@ if [ "$TYPE" = 'style' ]; then
 
 else
 
-	export CMAKE_FLAGS="-DCMAKE_BUILD_TYPE=RelWithDebInfo"
+	export CMAKE_FLAGS="-DCMAKE_BUILD_TYPE=RelWithDebInfo -DBUNDLE_QT_TRANSLATIONS=ON"
 
 	if [ -z "$TRAVIS_TAG" ]; then
 		export CMAKE_FLAGS="$CMAKE_FLAGS -DUSE_CCACHE=ON"

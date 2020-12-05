@@ -63,7 +63,7 @@ public:
 	}
 
 
-	void processInEvent( const MidiEvent& event, const MidiTime& time, f_cnt_t offset = 0 ) override
+	void processInEvent( const MidiEvent& event, const TimePos& time, f_cnt_t offset = 0 ) override
 	{
 		if( event.type() == MidiControlChange &&
 			( m_midiPort.inputChannel() == 0 || m_midiPort.inputChannel() == event.channel() + 1 ) )
@@ -187,7 +187,7 @@ ControllerConnectionDialog::ControllerConnectionDialog( QWidget * _parent,
 			this, SLOT( userToggled() ) );
 
 	m_userController = new ComboBox( m_userGroupBox, "Controller" );
-	m_userController->setGeometry( 10, 24, 200, 22 );
+	m_userController->setGeometry( 10, 24, 200, ComboBox::DEFAULT_HEIGHT );
 	for (Controller * c : Engine::getSong()->controllers())
 	{
 		m_userController->model()->addItem( c->name() );

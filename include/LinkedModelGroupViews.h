@@ -98,7 +98,7 @@ protected:
 	void modelChanged(class LinkedModelGroups* ctrlBase);
 
 private:
-	//! The base class must return the adressed group view,
+	//! The base class must return the addressed group view,
 	//! which has the same value as "this"
 	virtual LinkedModelGroupView* getGroupView() = 0;
 };

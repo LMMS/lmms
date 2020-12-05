@@ -26,7 +26,9 @@
 
 #ifdef LMMS_HAVE_LV2
 
+#include <algorithm>
 #include <cstdlib>
+#include <cstring>
 #include <lilv/lilv.h>
 #include <lv2.h>
 #include <QDebug>
@@ -35,6 +37,7 @@
 #include <QElapsedTimer>
 
 #include "ConfigManager.h"
+#include "Engine.h"
 #include "Plugin.h"
 #include "PluginFactory.h"
 #include "Lv2ControlBase.h"
@@ -43,13 +46,27 @@
 
 
 
-Lv2Manager::Lv2Manager()
+const std::set<const char*, Lv2Manager::CmpStr> Lv2Manager::pluginBlacklist =
+{
+	// github.com/calf-studio-gear/calf, #278
+	"http://calf.sourceforge.net/plugins/Analyzer",
+	"http://calf.sourceforge.net/plugins/BassEnhancer"
+};
+
+
+
+
+Lv2Manager::Lv2Manager() :
+	m_uridCache(m_uridMap)
 {
 	const char* dbgStr = getenv("LMMS_LV2_DEBUG");
 	m_debug = (dbgStr && *dbgStr);
 
 	m_world = lilv_world_new();
 	lilv_world_load_all(m_world);
+
+	m_supportedFeatureURIs.insert(LV2_URID__map);
+	m_supportedFeatureURIs.insert(LV2_URID__unmap);
 }
 
 
@@ -95,17 +112,40 @@ void Lv2Manager::initPlugins()
 	QElapsedTimer timer;
 	timer.start();
 
+	unsigned blacklisted = 0;
 	LILV_FOREACH(plugins, itr, plugins)
 	{
 		const LilvPlugin* curPlug = lilv_plugins_get(plugins, itr);
 
 		std::vector<PluginIssue> issues;
-		Plugin::PluginTypes type = Lv2ControlBase::check(curPlug, issues, m_debug);
+		Plugin::PluginTypes type = Lv2ControlBase::check(curPlug, issues);
+		std::sort(issues.begin(), issues.end());
+		auto last = std::unique(issues.begin(), issues.end());
+		issues.erase(last, issues.end());
+		if (m_debug && issues.size())
+		{
+			qDebug() << "Lv2 plugin"
+				<< qStringFromPluginNode(curPlug, lilv_plugin_get_name)
+				<< "(URI:"
+				<< lilv_node_as_uri(lilv_plugin_get_uri(curPlug))
+				<< ") can not be loaded:";
+			for (const PluginIssue& iss : issues) { qDebug() << "  - " << iss; }
+		}
+
 		Lv2Info info(curPlug, type, issues.empty());
 
 		m_lv2InfoMap[lilv_node_as_uri(lilv_plugin_get_uri(curPlug))]
 			= std::move(info);
 		if(issues.empty()) { ++pluginsLoaded; }
+		else
+		{
+			if(std::any_of(issues.begin(), issues.end(),
+				[](const PluginIssue& iss) {
+				return iss.type() == PluginIssueType::blacklisted; }))
+			{
+				++blacklisted;
+			}
+		}
 		++pluginCount;
 	}
 
@@ -128,6 +168,38 @@ void Lv2Manager::initPlugins()
 				"  environment variable \"LMMS_LV2_DEBUG\" to nonempty.";
 		}
 	}
+
+	// TODO: might be better in the LMMS core
+	if(Engine::ignorePluginBlacklist())
+	{
+		qWarning() <<
+			"WARNING! Plugin blacklist disabled! If you want to use the blacklist,\n"
+			"  please set environment variable \"LMMS_IGNORE_BLACKLIST\" to empty or\n"
+			"  do not set it.";
+	}
+	else if(blacklisted > 0)
+	{
+		qDebug() <<
+			"Lv2 Plugins blacklisted:" << blacklisted << "of" << pluginCount << "\n"
+			"  If you want to ignore the blacklist (dangerous!), please set\n"
+			"  environment variable \"LMMS_IGNORE_BLACKLIST\" to nonempty.";
+	}
+}
+
+
+
+
+bool Lv2Manager::CmpStr::operator()(const char *a, const char *b) const
+{
+	return std::strcmp(a, b) < 0;
+}
+
+
+
+
+bool Lv2Manager::isFeatureSupported(const char *featName) const
+{
+	return m_supportedFeatureURIs.find(featName) != m_supportedFeatureURIs.end();
 }
 
 

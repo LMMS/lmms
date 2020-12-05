@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2007-2008 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
  * Copyright (c) 2009-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -32,15 +32,16 @@
 #include "ConfigManager.h"
 #include "endian_handling.h"
 #include "Engine.h"
+#include "FileDialog.h"
 #include "gui_templates.h"
 #include "InstrumentTrack.h"
 #include "NotePlayHandle.h"
+#include "PathUtil.h"
 #include "PixmapButton.h"
 #include "Song.h"
 #include "StringPairDrag.h"
 #include "ToolTip.h"
-#include "FileDialog.h"
-#include "ConfigManager.h"
+#include "Clipboard.h"
 
 #include "embed.h"
 
@@ -54,7 +55,7 @@ Plugin::Descriptor PLUGIN_EXPORT patman_plugin_descriptor =
 {
 	STRINGIFY( PLUGIN_NAME ),
 	"PatMan",
-	QT_TRANSLATE_NOOP( "pluginBrowser",
+	QT_TRANSLATE_NOOP( "PluginBrowser",
 				"GUS-compatible patch instrument" ),
 	"Javier Serrano Polo <jasp00/at/users.sourceforge.net>",
 	0x0100,
@@ -192,14 +193,13 @@ void patmanInstrument::setFile( const QString & _patch_file, bool _rename )
 				   	m_patchFile == "" ) )
 	{
 		// then set it to new one
-		instrumentTrack()->setName( QFileInfo( _patch_file
-								).fileName() );
+		instrumentTrack()->setName( PathUtil::cleanName( _patch_file ) );
 	}
 	// else we don't touch the instrument-track-name, because the user
 	// named it self
 
-	m_patchFile = SampleBuffer::tryToMakeRelative( _patch_file );
-	LoadErrors error = loadPatch( SampleBuffer::tryToMakeAbsolute( _patch_file ) );
+	m_patchFile = PathUtil::toShortestRelative( _patch_file );
+	LoadErrors error = loadPatch( PathUtil::toAbsolute( _patch_file ) );
 	if( error )
 	{
 		printf("Load error\n");
@@ -581,10 +581,13 @@ void PatmanView::updateFilename( void )
 
 void PatmanView::dragEnterEvent( QDragEnterEvent * _dee )
 {
-	if( _dee->mimeData()->hasFormat( StringPairDrag::mimeType() ) )
+	// For mimeType() and MimeType enum class
+	using namespace Clipboard;
+
+	if( _dee->mimeData()->hasFormat( mimeType( MimeType::StringPair ) ) )
 	{
 		QString txt = _dee->mimeData()->data(
-						StringPairDrag::mimeType() );
+						mimeType( MimeType::StringPair ) );
 		if( txt.section( ':', 0, 0 ) == "samplefile" )
 		{
 			_dee->acceptProposedAction();
@@ -625,8 +628,8 @@ void PatmanView::paintEvent( QPaintEvent * )
 	QPainter p( this );
 
 	p.setFont( pointSize<8>( font() ) );
-	p.drawText( 8, 116, 235, 16, 
-			Qt::AlignLeft | Qt::TextSingleLine | Qt::AlignVCenter, 
+	p.drawText( 8, 116, 235, 16,
+			Qt::AlignLeft | Qt::TextSingleLine | Qt::AlignVCenter,
 			m_displayFilename );
 }
 
@@ -641,8 +644,3 @@ void PatmanView::modelChanged( void )
 	connect( m_pi, SIGNAL( fileChanged() ),
 			this, SLOT( updateFilename() ) );
 }
-
-
-
-
-

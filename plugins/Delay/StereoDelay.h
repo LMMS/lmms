@@ -45,7 +45,7 @@ public:
 		m_feedback = feedback;
 	}
 
-	void tick( sampleFrame frame );
+	void tick( sampleFrame& frame );
 	void setSampleRate( int sampleRate );
 
 private:
