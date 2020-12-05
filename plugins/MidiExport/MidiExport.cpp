@@ -35,6 +35,7 @@
 #include "lmms_math.h"
 #include "TrackContainer.h"
 #include "BBTrack.h"
+#include "DataFile.h"
 #include "InstrumentTrack.h"
 #include "LocaleHelper.h"
 

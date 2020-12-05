@@ -29,15 +29,18 @@
 #include <QApplication>
 #include <QLayout>
 #include <QMdiArea>
+#include <QScrollBar>
 #include <QWheelEvent>
 
 #include "TrackContainer.h"
 #include "BBTrack.h"
+#include "DataFile.h"
 #include "MainWindow.h"
 #include "Mixer.h"
 #include "FileBrowser.h"
 #include "ImportFilter.h"
 #include "Instrument.h"
+#include "InstrumentTrack.h"
 #include "Song.h"
 #include "StringPairDrag.h"
 #include "GuiApplication.h"

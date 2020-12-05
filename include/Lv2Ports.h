@@ -61,10 +61,10 @@ enum class Type {
 //! Port visualization
 //! @note All Lv2 audio ports are float, this is only the visualisation
 enum class Vis {
-	None,
-	Integer,
-	Enumeration,
-	Toggled
+	Generic, //!< nothing specific, a generic knob or slider shall be used
+	Integer, //!< counter
+	Enumeration, //!< selection from enumerated values
+	Toggled //!< boolean widget
 };
 
 const char* toStr(Lv2Ports::Flow pf);
@@ -106,7 +106,7 @@ struct Meta
 {
 	Type m_type = Type::Unknown;
 	Flow m_flow = Flow::Unknown;
-	Vis m_vis = Vis::None;
+	Vis m_vis = Vis::Generic;
 
 	bool m_logarithmic = false;
 

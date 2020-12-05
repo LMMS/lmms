@@ -471,7 +471,7 @@ void Lv2Proc::createPort(std::size_t portNum)
 				}
 				switch (meta.m_vis)
 				{
-					case Lv2Ports::Vis::None:
+					case Lv2Ports::Vis::Generic:
 					{
 						// allow ~1000 steps
 						float stepSize = (meta.max(sr) - meta.min(sr)) / 1000.0f;

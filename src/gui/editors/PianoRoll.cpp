@@ -53,6 +53,7 @@
 #include "Clipboard.h"
 #include "ComboBox.h"
 #include "ConfigManager.h"
+#include "DataFile.h"
 #include "debug.h"
 #include "DeprecationHelper.h"
 #include "DetuningHelper.h"

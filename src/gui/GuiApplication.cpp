@@ -34,6 +34,7 @@
 #include "ConfigManager.h"
 #include "ControllerRackView.h"
 #include "FxMixerView.h"
+#include "InstrumentTrack.h"
 #include "MainWindow.h"
 #include "MicrotunerConfig.h"
 #include "PianoRoll.h"
