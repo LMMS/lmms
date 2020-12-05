@@ -45,15 +45,16 @@
 #endif
 
 #include "ActionGroup.h"
+#include "AutomationNode.h"
 #include "BBTrackContainer.h"
 #include "ComboBox.h"
 #include "debug.h"
 #include "DeprecationHelper.h"
-#include "GuiApplication.h"
-#include "MainWindow.h"
 #include "embed.h"
 #include "Engine.h"
+#include "GuiApplication.h"
 #include "gui_templates.h"
+#include "MainWindow.h"
 #include "PianoRoll.h"
 #include "ProjectJournal.h"
 #include "SongEditor.h"
@@ -61,7 +62,6 @@
 #include "TextFloat.h"
 #include "TimeLineWidget.h"
 #include "ToolTip.h"
-#include "AutomationNode.h"
 
 
 QPixmap * AutomationEditor::s_toolDraw = nullptr;

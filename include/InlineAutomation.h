@@ -25,8 +25,8 @@
 #ifndef INLINE_AUTOMATION_H
 #define INLINE_AUTOMATION_H
 
-#include "AutomationPattern.h"
 #include "AutomationNode.h"
+#include "AutomationPattern.h"
 #include "shared_object.h"
 
 
