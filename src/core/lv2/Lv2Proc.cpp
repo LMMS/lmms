@@ -50,7 +50,7 @@
 struct MidiInputEvent
 {
 	MidiEvent ev;
-	MidiTime time;
+	TimePos time;
 	f_cnt_t offset;
 };
 
@@ -320,7 +320,7 @@ void Lv2Proc::run(fpp_t frames)
 // in case there will be a PR which removes this callback and instead adds a
 // `ringbuffer_t<MidiEvent + time info>` to `class Instrument`, this
 // function (and the ringbuffer and its reader in `Lv2Proc`) will simply vanish
-void Lv2Proc::handleMidiInputEvent(const MidiEvent &event, const MidiTime &time, f_cnt_t offset)
+void Lv2Proc::handleMidiInputEvent(const MidiEvent &event, const TimePos &time, f_cnt_t offset)
 {
 	if(m_midiIn)
 	{
@@ -471,7 +471,7 @@ void Lv2Proc::createPort(std::size_t portNum)
 				}
 				switch (meta.m_vis)
 				{
-					case Lv2Ports::Vis::None:
+					case Lv2Ports::Vis::Generic:
 					{
 						// allow ~1000 steps
 						float stepSize = (meta.max(sr) - meta.min(sr)) / 1000.0f;

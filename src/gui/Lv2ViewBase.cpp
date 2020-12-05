@@ -67,7 +67,7 @@ Lv2ViewProc::Lv2ViewProc(QWidget* parent, Lv2Proc* ctrlBase, int colNum) :
 
 				switch (port.m_vis)
 				{
-					case PortVis::None:
+					case PortVis::Generic:
 						m_control = new KnobControl(m_par);
 						break;
 					case PortVis::Integer:

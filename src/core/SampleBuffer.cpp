@@ -195,11 +195,10 @@ void SampleBuffer::update(bool keepSettings)
 		{
 			// Use QFile to handle unicode file names on Windows
 			QFile f(file);
-			f.open(QIODevice::ReadOnly);
 			SNDFILE * sndFile;
 			SF_INFO sfInfo;
 			sfInfo.format = 0;
-			if ((sndFile = sf_open_fd(f.handle(), SFM_READ, &sfInfo, false)) != nullptr)
+			if (f.open(QIODevice::ReadOnly) && (sndFile = sf_open_fd(f.handle(), SFM_READ, &sfInfo, false)))
 			{
 				f_cnt_t frames = sfInfo.frames;
 				int rate = sfInfo.samplerate;
@@ -393,8 +392,7 @@ f_cnt_t SampleBuffer::decodeSampleSF(
 
 	// Use QFile to handle unicode file names on Windows
 	QFile f(fileName);
-	f.open(QIODevice::ReadOnly);
-	if ((sndFile = sf_open_fd(f.handle(), SFM_READ, &sfInfo, false)) != nullptr)
+	if (f.open(QIODevice::ReadOnly) && (sndFile = sf_open_fd(f.handle(), SFM_READ, &sfInfo, false)))
 	{
 		frames = sfInfo.frames;
 

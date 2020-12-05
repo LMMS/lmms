@@ -170,7 +170,7 @@ jobs:
     environment:
       <<: *common_environment
     macos:
-      xcode: "9.4.1"
+      xcode: "10.3.0"
     steps:
       - checkout
       - *init

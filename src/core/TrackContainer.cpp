@@ -248,13 +248,13 @@ bool TrackContainer::isEmpty() const
 
 
 
-AutomatedValueMap TrackContainer::automatedValuesAt(MidiTime time, int tcoNum) const
+AutomatedValueMap TrackContainer::automatedValuesAt(TimePos time, int tcoNum) const
 {
 	return automatedValuesFromTracks(tracks(), time, tcoNum);
 }
 
 
-AutomatedValueMap TrackContainer::automatedValuesFromTracks(const TrackList &tracks, MidiTime time, int tcoNum)
+AutomatedValueMap TrackContainer::automatedValuesFromTracks(const TrackList &tracks, TimePos time, int tcoNum)
 {
 	Track::tcoVector tcos;
 
@@ -295,7 +295,7 @@ AutomatedValueMap TrackContainer::automatedValuesFromTracks(const TrackList &tra
 			if (! p->hasAutomation()) {
 				continue;
 			}
-			MidiTime relTime = time - p->startPosition();
+			TimePos relTime = time - p->startPosition();
 			if (! p->getAutoResize()) {
 				relTime = qMin(relTime, p->length());
 			}
@@ -311,9 +311,9 @@ AutomatedValueMap TrackContainer::automatedValuesFromTracks(const TrackList &tra
 			auto bbIndex = dynamic_cast<class BBTrack*>(bb->getTrack())->index();
 			auto bbContainer = Engine::getBBTrackContainer();
 
-			MidiTime bbTime = time - tco->startPosition();
+			TimePos bbTime = time - tco->startPosition();
 			bbTime = std::min(bbTime, tco->length());
-			bbTime = bbTime % (bbContainer->lengthOfBB(bbIndex) * MidiTime::ticksPerBar());
+			bbTime = bbTime % (bbContainer->lengthOfBB(bbIndex) * TimePos::ticksPerBar());
 
 			auto bbValues = bbContainer->automatedValuesAt(bbTime, bbIndex);
 			for (auto it=bbValues.begin(); it != bbValues.end(); it++)
