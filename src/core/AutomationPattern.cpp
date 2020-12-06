@@ -82,6 +82,10 @@ AutomationPattern::AutomationPattern( const AutomationPattern & _pat_to_copy ) :
 	m_tension( _pat_to_copy.m_tension ),
 	m_progressionType( _pat_to_copy.m_progressionType )
 {
+	// Locks the mutex of the copied AutomationPattern to make sure it
+	// doesn't change while it's being copied
+	QMutexLocker m(&_pat_to_copy.m_patternMutex);
+
 	for( timeMap::const_iterator it = _pat_to_copy.m_timeMap.begin();
 				it != _pat_to_copy.m_timeMap.end(); ++it )
 	{
@@ -365,7 +369,7 @@ void AutomationPattern::recordValue(TimePos time, float value)
 /**
  * @brief Set the position of the point that is being dragged.
  *        Calling this function will also automatically set m_dragging to true.
- *        When applyDragValue() is called to m_dragging is set back to false.
+ *        When applyDragValue() is called, m_dragging is set back to false.
  * @param TimePos of the node being dragged
  * @param Float with the value to assign to the point being dragged
  * @param Boolean. True to snip x position
@@ -390,7 +394,7 @@ TimePos AutomationPattern::setDragValue(
 		m_dragKeepOutValue = false;
 
 		// Check if we already have a node on the position we are dragging
-		// and if we do, store the valueOffset so the discrete jump can be kept
+		// and if we do, store the outValue so the discrete jump can be kept
 		timeMap::iterator it = m_timeMap.find(newTime);
 		if (it != m_timeMap.end())
 		{
@@ -1080,7 +1084,7 @@ void AutomationPattern::generateTangents(timeMap::iterator it, int numToGenerate
 			// of the curve.
 			float inTangent;
 			float outTangent;
-			if (INVAL(it) == OUTVAL(it))
+			if (OFFSET(it) == 0)
 			{
 				inTangent = (INVAL(it + 1) - OUTVAL(it - 1)) / (POS(it + 1) - POS(it - 1));
 				it.value().setInTangent(inTangent);

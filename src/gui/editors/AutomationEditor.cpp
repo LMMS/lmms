@@ -344,8 +344,6 @@ void AutomationEditor::leaveEvent(QEvent * e )
 
 void AutomationEditor::drawLine( int x0In, float y0, int x1In, float y1 )
 {
-	// No need for a mutex here since no member variables are accessed/modified
-
 	int x0 = Note::quantized( x0In, AutomationPattern::quantization() );
 	int x1 = Note::quantized( x1In, AutomationPattern::quantization() );
 	int deltax = qAbs( x1 - x0 );
@@ -552,7 +550,7 @@ void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 					// If we clicked an outValue reset it
 					if (clickedNode != tm.end())
 					{
-						clickedNode.value().setOutValue(INVAL(clickedNode));
+						clickedNode.value().resetOutValue();
 						Engine::getSong()->setModified();
 					}
 
@@ -679,7 +677,7 @@ void AutomationEditor::removeNodes(int tick0, int tick1)
 	timeMap & tm = m_pattern->getTimeMap();
 	timeMap::iterator it = tm.lowerBound(start);
 
-	// Make a list of TimePoss with nodes to be removed
+	// Make a list of TimePos with nodes to be removed
 	// because we can't simply remove the nodes from
 	// the timeMap while we are iterating it.
 	QVector<TimePos> nodesToRemove;

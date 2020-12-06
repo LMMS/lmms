@@ -107,7 +107,7 @@ protected:
 	float getLevel( int y );
 	int xCoordOfTick( int tick );
 	float yCoordOfLevel( float level );
-	inline void drawLevelTick( QPainter & p, int tick, float value);// bool is_selected ); //NEEDS Change in CSS
+	inline void drawLevelTick(QPainter & p, int tick, float value);
 
 	timeMap::iterator getNodeAt(int x, int y, bool outValue = false, int r = 5);
 
