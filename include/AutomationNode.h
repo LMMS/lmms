@@ -80,6 +80,7 @@ public:
 		return m_outValue;
 	}
 	void setOutValue(float value);
+	void resetOutValue();
 
 	/**
 	 * @brief Gets the offset between inValue and outValue
@@ -88,14 +89,6 @@ public:
 	inline const float getValueOffset() const
 	{
 		return m_outValue - m_inValue;
-	}
-
-	/**
-	 * @brief Resets the outValue so it matches inValue
-	 */
-	inline void resetOutValue()
-	{
-		m_outValue = m_inValue;
 	}
 
 	/**

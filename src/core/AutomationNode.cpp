@@ -97,3 +97,13 @@ void AutomationNode::setOutValue(float value)
 	// Generate tangents from the previously, current and next nodes
 	m_pattern->generateTangents(it, 3);
 }
+
+/**
+ * @brief Resets the outValue so it matches inValue
+*/
+void AutomationNode::resetOutValue()
+{
+	// Calls setOutValue so it also takes care of generating
+	// the tangents
+	setOutValue(m_inValue);
+}
