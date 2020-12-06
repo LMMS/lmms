@@ -1551,13 +1551,13 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 	vlayout->addWidget( m_pianoView );
 	setModel( _itv->model() );
 
-	updateInstrumentView();
-
 	QMdiSubWindow* subWin = gui->mainWindow()->addWindowedWidget( this );
 	Qt::WindowFlags flags = subWin->windowFlags();
 	flags |= Qt::MSWindowsFixedSizeDialogHint;
 	flags &= ~Qt::WindowMaximizeButtonHint;
 	subWin->setWindowFlags( flags );
+
+	updateInstrumentView();
 
 	// Hide the Size and Maximize options from the system menu
 	// since the dialog size is fixed.
