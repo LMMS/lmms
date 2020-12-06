@@ -26,7 +26,6 @@
 #ifndef AUTOMATION_EDITOR_H
 #define AUTOMATION_EDITOR_H
 
-#include <QtCore/QMutex>
 #include <QVector>
 #include <QWidget>
 
@@ -180,10 +179,6 @@ private:
 	static const QVector<double> m_zoomXLevels;
 
 	FloatModel * m_tensionModel;
-
-	// Mutex for making automation editor methods thread safe
-	// Mutable so we can lock it from const objects
-	mutable QMutex m_patternEditorMutex;
 
 	AutomationPattern * m_pattern;
 	float m_minLevel;
