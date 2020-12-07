@@ -150,8 +150,13 @@ SampleBuffer::SampleBuffer(const SampleBuffer& orig)
 	m_sampleRate = orig.m_sampleRate;
 
 	//Deep copy m_origData and m_data from original
-	memcpy(m_origData, orig.m_origData, m_origFrames * BYTES_PER_FRAME);
-	memcpy(m_data, orig.m_data, m_frames * BYTES_PER_FRAME);
+	const auto origFrameBytes = m_origFrames * BYTES_PER_FRAME;
+	const auto frameBytes = m_frames * BYTES_PER_FRAME;
+	if (orig.m_origData != nullptr && origFrameBytes > 0)
+		{ memcpy(m_origData, orig.m_origData, origFrameBytes); }
+	if (orig.m_data != nullptr && frameBytes > 0)
+		{ memcpy(m_data, orig.m_data, frameBytes); }
+
 	orig.m_varLock.unlock();
 }
 
