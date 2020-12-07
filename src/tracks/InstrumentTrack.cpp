@@ -268,10 +268,10 @@ void InstrumentTrack::processCCEvent(int controller)
 	uint16_t cc = static_cast<uint16_t>(controller);
 	uint16_t value = static_cast<uint16_t>(m_midiCCModel[controller]->value());
 
-	// Process the MIDI CC event as an input event but with ignoreOnExport set to false
+	// Process the MIDI CC event as an input event but with source set to Internal
 	// so we can know LMMS generated the event, not a controller, and can process it during
 	// the project export
-	processInEvent(MidiEvent(MidiControlChange, channel, cc, value, NULL, false));
+	processInEvent(MidiEvent(MidiControlChange, channel, cc, value, nullptr, MidiEvent::Source::Internal));
 }
 
 
@@ -279,7 +279,7 @@ void InstrumentTrack::processCCEvent(int controller)
 
 void InstrumentTrack::processInEvent( const MidiEvent& event, const TimePos& time, f_cnt_t offset )
 {
-	if (Engine::getSong()->isExporting() && event.ignoreOnExport())
+	if (Engine::getSong()->isExporting() && event.source() == MidiEvent::Source::External)
 	{
 		return;
 	}
