@@ -128,6 +128,23 @@ Plugin::PluginTypes Lv2Proc::check(const LilvPlugin *plugin,
 		}
 	}
 
+	Lv2Manager* mgr = Engine::getLv2Manager();
+	AutoLilvNode requiredOptionNode(mgr->uri(LV2_OPTIONS__requiredOption));
+	AutoLilvNodes requiredOptions = mgr->findNodes(lilv_plugin_get_uri (plugin), requiredOptionNode.get(), nullptr);
+	if (requiredOptions)
+	{
+		LILV_FOREACH(nodes, i, requiredOptions.get())
+		{
+			const char* ro = lilv_node_as_uri (lilv_nodes_get (requiredOptions.get(), i));
+			if (!Lv2Options::isOptionSupported(mgr->uridMap().map(ro)))
+			{
+				// yes, this is not a Lv2 feature,
+				// but it's a feature in abstract sense
+				issues.emplace_back(featureNotSupported, ro);
+			}
+		}
+	}
+
 	return (audioChannels[inCount] > 2 || audioChannels[outCount] > 2)
 		? Plugin::Undefined
 		: (audioChannels[inCount] > 0)
@@ -422,11 +439,38 @@ bool Lv2Proc::hasNoteInput() const
 
 
 
+void Lv2Proc::initMOptions()
+{
+	/*
+		sampleRate:
+		LMMS can in theory inform plugins of a new sample rate.
+		However, Lv2 plugins seem to not allow sample rate changes
+		(not even through LV2_Options_Interface) - it's assumed to be
+		fixed after being passed via LV2_Descriptor::instantiate.
+		So, if the sampleRate would change, the plugin will need to
+		re-initialize, and this code section will be
+		executed again, creating a new option vector.
+	*/
+	float sampleRate = Engine::mixer()->processingSampleRate();
+	int32_t blockLength = Engine::mixer()->framesPerPeriod();
+	int32_t sequenceSize = defaultEvbufSize();
+
+	using Id = Lv2UridCache::Id;
+	m_options.initOption<float>(Id::param_sampleRate, sampleRate);
+	m_options.initOption<int32_t>(Id::bufsz_maxBlockLength, blockLength);
+	m_options.initOption<int32_t>(Id::bufsz_minBlockLength, blockLength);
+	m_options.initOption<int32_t>(Id::bufsz_nominalBlockLength, blockLength);
+	m_options.initOption<int32_t>(Id::bufsz_sequenceSize, sequenceSize);
+	m_options.createOptionVectors();
+}
+
+
+
+
 void Lv2Proc::initPluginSpecificFeatures()
 {
-	// nothing yet
-	// it would look like this:
-	// m_features[LV2_URID__map] = m_uridMapFeature
+	initMOptions();
+	m_features[LV2_OPTIONS__options] = const_cast<LV2_Options_Option*>(m_options.feature());
 }
 
 
@@ -558,7 +602,7 @@ void Lv2Proc::createPort(std::size_t portNum)
 				}
 			}
 
-			int minimumSize = minimumEvbufSize();
+			int minimumSize = defaultEvbufSize();
 
 			Lv2Manager* mgr = Engine::getLv2Manager();
 
