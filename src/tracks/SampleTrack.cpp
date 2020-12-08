@@ -24,6 +24,7 @@
  */
 #include "SampleTrack.h"
 
+#include <QDomElement>
 #include <QDropEvent>
 #include <QFileInfo>
 #include <QMenu>

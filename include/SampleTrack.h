@@ -33,6 +33,8 @@
 #include "FxMixer.h"
 #include "FxLineLcdSpinBox.h"
 #include "Track.h"
+#include "TrackContentObjectView.h"
+#include "TrackView.h"
 
 class EffectRackView;
 class Knob;

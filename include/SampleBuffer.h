@@ -62,7 +62,7 @@ public:
 	{
 		MM_OPERATORS
 	public:
-		handleState( bool _varying_pitch = false, int interpolation_mode = SRC_LINEAR );
+		handleState(bool varyingPitch = false, int interpolationMode = SRC_LINEAR);
 		virtual ~handleState();
 
 		const f_cnt_t frameIndex() const
@@ -70,9 +70,9 @@ public:
 			return m_frameIndex;
 		}
 
-		void setFrameIndex( f_cnt_t _index )
+		void setFrameIndex(f_cnt_t index)
 		{
-			m_frameIndex = _index;
+			m_frameIndex = index;
 		}
 
 		bool isBackwards() const
@@ -80,9 +80,9 @@ public:
 			return m_isBackwards;
 		}
 
-		void setBackwards( bool _backwards )
+		void setBackwards(bool backwards)
 		{
-			m_isBackwards = _backwards;
+			m_isBackwards = backwards;
 		}
 
 		int interpolationMode() const
@@ -106,21 +106,35 @@ public:
 	SampleBuffer();
 	// constructor which either loads sample _audio_file or decodes
 	// base64-data out of string
-	SampleBuffer( const QString & _audio_file, bool _is_base64_data = false );
-	SampleBuffer( const sampleFrame * _data, const f_cnt_t _frames );
-	explicit SampleBuffer( const f_cnt_t _frames );
+	SampleBuffer(const QString & audioFile, bool isBase64Data = false);
+	SampleBuffer(const sampleFrame * data, const f_cnt_t frames);
+	explicit SampleBuffer(const f_cnt_t frames);
 
 	virtual ~SampleBuffer();
 
-	bool play( sampleFrame * _ab, handleState * _state,
-				const fpp_t _frames,
-				const float _freq,
-				const LoopMode _loopmode = LoopOff );
+	bool play(
+		sampleFrame * ab,
+		handleState * state,
+		const fpp_t frames,
+		const float freq,
+		const LoopMode loopMode = LoopOff
+	);
 
-	void visualize(QPainter & p, const QRect & dr, const QRect & clip, f_cnt_t from_frame = 0, f_cnt_t to_frame = 0);
-	inline void visualize(QPainter & p, const QRect & dr, f_cnt_t from_frame = 0, f_cnt_t to_frame = 0)
+	void visualize(
+		QPainter & p,
+		const QRect & dr,
+		const QRect & clip,
+		f_cnt_t fromFrame = 0,
+		f_cnt_t toFrame = 0
+	);
+	inline void visualize(
+		QPainter & p,
+		const QRect & dr,
+		f_cnt_t fromFrame = 0,
+		f_cnt_t toFrame = 0
+	)
 	{
-		visualize(p, dr, dr, from_frame, to_frame);
+		visualize(p, dr, dr, fromFrame, toFrame);
 	}
 
 	inline const QString & audioFile() const
@@ -148,22 +162,27 @@ public:
 		return m_loopEndFrame;
 	}
 
-	void setLoopStartFrame( f_cnt_t _start )
+	void setLoopStartFrame(f_cnt_t start)
 	{
-		m_loopStartFrame = _start;
+		m_loopStartFrame = start;
 	}
 
-	void setLoopEndFrame( f_cnt_t _end )
+	void setLoopEndFrame(f_cnt_t end)
 	{
-		m_loopEndFrame = _end;
+		m_loopEndFrame = end;
 	}
 
-	void setAllPointFrames( f_cnt_t _start, f_cnt_t _end, f_cnt_t _loopstart, f_cnt_t _loopend )
+	void setAllPointFrames(
+		f_cnt_t start,
+		f_cnt_t end,
+		f_cnt_t loopStart,
+		f_cnt_t loopEnd
+	)
 	{
-		m_startFrame = _start;
-		m_endFrame = _end;
-		m_loopStartFrame = _loopstart;
-		m_loopEndFrame = _loopend;
+		m_startFrame = start;
+		m_endFrame = end;
+		m_loopStartFrame = loopStart;
+		m_loopEndFrame = loopEnd;
 	}
 
 	inline f_cnt_t frames() const
@@ -193,17 +212,17 @@ public:
 
 	int sampleLength() const
 	{
-		return double( m_endFrame - m_startFrame ) / m_sampleRate * 1000;
+		return double(m_endFrame - m_startFrame) / m_sampleRate * 1000;
 	}
 
-	inline void setFrequency( float _freq )
+	inline void setFrequency(float freq)
 	{
-		m_frequency = _freq;
+		m_frequency = freq;
 	}
 
-	inline void setSampleRate( sample_rate_t _rate )
+	inline void setSampleRate(sample_rate_t rate)
 	{
-		m_sampleRate = _rate;
+		m_sampleRate = rate;
 	}
 
 	inline const sampleFrame * data() const
@@ -215,30 +234,28 @@ public:
 	QString openAndSetAudioFile();
 	QString openAndSetWaveformFile();
 
-	QString & toBase64( QString & _dst ) const;
+	QString & toBase64(QString & dst) const;
 
 
 	// protect calls from the GUI to this function with dataReadLock() and
 	// dataUnlock()
-	SampleBuffer * resample( const sample_rate_t _src_sr,
-						const sample_rate_t _dst_sr );
+	SampleBuffer * resample(const sample_rate_t srcSR, const sample_rate_t dstSR);
 
-	void normalizeSampleRate( const sample_rate_t _src_sr,
-						bool _keep_settings = false );
+	void normalizeSampleRate(const sample_rate_t srcSR, bool keepSettings = false);
 
 	// protect calls from the GUI to this function with dataReadLock() and
 	// dataUnlock(), out of loops for efficiency
-	inline sample_t userWaveSample( const float _sample ) const
+	inline sample_t userWaveSample(const float sample) const
 	{
 		f_cnt_t frames = m_frames;
 		sampleFrame * data = m_data;
-		const float frame = _sample * frames;
-		f_cnt_t f1 = static_cast<f_cnt_t>( frame ) % frames;
-		if( f1 < 0 )
+		const float frame = sample * frames;
+		f_cnt_t f1 = static_cast<f_cnt_t>(frame) % frames;
+		if (f1 < 0)
 		{
 			f1 += frames;
 		}
-		return linearInterpolate( data[f1][0], data[ (f1 + 1) % frames ][0], fraction( frame ) );
+		return linearInterpolate(data[f1][0], data[(f1 + 1) % frames][0], fraction(frame));
 	}
 
 	void dataReadLock()
@@ -253,33 +270,42 @@ public:
 
 
 public slots:
-	void setAudioFile( const QString & _audio_file );
-	void loadFromBase64( const QString & _data );
-	void setStartFrame( const f_cnt_t _s );
-	void setEndFrame( const f_cnt_t _e );
-	void setAmplification( float _a );
-	void setReversed( bool _on );
+	void setAudioFile(const QString & audioFile);
+	void loadFromBase64(const QString & data);
+	void setStartFrame(const f_cnt_t s);
+	void setEndFrame(const f_cnt_t e);
+	void setAmplification(float a);
+	void setReversed(bool on);
 	void sampleRateChanged();
 
 private:
 	static sample_rate_t mixerSampleRate();
 
-	void update( bool _keep_settings = false );
+	void update(bool keepSettings = false);
 
 	void convertIntToFloat(int_sample_t * & ibuf, f_cnt_t frames, int channels);
 	void directFloatWrite(sample_t * & fbuf, f_cnt_t frames, int channels);
 
-	f_cnt_t decodeSampleSF( QString _f, sample_t * & _buf,
-						ch_cnt_t & _channels,
-						sample_rate_t & _sample_rate );
+	f_cnt_t decodeSampleSF(
+		QString fileName,
+		sample_t * & buf,
+		ch_cnt_t & channels,
+		sample_rate_t & samplerate
+	);
 #ifdef LMMS_HAVE_OGGVORBIS
-	f_cnt_t decodeSampleOGGVorbis( QString _f, int_sample_t * & _buf,
-						ch_cnt_t & _channels,
-						sample_rate_t & _sample_rate );
+	f_cnt_t decodeSampleOGGVorbis(
+		QString fileName,
+		int_sample_t * & buf,
+		ch_cnt_t & channels,
+		sample_rate_t & samplerate
+	);
 #endif
-	f_cnt_t decodeSampleDS( QString _f, int_sample_t * & _buf,
-						ch_cnt_t & _channels,
-						sample_rate_t & _sample_rate );
+	f_cnt_t decodeSampleDS(
+		QString fileName,
+		int_sample_t * & buf,
+		ch_cnt_t & channels,
+		sample_rate_t & samplerate
+	);
 
 	QString m_audioFile;
 	sampleFrame * m_origData;
@@ -296,13 +322,19 @@ private:
 	float m_frequency;
 	sample_rate_t m_sampleRate;
 
-	sampleFrame * getSampleFragment( f_cnt_t _index, f_cnt_t _frames,
-						LoopMode _loopmode,
-						sampleFrame * * _tmp,
-						bool * _backwards, f_cnt_t _loopstart, f_cnt_t _loopend,
-						f_cnt_t _end ) const;
-	f_cnt_t getLoopedIndex( f_cnt_t _index, f_cnt_t _startf, f_cnt_t _endf  ) const;
-	f_cnt_t getPingPongIndex( f_cnt_t _index, f_cnt_t _startf, f_cnt_t _endf  ) const;
+	sampleFrame * getSampleFragment(
+		f_cnt_t index,
+		f_cnt_t frames,
+		LoopMode loopMode,
+		sampleFrame * * tmp,
+		bool * backwards,
+		f_cnt_t loopStart,
+		f_cnt_t loopEnd,
+		f_cnt_t end
+	) const;
+
+	f_cnt_t getLoopedIndex(f_cnt_t index, f_cnt_t startf, f_cnt_t endf) const;
+	f_cnt_t getPingPongIndex(f_cnt_t index, f_cnt_t startf, f_cnt_t endf) const;
 
 
 signals:

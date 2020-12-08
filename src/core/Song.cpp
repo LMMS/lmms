@@ -48,6 +48,8 @@
 #include "FxMixerView.h"
 #include "GuiApplication.h"
 #include "ExportFilter.h"
+#include "InstrumentTrack.h"
+#include "NotePlayHandle.h"
 #include "Pattern.h"
 #include "PianoRoll.h"
 #include "ProjectJournal.h"
@@ -295,7 +297,7 @@ void Song::processNextBuffer()
 			}
 
 			// Handle loop points, and inform VST plugins of the loop status
-			if (loopEnabled || m_loopRenderRemaining > 1)
+			if (loopEnabled || (m_loopRenderRemaining > 1 && getPlayPos() >= timeline->loopBegin()))
 			{
 				m_vstSyncController.startCycle(
 					timeline->loopBegin().getTicks(), timeline->loopEnd().getTicks());
@@ -884,8 +886,6 @@ void Song::clearProject()
 	Engine::projectJournal()->clearJournal();
 
 	Engine::projectJournal()->setJournalling( true );
-
-	InstrumentTrackView::cleanupWindowCache();
 }
 
 

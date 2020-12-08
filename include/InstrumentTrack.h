@@ -30,6 +30,8 @@
 #include "GroupBox.h"
 #include "InstrumentFunctions.h"
 #include "InstrumentSoundShaping.h"
+#include "Midi.h"
+#include "MidiCCRackView.h"
 #include "MidiEventProcessor.h"
 #include "MidiPort.h"
 #include "NotePlayHandle.h"
@@ -38,11 +40,11 @@
 #include "Pitch.h"
 #include "Plugin.h"
 #include "Track.h"
+#include "TrackView.h"
 
 
 
 class QLineEdit;
-template<class T> class QQueue;
 class InstrumentFunctionArpeggioView;
 class InstrumentFunctionNoteStackingView;
 class EffectRackView;
@@ -229,7 +231,6 @@ signals:
 	void newNote();
 	void endNote();
 
-
 protected:
 	QString nodeName() const override
 	{
@@ -248,6 +249,8 @@ protected slots:
 
 
 private:
+	void processCCEvent(int controller);
+
 	MidiPort m_midiPort;
 
 	NotePlayHandle* m_notes[NumKeys];
@@ -287,11 +290,14 @@ private:
 
 	Piano m_piano;
 
+	std::unique_ptr<BoolModel> m_midiCCEnable;
+	std::unique_ptr<FloatModel> m_midiCCModel[MidiControllerCount];
 
 	friend class InstrumentTrackView;
 	friend class InstrumentTrackWindow;
 	friend class NotePlayHandle;
 	friend class InstrumentMiscView;
+	friend class MidiCCRackView;
 
 } ;
 
@@ -324,10 +330,6 @@ public:
 		return m_midiMenu;
 	}
 
-	void freeInstrumentTrackWindow();
-
-	static void cleanupWindowCache();
-
 	// Create a menu for assigning/creating channels for this track
 	QMenu * createFxMenu( QString title, QString newFxLabel ) override;
 
@@ -339,6 +341,7 @@ protected:
 
 private slots:
 	void toggleInstrumentWindow( bool _on );
+	void toggleMidiCCRack();
 	void activityIndicatorPressed();
 	void activityIndicatorReleased();
 
@@ -349,11 +352,11 @@ private slots:
 	void assignFxLine( int channelIndex );
 	void createFxLine();
 
+	void handleConfigChange(QString cls, QString attr, QString value);
+
 
 private:
 	InstrumentTrackWindow * m_window;
-
-	static QQueue<InstrumentTrackWindow *> s_windowCache;
 
 	// widgets in track-settings-widget
 	TrackLabelButton * m_tlb;
@@ -365,6 +368,8 @@ private:
 
 	QAction * m_midiInputAction;
 	QAction * m_midiOutputAction;
+
+	std::unique_ptr<MidiCCRackView> m_midiCCRackView;
 
 	QPoint m_lastPos;
 
@@ -482,6 +487,7 @@ private:
 	PianoView * m_pianoView;
 
 	friend class InstrumentView;
+	friend class InstrumentTrackView;
 
 } ;
 

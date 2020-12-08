@@ -71,6 +71,7 @@ set(LMMS_SRCS
 	core/ToolPlugin.cpp
 	core/Track.cpp
 	core/TrackContainer.cpp
+	core/TrackContentObject.cpp
 	core/ValueBuffer.cpp
 	core/VstSyncController.cpp
 	core/StepRecorder.cpp
@@ -99,6 +100,7 @@ set(LMMS_SRCS
 	core/lv2/Lv2Ports.cpp
 	core/lv2/Lv2Proc.cpp
 	core/lv2/Lv2Manager.cpp
+	core/lv2/Lv2Options.cpp
 	core/lv2/Lv2SubPluginFeatures.cpp
 	core/lv2/Lv2UridCache.cpp
 	core/lv2/Lv2UridMap.cpp

@@ -39,6 +39,7 @@
 #include "FileBrowser.h"
 #include "BBTrackContainer.h"
 #include "ConfigManager.h"
+#include "DataFile.h"
 #include "embed.h"
 #include "Engine.h"
 #include "GuiApplication.h"
