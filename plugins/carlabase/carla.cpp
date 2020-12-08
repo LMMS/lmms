@@ -425,7 +425,7 @@ void CarlaInstrument::refreshParams(bool init)
 			if (paramInfo->groupName != nullptr){
 				m_paramModels[i]->setGroupName(paramInfo->groupName);
 
-				if (!groups.contains(paramInfo->groupName)) {
+				if (m_paramModels[i]->enabled() && !groups.contains(paramInfo->groupName)) {
 					groups.push_back(paramInfo->groupName);
 					m_knobGroupCount++;
 				}
@@ -461,6 +461,8 @@ void CarlaInstrument::clearKnobModels(){
 
 	//Clear the list
 	m_paramModels.clear();
+
+	m_knobGroupCount = 0;
 }
 
 void CarlaInstrument::knobModelChanged(uint32_t index)
@@ -890,10 +892,13 @@ void CarlaParamsView::clearFilterText()
 
 void CarlaParamsView::filterKnobs()
 {
-	QString text = m_paramsFilterLineEdit->text();
 	clearKnobs(); // Remove all knobs from the layout.
 
+	if (!m_carlaInstrument->m_knobGroupCount) {
+		return;
+	}
 	m_maxColumns = (m_inputScrollArea->width() / m_maxKnobWidthPerGroup[m_groupFilterCombo->currentIndex()]);
+	QString text = m_paramsFilterLineEdit->text();
 
 	for (uint32_t i=0; i < m_knobs.count(); ++i)
 	{
