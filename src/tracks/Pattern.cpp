@@ -630,7 +630,7 @@ PatternView::PatternView( Pattern* pattern, TrackView* parent ) :
 
 
 
-Pattern * PatternView::getPattern()
+Pattern* PatternView::getPattern()
 {
 	return m_pat;
 }

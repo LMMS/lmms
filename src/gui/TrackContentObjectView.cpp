@@ -942,7 +942,7 @@ void TrackContentObjectView::mouseReleaseEvent( QMouseEvent * me )
  */
 void TrackContentObjectView::contextMenuEvent( QContextMenuEvent * cme )
 {
-	QVector<TrackContentObjectView *> selectedTCOs = getClickedTCOs();
+	QVector<TrackContentObjectView*> selectedTCOs = getClickedTCOs();
 
 	// Depending on whether we right-clicked a selection or an individual TCO we will have
 	// different labels for the actions.
@@ -1127,7 +1127,7 @@ void TrackContentObjectView::toggleMute( QVector<TrackContentObjectView *> tcovs
 	}
 }
 
-bool TrackContentObjectView::canMergeSelection(QVector<TrackContentObjectView *> tcovs)
+bool TrackContentObjectView::canMergeSelection(QVector<TrackContentObjectView*> tcovs)
 {
 	// We can only merge InstrumentTrack's TCOs, so check if we only have those in the selection,
 	// and also if they all belong to the same track
@@ -1136,13 +1136,13 @@ bool TrackContentObjectView::canMergeSelection(QVector<TrackContentObjectView *>
 	bool canMerge = true;
 
 	// Variable to check if all TCOs belong to the same track
-	TrackView * previousOwnerTrackView = nullptr;
+	TrackView* previousOwnerTrackView = nullptr;
 
 	// Then we check every selected TCO to see if all of them are InstrumentTrack's TCOs.
 	// If any isn't, we set canMerge to false and quit the loop.
 	for (auto tcov: tcovs)
 	{
-		TrackView * ownerTrackView = tcov->getTrackView();
+		TrackView* ownerTrackView = tcov->getTrackView();
 
 		// Set the previousOwnerTrackView to the first TrackView
 		if (!previousOwnerTrackView)
@@ -1153,7 +1153,7 @@ bool TrackContentObjectView::canMergeSelection(QVector<TrackContentObjectView *>
 		// If there are TCOs from different tracks or TCOs from tracks
 		// other than an InstrumentTrack, can't merge them
 		if (ownerTrackView != previousOwnerTrackView
-			|| !dynamic_cast<InstrumentTrackView *>(ownerTrackView))
+			|| !dynamic_cast<InstrumentTrackView*>(ownerTrackView))
 		{
 			canMerge = false;
 			break;
@@ -1163,11 +1163,11 @@ bool TrackContentObjectView::canMergeSelection(QVector<TrackContentObjectView *>
 	return canMerge;
 }
 
-void TrackContentObjectView::mergeTCOs(QVector<TrackContentObjectView *> tcovs)
+void TrackContentObjectView::mergeTCOs(QVector<TrackContentObjectView*> tcovs)
 {
 	// Get the track that we are merging TCOs in
-	InstrumentTrack * track =
-		dynamic_cast<InstrumentTrack *>(tcovs.at(0)->getTrackView()->getTrack());
+	InstrumentTrack* track =
+		dynamic_cast<InstrumentTrack*>(tcovs.at(0)->getTrackView()->getTrack());
 
 	if (!track)
 	{
@@ -1193,7 +1193,7 @@ void TrackContentObjectView::mergeTCOs(QVector<TrackContentObjectView *> tcovs)
 	}
 
 	// Create a pattern where all notes will be added
-	Pattern * newPattern = dynamic_cast<Pattern *>(track->createTCO(earliestPos));
+	Pattern* newPattern = dynamic_cast<Pattern*>(track->createTCO(earliestPos));
 	if (!newPattern)
 	{
 		qWarning("Warning: Failed to convert TCO to Pattern on mergeTCOs");
@@ -1206,7 +1206,7 @@ void TrackContentObjectView::mergeTCOs(QVector<TrackContentObjectView *> tcovs)
 	for (auto tcov: tcovs)
 	{
 		// Convert TCOV to PatternView
-		PatternView * pView = dynamic_cast<PatternView *>(tcov);
+		PatternView* pView = dynamic_cast<PatternView*>(tcov);
 
 		if (!pView)
 		{
@@ -1217,9 +1217,9 @@ void TrackContentObjectView::mergeTCOs(QVector<TrackContentObjectView *> tcovs)
 		NoteVector currentTCONotes = pView->getPattern()->notes();
 		TimePos pViewPos = pView->getPattern()->startPosition();
 
-		for (Note * note: currentTCONotes)
+		for (Note* note: currentTCONotes)
 		{
-			Note * newNote = newPattern->addNote(*note, false);
+			Note* newNote = newPattern->addNote(*note, false);
 			TimePos originalNotePos = newNote->pos();
 			newNote->setPos(originalNotePos + (pViewPos - earliestPos));
 		}
