@@ -136,7 +136,7 @@ SampleBuffer::~SampleBuffer()
 {
 	MM_FREE(m_origData);
 	MM_FREE(m_data);
-  if (m_userAntiAliasWaveTable)
+	if (m_userAntiAliasWaveTable)
 	{
 		for (int i = 0; i < OscillatorConstants::WAVE_TABLES_PER_WAVEFORM_COUNT; ++i)
 		{
