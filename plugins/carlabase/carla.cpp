@@ -393,6 +393,7 @@ void CarlaInstrument::saveSettings(QDomDocument& doc, QDomElement& parent)
 
 void CarlaInstrument::refreshParams(bool init)
 {
+	m_knobGroupCount = 0;
 	if (fDescriptor->get_parameter_count != nullptr &&
 		fDescriptor->get_parameter_info  != nullptr &&
 		fDescriptor->get_parameter_value != nullptr &&
@@ -401,6 +402,7 @@ void CarlaInstrument::refreshParams(bool init)
 		uint32_t param_count = fDescriptor->get_parameter_count(fHandle);
 
 		QList<QString> completerData;
+		QList<QString> groups; // tmp used to count no. groups.
 
 		for (uint32_t i=0; i < param_count; ++i)
 		{
@@ -414,7 +416,6 @@ void CarlaInstrument::refreshParams(bool init)
 
 			m_paramModels[i]->setValue(param_value);
 
-
 			// Get parameter name
 			QString name = "_NO_NAME_";
 			if (paramInfo->name != nullptr){
@@ -423,6 +424,12 @@ void CarlaInstrument::refreshParams(bool init)
 
 			if (paramInfo->groupName != nullptr){
 				m_paramModels[i]->setGroupName(paramInfo->groupName);
+
+				if (!groups.contains(paramInfo->groupName)) {
+					groups.push_back(paramInfo->groupName);
+					m_knobGroupCount++;
+				}
+				m_paramModels[i]->setGroupId(groups.indexOf(paramInfo->groupName));
 			}
 
 			completerData.push_back(name);
@@ -835,25 +842,22 @@ CarlaParamsView::CarlaParamsView(CarlaInstrument* const instrument, QWidget* con
 	CarlaParamsSubWindow* win = new CarlaParamsSubWindow(gui->mainWindow()->workspace()->viewport(), Qt::SubWindow |
 			Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowSystemMenuHint);
 	m_carlaInstrument->m_subWindow = gui->mainWindow()->workspace()->addSubWindow(win);
-	m_carlaInstrument->m_subWindow->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::MinimumExpanding);
+	m_carlaInstrument->m_subWindow->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
 	m_carlaInstrument->m_subWindow->setMinimumHeight(200);
+	m_carlaInstrument->m_subWindow->setMinimumWidth(200);
 	m_carlaInstrument->m_subWindow->resize(600, 400);
 	m_carlaInstrument->m_subWindow->setWidget(centralWidget);
 	centralWidget->setWindowTitle(m_carlaInstrument->instrumentTrack()->name() + tr(" - Parameters"));
 
 	// -- Connect signals
+	connect(m_carlaInstrument->m_subWindow, SIGNAL(resized()), this, SLOT(windowResized()));
 	connect(m_paramsFilterLineEdit, SIGNAL(textChanged(const QString)), this, SLOT(filterKnobs()));
 	connect(m_clearFilterButton, SIGNAL(clicked(bool)), this, SLOT(clearFilterText()));
 	connect(m_automatedOnlyButton, SIGNAL(toggled(bool)), this, SLOT(filterKnobs()));
 	connect(m_groupFilterCombo, SIGNAL(currentTextChanged(const QString)), this, SLOT(filterKnobs()));
-
 	connect(m_carlaInstrument, SIGNAL(paramsUpdated()), this, SLOT(refreshKnobs()));
 
-	// -- Add spacer so all knobs go to top
-	QSpacerItem* verticalSpacer = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
-	m_inputScrollAreaLayout->addItem(verticalSpacer, m_curRow + 1, 0, 1, 1);
-
-	refreshKnobs(); // Add buttons if there are any already.
+	modelChanged(); // Add buttons if there are any already.
 	m_carlaInstrument->m_subWindow->show(); // Show the subwindow
 }
 
@@ -889,6 +893,8 @@ void CarlaParamsView::filterKnobs()
 	QString text = m_paramsFilterLineEdit->text();
 	clearKnobs(); // Remove all knobs from the layout.
 
+	m_maxColumns = (m_inputScrollArea->width() / m_maxKnobWidthPerGroup[m_groupFilterCombo->currentIndex()]);
+
 	for (uint32_t i=0; i < m_knobs.count(); ++i)
 	{
 		// Don't show disabled (unused) knobs.
@@ -923,6 +929,10 @@ void CarlaParamsView::filterKnobs()
 			addKnob(i);
 		}
 	}
+
+	// Add spacer so all knobs go to top
+	QSpacerItem* verticalSpacer = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
+	m_inputScrollAreaLayout->addItem(verticalSpacer, m_curRow+1, 0, 1, 1);
 }
 
 void CarlaParamsView::refreshKnobs()
@@ -934,21 +944,6 @@ void CarlaParamsView::refreshKnobs()
 	}
 	m_knobs.clear(); // Clear the pointer list.
 
-	// Clear the input layout (posible spacer).
-	QLayoutItem *item;
-	while ((item = m_inputScrollAreaLayout->takeAt(0)))
-	{
-		if (item->widget()) {delete item->widget();}
-		delete item;
-	}
-
-	// Clear the output layout (posible spacer).
-	while ((item = m_outputScrollAreaLayout->takeAt(0)))
-	{
-		if (item->widget()) {delete item->widget();}
-		delete item;
-	}
-
 	// Reset position data.
 	m_curColumn = 0;
 	m_curRow = 0;
@@ -956,6 +951,12 @@ void CarlaParamsView::refreshKnobs()
 	m_curOutColumn = 0;
 	m_curOutRow = 0;
 
+	// Clear max knob width per group
+	m_maxKnobWidthPerGroup.clear();
+	m_maxKnobWidthPerGroup.reserve(m_carlaInstrument->m_knobGroupCount);
+	for (uint8_t i = 0; i < m_carlaInstrument->m_knobGroupCount; i++) {
+		m_maxKnobWidthPerGroup[i] = 0;
+	}
 
 	if (!m_carlaInstrument->m_paramModels.count()) { return; }
 
@@ -963,6 +964,7 @@ void CarlaParamsView::refreshKnobs()
 	m_knobs.reserve(m_carlaInstrument->m_paramModels.count());
 
 	QStringList groupNameList;
+	groupNameList.reserve(m_carlaInstrument->m_knobGroupCount);
 
 	for (uint32_t i=0; i < m_carlaInstrument->m_paramModels.count(); ++i)
 	{
@@ -986,12 +988,12 @@ void CarlaParamsView::refreshKnobs()
 				groupNameList.append(m_carlaInstrument->m_paramModels[i]->groupName());
 			}
 
-			// Add knob to layout
-			addKnob(i);
-		}
-		else
-		{
-			m_knobs[i]->hide();
+			// Store biggest knob width per group (so we can calc how many
+			// knobs we can horizontaly fit)
+			if (m_maxKnobWidthPerGroup[m_carlaInstrument->m_paramModels[i]->groupId()] < m_knobs[i]->width())
+			{
+				m_maxKnobWidthPerGroup[m_carlaInstrument->m_paramModels[i]->groupId()] = m_knobs[i]->width() + m_inputScrollAreaLayout->spacing();
+			}
 		}
 	}
 
@@ -1002,24 +1004,13 @@ void CarlaParamsView::refreshKnobs()
 	}
 	m_groupFilterModel->setStringList(groupNameList);
 	m_groupFilterCombo->setCurrentIndex(0);
-
-	// Add spacer so all knobs go to top
-	QSpacerItem* verticalSpacer = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
-	m_inputScrollAreaLayout->addItem(verticalSpacer, m_curRow + 1, 0, 1, 1);
-
-	adjustWindowWidth();
 }
 
-void CarlaParamsView::adjustWindowWidth()
-{
-	// Resize window
-	int newWidth = m_inputScrollAreaWidgetContent->sizeHint().width() + 100;
-	newWidth = (newWidth >= 200) ? newWidth : 200;
-	//m_carlaInstrument->m_subWindow->setFixedWidth(newWidth);
-	//m_carlaInstrument->m_subWindow->setMinimumWidth(newWidth);
-	//m_carlaInstrument->m_subWindow->setMaximumWidth(newWidth);
-	m_carlaInstrument->m_subWindow->resize(newWidth, m_carlaInstrument->m_subWindow->height());
+
+void CarlaParamsView::windowResized() {
+	filterKnobs();
 }
+
 
 void CarlaParamsView::addKnob(uint32_t index)
 {
@@ -1041,6 +1032,7 @@ void CarlaParamsView::addKnob(uint32_t index)
 	{
 		// Add the new knob to layout
 		m_inputScrollAreaLayout->addWidget(m_knobs[index], m_curRow, m_curColumn, Qt::AlignHCenter | Qt::AlignTop);
+		m_inputScrollAreaLayout->setColumnStretch(m_curColumn, 1);
 
 		// Chances that we did close() on the widget is big, so show it.
 		m_knobs[index]->show();
@@ -1058,9 +1050,24 @@ void CarlaParamsView::addKnob(uint32_t index)
 void CarlaParamsView::clearKnobs()
 {
 	// Remove knobs from layout.
-	for (uint32_t i=0; i < m_knobs.count(); ++i)
+	for (uint16_t i=0; i < m_knobs.count(); ++i)
 	{
 		m_knobs[i]->close();
+	}
+
+	// Remove spacers
+	QLayoutItem * item;
+	for (int16_t i=m_inputScrollAreaLayout->count() - 1; i > 0; i--)
+	{
+		item = m_inputScrollAreaLayout->takeAt(i);
+		if (item->widget()) {continue;}
+		delete item;
+	}
+	for (int16_t i=m_outputScrollAreaLayout->count() - 1; i > 0; i--)
+	{
+		item = m_outputScrollAreaLayout->takeAt(i);
+		if (item->widget()) {continue;}
+		delete item;
 	}
 
 	// Reset position data.

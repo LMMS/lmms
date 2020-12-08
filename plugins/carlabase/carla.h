@@ -131,14 +131,25 @@ public:
 		m_groupName = groupName;
 	}
 
+	inline void setGroupId(uint8_t groupId)
+	{
+		m_groupId = groupId;
+	}
+
 	virtual QString groupName() const
 	{
 		return m_groupName;
 	}
 
+	virtual uint8_t groupId() const
+	{
+		return m_groupId;
+	}
+
 private:
 	bool m_isOutput;
 	bool m_isEnabled;
+	uint8_t m_groupId;
 	QString m_groupName;
 };
 
@@ -150,6 +161,7 @@ class CarlaParamsSubWindow : public SubWindow
 
 signals:
 	void uiClosed();
+	void resized();
 
 public:
 	CarlaParamsSubWindow(QWidget * _parent, Qt::WindowFlags windowFlags) :
@@ -159,11 +171,39 @@ public:
 		setWindowFlags(windowFlags);
 	}
 
+	virtual void resizeEvent(QResizeEvent * event) override
+	{
+		if (mousePress) {
+			resizing = true;
+		}
+		SubWindow::resizeEvent(event);
+	}
+
+	virtual void mousePressEvent(QMouseEvent * event) override
+	{
+		mousePress = true;
+		SubWindow::mousePressEvent(event);
+	}
+
+	virtual void mouseReleaseEvent(QMouseEvent * event) override
+	{
+		if (resizing) {
+			resizing = false;
+			mousePress = false;
+			emit resized();
+		}
+		SubWindow::mouseReleaseEvent(event);
+	}
+
 	virtual void closeEvent(QCloseEvent * event) override
 	{
 		emit uiClosed();
 		event->accept();
 	}
+
+private:
+	bool resizing = false;
+	bool mousePress = false;
 };
 
 // -------------------------------------------------------------------
@@ -221,6 +261,7 @@ private:
     // this is only needed because note-offs are being sent during play
     QMutex fMutex;
 
+    uint8_t m_knobGroupCount;
     QList<CarlaParamFloatModel*> m_paramModels;
     QDomElement m_settingsElem;
     QMdiSubWindow* m_subWindow;
@@ -281,6 +322,7 @@ private slots:
 	void refreshKnobs();
 	void filterKnobs();
 	void clearFilterText();
+	void windowResized();
 
 private:
 	virtual void modelChanged();
@@ -292,7 +334,10 @@ private:
 	CarlaInstrument* const m_carlaInstrument;
 	QList<Knob*> m_knobs;
 
-	const uint32_t m_maxColumns;
+	// Keep track of the biggest knob width per group
+	QList<uint16_t> m_maxKnobWidthPerGroup;
+
+	uint32_t m_maxColumns;
 	uint32_t m_curColumn;
 	uint32_t m_curRow;
 
