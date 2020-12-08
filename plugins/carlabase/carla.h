@@ -325,8 +325,6 @@ private slots:
 	void windowResized();
 
 private:
-	virtual void modelChanged();
-
 	void adjustWindowWidth();
 	void addKnob(uint32_t index);
 	void clearKnobs();

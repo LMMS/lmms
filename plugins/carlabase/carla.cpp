@@ -22,11 +22,6 @@
  *
  */
 
- /* TODO
-  * - Flow layout for knobs.
-  * - Search other TODO
-  */
-
 #include "carla.h"
 
 #include "Engine.h"
@@ -859,8 +854,11 @@ CarlaParamsView::CarlaParamsView(CarlaInstrument* const instrument, QWidget* con
 	connect(m_groupFilterCombo, SIGNAL(currentTextChanged(const QString)), this, SLOT(filterKnobs()));
 	connect(m_carlaInstrument, SIGNAL(paramsUpdated()), this, SLOT(refreshKnobs()));
 
-	modelChanged(); // Add buttons if there are any already.
 	m_carlaInstrument->m_subWindow->show(); // Show the subwindow
+
+	// Add knobs if there are any already.
+	// Call this after show() so the m_inputScrollArea->width() is set properly.
+	refreshKnobs(); // Will trigger filterKnobs() due m_groupFilterCombo->setCurrentIndex(0)
 }
 
 CarlaParamsView::~CarlaParamsView()
@@ -1081,10 +1079,4 @@ void CarlaParamsView::clearKnobs()
 
 	m_curOutColumn = 0;
 	m_curOutRow = 0;
-}
-
-void CarlaParamsView::modelChanged()
-{
-	refreshKnobs();
-	filterKnobs();
 }
