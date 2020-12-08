@@ -31,6 +31,7 @@
 #include <cstring>
 #include <lilv/lilv.h>
 #include <lv2.h>
+#include <lv2/lv2plug.in/ns/ext/options/options.h>
 #include <QDebug>
 #include <QDir>
 #include <QLibrary>
@@ -41,6 +42,7 @@
 #include "Plugin.h"
 #include "PluginFactory.h"
 #include "Lv2ControlBase.h"
+#include "Lv2Options.h"
 #include "PluginIssue.h"
 
 
@@ -67,6 +69,17 @@ Lv2Manager::Lv2Manager() :
 
 	m_supportedFeatureURIs.insert(LV2_URID__map);
 	m_supportedFeatureURIs.insert(LV2_URID__unmap);
+	m_supportedFeatureURIs.insert(LV2_OPTIONS__options);
+
+	auto supportOpt = [this](Lv2UridCache::Id id)
+	{
+		Lv2Options::supportOption(uridCache()[id]);
+	};
+	supportOpt(Lv2UridCache::Id::param_sampleRate);
+	supportOpt(Lv2UridCache::Id::bufsz_maxBlockLength);
+	supportOpt(Lv2UridCache::Id::bufsz_minBlockLength);
+	supportOpt(Lv2UridCache::Id::bufsz_nominalBlockLength);
+	supportOpt(Lv2UridCache::Id::bufsz_sequenceSize);
 }
 
 
@@ -200,6 +213,15 @@ bool Lv2Manager::CmpStr::operator()(const char *a, const char *b) const
 bool Lv2Manager::isFeatureSupported(const char *featName) const
 {
 	return m_supportedFeatureURIs.find(featName) != m_supportedFeatureURIs.end();
+}
+
+
+
+
+AutoLilvNodes Lv2Manager::findNodes(const LilvNode *subject,
+	const LilvNode *predicate, const LilvNode *object)
+{
+	return AutoLilvNodes(lilv_world_find_nodes (m_world, subject, predicate, object));
 }
 
 

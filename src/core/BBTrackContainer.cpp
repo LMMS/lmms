@@ -32,15 +32,15 @@
 
 BBTrackContainer::BBTrackContainer() :
 	TrackContainer(),
-	m_bbComboBoxModel( this )
+	m_bbComboBoxModel(this)
 {
-	connect( &m_bbComboBoxModel, SIGNAL( dataChanged() ),
-			this, SLOT( currentBBChanged() ) );
+	connect(&m_bbComboBoxModel, SIGNAL(dataChanged()),
+			this, SLOT(currentBBChanged()));
 	// we *always* want to receive updates even in case BB actually did
 	// not change upon setCurrentBB()-call
-	connect( &m_bbComboBoxModel, SIGNAL( dataUnchanged() ),
-			this, SLOT( currentBBChanged() ) );
-	setType( BBContainer );
+	connect(&m_bbComboBoxModel, SIGNAL(dataUnchanged()),
+			this, SLOT(currentBBChanged()));
+	setType(BBContainer);
 }
 
 
@@ -53,27 +53,27 @@ BBTrackContainer::~BBTrackContainer()
 
 
 
-bool BBTrackContainer::play( TimePos _start, fpp_t _frames,
-								f_cnt_t _offset, int _tco_num )
+bool BBTrackContainer::play(TimePos start, fpp_t frames, f_cnt_t offset, int tcoNum)
 {
-	bool played_a_note = false;
-	if( lengthOfBB( _tco_num ) <= 0 )
+	bool notePlayed = false;
+
+	if (lengthOfBB(tcoNum) <= 0)
 	{
 		return false;
 	}
 
-	_start = _start % ( lengthOfBB( _tco_num ) * TimePos::ticksPerBar() );
+	start = start % (lengthOfBB(tcoNum) * TimePos::ticksPerBar());
 
 	TrackList tl = tracks();
-	for( TrackList::iterator it = tl.begin(); it != tl.end(); ++it )
+	for (Track * t : tl)
 	{
-		if( ( *it )->play( _start, _frames, _offset, _tco_num ) )
+		if (t->play(start, frames, offset, tcoNum))
 		{
-			played_a_note = true;
+			notePlayed = true;
 		}
 	}
 
-	return played_a_note;
+	return notePlayed;
 }
 
 
@@ -81,7 +81,7 @@ bool BBTrackContainer::play( TimePos _start, fpp_t _frames,
 
 void BBTrackContainer::updateAfterTrackAdd()
 {
-	if( numOfBBs() == 0 && !Engine::getSong()->isLoadingProject() )
+	if (numOfBBs() == 0 && !Engine::getSong()->isLoadingProject())
 	{
 		Engine::getSong()->addBBTrack();
 	}
@@ -90,21 +90,21 @@ void BBTrackContainer::updateAfterTrackAdd()
 
 
 
-bar_t BBTrackContainer::lengthOfBB( int _bb ) const
+bar_t BBTrackContainer::lengthOfBB(int bb) const
 {
-	TimePos max_length = TimePos::ticksPerBar();
+	TimePos maxLength = TimePos::ticksPerBar();
 
 	const TrackList & tl = tracks();
-	for (Track* t : tl)
+	for (Track * t : tl)
 	{
-		// Don't create TCOs here if not exist
-		if (_bb < t->numOfTCOs())
+		// Don't create TCOs here if they don't exist
+		if (bb < t->numOfTCOs())
 		{
-			max_length = qMax(max_length, t->getTCO( _bb )->length());
+			maxLength = qMax(maxLength, t->getTCO(bb)->length());
 		}
 	}
 
-	return max_length.nextFullBar();
+	return maxLength.nextFullBar();
 }
 
 
@@ -112,35 +112,35 @@ bar_t BBTrackContainer::lengthOfBB( int _bb ) const
 
 int BBTrackContainer::numOfBBs() const
 {
-	return Engine::getSong()->countTracks( Track::BBTrack );
+	return Engine::getSong()->countTracks(Track::BBTrack);
 }
 
 
 
 
-void BBTrackContainer::removeBB( int _bb )
+void BBTrackContainer::removeBB(int bb)
 {
 	TrackList tl = tracks();
-	for( TrackList::iterator it = tl.begin(); it != tl.end(); ++it )
+	for (Track * t : tl)
 	{
-		delete ( *it )->getTCO( _bb );
-		( *it )->removeBar( _bb * DefaultTicksPerBar );
+		delete t->getTCO(bb);
+		t->removeBar(bb * DefaultTicksPerBar);
 	}
-	if( _bb <= currentBB() )
+	if (bb <= currentBB())
 	{
-		setCurrentBB( qMax( currentBB() - 1, 0 ) );
+		setCurrentBB(qMax(currentBB() - 1, 0));
 	}
 }
 
 
 
 
-void BBTrackContainer::swapBB( int _bb1, int _bb2 )
+void BBTrackContainer::swapBB(int bb1, int bb2)
 {
 	TrackList tl = tracks();
-	for( TrackList::iterator it = tl.begin(); it != tl.end(); ++it )
+	for (Track * t : tl)
 	{
-		( *it )->swapPositionOfTCOs( _bb1, _bb2 );
+		t->swapPositionOfTCOs(bb1, bb2);
 	}
 	updateComboBox();
 }
@@ -148,11 +148,10 @@ void BBTrackContainer::swapBB( int _bb1, int _bb2 )
 
 
 
-void BBTrackContainer::updateBBTrack( TrackContentObject * _tco )
+void BBTrackContainer::updateBBTrack(TrackContentObject * tco)
 {
-	BBTrack * t = BBTrack::findBBTrack( _tco->startPosition() /
-							DefaultTicksPerBar );
-	if( t != NULL )
+	BBTrack * t = BBTrack::findBBTrack(tco->startPosition() / DefaultTicksPerBar);
+	if (t != NULL)
 	{
 		t->dataChanged();
 	}
@@ -164,11 +163,11 @@ void BBTrackContainer::updateBBTrack( TrackContentObject * _tco )
 void BBTrackContainer::fixIncorrectPositions()
 {
 	TrackList tl = tracks();
-	for( TrackList::iterator it = tl.begin(); it != tl.end(); ++it )
+	for (Track * t : tl)
 	{
-		for( int i = 0; i < numOfBBs(); ++i )
+		for (int i = 0; i < numOfBBs(); ++i)
 		{
-			( *it )->getTCO( i )->movePosition( TimePos( i, 0 ) );
+			t->getTCO(i)->movePosition(TimePos(i, 0));
 		}
 	}
 }
@@ -178,7 +177,7 @@ void BBTrackContainer::fixIncorrectPositions()
 
 void BBTrackContainer::play()
 {
-	if( Engine::getSong()->playMode() != Song::Mode_PlayBB )
+	if (Engine::getSong()->playMode() != Song::Mode_PlayBB)
 	{
 		Engine::getSong()->playBB();
 	}
@@ -201,16 +200,16 @@ void BBTrackContainer::stop()
 
 void BBTrackContainer::updateComboBox()
 {
-	const int cur_bb = currentBB();
+	const int curBB = currentBB();
 
 	m_bbComboBoxModel.clear();
 
-	for( int i = 0; i < numOfBBs(); ++i )
+	for (int i = 0; i < numOfBBs(); ++i)
 	{
-		BBTrack * bbt = BBTrack::findBBTrack( i );
-		m_bbComboBoxModel.addItem( bbt->name() );
+		BBTrack * bbt = BBTrack::findBBTrack(i);
+		m_bbComboBoxModel.addItem(bbt->name());
 	}
-	setCurrentBB( cur_bb );
+	setCurrentBB(curBB);
 }
 
 
@@ -218,14 +217,13 @@ void BBTrackContainer::updateComboBox()
 
 void BBTrackContainer::currentBBChanged()
 {
-	// now update all track-labels (the current one has to become white,
-	// the others gray)
+	// now update all track-labels (the current one has to become white, the others gray)
 	TrackList tl = Engine::getSong()->tracks();
-	for( TrackList::iterator it = tl.begin(); it != tl.end(); ++it )
+	for (Track * t : tl)
 	{
-		if( ( *it )->type() == Track::BBTrack )
+		if (t->type() == Track::BBTrack)
 		{
-			( *it )->dataChanged();
+			t->dataChanged();
 		}
 	}
 }
@@ -233,12 +231,12 @@ void BBTrackContainer::currentBBChanged()
 
 
 
-void BBTrackContainer::createTCOsForBB( int _bb )
+void BBTrackContainer::createTCOsForBB(int bb)
 {
 	TrackList tl = tracks();
-	for( int i = 0; i < tl.size(); ++i )
+	for (Track * t : tl)
 	{
-		tl[i]->createTCOsForBB( _bb );
+		t->createTCOsForBB(bb);
 	}
 }
 
@@ -247,11 +245,11 @@ AutomatedValueMap BBTrackContainer::automatedValuesAt(TimePos time, int tcoNum) 
 	Q_ASSERT(tcoNum >= 0);
 	Q_ASSERT(time.getTicks() >= 0);
 
-	auto length_bars = lengthOfBB(tcoNum);
-	auto length_ticks = length_bars * TimePos::ticksPerBar();
-	if (time > length_ticks)
+	auto lengthBars = lengthOfBB(tcoNum);
+	auto lengthTicks = lengthBars * TimePos::ticksPerBar();
+	if (time > lengthTicks)
 	{
-		time = length_ticks;
+		time = lengthTicks;
 	}
 
 	return TrackContainer::automatedValuesAt(time + (TimePos::ticksPerBar() * tcoNum), tcoNum);
