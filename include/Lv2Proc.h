@@ -35,6 +35,7 @@
 
 #include "Lv2Basics.h"
 #include "Lv2Features.h"
+#include "Lv2Options.h"
 #include "LinkedModelGroups.h"
 #include "MidiEvent.h"
 #include "Plugin.h"
@@ -168,6 +169,7 @@ private:
 	const LilvPlugin* m_plugin;
 	LilvInstance* m_instance;
 	Lv2Features m_features;
+	Lv2Options m_options;
 
 	// full list of ports
 	std::vector<std::unique_ptr<Lv2Ports::PortBase>> m_ports;
@@ -187,11 +189,12 @@ private:
 	ringbuffer_reader_t<struct MidiInputEvent> m_midiInputReader;
 
 	// other
-	static std::size_t minimumEvbufSize() { return 1 << 15; /* ardour uses this*/ }
+	static int32_t defaultEvbufSize() { return 1 << 15; /* ardour uses this*/ }
 
 	//! models for the controls, sorted by port symbols
 	std::map<std::string, AutomatableModel *> m_connectedModels;
 
+	void initMOptions(); //!< initialize m_options
 	void initPluginSpecificFeatures();
 
 	//! load a file in the plugin, but don't do anything in LMMS
