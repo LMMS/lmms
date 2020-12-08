@@ -251,10 +251,11 @@ int main( int argc, char * * argv )
 {
 #ifdef LMMS_DEBUG_FPE
 	// Enable exceptions for certain floating point results
+	// Commenting out FE_UNDERFLOW for now as it generates too much noise.
 	feenableexcept( FE_INVALID   |
 			FE_DIVBYZERO |
-			FE_OVERFLOW  |
-			FE_UNDERFLOW);
+			FE_OVERFLOW  /*|
+			FE_UNDERFLOW*/);
 
 	// Install the trap handler
 	// register signal SIGFPE and signal handler
