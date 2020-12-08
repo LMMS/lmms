@@ -1229,9 +1229,6 @@ void TrackContentObjectView::mergeTCOs(QVector<TrackContentObjectView*> tcovs)
 		tcov->getTrackContentObject()->saveJournallingState(false);
 		// No need to check for nullptr because we check while building the tcovs QVector
 		tcov->remove();
-		// TODO: Is it a good idea to restore the journalling state after remove()
-		// or is the next line completely unnecessary?
-		tcov->getTrackContentObject()->restoreJournallingState();
 	}
 
 	// Update length since we might have moved notes beyond the end of the pattern length
