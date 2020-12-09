@@ -955,7 +955,7 @@ void TrackContentObjectView::contextMenuEvent( QContextMenuEvent * cme )
 
 	QMenu contextMenu( this );
 
-	bool canMergeTCOs = individualTCO ? false : canMergeSelection(selectedTCOs);
+	bool canMergeTCOs = !individualTCO && canMergeSelection(selectedTCOs);
 
 	if( fixedTCOs() == false )
 	{
@@ -1132,35 +1132,31 @@ bool TrackContentObjectView::canMergeSelection(QVector<TrackContentObjectView*> 
 	// We can only merge InstrumentTrack's TCOs, so check if we only have those in the selection,
 	// and also if they all belong to the same track
 
-	// We start assuming we can merge and if any condition is broken we set it to false
-	bool canMerge = true;
-
 	// Variable to check if all TCOs belong to the same track
 	TrackView* previousOwnerTrackView = nullptr;
 
-	// Then we check every selected TCO to see if all of them are InstrumentTrack's TCOs.
-	// If any isn't, we set canMerge to false and quit the loop.
 	for (auto tcov: tcovs)
 	{
 		TrackView* ownerTrackView = tcov->getTrackView();
 
 		// Set the previousOwnerTrackView to the first TrackView
+		// If the track isn't an InstrumentTrack can't merge the TCOs
 		if (!previousOwnerTrackView)
 		{
+			if (!dynamic_cast<InstrumentTrackView*>(ownerTrackView)) { return false; }
+
 			previousOwnerTrackView = ownerTrackView;
 		}
 
-		// If there are TCOs from different tracks or TCOs from tracks
-		// other than an InstrumentTrack, can't merge them
-		if (ownerTrackView != previousOwnerTrackView
-			|| !dynamic_cast<InstrumentTrackView*>(ownerTrackView))
+		// If the current TCO is from a different track we can't merge them
+		if (ownerTrackView != previousOwnerTrackView)
 		{
-			canMerge = false;
-			break;
+			return false;
 		}
 	}
 
-	return canMerge;
+	// If none of the conditions were broke, we can merge
+	return true;
 }
 
 void TrackContentObjectView::mergeTCOs(QVector<TrackContentObjectView*> tcovs)
