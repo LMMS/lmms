@@ -24,6 +24,8 @@
 
 #include "TrackContentObjectView.h"
 
+#include <set>
+
 #include <QMenu>
 #include <QMouseEvent>
 #include <QPainter>
@@ -1129,34 +1131,15 @@ void TrackContentObjectView::toggleMute( QVector<TrackContentObjectView *> tcovs
 
 bool TrackContentObjectView::canMergeSelection(QVector<TrackContentObjectView*> tcovs)
 {
-	// We can only merge InstrumentTrack's TCOs, so check if we only have those in the selection,
-	// and also if they all belong to the same track
+	// We check if the owner of the first TCO is an Instrument Track
+	bool isInstrumentTrack = dynamic_cast<InstrumentTrackView*>(tcovs.at(0)->getTrackView());
 
-	// Variable to check if all TCOs belong to the same track
-	TrackView* previousOwnerTrackView = nullptr;
+	// Then we create a set with all the TCOs owners
+	std::set<TrackView*> ownerTracks;
+	for (auto tcov: tcovs) { ownerTracks.insert(tcov->getTrackView()); }
 
-	for (auto tcov: tcovs)
-	{
-		TrackView* ownerTrackView = tcov->getTrackView();
-
-		// Set the previousOwnerTrackView to the first TrackView
-		// If the track isn't an InstrumentTrack can't merge the TCOs
-		if (!previousOwnerTrackView)
-		{
-			if (!dynamic_cast<InstrumentTrackView*>(ownerTrackView)) { return false; }
-
-			previousOwnerTrackView = ownerTrackView;
-		}
-
-		// If the current TCO is from a different track we can't merge them
-		if (ownerTrackView != previousOwnerTrackView)
-		{
-			return false;
-		}
-	}
-
-	// If none of the conditions were broke, we can merge
-	return true;
+	// Can merge if there's only one owner track and it's an Instrument Track
+	return isInstrumentTrack && ownerTracks.size() == 1;
 }
 
 void TrackContentObjectView::mergeTCOs(QVector<TrackContentObjectView*> tcovs)
@@ -1176,17 +1159,15 @@ void TrackContentObjectView::mergeTCOs(QVector<TrackContentObjectView*> tcovs)
 	track->saveJournallingState(false);
 
 	// Find the earliest position of all the selected TCOVs
-	TimePos earliestPos = tcovs.at(0)->getTrackContentObject()->startPosition();
-	TimePos currentPos = earliestPos;
-
-	for (auto tcov: tcovs)
-	{
-		currentPos = tcov->getTrackContentObject()->startPosition();
-		if (currentPos < earliestPos)
+	const auto earliestTCOV = std::min_element(tcovs.constBegin(), tcovs.constEnd(),
+		[](TrackContentObjectView* a, TrackContentObjectView* b)
 		{
-			earliestPos = currentPos;
+			return a->getTrackContentObject()->startPosition() <
+				b->getTrackContentObject()->startPosition();
 		}
-	}
+	);
+
+	const TimePos earliestPos = (*earliestTCOV)->getTrackContentObject()->startPosition();
 
 	// Create a pattern where all notes will be added
 	Pattern* newPattern = dynamic_cast<Pattern*>(track->createTCO(earliestPos));
