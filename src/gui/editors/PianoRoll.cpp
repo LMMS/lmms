@@ -2139,7 +2139,6 @@ void PianoRoll::mouseReleaseEvent( QMouseEvent * me )
 	if (m_editMode == ModeEditRazor && me->button() == Qt::RightButton)
 	{
 		cancelRazorAction();
-		return;
 	}
 
 	if( me->button() & Qt::LeftButton )
@@ -2173,11 +2172,6 @@ void PianoRoll::mouseReleaseEvent( QMouseEvent * me )
 		}
 	}
 
-	if (m_action == ActionRazor)
-	{
-		return;
-	}
-
 	if( me->button() & Qt::RightButton )
 	{
 		m_mouseDownRight = false;
@@ -2205,7 +2199,11 @@ void PianoRoll::mouseReleaseEvent( QMouseEvent * me )
 	}
 
 	m_currentNote = NULL;
-	m_action = ActionNone;
+
+	if (m_action != ActionRazor)
+	{
+		m_action = ActionNone;
+	}
 
 	if( m_editMode == ModeDraw )
 	{
