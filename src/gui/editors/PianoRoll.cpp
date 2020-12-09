@@ -1498,6 +1498,8 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 		if (!(me->modifiers() & Qt::ShiftModifier)) {
 			cancelRazorAction();
 		}
+
+		update();
 		return;
 	}
 
