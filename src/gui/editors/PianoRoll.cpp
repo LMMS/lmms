@@ -3700,7 +3700,12 @@ void PianoRoll::focusOutEvent( QFocusEvent * )
 			m_pattern->instrumentTrack()->pianoModel()->setKeyState( i, false );
 		}
 	}
-	m_editMode = m_ctrlMode;
+	if (m_editMode == ModeEditRazor) {
+		m_editMode = m_razorMode;
+		m_action = ActionNone;
+	} else {
+		m_editMode = m_ctrlMode;
+	}
 	update();
 }
 
