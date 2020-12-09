@@ -115,6 +115,7 @@ QPixmap * PianoRoll::s_toolErase = NULL;
 QPixmap * PianoRoll::s_toolSelect = NULL;
 QPixmap * PianoRoll::s_toolMove = NULL;
 QPixmap * PianoRoll::s_toolOpen = NULL;
+QPixmap * PianoRoll::s_toolRazor = NULL;
 
 TextFloat * PianoRoll::s_textFloat = NULL;
 
@@ -270,6 +271,10 @@ PianoRoll::PianoRoll() :
 	if( s_toolOpen == NULL )
 	{
 		s_toolOpen = new QPixmap( embed::getIconPixmap( "automation" ) );
+	}
+	if( s_toolRazor == NULL )
+	{
+		s_toolRazor = new QPixmap( embed::getIconPixmap( "razor" ) );
 	}
 
 	// init text-float
@@ -1268,8 +1273,15 @@ void PianoRoll::keyPressEvent(QKeyEvent* ke)
 			break;
 
 		case Qt::Key_Escape:
-			// Same as Ctrl + Shift + A
-			clearSelectedNotes();
+			if (m_editMode == ModeEditRazor)
+			{
+				cancelRazorAction();
+			}
+			else
+			{
+				// Same as Ctrl + Shift + A
+				clearSelectedNotes();
+			}
 			break;
 
 		case Qt::Key_Backspace:
@@ -1314,6 +1326,10 @@ void PianoRoll::keyPressEvent(QKeyEvent* ke)
 		}
 
 		case Qt::Key_Control:
+			if (m_editMode == ModeEditRazor)
+			{
+				break;
+			}
 			// Enter selection mode if:
 			// -> this window is active
 			// -> shift is not pressed
@@ -1353,6 +1369,10 @@ void PianoRoll::keyReleaseEvent(QKeyEvent* ke )
 	switch( ke->key() )
 	{
 		case Qt::Key_Control:
+			if (m_editMode == ModeEditRazor)
+			{
+				break;
+			}
 			computeSelectedNotes( ke->modifiers() & Qt::ShiftModifier);
 			m_editMode = m_ctrlMode;
 			update();
@@ -1438,6 +1458,46 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 
 	if( ! hasValidPattern() )
 	{
+		return;
+	}
+
+	// -- Razor
+	if (m_editMode == ModeEditRazor && me->button() == Qt::LeftButton
+		&& noteUnderMouse())
+	{
+		Note * n = noteUnderMouse();
+
+		float zoomFactor = ((float)m_ppb / TimePos::ticksPerBar());
+		int x = getMouseTickPos() - m_whiteKeyWidth;
+		int newLength = ((x/zoomFactor) + (m_currentPosition) - (n->pos()));
+		int leftOverLength = n->length() - newLength;
+
+		if (!newLength || !leftOverLength)
+		{
+			return;
+		}
+
+		m_pattern->addJournalCheckPoint();
+
+		// Reduce note length
+		n->setLength(newLength);
+
+		// Add note with leftover length
+		Note noteCopy(
+			leftOverLength,
+			n->pos() + newLength,
+			n->key(),
+			n->getVolume(),
+			n->getPanning(),
+			n->detuning()
+		);
+		if (n->selected()) { noteCopy.setSelected(true); }
+		m_pattern->addNote(noteCopy, false);
+
+		// Keep in razor mode while SHIFT is hold during cut
+		if (!(me->modifiers() & Qt::ShiftModifier)) {
+			cancelRazorAction();
+		}
 		return;
 	}
 
@@ -1946,6 +2006,33 @@ void PianoRoll::pauseChordNotes(int key)
 	}
 }
 
+void PianoRoll::setRazorAction()
+{
+	if (m_editMode != ModeEditRazor)
+	{
+		m_razorMode = m_editMode;
+		m_editMode = ModeEditRazor;
+		m_action = ActionRazor;
+		setCursor(Qt::ArrowCursor);
+		update();
+	}
+}
+
+void PianoRoll::cancelRazorAction()
+{
+	m_editMode = m_razorMode;
+	m_action = ActionNone;
+	update();
+}
+
+int PianoRoll::getMouseTickPos() {
+	QPoint pos = mapFromGlobal(QCursor::pos());
+	int pixelsPer = m_ppb / (TimePos::ticksPerBar() / quantization());
+	float zoomFactor = ((float)m_ppb / TimePos::ticksPerBar());
+	int scrollOffset = (int)(m_currentPosition * zoomFactor) % pixelsPer;
+	return (pixelsPer * (((pos.x() - m_whiteKeyWidth)) / pixelsPer) + (m_whiteKeyWidth - scrollOffset));
+}
+
 
 
 
@@ -2047,6 +2134,12 @@ void PianoRoll::mouseReleaseEvent( QMouseEvent * me )
 
 	s_textFloat->hide();
 
+	if (m_editMode == ModeEditRazor && me->button() == Qt::RightButton)
+	{
+		cancelRazorAction();
+		return;
+	}
+
 	if( me->button() & Qt::LeftButton )
 	{
 		mustRepaint = true;
@@ -2076,6 +2169,11 @@ void PianoRoll::mouseReleaseEvent( QMouseEvent * me )
 				clearSelectedNotes();
 			}
 		}
+	}
+
+	if (m_action == ActionRazor)
+	{
+		return;
 	}
 
 	if( me->button() & Qt::RightButton )
@@ -2131,6 +2229,8 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 
 	if( m_action == ActionNone && me->buttons() == 0 )
 	{
+		// When cursor is between note editing area and volume/panning
+		// area show vertical size cursor.
 		if( me->y() > keyAreaBottom() && me->y() < noteEditTop() )
 		{
 			setCursor( Qt::SizeVerCursor );
@@ -2439,7 +2539,7 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 				}
 			}
 		}
-		else if (me->buttons() == Qt::NoButton && m_editMode != ModeDraw)
+		else if (me->buttons() == Qt::NoButton && m_editMode != ModeDraw && m_editMode != ModeEditRazor)
 		{
 			// Is needed to restore cursor when it previously was set to
 			// Qt::SizeVerCursor (between keyAreaBottom and noteEditTop)
@@ -3232,6 +3332,45 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 			}
 		}
 
+		// -- Razor tool (draw cut line)
+		if (m_action == ActionRazor)
+		{
+			auto xCoordOfTick = [=](int tick) {
+				return m_whiteKeyWidth + (
+					(tick - m_currentPosition) * m_ppb / TimePos::ticksPerBar()
+				);
+			};
+			Note * n = noteUnderMouse();
+			if (n)
+			{
+				const int key = n->key() - m_startKey + 1;
+				int y = y_base - key * m_keyLineHeight;
+				int x = getMouseTickPos();
+
+				if (x > xCoordOfTick(n->pos()) &&
+					x < xCoordOfTick(n->pos() + n->length()))
+				{
+					p.setPen(QPen(QColor("#FF0000"), 1));
+					p.drawLine(
+						x, y,
+						x,
+						y + m_keyLineHeight
+					);
+
+					setCursor(Qt::BlankCursor);
+				}
+				else
+				{
+					setCursor(Qt::ArrowCursor);
+				}
+			}
+			else
+			{
+				setCursor(Qt::ArrowCursor);
+			}
+		}
+		// -- End razor tool
+
 		//draw current step recording notes
 		for( const Note *note : m_stepRecorder.getCurStepNotes() )
 		{
@@ -3353,6 +3492,7 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 			case ModeErase: cursor = s_toolErase; break;
 			case ModeSelect: cursor = s_toolSelect; break;
 			case ModeEditDetuning: cursor = s_toolOpen; break;
+			case ModeEditRazor: cursor = s_toolRazor; break;
 		}
 		QPoint mousePosition = mapFromGlobal( QCursor::pos() );
 		if( cursor != NULL && mousePosition.y() > keyAreaTop() && mousePosition.x() > noteEditLeft())
@@ -4443,7 +4583,14 @@ PianoRollWindow::PianoRollWindow() :
 	connect(glueAction, SIGNAL(triggered()), m_editor, SLOT(glueNotes()));
 	glueAction->setShortcut( Qt::SHIFT | Qt::Key_G );
 
+	// Razor
+	QAction * razorAction = new QAction(embed::getIconPixmap("razor"),
+				tr("Razor"), noteToolsButton);
+	connect(razorAction, &QAction::triggered, m_editor, &PianoRoll::setRazorAction);
+	razorAction->setShortcut( Qt::SHIFT | Qt::Key_R );
+
 	noteToolsButton->addAction(glueAction);
+	noteToolsButton->addAction(razorAction);
 
 	notesActionsToolBar->addWidget(noteToolsButton);
 

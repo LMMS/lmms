@@ -95,6 +95,7 @@ public:
 		ModeErase,
 		ModeSelect,
 		ModeEditDetuning,
+		ModeEditRazor
 	};
 
 	/*! \brief Resets settings to default when e.g. creating a new project */
@@ -226,7 +227,8 @@ private:
 		ActionResizeNote,
 		ActionSelectNotes,
 		ActionChangeNoteProperty,
-		ActionResizeNoteEditArea
+		ActionResizeNoteEditArea,
+		ActionRazor
 	};
 
 	enum NoteEditMode
@@ -282,6 +284,10 @@ private:
 	void playChordNotes(int key, int velocity=-1);
 	void pauseChordNotes(int key);
 
+	void setRazorAction();
+	void cancelRazorAction();
+	int getMouseTickPos();
+
 	void updateScrollbars();
 	void updatePositionLineHeight();
 
@@ -304,6 +310,7 @@ private:
 	static QPixmap * s_toolSelect;
 	static QPixmap * s_toolMove;
 	static QPixmap * s_toolOpen;
+	static QPixmap * s_toolRazor;
 
 	static PianoRollKeyTypes prKeyOrder[];
 
@@ -389,6 +396,7 @@ private:
 
 	EditModes m_editMode;
 	EditModes m_ctrlMode; // mode they were in before they hit ctrl
+	EditModes m_razorMode; // mode they where in before entering razor
 
 	bool m_mouseDownRight; //true if right click is being held down
 
