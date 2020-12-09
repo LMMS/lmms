@@ -957,8 +957,6 @@ void TrackContentObjectView::contextMenuEvent( QContextMenuEvent * cme )
 
 	QMenu contextMenu( this );
 
-	bool canMergeTCOs = !individualTCO && canMergeSelection(selectedTCOs);
-
 	if( fixedTCOs() == false )
 	{
 		contextMenu.addAction(
@@ -977,7 +975,7 @@ void TrackContentObjectView::contextMenuEvent( QContextMenuEvent * cme )
 				: tr("Cut selection"),
 			[this](){ contextMenuAction( Cut ); } );
 
-		if (canMergeTCOs)
+		if (canMergeSelection(selectedTCOs))
 		{
 			contextMenu.addAction(
 				embed::getIconPixmap("edit_merge"),
@@ -1131,6 +1129,9 @@ void TrackContentObjectView::toggleMute( QVector<TrackContentObjectView *> tcovs
 
 bool TrackContentObjectView::canMergeSelection(QVector<TrackContentObjectView*> tcovs)
 {
+	// Can't merge a single TCO
+	if (tcovs.size() < 2) { return false; }
+
 	// We check if the owner of the first TCO is an Instrument Track
 	bool isInstrumentTrack = dynamic_cast<InstrumentTrackView*>(tcovs.at(0)->getTrackView());
 
