@@ -55,7 +55,7 @@ DisintegratorEffect::DisintegratorEffect(Model* parent, const Descriptor::SubPlu
 	m_hp(Engine::mixer()->processingSampleRate()),
 	m_needsUpdate(true)
 {
-	emit sampleRateChanged();
+	sampleRateChanged();
 }
 
 
@@ -93,12 +93,11 @@ bool DisintegratorEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frame
 	const ValueBuffer * freqBuf = m_disintegratorControls.m_lowCutModel.valueBuffer();
 
 	// Update filters
-	if(m_needsUpdate || m_disintegratorControls.m_highCutModel.isValueChanged())
+	if (m_needsUpdate || m_disintegratorControls.m_highCutModel.isValueChanged())
 	{
 		m_lp.setLowpass(m_disintegratorControls.m_highCutModel.value());
-		
 	}
-	if(m_needsUpdate || m_disintegratorControls.m_lowCutModel.isValueChanged())
+	if (m_needsUpdate || m_disintegratorControls.m_lowCutModel.isValueChanged())
 	{
 		m_hp.setHighpass(m_disintegratorControls.m_lowCutModel.value());
 	}
@@ -256,4 +255,3 @@ PLUGIN_EXPORT Plugin * lmms_plugin_main(Model* parent, void* data)
 }
 
 }
-
