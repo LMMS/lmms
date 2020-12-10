@@ -61,11 +61,11 @@ SamplePlayHandle::SamplePlayHandle( const QString& sampleFile ) :
 
 
 
-SamplePlayHandle::SamplePlayHandle( SampleTCO* tco ) :
-	SamplePlayHandle( tco->sampleBuffer() , false)
+SamplePlayHandle::SamplePlayHandle( SampleClip* clip ) :
+	SamplePlayHandle( clip->sampleBuffer() , false)
 {
-	m_track = tco->getTrack();
-	setAudioPort( ( (SampleTrack *)tco->getTrack() )->audioPort() );
+	m_track = clip->getTrack();
+	setAudioPort( ( (SampleTrack *)clip->getTrack() )->audioPort() );
 }
 
 

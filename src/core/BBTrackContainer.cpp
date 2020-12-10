@@ -53,21 +53,21 @@ BBTrackContainer::~BBTrackContainer()
 
 
 
-bool BBTrackContainer::play(TimePos start, fpp_t frames, f_cnt_t offset, int tcoNum)
+bool BBTrackContainer::play(TimePos start, fpp_t frames, f_cnt_t offset, int clipNum)
 {
 	bool notePlayed = false;
 
-	if (lengthOfBB(tcoNum) <= 0)
+	if (lengthOfBB(clipNum) <= 0)
 	{
 		return false;
 	}
 
-	start = start % (lengthOfBB(tcoNum) * TimePos::ticksPerBar());
+	start = start % (lengthOfBB(clipNum) * TimePos::ticksPerBar());
 
 	TrackList tl = tracks();
 	for (Track * t : tl)
 	{
-		if (t->play(start, frames, offset, tcoNum))
+		if (t->play(start, frames, offset, clipNum))
 		{
 			notePlayed = true;
 		}
@@ -97,10 +97,10 @@ bar_t BBTrackContainer::lengthOfBB(int bb) const
 	const TrackList & tl = tracks();
 	for (Track * t : tl)
 	{
-		// Don't create TCOs here if they don't exist
-		if (bb < t->numOfTCOs())
+		// Don't create Clips here if they don't exist
+		if (bb < t->numOfClips())
 		{
-			maxLength = qMax(maxLength, t->getTCO(bb)->length());
+			maxLength = qMax(maxLength, t->getClip(bb)->length());
 		}
 	}
 
@@ -123,7 +123,7 @@ void BBTrackContainer::removeBB(int bb)
 	TrackList tl = tracks();
 	for (Track * t : tl)
 	{
-		delete t->getTCO(bb);
+		delete t->getClip(bb);
 		t->removeBar(bb * DefaultTicksPerBar);
 	}
 	if (bb <= currentBB())
@@ -140,7 +140,7 @@ void BBTrackContainer::swapBB(int bb1, int bb2)
 	TrackList tl = tracks();
 	for (Track * t : tl)
 	{
-		t->swapPositionOfTCOs(bb1, bb2);
+		t->swapPositionOfClips(bb1, bb2);
 	}
 	updateComboBox();
 }
@@ -148,9 +148,9 @@ void BBTrackContainer::swapBB(int bb1, int bb2)
 
 
 
-void BBTrackContainer::updateBBTrack(TrackContentObject * tco)
+void BBTrackContainer::updateBBTrack(Clip * clip)
 {
-	BBTrack * t = BBTrack::findBBTrack(tco->startPosition() / DefaultTicksPerBar);
+	BBTrack * t = BBTrack::findBBTrack(clip->startPosition() / DefaultTicksPerBar);
 	if (t != NULL)
 	{
 		t->dataChanged();
@@ -167,7 +167,7 @@ void BBTrackContainer::fixIncorrectPositions()
 	{
 		for (int i = 0; i < numOfBBs(); ++i)
 		{
-			t->getTCO(i)->movePosition(TimePos(i, 0));
+			t->getClip(i)->movePosition(TimePos(i, 0));
 		}
 	}
 }
@@ -231,27 +231,27 @@ void BBTrackContainer::currentBBChanged()
 
 
 
-void BBTrackContainer::createTCOsForBB(int bb)
+void BBTrackContainer::createClipsForBB(int bb)
 {
 	TrackList tl = tracks();
 	for (Track * t : tl)
 	{
-		t->createTCOsForBB(bb);
+		t->createClipsForBB(bb);
 	}
 }
 
-AutomatedValueMap BBTrackContainer::automatedValuesAt(TimePos time, int tcoNum) const
+AutomatedValueMap BBTrackContainer::automatedValuesAt(TimePos time, int clipNum) const
 {
-	Q_ASSERT(tcoNum >= 0);
+	Q_ASSERT(clipNum >= 0);
 	Q_ASSERT(time.getTicks() >= 0);
 
-	auto lengthBars = lengthOfBB(tcoNum);
+	auto lengthBars = lengthOfBB(clipNum);
 	auto lengthTicks = lengthBars * TimePos::ticksPerBar();
 	if (time > lengthTicks)
 	{
 		time = lengthTicks;
 	}
 
-	return TrackContainer::automatedValuesAt(time + (TimePos::ticksPerBar() * tcoNum), tcoNum);
+	return TrackContainer::automatedValuesAt(time + (TimePos::ticksPerBar() * clipNum), clipNum);
 }
 

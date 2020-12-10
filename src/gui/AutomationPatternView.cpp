@@ -45,7 +45,7 @@ QPixmap * AutomationPatternView::s_pat_rec = NULL;
 
 AutomationPatternView::AutomationPatternView( AutomationPattern * _pattern,
 						TrackView * _parent ) :
-	TrackContentObjectView( _pattern, _parent ),
+	ClipView( _pattern, _parent ),
 	m_pat( _pattern ),
 	m_paintPixmap()
 {
@@ -85,7 +85,7 @@ void AutomationPatternView::update()
 {
 	ToolTip::add(this, m_pat->name());
 
-	TrackContentObjectView::update();
+	ClipView::update();
 }
 
 
@@ -273,21 +273,21 @@ void AutomationPatternView::paintEvent( QPaintEvent * )
 		p.fillRect( rect(), c );
 	}
 	
-	const float ppb = fixedTCOs() ?
-			( parentWidget()->width() - 2 * TCO_BORDER_WIDTH )
+	const float ppb = fixedClips() ?
+			( parentWidget()->width() - 2 * Clip_BORDER_WIDTH )
 				/ (float) m_pat->timeMapLength().getBar() :
 								pixelsPerBar();
 
-	const int x_base = TCO_BORDER_WIDTH;
+	const int x_base = Clip_BORDER_WIDTH;
 	
 	const float min = m_pat->firstObject()->minValue<float>();
 	const float max = m_pat->firstObject()->maxValue<float>();
 
 	const float y_scale = max - min;
-	const float h = ( height() - 2 * TCO_BORDER_WIDTH ) / y_scale;
+	const float h = ( height() - 2 * Clip_BORDER_WIDTH ) / y_scale;
 	const float ppTick  = ppb / TimePos::ticksPerBar();
 
-	p.translate( 0.0f, max * height() / y_scale - TCO_BORDER_WIDTH );
+	p.translate( 0.0f, max * height() / y_scale - Clip_BORDER_WIDTH );
 	p.scale( 1.0f, -h );
 
 	QLinearGradient lin2grad( 0, min, 0, max );
@@ -307,8 +307,8 @@ void AutomationPatternView::paintEvent( QPaintEvent * )
 		if( it+1 == m_pat->getTimeMap().end() )
 		{
 			const float x1 = x_base + it.key() * ppTick;
-			const float x2 = (float)( width() - TCO_BORDER_WIDTH );
-			if( x1 > ( width() - TCO_BORDER_WIDTH ) ) break;
+			const float x2 = (float)( width() - Clip_BORDER_WIDTH );
+			if( x1 > ( width() - Clip_BORDER_WIDTH ) ) break;
 			if( gradient() )
 			{
 				p.fillRect( QRectF( x1, 0.0f, x2 - x1, it.value() ), lin2grad );
@@ -340,7 +340,7 @@ void AutomationPatternView::paintEvent( QPaintEvent * )
 		for( int i = it.key() + 1; i < ( it + 1 ).key(); i++ )
 		{
 			x = x_base + i * ppTick;
-			if( x > ( width() - TCO_BORDER_WIDTH ) ) break;
+			if( x > ( width() - Clip_BORDER_WIDTH ) ) break;
 			float value = values[ i - it.key() ];
 			path.lineTo( QPointF( x, value ) );
 
@@ -367,12 +367,12 @@ void AutomationPatternView::paintEvent( QPaintEvent * )
 	const int lineSize = 3;
 	p.setPen( c.darker( 300 ) );
 
-	for( bar_t t = 1; t < width() - TCO_BORDER_WIDTH; ++t )
+	for( bar_t t = 1; t < width() - Clip_BORDER_WIDTH; ++t )
 	{
 		const int tx = x_base + static_cast<int>( ppb * t ) - 2;
-		p.drawLine( tx, TCO_BORDER_WIDTH, tx, TCO_BORDER_WIDTH + lineSize );
-		p.drawLine( tx,	rect().bottom() - ( lineSize + TCO_BORDER_WIDTH ),
-					tx, rect().bottom() - TCO_BORDER_WIDTH );
+		p.drawLine( tx, Clip_BORDER_WIDTH, tx, Clip_BORDER_WIDTH + lineSize );
+		p.drawLine( tx,	rect().bottom() - ( lineSize + Clip_BORDER_WIDTH ),
+					tx, rect().bottom() - Clip_BORDER_WIDTH );
 	}
 
 	// recording icon for when recording automation
@@ -387,8 +387,8 @@ void AutomationPatternView::paintEvent( QPaintEvent * )
 	
 	// inner border
 	p.setPen( c.lighter( current ? 160 : 130 ) );
-	p.drawRect( 1, 1, rect().right() - TCO_BORDER_WIDTH, 
-		rect().bottom() - TCO_BORDER_WIDTH );
+	p.drawRect( 1, 1, rect().right() - Clip_BORDER_WIDTH, 
+		rect().bottom() - Clip_BORDER_WIDTH );
 		
 	// outer border	
 	p.setPen( current? c.lighter( 130 ) : c.darker( 300 ) );
@@ -397,7 +397,7 @@ void AutomationPatternView::paintEvent( QPaintEvent * )
 	// draw the 'muted' pixmap only if the pattern was manualy muted
 	if( m_pat->isMuted() )
 	{
-		const int spacing = TCO_BORDER_WIDTH;
+		const int spacing = Clip_BORDER_WIDTH;
 		const int size = 14;
 		p.drawPixmap( spacing, height() - ( size + spacing ),
 			embed::getIconPixmap( "muted", size, size ) );
@@ -416,7 +416,7 @@ void AutomationPatternView::dragEnterEvent( QDragEnterEvent * _dee )
 	StringPairDrag::processDragEnterEvent( _dee, "automatable_model" );
 	if( !_dee->isAccepted() )
 	{
-		TrackContentObjectView::dragEnterEvent( _dee );
+		ClipView::dragEnterEvent( _dee );
 	}
 }
 
@@ -454,7 +454,7 @@ void AutomationPatternView::dropEvent( QDropEvent * _de )
 	}
 	else
 	{
-		TrackContentObjectView::dropEvent( _de );
+		ClipView::dropEvent( _de );
 	}
 }
 

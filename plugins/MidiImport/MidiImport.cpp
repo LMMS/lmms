@@ -193,7 +193,7 @@ public:
 		{
 			TimePos pPos = TimePos( time.getBar(), 0 );
 			ap = dynamic_cast<AutomationPattern*>(
-				at->createTCO(pPos));
+				at->createClip(pPos));
 			ap->addObject( objModel );
 		}
 
@@ -259,7 +259,7 @@ public:
 			it->pitchRangeModel()->setInitValue( 2 );
 
 			// Create a default pattern
-			p = dynamic_cast<Pattern*>(it->createTCO(0));
+			p = dynamic_cast<Pattern*>(it->createClip(0));
 		}
 		return this;
 	}
@@ -269,7 +269,7 @@ public:
 	{
 		if (!p)
 		{
-			p = dynamic_cast<Pattern*>(it->createTCO(0));
+			p = dynamic_cast<Pattern*>(it->createClip(0));
 		}
 		p->addNote(n, false);
 		hasNotes = true;
@@ -286,7 +286,7 @@ public:
 			if (!newPattern || n->pos() > lastEnd + DefaultTicksPerBar)
 			{
 				TimePos pPos = TimePos(n->pos().getBar(), 0);
-				newPattern = dynamic_cast<Pattern*>(it->createTCO(pPos));
+				newPattern = dynamic_cast<Pattern*>(it->createClip(pPos));
 			}
 			lastEnd = n->pos() + n->length();
 

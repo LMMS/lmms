@@ -1,5 +1,5 @@
 /*
- * TrackContentObjectView.h - declaration of TrackContentObjectView class
+ * ClipView.h - declaration of ClipView class
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
@@ -30,7 +30,7 @@
 
 #include "ModelView.h"
 #include "Rubberband.h"
-#include "TrackContentObject.h"
+#include "Clip.h"
 
 
 class QMenu;
@@ -38,11 +38,11 @@ class QContextMenuEvent;
 
 class DataFile;
 class TextFloat;
-class TrackContentObject;
+class Clip;
 class TrackView;
 
 
-class TrackContentObjectView : public selectableObject, public ModelView
+class ClipView : public selectableObject, public ModelView
 {
 	Q_OBJECT
 
@@ -60,14 +60,14 @@ class TrackContentObjectView : public selectableObject, public ModelView
 	Q_PROPERTY( QSize mouseHotspotHand WRITE setMouseHotspotHand )
 
 public:
-	TrackContentObjectView( TrackContentObject * tco, TrackView * tv );
-	virtual ~TrackContentObjectView();
+	ClipView( Clip * clip, TrackView * tv );
+	virtual ~ClipView();
 
-	bool fixedTCOs();
+	bool fixedClips();
 
-	inline TrackContentObject * getTrackContentObject()
+	inline Clip * getClip()
 	{
-		return m_tco;
+		return m_clip;
 	}
 
 	inline TrackView * getTrackView()
@@ -98,19 +98,19 @@ public:
 	bool needsUpdate();
 	void setNeedsUpdate( bool b );
 
-	// Method to get a QVector of TCOs to be affected by a context menu action
-	QVector<TrackContentObjectView *> getClickedTCOs();
+	// Method to get a QVector of Clips to be affected by a context menu action
+	QVector<ClipView *> getClickedClips();
 
-	// Methods to remove, copy, cut, paste and mute a QVector of TCO views
-	void copy( QVector<TrackContentObjectView *> tcovs );
-	void cut( QVector<TrackContentObjectView *> tcovs );
+	// Methods to remove, copy, cut, paste and mute a QVector of Clip views
+	void copy( QVector<ClipView *> clipvs );
+	void cut( QVector<ClipView *> clipvs );
 	void paste();
 	// remove and toggleMute are static because they don't depend
-	// being called from a particular TCO view, but can be called anywhere as long
-	// as a valid TCO view list is given, while copy/cut require an instance for
+	// being called from a particular Clip view, but can be called anywhere as long
+	// as a valid Clip view list is given, while copy/cut require an instance for
 	// some metadata to be written to the clipboard.
-	static void remove( QVector<TrackContentObjectView *> tcovs );
-	static void toggleMute( QVector<TrackContentObjectView *> tcovs );
+	static void remove( QVector<ClipView *> clipvs );
+	static void toggleMute( QVector<ClipView *> clipvs );
 
 	QColor getColorForDisplay( QColor );
 
@@ -153,7 +153,7 @@ protected:
 	float pixelsPerBar();
 
 
-	DataFile createTCODataFiles(const QVector<TrackContentObjectView *> & tcos) const;
+	DataFile createClipDataFiles(const QVector<ClipView *> & clips) const;
 
 	virtual void paintTextLabel(QString const & text, QPainter & painter);
 
@@ -177,13 +177,13 @@ private:
 
 	static TextFloat * s_textFloat;
 
-	TrackContentObject * m_tco;
+	Clip * m_clip;
 	TrackView * m_trackView;
 	Actions m_action;
 	QPoint m_initialMousePos;
 	QPoint m_initialMouseGlobalPos;
-	TimePos m_initialTCOPos;
-	TimePos m_initialTCOEnd;
+	TimePos m_initialClipPos;
+	TimePos m_initialClipEnd;
 	QVector<TimePos> m_initialOffsets;
 
 	TextFloat * m_hint;
@@ -205,13 +205,13 @@ private:
 	{
 		m_initialMousePos = pos;
 		m_initialMouseGlobalPos = mapToGlobal( pos );
-		m_initialTCOPos = m_tco->startPosition();
-		m_initialTCOEnd = m_initialTCOPos + m_tco->length();
+		m_initialClipPos = m_clip->startPosition();
+		m_initialClipEnd = m_initialClipPos + m_clip->length();
 	}
 	void setInitialOffsets();
 
 	bool mouseMovedDistance( QMouseEvent * me, int distance );
-	TimePos draggedTCOPos( QMouseEvent * me );
+	TimePos draggedClipPos( QMouseEvent * me );
 } ;
 
 

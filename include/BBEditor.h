@@ -71,7 +71,7 @@ class BBTrackContainerView : public TrackContainerView
 public:
 	BBTrackContainerView(BBTrackContainer* tc);
 
-	bool fixedTCOs() const override
+	bool fixedClips() const override
 	{
 		return true;
 	}

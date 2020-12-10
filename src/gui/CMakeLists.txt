@@ -6,6 +6,7 @@ SET(LMMS_SRCS
 	gui/AudioDeviceSetupWidget.cpp
 	gui/AutomatableModelView.cpp
 	gui/AutomationPatternView.cpp
+	gui/ClipView.cpp
 	gui/ControllerConnectionDialog.cpp
 	gui/ControllerDialog.cpp
 	gui/EffectControlDialog.cpp
@@ -35,7 +36,6 @@ SET(LMMS_SRCS
 	gui/TimeLineWidget.cpp
 	gui/ToolPluginView.cpp
 	gui/TrackContainerView.cpp
-	gui/TrackContentObjectView.cpp
 	gui/TrackView.cpp
 
 	gui/dialogs/FileDialog.cpp

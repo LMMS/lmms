@@ -7,6 +7,7 @@ set(LMMS_SRCS
 	core/base64.cpp
 	core/BBTrackContainer.cpp
 	core/BufferManager.cpp
+	core/Clip.cpp
 	core/Clipboard.cpp
 	core/ComboBoxModel.cpp
 	core/ConfigManager.cpp
@@ -71,7 +72,6 @@ set(LMMS_SRCS
 	core/ToolPlugin.cpp
 	core/Track.cpp
 	core/TrackContainer.cpp
-	core/TrackContentObject.cpp
 	core/ValueBuffer.cpp
 	core/VstSyncController.cpp
 	core/StepRecorder.cpp

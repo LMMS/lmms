@@ -33,7 +33,7 @@
 #include "FxMixer.h"
 #include "FxLineLcdSpinBox.h"
 #include "Track.h"
-#include "TrackContentObjectView.h"
+#include "ClipView.h"
 #include "TrackView.h"
 
 class EffectRackView;
@@ -44,13 +44,13 @@ class TrackLabelButton;
 class QLineEdit;
 
 
-class SampleTCO : public TrackContentObject
+class SampleClip : public Clip
 {
 	Q_OBJECT
 	mapPropertyFromModel(bool,isRecord,setRecord,m_recordModel);
 public:
-	SampleTCO( Track * _track );
-	virtual ~SampleTCO();
+	SampleClip( Track * _track );
+	virtual ~SampleClip();
 
 	void changeLength( const TimePos & _length ) override;
 	const QString & sampleFile() const;
@@ -59,7 +59,7 @@ public:
 	void loadSettings( const QDomElement & _this ) override;
 	inline QString nodeName() const override
 	{
-		return "sampletco";
+		return "sampleclip";
 	}
 
 	SampleBuffer* sampleBuffer()
@@ -70,7 +70,7 @@ public:
 	TimePos sampleLength() const;
 	void setSampleStartFrame( f_cnt_t startFrame );
 	void setSamplePlayLength( f_cnt_t length );
-	TrackContentObjectView * createView( TrackView * _tv ) override;
+	ClipView * createView( TrackView * _tv ) override;
 
 
 	bool isPlaying() const;
@@ -82,7 +82,7 @@ public slots:
 	void updateLength();
 	void toggleRecord();
 	void playbackPositionChanged();
-	void updateTrackTcos();
+	void updateTrackClips();
 
 
 private:
@@ -91,7 +91,7 @@ private:
 	bool m_isPlaying;
 
 
-	friend class SampleTCOView;
+	friend class SampleClipView;
 
 
 signals:
@@ -102,13 +102,13 @@ signals:
 
 
 
-class SampleTCOView : public TrackContentObjectView
+class SampleClipView : public ClipView
 {
 	Q_OBJECT
 
 public:
-	SampleTCOView( SampleTCO * _tco, TrackView * _tv );
-	virtual ~SampleTCOView() = default;
+	SampleClipView( SampleClip * _clip, TrackView * _tv );
+	virtual ~SampleClipView() = default;
 
 public slots:
 	void updateSample();
@@ -127,7 +127,7 @@ protected:
 
 
 private:
-	SampleTCO * m_tco;
+	SampleClip * m_clip;
 	QPixmap m_paintPixmap;
 } ;
 
@@ -142,9 +142,9 @@ public:
 	virtual ~SampleTrack();
 
 	virtual bool play( const TimePos & _start, const fpp_t _frames,
-						const f_cnt_t _frame_base, int _tco_num = -1 ) override;
+						const f_cnt_t _frame_base, int _clip_num = -1 ) override;
 	TrackView * createView( TrackContainerView* tcv ) override;
-	TrackContentObject* createTCO(const TimePos & pos) override;
+	Clip* createClip(const TimePos & pos) override;
 
 
 	virtual void saveTrackSpecificSettings( QDomDocument & _doc,
@@ -181,8 +181,8 @@ signals:
 	void playingChanged();
 
 public slots:
-	void updateTcos();
-	void setPlayingTcos( bool isPlaying );
+	void updateClips();
+	void setPlayingClips( bool isPlaying );
 	void updateEffectChannel();
 
 private:

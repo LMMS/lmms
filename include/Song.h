@@ -275,7 +275,7 @@ public:
 	}
 
 	//TODO: Add Q_DECL_OVERRIDE when Qt4 is dropped
-	AutomatedValueMap automatedValuesAt(TimePos time, int tcoNum = -1) const override;
+	AutomatedValueMap automatedValuesAt(TimePos time, int clipNum = -1) const override;
 
 	// file management
 	void createNewProject();
@@ -316,7 +316,7 @@ public:
 		return "song";
 	}
 
-	virtual bool fixedTCOs() const
+	virtual bool fixedClips() const
 	{
 		return false;
 	}

@@ -31,7 +31,7 @@
 #include <QtCore/QMap>
 #include <QStaticText>
 
-#include "TrackContentObjectView.h"
+#include "ClipView.h"
 #include "Track.h"
 #include "TrackView.h"
 
@@ -39,38 +39,38 @@ class TrackLabelButton;
 class TrackContainer;
 
 
-class BBTCO : public TrackContentObject
+class BBClip : public Clip
 {
 public:
-	BBTCO( Track * _track );
-	virtual ~BBTCO() = default;
+	BBClip( Track * _track );
+	virtual ~BBClip() = default;
 
 	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
 	void loadSettings( const QDomElement & _this ) override;
 	inline QString nodeName() const override
 	{
-		return( "bbtco" );
+		return( "bbclip" );
 	}
 
 	int bbTrackIndex();
 
-	TrackContentObjectView * createView( TrackView * _tv ) override;
+	ClipView * createView( TrackView * _tv ) override;
 
 private:
 
 
-	friend class BBTCOView;
+	friend class BBClipView;
 
 } ;
 
 
 
-class BBTCOView : public TrackContentObjectView
+class BBClipView : public ClipView
 {
 	Q_OBJECT
 public:
-	BBTCOView( TrackContentObject * _tco, TrackView * _tv );
-	virtual ~BBTCOView() = default;
+	BBClipView( Clip * _clip, TrackView * _tv );
+	virtual ~BBClipView() = default;
 
 
 public slots:
@@ -89,7 +89,7 @@ protected:
 
 
 private:
-	BBTCO * m_bbTCO;
+	BBClip * m_bbClip;
 	QPixmap m_paintPixmap;
 	
 	QStaticText m_staticTextName;
@@ -106,9 +106,9 @@ public:
 	virtual ~BBTrack();
 
 	virtual bool play( const TimePos & _start, const fpp_t _frames,
-						const f_cnt_t _frame_base, int _tco_num = -1 ) override;
+						const f_cnt_t _frame_base, int _clip_num = -1 ) override;
 	TrackView * createView( TrackContainerView* tcv ) override;
-	TrackContentObject* createTCO(const TimePos & pos) override;
+	Clip* createClip(const TimePos & pos) override;
 
 	virtual void saveTrackSpecificSettings( QDomDocument & _doc,
 							QDomElement & _parent ) override;

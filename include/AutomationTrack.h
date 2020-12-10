@@ -39,7 +39,7 @@ public:
 	virtual ~AutomationTrack() = default;
 
 	virtual bool play( const TimePos & _start, const fpp_t _frames,
-						const f_cnt_t _frame_base, int _tco_num = -1 ) override;
+						const f_cnt_t _frame_base, int _clip_num = -1 ) override;
 
 	QString nodeName() const override
 	{
@@ -47,7 +47,7 @@ public:
 	}
 
 	TrackView * createView( TrackContainerView* ) override;
-	TrackContentObject* createTCO(const TimePos & pos) override;
+	Clip* createClip(const TimePos & pos) override;
 
 	virtual void saveTrackSpecificSettings( QDomDocument & _doc,
 							QDomElement & _parent ) override;

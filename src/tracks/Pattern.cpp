@@ -53,7 +53,7 @@ QPixmap * PatternView::s_stepBtnOffLight = NULL;
 
 
 Pattern::Pattern( InstrumentTrack * _instrument_track ) :
-	TrackContentObject( _instrument_track ),
+	Clip( _instrument_track ),
 	m_instrumentTrack( _instrument_track ),
 	m_patternType( BeatPattern ),
 	m_steps( TimePos::stepsPerBar() )
@@ -71,7 +71,7 @@ Pattern::Pattern( InstrumentTrack * _instrument_track ) :
 
 
 Pattern::Pattern( const Pattern& other ) :
-	TrackContentObject( other.m_instrumentTrack ),
+	Clip( other.m_instrumentTrack ),
 	m_instrumentTrack( other.m_instrumentTrack ),
 	m_patternType( other.m_patternType ),
 	m_steps( other.m_steps )
@@ -124,10 +124,10 @@ void Pattern::resizeToFirstTrack()
 		{
 			if(tracks.at(trackID) != m_instrumentTrack)
 			{
-				unsigned int currentTCO = m_instrumentTrack->
-					getTCOs().indexOf(this);
+				unsigned int currentClip = m_instrumentTrack->
+					getClips().indexOf(this);
 				m_steps = static_cast<Pattern *>
-					(tracks.at(trackID)->getTCO(currentTCO))
+					(tracks.at(trackID)->getClip(currentClip))
 					->m_steps;
 			}
 			break;
@@ -458,9 +458,9 @@ Pattern *  Pattern::nextPattern() const
 
 Pattern * Pattern::adjacentPatternByOffset(int offset) const
 {
-	QVector<TrackContentObject *> tcos = m_instrumentTrack->getTCOs();
-	int tcoNum = m_instrumentTrack->getTCONum(this);
-	return dynamic_cast<Pattern*>(tcos.value(tcoNum + offset, NULL));
+	QVector<Clip *> clips = m_instrumentTrack->getClips();
+	int clipNum = m_instrumentTrack->getClipNum(this);
+	return dynamic_cast<Pattern*>(clips.value(clipNum + offset, NULL));
 }
 
 
@@ -524,7 +524,7 @@ void Pattern::removeSteps()
 
 
 
-TrackContentObjectView * Pattern::createView( TrackView * _tv )
+ClipView * Pattern::createView( TrackView * _tv )
 {
 	return new PatternView( this, _tv );
 }
@@ -587,7 +587,7 @@ void Pattern::changeTimeSignature()
 
 
 PatternView::PatternView( Pattern* pattern, TrackView* parent ) :
-	TrackContentObjectView( pattern, parent ),
+	ClipView( pattern, parent ),
 	m_pat( pattern ),
 	m_paintPixmap(),
 	m_noteFillColor(255, 255, 255, 220),
@@ -631,7 +631,7 @@ void PatternView::update()
 {
 	ToolTip::add(this, m_pat->name());
 
-	TrackContentObjectView::update();
+	ClipView::update();
 }
 
 
@@ -723,7 +723,7 @@ void PatternView::mousePressEvent( QMouseEvent * _me )
 {
 	if( _me->button() == Qt::LeftButton &&
 				m_pat->m_patternType == Pattern::BeatPattern &&
-				( fixedTCOs() || pixelsPerBar() >= 96 ) &&
+				( fixedClips() || pixelsPerBar() >= 96 ) &&
 				_me->y() > height() - s_stepBtnOff->height() )
 
 	// when mouse button is pressed in beat/bassline -mode
@@ -731,8 +731,8 @@ void PatternView::mousePressEvent( QMouseEvent * _me )
 	{
 //	get the step number that was clicked on and
 //	do calculations in floats to prevent rounding errors...
-		float tmp = ( ( float(_me->x()) - TCO_BORDER_WIDTH ) *
-				float( m_pat -> m_steps ) ) / float(width() - TCO_BORDER_WIDTH*2);
+		float tmp = ( ( float(_me->x()) - Clip_BORDER_WIDTH ) *
+				float( m_pat -> m_steps ) ) / float(width() - Clip_BORDER_WIDTH*2);
 
 		int step = int( tmp );
 
@@ -770,7 +770,7 @@ void PatternView::mousePressEvent( QMouseEvent * _me )
 	// if not in beat/bassline -mode, let parent class handle the event
 
 	{
-		TrackContentObjectView::mousePressEvent( _me );
+		ClipView::mousePressEvent( _me );
 	}
 }
 
@@ -781,7 +781,7 @@ void PatternView::mouseDoubleClickEvent(QMouseEvent *_me)
 		_me->ignore();
 		return;
 	}
-	if( m_pat->m_patternType == Pattern::MelodyPattern || !fixedTCOs() )
+	if( m_pat->m_patternType == Pattern::MelodyPattern || !fixedClips() )
 	{
 		openInPianoRoll();
 	}
@@ -793,13 +793,13 @@ void PatternView::mouseDoubleClickEvent(QMouseEvent *_me)
 void PatternView::wheelEvent(QWheelEvent * we)
 {
 	if(m_pat->m_patternType == Pattern::BeatPattern &&
-				(fixedTCOs() || pixelsPerBar() >= 96) &&
+				(fixedClips() || pixelsPerBar() >= 96) &&
 				position(we).y() > height() - s_stepBtnOff->height())
 	{
 //	get the step number that was wheeled on and
 //	do calculations in floats to prevent rounding errors...
-		float tmp = ((float(position(we).x()) - TCO_BORDER_WIDTH) *
-				float(m_pat -> m_steps)) / float(width() - TCO_BORDER_WIDTH*2);
+		float tmp = ((float(position(we).x()) - Clip_BORDER_WIDTH) *
+				float(m_pat -> m_steps)) / float(width() - Clip_BORDER_WIDTH*2);
 
 		int step = int( tmp );
 
@@ -838,7 +838,7 @@ void PatternView::wheelEvent(QWheelEvent * we)
 	}
 	else
 	{
-		TrackContentObjectView::wheelEvent(we);
+		ClipView::wheelEvent(we);
 	}
 }
 
@@ -874,7 +874,7 @@ void PatternView::paintEvent( QPaintEvent * )
 	
 	if( beatPattern )
 	{
-		// Do not paint BBTCOs how we paint pattern TCOs
+		// Do not paint BBClips how we paint pattern Clips
 		c = BBPatternBackground();
 	}
 	else
@@ -904,9 +904,9 @@ void PatternView::paintEvent( QPaintEvent * )
 	bool const drawName = !m_pat->name().isEmpty();
 	bool const drawTextBox = !beatPattern && drawName;
 
-	// TODO Warning! This might cause problems if TrackContentObjectView::paintTextLabel changes
+	// TODO Warning! This might cause problems if ClipView::paintTextLabel changes
 	int textBoxHeight = 0;
-	const int textTop = TCO_BORDER_WIDTH + 1;
+	const int textTop = Clip_BORDER_WIDTH + 1;
 	if (drawTextBox)
 	{
 		QFont labelFont = this->font();
@@ -917,15 +917,15 @@ void PatternView::paintEvent( QPaintEvent * )
 	}
 
 	// Compute pixels per bar
-	const int baseWidth = fixedTCOs() ? parentWidget()->width() - 2 * TCO_BORDER_WIDTH
-						: width() - TCO_BORDER_WIDTH;
+	const int baseWidth = fixedClips() ? parentWidget()->width() - 2 * Clip_BORDER_WIDTH
+						: width() - Clip_BORDER_WIDTH;
 	const float pixelsPerBar = baseWidth / (float) m_pat->length().getBar();
 
 	// Length of one bar/beat in the [0,1] x [0,1] coordinate system
 	const float barLength = 1. / m_pat->length().getBar();
 	const float tickLength = barLength / TimePos::ticksPerBar();
 
-	const int x_base = TCO_BORDER_WIDTH;
+	const int x_base = Clip_BORDER_WIDTH;
 
 	// melody pattern paint event
 	NoteVector const & noteCollection = m_pat->m_notes;
@@ -1044,7 +1044,7 @@ void PatternView::paintEvent( QPaintEvent * )
 	}
 
 	// beat pattern paint event
-	else if( beatPattern &&	( fixedTCOs() || pixelsPerBar >= 96 ) )
+	else if( beatPattern &&	( fixedClips() || pixelsPerBar >= 96 ) )
 	{
 		QPixmap stepon0;
 		QPixmap stepon200;
@@ -1052,7 +1052,7 @@ void PatternView::paintEvent( QPaintEvent * )
 		QPixmap stepoffl;
 		const int steps = qMax( 1,
 					m_pat->m_steps );
-		const int w = width() - 2 * TCO_BORDER_WIDTH;
+		const int w = width() - 2 * Clip_BORDER_WIDTH;
 
 		// scale step graphics to fit the beat pattern length
 		stepon0 = s_stepBtnOn0->scaled( w / steps,
@@ -1077,7 +1077,7 @@ void PatternView::paintEvent( QPaintEvent * )
 			Note * n = m_pat->noteAtStep( it );
 
 			// figure out x and y coordinates for step graphic
-			const int x = TCO_BORDER_WIDTH + static_cast<int>( it * w / steps );
+			const int x = Clip_BORDER_WIDTH + static_cast<int>( it * w / steps );
 			const int y = height() - s_stepBtnOff->height() - 1;
 
 			if( n )
@@ -1115,12 +1115,12 @@ void PatternView::paintEvent( QPaintEvent * )
 	for( bar_t t = 1; t < m_pat->length().getBar(); ++t )
 	{
 		p.drawLine( x_base + static_cast<int>( pixelsPerBar * t ) - 1,
-				TCO_BORDER_WIDTH, x_base + static_cast<int>(
-						pixelsPerBar * t ) - 1, TCO_BORDER_WIDTH + lineSize );
+				Clip_BORDER_WIDTH, x_base + static_cast<int>(
+						pixelsPerBar * t ) - 1, Clip_BORDER_WIDTH + lineSize );
 		p.drawLine( x_base + static_cast<int>( pixelsPerBar * t ) - 1,
-				rect().bottom() - ( lineSize + TCO_BORDER_WIDTH ),
+				rect().bottom() - ( lineSize + Clip_BORDER_WIDTH ),
 				x_base + static_cast<int>( pixelsPerBar * t ) - 1,
-				rect().bottom() - TCO_BORDER_WIDTH );
+				rect().bottom() - Clip_BORDER_WIDTH );
 	}
 
 	// pattern name
@@ -1129,12 +1129,12 @@ void PatternView::paintEvent( QPaintEvent * )
 		paintTextLabel(m_pat->name(), p);
 	}
 
-	if( !( fixedTCOs() && beatPattern ) )
+	if( !( fixedClips() && beatPattern ) )
 	{
 		// inner border
 		p.setPen( c.lighter( current ? 160 : 130 ) );
-		p.drawRect( 1, 1, rect().right() - TCO_BORDER_WIDTH,
-			rect().bottom() - TCO_BORDER_WIDTH );
+		p.drawRect( 1, 1, rect().right() - Clip_BORDER_WIDTH,
+			rect().bottom() - Clip_BORDER_WIDTH );
 
 		// outer border
 		p.setPen( current ? c.lighter( 130 ) : c.darker( 300 ) );
@@ -1144,7 +1144,7 @@ void PatternView::paintEvent( QPaintEvent * )
 	// draw the 'muted' pixmap only if the pattern was manually muted
 	if( m_pat->isMuted() )
 	{
-		const int spacing = TCO_BORDER_WIDTH;
+		const int spacing = Clip_BORDER_WIDTH;
 		const int size = 14;
 		p.drawPixmap( spacing, height() - ( size + spacing ),
 			embed::getIconPixmap( "muted", size, size ) );

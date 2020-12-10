@@ -1,5 +1,5 @@
 /*
- * BBTrack.cpp - implementation of class BBTrack and bbTCO
+ * BBTrack.cpp - implementation of class BBTrack and bbClip
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
@@ -46,8 +46,8 @@
 BBTrack::infoMap BBTrack::s_infoMap;
 
 
-BBTCO::BBTCO( Track * _track ) :
-	TrackContentObject( _track )
+BBClip::BBClip( Track * _track ) :
+	Clip( _track )
 {
 	bar_t t = Engine::getBBTrackContainer()->lengthOfBB( bbTrackIndex() );
 	if( t > 0 )
@@ -59,7 +59,7 @@ BBTCO::BBTCO( Track * _track ) :
 	setAutoResize( false );
 }
 
-void BBTCO::saveSettings( QDomDocument & doc, QDomElement & element )
+void BBClip::saveSettings( QDomDocument & doc, QDomElement & element )
 {
 	element.setAttribute( "name", name() );
 	if( element.parentNode().nodeName() == "clipboard" )
@@ -81,7 +81,7 @@ void BBTCO::saveSettings( QDomDocument & doc, QDomElement & element )
 
 
 
-void BBTCO::loadSettings( const QDomElement & element )
+void BBClip::loadSettings( const QDomElement & element )
 {
 	setName( element.attribute( "name" ) );
 	if( element.attribute( "pos" ).toInt() >= 0 )
@@ -113,33 +113,33 @@ void BBTCO::loadSettings( const QDomElement & element )
 
 
 
-int BBTCO::bbTrackIndex()
+int BBClip::bbTrackIndex()
 {
 	return dynamic_cast<BBTrack *>( getTrack() )->index();
 }
 
 
 
-TrackContentObjectView * BBTCO::createView( TrackView * _tv )
+ClipView * BBClip::createView( TrackView * _tv )
 {
-	return new BBTCOView( this, _tv );
+	return new BBClipView( this, _tv );
 }
 
 
 
 
-BBTCOView::BBTCOView( TrackContentObject * _tco, TrackView * _tv ) :
-	TrackContentObjectView( _tco, _tv ),
-	m_bbTCO( dynamic_cast<BBTCO *>( _tco ) ),
+BBClipView::BBClipView( Clip * _clip, TrackView * _tv ) :
+	ClipView( _clip, _tv ),
+	m_bbClip( dynamic_cast<BBClip *>( _clip ) ),
 	m_paintPixmap()
 {
-	connect( _tco->getTrack(), SIGNAL( dataChanged() ), 
+	connect( _clip->getTrack(), SIGNAL( dataChanged() ), 
 			this, SLOT( update() ) );
 
 	setStyle( QApplication::style() );
 }
 
-void BBTCOView::constructContextMenu( QMenu * _cm )
+void BBClipView::constructContextMenu( QMenu * _cm )
 {
 	QAction * a = new QAction( embed::getIconPixmap( "bb_track" ),
 					tr( "Open in Beat+Bassline-Editor" ),
@@ -159,7 +159,7 @@ void BBTCOView::constructContextMenu( QMenu * _cm )
 
 
 
-void BBTCOView::mouseDoubleClickEvent( QMouseEvent * )
+void BBClipView::mouseDoubleClickEvent( QMouseEvent * )
 {
 	openInBBEditor();
 }
@@ -167,7 +167,7 @@ void BBTCOView::mouseDoubleClickEvent( QMouseEvent * )
 
 
 
-void BBTCOView::paintEvent( QPaintEvent * )
+void BBClipView::paintEvent( QPaintEvent * )
 {
 	QPainter painter( this );
 
@@ -208,35 +208,35 @@ void BBTCOView::paintEvent( QPaintEvent * )
 	const int lineSize = 3;
 	p.setPen( c.darker( 200 ) );
 
-	bar_t t = Engine::getBBTrackContainer()->lengthOfBB( m_bbTCO->bbTrackIndex() );
-	if( m_bbTCO->length() > TimePos::ticksPerBar() && t > 0 )
+	bar_t t = Engine::getBBTrackContainer()->lengthOfBB( m_bbClip->bbTrackIndex() );
+	if( m_bbClip->length() > TimePos::ticksPerBar() && t > 0 )
 	{
 		for( int x = static_cast<int>( t * pixelsPerBar() );
 								x < width() - 2;
 			x += static_cast<int>( t * pixelsPerBar() ) )
 		{
-			p.drawLine( x, TCO_BORDER_WIDTH, x, TCO_BORDER_WIDTH + lineSize );
-			p.drawLine( x, rect().bottom() - ( TCO_BORDER_WIDTH + lineSize ),
-			 	x, rect().bottom() - TCO_BORDER_WIDTH );
+			p.drawLine( x, Clip_BORDER_WIDTH, x, Clip_BORDER_WIDTH + lineSize );
+			p.drawLine( x, rect().bottom() - ( Clip_BORDER_WIDTH + lineSize ),
+			 	x, rect().bottom() - Clip_BORDER_WIDTH );
 		}
 	}
 
 	// pattern name
-	paintTextLabel(m_bbTCO->name(), p);
+	paintTextLabel(m_bbClip->name(), p);
 
 	// inner border
 	p.setPen( c.lighter( 130 ) );
-	p.drawRect( 1, 1, rect().right() - TCO_BORDER_WIDTH,
-		rect().bottom() - TCO_BORDER_WIDTH );	
+	p.drawRect( 1, 1, rect().right() - Clip_BORDER_WIDTH,
+		rect().bottom() - Clip_BORDER_WIDTH );	
 
 	// outer border
 	p.setPen( c.darker( 300 ) );
 	p.drawRect( 0, 0, rect().right(), rect().bottom() );
 	
 	// draw the 'muted' pixmap only if the pattern was manualy muted
-	if( m_bbTCO->isMuted() )
+	if( m_bbClip->isMuted() )
 	{
-		const int spacing = TCO_BORDER_WIDTH;
+		const int spacing = Clip_BORDER_WIDTH;
 		const int size = 14;
 		p.drawPixmap( spacing, height() - ( size + spacing ),
 			embed::getIconPixmap( "muted", size, size ) );
@@ -251,9 +251,9 @@ void BBTCOView::paintEvent( QPaintEvent * )
 
 
 
-void BBTCOView::openInBBEditor()
+void BBClipView::openInBBEditor()
 {
-	Engine::getBBTrackContainer()->setCurrentBB( m_bbTCO->bbTrackIndex() );
+	Engine::getBBTrackContainer()->setCurrentBB( m_bbClip->bbTrackIndex() );
 
 	gui->mainWindow()->toggleBBEditorWin( true );
 }
@@ -261,26 +261,26 @@ void BBTCOView::openInBBEditor()
 
 
 
-void BBTCOView::resetName() { m_bbTCO->setName(""); }
+void BBClipView::resetName() { m_bbClip->setName(""); }
 
 
 
 
-void BBTCOView::changeName()
+void BBClipView::changeName()
 {
-	QString s = m_bbTCO->name();
+	QString s = m_bbClip->name();
 	RenameDialog rename_dlg( s );
 	rename_dlg.exec();
-	m_bbTCO->setName( s );
+	m_bbClip->setName( s );
 }
 
 
 
-void BBTCOView::update()
+void BBClipView::update()
 {
-	ToolTip::add(this, m_bbTCO->name());
+	ToolTip::add(this, m_bbClip->name());
 
-	TrackContentObjectView::update();
+	ClipView::update();
 }
 
 
@@ -292,7 +292,7 @@ BBTrack::BBTrack( TrackContainer* tc ) :
 	s_infoMap[this] = bbNum;
 
 	setName( tr( "Beat/Bassline %1" ).arg( bbNum ) );
-	Engine::getBBTrackContainer()->createTCOsForBB( bbNum );
+	Engine::getBBTrackContainer()->createClipsForBB( bbNum );
 	Engine::getBBTrackContainer()->setCurrentBB( bbNum );
 	Engine::getBBTrackContainer()->updateComboBox();
 
@@ -331,31 +331,31 @@ BBTrack::~BBTrack()
 
 
 
-// play _frames frames of given TCO within starting with _start
+// play _frames frames of given Clip within starting with _start
 bool BBTrack::play( const TimePos & _start, const fpp_t _frames,
-					const f_cnt_t _offset, int _tco_num )
+					const f_cnt_t _offset, int _clip_num )
 {
 	if( isMuted() )
 	{
 		return false;
 	}
 
-	if( _tco_num >= 0 )
+	if( _clip_num >= 0 )
 	{
 		return Engine::getBBTrackContainer()->play( _start, _frames, _offset, s_infoMap[this] );
 	}
 
-	tcoVector tcos;
-	getTCOsInRange( tcos, _start, _start + static_cast<int>( _frames / Engine::framesPerTick() ) );
+	clipVector clips;
+	getClipsInRange( clips, _start, _start + static_cast<int>( _frames / Engine::framesPerTick() ) );
 
-	if( tcos.size() == 0 )
+	if( clips.size() == 0 )
 	{
 		return false;
 	}
 
 	TimePos lastPosition;
 	TimePos lastLen;
-	for( tcoVector::iterator it = tcos.begin(); it != tcos.end(); ++it )
+	for( clipVector::iterator it = clips.begin(); it != clips.end(); ++it )
 	{
 		if( !( *it )->isMuted() &&
 				( *it )->startPosition() >= lastPosition )
@@ -383,11 +383,11 @@ TrackView * BBTrack::createView( TrackContainerView* tcv )
 
 
 
-TrackContentObject* BBTrack::createTCO(const TimePos & pos)
+Clip* BBTrack::createClip(const TimePos & pos)
 {
-	BBTCO* bbtco = new BBTCO(this);
-	bbtco->movePosition(pos);
-	return bbtco;
+	BBClip* bbclip = new BBClip(this);
+	bbclip->movePosition(pos);
+	return bbclip;
 }
 
 
@@ -428,13 +428,13 @@ void BBTrack::loadTrackSpecificSettings( const QDomElement & _this )
 		const int dst = s_infoMap[this];
 		TrackContainer::TrackList tl =
 					Engine::getBBTrackContainer()->tracks();
-		// copy TCOs of all tracks from source BB (at bar "src") to destination
-		// TCOs (which are created if they do not exist yet)
+		// copy Clips of all tracks from source BB (at bar "src") to destination
+		// Clips (which are created if they do not exist yet)
 		for( TrackContainer::TrackList::iterator it = tl.begin();
 							it != tl.end(); ++it )
 		{
-			TrackContentObject::copyStateTo( ( *it )->getTCO( src ),
-				( *it )->getTCO( dst ) );
+			Clip::copyStateTo( ( *it )->getClip( src ),
+				( *it )->getClip( dst ) );
 		}
 		setName( tr( "Clone of %1" ).arg(
 					_this.parentNode().toElement().attribute( "name" ) ) );

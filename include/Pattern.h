@@ -34,13 +34,13 @@
 
 
 #include "Note.h"
-#include "TrackContentObjectView.h"
+#include "ClipView.h"
 
 
 class InstrumentTrack;
 
 
-class LMMS_EXPORT Pattern : public TrackContentObject
+class LMMS_EXPORT Pattern : public Clip
 {
 	Q_OBJECT
 public:
@@ -103,7 +103,7 @@ public:
 	bool empty();
 
 
-	TrackContentObjectView * createView( TrackView * _tv ) override;
+	ClipView * createView( TrackView * _tv ) override;
 
 
 	using Model::dataChanged;
@@ -150,7 +150,7 @@ signals:
 
 
 
-class PatternView : public TrackContentObjectView
+class PatternView : public ClipView
 {
 	Q_OBJECT
 

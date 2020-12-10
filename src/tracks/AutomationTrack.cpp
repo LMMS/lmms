@@ -41,7 +41,7 @@ AutomationTrack::AutomationTrack( TrackContainer* tc, bool _hidden ) :
 }
 
 bool AutomationTrack::play( const TimePos & time_start, const fpp_t _frames,
-							const f_cnt_t _frame_base, int _tco_num )
+							const f_cnt_t _frame_base, int _clip_num )
 {
 	return false;
 }
@@ -57,7 +57,7 @@ TrackView * AutomationTrack::createView( TrackContainerView* tcv )
 
 
 
-TrackContentObject* AutomationTrack::createTCO(const TimePos & pos)
+Clip* AutomationTrack::createClip(const TimePos & pos)
 {
 	AutomationPattern* p = new AutomationPattern(this);
 	p->movePosition(pos);
@@ -132,8 +132,8 @@ void AutomationTrackView::dropEvent( QDropEvent * _de )
 				pos.setTicks( 0 );
 			}
 
-			TrackContentObject * tco = getTrack()->createTCO( pos );
-			AutomationPattern * pat = dynamic_cast<AutomationPattern *>( tco );
+			Clip * clip = getTrack()->createClip( pos );
+			AutomationPattern * pat = dynamic_cast<AutomationPattern *>( clip );
 			pat->addObject( mod );
 		}
 	}

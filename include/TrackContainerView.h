@@ -65,7 +65,7 @@ public:
 		return m_currentPosition;
 	}
 
-	virtual bool fixedTCOs() const
+	virtual bool fixedClips() const
 	{
 		return false;
 	}

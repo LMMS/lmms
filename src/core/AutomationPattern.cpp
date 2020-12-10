@@ -42,7 +42,7 @@ const float AutomationPattern::DEFAULT_MAX_VALUE = 1;
 
 
 AutomationPattern::AutomationPattern( AutomationTrack * _auto_track ) :
-	TrackContentObject( _auto_track ),
+	Clip( _auto_track ),
 	m_autoTrack( _auto_track ),
 	m_objects(),
 	m_tension( 1.0 ),
@@ -73,7 +73,7 @@ AutomationPattern::AutomationPattern( AutomationTrack * _auto_track ) :
 
 
 AutomationPattern::AutomationPattern( const AutomationPattern & _pat_to_copy ) :
-	TrackContentObject( _pat_to_copy.m_autoTrack ),
+	Clip( _pat_to_copy.m_autoTrack ),
 	m_autoTrack( _pat_to_copy.m_autoTrack ),
 	m_objects( _pat_to_copy.m_objects ),
 	m_tension( _pat_to_copy.m_tension ),
@@ -184,7 +184,7 @@ TimePos AutomationPattern::timeMapLength() const
 	timeMap::const_iterator it = m_timeMap.end();
 	tick_t last_tick = static_cast<tick_t>((it-1).key());
 	// if last_tick is 0 (single item at tick 0)
-	// return length as a whole bar to prevent disappearing TCO
+	// return length as a whole bar to prevent disappearing Clip
 	if (last_tick == 0) { return one_bar; }
 
 	return TimePos(last_tick);
@@ -623,9 +623,9 @@ void AutomationPattern::loadSettings( const QDomElement & _this )
 
 const QString AutomationPattern::name() const
 {
-	if( !TrackContentObject::name().isEmpty() )
+	if( !Clip::name().isEmpty() )
 	{
-		return TrackContentObject::name();
+		return Clip::name();
 	}
 	if( !m_objects.isEmpty() && m_objects.first() != NULL )
 	{
@@ -637,7 +637,7 @@ const QString AutomationPattern::name() const
 
 
 
-TrackContentObjectView * AutomationPattern::createView( TrackView * _tv )
+ClipView * AutomationPattern::createView( TrackView * _tv )
 {
 	return new AutomationPatternView( this, _tv );
 }
@@ -658,8 +658,8 @@ bool AutomationPattern::isAutomated( const AutomatableModel * _m )
 		if( ( *it )->type() == Track::AutomationTrack ||
 			( *it )->type() == Track::HiddenAutomationTrack )
 		{
-			const Track::tcoVector & v = ( *it )->getTCOs();
-			for( Track::tcoVector::ConstIterator j = v.begin(); j != v.end(); ++j )
+			const Track::clipVector & v = ( *it )->getClips();
+			for( Track::clipVector::ConstIterator j = v.begin(); j != v.end(); ++j )
 			{
 				const AutomationPattern * a = dynamic_cast<const AutomationPattern *>( *j );
 				if( a && a->hasAutomation() )
@@ -698,9 +698,9 @@ QVector<AutomationPattern *> AutomationPattern::patternsForModel( const Automata
 			( *it )->type() == Track::HiddenAutomationTrack )
 		{
 			// get patterns in those tracks....
-			const Track::tcoVector & v = ( *it )->getTCOs();
+			const Track::clipVector & v = ( *it )->getClips();
 			// go through all the patterns...
-			for( Track::tcoVector::ConstIterator j = v.begin(); j != v.end(); ++j )
+			for( Track::clipVector::ConstIterator j = v.begin(); j != v.end(); ++j )
 			{
 				AutomationPattern * a = dynamic_cast<AutomationPattern *>( *j );
 				// check that the pattern has automation
@@ -731,8 +731,8 @@ AutomationPattern * AutomationPattern::globalAutomationPattern(
 							AutomatableModel * _m )
 {
 	AutomationTrack * t = Engine::getSong()->globalAutomationTrack();
-	Track::tcoVector v = t->getTCOs();
-	for( Track::tcoVector::const_iterator j = v.begin(); j != v.end(); ++j )
+	Track::clipVector v = t->getClips();
+	for( Track::clipVector::const_iterator j = v.begin(); j != v.end(); ++j )
 	{
 		AutomationPattern * a = dynamic_cast<AutomationPattern *>( *j );
 		if( a )
@@ -767,8 +767,8 @@ void AutomationPattern::resolveAllIDs()
 		if( ( *it )->type() == Track::AutomationTrack ||
 			 ( *it )->type() == Track::HiddenAutomationTrack )
 		{
-			Track::tcoVector v = ( *it )->getTCOs();
-			for( Track::tcoVector::iterator j = v.begin();
+			Track::clipVector v = ( *it )->getClips();
+			for( Track::clipVector::iterator j = v.begin();
 							j != v.end(); ++j )
 			{
 				AutomationPattern * a = dynamic_cast<AutomationPattern *>( *j );

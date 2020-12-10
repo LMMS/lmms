@@ -30,10 +30,10 @@
 #include "AutomationPattern.h"
 #include "Song.h"
 #include "SongEditor.h"
-#include "TrackContentObjectView.h"
+#include "ClipView.h"
 
 
-class AutomationPatternView : public TrackContentObjectView
+class AutomationPatternView : public ClipView
 {
 	Q_OBJECT
 

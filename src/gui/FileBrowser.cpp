@@ -861,7 +861,7 @@ bool FileBrowserTreeWidget::openInNewSampleTrack(FileItem* item)
 
 	// Add the sample clip to the track
 	Engine::mixer()->requestChangeInModel();
-	SampleTCO* clip = static_cast<SampleTCO*>(sampleTrack->createTCO(0));
+	SampleClip* clip = static_cast<SampleClip*>(sampleTrack->createClip(0));
 	clip->setSampleFile(item->fullName());
 	Engine::mixer()->doneChangeInModel();
 	return true;
