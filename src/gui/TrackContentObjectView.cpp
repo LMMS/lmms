@@ -1214,9 +1214,9 @@ void TrackContentObjectView::mergeTCOs(QVector<TrackContentObjectView*> tcovs)
 	// Rearrange notes because we might have moved them
 	newPattern->rearrangeAllNotes();
 	// Restore journalling states now that the operation is finished
-	track->restoreJournallingState();
 	newPattern->restoreJournallingState();
-	// Update engine
+	track->restoreJournallingState();
+	// Update song
 	Engine::getSong()->setModified();
 	gui->songEditor()->update();
 }
