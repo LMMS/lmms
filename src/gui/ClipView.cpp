@@ -58,7 +58,7 @@ const int RESIZE_GRIP_WIDTH = 4;
 TextFloat * ClipView::s_textFloat = NULL;
 
 
-/*! \brief Create a new trackContentObjectView
+/*! \brief Create a new clipView
  *
  *  Creates a new clip view for the given
  *  clip in the given track view.
@@ -125,7 +125,7 @@ ClipView::ClipView( Clip * clip,
 
 
 
-/*! \brief Destroy a trackContentObjectView
+/*! \brief Destroy a clipView
  *
  *  Destroys the given clip view.
  *
@@ -166,7 +166,7 @@ void ClipView::update()
 
 
 
-/*! \brief Does this trackContentObjectView have a fixed Clip?
+/*! \brief Does this clipView have a fixed Clip?
  *
  *  Returns whether the containing trackView has fixed
  *  Clips.
@@ -247,7 +247,7 @@ bool ClipView::needsUpdate()
 void ClipView::setNeedsUpdate( bool b )
 { m_needsUpdate = b; }
 
-/*! \brief Close a trackContentObjectView
+/*! \brief Close a clipView
  *
  *  Closes a clip view by asking the track
  *  view to remove us and then asking the QWidget to close us.
@@ -263,7 +263,7 @@ bool ClipView::close()
 
 
 
-/*! \brief Removes a trackContentObjectView from its track view.
+/*! \brief Removes a clipView from its track view.
  *
  *  Like the close() method, this asks the track view to remove this
  *  clip view.  However, the clip is
@@ -282,7 +282,7 @@ void ClipView::remove()
 
 
 
-/*! \brief Updates a trackContentObjectView's length
+/*! \brief Updates a clipView's length
  *
  *  If this clip view has a fixed Clip, then we must
  *  keep the width of our parent.  Otherwise, calculate our width from
@@ -308,7 +308,7 @@ void ClipView::updateLength()
 
 
 
-/*! \brief Updates a trackContentObjectView's position.
+/*! \brief Updates a clipView's position.
  *
  *  Ask our track view to change our position.  Then make sure that the
  *  track view is updated in case this position has changed the track
@@ -351,7 +351,7 @@ void ClipView::useTrackColor()
 
 
 
-/*! \brief Change the trackContentObjectView's display when something
+/*! \brief Change the clipView's display when something
  *  being dragged enters it.
  *
  *  We need to notify Qt to change our display if something being
@@ -378,9 +378,9 @@ void ClipView::dragEnterEvent( QDragEnterEvent * dee )
 
 
 
-/*! \brief Handle something being dropped on this trackContentObjectView.
+/*! \brief Handle something being dropped on this clipView.
  *
- *  When something has been dropped on this trackContentObjectView, and
+ *  When something has been dropped on this clipView, and
  *  it's a clip, then use an instance of our dataFile reader
  *  to take the xml of the clip and turn it into something
  *  we can write over our current state.
@@ -448,10 +448,10 @@ void ClipView::leaveEvent( QEvent * e )
 	}
 }
 
-/*! \brief Create a DataFile suitable for copying multiple trackContentObjects.
+/*! \brief Create a DataFile suitable for copying multiple clips.
  *
- *	trackContentObjects in the vector are written to the "clips" node in the
- *  DataFile.  The trackContentObjectView's initial mouse position is written
+ *	clips in the vector are written to the "clips" node in the
+ *  DataFile.  The clipView's initial mouse position is written
  *  to the "initialMouseX" node in the DataFile.  When dropped on a track,
  *  this is used to create copies of the Clips.
  *
@@ -534,9 +534,9 @@ void ClipView::paintTextLabel(QString const & text, QPainter & painter)
 	painter.drawText( textLeft, finalTextTop, elidedPatternName );
 }
 
-/*! \brief Handle a mouse press on this trackContentObjectView.
+/*! \brief Handle a mouse press on this clipView.
  *
- *  Handles the various ways in which a trackContentObjectView can be
+ *  Handles the various ways in which a clipView can be
  *  used with a click of a mouse button.
  *
  *  * If our container supports rubber band selection then handle
@@ -672,9 +672,9 @@ void ClipView::mousePressEvent( QMouseEvent * me )
 
 
 
-/*! \brief Handle a mouse movement (drag) on this trackContentObjectView.
+/*! \brief Handle a mouse movement (drag) on this clipView.
  *
- *  Handles the various ways in which a trackContentObjectView can be
+ *  Handles the various ways in which a clipView can be
  *  used with a mouse drag.
  *
  *  * If in move mode, move ourselves in the track,
@@ -893,7 +893,7 @@ void ClipView::mouseMoveEvent( QMouseEvent * me )
 
 
 
-/*! \brief Handle a mouse release on this trackContentObjectView.
+/*! \brief Handle a mouse release on this clipView.
  *
  *  If we're in move or resize mode, journal the change as appropriate.
  *  Then tidy up.
@@ -928,7 +928,7 @@ void ClipView::mouseReleaseEvent( QMouseEvent * me )
 
 
 
-/*! \brief Set up the context menu for this trackContentObjectView.
+/*! \brief Set up the context menu for this clipView.
  *
  *  Set up the various context menu events that can apply to a
  *  clip view.
@@ -1109,7 +1109,7 @@ void ClipView::toggleMute( QVector<ClipView *> clipvs )
 
 
 
-/*! \brief How many pixels a bar takes for this trackContentObjectView.
+/*! \brief How many pixels a bar takes for this clipView.
  *
  * \return the number of pixels per bar.
  */

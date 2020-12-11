@@ -89,7 +89,7 @@ TrackView::TrackView( Track * track, TrackContainerView * tcv ) :
 
 	connect( m_track, SIGNAL( destroyedTrack() ), this, SLOT( close() ) );
 	connect( m_track,
-		SIGNAL( trackContentObjectAdded( Clip * ) ),
+		SIGNAL( clipAdded( Clip * ) ),
 			this, SLOT( createClipView( Clip * ) ),
 			Qt::QueuedConnection );
 
@@ -110,8 +110,8 @@ TrackView::TrackView( Track * track, TrackContainerView * tcv ) :
 
 	// create views for already existing Clips
 	for( Track::clipVector::iterator it =
-					m_track->m_trackContentObjects.begin();
-			it != m_track->m_trackContentObjects.end(); ++it )
+					m_track->m_clips.begin();
+			it != m_track->m_clips.end(); ++it )
 	{
 		createClipView( *it );
 	}

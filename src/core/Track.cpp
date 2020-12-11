@@ -60,7 +60,7 @@ Track::Track( TrackTypes type, TrackContainer * tc ) :
 	m_mutedModel( false, this, tr( "Mute" ) ), /*!< For controlling track muting */
 	m_soloModel( false, this, tr( "Solo" ) ), /*!< For controlling track soloing */
 	m_simpleSerializingMode( false ),
-	m_trackContentObjects(),        /*!< The clips (segments) */
+	m_clips(),        /*!< The clips (segments) */
 	m_color( 0, 0, 0 ),
 	m_hasColor( false )
 {
@@ -86,9 +86,9 @@ Track::~Track()
 	lock();
 	emit destroyedTrack();
 
-	while( !m_trackContentObjects.isEmpty() )
+	while( !m_clips.isEmpty() )
 	{
-		delete m_trackContentObjects.last();
+		delete m_clips.last();
 	}
 
 	m_trackContainer->removeTrack( this );
@@ -185,7 +185,7 @@ Track* Track::clone()
 /*! \brief Save this track's settings to file
  *
  *  We save the track type and its muted state and solo state, then append the track-
- *  specific settings.  Then we iterate through the trackContentObjects
+ *  specific settings.  Then we iterate through the clips
  *  and save all their states in turn.
  *
  *  \param doc The QDomDocument to use to save
@@ -229,8 +229,8 @@ void Track::saveSettings( QDomDocument & doc, QDomElement & element )
 	}
 
 	// now save settings of all Clip's
-	for( clipVector::const_iterator it = m_trackContentObjects.begin();
-				it != m_trackContentObjects.end(); ++it )
+	for( clipVector::const_iterator it = m_clips.begin();
+				it != m_clips.end(); ++it )
 	{
 		( *it )->saveState( doc, element );
 	}
@@ -245,7 +245,7 @@ void Track::saveSettings( QDomDocument & doc, QDomElement & element )
  *  current Clip.
  *
  *  Then we step through the QDomElement's children and load the
- *  track-specific settings and trackContentObjects states from it
+ *  track-specific settings and clips states from it
  *  one at a time.
  *
  *  \param element the QDomElement to load track settings from
@@ -290,10 +290,10 @@ void Track::loadSettings( const QDomElement & element )
 		return;
 	}
 
-	while( !m_trackContentObjects.empty() )
+	while( !m_clips.empty() )
 	{
-		delete m_trackContentObjects.front();
-//		m_trackContentObjects.erase( m_trackContentObjects.begin() );
+		delete m_clips.front();
+//		m_clips.erase( m_clips.begin() );
 	}
 
 	QDomNode node = element.firstChild();
@@ -333,9 +333,9 @@ void Track::loadSettings( const QDomElement & element )
  */
 Clip * Track::addClip( Clip * clip )
 {
-	m_trackContentObjects.push_back( clip );
+	m_clips.push_back( clip );
 
-	emit trackContentObjectAdded( clip );
+	emit clipAdded( clip );
 
 	return clip;		// just for convenience
 }
@@ -349,12 +349,12 @@ Clip * Track::addClip( Clip * clip )
  */
 void Track::removeClip( Clip * clip )
 {
-	clipVector::iterator it = std::find( m_trackContentObjects.begin(),
-					m_trackContentObjects.end(),
+	clipVector::iterator it = std::find( m_clips.begin(),
+					m_clips.end(),
 					clip );
-	if( it != m_trackContentObjects.end() )
+	if( it != m_clips.end() )
 	{
-		m_trackContentObjects.erase( it );
+		m_clips.erase( it );
 		if( Engine::getSong() )
 		{
 			Engine::getSong()->updateLength();
@@ -367,20 +367,20 @@ void Track::removeClip( Clip * clip )
 /*! \brief Remove all Clips from this track */
 void Track::deleteClips()
 {
-	while( ! m_trackContentObjects.isEmpty() )
+	while( ! m_clips.isEmpty() )
 	{
-		delete m_trackContentObjects.first();
+		delete m_clips.first();
 	}
 }
 
 
-/*! \brief Return the number of trackContentObjects we contain
+/*! \brief Return the number of clips we contain
  *
- *  \return the number of trackContentObjects we currently contain.
+ *  \return the number of clips we currently contain.
  */
 int Track::numOfClips()
 {
-	return m_trackContentObjects.size();
+	return m_clips.size();
 }
 
 
@@ -400,9 +400,9 @@ int Track::numOfClips()
  */
 Clip * Track::getClip( int clipNum )
 {
-	if( clipNum < m_trackContentObjects.size() )
+	if( clipNum < m_clips.size() )
 	{
-		return m_trackContentObjects[clipNum];
+		return m_clips[clipNum];
 	}
 	printf( "called Track::getClip( %d ), "
 			"but Clip %d doesn't exist\n", clipNum, clipNum );
@@ -421,16 +421,16 @@ Clip * Track::getClip( int clipNum )
 int Track::getClipNum( const Clip * clip )
 {
 //	for( int i = 0; i < getTrackContentWidget()->numOfClips(); ++i )
-	clipVector::iterator it = std::find( m_trackContentObjects.begin(),
-					m_trackContentObjects.end(),
+	clipVector::iterator it = std::find( m_clips.begin(),
+					m_clips.end(),
 					clip );
-	if( it != m_trackContentObjects.end() )
+	if( it != m_clips.end() )
 	{
 /*		if( getClip( i ) == _clip )
 		{
 			return i;
 		}*/
-		return it - m_trackContentObjects.begin();
+		return it - m_clips.begin();
 	}
 	qWarning( "Track::getClipNum(...) -> _clip not found!\n" );
 	return 0;
@@ -439,21 +439,21 @@ int Track::getClipNum( const Clip * clip )
 
 
 
-/*! \brief Retrieve a list of trackContentObjects that fall within a period.
+/*! \brief Retrieve a list of clips that fall within a period.
  *
- *  Here we're interested in a range of trackContentObjects that intersect
+ *  Here we're interested in a range of clips that intersect
  *  the given time period.
  *
  *  We return the Clips we find in order by time, earliest Clips first.
  *
- *  \param clipV The list to contain the found trackContentObjects.
+ *  \param clipV The list to contain the found clips.
  *  \param start The MIDI start time of the range.
  *  \param end   The MIDI endi time of the range.
  */
 void Track::getClipsInRange( clipVector & clipV, const TimePos & start,
 							const TimePos & end )
 {
-	for( Clip* clip : m_trackContentObjects )
+	for( Clip* clip : m_clips )
 	{
 		int s = clip->startPosition();
 		int e = clip->endPosition();
@@ -470,24 +470,24 @@ void Track::getClipsInRange( clipVector & clipV, const TimePos & start,
 
 
 
-/*! \brief Swap the position of two trackContentObjects.
+/*! \brief Swap the position of two clips.
  *
  *  First, we arrange to swap the positions of the two Clips in the
- *  trackContentObjects list.  Then we swap their start times as well.
+ *  clips list.  Then we swap their start times as well.
  *
  *  \param clipNum1 The first Clip to swap.
  *  \param clipNum2 The second Clip to swap.
  */
 void Track::swapPositionOfClips( int clipNum1, int clipNum2 )
 {
-	qSwap( m_trackContentObjects[clipNum1],
-					m_trackContentObjects[clipNum2] );
+	qSwap( m_clips[clipNum1],
+					m_clips[clipNum2] );
 
-	const TimePos pos = m_trackContentObjects[clipNum1]->startPosition();
+	const TimePos pos = m_clips[clipNum1]->startPosition();
 
-	m_trackContentObjects[clipNum1]->movePosition(
-			m_trackContentObjects[clipNum2]->startPosition() );
-	m_trackContentObjects[clipNum2]->movePosition( pos );
+	m_clips[clipNum1]->movePosition(
+			m_clips[clipNum2]->startPosition() );
+	m_clips[clipNum2]->movePosition( pos );
 }
 
 
@@ -506,7 +506,7 @@ void Track::createClipsForBB( int bb )
 
 
 
-/*! \brief Move all the trackContentObjects after a certain time later by one bar.
+/*! \brief Move all the clips after a certain time later by one bar.
  *
  *  \param pos The time at which we want to insert the bar.
  *  \todo if we stepped through this list last to first, and the list was
@@ -517,8 +517,8 @@ void Track::insertBar( const TimePos & pos )
 {
 	// we'll increase the position of every Clip, positioned behind pos, by
 	// one bar
-	for( clipVector::iterator it = m_trackContentObjects.begin();
-				it != m_trackContentObjects.end(); ++it )
+	for( clipVector::iterator it = m_clips.begin();
+				it != m_clips.end(); ++it )
 	{
 		if( ( *it )->startPosition() >= pos )
 		{
@@ -531,7 +531,7 @@ void Track::insertBar( const TimePos & pos )
 
 
 
-/*! \brief Move all the trackContentObjects after a certain time earlier by one bar.
+/*! \brief Move all the clips after a certain time earlier by one bar.
  *
  *  \param pos The time at which we want to remove the bar.
  */
@@ -539,8 +539,8 @@ void Track::removeBar( const TimePos & pos )
 {
 	// we'll decrease the position of every Clip, positioned behind pos, by
 	// one bar
-	for( clipVector::iterator it = m_trackContentObjects.begin();
-				it != m_trackContentObjects.end(); ++it )
+	for( clipVector::iterator it = m_clips.begin();
+				it != m_clips.end(); ++it )
 	{
 		if( ( *it )->startPosition() >= pos )
 		{
@@ -562,8 +562,8 @@ bar_t Track::length() const
 {
 	// find last end-position
 	tick_t last = 0;
-	for( clipVector::const_iterator it = m_trackContentObjects.begin();
-				it != m_trackContentObjects.end(); ++it )
+	for( clipVector::const_iterator it = m_clips.begin();
+				it != m_clips.end(); ++it )
 	{
 		if( Engine::getSong()->isExporting() &&
 				( *it )->isMuted() )
@@ -651,7 +651,7 @@ void Track::trackColorChanged( QColor & c )
 {
 	for (int i = 0; i < numOfClips(); i++)
 	{
-		m_trackContentObjects[i]->updateColor();
+		m_clips[i]->updateColor();
 	}
 	m_hasColor = true;
 	m_color = c;
@@ -661,7 +661,7 @@ void Track::trackColorReset()
 {
 	for (int i = 0; i < numOfClips(); i++)
 	{
-		m_trackContentObjects[i]->updateColor();
+		m_clips[i]->updateColor();
 	}
 	m_hasColor = false;
 }
