@@ -112,10 +112,6 @@ protected:
 	timeMap::iterator getNodeAt(int x, int y, bool outValue = false, int r = 5);
 
 	void drawLine( int x0, float y0, int x1, float y1 );
-	// Remove nodes from tick0 to tick1
-	void removeNodes(int tick0, int tick1);
-	// Reset the outValue of nodes from tick0 to tick1
-	void resetNodes(int tick0, int tick1);
 
 protected slots:
 	void play();

@@ -253,11 +253,11 @@ TimePos AutomationPattern::putValue(
 	if (!ignoreSurroundingPoints)
 	{
 		// TODO: This loop can be optimized by going through the nodes
-		// between the quantized times instead of calling removeValue
+		// between the quantized times instead of calling removeNode
 		// for each tick even when there are no nodes there.
 		for (int i = newTime + 1; i < newTime + quantization(); ++i)
 		{
-			AutomationPattern::removeValue(i);
+			AutomationPattern::removeNode(i);
 		}
 	}
 	if (it != m_timeMap.begin()) { --it; }
@@ -307,11 +307,11 @@ TimePos AutomationPattern::putValues(
 	if (!ignoreSurroundingPoints)
 	{
 		// TODO: This loop can be optimized by going through the nodes
-		// between the quantized times instead of calling removeValue
+		// between the quantized times instead of calling removeNode
 		// for each tick even when there are no nodes there.
 		for (int i = newTime + 1; i < newTime + quantization(); ++i)
 		{
-			AutomationPattern::removeValue(i);
+			AutomationPattern::removeNode(i);
 		}
 	}
 	if (it != m_timeMap.begin()) { --it; }
@@ -327,7 +327,7 @@ TimePos AutomationPattern::putValues(
 
 
 
-void AutomationPattern::removeValue( const TimePos & time )
+void AutomationPattern::removeNode(const TimePos & time)
 {
 	QMutexLocker m(&m_patternMutex);
 
@@ -348,6 +348,59 @@ void AutomationPattern::removeValue( const TimePos & time )
 
 
 
+
+/**
+ * @brief Removes all automation nodes between the given ticks
+ * @param Int first tick of the range
+ * @param Int second tick of the range
+ */
+void AutomationPattern::removeNodes(const int tick0, const int tick1)
+{
+	if (tick0 == tick1) { return; }
+
+	TimePos start = TimePos(qMin(tick0, tick1));
+	TimePos end = TimePos(qMax(tick0, tick1));
+
+	// Make a list of TimePos with nodes to be removed
+	// because we can't simply remove the nodes from
+	// the timeMap while we are iterating it.
+	QVector<TimePos> nodesToRemove;
+
+	for (auto it = m_timeMap.lowerBound(start), endIt = m_timeMap.upperBound(end); it != endIt; ++it)
+	{
+		nodesToRemove.append(POS(it));
+	}
+
+	for (auto node: nodesToRemove)
+	{
+		removeNode(node);
+	}
+}
+
+
+
+
+/**
+ * @brief Resets the outValues of all automation nodes between the given ticks
+ * @param Int first tick of the range
+ * @param Int second tick of the range
+ */
+void AutomationPattern::resetNodes(const int tick0, const int tick1)
+{
+	if (tick0 == tick1) { return; }
+
+	TimePos start = TimePos(qMin(tick0, tick1));
+	TimePos end = TimePos(qMax(tick0, tick1));
+
+	for (auto it = m_timeMap.lowerBound(start), endIt = m_timeMap.upperBound(end); it != endIt; ++it)
+	{
+		it.value().resetOutValue();
+	}
+}
+
+
+
+
 void AutomationPattern::recordValue(TimePos time, float value)
 {
 	QMutexLocker m(&m_patternMutex);
@@ -359,7 +412,7 @@ void AutomationPattern::recordValue(TimePos time, float value)
 	}
 	else if( valueAt( time ) != value )
 	{
-		removeValue( time );
+		removeNode(time);
 	}
 }
 
@@ -405,7 +458,7 @@ TimePos AutomationPattern::setDragValue(
 			}
 		}
 
-		this->removeValue(newTime);
+		this->removeNode(newTime);
 		m_oldTimeMap = m_timeMap;
 		m_dragging = true;
 	}

@@ -93,7 +93,10 @@ public:
 		const bool ignoreSurroundingPoints = true
 	);
 
-	void removeValue( const TimePos & time );
+	void removeNode(const TimePos & time);
+	void removeNodes(const int tick0, const int tick1);
+
+	void resetNodes(const int tick0, const int tick1);
 
 	void recordValue(TimePos time, float value);
 

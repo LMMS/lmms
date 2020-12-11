@@ -390,7 +390,7 @@ void AutomationEditor::drawLine( int x0In, float y0, int x1In, float y1 )
 
 		x += xstep;
 		i += 1;
-		m_pattern->removeValue( TimePos( x ) );
+		m_pattern->removeNode(TimePos(x));
 		m_pattern->putValue( TimePos( x ), y );
 	}
 }
@@ -517,7 +517,7 @@ void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 					// If we right-clicked a node, remove it
 					if (clickedNode != tm.end())
 					{
-						m_pattern->removeValue(POS(clickedNode));
+						m_pattern->removeNode(POS(clickedNode));
 						Engine::getSong()->setModified();
 					}
 
@@ -539,7 +539,7 @@ void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 					// If we right-clicked a node, remove it
 					if (clickedNode != tm.end())
 					{
-						m_pattern->removeValue(POS(clickedNode));
+						m_pattern->removeNode(POS(clickedNode));
 						Engine::getSong()->setModified();
 					}
 
@@ -662,62 +662,6 @@ void AutomationEditor::mouseReleaseEvent(QMouseEvent * mouseEvent )
 
 
 
-/**
- * @brief Removes all automation nodes between the given ticks
- * @param Int first tick of the range
- * @param Int second tick of the range
- */
-void AutomationEditor::removeNodes(int tick0, int tick1)
-{
-	if (tick0 == tick1) { return; }
-
-	TimePos start = TimePos(qMin(tick0, tick1));
-	TimePos end = TimePos(qMax(tick0, tick1));
-
-	timeMap & tm = m_pattern->getTimeMap();
-
-	// Make a list of TimePos with nodes to be removed
-	// because we can't simply remove the nodes from
-	// the timeMap while we are iterating it.
-	QVector<TimePos> nodesToRemove;
-
-	for (auto it = tm.lowerBound(start), endIt = tm.upperBound(end); it != endIt; ++it)
-	{
-		nodesToRemove.append(POS(it));
-	}
-
-	for (auto node: nodesToRemove)
-	{
-		m_pattern->removeValue(node);
-	}
-}
-
-
-
-
-/**
- * @brief Resets the outValues of all automation nodes between the given ticks
- * @param Int first tick of the range
- * @param Int second tick of the range
- */
-void AutomationEditor::resetNodes(int tick0, int tick1)
-{
-	if (tick0 == tick1) { return; }
-
-	TimePos start = TimePos(qMin(tick0, tick1));
-	TimePos end = TimePos(qMax(tick0, tick1));
-
-	timeMap & tm = m_pattern->getTimeMap();
-
-	for (auto it = tm.lowerBound(start), endIt = tm.upperBound(end); it != endIt; ++it)
-	{
-		it.value().resetOutValue();
-	}
-}
-
-
-
-
 void AutomationEditor::mouseMoveEvent(QMouseEvent * mouseEvent )
 {
 	if( !validPattern() )
@@ -783,7 +727,7 @@ void AutomationEditor::mouseMoveEvent(QMouseEvent * mouseEvent )
 						// Removing automation nodes
 
 						// Removes all values from the last clicked tick up to the current position tick
-						removeNodes(m_drawLastTick, posTicks);
+						m_pattern->removeNodes(m_drawLastTick, posTicks);
 
 						Engine::getSong()->setModified();
 					}
@@ -803,7 +747,7 @@ void AutomationEditor::mouseMoveEvent(QMouseEvent * mouseEvent )
 						// Removing automation nodes
 
 						// Removes all values from the last clicked tick up to the current position tick
-						removeNodes(m_drawLastTick, posTicks);
+						m_pattern->removeNodes(m_drawLastTick, posTicks);
 
 						Engine::getSong()->setModified();
 					}
@@ -815,7 +759,7 @@ void AutomationEditor::mouseMoveEvent(QMouseEvent * mouseEvent )
 						// Reseting outValues
 
 						// Resets all values from the last clicked tick up to the current position tick
-						resetNodes(m_drawLastTick, posTicks);
+						m_pattern->resetNodes(m_drawLastTick, posTicks);
 
 						Engine::getSong()->setModified();
 					}
@@ -851,7 +795,7 @@ void AutomationEditor::mouseMoveEvent(QMouseEvent * mouseEvent )
 						// Reseting outValues
 
 						// Resets all values from the last clicked tick up to the current position tick
-						resetNodes(m_drawLastTick, posTicks);
+						m_pattern->resetNodes(m_drawLastTick, posTicks);
 
 						Engine::getSong()->setModified();
 					}
