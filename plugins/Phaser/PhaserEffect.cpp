@@ -25,12 +25,13 @@
 #include "PhaserEffect.h"
 
 #include "embed.h"
-#include "plugin_export.h"
-#include "lmms_math.h"
 #include "Engine.h"
-#include "Song.h"
 #include "GuiApplication.h"
+#include "lmms_math.h"
 #include "MainWindow.h"
+#include "plugin_export.h"
+#include "Song.h"
+
 
 extern "C"
 {
@@ -70,20 +71,14 @@ PhaserEffect::PhaserEffect(Model* parent, const Descriptor::SubPluginFeatures::K
 
 	connect(&m_phaserControls.m_attackModel, SIGNAL(dataChanged()), this, SLOT(calcAttack()), Qt::DirectConnection);
 	connect(&m_phaserControls.m_releaseModel, SIGNAL(dataChanged()), this, SLOT(calcRelease()), Qt::DirectConnection);
-	connect(&m_phaserControls.m_distortionModel, SIGNAL(dataChanged()), this, SLOT(calcDistortion()), Qt::DirectConnection);
-	connect(&m_phaserControls.m_feedbackModel, SIGNAL(dataChanged()), this, SLOT(calcFeedback()), Qt::DirectConnection);
 	connect(&m_phaserControls.m_outGainModel, SIGNAL(dataChanged()), this, SLOT(calcOutGain()), Qt::DirectConnection);
 	connect(&m_phaserControls.m_inGainModel, SIGNAL(dataChanged()), this, SLOT(calcInGain()), Qt::DirectConnection);
-	connect(&m_phaserControls.m_delayModel, SIGNAL(dataChanged()), this, SLOT(calcDelay()), Qt::DirectConnection);
 	connect(&m_phaserControls.m_phaseModel, SIGNAL(dataChanged()), this, SLOT(calcPhase()), Qt::DirectConnection);
 
 	calcAttack();
 	calcRelease();
-	calcDistortion();
-	calcFeedback();
 	calcOutGain();
 	calcInGain();
-	calcDelay();
 	calcPhase();	
 
 	connect(Engine::mixer(), SIGNAL(sampleRateChanged()), this, SLOT(changeSampleRate()));
@@ -109,16 +104,6 @@ void PhaserEffect::calcRelease()
 	m_relCoeff = exp10((-PHA_LOG / (m_phaserControls.m_releaseModel.value() * 0.001)) / Engine::mixer()->processingSampleRate());
 }
 
-void PhaserEffect::calcDistortion()
-{
-	m_distVal = m_phaserControls.m_distortionModel.value() * 0.01f;
-}
-
-void PhaserEffect::calcFeedback()
-{
-	m_feedbackVal = m_phaserControls.m_feedbackModel.value() * 0.01f;
-}
-
 void PhaserEffect::calcOutGain()
 {
 	m_outGain = dbfsToAmp(m_phaserControls.m_outGainModel.value());
@@ -127,11 +112,6 @@ void PhaserEffect::calcOutGain()
 void PhaserEffect::calcInGain()
 {
 	m_inGain = dbfsToAmp(m_phaserControls.m_inGainModel.value());
-}
-
-void PhaserEffect::calcDelay()
-{
-	m_delayVal = m_phaserControls.m_delayModel.value() * 0.001f * Engine::mixer()->processingSampleRate();
 }
 
 void PhaserEffect::calcPhase()
@@ -165,6 +145,16 @@ bool PhaserEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 	const ValueBuffer * inFollowBuf = m_phaserControls.m_inFollowModel.valueBuffer();
 	const ValueBuffer * invertBuf = m_phaserControls.m_invertModel.valueBuffer();
 	const ValueBuffer * wetBuf = m_phaserControls.m_wetModel.valueBuffer();
+	const ValueBuffer * modeBuf = m_phaserControls.m_modeModel.valueBuffer();
+	const ValueBuffer * analogBuf = m_phaserControls.m_analogModel.valueBuffer();
+	const ValueBuffer * analogDistBuf = m_phaserControls.m_analogDistModel.valueBuffer();
+	const ValueBuffer * delayBuf = m_phaserControls.m_delayModel.valueBuffer();
+	const ValueBuffer * cutoffControlBuf = m_phaserControls.m_cutoffControlModel.valueBuffer();
+	const ValueBuffer * delayControlBuf = m_phaserControls.m_delayControlModel.valueBuffer();
+	const ValueBuffer * doubleBuf = m_phaserControls.m_doubleModel.valueBuffer();
+	const ValueBuffer * aliasBuf = m_phaserControls.m_aliasModel.valueBuffer();
+	const ValueBuffer * distortionBuf = m_phaserControls.m_distortionModel.valueBuffer();
+	const ValueBuffer * feedbackBuf = m_phaserControls.m_feedbackModel.valueBuffer();
 
 	float lOutPeak = 0.0;
 	float rOutPeak = 0.0;
@@ -182,7 +172,10 @@ bool PhaserEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 	for (fpp_t f = 0; f < frames; ++f)
 	{
 		/*
-		                Feedback diagram
+		                Feedback diagrams
+
+
+		                      Default
 
 		              -------------------------
 		              |                       |
@@ -192,11 +185,56 @@ bool PhaserEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 		        |                       |
 		        --{delay}<---(*k)<-------
 
+		A regular phaser signal flow, as suggested in Vadim
+		Zavalishin's "The Art of VA Filter Design" book.
 
-		Usually the delay in the bottom isn't there, but I added
-		one in because it sounds really cool (adjustable via
-		delay knob).  When the delay is at 0, there really is 0
-		delay, not just a 1-sample delay like some may expect.
+
+		                   Standard
+
+		        -------------------------------
+		        |                             |
+		        |                             V
+		x(t)-->(+)-->(+)-->[allpass]-->(+)-->(+)-->(*0.5)-->y(t)
+		              ^                 |
+		              |                 |
+		              --{delay}<--(*k)<--
+
+		A more generic signal flow.
+
+
+		                            Nested
+
+		              ------------>(*-k)-----------------
+		              |                                 |
+		              |                                 V
+		x(t)-->(+)-->(+)-->{delay}-->[allpass]-->(+)-->(+)-->(*0.5)-->y(t)
+		        ^                                 |
+		        |                                 |
+		        -------------------(*k)<-----------
+
+		A nested allpass filter.
+
+
+		                          Inane
+
+		              -------------------------------
+		              |                             |
+		              |                             V
+		x(t)-->(+)-->(+)----->[allpass]----->(+)-->(+)-->(*0.5)-->y(t)
+		        ^                             |
+		        |                             |
+		        --[allpass]<--{delay}<---(*k)<-
+
+		Straight insanity.  Two allpass filters are shown,
+		but only one filter buffer is used, so every allpass
+		calculation borrows the buffer left over from the other.
+
+		---------------------------------------------------------
+
+		Usually the delays shown in the above diagrams never
+		show up in any phasers, but I added them in because
+		they sound really cool (adjustable via delay knob).
+
 		The extra delay can turn this into an interesting
 		allpass/comb hybrid.
 		*/
@@ -208,6 +246,15 @@ bool PhaserEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 
 		sample_t s[2] = {drySignal[0], drySignal[1]};
 
+		/*
+		You can reflect an entire sound's frequencies
+		around Nyquist by flipping every other sample.
+		This Phaser's Alias button does this both before
+		and after the allpass filters, linearly reflecting
+		the resulting phase response around Nyquist.
+		*/
+		m_aliasFlip = -m_aliasFlip;
+
 		const float cutoff = cutoffBuf ? cutoffBuf->value(f) : m_phaserControls.m_cutoffModel.value();
 		const float resonance = resonanceBuf ? resonanceBuf->value(f) : m_phaserControls.m_resonanceModel.value();
 		const float order = orderBuf ? orderBuf->value(f) : m_phaserControls.m_orderModel.value();
@@ -216,6 +263,16 @@ bool PhaserEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 		const float inFollow = inFollowBuf ? inFollowBuf->value(f) : m_phaserControls.m_inFollowModel.value();
 		const bool invert = invertBuf ? invertBuf->value(f) : m_phaserControls.m_invertModel.value();
 		const bool wetIsolate = wetBuf ? wetBuf->value(f) : m_phaserControls.m_wetModel.value();
+		const int mode = modeBuf ? modeBuf->value(f) : m_phaserControls.m_modeModel.value();
+		const bool analog = analogBuf ? analogBuf->value(f) : m_phaserControls.m_analogModel.value();
+		const float analogDist = analogDistBuf ? analogDistBuf->value(f) : m_phaserControls.m_analogDistModel.value();
+		const bool doubleVal = doubleBuf ? doubleBuf->value(f) : m_phaserControls.m_doubleModel.value();
+		const bool alias = aliasBuf ? aliasBuf->value(f) : m_phaserControls.m_aliasModel.value();
+		const float delay = delayBuf ? delayBuf->value(f) : m_phaserControls.m_delayModel.value();
+		const float cutoffControl = cutoffControlBuf ? cutoffControlBuf->value(f) : m_phaserControls.m_cutoffControlModel.value();
+		const float delayControl = delayControlBuf ? delayControlBuf->value(f) : m_phaserControls.m_delayControlModel.value();
+		const float distortion = (distortionBuf ? distortionBuf->value(f) : m_phaserControls.m_distortionModel.value()) * 0.01f;
+		const float feedback = (feedbackBuf ? feedbackBuf->value(f) : m_phaserControls.m_feedbackModel.value()) * 0.01f;
 
 		// Calculate input follower values
 		const double sAbs[2] = {abs(s[0]), abs(s[1])};
@@ -235,20 +292,20 @@ bool PhaserEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 		}
 
 		// Calculate real allpass filter frequencies
+		float lfoResults[2] = {0, 0};
 		if (enableLFO)
 		{
-			float leftLfo;
-			float rightLfo;
-			m_lfo->tick(&leftLfo, &rightLfo);
-			m_realCutoff[0] = qBound(20.f, detuneWithOctaves(cutoff, leftLfo * amount + inFollow * m_currentPeak[0]), 20000.f);
-			m_realCutoff[1] = qBound(20.f, detuneWithOctaves(cutoff, rightLfo * amount + inFollow * m_currentPeak[1]), 20000.f);
-		}
-		else
-		{
-			m_realCutoff[0] = qBound(20.f, detuneWithOctaves(cutoff, inFollow * m_currentPeak[0]), 20000.f);
-			m_realCutoff[1] = qBound(20.f, detuneWithOctaves(cutoff, inFollow * m_currentPeak[1]), 20000.f);
+			m_lfo->tick(&lfoResults[0], &lfoResults[1]);
 		}
 
+		const float realLfo[2] = {lfoResults[0] * amount, lfoResults[1] * amount};
+		const float realInFollow[2] = {m_currentPeak[0] * inFollow, m_currentPeak[1] * inFollow};
+		for (int i = 0; i < 2; i++)
+		{
+			m_displayCutoff[i] = qBound(20.f, detuneWithOctaves(cutoff, realLfo[i] + realInFollow[i]), 20000.f);
+			m_realCutoff[i] = qBound(20.f, detuneWithOctaves(cutoff, (realLfo[i] + realInFollow[i]) * cutoffControl), 20000.f);
+		}
+		
 		/*
 		Precalculate the allpass filter coefficients.
 		Because of very aggressive CPU optimization, some of
@@ -265,50 +322,155 @@ bool PhaserEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 			b1[b] = (-2*cos(w0)) / a0;
 		}
 
-		float firstAdd[2];
-		float secondAdd[2];
+		float firstAdd[2] = {0, 0};
+		float secondAdd[2] = {0, 0};
+		float delayOut[2] = {0, 0};
 
-		// Read next value from delay buffer
-		float readLoc = m_filtFeedbackLoc - m_delayVal;
-		if (readLoc < 0) {readLoc += m_delayBufSize;}
-		float readLocFrac = fraction(readLoc);
-		if (readLoc < m_delayBufSize - 1)
+		for (int i = 0; i < 2; ++i)
 		{
-			for (int i = 0; i < 2; ++i)
+			// Calculate delay amount to find read location
+			float readLoc = m_filtFeedbackLoc -
+				qMin(abs(delay + ((realLfo[i] + realInFollow[i]) * delayControl)), 20.f) *
+				0.001f * Engine::mixer()->processingSampleRate();
+
+			if (readLoc < 0) {readLoc += m_delayBufSize;}
+			float readLocFrac = fraction(readLoc);
+
+			// Read value from delay buffer
+			if (readLoc < m_delayBufSize - 1)
 			{
-				secondAdd[i] = m_filtDelayBuf[i][floor(readLoc)] * (1 - readLocFrac) + m_filtDelayBuf[i][ceil(readLoc)] * readLocFrac;
+				delayOut[i] = m_filtDelayBuf[i][floor(readLoc)] * (1 - readLocFrac) + m_filtDelayBuf[i][ceil(readLoc)] * readLocFrac;
+			}
+			else// For when the interpolation wraps around to the beginning of the buffer
+			{
+				delayOut[i] = m_filtDelayBuf[i][m_delayBufSize - 1] * (1 - readLocFrac) + m_filtDelayBuf[i][0] * readLocFrac;
 			}
 		}
-		else// For when the interpolation wraps around to the beginning of the buffer
+
+		float tempAdd[2] = {0, 0};
+		switch (mode)
 		{
-			for (int i = 0; i < 2; ++i)
+			case 0: case 1:
 			{
-				secondAdd[i] = m_filtDelayBuf[i][m_delayBufSize - 1] * (1 - readLocFrac) + m_filtDelayBuf[i][0] * readLocFrac;
+				tempAdd[0] = delayOut[0] * feedback;
+				tempAdd[1] = delayOut[1] * feedback;
+				break;
+			}
+			case 2:
+			{
+				tempAdd[0] = lastSecondAdd[0] * feedback;
+				tempAdd[1] = lastSecondAdd[1] * feedback;
+				break;
+			}
+			case 3:
+			{
+				tempAdd[0] = delayOut[0] * feedback;
+				tempAdd[1] = delayOut[1] * feedback;
+				for (int a = 0; a < order; ++a)
+				{
+					for (int b = 0; b < 2; ++b)
+					{
+						for (int c = 0; c < 1 + doubleVal; ++c)// Runs twice if doubleVal is true
+						{
+							tempAdd[b] = calcAllpassFilter(tempAdd[b], sample_rate, a, b, b0[b], b1[b]);
+						}
+					}
+				}
 			}
 		}
-
-
-		// Add feedback results to dry signal
-		firstAdd[0] = s[0] + secondAdd[0];
-		firstAdd[1] = s[1] + secondAdd[1];
+		if (analog)
+		{
+			firstAdd[0] = tanh(s[0] * analogDist) / analogDist + tanh(tempAdd[0] * analogDist) / analogDist;
+			firstAdd[1] = tanh(s[1] * analogDist) / analogDist + tanh(tempAdd[1] * analogDist) / analogDist;
+		}
+		else
+		{
+			firstAdd[0] = s[0] + tempAdd[0];
+			firstAdd[1] = s[1] + tempAdd[1];
+		}
+		
 
 		
 		// Unleash the allpass filters
-		secondAdd[0] = firstAdd[0];
-		secondAdd[1] = firstAdd[1];
+		switch (mode)
+		{
+			case 0: case 1: case 3:
+			{
+				secondAdd[0] = firstAdd[0];
+				secondAdd[1] = firstAdd[1];
+				break;
+			}
+			case 2:
+			{
+				secondAdd[0] = delayOut[0];
+				secondAdd[1] = delayOut[1];
+				break;
+			}
+		}
+
+		if (alias)
+		{
+			secondAdd[0] *= m_aliasFlip;
+			secondAdd[1] *= m_aliasFlip;
+		}
 		for (int a = 0; a < order; ++a)
 		{
 			for (int b = 0; b < 2; ++b)
 			{
-				secondAdd[b] = calcAllpassFilter(secondAdd[b], sample_rate, a, b, b0[b], b1[b]);
+				for (int c = 0; c < 1 + doubleVal; ++c)// Runs twice if doubleVal is true
+				{
+					secondAdd[b] = calcAllpassFilter(secondAdd[b], sample_rate, a, b, b0[b], b1[b]);
+				}
+			}
+		}
+		if (alias)
+		{
+			secondAdd[0] *= m_aliasFlip;
+			secondAdd[1] *= m_aliasFlip;
+		}
+
+		// Get final result
+		switch (mode)
+		{
+			case 0: case 3:
+			{
+				s[0] = (secondAdd[0] * (invert ? -1 : 1) + firstAdd[0] * !wetIsolate) / 2.f;
+				s[1] = (secondAdd[1] * (invert ? -1 : 1) + firstAdd[1] * !wetIsolate) / 2.f;
+				break;
+			}
+			case 1:
+			{
+				s[0] = (secondAdd[0] * (invert ? -1 : 1) + s[0] * !wetIsolate) / 2.f;
+				s[1] = (secondAdd[1] * (invert ? -1 : 1) + s[1] * !wetIsolate) / 2.f;
+				break;
+			}
+			case 2:
+			{
+				s[0] = (secondAdd[0] * (invert ? -1 : 1) + firstAdd[0] * !wetIsolate * -feedback) / 2.f;
+				s[1] = (secondAdd[1] * (invert ? -1 : 1) + firstAdd[1] * !wetIsolate * -feedback) / 2.f;
+				break;
 			}
 		}
 
+		lastSecondAdd[0] = secondAdd[0];
+		lastSecondAdd[1] = secondAdd[1];
 
-		// Get final result
-		s[0] = (secondAdd[0] * (invert ? -1 : 1) + firstAdd[0] * !wetIsolate) / 2.f;
-		s[1] = (secondAdd[1] * (invert ? -1 : 1) + firstAdd[1] * !wetIsolate) / 2.f;
-
+		tempAdd[0] = tempAdd[1] = 0;
+		switch (mode)
+		{
+			case 0: case 1: case 3:
+			{
+				tempAdd[0] = secondAdd[0];
+				tempAdd[1] = secondAdd[1];
+				break;
+			}
+			case 2:
+			{
+				tempAdd[0] = firstAdd[0];
+				tempAdd[1] = firstAdd[1];
+				break;
+			}
+		}
 
 		/*
 		Some gentle feedback distortion to prevent infinite loops.
@@ -316,10 +478,10 @@ bool PhaserEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 		I used tanh(x/2)*2 rather than just tanh(x) because tanh(x)
 		decreased the volume too much for my liking.
 		*/
-		secondAdd[0] = tanh(secondAdd[0] * 0.5) * 2;
-		secondAdd[1] = tanh(secondAdd[1] * 0.5) * 2;
+		tempAdd[0] = tanh(tempAdd[0] * 0.5) * 2;
+		tempAdd[1] = tanh(tempAdd[1] * 0.5) * 2;
 
-		if (m_distVal)
+		if (distortion)
 		{
 			/*
 			This behaves as a full-wave rectifier at 100% distortion.
@@ -335,8 +497,9 @@ bool PhaserEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 			Note that the DC offset added here by this distortion is
 			removed later on.
 			*/
-			secondAdd[0] = abs(secondAdd[0] + 1.5 - m_distVal * 1.5);
-			secondAdd[1] = abs(secondAdd[1] + 1.5 - m_distVal * 1.5);
+			const float trueDistVal = distortion * 1.5;
+			tempAdd[0] = abs(tempAdd[0] + 1.5 - trueDistVal) - 1.5 + trueDistVal;
+			tempAdd[1] = abs(tempAdd[1] + 1.5 - trueDistVal) - 1.5 + trueDistVal;
 		}
 
 		// Remove DC Offset
@@ -344,8 +507,8 @@ bool PhaserEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 		{
 			// Just subtract the approximate average of the latest many
 			// audio samples.
-			m_sampAvg[i] = m_sampAvg[i] * 0.999 + secondAdd[i] * 0.001;
-			secondAdd[i] -= m_sampAvg[i];
+			m_sampAvg[i] = m_sampAvg[i] * 0.999 + tempAdd[i] * 0.001;
+			tempAdd[i] -= m_sampAvg[i];
 		}
 
 
@@ -355,9 +518,10 @@ bool PhaserEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 		{
 			m_filtFeedbackLoc -= m_delayBufSize;
 		}
+
 		// Send new value to delay line
-		m_filtDelayBuf[0][m_filtFeedbackLoc] = secondAdd[0] * m_feedbackVal;
-		m_filtDelayBuf[1][m_filtFeedbackLoc] = secondAdd[1] * m_feedbackVal;
+		m_filtDelayBuf[0][m_filtFeedbackLoc] = tempAdd[0];
+		m_filtDelayBuf[1][m_filtFeedbackLoc] = tempAdd[1];
 
 		s[0] *= m_outGain;
 		s[1] *= m_outGain;

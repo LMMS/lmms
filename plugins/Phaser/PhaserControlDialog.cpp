@@ -24,15 +24,17 @@
 
 #include <QLayout>
 
-#include "PhaserEffect.h"
 #include "PhaserControlDialog.h"
 #include "PhaserControls.h"
-#include "embed.h"
-#include "LedCheckbox.h"
-#include "TempoSyncKnob.h"
-#include "PixmapButton.h"
+#include "PhaserEffect.h"
+
 #include "../Eq/EqFader.h"
+#include "embed.h"
+#include "gui_templates.h"
+#include "LedCheckbox.h"
 #include "lmms_math.h"
+#include "PixmapButton.h"
+#include "TempoSyncKnob.h"
 #include "ToolTip.h"
 
 
@@ -49,98 +51,122 @@ PhaserControlDialog::PhaserControlDialog(PhaserControls* controls) :
 	QPalette pal;
 	pal.setBrush(backgroundRole(), PLUGIN_NAME::getIconPixmap("artwork"));
 	setPalette(pal);
-	setFixedSize(371, 155);
+	setFixedSize(370, 200);
 
 	Knob * cutoffKnob = new Knob(knobBright_26, this);
-	cutoffKnob -> move(65, 13);
+	cutoffKnob -> move(64, 50);
 	cutoffKnob->setModel(&controls->m_cutoffModel);
 	cutoffKnob->setHintText(tr("Cutoff:"), " Hz");
 	ToolTip::add(cutoffKnob, tr("Center frequency of allpass filters"));
 
 	Knob * resonanceKnob = new Knob(knobBright_26, this);
-	resonanceKnob -> move(103, 13);
+	resonanceKnob -> move(102, 50);
 	resonanceKnob->setModel(&controls->m_resonanceModel);
 	resonanceKnob->setHintText(tr("Resonance:"), "");
 	ToolTip::add(resonanceKnob, tr("Resonance of allpass filters"));
 
 	Knob * feedbackKnob = new Knob(knobBright_26, this);
-	feedbackKnob -> move(159, 13);
+	feedbackKnob -> move(158, 50);
 	feedbackKnob->setModel(&controls->m_feedbackModel);
 	feedbackKnob->setHintText(tr("Feedback:"), "%");
 	ToolTip::add(feedbackKnob, tr("Feedback amount for allpass filters"));
 
 	LcdSpinBox * m_orderBox = new LcdSpinBox(2, this, "Order");
 	m_orderBox->setModel(&controls->m_orderModel);
-	m_orderBox->move(241, 20);
+	m_orderBox->move(247, 61);
 	ToolTip::add(m_orderBox, tr("Number of allpass filters"));
 
 	Knob * delayKnob = new Knob(knobBright_26, this);
-	delayKnob -> move(197, 13);
+	delayKnob -> move(196, 50);
 	delayKnob->setModel(&controls->m_delayModel);
 	delayKnob->setHintText(tr("Delay:"), " ms");
 	ToolTip::add(delayKnob, tr("Delay length of allpass filter feedback"));
 
 	TempoSyncKnob * rateKnob = new TempoSyncKnob(knobBright_26, this);
-	rateKnob -> move(104, 84);
+	rateKnob -> move(103, 126);
 	rateKnob->setModel(&controls->m_rateModel);
 	rateKnob->setHintText(tr("Rate:"), " Sec");
 	ToolTip::add(rateKnob, tr("LFO frequency"));
 
 	Knob * amountKnob = new Knob(knobBright_26, this);
-	amountKnob -> move(66, 84);
+	amountKnob -> move(65, 126);
 	amountKnob->setModel(&controls->m_amountModel);
 	amountKnob->setHintText(tr("Amount:"), " octaves");
 	ToolTip::add(amountKnob, tr("LFO amplitude"));
 
 	Knob * phaseKnob = new Knob(knobBright_26, this);
-	phaseKnob -> move(142, 84);
+	phaseKnob -> move(141, 126);
 	phaseKnob->setModel(&controls->m_phaseModel);
 	phaseKnob->setHintText(tr("Phase:"), " degrees");
 	ToolTip::add(phaseKnob, tr("LFO stereo phase"));
 
 	Knob * inFollowKnob = new Knob(knobBright_26, this);
-	inFollowKnob -> move(203, 84);
+	inFollowKnob -> move(202, 126);
 	inFollowKnob->setModel(&controls->m_inFollowModel);
 	inFollowKnob->setHintText(tr("Input Following:"), " octaves");
 	ToolTip::add(inFollowKnob, tr("Input follower amplitude"));
 
 	Knob * attackKnob = new Knob(knobBright_26, this);
-	attackKnob -> move(241, 84);
+	attackKnob -> move(240, 126);
 	attackKnob->setModel(&controls->m_attackModel);
 	attackKnob->setHintText(tr("Attack:"), " ms");
 	ToolTip::add(attackKnob, tr("Input follower attack"));
 
 	Knob * releaseKnob = new Knob(knobBright_26, this);
-	releaseKnob -> move(279, 84);
+	releaseKnob -> move(278, 126);
 	releaseKnob->setModel(&controls->m_releaseModel);
 	releaseKnob->setHintText(tr("Release:"), " ms");
 	ToolTip::add(releaseKnob, tr("Input follower release"));
 
 	Knob * distortionKnob = new Knob(knobSmall_17, this);
-	distortionKnob -> move(292, 26);
+	distortionKnob -> move(292, 63);
 	distortionKnob->setModel(&controls->m_distortionModel);
 	distortionKnob->setHintText(tr("Distortion:"), "%");
 	ToolTip::add(distortionKnob, tr("Feedback rectifier"));
+
+	Knob * analogDistKnob = new Knob(knobSmall_17, this);
+	analogDistKnob -> move(243, 8);
+	analogDistKnob->setModel(&controls->m_analogDistModel);
+	analogDistKnob->setHintText(tr("Analog Distortion:"), "x");
+	ToolTip::add(analogDistKnob, tr("Analog distortion amount"));
+
+	Knob * delayControlKnob = new Knob(knobSmall_17, this);
+	delayControlKnob -> move(344, 8);
+	delayControlKnob->setModel(&controls->m_delayControlModel);
+	delayControlKnob->setHintText(tr("Delay Control:"), "x");
+	ToolTip::add(delayControlKnob, tr("Delay control amount"));
+
+	Knob * cutoffControlKnob = new Knob(knobSmall_17, this);
+	cutoffControlKnob -> move(300, 8);
+	cutoffControlKnob->setModel(&controls->m_cutoffControlModel);
+	cutoffControlKnob->setHintText(tr("Cutoff Control:"), "x");
+	ToolTip::add(cutoffControlKnob, tr("Cutoff control amount"));
+
+	ComboBox * m_modeBox = new ComboBox(this);
+	m_modeBox->setGeometry(6, 6, 74, 22);
+	m_modeBox->setFont(pointSize<8>(m_modeBox->font()));
+	m_modeBox->setModel(&m_controls->m_modeModel);
+	ToolTip::add(m_modeBox, tr("Change Phaser feedback circuit"));
 
 	QPixmap cutoffDotLeftImg = PLUGIN_NAME::getIconPixmap("cutoffDotLeft");
 	m_cutoffDotLeftLabel = new QLabel(this);
 	m_cutoffDotLeftLabel->setPixmap(cutoffDotLeftImg);
 	m_cutoffDotLeftLabel->setAttribute(Qt::WA_TransparentForMouseEvents);
-	m_cutoffDotLeftLabel->move(182, 139);
+	m_cutoffDotLeftLabel->move(182, 183);
 
 	QPixmap cutoffDotRightImg = PLUGIN_NAME::getIconPixmap("cutoffDotRight");
 	m_cutoffDotRightLabel = new QLabel(this);
 	m_cutoffDotRightLabel->setPixmap(cutoffDotRightImg);
 	m_cutoffDotRightLabel->setAttribute(Qt::WA_TransparentForMouseEvents);
-	m_cutoffDotRightLabel->move(182, 139);
+	m_cutoffDotRightLabel->move(182, 183);
 
 	LedCheckBox * enableLFO = new LedCheckBox("", this, tr("Enable LFO"), LedCheckBox::Green);
 	enableLFO->setModel(&controls->m_enableLFOModel);
-	enableLFO->move(160, 63);
+	enableLFO->move(159, 104);
 	ToolTip::add(enableLFO, tr("Enable LFO"));
 
 	PixmapButton * invertButton = new PixmapButton(this, tr("Invert wet signal"));
-	invertButton->move(276, 6);
+	invertButton->move(241, 42);
 	invertButton->setActiveGraphic(PLUGIN_NAME::getIconPixmap("invert_active"));
 	invertButton->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("invert_inactive"));
 	invertButton->setCheckable(true);
@@ -148,19 +174,43 @@ PhaserControlDialog::PhaserControlDialog(PhaserControls* controls) :
 	ToolTip::add(invertButton, tr("Invert wet signal"));
 
 	PixmapButton * wetButton = new PixmapButton(this, tr("Wet"));
-	wetButton->move(242, 6);
+	wetButton->move(287, 42);
 	wetButton->setActiveGraphic(PLUGIN_NAME::getIconPixmap("wet_active"));
 	wetButton->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("wet_inactive"));
 	wetButton->setCheckable(true);
 	wetButton->setModel(&controls->m_wetModel);
 	ToolTip::add(wetButton, tr("Isolate wet signal"));
 
+	PixmapButton * analogButton = new PixmapButton(this, tr("Analog"));
+	analogButton->move(188, 9);
+	analogButton->setActiveGraphic(PLUGIN_NAME::getIconPixmap("analog_active"));
+	analogButton->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("analog_inactive"));
+	analogButton->setCheckable(true);
+	analogButton->setModel(&controls->m_analogModel);
+	ToolTip::add(analogButton, tr("Saturate feedback signal"));
+
+	PixmapButton * doubleButton = new PixmapButton(this, tr("Double"));
+	doubleButton->move(88, 9);
+	doubleButton->setActiveGraphic(PLUGIN_NAME::getIconPixmap("double_active"));
+	doubleButton->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("double_inactive"));
+	doubleButton->setCheckable(true);
+	doubleButton->setModel(&controls->m_doubleModel);
+	ToolTip::add(doubleButton, tr("Send through allpass filters twice"));
+
+	PixmapButton * aliasButton = new PixmapButton(this, tr("Alias"));
+	aliasButton->move(143, 9);
+	aliasButton->setActiveGraphic(PLUGIN_NAME::getIconPixmap("alias_active"));
+	aliasButton->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("alias_inactive"));
+	aliasButton->setCheckable(true);
+	aliasButton->setModel(&controls->m_aliasModel);
+	ToolTip::add(aliasButton, tr("Linearly invert spectrum before/after allpass filters"));
+
 	EqFader * outFader = new EqFader(&controls->m_outGainModel,tr("Output gain"),
 		this, &controls->m_outPeakL, &controls->m_outPeakR);
 	outFader->setMinimumHeight(84);
 	outFader->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
-	outFader->resize(23, 84);
-	outFader->move(336, 33);
+	outFader->resize(23, 94);
+	outFader->move(333, 67);
 	outFader->setDisplayConversion(false);
 	outFader->setHintText(tr("Gain"), "dBFS");
 	ToolTip::add(outFader, tr("Output gain"));
@@ -169,8 +219,8 @@ PhaserControlDialog::PhaserControlDialog(PhaserControls* controls) :
 		this, &controls->m_inPeakL, &controls->m_inPeakR);
 	inFader->setMinimumHeight(84);
 	inFader->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
-	inFader->resize(23, 84);
-	inFader->move(13, 33);
+	inFader->resize(23, 94);
+	inFader->move(14, 67);
 	inFader->setDisplayConversion(false);
 	inFader->setHintText(tr("Gain"), "dBFS");
 	ToolTip::add(inFader, tr("Input gain"));
@@ -183,8 +233,8 @@ void PhaserControlDialog::updateSliders()
 {
 	// Magic. Do not touch.
 	m_cutoffDotLeftLabel->move((int((log2(m_controls->m_effect->getCutoff(0)) - log2(PHA_MIN_FREQ)) /
-		log2(PHA_MAX_FREQ / PHA_MIN_FREQ) * PHA_DOT_SLIDER_LENGTH)) + 12, 139);
+		log2(PHA_MAX_FREQ / PHA_MIN_FREQ) * PHA_DOT_SLIDER_LENGTH)) + 12, 183);
 	m_cutoffDotRightLabel->move((int((log2(m_controls->m_effect->getCutoff(1)) - log2(PHA_MIN_FREQ)) /
-		log2(PHA_MAX_FREQ / PHA_MIN_FREQ) * PHA_DOT_SLIDER_LENGTH)) + 12, 139);
+		log2(PHA_MAX_FREQ / PHA_MIN_FREQ) * PHA_DOT_SLIDER_LENGTH)) + 12, 183);
 }
 

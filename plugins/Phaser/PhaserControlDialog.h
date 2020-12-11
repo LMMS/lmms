@@ -25,8 +25,10 @@
 #ifndef PHASER_CONTROL_DIALOG_H
 #define PHASER_CONTROL_DIALOG_H
 
-#include "EffectControlDialog.h"
 #include <QLabel>
+
+#include "ComboBox.h"
+#include "EffectControlDialog.h"
 #include "Fader.h"
 
 

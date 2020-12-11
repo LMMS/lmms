@@ -26,10 +26,11 @@
 #ifndef PHASER_H
 #define PHASER_H
 
-#include "Effect.h"
 #include "PhaserControls.h"
-#include "ValueBuffer.h"
+
 #include "../Flanger/QuadratureLfo.h"
+#include "Effect.h"
+#include "ValueBuffer.h"
 
 class PhaserEffect : public Effect
 {
@@ -46,17 +47,14 @@ public:
 
 	float getCutoff(int channel)
 	{
-		return m_realCutoff[channel];
+		return m_displayCutoff[channel];
 	}
 
 private slots:
 	void calcAttack();
 	void calcRelease();
-	void calcDistortion();
-	void calcFeedback();
 	void calcOutGain();
 	void calcInGain();
-	void calcDelay();
 	void calcPhase();
 	void changeSampleRate();
 	void restartLFO();
@@ -81,16 +79,23 @@ private:
 
 	double m_attCoeff;
 	double m_relCoeff;
-	float m_distVal;
-	float m_feedbackVal;
-	float m_delayVal;
 
 	float m_outGain;
 	float m_inGain;
 
 	float m_sampAvg[2] = {0};
+	float m_oscillateTracker1[2] = {0};
+	float m_oscillateTracker2[2] = {0};
 
+	sampleFrame m_displayCutoff;
 	sampleFrame m_realCutoff;
+
+	float lastSecondAdd[2] = {0};
+
+	float m_dcTimeConst;
+	float m_oscillateTimeConst;
+
+	float m_aliasFlip = 1;
 
 	friend class PhaserControls;
 

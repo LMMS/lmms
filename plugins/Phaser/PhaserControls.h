@@ -25,8 +25,10 @@
 #ifndef PHASER_CONTROLS_H
 #define PHASER_CONTROLS_H
 
-#include "EffectControls.h"
 #include "PhaserControlDialog.h"
+
+#include "ComboBox.h"
+#include "EffectControls.h"
 #include "Knob.h"
 #include "LcdSpinBox.h"
 
@@ -49,7 +51,7 @@ public:
 
 	int controlCount() override
 	{
-		return 17;
+		return 24;
 	}
 
 	EffectControlDialog * createView() override
@@ -78,10 +80,17 @@ private:
 	FloatModel m_attackModel;
 	FloatModel m_releaseModel;
 	FloatModel m_distortionModel;
+	FloatModel m_analogDistModel;
+	FloatModel m_cutoffControlModel;
+	FloatModel m_delayControlModel;
 	FloatModel m_outGainModel;
 	FloatModel m_inGainModel;
 	BoolModel m_invertModel;
 	BoolModel m_wetModel;
+	BoolModel m_analogModel;
+	BoolModel m_doubleModel;
+	BoolModel m_aliasModel;
+	ComboBoxModel m_modeModel;
 
 	friend class PhaserControlDialog;
 	friend class PhaserEffect;
