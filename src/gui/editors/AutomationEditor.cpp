@@ -675,24 +675,20 @@ void AutomationEditor::removeNodes(int tick0, int tick1)
 	TimePos end = TimePos(qMax(tick0, tick1));
 
 	timeMap & tm = m_pattern->getTimeMap();
-	timeMap::iterator it = tm.lowerBound(start);
 
 	// Make a list of TimePos with nodes to be removed
 	// because we can't simply remove the nodes from
 	// the timeMap while we are iterating it.
 	QVector<TimePos> nodesToRemove;
 
-	while (it != tm.end())
+	for (auto it = tm.lowerBound(start), endIt = tm.upperBound(end); it != endIt; ++it)
 	{
-		if (POS(it) > end) { break; }
-
 		nodesToRemove.append(POS(it));
-		++it;
 	}
 
-	for (int c = 0; c < nodesToRemove.size(); ++c)
+	for (auto node: nodesToRemove)
 	{
-		m_pattern->removeValue(nodesToRemove[c]);
+		m_pattern->removeValue(node);
 	}
 }
 
@@ -712,14 +708,10 @@ void AutomationEditor::resetNodes(int tick0, int tick1)
 	TimePos end = TimePos(qMax(tick0, tick1));
 
 	timeMap & tm = m_pattern->getTimeMap();
-	timeMap::iterator it = tm.lowerBound(start);
 
-	while (it != tm.end())
+	for (auto it = tm.lowerBound(start), endIt = tm.upperBound(end); it != endIt; ++it)
 	{
-		if (POS(it) > end) { return; }
-
 		it.value().resetOutValue();
-		++it;
 	}
 }
 
