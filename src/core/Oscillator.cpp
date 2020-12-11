@@ -25,7 +25,9 @@
 
 #include "Oscillator.h"
 
-#if NEED_MINGW_THREADS_REPLACEMENT
+// replace this check after #4443 has been merged
+//#if NEED_MINGW_THREADS_REPLACEMENT
+#if defined(__MINGW32__) || defined(__MINGW64__)
 #   include <mingw.thread.h>
 #else
 #   include <thread>
