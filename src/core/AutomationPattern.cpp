@@ -252,12 +252,13 @@ TimePos AutomationPattern::putValue(
 	// quantization value. Control Key to override
 	if (!ignoreSurroundingPoints)
 	{
-		// TODO: This loop can be optimized by going through the nodes
-		// between the quantized times instead of calling removeNode
-		// for each tick even when there are no nodes there.
-		for (int i = newTime + 1; i < newTime + quantization(); ++i)
+		// We need to check that to avoid removing nodes from
+		// newTime + 1 to newTime (removing the node we are adding)
+		if (quantization() > 1)
 		{
-			AutomationPattern::removeNode(i);
+			// Remove nodes between the quantization points, them not
+			// being included
+			removeNodes(newTime + 1, newTime + quantization() - 1);
 		}
 	}
 	if (it != m_timeMap.begin()) { --it; }
@@ -306,12 +307,13 @@ TimePos AutomationPattern::putValues(
 	// quantization value. Control Key to override
 	if (!ignoreSurroundingPoints)
 	{
-		// TODO: This loop can be optimized by going through the nodes
-		// between the quantized times instead of calling removeNode
-		// for each tick even when there are no nodes there.
-		for (int i = newTime + 1; i < newTime + quantization(); ++i)
+		// We need to check that to avoid removing nodes from
+		// newTime + 1 to newTime (removing the node we are adding)
+		if (quantization() > 1)
 		{
-			AutomationPattern::removeNode(i);
+			// Remove nodes between the quantization points, them not
+			// being included
+			removeNodes(newTime + 1, newTime + quantization() - 1);
 		}
 	}
 	if (it != m_timeMap.begin()) { --it; }
@@ -356,7 +358,11 @@ void AutomationPattern::removeNode(const TimePos & time)
  */
 void AutomationPattern::removeNodes(const int tick0, const int tick1)
 {
-	if (tick0 == tick1) { return; }
+	if (tick0 == tick1)
+	{
+		removeNode(TimePos(tick0));
+		return;
+	}
 
 	TimePos start = TimePos(qMin(tick0, tick1));
 	TimePos end = TimePos(qMax(tick0, tick1));
@@ -387,7 +393,11 @@ void AutomationPattern::removeNodes(const int tick0, const int tick1)
  */
 void AutomationPattern::resetNodes(const int tick0, const int tick1)
 {
-	if (tick0 == tick1) { return; }
+	if (tick0 == tick1)
+	{
+		m_timeMap.find(TimePos(tick0)).value().resetOutValue();
+		return;
+	}
 
 	TimePos start = TimePos(qMin(tick0, tick1));
 	TimePos end = TimePos(qMax(tick0, tick1));
