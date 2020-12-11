@@ -93,9 +93,9 @@ public:
 		Interpolation interpolation;
 		Oversampling oversampling;
 
-		qualitySettings( Mode _m )
+		qualitySettings(Mode m)
 		{
-			switch( _m )
+			switch (m)
 			{
 				case Mode_Draft:
 					interpolation = Interpolation_Linear;
@@ -113,9 +113,9 @@ public:
 			}
 		}
 
-		qualitySettings( Interpolation _i, Oversampling _o ) :
-			interpolation( _i ),
-			oversampling( _o )
+		qualitySettings(Interpolation i, Oversampling o) :
+			interpolation(i),
+			oversampling(o)
 		{
 		}
 
@@ -181,14 +181,14 @@ public:
 
 
 	// audio-port-stuff
-	inline void addAudioPort( AudioPort * _port )
+	inline void addAudioPort(AudioPort * port)
 	{
 		requestChangeInModel();
-		m_audioPorts.push_back( _port );
+		m_audioPorts.push_back(port);
 		doneChangeInModel();
 	}
 
-	void removeAudioPort( AudioPort * _port );
+	void removeAudioPort(AudioPort * port);
 
 
 	// MIDI-client-stuff
@@ -213,7 +213,7 @@ public:
 		return m_playHandles;
 	}
 
-	void removePlayHandlesOfTypes( Track * _track, const quint8 types );
+	void removePlayHandlesOfTypes(Track * track, const quint8 types);
 
 
 	// methods providing information for other classes
@@ -250,23 +250,23 @@ public:
 		return m_masterGain;
 	}
 
-	inline void setMasterGain( const float _mo )
+	inline void setMasterGain(const float mo)
 	{
-		m_masterGain = _mo;
+		m_masterGain = mo;
 	}
 
 
-	static inline sample_t clip( const sample_t _s )
+	static inline sample_t clip(const sample_t s)
 	{
-		if( _s > 1.0f )
+		if (s > 1.0f)
 		{
 			return 1.0f;
 		}
-		else if( _s < -1.0f )
+		else if (s < -1.0f)
 		{
 			return -1.0f;
 		}
-		return _s;
+		return s;
 	}
 
 
@@ -276,7 +276,7 @@ public:
 		sample_t left;
 		sample_t right;
 	};
-	StereoSample getPeakValues(sampleFrame * _ab, const f_cnt_t _frames) const;
+	StereoSample getPeakValues(sampleFrame * ab, const f_cnt_t _frames) const;
 
 
 	bool criticalXRuns() const;
@@ -303,7 +303,7 @@ public:
 		return hasFifoWriter() ? m_fifo->read() : renderNextBuffer();
 	}
 
-	void changeQuality( const struct qualitySettings & _qs );
+	void changeQuality(const struct qualitySettings & qs);
 
 	inline bool isMetronomeActive() const { return m_metronomeActive; }
 	inline void setMetronomeActive(bool value = true) { m_metronomeActive = value; }
@@ -328,7 +328,7 @@ private:
 	class fifoWriter : public QThread
 	{
 	public:
-		fifoWriter( Mixer * _mixer, fifo * _fifo );
+		fifoWriter(Mixer * mixer, fifo * _fifo);
 
 		void finish();
 
@@ -348,7 +348,7 @@ private:
 	Mixer( bool renderOnly );
 	virtual ~Mixer();
 
-	void startProcessing( bool _needs_fifo = true );
+	void startProcessing(bool needsFifo = true);
 	void stopProcessing();
 
 
@@ -357,6 +357,10 @@ private:
 
 
 	const surroundSampleFrame * renderNextBuffer();
+
+	void swapBuffers();
+
+	void handleMetronome();
 
 	void clearInternal();
 
@@ -376,13 +380,8 @@ private:
 	int m_inputBufferRead;
 	int m_inputBufferWrite;
 
-	surroundSampleFrame * m_readBuf;
-	surroundSampleFrame * m_writeBuf;
-
-	QVector<surroundSampleFrame *> m_bufferPool;
-	int m_readBuffer;
-	int m_writeBuffer;
-	int m_poolDepth;
+	surroundSampleFrame * m_outputBufferRead;
+	surroundSampleFrame * m_outputBufferWrite;
 
 	// worker thread stuff
 	QVector<MixerWorkerThread *> m_workers;
