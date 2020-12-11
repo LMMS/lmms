@@ -221,7 +221,7 @@ void Oscillator::generateAntiAliasUserWaveTable(SampleBuffer *sampleBuffer)
 			s_sampleBuffer[i] = sampleBuffer->userWaveSample((float)i / (float)OscillatorConstants::WAVETABLE_LENGTH);
 		}
 		fftwf_execute(s_fftPlan);
-		Oscillator::generateFromFFT(OscillatorConstants::MAX_FREQ / freqFromWaveTableBand(i), 0.001f, sampleBuffer->m_userAntiAliasWaveTable[i]);
+		Oscillator::generateFromFFT(OscillatorConstants::MAX_FREQ / freqFromWaveTableBand(i), 0.001f, (*(sampleBuffer->m_userAntiAliasWaveTable))[i].data());
 	}
 }
 

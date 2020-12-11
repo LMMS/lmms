@@ -195,6 +195,13 @@ public:
 				table[control.band][control.f2], fraction(control.frame));
 	}
 
+	inline sample_t wtSample(const std::unique_ptr<SampleBuffer::wavetable_t>& table, const float sample)
+	{
+		wtSampleControl control = getWtSampleControl(sample);
+		return linearInterpolate((*table)[control.band][control.f1],
+				(*table)[control.band][control.f2], fraction(control.frame));
+	}
+
 	inline sample_t wtSample( sample_t **table, const float _sample)
 	{
 		wtSampleControl control = getWtSampleControl(_sample);

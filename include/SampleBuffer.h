@@ -26,6 +26,8 @@
 #ifndef SAMPLE_BUFFER_H
 #define SAMPLE_BUFFER_H
 
+#include <array>
+#include <memory>
 #include <QtCore/QReadWriteLock>
 #include <QtCore/QObject>
 
@@ -270,7 +272,9 @@ public:
 	}
 
 
-	sample_t **m_userAntiAliasWaveTable;
+	typedef std::array<std::array<sample_t, OscillatorConstants::WAVETABLE_LENGTH>,
+		OscillatorConstants::WAVE_TABLES_PER_WAVEFORM_COUNT> wavetable_t;
+	std::unique_ptr<wavetable_t> m_userAntiAliasWaveTable;
 
 
 public slots:

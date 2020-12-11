@@ -63,7 +63,7 @@
 
 
 SampleBuffer::SampleBuffer() :
-  m_userAntiAliasWaveTable(nullptr),
+	m_userAntiAliasWaveTable(nullptr),
 	m_audioFile(""),
 	m_origData(nullptr),
 	m_origFrames(0),
@@ -136,16 +136,6 @@ SampleBuffer::~SampleBuffer()
 {
 	MM_FREE(m_origData);
 	MM_FREE(m_data);
-	if (m_userAntiAliasWaveTable)
-	{
-		for (int i = 0; i < OscillatorConstants::WAVE_TABLES_PER_WAVEFORM_COUNT; ++i)
-		{
-			delete [] m_userAntiAliasWaveTable[i];
-			m_userAntiAliasWaveTable[i] = nullptr;
-		}
-		delete [] m_userAntiAliasWaveTable;
-		m_userAntiAliasWaveTable = nullptr;
-	}
 }
 
 
@@ -287,11 +277,7 @@ void SampleBuffer::update(bool keepSettings)
 	// allocate space for anti-aliased wave table
 	if (m_userAntiAliasWaveTable == nullptr)
 	{
-		m_userAntiAliasWaveTable = new sample_t *[OscillatorConstants::WAVE_TABLES_PER_WAVEFORM_COUNT];
-		for (int i = 0; i < OscillatorConstants::WAVE_TABLES_PER_WAVEFORM_COUNT; ++i)
-		{
-			m_userAntiAliasWaveTable[i] = new sample_t[OscillatorConstants::WAVETABLE_LENGTH];
-		}
+		m_userAntiAliasWaveTable = std::make_unique<wavetable_t>();
 	}
 	Oscillator::generateAntiAliasUserWaveTable(this);
 
