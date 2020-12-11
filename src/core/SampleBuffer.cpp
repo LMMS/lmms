@@ -63,7 +63,7 @@
 
 
 SampleBuffer::SampleBuffer() :
-	m_userAntiAliasWaveTable(nullptr),
+  m_userAntiAliasWaveTable(nullptr),
 	m_audioFile(""),
 	m_origData(nullptr),
 	m_origFrames(0),
@@ -78,6 +78,7 @@ SampleBuffer::SampleBuffer() :
 	m_frequency(BaseFreq),
 	m_sampleRate(mixerSampleRate())
 {
+
 	connect(Engine::mixer(), SIGNAL(sampleRateChanged()), this, SLOT(sampleRateChanged()));
 	update();
 }
