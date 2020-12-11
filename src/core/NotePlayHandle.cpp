@@ -520,9 +520,9 @@ void NotePlayHandle::updateFrequency()
 		m_unpitchedFrequency = DefaultBaseFreq * powf(2.0f, pitch);
 	}
 
-	for (NotePlayHandleList::Iterator it = m_subNotes.begin(); it != m_subNotes.end(); ++it)
+	for (auto it : m_subNotes)
 	{
-		(*it)->updateFrequency();
+		it->updateFrequency();
 	}
 }
 

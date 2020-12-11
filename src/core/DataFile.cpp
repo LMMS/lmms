@@ -1389,10 +1389,10 @@ void DataFile::upgrade_noHiddenClipNames()
 
 /** \brief Note range has been extended to match MIDI specification
  *
- * Default base note number changed from 57 to 69. To ensure that patterns
- * copied to a new instrument instance sound correctly, the adjusment is
- * are adjusted instead of just shifting the instrument base note.
- * Affects all MIDI-based instruments except OpulenZ.
+ * The non-standard note range previously affected all MIDI-based instruments
+ * except OpulenZ, and made them sound an octave lower than they should (#1857).
+ * This routine lowers the pitch of all notes in patterns assigned to affected
+ * instruments, preserving their pitch in existing projects.
  */
 void DataFile::upgrade_extendedNoteRange()
 {
@@ -1404,6 +1404,7 @@ void DataFile::upgrade_extendedNoteRange()
 		QDomElement instrument = instruments.item(0).toElement();
 		if (instrument.attribute("name") == "zynaddsubfx" ||
 			instrument.attribute("name") == "vestige" ||
+			instrument.attribute("name") == "lv2instrument" ||
 			instrument.attribute("name") == "carlapatchbay" ||
 			instrument.attribute("name") == "carlarack")
 		{
