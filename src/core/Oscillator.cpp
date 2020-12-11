@@ -25,8 +25,12 @@
 
 #include "Oscillator.h"
 
-#if !defined(__MINGW32__) && !defined(__MINGW64__)
-	#include <thread>
+// replace this check after #4443 has been merged
+//#if NEED_MINGW_THREADS_REPLACEMENT
+#if defined(__MINGW32__) || defined(__MINGW64__)
+#   include <mingw.thread.h>
+#else
+#   include <thread>
 #endif
 
 #include "BufferManager.h"
@@ -318,7 +322,6 @@ void Oscillator::generateWaveTables()
 		}
 	};
 
-#if !defined(__MINGW32__) && !defined(__MINGW64__)
 	std::thread sinThread(sinGen);
 	std::thread sawThread(sawGen);
 	std::thread squareThread(squareGen);
@@ -329,13 +332,6 @@ void Oscillator::generateWaveTables()
 	squareThread.join();
 	triangleThread.join();
 	fftThread.join();
-#else
-	sinGen();
-	sawGen();
-	squareGen();
-	triangleGen();
-	fftGen();
-#endif
 }
 
 
