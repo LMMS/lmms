@@ -50,6 +50,7 @@
 #include "SampleTrack.h"
 #include "Song.h"
 #include "BBTrackContainer.h"
+#include "TrackContainer.h" // For TrackContainer::TrackList typedef
 
 FxMixerView::FxMixerView() :
 	QWidget(),
@@ -237,13 +238,13 @@ void FxMixerView::refreshDisplay()
 // update the and max. channel number for every instrument
 void FxMixerView::updateMaxChannelSelector()
 {
-	QVector<Track *> songTrackList = Engine::getSong()->tracks();
-	QVector<Track *> bbTrackList = Engine::getBBTrackContainer()->tracks();
+	TrackContainer::TrackList songTrackList = Engine::getSong()->tracks();
+	TrackContainer::TrackList bbTrackList = Engine::getBBTrackContainer()->tracks();
 
-	QVector<Track *> trackLists[] = {songTrackList, bbTrackList};
+	TrackContainer::TrackList trackLists[] = {songTrackList, bbTrackList};
 	for(int tl=0; tl<2; ++tl)
 	{
-		QVector<Track *> trackList = trackLists[tl];
+		TrackContainer::TrackList trackList = trackLists[tl];
 		for(int i=0; i<trackList.size(); ++i)
 		{
 			if( trackList[i]->type() == Track::InstrumentTrack )
@@ -318,7 +319,7 @@ FxMixerView::FxChannelView::FxChannelView(QWidget * _parent, FxMixerView * _mv,
 
 	// Create EffectRack for the channel
 	m_rackView = new EffectRackView( &fxChannel->m_fxChain, _mv->m_racksWidget );
-	m_rackView->setFixedSize( 245, FxLine::FxLineHeight );
+	m_rackView->setFixedSize( EffectRackView::DEFAULT_WIDTH, FxLine::FxLineHeight );
 }
 
 
@@ -412,12 +413,9 @@ void FxMixerView::deleteChannel(int index)
 	m_channelAreaWidget->adjustSize();
 
 	// make sure every channel knows what index it is
-	for(int i=0; i<m_fxChannelViews.size(); ++i)
+	for(int i=index + 1; i<m_fxChannelViews.size(); ++i)
 	{
-		if( i > index )
-		{
-			m_fxChannelViews[i]->m_fxLine->setChannelIndex(i-1);
-		}
+		m_fxChannelViews[i]->m_fxLine->setChannelIndex(i-1);
 	}
 	m_fxChannelViews.remove(index);
 
@@ -439,29 +437,32 @@ void FxMixerView::deleteUnusedChannels()
 	tracks += Engine::getSong()->tracks();
 	tracks += Engine::getBBTrackContainer()->tracks();
 
-	// go through all FX Channels
+	std::vector<bool> inUse(m_fxChannelViews.size(), false);
+
+	//Populate inUse by checking the destination channel for every track
+	for (Track* t: tracks)
+	{
+		//The channel that this track sends to. Since master channel is always in use,
+		//setting this to 0 is a safe default (for tracks that don't sent to the mixer).
+		int channel = 0;
+		if (t->type() == Track::InstrumentTrack)
+		{
+			InstrumentTrack* inst = dynamic_cast<InstrumentTrack *>(t);
+			channel = inst->effectChannelModel()->value();
+		}
+		else if (t->type() == Track::SampleTrack)
+		{
+			SampleTrack *strack = dynamic_cast<SampleTrack *>(t);
+			channel = strack->effectChannelModel()->value();
+		}
+		inUse[channel] = true;
+	}
+
+	//Check all channels except master, delete those with no incoming sends
 	for(int i = m_fxChannelViews.size()-1; i > 0; --i)
 	{
-		// check if an instrument references to the current channel
-		bool empty=true;
-		for( Track* t : tracks )
-		{
-			if( t->type() == Track::InstrumentTrack )
-			{
-				InstrumentTrack* inst = dynamic_cast<InstrumentTrack *>( t );
-				if( i == inst->effectChannelModel()->value(0) )
-				{
-					empty=false;
-					break;
-				}
-			}
-		}
-		FxChannel * ch = Engine::fxMixer()->effectChannel( i );
-		// delete channel if no references found
-		if( empty && ch->m_receives.isEmpty() )
-		{
-			deleteChannel( i );
-		}
+		if (!inUse[i] && Engine::fxMixer()->effectChannel(i)->m_receives.isEmpty())
+		{ deleteChannel(i); }
 	}
 }
 

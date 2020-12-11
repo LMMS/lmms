@@ -28,6 +28,7 @@
  *
  */
 
+#include "GigPlayer.h"
 
 #include <cstring>
 #include <QDebug>
@@ -35,18 +36,18 @@
 #include <QLabel>
 #include <QDomDocument>
 
-#include "FileDialog.h"
-#include "GigPlayer.h"
-#include "Engine.h"
-#include "InstrumentTrack.h"
-#include "InstrumentPlayHandle.h"
-#include "Mixer.h"
-#include "NotePlayHandle.h"
-#include "Knob.h"
-#include "SampleBuffer.h"
-#include "Song.h"
 #include "ConfigManager.h"
 #include "endian_handling.h"
+#include "Engine.h"
+#include "FileDialog.h"
+#include "InstrumentTrack.h"
+#include "InstrumentPlayHandle.h"
+#include "Knob.h"
+#include "Mixer.h"
+#include "NotePlayHandle.h"
+#include "PathUtil.h"
+#include "SampleBuffer.h"
+#include "Song.h"
 
 #include "PatchesDialog.h"
 #include "ToolTip.h"
@@ -62,7 +63,7 @@ Plugin::Descriptor PLUGIN_EXPORT gigplayer_plugin_descriptor =
 {
 	STRINGIFY( PLUGIN_NAME ),
 	"GIG Player",
-	QT_TRANSLATE_NOOP( "pluginBrowser", "Player for GIG files" ),
+	QT_TRANSLATE_NOOP( "PluginBrowser", "Player for GIG files" ),
 	"Garrett Wilson <g/at/floft/dot/net>",
 	0x0100,
 	Plugin::Instrument,
@@ -211,8 +212,8 @@ void GigInstrument::openFile( const QString & _gigFile, bool updateTrackName )
 
 		try
 		{
-			m_instance = new GigInstance( SampleBuffer::tryToMakeAbsolute( _gigFile ) );
-			m_filename = SampleBuffer::tryToMakeRelative( _gigFile );
+			m_instance = new GigInstance( PathUtil::toAbsolute( _gigFile ) );
+			m_filename = PathUtil::toShortestRelative( _gigFile );
 		}
 		catch( ... )
 		{
@@ -225,7 +226,7 @@ void GigInstrument::openFile( const QString & _gigFile, bool updateTrackName )
 
 	if( updateTrackName == true )
 	{
-		instrumentTrack()->setName( QFileInfo( _gigFile ).baseName() );
+		instrumentTrack()->setName(PathUtil::cleanName( _gigFile ) );
 		updatePatch();
 	}
 }
@@ -1057,7 +1058,7 @@ void GigInstrumentView::showFileDialog()
 
 	if( k->m_filename != "" )
 	{
-		QString f = SampleBuffer::tryToMakeAbsolute( k->m_filename );
+		QString f = PathUtil::toAbsolute( k->m_filename );
 		ofd.setDirectory( QFileInfo( f ).absolutePath() );
 		ofd.selectFile( QFileInfo( f ).fileName() );
 	}

@@ -29,7 +29,6 @@
 #include "Song.h"
 #include "BBTrackContainer.h"
 #include "BBTrack.h"
-#include "stdshims.h"
 
 
 RenderManager::RenderManager(
@@ -80,9 +79,9 @@ void RenderManager::renderNextTrack()
 		m_tracksToRender.pop_back();
 
 		// mute everything but the track we are about to render
-		for( auto it = m_unmuted.begin(); it != m_unmuted.end(); ++it )
+		for (auto track : m_unmuted)
 		{
-			(*it)->setMuted( (*it) != renderTrack );
+			track->setMuted(track != renderTrack);
 		}
 
 		// for multi-render, prefix each output file with a different number
@@ -140,7 +139,7 @@ void RenderManager::renderProject()
 
 void RenderManager::render(QString outputPath)
 {
-	m_activeRenderer = make_unique<ProjectRenderer>(
+	m_activeRenderer = std::make_unique<ProjectRenderer>(
 			m_qualitySettings,
 			m_outputSettings,
 			m_format,

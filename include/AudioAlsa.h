@@ -71,7 +71,7 @@ public:
 
 	inline static QString name()
 	{
-		return QT_TRANSLATE_NOOP( "setupWidget",
+		return QT_TRANSLATE_NOOP( "AudioDeviceSetupWidget",
 			"ALSA (Advanced Linux Sound Architecture)" );
 	}
 

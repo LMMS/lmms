@@ -170,7 +170,7 @@ jobs:
     environment:
       <<: *common_environment
     macos:
-      xcode: "9.3.1"
+      xcode: "10.3.0"
     steps:
       - checkout
       - *init
@@ -179,9 +179,9 @@ jobs:
       - run:
           name: Install Homebrew dependencies
           command: |
-            # unlink Homebrew's python 2 to prevent an node-gyp error
-            brew unlink python@2 || true
-            brew update && brew install ccache fftw cmake pkg-config libogg libvorbis lame libsndfile libsamplerate jack sdl libgig libsoundio stk fluid-synth portaudio fltk qt5 carla
+            # uninstall Homebrew's python 2 to prevent errors on brew install
+            brew uninstall python@2 || true
+            brew update && brew install ccache fftw cmake pkg-config libogg libvorbis lame libsndfile libsamplerate jack sdl libgig libsoundio lilv lv2 stk fluid-synth portaudio fltk qt5 carla
       - run:
           name: Install nodejs dependencies
           command: npm install -g appdmg

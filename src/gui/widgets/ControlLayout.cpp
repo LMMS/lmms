@@ -177,6 +177,11 @@ QLayoutItem *ControlLayout::takeAt(int index)
 	return (itr == m_itemMap.end()) ? nullptr : m_itemMap.take(itr.key());
 }
 
+void ControlLayout::removeFocusFromSearchBar()
+{
+	m_searchBar->clearFocus();
+}
+
 Qt::Orientations ControlLayout::expandingDirections() const
 {
 	return Qt::Orientations();

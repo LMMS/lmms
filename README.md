@@ -6,6 +6,8 @@
 [![Join the chat at Discord](https://img.shields.io/badge/chat-on%20discord-7289DA.svg)](https://discord.gg/3sc5su7)
 [![Localise on transifex](https://img.shields.io/badge/localise-on_transifex-green.svg)](https://www.transifex.com/lmms/lmms/)
 
+**A soft PR-Freeze is currently underway to prepare for refactoring ([#5592](https://github.com/LMMS/lmms/issues/5592)). Please do not open non-essential PRs at this time.**
+
 What is LMMS?
 --------------
 
@@ -53,7 +55,6 @@ Information about what you can do and how can be found in the
 
 Before coding a new big feature, please _always_
 [file an issue](https://github.com/LMMS/lmms/issues/new) for your idea and
-suggestions about your feature and about the intended implementation on GitHub
-or post to the LMMS developers mailinglist (lmms-devel@lists.sourceforge.net)
-and wait for replies! Maybe there are different ideas, improvements, hints or
+suggestions about your feature and about the intended implementation on GitHub,
+or ask in one of the tech channels on Discord and wait for replies! Maybe there are different ideas, improvements, or hints, or
 maybe your feature is not welcome/needed at the moment.

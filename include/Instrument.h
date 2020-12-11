@@ -30,8 +30,8 @@
 #include "lmms_export.h"
 #include "lmms_basics.h"
 #include "Memory.h"
-#include "MidiTime.h"
 #include "Plugin.h"
+#include "TimePos.h"
 
 
 // forward-declarations
@@ -105,7 +105,7 @@ public:
 
 	// sub-classes can re-implement this for receiving all incoming
 	// MIDI-events
-	inline virtual bool handleMidiEvent( const MidiEvent&, const MidiTime& = MidiTime(), f_cnt_t offset = 0 )
+	inline virtual bool handleMidiEvent( const MidiEvent&, const TimePos& = TimePos(), f_cnt_t offset = 0 )
 	{
 		return true;
 	}
@@ -132,6 +132,9 @@ public:
 
 
 protected:
+	// fade in to prevent clicks
+	void applyFadeIn(sampleFrame * buf, NotePlayHandle * n);
+
 	// instruments may use this to apply a soft fade out at the end of
 	// notes - method does this only if really less or equal
 	// desiredReleaseFrames() frames are left

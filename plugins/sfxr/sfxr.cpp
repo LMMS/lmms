@@ -48,7 +48,6 @@ float frnd(float range)
 #include "ToolTip.h"
 #include "Song.h"
 #include "MidiEvent.h"
-#include "MidiTime.h"
 #include "Mixer.h"
 
 #include "embed.h"
@@ -62,7 +61,7 @@ Plugin::Descriptor PLUGIN_EXPORT sfxr_plugin_descriptor =
 {
 	STRINGIFY( PLUGIN_NAME ),
 	"sfxr",
-	QT_TRANSLATE_NOOP( "pluginBrowser",
+	QT_TRANSLATE_NOOP( "PluginBrowser",
 				"LMMS port of sfxr" ),
 	"Wong Cho Ching",
 	0x0100,

@@ -30,11 +30,11 @@
 #include <QtCore/QObject>
 
 
+#include "lmmsconfig.h"
 #include "lmms_export.h"
 #include "lmms_basics.h"
 
 class BBTrackContainer;
-class DummyTrackContainer;
 class FxMixer;
 class ProjectJournal;
 class Mixer;
@@ -87,14 +87,18 @@ public:
 		return s_projectJournal;
 	}
 
+	static bool ignorePluginBlacklist();
+
+#ifdef LMMS_HAVE_LV2
+	static class Lv2Manager * getLv2Manager()
+	{
+		return s_lv2Manager;
+	}
+#endif
+
 	static Ladspa2LMMS * getLADSPAManager()
 	{
 		return s_ladspaManager;
-	}
-
-	static DummyTrackContainer * dummyTrackContainer()
-	{
-		return s_dummyTC;
 	}
 
 	static float framesPerTick()
@@ -141,8 +145,10 @@ private:
 	static Song * s_song;
 	static BBTrackContainer * s_bbTrackContainer;
 	static ProjectJournal * s_projectJournal;
-	static DummyTrackContainer * s_dummyTC;
 
+#ifdef LMMS_HAVE_LV2
+	static class Lv2Manager* s_lv2Manager;
+#endif
 	static Ladspa2LMMS * s_ladspaManager;
 	static void* s_dndPluginKey;
 

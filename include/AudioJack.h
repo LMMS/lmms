@@ -34,6 +34,7 @@
 #include "weak_libjack.h"
 #endif
 
+#include <atomic>
 #include <QtCore/QVector>
 #include <QtCore/QList>
 #include <QtCore/QMap>
@@ -57,11 +58,12 @@ public:
 	// the jack callback is handled here, we call the midi client so that it can read
 	// it's midi data during the callback
 	AudioJack * addMidiClient(MidiJack *midiClient);
+	void removeMidiClient(void) { m_midiClient = nullptr; }
 	jack_client_t * jackClient() {return m_client;};
 
 	inline static QString name()
 	{
-		return QT_TRANSLATE_NOOP( "setupWidget",
+		return QT_TRANSLATE_NOOP( "AudioDeviceSetupWidget",
 			"JACK (JACK Audio Connection Kit)" );
 	}
 
@@ -106,9 +108,9 @@ private:
 	jack_client_t * m_client;
 
 	bool m_active;
-	bool m_stopped;
+	std::atomic<bool> m_stopped;
 
-	MidiJack *m_midiClient;
+	std::atomic<MidiJack *> m_midiClient;
 	QVector<jack_port_t *> m_outputPorts;
 	jack_default_audio_sample_t * * m_tempOutBufs;
 	surroundSampleFrame * m_outBuf;

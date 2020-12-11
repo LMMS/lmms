@@ -44,7 +44,6 @@ Oscilloscope::Oscilloscope( QWidget * _p ) :
 	m_points( new QPointF[Engine::mixer()->framesPerPeriod()] ),
 	m_active( false ),
 	m_normalColor(71, 253, 133),
-	m_warningColor(255, 192, 64),
 	m_clippingColor(255, 64, 64)
 {
 	setFixedSize( m_background.width(), m_background.height() );
@@ -121,16 +120,6 @@ void Oscilloscope::setNormalColor(QColor const & normalColor)
 	m_normalColor = normalColor;
 }
 
-QColor const & Oscilloscope::warningColor() const
-{
-	return m_warningColor;
-}
-
-void Oscilloscope::setWarningColor(QColor const & warningColor)
-{
-	m_warningColor = warningColor;
-}
-
 QColor const & Oscilloscope::clippingColor() const
 {
 	return m_clippingColor;
@@ -205,13 +194,9 @@ void Oscilloscope::mousePressEvent( QMouseEvent * _me )
 
 QColor const & Oscilloscope::determineLineColor(float level) const
 {
-	if( level < 0.9f )
+	if( level <= 1.0f )
 	{
 		return normalColor();
-	}
-	else if( level <= 1.0f )
-	{
-		return warningColor();
 	}
 	else
 	{

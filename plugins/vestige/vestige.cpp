@@ -38,22 +38,26 @@
 #include <QMenu>
 #include <QDomElement>
 
+#include <string>
+
 #include "ConfigManager.h"
 #include "Engine.h"
+#include "FileDialog.h"
+#include "GuiApplication.h"
 #include "gui_templates.h"
 #include "InstrumentPlayHandle.h"
 #include "InstrumentTrack.h"
 #include "LocaleHelper.h"
 #include "MainWindow.h"
 #include "Mixer.h"
-#include "GuiApplication.h"
+#include "PathUtil.h"
 #include "PixmapButton.h"
 #include "SampleBuffer.h"
 #include "Song.h"
 #include "StringPairDrag.h"
 #include "TextFloat.h"
 #include "ToolTip.h"
-#include "FileDialog.h"
+#include "Clipboard.h"
 
 
 #include "embed.h"
@@ -67,7 +71,7 @@ Plugin::Descriptor Q_DECL_EXPORT  vestige_plugin_descriptor =
 {
 	STRINGIFY( PLUGIN_NAME ),
 	"VeSTige",
-	QT_TRANSLATE_NOOP( "pluginBrowser",
+	QT_TRANSLATE_NOOP( "PluginBrowser",
 			"VST-host for using VST(i)-plugins within LMMS" ),
 	"Tobias Doerffel <tobydox/at/users.sf.net>",
 	0x0100,
@@ -267,7 +271,7 @@ void vestigeInstrument::reloadPlugin()
 
 void vestigeInstrument::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
-	_this.setAttribute( "plugin", m_pluginDLL );
+	_this.setAttribute( "plugin", PathUtil::toShortestRelative(m_pluginDLL) );
 	m_pluginMutex.lock();
 	if( m_plugin != NULL )
 	{
@@ -334,14 +338,14 @@ void vestigeInstrument::loadFile( const QString & _file )
 
 	// if the same is loaded don't load again (for preview)
 	if (instrumentTrack() != NULL && instrumentTrack()->isPreviewMode() &&
-			m_pluginDLL == SampleBuffer::tryToMakeRelative( _file ))
+			m_pluginDLL == PathUtil::toShortestRelative( _file ))
 		return;
 
 	if ( m_plugin != NULL )
 	{
 		closePlugin();
 	}
-	m_pluginDLL = SampleBuffer::tryToMakeRelative( _file );
+	m_pluginDLL = PathUtil::toShortestRelative( _file );
 	TextFloat * tf = NULL;
 	if( gui )
 	{
@@ -406,7 +410,7 @@ void vestigeInstrument::play( sampleFrame * _buf )
 
 
 
-bool vestigeInstrument::handleMidiEvent( const MidiEvent& event, const MidiTime& time, f_cnt_t offset )
+bool vestigeInstrument::handleMidiEvent( const MidiEvent& event, const TimePos& time, f_cnt_t offset )
 {
 	m_pluginMutex.lock();
 	if( m_plugin != NULL )
@@ -682,7 +686,7 @@ void VestigeInstrumentView::openPlugin()
 
 	if( m_vi->m_pluginDLL != "" )
 	{
-		QString f = SampleBuffer::tryToMakeAbsolute( m_vi->m_pluginDLL );
+		QString f = PathUtil::toAbsolute( m_vi->m_pluginDLL );
 		ofd.setDirectory( QFileInfo( f ).absolutePath() );
 		ofd.selectFile( QFileInfo( f ).fileName() );
 	}
@@ -829,10 +833,13 @@ void VestigeInstrumentView::noteOffAll( void )
 
 void VestigeInstrumentView::dragEnterEvent( QDragEnterEvent * _dee )
 {
-	if( _dee->mimeData()->hasFormat( StringPairDrag::mimeType() ) )
+	// For mimeType() and MimeType enum class
+	using namespace Clipboard;
+
+	if( _dee->mimeData()->hasFormat( mimeType( MimeType::StringPair ) ) )
 	{
 		QString txt = _dee->mimeData()->data(
-						StringPairDrag::mimeType() );
+						mimeType( MimeType::StringPair ) );
 		if( txt.section( ':', 0, 0 ) == "vstplugin" )
 		{
 			_dee->acceptProposedAction();
@@ -963,7 +970,7 @@ manageVestigeInstrumentView::manageVestigeInstrumentView( Instrument * _instrume
 	const QMap<QString, QString> & dump = m_vi->m_plugin->parameterDump();
 	m_vi->paramCount = dump.size();
 
-	vstKnobs = new Knob *[ m_vi->paramCount ];
+	vstKnobs = new CustomTextKnob *[ m_vi->paramCount ];
 
 	bool hasKnobModel = true;
 	if (m_vi->knobFModel == NULL) {
@@ -979,15 +986,15 @@ manageVestigeInstrumentView::manageVestigeInstrumentView( Instrument * _instrume
 		sprintf( paramStr, "param%d", i);
 		s_dumpValues = dump[ paramStr ].split( ":" );
 
-		vstKnobs[ i ] = new Knob( knobBright_26, this, s_dumpValues.at( 1 ) );
-		vstKnobs[ i ]->setHintText( s_dumpValues.at( 1 ) + ":", "" );
+		vstKnobs[ i ] = new CustomTextKnob( knobBright_26, this, s_dumpValues.at( 1 ) );
+		vstKnobs[ i ]->setDescription( s_dumpValues.at( 1 ) + ":" );
 		vstKnobs[ i ]->setLabel( s_dumpValues.at( 1 ).left( 15 ) );
 
 		if( !hasKnobModel )
 		{
 			sprintf( paramStr, "%d", i);
 			m_vi->knobFModel[ i ] = new FloatModel( LocaleHelper::toFloat(s_dumpValues.at(2)),
-				0.0f, 1.0f, 0.01f, castModel<vestigeInstrument>(), tr( paramStr ) );
+				0.0f, 1.0f, 0.01f, castModel<vestigeInstrument>(), paramStr );
 		}
 
 		FloatModel * model = m_vi->knobFModel[i];
@@ -995,6 +1002,7 @@ manageVestigeInstrumentView::manageVestigeInstrumentView( Instrument * _instrume
 			[this, model]() { setParameter( model ); }, Qt::DirectConnection);
 		vstKnobs[i] ->setModel( model );
 	}
+	syncParameterText();
 
 	int i = 0;
 	for( int lrow = 1; lrow < ( int( m_vi->paramCount / 10 ) + 1 ) + 1; lrow++ )
@@ -1055,6 +1063,7 @@ void manageVestigeInstrumentView::syncPlugin( void )
 			m_vi->knobFModel[ i ]->setInitValue( f_value );
 		}
 	}
+	syncParameterText();
 }
 
 
@@ -1130,6 +1139,38 @@ void manageVestigeInstrumentView::setParameter( Model * action )
 
 	if ( m_vi->m_plugin != NULL ) {
 		m_vi->m_plugin->setParam( knobUNID, m_vi->knobFModel[knobUNID]->value() );
+		syncParameterText();
+	}
+}
+
+void manageVestigeInstrumentView::syncParameterText()
+{
+	m_vi->m_plugin->loadParameterLabels();
+	m_vi->m_plugin->loadParameterDisplays();
+
+	QString paramLabelStr   = m_vi->m_plugin->allParameterLabels();
+	QString paramDisplayStr = m_vi->m_plugin->allParameterDisplays();
+
+	QStringList paramLabelList;
+	QStringList paramDisplayList;
+
+	for( int i = 0; i < paramLabelStr.size(); )
+	{
+		const int length = paramLabelStr[i].digitValue();
+		paramLabelList.append(paramLabelStr.mid(i + 1, length));
+		i += length + 1;
+	}
+
+	for( int i = 0; i < paramDisplayStr.size(); )
+	{
+		const int length = paramDisplayStr[i].digitValue();
+		paramDisplayList.append(paramDisplayStr.mid(i + 1, length));
+		i += length + 1;
+	}
+
+	for( int i = 0; i < paramLabelList.size(); ++i )
+	{
+		vstKnobs[i]->setValueText(paramDisplayList[i] + ' ' + paramLabelList[i]);
 	}
 }
 
@@ -1137,10 +1178,13 @@ void manageVestigeInstrumentView::setParameter( Model * action )
 
 void manageVestigeInstrumentView::dragEnterEvent( QDragEnterEvent * _dee )
 {
-	if( _dee->mimeData()->hasFormat( StringPairDrag::mimeType() ) )
+	// For mimeType() and MimeType enum class
+	using namespace Clipboard;
+
+	if( _dee->mimeData()->hasFormat( mimeType( MimeType::StringPair ) ) )
 	{
 		QString txt = _dee->mimeData()->data(
-						StringPairDrag::mimeType() );
+						mimeType( MimeType::StringPair ) );
 		if( txt.section( ':', 0, 0 ) == "vstplugin" )
 		{
 			_dee->acceptProposedAction();
@@ -1195,7 +1239,3 @@ Q_DECL_EXPORT Plugin * lmms_plugin_main( Model *m, void * )
 
 
 }
-
-
-
-
