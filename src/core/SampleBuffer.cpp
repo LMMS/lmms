@@ -135,10 +135,10 @@ SampleBuffer::SampleBuffer(const SampleBuffer& orig)
 	orig.m_varLock.lockForRead();
 
 	m_audioFile = orig.m_audioFile;
-	m_origData = MM_ALLOC(sampleFrame, orig.m_origFrames);
 	m_origFrames = orig.m_origFrames;
-	m_data = MM_ALLOC(sampleFrame, orig.m_frames);
+	m_origData = (m_origFrames > 0) ? MM_ALLOC(sampleFrame, m_origFrames) : nullptr;
 	m_frames = orig.m_frames;
+	m_data = (m_frames > 0) ? MM_ALLOC(sampleFrame, m_frames) : nullptr;
 	m_startFrame = orig.m_startFrame;
 	m_endFrame = orig.m_endFrame;
 	m_loopStartFrame = orig.m_loopStartFrame;
