@@ -111,6 +111,10 @@ public:
 	// some metadata to be written to the clipboard.
 	static void remove( QVector<TrackContentObjectView *> tcovs );
 	static void toggleMute( QVector<TrackContentObjectView *> tcovs );
+	static void mergeTCOs(QVector<TrackContentObjectView*> tcovs);
+
+	// Returns true if selection can be merged and false if not
+	static bool canMergeSelection(QVector<TrackContentObjectView*> tcovs);
 
 	QColor getColorForDisplay( QColor );
 
@@ -129,7 +133,8 @@ protected:
 		Cut,
 		Copy,
 		Paste,
-		Mute
+		Mute,
+		Merge
 	};
 
 	virtual void constructContextMenu( QMenu * )

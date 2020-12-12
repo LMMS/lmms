@@ -24,6 +24,8 @@
 
 #include "TrackContentObjectView.h"
 
+#include <set>
+
 #include <QMenu>
 #include <QMouseEvent>
 #include <QPainter>
@@ -33,9 +35,14 @@
 #include "ColorChooser.h"
 #include "ComboBoxModel.h"
 #include "DataFile.h"
+#include "Engine.h"
 #include "embed.h"
 #include "GuiApplication.h"
+#include "InstrumentTrack.h"
+#include "Note.h"
+#include "Pattern.h"
 #include "SampleTrack.h"
+#include "Song.h"
 #include "SongEditor.h"
 #include "StringPairDrag.h"
 #include "TextFloat.h"
@@ -937,9 +944,11 @@ void TrackContentObjectView::mouseReleaseEvent( QMouseEvent * me )
  */
 void TrackContentObjectView::contextMenuEvent( QContextMenuEvent * cme )
 {
+	QVector<TrackContentObjectView*> selectedTCOs = getClickedTCOs();
+
 	// Depending on whether we right-clicked a selection or an individual TCO we will have
 	// different labels for the actions.
-	bool individualTCO = getClickedTCOs().size() <= 1;
+	bool individualTCO = selectedTCOs.size() <= 1;
 
 	if( cme->modifiers() )
 	{
@@ -965,6 +974,15 @@ void TrackContentObjectView::contextMenuEvent( QContextMenuEvent * cme )
 				? tr("Cut")
 				: tr("Cut selection"),
 			[this](){ contextMenuAction( Cut ); } );
+
+		if (canMergeSelection(selectedTCOs))
+		{
+			contextMenu.addAction(
+				embed::getIconPixmap("edit_merge"),
+				tr("Merge Selection"),
+				[this]() { contextMenuAction(Merge); }
+			);
+		}
 	}
 
 	contextMenu.addAction(
@@ -1022,6 +1040,9 @@ void TrackContentObjectView::contextMenuAction( ContextMenuAction action )
 			break;
 		case Mute:
 			toggleMute( active );
+			break;
+		case Merge:
+			mergeTCOs(active);
 			break;
 	}
 }
@@ -1104,6 +1125,100 @@ void TrackContentObjectView::toggleMute( QVector<TrackContentObjectView *> tcovs
 		// No need to check for nullptr because we check while building the tcovs QVector
 		tcov->getTrackContentObject()->toggleMute();
 	}
+}
+
+bool TrackContentObjectView::canMergeSelection(QVector<TrackContentObjectView*> tcovs)
+{
+	// Can't merge a single TCO
+	if (tcovs.size() < 2) { return false; }
+
+	// We check if the owner of the first TCO is an Instrument Track
+	bool isInstrumentTrack = dynamic_cast<InstrumentTrackView*>(tcovs.at(0)->getTrackView());
+
+	// Then we create a set with all the TCOs owners
+	std::set<TrackView*> ownerTracks;
+	for (auto tcov: tcovs) { ownerTracks.insert(tcov->getTrackView()); }
+
+	// Can merge if there's only one owner track and it's an Instrument Track
+	return isInstrumentTrack && ownerTracks.size() == 1;
+}
+
+void TrackContentObjectView::mergeTCOs(QVector<TrackContentObjectView*> tcovs)
+{
+	// Get the track that we are merging TCOs in
+	InstrumentTrack* track =
+		dynamic_cast<InstrumentTrack*>(tcovs.at(0)->getTrackView()->getTrack());
+
+	if (!track)
+	{
+		qWarning("Warning: Couldn't retrieve InstrumentTrack in mergeTCOs()");
+		return;
+	}
+
+	// For Undo/Redo
+	track->addJournalCheckPoint();
+	track->saveJournallingState(false);
+
+	// Find the earliest position of all the selected TCOVs
+	const auto earliestTCOV = std::min_element(tcovs.constBegin(), tcovs.constEnd(),
+		[](TrackContentObjectView* a, TrackContentObjectView* b)
+		{
+			return a->getTrackContentObject()->startPosition() <
+				b->getTrackContentObject()->startPosition();
+		}
+	);
+
+	const TimePos earliestPos = (*earliestTCOV)->getTrackContentObject()->startPosition();
+
+	// Create a pattern where all notes will be added
+	Pattern* newPattern = dynamic_cast<Pattern*>(track->createTCO(earliestPos));
+	if (!newPattern)
+	{
+		qWarning("Warning: Failed to convert TCO to Pattern on mergeTCOs");
+		return;
+	}
+
+	newPattern->saveJournallingState(false);
+
+	// Add the notes and remove the TCOs that are being merged
+	for (auto tcov: tcovs)
+	{
+		// Convert TCOV to PatternView
+		PatternView* pView = dynamic_cast<PatternView*>(tcov);
+
+		if (!pView)
+		{
+			qWarning("Warning: Non-pattern TCO on InstrumentTrack");
+			continue;
+		}
+
+		NoteVector currentTCONotes = pView->getPattern()->notes();
+		TimePos pViewPos = pView->getPattern()->startPosition();
+
+		for (Note* note: currentTCONotes)
+		{
+			Note* newNote = newPattern->addNote(*note, false);
+			TimePos originalNotePos = newNote->pos();
+			newNote->setPos(originalNotePos + (pViewPos - earliestPos));
+		}
+
+		// We disable the journalling system before removing, so the
+		// removal doesn't get added to the undo/redo history
+		tcov->getTrackContentObject()->saveJournallingState(false);
+		// No need to check for nullptr because we check while building the tcovs QVector
+		tcov->remove();
+	}
+
+	// Update length since we might have moved notes beyond the end of the pattern length
+	newPattern->updateLength();
+	// Rearrange notes because we might have moved them
+	newPattern->rearrangeAllNotes();
+	// Restore journalling states now that the operation is finished
+	newPattern->restoreJournallingState();
+	track->restoreJournallingState();
+	// Update song
+	Engine::getSong()->setModified();
+	gui->songEditor()->update();
 }
 
 
