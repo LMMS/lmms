@@ -854,7 +854,12 @@ inline void AutomationEditor::drawAutomationPoint(QPainter & p, timeMap::iterato
 {
 	int x = xCoordOfTick(POS(it));
 	int y;
-	const int outerRadius = qBound(3, (m_ppb * AutomationPattern::quantization()) / 576, 5); // man, getting this calculation right took forever
+	// Below (m_ppb * AutomationPattern::quantization() / 576) is used because:
+	// 1 bar equals to 192/quantization() notes. Hence, to calculate the number of pixels
+	// per note we would have (m_ppb * 1 bar / (192/quantization()) notes per bar), or
+	// (m_ppb * quantization / 192). If we want 1/3 of the number of pixels per note we
+	// get (m_ppb * quantization() / 192*3) or (m_ppb * quantization() / 576)
+	const int outerRadius = qBound(3, (m_ppb * AutomationPattern::quantization()) / 576, 5);
 
 	// Draw a circle for the outValue
 	y = yCoordOfLevel(OUTVAL(it));
