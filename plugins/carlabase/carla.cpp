@@ -895,7 +895,14 @@ void CarlaParamsView::filterKnobs()
 	if (!m_carlaInstrument->m_knobGroupCount) {
 		return;
 	}
-	m_maxColumns = (m_inputScrollArea->width() / m_maxKnobWidthPerGroup[m_groupFilterCombo->currentIndex()]);
+
+	uint16_t maxWidth = m_maxKnobWidthPerGroup[m_groupFilterCombo->currentIndex()];
+	if (!maxWidth) {
+		// Prevent possible division by zero.
+		return;
+	}
+
+	m_maxColumns = (m_inputScrollArea->width() / maxWidth);
 	QString text = m_paramsFilterLineEdit->text();
 
 	for (uint32_t i=0; i < m_knobs.count(); ++i)
