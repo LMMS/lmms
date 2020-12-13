@@ -508,7 +508,7 @@ bool TrackContentWidget::pasteSelection( TimePos tcoPos, const QMimeData * md, b
 		TimePos pos = tcoElement.attributeNode( "pos" ).value().toInt() + offset;
 		// If we land on ourselves, offset by one snap
 		TimePos shift = TimePos::ticksPerBar() * gui->songEditor()->m_editor->getSnapSize();
-		if (offset == 0) { pos += shift; }
+		if (offset == 0 && initialTrackIndex == currentTrackIndex) { pos += shift; }
 
 		TrackContentObject * tco = t->createTCO( pos );
 		tco->restoreState( tcoElement );
