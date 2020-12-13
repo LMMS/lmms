@@ -1391,8 +1391,6 @@ void DataFile::upgrade_noHiddenClipNames()
  *
  * The non-standard note range previously affected all MIDI-based instruments
  * except OpulenZ, and made them sound an octave lower than they should (#1857).
- * This routine lowers the pitch of all notes in patterns assigned to affected
- * instruments, preserving their pitch in existing projects.
  */
 void DataFile::upgrade_extendedNoteRange()
 {
@@ -1402,11 +1400,20 @@ void DataFile::upgrade_extendedNoteRange()
 		QDomNodeList instruments = tracks.item(i).toElement().elementsByTagName("instrument");
 		if (instruments.isEmpty()) {continue;}
 		QDomElement instrument = instruments.item(0).toElement();
-		if (instrument.attribute("name") == "zynaddsubfx" ||
-			instrument.attribute("name") == "vestige" ||
-			instrument.attribute("name") == "lv2instrument" ||
-			instrument.attribute("name") == "carlapatchbay" ||
-			instrument.attribute("name") == "carlarack")
+		// Raise the base note of every instrument by 12 to compensate for the change
+		// of A4 key code from 57 to 69. This ensures that notes are labeled correctly.
+		instrument.parentNode().toElement().setAttribute(
+			"basenote",
+			instrument.parentNode().toElement().attribute("basenote").toInt() + 12);
+		// Raise the pitch of all notes in patterns assigned to instruments not affected
+		// by #1857 by an octave. This negates the base note change for normal instruments,
+		// but leaves the MIDI-based instruments sounding an octave lower, preserving their
+		// pitch in existing projects.
+		if (instrument.attribute("name") != "zynaddsubfx" &&
+			instrument.attribute("name") != "vestige" &&
+			instrument.attribute("name") != "lv2instrument" &&
+			instrument.attribute("name") != "carlapatchbay" &&
+			instrument.attribute("name") != "carlarack")
 		{
 			QDomNodeList patterns = tracks.item(i).toElement().elementsByTagName("pattern");
 			for (int i = 0; !patterns.item(i).isNull(); i++)
@@ -1416,7 +1423,7 @@ void DataFile::upgrade_extendedNoteRange()
 				{
 					notes.item(i).toElement().setAttribute(
 						"key",
-						notes.item(i).toElement().attribute("key").toInt() - 12
+						notes.item(i).toElement().attribute("key").toInt() + 12
 					);
 				}
 			}
