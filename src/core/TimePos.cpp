@@ -63,7 +63,7 @@ TimePos::TimePos( const tick_t ticks ) :
 {
 }
 
-TimePos TimePos::quantize(float bars) const
+TimePos TimePos::quantize(float bars, bool snap) const
 {
 	//The intervals we should snap to, our new position should be a factor of this
 	int interval = s_ticksPerBar * bars;
@@ -72,7 +72,7 @@ TimePos TimePos::quantize(float bars) const
 	//Offset from the lower position
 	int offset = m_ticks % interval;
 	//1 if we should snap up, 0 if we shouldn't
-	int snapUp = offset / (interval / 2);
+	int snapUp = snap ? offset / (interval / 2) : 0;
 
 	return (lowPos + snapUp) * interval;
 }
