@@ -474,20 +474,12 @@ bool TrackContentWidget::pasteSelection( TimePos tcoPos, const QMimeData * md, b
 	// onto their final position.
 
 	float snapSize = gui->songEditor()->m_editor->getSnapSize();
-	int snapTicks = static_cast<int>(snapSize * TimePos::ticksPerBar());
 	// All patterns should be offset the same amount as the grabbed pattern
 	TimePos offset = TimePos(tcoPos - grabbedTCOPos);
-	// If we need to quantize
-	if (offset % snapTicks)
-	{
-		// Since negative offsets will quantize up instead of down, we shift them back 1 snapSize
-		offset -= offset < 0 ? snapTicks : 0;
-
-		// The offset is quantized (rather than the positions) to preserve fine adjustments.
-		// We call quantize with snap set to false, so the TCO falls in the lowest bar, even
-		// if we clicked in the second half of it.
-		offset = offset.quantize(snapSize, false);
-	}
+	// Users expect clips to "fall" backwards, so bias the offset
+	offset -= TimePos::ticksPerBar() * snapSize / 2;
+	// The offset is quantized (rather than the positions) to preserve fine adjustments
+	offset = offset.quantize(snapSize);
 
 	// Get the leftmost TCO and fix the offset if it reaches below bar 0
 	TimePos leftmostPos = grabbedTCOPos;

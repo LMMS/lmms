@@ -68,9 +68,7 @@ public:
 	TimePos( const bar_t bar, const tick_t ticks );
 	TimePos( const tick_t ticks = 0 );
 
-	// Snap defines whether we should snap to the closest bar. If it's
-	// false we'll just stick to the lowest bar.
-	TimePos quantize(float bars, bool snap = true) const;
+	TimePos quantize(float) const;
 	TimePos toAbsoluteBar() const;
 
 	TimePos& operator+=( const TimePos& time );
