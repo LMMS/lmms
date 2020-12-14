@@ -329,8 +329,13 @@ void AudioJack::renamePort( AudioPort * _port )
 					_port->name() + " R" };
 		for( ch_cnt_t ch = 0; ch < DEFAULT_CHANNELS; ++ch )
 		{
+#ifdef LMMS_HAVE_JACK_PRENAME
 			jack_port_rename( m_client, m_portMap[_port].ports[ch],
 					name[ch].toLatin1().constData() );
+#else
+			jack_port_set_name( m_portMap[_port].ports[ch],
+					name[ch].toLatin1().constData() );
+#endif
 		}
 	}
 #endif
