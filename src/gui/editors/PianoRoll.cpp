@@ -2550,7 +2550,7 @@ void PianoRoll::dragNotes( int x, int y, bool alt, bool shift, bool ctrl, Note* 
 	// dragging one or more notes around
 	
 	// get note that's dragged
-	if (noteDragged != NULL)
+	if (noteDragged != nullptr)
 	{
 		draggedNote = noteDragged;
 	}
@@ -2558,6 +2558,7 @@ void PianoRoll::dragNotes( int x, int y, bool alt, bool shift, bool ctrl, Note* 
 	// convert pixels to ticks and keys
 	int off_x = x - m_moveStartX;
 	int off_ticks = off_x * TimePos::ticksPerBar() / m_ppb;
+	int unquantized_off_ticks = off_ticks;
 	int off_key = getKey( y ) - getKey( m_moveStartY );
 
 	// handle scroll changes while dragging
@@ -2566,10 +2567,9 @@ void PianoRoll::dragNotes( int x, int y, bool alt, bool shift, bool ctrl, Note* 
 
 
 	// if they're not holding alt, quantize the offset
-	if( ! alt )
+	if (!alt)
 	{
-		off_ticks = floor( off_ticks / quantization() )
-						* quantization();
+		off_ticks = floor(off_ticks / quantization()) * quantization();
 	}
 
 	// make sure notes won't go outside boundary conditions
@@ -2617,12 +2617,35 @@ void PianoRoll::dragNotes( int x, int y, bool alt, bool shift, bool ctrl, Note* 
 					firstIteration = false;
 					Note* copy(draggedNote);
 					// guantize first note
-					int pos_ticks = copy->oldPos().getTicks() + off_ticks;
-					pos_ticks = qMax(0, pos_ticks);
-					copy->setPos(TimePos(pos_ticks));
+					int start_pos_ticks = copy->oldPos().getTicks() + unquantized_off_ticks;
+					int end_pos_ticks = start_pos_ticks + copy->length().getTicks();
+					start_pos_ticks = qMax(0, start_pos_ticks);
+					end_pos_ticks = qMax(0, end_pos_ticks);
+										
+					copy->setPos(TimePos(start_pos_ticks));
 					copy->quantizePos(quantization());
+					auto tmp_pos=copy->pos(); // store start position
+					
+					int gap_start = qAbs(start_pos_ticks - copy->pos().getTicks());
+
+					copy->setPos(TimePos(end_pos_ticks));
+					copy->quantizePos(quantization());
+
+					int gap_end = qAbs(end_pos_ticks - copy->pos().getTicks());
+					
+					if (gap_start < gap_end)
+					{
+						copy->setPos(tmp_pos); // restore start position
+						off_ticks += copy->pos().getTicks() - (draggedNote->oldPos().getTicks() + off_ticks);
+					}
+					else 
+					{
+						off_ticks += copy->pos().getTicks() - (draggedNote->oldPos().getTicks() + off_ticks) - draggedNote->length().getTicks();
+					}
+				
 					// new off_ticks based on quantized (copy) note and not-quantized notes
-					off_ticks += copy->pos().getTicks() - (draggedNote->oldPos().getTicks() + off_ticks);
+					
+					printf("gap_start = %i\n gap_end %i\n", gap_start,gap_end);
 				}
 				int pos_ticks = note->oldPos().getTicks() + off_ticks;
 				int key_num = note->oldKey() + off_key;
