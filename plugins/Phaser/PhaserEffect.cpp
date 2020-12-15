@@ -53,7 +53,7 @@ Plugin::Descriptor PLUGIN_EXPORT Phaser_plugin_descriptor =
 
 
 constexpr float PHA_NOISE_FLOOR = 0.00001f;
-constexpr double PHA_LOG = 2.2; //Standard constant for attack/release times
+constexpr double PHA_LOG = 2.2; //Standard multiplier constant for attack/release times
 
 
 PhaserEffect::PhaserEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* key) :
@@ -555,14 +555,14 @@ sample_t PhaserEffect::calcAllpassFilter(sample_t inSamp, sample_rate_t Fs, int 
 	// Much effort was put into CPU optimization, so now the filters
 	// only require a very small number of operations.
 
-	float filterOutput = b0 * (inSamp - m_filtY[filtNum][channel][1]) +
-		b1 * (m_filtX[filtNum][channel][0] - m_filtY[filtNum][channel][0]) +
-		m_filtX[filtNum][channel][1];
+	float filterOutput = b0 * (inSamp - m_filt[filtNum][channel].y[1]) +
+		b1 * (m_filt[filtNum][channel].x[0] - m_filt[filtNum][channel].y[0]) +
+		m_filt[filtNum][channel].x[1];
 
-	m_filtX[filtNum][channel][1] = m_filtX[filtNum][channel][0];
-	m_filtX[filtNum][channel][0] = inSamp;
-	m_filtY[filtNum][channel][1] = m_filtY[filtNum][channel][0];
-	m_filtY[filtNum][channel][0] = filterOutput;
+	m_filt[filtNum][channel].x[1] = m_filt[filtNum][channel].x[0];
+	m_filt[filtNum][channel].x[0] = inSamp;
+	m_filt[filtNum][channel].y[1] = m_filt[filtNum][channel].y[0];
+	m_filt[filtNum][channel].y[0] = filterOutput;
 
 	return filterOutput;
 }

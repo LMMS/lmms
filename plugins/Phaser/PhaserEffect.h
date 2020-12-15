@@ -65,8 +65,12 @@ private:
 
 	PhaserControls m_phaserControls;
 
-	float m_filtX[32][2][2] = {{{0}}};// [filter number][channel][samples back in time]
-	float m_filtY[32][2][2] = {{{0}}};// [filter number][channel][samples back in time]
+	struct FilterState
+	{
+		float x[2] = {};
+		float y[2] = {};
+	};
+	FilterState m_filt[32][2] = {{}};// [filter number][channel]
 	std::vector<float> m_filtDelayBuf[2];
 	int m_delayBufSize;
 	int m_filtFeedbackLoc = 0;
@@ -85,13 +89,13 @@ private:
 	float m_inGain;
 
 	float m_sampAvg[2] = {0};
-	float m_oscillateTracker1[2] = {0};
-	float m_oscillateTracker2[2] = {0};
+	float m_oscillateTracker1[2] = {};
+	float m_oscillateTracker2[2] = {};
 
 	sampleFrame m_displayCutoff;
 	sampleFrame m_realCutoff;
 
-	float lastSecondAdd[2] = {0};
+	float lastSecondAdd[2] = {};
 
 	float m_dcTimeConst;
 	float m_oscillateTimeConst;
