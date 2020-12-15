@@ -52,8 +52,8 @@ PhaserControls::PhaserControls(PhaserEffect* effect) :
 	m_enableLFOModel(true , this, tr("Enable LFO")),
 	m_phaseModel(180.0f, 0.f, 360.0f, 0.01f, this, tr("Phase")),
 	m_inFollowModel(0.f, -30.f, 30.0f, 0.01f, this, tr("Input Follow")),
-	m_attackModel(200.0f, 0.0f, 2000.0f, 1.0f, this, tr("Attack")),
-	m_releaseModel(500.0f, 0.0f, 2000.0f, 1.0f, this, tr("Release")),
+	m_attackModel(200.0f, 0.1f, 2000.0f, 0.1f, this, tr("Attack")),
+	m_releaseModel(500.0f, 0.1f, 2000.0f, 0.1f, this, tr("Release")),
 	m_distortionModel(0.0f, 0.0f, 100.0f, 0.001f, this, tr("Distortion")),
 	m_analogDistModel(1.0f, 0.25f, 8.0f, 0.01f, this, tr("Analog Distortion")),
 	m_cutoffControlModel(1.0f, -4.0f, 4.0f, 0.01f, this, tr("Delay Control")),
@@ -82,62 +82,62 @@ PhaserControls::PhaserControls(PhaserEffect* effect) :
 }
 
 
-void PhaserControls::saveSettings(QDomDocument& doc, QDomElement& _this)
+void PhaserControls::saveSettings(QDomDocument& doc, QDomElement& elem)
 {
-	m_cutoffModel.saveSettings(doc, _this, "cutoff");
-	m_resonanceModel.saveSettings(doc, _this, "resonance");
-	m_feedbackModel.saveSettings(doc, _this, "feedback");
-	m_orderModel.saveSettings(doc, _this, "order");
-	m_delayModel.saveSettings(doc, _this, "delay");
-	m_rateModel.saveSettings(doc, _this, "rate");
-	m_enableLFOModel.saveSettings(doc, _this, "enableLFO");
-	m_amountModel.saveSettings(doc, _this, "amount");
-	m_phaseModel.saveSettings(doc, _this, "phase");
-	m_inFollowModel.saveSettings(doc, _this, "inFollow");
-	m_attackModel.saveSettings(doc, _this, "attack");
-	m_releaseModel.saveSettings(doc, _this, "release");
-	m_distortionModel.saveSettings(doc, _this, "distortion");
-	m_outGainModel.saveSettings(doc, _this, "outGain");
-	m_inGainModel.saveSettings(doc, _this, "inGain");
-	m_invertModel.saveSettings(doc, _this, "invert");
-	m_wetModel.saveSettings(doc, _this, "wet");
-	m_analogModel.saveSettings(doc, _this, "analog");
-	m_doubleModel.saveSettings(doc, _this, "double");
-	m_aliasModel.saveSettings(doc, _this, "alias");
-	m_modeModel.saveSettings(doc, _this, "mode");
-	m_analogDistModel.saveSettings(doc, _this, "analogDist");
-	m_cutoffControlModel.saveSettings(doc, _this, "cutoffControl");
-	m_delayControlModel.saveSettings(doc, _this, "delayControl");
+	m_cutoffModel.saveSettings(doc, elem, "cutoff");
+	m_resonanceModel.saveSettings(doc, elem, "resonance");
+	m_feedbackModel.saveSettings(doc, elem, "feedback");
+	m_orderModel.saveSettings(doc, elem, "order");
+	m_delayModel.saveSettings(doc, elem, "delay");
+	m_rateModel.saveSettings(doc, elem, "rate");
+	m_enableLFOModel.saveSettings(doc, elem, "enableLFO");
+	m_amountModel.saveSettings(doc, elem, "amount");
+	m_phaseModel.saveSettings(doc, elem, "phase");
+	m_inFollowModel.saveSettings(doc, elem, "inFollow");
+	m_attackModel.saveSettings(doc, elem, "attack");
+	m_releaseModel.saveSettings(doc, elem, "release");
+	m_distortionModel.saveSettings(doc, elem, "distortion");
+	m_outGainModel.saveSettings(doc, elem, "outGain");
+	m_inGainModel.saveSettings(doc, elem, "inGain");
+	m_invertModel.saveSettings(doc, elem, "invert");
+	m_wetModel.saveSettings(doc, elem, "wet");
+	m_analogModel.saveSettings(doc, elem, "analog");
+	m_doubleModel.saveSettings(doc, elem, "double");
+	m_aliasModel.saveSettings(doc, elem, "alias");
+	m_modeModel.saveSettings(doc, elem, "mode");
+	m_analogDistModel.saveSettings(doc, elem, "analogDist");
+	m_cutoffControlModel.saveSettings(doc, elem, "cutoffControl");
+	m_delayControlModel.saveSettings(doc, elem, "delayControl");
 }
 
 
 
-void PhaserControls::loadSettings(const QDomElement& _this)
+void PhaserControls::loadSettings(const QDomElement& elem)
 {
-	m_cutoffModel.loadSettings(_this, "cutoff");
-	m_resonanceModel.loadSettings(_this, "resonance");
-	m_feedbackModel.loadSettings(_this, "feedback");
-	m_orderModel.loadSettings(_this, "order");
-	m_delayModel.loadSettings(_this, "delay");
-	m_rateModel.loadSettings(_this, "rate");
-	m_amountModel.loadSettings(_this, "amount");
-	m_enableLFOModel.loadSettings(_this, "enableLFO");
-	m_phaseModel.loadSettings(_this, "phase");
-	m_inFollowModel.loadSettings(_this, "inFollow");
-	m_attackModel.loadSettings(_this, "attack");
-	m_releaseModel.loadSettings(_this, "release");
-	m_distortionModel.loadSettings(_this, "distortion");
-	m_outGainModel.loadSettings(_this, "outGain");
-	m_inGainModel.loadSettings(_this, "inGain");
-	m_invertModel.loadSettings(_this, "invert");
-	m_wetModel.loadSettings(_this, "wet");
-	m_analogModel.loadSettings(_this, "analog");
-	m_doubleModel.loadSettings(_this, "double");
-	m_aliasModel.loadSettings(_this, "alias");
-	m_modeModel.loadSettings(_this, "mode");
-	m_analogDistModel.loadSettings(_this, "analogDist");
-	m_cutoffControlModel.loadSettings(_this, "cutoffControl");
-	m_delayControlModel.loadSettings(_this, "delayControl");
+	m_cutoffModel.loadSettings(elem, "cutoff");
+	m_resonanceModel.loadSettings(elem, "resonance");
+	m_feedbackModel.loadSettings(elem, "feedback");
+	m_orderModel.loadSettings(elem, "order");
+	m_delayModel.loadSettings(elem, "delay");
+	m_rateModel.loadSettings(elem, "rate");
+	m_amountModel.loadSettings(elem, "amount");
+	m_enableLFOModel.loadSettings(elem, "enableLFO");
+	m_phaseModel.loadSettings(elem, "phase");
+	m_inFollowModel.loadSettings(elem, "inFollow");
+	m_attackModel.loadSettings(elem, "attack");
+	m_releaseModel.loadSettings(elem, "release");
+	m_distortionModel.loadSettings(elem, "distortion");
+	m_outGainModel.loadSettings(elem, "outGain");
+	m_inGainModel.loadSettings(elem, "inGain");
+	m_invertModel.loadSettings(elem, "invert");
+	m_wetModel.loadSettings(elem, "wet");
+	m_analogModel.loadSettings(elem, "analog");
+	m_doubleModel.loadSettings(elem, "double");
+	m_aliasModel.loadSettings(elem, "alias");
+	m_modeModel.loadSettings(elem, "mode");
+	m_analogDistModel.loadSettings(elem, "analogDist");
+	m_cutoffControlModel.loadSettings(elem, "cutoffControl");
+	m_delayControlModel.loadSettings(elem, "delayControl");
 }
 
 

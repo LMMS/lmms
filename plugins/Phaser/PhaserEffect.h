@@ -74,6 +74,7 @@ private:
 	QuadratureLfo * m_lfo;
 
 	float m_twoPiOverSr;
+	float m_dcCoeff;
 
 	float m_currentPeak[2];
 

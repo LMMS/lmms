@@ -195,7 +195,7 @@ PhaserControlDialog::PhaserControlDialog(PhaserControls* controls) :
 	doubleButton->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("double_inactive"));
 	doubleButton->setCheckable(true);
 	doubleButton->setModel(&controls->m_doubleModel);
-	ToolTip::add(doubleButton, tr("Send through allpass filters twice"));
+	ToolTip::add(doubleButton, tr("Send through allpass filters twice per input"));
 
 	PixmapButton * aliasButton = new PixmapButton(this, tr("Alias"));
 	aliasButton->move(143, 9);

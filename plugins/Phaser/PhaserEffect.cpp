@@ -53,7 +53,7 @@ Plugin::Descriptor PLUGIN_EXPORT Phaser_plugin_descriptor =
 
 
 constexpr float PHA_NOISE_FLOOR = 0.00001f;
-constexpr double PHA_LOG = 2.2;
+constexpr double PHA_LOG = 2.2; //Standard constant for attack/release times
 
 
 PhaserEffect::PhaserEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* key) :
@@ -282,8 +282,7 @@ bool PhaserEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 			{
 				m_currentPeak[i] = qMin(m_currentPeak[i] * m_attCoeff, sAbs[i]);
 			}
-			else
-			if (sAbs[i] < m_currentPeak[i])
+			else if (sAbs[i] < m_currentPeak[i])
 			{
 				m_currentPeak[i] = qMax(m_currentPeak[i] * m_relCoeff, sAbs[i]);
 			}
@@ -314,12 +313,12 @@ bool PhaserEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 		*/
 		float b0[2];
 		float b1[2];
-		for (int b = 0; b < 2; ++b)
+		for (int i = 0; i < 2; ++i)
 		{
-			const float w0 = m_twoPiOverSr * m_realCutoff[b];
+			const float w0 = m_twoPiOverSr * m_realCutoff[i];
 			const float a0 = 1 + (sin(w0) / (resonance * 2.f));
-			b0[b] = (1 - (a0 - 1)) / a0;
-			b1[b] = (-2*cos(w0)) / a0;
+			b0[i] = (1 - (a0 - 1)) / a0;
+			b1[i] = (-2*cos(w0)) / a0;
 		}
 
 		float firstAdd[2] = {0, 0};
@@ -366,13 +365,13 @@ bool PhaserEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 			{
 				tempAdd[0] = delayOut[0] * feedback;
 				tempAdd[1] = delayOut[1] * feedback;
-				for (int a = 0; a < order; ++a)
+				for (int i = 0; i < order; ++i)
 				{
-					for (int b = 0; b < 2; ++b)
+					for (int j = 0; j < 2; ++j)
 					{
-						for (int c = 0; c < 1 + doubleVal; ++c)// Runs twice if doubleVal is true
+						for (int k = 0; k < 1 + doubleVal; ++k)// Runs twice if doubleVal is true
 						{
-							tempAdd[b] = calcAllpassFilter(tempAdd[b], sample_rate, a, b, b0[b], b1[b]);
+							tempAdd[j] = calcAllpassFilter(tempAdd[j], sample_rate, i, j, b0[j], b1[j]);
 						}
 					}
 				}
@@ -413,13 +412,13 @@ bool PhaserEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 			secondAdd[0] *= m_aliasFlip;
 			secondAdd[1] *= m_aliasFlip;
 		}
-		for (int a = 0; a < order; ++a)
+		for (int i = 0; i < order; ++i)
 		{
-			for (int b = 0; b < 2; ++b)
+			for (int j = 0; j < 2; ++j)
 			{
-				for (int c = 0; c < 1 + doubleVal; ++c)// Runs twice if doubleVal is true
+				for (int k = 0; k < 1 + doubleVal; ++k)// Runs twice if doubleVal is true
 				{
-					secondAdd[b] = calcAllpassFilter(secondAdd[b], sample_rate, a, b, b0[b], b1[b]);
+					secondAdd[j] = calcAllpassFilter(secondAdd[j], sample_rate, i, j, b0[j], b1[j]);
 				}
 			}
 		}
@@ -507,7 +506,7 @@ bool PhaserEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 		{
 			// Just subtract the approximate average of the latest many
 			// audio samples.
-			m_sampAvg[i] = m_sampAvg[i] * 0.999 + tempAdd[i] * 0.001;
+			m_sampAvg[i] = m_sampAvg[i] * (1.f - m_dcCoeff) + tempAdd[i] * m_dcCoeff;
 			tempAdd[i] -= m_sampAvg[i];
 		}
 
@@ -573,13 +572,14 @@ void PhaserEffect::changeSampleRate()
 {
 	m_lfo->setSampleRate(Engine::mixer()->processingSampleRate());
 	m_twoPiOverSr = F_2PI / Engine::mixer()->processingSampleRate();
+	m_dcCoeff = 44.1f / Engine::mixer()->processingSampleRate();
 	calcAttack();
 	calcRelease();
 
-	for (int b = 0; b < 2; ++b)
+	for (int i = 0; i < 2; ++i)
 	{
 		m_delayBufSize = Engine::mixer()->processingSampleRate() * 0.03 + 1;
-		m_filtDelayBuf[b].resize(m_delayBufSize);
+		m_filtDelayBuf[i].resize(m_delayBufSize);
 	}
 }
 
