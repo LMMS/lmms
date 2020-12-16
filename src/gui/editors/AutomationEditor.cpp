@@ -456,38 +456,22 @@ void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 					}
 					else // No shift, we are just creating/moving nodes
 					{
-						// If the place we clicked had no nodes
-						if (clickedNode == tm.end())
-						{
-							// We create a new node and start dragging it
-							TimePos valuePos(posTicks);
+						// Starts actually moving/draging the node
+						TimePos newTime = m_pattern->setDragValue(
+							// The TimePos of either the clicked node or a new one
+							TimePos(
+								clickedNode == tm.end()
+								? posTicks
+								: POS(clickedNode)
+							),
+							level,
+							true,
+							mouseEvent->modifiers() & Qt::ControlModifier
+						);
 
-							// Starts actually moving/draging the node
-							TimePos newTime = m_pattern->setDragValue(
-								valuePos,
-								level,
-								true,
-								mouseEvent->modifiers() & Qt::ControlModifier
-							);
-
-							// Set the iterator to our newly created node so we can use it later
-							// for the m_moveXOffset calculation
-							clickedNode = tm.find(newTime);
-						}
-						else // If we clicked over an existing node
-						{
-							// Simply start moving/draging it
-							TimePos newTime = m_pattern->setDragValue(
-								TimePos(POS(clickedNode)),
-								level,
-								true,
-								mouseEvent->modifiers() & Qt::ControlModifier
-							);
-
-							// We need to update our iterator because setDragValue removes the node that
-							// is being dragged, so if we don't update it we have a bogus iterator
-							clickedNode = tm.find(newTime);
-						}
+						// Set the iterator to our newly created node so we can use it later
+						// for the m_moveXOffset calculation
+						clickedNode = tm.find(newTime);
 
 						// Set the action to MOVE_VALUE so moveMouseEvent() knows we are moving a node
 						m_action = MOVE_VALUE;
@@ -710,12 +694,12 @@ void AutomationEditor::mouseMoveEvent(QMouseEvent * mouseEvent )
 
 						Engine::getSong()->setModified();
 					}
-					else if (m_action == DRAW_LINE)
+					/* else if (m_action == DRAW_LINE)
 					{
 						// We are drawing a line. For now do nothing (as before), but later logic
 						// could be added here so the line is updated according to the new mouse position
 						// until the button is released
-					}
+					}*/
 				}
 				else if (m_mouseDownRight) // We are removing nodes
 				{
@@ -1143,8 +1127,11 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 				++it;
 			}
 
-			for (int i = POS(it), x = xCoordOfTick(i); x <= width();
-							i++, x = xCoordOfTick(i))
+			for (
+				int i = POS(it), x = xCoordOfTick(i);
+				x <= width();
+				i++, x = xCoordOfTick(i)
+			)
 			{
 				// Draws the rectangle representing the value after the last node (for
 				// that reason we use outValue).
