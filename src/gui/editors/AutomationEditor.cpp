@@ -469,8 +469,9 @@ void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 							mouseEvent->modifiers() & Qt::ControlModifier
 						);
 
-						// Set the iterator to our newly created node so we can use it later
-						// for the m_moveXOffset calculation
+						// We need to update our iterator because we are either creating a new node
+						// or dragging an existing one. In the latter, setDragValue removes the node that
+						// is being dragged, so if we don't update it we have a bogus iterator
 						clickedNode = tm.find(newTime);
 
 						// Set the action to MOVE_VALUE so moveMouseEvent() knows we are moving a node
