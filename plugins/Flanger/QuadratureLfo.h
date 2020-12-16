@@ -33,6 +33,8 @@ public:
 	QuadratureLfo( int sampleRate )
 	{
 		setSampleRate(sampleRate);
+		m_frequency = 0;
+		m_phase = 0;
 	}
 	~QuadratureLfo()
 	{
