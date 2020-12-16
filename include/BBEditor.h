@@ -26,6 +26,7 @@
 #ifndef BB_EDITOR_H
 #define BB_EDITOR_H
 
+
 #include "Editor.h"
 #include "TrackContainerView.h"
 
@@ -86,6 +87,7 @@ public slots:
 	void removeSteps();
 	void addSampleTrack();
 	void addAutomationTrack();
+	void clonePattern();
 
 protected slots:
 	void dropEvent(QDropEvent * de ) override;

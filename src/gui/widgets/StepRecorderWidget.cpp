@@ -53,9 +53,22 @@ void StepRecorderWidget::setPixelsPerBar(int ppb)
 	m_ppb = ppb;
 }
 
-void StepRecorderWidget::setCurrentPosition(MidiTime currentPosition)
+void StepRecorderWidget::setCurrentPosition(TimePos currentPosition)
 {
 	m_currentPosition = currentPosition;
+}
+
+void StepRecorderWidget::setMargins(const QMargins &qm)
+{
+	m_left = qm.left();
+	m_right = qm.right();
+	m_top = qm.top();
+	m_bottom = qm.bottom();
+}
+
+QMargins StepRecorderWidget::margins()
+{
+	return QMargins(m_left, m_top, m_right, m_bottom);
 }
 
 void StepRecorderWidget::setBottomMargin(const int marginBottom)
@@ -63,12 +76,12 @@ void StepRecorderWidget::setBottomMargin(const int marginBottom)
 	m_marginBottom = marginBottom;
 }
 
-void StepRecorderWidget::setStartPosition(MidiTime pos)
+void StepRecorderWidget::setStartPosition(TimePos pos)
 {
 	m_curStepStartPos = pos;
 }
 
-void StepRecorderWidget::setEndPosition(MidiTime pos)
+void StepRecorderWidget::setEndPosition(TimePos pos)
 {
 	m_curStepEndPos = pos;
 	emit positionChanged(m_curStepEndPos);
@@ -80,7 +93,7 @@ void StepRecorderWidget::showHint()
 		embed::getIconPixmap("hint"));
 }
 
-void StepRecorderWidget::setStepsLength(MidiTime stepsLength)
+void StepRecorderWidget::setStepsLength(TimePos stepsLength)
 {
 	m_stepsLength = stepsLength;
 }
@@ -96,7 +109,7 @@ void StepRecorderWidget::paintEvent(QPaintEvent * pe)
 	//draw steps ruler
 	painter.setPen(m_colorLineEnd);
 
-	MidiTime curPos = m_curStepEndPos;
+	TimePos curPos = m_curStepEndPos;
 	int x = xCoordOfTick(curPos);
 	while(x <= m_right)
 	{
@@ -125,7 +138,7 @@ void StepRecorderWidget::paintEvent(QPaintEvent * pe)
 
 int StepRecorderWidget::xCoordOfTick(int tick)
 {
-	return m_marginLeft + ((tick - m_currentPosition) * m_ppb / MidiTime::ticksPerBar());
+	return m_marginLeft + ((tick - m_currentPosition) * m_ppb / TimePos::ticksPerBar());
 }
 
 
@@ -138,7 +151,7 @@ void StepRecorderWidget::drawVerLine(QPainter* painter, int x, const QColor& col
 	}
 }
 
-void StepRecorderWidget::drawVerLine(QPainter* painter, const MidiTime& pos, const QColor& color, int top, int bottom)
+void StepRecorderWidget::drawVerLine(QPainter* painter, const TimePos& pos, const QColor& color, int top, int bottom)
 {
 	drawVerLine(painter, xCoordOfTick(pos), color, top, bottom);
 }

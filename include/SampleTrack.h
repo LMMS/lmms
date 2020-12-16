@@ -29,9 +29,12 @@
 #include <QLayout>
 
 #include "AudioPort.h"
+#include "FadeButton.h"
 #include "FxMixer.h"
 #include "FxLineLcdSpinBox.h"
 #include "Track.h"
+#include "TrackContentObjectView.h"
+#include "TrackView.h"
 
 class EffectRackView;
 class Knob;
@@ -49,7 +52,7 @@ public:
 	SampleTCO( Track * _track );
 	virtual ~SampleTCO();
 
-	void changeLength( const MidiTime & _length ) override;
+	void changeLength( const TimePos & _length ) override;
 	const QString & sampleFile() const;
 
 	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
@@ -64,7 +67,7 @@ public:
 		return m_sampleBuffer;
 	}
 
-	MidiTime sampleLength() const;
+	TimePos sampleLength() const;
 	void setSampleStartFrame( f_cnt_t startFrame );
 	void setSamplePlayLength( f_cnt_t length );
 	TrackContentObjectView * createView( TrackView * _tv ) override;
@@ -93,6 +96,7 @@ private:
 
 signals:
 	void sampleChanged();
+	void wasReversed();
 
 } ;
 
@@ -108,6 +112,7 @@ public:
 
 public slots:
 	void updateSample();
+	void reverseSample();
 
 
 
@@ -136,10 +141,10 @@ public:
 	SampleTrack( TrackContainer* tc );
 	virtual ~SampleTrack();
 
-	virtual bool play( const MidiTime & _start, const fpp_t _frames,
+	virtual bool play( const TimePos & _start, const fpp_t _frames,
 						const f_cnt_t _frame_base, int _tco_num = -1 ) override;
 	TrackView * createView( TrackContainerView* tcv ) override;
-	TrackContentObject * createTCO( const MidiTime & _pos ) override;
+	TrackContentObject* createTCO(const TimePos & pos) override;
 
 
 	virtual void saveTrackSpecificSettings( QDomDocument & _doc,
@@ -161,6 +166,20 @@ public:
 		return "sampletrack";
 	}
 
+	bool isPlaying()
+	{
+		return m_isPlaying;
+	}
+
+	void setPlaying(bool playing)
+	{
+		if (m_isPlaying != playing) { emit playingChanged(); }
+		m_isPlaying = playing;
+	}
+
+signals:
+	void playingChanged();
+
 public slots:
 	void updateTcos();
 	void setPlayingTcos( bool isPlaying );
@@ -171,6 +190,7 @@ private:
 	FloatModel m_panningModel;
 	IntModel m_effectChannelModel;
 	AudioPort m_audioPort;
+	bool m_isPlaying;
 
 
 
@@ -209,6 +229,7 @@ public:
 
 public slots:
 	void showEffects();
+	void updateIndicator();
 
 
 protected:
@@ -230,9 +251,14 @@ private:
 	SampleTrackWindow * m_window;
 	Knob * m_volumeKnob;
 	Knob * m_panningKnob;
+	FadeButton * m_activityIndicator;
 
 	TrackLabelButton * m_tlb;
 
+	FadeButton * getActivityIndicator() override
+	{
+		return m_activityIndicator;
+	}
 
 	friend class SampleTrackWindow;
 

@@ -30,7 +30,7 @@
 
 #include "JournallingObject.h"
 #include "Model.h"
-#include "MidiTime.h"
+#include "TimePos.h"
 #include "ValueBuffer.h"
 #include "MemoryManager.h"
 #include "ModelVisitor.h"
@@ -148,7 +148,7 @@ public:
 	template<class T>
 	inline T value( int frameOffset = 0 ) const
 	{
-		if( unlikely( hasLinkedModels() || m_controllerConnection != NULL ) )
+		if( hasLinkedModels() || m_controllerConnection != NULL )
 		{
 			return castValue<T>( controllerValue( frameOffset ) );
 		}
@@ -236,6 +236,7 @@ public:
 		m_centerValue = centerVal;
 	}
 
+	//! link @p m1 and @p m2, let @p m1 take the values of @p m2
 	static void linkModels( AutomatableModel* m1, AutomatableModel* m2 );
 	static void unlinkModels( AutomatableModel* m1, AutomatableModel* m2 );
 
@@ -280,7 +281,7 @@ public:
 		return false;
 	}
 
-	float globalAutomationValueAt( const MidiTime& time );
+	float globalAutomationValueAt( const TimePos& time );
 
 	void setStrictStepSize( const bool b )
 	{
@@ -359,7 +360,7 @@ private:
 	template<class T> void roundAt( T &value, const T &where ) const;
 
 
-	ScaleType m_scaleType; //! scale type, linear by default
+	ScaleType m_scaleType; //!< scale type, linear by default
 	float m_value;
 	float m_initValue;
 	float m_minValue;

@@ -499,8 +499,23 @@ void AutomatableModel::unlinkModel( AutomatableModel* model )
 
 void AutomatableModel::linkModels( AutomatableModel* model1, AutomatableModel* model2 )
 {
+	if (!model1->m_linkedModels.contains( model2 ) && model1 != model2)
+	{
+		// copy data
+		model1->m_value = model2->m_value;
+		if (model1->valueBuffer() && model2->valueBuffer())
+		{
+			std::copy_n(model2->valueBuffer()->data(),
+				model1->valueBuffer()->length(),
+				model1->valueBuffer()->data());
+		}
+		// send dataChanged() before linking (because linking will
+		// connect the two dataChanged() signals)
+		emit model1->dataChanged();
+		// finally: link the models
 		model1->linkModel( model2 );
 		model2->linkModel( model1 );
+	}
 }
 
 
@@ -693,7 +708,7 @@ void AutomatableModel::reset()
 
 
 
-float AutomatableModel::globalAutomationValueAt( const MidiTime& time )
+float AutomatableModel::globalAutomationValueAt( const TimePos& time )
 {
 	// get patterns that connect to this model
 	QVector<AutomationPattern *> patterns = AutomationPattern::patternsForModel( this );
@@ -705,7 +720,7 @@ float AutomatableModel::globalAutomationValueAt( const MidiTime& time )
 	else
 	{
 		// of those patterns:
-		// find the patterns which overlap with the miditime position
+		// find the patterns which overlap with the time position
 		QVector<AutomationPattern *> patternsInRange;
 		for( QVector<AutomationPattern *>::ConstIterator it = patterns.begin(); it != patterns.end(); it++ )
 		{
@@ -723,7 +738,7 @@ float AutomatableModel::globalAutomationValueAt( const MidiTime& time )
 			latestPattern = patternsInRange[0];
 		}
 		else
-		// if we find no patterns at the exact miditime, we need to search for the last pattern before time and use that
+		// if we find no patterns at the exact time, we need to search for the last pattern before time and use that
 		{
 			int latestPosition = 0;
 

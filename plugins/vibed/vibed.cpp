@@ -48,7 +48,7 @@ Plugin::Descriptor PLUGIN_EXPORT vibedstrings_plugin_descriptor =
 {
 	STRINGIFY( PLUGIN_NAME ),
 	"Vibed",
-	QT_TRANSLATE_NOOP( "pluginBrowser",
+	QT_TRANSLATE_NOOP( "PluginBrowser",
 					"Vibrating string modeler" ),
 	"Danny McRae <khjklujn/at/yahoo/com>",
 	0x0100,

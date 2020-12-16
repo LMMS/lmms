@@ -102,14 +102,14 @@ RemotePlugin::RemotePlugin() :
 
 	m_socketFile = QDir::tempPath() + QDir::separator() +
 						QUuid::createUuid().toString();
-	const char * path = m_socketFile.toUtf8().constData();
-	size_t length = strlen( path );
+	auto path = m_socketFile.toUtf8();
+	size_t length = path.length();
 	if ( length >= sizeof sa.sun_path )
 	{
 		length = sizeof sa.sun_path - 1;
 		qWarning( "Socket path too long." );
 	}
-	memcpy( sa.sun_path, path, length );
+	memcpy(sa.sun_path, path.constData(), length );
 	sa.sun_path[length] = '\0';
 
 	m_server = socket( PF_LOCAL, SOCK_STREAM, 0 );
@@ -117,7 +117,7 @@ RemotePlugin::RemotePlugin() :
 	{
 		qWarning( "Unable to start the server." );
 	}
-	remove( path );
+	remove(path.constData());
 	int ret = bind( m_server, (struct sockaddr *) &sa, sizeof sa );
 	if ( ret == -1 || listen( m_server, 1 ) == -1 )
 	{

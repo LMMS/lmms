@@ -34,7 +34,7 @@
 
 #include "lmms_basics.h"
 #include "JournallingObject.h"
-#include "MidiTime.h"
+#include "TimePos.h"
 #include "AutomationPattern.h"
 #include "ComboBoxModel.h"
 #include "Knob.h"
@@ -70,7 +70,7 @@ public:
 
 	inline bool validPattern() const
 	{
-		return m_pattern != nullptr;
+		return m_pattern != nullptr && m_pattern->hasAutomation();
 	}
 
 	void saveSettings(QDomDocument & doc, QDomElement & parent) override;
@@ -153,7 +153,7 @@ protected slots:
 	void pasteValues();
 	void deleteSelectedValues();
 
-	void updatePosition( const MidiTime & t );
+	void updatePosition( const TimePos & t );
 
 	void zoomingXChanged();
 	void zoomingYChanged();
@@ -209,12 +209,13 @@ private:
 	float m_bottomLevel;
 	float m_topLevel;
 
+	void centerTopBottomScroll();
 	void updateTopBottomLevels();
 
 	QScrollBar * m_leftRightScroll;
 	QScrollBar * m_topBottomScroll;
 
-	MidiTime m_currentPosition;
+	TimePos m_currentPosition;
 
 	Actions m_action;
 
@@ -240,6 +241,7 @@ private:
 
 	EditModes m_editMode;
 
+	bool m_mouseDownLeft;
 	bool m_mouseDownRight; //true if right click is being held down
 
 	TimeLineWidget * m_timeLine;
@@ -263,7 +265,7 @@ private:
 
 signals:
 	void currentPatternChanged();
-	void positionChanged( const MidiTime & );
+	void positionChanged( const TimePos & );
 } ;
 
 

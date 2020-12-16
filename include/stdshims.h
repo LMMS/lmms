@@ -4,23 +4,26 @@
 #ifndef STDSHIMS_H
 #define STDSHIMS_H
 
-#include <memory>
+#include <type_traits>
 #include <utility>
 
-#if (__cplusplus >= 201402L || _MSC_VER)
+#if (__cplusplus >= 201703L || _MSC_VER >= 1914)
 #ifndef _MSC_VER
-#warning "This file should now be removed! The functions it provides are part of the C++14 standard."
+#warning "This part of this file should now be removed! The functions it provides are part of the C++17 standard."
 #endif
-using std::make_unique;
+using std::as_const;
 
 #else
 
-/// Shim for http://en.cppreference.com/w/cpp/memory/unique_ptr/make_unique
-template<typename T, typename... Args>
-std::unique_ptr<T> make_unique(Args&&... args)
+/// Shim for http://en.cppreference.com/w/cpp/utility/as_const
+template <typename T>
+constexpr typename std::add_const<T>::type& as_const(T& t) noexcept
 {
-	return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
+    return t;
 }
+
+template <typename T>
+void as_const(const T&&) = delete;
 #endif
 
 #endif // include guard

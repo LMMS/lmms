@@ -3,7 +3,7 @@
 	url = https://github.com/Lukas-W/qt5-x11embed.git
 [submodule "src/3rdparty/rpmalloc/rpmalloc"]
 	path = src/3rdparty/rpmalloc/rpmalloc
-	url = https://github.com/rampantpixels/rpmalloc.git
+	url = https://github.com/mjansson/rpmalloc.git
 [submodule "plugins/zynaddsubfx/zynaddsubfx"]
 	path = plugins/zynaddsubfx/zynaddsubfx
 	url = https://github.com/lmms/zynaddsubfx.git
@@ -34,3 +34,18 @@
 [submodule "doc/wiki"]
 	path = doc/wiki
 	url = https://github.com/lmms/lmms.wiki.git
+[submodule "src/3rdparty/ringbuffer"]
+	path = src/3rdparty/ringbuffer
+	url = https://github.com/JohannesLorenz/ringbuffer.git
+[submodule "plugins/carlabase/carla"]
+	path = plugins/carlabase/carla
+	url = https://github.com/falktx/carla
+[submodule "plugins/sid/resid"]
+	path = plugins/Sid/resid
+	url = https://github.com/simonowen/resid
+[submodule "src/3rdparty/jack2"]
+	path = src/3rdparty/jack2
+	url = https://github.com/jackaudio/jack2
+[submodule "plugins/LadspaEffect/cmt/cmt"]
+	path = plugins/LadspaEffect/cmt/cmt
+	url = https://github.com/lmms/cmt

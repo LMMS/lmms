@@ -1,5 +1,5 @@
-#include <cstring>
 #include <string>
+#include <cstring>
 // #include <iostream>  -- for debugging (cout)
 #include "ctype.h"
 using namespace std;
@@ -48,10 +48,10 @@ void String_parse::get_nonspace_quoted(string &field)
 }
 
 
-char *escape_chars[] = { (char *) "\\n", (char *)"\\t", (char *)"\\\\", (char *)"\\r", (char *) "\\\""};
+static const char *const escape_chars[] = {"\\n", "\\t", "\\\\", "\\r", "\\\""};
 
 
-void string_escape(string &result, char *str, const char *quote)
+void string_escape(string &result, const char *str, const char *quote)
 {
     int length = (int) strlen(str);
     if (quote[0]) {
@@ -59,8 +59,8 @@ void string_escape(string &result, char *str, const char *quote)
     }
     for (int i = 0; i < length; i++) {
         if (!isalnum((unsigned char) str[i])) {
-            char *chars = (char *)"\n\t\\\r\"";
-            char *special = strchr(chars, str[i]);
+            const char *const chars = "\n\t\\\r\"";
+            const char *const special = strchr(chars, str[i]);
             if (special) {
                 result.append(escape_chars[special - chars]);
             } else {
@@ -78,7 +78,7 @@ void String_parse::get_remainder(std::string &field)
     field.clear();
     skip_space();
     int len = str->length() - pos;
-    if ((*str)[len - 1] == '\n') { // if str ends in newline, 
+    if ((len > 0) && ((*str)[len - 1] == '\n')) { // if str ends in newline, 
         len--; // reduce length to ignore newline
     }
     field.insert(0, *str, pos, len);

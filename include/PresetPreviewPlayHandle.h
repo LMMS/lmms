@@ -29,6 +29,7 @@
 #include "NotePlayHandle.h"
 
 
+class DataFile;
 class InstrumentTrack;
 class PreviewTrackContainer;
 

@@ -34,16 +34,10 @@
 
 
 #include "Note.h"
-#include "Track.h"
+#include "TrackContentObjectView.h"
 
-
-class QAction;
-class QProgressBar;
-class QPushButton;
 
 class InstrumentTrack;
-class SampleBuffer;
-
 
 
 class LMMS_EXPORT Pattern : public TrackContentObject
@@ -128,7 +122,7 @@ protected slots:
 
 
 private:
-	MidiTime beatPatternLength() const;
+	TimePos beatPatternLength() const;
 
 	void setType( PatternTypes _new_pattern_type );
 	void checkType();
@@ -182,6 +176,7 @@ public:
 	void setMutedNoteBorderColor(QColor const & color) { m_mutedNoteBorderColor = color; }
 
 public slots:
+	Pattern* getPattern();
 	void update() override;
 
 

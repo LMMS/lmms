@@ -40,6 +40,17 @@ QMdiArea {
 	background-color: #111314;
 }
 
+FileBrowser QCheckBox
+{
+	font-size: 10px;
+	color: white;
+}
+
+Knob {
+	qproperty-lineInactiveColor: rgb(120, 120, 120);
+	qproperty-arcInactiveColor: rgba(120, 120, 120, 70);
+}
+
 AutomationEditor {
 	color: #ffffff;
 	background-color: #141616;
@@ -61,7 +72,6 @@ QLineEdit {
 	border-radius: 4px;
 	border: 1px;
 	background: #101213;
-	color: #d1d8e4;
 }
 
 QLineEdit:read-only {
@@ -75,6 +85,13 @@ QLineEdit:focus {
 	border: 1px solid #0bd556;
 }
 
+/* Set color and selection background color for various inputs.
+   SpinBoxes are used in QInputDialogs */
+
+QTextEdit, QLineEdit:focus, QComboBox:focus, QSpinBox:focus, QDoubleSpinBox:focus {
+	color: #d1d8e4;
+	selection-background-color: #17793b;
+}
 
 QToolTip {
 	border-radius: 4px;
@@ -150,6 +167,11 @@ QMenu::indicator:selected {
 	background-color: #101213;
 }
 
+PositionLine {
+	qproperty-tailGradient: true;
+	qproperty-lineColor: rgb(255, 255, 255);
+}
+
 PianoRoll {
 	background-color: #141616;
 	qproperty-backgroundShade: rgba(255, 255, 255, 10);
@@ -165,6 +187,17 @@ PianoRoll {
 	qproperty-ghostNoteBorders: false;
 	qproperty-barColor: #078f3a;
 	qproperty-markedSemitoneColor: rgba(255, 255, 255, 30);
+	/* Piano keys */
+	qproperty-whiteKeyWidth: 64;
+	qproperty-whiteKeyActiveTextColor: #000;
+	qproperty-whiteKeyActiveTextShadow: #fff;
+	qproperty-whiteKeyActiveBackground: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #43e97b, stop:1 #3bcd6c);
+	qproperty-whiteKeyInactiveTextColor: #000;
+	qproperty-whiteKeyInactiveTextShadow: #fff;
+	qproperty-whiteKeyInactiveBackground: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #eeeeee, stop:1 #ffffff);
+	qproperty-blackKeyWidth: 48;
+	qproperty-blackKeyActiveBackground: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #43e97b, stop:1 #3bcd6c);
+	qproperty-blackKeyInactiveBackground: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #333, stop:1 #000);
 	/* Grid colors */
 	qproperty-lineColor: #292929;
 	qproperty-beatLineColor: #2d6b45;
@@ -191,11 +224,10 @@ GroupBox {
 
 /* main toolbar oscilloscope - can have transparent bg now */
 
-VisualizationWidget  {
+Oscilloscope {
 	background: none;
 	border: none;
 	qproperty-normalColor: rgb(71, 253, 133);
-	qproperty-warningColor: rgb(255, 192, 64);
 	qproperty-clippingColor: rgb(255, 64, 64);
 }
 
@@ -271,6 +303,12 @@ QScrollBar::handle:horizontal:disabled, QScrollBar::handle:vertical:disabled  {
 	border: none;
 }
 
+EffectRackView QScrollBar::handle:vertical:disabled  {
+	background: #3f4750;
+	border: none;
+	border-radius: 4px;
+}
+
 /* arrow buttons */
 
 QScrollBar::add-line, QScrollBar::sub-line {
@@ -323,6 +361,8 @@ QScrollBar::left-arrow:horizontal:disabled { background-image: url(resources:sba
 QScrollBar::right-arrow:horizontal:disabled { background-image: url(resources:sbarrow_right_d.png);}
 QScrollBar::up-arrow:vertical:disabled { background-image: url(resources:sbarrow_up_d.png);}
 QScrollBar::down-arrow:vertical:disabled { background-image: url(resources:sbarrow_down_d.png);}
+EffectRackView QScrollBar::up-arrow:vertical:disabled { background-image: url(resources:sbarrow_up.png);}
+EffectRackView QScrollBar::down-arrow:vertical:disabled { background-image: url(resources:sbarrow_down.png);}
 
 /* background for song editor and bb-editor */
 
@@ -660,6 +700,8 @@ TrackContentObjectView   {
 	qproperty-textBackgroundColor: rgba(0, 0, 0, 75);
 	qproperty-textShadowColor: rgba(0,0,0,200);
 	qproperty-gradient: false; /* boolean property, set true to have a gradient */
+	/* finger tip offset of cursor */
+	qproperty-mouseHotspotHand: 7px 2px;
 	
 	font-size: 11px;
 }

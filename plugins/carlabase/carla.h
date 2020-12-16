@@ -26,10 +26,9 @@
 #define CARLA_H
 
 #include <QtCore/QMutex>
-#include "plugin_export.h"
+#include "carlabase_export.h"
 
 #include "CarlaNative.h"
-#define REAL_BUILD // FIXME this shouldn't be needed
 #if CARLA_VERSION_HEX >= 0x010911
     #include "CarlaNativePlugin.h"
 #else
@@ -48,7 +47,7 @@
 
 class QPushButton;
 
-class PLUGIN_EXPORT CarlaInstrument : public Instrument
+class CARLABASE_EXPORT CarlaInstrument : public Instrument
 {
     Q_OBJECT
 
@@ -73,7 +72,7 @@ public:
     virtual void saveSettings(QDomDocument& doc, QDomElement& parent);
     virtual void loadSettings(const QDomElement& elem);
     virtual void play(sampleFrame* workingBuffer);
-    virtual bool handleMidiEvent(const MidiEvent& event, const MidiTime& time, f_cnt_t offset);
+    virtual bool handleMidiEvent(const MidiEvent& event, const TimePos& time, f_cnt_t offset);
     virtual PluginView* instantiateView(QWidget* parent);
 
 signals:

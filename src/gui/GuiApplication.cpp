@@ -34,6 +34,7 @@
 #include "ConfigManager.h"
 #include "ControllerRackView.h"
 #include "FxMixerView.h"
+#include "InstrumentTrack.h"
 #include "MainWindow.h"
 #include "PianoRoll.h"
 #include "ProjectNotes.h"
@@ -44,6 +45,10 @@
 #include <QtGlobal>
 #include <QMessageBox>
 #include <QSplashScreen>
+
+#ifdef LMMS_BUILD_WIN32
+#include <windows.h>
+#endif
 
 GuiApplication* GuiApplication::s_instance = nullptr;
 
@@ -159,7 +164,6 @@ GuiApplication::GuiApplication()
 
 GuiApplication::~GuiApplication()
 {
-	InstrumentTrackView::cleanupWindowCache();
 	s_instance = nullptr;
 }
 
@@ -211,3 +215,24 @@ void GuiApplication::childDestroyed(QObject *obj)
 		m_controllerRackView = nullptr;
 	}
 }
+
+#ifdef LMMS_BUILD_WIN32
+/*!
+ * @brief Returns the Windows System font.
+ */
+QFont GuiApplication::getWin32SystemFont()
+{
+	NONCLIENTMETRICS metrics = { sizeof( NONCLIENTMETRICS ) };
+	SystemParametersInfo( SPI_GETNONCLIENTMETRICS, sizeof( NONCLIENTMETRICS ), &metrics, 0 );
+	int pointSize = metrics.lfMessageFont.lfHeight;
+	if ( pointSize < 0 )
+	{
+		// height is in pixels, convert to points
+		HDC hDC = GetDC( NULL );
+		pointSize = MulDiv( abs( pointSize ), 72, GetDeviceCaps( hDC, LOGPIXELSY ) );
+		ReleaseDC( NULL, hDC );
+	}
+
+	return QFont( QString::fromUtf8( metrics.lfMessageFont.lfFaceName ), pointSize );
+}
+#endif

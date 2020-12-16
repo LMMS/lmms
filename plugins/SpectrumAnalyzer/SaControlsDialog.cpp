@@ -34,6 +34,7 @@
 #include "ComboBoxModel.h"
 #include "embed.h"
 #include "Engine.h"
+#include "Knob.h"
 #include "LedCheckbox.h"
 #include "PixmapButton.h"
 #include "SaControls.h"
@@ -53,13 +54,24 @@ SaControlsDialog::SaControlsDialog(SaControls *controls, SaProcessor *processor)
 	master_layout->setContentsMargins(2, 6, 2, 8);
 	setLayout(master_layout);
 
-	// QSplitter top: configuration section
+	// Display splitter top: controls section
+	QWidget *controls_widget = new QWidget;
+	QHBoxLayout *controls_layout = new QHBoxLayout;
+	controls_layout->setContentsMargins(0, 0, 0, 0);
+	controls_widget->setLayout(controls_layout);
+	controls_widget->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
+	controls_widget->setMaximumHeight(m_configHeight);
+	display_splitter->addWidget(controls_widget);
+
+
+	// Basic configuration
 	QWidget *config_widget = new QWidget;
 	QGridLayout *config_layout = new QGridLayout;
 	config_widget->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
 	config_widget->setMaximumHeight(m_configHeight);
 	config_widget->setLayout(config_layout);
-	display_splitter->addWidget(config_widget);
+	controls_layout->addWidget(config_widget);
+	controls_layout->setStretchFactor(config_widget, 10);
 
 	// Pre-compute target pixmap size based on monitor DPI.
 	// Using setDevicePixelRatio() on pixmap allows the SVG image to be razor
@@ -67,6 +79,8 @@ SaControlsDialog::SaControlsDialog(SaControls *controls, SaProcessor *processor)
 	// enlarged. No idea how to make Qt do it in a more reasonable way.
 	QSize iconSize = QSize(22.0 * devicePixelRatio(), 22.0 * devicePixelRatio());
 	QSize buttonSize = 1.2 * iconSize;
+	QSize advButtonSize = QSize((m_configHeight * devicePixelRatio()) / 3, m_configHeight * devicePixelRatio());
+
 
 	// pause and freeze buttons
 	PixmapButton *pauseButton = new PixmapButton(this, tr("Pause"));
@@ -79,7 +93,7 @@ SaControlsDialog::SaControlsDialog(SaControls *controls, SaProcessor *processor)
 	pauseButton->setInactiveGraphic(*pauseOffPixmap);
 	pauseButton->setCheckable(true);
 	pauseButton->setModel(&controls->m_pauseModel);
-	config_layout->addWidget(pauseButton, 0, 0, 2, 1);
+	config_layout->addWidget(pauseButton, 0, 0, 2, 1, Qt::AlignHCenter);
 
 	PixmapButton *refFreezeButton = new PixmapButton(this, tr("Reference freeze"));
 	refFreezeButton->setToolTip(tr("Freeze current input as a reference / disable falloff in peak-hold mode."));
@@ -91,7 +105,7 @@ SaControlsDialog::SaControlsDialog(SaControls *controls, SaProcessor *processor)
 	refFreezeButton->setInactiveGraphic(*freezeOffPixmap);
 	refFreezeButton->setCheckable(true);
 	refFreezeButton->setModel(&controls->m_refFreezeModel);
-	config_layout->addWidget(refFreezeButton, 2, 0, 2, 1);
+	config_layout->addWidget(refFreezeButton, 2, 0, 2, 1, Qt::AlignHCenter);
 
 	// misc configuration switches
 	LedCheckBox *waterfallButton = new LedCheckBox(tr("Waterfall"), this);
@@ -137,8 +151,8 @@ SaControlsDialog::SaControlsDialog(SaControls *controls, SaProcessor *processor)
 
 	ComboBox *freqRangeCombo = new ComboBox(this, tr("Frequency range"));
 	freqRangeCombo->setToolTip(tr("Frequency range"));
-	freqRangeCombo->setMinimumSize(100, 22);
-	freqRangeCombo->setMaximumSize(200, 22);
+	freqRangeCombo->setMinimumSize(100, ComboBox::DEFAULT_HEIGHT);
+	freqRangeCombo->setMaximumSize(200, ComboBox::DEFAULT_HEIGHT);
 	freqRangeCombo->setModel(&controls->m_freqRangeModel);
 	config_layout->addWidget(freqRangeCombo, 0, 3, 2, 1);
 
@@ -157,8 +171,8 @@ SaControlsDialog::SaControlsDialog(SaControls *controls, SaProcessor *processor)
 
 	ComboBox *ampRangeCombo = new ComboBox(this, tr("Amplitude range"));
 	ampRangeCombo->setToolTip(tr("Amplitude range"));
-	ampRangeCombo->setMinimumSize(100, 22);
-	ampRangeCombo->setMaximumSize(200, 22);
+	ampRangeCombo->setMinimumSize(100, ComboBox::DEFAULT_HEIGHT);
+	ampRangeCombo->setMaximumSize(200, ComboBox::DEFAULT_HEIGHT);
 	ampRangeCombo->setModel(&controls->m_ampRangeModel);
 	config_layout->addWidget(ampRangeCombo, 2, 3, 2, 1);
 
@@ -169,7 +183,7 @@ SaControlsDialog::SaControlsDialog(SaControls *controls, SaProcessor *processor)
 	blockSizeLabel->setPixmap(blockSizeIcon->scaled(iconSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
 	config_layout->addWidget(blockSizeLabel, 0, 4, 2, 1, Qt::AlignRight);
 
-	ComboBox *blockSizeCombo = new ComboBox(this, tr("FFT block bize"));
+	ComboBox *blockSizeCombo = new ComboBox(this, tr("FFT block size"));
 	blockSizeCombo->setToolTip(tr("FFT block size"));
 	blockSizeCombo->setMinimumSize(100, 22);
 	blockSizeCombo->setMaximumSize(200, 22);
@@ -187,13 +201,124 @@ SaControlsDialog::SaControlsDialog(SaControls *controls, SaProcessor *processor)
 
 	ComboBox *windowCombo = new ComboBox(this, tr("FFT window type"));
 	windowCombo->setToolTip(tr("FFT window type"));
-	windowCombo->setMinimumSize(100, 22);
-	windowCombo->setMaximumSize(200, 22);
+	windowCombo->setMinimumSize(100, ComboBox::DEFAULT_HEIGHT);
+	windowCombo->setMaximumSize(200, ComboBox::DEFAULT_HEIGHT);
 	windowCombo->setModel(&controls->m_windowModel);
 	config_layout->addWidget(windowCombo, 2, 5, 2, 1);
 	processor->rebuildWindow();
 	connect(&controls->m_windowModel, &ComboBoxModel::dataChanged, [=] {processor->rebuildWindow();});
 
+	// set stretch factors so that combo boxes expand first
+	config_layout->setColumnStretch(3, 2);
+	config_layout->setColumnStretch(5, 3);
+
+
+	// Advanced configuration
+	QWidget *advanced_widget = new QWidget;
+	QGridLayout *advanced_layout = new QGridLayout;
+	advanced_widget->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+	advanced_widget->setMaximumHeight(m_configHeight);
+	advanced_widget->setLayout(advanced_layout);
+	advanced_widget->hide();
+	controls_layout->addWidget(advanced_widget);
+	controls_layout->setStretchFactor(advanced_widget, 10);
+
+	// Peak envelope resolution
+	Knob *envelopeResolutionKnob = new Knob(knobSmall_17, this);
+	envelopeResolutionKnob->setModel(&controls->m_envelopeResolutionModel);
+	envelopeResolutionKnob->setLabel(tr("Envelope res."));
+	envelopeResolutionKnob->setToolTip(tr("Increase envelope resolution for better details, decrease for better GUI performance."));
+	envelopeResolutionKnob->setHintText(tr("Draw at most"), tr(" envelope points per pixel"));
+	advanced_layout->addWidget(envelopeResolutionKnob, 0, 0, 1, 1, Qt::AlignCenter);
+
+	// Spectrum graph resolution
+	Knob *spectrumResolutionKnob = new Knob(knobSmall_17, this);
+	spectrumResolutionKnob->setModel(&controls->m_spectrumResolutionModel);
+	spectrumResolutionKnob->setLabel(tr("Spectrum res."));
+	spectrumResolutionKnob->setToolTip(tr("Increase spectrum resolution for better details, decrease for better GUI performance."));
+	spectrumResolutionKnob->setHintText(tr("Draw at most"), tr(" spectrum points per pixel"));
+	advanced_layout->addWidget(spectrumResolutionKnob, 1, 0, 1, 1, Qt::AlignCenter);
+
+	// Peak falloff speed
+	Knob *peakDecayFactorKnob = new Knob(knobSmall_17, this);
+	peakDecayFactorKnob->setModel(&controls->m_peakDecayFactorModel);
+	peakDecayFactorKnob->setLabel(tr("Falloff factor"));
+	peakDecayFactorKnob->setToolTip(tr("Decrease to make peaks fall faster."));
+	peakDecayFactorKnob->setHintText(tr("Multiply buffered value by"), "");
+	advanced_layout->addWidget(peakDecayFactorKnob, 0, 1, 1, 1, Qt::AlignCenter);
+
+	// Averaging weight
+	Knob *averagingWeightKnob = new Knob(knobSmall_17, this);
+	averagingWeightKnob->setModel(&controls->m_averagingWeightModel);
+	averagingWeightKnob->setLabel(tr("Averaging weight"));
+	averagingWeightKnob->setToolTip(tr("Decrease to make averaging slower and smoother."));
+	averagingWeightKnob->setHintText(tr("New sample contributes"), "");
+	advanced_layout->addWidget(averagingWeightKnob, 1, 1, 1, 1, Qt::AlignCenter);
+
+	// Waterfall history size
+	Knob *waterfallHeightKnob = new Knob(knobSmall_17, this);
+	waterfallHeightKnob->setModel(&controls->m_waterfallHeightModel);
+	waterfallHeightKnob->setLabel(tr("Waterfall height"));
+	waterfallHeightKnob->setToolTip(tr("Increase to get slower scrolling, decrease to see fast transitions better. Warning: medium CPU usage."));
+	waterfallHeightKnob->setHintText(tr("Keep"), tr(" lines"));
+	advanced_layout->addWidget(waterfallHeightKnob, 0, 2, 1, 1, Qt::AlignCenter);
+	processor->reallocateBuffers();
+	connect(&controls->m_waterfallHeightModel, &FloatModel::dataChanged, [=] {processor->reallocateBuffers();});
+
+	// Waterfall gamma correction
+	Knob *waterfallGammaKnob = new Knob(knobSmall_17, this);
+	waterfallGammaKnob->setModel(&controls->m_waterfallGammaModel);
+	waterfallGammaKnob->setLabel(tr("Waterfall gamma"));
+	waterfallGammaKnob->setToolTip(tr("Decrease to see very weak signals, increase to get better contrast."));
+	waterfallGammaKnob->setHintText(tr("Gamma value:"), "");
+	advanced_layout->addWidget(waterfallGammaKnob, 1, 2, 1, 1, Qt::AlignCenter);
+
+	// FFT window overlap
+	Knob *windowOverlapKnob = new Knob(knobSmall_17, this);
+	windowOverlapKnob->setModel(&controls->m_windowOverlapModel);
+	windowOverlapKnob->setLabel(tr("Window overlap"));
+	windowOverlapKnob->setToolTip(tr("Increase to prevent missing fast transitions arriving near FFT window edges. Warning: high CPU usage."));
+	windowOverlapKnob->setHintText(tr("Each sample processed"), tr(" times"));
+	advanced_layout->addWidget(windowOverlapKnob, 0, 3, 1, 1, Qt::AlignCenter);
+
+	// FFT zero padding
+	Knob *zeroPaddingKnob = new Knob(knobSmall_17, this);
+	zeroPaddingKnob->setModel(&controls->m_zeroPaddingModel);
+	zeroPaddingKnob->setLabel(tr("Zero padding"));
+	zeroPaddingKnob->setToolTip(tr("Increase to get smoother-looking spectrum. Warning: high CPU usage."));
+	zeroPaddingKnob->setHintText(tr("Processing buffer is"), tr(" steps larger than input block"));
+	advanced_layout->addWidget(zeroPaddingKnob, 1, 3, 1, 1, Qt::AlignCenter);
+	processor->reallocateBuffers();
+	connect(&controls->m_zeroPaddingModel, &FloatModel::dataChanged, [=] {processor->reallocateBuffers();});
+
+
+	// Advanced settings button
+	PixmapButton *advancedButton = new PixmapButton(this, tr("Advanced settings"));
+	advancedButton->setToolTip(tr("Access advanced settings"));
+	QPixmap *advancedOnPixmap = new QPixmap(PLUGIN_NAME::getIconPixmap("advanced_on").scaled(advButtonSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
+	QPixmap *advancedOffPixmap = new QPixmap(PLUGIN_NAME::getIconPixmap("advanced_off").scaled(advButtonSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
+	advancedOnPixmap->setDevicePixelRatio(devicePixelRatio());
+	advancedOffPixmap->setDevicePixelRatio(devicePixelRatio());
+	advancedButton->setActiveGraphic(*advancedOnPixmap);
+	advancedButton->setInactiveGraphic(*advancedOffPixmap);
+	advancedButton->setCheckable(true);
+	controls_layout->addStretch(0);
+	controls_layout->addWidget(advancedButton);
+
+	connect(advancedButton, &PixmapButton::toggled, [=](bool checked)
+		{
+			if (checked)
+			{
+				config_widget->hide();
+				advanced_widget->show();
+			}
+			else
+			{
+				config_widget->show();
+				advanced_widget->hide();
+			}
+		}
+	);
 
 	// QSplitter middle and bottom: spectrum display widgets
 	m_spectrum = new SaSpectrumView(controls, processor, this);

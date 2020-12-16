@@ -5,7 +5,7 @@
   <instrumenttracksettings muted="0" type="0" name="Hihat Open" solo="0">
     <instrumenttrack pan="0" fxch="0" pitchrange="1" pitch="0" basenote="57" vol="100">
       <instrument name="tripleoscillator">
-        <tripleoscillator phoffset2="0" userwavefile0="" finer0="0" userwavefile1="" finer1="0" userwavefile2="" finer2="0" coarse0="0" coarse1="-12" coarse2="-24" finel0="0" finel1="0" modalgo1="2" modalgo2="2" finel2="0" pan0="0" modalgo3="2" pan1="0" stphdetun0="0" pan2="0" stphdetun1="0" wavetype0="6" stphdetun2="0" wavetype1="6" wavetype2="6" vol0="33" vol1="33" phoffset0="0" phoffset1="0" vol2="33"/>
+        <tripleoscillator phoffset2="0" userwavefile0="" finer0="0" userwavefile1="" finer1="0" userwavefile2="" finer2="0" coarse0="0" coarse1="0" coarse2="0" finel0="0" finel1="0" modalgo1="2" modalgo2="2" finel2="0" pan0="0" modalgo3="2" pan1="0" stphdetun0="0" pan2="0" stphdetun1="0" wavetype0="6" stphdetun2="0" wavetype1="6" wavetype2="6" vol0="33" vol1="0" phoffset0="0" phoffset1="0" vol2="0"/>
       </instrument>
       <eldata fres="0.96" ftype="1" fcut="4480" fwet="1">
         <elvol lspd_denominator="4" sustain="0" pdel="0" userwavefile="" dec="0.321" lamt="0" syncmode="0" latt="0" rel="0.1" amt="1" x100="0" att="0" lpdel="0" hold="0.07" lshp="0" lspd="0.1" ctlenvamt="0" lspd_numerator="4"/>

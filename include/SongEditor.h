@@ -28,10 +28,12 @@
 #define SONG_EDITOR_H
 
 #include <QVector>
+#include <QLinearGradient>
 
 #include "ActionGroup.h"
 #include "Editor.h"
 #include "TrackContainerView.h"
+#include "PositionLine.h"
 
 class QLabel;
 class QScrollBar;
@@ -44,16 +46,6 @@ class MeterDialog;
 class Song;
 class TextFloat;
 class TimeLineWidget;
-
-class positionLine : public QWidget
-{
-public:
-	positionLine( QWidget * parent );
-
-private:
-	void paintEvent( QPaintEvent * pe ) override;
-
-} ;
 
 
 class SongEditor : public TrackContainerView
@@ -88,7 +80,7 @@ public slots:
 	void setEditModeSelect();
 	void toggleProportionalSnap();
 
-	void updatePosition( const MidiTime & t );
+	void updatePosition( const TimePos & t );
 	void updatePositionLine();
 	void selectAllTcos( bool select );
 
@@ -140,7 +132,7 @@ private:
 	TextFloat * m_mvsStatus;
 	TextFloat * m_mpsStatus;
 
-	positionLine * m_positionLine;
+	PositionLine * m_positionLine;
 
 	ComboBoxModel* m_zoomingModel;
 	ComboBoxModel* m_snappingModel;
@@ -158,12 +150,15 @@ private:
 	QPoint m_scrollPos;
 	QPoint m_mousePos;
 	int m_rubberBandStartTrackview;
-	MidiTime m_rubberbandStartMidipos;
+	TimePos m_rubberbandStartTimePos;
 	int m_currentZoomingValue;
 	int m_trackHeadWidth;
 	bool m_selectRegion;
 
 	friend class SongEditorWindow;
+
+signals:
+	void zoomingValueChanged( double );
 } ;
 
 
@@ -215,6 +210,9 @@ private:
 	ComboBox * m_zoomingComboBox;
 	ComboBox * m_snappingComboBox;
 	QLabel* m_snapSizeLabel;
+
+	QAction* m_insertBarAction;
+	QAction* m_removeBarAction;
 };
 
 #endif

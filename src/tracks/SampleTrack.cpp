@@ -24,6 +24,7 @@
  */
 #include "SampleTrack.h"
 
+#include <QDomElement>
 #include <QDropEvent>
 #include <QFileInfo>
 #include <QMenu>
@@ -34,23 +35,24 @@
 #include <QPainter>
 #include <QPushButton>
 
+#include "BBTrack.h"
+#include "EffectRackView.h"
+#include "embed.h"
+#include "FxMixerView.h"
 #include "gui_templates.h"
 #include "GuiApplication.h"
-#include "Song.h"
-#include "embed.h"
-#include "ToolTip.h"
-#include "BBTrack.h"
-#include "SamplePlayHandle.h"
-#include "SampleRecordHandle.h"
-#include "SongEditor.h"
-#include "StringPairDrag.h"
-#include "TimeLineWidget.h"
 #include "Knob.h"
 #include "MainWindow.h"
 #include "Mixer.h"
-#include "EffectRackView.h"
-#include "FxMixerView.h"
+#include "PathUtil.h"
+#include "SamplePlayHandle.h"
+#include "SampleRecordHandle.h"
+#include "Song.h"
+#include "SongEditor.h"
+#include "StringPairDrag.h"
 #include "TabWidget.h"
+#include "TimeLineWidget.h"
+#include "ToolTip.h"
 #include "TrackLabelButton.h"
 
 SampleTCO::SampleTCO( Track * _track ) :
@@ -122,7 +124,7 @@ SampleTCO::~SampleTCO()
 
 
 
-void SampleTCO::changeLength( const MidiTime & _length )
+void SampleTCO::changeLength( const TimePos & _length )
 {
 	TrackContentObject::changeLength( qMax( static_cast<int>( _length ), 1 ) );
 }
@@ -230,7 +232,7 @@ void SampleTCO::updateLength()
 
 
 
-MidiTime SampleTCO::sampleLength() const
+TimePos SampleTCO::sampleLength() const
 {
 	return (int)( m_sampleBuffer->frames() / Engine::framesPerTick() );
 }
@@ -274,7 +276,15 @@ void SampleTCO::saveSettings( QDomDocument & _doc, QDomElement & _this )
 		_this.setAttribute( "data", m_sampleBuffer->toBase64( s ) );
 	}
 
-	_this.setAttribute ("sample_rate", m_sampleBuffer->sampleRate());
+	_this.setAttribute( "sample_rate", m_sampleBuffer->sampleRate());
+	if( usesCustomClipColor() )
+	{
+		_this.setAttribute( "color", color().name() );
+	}
+	if (m_sampleBuffer->reversed())
+	{
+		_this.setAttribute("reversed", "true");
+	}
 	// TODO: start- and end-frame
 }
 
@@ -296,8 +306,20 @@ void SampleTCO::loadSettings( const QDomElement & _this )
 	setMuted( _this.attribute( "muted" ).toInt() );
 	setStartTimeOffset( _this.attribute( "off" ).toInt() );
 
-	if (_this.hasAttribute("sample_rate")) {
-		m_sampleBuffer->setSampleRate(_this.attribute("sample_rate").toInt());
+	if ( _this.hasAttribute( "sample_rate" ) ) {
+		m_sampleBuffer->setSampleRate( _this.attribute( "sample_rate" ).toInt() );
+	}
+	
+	if( _this.hasAttribute( "color" ) )
+	{
+		useCustomClipColor( true );
+		setColor( _this.attribute( "color" ) );
+	}
+
+	if(_this.hasAttribute("reversed"))
+	{
+		m_sampleBuffer->setReversed(true);
+		emit wasReversed(); // tell SampleTCOView to update the view
 	}
 }
 
@@ -321,8 +343,9 @@ SampleTCOView::SampleTCOView( SampleTCO * _tco, TrackView * _tv ) :
 	updateSample();
 
 	// track future changes of SampleTCO
-	connect( m_tco, SIGNAL( sampleChanged() ),
-			this, SLOT( updateSample() ) );
+	connect(m_tco, SIGNAL(sampleChanged()), this, SLOT(updateSample()));
+
+	connect(m_tco, SIGNAL(wasReversed()), this, SLOT(update()));
 
 	setStyle( QApplication::style() );
 }
@@ -333,7 +356,7 @@ void SampleTCOView::updateSample()
 	// set tooltip to filename so that user can see what sample this
 	// sample-tco contains
 	ToolTip::add( this, ( m_tco->m_sampleBuffer->audioFile() != "" ) ?
-					m_tco->m_sampleBuffer->audioFile() :
+					PathUtil::toAbsolute(m_tco->m_sampleBuffer->audioFile()) :
 					tr( "Double-click to open sample" ) );
 }
 
@@ -342,32 +365,75 @@ void SampleTCOView::updateSample()
 
 void SampleTCOView::contextMenuEvent( QContextMenuEvent * _cme )
 {
+	// Depending on whether we right-clicked a selection or an individual TCO we will have
+	// different labels for the actions.
+	bool individualTCO = getClickedTCOs().size() <= 1;
+
 	if( _cme->modifiers() )
 	{
 		return;
 	}
 
 	QMenu contextMenu( this );
+
 	if( fixedTCOs() == false )
 	{
-		contextMenu.addAction( embed::getIconPixmap( "cancel" ),
-					tr( "Delete (middle mousebutton)" ),
-						this, SLOT( remove() ) );
+		contextMenu.addAction(
+			embed::getIconPixmap( "cancel" ),
+			individualTCO
+				? tr("Delete (middle mousebutton)")
+				: tr("Delete selection (middle mousebutton)"),
+			[this](){ contextMenuAction( Remove ); } );
+
 		contextMenu.addSeparator();
-		contextMenu.addAction( embed::getIconPixmap( "edit_cut" ),
-					tr( "Cut" ), this, SLOT( cut() ) );
+
+		contextMenu.addAction(
+			embed::getIconPixmap( "edit_cut" ),
+			individualTCO
+				? tr("Cut")
+				: tr("Cut selection"),
+			[this](){ contextMenuAction( Cut ); } );
 	}
-	contextMenu.addAction( embed::getIconPixmap( "edit_copy" ),
-					tr( "Copy" ), m_tco, SLOT( copy() ) );
-	contextMenu.addAction( embed::getIconPixmap( "edit_paste" ),
-					tr( "Paste" ), m_tco, SLOT( paste() ) );
+
+	contextMenu.addAction(
+		embed::getIconPixmap( "edit_copy" ),
+		individualTCO
+			? tr("Copy")
+			: tr("Copy selection"),
+		[this](){ contextMenuAction( Copy ); } );
+
+	contextMenu.addAction(
+		embed::getIconPixmap( "edit_paste" ),
+		tr( "Paste" ),
+		[this](){ contextMenuAction( Paste ); } );
+
 	contextMenu.addSeparator();
-	contextMenu.addAction( embed::getIconPixmap( "muted" ),
-				tr( "Mute/unmute (<%1> + middle click)" ).arg(UI_CTRL_KEY),
-						m_tco, SLOT( toggleMute() ) );
+
+	contextMenu.addAction(
+		embed::getIconPixmap( "muted" ),
+		(individualTCO
+			? tr("Mute/unmute (<%1> + middle click)")
+			: tr("Mute/unmute selection (<%1> + middle click)")).arg(UI_CTRL_KEY),
+		[this](){ contextMenuAction( Mute ); } );
+
 	/*contextMenu.addAction( embed::getIconPixmap( "record" ),
 				tr( "Set/clear record" ),
 						m_tco, SLOT( toggleRecord() ) );*/
+
+	contextMenu.addAction(
+		embed::getIconPixmap("flip_x"),
+		tr("Reverse sample"),
+		this,
+		SLOT(reverseSample())
+	);
+
+	contextMenu.addSeparator();
+
+	contextMenu.addAction( embed::getIconPixmap( "colorize" ),
+			tr( "Set clip color" ), this, SLOT( changeClipColor() ) );
+	contextMenu.addAction( embed::getIconPixmap( "colorize" ),
+			tr( "Use track color" ), this, SLOT( useTrackColor() ) );
+	
 	constructContextMenu( &contextMenu );
 
 	contextMenu.exec( QCursor::pos() );
@@ -496,12 +562,8 @@ void SampleTCOView::paintEvent( QPaintEvent * pe )
 	QPainter p( &m_paintPixmap );
 
 	QLinearGradient lingrad( 0, 0, 0, height() );
-	QColor c;
+	QColor c = getColorForDisplay( painter.background().color() );
 	bool muted = m_tco->getTrack()->isMuted() || m_tco->isMuted();
-
-	// state: selected, muted, normal
-	c = isSelected() ? selectedColor() : ( muted ? mutedBackgroundColor()
-		: painter.background().color() );
 
 	lingrad.setColorAt( 1, c.darker( 300 ) );
 	lingrad.setColorAt( 0, c );
@@ -535,20 +597,19 @@ void SampleTCOView::paintEvent( QPaintEvent * pe )
 			qMax( static_cast<int>( m_tco->sampleLength() * ppb / ticksPerBar ), 1 ), rect().bottom() - 2 * spacing );
 	m_tco->m_sampleBuffer->visualize( p, r, pe->rect() );
 
-	QFileInfo fileInfo(m_tco->m_sampleBuffer->audioFile());
-	QString filename = fileInfo.fileName();
-	paintTextLabel(filename, p);
+	QString name = PathUtil::cleanName(m_tco->m_sampleBuffer->audioFile());
+	paintTextLabel(name, p);
 
 	// disable antialiasing for borders, since its not needed
 	p.setRenderHint( QPainter::Antialiasing, false );
 
 	// inner border
-	p.setPen( c.lighter( 160 ) );
+	p.setPen( c.lighter( 135 ) );
 	p.drawRect( 1, 1, rect().right() - TCO_BORDER_WIDTH,
 		rect().bottom() - TCO_BORDER_WIDTH );
 
 	// outer border
-	p.setPen( c.darker( 300 ) );
+	p.setPen( c.darker( 200 ) );
 	p.drawRect( 0, 0, rect().right(), rect().bottom() );
 
 	// draw the 'muted' pixmap only if the pattern was manualy muted
@@ -583,22 +644,31 @@ void SampleTCOView::paintEvent( QPaintEvent * pe )
 
 
 
-
-
-SampleTrack::SampleTrack( TrackContainer* tc ) :
-	Track( Track::SampleTrack, tc ),
-	m_volumeModel( DefaultVolume, MinVolume, MaxVolume, 0.1f, this,
-							tr( "Volume" ) ),
-	m_panningModel( DefaultPanning, PanningLeft, PanningRight, 0.1f,
-					this, tr( "Panning" ) ),
-	m_effectChannelModel( 0, 0, 0, this, tr( "FX channel" ) ),
-	m_audioPort( tr( "Sample track" ), true, &m_volumeModel, &m_panningModel, &m_mutedModel )
+void SampleTCOView::reverseSample()
 {
-	setName( tr( "Sample track" ) );
-	m_panningModel.setCenterValue( DefaultPanning );
-	m_effectChannelModel.setRange( 0, Engine::fxMixer()->numChannels()-1, 1);
+	m_tco->sampleBuffer()->setReversed(!m_tco->sampleBuffer()->reversed());
+	Engine::getSong()->setModified();
+	update();
+}
 
-	connect( &m_effectChannelModel, SIGNAL( dataChanged() ), this, SLOT( updateEffectChannel() ) );
+
+
+
+
+
+SampleTrack::SampleTrack(TrackContainer* tc) :
+	Track(Track::SampleTrack, tc),
+	m_volumeModel(DefaultVolume, MinVolume, MaxVolume, 0.1f, this, tr("Volume")),
+	m_panningModel(DefaultPanning, PanningLeft, PanningRight, 0.1f, this, tr("Panning")),
+	m_effectChannelModel(0, 0, 0, this, tr("FX channel")),
+	m_audioPort(tr("Sample track"), true, &m_volumeModel, &m_panningModel, &m_mutedModel),
+	m_isPlaying(false)
+{
+	setName(tr("Sample track"));
+	m_panningModel.setCenterValue(DefaultPanning);
+	m_effectChannelModel.setRange(0, Engine::fxMixer()->numChannels()-1, 1);
+
+	connect(&m_effectChannelModel, SIGNAL(dataChanged()), this, SLOT(updateEffectChannel()));
 }
 
 
@@ -612,7 +682,7 @@ SampleTrack::~SampleTrack()
 
 
 
-bool SampleTrack::play( const MidiTime & _start, const fpp_t _frames,
+bool SampleTrack::play( const TimePos & _start, const fpp_t _frames,
 					const f_cnt_t _offset, int _tco_num )
 {
 	m_audioPort.effects()->startRunning();
@@ -622,6 +692,10 @@ bool SampleTrack::play( const MidiTime & _start, const fpp_t _frames,
 	::BBTrack * bb_track = NULL;
 	if( _tco_num >= 0 )
 	{
+		if (_start > getTCO(_tco_num)->length())
+		{
+			setPlaying(false);
+		}
 		if( _start != 0 )
 		{
 			return false;
@@ -630,10 +704,12 @@ bool SampleTrack::play( const MidiTime & _start, const fpp_t _frames,
 		if (trackContainer() == (TrackContainer*)Engine::getBBTrackContainer())
 		{
 			bb_track = BBTrack::findBBTrack( _tco_num );
+			setPlaying(true);
 		}
 	}
 	else
 	{
+		bool nowPlaying = false;
 		for( int i = 0; i < numOfTCOs(); ++i )
 		{
 			TrackContentObject * tco = getTCO( i );
@@ -641,7 +717,7 @@ bool SampleTrack::play( const MidiTime & _start, const fpp_t _frames,
 
 			if( _start >= sTco->startPosition() && _start < sTco->endPosition() )
 			{
-				if( sTco->isPlaying() == false && _start > sTco->startPosition() + sTco->startTimeOffset() )
+				if( sTco->isPlaying() == false && _start >= (sTco->startPosition() + sTco->startTimeOffset()) )
 				{
 					auto bufferFramesPerTick = Engine::framesPerTick (sTco->sampleBuffer ()->sampleRate ());
 					f_cnt_t sampleStart = bufferFramesPerTick * ( _start - sTco->startPosition() - sTco->startTimeOffset() );
@@ -657,6 +733,7 @@ bool SampleTrack::play( const MidiTime & _start, const fpp_t _frames,
 						sTco->setSamplePlayLength( samplePlayLength );
 						tcos.push_back( sTco );
 						sTco->setIsPlaying( true );
+						nowPlaying = true;
 					}
 				}
 			}
@@ -664,7 +741,9 @@ bool SampleTrack::play( const MidiTime & _start, const fpp_t _frames,
 			{
 				sTco->setIsPlaying( false );
 			}
+			nowPlaying = nowPlaying || sTco->isPlaying();
 		}
+		setPlaying(nowPlaying);
 	}
 
 	for( tcoVector::Iterator it = tcos.begin(); it != tcos.end(); ++it )
@@ -710,7 +789,7 @@ TrackView * SampleTrack::createView( TrackContainerView* tcv )
 
 
 
-TrackContentObject * SampleTrack::createTCO(const MidiTime & pos)
+TrackContentObject * SampleTrack::createTCO(const TimePos & pos)
 {
 	SampleTCO * sTco = new SampleTCO(this);
 	sTco->movePosition(pos);
@@ -826,10 +905,29 @@ SampleTrackView::SampleTrackView( SampleTrack * _t, TrackContainerView* tcv ) :
 	m_panningKnob->setLabel( tr( "PAN" ) );
 	m_panningKnob->show();
 
+	m_activityIndicator = new FadeButton(
+		QApplication::palette().color(QPalette::Active, QPalette::Background),
+		QApplication::palette().color(QPalette::Active, QPalette::BrightText),
+		QApplication::palette().color(QPalette::Active, QPalette::BrightText).darker(),
+		getTrackSettingsWidget()
+	);
+	m_activityIndicator->setGeometry(settingsWidgetWidth - 2 * 24 - 11, 2, 8, 28);
+	m_activityIndicator->show();
+	connect(_t, SIGNAL(playingChanged()), this, SLOT(updateIndicator()));
+
 	setModel( _t );
 
 	m_window = new SampleTrackWindow(this);
 	m_window->toggleVisibility(false);
+}
+
+
+
+
+void SampleTrackView::updateIndicator()
+{
+	if (model()->isPlaying()) { m_activityIndicator->activateOnce(); }
+	else { m_activityIndicator->noteEnd(); }
 }
 
 
@@ -926,10 +1024,10 @@ void SampleTrackView::dropEvent(QDropEvent *de)
 				? trackHeadWidth
 				: de->pos().x();
 
-		MidiTime tcoPos = trackContainerView()->fixedTCOs()
-				? MidiTime(0)
-				: MidiTime(((xPos - trackHeadWidth) / trackContainerView()->pixelsPerBar()
-							* MidiTime::ticksPerBar()) + trackContainerView()->currentPosition()
+		TimePos tcoPos = trackContainerView()->fixedTCOs()
+				? TimePos(0)
+				: TimePos(((xPos - trackHeadWidth) / trackContainerView()->pixelsPerBar()
+							* TimePos::ticksPerBar()) + trackContainerView()->currentPosition()
 						).quantize(1.0);
 
 		SampleTCO * sTco = static_cast<SampleTCO*>(getTrack()->createTCO(tcoPos));
@@ -1031,7 +1129,7 @@ SampleTrackWindow::SampleTrackWindow(SampleTrackView * tv) :
 	generalSettingsLayout->addLayout(basicControlsLayout);
 
 	m_effectRack = new EffectRackView(tv->model()->audioPort()->effects());
-	m_effectRack->setFixedSize(240, 242);
+	m_effectRack->setFixedSize(EffectRackView::DEFAULT_WIDTH, 242);
 
 	vlayout->addWidget(generalSettingsWidget);
 	vlayout->addWidget(m_effectRack);
@@ -1100,8 +1198,10 @@ void SampleTrackWindow::modelChanged()
 void SampleTrackView::createFxLine()
 {
 	int channelIndex = gui->fxMixerView()->addNewChannel();
+	auto channel = Engine::fxMixer()->effectChannel(channelIndex);
 
-	Engine::fxMixer()->effectChannel(channelIndex)->m_name = getTrack()->name();
+	channel->m_name = getTrack()->name();
+	if (getTrack()->useColor()) { channel->setColor (getTrack()->color()); }
 
 	assignFxLine(channelIndex);
 }
