@@ -405,6 +405,24 @@ void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 		return;
 	}
 
+	// Some helper lambda functions to avoid repetition of code
+	auto eraseNode = [this](timeMap::iterator node)
+	{
+		if (node != m_pattern->getTimeMap().end())
+		{
+			m_pattern->removeNode(POS(node));
+			Engine::getSong()->setModified();
+		}
+	};
+	auto resetNode = [this](timeMap::iterator node)
+	{
+		if (node != m_pattern->getTimeMap().end())
+		{
+			node.value().resetOutValue();
+			Engine::getSong()->setModified();
+		}
+	};
+
 	// If we clicked inside the AutomationEditor viewport (where the nodes are represented)
 	if (mouseEvent->y() > TOP_MARGIN && mouseEvent->x() >= VALUES_WIDTH)
 	{
@@ -500,11 +518,7 @@ void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 					m_drawLastTick = posTicks;
 
 					// If we right-clicked a node, remove it
-					if (clickedNode != tm.end())
-					{
-						m_pattern->removeNode(POS(clickedNode));
-						Engine::getSong()->setModified();
-					}
+					eraseNode(clickedNode);
 
 					m_action = ERASE_VALUES;
 				}
@@ -522,22 +536,14 @@ void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 					m_drawLastTick = posTicks;
 
 					// If we right-clicked a node, remove it
-					if (clickedNode != tm.end())
-					{
-						m_pattern->removeNode(POS(clickedNode));
-						Engine::getSong()->setModified();
-					}
+					eraseNode(clickedNode);
 
 					m_action = ERASE_VALUES;
 				}
 				else if (m_mouseDownRight) // And right click resets outValues
 				{
 					// If we clicked an outValue reset it
-					if (clickedNode != tm.end())
-					{
-						clickedNode.value().resetOutValue();
-						Engine::getSong()->setModified();
-					}
+					resetNode(clickedNode);
 
 					// Update the last clicked position so we reset all outValues from
 					// that point up to the point we release the mouse button
@@ -590,11 +596,7 @@ void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 				else if (m_mouseDownRight) // Right click resets outValues
 				{
 					// If we clicked an outValue reset it
-					if (clickedNode != tm.end())
-					{
-						clickedNode.value().resetOutValue();
-						Engine::getSong()->setModified();
-					}
+					resetNode(clickedNode);
 
 					// Update the last clicked position so we reset all outValues from
 					// that point up to the point we release the mouse button
