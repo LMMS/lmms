@@ -6,6 +6,8 @@
 [![Join the chat at Discord](https://img.shields.io/badge/chat-on%20discord-7289DA.svg)](https://discord.gg/3sc5su7)
 [![Localise on transifex](https://img.shields.io/badge/localise-on_transifex-green.svg)](https://www.transifex.com/lmms/lmms/)
 
+**A soft PR-Freeze is currently underway to prepare for refactoring ([#5592](https://github.com/LMMS/lmms/issues/5592)). Please do not open non-essential PRs at this time.**
+
 What is LMMS?
 --------------
 

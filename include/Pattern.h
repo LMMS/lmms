@@ -176,6 +176,7 @@ public:
 	void setMutedNoteBorderColor(QColor const & color) { m_mutedNoteBorderColor = color; }
 
 public slots:
+	Pattern* getPattern();
 	void update() override;
 
 

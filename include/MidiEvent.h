@@ -33,30 +33,32 @@
 class MidiEvent
 {
 public:
+	enum class Source { Internal, External };
+
 	MidiEvent(MidiEventTypes type = MidiActiveSensing,
 				int8_t channel = 0,
 				int16_t param1 = 0,
 				int16_t param2 = 0,
 				const void* sourcePort = nullptr,
-				bool ignoreOnExport = true) :
+				Source source = Source::External) :
 		m_type( type ),
 		m_metaEvent( MidiMetaInvalid ),
 		m_channel( channel ),
 		m_sysExData( NULL ),
 		m_sourcePort(sourcePort),
-		m_ignoreOnExport(ignoreOnExport)
+		m_source(source)
 	{
 		m_data.m_param[0] = param1;
 		m_data.m_param[1] = param2;
 	}
 
-	MidiEvent(MidiEventTypes type, const char* sysExData, int dataLen, bool ignoreOnExport = true) :
+	MidiEvent(MidiEventTypes type, const char* sysExData, std::size_t dataLen, Source source = Source::External) :
 		m_type( type ),
 		m_metaEvent( MidiMetaInvalid ),
 		m_channel( 0 ),
 		m_sysExData( sysExData ),
 		m_sourcePort(nullptr),
-		m_ignoreOnExport(ignoreOnExport)
+		m_source(source)
 	{
 		m_data.m_sysExDataLen = dataLen;
 	}
@@ -68,7 +70,7 @@ public:
 		m_data( other.m_data ),
 		m_sysExData( other.m_sysExData ),
 		m_sourcePort(other.m_sourcePort),
-		m_ignoreOnExport(other.m_ignoreOnExport)
+		m_source(other.m_source)
 	{
 	}
 
@@ -194,14 +196,14 @@ public:
 		setParam( 0, pitchBend );
 	}
 
-	bool ignoreOnExport() const
+	Source source() const
 	{
-		return m_ignoreOnExport;
+		return m_source;
 	}
 
-	void setIgnoreOnExport(bool value)
+	void setSource(Source value)
 	{
-		m_ignoreOnExport = value;
+		m_source = value;
 	}
 
 
@@ -212,16 +214,15 @@ private:
 	union
 	{
 		int16_t m_param[2];	// first/second parameter (key/velocity)
-		uint8_t m_bytes[4];		// raw bytes
+		uint8_t m_bytes[4];	// raw bytes
 		int32_t m_sysExDataLen;	// len of m_sysExData
 	} m_data;
 
 	const char* m_sysExData;
 	const void* m_sourcePort;
 
-	// This helps us ignore MIDI events that shouldn't be processed
-	// during a project export, like physical controller events.
-	bool m_ignoreOnExport;
+	// Stores the source of the MidiEvent: Internal or External (hardware controllers).
+	Source m_source;
 } ;
 
 #endif
