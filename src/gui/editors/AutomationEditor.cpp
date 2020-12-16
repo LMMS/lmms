@@ -432,7 +432,7 @@ void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 
 		timeMap::iterator clickedNode = getNodeAt(mouseEvent->x(), mouseEvent->y(), editingOutValue);
 
-		switch(m_editMode)
+		switch (m_editMode)
 		{
 			case DRAW:
 			{
@@ -680,7 +680,7 @@ void AutomationEditor::mouseMoveEvent(QMouseEvent * mouseEvent )
 		// Get the X position in ticks
 		int posTicks = (x * TimePos::ticksPerBar() / m_ppb) + m_currentPosition;
 
-		switch(m_editMode)
+		switch (m_editMode)
 		{
 			case DRAW:
 			{
@@ -1734,27 +1734,24 @@ AutomationEditor::timeMap::iterator AutomationEditor::getNodeAt(int x, int y, bo
 
 	while (it != tm.end())
 	{
+		// The node we are checking is past the coordinates already, so the others will be too
+		if (posTicks < POS(it) - ticksOffset) { break; }
+
 		// If the x coordinate is within "r" pixels of the node's position
-		if (posTicks >= POS(it) - ticksOffset)
+		// POS(it) - ticksOffset <= posTicks <= POS(it) + ticksOffset
+		if (posTicks <= POS(it) + ticksOffset)
 		{
-			if (posTicks <= POS(it) + ticksOffset)
+			// The y position of the node
+			float valueY = yCoordOfLevel(
+				outValue
+				? OUTVAL(it)
+				: INVAL(it)
+			);
+			// If the y coordinate is within "r" pixels of the node's value
+			if (y >= (valueY - r) && y <= (valueY + r))
 			{
-				// The y position of the node
-				float valueY = yCoordOfLevel(
-					outValue
-					? OUTVAL(it)
-					: INVAL(it)
-				);
-				// If the y coordinate is within "r" pixels of the node's value
-				if (y >= (valueY - r) && y <= (valueY + r))
-				{
-					return it;
-				}
+				return it;
 			}
-		}
-		else // The node we are checking is past the coordinates already, so the others will be too
-		{
-			break;
 		}
 		++it;
 	}
