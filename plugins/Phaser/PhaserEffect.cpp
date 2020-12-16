@@ -141,6 +141,7 @@ bool PhaserEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 	const ValueBuffer * resonanceBuf = m_phaserControls.m_resonanceModel.valueBuffer();
 	const ValueBuffer * orderBuf = m_phaserControls.m_orderModel.valueBuffer();
 	const ValueBuffer * enableLFOBuf = m_phaserControls.m_enableLFOModel.valueBuffer();
+	const ValueBuffer * enableInFollowBuf = m_phaserControls.m_enableInFollowModel.valueBuffer();
 	const ValueBuffer * amountBuf = m_phaserControls.m_amountModel.valueBuffer();
 	const ValueBuffer * inFollowBuf = m_phaserControls.m_inFollowModel.valueBuffer();
 	const ValueBuffer * invertBuf = m_phaserControls.m_invertModel.valueBuffer();
@@ -259,6 +260,7 @@ bool PhaserEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 		const float resonance = resonanceBuf ? resonanceBuf->value(f) : m_phaserControls.m_resonanceModel.value();
 		const float order = orderBuf ? orderBuf->value(f) : m_phaserControls.m_orderModel.value();
 		const bool enableLFO = enableLFOBuf ? enableLFOBuf->value(f) : m_phaserControls.m_enableLFOModel.value();
+		const bool enableInFollow = enableInFollowBuf ? enableInFollowBuf->value(f) : m_phaserControls.m_enableInFollowModel.value();
 		const float amount = amountBuf ? amountBuf->value(f) : m_phaserControls.m_amountModel.value();
 		const float inFollow = inFollowBuf ? inFollowBuf->value(f) : m_phaserControls.m_inFollowModel.value();
 		const bool invert = invertBuf ? invertBuf->value(f) : m_phaserControls.m_invertModel.value();
@@ -276,18 +278,26 @@ bool PhaserEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 
 		// Calculate input follower values
 		const double sAbs[2] = {abs(s[0]), abs(s[1])};
-		for (int i = 0; i < 2; i++)
+		if (enableInFollow)
 		{
-			if (sAbs[i] > m_currentPeak[i])
+			for (int i = 0; i < 2; i++)
 			{
-				m_currentPeak[i] = qMin(m_currentPeak[i] * m_attCoeff, sAbs[i]);
-			}
-			else if (sAbs[i] < m_currentPeak[i])
-			{
-				m_currentPeak[i] = qMax(m_currentPeak[i] * m_relCoeff, sAbs[i]);
-			}
+				if (sAbs[i] > m_currentPeak[i])
+				{
+					m_currentPeak[i] = qMin(m_currentPeak[i] * m_attCoeff, sAbs[i]);
+				}
+				else if (sAbs[i] < m_currentPeak[i])
+				{
+					m_currentPeak[i] = qMax(m_currentPeak[i] * m_relCoeff, sAbs[i]);
+				}
 
-			m_currentPeak[i] = qBound(PHA_NOISE_FLOOR, m_currentPeak[i], 10.0f);
+				m_currentPeak[i] = qBound(PHA_NOISE_FLOOR, m_currentPeak[i], 10.0f);
+			}
+		}
+		else
+		{
+			m_currentPeak[0] = 0;
+			m_currentPeak[1] = 0;
 		}
 
 		// Calculate real allpass filter frequencies

@@ -49,7 +49,8 @@ PhaserControls::PhaserControls(PhaserEffect* effect) :
 	m_delayModel(0.0f, 0.0f, 20.0f, 0.001f, this, tr("Delay")),
 	m_rateModel(9.0f, 0.01f, 60.0f, 0.001f, 60000.0, this, tr("Rate")),
 	m_amountModel(4.5f, 0.f, 5.0f, 0.01f, this, tr("Amount")),
-	m_enableLFOModel(true , this, tr("Enable LFO")),
+	m_enableLFOModel(true, this, tr("Enable LFO")),
+	m_enableInFollowModel(true, this, tr("Enable Input Follower")),
 	m_phaseModel(180.0f, 0.f, 360.0f, 0.01f, this, tr("Phase")),
 	m_inFollowModel(0.f, -30.f, 30.0f, 0.01f, this, tr("Input Follow")),
 	m_attackModel(200.0f, 0.1f, 2000.0f, 0.1f, this, tr("Attack")),
@@ -91,6 +92,7 @@ void PhaserControls::saveSettings(QDomDocument& doc, QDomElement& elem)
 	m_delayModel.saveSettings(doc, elem, "delay");
 	m_rateModel.saveSettings(doc, elem, "rate");
 	m_enableLFOModel.saveSettings(doc, elem, "enableLFO");
+	m_enableInFollowModel.saveSettings(doc, elem, "enableInFollow");
 	m_amountModel.saveSettings(doc, elem, "amount");
 	m_phaseModel.saveSettings(doc, elem, "phase");
 	m_inFollowModel.saveSettings(doc, elem, "inFollow");
@@ -122,6 +124,7 @@ void PhaserControls::loadSettings(const QDomElement& elem)
 	m_rateModel.loadSettings(elem, "rate");
 	m_amountModel.loadSettings(elem, "amount");
 	m_enableLFOModel.loadSettings(elem, "enableLFO");
+	m_enableInFollowModel.loadSettings(elem, "enableInFollow");
 	m_phaseModel.loadSettings(elem, "phase");
 	m_inFollowModel.loadSettings(elem, "inFollow");
 	m_attackModel.loadSettings(elem, "attack");

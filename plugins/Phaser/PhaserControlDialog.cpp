@@ -162,8 +162,13 @@ PhaserControlDialog::PhaserControlDialog(PhaserControls* controls) :
 
 	LedCheckBox * enableLFO = new LedCheckBox("", this, tr("Enable LFO"), LedCheckBox::Green);
 	enableLFO->setModel(&controls->m_enableLFOModel);
-	enableLFO->move(159, 104);
+	enableLFO->move(159, 102);
 	ToolTip::add(enableLFO, tr("Enable LFO"));
+
+	LedCheckBox * enableInFollow = new LedCheckBox("", this, tr("Enable Input Follower"), LedCheckBox::Green);
+	enableInFollow->setModel(&controls->m_enableInFollowModel);
+	enableInFollow->move(296, 102);
+	ToolTip::add(enableInFollow, tr("Enable Input Follower"));
 
 	PixmapButton * invertButton = new PixmapButton(this, tr("Invert wet signal"));
 	invertButton->move(241, 42);

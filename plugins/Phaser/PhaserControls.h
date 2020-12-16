@@ -51,7 +51,7 @@ public:
 
 	int controlCount() override
 	{
-		return 24;
+		return 25;
 	}
 
 	EffectControlDialog * createView() override
@@ -75,6 +75,7 @@ private:
 	TempoSyncKnobModel m_rateModel;
 	FloatModel m_amountModel;
 	BoolModel m_enableLFOModel;
+	BoolModel m_enableInFollowModel;
 	FloatModel m_phaseModel;
 	FloatModel m_inFollowModel;
 	FloatModel m_attackModel;
