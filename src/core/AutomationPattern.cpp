@@ -395,7 +395,8 @@ void AutomationPattern::resetNodes(const int tick0, const int tick1)
 {
 	if (tick0 == tick1)
 	{
-		m_timeMap.find(TimePos(tick0)).value().resetOutValue();
+		auto it = m_timeMap.find(TimePos(tick0));
+		if (it != m_timeMap.end()) { it.value().resetOutValue(); }
 		return;
 	}
 
