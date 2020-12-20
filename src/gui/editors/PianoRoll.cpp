@@ -2552,7 +2552,7 @@ void PianoRoll::dragNotes( int x, int y, bool alt, bool shift, bool ctrl, Note* 
 	// get note that's dragged
 	if (noteDragged != nullptr)
 	{
-		draggedNote = noteDragged;
+		m_draggedNote = noteDragged;
 	}
 
 	// convert pixels to ticks and keys
@@ -2615,7 +2615,7 @@ void PianoRoll::dragNotes( int x, int y, bool alt, bool shift, bool ctrl, Note* 
 				if (m_gridMode == gridSnap && firstIteration)
 				{	
 					firstIteration = false;
-					Note* copy(draggedNote);
+					Note* copy(m_draggedNote);
 					// guantize first note
 					int start_pos_ticks = copy->oldPos().getTicks() + unquantized_off_ticks;
 					int end_pos_ticks = start_pos_ticks + copy->length().getTicks();
@@ -2636,11 +2636,11 @@ void PianoRoll::dragNotes( int x, int y, bool alt, bool shift, bool ctrl, Note* 
 					if (gap_start < gap_end)
 					{
 						copy->setPos(tmp_pos); // restore start position
-						off_ticks += copy->pos().getTicks() - (draggedNote->oldPos().getTicks() + off_ticks);
+						off_ticks += copy->pos().getTicks() - (m_draggedNote->oldPos().getTicks() + off_ticks);
 					}
 					else 
 					{
-						off_ticks += copy->pos().getTicks() - (draggedNote->oldPos().getTicks() + off_ticks) - draggedNote->length().getTicks();
+						off_ticks += copy->pos().getTicks() - (m_draggedNote->oldPos().getTicks() + off_ticks) - m_draggedNote->length().getTicks();
 					}
 				
 					// new off_ticks based on quantized (copy) note and not-quantized notes

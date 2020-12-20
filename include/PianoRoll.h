@@ -304,7 +304,7 @@ private:
 	int noteEditLeft() const;
 
 	void dragNotes( int x, int y, bool alt, bool shift, bool ctrl, Note * nt );
-	Note * draggedNote;
+	Note * m_draggedNote;
 
 	static const int cm_scrollAmtHoriz = 10;
 	static const int cm_scrollAmtVert = 1;
