@@ -773,7 +773,7 @@ void AutomationPattern::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	{
 		QDomElement element = _doc.createElement( "time" );
 		element.setAttribute("pos", POS(it));
-		element.setAttribute("inValue", INVAL(it));
+		element.setAttribute("value", INVAL(it));
 		element.setAttribute("outValue", OUTVAL(it));
 		_this.appendChild( element );
 	}
@@ -818,7 +818,7 @@ void AutomationPattern::loadSettings( const QDomElement & _this )
 		if( element.tagName() == "time" )
 		{
 			int timeMapPos = element.attribute("pos").toInt();
-			float timeMapInValue = LocaleHelper::toFloat(element.attribute("inValue"));
+			float timeMapInValue = LocaleHelper::toFloat(element.attribute("value"));
 			float timeMapOutValue = LocaleHelper::toFloat(element.attribute("outValue"));
 
 			m_timeMap[timeMapPos] = AutomationNode(this, timeMapInValue, timeMapOutValue, timeMapPos);

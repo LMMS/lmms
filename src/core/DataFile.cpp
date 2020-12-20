@@ -1405,11 +1405,9 @@ void DataFile::upgrade_automationNodes()
 
 			float value = LocaleHelper::toFloat(el.attribute("value"));
 
-			// Set both inValue and outValue of the nodes to the value on that time
-			el.setAttribute("inValue", value);
+			// inValue will be equal to "value" and outValue will
+			// be set to the same
 			el.setAttribute("outValue", value);
-
-			el.removeAttribute("value");
 		}
 	}
 }
