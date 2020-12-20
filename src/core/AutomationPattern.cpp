@@ -687,8 +687,9 @@ void AutomationPattern::flipX(int length)
 			// Now flip the nodes we have in relation to the length
 			do
 			{
-				tempValue = INVAL(it);
-				tempOutValue = OUTVAL(it);
+				// We swap the inValue and outValue when flipping horizontally
+				tempValue = OUTVAL(it);
+				tempOutValue = INVAL(it);
 				TimePos newTime = TimePos(length - POS(it));
 
 				tempMap[newTime] = AutomationNode(this, tempValue, tempOutValue, newTime);
@@ -700,12 +701,22 @@ void AutomationPattern::flipX(int length)
 		{
 			do
 			{
-				tempValue = INVAL(it);
-				tempOutValue = OUTVAL(it);
 				TimePos newTime;
 
 				// Only flips the length to be flipped and keep the remaining values in place
-				newTime = TimePos(POS(it) <= length ? length - POS(it) : POS(it));
+				// We also only swap the inValue and outValue if we are flipping the node
+				if (POS(it) <= length)
+				{
+					newTime = length - POS(it);
+					tempValue = OUTVAL(it);
+					tempOutValue = INVAL(it);
+				}
+				else
+				{
+					newTime = POS(it);
+					tempValue = INVAL(it);
+					tempOutValue = OUTVAL(it);
+				}
 
 				tempMap[newTime] = AutomationNode(this, tempValue, tempOutValue, newTime);
 
@@ -717,8 +728,9 @@ void AutomationPattern::flipX(int length)
 	{
 		do
 		{
-			tempValue = INVAL(it);
-			tempOutValue = OUTVAL(it);
+			// Swap the inValue and outValue
+			tempValue = OUTVAL(it);
+			tempOutValue = INVAL(it);
 
 			TimePos newTime = TimePos(realLength - POS(it));
 			tempMap[newTime] = AutomationNode(this, tempValue, tempOutValue, newTime);
@@ -1145,6 +1157,9 @@ void AutomationPattern::generateTangents(timeMap::iterator it, int numToGenerate
 			// have a discrete jump at this node. If we do not, then we can calculate the tangents normally.
 			// If we do have a discrete jump, then we have to calculate the tangents differently for each side
 			// of the curve.
+			// TODO: This behavior means that a very small difference between the inValue and outValue can
+			// result in a big change in the curve. In the future, allowing the user to manually adjust
+			// the tangents would be better.
 			float inTangent;
 			float outTangent;
 			if (OFFSET(it) == 0)
