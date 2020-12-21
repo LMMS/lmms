@@ -22,6 +22,7 @@ AutomationEditor {
 	qproperty-backgroundShade: rgba(255, 255, 255, 15);
 	qproperty-nodeInValueColor: rgba(255, 119, 175, 150);
 	qproperty-nodeOutValueColor: rgba(129, 231, 181, 150);
+	qproperty-nodeTangentLineColor: rgba(200, 200, 200, 255);
 	qproperty-crossColor: rgb( 255, 51, 51 );
 	/* Grid colors */
 	qproperty-lineColor: rgba(128, 128, 128, 80);

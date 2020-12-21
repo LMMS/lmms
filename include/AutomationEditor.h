@@ -56,6 +56,7 @@ class AutomationEditor : public QWidget, public JournallingObject
 	Q_PROPERTY(QColor lineColor MEMBER m_lineColor)
 	Q_PROPERTY(QColor nodeInValueColor MEMBER m_nodeInValueColor)
 	Q_PROPERTY(QColor nodeOutValueColor MEMBER m_nodeOutValueColor)
+	Q_PROPERTY(QColor nodeTangentLineColor MEMBER m_nodeTangentLineColor)
 	Q_PROPERTY(QBrush scaleColor MEMBER m_scaleColor)
 	Q_PROPERTY(QBrush graphColor MEMBER m_graphColor)
 	Q_PROPERTY(QColor crossColor MEMBER m_crossColor)
@@ -216,6 +217,7 @@ private:
 
 	void drawCross(QPainter & p );
 	void drawAutomationPoint( QPainter & p, timeMap::iterator it );
+	void drawAutomationTangents(QPainter & p, timeMap::iterator it);
 	bool inBBEditor();
 
 	QColor m_barLineColor;
@@ -224,6 +226,7 @@ private:
 	QBrush m_graphColor;
 	QColor m_nodeInValueColor;
 	QColor m_nodeOutValueColor;
+	QColor m_nodeTangentLineColor;
 	QBrush m_scaleColor;
 	QColor m_crossColor;
 	QColor m_backgroundShade;

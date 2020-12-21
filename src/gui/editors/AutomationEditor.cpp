@@ -105,6 +105,7 @@ AutomationEditor::AutomationEditor() :
 	m_graphColor(Qt::SolidPattern),
 	m_nodeInValueColor(0, 0, 0),
 	m_nodeOutValueColor(0, 0, 0),
+	m_nodeTangentLineColor(0, 0, 0),
 	m_scaleColor(Qt::SolidPattern),
 	m_crossColor(0, 0, 0),
 	m_backgroundShade(0, 0, 0)
@@ -864,6 +865,43 @@ inline void AutomationEditor::drawAutomationPoint(QPainter & p, timeMap::iterato
 
 
 
+inline void AutomationEditor::drawAutomationTangents(QPainter & p, timeMap::iterator it)
+{
+	int x = xCoordOfTick(POS(it));
+	int y, tx, ty;
+
+	// The tangent value correlates the variation in the node value related to the increase
+	// in ticks. So to have a proportionate drawing of the tangent line, we need to find the
+	// relation between the number of pixels per tick and the number of pixels per value level.
+	float viewportHeight = (height() - SCROLLBAR_SIZE - 1) - TOP_MARGIN;
+	float pixelsPerTick = m_ppb / TimePos::ticksPerBar();
+	// std::abs just in case the topLevel is smaller than the bottomLevel for some reason
+	float pixelsPerLevel = std::abs(viewportHeight / (m_topLevel - m_bottomLevel));
+	float proportion = pixelsPerLevel / pixelsPerTick;
+
+	p.setPen(QPen(m_nodeTangentLineColor));
+	p.setBrush(QBrush(m_nodeTangentLineColor));
+
+	y = yCoordOfLevel(INVAL(it));
+	tx = x - 20;
+	ty = y + 20 * INTAN(it) * proportion;
+	p.drawLine(x, y, tx, ty);
+	p.setBrush(QBrush(m_nodeTangentLineColor.darker(200)));
+	p.drawEllipse(tx - 3, ty - 3, 6, 6);
+
+	p.setBrush(QBrush(m_nodeTangentLineColor));
+
+	y = yCoordOfLevel(OUTVAL(it));
+	tx = x + 20;
+	ty = y - 20 * OUTTAN(it) * proportion;
+	p.drawLine(x, y, tx, ty);
+	p.setBrush(QBrush(m_nodeTangentLineColor.darker(200)));
+	p.drawEllipse(tx - 3, ty - 3, 6, 6);
+}
+
+
+
+
 void AutomationEditor::paintEvent(QPaintEvent * pe )
 {
 	QStyleOption opt;
@@ -1126,6 +1164,11 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 
 				// Draw circle
 				drawAutomationPoint(p, it);
+				// Draw tangents if necessary
+				if (m_pattern->progressionType() == AutomationPattern::CubicHermiteProgression)
+				{
+					drawAutomationTangents(p, it);
+				}
 
 				++it;
 			}
@@ -1142,6 +1185,11 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 			}
 			// Draw circle(the last one)
 			drawAutomationPoint(p, it);
+			// Draw tangents if necessary
+			if (m_pattern->progressionType() == AutomationPattern::CubicHermiteProgression)
+			{
+				drawAutomationTangents(p, it);
+			}
 		}
 	}
 	else
