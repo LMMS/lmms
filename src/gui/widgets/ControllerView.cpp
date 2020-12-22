@@ -4,7 +4,7 @@
  * Copyright (c) 2008-2009 Paul Giblock <drfaygo/at/gmail.com>
  * Copyright (c) 2011-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -30,7 +30,6 @@
 #include <QMdiSubWindow>
 #include <QPainter>
 #include <QInputDialog>
-#include <QWhatsThis>
 #include <QLayout>
 
 #include "ControllerView.h"
@@ -39,7 +38,6 @@
 #include "ControllerDialog.h"
 #include "gui_templates.h"
 #include "embed.h"
-#include "Engine.h"
 #include "GuiApplication.h"
 #include "LedCheckbox.h"
 #include "MainWindow.h"
@@ -92,9 +90,6 @@ ControllerView::ControllerView( Controller * _model, QWidget * _parent ) :
 		this, SLOT( closeControls() ) );
 
 	m_subWindow->hide();
-
-	setWhatsThis( tr( "Controllers are able to automate the value of a knob, "
-				"slider, and other controls."  ) );
 
 	setModel( _model );
 }
@@ -184,19 +179,6 @@ void ControllerView::contextMenuEvent( QContextMenuEvent * )
 						this, SLOT( deleteController() ) );
 	contextMenu->addAction( tr("Re&name this controller"), this, SLOT( renameController() ));
 	contextMenu->addSeparator();
-	contextMenu->addHelpAction();
 	contextMenu->exec( QCursor::pos() );
 	delete contextMenu;
 }
-
-
-void ControllerView::displayHelp()
-{
-	QWhatsThis::showText( mapToGlobal( rect().center() ),
-								whatsThis() );
-}
-
-
-
-
-

@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -27,8 +27,11 @@
 
 #include "MidiPort.h"
 #include "MidiClient.h"
+#include "MidiDummy.h"
 #include "Note.h"
 #include "Song.h"
+
+static MidiDummy s_dummyClient;
 
 
 
@@ -44,7 +47,7 @@ MidiPort::MidiPort( const QString& name,
 	m_midiEventProcessor( eventProcessor ),
 	m_mode( mode ),
 	m_inputChannelModel( 0, 0, MidiChannelCount, this, tr( "Input channel" ) ),
-	m_outputChannelModel( 1, 1, MidiChannelCount, this, tr( "Output channel" ) ),
+	m_outputChannelModel( 1, 0, MidiChannelCount, this, tr( "Output channel" ) ),
 	m_inputControllerModel( 0, 0, MidiControllerCount, this, tr( "Input controller" ) ),
 	m_outputControllerModel( 0, 0, MidiControllerCount, this, tr( "Output controller" ) ),
 	m_fixedInputVelocityModel( -1, -1, MidiMaxVelocity, this, tr( "Fixed input velocity" ) ),
@@ -60,9 +63,12 @@ MidiPort::MidiPort( const QString& name,
 	m_readableModel.setValue( m_mode == Input || m_mode == Duplex );
 	m_writableModel.setValue( m_mode == Output || m_mode == Duplex );
 
-	connect( &m_readableModel, SIGNAL( dataChanged() ), this, SLOT( updateMidiPortMode() ) );
-	connect( &m_writableModel, SIGNAL( dataChanged() ), this, SLOT( updateMidiPortMode() ) );
-	connect( &m_outputProgramModel, SIGNAL( dataChanged() ), this, SLOT( updateOutputProgram() ) );
+	connect( &m_readableModel, SIGNAL( dataChanged() ),
+			this, SLOT( updateMidiPortMode() ), Qt::DirectConnection );
+	connect( &m_writableModel, SIGNAL( dataChanged() ),
+			this, SLOT( updateMidiPortMode() ), Qt::DirectConnection );
+	connect( &m_outputProgramModel, SIGNAL( dataChanged() ),
+			this, SLOT( updateOutputProgram() ), Qt::DirectConnection );
 
 
 	// when using with non-raw-clients we can provide buttons showing
@@ -114,7 +120,7 @@ void MidiPort::setMode( Mode mode )
 
 
 
-void MidiPort::processInEvent( const MidiEvent& event, const MidiTime& time )
+void MidiPort::processInEvent( const MidiEvent& event, const TimePos& time )
 {
 	// mask event
 	if( isInputEnabled() &&
@@ -129,11 +135,11 @@ void MidiPort::processInEvent( const MidiEvent& event, const MidiTime& time )
 			{
 				return;
 			}
-		}
 
-		if( fixedInputVelocity() >= 0 && inEvent.velocity() > 0 )
-		{
-			inEvent.setVelocity( fixedInputVelocity() );
+			if( fixedInputVelocity() >= 0 && inEvent.velocity() > 0 )
+			{
+				inEvent.setVelocity( fixedInputVelocity() );
+			}
 		}
 
 		m_midiEventProcessor->processInEvent( inEvent, time );
@@ -143,10 +149,11 @@ void MidiPort::processInEvent( const MidiEvent& event, const MidiTime& time )
 
 
 
-void MidiPort::processOutEvent( const MidiEvent& event, const MidiTime& time )
+void MidiPort::processOutEvent( const MidiEvent& event, const TimePos& time )
 {
-	// mask event
-	if( isOutputEnabled() && realOutputChannel() == event.channel() )
+	// When output is enabled, route midi events if the selected channel matches
+	// the event channel or if there's no selected channel (value 0, represented by "--")
+	if( isOutputEnabled() && ( outputChannel() == 0 || realOutputChannel() == event.channel() ) )
 	{
 		MidiEvent outEvent = event;
 
@@ -410,4 +417,7 @@ void MidiPort::updateOutputProgram()
 
 
 
-
+void MidiPort::invalidateCilent()
+{
+	m_midiClient = &s_dummyClient;
+}

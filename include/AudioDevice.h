@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -115,7 +115,7 @@ protected:
 							const fpp_t _frames );
 
 	// resample given buffer from samplerate _src_sr to samplerate _dst_sr
-	void resample( const surroundSampleFrame * _src,
+	fpp_t resample( const surroundSampleFrame * _src,
 					const fpp_t _frames,
 					surroundSampleFrame * _dst,
 					const sample_rate_t _src_sr,

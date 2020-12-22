@@ -3,8 +3,8 @@
  *
  * Copyright (c) 2007-2008 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
  * Copyright (c) 2009-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
- * This file is part of LMMS - http://lmms.io
+ *
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -29,20 +29,23 @@
 #include <QPainter>
 #include <QDomElement>
 
+#include "ConfigManager.h"
 #include "endian_handling.h"
 #include "Engine.h"
+#include "FileDialog.h"
 #include "gui_templates.h"
 #include "InstrumentTrack.h"
 #include "NotePlayHandle.h"
+#include "PathUtil.h"
 #include "PixmapButton.h"
 #include "Song.h"
 #include "StringPairDrag.h"
 #include "ToolTip.h"
-#include "FileDialog.h"
+#include "Clipboard.h"
 
-#include "embed.cpp"
+#include "embed.h"
 
-
+#include "plugin_export.h"
 
 
 extern "C"
@@ -52,7 +55,7 @@ Plugin::Descriptor PLUGIN_EXPORT patman_plugin_descriptor =
 {
 	STRINGIFY( PLUGIN_NAME ),
 	"PatMan",
-	QT_TRANSLATE_NOOP( "pluginBrowser",
+	QT_TRANSLATE_NOOP( "PluginBrowser",
 				"GUS-compatible patch instrument" ),
 	"Javier Serrano Polo <jasp00/at/users.sourceforge.net>",
 	0x0100,
@@ -64,9 +67,9 @@ Plugin::Descriptor PLUGIN_EXPORT patman_plugin_descriptor =
 
 
 // necessary for getting instance out of shared lib
-Plugin * PLUGIN_EXPORT lmms_plugin_main( Model *, void * _data )
+PLUGIN_EXPORT Plugin * lmms_plugin_main( Model *m, void * )
 {
-	return new patmanInstrument( static_cast<InstrumentTrack *>( _data ) );
+	return new patmanInstrument( static_cast<InstrumentTrack *>( m ) );
 }
 
 }
@@ -76,7 +79,6 @@ Plugin * PLUGIN_EXPORT lmms_plugin_main( Model *, void * _data )
 
 patmanInstrument::patmanInstrument( InstrumentTrack * _instrument_track ) :
 	Instrument( _instrument_track, &patman_plugin_descriptor ),
-	m_patchFile( QString::null ),
 	m_loopedModel( true, this ),
 	m_tunedModel( true, this )
 {
@@ -180,7 +182,7 @@ void patmanInstrument::setFile( const QString & _patch_file, bool _rename )
 {
 	if( _patch_file.size() <= 0 )
 	{
-		m_patchFile = QString::null;
+		m_patchFile = QString();
 		return;
 	}
 
@@ -191,14 +193,13 @@ void patmanInstrument::setFile( const QString & _patch_file, bool _rename )
 				   	m_patchFile == "" ) )
 	{
 		// then set it to new one
-		instrumentTrack()->setName( QFileInfo( _patch_file
-								).fileName() );
+		instrumentTrack()->setName( PathUtil::cleanName( _patch_file ) );
 	}
 	// else we don't touch the instrument-track-name, because the user
 	// named it self
 
-	m_patchFile = SampleBuffer::tryToMakeRelative( _patch_file );
-	LoadErrors error = loadPatch( SampleBuffer::tryToMakeAbsolute( _patch_file ) );
+	m_patchFile = PathUtil::toShortestRelative( _patch_file );
+	LoadErrors error = loadPatch( PathUtil::toAbsolute( _patch_file ) );
 	if( error )
 	{
 		printf("Load error\n");
@@ -442,7 +443,7 @@ PluginView * patmanInstrument::instantiateView( QWidget * _parent )
 
 
 PatmanView::PatmanView( Instrument * _instrument, QWidget * _parent ) :
-	InstrumentView( _instrument, _parent ),
+	InstrumentViewFixedSize( _instrument, _parent ),
 	m_pi( NULL )
 {
 	setAutoFillBackground( true );
@@ -462,11 +463,7 @@ PatmanView::PatmanView( Instrument * _instrument, QWidget * _parent ) :
 							"select_file" ) );
 	connect( m_openFileButton, SIGNAL( clicked() ),
 				this, SLOT( openFile() ) );
-	ToolTip::add( m_openFileButton, tr( "Open other patch" ) );
-
-	m_openFileButton->setWhatsThis(
-		tr( "Click here to open another patch-file. Loop and Tune "
-			"settings are not reset." ) );
+	ToolTip::add( m_openFileButton, tr( "Open patch" ) );
 
 	m_loopButton = new PixmapButton( this, tr( "Loop" ) );
 	m_loopButton->setObjectName("loopButton");
@@ -477,10 +474,6 @@ PatmanView::PatmanView( Instrument * _instrument, QWidget * _parent ) :
 	m_loopButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
 								"loop_off" ) );
 	ToolTip::add( m_loopButton, tr( "Loop mode" ) );
-	m_loopButton->setWhatsThis(
-		tr( "Here you can toggle the Loop mode. If enabled, PatMan "
-			"will use the loop information available in the "
-			"file." ) );
 
 	m_tuneButton = new PixmapButton( this, tr( "Tune" ) );
 	m_tuneButton->setObjectName("tuneButton");
@@ -491,10 +484,6 @@ PatmanView::PatmanView( Instrument * _instrument, QWidget * _parent ) :
 	m_tuneButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
 								"tune_off" ) );
 	ToolTip::add( m_tuneButton, tr( "Tune mode" ) );
-	m_tuneButton->setWhatsThis(
-		tr( "Here you can toggle the Tune mode. If enabled, PatMan "
-			"will tune the sample to match the note's "
-			"frequency." ) );
 
 	m_displayFilename = tr( "No file selected" );
 
@@ -592,10 +581,13 @@ void PatmanView::updateFilename( void )
 
 void PatmanView::dragEnterEvent( QDragEnterEvent * _dee )
 {
-	if( _dee->mimeData()->hasFormat( StringPairDrag::mimeType() ) )
+	// For mimeType() and MimeType enum class
+	using namespace Clipboard;
+
+	if( _dee->mimeData()->hasFormat( mimeType( MimeType::StringPair ) ) )
 	{
 		QString txt = _dee->mimeData()->data(
-						StringPairDrag::mimeType() );
+						mimeType( MimeType::StringPair ) );
 		if( txt.section( ':', 0, 0 ) == "samplefile" )
 		{
 			_dee->acceptProposedAction();
@@ -636,8 +628,8 @@ void PatmanView::paintEvent( QPaintEvent * )
 	QPainter p( this );
 
 	p.setFont( pointSize<8>( font() ) );
-	p.drawText( 8, 116, 235, 16, 
-			Qt::AlignLeft | Qt::TextSingleLine | Qt::AlignVCenter, 
+	p.drawText( 8, 116, 235, 16,
+			Qt::AlignLeft | Qt::TextSingleLine | Qt::AlignVCenter,
 			m_displayFilename );
 }
 
@@ -652,8 +644,3 @@ void PatmanView::modelChanged( void )
 	connect( m_pi, SIGNAL( fileChanged() ),
 			this, SLOT( updateFilename() ) );
 }
-
-
-
-
-

@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2004-2013 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -134,11 +134,11 @@ QSize PixmapButton::sizeHint() const
 {
 	if( ( model() != NULL && model()->value() ) || m_pressed )
 	{
-		return m_activePixmap.size();
+		return m_activePixmap.size() / devicePixelRatio();
 	}
 	else 
 	{
-		return m_inactivePixmap.size();
+		return m_inactivePixmap.size() / devicePixelRatio();
 	}
 }
 

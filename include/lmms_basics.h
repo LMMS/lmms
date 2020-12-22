@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -31,11 +31,12 @@
 #include "lmmsconfig.h"
 
 #ifdef LMMS_HAVE_STDINT_H
-#include <stdint.h>
+#include <cstdint>
+#include <array>
 #endif
 
 
-typedef int32_t tact_t;
+typedef int32_t bar_t;
 typedef int32_t tick_t;
 typedef uint8_t volume_t;
 typedef int8_t panning_t;
@@ -55,10 +56,10 @@ typedef uint16_t fx_ch_t;			// FX-channel (0 to MAX_EFFECT_CHANNEL)
 
 typedef uint32_t jo_id_t;			// (unique) ID of a journalling object
 
-// use for improved branch prediction
-#define likely(x)	__builtin_expect((x),1)
-#define unlikely(x)	__builtin_expect((x),0)
 
+// windows headers define "min" and "max" macros, breaking the methods bwloe
+#undef min
+#undef max
 
 template<typename T>
 struct typeInfo
@@ -93,7 +94,7 @@ struct typeInfo
 template<>
 inline float typeInfo<float>::minEps()
 {
-	return 1.0e-10;
+	return 1.0e-10f;
 }
 
 template<>
@@ -127,16 +128,19 @@ const ch_cnt_t SURROUND_CHANNELS =
 
 
 
-typedef sample_t sampleFrame[DEFAULT_CHANNELS];
-typedef sample_t surroundSampleFrame[SURROUND_CHANNELS];
+using         sampleFrame = std::array<sample_t,  DEFAULT_CHANNELS>;
+using surroundSampleFrame = std::array<sample_t, SURROUND_CHANNELS>;
 #define ALIGN_SIZE 16
-#if __GNUC__
-typedef sample_t sampleFrameA[DEFAULT_CHANNELS] __attribute__((__aligned__(ALIGN_SIZE)));
-#endif
 
 
 #define STRINGIFY(s) STR(s)
 #define STR(PN)	#PN
 
+// Abstract away GUI CTRL key (linux/windows) vs ⌘ (apple)
+#ifdef LMMS_BUILD_APPLE
+# define UI_CTRL_KEY "⌘"
+#else
+# define UI_CTRL_KEY "Ctrl"
+#endif
 
 #endif

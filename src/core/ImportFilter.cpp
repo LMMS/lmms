@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2006-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -23,6 +23,7 @@
  */
 
 
+#include <memory>
 #include <QMessageBox>
 
 #include "ImportFilter.h"
@@ -31,6 +32,8 @@
 #include "PluginFactory.h"
 #include "ProjectJournal.h"
 
+
+using std::unique_ptr;
 
 ImportFilter::ImportFilter( const QString & _file_name,
 							const Descriptor * _descriptor ) :
@@ -54,7 +57,8 @@ void ImportFilter::import( const QString & _file_to_import,
 {
 	bool successful = false;
 
-	char * s = qstrdup( _file_to_import.toUtf8().constData() );
+	QByteArray s = _file_to_import.toUtf8();
+	s.detach();
 
 	// do not record changes while importing files
 	const bool j = Engine::projectJournal()->isJournalling();
@@ -62,20 +66,16 @@ void ImportFilter::import( const QString & _file_to_import,
 
 	for (const Plugin::Descriptor* desc : pluginFactory->descriptors(Plugin::ImportFilter))
 	{
-		Plugin * p = Plugin::instantiate( desc->name, NULL, s );
-		if( dynamic_cast<ImportFilter *>( p ) != NULL &&
-			dynamic_cast<ImportFilter *>( p )->tryImport( tc ) == true )
+		unique_ptr<Plugin> p(Plugin::instantiate( desc->name, NULL, s.data() ));
+		if( dynamic_cast<ImportFilter *>( p.get() ) != NULL &&
+			dynamic_cast<ImportFilter *>( p.get() )->tryImport( tc ) )
 		{
-			delete p;
 			successful = true;
 			break;
 		}
-		delete p;
 	}
 
 	Engine::projectJournal()->setJournalling( j );
-
-	delete[] s;
 
 	if( successful == false )
 	{

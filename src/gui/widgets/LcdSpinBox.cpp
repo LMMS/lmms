@@ -4,7 +4,7 @@
  * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * Copyright (c) 2008 Paul Giblock <pgllama/at/gmail.com>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -23,21 +23,17 @@
  *
  */
 
+#include <cmath>
 #include <QApplication>
 #include <QLabel>
 #include <QMouseEvent>
 #include <QPainter>
-#include <QFontMetrics>
 #include <QStyleOptionFrameV2>
 #include <QInputDialog>
 
 #include "LcdSpinBox.h"
 #include "CaptionMenu.h"
-#include "Engine.h"
-#include "embed.h"
 #include "GuiApplication.h"
-#include "gui_templates.h"
-#include "templates.h"
 #include "MainWindow.h"
 
 
@@ -45,8 +41,9 @@
 LcdSpinBox::LcdSpinBox( int numDigits, QWidget* parent, const QString& name ) :
 	LcdWidget( numDigits, parent, name ),
 	IntModelView( new IntModel( 0, 0, 0, NULL, name, true ), this ),
+	m_remainder( 0.f ),
 	m_mouseMoving( false ),
-	m_origMousePos(),
+	m_lastMousePos(),
 	m_displayOffset( 0 )
 {
 }
@@ -55,21 +52,14 @@ LcdSpinBox::LcdSpinBox( int numDigits, QWidget* parent, const QString& name ) :
 
 
 LcdSpinBox::LcdSpinBox( int numDigits, const QString& style, QWidget* parent, const QString& name ) :
-	LcdWidget( numDigits, parent, name ),
+	LcdWidget( numDigits, style, parent, name ),
 	IntModelView( new IntModel( 0, 0, 0, NULL, name, true ), this ),
+	m_remainder( 0.f ),
 	m_mouseMoving( false ),
-	m_origMousePos(),
+	m_lastMousePos(),
 	m_displayOffset( 0 )
 {
 }
-
-
-
-LcdSpinBox::~LcdSpinBox()
-{
-}
-
-
 
 void LcdSpinBox::update()
 {
@@ -103,8 +93,7 @@ void LcdSpinBox::mousePressEvent( QMouseEvent* event )
 						event->y() < cellHeight() + 2  )
 	{
 		m_mouseMoving = true;
-		m_origMousePos = event->globalPos();
-		QApplication::setOverrideCursor( Qt::BlankCursor );
+		m_lastMousePos = event->globalPos();
 
 		AutomatableModel *thisModel = model();
 		if( thisModel )
@@ -126,15 +115,20 @@ void LcdSpinBox::mouseMoveEvent( QMouseEvent* event )
 {
 	if( m_mouseMoving )
 	{
-		int dy = event->globalY() - m_origMousePos.y();
-		if( gui->mainWindow()->isShiftPressed() )
-			dy = qBound( -4, dy/4, 4 );
-		if( dy > 1 || dy < -1 )
+		int dy = event->globalY() - m_lastMousePos.y();
+		if( dy )
 		{
-			model()->setInitValue( model()->value() -
-						dy / 2 * model()->step<int>() );
+			float fdy = static_cast<float>(dy);
+			if( event->modifiers() & Qt::ShiftModifier ) {
+				fdy = qBound( -4.f, fdy/4.f, 4.f );
+			}
+			float floatValNotRounded =
+				model()->value() + m_remainder - fdy / 2.f * model()->step<int>();
+			float floatValRounded = roundf( floatValNotRounded );
+			m_remainder = floatValNotRounded - floatValRounded;
+			model()->setInitValue( floatValRounded );
 			emit manualChange();
-			QCursor::setPos( m_origMousePos );
+			m_lastMousePos = event->globalPos();
 		}
 	}
 }
@@ -147,10 +141,7 @@ void LcdSpinBox::mouseReleaseEvent( QMouseEvent* )
 	if( m_mouseMoving )
 	{
 		model()->restoreJournallingState();
-
-		QCursor::setPos( m_origMousePos );
 		QApplication::restoreOverrideCursor();
-
 		m_mouseMoving = false;
 	}
 }
@@ -158,11 +149,10 @@ void LcdSpinBox::mouseReleaseEvent( QMouseEvent* )
 
 
 
-void LcdSpinBox::wheelEvent( QWheelEvent * _we )
+void LcdSpinBox::wheelEvent(QWheelEvent * we)
 {
-	_we->accept();
-	model()->setInitValue( model()->value() +
-			( ( _we->delta() > 0 ) ? 1 : -1 ) * model()->step<int>() );
+	we->accept();
+	model()->setInitValue(model()->value() + ((we->angleDelta().y() > 0) ? 1 : -1) * model()->step<int>());
 	emit manualChange();
 }
 
@@ -177,19 +167,18 @@ void LcdSpinBox::enterValue()
 	int new_val;
 
 	new_val = QInputDialog::getInt(
-			this, windowTitle(),
+			this, tr( "Set value" ),
 			tr( "Please enter a new value between %1 and %2:" ).
 			arg( model()->minValue() ).
 			arg( model()->maxValue() ),
 			model()->value(),
 			model()->minValue(),
-			model()->maxValue(), 4, &ok );
+			model()->maxValue(),
+			model()->step<int>(), &ok );
 
 	if( ok )
 	{
 		model()->setValue( new_val );
 	}
 }
-
-
 

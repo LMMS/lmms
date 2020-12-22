@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -41,16 +41,15 @@ public:
 		m_orientation( _orientation )
 	{
 	}
-	virtual ~SideBarButton()
-	{
-	}
+
+	virtual ~SideBarButton() = default;
 
 	Qt::Orientation orientation() const
 	{
 		return m_orientation;
 	}
 
-	virtual QSize sizeHint() const
+	QSize sizeHint() const override
 	{
 		QSize s = QToolButton::sizeHint();
 		s.setWidth( s.width() + 8 );
@@ -63,7 +62,7 @@ public:
 
 
 protected:
-	virtual void paintEvent( QPaintEvent * )
+	void paintEvent( QPaintEvent * ) override
 	{
 		QStylePainter p( this );
 		QStyleOptionToolButton opt;
@@ -110,8 +109,9 @@ SideBar::~SideBar()
 void SideBar::appendTab( SideBarWidget *widget )
 {
 	SideBarButton *button = new SideBarButton( orientation(), this );
-	button->setText( widget->title() );
+	button->setText( " " + widget->title() );
 	button->setIcon( widget->icon() );
+	button->setLayoutDirection( Qt::RightToLeft );
 	button->setCheckable( true );
 	m_widgets[button] = widget;
 	m_btnGroup.addButton( button );
@@ -121,6 +121,9 @@ void SideBar::appendTab( SideBarWidget *widget )
 	widget->setMinimumWidth( 200 );
 
 	ToolTip::add( button, widget->title() );
+
+	connect(widget, &SideBarWidget::closeButtonClicked,
+		[=]() { button->click(); });
 }
 
 

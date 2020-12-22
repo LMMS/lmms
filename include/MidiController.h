@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2008 Paul Giblock <drfaygo/at/gmail.com>
  * 
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -44,30 +44,30 @@ public:
 	virtual ~MidiController();
 
 	virtual void processInEvent( const MidiEvent & _me,
-					const MidiTime & _time, f_cnt_t offset = 0 );
+					const TimePos & _time, f_cnt_t offset = 0 ) override;
 
 	virtual void processOutEvent( const MidiEvent& _me,
-					const MidiTime & _time, f_cnt_t offset = 0 )
+					const TimePos & _time, f_cnt_t offset = 0 ) override
 	{
 		// No output yet
 	}
 
-	virtual void saveSettings( QDomDocument & _doc, QDomElement & _this );
-	virtual void loadSettings( const QDomElement & _this );
-	virtual QString nodeName() const;
+	void saveSettings( QDomDocument & _doc, QDomElement & _this ) override;
+	void loadSettings( const QDomElement & _this ) override;
+	QString nodeName() const override;
 
 	// Used by controllerConnectionDialog to copy
 	void subscribeReadablePorts( const MidiPort::Map & _map );
 
 
 public slots:
-	virtual ControllerDialog * createDialog( QWidget * _parent );
+	ControllerDialog * createDialog( QWidget * _parent ) override;
 	void updateName();
 
 
 protected:
 	// The internal per-controller get-value function
-	virtual void updateValueBuffer();
+	void updateValueBuffer() override;
 
 
 	MidiPort m_midiPort;

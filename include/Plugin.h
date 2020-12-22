@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -40,8 +40,28 @@ class PixmapLoader;
 class PluginView;
 class AutomatableModel;
 
+/**
+	Abstract representation of a plugin
 
-class EXPORT Plugin : public Model, public JournallingObject
+	Such a plugin can be an Instrument, Effect, Tool plugin etc.
+
+	Plugins have descriptors, containing meta info, which is used especially
+	by PluginFactory and friends.
+
+	There are also Plugin keys (class Key, confusingly under
+	SubPluginFeatures), which contain pointers to the plugin descriptor.
+
+	Some plugins have sub plugins, e.g. there is one CALF Plugin and for
+	each CALF effect, there is a CALF sub plugin. For those plugins, there
+	are keys for each sub plugin. These keys also link to the superior
+	Plugin::Descriptor. Additionally, they contain attributes that help the
+	superior Plugin saving them and recognizing them when loading.
+
+	In case of sub plugins, the Descriptor has SubPluginFeatures. Those
+	are a bit like values to the sub plugins' keys (in terms of a key-value-
+	map).
+*/
+class LMMS_EXPORT Plugin : public Model, public JournallingObject
 {
 	MM_OPERATORS
 	Q_OBJECT
@@ -59,9 +79,9 @@ public:
 		Undefined = 255
 	} ;
 
-	// descriptor holds information about a plugin - every external plugin
-	// has to instantiate such a descriptor in an extern "C"-section so that
-	// the plugin-loader is able to access information about the plugin
+	//! Descriptor holds information about a plugin - every external plugin
+	//! has to instantiate such a Descriptor in an extern "C"-section so that
+	//! the plugin-loader is able to access information about the plugin
 	struct Descriptor
 	{
 		const char * name;
@@ -71,23 +91,49 @@ public:
 		int version;
 		PluginTypes type;
 		const PixmapLoader * logo;
-		const char * supportedFileTypes;
+		const char * supportedFileTypes; //!< csv list of extensions
 
 		inline bool supportsFileType( const QString& extension ) const
 		{
 			return QString( supportedFileTypes ).split( QChar( ',' ) ).contains( extension );
 		}
 
-		class EXPORT SubPluginFeatures
+		/**
+			Access to non-key-data of a sub plugin
+
+			If you consider sub plugin keys as keys in a
+			key-value-map, this is the lookup for the corresponding
+			values. In order to have flexibility between different
+			plugin APIs, this is rather an array of fixed data,
+			but a bunch of virtual functions taking the key and
+			returning some values (or modifying objects of other
+			classes).
+		 */
+		class LMMS_EXPORT SubPluginFeatures
 		{
 		public:
+			/**
+				Key reference a Plugin::Descriptor, and,
+				if the plugin has sub plugins, also reference
+				its sub plugin (using the attributes).
+				When keys are saved, those attributes are
+				written to XML in order to find the right sub
+				plugin when realoading.
+
+				@note Any data that is not required to reference
+					the right Plugin or sub plugin should
+					not be here (but rather in
+					SubPluginFeatures, which are like values
+					in a key-value map).
+			*/
 			struct Key
 			{
 				typedef QMap<QString, QString> AttributeMap;
 
 				inline Key( const Plugin::Descriptor * desc = NULL,
-							const QString & name = QString(),
-							const AttributeMap & am = AttributeMap() )
+						const QString & name = QString(),
+						const AttributeMap & am = AttributeMap()
+					)
 					:
 					desc( desc ),
 					name( name ),
@@ -101,12 +147,28 @@ public:
 
 				inline bool isValid() const
 				{
-					return desc != NULL && name.isNull() == false;
+					return desc != nullptr;
 				}
 
+				//! Key to subplugin: reference to parent descriptor
+				//! Key to plugin: reference to its descriptor
 				const Plugin::Descriptor* desc;
+				//! Descriptive name like "Calf Phaser".
+				//! Not required for key lookup and not saved
+				//! only used sometimes to temporary store descriptive names
+				//! @todo This is a bug, there should be a function
+				//!   in SubPluginFeatures (to get the name) instead
 				QString name;
+				//! Attributes that make up the key and identify
+				//! the sub plugin. They are being loaded and saved
 				AttributeMap attributes;
+
+				// helper functions to retrieve data that is
+				// not part of the key, but mapped via desc->subPluginFeatures
+				QString additionalFileExtensions() const;
+				QString displayName() const;
+				QString description() const;
+				const PixmapLoader* logo() const;
 			} ;
 
 			typedef QList<Key> KeyList;
@@ -125,10 +187,39 @@ public:
 			{
 			}
 
+			//! While PluginFactory only collects the plugins,
+			//! this function is used by widgets like EffectSelectDialog
+			//! to find all possible sub plugins
 			virtual void listSubPluginKeys( const Plugin::Descriptor *, KeyList & ) const
 			{
 			}
 
+
+		private:
+			// You can add values mapped by "Key" below
+			// The defaults are sane, i.e. redirect to sub plugin's
+			// supererior descriptor
+
+			virtual QString additionalFileExtensions(const Key&) const
+			{
+				return QString();
+			}
+
+			virtual QString displayName(const Key& k) const
+			{
+				return k.isValid() ? k.name : QString();
+			}
+
+			virtual QString description(const Key& k) const
+			{
+				return k.isValid() ? k.desc->description : QString();
+			}
+
+			virtual const PixmapLoader* logo(const Key& k) const
+			{
+				Q_ASSERT(k.desc);
+				return k.desc->logo;
+			}
 
 		protected:
 			const Plugin::PluginTypes m_type;
@@ -140,54 +231,74 @@ public:
 	// typedef a list so we can easily work with list of plugin descriptors
 	typedef QList<Descriptor*> DescriptorList;
 
-	// contructor of a plugin
-	Plugin( const Descriptor * descriptor, Model * parent );
+	//! Constructor of a plugin
+	//! @param key Sub plugins must pass a key here, optional otherwise.
+	//!   See the key() function
+	Plugin(const Descriptor * descriptor, Model * parent,
+		const Descriptor::SubPluginFeatures::Key *key = nullptr);
 	virtual ~Plugin();
 
-	// returns display-name out of descriptor
-	virtual QString displayName() const
-	{
-		return Model::displayName().isEmpty()
-			? m_descriptor->displayName
-			: Model::displayName();
-	}
+	//! Return display-name out of sub plugin or descriptor
+	QString displayName() const override;
 
-	// return plugin-type
+	//! Return logo out of sub plugin or descriptor
+	const PixmapLoader *logo() const;
+
+	//! Return plugin type
 	inline PluginTypes type( void ) const
 	{
 		return m_descriptor->type;
 	}
 
-	// return plugin-descriptor for further information
+	//! Return plugin Descriptor
 	inline const Descriptor * descriptor() const
 	{
 		return m_descriptor;
 	}
 
-	// can be called if a file matching supportedFileTypes should be
-	// loaded/processed with the help of this plugin
+	//! Return the key referencing this plugin. If the Plugin has no
+	//! sub plugin features, the key is pretty useless. If it has,
+	//! this key will also contain the sub plugin attributes, and will be
+	//! a key to those SubPluginFeatures.
+	inline const Descriptor::SubPluginFeatures::Key & key() const
+	{
+		return m_key;
+	}
+
+	//! Can be called if a file matching supportedFileTypes should be
+	//! loaded/processed with the help of this plugin
 	virtual void loadFile( const QString & file );
 
-	// Called if external source needs to change something but we cannot
-	// reference the class header.  Should return null if not key not found.
+	//! Called if external source needs to change something but we cannot
+	//! reference the class header.  Should return null if not key not found.
 	virtual AutomatableModel* childModel( const QString & modelName );
 
-	// returns an instance of a plugin whose name matches to given one
-	// if specified plugin couldn't be loaded, it creates a dummy-plugin
-	static Plugin * instantiate( const QString& pluginName, Model * parent, void * data );
+	//! Overload if the argument passed to the plugin is a subPluginKey
+	//! If you can not pass the key and are aware that it's stored in
+	//! Engine::pickDndPluginKey(), use this function, too
+	static Plugin * instantiateWithKey(const QString& pluginName, Model * parent,
+					const Descriptor::SubPluginFeatures::Key *key,
+					bool keyFromDnd = false);
 
-	// create a view for the model 
+	//! Return an instance of a plugin whose name matches to given one
+	//! if specified plugin couldn't be loaded, it creates a dummy-plugin
+	//! @param data Anything the plugin expects. If this is a pointer to a sub plugin key,
+	//!   use instantiateWithKey instead
+	static Plugin * instantiate(const QString& pluginName, Model * parent, void *data);
+
+	//! Create a view for the model
 	PluginView * createView( QWidget * parent );
 
-
 protected:
-	// create a view for the model 
+	//! Create a view for the model
 	virtual PluginView* instantiateView( QWidget * ) = 0;
 	void collectErrorForUI( QString errMsg );
 
 
 private:
 	const Descriptor * m_descriptor;
+
+	Descriptor::SubPluginFeatures::Key m_key;
 
 	// pointer to instantiation-function in plugin
 	typedef Plugin * ( * InstantiationHook )( Model * , void * );

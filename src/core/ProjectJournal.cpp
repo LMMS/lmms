@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2006-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -29,6 +29,8 @@
 #include "JournallingObject.h"
 #include "Song.h"
 
+//! Avoid clashes between loaded IDs (have the bit cleared)
+//! and newly created IDs (have the bit set)
 static const int EO_ID_MSB = 1 << 23;
 
 const int ProjectJournal::MAX_UNDO_STATES = 100; // TODO: make this configurable in settings
@@ -162,6 +164,11 @@ void ProjectJournal::reallocID( const jo_id_t _id, JournallingObject * _obj )
 jo_id_t ProjectJournal::idToSave( jo_id_t id )
 {
 	return id & ~EO_ID_MSB;
+}
+
+jo_id_t ProjectJournal::idFromSave( jo_id_t id )
+{
+	return id | EO_ID_MSB;
 }
 
 

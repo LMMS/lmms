@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -25,6 +25,7 @@
 #ifndef AUDIO_PORT_H
 #define AUDIO_PORT_H
 
+#include <memory>
 #include <QtCore/QString>
 #include <QtCore/QMutex>
 #include <QtCore/QMutexLocker>
@@ -79,7 +80,7 @@ public:
 
 	inline EffectChain * effects()
 	{
-		return m_effects;
+		return m_effects.get();
 	}
 
 	void setNextFxChannel( const fx_ch_t _chnl )
@@ -99,8 +100,8 @@ public:
 	bool processEffects();
 
 	// ThreadableJob stuff
-	virtual void doProcessing();
-	virtual bool requiresProcessing() const
+	void doProcessing() override;
+	bool requiresProcessing() const override
 	{
 		return true;
 	}
@@ -119,7 +120,7 @@ private:
 
 	QString m_name;
 
-	EffectChain * m_effects;
+	std::unique_ptr<EffectChain> m_effects;
 
 	PlayHandleList m_playHandles;
 	QMutex m_playHandleLock;

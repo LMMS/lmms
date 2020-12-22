@@ -102,6 +102,7 @@
  <customwidgets>
   <customwidget>
    <class>RowTableView</class>
+   <extends>QTableView</extends>
    <header>RowTableView.h</header>
   </customwidget>
  </customwidgets>

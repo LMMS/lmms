@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -24,33 +24,29 @@
 
 #include "TrackContainerView.h"
 
-#include <algorithm>
+#include <cmath>
 
 #include <QApplication>
 #include <QLayout>
 #include <QMdiArea>
-#include <QProgressDialog>
 #include <QScrollBar>
 #include <QWheelEvent>
 
-
 #include "TrackContainer.h"
 #include "BBTrack.h"
+#include "DataFile.h"
 #include "MainWindow.h"
 #include "Mixer.h"
-#include "debug.h"
 #include "FileBrowser.h"
 #include "ImportFilter.h"
 #include "Instrument.h"
 #include "InstrumentTrack.h"
-#include "DataFile.h"
-#include "Rubberband.h"
 #include "Song.h"
 #include "StringPairDrag.h"
-#include "Track.h"
 #include "GuiApplication.h"
 #include "PluginFactory.h"
 
+using namespace std;
 
 TrackContainerView::TrackContainerView( TrackContainer * _tc ) :
 	QWidget(),
@@ -61,12 +57,12 @@ TrackContainerView::TrackContainerView( TrackContainer * _tc ) :
 	m_tc( _tc ),
 	m_trackViews(),
 	m_scrollArea( new scrollArea( this ) ),
-	m_ppt( DEFAULT_PIXELS_PER_TACT ),
-	m_rubberBand( new RubberBand( m_scrollArea ) ),
-	m_origin()
+	m_ppb( DEFAULT_PIXELS_PER_BAR ),
+	m_rubberBand( new RubberBand( m_scrollArea ) )
 {
 	m_tc->setHook( this );
-
+	//keeps the direction of the widget, undepended on the locale
+	setLayoutDirection( Qt::LeftToRight );
 	QVBoxLayout * layout = new QVBoxLayout( this );
 	layout->setMargin( 0 );
 	layout->setSpacing( 0 );
@@ -129,9 +125,9 @@ TrackView * TrackContainerView::addTrackView( TrackView * _tv )
 {
 	m_trackViews.push_back( _tv );
 	m_scrollLayout->addWidget( _tv );
-	connect( this, SIGNAL( positionChanged( const MidiTime & ) ),
+	connect( this, SIGNAL( positionChanged( const TimePos & ) ),
 				_tv->getTrackContentWidget(),
-				SLOT( changePosition( const MidiTime & ) ) );
+				SLOT( changePosition( const TimePos & ) ) );
 	realignTracks();
 	return( _tv );
 }
@@ -232,10 +228,9 @@ void TrackContainerView::scrollToTrackView( TrackView * _tv )
 
 void TrackContainerView::realignTracks()
 {
-	QWidget * content = m_scrollArea->widget();
-	content->setFixedWidth( width()
-				- m_scrollArea->verticalScrollBar()->width() );
-	content->setFixedHeight( content->minimumSizeHint().height() );
+	m_scrollArea->widget()->setFixedWidth(width());
+	m_scrollArea->widget()->setFixedHeight(
+				m_scrollArea->widget()->minimumSizeHint().height());
 
 	for( trackViewList::iterator it = m_trackViews.begin();
 						it != m_trackViews.end(); ++it )
@@ -313,9 +308,9 @@ bool TrackContainerView::allowRubberband() const
 
 
 
-void TrackContainerView::setPixelsPerTact( int _ppt )
+void TrackContainerView::setPixelsPerBar( int ppb )
 {
-	m_ppt = _ppt;
+	m_ppb = ppb;
 
 	// tell all TrackContentWidgets to update their background tile pixmap
 	for( trackViewList::Iterator it = m_trackViews.begin();
@@ -346,18 +341,14 @@ void TrackContainerView::dragEnterEvent( QDragEnterEvent * _dee )
 {
 	StringPairDrag::processDragEnterEvent( _dee,
 		QString( "presetfile,pluginpresetfile,samplefile,instrument,"
-				"importedproject,soundfontfile,vstpluginfile,projectfile,"
+				"importedproject,soundfontfile,patchfile,vstpluginfile,projectfile,"
 				"track_%1,track_%2" ).
 						arg( Track::InstrumentTrack ).
 						arg( Track::SampleTrack ) );
 }
 
-void TrackContainerView::selectRegionFromPixels(int xStart, int xEnd)
-{
-	m_rubberBand->setEnabled( true );
-	m_rubberBand->show();
-	m_rubberBand->setGeometry( min( xStart, xEnd ), 0, max( xStart, xEnd ) - min( xStart, xEnd ), std::numeric_limits<int>::max() );
-}
+
+
 
 void TrackContainerView::stopRubberBand()
 {
@@ -384,13 +375,15 @@ void TrackContainerView::dropEvent( QDropEvent * _de )
 		_de->accept();
 	}
 	else if( type == "samplefile" || type == "pluginpresetfile" 
-		|| type == "soundfontfile" || type == "vstpluginfile")
+		|| type == "soundfontfile" || type == "vstpluginfile"
+		|| type == "patchfile" )
 	{
 		InstrumentTrack * it = dynamic_cast<InstrumentTrack *>(
 				Track::create( Track::InstrumentTrack,
 								m_tc ) );
-		Instrument * i = it->loadInstrument(
-			pluginFactory->pluginSupportingExtension(FileItem::extension(value)).name());
+		PluginFactory::PluginInfoAndKey piakn =
+			pluginFactory->pluginSupportingExtension(FileItem::extension(value));
+		Instrument * i = it->loadInstrument(piakn.info.name(), &piakn.key);
 		i->loadFile( value );
 		//it->toggledInstrumentTrackButton( true );
 		_de->accept();
@@ -432,50 +425,18 @@ void TrackContainerView::dropEvent( QDropEvent * _de )
 
 
 
-void TrackContainerView::mousePressEvent( QMouseEvent * _me )
-{
-	if( allowRubberband() == true )
-	{
-		m_origin = m_scrollArea->mapFromParent( _me->pos() );
-		m_rubberBand->setEnabled( true );
-		m_rubberBand->setGeometry( QRect( m_origin, QSize() ) );
-		m_rubberBand->show();
-	}
-	QWidget::mousePressEvent( _me );
-}
-
-
-
-
-void TrackContainerView::mouseMoveEvent( QMouseEvent * _me )
-{
-	if( rubberBandActive() == true )
-	{
-		m_rubberBand->setGeometry( QRect( m_origin,
-				m_scrollArea->mapFromParent( _me->pos() ) ).
-								normalized() );
-	}
-	QWidget::mouseMoveEvent( _me );
-}
-
-
-
-
-void TrackContainerView::mouseReleaseEvent( QMouseEvent * _me )
-{
-	m_rubberBand->hide();
-	m_rubberBand->setEnabled( false );
-	QWidget::mouseReleaseEvent( _me );
-}
-
-
-
-
-
 void TrackContainerView::resizeEvent( QResizeEvent * _re )
 {
 	realignTracks();
 	QWidget::resizeEvent( _re );
+}
+
+
+
+
+RubberBand *TrackContainerView::rubberBand() const
+{
+	return m_rubberBand;
 }
 
 
@@ -487,7 +448,6 @@ TrackContainerView::scrollArea::scrollArea( TrackContainerView * _parent ) :
 {
 	setFrameStyle( QFrame::NoFrame );
 	setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
-	setVerticalScrollBarPolicy( Qt::ScrollBarAlwaysOn );
 }
 
 
@@ -529,7 +489,8 @@ InstrumentLoaderThread::InstrumentLoaderThread( QObject *parent, InstrumentTrack
 
 void InstrumentLoaderThread::run()
 {
-	Instrument *i = m_it->loadInstrument( m_name );
+	Instrument *i = m_it->loadInstrument(m_name, nullptr,
+				true /*always DnD*/);
 	QObject *parent = i->parent();
 	i->setParent( 0 );
 	i->moveToThread( m_containerThread );

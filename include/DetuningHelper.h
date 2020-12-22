@@ -4,7 +4,7 @@
  * Copyright (c) 2007 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
  * Copyright (c) 2008-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -43,17 +43,17 @@ public:
 	{
 	}
 
-	virtual float defaultValue() const
+	float defaultValue() const override
 	{
 		return 0;
 	}
 
-	virtual QString displayName() const
+	QString displayName() const override
 	{
 		return tr( "Note detuning" );
 	}
 
-	inline virtual QString nodeName() const
+	inline QString nodeName() const override
 	{
 		return "detuning";
 	}

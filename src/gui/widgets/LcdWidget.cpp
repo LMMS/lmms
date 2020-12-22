@@ -4,7 +4,7 @@
  * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * Copyright (c) 2008 Paul Giblock <pgllama/at/gmail.com>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -29,11 +29,10 @@
 #include <QLabel>
 #include <QMouseEvent>
 #include <QPainter>
-#include <QFontMetrics>
 #include <QStyleOptionFrameV2>
 
 #include "LcdWidget.h"
-#include "Engine.h"
+#include "DeprecationHelper.h"
 #include "embed.h"
 #include "gui_templates.h"
 #include "MainWindow.h"
@@ -41,41 +40,31 @@
 
 
 
-//! @todo: in C++11, we can use delegating ctors
-#define DEFAULT_LCDWIDGET_INITIALIZER_LIST \
-	QWidget( parent ), \
-	m_label(), \
-	m_textColor( 255, 255, 255 ), \
-	m_textShadowColor( 64, 64, 64 )
-
 LcdWidget::LcdWidget( QWidget* parent, const QString& name ) :
-	DEFAULT_LCDWIDGET_INITIALIZER_LIST,
-	m_numDigits( 1 )
+	LcdWidget( 1, parent, name )
 {
-	initUi( name );
 }
 
 
 
 
 LcdWidget::LcdWidget( int numDigits, QWidget* parent, const QString& name ) :
-	DEFAULT_LCDWIDGET_INITIALIZER_LIST,
-	m_numDigits( numDigits )
+	LcdWidget( numDigits, QString("19green"), parent, name )
 {
-	initUi( name );
 }
 
 
 
 
 LcdWidget::LcdWidget( int numDigits, const QString& style, QWidget* parent, const QString& name ) :
-	DEFAULT_LCDWIDGET_INITIALIZER_LIST,
+	QWidget( parent ),
+	m_label(),
+	m_textColor( 255, 255, 255 ),
+	m_textShadowColor( 64, 64, 64 ),
 	m_numDigits( numDigits )
 {
 	initUi( name, style );
 }
-
-#undef DEFAULT_LCDWIDGET_INITIALIZER_LIST
 
 
 
@@ -211,13 +200,13 @@ void LcdWidget::paintEvent( QPaintEvent* )
 	{
 		p.setFont( pointSizeF( p.font(), 6.5 ) );
 		p.setPen( textShadowColor() );
-		p.drawText( width() / 2 -
-				p.fontMetrics().width( m_label ) / 2 + 1,
-						height(), m_label );
+		p.drawText(width() / 2 -
+				horizontalAdvance(p.fontMetrics(), m_label) / 2 + 1,
+						height(), m_label);
 		p.setPen( textColor() );
-		p.drawText( width() / 2 -
-				p.fontMetrics().width( m_label ) / 2,
-						height() - 1, m_label );
+		p.drawText(width() / 2 -
+				horizontalAdvance(p.fontMetrics(), m_label) / 2,
+						height() - 1, m_label);
 	}
 
 }
@@ -252,10 +241,10 @@ void LcdWidget::updateSize()
 				m_cellHeight + (2*margin) );
 	}
 	else {
-		setFixedSize( qMax<int>(
+		setFixedSize(qMax<int>(
 				m_cellWidth * m_numDigits + 2*(margin+m_marginWidth),
-				QFontMetrics( pointSizeF( font(), 6.5 ) ).width( m_label ) ),
-				m_cellHeight + (2*margin) + 9 );
+				horizontalAdvance(QFontMetrics(pointSizeF(font(), 6.5)), m_label)),
+				m_cellHeight + (2*margin) + 9);
 	}
 
 	update();

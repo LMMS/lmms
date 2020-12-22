@@ -3,7 +3,7 @@
  * Copyright (c) 2014 Vesa Kivimäki
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -22,13 +22,11 @@
  *
  */
 
-
 #include <QDomElement>
 
 #include "Nes.h"
 #include "Engine.h"
 #include "InstrumentTrack.h"
-#include "templates.h"
 #include "ToolTip.h"
 #include "Song.h"
 #include "lmms_math.h"
@@ -36,7 +34,8 @@
 #include "Mixer.h"
 #include "Oscillator.h"
 
-#include "embed.cpp"
+#include "embed.h"
+#include "plugin_export.h"
 
 extern "C"
 {
@@ -45,7 +44,7 @@ Plugin::Descriptor PLUGIN_EXPORT nes_plugin_descriptor =
 {
 	STRINGIFY( PLUGIN_NAME ),
 	"Nescaline",
-	QT_TRANSLATE_NOOP( "pluginBrowser",
+	QT_TRANSLATE_NOOP( "PluginBrowser",
 				"A NES-like synthesizer" ),
 	"Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>",
 	0x0100,
@@ -487,18 +486,18 @@ void NesObject::updatePitch()
 NesInstrument::NesInstrument( InstrumentTrack * instrumentTrack ) :
 	Instrument( instrumentTrack, &nes_plugin_descriptor ),
 	m_ch1Enabled( true, this ),
-	m_ch1Crs( 0.f, -24.f, 24.f, 1.f, this, tr( "Channel 1 Coarse detune" ) ),
-	m_ch1Volume( 15.f, 0.f, 15.f, 1.f, this, tr( "Channel 1 Volume" ) ),
+	m_ch1Crs( 0.f, -24.f, 24.f, 1.f, this, tr( "Channel 1 coarse detune" ) ),
+	m_ch1Volume( 15.f, 0.f, 15.f, 1.f, this, tr( "Channel 1 volume" ) ),
 	
 	m_ch1EnvEnabled( false, this ),
 	m_ch1EnvLooped( false, this ),
-	m_ch1EnvLen( 0.f, 0.f, 15.f, 1.f, this, tr( "Channel 1 Envelope length" ) ),
+	m_ch1EnvLen( 0.f, 0.f, 15.f, 1.f, this, tr( "Channel 1 envelope length" ) ),
 	
-	m_ch1DutyCycle( 0, 0, 3, this, tr( "Channel 1 Duty cycle" ) ),
+	m_ch1DutyCycle( 0, 0, 3, this, tr( "Channel 1 duty cycle" ) ),
 	
 	m_ch1SweepEnabled( false, this ),
-	m_ch1SweepAmt( 0.f, -7.f, 7.f, 1.f, this, tr( "Channel 1 Sweep amount" ) ),
-	m_ch1SweepRate( 0.f, 0.f, 7.f, 1.f, this, tr( "Channel 1 Sweep rate" ) ),
+	m_ch1SweepAmt( 0.f, -7.f, 7.f, 1.f, this, tr( "Channel 1 sweep amount" ) ),
+	m_ch1SweepRate( 0.f, 0.f, 7.f, 1.f, this, tr( "Channel 1 sweep rate" ) ),
 	
 	m_ch2Enabled( true, this ),
 	m_ch2Crs( 0.f, -24.f, 24.f, 1.f, this, tr( "Channel 2 Coarse detune" ) ),
@@ -506,41 +505,41 @@ NesInstrument::NesInstrument( InstrumentTrack * instrumentTrack ) :
 	
 	m_ch2EnvEnabled( false, this ),
 	m_ch2EnvLooped( false, this ),
-	m_ch2EnvLen( 0.f, 0.f, 15.f, 1.f, this, tr( "Channel 2 Envelope length" ) ),
+	m_ch2EnvLen( 0.f, 0.f, 15.f, 1.f, this, tr( "Channel 2 envelope length" ) ),
 	
-	m_ch2DutyCycle( 2, 0, 3, this, tr( "Channel 2 Duty cycle" ) ),
+	m_ch2DutyCycle( 2, 0, 3, this, tr( "Channel 2 duty cycle" ) ),
 	
 	m_ch2SweepEnabled( false, this ),
-	m_ch2SweepAmt( 0.f, -7.f, 7.f, 1.f, this, tr( "Channel 2 Sweep amount" ) ),
-	m_ch2SweepRate( 0.f, 0.f, 7.f, 1.f, this, tr( "Channel 2 Sweep rate" ) ),
+	m_ch2SweepAmt( 0.f, -7.f, 7.f, 1.f, this, tr( "Channel 2 sweep amount" ) ),
+	m_ch2SweepRate( 0.f, 0.f, 7.f, 1.f, this, tr( "Channel 2 sweep rate" ) ),
 	
 	//channel 3
 	m_ch3Enabled( true, this ),
-	m_ch3Crs( 0.f, -24.f, 24.f, 1.f, this, tr( "Channel 3 Coarse detune" ) ),
-	m_ch3Volume( 15.f, 0.f, 15.f, 1.f, this, tr( "Channel 3 Volume" ) ),
+	m_ch3Crs( 0.f, -24.f, 24.f, 1.f, this, tr( "Channel 3 coarse detune" ) ),
+	m_ch3Volume( 15.f, 0.f, 15.f, 1.f, this, tr( "Channel 3 volume" ) ),
 
 	//channel 4
-	m_ch4Enabled( true, this ),
-	m_ch4Volume( 15.f, 0.f, 15.f, 1.f, this, tr( "Channel 4 Volume" ) ),
+	m_ch4Enabled( false, this ),
+	m_ch4Volume( 15.f, 0.f, 15.f, 1.f, this, tr( "Channel 4 volume" ) ),
 	
 	m_ch4EnvEnabled( false, this ),
 	m_ch4EnvLooped( false, this ),
-	m_ch4EnvLen( 0.f, 0.f, 15.f, 1.f, this, tr( "Channel 4 Envelope length" ) ),
+	m_ch4EnvLen( 0.f, 0.f, 15.f, 1.f, this, tr( "Channel 4 envelope length" ) ),
 	
 	m_ch4NoiseMode( false, this ),
 	m_ch4NoiseFreqMode( false, this ),
-	m_ch4NoiseFreq( 0.f, 0.f, 15.f, 1.f, this, tr( "Channel 4 Noise frequency" ) ), 
+	m_ch4NoiseFreq( 0.f, 0.f, 15.f, 1.f, this, tr( "Channel 4 noise frequency" ) ),
 	
-	m_ch4Sweep( 0.f, -7.f, 7.f, 1.f, this, tr( "Channel 4 Noise frequency sweep" ) ), 
+	m_ch4Sweep( 0.f, -7.f, 7.f, 1.f, this, tr( "Channel 4 noise frequency sweep" ) ),
 	m_ch4NoiseQuantize( true, this ),
 	
 	//master
 	m_masterVol( 1.0f, 0.0f, 2.0f, 0.01f, this, tr( "Master volume" ) ),
 	m_vibrato( 0.0f, 0.0f, 15.0f, 1.0f, this, tr( "Vibrato" ) )
 {
-	connect( &m_ch1Crs, SIGNAL( dataChanged() ), this, SLOT( updateFreq1() ) );
-	connect( &m_ch2Crs, SIGNAL( dataChanged() ), this, SLOT( updateFreq2() ) );
-	connect( &m_ch3Crs, SIGNAL( dataChanged() ), this, SLOT( updateFreq3() ) );
+	connect( &m_ch1Crs, SIGNAL( dataChanged() ), this, SLOT( updateFreq1() ), Qt::DirectConnection );
+	connect( &m_ch2Crs, SIGNAL( dataChanged() ), this, SLOT( updateFreq2() ), Qt::DirectConnection );
+	connect( &m_ch3Crs, SIGNAL( dataChanged() ), this, SLOT( updateFreq3() ), Qt::DirectConnection );
 	
 	updateFreq1();
 	updateFreq2();
@@ -732,7 +731,7 @@ QPixmap * NesInstrumentView::s_artwork = NULL;
 
 
 NesInstrumentView::NesInstrumentView( Instrument * instrument,	QWidget * parent ) :
-	InstrumentView( instrument, parent )
+	InstrumentViewFixedSize( instrument, parent )
 {
 	setAutoFillBackground( true );
 	QPalette pal;
@@ -843,7 +842,7 @@ NesInstrumentView::NesInstrumentView( Instrument * instrument,	QWidget * parent 
 
 	
 	//master
-	makeknob( m_masterVolKnob, KNOB_X4, KNOB_Y3, tr( "Master Volume" ), "", "" )
+	makeknob( m_masterVolKnob, KNOB_X4, KNOB_Y3, tr( "Master volume" ), "", "" )
 	makeknob( m_vibratoKnob, KNOB_X5, KNOB_Y3, tr( "Vibrato" ), "", "" )
 
 }
@@ -918,9 +917,9 @@ extern "C"
 {
 
 // necessary for getting instance out of shared lib
-Plugin * PLUGIN_EXPORT lmms_plugin_main( Model *, void * _data )
+PLUGIN_EXPORT Plugin * lmms_plugin_main( Model *m, void * _data )
 {
-	return( new NesInstrument( static_cast<InstrumentTrack *>( _data ) ) );
+	return( new NesInstrument( static_cast<InstrumentTrack *>( m ) ) );
 }
 
 

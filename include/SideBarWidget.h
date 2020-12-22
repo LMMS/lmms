@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -28,6 +28,7 @@
 #include <QPixmap>
 #include <QVBoxLayout>
 #include <QWidget>
+#include <QPushButton>
 
 
 class SideBarWidget : public QWidget
@@ -47,11 +48,13 @@ public:
 		return m_title;
 	}
 
+signals:
+	void closeButtonClicked();
 
 protected:
-	virtual void paintEvent( QPaintEvent * _pe );
-	virtual void resizeEvent( QResizeEvent * _re );
-	virtual void contextMenuEvent( QContextMenuEvent * )
+	void paintEvent( QPaintEvent * _pe ) override;
+	void resizeEvent( QResizeEvent * _re ) override;
+	void contextMenuEvent( QContextMenuEvent * ) override
 	{
 	}
 
@@ -70,12 +73,13 @@ protected:
 		m_layout->addLayout( _l );
 	}
 
-
 private:
 	QWidget * m_contents;
 	QVBoxLayout * m_layout;
 	QString m_title;
 	QPixmap m_icon;
+	QPushButton * m_closeBtn;
+	const QSize m_buttonSize;
 
 } ;
 

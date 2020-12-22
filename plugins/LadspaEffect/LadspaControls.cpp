@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2008-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -36,7 +36,8 @@ LadspaControls::LadspaControls( LadspaEffect * _eff ) :
 {
 
 	connect( &m_stereoLinkModel, SIGNAL( dataChanged() ),
-				this, SLOT( updateLinkStatesFromGlobal() ) );
+				this, SLOT( updateLinkStatesFromGlobal() ),
+				Qt::DirectConnection );
 
 	multi_proc_t controls = m_effect->getPortControls();
 	m_controlCount = controls.count();
@@ -59,7 +60,8 @@ LadspaControls::LadspaControls( LadspaEffect * _eff ) :
 				if( linked_control )
 				{
 					connect( (*it)->control, SIGNAL( linkChanged( int, bool ) ),
-								this, SLOT( linkPort( int, bool ) ) );
+								this, SLOT( linkPort( int, bool ) ),
+								Qt::DirectConnection );
 				}
 			}
 		}
@@ -153,6 +155,9 @@ void LadspaControls::linkPort( int _port, bool _state )
 		{
 			first->unlinkControls( m_controls[proc][_port] );
 		}
+
+		// m_stereoLinkModel.setValue() will call updateLinkStatesFromGlobal()
+		// m_noLink will make sure that this will not unlink any other ports
 		m_noLink = true;
 		m_stereoLinkModel.setValue( false );
 	}

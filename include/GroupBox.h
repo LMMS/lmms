@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -42,7 +42,7 @@ public:
 	GroupBox( const QString & _caption, QWidget * _parent = NULL );
 	virtual ~GroupBox();
 
-	virtual void modelChanged();
+	void modelChanged() override;
 
 	PixmapButton * ledButton()
 	{
@@ -56,8 +56,8 @@ public:
 
 
 protected:
-	virtual void mousePressEvent( QMouseEvent * _me );
-	virtual void resizeEvent( QResizeEvent * _re );
+	void mousePressEvent( QMouseEvent * _me ) override;
+	void paintEvent( QPaintEvent * _pe ) override;
 
 
 private:
@@ -70,7 +70,6 @@ private:
 } ;
 
 
-typedef BoolModel groupBoxModel;
 
 
 #endif

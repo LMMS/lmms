@@ -4,7 +4,7 @@
  * Copyright (c) 2008 Paul Giblock <drfaygo/at/gmail/dot/com>
  * Copyright (c) 2009-2011 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -29,7 +29,6 @@
 #include "PeakController.h"
 #include "peak_controller_effect_controls.h"
 #include "peak_controller_effect.h"
-#include "PresetPreviewPlayHandle.h"
 #include "Song.h"
 
 
@@ -43,8 +42,8 @@ PeakControllerEffectControls( PeakControllerEffect * _eff ) :
 	m_decayModel( 0, 0, 0.999, 0.001, this, tr( "Release" ) ),
 	m_tresholdModel( 0, 0, 1.0, 0.001, this, tr( "Treshold" ) ),
 	m_muteModel( false, this, tr( "Mute output" ) ),
-	m_absModel( true, this, tr("Abs Value") ),
-	m_amountMultModel( 1.0, 0, 32, 0.2, this, tr("Amount Multiplicator") )
+	m_absModel( true, this, tr("Absolute value") ),
+	m_amountMultModel( 1.0, 0, 32, 0.2, this, tr("Amount multiplicator") )
 {
 }
 
@@ -54,6 +53,7 @@ PeakControllerEffectControls( PeakControllerEffect * _eff ) :
 void PeakControllerEffectControls::loadSettings( const QDomElement & _this )
 {
 	m_baseModel.loadSettings( _this, "base" );
+	m_effect->m_lastSample = m_baseModel.value(); //Set initial Peak Controller output to Base
 	m_amountModel.loadSettings( _this, "amount" );
 	m_muteModel.loadSettings( _this, "mute" );
 
@@ -78,13 +78,8 @@ void PeakControllerEffectControls::loadSettings( const QDomElement & _this )
 	}
 	else
 	{
+		// TODO: Fix possible collision
 		m_effect->m_effectId = rand();
-	}
-
-	if( m_effect->m_autoController && PresetPreviewPlayHandle::isPreviewing() == true )
-	{
-		delete m_effect->m_autoController;
-		m_effect->m_autoController = 0;
 	}
 }
 

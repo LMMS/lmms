@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -79,13 +79,13 @@ public:
 	virtual ~RubberBand();
 
 	QVector<selectableObject *> selectedObjects() const;
+	QVector<selectableObject *> selectableObjects() const;
 
 
 protected:
-	virtual void resizeEvent( QResizeEvent * _re );
+	void resizeEvent( QResizeEvent * _re ) override;
 
 private:
-	QVector<selectableObject *> selectableObjects() const;
 
 };
 

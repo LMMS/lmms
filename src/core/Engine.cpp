@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2006-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -28,15 +28,13 @@
 #include "ConfigManager.h"
 #include "FxMixer.h"
 #include "Ladspa2LMMS.h"
+#include "Lv2Manager.h"
 #include "Mixer.h"
+#include "Plugin.h"
 #include "PresetPreviewPlayHandle.h"
 #include "ProjectJournal.h"
-#include "Plugin.h"
-#include "PluginFactory.h"
 #include "Song.h"
 #include "BandLimitedWave.h"
-
-#include "GuiApplication.h"
 
 float LmmsCore::s_framesPerTick;
 Mixer* LmmsCore::s_mixer = NULL;
@@ -44,8 +42,11 @@ FxMixer * LmmsCore::s_fxMixer = NULL;
 BBTrackContainer * LmmsCore::s_bbTrackContainer = NULL;
 Song * LmmsCore::s_song = NULL;
 ProjectJournal * LmmsCore::s_projectJournal = NULL;
+#ifdef LMMS_HAVE_LV2
+Lv2Manager * LmmsCore::s_lv2Manager = nullptr;
+#endif
 Ladspa2LMMS * LmmsCore::s_ladspaManager = NULL;
-DummyTrackContainer * LmmsCore::s_dummyTC = NULL;
+void* LmmsCore::s_dndPluginKey = nullptr;
 
 
 
@@ -65,6 +66,10 @@ void LmmsCore::init( bool renderOnly )
 	s_fxMixer = new FxMixer;
 	s_bbTrackContainer = new BBTrackContainer;
 
+#ifdef LMMS_HAVE_LV2
+	s_lv2Manager = new Lv2Manager;
+	s_lv2Manager->initPlugins();
+#endif
 	s_ladspaManager = new Ladspa2LMMS;
 
 	s_projectJournal->setJournalling( true );
@@ -73,7 +78,6 @@ void LmmsCore::init( bool renderOnly )
 	s_mixer->initDevices();
 
 	PresetPreviewPlayHandle::init();
-	s_dummyTC = new DummyTrackContainer;
 
 	emit engine->initProgress(tr("Launching mixer threads"));
 	s_mixer->startProcessing();
@@ -92,11 +96,13 @@ void LmmsCore::destroy()
 	s_song->clearProject();
 
 	deleteHelper( &s_bbTrackContainer );
-	deleteHelper( &s_dummyTC );
 
 	deleteHelper( &s_fxMixer );
 	deleteHelper( &s_mixer );
 
+#ifdef LMMS_HAVE_LV2
+	deleteHelper( &s_lv2Manager );
+#endif
 	deleteHelper( &s_ladspaManager );
 
 	//delete ConfigManager::inst();
@@ -110,10 +116,48 @@ void LmmsCore::destroy()
 
 
 
+bool LmmsCore::ignorePluginBlacklist()
+{
+	const char* envVar = getenv("LMMS_IGNORE_BLACKLIST");
+	return (envVar && *envVar);
+}
+
+
+
+
+float LmmsCore::framesPerTick(sample_rate_t sampleRate)
+{
+	return sampleRate * 60.0f * 4 /
+			DefaultTicksPerBar / s_song->getTempo();
+}
+
+
+
+
 void LmmsCore::updateFramesPerTick()
 {
 	s_framesPerTick = s_mixer->processingSampleRate() * 60.0f * 4 /
-				DefaultTicksPerTact / s_song->getTempo();
+				DefaultTicksPerBar / s_song->getTempo();
 }
+
+
+
+
+void LmmsCore::setDndPluginKey(void *newKey)
+{
+	Q_ASSERT(static_cast<Plugin::Descriptor::SubPluginFeatures::Key*>(newKey));
+	s_dndPluginKey = newKey;
+}
+
+
+
+
+void *LmmsCore::pickDndPluginKey()
+{
+	return s_dndPluginKey;
+}
+
+
+
 
 LmmsCore * LmmsCore::s_instanceOfMe = NULL;

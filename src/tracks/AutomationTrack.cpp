@@ -5,7 +5,7 @@
  * Copyright (c) 2008-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * Copyright (c) 2006-2008 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -40,50 +40,9 @@ AutomationTrack::AutomationTrack( TrackContainer* tc, bool _hidden ) :
 	setName( tr( "Automation track" ) );
 }
 
-
-
-
-AutomationTrack::~AutomationTrack()
-{
-}
-
-
-
-
-bool AutomationTrack::play( const MidiTime & _start, const fpp_t _frames,
+bool AutomationTrack::play( const TimePos & time_start, const fpp_t _frames,
 							const f_cnt_t _frame_base, int _tco_num )
 {
-	if( isMuted() )
-	{
-		return false;
-	}
-
-	tcoVector tcos;
-	if( _tco_num >= 0 )
-	{
-		TrackContentObject * tco = getTCO( _tco_num );
-		tcos.push_back( tco );
-	}
-	else
-	{
-		getTCOsInRange( tcos, _start, _start + static_cast<int>(
-					_frames / Engine::framesPerTick()) );
-	}
-
-	for( tcoVector::iterator it = tcos.begin(); it != tcos.end(); ++it )
-	{
-		AutomationPattern * p = dynamic_cast<AutomationPattern *>( *it );
-		if( p == NULL || ( *it )->isMuted() )
-		{
-			continue;
-		}
-		MidiTime cur_start = _start;
-		if( _tco_num < 0 )
-		{
-			cur_start -= p->startPosition();
-		}
-		p->processMidiTime( cur_start );
-	}
 	return false;
 }
 
@@ -98,9 +57,11 @@ TrackView * AutomationTrack::createView( TrackContainerView* tcv )
 
 
 
-TrackContentObject * AutomationTrack::createTCO( const MidiTime & )
+TrackContentObject* AutomationTrack::createTCO(const TimePos & pos)
 {
-	return new AutomationPattern( this );
+	AutomationPattern* p = new AutomationPattern(this);
+	p->movePosition(pos);
+	return p;
 }
 
 
@@ -139,16 +100,6 @@ AutomationTrackView::AutomationTrackView( AutomationTrack * _at, TrackContainerV
 	setModel( _at );
 }
 
-
-
-
-AutomationTrackView::~AutomationTrackView()
-{
-}
-
-
-
-
 void AutomationTrackView::dragEnterEvent( QDragEnterEvent * _dee )
 {
 	StringPairDrag::processDragEnterEvent( _dee, "automatable_model" );
@@ -168,13 +119,13 @@ void AutomationTrackView::dropEvent( QDropEvent * _de )
 					journallingObject( val.toInt() ) );
 		if( mod != NULL )
 		{
-			MidiTime pos = MidiTime( trackContainerView()->
+			TimePos pos = TimePos( trackContainerView()->
 							currentPosition() +
 				( _de->pos().x() -
 					getTrackContentWidget()->x() ) *
-						MidiTime::ticksPerTact() /
-		static_cast<int>( trackContainerView()->pixelsPerTact() ) )
-				.toAbsoluteTact();
+						TimePos::ticksPerBar() /
+		static_cast<int>( trackContainerView()->pixelsPerBar() ) )
+				.toAbsoluteBar();
 
 			if( pos.getTicks() < 0 )
 			{
@@ -184,7 +135,6 @@ void AutomationTrackView::dropEvent( QDropEvent * _de )
 			TrackContentObject * tco = getTrack()->createTCO( pos );
 			AutomationPattern * pat = dynamic_cast<AutomationPattern *>( tco );
 			pat->addObject( mod );
-			pat->movePosition( pos );
 		}
 	}
 

@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2008 Csaba Hruska <csaba.hruska/at/gmail.com>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -34,6 +34,7 @@ class AudioPortAudioSetupUtil : public QObject
 {
 	Q_OBJECT
 public slots:
+	void updateBackends();
 	void updateDevices();
 	void updateChannels();
 
@@ -71,7 +72,7 @@ public:
 
 	inline static QString name()
 	{
-		return QT_TRANSLATE_NOOP( "setupWidget", "PortAudio" );
+		return QT_TRANSLATE_NOOP( "AudioDeviceSetupWidget", "PortAudio" );
 	}
 
 
@@ -87,6 +88,7 @@ public:
 		virtual ~setupWidget();
 
 		virtual void saveSettings();
+		virtual void show();
 
 	private:
 		ComboBox * m_backend;
@@ -145,7 +147,6 @@ private:
 	int m_outBufSize;
 
 	bool m_stopped;
-	QSemaphore m_stopSemaphore;
 
 } ;
 

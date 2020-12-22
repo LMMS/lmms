@@ -5,7 +5,7 @@
  * Copyright (c) 2006-2008 Danny McRae <khjklujn/at/users.sourceforge.net>
  * Copyright (c) 2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -38,8 +38,8 @@
 #include "TabBar.h"
 #include "TabButton.h"
 
-#include "embed.cpp"
-
+#include "embed.h"
+#include "plugin_export.h"
 
 
 extern "C"
@@ -49,19 +49,19 @@ Plugin::Descriptor PLUGIN_EXPORT ladspabrowser_plugin_descriptor =
 {
 	STRINGIFY( PLUGIN_NAME ),
 	"LADSPA Plugin Browser",
-	QT_TRANSLATE_NOOP( "pluginBrowser",
+	QT_TRANSLATE_NOOP( "PluginBrowser",
 				"List installed LADSPA plugins" ),
 	"Danny McRae <khjklujn/at/users.sourceforge.net>",
 	0x0100,
 	Plugin::Tool,
-	new PluginPixmapLoader( "logo" ),
+	new PluginPixmapLoader("logo"),
 	NULL,
 	NULL
 } ;
 
 
 // necessary for getting instance out of shared lib
-Plugin * PLUGIN_EXPORT lmms_plugin_main( Model * _parent, void * _data )
+PLUGIN_EXPORT Plugin * lmms_plugin_main( Model * _parent, void * _data )
 {
 	return new ladspaBrowser;
 }
@@ -144,33 +144,6 @@ ladspaBrowserView::ladspaBrowserView( ToolPlugin * _tool ) :
 	hlayout->addWidget( ws );
 	hlayout->addSpacing( 10 );
 	hlayout->addStretch();
-
-	setWhatsThis( tr(
-"This dialog displays information on all of the LADSPA plugins LMMS was "
-"able to locate. The plugins are divided into five categories based "
-"upon an interpretation of the port types and names.\n\n"
-
-"Available Effects are those that can be used by LMMS. In order for LMMS "
-"to be able to use an effect, it must, first and foremost, be an effect, "
-"which is to say, it has to have both input channels and output channels. "
-"LMMS identifies an input channel as an audio rate port containing 'in' in "
-"the name. Output channels are identified by the letters 'out'. Furthermore, "
-"the effect must have the same number of inputs and outputs and be real time "
-"capable.\n\n"
-
-"Unavailable Effects are those that were identified as effects, but either "
-"didn't have the same number of input and output channels or weren't real "
-"time capable.\n\n"
-
-"Instruments are plugins for which only output channels were identified.\n\n"
-
-"Analysis Tools are plugins for which only input channels were identified.\n\n"
-
-"Don't Knows are plugins for which no input or output channels were "
-"identified.\n\n"
-
-"Double clicking any of the plugins will bring up information on the "
-"ports." ) );
 
 	hide();
 	if( parentWidget() )

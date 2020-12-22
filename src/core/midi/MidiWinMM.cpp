@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2008-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -23,12 +23,7 @@
  */
 
 #include "MidiWinMM.h"
-#include "ConfigManager.h"
-#include "Engine.h"
-#include "gui_templates.h"
-#include "MidiPort.h"
 #include "Note.h"
-
 
 #ifdef LMMS_BUILD_WIN32
 
@@ -54,7 +49,7 @@ MidiWinMM::~MidiWinMM()
 
 
 
-void MidiWinMM::processOutEvent( const MidiEvent& event, const MidiTime& time, const MidiPort* port )
+void MidiWinMM::processOutEvent( const MidiEvent& event, const TimePos& time, const MidiPort* port )
 {
 	const DWORD shortMsg = ( event.type() + event.channel() ) +
 				( ( event.param( 0 ) & 0xff ) << 8 ) +
@@ -253,9 +248,13 @@ void MidiWinMM::closeDevices()
 	m_outputSubs.clear();
 
 	QMapIterator<HMIDIIN, QString> i( m_inputDevices );
+
+	HMIDIIN hInDev;
 	while( i.hasNext() )
 	{
-		midiInClose( i.next().key() );
+		hInDev = i.next().key();
+		midiInReset( hInDev );
+		midiInClose( hInDev );
 	}
 
 	QMapIterator<HMIDIOUT, QString> o( m_outputDevices );

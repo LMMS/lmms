@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2006-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -32,25 +32,27 @@
 #include "Plugin.h"
 
 
-class EXPORT ExportFilter : public Plugin
+class LMMS_EXPORT ExportFilter : public Plugin
 {
 public:
 	ExportFilter( const Descriptor * _descriptor ) : Plugin( _descriptor, NULL ) {}
 	virtual ~ExportFilter() {}
 
 
-	virtual bool tryExport( const TrackContainer::TrackList &tracks, int tempo, const QString &filename ) = 0;
+	virtual bool tryExport(const TrackContainer::TrackList &tracks,
+				const TrackContainer::TrackList &tracksBB,
+				int tempo, int masterPitch, const QString &filename ) = 0;
 protected:
 
-	virtual void saveSettings( QDomDocument &, QDomElement & )
+	void saveSettings( QDomDocument &, QDomElement & ) override
 	{
 	}
 
-	virtual void loadSettings( const QDomElement & )
+	void loadSettings( const QDomElement & ) override
 	{
 	}
 
-	virtual QString nodeName() const
+	QString nodeName() const override
 	{
 		return "import_filter";
 	}

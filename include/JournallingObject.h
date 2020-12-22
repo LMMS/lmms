@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2006-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -31,7 +31,7 @@
 #include "SerializingObject.h"
 
 
-class EXPORT JournallingObject : public SerializingObject
+class LMMS_EXPORT JournallingObject : public SerializingObject
 {
 public:
 	JournallingObject();
@@ -59,9 +59,9 @@ public:
 	void addJournalCheckPoint();
 
 	virtual QDomElement saveState( QDomDocument & _doc,
-									QDomElement & _parent );
+									QDomElement & _parent ) override;
 
-	virtual void restoreState( const QDomElement & _this );
+	void restoreState( const QDomElement & _this ) override;
 
 	inline bool isJournalling() const
 	{

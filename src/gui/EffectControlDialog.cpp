@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2006-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -28,7 +28,6 @@
 
 #include "EffectControlDialog.h"
 #include "EffectControls.h"
-#include "Effect.h"
 
 
 EffectControlDialog::EffectControlDialog( EffectControls * _controls ) :
@@ -37,6 +36,7 @@ EffectControlDialog::EffectControlDialog( EffectControls * _controls ) :
 	m_effectControls( _controls )
 {
 	setWindowTitle( m_effectControls->effect()->displayName() );
+	setSizePolicy( QSizePolicy::Preferred, QSizePolicy::Preferred );
 }
 
 

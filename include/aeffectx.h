@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2006 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -26,10 +26,15 @@
 #ifndef AEFFECTX_H
 #define AEFFECTX_H
 
-#define CCONST(a, b, c, d)( ( ( (int) a ) << 24 ) |		\
-				( ( (int) b ) << 16 ) |		\
-				( ( (int) c ) << 8 ) |		\
-				( ( (int) d ) << 0 ) )
+#include <stdint.h>
+
+// Calling convention
+#define VST_CALL_CONV __cdecl
+
+#define CCONST(a, b, c, d)( ( ( (int32_t) a ) << 24 ) |		\
+				( ( (int32_t) b ) << 16 ) |		\
+				( ( (int32_t) c ) << 8 ) |		\
+				( ( (int32_t) d ) << 0 ) )
 
 const int audioMasterAutomate = 0;
 const int audioMasterVersion = 1;
@@ -92,6 +97,8 @@ const int effClose = 1; // currently unused
 const int effSetProgram = 2; // currently unused
 const int effGetProgram = 3; // currently unused
 const int effGetProgramName = 5; // currently unused
+const int effGetParamLabel = 6;
+const int effGetParamDisplay = 7;
 const int effGetParamName = 8; // currently unused
 const int effSetSampleRate = 10;
 const int effSetBlockSize = 11;
@@ -101,6 +108,7 @@ const int effEditOpen = 14;
 const int effEditClose = 15;
 const int effEditIdle = 19;
 const int effEditTop = 20;
+const int effSetChunk = 24;
 const int effProcessEvents = 25;
 const int effGetEffectName = 45;
 const int effGetVendorString = 47;
@@ -146,17 +154,17 @@ class VstMidiEvent
 {
 public:
 	// 00
-	int type;
+	int32_t type;
 	// 04
-	int byteSize;
+	int32_t byteSize;
 	// 08
-	int deltaFrames;
+	int32_t deltaFrames;
 	// 0c?
-	int flags;
+	int32_t flags;
 	// 10?
-	int noteLength;
+	int32_t noteLength;
 	// 14?
-	int noteOffset;
+	int32_t noteOffset;
 	// 18
 	char midiData[4];
 	// 1c?
@@ -186,7 +194,7 @@ class VstEvents
 {
 public:
 	// 00
-	int numEvents;
+	int32_t numEvents;
 	// 04
 	void *reserved;
 	// 08
@@ -200,25 +208,25 @@ class AEffect
 public:
 	// Never use virtual functions!!!
 	// 00-03
-	int magic;
+	int32_t magic;
 	// dispatcher 04-07
-	intptr_t (* dispatcher)( AEffect * , int , int , intptr_t, void * , float );
+	intptr_t (VST_CALL_CONV * dispatcher)( AEffect * , int32_t , int32_t , intptr_t, void * , float );
 	// process, quite sure 08-0b
-	void (* process)( AEffect * , float * * , float * * , int );
+	void (VST_CALL_CONV * process)( AEffect * , float * * , float * * , int32_t );
 	// setParameter 0c-0f
-	void (* setParameter)( AEffect * , int , float );
+	void (VST_CALL_CONV * setParameter)( AEffect * , int32_t , float );
 	// getParameter 10-13
-	float (* getParameter)( AEffect * , int );
+	float (VST_CALL_CONV * getParameter)( AEffect * , int32_t );
 	// programs 14-17
-	int numPrograms;
+	int32_t numPrograms;
 	// Params 18-1b
-	int numParams;
+	int32_t numParams;
 	// Input 1c-1f
-	int numInputs;
+	int32_t numInputs;
 	// Output 20-23
-	int numOutputs;
+	int32_t numOutputs;
 	// flags 24-27
-	int flags;
+	int32_t flags;
 	// Fill somewhere 28-2b
 	void *ptr1;
 	void *ptr2;
@@ -235,7 +243,7 @@ public:
 	// Don't know 4c-4f
 	char unknown1[4];
 	// processReplacing 50-53
-	void (* processReplacing)( AEffect * , float * * , float * * , int );
+	void (VST_CALL_CONV * processReplacing)( AEffect * , float * * , float * * , int );
 
 } ;
 
@@ -278,7 +286,7 @@ public:
 
 
 
-typedef intptr_t (* audioMasterCallback)( AEffect * , int32_t, int32_t, intptr_t, void * , float );
+typedef intptr_t (VST_CALL_CONV * audioMasterCallback)( AEffect * , int32_t, int32_t, intptr_t, void * , float );
 
 
 #endif

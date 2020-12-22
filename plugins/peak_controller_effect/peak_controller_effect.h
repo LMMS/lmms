@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2008 Paul Giblock <drfaygo/at/gmail/dot/com>
  * 
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -36,9 +36,9 @@ public:
 						const Descriptor::SubPluginFeatures::Key * _key );
 	virtual ~PeakControllerEffect();
 	virtual bool processAudioBuffer( sampleFrame * _buf,
-									const fpp_t _frames );
+									const fpp_t _frames ) override;
 
-	virtual EffectControls * controls()
+	EffectControls * controls() override
 	{
 		return &m_peakControls;
 	}

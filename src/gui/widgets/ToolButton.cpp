@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2005-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -40,11 +40,4 @@ ToolButton::ToolButton( const QPixmap & _pixmap, const QString & _tooltip,
 	}
 	ToolTip::add( this, _tooltip );
 	setIcon( _pixmap );
-}
-
-
-
-
-ToolButton::~ToolButton()
-{
 }

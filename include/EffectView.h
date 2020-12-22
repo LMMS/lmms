@@ -4,7 +4,7 @@
  * Copyright (c) 2006-2007 Danny McRae <khjklujn/at/users.sourceforge.net>
  * Copyright (c) 2007-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -57,13 +57,13 @@ public:
 		return castModel<Effect>();
 	}
 
+	static constexpr int DEFAULT_WIDTH = 215;
 
 public slots:
 	void editControls();
 	void moveUp();
 	void moveDown();
 	void deletePlugin();
-	void displayHelp();
 	void closeEffects();
 
 
@@ -74,9 +74,9 @@ signals:
 
 
 protected:
-	virtual void contextMenuEvent( QContextMenuEvent * _me );
-	virtual void paintEvent( QPaintEvent * _pe );
-	virtual void modelChanged();
+	void contextMenuEvent( QContextMenuEvent * _me ) override;
+	void paintEvent( QPaintEvent * _pe ) override;
+	void modelChanged() override;
 
 
 private:

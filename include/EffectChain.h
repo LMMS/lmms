@@ -4,7 +4,7 @@
  * Copyright (c) 2006-2008 Danny McRae <khjklujn/at/users.sourceforge.net>
  * Copyright (c) 2008-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -33,17 +33,17 @@
 class Effect;
 
 
-class EXPORT EffectChain : public Model, public SerializingObject
+class LMMS_EXPORT EffectChain : public Model, public SerializingObject
 {
 	Q_OBJECT
 public:
 	EffectChain( Model * _parent );
 	virtual ~EffectChain();
 
-	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
-	virtual void loadSettings( const QDomElement & _this );
+	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
+	void loadSettings( const QDomElement & _this ) override;
 
-	inline virtual QString nodeName() const
+	inline QString nodeName() const override
 	{
 		return "fxchain";
 	}
@@ -56,11 +56,6 @@ public:
 	void startRunning();
 
 	void clear();
-
-	void setEnabled( bool _on )
-	{
-		m_enabledModel.setValue( _on );
-	}
 
 
 private:

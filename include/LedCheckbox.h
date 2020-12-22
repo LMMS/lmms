@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -32,7 +32,7 @@
 class QPixmap;
 
 
-class EXPORT LedCheckBox : public AutomatableButton
+class LMMS_EXPORT LedCheckBox : public AutomatableButton
 {
 	Q_OBJECT
 public:
@@ -45,10 +45,10 @@ public:
 	} ;
 
 	LedCheckBox( const QString & _txt, QWidget * _parent,
-				const QString & _name = QString::null,
+				const QString & _name = QString(),
 						LedColors _color = Yellow );
 	LedCheckBox( QWidget * _parent,
-				const QString & _name = QString::null,
+				const QString & _name = QString(),
 						LedColors _color = Yellow );
 
 	virtual ~LedCheckBox();
@@ -64,7 +64,7 @@ public:
 	Q_PROPERTY( QString text READ text WRITE setText )
 
 protected:
-	virtual void paintEvent( QPaintEvent * _pe );
+	void paintEvent( QPaintEvent * _pe ) override;
 
 
 private:

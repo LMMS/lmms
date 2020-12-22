@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2006-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -26,15 +26,15 @@
 #ifndef ENGINE_H
 #define ENGINE_H
 
-#include <QtCore/QMap>
 #include <QtCore/QString>
 #include <QtCore/QObject>
 
 
-#include "export.h"
+#include "lmmsconfig.h"
+#include "lmms_export.h"
+#include "lmms_basics.h"
 
 class BBTrackContainer;
-class DummyTrackContainer;
 class FxMixer;
 class ProjectJournal;
 class Mixer;
@@ -54,7 +54,7 @@ class Ladspa2LMMS;
 class LmmsCore;
 typedef LmmsCore Engine;
 
-class EXPORT LmmsCore : public QObject
+class LMMS_EXPORT LmmsCore : public QObject
 {
 	Q_OBJECT
 public:
@@ -87,20 +87,27 @@ public:
 		return s_projectJournal;
 	}
 
+	static bool ignorePluginBlacklist();
+
+#ifdef LMMS_HAVE_LV2
+	static class Lv2Manager * getLv2Manager()
+	{
+		return s_lv2Manager;
+	}
+#endif
+
 	static Ladspa2LMMS * getLADSPAManager()
 	{
 		return s_ladspaManager;
-	}
-
-	static DummyTrackContainer * dummyTrackContainer()
-	{
-		return s_dummyTC;
 	}
 
 	static float framesPerTick()
 	{
 		return s_framesPerTick;
 	}
+
+	static float framesPerTick(sample_rate_t sample_rate);
+
 	static void updateFramesPerTick();
 
 	static inline LmmsCore * inst()
@@ -111,6 +118,9 @@ public:
 		}
 		return s_instanceOfMe;
 	}
+
+	static void setDndPluginKey(void* newKey);
+	static void* pickDndPluginKey();
 
 signals:
 	void initProgress(const QString &msg);
@@ -135,9 +145,12 @@ private:
 	static Song * s_song;
 	static BBTrackContainer * s_bbTrackContainer;
 	static ProjectJournal * s_projectJournal;
-	static DummyTrackContainer * s_dummyTC;
 
+#ifdef LMMS_HAVE_LV2
+	static class Lv2Manager* s_lv2Manager;
+#endif
 	static Ladspa2LMMS * s_ladspaManager;
+	static void* s_dndPluginKey;
 
 	// even though most methods are static, an instance is needed for Qt slots/signals
 	static LmmsCore * s_instanceOfMe;

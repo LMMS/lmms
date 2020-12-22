@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -93,10 +93,8 @@ fpp_t AudioDevice::getNextBuffer( surroundSampleFrame * _ab )
 	// resample if necessary
 	if( mixer()->processingSampleRate() != m_sampleRate )
 	{
-		resample( b, frames, _ab, mixer()->processingSampleRate(),
-								m_sampleRate );
-		frames = frames * m_sampleRate /
-					mixer()->processingSampleRate();
+		frames = resample( b, frames, _ab, mixer()->processingSampleRate(),
+				    	   m_sampleRate );
 	}
 	else
 	{
@@ -184,7 +182,7 @@ void AudioDevice::renamePort( AudioPort * )
 
 
 
-void AudioDevice::resample( const surroundSampleFrame * _src,
+fpp_t AudioDevice::resample( const surroundSampleFrame * _src,
 						const fpp_t _frames,
 						surroundSampleFrame * _dst,
 						const sample_rate_t _src_sr,
@@ -192,12 +190,12 @@ void AudioDevice::resample( const surroundSampleFrame * _src,
 {
 	if( m_srcState == NULL )
 	{
-		return;
+		return _frames;
 	}
 	m_srcData.input_frames = _frames;
 	m_srcData.output_frames = _frames;
-	m_srcData.data_in = (float *) _src[0];
-	m_srcData.data_out = _dst[0];
+	m_srcData.data_in = const_cast<float*>(_src[0].data());
+	m_srcData.data_out = _dst[0].data ();
 	m_srcData.src_ratio = (double) _dst_sr / _src_sr;
 	m_srcData.end_of_input = 0;
 	int error;
@@ -206,6 +204,7 @@ void AudioDevice::resample( const surroundSampleFrame * _src,
 		printf( "AudioDevice::resample(): error while resampling: %s\n",
 							src_strerror( error ) );
 	}
+	return static_cast<fpp_t>(m_srcData.output_frames_gen);
 }
 
 

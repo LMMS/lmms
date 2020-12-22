@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2016 Javier Serrano Polo <javier@jasp.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -25,9 +25,8 @@
 #ifndef LOCKLESS_ALLOCATOR_H
 #define LOCKLESS_ALLOCATOR_H
 
+#include <atomic>
 #include <stddef.h>
-
-#include "AtomicInt.h"
 
 class LocklessAllocator
 {
@@ -43,11 +42,11 @@ private:
 	size_t m_capacity;
 	size_t m_elementSize;
 
-	AtomicInt * m_freeState;
+	std::atomic_int * m_freeState;
 	size_t m_freeStateSets;
 
-	AtomicInt m_available;
-	AtomicInt m_startIndex;
+	std::atomic_int m_available;
+	std::atomic_int m_startIndex;
 
 } ;
 

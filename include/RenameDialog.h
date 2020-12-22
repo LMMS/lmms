@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2004-2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -42,8 +42,8 @@ public:
 
 
 protected:
-	void keyPressEvent( QKeyEvent * _ke );
-	virtual void resizeEvent(QResizeEvent * event);
+	void keyPressEvent( QKeyEvent * _ke ) override;
+	void resizeEvent(QResizeEvent * event) override;
 
 
 protected slots:

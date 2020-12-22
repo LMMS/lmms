@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -32,11 +32,12 @@
 class InstrumentTrackWindow;
 
 
-class EXPORT InstrumentView : public PluginView
+//! Instrument view with variable size
+class LMMS_EXPORT InstrumentView : public PluginView
 {
 public:
 	InstrumentView( Instrument * _instrument, QWidget * _parent );
-	virtual ~InstrumentView();
+	~InstrumentView() override;
 
 	Instrument * model()
 	{
@@ -48,10 +49,24 @@ public:
 		return( castModel<Instrument>() );
 	}
 
-	virtual void setModel( Model * _model, bool = false );
+	void setModel( Model * _model, bool = false ) override;
 
 	InstrumentTrackWindow * instrumentTrackWindow();
 
+} ;
+
+
+
+
+//! Instrument view with fixed LMMS-default size
+class LMMS_EXPORT InstrumentViewFixedSize : public InstrumentView
+{
+	QSize sizeHint() const override { return QSize(250, 250); }
+	QSize minimumSizeHint() const override { return sizeHint(); }
+
+public:
+	using InstrumentView::InstrumentView;
+	~InstrumentViewFixedSize() override;
 } ;
 
 

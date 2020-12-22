@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2015 Ryan Roden-Corrent <ryan/at/rcorre.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -26,9 +26,11 @@
 #ifndef RENDER_MANAGER_H
 #define RENDER_MANAGER_H
 
-#include <vector>
+#include <memory>
 
 #include "ProjectRenderer.h"
+#include "OutputSettings.h"
+
 
 class RenderManager : public QObject
 {
@@ -36,7 +38,7 @@ class RenderManager : public QObject
 public:
 	RenderManager(
 		const Mixer::qualitySettings & qualitySettings,
-		const ProjectRenderer::OutputSettings & outputSettings,
+		const OutputSettings & outputSettings,
 		ProjectRenderer::ExportFileFormats fmt,
 		QString outputPath);
 
@@ -62,12 +64,15 @@ private:
 	QString pathForTrack( const Track *track, int num );
 	void restoreMutedState();
 
+	void render( QString outputPath );
+
 	const Mixer::qualitySettings m_qualitySettings;
-	const ProjectRenderer::OutputSettings m_outputSettings;
+	const Mixer::qualitySettings m_oldQualitySettings;
+	const OutputSettings m_outputSettings;
 	ProjectRenderer::ExportFileFormats m_format;
 	QString m_outputPath;
 
-	ProjectRenderer* m_activeRenderer;
+	std::unique_ptr<ProjectRenderer> m_activeRenderer;
 
 	QVector<Track*> m_tracksToRender;
 	QVector<Track*> m_unmuted;

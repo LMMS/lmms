@@ -4,7 +4,7 @@
  * Copyright (c) 2005-2007 Danny McRae <khjklujn/at/yahoo.com>
  * Copyright (c) 2005-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -147,8 +147,6 @@ void TempoSyncKnob::contextMenuEvent( QContextMenuEvent * )
 	contextMenu.addSeparator();
 
 	}
-
-	contextMenu.addHelpAction();
 	contextMenu.exec( QCursor::pos() );
 
 	delete syncMenu;
@@ -293,7 +291,11 @@ void TempoSyncKnob::showCustom()
 	if( m_custom == NULL )
 	{
 		m_custom = new MeterDialog( gui->mainWindow()->workspace() );
-		gui->mainWindow()->addWindowedWidget( m_custom );
+		QMdiSubWindow * subWindow = gui->mainWindow()->addWindowedWidget( m_custom );
+		Qt::WindowFlags flags = subWindow->windowFlags();
+		flags &= ~Qt::WindowMaximizeButtonHint;
+		subWindow->setWindowFlags( flags );
+		subWindow->setFixedSize( subWindow->size() );
 		m_custom->setWindowTitle( "Meter" );
 		m_custom->setModel( &model()->m_custom );
 	}

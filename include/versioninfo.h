@@ -1,7 +1,11 @@
+#include "lmms_basics.h"
+
 #ifdef __GNUC__
-#define GCC_VERSION "GCC " __VERSION__
+#define COMPILER_VERSION "GCC " __VERSION__
+#elif defined(_MSC_VER)
+#define COMPILER_VERSION "MSVC " STRINGIFY(_MSC_FULL_VER)
 #else
-#define GCC_VERSION "unknown compiler"
+#define COMPILER_VERSION "unknown compiler"
 #endif
 
 #ifdef LMMS_HOST_X86
@@ -26,6 +30,10 @@
 
 #ifdef LMMS_BUILD_OPENBSD
 #define PLATFORM "OpenBSD"
+#endif
+
+#ifdef LMMS_BUILD_FREEBSD
+#define PLATFORM "FreeBSD"
 #endif
 
 #ifdef LMMS_BUILD_WIN32

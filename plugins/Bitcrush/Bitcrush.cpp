@@ -4,7 +4,7 @@
  * Copyright (c) 2014 Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>
  * Copyright (c) 2006-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -24,7 +24,8 @@
  */
 
 #include "Bitcrush.h"
-#include "embed.cpp"
+#include "embed.h"
+#include "plugin_export.h"
 
 const int OS_RATE = 5;
 const float OS_RATIO = 1.0f / OS_RATE;
@@ -40,7 +41,7 @@ Plugin::Descriptor PLUGIN_EXPORT bitcrush_plugin_descriptor =
 {
 	STRINGIFY( PLUGIN_NAME ),
 	"Bitcrush",
-	QT_TRANSLATE_NOOP( "pluginBrowser", "An oversampling bitcrusher" ),
+	QT_TRANSLATE_NOOP( "PluginBrowser", "An oversampling bitcrusher" ),
 	"Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>",
 	0x0100,
 	Plugin::Effect,
@@ -244,7 +245,7 @@ extern "C"
 {
 
 // necessary for getting instance out of shared lib
-Plugin * PLUGIN_EXPORT lmms_plugin_main( Model* parent, void* data )
+PLUGIN_EXPORT Plugin * lmms_plugin_main( Model* parent, void* data )
 {
 	return new BitcrushEffect( parent, static_cast<const Plugin::Descriptor::SubPluginFeatures::Key *>( data ) );
 }

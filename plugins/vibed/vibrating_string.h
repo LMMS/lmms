@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2006-2007 Danny McRae <khjklujn/at/yahoo/com>
  * 
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -121,7 +121,7 @@ private:
 		float r;
 		float offset;
 		
-		if( not _state )
+		if( ! _state )
 		{
 			for( int i = 0; i < _pick; i++ )
 			{
@@ -130,7 +130,7 @@ private:
 				offset =  ( m_randomize / 2.0f -
 						m_randomize ) * r;
 				_dl->data[i] = _scale *
-						_values[_dl->length - i] +
+						_values[_dl->length - i - 1] +
 						offset;
 			}
 			for( int i = _pick; i < _dl->length; i++ )
@@ -183,7 +183,7 @@ private:
 	* iteration. */
 	inline void toBridgeUpdate( delayLine * _dl, sample_t _insamp )
 	{
-		register sample_t * ptr = _dl->pointer;
+		sample_t * ptr = _dl->pointer;
 		*ptr = _insamp * m_stringLoss;
 		++ptr;
 		if( ptr > _dl->end )
@@ -202,7 +202,7 @@ private:
 	inline void fromBridgeUpdate( delayLine * _dl, 
 							sample_t _insamp )
 	{
-		register sample_t * ptr = _dl->pointer;
+		sample_t * ptr = _dl->pointer;
 		--ptr;
 		if( ptr < _dl->data )
 		{

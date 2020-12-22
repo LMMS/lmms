@@ -4,7 +4,7 @@
  * Copyright (c) 2005-2008 Danny McRae <khjklujn/at/yahoo.com>
  * Copyright (c) 2009-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -34,7 +34,7 @@
 
 class MeterDialog;
 
-class EXPORT TempoSyncKnob : public Knob
+class LMMS_EXPORT TempoSyncKnob : public Knob
 {
 	Q_OBJECT
 public:
@@ -52,7 +52,7 @@ public:
 		return castModel<TempoSyncKnobModel>();
 	}
 
-	virtual void modelChanged();
+	void modelChanged() override;
 
 
 signals:
@@ -61,7 +61,7 @@ signals:
 
 
 protected:
-	virtual void contextMenuEvent( QContextMenuEvent * _me );
+	void contextMenuEvent( QContextMenuEvent * _me ) override;
 
 
 protected slots:

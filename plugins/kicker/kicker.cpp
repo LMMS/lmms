@@ -2,9 +2,9 @@
  * kicker.cpp - drum synthesizer
  *
  * Copyright (c) 2006-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * Copyright (c) 2014 Hannu Haahti <grejppi/at/gmail.com>
+ * Copyright (c) 2014 grejppi <grejppi/at/gmail.com>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -35,8 +35,8 @@
 #include "NotePlayHandle.h"
 #include "KickerOsc.h"
 
-#include "embed.cpp"
-
+#include "embed.h"
+#include "plugin_export.h"
 
 extern "C"
 {
@@ -45,7 +45,7 @@ Plugin::Descriptor PLUGIN_EXPORT kicker_plugin_descriptor =
 {
 	STRINGIFY( PLUGIN_NAME ),
 	"Kicker",
-	QT_TRANSLATE_NOOP( "pluginBrowser",
+	QT_TRANSLATE_NOOP( "PluginBrowser",
 				"Versatile drum synthesizer" ),
 	"Tobias Doerffel <tobydox/at/users.sf.net>",
 	0x0100,
@@ -63,13 +63,13 @@ kickerInstrument::kickerInstrument( InstrumentTrack * _instrument_track ) :
 	m_startFreqModel( 150.0f, 5.0f, 1000.0f, 1.0f, this, tr( "Start frequency" ) ),
 	m_endFreqModel( 40.0f, 5.0f, 1000.0f, 1.0f, this, tr( "End frequency" ) ),
 	m_decayModel( 440.0f, 5.0f, 5000.0f, 1.0f, 5000.0f, this, tr( "Length" ) ),
-	m_distModel( 0.8f, 0.0f, 100.0f, 0.1f, this, tr( "Distortion Start" ) ),
-	m_distEndModel( 0.8f, 0.0f, 100.0f, 0.1f, this, tr( "Distortion End" ) ),
+	m_distModel( 0.8f, 0.0f, 100.0f, 0.1f, this, tr( "Start distortion" ) ),
+	m_distEndModel( 0.8f, 0.0f, 100.0f, 0.1f, this, tr( "End distortion" ) ),
 	m_gainModel( 1.0f, 0.1f, 5.0f, 0.05f, this, tr( "Gain" ) ),
-	m_envModel( 0.163f, 0.01f, 1.0f, 0.001f, this, tr( "Envelope Slope" ) ),
+	m_envModel( 0.163f, 0.01f, 1.0f, 0.001f, this, tr( "Envelope slope" ) ),
 	m_noiseModel( 0.0f, 0.0f, 1.0f, 0.01f, this, tr( "Noise" ) ),
 	m_clickModel( 0.4f, 0.0f, 1.0f, 0.05f, this, tr( "Click" ) ),
-	m_slopeModel( 0.06f, 0.001f, 1.0f, 0.001f, this, tr( "Frequency Slope" ) ),
+	m_slopeModel( 0.06f, 0.001f, 1.0f, 0.001f, this, tr( "Frequency slope" ) ),
 	m_startNoteModel( true, this, tr( "Start from note" ) ),
 	m_endNoteModel( false, this, tr( "End to note" ) ),
 	m_versionModel( KICKER_PRESET_VERSION, 0, KICKER_PRESET_VERSION, this, "" )
@@ -267,7 +267,7 @@ public:
 
 kickerInstrumentView::kickerInstrumentView( Instrument * _instrument,
 							QWidget * _parent ) :
-	InstrumentView( _instrument, _parent )
+	InstrumentViewFixedSize( _instrument, _parent )
 {
 	const int ROW1 = 14;
 	const int ROW2 = ROW1 + 56;
@@ -289,7 +289,7 @@ kickerInstrumentView::kickerInstrumentView( Instrument * _instrument,
 	m_endFreqKnob->move( END_COL, ROW1 );
 
 	m_slopeKnob = new kickerKnob( this );
-	m_slopeKnob->setHintText( tr( "Frequency Slope:" ), "" );
+	m_slopeKnob->setHintText( tr( "Frequency slope:" ), "" );
 	m_slopeKnob->move( COL3, ROW1 );
 
 	m_gainKnob = new kickerKnob( this );
@@ -297,11 +297,11 @@ kickerInstrumentView::kickerInstrumentView( Instrument * _instrument,
 	m_gainKnob->move( COL1, ROW3 );
 
 	m_decayKnob = new kickerEnvKnob( this );
-	m_decayKnob->setHintText( tr( "Envelope Length:" ), "ms" );
+	m_decayKnob->setHintText( tr( "Envelope length:" ), "ms" );
 	m_decayKnob->move( COL2, ROW3 );
 
 	m_envKnob = new kickerKnob( this );
-	m_envKnob->setHintText( tr( "Envelope Slope:" ), "" );
+	m_envKnob->setHintText( tr( "Envelope slope:" ), "" );
 	m_envKnob->move( COL3, ROW3 );
 
 	m_clickKnob = new kickerKnob( this );
@@ -313,11 +313,11 @@ kickerInstrumentView::kickerInstrumentView( Instrument * _instrument,
 	m_noiseKnob->move( COL5, ROW3 );
 
 	m_distKnob = new kickerKnob( this );
-	m_distKnob->setHintText( tr( "Distortion Start:" ), "" );
+	m_distKnob->setHintText( tr( "Start distortion:" ), "" );
 	m_distKnob->move( COL4, ROW2 );
 
 	m_distEndKnob = new kickerKnob( this );
-	m_distEndKnob->setHintText( tr( "Distortion End:" ), "" );
+	m_distEndKnob->setHintText( tr( "End distortion:" ), "" );
 	m_distEndKnob->move( COL5, ROW2 );
 
 	m_startNoteToggle = new LedCheckBox( "", this, "", LedCheckBox::Green );
@@ -367,9 +367,9 @@ extern "C"
 {
 
 // necessary for getting instance out of shared lib
-Plugin * PLUGIN_EXPORT lmms_plugin_main( Model *, void * _data )
+PLUGIN_EXPORT Plugin * lmms_plugin_main( Model * m, void * )
 {
-	return new kickerInstrument( static_cast<InstrumentTrack *>( _data ) );
+	return new kickerInstrument( static_cast<InstrumentTrack *>( m ) );
 }
 
 

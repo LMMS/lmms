@@ -1,6 +1,7 @@
 /build
 /target
 .*.sw?
+.DS_Store
 *~
 /CMakeLists.txt.user
 /plugins/zynaddsubfx/zynaddsubfx/ExternalPrograms/Controller/Makefile

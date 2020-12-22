@@ -4,7 +4,7 @@
  * Copyright (c) 2008 Csaba Hruska <csaba.hruska/at/gmail.com>
  * Copyright (c) 2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -27,6 +27,10 @@
 #include "AudioPortAudio.h"
 
 #ifndef LMMS_HAVE_PORTAUDIO
+void AudioPortAudioSetupUtil::updateBackends()
+{
+}
+
 void AudioPortAudioSetupUtil::updateDevices()
 {
 }
@@ -42,25 +46,21 @@ void AudioPortAudioSetupUtil::updateChannels()
 #include <QLineEdit>
 
 #include "Engine.h"
-#include "debug.h"
 #include "ConfigManager.h"
 #include "gui_templates.h"
-#include "templates.h"
 #include "ComboBox.h"
-#include "LcdSpinBox.h"
 #include "Mixer.h"
 
 
 AudioPortAudio::AudioPortAudio( bool & _success_ful, Mixer * _mixer ) :
-	AudioDevice( tLimit<ch_cnt_t>(
+	AudioDevice( qBound<ch_cnt_t>(
+		DEFAULT_CHANNELS,
 		ConfigManager::inst()->value( "audioportaudio", "channels" ).toInt(),
-					DEFAULT_CHANNELS, SURROUND_CHANNELS ),
-								_mixer ),
+		SURROUND_CHANNELS ), _mixer ),
 	m_paStream( NULL ),
 	m_wasPAInitError( false ),
 	m_outBuf( new surroundSampleFrame[mixer()->framesPerPeriod()] ),
-	m_outBufPos( 0 ),
-	m_stopSemaphore( 1 )
+	m_outBufPos( 0 )
 {
 	_success_ful = false;
 
@@ -169,8 +169,6 @@ AudioPortAudio::AudioPortAudio( bool & _success_ful, Mixer * _mixer ) :
 	printf( "Input device: '%s' backend: '%s'\n", Pa_GetDeviceInfo( inDevIdx )->name, Pa_GetHostApiInfo( Pa_GetDeviceInfo( inDevIdx )->hostApi )->name );
 	printf( "Output device: '%s' backend: '%s'\n", Pa_GetDeviceInfo( outDevIdx )->name, Pa_GetHostApiInfo( Pa_GetDeviceInfo( outDevIdx )->hostApi )->name );
 
-	m_stopSemaphore.acquire();
-
 	// TODO: debug Mixer::pushInputFrames()
 	//m_supportsCapture = true;
 
@@ -183,7 +181,6 @@ AudioPortAudio::AudioPortAudio( bool & _success_ful, Mixer * _mixer ) :
 AudioPortAudio::~AudioPortAudio()
 {
 	stopProcessing();
-	m_stopSemaphore.release();
 
 	if( !m_wasPAInitError )
 	{
@@ -214,8 +211,7 @@ void AudioPortAudio::stopProcessing()
 {
 	if( m_paStream && Pa_IsStreamActive( m_paStream ) )
 	{
-		m_stopSemaphore.acquire();
-		
+		m_stopped = true;
 		PaError err = Pa_StopStream( m_paStream );
 	
 		if( err != paNoError )
@@ -285,7 +281,6 @@ int AudioPortAudio::process_callback(
 			if( !frames )
 			{
 				m_stopped = true;
-				m_stopSemaphore.release();
 				memset( _outputBuffer, 0, _framesPerBuffer *
 					channels() * sizeof(float) );
 				return paComplete;
@@ -333,6 +328,28 @@ int AudioPortAudio::_process_callback(
 	return _this->process_callback( (const float*)_inputBuffer,
 		(float*)_outputBuffer, _framesPerBuffer );
 }
+
+
+
+
+void AudioPortAudioSetupUtil::updateBackends()
+{
+	PaError err = Pa_Initialize();
+	if( err != paNoError ) {
+		printf( "Couldn't initialize PortAudio: %s\n", Pa_GetErrorText( err ) );
+		return;
+	}
+
+	const PaHostApiInfo * hi;
+	for( int i = 0; i < Pa_GetHostApiCount(); ++i )
+	{
+		hi = Pa_GetHostApiInfo( i );
+		m_backendModel.addItem( hi->name );
+	}
+
+	Pa_Terminate();
+}
+
 
 
 
@@ -393,16 +410,16 @@ AudioPortAudio::setupWidget::setupWidget( QWidget * _parent ) :
 	AudioDeviceSetupWidget( AudioPortAudio::name(), _parent )
 {
 	m_backend = new ComboBox( this, "BACKEND" );
-	m_backend->setGeometry( 64, 15, 260, 20 );
+	m_backend->setGeometry( 64, 15, 260, ComboBox::DEFAULT_HEIGHT );
 
-	QLabel * backend_lbl = new QLabel( tr( "BACKEND" ), this );
+	QLabel * backend_lbl = new QLabel( tr( "Backend" ), this );
 	backend_lbl->setFont( pointSize<7>( backend_lbl->font() ) );
 	backend_lbl->move( 8, 18 );
 
 	m_device = new ComboBox( this, "DEVICE" );
-	m_device->setGeometry( 64, 35, 260, 20 );
+	m_device->setGeometry( 64, 35, 260, ComboBox::DEFAULT_HEIGHT );
 
-	QLabel * dev_lbl = new QLabel( tr( "DEVICE" ), this );
+	QLabel * dev_lbl = new QLabel( tr( "Device" ), this );
 	dev_lbl->setFont( pointSize<7>( dev_lbl->font() ) );
 	dev_lbl->move( 8, 38 );
 	
@@ -414,39 +431,8 @@ AudioPortAudio::setupWidget::setupWidget( QWidget * _parent ) :
 
 	m_channels = new LcdSpinBox( 1, this );
 	m_channels->setModel( m );
-	m_channels->setLabel( tr( "CHANNELS" ) );
+	m_channels->setLabel( tr( "Channels" ) );
 	m_channels->move( 308, 20 );*/
-
-	// Setup models
-	PaError err = Pa_Initialize();
-	if( err != paNoError ) {
-		printf( "Couldn't initialize PortAudio: %s\n", Pa_GetErrorText( err ) );
-		return;
-	}
-	
-	// todo: setup backend model
-	const PaHostApiInfo * hi;
-	for( int i = 0; i < Pa_GetHostApiCount(); ++i )
-	{
-		hi = Pa_GetHostApiInfo( i );
-		m_setupUtil.m_backendModel.addItem( hi->name );
-	}
-
-	Pa_Terminate();
-
-
-	const QString& backend = ConfigManager::inst()->value( "audioportaudio",
-		"backend" );
-	const QString& device = ConfigManager::inst()->value( "audioportaudio",
-		"device" );
-	
-	int i = qMax( 0, m_setupUtil.m_backendModel.findText( backend ) );
-	m_setupUtil.m_backendModel.setValue( i );
-	
-	m_setupUtil.updateDevices();
-	
-	i = qMax( 0, m_setupUtil.m_deviceModel.findText( device ) );
-	m_setupUtil.m_deviceModel.setValue( i );
 
 	connect( &m_setupUtil.m_backendModel, SIGNAL( dataChanged() ),
 			&m_setupUtil, SLOT( updateDevices() ) );
@@ -483,6 +469,33 @@ void AudioPortAudio::setupWidget::saveSettings()
 /*	ConfigManager::inst()->setValue( "audioportaudio", "channels",
 				QString::number( m_channels->value<int>() ) );*/
 
+}
+
+
+
+
+void AudioPortAudio::setupWidget::show()
+{
+	if( m_setupUtil.m_backendModel.size() == 0 )
+	{
+		// populate the backend model the first time we are shown
+		m_setupUtil.updateBackends();
+
+		const QString& backend = ConfigManager::inst()->value(
+			"audioportaudio", "backend" );
+		const QString& device = ConfigManager::inst()->value(
+			"audioportaudio", "device" );
+		
+		int i = qMax( 0, m_setupUtil.m_backendModel.findText( backend ) );
+		m_setupUtil.m_backendModel.setValue( i );
+		
+		m_setupUtil.updateDevices();
+		
+		i = qMax( 0, m_setupUtil.m_deviceModel.findText( device ) );
+		m_setupUtil.m_deviceModel.setValue( i );
+	}
+
+	AudioDeviceSetupWidget::show();
 }
 
 

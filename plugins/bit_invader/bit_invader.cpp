@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2006-2008 Andreas Brandmaier <andy/at/brandmaier/dot/de>
  * 
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -36,12 +36,15 @@
 #include "NotePlayHandle.h"
 #include "Oscillator.h"
 #include "PixmapButton.h"
-#include "templates.h"
 #include "ToolTip.h"
 #include "Song.h"
 #include "interpolation.h"
 
-#include "embed.cpp"
+#include "embed.h"
+
+#include "plugin_export.h"
+
+static const int wavetableSize = 200;
 
 extern "C"
 {
@@ -50,7 +53,7 @@ Plugin::Descriptor PLUGIN_EXPORT bitinvader_plugin_descriptor =
 {
 	STRINGIFY( PLUGIN_NAME ),
 	"BitInvader",
-	QT_TRANSLATE_NOOP( "pluginBrowser",
+	QT_TRANSLATE_NOOP( "PluginBrowser",
 				"Customizable wavetable synthesizer" ),
 	"Andreas Brandmaier <andreas/at/brandmaier/dot/de>",
 	0x0100,
@@ -63,17 +66,16 @@ Plugin::Descriptor PLUGIN_EXPORT bitinvader_plugin_descriptor =
 }
 
 
-bSynth::bSynth( float * _shape, int _length, NotePlayHandle * _nph, bool _interpolation,
+bSynth::bSynth( float * _shape, NotePlayHandle * _nph, bool _interpolation,
 				float _factor, const sample_rate_t _sample_rate ) :
 	sample_index( 0 ),
 	sample_realindex( 0 ),
 	nph( _nph ),
-	sample_length( _length ),
 	sample_rate( _sample_rate ),
 	interpolation( _interpolation)
 {
-	sample_shape = new float[sample_length];
-	for (int i=0; i < _length; ++i)
+	sample_shape = new float[wavetableSize];
+	for (int i=0; i < wavetableSize; ++i)
 	{
 		sample_shape[i] = _shape[i] * _factor;
 	}
@@ -86,7 +88,7 @@ bSynth::~bSynth()
 }
 
 
-sample_t bSynth::nextStringSample()
+sample_t bSynth::nextStringSample( float sample_length )
 {
 	float sample_step = 
 		static_cast<float>( sample_length / ( sample_rate / nph->frequency() ) );
@@ -138,16 +140,18 @@ sample_t bSynth::nextStringSample()
 
 bitInvader::bitInvader( InstrumentTrack * _instrument_track ) :
 	Instrument( _instrument_track, &bitinvader_plugin_descriptor ),
-	m_sampleLength( 128, 4, 200, 1, this, tr( "Samplelength" ) ),
-	m_graph( -1.0f, 1.0f, 128, this ),
+	m_sampleLength(128, 4, wavetableSize, 1, this, tr("Sample length")),
+	m_graph(-1.0f, 1.0f, wavetableSize, this),
 	m_interpolation( false, this ),
 	m_normalize( false, this )
 {
 
+	lengthChanged();
+
 	m_graph.setWaveToSine();
 
 	connect( &m_sampleLength, SIGNAL( dataChanged( ) ),
-			this, SLOT( lengthChanged( ) ) );
+			this, SLOT( lengthChanged( ) ), Qt::DirectConnection );
 
 	connect( &m_graph, SIGNAL( samplesChanged( int, int ) ),
 			this, SLOT( samplesChanged( int, int ) ) );
@@ -175,8 +179,8 @@ void bitInvader::saveSettings( QDomDocument & _doc, QDomElement & _this )
 
 	// Save sample shape base64-encoded
 	QString sampleString;
-	base64::encode( (const char *)m_graph.samples(),
-		m_graph.length() * sizeof(float), sampleString );
+	base64::encode((const char *)m_graph.samples(),
+		wavetableSize * sizeof(float), sampleString);
 	_this.setAttribute( "sampleShape", sampleString );
 	
 
@@ -192,6 +196,9 @@ void bitInvader::saveSettings( QDomDocument & _doc, QDomElement & _this )
 
 void bitInvader::loadSettings( const QDomElement & _this )
 {
+	// Clear wavetable before loading a new
+	m_graph.clear();
+
 	// Load sample length
 	m_sampleLength.loadSettings( _this, "sampleLength" );
 
@@ -202,8 +209,9 @@ void bitInvader::loadSettings( const QDomElement & _this )
 	char * dst = 0;
 	base64::decode( _this.attribute( "sampleShape"), &dst, &size );
 
-	m_graph.setLength( sampleLength );
-	m_graph.setSamples( (float*) dst );
+	m_graph.setLength(size / sizeof(float));
+	m_graph.setSamples(reinterpret_cast<float*>(dst));
+	m_graph.setLength(sampleLength);
 	delete[] dst;
 
 	// Load LED normalize 
@@ -238,7 +246,7 @@ void bitInvader::samplesChanged( int _begin, int _end )
 void bitInvader::normalize()
 {
 	// analyze
-	float max = 0;
+	float max = std::numeric_limits<float>::epsilon();
 	const float* samples = m_graph.samples();
 	for(int i=0; i < m_graph.length(); i++)
 	{
@@ -277,7 +285,6 @@ void bitInvader::playNote( NotePlayHandle * _n,
 
 		_n->m_pluginData = new bSynth(
 					const_cast<float*>( m_graph.samples() ),
-					m_graph.length(),
 					_n,
 					m_interpolation.value(), factor,
 				Engine::mixer()->processingSampleRate() );
@@ -289,7 +296,7 @@ void bitInvader::playNote( NotePlayHandle * _n,
 	bSynth * ps = static_cast<bSynth *>( _n->m_pluginData );
 	for( fpp_t frame = offset; frame < frames + offset; ++frame )
 	{
-		const sample_t cur = ps->nextStringSample();
+		const sample_t cur = ps->nextStringSample( m_graph.length() );
 		for( ch_cnt_t chnl = 0; chnl < DEFAULT_CHANNELS; ++chnl )
 		{
 			_working_buffer[frame][chnl] = cur;
@@ -325,7 +332,7 @@ PluginView * bitInvader::instantiateView( QWidget * _parent )
 
 bitInvaderView::bitInvaderView( Instrument * _instrument,
 					QWidget * _parent ) :
-	InstrumentView( _instrument, _parent )
+	InstrumentViewFixedSize( _instrument, _parent )
 {
 	setAutoFillBackground( true );
 	QPalette pal;
@@ -336,7 +343,7 @@ bitInvaderView::bitInvaderView( Instrument * _instrument,
 	
 	m_sampleLengthKnob = new Knob( knobDark_28, this );
 	m_sampleLengthKnob->move( 6, 201 );
-	m_sampleLengthKnob->setHintText( tr( "Sample Length" ), "" );
+	m_sampleLengthKnob->setHintText( tr( "Sample length" ), "" );
 
 	m_graph = new Graph( this, Graph::NearestStyle, 204, 134 );
 	m_graph->move(23,59);	// 55,120 - 2px border
@@ -361,7 +368,7 @@ bitInvaderView::bitInvaderView( Instrument * _instrument,
 	m_sinWaveBtn->setInactiveGraphic( embed::getIconPixmap(
 						"sin_wave_inactive" ) );
 	ToolTip::add( m_sinWaveBtn,
-			tr( "Click for a sine-wave." ) );
+			tr( "Sine wave" ) );
 
 	m_triangleWaveBtn = new PixmapButton( this, tr( "Triangle wave" ) );
 	m_triangleWaveBtn->move( 131 + 14, 205 );
@@ -370,7 +377,7 @@ bitInvaderView::bitInvaderView( Instrument * _instrument,
 	m_triangleWaveBtn->setInactiveGraphic(
 		embed::getIconPixmap( "triangle_wave_inactive" ) );
 	ToolTip::add( m_triangleWaveBtn,
-			tr( "Click here for a triangle-wave." ) );
+			tr( "Triangle wave" ) );
 
 	m_sawWaveBtn = new PixmapButton( this, tr( "Saw wave" ) );
 	m_sawWaveBtn->move( 131 + 14*2, 205  );
@@ -379,7 +386,7 @@ bitInvaderView::bitInvaderView( Instrument * _instrument,
 	m_sawWaveBtn->setInactiveGraphic( embed::getIconPixmap(
 						"saw_wave_inactive" ) );
 	ToolTip::add( m_sawWaveBtn,
-			tr( "Click here for a saw-wave." ) );
+			tr( "Saw wave" ) );
 
 	m_sqrWaveBtn = new PixmapButton( this, tr( "Square wave" ) );
 	m_sqrWaveBtn->move( 131 + 14*3, 205 );
@@ -388,35 +395,35 @@ bitInvaderView::bitInvaderView( Instrument * _instrument,
 	m_sqrWaveBtn->setInactiveGraphic( embed::getIconPixmap(
 					"square_wave_inactive" ) );
 	ToolTip::add( m_sqrWaveBtn,
-			tr( "Click here for a square-wave." ) );
+			tr( "Square wave" ) );
 
 	m_whiteNoiseWaveBtn = new PixmapButton( this,
-					tr( "White noise wave" ) );
+					tr( "White noise" ) );
 	m_whiteNoiseWaveBtn->move( 131 + 14*4, 205 );
 	m_whiteNoiseWaveBtn->setActiveGraphic(
 		embed::getIconPixmap( "white_noise_wave_active" ) );
 	m_whiteNoiseWaveBtn->setInactiveGraphic(
 		embed::getIconPixmap( "white_noise_wave_inactive" ) );
 	ToolTip::add( m_whiteNoiseWaveBtn,
-			tr( "Click here for white-noise." ) );
+			tr( "White noise" ) );
 
-	m_usrWaveBtn = new PixmapButton( this, tr( "User defined wave" ) );
+	m_usrWaveBtn = new PixmapButton( this, tr( "User-defined wave" ) );
 	m_usrWaveBtn->move( 131 + 14*5, 205 );
 	m_usrWaveBtn->setActiveGraphic( embed::getIconPixmap(
 						"usr_wave_active" ) );
 	m_usrWaveBtn->setInactiveGraphic( embed::getIconPixmap(
 						"usr_wave_inactive" ) );
 	ToolTip::add( m_usrWaveBtn,
-			tr( "Click here for a user-defined shape." ) );
+			tr( "User-defined wave" ) );
 
-	m_smoothBtn = new PixmapButton( this, tr( "Smooth" ) );
+	m_smoothBtn = new PixmapButton( this, tr( "Smooth waveform" ) );
 	m_smoothBtn->move( 131 + 14*6, 205 );
 	m_smoothBtn->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
 						"smooth_active" ) );
 	m_smoothBtn->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
 						"smooth_inactive" ) );
 	ToolTip::add( m_smoothBtn,
-			tr( "Click here to smooth waveform." ) );
+			tr( "Smooth waveform" ) );
 
 
 	m_interpolationToggle = new LedCheckBox( "Interpolation", this,
@@ -472,6 +479,7 @@ void bitInvaderView::modelChanged()
 
 void bitInvaderView::sinWaveClicked()
 {
+	m_graph->model()->clearInvisible();
 	m_graph->model()->setWaveToSine();
 	Engine::getSong()->setModified();
 }
@@ -481,6 +489,7 @@ void bitInvaderView::sinWaveClicked()
 
 void bitInvaderView::triangleWaveClicked()
 {
+	m_graph->model()->clearInvisible();
 	m_graph->model()->setWaveToTriangle();
 	Engine::getSong()->setModified();
 }
@@ -490,6 +499,7 @@ void bitInvaderView::triangleWaveClicked()
 
 void bitInvaderView::sawWaveClicked()
 {
+	m_graph->model()->clearInvisible();
 	m_graph->model()->setWaveToSaw();
 	Engine::getSong()->setModified();
 }
@@ -499,6 +509,7 @@ void bitInvaderView::sawWaveClicked()
 
 void bitInvaderView::sqrWaveClicked()
 {
+	m_graph->model()->clearInvisible();
 	m_graph->model()->setWaveToSquare();
 	Engine::getSong()->setModified();
 }
@@ -508,6 +519,7 @@ void bitInvaderView::sqrWaveClicked()
 
 void bitInvaderView::noiseWaveClicked()
 {
+	m_graph->model()->clearInvisible();
 	m_graph->model()->setWaveToNoise();
 	Engine::getSong()->setModified();
 }
@@ -518,35 +530,12 @@ void bitInvaderView::noiseWaveClicked()
 void bitInvaderView::usrWaveClicked()
 {
 	QString fileName = m_graph->model()->setWaveToUser();
-	ToolTip::add( m_usrWaveBtn, fileName );
-	Engine::getSong()->setModified();
-	/*
-	m_graph->model()->setWaveToNoise();
-	Engine::getSong()->setModified();
-	// zero sample_shape
-	for (int i = 0; i < sample_length; i++)
+	if (!fileName.isEmpty())
 	{
-		sample_shape[i] = 0;
+		ToolTip::add(m_usrWaveBtn, fileName);
+		m_graph->model()->clearInvisible();
+		Engine::getSong()->setModified();
 	}
-
-	// load user shape
-	sampleBuffer buffer;
-	QString af = buffer.openAudioFile();
-	if ( af != "" )
-	{
-		buffer.setAudioFile( af );
-		
-		// copy buffer data
-		sample_length = min( sample_length, static_cast<int>(
-							buffer.frames() ) );
-		for ( int i = 0; i < sample_length; i++ )
-		{
-			sample_shape[i] = (float)*buffer.data()[i];
-		}
-	}
-
-	sampleChanged();
-	*/
 }
 
 
@@ -582,14 +571,10 @@ extern "C"
 {
 
 // necessary for getting instance out of shared lib
-Plugin * PLUGIN_EXPORT lmms_plugin_main( Model *, void * _data )
+PLUGIN_EXPORT Plugin * lmms_plugin_main( Model *m, void * )
 {
-	return( new bitInvader( static_cast<InstrumentTrack *>( _data ) ) );
+	return( new bitInvader( static_cast<InstrumentTrack *>( m ) ) );
 }
 
 
 }
-
-
-
-

@@ -4,7 +4,7 @@
  * Copyright (c) 2006-2007 Andreas Brandmaier <andy/at/brandmaier/dot/de>
  *               2008 Paul Giblock <drfaygo/at/gmail/dot/com>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -38,24 +38,29 @@
 class graphModel;
 
 
-class EXPORT Graph : public QWidget, public ModelView
+class LMMS_EXPORT Graph : public QWidget, public ModelView
 {
 	Q_OBJECT
 public:
 	enum graphStyle
 	{
-		NearestStyle,
-		LinearStyle,
-		LinearNonCyclicStyle,
-		BarStyle,
+		NearestStyle, //!< draw as stairs
+		LinearStyle, //!< connect each 2 samples with a line, with wrapping
+		LinearNonCyclicStyle, //!< LinearStyle without wrapping
+		BarStyle, //!< draw thick bars
 		NumGraphStyles
 	};
 
+	/**
+	 * @brief Constructor
+	 * @param _width Pixel width of widget
+	 * @param _height Pixel height of widget
+	 */
 	Graph( QWidget * _parent, graphStyle _style = Graph::LinearStyle,
 		int _width = 132,
 		int _height = 104
 	);
-	virtual ~Graph();
+	virtual ~Graph() = default;
 
 	void setForeground( const QPixmap & _pixmap );
 
@@ -79,21 +84,22 @@ public:
 		update();
 	}
 
-
+signals:
+	void drawn();
 protected:
-	virtual void paintEvent( QPaintEvent * _pe );
-	virtual void dropEvent( QDropEvent * _de );
-	virtual void dragEnterEvent( QDragEnterEvent * _dee );
-	virtual void mousePressEvent( QMouseEvent * _me );
-	virtual void mouseMoveEvent( QMouseEvent * _me );
-	virtual void mouseReleaseEvent( QMouseEvent * _me );
+	void paintEvent( QPaintEvent * _pe ) override;
+	void dropEvent( QDropEvent * _de ) override;
+	void dragEnterEvent( QDragEnterEvent * _dee ) override;
+	void mousePressEvent( QMouseEvent * _me ) override;
+	void mouseMoveEvent( QMouseEvent * _me ) override;
+	void mouseReleaseEvent( QMouseEvent * _me ) override;
 
 protected slots:
 	void updateGraph( int _startPos, int _endPos );
 	void updateGraph();
 
 private:
-	virtual void modelChanged();
+	void modelChanged() override;
 
 	void changeSampleAt( int _x, int _y );
 	void drawLineAt( int _x, int _y, int _lastx );
@@ -110,10 +116,24 @@ private:
 } ;
 
 
-class EXPORT graphModel : public Model
+/**
+	@brief 2 dimensional function plot
+
+	Function plot graph with discrete x scale and continous y scale
+	This makes it possible to display "#x" samples
+*/
+class LMMS_EXPORT graphModel : public Model
 {
 	Q_OBJECT
 public:
+	/**
+	 * @brief Constructor
+	 * @param _min Minimum y value to display
+	 * @param _max Maximum y value to display
+	 * @param _size Number of samples (e.g. x value)
+	 * @param _step Step size on y axis where values snap to, or 0.0f
+	 *   for "no snapping"
+	 */
 	graphModel( float _min,
 			float _max,
 			int _size,
@@ -121,7 +141,7 @@ public:
 			bool _default_constructed = false,
 			float _step = 0.0 );
 
-	virtual ~graphModel();
+	virtual ~graphModel() = default;
 
 	// TODO: saveSettings, loadSettings?
 
@@ -145,12 +165,21 @@ public:
 		return( m_samples.data() );
 	}
 
+	//! Make cyclic convolution
+	//! @param convolution Samples to convolve with
+	//! @param convolutionLength Number of samples to take for each sum
+	//! @param centerOffset Offset for resulting values
+	void convolve(const float *convolution,
+		const int convolutionLength, const int centerOffset);
+
 public slots:
+	//! Set range of y values
 	void setRange( float _min, float _max );
 
 	void setLength( int _size );
-
+	//! Update one sample
 	void setSampleAt( int x, float val );
+	//! Update samples array
 	void setSamples( const float * _value );
 
 	void setWaveToSine();
@@ -165,6 +194,8 @@ public slots:
 	void normalize();
 	void invert();
 	void shiftPhase( int _deg );
+	void clear();
+	void clearInvisible();
 
 signals:
 	void lengthChanged();

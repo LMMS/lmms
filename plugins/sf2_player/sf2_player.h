@@ -4,7 +4,7 @@
  * Copyright (c) 2008 Paul Giblock <drfaygo/at/gmail/dot/com>
  * Copyright (c) 2009-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -36,7 +36,7 @@
 #include "Knob.h"
 #include "LcdSpinBox.h"
 #include "LedCheckbox.h"
-#include "fluidsynth.h"
+#include "fluidsynthshims.h"
 #include "MemoryManager.h"
 
 class sf2InstrumentView;
@@ -187,7 +187,7 @@ public:
 
 
 
-class sf2InstrumentView : public InstrumentView
+class sf2InstrumentView : public InstrumentViewFixedSize
 {
 	Q_OBJECT
 public:

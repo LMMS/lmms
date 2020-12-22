@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2008 Csaba Hruska <csaba.hruska/at/gmail.com>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -73,7 +73,7 @@ void SampleRecordHandle::play( sampleFrame * /*_working_buffer*/ )
 	writeBuffer( recbuf, frames );
 	m_framesRecorded += frames;
 
-	MidiTime len = (tick_t)( m_framesRecorded / Engine::framesPerTick() );
+	TimePos len = (tick_t)( m_framesRecorded / Engine::framesPerTick() );
 	if( len > m_minLength )
 	{
 //		m_tco->changeLength( len );

@@ -5,7 +5,7 @@
  * Copyright (c) 2014 Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>
  * Copyright (c) 2006-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -26,7 +26,8 @@
  
 #include "CrossoverEQ.h"
 #include "lmms_math.h"
-#include "embed.cpp"
+#include "embed.h"
+#include "plugin_export.h"
 
 extern "C"
 {
@@ -35,7 +36,7 @@ Plugin::Descriptor PLUGIN_EXPORT crossovereq_plugin_descriptor =
 {
 	STRINGIFY( PLUGIN_NAME ),
 	"Crossover Equalizer",
-	QT_TRANSLATE_NOOP( "pluginBrowser", "A 4-band Crossover Equalizer" ),
+	QT_TRANSLATE_NOOP( "PluginBrowser", "A 4-band Crossover Equalizer" ),
 	"Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>",
 	0x0100,
 	Plugin::Effect,
@@ -95,23 +96,17 @@ bool CrossoverEQEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames
 	if( m_needsUpdate || m_controls.m_xover12.isValueChanged() )
 	{
 		m_lp1.setLowpass( m_controls.m_xover12.value() );
-		m_lp1.clearHistory();
 		m_hp2.setHighpass( m_controls.m_xover12.value() );
-		m_hp2.clearHistory();
 	}
 	if( m_needsUpdate || m_controls.m_xover23.isValueChanged() )
 	{
 		m_lp2.setLowpass( m_controls.m_xover23.value() );
-		m_lp2.clearHistory();
 		m_hp3.setHighpass( m_controls.m_xover23.value() );
-		m_hp3.clearHistory();
 	}
 	if( m_needsUpdate || m_controls.m_xover34.isValueChanged() )
 	{
 		m_lp3.setLowpass( m_controls.m_xover34.value() );
-		m_lp3.clearHistory();
 		m_hp4.setHighpass( m_controls.m_xover34.value() );
-		m_hp4.clearHistory();
 	}
 	
 	// gain values update
@@ -196,14 +191,24 @@ bool CrossoverEQEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames
 	double outSum = 0.0;
 	for( int f = 0; f < frames; ++f )
 	{
-		outSum = buf[f][0] * buf[f][0] + buf[f][1] * buf[f][1];
 		buf[f][0] = d * buf[f][0] + w * m_work[f][0];
 		buf[f][1] = d * buf[f][1] + w * m_work[f][1];
+		outSum += buf[f][0] * buf[f][0] + buf[f][1] * buf[f][1];
 	}
 	
-	checkGate( outSum );
+	checkGate( outSum / frames );
 	
 	return isRunning();
+}
+
+void CrossoverEQEffect::clearFilterHistories()
+{
+	m_lp1.clearHistory();
+	m_lp2.clearHistory();
+	m_lp3.clearHistory();
+	m_hp2.clearHistory();
+	m_hp3.clearHistory();
+	m_hp4.clearHistory();
 }
 
 
@@ -211,7 +216,7 @@ extern "C"
 {
 
 // necessary for getting instance out of shared lib
-Plugin * PLUGIN_EXPORT lmms_plugin_main( Model* parent, void* data )
+PLUGIN_EXPORT Plugin * lmms_plugin_main( Model* parent, void* data )
 {
 	return new CrossoverEQEffect( parent, static_cast<const Plugin::Descriptor::SubPluginFeatures::Key *>( data ) );
 }

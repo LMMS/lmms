@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2006-2008 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -36,7 +36,7 @@ class AutomatableSlider : public QSlider, public IntModelView
 {
 	Q_OBJECT
 public:
-	AutomatableSlider( QWidget * _parent, const QString & _name = QString::null );
+	AutomatableSlider( QWidget * _parent, const QString & _name = QString() );
 	virtual ~AutomatableSlider();
 
 	bool showStatus()
@@ -51,12 +51,12 @@ signals:
 
 
 protected:
-	virtual void contextMenuEvent( QContextMenuEvent * _me );
-	virtual void mousePressEvent( QMouseEvent * _me );
-	virtual void mouseReleaseEvent( QMouseEvent * _me );
-	virtual void wheelEvent( QWheelEvent * _me );
+	void contextMenuEvent( QContextMenuEvent * _me ) override;
+	void mousePressEvent( QMouseEvent * _me ) override;
+	void mouseReleaseEvent( QMouseEvent * _me ) override;
+	void wheelEvent( QWheelEvent * _me ) override;
 
-	virtual void modelChanged();
+	void modelChanged() override;
 
 
 private:

@@ -2,6 +2,11 @@ if(LMMS_HAVE_GIG)
 	INCLUDE(BuildPlugin)
 	INCLUDE_DIRECTORIES(${GIG_INCLUDE_DIRS})
 
+	# Disable C++11 on Clang until gig.h is patched
+	IF(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+		SET(CMAKE_CXX_STANDARD 98)
+	ENDIF()
+
 	# Required for not crashing loading files with libgig
 	SET(GCC_COVERAGE_COMPILE_FLAGS "-fexceptions")
 	add_definitions(${GCC_COVERAGE_COMPILE_FLAGS})
@@ -11,13 +16,6 @@ if(LMMS_HAVE_GIG)
 		SET(GCC_GIG_COMPILE_FLAGS "-Wno-deprecated")
 		add_definitions(${GCC_GIG_COMPILE_FLAGS})
 	endif(LMMS_BUILD_WIN32)
-
-	# Enable C++11
-	ADD_DEFINITIONS(-std=c++0x)
-	
-	IF(LMMS_BUILD_APPLE)
-		SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
-	ENDIF()
 
 	LINK_DIRECTORIES(${GIG_LIBRARY_DIRS} ${SAMPLERATE_LIBRARY_DIRS})
 	LINK_LIBRARIES(${GIG_LIBRARIES} ${SAMPLERATE_LIBRARIES})

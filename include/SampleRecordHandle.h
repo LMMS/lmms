@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2008 Csaba Hruska <csaba.hruska/at/gmail.com>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -29,8 +29,8 @@
 #include <QtCore/QList>
 #include <QtCore/QPair>
 
-#include "MidiTime.h"
 #include "PlayHandle.h"
+#include "TimePos.h"
 
 class BBTrack;
 class SampleBuffer;
@@ -44,10 +44,10 @@ public:
 	SampleRecordHandle( SampleTCO* tco );
 	virtual ~SampleRecordHandle();
 
-	virtual void play( sampleFrame * _working_buffer );
-	virtual bool isFinished() const;
+	void play( sampleFrame * _working_buffer ) override;
+	bool isFinished() const override;
 
-	virtual bool isFromTrack( const Track * _track ) const;
+	bool isFromTrack( const Track * _track ) const override;
 
 	f_cnt_t framesRecorded() const;
 	void createSampleBuffer( SampleBuffer * * _sample_buf );
@@ -60,7 +60,7 @@ private:
 	typedef QList<QPair<sampleFrame *, f_cnt_t> > bufferList;
 	bufferList m_buffers;
 	f_cnt_t m_framesRecorded;
-	MidiTime m_minLength;
+	TimePos m_minLength;
 
 	Track * m_track;
 	BBTrack * m_bbTrack;

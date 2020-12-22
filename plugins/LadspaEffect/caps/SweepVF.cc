@@ -28,9 +28,9 @@
 	02111-1307, USA or point your web browser to http://www.gnu.org.
 */
 
-#include <algorithm>
-
 #include "basics.h"
+
+#include <algorithm>
 
 #include "SweepVF.h"
 #include "Descriptor.h"

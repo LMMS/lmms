@@ -1,13 +1,5 @@
 IF(LMMS_SUPPORT_VST)
-   # Enable C++11
-   ADD_DEFINITIONS(-std=c++0x)
-   
-   IF(LMMS_BUILD_APPLE)
-      SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
-   ENDIF()
-
    INCLUDE(BuildPlugin)
-   INCLUDE_DIRECTORIES("${CMAKE_CURRENT_SOURCE_DIR}/../vst_base")
    LINK_DIRECTORIES("${CMAKE_CURRENT_BINARY_DIR}/..")
    IF(LMMS_BUILD_LINUX)
       LINK_LIBRARIES(-Wl,--enable-new-dtags)
@@ -17,7 +9,6 @@ IF(LMMS_SUPPORT_VST)
       SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/${PLUGIN_DIR}")
    ENDIF()
    BUILD_PLUGIN(vestige vestige.cpp vestige.h MOCFILES vestige.h EMBEDDED_RESOURCES "${CMAKE_CURRENT_SOURCE_DIR}/*.png")
-   TARGET_LINK_LIBRARIES(vestige -lvstbase)
-   ADD_DEPENDENCIES(vestige vstbase)
+   TARGET_LINK_LIBRARIES(vestige vstbase)
 ENDIF(LMMS_SUPPORT_VST)
 

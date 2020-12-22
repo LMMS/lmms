@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -48,7 +48,7 @@ public:
 private:
 	virtual void writeBuffer( const surroundSampleFrame * _ab,
 						const fpp_t _frames,
-						const float _master_gain );
+						const float _master_gain ) override;
 
 	typedef QList<QPair<sampleFrame *, fpp_t> > BufferList;
 	BufferList m_buffers;

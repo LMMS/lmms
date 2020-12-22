@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2006-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -53,25 +53,25 @@ public:
 	{
 	}
 
-	virtual int controlCount()
+	int controlCount() override
 	{
 		return 0;
 	}
 
-	virtual void saveSettings( QDomDocument &, QDomElement & )
+	void saveSettings( QDomDocument &, QDomElement & ) override
 	{
 	}
 
-	virtual void loadSettings( const QDomElement & )
+	void loadSettings( const QDomElement & ) override
 	{
 	}
 
-	virtual QString nodeName() const
+	QString nodeName() const override
 	{
 		return "DummyControls";
 	}
 
-	virtual EffectControlDialog * createView()
+	EffectControlDialog * createView() override
 	{
 		return new DummyEffectControlDialog( this );
 	}
@@ -95,12 +95,12 @@ public:
 	{
 	}
 
-	virtual EffectControls * controls()
+	EffectControls * controls() override
 	{
 		return &m_controls;
 	}
 
-	bool processAudioBuffer( sampleFrame *, const fpp_t )
+	bool processAudioBuffer( sampleFrame *, const fpp_t ) override
 	{
 		return false;
 	}

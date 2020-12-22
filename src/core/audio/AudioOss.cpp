@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -35,7 +35,6 @@
 #include "Mixer.h"
 #include "Engine.h"
 #include "gui_templates.h"
-#include "templates.h"
 
 #ifdef LMMS_HAVE_UNISTD_H
 #include <unistd.h>
@@ -45,9 +44,6 @@
 #endif
 #ifdef LMMS_HAVE_SYS_IOCTL_H
 #include <sys/ioctl.h>
-#endif
-#ifdef LMMS_HAVE_STDLIB_H
-#include <stdlib.h>
 #endif
 
 #ifdef LMMS_HAVE_SYS_SOUNDCARD_H
@@ -63,7 +59,7 @@
 
 
 #ifndef _PATH_DEV_DSP
-#ifdef __OpenBSD__
+#if defined(__NetBSD__) || defined(__OpenBSD__)
 #define _PATH_DEV_DSP  "/dev/audio"
 #else
 #define _PATH_DEV_DSP  "/dev/dsp"
@@ -73,10 +69,10 @@
 
 
 AudioOss::AudioOss( bool & _success_ful, Mixer*  _mixer ) :
-	AudioDevice( tLimit<ch_cnt_t>(
+	AudioDevice( qBound<ch_cnt_t>(
+		DEFAULT_CHANNELS,
 		ConfigManager::inst()->value( "audiooss", "channels" ).toInt(),
-					DEFAULT_CHANNELS, SURROUND_CHANNELS ),
-								_mixer ),
+		SURROUND_CHANNELS ), _mixer ),
 	m_convertEndian( false )
 {
 	_success_ful = false;
@@ -331,7 +327,7 @@ AudioOss::setupWidget::setupWidget( QWidget * _parent ) :
 	m_device = new QLineEdit( probeDevice(), this );
 	m_device->setGeometry( 10, 20, 160, 20 );
 
-	QLabel * dev_lbl = new QLabel( tr( "DEVICE" ), this );
+	QLabel * dev_lbl = new QLabel( tr( "Device" ), this );
 	dev_lbl->setFont( pointSize<7>( dev_lbl->font() ) );
 	dev_lbl->setGeometry( 10, 40, 160, 10 );
 
@@ -343,7 +339,7 @@ AudioOss::setupWidget::setupWidget( QWidget * _parent ) :
 
 	m_channels = new LcdSpinBox( 1, this );
 	m_channels->setModel( m );
-	m_channels->setLabel( tr( "CHANNELS" ) );
+	m_channels->setLabel( tr( "Channels" ) );
 	m_channels->move( 180, 20 );
 
 }

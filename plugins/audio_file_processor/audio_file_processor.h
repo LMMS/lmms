@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -111,7 +111,7 @@ private:
 class AudioFileProcessorWaveView;
 
 
-class AudioFileProcessorView : public InstrumentView
+class AudioFileProcessorView : public InstrumentViewFixedSize
 {
 	Q_OBJECT
 public:
@@ -211,7 +211,6 @@ public:
 
 	private:
 		bool checkBound( double _v ) const;
-
 	} ;
 
 
@@ -276,6 +275,7 @@ private:
 
 	void updateGraph();
 	void reverse();
+	void updateCursor( QMouseEvent * _me = nullptr );
 
 	static bool isCloseTo( int _a, int _b )
 	{

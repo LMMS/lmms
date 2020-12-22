@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2004-2015 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -24,9 +24,9 @@
 
 #include "AudioDeviceSetupWidget.h"
 
-AudioDeviceSetupWidget::AudioDeviceSetupWidget( const QString & _caption, QWidget * _parent ) :
-	TabWidget( TabWidget::tr( "Settings for %1" ).arg(TabWidget::tr( _caption.toLatin1() ) ).toUpper(),
-			   _parent )
+
+AudioDeviceSetupWidget::AudioDeviceSetupWidget(const QString & caption, QWidget * parent) :
+	TabWidget(TabWidget::tr("Settings for %1").arg(tr(caption.toUtf8())), parent)
 {
 }
 

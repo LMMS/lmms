@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2008-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -41,7 +41,7 @@
 class QButtonGroup;
 class FxLine;
 
-class EXPORT FxMixerView : public QWidget, public ModelView,
+class LMMS_EXPORT FxMixerView : public QWidget, public ModelView,
 					public SerializingObjectHook
 {
 	Q_OBJECT
@@ -64,10 +64,10 @@ public:
 	FxMixerView();
 	virtual ~FxMixerView();
 
-	virtual void keyPressEvent(QKeyEvent * e);
+	void keyPressEvent(QKeyEvent * e) override;
 
-	virtual void saveSettings( QDomDocument & _doc, QDomElement & _this );
-	virtual void loadSettings( const QDomElement & _this );
+	void saveSettings( QDomDocument & _doc, QDomElement & _this ) override;
+	void loadSettings( const QDomElement & _this ) override;
 
 	inline FxLine * currentFxLine()
 	{
@@ -100,6 +100,8 @@ public:
 	void moveChannelLeft(int index, int focusIndex);
 	void moveChannelRight(int index);
 
+	void renameChannel(int index);
+
 	// make sure the display syncs up with the fx mixer.
 	// useful for loading projects
 	void refreshDisplay();
@@ -108,7 +110,7 @@ public slots:
 	int addNewChannel();
 
 protected:
-	virtual void closeEvent( QCloseEvent * _ce );
+	void closeEvent( QCloseEvent * _ce ) override;
 	
 private slots:
 	void updateFaders();

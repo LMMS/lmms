@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -26,10 +26,7 @@
 #ifndef VOLUME_H
 #define VOLUME_H
 
-#include "lmmsconfig.h"
-
 #include "lmms_basics.h"
-#include "Midi.h"
 
 const volume_t MinVolume = 0;
 const volume_t MaxVolume = 200;

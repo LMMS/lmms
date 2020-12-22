@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2006-2008 Andreas Brandmaier <andy/at/brandmaier/dot/de>
  * 
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -42,12 +42,12 @@ class bSynth
 {
 	MM_OPERATORS
 public:
-	bSynth( float * sample, int length, NotePlayHandle * _nph,
+	bSynth( float * sample, NotePlayHandle * _nph,
 			bool _interpolation, float factor, 
 			const sample_rate_t _sample_rate );
 	virtual ~bSynth();
 	
-	sample_t nextStringSample();
+	sample_t nextStringSample( float sample_length );
 
 
 private:
@@ -55,7 +55,6 @@ private:
 	float sample_realindex;
 	float* sample_shape;
 	NotePlayHandle* nph;
-	const int sample_length;
 	const sample_rate_t sample_rate;
 
 	bool interpolation;
@@ -108,7 +107,7 @@ private:
 
 
 
-class bitInvaderView : public InstrumentView
+class bitInvaderView : public InstrumentViewFixedSize
 {
 	Q_OBJECT
 public:

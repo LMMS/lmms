@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -30,7 +30,7 @@
 #include "ComboBoxModel.h"
 
 
-class EXPORT BBTrackContainer : public TrackContainer
+class LMMS_EXPORT BBTrackContainer : public TrackContainer
 {
 	Q_OBJECT
 	mapPropertyFromModel(int,currentBB,setCurrentBB,m_bbComboBoxModel);
@@ -38,30 +38,30 @@ public:
 	BBTrackContainer();
 	virtual ~BBTrackContainer();
 
-	virtual bool play( MidiTime _start, const fpp_t _frames,
-						const f_cnt_t _frame_base, int _tco_num = -1 );
+	virtual bool play(TimePos start, const fpp_t frames, const f_cnt_t frameBase, int tcoNum = -1);
 
-	virtual void updateAfterTrackAdd();
+	void updateAfterTrackAdd() override;
 
-	inline virtual QString nodeName() const
+	inline QString nodeName() const override
 	{
 		return "bbtrackcontainer";
 	}
 
-	tact_t lengthOfBB( int _bb );
-	inline tact_t lengthOfCurrentBB()
+	bar_t lengthOfBB(int bb) const;
+	inline bar_t lengthOfCurrentBB()
 	{
-		return lengthOfBB( currentBB() );
+		return lengthOfBB(currentBB());
 	}
 	int numOfBBs() const;
-	void removeBB( int _bb );
+	void removeBB(int bb);
 
-	void swapBB( int _bb1, int _bb2 );
+	void swapBB(int bb1, int bb2);
 
-	void updateBBTrack( TrackContentObject * _tco );
+	void updateBBTrack(TrackContentObject * tco);
 	void fixIncorrectPositions();
-	void createTCOsForBB( int _bb );
+	void createTCOsForBB(int bb);
 
+	AutomatedValueMap automatedValuesAt(TimePos time, int tcoNum) const override;
 
 public slots:
 	void play();

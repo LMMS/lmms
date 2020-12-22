@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2004-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -38,25 +38,26 @@ class PianoView : public QWidget, public ModelView
 	Q_OBJECT
 public:
 	PianoView( QWidget * _parent );
-	virtual ~PianoView();
+	virtual ~PianoView() = default;
 
 	static int getKeyFromKeyEvent( QKeyEvent * _ke );
 
 
 public:
-	virtual void keyPressEvent( QKeyEvent * ke );
-	virtual void keyReleaseEvent( QKeyEvent * ke );
+	void keyPressEvent( QKeyEvent * ke ) override;
+	void keyReleaseEvent( QKeyEvent * ke ) override;
 
 
 protected:
-	virtual void modelChanged();
-	virtual void contextMenuEvent( QContextMenuEvent * _me );
-	virtual void paintEvent( QPaintEvent * );
-	virtual void mousePressEvent( QMouseEvent * me );
-	virtual void mouseReleaseEvent( QMouseEvent * me );
-	virtual void mouseMoveEvent( QMouseEvent * me );
-	virtual void focusOutEvent( QFocusEvent * _fe );
-	virtual void resizeEvent( QResizeEvent * _event );
+	void modelChanged() override;
+	void contextMenuEvent( QContextMenuEvent * _me ) override;
+	void paintEvent( QPaintEvent * ) override;
+	void mousePressEvent( QMouseEvent * me ) override;
+	void mouseReleaseEvent( QMouseEvent * me ) override;
+	void mouseMoveEvent( QMouseEvent * me ) override;
+	void focusOutEvent( QFocusEvent * _fe ) override;
+	void focusInEvent( QFocusEvent * fe ) override;
+	void resizeEvent( QResizeEvent * _event ) override;
 
 
 private:

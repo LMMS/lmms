@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -28,56 +28,43 @@
 #include "Engine.h"
 #include "InstrumentTrack.h"
 #include "Mixer.h"
-#include "SampleBuffer.h"
 #include "SampleTrack.h"
 
 
 
-SamplePlayHandle::SamplePlayHandle( const QString& sampleFile ) :
+SamplePlayHandle::SamplePlayHandle( SampleBuffer* sampleBuffer , bool ownAudioPort ) :
 	PlayHandle( TypeSamplePlayHandle ),
-	m_sampleBuffer( new SampleBuffer( sampleFile ) ),
+	m_sampleBuffer( sharedObject::ref( sampleBuffer ) ),
 	m_doneMayReturnTrue( true ),
 	m_frame( 0 ),
-	m_ownAudioPort( true ),
+	m_ownAudioPort( ownAudioPort ),
 	m_defaultVolumeModel( DefaultVolume, MinVolume, MaxVolume, 1 ),
 	m_volumeModel( &m_defaultVolumeModel ),
 	m_track( NULL ),
 	m_bbTrack( NULL )
 {
-	setAudioPort( new AudioPort( "SamplePlayHandle", false ) );
+	if (ownAudioPort)
+	{
+		setAudioPort( new AudioPort( "SamplePlayHandle", false ) );
+	}
 }
 
 
 
 
-SamplePlayHandle::SamplePlayHandle( SampleBuffer* sampleBuffer ) :
-	PlayHandle( TypeSamplePlayHandle ),
-	m_sampleBuffer( sharedObject::ref( sampleBuffer ) ),
-	m_doneMayReturnTrue( true ),
-	m_frame( 0 ),
-	m_ownAudioPort( true ),
-	m_defaultVolumeModel( DefaultVolume, MinVolume, MaxVolume, 1 ),
-	m_volumeModel( &m_defaultVolumeModel ),
-	m_track( NULL ),
-	m_bbTrack( NULL )
+SamplePlayHandle::SamplePlayHandle( const QString& sampleFile ) :
+	SamplePlayHandle( new SampleBuffer( sampleFile ) , true)
 {
-	setAudioPort( new AudioPort( "SamplePlayHandle", false ) );
+	sharedObject::unref( m_sampleBuffer );
 }
 
 
 
 
 SamplePlayHandle::SamplePlayHandle( SampleTCO* tco ) :
-	PlayHandle( TypeSamplePlayHandle ),
-	m_sampleBuffer( sharedObject::ref( tco->sampleBuffer() ) ),
-	m_doneMayReturnTrue( true ),
-	m_frame( 0 ),
-	m_ownAudioPort( false ),
-	m_defaultVolumeModel( DefaultVolume, MinVolume, MaxVolume, 1 ),
-	m_volumeModel( &m_defaultVolumeModel ),
-	m_track( tco->getTrack() ),
-	m_bbTrack( NULL )
+	SamplePlayHandle( tco->sampleBuffer() , false)
 {
+	m_track = tco->getTrack();
 	setAudioPort( ( (SampleTrack *)tco->getTrack() )->audioPort() );
 }
 
@@ -154,7 +141,7 @@ bool SamplePlayHandle::isFromTrack( const Track * _track ) const
 
 f_cnt_t SamplePlayHandle::totalFrames() const
 {
-	return ( m_sampleBuffer->endFrame() - m_sampleBuffer->startFrame() ) * ( Engine::mixer()->processingSampleRate() / Engine::mixer()->baseSampleRate() );
+	return ( m_sampleBuffer->endFrame() - m_sampleBuffer->startFrame() ) * ( Engine::mixer()->processingSampleRate() / m_sampleBuffer->sampleRate() );
 }
 
 

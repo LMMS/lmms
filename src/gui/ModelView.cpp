@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2007-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -69,6 +69,16 @@ void ModelView::setModel( Model* model, bool isOldModelValid )
 	widget()->update();
 
 	modelChanged();
+}
+
+
+
+
+// Unsets the current model by setting a dummy empty model. The dummy model is marked as
+// "defaultConstructed", so the next call to setModel will delete it.
+void ModelView::unsetModel()
+{
+	setModel(new Model(nullptr, QString(), true));
 }
 
 

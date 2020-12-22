@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2015 Shane Ambler <develop/at/shaneware.biz>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -28,8 +28,12 @@
 #include "lmmsconfig.h"
 
 #ifdef LMMS_HAVE_JACK
+#ifndef LMMS_HAVE_WEAKJACK
 #include <jack/jack.h>
 #include <jack/midiport.h>
+#else
+#include "weak_libjack.h"
+#endif
 
 #include <QtCore/QThread>
 #include <QMutex>

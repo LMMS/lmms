@@ -4,7 +4,7 @@
  * Copyright (c) 2006-2007 Danny McRae <khjklujn@netscape.net>
  * Copyright (c) 2008-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -27,7 +27,6 @@
 #include <QLayout>
 #include <QPushButton>
 #include <QScrollArea>
-#include <QVBoxLayout>
 
 #include "EffectRackView.h"
 #include "EffectSelectDialog.h"
@@ -40,7 +39,7 @@ EffectRackView::EffectRackView( EffectChain* model, QWidget* parent ) :
 	ModelView( NULL, this )
 {
 	QVBoxLayout* mainLayout = new QVBoxLayout( this );
-	mainLayout->setMargin( 0 );
+	mainLayout->setMargin( 5 );
 
 	m_effectsGroupBox = new GroupBox( tr( "EFFECTS CHAIN" ) );
 	mainLayout->addWidget( m_effectsGroupBox );
@@ -127,7 +126,7 @@ void EffectRackView::moveDown( EffectView* view )
 	if( view != m_effectViews.last() )
 	{
 		// moving next effect up is the same
-		moveUp( *( qFind( m_effectViews.begin(), m_effectViews.end(), view ) + 1 ) );
+		moveUp( *( std::find( m_effectViews.begin(), m_effectViews.end(), view ) + 1 ) );
 	}
 }
 
@@ -137,7 +136,7 @@ void EffectRackView::moveDown( EffectView* view )
 void EffectRackView::deletePlugin( EffectView* view )
 {
 	Effect * e = view->effect();
-	m_effectViews.erase( qFind( m_effectViews.begin(), m_effectViews.end(), view ) );
+	m_effectViews.erase( std::find( m_effectViews.begin(), m_effectViews.end(), view ) );
 	delete view;
 	fxChain()->removeEffect( e );
 	e->deleteLater();
@@ -212,7 +211,7 @@ void EffectRackView::update()
 		}
 	}
 
-	w->setFixedSize( 210 + 2*EffectViewMargin, m_lastY );
+	w->setFixedSize( EffectView::DEFAULT_WIDTH + 2*EffectViewMargin, m_lastY);
 
 	QWidget::update();
 }
@@ -232,7 +231,6 @@ void EffectRackView::addEffect()
 
 	Effect * fx = esd.instantiateSelectedPlugin( fxChain() );
 
-	fxChain()->m_enabledModel.setValue( true );
 	fxChain()->appendEffect( fx );
 	update();
 

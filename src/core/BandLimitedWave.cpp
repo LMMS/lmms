@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2014 Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -26,8 +26,6 @@
 #include "BandLimitedWave.h"
 
 #include <QDataStream>
-
-#include "ConfigManager.h"
 
 WaveMipMap BandLimitedWave::s_waveforms[4] = {  };
 bool BandLimitedWave::s_wavesGenerated = false;

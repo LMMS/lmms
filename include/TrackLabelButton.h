@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -29,8 +29,9 @@
 #include <QToolButton>
 #include <QLineEdit>
 
-
 class TrackView;
+
+class TrackRenameLineEdit;
 
 
 class TrackLabelButton : public QToolButton
@@ -44,20 +45,25 @@ public:
 public slots:
 	void rename();
 	void renameFinished();
+	void nameChanged();
 
 
 protected:
-	virtual void dragEnterEvent( QDragEnterEvent * _dee );
-	virtual void dropEvent( QDropEvent * _de );
-	virtual void mousePressEvent( QMouseEvent * _me );
-	virtual void mouseDoubleClickEvent( QMouseEvent * _me );
-	virtual void paintEvent( QPaintEvent * _pe );
+	void dragEnterEvent( QDragEnterEvent * _dee ) override;
+	void dropEvent( QDropEvent * _de ) override;
+	void mousePressEvent( QMouseEvent * _me ) override;
+	void mouseDoubleClickEvent( QMouseEvent * _me ) override;
+	void mouseReleaseEvent( QMouseEvent * _me ) override;
+	void paintEvent( QPaintEvent * _pe ) override;
+	void resizeEvent( QResizeEvent * _re ) override;
 
 
 private:
 	TrackView * m_trackView;
 	QString m_iconName;
-	QLineEdit * m_renameLineEdit;
+	TrackRenameLineEdit * m_renameLineEdit;
+	QRect m_buttonRect;
+	QString elideName( const QString &name );
 
 } ;
 

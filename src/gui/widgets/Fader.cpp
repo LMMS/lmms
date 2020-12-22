@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2008-2012 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -44,20 +44,18 @@
  *
  */
 
+#include "Fader.h"
 
 #include <QInputDialog>
 #include <QMouseEvent>
-#include <QPaintEvent>
 #include <QPainter>
 
-#include "Fader.h"
+#include "lmms_math.h"
 #include "embed.h"
-#include "Engine.h"
 #include "CaptionMenu.h"
 #include "ConfigManager.h"
 #include "TextFloat.h"
 #include "MainWindow.h"
-#include "lmms_math.h"
 
 
 TextFloat * Fader::s_textFloat = NULL;
@@ -74,7 +72,6 @@ Fader::Fader( FloatModel * _model, const QString & _name, QWidget * _parent ) :
 	m_persistentPeak_R( 0.0 ),
 	m_fMinPeak( 0.01f ),
 	m_fMaxPeak( 1.1 ),
-	m_displayConversion( true ),
 	m_levelsDisplayedInDBFS(false),
 	m_moveStartPoint( -1 ),
 	m_startValue( 0 ),
@@ -104,6 +101,8 @@ Fader::Fader( FloatModel * _model, const QString & _name, QWidget * _parent ) :
 	m_knob = s_knob;
 
 	init(_model, _name);
+
+	m_conversionFactor = 100.0;
 }
 
 
@@ -116,7 +115,6 @@ Fader::Fader( FloatModel * model, const QString & name, QWidget * parent, QPixma
 	m_persistentPeak_R( 0.0 ),
 	m_fMinPeak( 0.01f ),
 	m_fMaxPeak( 1.1 ),
-	m_displayConversion( false ),
 	m_levelsDisplayedInDBFS(false),
 	m_moveStartPoint( -1 ),
 	m_startValue( 0 ),
@@ -134,12 +132,6 @@ Fader::Fader( FloatModel * model, const QString & name, QWidget * parent, QPixma
 
 	init(model, name);
 }
-
-
-Fader::~Fader()
-{
-}
-
 
 void Fader::init(FloatModel * model, QString const & name)
 {
@@ -174,7 +166,9 @@ void Fader::mouseMoveEvent( QMouseEvent *mouseEvent )
 
 		float delta = dy * ( model()->maxValue() - model()->minValue() ) / (float) ( height() - ( *m_knob ).height() );
 
-		model()->setValue( m_startValue + delta );
+		const float step = model()->step<float>();
+		float newValue = static_cast<float>( static_cast<int>( ( m_startValue + delta ) / step + 0.5 ) ) * step;
+		model()->setValue( newValue );
 
 		updateTextFloat();
 	}
@@ -188,6 +182,13 @@ void Fader::mousePressEvent( QMouseEvent* mouseEvent )
 	if( mouseEvent->button() == Qt::LeftButton &&
 			! ( mouseEvent->modifiers() & Qt::ControlModifier ) )
 	{
+		AutomatableModel *thisModel = model();
+		if( thisModel )
+		{
+			thisModel->addJournalCheckPoint();
+			thisModel->saveJournallingState( false );
+		}
+
 		if( mouseEvent->y() >= knobPosY() - ( *m_knob ).height() && mouseEvent->y() < knobPosY() )
 		{
 			updateTextFloat();
@@ -215,28 +216,14 @@ void Fader::mouseDoubleClickEvent( QMouseEvent* mouseEvent )
 {
 	bool ok;
 	float newValue;
-
 	// TODO: dbV handling
-	if( m_displayConversion )
-	{
-		newValue = QInputDialog::getDouble( this, windowTitle(),
-					tr( "Please enter a new value between %1 and %2:" ).
-							arg( model()->minValue() * 100 ).
-							arg( model()->maxValue() * 100 ),
-						model()->value() * 100,
-						model()->minValue() * 100,
-						model()->maxValue() * 100, 4, &ok ) * 0.01f;
-	}
-	else
-	{
-		newValue = QInputDialog::getDouble( this, windowTitle(),
-					tr( "Please enter a new value between %1 and %2:" ).
-							arg( model()->minValue() ).
-							arg( model()->maxValue() ),
-						model()->value(),
-						model()->minValue(),
-						model()->maxValue(), 4, &ok );
-	}
+	newValue = QInputDialog::getDouble( this, tr( "Set value" ),
+				tr( "Please enter a new value between %1 and %2:" ).
+						arg( model()->minValue() * m_conversionFactor ).
+						arg( model()->maxValue() * m_conversionFactor ),
+					model()->getRoundedValue() * m_conversionFactor,
+					model()->minValue() * m_conversionFactor,
+					model()->maxValue() * m_conversionFactor, model()->getDigitCount(), &ok ) / m_conversionFactor;
 
 	if( ok )
 	{
@@ -246,8 +233,17 @@ void Fader::mouseDoubleClickEvent( QMouseEvent* mouseEvent )
 
 
 
-void Fader::mouseReleaseEvent( QMouseEvent * _me )
+void Fader::mouseReleaseEvent( QMouseEvent * mouseEvent )
 {
+	if( mouseEvent && mouseEvent->button() == Qt::LeftButton )
+	{
+		AutomatableModel *thisModel = model();
+		if( thisModel )
+		{
+			thisModel->restoreJournallingState();
+		}
+	}
+
 	s_textFloat->hide();
 }
 
@@ -256,7 +252,7 @@ void Fader::wheelEvent ( QWheelEvent *ev )
 {
 	ev->accept();
 
-	if ( ev->delta() > 0 )
+	if (ev->angleDelta().y() > 0)
 	{
 		model()->incValue( 1 );
 	}
@@ -273,7 +269,7 @@ void Fader::wheelEvent ( QWheelEvent *ev )
 ///
 /// Set peak value (0.0 .. 1.0)
 ///
-void Fader::setPeak( float fPeak, float &targetPeak, float &persistentPeak, QTime &lastPeakTime )
+void Fader::setPeak( float fPeak, float &targetPeak, float &persistentPeak, QElapsedTimer &lastPeakTimer )
 {
 	if( fPeak <  m_fMinPeak )
 	{
@@ -290,12 +286,12 @@ void Fader::setPeak( float fPeak, float &targetPeak, float &persistentPeak, QTim
 		if( targetPeak >= persistentPeak )
 		{
 			persistentPeak = targetPeak;
-			lastPeakTime.restart();
+			lastPeakTimer.restart();
 		}
 		update();
 	}
 
-	if( persistentPeak > 0 && lastPeakTime.elapsed() > 1500 )
+	if( persistentPeak > 0 && lastPeakTimer.elapsed() > 1500 )
 	{
 		persistentPeak = qMax<float>( 0, persistentPeak-0.05 );
 		update();
@@ -306,14 +302,14 @@ void Fader::setPeak( float fPeak, float &targetPeak, float &persistentPeak, QTim
 
 void Fader::setPeak_L( float fPeak )
 {
-	setPeak( fPeak, m_fPeakValue_L, m_persistentPeak_L, m_lastPeakTime_L );
+	setPeak( fPeak, m_fPeakValue_L, m_persistentPeak_L, m_lastPeakTimer_L );
 }
 
 
 
 void Fader::setPeak_R( float fPeak )
 {
-	setPeak( fPeak, m_fPeakValue_R, m_persistentPeak_R, m_lastPeakTime_R );
+	setPeak( fPeak, m_fPeakValue_R, m_persistentPeak_R, m_lastPeakTimer_R );
 }
 
 
@@ -321,14 +317,14 @@ void Fader::setPeak_R( float fPeak )
 // update tooltip showing value and adjust position while changing fader value
 void Fader::updateTextFloat()
 {
-	if( ConfigManager::inst()->value( "app", "displaydbfs" ).toInt() && m_displayConversion )
+	if( ConfigManager::inst()->value( "app", "displaydbfs" ).toInt() && m_conversionFactor == 100.0 )
 	{
 		s_textFloat->setText( QString("Volume: %1 dBFS").
-				arg( 20.0 * log10( model()->value() ), 3, 'f', 2 ) );
+				arg( ampToDbfs( model()->value() ), 3, 'f', 2 ) );
 	}
 	else
 	{
-		s_textFloat->setText( m_description + " " + QString("%1 ").arg( m_displayConversion ? model()->value() * 100 : model()->value() ) + " " + m_unit );
+		s_textFloat->setText( m_description + " " + QString("%1 ").arg( model()->value() * m_conversionFactor ) + " " + m_unit );
 	}
 	s_textFloat->moveGlobal( this, QPoint( width() - ( *m_knob ).width() - 5, knobPosY() - 46 ) );
 }
@@ -378,12 +374,12 @@ void Fader::paintDBFSLevels(QPaintEvent * ev, QPainter & painter)
 
 
 	// Draw left levels
-	float const leftSpan = ampToDbfs(m_fPeakValue_L) - minDB;
+	float const leftSpan = ampToDbfs(qMax<float>(0.0001, m_fPeakValue_L)) - minDB;
 	int peak_L = height * leftSpan * fullSpanReciprocal;
 	QRect drawRectL( 0, height - peak_L, width, peak_L ); // Source and target are identical
 	painter.drawPixmap( drawRectL, *m_leds, drawRectL );
 
-	float const persistentLeftPeakDBFS = ampToDbfs(m_persistentPeak_L);
+	float const persistentLeftPeakDBFS = ampToDbfs(qMax<float>(0.0001, m_persistentPeak_L));
 	int persistentPeak_L = height * (1 - (persistentLeftPeakDBFS - minDB) * fullSpanReciprocal);
 	// the LED's have a  4px padding and we don't want the peaks
 	// to draw on the fader background
@@ -400,12 +396,12 @@ void Fader::paintDBFSLevels(QPaintEvent * ev, QPainter & painter)
 
 
 	// Draw right levels
-	float const rightSpan = ampToDbfs(m_fPeakValue_R) - minDB;
+	float const rightSpan = ampToDbfs(qMax<float>(0.0001, m_fPeakValue_R)) - minDB;
 	int peak_R = height * rightSpan * fullSpanReciprocal;
 	QRect const drawRectR( center, height - peak_R, width, peak_R ); // Source and target are identical
 	painter.drawPixmap( drawRectR, *m_leds, drawRectR );
 
-	float const persistentRightPeakDBFS = ampToDbfs(m_persistentPeak_R);
+	float const persistentRightPeakDBFS = ampToDbfs(qMax<float>(0.0001, m_persistentPeak_R));
 	int persistentPeak_R = height * (1 - (persistentRightPeakDBFS - minDB) * fullSpanReciprocal);
 	// the LED's have a  4px padding and we don't want the peaks
 	// to draw on the fader background

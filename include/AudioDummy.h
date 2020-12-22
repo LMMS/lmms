@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -31,8 +31,9 @@
 #include "Mixer.h"
 
 
-class AudioDummy : public AudioDevice, public QThread
+class AudioDummy : public QThread, public AudioDevice
 {
+	Q_OBJECT
 public:
 	AudioDummy( bool & _success_ful, Mixer* mixer ) :
 		AudioDevice( DEFAULT_CHANNELS, mixer )
@@ -47,7 +48,7 @@ public:
 
 	inline static QString name()
 	{
-		return QT_TRANSLATE_NOOP( "setupWidget", "Dummy (no sound output)" );
+		return QT_TRANSLATE_NOOP( "AudioDeviceSetupWidget", "Dummy (no sound output)" );
 	}
 
 
@@ -63,11 +64,11 @@ public:
 		{
 		}
 
-		virtual void saveSettings()
+		void saveSettings() override
 		{
 		}
 
-		virtual void show()
+		void show() override
 		{
 			parentWidget()->hide();
 			QWidget::show();
@@ -77,17 +78,17 @@ public:
 
 
 private:
-	virtual void startProcessing()
+	void startProcessing() override
 	{
 		start();
 	}
 
-	virtual void stopProcessing()
+	void stopProcessing() override
 	{
 		stopProcessingThread( this );
 	}
 
-	virtual void run()
+	void run() override
 	{
 		MicroTimer timer;
 		while( true )

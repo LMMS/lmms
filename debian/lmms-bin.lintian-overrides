@@ -1,0 +1,9 @@
+lmms: pkg-has-shlibs-control-file-but-no-actual-shared-libs
+lmms: postinst-has-useless-call-to-ldconfig
+lmms: postrm-has-useless-call-to-ldconfig
+
+# env is used to set the environment, then lmms is called.
+lmms: desktop-command-not-in-package usr/share/applications/lmms.desktop env
+
+# Icon is in lmms-common.
+lmms: menu-icon-missing usr/share/pixmaps/lmms.xpm

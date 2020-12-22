@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2005-2013 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -39,7 +39,6 @@
 
 
 struct pollfd;
-class QLineEdit;
 
 
 class MidiAlsaSeq : public QThread, public MidiClient
@@ -67,45 +66,45 @@ public:
 
 
 	virtual void processOutEvent( const MidiEvent & _me,
-						const MidiTime & _time,
-						const MidiPort * _port );
+						const TimePos & _time,
+						const MidiPort * _port ) override;
 
-	virtual void applyPortMode( MidiPort * _port );
-	virtual void applyPortName( MidiPort * _port );
+	void applyPortMode( MidiPort * _port ) override;
+	void applyPortName( MidiPort * _port ) override;
 
-	virtual void removePort( MidiPort * _port );
+	void removePort( MidiPort * _port ) override;
 
 
 	// list seq-ports from ALSA
-	virtual QStringList readablePorts() const
+	QStringList readablePorts() const override
 	{
 		return m_readablePorts;
 	}
 
-	virtual QStringList writablePorts() const
+	QStringList writablePorts() const override
 	{
 		return m_writablePorts;
 	}
 
 	// return name of port which specified MIDI event came from
-	virtual QString sourcePortName( const MidiEvent & ) const;
+	QString sourcePortName( const MidiEvent & ) const override;
 
 	// (un)subscribe given MidiPort to/from destination-port
 	virtual void subscribeReadablePort( MidiPort * _port,
 						const QString & _dest,
-						bool _subscribe = true );
+						bool _subscribe = true ) override;
 	virtual void subscribeWritablePort( MidiPort * _port,
 						const QString & _dest,
-						bool _subscribe = true );
+						bool _subscribe = true ) override;
 	virtual void connectRPChanged( QObject * _receiver,
-							const char * _member )
+							const char * _member ) override
 	{
 		connect( this, SIGNAL( readablePortsChanged() ),
 							_receiver, _member );
 	}
 
 	virtual void connectWPChanged( QObject * _receiver,
-							const char * _member )
+							const char * _member ) override
 	{
 		connect( this, SIGNAL( writablePortsChanged() ),
 							_receiver, _member );
@@ -118,7 +117,7 @@ private slots:
 
 
 private:
-	virtual void run();
+	void run() override;
 
 #ifdef LMMS_HAVE_ALSA
 	QMutex m_seqMutex;

@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2008 Paul Giblock <drfaygo/at/gmail.com>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -25,18 +25,14 @@
 
 #include "PeakController.h"
 
-#include <cstdio>
+#include <cmath>
+
 #include <QDomElement>
-#include <QObject>
 #include <QMessageBox>
 
-#include "Engine.h"
 #include "Mixer.h"
 #include "EffectChain.h"
 #include "plugins/peak_controller_effect/peak_controller_effect.h"
-#include "PresetPreviewPlayHandle.h"
-
-class ControllerDialog;
 
 PeakControllerEffectVector PeakController::s_effects;
 int PeakController::m_getCount;
@@ -57,8 +53,10 @@ PeakController::PeakController( Model * _parent,
 			this, SLOT( handleDestroyedEffect( ) ) );
 	}
 	connect( Engine::mixer(), SIGNAL( sampleRateChanged() ), this, SLOT( updateCoeffs() ) );
-	connect( m_peakEffect->attackModel(), SIGNAL( dataChanged() ), this, SLOT( updateCoeffs() ) );
-	connect( m_peakEffect->decayModel(), SIGNAL( dataChanged() ), this, SLOT( updateCoeffs() ) );
+	connect( m_peakEffect->attackModel(), SIGNAL( dataChanged() ),
+			this, SLOT( updateCoeffs() ), Qt::DirectConnection );
+	connect( m_peakEffect->decayModel(), SIGNAL( dataChanged() ),
+			this, SLOT( updateCoeffs() ), Qt::DirectConnection );
 	m_coeffNeedsUpdate = true;
 }
 
@@ -67,11 +65,7 @@ PeakController::PeakController( Model * _parent,
 
 PeakController::~PeakController()
 {
-	//EffectChain::loadSettings() appends effect to EffectChain::m_effects
-	//When it's previewing, EffectChain::loadSettings(<Controller Fx XML>) is not called
-	//Therefore, we shouldn't call removeEffect() as it is not even appended.
-	//NB: Most XML setting are loaded on preview, except controller fx.
-	if( m_peakEffect != NULL && m_peakEffect->effectChain() != NULL && PresetPreviewPlayHandle::isPreviewing() == false )
+	if( m_peakEffect != NULL && m_peakEffect->effectChain() != NULL )
 	{
 		m_peakEffect->effectChain()->removeEffect( m_peakEffect );
 	}

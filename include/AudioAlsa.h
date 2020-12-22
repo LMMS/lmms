@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -38,9 +38,9 @@
 #include "AudioDevice.h"
 
 
-class AudioAlsa : public AudioDevice, public QThread
+class AudioAlsa : public QThread, public AudioDevice
 {
-	// Public classes and enums
+	Q_OBJECT
 public:
 	/**
 	 * @brief Contains the relevant information about available ALSA devices
@@ -71,7 +71,7 @@ public:
 
 	inline static QString name()
 	{
-		return QT_TRANSLATE_NOOP( "setupWidget",
+		return QT_TRANSLATE_NOOP( "AudioDeviceSetupWidget",
 			"ALSA (Advanced Linux Sound Architecture)" );
 	}
 
@@ -80,10 +80,10 @@ public:
 	static DeviceInfoCollection getAvailableDevices();
 
 private:
-	virtual void startProcessing();
-	virtual void stopProcessing();
-	virtual void applyQualitySettings();
-	virtual void run();
+	void startProcessing() override;
+	void stopProcessing() override;
+	void applyQualitySettings() override;
+	void run() override;
 
 	int setHWParams( const ch_cnt_t _channels, snd_pcm_access_t _access );
 	int setSWParams();

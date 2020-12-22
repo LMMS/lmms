@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2006-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -34,12 +34,12 @@
 class automatableButtonGroup;
 
 
-class EXPORT AutomatableButton : public QPushButton, public BoolModelView
+class LMMS_EXPORT AutomatableButton : public QPushButton, public BoolModelView
 {
 	Q_OBJECT
 public:
 	AutomatableButton( QWidget * _parent, const QString & _name
-			= QString::null );
+			= QString() );
 	virtual ~AutomatableButton();
 
 	inline void setCheckable( bool _on )
@@ -48,7 +48,7 @@ public:
 		model()->setJournalling( _on );
 	}
 
-	virtual void modelChanged();
+	void modelChanged() override;
 
 
 public slots:
@@ -62,9 +62,9 @@ public slots:
 
 
 protected:
-	virtual void contextMenuEvent( QContextMenuEvent * _me );
-	virtual void mousePressEvent( QMouseEvent * _me );
-	virtual void mouseReleaseEvent( QMouseEvent * _me );
+	void contextMenuEvent( QContextMenuEvent * _me ) override;
+	void mousePressEvent( QMouseEvent * _me ) override;
+	void mouseReleaseEvent( QMouseEvent * _me ) override;
 
 
 private:
@@ -79,12 +79,12 @@ private:
 
 
 
-class EXPORT automatableButtonGroup : public QWidget, public IntModelView
+class LMMS_EXPORT automatableButtonGroup : public QWidget, public IntModelView
 {
 	Q_OBJECT
 public:
 	automatableButtonGroup( QWidget * _parent, const QString & _name
-			= QString::null );
+			= QString() );
 	virtual ~automatableButtonGroup();
 
 	void addButton( AutomatableButton * _btn );
@@ -92,7 +92,7 @@ public:
 
 	void activateButton( AutomatableButton * _btn );
 
-	virtual void modelChanged();
+	void modelChanged() override;
 
 
 private slots:

@@ -4,7 +4,7 @@
  * Copyright (c) 2009 Andrew Kelley <superjoe30/at/gmail/dot/com>
  * Copyright (c) 2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -26,10 +26,12 @@
 #ifndef FX_LINE_H
 #define FX_LINE_H
 
+#include <QColorDialog>
 #include <QGraphicsView>
 #include <QLineEdit>
 #include <QWidget>
 
+#include "ColorChooser.h"
 #include "Knob.h"
 #include "LcdWidget.h"
 #include "SendButtonIndicator.h"
@@ -51,10 +53,10 @@ public:
 	FxLine( QWidget * _parent, FxMixerView * _mv, int _channelIndex);
 	~FxLine();
 
-	virtual void paintEvent( QPaintEvent * );
-	virtual void mousePressEvent( QMouseEvent * );
-	virtual void mouseDoubleClickEvent( QMouseEvent * );
-	virtual void contextMenuEvent( QContextMenuEvent * );
+	void paintEvent( QPaintEvent * ) override;
+	void mousePressEvent( QMouseEvent * ) override;
+	void mouseDoubleClickEvent( QMouseEvent * ) override;
+	void contextMenuEvent( QContextMenuEvent * ) override;
 
 	inline int channelIndex() { return m_channelIndex; }
 	void setChannelIndex(int index);
@@ -79,6 +81,8 @@ public:
 
 	static const int FxLineHeight;
 
+	bool eventFilter (QObject *dist, QEvent *event) override;
+
 private:
 	void drawFxLine( QPainter* p, const FxLine *fxLine, bool isActive, bool sendToThis, bool receiveFromThis );
 	QString elideName( const QString & name );
@@ -97,14 +101,18 @@ private:
 	QLineEdit * m_renameLineEdit;
 	QGraphicsView * m_view;
 
-private slots:
+public slots:
 	void renameChannel();
+	void resetColor();
+	void changeColor();
+	void randomColor();
+
+private slots:
 	void renameFinished();
 	void removeChannel();
 	void removeUnusedChannels();
 	void moveChannelLeft();
 	void moveChannelRight();
-	void displayHelp();
 };
 
 

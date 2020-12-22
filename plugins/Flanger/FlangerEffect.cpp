@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2014 David French <dave/dot/french3/at/googlemail/dot/com>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -24,7 +24,9 @@
 
 #include "FlangerEffect.h"
 #include "Engine.h"
-#include "embed.cpp"
+
+#include "embed.h"
+#include "plugin_export.h"
 
 extern "C"
 {
@@ -33,11 +35,11 @@ Plugin::Descriptor PLUGIN_EXPORT flanger_plugin_descriptor =
 {
 	STRINGIFY( PLUGIN_NAME ),
 	"Flanger",
-	QT_TRANSLATE_NOOP( "pluginBrowser", "A native flanger plugin" ),
+	QT_TRANSLATE_NOOP( "PluginBrowser", "A native flanger plugin" ),
 	"Dave French <contact/dot/dave/dot/french3/at/googlemail/dot/com>",
 	0x0100,
 	Plugin::Effect,
-	new PluginPixmapLoader( "logo" ),
+	new PluginPixmapLoader("logo"),
 	NULL,
 	NULL
 } ;
@@ -68,7 +70,7 @@ FlangerEffect::~FlangerEffect()
 	{
 		delete m_rDelay;
 	}
-	if(m_lfo )
+	if( m_lfo )
 	{
 		delete m_lfo;
 	}
@@ -94,7 +96,7 @@ bool FlangerEffect::processAudioBuffer( sampleFrame *buf, const fpp_t frames )
 	const float noise = m_flangerControls.m_whiteNoiseAmountModel.value();
 	float amplitude = m_flangerControls.m_lfoAmountModel.value() * Engine::mixer()->processingSampleRate();
 	bool invertFeedback = m_flangerControls.m_invertFeedbackModel.value();
-	m_lfo->setFrequency(  m_flangerControls.m_lfoFrequencyModel.value() );
+	m_lfo->setFrequency(  1.0/m_flangerControls.m_lfoFrequencyModel.value() );
 	m_lDelay->setFeedback( m_flangerControls.m_feedbackModel.value() );
 	m_rDelay->setFeedback( m_flangerControls.m_feedbackModel.value() );
 	sample_t dryS[2];
@@ -107,8 +109,8 @@ bool FlangerEffect::processAudioBuffer( sampleFrame *buf, const fpp_t frames )
 		dryS[0] = buf[f][0];
 		dryS[1] = buf[f][1];
 		m_lfo->tick(&leftLfo, &rightLfo);
-		m_lDelay->setLength( ( float )length + ( amplitude * leftLfo ) );
-		m_rDelay->setLength( ( float )length+ ( amplitude * rightLfo ) );
+		m_lDelay->setLength( ( float )length + amplitude * (leftLfo+1.0)  );
+		m_rDelay->setLength( ( float )length + amplitude * (rightLfo+1.0)  );
 		if(invertFeedback)
 		{
 			m_lDelay->tick( &buf[f][1] );
@@ -139,11 +141,20 @@ void FlangerEffect::changeSampleRate()
 
 
 
+
+void FlangerEffect::restartLFO()
+{
+	m_lfo->restart();
+}
+
+
+
+
 extern "C"
 {
 
 //needed for getting plugin out of shared lib
-Plugin * PLUGIN_EXPORT lmms_plugin_main( Model* parent, void* data )
+PLUGIN_EXPORT Plugin * lmms_plugin_main( Model* parent, void* data )
 {
 	return new FlangerEffect( parent , static_cast<const Plugin::Descriptor::SubPluginFeatures::Key *>( data ) );
 }

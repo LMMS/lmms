@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -36,29 +36,22 @@
  * \todo write isWhite inline function and replace throughout
  */
 
+#include <cmath>
 
 #include <QCursor>
 #include <QKeyEvent>
-#include <QMouseEvent>
 #include <QPainter>
 #include <QVBoxLayout>
-
 
 #include "PianoView.h"
 #include "Piano.h"
 #include "CaptionMenu.h"
 #include "embed.h"
-#include "Engine.h"
 #include "gui_templates.h"
 #include "InstrumentTrack.h"
 #include "Knob.h"
 #include "StringPairDrag.h"
 #include "MainWindow.h"
-#include "MidiEvent.h"
-#include "templates.h"
-#include "update_event.h"
-
-
 
 
 /*! The scale of C Major - white keys only.
@@ -137,19 +130,6 @@ PianoView::PianoView( QWidget * _parent ) :
 
 }
 
-
-
-
-/*! \brief Destroy this piano display view
- *
- */
-PianoView::~PianoView()
-{
-}
-
-
-
-
 /*! \brief Map a keyboard key being pressed to a note in our keyboard view
  *
  *  \param _k The keyboard scan code of the key being pressed.
@@ -207,7 +187,7 @@ int PianoView::getKeyFromKeyEvent( QKeyEvent * _ke )
 		case 27: return 31; // ]
 	}
 #endif
-#if defined(LMMS_BUILD_LINUX) || defined(LMMS_BUILD_OPENBSD)
+#if defined(LMMS_BUILD_LINUX) || defined(LMMS_BUILD_OPENBSD) || defined(LMMS_BUILD_FREEBSD)
 	switch( k )
 	{
 		case 52: return 0; // Z  = C
@@ -334,13 +314,22 @@ void PianoView::modelChanged()
  */
 int PianoView::getKeyFromMouse( const QPoint & _p ) const
 {
-	int key_num = (int)( (float) _p.x() / (float) PW_WHITE_KEY_WIDTH );
+	int offset = _p.x() % PW_WHITE_KEY_WIDTH;
+	if( offset < 0 ) offset += PW_WHITE_KEY_WIDTH;
+	int key_num = ( _p.x() - offset) / PW_WHITE_KEY_WIDTH;
 
 	for( int i = 0; i <= key_num; ++i )
 	{
 		if ( Piano::isBlackKey( m_startKey+i ) )
 		{
 			++key_num;
+		}
+	}
+	for( int i = 0; i >= key_num; --i )
+	{
+		if ( Piano::isBlackKey( m_startKey+i ) )
+		{
+			--key_num;
 		}
 	}
 
@@ -352,23 +341,21 @@ int PianoView::getKeyFromMouse( const QPoint & _p ) const
 		// then do extra checking whether the mouse-cursor is over
 		// a black key
 		if( key_num > 0 && Piano::isBlackKey( key_num-1 ) &&
-			_p.x() % PW_WHITE_KEY_WIDTH <=
-					( PW_WHITE_KEY_WIDTH / 2 ) -
-						( PW_BLACK_KEY_WIDTH / 2 ) )
+			offset <= ( PW_WHITE_KEY_WIDTH / 2 ) -
+					( PW_BLACK_KEY_WIDTH / 2 ) )
 		{
 			--key_num;
 		}
 		if( key_num < NumKeys - 1 && Piano::isBlackKey( key_num+1 ) &&
-			_p.x() % PW_WHITE_KEY_WIDTH >=
-				( PW_WHITE_KEY_WIDTH -
-				  		PW_BLACK_KEY_WIDTH / 2 ) )
+			offset >= ( PW_WHITE_KEY_WIDTH -
+					PW_BLACK_KEY_WIDTH / 2 ) )
 		{
 			++key_num;
 		}
 	}
 
 	// some range-checking-stuff
-	return tLimit( key_num, 0, NumKeys - 1 );
+	return qBound( 0, key_num, NumKeys - 1 );
 }
 
 
@@ -668,8 +655,10 @@ void PianoView::focusOutEvent( QFocusEvent * )
 	// window we live in?
 	if( parentWidget()->parentWidget()->focusWidget() != this &&
 		parentWidget()->parentWidget()->focusWidget() != NULL &&
-		!parentWidget()->parentWidget()->
-				focusWidget()->inherits( "QLineEdit" ) )
+		!(parentWidget()->parentWidget()->
+				focusWidget()->inherits( "QLineEdit" ) ||
+		parentWidget()->parentWidget()->
+				focusWidget()->inherits( "QPlainTextEdit" ) ))
 	{
 		// then reclaim keyboard focus!
 		setFocus();
@@ -684,9 +673,16 @@ void PianoView::focusOutEvent( QFocusEvent * )
 		m_piano->midiEventProcessor()->processInEvent( MidiEvent( MidiNoteOff, -1, i, 0 ) );
 		m_piano->setKeyState( i, false );
 	}
+
+
 	update();
 }
 
+
+void PianoView::focusInEvent( QFocusEvent * )
+{
+	m_piano->instrumentTrack()->autoAssignMidiDevice(true);
+}
 
 
 

@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2008-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -27,9 +27,10 @@
 
 #include <QStaticText>
 
-#include "Track.h"
-
-class AutomationPattern;
+#include "AutomationPattern.h"
+#include "Song.h"
+#include "SongEditor.h"
+#include "TrackContentObjectView.h"
 
 
 class AutomationPatternView : public TrackContentObjectView
@@ -44,6 +45,7 @@ public:
 public slots:
 	/// Opens this view's pattern in the global automation editor
 	void openInAutomationEditor();
+	void update() override;
 
 
 protected slots:
@@ -55,11 +57,11 @@ protected slots:
 	void flipX();
 
 protected:
-	virtual void constructContextMenu( QMenu * );
-	virtual void mouseDoubleClickEvent(QMouseEvent * me );
-	virtual void paintEvent( QPaintEvent * pe );
-	virtual void dragEnterEvent( QDragEnterEvent * _dee );
-	virtual void dropEvent( QDropEvent * _de );
+	void constructContextMenu( QMenu * ) override;
+	void mouseDoubleClickEvent(QMouseEvent * me ) override;
+	void paintEvent( QPaintEvent * pe ) override;
+	void dragEnterEvent( QDragEnterEvent * _dee ) override;
+	void dropEvent( QDropEvent * _de ) override;
 
 
 private:

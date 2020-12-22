@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -54,10 +54,10 @@ public:
 	void processNote( NotePlayHandle* n );
 
 
-	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
-	virtual void loadSettings( const QDomElement & _this );
+	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
+	void loadSettings( const QDomElement & _this ) override;
 
-	inline virtual QString nodeName() const
+	inline QString nodeName() const override
 	{
 		return "chordcreator";
 	}
@@ -165,8 +165,8 @@ public:
 		ArpDirUp,
 		ArpDirDown,
 		ArpDirUpAndDown,
-		ArpDirRandom,
 		ArpDirDownAndUp,
+		ArpDirRandom,
 		NumArpDirections
 	} ;
 
@@ -176,10 +176,10 @@ public:
 	void processNote( NotePlayHandle* n );
 
 
-	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
-	virtual void loadSettings( const QDomElement & _this );
+	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
+	void loadSettings( const QDomElement & _this ) override;
 
-	inline virtual QString nodeName() const
+	inline QString nodeName() const override
 	{
 		return "arpeggiator";
 	}

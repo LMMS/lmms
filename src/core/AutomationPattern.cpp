@@ -5,7 +5,7 @@
  * Copyright (c) 2008-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * Copyright (c) 2006-2008 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -28,11 +28,13 @@
 
 #include "AutomationPatternView.h"
 #include "AutomationTrack.h"
+#include "LocaleHelper.h"
 #include "Note.h"
 #include "ProjectJournal.h"
 #include "BBTrackContainer.h"
 #include "Song.h"
-#include "embed.h"
+
+#include <cmath>
 
 int AutomationPattern::s_quantization = 1;
 const float AutomationPattern::DEFAULT_MIN_VALUE = 0;
@@ -49,7 +51,7 @@ AutomationPattern::AutomationPattern( AutomationTrack * _auto_track ) :
 	m_isRecording( false ),
 	m_lastRecordedValue( 0 )
 {
-	changeLength( MidiTime( 1, 0 ) );
+	changeLength( TimePos( 1, 0 ) );
 	if( getTrack() )
 	{
 		switch( getTrack()->trackContainer()->type() )
@@ -97,35 +99,18 @@ AutomationPattern::AutomationPattern( const AutomationPattern & _pat_to_copy ) :
 	}
 }
 
-
-
-
-AutomationPattern::~AutomationPattern()
-{
-}
-
-
-
-
 bool AutomationPattern::addObject( AutomatableModel * _obj, bool _search_dup )
 {
-	if( _search_dup )
+	if( _search_dup && m_objects.contains(_obj) )
 	{
-		for( objectVector::iterator it = m_objects.begin();
-					it != m_objects.end(); ++it )
-		{
-			if( *it == _obj )
-			{				
-				return false;
-			}
-		}
+		return false;
 	}
 
 	// the automation track is unconnected and there is nothing in the track
 	if( m_objects.isEmpty() && hasAutomation() == false )
 	{
 		// then initialize first value
-		putValue( MidiTime(0), _obj->inverseScaledValue( _obj->value<float>() ), false );
+		putValue( TimePos(0), _obj->inverseScaledValue( _obj->value<float>() ), false );
 	}
 
 	m_objects += _obj;
@@ -160,11 +145,11 @@ void AutomationPattern::setProgressionType(
 void AutomationPattern::setTension( QString _new_tension )
 {
 	bool ok;
-	float nt = _new_tension.toFloat( & ok );
+	float nt = LocaleHelper::toFloat(_new_tension, & ok);
 
 	if( ok && nt > -0.01 && nt < 1.01 )
 	{
-		m_tension = _new_tension.toFloat();
+		m_tension = nt;
 	}
 }
 
@@ -183,14 +168,26 @@ const AutomatableModel * AutomationPattern::firstObject() const
 	return &_fm;
 }
 
-
-
-
-MidiTime AutomationPattern::timeMapLength() const
+const AutomationPattern::objectVector& AutomationPattern::objects() const
 {
-	if( m_timeMap.isEmpty() ) return 0;
+	return m_objects;
+}
+
+
+
+
+TimePos AutomationPattern::timeMapLength() const
+{
+	TimePos one_bar = TimePos(1, 0);
+	if (m_timeMap.isEmpty()) { return one_bar; }
+
 	timeMap::const_iterator it = m_timeMap.end();
-	return MidiTime( qMax( MidiTime( (it-1).key() ).getTact() + 1, 1 ), 0 );
+	tick_t last_tick = static_cast<tick_t>((it-1).key());
+	// if last_tick is 0 (single item at tick 0)
+	// return length as a whole bar to prevent disappearing TCO
+	if (last_tick == 0) { return one_bar; }
+
+	return TimePos(last_tick);
 }
 
 
@@ -198,36 +195,43 @@ MidiTime AutomationPattern::timeMapLength() const
 
 void AutomationPattern::updateLength()
 {
-	changeLength( timeMapLength() );
+	// Do not resize down in case user manually extended up
+	changeLength(qMax(length(), timeMapLength()));
 }
 
 
 
 
-MidiTime AutomationPattern::putValue( const MidiTime & _time,
-							const float _value,
-							const bool _quant_pos )
+TimePos AutomationPattern::putValue( const TimePos & time,
+					const float value,
+					const bool quantPos,
+					const bool ignoreSurroundingPoints )
 {
 	cleanObjects();
 
-	MidiTime newTime = _quant_pos ?
-				Note::quantized( _time, quantization() ) :
-				_time;
+	TimePos newTime = quantPos ?
+				Note::quantized( time, quantization() ) :
+				time;
 
-	m_timeMap[newTime] = _value;
+	m_timeMap[ newTime ] = value;
 	timeMap::const_iterator it = m_timeMap.find( newTime );
+
+	// Remove control points that are covered by the new points
+	// quantization value. Control Key to override
+	if( ! ignoreSurroundingPoints )
+	{
+		for( int i = newTime + 1; i < newTime + quantization(); ++i )
+		{
+			AutomationPattern::removeValue( i );
+		}
+	}
 	if( it != m_timeMap.begin() )
 	{
 		--it;
 	}
-	generateTangents(it, 3);
+	generateTangents( it, 3 );
 
-	// we need to maximize our length in case we're part of a hidden
-	// automation track as the user can't resize this pattern
-	if( getTrack() && getTrack()->type() == Track::HiddenAutomationTrack )
-	{
-		updateLength();
-	}
+	updateLength();
 
 	emit dataChanged();
 
@@ -237,37 +241,44 @@ MidiTime AutomationPattern::putValue( const MidiTime & _time,
 
 
 
-void AutomationPattern::removeValue( const MidiTime & _time,
-									 const bool _quant_pos )
+void AutomationPattern::removeValue( const TimePos & time )
 {
 	cleanObjects();
 
-	MidiTime newTime = _quant_pos ?
-				Note::quantized( _time, quantization() ) :
-				_time;
-
-	m_timeMap.remove( newTime );
-	m_tangents.remove( newTime );
-	timeMap::const_iterator it = m_timeMap.lowerBound( newTime );
+	m_timeMap.remove( time );
+	m_tangents.remove( time );
+	timeMap::const_iterator it = m_timeMap.lowerBound( time );
 	if( it != m_timeMap.begin() )
 	{
 		--it;
 	}
 	generateTangents(it, 3);
 
-	if( getTrack() && getTrack()->type() == Track::HiddenAutomationTrack )
-	{
-		updateLength();
-	}
+	updateLength();
 
 	emit dataChanged();
 }
 
 
 
+void AutomationPattern::recordValue(TimePos time, float value)
+{
+	if( value != m_lastRecordedValue )
+	{
+		putValue( time, value, true );
+		m_lastRecordedValue = value;
+	}
+	else if( valueAt( time ) != value )
+	{
+		removeValue( time );
+	}
+}
+
+
+
 
 /**
- * @brief Set the position of the point that is being draged.
+ * @brief Set the position of the point that is being dragged.
  *        Calling this function will also automatically set m_dragging to true,
  *        which applyDragValue() have to be called to m_dragging.
  * @param the time(x position) of the point being dragged
@@ -275,14 +286,16 @@ void AutomationPattern::removeValue( const MidiTime & _time,
  * @param true to snip x position
  * @return
  */
-MidiTime AutomationPattern::setDragValue( const MidiTime & _time, const float _value,
-					   const bool _quant_pos )
+TimePos AutomationPattern::setDragValue( const TimePos & time,
+						const float value,
+						const bool quantPos,
+						const bool controlKey )
 {
 	if( m_dragging == false )
 	{
-		MidiTime newTime = _quant_pos  ?
-					Note::quantized( _time, quantization() ) :
-					_time;
+		TimePos newTime = quantPos  ?
+				Note::quantized( time, quantization() ) :
+							time;
 		this->removeValue( newTime );
 		m_oldTimeMap = m_timeMap;
 		m_dragging = true;
@@ -293,10 +306,10 @@ MidiTime AutomationPattern::setDragValue( const MidiTime & _time, const float _v
 
 	for( timeMap::const_iterator it = m_timeMap.begin(); it != m_timeMap.end(); ++it )
 	{
-		generateTangents(it, 3);
+		generateTangents( it, 3 );
 	}
 
-	return this->putValue( _time, _value, _quant_pos );
+	return this->putValue( time, value, quantPos, controlKey );
 
 }
 
@@ -314,7 +327,7 @@ void AutomationPattern::applyDragValue()
 
 
 
-float AutomationPattern::valueAt( const MidiTime & _time ) const
+float AutomationPattern::valueAt( const TimePos & _time ) const
 {
 	if( m_timeMap.isEmpty() )
 	{
@@ -382,7 +395,7 @@ float AutomationPattern::valueAt( timeMap::const_iterator v, int offset ) const
 
 
 
-float *AutomationPattern::valuesAfter( const MidiTime & _time ) const
+float *AutomationPattern::valuesAfter( const TimePos & _time ) const
 {
 	timeMap::ConstIterator v = m_timeMap.lowerBound( _time );
 	if( v == m_timeMap.end() || (v+1) == m_timeMap.end() )
@@ -423,12 +436,12 @@ void AutomationPattern::flipY( int min, int max )
 		if ( min < 0 )
 		{
 			tempValue = valueAt( ( iterate + i ).key() ) * -1;
-			putValue( MidiTime( (iterate + i).key() ) , tempValue, false);
+			putValue( TimePos( (iterate + i).key() ) , tempValue, false);
 		}
 		else
 		{
 			tempValue = max - valueAt( ( iterate + i ).key() );
-			putValue( MidiTime( (iterate + i).key() ) , tempValue, false);
+			putValue( TimePos( (iterate + i).key() ) , tempValue, false);
 		}
 	}
 
@@ -467,12 +480,12 @@ void AutomationPattern::flipX( int length )
 		if ( realLength < length )
 		{
 			tempValue = valueAt( ( iterate + numPoints ).key() );
-			putValue( MidiTime( length ) , tempValue, false);
+			putValue( TimePos( length ) , tempValue, false);
 			numPoints++;
 			for( int i = 0; i <= numPoints; i++ )
 			{
 				tempValue = valueAt( ( iterate + i ).key() );
-				MidiTime newTime = MidiTime( length - ( iterate + i ).key() );
+				TimePos newTime = TimePos( length - ( iterate + i ).key() );
 				tempMap[newTime] = tempValue;
 			}
 		}
@@ -481,15 +494,15 @@ void AutomationPattern::flipX( int length )
 			for( int i = 0; i <= numPoints; i++ )
 			{
 				tempValue = valueAt( ( iterate + i ).key() );
-				MidiTime newTime;
+				TimePos newTime;
 
 				if ( ( iterate + i ).key() <= length )
 				{
-					newTime = MidiTime( length - ( iterate + i ).key() );
+					newTime = TimePos( length - ( iterate + i ).key() );
 				}
 				else
 				{
-					newTime = MidiTime( ( iterate + i ).key() );
+					newTime = TimePos( ( iterate + i ).key() );
 				}
 				tempMap[newTime] = tempValue;
 			}
@@ -501,7 +514,7 @@ void AutomationPattern::flipX( int length )
 		{
 			tempValue = valueAt( ( iterate + i ).key() );
 			cleanObjects();
-			MidiTime newTime = MidiTime( realLength - ( iterate + i ).key() );
+			TimePos newTime = TimePos( realLength - ( iterate + i ).key() );
 			tempMap[newTime] = tempValue;
 		}
 	}
@@ -525,6 +538,11 @@ void AutomationPattern::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	_this.setAttribute( "prog", QString::number( progressionType() ) );
 	_this.setAttribute( "tens", QString::number( getTension() ) );
 	_this.setAttribute( "mute", QString::number( isMuted() ) );
+	
+	if( usesCustomClipColor() )
+	{
+		_this.setAttribute( "color", color().name() );
+	}
 
 	for( timeMap::const_iterator it = m_timeMap.begin();
 						it != m_timeMap.end(); ++it )
@@ -573,12 +591,18 @@ void AutomationPattern::loadSettings( const QDomElement & _this )
 		if( element.tagName() == "time" )
 		{
 			m_timeMap[element.attribute( "pos" ).toInt()]
-				= element.attribute( "value" ).toFloat();
+				= LocaleHelper::toFloat(element.attribute("value"));
 		}
 		else if( element.tagName() == "object" )
 		{
 			m_idsToResolve << element.attribute( "id" ).toInt();
 		}
+	}
+	
+	if( _this.hasAttribute( "color" ) )
+	{
+		useCustomClipColor( true );
+		setColor( _this.attribute( "color" ) );
 	}
 
 	int len = _this.attribute( "len" ).toInt();
@@ -607,52 +631,9 @@ const QString AutomationPattern::name() const
 	{
 		return m_objects.first()->fullDisplayName();
 	}
-	return tr( "Drag a control while pressing <%1>" ).arg(
-	#ifdef LMMS_BUILD_APPLE
-		"⌘");
-	#else
-		"Ctrl");
-	#endif
+	return tr( "Drag a control while pressing <%1>" ).arg(UI_CTRL_KEY);
 }
 
-
-
-
-void AutomationPattern::processMidiTime( const MidiTime & time )
-{
-	if( ! isRecording() )
-	{
-		if( time >= 0 && hasAutomation() )
-		{
-			const float val = valueAt( time );
-			for( objectVector::iterator it = m_objects.begin();
-							it != m_objects.end(); ++it )
-			{
-				if( *it )
-				{
-					( *it )->setAutomatedValue( val );
-				}
-
-			}
-		}
-	}
-	else
-	{
-		if( time >= 0 && ! m_objects.isEmpty() )
-		{
-			const float value = static_cast<float>( firstObject()->value<float>() );
-			if( value != m_lastRecordedValue )
-			{
-				putValue( time, value, true );
-				m_lastRecordedValue = value;
-			}
-			else if( valueAt( time ) != value )
-			{
-				removeValue( time, false );
-			}
-		}
-	}
-}
 
 
 
@@ -801,6 +782,26 @@ void AutomationPattern::resolveAllIDs()
 						if( o && dynamic_cast<AutomatableModel *>( o ) )
 						{
 							a->addObject( dynamic_cast<AutomatableModel *>( o ), false );
+						}
+						else
+						{
+							// FIXME: Remove this block once the automation system gets fixed
+							// This is a temporary fix for https://github.com/LMMS/lmms/issues/3781
+							o = Engine::projectJournal()->journallingObject(ProjectJournal::idFromSave(*k));
+							if( o && dynamic_cast<AutomatableModel *>( o ) )
+							{
+								a->addObject( dynamic_cast<AutomatableModel *>( o ), false );
+							}
+							else
+							{
+								// FIXME: Remove this block once the automation system gets fixed
+								// This is a temporary fix for https://github.com/LMMS/lmms/issues/4781
+								o = Engine::projectJournal()->journallingObject(ProjectJournal::idToSave(*k));
+								if( o && dynamic_cast<AutomatableModel *>( o ) )
+								{
+									a->addObject( dynamic_cast<AutomatableModel *>( o ), false );
+								}
+							}
 						}
 					}
 					a->m_idsToResolve.clear();

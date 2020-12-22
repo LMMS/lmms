@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2014 David French <dave/dot/french3/at/googlemail/dot/com>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -45,14 +45,14 @@ public:
 		m_feedback = feedback;
 	}
 
-	void tick( sampleFrame frame );
+	void tick( sampleFrame& frame );
 	void setSampleRate( int sampleRate );
 
 private:
 	sampleFrame* m_buffer;
 	int m_maxLength;
 	float m_length;
-	int m_index;
+	int m_writeIndex;
 	float m_feedback;
 	float m_maxTime;
 };

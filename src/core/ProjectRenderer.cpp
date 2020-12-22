@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -27,24 +27,30 @@
 
 #include "ProjectRenderer.h"
 #include "Song.h"
-#include "Engine.h"
+#include "PerfLog.h"
 
 #include "AudioFileWave.h"
 #include "AudioFileOgg.h"
+#include "AudioFileMP3.h"
+#include "AudioFileFlac.h"
 
 #ifdef LMMS_HAVE_SCHED_H
-#include <sched.h>
+#include "sched.h"
 #endif
-#include <QMutexLocker>
 
 const ProjectRenderer::FileEncodeDevice ProjectRenderer::fileEncodeDevices[] =
 {
 
 	{ ProjectRenderer::WaveFile,
-		QT_TRANSLATE_NOOP( "ProjectRenderer", "WAV-File (*.wav)" ),
+		QT_TRANSLATE_NOOP( "ProjectRenderer", "WAV (*.wav)" ),
 					".wav", &AudioFileWave::getInst },
+	{ ProjectRenderer::FlacFile,
+		QT_TRANSLATE_NOOP("ProjectRenderer", "FLAC (*.flac)"),
+		".flac",
+		&AudioFileFlac::getInst
+	},
 	{ ProjectRenderer::OggFile,
-		QT_TRANSLATE_NOOP( "ProjectRenderer", "Compressed OGG-File (*.ogg)" ),
+		QT_TRANSLATE_NOOP( "ProjectRenderer", "OGG (*.ogg)" ),
 					".ogg",
 #ifdef LMMS_HAVE_OGGVORBIS
 					&AudioFileOgg::getInst
@@ -52,8 +58,17 @@ const ProjectRenderer::FileEncodeDevice ProjectRenderer::fileEncodeDevices[] =
 					NULL
 #endif
 									},
-	// ... insert your own file-encoder-infos here... may be one day the
-	// user can add own encoders inside the program...
+	{ ProjectRenderer::MP3File,
+		QT_TRANSLATE_NOOP( "ProjectRenderer", "MP3 (*.mp3)" ),
+					".mp3",
+#ifdef LMMS_HAVE_MP3LAME
+					&AudioFileMP3::getInst
+#else
+					NULL
+#endif
+									},
+	// Insert your own file-encoder infos here.
+	// Maybe one day the user can add own encoders inside the program.
 
 	{ ProjectRenderer::NumFileFormats, NULL, NULL, NULL }
 
@@ -62,35 +77,31 @@ const ProjectRenderer::FileEncodeDevice ProjectRenderer::fileEncodeDevices[] =
 
 
 
-ProjectRenderer::ProjectRenderer( const Mixer::qualitySettings & _qs,
-					const OutputSettings & _os,
-					ExportFileFormats _file_format,
-					const QString & _out_file ) :
+ProjectRenderer::ProjectRenderer( const Mixer::qualitySettings & qualitySettings,
+					const OutputSettings & outputSettings,
+					ExportFileFormats exportFileFormat,
+					const QString & outputFilename ) :
 	QThread( Engine::mixer() ),
 	m_fileDev( NULL ),
-	m_qualitySettings( _qs ),
-	m_oldQualitySettings( Engine::mixer()->currentQualitySettings() ),
+	m_qualitySettings( qualitySettings ),
 	m_progress( 0 ),
 	m_abort( false )
 {
-	if( fileEncodeDevices[_file_format].m_getDevInst == NULL )
-	{
-		return;
-	}
+	AudioFileDeviceInstantiaton audioEncoderFactory = fileEncodeDevices[exportFileFormat].m_getDevInst;
 
-	bool success_ful = false;
-	m_fileDev = fileEncodeDevices[_file_format].m_getDevInst(
-				_os.samplerate, DEFAULT_CHANNELS, success_ful,
-				_out_file, _os.vbr,
-				_os.bitrate, _os.bitrate - 64, _os.bitrate + 64,
-				_os.depth == Depth_32Bit ? 32 : 16,
-							Engine::mixer() );
-	if( success_ful == false )
+	if (audioEncoderFactory)
 	{
-		delete m_fileDev;
-		m_fileDev = NULL;
-	}
+		bool successful = false;
 
+		m_fileDev = audioEncoderFactory(
+					outputFilename, outputSettings, DEFAULT_CHANNELS,
+					Engine::mixer(), successful );
+		if( !successful )
+		{
+			delete m_fileDev;
+			m_fileDev = NULL;
+		}
+	}
 }
 
 
@@ -103,8 +114,8 @@ ProjectRenderer::~ProjectRenderer()
 
 
 
-// little help-function for getting file-format from a file-extension (only for
-// registered file-encoders)
+// Little help function for getting file format from a file extension
+// (only for registered file-encoders).
 ProjectRenderer::ExportFileFormats ProjectRenderer::getFileFormatFromExtension(
 							const QString & _ext )
 {
@@ -118,7 +129,7 @@ ProjectRenderer::ExportFileFormats ProjectRenderer::getFileFormatFromExtension(
 		++idx;
 	}
 
-	return( WaveFile );	// default
+	return( WaveFile ); // Default.
 }
 
 
@@ -138,11 +149,10 @@ void ProjectRenderer::startProcessing()
 
 	if( isReady() )
 	{
-		// have to do mixer stuff with GUI-thread-affinity in order to
-		// make slots connected to sampleRateChanged()-signals being
-		// called immediately
+		// Have to do mixer stuff with GUI-thread affinity in order to
+		// make slots connected to sampleRateChanged()-signals being called immediately.
 		Engine::mixer()->setAudioDevice( m_fileDev,
-						m_qualitySettings, false );
+						m_qualitySettings, false, false );
 
 		start(
 #ifndef LMMS_BUILD_WIN32
@@ -156,8 +166,9 @@ void ProjectRenderer::startProcessing()
 
 void ProjectRenderer::run()
 {
+	MemoryManager::ThreadGuard mmThreadGuard; Q_UNUSED(mmThreadGuard);
 #if 0
-#ifdef LMMS_BUILD_LINUX
+#if defined(LMMS_BUILD_LINUX) || defined(LMMS_BUILD_FREEBSD)
 #ifdef LMMS_HAVE_SCHED_H
 	cpu_set_t mask;
 	CPU_ZERO( &mask );
@@ -167,40 +178,38 @@ void ProjectRenderer::run()
 #endif
 #endif
 
+	PerfLogTimer perfLog("Project Render");
 
 	Engine::getSong()->startExport();
-    //skip first empty buffer
-    Engine::mixer()->nextBuffer();
+	// Skip first empty buffer.
+	Engine::mixer()->nextBuffer();
 
-	const Song::PlayPos & exportPos = Engine::getSong()->getPlayPos(
-							Song::Mode_PlaySong );
 	m_progress = 0;
-	std::pair<MidiTime, MidiTime> exportEndpoints = Engine::getSong()->getExportEndpoints();
-	tick_t startTick = exportEndpoints.first.getTicks();
-	tick_t lengthTicks = exportEndpoints.second.getTicks() - startTick;
 
-	// Continually track and emit progress percentage to listeners
-	while( Engine::getSong()->isExportDone() == false &&
-				Engine::getSong()->isExporting() == true
-							&& !m_abort )
+	// Now start processing
+	Engine::mixer()->startProcessing(false);
+
+	// Continually track and emit progress percentage to listeners.
+	while (!Engine::getSong()->isExportDone() && !m_abort)
 	{
 		m_fileDev->processNextBuffer();
-		const int nprog = lengthTicks == 0 ? 100 : (exportPos.getTicks()-startTick) * 100 / lengthTicks;
-		if( m_progress != nprog )
+		const int nprog = Engine::getSong()->getExportProgress();
+		if (m_progress != nprog)
 		{
 			m_progress = nprog;
 			emit progressChanged( m_progress );
 		}
 	}
 
+	// Notify mixer of the end of processing.
+	Engine::mixer()->stopProcessing();
+
 	Engine::getSong()->stopExport();
 
+	perfLog.end();
+
+	// If the user aborted export-process, the file has to be deleted.
 	const QString f = m_fileDev->outputFile();
-
-	Engine::mixer()->restoreAudioDevice();  // also deletes audio-dev
-	Engine::mixer()->changeQuality( m_oldQualitySettings );
-
-	// if the user aborted export-process, the file has to be deleted
 	if( m_abort )
 	{
 		QFile( f ).remove();
@@ -240,6 +249,5 @@ void ProjectRenderer::updateConsoleProgress()
 	fprintf( stderr, "%s", buf );
 	fflush( stderr );
 }
-
 
 

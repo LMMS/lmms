@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2014 David French <dave/dot/french3/at/googlemail/dot/com>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -31,11 +31,11 @@
 ///
 /// \brief The EqFilter class.
 /// A wrapper for the StereoBiQuad class, giving it freq, res, and gain controls.
-/// It is designed to process periods in one pass, with recalculation of coefficents
+/// Used on a per channel per frame basis with recalculation of coefficents
 /// upon parameter changes. The intention is to use this as a bass class, children override
 /// the calcCoefficents() function, providing the coefficents a1, a2, b0, b1, b2.
 ///
-class EqFilter : public StereoBiQuad
+class EqFilter
 {
 public:
 	EqFilter() :
@@ -114,7 +114,28 @@ public:
 	}
 
 
+	///
+	/// \brief update
+	/// filters using two BiQuads, then crossfades,
+	///  depending on on percentage of period processes
+	/// \param in
+	/// \param ch
+	/// \param frameProgress percentage of frame processed
+	/// \return
+	///
+	inline float update( float in, ch_cnt_t ch, float frameProgress)
+	{
+		float initailF =  m_biQuadFrameInitial.update( in, ch );
+		float targetF = m_biQuadFrameTarget.update( in, ch );
 
+		if(frameProgress > 0.99999 )
+		{
+			m_biQuadFrameInitial= m_biQuadFrameTarget;
+		}
+
+		return (1.0f-frameProgress) * initailF + frameProgress * targetF;
+
+	}
 
 
 protected:
@@ -127,11 +148,23 @@ protected:
 
 	}
 
+	inline void setCoeffs( float a1, float a2, float b0, float b1, float b2 )
+	{
+		m_biQuadFrameTarget.setCoeffs( a1, a2, b0, b1, b2 );
+	}
+
+
+
+
+
+
 	float m_sampleRate;
 	float m_freq;
 	float m_res;
 	float m_gain;
 	float m_bw;
+	StereoBiQuad m_biQuadFrameInitial;
+	StereoBiQuad m_biQuadFrameTarget;
 };
 
 

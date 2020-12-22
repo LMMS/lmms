@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2005-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -31,12 +31,12 @@
 #include <QDropEvent>
 #include <QMimeData>
 
-#include "export.h"
+#include "lmms_export.h"
 
 class QPixmap;
 
 
-class EXPORT StringPairDrag : public QDrag
+class LMMS_EXPORT StringPairDrag : public QDrag
 {
 public:
 	StringPairDrag( const QString & _key, const QString & _value,
@@ -45,16 +45,8 @@ public:
 
 	static bool processDragEnterEvent( QDragEnterEvent * _dee,
 						const QString & _allowed_keys );
-	static QString decodeMimeKey( const QMimeData * mimeData );
-	static QString decodeMimeValue( const QMimeData * mimeData );
 	static QString decodeKey( QDropEvent * _de );
 	static QString decodeValue( QDropEvent * _de );
-
-	static const char * mimeType()
-	{
-		return( "application/x-lmms-stringpair" );
-	}
-
 } ;
 
 

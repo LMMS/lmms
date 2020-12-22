@@ -4,7 +4,7 @@
  * Copyright (c) 1998-2000 Paul Kellett (mda-vst.com)
  * Copyright (c) 2007 Paul Giblock <drfaygo/at/gmail.com>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -30,22 +30,24 @@
 #include <stdint.h>
 #include "lmms_basics.h"
 
+class QString;
+
 class DrumSynth {
     public:
         DrumSynth() {};
-        int GetDSFileSamples(const char *dsfile, int16_t *&wave, int channels, sample_rate_t Fs);
+        int GetDSFileSamples(QString dsfile, int16_t *&wave, int channels, sample_rate_t Fs);
 
     private:
         float LoudestEnv(void);
         int   LongestEnv(void);
         void  UpdateEnv(int e, long t);
-        void  GetEnv(int env, const char *sec, const char *key, const char *ini);
+        void  GetEnv(int env, const char *sec, const char *key, QString ini);
 
         float waveform(float ph, int form);
 
-        int GetPrivateProfileString(const char *sec, const char *key, const char *def, char *buffer, int size, const char *file);
-        int GetPrivateProfileInt(const char *sec, const char *key, int def, const char *file);
-        float GetPrivateProfileFloat(const char *sec, const char *key, float def, const char *file);
+        int GetPrivateProfileString(const char *sec, const char *key, const char *def, char *buffer, int size, QString file);
+        int GetPrivateProfileInt(const char *sec, const char *key, int def, QString file);
+        float GetPrivateProfileFloat(const char *sec, const char *key, float def, QString file);
 
 };
 

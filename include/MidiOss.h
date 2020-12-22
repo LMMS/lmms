@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -35,11 +35,10 @@
 #include "MidiClient.h"
 
 
-class QLineEdit;
 
-
-class MidiOss : public MidiClientRaw, public QThread
+class MidiOss : public QThread, public MidiClientRaw
 {
+	Q_OBJECT
 public:
 	MidiOss();
 	virtual ~MidiOss();
@@ -59,8 +58,8 @@ public:
 	}
 
 protected:
-	virtual void sendByte( const unsigned char c );
-	virtual void run();
+	void sendByte( const unsigned char c ) override;
+	void run() override;
 
 
 private:

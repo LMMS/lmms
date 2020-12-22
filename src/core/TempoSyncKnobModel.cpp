@@ -4,7 +4,7 @@
  * Copyright (c) 2005-2007 Danny McRae <khjklujn/at/yahoo.com>
  * Copyright (c) 2005-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -42,7 +42,8 @@ TempoSyncKnobModel::TempoSyncKnobModel( const float _val, const float _min,
 	m_custom( _parent )
 {
 	connect( Engine::getSong(), SIGNAL( tempoChanged( bpm_t ) ),
-			this, SLOT( calculateTempoSyncTime( bpm_t ) ) );
+			this, SLOT( calculateTempoSyncTime( bpm_t ) ),
+			Qt::DirectConnection );
 }
 
 
@@ -127,7 +128,7 @@ void TempoSyncKnobModel::calculateTempoSyncTime( bpm_t _bpm )
 void TempoSyncKnobModel::saveSettings( QDomDocument & _doc, QDomElement & _this,
 							const QString & _name )
 {
- 	_this.setAttribute( "syncmode", (int) syncMode() );
+	_this.setAttribute( _name + "_syncmode", (int) syncMode() );
 	m_custom.saveSettings( _doc, _this, _name );
 	FloatModel::saveSettings( _doc, _this, _name );
 }
@@ -140,7 +141,7 @@ void TempoSyncKnobModel::loadSettings( const QDomElement & _this,
 {
 	FloatModel::loadSettings( _this, _name );
 	m_custom.loadSettings( _this, _name );
-	setSyncMode( ( TempoSyncMode ) _this.attribute( "syncmode" ).toInt() );
+	setSyncMode( ( TempoSyncMode ) _this.attribute( _name + "_syncmode" ).toInt() );
 }
 
 
@@ -154,7 +155,8 @@ void TempoSyncKnobModel::setSyncMode( TempoSyncMode _new_mode )
 		if( _new_mode == SyncCustom )
 		{
 			connect( &m_custom, SIGNAL( dataChanged() ),
-					this, SLOT( updateCustom() ) );
+					this, SLOT( updateCustom() ),
+					Qt::DirectConnection );
 		}
 	}
 	calculateTempoSyncTime( Engine::getSong()->getTempo() );

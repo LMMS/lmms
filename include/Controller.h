@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2008-2009 Paul Giblock <pgllama/at/gmail.com>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -27,10 +27,10 @@
 #ifndef CONTROLLER_H
 #define CONTROLLER_H
 
+#include "lmms_export.h"
 #include "Engine.h"
 #include "Model.h"
 #include "JournallingObject.h"
-#include "templates.h"
 #include "ValueBuffer.h"
 
 class ControllerDialog;
@@ -40,7 +40,7 @@ class ControllerConnection;
 typedef QVector<Controller *> ControllerVector;
 
 
-class Controller : public Model, public JournallingObject
+class LMMS_EXPORT Controller : public Model, public JournallingObject
 {
 	Q_OBJECT
 public:
@@ -101,9 +101,9 @@ public:
 	}
 
 
-	virtual void saveSettings( QDomDocument & _doc, QDomElement & _this );
-	virtual void loadSettings( const QDomElement & _this );
-	virtual QString nodeName() const;
+	void saveSettings( QDomDocument & _doc, QDomElement & _this ) override;
+	void loadSettings( const QDomElement & _this ) override;
+	QString nodeName() const override;
 
 	static Controller * create( ControllerTypes _tt, Model * _parent );
 	static Controller * create( const QDomElement & _this,
@@ -111,7 +111,7 @@ public:
 
 	inline static float fittedValue( float _val )
 	{
-		return tLimit<float>( _val, 0.0f, 1.0f );
+		return qBound<float>( 0.0f, _val, 1.0f );
 	}
 
 	static long runningPeriods()
@@ -129,6 +129,7 @@ public:
 	void removeConnection( ControllerConnection * );
 	int connectionCount() const;
 
+	bool hasModel( const Model * m ) const;
 
 public slots:
 	virtual ControllerDialog * createDialog( QWidget * _parent );
@@ -137,8 +138,6 @@ public slots:
 	{
 		m_name = _new_name;
 	}
-
-	bool hasModel( const Model * m );
 
 
 protected:

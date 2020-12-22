@@ -4,7 +4,7 @@
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * Copyright (c) 2012-2013 Paul Giblock <p/at/pgiblock.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -29,14 +29,18 @@
 
 #include <QDomDocument>
 
-#include "export.h"
+#include "lmms_export.h"
 #include "MemoryManager.h"
+#include "ProjectVersion.h"
 
 class QTextStream;
 
-class EXPORT DataFile : public QDomDocument
+class LMMS_EXPORT DataFile : public QDomDocument
 {
 	MM_OPERATORS
+
+	using UpgradeMethod = void(DataFile::*)();
+
 public:
 	enum Types
 	{
@@ -84,24 +88,7 @@ public:
 		return m_type;
 	}
 
-	// small helper class for adjusting application's locale settings
-	// when loading or saving floating point values rendered to strings
-	class LocaleHelper
-	{
-	public:
-		enum Modes
-		{
-			ModeLoad,
-			ModeSave,
-			ModeCount
-		};
-		typedef Modes Mode;
-
-		LocaleHelper( Mode mode );
-		~LocaleHelper();
-
-	};
-
+	unsigned int legacyFileVersion();
 
 private:
 	static Type type( const QString& typeName );
@@ -125,13 +112,21 @@ private:
 	void upgrade_1_0_99();
 	void upgrade_1_1_0();
 	void upgrade_1_1_91();
+	void upgrade_1_2_0_rc3();
+	void upgrade_1_3_0();
+	void upgrade_noHiddenClipNames();
+
+	// List of all upgrade methods
+	static const std::vector<UpgradeMethod> UPGRADE_METHODS;
+	// List of ProjectVersions for the legacyFileVersion method
+	static const std::vector<ProjectVersion> UPGRADE_VERSIONS;
 
 	void upgrade();
 
 	void loadData( const QByteArray & _data, const QString & _sourceFile );
 
 
-	struct EXPORT typeDescStruct
+	struct LMMS_EXPORT typeDescStruct
 	{
 		Type m_type;
 		QString m_name;
@@ -141,14 +136,9 @@ private:
 	QDomElement m_content;
 	QDomElement m_head;
 	Type m_type;
+	unsigned int m_fileVersion;
 
 } ;
 
 
-const int LDF_MAJOR_VERSION = 1;
-const int LDF_MINOR_VERSION = 0;
-const QString LDF_VERSION_STRING = QString::number( LDF_MAJOR_VERSION ) + "." + QString::number( LDF_MINOR_VERSION );
-
-
 #endif
-

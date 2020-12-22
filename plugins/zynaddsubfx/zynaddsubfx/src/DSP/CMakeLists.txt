@@ -1,9 +1,0 @@
-set(zynaddsubfx_dsp_SRCS
-    DSP/AnalogFilter.cpp
-    DSP/FFTwrapper.cpp
-    DSP/Filter.cpp
-    DSP/FormantFilter.cpp
-    DSP/SVFilter.cpp
-    DSP/Unison.cpp
-    PARENT_SCOPE
-)

@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2008 Paul Giblock <drfaygo/at/gmail/dot/com>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -30,7 +30,6 @@
 #include "LcdSpinBox.h"
 #include "GigPlayer.h"
 
-#include <fluidsynth.h>
 #include <QWidget>
 #include <QLabel>
 
@@ -44,7 +43,7 @@ class PatchesDialog : public QDialog, private Ui::PatchesDialog
 public:
 
 	// Constructor.
-	PatchesDialog( QWidget * pParent = 0, Qt::WindowFlags wflags = 0 );
+	PatchesDialog(QWidget * pParent = 0, Qt::WindowFlags wflags = QFlag(0));
 
 	// Destructor.
 	virtual ~PatchesDialog();

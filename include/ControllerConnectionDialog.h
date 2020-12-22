@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2008  Paul Giblock <drfaygo/at/gmail.com>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -66,6 +66,7 @@ public slots:
 	void selectController();
 	void midiToggled();
 	void userToggled();
+	void userSelected();
 	void autoDetectToggled();
 	void enableAutoDetect( QAction * _a );
 

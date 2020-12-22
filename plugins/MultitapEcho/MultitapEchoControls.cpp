@@ -4,7 +4,7 @@
  * Copyright (c) 2014 Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>
  * Copyright (c) 2008-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -24,6 +24,7 @@
  */
 
 #include <QDomElement>
+#include <QVarLengthArray>
 
 #include "MultitapEchoControls.h"
 #include "MultitapEcho.h"
@@ -102,7 +103,7 @@ void MultitapEchoControls::setDefaultAmpShape()
 {
 	const int length = m_steps.value();
 	
-	float samples [length];
+	QVarLengthArray<float> samples(length);
 	for( int i = 0; i < length; ++i )
 	{
 		samples[i] = 0.0f;
@@ -116,7 +117,7 @@ void MultitapEchoControls::setDefaultLpShape()
 {
 	const int length = m_steps.value();
 	
-	float samples [length];
+	QVarLengthArray<float> samples(length);
 	for( int i = 0; i < length; ++i )
 	{
 		samples[i] = 3.0f;
@@ -148,7 +149,7 @@ void MultitapEchoControls::lpSamplesChanged( int begin, int end )
 	const float * samples = m_lpGraph.samples();
 	for( int i = begin; i <= end; ++i )
 	{
-		m_effect->m_lpFreq[i] = 20.0f * exp10f( samples[i] );
+		m_effect->m_lpFreq[i] = 20.0f * exp10( samples[i] );
 	}
 	m_effect->updateFilters( begin, end );
 }

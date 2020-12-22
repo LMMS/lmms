@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2015 Andrew Kelley <superjoe30@gmail.com>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -33,22 +33,24 @@
 #include "debug.h"
 #include "ConfigManager.h"
 #include "gui_templates.h"
-#include "templates.h"
 #include "ComboBox.h"
-#include "LcdSpinBox.h"
 #include "Mixer.h"
 
 AudioSoundIo::AudioSoundIo( bool & outSuccessful, Mixer * _mixer ) :
-	AudioDevice( tLimit<ch_cnt_t>(
-		ConfigManager::inst()->value( "audiosoundio", "channels" ).toInt(), DEFAULT_CHANNELS, SURROUND_CHANNELS ),
-								_mixer )
+	AudioDevice( qBound<ch_cnt_t>(
+		DEFAULT_CHANNELS,
+		ConfigManager::inst()->value( "audiosoundio", "channels" ).toInt(),
+		SURROUND_CHANNELS ), _mixer )
 {
 	outSuccessful = false;
 	m_soundio = NULL;
 	m_outstream = NULL;
+	m_outBuf = NULL;
 	m_disconnectErr = 0;
 	m_outBufFrameIndex = 0;
 	m_outBufFramesTotal = 0;
+	m_stopped = true;
+	m_outstreamStarted = false;
 
 	m_soundio = soundio_create();
 	if (!m_soundio)
@@ -195,31 +197,72 @@ void AudioSoundIo::onBackendDisconnect(int err)
 AudioSoundIo::~AudioSoundIo()
 {
 	stopProcessing();
-	soundio_destroy(m_soundio);
+	
+	if (m_outstream)
+	{
+		soundio_outstream_destroy(m_outstream);
+	}
+	
+	if (m_soundio)
+	{
+		soundio_destroy(m_soundio);
+		m_soundio = NULL;
+	}
 }
 
 void AudioSoundIo::startProcessing()
 {
+	int err;
+	
 	m_outBufFrameIndex = 0;
 	m_outBufFramesTotal = 0;
 	m_outBufSize = mixer()->framesPerPeriod();
 
 	m_outBuf = new surroundSampleFrame[m_outBufSize];
 
-	int err;
-	if ((err = soundio_outstream_start(m_outstream)))
+	if (! m_outstreamStarted)
 	{
-		fprintf(stderr, "soundio unable to start stream: %s\n", soundio_strerror(err));
+		if ((err = soundio_outstream_start(m_outstream)))
+		{
+			fprintf(stderr, 
+				"AudioSoundIo::startProcessing() :: soundio unable to start stream: %s\n", 
+				soundio_strerror(err));
+		} else {
+			m_outstreamStarted = true;
+		}
+	}
+
+	m_stopped = false;
+
+	if ((err = soundio_outstream_pause(m_outstream, false)))
+	{
+		m_stopped = true;
+		fprintf(stderr, 
+			"AudioSoundIo::startProcessing() :: resuming result error: %s\n", 
+			soundio_strerror(err));
 	}
 }
 
 void AudioSoundIo::stopProcessing()
 {
-	soundio_outstream_destroy(m_outstream);
-	m_outstream = NULL;
+	int err;
+	
+	m_stopped = true;
+	if (m_outstream)
+	{
+		if ((err = soundio_outstream_pause(m_outstream, true)))
+		{
+			fprintf(stderr, 
+				"AudioSoundIo::stopProcessing() :: pausing result error: %s\n",
+				soundio_strerror(err));
+		}
+	}
 
-	delete[] m_outBuf;
-	m_outBuf = NULL;
+	if (m_outBuf)
+	{
+		delete[] m_outBuf;
+		m_outBuf = NULL;
+	}
 }
 
 void AudioSoundIo::errorCallback(int err)
@@ -234,6 +277,7 @@ void AudioSoundIo::underflowCallback()
 
 void AudioSoundIo::writeCallback(int frameCountMin, int frameCountMax)
 {
+	if (m_stopped) {return;}
 	const struct SoundIoChannelLayout *layout = &m_outstream->layout;
 	SoundIoChannelArea *areas;
 	int bytesPerSample = m_outstream->bytes_per_sample;
@@ -255,11 +299,27 @@ void AudioSoundIo::writeCallback(int frameCountMin, int frameCountMax)
 		if (!frameCount)
 			break;
 
+		
+		if (m_stopped)
+		{
+			for (int channel = 0; channel < layout->channel_count; ++channel)
+			{
+				memset(areas[channel].ptr, 0, bytesPerSample * frameCount);
+				areas[channel].ptr += areas[channel].step * frameCount;
+			}
+			continue;
+		}
+
 		for (int frame = 0; frame < frameCount; frame += 1)
 		{
 			if (m_outBufFrameIndex >= m_outBufFramesTotal)
 			{
 				m_outBufFramesTotal = getNextBuffer(m_outBuf);
+				if (m_outBufFramesTotal == 0)
+				{
+					m_stopped = true;
+					break;
+				}
 				m_outBufFrameIndex = 0;
 			}
 
@@ -395,14 +455,14 @@ AudioSoundIo::setupWidget::setupWidget( QWidget * _parent ) :
 	m_backend = new ComboBox( this, "BACKEND" );
 	m_backend->setGeometry( 64, 15, 260, 20 );
 
-	QLabel * backend_lbl = new QLabel( tr( "BACKEND" ), this );
+	QLabel * backend_lbl = new QLabel( tr( "Backend" ), this );
 	backend_lbl->setFont( pointSize<7>( backend_lbl->font() ) );
 	backend_lbl->move( 8, 18 );
 
 	m_device = new ComboBox( this, "DEVICE" );
 	m_device->setGeometry( 64, 35, 260, 20 );
 
-	QLabel * dev_lbl = new QLabel( tr( "DEVICE" ), this );
+	QLabel * dev_lbl = new QLabel( tr( "Device" ), this );
 	dev_lbl->setFont( pointSize<7>( dev_lbl->font() ) );
 	dev_lbl->move( 8, 38 );
 
@@ -440,7 +500,11 @@ AudioSoundIo::setupWidget::~setupWidget()
 {
 	bool ok = disconnect( &m_backendModel, SIGNAL( dataChanged() ), &m_setupUtil, SLOT( reconnectSoundIo() ) );
 	assert(ok);
-	soundio_destroy(m_soundio);
+	if (m_soundio)
+	{
+		soundio_destroy(m_soundio);
+		m_soundio = NULL;
+	}
 }
 
 void AudioSoundIo::setupWidget::saveSettings()

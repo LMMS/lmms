@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -316,8 +316,7 @@ inline void Oscillator::recalcPhase()
 		m_phaseOffset = m_ext_phaseOffset;
 		m_phase += m_phaseOffset;
 	}
-	m_phase = absFraction( m_phase )+2;	// make sure we're not running
-						// negative when doing PM
+	m_phase = absFraction( m_phase );
 }
 
 

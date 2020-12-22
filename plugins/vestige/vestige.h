@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -29,14 +29,13 @@
 
 #include <QMutex>
 #include <QLayout>
-#include <QMdiSubWindow>
 #include <QScrollArea>
 
 #include "Instrument.h"
 #include "InstrumentView.h"
 #include "Note.h"
-#include "Knob.h"
-
+#include "CustomTextKnob.h"
+#include "SubWindow.h"
 #include "AutomatableModel.h"
 
 
@@ -68,12 +67,14 @@ public:
 		return IsSingleStreamed | IsMidiBased;
 	}
 
-	virtual bool handleMidiEvent( const MidiEvent& event, const MidiTime& time, f_cnt_t offset = 0 );
+	virtual bool handleMidiEvent( const MidiEvent& event, const TimePos& time, f_cnt_t offset = 0 );
 
 	virtual PluginView * instantiateView( QWidget * _parent );
 
 protected slots:
-	void setParameter( void );
+	void setParameter( Model * action );
+	void handleConfigChange( QString cls, QString attr, QString value );
+	void reloadPlugin();
 
 private:
 	void closePlugin( void );
@@ -85,7 +86,6 @@ private:
 	QString m_pluginDLL;
 	QMdiSubWindow * m_subWindow;
 	QScrollArea * m_scrollArea;
-	Knob ** vstKnobs;
 	FloatModel ** knobFModel;
 	QObject * p_subWindow;
 	int paramCount;
@@ -97,7 +97,7 @@ private:
 } ;
 
 
-class manageVestigeInstrumentView : public InstrumentView
+class manageVestigeInstrumentView : public InstrumentViewFixedSize
 {
 	Q_OBJECT
 public:
@@ -108,7 +108,8 @@ public:
 protected slots:
 	void syncPlugin( void );
 	void displayAutomatedOnly( void );
-	void setParameter( void );
+	void setParameter( Model * action );
+	void syncParameterText();
 	void closeWindow();
 
 
@@ -128,11 +129,12 @@ private:
 	QPushButton * m_syncButton;
 	QPushButton * m_displayAutomatedOnly;
 	QPushButton * m_closeButton;
+	CustomTextKnob ** vstKnobs;
 
 } ;
 
 
-class VestigeInstrumentView : public InstrumentView
+class VestigeInstrumentView : public InstrumentViewFixedSize
 {
 	Q_OBJECT
 public:

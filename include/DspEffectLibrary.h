@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2006-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -27,7 +27,6 @@
 #define DSP_EFFECT_LIBRARY_H
 
 #include "lmms_math.h"
-#include "templates.h"
 #include "lmms_constants.h"
 #include "lmms_basics.h"
 
@@ -245,14 +244,36 @@ namespace DspEffectLibrary
 	} ;
 
 
-	class FoldbackDistortion : public MonoBase<FoldbackDistortion>
+	template<class T>
+	class DistortionBase : public MonoBase<T>
 	{
 	public:
-		FoldbackDistortion( float threshold, float gain ) :
+		DistortionBase( float threshold, float gain ) :
 			m_threshold( threshold ),
 			m_gain( gain )
 		{
 		}
+
+		void setThreshold( float threshold )
+		{
+			m_threshold = threshold;
+		}
+
+		void setGain( float gain )
+		{
+			m_gain = gain;
+		}
+
+	protected:
+		float m_threshold;
+		float m_gain;
+	};
+
+
+	class FoldbackDistortion : public DistortionBase<FoldbackDistortion>
+	{
+	public:
+		using DistortionBase<FoldbackDistortion>::DistortionBase;
 
 		sample_t nextSample( sample_t in )
 		{
@@ -262,54 +283,18 @@ namespace DspEffectLibrary
 			}
 			return in * m_gain;
 		}
-
-		void setThreshold( float threshold )
-		{
-			m_threshold = threshold;
-		}
-
-		void setGain( float gain )
-		{
-			m_gain = gain;
-		}
-
-
-	private:
-		float m_threshold;
-		float m_gain;
-
 	} ;
 
 
-	class Distortion : public MonoBase<Distortion>
+	class Distortion : public DistortionBase<Distortion>
 	{
 	public:
-		Distortion( float threshold, float gain ) :
-			m_threshold( threshold ),
-			m_gain( gain )
-		{
-		}
+		using DistortionBase<Distortion>::DistortionBase;
 
 		sample_t nextSample( sample_t in )
 		{
 			return m_gain * ( in * ( fabsf( in )+m_threshold ) / ( in*in +( m_threshold-1 )* fabsf( in ) + 1 ) );
 		}
-
-		void setThreshold( float threshold )
-		{
-			m_threshold = threshold;
-		}
-
-		void setGain( float gain )
-		{
-			m_gain = gain;
-		}
-
-
-	private:
-		float m_threshold;
-		float m_gain;
-
 	} ;
 
 

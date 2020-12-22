@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -24,7 +24,6 @@
 #include "BBTrack.h"
 
 #include <QDomElement>
-#include <QColorDialog>
 #include <QMenu>
 #include <QPainter>
 
@@ -33,13 +32,13 @@
 #include "embed.h"
 #include "Engine.h"
 #include "gui_templates.h"
-#include "MainWindow.h"
 #include "GuiApplication.h"
+#include "MainWindow.h"
 #include "Mixer.h"
 #include "RenameDialog.h"
 #include "Song.h"
 #include "SongEditor.h"
-#include "templates.h"
+#include "ToolTip.h"
 #include "TrackLabelButton.h"
 
 
@@ -48,29 +47,17 @@ BBTrack::infoMap BBTrack::s_infoMap;
 
 
 BBTCO::BBTCO( Track * _track ) :
-	TrackContentObject( _track ),
-	m_color( 128, 128, 128 ),
-	m_useStyleColor( true )
+	TrackContentObject( _track )
 {
-	tact_t t = Engine::getBBTrackContainer()->lengthOfBB( bbTrackIndex() );
+	bar_t t = Engine::getBBTrackContainer()->lengthOfBB( bbTrackIndex() );
 	if( t > 0 )
 	{
 		saveJournallingState( false );
-		changeLength( MidiTime( t, 0 ) );
+		changeLength( TimePos( t, 0 ) );
 		restoreJournallingState();
 	}
 	setAutoResize( false );
 }
-
-
-
-
-BBTCO::~BBTCO()
-{
-}
-
-
-
 
 void BBTCO::saveSettings( QDomDocument & doc, QDomElement & element )
 {
@@ -85,15 +72,9 @@ void BBTCO::saveSettings( QDomDocument & doc, QDomElement & element )
 	}
 	element.setAttribute( "len", length() );
 	element.setAttribute( "muted", isMuted() );
-	element.setAttribute( "color", color() );
-	
-	if( m_useStyleColor )
+	if( usesCustomClipColor() )
 	{
-		element.setAttribute( "usestyle", 1 );
-	}
-	else
-	{
-		element.setAttribute( "usestyle", 0 );
+		element.setAttribute( "color", color().name() );
 	}
 }
 
@@ -112,33 +93,21 @@ void BBTCO::loadSettings( const QDomElement & element )
 	{
 		toggleMute();
 	}
-
-	if( element.hasAttribute( "color" ) )
+	
+	// for colors saved in 1.3-onwards
+	if( element.hasAttribute( "color" ) && !element.hasAttribute( "usestyle" ) )
 	{
-		setColor( QColor( element.attribute( "color" ).toUInt() ) );
+		useCustomClipColor( true );
+		setColor( element.attribute( "color" ) );
 	}
 	
-	if( element.hasAttribute( "usestyle" ) )
-	{
-		if( element.attribute( "usestyle" ).toUInt() == 1 ) 
-		{
-			m_useStyleColor = true;
-		}
-		else
-		{
-			m_useStyleColor = false;
-		}
-	}
+	// for colors saved before 1.3
 	else
 	{
-		if( m_color.rgb() == qRgb( 128, 182, 175 ) || m_color.rgb() == qRgb( 64, 128, 255 ) ) // old or older default color
-		{
-			m_useStyleColor = true;
-		}
-		else
-		{
-			m_useStyleColor = false;
-		}
+		if( element.hasAttribute( "color" ) )
+		{ setColor( QColor( element.attribute( "color" ).toUInt() ) ); }
+		
+		// usestyle attribute is no longer used
 	}
 }
 
@@ -164,20 +133,11 @@ BBTCOView::BBTCOView( TrackContentObject * _tco, TrackView * _tv ) :
 	m_bbTCO( dynamic_cast<BBTCO *>( _tco ) ),
 	m_paintPixmap()
 {
-	connect( _tco->getTrack(), SIGNAL( dataChanged() ), this, SLOT( update() ) );
+	connect( _tco->getTrack(), SIGNAL( dataChanged() ), 
+			this, SLOT( update() ) );
 
 	setStyle( QApplication::style() );
 }
-
-
-
-
-BBTCOView::~BBTCOView()
-{
-}
-
-
-
 
 void BBTCOView::constructContextMenu( QMenu * _cm )
 {
@@ -194,10 +154,6 @@ void BBTCOView::constructContextMenu( QMenu * _cm )
 	_cm->addAction( embed::getIconPixmap( "edit_rename" ),
 						tr( "Change name" ),
 						this, SLOT( changeName() ) );
-	_cm->addAction( embed::getIconPixmap( "colorize" ),
-			tr( "Change color" ), this, SLOT( changeColor() ) );
-	_cm->addAction( embed::getIconPixmap( "colorize" ),
-			tr( "Reset color to default" ), this, SLOT( resetColor() ) );
 }
 
 
@@ -223,23 +179,22 @@ void BBTCOView::paintEvent( QPaintEvent * )
 
 	setNeedsUpdate( false );
 
-	m_paintPixmap = m_paintPixmap.isNull() == true || m_paintPixmap.size() != size() 
-		? QPixmap( size() ) : m_paintPixmap;
+	if (m_paintPixmap.isNull() || m_paintPixmap.size() != size())
+	{
+		m_paintPixmap = QPixmap(size());
+	}
 
 	QPainter p( &m_paintPixmap );
 
 	QLinearGradient lingrad( 0, 0, 0, height() );
-	QColor c;
-	bool muted = m_bbTCO->getTrack()->isMuted() || m_bbTCO->isMuted();
+	QColor c = getColorForDisplay( painter.background().color() );
 	
-	// state: selected, muted, default, user selected
-	c = isSelected() ? selectedColor() : ( muted ? mutedBackgroundColor() 
-		: ( m_bbTCO->m_useStyleColor ? painter.background().color() 
-		: m_bbTCO->colorObj() ) );
-	
-	lingrad.setColorAt( 0, c.light( 130 ) );
-	lingrad.setColorAt( 1, c.light( 70 ) );
-	
+	lingrad.setColorAt( 0, c.lighter( 130 ) );
+	lingrad.setColorAt( 1, c.lighter( 70 ) );
+
+	// paint a black rectangle under the pattern to prevent glitches with transparent backgrounds
+	p.fillRect( rect(), QColor( 0, 0, 0 ) );
+
 	if( gradient() )
 	{
 		p.fillRect( rect(), lingrad );
@@ -253,12 +208,12 @@ void BBTCOView::paintEvent( QPaintEvent * )
 	const int lineSize = 3;
 	p.setPen( c.darker( 200 ) );
 
-	tact_t t = Engine::getBBTrackContainer()->lengthOfBB( m_bbTCO->bbTrackIndex() );
-	if( m_bbTCO->length() > MidiTime::ticksPerTact() && t > 0 )
+	bar_t t = Engine::getBBTrackContainer()->lengthOfBB( m_bbTCO->bbTrackIndex() );
+	if( m_bbTCO->length() > TimePos::ticksPerBar() && t > 0 )
 	{
-		for( int x = static_cast<int>( t * pixelsPerTact() );
+		for( int x = static_cast<int>( t * pixelsPerBar() );
 								x < width() - 2;
-			x += static_cast<int>( t * pixelsPerTact() ) )
+			x += static_cast<int>( t * pixelsPerBar() ) )
 		{
 			p.drawLine( x, TCO_BORDER_WIDTH, x, TCO_BORDER_WIDTH + lineSize );
 			p.drawLine( x, rect().bottom() - ( TCO_BORDER_WIDTH + lineSize ),
@@ -267,25 +222,7 @@ void BBTCOView::paintEvent( QPaintEvent * )
 	}
 
 	// pattern name
-	p.setRenderHint( QPainter::TextAntialiasing );
-
-	if(  m_staticTextName.text() != m_bbTCO->name() )
-	{
-		m_staticTextName.setText( m_bbTCO->name() );
-	}
-
-	QFont font;
-	font.setHintingPreference( QFont::PreferFullHinting );
-	font.setPointSize( 8 );
-	p.setFont( font );
-
-	const int textTop = TCO_BORDER_WIDTH + 1;
-	const int textLeft = TCO_BORDER_WIDTH + 1;
-
-	p.setPen( textShadowColor() );
-	p.drawStaticText( textLeft + 1, textTop + 1, m_staticTextName );
-	p.setPen( textColor() );
-	p.drawStaticText( textLeft, textTop, m_staticTextName );
+	paintTextLabel(m_bbTCO->name(), p);
 
 	// inner border
 	p.setPen( c.lighter( 130 ) );
@@ -324,10 +261,7 @@ void BBTCOView::openInBBEditor()
 
 
 
-void BBTCOView::resetName()
-{
-	m_bbTCO->setName( m_bbTCO->getTrack()->name() );
-}
+void BBTCOView::resetName() { m_bbTCO->setName(""); }
 
 
 
@@ -342,67 +276,14 @@ void BBTCOView::changeName()
 
 
 
-
-void BBTCOView::changeColor()
+void BBTCOView::update()
 {
-	QColor new_color = QColorDialog::getColor( m_bbTCO->m_color );
-	if( ! new_color.isValid() )
-	{
-		return;
-	}
-	if( isSelected() )
-	{
-		QVector<selectableObject *> selected =
-				gui->songEditor()->m_editor->selectedObjects();
-		for( QVector<selectableObject *>::iterator it =
-							selected.begin();
-						it != selected.end(); ++it )
-		{
-			BBTCOView * bb_tcov = dynamic_cast<BBTCOView *>( *it );
-			if( bb_tcov )
-			{
-				bb_tcov->setColor( new_color );
-			}
-		}
-	}
-	else
-	{
-		setColor( new_color );
-	}
+	ToolTip::add(this, m_bbTCO->name());
+
+	TrackContentObjectView::update();
 }
 
 
-/** \brief Makes the BB pattern use the colour defined in the stylesheet */
-void BBTCOView::resetColor()
-{
-	if( ! m_bbTCO->m_useStyleColor )
-	{
-		m_bbTCO->m_useStyleColor = true;
-		Engine::getSong()->setModified();
-		update();
-	}
-	BBTrack::clearLastTCOColor();
-}
-
-
-
-void BBTCOView::setColor( QColor new_color )
-{
-	if( new_color.rgb() != m_bbTCO->color() )
-	{
-		m_bbTCO->setColor( new_color );
-		m_bbTCO->m_useStyleColor = false;
-		Engine::getSong()->setModified();
-		update();
-	}
-	BBTrack::setLastTCOColor( new_color );
-}
-
-
-
-
-
-QColor * BBTrack::s_lastTCOColor = NULL;
 
 BBTrack::BBTrack( TrackContainer* tc ) :
 	Track( Track::BBTrack, tc )
@@ -451,7 +332,7 @@ BBTrack::~BBTrack()
 
 
 // play _frames frames of given TCO within starting with _start
-bool BBTrack::play( const MidiTime & _start, const fpp_t _frames,
+bool BBTrack::play( const TimePos & _start, const fpp_t _frames,
 					const f_cnt_t _offset, int _tco_num )
 {
 	if( isMuted() )
@@ -472,8 +353,8 @@ bool BBTrack::play( const MidiTime & _start, const fpp_t _frames,
 		return false;
 	}
 
-	MidiTime lastPosition;
-	MidiTime lastLen;
+	TimePos lastPosition;
+	TimePos lastLen;
 	for( tcoVector::iterator it = tcos.begin(); it != tcos.end(); ++it )
 	{
 		if( !( *it )->isMuted() &&
@@ -502,14 +383,10 @@ TrackView * BBTrack::createView( TrackContainerView* tcv )
 
 
 
-TrackContentObject * BBTrack::createTCO( const MidiTime & _pos )
+TrackContentObject* BBTrack::createTCO(const TimePos & pos)
 {
-	BBTCO * bbtco = new BBTCO( this );
-	if( s_lastTCOColor )
-	{
-		bbtco->setColor( *s_lastTCOColor );
-		bbtco->setUseStyleColor( false );
-	}
+	BBTCO* bbtco = new BBTCO(this);
+	bbtco->movePosition(pos);
 	return bbtco;
 }
 
@@ -556,8 +433,8 @@ void BBTrack::loadTrackSpecificSettings( const QDomElement & _this )
 		for( TrackContainer::TrackList::iterator it = tl.begin();
 							it != tl.end(); ++it )
 		{
-			( *it )->getTCO( src )->copy();
-			( *it )->getTCO( dst )->paste();
+			TrackContentObject::copyStateTo( ( *it )->getTCO( src ),
+				( *it )->getTCO( dst ) );
 		}
 		setName( tr( "Clone of %1" ).arg(
 					_this.parentNode().toElement().attribute( "name" ) ) );
@@ -663,5 +540,6 @@ bool BBTrackView::close()
 void BBTrackView::clickedTrackLabel()
 {
 	Engine::getBBTrackContainer()->setCurrentBB( m_bbTrack->index() );
-	gui->getBBEditor()->show();
+	gui->getBBEditor()->parentWidget()->show();
+	gui->getBBEditor()->setFocus( Qt::ActiveWindowFocusReason );
 }

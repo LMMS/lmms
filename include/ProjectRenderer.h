@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2008-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -28,45 +28,27 @@
 #include "AudioFileDevice.h"
 #include "lmmsconfig.h"
 #include "Mixer.h"
+#include "OutputSettings.h"
 
+#include "lmms_export.h"
 
-class ProjectRenderer : public QThread
+class LMMS_EXPORT ProjectRenderer : public QThread
 {
 	Q_OBJECT
 public:
-	enum ExportFileFormats
+	enum ExportFileFormats: int
 	{
 		WaveFile,
+		FlacFile,
 		OggFile,
+		MP3File,
 		NumFileFormats
-	} ;
-
-	enum Depths
-	{
-		Depth_16Bit,
-		Depth_32Bit,
-		NumDepths
-	} ;
-
-	struct OutputSettings
-	{
-		sample_rate_t samplerate;
-		bool vbr;
-		int bitrate;
-		Depths depth;
-
-		OutputSettings( sample_rate_t _sr, bool _vbr, int _bitrate,
-								Depths _d ) :
-			samplerate( _sr ),
-			vbr( _vbr ),
-			bitrate( _bitrate ),
-			depth( _d )
-		{
-		}
 	} ;
 
 	struct FileEncodeDevice
 	{
+		bool isAvailable() const { return m_getDevInst != nullptr; }
+
 		ExportFileFormats m_fileFormat;
 		const char * m_description;
 		const char * m_extension;
@@ -104,11 +86,10 @@ signals:
 
 
 private:
-	virtual void run();
+	void run() override;
 
 	AudioFileDevice * m_fileDev;
 	Mixer::qualitySettings m_qualitySettings;
-	Mixer::qualitySettings m_oldQualitySettings;
 
 	volatile int m_progress;
 	volatile bool m_abort;

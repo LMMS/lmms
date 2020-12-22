@@ -1,111 +1,117 @@
 #!/bin/bash
-#title         :install_apple.sh
-#description   :Creates Apple ".app" bundle for LMMS
-#author        :Tres Finocchiaro
-#date          :20140504
-#version       :1.1
-#usage         :bash create_applet_installer.sh
-#notes         :See also https://github.com/LMMS
-#notes         :Troubleshooting try: export DYLD_PRINT_LIBRARIES=1; export VERBOSE=1;
-#requires      :deploymacqt
-#=========================================================================================
+# Creates Apple ".app" bundle for @PROJECT_NAME_UCASE@
+# Note:
+#   Examine linkings using `otool -L somelib.so`
+#   Debug the loading of dynamic libraries using `export DYLD_PRINT_LIBRARIES=1`
+
+set -e
+
 # STK rawwaves directory
-STK_RAWWAVE=$HOME/stk-*/rawwaves
- 
+STK_RAWWAVE=$(brew --prefix stk)/share/stk/rawwaves
+
 # Place to create ".app" bundle
 APP="@CMAKE_BINARY_DIR@/@PROJECT_NAME_UCASE@.app"
- 
-# MacPorts installs libreadline with wrong permissions
-LIBREADLINE="libreadline.6.2.dylib"
- 
-#=========================================================================================
 
 MSG_COLOR='\x1B[1;36m'
 COLOR_RESET='\x1B[0m'
 echo -e "$MSG_COLOR\n\nCreating App Bundle \"$APP\"...$COLOR_RESET"
 
-# Locate macdeployqt, assume homebrew & Qt5
-which macdeployqt > /dev/null 2>&1
-if [ $? -ne 0 ]; then
-  brew --prefix qt55 > /dev/null 2>&1
-  if [ $? -eq 0 ]; then
-    # Prefer Qt 5.5 (QTBUG-53533)
-    export PATH=$PATH:$(brew --prefix qt55)/bin
-  else
-    # Fallback Qt 5.6+
-  	export PATH=$PATH:$(brew --prefix qt5)/bin
-  fi
-fi
- 
-# MacPorts only - check for u+w permissions on libreadline
-if [ -f "@APPLE_PREFIX@/lib/$LIBREADLINE" ]; then
-  CHECKREADLINE=$(stat -f "%p" @APPLE_PREFIX@/lib/$LIBREADLINE)
-  CHECKREADLINE=${CHECKREADLINE:3:1}
-  if [ "${CHECKREADLINE}" != "7" ]; then
-    echo -e "\n\n\t\t\t\t***********\n\t\t\t\t* WARNING *\n\t\t\t\t***********"
-    echo -e "File $LIBREADLINE is not marked as user writable."
-    echo -e "This will break macdeployqt's linking process after it is copied."
-    echo -e "A sudo password is required to elevate and fix using chmod u+w."
-    echo -e "\nPLEASE ENTER SUDO PASSWORD:"
-    sudo chmod u+w "@APPLE_PREFIX@/lib/$LIBREADLINE"
-  fi
-fi
- 
+qtpath="$(dirname "@QT_QMAKE_EXECUTABLE@")"
+export PATH="$PATH:$qtpath"
+
 # Remove any old .app bundles
 rm -Rf "$APP"
- 
-# Create new bundle, copy our built code to it
-mkdir -p "$APP"
-cd "@CMAKE_INSTALL_PREFIX@"
-mkdir "$APP/Contents"
-cp -R * "$APP/Contents"
- 
-# Manually copy STK rawwaves
+
+# Copy/overwrite Info.plist
+command cp  "@CMAKE_BINARY_DIR@/Info.plist" "@CMAKE_INSTALL_PREFIX@/"
+
+# Create .app bundle containing contents from CMAKE_INSTALL_PREFIX
+mkdir -p "$APP/Contents/MacOS"
+mkdir -p "$APP/Contents/Frameworks"
+mkdir -p "$APP/Contents/Resources"
 mkdir -p "$APP/Contents/share/stk/rawwaves"
-cp $STK_RAWWAVE/*.raw "$APP/Contents/share/stk/rawwaves" > /dev/null 2>&1
- 
+cd "@CMAKE_INSTALL_PREFIX@"
+cp -R ./* "$APP/Contents"
+cp "@CMAKE_SOURCE_DIR@/cmake/apple/"*.icns "$APP/Contents/Resources/"
+cp "$STK_RAWWAVE"/*.raw "$APP/Contents/share/stk/rawwaves" > /dev/null 2>&1
+
 # Make all libraries writable for macdeployqt
 cd "$APP"
 find . -type f -print0 | xargs -0 chmod u+w
- 
-# Move lmms binary to the proper location
-mkdir -p "$APP/Contents/MacOS"
-mv "$APP/Contents/bin/lmms" "$APP/Contents/MacOS/lmms"
-rm -rf "$APP/Contents/bin"
- 
-# Move libraries to proper locations
-mkdir -p "$APP/Contents/Frameworks"
-mv "$APP/Contents/lib/lmms/RemoteZynAddSubFx" \
-   "$APP/Contents/MacOS/RemoteZynAddSubFx"
-   
-rm "$APP/Contents/Frameworks/libZynAddSubFxCore.dylib" > /dev/null 2>&1
 
-# Fix zyn linking 
+lmmsbin="MacOS/@CMAKE_PROJECT_NAME@"
+zynlib="lib/lmms/libzynaddsubfx.so"
+zynfmk="Frameworks/libZynAddSubFxCore.dylib"
+zynbin="MacOS/RemoteZynAddSubFx"
+
+# Move lmms binary
+mv "$APP/Contents/bin/@CMAKE_PROJECT_NAME@" "$APP/Contents/$lmmsbin"
+
+# Fix zyn linking
+mv "$APP/Contents/lib/lmms/RemoteZynAddSubFx" "$APP/Contents/$zynbin"
+mv "$APP/Contents/lib/lmms/libZynAddSubFxCore.dylib" "$APP/Contents/$zynfmk"
+
 install_name_tool -change @rpath/libZynAddSubFxCore.dylib \
-   @loader_path/../lib/lmms/libZynAddSubFxCore.dylib \
-  "$APP/Contents/MacOS/RemoteZynAddSubFx"
- 
+   @loader_path/../$zynfmk \
+  "$APP/Contents/$zynbin"
+
+install_name_tool -change @rpath/libZynAddSubFxCore.dylib \
+   @loader_path/../../$zynfmk \
+  "$APP/Contents/$zynlib"
+  
+# Replace @rpath with @loader_path for Carla
+# See also plugins/carlabase/CMakeLists.txt
+# This MUST be done BEFORE calling macdeployqt
+install_name_tool -change @rpath/libcarlabase.dylib \
+   @loader_path/libcarlabase.dylib \
+  "$APP/Contents/lib/lmms/libcarlapatchbay.so"
+
+install_name_tool -change @rpath/libcarlabase.dylib \
+  @loader_path/libcarlabase.dylib \
+  "$APP/Contents/lib/lmms/libcarlarack.so"
+
+# Link lmms binary
+_executables="${_executables} -executable=$APP/Contents/$zynbin"
+_executables="${_executables} -executable=$APP/Contents/$zynfmk"
+
 # Build a list of shared objects in target/lib/lmms
 for file in "$APP/Contents/lib/lmms/"*.so; do
    _thisfile="$APP/Contents/lib/lmms/${file##*/}"
    _executables="${_executables} -executable=$_thisfile"
 done
- 
+
 # Build a list of shared objects in target/lib/lmms/ladspa
 for file in "$APP/Contents/lib/lmms/ladspa/"*.so; do
    _thisfile="$APP/Contents/lib/lmms/ladspa/${file##*/}"
    _executables="${_executables} -executable=$_thisfile"
 done
- 
-# Additional binaries that require linking
-_executables="${_executables} -executable=$APP/Contents/MacOS/RemoteZynAddSubFx"
-_executables="${_executables} -executable=$APP/Contents/lib/lmms/libZynAddSubFxCore.dylib"
 
-# Build our App Package using "macdeployqt"
+# Finalize .app
+# shellcheck disable=SC2086
 macdeployqt "$APP" $_executables
 
-# OS X Specific Artwork
-mkdir -p "$APP/Contents/Resources"
-cp "@CMAKE_SOURCE_DIR@/cmake/apple/"*.icns "$APP/Contents/Resources/"
+# Carla is a standalone plugin.  Remove library, look for it side-by-side LMMS.app
+# This MUST be done AFTER calling macdeployqt
+#
+# For example:
+#    /Applications/LMMS.app
+#    /Applications/Carla.app
+carlalibs=$(echo "@CARLA_LIBRARIES@"|tr ";" "\n")
 
+# Loop over all libcarlas, fix linking
+for file in "$APP/Contents/lib/lmms/"libcarla*; do
+   _thisfile="$APP/Contents/lib/lmms/${file##*/}"
+   for lib in $carlalibs; do
+     _oldpath="../../Frameworks/lib${lib}.dylib"
+     _newpath="Carla.app/Contents/MacOS/lib${lib}.dylib"
+     # shellcheck disable=SC2086
+     install_name_tool -change @loader_path/$_oldpath \
+       @executable_path/../../../$_newpath \
+       "$_thisfile"
+     rm -f "$APP/Contents/Frameworks/lib${lib}.dylib"
+   done
+done
+
+# Cleanup
+rm -rf "$APP/Contents/bin"
 echo -e "\nFinished.\n\n"

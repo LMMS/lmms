@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -30,17 +30,17 @@
 #include "AutomatableModelView.h"
 
 
-class EXPORT LcdSpinBox : public LcdWidget, public IntModelView
+class LMMS_EXPORT LcdSpinBox : public LcdWidget, public IntModelView
 {
 	Q_OBJECT
 public:
-	LcdSpinBox( int numDigits, QWidget* parent, const QString& name = QString::null );
+	LcdSpinBox( int numDigits, QWidget* parent, const QString& name = QString() );
 
-	LcdSpinBox( int numDigits, const QString& style, QWidget* parent, const QString& name = QString::null );
+	LcdSpinBox( int numDigits, const QString& style, QWidget* parent, const QString& name = QString() );
 
-	virtual ~LcdSpinBox();
+	virtual ~LcdSpinBox() = default;
 
-	virtual void modelChanged()
+	void modelChanged() override
 	{
 		ModelView::modelChanged();
 		update();
@@ -65,16 +65,17 @@ public slots:
 
 
 protected:
-	virtual void contextMenuEvent( QContextMenuEvent * _me );
-	virtual void mousePressEvent( QMouseEvent * _me );
-	virtual void mouseMoveEvent( QMouseEvent * _me );
-	virtual void mouseReleaseEvent( QMouseEvent * _me );
-	virtual void wheelEvent( QWheelEvent * _we );
-	virtual void mouseDoubleClickEvent( QMouseEvent * _me );
+	void contextMenuEvent( QContextMenuEvent * _me ) override;
+	void mousePressEvent( QMouseEvent * _me ) override;
+	void mouseMoveEvent( QMouseEvent * _me ) override;
+	void mouseReleaseEvent( QMouseEvent * _me ) override;
+	void wheelEvent( QWheelEvent * _we ) override;
+	void mouseDoubleClickEvent( QMouseEvent * _me ) override;
 
 private:
+	float m_remainder; //!< floating offset of spinbox in [-0.5, 0.5]
 	bool m_mouseMoving;
-	QPoint m_origMousePos;
+	QPoint m_lastMousePos; //!< mouse position in last mouseMoveEvent
 	int m_displayOffset;
 	void enterValue();
 

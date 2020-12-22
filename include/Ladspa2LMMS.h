@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2005-2008 Danny McRae <khjklujn@netscape.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  * 
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -30,7 +30,9 @@
 #include "LadspaManager.h"
 
 
-class EXPORT Ladspa2LMMS : public LadspaManager
+//! Class responsible for sorting found plugins (by LadspaManager)
+//! into categories
+class LMMS_EXPORT Ladspa2LMMS : public LadspaManager
 {
 public:
 	

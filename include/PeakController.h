@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2008-2009 Paul Giblock <drfaygo/at/gmail.com>
  * 
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -25,21 +25,18 @@
 #ifndef PEAK_CONTROLLER_H
 #define PEAK_CONTROLLER_H
 
-#include <QWidget>
-
 #include "Model.h"
-#include "AutomatableModel.h"
 #include "Controller.h"
 #include "ControllerDialog.h"
 
-class automatableButtonGroup;
-class Knob;
+class QWidget;
+
 class PeakControllerEffect;
 
 typedef QVector<PeakControllerEffect *> PeakControllerEffectVector;
 
 
-class EXPORT PeakController : public Controller
+class LMMS_EXPORT PeakController : public Controller
 {
 	Q_OBJECT
 public:
@@ -49,9 +46,9 @@ public:
 
 	virtual ~PeakController();
 
-	virtual void saveSettings( QDomDocument & _doc, QDomElement & _this );
-	virtual void loadSettings( const QDomElement & _this );
-	virtual QString nodeName() const;
+	void saveSettings( QDomDocument & _doc, QDomElement & _this ) override;
+	void loadSettings( const QDomElement & _this ) override;
+	QString nodeName() const override;
 
 	static void initGetControllerBySetting();
 	static PeakController * getControllerBySetting( const QDomElement & _this );
@@ -60,13 +57,13 @@ public:
 
 
 public slots:
-	virtual ControllerDialog * createDialog( QWidget * _parent );
+	ControllerDialog * createDialog( QWidget * _parent ) override;
 	void handleDestroyedEffect( );
 	void updateCoeffs();
 
 protected:
 	// The internal per-controller get-value function
-	virtual void updateValueBuffer();
+	void updateValueBuffer() override;
 
 	PeakControllerEffect * m_peakEffect;
 
@@ -94,9 +91,9 @@ public:
 	virtual ~PeakControllerDialog();
 
 protected:
-	virtual void contextMenuEvent( QContextMenuEvent * _me );
-	virtual void paintEvent( QPaintEvent * _pe );
-	virtual void modelChanged();
+	void contextMenuEvent( QContextMenuEvent * _me ) override;
+	void paintEvent( QPaintEvent * _pe ) override;
+	void modelChanged() override;
 
 	PeakController * m_peakController;
 

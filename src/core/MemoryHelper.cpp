@@ -2,7 +2,7 @@
  * Copyright (c) 2014 Simon Symeonidis <lethaljellybean/at/gmail/com>
  * Copyright (c) 2008-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -30,7 +30,7 @@
  * Allocate a number of bytes and return them.
  * @param byteNum is the number of bytes
  */
-void* MemoryHelper::alignedMalloc( int byteNum )
+void* MemoryHelper::alignedMalloc( size_t byteNum )
 {
 	char *ptr, *ptr2, *aligned_ptr;
 	int align_mask = ALIGN_SIZE - 1;

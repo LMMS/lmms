@@ -4,7 +4,7 @@
  * Copyright (c) 2008-2009 Paul Giblock <drfaygo/at/gmail.com>
  * Copyright (c) 2010-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -28,11 +28,8 @@
 #include <QMdiSubWindow>
 #include <QPushButton>
 #include <QScrollArea>
-#include <QScrollBar>
-#include <QVBoxLayout>
 #include <QMdiArea>
 #include <QMessageBox>
-#include <QVBoxLayout>
 
 #include "Song.h"
 #include "embed.h"
@@ -87,7 +84,9 @@ ControllerRackView::ControllerRackView( ) :
 	
 	subWin->setAttribute( Qt::WA_DeleteOnClose, false );
 	subWin->move( 680, 310 );
-	subWin->resize(400, 200);
+	subWin->resize( 350, 200 );
+	subWin->setFixedWidth( 350 );
+	subWin->setMinimumHeight( 200 );
 }
 
 
@@ -103,7 +102,7 @@ ControllerRackView::~ControllerRackView()
 void ControllerRackView::saveSettings( QDomDocument & _doc,
 							QDomElement & _this )
 {
-	MainWindow::saveWidgetState( this, _this, QSize( 400, 300) );
+	MainWindow::saveWidgetState( this, _this );
 }
 
 
@@ -177,7 +176,7 @@ void ControllerRackView::onControllerRemoved( Controller * removedController )
 
 	if (viewOfRemovedController )
 	{
-		m_controllerViews.erase( qFind( m_controllerViews.begin(),
+		m_controllerViews.erase( std::find( m_controllerViews.begin(),
 					m_controllerViews.end(), viewOfRemovedController ) );
 
 		delete viewOfRemovedController;

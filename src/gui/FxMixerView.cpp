@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2008-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -32,15 +32,14 @@
 #include <QMdiSubWindow>
 #include <QPainter>
 #include <QPushButton>
-#include <QToolButton>
 #include <QScrollArea>
 #include <QStyle>
 #include <QKeyEvent>
 
+#include "lmms_math.h"
+
 #include "FxMixerView.h"
 #include "Knob.h"
-#include "Engine.h"
-#include "embed.h"
 #include "FxLine.h"
 #include "FxMixer.h"
 #include "GuiApplication.h"
@@ -48,9 +47,10 @@
 #include "Mixer.h"
 #include "gui_templates.h"
 #include "InstrumentTrack.h"
+#include "SampleTrack.h"
 #include "Song.h"
 #include "BBTrackContainer.h"
-#include "lmms_math.h"
+#include "TrackContainer.h" // For TrackContainer::TrackList typedef
 
 FxMixerView::FxMixerView() :
 	QWidget(),
@@ -75,7 +75,7 @@ FxMixerView::FxMixerView() :
 
 	// Set margins
 	ml->setContentsMargins( 0, 4, 0, 0 );
-	
+
 	// Channel area
 	m_channelAreaWidget = new QWidget;
 	chLayout = new QHBoxLayout( m_channelAreaWidget );
@@ -116,7 +116,7 @@ FxMixerView::FxMixerView() :
 			ChannelArea( QWidget * parent, FxMixerView * mv ) :
 				QScrollArea( parent ), m_mv( mv ) {}
 			~ChannelArea() {}
-			virtual void keyPressEvent( QKeyEvent * e )
+			void keyPressEvent( QKeyEvent * e ) override
 			{
 				m_mv->keyPressEvent( e );
 			}
@@ -133,16 +133,16 @@ FxMixerView::FxMixerView() :
 	ml->addWidget( channelArea, 1, Qt::AlignTop );
 
 	// show the add new effect channel button
-	QPushButton * newChannelBtn = new QPushButton( embed::getIconPixmap( "new_channel" ), QString::null, this );
+	QPushButton * newChannelBtn = new QPushButton( embed::getIconPixmap( "new_channel" ), QString(), this );
 	newChannelBtn->setObjectName( "newChannelBtn" );
 	newChannelBtn->setFixedSize( fxLineSize );
 	connect( newChannelBtn, SIGNAL( clicked() ), this, SLOT( addNewChannel() ) );
 	ml->addWidget( newChannelBtn, 0, Qt::AlignTop );
 
 
-	// add the stacked layout for the effect racks of fx channels 
+	// add the stacked layout for the effect racks of fx channels
 	ml->addWidget( m_racksWidget, 0, Qt::AlignTop | Qt::AlignRight );
-	
+
 	setCurrentFxLine( m_fxChannelViews[0]->m_fxLine );
 
 	setLayout( ml );
@@ -221,10 +221,10 @@ void FxMixerView::refreshDisplay()
 		chLayout->addWidget(m_fxChannelViews[i]->m_fxLine);
 		m_racksLayout->addWidget( m_fxChannelViews[i]->m_rackView );
 	}
-	
+
 	// set selected fx line to 0
 	setCurrentFxLine( 0 );
-	
+
 	// update all fx lines
 	for( int i = 0; i < m_fxChannelViews.size(); ++i )
 	{
@@ -238,19 +238,25 @@ void FxMixerView::refreshDisplay()
 // update the and max. channel number for every instrument
 void FxMixerView::updateMaxChannelSelector()
 {
-	QVector<Track *> songTrackList = Engine::getSong()->tracks();
-	QVector<Track *> bbTrackList = Engine::getBBTrackContainer()->tracks();
+	TrackContainer::TrackList songTrackList = Engine::getSong()->tracks();
+	TrackContainer::TrackList bbTrackList = Engine::getBBTrackContainer()->tracks();
 
-	QVector<Track *> trackLists[] = {songTrackList, bbTrackList};
+	TrackContainer::TrackList trackLists[] = {songTrackList, bbTrackList};
 	for(int tl=0; tl<2; ++tl)
 	{
-		QVector<Track *> trackList = trackLists[tl];
+		TrackContainer::TrackList trackList = trackLists[tl];
 		for(int i=0; i<trackList.size(); ++i)
 		{
 			if( trackList[i]->type() == Track::InstrumentTrack )
 			{
 				InstrumentTrack * inst = (InstrumentTrack *) trackList[i];
 				inst->effectChannelModel()->setRange(0,
+					m_fxChannelViews.size()-1,1);
+			}
+			else if( trackList[i]->type() == Track::SampleTrack )
+			{
+				SampleTrack * strk = (SampleTrack *) trackList[i];
+				strk->effectChannelModel()->setRange(0,
 					m_fxChannelViews.size()-1,1);
 			}
 		}
@@ -308,12 +314,12 @@ FxMixerView::FxChannelView::FxChannelView(QWidget * _parent, FxMixerView * _mv,
 	m_soloBtn->setCheckable( true );
 	m_soloBtn->move( 9,  m_fader->y()-21);
 	connect(&fxChannel->m_soloModel, SIGNAL( dataChanged() ),
-			_mv, SLOT ( toggledSolo() ) );
+			_mv, SLOT ( toggledSolo() ), Qt::DirectConnection );
 	ToolTip::add( m_soloBtn, tr( "Solo FX channel" ) );
-	
+
 	// Create EffectRack for the channel
 	m_rackView = new EffectRackView( &fxChannel->m_fxChain, _mv->m_racksWidget );
-	m_rackView->setFixedSize( 245, FxLine::FxLineHeight );
+	m_rackView->setFixedSize( EffectRackView::DEFAULT_WIDTH, FxLine::FxLineHeight );
 }
 
 
@@ -356,6 +362,8 @@ void FxMixerView::updateFxLine(int index)
 	// does current channel send to this channel?
 	int selIndex = m_currentFxLine->channelIndex();
 	FxLine * thisLine = m_fxChannelViews[index]->m_fxLine;
+	thisLine->setToolTip( Engine::fxMixer()->effectChannel( index )->m_name );
+
 	FloatModel * sendModel = mix->channelSendModel(selIndex, index);
 	if( sendModel == NULL )
 	{
@@ -384,6 +392,10 @@ void FxMixerView::deleteChannel(int index)
 	// remember selected line
 	int selLine = m_currentFxLine->channelIndex();
 
+	// in case the deleted channel is soloed or the remaining
+	// channels will be left in a muted state
+	Engine::fxMixer()->clearChannel(index);
+
 	// delete the real channel
 	Engine::fxMixer()->deleteChannel(index);
 
@@ -401,12 +413,9 @@ void FxMixerView::deleteChannel(int index)
 	m_channelAreaWidget->adjustSize();
 
 	// make sure every channel knows what index it is
-	for(int i=0; i<m_fxChannelViews.size(); ++i)
+	for(int i=index + 1; i<m_fxChannelViews.size(); ++i)
 	{
-		if( i > index )
-		{
-			m_fxChannelViews[i]->m_fxLine->setChannelIndex(i-1);
-		}
+		m_fxChannelViews[i]->m_fxLine->setChannelIndex(i-1);
 	}
 	m_fxChannelViews.remove(index);
 
@@ -428,29 +437,32 @@ void FxMixerView::deleteUnusedChannels()
 	tracks += Engine::getSong()->tracks();
 	tracks += Engine::getBBTrackContainer()->tracks();
 
-	// go through all FX Channels
+	std::vector<bool> inUse(m_fxChannelViews.size(), false);
+
+	//Populate inUse by checking the destination channel for every track
+	for (Track* t: tracks)
+	{
+		//The channel that this track sends to. Since master channel is always in use,
+		//setting this to 0 is a safe default (for tracks that don't sent to the mixer).
+		int channel = 0;
+		if (t->type() == Track::InstrumentTrack)
+		{
+			InstrumentTrack* inst = dynamic_cast<InstrumentTrack *>(t);
+			channel = inst->effectChannelModel()->value();
+		}
+		else if (t->type() == Track::SampleTrack)
+		{
+			SampleTrack *strack = dynamic_cast<SampleTrack *>(t);
+			channel = strack->effectChannelModel()->value();
+		}
+		inUse[channel] = true;
+	}
+
+	//Check all channels except master, delete those with no incoming sends
 	for(int i = m_fxChannelViews.size()-1; i > 0; --i)
 	{
-		// check if an instrument references to the current channel
-		bool empty=true;
-		for( Track* t : tracks )
-		{
-			if( t->type() == Track::InstrumentTrack )
-			{
-				InstrumentTrack* inst = dynamic_cast<InstrumentTrack *>( t );
-				if( i == inst->effectChannelModel()->value(0) )
-				{
-					empty=false;
-					break;
-				}
-			}
-		}
-		FxChannel * ch = Engine::fxMixer()->effectChannel( i );
-		// delete channel if no references found
-		if( empty && ch->m_receives.isEmpty() )
-		{
-			deleteChannel( i );
-		}
+		if (!inUse[i] && Engine::fxMixer()->effectChannel(i)->m_receives.isEmpty())
+		{ deleteChannel(i); }
 	}
 }
 
@@ -489,6 +501,12 @@ void FxMixerView::moveChannelRight(int index)
 }
 
 
+void FxMixerView::renameChannel(int index)
+{
+	m_fxChannelViews[index]->m_fxLine->renameChannel();
+}
+
+
 
 void FxMixerView::keyPressEvent(QKeyEvent * e)
 {
@@ -524,6 +542,11 @@ void FxMixerView::keyPressEvent(QKeyEvent * e)
 			{
 				addNewChannel();
 			}
+			break;
+		case Qt::Key_Enter:
+		case Qt::Key_Return:
+		case Qt::Key_F2:
+			renameChannel( m_currentFxLine->channelIndex() );
 			break;
 	}
 }
@@ -577,25 +600,27 @@ void FxMixerView::updateFaders()
 	{
 		const float opl = m_fxChannelViews[i]->m_fader->getPeak_L();
 		const float opr = m_fxChannelViews[i]->m_fader->getPeak_R();
-		const float fall_off = 1.2;
-		if( m->effectChannel(i)->m_peakLeft > opl )
+		const float fallOff = 1.25;
+		if( m->effectChannel(i)->m_peakLeft >= opl/fallOff )
 		{
 			m_fxChannelViews[i]->m_fader->setPeak_L( m->effectChannel(i)->m_peakLeft );
-			m->effectChannel(i)->m_peakLeft = 0;
+			// Set to -1 so later we'll know if this value has been refreshed yet.
+			m->effectChannel(i)->m_peakLeft = -1;
 		}
-		else
+		else if( m->effectChannel(i)->m_peakLeft != -1 )
 		{
-			m_fxChannelViews[i]->m_fader->setPeak_L( opl/fall_off );
+			m_fxChannelViews[i]->m_fader->setPeak_L( opl/fallOff );
 		}
 
-		if( m->effectChannel(i)->m_peakRight > opr )
+		if( m->effectChannel(i)->m_peakRight >= opr/fallOff )
 		{
 			m_fxChannelViews[i]->m_fader->setPeak_R( m->effectChannel(i)->m_peakRight );
-			m->effectChannel(i)->m_peakRight = 0;
+			// Set to -1 so later we'll know if this value has been refreshed yet.
+			m->effectChannel(i)->m_peakRight = -1;
 		}
-		else
+		else if( m->effectChannel(i)->m_peakRight != -1 )
 		{
-			m_fxChannelViews[i]->m_fader->setPeak_R( opr/fall_off );
+			m_fxChannelViews[i]->m_fader->setPeak_R( opr/fallOff );
 		}
 	}
 }

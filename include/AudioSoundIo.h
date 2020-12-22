@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2015 Andrew Kelley <superjoe30@gmail.com>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -61,7 +61,7 @@ public:
 
 	inline static QString name()
 	{
-		return QT_TRANSLATE_NOOP( "setupWidget", "soundio" );
+		return QT_TRANSLATE_NOOP( "AudioDeviceSetupWidget", "soundio" );
 	}
 
 	class setupWidget : public AudioDeviceSetupWidget
@@ -108,6 +108,9 @@ private:
 	int m_outBufSize;
 	fpp_t m_outBufFramesTotal;
 	fpp_t m_outBufFrameIndex;
+
+	bool m_stopped;
+	bool m_outstreamStarted;
 
 	int m_disconnectErr;
 	void onBackendDisconnect(int err);

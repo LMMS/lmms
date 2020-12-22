@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -30,8 +30,8 @@
 
 #include "volume.h"
 #include "panning.h"
-#include "MidiTime.h"
 #include "SerializingObject.h"
+#include "TimePos.h"
 
 class DetuningHelper;
 
@@ -78,11 +78,11 @@ const float MaxDetuning = 4 * 12.0f;
 
 
 
-class EXPORT Note : public SerializingObject
+class LMMS_EXPORT Note : public SerializingObject
 {
 public:
-	Note( const MidiTime & length = MidiTime( 0 ),
-		const MidiTime & pos = MidiTime( 0 ),
+	Note( const TimePos & length = TimePos( 0 ),
+		const TimePos & pos = TimePos( 0 ),
 		int key = DefaultKey,
 		volume_t volume = DefaultVolume,
 		panning_t panning = DefaultPanning,
@@ -93,9 +93,9 @@ public:
 	// used by GUI
 	inline void setSelected( const bool selected ) { m_selected = selected; }
 	inline void setOldKey( const int oldKey ) { m_oldKey = oldKey; }
-	inline void setOldPos( const MidiTime & oldPos ) { m_oldPos = oldPos; }
+	inline void setOldPos( const TimePos & oldPos ) { m_oldPos = oldPos; }
 
-	inline void setOldLength( const MidiTime & oldLength )
+	inline void setOldLength( const TimePos & oldLength )
 	{
 		m_oldLength = oldLength;
 	}
@@ -105,19 +105,27 @@ public:
 	}
 
 
-	void setLength( const MidiTime & length );
-	void setPos( const MidiTime & pos );
+	void setLength( const TimePos & length );
+	void setPos( const TimePos & pos );
 	void setKey( const int key );
 	virtual void setVolume( volume_t volume );
 	virtual void setPanning( panning_t panning );
 	void quantizeLength( const int qGrid );
 	void quantizePos( const int qGrid );
 
-	static inline bool lessThan( Note * &lhs, Note * &rhs )
+	static inline bool lessThan( const Note * lhs, const Note * rhs )
 	{
 		// function to compare two notes - must be called explictly when
 		// using qSort
-		return (bool) ((int) ( *lhs ).pos() < (int) ( *rhs ).pos());
+		if( (int)( *lhs ).pos() < (int)( *rhs ).pos() )
+		{
+			return true;
+		}
+		else if( (int)( *lhs ).pos() > (int)( *rhs ).pos() )
+		{
+			return false;
+		}
+		return ( (int)( *lhs ).key() > (int)( *rhs ).key() );
 	}
 
 	inline bool selected() const
@@ -130,12 +138,12 @@ public:
 		return m_oldKey;
 	}
 
-	inline MidiTime oldPos() const
+	inline TimePos oldPos() const
 	{
 		return m_oldPos;
 	}
 
-	inline MidiTime oldLength() const
+	inline TimePos oldLength() const
 	{
 		return m_oldLength;
 	}
@@ -145,23 +153,23 @@ public:
 		return m_isPlaying;
 	}
 
-	inline MidiTime endPos() const
+	inline TimePos endPos() const
 	{
 		const int l = length();
 		return pos() + l;
 	}
 
-	inline const MidiTime & length() const
+	inline const TimePos & length() const
 	{
 		return m_length;
 	}
 
-	inline const MidiTime & pos() const
+	inline const TimePos & pos() const
 	{
 		return m_pos;
 	}
 
-	inline MidiTime pos( MidiTime basePos ) const
+	inline TimePos pos( TimePos basePos ) const
 	{
 		const int bp = basePos;
 		return m_pos - bp;
@@ -192,12 +200,12 @@ public:
 		return "note";
 	}
 
-	inline virtual QString nodeName() const
+	inline QString nodeName() const override
 	{
 		return classNodeName();
 	}
 
-	static MidiTime quantized( const MidiTime & m, const int qGrid );
+	static TimePos quantized( const TimePos & m, const int qGrid );
 
 	DetuningHelper * detuning() const
 	{
@@ -210,23 +218,23 @@ public:
 
 
 protected:
-	virtual void saveSettings( QDomDocument & doc, QDomElement & parent );
-	virtual void loadSettings( const QDomElement & _this );
+	void saveSettings( QDomDocument & doc, QDomElement & parent ) override;
+	void loadSettings( const QDomElement & _this ) override;
 
 
 private:
 	// for piano roll editing
 	bool m_selected;
 	int m_oldKey;
-	MidiTime m_oldPos;
-	MidiTime m_oldLength;
+	TimePos m_oldPos;
+	TimePos m_oldLength;
 	bool m_isPlaying;
 
 	int m_key;
 	volume_t m_volume;
 	panning_t m_panning;
-	MidiTime m_length;
-	MidiTime m_pos;
+	TimePos m_length;
+	TimePos m_pos;
 	DetuningHelper * m_detuning;
 };
 

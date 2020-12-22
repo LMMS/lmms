@@ -4,7 +4,7 @@
  * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * Copyright (c) 2015 Maurizio Lo Bosco (rageboge on github)
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -23,8 +23,9 @@
  *
  */
 
-
 #include "MidiApple.h"
+
+#ifdef LMMS_BUILD_APPLE
 
 #include <QtAlgorithms>
 #include <algorithm>
@@ -32,8 +33,6 @@
 #include "ConfigManager.h"
 #include "MidiPort.h"
 #include "Note.h"
-
-#ifdef LMMS_BUILD_APPLE
 
 #include <CoreMIDI/CoreMIDI.h>
 
@@ -58,7 +57,7 @@ MidiApple::~MidiApple()
 
 
 
-void MidiApple::processOutEvent( const MidiEvent& event, const MidiTime& time, const MidiPort* port )
+void MidiApple::processOutEvent( const MidiEvent& event, const TimePos& time, const MidiPort* port )
 {
 	qDebug("MidiApple:processOutEvent displayName:'%s'",port->displayName().toLatin1().constData());
 	
@@ -402,9 +401,9 @@ void MidiApple::midiInClose( MIDIEndpointRef reference )
 char *getName( MIDIObjectRef &object )
 {
 	// Returns the name of a given MIDIObjectRef as char *
-	CFStringRef name = nil;
+	CFStringRef name = nullptr;
 	if (noErr != MIDIObjectGetStringProperty(object, kMIDIPropertyName, &name))
-		return nil;
+		return nullptr;
 	int len = CFStringGetLength(name)+1;
 	char *value = (char *) malloc(len);
 	
@@ -616,8 +615,12 @@ char * MidiApple::getFullName(MIDIEndpointRef &endpoint_ref)
 	char * deviceName = getName(device);
 	char * endPointName = getName(endpoint_ref);
 	qDebug("device name='%s' endpoint name='%s'",deviceName,endPointName);
-	char * fullName = (char *)malloc(strlen(deviceName) + strlen(endPointName)+1);
+	size_t deviceNameLen = deviceName == nullptr ? 0 : strlen(deviceName);
+	size_t endPointNameLen = endPointName == nullptr ? 0 : strlen(endPointName);
+	char * fullName = (char *)malloc(deviceNameLen + endPointNameLen + 2);
 	sprintf(fullName, "%s:%s", deviceName,endPointName);
+	if (deviceName != nullptr) { free(deviceName); }
+	if (endPointName != nullptr) { free(endPointName); }
 	return fullName;
 }
 

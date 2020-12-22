@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -49,7 +49,7 @@ TimeDisplayWidget::TimeDisplayWidget() :
 
 	setMaximumHeight( 32 );
 
-	ToolTip::add( this, tr( "click to change time units" ) );
+	ToolTip::add( this, tr( "Time units" ) );
 
 	// update labels of LCD spinboxes
 	setDisplayMode( m_displayMode );
@@ -57,17 +57,6 @@ TimeDisplayWidget::TimeDisplayWidget() :
 	connect( gui->mainWindow(), SIGNAL( periodicUpdate() ),
 					this, SLOT( updateTime() ) );
 }
-
-
-
-
-TimeDisplayWidget::~TimeDisplayWidget()
-{
-}
-
-
-
-
 
 void TimeDisplayWidget::setDisplayMode( DisplayMode displayMode )
 {
@@ -101,19 +90,21 @@ void TimeDisplayWidget::updateTime()
 	switch( m_displayMode )
 	{
 		case MinutesSeconds:
-			m_majorLCD.setValue( s->getMilliseconds() / 60000 );
-			m_minorLCD.setValue( ( s->getMilliseconds() / 1000 ) % 60 );
-			m_milliSecondsLCD.setValue( s->getMilliseconds() % 1000 );
+			int msec;
+			msec = s->getMilliseconds();
+			m_majorLCD.setValue(msec / 60000);
+			m_minorLCD.setValue((msec / 1000) % 60);
+			m_milliSecondsLCD.setValue(msec % 1000);
 			break;
 
 		case BarsTicks:
 			int tick;
-			tick = ( s->getMilliseconds() * s->getTempo() * (DefaultTicksPerTact / 4 ) ) / 60000 ;
-			m_majorLCD.setValue( (int)(tick / s->ticksPerTact() ) + 1);
-			m_minorLCD.setValue( ( tick % s->ticksPerTact() ) /
-						 ( s->ticksPerTact() / s->getTimeSigModel().getNumerator() ) +1 );
-			m_milliSecondsLCD.setValue( ( tick % s->ticksPerTact() ) %
-							( s->ticksPerTact() / s->getTimeSigModel().getNumerator() ) );
+			tick = s->getPlayPos().getTicks();
+			m_majorLCD.setValue((int)(tick / s->ticksPerBar()) + 1);
+			m_minorLCD.setValue((tick % s->ticksPerBar()) /
+						 (s->ticksPerBar() / s->getTimeSigModel().getNumerator() ) +1);
+			m_milliSecondsLCD.setValue((tick % s->ticksPerBar()) %
+							(s->ticksPerBar() / s->getTimeSigModel().getNumerator()));
 			break;
 
 		default: break;

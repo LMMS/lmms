@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2008 Paul Giblock <drfaygo/at/gmail/dot/com>
  * 
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -49,7 +49,7 @@ PeakControllerEffectControlDialog::PeakControllerEffectControlDialog(
 	m_baseKnob = new Knob( knobBright_26, this );
 	m_baseKnob->setLabel( tr( "BASE" ) );
 	m_baseKnob->setModel( &_controls->m_baseModel );
-	m_baseKnob->setHintText( tr( "Base amount:" ) , "" );
+	m_baseKnob->setHintText( tr( "Base:" ) , "" );
 
 	m_amountKnob = new Knob( knobBright_26, this );
 	m_amountKnob->setLabel( tr( "AMNT" ) );
@@ -59,7 +59,7 @@ PeakControllerEffectControlDialog::PeakControllerEffectControlDialog(
 	m_amountMultKnob = new Knob( knobBright_26, this );
 	m_amountMultKnob->setLabel( tr( "MULT" ) );
 	m_amountMultKnob->setModel( &_controls->m_amountMultModel );
-	m_amountMultKnob->setHintText( tr( "Amount Multiplicator:" ) , "" );
+	m_amountMultKnob->setHintText( tr( "Amount multiplicator:" ) , "" );
 
 	m_attackKnob = new Knob( knobBright_26, this );
 	m_attackKnob->setLabel( tr( "ATCK" ) );
@@ -76,10 +76,10 @@ PeakControllerEffectControlDialog::PeakControllerEffectControlDialog(
 	m_tresholdKnob->setModel( &_controls->m_tresholdModel );
 	m_tresholdKnob->setHintText( tr( "Treshold:" ) , "" );
 
-	m_muteLed = new LedCheckBox( "Mute Effect", this );
+	m_muteLed = new LedCheckBox( tr( "Mute output" ), this );
 	m_muteLed->setModel( &_controls->m_muteModel );
 
-	m_absLed = new LedCheckBox( "Absolute Value", this );
+	m_absLed = new LedCheckBox( tr( "Absolute value" ), this );
 	m_absLed->setModel( &_controls->m_absModel );
 
 	QVBoxLayout * mainLayout = new QVBoxLayout();

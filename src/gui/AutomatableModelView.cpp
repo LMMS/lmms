@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2011-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -22,6 +22,7 @@
  *
  */
 
+#include <QApplication>
 #include <QMenu>
 #include <QMouseEvent>
 
@@ -33,29 +34,20 @@
 #include "GuiApplication.h"
 #include "MainWindow.h"
 #include "StringPairDrag.h"
+#include "Clipboard.h"
 
 #include "AutomationEditor.h"
 
 
+static float floatFromClipboard(bool* ok=nullptr);
 
 AutomatableModelView::AutomatableModelView( ::Model* model, QWidget* _this ) :
 	ModelView( model, _this ),
-	m_description( QString::null ),
-	m_unit( QString::null )
+	m_conversionFactor( 1.0 )
 {
 	widget()->setAcceptDrops( true );
 	widget()->setCursor( QCursor( embed::getIconPixmap( "hand" ), 3, 3 ) );
 }
-
-
-
-
-AutomatableModelView::~AutomatableModelView()
-{
-}
-
-
-
 
 void AutomatableModelView::addDefaultActions( QMenu* menu )
 {
@@ -65,22 +57,27 @@ void AutomatableModelView::addDefaultActions( QMenu* menu )
 
 	menu->addAction( embed::getIconPixmap( "reload" ),
 						AutomatableModel::tr( "&Reset (%1%2)" ).
-							arg( model->displayValue( model->initValue<float>() ) ).
+							arg( model->initValue<float>() * m_conversionFactor ).
 							arg( m_unit ),
 						model, SLOT( reset() ) );
 
 	menu->addSeparator();
 	menu->addAction( embed::getIconPixmap( "edit_copy" ),
 						AutomatableModel::tr( "&Copy value (%1%2)" ).
-							arg( model->displayValue( model->value<float>() ) ).
+							arg( model->value<float>() * m_conversionFactor ).
 							arg( m_unit ),
-						model, SLOT( copyValue() ) );
+						amvSlots, SLOT( copyToClipboard() ) );
 
-	menu->addAction( embed::getIconPixmap( "edit_paste" ),
-						AutomatableModel::tr( "&Paste value (%1%2)").
-							arg( model->displayValue( AutomatableModel::copiedValue() ) ).
-							arg( m_unit ),
-						model, SLOT( pasteValue() ) );
+	bool canPaste = true;
+	const float valueToPaste = floatFromClipboard(&canPaste);
+	const QString pasteDesc = canPaste ?
+					AutomatableModel::tr( "&Paste value (%1%2)").
+						arg( valueToPaste ).
+						arg( m_unit )
+					: AutomatableModel::tr( "&Paste value");
+	QAction* pasteAction = menu->addAction( embed::getIconPixmap( "edit_paste" ),
+						pasteDesc, amvSlots, SLOT( pasteFromClipboard() ) );
+	pasteAction->setEnabled(canPaste);
 
 	menu->addSeparator();
 
@@ -145,6 +142,31 @@ void AutomatableModelView::setModel( Model* model, bool isOldModelValid )
 
 
 
+// Unsets the current model by setting a dummy empty model. The dummy model is marked as
+// "defaultConstructed", so the next call to setModel will delete it.
+void AutomatableModelView::unsetModel()
+{
+	if (dynamic_cast<FloatModelView*>(this))
+	{
+		setModel(new FloatModel(0, 0, 0, 1, nullptr, QString(), true));
+	}
+	else if (dynamic_cast<IntModelView*>(this))
+	{
+		setModel(new IntModel(0, 0, 0, nullptr, QString(), true));
+	}
+	else if (dynamic_cast<BoolModelView*>(this))
+	{
+		setModel(new BoolModel(false, nullptr, QString(), true));
+	}
+	else
+	{
+		ModelView::unsetModel();
+	}
+}
+
+
+
+
 void AutomatableModelView::mousePressEvent( QMouseEvent* event )
 {
 	if( event->button() == Qt::LeftButton && event->modifiers() & Qt::ControlModifier )
@@ -159,8 +181,19 @@ void AutomatableModelView::mousePressEvent( QMouseEvent* event )
 }
 
 
+void AutomatableModelView::setConversionFactor( float factor )
+{
+	if( factor != 0.0 )
+	{
+		m_conversionFactor = factor;
+	}
+}
 
 
+float AutomatableModelView::getConversionFactor()
+{
+	return m_conversionFactor;
+}
 
 
 AutomatableModelViewSlots::AutomatableModelViewSlots( AutomatableModelView* amv, QObject* parent ) :
@@ -245,5 +278,30 @@ void AutomatableModelViewSlots::unlinkAllModels()
 	m_amv->modelUntyped()->unlinkAllModels();
 }
 
+void AutomatableModelViewSlots::copyToClipboard()
+{
+	// For copyString() and MimeType enum class
+	using namespace Clipboard;
 
+	copyString( QString::number( m_amv->value<float>() * m_amv->getConversionFactor() ), MimeType::Default );
+}
+
+void AutomatableModelViewSlots::pasteFromClipboard()
+{
+	bool isNumber = false;
+	const float number = floatFromClipboard(&isNumber);
+	if (isNumber) {
+		m_amv->modelUntyped()->setValue(number / m_amv->getConversionFactor());
+	}
+}
+
+
+/// Attempt to parse a float from the clipboard
+static float floatFromClipboard(bool* ok)
+{
+	// For getString() and MimeType enum class
+	using namespace Clipboard;
+
+	return getString( MimeType::Default ).toFloat(ok);
+}
 

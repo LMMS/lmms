@@ -5,7 +5,7 @@
  * Copyright (c) 2014 Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>
  * Copyright (c) 2006-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -86,6 +86,7 @@ void CrossoverEQControls::loadSettings( const QDomElement & elem )
 	m_mute4.loadSettings( elem, "mute4" );
 	
 	m_effect->m_needsUpdate = true;
+	m_effect->clearFilterHistories();
 }
 
 void CrossoverEQControls::xover12Changed()

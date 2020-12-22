@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -24,7 +24,6 @@
 
 #include <QComboBox>
 #include <QLineEdit>
-#include <QLabel>
 
 #include "AudioAlsa.h"
 
@@ -33,26 +32,27 @@
 #include "endian_handling.h"
 #include "ConfigManager.h"
 #include "Engine.h"
-#include "LcdSpinBox.h"
 #include "Mixer.h"
 #include "gui_templates.h"
-#include "templates.h"
-
-#include <iostream>
-#include <vector>
 
 
 AudioAlsa::AudioAlsa( bool & _success_ful, Mixer*  _mixer ) :
-	AudioDevice( tLimit<ch_cnt_t>(
+	AudioDevice( qBound<ch_cnt_t>(
+		DEFAULT_CHANNELS,
 		ConfigManager::inst()->value( "audioalsa", "channels" ).toInt(),
-					DEFAULT_CHANNELS, SURROUND_CHANNELS ),
-								_mixer ),
+		SURROUND_CHANNELS ), _mixer ),
 	m_handle( NULL ),
 	m_hwParams( NULL ),
 	m_swParams( NULL ),
 	m_convertEndian( false )
 {
 	_success_ful = false;
+
+	if( setenv( "PULSE_ALSA_HOOK_CONF", "/dev/null", 0 ) )
+	{
+		fprintf( stderr,
+		"Could not avoid possible interception by PulseAudio\n" );
+	}
 
 	int err;
 

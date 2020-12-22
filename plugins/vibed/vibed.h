@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2006-2008 Danny McRae <khjklujn/at/yahoo/com>
  * 
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -82,7 +82,7 @@ private:
 
 
 
-class vibedView : public InstrumentView
+class vibedView : public InstrumentViewFixedSize
 {
 	Q_OBJECT
 public:
@@ -93,7 +93,6 @@ public:
 public slots:
 	void showString( int _string );
 	void contextMenuEvent( QContextMenuEvent * );
-	void displayHelp();
 
 protected slots:
 	void sinWaveClicked();

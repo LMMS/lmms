@@ -1,0 +1,194 @@
+#!/usr/bin/env bash
+# Creates Linux ".AppImage" for @PROJECT_NAME_UCASE@
+#
+# Depends:  linuxdeployqt
+#
+# Notes:    Will attempt to fetch linuxdeployqt automatically (x86_64 only)
+#           See Also: https://github.com/probonopd/linuxdeployqt/blob/master/BUILDING.md
+
+set -e
+
+LINUXDEPLOYQT="@CMAKE_BINARY_DIR@/linuxdeployqt"
+VERBOSITY=2 # 3=debug
+LOGFILE="@CMAKE_BINARY_DIR@/appimage.log"
+APPDIR="@CMAKE_BINARY_DIR@/@PROJECT_NAME_UCASE@.AppDir/"
+DESKTOPFILE="${APPDIR}usr/share/applications/lmms.desktop"
+STRIP=""
+
+# Don't strip for Debug|RelWithDebInfo builds
+# shellcheck disable=SC2193
+if [[ "@CMAKE_BUILD_TYPE@" == *"Deb"* ]]; then
+	STRIP="-no-strip"
+fi
+
+# Console colors
+RED="\\x1B[1;31m"
+GREEN="\\x1B[1;32m"
+YELLOW="\\x1B[1;33m"
+PLAIN="\\x1B[0m"
+
+function error {
+	echo -e "   ${PLAIN}[${RED}error${PLAIN}] ${1}"
+	return 1
+}
+
+function success {
+	echo -e "   ${PLAIN}[${GREEN}success${PLAIN}] ${1}"
+}
+
+function skipped {
+	echo -e "   ${PLAIN}[${YELLOW}skipped${PLAIN}] ${1}"
+}
+
+# Blindly assume system arch is appimage arch
+ARCH=$(arch)
+export ARCH
+
+# Check for problematic install locations
+INSTALL=$(echo "@CMAKE_INSTALL_PREFIX@" | sed 's/\/*$//g')
+if [ "$INSTALL" == "/usr/local" ] || [ "$INSTALL" == "/usr" ] ; then
+	error "Incompatible CMAKE_INSTALL_PREFIX for creating AppImage: @CMAKE_INSTALL_PREFIX@"
+fi
+
+echo -e "\nWriting verbose output to \"${LOGFILE}\""
+
+# Ensure linuxdeployqt uses the same qmake version as cmake
+PATH="$(pwd -P)/squashfs-root/usr/bin:$(dirname "@QT_QMAKE_EXECUTABLE@")":$PATH
+export PATH
+
+# Fetch portable linuxdeployqt if not in PATH
+APPIMAGETOOL="squashfs-root/usr/bin/appimagetool"
+echo -e "\nDownloading linuxdeployqt to ${LINUXDEPLOYQT}..."
+if env -i which linuxdeployqt > /dev/null 2>&1; then
+	skipped "System already provides this utility"
+else
+	filename="linuxdeployqt-continuous-$(uname -p).AppImage"
+	url="https://github.com/probonopd/linuxdeployqt/releases/download/continuous/$filename"
+	down_file="$(pwd)/$filename"
+	if [ ! -f "$LINUXDEPLOYQT" ]; then
+		ln -s "$down_file" "$LINUXDEPLOYQT"
+	fi
+	echo "   [.......] Downloading ($(uname -p)): ${url}"
+	wget -N -q "$url" || (rm "$filename" && false)
+	chmod +x "$LINUXDEPLOYQT"
+	success "Downloaded $LINUXDEPLOYQT"
+	# Extract AppImage and replace LINUXDEPLOYQT variable with extracted binary
+	# to support systems without fuse
+	# Also, we need to set LD_LIBRARY_PATH, but linuxdepoyqt's AppRun unsets it
+	# See https://github.com/probonopd/linuxdeployqt/pull/370/
+	"$LINUXDEPLOYQT" --appimage-extract > /dev/null 2>&1
+	LINUXDEPLOYQT="squashfs-root/usr/bin/linuxdeployqt"
+	success "Extracted $APPIMAGETOOL"
+fi
+
+# Make skeleton AppDir
+echo -e "\nCreating ${APPDIR}..."
+rm -rf "${APPDIR}"
+mkdir -p "${APPDIR}usr"
+success "Created ${APPDIR}"
+
+# Clone install to AppDir
+echo -e "\nCopying @CMAKE_INSTALL_PREFIX@ to ${APPDIR}..."
+cp -R "@CMAKE_INSTALL_PREFIX@/." "${APPDIR}usr"
+rm -rf "${APPDIR}usr/include"
+success "${APPDIR}"
+
+# Copy rawwaves directory for stk/mallets
+mkdir -p "${APPDIR}usr/share/stk/"
+cp -R /usr/share/stk/rawwaves/ "${APPDIR}usr/share/stk/"
+
+# Create a wrapper script which calls the lmms executable
+mv "${APPDIR}usr/bin/lmms" "${APPDIR}usr/bin/lmms.real"
+
+cp "@CMAKE_CURRENT_SOURCE_DIR@/launch_lmms.sh" "${APPDIR}usr/bin/lmms"
+
+chmod +x "${APPDIR}usr/bin/lmms"
+
+# Per https://github.com/probonopd/linuxdeployqt/issues/129
+unset LD_LIBRARY_PATH
+
+# Ensure linuxdeployqt can find shared objects
+export LD_LIBRARY_PATH="${APPDIR}"usr/lib/lmms/:"${APPDIR}"usr/lib/lmms/optional:"$LD_LIBRARY_PATH"
+
+# Move executables so linuxdeployqt can find them
+ZYNLIB="${APPDIR}usr/lib/lmms/RemoteZynAddSubFx"
+VSTLIB32="${APPDIR}usr/lib/lmms/32/RemoteVstPlugin32.exe.so"
+VSTLIB64="${APPDIR}usr/lib/lmms/RemoteVstPlugin64.exe.so"
+
+ZYNBIN="${APPDIR}usr/bin/RemoteZynAddSubFx"
+VSTBIN32="${APPDIR}usr/bin/RemoteVstPlugin32.exe.so"
+VSTBIN64="${APPDIR}usr/bin/RemoteVstPlugin64.exe.so"
+
+mv "$ZYNLIB" "$ZYNBIN"
+mv "$VSTLIB32" "$VSTBIN32" || true
+mv "$VSTLIB64" "$VSTBIN64" || true
+
+# Handle wine linking
+if [ -d "@WINE_32_LIBRARY_DIR@" ] && \
+		ldd "$VSTBIN32" | grep "libwine\.so" | grep "not found"; then
+   export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:"@WINE_32_LIBRARY_DIRS@"
+fi
+if [ -d "@WINE_64_LIBRARY_DIR@" ] && \
+		ldd "$VSTBIN64" | grep "libwine\.so" | grep "not found"; then
+   export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:"@WINE_64_LIBRARY_DIRS@"
+fi
+
+# Patch the desktop file
+sed -i 's/.*Exec=.*/Exec=lmms.real/' "$DESKTOPFILE"
+
+# Fix linking for soft-linked plugins
+for file in "${APPDIR}usr/lib/lmms/"*.so; do
+   thisfile="${APPDIR}usr/lib/lmms/${file##*/}"
+   executables="${executables} -executable=$thisfile"
+done
+executables="${executables} -executable=${ZYNBIN}"
+executables="${executables} -executable=${VSTBIN32}"
+executables="${executables} -executable=${VSTBIN64}"
+executables="${executables} -executable=${APPDIR}usr/lib/lmms/ladspa/imp_1199.so"
+executables="${executables} -executable=${APPDIR}usr/lib/lmms/ladspa/imbeq_1197.so"
+executables="${executables} -executable=${APPDIR}usr/lib/lmms/ladspa/pitch_scale_1193.so"
+executables="${executables} -executable=${APPDIR}usr/lib/lmms/ladspa/pitch_scale_1194.so"
+
+# Bundle both qt and non-qt dependencies into appimage format
+echo -e "\nBundling and relinking system dependencies..."
+echo -e ">>>>> linuxdeployqt" > "$LOGFILE"
+
+# shellcheck disable=SC2086
+"$LINUXDEPLOYQT" "$DESKTOPFILE" $executables -bundle-non-qt-libs -verbose=$VERBOSITY $STRIP >> "$LOGFILE" 2>&1
+success "Bundled and relinked dependencies"
+
+# Link to original location so lmms can find them
+ln -sr  "$ZYNBIN" "$ZYNLIB"
+ln -sr  "$VSTBIN32" "$VSTLIB32" || true
+ln -sr  "$VSTBIN64" "$VSTLIB64" || true
+
+# Remove wine library conflict
+rm -f "${APPDIR}/usr/lib/libwine.so.1"
+
+# Use system-provided carla
+rm -f "${APPDIR}usr/lib/"libcarla*.so
+rm -f "${APPDIR}usr/lib/lmms/optional/"libcarla*.so
+
+# Remove bundled jack in LD_LIBRARY_PATH if exists
+if [ -e "${APPDIR}/usr/lib/libjack.so.0" ]; then
+   rm "${APPDIR}/usr/lib/libjack.so.0"
+fi
+
+# Bundle jack out of LD_LIBRARY_PATH
+JACK_LIB=$(ldd "${APPDIR}/usr/bin/lmms.real" | sed -n 's/\tlibjack\.so\.0 => \(.\+\) (0x[0-9a-f]\+)/\1/p')
+if [ -e "$JACK_LIB" ]; then
+   mkdir -p "${APPDIR}usr/lib/lmms/optional/"
+   cp "$JACK_LIB" "${APPDIR}usr/lib/lmms/optional/"
+fi
+
+# Point the AppRun to the shim launcher
+rm -f "${APPDIR}/AppRun"
+ln -sr "${APPDIR}/usr/bin/lmms" "${APPDIR}/AppRun"
+
+# Create AppImage
+echo -e "\nFinishing the AppImage..."
+echo -e "\n\n>>>>> appimagetool" >> "$LOGFILE"
+"$APPIMAGETOOL" "${APPDIR}" "@APPIMAGE_FILE@" >> "$LOGFILE" 2>&1
+success "Created @APPIMAGE_FILE@"
+
+echo -e "\nFinished"

@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -61,7 +61,7 @@ public:
 	void addSpacingToToolBar( int _size );
 
 	// wrap the widget with a window decoration and add it to the workspace
-	EXPORT SubWindow* addWindowedWidget(QWidget *w, Qt::WindowFlags windowFlags=0);
+	LMMS_EXPORT SubWindow* addWindowedWidget(QWidget *w, Qt::WindowFlags windowFlags = QFlag(0));
 
 
 	///
@@ -105,13 +105,10 @@ public:
 		return m_autoSaveTimer.interval();
 	}
 
-	void runAutoSave();
-
 	enum SessionState
 	{
 		Normal,
-		Recover,
-		Limited,
+		Recover
 	};
 
 	void setSession( SessionState session )
@@ -128,31 +125,21 @@ public:
 
 	void clearKeyModifiers();
 
-	bool isCtrlPressed()
-	{
-		return m_keyMods.m_ctrl;
-	}
-
+	// TODO Remove this function, since m_shift can get stuck down.
+	// [[deprecated]]
 	bool isShiftPressed()
 	{
 		return m_keyMods.m_shift;
 	}
 
-	bool isAltPressed()
-	{
-		return m_keyMods.m_alt;
-	}
-
-	static void saveWidgetState( QWidget * _w, QDomElement & _de, QSize const & sizeIfInvisible = QSize(0, 0) );
+	static void saveWidgetState( QWidget * _w, QDomElement & _de );
 	static void restoreWidgetState( QWidget * _w, const QDomElement & _de );
 
 public slots:
 	void resetWindowTitle();
 
 	void emptySlot();
-	void enterWhatsThisMode();
 	void createNewProject();
-	void createNewProjectFromTemplate( QAction * _idx );
 	void openProject();
 	bool saveProject();
 	bool saveProjectAs();
@@ -168,6 +155,7 @@ public slots:
 	void toggleFxMixerWin();
 	void togglePianoRollWin();
 	void toggleControllerRack();
+	void toggleFullscreen();
 
 	void updatePlayPauseIcons();
 
@@ -177,12 +165,15 @@ public slots:
 
 	void autoSave();
 
+private slots:
+	void onExportProjectMidi();
+
 protected:
-	virtual void closeEvent( QCloseEvent * _ce );
-	virtual void focusOutEvent( QFocusEvent * _fe );
-	virtual void keyPressEvent( QKeyEvent * _ke );
-	virtual void keyReleaseEvent( QKeyEvent * _ke );
-	virtual void timerEvent( QTimerEvent * _ev );
+	void closeEvent( QCloseEvent * _ce ) override;
+	void focusOutEvent( QFocusEvent * _fe ) override;
+	void keyPressEvent( QKeyEvent * _ke ) override;
+	void keyReleaseEvent( QKeyEvent * _ke ) override;
+	void timerEvent( QTimerEvent * _ev ) override;
 
 
 private:
@@ -195,14 +186,15 @@ private:
 	void toggleWindow( QWidget *window, bool forceShow = false );
 	void refocus();
 
+	void exportProject(bool multiExport = false);
+	void handleSaveResult(QString const & filename, bool songSavedSuccessfully);
+	bool guiSaveProject();
+	bool guiSaveProjectAs( const QString & filename );
+
 	QMdiArea * m_workspace;
 
 	QWidget * m_toolBar;
 	QGridLayout * m_toolBarLayout;
-
-	QMenu * m_templatesMenu;
-	QMenu * m_recentlyOpenedProjectsMenu;
-	int m_custom_templates_count;
 
 	struct keyModifiers
 	{
@@ -233,17 +225,21 @@ private:
 	ToolButton * m_metronomeToggle;
 
 	SessionState m_session;
+	
+	bool maximized;
 
 private slots:
 	void browseHelp();
-	void fillTemplatesMenu();
-	void openRecentlyOpenedProject( QAction * _action );
 	void showTool( QAction * _idx );
-	void updateRecentlyOpenedProjectsMenu();
 	void updateViewMenu( void );
 	void updateConfig( QAction * _who );
 	void onToggleMetronome();
-
+	void onExportProject();
+	void onExportProjectTracks();
+	void onImportProject();
+	void onSongStopped();
+	void onSongModified();
+	void onProjectFileNameChanged();
 
 signals:
 	void periodicUpdate();

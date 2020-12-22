@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2006-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -31,6 +31,7 @@
 #include <QObject>
 #include <QPainter>
 #include <QLabel>
+#include <QSharedPointer>
 
 
 class VstEffectControls;
@@ -48,20 +49,25 @@ public:
 	virtual ~VstEffectControlDialog();
 
 protected:
-	virtual void paintEvent( QPaintEvent * _pe );
+	void paintEvent( QPaintEvent * _pe ) override;
+	void showEvent( QShowEvent* _se ) override;
 
 private:
 	QWidget * m_pluginWidget;
 
+	QPushButton * m_togglePluginButton;
 	PixmapButton * m_openPresetButton;
 	PixmapButton * m_rolLPresetButton;
 	PixmapButton * m_rolRPresetButton;
 	PixmapButton * m_managePluginButton;
 	PixmapButton * m_savePresetButton;
 
-	VstPlugin * m_plugin;
+	QSharedPointer<VstPlugin> m_plugin;
 
 	QLabel * tbLabel;
+
+public slots:
+	void togglePluginUI( bool checked );
 } ;
 
 #endif

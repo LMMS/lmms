@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -29,12 +29,18 @@
 #include <QDomElement>
 #include <QWriteLocker>
 
+#include "AutomationPattern.h"
+#include "AutomationTrack.h"
+#include "BBTrack.h"
+#include "BBTrackContainer.h"
+#include "embed.h"
 #include "TrackContainer.h"
 #include "InstrumentTrack.h"
-#include "GuiApplication.h"
-#include "MainWindow.h"
 #include "Song.h"
 
+#include "GuiApplication.h"
+#include "MainWindow.h"
+#include "TextFloat.h"
 
 TrackContainer::TrackContainer() :
 	Model( NULL ),
@@ -82,24 +88,17 @@ void TrackContainer::loadSettings( const QDomElement & _this )
 
 	static QProgressDialog * pd = NULL;
 	bool was_null = ( pd == NULL );
-	int start_val = 0;
 	if( !journalRestore && gui != nullptr )
 	{
 		if( pd == NULL )
 		{
 			pd = new QProgressDialog( tr( "Loading project..." ),
 						tr( "Cancel" ), 0,
-						_this.childNodes().count(),
+						Engine::getSong()->getLoadingTrackCount(),
 						gui->mainWindow() );
 			pd->setWindowModality( Qt::ApplicationModal );
 			pd->setWindowTitle( tr( "Please wait..." ) );
 			pd->show();
-		}
-		else
-		{
-			start_val = pd->value();
-			pd->setMaximum( pd->maximum() +
-						_this.childNodes().count() );
 		}
 	}
 
@@ -113,6 +112,14 @@ void TrackContainer::loadSettings( const QDomElement & _this )
 						QEventLoop::AllEvents, 100 );
 			if( pd->wasCanceled() )
 			{
+				if ( gui )
+				{
+					TextFloat::displayMessage( tr( "Loading cancelled" ),
+					tr( "Project loading was cancelled." ),
+					embed::getIconPixmap( "project_file", 24, 24 ),
+					2000 );
+				}
+				Engine::getSong()->loadingCancelled();
 				break;
 			}
 		}
@@ -120,6 +127,14 @@ void TrackContainer::loadSettings( const QDomElement & _this )
 		if( node.isElement() &&
 			!node.toElement().attribute( "metadata" ).toInt() )
 		{
+			QString trackName = node.toElement().hasAttribute( "name" ) ?
+						node.toElement().attribute( "name" ) :
+						node.firstChild().toElement().attribute( "name" );
+			if( pd != NULL )
+			{
+				pd->setLabelText( tr("Loading Track %1 (%2/Total %3)").arg( trackName ).
+						  arg( pd->value() + 1 ).arg( Engine::getSong()->getLoadingTrackCount() ) );
+			}
 			Track::create( node.toElement(), this );
 		}
 		node = node.nextSibling();
@@ -127,7 +142,6 @@ void TrackContainer::loadSettings( const QDomElement & _this )
 
 	if( pd != NULL )
 	{
-		pd->setValue( start_val + _this.childNodes().count() );
 		if( was_null )
 		{
 			delete pd;
@@ -234,22 +248,86 @@ bool TrackContainer::isEmpty() const
 
 
 
-
-
-
-DummyTrackContainer::DummyTrackContainer() :
-	TrackContainer(),
-	m_dummyInstrumentTrack( NULL )
+AutomatedValueMap TrackContainer::automatedValuesAt(TimePos time, int tcoNum) const
 {
-	setJournalling( false );
-	m_dummyInstrumentTrack = dynamic_cast<InstrumentTrack *>(
-				Track::create( Track::InstrumentTrack,
-							this ) );
-	m_dummyInstrumentTrack->setJournalling( false );
+	return automatedValuesFromTracks(tracks(), time, tcoNum);
 }
 
 
+AutomatedValueMap TrackContainer::automatedValuesFromTracks(const TrackList &tracks, TimePos time, int tcoNum)
+{
+	Track::tcoVector tcos;
 
+	for (Track* track: tracks)
+	{
+		if (track->isMuted()) {
+			continue;
+		}
 
+		switch(track->type())
+		{
+		case Track::AutomationTrack:
+		case Track::HiddenAutomationTrack:
+		case Track::BBTrack:
+			if (tcoNum < 0) {
+				track->getTCOsInRange(tcos, 0, time);
+			} else {
+				Q_ASSERT(track->numOfTCOs() > tcoNum);
+				tcos << track->getTCO(tcoNum);
+			}
+		default:
+			break;
+		}
+	}
 
+	AutomatedValueMap valueMap;
+
+	Q_ASSERT(std::is_sorted(tcos.begin(), tcos.end(), TrackContentObject::comparePosition));
+
+	for(TrackContentObject* tco : tcos)
+	{
+		if (tco->isMuted() || tco->startPosition() > time) {
+			continue;
+		}
+
+		if (auto* p = dynamic_cast<AutomationPattern *>(tco))
+		{
+			if (! p->hasAutomation()) {
+				continue;
+			}
+			TimePos relTime = time - p->startPosition();
+			if (! p->getAutoResize()) {
+				relTime = qMin(relTime, p->length());
+			}
+			float value = p->valueAt(relTime);
+
+			for (AutomatableModel* model : p->objects())
+			{
+				valueMap[model] = value;
+			}
+		}
+		else if (auto* bb = dynamic_cast<BBTCO *>(tco))
+		{
+			auto bbIndex = dynamic_cast<class BBTrack*>(bb->getTrack())->index();
+			auto bbContainer = Engine::getBBTrackContainer();
+
+			TimePos bbTime = time - tco->startPosition();
+			bbTime = std::min(bbTime, tco->length());
+			bbTime = bbTime % (bbContainer->lengthOfBB(bbIndex) * TimePos::ticksPerBar());
+
+			auto bbValues = bbContainer->automatedValuesAt(bbTime, bbIndex);
+			for (auto it=bbValues.begin(); it != bbValues.end(); it++)
+			{
+				// override old values, bb track with the highest index takes precedence
+				valueMap[it.key()] = it.value();
+			}
+		}
+		else
+		{
+			continue;
+		}
+	}
+
+	return valueMap;
+};
 

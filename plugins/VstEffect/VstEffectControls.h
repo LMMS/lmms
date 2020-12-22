@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2008-2011 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -34,7 +34,7 @@
 
 #include <QMdiSubWindow>
 #include <QScrollArea>
-#include "Knob.h"
+#include "CustomTextKnob.h"
 #include <QLayout>
 #include <QPainter>
 #include <QObject>
@@ -59,10 +59,7 @@ public:
 
 	virtual int controlCount();
 
-	virtual EffectControlDialog * createView()
-	{
-		return new VstEffectControlDialog( this );
-	}
+	virtual EffectControlDialog * createView();
 
 
 protected slots:
@@ -73,7 +70,7 @@ protected slots:
 	void rollPreset( void );
 	void rolrPreset( void );
 	void selPreset( void );
-	void setParameter( void );
+	void setParameter( Model * action );
 
 protected:
 	virtual void paintEvent( QPaintEvent * _pe );
@@ -82,12 +79,10 @@ private:
 	VstEffect * m_effect;
 
 	QPushButton * m_selPresetButton;
-	QMenu *menu;
 
 	QMdiSubWindow * m_subWindow;
 	QScrollArea * m_scrollArea;
 	FloatModel ** knobFModel;
-	Knob ** vstKnobs;
 	int paramCount;
 
 	QObject * ctrHandle;
@@ -98,6 +93,7 @@ private:
 	friend class VstEffectControlDialog;
 	friend class manageVSTEffectView;
 
+	bool m_vstGuiVisible;
 } ;
 
 
@@ -114,7 +110,8 @@ public:
 protected slots:
 	void syncPlugin( void );
 	void displayAutomatedOnly( void );
-	void setParameter( void );
+	void setParameter( Model * action );
+	void syncParameterText();
 	void closeWindow();
 
 private:
@@ -133,6 +130,7 @@ private:
 	QPushButton * m_syncButton;
 	QPushButton * m_displayAutomatedOnly;
 	QPushButton * m_closeButton;
+	CustomTextKnob ** vstKnobs;
 
 } ;
 

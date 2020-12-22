@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2016 Javier Serrano Polo <javier@jasp.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -38,11 +38,11 @@ public:
 	RowTableView( QWidget * parent = 0 );
 	virtual ~RowTableView();
 
-	virtual void setModel( QAbstractItemModel * model );
+	void setModel( QAbstractItemModel * model ) override;
 
 
 protected:
-	virtual void keyPressEvent( QKeyEvent * event );
+	void keyPressEvent( QKeyEvent * event ) override;
 
 
 private:

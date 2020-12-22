@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -31,7 +31,9 @@
 #include <QtCore/QMap>
 #include <QStaticText>
 
+#include "TrackContentObjectView.h"
 #include "Track.h"
+#include "TrackView.h"
 
 class TrackLabelButton;
 class TrackContainer;
@@ -41,42 +43,20 @@ class BBTCO : public TrackContentObject
 {
 public:
 	BBTCO( Track * _track );
-	virtual ~BBTCO();
+	virtual ~BBTCO() = default;
 
-	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
-	virtual void loadSettings( const QDomElement & _this );
-	inline virtual QString nodeName() const
+	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
+	void loadSettings( const QDomElement & _this ) override;
+	inline QString nodeName() const override
 	{
 		return( "bbtco" );
 	}
 
-	unsigned int color() const
-	{
-		return( m_color.rgb() );
-	}
-	
-	QColor colorObj() const
-	{
-		return m_color;
-	}
-
-	void setColor( const QColor & c )
-	{
-		m_color = QColor( c );
-	}
-
-	void setUseStyleColor( bool b )
-	{
-		m_useStyleColor = b;
-	}
-
 	int bbTrackIndex();
 
-	virtual TrackContentObjectView * createView( TrackView * _tv );
+	TrackContentObjectView * createView( TrackView * _tv ) override;
 
 private:
-	QColor m_color;
-	bool m_useStyleColor;
 
 
 	friend class BBTCOView;
@@ -90,27 +70,22 @@ class BBTCOView : public TrackContentObjectView
 	Q_OBJECT
 public:
 	BBTCOView( TrackContentObject * _tco, TrackView * _tv );
-	virtual ~BBTCOView();
+	virtual ~BBTCOView() = default;
 
-	QColor color() const
-	{
-		return( m_bbTCO->m_color );
-	}
-	void setColor( QColor _new_color );
 
+public slots:
+	void update() override;
 
 protected slots:
 	void openInBBEditor();
 	void resetName();
 	void changeName();
-	void changeColor();
-	void resetColor();
 
 
 protected:
-	virtual void paintEvent( QPaintEvent * pe );
-	virtual void mouseDoubleClickEvent( QMouseEvent * _me );
-	virtual void constructContextMenu( QMenu * );
+	void paintEvent( QPaintEvent * pe ) override;
+	void mouseDoubleClickEvent( QMouseEvent * _me ) override;
+	void constructContextMenu( QMenu * ) override;
 
 
 private:
@@ -123,21 +98,21 @@ private:
 
 
 
-class EXPORT BBTrack : public Track
+class LMMS_EXPORT BBTrack : public Track
 {
 	Q_OBJECT
 public:
 	BBTrack( TrackContainer* tc );
 	virtual ~BBTrack();
 
-	virtual bool play( const MidiTime & _start, const fpp_t _frames,
-						const f_cnt_t _frame_base, int _tco_num = -1 );
-	virtual TrackView * createView( TrackContainerView* tcv );
-	virtual TrackContentObject * createTCO( const MidiTime & _pos );
+	virtual bool play( const TimePos & _start, const fpp_t _frames,
+						const f_cnt_t _frame_base, int _tco_num = -1 ) override;
+	TrackView * createView( TrackContainerView* tcv ) override;
+	TrackContentObject* createTCO(const TimePos & pos) override;
 
 	virtual void saveTrackSpecificSettings( QDomDocument & _doc,
-							QDomElement & _parent );
-	virtual void loadTrackSpecificSettings( const QDomElement & _this );
+							QDomElement & _parent ) override;
+	void loadTrackSpecificSettings( const QDomElement & _this ) override;
 
 	static BBTrack * findBBTrack( int _bb_num );
 	static void swapBBTracks( Track * _track1, Track * _track2 );
@@ -160,29 +135,8 @@ public:
 		m_disabledTracks.removeAll( _track );
 	}
 
-	static void setLastTCOColor( const QColor & c )
-	{
-		if( ! s_lastTCOColor )
-		{
-			s_lastTCOColor = new QColor( c );
-		}
-		else
-		{
-			*s_lastTCOColor = QColor( c );
-		}
-	}
-	
-	static void clearLastTCOColor()
-	{
-		if( s_lastTCOColor )
-		{
-			delete s_lastTCOColor;
-		}
-		s_lastTCOColor = NULL;
-	}
-
 protected:
-	inline virtual QString nodeName() const
+	inline QString nodeName() const override
 	{
 		return( "bbtrack" );
 	}
@@ -193,8 +147,6 @@ private:
 
 	typedef QMap<BBTrack *, int> infoMap;
 	static infoMap s_infoMap;
-
-	static QColor * s_lastTCOColor;
 
 	friend class BBTrackView;
 
@@ -209,7 +161,7 @@ public:
 	BBTrackView( BBTrack* bbt, TrackContainerView* tcv );
 	virtual ~BBTrackView();
 
-	virtual bool close();
+	bool close() override;
 
 	const BBTrack * getBBTrack() const
 	{

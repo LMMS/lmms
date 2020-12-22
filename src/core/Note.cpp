@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -29,13 +29,9 @@
 
 #include "Note.h"
 #include "DetuningHelper.h"
-#include "templates.h"
 
 
-
-
-
-Note::Note( const MidiTime & length, const MidiTime & pos,
+Note::Note( const TimePos & length, const TimePos & pos,
 		int key, volume_t volume, panning_t panning,
 						DetuningHelper * detuning ) :
 	m_selected( false ),
@@ -97,7 +93,7 @@ Note::~Note()
 
 
 
-void Note::setLength( const MidiTime & length )
+void Note::setLength( const TimePos & length )
 {
 	m_length = length;
 }
@@ -105,7 +101,7 @@ void Note::setLength( const MidiTime & length )
 
 
 
-void Note::setPos( const MidiTime & pos )
+void Note::setPos( const TimePos & pos )
 {
 	m_pos = pos;
 }
@@ -140,7 +136,7 @@ void Note::setPanning( panning_t panning )
 
 
 
-MidiTime Note::quantized( const MidiTime & m, const int qGrid )
+TimePos Note::quantized( const TimePos & m, const int qGrid )
 {
 	float p = ( (float) m / qGrid );
 	if( p - floorf( p ) < 0.5f )

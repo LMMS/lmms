@@ -4,7 +4,7 @@
  * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * This file partly contains code from Fluidsynth, Peter Hanappe
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -38,6 +38,10 @@ MidiClient::MidiClient()
 MidiClient::~MidiClient()
 {
 	//TODO: noteOffAll(); / clear all ports
+	for (MidiPort* port : m_midiPorts)
+	{
+		port->invalidateCilent();
+	}
 }
 
 
@@ -67,8 +71,13 @@ void MidiClient::addPort( MidiPort* port )
 
 void MidiClient::removePort( MidiPort* port )
 {
+	if( ! port )
+	{
+		return;
+	}
+
 	QVector<MidiPort *>::Iterator it =
-		qFind( m_midiPorts.begin(), m_midiPorts.end(), port );
+		std::find( m_midiPorts.begin(), m_midiPorts.end(), port );
 	if( it != m_midiPorts.end() )
 	{
 		m_midiPorts.erase( it );
@@ -213,9 +222,13 @@ void MidiClientRaw::parseData( const unsigned char c )
 		case MidiNoteOff:
 		case MidiNoteOn:
 		case MidiKeyPressure:
-		case MidiProgramChange:
 		case MidiChannelPressure:
 			m_midiParseData.m_midiEvent.setKey( m_midiParseData.m_buffer[0] - KeysPerOctave );
+			m_midiParseData.m_midiEvent.setVelocity( m_midiParseData.m_buffer[1] );
+			break;
+
+		case MidiProgramChange:
+			m_midiParseData.m_midiEvent.setKey( m_midiParseData.m_buffer[0] );
 			m_midiParseData.m_midiEvent.setVelocity( m_midiParseData.m_buffer[1] );
 			break;
 
@@ -253,7 +266,7 @@ void MidiClientRaw::processParsedEvent()
 
 
 
-void MidiClientRaw::processOutEvent( const MidiEvent& event, const MidiTime & , const MidiPort* port )
+void MidiClientRaw::processOutEvent( const MidiEvent& event, const TimePos & , const MidiPort* port )
 {
 	// TODO: also evaluate _time and queue event if necessary
 	switch( event.type() )

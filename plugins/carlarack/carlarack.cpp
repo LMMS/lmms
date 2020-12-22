@@ -1,9 +1,9 @@
 /*
  * carlarack.cpp - Carla for LMMS (Rack)
  *
- * Copyright (C) 2014 Filipe Coelho <falktx@falktx.com>
+ * Copyright (C) 2014-2018 Filipe Coelho <falktx@falktx.com>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -24,7 +24,9 @@
 
 #include "carla.h"
 
-#include "embed.cpp"
+#include "embed.h"
+#include "plugin_export.h"
+#include "InstrumentTrack.h"
 
 extern "C"
 {
@@ -33,19 +35,19 @@ Plugin::Descriptor PLUGIN_EXPORT carlarack_plugin_descriptor =
 {
     STRINGIFY( PLUGIN_NAME ),
     "Carla Rack",
-    QT_TRANSLATE_NOOP( "pluginBrowser",
+    QT_TRANSLATE_NOOP( "PluginBrowser",
                        "Carla Rack Instrument" ),
     "falkTX <falktx/at/falktx.com>",
-    0x0195,
+    CARLA_VERSION_HEX,
     Plugin::Instrument,
     new PluginPixmapLoader( "logo" ),
     NULL,
     NULL
 } ;
 
-Plugin* PLUGIN_EXPORT lmms_plugin_main(Model*, void* data)
+PLUGIN_EXPORT Plugin* lmms_plugin_main(Model* m, void*)
 {
-    return new CarlaInstrument(static_cast<InstrumentTrack*>(data), &carlarack_plugin_descriptor, false);
+    return new CarlaInstrument(static_cast<InstrumentTrack*>(m), &carlarack_plugin_descriptor, false);
 }
 
 }

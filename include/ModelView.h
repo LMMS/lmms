@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2007-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -29,13 +29,14 @@
 #include "Model.h"
 
 
-class EXPORT ModelView
+class LMMS_EXPORT ModelView
 {
 public:
 	ModelView( Model* model, QWidget* widget );
 	virtual ~ModelView();
 
 	virtual void setModel( Model* model, bool isOldModelValid = true );
+	virtual void unsetModel();
 
 	Model* model()
 	{

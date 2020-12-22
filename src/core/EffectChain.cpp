@@ -4,7 +4,7 @@
  * Copyright (c) 2006-2008 Danny McRae <khjklujn/at/users.sourceforge.net>
  * Copyright (c) 2008-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -28,7 +28,6 @@
 
 #include "EffectChain.h"
 #include "Effect.h"
-#include "Engine.h"
 #include "DummyEffect.h"
 #include "MixHelpers.h"
 #include "Song.h"
@@ -54,7 +53,7 @@ EffectChain::~EffectChain()
 
 void EffectChain::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
-	_this.setAttribute( "enabled", m_enabledModel.value() );
+	m_enabledModel.saveSettings( _doc, _this, "enabled" );
 	_this.setAttribute( "numofeffects", m_effects.count() );
 
 	for( Effect* effect : m_effects)
@@ -81,7 +80,7 @@ void EffectChain::loadSettings( const QDomElement & _this )
 
 	// TODO This method should probably also lock the mixer
 
-	m_enabledModel.setValue( _this.attribute( "enabled" ).toInt() );
+	m_enabledModel.loadSettings( _this, "enabled" );
 
 	const int plugin_cnt = _this.attribute( "numofeffects" ).toInt();
 
@@ -126,6 +125,8 @@ void EffectChain::appendEffect( Effect * _effect )
 	m_effects.append( _effect );
 	Engine::mixer()->doneChangeInModel();
 
+	m_enabledModel.setValue( true );
+
 	emit dataChanged();
 }
 
@@ -136,7 +137,7 @@ void EffectChain::removeEffect( Effect * _effect )
 {
 	Engine::mixer()->requestChangeInModel();
 
-	Effect ** found = qFind( m_effects.begin(), m_effects.end(), _effect );
+	Effect ** found = std::find( m_effects.begin(), m_effects.end(), _effect );
 	if( found == m_effects.end() )
 	{
 		Engine::mixer()->doneChangeInModel();
@@ -145,6 +146,12 @@ void EffectChain::removeEffect( Effect * _effect )
 	m_effects.erase( found );
 
 	Engine::mixer()->doneChangeInModel();
+
+	if( m_effects.isEmpty() )
+	{
+		m_enabledModel.setValue( false );
+	}
+
 	emit dataChanged();
 }
 
@@ -155,19 +162,8 @@ void EffectChain::moveDown( Effect * _effect )
 {
 	if( _effect != m_effects.last() )
 	{
-		int i = 0;
-		for( EffectList::Iterator it = m_effects.begin();
-					it != m_effects.end(); it++, i++ )
-		{
-			if( *it == _effect )
-			{
-				break;
-			}
-		}
-
-		Effect * temp = m_effects[i + 1];
-		m_effects[i + 1] = _effect;
-		m_effects[i] = temp;
+		int i = m_effects.indexOf(_effect);
+		std::swap(m_effects[i + 1], m_effects[i]);
 	}
 }
 
@@ -178,19 +174,8 @@ void EffectChain::moveUp( Effect * _effect )
 {
 	if( _effect != m_effects.first() )
 	{
-		int i = 0;
-		for( EffectList::Iterator it = m_effects.begin();
-					it != m_effects.end(); it++, i++ )
-		{
-			if( *it == _effect )
-			{
-				break;
-			}
-		}
-
-		Effect * temp = m_effects[i - 1];
-		m_effects[i - 1] = _effect;
-		m_effects[i] = temp;
+		int i = m_effects.indexOf(_effect);
+		std::swap(m_effects[i - 1], m_effects[i]);
 	}
 }
 
@@ -203,11 +188,8 @@ bool EffectChain::processAudioBuffer( sampleFrame * _buf, const fpp_t _frames, b
 	{
 		return false;
 	}
-	const bool exporting = Engine::getSong()->isExporting();
-	if( exporting ) // strip infs/nans if exporting
-	{
-		MixHelpers::sanitize( _buf, _frames );
-	}
+
+	MixHelpers::sanitize( _buf, _frames );
 
 	bool moreEffects = false;
 	for( EffectList::Iterator it = m_effects.begin(); it != m_effects.end(); ++it )
@@ -215,10 +197,7 @@ bool EffectChain::processAudioBuffer( sampleFrame * _buf, const fpp_t _frames, b
 		if( hasInputNoise || ( *it )->isRunning() )
 		{
 			moreEffects |= ( *it )->processAudioBuffer( _buf, _frames );
-			if( exporting ) // strip infs/nans if exporting
-			{
-				MixHelpers::sanitize( _buf, _frames );
-			}
+			MixHelpers::sanitize( _buf, _frames );
 		}
 	}
 
@@ -251,7 +230,6 @@ void EffectChain::clear()
 
 	Engine::mixer()->requestChangeInModel();
 
-	m_enabledModel.setValue( false );
 	while( m_effects.count() )
 	{
 		Effect * e = m_effects[m_effects.count() - 1];
@@ -260,4 +238,6 @@ void EffectChain::clear()
 	}
 
 	Engine::mixer()->doneChangeInModel();
+
+	m_enabledModel.setValue( false );
 }

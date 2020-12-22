@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2007-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -67,21 +67,21 @@ public:
 	{
 	}
 
-	virtual QPalette standardPalette( void ) const;
+	QPalette standardPalette( void ) const override;
 
 	virtual void drawComplexControl(
 				ComplexControl control,
 				const QStyleOptionComplex * option,
 					QPainter *painter,
-						const QWidget *widget ) const;
+						const QWidget *widget ) const override;
 	virtual void drawPrimitive( PrimitiveElement element,
 					const QStyleOption *option,
 					QPainter *painter,
-					const QWidget *widget = 0 ) const;
+					const QWidget *widget = 0 ) const override;
 
 	virtual int pixelMetric( PixelMetric metric,
 					const QStyleOption * option = 0,
-					const QWidget * widget = 0 ) const;
+					const QWidget * widget = 0 ) const override;
 
 	static QPalette * s_palette;
 

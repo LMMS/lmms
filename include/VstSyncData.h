@@ -4,7 +4,7 @@
  * Copyright (c) 2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * Copyright (c) 2013 Mike Choi <rdavidian71/at/gmail/dot/com>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -41,14 +41,15 @@
 
 struct VstSyncData
 {
-	bool isPlaying;
-	float ppqPos;
+	double ppqPos;
 	int timeSigNumer;
 	int timeSigDenom;
+	bool isPlaying;
 	bool isCycle;
 	bool hasSHM;
 	float cycleStart;
 	float cycleEnd;
+	bool m_playbackJumped;
 	int m_bufferSize;
 	int m_sampleRate;
 	int m_bpm;

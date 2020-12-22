@@ -10913,7 +10913,7 @@ Double clicking any of the plugins will bring up information on the ports.</sour
     </message>
 </context>
 <context>
-    <name>papuInstrument</name>
+    <name>FreeBoyInstrument</name>
     <message>
         <location filename="plugins/papu/papu_instrument.cpp" line="65"/>
         <source>Sweep time</source>
@@ -11036,7 +11036,7 @@ Double clicking any of the plugins will bring up information on the ports.</sour
     </message>
 </context>
 <context>
-    <name>papuInstrumentView</name>
+    <name>FreeBoyInstrumentView</name>
     <message>
         <location filename="plugins/papu/papu_instrument.cpp" line="459"/>
         <source>Sweep Time:</source>

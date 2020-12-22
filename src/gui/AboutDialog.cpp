@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -44,7 +44,7 @@ AboutDialog::AboutDialog(QWidget* parent) :
 					arg( PLATFORM ).
 					arg( MACHINE ).
 					arg( QT_VERSION_STR ).
-					arg( GCC_VERSION ) );
+					arg( COMPILER_VERSION ) );
 	versionLabel->setTextInteractionFlags(
 					versionLabel->textInteractionFlags() |
 					Qt::TextSelectableByMouse );

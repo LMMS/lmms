@@ -7,7 +7,7 @@
  * Copyright (c) 2008 Paul Giblock <pgllama/at/gmail.com>
  * Copyright (c) 2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -42,7 +42,7 @@ class ControllerConnection;
 typedef QVector<ControllerConnection *> ControllerConnectionVector;
 
 
-class EXPORT ControllerConnection : public QObject, public JournallingObject
+class LMMS_EXPORT ControllerConnection : public QObject, public JournallingObject
 {
 	Q_OBJECT
 public:
@@ -85,15 +85,15 @@ public:
 
 	static void finalizeConnections();
 
-	virtual void saveSettings( QDomDocument & _doc, QDomElement & _this );
-	virtual void loadSettings( const QDomElement & _this );
+	void saveSettings( QDomDocument & _doc, QDomElement & _this ) override;
+	void loadSettings( const QDomElement & _this ) override;
 
 	static inline const QString classNodeName()
 	{
 		return "connection";
 	}
 
-	virtual QString nodeName() const
+	QString nodeName() const override
 	{
 		return classNodeName();
 	}

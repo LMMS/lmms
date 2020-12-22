@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2006-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -33,12 +33,14 @@
 class EffectControls;
 
 
-class EXPORT EffectControlDialog : public QWidget, public ModelView
+class LMMS_EXPORT EffectControlDialog : public QWidget, public ModelView
 {
 	Q_OBJECT
 public:
 	EffectControlDialog( EffectControls * _controls );
 	virtual ~EffectControlDialog();
+
+	virtual bool isResizable() const {return false;}
 
 
 signals:
@@ -46,7 +48,7 @@ signals:
 
 
 protected:
-	virtual void closeEvent( QCloseEvent * _ce );
+	void closeEvent( QCloseEvent * _ce ) override;
 
 	EffectControls * m_effectControls;
 
