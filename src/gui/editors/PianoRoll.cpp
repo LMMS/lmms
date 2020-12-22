@@ -4407,7 +4407,7 @@ PianoRollWindow::PianoRollWindow() :
 
 	// setup quantize-stuff
 	QLabel * quantize_lbl = new QLabel( m_toolBar );
-	quantize_lbl->setPixmap(embed::getIconPixmap("grid_size"));
+	quantize_lbl->setPixmap( embed::getIconPixmap( "quantize" ) );
 
 	m_quantizeComboBox = new ComboBox( m_toolBar );
 	m_quantizeComboBox->setModel( &m_editor->m_quantizeModel );
