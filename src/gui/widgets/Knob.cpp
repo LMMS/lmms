@@ -177,19 +177,21 @@ void Knob::setLabel( const QString & txt )
 	update();
 }
 
-void Knob::setHtmlLabel( const QString &htmltxt )
+
+void Knob::setHtmlLabel(const QString &htmltxt)
 {
 	m_label = htmltxt;
 	m_isHtmlLabel = true;
 	// Put the rendered HTML content into cache
 	m_tdRenderer = new QTextDocument();
 
-	m_tdRenderer->setHtml( QString( "<font color=\"%1\">%2</font>" ).arg( textColor().name(), m_label ) );
+	// TODO: stop using <font>
+	m_tdRenderer->setHtml(QString("<font color=\"%1\">%2</font>").arg(textColor().name(), m_label));
 
-	if( m_knobPixmap )
+	if (m_knobPixmap)
 	{
-		setFixedSize( m_knobPixmap->width(),
-				m_knobPixmap->height() + 15 );
+		setFixedSize(m_knobPixmap->width(),
+				m_knobPixmap->height() + 15);
 	}
 
 	update();
@@ -661,22 +663,24 @@ void Knob::paintEvent( QPaintEvent * _me )
 	drawKnob( &p );
 	if( !m_label.isEmpty() )
 	{
-		if ( !m_isHtmlLabel )
+		if (!m_isHtmlLabel)
 		{
-			p.setFont( pointSizeF( p.font(), 6.5 ) );
-			p.setPen( textColor() );
-			p.drawText( width() / 2 -
+			p.setFont(pointSizeF(p.font(),6.5));
+			p.setPen(textColor());
+			p.drawText(width() / 2 -
 				horizontalAdvance(p.fontMetrics(), m_label) / 2,
-				height() - 2, m_label );
+				height() - 2, m_label);
 		}
 		else
 		{
-			m_tdRenderer->setDefaultFont( pointSizeF( p.font(), 6.5 ) );
-			p.translate( width() / 2 - m_tdRenderer->idealWidth() / 2 ,  ( height() - m_tdRenderer->pageSize().height() ) / 2 );
-			m_tdRenderer->drawContents( &p );
+			m_tdRenderer->setDefaultFont(pointSizeF(p.font(), 6.5));
+			p.translate(width() / 2 - m_tdRenderer->idealWidth() / 2, (height() - m_tdRenderer->pageSize().height()) / 2);
+			m_tdRenderer->drawContents(&p);
 		}
 	}
 }
+
+
 
 
 void Knob::wheelEvent(QWheelEvent * we)
