@@ -60,14 +60,14 @@ Knob::Knob( knobTypes _knob_num, QWidget * _parent, const QString & _name ) :
 	QWidget( _parent ),
 	FloatModelView( new FloatModel( 0, 0, 0, 1, NULL, _name, true ), this ),
 	m_label( "" ),
+	m_isHtmlLabel(false),
 	m_volumeKnob( false ),
 	m_volumeRatio( 100.0, 0.0, 1000000.0 ),
 	m_buttonPressed( false ),
 	m_angle( -10 ),
 	m_lineWidth( 0 ),
 	m_textColor( 255, 255, 255 ),
-	m_knobNum( _knob_num ),
-	m_isHtmlLabel(false)
+	m_knobNum( _knob_num )
 {
 	initUi( _name );
 }
