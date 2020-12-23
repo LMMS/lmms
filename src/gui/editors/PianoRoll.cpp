@@ -712,6 +712,89 @@ void PianoRoll::glueNotes()
 	}
 }
 
+void PianoRoll::fitNoteLengths(bool shrink, bool grow)
+{
+	if (hasValidPattern())
+	{
+		m_pattern->addJournalCheckPoint();
+
+		NoteVector notes = getSelectedNotes();
+		if (notes.empty())
+		{
+			notes = m_pattern->notes();
+		}
+
+		// Sort notes by position
+		std::sort(notes.begin(), notes.end(), [](const Note *n1, const Note *n2){ return n1->pos() < n2->pos(); });
+
+		NoteVector chordGroup;
+		TimePos chordLength;
+		for (int i = 0; i < notes.count(); i++)
+		{
+			chordGroup.append(notes[i]);
+
+			// Stretch last chord to end of bar
+			if (i+1 == notes.count())
+			{
+				chordLength = notes[i]->endPos().nextFullBar() * TimePos::ticksPerBar() - notes[i]->pos();
+			}
+			// Stretch chord to next note
+			else if (notes[i]->pos() != notes[i+1]->pos())
+			{
+				chordLength = notes[i+1]->pos() - notes[i]->pos();
+			}
+			// There are more notes in the chord
+			else
+			{
+				continue;
+			}
+
+			for (Note *chordNote: chordGroup)
+			{
+				if ((shrink && chordNote->length() > chordLength)
+					|| (grow && chordNote->length() < chordLength))
+				{
+					chordNote->setLength(chordLength);
+				}
+			}
+			chordGroup.clear();
+		}
+
+		update();
+		gui->songEditor()->update();
+		Engine::getSong()->setModified();
+	}
+}
+
+
+void PianoRoll::limitNoteLengths(bool minimumLimit)
+{
+	if (hasValidPattern())
+	{
+		m_pattern->addJournalCheckPoint();
+
+		NoteVector notes = getSelectedNotes();
+		if (notes.empty())
+		{
+			notes = m_pattern->notes();
+		}
+
+		TimePos limit = m_lenOfNewNotes;  // length of last note
+		for (Note *note : notes)
+			{
+			if ((minimumLimit && note->length() < limit)
+			  || (!minimumLimit && note->length() > limit))
+			{
+				note->setLength(limit);
+			}
+		}
+
+		update();
+		gui->songEditor()->update();
+		Engine::getSong()->setModified();
+	}
+}
+
 
 void PianoRoll::loadMarkedSemiTones(const QDomElement & de)
 {
@@ -4432,18 +4515,34 @@ PianoRollWindow::PianoRollWindow() :
 	m_editor->m_timeLine->addToolButtons( timeLineToolBar );
 
 	// -- Note modifier tools
-	// Toolbar
 	QToolButton * noteToolsButton = new QToolButton(m_toolBar);
 	noteToolsButton->setIcon(embed::getIconPixmap("tool"));
 	noteToolsButton->setPopupMode(QToolButton::InstantPopup);
 
-	// Glue
 	QAction * glueAction = new QAction(embed::getIconPixmap("glue"),
 				tr("Glue"), noteToolsButton);
 	connect(glueAction, SIGNAL(triggered()), m_editor, SLOT(glueNotes()));
 	glueAction->setShortcut( Qt::SHIFT | Qt::Key_G );
 
+	QAction *fillAction = new QAction(embed::getIconPixmap("fill"), tr("Fill"), noteToolsButton);
+	connect(fillAction, &QAction::triggered, [this](){ m_editor->fitNoteLengths(false, true); });
+	fillAction->setShortcut( Qt::SHIFT | Qt::Key_F );
+
+	QAction *cutOverlapsAction = new QAction(embed::getIconPixmap("cut_overlaps"), tr("Cut overlaps"), noteToolsButton);
+	connect(cutOverlapsAction, &QAction::triggered, [this](){ m_editor->fitNoteLengths(true, false); });
+	cutOverlapsAction->setShortcut( Qt::SHIFT | Qt::Key_C );
+
+	QAction *minLengthAction = new QAction(embed::getIconPixmap("min_length"), tr("Min length as latest"), noteToolsButton);
+	connect(minLengthAction, &QAction::triggered, [this](){ m_editor->limitNoteLengths(true); });
+
+	QAction *maxLengthAction = new QAction(embed::getIconPixmap("max_length"), tr("Max length as latest"), noteToolsButton);
+	connect(maxLengthAction, &QAction::triggered, [this](){ m_editor->limitNoteLengths(false); });
+
 	noteToolsButton->addAction(glueAction);
+	noteToolsButton->addAction(fillAction);
+	noteToolsButton->addAction(cutOverlapsAction);
+	noteToolsButton->addAction(minLengthAction);
+	noteToolsButton->addAction(maxLengthAction);
 
 	notesActionsToolBar->addWidget(noteToolsButton);
 
