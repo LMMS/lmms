@@ -149,9 +149,9 @@ PianoRoll {
 	qproperty-noteOpacity: 128;
 	qproperty-noteBorders: true; /* boolean property, set false to have borderless notes */
 	qproperty-selectedNoteColor: rgb( 0, 125, 255 );
-	qproperty-ghostNoteColor: #000000;
+	qproperty-ghostNoteColor: #1e1e1e;
 	qproperty-ghostNoteTextColor: #ffffff;
-	qproperty-ghostNoteOpacity: 50;
+	qproperty-ghostNoteOpacity: 60;
 	qproperty-ghostNoteBorders: true;
 	qproperty-barColor: #4afd85;
 	qproperty-markedSemitoneColor: rgba( 0, 255, 200, 60 );
@@ -159,13 +159,13 @@ PianoRoll {
 	qproperty-whiteKeyWidth: 64;
 	qproperty-whiteKeyActiveTextColor: #000;
 	qproperty-whiteKeyActiveTextShadow: rgb( 240, 240, 240 );
-	qproperty-whiteKeyActiveBackground: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #43e97b, stop:1 #3bcd6c);
+	qproperty-whiteKeyActiveBackground: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #3bcd6c, stop:1 #43e97b);
 	qproperty-whiteKeyInactiveTextColor: rgb( 128, 128, 128);
 	qproperty-whiteKeyInactiveTextShadow: rgb( 240, 240, 240 );
-	qproperty-whiteKeyInactiveBackground: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #eeeeee, stop:1 #ffffff);
+	qproperty-whiteKeyInactiveBackground: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #d6d6d6, stop:1 #e3e3e3);
 	qproperty-blackKeyWidth: 48;
-	qproperty-blackKeyActiveBackground: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #43e97b, stop:1 #3bcd6c);
-	qproperty-blackKeyInactiveBackground: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #333, stop:1 #000);
+	qproperty-blackKeyActiveBackground: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #3bcd6c, stop:1 #43e97b);
+	qproperty-blackKeyInactiveBackground: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #262626, stop:1 #313131);
 	/* Grid colors */
 	qproperty-lineColor: rgba( 128, 128, 128, 80 );
 	qproperty-beatLineColor: rgba( 128, 128, 128, 160 );
