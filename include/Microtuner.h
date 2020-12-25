@@ -53,7 +53,7 @@ public:
 	int baseKey() const;
 	float baseFreq() const;
 
-	float keyToFreq(int key, float detune = 0) const;
+	float keyToFreq(int key) const;
 	bool isKeyMapped(int key) const;
 
 	QString nodeName() const override {return "microtuner";}

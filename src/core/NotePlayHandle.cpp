@@ -508,9 +508,10 @@ void NotePlayHandle::updateFrequency()
 	if (m_instrumentTrack->m_microtuner.enabled())
 	{
 		// custom key mapping and scale: get frequency from the microtuner
-		const float totalDetune = 100 * detune + 100 * masterPitch + instrumentPitch;
-		m_frequency = m_instrumentTrack->m_microtuner.keyToFreq(key(), totalDetune);
-		m_unpitchedFrequency = m_instrumentTrack->m_microtuner.keyToFreq(key(), 100 * detune + 100 * masterPitch);
+		const float detuneMaster = detune + masterPitch;
+		const auto frequency = m_instrumentTrack->m_microtuner.keyToFreq(key());
+		m_frequency = frequency * powf(2.f, (detuneMaster + instrumentPitch / 100) / 12.f);
+		m_unpitchedFrequency = frequency * powf(2.f, detuneMaster / 12.f);
 	}
 	else
 	{

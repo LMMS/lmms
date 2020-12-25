@@ -123,20 +123,17 @@ float Microtuner::baseFreq() const
 
 /** \brief Return frequency for a given MIDI key, using the active mapping and scale.
  *  \param key A MIDI key number ranging from 0 to 127.
- *  \param detune Note detuning amount (+- cents).
  *  \return Frequency in Hz; 0 if key is out of range or not mapped.
  */
-float Microtuner::keyToFreq(int key, float detune) const
+float Microtuner::keyToFreq(int key) const
 {
 	if (key < firstKey() || key > lastKey()) {return 0;}
 	Song *song = Engine::getSong();
 	if (!song) {return 0;}
 
 	// Get keymap and scale selected at this moment
-	const unsigned int keymap_id = m_keymapModel.value();
-	const unsigned int scale_id = m_scaleModel.value();
-	std::shared_ptr<const Keymap> keymap = song->getKeymap(keymap_id);
-	std::shared_ptr<const Scale> scale = song->getScale(scale_id);
+	std::shared_ptr<const Keymap> keymap = song->getKeymap(m_keymapModel.value());
+	std::shared_ptr<const Scale> scale = song->getScale(m_scaleModel.value());
 	const std::vector<Interval> &intervals = scale->getIntervals();
 
 	// Convert MIDI key to scale degree + octave offset.
@@ -148,7 +145,7 @@ float Microtuner::keyToFreq(int key, float detune) const
 	const int keymapOctave = keymap->getOctave(key);		// how many times did the keymap repeat
 	const int octaveDegree = intervals.size() - 1;			// index of the interval with octave ratio
 	if (octaveDegree == 0) {								// octave interval is 1/1, i.e. constant base frequency
-		return keymap->getBaseFreq() * powf(2.f, detune / (100 * 12.f));	// → return detuned baseFreq directly
+		return keymap->getBaseFreq();						// → return the baseFreq directly
 	}
 	const int scaleOctave = keymapDegree / octaveDegree;
 
@@ -166,17 +163,12 @@ float Microtuner::keyToFreq(int key, float detune) const
 	const int baseDegree_rem = baseKeymapDegree % octaveDegree;
 	const int baseScaleDegree = baseDegree_rem >= 0 ? baseDegree_rem : baseDegree_rem + octaveDegree;
 
-	// Compute frequency of the middle note and the final frequency
+	// Compute frequency of the middle note and return the final frequency
 	const double octaveRatio = intervals[octaveDegree].getRatio();
 	const float middleFreq = (keymap->getBaseFreq() / pow(octaveRatio, (baseScaleOctave + baseKeymapOctave)))
 								/ intervals[baseScaleDegree].getRatio();
 
-	float frequency = middleFreq * intervals[scaleDegree].getRatio() * pow(octaveRatio, keymapOctave + scaleOctave);
-
-	// Detune or pitch shift: adjust frequency by a given number of cents
-	frequency *= powf(2.f, detune / (100 * 12.f));
-
-	return frequency;
+	return middleFreq * intervals[scaleDegree].getRatio() * pow(octaveRatio, keymapOctave + scaleOctave);
 }
 
 
