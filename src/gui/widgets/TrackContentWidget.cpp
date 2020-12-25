@@ -477,7 +477,7 @@ bool TrackContentWidget::pasteSelection( TimePos tcoPos, const QMimeData * md, b
 	// All patterns should be offset the same amount as the grabbed pattern
 	TimePos offset = TimePos(tcoPos - grabbedTCOPos);
 	// Users expect clips to "fall" backwards, so bias the offset
-	offset = offset - TimePos::ticksPerBar() * snapSize / 2;
+	offset -= TimePos::ticksPerBar() * snapSize / 2;
 	// The offset is quantized (rather than the positions) to preserve fine adjustments
 	offset = offset.quantize(snapSize);
 
