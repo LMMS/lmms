@@ -615,6 +615,74 @@ void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 
 
 
+void AutomationEditor::mouseDoubleClickEvent(QMouseEvent * mouseEvent)
+{
+	if (!validPattern()) { return; }
+
+	// If we double clicked inside the AutomationEditor viewport
+	if (mouseEvent->y() > TOP_MARGIN && mouseEvent->x() >= VALUES_WIDTH)
+	{
+		timeMap & tm = m_pattern->getTimeMap();
+
+		timeMap::iterator clickedNode;
+
+		// Are we editing the inValue or outValue?
+		bool editingInValue;
+
+		switch (m_editMode)
+		{
+			case DRAW:
+				// We will edit the inValue
+				clickedNode = getNodeAt(mouseEvent->x(), mouseEvent->y());
+				editingInValue = true;
+				break;
+			case DRAW_OUTVALUES:
+				// We will edit the outValue
+				clickedNode = getNodeAt(mouseEvent->x(), mouseEvent->y(), true);
+				editingInValue = false;
+				break;
+		}
+
+		if (clickedNode == tm.end())
+		{
+			return;
+		}
+
+		// Display dialog to edit the value
+		bool ok;
+		double value = QInputDialog::getDouble(
+			this,
+			tr("Edit Value"),
+			editingInValue
+				? tr("New inValue")
+				: tr("New outValue"),
+			editingInValue
+				? INVAL(clickedNode)
+				: OUTVAL(clickedNode),
+			m_pattern->firstObject()->minValue<float>(),
+			m_pattern->firstObject()->maxValue<float>(),
+			3,
+			&ok
+		);
+
+		if (ok)
+		{
+			// Set the new inValue/outValue
+			if (editingInValue)
+			{
+				clickedNode.value().setInValue(value);
+			}
+			else
+			{
+				clickedNode.value().setOutValue(value);
+			}
+		}
+	}
+}
+
+
+
+
 void AutomationEditor::mouseReleaseEvent(QMouseEvent * mouseEvent )
 {
 	bool mustRepaint = false;
