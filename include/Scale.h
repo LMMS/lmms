@@ -36,18 +36,11 @@
 class Interval : public SerializingObject
 {
 public:
-	Interval() : m_numerator(1), m_denominator(1), m_cents(0) {};
-	explicit Interval(float cents) : m_numerator(0), m_denominator(0), m_cents(cents) {};
-	Interval(uint32_t numerator, uint32_t denominator) :
-		m_numerator(numerator),
-		m_denominator(denominator > 0 ? denominator : 1),
-		m_cents(0) {};
+	Interval() : m_numerator(1), m_denominator(1), m_cents(0), m_ratio(1) {};
+	explicit Interval(float cents);
+	Interval(uint32_t numerator, uint32_t denominator);
 
-	float getRatio() const
-	{
-		if (m_denominator) {return static_cast<float>(m_numerator) / m_denominator;}
-		else {return powf(2.f, m_cents / 1200.f);}
-	}
+	float getRatio() const {return m_ratio;}
 
 	QString getString() const
 	{
@@ -64,6 +57,7 @@ private:
 	uint32_t m_numerator;	//!< numerator of the interval fraction
 	uint32_t m_denominator;	//!< denominator of the interval fraction
 	float m_cents;			//!< interval defined in cents (used when denominator is set to zero)
+	float m_ratio;			//!< precomputed output value for better performance
 };
 
 

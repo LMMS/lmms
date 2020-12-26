@@ -27,6 +27,23 @@
 #include <QDomElement>
 
 
+Interval::Interval(float cents) :
+	m_numerator(0),
+	m_denominator(0),
+	m_cents(cents)
+{
+	m_ratio = powf(2.f, m_cents / 1200.f);
+}
+
+Interval::Interval(uint32_t numerator, uint32_t denominator) :
+	m_numerator(numerator),
+	m_denominator(denominator > 0 ? denominator : 1),
+	m_cents(0)
+{
+	m_ratio = static_cast<float>(m_numerator) / m_denominator;
+}
+
+
 void Interval::saveSettings(QDomDocument &document, QDomElement &element)
 {
 	element.setAttribute("num", QString::number(m_numerator));
@@ -40,6 +57,8 @@ void Interval::loadSettings(const QDomElement &element)
 	m_numerator = element.attribute("num").toULong();
 	m_denominator = element.attribute("den").toULong();
 	m_cents = element.attribute("cents").toDouble();
+	if (m_denominator) {m_ratio = static_cast<float>(m_numerator) / m_denominator;}
+	else {m_ratio = powf(2.f, m_cents / 1200.f);}
 }
 
 
