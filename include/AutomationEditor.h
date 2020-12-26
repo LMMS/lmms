@@ -85,7 +85,8 @@ public:
 	{
 		DRAW,
 		ERASE,
-		DRAW_OUTVALUES
+		DRAW_OUTVALUES,
+		EDIT_TANGENTS
 	};
 
 public slots:
@@ -145,7 +146,8 @@ private:
 		ERASE_VALUES,
 		MOVE_OUTVALUE,
 		RESET_OUTVALUES,
-		DRAW_LINE
+		DRAW_LINE,
+		MOVE_TANGENT
 	} ;
 
 	// some constants...
@@ -165,6 +167,7 @@ private:
 	static QPixmap * s_toolDraw;
 	static QPixmap * s_toolErase;
 	static QPixmap * s_toolDrawOut;
+	static QPixmap * s_toolEditTangents;
 	static QPixmap * s_toolMove;
 	static QPixmap * s_toolYFlip;
 	static QPixmap * s_toolXFlip;

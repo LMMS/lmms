@@ -67,6 +67,7 @@
 QPixmap * AutomationEditor::s_toolDraw = nullptr;
 QPixmap * AutomationEditor::s_toolErase = nullptr;
 QPixmap * AutomationEditor::s_toolDrawOut = nullptr;
+QPixmap * AutomationEditor::s_toolEditTangents = nullptr;
 QPixmap * AutomationEditor::s_toolMove = nullptr;
 QPixmap * AutomationEditor::s_toolYFlip = nullptr;
 QPixmap * AutomationEditor::s_toolXFlip = nullptr;
@@ -179,6 +180,10 @@ AutomationEditor::AutomationEditor() :
 	if (s_toolDrawOut == nullptr)
 	{
 		s_toolDrawOut = new QPixmap(embed::getIconPixmap("edit_draw_outvalue"));
+	}
+	if (s_toolEditTangents == nullptr)
+	{
+		s_toolEditTangents = new QPixmap(embed::getIconPixmap("edit_tangent"));
 	}
 	if (s_toolMove == nullptr)
 	{
@@ -1244,6 +1249,12 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 			else { cursor = s_toolDrawOut; }
 			break;
 		}
+		case EDIT_TANGENTS:
+		{
+			if (m_action == MOVE_TANGENT) { cursor = s_toolMove; }
+			else { cursor = s_toolEditTangents; }
+			break;
+		}
 	}
 	QPoint mousePosition = mapFromGlobal( QCursor::pos() );
 	if (cursor != nullptr && mousePosition.y() > TOP_MARGIN + SCROLLBAR_SIZE)
@@ -1827,6 +1838,9 @@ AutomationEditorWindow::AutomationEditorWindow() :
 	QAction* drawOutAction = editModeGroup->addAction(embed::getIconPixmap("edit_draw_outvalue"), tr("Draw outValues mode (Shift+C)"));
 	drawOutAction->setShortcut(Qt::SHIFT | Qt::Key_C);
 
+	QAction* editTanAction = editModeGroup->addAction(embed::getIconPixmap("edit_tangent"), tr("Edit tangents mode (Shift+T)"));
+	drawOutAction->setShortcut(Qt::SHIFT | Qt::Key_T);
+
 	m_flipYAction = new QAction(embed::getIconPixmap("flip_y"), tr("Flip vertically"), this);
 	m_flipXAction = new QAction(embed::getIconPixmap("flip_x"), tr("Flip horizontally"), this);
 
@@ -1835,6 +1849,7 @@ AutomationEditorWindow::AutomationEditorWindow() :
 	editActionsToolBar->addAction(drawAction);
 	editActionsToolBar->addAction(eraseAction);
 	editActionsToolBar->addAction(drawOutAction);
+	editActionsToolBar->addAction(editTanAction);
 	editActionsToolBar->addAction(m_flipXAction);
 	editActionsToolBar->addAction(m_flipYAction);
 
