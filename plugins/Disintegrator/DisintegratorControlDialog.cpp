@@ -59,7 +59,7 @@ DisintegratorControlDialog::DisintegratorControlDialog(DisintegratorControls* co
 	m_amountKnob -> setVolumeKnob(true);
 	m_amountKnob->setModel(&m_controls->m_amountModel);
 	m_amountKnob->setLabel(tr("AMOUNT"));
-	m_amountKnob->setHintText(tr("Amount:"), " samples");
+	m_amountKnob->setHintText(tr("Amount:"), " ms");
 
 	m_typeBox = new ComboBox(this);
 	m_typeBox->setGeometry(1000, 5, 149, 22);
