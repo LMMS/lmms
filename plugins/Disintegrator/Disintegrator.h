@@ -58,13 +58,13 @@ private:
 
 	float m_sineLoc = 0;
 
-	StereoLinkwitzRiley m_lp;
-	StereoLinkwitzRiley m_hp;
+	BasicFilters<2> * m_lp;
+	BasicFilters<2> * m_hp;
 	bool m_needsUpdate;
 
 	float m_sampleRate;
 	float m_sampleRateMult;
-	int m_bufferSize = 201;
+	int m_bufferSize = 500;
 
 	friend class DisintegratorControls;
 
