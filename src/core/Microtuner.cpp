@@ -62,7 +62,7 @@ Microtuner::Microtuner(InstrumentTrack *parent) :
  */
 int Microtuner::firstKey() const
 {
-	if (enabled() && keyRangeImport())
+	if (keyRangeImport())
 	{
 		return Engine::getSong()->getKeymap(m_keymapModel.value())->getFirstKey();
 	}
@@ -78,7 +78,7 @@ int Microtuner::firstKey() const
  */
 int Microtuner::lastKey() const
 {
-	if (enabled() && keyRangeImport())
+	if (keyRangeImport())
 	{
 		return Engine::getSong()->getKeymap(m_keymapModel.value())->getLastKey();
 	}
@@ -94,7 +94,7 @@ int Microtuner::lastKey() const
  */
 int Microtuner::baseKey() const
 {
-	if (enabled() && keyRangeImport())
+	if (keyRangeImport())
 	{
 		return Engine::getSong()->getKeymap(m_keymapModel.value())->getBaseKey();
 	}

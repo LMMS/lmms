@@ -40,7 +40,7 @@ public:
 	explicit Microtuner(InstrumentTrack *parent);
 
 	bool enabled() const {return m_enabledModel.value();}
-	bool keyRangeImport() const {return m_keyRangeImportModel.value();}
+	bool keyRangeImport() const {return enabled() && m_keyRangeImportModel.value();}
 
 	BoolModel *enabledModel() {return &m_enabledModel;}
 	ComboBoxModel *scaleModel() {return &m_scaleModel;}
