@@ -123,13 +123,14 @@ PianoView::PianoView(QWidget *parent) :
 
 	setAttribute(Qt::WA_OpaquePaintEvent, true);
 	setFocusPolicy(Qt::StrongFocus);
-	setMaximumWidth(WhiteKeysPerOctave * NumKeys * PW_WHITE_KEY_WIDTH / KeysPerOctave);
+	setMaximumWidth(Piano::NumWhiteKeys * PW_WHITE_KEY_WIDTH +
+		(Piano::isBlackKey(NumKeys-1) ? PW_BLACK_KEY_WIDTH / 2 : 0));
 
 	// create scrollbar at the bottom
 	m_pianoScroll = new QScrollBar( Qt::Horizontal, this );
 	m_pianoScroll->setSingleStep( 1 );
 	m_pianoScroll->setPageStep( 20 );
-	m_pianoScroll->setValue( Octave_3 * WhiteKeysPerOctave );
+	m_pianoScroll->setValue(Octave_3 * Piano::WhiteKeysPerOctave);
 
 	// and connect it to this widget
 	connect( m_pianoScroll, SIGNAL( valueChanged( int ) ),
@@ -386,10 +387,10 @@ int PianoView::getKeyFromMouse( const QPoint & _p ) const
  *
  *  \param _new_pos the new key position.
  */
-void PianoView::pianoScrolled( int _new_pos )
+void PianoView::pianoScrolled(int new_pos)
 {
-	m_startKey = WhiteKeys[_new_pos % WhiteKeysPerOctave]+
-			( _new_pos / WhiteKeysPerOctave ) * KeysPerOctave;
+	m_startKey = WhiteKeys[new_pos % Piano::WhiteKeysPerOctave] +
+		(new_pos / Piano::WhiteKeysPerOctave) * KeysPerOctave;
 
 	update();
 }
@@ -453,13 +454,13 @@ void PianoView::mousePressEvent(QMouseEvent *me)
 		{
 			int y_diff = me->pos().y() - PIANO_BASE;
 			int velocity = static_cast<int>(
-				static_cast<float>(y_diff) / getKeyWidth(key_num) *
+				static_cast<float>(y_diff) / getKeyHeight(key_num) *
 				m_piano->instrumentTrack()->midiPort()->baseVelocity());
 			if (y_diff < 0)
 			{
 				velocity = 0;
 			}
-			else if (y_diff > getKeyWidth(key_num))
+			else if (y_diff > getKeyHeight(key_num))
 			{
 				velocity = m_piano->instrumentTrack()->midiPort()->baseVelocity();
 			}
@@ -724,8 +725,8 @@ void PianoView::focusInEvent( QFocusEvent * )
 void PianoView::resizeEvent(QResizeEvent* event)
 {
 	QWidget::resizeEvent(event);
-	m_pianoScroll->setRange(0, WhiteKeysPerOctave * (NumKeys + 1) / KeysPerOctave -
-					static_cast<int>(floor(static_cast<float>(width()) / PW_WHITE_KEY_WIDTH)));
+	m_pianoScroll->setRange(0, Piano::NumWhiteKeys -
+		static_cast<int>(floor(static_cast<float>(width()) / PW_WHITE_KEY_WIDTH)));
 }
 
 
@@ -789,8 +790,14 @@ int PianoView::getKeyX( int _key_num ) const
  */
 int PianoView::getKeyWidth(int key_num) const
 {
-	if (Piano::isWhiteKey(key_num)) {return PW_WHITE_KEY_WIDTH;}
-	else {return PW_BLACK_KEY_WIDTH;}
+	return Piano::isWhiteKey(key_num) ? PW_WHITE_KEY_WIDTH : PW_BLACK_KEY_WIDTH;
+}
+
+/*! \brief Return the height of a given key
+ */
+int PianoView::getKeyHeight(int key_num) const
+{
+	return Piano::isWhiteKey(key_num) ? PW_WHITE_KEY_HEIGHT : PW_BLACK_KEY_HEIGHT;
 }
 
 

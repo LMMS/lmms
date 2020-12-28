@@ -70,9 +70,7 @@ enum Octaves
 };
 
 const int FirstOctave = -1;
-const int WhiteKeysPerOctave = 7;
-const int BlackKeysPerOctave = 5;
-const int KeysPerOctave = WhiteKeysPerOctave + BlackKeysPerOctave;
+const int KeysPerOctave = 12;
 const int DefaultKey = DefaultOctave * KeysPerOctave + Key_A;
 //! Number of physical keys, limited to MIDI range (valid for both MIDI 1.0 and 2.0)
 const int NumKeys = 128;
