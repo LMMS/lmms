@@ -32,7 +32,7 @@
 
 #include "AutomatableModel.h"
 #include "ComboBoxModel.h"
-#include "LcdFloatSpinBox.h"
+//#include "LcdFloatSpinBox.h"	// re-enable after LcdFloatSpinBox is merged
 #include "LcdSpinBox.h"
 #include "SerializingObject.h"
 
