@@ -39,8 +39,8 @@ Keymap::Keymap() :
 
 
 Keymap::Keymap(
-	QString description,
-	std::vector<int> newMap,
+	const QString &description,
+	const std::vector<int> &newMap,
 	int newFirst,
 	int newLast,
 	int newMiddle,
@@ -48,7 +48,7 @@ Keymap::Keymap(
 	float newBaseFreq
 ) :
 	m_description(description),
-	m_map(std::move(newMap)),
+	m_map(newMap),
 	m_firstKey(newFirst),
 	m_lastKey(newLast),
 	m_middleKey(newMiddle),
@@ -103,7 +103,7 @@ QString Keymap::getDescription() const
 }
 
 
-void Keymap::setDescription(QString description)
+void Keymap::setDescription(const QString &description)
 {
 	m_description = description;
 }

@@ -66,10 +66,10 @@ class Scale : public QObject, public SerializingObject
 	Q_OBJECT
 public:
 	Scale();
-	Scale(QString description, std::vector<Interval> intervals);
+	Scale(const QString &description, const std::vector<Interval> &intervals);
 
 	QString getDescription() const;
-	void setDescription(QString description);
+	void setDescription(const QString &description);
 
 	const std::vector<Interval> &getIntervals() const {return m_intervals;}
 	void setIntervals(std::vector<Interval> input) {m_intervals = std::move(input);}

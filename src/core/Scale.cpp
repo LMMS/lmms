@@ -68,9 +68,9 @@ Scale::Scale() :
 	m_intervals.push_back(Interval(1, 1));
 }
 
-Scale::Scale(QString description, std::vector<Interval> intervals) :
+Scale::Scale(const QString &description, const std::vector<Interval> &intervals) :
 	m_description(description),
-	m_intervals(std::move(intervals))
+	m_intervals(intervals)
 {
 }
 
@@ -81,7 +81,7 @@ QString Scale::getDescription() const
 }
 
 
-void Scale::setDescription(QString description)
+void Scale::setDescription(const QString &description)
 {
 	m_description = description;
 }
