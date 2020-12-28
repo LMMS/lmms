@@ -61,6 +61,7 @@ DisintegratorEffect::DisintegratorEffect(Model* parent, const Descriptor::SubPlu
 void DisintegratorEffect::sampleRateChanged()
 {
 	m_sampleRate = Engine::mixer()->processingSampleRate();
+	m_2PiOverSR =  F_2PI / m_sampleRate;
 	m_lp = new BasicFilters<2>(Engine::mixer()->processingSampleRate());
 	m_hp = new BasicFilters<2>(Engine::mixer()->processingSampleRate());
 	m_lp->setFilterType(0);
@@ -144,7 +145,7 @@ bool DisintegratorEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frame
 			}
 			case 2://Sine Wave
 			{
-				m_sineLoc = fmod(m_sineLoc + (freq / m_sampleRate * F_2PI), F_2PI);
+				m_sineLoc = fmod(m_sineLoc + (freq * m_2PiOverSR), F_2PI);
 				delayModInput[0] = sin(m_sineLoc);
 				delayModInput[1] = delayModInput[0];
 				break;

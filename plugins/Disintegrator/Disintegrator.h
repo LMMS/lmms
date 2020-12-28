@@ -63,6 +63,7 @@ private:
 	bool m_needsUpdate;
 
 	float m_sampleRate;
+	float m_2PiOverSR;
 	float m_sampleRateMult;
 	int m_bufferSize = 500;
 
