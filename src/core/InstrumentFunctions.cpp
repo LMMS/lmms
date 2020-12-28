@@ -481,7 +481,7 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 		}
 
 		// Divide cur_arp_idx with wanted repeats. The repeat feature will not affect random notes.
-		cur_arp_idx = (int)(cur_arp_idx / m_arpRepeatsModel.value());
+		cur_arp_idx = static_cast<int>(cur_arp_idx / m_arpRepeatsModel.value());
 
 		// Cycle notes
 		if( m_arpCycleModel.value() && dir != ArpDirRandom )
