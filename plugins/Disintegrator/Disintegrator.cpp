@@ -53,7 +53,7 @@ DisintegratorEffect::DisintegratorEffect(Model* parent, const Descriptor::SubPlu
 	m_disintegratorControls(this),
 	m_needsUpdate(true)
 {
-	emit sampleRateChanged();
+	sampleRateChanged();
 }
 
 

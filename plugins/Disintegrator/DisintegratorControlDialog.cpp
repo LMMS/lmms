@@ -82,7 +82,7 @@ DisintegratorControlDialog::DisintegratorControlDialog(DisintegratorControls* co
 frequency knobs depending on the modulation type. */
 void DisintegratorControlDialog::updateKnobVisibility()
 {
-	if (m_controls->m_typeModel.value() == 2)
+	if (m_controls->m_typeModel.value() == 2)// Sine Mode
 	{
 		m_lowCutKnob->hide();
 		m_highCutKnob->hide();
