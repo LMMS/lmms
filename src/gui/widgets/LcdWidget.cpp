@@ -40,28 +40,31 @@
 
 
 
-LcdWidget::LcdWidget( QWidget* parent, const QString& name ) :
-	LcdWidget( 1, parent, name )
+LcdWidget::LcdWidget( QWidget* parent, const QString& name, bool leadingZero ) :
+	LcdWidget( 1, parent, name, leadingZero )
 {
 }
 
 
 
 
-LcdWidget::LcdWidget( int numDigits, QWidget* parent, const QString& name ) :
-	LcdWidget( numDigits, QString("19green"), parent, name )
+LcdWidget::LcdWidget( int numDigits, QWidget* parent, const QString& name, bool leadingZero ) :
+	LcdWidget( numDigits, QString("19green"), parent, name, leadingZero )
 {
 }
 
 
 
 
-LcdWidget::LcdWidget( int numDigits, const QString& style, QWidget* parent, const QString& name ) :
+LcdWidget::LcdWidget( int numDigits, const QString& style, QWidget* parent, const QString& name, bool leadingZero ) :
 	QWidget( parent ),
 	m_label(),
 	m_textColor( 255, 255, 255 ),
 	m_textShadowColor( 64, 64, 64 ),
-	m_numDigits( numDigits )
+	m_numDigits( numDigits ),
+	m_seamlessLeft( false ),
+	m_seamlessRight( false ),
+	m_leadingZero( leadingZero )
 {
 	initUi( name, style );
 }
@@ -77,19 +80,15 @@ LcdWidget::~LcdWidget()
 
 
 
-void LcdWidget::setValue( int value )
+void LcdWidget::setValue(int value)
 {
 	QString s = m_textForValue[value];
-	if( s.isEmpty() )
+	if (s.isEmpty())
 	{
-		s = QString::number( value );
-		// TODO: if pad == true
-		/*
-		while( (int) s.length() < m_numDigits )
-		{
-			s = "0" + s;
+		s = QString::number(value);
+		if (m_leadingZero) {
+			s = s.rightJustified(m_numDigits, '0');
 		}
-		*/
 	}
 
 	m_display = s;
@@ -140,15 +139,23 @@ void LcdWidget::paintEvent( QPaintEvent* )
 //	p.translate( width() / 2 - lcdWidth / 2, 0 ); 
 	p.save();
 
-	p.translate( margin, margin );
+	// Don't skip any space and don't draw margin on the left side in seamless mode
+	if (m_seamlessLeft)
+	{
+		p.translate(0, margin);
+	}
+	else
+	{
+		p.translate(margin, margin);
+		// Left Margin
+		p.drawPixmap(
+			cellRect,
+			*m_lcdPixmap,
+			QRect(QPoint(charsPerPixmap * m_cellWidth, isEnabled() ? 0 : m_cellHeight),	cellSize)
+		);
 
-	// Left Margin
-	p.drawPixmap( cellRect, *m_lcdPixmap, 
-			QRect( QPoint( charsPerPixmap*m_cellWidth, 
-				isEnabled()?0:m_cellHeight ), 
-			cellSize ) );
-
-	p.translate( m_marginWidth, 0 );
+		p.translate(m_marginWidth, 0);
+	}
 
 	// Padding
 	for( int i=0; i < m_numDigits - m_display.length(); i++ ) 
@@ -177,21 +184,24 @@ void LcdWidget::paintEvent( QPaintEvent* )
 	}
 
 	// Right Margin
-	p.drawPixmap( QRect( 0, 0, m_marginWidth-1, m_cellHeight ), *m_lcdPixmap, 
-			QRect( charsPerPixmap*m_cellWidth, isEnabled()?0:m_cellHeight,
-				m_cellWidth / 2, m_cellHeight ) );
+	p.drawPixmap(QRect(0, 0, m_seamlessRight ? m_marginWidth : m_marginWidth - 1, m_cellHeight),
+		*m_lcdPixmap,
+		QRect(charsPerPixmap * m_cellWidth, isEnabled() ? 0 : m_cellHeight, m_cellWidth / 2, m_cellHeight));
 
 
 	p.restore();
 
 	// Border
-	QStyleOptionFrame opt;
-	opt.initFrom( this );
-	opt.state = QStyle::State_Sunken;
-	opt.rect = QRect( 0, 0, m_cellWidth * m_numDigits + (margin+m_marginWidth)*2 - 1,
-			m_cellHeight + (margin*2) );
+	if (!m_seamlessLeft && !m_seamlessRight)
+	{
+		QStyleOptionFrame opt;
+		opt.initFrom(this);
+		opt.state = QStyle::State_Sunken;
+		opt.rect = QRect(0, 0, m_cellWidth * m_numDigits + (margin + m_marginWidth) * 2 - 1,
+			m_cellHeight + (margin * 2));
 
-	style()->drawPrimitive( QStyle::PE_Frame, &opt, &p, this );
+		style()->drawPrimitive(QStyle::PE_Frame, &opt, &p, this);
+	}
 
 	p.resetTransform();
 
@@ -235,16 +245,25 @@ void LcdWidget::setMarginWidth( int width )
 
 void LcdWidget::updateSize()
 {
-	int margin = 1;
-	if (m_label.isEmpty()) {
-		setFixedSize( m_cellWidth * m_numDigits + 2*(margin+m_marginWidth),
-				m_cellHeight + (2*margin) );
+	int margin_x1 = m_seamlessLeft ? 0 : 1 + m_marginWidth;
+	int margin_x2 = m_seamlessRight ? 0 : 1 + m_marginWidth;
+	int margin_y = 1;
+	if (m_label.isEmpty())
+	{
+		setFixedSize(
+			m_cellWidth * m_numDigits + margin_x1 + margin_x2,
+			m_cellHeight + (2 * margin_y)
+		);
 	}
-	else {
-		setFixedSize(qMax<int>(
-				m_cellWidth * m_numDigits + 2*(margin+m_marginWidth),
-				horizontalAdvance(QFontMetrics(pointSizeF(font(), 6.5)), m_label)),
-				m_cellHeight + (2*margin) + 9);
+	else
+	{
+		setFixedSize(
+			qMax<int>(
+				m_cellWidth * m_numDigits + margin_x1 + margin_x2,
+				horizontalAdvance(QFontMetrics(pointSizeF(font(), 6.5)), m_label)
+			),
+			m_cellHeight + (2 * margin_y) + 9
+		);
 	}
 
 	update();
@@ -271,8 +290,6 @@ void LcdWidget::initUi(const QString& name , const QString& style)
 
 	updateSize();
 }
-
-
 
 
 
