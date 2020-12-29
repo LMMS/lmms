@@ -50,7 +50,10 @@ class SampleTCO : public TrackContentObject
 	mapPropertyFromModel(bool,isRecord,setRecord,m_recordModel);
 public:
 	SampleTCO( Track * _track );
+	SampleTCO( const SampleTCO& orig );
 	virtual ~SampleTCO();
+
+	SampleTCO& operator=( const SampleTCO& that ) = delete;
 
 	void changeLength( const TimePos & _length ) override;
 	const QString & sampleFile() const;
