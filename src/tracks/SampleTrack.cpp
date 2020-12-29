@@ -115,8 +115,7 @@ SampleTCO::SampleTCO(const SampleTCO& orig) :
 	// TODO: This creates a new SampleBuffer for the new TCO, eating up memory
 	// & eventually causing performance issues. Letting tracks share buffers
 	// when they're identical would fix this, but isn't possible right now.
-	delete m_sampleBuffer;
-	m_sampleBuffer = new SampleBuffer(*orig.m_sampleBuffer);
+	*m_sampleBuffer = *orig.m_sampleBuffer;
 	m_isPlaying = orig.m_isPlaying;
 }
 
