@@ -183,10 +183,12 @@ void Knob::setHtmlLabel(const QString &htmltxt)
 	m_label = htmltxt;
 	m_isHtmlLabel = true;
 	// Put the rendered HTML content into cache
-	m_tdRenderer = new QTextDocument();
+	if (!m_tdRenderer)
+	{
+		m_tdRenderer = new QTextDocument(this);
+	}
 
-	// TODO: stop using <font>
-	m_tdRenderer->setHtml(QString("<font color=\"%1\">%2</font>").arg(textColor().name(), m_label));
+	m_tdRenderer->setHtml(QString("<span style=\"color:\"%1\;">%2</span>").arg(textColor().name(), m_label));
 
 	if (m_knobPixmap)
 	{
@@ -665,7 +667,7 @@ void Knob::paintEvent( QPaintEvent * _me )
 	{
 		if (!m_isHtmlLabel)
 		{
-			p.setFont(pointSizeF(p.font(),6.5));
+			p.setFont(pointSizeF(p.font(), 6.5));
 			p.setPen(textColor());
 			p.drawText(width() / 2 -
 				horizontalAdvance(p.fontMetrics(), m_label) / 2,
