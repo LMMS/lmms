@@ -188,7 +188,7 @@ void Knob::setHtmlLabel(const QString &htmltxt)
 		m_tdRenderer = new QTextDocument(this);
 	}
 
-	m_tdRenderer->setHtml(QString("<span style=\"color:\"%1\;">%2</span>").arg(textColor().name(), m_label));
+	m_tdRenderer->setHtml(QString("<span style=\"color:\"%1;\">%2</span>").arg(textColor().name(), m_label));
 
 	if (m_knobPixmap)
 	{
