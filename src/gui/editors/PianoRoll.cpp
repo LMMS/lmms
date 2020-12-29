@@ -4532,10 +4532,10 @@ PianoRollWindow::PianoRollWindow() :
 	connect(cutOverlapsAction, &QAction::triggered, [this](){ m_editor->fitNoteLengths(true, false); });
 	cutOverlapsAction->setShortcut( Qt::SHIFT | Qt::Key_C );
 
-	QAction *minLengthAction = new QAction(embed::getIconPixmap("min_length"), tr("Min length as latest"), noteToolsButton);
+	QAction *minLengthAction = new QAction(embed::getIconPixmap("min_length"), tr("Min length as last"), noteToolsButton);
 	connect(minLengthAction, &QAction::triggered, [this](){ m_editor->limitNoteLengths(true); });
 
-	QAction *maxLengthAction = new QAction(embed::getIconPixmap("max_length"), tr("Max length as latest"), noteToolsButton);
+	QAction *maxLengthAction = new QAction(embed::getIconPixmap("max_length"), tr("Max length as last"), noteToolsButton);
 	connect(maxLengthAction, &QAction::triggered, [this](){ m_editor->limitNoteLengths(false); });
 
 	noteToolsButton->addAction(glueAction);
