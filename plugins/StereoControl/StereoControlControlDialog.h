@@ -71,6 +71,6 @@ private:
 private slots:
 	void updateKnobVisibility();
 
-} ;
+};
 
 #endif
