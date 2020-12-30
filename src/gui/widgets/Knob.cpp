@@ -61,6 +61,7 @@ Knob::Knob( knobTypes _knob_num, QWidget * _parent, const QString & _name ) :
 	FloatModelView( new FloatModel( 0, 0, 0, 1, NULL, _name, true ), this ),
 	m_label( "" ),
 	m_isHtmlLabel(false),
+	m_tdRenderer(nullptr),
 	m_volumeKnob( false ),
 	m_volumeRatio( 100.0, 0.0, 1000000.0 ),
 	m_buttonPressed( false ),
