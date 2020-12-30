@@ -39,12 +39,9 @@ class StereoControlControls : public EffectControls
 	Q_OBJECT
 public:
 	StereoControlControls(StereoControlEffect* effect);
-	~StereoControlControls() override
-	{
-	}
 
-	void saveSettings(QDomDocument & _doc, QDomElement & _parent) override;
-	void loadSettings(const QDomElement & _this);
+	void saveSettings(QDomDocument & doc, QDomElement & elem) override;
+	void loadSettings(const QDomElement & elem);
 	inline QString nodeName() const override
 	{
 		return "StereoControlControls";
@@ -61,8 +58,6 @@ public:
 	}
 
 private:
-	StereoControlEffect* m_effect;
-
 	FloatModel m_gainModel;
 	FloatModel m_stereoizerModel;
 	FloatModel m_widthModel;
@@ -79,7 +74,7 @@ private:
 	ComboBoxModel m_soloChannelModel;
 
 	BoolModel m_monoModel;
-	BoolModel m_dcModel;
+	BoolModel m_dcRemovalModel;
 	BoolModel m_muteModel;
 	BoolModel m_monoBassModel;
 	BoolModel m_auditionModel;

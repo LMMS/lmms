@@ -25,9 +25,8 @@
 #ifndef STEREOCONTROL_CONTROL_DIALOG_H
 #define STEREOCONTROL_CONTROL_DIALOG_H
 
-#include "EffectControlDialog.h"
-
 #include "ComboBox.h"
+#include "EffectControlDialog.h"
 #include "LedCheckbox.h"
 #include "Knob.h"
 #include "PixmapButton.h"
@@ -41,9 +40,6 @@ class StereoControlControlDialog : public EffectControlDialog
 	Q_OBJECT
 public:
 	StereoControlControlDialog(StereoControlControls* controls);
-	~StereoControlControlDialog() override
-	{
-	}
 
 private:
 	StereoControlControls * m_controls;
@@ -64,7 +60,7 @@ private:
 	PixmapButton * m_haasButton;
 	automatableButtonGroup * m_panModeGroup;
 	PixmapButton * m_monoButton;
-	PixmapButton * m_dcButton;
+	PixmapButton * m_dcRemovalButton;
 	PixmapButton * m_muteButton;
 	LedCheckBox * m_monoBassButton;
 	PixmapButton * m_auditionButton;

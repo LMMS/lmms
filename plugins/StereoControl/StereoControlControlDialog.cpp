@@ -22,10 +22,10 @@
  *
  */
 
-#include <QLayout>
-
 #include "StereoControlControlDialog.h"
 #include "StereoControlControls.h"
+
+#include <QLayout>
 
 #include "embed.h"
 #include "gui_templates.h"
@@ -145,13 +145,13 @@ StereoControlControlDialog::StereoControlControlDialog(StereoControlControls* co
 	m_monoButton->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("mono_unsel"));
 	ToolTip::add(m_monoButton, tr("Converts input to mono"));
 
-	m_dcButton = new PixmapButton(this, tr("DC Offset Removal"));
-	m_dcButton->move(55, 146);
-	m_dcButton->setModel(&m_controls->m_dcModel);
-	m_dcButton->setCheckable(true);
-	m_dcButton->setActiveGraphic(PLUGIN_NAME::getIconPixmap("dc_sel"));
-	m_dcButton->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("dc_unsel"));
-	ToolTip::add(m_dcButton, tr("Removes DC offset from the signal"));
+	m_dcRemovalButton = new PixmapButton(this, tr("DC Offset Removal"));
+	m_dcRemovalButton->move(55, 146);
+	m_dcRemovalButton->setModel(&m_controls->m_dcRemovalModel);
+	m_dcRemovalButton->setCheckable(true);
+	m_dcRemovalButton->setActiveGraphic(PLUGIN_NAME::getIconPixmap("dc_sel"));
+	m_dcRemovalButton->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("dc_unsel"));
+	ToolTip::add(m_dcRemovalButton, tr("Removes DC offset from the signal"));
 
 	m_muteButton = new PixmapButton(this, tr("Mute"));
 	m_muteButton->move(11, 181);
@@ -198,7 +198,7 @@ StereoControlControlDialog::StereoControlControlDialog(StereoControlControls* co
 	ToolTip::add(m_soloChannelBox, tr("Solo a single channel"));
 	
 	connect(&m_controls->m_panModeModel, SIGNAL(dataChanged()), this, SLOT(updateKnobVisibility()));
-	emit updateKnobVisibility();
+	updateKnobVisibility();
 }
 
 

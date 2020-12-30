@@ -26,21 +26,24 @@
 #ifndef STEREOCONTROL_H
 #define STEREOCONTROL_H
 
-#include "Effect.h"
 #include "StereoControlControls.h"
+
+#include "Effect.h"
 #include "ValueBuffer.h"
 
 class StereoControlEffect : public Effect
 {
 public:
 	StereoControlEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* key);
-	~StereoControlEffect() override;
 	bool processAudioBuffer(sampleFrame* buf, const fpp_t frames) override;
 
 	EffectControls* controls() override
 	{
 		return &m_stereocontrolControls;
 	}
+
+private slots:
+	void changeSampleRate();
 
 private:
 	inline sample_t calcAllpassFilter(sample_t inSamp, sample_rate_t Fs, int filtNum, int channel, float a, float b);
@@ -63,15 +66,13 @@ private:
 
 	float m_sampleRate = 0;
 
-	float m_dcInfo[2] = {0};
+	float m_dcCoeff;
+	float m_dcRemovalInfo[2] = {0};
 
 	float m_monoBassFilter[2][2] = {{0}};
 	float m_stereoizerFilter[2][2] = {{0}};
 
 	float m_haasSpectralPanFilter[2] = {0};
-
-	friend class StereoControlControls;
-
 };
 
-#endif
+#endif 

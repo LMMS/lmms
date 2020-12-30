@@ -23,17 +23,17 @@
  */
 
 
+#include "StereoControlControls.h"
+#include "StereoControl.h"
+
 #include <QDomElement>
 
 #include "Engine.h"
 #include "Song.h"
-#include "StereoControlControls.h"
-#include "StereoControl.h"
 
 
 StereoControlControls::StereoControlControls(StereoControlEffect* effect) :
 	EffectControls(effect),
-	m_effect(effect),
 	m_gainModel(0.0f, -54.0f, 54.0f, 0.01f, this, tr("gain")),
 	m_stereoizerModel(0.0f, 0.0f, 200.0f, 0.01f, this, tr("Stereoize")),
 	m_widthModel(100.0f, 0.0f, 200.0f, 0.01f, this, tr("Width")),
@@ -48,7 +48,7 @@ StereoControlControls::StereoControlControls(StereoControlEffect* effect) :
 	m_panModeModel(0, 0, 2, this, tr("Panning Mode")),
 	m_soloChannelModel(this, tr("Solo Channel")),
 	m_monoModel(false, this, tr("Mono")),
-	m_dcModel(false, this, tr("DC Offset Removal")),
+	m_dcRemovalModel(false, this, tr("DC Offset Removal")),
 	m_muteModel(false, this, tr("Mute")),
 	m_monoBassModel(false, this, tr("Mono Bass")),
 	m_auditionModel(false, this, tr("Mono Bass Audition")),
@@ -65,54 +65,54 @@ StereoControlControls::StereoControlControls(StereoControlEffect* effect) :
 }
 
 
-void StereoControlControls::saveSettings(QDomDocument& doc, QDomElement& _this)
+void StereoControlControls::saveSettings(QDomDocument& doc, QDomElement& elem)
 {
-	m_gainModel.saveSettings(doc, _this, "gain"); 
-	m_stereoizerModel.saveSettings(doc, _this, "stereoizer"); 
-	m_widthModel.saveSettings(doc, _this, "width");
-	m_panModel.saveSettings(doc, _this, "pan");
-	m_panModeModel.saveSettings(doc, _this, "panMode");
-	m_monoModel.saveSettings(doc, _this, "mono");
-	m_dcModel.saveSettings(doc, _this, "dc");
-	m_muteModel.saveSettings(doc, _this, "mute");
-	m_monoBassModel.saveSettings(doc, _this, "monoBass");
-	m_auditionModel.saveSettings(doc, _this, "audition");
-	m_invertLModel.saveSettings(doc, _this, "invertL");
-	m_invertRModel.saveSettings(doc, _this, "invertR");
-	m_soloChannelModel.saveSettings(doc, _this, "soloChannel");
-	m_monoBassFreqModel.saveSettings(doc, _this, "monoBassFreq");
-	m_stereoizerLPModel.saveSettings(doc, _this, "stereoizerLP");
-	m_stereoizerHPModel.saveSettings(doc, _this, "stereoizerHP");
-	m_panSpectralModel.saveSettings(doc, _this, "panSpectral");
-	m_panDelayModel.saveSettings(doc, _this, "panDelay");
-	m_panDualLModel.saveSettings(doc, _this, "panDualL");
-	m_panDualRModel.saveSettings(doc, _this, "panDualR");
+	m_gainModel.saveSettings(doc, elem, "gain"); 
+	m_stereoizerModel.saveSettings(doc, elem, "stereoizer"); 
+	m_widthModel.saveSettings(doc, elem, "width");
+	m_panModel.saveSettings(doc, elem, "pan");
+	m_panModeModel.saveSettings(doc, elem, "panMode");
+	m_monoModel.saveSettings(doc, elem, "mono");
+	m_dcRemovalModel.saveSettings(doc, elem, "dcRemoval");
+	m_muteModel.saveSettings(doc, elem, "mute");
+	m_monoBassModel.saveSettings(doc, elem, "monoBass");
+	m_auditionModel.saveSettings(doc, elem, "audition");
+	m_invertLModel.saveSettings(doc, elem, "invertL");
+	m_invertRModel.saveSettings(doc, elem, "invertR");
+	m_soloChannelModel.saveSettings(doc, elem, "soloChannel");
+	m_monoBassFreqModel.saveSettings(doc, elem, "monoBassFreq");
+	m_stereoizerLPModel.saveSettings(doc, elem, "stereoizerLP");
+	m_stereoizerHPModel.saveSettings(doc, elem, "stereoizerHP");
+	m_panSpectralModel.saveSettings(doc, elem, "panSpectral");
+	m_panDelayModel.saveSettings(doc, elem, "panDelay");
+	m_panDualLModel.saveSettings(doc, elem, "panDualL");
+	m_panDualRModel.saveSettings(doc, elem, "panDualR");
 }
 
 
 
-void StereoControlControls::loadSettings(const QDomElement& _this)
+void StereoControlControls::loadSettings(const QDomElement& elem)
 {
-	m_gainModel.loadSettings(_this, "gain");
-	m_stereoizerModel.loadSettings(_this, "stereoizer");
-	m_widthModel.loadSettings(_this, "width");
-	m_panModel.loadSettings(_this, "pan");
-	m_panModeModel.loadSettings(_this, "panMode");
-	m_monoModel.loadSettings(_this, "mono");
-	m_dcModel.loadSettings(_this, "dc");
-	m_muteModel.loadSettings(_this, "mute");
-	m_monoBassModel.loadSettings(_this, "monoBass");
-	m_auditionModel.loadSettings(_this, "audition");
-	m_invertLModel.loadSettings(_this, "invertL");
-	m_invertRModel.loadSettings(_this, "invertR");
-	m_soloChannelModel.loadSettings(_this, "soloChannel");
-	m_monoBassFreqModel.loadSettings(_this, "monoBassFreq");
-	m_stereoizerLPModel.loadSettings(_this, "stereoizerLP");
-	m_stereoizerHPModel.loadSettings(_this, "stereoizerHP");
-	m_panSpectralModel.loadSettings(_this, "panSpectral");
-	m_panDelayModel.loadSettings(_this, "panDelay");
-	m_panDualLModel.loadSettings(_this, "panDualL");
-	m_panDualRModel.loadSettings(_this, "panDualR");
+	m_gainModel.loadSettings(elem, "gain");
+	m_stereoizerModel.loadSettings(elem, "stereoizer");
+	m_widthModel.loadSettings(elem, "width");
+	m_panModel.loadSettings(elem, "pan");
+	m_panModeModel.loadSettings(elem, "panMode");
+	m_monoModel.loadSettings(elem, "mono");
+	m_dcRemovalModel.loadSettings(elem, "dcRemoval");
+	m_muteModel.loadSettings(elem, "mute");
+	m_monoBassModel.loadSettings(elem, "monoBass");
+	m_auditionModel.loadSettings(elem, "audition");
+	m_invertLModel.loadSettings(elem, "invertL");
+	m_invertRModel.loadSettings(elem, "invertR");
+	m_soloChannelModel.loadSettings(elem, "soloChannel");
+	m_monoBassFreqModel.loadSettings(elem, "monoBassFreq");
+	m_stereoizerLPModel.loadSettings(elem, "stereoizerLP");
+	m_stereoizerHPModel.loadSettings(elem, "stereoizerHP");
+	m_panSpectralModel.loadSettings(elem, "panSpectral");
+	m_panDelayModel.loadSettings(elem, "panDelay");
+	m_panDualLModel.loadSettings(elem, "panDualL");
+	m_panDualRModel.loadSettings(elem, "panDualR");
 }
 
 

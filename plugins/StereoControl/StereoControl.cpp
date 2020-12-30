@@ -53,24 +53,10 @@ StereoControlEffect::StereoControlEffect(Model* parent, const Descriptor::SubPlu
 	Effect(&stereocontrol_plugin_descriptor, parent, key),
 	m_stereocontrolControls(this)
 {
-	m_sampleRate = Engine::mixer()->processingSampleRate();
+	changeSampleRate();
 
-	m_delayBufSize = int(m_sampleRate / 160.f) + 1.f;
-	m_delayBuf[0].resize(m_delayBufSize);
-	m_delayBuf[1].resize(m_delayBufSize);
-
-	m_haasBufSize = int(m_sampleRate * 0.002f) + 1.f;
-	m_haasBuf[0].resize(m_haasBufSize);
-	m_haasBuf[1].resize(m_haasBufSize);
+	connect(Engine::mixer(), SIGNAL(sampleRateChanged()), this, SLOT(changeSampleRate()));
 }
-
-
-
-
-StereoControlEffect::~StereoControlEffect()
-{
-}
-
 
 
 
@@ -91,7 +77,7 @@ bool StereoControlEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frame
 	const ValueBuffer * panModeBuf = m_stereocontrolControls.m_panModeModel.valueBuffer();
 	const ValueBuffer * panBuf = m_stereocontrolControls.m_panModel.valueBuffer();
 	const ValueBuffer * monoBuf = m_stereocontrolControls.m_monoModel.valueBuffer();
-	const ValueBuffer * dcBuf = m_stereocontrolControls.m_dcModel.valueBuffer();
+	const ValueBuffer * dcRemovalBuf = m_stereocontrolControls.m_dcRemovalModel.valueBuffer();
 	const ValueBuffer * muteBuf = m_stereocontrolControls.m_muteModel.valueBuffer();
 	const ValueBuffer * monoBassBuf = m_stereocontrolControls.m_monoBassModel.valueBuffer();
 	const ValueBuffer * auditionBuf = m_stereocontrolControls.m_auditionModel.valueBuffer();
@@ -114,7 +100,7 @@ bool StereoControlEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frame
 		const int panMode = panModeBuf ? panModeBuf->value(f) : m_stereocontrolControls.m_panModeModel.value();
 		const float pan = (panBuf ? panBuf->value(f) : m_stereocontrolControls.m_panModel.value()) * 0.01f;
 		const bool mono = monoBuf ? monoBuf->value(f) : m_stereocontrolControls.m_monoModel.value();
-		const bool dc = dcBuf ? dcBuf->value(f) : m_stereocontrolControls.m_dcModel.value();
+		const bool dcRemoval = dcRemovalBuf ? dcRemovalBuf->value(f) : m_stereocontrolControls.m_dcRemovalModel.value();
 		const bool mute = muteBuf ? muteBuf->value(f) : m_stereocontrolControls.m_muteModel.value();
 		const bool monoBass = monoBassBuf ? monoBassBuf->value(f) : m_stereocontrolControls.m_monoBassModel.value();
 		const bool audition = auditionBuf ? auditionBuf->value(f) : m_stereocontrolControls.m_auditionModel.value();
@@ -369,12 +355,12 @@ bool StereoControlEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frame
 			}
 		}
 
-		if (dc)
+		if (dcRemoval)
 		{
 			for (int i = 0; i < 2; ++i)
 			{
-				m_dcInfo[i] = m_dcInfo[i] * 0.999f + s[i] * 0.001f;
-				s[i] -= m_dcInfo[i];
+				m_dcRemovalInfo[i] = m_dcRemovalInfo[i] * (1.f - m_dcCoeff) + s[i] * m_dcCoeff;
+				s[i] -= m_dcRemovalInfo[i];
 			}
 		}
 
@@ -423,8 +409,23 @@ void StereoControlEffect::multimodeFilter(sample_t in, float g, sample_t &lp, sa
 
 float StereoControlEffect::multimodeCoeff(float freq)
 {
-	const float g = tan(F_PI * freq / m_sampleRate);
-	return g / (1.f + g);
+	const float g = 1.f / (1.f + 1.f / tan(F_PI * freq / m_sampleRate));
+	return g;
+}
+
+void StereoControlEffect::changeSampleRate()
+{
+	m_sampleRate = Engine::mixer()->processingSampleRate();
+
+	m_dcCoeff = 44.1f / m_sampleRate;
+
+	m_delayBufSize = int(m_sampleRate / 160.f) + 1.f;
+	m_delayBuf[0].resize(m_delayBufSize);
+	m_delayBuf[1].resize(m_delayBufSize);
+
+	m_haasBufSize = int(m_sampleRate * 0.002f) + 1.f;
+	m_haasBuf[0].resize(m_haasBufSize);
+	m_haasBuf[1].resize(m_haasBufSize);
 }
 
 
