@@ -75,4 +75,4 @@ private:
 	float m_haasSpectralPanFilter[2] = {0};
 };
 
-#endif 
+#endif
