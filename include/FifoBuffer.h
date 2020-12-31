@@ -39,7 +39,7 @@ public:
 		m_writeIndex(0),
 		m_size(size)
 	{
-		m_buffer = new surroundSampleFrame*[size];
+		m_buffer = new T[size];
 		m_readSem.acquire(size);
 	}
 
