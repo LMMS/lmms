@@ -131,7 +131,7 @@ Mixer::Mixer( bool renderOnly ) :
 	}
 
 	// allocte the FIFO from the determined size
-	m_fifo = new FifoBuffer( fifoSize );
+	m_fifo = new Fifo( fifoSize );
 
 	// now that framesPerPeriod is fixed initialize global BufferManager
 	BufferManager::init( m_framesPerPeriod );
@@ -1222,9 +1222,9 @@ MidiClient * Mixer::tryMidiClients()
 
 
 
-Mixer::fifoWriter::fifoWriter( Mixer* mixer, FifoBuffer * _fifo ) :
+Mixer::fifoWriter::fifoWriter( Mixer* mixer, Fifo * fifo ) :
 	m_mixer( mixer ),
-	m_fifo( _fifo ),
+	m_fifo( fifo ),
 	m_writing( true )
 {
 	setObjectName("Mixer::fifoWriter");

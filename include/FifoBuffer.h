@@ -27,9 +27,8 @@
 
 #include <QtCore/QSemaphore>
 
-#include "lmms_basics.h"
 
-
+template<typename T>
 class FifoBuffer
 {
 public:
@@ -50,7 +49,7 @@ public:
 		m_readSem.release(m_size);
 	}
 
-	void write(surroundSampleFrame * element)
+	void write(T element)
 	{
 		m_writeSem.acquire();
 		m_buffer[m_writeIndex++] = element;
@@ -58,10 +57,10 @@ public:
 		m_readSem.release();
 	}
 
-	surroundSampleFrame * read()
+	T read()
 	{
 		m_readSem.acquire();
-		surroundSampleFrame * element = m_buffer[m_readIndex++];
+		T element = m_buffer[m_readIndex++];
 		m_readIndex %= m_size;
 		m_writeSem.release();
 		return element;
@@ -85,7 +84,7 @@ private:
 	int m_readIndex;
 	int m_writeIndex;
 	int m_size;
-	surroundSampleFrame ** m_buffer;
+	T * m_buffer;
 } ;
 
 

@@ -328,17 +328,19 @@ signals:
 
 
 private:
+	typedef FifoBuffer<surroundSampleFrame *> Fifo;
+
 	class fifoWriter : public QThread
 	{
 	public:
-		fifoWriter( Mixer * mixer, FifoBuffer * fifo );
+		fifoWriter( Mixer * mixer, Fifo * fifo );
 
 		void finish();
 
 
 	private:
 		Mixer * m_mixer;
-		FifoBuffer * m_fifo;
+		Fifo * m_fifo;
 		volatile bool m_writing;
 
 		void run() override;
@@ -414,7 +416,7 @@ private:
 	QString m_midiClientName;
 
 	// FIFO stuff
-	FifoBuffer * m_fifo;
+	Fifo * m_fifo;
 	fifoWriter * m_fifoWriter;
 
 	MixerProfiler m_profiler;
