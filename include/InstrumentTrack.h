@@ -30,6 +30,7 @@
 #include "GroupBox.h"
 #include "InstrumentFunctions.h"
 #include "InstrumentSoundShaping.h"
+//#include "Microtuner.h"
 #include "Midi.h"
 #include "MidiCCRackView.h"
 #include "MidiEventProcessor.h"
@@ -174,12 +175,29 @@ public:
 		return &m_baseNoteModel;
 	}
 
+	IntModel *firstKeyModel()
+	{
+		return &m_firstKeyModel;
+	}
+
+	IntModel *lastKeyModel()
+	{
+		return &m_lastKeyModel;
+	}
+
 	int baseNote() const;
+	int firstKey() const;
+	int lastKey() const;
 
 	Piano *pianoModel()
 	{
 		return &m_piano;
 	}
+
+/*	Microtuner *microtuner()
+	{
+		return &m_microtuner;
+	}*/
 
 	bool isArpeggioEnabled() const
 	{
@@ -265,10 +283,12 @@ private:
 
 	bool m_previewMode;
 
+	IntModel m_baseNoteModel;	//!< The "A4" or "440 Hz" key (default 69)
+	IntModel m_firstKeyModel;	//!< First key the instrument reacts to
+	IntModel m_lastKeyModel;	//!< Last key the instrument reacts to
+
 	bool m_hasAutoMidiDev;
 	static InstrumentTrack *s_autoAssignedTrack;
-
-	IntModel m_baseNoteModel;
 
 	NotePlayHandleList m_processHandles;
 
@@ -282,13 +302,14 @@ private:
 	IntModel m_effectChannelModel;
 	BoolModel m_useMasterPitchModel;
 
-
 	Instrument * m_instrument;
 	InstrumentSoundShaping m_soundShaping;
 	InstrumentFunctionArpeggio m_arpeggio;
 	InstrumentFunctionNoteStacking m_noteStacking;
 
 	Piano m_piano;
+
+//	Microtuner m_microtuner;
 
 	std::unique_ptr<BoolModel> m_midiCCEnable;
 	std::unique_ptr<FloatModel> m_midiCCModel[MidiControllerCount];

@@ -40,6 +40,7 @@
 #include "AutomationPattern.h"
 #include "BBTrack.h"
 #include "CaptionMenu.h"
+#include "ComboBox.h"
 #include "ConfigManager.h"
 #include "ControllerConnection.h"
 #include "DataFile.h"
@@ -57,10 +58,12 @@
 #include "Instrument.h"
 #include "InstrumentFunctionViews.h"
 #include "InstrumentMidiIOView.h"
+//#include "InstrumentMiscView.h"
 #include "Knob.h"
 #include "LcdSpinBox.h"
 #include "LedCheckbox.h"
 #include "LeftRightNav.h"
+#include "lmms_constants.h"
 #include "MainWindow.h"
 #include "MidiClient.h"
 #include "MidiPortMenu.h"
@@ -92,9 +95,10 @@ InstrumentTrack::InstrumentTrack( TrackContainer* tc ) :
 	m_sustainPedalPressed( false ),
 	m_silentBuffersProcessed( false ),
 	m_previewMode( false ),
+	m_baseNoteModel(0, 0, NumKeys - 1, this, tr("Base note")),
+	m_firstKeyModel(0, 0, NumKeys - 1, this, tr("First note")),
+	m_lastKeyModel(0, 0, NumKeys - 1, this, tr("Last note")),
 	m_hasAutoMidiDev( false ),
-	m_baseNoteModel( 0, 0, KeysPerOctave * NumOctaves - 1, this,
-							tr( "Base note" ) ),
 	m_volumeModel( DefaultVolume, MinVolume, MaxVolume, 0.1f, this, tr( "Volume" ) ),
 	m_panningModel( DefaultPanning, PanningLeft, PanningRight, 0.1f, this, tr( "Panning" ) ),
 	m_audioPort( tr( "unnamed_track" ), true, &m_volumeModel, &m_panningModel, &m_mutedModel ),
@@ -106,11 +110,14 @@ InstrumentTrack::InstrumentTrack( TrackContainer* tc ) :
 	m_soundShaping( this ),
 	m_arpeggio( this ),
 	m_noteStacking( this ),
-	m_piano( this )
+	m_piano(this)
+//	m_microtuner(this)
 {
 	m_pitchModel.setCenterValue( 0 );
 	m_panningModel.setCenterValue( DefaultPanning );
 	m_baseNoteModel.setInitValue( DefaultKey );
+	m_firstKeyModel.setInitValue(0);
+	m_lastKeyModel.setInitValue(NumKeys - 1);
 
 	m_effectChannelModel.setRange( 0, Engine::fxMixer()->numChannels()-1, 1);
 
@@ -138,14 +145,10 @@ InstrumentTrack::InstrumentTrack( TrackContainer* tc ) :
 
 	setName( tr( "Default preset" ) );
 
-	connect( &m_baseNoteModel, SIGNAL( dataChanged() ),
-			this, SLOT( updateBaseNote() ), Qt::DirectConnection );
-	connect( &m_pitchModel, SIGNAL( dataChanged() ),
-			this, SLOT( updatePitch() ), Qt::DirectConnection );
-	connect( &m_pitchRangeModel, SIGNAL( dataChanged() ),
-			this, SLOT( updatePitchRange() ), Qt::DirectConnection );
-	connect( &m_effectChannelModel, SIGNAL( dataChanged() ),
-			this, SLOT( updateEffectChannel() ), Qt::DirectConnection );
+	connect(&m_baseNoteModel, SIGNAL(dataChanged()), this, SLOT(updateBaseNote()), Qt::DirectConnection);
+	connect(&m_pitchModel, SIGNAL(dataChanged()), this, SLOT(updatePitch()), Qt::DirectConnection);
+	connect(&m_pitchRangeModel, SIGNAL(dataChanged()), this, SLOT(updatePitchRange()), Qt::DirectConnection);
+	connect(&m_effectChannelModel, SIGNAL(dataChanged()), this, SLOT(updateEffectChannel()), Qt::DirectConnection);
 }
 
 
@@ -153,9 +156,21 @@ int InstrumentTrack::baseNote() const
 {
 	int mp = m_useMasterPitchModel.value() ? Engine::getSong()->masterPitch() : 0;
 
-	return m_baseNoteModel.value() - mp;
+//	return m_microtuner.baseKey() - mp;
+	return DefaultBaseKey - mp;
 }
 
+int InstrumentTrack::firstKey() const
+{
+//	return m_microtuner.firstKey();
+	return 0;
+}
+
+int InstrumentTrack::lastKey() const
+{
+//	return m_microtuner.lastKey();
+	return 127;
+}
 
 
 InstrumentTrack::~InstrumentTrack()
@@ -294,7 +309,8 @@ void InstrumentTrack::processInEvent( const MidiEvent& event, const TimePos& tim
 		case MidiNoteOn:
 			if( event.velocity() > 0 )
 			{
-				if( m_notes[event.key()] == NULL )
+				// play a note only if it is not already playing and if it is within configured bounds
+				if (m_notes[event.key()] == nullptr && event.key() >= firstKey() && event.key() <= lastKey())
 				{
 					NotePlayHandle* nph =
 						NotePlayHandleManager::acquire(
@@ -776,6 +792,7 @@ void InstrumentTrack::saveTrackSpecificSettings( QDomDocument& doc, QDomElement 
 	m_effectChannelModel.saveSettings( doc, thisElement, "fxch" );
 	m_baseNoteModel.saveSettings( doc, thisElement, "basenote" );
 	m_useMasterPitchModel.saveSettings( doc, thisElement, "usemasterpitch");
+//	m_microtuner.saveSettings(doc, thisElement);
 
 	// Save MIDI CC stuff
 	m_midiCCEnable->saveSettings(doc, thisElement, "enablecc");
@@ -840,6 +857,7 @@ void InstrumentTrack::loadTrackSpecificSettings( const QDomElement & thisElement
 	}
 	m_baseNoteModel.loadSettings( thisElement, "basenote" );
 	m_useMasterPitchModel.loadSettings( thisElement, "usemasterpitch");
+//	m_microtuner.loadSettings(thisElement);
 
 	// clear effect-chain just in case we load an old preset without FX-data
 	m_audioPort.effects()->clear();
@@ -1004,7 +1022,6 @@ void InstrumentTrack::autoAssignMidiDevice(bool assign)
 		m_hasAutoMidiDev = assign;
 	}
 }
-
 
 
 // #### ITV:
@@ -1638,12 +1655,26 @@ void InstrumentTrackWindow::modelChanged()
 		m_pitchRangeLabel->hide();
 	}
 
+	if (m_track->instrument() && m_track->instrument()->flags().testFlag(Instrument::IsMidiBased))
+	{
+/*		m_miscView->microtunerGroupBox()->hide();
+		m_track->m_microtuner.enabledModel()->setValue(false);*/
+	}
+	else
+	{
+//		m_miscView->microtunerGroupBox()->show();
+	}
+
 	m_ssView->setModel( &m_track->m_soundShaping );
 	m_noteStackingView->setModel( &m_track->m_noteStacking );
 	m_arpeggioView->setModel( &m_track->m_arpeggio );
 	m_midiView->setModel( &m_track->m_midiPort );
 	m_effectView->setModel( m_track->m_audioPort.effects() );
 	m_miscView->pitchGroupBox()->setModel(&m_track->m_useMasterPitchModel);
+/*	m_miscView->microtunerGroupBox()->setModel(m_track->m_microtuner.enabledModel());
+	m_miscView->scaleCombo()->setModel(m_track->m_microtuner.scaleModel());
+	m_miscView->keymapCombo()->setModel(m_track->m_microtuner.keymapModel());
+	m_miscView->rangeImportCheckbox()->setModel(m_track->m_microtuner.keyRangeImportModel());*/
 	updateName();
 }
 
