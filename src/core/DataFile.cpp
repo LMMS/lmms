@@ -59,7 +59,8 @@ const std::vector<DataFile::UpgradeMethod> DataFile::UPGRADE_METHODS = {
 	&DataFile::upgrade_0_4_0_beta1      ,   &DataFile::upgrade_0_4_0_rc2,
 	&DataFile::upgrade_1_0_99           ,   &DataFile::upgrade_1_1_0,
 	&DataFile::upgrade_1_1_91           ,   &DataFile::upgrade_1_2_0_rc3,
-	&DataFile::upgrade_1_3_0            ,   &DataFile::upgrade_noHiddenClipNames
+	&DataFile::upgrade_1_3_0            ,   &DataFile::upgrade_noHiddenClipNames,
+	&DataFile::upgrade_extendedNoteRange
 };
 
 // Vector of all versions that have upgrade routines.
@@ -1382,6 +1383,51 @@ void DataFile::upgrade_noHiddenClipNames()
 		clearDefaultNames(instClips, trackName);
 		clearDefaultNames(autoClips, trackName);
 		clearDefaultNames(bbClips, trackName);
+	}
+}
+
+
+/** \brief Note range has been extended to match MIDI specification
+ *
+ * The non-standard note range previously affected all MIDI-based instruments
+ * except OpulenZ, and made them sound an octave lower than they should (#1857).
+ */
+void DataFile::upgrade_extendedNoteRange()
+{
+	QDomNodeList tracks = elementsByTagName("track");
+	for (int i = 0; !tracks.item(i).isNull(); i++)
+	{
+		QDomNodeList instruments = tracks.item(i).toElement().elementsByTagName("instrument");
+		if (instruments.isEmpty()) {continue;}
+		QDomElement instrument = instruments.item(0).toElement();
+		// Raise the base note of every instrument by 12 to compensate for the change
+		// of A4 key code from 57 to 69. This ensures that notes are labeled correctly.
+		instrument.parentNode().toElement().setAttribute(
+			"basenote",
+			instrument.parentNode().toElement().attribute("basenote").toInt() + 12);
+		// Raise the pitch of all notes in patterns assigned to instruments not affected
+		// by #1857 by an octave. This negates the base note change for normal instruments,
+		// but leaves the MIDI-based instruments sounding an octave lower, preserving their
+		// pitch in existing projects.
+		if (instrument.attribute("name") != "zynaddsubfx" &&
+			instrument.attribute("name") != "vestige" &&
+			instrument.attribute("name") != "lv2instrument" &&
+			instrument.attribute("name") != "carlapatchbay" &&
+			instrument.attribute("name") != "carlarack")
+		{
+			QDomNodeList patterns = tracks.item(i).toElement().elementsByTagName("pattern");
+			for (int i = 0; !patterns.item(i).isNull(); i++)
+			{
+				QDomNodeList notes = patterns.item(i).toElement().elementsByTagName("note");
+				for (int i = 0; !notes.item(i).isNull(); i++)
+				{
+					notes.item(i).toElement().setAttribute(
+						"key",
+						notes.item(i).toElement().attribute("key").toInt() + 12
+					);
+				}
+			}
+		}
 	}
 }
 
