@@ -157,19 +157,19 @@ int InstrumentTrack::baseNote() const
 	int mp = m_useMasterPitchModel.value() ? Engine::getSong()->masterPitch() : 0;
 
 //	return m_microtuner.baseKey() - mp;
-	return DefaultBaseKey - mp;
+	return m_baseNoteModel.value() - mp;
 }
 
 int InstrumentTrack::firstKey() const
 {
 //	return m_microtuner.firstKey();
-	return 0;
+	return m_firstKeyModel.value();
 }
 
 int InstrumentTrack::lastKey() const
 {
 //	return m_microtuner.lastKey();
-	return 127;
+	return m_lastKeyModel.value();
 }
 
 
@@ -1653,16 +1653,6 @@ void InstrumentTrackWindow::modelChanged()
 		m_pitchKnob->setModel( NULL );
 		m_pitchRangeSpinBox->hide();
 		m_pitchRangeLabel->hide();
-	}
-
-	if (m_track->instrument() && m_track->instrument()->flags().testFlag(Instrument::IsMidiBased))
-	{
-/*		m_miscView->microtunerGroupBox()->hide();
-		m_track->m_microtuner.enabledModel()->setValue(false);*/
-	}
-	else
-	{
-//		m_miscView->microtunerGroupBox()->show();
 	}
 
 	m_ssView->setModel( &m_track->m_soundShaping );
