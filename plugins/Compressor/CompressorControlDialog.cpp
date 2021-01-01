@@ -79,7 +79,7 @@ CompressorControlDialog::CompressorControlDialog(CompressorControls* controls) :
 	m_ratioEnabledLabel->setAttribute(Qt::WA_TransparentForMouseEvents);
 
 	m_thresholdKnob = new Knob(knobStyled, this);
-	makeLargeKnob(m_thresholdKnob, tr("Threshold:") , " dbFs");
+	makeLargeKnob(m_thresholdKnob, tr("Threshold:") , " dBFS");
 	m_thresholdKnob->setModel(&controls->m_thresholdModel);
 	ToolTip::add(m_thresholdKnob, tr("Volume at which the compression begins to take place"));
 
@@ -99,12 +99,12 @@ CompressorControlDialog::CompressorControlDialog(CompressorControls* controls) :
 	ToolTip::add(m_releaseKnob, tr("Speed at which the compressor ceases to compress the audio"));
 
 	m_kneeKnob = new Knob(knobStyled, this);
-	makeSmallKnob(m_kneeKnob, tr("Knee:") , " dbFs");
+	makeSmallKnob(m_kneeKnob, tr("Knee:") , " dB");
 	m_kneeKnob->setModel(&controls->m_kneeModel);
 	ToolTip::add(m_kneeKnob, tr("Smooth out the gain reduction curve around the threshold"));
 
 	m_rangeKnob = new Knob(knobStyled, this);
-	makeSmallKnob(m_rangeKnob, tr("Range:") , " dbFs");
+	makeSmallKnob(m_rangeKnob, tr("Range:") , " dBFS");
 	m_rangeKnob->setModel(&controls->m_rangeModel);
 	ToolTip::add(m_rangeKnob, tr("Maximum gain reduction"));
 
@@ -144,7 +144,7 @@ CompressorControlDialog::CompressorControlDialog(CompressorControls* controls) :
 	ToolTip::add(m_blendKnob, tr("Blend between unlinked/maximum/average/minimum stereo linking modes"));
 
 	m_tiltKnob = new Knob(knobStyled, this);
-	makeSmallKnob(m_tiltKnob, tr("Tilt Gain:") , " db");
+	makeSmallKnob(m_tiltKnob, tr("Tilt Gain:") , " dB");
 	m_tiltKnob->setModel(&controls->m_tiltModel);
 	ToolTip::add(m_tiltKnob, tr("Bias the sidechain signal to the low or high frequencies.  -6 db is lowpass, 6 db is highpass."));
 

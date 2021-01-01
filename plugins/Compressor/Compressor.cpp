@@ -111,16 +111,12 @@ void CompressorEffect::calcAutoMakeup()
 	// Formulas using the compressor's Threshold, Ratio, and Knee values to estimate a good makeup gain value
 
 	float tempGainResult;
-	if (-m_thresholdVal < -m_kneeVal)// Below knee
-	{
-		tempGainResult = 0;
-	}
-	else if (abs(1 - m_thresholdVal) < m_kneeVal)// Within knee
+	if (m_thresholdVal < m_kneeVal)
 	{
 		const float temp = -m_thresholdVal + m_kneeVal;
 		tempGainResult = ((m_compressorControls.m_limiterModel.value() ? 0 : m_ratioVal) - 1) * temp * temp / (4 * m_kneeVal);
 	}
-	else// Above knee
+	else
 	{
 		tempGainResult = m_compressorControls.m_limiterModel.value()
 			? m_thresholdVal
@@ -422,7 +418,7 @@ bool CompressorEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 			{
 				gainResult[i] = currentPeakDbfs;
 			}
-			else if (abs(currentPeakDbfs - m_thresholdVal) < m_kneeVal)// Within knee
+			else if (currentPeakDbfs - m_thresholdVal < m_kneeVal)// Within knee
 			{
 				const float temp = currentPeakDbfs - m_thresholdVal + m_kneeVal;
 				gainResult[i] = currentPeakDbfs + ((limiter ? 0 : m_ratioVal) - 1) * temp * temp / (4 * m_kneeVal);
@@ -553,8 +549,8 @@ bool CompressorEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 		}
 
 		// Calculate wet/dry value results
-		const float temp1 = buf[f][0];
-		const float temp2 = buf[f][1];
+		const float temp1 = delayedDrySignal[0];
+		const float temp2 = delayedDrySignal[1];
 		buf[f][0] = d * temp1 + w * s[0];
 		buf[f][1] = d * temp2 + w * s[1];
 		buf[f][0] = (1 - m_mixVal) * temp1 + m_mixVal * buf[f][0];
