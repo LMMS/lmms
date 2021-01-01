@@ -85,6 +85,7 @@ CompressorEffect::CompressorEffect(Model* parent, const Descriptor::SubPluginFea
 	connect(&m_compressorControls.m_ratioModel, SIGNAL(dataChanged()), this, SLOT(calcAutoMakeup()));
 	connect(&m_compressorControls.m_kneeModel, SIGNAL(dataChanged()), this, SLOT(calcAutoMakeup()));
 	connect(&m_compressorControls.m_autoMakeupModel, SIGNAL(dataChanged()), this, SLOT(calcAutoMakeup()));
+	connect(&m_compressorControls.m_inGainModel, SIGNAL(dataChanged()), this, SLOT(calcAutoMakeup()));
 
 	connect(Engine::mixer(), SIGNAL(sampleRateChanged()), this, SLOT(changeSampleRate()));
 	changeSampleRate();
@@ -111,19 +112,19 @@ void CompressorEffect::calcAutoMakeup()
 	// Formulas using the compressor's Threshold, Ratio, and Knee values to estimate a good makeup gain value
 
 	float tempGainResult;
-	if (m_thresholdVal < m_kneeVal)
+	if (-m_thresholdVal < m_kneeVal)
 	{
 		const float temp = -m_thresholdVal + m_kneeVal;
 		tempGainResult = ((m_compressorControls.m_limiterModel.value() ? 0 : m_ratioVal) - 1) * temp * temp / (4 * m_kneeVal);
 	}
-	else
+	else// Above knee
 	{
 		tempGainResult = m_compressorControls.m_limiterModel.value()
 			? m_thresholdVal
 			: m_thresholdVal - m_thresholdVal * m_ratioVal;
 	}
 
-	m_autoMakeupVal = 1.f / dbfsToAmp(tempGainResult);
+	m_autoMakeupVal = m_inGainVal / dbfsToAmp(tempGainResult);
 }
 
 
@@ -292,8 +293,8 @@ bool CompressorEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 
 	for(fpp_t f = 0; f < frames; ++f)
 	{
-		sample_t drySignal[2] = {buf[f][0] * m_inGainVal, buf[f][1] * m_inGainVal};
-		sample_t s[2] = {drySignal[0], drySignal[1]};
+		sample_t drySignal[2] = {buf[f][0], buf[f][1]};
+		sample_t s[2] = {drySignal[0] * m_inGainVal, drySignal[1] * m_inGainVal};
 
 		// Calculate tilt filters, to bias the sidechain to the low or high frequencies
 		if (m_tiltVal)
