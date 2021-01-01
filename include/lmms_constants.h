@@ -49,15 +49,9 @@ const float F_PI_SQR = (float) LD_PI_SQR;
 const float F_E = (float) LD_E;
 const float F_E_R = (float) LD_E_R;
 
-
-// Microtuner
-const unsigned int MaxScaleCount = 10;	//!< number of scales per project
-const unsigned int MaxKeymapCount = 10;	//!< number of keyboard mappings per project
-
-
 // Frequency ranges (in Hz).
 // Arbitrary low limit for logarithmic frequency scale; >1 Hz.
-const int LOWEST_LOG_FREQ = 5;
+const int LOWEST_LOG_FREQ = 10;
 
 // Full range is defined by LOWEST_LOG_FREQ and current sample rate.
 enum FREQUENCY_RANGES
