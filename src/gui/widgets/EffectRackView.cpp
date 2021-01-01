@@ -211,7 +211,7 @@ void EffectRackView::update()
 		}
 	}
 
-	w->setFixedSize( 210 + 2*EffectViewMargin, m_lastY );
+	w->setFixedSize( EffectView::DEFAULT_WIDTH + 2*EffectViewMargin, m_lastY);
 
 	QWidget::update();
 }

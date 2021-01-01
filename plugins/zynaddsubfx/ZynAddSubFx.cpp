@@ -47,6 +47,7 @@
 #include "LocalZynAddSubFx.h"
 #include "Mixer.h"
 #include "ControllerConnection.h"
+#include "Clipboard.h"
 
 #include "embed.h"
 #include "plugin_export.h"
@@ -58,7 +59,7 @@ Plugin::Descriptor PLUGIN_EXPORT zynaddsubfx_plugin_descriptor =
 {
 	STRINGIFY( PLUGIN_NAME ),
 	"ZynAddSubFX",
-	QT_TRANSLATE_NOOP( "pluginBrowser",
+	QT_TRANSLATE_NOOP( "PluginBrowser",
 			"Embedded ZynAddSubFX" ),
 	"Tobias Doerffel <tobydox/at/users.sf.net>",
 	0x0100,
@@ -350,7 +351,7 @@ void ZynAddSubFxInstrument::play( sampleFrame * _buf )
 
 
 
-bool ZynAddSubFxInstrument::handleMidiEvent( const MidiEvent& event, const MidiTime& time, f_cnt_t offset )
+bool ZynAddSubFxInstrument::handleMidiEvent( const MidiEvent& event, const TimePos& time, f_cnt_t offset )
 {
 	// do not forward external MIDI Control Change events if the according
 	// LED is not checked
@@ -578,10 +579,13 @@ ZynAddSubFxView::~ZynAddSubFxView()
 
 void ZynAddSubFxView::dragEnterEvent( QDragEnterEvent * _dee )
 {
-	if( _dee->mimeData()->hasFormat( StringPairDrag::mimeType() ) )
+	// For mimeType() and MimeType enum class
+	using namespace Clipboard;
+
+	if( _dee->mimeData()->hasFormat( mimeType( MimeType::StringPair ) ) )
 	{
 		QString txt = _dee->mimeData()->data(
-						StringPairDrag::mimeType() );
+						mimeType( MimeType::StringPair ) );
 		if( txt.section( ':', 0, 0 ) == "pluginpresetfile" )
 		{
 			_dee->acceptProposedAction();

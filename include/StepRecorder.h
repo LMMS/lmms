@@ -21,7 +21,7 @@
 #ifndef STEP_RECORDER_H
 #define STEP_RECORDER_H
 
-#include <QTime>
+#include <QElapsedTimer>
 #include <QTimer>
 #include <QObject>
 #include <QKeyEvent>
@@ -41,14 +41,14 @@ class StepRecorder : public QObject
 	StepRecorder(PianoRoll& pianoRoll, StepRecorderWidget& stepRecorderWidget);
 
 	void initialize();
-	void start(const MidiTime& currentPosition,const MidiTime& stepLength);
+	void start(const TimePos& currentPosition,const TimePos& stepLength);
 	void stop();
 	void notePressed(const Note & n);
 	void noteReleased(const Note & n);
 	bool keyPressEvent(QKeyEvent* ke);
 	bool mousePressEvent(QMouseEvent* ke);
 	void setCurrentPattern(Pattern* newPattern);
-	void setStepsLength(const MidiTime& newLength);
+	void setStepsLength(const TimePos& newLength);
 
 	QVector<Note*> getCurStepNotes();
 
@@ -73,7 +73,7 @@ class StepRecorder : public QObject
 	void dismissStep();
 	void prepareNewStep();
 
-	MidiTime getCurStepEndPos();
+	TimePos getCurStepEndPos();
 
 	void updateCurStepNotes();
 	void updateWidget();
@@ -84,11 +84,11 @@ class StepRecorder : public QObject
 	StepRecorderWidget& m_stepRecorderWidget;
 
 	bool m_isRecording = false;
-	MidiTime m_curStepStartPos = 0;
-	MidiTime m_curStepEndPos = 0;
+	TimePos m_curStepStartPos = 0;
+	TimePos m_curStepEndPos = 0;
 
-	MidiTime m_stepsLength;
-	MidiTime m_curStepLength; // current step length refers to the step currently recorded. it may defer from m_stepsLength
+	TimePos m_stepsLength;
+	TimePos m_curStepLength; // current step length refers to the step currently recorded. it may defer from m_stepsLength
 							  // since the user can make current step larger
 
 	QTimer m_updateReleasedTimer;
@@ -130,7 +130,7 @@ class StepRecorder : public QObject
 
 		private:
 		bool m_pressed;
-		QTime releasedTimer;
+		QElapsedTimer releasedTimer;
 	} ;
 
 	QVector<StepNote*> m_curStepNotes; // contains the current recorded step notes (i.e. while user still press the notes; before they are applied to the pattern)

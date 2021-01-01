@@ -59,6 +59,7 @@
 
 #include "MainApplication.h"
 #include "ConfigManager.h"
+#include "DataFile.h"
 #include "NotePlayHandle.h"
 #include "embed.h"
 #include "Engine.h"
@@ -129,9 +130,10 @@ inline void loadTranslation( const QString & tname,
 	QTranslator * t = new QTranslator( QCoreApplication::instance() );
 	QString name = tname + ".qm";
 
-	t->load( name, dir );
-
-	QCoreApplication::instance()->installTranslator( t );
+	if (t->load(name, dir))
+	{
+		QCoreApplication::instance()->installTranslator(t);
+	}
 }
 
 
@@ -250,10 +252,11 @@ int main( int argc, char * * argv )
 {
 #ifdef LMMS_DEBUG_FPE
 	// Enable exceptions for certain floating point results
+	// FE_UNDERFLOW is disabled for the time being
 	feenableexcept( FE_INVALID   |
 			FE_DIVBYZERO |
-			FE_OVERFLOW  |
-			FE_UNDERFLOW);
+			FE_OVERFLOW  /*|
+			FE_UNDERFLOW*/);
 
 	// Install the trap handler
 	// register signal SIGFPE and signal handler
@@ -436,7 +439,7 @@ int main( int argc, char * * argv )
 			{
 				return noInputFileError();
 			}
-			
+
 			QFile f( QString::fromLocal8Bit( argv[i] ) );
 			f.open( QIODevice::ReadOnly );
 			QByteArray d = qCompress( f.readAll() ) ;
@@ -723,18 +726,16 @@ int main( int argc, char * * argv )
 		pos = QLocale::system().name().left( 2 );
 	}
 
-#ifdef LMMS_BUILD_WIN32
-#undef QT_TRANSLATIONS_DIR
-#define QT_TRANSLATIONS_DIR ConfigManager::inst()->localeDir()
-#endif
-
-#ifdef QT_TRANSLATIONS_DIR
-	// load translation for Qt-widgets/-dialogs
-	loadTranslation( QString( "qt_" ) + pos,
-					QString( QT_TRANSLATIONS_DIR ) );
-#endif
 	// load actual translation for LMMS
 	loadTranslation( pos );
+
+	// load translation for Qt-widgets/-dialogs
+#ifdef QT_TRANSLATIONS_DIR
+	// load from the original path first
+	loadTranslation(QString("qt_") + pos, QT_TRANSLATIONS_DIR);
+#endif
+	// override it with bundled/custom one, if exists
+	loadTranslation(QString("qt_") + pos, ConfigManager::inst()->localeDir());
 
 
 	// try to set realtime priority
@@ -1009,6 +1010,9 @@ int main( int argc, char * * argv )
 		FreeConsole();
 	}
 #endif
+
+
+	NotePlayHandleManager::free();
 
 	return ret;
 }

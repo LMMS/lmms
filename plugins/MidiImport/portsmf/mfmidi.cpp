@@ -13,6 +13,7 @@
 #include "stdio.h"
 #include "mfmidi.h"
 #include "string.h"
+#include "assert.h"
 
 #define MIDIFILE_ERROR -1
 
@@ -38,6 +39,7 @@ int Midifile_reader::readmt(const char *s, int skip)
     /* read through the "MThd" or "MTrk" header string */
     /* if skip == 1, we attempt to skip initial garbage. */
 {
+    assert(strlen(s) == 4); // must be "MThd" or "MTrk"
     int nread = 0;
     char b[4];
     char buff[32];
@@ -66,8 +68,10 @@ int Midifile_reader::readmt(const char *s, int skip)
         goto retry;
     }
     err:
+//#pragma warning(disable: 4996) // strcpy is safe since strings have known lengths
     (void) strcpy(buff,errmsg);
     (void) strcat(buff,s);
+//#pragma warning(default: 4996) // turn it back on
     mferror(buff);
     return(0);
 }
@@ -189,7 +193,7 @@ void Midifile_reader::readtrack()
             msginit();
 
             while ( Mf_toberead > lookfor ) {
-                char c = egetc();
+                unsigned char c = egetc();
                 if (midifile_error) return;
                 msgadd(c);
             }
@@ -253,15 +257,17 @@ void Midifile_reader::readtrack()
 void Midifile_reader::badbyte(int c)
 {
     char buff[32];
-
+//#pragma warning(disable: 4996) // safe in this case
     (void) sprintf(buff,"unexpected byte: 0x%02x",c);
+//#pragma warning(default: 4996)
     mferror(buff);
 }
 
 void Midifile_reader::metaevent(int type)
 {
     int leng = msgleng();
-    char *m = msg();
+    // made this unsigned to avoid sign extend
+    unsigned char *m = msg();
 
     switch ( type ) {
     case 0x00:
@@ -408,10 +414,15 @@ int Midifile_reader::read16bit()
     return to16bit(c1,c2);
 }
 
-void Midifile_reader::mferror(const char *s)
+void Midifile_reader::mferror(char *s)
 {
     Mf_error(s);
     midifile_error = 1;
+}
+
+void Midifile_reader::mferror(const char *s)
+{
+    mferror(const_cast<char *>(s));
 }
 
 /* The code below allows collection of a system exclusive message of */
@@ -444,7 +455,7 @@ void Midifile_reader::msginit()
     Msgindex = 0;
 }
 
-char *Midifile_reader::msg()
+unsigned char *Midifile_reader::msg()
 {
     return(Msgbuff);
 }
@@ -464,21 +475,16 @@ void Midifile_reader::msgadd(int c)
 
 void Midifile_reader::msgenlarge()
 {
-    char *newmess;
-    char *oldmess = Msgbuff;
+    unsigned char *newmess;
+    unsigned char *oldmess = Msgbuff;
     int oldleng = Msgsize;
 
     Msgsize += MSGINCREMENT;
-    newmess = (char *) Mf_malloc((sizeof(char) * Msgsize) );
+    newmess = (unsigned char *) Mf_malloc((sizeof(unsigned char) * Msgsize) );
 
     /* copy old message into larger new one */
     if ( oldmess != 0 ) {
-        register char *p = newmess;
-        register char *q = oldmess;
-        register char *endq = &oldmess[oldleng];
-
-        for ( ; q!=endq ; p++,q++ )
-            *p = *q;
+        memcpy(newmess, oldmess, oldleng);
         Mf_free(oldmess, oldleng);
     }
     Msgbuff = newmess;

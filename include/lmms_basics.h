@@ -32,6 +32,7 @@
 
 #ifdef LMMS_HAVE_STDINT_H
 #include <cstdint>
+#include <array>
 #endif
 
 
@@ -55,9 +56,6 @@ typedef uint16_t fx_ch_t;			// FX-channel (0 to MAX_EFFECT_CHANNEL)
 
 typedef uint32_t jo_id_t;			// (unique) ID of a journalling object
 
-// use for improved branch prediction
-#define likely(x)	Q_LIKELY(x)
-#define unlikely(x)	Q_UNLIKELY(x)
 
 // windows headers define "min" and "max" macros, breaking the methods bwloe
 #undef min
@@ -130,12 +128,9 @@ const ch_cnt_t SURROUND_CHANNELS =
 
 
 
-typedef sample_t sampleFrame[DEFAULT_CHANNELS];
-typedef sample_t surroundSampleFrame[SURROUND_CHANNELS];
+using         sampleFrame = std::array<sample_t,  DEFAULT_CHANNELS>;
+using surroundSampleFrame = std::array<sample_t, SURROUND_CHANNELS>;
 #define ALIGN_SIZE 16
-#if __GNUC__
-typedef sample_t sampleFrameA[DEFAULT_CHANNELS] __attribute__((__aligned__(ALIGN_SIZE)));
-#endif
 
 
 #define STRINGIFY(s) STR(s)

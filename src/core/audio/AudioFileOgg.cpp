@@ -30,7 +30,9 @@
 
 #ifdef LMMS_HAVE_OGGVORBIS
 
-
+#if (QT_VERSION >= QT_VERSION_CHECK(5,10,0))
+#include <QRandomGenerator>
+#endif
 #include <string>
 #include <vorbis/vorbisenc.h>
 
@@ -136,8 +138,13 @@ bool AudioFileOgg::startEncoding()
 
 	// We give our ogg file a random serial number and avoid
 	// 0 and UINT32_MAX which can get you into trouble.
-	qsrand( time( 0 ) );
+#if (QT_VERSION >= QT_VERSION_CHECK(5,10,0))
+	// QRandomGenerator::global() is already initialized, and we can't seed() it.
+	m_serialNo = 0xD0000000 + QRandomGenerator::global()->generate() % 0x0FFFFFFF;
+#else
+	qsrand(time(0));
 	m_serialNo = 0xD0000000 + qrand() % 0x0FFFFFFF;
+#endif
 	ogg_stream_init( &m_os, m_serialNo );
 
 	// Now, build the three header packets and send through to the stream

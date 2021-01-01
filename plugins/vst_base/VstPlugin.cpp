@@ -46,10 +46,6 @@
 #include <QDomDocument>
 
 #ifdef LMMS_BUILD_WIN32
-#	ifndef NOMINMAX
-#		define NOMINMAX
-#	endif
-
 #	include <windows.h>
 #	include <QLayout>
 #endif
@@ -59,6 +55,7 @@
 #include "LocaleHelper.h"
 #include "MainWindow.h"
 #include "Mixer.h"
+#include "PathUtil.h"
 #include "Song.h"
 #include "FileDialog.h"
 
@@ -121,7 +118,7 @@ private:
 
 
 VstPlugin::VstPlugin( const QString & _plugin ) :
-	m_plugin( _plugin ),
+	m_plugin( PathUtil::toAbsolute(_plugin) ),
 	m_pluginWindowID( 0 ),
 	m_embedMethod( gui
 			? ConfigManager::inst()->vstEmbedMethod()
@@ -129,11 +126,6 @@ VstPlugin::VstPlugin( const QString & _plugin ) :
 	m_version( 0 ),
 	m_currentProgram()
 {
-	if( QDir::isRelativePath( m_plugin ) )
-	{
-		m_plugin = ConfigManager::inst()->vstDir()  + m_plugin;
-	}
-
 	setSplittedChannels( true );
 
 	PE::MachineType machineType;
@@ -564,7 +556,7 @@ void VstPlugin::loadParameterDisplays()
 void VstPlugin::savePreset( )
 {
 	QString presName = currentProgramName().isEmpty() ? tr(": default") : currentProgramName();
-	presName.replace(tr("\""), tr("'")); // QFileDialog unable to handle double quotes properly
+	presName.replace("\"", "'"); // QFileDialog unable to handle double quotes properly
 
 	FileDialog sfd( NULL, tr( "Save Preset" ), presName.section(": ", 1, 1) + tr(".fxp"),
 		tr( "Vst Plugin Preset (*.fxp *.fxb)" ) );
@@ -804,7 +796,3 @@ QString VstPlugin::embedMethod() const
 {
 	return m_embedMethod;
 }
-
-
-
-
