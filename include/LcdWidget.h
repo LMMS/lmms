@@ -40,10 +40,10 @@ class LMMS_EXPORT LcdWidget : public QWidget
 	Q_PROPERTY( QColor textShadowColor READ textShadowColor WRITE setTextShadowColor )
 	
 public:
-	LcdWidget( QWidget* parent, const QString& name = QString(), bool leadingZero = false );
-	LcdWidget( int numDigits, QWidget* parent, const QString& name = QString(), bool leadingZero = false );
-	LcdWidget( int numDigits, const QString& style, QWidget* parent, const QString& name = QString(),
-		bool leadingZero = false );
+	LcdWidget(QWidget* parent, const QString& name = QString(), bool leadingZero = false);
+	LcdWidget(int numDigits, QWidget* parent, const QString& name = QString(), bool leadingZero = false);
+	LcdWidget(int numDigits, const QString& style, QWidget* parent, const QString& name = QString(),
+		bool leadingZero = false);
 
 	virtual ~LcdWidget();
 
@@ -69,7 +69,12 @@ public:
 
 	int cellHeight() const { return m_cellHeight; }
 
-	void setSeamless(bool left, bool right) {m_seamlessLeft = left; m_seamlessRight = right; updateSize();}
+	void setSeamless(bool left, bool right)
+	{
+		m_seamlessLeft = left;
+		m_seamlessRight = right;
+		updateSize();
+	}
 
 public slots:
 	virtual void setMarginWidth( int width );

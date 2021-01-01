@@ -40,31 +40,31 @@
 
 
 
-LcdWidget::LcdWidget( QWidget* parent, const QString& name, bool leadingZero ) :
-	LcdWidget( 1, parent, name, leadingZero )
+LcdWidget::LcdWidget(QWidget* parent, const QString& name, bool leadingZero) :
+	LcdWidget(1, parent, name, leadingZero)
 {
 }
 
 
 
 
-LcdWidget::LcdWidget( int numDigits, QWidget* parent, const QString& name, bool leadingZero ) :
-	LcdWidget( numDigits, QString("19green"), parent, name, leadingZero )
+LcdWidget::LcdWidget(int numDigits, QWidget* parent, const QString& name, bool leadingZero) :
+	LcdWidget(numDigits, QString("19green"), parent, name, leadingZero)
 {
 }
 
 
 
 
-LcdWidget::LcdWidget( int numDigits, const QString& style, QWidget* parent, const QString& name, bool leadingZero ) :
+LcdWidget::LcdWidget(int numDigits, const QString& style, QWidget* parent, const QString& name, bool leadingZero) :
 	QWidget( parent ),
 	m_label(),
 	m_textColor( 255, 255, 255 ),
 	m_textShadowColor( 64, 64, 64 ),
-	m_numDigits( numDigits ),
-	m_seamlessLeft( false ),
-	m_seamlessRight( false ),
-	m_leadingZero( leadingZero )
+	m_numDigits(numDigits),
+	m_seamlessLeft(false),
+	m_seamlessRight(false),
+	m_leadingZero(leadingZero)
 {
 	initUi( name, style );
 }
@@ -86,7 +86,8 @@ void LcdWidget::setValue(int value)
 	if (s.isEmpty())
 	{
 		s = QString::number(value);
-		if (m_leadingZero) {
+		if (m_leadingZero)
+		{
 			s = s.rightJustified(m_numDigits, '0');
 		}
 	}
@@ -290,6 +291,5 @@ void LcdWidget::initUi(const QString& name , const QString& style)
 
 	updateSize();
 }
-
 
 

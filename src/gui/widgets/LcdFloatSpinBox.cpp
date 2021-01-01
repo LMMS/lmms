@@ -103,7 +103,7 @@ void LcdFloatSpinBox::layoutSetup(const QString &style)
 void LcdFloatSpinBox::update()
 {
 	const int whole = static_cast<int>(model()->value());
-	const float fraction = model()->value() - static_cast<int>(model()->value());
+	const float fraction = model()->value() - whole;
 	const int intFraction = fraction * std::pow(10.f, m_fractionDisplay.numDigits());
 	m_wholeDisplay.setValue(whole + m_displayOffset);
 	m_fractionDisplay.setValue(intFraction + m_displayOffset);
@@ -159,8 +159,7 @@ void LcdFloatSpinBox::mouseMoveEvent(QMouseEvent* event)
 	if (m_mouseMoving)
 	{
 		int dy = event->globalY() - m_origMousePos.y();
-		if (gui->mainWindow()->isShiftPressed())
-			dy = qBound(-4, dy/4, 4);
+		if (gui->mainWindow()->isShiftPressed()) { dy = qBound(-4, dy/4, 4); }
 		if (dy > 1 || dy < -1)
 		{
 			model()->setInitValue(model()->value() - dy / 2 * getStep());
@@ -211,8 +210,8 @@ void LcdFloatSpinBox::enterValue()
 	new_val = QInputDialog::getDouble(
 			this, tr("Set value"),
 			tr("Please enter a new value between %1 and %2:").
-			arg(model()->minValue()).
-			arg(model()->maxValue()),
+				arg(model()->minValue()).
+				arg(model()->maxValue()),
 			model()->value(),
 			model()->minValue(),
 			model()->maxValue(),
