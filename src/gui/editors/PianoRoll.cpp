@@ -433,9 +433,6 @@ PianoRoll::PianoRoll() :
 			this, SLOT( selectRegionFromPixels( int, int ) ) );
 
 	m_stepRecorder.initialize();
-
-	// trigger a redraw if keymap definitions change (different keys may become disabled)
-	connect(Engine::getSong(), SIGNAL(keymapListChanged(int)), this, SLOT(update()));
 }
 
 

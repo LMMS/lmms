@@ -114,11 +114,11 @@ PianoView::PianoView(QWidget *parent) :
 	}
 	if (s_whiteKeyDisabledPm == nullptr)
 	{
-		s_whiteKeyDisabledPm = new QPixmap(embed::getIconPixmap("white_key_disabled"));
+		s_whiteKeyDisabledPm = new QPixmap(embed::getIconPixmap("white_key"));
 	}
 	if (s_blackKeyDisabledPm == nullptr)
 	{
-		s_blackKeyDisabledPm = new QPixmap(embed::getIconPixmap("black_key_disabled"));
+		s_blackKeyDisabledPm = new QPixmap(embed::getIconPixmap("black_key"));
 	}
 
 	setAttribute(Qt::WA_OpaquePaintEvent, true);
@@ -142,9 +142,6 @@ PianoView::PianoView(QWidget *parent) :
 	layout->setMargin( 0 );
 	layout->addSpacing( PIANO_BASE+PW_WHITE_KEY_HEIGHT );
 	layout->addWidget( m_pianoScroll );
-
-	// trigger a redraw if keymap definitions change (different keys may become disabled)
-	connect(Engine::getSong(), SIGNAL(keymapListChanged(int)), this, SLOT(update()));
 }
 
 /*! \brief Map a keyboard key being pressed to a note in our keyboard view
@@ -939,7 +936,7 @@ void PianoView::paintEvent( QPaintEvent * )
 		}
 		else
 		{
-			p.drawPixmap(0 + PW_WHITE_KEY_WIDTH / 2, PIANO_BASE, *s_blackKeyDisabledPm);
+			p.drawPixmap(0 - PW_WHITE_KEY_WIDTH / 2, PIANO_BASE, *s_blackKeyDisabledPm);
 		}
 	}
 
