@@ -114,11 +114,11 @@ PianoView::PianoView(QWidget *parent) :
 	}
 	if (s_whiteKeyDisabledPm == nullptr)
 	{
-		s_whiteKeyDisabledPm = new QPixmap(embed::getIconPixmap("white_key"));
+		s_whiteKeyDisabledPm = new QPixmap(embed::getIconPixmap("white_key_disabled"));
 	}
 	if (s_blackKeyDisabledPm == nullptr)
 	{
-		s_blackKeyDisabledPm = new QPixmap(embed::getIconPixmap("black_key"));
+		s_blackKeyDisabledPm = new QPixmap(embed::getIconPixmap("black_key_disabled"));
 	}
 
 	setAttribute(Qt::WA_OpaquePaintEvent, true);
@@ -888,7 +888,9 @@ void PianoView::paintEvent( QPaintEvent * )
 
 		// draw normal, pressed or disabled key, depending on state and position of current key
 //		if (m_piano && m_piano->instrumentTrack()->microtuner()->isKeyMapped(cur_key))
-		if (m_piano && true)
+		if (m_piano &&
+			cur_key >= m_piano->instrumentTrack()->firstKeyModel()->value() &&
+			cur_key <= m_piano->instrumentTrack()->lastKeyModel()->value())
 		{
 			if (m_piano && m_piano->isKeyPressed(cur_key))
 			{
@@ -923,7 +925,9 @@ void PianoView::paintEvent( QPaintEvent * )
 	if (startKey > 0 && Piano::isBlackKey((Keys)(--startKey)))
 	{
 //		if (m_piano && m_piano->instrumentTrack()->microtuner()->isKeyMapped(startKey))
-		if (m_piano && true)
+		if (m_piano &&
+			startKey >= m_piano->instrumentTrack()->firstKeyModel()->value() &&
+			startKey <= m_piano->instrumentTrack()->lastKeyModel()->value())
 		{
 			if (m_piano && m_piano->isKeyPressed(startKey))
 			{
@@ -947,7 +951,9 @@ void PianoView::paintEvent( QPaintEvent * )
 		{
 			// draw normal, pressed or disabled key, depending on state and position of current key
 //			if (m_piano && m_piano->instrumentTrack()->microtuner()->isKeyMapped(cur_key))
-			if (m_piano && true)
+			if (m_piano &&
+				cur_key >= m_piano->instrumentTrack()->firstKeyModel()->value() &&
+				cur_key <= m_piano->instrumentTrack()->lastKeyModel()->value())
 			{
 				if (m_piano && m_piano->isKeyPressed(cur_key))
 				{
