@@ -225,7 +225,7 @@ private:
 	bool unquantizedModHeld( QMouseEvent * me );
 	TimePos draggedTCOPos( QMouseEvent * me );
 	int knifeMarkerPos( QMouseEvent * me );
-	MidiTime quantizeMarkerPos( MidiTime, bool shiftMode );
+	TimePos quantizeMarkerPos( TimePos, bool shiftMode );
 } ;
 
 

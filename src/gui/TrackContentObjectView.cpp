@@ -995,7 +995,7 @@ void TrackContentObjectView::mouseReleaseEvent( QMouseEvent * me )
 
 			const int relativePixelPos = me->pos().x();
 			const float ppb = m_trackView->trackContainerView()->pixelsPerBar();
-			MidiTime splitPos = relativePixelPos * MidiTime::ticksPerBar() / ppb;
+			TimePos splitPos = relativePixelPos * TimePos::ticksPerBar() / ppb;
 
 			if ( !unquantizedModHeld(me) )
 			{
@@ -1428,35 +1428,35 @@ int TrackContentObjectView::knifeMarkerPos( QMouseEvent * me )
 	if ( unquantizedModHeld(me) ) { return markerPos; }
 	else
 	{	//Otherwise we...
-		//1: Convert the position to a MidiTime
+		//1: Convert the position to a TimePos
 		const float ppb = m_trackView->trackContainerView()->pixelsPerBar();
-		MidiTime midiPos = markerPos * MidiTime::ticksPerBar() / ppb;
+		TimePos midiPos = markerPos * TimePos::ticksPerBar() / ppb;
 		//2: Snap to the correct position, based on modifier keys
 		midiPos = quantizeMarkerPos( midiPos, me->modifiers() & Qt::ShiftModifier );
 		//3: Convert back to a pixel position
-		return midiPos * ppb / MidiTime::ticksPerBar();
+		return midiPos * ppb / TimePos::ticksPerBar();
 	}
 }
 
 
 
 
-MidiTime TrackContentObjectView::quantizeMarkerPos( MidiTime midiPos, bool shiftMode )
+TimePos TrackContentObjectView::quantizeMarkerPos( TimePos midiPos, bool shiftMode )
 {
 	const float snapSize = gui->songEditor()->m_editor->getSnapSize();
 	if ( shiftMode )
 	{	//If shift is held we quantize the length of the new left clip...
-		const MidiTime leftPos = midiPos.quantize( snapSize );
+		const TimePos leftPos = midiPos.quantize( snapSize );
 		//...or right clip...
-		const MidiTime rightOff = m_tco->length() - midiPos;
-		const MidiTime rightPos = m_tco->length() - rightOff.quantize( snapSize );
+		const TimePos rightOff = m_tco->length() - midiPos;
+		const TimePos rightPos = m_tco->length() - rightOff.quantize( snapSize );
 		//...whichever gives a position closer to the cursor
 		if ( abs(leftPos - midiPos) < abs(rightPos - midiPos) ) { return leftPos; }
 		else { return rightPos; }
 	}
 	else
 	{
-		return (MidiTime(midiPos + m_initialTCOPos).quantize( snapSize ) - m_initialTCOPos);
+		return (TimePos(midiPos + m_initialTCOPos).quantize( snapSize ) - m_initialTCOPos);
 	}
 }
 
