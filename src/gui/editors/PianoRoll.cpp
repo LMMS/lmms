@@ -806,6 +806,8 @@ void PianoRoll::setCurrentPattern( Pattern* newPattern )
 	connect( m_pattern->instrumentTrack(), SIGNAL( midiNoteOff( const Note& ) ), this, SLOT( finishRecordNote( const Note& ) ) );
 	connect( m_pattern->instrumentTrack()->pianoModel(), SIGNAL( dataChanged() ), this, SLOT( update() ) );
 
+	connect(m_pattern->instrumentTrack()->firstKeyModel(), SIGNAL(dataChanged()), this, SLOT(update()));
+	connect(m_pattern->instrumentTrack()->lastKeyModel(), SIGNAL(dataChanged()), this, SLOT(update()));
 /*	connect(m_pattern->instrumentTrack()->microtuner()->keymapModel(), SIGNAL(dataChanged()), this, SLOT(update()));
 	connect(m_pattern->instrumentTrack()->microtuner()->keyRangeImportModel(), SIGNAL(dataChanged()),
 		this, SLOT(update()));*/
@@ -2899,7 +2901,8 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 			const int yb)
 		{
 //			const bool mapped = m_pattern->instrumentTrack()->microtuner()->isKeyMapped(key);
-			const bool mapped = true;
+			const bool mapped = m_pattern->instrumentTrack()->firstKeyModel()->value() <= key &&
+				m_pattern->instrumentTrack()->lastKeyModel()->value() >= key;
 			const bool pressed = m_pattern->instrumentTrack()->pianoModel()->isKeyPressed(key);
 			const int keyCode = key % KeysPerOctave;
 			const int yt = yb - gridCorrection(key);
