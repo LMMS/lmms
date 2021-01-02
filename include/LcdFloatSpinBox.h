@@ -60,7 +60,7 @@ public:
 		return m_displayOffset;
 	}
 
-	void setLabel(const QString &label) {m_label = label;}
+	void setLabel(const QString &label) { m_label = label; }
 
 public slots:
 	virtual void update();

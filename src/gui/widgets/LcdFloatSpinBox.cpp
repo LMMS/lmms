@@ -153,8 +153,8 @@ void LcdFloatSpinBox::mousePressEvent(QMouseEvent* event)
 void LcdFloatSpinBox::mouseMoveEvent(QMouseEvent* event)
 {
 	// switch between integer and fractional step based on cursor position
-	if (event->x() < m_wholeDisplay.width()) {m_intStep = true;}
-	else {m_intStep = false;}
+	if (event->x() < m_wholeDisplay.width()) { m_intStep = true; }
+	else { m_intStep = false; }
 
 	if (m_mouseMoving)
 	{
@@ -187,8 +187,8 @@ void LcdFloatSpinBox::mouseReleaseEvent(QMouseEvent*)
 void LcdFloatSpinBox::wheelEvent(QWheelEvent *event)
 {
 	// switch between integer and fractional step based on cursor position
-	if (event->x() < m_wholeDisplay.width()) {m_intStep = true;}
-	else {m_intStep = false;}
+	if (event->x() < m_wholeDisplay.width()) { m_intStep = true; }
+	else { m_intStep = false; }
 
 	event->accept();
 	model()->setInitValue(model()->value() + ((event->delta() > 0) ? 1 : -1) * getStep());
@@ -226,8 +226,8 @@ void LcdFloatSpinBox::enterValue()
 
 float LcdFloatSpinBox::getStep()
 {
-	if (m_intStep) {return 1;}
-	else {return model()->step<float>();}
+	if (m_intStep) { return 1; }
+	else { return model()->step<float>(); }
 }
 
 
