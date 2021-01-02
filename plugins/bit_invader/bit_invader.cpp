@@ -140,7 +140,7 @@ sample_t bSynth::nextStringSample( float sample_length )
 
 bitInvader::bitInvader( InstrumentTrack * _instrument_track ) :
 	Instrument( _instrument_track, &bitinvader_plugin_descriptor ),
-	m_sampleLength(128, 4, wavetableSize, 1, this, tr("Sample length")),
+	m_sampleLength(wavetableSize, 4, wavetableSize, 1, this, tr("Sample length")),
 	m_graph(-1.0f, 1.0f, wavetableSize, this),
 	m_interpolation( false, this ),
 	m_normalize( false, this )
