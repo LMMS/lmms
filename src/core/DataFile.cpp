@@ -1397,8 +1397,11 @@ void DataFile::upgrade_extendedNoteRange()
 	QDomNodeList tracks = elementsByTagName("track");
 	for (int i = 0; !tracks.item(i).isNull(); i++)
 	{
+		// Ignore BB container tracks
+		if (tracks.item(i).toElement().attribute("type").toInt() == 1) { continue; }
+
 		QDomNodeList instruments = tracks.item(i).toElement().elementsByTagName("instrument");
-		if (instruments.isEmpty()) {continue;}
+		if (instruments.isEmpty()) { continue; }
 		QDomElement instrument = instruments.item(0).toElement();
 		// Raise the base note of every instrument by 12 to compensate for the change
 		// of A4 key code from 57 to 69. This ensures that notes are labeled correctly.
