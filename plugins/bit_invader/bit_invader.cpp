@@ -45,6 +45,7 @@
 #include "plugin_export.h"
 
 static const int wavetableSize = 200;
+static const float defaultNormalizationFactor = 1.0f;
 
 extern "C"
 {
@@ -77,7 +78,17 @@ bSynth::bSynth( float * _shape, NotePlayHandle * _nph, bool _interpolation,
 	sample_shape = new float[wavetableSize];
 	for (int i=0; i < wavetableSize; ++i)
 	{
-		sample_shape[i] = _shape[i] * _factor;
+		float buf = _shape[i] * _factor;
+
+		/* Double check that normalization has been performed correctly,
+		i.e., the absolute value of all samples is <= 1.0 if _factor
+		is different to the default normalization factor. If there is
+		a value > 1.0, clip the sample to 1.0 to limit the range. */
+		if ((_factor != defaultNormalizationFactor) && (fabsf(buf) > 1.0f))
+		{
+			buf = (buf < 0) ? -1.0f : 1.0f;
+		}
+		sample_shape[i] = buf;
 	}
 }
 
@@ -273,7 +284,7 @@ void bitInvader::playNote( NotePlayHandle * _n,
 		float factor;
 		if( !m_normalize.value() )
 		{
-			factor = 1.0f;
+			factor = defaultNormalizationFactor;
 		}
 		else
 		{
