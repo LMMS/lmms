@@ -198,6 +198,8 @@ bool FileBrowser::filterItems( const QString & filter, QTreeWidgetItem * item )
 void FileBrowser::reloadTree( void )
 {
 	QList<QString> expandedDirs = m_fileBrowserTreeWidget->expandedDirs();
+	expandedDirs.sort(Qt::CaseSensitive);
+
 	const QString text = m_filterEdit->text();
 	m_filterEdit->clear();
 	m_fileBrowserTreeWidget->clear();
@@ -262,7 +264,6 @@ void FileBrowser::giveFocusToFilter()
 }
 
 
-
 void FileBrowser::addItems(const QString & path )
 {
 	if( m_dirsAsItems )
@@ -274,6 +275,7 @@ void FileBrowser::addItems(const QString & path )
 	// try to add all directories from file system alphabetically into the tree
 	QDir cdir( path );
 	QStringList files = cdir.entryList( QDir::Dirs, QDir::Name );
+	files.sort(Qt::CaseInsensitive);
 	for( QStringList::const_iterator it = files.constBegin();
 						it != files.constEnd(); ++it )
 	{
@@ -1081,8 +1083,13 @@ bool Directory::addItems(const QString & path )
 		}
 	}
 
+	// sorts the path alphabetically instead of just appending to the bottom (see "orphans")
+	if (added_something)
+		sortChildren(0, Qt::AscendingOrder);
+
 	QList<QTreeWidgetItem*> items;
 	files = thisDir.entryList( QDir::Files, QDir::Name );
+	files.sort(Qt::CaseInsensitive);
 	for( QStringList::const_iterator it = files.constBegin();
 						it != files.constEnd(); ++it )
 	{
