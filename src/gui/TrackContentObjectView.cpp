@@ -110,7 +110,6 @@ TrackContentObjectView::TrackContentObjectView( TrackContentObject * tco,
 	setAttribute( Qt::WA_DeleteOnClose, true );
 	setFocusPolicy( Qt::StrongFocus );
 	setCursor( m_cursorHand );
-	setCursor( QCursor( embed::getIconPixmap( "hand" ), m_mouseHotspotHand.width(), m_mouseHotspotHand.height() ) );
 	move( 0, 0 );
 	show();
 
@@ -985,45 +984,7 @@ void TrackContentObjectView::mouseReleaseEvent( QMouseEvent * me )
 		// TODO: Fix m_tco->setJournalling() consistency
 		m_tco->setJournalling( true );
 	}
-	else if( m_action == Split )
-	{
-		SampleTCO * leftTCO = dynamic_cast<SampleTCO*>( m_tco );
-
-		if (leftTCO)
-		{
-			leftTCO->setMarkerEnabled( false );
-
-			const int relativePixelPos = me->pos().x();
-			const float ppb = m_trackView->trackContainerView()->pixelsPerBar();
-			TimePos splitPos = relativePixelPos * TimePos::ticksPerBar() / ppb;
-
-			if ( !unquantizedModHeld(me) )
-			{
-				splitPos = quantizeMarkerPos( splitPos, me->modifiers() & Qt::ShiftModifier );
-			}
-
-			splitPos += m_initialTCOPos;
-
-			//Don't split if we slid off the TCO or if we're on the clip's start/end
-			//Cutting at exactly the start/end position would create a zero length
-			//clip (bad), and a clip the same length as the original one (pointless).
-			if ( splitPos > m_initialTCOPos && splitPos < m_initialTCOEnd )
-			{
-				leftTCO->getTrack()->addJournalCheckPoint();
-				leftTCO->getTrack()->saveJournallingState( false );
-
-				SampleTCO * rightTCO = new SampleTCO ( *leftTCO );
-
-				leftTCO->changeLength( splitPos - m_initialTCOPos );
-
-				rightTCO->movePosition( splitPos );
-				rightTCO->changeLength( m_initialTCOEnd - splitPos );
-				rightTCO->setStartTimeOffset( leftTCO->startTimeOffset() - leftTCO->length() );
-
-				leftTCO->getTrack()->restoreJournallingState();
-			}
-		}
-	}
+	else if( m_action == Split ) { splitTCO( me ); }
 
 	m_action = NoAction;
 	delete m_hint;
@@ -1456,8 +1417,54 @@ TimePos TrackContentObjectView::quantizeMarkerPos( TimePos midiPos, bool shiftMo
 	}
 	else
 	{
-		return (TimePos(midiPos + m_initialTCOPos).quantize( snapSize ) - m_initialTCOPos);
+		return TimePos(midiPos + m_initialTCOPos).quantize( snapSize ) - m_initialTCOPos;
 	}
+}
+
+
+
+
+// This should eventually be available for all clip types, hence why it's not
+// located inside SampleTCOView
+bool TrackContentObjectView::splitTCO( QMouseEvent * me )
+{
+	SampleTCO * leftTCO = dynamic_cast<SampleTCO*>( m_tco );
+
+	if (!leftTCO) { return false; }
+
+	leftTCO->setMarkerEnabled( false );
+
+	const int relativePixelPos = me->pos().x();
+	const float ppb = m_trackView->trackContainerView()->pixelsPerBar();
+	TimePos splitPos = relativePixelPos * TimePos::ticksPerBar() / ppb;
+
+	if ( !unquantizedModHeld(me) )
+	{
+		splitPos = quantizeMarkerPos( splitPos, me->modifiers() & Qt::ShiftModifier );
+	}
+
+	splitPos += m_initialTCOPos;
+
+	//Don't split if we slid off the TCO or if we're on the clip's start/end
+	//Cutting at exactly the start/end position would create a zero length
+	//clip (bad), and a clip the same length as the original one (pointless).
+	if ( splitPos > m_initialTCOPos && splitPos < m_initialTCOEnd )
+	{
+		leftTCO->getTrack()->addJournalCheckPoint();
+		leftTCO->getTrack()->saveJournallingState( false );
+
+		SampleTCO * rightTCO = new SampleTCO ( *leftTCO );
+
+		leftTCO->changeLength( splitPos - m_initialTCOPos );
+
+		rightTCO->movePosition( splitPos );
+		rightTCO->changeLength( m_initialTCOEnd - splitPos );
+		rightTCO->setStartTimeOffset( leftTCO->startTimeOffset() - leftTCO->length() );
+
+		leftTCO->getTrack()->restoreJournallingState();
+		return true;
+	}
+	else { return false; }
 }
 
 

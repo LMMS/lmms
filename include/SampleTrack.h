@@ -79,14 +79,8 @@ public:
 	bool isPlaying() const;
 	void setIsPlaying(bool isPlaying);
 
-	void inline setMarkerPos( int x )
-	{
-		m_markerPos = x;
-	}
-	void inline setMarkerEnabled( bool e )
-	{
-		m_marker = e;
-	}
+	void inline setMarkerPos(int x) { m_markerPos = x; }
+	void inline setMarkerEnabled(bool e) { m_marker = e; }
 
 public slots:
 	void setSampleBuffer( SampleBuffer* sb );

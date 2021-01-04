@@ -226,6 +226,8 @@ private:
 	TimePos draggedTCOPos( QMouseEvent * me );
 	int knifeMarkerPos( QMouseEvent * me );
 	TimePos quantizeMarkerPos( TimePos, bool shiftMode );
+	//! Return true iff TCO could be split
+	bool splitTCO( QMouseEvent * me );
 } ;
 
 
