@@ -77,13 +77,13 @@ TrackContentObjectView::TrackContentObjectView( TrackContentObject * tco,
 							TrackView * tv ) :
 	selectableObject( tv->getTrackContentWidget() ),
 	ModelView( NULL, this ),
-	m_tco( tco ),
 	m_trackView( tv ),
+	m_initialTCOPos( TimePos(0) ),
+	m_initialTCOEnd( TimePos(0) ),
+	m_tco( tco ),
 	m_action( NoAction ),
 	m_initialMousePos( QPoint( 0, 0 ) ),
 	m_initialMouseGlobalPos( QPoint( 0, 0 ) ),
-	m_initialTCOPos( TimePos(0) ),
-	m_initialTCOEnd( TimePos(0) ),
 	m_initialOffsets( QVector<TimePos>() ),
 	m_hint( NULL ),
 	m_mutedColor( 0, 0, 0 ),
@@ -1419,52 +1419,6 @@ TimePos TrackContentObjectView::quantizeMarkerPos( TimePos midiPos, bool shiftMo
 	{
 		return TimePos(midiPos + m_initialTCOPos).quantize( snapSize ) - m_initialTCOPos;
 	}
-}
-
-
-
-
-// This should eventually be available for all clip types, hence why it's not
-// located inside SampleTCOView
-bool TrackContentObjectView::splitTCO( QMouseEvent * me )
-{
-	SampleTCO * leftTCO = dynamic_cast<SampleTCO*>( m_tco );
-
-	if (!leftTCO) { return false; }
-
-	leftTCO->setMarkerEnabled( false );
-
-	const int relativePixelPos = me->pos().x();
-	const float ppb = m_trackView->trackContainerView()->pixelsPerBar();
-	TimePos splitPos = relativePixelPos * TimePos::ticksPerBar() / ppb;
-
-	if ( !unquantizedModHeld(me) )
-	{
-		splitPos = quantizeMarkerPos( splitPos, me->modifiers() & Qt::ShiftModifier );
-	}
-
-	splitPos += m_initialTCOPos;
-
-	//Don't split if we slid off the TCO or if we're on the clip's start/end
-	//Cutting at exactly the start/end position would create a zero length
-	//clip (bad), and a clip the same length as the original one (pointless).
-	if ( splitPos > m_initialTCOPos && splitPos < m_initialTCOEnd )
-	{
-		leftTCO->getTrack()->addJournalCheckPoint();
-		leftTCO->getTrack()->saveJournallingState( false );
-
-		SampleTCO * rightTCO = new SampleTCO ( *leftTCO );
-
-		leftTCO->changeLength( splitPos - m_initialTCOPos );
-
-		rightTCO->movePosition( splitPos );
-		rightTCO->changeLength( m_initialTCOEnd - splitPos );
-		rightTCO->setStartTimeOffset( leftTCO->startTimeOffset() - leftTCO->length() );
-
-		leftTCO->getTrack()->restoreJournallingState();
-		return true;
-	}
-	else { return false; }
 }
 
 

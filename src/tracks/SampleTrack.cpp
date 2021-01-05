@@ -668,6 +668,47 @@ void SampleTCOView::reverseSample()
 
 
 
+//! Split this TCO
+bool SampleTCOView::splitTCO( QMouseEvent * me )
+{
+	m_tco->setMarkerEnabled( false );
+
+	const int relativePixelPos = me->pos().x();
+	const float ppb = m_trackView->trackContainerView()->pixelsPerBar();
+	TimePos splitPos = relativePixelPos * TimePos::ticksPerBar() / ppb;
+
+	if ( !unquantizedModHeld(me) )
+	{
+		splitPos = quantizeMarkerPos( splitPos, me->modifiers() & Qt::ShiftModifier );
+	}
+
+	splitPos += m_initialTCOPos;
+
+	//Don't split if we slid off the TCO or if we're on the clip's start/end
+	//Cutting at exactly the start/end position would create a zero length
+	//clip (bad), and a clip the same length as the original one (pointless).
+	if ( splitPos > m_initialTCOPos && splitPos < m_initialTCOEnd )
+	{
+		m_tco->getTrack()->addJournalCheckPoint();
+		m_tco->getTrack()->saveJournallingState( false );
+
+		SampleTCO * rightTCO = new SampleTCO ( *m_tco );
+
+		m_tco->changeLength( splitPos - m_initialTCOPos );
+
+		rightTCO->movePosition( splitPos );
+		rightTCO->changeLength( m_initialTCOEnd - splitPos );
+		rightTCO->setStartTimeOffset( m_tco->startTimeOffset() - m_tco->length() );
+
+		m_tco->getTrack()->restoreJournallingState();
+		return true;
+	}
+	else { return false; }
+}
+
+
+
+
 
 
 SampleTrack::SampleTrack(TrackContainer* tc) :

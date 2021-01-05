@@ -139,6 +139,10 @@ protected:
 		Merge
 	};
 
+	TrackView * m_trackView;
+	TimePos m_initialTCOPos;
+	TimePos m_initialTCOEnd;
+
 	virtual void constructContextMenu( QMenu * )
 	{
 	}
@@ -156,6 +160,9 @@ protected:
 		m_needsUpdate = true;
 		selectableObject::resizeEvent( re );
 	}
+
+	bool unquantizedModHeld( QMouseEvent * me );
+	TimePos quantizeMarkerPos( TimePos, bool shiftMode );
 
 	float pixelsPerBar();
 
@@ -186,12 +193,9 @@ private:
 	static TextFloat * s_textFloat;
 
 	TrackContentObject * m_tco;
-	TrackView * m_trackView;
 	Actions m_action;
 	QPoint m_initialMousePos;
 	QPoint m_initialMouseGlobalPos;
-	TimePos m_initialTCOPos;
-	TimePos m_initialTCOEnd;
 	QVector<TimePos> m_initialOffsets;
 
 	TextFloat * m_hint;
@@ -222,12 +226,10 @@ private:
 	void setInitialOffsets();
 
 	bool mouseMovedDistance( QMouseEvent * me, int distance );
-	bool unquantizedModHeld( QMouseEvent * me );
 	TimePos draggedTCOPos( QMouseEvent * me );
 	int knifeMarkerPos( QMouseEvent * me );
-	TimePos quantizeMarkerPos( TimePos, bool shiftMode );
-	//! Return true iff TCO could be split
-	bool splitTCO( QMouseEvent * me );
+	//! Return true iff TCO could be split. Currently only implemented for samples
+	virtual bool splitTCO( QMouseEvent * me ){ return false; };
 } ;
 
 

@@ -137,6 +137,7 @@ protected:
 private:
 	SampleTCO * m_tco;
 	QPixmap m_paintPixmap;
+	bool splitTCO( QMouseEvent * me ) override;
 } ;
 
 
