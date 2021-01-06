@@ -198,7 +198,6 @@ bool FileBrowser::filterItems( const QString & filter, QTreeWidgetItem * item )
 void FileBrowser::reloadTree( void )
 {
 	QList<QString> expandedDirs = m_fileBrowserTreeWidget->expandedDirs();
-	expandedDirs.sort(Qt::CaseSensitive);
 
 	const QString text = m_filterEdit->text();
 	m_filterEdit->clear();
