@@ -198,7 +198,6 @@ bool FileBrowser::filterItems( const QString & filter, QTreeWidgetItem * item )
 void FileBrowser::reloadTree( void )
 {
 	QList<QString> expandedDirs = m_fileBrowserTreeWidget->expandedDirs();
-
 	const QString text = m_filterEdit->text();
 	m_filterEdit->clear();
 	m_fileBrowserTreeWidget->clear();
