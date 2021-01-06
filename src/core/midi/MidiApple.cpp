@@ -57,7 +57,7 @@ MidiApple::~MidiApple()
 
 
 
-void MidiApple::processOutEvent( const MidiEvent& event, const MidiTime& time, const MidiPort* port )
+void MidiApple::processOutEvent( const MidiEvent& event, const TimePos& time, const MidiPort* port )
 {
 	qDebug("MidiApple:processOutEvent displayName:'%s'",port->displayName().toLatin1().constData());
 	

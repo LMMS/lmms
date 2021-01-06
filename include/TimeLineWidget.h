@@ -73,7 +73,7 @@ public:
 
 
 	TimeLineWidget(int xoff, int yoff, float ppb, Song::PlayPos & pos,
-				const MidiTime & begin, Song::PlayModes mode, QWidget * parent);
+				const TimePos & begin, Song::PlayModes mode, QWidget * parent);
 	virtual ~TimeLineWidget();
 
 	inline QColor const & getBarLineColor() const { return m_barLineColor; }
@@ -123,23 +123,23 @@ public:
 		return m_loopPoints == LoopPointsEnabled;
 	}
 
-	inline const MidiTime & loopBegin() const
+	inline const TimePos & loopBegin() const
 	{
 		return ( m_loopPos[0] < m_loopPos[1] ) ?
 						m_loopPos[0] : m_loopPos[1];
 	}
 
-	inline const MidiTime & loopEnd() const
+	inline const TimePos & loopEnd() const
 	{
 		return ( m_loopPos[0] > m_loopPos[1] ) ?
 						m_loopPos[0] : m_loopPos[1];
 	}
 
-	inline void savePos( const MidiTime & pos )
+	inline void savePos( const TimePos & pos )
 	{
 		m_savedPos = pos;
 	}
-	inline const MidiTime & savedPos() const
+	inline const TimePos & savedPos() const
 	{
 		return m_savedPos;
 	}
@@ -162,10 +162,10 @@ public:
 		return "timeline";
 	}
 
-	inline int markerX( const MidiTime & _t ) const
+	inline int markerX( const TimePos & _t ) const
 	{
 		return m_xOffset + static_cast<int>( ( _t - m_begin ) *
-					m_ppb / MidiTime::ticksPerBar() );
+					m_ppb / TimePos::ticksPerBar() );
 	}
 
 signals:
@@ -175,10 +175,10 @@ signals:
 
 
 public slots:
-	void updatePosition( const MidiTime & );
+	void updatePosition( const TimePos & );
 	void updatePosition()
 	{
-		updatePosition( MidiTime() );
+		updatePosition( TimePos() );
 	}
 	void toggleAutoScroll( int _n );
 	void toggleLoopPoints( int _n );
@@ -218,11 +218,11 @@ private:
 	int m_posMarkerX;
 	float m_ppb;
 	Song::PlayPos & m_pos;
-	const MidiTime & m_begin;
+	const TimePos & m_begin;
 	const Song::PlayModes m_mode;
-	MidiTime m_loopPos[2];
+	TimePos m_loopPos[2];
 
-	MidiTime m_savedPos;
+	TimePos m_savedPos;
 
 
 	TextFloat * m_hint;
@@ -242,7 +242,7 @@ private:
 
 
 signals:
-	void positionChanged( const MidiTime & _t );
+	void positionChanged( const TimePos & _t );
 	void loopPointStateLoaded( int _n );
 	void positionMarkerMoved();
 	void loadBehaviourAtStop( int _n );

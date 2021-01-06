@@ -35,6 +35,9 @@
 
 
 
+extern "C"
+{
+
 Plugin::Descriptor PLUGIN_EXPORT lv2effect_plugin_descriptor =
 {
 	STRINGIFY(PLUGIN_NAME),
@@ -48,6 +51,8 @@ Plugin::Descriptor PLUGIN_EXPORT lv2effect_plugin_descriptor =
 	nullptr,
 	new Lv2SubPluginFeatures(Plugin::Effect)
 };
+
+}
 
 
 
