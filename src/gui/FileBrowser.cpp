@@ -262,6 +262,7 @@ void FileBrowser::giveFocusToFilter()
 }
 
 
+
 void FileBrowser::addItems(const QString & path )
 {
 	if( m_dirsAsItems )
