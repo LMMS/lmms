@@ -557,8 +557,8 @@ float AutomationPattern::valueAt( timeMap::const_iterator v, int offset ) const
 	else if( m_progressionType == LinearProgression )
 	{
 		float slope =
-			(INVAL(v + 1) - OUTVAL(v)) /
-			(POS(v + 1) - POS(v));
+			(INVAL(v + 1) - OUTVAL(v))
+			/ (POS(v + 1) - POS(v));
 
 		return OUTVAL(v) + offset * slope;
 	}
