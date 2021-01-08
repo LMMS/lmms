@@ -725,11 +725,7 @@ void PianoRoll::fitNoteLengths(bool shrink, bool grow)
 		}
 
 		// Sort notes by position
-		std::sort(
-			notes.begin(),
-			notes.end(),
-			[](const Note *n1, const Note *n2){ return n1->pos() < n2->pos(); }
-		);
+		std::sort(notes.begin(), notes.end(), Note::lessThan);
 
 		NoteVector chordGroup;
 		TimePos chordLength;
