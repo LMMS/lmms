@@ -50,7 +50,10 @@ class SampleClip : public Clip
 	mapPropertyFromModel(bool,isRecord,setRecord,m_recordModel);
 public:
 	SampleClip( Track * _track );
+	SampleClip( const SampleClip& orig );
 	virtual ~SampleClip();
+
+	SampleClip& operator=( const SampleClip& that ) = delete;
 
 	void changeLength( const TimePos & _length ) override;
 	const QString & sampleFile() const;

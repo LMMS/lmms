@@ -340,7 +340,7 @@ bool Knob::updateAngle()
 	{
 		angle = angleFromValue( model()->inverseScaledValue( model()->value() ), model()->minValue(), model()->maxValue(), m_totalAngle );
 	}
-	if( qAbs( angle - m_angle ) > 3 )
+	if( qAbs( angle - m_angle ) > 0 )
 	{
 		m_angle = angle;
 		return true;

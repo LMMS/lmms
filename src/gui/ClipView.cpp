@@ -24,6 +24,8 @@
 
 #include "ClipView.h"
 
+#include <set>
+
 #include <QMenu>
 #include <QMouseEvent>
 #include <QPainter>
@@ -33,9 +35,14 @@
 #include "ColorChooser.h"
 #include "ComboBoxModel.h"
 #include "DataFile.h"
+#include "Engine.h"
 #include "embed.h"
 #include "GuiApplication.h"
+#include "InstrumentTrack.h"
+#include "Note.h"
+#include "Pattern.h"
 #include "SampleTrack.h"
+#include "Song.h"
 #include "SongEditor.h"
 #include "StringPairDrag.h"
 #include "TextFloat.h"
@@ -937,9 +944,11 @@ void ClipView::mouseReleaseEvent( QMouseEvent * me )
  */
 void ClipView::contextMenuEvent( QContextMenuEvent * cme )
 {
-	// Depending on whether we right-clicked a selection or an individual Clip we will have
+	QVector<ClipView*> selectedClips = getClickedClips();
+
+	// Depending on whether we right-clicked a selection or an individual clip we will have
 	// different labels for the actions.
-	bool individualClip = getClickedClips().size() <= 1;
+	bool individualClip = selectedClips.size() <= 1;
 
 	if( cme->modifiers() )
 	{
@@ -965,6 +974,15 @@ void ClipView::contextMenuEvent( QContextMenuEvent * cme )
 				? tr("Cut")
 				: tr("Cut selection"),
 			[this](){ contextMenuAction( Cut ); } );
+
+		if (canMergeSelection(selectedClips))
+		{
+			contextMenu.addAction(
+				embed::getIconPixmap("edit_merge"),
+				tr("Merge Selection"),
+				[this]() { contextMenuAction(Merge); }
+			);
+		}
 	}
 
 	contextMenu.addAction(
@@ -1022,6 +1040,9 @@ void ClipView::contextMenuAction( ContextMenuAction action )
 			break;
 		case Mute:
 			toggleMute( active );
+			break;
+		case Merge:
+			mergeClips(active);
 			break;
 	}
 }
@@ -1104,6 +1125,100 @@ void ClipView::toggleMute( QVector<ClipView *> clipvs )
 		// No need to check for nullptr because we check while building the clipvs QVector
 		clipv->getClip()->toggleMute();
 	}
+}
+
+bool ClipView::canMergeSelection(QVector<ClipView*> clipvs)
+{
+	// Can't merge a single Clip
+	if (clipvs.size() < 2) { return false; }
+
+	// We check if the owner of the first Clip is an Instrument Track
+	bool isInstrumentTrack = dynamic_cast<InstrumentTrackView*>(clipvs.at(0)->getTrackView());
+
+	// Then we create a set with all the Clips owners
+	std::set<TrackView*> ownerTracks;
+	for (auto clipv: clipvs) { ownerTracks.insert(clipv->getTrackView()); }
+
+	// Can merge if there's only one owner track and it's an Instrument Track
+	return isInstrumentTrack && ownerTracks.size() == 1;
+}
+
+void ClipView::mergeClips(QVector<ClipView*> clipvs)
+{
+	// Get the track that we are merging Clips in
+	InstrumentTrack* track =
+		dynamic_cast<InstrumentTrack*>(clipvs.at(0)->getTrackView()->getTrack());
+
+	if (!track)
+	{
+		qWarning("Warning: Couldn't retrieve InstrumentTrack in mergeClips()");
+		return;
+	}
+
+	// For Undo/Redo
+	track->addJournalCheckPoint();
+	track->saveJournallingState(false);
+
+	// Find the earliest position of all the selected ClipVs
+	const auto earliestClipV = std::min_element(clipvs.constBegin(), clipvs.constEnd(),
+		[](ClipView* a, ClipView* b)
+		{
+			return a->getClip()->startPosition() <
+				b->getClip()->startPosition();
+		}
+	);
+
+	const TimePos earliestPos = (*earliestClipV)->getClip()->startPosition();
+
+	// Create a pattern where all notes will be added
+	Pattern* newPattern = dynamic_cast<Pattern*>(track->createClip(earliestPos));
+	if (!newPattern)
+	{
+		qWarning("Warning: Failed to convert Clip to Pattern on mergeClips");
+		return;
+	}
+
+	newPattern->saveJournallingState(false);
+
+	// Add the notes and remove the Clips that are being merged
+	for (auto clipv: clipvs)
+	{
+		// Convert ClipV to PatternView
+		PatternView* pView = dynamic_cast<PatternView*>(clipv);
+
+		if (!pView)
+		{
+			qWarning("Warning: Non-pattern Clip on InstrumentTrack");
+			continue;
+		}
+
+		NoteVector currentClipNotes = pView->getPattern()->notes();
+		TimePos pViewPos = pView->getPattern()->startPosition();
+
+		for (Note* note: currentClipNotes)
+		{
+			Note* newNote = newPattern->addNote(*note, false);
+			TimePos originalNotePos = newNote->pos();
+			newNote->setPos(originalNotePos + (pViewPos - earliestPos));
+		}
+
+		// We disable the journalling system before removing, so the
+		// removal doesn't get added to the undo/redo history
+		clipv->getClip()->saveJournallingState(false);
+		// No need to check for nullptr because we check while building the clipvs QVector
+		clipv->remove();
+	}
+
+	// Update length since we might have moved notes beyond the end of the pattern length
+	newPattern->updateLength();
+	// Rearrange notes because we might have moved them
+	newPattern->rearrangeAllNotes();
+	// Restore journalling states now that the operation is finished
+	newPattern->restoreJournallingState();
+	track->restoreJournallingState();
+	// Update song
+	Engine::getSong()->setModified();
+	gui->songEditor()->update();
 }
 
 

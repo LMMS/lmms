@@ -106,11 +106,15 @@ public:
 	void cut( QVector<ClipView *> clipvs );
 	void paste();
 	// remove and toggleMute are static because they don't depend
-	// being called from a particular Clip view, but can be called anywhere as long
+	// being called from a particular clip view, but can be called anywhere as long
 	// as a valid Clip view list is given, while copy/cut require an instance for
 	// some metadata to be written to the clipboard.
 	static void remove( QVector<ClipView *> clipvs );
 	static void toggleMute( QVector<ClipView *> clipvs );
+	static void mergeClips(QVector<ClipView*> clipvs);
+
+	// Returns true if selection can be merged and false if not
+	static bool canMergeSelection(QVector<ClipView*> clipvs);
 
 	QColor getColorForDisplay( QColor );
 
@@ -129,7 +133,8 @@ protected:
 		Cut,
 		Copy,
 		Paste,
-		Mute
+		Mute,
+		Merge
 	};
 
 	virtual void constructContextMenu( QMenu * )

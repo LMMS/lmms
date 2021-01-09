@@ -477,7 +477,7 @@ bool TrackContentWidget::pasteSelection( TimePos clipPos, const QMimeData * md, 
 	// All patterns should be offset the same amount as the grabbed pattern
 	TimePos offset = TimePos(clipPos - grabbedClipPos);
 	// Users expect clips to "fall" backwards, so bias the offset
-	offset = offset - TimePos::ticksPerBar() * snapSize / 2;
+	offset -= TimePos::ticksPerBar() * snapSize / 2;
 	// The offset is quantized (rather than the positions) to preserve fine adjustments
 	offset = offset.quantize(snapSize);
 
@@ -508,7 +508,7 @@ bool TrackContentWidget::pasteSelection( TimePos clipPos, const QMimeData * md, 
 		TimePos pos = clipElement.attributeNode( "pos" ).value().toInt() + offset;
 		// If we land on ourselves, offset by one snap
 		TimePos shift = TimePos::ticksPerBar() * gui->songEditor()->m_editor->getSnapSize();
-		if (offset == 0) { pos += shift; }
+		if (offset == 0 && initialTrackIndex == currentTrackIndex) { pos += shift; }
 
 		Clip * clip = t->createClip( pos );
 		clip->restoreState( clipElement );
