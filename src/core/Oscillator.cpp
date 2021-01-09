@@ -190,7 +190,7 @@ void Oscillator::generateSquareWaveTable(int bands, sample_t * table)
 //expects sample in sample buffer
 void Oscillator::generateFromFFT(int bands, float threshold, sample_t * table)
 {
-	//set unrequired bands to zero 
+	//set unrequired bands to zero
 	for (int i = bands; i < OscillatorConstants::WAVETABLE_LENGTH * 2 + 1 - bands; i++)
 	{
 		s_specBuf[i][0] = 0.0f;
@@ -845,7 +845,6 @@ inline sample_t Oscillator::getSample<Oscillator::UserDefinedWave>(
 		return userWaveSample(_sample);
 	}
 }
-
 
 
 
