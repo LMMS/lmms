@@ -78,7 +78,7 @@ void LcdFloatSpinBox::layoutSetup(const QString &style)
 	m_wholeDisplay.setSeamless(false, true);
 	m_fractionDisplay.setSeamless(true, false);
 
-	lcdLayout->addWidget(&m_wholeDisplay);  
+	lcdLayout->addWidget(&m_wholeDisplay);
 
 	QLabel *dotLabel = new QLabel("", this);
 	QPixmap *dotPixmap = new QPixmap(embed::getIconPixmap(QString("lcd_" + style + "_dot").toUtf8().constData()));
