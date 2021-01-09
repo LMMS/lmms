@@ -161,7 +161,7 @@ bool MidiExport::tryExport(const TrackContainer::TrackList &tracks,
 			for (QDomNode n = element.firstChild(); !n.isNull(); n = n.nextSibling())
 			{
 
-				if (n.nodeName() == "bbtco")
+				if (n.nodeName() == "bbclip")
 				{
 					QDomElement it = n.toElement();
 					int pos = it.attribute("pos", "0").toInt();
