@@ -74,7 +74,7 @@ typedef AutomationPattern::timeMap timeMap;
 
 
 // some constants...
-const int INITIAL_PIANOROLL_WIDTH = 860;
+const int INITIAL_PIANOROLL_WIDTH = 970;
 const int INITIAL_PIANOROLL_HEIGHT = 485;
 
 const int SCROLLBAR_SIZE = 12;
