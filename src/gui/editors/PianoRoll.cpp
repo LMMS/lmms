@@ -431,7 +431,7 @@ PianoRoll::PianoRoll() :
 	//connection for selecion from timeline
 	connect( m_timeLine, SIGNAL( regionSelectedFromPixels( int, int ) ),
 			this, SLOT( selectRegionFromPixels( int, int ) ) );
-	
+
 	// Set up snap model
 	m_snapModel.addItem( tr("Nudge") );
 	m_snapModel.addItem( tr("Snap") );
@@ -2548,7 +2548,7 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 void PianoRoll::dragNotes( int x, int y, bool alt, bool shift, bool ctrl, Note* noteDragged )
 {
 	// dragging one or more notes around
-	
+
 	// get note that's dragged
 	if (noteDragged != nullptr)
 	{
@@ -2613,7 +2613,7 @@ void PianoRoll::dragNotes( int x, int y, bool alt, bool shift, bool ctrl, Note* 
 			{
 				// moving note
 				if (m_gridMode == gridSnap && firstIteration)
-				{	
+				{
 					firstIteration = false;
 					Note* copy(m_draggedNote);
 					// guantize first note
@@ -2621,30 +2621,30 @@ void PianoRoll::dragNotes( int x, int y, bool alt, bool shift, bool ctrl, Note* 
 					int end_pos_ticks = start_pos_ticks + copy->length().getTicks();
 					start_pos_ticks = qMax(0, start_pos_ticks);
 					end_pos_ticks = qMax(0, end_pos_ticks);
-										
+
 					copy->setPos(TimePos(start_pos_ticks));
 					copy->quantizePos(quantization());
 					auto tmp_pos=copy->pos(); // store start position
-					
+
 					int gap_start = qAbs(start_pos_ticks - copy->pos().getTicks());
 
 					copy->setPos(TimePos(end_pos_ticks));
 					copy->quantizePos(quantization());
 
 					int gap_end = qAbs(end_pos_ticks - copy->pos().getTicks());
-					
+
 					if (gap_start < gap_end)
 					{
 						copy->setPos(tmp_pos); // restore start position
 						off_ticks += copy->pos().getTicks() - (m_draggedNote->oldPos().getTicks() + off_ticks);
 					}
-					else 
+					else
 					{
 						off_ticks += copy->pos().getTicks() - (m_draggedNote->oldPos().getTicks() + off_ticks) - m_draggedNote->length().getTicks();
 					}
-				
+
 					// new off_ticks based on quantized (copy) note and not-quantized notes
-					
+
 					printf("gap_start = %i\n gap_end %i\n", gap_start,gap_end);
 				}
 				int pos_ticks = note->oldPos().getTicks() + off_ticks;
@@ -4669,7 +4669,7 @@ PianoRollWindow::PianoRollWindow() :
 	snap_widget->setLayout(snap_hbox);
 	zoomAndNotesToolBar->addSeparator();
 	zoomAndNotesToolBar->addWidget(snap_widget);
-	
+
 	// setup our actual window
 	setFocusPolicy( Qt::StrongFocus );
 	setFocus();
