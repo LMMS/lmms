@@ -80,12 +80,12 @@ EqControlsDialog::EqControlsDialog( EqControls *controls ) :
 	EqFader * GainFaderIn = new EqFader( &controls->m_inGainModel, tr( "Input gain" ), this, faderBg, faderLeds, faderKnob, &controls->m_inPeakL, &controls->m_inPeakR );
 	GainFaderIn->move( 23, 295 );
 	GainFaderIn->setDisplayConversion( false );
-	GainFaderIn->setHintText( tr( "Gain:" ), "dBv" );
+	GainFaderIn->setHintText( tr( "Gain:" ), " dB" );
 
 	EqFader * GainFaderOut = new EqFader( &controls->m_outGainModel, tr( "Output gain" ), this, faderBg, faderLeds, faderKnob, &controls->m_outPeakL, &controls->m_outPeakR );
 	GainFaderOut->move( 453, 295);
 	GainFaderOut->setDisplayConversion( false );
-	GainFaderOut->setHintText( tr( "Gain:" ), "dBv" );
+	GainFaderOut->setHintText( tr( "Gain:" ), " dB" );
 
 	// Gain Fader for each Filter exepts the pass filter
 	int distance = 126;
@@ -97,7 +97,7 @@ EqControlsDialog::EqControlsDialog( EqControls *controls ) :
 		gainFader->setMinimumHeight(80);
 		gainFader->resize(gainFader->width() , 80);
 		gainFader->setDisplayConversion( false );
-		gainFader->setHintText( tr( "Gain:" ) , "dB" );
+		gainFader->setHintText( tr( "Gain:" ) , " dB" );
 	}
 
 	//Control Button and Knobs for each Band
@@ -115,7 +115,7 @@ EqControlsDialog::EqControlsDialog( EqControls *controls ) :
 		freqKnob->move( distance, 396 );
 		freqKnob->setVolumeKnob( false );
 		freqKnob->setModel( m_parameterWidget->getBandModels( i )->freq );
-		freqKnob->setHintText( tr( "Frequency:" ), "Hz" );
+		freqKnob->setHintText( tr( "Frequency:" ), " Hz" );
 
 		// adds the Number Active buttons
 		PixmapButton * activeButton = new PixmapButton( this, NULL );
