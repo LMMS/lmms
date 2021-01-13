@@ -859,7 +859,7 @@ lb302SynthView::lb302SynthView( Instrument * _instrument, QWidget * _parent ) :
 
 	m_distKnob = new Knob( knobBright_26, this );
 	m_distKnob->move( 210, 190 );
-	m_distKnob->setHintText( tr( "DIST:" ), "" );
+	m_distKnob->setHintText( tr( "Distortion:" ), "" );
 	m_distKnob->setLabel( tr( ""));
 
 

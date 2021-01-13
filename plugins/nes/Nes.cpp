@@ -759,17 +759,17 @@ NesInstrumentView::NesInstrumentView( Instrument * instrument,	QWidget * parent 
 	
 	// channel 1
 	
-	makeknob( m_ch1VolumeKnob, KNOB_X1, KNOB_Y1, tr( "Volume" ), "", "" )
-	makeknob( m_ch1CrsKnob, KNOB_X2, KNOB_Y1, tr( "Coarse detune" ), "", "" )
-	makeknob( m_ch1EnvLenKnob, KNOB_X3, KNOB_Y1, tr( "Envelope length" ), "", "" )
+	makeknob( m_ch1VolumeKnob, KNOB_X1, KNOB_Y1, tr( "Volume:" ), "", "" )
+	makeknob( m_ch1CrsKnob, KNOB_X2, KNOB_Y1, tr( "Coarse detune:" ), "", "" )
+	makeknob( m_ch1EnvLenKnob, KNOB_X3, KNOB_Y1, tr( "Envelope length:" ), "", "" )
 	
 	makenesled( m_ch1EnabledBtn, KNOB_X1, KNOB_Y1 - 12, tr( "Enable channel 1" ) )
 	makenesled( m_ch1EnvEnabledBtn, KNOB_X3, KNOB_Y1 - 12, tr( "Enable envelope 1" ) )
 	makenesled( m_ch1EnvLoopedBtn, 129, KNOB_Y1 - 12, tr( "Enable envelope 1 loop" ) )
 
 	makenesled( m_ch1SweepEnabledBtn, KNOB_X6, KNOB_Y1 - 12, tr( "Enable sweep 1" ) )
-	makeknob( m_ch1SweepAmtKnob, KNOB_X6, KNOB_Y1, tr( "Sweep amount" ), "", "" )
-	makeknob( m_ch1SweepRateKnob, KNOB_X7, KNOB_Y1, tr( "Sweep rate" ), "", "" )
+	makeknob( m_ch1SweepAmtKnob, KNOB_X6, KNOB_Y1, tr( "Sweep amount:" ), "", "" )
+	makeknob( m_ch1SweepRateKnob, KNOB_X7, KNOB_Y1, tr( "Sweep rate:" ), "", "" )
 
 	int dcx = 117;
 	makedcled( ch1_dc1, dcx, 42, tr( "12.5% Duty cycle" ), "nesdc1_on" )
@@ -790,17 +790,17 @@ NesInstrumentView::NesInstrumentView( Instrument * instrument,	QWidget * parent 
 	
 	// channel 2
 	
-	makeknob( m_ch2VolumeKnob, KNOB_X1, KNOB_Y2, tr( "Volume" ), "", "" )
-	makeknob( m_ch2CrsKnob, KNOB_X2, KNOB_Y2, tr( "Coarse detune" ), "", "" )
-	makeknob( m_ch2EnvLenKnob, KNOB_X3, KNOB_Y2, tr( "Envelope length" ), "", "" )
+	makeknob( m_ch2VolumeKnob, KNOB_X1, KNOB_Y2, tr( "Volume:" ), "", "" )
+	makeknob( m_ch2CrsKnob, KNOB_X2, KNOB_Y2, tr( "Coarse detune:" ), "", "" )
+	makeknob( m_ch2EnvLenKnob, KNOB_X3, KNOB_Y2, tr( "Envelope length:" ), "", "" )
 	
 	makenesled( m_ch2EnabledBtn, KNOB_X1, KNOB_Y2 - 12, tr( "Enable channel 2" ) )
 	makenesled( m_ch2EnvEnabledBtn, KNOB_X3, KNOB_Y2 - 12, tr( "Enable envelope 2" ) )
 	makenesled( m_ch2EnvLoopedBtn, 129, KNOB_Y2 - 12, tr( "Enable envelope 2 loop" ) )
 
 	makenesled( m_ch2SweepEnabledBtn, KNOB_X6, KNOB_Y2 - 12, tr( "Enable sweep 2" ) )
-	makeknob( m_ch2SweepAmtKnob, KNOB_X6, KNOB_Y2, tr( "Sweep amount" ), "", "" )
-	makeknob( m_ch2SweepRateKnob, KNOB_X7, KNOB_Y2, tr( "Sweep rate" ), "", "" )
+	makeknob( m_ch2SweepAmtKnob, KNOB_X6, KNOB_Y2, tr( "Sweep amount:" ), "", "" )
+	makeknob( m_ch2SweepRateKnob, KNOB_X7, KNOB_Y2, tr( "Sweep rate:" ), "", "" )
 
 	dcx = 117;
 	makedcled( ch2_dc1, dcx, 99, tr( "12.5% Duty cycle" ), "nesdc1_on" )
@@ -821,15 +821,15 @@ NesInstrumentView::NesInstrumentView( Instrument * instrument,	QWidget * parent 
 	
 	//channel 3
 	makenesled( m_ch3EnabledBtn, KNOB_X1, KNOB_Y3 - 12, tr( "Enable channel 3" ) )
-	makeknob( m_ch3VolumeKnob, KNOB_X1, KNOB_Y3, tr( "Volume" ), "", "" )
-	makeknob( m_ch3CrsKnob, KNOB_X2, KNOB_Y3, tr( "Coarse detune" ), "", "" )
+	makeknob( m_ch3VolumeKnob, KNOB_X1, KNOB_Y3, tr( "Volume:" ), "", "" )
+	makeknob( m_ch3CrsKnob, KNOB_X2, KNOB_Y3, tr( "Coarse detune:" ), "", "" )
 	
 
 	//channel 4
-	makeknob( m_ch4VolumeKnob, KNOB_X1, KNOB_Y4, tr( "Volume" ), "", "" )
-	makeknob( m_ch4NoiseFreqKnob, KNOB_X2, KNOB_Y4, tr( "Noise Frequency" ), "", "" )
-	makeknob( m_ch4EnvLenKnob, KNOB_X3, KNOB_Y4, tr( "Envelope length" ), "", "" )
-	makeknob( m_ch4SweepKnob, KNOB_X4, KNOB_Y4, tr( "Frequency sweep" ), "", "" )
+	makeknob( m_ch4VolumeKnob, KNOB_X1, KNOB_Y4, tr( "Volume:" ), "", "" )
+	makeknob( m_ch4NoiseFreqKnob, KNOB_X2, KNOB_Y4, tr( "Noise Frequency:" ), "", "" )
+	makeknob( m_ch4EnvLenKnob, KNOB_X3, KNOB_Y4, tr( "Envelope length:" ), "", "" )
+	makeknob( m_ch4SweepKnob, KNOB_X4, KNOB_Y4, tr( "Frequency sweep:" ), "", "" )
 	
 	makenesled( m_ch4EnabledBtn, KNOB_X1, KNOB_Y4 - 12, tr( "Enable channel 4" ) )
 	makenesled( m_ch4EnvEnabledBtn, KNOB_X3, KNOB_Y4 - 12, tr( "Enable envelope 4" ) )
@@ -842,8 +842,8 @@ NesInstrumentView::NesInstrumentView( Instrument * instrument,	QWidget * parent 
 
 	
 	//master
-	makeknob( m_masterVolKnob, KNOB_X4, KNOB_Y3, tr( "Master volume" ), "", "" )
-	makeknob( m_vibratoKnob, KNOB_X5, KNOB_Y3, tr( "Vibrato" ), "", "" )
+	makeknob( m_masterVolKnob, KNOB_X4, KNOB_Y3, tr( "Master volume:" ), "", "" )
+	makeknob( m_vibratoKnob, KNOB_X5, KNOB_Y3, tr( "Vibrato:" ), "", "" )
 
 }
 

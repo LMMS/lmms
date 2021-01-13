@@ -99,7 +99,7 @@ Xpressive::Xpressive(InstrumentTrack* instrument_track) :
 	m_interpolateW3(false, this),
 	m_panning1( 1, -1.0f, 1.0f, 0.01f, this, tr("Panning 1")),
 	m_panning2(-1, -1.0f, 1.0f, 0.01f, this, tr("Panning 2")),
-	m_relTransition(50.0f, 0.0f, 500.0f, 1.0f, this, tr("Rel trans")),
+	m_relTransition(50.0f, 0.0f, 500.0f, 1.0f, this, tr("Release transition")),
 	m_W1(GRAPH_LENGTH),
 	m_W2(GRAPH_LENGTH),
 	m_W3(GRAPH_LENGTH),
@@ -450,7 +450,7 @@ XpressiveView::XpressiveView(Instrument * _instrument, QWidget * _parent) :
 	m_panningKnob[1]->move(COL_KNOBS, ROW_KNOBSP2);
 
 	m_relKnob = new XpressiveKnob(this,"Release transition");
-	m_relKnob->setHintText(tr("Release transition:"), "ms");
+	m_relKnob->setHintText(tr("Release transition:"), " ms");
 	m_relKnob->move(COL_KNOBS, ROW_KNOBREL);
 
 
@@ -463,7 +463,7 @@ XpressiveView::XpressiveView(Instrument * _instrument, QWidget * _parent) :
 	m_smoothKnob->setOuterRadius(9);
 	m_smoothKnob->setTotalAngle(280.0);
 	m_smoothKnob->setLineWidth(3);
-	m_smoothKnob->setHintText(tr("Smoothness"), "");
+	m_smoothKnob->setHintText(tr("Smoothness:"), "");
 	m_smoothKnob->move(66, EXPR_TEXT_Y + EXPR_TEXT_H + 4);
 
 	connect(m_generalPurposeKnob[0], SIGNAL(sliderMoved(float)), this,

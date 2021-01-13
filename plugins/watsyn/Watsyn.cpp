@@ -241,10 +241,10 @@ WatsynInstrument::WatsynInstrument( InstrumentTrack * _instrument_track ) :
 		b1_pan( 0.0f, -100.0f, 100.0f, 0.1f, this, tr( "Panning B1" ) ),
 		b2_pan( 0.0f, -100.0f, 100.0f, 0.1f, this, tr( "Panning B2" ) ),
 
-		a1_mult( 8.0f, 1.0, 24.0, 1.0, this, tr( "Freq. multiplier A1" ) ),
-		a2_mult( 8.0f, 1.0, 24.0, 1.0, this, tr( "Freq. multiplier A2" ) ),
-		b1_mult( 8.0f, 1.0, 24.0, 1.0, this, tr( "Freq. multiplier B1" ) ),
-		b2_mult( 8.0f, 1.0, 24.0, 1.0, this, tr( "Freq. multiplier B2" ) ),
+		a1_mult( 8.0f, 1.0, 24.0, 1.0, this, tr( "Frequency multiplier A1" ) ),
+		a2_mult( 8.0f, 1.0, 24.0, 1.0, this, tr( "Frequency multiplier A2" ) ),
+		b1_mult( 8.0f, 1.0, 24.0, 1.0, this, tr( "Frequency multiplier B1" ) ),
+		b2_mult( 8.0f, 1.0, 24.0, 1.0, this, tr( "Frequency multiplier B2" ) ),
 
 		a1_ltune( 0.0f, -600.0f, 600.0f, 1.0f, this, tr( "Left detune A1" ) ),
 		a2_ltune( 0.0f, -600.0f, 600.0f, 1.0f, this, tr( "Left detune A2" ) ),
@@ -676,40 +676,40 @@ WatsynView::WatsynView( Instrument * _instrument,
 
 // knobs... lots of em
 
-	makeknob( a1_volKnob, 130, A1ROW, tr( "Volume" ), "%", "aKnob" )
-	makeknob( a2_volKnob, 130, A2ROW, tr( "Volume" ), "%", "aKnob" )
-	makeknob( b1_volKnob, 130, B1ROW, tr( "Volume" ), "%", "bKnob" )
-	makeknob( b2_volKnob, 130, B2ROW, tr( "Volume" ), "%", "bKnob"  )
+	makeknob( a1_volKnob, 130, A1ROW, tr( "Volume:" ), "%", "aKnob" )
+	makeknob( a2_volKnob, 130, A2ROW, tr( "Volume:" ), "%", "aKnob" )
+	makeknob( b1_volKnob, 130, B1ROW, tr( "Volume:" ), "%", "bKnob" )
+	makeknob( b2_volKnob, 130, B2ROW, tr( "Volume:" ), "%", "bKnob"  )
 
-	makeknob( a1_panKnob, 154, A1ROW, tr( "Panning" ), "", "aKnob" )
-	makeknob( a2_panKnob, 154, A2ROW, tr( "Panning" ), "", "aKnob" )
-	makeknob( b1_panKnob, 154, B1ROW, tr( "Panning" ), "", "bKnob"  )
-	makeknob( b2_panKnob, 154, B2ROW, tr( "Panning" ), "", "bKnob"  )
+	makeknob( a1_panKnob, 154, A1ROW, tr( "Panning:" ), "", "aKnob" )
+	makeknob( a2_panKnob, 154, A2ROW, tr( "Panning:" ), "", "aKnob" )
+	makeknob( b1_panKnob, 154, B1ROW, tr( "Panning:" ), "", "bKnob"  )
+	makeknob( b2_panKnob, 154, B2ROW, tr( "Panning:" ), "", "bKnob"  )
 
-	makeknob( a1_multKnob, 178, A1ROW, tr( "Freq. multiplier" ), "/8", "aKnob" )
-	makeknob( a2_multKnob, 178, A2ROW, tr( "Freq. multiplier" ), "/8", "aKnob" )
-	makeknob( b1_multKnob, 178, B1ROW, tr( "Freq. multiplier" ), "/8", "bKnob"  )
-	makeknob( b2_multKnob, 178, B2ROW, tr( "Freq. multiplier" ), "/8", "bKnob"  )
+	makeknob( a1_multKnob, 178, A1ROW, tr( "Frequency multiplier:" ), "/8", "aKnob" )
+	makeknob( a2_multKnob, 178, A2ROW, tr( "Frequency multiplier:" ), "/8", "aKnob" )
+	makeknob( b1_multKnob, 178, B1ROW, tr( "Frequency multiplier:" ), "/8", "bKnob"  )
+	makeknob( b2_multKnob, 178, B2ROW, tr( "Frequency multiplier:" ), "/8", "bKnob"  )
 
-	makeknob( a1_ltuneKnob, 202, A1ROW, tr( "Left detune" ), tr( " cents" ), "aKnob" )
-	makeknob( a2_ltuneKnob, 202, A2ROW, tr( "Left detune" ), tr( " cents" ), "aKnob" )
-	makeknob( b1_ltuneKnob, 202, B1ROW, tr( "Left detune" ), tr( " cents" ), "bKnob"  )
-	makeknob( b2_ltuneKnob, 202, B2ROW, tr( "Left detune" ), tr( " cents" ), "bKnob"  )
+	makeknob( a1_ltuneKnob, 202, A1ROW, tr( "Left detune:" ), tr( " cents" ), "aKnob" )
+	makeknob( a2_ltuneKnob, 202, A2ROW, tr( "Left detune:" ), tr( " cents" ), "aKnob" )
+	makeknob( b1_ltuneKnob, 202, B1ROW, tr( "Left detune:" ), tr( " cents" ), "bKnob"  )
+	makeknob( b2_ltuneKnob, 202, B2ROW, tr( "Left detune:" ), tr( " cents" ), "bKnob"  )
 
-	makeknob( a1_rtuneKnob, 226, A1ROW, tr( "Right detune" ), tr( " cents" ), "aKnob" )
-	makeknob( a2_rtuneKnob, 226, A2ROW, tr( "Right detune" ), tr( " cents" ), "aKnob" )
-	makeknob( b1_rtuneKnob, 226, B1ROW, tr( "Right detune" ), tr( " cents" ), "bKnob"  )
-	makeknob( b2_rtuneKnob, 226, B2ROW, tr( "Right detune" ), tr( " cents" ), "bKnob"  )
+	makeknob( a1_rtuneKnob, 226, A1ROW, tr( "Right detune:" ), tr( " cents" ), "aKnob" )
+	makeknob( a2_rtuneKnob, 226, A2ROW, tr( "Right detune:" ), tr( " cents" ), "aKnob" )
+	makeknob( b1_rtuneKnob, 226, B1ROW, tr( "Right detune:" ), tr( " cents" ), "bKnob"  )
+	makeknob( b2_rtuneKnob, 226, B2ROW, tr( "Right detune:" ), tr( " cents" ), "bKnob"  )
 
-	makeknob( m_abmixKnob, 4, 3, tr( "A-B Mix" ), "", "mixKnob" )
+	makeknob( m_abmixKnob, 4, 3, tr( "A-B Mix:" ), "", "mixKnob" )
 
-	makeknob( m_envAmtKnob, 88, 3, tr( "Mix envelope amount" ), "", "mixenvKnob" )
+	makeknob( m_envAmtKnob, 88, 3, tr( "Mix envelope amount:" ), "", "mixenvKnob" )
 
-	maketsknob( m_envAttKnob, 88, A1ROW, tr( "Mix envelope attack" ), " ms", "mixenvKnob" )
-	maketsknob( m_envHoldKnob, 88, A2ROW, tr( "Mix envelope hold" ), " ms", "mixenvKnob" )
-	maketsknob( m_envDecKnob, 88, B1ROW, tr( "Mix envelope decay" ), " ms", "mixenvKnob" )
+	maketsknob( m_envAttKnob, 88, A1ROW, tr( "Mix envelope attack:" ), " ms", "mixenvKnob" )
+	maketsknob( m_envHoldKnob, 88, A2ROW, tr( "Mix envelope hold:" ), " ms", "mixenvKnob" )
+	maketsknob( m_envDecKnob, 88, B1ROW, tr( "Mix envelope decay:" ), " ms", "mixenvKnob" )
 
-	makeknob( m_xtalkKnob, 88, B2ROW, tr( "Crosstalk" ), "", "xtalkKnob" )
+	makeknob( m_xtalkKnob, 88, B2ROW, tr( "Crosstalk:" ), "", "xtalkKnob" )
 
 // let's set volume knobs
 	a1_volKnob -> setVolumeKnob( true );
