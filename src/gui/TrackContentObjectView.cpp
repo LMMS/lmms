@@ -578,12 +578,11 @@ void TrackContentObjectView::mousePressEvent( QMouseEvent * me )
 	setInitialOffsets();
 	if( !fixedTCOs() && me->button() == Qt::LeftButton )
 	{
-		if( m_trackView->trackContainerView()->knifeMode() )
+		if( m_trackView->trackContainerView()->knifeMode() && !m_tco->getAutoResize() )
 		{
 			SampleTCO * sTco = dynamic_cast<SampleTCO*>( m_tco );
 
-			if( me->x() < RESIZE_GRIP_WIDTH && sTco
-					&& !m_tco->getAutoResize() )
+			if( me->x() < RESIZE_GRIP_WIDTH && sTco )
 			{
 				m_action = ResizeLeft;
 				setCursor( Qt::SizeHorCursor );
