@@ -151,7 +151,7 @@ public:
 	{
 		if (m_controllerConnection)
 		{
-			if (m_controllerConnection->isControllerMidi() && !m_controllerValue)
+			if (m_controllerConnection->isControllerMidi() && !m_useControllerValue)
 			{
 				return castValue<T>(m_value);
 			}
@@ -310,19 +310,15 @@ public:
 		s_periodCounter = 0;
 	}
 
-	bool isControllerValue()
+	bool useControllerValue()
 	{
-		return m_controllerValue;
-	}
-	void setControllerValue(bool b)
-	{
-		m_controllerValue = b;
+		return m_useControllerValue;
 	}
 
 public slots:
 	virtual void reset();
 	void unlinkControllerConnection();
-	void setAndEmitControllerValue();
+	void setUseControllerValue(bool b = true);
 
 
 protected:
@@ -417,7 +413,7 @@ private:
 	// prevent several threads from attempting to write the same vb at the same time
 	QMutex m_valueBufferMutex;
 
-	bool m_controllerValue;
+	bool m_useControllerValue;
 
 signals:
 	void initValueChanged( float val );

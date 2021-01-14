@@ -54,7 +54,7 @@ AutomatableModel::AutomatableModel(
 	m_valueBuffer( static_cast<int>( Engine::mixer()->framesPerPeriod() ) ),
 	m_lastUpdatedPeriod( -1 ),
 	m_hasSampleExactData(false),
-	m_controllerValue(true)
+	m_useControllerValue(true)
 
 {
 	m_value = fittedValue( val );
@@ -372,14 +372,8 @@ void AutomatableModel::roundAt( T& value, const T& where ) const
 
 void AutomatableModel::setAutomatedValue( const float value )
 {
-	bool emitDataChanged = false;
-
-	if (m_controllerConnection && m_controllerValue && m_controllerConnection->isControllerMidi())
-	{
-		m_controllerValue = false;
-		emitDataChanged = true;
-	}
-
+	setUseControllerValue(false);
+	
 	m_oldValue = m_value;
 	++m_setValueDepth;
 	const float oldValue = m_value;
@@ -401,10 +395,8 @@ void AutomatableModel::setAutomatedValue( const float value )
 			}
 		}
 		m_valueChanged = true;
-		emitDataChanged = true;
+		emit dataChanged();
 	}
-
-	if (emitDataChanged) {emit dataChanged();}
 	--m_setValueDepth;
 }
 
@@ -595,7 +587,7 @@ float AutomatableModel::controllerValue( int frameOffset ) const
 	}
 
 	AutomatableModel* lm = m_linkedModels.first();
-	if (lm->controllerConnection() && lm->isControllerValue())
+	if (lm->controllerConnection() && lm->useControllerValue())
 	{
 		return fittedValue( lm->controllerValue( frameOffset ) );
 	}
@@ -618,7 +610,7 @@ ValueBuffer * AutomatableModel::valueBuffer()
 	float val = m_value; // make sure our m_value doesn't change midway
 
 	ValueBuffer * vb;
-	if (m_controllerConnection && m_controllerValue && m_controllerConnection->getController()->isSampleExact())
+	if (m_controllerConnection && m_useControllerValue && m_controllerConnection->getController()->isSampleExact())
 	{
 		vb = m_controllerConnection->valueBuffer();
 		if( vb )
@@ -657,7 +649,7 @@ ValueBuffer * AutomatableModel::valueBuffer()
 		{
 			lm = m_linkedModels.first();
 		}
-		if (lm && lm->controllerConnection() && lm->isControllerValue() &&
+		if (lm && lm->controllerConnection() && lm->useControllerValue() &&
 				lm->controllerConnection()->getController()->isSampleExact())
 		{
 			vb = lm->valueBuffer();
@@ -782,10 +774,19 @@ float AutomatableModel::globalAutomationValueAt( const MidiTime& time )
 	}
 }
 
-void AutomatableModel::setAndEmitControllerValue()
+void AutomatableModel::setUseControllerValue(bool b)
 {
-	m_controllerValue = true;
-	emit dataChanged();
+	if (b)
+	{
+		m_useControllerValue = true;
+		emit dataChanged();
+	}
+	else if (m_controllerConnection && m_useControllerValue && m_controllerConnection->isControllerMidi())
+	{
+		m_useControllerValue = false;
+		emit dataChanged();
+	}
+	
 }
 
 float FloatModel::getRoundedValue() const

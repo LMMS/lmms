@@ -477,7 +477,7 @@ void Song::processAutomations(const TrackList &tracklist, MidiTime timeStart, fp
 				am->controllerConnection()->isControllerMidi() &&
 				!values.contains(am))
 			{
-				am->setAndEmitControllerValue();
+				am->setUseControllerValue(true);
 			}
 		}
 	}
@@ -490,9 +490,9 @@ void Song::processAutomations(const TrackList &tracklist, MidiTime timeStart, fp
 		{
 			it.key()->setAutomatedValue(it.value());
 		}
-		else if (!it.key()->isControllerValue())
+		else if (!it.key()->useControllerValue())
 		{
-			it.key()->setAndEmitControllerValue();
+			it.key()->setUseControllerValue(true);
 		}
 	}
 }

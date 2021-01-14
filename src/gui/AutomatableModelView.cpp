@@ -269,7 +269,7 @@ void AutomatableModelViewSlots::pasteFromClipboard()
 void AutomatableModelViewSlots::disconnectStopSignalMidi(AutomatableModel * autmod)
 {
 	disconnect(Engine::getSong(), SIGNAL(stopped()),
-		   autmod, SLOT(setAndEmitControllerValue()));
+		   autmod, SLOT(setUseControllerValue()));
 }
 
 /// Attempt to parse a float from the clipboard

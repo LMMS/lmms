@@ -125,7 +125,7 @@ void ControllerConnection::setController( Controller * _controller )
 	{
 
 		connect(Engine::getSong(), SIGNAL(stopped()),
-			m_controlledModel, SLOT(setAndEmitControllerValue()),
+			m_controlledModel, SLOT(setUseControllerValue()),
 				Qt::UniqueConnection);
 
 		m_ownsController = true;
@@ -136,7 +136,7 @@ void ControllerConnection::setController( Controller * _controller )
 		m_ownsController = false;
 		m_controllerMidi = false;
 	}
-	m_controlledModel->setControllerValue(true);
+	m_controlledModel->setUseControllerValue(true);
 
 	// If we don't own the controller, allow deletion of controller
 	// to delete the connection
