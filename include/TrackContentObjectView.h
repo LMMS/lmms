@@ -120,6 +120,9 @@ public:
 
 	QColor getColorForDisplay( QColor );
 
+	void inline setMarkerPos(int x) { m_markerPos = x; }
+	void inline setMarkerEnabled(bool e) { m_marker = e; }
+
 public slots:
 	virtual bool close();
 	void remove();
@@ -143,6 +146,9 @@ protected:
 	TimePos m_initialTCOPos;
 	TimePos m_initialTCOEnd;
 
+	bool m_marker = false;
+	int m_markerPos = 0;
+
 	virtual void constructContextMenu( QMenu * )
 	{
 	}
@@ -162,7 +168,7 @@ protected:
 	}
 
 	bool unquantizedModHeld( QMouseEvent * me );
-	TimePos quantizeMarkerPos( TimePos, bool shiftMode );
+	TimePos quantizeSplitPos( TimePos, bool shiftMode );
 
 	float pixelsPerBar();
 
@@ -229,7 +235,7 @@ private:
 	TimePos draggedTCOPos( QMouseEvent * me );
 	int knifeMarkerPos( QMouseEvent * me );
 	//! Return true iff TCO could be split. Currently only implemented for samples
-	virtual bool splitTCO( QMouseEvent * me ){ return false; };
+	virtual bool splitTCO( const TimePos pos ){ return false; };
 } ;
 
 

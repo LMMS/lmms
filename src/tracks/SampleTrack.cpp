@@ -631,9 +631,9 @@ void SampleTCOView::paintEvent( QPaintEvent * pe )
 			embed::getIconPixmap( "muted", size, size ) );
 	}
 
-	if ( m_tco->m_marker )
+	if ( m_marker )
 	{
-		p.drawLine(m_tco->m_markerPos, rect().bottom(), m_tco->m_markerPos, rect().top());
+		p.drawLine(m_markerPos, rect().bottom(), m_markerPos, rect().top());
 	}
 	// recording sample tracks is not possible at the moment
 
@@ -668,21 +668,13 @@ void SampleTCOView::reverseSample()
 
 
 
-//! Split this TCO
-bool SampleTCOView::splitTCO( QMouseEvent * me )
+//! Split this TCO.
+/*! \param pos the position of the split, relative to the start of the clip */
+bool SampleTCOView::splitTCO( const TimePos pos )
 {
-	m_tco->setMarkerEnabled( false );
+	setMarkerEnabled( false );
 
-	const int relativePixelPos = me->pos().x();
-	const float ppb = m_trackView->trackContainerView()->pixelsPerBar();
-	TimePos splitPos = relativePixelPos * TimePos::ticksPerBar() / ppb;
-
-	if ( !unquantizedModHeld(me) )
-	{
-		splitPos = quantizeMarkerPos( splitPos, me->modifiers() & Qt::ShiftModifier );
-	}
-
-	splitPos += m_initialTCOPos;
+	const TimePos splitPos = m_initialTCOPos + pos;
 
 	//Don't split if we slid off the TCO or if we're on the clip's start/end
 	//Cutting at exactly the start/end position would create a zero length

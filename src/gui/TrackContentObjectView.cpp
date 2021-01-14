@@ -597,8 +597,8 @@ void TrackContentObjectView::mousePressEvent( QMouseEvent * me )
 			{
 				m_action = Split;
 				setCursor( m_cursorKnife );
-				sTco->setMarkerPos( knifeMarkerPos( me ) );
-				sTco->setMarkerEnabled( true );
+				setMarkerPos( knifeMarkerPos( me ) );
+				setMarkerEnabled( true );
 				update();
 			}
 			// We can't split anything except samples right now, so disable the
@@ -706,7 +706,7 @@ void TrackContentObjectView::mousePressEvent( QMouseEvent * me )
 			SampleTCO * sTco = dynamic_cast<SampleTCO*>( m_tco );
 			if (sTco)
 			{
-				sTco->setMarkerEnabled( false );
+				setMarkerEnabled( false );
 				update();
 			}
 		}
@@ -934,7 +934,7 @@ void TrackContentObjectView::mouseMoveEvent( QMouseEvent * me )
 		SampleTCO * sTco = dynamic_cast<SampleTCO*>( m_tco );
 		if (sTco) {
 			setCursor( m_cursorKnife );
-			sTco->setMarkerPos( knifeMarkerPos( me ) );
+			setMarkerPos( knifeMarkerPos( me ) );
 		}
 		update();
 	}
@@ -984,7 +984,15 @@ void TrackContentObjectView::mouseReleaseEvent( QMouseEvent * me )
 		// TODO: Fix m_tco->setJournalling() consistency
 		m_tco->setJournalling( true );
 	}
-	else if( m_action == Split ) { splitTCO( me ); }
+	else if( m_action == Split )
+	{
+		const float ppb = m_trackView->trackContainerView()->pixelsPerBar();
+		const TimePos relPos = me->pos().x() * TimePos::ticksPerBar() / ppb;
+		splitTCO(unquantizedModHeld(me) ?
+			relPos :
+			quantizeSplitPos(relPos, me->modifiers() & Qt::ShiftModifier)
+		);
+	}
 
 	m_action = NoAction;
 	delete m_hint;
@@ -1393,7 +1401,7 @@ int TrackContentObjectView::knifeMarkerPos( QMouseEvent * me )
 		const float ppb = m_trackView->trackContainerView()->pixelsPerBar();
 		TimePos midiPos = markerPos * TimePos::ticksPerBar() / ppb;
 		//2: Snap to the correct position, based on modifier keys
-		midiPos = quantizeMarkerPos( midiPos, me->modifiers() & Qt::ShiftModifier );
+		midiPos = quantizeSplitPos( midiPos, me->modifiers() & Qt::ShiftModifier );
 		//3: Convert back to a pixel position
 		return midiPos * ppb / TimePos::ticksPerBar();
 	}
@@ -1402,7 +1410,7 @@ int TrackContentObjectView::knifeMarkerPos( QMouseEvent * me )
 
 
 
-TimePos TrackContentObjectView::quantizeMarkerPos( TimePos midiPos, bool shiftMode )
+TimePos TrackContentObjectView::quantizeSplitPos( TimePos midiPos, bool shiftMode )
 {
 	const float snapSize = gui->songEditor()->m_editor->getSnapSize();
 	if ( shiftMode )
