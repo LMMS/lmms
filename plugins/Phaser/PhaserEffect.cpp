@@ -40,7 +40,7 @@ Plugin::Descriptor PLUGIN_EXPORT Phaser_plugin_descriptor =
 {
 	STRINGIFY(PLUGIN_NAME),
 	"Phaser",
-	QT_TRANSLATE_NOOP("pluginBrowser", "A versatile phaser plugin"),
+	QT_TRANSLATE_NOOP("PluginBrowser", "A versatile phaser plugin"),
 	"Lost Robot <r94231@gmail.com>",
 	0x0100,
 	Plugin::Effect,
