@@ -36,7 +36,7 @@ Plugin::Descriptor PLUGIN_EXPORT compressor_plugin_descriptor =
 {
 	STRINGIFY(PLUGIN_NAME),
 	"Compressor",
-	QT_TRANSLATE_NOOP("pluginBrowser", "A dynamic range compressor."),
+	QT_TRANSLATE_NOOP("PluginBrowser", "A dynamic range compressor."),
 	"Lost Robot <r94231@gmail.com>",
 	0x0100,
 	Plugin::Effect,
