@@ -36,7 +36,7 @@ Plugin::Descriptor PLUGIN_EXPORT stereocontrol_plugin_descriptor =
 {
 	STRINGIFY(PLUGIN_NAME),
 	"Stereo Control",
-	QT_TRANSLATE_NOOP("pluginBrowser", "General utility and stereo processing, including multiple types of panning and stereo enhancement."),
+	QT_TRANSLATE_NOOP("PluginBrowser", "General utility and stereo processing, including multiple types of panning and stereo enhancement."),
 	"Lost Robot <r94231@gmail.com>",
 	0x0100,
 	Plugin::Effect,
@@ -281,11 +281,11 @@ bool StereoControlEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frame
 
 				if (pan >= 0)
 				{
-					haasDelayVal[0] = linearInterpolate(0, 0.0008f * m_sampleRate * panDelay, abs(pan));
+					haasDelayVal[0] = 0.0008f * m_sampleRate * panDelay * asin(pan);
 				}
 				else
 				{
-					haasDelayVal[1] = linearInterpolate(0, 0.0008f * m_sampleRate * panDelay, abs(pan));
+					haasDelayVal[1] = 0.0008f * m_sampleRate * panDelay * asin(-pan);
 				}
 
 				for (int i = 0; i < 2; ++i)
@@ -337,7 +337,8 @@ bool StereoControlEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frame
 				float lp;
 				float hp;
 
-				// Filter parameters are semi-arbitrary, but are vaguely based on some random graphs I saw during research
+				// Filter parameters are semi-arbitrary, but are vaguely based on some random graphs I found here:
+				// https://goodhertz.co/panpot/
 				float temp = -abs(pan) + 1.f;
 				float filtFreq = 2000.f + 8000.f * temp * temp;
 				float hpGain = abs(pan) < 0.5 ? 1.f - abs(pan) * 2.f : 0.f;
@@ -423,7 +424,7 @@ void StereoControlEffect::changeSampleRate()
 	m_delayBuf[0].resize(m_delayBufSize);
 	m_delayBuf[1].resize(m_delayBufSize);
 
-	m_haasBufSize = int(m_sampleRate * 0.002f) + 1.f;
+	m_haasBufSize = int(m_sampleRate * 0.0008f * F_PI) + 1.f;
 	m_haasBuf[0].resize(m_haasBufSize);
 	m_haasBuf[1].resize(m_haasBufSize);
 }
