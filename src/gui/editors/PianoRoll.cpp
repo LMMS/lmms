@@ -3377,7 +3377,6 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 				{
 					len_ticks = 4;
 				}
-				const int key = note->key() - m_startKey + 1;
 
 				int pos_ticks = note->pos();
 
@@ -3396,7 +3395,7 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 
 					// we've done and checked all, let's draw the note
 					drawNoteRect(
-						p, x + m_whiteKeyWidth, y_base - key * m_keyLineHeight, note_width,
+						p, x + m_whiteKeyWidth, (topKey - note->key()) * m_keyLineHeight + keyAreaTop() - 1, note_width,
 						note, m_ghostNoteColor, m_ghostNoteTextColor, m_selectedNoteColor,
 						m_ghostNoteOpacity, m_ghostNoteBorders, drawNoteNames);
 				}
@@ -3434,10 +3433,9 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 			// is the note in visible area?
 			if (note->key() > bottomKey && note->key() <= topKey)
 			{
-
 				// we've done and checked all, let's draw the note
 				drawNoteRect(
-					p, x + m_whiteKeyWidth, y_base - key * m_keyLineHeight, note_width,
+					p, x + m_whiteKeyWidth, (topKey - note->key()) * m_keyLineHeight + keyAreaTop() - 1, note_width,
 					note, m_noteColor, m_noteTextColor, m_selectedNoteColor,
 					m_noteOpacity, m_noteBorders, drawNoteNames);
 			}
@@ -3540,7 +3538,6 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 				continue;
 			}
 
-			const int key = note->key() - m_startKey + 1;
 
 			int pos_ticks = note->pos();
 
@@ -3559,7 +3556,7 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 
 				// we've done and checked all, let's draw the note
 				drawNoteRect(
-					p, x + m_whiteKeyWidth, y_base - key * m_keyLineHeight, note_width,
+					p, x + m_whiteKeyWidth, (topKey - note->key()) * m_keyLineHeight + keyAreaTop() - 1, note_width,
 					note, m_stepRecorder.curStepNoteColor(), m_noteTextColor, m_selectedNoteColor,
 					m_noteOpacity, m_noteBorders, drawNoteNames);
 			}
