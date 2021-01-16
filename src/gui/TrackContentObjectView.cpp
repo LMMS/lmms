@@ -578,34 +578,10 @@ void TrackContentObjectView::mousePressEvent( QMouseEvent * me )
 	setInitialOffsets();
 	if( !fixedTCOs() && me->button() == Qt::LeftButton )
 	{
-		if( m_trackView->trackContainerView()->knifeMode() && !m_tco->getAutoResize() )
-		{
-			SampleTCO * sTco = dynamic_cast<SampleTCO*>( m_tco );
+		SampleTCO * sTco = dynamic_cast<SampleTCO*>( m_tco );
+		const bool knifeMode = m_trackView->trackContainerView()->knifeMode();
 
-			if( me->x() < RESIZE_GRIP_WIDTH && sTco )
-			{
-				m_action = ResizeLeft;
-				setCursor( Qt::SizeHorCursor );
-			}
-			else if( me->x() >= width() - RESIZE_GRIP_WIDTH )
-			{
-				m_action = Resize;
-				setCursor( Qt::SizeHorCursor );
-			}
-			else if (sTco)
-			{
-				m_action = Split;
-				setCursor( m_cursorKnife );
-				setMarkerPos( knifeMarkerPos( me ) );
-				setMarkerEnabled( true );
-				update();
-			}
-			// We can't split anything except samples right now, so disable the
-			// action to avoid entering if statements we don't need to. This
-			// also saves us a few 'if(sTco)' checks
-			else { m_action = NoAction; }
-		}
-		else if ( me->modifiers() & Qt::ControlModifier )
+		if ( me->modifiers() & Qt::ControlModifier && !(sTco && knifeMode) )
 		{
 			if( isSelected() )
 			{
@@ -616,9 +592,7 @@ void TrackContentObjectView::mousePressEvent( QMouseEvent * me )
 				m_action = ToggleSelected;
 			}
 		}
-		else if( !me->modifiers()
-			|| (me->modifiers() & Qt::AltModifier)
-			|| (me->modifiers() & Qt::ShiftModifier) )
+		else
 		{
 			if( isSelected() )
 			{
@@ -635,22 +609,33 @@ void TrackContentObjectView::mousePressEvent( QMouseEvent * me )
 				setInitialPos( me->pos() );
 				setInitialOffsets();
 
-				SampleTCO * sTco = dynamic_cast<SampleTCO*>( m_tco );
-				if( me->x() < RESIZE_GRIP_WIDTH && sTco
-						&& !m_tco->getAutoResize() )
+				if( m_tco->getAutoResize() )
+				{	// Always move clips that can't be manually resized
+					m_action = Move;
+					setCursor( Qt::SizeAllCursor );
+				}
+				else if( me->x() >= width() - RESIZE_GRIP_WIDTH )
+				{
+					m_action = Resize;
+					setCursor( Qt::SizeHorCursor );
+				}
+				else if( me->x() < RESIZE_GRIP_WIDTH && sTco )
 				{
 					m_action = ResizeLeft;
 					setCursor( Qt::SizeHorCursor );
 				}
-				else if( m_tco->getAutoResize() || me->x() < width() - RESIZE_GRIP_WIDTH )
+				else if( sTco && knifeMode )
 				{
-					m_action = Move;
-					setCursor( Qt::SizeAllCursor );
+					m_action = Split;
+					setCursor( m_cursorKnife );
+					setMarkerPos( knifeMarkerPos( me ) );
+					setMarkerEnabled( true );
+					update();
 				}
 				else
 				{
-					m_action = Resize;
-					setCursor( Qt::SizeHorCursor );
+					m_action = Move;
+					setCursor( Qt::SizeAllCursor );
 				}
 
 				if( m_action == Move )

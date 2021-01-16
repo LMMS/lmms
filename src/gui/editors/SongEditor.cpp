@@ -1047,6 +1047,13 @@ void SongEditorWindow::updateSnapLabel(){
 
 
 
+void SongEditorWindow::syncEditMode(){
+	m_editModeGroup->checkedAction()->trigger();
+}
+
+
+
+
 void SongEditorWindow::resizeEvent(QResizeEvent *event)
 {
 	emit resized();
@@ -1123,32 +1130,4 @@ void SongEditorWindow::adjustUiAfterProjectLoad()
 			qobject_cast<QMdiSubWindow *>( parentWidget() ) );
 	connect( qobject_cast<SubWindow *>( parentWidget() ), SIGNAL( focusLost() ), this, SLOT( lostFocus() ) );
 	m_editor->scrolled(0);
-}
-
-
-
-
-void SongEditorWindow::keyPressEvent( QKeyEvent *ke )
-{
-	if( ke->key() == Qt::Key_Control )
-	{
-		m_crtlAction = m_editModeGroup->checkedAction();
-		m_selectModeAction->setChecked( true );
-		m_selectModeAction->trigger();
-	}
-}
-
-
-
-
-void SongEditorWindow::keyReleaseEvent( QKeyEvent *ke )
-{
-	if( ke->key() == Qt::Key_Control )
-	{
-		if( m_crtlAction )
-		{
-			m_crtlAction->setChecked( true );
-			m_crtlAction->trigger();
-		}
-	}
 }

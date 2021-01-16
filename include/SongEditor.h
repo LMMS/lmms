@@ -176,6 +176,7 @@ public:
 	QSize sizeHint() const override;
 
 	SongEditor* m_editor;
+	void syncEditMode();
 
 protected:
 	void resizeEvent( QResizeEvent * event ) override;
@@ -197,9 +198,6 @@ signals:
 	void resized();
 
 private:
-	void keyPressEvent( QKeyEvent * ke ) override;
-	void keyReleaseEvent( QKeyEvent * ke ) override;
-
 	QAction* m_addBBTrackAction;
 	QAction* m_addSampleTrackAction;
 	QAction* m_addAutomationTrackAction;
