@@ -724,8 +724,13 @@ void PianoRoll::fitNoteLengths(bool shrink, bool grow)
 			notes = m_pattern->notes();
 		}
 
-		// Sort notes by position
-		std::sort(notes.begin(), notes.end(), Note::lessThan);
+		// Sort notes by position, then length
+		std::sort(notes.begin(), notes.end(), [](const Note *n1, const Note *n2) {
+			if (n1->pos() == n2->pos()) {
+				return n1->length() < n2->length();
+			}
+			return n1->pos() < n2->pos();
+		});
 
 		NoteVector chordGroup;
 		TimePos chordLength;
@@ -734,6 +739,7 @@ void PianoRoll::fitNoteLengths(bool shrink, bool grow)
 			chordGroup.append(notes[i]);
 
 			// Stretch last chord to end of bar
+			// in this case notes[i] will always be the longest note in the chord
 			if (i+1 == notes.count())
 			{
 				chordLength = notes[i]->endPos().nextFullBar() * TimePos::ticksPerBar() - notes[i]->pos();
