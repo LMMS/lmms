@@ -43,6 +43,7 @@
 #include "ProjectVersion.h"
 #include "SongEditor.h"
 #include "TextFloat.h"
+#include "Track.h"
 
 #include "lmmsversion.h"
 
@@ -59,7 +60,8 @@ const std::vector<DataFile::UpgradeMethod> DataFile::UPGRADE_METHODS = {
 	&DataFile::upgrade_0_4_0_beta1      ,   &DataFile::upgrade_0_4_0_rc2,
 	&DataFile::upgrade_1_0_99           ,   &DataFile::upgrade_1_1_0,
 	&DataFile::upgrade_1_1_91           ,   &DataFile::upgrade_1_2_0_rc3,
-	&DataFile::upgrade_1_3_0            ,   &DataFile::upgrade_noHiddenClipNames
+	&DataFile::upgrade_1_3_0            ,   &DataFile::upgrade_noHiddenClipNames,
+	&DataFile::upgrade_noHiddenAutomationTracks
 };
 
 // Vector of all versions that have upgrade routines.
@@ -1354,7 +1356,39 @@ void DataFile::upgrade_1_3_0()
 			}
 		}
 	}
+}
 
+void DataFile::upgrade_noHiddenClipNames()
+{
+	QDomNodeList tracks = elementsByTagName("track");
+
+	auto clearDefaultNames = [](QDomNodeList clips, QString trackName)
+	{
+		for (int j = 0; j < clips.size(); ++j)
+		{
+			QDomElement clip = clips.item(j).toElement();
+			QString clipName = clip.attribute("name", "");
+			if (clipName == trackName) { clip.setAttribute("name", ""); }
+		}
+	};
+
+	for (int i = 0; i < tracks.size(); ++i)
+	{
+		QDomElement track = tracks.item(i).toElement();
+		QString trackName = track.attribute("name", "");
+
+		QDomNodeList instClips = track.elementsByTagName("pattern");
+		QDomNodeList autoClips = track.elementsByTagName("automationpattern");
+		QDomNodeList bbClips = track.elementsByTagName("bbtco");
+
+		clearDefaultNames(instClips, trackName);
+		clearDefaultNames(autoClips, trackName);
+		clearDefaultNames(bbClips, trackName);
+	}
+}
+
+void DataFile::upgrade_noHiddenAutomationTracks()
+{
 	// convert global automation tracks to non-hidden
 	QDomElement song = firstChildElement("lmms-project")
 		.firstChildElement("song");
@@ -1388,35 +1422,6 @@ void DataFile::upgrade_1_3_0()
 		}
 		// Remove the track object just in case
 		gaTrack.parentNode().removeChild(gaTrack);
-	}
-}
-
-void DataFile::upgrade_noHiddenClipNames()
-{
-	QDomNodeList tracks = elementsByTagName("track");
-
-	auto clearDefaultNames = [](QDomNodeList clips, QString trackName)
-	{
-		for (int j = 0; j < clips.size(); ++j)
-		{
-			QDomElement clip = clips.item(j).toElement();
-			QString clipName = clip.attribute("name", "");
-			if (clipName == trackName) { clip.setAttribute("name", ""); }
-		}
-	};
-
-	for (int i = 0; i < tracks.size(); ++i)
-	{
-		QDomElement track = tracks.item(i).toElement();
-		QString trackName = track.attribute("name", "");
-
-		QDomNodeList instClips = track.elementsByTagName("pattern");
-		QDomNodeList autoClips = track.elementsByTagName("automationpattern");
-		QDomNodeList bbClips = track.elementsByTagName("bbtco");
-
-		clearDefaultNames(instClips, trackName);
-		clearDefaultNames(autoClips, trackName);
-		clearDefaultNames(bbClips, trackName);
 	}
 }
 
