@@ -1615,35 +1615,6 @@ void DataFile::upgrade_1_3_0()
 	}
 }
 
-void DataFile::upgrade_noHiddenClipNames()
-{
-	QDomNodeList tracks = elementsByTagName("track");
-
-	auto clearDefaultNames = [](QDomNodeList clips, QString trackName)
-	{
-		for (int j = 0; j < clips.size(); ++j)
-		{
-			QDomElement clip = clips.item(j).toElement();
-			QString clipName = clip.attribute("name", "");
-			if (clipName == trackName) { clip.setAttribute("name", ""); }
-		}
-	};
-
-	for (int i = 0; i < tracks.size(); ++i)
-	{
-		QDomElement track = tracks.item(i).toElement();
-		QString trackName = track.attribute("name", "");
-
-		QDomNodeList instClips = track.elementsByTagName("pattern");
-		QDomNodeList autoClips = track.elementsByTagName("automationpattern");
-		QDomNodeList bbClips = track.elementsByTagName("bbtco");
-
-		clearDefaultNames(instClips, trackName);
-		clearDefaultNames(autoClips, trackName);
-		clearDefaultNames(bbClips, trackName);
-	}
-}
-
 void DataFile::upgrade_noHiddenAutomationTracks()
 {
 	// convert global automation tracks to non-hidden
