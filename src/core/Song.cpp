@@ -1159,7 +1159,6 @@ bool Song::saveProjectFile( const QString & filename )
 
 	saveState( dataFile, dataFile.content() );
 
-	m_globalAutomationTrack->saveState( dataFile, dataFile.content() );
 	Engine::fxMixer()->saveState( dataFile, dataFile.content() );
 	if( gui )
 	{
