@@ -99,11 +99,6 @@ public:
 		return classNodeName();
 	}
 
-	bool isControllerMidi()
-	{
-		return m_controllerMidi;
-	}
-
 public slots:
 	void deleteConnection();
 
@@ -117,7 +112,6 @@ protected:
 
 	static ControllerConnectionVector s_connections;
 
-	bool m_controllerMidi;
 	AutomatableModel * m_controlledModel;
 
 signals:

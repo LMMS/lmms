@@ -121,21 +121,13 @@ void ControllerConnection::setController( Controller * _controller )
 				this, SIGNAL( valueChanged() ), Qt::DirectConnection );
 	}
 
-	if (_controller->type() == Controller::MidiController)
-	{
+	m_ownsController =
+		(_controller->type() == Controller::MidiController);
 
 		connect(Engine::getSong(), SIGNAL(stopped()),
 			m_controlledModel, SLOT(setUseControllerValue()),
 				Qt::UniqueConnection);
 
-		m_ownsController = true;
-		m_controllerMidi = true;
-	}
-	else
-	{
-		m_ownsController = false;
-		m_controllerMidi = false;
-	}
 	m_controlledModel->setUseControllerValue(true);
 
 	// If we don't own the controller, allow deletion of controller

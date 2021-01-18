@@ -186,11 +186,6 @@ void AutomatableModelViewSlots::execConnectionDialog()
 			// Update
 			if( m->controllerConnection() )
 			{
-				if (m->controllerConnection()->isControllerMidi() &&
-						!(d.chosenController()->type() == Controller::MidiController))
-				{
-					disconnectStopSignalMidi(m);
-				}
 				m->controllerConnection()->setController( d.chosenController() );
 			}
 			// New
@@ -218,10 +213,9 @@ void AutomatableModelViewSlots::removeConnection()
 
 	if( m->controllerConnection() )
 	{
-		if (m->controllerConnection()->isControllerMidi())
-		{
-			disconnectStopSignalMidi(m);
-		}
+		disconnect(Engine::getSong(), SIGNAL(stopped()),
+			   m, SLOT(setUseControllerValue()));
+
 		delete m->controllerConnection();
 		m->setControllerConnection( NULL );
 		emit m->dataChanged();
@@ -264,12 +258,6 @@ void AutomatableModelViewSlots::pasteFromClipboard()
 	if (isNumber) {
 		m_amv->modelUntyped()->setValue(number);
 	}
-}
-
-void AutomatableModelViewSlots::disconnectStopSignalMidi(AutomatableModel * autmod)
-{
-	disconnect(Engine::getSong(), SIGNAL(stopped()),
-		   autmod, SLOT(setUseControllerValue()));
 }
 
 /// Attempt to parse a float from the clipboard

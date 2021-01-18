@@ -473,9 +473,7 @@ void Song::processAutomations(const TrackList &tracklist, MidiTime timeStart, fp
 		for (auto it = m_oldAutomatedValues.begin(); it != m_oldAutomatedValues.end(); it++)
 		{
 			AutomatableModel * am = it.key();
-			if (am->controllerConnection() &&
-				am->controllerConnection()->isControllerMidi() &&
-				!values.contains(am))
+			if (am->controllerConnection() && !values.contains(am))
 			{
 				am->setUseControllerValue(true);
 			}

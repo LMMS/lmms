@@ -102,8 +102,6 @@ private slots:
 protected:
 	AutomatableModelView* m_amv;
 
-	void disconnectStopSignalMidi(AutomatableModel * autmod);
-
 } ;
 
 

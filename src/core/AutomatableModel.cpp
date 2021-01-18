@@ -373,7 +373,7 @@ void AutomatableModel::roundAt( T& value, const T& where ) const
 void AutomatableModel::setAutomatedValue( const float value )
 {
 	setUseControllerValue(false);
-	
+
 	m_oldValue = m_value;
 	++m_setValueDepth;
 	const float oldValue = m_value;
@@ -781,12 +781,11 @@ void AutomatableModel::setUseControllerValue(bool b)
 		m_useControllerValue = true;
 		emit dataChanged();
 	}
-	else if (m_controllerConnection && m_useControllerValue && m_controllerConnection->isControllerMidi())
+	else if (m_controllerConnection && m_useControllerValue)
 	{
 		m_useControllerValue = false;
 		emit dataChanged();
 	}
-	
 }
 
 float FloatModel::getRoundedValue() const

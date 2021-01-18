@@ -151,7 +151,7 @@ public:
 	{
 		if (m_controllerConnection)
 		{
-			if (m_controllerConnection->isControllerMidi() && !m_useControllerValue)
+			if (!m_useControllerValue)
 			{
 				return castValue<T>(m_value);
 			}
