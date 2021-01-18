@@ -124,9 +124,9 @@ void ControllerConnection::setController( Controller * _controller )
 	m_ownsController =
 		(_controller->type() == Controller::MidiController);
 
-		connect(Engine::getSong(), SIGNAL(stopped()),
-			m_controlledModel, SLOT(setUseControllerValue()),
-				Qt::UniqueConnection);
+	connect(Engine::getSong(), SIGNAL(stopped()),
+		m_controlledModel, SLOT(setUseControllerValue()),
+			Qt::UniqueConnection);
 
 	m_controlledModel->setUseControllerValue(true);
 
