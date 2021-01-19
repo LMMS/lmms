@@ -58,6 +58,7 @@
 #include "StringPairDrag.h"
 #include "TextFloat.h"
 #include "ToolTip.h"
+#include "Clipboard.h"
 
 
 #include "embed.h"
@@ -71,7 +72,7 @@ Plugin::Descriptor Q_DECL_EXPORT  vestige_plugin_descriptor =
 {
 	STRINGIFY( PLUGIN_NAME ),
 	"VeSTige",
-	QT_TRANSLATE_NOOP( "pluginBrowser",
+	QT_TRANSLATE_NOOP( "PluginBrowser",
 			"VST-host for using VST(i)-plugins within LMMS" ),
 	"Tobias Doerffel <tobydox/at/users.sf.net>",
 	0x0100,
@@ -410,7 +411,7 @@ void vestigeInstrument::play( sampleFrame * _buf )
 
 
 
-bool vestigeInstrument::handleMidiEvent( const MidiEvent& event, const MidiTime& time, f_cnt_t offset )
+bool vestigeInstrument::handleMidiEvent( const MidiEvent& event, const TimePos& time, f_cnt_t offset )
 {
 	m_pluginMutex.lock();
 	if( m_plugin != NULL )
@@ -833,10 +834,13 @@ void VestigeInstrumentView::noteOffAll( void )
 
 void VestigeInstrumentView::dragEnterEvent( QDragEnterEvent * _dee )
 {
-	if( _dee->mimeData()->hasFormat( StringPairDrag::mimeType() ) )
+	// For mimeType() and MimeType enum class
+	using namespace Clipboard;
+
+	if( _dee->mimeData()->hasFormat( mimeType( MimeType::StringPair ) ) )
 	{
 		QString txt = _dee->mimeData()->data(
-						StringPairDrag::mimeType() );
+						mimeType( MimeType::StringPair ) );
 		if( txt.section( ':', 0, 0 ) == "vstplugin" )
 		{
 			_dee->acceptProposedAction();
@@ -991,7 +995,7 @@ manageVestigeInstrumentView::manageVestigeInstrumentView( Instrument * _instrume
 		{
 			sprintf( paramStr, "%d", i);
 			m_vi->knobFModel[ i ] = new FloatModel( LocaleHelper::toFloat(s_dumpValues.at(2)),
-				0.0f, 1.0f, 0.01f, castModel<vestigeInstrument>(), tr( paramStr ) );
+				0.0f, 1.0f, 0.01f, castModel<vestigeInstrument>(), paramStr );
 		}
 
 		FloatModel * model = m_vi->knobFModel[i];
@@ -1175,10 +1179,13 @@ void manageVestigeInstrumentView::syncParameterText()
 
 void manageVestigeInstrumentView::dragEnterEvent( QDragEnterEvent * _dee )
 {
-	if( _dee->mimeData()->hasFormat( StringPairDrag::mimeType() ) )
+	// For mimeType() and MimeType enum class
+	using namespace Clipboard;
+
+	if( _dee->mimeData()->hasFormat( mimeType( MimeType::StringPair ) ) )
 	{
 		QString txt = _dee->mimeData()->data(
-						StringPairDrag::mimeType() );
+						mimeType( MimeType::StringPair ) );
 		if( txt.section( ':', 0, 0 ) == "vstplugin" )
 		{
 			_dee->acceptProposedAction();

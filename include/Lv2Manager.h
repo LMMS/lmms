@@ -34,6 +34,7 @@
 #include <lilv/lilv.h>
 
 #include "Lv2Basics.h"
+#include "Lv2UridCache.h"
 #include "Lv2UridMap.h"
 #include "Plugin.h"
 
@@ -123,12 +124,19 @@ public:
 	};
 
 	UridMap& uridMap() { return m_uridMap; }
-	//! Return all
+	const Lv2UridCache& uridCache() const { return m_uridCache; }
 	const std::set<const char*, CmpStr>& supportedFeatureURIs() const
 	{
 		return m_supportedFeatureURIs;
 	}
 	bool isFeatureSupported(const char* featName) const;
+	AutoLilvNodes findNodes(const LilvNode *subject,
+		const LilvNode *predicate, const LilvNode *object);
+
+	static const std::set<const char*, Lv2Manager::CmpStr>& getPluginBlacklist()
+	{
+		return pluginBlacklist;
+	}
 
 private:
 	// general data
@@ -139,6 +147,12 @@ private:
 
 	// feature data that are common for all Lv2Proc
 	UridMap m_uridMap;
+
+	// URID cache for fast URID access
+	Lv2UridCache m_uridCache;
+
+	// static
+	static const std::set<const char*, Lv2Manager::CmpStr> pluginBlacklist;
 
 	// functions
 	bool isSubclassOf(const LilvPluginClass *clvss, const char *uriStr);

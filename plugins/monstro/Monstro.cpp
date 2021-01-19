@@ -45,7 +45,7 @@ Plugin::Descriptor PLUGIN_EXPORT monstro_plugin_descriptor =
 {
 	STRINGIFY( PLUGIN_NAME ),
 	"Monstro",
-	QT_TRANSLATE_NOOP( "pluginBrowser",
+	QT_TRANSLATE_NOOP( "PluginBrowser",
 				"Monstrous 3-oscillator synth with modulation matrix" ),
 	"Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>",
 	0x0100,
@@ -957,52 +957,52 @@ MonstroInstrument::MonstroInstrument( InstrumentTrack * _instrument_track ) :
 
 // updateVolumes
 
-	connect( &m_osc1Vol, SIGNAL( dataChanged() ), this, SLOT( updateVolume1() ) );
-	connect( &m_osc1Pan, SIGNAL( dataChanged() ), this, SLOT( updateVolume1() ) );
-	connect( &m_osc2Vol, SIGNAL( dataChanged() ), this, SLOT( updateVolume2() ) );
-	connect( &m_osc2Pan, SIGNAL( dataChanged() ), this, SLOT( updateVolume2() ) );
-	connect( &m_osc3Vol, SIGNAL( dataChanged() ), this, SLOT( updateVolume3() ) );
-	connect( &m_osc3Pan, SIGNAL( dataChanged() ), this, SLOT( updateVolume3() ) );
+	connect( &m_osc1Vol, SIGNAL( dataChanged() ), this, SLOT( updateVolume1() ), Qt::DirectConnection );
+	connect( &m_osc1Pan, SIGNAL( dataChanged() ), this, SLOT( updateVolume1() ), Qt::DirectConnection );
+	connect( &m_osc2Vol, SIGNAL( dataChanged() ), this, SLOT( updateVolume2() ), Qt::DirectConnection );
+	connect( &m_osc2Pan, SIGNAL( dataChanged() ), this, SLOT( updateVolume2() ), Qt::DirectConnection );
+	connect( &m_osc3Vol, SIGNAL( dataChanged() ), this, SLOT( updateVolume3() ), Qt::DirectConnection );
+	connect( &m_osc3Pan, SIGNAL( dataChanged() ), this, SLOT( updateVolume3() ), Qt::DirectConnection );
 
 // updateFreq
 
-	connect( &m_osc1Crs, SIGNAL( dataChanged() ), this, SLOT( updateFreq1() ) );
-	connect( &m_osc2Crs, SIGNAL( dataChanged() ), this, SLOT( updateFreq2() ) );
-	connect( &m_osc3Crs, SIGNAL( dataChanged() ), this, SLOT( updateFreq3() ) );
+	connect( &m_osc1Crs, SIGNAL( dataChanged() ), this, SLOT( updateFreq1() ), Qt::DirectConnection );
+	connect( &m_osc2Crs, SIGNAL( dataChanged() ), this, SLOT( updateFreq2() ), Qt::DirectConnection );
+	connect( &m_osc3Crs, SIGNAL( dataChanged() ), this, SLOT( updateFreq3() ), Qt::DirectConnection );
 
-	connect( &m_osc1Ftl, SIGNAL( dataChanged() ), this, SLOT( updateFreq1() ) );
-	connect( &m_osc2Ftl, SIGNAL( dataChanged() ), this, SLOT( updateFreq2() ) );
+	connect( &m_osc1Ftl, SIGNAL( dataChanged() ), this, SLOT( updateFreq1() ), Qt::DirectConnection );
+	connect( &m_osc2Ftl, SIGNAL( dataChanged() ), this, SLOT( updateFreq2() ), Qt::DirectConnection );
 
-	connect( &m_osc1Ftr, SIGNAL( dataChanged() ), this, SLOT( updateFreq1() ) );
-	connect( &m_osc2Ftr, SIGNAL( dataChanged() ), this, SLOT( updateFreq2() ) );
+	connect( &m_osc1Ftr, SIGNAL( dataChanged() ), this, SLOT( updateFreq1() ), Qt::DirectConnection );
+	connect( &m_osc2Ftr, SIGNAL( dataChanged() ), this, SLOT( updateFreq2() ), Qt::DirectConnection );
 
 // updatePO
-	connect( &m_osc1Spo, SIGNAL( dataChanged() ), this, SLOT( updatePO1() ) );
-	connect( &m_osc2Spo, SIGNAL( dataChanged() ), this, SLOT( updatePO2() ) );
-	connect( &m_osc3Spo, SIGNAL( dataChanged() ), this, SLOT( updatePO3() ) );
+	connect( &m_osc1Spo, SIGNAL( dataChanged() ), this, SLOT( updatePO1() ), Qt::DirectConnection );
+	connect( &m_osc2Spo, SIGNAL( dataChanged() ), this, SLOT( updatePO2() ), Qt::DirectConnection );
+	connect( &m_osc3Spo, SIGNAL( dataChanged() ), this, SLOT( updatePO3() ), Qt::DirectConnection );
 
 // updateEnvelope1
 
-	connect( &m_env1Pre, SIGNAL( dataChanged() ), this, SLOT( updateEnvelope1() ) );
-	connect( &m_env1Att, SIGNAL( dataChanged() ), this, SLOT( updateEnvelope1() ) );
-	connect( &m_env1Hold, SIGNAL( dataChanged() ), this, SLOT( updateEnvelope1() ) );
-	connect( &m_env1Dec, SIGNAL( dataChanged() ), this, SLOT( updateEnvelope1() ) );
-	connect( &m_env1Rel, SIGNAL( dataChanged() ), this, SLOT( updateEnvelope1() ) );
-	connect( &m_env1Slope, SIGNAL( dataChanged() ), this, SLOT( updateSlope1() ) );
+	connect( &m_env1Pre, SIGNAL( dataChanged() ), this, SLOT( updateEnvelope1() ), Qt::DirectConnection );
+	connect( &m_env1Att, SIGNAL( dataChanged() ), this, SLOT( updateEnvelope1() ), Qt::DirectConnection );
+	connect( &m_env1Hold, SIGNAL( dataChanged() ), this, SLOT( updateEnvelope1() ), Qt::DirectConnection );
+	connect( &m_env1Dec, SIGNAL( dataChanged() ), this, SLOT( updateEnvelope1() ), Qt::DirectConnection );
+	connect( &m_env1Rel, SIGNAL( dataChanged() ), this, SLOT( updateEnvelope1() ), Qt::DirectConnection );
+	connect( &m_env1Slope, SIGNAL( dataChanged() ), this, SLOT( updateSlope1() ), Qt::DirectConnection );
 
 // updateEnvelope2
 
-	connect( &m_env2Pre, SIGNAL( dataChanged() ), this, SLOT( updateEnvelope2() ) );
-	connect( &m_env2Att, SIGNAL( dataChanged() ), this, SLOT( updateEnvelope2() ) );
-	connect( &m_env2Hold, SIGNAL( dataChanged() ), this, SLOT( updateEnvelope2() ) );
-	connect( &m_env2Dec, SIGNAL( dataChanged() ), this, SLOT( updateEnvelope2() ) );
-	connect( &m_env2Rel, SIGNAL( dataChanged() ), this, SLOT( updateEnvelope2() ) );
-	connect( &m_env2Slope, SIGNAL( dataChanged() ), this, SLOT( updateSlope2() ) );
+	connect( &m_env2Pre, SIGNAL( dataChanged() ), this, SLOT( updateEnvelope2() ), Qt::DirectConnection );
+	connect( &m_env2Att, SIGNAL( dataChanged() ), this, SLOT( updateEnvelope2() ), Qt::DirectConnection );
+	connect( &m_env2Hold, SIGNAL( dataChanged() ), this, SLOT( updateEnvelope2() ), Qt::DirectConnection );
+	connect( &m_env2Dec, SIGNAL( dataChanged() ), this, SLOT( updateEnvelope2() ), Qt::DirectConnection );
+	connect( &m_env2Rel, SIGNAL( dataChanged() ), this, SLOT( updateEnvelope2() ), Qt::DirectConnection );
+	connect( &m_env2Slope, SIGNAL( dataChanged() ), this, SLOT( updateSlope2() ), Qt::DirectConnection );
 
 // updateLFOAtts
 
-	connect( &m_lfo1Att, SIGNAL( dataChanged() ), this, SLOT( updateLFOAtts() ) );
-	connect( &m_lfo2Att, SIGNAL( dataChanged() ), this, SLOT( updateLFOAtts() ) );
+	connect( &m_lfo1Att, SIGNAL( dataChanged() ), this, SLOT( updateLFOAtts() ), Qt::DirectConnection );
+	connect( &m_lfo2Att, SIGNAL( dataChanged() ), this, SLOT( updateLFOAtts() ), Qt::DirectConnection );
 
 // updateSampleRate
 

@@ -44,7 +44,7 @@ static Plugin::Descriptor dummyPluginDescriptor =
 {
 	"dummy",
 	"dummy",
-	QT_TRANSLATE_NOOP( "pluginBrowser", "no description" ),
+	QT_TRANSLATE_NOOP( "PluginBrowser", "no description" ),
 	"Tobias Doerffel <tobydox/at/users.sf.net>",
 	0x0100,
 	Plugin::Undefined,

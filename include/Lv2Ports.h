@@ -37,6 +37,7 @@
 #include "PluginIssue.h"
 
 struct ConnectPortVisitor;
+typedef struct LV2_Evbuf_Impl LV2_Evbuf;
 
 namespace Lv2Ports {
 
@@ -53,17 +54,17 @@ enum class Type {
 	Unknown,
 	Control,
 	Audio,
-	Event, //!< TODO: unused, describe
+	AtomSeq,
 	Cv //!< TODO: unused, describe
 };
 
 //! Port visualization
 //! @note All Lv2 audio ports are float, this is only the visualisation
 enum class Vis {
-	None,
-	Integer,
-	Enumeration,
-	Toggled
+	Generic, //!< nothing specific, a generic knob or slider shall be used
+	Integer, //!< counter
+	Enumeration, //!< selection from enumerated values
+	Toggled //!< boolean widget
 };
 
 const char* toStr(Lv2Ports::Flow pf);
@@ -74,6 +75,7 @@ struct ControlPortBase;
 struct Control;
 struct Audio;
 struct Cv;
+struct AtomSeq;
 struct Unknown;
 
 struct ConstVisitor
@@ -82,6 +84,7 @@ struct ConstVisitor
 	virtual void visit(const Lv2Ports::Control& ) {}
 	virtual void visit(const Lv2Ports::Audio& ) {}
 	virtual void visit(const Lv2Ports::Cv& ) {}
+	virtual void visit(const Lv2Ports::AtomSeq& ) {}
 	virtual void visit(const Lv2Ports::Unknown& ) {}
 
 	virtual ~ConstVisitor();
@@ -93,6 +96,7 @@ struct Visitor
 	virtual void visit(Lv2Ports::Control& ) {}
 	virtual void visit(Lv2Ports::Audio& ) {}
 	virtual void visit(Lv2Ports::Cv& ) {}
+	virtual void visit(Lv2Ports::AtomSeq& ) {}
 	virtual void visit(Lv2Ports::Unknown& ) {}
 
 	virtual ~Visitor();
@@ -102,13 +106,21 @@ struct Meta
 {
 	Type m_type = Type::Unknown;
 	Flow m_flow = Flow::Unknown;
-	Vis m_vis = Vis::None;
+	Vis m_vis = Vis::Generic;
 
-	float m_def = .0f, m_min = .0f, m_max = .0f;
+	bool m_logarithmic = false;
+
 	bool m_optional = false;
 	bool m_used = true;
 
 	std::vector<PluginIssue> get(const LilvPlugin* plugin, std::size_t portNum);
+
+	float def() const { return m_def; }
+	float min(sample_rate_t sr) const { return m_sampleRate ? sr * m_min : m_min; }
+	float max(sample_rate_t sr) const { return m_sampleRate ? sr * m_max : m_max; }
+private:
+	float m_def = .0f, m_min = .0f, m_max = .0f;
+	bool m_sampleRate = false;
 };
 
 struct PortBase : public Meta
@@ -162,7 +174,7 @@ struct Cv : public VisitablePort<Cv, ControlPortBase>
 
 struct Audio : public VisitablePort<Audio, PortBase>
 {
-	Audio(std::size_t bufferSize, bool isSidechain, bool isOptional);
+	Audio(std::size_t bufferSize, bool isSidechain);
 
 	//! Copy buffer passed by LMMS into our ports
 	//! @param channel channel index into each sample frame
@@ -186,10 +198,26 @@ private:
 	//! the buffer where Lv2 reads/writes the data from/to
 	std::vector<float> m_buffer;
 	bool m_sidechain;
-	bool m_optional;
 
 	// the only case when data of m_buffer may be referenced:
 	friend struct ::ConnectPortVisitor;
+};
+
+struct AtomSeq : public VisitablePort<AtomSeq, PortBase>
+{
+	enum FlagType
+	{
+		None = 0,
+		Midi = 1
+	};
+	unsigned flags = FlagType::None;
+
+	struct Lv2EvbufDeleter
+	{
+		void operator()(LV2_Evbuf* n);
+	};
+	using AutoLv2Evbuf = std::unique_ptr<LV2_Evbuf, Lv2EvbufDeleter>;
+	AutoLv2Evbuf m_buf;
 };
 
 struct Unknown : public VisitablePort<Unknown, PortBase>

@@ -42,22 +42,41 @@ using namespace std;
 
 static inline float absFraction( const float _x )
 {
-	return( _x - ( _x >= 0.0f ? floorf( _x ) : floorf( _x ) - 1 ) );
+	return( _x - floorf( _x ) );
 }
 
 static inline float fraction( const float _x )
 {
-	return( _x - floorf( _x ) );
+	return( _x - floorf( _x ) - ( _x >= 0.0f ? 0.0 : 1.0 ) );
 }
 
 #else
 
+/*!
+ * @brief Returns the wrapped fractional part of a float, a value between 0.0f and 1.0f.
+ *
+ * absFraction( 2.3) =>  0.3
+ * absFraction(-2.3) =>  0.7
+ *
+ * Note that this not the same as the absolute value of the fraction (as the function name suggests).
+ * If the result is interpreted as a phase of an oscillator, it makes that negative phases are
+ * converted to positive phases.
+ */
 static inline float absFraction( const float _x )
 {
 	return( _x - ( _x >= 0.0f ? static_cast<int>( _x ) :
 						static_cast<int>( _x ) - 1 ) );
 }
 
+/*!
+ * @brief Returns the fractional part of a float, a value between -1.0f and 1.0f.
+ *
+ * fraction( 2.3) =>  0.3
+ * fraction(-2.3) => -0.3
+ *
+ * Note that if the return value is used as a phase of an oscillator, that the oscillator must support
+ * negative phases.
+ */
 static inline float fraction( const float _x )
 {
 	return( _x - static_cast<int>( _x ) );

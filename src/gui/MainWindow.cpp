@@ -32,6 +32,7 @@
 #include <QMdiArea>
 #include <QMenuBar>
 #include <QMessageBox>
+#include <QScrollBar>
 #include <QShortcut>
 #include <QLibrary>
 #include <QSplitter>
@@ -50,6 +51,7 @@
 #include "FxMixerView.h"
 #include "GuiApplication.h"
 #include "ImportFilter.h"
+#include "InstrumentTrack.h"
 #include "PianoRoll.h"
 #include "PluginBrowser.h"
 #include "PluginFactory.h"
@@ -70,6 +72,7 @@
 #include "VersionedSaveDialog.h"
 
 #include "lmmsversion.h"
+
 
 #if !defined(LMMS_BUILD_WIN32) && !defined(LMMS_BUILD_APPLE) && !defined(LMMS_BUILD_HAIKU)
 //Work around an issue on KDE5 as per https://bugs.kde.org/show_bug.cgi?id=337491#c21
@@ -128,20 +131,26 @@ MainWindow::MainWindow() :
 					"*.mmp *.mmpz *.xml *.mid",
 							tr( "My Projects" ),
 					embed::getIconPixmap( "project_file" ).transformed( QTransform().rotate( 90 ) ),
-							splitter, false, true ) );
+							splitter, false, true,
+				confMgr->userProjectsDir(),
+				confMgr->factoryProjectsDir()));
 	sideBar->appendTab( new FileBrowser(
 				confMgr->userSamplesDir() + "*" +
 				confMgr->factorySamplesDir(),
 					"*", tr( "My Samples" ),
 					embed::getIconPixmap( "sample_file" ).transformed( QTransform().rotate( 90 ) ),
-							splitter, false, true ) );
+							splitter, false, true,
+					confMgr->userSamplesDir(),
+					confMgr->factorySamplesDir()));
 	sideBar->appendTab( new FileBrowser(
 				confMgr->userPresetsDir() + "*" +
 				confMgr->factoryPresetsDir(),
 					"*.xpf *.cs.xml *.xiz *.lv2",
 					tr( "My Presets" ),
 					embed::getIconPixmap( "preset_file" ).transformed( QTransform().rotate( 90 ) ),
-							splitter , false, true  ) );
+							splitter , false, true,
+				confMgr->userPresetsDir(),
+				confMgr->factoryPresetsDir()));
 	sideBar->appendTab( new FileBrowser( QDir::homePath(), "*",
 							tr( "My Home" ),
 					embed::getIconPixmap( "home" ).transformed( QTransform().rotate( 90 ) ),
@@ -1665,7 +1674,7 @@ void MainWindow::onSongStopped()
 				{
 					if(songEditor && ( tl->autoScroll() == TimeLineWidget::AutoScrollEnabled ) )
 					{
-						songEditor->m_editor->updatePosition( MidiTime(tl->savedPos().getTicks() ) );
+						songEditor->m_editor->updatePosition( TimePos(tl->savedPos().getTicks() ) );
 					}
 					tl->savePos( -1 );
 				}

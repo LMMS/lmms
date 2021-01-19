@@ -80,7 +80,7 @@ public slots:
 	void setEditModeSelect();
 	void toggleProportionalSnap();
 
-	void updatePosition( const MidiTime & t );
+	void updatePosition( const TimePos & t );
 	void updatePositionLine();
 	void selectAllTcos( bool select );
 
@@ -150,7 +150,7 @@ private:
 	QPoint m_scrollPos;
 	QPoint m_mousePos;
 	int m_rubberBandStartTrackview;
-	MidiTime m_rubberbandStartMidipos;
+	TimePos m_rubberbandStartTimePos;
 	int m_currentZoomingValue;
 	int m_trackHeadWidth;
 	bool m_selectRegion;
@@ -210,6 +210,9 @@ private:
 	ComboBox * m_zoomingComboBox;
 	ComboBox * m_snappingComboBox;
 	QLabel* m_snapSizeLabel;
+
+	QAction* m_insertBarAction;
+	QAction* m_removeBarAction;
 };
 
 #endif

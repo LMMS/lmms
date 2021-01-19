@@ -168,7 +168,7 @@ void VectorView::paintEvent(QPaintEvent *event)
 				// To better preserve shapes, the log scale is applied to the distance from origin,
 				// not the individual channels.
 				const float distance = sqrt(inLeft * inLeft + inRight * inRight);
-				const float distanceLog = log10(1 + 9 * abs(distance));
+				const float distanceLog = log10(1 + 9 * std::abs(distance));
 				const float angleCos = inLeft / distance;
 				const float angleSin = inRight / distance;
 				left  = distanceLog * angleCos * (activeSize - 1) / 4;
@@ -222,7 +222,7 @@ void VectorView::paintEvent(QPaintEvent *event)
 			float inRight = inBuffer[frame][1] * m_zoom;
 			if (logScale) {
 				const float distance = sqrt(inLeft * inLeft + inRight * inRight);
-				const float distanceLog = log10(1 + 9 * abs(distance));
+				const float distanceLog = log10(1 + 9 * std::abs(distance));
 				const float angleCos = inLeft / distance;
 				const float angleSin = inRight / distance;
 				left  = distanceLog * angleCos * (activeSize - 1) / 4;

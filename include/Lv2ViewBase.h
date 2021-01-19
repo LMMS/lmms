@@ -34,6 +34,7 @@
 #include <QVector>
 
 #include "LinkedModelGroupViews.h"
+#include "lmms_export.h"
 #include "Lv2Basics.h"
 
 class Lv2Proc;
@@ -54,7 +55,7 @@ private:
 
 
 //! Base class for view for one Lv2 plugin
-class Lv2ViewBase : public LinkedModelGroupsView
+class LMMS_EXPORT Lv2ViewBase : public LinkedModelGroupsView
 {
 protected:
 	//! @param pluginWidget A child class which inherits QWidget

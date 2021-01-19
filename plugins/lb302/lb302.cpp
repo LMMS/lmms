@@ -74,7 +74,7 @@
 
 
 //#define engine::mixer()->processingSampleRate() 44100.0f
-
+const float sampleRateCutoff = 44100.0f;
 
 extern "C"
 {
@@ -83,7 +83,7 @@ Plugin::Descriptor PLUGIN_EXPORT lb302_plugin_descriptor =
 {
 	STRINGIFY( PLUGIN_NAME ),
 	"LB302",
-	QT_TRANSLATE_NOOP( "pluginBrowser",
+	QT_TRANSLATE_NOOP( "PluginBrowser",
 			"Incomplete monophonic imitation tb303" ),
 	"Paul Giblock <pgib/at/users.sf.net>",
 	0x0100,
@@ -228,8 +228,11 @@ void lb302Filter3Pole::envRecalc()
 	// e0 is adjusted for Hz and doesn't need ENVINC
 	w = vcf_e0 + vcf_c0;
 	k = (fs->cutoff > 0.975)?0.975:fs->cutoff;
+    // sampleRateCutoff should not be changed to anything dynamic that is outside the
+    // scope of lb302 (like e.g. the mixers sample rate) as this changes the filters cutoff
+    // behavior without any modification to its controls.
 	kfco = 50.f + (k)*((2300.f-1600.f*(fs->envmod))+(w) *
-	                   (700.f+1500.f*(k)+(1500.f+(k)*(Engine::mixer()->processingSampleRate()/2.f-6000.f)) *
+	                   (700.f+1500.f*(k)+(1500.f+(k)*(sampleRateCutoff/2.f-6000.f)) *
 	                   (fs->envmod)) );
 	//+iacc*(.3+.7*kfco*kenvmod)*kaccent*kaccurve*2000
 
@@ -433,8 +436,11 @@ QString lb302Synth::nodeName() const
 // OBSOLETE. Break apart once we get Q_OBJECT to work. >:[
 void lb302Synth::recalcFilter()
 {
+#if (QT_VERSION >= QT_VERSION_CHECK(5,14,0))
+	vcf.loadRelaxed()->recalc();
+#else
 	vcf.load()->recalc();
-
+#endif
 	// THIS IS OLD 3pole/24dB code, I may reintegrate it.  Don't need it
 	// right now.   Should be toggled by LB_24_RES_TRICK at the moment.
 
@@ -683,7 +689,11 @@ void lb302Synth::initNote( lb302Note *n)
 
 	if(n->dead ==0){
 		// Swap next two blocks??
+#if (QT_VERSION >= QT_VERSION_CHECK(5,14,0))
+		vcf.loadRelaxed()->playNote();
+#else
 		vcf.load()->playNote();
+#endif
 		// Ensure envelope is recalculated
 		vcf_envpos = ENVINC;
 

@@ -35,7 +35,7 @@ Plugin::Descriptor PLUGIN_EXPORT amplifier_plugin_descriptor =
 {
 	STRINGIFY( PLUGIN_NAME ),
 	"Amplifier",
-	QT_TRANSLATE_NOOP( "pluginBrowser", "A native amplifier plugin" ),
+	QT_TRANSLATE_NOOP( "PluginBrowser", "A native amplifier plugin" ),
 	"Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>",
 	0x0100,
 	Plugin::Effect,

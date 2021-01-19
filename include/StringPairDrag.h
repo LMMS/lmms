@@ -45,16 +45,8 @@ public:
 
 	static bool processDragEnterEvent( QDragEnterEvent * _dee,
 						const QString & _allowed_keys );
-	static QString decodeMimeKey( const QMimeData * mimeData );
-	static QString decodeMimeValue( const QMimeData * mimeData );
 	static QString decodeKey( QDropEvent * _de );
 	static QString decodeValue( QDropEvent * _de );
-
-	static const char * mimeType()
-	{
-		return( "application/x-lmms-stringpair" );
-	}
-
 } ;
 
 

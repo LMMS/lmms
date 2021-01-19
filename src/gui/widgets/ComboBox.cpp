@@ -194,7 +194,7 @@ void ComboBox::paintEvent( QPaintEvent * _pe )
 	// Border
 	QStyleOptionFrame opt;
 	opt.initFrom( this );
-	opt.state = 0;
+	opt.state = QStyle::StateFlag::State_None;
 
 	style()->drawPrimitive( QStyle::PE_Frame, &opt, &p, this );
 
@@ -232,7 +232,7 @@ void ComboBox::wheelEvent( QWheelEvent* event )
 {
 	if( model() )
 	{
-		model()->setInitValue( model()->value() + ( ( event->delta() < 0 ) ? 1 : -1 ) );
+		model()->setInitValue(model()->value() + ((event->angleDelta().y() < 0) ? 1 : -1));
 		update();
 		event->accept();
 	}

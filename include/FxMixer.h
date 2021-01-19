@@ -73,7 +73,13 @@ class FxChannel : public ThreadableJob
 		void unmuteForSolo();
 
 
-		// TODO C++17 and above: use std::optional insteads
+		void setColor (QColor newColor)
+		{
+			m_color = newColor;
+			m_hasColor = true;
+		}
+
+		// TODO C++17 and above: use std::optional instead
 		QColor m_color;
 		bool m_hasColor;
 

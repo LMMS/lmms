@@ -45,21 +45,22 @@
 #endif
 
 #include "ActionGroup.h"
-#include "SongEditor.h"
-#include "MainWindow.h"
+#include "BBTrackContainer.h"
+#include "ComboBox.h"
+#include "debug.h"
+#include "DeprecationHelper.h"
 #include "GuiApplication.h"
+#include "MainWindow.h"
 #include "embed.h"
 #include "Engine.h"
 #include "gui_templates.h"
+#include "PianoRoll.h"
+#include "ProjectJournal.h"
+#include "SongEditor.h"
+#include "StringPairDrag.h"
+#include "TextFloat.h"
 #include "TimeLineWidget.h"
 #include "ToolTip.h"
-#include "TextFloat.h"
-#include "ComboBox.h"
-#include "BBTrackContainer.h"
-#include "PianoRoll.h"
-#include "debug.h"
-#include "StringPairDrag.h"
-#include "ProjectJournal.h"
 
 
 QPixmap * AutomationEditor::s_toolDraw = NULL;
@@ -149,10 +150,10 @@ AutomationEditor::AutomationEditor() :
 					Song::Mode_PlayAutomationPattern ),
 					m_currentPosition,
 					Song::Mode_PlayAutomationPattern, this );
-	connect( this, SIGNAL( positionChanged( const MidiTime & ) ),
-		m_timeLine, SLOT( updatePosition( const MidiTime & ) ) );
-	connect( m_timeLine, SIGNAL( positionChanged( const MidiTime & ) ),
-			this, SLOT( updatePosition( const MidiTime & ) ) );
+	connect( this, SIGNAL( positionChanged( const TimePos & ) ),
+		m_timeLine, SLOT( updatePosition( const TimePos & ) ) );
+	connect( m_timeLine, SIGNAL( positionChanged( const TimePos & ) ),
+			this, SLOT( updatePosition( const TimePos & ) ) );
 
 	removeSelection();
 
@@ -481,8 +482,8 @@ void AutomationEditor::drawLine( int x0In, float y0, int x1In, float y1 )
 
 		x += xstep;
 		i += 1;
-		m_pattern->removeValue( MidiTime( x ) );
-		m_pattern->putValue( MidiTime( x ), y );
+		m_pattern->removeValue( TimePos( x ) );
+		m_pattern->putValue( TimePos( x ), y );
 	}
 }
 
@@ -509,7 +510,7 @@ void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 			x -= VALUES_WIDTH;
 
 			// get tick in which the user clicked
-			int pos_ticks = x * MidiTime::ticksPerBar() / m_ppb +
+			int pos_ticks = x * TimePos::ticksPerBar() / m_ppb +
 							m_currentPosition;
 
 			// get time map of current pattern
@@ -526,7 +527,7 @@ void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 				if( pos_ticks >= it.key() &&
 					( it+1==time_map.end() ||
 						pos_ticks <= (it+1).key() ) &&
-		( pos_ticks<= it.key() + MidiTime::ticksPerBar() *4 / m_ppb ) &&
+		( pos_ticks<= it.key() + TimePos::ticksPerBar() *4 / m_ppb ) &&
 		( level == it.value() || mouseEvent->button() == Qt::RightButton ) )
 				{
 					break;
@@ -564,9 +565,9 @@ void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 				if( it == time_map.end() )
 				{
 					// then set new value
-					MidiTime value_pos( pos_ticks );
+					TimePos value_pos( pos_ticks );
 
-					MidiTime new_time =
+					TimePos new_time =
 						m_pattern->setDragValue( value_pos,
 									level, true,
 							mouseEvent->modifiers() &
@@ -583,7 +584,7 @@ void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 				int aligned_x = (int)( (float)( (
 						it.key() -
 						m_currentPosition ) *
-						m_ppb ) / MidiTime::ticksPerBar() );
+						m_ppb ) / TimePos::ticksPerBar() );
 				m_moveXOffset = x - aligned_x - 1;
 				// set move-cursor
 				QCursor c( Qt::SizeAllCursor );
@@ -716,7 +717,7 @@ void AutomationEditor::removePoints( int x0, int x1 )
 	int i = 0;
 	while( i <= deltax )
 	{
-		m_pattern->removeValue( MidiTime( x ) );
+		m_pattern->removeValue( TimePos( x ) );
 		x += xstep;
 		i += 1;
 	}
@@ -745,7 +746,7 @@ void AutomationEditor::mouseMoveEvent(QMouseEvent * mouseEvent )
 			x -= m_moveXOffset;
 		}
 
-		int pos_ticks = x * MidiTime::ticksPerBar() / m_ppb +
+		int pos_ticks = x * TimePos::ticksPerBar() / m_ppb +
 							m_currentPosition;
 		// m_mouseDownLeft used to prevent drag when drawing line
 		if (m_mouseDownLeft && m_editMode == DRAW)
@@ -767,7 +768,7 @@ void AutomationEditor::mouseMoveEvent(QMouseEvent * mouseEvent )
 				// we moved the value so the value has to be
 				// moved properly according to new starting-
 				// time in the time map of pattern
-				m_pattern->setDragValue( MidiTime( pos_ticks ),
+				m_pattern->setDragValue( TimePos( pos_ticks ),
 								level, true,
 							mouseEvent->modifiers() &
 								Qt::ControlModifier );
@@ -878,7 +879,7 @@ void AutomationEditor::mouseMoveEvent(QMouseEvent * mouseEvent )
 			}
 
 			// get tick in which the cursor is posated
-			int pos_ticks = x * MidiTime::ticksPerBar() / m_ppb +
+			int pos_ticks = x * TimePos::ticksPerBar() / m_ppb +
 							m_currentPosition;
 
 			m_selectedTick = pos_ticks - m_selectStartTick;
@@ -899,7 +900,7 @@ void AutomationEditor::mouseMoveEvent(QMouseEvent * mouseEvent )
 			// move selection + selected values
 
 			// do horizontal move-stuff
-			int pos_ticks = x * MidiTime::ticksPerBar() / m_ppb +
+			int pos_ticks = x * TimePos::ticksPerBar() / m_ppb +
 							m_currentPosition;
 			int ticks_diff = pos_ticks -
 							m_moveStartTick;
@@ -924,8 +925,8 @@ void AutomationEditor::mouseMoveEvent(QMouseEvent * mouseEvent )
 			}
 			m_selectStartTick += ticks_diff;
 
-			int bar_diff = ticks_diff / MidiTime::ticksPerBar();
-			ticks_diff = ticks_diff % MidiTime::ticksPerBar();
+			int bar_diff = ticks_diff / TimePos::ticksPerBar();
+			ticks_diff = ticks_diff % TimePos::ticksPerBar();
 
 
 			// do vertical move-stuff
@@ -970,27 +971,27 @@ void AutomationEditor::mouseMoveEvent(QMouseEvent * mouseEvent )
 			for( timeMap::iterator it = m_selValuesForMove.begin();
 					it != m_selValuesForMove.end(); ++it )
 			{
-				MidiTime new_value_pos;
+				TimePos new_value_pos;
 				if( it.key() )
 				{
 					int value_bar =
 						( it.key() /
-							MidiTime::ticksPerBar() )
+							TimePos::ticksPerBar() )
 								+ bar_diff;
 					int value_ticks =
 						( it.key() %
-							MidiTime::ticksPerBar() )
+							TimePos::ticksPerBar() )
 								+ ticks_diff;
 					// ensure value_ticks range
-					if( value_ticks / MidiTime::ticksPerBar() )
+					if( value_ticks / TimePos::ticksPerBar() )
 					{
 						value_bar += value_ticks
-							/ MidiTime::ticksPerBar();
+							/ TimePos::ticksPerBar();
 						value_ticks %=
-							MidiTime::ticksPerBar();
+							TimePos::ticksPerBar();
 					}
 					m_pattern->removeValue( it.key() );
-					new_value_pos = MidiTime( value_bar,
+					new_value_pos = TimePos( value_bar,
 							value_ticks );
 				}
 				new_selValuesForMove[
@@ -1038,7 +1039,7 @@ void AutomationEditor::mouseMoveEvent(QMouseEvent * mouseEvent )
 			}
 
 			// get tick in which the cursor is posated
-			int pos_ticks = x * MidiTime::ticksPerBar() / m_ppb +
+			int pos_ticks = x * TimePos::ticksPerBar() / m_ppb +
 							m_currentPosition;
 
 			m_selectedTick = pos_ticks -
@@ -1294,7 +1295,7 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 				/ static_cast<float>( Engine::getSong()->getTimeSigModel().getDenominator() );
 		float zoomFactor = m_zoomXLevels[m_zoomingXModel.value()];
 		//the bars which disappears at the left side by scrolling
-		int leftBars = m_currentPosition * zoomFactor / MidiTime::ticksPerBar();
+		int leftBars = m_currentPosition * zoomFactor / TimePos::ticksPerBar();
 
 		//iterates the visible bars and draw the shading on uneven bars
 		for( int x = VALUES_WIDTH, barCount = leftBars; x < width() + m_currentPosition * zoomFactor / timeSignature; x += m_ppb, ++barCount )
@@ -1320,10 +1321,10 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 		}
 
 		// and finally bars
-		for( tick = m_currentPosition - m_currentPosition % MidiTime::ticksPerBar(),
+		for( tick = m_currentPosition - m_currentPosition % TimePos::ticksPerBar(),
 				 x = xCoordOfTick( tick );
 			 x<=width();
-			 tick += MidiTime::ticksPerBar(), x = xCoordOfTick( tick ) )
+			 tick += TimePos::ticksPerBar(), x = xCoordOfTick( tick ) )
 		{
 			p.setPen( barLineColor() );
 			p.drawLine( x, grid_bottom, x, x_line_end );
@@ -1459,8 +1460,8 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 
 	// now draw selection-frame
 	int x = ( sel_pos_start - m_currentPosition ) * m_ppb /
-							MidiTime::ticksPerBar();
-	int w = ( sel_pos_end - sel_pos_start ) * m_ppb / MidiTime::ticksPerBar();
+							TimePos::ticksPerBar();
+	int w = ( sel_pos_end - sel_pos_start ) * m_ppb / TimePos::ticksPerBar();
 	int y, h;
 	if( m_y_auto )
 	{
@@ -1532,7 +1533,7 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 int AutomationEditor::xCoordOfTick(int tick )
 {
 	return VALUES_WIDTH + ( ( tick - m_currentPosition )
-		* m_ppb / MidiTime::ticksPerBar() );
+		* m_ppb / TimePos::ticksPerBar() );
 }
 
 
@@ -1677,11 +1678,11 @@ void AutomationEditor::wheelEvent(QWheelEvent * we )
 	if( we->modifiers() & Qt::ControlModifier && we->modifiers() & Qt::ShiftModifier )
 	{
 		int y = m_zoomingYModel.value();
-		if( we->delta() > 0 )
+		if(we->angleDelta().y() > 0)
 		{
 			y++;
 		}
-		else if( we->delta() < 0 )
+		else if(we->angleDelta().y() < 0)
 		{
 			y--;
 		}
@@ -1691,11 +1692,11 @@ void AutomationEditor::wheelEvent(QWheelEvent * we )
 	else if( we->modifiers() & Qt::ControlModifier && we->modifiers() & Qt::AltModifier )
 	{
 		int q = m_quantizeModel.value();
-		if( we->delta() > 0 )
+		if((we->angleDelta().x() + we->angleDelta().y()) > 0) // alt + scroll becomes horizontal scroll on KDE
 		{
 			q--;
 		}
-		else if( we->delta() < 0 )
+		else if((we->angleDelta().x() + we->angleDelta().y()) < 0) // alt + scroll becomes horizontal scroll on KDE
 		{
 			q++;
 		}
@@ -1706,17 +1707,17 @@ void AutomationEditor::wheelEvent(QWheelEvent * we )
 	else if( we->modifiers() & Qt::ControlModifier )
 	{
 		int x = m_zoomingXModel.value();
-		if( we->delta() > 0 )
+		if(we->angleDelta().y() > 0)
 		{
 			x++;
 		}
-		else if( we->delta() < 0 )
+		else if(we->angleDelta().y() < 0)
 		{
 			x--;
 		}
 		x = qBound( 0, x, m_zoomingXModel.size() - 1 );
 
-		int mouseX = (we->x() - VALUES_WIDTH)* MidiTime::ticksPerBar();
+		int mouseX = (position( we ).x() - VALUES_WIDTH)* TimePos::ticksPerBar();
 		// ticks based on the mouse x-position where the scroll wheel was used
 		int ticks = mouseX / m_ppb;
 		// what would be the ticks in the new zoom level on the very same mouse x
@@ -1728,16 +1729,22 @@ void AutomationEditor::wheelEvent(QWheelEvent * we )
 
 		m_zoomingXModel.setValue( x );
 	}
-	else if( we->modifiers() & Qt::ShiftModifier
-			|| we->orientation() == Qt::Horizontal )
+
+	// FIXME: Reconsider if determining orientation is necessary in Qt6.
+	else if(abs(we->angleDelta().x()) > abs(we->angleDelta().y())) // scrolling is horizontal
 	{
-		m_leftRightScroll->setValue( m_leftRightScroll->value() -
-							we->delta() * 2 / 15 );
+		m_leftRightScroll->setValue(m_leftRightScroll->value() -
+							we->angleDelta().x() * 2 / 15);
+	}
+	else if(we->modifiers() & Qt::ShiftModifier)
+	{
+		m_leftRightScroll->setValue(m_leftRightScroll->value() -
+							we->angleDelta().y() * 2 / 15);
 	}
 	else
 	{
-		m_topBottomScroll->setValue( m_topBottomScroll->value() -
-							we->delta() / 30 );
+		m_topBottomScroll->setValue(m_topBottomScroll->value() -
+							(we->angleDelta().x() + we->angleDelta().y()) / 30);
 	}
 }
 
@@ -1987,7 +1994,7 @@ void AutomationEditor::getSelectedValues( timeMap & selected_values )
 									++it )
 	{
 		//TODO: Add constant
-		tick_t len_ticks = MidiTime::ticksPerBar() / 16;
+		tick_t len_ticks = TimePos::ticksPerBar() / 16;
 
 		float level = it.value();
 		tick_t pos_ticks = it.key();
@@ -2116,7 +2123,7 @@ void AutomationEditor::deleteSelectedValues()
 
 
 
-void AutomationEditor::updatePosition(const MidiTime & t )
+void AutomationEditor::updatePosition(const TimePos & t )
 {
 	if( ( Engine::getSong()->isPlaying() &&
 			Engine::getSong()->playMode() ==
@@ -2124,17 +2131,17 @@ void AutomationEditor::updatePosition(const MidiTime & t )
 							m_scrollBack == true )
 	{
 		const int w = width() - VALUES_WIDTH;
-		if( t > m_currentPosition + w * MidiTime::ticksPerBar() / m_ppb )
+		if( t > m_currentPosition + w * TimePos::ticksPerBar() / m_ppb )
 		{
 			m_leftRightScroll->setValue( t.getBar() *
-							MidiTime::ticksPerBar() );
+							TimePos::ticksPerBar() );
 		}
 		else if( t < m_currentPosition )
 		{
-			MidiTime t_ = qMax( t - w * MidiTime::ticksPerBar() *
-					MidiTime::ticksPerBar() / m_ppb, 0 );
+			TimePos t_ = qMax( t - w * TimePos::ticksPerBar() *
+					TimePos::ticksPerBar() / m_ppb, 0 );
 			m_leftRightScroll->setValue( t_.getBar() *
-							MidiTime::ticksPerBar() );
+							TimePos::ticksPerBar() );
 		}
 		m_scrollBack = false;
 	}

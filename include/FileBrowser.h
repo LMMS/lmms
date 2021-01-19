@@ -26,6 +26,7 @@
 #ifndef FILE_BROWSER_H
 #define FILE_BROWSER_H
 
+#include <QCheckBox>
 #include <QtCore/QDir>
 #include <QtCore/QMutex>
 #include <QTreeWidget>
@@ -58,14 +59,17 @@ public:
 	*/
 	FileBrowser( const QString & directories, const QString & filter,
 			const QString & title, const QPixmap & pm,
-			QWidget * parent, bool dirs_as_items = false, bool recurse = false );
+			QWidget * parent, bool dirs_as_items = false, bool recurse = false,
+			const QString& userDir = "",
+			const QString& factoryDir = "");
+
 	virtual ~FileBrowser() = default;
 
 private slots:
 	void reloadTree( void );
-	void expandItems( QTreeWidgetItem * item=NULL, QList<QString> expandedDirs = QList<QString>() );
+	void expandItems( QTreeWidgetItem * item=nullptr, QList<QString> expandedDirs = QList<QString>() );
 	// call with item=NULL to filter the entire tree
-	bool filterItems( const QString & filter, QTreeWidgetItem * item=NULL );
+	bool filterItems( const QString & filter, QTreeWidgetItem * item=nullptr );
 	void giveFocusToFilter();
 
 private:
@@ -83,6 +87,11 @@ private:
 	bool m_dirsAsItems;
 	bool m_recurse;
 
+	void addContentCheckBox();
+	QCheckBox* m_showUserContent = nullptr;
+	QCheckBox* m_showFactoryContent = nullptr;
+	QString m_userDir;
+	QString m_factoryDir;
 } ;
 
 
@@ -105,29 +114,39 @@ protected:
 	void mousePressEvent( QMouseEvent * me ) override;
 	void mouseMoveEvent( QMouseEvent * me ) override;
 	void mouseReleaseEvent( QMouseEvent * me ) override;
+	void keyPressEvent( QKeyEvent * ke ) override;
+	void keyReleaseEvent( QKeyEvent * ke ) override;
+	void hideEvent( QHideEvent * he ) override;
+	void focusOutEvent( QFocusEvent * fe ) override;
 
 
 private:
+	//! Start a preview of a file item
+	void previewFileItem(FileItem* file);
+	//! If a preview is playing, stop it.
+	void stopPreview();
+
 	void handleFile( FileItem * fi, InstrumentTrack * it );
-	void openInNewInstrumentTrack( TrackContainer* tc );
+	void openInNewInstrumentTrack( TrackContainer* tc, FileItem* item );
 
 
 	bool m_mousePressed;
 	QPoint m_pressPos;
 
+	//! This should only be accessed or modified when m_pphMutex is held
 	PlayHandle* m_previewPlayHandle;
 	QMutex m_pphMutex;
 
-	FileItem * m_contextMenuItem;
+	QList<QAction*> getContextActions(FileItem* item, bool songEditor);
 
 
 private slots:
 	void activateListItem( QTreeWidgetItem * item, int column );
-	void openInNewInstrumentTrackBBE( void );
-	void openInNewInstrumentTrackSE( void );
-	void sendToActiveInstrumentTrack( void );
+	void openInNewInstrumentTrack( FileItem* item, bool songEditor );
+	bool openInNewSampleTrack( FileItem* item );
+	void sendToActiveInstrumentTrack( FileItem* item );
 	void updateDirectory( QTreeWidgetItem * item );
-	void openContainingFolder();
+	void openContainingFolder( FileItem* item );
 
 } ;
 
@@ -232,6 +251,11 @@ public:
 	inline FileHandling handling( void ) const
 	{
 		return( m_handling );
+	}
+
+	inline bool isTrack( void ) const
+	{
+		return m_handling == LoadAsPreset || m_handling == LoadByPlugin;
 	}
 
 	QString extension( void );

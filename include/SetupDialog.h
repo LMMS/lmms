@@ -75,6 +75,7 @@ private slots:
 	void toggleCompactTrackButtons(bool enabled);
 	void toggleOneInstrumentTrackWindow(bool enabled);
 	void toggleSideBarOnRight(bool enabled);
+	void toggleLetPreviewsFinish(bool enabled);
 	void toggleSoloLegacyBehavior(bool enabled);
 	void toggleMMPZ(bool enabled);
 	void toggleDisableBackup(bool enabled);
@@ -133,6 +134,7 @@ private:
 	bool m_compactTrackButtons;
 	bool m_oneInstrumentTrackWindow;
 	bool m_sideBarOnRight;
+	bool m_letPreviewsFinish;
 	bool m_soloLegacyBehavior;
 	bool m_MMPZ;
 	bool m_disableBackup;

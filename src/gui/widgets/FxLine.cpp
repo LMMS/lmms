@@ -418,11 +418,9 @@ void FxLine::setStrokeInnerInactive( const QColor & c )
 void FxLine::changeColor()
 {
 	auto channel = Engine::fxMixer()->effectChannel( m_channelIndex );
-	auto new_color = ColorChooser( this ).withPalette( ColorChooser::Palette::Mixer )->getColor( channel->m_color );
-	if( ! new_color.isValid() )
-	{ return; }
-	channel->m_color = new_color;
-	channel->m_hasColor = true;
+	auto new_color = ColorChooser(this).withPalette(ColorChooser::Palette::Mixer)->getColor(channel->m_color);
+	if(!new_color.isValid()) { return; }
+	channel->setColor (new_color);
 	update();
 }
 
@@ -439,7 +437,6 @@ void FxLine::resetColor()
 void FxLine::randomColor()
 {
 	auto channel = Engine::fxMixer()->effectChannel( m_channelIndex );
-	channel->m_color = ColorChooser::getPalette( ColorChooser::Palette::Mixer )[ rand() % 48 ];
-	channel->m_hasColor = true;
+	channel->setColor (ColorChooser::getPalette(ColorChooser::Palette::Mixer)[rand() % 48]);
 	update();
 }

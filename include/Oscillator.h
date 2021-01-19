@@ -97,7 +97,7 @@ public:
 
 	static inline sample_t triangleSample( const float _sample )
 	{
-		const float ph = fraction( _sample );
+		const float ph = absFraction( _sample );
 		if( ph <= 0.25f )
 		{
 			return ph * 4.0f;
@@ -111,17 +111,17 @@ public:
 
 	static inline sample_t sawSample( const float _sample )
 	{
-		return -1.0f + fraction( _sample ) * 2.0f;
+		return -1.0f + absFraction( _sample ) * 2.0f;
 	}
 
 	static inline sample_t squareSample( const float _sample )
 	{
-		return ( fraction( _sample ) > 0.5f ) ? -1.0f : 1.0f;
+		return ( absFraction( _sample ) > 0.5f ) ? -1.0f : 1.0f;
 	}
 
 	static inline sample_t moogSawSample( const float _sample )
 	{
-		const float ph = fraction( _sample );
+		const float ph = absFraction( _sample );
 		if( ph < 0.5f )
 		{
 			return -1.0f + ph * 4.0f;
@@ -131,7 +131,7 @@ public:
 
 	static inline sample_t expSample( const float _sample )
 	{
-		float ph = fraction( _sample );
+		float ph = absFraction( _sample );
 		if( ph > 0.5f )
 		{
 			ph = 1.0f - ph;

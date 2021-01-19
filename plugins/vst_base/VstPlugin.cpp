@@ -46,10 +46,6 @@
 #include <QDomDocument>
 
 #ifdef LMMS_BUILD_WIN32
-#	ifndef NOMINMAX
-#		define NOMINMAX
-#	endif
-
 #	include <windows.h>
 #	include <QLayout>
 #endif
@@ -560,7 +556,7 @@ void VstPlugin::loadParameterDisplays()
 void VstPlugin::savePreset( )
 {
 	QString presName = currentProgramName().isEmpty() ? tr(": default") : currentProgramName();
-	presName.replace(tr("\""), tr("'")); // QFileDialog unable to handle double quotes properly
+	presName.replace("\"", "'"); // QFileDialog unable to handle double quotes properly
 
 	FileDialog sfd( NULL, tr( "Save Preset" ), presName.section(": ", 1, 1) + tr(".fxp"),
 		tr( "Vst Plugin Preset (*.fxp *.fxb)" ) );

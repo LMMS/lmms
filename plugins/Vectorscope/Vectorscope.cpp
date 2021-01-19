@@ -33,7 +33,7 @@ extern "C" {
 	{
 		STRINGIFY(PLUGIN_NAME),
 		"Vectorscope",
-		QT_TRANSLATE_NOOP("pluginBrowser", "A stereo field visualizer."),
+		QT_TRANSLATE_NOOP("PluginBrowser", "A stereo field visualizer."),
 		"Martin Pavelek <he29/dot/HS/at/gmail/dot/com>",
 		0x0100,
 		Plugin::Effect,
