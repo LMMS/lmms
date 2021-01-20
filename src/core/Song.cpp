@@ -468,6 +468,8 @@ void Song::processAutomations(const TrackList &tracklist, MidiTime timeStart, fp
 		}
 	}
 
+	// Checks if an automated model stopped being automated by automation patterns
+	// so we can move the control back to any connected controller again
 	if (!m_oldAutomatedValues.isEmpty())
 	{
 		for (auto it = m_oldAutomatedValues.begin(); it != m_oldAutomatedValues.end(); it++)
