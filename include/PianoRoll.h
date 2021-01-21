@@ -47,6 +47,7 @@ class QPixmap;
 class QScrollBar;
 class QString;
 class QMenu;
+class QToolButton;
 
 class ComboBox;
 class NotePlayHandle;
@@ -497,15 +498,19 @@ signals:
 private slots:
 	void updateAfterPatternChange();
 	void ghostPatternSet( bool state );
+	void exportPattern();
+	void importPattern();
 
 private:
 	void patternRenamed();
 	void focusInEvent(QFocusEvent * event) override;
 	void stopStepRecording();
 	void updateStepRecordingIcon();
+	int savePatternXML(QString filepath, bool compress = true);
 
 	PianoRoll* m_editor;
 
+	QToolButton * m_fileToolsButton;
 	ComboBox * m_zoomingComboBox;
 	ComboBox * m_zoomingYComboBox;
 	ComboBox * m_quantizeComboBox;
