@@ -168,6 +168,7 @@ void Knob::onKnobNumUpdated()
 void Knob::setLabel( const QString & txt )
 {
 	m_label = txt;
+	m_isHtmlLabel = false;
 	if( m_knobPixmap )
 	{
 		setFixedSize(qMax<int>( m_knobPixmap->width(),
@@ -677,7 +678,7 @@ void Knob::paintEvent( QPaintEvent * _me )
 		else
 		{
 			m_tdRenderer->setDefaultFont(pointSizeF(p.font(), 6.5));
-			p.translate(width() / 2 - m_tdRenderer->idealWidth() / 2, (height() - m_tdRenderer->pageSize().height()) / 2);
+			p.translate((width() - m_tdRenderer->idealWidth()) / 2, (height() - m_tdRenderer->pageSize().height()) / 2);
 			m_tdRenderer->drawContents(&p);
 		}
 	}
