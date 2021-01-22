@@ -144,7 +144,7 @@ OutputSettings::StereoMode mapToStereoMode(int index)
 	case 0:
 		return OutputSettings::StereoMode_Mono;
 	case 1:
- 		return OutputSettings::StereoMode_Stereo;
+		return OutputSettings::StereoMode_Stereo;
 	case 2:
 		return OutputSettings::StereoMode_JointStereo;
 	default:
