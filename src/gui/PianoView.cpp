@@ -922,7 +922,7 @@ void PianoView::paintEvent( QPaintEvent * )
 	int white_cnt = 0;
 
 	int startKey = m_startKey;
-	if (startKey > 0 && Piano::isBlackKey((Keys)(--startKey)))
+	if (startKey > 0 && Piano::isBlackKey(static_cast<Keys>(--startKey)))
 	{
 //		if (m_piano && m_piano->instrumentTrack()->microtuner()->isKeyMapped(startKey))
 		if (m_piano &&

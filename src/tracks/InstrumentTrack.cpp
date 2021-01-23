@@ -791,6 +791,8 @@ void InstrumentTrack::saveTrackSpecificSettings( QDomDocument& doc, QDomElement 
 
 	m_effectChannelModel.saveSettings( doc, thisElement, "fxch" );
 	m_baseNoteModel.saveSettings( doc, thisElement, "basenote" );
+	m_firstKeyModel.saveSettings(doc, thisElement, "firstkey");
+	m_lastKeyModel.saveSettings(doc, thisElement, "lastkey");
 	m_useMasterPitchModel.saveSettings( doc, thisElement, "usemasterpitch");
 //	m_microtuner.saveSettings(doc, thisElement);
 
@@ -856,6 +858,8 @@ void InstrumentTrack::loadTrackSpecificSettings( const QDomElement & thisElement
 		m_effectChannelModel.loadSettings( thisElement, "fxch" );
 	}
 	m_baseNoteModel.loadSettings( thisElement, "basenote" );
+	m_firstKeyModel.loadSettings(thisElement, "firstkey");
+	m_lastKeyModel.loadSettings(thisElement, "lastkey");
 	m_useMasterPitchModel.loadSettings( thisElement, "usemasterpitch");
 //	m_microtuner.loadSettings(thisElement);
 

@@ -182,7 +182,7 @@ int NotePlayHandle::midiKey() const
 
 void NotePlayHandle::play( sampleFrame * _working_buffer )
 {
-	if( m_muted )
+	if (m_muted)
 	{
 		return;
 	}
@@ -195,6 +195,22 @@ void NotePlayHandle::play( sampleFrame * _working_buffer )
 	}
 
 	lock();
+
+	// Don't play the note if it falls outside of the user defined key range	TODO: handle by Microtuner
+	if (key() < m_instrumentTrack->m_firstKeyModel.value() ||
+		key() > m_instrumentTrack->m_lastKeyModel.value())
+	{
+		if (m_totalFramesPlayed == 0)
+		{
+			unlock();
+			return;
+		}
+		// Release the note if it already started playing before the key range changed
+		if (!m_released || m_hasMidiNote)
+		{
+			noteOff(0);
+		}
+	}
 
 	/* It is possible for NotePlayHandle::noteOff to be called before NotePlayHandle::play,
 	 * which results in a note-on message being sent without a subsequent note-off message.
