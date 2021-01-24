@@ -67,8 +67,8 @@ StereoControlControls::StereoControlControls(StereoControlEffect* effect) :
 
 void StereoControlControls::saveSettings(QDomDocument& doc, QDomElement& elem)
 {
-	m_gainModel.saveSettings(doc, elem, "gain"); 
-	m_stereoizerModel.saveSettings(doc, elem, "stereoizer"); 
+	m_gainModel.saveSettings(doc, elem, "gain");
+	m_stereoizerModel.saveSettings(doc, elem, "stereoizer");
 	m_widthModel.saveSettings(doc, elem, "width");
 	m_panModel.saveSettings(doc, elem, "pan");
 	m_panModeModel.saveSettings(doc, elem, "panMode");
