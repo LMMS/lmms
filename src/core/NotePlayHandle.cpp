@@ -196,7 +196,9 @@ void NotePlayHandle::play( sampleFrame * _working_buffer )
 
 	lock();
 
-	// Don't play the note if it falls outside of the user defined key range	TODO: handle by Microtuner
+	// Don't play the note if it falls outside of the user defined key range
+	// TODO: handle the range check by Microtuner, and if the key becomes "not mapped", save the current frequency
+	// so that the note release can finish playing using a valid frequency instead of a 1 Hz placeholder
 	if (key() < m_instrumentTrack->m_firstKeyModel.value() ||
 		key() > m_instrumentTrack->m_lastKeyModel.value())
 	{

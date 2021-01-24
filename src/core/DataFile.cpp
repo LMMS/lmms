@@ -1394,42 +1394,70 @@ void DataFile::upgrade_noHiddenClipNames()
  */
 void DataFile::upgrade_extendedNoteRange()
 {
-	QDomNodeList tracks = elementsByTagName("track");
-	for (int i = 0; !tracks.item(i).isNull(); i++)
+	if (!elementsByTagName("song").item(0).isNull())
 	{
-		// Ignore BB container tracks
-		if (tracks.item(i).toElement().attribute("type").toInt() == 1) { continue; }
-
-		QDomNodeList instruments = tracks.item(i).toElement().elementsByTagName("instrument");
-		if (instruments.isEmpty()) { continue; }
-		QDomElement instrument = instruments.item(0).toElement();
-		// Raise the base note of every instrument by 12 to compensate for the change
-		// of A4 key code from 57 to 69. This ensures that notes are labeled correctly.
-		instrument.parentNode().toElement().setAttribute(
-			"basenote",
-			instrument.parentNode().toElement().attribute("basenote").toInt() + 12);
-		// Raise the pitch of all notes in patterns assigned to instruments not affected
-		// by #1857 by an octave. This negates the base note change for normal instruments,
-		// but leaves the MIDI-based instruments sounding an octave lower, preserving their
-		// pitch in existing projects.
-		if (instrument.attribute("name") != "zynaddsubfx" &&
-			instrument.attribute("name") != "vestige" &&
-			instrument.attribute("name") != "lv2instrument" &&
-			instrument.attribute("name") != "carlapatchbay" &&
-			instrument.attribute("name") != "carlarack")
+		// Dealing with a project file, go through all the tracks
+		QDomNodeList tracks = elementsByTagName("track");
+		for (int i = 0; !tracks.item(i).isNull(); i++)
 		{
-			QDomNodeList patterns = tracks.item(i).toElement().elementsByTagName("pattern");
-			for (int i = 0; !patterns.item(i).isNull(); i++)
+			// Ignore BB container tracks
+			if (tracks.item(i).toElement().attribute("type").toInt() == 1) { continue; }
+
+			QDomNodeList instruments = tracks.item(i).toElement().elementsByTagName("instrument");
+			if (instruments.isEmpty()) { continue; }
+			QDomElement instrument = instruments.item(0).toElement();
+			// Raise the base note of every instrument by 12 to compensate for the change
+			// of A4 key code from 57 to 69. This ensures that notes are labeled correctly.
+			instrument.parentNode().toElement().setAttribute(
+				"basenote",
+				instrument.parentNode().toElement().attribute("basenote").toInt() + 12);
+			// Raise the pitch of all notes in patterns assigned to instruments not affected
+			// by #1857 by an octave. This negates the base note change for normal instruments,
+			// but leaves the MIDI-based instruments sounding an octave lower, preserving their
+			// pitch in existing projects.
+			if (instrument.attribute("name") != "zynaddsubfx" &&
+				instrument.attribute("name") != "vestige" &&
+				instrument.attribute("name") != "lv2instrument" &&
+				instrument.attribute("name") != "carlapatchbay" &&
+				instrument.attribute("name") != "carlarack")
 			{
-				QDomNodeList notes = patterns.item(i).toElement().elementsByTagName("note");
-				for (int i = 0; !notes.item(i).isNull(); i++)
+				QDomNodeList patterns = tracks.item(i).toElement().elementsByTagName("pattern");
+				for (int i = 0; !patterns.item(i).isNull(); i++)
 				{
-					notes.item(i).toElement().setAttribute(
-						"key",
-						notes.item(i).toElement().attribute("key").toInt() + 12
-					);
+					QDomNodeList notes = patterns.item(i).toElement().elementsByTagName("note");
+					for (int i = 0; !notes.item(i).isNull(); i++)
+					{
+						notes.item(i).toElement().setAttribute(
+							"key",
+							notes.item(i).toElement().attribute("key").toInt() + 12
+						);
+					}
 				}
 			}
+		}
+	}
+	else
+	{
+		// Dealing with a preset, not a song; find out what instrument it describes
+		QDomNodeList presets = elementsByTagName("instrumenttrack");
+		if (presets.item(0).isNull()) { return; }
+		QDomNodeList instruments = presets.item(0).toElement().elementsByTagName("instrument");
+		if (instruments.isEmpty()) { return; }
+		QDomElement instrument = instruments.item(0).toElement();
+		// Only touch VeSTige, LV2 and Carla.
+		// Users may have custom presets for them that need to have the base note shifted 2 octaves up:
+		// once to match the new MIDI range (57 → 69), and once again to make the preset sound an octave
+		// lower, preserving the priginal pitch by matching the old, buggy behavior.
+		// Zyn presets are not processed here. And even if they were, there would be likely no easy way to
+		// distinguish factory presets (which now sound correctly and should not be touched) from user presets
+		// (which may sound an octave higher than the user intended and could benefit from an upgrade).
+		if (instrument.attribute("name") == "vestige" ||
+			instrument.attribute("name") == "lv2instrument" ||
+			instrument.attribute("name") == "carlapatchbay" ||
+			instrument.attribute("name") == "carlarack")
+		{
+			QDomElement preset = presets.item(0).toElement();
+			preset.setAttribute("basenote", preset.attribute("basenote").toInt() + 24);
 		}
 	}
 }
