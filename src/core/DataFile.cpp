@@ -1438,26 +1438,29 @@ void DataFile::upgrade_extendedNoteRange()
 	}
 	else
 	{
-		// Dealing with a preset, not a song; find out what instrument it describes
+		// Dealing with a preset, not a song
 		QDomNodeList presets = elementsByTagName("instrumenttrack");
 		if (presets.item(0).isNull()) { return; }
+		QDomElement preset = presets.item(0).toElement();
+		// Common correction for all instrument presets (make base notes match the new MIDI range).
+		// NOTE: Many older presets do not have any basenote defined, assume they were "made for 57".
+		// (Specifying a default like this also happens to fix a FileBrowser bug where previews of presets
+		// with undefined basenote always play with the basenote inherited from previously played preview.)
+		bool ok = false;
+		int oldBase = preset.attribute("basenote").toInt(&ok);
+		if (!ok) { oldBase = 57; }
+		preset.setAttribute("basenote", oldBase + 12);
+		// Extra correction for Zyn, VeSTige, LV2 and Carla (to preserve the original buggy behavior).
 		QDomNodeList instruments = presets.item(0).toElement().elementsByTagName("instrument");
 		if (instruments.isEmpty()) { return; }
 		QDomElement instrument = instruments.item(0).toElement();
-		// Only touch VeSTige, LV2 and Carla.
-		// Users may have custom presets for them that need to have the base note shifted 2 octaves up:
-		// once to match the new MIDI range (57 → 69), and once again to make the preset sound an octave
-		// lower, preserving the priginal pitch by matching the old, buggy behavior.
-		// Zyn presets are not processed here. And even if they were, there would be likely no easy way to
-		// distinguish factory presets (which now sound correctly and should not be touched) from user presets
-		// (which may sound an octave higher than the user intended and could benefit from an upgrade).
-		if (instrument.attribute("name") == "vestige" ||
+		if (instrument.attribute("name") == "zynaddsubfx" ||
+			instrument.attribute("name") == "vestige" ||
 			instrument.attribute("name") == "lv2instrument" ||
 			instrument.attribute("name") == "carlapatchbay" ||
 			instrument.attribute("name") == "carlarack")
 		{
-			QDomElement preset = presets.item(0).toElement();
-			preset.setAttribute("basenote", preset.attribute("basenote").toInt() + 24);
+			preset.setAttribute("basenote", preset.attribute("basenote").toInt() + 12);
 		}
 	}
 }
