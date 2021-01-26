@@ -26,6 +26,8 @@
 #ifndef OSCILLATORCONSTANTS_H
 #define OSCILLATORCONSTANTS_H
 
+#include <array>
+
 class OscillatorConstants
 {
 public:
@@ -39,6 +41,8 @@ public:
 	static const int SEMITONES_PER_TABLE = 1;
 	static const int WAVE_TABLES_PER_WAVEFORM_COUNT = 128 / SEMITONES_PER_TABLE;
 
+	typedef std::array<sample_t, OscillatorConstants::WAVETABLE_LENGTH> wavetable_t;
+	typedef std::array<wavetable_t,	OscillatorConstants::WAVE_TABLES_PER_WAVEFORM_COUNT> waveform_t;
 };
 
 

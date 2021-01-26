@@ -26,8 +26,7 @@
 #ifndef OSCILLATOR_H
 #define OSCILLATOR_H
 
-#include "lmmsconfig.h"
-
+#include <fftw3.h>
 #include <math.h>
 
 #ifdef LMMS_HAVE_STDLIB_H
@@ -35,11 +34,11 @@
 #endif
 
 #include "Engine.h"
-#include <fftw3.h>
+#include "lmms_constants.h"
+#include "lmmsconfig.h"
+#include "Mixer.h"
 #include "OscillatorConstants.h"
 #include "SampleBuffer.h"
-#include "lmms_constants.h"
-#include "Mixer.h"
 
 class IntModel;
 
@@ -57,7 +56,7 @@ public:
 		MoogSawWave,
 		ExponentialWave,
 		WhiteNoise,
-		UserDefinedWave, //to remain penultimate
+		UserDefinedWave,
 		NumWaveShapes
 	} ;
 
@@ -100,7 +99,7 @@ public:
 
 	void update( sampleFrame * _ab, const fpp_t _frames,
 							const ch_cnt_t _chnl );
-// now follow the wave-shape-routines...
+	// now follow the wave-shape-routines...
 
 	static inline sample_t sinSample( const float _sample )
 	{
@@ -195,7 +194,7 @@ public:
 				table[control.band][control.f2], fraction(control.frame));
 	}
 
-	inline sample_t wtSample(const std::unique_ptr<SampleBuffer::wavetable_t>& table, const float sample)
+	inline sample_t wtSample(const std::unique_ptr<OscillatorConstants::waveform_t>& table, const float sample)
 	{
 		wtSampleControl control = getWtSampleControl(sample);
 		return linearInterpolate((*table)[control.band][control.f1],

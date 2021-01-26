@@ -66,7 +66,6 @@
 #include "GuiApplication.h"
 #include "ImportFilter.h"
 #include "MainWindow.h"
-#include "Oscillator.h"
 #include "MixHelpers.h"
 #include "OutputSettings.h"
 #include "ProjectRenderer.h"
