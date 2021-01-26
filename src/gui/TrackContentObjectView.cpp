@@ -449,21 +449,31 @@ void TrackContentObjectView::dropEvent( QDropEvent * de )
 
 
 
-/*! \brief Handle a dragged selection leaving our 'airspace'.
+/* @brief Chooses the correct cursor to be displayed on the widget
  *
- * \param e The QEvent to watch.
+ * @param me The QMouseEvent that is triggering the cursor change
  */
-void TrackContentObjectView::leaveEvent( QEvent * e )
+void TrackContentObjectView::updateCursor(QMouseEvent * me)
 {
-	if( cursor().shape() != Qt::BitmapCursor )
+	SampleTCO * sTco = dynamic_cast<SampleTCO*>(m_tco);
+
+	// If we are at the edges, use the resize cursor
+	if ((me->x() > width() - RESIZE_GRIP_WIDTH && !me->buttons() && !m_tco->getAutoResize())
+		|| (me->x() < RESIZE_GRIP_WIDTH && !me->buttons() && sTco && !m_tco->getAutoResize()))
 	{
-		setCursor( m_cursorHand );
+		setCursor(Qt::SizeHorCursor);
 	}
-	if( e != NULL )
+	// If we are in the middle on knife mode, use the knife cursor
+	else if (sTco && m_trackView->trackContainerView()->knifeMode())
 	{
-		QWidget::leaveEvent( e );
+		setCursor(m_cursorKnife);
 	}
+	// If we are in the middle in any other mode, use the hand cursor
+	else { setCursor(m_cursorHand); }
 }
+
+
+
 
 /*! \brief Create a DataFile suitable for copying multiple trackContentObjects.
  *
@@ -603,7 +613,7 @@ void TrackContentObjectView::mousePressEvent( QMouseEvent * me )
 				gui->songEditor()->m_editor->selectAllTcos( false );
 				m_tco->addJournalCheckPoint();
 
-				// move or resize
+				// Move, Resize, ResizeLeft and Split
 				m_tco->setJournalling( false );
 
 				setInitialPos( me->pos() );
@@ -922,24 +932,8 @@ void TrackContentObjectView::mouseMoveEvent( QMouseEvent * me )
 		}
 		update();
 	}
-	else
-	{
-		SampleTCO * sTco = dynamic_cast<SampleTCO*>( m_tco );
-
-		if (sTco && m_trackView->trackContainerView()->knifeMode())
-		{ setCursor( m_cursorKnife ); }
-
-
-		if( ( me->x() > width() - RESIZE_GRIP_WIDTH && !me->buttons() && !m_tco->getAutoResize() )
-		||  ( me->x() < RESIZE_GRIP_WIDTH && !me->buttons() && sTco && !m_tco->getAutoResize() ) )
-		{
-			setCursor( Qt::SizeHorCursor );
-		}
-		else
-		{
-			leaveEvent( NULL );
-		}
-	}
+	// None of the actions above, we will just handle the cursor
+	else { updateCursor(me); }
 }
 
 
@@ -970,6 +964,7 @@ void TrackContentObjectView::mouseReleaseEvent( QMouseEvent * me )
 	}
 	else if( m_action == Split )
 	{
+		m_tco->setJournalling( true );
 		const float ppb = m_trackView->trackContainerView()->pixelsPerBar();
 		const TimePos relPos = me->pos().x() * TimePos::ticksPerBar() / ppb;
 		splitTCO(unquantizedModHeld(me) ?
@@ -982,7 +977,7 @@ void TrackContentObjectView::mouseReleaseEvent( QMouseEvent * me )
 	delete m_hint;
 	m_hint = NULL;
 	s_textFloat->hide();
-	leaveEvent( NULL );
+	updateCursor(me);
 	selectableObject::mouseReleaseEvent( me );
 }
 

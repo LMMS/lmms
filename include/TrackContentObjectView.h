@@ -157,7 +157,6 @@ protected:
 	void contextMenuAction( ContextMenuAction action );
 	void dragEnterEvent( QDragEnterEvent * dee ) override;
 	void dropEvent( QDropEvent * de ) override;
-	void leaveEvent( QEvent * e ) override;
 	void mousePressEvent( QMouseEvent * me ) override;
 	void mouseMoveEvent( QMouseEvent * me ) override;
 	void mouseReleaseEvent( QMouseEvent * me ) override;
@@ -236,6 +235,7 @@ private:
 	int knifeMarkerPos( QMouseEvent * me );
 	//! Return true iff TCO could be split. Currently only implemented for samples
 	virtual bool splitTCO( const TimePos pos ){ return false; };
+	void updateCursor(QMouseEvent * me);
 } ;
 
 
