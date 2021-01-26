@@ -673,7 +673,7 @@ void TrackContentObjectView::mousePressEvent( QMouseEvent * me )
 				// s_textFloat->reparent( this );
 				// setup text-float as if TCO was already moved/resized
 				s_textFloat->moveGlobal( this, QPoint( width() + 2, height() + 2) );
-				s_textFloat->show();
+				if ( m_action != Split) { s_textFloat->show(); }
 			}
 
 			delete m_hint;
