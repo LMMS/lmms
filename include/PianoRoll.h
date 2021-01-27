@@ -506,11 +506,11 @@ private:
 	void focusInEvent(QFocusEvent * event) override;
 	void stopStepRecording();
 	void updateStepRecordingIcon();
-	int savePatternXML(QString filepath, bool compress = true);
+	bool savePatternXML(QString filepath, bool compress = true);
 
 	PianoRoll* m_editor;
 
-	QToolButton * m_fileToolsButton;
+	QToolButton* m_fileToolsButton;
 	ComboBox * m_zoomingComboBox;
 	ComboBox * m_zoomingYComboBox;
 	ComboBox * m_quantizeComboBox;

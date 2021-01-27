@@ -4408,7 +4408,7 @@ PianoRollWindow::PianoRollWindow() :
 	notesActionsToolBar->addAction( quantizeAction );
 
 	// -- File actions
-	DropToolBar *fileActionsToolBar = addDropToolBarToTop( tr( "File actions" ) );
+	DropToolBar* fileActionsToolBar = addDropToolBarToTop(tr("File actions"));
 
 	// -- File ToolButton
 	m_fileToolsButton = new QToolButton(m_toolBar);
@@ -4416,11 +4416,11 @@ PianoRollWindow::PianoRollWindow() :
 	m_fileToolsButton->setPopupMode(QToolButton::InstantPopup);
 
 	// Import / export
-	QAction * importAction = new QAction(embed::getIconPixmap("project_import"),
-				tr("Import pattern"), m_fileToolsButton);
+	QAction* importAction = new QAction(embed::getIconPixmap("project_import"),
+		tr("Import pattern"), m_fileToolsButton);
 
-	QAction * exportAction = new QAction(embed::getIconPixmap("project_export"),
-				tr("Export pattern"), m_fileToolsButton);
+	QAction* exportAction = new QAction(embed::getIconPixmap("project_export"),
+		tr("Export pattern"), m_fileToolsButton);
 
 	m_fileToolsButton->addAction(importAction);
 	m_fileToolsButton->addAction(exportAction);
@@ -4845,10 +4845,10 @@ void PianoRollWindow::exportPattern()
 		!exportDialog.selectedFiles().isEmpty() &&
 		!exportDialog.selectedFiles().first().isEmpty())
 	{
-		QString suffix = ConfigManager::inst()->value( "app",
-								"nommpz" ).toInt() == 0
-							? "xptz"
-							: "xpt" ;
+		QString suffix =
+			ConfigManager::inst()->value("app", "nommpz").toInt() == 0
+				? "xptz"
+				: "xpt";
 		exportDialog.setDefaultSuffix(suffix);
 
 		QString fullPath = exportDialog.selectedFiles()[0];
@@ -4856,7 +4856,7 @@ void PianoRollWindow::exportPattern()
 
 		bool compress = (chosenSuffix == "xpt") ? false : true;
 
-		if (savePatternXML(fullPath, compress) != 0)
+		if (!savePatternXML(fullPath, compress))
 		{
 			TextFloat::displayMessage(tr("Export pattern failed"),
 				tr("No permission to write to %1").arg(fullPath),
@@ -4875,26 +4875,28 @@ void PianoRollWindow::exportPattern()
 void PianoRollWindow::importPattern()
 {
 	// Overwrite confirmation.
-	if (!m_editor->m_pattern->empty() && QMessageBox::warning(NULL,
-				tr("Import pattern."),
-				tr("You are about to import a pattern, this will "
-					"overwrite your current pattern. Do you want to "
-					"continue?"),
-				QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes)
-				!= QMessageBox::Yes)
+	if (!m_editor->m_pattern->empty() &&
+		QMessageBox::warning(
+			NULL,
+			tr("Import pattern."),
+			tr("You are about to import a pattern, this will "
+				"overwrite your current pattern. Do you want to "
+				"continue?"),
+			QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes
+		) != QMessageBox::Yes)
 	{
 		return;
 	}
 
 	FileDialog importDialog(this, tr("Open Pattern"), "",
-			tr("XML pattern file (*.xpt *.xptz)"));
+		tr("XML pattern file (*.xpt *.xptz)"));
 	importDialog.setFileMode(FileDialog::ExistingFiles);
 
-	if (importDialog.exec () == QDialog::Accepted &&
+	if (importDialog.exec() == QDialog::Accepted &&
 		!importDialog.selectedFiles().isEmpty())
 	{
 		QString fullPath = importDialog.selectedFiles()[0];
-		QString suffix = fullPath.section( '.', -1 );
+		QString suffix = fullPath.section('.', -1);
 		bool compression = (suffix == "xpt") ? false : true;
 
 		QDomDocument doc("xml");
@@ -4936,8 +4938,8 @@ void PianoRollWindow::importPattern()
 		m_editor->m_pattern->movePosition(pos);
 
 		TextFloat::displayMessage(tr("Import pattern success"),
-						tr("Imported pattern %1!").arg(fullPath),
-						embed::getIconPixmap("project_import"), 4000);
+			tr("Imported pattern %1!").arg(fullPath),
+			embed::getIconPixmap("project_import"), 4000);
 	}
 }
 
@@ -4974,11 +4976,11 @@ void PianoRollWindow::updateStepRecordingIcon()
 
 
 
-int PianoRollWindow::savePatternXML(QString filepath, bool compress)
+bool PianoRollWindow::savePatternXML(QString filepath, bool compress)
 {
 	QDomDocument doc("xml");
-	QDomElement rootElement = doc.createElement( "pattern" );
-	m_editor->m_pattern->saveSettings( doc, rootElement );
+	QDomElement rootElement = doc.createElement("pattern");
+	m_editor->m_pattern->saveSettings(doc, rootElement);
 
 	doc.appendChild(rootElement);
 
@@ -4987,7 +4989,7 @@ int PianoRollWindow::savePatternXML(QString filepath, bool compress)
 	if (!f.open(QFile::WriteOnly | QFile::Text))
 	{
 		f.close();
-		return 1;
+		return false;
 	}
 
 	if (compress)
@@ -5001,5 +5003,5 @@ int PianoRollWindow::savePatternXML(QString filepath, bool compress)
 	}
 	f.close();
 
-	return 0;
+	return true;
 }
