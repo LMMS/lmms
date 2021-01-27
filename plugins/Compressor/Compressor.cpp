@@ -124,7 +124,7 @@ void CompressorEffect::calcAutoMakeup()
 			: m_thresholdVal - m_thresholdVal * m_ratioVal;
 	}
 
-	m_autoMakeupVal = m_inGainVal / dbfsToAmp(tempGainResult);
+	m_autoMakeupVal = 1.f / dbfsToAmp(tempGainResult);
 }
 
 
@@ -523,8 +523,8 @@ bool CompressorEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 			s[1] = temp - s[1];
 		}
 
-		s[0] *= gainResult[0] * m_outGainVal * (outBalance > 0 ? 1 - outBalance : 1);
-		s[1] *= gainResult[1] * m_outGainVal * (outBalance < 0 ? 1 + outBalance : 1);
+		s[0] *= gainResult[0] * m_inGainVal * m_outGainVal * (outBalance > 0 ? 1 - outBalance : 1);
+		s[1] *= gainResult[1] * m_inGainVal * m_outGainVal * (outBalance < 0 ? 1 + outBalance : 1);
 
 		if (midside)// Convert mid/side back to left/right
 		{
@@ -540,8 +540,8 @@ bool CompressorEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 		// Negate wet signal from dry signal
 		if (audition)
 		{
-			s[0] = -s[0] + delayedDrySignal[0] * m_inGainVal;
-			s[1] = -s[1] + delayedDrySignal[1] * m_inGainVal;
+			s[0] = (-s[0] + delayedDrySignal[0] * m_outGainVal);
+			s[1] = (-s[1] + delayedDrySignal[1] * m_outGainVal);
 		}
 		else if (autoMakeup)
 		{
