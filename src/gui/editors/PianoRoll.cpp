@@ -4932,7 +4932,7 @@ void PianoRollWindow::importPattern()
 		}
 		f.close();
 
-		int pos = m_editor->m_pattern->startPosition(); // Backup position in timeline.
+		TimePos pos = m_editor->m_pattern->startPosition(); // Backup position in timeline.
 
 		m_editor->m_pattern->loadSettings(doc.documentElement());
 		m_editor->m_pattern->movePosition(pos);
