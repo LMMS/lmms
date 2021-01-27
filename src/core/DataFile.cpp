@@ -1446,9 +1446,7 @@ void DataFile::upgrade_extendedNoteRange()
 		// NOTE: Many older presets do not have any basenote defined, assume they were "made for 57".
 		// (Specifying a default like this also happens to fix a FileBrowser bug where previews of presets
 		// with undefined basenote always play with the basenote inherited from previously played preview.)
-		bool ok = false;
-		int oldBase = preset.attribute("basenote").toInt(&ok);
-		if (!ok) { oldBase = 57; }
+		int oldBase = preset.attribute("basenote", "57").toInt();
 		preset.setAttribute("basenote", oldBase + 12);
 		// Extra correction for Zyn, VeSTige, LV2 and Carla (to preserve the original buggy behavior).
 		QDomNodeList instruments = presets.item(0).toElement().elementsByTagName("instrument");
