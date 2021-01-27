@@ -4890,7 +4890,7 @@ void PianoRollWindow::importPattern()
 
 	FileDialog importDialog(this, tr("Open Pattern"), "",
 		tr("XML pattern file (*.xpt *.xptz)"));
-	importDialog.setFileMode(FileDialog::ExistingFiles);
+	importDialog.setFileMode(FileDialog::ExistingFile);
 
 	if (importDialog.exec() == QDialog::Accepted &&
 		!importDialog.selectedFiles().isEmpty())
