@@ -39,8 +39,6 @@
 #include <QStyleOption>
 #include <QtMath>
 #include <QToolButton>
-#include <QTextStream>
-#include <QToolButton>
 
 #ifndef __USE_XOPEN
 #define __USE_XOPEN
