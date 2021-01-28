@@ -3978,7 +3978,7 @@ void PianoRoll::updateYScroll()
 						height() - PR_TOP_MARGIN -
 						SCROLLBAR_SIZE);
 
-	const int visible_space = height() - PR_TOP_MARGIN - PR_BOTTOM_MARGIN - m_notesEditHeight;
+	const int visible_space = keyAreaBottom() - keyAreaTop();
 	m_totalKeysToScroll = qMax(0, NumKeys - 1 - visible_space / m_keyLineHeight);
 
 	m_topBottomScroll->setRange(0, m_totalKeysToScroll);
