@@ -4851,21 +4851,16 @@ void PianoRollWindow::exportPattern()
 				: "xpt";
 		exportDialog.setDefaultSuffix(suffix);
 
-		QString fullPath = exportDialog.selectedFiles()[0];
-		QString chosenSuffix = fullPath.section( '.', -1 );
+		const QString fullPath = exportDialog.selectedFiles()[0];
+		DataFile dataFile(DataFile::NotePattern);
+		m_editor->m_pattern->saveSettings(dataFile, dataFile.content());
 
-		bool compress = (chosenSuffix == "xpt") ? false : true;
-
-		if (!savePatternXML(fullPath, compress))
+		if (dataFile.writeFile(fullPath))
 		{
-			TextFloat::displayMessage(tr("Export pattern failed"),
-				tr("No permission to write to %1").arg(fullPath),
-				embed::getIconPixmap("error"), 4000);
-			return;
+			TextFloat::displayMessage(tr("Export pattern success"),
+				tr("Pattern saved to %1").arg(fullPath),
+				embed::getIconPixmap("project_export"), 4000);
 		}
-		TextFloat::displayMessage(tr("Export pattern success"),
-			tr("Pattern saved to %1").arg(fullPath),
-			embed::getIconPixmap("project_export"), 4000);
 	}
 }
 
@@ -4895,46 +4890,17 @@ void PianoRollWindow::importPattern()
 	if (importDialog.exec() == QDialog::Accepted &&
 		!importDialog.selectedFiles().isEmpty())
 	{
-		QString fullPath = importDialog.selectedFiles()[0];
-		QString suffix = fullPath.section('.', -1);
-		bool compression = (suffix == "xpt") ? false : true;
+		const QString fullPath = importDialog.selectedFiles()[0];
+		DataFile dataFile(fullPath);
 
-		QDomDocument doc("xml");
-		QFile f(fullPath);
-
-		if (!f.open(QIODevice::ReadOnly))
-		{ // Check if we may read the file.
-			TextFloat::displayMessage(tr("Import pattern failed"),
-				tr("No permission to read file %1").arg(fullPath),
-				embed::getIconPixmap("error"), 4000);
-			f.close();
+		if (dataFile.head().isNull())
+		{
 			return;
 		}
-
-		bool contentSet = false;
-		if (compression)
-		{
-			contentSet = doc.setContent(qUncompress(f.readAll()));
-		}
-		else
-		{
-			contentSet = doc.setContent(&f);
-		}
-
-		// Check if valid xml.
-		if (!contentSet)
-		{
-			TextFloat::displayMessage(tr("Import pattern failed"),
-				tr("Pattern file corrupt %1").arg(fullPath),
-				embed::getIconPixmap("error"), 4000);
-			f.close();
-			return;
-		}
-		f.close();
 
 		TimePos pos = m_editor->m_pattern->startPosition(); // Backup position in timeline.
 
-		m_editor->m_pattern->loadSettings(doc.documentElement());
+		m_editor->m_pattern->loadSettings(dataFile.content());
 		m_editor->m_pattern->movePosition(pos);
 
 		TextFloat::displayMessage(tr("Import pattern success"),
@@ -4971,37 +4937,4 @@ void PianoRollWindow::updateStepRecordingIcon()
 	{
 		m_toggleStepRecordingAction->setIcon(embed::getIconPixmap("record_step_off"));
 	}
-}
-
-
-
-
-bool PianoRollWindow::savePatternXML(QString filepath, bool compress)
-{
-	QDomDocument doc("xml");
-	QDomElement rootElement = doc.createElement("pattern");
-	m_editor->m_pattern->saveSettings(doc, rootElement);
-
-	doc.appendChild(rootElement);
-
-	// Write file
-	QFile f(filepath);
-	if (!f.open(QFile::WriteOnly | QFile::Text))
-	{
-		f.close();
-		return false;
-	}
-
-	if (compress)
-	{
-		f.write(qCompress(doc.toString().toUtf8()));
-	}
-	else
-	{
-		QTextStream ts(&f);
-		ts << doc.toString();
-	}
-	f.close();
-
-	return true;
 }

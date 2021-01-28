@@ -52,6 +52,7 @@ public:
 		ClipboardData,
 		JournalData,
 		EffectSettings,
+		NotePattern,
 		TypeCount
 	} ;
 	typedef Types Type;

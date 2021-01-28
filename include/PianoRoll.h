@@ -506,7 +506,6 @@ private:
 	void focusInEvent(QFocusEvent * event) override;
 	void stopStepRecording();
 	void updateStepRecordingIcon();
-	bool savePatternXML(QString filepath, bool compress = true);
 
 	PianoRoll* m_editor;
 
