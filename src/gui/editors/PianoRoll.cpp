@@ -125,6 +125,9 @@ static QString getNoteString( int key )
 	return s_noteStrings[key % 12] + QString::number( static_cast<int>( key / KeysPerOctave ) );
 }
 
+// Probability of a key, relative to root of scale, being used in a pop song chord
+static int s_keyRatings[] = {100, 0, 53, 0, 68, 65, 2, 87, 4, 83, 1, 39};
+
 // used for drawing of piano
 PianoRoll::PianoRollKeyTypes PianoRoll::prKeyOrder[] =
 {
@@ -597,6 +600,55 @@ void PianoRoll::markSemiTone(int i, bool fromMenu)
 	m_markedSemiTones.erase( new_end, m_markedSemiTones.end() );
 	// until we move the mouse the window won't update, force redraw
 	update();
+}
+
+
+void PianoRoll::guessScale()
+{
+	if (!hasValidPattern() || m_pattern->notes().length() == 0) { return; }
+
+	// Number of times each key is used, C is index 0
+	int keyUse[12] {};
+	for (Note *note: m_pattern->notes())
+	{
+		keyUse[note->key() % 12]++;
+	}
+
+	int correctness[12] {};
+	int commonness[12] {};
+	int bestScale=0;
+
+	// Walk through all Major scales, starting with C Major
+	for (int scale=0; scale<12; scale++)
+	{
+		for (int key=0; key<12; key++)
+		{
+			// Get key relative to the scale (D is 0 in D Major)
+			int relativeKey = (12 + key - scale) % 12;
+
+			// Score for using keys "in this scale"
+			// (key in Major is either even OR higher than 4, not both)
+			if ((relativeKey % 2 == 0) ^ (relativeKey > 4))
+			{
+				correctness[scale] += keyUse[key];
+			}
+			// Score for using keys common to this scale
+			commonness[scale] += keyUse[key] * s_keyRatings[relativeKey];
+		}
+		// Get the scale with most correct notes first, then the one with most common notes
+		if (scale != 0)
+		{
+			if (correctness[scale] > correctness[bestScale] ||
+				(correctness[scale] == correctness[bestScale] &&
+				commonness[scale] > commonness[bestScale]))
+			{
+				bestScale = scale;
+			}
+		}
+	}
+
+	m_keyModel.setValue(bestScale + 1);  // 0 = "No key"
+	m_scaleModel.setValue(1);  // Major
 }
 
 
@@ -4503,9 +4555,13 @@ PianoRollWindow::PianoRollWindow() :
 	QAction *pasteGhostAction = new QAction(tr("Paste as ghost"), this);
 	connect(pasteGhostAction, SIGNAL(triggered()), m_editor, SLOT(pasteGhostNotes()));
 
+	QAction *guessScaleAction = new QAction(embed::getIconPixmap("guess_scale"), tr("Guess scale"), this);
+	connect(guessScaleAction, SIGNAL(triggered()), m_editor, SLOT(guessScale()));
+
 	ghostButton->addAction(setGhostAction);
 	ghostButton->addAction(pasteGhostAction);
 	markerToolBar->addWidget(ghostButton);
+	markerToolBar->addAction(guessScaleAction);
 
 	addToolBarBreak();
 

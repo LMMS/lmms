@@ -209,6 +209,8 @@ protected slots:
 
 	void showGhostNotes(bool state);
 	void pasteGhostNotes();
+	void guessScale();
+
 	void glueNotes();
 
 
