@@ -535,21 +535,6 @@ QToolButton::menu-button {
 	border-top-left-radius: 0px;
 	border-bottom-left-radius: 0px;
 }
-/*
-QToolButton::menu-arrow {
-	subcontrol-position: right;
-}
-*/
-/* buttons where the whole button opens a menu
-
-QToolButton[popupMode="2"] {
-	padding-right: 14px;
-}
-
-QToolButton::menu-indicator {
-	subcontrol-position: right;
-}
-*/
 
 /* track label buttons - the part that contains the icon and track title */
 
