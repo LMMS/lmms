@@ -1,12 +1,12 @@
 #include "SignalSender.h"
 
-static SignalSender* getInstance()
+SignalSender* SignalSender::getInstance()
 {
 	static SignalSender* instance = new SignalSender();
 	return instance;
 }
 
-void closeAll()
+void SignalSender::closeAll()
 {
 	emit closeAllSignal();
 }
