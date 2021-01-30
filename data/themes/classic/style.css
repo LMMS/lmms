@@ -129,6 +129,12 @@ QMenu::indicator:selected {
 	background-color: #747474;
 }
 
+FileBrowser QCheckBox
+{
+	font-size: 10px;
+	color: white;
+}
+
 PositionLine {
 	qproperty-tailGradient: false;
 	qproperty-lineColor: rgb(255, 255, 255);

@@ -57,6 +57,7 @@ public:
 		return castModel<Effect>();
 	}
 
+	static constexpr int DEFAULT_WIDTH = 215;
 
 public slots:
 	void editControls();

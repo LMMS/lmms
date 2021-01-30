@@ -141,20 +141,20 @@ private slots:
 				dynamic_cast<InstrumentTrack*>(Track::create(Track::InstrumentTrack, song));
 
 		Pattern* notePattern = dynamic_cast<Pattern*>(instrumentTrack->createTCO(0));
-		notePattern->changeLength(MidiTime(4, 0));
-		Note* note = notePattern->addNote(Note(MidiTime(4, 0)), false);
+		notePattern->changeLength(TimePos(4, 0));
+		Note* note = notePattern->addNote(Note(TimePos(4, 0)), false);
 		note->createDetuning();
 
 		DetuningHelper* dh = note->detuning();
 		auto pattern = dh->automationPattern();
 		pattern->setProgressionType( AutomationPattern::LinearProgression );
-		pattern->putValue(MidiTime(0, 0), 0.0);
-		pattern->putValue(MidiTime(4, 0), 1.0);
+		pattern->putValue(TimePos(0, 0), 0.0);
+		pattern->putValue(TimePos(4, 0), 1.0);
 
-		QCOMPARE(pattern->valueAt(MidiTime(0, 0)), 0.0f);
-		QCOMPARE(pattern->valueAt(MidiTime(1, 0)), 0.25f);
-		QCOMPARE(pattern->valueAt(MidiTime(2, 0)), 0.5f);
-		QCOMPARE(pattern->valueAt(MidiTime(4, 0)), 1.0f);
+		QCOMPARE(pattern->valueAt(TimePos(0, 0)), 0.0f);
+		QCOMPARE(pattern->valueAt(TimePos(1, 0)), 0.25f);
+		QCOMPARE(pattern->valueAt(TimePos(2, 0)), 0.5f);
+		QCOMPARE(pattern->valueAt(TimePos(4, 0)), 1.0f);
 	}
 
 	void testBBTrack()
@@ -186,12 +186,12 @@ private slots:
 		QVERIFY(! bbContainer->automatedValuesAt(5, bbTrack2.index()).size());
 
 		BBTCO tco(&bbTrack);
-		tco.changeLength(MidiTime::ticksPerBar() * 2);
+		tco.changeLength(TimePos::ticksPerBar() * 2);
 		tco.movePosition(0);
 
 		QCOMPARE(song->automatedValuesAt(0)[&model], 0.0f);
 		QCOMPARE(song->automatedValuesAt(5)[&model], 0.5f);
-		QCOMPARE(song->automatedValuesAt(MidiTime::ticksPerBar() + 5)[&model], 0.5f);
+		QCOMPARE(song->automatedValuesAt(TimePos::ticksPerBar() + 5)[&model], 0.5f);
 	}
 
 	void testGlobalAutomation()

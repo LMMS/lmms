@@ -411,7 +411,7 @@ void vestigeInstrument::play( sampleFrame * _buf )
 
 
 
-bool vestigeInstrument::handleMidiEvent( const MidiEvent& event, const MidiTime& time, f_cnt_t offset )
+bool vestigeInstrument::handleMidiEvent( const MidiEvent& event, const TimePos& time, f_cnt_t offset )
 {
 	m_pluginMutex.lock();
 	if( m_plugin != NULL )

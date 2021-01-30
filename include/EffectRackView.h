@@ -46,6 +46,7 @@ public:
 	EffectRackView( EffectChain* model, QWidget* parent = NULL );
 	virtual ~EffectRackView();
 
+	static constexpr int DEFAULT_WIDTH = 245;
 
 public slots:
 	void clearViews();
