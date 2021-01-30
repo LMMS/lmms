@@ -1,8 +1,8 @@
 #include "SignalSender.h"
 
-static SignalSender* getInstance(QObject* parent = 0)
+static SignalSender* getInstance()
 {
-	static SignalSender* instance = new SignalSender(parent);
+	static SignalSender* instance = new SignalSender();
 	return instance;
 }
 
