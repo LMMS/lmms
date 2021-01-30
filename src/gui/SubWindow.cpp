@@ -114,7 +114,7 @@ SubWindow::SubWindow( QWidget *parent, Qt::WindowFlags windowFlags ) :
 	// create 'close all but this' action
 	m_closeAllButThisAction = new QAction();
 	m_closeAllButThisAction->setText("Close all but this");
-	//m_closeAllButThisAction->setShortcut(QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_W));
+	m_closeAllButThisAction->setShortcut(QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_W));
 	// connect action to signal
 	connect(m_closeAllButThisAction, SIGNAL(triggered()), this, SLOT(closeAllButThisEmit()));
 	//connect(m_closeAllButThisAction, SIGNAL(triggered()), SignalSender::getInstance(), SLOT(closeAllButThis(this)));
@@ -126,7 +126,7 @@ SubWindow::SubWindow( QWidget *parent, Qt::WindowFlags windowFlags ) :
 	// create 'close all' action
 	m_closeAllAction = new QAction();
 	m_closeAllAction->setText("Close all");
-	//m_closeAllAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_W));
+	m_closeAllAction->setShortcut(QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_E));
 	// connect action to signal
 	connect(m_closeAllAction, SIGNAL(triggered()), SignalSender::getInstance(), SLOT(closeAll()));
 	connect(SignalSender::getInstance(), SIGNAL(closeAllSignal()), this, SLOT(close()));
