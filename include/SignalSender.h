@@ -12,11 +12,11 @@ public:
 
 signals:
 	void closeAllSignal();
-	void closeAllButThisSignal();
+	void closeAllButThisSignal(SubWindow * source);
 
 public slots:
 	void closeAll();
-	void closeAllButThis();
+	void closeAllButThis(SubWindow* source);
 };
 
 #endif

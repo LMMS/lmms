@@ -1,4 +1,5 @@
 #include "SignalSender.h"
+#include "SubWindow.h"
 
 SignalSender* SignalSender::getInstance()
 {
@@ -11,7 +12,7 @@ void SignalSender::closeAll()
 	emit closeAllSignal();
 }
 
-void SignalSender::closeAllButThis()
+void SignalSender::closeAllButThis(SubWindow* source)
 {
-	emit closeAllButThisSignal();
+	emit closeAllButThisSignal(source);
 }

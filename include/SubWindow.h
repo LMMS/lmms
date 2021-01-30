@@ -74,7 +74,7 @@ protected:
 
 signals:
 	void focusLost();
-	void closeAllButThisSignal();
+	void closeSignal();
 
 private:
 	const QSize m_buttonSize;
@@ -99,7 +99,7 @@ private:
 
 private slots:
 	void focusChanged( QMdiSubWindow * subWindow );
-	void closeAllButThis();
+	void closeAllButThis( SubWindow * source);
 };
 
 #endif

@@ -37,9 +37,11 @@
 #include "embed.h"
 #include "SignalSender.h"
 
-void SubWindow::closeAllButThis()
+void SubWindow::closeAllButThis(SubWindow* source)
 {
-	emit closeAllButThisSignal();
+	if (source != this) {
+		emit closeSignal();
+	}
 }
 
 
@@ -108,9 +110,9 @@ SubWindow::SubWindow( QWidget *parent, Qt::WindowFlags windowFlags ) :
 	m_closeAllButThisAction->setText("Close all but this");
 	//m_closeAllButThisAction->setShortcut(QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_W));
 	// connect action to signal
-	connect(m_closeAllButThisAction, SIGNAL(triggered()), SignalSender::getInstance(), SLOT(closeAllButThis()));
-	connect(SignalSender::getInstance(), SIGNAL(closeAllButThisSignal()), this, SLOT(closeAllButThis()));
-	connect(this, SIGNAL(closeAllButThisSignal()), this, SLOT(close()));
+	connect(m_closeAllButThisAction, SIGNAL(triggered()), SignalSender::getInstance(), SLOT(closeAllButThis(this)));
+	connect(SignalSender::getInstance(), SIGNAL(closeAllButThisSignal(SubWindow*)), this, SLOT(closeAllButThis(SubWindow*)));
+	connect(this, SIGNAL(closeSignal()), this, SLOT(close()));
 	// add action to systemMenu
 	m_systemMenu->addAction(m_closeAllButThisAction);
 
