@@ -35,6 +35,7 @@
 #include <QMenu>
 
 #include "embed.h"
+#include "SignalSender.h"
 
 
 
@@ -103,10 +104,8 @@ SubWindow::SubWindow( QWidget *parent, Qt::WindowFlags windowFlags ) :
 	m_closeAllAction->setText("Close all");
 	m_closeAllAction->setShortcut(QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_W));
 	// connect action to signal
-	//connect(m_closeOthersAction, &QAction::triggered, this, &SubWindow::emitCloseOthersSignal);
-	connect(m_closeAllAction, SIGNAL(triggered()), this, SLOT(emitCloseOthersSignal()));
-	//connect(this, &SubWindow::closeOthers, this, close);
-	connect(this, SIGNAL(closeOthers()), this, SLOT(close()));
+	connect(m_closeAllAction, SIGNAL(triggered()), SignalSender::getInstance(), SLOT(closeAll()));
+	connect(SignalSender::getInstance(), SIGNAL(closeAllSignal()), this, SLOT(close()));
 	// add action to systemMenu
 	m_systemMenu->addAction(m_closeAllAction);
 
@@ -394,11 +393,4 @@ void SubWindow::resizeEvent( QResizeEvent * event )
 	{
 		m_trackedNormalGeom.setSize( event->size() );
 	}
-}
-
-
-
-void SubWindow::emitCloseOthersSignal()
-{
-	emit closeOthers();
 }
