@@ -202,6 +202,7 @@ PianoRoll::PianoRoll() :
 	m_markedSemitoneColor( 0, 0, 0 ),
 	m_noteOpacity( 255 ),
 	m_ghostNoteOpacity( 255 ),
+	m_ghostNotesVisible( false ),
 	m_noteBorders( true ),
 	m_ghostNoteBorders( true ),
 	m_backgroundShade( 0, 0, 0 ),
@@ -441,7 +442,7 @@ void PianoRoll::reset()
 {
 	m_lastNoteVolume = DefaultVolume;
 	m_lastNotePanning = DefaultPanning;
-	clearGhostPattern();
+	m_ghostNotes.clear();
 }
 
 void PianoRoll::showTextFloat(const QString &text, const QPoint &pos, int timeout)
@@ -608,15 +609,16 @@ void PianoRoll::setGhostPattern( Pattern* newPattern )
 {
 	// Expects a pointer to a pattern or nullptr.
 	m_ghostNotes.clear();
-	if( newPattern != nullptr )
+	if(newPattern != nullptr)
 	{
 		for( Note *note : newPattern->notes() )
 		{
 			Note * new_note = new Note( note->length(), note->pos(), note->key() );
 			m_ghostNotes.push_back( new_note );
 		}
-		emit ghostPatternSet( true );
 	}
+
+	showGhostNotes(!m_ghostNotes.empty());
 }
 
 
@@ -633,15 +635,15 @@ void PianoRoll::loadGhostNotes( const QDomElement & de )
 			m_ghostNotes.push_back( n );
 			node = node.nextSibling();
 		}
-		emit ghostPatternSet( true );
+		showGhostNotes(true);
 	}
 }
 
 
-void PianoRoll::clearGhostPattern()
+void PianoRoll::showGhostNotes(bool state)
 {
-	setGhostPattern( nullptr );
-	emit ghostPatternSet( false );
+	m_ghostNotesVisible = state;
+	emit ghostNotesShown(state);
 	update();
 }
 
@@ -3100,7 +3102,7 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 		QPolygonF editHandles;
 
 		// -- Begin ghost pattern
-		if( !m_ghostNotes.empty() )
+		if(!m_ghostNotes.empty() && m_ghostNotesVisible)
 		{
 			for( const Note *note : m_ghostNotes )
 			{
@@ -4086,6 +4088,42 @@ void PianoRoll::pasteNotes()
 }
 
 
+void PianoRoll::pasteGhostNotes()
+{
+	if(!hasValidPattern()) { return; }
+
+	QString value = Clipboard::getString(Clipboard::MimeType::Default);
+
+	if(!value.isEmpty())
+	{
+		DataFile dataFile(value.toUtf8());
+
+		QDomNodeList list = dataFile.elementsByTagName(Note::classNodeName());
+
+		if(!list.isEmpty())
+		{
+			m_ghostNotes.clear();
+
+			for(int i = 0; !list.item(i).isNull(); ++i)
+			{
+				Note *note = new Note;
+				note->restoreState(list.item(i).toElement());
+				note->setPos(note->pos() + Note::quantized(m_timeLine->pos(), quantization()));
+
+				m_ghostNotes.push_back(note);
+			}
+
+			// Paste was sucessful
+			showGhostNotes(true);
+			return;
+		}
+	}
+
+	TextFloat::displayMessage(tr("Paste as ghost failed"),
+			tr("Clipboard is empty"),
+			embed::getIconPixmap("ghost_note", 24, 24),
+			3000);
+}
 
 
 //Return false if no notes are deleted
@@ -4447,6 +4485,28 @@ PianoRollWindow::PianoRollWindow() :
 
 	notesActionsToolBar->addWidget(noteToolsButton);
 
+	// Ghost combo button + semitone marker tools
+	DropToolBar *markerToolBar = addDropToolBarToTop(tr("Note marker controls"));
+
+	QToolButton *ghostButton = new QToolButton(m_toolBar);
+	ghostButton->setPopupMode(QToolButton::MenuButtonPopup);
+	ghostButton->setIcon(embed::getIconPixmap("ghost_note"));
+	ghostButton->setToolTip(tr("Show ghost notes"));
+	ghostButton->setChecked(false);
+	ghostButton->setCheckable(true);
+	connect(ghostButton, &QToolButton::clicked, [this]() { m_editor->showGhostNotes(!m_editor->m_ghostNotesVisible); });
+	connect(m_editor, SIGNAL(ghostNotesShown(bool)), ghostButton, SLOT(setChecked(bool)));
+
+	QAction *setGhostAction = new QAction(tr("Current pattern as ghost"), this);
+	connect(setGhostAction, &QAction::triggered, [this]() { m_editor->setGhostPattern(m_editor->m_pattern); });
+
+	QAction *pasteGhostAction = new QAction(tr("Paste as ghost"), this);
+	connect(pasteGhostAction, SIGNAL(triggered()), m_editor, SLOT(pasteGhostNotes()));
+
+	ghostButton->addAction(setGhostAction);
+	ghostButton->addAction(pasteGhostAction);
+	markerToolBar->addWidget(ghostButton);
+
 	addToolBarBreak();
 
 
@@ -4510,14 +4570,6 @@ PianoRollWindow::PianoRollWindow() :
 	m_chordComboBox->setFixedSize( 105, ComboBox::DEFAULT_HEIGHT );
 	m_chordComboBox->setToolTip( tr( "Chord" ) );
 
-	// -- Clear ghost pattern button
-	m_clearGhostButton = new QPushButton( m_toolBar );
-	m_clearGhostButton->setIcon( embed::getIconPixmap( "clear_ghost_note" ) );
-	m_clearGhostButton->setToolTip( tr( "Clear ghost notes" ) );
-	m_clearGhostButton->setEnabled( false );
-	connect( m_clearGhostButton, SIGNAL( clicked() ), m_editor, SLOT( clearGhostPattern() ) );
-	connect( m_editor, SIGNAL( ghostPatternSet( bool ) ), this, SLOT( ghostPatternSet( bool ) ) );
-
 	// Wrap label icons and comboboxes in a single widget so when
 	// the window is resized smaller in width it hides both
 	QWidget * zoom_widget = new QWidget();
@@ -4573,9 +4625,6 @@ PianoRollWindow::PianoRollWindow() :
 	chord_widget->setLayout(chord_hbox);
 	zoomAndNotesToolBar->addSeparator();
 	zoomAndNotesToolBar->addWidget(chord_widget);
-
-	zoomAndNotesToolBar->addSeparator();
-	zoomAndNotesToolBar->addWidget( m_clearGhostButton );
 
 	// setup our actual window
 	setFocusPolicy( Qt::StrongFocus );
@@ -4790,14 +4839,6 @@ void PianoRollWindow::patternRenamed()
 	{
 		setWindowTitle( tr( "Piano-Roll - no pattern" ) );
 	}
-}
-
-
-
-
-void PianoRollWindow::ghostPatternSet( bool state )
-{
-	m_clearGhostButton->setEnabled( state );
 }
 
 
