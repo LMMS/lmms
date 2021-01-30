@@ -9,10 +9,12 @@ class SignalSender : public QObject
 
 public:
 	static SignalSender* getInstance();
-	void closeAll();
 
 signals:
 	void closeAllSignal();
+
+public slots:
+	void closeAll();
 };
 
 #endif
