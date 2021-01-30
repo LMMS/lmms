@@ -74,6 +74,7 @@ protected:
 
 signals:
 	void focusLost();
+	void closeAllButThisSignal();
 
 private:
 	const QSize m_buttonSize;
@@ -91,12 +92,14 @@ private:
 	bool m_hasFocus;
 	QMenu* m_systemMenu;
 	QAction* m_closeAllAction;
+	QAction* m_closeAllButThisAction;
 
 	static void elideText( QLabel *label, QString text );
 	void adjustTitleBar();
 
 private slots:
 	void focusChanged( QMdiSubWindow * subWindow );
+	void closeAllButThis();
 };
 
 #endif

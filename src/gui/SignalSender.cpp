@@ -10,3 +10,8 @@ void SignalSender::closeAll()
 {
 	emit closeAllSignal();
 }
+
+void SignalSender::closeAllButThis()
+{
+	emit closeAllButThisSignal();
+}

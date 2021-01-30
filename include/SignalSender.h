@@ -12,9 +12,11 @@ public:
 
 signals:
 	void closeAllSignal();
+	void closeAllButThisSignal();
 
 public slots:
 	void closeAll();
+	void closeAllButThis();
 };
 
 #endif
