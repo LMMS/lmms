@@ -2,6 +2,7 @@
 #define SIGNALSENDER_H
 
 #include <QObject>
+#include "SubWindow.h"
 
 class SignalSender : public QObject
 {

@@ -99,7 +99,8 @@ private:
 
 private slots:
 	void focusChanged( QMdiSubWindow * subWindow );
-	void closeAllButThis( SubWindow * source);
+	void closeAllButThisEmit();
+	void closeAllButThisRecive( SubWindow * source);
 };
 
 #endif

@@ -1,10 +1,8 @@
 #include "SignalSender.h"
-#include "SubWindow.h"
 
 SignalSender* SignalSender::getInstance()
 {
-	static SignalSender* instance = new SignalSender();
-	return instance;
+	return new SignalSender();
 }
 
 void SignalSender::closeAll()
