@@ -608,8 +608,8 @@ CarlaInstrumentView::CarlaInstrumentView(CarlaInstrument* const instrument, QWid
       fTimerId(fHandle != NULL && fDescriptor->ui_idle != NULL ? startTimer(30) : 0),
       m_carlaInstrument(instrument),
       p_parent(parent),
-      m_subWindow(nullptr),
-      p_subWindow(nullptr)
+      m_paramsSubWindow(nullptr),
+      m_paramsView(nullptr)
 {
     setAutoFillBackground(true);
 
@@ -660,9 +660,9 @@ CarlaInstrumentView::~CarlaInstrumentView()
         toggleUI(false);
 
 #if CARLA_VERSION_HEX >= CARLA_MIN_PARAM_VERSION
-    if (p_subWindow) {
-        delete p_subWindow;
-        p_subWindow = nullptr;
+    if (m_paramsView) {
+        delete m_paramsView;
+        m_paramsView = nullptr;
     }
 #endif
 }
@@ -704,15 +704,15 @@ void CarlaInstrumentView::timerEvent(QTimerEvent* event)
 
 void CarlaInstrumentView::toggleParamsWindow()
 {
-	if (!m_subWindow)
+	if (!m_paramsSubWindow)
 	{
-		p_subWindow = new CarlaParamsView(this, p_parent);
-		connect(m_subWindow, SIGNAL(uiClosed()), this, SLOT(paramsUiClosed()));
+		m_paramsView = new CarlaParamsView(this, p_parent);
+		connect(m_paramsSubWindow, SIGNAL(uiClosed()), this, SLOT(paramsUiClosed()));
 	} else {
-		if (m_subWindow->isVisible()) {
-			m_subWindow->hide();
+		if (m_paramsSubWindow->isVisible()) {
+			m_paramsSubWindow->hide();
 		} else {
-			m_subWindow->show();
+			m_paramsSubWindow->show();
 		}
 	}
 }
@@ -842,23 +842,23 @@ CarlaParamsView::CarlaParamsView(CarlaInstrumentView* const instrumentView, QWid
 	// -- Sub window
 	CarlaParamsSubWindow* win = new CarlaParamsSubWindow(gui->mainWindow()->workspace()->viewport(), Qt::SubWindow |
 			Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowSystemMenuHint);
-	m_carlaInstrumentView->m_subWindow = gui->mainWindow()->workspace()->addSubWindow(win);
-	m_carlaInstrumentView->m_subWindow->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
-	m_carlaInstrumentView->m_subWindow->setMinimumHeight(200);
-	m_carlaInstrumentView->m_subWindow->setMinimumWidth(200);
-	m_carlaInstrumentView->m_subWindow->resize(600, 400);
-	m_carlaInstrumentView->m_subWindow->setWidget(centralWidget);
+	m_carlaInstrumentView->m_paramsSubWindow = gui->mainWindow()->workspace()->addSubWindow(win);
+	m_carlaInstrumentView->m_paramsSubWindow->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
+	m_carlaInstrumentView->m_paramsSubWindow->setMinimumHeight(200);
+	m_carlaInstrumentView->m_paramsSubWindow->setMinimumWidth(200);
+	m_carlaInstrumentView->m_paramsSubWindow->resize(600, 400);
+	m_carlaInstrumentView->m_paramsSubWindow->setWidget(centralWidget);
 	centralWidget->setWindowTitle(m_carlaInstrument->instrumentTrack()->name() + tr(" - Parameters"));
 
 	// -- Connect signals
-	connect(m_carlaInstrumentView->m_subWindow, SIGNAL(resized()), this, SLOT(windowResized()));
+	connect(m_carlaInstrumentView->m_paramsSubWindow, SIGNAL(resized()), this, SLOT(windowResized()));
 	connect(m_paramsFilterLineEdit, SIGNAL(textChanged(const QString)), this, SLOT(filterKnobs()));
 	connect(m_clearFilterButton, SIGNAL(clicked(bool)), this, SLOT(clearFilterText()));
 	connect(m_automatedOnlyButton, SIGNAL(toggled(bool)), this, SLOT(filterKnobs()));
 	connect(m_groupFilterCombo, SIGNAL(currentTextChanged(const QString)), this, SLOT(filterKnobs()));
 	connect(m_carlaInstrument, SIGNAL(paramsUpdated()), this, SLOT(refreshKnobs()));
 
-	m_carlaInstrumentView->m_subWindow->show(); // Show the subwindow
+	m_carlaInstrumentView->m_paramsSubWindow->show(); // Show the subwindow
 
 	// Add knobs if there are any already.
 	// Call this after show() so the m_inputScrollArea->width() is set properly.
@@ -867,17 +867,17 @@ CarlaParamsView::CarlaParamsView(CarlaInstrumentView* const instrumentView, QWid
 
 CarlaParamsView::~CarlaParamsView()
 {
-	// Close and delete m_subWindow
-	if (m_carlaInstrumentView->m_subWindow)
+	// Close and delete m_paramsSubWindow
+	if (m_carlaInstrumentView->m_paramsSubWindow)
 	{
-		m_carlaInstrumentView->m_subWindow->setAttribute(Qt::WA_DeleteOnClose);
-		m_carlaInstrumentView->m_subWindow->close();
+		m_carlaInstrumentView->m_paramsSubWindow->setAttribute(Qt::WA_DeleteOnClose);
+		m_carlaInstrumentView->m_paramsSubWindow->close();
 
-		delete m_carlaInstrumentView->m_subWindow;
-		m_carlaInstrumentView->m_subWindow = nullptr;
+		delete m_carlaInstrumentView->m_paramsSubWindow;
+		m_carlaInstrumentView->m_paramsSubWindow = nullptr;
 	}
 
-	m_carlaInstrumentView->p_subWindow = nullptr;
+	m_carlaInstrumentView->m_paramsView = nullptr;
 
 	// Clear models
 	if (m_carlaInstrument->m_paramModels.isEmpty() == false)

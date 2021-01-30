@@ -63,6 +63,8 @@
 class QPushButton;
 class QComboBox;
 
+class CarlaParamsView;
+
 class CarlaParamFloatModel : public FloatModel
 {
 public:
@@ -300,8 +302,8 @@ private:
     CarlaInstrument* const m_carlaInstrument;
     QWidget* const p_parent;
 
-    QMdiSubWindow* m_subWindow;
-    QObject* p_subWindow;
+    QMdiSubWindow* m_paramsSubWindow;
+    CarlaParamsView* m_paramsView;
 
     QPushButton* m_toggleUIButton;
     QPushButton* m_toggleParamsWindowButton;
