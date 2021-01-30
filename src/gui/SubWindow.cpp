@@ -111,6 +111,18 @@ SubWindow::SubWindow( QWidget *parent, Qt::WindowFlags windowFlags ) :
 	// get the default systemMenu
 	m_systemMenu = systemMenu();
 
+	// create 'close all' action
+	m_closeAllAction = new QAction();
+	m_closeAllAction->setText("Close all");
+	m_closeAllAction->setShortcut(QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_W));
+	// connect action to signal
+	connect(m_closeAllAction, SIGNAL(triggered()), SignalSender::getInstance(), SLOT(closeAll()));
+	connect(SignalSender::getInstance(), SIGNAL(closeAllSignal()), this, SLOT(close()));
+	// add action to subwindow to capture keypress
+	addAction(m_closeAllAction);
+	// add action to systemMenu
+	m_systemMenu->addAction(m_closeAllAction);
+
 	// create 'close all but this' action
 	m_closeAllButThisAction = new QAction();
 	m_closeAllButThisAction->setText("Close all but this");
@@ -124,18 +136,6 @@ SubWindow::SubWindow( QWidget *parent, Qt::WindowFlags windowFlags ) :
 	addAction(m_closeAllButThisAction);
 	// add action to systemMenu
 	m_systemMenu->addAction(m_closeAllButThisAction);
-
-	// create 'close all' action
-	m_closeAllAction = new QAction();
-	m_closeAllAction->setText("Close all");
-	m_closeAllAction->setShortcut(QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_W));
-	// connect action to signal
-	connect(m_closeAllAction, SIGNAL(triggered()), SignalSender::getInstance(), SLOT(closeAll()));
-	connect(SignalSender::getInstance(), SIGNAL(closeAllSignal()), this, SLOT(close()));
-	// add action to subwindow to capture keypress
-	addAction(m_closeAllAction);
-	// add action to systemMenu
-	m_systemMenu->addAction(m_closeAllAction);
 
 	// update systemMenu
 	setSystemMenu(m_systemMenu);
