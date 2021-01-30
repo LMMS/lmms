@@ -264,8 +264,6 @@ private:
     uint8_t m_knobGroupCount;
     QList<CarlaParamFloatModel*> m_paramModels;
     QDomElement m_settingsElem;
-    QMdiSubWindow* m_subWindow;
-    QObject* p_subWindow;
 
     QCompleter* m_paramsCompleter;
     QStringListModel* m_completerModel;
@@ -302,8 +300,13 @@ private:
     CarlaInstrument* const m_carlaInstrument;
     QWidget* const p_parent;
 
+    QMdiSubWindow* m_subWindow;
+    QObject* p_subWindow;
+
     QPushButton* m_toggleUIButton;
     QPushButton* m_toggleParamsWindowButton;
+
+    friend class CarlaParamsView;
 };
 
 // -------------------------------------------------------------------
@@ -312,7 +315,7 @@ class CarlaParamsView : public InstrumentView
 {
 	Q_OBJECT
 public:
-	CarlaParamsView(CarlaInstrument* const instrument, QWidget* const parent);
+	CarlaParamsView(CarlaInstrumentView* const instrumentView, QWidget* const parent);
 	virtual ~CarlaParamsView();
 
 signals:
@@ -330,6 +333,7 @@ private:
 	void clearKnobs();
 
 	CarlaInstrument* const m_carlaInstrument;
+	CarlaInstrumentView* const m_carlaInstrumentView;
 	QList<Knob*> m_knobs;
 
 	// Keep track of the biggest knob width per group
