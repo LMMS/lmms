@@ -2,7 +2,8 @@
 
 SignalSender* SignalSender::getInstance()
 {
-	return new SignalSender();
+	static SignalSender* instance = new SignalSender();
+	return instance;
 }
 
 void SignalSender::closeAll()
