@@ -102,6 +102,9 @@ SubWindow::SubWindow( QWidget *parent, Qt::WindowFlags windowFlags ) :
 	m_closeOthersAction->setText("Close all but this");
 	m_closeOthersAction->setShortcut(QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_W));
 	connect(m_closeOthersAction, &QAction::triggered, this, &SubWindow::emitCloseOthersSignal);
+	connect(m_closeOthersAction, SIGNAL(triggered(QAction*)), this, SLOT(emitCloseOthersSignal(SubWindow*)));
+	//connect(this, &SubWindow::closeOthers, this, close);
+	connect(this, SIGNAL(closeOthers(SubWindow*)), this, SLOT(close()));
 	// add action to systemMenu
 	m_systemMenu->addAction(m_closeOthersAction);
 	// update systemMenu
