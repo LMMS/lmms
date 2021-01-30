@@ -97,16 +97,19 @@ SubWindow::SubWindow( QWidget *parent, Qt::WindowFlags windowFlags ) :
 
 	// get the default systemMenu
 	m_systemMenu = systemMenu();
-	// create 'close all but this' action
-	m_closeOthersAction = new QAction();
-	m_closeOthersAction->setText("Close all but this");
-	m_closeOthersAction->setShortcut(QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_W));
+
+	// create 'close all' action
+	m_closeAllAction = new QAction();
+	m_closeAllAction->setText("Close all");
+	m_closeAllAction->setShortcut(QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_W));
+	// connect action to signal
 	//connect(m_closeOthersAction, &QAction::triggered, this, &SubWindow::emitCloseOthersSignal);
-	connect(m_closeOthersAction, SIGNAL(triggered()), this, SLOT(emitCloseOthersSignal()));
+	connect(m_closeAllAction, SIGNAL(triggered()), this, SLOT(emitCloseOthersSignal()));
 	//connect(this, &SubWindow::closeOthers, this, close);
 	connect(this, SIGNAL(closeOthers()), this, SLOT(close()));
 	// add action to systemMenu
-	m_systemMenu->addAction(m_closeOthersAction);
+	m_systemMenu->addAction(m_closeAllAction);
+
 	// update systemMenu
 	setSystemMenu(m_systemMenu);
 }
