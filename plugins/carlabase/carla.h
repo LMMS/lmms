@@ -93,7 +93,8 @@ public:
 		}
 	}
 
-	inline virtual void saveSettings(QDomDocument& doc, QDomElement& element, const QString& name = QString( "value" )) override
+	inline virtual void saveSettings(QDomDocument& doc, QDomElement& element,
+		const QString& name = QString( "value" )) override
 	{
 		if (m_isEnabled)
 		{

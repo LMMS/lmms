@@ -282,7 +282,8 @@ void CarlaInstrument::handleUiClosed()
     emit uiClosed();
 }
 
-intptr_t CarlaInstrument::handleDispatcher(const NativeHostDispatcherOpcode opcode, const int32_t index, const intptr_t value, void* const ptr, const float opt)
+intptr_t CarlaInstrument::handleDispatcher(const NativeHostDispatcherOpcode opcode, const int32_t index,
+	const intptr_t value, void* const ptr, const float opt)
 {
     intptr_t ret = 0;
 
@@ -400,7 +401,6 @@ void CarlaInstrument::refreshParams(bool init)
 			m_paramModels[i]->setOutput((paramInfo->hints & NATIVE_PARAMETER_IS_OUTPUT));
 			m_paramModels[i]->setEnabled((paramInfo->hints & NATIVE_PARAMETER_IS_ENABLED));
 
-			// https://github.com/falkTX/Carla/tree/master/source/native-plugins source/native-plugins/resources/carla-plugin
 			float param_value = fDescriptor->get_parameter_value(fHandle, i);
 
 			m_paramModels[i]->setValue(param_value);
@@ -841,9 +841,10 @@ CarlaParamsView::CarlaParamsView(CarlaInstrumentView* const instrumentView, QWid
 
 	// -- Sub window
 	CarlaParamsSubWindow* win = new CarlaParamsSubWindow(gui->mainWindow()->workspace()->viewport(), Qt::SubWindow |
-			Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowSystemMenuHint);
+		Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowSystemMenuHint);
 	m_carlaInstrumentView->m_paramsSubWindow = gui->mainWindow()->workspace()->addSubWindow(win);
-	m_carlaInstrumentView->m_paramsSubWindow->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
+	m_carlaInstrumentView->m_paramsSubWindow->setSizePolicy(
+		QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
 	m_carlaInstrumentView->m_paramsSubWindow->setMinimumHeight(200);
 	m_carlaInstrumentView->m_paramsSubWindow->setMinimumWidth(200);
 	m_carlaInstrumentView->m_paramsSubWindow->resize(600, 400);
@@ -1003,9 +1004,10 @@ void CarlaParamsView::refreshKnobs()
 
 			// Store biggest knob width per group (so we can calc how many
 			// knobs we can horizontaly fit)
-			if (m_maxKnobWidthPerGroup[m_carlaInstrument->m_paramModels[i]->groupId()] < m_knobs[i]->width())
+			uint8_t groupId = m_carlaInstrument->m_paramModels[i]->groupId();
+			if (m_maxKnobWidthPerGroup[groupId] < m_knobs[i]->width())
 			{
-				m_maxKnobWidthPerGroup[m_carlaInstrument->m_paramModels[i]->groupId()] = m_knobs[i]->width() + m_inputScrollAreaLayout->spacing();
+				m_maxKnobWidthPerGroup[groupId] = (m_knobs[i]->width() + m_inputScrollAreaLayout->spacing();
 			}
 		}
 	}
@@ -1030,7 +1032,8 @@ void CarlaParamsView::addKnob(uint32_t index)
 	bool output = m_carlaInstrument->m_paramModels[index]->isOutput();
 	if (output)
 	{
-		m_outputScrollAreaLayout->addWidget(m_knobs[index], m_curOutRow, m_curOutColumn, Qt::AlignHCenter | Qt::AlignTop);
+		m_outputScrollAreaLayout->addWidget(
+			m_knobs[index], m_curOutRow, m_curOutColumn, Qt::AlignHCenter | Qt::AlignTop);
 		m_knobs[index]->setEnabled(false); // We should not be able to adjust output.
 		m_knobs[index]->show();
 		if (m_curOutColumn < m_maxColumns - 1)
