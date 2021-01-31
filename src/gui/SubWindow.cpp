@@ -37,15 +37,15 @@
 #include "embed.h"
 #include "SignalSender.h"
 
-void SubWindow::closeAllButThisEmit()
+void SubWindow::closeOthersEmit()
 {
 	// trigger signal sender to send a close event to all elements
-	emit SignalSender::getInstance()->closeAllButThis(this);
+	emit SignalSender::getInstance()->closeOthers(this);
 }
 
-void SubWindow::closeAllButThisRecive(SubWindow* source)
+void SubWindow::closeOthersRecive(SubWindow* source)
 {
-	// check if source of signal is equal to the current window
+	// make sure source of signal is not the current window
 	if (source != this) {
 		emit closeSignal();
 	}
@@ -124,20 +124,20 @@ SubWindow::SubWindow( QWidget *parent, Qt::WindowFlags windowFlags ) :
 	// add action to systemMenu
 	m_systemMenu->addAction(m_closeAllAction);
 
-	// create 'close all but this' action
-	m_closeAllButThisAction = new QAction();
-	m_closeAllButThisAction->setText("Close all but this");
-	m_closeAllButThisAction->setShortcut(QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_Q));
+	// create 'close others' action
+	m_closeOthersAction = new QAction();
+	m_closeOthersAction->setText("Close others");
+	m_closeOthersAction->setShortcut(QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_Q));
 	// connect action to signal emit
-	connect(m_closeAllButThisAction, SIGNAL(triggered()), this, SLOT(closeAllButThisEmit()));
+	connect(m_closeOthersAction, SIGNAL(triggered()), this, SLOT(closeOthersEmit()));
 	// connect SignalSender to signal recive
-	connect(SignalSender::getInstance(), SIGNAL(closeAllButThisSignal(SubWindow*)), this, SLOT(closeAllButThisRecive(SubWindow*)));
+	connect(SignalSender::getInstance(), SIGNAL(closeOthersSignal(SubWindow*)), this, SLOT(closeOthersRecive(SubWindow*)));
 	// connect signal to close action
 	connect(this, SIGNAL(closeSignal()), this, SLOT(close()));
 	// add action to subwindow to capture keypress
-	addAction(m_closeAllButThisAction);
+	addAction(m_closeOthersAction);
 	// add action to systemMenu
-	m_systemMenu->addAction(m_closeAllButThisAction);
+	m_systemMenu->addAction(m_closeOthersAction);
 
 	// update systemMenu
 	setSystemMenu(m_systemMenu);

@@ -92,15 +92,15 @@ private:
 	bool m_hasFocus;
 	QMenu* m_systemMenu;
 	QAction* m_closeAllAction;
-	QAction* m_closeAllButThisAction;
+	QAction* m_closeOthersAction;
 
 	static void elideText( QLabel *label, QString text );
 	void adjustTitleBar();
 
 private slots:
 	void focusChanged( QMdiSubWindow * subWindow );
-	void closeAllButThisEmit();
-	void closeAllButThisRecive( SubWindow * source);
+	void closeOthersEmit();
+	void closeOthersRecive( SubWindow * source);
 };
 
 #endif

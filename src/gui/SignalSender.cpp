@@ -11,7 +11,7 @@ void SignalSender::closeAll()
 	emit closeAllSignal();
 }
 
-void SignalSender::closeAllButThis(SubWindow* source)
+void SignalSender::closeOthers(SubWindow* source)
 {
-	emit closeAllButThisSignal(source);
+	emit closeOthersSignal(source);
 }
