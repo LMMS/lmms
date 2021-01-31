@@ -112,8 +112,7 @@ SubWindow::SubWindow( QWidget *parent, Qt::WindowFlags windowFlags ) :
 	m_systemMenu = systemMenu();
 
 	// create 'close all' action
-	m_closeAllAction = new QAction();
-	m_closeAllAction->setText("Close all");
+	m_closeAllAction = new QAction("Close all", this);
 	m_closeAllAction->setShortcut(QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_W));
 	// connect action to SignalSender
 	connect(m_closeAllAction, SIGNAL(triggered()), SignalSender::getInstance(), SLOT(closeAll()));
@@ -125,8 +124,7 @@ SubWindow::SubWindow( QWidget *parent, Qt::WindowFlags windowFlags ) :
 	m_systemMenu->addAction(m_closeAllAction);
 
 	// create 'close others' action
-	m_closeOthersAction = new QAction();
-	m_closeOthersAction->setText("Close others");
+	m_closeOthersAction = new QAction("Close others", this);
 	m_closeOthersAction->setShortcut(QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_Q));
 	// connect action to signal emit
 	connect(m_closeOthersAction, SIGNAL(triggered()), this, SLOT(closeOthersEmit()));
