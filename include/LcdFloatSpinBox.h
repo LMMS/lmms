@@ -37,27 +37,14 @@ class LMMS_EXPORT LcdFloatSpinBox : public QWidget, public FloatModelView
 {
 	Q_OBJECT
 public:
-	LcdFloatSpinBox(int numWhole, int numFrac, QWidget* parent, const QString& name = QString());
-	LcdFloatSpinBox(int numWhole, int numFrac, const QString& style, QWidget* parent, const QString& name = QString());
-	virtual ~LcdFloatSpinBox() = default;
+	LcdFloatSpinBox(int numWhole, int numFrac, QWidget* parent = nullptr, const QString& name = QString());
+	LcdFloatSpinBox(int numWhole, int numFrac, const QString& style, QWidget* parent = nullptr,
+		const QString& name = QString());
 
 	void modelChanged() override
 	{
 		ModelView::modelChanged();
 		update();
-	}
-
-	/*! Sets an offset which is always added to value of model so we can
-	    display values in a user-friendly way if they internally start at 0 */
-	void setDisplayOffset(int offset)
-	{
-		m_displayOffset = offset;
-	}
-
-	/*! \brief Returns internal offset for displaying values */
-	int displayOffset() const
-	{
-		return m_displayOffset;
 	}
 
 	void setLabel(const QString &label) { m_label = label; }
@@ -77,7 +64,7 @@ protected:
 private:
 	void layoutSetup(const QString &style = QString("19green"));
 	void enterValue();
-	float getStep();
+	float getStep() const;
 
 	LcdWidget m_wholeDisplay;
 	LcdWidget m_fractionDisplay;

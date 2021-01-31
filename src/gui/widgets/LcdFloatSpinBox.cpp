@@ -106,8 +106,8 @@ void LcdFloatSpinBox::update()
 	const int whole = static_cast<int>(model()->value());
 	const float fraction = model()->value() - whole;
 	const int intFraction = fraction * std::pow(10.f, m_fractionDisplay.numDigits());
-	m_wholeDisplay.setValue(whole + m_displayOffset);
-	m_fractionDisplay.setValue(intFraction + m_displayOffset);
+	m_wholeDisplay.setValue(whole);
+	m_fractionDisplay.setValue(intFraction);
 
 	QWidget::update();
 }
@@ -225,7 +225,7 @@ void LcdFloatSpinBox::enterValue()
 }
 
 
-float LcdFloatSpinBox::getStep()
+float LcdFloatSpinBox::getStep() const
 {
 	if (m_intStep) { return 1; }
 	else { return model()->step<float>(); }

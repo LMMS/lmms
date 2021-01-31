@@ -246,24 +246,24 @@ void LcdWidget::setMarginWidth( int width )
 
 void LcdWidget::updateSize()
 {
-	int margin_x1 = m_seamlessLeft ? 0 : 1 + m_marginWidth;
-	int margin_x2 = m_seamlessRight ? 0 : 1 + m_marginWidth;
-	int margin_y = 1;
+	const int marginX1 = m_seamlessLeft ? 0 : 1 + m_marginWidth;
+	const int marginX2 = m_seamlessRight ? 0 : 1 + m_marginWidth;
+	const int marginY = 1;
 	if (m_label.isEmpty())
 	{
 		setFixedSize(
-			m_cellWidth * m_numDigits + margin_x1 + margin_x2,
-			m_cellHeight + (2 * margin_y)
+			m_cellWidth * m_numDigits + marginX1 + marginX2,
+			m_cellHeight + (2 * marginY)
 		);
 	}
 	else
 	{
 		setFixedSize(
 			qMax<int>(
-				m_cellWidth * m_numDigits + margin_x1 + margin_x2,
+				m_cellWidth * m_numDigits + marginX1 + marginX2,
 				horizontalAdvance(QFontMetrics(pointSizeF(font(), 6.5)), m_label)
 			),
-			m_cellHeight + (2 * margin_y) + 9
+			m_cellHeight + (2 * marginY) + 9
 		);
 	}
 
