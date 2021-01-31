@@ -4145,36 +4145,34 @@ void PianoRoll::pasteGhostNotes()
 	if(!hasValidPattern()) { return; }
 
 	QString value = Clipboard::getString(Clipboard::MimeType::Default);
+	QDomNodeList list;
 
 	if(!value.isEmpty())
 	{
 		DataFile dataFile(value.toUtf8());
-
-		QDomNodeList list = dataFile.elementsByTagName(Note::classNodeName());
-
-		if(!list.isEmpty())
-		{
-			m_ghostNotes.clear();
-
-			for(int i = 0; !list.item(i).isNull(); ++i)
-			{
-				Note *note = new Note;
-				note->restoreState(list.item(i).toElement());
-				note->setPos(note->pos() + Note::quantized(m_timeLine->pos(), quantization()));
-
-				m_ghostNotes.push_back(note);
-			}
-
-			// Paste was sucessful
-			showGhostNotes(true);
-			return;
-		}
+		list = dataFile.elementsByTagName(Note::classNodeName());
 	}
 
-	TextFloat::displayMessage(tr("Paste as ghost failed"),
-			tr("Clipboard is empty"),
-			embed::getIconPixmap("ghost_note", 24, 24),
-			3000);
+	if(list.isEmpty())
+	{
+		TextFloat::displayMessage(tr("Paste as ghost failed"),
+				tr("Clipboard is empty"),
+				embed::getIconPixmap("ghost_note", 24, 24),
+				3000);
+	}
+
+	m_ghostNotes.clear();
+
+	for(int i = 0; !list.item(i).isNull(); ++i)
+	{
+		Note *note = new Note;
+		note->restoreState(list.item(i).toElement());
+		note->setPos(note->pos() + Note::quantized(m_timeLine->pos(), quantization()));
+
+		m_ghostNotes.push_back(note);
+	}
+
+	showGhostNotes(true);
 }
 
 
