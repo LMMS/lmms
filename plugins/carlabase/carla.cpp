@@ -1002,7 +1002,7 @@ void CarlaParamsView::refreshKnobs()
 			uint8_t groupId = m_carlaInstrument->m_paramModels[i]->groupId();
 			if (m_maxKnobWidthPerGroup[groupId] < m_knobs[i]->width())
 			{
-				m_maxKnobWidthPerGroup[groupId] = (m_knobs[i]->width() + m_inputScrollAreaLayout->spacing();
+				m_maxKnobWidthPerGroup[groupId] = m_knobs[i]->width() + m_inputScrollAreaLayout->spacing();
 			}
 		}
 	}
