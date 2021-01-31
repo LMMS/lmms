@@ -40,7 +40,7 @@ class LMMS_EXPORT LcdWidget : public QWidget
 	Q_PROPERTY( QColor textShadowColor READ textShadowColor WRITE setTextShadowColor )
 	
 public:
-	LcdWidget(QWidget* parent, const QString& name = QString(), bool leadingZero = false);
+	explicit LcdWidget(QWidget* parent, const QString& name = QString(), bool leadingZero = false);
 	LcdWidget(int numDigits, QWidget* parent, const QString& name = QString(), bool leadingZero = false);
 	LcdWidget(int numDigits, const QString& style, QWidget* parent, const QString& name = QString(),
 		bool leadingZero = false);
@@ -104,8 +104,8 @@ private:
 	int m_cellHeight;
 	int m_numDigits;
 	int m_marginWidth;
-	int m_seamlessLeft;
-	int m_seamlessRight;
+	bool m_seamlessLeft;
+	bool m_seamlessRight;
 	bool m_leadingZero;
 
 	void initUi( const QString& name, const QString &style ); //!< to be called by ctors

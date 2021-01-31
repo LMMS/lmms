@@ -152,7 +152,7 @@ void LcdWidget::paintEvent( QPaintEvent* )
 		p.drawPixmap(
 			cellRect,
 			*m_lcdPixmap,
-			QRect(QPoint(charsPerPixmap * m_cellWidth, isEnabled() ? 0 : m_cellHeight),	cellSize)
+			QRect(QPoint(charsPerPixmap * m_cellWidth, isEnabled() ? 0 : m_cellHeight), cellSize)
 		);
 
 		p.translate(m_marginWidth, 0);
@@ -291,5 +291,4 @@ void LcdWidget::initUi(const QString& name , const QString& style)
 
 	updateSize();
 }
-
 

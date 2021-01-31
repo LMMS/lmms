@@ -27,6 +27,7 @@
 #include "LcdFloatSpinBox.h"
 
 #include <cmath>
+
 #include <QApplication>
 #include <QHBoxLayout>
 #include <QInputDialog>
@@ -81,8 +82,8 @@ void LcdFloatSpinBox::layoutSetup(const QString &style)
 	lcdLayout->addWidget(&m_wholeDisplay);
 
 	QLabel *dotLabel = new QLabel("", this);
-	QPixmap *dotPixmap = new QPixmap(embed::getIconPixmap(QString("lcd_" + style + "_dot").toUtf8().constData()));
-	dotLabel->setPixmap(dotPixmap->copy(0, 0, dotPixmap->size().width(), dotPixmap->size().height() / 2));
+	QPixmap dotPixmap(embed::getIconPixmap(QString("lcd_" + style + "_dot").toUtf8().constData()));
+	dotLabel->setPixmap(dotPixmap.copy(0, 0, dotPixmap.size().width(), dotPixmap.size().height() / 2));
 	lcdLayout->addWidget(dotLabel);
 
 	lcdLayout->addWidget(&m_fractionDisplay);
@@ -162,7 +163,7 @@ void LcdFloatSpinBox::mouseMoveEvent(QMouseEvent* event)
 		if (gui->mainWindow()->isShiftPressed()) { dy = qBound(-4, dy/4, 4); }
 		if (dy > 1 || dy < -1)
 		{
-			model()->setInitValue(model()->value() - dy / 2 * getStep());
+			model()->setValue(model()->value() - dy / 2 * getStep());
 			emit manualChange();
 			QCursor::setPos(m_origMousePos);
 		}
@@ -191,7 +192,7 @@ void LcdFloatSpinBox::wheelEvent(QWheelEvent *event)
 	else { m_intStep = false; }
 
 	event->accept();
-	model()->setInitValue(model()->value() + ((event->delta() > 0) ? 1 : -1) * getStep());
+	model()->setValue(model()->value() + ((event->delta() > 0) ? 1 : -1) * getStep());
 	emit manualChange();
 }
 

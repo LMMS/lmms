@@ -92,6 +92,6 @@ signals:
 
 };
 
-typedef FloatModel LcdFloatSpinBoxModel;
+using LcdFloatSpinBoxModel = FloatModel;
 
 #endif
