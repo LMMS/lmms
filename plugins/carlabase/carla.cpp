@@ -51,7 +51,6 @@
 #include <QStringList>
 #include <QTimerEvent>
 #include <QVBoxLayout>
-#include <QDebug>
 
 #include <cstring>
 
@@ -321,10 +320,8 @@ intptr_t CarlaInstrument::handleDispatcher(const NativeHostDispatcherOpcode opco
         refreshParams();
         break;
     case NATIVE_HOST_OPCODE_UPDATE_PARAMETER:
-        qDebug() << "CarlaInstrument::handleDispatcher NATIVE_HOST_OPCODE_UPDATE_PARAMETER";
         break;
     case NATIVE_HOST_OPCODE_RELOAD_PARAMETERS:
-        qDebug() << "CarlaInstrument::handleDispatcher NATIVE_HOST_OPCODE_RELOAD_PARAMETERS";
         refreshParams();
         break;
     case NATIVE_HOST_OPCODE_UPDATE_MIDI_PROGRAM:
