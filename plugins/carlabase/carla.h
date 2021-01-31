@@ -345,7 +345,6 @@ private:
 	uint32_t m_maxColumns;
 	uint32_t m_curColumn;
 	uint32_t m_curRow;
-
 	uint32_t m_curOutColumn;
 	uint32_t m_curOutRow;
 
@@ -356,11 +355,9 @@ private:
 	QGridLayout* m_outputScrollAreaLayout;
 	QWidget* m_outputScrollAreaWidgetContent;
 	QHBoxLayout* m_toolBarLayout;
-
 	QLineEdit* m_paramsFilterLineEdit;
 	QPushButton* m_clearFilterButton;
 	QPushButton* m_automatedOnlyButton;
-
 	QComboBox* m_groupFilterCombo;
 	QStringListModel* m_groupFilterModel;
 };

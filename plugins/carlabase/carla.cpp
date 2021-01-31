@@ -392,7 +392,7 @@ void CarlaInstrument::refreshParams(bool init)
 		uint32_t param_count = fDescriptor->get_parameter_count(fHandle);
 
 		QList<QString> completerData;
-		QList<QString> groups; // tmp used to count no. groups.
+		QList<QString> groups; // used to count no. groups.
 
 		for (uint32_t i=0; i < param_count; ++i)
 		{
@@ -777,7 +777,6 @@ CarlaParamsView::CarlaParamsView(CarlaInstrumentView* const instrumentView, QWid
 	m_toolBarLayout->addWidget(m_automatedOnlyButton);
 	m_toolBarLayout->addWidget(m_groupFilterCombo);
 
-
 	// -- Input params
 	QFrame * inputFrame = new QFrame(this);
 	QVBoxLayout* inputLayout = new QVBoxLayout(inputFrame);
@@ -991,7 +990,6 @@ void CarlaParamsView::refreshKnobs()
 
 		// Set the newly created model to the knob.
 		m_knobs[i]->setModel(m_carlaInstrument->m_paramModels[i]);
-
 		m_knobs[i]->setEnabled(enabled);
 
 		if (enabled)
