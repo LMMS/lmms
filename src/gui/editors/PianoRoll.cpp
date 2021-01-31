@@ -4159,6 +4159,7 @@ void PianoRoll::pasteGhostNotes()
 				tr("Clipboard is empty"),
 				embed::getIconPixmap("ghost_note", 24, 24),
 				3000);
+		return;
 	}
 
 	m_ghostNotes.clear();
