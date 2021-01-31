@@ -1189,11 +1189,13 @@ void PianoRoll::keyPressEvent(QKeyEvent* ke)
 					if( m_action == ActionMoveNote ||
 							m_action == ActionResizeNote )
 					{
-						dragNotes( m_lastMouseX, m_lastMouseY,
-									ke->modifiers() & Qt::AltModifier,
-									ke->modifiers() & Qt::ShiftModifier,
-									ke->modifiers() & Qt::ControlModifier,
-									nullptr );
+						dragNotes(
+							m_lastMouseX,
+							m_lastMouseY,
+							ke->modifiers() & Qt::AltModifier,
+							ke->modifiers() & Qt::ShiftModifier,
+							ke->modifiers() & Qt::ControlModifier
+						);
 					}
 				}
 				ke->accept();
@@ -1246,11 +1248,13 @@ void PianoRoll::keyPressEvent(QKeyEvent* ke)
 					if( m_action == ActionMoveNote ||
 							m_action == ActionResizeNote )
 					{
-						dragNotes( m_lastMouseX, m_lastMouseY,
-									ke->modifiers() & Qt::AltModifier,
-									ke->modifiers() & Qt::ShiftModifier,
-									ke->modifiers() & Qt::ControlModifier,
-									nullptr );
+						dragNotes(
+							m_lastMouseX,
+							m_lastMouseY,
+							ke->modifiers() & Qt::AltModifier,
+							ke->modifiers() & Qt::ShiftModifier,
+							ke->modifiers() & Qt::ControlModifier
+						);
 					}
 
 				}
@@ -2204,11 +2208,13 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 				pauseTestNotes();
 			}
 
-			dragNotes( me->x(), me->y(),
+			dragNotes(
+				me->x(),
+				me->y(),
 				me->modifiers() & Qt::AltModifier,
 				me->modifiers() & Qt::ShiftModifier,
-				me->modifiers() & Qt::ControlModifier,
-				noteUnderMouse() );
+				me->modifiers() & Qt::ControlModifier
+			);
 
 			if( replay_note && m_action == ActionMoveNote && ! ( ( me->modifiers() & Qt::ShiftModifier ) && ! m_startedWithShift ) )
 			{
@@ -2545,20 +2551,13 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 
 
 
-void PianoRoll::dragNotes( int x, int y, bool alt, bool shift, bool ctrl, Note* noteDragged )
+void PianoRoll::dragNotes(int x, int y, bool alt, bool shift, bool ctrl)
 {
 	// dragging one or more notes around
-
-	// get note that's dragged
-	if (noteDragged != nullptr)
-	{
-		m_draggedNote = noteDragged;
-	}
 
 	// convert pixels to ticks and keys
 	int off_x = x - m_moveStartX;
 	int off_ticks = off_x * TimePos::ticksPerBar() / m_ppb;
-	int unquantized_off_ticks = off_ticks;
 	int off_key = getKey( y ) - getKey( m_moveStartY );
 
 	// handle scroll changes while dragging
@@ -2595,7 +2594,6 @@ void PianoRoll::dragNotes( int x, int y, bool alt, bool shift, bool ctrl, Note* 
 
 	if (m_action == ActionMoveNote)
 	{
-		bool firstIteration = true;
 		for (Note *note : getSelectedNotes())
 		{
 			if (shift && ! m_startedWithShift)
@@ -2612,41 +2610,37 @@ void PianoRoll::dragNotes( int x, int y, bool alt, bool shift, bool ctrl, Note* 
 			else
 			{
 				// moving note
-				if (m_gridMode == gridSnap && firstIteration)
+				if ( m_gridMode == gridSnap && quantization() > 1 )
 				{
-					firstIteration = false;
-					Note* copy(m_draggedNote);
-					// guantize first note
-					int start_pos_ticks = copy->oldPos().getTicks() + unquantized_off_ticks;
-					int end_pos_ticks = start_pos_ticks + copy->length().getTicks();
-					start_pos_ticks = qMax(0, start_pos_ticks);
-					end_pos_ticks = qMax(0, end_pos_ticks);
+					// Get the relative X position of mouse inside PianoRoll viewport
+					int viewportMouseX = x - m_whiteKeyWidth;
+					// Convert it to a TimePos
+					TimePos mousePos(viewportMouseX * TimePos::ticksPerBar() / m_ppb + m_currentPosition);
+					// Calculate the initial offset when we clicked on the note in Ticks
+					int initialOffset = (m_moveStartX - m_whiteKeyWidth) * TimePos::ticksPerBar() / m_ppb + m_mouseDownTick - m_currentNote->oldPos().getTicks();
+					// Remove that initial offset to the mouse X position for a more
+					// fluid movement
+					mousePos -= initialOffset;
 
-					copy->setPos(TimePos(start_pos_ticks));
-					copy->quantizePos(quantization());
-					auto tmp_pos=copy->pos(); // store start position
+					// We create a mousePos that is relative to the end of the note instead
+					// of the beginning. That's to see if we will snap the beginning or end
+					// of the note
+					TimePos mousePosEnd(mousePos);
+					mousePosEnd += m_currentNote->oldLength();
 
-					int gap_start = qAbs(start_pos_ticks - copy->pos().getTicks());
+					// Now we quantize the mouse position to snap it to the grid
+					TimePos mousePosQ = mousePos.quantize(static_cast<float>(quantization()) / DefaultTicksPerBar);
+					TimePos mousePosEndQ = mousePosEnd.quantize(static_cast<float>(quantization()) / DefaultTicksPerBar);
 
-					copy->setPos(TimePos(end_pos_ticks));
-					copy->quantizePos(quantization());
+					bool snapEnd = abs(mousePosEndQ - mousePosEnd) < abs(mousePosQ - mousePos);
 
-					int gap_end = qAbs(end_pos_ticks - copy->pos().getTicks());
-
-					if (gap_start < gap_end)
-					{
-						copy->setPos(tmp_pos); // restore start position
-						off_ticks += copy->pos().getTicks() - (m_draggedNote->oldPos().getTicks() + off_ticks);
-					}
-					else
-					{
-						off_ticks += copy->pos().getTicks() - (m_draggedNote->oldPos().getTicks() + off_ticks) - m_draggedNote->length().getTicks();
-					}
-
-					// new off_ticks based on quantized (copy) note and not-quantized notes
-
-					printf("gap_start = %i\n gap_end %i\n", gap_start,gap_end);
+					// Overwrite the offset we had in ticks with the distance between
+					// the note we are moving and the calculated position from the mouse
+					off_ticks = snapEnd
+									? mousePosEndQ.getTicks() - m_currentNote->oldPos().getTicks() - m_currentNote->oldLength().getTicks()
+									: mousePosQ.getTicks() - m_currentNote->oldPos().getTicks();
 				}
+
 				int pos_ticks = note->oldPos().getTicks() + off_ticks;
 				int key_num = note->oldKey() + off_key;
 
@@ -2656,8 +2650,8 @@ void PianoRoll::dragNotes( int x, int y, bool alt, bool shift, bool ctrl, Note* 
 				key_num = qMax(0, key_num);
 				key_num = qMin(key_num, NumKeys);
 
-				note->setPos( TimePos( pos_ticks ) );
-				note->setKey( key_num );
+				note->setPos(TimePos(pos_ticks));
+				note->setKey(key_num);
 			}
 		}
 	}
@@ -2754,19 +2748,20 @@ void PianoRoll::dragNotes( int x, int y, bool alt, bool shift, bool ctrl, Note* 
 		else
 		{
 			// shift is not pressed; stretch length of selected notes but not their position
-			bool firstIteraton = true;
 			int minLength = alt ? 1 : m_minResizeLen.getTicks();
+
+			if (m_gridMode == gridSnap)
+			{
+				// Calculate the end point of the note being dragged
+				TimePos oldEndPoint = m_currentNote->oldPos() + m_currentNote->oldLength();
+				// Quantize that position
+				TimePos quantizedEndPoint = Note::quantized(oldEndPoint, quantization());
+				// Add that difference to the offset from the resize
+				off_ticks += quantizedEndPoint - oldEndPoint;
+			}
 
 			for (Note *note : selectedNotes)
 			{
-				if (m_gridMode == gridSnap && firstIteraton)
-				{
-					firstIteraton = false;
-					Note copy (*note);
-					int oldEndPoint = copy.oldPos()+copy.oldLength();
-					int quantizedEndPoint = Note::quantized(copy.oldLength()+copy.oldPos(),quantization());
-					off_ticks += quantizedEndPoint - oldEndPoint;
-				}
 				int newLength = qMax(minLength, note->oldLength() + off_ticks);
 				note->setLength(TimePos(newLength));
 
