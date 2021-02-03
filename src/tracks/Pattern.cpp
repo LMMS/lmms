@@ -183,23 +183,20 @@ TimePos Pattern::beatPatternLength() const
 {
 	tick_t max_length = TimePos::ticksPerBar();
 
-	for( NoteVector::ConstIterator it = m_notes.begin();
-						it != m_notes.end(); ++it )
+	for (NoteVector::ConstIterator it = m_notes.begin(); it != m_notes.end(); ++it)
 	{
-		if( ( *it )->length() < 0 )
+		if ((*it)->type() == Note::StepNote)
 		{
-			max_length = qMax<tick_t>( max_length,
-				( *it )->pos() + 1 );
+			max_length = qMax<tick_t>(max_length, (*it)->pos() + 1);
 		}
 	}
 
-	if( m_steps != TimePos::stepsPerBar() )
+	if (m_steps != TimePos::stepsPerBar())
 	{
-		max_length = m_steps * TimePos::ticksPerBar() /
-						TimePos::stepsPerBar();
+		max_length = m_steps * TimePos::ticksPerBar() / TimePos::stepsPerBar();
 	}
 
-	return TimePos( max_length ).nextFullBar() * TimePos::ticksPerBar();
+	return TimePos(max_length).nextFullBar() * TimePos::ticksPerBar();
 }
 
 
@@ -958,9 +955,12 @@ void PatternView::paintEvent( QPaintEvent * )
 
 	const int x_base = TCO_BORDER_WIDTH;
 
-	// melody pattern paint event
+	// Melody pattern and Beat Pattern (on Song Editor) paint event
+	// TODO: Improve this ugly conditional
 	NoteVector const & noteCollection = m_pat->m_notes;
-	if( m_pat->m_patternType == Pattern::MelodyPattern && !noteCollection.empty() )
+	if ((m_pat->m_patternType == Pattern::MelodyPattern
+		|| (m_pat->m_patternType == Pattern::BeatPattern && !fixedTCOs()))
+		&& !noteCollection.empty())
 	{
 		// Compute the minimum and maximum key in the pattern
 		// so that we know how much there is to draw.
@@ -1073,7 +1073,6 @@ void PatternView::paintEvent( QPaintEvent * )
 
 		p.restore();
 	}
-
 	// beat pattern paint event
 	else if( beatPattern &&	( fixedTCOs() || pixelsPerBar >= 96 ) )
 	{
