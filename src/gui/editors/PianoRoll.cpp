@@ -762,32 +762,29 @@ void PianoRoll::fitNoteLengths(bool fill)
 }
 
 
-void PianoRoll::limitNoteLengths(bool minimumLimit)
+void PianoRoll::constrainNoteLengths(bool constrainMax)
 {
-	if (hasValidPattern())
+	if (!hasValidPattern()) { return; }
+	m_pattern->addJournalCheckPoint();
+
+	NoteVector notes = getSelectedNotes();
+	if (notes.empty())
 	{
-		m_pattern->addJournalCheckPoint();
-
-		NoteVector notes = getSelectedNotes();
-		if (notes.empty())
-		{
-			notes = m_pattern->notes();
-		}
-
-		TimePos limit = m_lenOfNewNotes;  // length of last note
-		for (Note *note : notes)
-			{
-			if ((minimumLimit && note->length() < limit)
-			  || (!minimumLimit && note->length() > limit))
-			{
-				note->setLength(limit);
-			}
-		}
-
-		update();
-		gui->songEditor()->update();
-		Engine::getSong()->setModified();
+		notes = m_pattern->notes();
 	}
+
+	TimePos bound = m_lenOfNewNotes;  // will be length of last note
+	for (Note *note : notes)
+	{
+		if (constrainMax ? note->length() > bound : note->length() < bound)
+		{
+			note->setLength(bound);
+		}
+	}
+
+	update();
+	gui->songEditor()->update();
+	Engine::getSong()->setModified();
 }
 
 
@@ -4528,10 +4525,10 @@ PianoRollWindow::PianoRollWindow() :
 	cutOverlapsAction->setShortcut( Qt::SHIFT | Qt::Key_C );
 
 	QAction *minLengthAction = new QAction(embed::getIconPixmap("min_length"), tr("Min length as last"), noteToolsButton);
-	connect(minLengthAction, &QAction::triggered, [this](){ m_editor->limitNoteLengths(true); });
+	connect(minLengthAction, &QAction::triggered, [this](){ m_editor->constrainNoteLengths(false); });
 
 	QAction *maxLengthAction = new QAction(embed::getIconPixmap("max_length"), tr("Max length as last"), noteToolsButton);
-	connect(maxLengthAction, &QAction::triggered, [this](){ m_editor->limitNoteLengths(false); });
+	connect(maxLengthAction, &QAction::triggered, [this](){ m_editor->constrainNoteLengths(true); });
 
 	noteToolsButton->addAction(glueAction);
 	noteToolsButton->addAction(fillAction);
