@@ -955,12 +955,74 @@ void PatternView::paintEvent( QPaintEvent * )
 
 	const int x_base = TCO_BORDER_WIDTH;
 
-	// Melody pattern and Beat Pattern (on Song Editor) paint event
-	// TODO: Improve this ugly conditional
 	NoteVector const & noteCollection = m_pat->m_notes;
-	if ((m_pat->m_patternType == Pattern::MelodyPattern
-		|| (m_pat->m_patternType == Pattern::BeatPattern && !fixedTCOs()))
-		&& !noteCollection.empty())
+
+	// Beat pattern paint event
+	if (beatPattern && (fixedTCOs() || pixelsPerBar >= 96))
+	{
+		QPixmap stepon0;
+		QPixmap stepon200;
+		QPixmap stepoff;
+		QPixmap stepoffl;
+		const int steps = qMax( 1,
+					m_pat->m_steps );
+		const int w = width() - 2 * TCO_BORDER_WIDTH;
+
+		// scale step graphics to fit the beat pattern length
+		stepon0 = s_stepBtnOn0->scaled( w / steps,
+					      s_stepBtnOn0->height(),
+					      Qt::IgnoreAspectRatio,
+					      Qt::SmoothTransformation );
+		stepon200 = s_stepBtnOn200->scaled( w / steps,
+					      s_stepBtnOn200->height(),
+					      Qt::IgnoreAspectRatio,
+					      Qt::SmoothTransformation );
+		stepoff = s_stepBtnOff->scaled( w / steps,
+						s_stepBtnOff->height(),
+						Qt::IgnoreAspectRatio,
+						Qt::SmoothTransformation );
+		stepoffl = s_stepBtnOffLight->scaled( w / steps,
+						s_stepBtnOffLight->height(),
+						Qt::IgnoreAspectRatio,
+						Qt::SmoothTransformation );
+
+		for( int it = 0; it < steps; it++ )	// go through all the steps in the beat pattern
+		{
+			Note * n = m_pat->noteAtStep( it );
+
+			// figure out x and y coordinates for step graphic
+			const int x = TCO_BORDER_WIDTH + static_cast<int>( it * w / steps );
+			const int y = height() - s_stepBtnOff->height() - 1;
+
+			if( n )
+			{
+				const int vol = n->getVolume();
+				p.drawPixmap( x, y, stepoffl );
+				p.drawPixmap( x, y, stepon0 );
+				p.setOpacity( sqrt( vol / 200.0 ) );
+				p.drawPixmap( x, y, stepon200 );
+				p.setOpacity( 1 );
+			}
+			else if( ( it / 4 ) % 2 )
+			{
+				p.drawPixmap( x, y, stepoffl );
+			}
+			else
+			{
+				p.drawPixmap( x, y, stepoff );
+			}
+		} // end for loop
+
+		// draw a transparent rectangle over muted patterns
+		if ( muted )
+		{
+			p.setBrush( mutedBackgroundColor() );
+			p.setOpacity( 0.5 );
+			p.drawRect( 0, 0, width(), height() );
+		}
+	}
+	// Melody pattern and Beat Pattern (on Song Editor) paint event
+	else if (!noteCollection.empty())
 	{
 		// Compute the minimum and maximum key in the pattern
 		// so that we know how much there is to draw.
@@ -1072,70 +1134,6 @@ void PatternView::paintEvent( QPaintEvent * )
 		}
 
 		p.restore();
-	}
-	// beat pattern paint event
-	else if( beatPattern &&	( fixedTCOs() || pixelsPerBar >= 96 ) )
-	{
-		QPixmap stepon0;
-		QPixmap stepon200;
-		QPixmap stepoff;
-		QPixmap stepoffl;
-		const int steps = qMax( 1,
-					m_pat->m_steps );
-		const int w = width() - 2 * TCO_BORDER_WIDTH;
-
-		// scale step graphics to fit the beat pattern length
-		stepon0 = s_stepBtnOn0->scaled( w / steps,
-					      s_stepBtnOn0->height(),
-					      Qt::IgnoreAspectRatio,
-					      Qt::SmoothTransformation );
-		stepon200 = s_stepBtnOn200->scaled( w / steps,
-					      s_stepBtnOn200->height(),
-					      Qt::IgnoreAspectRatio,
-					      Qt::SmoothTransformation );
-		stepoff = s_stepBtnOff->scaled( w / steps,
-						s_stepBtnOff->height(),
-						Qt::IgnoreAspectRatio,
-						Qt::SmoothTransformation );
-		stepoffl = s_stepBtnOffLight->scaled( w / steps,
-						s_stepBtnOffLight->height(),
-						Qt::IgnoreAspectRatio,
-						Qt::SmoothTransformation );
-
-		for( int it = 0; it < steps; it++ )	// go through all the steps in the beat pattern
-		{
-			Note * n = m_pat->noteAtStep( it );
-
-			// figure out x and y coordinates for step graphic
-			const int x = TCO_BORDER_WIDTH + static_cast<int>( it * w / steps );
-			const int y = height() - s_stepBtnOff->height() - 1;
-
-			if( n )
-			{
-				const int vol = n->getVolume();
-				p.drawPixmap( x, y, stepoffl );
-				p.drawPixmap( x, y, stepon0 );
-				p.setOpacity( sqrt( vol / 200.0 ) );
-				p.drawPixmap( x, y, stepon200 );
-				p.setOpacity( 1 );
-			}
-			else if( ( it / 4 ) % 2 )
-			{
-				p.drawPixmap( x, y, stepoffl );
-			}
-			else
-			{
-				p.drawPixmap( x, y, stepoff );
-			}
-		} // end for loop
-
-		// draw a transparent rectangle over muted patterns
-		if ( muted )
-		{
-			p.setBrush( mutedBackgroundColor() );
-			p.setOpacity( 0.5 );
-			p.drawRect( 0, 0, width(), height() );
-		}
 	}
 
 	// bar lines
