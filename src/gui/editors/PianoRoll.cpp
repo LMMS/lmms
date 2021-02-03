@@ -712,62 +712,53 @@ void PianoRoll::glueNotes()
 	}
 }
 
-void PianoRoll::fitNoteLengths(bool shrink, bool grow)
+void PianoRoll::fitNoteLengths(bool fill)
 {
-	if (hasValidPattern())
+	if (!hasValidPattern()) { return; }
+	m_pattern->addJournalCheckPoint();
+
+	NoteVector refNotes = getSelectedNotes();
+	if (refNotes.empty())
 	{
-		m_pattern->addJournalCheckPoint();
-
-		NoteVector notes = getSelectedNotes();
-		if (notes.empty())
-		{
-			notes = m_pattern->notes();
-		}
-
-		// Sort notes by position
-		std::sort(notes.begin(), notes.end(), Note::lessThan);
-
-		NoteVector chordGroup;
-		TimePos chordLength;
-		TimePos lastEndPos(0);
-
-		for (int i = 0; i < notes.count(); i++)
-		{
-			lastEndPos = qMax(notes[i]->endPos(), lastEndPos);
-
-			chordGroup.append(notes[i]);
-
-			// Stretch last chord to end of last bar
-			if (i+1 == notes.count())
-			{
-				chordLength = lastEndPos.nextFullBar() * TimePos::ticksPerBar() - notes[i]->pos();
-			}
-			// Stretch chord to next note
-			else if (notes[i]->pos() != notes[i+1]->pos())
-			{
-				chordLength = notes[i+1]->pos() - notes[i]->pos();
-			}
-			// There are more notes in the chord
-			else
-			{
-				continue;
-			}
-
-			for (Note *chordNote: chordGroup)
-			{
-				if ((shrink && chordNote->length() > chordLength)
-					|| (grow && chordNote->length() < chordLength))
-				{
-					chordNote->setLength(chordLength);
-				}
-			}
-			chordGroup.clear();
-		}
-
-		update();
-		gui->songEditor()->update();
-		Engine::getSong()->setModified();
+		refNotes = m_pattern->notes();
 	}
+	// Sort by start position
+	std::sort(refNotes.begin(), refNotes.end(), Note::lessThan);
+
+	NoteVector notes = refNotes;
+	if (fill)
+	{
+		// Sort by end position when filling
+		std::sort(notes.begin(), notes.end(), [](Note *n1, Note *n2) { return n1->endPos() < n2->endPos(); });
+	}
+
+	int length;
+	NoteVector::iterator ref = refNotes.begin();
+	for (Note *note : notes)
+	{
+		// Fast forward to next reference note
+		while (ref != refNotes.end() && (fill ? (*ref)->pos() < note->endPos() : (*ref)->pos() <= note->pos()))
+		{
+			ref++;
+		}
+		if (ref == refNotes.end())
+		{
+			// Last notes stretch to end of last bar
+			length = notes.last()->endPos().nextFullBar() * TimePos::ticksPerBar() - note->pos();
+		}
+		else
+		{
+			length = (*ref)->pos() - note->pos();
+		}
+		if (fill ? note->length() < length : note->length() > length)
+		{
+			note->setLength(length);
+		}
+	}
+
+	update();
+	gui->songEditor()->update();
+	Engine::getSong()->setModified();
 }
 
 
@@ -4529,11 +4520,11 @@ PianoRollWindow::PianoRollWindow() :
 	glueAction->setShortcut( Qt::SHIFT | Qt::Key_G );
 
 	QAction *fillAction = new QAction(embed::getIconPixmap("fill"), tr("Fill"), noteToolsButton);
-	connect(fillAction, &QAction::triggered, [this](){ m_editor->fitNoteLengths(false, true); });
+	connect(fillAction, &QAction::triggered, [this](){ m_editor->fitNoteLengths(true); });
 	fillAction->setShortcut( Qt::SHIFT | Qt::Key_F );
 
 	QAction *cutOverlapsAction = new QAction(embed::getIconPixmap("cut_overlaps"), tr("Cut overlaps"), noteToolsButton);
-	connect(cutOverlapsAction, &QAction::triggered, [this](){ m_editor->fitNoteLengths(true, false); });
+	connect(cutOverlapsAction, &QAction::triggered, [this](){ m_editor->fitNoteLengths(false); });
 	cutOverlapsAction->setShortcut( Qt::SHIFT | Qt::Key_C );
 
 	QAction *minLengthAction = new QAction(embed::getIconPixmap("min_length"), tr("Min length as last"), noteToolsButton);

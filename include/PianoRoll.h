@@ -209,7 +209,7 @@ protected slots:
 
 	void clearGhostPattern();
 	void glueNotes();
-	void fitNoteLengths(bool shrink, bool grow);
+	void fitNoteLengths(bool fill);
 	void limitNoteLengths(bool minimumLimit);
 
 
