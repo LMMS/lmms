@@ -205,7 +205,8 @@ void Note::loadSettings( const QDomElement & _this )
 	m_panning = _this.attribute( "pan" ).toInt();
 	m_length = _this.attribute( "len" ).toInt();
 	m_pos = _this.attribute( "pos" ).toInt();
-	m_type = static_cast<Type>(_this.attribute("type").toInt());
+	// Default m_type value is 0, which corresponds to RegularNote
+	m_type = static_cast<Type>(_this.attribute("type", "0").toInt());
 
 	if( _this.hasChildNodes() )
 	{

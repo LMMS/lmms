@@ -93,7 +93,7 @@ public:
 	// Note types
 	enum Types
 	{
-		RegularNote,
+		RegularNote = 0,
 		StepNote
 	};
 	typedef Types Type;
