@@ -3172,11 +3172,15 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 			if (note->key() > bottomKey && note->key() <= topKey)
 			{
 
-				// we've done and checked all, let's draw the note
+				// We've done and checked all, let's draw the note with
+				// the appropriate color
+				QColor fillColor = note->type() == Note::RegularNote ? m_noteColor : m_stepNoteColor;
+
 				drawNoteRect(
 					p, x + m_whiteKeyWidth, y_base - key * m_keyLineHeight, note_width,
-					note, m_noteColor, m_noteTextColor, m_selectedNoteColor,
-					m_noteOpacity, m_noteBorders, drawNoteNames);
+					note, fillColor, m_noteTextColor, m_selectedNoteColor,
+					m_noteOpacity, m_noteBorders, drawNoteNames
+				);
 			}
 
 			// draw note editing stuff

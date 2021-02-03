@@ -297,8 +297,13 @@ void Pattern::clearNotes()
 
 Note * Pattern::addStepNote( int step )
 {
-	return addNote( Note( TimePos( -DefaultTicksPerBar ),
-				TimePos::stepPosition( step ) ), false );
+	Note * n =
+		addNote(
+			Note(TimePos(-DefaultTicksPerBar),
+			TimePos::stepPosition(step)), false
+		);
+	n->setType(Note::StepNote);
+	return n;
 }
 
 

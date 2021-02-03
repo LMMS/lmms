@@ -90,6 +90,20 @@ public:
 	Note( const Note & note );
 	virtual ~Note();
 
+	// Note types
+	enum Types
+	{
+		RegularNote,
+		StepNote
+	};
+	typedef Types Type;
+
+	Type type() const
+	{
+		return m_type;
+	}
+	void setType(Type t);
+
 	// used by GUI
 	inline void setSelected( const bool selected ) { m_selected = selected; }
 	inline void setOldKey( const int oldKey ) { m_oldKey = oldKey; }
@@ -236,6 +250,9 @@ private:
 	TimePos m_length;
 	TimePos m_pos;
 	DetuningHelper * m_detuning;
+
+	// The type of this note
+	Type m_type;
 };
 
 

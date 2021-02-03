@@ -44,7 +44,8 @@ Note::Note( const TimePos & length, const TimePos & pos,
 	m_panning( qBound( PanningLeft, panning, PanningRight ) ),
 	m_length( length ),
 	m_pos( pos ),
-	m_detuning( NULL )
+	m_detuning(nullptr),
+	m_type(Note::RegularNote)
 {
 	if( detuning )
 	{
@@ -71,7 +72,8 @@ Note::Note( const Note & note ) :
 	m_panning( note.m_panning ),
 	m_length( note.m_length ),
 	m_pos( note.m_pos ),
-	m_detuning( NULL )
+	m_detuning(nullptr),
+	m_type(note.m_type)
 {
 	if( note.m_detuning )
 	{
@@ -136,6 +138,14 @@ void Note::setPanning( panning_t panning )
 
 
 
+void Note::setType(Note::Type t)
+{
+	m_type = t;
+}
+
+
+
+
 TimePos Note::quantized( const TimePos & m, const int qGrid )
 {
 	float p = ( (float) m / qGrid );
@@ -176,6 +186,7 @@ void Note::saveSettings( QDomDocument & doc, QDomElement & parent )
 	parent.setAttribute( "pan", m_panning );
 	parent.setAttribute( "len", m_length );
 	parent.setAttribute( "pos", m_pos );
+	parent.setAttribute("type", static_cast<int>(m_type));
 
 	if( m_detuning && m_length )
 	{
@@ -194,6 +205,7 @@ void Note::loadSettings( const QDomElement & _this )
 	m_panning = _this.attribute( "pan" ).toInt();
 	m_length = _this.attribute( "len" ).toInt();
 	m_pos = _this.attribute( "pos" ).toInt();
+	m_type = static_cast<Type>(_this.attribute("type").toInt());
 
 	if( _this.hasChildNodes() )
 	{
