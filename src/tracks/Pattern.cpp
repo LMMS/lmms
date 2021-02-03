@@ -251,20 +251,18 @@ void Pattern::removeNote( Note * _note_to_del )
 }
 
 
-// returns a pointer to the note at specified step, or NULL if note doesn't exist
-
-Note * Pattern::noteAtStep( int _step )
+// Returns a pointer to the note at specified step, or nullptr if note doesn't exist
+Note * Pattern::noteAtStep(int step)
 {
-	for( NoteVector::Iterator it = m_notes.begin(); it != m_notes.end();
-									++it )
+	for (NoteVector::Iterator it = m_notes.begin(); it != m_notes.end(); ++it)
 	{
-		if( ( *it )->pos() == TimePos::stepPosition( _step )
-						&& ( *it )->length() < 0 )
+		if ((*it)->pos() == TimePos::stepPosition(step)
+			&& (*it)->type() == Note::StepNote)
 		{
 			return *it;
 		}
 	}
-	return NULL;
+	return nullptr;
 }
 
 
@@ -295,14 +293,20 @@ void Pattern::clearNotes()
 
 
 
-Note * Pattern::addStepNote( int step )
+Note * Pattern::addStepNote(int step)
 {
 	Note * n =
 		addNote(
-			Note(TimePos(-DefaultTicksPerBar),
+			Note(TimePos(DefaultTicksPerBar / 16),
 			TimePos::stepPosition(step)), false
 		);
 	n->setType(Note::StepNote);
+	// Have to check the type again now that we changed
+	// the type of the note
+	// TODO: This means checkType is called twice:
+	// Once on addNote and once here. Rethink it so we
+	// can call it only once.
+	checkType();
 	return n;
 }
 
@@ -344,16 +348,27 @@ void Pattern::setType( PatternTypes _new_pattern_type )
 void Pattern::checkType()
 {
 	NoteVector::Iterator it = m_notes.begin();
-	while( it != m_notes.end() )
+
+	// If all notes are StepNotes, we have a BeatPattern
+	bool beatPattern = true;
+	while (it != m_notes.end())
 	{
-		if( ( *it )->length() > 0 )
+		if ((*it)->type() != Note::StepNote)
 		{
-			setType( MelodyPattern );
-			return;
+			beatPattern = false;
+			break;
 		}
 		++it;
 	}
-	setType( BeatPattern );
+
+	if (beatPattern)
+	{
+		setType(BeatPattern);
+	}
+	else
+	{
+		setType(MelodyPattern);
+	}
 }
 
 
@@ -763,7 +778,7 @@ void PatternView::mousePressEvent( QMouseEvent * _me )
 
 		Note * n = m_pat->noteAtStep( step );
 
-		if( n == NULL )
+		if (n == nullptr)
 		{
 			m_pat->addStepNote( step );
 		}
