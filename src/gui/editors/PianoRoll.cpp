@@ -717,18 +717,22 @@ void PianoRoll::fitNoteLengths(bool fill)
 	if (!hasValidPattern()) { return; }
 	m_pattern->addJournalCheckPoint();
 
-	NoteVector refNotes = getSelectedNotes();
-	if (refNotes.empty())
-	{
-		refNotes = m_pattern->notes();
-	}
-	// Sort by start position
+	// Reference notes
+	NoteVector refNotes = m_pattern->notes();
 	std::sort(refNotes.begin(), refNotes.end(), Note::lessThan);
 
-	NoteVector notes = refNotes;
+	// Notes to edit
+	NoteVector notes = getSelectedNotes();
+	if (notes.empty())
+	{
+		notes = refNotes;
+	}
+	else if (!fill)
+	{
+		std::sort(notes.begin(), notes.end(), Note::lessThan);
+	}
 	if (fill)
 	{
-		// Sort by end position when filling
 		std::sort(notes.begin(), notes.end(), [](Note *n1, Note *n2) { return n1->endPos() < n2->endPos(); });
 	}
 
