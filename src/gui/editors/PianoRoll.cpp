@@ -4422,15 +4422,7 @@ void PianoRoll::changeSnapMode()
 	//	gridSnap,
 	//	gridFree - to be implemented
 
-	QString qs_snapMode = m_snapModel.currentText();
-	if (qs_snapMode == "Nudge")
-	{
-		m_gridMode = gridNudge;
-	}
-	if (qs_snapMode == "Snap")
-	{
-		m_gridMode = gridSnap;
-	}
+	m_gridMode = static_cast<GridMode>(m_snapModel.value());
 }
 
 PianoRollWindow::PianoRollWindow() :
