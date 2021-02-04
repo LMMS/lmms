@@ -433,11 +433,11 @@ PianoRoll::PianoRoll() :
 			this, SLOT( selectRegionFromPixels( int, int ) ) );
 
 	// Set up snap model
-	m_snapModel.addItem( tr("Nudge") );
-	m_snapModel.addItem( tr("Snap") );
-	m_snapModel.setValue( 0 );
-	connect( &m_snapModel, SIGNAL( dataChanged() ),
-					this, SLOT( changeSnapMode() ) );
+	m_snapModel.addItem(tr("Nudge"));
+	m_snapModel.addItem(tr("Snap"));
+	m_snapModel.setValue(0);
+	connect(&m_snapModel, SIGNAL(dataChanged()),
+		this, SLOT(changeSnapMode()));
 
 	m_stepRecorder.initialize();
 }
@@ -2610,14 +2610,15 @@ void PianoRoll::dragNotes(int x, int y, bool alt, bool shift, bool ctrl)
 			else
 			{
 				// moving note
-				if ( m_gridMode == gridSnap && quantization() > 1 )
+				if (m_gridMode == gridSnap && quantization() > 1)
 				{
 					// Get the relative X position of mouse inside PianoRoll viewport
 					int viewportMouseX = x - m_whiteKeyWidth;
 					// Convert it to a TimePos
 					TimePos mousePos(viewportMouseX * TimePos::ticksPerBar() / m_ppb + m_currentPosition);
 					// Calculate the initial offset when we clicked on the note in Ticks
-					int initialOffset = (m_moveStartX - m_whiteKeyWidth) * TimePos::ticksPerBar() / m_ppb + m_mouseDownTick - m_currentNote->oldPos().getTicks();
+					int initialOffset = (m_moveStartX - m_whiteKeyWidth) * TimePos::ticksPerBar() / m_ppb
+						+ m_mouseDownTick - m_currentNote->oldPos().getTicks();
 					// Remove that initial offset to the mouse X position for a more
 					// fluid movement
 					mousePos -= initialOffset;
@@ -2637,8 +2638,8 @@ void PianoRoll::dragNotes(int x, int y, bool alt, bool shift, bool ctrl)
 					// Overwrite the offset we had in ticks with the distance between
 					// the note we are moving and the calculated position from the mouse
 					off_ticks = snapEnd
-									? mousePosEndQ.getTicks() - m_currentNote->oldPos().getTicks() - m_currentNote->oldLength().getTicks()
-									: mousePosQ.getTicks() - m_currentNote->oldPos().getTicks();
+					? mousePosEndQ.getTicks() - m_currentNote->oldPos().getTicks() - m_currentNote->oldLength().getTicks()
+					: mousePosQ.getTicks() - m_currentNote->oldPos().getTicks();
 				}
 
 				int pos_ticks = note->oldPos().getTicks() + off_ticks;
@@ -4573,8 +4574,8 @@ PianoRollWindow::PianoRollWindow() :
 	m_chordComboBox->setToolTip( tr( "Chord" ) );
 
 	// setup snap-stuff
-	QLabel *snap_lbl = new QLabel(m_toolBar);
-	snap_lbl->setPixmap(embed::getIconPixmap("gridmode"));
+	QLabel* snapLbl = new QLabel(m_toolBar);
+	snapLbl->setPixmap(embed::getIconPixmap("gridmode"));
 
 	m_snapComboBox = new ComboBox(m_toolBar);
 	m_snapComboBox->setModel(&m_editor->m_snapModel);
@@ -4648,14 +4649,14 @@ PianoRollWindow::PianoRollWindow() :
 	zoomAndNotesToolBar->addSeparator();
 	zoomAndNotesToolBar->addWidget( m_clearGhostButton );
 
-	QWidget * snap_widget = new QWidget();
-	QHBoxLayout * snap_hbox = new QHBoxLayout();
-	snap_hbox->setContentsMargins(0, 0, 0, 0);
-	snap_hbox->addWidget(snap_lbl);
-	snap_hbox->addWidget(m_snapComboBox);
-	snap_widget->setLayout(snap_hbox);
+	QWidget* snapWidget = new QWidget();
+	QHBoxLayout* snapHbox = new QHBoxLayout();
+	snapHbox->setContentsMargins(0, 0, 0, 0);
+	snapHbox->addWidget(snapLbl);
+	snapHbox->addWidget(m_snapComboBox);
+	snapWidget->setLayout(snapHbox);
 	zoomAndNotesToolBar->addSeparator();
-	zoomAndNotesToolBar->addWidget(snap_widget);
+	zoomAndNotesToolBar->addWidget(snapWidget);
 
 	// setup our actual window
 	setFocusPolicy( Qt::StrongFocus );

@@ -524,7 +524,7 @@ private:
 	ComboBox * m_keyComboBox;
 	ComboBox * m_scaleComboBox;
 	ComboBox * m_chordComboBox;
-	ComboBox * m_snapComboBox;
+	ComboBox* m_snapComboBox;
 	QPushButton * m_clearGhostButton;
 
 };
