@@ -258,7 +258,7 @@ private:
 	enum GridMode
 	{
 		gridNudge,
-		gridSnap,
+		gridSnap
 	//	gridFree
 	};
 
