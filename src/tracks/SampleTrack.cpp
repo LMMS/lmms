@@ -501,9 +501,9 @@ void SampleTCOView::contextMenuEvent( QContextMenuEvent * _cme )
 	contextMenu.addSeparator();
 	contextMenu.addAction(
 		embed::getIconPixmap( "muted" ),
-		tr( individualTCO
-			? "Mute/unmute (<%1> + middle click)"
-			: "Mute/unmute selection (<%1> + middle click)" ).arg(UI_CTRL_KEY),
+		(individualTCO
+			? tr("Mute/unmute (<%1> + middle click)")
+			: tr("Mute/unmute selection (<%1> + middle click)")).arg(UI_CTRL_KEY),
 		[this](){ contextMenuAction( Mute ); } );
 
 	contextMenu.addSeparator();
@@ -516,7 +516,7 @@ void SampleTCOView::contextMenuEvent( QContextMenuEvent * _cme )
 		fadingMenu->addAction(tr("Manual Mode"), this, SLOT(setManualFade()));
 		contextMenu.addMenu(fadingMenu);
 	}
-  
+
 	/*contextMenu.addAction( embed::getIconPixmap( "record" ),
 				tr( "Set/clear record" ),
 						m_tco, SLOT( toggleRecord() ) );*/
