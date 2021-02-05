@@ -100,6 +100,8 @@ private:
 	TimePos m_lenOld;
 	TimePos m_startTimeOffsetOld;
 
+	void saveFaderSettings(QDomElement&);
+	void loadFaderSettings(const QDomElement&);
 
 	friend class SampleTCOView;
 
@@ -169,6 +171,9 @@ private:
 	void drawFades();
 	void checkCornersClicked(const QMouseEvent *e);
 	void checkFadesClicked(const QMouseEvent *e);
+	void mouseMoveFadingPos(const QMouseEvent *e);
+	void mouseMoveLeftControlPoints(const QMouseEvent *e);
+	void mouseMoveRightControlPoints(const QMouseEvent *e);
 } ;
 
 

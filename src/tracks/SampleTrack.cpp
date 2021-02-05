@@ -288,6 +288,22 @@ void SampleTCO::setSamplePlayLength(f_cnt_t length)
 }
 
 
+void SampleTCO::saveFaderSettings(QDomElement& dom)
+{
+	dom.setAttribute( "leftFaderPos", m_sampleBuffer->leftFaderPos());
+	dom.setAttribute( "rightFaderPos", m_sampleBuffer->rightFaderPos());
+
+	auto saveControlPoint = [&dom](QString s, ControlPoint p)
+	{
+		dom.setAttribute(s + "x", p.x());
+		dom.setAttribute(s + "y", p.y());
+	};
+
+	saveControlPoint("leftP1", m_sampleBuffer->getLeftP1());
+	saveControlPoint("leftP2", m_sampleBuffer->getLeftP2());
+	saveControlPoint("rightP1", m_sampleBuffer->getRightP1());
+	saveControlPoint("rightP2", m_sampleBuffer->getRightP2());
+}
 
 
 void SampleTCO::saveSettings( QDomDocument & _doc, QDomElement & _this )
@@ -305,20 +321,6 @@ void SampleTCO::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	_this.setAttribute( "src", sampleFile() );
 	_this.setAttribute( "off", startTimeOffset() );
 
-	_this.setAttribute( "leftFaderPos", m_sampleBuffer->leftFaderPos());
-	_this.setAttribute( "rightFaderPos", m_sampleBuffer->rightFaderPos());
-
-	auto saveControlPoint = [&_this](QString s, ControlPoint p)
-	{
-		_this.setAttribute(s + "x", p.x());
-		_this.setAttribute(s + "y", p.y());
-	};
-
-	saveControlPoint("leftP1", m_sampleBuffer->getLeftP1());
-	saveControlPoint("leftP2", m_sampleBuffer->getLeftP2());
-	saveControlPoint("rightP1", m_sampleBuffer->getRightP1());
-	saveControlPoint("rightP2", m_sampleBuffer->getRightP2());
-
 	if( sampleFile() == "" )
 	{
 		QString s;
@@ -335,11 +337,46 @@ void SampleTCO::saveSettings( QDomDocument & _doc, QDomElement & _this )
 		_this.setAttribute("reversed", "true");
 	}
 	// TODO: start- and end-frame
+
+	saveFaderSettings(_this);
 }
 
-float limitZeroOne(float val)
+
+void SampleTCO::loadFaderSettings(const QDomElement& dom)
 {
-	return qBound<float>(0.0f, val, 1.0f);
+	auto limitToZeroOne = [](float val)
+	{
+		return qBound<float>(0.0f, val, 1.0f);
+	};
+
+	if (dom.hasAttribute("leftP1x") && dom.hasAttribute("leftP1y") &&
+	    dom.hasAttribute("leftP2x") && dom.hasAttribute("leftP2y"))
+	{
+		m_sampleBuffer->setLeftP1(limitToZeroOne(dom.attribute("leftP1x").toFloat()),
+		                          limitToZeroOne(dom.attribute("leftP1y").toFloat()));
+		m_sampleBuffer->setLeftP2(limitToZeroOne(dom.attribute("leftP2x").toFloat()),
+		                          limitToZeroOne(dom.attribute("leftP2y").toFloat()));
+	}
+
+	if (dom.hasAttribute("rightP1x") && dom.hasAttribute("rightP1y") &&
+	    dom.hasAttribute("rightP2x") && dom.hasAttribute("rightP2y"))
+	{
+		m_sampleBuffer->setRightP1(limitToZeroOne(1.0f-dom.attribute("rightP1x").toFloat()),
+		                           limitToZeroOne(dom.attribute("rightP1y").toFloat()));
+		m_sampleBuffer->setRightP2(limitToZeroOne(1.0f-dom.attribute("rightP2x").toFloat()),
+		                           limitToZeroOne(dom.attribute("rightP2y").toFloat()));
+	}
+
+	if (dom.hasAttribute("leftFaderPos"))
+	{
+		m_sampleBuffer->setLeftFader(limitToZeroOne(dom.attribute("leftFaderPos").toFloat()));
+		m_sampleBuffer->checkFadingActive();
+	}
+	if (dom.hasAttribute("rightFaderPos"))
+	{
+		m_sampleBuffer->setRightFader(limitToZeroOne(dom.attribute("rightFaderPos").toFloat()));
+		m_sampleBuffer->checkFadingActive();
+	}
 }
 
 
@@ -374,37 +411,8 @@ void SampleTCO::loadSettings( const QDomElement & _this )
 		emit wasReversed(); // tell SampleTCOView to update the view
 	}
 
-	if (_this.hasAttribute("leftP1x") && _this.hasAttribute("leftP1y") &&
-	    _this.hasAttribute("leftP2x") && _this.hasAttribute("leftP2y"))
-	{
-		m_sampleBuffer->setLeftP1(limitZeroOne(_this.attribute("leftP1x").toFloat()),
-		                          limitZeroOne(_this.attribute("leftP1y").toFloat()));
-		m_sampleBuffer->setLeftP2(limitZeroOne(_this.attribute("leftP2x").toFloat()),
-		                          limitZeroOne(_this.attribute("leftP2y").toFloat()));
-	}
-
-	if (_this.hasAttribute("rightP1x") && _this.hasAttribute("rightP1y") &&
-	    _this.hasAttribute("rightP2x") && _this.hasAttribute("rightP2y"))
-	{
-		m_sampleBuffer->setRightP1(limitZeroOne(1.0f-_this.attribute("rightP1x").toFloat()),
-		                           limitZeroOne(_this.attribute("rightP1y").toFloat()));
-		m_sampleBuffer->setRightP2(limitZeroOne(1.0f-_this.attribute("rightP2x").toFloat()),
-		                           limitZeroOne(_this.attribute("rightP2y").toFloat()));
-	}
-
-	if (_this.hasAttribute("leftFaderPos"))
-	{
-		m_sampleBuffer->setLeftFader(limitZeroOne(_this.attribute("leftFaderPos").toFloat()));
-		m_sampleBuffer->checkFadingActive();
-	}
-	if (_this.hasAttribute("rightFaderPos"))
-	{
-		m_sampleBuffer->setRightFader(limitZeroOne(_this.attribute("rightFaderPos").toFloat()));
-		m_sampleBuffer->checkFadingActive();
-	}
-
+	loadFaderSettings(_this);
 }
-
 
 
 
@@ -1105,59 +1113,77 @@ void SampleTCOView::reverseSample()
 }
 
 
+void SampleTCOView::mouseMoveFadingPos(const QMouseEvent* e)
+{
+	float xpos = static_cast<float>(e->localPos().x());
+	float width = static_cast<float>(this->width());
+	float faderPos = qMin(qMax(0.0f, xpos / width), 1.0f);
+	if (m_leftCorner)
+	{
+		m_tco->m_sampleBuffer->setLeftFader(faderPos);
+	}
+	else if (m_rightCorner)
+	{
+		m_tco->m_sampleBuffer->setRightFader(faderPos);
+	}
+	updateSample();
+}
+
+
+void SampleTCOView::mouseMoveLeftControlPoints(const QMouseEvent* e)
+{
+	float xpos = e->localPos().x();
+	float ypos = qMin(
+		qMax(e->localPos().y(), static_cast<qreal>(m_textLabelHeight)),
+		static_cast<qreal>(this->height())
+	);
+	float leftFaderAbsolutePos = m_tco->m_sampleBuffer->leftFaderPos() * this->width();
+	float Px = xpos / leftFaderAbsolutePos;
+	float Py = 1 - (ypos - m_textLabelHeight) / (this->height() - m_textLabelHeight);
+	if (m_moveLeftP1)
+	{
+		m_tco->m_sampleBuffer->setLeftP1(Px, Py);
+	}
+	else if (m_moveLeftP2)
+	{
+		m_tco->m_sampleBuffer->setLeftP2(Px, Py);
+	}
+	updateSample();
+}
+
+
+void SampleTCOView::mouseMoveRightControlPoints(const QMouseEvent* e)
+{
+	float xpos = e->localPos().x();
+	float ypos = e->localPos().y();
+	float rightFaderAbsolutePos = m_tco->m_sampleBuffer->rightFaderPos() * this->width();
+	float Px = (xpos - rightFaderAbsolutePos) / (this->width() - rightFaderAbsolutePos);
+	float Py = 1 - (ypos - m_textLabelHeight) / (this->height() - m_textLabelHeight);
+	if (m_moveRightP1)
+	{
+		m_tco->m_sampleBuffer->setRightP1(Px, Py);
+	}
+	else if (m_moveRightP2)
+	{
+		m_tco->m_sampleBuffer->setRightP2(Px, Py);
+	}
+	updateSample();
+}
+
+
 void SampleTCOView::mouseMoveEvent(QMouseEvent* e)
 {
 	if ((e->buttons() & Qt::LeftButton) && (m_leftCorner || m_rightCorner))
 	{
-		float xpos = static_cast<float>(e->localPos().x());
-		float width = static_cast<float>(this->width());
-		float faderPos = qMin(qMax(0.0f, xpos / width), 1.0f);
-		if (m_leftCorner)
-		{
-			m_tco->m_sampleBuffer->setLeftFader(faderPos);
-		}
-		else if (m_rightCorner)
-		{
-			m_tco->m_sampleBuffer->setRightFader(faderPos);
-		}
-		updateSample();
+		mouseMoveFadingPos(e);
 	}
 	else if ((e->buttons() & Qt::LeftButton) && (m_moveLeftP1 || m_moveLeftP2))
 	{
-		float xpos = e->localPos().x();
-		float ypos = qMin(
-			qMax(e->localPos().y(), static_cast<qreal>(m_textLabelHeight)),
-			static_cast<qreal>(this->height())
-		);
-		float leftFaderAbsolutePos = m_tco->m_sampleBuffer->leftFaderPos() * this->width();
-		float Px = xpos / leftFaderAbsolutePos;
-		float Py = 1 - (ypos - m_textLabelHeight) / (this->height() - m_textLabelHeight);
-		if (m_moveLeftP1)
-		{
-			m_tco->m_sampleBuffer->setLeftP1(Px, Py);
-		}
-		else if (m_moveLeftP2)
-		{
-			m_tco->m_sampleBuffer->setLeftP2(Px, Py);
-		}
-		updateSample();
+		mouseMoveLeftControlPoints(e);
 	}
 	else if ((e->buttons() & Qt::LeftButton) && (m_moveRightP1 || m_moveRightP2))
 	{
-		float xpos = e->localPos().x();
-		float ypos = e->localPos().y();
-		float rightFaderAbsolutePos = m_tco->m_sampleBuffer->rightFaderPos() * this->width();
-		float Px = (xpos - rightFaderAbsolutePos) / (this->width() - rightFaderAbsolutePos);
-		float Py = 1 - (ypos - m_textLabelHeight) / (this->height() - m_textLabelHeight);
-		if (m_moveRightP1)
-		{
-			m_tco->m_sampleBuffer->setRightP1(Px, Py);
-		}
-		else if (m_moveRightP2)
-		{
-			m_tco->m_sampleBuffer->setRightP2(Px, Py);
-		}
-		updateSample();
+		mouseMoveRightControlPoints(e);
 	}
 	else
 	{
@@ -1608,7 +1634,6 @@ void SampleTrackView::dropEvent(QDropEvent *de)
 		SampleTCO * sTco = static_cast<SampleTCO*>(getTrack()->createTCO(tcoPos));
 		if (sTco) { sTco->setSampleFile(value); }
 	}
-
 }
 
 
