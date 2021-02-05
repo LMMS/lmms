@@ -2570,7 +2570,7 @@ void PianoRoll::dragNotes(int x, int y, bool alt, bool shift, bool ctrl)
 	if (m_action == ActionMoveNote)
 	{
 		// Calculate the offset for either Nudge or Snap modes
-		TimePos noteOffset;
+		int noteOffset = off_ticks;
 		if (m_gridMode == gridSnap && quantization () > 1)
 		{
 			// Get the mouse timeline absolute position
@@ -2637,7 +2637,7 @@ void PianoRoll::dragNotes(int x, int y, bool alt, bool shift, bool ctrl)
 				// moving note
 
 				// Final position of the note
-				TimePos posTicks = note->oldPos().getTicks() + noteOffset;
+				TimePos posTicks(note->oldPos().getTicks() + noteOffset);
 				int key_num = note->oldKey() + off_key;
 
 				note->setPos(posTicks);
