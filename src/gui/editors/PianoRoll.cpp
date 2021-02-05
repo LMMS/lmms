@@ -2564,42 +2564,67 @@ void PianoRoll::dragNotes(int x, int y, bool alt, bool shift, bool ctrl)
 	off_ticks -= m_mouseDownTick - m_currentPosition;
 	off_key -= m_mouseDownKey - m_startKey;
 
-
-	// if they're not holding alt, quantize the offset
-	if (!alt)
-	{
-		off_ticks = floor(off_ticks / quantization()) * quantization();
-	}
-
-	// make sure notes won't go outside boundary conditions
-	if( m_action == ActionMoveNote && ! ( shift && ! m_startedWithShift ) )
-	{
-		if( m_moveBoundaryLeft + off_ticks < 0 )
-		{
-			off_ticks -= (off_ticks + m_moveBoundaryLeft);
-		}
-		if( m_moveBoundaryTop + off_key > NumKeys )
-		{
-			off_key -= NumKeys - (m_moveBoundaryTop + off_key);
-		}
-		if( m_moveBoundaryBottom + off_key < 0 )
-		{
-			off_key -= (m_moveBoundaryBottom + off_key);
-		}
-	}
-
-
 	// get note-vector of current pattern
 	const NoteVector & notes = m_pattern->notes();
 
 	if (m_action == ActionMoveNote)
 	{
+		// Calculate the offset for either Nudge or Snap modes
+		TimePos noteOffset;
+		if (m_gridMode == gridSnap && quantization () > 1)
+		{
+			// Get the mouse timeline absolute position
+			TimePos mousePos(m_currentNote->oldPos().getTicks() + off_ticks);
+
+			// We create a mousePos that is relative to the end of the note instead
+			// of the beginning. That's to see if we will snap the beginning or end
+			// of the note
+			TimePos mousePosEnd(mousePos);
+			mousePosEnd += m_currentNote->oldLength();
+
+			// Now we quantize the mouse position to snap it to the grid
+			TimePos mousePosQ = mousePos.quantize(static_cast<float>(quantization()) / DefaultTicksPerBar);
+			TimePos mousePosEndQ = mousePosEnd.quantize(static_cast<float>(quantization()) / DefaultTicksPerBar);
+
+			bool snapEnd = abs(mousePosEndQ - mousePosEnd) < abs(mousePosQ - mousePos);
+
+			// Set the offset
+			noteOffset = snapEnd
+			? mousePosEndQ.getTicks() - m_currentNote->oldPos().getTicks() - m_currentNote->oldLength().getTicks()
+			: mousePosQ.getTicks() - m_currentNote->oldPos().getTicks();
+		}
+		else if (m_gridMode == gridNudge)
+		{
+			// if they're not holding alt, quantize the offset
+			if (!alt)
+			{
+				noteOffset = floor(off_ticks / quantization()) * quantization();
+			}
+		}
+
+		// Make sure notes won't go outside boundary conditions
+		if (m_moveBoundaryLeft + noteOffset < 0)
+		{
+			noteOffset = -m_moveBoundaryLeft;
+		}
+		if (m_moveBoundaryTop + off_key >= NumKeys)
+		{
+			off_key = -m_moveBoundaryTop + NumKeys - 1;
+		}
+		if (m_moveBoundaryBottom + off_key < 0)
+		{
+			off_key = -m_moveBoundaryBottom;
+		}
+
+		// Apply offset to all selected notes
 		for (Note *note : getSelectedNotes())
 		{
-			if (shift && ! m_startedWithShift)
+			// Quick resize is only enabled on Nudge mode, since resizing the note
+			// while in Snap mode breaks the calculation of the note offset
+			if (shift && ! m_startedWithShift && m_gridMode == gridNudge)
 			{
 				// quick resize, toggled by holding shift after starting a note move, but not before
-				int ticks_new = note->oldLength().getTicks() + off_ticks;
+				int ticks_new = note->oldLength().getTicks() + noteOffset;
 				if( ticks_new <= 0 )
 				{
 					ticks_new = 1;
@@ -2610,48 +2635,12 @@ void PianoRoll::dragNotes(int x, int y, bool alt, bool shift, bool ctrl)
 			else
 			{
 				// moving note
-				if (m_gridMode == gridSnap && quantization() > 1)
-				{
-					// Get the relative X position of mouse inside PianoRoll viewport
-					int viewportMouseX = x - m_whiteKeyWidth;
-					// Convert it to a TimePos
-					TimePos mousePos(viewportMouseX * TimePos::ticksPerBar() / m_ppb + m_currentPosition);
-					// Calculate the initial offset when we clicked on the note in Ticks
-					int initialOffset = (m_moveStartX - m_whiteKeyWidth) * TimePos::ticksPerBar() / m_ppb
-						+ m_mouseDownTick - m_currentNote->oldPos().getTicks();
-					// Remove that initial offset to the mouse X position for a more
-					// fluid movement
-					mousePos -= initialOffset;
 
-					// We create a mousePos that is relative to the end of the note instead
-					// of the beginning. That's to see if we will snap the beginning or end
-					// of the note
-					TimePos mousePosEnd(mousePos);
-					mousePosEnd += m_currentNote->oldLength();
-
-					// Now we quantize the mouse position to snap it to the grid
-					TimePos mousePosQ = mousePos.quantize(static_cast<float>(quantization()) / DefaultTicksPerBar);
-					TimePos mousePosEndQ = mousePosEnd.quantize(static_cast<float>(quantization()) / DefaultTicksPerBar);
-
-					bool snapEnd = abs(mousePosEndQ - mousePosEnd) < abs(mousePosQ - mousePos);
-
-					// Overwrite the offset we had in ticks with the distance between
-					// the note we are moving and the calculated position from the mouse
-					off_ticks = snapEnd
-					? mousePosEndQ.getTicks() - m_currentNote->oldPos().getTicks() - m_currentNote->oldLength().getTicks()
-					: mousePosQ.getTicks() - m_currentNote->oldPos().getTicks();
-				}
-
-				int pos_ticks = note->oldPos().getTicks() + off_ticks;
+				// Final position of the note
+				TimePos posTicks = note->oldPos().getTicks() + noteOffset;
 				int key_num = note->oldKey() + off_key;
 
-				// ticks can't be negative
-				pos_ticks = qMax(0, pos_ticks);
-				// upper/lower bound checks on key_num
-				key_num = qMax(0, key_num);
-				key_num = qMin(key_num, NumKeys);
-
-				note->setPos(TimePos(pos_ticks));
+				note->setPos(posTicks);
 				note->setKey(key_num);
 			}
 		}
@@ -2663,6 +2652,12 @@ void PianoRoll::dragNotes(int x, int y, bool alt, bool shift, bool ctrl)
 		// If shift is pressed we resize and rearrange only the selected notes
 		// If shift + ctrl then we also rearrange all posterior notes (sticky)
 		// If shift is pressed but only one note is selected, apply sticky
+
+		// Quantize the resizing if alt is not pressed
+		if (!alt)
+		{
+			off_ticks = floor(off_ticks / quantization()) * quantization();
+		}
 
 		auto selectedNotes = getSelectedNotes();
 
