@@ -290,8 +290,8 @@ void SampleTCO::setSamplePlayLength(f_cnt_t length)
 
 void SampleTCO::saveFaderSettings(QDomElement& dom)
 {
-	dom.setAttribute( "leftFaderPos", m_sampleBuffer->leftFaderPos());
-	dom.setAttribute( "rightFaderPos", m_sampleBuffer->rightFaderPos());
+	dom.setAttribute("leftFaderPos", m_sampleBuffer->leftFaderPos());
+	dom.setAttribute("rightFaderPos", m_sampleBuffer->rightFaderPos());
 
 	auto saveControlPoint = [&dom](QString s, ControlPoint p)
 	{

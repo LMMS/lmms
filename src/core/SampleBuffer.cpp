@@ -1531,7 +1531,7 @@ SampleBuffer::handleState::~handleState()
 
 float SampleBuffer::fadingVal(f_cnt_t pos, bool isLeft)
 {
-	float relativePos = static_cast<float>(pos)/static_cast<float>(m_frames);
+	float relativePos = static_cast<float>(pos) / static_cast<float>(m_frames);
 	return (this->*fadefuncPtr)(relativePos, isLeft);
 }
 
@@ -1580,13 +1580,20 @@ float SampleBuffer::bezierFade(float relativePos, bool isLeft)
 
 float CubicBezier::cubicBezierLastSegmentP1(float t, float p1, float p2)
 {
-	return 2 * p1 * t * (1 - t) + p2 * pow(t, 2);
+	return (
+		2 * p1 * t * (1 - t)
+		+ p2 * pow(t, 2)
+	);
 }
 
 
 float CubicBezier::cubicBezierLastSegmentP2(float t, float p1, float p2)
 {
-	return p1 * pow(1 - t, 2) + 2 * p2 * t * (1 - t) + pow(t, 2);
+	return (
+		p1 * pow(1 - t, 2)
+		+ 2 * p2 * t * (1 - t)
+		+ pow(t, 2)
+	);
 }
 
 
@@ -1612,9 +1619,8 @@ float CubicBezier::cubicBezierDerivative(float t, float p1, float p2)
 float CubicBezier::solveXforTNewton(float x, bool useCache=true)
 {
 	int maxIter = 100;
-	float t, tUp, f, fPrime;
-	if (useCache) { t = m_tCache; }
-	else { t = 0.5f; }
+	float tUp, f, fPrime;
+	float t = useCache ? m_tCache : 0.5f;
 	for (int i = 0; i < maxIter; ++i)
 	{
 		f = cubicBezier(t, m_p1.x(), m_p2.x()) - x;
@@ -1638,7 +1644,7 @@ float CubicBezier::solveXforTBisection(float x)
 	int maxIter = 10;
 	for (int i = 0; i < maxIter; ++i)
 	{
-		t = (a + b)/2;
+		t = (a + b) / 2;
 		if (cubicBezier(t, m_p1.x(), m_p2.x()) < x) { a = t; }
 		else { b = t; }
 	}

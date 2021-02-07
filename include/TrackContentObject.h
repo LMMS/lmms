@@ -133,7 +133,7 @@ public:
 	static bool comparePosition(const TrackContentObject* a, const TrackContentObject* b);
 
 	TimePos startTimeOffset() const;
-	virtual void setStartTimeOffset( const TimePos &startTimeOffset );
+	virtual void setStartTimeOffset(const TimePos &startTimeOffset);
 
 	void updateColor();
 
