@@ -148,8 +148,8 @@ private:
 	QPixmap m_paintPixmap;
 
 	// Members related to fading
-	bool m_leftCorner = false;
-	bool m_rightCorner = false;
+	bool m_moveLeftCorner = false;
+	bool m_moveRightCorner = false;
 	bool m_leftFadeClicked = false;
 	bool m_rightFadeClicked = false;
 	bool m_leftFadeManual = false;

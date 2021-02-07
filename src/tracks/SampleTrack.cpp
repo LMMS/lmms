@@ -349,32 +349,44 @@ void SampleTCO::loadFaderSettings(const QDomElement& dom)
 		return qBound<float>(0.0f, val, 1.0f);
 	};
 
-	if (dom.hasAttribute("leftP1x") && dom.hasAttribute("leftP1y") &&
-	    dom.hasAttribute("leftP2x") && dom.hasAttribute("leftP2y"))
+	if (dom.hasAttribute("leftP1x") && dom.hasAttribute("leftP1y")
+	    && dom.hasAttribute("leftP2x") && dom.hasAttribute("leftP2y"))
 	{
-		m_sampleBuffer->setLeftP1(limitToZeroOne(dom.attribute("leftP1x").toFloat()),
-		                          limitToZeroOne(dom.attribute("leftP1y").toFloat()));
-		m_sampleBuffer->setLeftP2(limitToZeroOne(dom.attribute("leftP2x").toFloat()),
-		                          limitToZeroOne(dom.attribute("leftP2y").toFloat()));
+		m_sampleBuffer->setLeftP1(
+			limitToZeroOne(dom.attribute("leftP1x").toFloat()),
+			limitToZeroOne(dom.attribute("leftP1y").toFloat())
+		);
+		m_sampleBuffer->setLeftP2(
+			limitToZeroOne(dom.attribute("leftP2x").toFloat()),
+			limitToZeroOne(dom.attribute("leftP2y").toFloat())
+		);
 	}
 
-	if (dom.hasAttribute("rightP1x") && dom.hasAttribute("rightP1y") &&
-	    dom.hasAttribute("rightP2x") && dom.hasAttribute("rightP2y"))
+	if (dom.hasAttribute("rightP1x") && dom.hasAttribute("rightP1y")
+	    && dom.hasAttribute("rightP2x") && dom.hasAttribute("rightP2y"))
 	{
-		m_sampleBuffer->setRightP1(limitToZeroOne(1.0f-dom.attribute("rightP1x").toFloat()),
-		                           limitToZeroOne(dom.attribute("rightP1y").toFloat()));
-		m_sampleBuffer->setRightP2(limitToZeroOne(1.0f-dom.attribute("rightP2x").toFloat()),
-		                           limitToZeroOne(dom.attribute("rightP2y").toFloat()));
+		m_sampleBuffer->setRightP1(
+			limitToZeroOne(1.0f-dom.attribute("rightP1x").toFloat()),
+			limitToZeroOne(dom.attribute("rightP1y").toFloat())
+		);
+		m_sampleBuffer->setRightP2(
+			limitToZeroOne(1.0f-dom.attribute("rightP2x").toFloat()),
+			limitToZeroOne(dom.attribute("rightP2y").toFloat())
+		);
 	}
 
 	if (dom.hasAttribute("leftFaderPos"))
 	{
-		m_sampleBuffer->setLeftFader(limitToZeroOne(dom.attribute("leftFaderPos").toFloat()));
+		m_sampleBuffer->setLeftFader(
+			limitToZeroOne(dom.attribute("leftFaderPos").toFloat())
+		);
 		m_sampleBuffer->checkFadingActive();
 	}
 	if (dom.hasAttribute("rightFaderPos"))
 	{
-		m_sampleBuffer->setRightFader(limitToZeroOne(dom.attribute("rightFaderPos").toFloat()));
+		m_sampleBuffer->setRightFader(
+			limitToZeroOne(dom.attribute("rightFaderPos").toFloat())
+		);
 		m_sampleBuffer->checkFadingActive();
 	}
 }
@@ -586,11 +598,11 @@ void SampleTCOView::checkCornersClicked(const QMouseEvent *e)
 
 	if (m_leftHandle->contains(currentPos))
 	{
-		m_leftCorner = true;
+		m_moveLeftCorner = true;
 	}
 	else if (m_rightHandle->contains(currentPos))
 	{
-		m_rightCorner = true;
+		m_moveRightCorner = true;
 	}
 	else if ((m_leftP1 != nullptr) && (m_leftP1->contains(currentPos)))
 	{
@@ -692,10 +704,10 @@ void SampleTCOView::mouseReleaseEvent(QMouseEvent *_me)
 			sTco->playbackPositionChanged();
 		}
 	}
-	if (m_leftCorner || m_rightCorner)
+	if (m_moveLeftCorner || m_moveRightCorner)
 	{
-		m_leftCorner = false;
-		m_rightCorner = false;
+		m_moveLeftCorner = false;
+		m_moveRightCorner = false;
 	}
 	if (m_moveLeftP1 || m_moveLeftP2)
 	{
@@ -1118,11 +1130,11 @@ void SampleTCOView::mouseMoveFadingPos(const QMouseEvent* e)
 	float xpos = static_cast<float>(e->localPos().x());
 	float width = static_cast<float>(this->width());
 	float faderPos = qMin(qMax(0.0f, xpos / width), 1.0f);
-	if (m_leftCorner)
+	if (m_moveLeftCorner)
 	{
 		m_tco->m_sampleBuffer->setLeftFader(faderPos);
 	}
-	else if (m_rightCorner)
+	else if (m_moveRightCorner)
 	{
 		m_tco->m_sampleBuffer->setRightFader(faderPos);
 	}
@@ -1173,15 +1185,16 @@ void SampleTCOView::mouseMoveRightControlPoints(const QMouseEvent* e)
 
 void SampleTCOView::mouseMoveEvent(QMouseEvent* e)
 {
-	if ((e->buttons() & Qt::LeftButton) && (m_leftCorner || m_rightCorner))
+	auto leftButtonDown = e->buttons() & Qt::LeftButton;
+	if (leftButtonDown && (m_moveLeftCorner || m_moveRightCorner))
 	{
 		mouseMoveFadingPos(e);
 	}
-	else if ((e->buttons() & Qt::LeftButton) && (m_moveLeftP1 || m_moveLeftP2))
+	else if (leftButtonDown && (m_moveLeftP1 || m_moveLeftP2))
 	{
 		mouseMoveLeftControlPoints(e);
 	}
-	else if ((e->buttons() & Qt::LeftButton) && (m_moveRightP1 || m_moveRightP2))
+	else if (leftButtonDown && (m_moveRightP1 || m_moveRightP2))
 	{
 		mouseMoveRightControlPoints(e);
 	}
@@ -1195,6 +1208,14 @@ void SampleTCOView::mouseMoveEvent(QMouseEvent* e)
 }
 
 
+/**
+ * For getting an S-shaped curve the control points are set to
+ * lie in the middle of the x-interval, i.e., at 0.5.
+ * By changing this to e.g. [0.2, 0.8] the steepness
+ * at the inflection point can be controlled.
+ * By setting the y coordinates to [0, 1] it is ensured
+ * that the derivative at the start and end points is zero.
+ */
 void SampleTCOView::setSFade()
 {
 	if (m_leftFadeClicked)
@@ -1213,6 +1234,12 @@ void SampleTCOView::setSFade()
 }
 
 
+/**
+ * The control points for the cosine like fade are set
+ * by manual tuning to resemble a cosine function.
+ * It might be somehow possible to derive the control
+ * points for the cosine function.
+ */
 void SampleTCOView::setCosFade()
 {
 	if (m_leftFadeClicked)
@@ -1231,6 +1258,11 @@ void SampleTCOView::setCosFade()
 }
 
 
+/**
+ * For getting a linear fading shape the control points
+ * have to lie on the diagonal of the rectangle defined
+ * by the start and end point of the Bezier curve.
+ */
 void SampleTCOView::setLinearFade()
 {
 	if (m_leftFadeClicked)
