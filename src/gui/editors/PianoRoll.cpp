@@ -747,7 +747,7 @@ void PianoRoll::fitNoteLengths(bool fill)
 		}
 		if (ref == refNotes.end())
 		{
-			if (!fill) { continue; }
+			if (!fill) { break; }
 			// Last notes stretch to end of last bar
 			length = notes.last()->endPos().nextFullBar() * TimePos::ticksPerBar() - note->pos();
 		}
