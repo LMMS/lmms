@@ -358,8 +358,7 @@ void Pattern::checkType()
 		++it;
 	}
 
-	if (beatPattern) { setType(BeatPattern); }
-	else { setType(MelodyPattern); }
+	setType(beatPattern ? BeatPattern : MelodyPattern);
 }
 
 
