@@ -292,18 +292,18 @@ void Pattern::clearNotes()
 
 Note * Pattern::addStepNote(int step)
 {
+	auto prevPatternType = m_patternType;
 	Note * n =
 		addNote(
 			Note(TimePos(DefaultTicksPerBar / 16),
 			TimePos::stepPosition(step)), false
 		);
 	n->setType(Note::StepNote);
-	// Have to check the type again now that we changed
-	// the type of the note
-	// TODO: This means checkType is called twice:
-	// Once on addNote and once here. Rethink it so we
-	// can call it only once.
-	checkType();
+	// addNote will change a BeatPattern to a MelodyPattern
+	// because it calls checkType after adding a regular note.
+	// We need to revert it back to a BeatPattern if it was one
+	// before we added the note.
+	if (prevPatternType == BeatPattern) { setType(BeatPattern); }
 	return n;
 }
 
@@ -358,14 +358,8 @@ void Pattern::checkType()
 		++it;
 	}
 
-	if (beatPattern)
-	{
-		setType(BeatPattern);
-	}
-	else
-	{
-		setType(MelodyPattern);
-	}
+	if (beatPattern) { setType(BeatPattern); }
+	else { setType(MelodyPattern); }
 }
 
 
