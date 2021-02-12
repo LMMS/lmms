@@ -613,8 +613,12 @@ void TrackContentObjectView::mousePressEvent( QMouseEvent * me )
 				gui->songEditor()->m_editor->selectAllTcos( false );
 				m_tco->addJournalCheckPoint();
 
-				// Move, Resize, ResizeLeft and Split
-				m_tco->setJournalling( false );
+				// Move, Resize and ResizeLeft
+				// Split action doesn't disable TCO journalling
+				if (m_action == Move || m_action == Resize || m_action == ResizeLeft)
+				{
+					m_tco->setJournalling(false);
+				}
 
 				setInitialPos( me->pos() );
 				setInitialOffsets();
@@ -964,7 +968,6 @@ void TrackContentObjectView::mouseReleaseEvent( QMouseEvent * me )
 	}
 	else if( m_action == Split )
 	{
-		m_tco->setJournalling( true );
 		const float ppb = m_trackView->trackContainerView()->pixelsPerBar();
 		const TimePos relPos = me->pos().x() * TimePos::ticksPerBar() / ppb;
 		splitTCO(unquantizedModHeld(me) ?

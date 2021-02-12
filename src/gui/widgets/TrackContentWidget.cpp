@@ -584,7 +584,7 @@ void TrackContentWidget::mousePressEvent( QMouseEvent * me )
 void TrackContentWidget::mouseReleaseEvent( QMouseEvent * me )
 {
 	gui->songEditor()->syncEditMode();
-	QWidget::mousePressEvent(me);
+	QWidget::mouseReleaseEvent(me);
 }
 
 
