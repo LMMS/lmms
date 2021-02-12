@@ -45,7 +45,7 @@
 #include "MainWindow.h"
 
 
-LcdFloatSpinBox::LcdFloatSpinBox(int numWhole, int numFrac, QWidget* parent, const QString& name) :
+LcdFloatSpinBox::LcdFloatSpinBox(int numWhole, int numFrac, const QString& name, QWidget* parent) :
 	FloatModelView(new FloatModel(0, 0, 0, 0, nullptr, name, true), this),
 	m_wholeDisplay(numWhole, parent, name, false),
 	m_fractionDisplay(numFrac, parent, name, true),
@@ -58,7 +58,7 @@ LcdFloatSpinBox::LcdFloatSpinBox(int numWhole, int numFrac, QWidget* parent, con
 }
 
 
-LcdFloatSpinBox::LcdFloatSpinBox(int numWhole, int numFrac, const QString& style, QWidget* parent, const QString& name) :
+LcdFloatSpinBox::LcdFloatSpinBox(int numWhole, int numFrac, const QString& style, const QString& name, QWidget* parent) :
 	FloatModelView(new FloatModel(0, 0, 0, 0, nullptr, name, true), this),
 	m_wholeDisplay(numWhole, style, parent, name, false),
 	m_fractionDisplay(numFrac, style, parent, name, true),
@@ -115,12 +115,6 @@ void LcdFloatSpinBox::update()
 
 void LcdFloatSpinBox::contextMenuEvent(QContextMenuEvent* event)
 {
-	// for the case, the user clicked right while pressing left mouse-
-	// button, the context-menu appears while mouse-cursor is still hidden
-	// and it isn't shown again until user does something which causes
-	// an QApplication::restoreOverrideCursor()-call...
-	mouseReleaseEvent(nullptr);
-
 	CaptionMenu contextMenu(model()->displayName());
 	addDefaultActions(&contextMenu);
 	contextMenu.exec(QCursor::pos());
@@ -135,7 +129,6 @@ void LcdFloatSpinBox::mousePressEvent(QMouseEvent* event)
 	{
 		m_mouseMoving = true;
 		m_origMousePos = event->globalPos();
-		QApplication::setOverrideCursor(Qt::BlankCursor);
 
 		AutomatableModel *thisModel = model();
 		if (thisModel)
@@ -165,7 +158,6 @@ void LcdFloatSpinBox::mouseMoveEvent(QMouseEvent* event)
 		{
 			model()->setValue(model()->value() - dy / 2 * getStep());
 			emit manualChange();
-			QCursor::setPos(m_origMousePos);
 		}
 	}
 }
@@ -176,10 +168,6 @@ void LcdFloatSpinBox::mouseReleaseEvent(QMouseEvent*)
 	if (m_mouseMoving)
 	{
 		model()->restoreJournallingState();
-
-		QCursor::setPos(m_origMousePos);
-		QApplication::restoreOverrideCursor();
-
 		m_mouseMoving = false;
 	}
 }
