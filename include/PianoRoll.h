@@ -207,13 +207,14 @@ protected slots:
 
 	void selectRegionFromPixels( int xStart, int xEnd );
 
-	void clearGhostPattern();
+	void showGhostNotes(bool state);
+	void pasteGhostNotes();
 	void glueNotes();
 
 
 signals:
 	void currentPatternChanged();
-	void ghostPatternSet(bool);
+	void ghostNotesShown(bool);
 	void semiToneMarkerMenuScaleSetEnabled(bool);
 	void semiToneMarkerMenuChordSetEnabled(bool);
 
@@ -322,6 +323,7 @@ private:
 
 	Pattern* m_pattern;
 	NoteVector m_ghostNotes;
+	bool m_ghostNotesVisible;
 
 	inline const NoteVector & ghostNotes() const
 	{
@@ -496,7 +498,6 @@ signals:
 
 private slots:
 	void updateAfterPatternChange();
-	void ghostPatternSet( bool state );
 
 private:
 	void patternRenamed();
@@ -513,7 +514,6 @@ private:
 	ComboBox * m_keyComboBox;
 	ComboBox * m_scaleComboBox;
 	ComboBox * m_chordComboBox;
-	QPushButton * m_clearGhostButton;
 
 };
 
