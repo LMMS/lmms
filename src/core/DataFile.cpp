@@ -43,6 +43,7 @@
 #include "ProjectVersion.h"
 #include "SongEditor.h"
 #include "TextFloat.h"
+#include "Track.h"
 
 #include "lmmsversion.h"
 
@@ -59,7 +60,8 @@ const std::vector<DataFile::UpgradeMethod> DataFile::UPGRADE_METHODS = {
 	&DataFile::upgrade_0_4_0_beta1      ,   &DataFile::upgrade_0_4_0_rc2,
 	&DataFile::upgrade_1_0_99           ,   &DataFile::upgrade_1_1_0,
 	&DataFile::upgrade_1_1_91           ,   &DataFile::upgrade_1_2_0_rc3,
-	&DataFile::upgrade_1_3_0            ,   &DataFile::upgrade_noHiddenClipNames
+	&DataFile::upgrade_1_3_0            ,   &DataFile::upgrade_noHiddenClipNames,
+	&DataFile::upgrade_noHiddenAutomationTracks
 };
 
 // Vector of all versions that have upgrade routines.
@@ -1382,6 +1384,44 @@ void DataFile::upgrade_noHiddenClipNames()
 		clearDefaultNames(instClips, trackName);
 		clearDefaultNames(autoClips, trackName);
 		clearDefaultNames(bbClips, trackName);
+	}
+}
+
+void DataFile::upgrade_noHiddenAutomationTracks()
+{
+	// convert global automation tracks to non-hidden
+	QDomElement song = firstChildElement("lmms-project")
+		.firstChildElement("song");
+	QDomElement tc = song.firstChildElement("trackcontainer");
+	QDomElement gaTrack = song.firstChildElement("track");
+	if (!gaTrack.isNull()
+		&& gaTrack.attribute("type").toInt() == Track::HiddenAutomationTrack)
+	{
+		// global automationpatterns
+		QDomNodeList aps = gaTrack.elementsByTagName("automationpattern");
+		for (int i = 0; i < aps.length(); ++i)
+		{
+			QDomElement ap = aps.item(i).toElement();
+			// If ap has time nodes, move it to trackcontainer
+			// There are times when an <object> node is present without an
+			// object with the same ID in the file, so we ignore that node
+			if (ap.elementsByTagName("time").length() > 1)
+			{
+				QDomElement aptrack = createElement("track");
+				aptrack.setAttribute("muted", QString::number(false));
+				aptrack.setAttribute("solo", QString::number(false));
+				aptrack.setAttribute("type",
+					QString::number(Track::AutomationTrack));
+				aptrack.setAttribute("name",
+					ap.attribute("name", "Automation Track"));
+				QDomElement at = createElement("automationtrack");
+				aptrack.appendChild(at);
+				aptrack.appendChild(aps.item(i).cloneNode());
+				tc.appendChild(aptrack);
+			}
+		}
+		// Remove the track object just in case
+		gaTrack.parentNode().removeChild(gaTrack);
 	}
 }
 

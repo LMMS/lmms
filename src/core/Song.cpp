@@ -1015,12 +1015,6 @@ void Song::loadProject( const QString & fileName )
 		m_playPos[Mode_PlaySong].m_timeLine->toggleLoopPoints( 0 );
 	}
 
-	if( !dataFile.content().firstChildElement( "track" ).isNull() )
-	{
-		m_globalAutomationTrack->restoreState( dataFile.content().
-						firstChildElement( "track" ) );
-	}
-
 	//Backward compatibility for LMMS <= 0.4.15
 	PeakController::initGetControllerBySetting();
 
@@ -1165,7 +1159,6 @@ bool Song::saveProjectFile( const QString & filename )
 
 	saveState( dataFile, dataFile.content() );
 
-	m_globalAutomationTrack->saveState( dataFile, dataFile.content() );
 	Engine::fxMixer()->saveState( dataFile, dataFile.content() );
 	if( gui )
 	{
