@@ -1394,6 +1394,15 @@ void DataFile::upgrade_noHiddenClipNames()
  */
 void DataFile::upgrade_extendedNoteRange()
 {
+	auto affected = [](QDomElement instrument)
+	{
+		return instrument.attribute("name") == "zynaddsubfx" ||
+			instrument.attribute("name") == "vestige" ||
+			instrument.attribute("name") == "lv2instrument" ||
+			instrument.attribute("name") == "carlapatchbay" ||
+			instrument.attribute("name") == "carlarack";
+	};
+
 	if (!elementsByTagName("song").item(0).isNull())
 	{
 		// Dealing with a project file, go through all the tracks
@@ -1415,11 +1424,7 @@ void DataFile::upgrade_extendedNoteRange()
 			// by #1857 by an octave. This negates the base note change for normal instruments,
 			// but leaves the MIDI-based instruments sounding an octave lower, preserving their
 			// pitch in existing projects.
-			if (instrument.attribute("name") != "zynaddsubfx" &&
-				instrument.attribute("name") != "vestige" &&
-				instrument.attribute("name") != "lv2instrument" &&
-				instrument.attribute("name") != "carlapatchbay" &&
-				instrument.attribute("name") != "carlarack")
+			if (!affected(instrument))
 			{
 				QDomNodeList patterns = tracks.item(i).toElement().elementsByTagName("pattern");
 				for (int i = 0; !patterns.item(i).isNull(); i++)
@@ -1452,11 +1457,7 @@ void DataFile::upgrade_extendedNoteRange()
 		QDomNodeList instruments = presets.item(0).toElement().elementsByTagName("instrument");
 		if (instruments.isEmpty()) { return; }
 		QDomElement instrument = instruments.item(0).toElement();
-		if (instrument.attribute("name") == "zynaddsubfx" ||
-			instrument.attribute("name") == "vestige" ||
-			instrument.attribute("name") == "lv2instrument" ||
-			instrument.attribute("name") == "carlapatchbay" ||
-			instrument.attribute("name") == "carlarack")
+		if (affected(instrument))
 		{
 			preset.setAttribute("basenote", preset.attribute("basenote").toInt() + 12);
 		}
