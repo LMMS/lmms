@@ -1394,7 +1394,7 @@ void DataFile::upgrade_noHiddenClipNames()
  */
 void DataFile::upgrade_extendedNoteRange()
 {
-	auto affected = [](QDomElement instrument)
+	auto affected = [](const QDomElement& instrument)
 	{
 		return instrument.attribute("name") == "zynaddsubfx" ||
 			instrument.attribute("name") == "vestige" ||
