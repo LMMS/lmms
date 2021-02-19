@@ -380,8 +380,6 @@ void CompressorControlDialog::updateDisplay()
 		m_controls->m_effect->m_displayPeak[1] = COMP_NOISE_FLOOR;
 		m_controls->m_effect->m_displayGain[0] = 1;
 		m_controls->m_effect->m_displayGain[1] = 1;
-		//m_lastPoint = dbfsToYPoint(-9999);
-		//m_lastGainPoint = dbfsToYPoint(0);
 	}
 
 	const float peakAvg = (m_controls->m_effect->m_displayPeak[0] + m_controls->m_effect->m_displayPeak[1]) * 0.5f;
@@ -562,27 +560,29 @@ void CompressorControlDialog::updateDisplay()
 
 void CompressorControlDialog::paintEvent(QPaintEvent *event)
 {
-	if (isVisible())
+	if (!isVisible())
 	{
-		QPainter p(this);
-
-		p.setCompositionMode(QPainter::CompositionMode_Source);
-		p.fillRect(0, 0, m_windowSizeX, m_windowSizeY, QColor("transparent"));
-		p.setCompositionMode(QPainter::CompositionMode_SourceOver);
-
-		p.drawPixmap(0, 0, m_graphPixmap);
-		p.drawPixmap(0, 0, m_visPixmap);
-		p.setOpacity(0.25);
-		p.drawPixmap(0, 0, m_kneePixmap);
-		p.setOpacity(1);
-		if (m_controls->m_effect->isEnabled() && m_controls->m_effect->isRunning())
-		{
-			p.drawPixmap(0, 0, m_kneePixmap2);
-		}
-		p.drawPixmap(0, 0, m_miscPixmap);
-
-		p.end();
+		return;
 	}
+
+	QPainter p(this);
+
+	p.setCompositionMode(QPainter::CompositionMode_Source);
+	p.fillRect(0, 0, m_windowSizeX, m_windowSizeY, QColor("transparent"));
+	p.setCompositionMode(QPainter::CompositionMode_SourceOver);
+
+	p.drawPixmap(0, 0, m_graphPixmap);
+	p.drawPixmap(0, 0, m_visPixmap);
+	p.setOpacity(0.25);
+	p.drawPixmap(0, 0, m_kneePixmap);
+	p.setOpacity(1);
+	if (m_controls->m_effect->isEnabled() && m_controls->m_effect->isRunning())
+	{
+		p.drawPixmap(0, 0, m_kneePixmap2);
+	}
+	p.drawPixmap(0, 0, m_miscPixmap);
+
+	p.end();
 }
 
 
@@ -606,7 +606,7 @@ void CompressorControlDialog::resizeEvent(QResizeEvent *event)
 void CompressorControlDialog::wheelEvent(QWheelEvent * event)
 {
 	const float temp = m_dbRange;
-	m_dbRange = round(qBound(3.f, m_dbRange - event->delta() / 20.f, 96.f) / 3.f) * 3.f;
+	m_dbRange = round(qBound(COMP_GRID_SPACING, m_dbRange - event->delta() / 20.f, 96.f) / COMP_GRID_SPACING) * COMP_GRID_SPACING;
 
 	// Only reset view if the scolling had an effect
 	if (m_dbRange != temp)
@@ -635,11 +635,11 @@ void CompressorControlDialog::resetGraph()
 
 	// Redraw graph
 	p.setPen(QPen(m_graphColor, 1));
-	for (int i = 1; i < m_dbRange / 3.f + 1; ++i)
+	for (int i = 1; i < m_dbRange / COMP_GRID_SPACING + 1; ++i)
 	{
-		p.drawLine(0, dbfsToYPoint(-3 * i), m_windowSizeX, dbfsToYPoint(-3 * i));
-		p.drawLine(dbfsToXPoint(-3 * i), 0, dbfsToXPoint(-3 * i), m_kneeWindowSizeY);
-		p.drawText(QRectF(m_windowSizeX - 50, dbfsToYPoint(-3 * i), 50, 50), Qt::AlignRight | Qt::AlignTop, QString::number(i * -3));
+		p.drawLine(0, dbfsToYPoint(-COMP_GRID_SPACING * i), m_windowSizeX, dbfsToYPoint(-COMP_GRID_SPACING * i));
+		p.drawLine(dbfsToXPoint(-COMP_GRID_SPACING * i), 0, dbfsToXPoint(-COMP_GRID_SPACING * i), m_kneeWindowSizeY);
+		p.drawText(QRectF(m_windowSizeX - 50, dbfsToYPoint(-COMP_GRID_SPACING * i), 50, 50), Qt::AlignRight | Qt::AlignTop, QString::number(i * -COMP_GRID_SPACING));
 	}
 
 	p.end();

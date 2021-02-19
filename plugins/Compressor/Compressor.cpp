@@ -85,7 +85,6 @@ CompressorEffect::CompressorEffect(Model* parent, const Descriptor::SubPluginFea
 	connect(&m_compressorControls.m_ratioModel, SIGNAL(dataChanged()), this, SLOT(calcAutoMakeup()));
 	connect(&m_compressorControls.m_kneeModel, SIGNAL(dataChanged()), this, SLOT(calcAutoMakeup()));
 	connect(&m_compressorControls.m_autoMakeupModel, SIGNAL(dataChanged()), this, SLOT(calcAutoMakeup()));
-	connect(&m_compressorControls.m_inGainModel, SIGNAL(dataChanged()), this, SLOT(calcAutoMakeup()));
 
 	connect(Engine::mixer(), SIGNAL(sampleRateChanged()), this, SLOT(changeSampleRate()));
 	changeSampleRate();
@@ -617,16 +616,17 @@ void CompressorEffect::changeSampleRate()
 	m_preLookaheadBuf[0].resize(m_lookaheadDelayLength);
 	m_preLookaheadBuf[1].resize(m_lookaheadDelayLength);
 
-	calcAutoMakeup();
+	calcThreshold();
+	calcKnee();
+	calcRatio();
+	calcAutoMakeup();// This should be after Threshold, Knee, and Ratio
+
 	calcAttack();
 	calcRelease();
-	calcRatio();
 	calcRange();
 	calcLookaheadLength();
 	calcHold();
 	resizeRMS();
-	calcThreshold();
-	calcKnee();
 	calcOutGain();
 	calcInGain();
 	calcTiltCoeffs();
