@@ -40,7 +40,6 @@
 
 #include <string>
 
-#include "BufferManager.h"
 #include "ConfigManager.h"
 #include "Engine.h"
 #include "FileDialog.h"

@@ -34,7 +34,7 @@
 #include "Graph.h"
 #include "PixmapButton.h"
 #include "LedCheckbox.h"
-#include "MemoryManager.h"
+#include "Memory.h"
 
 
 enum SfxrWaves

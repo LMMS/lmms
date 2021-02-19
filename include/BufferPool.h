@@ -1,7 +1,6 @@
 /*
- * BufferManager.cpp - A buffer caching/memory management system
+ * BufferPool.h
  *
- * Copyright (c) 2017 Lukas W <lukaswhl/at/gmail.com>
  * Copyright (c) 2014 Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>
  * Copyright (c) 2006-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
@@ -24,41 +23,16 @@
  *
  */
 
-#include "BufferManager.h"
+#pragma once
 
-#include "Engine.h"
-#include "Mixer.h"
-#include "MemoryManager.h"
+#include "lmms_export.h"
+#include "lmms_basics.h"
 
-static fpp_t framesPerPeriod;
-
-void BufferManager::init( fpp_t framesPerPeriod )
+/// Legacy interface for buffer re-use. Uses MemoryPool internally now.
+class LMMS_EXPORT BufferPool
 {
-	::framesPerPeriod = framesPerPeriod;
-}
-
-
-sampleFrame * BufferManager::acquire()
-{
-	return MM_ALLOC( sampleFrame, ::framesPerPeriod );
-}
-
-void BufferManager::clear( sampleFrame *ab, const f_cnt_t frames, const f_cnt_t offset )
-{
-	memset( ab + offset, 0, sizeof( *ab ) * frames );
-}
-
-#ifndef LMMS_DISABLE_SURROUND
-void BufferManager::clear( surroundSampleFrame * ab, const f_cnt_t frames,
-							const f_cnt_t offset )
-{
-	memset( ab + offset, 0, sizeof( *ab ) * frames );
-}
-#endif
-
-
-void BufferManager::release( sampleFrame * buf )
-{
-	MM_FREE( buf );
-}
-
+public:
+	static void init( fpp_t framesPerPeriod );
+	static sampleFrame * acquire();
+	static void release( sampleFrame * buf );
+};

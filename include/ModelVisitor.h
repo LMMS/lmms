@@ -25,6 +25,8 @@
 #ifndef MODELVISITOR_H
 #define MODELVISITOR_H
 
+#include "lmms_export.h"
+
 class AutomatableModel;
 class BoolModel;
 class IntModel;
@@ -32,7 +34,7 @@ class FloatModel;
 class ComboBoxModel;
 class TempoSyncKnobModel;
 
-class ModelVisitor
+class LMMS_EXPORT ModelVisitor
 {
 	template<class ParentType = AutomatableModel, class ModelType>
 	void up(ModelType& m) { visit(static_cast<ParentType&>(m)); }
@@ -46,7 +48,7 @@ public:
 	virtual ~ModelVisitor();
 };
 
-class ConstModelVisitor
+class LMMS_EXPORT ConstModelVisitor
 {
 	template<class ParentType = AutomatableModel, class ModelType>
 	void up(const ModelType& m) {

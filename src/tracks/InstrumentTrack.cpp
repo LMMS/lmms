@@ -297,11 +297,11 @@ void InstrumentTrack::processInEvent( const MidiEvent& event, const TimePos& tim
 				if( m_notes[event.key()] == NULL )
 				{
 					NotePlayHandle* nph =
-						NotePlayHandleManager::acquire(
+						NotePlayHandlePool.construct(
 								this, offset,
 								typeInfo<f_cnt_t>::max() / 2,
 								Note( TimePos(), TimePos(), event.key(), event.volume( midiPort()->baseVelocity() ) ),
-								NULL, event.channel(),
+								nullptr, event.channel(),
 								NotePlayHandle::OriginMidiInput );
 					m_notes[event.key()] = nph;
 					if( ! Engine::mixer()->addPlayHandle( nph ) )
@@ -726,7 +726,7 @@ bool InstrumentTrack::play( const TimePos & _start, const fpp_t _frames,
 			const f_cnt_t note_frames =
 				cur_note->length().frames( frames_per_tick );
 
-			NotePlayHandle* notePlayHandle = NotePlayHandleManager::acquire( this, _offset, note_frames, *cur_note );
+			NotePlayHandle* notePlayHandle = NotePlayHandlePool.construct( this, _offset, note_frames, *cur_note );
 			notePlayHandle->setBBTrack( bb_track );
 			// are we playing global song?
 			if( _tco_num < 0 )

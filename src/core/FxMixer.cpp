@@ -24,7 +24,7 @@
 
 #include <QDomElement>
 
-#include "BufferManager.h"
+#include "BufferPool.h"
 #include "FxMixer.h"
 #include "Mixer.h"
 #include "MixerWorkerThread.h"
@@ -76,7 +76,7 @@ FxChannel::FxChannel( int idx, Model * _parent ) :
 	m_hasColor( false ),
 	m_dependenciesMet(0)
 {
-	BufferManager::clear( m_buffer, Engine::mixer()->framesPerPeriod() );
+	MixHelpers::clear( m_buffer, Engine::mixer()->framesPerPeriod() );
 }
 
 
@@ -596,7 +596,7 @@ void FxMixer::mixToChannel( const sampleFrame * _buf, fx_ch_t _ch )
 
 void FxMixer::prepareMasterMix()
 {
-	BufferManager::clear( m_fxChannels[0]->m_buffer,
+	MixHelpers::clear( m_fxChannels[0]->m_buffer,
 					Engine::mixer()->framesPerPeriod() );
 }
 
@@ -669,7 +669,7 @@ void FxMixer::masterMix( sampleFrame * _buf )
 	// reset channel process state
 	for( int i = 0; i < numChannels(); ++i)
 	{
-		BufferManager::clear( m_fxChannels[i]->m_buffer,
+		MixHelpers::clear( m_fxChannels[i]->m_buffer,
 				Engine::mixer()->framesPerPeriod() );
 		m_fxChannels[i]->reset();
 		m_fxChannels[i]->m_queued = false;

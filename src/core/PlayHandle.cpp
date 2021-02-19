@@ -22,10 +22,11 @@
  *
  */
  
+#include "BufferPool.h"
 #include "PlayHandle.h"
-#include "BufferManager.h"
 #include "Engine.h"
 #include "Mixer.h"
+#include "MixHelpers.h"
 
 #include <QtCore/QThread>
 #include <QDebug>
@@ -36,7 +37,7 @@ PlayHandle::PlayHandle(const Type type, f_cnt_t offset) :
 		m_type(type),
 		m_offset(offset),
 		m_affinity(QThread::currentThread()),
-		m_playHandleBuffer(BufferManager::acquire()),
+		m_playHandleBuffer(BufferPool::acquire()),
 		m_bufferReleased(true),
 		m_usesBuffer(true)
 {
@@ -45,7 +46,7 @@ PlayHandle::PlayHandle(const Type type, f_cnt_t offset) :
 
 PlayHandle::~PlayHandle()
 {
-	BufferManager::release(m_playHandleBuffer);
+	BufferPool::release(m_playHandleBuffer);
 }
 
 
@@ -54,7 +55,7 @@ void PlayHandle::doProcessing()
 	if( m_usesBuffer )
 	{
 		m_bufferReleased = false;
-		BufferManager::clear(m_playHandleBuffer, Engine::mixer()->framesPerPeriod());
+		MixHelpers::clear(m_playHandleBuffer, Engine::mixer()->framesPerPeriod());
 		play( buffer() );
 	}
 	else

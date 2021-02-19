@@ -290,9 +290,6 @@ int main( int argc, char * * argv )
 	qInstallMessageHandler(consoleMessageHandler);
 #endif
 
-	// initialize memory managers
-	NotePlayHandleManager::init();
-
 	// intialize RNG
 	srand( getpid() + time( 0 ) );
 
@@ -1010,9 +1007,6 @@ int main( int argc, char * * argv )
 		FreeConsole();
 	}
 #endif
-
-
-	NotePlayHandleManager::free();
 
 	return ret;
 }

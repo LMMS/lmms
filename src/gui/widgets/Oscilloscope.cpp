@@ -31,11 +31,11 @@
 #include "gui_templates.h"
 #include "MainWindow.h"
 #include "Mixer.h"
+#include "MixHelpers.h"
 #include "Engine.h"
 #include "ToolTip.h"
 #include "Song.h"
 #include "embed.h"
-#include "BufferManager.h"
 
 
 Oscilloscope::Oscilloscope( QWidget * _p ) :
@@ -53,7 +53,7 @@ Oscilloscope::Oscilloscope( QWidget * _p ) :
 	const fpp_t frames = Engine::mixer()->framesPerPeriod();
 	m_buffer = new sampleFrame[frames];
 
-	BufferManager::clear( m_buffer, frames );
+	MixHelpers::clear( m_buffer, frames );
 
 
 	ToolTip::add( this, tr( "Oscilloscope" ) );

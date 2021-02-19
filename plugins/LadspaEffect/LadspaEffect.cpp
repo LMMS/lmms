@@ -38,7 +38,7 @@
 #include "EffectChain.h"
 #include "AutomationPattern.h"
 #include "ControllerConnection.h"
-#include "MemoryManager.h"
+#include "Memory.h"
 #include "ValueBuffer.h"
 #include "Song.h"
 

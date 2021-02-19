@@ -24,8 +24,8 @@
 
 #include "Oscillator.h"
 
-#include "BufferManager.h"
 #include "Engine.h"
+#include "MixHelpers.h"
 #include "Mixer.h"
 #include "AutomatableModel.h"
 
@@ -59,7 +59,7 @@ void Oscillator::update( sampleFrame * _ab, const fpp_t _frames,
 {
 	if( m_freq >= Engine::mixer()->processingSampleRate() / 2 )
 	{
-		BufferManager::clear( _ab, _frames );
+		MixHelpers::clear( _ab, _frames );
 		return;
 	}
 	if( m_subOsc != NULL )
