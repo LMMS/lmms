@@ -92,7 +92,7 @@ QMenu::separator {
 QMenu::item {
 	color: black;
 	padding: 2px 35px 2px 23px;
-	margin: 3px 0px 3px 0px;
+	margin: 3px 0;
 }
 
 QMenu::item:selected {
@@ -212,13 +212,13 @@ QScrollBar:horizontal {
     border: 1px solid #131313;
     background: rgb( 50,50,50 );
     height: 14px;
-    margin: 0px 13px;
+    margin: 0 13px;
 }
 QScrollBar:vertical {
     border: 1px solid #131313;
     background: rgb( 50,50,50 );
     width: 14px;
-    margin: 13px 0px;
+    margin: 13px 0;
 }
 
 /* scrollbar: trough clicky things */
@@ -401,7 +401,7 @@ AutomatableSlider::groove:vertical {
 	border: 1px inset rgba(100,100,100, 64);
 	border-radius: 2px;
 	width: 2px;
-	margin: 2px 2px;
+	margin: 2px;
 }
 
 AutomatableSlider::handle:vertical {
@@ -483,7 +483,7 @@ QToolButton#stopButton {
 /* all tool buttons */
 
 QToolButton {
-	padding: 1px 1px 1px 1px;
+	padding: 1px;
 	border-radius: 5px;
 	border: 1px solid rgba(63, 63, 63, 128);
 	background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #98a2a7, stop:1 #5b646f);
@@ -498,13 +498,13 @@ QToolButton:hover {
 
 QToolButton:pressed {
 	background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #969696, stop:0.5 #c9c9c9, stop:1 #969696 );
-	padding: 2px 1px 0px 1px;
+	padding: 2px 1px 0;
 	color: white;
 }
 
 QToolButton:checked  {
 	background: qradialgradient(cx:0.3, cy:0.3, radius:0.8, fx:0.3, fy:0.3, stop:0 #e0e0e0, stop:0.8 #c9c9c9, stop:1 #c0c0c0 );
-	padding: 2px 1px 0px 1px;
+	padding: 2px 1px 0;
 	color: black;
 }
 
@@ -524,15 +524,15 @@ TrackLabelButton:hover {
 	background-color: qlineargradient(spread:reflect, x1:0, y1:0, x2:0, y2:0.5, stop:0 #5b6571, stop:0.75 #7b838d, stop:1 #7b838d );
 	color: white;
 	border: 1px solid rgba(0,0,0,64);
-	padding: 1px 0px;
-	margin: 0px;
+	padding: 1px 0;
+	margin: 0;
 }
 
 TrackLabelButton:pressed {
 	background: qlineargradient(spread:reflect, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 #49515b, stop:0.3 #5b6571, stop:1 #6b7581 );
 	color: white;
 	border: 1px solid rgba(0,0,0,64);
-	padding: 2px 0px 0px;
+	padding: 2px 0 0;
 	font-weight: bold;
 }
 
@@ -540,7 +540,7 @@ TrackLabelButton:checked {
 	background: qlineargradient(spread:reflect, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 #49515b, stop:0.3 #5b6571, stop:1 #6b7581 );
 	color: white;
 	border: 1px solid rgba(0,0,0,128);
-	padding: 2px 0px 0px;
+	padding: 2px 0 0;
 	font-weight: bold;
 }
 
@@ -572,7 +572,7 @@ PluginDescWidget {
 	background-color: #e0e0e0;
 	color: #404040;
 	border: 1px solid rgb(64, 64, 64);
-	margin: 0px;
+	margin: 0;
 }
 
 PluginDescWidget:hover {
@@ -596,10 +596,10 @@ FxLine {
 	color: #e0e0e0;
 	qproperty-backgroundActive: qlineargradient(spread:reflect, x1:0, y1:0, x2:1, y2:0,
 								stop:0 #7b838d, stop:1 #6b7581 );
-	qproperty-strokeOuterActive: rgb( 0, 0, 0 );	
-	qproperty-strokeOuterInactive: rgba( 0, 0, 0, 50 );	
-	qproperty-strokeInnerActive: rgba( 255, 255, 255, 100 );	
-	qproperty-strokeInnerInactive: rgba( 255, 255, 255, 50 );					
+	qproperty-strokeOuterActive: rgb( 0, 0, 0 );
+	qproperty-strokeOuterInactive: rgba( 0, 0, 0, 50 );
+	qproperty-strokeInnerActive: rgba( 255, 255, 255, 100 );
+	qproperty-strokeInnerInactive: rgba( 255, 255, 255, 50 );
 }
 
 /* persistent peak markers for fx peak meters */
@@ -708,7 +708,7 @@ SubWindow > QLabel {
 /* SubWindow titlebar button */
 SubWindow > QPushButton {
 	background-color: rgba( 255, 255, 255, 0% );
-	border-width: 0px;
+	border-width: 0;
 	border-color: none;
 	border-style: none;
 }
