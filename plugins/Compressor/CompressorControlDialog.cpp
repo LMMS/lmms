@@ -606,7 +606,9 @@ void CompressorControlDialog::resizeEvent(QResizeEvent *event)
 void CompressorControlDialog::wheelEvent(QWheelEvent * event)
 {
 	const float temp = m_dbRange;
-	m_dbRange = round(qBound(COMP_GRID_SPACING, m_dbRange - event->delta() / 20.f, 96.f) / COMP_GRID_SPACING) * COMP_GRID_SPACING;
+	m_dbRange = round(
+		qBound(COMP_GRID_SPACING, m_dbRange - copysignf(COMP_GRID_SPACING, event->delta()), COMP_GRID_MAX)
+		/ COMP_GRID_SPACING) * COMP_GRID_SPACING;
 
 	// Only reset view if the scolling had an effect
 	if (m_dbRange != temp)
@@ -631,6 +633,8 @@ void CompressorControlDialog::resetGraph()
 	p.setCompositionMode(QPainter::CompositionMode_SourceOver);
 
 	p.setPen(QPen(m_textColor, 1));
+
+	// Arbitrary formula for increasing font size when window size increases
 	p.setFont(QFont("Arial", qMax(int(m_windowSizeY / 1080.f * 24), 12)));
 
 	// Redraw graph

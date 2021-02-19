@@ -49,7 +49,8 @@ constexpr int KNEE_SCREEN_Y = COMP_SCREEN_Y;
 constexpr int COMP_KNEE_LINES = 20;
 constexpr int COMP_BOX_X = 720;
 constexpr int COMP_BOX_Y = 280;
-constexpr float COMP_GRID_SPACING = 3.0;// 3 db per grid line
+constexpr float COMP_GRID_SPACING = 3.f;// 3 db per grid line
+constexpr float COMP_GRID_MAX = 96.f;// Can't zoom out past 96 db
 
 constexpr float COMP_NOISE_FLOOR = 0.000001;// -120 dbFs
 
