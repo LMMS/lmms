@@ -27,8 +27,9 @@
 #ifndef AUTOMATION_PATTERN_H
 #define AUTOMATION_PATTERN_H
 
-#include <QtCore/QMap>
-#include <QtCore/QPointer>
+#include <QMap>
+#include <QPair>
+#include <QPointer>
 
 #include "TrackContentObject.h"
 
@@ -46,10 +47,12 @@ public:
 	{
 		DiscreteProgression,
 		LinearProgression,
-		CubicHermiteProgression
+		CubicHermiteProgression,
+		BezierProgression
 	} ;
 
 	typedef QMap<int, float> timeMap;
+	typedef QMap<int, QPair<int, float> > controlPointTimeMap;
 	typedef QVector<QPointer<AutomatableModel> > objectVector;
 
 	AutomationPattern( AutomationTrack * _auto_track );
@@ -82,6 +85,15 @@ public:
 				const bool quantPos = true,
 				const bool ignoreSurroundingPoints = true );
 
+	TimePos putControlPoint( timeMap::const_iterator it,
+						const float _value);
+
+	TimePos putControlPoint(timeMap::const_iterator it,
+						const int time, const float _value);
+
+	TimePos putControlPoint(timeMap::const_iterator it,
+					const int time, const float _value, const bool flip);
+
 	void removeValue( const TimePos & time );
 
 	void recordValue(TimePos time, float value);
@@ -91,7 +103,12 @@ public:
 				const bool quantPos = true,
 				const bool controlKey = false );
 
+	TimePos setControlPointDragValue( const TimePos & _time, const float _value, const int _x,
+						   const bool _quant_pos = true );
+
 	void applyDragValue();
+
+	void flipControlPoint(bool flip);
 
 
 	bool isDragging() const
@@ -117,6 +134,27 @@ public:
 	inline timeMap & getTangents()
 	{
 		return m_tangents;
+	}
+
+	inline const controlPointTimeMap & getControlPoints() const
+	{
+		return m_controlPoints;
+	}
+
+	inline controlPointTimeMap & getControlPoints()
+	{
+		return m_controlPoints;
+	}
+
+	// This is for getting the node of the control point that is being dragged
+	inline const timeMap::ConstIterator & getControlPointNode() const
+	{
+		return m_oldControlPointNode;
+	}
+
+	inline  timeMap::ConstIterator & getControlPointNode()
+	{
+		return m_oldControlPointNode;
 	}
 
 	inline float getMin() const
@@ -160,6 +198,8 @@ public:
 	static int quantization() { return s_quantization; }
 	static void setQuantization(int q) { s_quantization = q; }
 
+	void clampControlPoints(bool clampVertical=true);
+
 public slots:
 	void clear();
 	void objectDestroyed( jo_id_t );
@@ -169,6 +209,7 @@ public slots:
 
 private:
 	void cleanObjects();
+	void cleanControlPoints();
 	void generateTangents();
 	void generateTangents( timeMap::const_iterator it, int numToGenerate );
 	float valueAt( timeMap::const_iterator v, int offset ) const;
@@ -179,12 +220,20 @@ private:
 	timeMap m_timeMap;	// actual values
 	timeMap m_oldTimeMap;	// old values for storing the values before setDragValue() is called.
 	timeMap m_tangents;	// slope at each point for calculating spline
+	controlPointTimeMap m_controlPoints;	// control points for calculating the bezier curve
+	controlPointTimeMap m_oldControlPoints;	// old values for storing the values before setDragValue() is called.
+	// m_oldControlPoints is similar to m_oldTimeMap, since the control points need to be dragged as well or something
+	timeMap::const_iterator m_oldControlPointNode;	// Which automation point was the control point connected to?
+	bool m_controlFlip; // If the lefthand control point is grabbed, the value must be flipped around the automation point
+
+	float m_controlPointDragOffset[2];
+
 	float m_tension;
 	bool m_hasAutomation;
 	ProgressionTypes m_progressionType;
 
 	bool m_dragging;
-	
+
 	bool m_isRecording;
 	float m_lastRecordedValue;
 
