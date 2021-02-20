@@ -286,7 +286,6 @@ private:
 
 	void setRazorAction();
 	void cancelRazorAction();
-	int getMouseTickPos();
 
 	void updateScrollbars();
 	void updatePositionLineHeight();
@@ -310,7 +309,7 @@ private:
 	static QPixmap * s_toolSelect;
 	static QPixmap * s_toolMove;
 	static QPixmap * s_toolOpen;
-	static QPixmap * s_toolRazor;
+	static QPixmap* s_toolRazor;
 
 	static PianoRollKeyTypes prKeyOrder[];
 
@@ -415,6 +414,10 @@ private:
 
 	// did we start a mouseclick with shift pressed
 	bool m_startedWithShift;
+
+	// Variable that holds the position in ticks for the razor action
+	int m_razorTickPos;
+	void updateRazorPos(QMouseEvent* me);
 
 	friend class PianoRollWindow;
 

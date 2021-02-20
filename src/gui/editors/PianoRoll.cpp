@@ -115,7 +115,7 @@ QPixmap * PianoRoll::s_toolErase = NULL;
 QPixmap * PianoRoll::s_toolSelect = NULL;
 QPixmap * PianoRoll::s_toolMove = NULL;
 QPixmap * PianoRoll::s_toolOpen = NULL;
-QPixmap * PianoRoll::s_toolRazor = NULL;
+QPixmap* PianoRoll::s_toolRazor = nullptr;
 
 TextFloat * PianoRoll::s_textFloat = NULL;
 
@@ -272,9 +272,9 @@ PianoRoll::PianoRoll() :
 	{
 		s_toolOpen = new QPixmap( embed::getIconPixmap( "automation" ) );
 	}
-	if( s_toolRazor == NULL )
+	if (s_toolRazor == nullptr)
 	{
-		s_toolRazor = new QPixmap( embed::getIconPixmap( "razor" ) );
+		s_toolRazor = new QPixmap(embed::getIconPixmap("razor"));
 	}
 
 	// init text-float
@@ -1273,6 +1273,7 @@ void PianoRoll::keyPressEvent(QKeyEvent* ke)
 			break;
 
 		case Qt::Key_Escape:
+			// On the Razor mode, ESC cancels it
 			if (m_editMode == ModeEditRazor)
 			{
 				cancelRazorAction();
@@ -1326,6 +1327,8 @@ void PianoRoll::keyPressEvent(QKeyEvent* ke)
 		}
 
 		case Qt::Key_Control:
+			// Ctrl will not enter selection mode if we are
+			// in Razor mode, but unquantize it
 			if (m_editMode == ModeEditRazor)
 			{
 				break;
@@ -1465,37 +1468,22 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 	if (m_editMode == ModeEditRazor && me->button() == Qt::LeftButton
 		&& noteUnderMouse())
 	{
-		Note * n = noteUnderMouse();
+		NoteVector n;
+		Note* note = noteUnderMouse();
 
-		float zoomFactor = ((float)m_ppb / TimePos::ticksPerBar());
-		int x = getMouseTickPos() - m_whiteKeyWidth;
-		int newLength = ((x/zoomFactor) + (m_currentPosition) - (n->pos()));
-		int leftOverLength = n->length() - newLength;
-
-		if (!newLength || !leftOverLength)
+		if (note)
 		{
-			return;
+			n.append(note);
+
+			updateRazorPos(me);
+
+			// Call splitNotes for the note
+			m_pattern->splitNotes(n, TimePos(m_razorTickPos));
 		}
 
-		m_pattern->addJournalCheckPoint();
-
-		// Reduce note length
-		n->setLength(newLength);
-
-		// Add note with leftover length
-		Note noteCopy(
-			leftOverLength,
-			n->pos() + newLength,
-			n->key(),
-			n->getVolume(),
-			n->getPanning(),
-			n->detuning()
-		);
-		if (n->selected()) { noteCopy.setSelected(true); }
-		m_pattern->addNote(noteCopy, false);
-
 		// Keep in razor mode while SHIFT is hold during cut
-		if (!(me->modifiers() & Qt::ShiftModifier)) {
+		if (!(me->modifiers() & Qt::ShiftModifier))
+		{
 			cancelRazorAction();
 		}
 
@@ -2027,15 +2015,6 @@ void PianoRoll::cancelRazorAction()
 	update();
 }
 
-int PianoRoll::getMouseTickPos() {
-	QPoint pos = mapFromGlobal(QCursor::pos());
-	int pixelsPer = m_ppb / (TimePos::ticksPerBar() / quantization());
-	float zoomFactor = ((float)m_ppb / TimePos::ticksPerBar());
-	int scrollOffset = (int)(m_currentPosition * zoomFactor) % pixelsPer;
-	return (pixelsPer * (((pos.x() - m_whiteKeyWidth)) / pixelsPer) + (m_whiteKeyWidth - scrollOffset));
-}
-
-
 
 
 void PianoRoll::testPlayKey( int key, int velocity, int pan )
@@ -2136,6 +2115,7 @@ void PianoRoll::mouseReleaseEvent( QMouseEvent * me )
 
 	s_textFloat->hide();
 
+	// Quit razor mode if we pressed and released the right mouse button
 	if (m_editMode == ModeEditRazor && me->button() == Qt::RightButton)
 	{
 		cancelRazorAction();
@@ -2258,6 +2238,12 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 		updatePositionLineHeight();
 		repaint();
 		return;
+	}
+
+	// Update Razor position if we are on Razor mode
+	if (m_editMode == ModeEditRazor)
+	{
+		updateRazorPos(me);
 	}
 
 	if( me->y() > PR_TOP_MARGIN || m_action != ActionNone )
@@ -2630,6 +2616,24 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 	m_lastMouseY = me->y();
 
 	update();
+}
+
+
+
+
+void PianoRoll::updateRazorPos(QMouseEvent* me)
+{
+	// Calculate the TimePos from the mouse
+	int mouseViewportPos = me->x() - m_whiteKeyWidth;
+	int mouseTickPos = mouseViewportPos / (m_ppb / TimePos::ticksPerBar()) + m_currentPosition;
+
+	// If ctrl is not pressed, quantize the position
+	if (!(me->modifiers() & Qt::ControlModifier))
+	{
+		mouseTickPos = floor(mouseTickPos / quantization()) * quantization();
+	}
+
+	m_razorTickPos = mouseTickPos;
 }
 
 
@@ -3335,17 +3339,17 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 		// -- Razor tool (draw cut line)
 		if (m_action == ActionRazor)
 		{
-			auto xCoordOfTick = [=](int tick) {
+			auto xCoordOfTick = [this](int tick) {
 				return m_whiteKeyWidth + (
-					(tick - m_currentPosition) * m_ppb / TimePos::ticksPerBar()
-				);
+					(tick - m_currentPosition) * m_ppb / TimePos::ticksPerBar());
 			};
-			Note * n = noteUnderMouse();
+			Note* n = noteUnderMouse();
 			if (n)
 			{
 				const int key = n->key() - m_startKey + 1;
 				int y = y_base - key * m_keyLineHeight;
-				int x = getMouseTickPos();
+
+				int x = xCoordOfTick(m_razorTickPos);
 
 				if (x > xCoordOfTick(n->pos()) &&
 					x < xCoordOfTick(n->pos() + n->length()))
