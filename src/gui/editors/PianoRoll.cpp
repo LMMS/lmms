@@ -1465,8 +1465,7 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 	}
 
 	// -- Razor
-	if (m_editMode == ModeEditRazor && me->button() == Qt::LeftButton
-		&& noteUnderMouse())
+	if (m_editMode == ModeEditRazor && me->button() == Qt::LeftButton)
 	{
 		NoteVector n;
 		Note* note = noteUnderMouse();
