@@ -998,9 +998,18 @@ void Song::loadProject( const QString & fileName )
 		if (dataFile.hasLocalPlugins())
 		{
 			cantLoadProject = true;
-			QMessageBox::critical(NULL, tr("Aborting project load"),
-				tr("Project file contains local paths to plugins, which could be used to "
-					"run malicious code."));
+
+			if (gui)
+			{
+				QMessageBox::critical(NULL, tr("Aborting project load"),
+					tr("Project file contains local paths to plugins, which could be used to "
+						"run malicious code."));
+			}
+			else
+			{
+				QTextStream(stderr) << tr("Can't load project: "
+					"Project file contains local paths to plugins.") << endl;
+			}
 		}
 	}
 
