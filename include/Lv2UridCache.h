@@ -29,6 +29,7 @@
 
 #ifdef LMMS_HAVE_LV2
 
+#include <QtGlobal>
 #include <cstdint>
 
 //! Cached URIDs for fast access (for use in real-time code)
@@ -37,16 +38,33 @@ class Lv2UridCache
 public:
 	enum class Id //!< ID for m_uridCache array
 	{
+		// keep it alphabetically (except "size" at the end)
+		atom_Float,
+		atom_Int,
+		bufsz_minBlockLength,
+		bufsz_maxBlockLength,
+		bufsz_nominalBlockLength,
+		bufsz_sequenceSize,
 		midi_MidiEvent,
+		param_sampleRate,
+		// exception to alphabetic ordering - keep at the end:
 		size
 	};
+
+	template<typename T>
+	struct IdForType;
+
 	//! Return URID for a cache ID
 	uint32_t operator[](Id id) const;
 
 	Lv2UridCache(class UridMap& mapper);
+
 private:
 	uint32_t m_cache[static_cast<int>(Id::size)];
 };
+
+template<> struct Lv2UridCache::IdForType<float> { static constexpr auto value = Id::atom_Float; };
+template<> struct Lv2UridCache::IdForType<std::int32_t> { static constexpr auto value = Id::atom_Int; };
 
 #endif // LMMS_HAVE_LV2
 #endif // LV2URIDCACHE_H

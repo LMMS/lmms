@@ -130,6 +130,13 @@ public:
 		return m_supportedFeatureURIs;
 	}
 	bool isFeatureSupported(const char* featName) const;
+	AutoLilvNodes findNodes(const LilvNode *subject,
+		const LilvNode *predicate, const LilvNode *object);
+
+	static const std::set<const char*, Lv2Manager::CmpStr>& getPluginBlacklist()
+	{
+		return pluginBlacklist;
+	}
 
 private:
 	// general data
@@ -143,6 +150,9 @@ private:
 
 	// URID cache for fast URID access
 	Lv2UridCache m_uridCache;
+
+	// static
+	static const std::set<const char*, Lv2Manager::CmpStr> pluginBlacklist;
 
 	// functions
 	bool isSubclassOf(const LilvPluginClass *clvss, const char *uriStr);

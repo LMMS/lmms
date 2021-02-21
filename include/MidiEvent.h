@@ -33,27 +33,32 @@
 class MidiEvent
 {
 public:
-	MidiEvent( MidiEventTypes type = MidiActiveSensing,
+	enum class Source { Internal, External };
+
+	MidiEvent(MidiEventTypes type = MidiActiveSensing,
 				int8_t channel = 0,
 				int16_t param1 = 0,
 				int16_t param2 = 0,
-				const void* sourcePort = NULL ) :
+				const void* sourcePort = nullptr,
+				Source source = Source::External) :
 		m_type( type ),
 		m_metaEvent( MidiMetaInvalid ),
 		m_channel( channel ),
 		m_sysExData( NULL ),
-		m_sourcePort( sourcePort )
+		m_sourcePort(sourcePort),
+		m_source(source)
 	{
 		m_data.m_param[0] = param1;
 		m_data.m_param[1] = param2;
 	}
 
-	MidiEvent( MidiEventTypes type, const char* sysExData, int dataLen ) :
+	MidiEvent(MidiEventTypes type, const char* sysExData, std::size_t dataLen, Source source = Source::External) :
 		m_type( type ),
 		m_metaEvent( MidiMetaInvalid ),
 		m_channel( 0 ),
 		m_sysExData( sysExData ),
-		m_sourcePort( NULL )
+		m_sourcePort(nullptr),
+		m_source(source)
 	{
 		m_data.m_sysExDataLen = dataLen;
 	}
@@ -64,7 +69,8 @@ public:
 		m_channel( other.m_channel ),
 		m_data( other.m_data ),
 		m_sysExData( other.m_sysExData ),
-		m_sourcePort( other.m_sourcePort )
+		m_sourcePort(other.m_sourcePort),
+		m_source(other.m_source)
 	{
 	}
 
@@ -190,6 +196,16 @@ public:
 		setParam( 0, pitchBend );
 	}
 
+	Source source() const
+	{
+		return m_source;
+	}
+
+	void setSource(Source value)
+	{
+		m_source = value;
+	}
+
 
 private:
 	MidiEventTypes m_type;		// MIDI event type
@@ -198,13 +214,15 @@ private:
 	union
 	{
 		int16_t m_param[2];	// first/second parameter (key/velocity)
-		uint8_t m_bytes[4];		// raw bytes
+		uint8_t m_bytes[4];	// raw bytes
 		int32_t m_sysExDataLen;	// len of m_sysExData
 	} m_data;
 
 	const char* m_sysExData;
 	const void* m_sourcePort;
 
+	// Stores the source of the MidiEvent: Internal or External (hardware controllers).
+	Source m_source;
 } ;
 
 #endif
