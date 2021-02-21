@@ -398,6 +398,7 @@ private:
 	EditModes m_razorMode; // mode they where in before entering razor
 
 	bool m_mouseDownRight; //true if right click is being held down
+	bool m_firstRazorSplit; // if it's allowed to cancel razor action on SHIFT release event.
 
 	TimeLineWidget * m_timeLine;
 	bool m_scrollBack;

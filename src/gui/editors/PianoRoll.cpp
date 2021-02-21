@@ -185,6 +185,7 @@ PianoRoll::PianoRoll() :
 	m_editMode( ModeDraw ),
 	m_ctrlMode( ModeDraw ),
 	m_mouseDownRight( false ),
+	m_firstRazorSplit(false),
 	m_scrollBack( false ),
 	m_stepRecorderWidget(this, DEFAULT_PR_PPB, PR_TOP_MARGIN, PR_BOTTOM_MARGIN + m_notesEditHeight, WHITE_KEY_WIDTH, 0),
 	m_stepRecorder(*this, m_stepRecorderWidget),
@@ -1381,6 +1382,12 @@ void PianoRoll::keyReleaseEvent(QKeyEvent* ke )
 			update();
 			break;
 
+		case Qt::Key_Shift:
+			if (m_editMode == ModeEditRazor && !m_firstRazorSplit)
+			{
+				cancelRazorAction();
+			}
+
 		// update after undo/redo
 		case Qt::Key_Z:
 		case Qt::Key_R:
@@ -1478,6 +1485,9 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 
 			// Call splitNotes for the note
 			m_pattern->splitNotes(n, TimePos(m_razorTickPos));
+
+			// Allow cancel razor mode when shift is released (if hold down).
+			m_firstRazorSplit = false;
 		}
 
 		// Keep in razor mode while SHIFT is hold during cut
@@ -1999,6 +2009,7 @@ void PianoRoll::setRazorAction()
 {
 	if (m_editMode != ModeEditRazor)
 	{
+		m_firstRazorSplit = true;
 		m_razorMode = m_editMode;
 		m_editMode = ModeEditRazor;
 		m_action = ActionRazor;
