@@ -3354,11 +3354,7 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 					x < xCoordOfTick(n->pos() + n->length()))
 				{
 					p.setPen(QPen(QColor("#FF0000"), 1));
-					p.drawLine(
-						x, y,
-						x,
-						y + m_keyLineHeight
-					);
+					p.drawLine(x, y, x, y + m_keyLineHeight);
 
 					setCursor(Qt::BlankCursor);
 				}
