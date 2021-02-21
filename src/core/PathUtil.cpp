@@ -44,7 +44,7 @@ namespace PathUtil
 				}
 				else
 				{
-					qWarning("PathUtil: No song loaded!");
+					qWarning("PathUtil: Can't resolve 'local:'. No song loaded!");
 					// Keeps the base prefix so the method calling this
 					// can handle the situation.
 					return QString("local:");

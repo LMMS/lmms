@@ -277,15 +277,10 @@ void DataFile::write( QTextStream & _strm )
 
 bool DataFile::writeFile(const QString& filename, bool withResources)
 {
-	qWarning() << "Write Bundle DEBUG:";
-
 	const QString fullName = nameWithExtension( filename );
 	const QString fullNameTemp = fullName + ".new";
 	const QString fullNameBak = fullName + ".bak";
 	const QString resourcesDir = QFileInfo(fullName).path() + "/resources";
-
-	qWarning() << "Destination File: " << fullName;
-	qWarning() << "Resources Folder: " << resourcesDir;
 
 	QFile outfile( fullNameTemp );
 
@@ -401,7 +396,6 @@ bool DataFile::copyResources(const QString& resourcesDir)
 	// Copy resources and manipulate the DataFile to have local paths to them
 	while (it != ELEMENTS_WITH_RESOURCES.end())
 	{
-		qWarning() << "Looking for resources on: " << it->first;
 		QDomNodeList list = elementsByTagName(it->first);
 
 		// Go through all elements with the tagname from our map
@@ -414,7 +408,6 @@ bool DataFile::copyResources(const QString& resourcesDir)
 			// Search for attributes that point to resources
 			while (res != it->second.end())
 			{
-				qWarning() << "Attribute: " << *res;
 				// If the element has that attribute
 				if (el.hasAttribute(*res))
 				{
@@ -433,9 +426,6 @@ bool DataFile::copyResources(const QString& resourcesDir)
 					// Final path is our resources dir + the new file name
 					QString finalPath = resourcesDir + "/" + finalFileName;
 
-					qWarning() << "Original Resource: " << resPath;
-					qWarning() << "Resource Destination: " << finalPath;
-
 					// Copy resource file to the resources folder
 					if(!QFile::copy(resPath, finalPath))
 					{
@@ -447,7 +437,6 @@ bool DataFile::copyResources(const QString& resourcesDir)
 					QString newAtt = "local:resources/" + finalFileName;
 					el.setAttribute(*res, newAtt);
 
-					qWarning() << "New Path: " << newAtt;
 					// Increases file counter
 					++resCounter;
 				}
