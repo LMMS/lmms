@@ -202,6 +202,7 @@ PianoRoll::PianoRoll() :
 	m_textColorLight( 0, 0, 0 ),
 	m_textShadow( 0, 0, 0 ),
 	m_markedSemitoneColor( 0, 0, 0 ),
+	m_razorCutLineColor(0, 0, 0),
 	m_noteOpacity( 255 ),
 	m_ghostNoteOpacity( 255 ),
 	m_noteBorders( true ),
@@ -3364,7 +3365,7 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 				if (x > xCoordOfTick(n->pos()) &&
 					x < xCoordOfTick(n->pos() + n->length()))
 				{
-					p.setPen(QPen(QColor("#FF0000"), 1));
+					p.setPen(QPen(m_razorCutLineColor, 1));
 					p.drawLine(x, y, x, y + m_keyLineHeight);
 
 					setCursor(Qt::BlankCursor);

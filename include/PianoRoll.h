@@ -70,6 +70,7 @@ class PianoRoll : public QWidget
 	Q_PROPERTY(QColor textColorLight MEMBER m_textColorLight)
 	Q_PROPERTY(QColor textShadow MEMBER m_textShadow)
 	Q_PROPERTY(QColor markedSemitoneColor MEMBER m_markedSemitoneColor)
+	Q_PROPERTY(QColor razorCutLine MEMBER m_razorCutLineColor)
 	Q_PROPERTY(int noteOpacity MEMBER m_noteOpacity)
 	Q_PROPERTY(bool noteBorders MEMBER m_noteBorders)
 	Q_PROPERTY(int ghostNoteOpacity MEMBER m_ghostNoteOpacity)
@@ -440,6 +441,7 @@ private:
 	QColor m_textColorLight;
 	QColor m_textShadow;
 	QColor m_markedSemitoneColor;
+	QColor m_razorCutLineColor;
 	int m_noteOpacity;
 	int m_ghostNoteOpacity;
 	bool m_noteBorders;
