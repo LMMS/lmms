@@ -646,6 +646,7 @@ void PianoRoll::loadGhostNotes( const QDomElement & de )
 		{
 			Note * n = new Note;
 			n->restoreState( node.toElement() );
+			n->setVolume(DefaultVolume);
 			m_ghostNotes.push_back( n );
 			node = node.nextSibling();
 		}
