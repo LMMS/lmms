@@ -70,7 +70,7 @@ class PianoRoll : public QWidget
 	Q_PROPERTY(QColor textColorLight MEMBER m_textColorLight)
 	Q_PROPERTY(QColor textShadow MEMBER m_textShadow)
 	Q_PROPERTY(QColor markedSemitoneColor MEMBER m_markedSemitoneColor)
-	Q_PROPERTY(QColor razorCutLine MEMBER m_razorCutLineColor)
+	Q_PROPERTY(QColor knifeCutLine MEMBER m_knifeCutLineColor)
 	Q_PROPERTY(int noteOpacity MEMBER m_noteOpacity)
 	Q_PROPERTY(bool noteBorders MEMBER m_noteBorders)
 	Q_PROPERTY(int ghostNoteOpacity MEMBER m_ghostNoteOpacity)
@@ -96,7 +96,7 @@ public:
 		ModeErase,
 		ModeSelect,
 		ModeEditDetuning,
-		ModeEditRazor
+		ModeEditKnife
 	};
 
 	/*! \brief Resets settings to default when e.g. creating a new project */
@@ -229,7 +229,7 @@ private:
 		ActionSelectNotes,
 		ActionChangeNoteProperty,
 		ActionResizeNoteEditArea,
-		ActionRazor
+		ActionKnife
 	};
 
 	enum NoteEditMode
@@ -285,8 +285,8 @@ private:
 	void playChordNotes(int key, int velocity=-1);
 	void pauseChordNotes(int key);
 
-	void setRazorAction();
-	void cancelRazorAction();
+	void setKnifeAction();
+	void cancelKnifeAction();
 
 	void updateScrollbars();
 	void updatePositionLineHeight();
@@ -310,7 +310,7 @@ private:
 	static QPixmap * s_toolSelect;
 	static QPixmap * s_toolMove;
 	static QPixmap * s_toolOpen;
-	static QPixmap* s_toolRazor;
+	static QPixmap* s_toolKnife;
 
 	static PianoRollKeyTypes prKeyOrder[];
 
@@ -396,10 +396,10 @@ private:
 
 	EditModes m_editMode;
 	EditModes m_ctrlMode; // mode they were in before they hit ctrl
-	EditModes m_razorMode; // mode they where in before entering razor
+	EditModes m_knifeMode; // mode they where in before entering knife mode
 
 	bool m_mouseDownRight; //true if right click is being held down
-	bool m_firstRazorSplit; // if it's allowed to cancel razor action on SHIFT release event.
+	bool m_firstKnifeSplit; // if it's allowed to cancel knife action on SHIFT release event.
 
 	TimeLineWidget * m_timeLine;
 	bool m_scrollBack;
@@ -417,9 +417,9 @@ private:
 	// did we start a mouseclick with shift pressed
 	bool m_startedWithShift;
 
-	// Variable that holds the position in ticks for the razor action
-	int m_razorTickPos;
-	void updateRazorPos(QMouseEvent* me);
+	// Variable that holds the position in ticks for the knife action
+	int m_knifeTickPos;
+	void updateKnifePos(QMouseEvent* me);
 
 	friend class PianoRollWindow;
 
@@ -441,7 +441,7 @@ private:
 	QColor m_textColorLight;
 	QColor m_textShadow;
 	QColor m_markedSemitoneColor;
-	QColor m_razorCutLineColor;
+	QColor m_knifeCutLineColor;
 	int m_noteOpacity;
 	int m_ghostNoteOpacity;
 	bool m_noteBorders;
