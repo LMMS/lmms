@@ -399,7 +399,6 @@ private:
 	EditModes m_knifeMode; // mode they where in before entering knife mode
 
 	bool m_mouseDownRight; //true if right click is being held down
-	bool m_firstKnifeSplit; // if it's allowed to cancel knife action on SHIFT release event.
 
 	TimeLineWidget * m_timeLine;
 	bool m_scrollBack;

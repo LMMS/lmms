@@ -185,7 +185,6 @@ PianoRoll::PianoRoll() :
 	m_editMode( ModeDraw ),
 	m_ctrlMode( ModeDraw ),
 	m_mouseDownRight( false ),
-	m_firstKnifeSplit(false),
 	m_scrollBack( false ),
 	m_stepRecorderWidget(this, DEFAULT_PR_PPB, PR_TOP_MARGIN, PR_BOTTOM_MARGIN + m_notesEditHeight, WHITE_KEY_WIDTH, 0),
 	m_stepRecorder(*this, m_stepRecorderWidget),
@@ -1383,12 +1382,6 @@ void PianoRoll::keyReleaseEvent(QKeyEvent* ke )
 			update();
 			break;
 
-		case Qt::Key_Shift:
-			if (m_editMode == ModeEditKnife && !m_firstKnifeSplit)
-			{
-				cancelKnifeAction();
-			}
-
 		// update after undo/redo
 		case Qt::Key_Z:
 		case Qt::Key_R:
@@ -1486,15 +1479,6 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 
 			// Call splitNotes for the note
 			m_pattern->splitNotes(n, TimePos(m_knifeTickPos));
-
-			// Allow cancel knife mode when shift is released (if hold down).
-			m_firstKnifeSplit = false;
-		}
-
-		// Keep in Knife mode while SHIFT is hold during cut
-		if (!(me->modifiers() & Qt::ShiftModifier))
-		{
-			cancelKnifeAction();
 		}
 
 		update();
@@ -2010,7 +1994,6 @@ void PianoRoll::setKnifeAction()
 {
 	if (m_editMode != ModeEditKnife)
 	{
-		m_firstKnifeSplit = true;
 		m_knifeMode = m_editMode;
 		m_editMode = ModeEditKnife;
 		m_action = ActionKnife;
