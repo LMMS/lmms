@@ -4586,7 +4586,7 @@ PianoRollWindow::PianoRollWindow() :
 	QAction * knifeAction = new QAction(embed::getIconPixmap("edit_knife"),
 				tr("Knife"), noteToolsButton);
 	connect(knifeAction, &QAction::triggered, m_editor, &PianoRoll::setKnifeAction);
-	knifeAction->setShortcut( Qt::SHIFT | Qt::Key_R );
+	knifeAction->setShortcut( Qt::SHIFT | Qt::Key_K );
 
 	noteToolsButton->addAction(glueAction);
 	noteToolsButton->addAction(knifeAction);
