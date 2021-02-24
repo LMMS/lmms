@@ -276,7 +276,7 @@ PianoRoll::PianoRoll() :
 	}
 	if (s_toolKnife == nullptr)
 	{
-		s_toolKnife = new QPixmap(embed::getIconPixmap("razor"));
+		s_toolKnife = new QPixmap(embed::getIconPixmap("edit_knife"));
 	}
 
 	// init text-float
@@ -4600,7 +4600,7 @@ PianoRollWindow::PianoRollWindow() :
 	glueAction->setShortcut( Qt::SHIFT | Qt::Key_G );
 
 	// Knife
-	QAction * knifeAction = new QAction(embed::getIconPixmap("razor"),
+	QAction * knifeAction = new QAction(embed::getIconPixmap("edit_knife"),
 				tr("Knife"), noteToolsButton);
 	connect(knifeAction, &QAction::triggered, m_editor, &PianoRoll::setKnifeAction);
 	knifeAction->setShortcut( Qt::SHIFT | Qt::Key_R );
