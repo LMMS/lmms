@@ -438,8 +438,6 @@ bool TrackContentWidget::pasteSelection( TimePos tcoPos, const QMimeData * md, b
 	QString type = decodeKey( md );
 	QString value = decodeValue( md );
 
-	getTrack()->addJournalCheckPoint();
-
 	// value contains XML needed to reconstruct TCOs and place them
 	DataFile dataFile( value.toUtf8() );
 
@@ -495,6 +493,10 @@ bool TrackContentWidget::pasteSelection( TimePos tcoPos, const QMimeData * md, b
 	// Fix offset if it sets the left most TCO to a negative position
 	offset = std::max(offset.getTicks(), -leftmostPos.getTicks());
 
+	// Keep track of Tracks we added a journal checkpoint to so we only add one
+	// checkpoint per Track.
+	QList<int> journaledTrackIndexes;
+
 	for( int i = 0; i<tcoNodes.length(); i++ )
 	{
 		QDomElement outerTCOElement = tcoNodes.item( i ).toElement();
@@ -503,6 +505,12 @@ bool TrackContentWidget::pasteSelection( TimePos tcoPos, const QMimeData * md, b
 		int trackIndex = outerTCOElement.attributeNode( "trackIndex" ).value().toInt();
 		int finalTrackIndex = trackIndex + ( currentTrackIndex - initialTrackIndex );
 		Track * t = tracks.at( finalTrackIndex );
+
+		if (!journaledTrackIndexes.contains(finalTrackIndex))
+		{
+			t->addJournalCheckPoint();
+			journaledTrackIndexes.push_back(finalTrackIndex);
+		}
 
 		// The new position is the old position plus the offset.
 		TimePos pos = tcoElement.attributeNode( "pos" ).value().toInt() + offset;
