@@ -773,6 +773,8 @@ void AutomationPattern::saveSettings( QDomDocument & _doc, QDomElement & _this )
 		element.setAttribute("pos", POS(it));
 		element.setAttribute("value", INVAL(it));
 		element.setAttribute("outValue", OUTVAL(it));
+		element.setAttribute("inTan", INTAN(it));
+		element.setAttribute("outTan", OUTTAN(it));
 		_this.appendChild( element );
 	}
 
@@ -795,6 +797,11 @@ void AutomationPattern::saveSettings( QDomDocument & _doc, QDomElement & _this )
 void AutomationPattern::loadSettings( const QDomElement & _this )
 {
 	QMutexLocker m(&m_patternMutex);
+
+	// Legacy compatibility: Previously tangents were not stored in
+	// the project file. So if any node doesn't have tangent information
+	// we will generate the tangents
+	bool shouldGenerateTangents = false;
 
 	clear();
 
@@ -820,6 +827,19 @@ void AutomationPattern::loadSettings( const QDomElement & _this )
 			float timeMapOutValue = LocaleHelper::toFloat(element.attribute("outValue"));
 
 			m_timeMap[timeMapPos] = AutomationNode(this, timeMapInValue, timeMapOutValue, timeMapPos);
+
+			// Load tangents if there is information about it
+			if (element.hasAttribute("inTan") && element.hasAttribute("outTan"))
+			{
+				float inTan = LocaleHelper::toFloat(element.attribute("inTan"));
+				float outTan = LocaleHelper::toFloat(element.attribute("outTan"));
+				m_timeMap[timeMapPos].setInTangent(inTan);
+				m_timeMap[timeMapPos].setOutTangent(outTan);
+			}
+			else
+			{
+				shouldGenerateTangents = true;
+			}
 		}
 		else if( element.tagName() == "object" )
 		{
@@ -843,7 +863,8 @@ void AutomationPattern::loadSettings( const QDomElement & _this )
 	{
 		changeLength( len );
 	}
-	generateTangents();
+
+	if (shouldGenerateTangents) { generateTangents(); }
 }
 
 
