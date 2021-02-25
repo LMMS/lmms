@@ -79,7 +79,7 @@ PhaserControls::PhaserControls(PhaserEffect* effect) :
 	m_modeModel.addItem(tr("Default"));
 	m_modeModel.addItem(tr("Standard"));
 	m_modeModel.addItem(tr("Nested"));
-	m_modeModel.addItem(tr("Inane"));
+	m_modeModel.addItem(tr("Yeet Mode"));
 }
 
 
