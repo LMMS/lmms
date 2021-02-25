@@ -612,6 +612,33 @@ void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 				}
 			break;
 			}
+			case EDIT_TANGENTS:
+			{
+				// Starts dragging a tangent
+				if (m_mouseDownLeft
+					&& m_pattern->progressionType() == AutomationPattern::CubicHermiteProgression)
+				{
+					// Gets the closest node to the mouse click
+					timeMap::iterator node = getClosestNode(mouseEvent->x());
+
+					// Starts dragging tangent
+					if (node != tm.end())
+					{
+						m_draggedTangentTick = POS(node);
+						if (posTicks >= m_draggedTangentTick)
+						{
+							m_draggedOutTangent = true;
+						}
+						else
+						{
+							m_draggedOutTangent = false;
+						}
+
+						m_action = MOVE_TANGENT;
+					}
+				}
+			break;
+			}
 		}
 
 		update();
@@ -791,6 +818,42 @@ void AutomationEditor::mouseMoveEvent(QMouseEvent * mouseEvent )
 						m_pattern->resetNodes(m_drawLastTick, posTicks);
 
 						Engine::getSong()->setModified();
+					}
+				}
+			break;
+			}
+			case EDIT_TANGENTS:
+			{
+				// If we moved the mouse past the beginning correct the position in ticks
+				posTicks = qMax(posTicks, 0);
+
+				if (m_mouseDownLeft)
+				{
+					if (m_action == MOVE_TANGENT)
+					{
+						timeMap & tm = m_pattern->getTimeMap();
+						timeMap::iterator it = tm.find(m_draggedTangentTick);
+
+						// Safety check
+						if (it != tm.end())
+						{
+							// Calculate new tangent
+							float y = m_draggedOutTangent
+								? yCoordOfLevel(OUTVAL(it))
+								: yCoordOfLevel(INVAL(it));
+							float dy = mouseEvent->y() - y;
+							float dx = POS(it) - posTicks;
+							float newTangent = dy / dx;
+
+							if (m_draggedOutTangent)
+							{
+								it.value().setOutTangent(newTangent);
+							}
+							else
+							{
+								it.value().setInTangent(newTangent);
+							}
+						}
 					}
 				}
 			break;
@@ -1805,6 +1868,63 @@ AutomationEditor::timeMap::iterator AutomationEditor::getNodeAt(int x, int y, bo
 	}
 
 	return tm.end();
+}
+
+
+
+
+/**
+ * @brief Given a mouse X coordinate, returns a timeMap::iterator that points to
+ *        the closest node.
+ * @param Int X coordinate
+ * @return timeMap::iterator with the closest node or timeMap.end() if there are no nodes.
+ */
+AutomationEditor::timeMap::iterator AutomationEditor::getClosestNode(int x)
+{
+	// Remove the VALUES_WIDTH from the x position, so we have the actual viewport x
+	x -= VALUES_WIDTH;
+	// Convert the x position to the position in ticks
+	int posTicks = (x * TimePos::ticksPerBar() / m_ppb) + m_currentPosition;
+
+	// Get our pattern timeMap and create a iterator so we can check the nodes
+	timeMap & tm = m_pattern->getTimeMap();
+
+	if (tm.isEmpty()) { return tm.end(); }
+
+	// Get the node with an equal or higher position
+	timeMap::iterator it = tm.lowerBound(posTicks);
+
+	// If there are no nodes equal or higher than the position return
+	// the one before it
+	if (it == tm.end())
+	{
+		--it;
+		return it;
+	}
+	// If the node returned is the first, return it
+	else if (it == tm.begin())
+	{
+		return it;
+	}
+	// Else return the closest node
+	else
+	{
+		// Distance from node to the right
+		int distanceRight = std::abs(POS(it) - posTicks);
+		--it;
+		// Distance from node to the left
+		int distanceLeft = std::abs(POS(it) - posTicks);
+
+		if (distanceLeft < distanceRight)
+		{
+			return it;
+		}
+		else
+		{
+			++it;
+			return it;
+		}
+	}
 }
 
 

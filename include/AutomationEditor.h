@@ -112,6 +112,8 @@ protected:
 	inline void drawLevelTick(QPainter & p, int tick, float value);
 
 	timeMap::iterator getNodeAt(int x, int y, bool outValue = false, int r = 5);
+	// Get the closest node to the x position (for the drag tangent)
+	timeMap::iterator getClosestNode(int x);
 
 	void drawLine( int x0, float y0, int x1, float y1 );
 
@@ -209,6 +211,11 @@ private:
 
 	// Time position (key) of automation node whose outValue is being dragged
 	int m_draggedOutValueKey;
+
+	// The tick from the node whose tangent is being dragged
+	int m_draggedTangentTick;
+	// Whether the tangent being dragged is the InTangent or OutTangent
+	bool m_draggedOutTangent;
 
 	EditModes m_editMode;
 
