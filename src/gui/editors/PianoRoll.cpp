@@ -982,7 +982,7 @@ void PianoRoll::drawDetuningInfo( QPainter & _p, const Note * _n, int _x,
 		keyAreaBottom() - PR_TOP_MARGIN);
 
 	// Draw lines for the detuning automation, treating cubic hermit curves
-	// as straight lines. Also draw discrete jumps.
+	// as straight lines for now. Also draw discrete jumps.
 	int old_x = 0;
 	int old_y = 0;
 

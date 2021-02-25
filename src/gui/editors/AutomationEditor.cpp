@@ -1074,8 +1074,7 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 			{
 				y =  yCoordOfLevel( (float)level );
 
-				if (level % 10 == 0) { p.setPen(m_beatLineColor); }
-				else { p.setPen(m_lineColor); }
+				p.setPen(level % 10 == 0 ? m_beatLineColor : m_lineColor);
 
 				// draw level line
 				p.drawLine( VALUES_WIDTH, (int) y, width(), (int) y );

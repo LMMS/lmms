@@ -30,6 +30,7 @@
 #include <QPixmap>
 #include <QWidget>
 #include <QtCore/QPoint>
+#include <QTextDocument>
 
 #include "AutomatableModelView.h"
 
@@ -90,6 +91,7 @@ public:
 		setUnit( _txt_after );
 	}
 	void setLabel( const QString & txt );
+	void setHtmlLabel( const QString &htmltxt );
 
 	void setTotalAngle( float angle );
 
@@ -171,6 +173,8 @@ private:
 	static TextFloat * s_textFloat;
 
 	QString m_label;
+	bool m_isHtmlLabel;
+	QTextDocument* m_tdRenderer;
 
 	std::unique_ptr<QPixmap> m_knobPixmap;
 	BoolModel m_volumeKnob;

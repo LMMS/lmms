@@ -75,7 +75,8 @@ BitcrushControlDialog::BitcrushControlDialog( BitcrushControls * controls ) :
 	outClip->move( 138, 76 );
 	outClip->setModel( & controls->m_outClip );
 	outClip->setLabel( tr( "CLIP" ) );
-	outClip->setHintText( tr( "Output clip:" ) , "%" );
+    outClip->setHintText( tr( "Output clip:" ) , " dBFS");
+
 	
 	
 	// leds
