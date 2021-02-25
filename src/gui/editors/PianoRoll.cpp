@@ -4834,8 +4834,8 @@ void PianoRollWindow::ghostPatternSet( bool state )
 
 void PianoRollWindow::exportPattern()
 {
-	QString extFilter("XML Pattern (*.xpt *.xptz)");
-	FileDialog exportDialog(this, tr("Export pattern"), "", extFilter);
+	FileDialog exportDialog(this, tr("Export pattern"), "",
+		tr("XML pattern file (*.xpt *.xptz)"));
 
 	exportDialog.setAcceptMode(FileDialog::AcceptSave);
 
@@ -4881,7 +4881,7 @@ void PianoRollWindow::importPattern()
 		return;
 	}
 
-	FileDialog importDialog(this, tr("Open Pattern"), "",
+	FileDialog importDialog(this, tr("Open pattern"), "",
 		tr("XML pattern file (*.xpt *.xptz)"));
 	importDialog.setFileMode(FileDialog::ExistingFile);
 
