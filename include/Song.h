@@ -338,7 +338,7 @@ public:
 
 	void exportProjectMidi(QString const & exportFileName) const;
 
-	inline void setLoadOnLauch(bool value) { m_loadOnLaunch = value; }
+	inline void setLoadOnLaunch(bool value) { m_loadOnLaunch = value; }
 	SaveOptions &getSaveOptions() {
 		return m_saveOptions;
 	}

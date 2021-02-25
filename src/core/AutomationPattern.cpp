@@ -557,8 +557,8 @@ float AutomationPattern::valueAt( timeMap::const_iterator v, int offset ) const
 	else if( m_progressionType == LinearProgression )
 	{
 		float slope =
-			(INVAL(v + 1) - OUTVAL(v)) /
-			(POS(v + 1) - POS(v));
+			(INVAL(v + 1) - OUTVAL(v))
+			/ (POS(v + 1) - POS(v));
 
 		return OUTVAL(v) + offset * slope;
 	}
@@ -617,30 +617,27 @@ void AutomationPattern::flipY(int min, int max)
 {
 	QMutexLocker m(&m_patternMutex);
 
-	timeMap::iterator it = m_timeMap.lowerBound(0);
+	bool changedTimeMap = false;
 
-	if (it == m_timeMap.end()) { return; }
-
-	float tempValue = 0;
-	float outValueOffset = 0;
-
-	do
+	for (auto it = m_timeMap.begin(); it != m_timeMap.end(); ++it)
 	{
-		if (min < 0)
-		{
-			it.value() *= -1.0;
-		}
-		else
-		{
-			tempValue = max - valueAt(POS(it));
-			outValueOffset = OFFSET(it) * -1.0;
-			putValues(TimePos(POS(it)), tempValue, tempValue + outValueOffset, false, true);
-		}
-		++it;
-	} while (it != m_timeMap.end());
+		// Get distance from IN/OUT values to max value
+		float inValDist = max - INVAL(it);
+		float outValDist = max - OUTVAL(it);
 
-	generateTangents();
-	emit dataChanged();
+		// To flip, that will be the new distance between
+		// the IN/OUT values and the min value
+		it.value().setInValue(min + inValDist);
+		it.value().setOutValue(min + outValDist);
+
+		changedTimeMap = true;
+	}
+
+	if (changedTimeMap)
+	{
+		generateTangents();
+		emit dataChanged();
+	}
 }
 
 
