@@ -187,6 +187,7 @@ PianoRoll {
 	qproperty-ghostNoteBorders: false;
 	qproperty-barColor: #078f3a;
 	qproperty-markedSemitoneColor: rgba(255, 255, 255, 30);
+	qproperty-knifeCutLine: rgba(255, 0, 0, 255);
 	/* Piano keys */
 	qproperty-whiteKeyWidth: 64;
 	qproperty-whiteKeyActiveTextColor: #000;

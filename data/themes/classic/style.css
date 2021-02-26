@@ -155,6 +155,7 @@ PianoRoll {
 	qproperty-ghostNoteBorders: true;
 	qproperty-barColor: #4afd85;
 	qproperty-markedSemitoneColor: rgba( 0, 255, 200, 60 );
+	qproperty-knifeCutLine: rgba(255, 0, 0, 255);
 	/* Piano keys */
 	qproperty-whiteKeyWidth: 64;
 	qproperty-whiteKeyActiveTextColor: #000;
