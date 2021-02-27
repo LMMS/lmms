@@ -32,6 +32,7 @@
 #define OFFSET(x) ((x).value().getValueOffset())
 #define INTAN(x) ((x).value().getInTangent())
 #define OUTTAN(x) ((x).value().getOutTangent())
+#define LOCKEDTAN(x) ((x).value().lockedTangents())
 #define POS(x) ((x).key())
 
 class AutomationPattern;
@@ -130,6 +131,22 @@ public:
 		m_outTangent = tangent;
 	}
 
+	/**
+	 * @brief Checks if the tangents from the node are locked
+	 */
+	inline const bool lockedTangents() const
+	{
+		return m_lockedTangents;
+	}
+
+	/**
+	 * @brief Locks or Unlocks the tangents from this node
+	 */
+	inline void setLockedTangents(bool b)
+	{
+		m_lockedTangents = b;
+	}
+
 private:
 	// Pattern that this node belongs to
 	AutomationPattern* m_pattern;
@@ -147,6 +164,11 @@ private:
 	// outValue are equal, inTangent and outTangent are equal too.
 	float m_inTangent;
 	float m_outTangent;
+
+	// If the tangents were edited manually, this will be true. That way
+	// the tangents from this node will not be recalculated. It's set back
+	// to false if the tangents are reset.
+	bool m_lockedTangents;
 };
 
 

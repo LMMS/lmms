@@ -614,27 +614,43 @@ void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 			}
 			case EDIT_TANGENTS:
 			{
-				// Starts dragging a tangent
-				if (m_mouseDownLeft
-					&& m_pattern->progressionType() == AutomationPattern::CubicHermiteProgression)
+				if (m_pattern->progressionType() == AutomationPattern::CubicHermiteProgression)
 				{
 					// Gets the closest node to the mouse click
 					timeMap::iterator node = getClosestNode(mouseEvent->x());
 
-					// Starts dragging tangent
-					if (node != tm.end())
+					// Starts dragging a tangent
+					if (m_mouseDownLeft)
 					{
-						m_draggedTangentTick = POS(node);
-						if (posTicks >= m_draggedTangentTick)
+						if (node != tm.end())
 						{
-							m_draggedOutTangent = true;
-						}
-						else
-						{
-							m_draggedOutTangent = false;
-						}
+							// Lock the tangents from that node, so it can only be
+							// manually edited
+							node.value().setLockedTangents(true);
 
-						m_action = MOVE_TANGENT;
+							m_draggedTangentTick = POS(node);
+							if (posTicks >= m_draggedTangentTick)
+							{
+								m_draggedOutTangent = true;
+							}
+							else
+							{
+								m_draggedOutTangent = false;
+							}
+
+							m_action = MOVE_TANGENT;
+						}
+					}
+					// Resets node's tangent
+					else if (m_mouseDownRight)
+					{
+						if (node != tm.end())
+						{
+							// Unlock the tangents from that node
+							node.value().setLockedTangents(false);
+							// Recalculate the tangents
+							m_pattern->generateTangents(node, 1);
+						}
 					}
 				}
 			break;
@@ -1231,8 +1247,9 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 
 				// Draw circle
 				drawAutomationPoint(p, it);
-				// Draw tangents if necessary
-				if (m_pattern->progressionType() == AutomationPattern::CubicHermiteProgression)
+				// Draw tangents if necessary (only for manually edited tangents)
+				if (m_pattern->progressionType() == AutomationPattern::CubicHermiteProgression
+					&& LOCKEDTAN(it))
 				{
 					drawAutomationTangents(p, it);
 				}
@@ -1252,8 +1269,9 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 			}
 			// Draw circle(the last one)
 			drawAutomationPoint(p, it);
-			// Draw tangents if necessary
-			if (m_pattern->progressionType() == AutomationPattern::CubicHermiteProgression)
+			// Draw tangents if necessary (only for manually edited tangents)
+			if (m_pattern->progressionType() == AutomationPattern::CubicHermiteProgression
+				&& LOCKEDTAN(it))
 			{
 				drawAutomationTangents(p, it);
 			}

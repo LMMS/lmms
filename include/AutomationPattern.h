@@ -204,6 +204,7 @@ private:
 
 	friend class AutomationPatternView;
 	friend class AutomationNode;
+	friend class AutomationEditor;
 
 } ;
 

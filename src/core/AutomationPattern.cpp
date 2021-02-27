@@ -775,6 +775,7 @@ void AutomationPattern::saveSettings( QDomDocument & _doc, QDomElement & _this )
 		element.setAttribute("outValue", OUTVAL(it));
 		element.setAttribute("inTan", INTAN(it));
 		element.setAttribute("outTan", OUTTAN(it));
+		element.setAttribute("lockedTan", static_cast<int>(LOCKEDTAN(it)));
 		_this.appendChild( element );
 	}
 
@@ -833,8 +834,11 @@ void AutomationPattern::loadSettings( const QDomElement & _this )
 			{
 				float inTan = LocaleHelper::toFloat(element.attribute("inTan"));
 				float outTan = LocaleHelper::toFloat(element.attribute("outTan"));
+				bool lockedTan = static_cast<bool>(element.attribute("lockedTan", "0").toInt());
+
 				m_timeMap[timeMapPos].setInTangent(inTan);
 				m_timeMap[timeMapPos].setOutTangent(outTan);
+				m_timeMap[timeMapPos].setLockedTangents(lockedTan);
 			}
 			else
 			{
@@ -1147,13 +1151,25 @@ void AutomationPattern::generateTangents(timeMap::iterator it, int numToGenerate
 
 	if( m_timeMap.size() < 2 && numToGenerate > 0 )
 	{
-		it.value().setInTangent(0);
-		it.value().setOutTangent(0);
+		// Set the value of the single node's tangents if they are not
+		// locked (were manually edited)
+		if (!LOCKEDTAN(it))
+		{
+			it.value().setInTangent(0);
+			it.value().setOutTangent(0);
+		}
 		return;
 	}
 
 	for( int i = 0; i < numToGenerate; i++ )
 	{
+		// Skip the node if it has locked tangents (were manually edited)
+		if (LOCKEDTAN(it))
+		{
+			++it;
+			continue;
+		}
+
 		if( it == m_timeMap.begin() )
 		{
 			// On the first node there's no curve behind it, so we will only calculate the outTangent
