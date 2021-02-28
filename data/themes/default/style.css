@@ -55,7 +55,8 @@ AutomationEditor {
 	color: #ffffff;
 	background-color: #141616;
 	qproperty-backgroundShade: rgba(255, 255, 255, 15);
-	qproperty-vertexColor: #6749C2;
+	qproperty-nodeInValueColor: rgba(103, 73, 194, 150);
+	qproperty-nodeOutValueColor: rgba(125, 40, 40, 150);
 	qproperty-crossColor: rgba(215, 210, 254, 150);
 	/* Grid colors */
 	qproperty-lineColor: #292929;
