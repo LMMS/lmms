@@ -59,7 +59,8 @@ const std::vector<DataFile::UpgradeMethod> DataFile::UPGRADE_METHODS = {
 	&DataFile::upgrade_0_4_0_beta1      ,   &DataFile::upgrade_0_4_0_rc2,
 	&DataFile::upgrade_1_0_99           ,   &DataFile::upgrade_1_1_0,
 	&DataFile::upgrade_1_1_91           ,   &DataFile::upgrade_1_2_0_rc3,
-	&DataFile::upgrade_1_3_0            ,   &DataFile::upgrade_noHiddenClipNames
+	&DataFile::upgrade_1_3_0            ,   &DataFile::upgrade_noHiddenClipNames,
+	&DataFile::upgrade_automationNodes
 };
 
 // Vector of all versions that have upgrade routines.
@@ -1382,6 +1383,32 @@ void DataFile::upgrade_noHiddenClipNames()
 		clearDefaultNames(instClips, trackName);
 		clearDefaultNames(autoClips, trackName);
 		clearDefaultNames(bbClips, trackName);
+	}
+}
+
+void DataFile::upgrade_automationNodes()
+{
+	QDomNodeList autoPatterns = elementsByTagName("automationpattern");
+
+	// Go through all automation patterns
+	for (int i = 0; i < autoPatterns.size(); ++i)
+	{
+		QDomElement autoPattern = autoPatterns.item(i).toElement();
+
+		// On each automation pattern, get all <time> elements
+		QDomNodeList times = autoPattern.elementsByTagName("time");
+
+		// Loop through all <time> elements and change what we need
+		for (int j=0; j < times.size(); ++j)
+		{
+			QDomElement el = times.item(j).toElement();
+
+			float value = LocaleHelper::toFloat(el.attribute("value"));
+
+			// inValue will be equal to "value" and outValue will
+			// be set to the same
+			el.setAttribute("outValue", value);
+		}
 	}
 }
 
