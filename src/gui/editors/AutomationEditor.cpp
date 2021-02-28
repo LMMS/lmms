@@ -646,6 +646,12 @@ void AutomationEditor::mouseDoubleClickEvent(QMouseEvent * mouseEvent)
 				// Set the new inValue/outValue
 				if (editingInValue)
 				{
+					// If the outValue is equal to the inValue we
+					// set both to the given value
+					if (OFFSET(node) == 0)
+					{
+						node.value().setOutValue(value);
+					}
 					node.value().setInValue(value);
 					Engine::getSong()->setModified();
 				}
