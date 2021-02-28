@@ -677,6 +677,8 @@ void AutomationEditor::mouseDoubleClickEvent(QMouseEvent * mouseEvent)
 				clickedNode.value().setOutValue(value);
 			}
 		}
+
+		update();
 	}
 }
 
