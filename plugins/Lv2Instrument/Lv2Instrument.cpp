@@ -134,7 +134,7 @@ void Lv2Instrument::loadFile(const QString &file)
 
 #ifdef LV2_INSTRUMENT_USE_MIDI
 bool Lv2Instrument::handleMidiEvent(
-	const MidiEvent &event, const MidiTime &time, f_cnt_t offset)
+	const MidiEvent &event, const TimePos &time, f_cnt_t offset)
 {
 	// this function can be called from GUI threads while the plugin is running
 	// handleMidiInputEvent will use a thread-safe ringbuffer

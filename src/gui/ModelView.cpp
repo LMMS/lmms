@@ -74,6 +74,16 @@ void ModelView::setModel( Model* model, bool isOldModelValid )
 
 
 
+// Unsets the current model by setting a dummy empty model. The dummy model is marked as
+// "defaultConstructed", so the next call to setModel will delete it.
+void ModelView::unsetModel()
+{
+	setModel(new Model(nullptr, QString(), true));
+}
+
+
+
+
 void ModelView::doConnections()
 {
 	if( m_model != NULL )

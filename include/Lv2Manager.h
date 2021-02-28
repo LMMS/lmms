@@ -130,6 +130,8 @@ public:
 		return m_supportedFeatureURIs;
 	}
 	bool isFeatureSupported(const char* featName) const;
+	AutoLilvNodes findNodes(const LilvNode *subject,
+		const LilvNode *predicate, const LilvNode *object);
 
 	static const std::set<const char*, Lv2Manager::CmpStr>& getPluginBlacklist()
 	{

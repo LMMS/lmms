@@ -33,6 +33,8 @@
 #include "FxMixer.h"
 #include "FxLineLcdSpinBox.h"
 #include "Track.h"
+#include "TrackContentObjectView.h"
+#include "TrackView.h"
 
 class EffectRackView;
 class Knob;
@@ -48,9 +50,12 @@ class SampleTCO : public TrackContentObject
 	mapPropertyFromModel(bool,isRecord,setRecord,m_recordModel);
 public:
 	SampleTCO( Track * _track );
+	SampleTCO( const SampleTCO& orig );
 	virtual ~SampleTCO();
 
-	void changeLength( const MidiTime & _length ) override;
+	SampleTCO& operator=( const SampleTCO& that ) = delete;
+
+	void changeLength( const TimePos & _length ) override;
 	const QString & sampleFile() const;
 
 	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
@@ -65,7 +70,7 @@ public:
 		return m_sampleBuffer;
 	}
 
-	MidiTime sampleLength() const;
+	TimePos sampleLength() const;
 	void setSampleStartFrame( f_cnt_t startFrame );
 	void setSamplePlayLength( f_cnt_t length );
 	TrackContentObjectView * createView( TrackView * _tv ) override;
@@ -139,10 +144,10 @@ public:
 	SampleTrack( TrackContainer* tc );
 	virtual ~SampleTrack();
 
-	virtual bool play( const MidiTime & _start, const fpp_t _frames,
+	virtual bool play( const TimePos & _start, const fpp_t _frames,
 						const f_cnt_t _frame_base, int _tco_num = -1 ) override;
 	TrackView * createView( TrackContainerView* tcv ) override;
-	TrackContentObject* createTCO(const MidiTime & pos) override;
+	TrackContentObject* createTCO(const TimePos & pos) override;
 
 
 	virtual void saveTrackSpecificSettings( QDomDocument & _doc,

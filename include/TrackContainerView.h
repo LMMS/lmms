@@ -31,12 +31,15 @@
 #include <QWidget>
 #include <QThread>
 
-#include "Track.h"
 #include "JournallingObject.h"
-#include "InstrumentTrack.h"
+#include "ModelView.h"
+#include "Rubberband.h"
+#include "TrackView.h"
 
 
 class QVBoxLayout;
+
+class InstrumentTrack;
 class TrackContainer;
 
 
@@ -57,7 +60,7 @@ public:
 		return m_scrollArea;
 	}
 
-	inline const MidiTime & currentPosition() const
+	inline const TimePos & currentPosition() const
 	{
 		return m_currentPosition;
 	}
@@ -143,7 +146,7 @@ protected:
 
 	void resizeEvent( QResizeEvent * ) override;
 
-	MidiTime m_currentPosition;
+	TimePos m_currentPosition;
 
 
 private:
@@ -182,7 +185,7 @@ private:
 
 
 signals:
-	void positionChanged( const MidiTime & _pos );
+	void positionChanged( const TimePos & _pos );
 
 
 } ;

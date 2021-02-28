@@ -50,8 +50,16 @@ const char *PluginIssue::msgFor(const PluginIssueType &it)
 			return "port is missing min value";
 		case portHasNoMax:
 			return "port is missing max value";
+		case minGreaterMax:
+			return "port minimum is greater than maximum";
 		case defaultValueNotInRange:
 			return "default value is not in range [min, max]";
+		case logScaleMinMissing:
+			return "logscale requires minimum value";
+		case logScaleMaxMissing:
+			return "logscale requires maximum value";
+		case logScaleMinMaxDifferentSigns:
+			return "logscale with min < 0 < max";
 		case featureNotSupported:
 			return "required feature not supported";
 		case badPortType:
@@ -62,6 +70,24 @@ const char *PluginIssue::msgFor(const PluginIssueType &it)
 			return nullptr;
 	}
 	return nullptr;
+}
+
+
+
+
+bool PluginIssue::operator==(const PluginIssue &other) const
+{
+	return (m_issueType == other.m_issueType) && (m_info == other.m_info);
+}
+
+
+
+
+bool PluginIssue::operator<(const PluginIssue &other) const
+{
+	return (m_issueType != other.m_issueType)
+			? m_issueType < other.m_issueType
+			: m_info < other.m_info;
 }
 
 

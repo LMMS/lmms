@@ -1,6 +1,6 @@
 /*
- * MidiTime.h - declaration of class MidiTime which provides data type for
- *              position- and length-variables
+ * TimePos.h - declaration of class TimePos which provides data type for
+ *             position- and length-variables
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net
  *
@@ -24,8 +24,8 @@
  */
 
 
-#ifndef MIDI_TIME_H
-#define MIDI_TIME_H
+#ifndef TIME_POS_H
+#define TIME_POS_H
 
 #include <QtGlobal>
 
@@ -40,13 +40,15 @@ const int DefaultBeatsPerBar = DefaultTicksPerBar / DefaultStepsPerBar;
 
 class MeterModel;
 
+/**
+	Represents a time signature, in which the numerator is the number of beats
+	in a bar, while the denominator is the type of note representing a beat.
+
+	Example: 6/8 means 6 beats in a bar with each beat having a duration of one 8th-note.
+*/
 class LMMS_EXPORT TimeSig
 {
 public:
-	// in a time signature,
-	// the numerator represents the number of beats in a measure.
-	// the denominator indicates which type of note represents a beat.
-	// example: 6/8 means 6 beats in a measure, where each beat has duration equal to one 8th-note.
 	TimeSig( int num, int denom );
 	TimeSig( const MeterModel &model );
 	int numerator() const;
@@ -57,17 +59,20 @@ private:
 };
 
 
-class LMMS_EXPORT MidiTime
+/**
+	Represents a position in time or length of a note or event, in ticks, beats, and bars
+*/
+class LMMS_EXPORT TimePos
 {
 public:
-	MidiTime( const bar_t bar, const tick_t ticks );
-	MidiTime( const tick_t ticks = 0 );
+	TimePos( const bar_t bar, const tick_t ticks );
+	TimePos( const tick_t ticks = 0 );
 
-	MidiTime quantize(float) const;
-	MidiTime toAbsoluteBar() const;
+	TimePos quantize(float) const;
+	TimePos toAbsoluteBar() const;
 
-	MidiTime& operator+=( const MidiTime& time );
-	MidiTime& operator-=( const MidiTime& time );
+	TimePos& operator+=( const TimePos& time );
+	TimePos& operator-=( const TimePos& time );
 
 	// return the bar, rounded down and 0-based
 	bar_t getBar() const;
@@ -92,12 +97,12 @@ public:
 
 	double getTimeInMilliseconds( bpm_t beatsPerMinute ) const;
 
-	static MidiTime fromFrames( const f_cnt_t frames, const float framesPerTick );
+	static TimePos fromFrames( const f_cnt_t frames, const float framesPerTick );
 	static tick_t ticksPerBar();
 	static tick_t ticksPerBar( const TimeSig &sig );
 	static int stepsPerBar();
 	static void setTicksPerBar( tick_t tpt );
-	static MidiTime stepPosition( int step );
+	static TimePos stepPosition( int step );
 	static double ticksToMilliseconds( tick_t ticks, bpm_t beatsPerMinute );
 	static double ticksToMilliseconds( double ticks, bpm_t beatsPerMinute );
 

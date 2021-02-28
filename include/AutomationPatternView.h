@@ -30,7 +30,7 @@
 #include "AutomationPattern.h"
 #include "Song.h"
 #include "SongEditor.h"
-#include "Track.h"
+#include "TrackContentObjectView.h"
 
 
 class AutomationPatternView : public TrackContentObjectView
