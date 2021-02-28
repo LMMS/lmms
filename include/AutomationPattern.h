@@ -98,6 +98,8 @@ public:
 
 	void resetNodes(const int tick0, const int tick1);
 
+	void resetTangents(const int tick0, const int tick1);
+
 	void recordValue(TimePos time, float value);
 
 	TimePos setDragValue( const TimePos & time,

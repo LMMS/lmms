@@ -428,6 +428,17 @@ void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 			Engine::getSong()->setModified();
 		}
 	};
+	auto resetTangent = [this](timeMap::iterator node)
+	{
+		if (node != m_pattern->getTimeMap().end())
+		{
+			// Unlock the tangents from that node
+			node.value().setLockedTangents(false);
+			// Recalculate the tangents
+			m_pattern->generateTangents(node, 1);
+			Engine::getSong()->setModified();
+		}
+	};
 
 	// If we clicked inside the AutomationEditor viewport (where the nodes are represented)
 	if (mouseEvent->y() > TOP_MARGIN && mouseEvent->x() >= VALUES_WIDTH)
@@ -644,13 +655,14 @@ void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 					// Resets node's tangent
 					else if (m_mouseDownRight)
 					{
-						if (node != tm.end())
-						{
-							// Unlock the tangents from that node
-							node.value().setLockedTangents(false);
-							// Recalculate the tangents
-							m_pattern->generateTangents(node, 1);
-						}
+						// Resets tangent from node
+						resetTangent(node);
+
+						// Update the last clicked position so we reset all tangents from
+						// that point up to the point we release the mouse button
+						m_drawLastTick = posTicks;
+
+						m_action = RESET_TANGENTS;
 					}
 				}
 			break;
@@ -870,6 +882,18 @@ void AutomationEditor::mouseMoveEvent(QMouseEvent * mouseEvent )
 								it.value().setInTangent(newTangent);
 							}
 						}
+					}
+				}
+				else if (m_mouseDownRight)
+				{
+					if (m_action == RESET_TANGENTS)
+					{
+						// Reseting tangents
+
+						// Resets all tangents from the last clicked tick up to the current position tick
+						m_pattern->resetTangents(m_drawLastTick, posTicks);
+
+						Engine::getSong()->setModified();
 					}
 				}
 			break;

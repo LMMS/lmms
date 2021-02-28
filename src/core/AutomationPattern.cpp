@@ -412,6 +412,37 @@ void AutomationPattern::resetNodes(const int tick0, const int tick1)
 
 
 
+/**
+ * @brief Resets the tangents from the nodes between the given ticks
+ * @param Int first tick of the range
+ * @param Int second tick of the range
+ */
+void AutomationPattern::resetTangents(const int tick0, const int tick1)
+{
+	if (tick0 == tick1)
+	{
+		auto it = m_timeMap.find(TimePos(tick0));
+		if (it != m_timeMap.end())
+		{
+			it.value().setLockedTangents(false);
+			generateTangents(it, 1);
+		}
+		return;
+	}
+
+	TimePos start = TimePos(qMin(tick0, tick1));
+	TimePos end = TimePos(qMax(tick0, tick1));
+
+	for (auto it = m_timeMap.lowerBound(start), endIt = m_timeMap.upperBound(end); it != endIt; ++it)
+	{
+		it.value().setLockedTangents(false);
+		generateTangents(it, 1);
+	}
+}
+
+
+
+
 void AutomationPattern::recordValue(TimePos time, float value)
 {
 	QMutexLocker m(&m_patternMutex);

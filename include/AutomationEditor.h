@@ -149,7 +149,8 @@ private:
 		MOVE_OUTVALUE,
 		RESET_OUTVALUES,
 		DRAW_LINE,
-		MOVE_TANGENT
+		MOVE_TANGENT,
+		RESET_TANGENTS
 	} ;
 
 	// some constants...
