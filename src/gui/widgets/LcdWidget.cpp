@@ -185,7 +185,7 @@ void LcdWidget::paintEvent( QPaintEvent* )
 	}
 
 	// Right Margin
-	p.drawPixmap(QRect(0, 0, m_seamlessRight ? m_marginWidth : m_marginWidth - 1, m_cellHeight),
+	p.drawPixmap(QRect(0, 0, m_seamlessRight ? 0 : m_marginWidth - 1, m_cellHeight),
 		*m_lcdPixmap,
 		QRect(charsPerPixmap * m_cellWidth, isEnabled() ? 0 : m_cellHeight, m_cellWidth / 2, m_cellHeight));
 
