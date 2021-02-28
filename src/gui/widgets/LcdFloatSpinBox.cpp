@@ -158,6 +158,7 @@ void LcdFloatSpinBox::mouseMoveEvent(QMouseEvent* event)
 		{
 			model()->setValue(model()->value() - dy / 2 * getStep());
 			emit manualChange();
+			m_origMousePos = event->globalPos();
 		}
 	}
 }
@@ -194,9 +195,9 @@ void LcdFloatSpinBox::mouseDoubleClickEvent(QMouseEvent *)
 void LcdFloatSpinBox::enterValue()
 {
 	bool ok;
-	float new_val;
+	float newVal;
 
-	new_val = QInputDialog::getDouble(
+	newVal = QInputDialog::getDouble(
 			this, tr("Set value"),
 			tr("Please enter a new value between %1 and %2:").
 				arg(model()->minValue()).
@@ -208,7 +209,7 @@ void LcdFloatSpinBox::enterValue()
 
 	if (ok)
 	{
-		model()->setValue(new_val);
+		model()->setValue(newVal);
 	}
 }
 
