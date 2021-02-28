@@ -115,6 +115,7 @@ QPixmap * PianoRoll::s_toolErase = NULL;
 QPixmap * PianoRoll::s_toolSelect = NULL;
 QPixmap * PianoRoll::s_toolMove = NULL;
 QPixmap * PianoRoll::s_toolOpen = NULL;
+QPixmap* PianoRoll::s_toolKnife = nullptr;
 
 TextFloat * PianoRoll::s_textFloat = NULL;
 
@@ -200,6 +201,7 @@ PianoRoll::PianoRoll() :
 	m_textColorLight( 0, 0, 0 ),
 	m_textShadow( 0, 0, 0 ),
 	m_markedSemitoneColor( 0, 0, 0 ),
+	m_knifeCutLineColor(0, 0, 0),
 	m_noteOpacity( 255 ),
 	m_ghostNoteOpacity( 255 ),
 	m_noteBorders( true ),
@@ -270,6 +272,10 @@ PianoRoll::PianoRoll() :
 	if( s_toolOpen == NULL )
 	{
 		s_toolOpen = new QPixmap( embed::getIconPixmap( "automation" ) );
+	}
+	if (s_toolKnife == nullptr)
+	{
+		s_toolKnife = new QPixmap(embed::getIconPixmap("edit_knife"));
 	}
 
 	// init text-float
@@ -1061,39 +1067,71 @@ void PianoRoll::drawDetuningInfo( QPainter & _p, const Note * _n, int _x,
 		width() - m_whiteKeyWidth,
 		keyAreaBottom() - PR_TOP_MARGIN);
 
+	// Draw lines for the detuning automation, treating cubic hermit curves
+	// as straight lines for now. Also draw discrete jumps.
 	int old_x = 0;
 	int old_y = 0;
 
 	timeMap & map = _n->detuning()->automationPattern()->getTimeMap();
-	for( timeMap::ConstIterator it = map.begin(); it != map.end(); ++it )
+	for (timeMap::const_iterator it = map.begin(); it != map.end(); ++it)
 	{
-		int pos_ticks = it.key();
-		int pos_x = _x + pos_ticks * m_ppb / TimePos::ticksPerBar();
+		// Current node values
+		int cur_ticks = POS(it);
+		int cur_x = _x + cur_ticks * m_ppb / TimePos::ticksPerBar();
+		const float cur_level = INVAL(it);
+		int cur_y = middle_y - cur_level * m_keyLineHeight;
 
-		const float level = it.value();
-
-		int pos_y = middle_y - level * m_keyLineHeight;
-
-		if( old_x != 0 && old_y != 0 )
+		// First line to represent the inValue of the first node
+		if (it == map.begin())
 		{
-			switch( _n->detuning()->automationPattern()->progressionType() )
+			_p.drawLine(cur_x - 1, cur_y, cur_x + 1, cur_y);
+			_p.drawLine(cur_x, cur_y - 1, cur_x, cur_y + 1);
+		}
+		// All subsequent lines will take the outValue of the previous node
+		// and the inValue of the current node. It will also draw a vertical
+		// line if there was a discrete jump (from old_x,old_y to pre_x,pre_y)
+		else
+		{
+			// Previous node values (based on outValue). We just calculate
+			// the y level because the x will be the same as old_x.
+			const float pre_level = OUTVAL(it - 1);
+			int pre_y = middle_y - pre_level * m_keyLineHeight;
+
+			// Draws the line representing the discrete jump if there's one
+			if (old_y != pre_y)
 			{
-			case AutomationPattern::DiscreteProgression:
-				_p.drawLine( old_x, old_y, pos_x, old_y );
-				_p.drawLine( pos_x, old_y, pos_x, pos_y );
-				break;
-			case AutomationPattern::CubicHermiteProgression: /* TODO */
-			case AutomationPattern::LinearProgression:
-				_p.drawLine( old_x, old_y, pos_x, pos_y );
-				break;
+				_p.drawLine(old_x, old_y, old_x, pre_y);
+			}
+
+			// Now draw the lines representing the actual progression from one
+			// node to the other
+			switch (_n->detuning()->automationPattern()->progressionType())
+			{
+				case AutomationPattern::DiscreteProgression:
+					_p.drawLine(old_x, pre_y, cur_x, pre_y);
+					_p.drawLine(cur_x, pre_y, cur_x, cur_y);
+					break;
+				case AutomationPattern::CubicHermiteProgression: /* TODO */
+				case AutomationPattern::LinearProgression:
+					_p.drawLine(old_x, pre_y, cur_x, cur_y);
+					break;
+			}
+
+			// If we are in the last node and there's a discrete jump, we draw a
+			// vertical line representing it
+			if ((it + 1) == map.end())
+			{
+				const float last_level = OUTVAL(it);
+				if (cur_level != last_level)
+				{
+					int last_y = middle_y - last_level * m_keyLineHeight;
+					_p.drawLine(cur_x, cur_y, cur_x, last_y);
+				}
 			}
 		}
 
-		_p.drawLine( pos_x - 1, pos_y, pos_x + 1, pos_y );
-		_p.drawLine( pos_x, pos_y - 1, pos_x, pos_y + 1 );
-
-		old_x = pos_x;
-		old_y = pos_y;
+		old_x = cur_x;
+		old_y = cur_y;
 	}
 }
 
@@ -1348,8 +1386,16 @@ void PianoRoll::keyPressEvent(QKeyEvent* ke)
 			break;
 
 		case Qt::Key_Escape:
-			// Same as Ctrl + Shift + A
-			clearSelectedNotes();
+			// On the Knife mode, ESC cancels it
+			if (m_editMode == ModeEditKnife)
+			{
+				cancelKnifeAction();
+			}
+			else
+			{
+				// Same as Ctrl + Shift + A
+				clearSelectedNotes();
+			}
 			break;
 
 		case Qt::Key_Backspace:
@@ -1394,6 +1440,12 @@ void PianoRoll::keyPressEvent(QKeyEvent* ke)
 		}
 
 		case Qt::Key_Control:
+			// Ctrl will not enter selection mode if we are
+			// in Knife mode, but unquantize it
+			if (m_editMode == ModeEditKnife)
+			{
+				break;
+			}
 			// Enter selection mode if:
 			// -> this window is active
 			// -> shift is not pressed
@@ -1433,6 +1485,10 @@ void PianoRoll::keyReleaseEvent(QKeyEvent* ke )
 	switch( ke->key() )
 	{
 		case Qt::Key_Control:
+			if (m_editMode == ModeEditKnife)
+			{
+				break;
+			}
 			computeSelectedNotes( ke->modifiers() & Qt::ShiftModifier);
 			m_editMode = m_ctrlMode;
 			update();
@@ -1518,6 +1574,26 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 
 	if( ! hasValidPattern() )
 	{
+		return;
+	}
+
+	// -- Knife
+	if (m_editMode == ModeEditKnife && me->button() == Qt::LeftButton)
+	{
+		NoteVector n;
+		Note* note = noteUnderMouse();
+
+		if (note)
+		{
+			n.append(note);
+
+			updateKnifePos(me);
+
+			// Call splitNotes for the note
+			m_pattern->splitNotes(n, TimePos(m_knifeTickPos));
+		}
+
+		update();
 		return;
 	}
 
@@ -2026,6 +2102,24 @@ void PianoRoll::pauseChordNotes(int key)
 	}
 }
 
+void PianoRoll::setKnifeAction()
+{
+	if (m_editMode != ModeEditKnife)
+	{
+		m_knifeMode = m_editMode;
+		m_editMode = ModeEditKnife;
+		m_action = ActionKnife;
+		setCursor(Qt::ArrowCursor);
+		update();
+	}
+}
+
+void PianoRoll::cancelKnifeAction()
+{
+	m_editMode = m_knifeMode;
+	m_action = ActionNone;
+	update();
+}
 
 
 
@@ -2127,6 +2221,12 @@ void PianoRoll::mouseReleaseEvent( QMouseEvent * me )
 
 	s_textFloat->hide();
 
+	// Quit knife mode if we pressed and released the right mouse button
+	if (m_editMode == ModeEditKnife && me->button() == Qt::RightButton)
+	{
+		cancelKnifeAction();
+	}
+
 	if( me->button() & Qt::LeftButton )
 	{
 		mustRepaint = true;
@@ -2185,7 +2285,11 @@ void PianoRoll::mouseReleaseEvent( QMouseEvent * me )
 	}
 
 	m_currentNote = NULL;
-	m_action = ActionNone;
+
+	if (m_action != ActionKnife)
+	{
+		m_action = ActionNone;
+	}
 
 	if( m_editMode == ModeDraw )
 	{
@@ -2211,6 +2315,8 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 
 	if( m_action == ActionNone && me->buttons() == 0 )
 	{
+		// When cursor is between note editing area and volume/panning
+		// area show vertical size cursor.
 		if( me->y() > keyAreaBottom() && me->y() < noteEditTop() )
 		{
 			setCursor( Qt::SizeVerCursor );
@@ -2238,6 +2344,12 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 		updatePositionLineHeight();
 		repaint();
 		return;
+	}
+
+	// Update Knife position if we are on knife mode
+	if (m_editMode == ModeEditKnife)
+	{
+		updateKnifePos(me);
 	}
 
 	if( me->y() > PR_TOP_MARGIN || m_action != ActionNone )
@@ -2519,7 +2631,7 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 				}
 			}
 		}
-		else if (me->buttons() == Qt::NoButton && m_editMode != ModeDraw)
+		else if (me->buttons() == Qt::NoButton && m_editMode != ModeDraw && m_editMode != ModeEditKnife)
 		{
 			// Is needed to restore cursor when it previously was set to
 			// Qt::SizeVerCursor (between keyAreaBottom and noteEditTop)
@@ -2610,6 +2722,24 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 	m_lastMouseY = me->y();
 
 	update();
+}
+
+
+
+
+void PianoRoll::updateKnifePos(QMouseEvent* me)
+{
+	// Calculate the TimePos from the mouse
+	int mouseViewportPos = me->x() - m_whiteKeyWidth;
+	int mouseTickPos = mouseViewportPos / (m_ppb / TimePos::ticksPerBar()) + m_currentPosition;
+
+	// If ctrl is not pressed, quantize the position
+	if (!(me->modifiers() & Qt::ControlModifier))
+	{
+		mouseTickPos = floor(mouseTickPos / quantization()) * quantization();
+	}
+
+	m_knifeTickPos = mouseTickPos;
 }
 
 
@@ -3312,6 +3442,41 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 			}
 		}
 
+		// -- Knife tool (draw cut line)
+		if (m_action == ActionKnife)
+		{
+			auto xCoordOfTick = [this](int tick) {
+				return m_whiteKeyWidth + (
+					(tick - m_currentPosition) * m_ppb / TimePos::ticksPerBar());
+			};
+			Note* n = noteUnderMouse();
+			if (n)
+			{
+				const int key = n->key() - m_startKey + 1;
+				int y = y_base - key * m_keyLineHeight;
+
+				int x = xCoordOfTick(m_knifeTickPos);
+
+				if (x > xCoordOfTick(n->pos()) &&
+					x < xCoordOfTick(n->pos() + n->length()))
+				{
+					p.setPen(QPen(m_knifeCutLineColor, 1));
+					p.drawLine(x, y, x, y + m_keyLineHeight);
+
+					setCursor(Qt::BlankCursor);
+				}
+				else
+				{
+					setCursor(Qt::ArrowCursor);
+				}
+			}
+			else
+			{
+				setCursor(Qt::ArrowCursor);
+			}
+		}
+		// -- End knife tool
+
 		//draw current step recording notes
 		for( const Note *note : m_stepRecorder.getCurStepNotes() )
 		{
@@ -3433,6 +3598,7 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 			case ModeErase: cursor = s_toolErase; break;
 			case ModeSelect: cursor = s_toolSelect; break;
 			case ModeEditDetuning: cursor = s_toolOpen; break;
+			case ModeEditKnife: cursor = s_toolKnife; break;
 		}
 		QPoint mousePosition = mapFromGlobal( QCursor::pos() );
 		if( cursor != NULL && mousePosition.y() > keyAreaTop() && mousePosition.x() > noteEditLeft())
@@ -3640,7 +3806,12 @@ void PianoRoll::focusOutEvent( QFocusEvent * )
 			m_pattern->instrumentTrack()->pianoModel()->setKeyState( i, false );
 		}
 	}
-	m_editMode = m_ctrlMode;
+	if (m_editMode == ModeEditKnife) {
+		m_editMode = m_knifeMode;
+		m_action = ActionNone;
+	} else {
+		m_editMode = m_ctrlMode;
+	}
 	update();
 }
 
@@ -4521,6 +4692,11 @@ PianoRollWindow::PianoRollWindow() :
 	connect(glueAction, SIGNAL(triggered()), m_editor, SLOT(glueNotes()));
 	glueAction->setShortcut( Qt::SHIFT | Qt::Key_G );
 
+	QAction * knifeAction = new QAction(embed::getIconPixmap("edit_knife"),
+				tr("Knife"), noteToolsButton);
+	connect(knifeAction, &QAction::triggered, m_editor, &PianoRoll::setKnifeAction);
+	knifeAction->setShortcut( Qt::SHIFT | Qt::Key_K );
+        
 	QAction* fillAction = new QAction(embed::getIconPixmap("fill"), tr("Fill"), noteToolsButton);
 	connect(fillAction, &QAction::triggered, [this](){ m_editor->fitNoteLengths(true); });
 	fillAction->setShortcut(Qt::SHIFT | Qt::Key_F);
@@ -4536,6 +4712,7 @@ PianoRollWindow::PianoRollWindow() :
 	connect(maxLengthAction, &QAction::triggered, [this](){ m_editor->constrainNoteLengths(true); });
 
 	noteToolsButton->addAction(glueAction);
+	noteToolsButton->addAction(knifeAction);
 	noteToolsButton->addAction(fillAction);
 	noteToolsButton->addAction(cutOverlapsAction);
 	noteToolsButton->addAction(minLengthAction);

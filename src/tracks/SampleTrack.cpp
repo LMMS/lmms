@@ -109,6 +109,19 @@ SampleTCO::SampleTCO( Track * _track ) :
 
 
 
+SampleTCO::SampleTCO(const SampleTCO& orig) :
+	SampleTCO(orig.getTrack())
+{
+	// TODO: This creates a new SampleBuffer for the new TCO, eating up memory
+	// & eventually causing performance issues. Letting tracks share buffers
+	// when they're identical would fix this, but isn't possible right now.
+	*m_sampleBuffer = *orig.m_sampleBuffer;
+	m_isPlaying = orig.m_isPlaying;
+}
+
+
+
+
 SampleTCO::~SampleTCO()
 {
 	SampleTrack * sampletrack = dynamic_cast<SampleTrack*>( getTrack() );
@@ -309,7 +322,7 @@ void SampleTCO::loadSettings( const QDomElement & _this )
 	if ( _this.hasAttribute( "sample_rate" ) ) {
 		m_sampleBuffer->setSampleRate( _this.attribute( "sample_rate" ).toInt() );
 	}
-	
+
 	if( _this.hasAttribute( "color" ) )
 	{
 		useCustomClipColor( true );
@@ -433,7 +446,7 @@ void SampleTCOView::contextMenuEvent( QContextMenuEvent * _cme )
 			tr( "Set clip color" ), this, SLOT( changeClipColor() ) );
 	contextMenu.addAction( embed::getIconPixmap( "colorize" ),
 			tr( "Use track color" ), this, SLOT( useTrackColor() ) );
-	
+
 	constructContextMenu( &contextMenu );
 
 	contextMenu.exec( QCursor::pos() );

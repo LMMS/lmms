@@ -70,6 +70,7 @@ class PianoRoll : public QWidget
 	Q_PROPERTY(QColor textColorLight MEMBER m_textColorLight)
 	Q_PROPERTY(QColor textShadow MEMBER m_textShadow)
 	Q_PROPERTY(QColor markedSemitoneColor MEMBER m_markedSemitoneColor)
+	Q_PROPERTY(QColor knifeCutLine MEMBER m_knifeCutLineColor)
 	Q_PROPERTY(int noteOpacity MEMBER m_noteOpacity)
 	Q_PROPERTY(bool noteBorders MEMBER m_noteBorders)
 	Q_PROPERTY(int ghostNoteOpacity MEMBER m_ghostNoteOpacity)
@@ -95,6 +96,7 @@ public:
 		ModeErase,
 		ModeSelect,
 		ModeEditDetuning,
+		ModeEditKnife
 	};
 
 	/*! \brief Resets settings to default when e.g. creating a new project */
@@ -228,7 +230,8 @@ private:
 		ActionResizeNote,
 		ActionSelectNotes,
 		ActionChangeNoteProperty,
-		ActionResizeNoteEditArea
+		ActionResizeNoteEditArea,
+		ActionKnife
 	};
 
 	enum NoteEditMode
@@ -284,6 +287,9 @@ private:
 	void playChordNotes(int key, int velocity=-1);
 	void pauseChordNotes(int key);
 
+	void setKnifeAction();
+	void cancelKnifeAction();
+
 	void updateScrollbars();
 	void updatePositionLineHeight();
 
@@ -306,6 +312,7 @@ private:
 	static QPixmap * s_toolSelect;
 	static QPixmap * s_toolMove;
 	static QPixmap * s_toolOpen;
+	static QPixmap* s_toolKnife;
 
 	static PianoRollKeyTypes prKeyOrder[];
 
@@ -391,6 +398,7 @@ private:
 
 	EditModes m_editMode;
 	EditModes m_ctrlMode; // mode they were in before they hit ctrl
+	EditModes m_knifeMode; // mode they where in before entering knife mode
 
 	bool m_mouseDownRight; //true if right click is being held down
 
@@ -409,6 +417,10 @@ private:
 
 	// did we start a mouseclick with shift pressed
 	bool m_startedWithShift;
+
+	// Variable that holds the position in ticks for the knife action
+	int m_knifeTickPos;
+	void updateKnifePos(QMouseEvent* me);
 
 	friend class PianoRollWindow;
 
@@ -430,6 +442,7 @@ private:
 	QColor m_textColorLight;
 	QColor m_textShadow;
 	QColor m_markedSemitoneColor;
+	QColor m_knifeCutLineColor;
 	int m_noteOpacity;
 	int m_ghostNoteOpacity;
 	bool m_noteBorders;
