@@ -73,6 +73,12 @@
 #ifndef _DSP_SVF_H_
 #define _DSP_SVF_H_
 
+#define min(a,b) (((a) < (b)) ? (a) : (b))
+
+#ifndef M_PI
+#define M_PI 3.14159265358979323846264338327
+#endif
+
 namespace DSP {
 
 template <int OVERSAMPLE>
