@@ -619,66 +619,75 @@ void AutomationEditor::mouseDoubleClickEvent(QMouseEvent * mouseEvent)
 {
 	if (!validPattern()) { return; }
 
+	// Helper lambda function to fine tune a node's in/out value
+	auto fineTuneValue = [this](timeMap::iterator node, bool editingInValue)
+	{
+		if (node != m_pattern->getTimeMap().end())
+		{
+			// Display dialog to edit the value
+			bool ok;
+			double value = QInputDialog::getDouble(
+				this,
+				tr("Edit Value"),
+				editingInValue
+					? tr("New inValue")
+					: tr("New outValue"),
+				editingInValue
+					? INVAL(node)
+					: OUTVAL(node),
+				m_pattern->firstObject()->minValue<float>(),
+				m_pattern->firstObject()->maxValue<float>(),
+				3,
+				&ok
+			);
+
+			if (ok)
+			{
+				// Set the new inValue/outValue
+				if (editingInValue)
+				{
+					node.value().setInValue(value);
+					Engine::getSong()->setModified();
+				}
+				else
+				{
+					node.value().setOutValue(value);
+					Engine::getSong()->setModified();
+				}
+
+				return true;
+			}
+		}
+
+		// If nothing was changed (invalid node, dialog closed, etc) return false
+		return false;
+	};
+
+	// Do we need to call update()?
+	bool needUpdate = false;
+
 	// If we double clicked inside the AutomationEditor viewport
 	if (mouseEvent->y() > TOP_MARGIN && mouseEvent->x() >= VALUES_WIDTH)
 	{
-		timeMap & tm = m_pattern->getTimeMap();
-
 		timeMap::iterator clickedNode;
-
-		// Are we editing the inValue or outValue?
-		bool editingInValue;
 
 		switch (m_editMode)
 		{
 			case DRAW:
 				// We will edit the inValue
 				clickedNode = getNodeAt(mouseEvent->x(), mouseEvent->y());
-				editingInValue = true;
+				if (fineTuneValue(clickedNode, true)) { needUpdate = true; }
 				break;
 			case DRAW_OUTVALUES:
 				// We will edit the outValue
 				clickedNode = getNodeAt(mouseEvent->x(), mouseEvent->y(), true);
-				editingInValue = false;
+				if (fineTuneValue(clickedNode, false)) { needUpdate = true; }
+				break;
+			default:
 				break;
 		}
 
-		if (clickedNode == tm.end())
-		{
-			return;
-		}
-
-		// Display dialog to edit the value
-		bool ok;
-		double value = QInputDialog::getDouble(
-			this,
-			tr("Edit Value"),
-			editingInValue
-				? tr("New inValue")
-				: tr("New outValue"),
-			editingInValue
-				? INVAL(clickedNode)
-				: OUTVAL(clickedNode),
-			m_pattern->firstObject()->minValue<float>(),
-			m_pattern->firstObject()->maxValue<float>(),
-			3,
-			&ok
-		);
-
-		if (ok)
-		{
-			// Set the new inValue/outValue
-			if (editingInValue)
-			{
-				clickedNode.value().setInValue(value);
-			}
-			else
-			{
-				clickedNode.value().setOutValue(value);
-			}
-		}
-
-		update();
+		if (needUpdate) { update(); }
 	}
 }
 
