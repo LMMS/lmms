@@ -829,8 +829,8 @@ void AutomationPattern::loadSettings( const QDomElement & _this )
 
 			m_timeMap[timeMapPos] = AutomationNode(this, timeMapInValue, timeMapOutValue, timeMapPos);
 
-			// Load tangents if there is information about it
-			if (element.hasAttribute("inTan") && element.hasAttribute("outTan"))
+			// Load tangents if there is information about it (it's enough to check for either inTan or outTan)
+			if (element.hasAttribute("inTan"))
 			{
 				float inTan = LocaleHelper::toFloat(element.attribute("inTan"));
 				float outTan = LocaleHelper::toFloat(element.attribute("outTan"));
