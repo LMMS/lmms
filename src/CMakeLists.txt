@@ -115,7 +115,7 @@ ADD_LIBRARY(lmmsobjs OBJECT
 	${LMMS_INCLUDES}
 	${LMMS_UI_OUT}
 	${LMMS_RCC_OUT}
-)
+ "sys/Time.cpp")
 
 GENERATE_EXPORT_HEADER(lmmsobjs
 	BASE_NAME lmms
@@ -125,7 +125,7 @@ ADD_EXECUTABLE(lmms
 	core/main.cpp
 	$<TARGET_OBJECTS:lmmsobjs>
 	"${WINRC}"
-)
+ "sys/Time.cpp")
 TARGET_INCLUDE_DIRECTORIES(lmms
 	PUBLIC ${CMAKE_CURRENT_BINARY_DIR}
 )

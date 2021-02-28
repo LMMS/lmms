@@ -1,7 +1,7 @@
 INCLUDE_DIRECTORIES("${CMAKE_SOURCE_DIR}/include")
 FILE(GLOB PLUGIN_SOURCES tap-plugins/*.c)
 LIST(SORT PLUGIN_SOURCES)
-SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O3 -Wno-write-strings -fomit-frame-pointer -fno-strict-aliasing -funroll-loops -ffast-math")
+SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O3 -fomit-frame-pointer -fno-strict-aliasing -funroll-loops -ffast-math")
 FOREACH(_item ${PLUGIN_SOURCES})
 	GET_FILENAME_COMPONENT(_plugin "${_item}" NAME_WE)
 	ADD_LIBRARY("${_plugin}" MODULE "${_item}")
