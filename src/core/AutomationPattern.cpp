@@ -1192,7 +1192,7 @@ void AutomationPattern::generateTangents(timeMap::iterator it, int numToGenerate
 		return;
 	}
 
-	for( int i = 0; i < numToGenerate; i++ )
+	for( int i = 0; i < numToGenerate && it != m_timeMap.end(); i++ )
 	{
 		// Skip the node if it has locked tangents (were manually edited)
 		if (LOCKEDTAN(it))
