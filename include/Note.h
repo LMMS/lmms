@@ -205,10 +205,11 @@ public:
 		return classNodeName();
 	}
 
-	inline QString getNoteName() const
+	inline const char *getNoteName() const
 	{
-        return m_nameList[m_key % 12] +
-               QString::number(static_cast<int>(m_key / KeysPerOctave));
+		QString result = m_nameList[m_key % 12] +
+			QString::number(static_cast<int>(m_key / KeysPerOctave));
+        return qPrintable(result);
 	}
 
 	static TimePos quantized( const TimePos & m, const int qGrid );
