@@ -205,6 +205,12 @@ public:
 		return classNodeName();
 	}
 
+	inline QString getNoteName() const
+	{
+        return m_nameList[m_key % 12] +
+               QString::number(static_cast<int>(m_key / KeysPerOctave));
+	}
+
 	static TimePos quantized( const TimePos & m, const int qGrid );
 
 	DetuningHelper * detuning() const
@@ -236,6 +242,21 @@ private:
 	TimePos m_length;
 	TimePos m_pos;
 	DetuningHelper * m_detuning;
+	static constexpr std::array<const char*,12> m_nameList =
+		{
+		"C",
+		"C#",
+		"D",
+		"D#",
+		"E",
+		"F",
+		"F#",
+		"G",
+		"G#",
+		"A",
+		"A#",
+		"B"
+		};
 };
 
 
