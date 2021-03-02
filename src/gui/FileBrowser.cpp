@@ -34,10 +34,12 @@
 #include <QMdiSubWindow>
 #include <QMessageBox>
 #include <QShortcut>
+#include <QStringList>
 
 #include "FileBrowser.h"
 #include "BBTrackContainer.h"
 #include "ConfigManager.h"
+#include "DataFile.h"
 #include "embed.h"
 #include "Engine.h"
 #include "GuiApplication.h"
@@ -55,8 +57,6 @@
 #include "StringPairDrag.h"
 #include "TextFloat.h"
 
-
-
 enum TreeWidgetItemTypes
 {
 	TypeFileItem = QTreeWidgetItem::UserType,
@@ -65,16 +65,49 @@ enum TreeWidgetItemTypes
 
 
 
+void FileBrowser::addContentCheckBox()
+{
+	auto filterWidget = new QWidget(contentParent());
+	filterWidget->setFixedHeight(15);
+	auto filterWidgetLayout = new QHBoxLayout(filterWidget);
+	filterWidgetLayout->setMargin(0);
+	filterWidgetLayout->setSpacing(0);
+
+	auto configCheckBox = [this, &filterWidgetLayout](QCheckBox* box)
+	{
+		box->setCheckState(Qt::Checked);
+		connect(box, SIGNAL(stateChanged(int)), this, SLOT(reloadTree()));
+		filterWidgetLayout->addWidget(box);
+	};
+
+	m_showUserContent = new QCheckBox(tr("User content"));
+	configCheckBox(m_showUserContent);
+	m_showFactoryContent = new QCheckBox(tr("Factory content"));
+	configCheckBox(m_showFactoryContent);
+
+	addContentWidget(filterWidget);
+};
+
+
 FileBrowser::FileBrowser(const QString & directories, const QString & filter,
 			const QString & title, const QPixmap & pm,
-			QWidget * parent, bool dirs_as_items, bool recurse ) :
+			QWidget * parent, bool dirs_as_items, bool recurse,
+			const QString& userDir,
+			const QString& factoryDir):
 	SideBarWidget( title, pm, parent ),
 	m_directories( directories ),
 	m_filter( filter ),
 	m_dirsAsItems( dirs_as_items ),
-	m_recurse( recurse )
+	m_recurse( recurse ),
+	m_userDir(userDir),
+	m_factoryDir(factoryDir)
 {
 	setWindowTitle( tr( "Browser" ) );
+
+	if (!userDir.isEmpty() && !factoryDir.isEmpty())
+	{
+		addContentCheckBox();
+	}
 
 	QWidget * searchWidget = new QWidget( contentParent() );
 	searchWidget->setFixedHeight( 24 );
@@ -162,17 +195,28 @@ bool FileBrowser::filterItems( const QString & filter, QTreeWidgetItem * item )
 }
 
 
-
 void FileBrowser::reloadTree( void )
 {
 	QList<QString> expandedDirs = m_fileBrowserTreeWidget->expandedDirs();
 	const QString text = m_filterEdit->text();
 	m_filterEdit->clear();
 	m_fileBrowserTreeWidget->clear();
-	QStringList paths = m_directories.split( '*' );
-	for( QStringList::iterator it = paths.begin(); it != paths.end(); ++it )
+	QStringList paths = m_directories.split('*');
+	if (m_showUserContent && !m_showUserContent->isChecked())
 	{
-		addItems( *it );
+		paths.removeAll(m_userDir);
+	}
+	if (m_showFactoryContent && !m_showFactoryContent->isChecked())
+	{
+		paths.removeAll(m_factoryDir);
+	}
+
+	if (!paths.isEmpty())
+	{
+		for (QStringList::iterator it = paths.begin(); it != paths.end(); ++it)
+		{
+			addItems(*it);
+		}
 	}
 	expandItems(nullptr, expandedDirs);
 	m_filterEdit->setText( text );
@@ -230,6 +274,7 @@ void FileBrowser::addItems(const QString & path )
 	// try to add all directories from file system alphabetically into the tree
 	QDir cdir( path );
 	QStringList files = cdir.entryList( QDir::Dirs, QDir::Name );
+	files.sort(Qt::CaseInsensitive);
 	for( QStringList::const_iterator it = files.constBegin();
 						it != files.constEnd(); ++it )
 	{
@@ -335,6 +380,13 @@ FileBrowserTreeWidget::FileBrowserTreeWidget(QWidget * parent ) :
 	connect( this, SIGNAL( itemExpanded( QTreeWidgetItem * ) ),
 				SLOT( updateDirectory( QTreeWidgetItem * ) ) );
 
+#if QT_VERSION < QT_VERSION_CHECK(5, 12, 2) && defined LMMS_BUILD_WIN32
+	// Set the font for the QTreeWidget to the Windows System font to make sure that
+	// truncated (elided) items use the same font as non-truncated items.
+	// This is a workaround for this qt bug, fixed in 5.12.2: https://bugreports.qt.io/browse/QTBUG-29232
+	// TODO: remove this when all builds use a recent enough version of qt.
+	setFont( GuiApplication::getWin32SystemFont() );
+#endif
 }
 
 
@@ -428,6 +480,16 @@ void FileBrowserTreeWidget::hideEvent(QHideEvent* he)
 	// Cancel previews when the user switches tabs or hides the sidebar
 	stopPreview();
 	QTreeWidget::hideEvent(he);
+}
+
+
+
+
+void FileBrowserTreeWidget::focusOutEvent(QFocusEvent* fe)
+{
+	// Cancel previews when the user clicks outside the browser
+	stopPreview();
+	QTreeWidget::focusOutEvent(fe);
 }
 
 
@@ -672,24 +734,16 @@ void FileBrowserTreeWidget::mouseReleaseEvent(QMouseEvent * me )
 {
 	m_mousePressed = false;
 
+	// If a preview is running, we may need to stop it. Otherwise, we're done
 	QMutexLocker previewLocker(&m_pphMutex);
+	if (m_previewPlayHandle == nullptr) { return; }
 
-	if (m_previewPlayHandle != nullptr)
-	{
-		// If less than 3 seconds remain of the sample, we don't
-		// stop them if the user releases mouse-button...
-		if (m_previewPlayHandle->type() == PlayHandle::TypeSamplePlayHandle)
-		{
-			SamplePlayHandle* s = dynamic_cast<SamplePlayHandle*>(m_previewPlayHandle);
-			auto second = static_cast<f_cnt_t>(Engine::mixer()->processingSampleRate());
-			if (s && s->totalFrames() - s->framesDone() <= second * 3)
-			{
-				s->setDoneMayReturnTrue(true);
-			}
-			else { stopPreview(); }
-		}
-		else { stopPreview(); }
-	}
+	// Only sample previews may continue after mouse up. Is this a sample preview?
+	bool isSample = m_previewPlayHandle->type() == PlayHandle::TypeSamplePlayHandle;
+	// Even sample previews should only continue if the user wants them to. Do they?
+	bool shouldContinue = ConfigManager::inst()->value("ui", "letpreviewsfinish").toInt();
+	// If both are true the preview may continue, otherwise we stop it
+	if (!(isSample && shouldContinue)) { stopPreview(); }
 }
 
 
@@ -1028,8 +1082,13 @@ bool Directory::addItems(const QString & path )
 		}
 	}
 
+	// sorts the path alphabetically instead of just appending to the bottom (see "orphans")
+	if (added_something)
+		sortChildren(0, Qt::AscendingOrder);
+
 	QList<QTreeWidgetItem*> items;
 	files = thisDir.entryList( QDir::Files, QDir::Name );
+	files.sort(Qt::CaseInsensitive);
 	for( QStringList::const_iterator it = files.constBegin();
 						it != files.constEnd(); ++it )
 	{

@@ -139,7 +139,7 @@ bool AudioFileOgg::startEncoding()
 	// We give our ogg file a random serial number and avoid
 	// 0 and UINT32_MAX which can get you into trouble.
 #if (QT_VERSION >= QT_VERSION_CHECK(5,10,0))
-	QRandomGenerator::global()->seed(time(0));
+	// QRandomGenerator::global() is already initialized, and we can't seed() it.
 	m_serialNo = 0xD0000000 + QRandomGenerator::global()->generate() % 0x0FFFFFFF;
 #else
 	qsrand(time(0));

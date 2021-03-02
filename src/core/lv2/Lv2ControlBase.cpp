@@ -37,10 +37,10 @@
 
 
 Plugin::PluginTypes Lv2ControlBase::check(const LilvPlugin *plugin,
-	std::vector<PluginIssue> &issues, bool printIssues)
+	std::vector<PluginIssue> &issues)
 {
 	// for some reason, all checks can be done by one processor...
-	return Lv2Proc::check(plugin, issues, printIssues);
+	return Lv2Proc::check(plugin, issues);
 }
 
 
@@ -206,7 +206,7 @@ bool Lv2ControlBase::hasNoteInput() const
 
 
 void Lv2ControlBase::handleMidiInputEvent(const MidiEvent &event,
-	const MidiTime &time, f_cnt_t offset)
+	const TimePos &time, f_cnt_t offset)
 {
 	for (auto& c : m_procs) { c->handleMidiInputEvent(event, time, offset); }
 }

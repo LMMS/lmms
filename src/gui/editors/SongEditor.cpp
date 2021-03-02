@@ -31,6 +31,7 @@
 #include <QMdiArea>
 #include <QMdiSubWindow>
 #include <QPainter>
+#include <QScrollBar>
 #include <QTimeLine>
 
 #include "AudioDevice.h"
@@ -69,7 +70,7 @@ SongEditor::SongEditor( Song * song ) :
 	m_scrollPos(),
 	m_mousePos(),
 	m_rubberBandStartTrackview(0),
-	m_rubberbandStartMidipos(0),
+	m_rubberbandStartTimePos(0),
 	m_currentZoomingValue(m_zoomingModel->value()),
 	m_trackHeadWidth(ConfigManager::inst()->value("ui", "compacttrackbuttons").toInt()==1
 					 ? DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT + TRACK_OP_WIDTH_COMPACT
@@ -83,11 +84,11 @@ SongEditor::SongEditor( Song * song ) :
 					m_song->m_playPos[Song::Mode_PlaySong],
 					m_currentPosition,
 					Song::Mode_PlaySong, this );
-	connect( this, SIGNAL( positionChanged( const MidiTime & ) ),
+	connect( this, SIGNAL( positionChanged( const TimePos & ) ),
 				m_song->m_playPos[Song::Mode_PlaySong].m_timeLine,
-			SLOT( updatePosition( const MidiTime & ) ) );
-	connect( m_timeLine, SIGNAL( positionChanged( const MidiTime & ) ),
-			this, SLOT( updatePosition( const MidiTime & ) ) );
+			SLOT( updatePosition( const TimePos & ) ) );
+	connect( m_timeLine, SIGNAL( positionChanged( const TimePos & ) ),
+			this, SLOT( updatePosition( const TimePos & ) ) );
 	connect( m_timeLine, SIGNAL( regionSelectedFromPixels( int, int ) ),
 			this, SLOT( selectRegionFromPixels( int, int ) ) );
 	connect( m_timeLine, SIGNAL( selectionFinished() ),
@@ -293,7 +294,7 @@ float SongEditor::getSnapSize() const
 	{
 		val = val - m_zoomingModel->value() + 3;
 	}
-	val = max(val, -6); // -6 gives 1/64th bar snapping. Lower values cause crashing.
+	val = std::max(val, -6); // -6 gives 1/64th bar snapping. Lower values cause crashing.
 
 	if ( val >= 0 ){
 		return 1 << val;
@@ -307,7 +308,7 @@ QString SongEditor::getSnapSizeString() const
 {
 	int val = -m_snappingModel->value() + 3;
 	val = val - m_zoomingModel->value() + 3;
-	val = max(val, -6); // -6 gives 1/64th bar snapping. Lower values cause crashing.
+	val = std::max(val, -6); // -6 gives 1/64th bar snapping. Lower values cause crashing.
 
 	if ( val >= 0 ){
 		int bars = 1 << val;
@@ -339,7 +340,7 @@ void SongEditor::setHighQuality( bool hq )
 void SongEditor::scrolled( int new_pos )
 {
 	update();
-	emit positionChanged( m_currentPosition = MidiTime( new_pos, 0 ) );
+	emit positionChanged( m_currentPosition = TimePos( new_pos, 0 ) );
 }
 
 
@@ -363,8 +364,8 @@ void SongEditor::selectRegionFromPixels(int xStart, int xEnd)
 		m_currentZoomingValue = zoomingModel()->value();
 
 		//calculate the song position where the mouse was clicked
-		m_rubberbandStartMidipos = MidiTime((xStart - m_trackHeadWidth)
-											/ pixelsPerBar() * MidiTime::ticksPerBar())
+		m_rubberbandStartTimePos = TimePos((xStart - m_trackHeadWidth)
+											/ pixelsPerBar() * TimePos::ticksPerBar())
 											+ m_currentPosition;
 		m_rubberBandStartTrackview = 0;
 	}
@@ -413,9 +414,9 @@ void SongEditor::updateRubberband()
 		//the index of the TrackView the mouse is hover
 		int rubberBandTrackview = trackIndexFromSelectionPoint(m_mousePos.y());
 
-		//the miditime the mouse is hover
-		MidiTime rubberbandMidipos = MidiTime((qMin(m_mousePos.x(), width()) - m_trackHeadWidth)
-											  / pixelsPerBar() * MidiTime::ticksPerBar())
+		//the time position the mouse is hover
+		TimePos rubberbandTimePos = TimePos((qMin(m_mousePos.x(), width()) - m_trackHeadWidth)
+											  / pixelsPerBar() * TimePos::ticksPerBar())
 											  + m_currentPosition;
 
 		//are tcos in the rect of selection?
@@ -427,9 +428,9 @@ void SongEditor::updateRubberband()
 				auto indexOfTrackView = trackViews().indexOf(tco->getTrackView());
 				bool isBeetweenRubberbandViews = indexOfTrackView >= qMin(m_rubberBandStartTrackview, rubberBandTrackview)
 											  && indexOfTrackView <= qMax(m_rubberBandStartTrackview, rubberBandTrackview);
-				bool isBeetweenRubberbandMidiPos = tco->getTrackContentObject()->endPosition() >= qMin(m_rubberbandStartMidipos, rubberbandMidipos)
-											  && tco->getTrackContentObject()->startPosition() <= qMax(m_rubberbandStartMidipos, rubberbandMidipos);
-				it->setSelected(isBeetweenRubberbandViews && isBeetweenRubberbandMidiPos);
+				bool isBeetweenRubberbandTimePos = tco->getTrackContentObject()->endPosition() >= qMin(m_rubberbandStartTimePos, rubberbandTimePos)
+											  && tco->getTrackContentObject()->startPosition() <= qMax(m_rubberbandStartTimePos, rubberbandTimePos);
+				it->setSelected(isBeetweenRubberbandViews && isBeetweenRubberbandTimePos);
 			}
 		}
 	}
@@ -476,7 +477,7 @@ void SongEditor::keyPressEvent( QKeyEvent * ke )
 	}
 	else if( ke->key() == Qt::Key_Left )
 	{
-		tick_t t = m_song->currentTick() - MidiTime::ticksPerBar();
+		tick_t t = m_song->currentTick() - TimePos::ticksPerBar();
 		if( t >= 0 )
 		{
 			m_song->setPlayPos( t, Song::Mode_PlaySong );
@@ -484,7 +485,7 @@ void SongEditor::keyPressEvent( QKeyEvent * ke )
 	}
 	else if( ke->key() == Qt::Key_Right )
 	{
-		tick_t t = m_song->currentTick() + MidiTime::ticksPerBar();
+		tick_t t = m_song->currentTick() + TimePos::ticksPerBar();
 		if( t < MaxSongLength )
 		{
 			m_song->setPlayPos( t, Song::Mode_PlaySong );
@@ -608,10 +609,10 @@ void SongEditor::mousePressEvent(QMouseEvent *me)
 		rubberBand()->setGeometry(QRect(m_origin, QSize()));
 		rubberBand()->show();
 
-		//the trackView(index) and the miditime where the mouse was clicked
+		//the trackView(index) and the time position where the mouse was clicked
 		m_rubberBandStartTrackview = trackIndexFromSelectionPoint(me->y());
-		m_rubberbandStartMidipos = MidiTime((me->x() - m_trackHeadWidth)
-											/ pixelsPerBar() * MidiTime::ticksPerBar())
+		m_rubberbandStartTimePos = TimePos((me->x() - m_trackHeadWidth)
+											/ pixelsPerBar() * TimePos::ticksPerBar())
 											+ m_currentPosition;
 	}
 	QWidget::mousePressEvent(me);
@@ -766,7 +767,7 @@ static inline void animateScroll( QScrollBar *scrollBar, int newVal, bool smooth
 
 
 
-void SongEditor::updatePosition( const MidiTime & t )
+void SongEditor::updatePosition( const TimePos & t )
 {
 	int widgetWidth, trackOpWidth;
 	if( ConfigManager::inst()->value( "ui", "compacttrackbuttons" ).toInt() )
@@ -788,7 +789,7 @@ void SongEditor::updatePosition( const MidiTime & t )
 		const int w = width() - widgetWidth
 							- trackOpWidth
 							- contentWidget()->verticalScrollBar()->width(); // width of right scrollbar
-		if( t > m_currentPosition + w * MidiTime::ticksPerBar() /
+		if( t > m_currentPosition + w * TimePos::ticksPerBar() /
 							pixelsPerBar() )
 		{
 			animateScroll( m_leftRightScroll, t.getBar(), m_smoothScroll );
