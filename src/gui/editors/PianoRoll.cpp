@@ -33,6 +33,7 @@
 #include <QLayout>
 #include <QMdiArea>
 #include <QPainter>
+#include <QPainterPath>
 #include <QPointer>
 #include <QScrollBar>
 #include <QStyleOption>
@@ -985,22 +986,6 @@ void PianoRoll::drawDetuningInfo(QPainter & p, const Note * n, int x, int y) con
 	// Return if it's empty
 	if (detuningMap.isEmpty()) { return; }
 
-	// Set the detuning color to the same color as the notes,
-	// but lighter and with some alpha
-	QColor detuningColor = QColor(m_noteColor.lighter(150));
-	detuningColor.setAlpha(70);
-
-	// Get the first node
-	timeMap::iterator it = detuningMap.begin();
-
-	// Set the clip area to the PianoRoll area
-	p.setClipRect(
-		m_whiteKeyWidth,
-		PR_TOP_MARGIN,
-		width() - m_whiteKeyWidth,
-		keyAreaBottom() - PR_TOP_MARGIN
-	);
-
 	// Reference pixel Y (that will be equivalent to
 	// zero in the automation pattern)
 	int baseY = y + m_keyLineHeight / 2;
@@ -1015,6 +1000,22 @@ void PianoRoll::drawDetuningInfo(QPainter & p, const Note * n, int x, int y) con
 	{
 		return baseY - value * m_keyLineHeight;
 	};
+
+	// Set the detuning color to the same color as the notes,
+	// but lighter and with some alpha
+	QColor detuningColor = QColor(m_noteColor.lighter(150));
+	detuningColor.setAlpha(70);
+
+	// Get the first node
+	timeMap::iterator it = detuningMap.begin();
+
+	// Set the clip area to the PianoRoll area
+	p.setClipRect(
+		m_whiteKeyWidth,
+		keyAreaTop(),
+		width() - m_whiteKeyWidth,
+		keyAreaBottom() - keyAreaTop()
+	);
 
 	while (it + 1 != detuningMap.end())
 	{
