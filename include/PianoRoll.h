@@ -405,7 +405,7 @@ private:
 
 	void copyToClipboard(const NoteVector & notes ) const;
 
-	void drawDetuningInfo( QPainter & _p, const Note * _n, int _x, int _y ) const;
+	void drawDetuningInfo(QPainter & p, const Note * n, int x, int y) const;
 	bool mouseOverNote();
 	Note * noteUnderMouse();
 

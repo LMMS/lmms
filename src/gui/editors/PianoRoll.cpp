@@ -976,82 +976,88 @@ void PianoRoll::drawNoteRect( QPainter & p, int x, int y,
 
 
 
-void PianoRoll::drawDetuningInfo( QPainter & _p, const Note * _n, int _x,
-								int _y ) const
+void PianoRoll::drawDetuningInfo(QPainter & p, const Note * n, int x, int y) const
 {
-	int middle_y = _y + m_keyLineHeight / 2;
-	_p.setPen(m_noteColor);
-	_p.setClipRect(
+	// Get a timeMap of the detuning pattern
+	AutomationPattern* detuningPattern = n->detuning()->automationPattern();
+	timeMap & detuningMap = detuningPattern->getTimeMap();
+
+	// Return if it's empty
+	if (detuningMap.isEmpty()) { return; }
+
+	// Set the detuning color to the same color as the notes,
+	// but lighter and with some alpha
+	QColor detuningColor = QColor(m_noteColor.lighter(150));
+	detuningColor.setAlpha(70);
+
+	// Get the first node
+	timeMap::iterator it = detuningMap.begin();
+
+	// Set the clip area to the PianoRoll area
+	p.setClipRect(
 		m_whiteKeyWidth,
 		PR_TOP_MARGIN,
 		width() - m_whiteKeyWidth,
-		keyAreaBottom() - PR_TOP_MARGIN);
+		keyAreaBottom() - PR_TOP_MARGIN
+	);
 
-	// Draw lines for the detuning automation, treating cubic hermit curves
-	// as straight lines for now. Also draw discrete jumps.
-	int old_x = 0;
-	int old_y = 0;
+	// Reference pixel Y (that will be equivalent to
+	// zero in the automation pattern)
+	int baseY = y + m_keyLineHeight / 2;
 
-	timeMap & map = _n->detuning()->automationPattern()->getTimeMap();
-	for (timeMap::const_iterator it = map.begin(); it != map.end(); ++it)
+	// Two lambda functions to calculate the X and Y position
+	// of nodes/values
+	auto getX = [this, x](int tick)
 	{
-		// Current node values
-		int cur_ticks = POS(it);
-		int cur_x = _x + cur_ticks * m_ppb / TimePos::ticksPerBar();
-		const float cur_level = INVAL(it);
-		int cur_y = middle_y - cur_level * m_keyLineHeight;
+		return x + tick * m_ppb / TimePos::ticksPerBar();
+	};
+	auto getY = [this, baseY](float value)
+	{
+		return baseY - value * m_keyLineHeight;
+	};
 
-		// First line to represent the inValue of the first node
-		if (it == map.begin())
+	while (it + 1 != detuningMap.end())
+	{
+		// Get the current node's x position in ticks
+		auto nodePos = POS(it);
+		// Convert it to a X position in the piano roll
+		int nodeX = getX(nodePos);
+
+		// Get values after this node
+		float* values = detuningPattern->valuesAfter(POS(it));
+
+		// We are creating a path to draw a polygon representing the values between two
+		// nodes. When we have two nodes with discrete progression, we will basically have
+		// a rectangle with the outValue of the first node (that's why nextValue will match
+		// the outValue of the current node). When we have nodes with linear or cubic progression
+		// the value of the end of the shape between the two nodes will be the inValue of
+		// the next node.
+		float nextValue;
+		if (detuningPattern->progressionType() == AutomationPattern::DiscreteProgression)
 		{
-			_p.drawLine(cur_x - 1, cur_y, cur_x + 1, cur_y);
-			_p.drawLine(cur_x, cur_y - 1, cur_x, cur_y + 1);
+			nextValue = OUTVAL(it);
 		}
-		// All subsequent lines will take the outValue of the previous node
-		// and the inValue of the current node. It will also draw a vertical
-		// line if there was a discrete jump (from old_x,old_y to pre_x,pre_y)
 		else
 		{
-			// Previous node values (based on outValue). We just calculate
-			// the y level because the x will be the same as old_x.
-			const float pre_level = OUTVAL(it - 1);
-			int pre_y = middle_y - pre_level * m_keyLineHeight;
-
-			// Draws the line representing the discrete jump if there's one
-			if (old_y != pre_y)
-			{
-				_p.drawLine(old_x, old_y, old_x, pre_y);
-			}
-
-			// Now draw the lines representing the actual progression from one
-			// node to the other
-			switch (_n->detuning()->automationPattern()->progressionType())
-			{
-				case AutomationPattern::DiscreteProgression:
-					_p.drawLine(old_x, pre_y, cur_x, pre_y);
-					_p.drawLine(cur_x, pre_y, cur_x, cur_y);
-					break;
-				case AutomationPattern::CubicHermiteProgression: /* TODO */
-				case AutomationPattern::LinearProgression:
-					_p.drawLine(old_x, pre_y, cur_x, cur_y);
-					break;
-			}
-
-			// If we are in the last node and there's a discrete jump, we draw a
-			// vertical line representing it
-			if ((it + 1) == map.end())
-			{
-				const float last_level = OUTVAL(it);
-				if (cur_level != last_level)
-				{
-					int last_y = middle_y - last_level * m_keyLineHeight;
-					_p.drawLine(cur_x, cur_y, cur_x, last_y);
-				}
-			}
+			nextValue = INVAL(it + 1);
 		}
 
-		old_x = cur_x;
-		old_y = cur_y;
+		p.setRenderHints(QPainter::Antialiasing, true);
+		QPainterPath path;
+
+		path.moveTo(QPointF(nodeX, getY(0)));
+		for (int i = 0; i < POS(it + 1) - POS(it); i++)
+		{
+			path.lineTo(QPointF(getX(nodePos + i), getY(values[i])));
+		}
+		path.lineTo(QPointF(getX(POS(it + 1)), getY(nextValue)));
+		path.lineTo(QPointF(getX(POS(it + 1)), getY(0)));
+		path.lineTo(QPointF(nodeX, getY(0)));
+		p.fillPath(path, detuningColor);
+		p.setRenderHints(QPainter::Antialiasing, false);
+		delete [] values;
+
+		++it;
 	}
 }
 
