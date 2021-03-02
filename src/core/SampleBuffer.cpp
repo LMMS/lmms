@@ -1017,9 +1017,9 @@ void SampleBuffer::visualize(
 	const float ySpace = h * 0.5f;
 	const int nbFrames = focusOnRange ? toFrame - fromFrame : m_frames;
 
-	const int fpp = qBound<int>(1, nbFrames / w, 20);
-	QPointF * l = new QPointF[nbFrames / fpp + 1];
-	QPointF * r = new QPointF[nbFrames / fpp + 1];
+	const int fpp = qBound<int>(1, nbFrames / w, 1000);
+	QPointF * fMax = new QPointF[nbFrames / fpp * 2 + 2];
+	QPointF * fRms = new QPointF[nbFrames / fpp * 2 + 2];
 	int n = 0;
 	const int xb = dr.x();
 	const int first = focusOnRange ? fromFrame : 0;
@@ -1027,20 +1027,53 @@ void SampleBuffer::visualize(
 
 	for (int frame = first; frame <= last; frame += fpp)
 	{
+		float maxData = -1;
+		float minData = 1;
+
+		float rmsData[2] = {0, 0};
+
+		// Find maximum and minimum samples within range
+		for (int i = 0; i < fpp; ++i)
+		{
+			for (int j = 0; j < 2; ++j)
+			{
+				if (m_data[frame + i][j] > maxData)
+				{
+					maxData = m_data[frame + i][j];
+				}
+
+				if (m_data[frame + i][j] < minData)
+				{
+					minData = m_data[frame + i][j];
+				}
+
+				rmsData[j] += m_data[frame + i][j] * m_data[frame + i][j];
+			}
+		}
+
+		const float trueRmsData = (rmsData[0] + rmsData[1]) * 0.5 / fpp;
+		const float sqrtRmsData = sqrt(trueRmsData);
+		const float maxRmsData = qBound(minData, sqrtRmsData, maxData);
+		const float minRmsData = qBound(minData, -sqrtRmsData, maxData);
+
 		auto x = xb + ((frame - first) * double(w) / nbFrames);
 		// Partial Y calculation
 		auto py = ySpace * m_amplification;
-		l[n] = QPointF(x, (yb - (m_data[frame][0] * py)));
-		r[n] = QPointF(x, (yb - (m_data[frame][1] * py)));
+		fMax[n*2] = QPointF(x, (yb - (maxData * py)));
+		fMax[n*2+1] = QPointF(x, (yb - (minData * py)));
+		fRms[n*2] = QPointF(x, (yb - (maxRmsData * py)));
+		fRms[n*2+1] = QPointF(x, (yb - (minRmsData * py)));
 		++n;
 	}
 
-	p.setRenderHint(QPainter::Antialiasing);
-	p.drawPolyline(l, nbFrames / fpp);
-	p.drawPolyline(r, nbFrames / fpp);
+	//p.setRenderHint(QPainter::Antialiasing);
+	p.drawPolyline(fMax, nbFrames * 2 / fpp);
 
-	delete[] l;
-	delete[] r;
+	p.setPen(p.pen().color().lighter(123));//
+
+	p.drawPolyline(fRms, nbFrames * 2 / fpp);
+
+	delete[] fMax;
 }
 
 

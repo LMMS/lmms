@@ -575,7 +575,7 @@ void SampleTCOView::paintEvent( QPaintEvent * pe )
 	QPainter p( &m_paintPixmap );
 
 	QLinearGradient lingrad( 0, 0, 0, height() );
-	QColor c = getColorForDisplay( painter.background().color() );
+	QColor c = painter.background().color();
 	bool muted = m_tco->getTrack()->isMuted() || m_tco->isMuted();
 
 	lingrad.setColorAt( 1, c.darker( 300 ) );
@@ -593,7 +593,7 @@ void SampleTCOView::paintEvent( QPaintEvent * pe )
 		p.fillRect( rect(), c );
 	}
 
-	p.setPen( !muted ? painter.pen().brush().color() : mutedColor() );
+	p.setPen( !muted ? getColorForDisplay( painter.pen().brush().color() ): mutedColor() );
 
 	const int spacing = TCO_BORDER_WIDTH + 1;
 	const float ppb = fixedTCOs() ?
