@@ -2000,7 +2000,7 @@ AutomationEditorWindow::AutomationEditorWindow() :
 	drawOutAction->setShortcut(Qt::SHIFT | Qt::Key_C);
 
 	QAction* editTanAction = editModeGroup->addAction(embed::getIconPixmap("edit_tangent"), tr("Edit tangents mode (Shift+T)"));
-	drawOutAction->setShortcut(Qt::SHIFT | Qt::Key_T);
+	editTanAction->setShortcut(Qt::SHIFT | Qt::Key_T);
 
 	m_flipYAction = new QAction(embed::getIconPixmap("flip_y"), tr("Flip vertically"), this);
 	m_flipXAction = new QAction(embed::getIconPixmap("flip_x"), tr("Flip horizontally"), this);
