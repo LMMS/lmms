@@ -1018,9 +1018,10 @@ void SampleBuffer::visualize(
 	const int nbFrames = focusOnRange ? toFrame - fromFrame : m_frames;
 
 	const int fpp = qMax<int>(1, nbFrames / w);
-	std::vector<QPointF> fMax(nbFrames / fpp * 2 + 2);
-	std::vector<QPointF> fRms(nbFrames / fpp * 2 + 2);
-	int n = 0;
+	const int totalPoints = nbFrames / fpp * 2 + 2;
+	std::vector<QPointF> fMax(totalPoints);
+	std::vector<QPointF> fRms(totalPoints);
+	int curFrame = 0;
 	const int xb = dr.x();
 	const int first = focusOnRange ? fromFrame : 0;
 	const int last = focusOnRange ? toFrame - 1 : m_frames - 1;
@@ -1037,17 +1038,12 @@ void SampleBuffer::visualize(
 		{
 			for (int j = 0; j < 2; ++j)
 			{
-				if (m_data[frame + i][j] > maxData)
-				{
-					maxData = m_data[frame + i][j];
-				}
+				auto curData = m_data[frame + i][j];
 
-				if (m_data[frame + i][j] < minData)
-				{
-					minData = m_data[frame + i][j];
-				}
+				if (curData > maxData) { maxData = m_data[frame + i][j]; }
+				if (curData < minData) { minData = m_data[frame + i][j]; }
 
-				rmsData[j] += m_data[frame + i][j] * m_data[frame + i][j];
+				rmsData[j] += curData * curData;
 			}
 		}
 
@@ -1059,19 +1055,19 @@ void SampleBuffer::visualize(
 		auto x = xb + ((frame - first) * double(w) / nbFrames);
 		// Partial Y calculation
 		auto py = ySpace * m_amplification;
-		fMax[n*2] = QPointF(x, (yb - (maxData * py)));
-		fMax[n*2+1] = QPointF(x, (yb - (minData * py)));
-		fRms[n*2] = QPointF(x, (yb - (maxRmsData * py)));
-		fRms[n*2+1] = QPointF(x, (yb - (minRmsData * py)));
-		++n;
+		fMax[curFrame*2] = QPointF(x, (yb - (maxData * py)));
+		fMax[curFrame*2+1] = QPointF(x, (yb - (minData * py)));
+		fRms[curFrame*2] = QPointF(x, (yb - (maxRmsData * py)));
+		fRms[curFrame*2+1] = QPointF(x, (yb - (minRmsData * py)));
+		++curFrame;
 	}
 
 	//p.setRenderHint(QPainter::Antialiasing);
-	p.drawPolyline(fMax.data(), nbFrames * 2 / fpp);
+	p.drawPolyline(fMax.data(), totalPoints);
 
 	p.setPen(p.pen().color().lighter(123));//
 
-	p.drawPolyline(fRms.data(), nbFrames * 2 / fpp);
+	p.drawPolyline(fRms.data(), totalPoints);
 }
 
 

@@ -579,14 +579,8 @@ void SampleTCOView::paintEvent( QPaintEvent * pe )
 
 	QLinearGradient lingrad( 0, 0, 0, height() );
 	QColor c = painter.background().color();
-	if (muted)
-	{
-		c = c.darker(150);
-	}
-	if (selected)
-	{
-		c = c.darker(150);
-	}
+	if (muted) { c = c.darker(150); }
+	if (selected) { c = c.darker(150); }
 
 	lingrad.setColorAt( 1, c.darker( 300 ) );
 	lingrad.setColorAt( 0, c );
@@ -604,10 +598,10 @@ void SampleTCOView::paintEvent( QPaintEvent * pe )
 	}
 
 	auto tcoColor = m_tco->hasColor()
-				? m_tco->usesCustomClipColor()
-					? m_tco->color()
-					: m_tco->getTrack()->color()
-				: painter.pen().brush().color();
+			? (m_tco->usesCustomClipColor()
+				? m_tco->color()
+				: m_tco->getTrack()->color())
+			: painter.pen().brush().color();
 
 	p.setPen( tcoColor );
 
