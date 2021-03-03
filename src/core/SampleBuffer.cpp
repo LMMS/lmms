@@ -1063,11 +1063,11 @@ void SampleBuffer::visualize(
 	}
 
 	//p.setRenderHint(QPainter::Antialiasing);
-	p.drawPolyline(fMax.data(), nbFrames / fpp * 2);
+	p.drawPolyline(fMax.data(), totalPoints);
 
 	p.setPen(p.pen().color().lighter(123));//
 
-	p.drawPolyline(fRms.data(), nbFrames / fpp * 2);
+	p.drawPolyline(fRms.data(), totalPoints);
 }
 
 
