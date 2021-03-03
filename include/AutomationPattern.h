@@ -195,6 +195,9 @@ private:
 	bool m_dragging;
 	bool m_dragKeepOutValue; // Should we keep the current dragged node's outValue?
 	float m_dragOutValue; // The outValue of the dragged node's
+	bool m_dragLockedTan; // If the dragged node has it's tangents locked
+	float m_dragInTan; // The dragged node's inTangent
+	float m_dragOutTan; // The dragged node's outTangent
 
 	bool m_isRecording;
 	float m_lastRecordedValue;

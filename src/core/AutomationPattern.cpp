@@ -488,15 +488,30 @@ TimePos AutomationPattern::setDragValue(
 		// inValue
 		m_dragKeepOutValue = false;
 
+		// We will set the tangents back to what they were if the node had
+		// its tangents locked
+		m_dragLockedTan = false;
+
 		// Check if we already have a node on the position we are dragging
 		// and if we do, store the outValue so the discrete jump can be kept
+		// and information about the tangents
 		timeMap::iterator it = m_timeMap.find(newTime);
 		if (it != m_timeMap.end())
 		{
+			// If we don't have a discrete jump, the outValue will be the
+			// same as the inValue
 			if (OFFSET(it) != 0)
 			{
 				m_dragKeepOutValue = true;
 				m_dragOutValue = OUTVAL(it);
+			}
+			// For the tangents, we will only keep them if the tangents were
+			// locked
+			if (LOCKEDTAN(it))
+			{
+				m_dragLockedTan = true;
+				m_dragInTan = INTAN(it);
+				m_dragOutTan = OUTTAN(it);
 			}
 		}
 
@@ -510,12 +525,31 @@ TimePos AutomationPattern::setDragValue(
 
 	generateTangents();
 
+	TimePos returnedPos;
+
 	if (m_dragKeepOutValue)
 	{
-		return this->putValues(time, value, m_dragOutValue, quantPos, controlKey);
+		returnedPos = this->putValues(time, value, m_dragOutValue, quantPos, controlKey);
+	}
+	else
+	{
+		returnedPos = this->putValue(time, value, quantPos, controlKey);
 	}
 
-	return this->putValue(time, value, quantPos, controlKey);
+	// Set the tangents on the newly created node if they were locked
+	// before dragging
+	if (m_dragLockedTan)
+	{
+		timeMap::iterator it = m_timeMap.find(returnedPos);
+		if (it != m_timeMap.end())
+		{
+			it.value().setInTangent(m_dragInTan);
+			it.value().setOutTangent(m_dragOutTan);
+			it.value().setLockedTangents(true);
+		}
+	}
+
+	return returnedPos;
 }
 
 
