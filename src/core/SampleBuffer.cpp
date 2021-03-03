@@ -1017,7 +1017,7 @@ void SampleBuffer::visualize(
 	const float ySpace = h * 0.5f;
 	const int nbFrames = focusOnRange ? toFrame - fromFrame : m_frames;
 
-	const int fpp = qBound<int>(1, nbFrames / w, 1000);
+	const int fpp = qMax<int>(1, nbFrames / w);
 	std::vector<QPointF> fMax(nbFrames / fpp * 2 + 2);
 	std::vector<QPointF> fRms(nbFrames / fpp * 2 + 2);
 	int n = 0;
@@ -1033,7 +1033,7 @@ void SampleBuffer::visualize(
 		float rmsData[2] = {0, 0};
 
 		// Find maximum and minimum samples within range
-		for (int i = 0; i < fpp; ++i)
+		for (int i = 0; i < fpp && frame + i < last; ++i)
 		{
 			for (int j = 0; j < 2; ++j)
 			{
