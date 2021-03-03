@@ -1040,8 +1040,8 @@ void SampleBuffer::visualize(
 			{
 				auto curData = m_data[frame + i][j];
 
-				if (curData > maxData) { maxData = m_data[frame + i][j]; }
-				if (curData < minData) { minData = m_data[frame + i][j]; }
+				if (curData > maxData) { maxData = curData; }
+				if (curData < minData) { minData = curData; }
 
 				rmsData[j] += curData * curData;
 			}
@@ -1063,11 +1063,11 @@ void SampleBuffer::visualize(
 	}
 
 	//p.setRenderHint(QPainter::Antialiasing);
-	p.drawPolyline(fMax.data(), totalPoints);
+	p.drawPolyline(fMax.data(), nbFrames / fpp * 2);
 
 	p.setPen(p.pen().color().lighter(123));//
 
-	p.drawPolyline(fRms.data(), totalPoints);
+	p.drawPolyline(fRms.data(), nbFrames / fpp * 2);
 }
 
 
