@@ -1989,28 +1989,29 @@ AutomationEditorWindow::AutomationEditorWindow() :
 	DropToolBar *editActionsToolBar = addDropToolBarToTop(tr("Edit actions"));
 
 	ActionGroup* editModeGroup = new ActionGroup(this);
-	QAction* drawAction = editModeGroup->addAction(embed::getIconPixmap("edit_draw"), tr("Draw mode (Shift+D)"));
-	drawAction->setShortcut(Qt::SHIFT | Qt::Key_D);
-	drawAction->setChecked(true);
+	m_drawAction = editModeGroup->addAction(embed::getIconPixmap("edit_draw"), tr("Draw mode (Shift+D)"));
+	m_drawAction->setShortcut(Qt::SHIFT | Qt::Key_D);
+	m_drawAction->setChecked(true);
 
-	QAction* eraseAction = editModeGroup->addAction(embed::getIconPixmap("edit_erase"), tr("Erase mode (Shift+E)"));
-	eraseAction->setShortcut(Qt::SHIFT | Qt::Key_E);
+	m_eraseAction = editModeGroup->addAction(embed::getIconPixmap("edit_erase"), tr("Erase mode (Shift+E)"));
+	m_eraseAction->setShortcut(Qt::SHIFT | Qt::Key_E);
 
-	QAction* drawOutAction = editModeGroup->addAction(embed::getIconPixmap("edit_draw_outvalue"), tr("Draw outValues mode (Shift+C)"));
-	drawOutAction->setShortcut(Qt::SHIFT | Qt::Key_C);
+	m_drawOutAction = editModeGroup->addAction(embed::getIconPixmap("edit_draw_outvalue"), tr("Draw outValues mode (Shift+C)"));
+	m_drawOutAction->setShortcut(Qt::SHIFT | Qt::Key_C);
 
-	QAction* editTanAction = editModeGroup->addAction(embed::getIconPixmap("edit_tangent"), tr("Edit tangents mode (Shift+T)"));
-	editTanAction->setShortcut(Qt::SHIFT | Qt::Key_T);
+	m_editTanAction = editModeGroup->addAction(embed::getIconPixmap("edit_tangent"), tr("Edit tangents mode (Shift+T)"));
+	m_editTanAction->setShortcut(Qt::SHIFT | Qt::Key_T);
+	m_editTanAction->setEnabled(false);
 
 	m_flipYAction = new QAction(embed::getIconPixmap("flip_y"), tr("Flip vertically"), this);
 	m_flipXAction = new QAction(embed::getIconPixmap("flip_x"), tr("Flip horizontally"), this);
 
 	connect(editModeGroup, SIGNAL(triggered(int)), m_editor, SLOT(setEditMode(int)));
 
-	editActionsToolBar->addAction(drawAction);
-	editActionsToolBar->addAction(eraseAction);
-	editActionsToolBar->addAction(drawOutAction);
-	editActionsToolBar->addAction(editTanAction);
+	editActionsToolBar->addAction(m_drawAction);
+	editActionsToolBar->addAction(m_eraseAction);
+	editActionsToolBar->addAction(m_drawOutAction);
+	editActionsToolBar->addAction(m_editTanAction);
 	editActionsToolBar->addAction(m_flipXAction);
 	editActionsToolBar->addAction(m_flipYAction);
 
@@ -2028,7 +2029,7 @@ AutomationEditorWindow::AutomationEditorWindow() :
 	m_cubicHermiteAction = progression_type_group->addAction(
 				embed::getIconPixmap("progression_cubic_hermite"), tr( "Cubic Hermite progression"));
 
-	connect(progression_type_group, SIGNAL(triggered(int)), m_editor, SLOT(setProgressionType(int)));
+	connect(progression_type_group, SIGNAL(triggered(int)), this, SLOT(setProgressionType(int)));
 
 	// setup tension-stuff
 	m_tensionKnob = new Knob( knobSmall_17, this, "Tension" );
@@ -2262,4 +2263,27 @@ void AutomationEditorWindow::updateWindowTitle()
 	}
 
 	setWindowTitle( tr( "Automation Editor - %1" ).arg( m_editor->m_pattern->name() ) );
+}
+
+/**
+ * @brief This method handles the AutomationEditorWindow event of changing
+ * progression types. The Edit Tangent edit mode should only be available for
+ * Cubic Hermite progressions, so this method is responsable for disabling it
+ * for other edit modes and reenabling it when it changes back to the Edit Tangent
+ * mode. After that, it calls the AutomationEditor::setProgressionType method so
+ * it can handle the rest.
+ * @param Int New progression type
+ */
+void AutomationEditorWindow::setProgressionType(int progType)
+{
+	if (progType != AutomationPattern::CubicHermiteProgression)
+	{
+		if (m_editTanAction->isChecked()) { m_drawAction->trigger(); }
+		if (m_editTanAction->isEnabled()) { m_editTanAction->setEnabled(false); }
+	}
+	else
+	{
+		if (m_editTanAction->isEnabled() == false) { m_editTanAction->setEnabled(true); }
+	}
+	m_editor->setProgressionType(progType);
 }

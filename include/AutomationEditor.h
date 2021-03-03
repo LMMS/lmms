@@ -290,8 +290,14 @@ protected slots:
 
 private slots:
 	void updateWindowTitle();
+	void setProgressionType(int progType);
 
 private:
+	QAction* m_drawAction;
+	QAction* m_eraseAction;
+	QAction* m_drawOutAction;
+	QAction* m_editTanAction;
+
 	QAction* m_discreteAction;
 	QAction* m_linearAction;
 	QAction* m_cubicHermiteAction;
