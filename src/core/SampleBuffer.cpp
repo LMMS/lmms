@@ -1018,8 +1018,8 @@ void SampleBuffer::visualize(
 	const int nbFrames = focusOnRange ? toFrame - fromFrame : m_frames;
 
 	const int fpp = qBound<int>(1, nbFrames / w, 1000);
-	QPointF * fMax = new QPointF[nbFrames / fpp * 2 + 2];
-	QPointF * fRms = new QPointF[nbFrames / fpp * 2 + 2];
+	std::vector<QPointF> fMax(nbFrames / fpp * 2 + 2);
+	std::vector<QPointF> fRms(nbFrames / fpp * 2 + 2);
 	int n = 0;
 	const int xb = dr.x();
 	const int first = focusOnRange ? fromFrame : 0;
@@ -1067,14 +1067,11 @@ void SampleBuffer::visualize(
 	}
 
 	//p.setRenderHint(QPainter::Antialiasing);
-	p.drawPolyline(fMax, nbFrames * 2 / fpp);
+	p.drawPolyline(fMax.data(), nbFrames * 2 / fpp);
 
 	p.setPen(p.pen().color().lighter(123));//
 
-	p.drawPolyline(fRms, nbFrames * 2 / fpp);
-
-	delete[] fMax;
-	delete[] fRms;
+	p.drawPolyline(fRms.data(), nbFrames * 2 / fpp);
 }
 
 
