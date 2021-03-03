@@ -70,50 +70,17 @@ public:
 	QSize sizeHint() const override {return QSize(COMP_SCREEN_X, COMP_SCREEN_Y);}
 
 	// For theming purposes
-	Q_PROPERTY(QColor inVolAreaColor READ inVolAreaColor WRITE setInVolAreaColor)
-	Q_PROPERTY(QColor inVolColor READ inVolColor WRITE setInVolColor)
-	Q_PROPERTY(QColor outVolAreaColor READ outVolAreaColor WRITE setOutVolAreaColor)
-	Q_PROPERTY(QColor outVolColor READ outVolColor WRITE setOutVolColor)
-	Q_PROPERTY(QColor gainReductionColor READ gainReductionColor WRITE setGainReductionColor)
-	Q_PROPERTY(QColor kneeColor READ kneeColor WRITE setKneeColor)
-	Q_PROPERTY(QColor kneeColor2 READ kneeColor2 WRITE setKneeColor2)
-	Q_PROPERTY(QColor threshColor READ threshColor WRITE setThreshColor)
-	Q_PROPERTY(QColor textColor READ textColor WRITE setTextColor)
-	Q_PROPERTY(QColor graphColor READ graphColor WRITE setGraphColor)
-	Q_PROPERTY(QColor resetColor READ resetColor WRITE setResetColor)
-
-	QColor const & inVolAreaColor() const;
-	void setInVolAreaColor( const QColor & c );
-
-	QColor const & inVolColor() const;
-	void setInVolColor( const QColor & c );
-
-	QColor const & outVolAreaColor() const;
-	void setOutVolAreaColor( const QColor & c );
-
-	QColor const & outVolColor() const;
-	void setOutVolColor( const QColor & c );
-
-	QColor const & gainReductionColor() const;
-	void setGainReductionColor( const QColor & c );
-
-	QColor const & kneeColor() const;
-	void setKneeColor( const QColor & c );
-
-	QColor const & kneeColor2() const;
-	void setKneeColor2( const QColor & c );
-
-	QColor const & threshColor() const;
-	void setThreshColor( const QColor & c );
-
-	QColor const & textColor() const;
-	void setTextColor( const QColor & c );
-
-	QColor const & graphColor() const;
-	void setGraphColor( const QColor & c );
-
-	QColor const & resetColor() const;
-	void setResetColor( const QColor & c );
+	Q_PROPERTY(QColor inVolAreaColor MEMBER m_inVolAreaColor)
+	Q_PROPERTY(QColor inVolColor MEMBER m_inVolColor)
+	Q_PROPERTY(QColor outVolAreaColor MEMBER m_outVolAreaColor)
+	Q_PROPERTY(QColor outVolColor MEMBER m_outVolColor)
+	Q_PROPERTY(QColor gainReductionColor MEMBER m_gainReductionColor)
+	Q_PROPERTY(QColor kneeColor MEMBER m_kneeColor)
+	Q_PROPERTY(QColor kneeColor2 MEMBER m_kneeColor2)
+	Q_PROPERTY(QColor threshColor MEMBER m_threshColor)
+	Q_PROPERTY(QColor textColor MEMBER m_textColor)
+	Q_PROPERTY(QColor graphColor MEMBER m_graphColor)
+	Q_PROPERTY(QColor resetColor MEMBER m_resetColor)
 
 protected:
 	void resizeEvent(QResizeEvent *event) override;

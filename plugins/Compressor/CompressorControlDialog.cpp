@@ -40,7 +40,18 @@
 
 CompressorControlDialog::CompressorControlDialog(CompressorControls* controls) :
 	EffectControlDialog(controls),
-	m_controls(controls)
+	m_controls(controls),
+	m_inVolAreaColor(209, 216, 228, 17),
+	m_inVolColor(209, 216, 228, 100),
+	m_outVolAreaColor(209, 216, 228, 30),
+	m_outVolColor(209, 216, 228, 240),
+	m_gainReductionColor(180, 100, 100, 210),
+	m_kneeColor(39, 171, 95, 255),
+	m_kneeColor2(9, 171, 160, 255),
+	m_threshColor(39, 171, 95, 100),
+	m_textColor(209, 216, 228, 50),
+	m_graphColor(209, 216, 228, 50),
+	m_resetColor(200, 100, 15, 200)
 {
 	setAutoFillBackground(true);
 	QPalette pal;
@@ -745,28 +756,3 @@ void CompressorControlDialog::resetCompressorView()
 	m_autoReleaseKnob->move(m_controlsBoxX + 590, m_controlsBoxY + 38);
 	lookaheadButton->move(m_controlsBoxX + 202, m_controlsBoxY + 171);
 }
-
-// For theming purposes
-QColor const & CompressorControlDialog::inVolAreaColor() const {return m_inVolAreaColor;}
-QColor const & CompressorControlDialog::inVolColor() const {return m_inVolColor;}
-QColor const & CompressorControlDialog::outVolAreaColor() const {return m_outVolAreaColor;}
-QColor const & CompressorControlDialog::outVolColor() const {return m_outVolColor;}
-QColor const & CompressorControlDialog::gainReductionColor() const {return m_gainReductionColor;}
-QColor const & CompressorControlDialog::kneeColor() const {return m_kneeColor;}
-QColor const & CompressorControlDialog::kneeColor2() const {return m_kneeColor2;}
-QColor const & CompressorControlDialog::threshColor() const {return m_threshColor;}
-QColor const & CompressorControlDialog::textColor() const {return m_textColor;}
-QColor const & CompressorControlDialog::graphColor() const {return m_graphColor;}
-QColor const & CompressorControlDialog::resetColor() const {return m_resetColor;}
-
-void CompressorControlDialog::setInVolAreaColor(const QColor & c){m_inVolAreaColor = c;}
-void CompressorControlDialog::setInVolColor(const QColor & c){m_inVolColor = c;}
-void CompressorControlDialog::setOutVolAreaColor(const QColor & c){m_outVolAreaColor = c;}
-void CompressorControlDialog::setOutVolColor(const QColor & c){m_outVolColor = c;}
-void CompressorControlDialog::setGainReductionColor(const QColor & c){m_gainReductionColor = c;}
-void CompressorControlDialog::setKneeColor(const QColor & c){m_kneeColor = c;}
-void CompressorControlDialog::setKneeColor2(const QColor & c){m_kneeColor2 = c;}
-void CompressorControlDialog::setThreshColor(const QColor & c){m_threshColor = c;}
-void CompressorControlDialog::setTextColor(const QColor & c){m_textColor = c;}
-void CompressorControlDialog::setGraphColor(const QColor & c){m_graphColor = c;}
-void CompressorControlDialog::setResetColor(const QColor & c){m_resetColor = c;}
