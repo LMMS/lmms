@@ -25,16 +25,18 @@
 #ifndef COMPRESSOR_CONTROL_DIALOG_H
 #define COMPRESSOR_CONTROL_DIALOG_H
 
-#include "EffectControlDialog.h"
-#include <QLabel>
-#include <QBasicTimer>
-#include "Knob.h"
 #include "../Eq/EqFader.h"
-#include "MainWindow.h"
+#include "EffectControlDialog.h"
 #include "GuiApplication.h"
+#include "Knob.h"
+#include "MainWindow.h"
 #include "PixmapButton.h"
+#include <QBasicTimer>
+#include <QLabel>
 #include <QMouseEvent>
+#include <QPainter>
 #include <QTime>
+
 
 
 constexpr int COMP_MILLI_PER_PIXEL = 6;
@@ -129,7 +131,13 @@ private:
 	void makeLargeKnob(Knob * knob, QString hint, QString unit);
 	void makeSmallKnob(Knob * knob, QString hint, QString unit);
 	void resetCompressorView();
-	void resetGraph();
+	void drawVisPixmap();
+	void redrawKnee();
+	void drawKneePixmap2();
+	void drawMiscPixmap();
+	void drawGraph();
+
+	QPainter m_p;
 
 	QBasicTimer m_updateTimer;
 
@@ -168,6 +176,17 @@ private:
 	QColor m_textColor = QColor(209, 216, 228, 50);
 	QColor m_graphColor = QColor(209, 216, 228, 50);
 	QColor m_resetColor = QColor(200, 100, 15, 200);
+
+	float m_peakAvg;
+	float m_gainAvg;
+
+	float m_yPoint;
+	float m_yGainPoint;
+
+	int m_threshYPoint;
+	int m_threshXPoint;
+
+	int m_compPixelMovement;
 
 	QLabel * m_controlsBoxLabel;
 	QLabel * m_rmsEnabledLabel;

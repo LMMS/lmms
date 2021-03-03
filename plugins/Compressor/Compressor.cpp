@@ -25,9 +25,9 @@
 #include "Compressor.h"
 
 #include "embed.h"
+#include "interpolation.h"
 #include "lmms_math.h"
 #include "plugin_export.h"
-#include "interpolation.h"
 
 extern "C"
 {
@@ -436,22 +436,26 @@ bool CompressorEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 
 		switch (stereoLink)
 		{
-			case 1:// Maximum
+			case Unlinked:
+			{
+				break;
+			}
+			case Maximum:
 			{
 				gainResult[0] = gainResult[1] = qMin(gainResult[0], gainResult[1]);
 				break;
 			}
-			case 2:// Average
+			case Average:
 			{
 				gainResult[0] = gainResult[1] = (gainResult[0] + gainResult[1]) * 0.5f;
 				break;
 			}
-			case 3:// Minimum
+			case Minimum:
 			{
 				gainResult[0] = gainResult[1] = qMax(gainResult[0], gainResult[1]);
 				break;
 			}
-			case 4:// Blend
+			case Blend:
 			{
 				if (blend > 0)// 0 is unlinked
 				{

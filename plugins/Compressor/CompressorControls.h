@@ -25,8 +25,9 @@
 #ifndef COMPRESSOR_CONTROLS_H
 #define COMPRESSOR_CONTROLS_H
 
-#include "EffectControls.h"
 #include "CompressorControlDialog.h"
+
+#include "EffectControls.h"
 #include "Knob.h"
 
 

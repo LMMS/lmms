@@ -26,8 +26,9 @@
 #ifndef COMPRESSOR_H
 #define COMPRESSOR_H
 
-#include "Effect.h"
 #include "CompressorControls.h"
+
+#include "Effect.h"
 #include "ValueBuffer.h"
 #include "RmsHelper.h"
 
@@ -75,6 +76,8 @@ private:
 	inline void calcTiltFilter(sample_t inputSample, sample_t &outputSample, int filtNum);
 	inline int realmod(int k, int n);
 	inline float realfmod(float k, float n);
+
+	enum StereoLinkModes { Unlinked, Maximum, Average, Minimum, Blend };
 
 	std::vector<float> m_preLookaheadBuf[2];
 	int m_preLookaheadBufLoc[2] = {0};

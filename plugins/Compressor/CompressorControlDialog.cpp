@@ -27,15 +27,16 @@
 #include "Compressor.h"
 #include "CompressorControlDialog.h"
 #include "CompressorControls.h"
+
 #include "embed.h"
-#include <QLabel>
 #include "GuiApplication.h"
-#include "MainWindow.h"
+#include "gui_templates.h"
 #include "interpolation.h"
+#include "MainWindow.h"
 #include <QGraphicsOpacityEffect>
+#include <QLabel>
 #include <QPainter>
 #include "ToolTip.h"
-#include "gui_templates.h"
 
 CompressorControlDialog::CompressorControlDialog(CompressorControls* controls) :
 	EffectControlDialog(controls),
@@ -167,9 +168,6 @@ CompressorControlDialog::CompressorControlDialog(CompressorControls* controls) :
 	makeSmallKnob(m_autoReleaseKnob, tr("Auto Release:") , "%");
 	m_autoReleaseKnob->setModel(&controls->m_autoReleaseModel);
 	ToolTip::add(m_autoReleaseKnob, tr("Automatically control release value depending on crest factor"));
-
-
-
 
 	m_outFader = new EqFader(&controls->m_outGainModel,tr("Output gain"),
 		this, &controls->m_outPeakL, &controls->m_outPeakR);
@@ -365,11 +363,11 @@ void CompressorControlDialog::updateDisplay()
 	int elapsedMil = m_timeElapsed.elapsed();
 	m_timeElapsed.restart();
 	m_timeSinceLastUpdate += elapsedMil;
-	int compPixelMovement = int(m_timeSinceLastUpdate / COMP_MILLI_PER_PIXEL);
+	m_compPixelMovement = int(m_timeSinceLastUpdate / COMP_MILLI_PER_PIXEL);
 	m_timeSinceLastUpdate %= COMP_MILLI_PER_PIXEL;
 
 	// Time Change / Daylight Savings Time protection
-	if (!compPixelMovement || compPixelMovement <= 0)
+	if (!m_compPixelMovement || m_compPixelMovement <= 0)
 	{
 		return;
 	}
@@ -382,178 +380,200 @@ void CompressorControlDialog::updateDisplay()
 		m_controls->m_effect->m_displayGain[1] = 1;
 	}
 
-	const float peakAvg = (m_controls->m_effect->m_displayPeak[0] + m_controls->m_effect->m_displayPeak[1]) * 0.5f;
-	const float gainAvg = (m_controls->m_effect->m_displayGain[0] + m_controls->m_effect->m_displayGain[1]) * 0.5f;
+	m_peakAvg = (m_controls->m_effect->m_displayPeak[0] + m_controls->m_effect->m_displayPeak[1]) * 0.5f;
+	m_gainAvg = (m_controls->m_effect->m_displayGain[0] + m_controls->m_effect->m_displayGain[1]) * 0.5f;
 
-	QPainter p;
-	float yPoint = dbfsToYPoint(ampToDbfs(peakAvg));
-	float yGainPoint = dbfsToYPoint(ampToDbfs(gainAvg));
+	m_yPoint = dbfsToYPoint(ampToDbfs(m_peakAvg));
+	m_yGainPoint = dbfsToYPoint(ampToDbfs(m_gainAvg));
 
-	int threshYPoint = dbfsToYPoint(m_controls->m_effect->m_thresholdVal);
-	int threshXPoint = m_kneeWindowSizeY - threshYPoint;
+	m_threshYPoint = dbfsToYPoint(m_controls->m_effect->m_thresholdVal);
+	m_threshXPoint = m_kneeWindowSizeY - m_threshYPoint;
 
-	p.begin(&m_visPixmap);
-
-	// Move entire display to the left
-	p.setCompositionMode(QPainter::CompositionMode_Source);
-	p.drawPixmap(-compPixelMovement, 0, m_visPixmap);
-	p.fillRect(m_windowSizeX-compPixelMovement, 0, m_windowSizeX, m_windowSizeY, QColor("transparent"));
-	p.setCompositionMode(QPainter::CompositionMode_SourceOver);
-
-	p.setRenderHint(QPainter::Antialiasing, true);
-
-	// Draw translucent portion of input volume line
-	p.setPen(QPen(m_inVolAreaColor, 1));
-	for (int i = 0; i < compPixelMovement; ++i)
-	{
-		const int temp = linearInterpolate(m_lastPoint, yPoint, float(i) / float(compPixelMovement));
-		p.drawLine(m_windowSizeX-compPixelMovement+i, temp, m_windowSizeX-compPixelMovement+i, m_windowSizeY);
-	}
-
-	// Draw input volume line
-	p.setPen(QPen(m_inVolColor, 1));
-	p.drawLine(m_windowSizeX-compPixelMovement-1, m_lastPoint, m_windowSizeX, yPoint);
-
-	// Draw translucent portion of output volume line
-	p.setPen(QPen(m_outVolAreaColor, 1));
-	for (int i = 0; i < compPixelMovement; ++i)
-	{
-		const int temp = linearInterpolate(m_lastPoint+m_lastGainPoint, yPoint+yGainPoint, float(i) / float(compPixelMovement));
-		p.drawLine(m_windowSizeX-compPixelMovement+i, temp, m_windowSizeX-compPixelMovement+i, m_windowSizeY);
-	}
-
-	// Draw output volume line
-	p.setPen(QPen(m_outVolColor, 1));
-	p.drawLine(m_windowSizeX-compPixelMovement-1, m_lastPoint+m_lastGainPoint, m_windowSizeX, yPoint+yGainPoint);
-
-	// Draw gain reduction line
-	p.setPen(QPen(m_gainReductionColor, 2));
-	p.drawLine(m_windowSizeX-compPixelMovement-1, m_lastGainPoint, m_windowSizeX, yGainPoint);
-
-	p.end();
+	drawVisPixmap();
 
 	if (m_controls->m_effect->m_redrawKnee)
 	{
-		m_controls->m_effect->m_redrawKnee = false;
-
-		// Start drawing knee visualizer
-		p.begin(&m_kneePixmap);
-
-		p.setRenderHint(QPainter::Antialiasing, false);
-
-		// Clear display
-		p.setCompositionMode(QPainter::CompositionMode_Source);
-		p.fillRect(0, 0, m_windowSizeX, m_kneeWindowSizeY, QColor("transparent"));
-		p.setCompositionMode(QPainter::CompositionMode_SourceOver);
-
-		p.setRenderHint(QPainter::Antialiasing, true);
-
-		p.setPen(QPen(m_kneeColor, 3));
-
-		// Limiter = infinite ratio
-		float actualRatio = m_controls->m_limiterModel.value() ? 0 : m_controls->m_effect->m_ratioVal;
-
-		// Calculate endpoints for the two straight lines
-		float kneePoint1 = m_controls->m_effect->m_thresholdVal - m_controls->m_effect->m_kneeVal;
-		float kneePoint2X = m_controls->m_effect->m_thresholdVal + m_controls->m_effect->m_kneeVal;
-		float kneePoint2Y = (m_controls->m_effect->m_thresholdVal + (-m_controls->m_effect->m_thresholdVal * (actualRatio * (m_controls->m_effect->m_kneeVal / -m_controls->m_effect->m_thresholdVal))));
-		float ratioPoint = m_controls->m_effect->m_thresholdVal + (-m_controls->m_effect->m_thresholdVal * actualRatio);
-
-		// Draw two straight lines
-		p.drawLine(0, m_kneeWindowSizeY, dbfsToXPoint(kneePoint1), dbfsToYPoint(kneePoint1));
-		if (dbfsToXPoint(kneePoint2X) < m_kneeWindowSizeY)
-		{
-			p.drawLine(dbfsToXPoint(kneePoint2X), dbfsToYPoint(kneePoint2Y), m_kneeWindowSizeY, dbfsToYPoint(ratioPoint));
-		}
-
-		// Draw knee section
-		if (m_controls->m_effect->m_kneeVal)
-		{
-			p.setPen(QPen(m_kneeColor2, 3));
-
-			float prevPoint[2] = {kneePoint1, kneePoint1};
-			float newPoint[2] = {0, 0};
-
-			// Draw knee curve using many straight lines.
-			for (int i = 0; i < COMP_KNEE_LINES; ++i)
-			{
-				newPoint[0] = linearInterpolate(kneePoint1, kneePoint2X, (i + 1) / (float)COMP_KNEE_LINES);
-
-				const float temp = newPoint[0] - m_controls->m_effect->m_thresholdVal + m_controls->m_effect->m_kneeVal;
-				newPoint[1] = (newPoint[0] + (actualRatio - 1) * temp * temp / (4 * m_controls->m_effect->m_kneeVal));
-
-				p.drawLine(dbfsToXPoint(prevPoint[0]), dbfsToYPoint(prevPoint[1]), dbfsToXPoint(newPoint[0]), dbfsToYPoint(newPoint[1]));
-
-				prevPoint[0] = newPoint[0];
-				prevPoint[1] = newPoint[1];
-			}
-		}
-
-		p.setRenderHint(QPainter::Antialiasing, false);
-
-		// Erase right portion
-		p.setCompositionMode(QPainter::CompositionMode_Source);
-		p.fillRect(m_kneeWindowSizeX + 1, 0, m_windowSizeX, m_kneeWindowSizeY, QColor("transparent"));
-		p.setCompositionMode(QPainter::CompositionMode_SourceOver);
-
-		p.end();
-
-		p.begin(&m_kneePixmap2);
-		
-		p.setCompositionMode(QPainter::CompositionMode_Source);
-		p.fillRect(0, 0, m_windowSizeX, m_kneeWindowSizeY, QColor("transparent"));
-		p.setCompositionMode(QPainter::CompositionMode_SourceOver);
-
-		p.end();
-
-		m_lastKneePoint = 0;
+		redrawKnee();
 	}
 
-	// Start drawing second knee layer
-	p.begin(&m_kneePixmap2);
-
-	p.setRenderHint(QPainter::Antialiasing, false);
-
-	int kneePoint = dbfsToXPoint(ampToDbfs(peakAvg));
-	if (kneePoint > m_lastKneePoint)
-	{
-		QRectF knee2Rect = QRect(m_lastKneePoint, 0, kneePoint - m_lastKneePoint, m_kneeWindowSizeY);
-		p.drawPixmap(knee2Rect, m_kneePixmap, knee2Rect);
-	}
-	else
-	{
-		p.setCompositionMode(QPainter::CompositionMode_Source);
-		p.fillRect(kneePoint, 0, m_lastKneePoint, m_kneeWindowSizeY, QColor("transparent"));
-		p.setCompositionMode(QPainter::CompositionMode_SourceOver);
-	}
-	m_lastKneePoint = kneePoint;
-
-	p.end();
+	drawKneePixmap2();
 
 	if (m_controls->m_effect->m_redrawThreshold)
 	{
-		p.begin(&m_miscPixmap);
-
-		p.setCompositionMode(QPainter::CompositionMode_Source);
-		p.fillRect(0, 0, m_windowSizeX, m_windowSizeY, QColor("transparent"));
-		p.setCompositionMode(QPainter::CompositionMode_SourceOver);
-
-		p.setRenderHint(QPainter::Antialiasing, true);
-
-		// Draw threshold lines
-		p.setPen(QPen(m_threshColor, 2, Qt::DotLine));
-		p.drawLine(0, threshYPoint, m_windowSizeX, threshYPoint);
-		p.drawLine(threshXPoint, 0, threshXPoint, m_kneeWindowSizeY);
-
-		p.end();
-
-		m_controls->m_effect->m_redrawThreshold = false;
+		drawMiscPixmap();
 	}
 
-	m_lastPoint = yPoint;
-	m_lastGainPoint = yGainPoint;
+	m_lastPoint = m_yPoint;
+	m_lastGainPoint = m_yGainPoint;
 
 	update();
+}
+
+
+void CompressorControlDialog::drawVisPixmap()
+{
+	m_p.begin(&m_visPixmap);
+
+	// Move entire display to the left
+	m_p.setCompositionMode(QPainter::CompositionMode_Source);
+	m_p.drawPixmap(-m_compPixelMovement, 0, m_visPixmap);
+	m_p.fillRect(m_windowSizeX-m_compPixelMovement, 0, m_windowSizeX, m_windowSizeY, QColor("transparent"));
+	m_p.setCompositionMode(QPainter::CompositionMode_SourceOver);
+
+	m_p.setRenderHint(QPainter::Antialiasing, true);
+
+	// Draw translucent portion of input volume line
+	m_p.setPen(QPen(m_inVolAreaColor, 1));
+	for (int i = 0; i < m_compPixelMovement; ++i)
+	{
+		const int temp = linearInterpolate(m_lastPoint, m_yPoint, float(i) / float(m_compPixelMovement));
+		m_p.drawLine(m_windowSizeX-m_compPixelMovement+i, temp, m_windowSizeX-m_compPixelMovement+i, m_windowSizeY);
+	}
+
+	// Draw input volume line
+	m_p.setPen(QPen(m_inVolColor, 1));
+	m_p.drawLine(m_windowSizeX-m_compPixelMovement-1, m_lastPoint, m_windowSizeX, m_yPoint);
+
+	// Draw translucent portion of output volume line
+	m_p.setPen(QPen(m_outVolAreaColor, 1));
+	for (int i = 0; i < m_compPixelMovement; ++i)
+	{
+		const int temp = linearInterpolate(m_lastPoint+m_lastGainPoint, m_yPoint+m_yGainPoint, float(i) / float(m_compPixelMovement));
+		m_p.drawLine(m_windowSizeX-m_compPixelMovement+i, temp, m_windowSizeX-m_compPixelMovement+i, m_windowSizeY);
+	}
+
+	// Draw output volume line
+	m_p.setPen(QPen(m_outVolColor, 1));
+	m_p.drawLine(m_windowSizeX-m_compPixelMovement-1, m_lastPoint+m_lastGainPoint, m_windowSizeX, m_yPoint+m_yGainPoint);
+
+	// Draw gain reduction line
+	m_p.setPen(QPen(m_gainReductionColor, 2));
+	m_p.drawLine(m_windowSizeX-m_compPixelMovement-1, m_lastGainPoint, m_windowSizeX, m_yGainPoint);
+
+	m_p.end();
+}
+
+
+void CompressorControlDialog::redrawKnee()
+{
+	m_controls->m_effect->m_redrawKnee = false;
+
+	// Start drawing knee visualizer
+	m_p.begin(&m_kneePixmap);
+
+	m_p.setRenderHint(QPainter::Antialiasing, false);
+
+	// Clear display
+	m_p.setCompositionMode(QPainter::CompositionMode_Source);
+	m_p.fillRect(0, 0, m_windowSizeX, m_kneeWindowSizeY, QColor("transparent"));
+	m_p.setCompositionMode(QPainter::CompositionMode_SourceOver);
+
+	m_p.setRenderHint(QPainter::Antialiasing, true);
+
+	m_p.setPen(QPen(m_kneeColor, 3));
+
+	// Limiter = infinite ratio
+	float actualRatio = m_controls->m_limiterModel.value() ? 0 : m_controls->m_effect->m_ratioVal;
+
+	// Calculate endpoints for the two straight lines
+	float kneePoint1 = m_controls->m_effect->m_thresholdVal - m_controls->m_effect->m_kneeVal;
+	float kneePoint2X = m_controls->m_effect->m_thresholdVal + m_controls->m_effect->m_kneeVal;
+	float kneePoint2Y = (m_controls->m_effect->m_thresholdVal + (-m_controls->m_effect->m_thresholdVal * (actualRatio * (m_controls->m_effect->m_kneeVal / -m_controls->m_effect->m_thresholdVal))));
+	float ratioPoint = m_controls->m_effect->m_thresholdVal + (-m_controls->m_effect->m_thresholdVal * actualRatio);
+
+	// Draw two straight lines
+	m_p.drawLine(0, m_kneeWindowSizeY, dbfsToXPoint(kneePoint1), dbfsToYPoint(kneePoint1));
+	if (dbfsToXPoint(kneePoint2X) < m_kneeWindowSizeY)
+	{
+		m_p.drawLine(dbfsToXPoint(kneePoint2X), dbfsToYPoint(kneePoint2Y), m_kneeWindowSizeY, dbfsToYPoint(ratioPoint));
+	}
+
+	// Draw knee section
+	if (m_controls->m_effect->m_kneeVal)
+	{
+		m_p.setPen(QPen(m_kneeColor2, 3));
+
+		float prevPoint[2] = {kneePoint1, kneePoint1};
+		float newPoint[2] = {0, 0};
+
+		// Draw knee curve using many straight lines.
+		for (int i = 0; i < COMP_KNEE_LINES; ++i)
+		{
+			newPoint[0] = linearInterpolate(kneePoint1, kneePoint2X, (i + 1) / (float)COMP_KNEE_LINES);
+
+			const float temp = newPoint[0] - m_controls->m_effect->m_thresholdVal + m_controls->m_effect->m_kneeVal;
+			newPoint[1] = (newPoint[0] + (actualRatio - 1) * temp * temp / (4 * m_controls->m_effect->m_kneeVal));
+
+			m_p.drawLine(dbfsToXPoint(prevPoint[0]), dbfsToYPoint(prevPoint[1]), dbfsToXPoint(newPoint[0]), dbfsToYPoint(newPoint[1]));
+
+			prevPoint[0] = newPoint[0];
+			prevPoint[1] = newPoint[1];
+		}
+	}
+
+	m_p.setRenderHint(QPainter::Antialiasing, false);
+
+	// Erase right portion
+	m_p.setCompositionMode(QPainter::CompositionMode_Source);
+	m_p.fillRect(m_kneeWindowSizeX + 1, 0, m_windowSizeX, m_kneeWindowSizeY, QColor("transparent"));
+	m_p.setCompositionMode(QPainter::CompositionMode_SourceOver);
+
+	m_p.end();
+
+	m_p.begin(&m_kneePixmap2);
+	
+	m_p.setCompositionMode(QPainter::CompositionMode_Source);
+	m_p.fillRect(0, 0, m_windowSizeX, m_kneeWindowSizeY, QColor("transparent"));
+	m_p.setCompositionMode(QPainter::CompositionMode_SourceOver);
+
+	m_p.end();
+
+	m_lastKneePoint = 0;
+}
+
+
+void CompressorControlDialog::drawKneePixmap2()
+{
+	m_p.begin(&m_kneePixmap2);
+
+	m_p.setRenderHint(QPainter::Antialiasing, false);
+
+	int kneePoint = dbfsToXPoint(ampToDbfs(m_peakAvg));
+	if (kneePoint > m_lastKneePoint)
+	{
+		QRectF knee2Rect = QRect(m_lastKneePoint, 0, kneePoint - m_lastKneePoint, m_kneeWindowSizeY);
+		m_p.drawPixmap(knee2Rect, m_kneePixmap, knee2Rect);
+	}
+	else
+	{
+		m_p.setCompositionMode(QPainter::CompositionMode_Source);
+		m_p.fillRect(kneePoint, 0, m_lastKneePoint, m_kneeWindowSizeY, QColor("transparent"));
+		m_p.setCompositionMode(QPainter::CompositionMode_SourceOver);
+	}
+	m_lastKneePoint = kneePoint;
+
+	m_p.end();
+}
+
+
+void CompressorControlDialog::drawMiscPixmap()
+{
+	m_p.begin(&m_miscPixmap);
+
+	m_p.setCompositionMode(QPainter::CompositionMode_Source);
+	m_p.fillRect(0, 0, m_windowSizeX, m_windowSizeY, QColor("transparent"));
+	m_p.setCompositionMode(QPainter::CompositionMode_SourceOver);
+
+	m_p.setRenderHint(QPainter::Antialiasing, true);
+
+	// Draw threshold lines
+	m_p.setPen(QPen(m_threshColor, 2, Qt::DotLine));
+	m_p.drawLine(0, m_threshYPoint, m_windowSizeX, m_threshYPoint);
+	m_p.drawLine(m_threshXPoint, 0, m_threshXPoint, m_kneeWindowSizeY);
+
+	m_p.end();
+
+	m_controls->m_effect->m_redrawThreshold = false;
 }
 
 
@@ -565,24 +585,24 @@ void CompressorControlDialog::paintEvent(QPaintEvent *event)
 		return;
 	}
 
-	QPainter p(this);
+	m_p.begin(this);
 
-	p.setCompositionMode(QPainter::CompositionMode_Source);
-	p.fillRect(0, 0, m_windowSizeX, m_windowSizeY, QColor("transparent"));
-	p.setCompositionMode(QPainter::CompositionMode_SourceOver);
+	m_p.setCompositionMode(QPainter::CompositionMode_Source);
+	m_p.fillRect(0, 0, m_windowSizeX, m_windowSizeY, QColor("transparent"));
+	m_p.setCompositionMode(QPainter::CompositionMode_SourceOver);
 
-	p.drawPixmap(0, 0, m_graphPixmap);
-	p.drawPixmap(0, 0, m_visPixmap);
-	p.setOpacity(0.25);
-	p.drawPixmap(0, 0, m_kneePixmap);
-	p.setOpacity(1);
+	m_p.drawPixmap(0, 0, m_graphPixmap);
+	m_p.drawPixmap(0, 0, m_visPixmap);
+	m_p.setOpacity(0.25);
+	m_p.drawPixmap(0, 0, m_kneePixmap);
+	m_p.setOpacity(1);
 	if (m_controls->m_effect->isEnabled() && m_controls->m_effect->isRunning())
 	{
-		p.drawPixmap(0, 0, m_kneePixmap2);
+		m_p.drawPixmap(0, 0, m_kneePixmap2);
 	}
-	p.drawPixmap(0, 0, m_miscPixmap);
+	m_p.drawPixmap(0, 0, m_miscPixmap);
 
-	p.end();
+	m_p.end();
 }
 
 
@@ -606,47 +626,44 @@ void CompressorControlDialog::resizeEvent(QResizeEvent *event)
 void CompressorControlDialog::wheelEvent(QWheelEvent * event)
 {
 	const float temp = m_dbRange;
-	m_dbRange = round(
-		qBound(COMP_GRID_SPACING, m_dbRange - copysignf(COMP_GRID_SPACING, event->delta()), COMP_GRID_MAX)
-		/ COMP_GRID_SPACING) * COMP_GRID_SPACING;
+	const float dbRangeNew = m_dbRange - copysignf(COMP_GRID_SPACING, event->delta());
+	m_dbRange = round(qBound(COMP_GRID_SPACING, dbRangeNew, COMP_GRID_MAX) / COMP_GRID_SPACING) * COMP_GRID_SPACING;
 
 	// Only reset view if the scolling had an effect
 	if (m_dbRange != temp)
 	{
-		resetGraph();
+		drawGraph();
 		m_controls->m_effect->m_redrawKnee = true;
 		m_controls->m_effect->m_redrawThreshold = true;
 	}
 }
 
 
-void CompressorControlDialog::resetGraph()
+void CompressorControlDialog::drawGraph()
 {
-	QPainter p;
+	m_p.begin(&m_graphPixmap);
 
-	p.begin(&m_graphPixmap);
+	m_p.setRenderHint(QPainter::Antialiasing, false);
 
-	p.setRenderHint(QPainter::Antialiasing, false);
+	m_p.setCompositionMode(QPainter::CompositionMode_Source);
+	m_p.fillRect(0, 0, m_windowSizeX, m_windowSizeY, QColor("transparent"));
+	m_p.setCompositionMode(QPainter::CompositionMode_SourceOver);
 
-	p.setCompositionMode(QPainter::CompositionMode_Source);
-	p.fillRect(0, 0, m_windowSizeX, m_windowSizeY, QColor("transparent"));
-	p.setCompositionMode(QPainter::CompositionMode_SourceOver);
-
-	p.setPen(QPen(m_textColor, 1));
+	m_p.setPen(QPen(m_textColor, 1));
 
 	// Arbitrary formula for increasing font size when window size increases
-	p.setFont(QFont("Arial", qMax(int(m_windowSizeY / 1080.f * 24), 12)));
+	m_p.setFont(QFont("Arial", qMax(int(m_windowSizeY / 1080.f * 24), 12)));
 
 	// Redraw graph
-	p.setPen(QPen(m_graphColor, 1));
+	m_p.setPen(QPen(m_graphColor, 1));
 	for (int i = 1; i < m_dbRange / COMP_GRID_SPACING + 1; ++i)
 	{
-		p.drawLine(0, dbfsToYPoint(-COMP_GRID_SPACING * i), m_windowSizeX, dbfsToYPoint(-COMP_GRID_SPACING * i));
-		p.drawLine(dbfsToXPoint(-COMP_GRID_SPACING * i), 0, dbfsToXPoint(-COMP_GRID_SPACING * i), m_kneeWindowSizeY);
-		p.drawText(QRectF(m_windowSizeX - 50, dbfsToYPoint(-COMP_GRID_SPACING * i), 50, 50), Qt::AlignRight | Qt::AlignTop, QString::number(i * -COMP_GRID_SPACING));
+		m_p.drawLine(0, dbfsToYPoint(-COMP_GRID_SPACING * i), m_windowSizeX, dbfsToYPoint(-COMP_GRID_SPACING * i));
+		m_p.drawLine(dbfsToXPoint(-COMP_GRID_SPACING * i), 0, dbfsToXPoint(-COMP_GRID_SPACING * i), m_kneeWindowSizeY);
+		m_p.drawText(QRectF(m_windowSizeX - 50, dbfsToYPoint(-COMP_GRID_SPACING * i), 50, 50), Qt::AlignRight | Qt::AlignTop, QString::number(i * -COMP_GRID_SPACING));
 	}
 
-	p.end();
+	m_p.end();
 }
 
 
@@ -663,23 +680,21 @@ void CompressorControlDialog::resetCompressorView()
 	m_controls->m_effect->m_redrawThreshold = true;
 	m_lastKneePoint = 0;
 
-	QPainter p;
+	drawGraph();
 
-	resetGraph();
+	m_p.begin(&m_visPixmap);
 
-	p.begin(&m_visPixmap);
-
-	p.setCompositionMode(QPainter::CompositionMode_Source);
-	p.fillRect(0, 0, m_windowSizeX, m_windowSizeY, QColor("transparent"));
-	p.setCompositionMode(QPainter::CompositionMode_SourceOver);
+	m_p.setCompositionMode(QPainter::CompositionMode_Source);
+	m_p.fillRect(0, 0, m_windowSizeX, m_windowSizeY, QColor("transparent"));
+	m_p.setCompositionMode(QPainter::CompositionMode_SourceOver);
 
 	// Draw line at right side, so the sudden
 	// content that the visualizer will display
 	// later on won't look too ugly
-	p.setPen(QPen(m_resetColor, 3));
-	p.drawLine(m_windowSizeX, 0, m_windowSizeX, m_windowSizeY);
+	m_p.setPen(QPen(m_resetColor, 3));
+	m_p.drawLine(m_windowSizeX, 0, m_windowSizeX, m_windowSizeY);
 
-	p.end();
+	m_p.end();
 
 	m_controlsBoxLabel->move(m_controlsBoxX, m_controlsBoxY);
 	m_rmsEnabledLabel->move(m_controlsBoxX + 429, m_controlsBoxY + 209);
