@@ -1074,6 +1074,7 @@ void SampleBuffer::visualize(
 	p.drawPolyline(fRms, nbFrames * 2 / fpp);
 
 	delete[] fMax;
+	delete[] fRms;
 }
 
 
