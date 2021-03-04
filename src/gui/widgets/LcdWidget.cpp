@@ -193,6 +193,8 @@ void LcdWidget::paintEvent( QPaintEvent* )
 	p.restore();
 
 	// Border
+	// When either the left or right edge is seamless, the border drawing must be done
+	// by the encapsulating class (usually LcdFloatSpinBox).
 	if (!m_seamlessLeft && !m_seamlessRight)
 	{
 		QStyleOptionFrame opt;
