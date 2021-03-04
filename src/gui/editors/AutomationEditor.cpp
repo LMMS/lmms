@@ -627,6 +627,8 @@ void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 			{
 				if (m_pattern->progressionType() == AutomationPattern::CubicHermiteProgression)
 				{
+					m_pattern->addJournalCheckPoint();
+
 					// Gets the closest node to the mouse click
 					timeMap::iterator node = getClosestNode(mouseEvent->x());
 
