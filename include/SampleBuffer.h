@@ -109,6 +109,10 @@ public:
 	SampleBuffer(const QString & audioFile, bool isBase64Data = false);
 	SampleBuffer(const sampleFrame * data, const f_cnt_t frames);
 	explicit SampleBuffer(const f_cnt_t frames);
+	SampleBuffer(const SampleBuffer & orig);
+
+	friend void swap(SampleBuffer & first, SampleBuffer & second) noexcept;
+	SampleBuffer& operator= (const SampleBuffer that);
 
 	virtual ~SampleBuffer();
 
@@ -311,7 +315,7 @@ private:
 	sampleFrame * m_origData;
 	f_cnt_t m_origFrames;
 	sampleFrame * m_data;
-	QReadWriteLock m_varLock;
+	mutable QReadWriteLock m_varLock;
 	f_cnt_t m_frames;
 	f_cnt_t m_startFrame;
 	f_cnt_t m_endFrame;
