@@ -211,6 +211,8 @@ protected slots:
 
 	void clearGhostPattern();
 	void glueNotes();
+	void fitNoteLengths(bool fill);
+	void constrainNoteLengths(bool constrainMax);
 
 
 signals:
