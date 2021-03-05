@@ -214,6 +214,8 @@ protected slots:
 	void fitNoteLengths(bool fill);
 	void constrainNoteLengths(bool constrainMax);
 
+	void changeSnapMode();
+
 
 signals:
 	void currentPatternChanged();
@@ -256,6 +258,13 @@ private:
 		PR_WHITE_KEY_SMALL,
 		PR_WHITE_KEY_BIG,
 		PR_BLACK_KEY
+	};
+
+	enum GridMode
+	{
+		gridNudge,
+		gridSnap
+	//	gridFree
 	};
 
 	PositionLine * m_positionLine;
@@ -302,7 +311,7 @@ private:
 	int noteEditRight() const;
 	int noteEditLeft() const;
 
-	void dragNotes( int x, int y, bool alt, bool shift, bool ctrl );
+	void dragNotes(int x, int y, bool alt, bool shift, bool ctrl);
 
 	static const int cm_scrollAmtHoriz = 10;
 	static const int cm_scrollAmtVert = 1;
@@ -325,6 +334,7 @@ private:
 	ComboBoxModel m_keyModel;
 	ComboBoxModel m_scaleModel;
 	ComboBoxModel m_chordModel;
+	ComboBoxModel m_snapModel;
 
 	static const QVector<double> m_zoomLevels;
 	static const QVector<double> m_zoomYLevels;
@@ -347,6 +357,7 @@ private:
 	Note * m_currentNote;
 	Actions m_action;
 	NoteEditMode m_noteEditMode;
+	GridMode m_gridMode;
 
 	int m_selectStartTick;
 	int m_selectedTick;
@@ -528,6 +539,7 @@ private:
 	ComboBox * m_keyComboBox;
 	ComboBox * m_scaleComboBox;
 	ComboBox * m_chordComboBox;
+	ComboBox* m_snapComboBox;
 	QPushButton * m_clearGhostButton;
 
 };
