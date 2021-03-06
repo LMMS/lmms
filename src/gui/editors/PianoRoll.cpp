@@ -442,6 +442,7 @@ PianoRoll::PianoRoll() :
 	m_snapModel.addItem(tr("Nudge"));
 	m_snapModel.addItem(tr("Snap"));
 	m_snapModel.setValue(0);
+	changeSnapMode();
 	connect(&m_snapModel, SIGNAL(dataChanged()),
 		this, SLOT(changeSnapMode()));
 
