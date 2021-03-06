@@ -39,6 +39,8 @@
 #include "SpaSubPluginFeatures.h"
 #include "StringPairDrag.h" // DnD TODO: move to SpaViewBase?
 #include "embed.h"
+#include "TimePos.h"
+
 #include "plugin_export.h"
 
 Plugin::Descriptor PLUGIN_EXPORT spainstrument_plugin_descriptor =
@@ -71,11 +73,6 @@ SpaInstrument::SpaInstrument(InstrumentTrack *instrumentTrackArg,
 	SpaControlBase(this, key->attributes["plugin"],
 		DataFile::Type::InstrumentTrackSettings)
 {
-#ifdef SPA_INSTRUMENT_USE_MIDI
-	for (int i = 0; i < NumKeys; ++i) {
-		m_runningNotes[i] = 0;
-	}
-#endif
 	if (isValid())
 	{
 		connect(instrumentTrack()->pitchRangeModel(), SIGNAL(dataChanged()),
@@ -177,53 +174,11 @@ QString SpaInstrument::nodeName() const
 
 #ifdef SPA_INSTRUMENT_USE_MIDI
 bool SpaInstrument::handleMidiEvent(
-	const MidiEvent &event, const MidiTime &time, f_cnt_t offset)
+	const MidiEvent &event, const TimePos &time, f_cnt_t offset)
 {
-	(void)time;
-	(void)offset;
-	switch (event.type())
-	{
-	// the old zynaddsubfx plugin always uses channel 0
-	case MidiNoteOn:
-		if (event.velocity() > 0)
-		{
-			if (event.key() <= 0 || event.key() >= 128)
-			{
-				break;
-			}
-			if (m_runningNotes[event.key()] > 0)
-			{
-//				m_pluginMutex.lock();
-				writeOscToAll("/noteOff", "ii", 0, event.key());
-//				m_pluginMutex.unlock();
-			}
-			++m_runningNotes[event.key()];
-//			m_pluginMutex.lock();
-			writeOscToAll("/noteOn", "iii", 0, event.key(), event.velocity());
-//			m_pluginMutex.unlock();
-		}
-		break;
-	case MidiNoteOff:
-		if (event.key() > 0 && event.key() < 128) {
-			if (--m_runningNotes[event.key()] <= 0)
-			{
-//				m_pluginMutex.lock();
-				writeOscToAll("/noteOff", "ii", 0, event.key());
-//				m_pluginMutex.unlock();
-			}
-		}
-		break;
-		/*              case MidiPitchBend:
-				m_master->SetController( event.channel(),
-		   C_pitchwheel, event.pitchBend()-8192 ); break; case
-		   MidiControlChange: m_master->SetController( event.channel(),
-					midiIn.getcontroller(
-		   event.controllerNumber() ), event.controllerValue() );
-				break;*/
-	default:
-		break;
-	}
-
+	// this function can be called from GUI threads while the plugin is running
+	// handleMidiInputEvent will use a thread-safe ringbuffer
+	handleMidiInputEvent(event, time, offset);
 	return true;
 }
 #endif

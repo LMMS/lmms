@@ -32,6 +32,9 @@
 
 void BoolOscModel::sendOsc()
 {
+	// TODO: this should not write directly to the plugin (the plugin might
+	//       be running!!), but instead write to something similar to
+	//       m_plugReg->m_midiInputReader
 	m_plugRef->writeOsc(m_dest.data(), value() ? "T" : "F");
 }
 void IntOscModel::sendOsc()

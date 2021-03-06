@@ -12,16 +12,24 @@
 
 #include "AutomatableModel.h"
 #include "Engine.h"
+#include "MidiEvent.h"
 #include "Mixer.h"
 #include "SpaOscModel.h"
+#include "TimePos.h"
 
 SpaProc::SpaProc(Model *parent, const spa::descriptor* desc, DataFile::Types settingsType) :
 	LinkedModelGroup(parent),
 	m_spaDescriptor(desc),
 	m_ports(Engine::mixer()->framesPerPeriod()),
 //	writeOscInUse(ATOMIC_FLAG_INIT), // not MSVC-compatible, workaround below
-	m_settingsType(settingsType)
+	m_settingsType(settingsType),
+	m_midiInputBuf(m_maxMidiInputEvents),
+	m_midiInputReader(m_midiInputBuf)
 {
+	for (int i = 0; i < NumKeys; ++i) {
+		m_runningNotes[i] = 0;
+	}
+
 	m_writeOscInUse.clear(); // workaround
 	initPlugin();
 }
@@ -127,6 +135,48 @@ void SpaProc::reloadPlugin()
 	}
 }
 
+// container for everything required to store MIDI events going to the plugin
+struct MidiInputEvent
+{
+	MidiEvent ev;
+	TimePos time;
+	f_cnt_t offset;
+};
+
+// in case there will be a PR which removes this callback and instead adds a
+// `ringbuffer_t<MidiEvent + time info>` to `class Instrument`, this
+// function (and the ringbuffer and its reader in `SpaProc`) will simply vanish
+void SpaProc::handleMidiInputEvent(const MidiEvent &event, const TimePos &time, f_cnt_t offset)
+{
+	if(/*m_midiIn*/true)
+	{
+		// ringbuffer allows only one writer at a time
+		// however, this function can be called by multiple threads
+		// (different RT and non-RT!) at the same time
+		// for now, a spinlock looks like the most safe/easy compromise
+
+		// source: https://en.cppreference.com/w/cpp/atomic/atomic_flag
+		while (m_ringLock.test_and_set(std::memory_order_acquire))  // acquire lock
+			 ; // spin
+
+		MidiInputEvent ev { event, time, offset };
+		std::size_t written = m_midiInputBuf.write(&ev, 1);
+		if(written != 1)
+		{
+			qWarning("MIDI ringbuffer is too small! Discarding MIDI event.");
+		}
+
+		m_ringLock.clear(std::memory_order_release);
+	}
+	else
+	{
+		qWarning() << "Warning: Caught MIDI event for an Lv2 instrument"
+					<< "that can not hande MIDI... Ignoring";
+	}
+}
+
+
+
 
 void SpaProc::copyModelsToPorts()
 {
@@ -145,6 +195,52 @@ void SpaProc::copyModelsToPorts()
 			break;
 		default:
 			assert(false);
+		}
+	}
+
+	while(m_midiInputReader.read_space() > 0)
+	{
+		const MidiInputEvent ev = m_midiInputReader.read(1)[0];
+		const MidiEvent& event = ev.ev;
+		switch (event.type())
+		{
+		// the old zynaddsubfx plugin always uses channel 0
+		case MidiNoteOn:
+			if (event.velocity() > 0)
+			{
+				if (event.key() <= 0 || event.key() >= 128)
+				{
+					break;
+				}
+				if (m_runningNotes[event.key()] > 0)
+				{
+					writeOsc("/noteOff", "ii", 0, event.key());
+				}
+				++m_runningNotes[event.key()];
+	//			m_pluginMutex.lock();
+				writeOsc("/noteOn", "iii", 0, event.key(), event.velocity());
+	//			m_pluginMutex.unlock();
+			}
+			break;
+		case MidiNoteOff:
+			if (event.key() > 0 && event.key() < 128) {
+				if (--m_runningNotes[event.key()] <= 0)
+				{
+	//				m_pluginMutex.lock();
+					writeOsc("/noteOff", "ii", 0, event.key());
+	//				m_pluginMutex.unlock();
+				}
+			}
+			break;
+			/*              case MidiPitchBend:
+					m_master->SetController( event.channel(),
+			   C_pitchwheel, event.pitchBend()-8192 ); break; case
+			   MidiControlChange: m_master->SetController( event.channel(),
+						midiIn.getcontroller(
+			   event.controllerNumber() ), event.controllerValue() );
+					break;*/
+		default:
+			break;
 		}
 	}
 }
@@ -392,6 +488,11 @@ void SpaProc::run(unsigned frames)
 {
 	m_ports.samplecount = static_cast<unsigned>(frames);
 	m_plugin->run();
+	// ringbuffers can already be reset now:
+	if(m_ports.rb)
+	{
+		m_ports.rb->reset();
+	}
 }
 
 unsigned SpaProc::netPort() const { return m_plugin->net_port(); }

@@ -248,5 +248,11 @@ AutomatableModel *SpaControlBase::modelAtPort(const QString &dest)
 	return m_procs[0]->modelAtPort(url.path());
 }
 
+void SpaControlBase::handleMidiInputEvent(const MidiEvent &event,
+	const TimePos &time, f_cnt_t offset)
+{
+	for (auto& c : m_procs) { c->handleMidiInputEvent(event, time, offset); }
+}
+
 
 #endif // LMMS_HAVE_SPA

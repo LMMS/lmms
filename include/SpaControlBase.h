@@ -99,6 +99,9 @@ protected:
 
 	std::vector<std::unique_ptr<SpaProc>> m_procs;
 
+	void handleMidiInputEvent(const class MidiEvent &event,
+		const class TimePos &time, f_cnt_t offset);
+
 private:
 	unsigned m_channelsPerProc;
 };

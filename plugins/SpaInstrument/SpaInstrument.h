@@ -58,7 +58,7 @@ public:
 
 #ifdef SPA_INSTRUMENT_USE_MIDI
 	bool handleMidiEvent(const MidiEvent &event,
-		const MidiTime &time = MidiTime(), f_cnt_t offset = 0) override;
+		const class TimePos &time = TimePos(), f_cnt_t offset = 0) override;
 #else
 	void playNote(NotePlayHandle *nph, sampleFrame *) override;
 #endif
@@ -83,9 +83,6 @@ private slots:
 	void reloadPlugin() { SpaControlBase::reloadPlugin(); }
 
 private:
-#ifdef SPA_INSTRUMENT_USE_MIDI
-	int m_runningNotes[NumKeys];
-#endif
 	friend class SpaInsView;
 	QString nodeName() const override;
 };

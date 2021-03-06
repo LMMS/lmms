@@ -8,6 +8,8 @@
 #include "DataFile.h"
 #include "LinkedModelGroups.h"
 #include "lmms_basics.h"
+#include "Note.h"
+#include "../src/3rdparty/ringbuffer/include/ringbuffer/ringbuffer.h"
 
 class AutomatableModel;
 
@@ -97,12 +99,29 @@ public:
 	void saveState(QDomDocument &doc, QDomElement &that);
 	void loadState(const QDomElement &that);
 	void reloadPlugin();
+
+	void handleMidiInputEvent(const class MidiEvent &event,
+		const class TimePos &time, f_cnt_t offset);
+
 private:
 	friend struct LmmsVisitor;
 	friend struct TypeChecker;
 	std::atomic_flag m_writeOscInUse;
 	bool m_valid = true;
 	const DataFile::Types m_settingsType;
+
+	int m_runningNotes[NumKeys];
+
+	// MIDI
+	// many things here may be moved into the `Instrument` class
+	constexpr const static std::size_t m_maxMidiInputEvents = 1024;
+	//! spinlock for the MIDI ringbuffer (for MIDI events going to the plugin)
+	std::atomic_flag m_ringLock = ATOMIC_FLAG_INIT;
+
+	//! MIDI ringbuffer (for MIDI events going to the plugin)
+	ringbuffer_t<struct MidiInputEvent> m_midiInputBuf;
+	//! MIDI ringbuffer reader
+	ringbuffer_reader_t<struct MidiInputEvent> m_midiInputReader;
 
 	//! load a file into the plugin, but don't do anything in LMMS
 //	void loadFile(const QString &file);
