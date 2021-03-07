@@ -203,11 +203,8 @@ TimePos Pattern::beatPatternLength() const
 }
 
 
-
-
-Note * Pattern::addNote( const Note & _new_note, const bool _quant_pos )
+Note *Pattern::addNote(Note * new_note, const bool _quant_pos)
 {
-	Note * new_note = new Note( _new_note );
 	if( _quant_pos && gui->pianoRoll() )
 	{
 		new_note->quantizePos( gui->pianoRoll()->quantization() );
@@ -225,6 +222,13 @@ Note * Pattern::addNote( const Note & _new_note, const bool _quant_pos )
 	return new_note;
 }
 
+
+
+Note * Pattern::addNote( const Note & _new_note, const bool _quant_pos )
+{
+	Note * new_note = new Note( _new_note );
+	return addNote(new_note,_quant_pos);
+}
 
 
 
@@ -615,10 +619,6 @@ void Pattern::changeTimeSignature()
 				last_pos.getBar() * TimePos::stepsPerBar() );
 	updateLength();
 }
-
-
-
-
 
 PatternView::PatternView( Pattern* pattern, TrackView* parent ) :
 	TrackContentObjectView( pattern, parent ),
