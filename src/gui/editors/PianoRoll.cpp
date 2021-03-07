@@ -3099,6 +3099,12 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 
 		QPolygonF editHandles;
 
+		// Return a note's Y position on the grid
+		auto noteYPos = [&](const int key)
+		{
+			return (topKey - key) * m_keyLineHeight + keyAreaTop() - 1;
+		};
+
 		// -- Begin ghost pattern
 		if( !m_ghostNotes.empty() )
 		{
@@ -3132,7 +3138,7 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 
 					// we've done and checked all, let's draw the note
 					drawNoteRect(
-						p, x + m_whiteKeyWidth, (topKey - note->key()) * m_keyLineHeight + keyAreaTop() - 1, note_width,
+						p, x + m_whiteKeyWidth, noteYPos(note->key()), note_width,
 						note, m_ghostNoteColor, m_ghostNoteTextColor, m_selectedNoteColor,
 						m_ghostNoteOpacity, m_ghostNoteBorders, drawNoteNames);
 				}
@@ -3154,8 +3160,6 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 				len_ticks = 4;
 			}
 
-			const int key = note->key() - m_startKey + 1;
-
 			int pos_ticks = note->pos();
 
 			int note_width = len_ticks * m_ppb / TimePos::ticksPerBar();
@@ -3172,7 +3176,7 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 			{
 				// we've done and checked all, let's draw the note
 				drawNoteRect(
-					p, x + m_whiteKeyWidth, (topKey - note->key()) * m_keyLineHeight + keyAreaTop() - 1, note_width,
+					p, x + m_whiteKeyWidth, noteYPos(note->key()), note_width,
 					note, m_noteColor, m_noteTextColor, m_selectedNoteColor,
 					m_noteOpacity, m_noteBorders, drawNoteNames);
 			}
@@ -3221,7 +3225,7 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 
 			if( note->hasDetuningInfo() )
 			{
-				drawDetuningInfo(p, note, x + m_whiteKeyWidth, y_base - key * m_keyLineHeight);
+				drawDetuningInfo(p, note, x + m_whiteKeyWidth, noteYPos(note->key()));
 				p.setClipRect(
 					m_whiteKeyWidth,
 					PR_TOP_MARGIN,
@@ -3258,7 +3262,7 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 
 				// we've done and checked all, let's draw the note
 				drawNoteRect(
-					p, x + m_whiteKeyWidth, (topKey - note->key()) * m_keyLineHeight + keyAreaTop() - 1, note_width,
+					p, x + m_whiteKeyWidth, noteYPos(note->key()), note_width,
 					note, m_stepRecorder.curStepNoteColor(), m_noteTextColor, m_selectedNoteColor,
 					m_noteOpacity, m_noteBorders, drawNoteNames);
 			}
