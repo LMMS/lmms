@@ -57,6 +57,8 @@
 const QVector<double> SongEditor::m_zoomLevels =
 		{ 0.125f, 0.25f, 0.5f, 1.0f, 2.0f, 4.0f, 8.0f, 16.0f };
 
+const float SongEditor::m_scrollPrecision = 1024.f;
+
 SongEditor::SongEditor( Song * song ) :
 	TrackContainerView( song ),
 	m_song( song ),
@@ -219,8 +221,8 @@ SongEditor::SongEditor( Song * song ) :
 	m_leftRightScroll = new QScrollBar( Qt::Horizontal, this );
 	m_leftRightScroll->setMinimum( 0 );
 	m_leftRightScroll->setMaximum( 0 );
-	m_leftRightScroll->setSingleStep( 1 );
-	m_leftRightScroll->setPageStep( 20 );
+	m_leftRightScroll->setSingleStep( m_scrollPrecision );
+	m_leftRightScroll->setPageStep( m_scrollPrecision * 20 );
 	static_cast<QVBoxLayout *>( layout() )->addWidget( m_leftRightScroll );
 	connect( m_leftRightScroll, SIGNAL( valueChanged( int ) ),
 					this, SLOT( scrolled( int ) ) );
@@ -340,7 +342,7 @@ void SongEditor::setHighQuality( bool hq )
 void SongEditor::scrolled( int new_pos )
 {
 	update();
-	emit positionChanged( m_currentPosition = TimePos( new_pos, 0 ) );
+	emit positionChanged( m_currentPosition = TimePos( new_pos / m_scrollPrecision * TimePos::ticksPerBar() ) );
 }
 
 
@@ -360,7 +362,7 @@ void SongEditor::selectRegionFromPixels(int xStart, int xEnd)
 
 		//we save the position of scrollbars, mouse position and zooming level
 		m_origin = QPoint(xStart, 0);
-		m_scrollPos = QPoint(m_leftRightScroll->value(), contentWidget()->verticalScrollBar()->value());
+		m_scrollPos = QPointF(m_leftRightScroll->value() / m_scrollPrecision, contentWidget()->verticalScrollBar()->value());
 		m_currentZoomingValue = zoomingModel()->value();
 
 		//calculate the song position where the mouse was clicked
@@ -400,7 +402,7 @@ void SongEditor::updateRubberband()
 		}
 
 		//take care of the scrollbar position
-		int hs = (m_leftRightScroll->value() - m_scrollPos.x()) * pixelsPerBar();
+		int hs = (m_leftRightScroll->value() / m_scrollPrecision - m_scrollPos.x()) * pixelsPerBar();
 		int vs = contentWidget()->verticalScrollBar()->value() - m_scrollPos.y();
 
 		//the adjusted origin point
@@ -546,7 +548,7 @@ void SongEditor::wheelEvent( QWheelEvent * we )
 		// what would be the bar in the new zoom level on the very same mouse x
 		int newBar = x / DEFAULT_PIXELS_PER_BAR / m_zoomLevels[z];
 		// scroll so the bar "selected" by the mouse x doesn't move on the screen
-		m_leftRightScroll->setValue(m_leftRightScroll->value() + bar - newBar);
+		m_leftRightScroll->setValue((m_leftRightScroll->value() / m_scrollPrecision + bar - newBar) * m_scrollPrecision);
 
 		// update combobox with zooming-factor
 		m_zoomingModel->setValue( z );
@@ -561,13 +563,13 @@ void SongEditor::wheelEvent( QWheelEvent * we )
 	// FIXME: Reconsider if determining orientation is necessary in Qt6.
 	else if(abs(we->angleDelta().x()) > abs(we->angleDelta().y())) // scrolling is horizontal
 	{
-		m_leftRightScroll->setValue(m_leftRightScroll->value() -
-							we->angleDelta().x() /30);
+		m_leftRightScroll->setValue((m_leftRightScroll->value() / m_scrollPrecision -
+							we->angleDelta().x() /30) * m_scrollPrecision);
 	}
 	else if(we->modifiers() & Qt::ShiftModifier)
 	{
-		m_leftRightScroll->setValue(m_leftRightScroll->value() -
-							we->angleDelta().y() / 30);
+		m_leftRightScroll->setValue((m_leftRightScroll->value() / m_scrollPrecision -
+							we->angleDelta().y() / 30) * m_scrollPrecision);
 	}
 	else
 	{
@@ -600,7 +602,7 @@ void SongEditor::mousePressEvent(QMouseEvent *me)
 	if (allowRubberband())
 	{
 		//we save the position of scrollbars, mouse position and zooming level
-		m_scrollPos = QPoint(m_leftRightScroll->value(), contentWidget()->verticalScrollBar()->value());
+		m_scrollPos = QPoint(m_leftRightScroll->value() / m_scrollPrecision, contentWidget()->verticalScrollBar()->value());
 		m_origin = contentWidget()->mapFromParent(QPoint(me->pos().x(), me->pos().y()));
 		m_currentZoomingValue = zoomingModel()->value();
 
@@ -730,7 +732,7 @@ void SongEditor::hideMasterPitchFloat( void )
 
 void SongEditor::updateScrollBar( int len )
 {
-	m_leftRightScroll->setMaximum( len );
+	m_leftRightScroll->setMaximum( len * m_scrollPrecision );
 }
 
 

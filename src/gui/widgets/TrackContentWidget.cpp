@@ -586,8 +586,8 @@ void TrackContentWidget::paintEvent( QPaintEvent * pe )
 	// Don't draw background on BB-Editor
 	if( m_trackView->trackContainerView() != gui->getBBEditor()->trackContainerView() )
 	{
-		p.drawTiledPixmap( rect(), m_background, QPoint(
-				tcv->currentPosition().getBar() * ppb, 0 ) );
+		p.drawTiledPixmap( rect(), m_background, QPointF(
+				(float)tcv->currentPosition().getTicks() / tcv->currentPosition().ticksPerBar() * ppb, 0 ) );
 	}
 }
 

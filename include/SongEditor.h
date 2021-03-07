@@ -139,6 +139,7 @@ private:
 	bool m_proportionalSnap;
 
 	static const QVector<double> m_zoomLevels;
+	static const float m_scrollPrecision;
 
 	bool m_scrollBack;
 	bool m_smoothScroll;
@@ -147,7 +148,7 @@ private:
 	EditMode m_ctrlMode; // mode they were in before they hit ctrl
 
 	QPoint m_origin;
-	QPoint m_scrollPos;
+	QPointF m_scrollPos;
 	QPoint m_mousePos;
 	int m_rubberBandStartTrackview;
 	TimePos m_rubberbandStartTimePos;
