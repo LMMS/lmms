@@ -27,6 +27,7 @@
 
 #include <QDialog>
 #include <QLayout>
+#include <memory>
 
 #include "AudioPort.h"
 #include "FadeButton.h"
@@ -39,6 +40,7 @@
 class EffectRackView;
 class Knob;
 class SampleBuffer;
+class ControlPoint;
 class SampleTrackWindow;
 class TrackLabelButton;
 class QLineEdit;
@@ -79,6 +81,8 @@ public:
 	bool isPlaying() const;
 	void setIsPlaying(bool isPlaying);
 
+	void setStartTimeOffset(const TimePos &startTimeOffset) override;
+
 public slots:
 	void setSampleBuffer( SampleBuffer* sb );
 	void setSampleFile( const QString & _sf );
@@ -92,7 +96,12 @@ private:
 	SampleBuffer* m_sampleBuffer;
 	BoolModel m_recordModel;
 	bool m_isPlaying;
+	bool m_changed = false;
+	TimePos m_lenOld;
+	TimePos m_startTimeOffsetOld;
 
+	void saveFaderSettings(QDomElement&);
+	void loadFaderSettings(const QDomElement&);
 
 	friend class SampleTCOView;
 
@@ -116,22 +125,55 @@ public:
 public slots:
 	void updateSample();
 	void reverseSample();
-
-
+	void setSFade();
+	void setCosFade();
+	void setLinearFade();
+	void setManualFade();
 
 protected:
 	void contextMenuEvent( QContextMenuEvent * _cme ) override;
 	void mousePressEvent( QMouseEvent * _me ) override;
 	void mouseReleaseEvent( QMouseEvent * _me ) override;
+	void mouseMoveEvent(QMouseEvent* e) override;
 	void dragEnterEvent( QDragEnterEvent * _dee ) override;
 	void dropEvent( QDropEvent * _de ) override;
 	void mouseDoubleClickEvent( QMouseEvent * ) override;
 	void paintEvent( QPaintEvent * ) override;
+	void enterEvent(QEvent *e) override;
+	void leaveEvent(QEvent *e) override;
 
 
 private:
 	SampleTCO * m_tco;
 	QPixmap m_paintPixmap;
+
+	// Members related to fading
+	bool m_moveLeftCorner = false;
+	bool m_moveRightCorner = false;
+	bool m_leftFadeClicked = false;
+	bool m_rightFadeClicked = false;
+	bool m_leftFadeManual = false;
+	bool m_rightFadeManual = false;
+	std::unique_ptr<QRectF> m_leftHandle;
+	std::unique_ptr<QRectF> m_rightHandle;
+	std::unique_ptr<QRectF> m_leftP1;
+	std::unique_ptr<QRectF> m_leftP2;
+	std::unique_ptr<QRectF> m_rightP1;
+	std::unique_ptr<QRectF> m_rightP2;
+	bool m_moveLeftP1 = false;
+	bool m_moveLeftP2 = false;
+	bool m_moveRightP1 = false;
+	bool m_moveRightP2 = false;
+	QVector<QPointF> m_leftPath;
+	QVector<QPointF> m_rightPath;
+	bool m_inside = false;
+	void drawFadePoints(bool drawLeft, QVector<QPointF>& points);
+	void drawFades();
+	void checkCornersClicked(const QMouseEvent *e);
+	void checkFadesClicked(const QMouseEvent *e);
+	void mouseMoveFadingPos(const QMouseEvent *e);
+	void mouseMoveLeftControlPoints(const QMouseEvent *e);
+	void mouseMoveRightControlPoints(const QMouseEvent *e);
 } ;
 
 

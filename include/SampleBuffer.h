@@ -48,6 +48,85 @@ class QRect;
 // may need to be higher - conversely, to optimize, some may work with lower values
 const f_cnt_t MARGIN[] = { 64, 64, 64, 4, 4 };
 
+
+class ControlPoint
+{
+public:
+	ControlPoint(float x, float y)
+	{
+		this->setX(x);
+		this->setY(y);
+	}
+
+	void setX(float x)
+	{
+		m_x = adjustPoint(x);
+	}
+
+	void setY(float y)
+	{
+		m_y = adjustPoint(y);
+	}
+
+	const float x() const
+	{
+		return m_x;
+	}
+
+	const float y() const
+	{
+		return m_y;
+	}
+
+private:
+	float m_x;
+	float m_y;
+	inline float adjustPoint(float val)
+	{
+		/*
+		Constrain the control points to lie in the interval [0.0, 1.0].
+		This ensures that the fade function has a unique value at each sample
+		and that the fade function can not go above 1.0 and below 0.0.
+		*/
+		return std::min(std::max(val, 0.0f), 1.0f);
+	}
+};
+
+
+class CubicBezier
+{
+/*
+Very comprehensive overview of Bezier curves:
+https://pomax.github.io/bezierinfo/
+*/
+public:
+	CubicBezier(float p1x, float p1y, float p2x, float p2y)
+	{
+		m_p1 = ControlPoint(p1x, p1y);
+		m_p2 = ControlPoint(p2x, p2y);
+	};
+
+	float evaluate(float);
+	ControlPoint m_p1 = ControlPoint(0.0f, 0.0f);
+	ControlPoint m_p2 = ControlPoint(0.0f, 0.0f);
+
+private:
+	float cubicBezier(float t, float p1, float p2);
+	float cubicBezierDerivative(float t, float p1, float p2);
+	float cubicBezierLastSegmentP1(float t, float p1, float p2);
+	float cubicBezierLastSegmentP2(float t, float p1, float p2);
+	// Solve with Newton's method: Very fast, but t might lie outside [0.0, 1.0]
+	float solveXforTNewton(float x, bool useCache);
+	// Solve with Bisection method: Slow, but t is guaranteed to lie inside [0.0, 1.0]
+	float solveXforTBisection(float x);
+	float solveXforT(float x)
+	{
+		return solveXforTBisection(x);
+	}
+	float m_tCache = -1.0f;
+};
+
+
 class LMMS_EXPORT SampleBuffer : public QObject, public sharedObject
 {
 	Q_OBJECT
@@ -273,6 +352,75 @@ public:
 	}
 
 
+	// Fading related members
+
+	float fadingVal(f_cnt_t pos, bool isLeft);
+
+	void setTcoStartTime(float startTime)
+	{
+		m_TcoStartTime = startTime;
+	}
+
+	void setTcoFrameLength(float len)
+	{
+		m_TcoFrameLength = len;
+	}
+
+	float leftFaderPos()
+	{
+		return m_leftFader;
+	}
+
+	float rightFaderPos()
+	{
+		return m_rightFader;
+	}
+
+	ControlPoint getLeftP1()
+	{
+		return m_leftBezierFade.m_p1;
+	}
+
+	ControlPoint getLeftP2()
+	{
+		return m_leftBezierFade.m_p2;
+	}
+
+	ControlPoint getRightP1()
+	{
+		return m_rightBezierFade.m_p1;
+	}
+
+	ControlPoint getRightP2()
+	{
+		return m_rightBezierFade.m_p2;
+	}
+
+	void setLeftP1(float x, float y)
+	{
+		m_leftBezierFade.m_p1 = ControlPoint(x, y);
+	}
+
+	void setLeftP2(float x, float y)
+	{
+		m_leftBezierFade.m_p2 = ControlPoint(x, y);
+	}
+
+	void setRightP1(float x, float y)
+	{
+		m_rightBezierFade.m_p1 = ControlPoint(1.0f - x, y);
+	}
+
+	void setRightP2(float x, float y)
+	{
+		m_rightBezierFade.m_p2 = ControlPoint(1.0f - x, y);
+	}
+
+	void setLeftFader(float lfader);
+	void setRightFader(float rfader);
+	void checkFadingActive();
+
+
 public slots:
 	void setAudioFile(const QString & audioFile);
 	void loadFromBase64(const QString & data);
@@ -340,11 +488,30 @@ private:
 	f_cnt_t getLoopedIndex(f_cnt_t index, f_cnt_t startf, f_cnt_t endf) const;
 	f_cnt_t getPingPongIndex(f_cnt_t index, f_cnt_t startf, f_cnt_t endf) const;
 
+	// Fading related members
+	bool m_fading = false;
+	float m_leftFader = 0.0f;
+	float m_rightFader = 1.0f;
+
+	f_cnt_t m_cachePos = -mixerSampleRate();
+	float m_cacheAmp = 1.0f;
+
+
+	CubicBezier m_leftBezierFade = CubicBezier(0.5f, 0.0f, 0.5f, 1.0f);
+	CubicBezier m_rightBezierFade = CubicBezier(0.5f, 0.0f, 0.5f, 1.0f);
+
+	float bezierFade(float, bool);
+	typedef float(SampleBuffer::*fadingFunc)(float, bool);
+	fadingFunc fadefuncPtr = &SampleBuffer::bezierFade;
+	float fadefunc(f_cnt_t);
+
+	float m_TcoStartTime = 0.0f;
+	float m_TcoFrameLength = 0.0f;
+
 
 signals:
 	void sampleUpdated();
 
 } ;
-
 
 #endif

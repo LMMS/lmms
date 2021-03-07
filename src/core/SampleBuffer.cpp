@@ -852,6 +852,11 @@ bool SampleBuffer::play(
 	{
 		ab[i][0] *= m_amplification;
 		ab[i][1] *= m_amplification;
+		if (m_fading)
+		{
+			ab[i][0] *= fadefunc(playFrame+i);
+			ab[i][1] *= fadefunc(playFrame+i);
+		}
 	}
 
 	return true;
@@ -1027,9 +1032,14 @@ void SampleBuffer::visualize(
 
 	for (int frame = first; frame <= last; frame += fpp)
 	{
+		float fade = 1.0f;
+		if (m_fading)
+		{
+			fade = fadefunc(frame);
+		}
 		auto x = xb + ((frame - first) * double(w) / nbFrames);
 		// Partial Y calculation
-		auto py = ySpace * m_amplification;
+		auto py = ySpace * m_amplification * fade;
 		l[n] = QPointF(x, (yb - (m_data[frame][0] * py)));
 		r[n] = QPointF(x, (yb - (m_data[frame][1] * py)));
 		++n;
@@ -1513,4 +1523,156 @@ SampleBuffer::handleState::handleState(bool varyingPitch, int interpolationMode)
 SampleBuffer::handleState::~handleState()
 {
 	src_delete(m_resamplingData);
+}
+
+
+
+// Fading related functions
+
+float SampleBuffer::fadingVal(f_cnt_t pos, bool isLeft)
+{
+	float relativePos = static_cast<float>(pos) / static_cast<float>(m_frames);
+	return (this->*fadefuncPtr)(relativePos, isLeft);
+}
+
+
+void SampleBuffer::setLeftFader(float lfader)
+{
+	m_leftFader = lfader;
+	checkFadingActive();
+}
+
+
+void SampleBuffer::setRightFader(float rfader)
+{
+	m_rightFader = rfader;
+	checkFadingActive();
+}
+
+
+void SampleBuffer::checkFadingActive()
+{
+	if ((m_leftFader > 0.0) || (m_rightFader < 1.0))
+	{
+		m_fading = true;
+	}
+	else
+	{
+		m_fading = false;
+	}
+}
+
+
+float SampleBuffer::bezierFade(float relativePos, bool isLeft)
+{
+	float amp = 1.0f;
+	if (isLeft)
+	{
+		amp *= m_leftBezierFade.evaluate(relativePos / m_leftFader);
+	}
+	else
+	{
+		amp *= m_rightBezierFade.evaluate(1 - (relativePos - m_rightFader) / (1 - m_rightFader));
+	}
+	return amp;
+}
+
+
+float CubicBezier::cubicBezierLastSegmentP1(float t, float p1, float p2)
+{
+	return (
+		2 * p1 * t * (1 - t)
+		+ p2 * pow(t, 2)
+	);
+}
+
+
+float CubicBezier::cubicBezierLastSegmentP2(float t, float p1, float p2)
+{
+	return (
+		p1 * pow(1 - t, 2)
+		+ 2 * p2 * t * (1 - t)
+		+ pow(t, 2)
+	);
+}
+
+
+float CubicBezier::cubicBezier(float t, float p1, float p2)
+{
+	return (
+		cubicBezierLastSegmentP1(t, p1, p2) * (1 - t)
+		+ cubicBezierLastSegmentP2(t, p1, p2) * t
+	);
+}
+
+
+float CubicBezier::cubicBezierDerivative(float t, float p1, float p2)
+{
+	return (
+		3 * (3 * pow(t, 2) - 4 * t + 1) * p1
+		+ 3 * t * (2 - 3 * t) * p2
+		+ 3 * pow(t, 2)
+	);
+}
+
+
+float CubicBezier::solveXforTNewton(float x, bool useCache=true)
+{
+	int maxIter = 100;
+	float tUp, f, fPrime;
+	float t = useCache ? m_tCache : 0.5f;
+	for (int i = 0; i < maxIter; ++i)
+	{
+		f = cubicBezier(t, m_p1.x(), m_p2.x()) - x;
+		fPrime = cubicBezierDerivative(t, m_p1.x(), m_p2.x());
+		tUp = t - f / fPrime;
+
+		if (abs(tUp - t) < 10e-3) { break; }
+		t = tUp;
+	}
+	if (useCache) { m_tCache = tUp; }
+	return tUp;
+}
+
+
+float CubicBezier::solveXforTBisection(float x)
+{
+	float a = 0.0f;
+	float b = 1.0f;
+	float t;
+
+	int maxIter = 10;
+	for (int i = 0; i < maxIter; ++i)
+	{
+		t = (a + b) / 2;
+		if (cubicBezier(t, m_p1.x(), m_p2.x()) < x) { a = t; }
+		else { b = t; }
+	}
+	return t;
+}
+
+
+float CubicBezier::evaluate(float x)
+{
+	float t = solveXforT(x);
+	return cubicBezier(t, m_p1.y(), m_p2.y());
+}
+
+
+float SampleBuffer::fadefunc(f_cnt_t pos)
+{
+	// TODO: This function should be cached in the future
+	float amp = 1.0f;
+	float relativePos = qMin((pos + m_TcoStartTime) / m_TcoFrameLength, 1.0f);
+	if (relativePos < m_leftFader)
+	{
+		amp *= (this->*fadefuncPtr)(relativePos, true);
+	}
+	if (relativePos > m_rightFader)
+	{
+		amp *= (this->*fadefuncPtr)(relativePos, false);
+	}
+	m_cachePos = pos;
+	m_cacheAmp = amp;
+	return m_cacheAmp;
 }
