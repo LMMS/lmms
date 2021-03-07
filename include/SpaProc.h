@@ -29,7 +29,7 @@ public:
 	void writeOsc(const char *dest, const char *args, ...);
 
 
-	void loadFile(const QString &file);
+	void loadFile(const QString &file, bool user);
 
 	void run(unsigned frames);
 

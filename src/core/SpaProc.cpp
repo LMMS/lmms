@@ -84,17 +84,17 @@ void SpaProc::loadState(const QDomElement &that)
 			{
 				tf.write(cdata.data().toUtf8());
 				tf.flush();
-				loadFile(tf.fileName());
+				loadFile(tf.fileName(), false);
 			}
 		}
 	}
 }
 
 
-void SpaProc::loadFile(const QString &file)
+void SpaProc::loadFile(const QString &file, bool user)
 {
 	const QByteArray fn = file.toUtf8();
-	if(fn.endsWith(".xmz"))
+	if(!user || fn.endsWith(".xmz"))
 	{
 	//	m_pluginMutex.lock();
 		m_plugin->load(fn.data(), ++m_saveTicket);

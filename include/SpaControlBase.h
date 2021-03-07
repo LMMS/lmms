@@ -60,7 +60,7 @@ public:
 //	void writeOsc(const char *dest, const char *args, va_list va) {}
 //	void writeOsc(const char *dest, const char *args, ...) {}
 
-	void loadFile(const QString &file);
+	void loadFile(const QString &file, bool user);
 
 	const spa::descriptor *m_spaDescriptor = nullptr;
 	bool hasUi() const;

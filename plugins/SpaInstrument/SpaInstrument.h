@@ -54,7 +54,7 @@ public:
 	void saveSettings(QDomDocument &doc, QDomElement &that) override;
 	void loadSettings(const QDomElement &that) override;
 	void loadFile(const QString &file) override {
-		SpaControlBase::loadFile(file); }
+		SpaControlBase::loadFile(file, true); }
 
 #ifdef SPA_INSTRUMENT_USE_MIDI
 	bool handleMidiEvent(const MidiEvent &event,

@@ -304,7 +304,7 @@ void SpaViewProc::dropEvent(QDropEvent *dev)
 	const QString value = StringPairDrag::decodeValue(dev);
 	if (type == "pluginpresetfile")
 	{
-		m_proc->loadFile(value);
+		m_proc->loadFile(value, true);
 		dev->accept();
 	}
 	else if( type == "automatable_model" )

@@ -149,11 +149,11 @@ void SpaControlBase::loadSettings(const QDomElement &that)
 
 SpaControlBase::~SpaControlBase() {}
 
-void SpaControlBase::loadFile(const QString &file)
+void SpaControlBase::loadFile(const QString &file, bool user)
 {
 	// for now, only support loading one proc into all proc (duplicating)
 	for(std::unique_ptr<SpaProc>& proc : m_procs)
-		proc->loadFile(file);
+		proc->loadFile(file, user);
 	setNameFromFile(QFileInfo(file).baseName().replace(
 		QRegExp("^[0-9]{4}-"), QString()));
 }
