@@ -1647,7 +1647,7 @@ void PianoRoll::mousePressEvent(QMouseEvent * me)
 		update();
 	}
 
-	const int key_num = getKey(mey);
+	const int keyNum = getKey(mey);
 
 
 	switch (pra)
@@ -1657,15 +1657,15 @@ void PianoRoll::mousePressEvent(QMouseEvent * me)
 			// reference to last key needed for both
 			// right click (used for copy all keys on note)
 			// and for playing the key when left-clicked
-			//m_lastKey = key_num;
+			//m_lastKey = keyNum;
 
 			if (leftButton)
 			{
 				int v = static_cast<int>((static_cast<float>(mex) / m_whiteKeyWidth) * MidiDefaultVelocity);
-				testPlayKey(key_num, v, 0);
-				//m_pattern->instrumentTrack()->pianoModel()->handleKeyPress(key_num, v);
+				testPlayKey(keyNum, v, 0);
+				//m_pattern->instrumentTrack()->pianoModel()->handleKeyPress(keyNum, v);
 				// if a chord is set, play the chords notes as well:
-				//playChordNotes(key_num, v);
+				//playChordNotes(keyNum, v);
 				//mouseMoveEvent(me);
 				//update();
 			}
@@ -1681,7 +1681,7 @@ void PianoRoll::mousePressEvent(QMouseEvent * me)
 		{
 			Note* n = noteUnderMouse(); // TODO: Rename to better name
 			// get tick in which the user clicked
-			const int pos_ticks = (mex - m_whiteKeyWidth) * TimePos::ticksPerBar() / m_ppb + m_currentPosition;
+			const int posTicks = (mex - m_whiteKeyWidth) * TimePos::ticksPerBar() / m_ppb + m_currentPosition;
 
 			switch (m_editMode)
 			{
@@ -1717,27 +1717,27 @@ void PianoRoll::mousePressEvent(QMouseEvent * me)
 				{
 					if (leftButton)
 					{
-						bool is_new_note = false;
-						Note* created_new_note = nullptr;
+						bool isNewNote = false;
+						Note* createdNewNote = nullptr;
 						// did we click on a note or are we creating new?
 						if (n == nullptr) // create new note at mouse click position
 						{
-							is_new_note = true;
+							isNewNote = true;
 							m_pattern->addJournalCheckPoint();
 							// clear selection and select this new note
 							clearSelectedNotes();
 							// +32 to quanitize the note correctly when placing notes with
 							// the mouse.  We do this here instead of in note.quantized
 							// because live notes should still be quantized at the half.
-							TimePos note_pos(pos_ticks - (quantization() / 2));
-							TimePos note_len(newNoteLen());
+							TimePos notePos(posTicks - (quantization() / 2));
+							TimePos noteLen(newNoteLen());
 
 							// create new note and add to pattern
-							Note new_note(note_len, note_pos, key_num);
-							new_note.setSelected(true);
-							new_note.setPanning(m_lastNotePanning);
-							new_note.setVolume(m_lastNoteVolume);
-							created_new_note = m_pattern->addNote(new_note);
+							Note newNote(noteLen, notePos, keyNum);
+							newNote.setSelected(true);
+							newNote.setPanning(m_lastNotePanning);
+							newNote.setVolume(m_lastNoteVolume);
+							createdNewNote = m_pattern->addNote(newNote);
 
 							// check for chord draw
 							const InstrumentFunctionNoteStacking::Chord & chord =
@@ -1752,17 +1752,17 @@ void PianoRoll::mousePressEvent(QMouseEvent * me)
 								{
 									if (m_startedWithShift) // arpeggio mode
 									{
-										note_pos += note_len;
+										notePos += noteLen;
 									}
-									Note new_note(note_len, note_pos, key_num + chord[i]);
-									new_note.setSelected(true);
-									new_note.setPanning(m_lastNotePanning);
-									new_note.setVolume(m_lastNoteVolume);
-									m_pattern->addNote(new_note);
+									Note newNote(noteLen, notePos, keyNum + chord[i]);
+									newNote.setSelected(true);
+									newNote.setPanning(m_lastNotePanning);
+									newNote.setVolume(m_lastNoteVolume);
+									m_pattern->addNote(newNote);
 								}
 							}
 
-							m_currentNote = created_new_note;
+							m_currentNote = createdNewNote;
 							m_lastNotePanning = m_currentNote->getPanning();
 							m_lastNoteVolume = m_currentNote->getVolume();
 							m_lenOfNewNotes = m_currentNote->length();
@@ -1773,7 +1773,8 @@ void PianoRoll::mousePressEvent(QMouseEvent * me)
 						m_mouseDownKey = m_startKey;
 						m_mouseDownTick = m_currentPosition;
 
-						// check if m_currentNote is still selected
+						// Check if m_currentNote is selected
+						// If user clicked in an unselected note it won't be
 						if (!m_currentNote->selected())
 						{
 							// clear notes and select this note
@@ -1781,7 +1782,7 @@ void PianoRoll::mousePressEvent(QMouseEvent * me)
 							m_currentNote->setSelected(true);
 						}
 
-						// if we didn't click on a note or we did, get new bounding box
+						// Get new bounding box for the current selection
 						auto selectedNotes = getSelectedNotes();
 						m_moveBoundaryLeft = selectedNotes.first()->pos().getTicks();
 						m_moveBoundaryRight = selectedNotes.first()->endPos();
@@ -1800,7 +1801,7 @@ void PianoRoll::mousePressEvent(QMouseEvent * me)
 						}
 						printf("check tail\n");
 						// clicked at the "tail" of the note?
-						if( pos_ticks * m_ppb / TimePos::ticksPerBar() >
+						if( posTicks * m_ppb / TimePos::ticksPerBar() >
 								m_currentNote->endPos() * m_ppb / TimePos::ticksPerBar() - RESIZE_AREA_WIDTH
 							&& m_currentNote->length() > 0 )
 						{
@@ -1836,7 +1837,7 @@ void PianoRoll::mousePressEvent(QMouseEvent * me)
 						}
 						else
 						{
-							if( ! created_new_note )
+							if( ! createdNewNote )
 							{
 								m_pattern->addJournalCheckPoint();
 							}
@@ -1848,7 +1849,7 @@ void PianoRoll::mousePressEvent(QMouseEvent * me)
 							setCursor( Qt::SizeAllCursor );
 
 							// if they're holding shift, copy all selected notes
-							if( ! is_new_note && me->modifiers() & Qt::ShiftModifier )
+							if( ! isNewNote && me->modifiers() & Qt::ShiftModifier )
 							{
 								for (Note *note: selectedNotes)
 								{
@@ -1901,9 +1902,9 @@ void PianoRoll::mousePressEvent(QMouseEvent * me)
 				{
 					if (leftButton) // select an area of notes
 					{
-						m_selectStartTick = pos_ticks;
+						m_selectStartTick = posTicks;
 						m_selectedTick = 0;
-						m_selectStartKey = key_num;
+						m_selectStartKey = keyNum;
 						m_selectedKeys = 1;
 						m_action = ActionSelectNotes;
 						printf("start ModeSelect\n");
