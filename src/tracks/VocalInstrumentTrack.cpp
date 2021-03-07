@@ -100,9 +100,8 @@ bool VocalInstrumentTrack::play(const TimePos & _start, const fpp_t _frames,
 			played_a_note = true;
 
 		}
-
-		return played_a_note;
 	}
+	return played_a_note;
 }
 
 void VocalInstrumentTrack::bounceVocalPattern()
