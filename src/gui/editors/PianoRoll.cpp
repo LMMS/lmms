@@ -1717,10 +1717,12 @@ void PianoRoll::mousePressEvent(QMouseEvent * me)
 				{
 					if (leftButton)
 					{
+						bool is_new_note = false;
+						Note* created_new_note = nullptr;
 						// did we click on a note or are we creating new?
 						if (n == nullptr) // create new note at mouse click position
 						{
-							Note* created_new_note = nullptr;
+							is_new_note = true;
 							m_pattern->addJournalCheckPoint();
 							// clear selection and select this new note
 							clearSelectedNotes();
@@ -1767,6 +1769,10 @@ void PianoRoll::mousePressEvent(QMouseEvent * me)
 						}
 						else { m_currentNote = n; } // select the current note
 
+						// remember which key and tick we started with
+						m_mouseDownKey = m_startKey;
+						m_mouseDownTick = m_currentPosition;
+
 						// check if m_currentNote is still selected
 						if (!m_currentNote->selected())
 						{
@@ -1792,6 +1798,78 @@ void PianoRoll::mousePressEvent(QMouseEvent * me)
 							m_moveBoundaryBottom = qMin(note->key(), m_moveBoundaryBottom);
 							m_moveBoundaryTop = qMax(note->key(), m_moveBoundaryTop);
 						}
+						printf("check tail\n");
+						// clicked at the "tail" of the note?
+						if( pos_ticks * m_ppb / TimePos::ticksPerBar() >
+								m_currentNote->endPos() * m_ppb / TimePos::ticksPerBar() - RESIZE_AREA_WIDTH
+							&& m_currentNote->length() > 0 )
+						{
+							printf("checkpoint\n");
+							m_pattern->addJournalCheckPoint();
+							// then resize the note
+							m_action = ActionResizeNote;
+
+							printf("quant\n");
+							//Calculate the minimum length we should allow when resizing
+							//each note, and let all notes use the smallest one found
+							m_minResizeLen = quantization();
+							printf("loop\n");
+							for (Note *note : selectedNotes)
+							{
+								printf("old\n");
+								//Notes from the BB editor can have a negative length, so
+								//change their length to the displayed one before resizing
+								if (note->oldLength() <= 0) { note->setOldLength(4); }
+								printf("min\n");
+								//Let the note be sized down by quantized increments, stopping
+								//when the next step down would result in a negative length
+								int thisMin = note->oldLength() % quantization();
+								printf("minresize\n");
+								//The initial value for m_minResizeLen is the minimum length of
+								//a note divisible by the current Q. Therefore we ignore notes
+								//where thisMin == 0 when checking for a new minimum
+								if (thisMin > 0 && thisMin < m_minResizeLen) { m_minResizeLen = thisMin; }
+							}
+
+							// set resize-cursor
+							setCursor( Qt::SizeHorCursor );
+						}
+						else
+						{
+							if( ! created_new_note )
+							{
+								m_pattern->addJournalCheckPoint();
+							}
+
+							// otherwise move it
+							m_action = ActionMoveNote;
+
+							// set move-cursor
+							setCursor( Qt::SizeAllCursor );
+
+							// if they're holding shift, copy all selected notes
+							if( ! is_new_note && me->modifiers() & Qt::ShiftModifier )
+							{
+								for (Note *note: selectedNotes)
+								{
+									Note *newNote = m_pattern->addNote(*note, false);
+									newNote->setSelected(false);
+								}
+
+								if (!selectedNotes.empty())
+								{
+									// added new notes, so must update engine, song, etc
+									Engine::getSong()->setModified();
+									update();
+									gui->songEditor()->update();
+								}
+							}
+
+							// play the note
+							testPlayNote( m_currentNote );
+						}
+
+						Engine::getSong()->setModified();
 					}
 					else if (rightButton) // erase single note
 					{
@@ -1915,73 +1993,73 @@ void PianoRoll::mousePressEvent(QMouseEvent * me)
 	// 	return;
 	// }
 
-	if( me->y() > PR_TOP_MARGIN )
-	{
-		bool edit_note = ( me->y() > noteEditTop() );
+	// if( me->y() > PR_TOP_MARGIN )
+	// {
+		// bool edit_note = ( me->y() > noteEditTop() );
 
-		int key_num = getKey( me->y() );
+		// int key_num = getKey( me->y() );
 
-		int x = me->x();
+		// int x = me->x();
 
 
-		if (x > m_whiteKeyWidth)
-		{
+		// if (x > m_whiteKeyWidth)
+		// {
 			// set, move or resize note
 
-			x -= m_whiteKeyWidth;
+			// x -= m_whiteKeyWidth;
 
-			// get tick in which the user clicked
-			int pos_ticks = x * TimePos::ticksPerBar() / m_ppb +
-							m_currentPosition;
+			// // get tick in which the user clicked
+			// int pos_ticks = x * TimePos::ticksPerBar() / m_ppb +
+			// 				m_currentPosition;
 
 
-			// get note-vector of current pattern
-			const NoteVector & notes = m_pattern->notes();
+			// // get note-vector of current pattern
+			// const NoteVector & notes = m_pattern->notes();
 
-			// will be our iterator in the following loop
-			NoteVector::ConstIterator it = notes.begin()+notes.size()-1;
+			// // will be our iterator in the following loop
+			// NoteVector::ConstIterator it = notes.begin()+notes.size()-1;
 
-			// loop through whole note-vector...
-			for( int i = 0; i < notes.size(); ++i )
-			{
-				Note *note = *it;
-				TimePos len = note->length();
-				if( len < 0 )
-				{
-					len = 4;
-				}
-				// and check whether the user clicked on an
-				// existing note or an edit-line
-				if( pos_ticks >= note->pos() && len > 0 &&
-					(
-						( ! edit_note && pos_ticks <= note->pos() + len && note->key() == key_num )
-					||
-						( edit_note && pos_ticks <= note->pos() + NOTE_EDIT_LINE_WIDTH * TimePos::ticksPerBar() / m_ppb )
-					)
-				)
-				{
-					break;
-				}
-				--it;
-			}
+			// // loop through whole note-vector...
+			// for( int i = 0; i < notes.size(); ++i )
+			// {
+			// 	Note *note = *it;
+			// 	TimePos len = note->length();
+			// 	if( len < 0 )
+			// 	{
+			// 		len = 4;
+			// 	}
+			// 	// and check whether the user clicked on an
+			// 	// existing note or an edit-line
+			// 	if( pos_ticks >= note->pos() && len > 0 &&
+			// 		(
+			// 			( ! edit_note && pos_ticks <= note->pos() + len && note->key() == key_num )
+			// 		||
+			// 			( edit_note && pos_ticks <= note->pos() + NOTE_EDIT_LINE_WIDTH * TimePos::ticksPerBar() / m_ppb )
+			// 		)
+			// 	)
+			// 	{
+			// 		break;
+			// 	}
+			// 	--it;
+			// }
 
 			// first check whether the user clicked in note-edit-
 			// area
-			if( edit_note )
-			{
+			// if( edit_note )
+			// {
 			// 	m_pattern->addJournalCheckPoint();
 			// 	// scribble note edit changes
 			// 	mouseMoveEvent( me );
-				return;
-			}
+			// 	return;
+			// }
 			// left button??
-			else if( me->button() == Qt::LeftButton &&
-							m_editMode == ModeDraw )
-			{
+			// else if( me->button() == Qt::LeftButton &&
+			// 				m_editMode == ModeDraw )
+			// {
 				// whether this action creates new note(s) or not
-				bool is_new_note = false;
+				// bool is_new_note = false;
 
-				Note * created_new_note = NULL;
+				// Note * created_new_note = NULL;
 				// did it reach end of vector because
 				// there's no note??
 				// if( it == notes.begin()-1 )
@@ -2045,8 +2123,8 @@ void PianoRoll::mousePressEvent(QMouseEvent * me)
 				// m_lenOfNewNotes = current_note->length();
 
 				// remember which key and tick we started with
-				m_mouseDownKey = m_startKey;
-				m_mouseDownTick = m_currentPosition;
+				// m_mouseDownKey = m_startKey;
+				// m_mouseDownTick = m_currentPosition;
 
 				//If clicked on an unselected note, remove selection and select that new note
 				// if (!m_currentNote->selected())
@@ -2055,7 +2133,7 @@ void PianoRoll::mousePressEvent(QMouseEvent * me)
 				// 	m_currentNote->setSelected( true );
 				// }
 
-				auto selectedNotes = getSelectedNotes();
+				// auto selectedNotes = getSelectedNotes();
 
 				// m_moveBoundaryLeft = selectedNotes.first()->pos().getTicks();
 				// m_moveBoundaryRight = selectedNotes.first()->endPos();
@@ -2076,79 +2154,79 @@ void PianoRoll::mousePressEvent(QMouseEvent * me)
 				// 	m_moveBoundaryTop = qMax(note->key(), m_moveBoundaryTop);
 				// }
 
-				printf("check tail\n");
-				// clicked at the "tail" of the note?
-				if( pos_ticks * m_ppb / TimePos::ticksPerBar() >
-						m_currentNote->endPos() * m_ppb / TimePos::ticksPerBar() - RESIZE_AREA_WIDTH
-					&& m_currentNote->length() > 0 )
-				{
-					printf("checkpoint\n");
-					m_pattern->addJournalCheckPoint();
-					// then resize the note
-					m_action = ActionResizeNote;
+				// printf("check tail\n");
+				// // clicked at the "tail" of the note?
+				// if( pos_ticks * m_ppb / TimePos::ticksPerBar() >
+				// 		m_currentNote->endPos() * m_ppb / TimePos::ticksPerBar() - RESIZE_AREA_WIDTH
+				// 	&& m_currentNote->length() > 0 )
+				// {
+				// 	printf("checkpoint\n");
+				// 	m_pattern->addJournalCheckPoint();
+				// 	// then resize the note
+				// 	m_action = ActionResizeNote;
 
-					printf("quant\n");
-					//Calculate the minimum length we should allow when resizing
-					//each note, and let all notes use the smallest one found
-					m_minResizeLen = quantization();
-					printf("loop\n");
-					for (Note *note : selectedNotes)
-					{
-						printf("old\n");
-						//Notes from the BB editor can have a negative length, so
-						//change their length to the displayed one before resizing
-						if (note->oldLength() <= 0) { note->setOldLength(4); }
-						printf("min\n");
-						//Let the note be sized down by quantized increments, stopping
-						//when the next step down would result in a negative length
-						int thisMin = note->oldLength() % quantization();
-						printf("minresize\n");
-						//The initial value for m_minResizeLen is the minimum length of
-						//a note divisible by the current Q. Therefore we ignore notes
-						//where thisMin == 0 when checking for a new minimum
-						if (thisMin > 0 && thisMin < m_minResizeLen) { m_minResizeLen = thisMin; }
-					}
+				// 	printf("quant\n");
+				// 	//Calculate the minimum length we should allow when resizing
+				// 	//each note, and let all notes use the smallest one found
+				// 	m_minResizeLen = quantization();
+				// 	printf("loop\n");
+				// 	for (Note *note : selectedNotes)
+				// 	{
+				// 		printf("old\n");
+				// 		//Notes from the BB editor can have a negative length, so
+				// 		//change their length to the displayed one before resizing
+				// 		if (note->oldLength() <= 0) { note->setOldLength(4); }
+				// 		printf("min\n");
+				// 		//Let the note be sized down by quantized increments, stopping
+				// 		//when the next step down would result in a negative length
+				// 		int thisMin = note->oldLength() % quantization();
+				// 		printf("minresize\n");
+				// 		//The initial value for m_minResizeLen is the minimum length of
+				// 		//a note divisible by the current Q. Therefore we ignore notes
+				// 		//where thisMin == 0 when checking for a new minimum
+				// 		if (thisMin > 0 && thisMin < m_minResizeLen) { m_minResizeLen = thisMin; }
+				// 	}
 
-					// set resize-cursor
-					setCursor( Qt::SizeHorCursor );
-				}
-				else
-				{
-					if( ! created_new_note )
-					{
-						m_pattern->addJournalCheckPoint();
-					}
+				// 	// set resize-cursor
+				// 	setCursor( Qt::SizeHorCursor );
+				// }
+				// else
+				// {
+				// 	if( ! created_new_note )
+				// 	{
+				// 		m_pattern->addJournalCheckPoint();
+				// 	}
 
-					// otherwise move it
-					m_action = ActionMoveNote;
+				// 	// otherwise move it
+				// 	m_action = ActionMoveNote;
 
-					// set move-cursor
-					setCursor( Qt::SizeAllCursor );
+				// 	// set move-cursor
+				// 	setCursor( Qt::SizeAllCursor );
 
-					// if they're holding shift, copy all selected notes
-					if( ! is_new_note && me->modifiers() & Qt::ShiftModifier )
-					{
-						for (Note *note: selectedNotes)
-						{
-							Note *newNote = m_pattern->addNote(*note, false);
-							newNote->setSelected(false);
-						}
+				// 	// if they're holding shift, copy all selected notes
+				// 	if( ! is_new_note && me->modifiers() & Qt::ShiftModifier )
+				// 	{
+				// 		for (Note *note: selectedNotes)
+				// 		{
+				// 			Note *newNote = m_pattern->addNote(*note, false);
+				// 			newNote->setSelected(false);
+				// 		}
 
-						if (!selectedNotes.empty())
-						{
-							// added new notes, so must update engine, song, etc
-							Engine::getSong()->setModified();
-							update();
-							gui->songEditor()->update();
-						}
-					}
+				// 		if (!selectedNotes.empty())
+				// 		{
+				// 			// added new notes, so must update engine, song, etc
+				// 			Engine::getSong()->setModified();
+				// 			update();
+				// 			gui->songEditor()->update();
+				// 		}
+				// 	}
 
-					// play the note
-					testPlayNote( m_currentNote );
-				}
+				// 	// play the note
+				// 	testPlayNote( m_currentNote );
+				// }
 
-				Engine::getSong()->setModified();
-			}
+				// Engine::getSong()->setModified();
+			// }
 			// else if( ( me->buttons() == Qt::RightButton &&
 			// 				m_editMode == ModeDraw ) ||
 			// 		m_editMode == ModeErase )
@@ -2178,8 +2256,8 @@ void PianoRoll::mousePressEvent(QMouseEvent * me)
 			// 	mouseMoveEvent( me );
 			// }
 
-			update();
-		}
+		// 	update();
+		// }
 		// else if( me->y() < keyAreaBottom() )
 		// {
 		// 	// reference to last key needed for both
@@ -2221,7 +2299,7 @@ void PianoRoll::mousePressEvent(QMouseEvent * me)
 		// 		m_noteEditMenu->popup( mapToGlobal( QPoint( me->x(), me->y() ) ) );
 		// 	}
 		// }
-	}
+	// }
 }
 
 
@@ -2634,6 +2712,10 @@ void PianoRoll::mouseMoveEvent(QMouseEvent * me)
 						update();
 						return;
 					}
+					case ModeSelect:
+					case ModeEditDetuning:
+					case ModeEditKnife:
+						break;
 				}
 			}
 
