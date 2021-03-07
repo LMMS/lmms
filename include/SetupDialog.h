@@ -146,8 +146,6 @@ private:
 
 	// Performance settings widgets.
 	int m_saveInterval;
-	QLineEdit * m_spaLineEdit;
-	QString m_spaDir;
 	bool m_enableAutoSave;
 	bool m_enableRunningAutoSave;
 	QSlider * m_saveIntervalSlider;
@@ -189,6 +187,7 @@ private:
 	QString m_workingDir;
 	QString m_vstDir;
 	QString m_ladspaDir;
+	QString m_spaDir;
 	QString m_gigDir;
 	QString m_sf2Dir;
 #ifdef LMMS_HAVE_FLUIDSYNTH
@@ -201,6 +200,7 @@ private:
 	QLineEdit * m_vstDirLineEdit;
 	QLineEdit * m_themeDirLineEdit;
 	QLineEdit * m_ladspaDirLineEdit;
+	QLineEdit * m_spaLineEdit;
 	QLineEdit * m_gigDirLineEdit;
 	QLineEdit * m_sf2DirLineEdit;
 #ifdef LMMS_HAVE_FLUIDSYNTH

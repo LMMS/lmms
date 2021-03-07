@@ -89,8 +89,9 @@ void SpaViewBase::modelChanged(SpaControlBase *ctrlBase)
 
 
 SpaViewProc::SpaViewProc(QWidget* parent, SpaProc *proc,
-	std::size_t colNum)
-	: LinkedModelGroupView(parent, proc, colNum)
+	std::size_t colNum) :
+	LinkedModelGroupView(parent, proc, colNum),
+	m_proc(proc)
 {
 #if 0
 	class SetupWidget : public Lv2Ports::Visitor

@@ -94,12 +94,19 @@ void SpaProc::loadState(const QDomElement &that)
 void SpaProc::loadFile(const QString &file)
 {
 	const QByteArray fn = file.toUtf8();
-//	m_pluginMutex.lock();
-	m_plugin->load(fn.data(), ++m_saveTicket);
-	while (!m_plugin->load_check(fn.data(), m_saveTicket)) {
-		QThread::msleep(1);
+	if(fn.endsWith(".xmz"))
+	{
+	//	m_pluginMutex.lock();
+		m_plugin->load(fn.data(), ++m_saveTicket);
+		while (!m_plugin->load_check(fn.data(), m_saveTicket)) {
+			QThread::msleep(1);
+		}
+	//	m_pluginMutex.unlock();
 	}
-//	m_pluginMutex.unlock();
+	else
+	{
+		qDebug() << "Unsupported file type (only \".xmz\" works):" << file;
+	}
 }
 
 void SpaProc::reloadPlugin()
