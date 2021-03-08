@@ -76,6 +76,7 @@ public:
 		Library,	// simple library holding a code-base for
 				// several other plugins (e.g. VST-support)
 		Other,
+		VocalInstrument,
 		Undefined = 255
 	} ;
 

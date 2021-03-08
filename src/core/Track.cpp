@@ -30,6 +30,7 @@
 #include "Track.h"
 
 #include <QVariant>
+#include <VocalInstrumentTrack.h>
 
 #include "AutomationPattern.h"
 #include "AutomationTrack.h"
@@ -119,6 +120,8 @@ Track * Track::create( TrackTypes tt, TrackContainer * tc )
 		case AutomationTrack: t = new ::AutomationTrack( tc ); break;
 		case HiddenAutomationTrack:
 						t = new ::AutomationTrack( tc, true ); break;
+		case VocalTrack:
+						t = new VocalInstrumentTrack(tc); break;
 		default: break;
 	}
 

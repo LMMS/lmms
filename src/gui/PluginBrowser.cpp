@@ -157,6 +157,7 @@ void PluginBrowser::addPlugins()
 
 	// Fetch and sort all instrument plugin descriptors
 	auto descs = pluginFactory->descriptors(Plugin::Instrument);
+	descs.append(pluginFactory->descriptors(Plugin::VocalInstrument));
 	std::sort(descs.begin(), descs.end(),
 		[](auto d1, auto d2)
 		{
@@ -279,8 +280,14 @@ void PluginDescWidget::mousePressEvent( QMouseEvent * _me )
 	if ( _me->button() == Qt::LeftButton )
 	{
 		Engine::setDndPluginKey(&m_pluginKey);
-		new StringPairDrag("instrument",
-			QString::fromUtf8(m_pluginKey.desc->name), m_logo, this);
+		if (m_pluginKey.desc->type == Plugin::Instrument){
+			new StringPairDrag("instrument",
+							   QString::fromUtf8(m_pluginKey.desc->name), m_logo, this);
+		}
+		else if (m_pluginKey.desc->type == Plugin::VocalInstrument){
+			new StringPairDrag("vocalinstrument",
+							   QString::fromUtf8(m_pluginKey.desc->name), m_logo, this);
+		}
 		leaveEvent( _me );
 	}
 }
