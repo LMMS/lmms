@@ -33,7 +33,6 @@
 #include "gui_templates.h"
 #include "interpolation.h"
 #include "MainWindow.h"
-#include <QGraphicsOpacityEffect>
 #include <QLabel>
 #include <QPainter>
 #include "ToolTip.h"
