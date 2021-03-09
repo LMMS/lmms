@@ -7,6 +7,7 @@
 #include "Pattern.h"
 #include <thread>
 #include <SampleBuffer.h>
+class VocalNote;
 class LMMS_EXPORT VocalPattern : public Pattern
 {
 public:
@@ -27,6 +28,8 @@ public:
 	void setRenderingProcessesCalled(int newProcesses){
 		m_renderingProcessesCalled = newProcesses;
 	}
+
+	void setLyric(VocalNote *note,const std::string &lyric);
 private:
 	bool m_playing;
 	std::string m_bouncePath;

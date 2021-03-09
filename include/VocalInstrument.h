@@ -14,7 +14,10 @@ public:
 					const Descriptor::SubPluginFeatures::Key * key = nullptr);
 	virtual ~VocalInstrument();
 	virtual bool hasNoteInput() const { return false; }
-	virtual void playVocalPattern(VocalPattern *vocalPattern,sampleFrame *_working_buf) = 0;
 	virtual void bounceVocalPattern(VocalPattern *_pattern_to_bounce) = 0;
+	virtual void bounceVocalPatterns(VocalPattern **_patterns_to_bounce,int _count) = 0;
+	virtual bool isRendering() const {return m_rendering;}
+protected:
+	bool m_rendering;
 };
 #endif //VOCALINSTRUMENT_H

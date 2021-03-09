@@ -119,7 +119,6 @@ public:
 
 	using Model::dataChanged;
 
-
 protected:
 	void updateBBTrack();
 	TimePos beatPatternLength() const;
@@ -154,6 +153,7 @@ private:
 
 signals:
 	void destroyedPattern( Pattern* );
+	void movedNote();
 
 } ;
 

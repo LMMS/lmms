@@ -46,6 +46,7 @@
 #include <math.h>
 #include <utility>
 #include <VocalNote.h>
+#include <VocalPattern.h>
 
 #include "AutomationEditor.h"
 #include "ActionGroup.h"
@@ -2006,7 +2007,11 @@ void PianoRoll::mouseDoubleClickEvent(QMouseEvent * me )
 		{
 			newLyric = "la";
 		}
-		vocalNote->setLyric(newLyric.toStdString());
+		VocalPattern *vocalPattern = dynamic_cast<VocalPattern*>(m_pattern);
+		if (vocalPattern){
+			vocalPattern->setLyric(vocalNote,newLyric.toStdString());
+		}
+
 	}
 
 	// if they clicked in the note edit area, enter value for the volume bar
@@ -4711,6 +4716,7 @@ void PianoRoll::changeSnapMode()
 
 	m_gridMode = static_cast<GridMode>(m_snapModel.value());
 }
+
 
 PianoRollWindow::PianoRollWindow() :
 	Editor(true, true),

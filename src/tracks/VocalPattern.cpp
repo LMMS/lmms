@@ -47,3 +47,8 @@ Note *VocalPattern::addNote(const Note &_new_note, const bool _quant_pos)
 	VocalNote *vocalNote = new VocalNote(_new_note);
 	return Pattern::addNote(vocalNote, _quant_pos);
 }
+void VocalPattern::setLyric(VocalNote *note, const std::string &lyric)
+{
+	note->setLyric(lyric);
+	emit movedNote();
+}

@@ -218,7 +218,7 @@ Note *Pattern::addNote(Note * new_note, const bool _quant_pos)
 	updateLength();
 
 	emit dataChanged();
-
+	emit movedNote();
 	return new_note;
 }
 
@@ -250,7 +250,7 @@ void Pattern::removeNote( Note * _note_to_del )
 
 	checkType();
 	updateLength();
-
+	emit movedNote();
 	emit dataChanged();
 }
 
@@ -277,6 +277,7 @@ void Pattern::rearrangeAllNotes()
 {
 	// sort notes by start time
 	std::sort(m_notes.begin(), m_notes.end(), Note::lessThan);
+	emit movedNote();
 }
 
 
@@ -294,6 +295,7 @@ void Pattern::clearNotes()
 
 	checkType();
 	emit dataChanged();
+	emit movedNote();
 }
 
 
