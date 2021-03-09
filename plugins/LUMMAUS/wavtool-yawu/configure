@@ -1,0 +1,12 @@
+#!/bin/sh
+
+set -e
+echo 'rm -rf build'
+rm -rf build
+echo 'mkdir build'
+mkdir build
+echo 'cd build'
+cd build
+echo 'cmake ..'
+cmake -DCMAKE_BUILD_TYPE=Release .. "$@"
+echo "Configured successfully, use 'cd build && make' to build."

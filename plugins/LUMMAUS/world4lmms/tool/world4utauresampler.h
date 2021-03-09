@@ -1,0 +1,4 @@
+#ifndef WORLD4UTAU_RESAMPLER
+#define WORLD4UTAU_RESAMPLER
+
+#endif
