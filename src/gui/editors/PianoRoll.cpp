@@ -5085,6 +5085,8 @@ void PianoRollWindow::saveSettings( QDomDocument & doc, QDomElement & de )
 		de.appendChild(markedSemiTonesRoot);
 	}
 
+	de.setAttribute("stopbehaviour", m_editor->m_timeLine->behaviourAtStop());
+
 	MainWindow::saveWidgetState( this, de );
 }
 
@@ -5097,6 +5099,8 @@ void PianoRollWindow::loadSettings( const QDomElement & de )
 	m_editor->loadMarkedSemiTones(de.firstChildElement("markedSemiTones"));
 
 	MainWindow::restoreWidgetState( this, de );
+
+	m_editor->m_timeLine->setBehaviourAtStop(de.attribute("stopbehaviour").toInt());
 
 	// update margins here because we're later in the startup process
 	// We can't earlier because everything is still starting with the

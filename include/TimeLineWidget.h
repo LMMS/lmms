@@ -118,6 +118,11 @@ public:
 		return m_behaviourAtStop;
 	}
 
+	void setBehaviourAtStop (int state)
+	{
+		emit loadBehaviourAtStop (state);
+	}
+
 	bool loopPointsEnabled() const
 	{
 		return m_loopPoints == LoopPointsEnabled;
