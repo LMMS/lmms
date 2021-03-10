@@ -209,7 +209,7 @@ private:
 	PixmapButton * feedbackButton;
 	PixmapButton * lookaheadButton;
 
-	QTime m_timeElapsed;
+	QElapsedTimer m_timeElapsed;
 	int m_timeSinceLastUpdate = 0;
 
 	friend class CompressorControls;

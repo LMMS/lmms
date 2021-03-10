@@ -229,7 +229,7 @@ CompressorControlDialog::CompressorControlDialog(CompressorControls* controls) :
 	limitButton = new PixmapButton(this, tr("Limiter"));
 	limitButton->setActiveGraphic(PLUGIN_NAME::getIconPixmap("limiter_sel"));
 	limitButton->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("limiter_unsel"));
-	ToolTip::add(limitButton, tr("Set Ratio to infinity"));
+	ToolTip::add(limitButton, tr("Set Ratio to infinity (is not guaranteed to limit audio volume)"));
 
 	compressLimitGroup = new automatableButtonGroup(this);
 	compressLimitGroup->addButton(compressButton);
