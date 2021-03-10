@@ -27,6 +27,7 @@
 #define NOTE_H
 
 #include <QtCore/QVector>
+#include <map>
 
 #include "volume.h"
 #include "panning.h"
@@ -216,6 +217,31 @@ public:
 
 	void createDetuning();
 
+	inline const std::string &getLyric()
+	{
+		return m_lyric;
+	}
+
+	void setLyric(const std::string &lyric)
+	{
+		m_lyric = lyric;
+	}
+
+	inline double getParameter(const std::string &paramName) const
+	{
+		if (m_parameters.count(paramName))
+		{
+			return m_parameters.at(paramName);
+		}
+		else{
+			return 0;
+		}
+	}
+
+	void setParameter(const std::string &paramName,double newValue)
+	{
+		m_parameters[paramName] = newValue;
+	}
 
 protected:
 	void saveSettings( QDomDocument & doc, QDomElement & parent ) override;
@@ -233,6 +259,8 @@ private:
 	int m_key;
 	volume_t m_volume;
 	panning_t m_panning;
+	std::string m_lyric;
+	std::map<std::string,double> m_parameters;
 	MidiTime m_length;
 	MidiTime m_pos;
 	DetuningHelper * m_detuning;

@@ -31,6 +31,7 @@
 #include "lmms_basics.h"
 #include "MemoryManager.h"
 #include "MidiTime.h"
+#include "NoteParameter.h"
 #include "Plugin.h"
 
 
@@ -101,6 +102,11 @@ public:
 	virtual Flags flags() const
 	{
 		return NoFlags;
+	}
+
+	virtual std::vector<NoteParameter> *noteParameters()
+	{
+		return nullptr;
 	}
 
 	// sub-classes can re-implement this for receiving all incoming

@@ -43,6 +43,7 @@ set(LMMS_SRCS
 	core/MixHelpers.cpp
 	core/Model.cpp
 	core/ModelVisitor.cpp
+	core/NoteParameter.cpp
 	core/Note.cpp
 	core/NotePlayHandle.cpp
 	core/Oscillator.cpp
