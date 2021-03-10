@@ -1,6 +1,6 @@
 INCLUDE(BuildPlugin)
-add_subdirectory(wavtool-yawu)
-add_subdirectory(world4lmms)
+add_subdirectory(wavtool-yawu-lmms-git)
+add_subdirectory(world4lmms-git)
 if (WORLD4LMMS_INCLUDE_DIR)
     include_directories(${WORLD4LMMS_INCLUDE_DIR})
 else()

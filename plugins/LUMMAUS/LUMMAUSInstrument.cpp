@@ -240,7 +240,6 @@ void LUMMAUSInstrument::bounceVocalPatterns(VocalPattern **_patterns_to_bounce, 
 
 void LUMMAUSInstrument::CallResampler(const OtoItem *otoItem,VocalNote* note, const std::string &output_path,int id)
 {
-	double overlap = id > 0 ? otoItem->overlap * factor : 0;
 	stringstream pitch_curve;
 	std::vector<float> *pitches = getUTAUPitchBend(note);
 	for (int j = 0; j < pitches->size();j++){
@@ -272,7 +271,7 @@ void LUMMAUSInstrument::CallWavtool(const OtoItem *otoItem, VocalNote *note,cons
 		output_path,
 		input_path,
 		0,
-		note->length().getTimeInMilliseconds(Engine::getSong()->getTempo()) ,
+		note->length().getTimeInMilliseconds(Engine::getSong()->getTempo()) + (otoItem->preutterance * factor),
 		0,
 		0,
 		0,
