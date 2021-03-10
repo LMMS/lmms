@@ -23,10 +23,10 @@
  */
 
 
-#include <QDomElement>
-
 #include "CompressorControls.h"
 #include "Compressor.h"
+
+#include <QDomElement>
 
 #include "Engine.h"
 #include "Song.h"

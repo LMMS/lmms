@@ -22,19 +22,19 @@
  *
  */
 
-#include <QLayout>
-
 #include "Compressor.h"
 #include "CompressorControlDialog.h"
 #include "CompressorControls.h"
+
+#include <QLabel>
+#include <QLayout>
+#include <QPainter>
 
 #include "embed.h"
 #include "GuiApplication.h"
 #include "gui_templates.h"
 #include "interpolation.h"
 #include "MainWindow.h"
-#include <QLabel>
-#include <QPainter>
 #include "ToolTip.h"
 
 CompressorControlDialog::CompressorControlDialog(CompressorControls* controls) :
@@ -392,6 +392,11 @@ void CompressorControlDialog::updateDisplay()
 
 	m_peakAvg = (m_controls->m_effect->m_displayPeak[0] + m_controls->m_effect->m_displayPeak[1]) * 0.5f;
 	m_gainAvg = (m_controls->m_effect->m_displayGain[0] + m_controls->m_effect->m_displayGain[1]) * 0.5f;
+
+	m_controls->m_effect->m_displayPeak[0] = m_controls->m_effect->m_yL[0];
+	m_controls->m_effect->m_displayPeak[1] = m_controls->m_effect->m_yL[1];
+	m_controls->m_effect->m_displayGain[0] = m_controls->m_effect->m_gainResult[0];
+	m_controls->m_effect->m_displayGain[1] = m_controls->m_effect->m_gainResult[1];
 
 	m_yPoint = dbfsToYPoint(ampToDbfs(m_peakAvg));
 	m_yGainPoint = dbfsToYPoint(ampToDbfs(m_gainAvg));

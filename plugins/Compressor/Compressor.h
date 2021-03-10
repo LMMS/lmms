@@ -135,6 +135,7 @@ private:
 	float m_prevOut[2] = {0};
 
 	float m_yL[2];
+	float m_gainResult[2];
 	float m_displayPeak[2];
 	float m_displayGain[2];
 

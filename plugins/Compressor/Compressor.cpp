@@ -246,6 +246,7 @@ bool CompressorEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 		if (!m_cleanedBuffers)
 		{
 			m_yL[0] = m_yL[1] = COMP_NOISE_FLOOR;
+			m_gainResult[0] = m_gainResult[1] = 1;
 			m_displayPeak[0] = m_displayPeak[1] = COMP_NOISE_FLOOR;
 			m_displayGain[0] = m_displayGain[1] = COMP_NOISE_FLOOR;
 			std::fill(std::begin(m_lookaheadBuf[0]), std::end(m_lookaheadBuf[0]), 0);
@@ -312,7 +313,8 @@ bool CompressorEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 		s[0] *= inBalance > 0 ? 1 - inBalance : 1;
 		s[1] *= inBalance < 0 ? 1 + inBalance : 1;
 
-		float gainResult[2] = {0, 0};
+		m_gainResult[0] = 0;
+		m_gainResult[1] = 0;
 
 		for (int i = 0; i < 2; i++)
 		{
@@ -415,7 +417,7 @@ bool CompressorEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 			m_yL[i] = qMax(COMP_NOISE_FLOOR, m_yL[i]);
 
 			// For the visualizer
-			m_displayPeak[i] = m_yL[i];
+			m_displayPeak[i] = qMax(m_yL[i], m_displayPeak[i]);
 
 			const float currentPeakDbfs = ampToDbfs(m_yL[i]);
 
@@ -423,22 +425,22 @@ bool CompressorEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 			// depending on the measured input value.
 			if (currentPeakDbfs - m_thresholdVal < -m_kneeVal)// Below knee
 			{
-				gainResult[i] = currentPeakDbfs;
+				m_gainResult[i] = currentPeakDbfs;
 			}
 			else if (currentPeakDbfs - m_thresholdVal < m_kneeVal)// Within knee
 			{
 				const float temp = currentPeakDbfs - m_thresholdVal + m_kneeVal;
-				gainResult[i] = currentPeakDbfs + ((limiter ? 0 : m_ratioVal) - 1) * temp * temp / (4 * m_kneeVal);
+				m_gainResult[i] = currentPeakDbfs + ((limiter ? 0 : m_ratioVal) - 1) * temp * temp / (4 * m_kneeVal);
 			}
 			else// Above knee
 			{
-				gainResult[i] = limiter
+				m_gainResult[i] = limiter
 					? m_thresholdVal
 					: m_thresholdVal + (currentPeakDbfs - m_thresholdVal) * m_ratioVal;
 			}
 
-			gainResult[i] = dbfsToAmp(gainResult[i]) / m_yL[i];
-			gainResult[i] = qMax(m_rangeVal, gainResult[i]);
+			m_gainResult[i] = dbfsToAmp(m_gainResult[i]) / m_yL[i];
+			m_gainResult[i] = qMax(m_rangeVal, m_gainResult[i]);
 		}
 
 		switch (stereoLink)
@@ -449,17 +451,17 @@ bool CompressorEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 			}
 			case Maximum:
 			{
-				gainResult[0] = gainResult[1] = qMin(gainResult[0], gainResult[1]);
+				m_gainResult[0] = m_gainResult[1] = qMin(m_gainResult[0], m_gainResult[1]);
 				break;
 			}
 			case Average:
 			{
-				gainResult[0] = gainResult[1] = (gainResult[0] + gainResult[1]) * 0.5f;
+				m_gainResult[0] = m_gainResult[1] = (m_gainResult[0] + m_gainResult[1]) * 0.5f;
 				break;
 			}
 			case Minimum:
 			{
-				gainResult[0] = gainResult[1] = qMax(gainResult[0], gainResult[1]);
+				m_gainResult[0] = m_gainResult[1] = qMax(m_gainResult[0], m_gainResult[1]);
 				break;
 			}
 			case Blend:
@@ -468,23 +470,23 @@ bool CompressorEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 				{
 					if (blend <= 1)// Blend to minimum volume
 					{
-						const float temp1 = qMin(gainResult[0], gainResult[1]);
-						gainResult[0] = linearInterpolate(gainResult[0], temp1, blend);
-						gainResult[1] = linearInterpolate(gainResult[1], temp1, blend);
+						const float temp1 = qMin(m_gainResult[0], m_gainResult[1]);
+						m_gainResult[0] = linearInterpolate(m_gainResult[0], temp1, blend);
+						m_gainResult[1] = linearInterpolate(m_gainResult[1], temp1, blend);
 					}
 					else if (blend <= 2)// Blend to average volume
 					{
-						const float temp1 = qMin(gainResult[0], gainResult[1]);
-						const float temp2 = (gainResult[0] + gainResult[1]) * 0.5f;
-						gainResult[0] = linearInterpolate(temp1, temp2, blend - 1);
-						gainResult[1] = gainResult[0];
+						const float temp1 = qMin(m_gainResult[0], m_gainResult[1]);
+						const float temp2 = (m_gainResult[0] + m_gainResult[1]) * 0.5f;
+						m_gainResult[0] = linearInterpolate(temp1, temp2, blend - 1);
+						m_gainResult[1] = m_gainResult[0];
 					}
 					else// Blend to maximum volume
 					{
-						const float temp1 = (gainResult[0] + gainResult[1]) * 0.5f;
-						const float temp2 = qMax(gainResult[0], gainResult[1]);
-						gainResult[0] = linearInterpolate(temp1, temp2, blend - 2);
-						gainResult[1] = gainResult[0];
+						const float temp1 = (m_gainResult[0] + m_gainResult[1]) * 0.5f;
+						const float temp2 = qMax(m_gainResult[0], m_gainResult[1]);
+						m_gainResult[0] = linearInterpolate(temp1, temp2, blend - 2);
+						m_gainResult[1] = m_gainResult[0];
 					}
 				}
 				break;
@@ -494,13 +496,13 @@ bool CompressorEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 		// Bias compression to the left or right (or mid or side)
 		if (stereoBalance != 0)
 		{
-			gainResult[0] = 1 - ((1 - gainResult[0]) * (stereoBalance > 0 ? 1 - stereoBalance : 1));
-			gainResult[1] = 1 - ((1 - gainResult[1]) * (stereoBalance < 0 ? 1 + stereoBalance : 1));
+			m_gainResult[0] = 1 - ((1 - m_gainResult[0]) * (stereoBalance > 0 ? 1 - stereoBalance : 1));
+			m_gainResult[1] = 1 - ((1 - m_gainResult[1]) * (stereoBalance < 0 ? 1 + stereoBalance : 1));
 		}
 
 		// For visualizer
-		m_displayGain[0] = gainResult[0];
-		m_displayGain[1] = gainResult[1];
+		m_displayGain[0] = qMax(m_gainResult[0], m_displayGain[0]);
+		m_displayGain[1] = qMax(m_gainResult[1], m_displayGain[1]);
 
 		// Delay the signal by 20 ms via ring buffer if lookahead is enabled
 		if (lookahead)
@@ -536,8 +538,8 @@ bool CompressorEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 		s[0] *= inBalance > 0 ? 1 - inBalance : 1;
 		s[1] *= inBalance < 0 ? 1 + inBalance : 1;
 
-		s[0] *= gainResult[0] * m_inGainVal * m_outGainVal * (outBalance > 0 ? 1 - outBalance : 1);
-		s[1] *= gainResult[1] * m_inGainVal * m_outGainVal * (outBalance < 0 ? 1 + outBalance : 1);
+		s[0] *= m_gainResult[0] * m_inGainVal * m_outGainVal * (outBalance > 0 ? 1 - outBalance : 1);
+		s[1] *= m_gainResult[1] * m_inGainVal * m_outGainVal * (outBalance < 0 ? 1 + outBalance : 1);
 
 		if (midside)// Convert mid/side back to left/right
 		{

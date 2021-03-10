@@ -25,18 +25,18 @@
 #ifndef COMPRESSOR_CONTROL_DIALOG_H
 #define COMPRESSOR_CONTROL_DIALOG_H
 
-#include "../Eq/EqFader.h"
-#include "EffectControlDialog.h"
-#include "GuiApplication.h"
-#include "Knob.h"
-#include "MainWindow.h"
-#include "PixmapButton.h"
 #include <QBasicTimer>
 #include <QLabel>
 #include <QMouseEvent>
 #include <QPainter>
 #include <QTime>
 
+#include "../Eq/EqFader.h"
+#include "EffectControlDialog.h"
+#include "GuiApplication.h"
+#include "Knob.h"
+#include "MainWindow.h"
+#include "PixmapButton.h"
 
 
 constexpr int COMP_MILLI_PER_PIXEL = 6;
