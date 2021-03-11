@@ -411,7 +411,7 @@ void PianoView::contextMenuEvent(QContextMenuEvent *me)
 		return;
 	}
 
-	// check which control element is closest to the mouse and open the approptiate menu
+	// check which control element is closest to the mouse and open the appropriate menu
 	QString title;
 	IntModel *noteModel = getNearestMarker(getKeyFromMouse(me->pos()), &title);
 
@@ -985,7 +985,6 @@ void PianoView::paintEvent( QPaintEvent * )
 		if (++cur_key == NumKeys) {break;}
 	}
 }
-
 
 
 
