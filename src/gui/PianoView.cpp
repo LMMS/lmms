@@ -123,6 +123,11 @@ PianoView::PianoView(QWidget *parent) :
 
 	setAttribute(Qt::WA_OpaquePaintEvent, true);
 	setFocusPolicy(Qt::StrongFocus);
+
+	// Black keys are drawn halfway between successive white keys, so they do not
+	// contribute to the total width. Half of a black key is added in case the last
+	// octave is incomplete and ends with a black key. Drawing always starts at
+	// a white key, so no similar modification is needed at the beginning.
 	setMaximumWidth(Piano::NumWhiteKeys * PW_WHITE_KEY_WIDTH +
 		(Piano::isBlackKey(NumKeys-1) ? PW_BLACK_KEY_WIDTH / 2 : 0));
 
