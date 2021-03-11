@@ -2306,7 +2306,7 @@ void PianoRoll::mousePressEvent(QMouseEvent * me)
 
 
 
-void PianoRoll::mouseDoubleClickEvent(QMouseEvent * me )
+void PianoRoll::mouseDoubleClickEvent(QMouseEvent* me)
 {
 	if (!hasValidPattern()) { return; }
 
@@ -2321,46 +2321,46 @@ void PianoRoll::mouseDoubleClickEvent(QMouseEvent * me )
 	{
 		case PianoRollArea::NoteProperties:
 		{
-			// get values for going through notes
-			int pixel_range = 4;
+			// Get values for going through notes
+			int pixelRange = 4;
 			int x = mex - m_whiteKeyWidth;
-			const int ticks_start = (x - pixel_range / 2) *
+			const int ticksStart = (x - pixelRange / 2) *
 						TimePos::ticksPerBar() / m_ppb + m_currentPosition;
-			const int ticks_end = (x + pixel_range / 2) *
+			const int ticksEnd = (x + pixelRange / 2) *
 						TimePos::ticksPerBar() / m_ppb + m_currentPosition;
-			const int ticks_middle = x * TimePos::ticksPerBar() / m_ppb + m_currentPosition;
+			const int ticksMiddle = x * TimePos::ticksPerBar() / m_ppb + m_currentPosition;
 
-			// go through notes to figure out which one we want to change
+			// Go through notes to figure out which ones we want to change
 			NoteVector nv;
-			for ( Note * i : m_pattern->notes() )
+			for (Note* i : m_pattern->notes())
 			{
-				if( i->withinRange( ticks_start, ticks_end ) || ( i->selected() && !altPressed ) )
+				if (i->withinRange(ticksStart, ticksEnd) || (i->selected() && !altPressed))
 				{
 					nv += i;
 				}
 			}
-			// make sure we're on a note
-			if( nv.size() > 0 )
+			// Make sure vector is not empty
+			if (nv.size() > 0)
 			{
-				const Note * closest = NULL;
-				int closest_dist = 9999999;
-				// if we caught multiple notes and we're not editing a
+				const Note* closest = nullptr;
+				int closestDist = 9999999;
+				// If we caught multiple notes and we're not editing a
 				// selection, find the closest...
-				if( nv.size() > 1 && !isSelection() )
+				if (nv.size() > 1 && !isSelection())
 				{
-					for ( const Note * i : nv )
+					for (const Note* i : nv)
 					{
-						const int dist = qAbs( i->pos().getTicks() - ticks_middle );
-						if( dist < closest_dist ) { closest = i; closest_dist = dist; }
+						const int dist = qAbs(i->pos().getTicks() - ticksMiddle);
+						if (dist < closestDist) { closest = i; closestDist = dist; }
 					}
 					// ... then remove all notes from the vector that aren't on the same exact time
 					NoteVector::Iterator it = nv.begin();
-					while( it != nv.end() )
+					while (it != nv.end())
 					{
-						const Note *note = *it;
-						if( note->pos().getTicks() != closest->pos().getTicks() )
+						const Note* note = *it;
+						if (note->pos().getTicks() != closest->pos().getTicks())
 						{
-							it = nv.erase( it );
+							it = nv.erase(it);
 						}
 						else
 						{
@@ -2368,7 +2368,7 @@ void PianoRoll::mouseDoubleClickEvent(QMouseEvent * me )
 						}
 					}
 				}
-				enterValue( &nv );
+				enterValue(&nv);
 			}
 			break;
 		}
