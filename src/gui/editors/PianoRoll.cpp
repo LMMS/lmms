@@ -2308,70 +2308,134 @@ void PianoRoll::mousePressEvent(QMouseEvent * me)
 
 void PianoRoll::mouseDoubleClickEvent(QMouseEvent * me )
 {
-	if( ! hasValidPattern() )
-	{
-		return;
-	}
+	if (!hasValidPattern()) { return; }
 
-	// if they clicked in the note edit area, enter value for the volume bar
-	if( me->x() > noteEditLeft() && me->x() < noteEditRight()
-		&& me->y() > noteEditTop() && me->y() < noteEditBottom() )
-	{
-		// get values for going through notes
-		int pixel_range = 4;
-		int x = me->x() - m_whiteKeyWidth;
-		const int ticks_start = ( x-pixel_range/2 ) *
-					TimePos::ticksPerBar() / m_ppb + m_currentPosition;
-		const int ticks_end = ( x+pixel_range/2 ) *
-					TimePos::ticksPerBar() / m_ppb + m_currentPosition;
-		const int ticks_middle = x * TimePos::ticksPerBar() / m_ppb + m_currentPosition;
+	const bool altPressed = me->modifiers() & Qt::AltModifier;
 
-		// go through notes to figure out which one we want to change
-		bool altPressed = me->modifiers() & Qt::AltModifier;
-		NoteVector nv;
-		for ( Note * i : m_pattern->notes() )
+	const int mey = me->y();
+	const int mex = me->x();
+
+	const PianoRollArea pra = getPianoRollAreaIn(mex, mey);
+
+	switch (pra)
+	{
+		case PianoRollArea::NoteProperties:
 		{
-			if( i->withinRange( ticks_start, ticks_end ) || ( i->selected() && !altPressed ) )
+			// get values for going through notes
+			int pixel_range = 4;
+			int x = mex - m_whiteKeyWidth;
+			const int ticks_start = (x - pixel_range / 2) *
+						TimePos::ticksPerBar() / m_ppb + m_currentPosition;
+			const int ticks_end = (x + pixel_range / 2) *
+						TimePos::ticksPerBar() / m_ppb + m_currentPosition;
+			const int ticks_middle = x * TimePos::ticksPerBar() / m_ppb + m_currentPosition;
+
+			// go through notes to figure out which one we want to change
+			NoteVector nv;
+			for ( Note * i : m_pattern->notes() )
 			{
-				nv += i;
-			}
-		}
-		// make sure we're on a note
-		if( nv.size() > 0 )
-		{
-			const Note * closest = NULL;
-			int closest_dist = 9999999;
-			// if we caught multiple notes and we're not editing a
-			// selection, find the closest...
-			if( nv.size() > 1 && !isSelection() )
-			{
-				for ( const Note * i : nv )
+				if( i->withinRange( ticks_start, ticks_end ) || ( i->selected() && !altPressed ) )
 				{
-					const int dist = qAbs( i->pos().getTicks() - ticks_middle );
-					if( dist < closest_dist ) { closest = i; closest_dist = dist; }
-				}
-				// ... then remove all notes from the vector that aren't on the same exact time
-				NoteVector::Iterator it = nv.begin();
-				while( it != nv.end() )
-				{
-					const Note *note = *it;
-					if( note->pos().getTicks() != closest->pos().getTicks() )
-					{
-						it = nv.erase( it );
-					}
-					else
-					{
-						it++;
-					}
+					nv += i;
 				}
 			}
-			enterValue( &nv );
+			// make sure we're on a note
+			if( nv.size() > 0 )
+			{
+				const Note * closest = NULL;
+				int closest_dist = 9999999;
+				// if we caught multiple notes and we're not editing a
+				// selection, find the closest...
+				if( nv.size() > 1 && !isSelection() )
+				{
+					for ( const Note * i : nv )
+					{
+						const int dist = qAbs( i->pos().getTicks() - ticks_middle );
+						if( dist < closest_dist ) { closest = i; closest_dist = dist; }
+					}
+					// ... then remove all notes from the vector that aren't on the same exact time
+					NoteVector::Iterator it = nv.begin();
+					while( it != nv.end() )
+					{
+						const Note *note = *it;
+						if( note->pos().getTicks() != closest->pos().getTicks() )
+						{
+							it = nv.erase( it );
+						}
+						else
+						{
+							it++;
+						}
+					}
+				}
+				enterValue( &nv );
+			}
+			break;
+		}
+		default:
+		{
+			QWidget::mouseDoubleClickEvent(me);
 		}
 	}
-	else
-	{
-		QWidget::mouseDoubleClickEvent(me);
-	}
+	// // if they clicked in the note edit area, enter value for the volume bar
+	// if( me->x() > noteEditLeft() && me->x() < noteEditRight()
+	// 	&& me->y() > noteEditTop() && me->y() < noteEditBottom() )
+	// {
+	// 	// get values for going through notes
+	// 	int pixel_range = 4;
+	// 	int x = me->x() - m_whiteKeyWidth;
+	// 	const int ticks_start = ( x-pixel_range/2 ) *
+	// 				TimePos::ticksPerBar() / m_ppb + m_currentPosition;
+	// 	const int ticks_end = ( x+pixel_range/2 ) *
+	// 				TimePos::ticksPerBar() / m_ppb + m_currentPosition;
+	// 	const int ticks_middle = x * TimePos::ticksPerBar() / m_ppb + m_currentPosition;
+
+	// 	// go through notes to figure out which one we want to change
+	// 	bool altPressed = me->modifiers() & Qt::AltModifier;
+	// 	NoteVector nv;
+	// 	for ( Note * i : m_pattern->notes() )
+	// 	{
+	// 		if( i->withinRange( ticks_start, ticks_end ) || ( i->selected() && !altPressed ) )
+	// 		{
+	// 			nv += i;
+	// 		}
+	// 	}
+	// 	// make sure we're on a note
+	// 	if( nv.size() > 0 )
+	// 	{
+	// 		const Note * closest = NULL;
+	// 		int closest_dist = 9999999;
+	// 		// if we caught multiple notes and we're not editing a
+	// 		// selection, find the closest...
+	// 		if( nv.size() > 1 && !isSelection() )
+	// 		{
+	// 			for ( const Note * i : nv )
+	// 			{
+	// 				const int dist = qAbs( i->pos().getTicks() - ticks_middle );
+	// 				if( dist < closest_dist ) { closest = i; closest_dist = dist; }
+	// 			}
+	// 			// ... then remove all notes from the vector that aren't on the same exact time
+	// 			NoteVector::Iterator it = nv.begin();
+	// 			while( it != nv.end() )
+	// 			{
+	// 				const Note *note = *it;
+	// 				if( note->pos().getTicks() != closest->pos().getTicks() )
+	// 				{
+	// 					it = nv.erase( it );
+	// 				}
+	// 				else
+	// 				{
+	// 					it++;
+	// 				}
+	// 			}
+	// 		}
+	// 		enterValue( &nv );
+	// 	}
+	// }
+	// else
+	// {
+	// 	QWidget::mouseDoubleClickEvent(me);
+	// }
 }
 
 
