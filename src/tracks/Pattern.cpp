@@ -324,6 +324,40 @@ void Pattern::setStep( int step, bool enabled )
 
 
 
+void Pattern::splitNotes(NoteVector notes, TimePos pos)
+{
+	if (notes.empty()) { return; }
+
+	addJournalCheckPoint();
+
+	for (int i = 0; i < notes.size(); ++i)
+	{
+		Note* note = notes.at(i);
+
+		int leftLength = pos.getTicks() - note->pos();
+		int rightLength = note->length() - leftLength;
+
+		// Split out of bounds
+		if (leftLength <= 0 || rightLength <= 0)
+		{
+			continue;
+		}
+
+		// Reduce note length
+		note->setLength(leftLength);
+
+		// Add new note with the remaining length
+		Note newNote = Note(*note);
+		newNote.setLength(rightLength);
+		newNote.setPos(note->pos() + leftLength);
+
+		addNote(newNote, false);
+	}
+}
+
+
+
+
 void Pattern::setType( PatternTypes _new_pattern_type )
 {
 	if( _new_pattern_type == BeatPattern ||

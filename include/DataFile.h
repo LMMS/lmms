@@ -115,6 +115,7 @@ private:
 	void upgrade_1_2_0_rc3();
 	void upgrade_1_3_0();
 	void upgrade_noHiddenClipNames();
+	void upgrade_automationNodes();
 	void upgrade_extendedNoteRange();
 
 	// List of all upgrade methods
