@@ -2342,31 +2342,22 @@ void PianoRoll::mouseDoubleClickEvent(QMouseEvent* me)
 			// Make sure vector is not empty
 			if (nv.size() > 0)
 			{
-				const Note* closest = nullptr;
-				int closestDist = 9999999;
+				Note* closest = nullptr;
+				// closestDist will be compared with all other note's distances to find
+				// the smallest, so we can set it to the first note's distance.
+				int closestDist = std::abs(nv.first()->pos().getTicks() - ticksMiddle);
 				// If we caught multiple notes and we're not editing a
 				// selection, find the closest...
 				if (nv.size() > 1 && !isSelection())
 				{
-					for (const Note* i : nv)
+					for (Note* i : nv)
 					{
-						const int dist = qAbs(i->pos().getTicks() - ticksMiddle);
-						if (dist < closestDist) { closest = i; closestDist = dist; }
+						const int dist = std::abs(i->pos().getTicks() - ticksMiddle);
+						if (dist <= closestDist) { closest = i; closestDist = dist; }
 					}
-					// ... then remove all notes from the vector that aren't on the same exact time
-					NoteVector::Iterator it = nv.begin();
-					while (it != nv.end())
-					{
-						const Note* note = *it;
-						if (note->pos().getTicks() != closest->pos().getTicks())
-						{
-							it = nv.erase(it);
-						}
-						else
-						{
-							it++;
-						}
-					}
+					// ... then we clear the vector and add just the closest note
+					nv.clear();
+					nv += closest;
 				}
 				enterValue(&nv);
 			}
