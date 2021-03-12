@@ -210,12 +210,12 @@ void Track::saveSettings( QDomDocument & doc, QDomElement & element )
 	{
 		element.setAttribute( "trackheight", m_height );
 	}
-
+	
 	if( m_hasColor )
 	{
 		element.setAttribute( "color", m_color.name() );
 	}
-
+	
 	QDomElement tsDe = doc.createElement( nodeName() );
 	// let actual track (InstrumentTrack, bbTrack, sampleTrack etc.) save
 	// its settings
@@ -671,3 +671,4 @@ BoolModel *Track::getMutedModel()
 {
 	return &m_mutedModel;
 }
+

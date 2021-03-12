@@ -177,7 +177,7 @@ public:
 	{
 		return m_processingLock.tryLock();
 	}
-
+	
 	QColor color()
 	{
 		return m_color;
@@ -186,7 +186,7 @@ public:
 	{
 		return m_hasColor;
 	}
-
+	
 	BoolModel* getMutedModel();
 
 public slots:
@@ -218,7 +218,7 @@ private:
 	tcoVector m_trackContentObjects;
 
 	QMutex m_processingLock;
-
+	
 	QColor m_color;
 	bool m_hasColor;
 
