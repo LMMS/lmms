@@ -1017,7 +1017,7 @@ void SampleBuffer::visualize(
 	const float ySpace = h * 0.5f;
 	const int nbFrames = focusOnRange ? toFrame - fromFrame : m_frames;
 
-	const int fpp = qMax<int>(1, nbFrames / w);
+	const int fpp = std::max(1, nbFrames / w);
 	const int totalPoints = nbFrames / fpp * 2 + 2;
 	std::vector<QPointF> fMax(totalPoints);
 	std::vector<QPointF> fRms(totalPoints);

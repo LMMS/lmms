@@ -577,7 +577,7 @@ void SampleTCOView::paintEvent( QPaintEvent * pe )
 	bool muted = m_tco->getTrack()->isMuted() || m_tco->isMuted();
 	bool selected = isSelected();
 
-	QLinearGradient lingrad( 0, 0, 0, height() );
+	QLinearGradient lingrad(0, 0, 0, height());
 	QColor c = painter.background().color();
 	if (muted) { c = c.darker(150); }
 	if (selected) { c = c.darker(150); }
@@ -603,12 +603,12 @@ void SampleTCOView::paintEvent( QPaintEvent * pe )
 				: m_tco->getTrack()->color())
 			: painter.pen().brush().color();
 
-	p.setPen( tcoColor );
+	p.setPen(tcoColor);
 
 	if (muted)
 	{
 		QColor penColor = p.pen().brush().color();
-		penColor.setHsv( penColor.hsvHue(), penColor.hsvSaturation() / 4, penColor.value() );
+		penColor.setHsv(penColor.hsvHue(), penColor.hsvSaturation() / 4, penColor.value());
 		p.setPen(penColor.darker(250));
 	}
 	if (selected)
