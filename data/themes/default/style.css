@@ -704,7 +704,8 @@ TrackContentObjectView   {
 	qproperty-gradient: false; /* boolean property, set true to have a gradient */
 	/* finger tip offset of cursor */
 	qproperty-mouseHotspotHand: 7px 2px;
-	
+	qproperty-mouseHotspotKnife: 0px 0px;
+
 	font-size: 11px;
 }
 

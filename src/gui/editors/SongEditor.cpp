@@ -449,6 +449,11 @@ void SongEditor::setEditModeDraw()
 	setEditMode(DrawMode);
 }
 
+void SongEditor::setEditModeKnife()
+{
+	setEditMode(KnifeMode);
+}
+
 void SongEditor::setEditModeSelect()
 {
 	setEditMode(SelectMode);
@@ -860,6 +865,14 @@ bool SongEditor::allowRubberband() const
 
 
 
+bool SongEditor::knifeMode() const
+{
+	return m_mode == KnifeMode;
+}
+
+
+
+
 int SongEditor::trackIndexFromSelectionPoint(int yPos)
 {
 	const TrackView * tv = trackViewAt(yPos - m_timeLine->height());
@@ -944,13 +957,16 @@ SongEditorWindow::SongEditorWindow(Song* song) :
 
 	m_editModeGroup = new ActionGroup(this);
 	m_drawModeAction = m_editModeGroup->addAction(embed::getIconPixmap("edit_draw"), tr("Draw mode"));
+	m_knifeModeAction = m_editModeGroup->addAction(embed::getIconPixmap("edit_knife"), tr("Knife mode (split sample clips)"));
 	m_selectModeAction = m_editModeGroup->addAction(embed::getIconPixmap("edit_select"), tr("Edit mode (select and move)"));
 	m_drawModeAction->setChecked(true);
 
 	connect(m_drawModeAction, SIGNAL(triggered()), m_editor, SLOT(setEditModeDraw()));
+	connect(m_knifeModeAction, SIGNAL(triggered()), m_editor, SLOT(setEditModeKnife()));
 	connect(m_selectModeAction, SIGNAL(triggered()), m_editor, SLOT(setEditModeSelect()));
 
 	editActionsToolBar->addAction( m_drawModeAction );
+	editActionsToolBar->addAction( m_knifeModeAction );
 	editActionsToolBar->addAction( m_selectModeAction );
 
 	DropToolBar *timeLineToolBar = addDropToolBarToTop(tr("Timeline controls"));
@@ -1026,6 +1042,13 @@ void SongEditorWindow::updateSnapLabel(){
 		m_snappingComboBox->setToolTip(tr("Clip snapping size"));
 		m_snapSizeLabel->clear();
 	}
+}
+
+
+
+
+void SongEditorWindow::syncEditMode(){
+	m_editModeGroup->checkedAction()->trigger();
 }
 
 
@@ -1107,32 +1130,4 @@ void SongEditorWindow::adjustUiAfterProjectLoad()
 			qobject_cast<QMdiSubWindow *>( parentWidget() ) );
 	connect( qobject_cast<SubWindow *>( parentWidget() ), SIGNAL( focusLost() ), this, SLOT( lostFocus() ) );
 	m_editor->scrolled(0);
-}
-
-
-
-
-void SongEditorWindow::keyPressEvent( QKeyEvent *ke )
-{
-	if( ke->key() == Qt::Key_Control )
-	{
-		m_crtlAction = m_editModeGroup->checkedAction();
-		m_selectModeAction->setChecked( true );
-		m_selectModeAction->trigger();
-	}
-}
-
-
-
-
-void SongEditorWindow::keyReleaseEvent( QKeyEvent *ke )
-{
-	if( ke->key() == Qt::Key_Control )
-	{
-		if( m_crtlAction )
-		{
-			m_crtlAction->setChecked( true );
-			m_crtlAction->trigger();
-		}
-	}
 }
