@@ -598,10 +598,10 @@ FxLine {
 	color: #e0e0e0;
 	qproperty-backgroundActive: qlineargradient(spread:reflect, x1:0, y1:0, x2:1, y2:0,
 								stop:0 #7b838d, stop:1 #6b7581 );
-	qproperty-strokeOuterActive: rgb( 0, 0, 0 );	
-	qproperty-strokeOuterInactive: rgba( 0, 0, 0, 50 );	
-	qproperty-strokeInnerActive: rgba( 255, 255, 255, 100 );	
-	qproperty-strokeInnerInactive: rgba( 255, 255, 255, 50 );					
+	qproperty-strokeOuterActive: rgb( 0, 0, 0 );
+	qproperty-strokeOuterInactive: rgba( 0, 0, 0, 50 );
+	qproperty-strokeInnerActive: rgba( 255, 255, 255, 100 );
+	qproperty-strokeInnerInactive: rgba( 255, 255, 255, 50 );
 }
 
 /* persistent peak markers for fx peak meters */
@@ -658,7 +658,8 @@ TrackContentObjectView   {
 	qproperty-gradient: true; /* boolean property, set true to have a gradient */
 	/* finger tip offset of cursor */
 	qproperty-mouseHotspotHand: 3px 3px;
-	
+	qproperty-mouseHotspotKnife: 0px 0px;
+
 	font-size: 11px;
 }
 
@@ -917,6 +918,26 @@ NesInstrumentView Knob {
 	qproperty-innerRadius: 8.0;
 	qproperty-centerPointX: 14.5;
 	qproperty-centerPointY: 14.5;
+	qproperty-lineWidth: 2;
+}
+
+CompressorControlDialog {
+	qproperty-inVolAreaColor: rgba(209, 216, 228, 17);
+	qproperty-inVolColor: rgba(209, 216, 228, 100);
+	qproperty-outVolAreaColor: rgba(209, 216, 228, 30);
+	qproperty-outVolColor: rgba(209, 216, 228, 240);
+	qproperty-gainReductionColor: rgba(180, 100, 100, 210);
+	qproperty-kneeColor: rgba(39, 171, 95, 255);
+	qproperty-kneeColor2: rgba(9, 171, 160, 255);
+	qproperty-threshColor: rgba(39, 171, 95, 100);
+	qproperty-textColor: rgba(209, 216, 228, 50);
+	qproperty-graphColor: rgba(209, 216, 228, 50);
+	qproperty-resetColor: rgba(200, 100, 15, 200);
+}
+
+CompressorControlDialog Knob {
+	color: #2fcc71;
+	qproperty-outerColor: #2fcc71;
 	qproperty-lineWidth: 2;
 }
 

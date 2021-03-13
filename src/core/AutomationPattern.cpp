@@ -92,6 +92,7 @@ AutomationPattern::AutomationPattern( const AutomationPattern & _pat_to_copy ) :
 		// Copies the automation node (in/out values and in/out tangents)
 		m_timeMap[POS(it)] = it.value();
 	}
+	if (!getTrack()){ return; }
 	switch( getTrack()->trackContainer()->type() )
 	{
 		case TrackContainer::BBContainer:

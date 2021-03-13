@@ -93,7 +93,6 @@ private:
 	BoolModel m_recordModel;
 	bool m_isPlaying;
 
-
 	friend class SampleTCOView;
 
 
@@ -132,6 +131,7 @@ protected:
 private:
 	SampleTCO * m_tco;
 	QPixmap m_paintPixmap;
+	bool splitTCO( const TimePos pos ) override;
 } ;
 
 
