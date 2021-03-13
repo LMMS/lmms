@@ -4712,12 +4712,12 @@ PianoRollWindow::PianoRollWindow() :
 	connect( editModeGroup, SIGNAL( triggered( int ) ), m_editor, SLOT( setEditMode( int ) ) );
 
 	// Quantize combo button
-	QToolButton *quantizeButton = new QToolButton(notesActionsToolBar);
-	QMenu *quantizeButtonMenu = new QMenu(quantizeButton);
+	QToolButton* quantizeButton = new QToolButton(notesActionsToolBar);
+	QMenu* quantizeButtonMenu = new QMenu(quantizeButton);
 
-	QAction *quantizeAction = new QAction(embed::getIconPixmap("quantize"), tr("Quantize"), this);
-	QAction *quantizePosAction = new QAction(tr("Quantize positions"), this);
-	QAction *quantizeLengthAction = new QAction(tr("Quantize lengths"), this);
+	QAction* quantizeAction = new QAction(embed::getIconPixmap("quantize"), tr("Quantize"), this);
+	QAction* quantizePosAction = new QAction(tr("Quantize positions"), this);
+	QAction* quantizeLengthAction = new QAction(tr("Quantize lengths"), this);
 
 	connect(quantizeAction, &QAction::triggered, [this](){ m_editor->quantizeNotes(); });
 	connect(quantizePosAction, &QAction::triggered, [this](){ m_editor->quantizeNotes(PianoRoll::QuantizePos); });
