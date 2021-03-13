@@ -27,12 +27,13 @@
 #define NOTE_H
 
 #include <QtCore/QVector>
-#include <map>
+#include <QMap>
 
 #include "volume.h"
 #include "panning.h"
 #include "MidiTime.h"
 #include "SerializingObject.h"
+#include "NoteParameter.h"
 
 class DetuningHelper;
 
@@ -227,7 +228,7 @@ public:
 		m_lyric = lyric;
 	}
 
-	inline double getParameter(const std::string &paramName) const
+	inline int getParameter(const std::string &paramName) const
 	{
 		if (m_parameters.count(paramName))
 		{
@@ -238,15 +239,16 @@ public:
 		}
 	}
 
-	void setParameter(const std::string &paramName,double newValue)
+	void setParameter(const std::string &paramName,int newValue)
 	{
 		m_parameters[paramName] = newValue;
 	}
 
 protected:
 	void saveSettings( QDomDocument & doc, QDomElement & parent ) override;
+	void saveCustomParameters(QDomDocument & doc, QDomElement & parent);
 	void loadSettings( const QDomElement & _this ) override;
-
+	void loadCustomParameters(const QDomElement & parent);
 
 private:
 	// for piano roll editing
@@ -260,7 +262,7 @@ private:
 	volume_t m_volume;
 	panning_t m_panning;
 	std::string m_lyric;
-	std::map<std::string,double> m_parameters;
+	std::map<std::string,int> m_parameters;
 	MidiTime m_length;
 	MidiTime m_pos;
 	DetuningHelper * m_detuning;

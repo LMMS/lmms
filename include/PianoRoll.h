@@ -30,6 +30,7 @@
 #include <QVector>
 #include <QWidget>
 #include <QInputDialog>
+#include <cassert>
 
 #include "Editor.h"
 #include "ComboBoxModel.h"
@@ -40,6 +41,9 @@
 #include "ToolTip.h"
 #include "StepRecorder.h"
 #include "StepRecorderWidget.h"
+#include "NoteParameter.h"
+#include "InstrumentTrack.h"
+#include "Instrument.h"
 
 class QPainter;
 class QPixmap;
@@ -88,6 +92,7 @@ public:
 
 	// functions to display the hover-text labeling a note's volume/panning
 	void showTextFloat(const QString &text, const QPoint &pos, int timeout=-1);
+	void showCustomTextFloat(panning_t pan, const QPoint &pos, int timeout=-1);
 	void showVolTextFloat(volume_t vol, const QPoint &pos, int timeout=-1);
 	void showPanTextFloat(panning_t pan, const QPoint &pos, int timeout=-1);
 
@@ -259,6 +264,7 @@ private:
 	{
 		NoteEditVolume,
 		NoteEditPanning,
+		NoteEditCustom,
 		NoteEditCount // make sure this one is always last
 	};
 
@@ -354,6 +360,15 @@ private:
 		return m_ghostNotes;
 	}
 
+	void updateCustomNoteParameters();
+
+	inline NoteParameter &getCustomNoteParameter()
+	{
+		assert(m_customNoteParameters != nullptr);
+		assert(m_customNoteParameters->size() > m_customNoteID);
+		return m_customNoteParameters->at(m_customNoteID);
+	}
+
 	QScrollBar * m_leftRightScroll;
 	QScrollBar * m_topBottomScroll;
 
@@ -364,7 +379,9 @@ private:
 	Note * m_currentNote;
 	Actions m_action;
 	NoteEditMode m_noteEditMode;
+	std::vector<NoteParameter> *m_customNoteParameters;
 
+	int m_customNoteID = -1;
 	int m_selectStartTick;
 	int m_selectedTick;
 	int m_selectStartKey;

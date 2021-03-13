@@ -63,7 +63,7 @@
 #include "TextFloat.h"
 #include "TimeLineWidget.h"
 #include "StepRecorderWidget.h"
-
+#include "Instrument.h"
 
 using std::move;
 
@@ -206,12 +206,13 @@ PianoRoll::PianoRoll() :
 	m_ghostNoteOpacity( 255 ),
 	m_noteBorders( true ),
 	m_ghostNoteBorders( true ),
-	m_backgroundShade( 0, 0, 0 )
+	m_backgroundShade( 0, 0, 0 ),
+	m_customNoteParameters(nullptr)
 {
 	// gui names of edit modes
 	m_nemStr.push_back( tr( "Note Velocity" ) );
 	m_nemStr.push_back( tr( "Note Panning" ) );
-
+	m_nemStr.push_back(tr("Custom Parameter"));
 	m_noteEditMenu = new QMenu( this );
 	m_noteEditMenu->clear();
 	for( int i = 0; i < m_nemStr.size(); ++i )
@@ -459,12 +460,17 @@ PianoRoll::PianoRoll() :
 	m_stepRecorder.initialize();
 }
 
-
-
 void PianoRoll::reset()
 {
 	m_lastNoteVolume = DefaultVolume;
 	m_lastNotePanning = DefaultPanning;
+	if (m_customNoteParameters)
+	{
+		for (auto &parameter : *m_customNoteParameters)
+		{
+			parameter.setValue(parameter.defaultValue());
+		}
+	}
 	clearGhostPattern();
 }
 
@@ -483,6 +489,12 @@ void PianoRoll::showTextFloat(const QString &text, const QPoint &pos, int timeou
 	}
 }
 
+void PianoRoll::showCustomTextFloat(panning_t value,const QPoint &pos,int timeout)
+{
+	QString text;
+	text = tr("%1 : %2%").arg(getCustomNoteParameter().name().c_str()).arg(value);
+	showTextFloat( text, pos, timeout );
+}
 
 void PianoRoll::showVolTextFloat(volume_t vol, const QPoint &pos, int timeout)
 {
@@ -687,6 +699,39 @@ void PianoRoll::loadMarkedSemiTones(const QDomElement & de)
 	m_markedSemiTones.erase(new_end, m_markedSemiTones.end());
 }
 
+void PianoRoll::updateCustomNoteParameters()
+{
+	Instrument *inst = m_pattern->instrumentTrack()->instrument();
+	assert(inst != nullptr);
+	std::vector<NoteParameter> *noteParams = inst->noteParameters();
+	m_customNoteParameters = noteParams;
+	// Increment the edit mode while it isn't a custom one
+	if (m_noteEditMode < NoteEditCustom)
+	{
+		m_customNoteID = -1;
+		m_noteEditMode = (NoteEditMode)((int)m_noteEditMode + 1);
+		qDebug() << "Edit Mode Change";
+		if (m_noteEditMode != NoteEditCustom)
+		{
+			return;
+		}
+	}
+	// If it is a custom one and it is inferior to the amount of parameters, get the next custom parameter
+	if(m_noteEditMode == NoteEditCustom && m_customNoteID + 1 < (int)noteParams->size())
+	{
+		m_customNoteID++;
+		m_nemStr[NoteEditCustom] = getCustomNoteParameter().name().c_str();
+		qDebug() << "custom note id is " << m_customNoteID << " the name is " << getCustomNoteParameter().name().c_str();
+	}
+	// go back to the start
+	else
+	{
+		qDebug() << "noteParam is customNoteParam : " << (m_noteEditMode == NoteEditCustom) << " " << "custom note ID is " << m_customNoteID << " in " << noteParams->size();
+		m_noteEditMode = (NoteEditMode)0;
+		m_customNoteID = -1;
+		m_customNoteParameters = noteParams;
+	}
+}
 
 void PianoRoll::setCurrentPattern( Pattern* newPattern )
 {
@@ -694,7 +739,6 @@ void PianoRoll::setCurrentPattern( Pattern* newPattern )
 	{
 		m_pattern->instrumentTrack()->disconnect( this );
 	}
-
 	// force the song-editor to stop playing if it played pattern before
 	if( Engine::getSong()->isPlaying() &&
 		Engine::getSong()->playMode() == Song::Mode_PlayPattern )
@@ -1831,11 +1875,7 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 			if( me->buttons() == Qt::LeftButton )
 			{
 				// clicked in the box below the keys to the left of note edit area
-				m_noteEditMode = (NoteEditMode)(((int)m_noteEditMode)+1);
-				if( m_noteEditMode == NoteEditCount )
-				{
-					m_noteEditMode = (NoteEditMode) 0;
-				}
+				updateCustomNoteParameters();
 				repaint();
 			}
 			else if( me->buttons() == Qt::RightButton )
@@ -2278,6 +2318,15 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 			// if middle-click, set to defaults
 			volume_t vol = DefaultVolume;
 			panning_t pan = DefaultPanning;
+			int custom;
+			if ( !m_customNoteParameters || m_customNoteParameters->empty())
+			{
+				custom = 0;
+			}
+			else
+			{
+				custom = getCustomNoteParameter().defaultValue();
+			}
 
 			if( me->buttons() & Qt::LeftButton )
 			{
@@ -2293,8 +2342,18 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 								( (float)( noteEditBottom() - noteEditTop() ) ) *
 								( (float)( PanningRight - PanningLeft ) ),
 										  PanningRight);
+				auto maxValue = (float)getCustomNoteParameter().maxValue();
+				auto minValue = (float)getCustomNoteParameter().minValue();
+				if (m_customNoteParameters && !m_customNoteParameters->empty())
+				{
+					custom = qBound<int>( minValue,
+										  minValue +
+											  ( ( (float)noteEditBottom() ) - ( (float)me->y() ) ) /
+												  ( (float)( noteEditBottom() - noteEditTop() ) ) *
+												  ( maxValue - minValue ),
+										  maxValue );
+				}
 			}
-
 			if( m_noteEditMode == NoteEditVolume )
 			{
 				m_lastNoteVolume = vol;
@@ -2304,6 +2363,11 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 			{
 				m_lastNotePanning = pan;
 				showPanTextFloat( pan, me->pos() );
+			}
+			else if (m_noteEditMode == NoteEditCustom && m_customNoteParameters && !m_customNoteParameters->empty())
+			{
+				getCustomNoteParameter().setValue(custom);
+				showCustomTextFloat(custom,me->pos());
 			}
 
 			// When alt is pressed we only edit the note under the cursor
@@ -2341,6 +2405,10 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 						MidiEvent evt( MidiMetaEvent, -1, n->key(), panningToMidi( pan ) );
 						evt.setMetaEvent( MidiNotePanning );
 						m_pattern->instrumentTrack()->processInEvent( evt );
+					}
+					else if (m_noteEditMode == NoteEditCustom && m_customNoteParameters && !m_customNoteParameters->empty())
+					{
+						n->setParameter(getCustomNoteParameter().key(),custom);
 					}
 				}
 				else if( n->isPlaying() && !isSelection() )
@@ -2775,7 +2843,16 @@ int PianoRoll::xCoordOfTick( int tick )
 void PianoRoll::paintEvent(QPaintEvent * pe )
 {
 	bool drawNoteNames = ConfigManager::inst()->value( "ui", "printnotelabels").toInt();
-
+	auto noteParams = m_pattern->instrumentTrack()->instrument()->noteParameters();
+	if (noteParams != m_customNoteParameters )
+	{
+		if (m_noteEditMode == NoteEditCustom)
+		{
+			m_noteEditMode = (NoteEditMode)0;
+		}
+		m_customNoteID = -1;
+		m_customNoteParameters = noteParams;
+	}
 	QStyleOption opt;
 	opt.initFrom( this );
 	QPainter p( this );
@@ -3284,6 +3361,34 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 						( (float)( noteEditBottom() - noteEditTop() ) ) / 2.0f,
 						    noteEditLeft() + x , editHandleTop ) );
 			}
+			else if (m_noteEditMode == NoteEditCustom && m_customNoteParameters && !m_customNoteParameters->empty())
+			{
+				QColor color = noteColor();
+				if( note->selected() )
+				{
+					color = selectedNoteColor();
+				}
+
+				p.setPen( QPen( color, NOTE_EDIT_LINE_WIDTH ) );
+				float minValue = getCustomNoteParameter().minValue();
+				float maxValue = getCustomNoteParameter().maxValue();
+				editHandleTop = noteEditBottom() -
+					( (float)( note->getParameter(getCustomNoteParameter().key()) - minValue ) ) /
+						( (float)( (maxValue - minValue ) ) ) *
+						( (float)( noteEditBottom() - noteEditTop() ) );
+
+				if (minValue < 0 && maxValue > 0)
+				{
+					p.drawLine( QLine( noteEditLeft() + x, noteEditTop() +
+										   ( (float)( noteEditBottom() - noteEditTop() ) ) / 2.0f,
+									   noteEditLeft() + x , editHandleTop ) );
+				}
+				else
+				{
+					p.drawLine( QLineF ( noteEditLeft() + x + 0.5, editHandleTop + 0.5,
+										 noteEditLeft() + x + 0.5, noteEditBottom() + 0.5 ) );
+				}
+			}
 			editHandles << QPoint ( x + noteEditLeft(),
 						editHandleTop );
 
@@ -3511,6 +3616,25 @@ void PianoRoll::wheelEvent(QWheelEvent * we )
 					// show the pan hover-text only if all notes have the same
 					// panning
 					showPanTextFloat( nv[0]->getPanning(), we->pos(), 1000 );
+				}
+			}
+			else if (m_noteEditMode == NoteEditCustom && m_customNoteParameters && !m_customNoteParameters->empty())
+			{
+				for ( Note * n : nv )
+				{
+					int newValue = qBound<int>( getCustomNoteParameter().minValue(), n->getParameter(getCustomNoteParameter().key()) + step, getCustomNoteParameter().maxValue() );
+					n->setParameter(getCustomNoteParameter().key(),newValue);
+				}
+				bool allCustomsEqual = std::all_of( nv.begin(), nv.end(),
+												 [this,nv](const Note *note)
+												 {
+													 return note->getParameter(getCustomNoteParameter().key()) == nv[0]->getParameter(getCustomNoteParameter().key());
+												 });
+				if ( allCustomsEqual )
+				{
+					// show the pan hover-text only if all notes have the same
+					// panning
+					showCustomTextFloat( nv[0]->getParameter(getCustomNoteParameter().key()), we->pos(), 1000 );
 				}
 			}
 			update();
@@ -3945,7 +4069,7 @@ void PianoRoll::selectNotesOnKey()
 	}
 }
 
-void PianoRoll::enterValue( NoteVector* nv )
+void PianoRoll::enterValue( NoteVector* nv)
 {
 
 	if( m_noteEditMode == NoteEditVolume )
@@ -3986,6 +4110,25 @@ void PianoRoll::enterValue( NoteVector* nv )
 			m_lastNotePanning = new_val;
 		}
 
+	}
+	else if (m_noteEditMode == NoteEditCustom)
+	{
+		bool ok;
+		int new_val;
+		new_val = QInputDialog::getInt(this,QString("Piano roll : ") + getCustomNoteParameter().name().c_str(),
+									tr("Please enter a new value between %1 and %2:").
+									arg(getCustomNoteParameter().minValue()).arg(getCustomNoteParameter().maxValue()),
+										  (*nv)[0]->getParameter(getCustomNoteParameter().key()),
+										  getCustomNoteParameter().minValue(),getCustomNoteParameter().maxValue(),1,&ok);
+		if (ok)
+		{
+			for (Note *n : *nv)
+			{
+				n->setParameter(getCustomNoteParameter().key(),new_val);
+			}
+			getCustomNoteParameter().setValue(new_val);
+
+		}
 	}
 }
 

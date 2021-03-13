@@ -176,34 +176,72 @@ void Note::saveSettings( QDomDocument & doc, QDomElement & parent )
 	parent.setAttribute( "pan", m_panning );
 	parent.setAttribute( "len", m_length );
 	parent.setAttribute( "pos", m_pos );
-
+	parent.setAttribute("lyric",m_lyric.c_str());
 	if( m_detuning && m_length )
 	{
 		m_detuning->saveSettings( doc, parent );
 	}
+	saveCustomParameters(doc,parent);
 }
 
 
-
+void Note::saveCustomParameters(QDomDocument &doc, QDomElement &parent)
+{
+	if( !m_parameters.empty() )
+	{
+		QDomElement original = parent.firstChildElement("noteParameters");
+		QDomElement noteParameters = original.isNull() ? doc.createElement("noteParameters") : original;
+		for (const auto& element : m_parameters)
+		{
+			noteParameters.setAttribute(element.first.c_str(),element.second);
+		}
+		if (original.isNull())
+		{
+			parent.appendChild(noteParameters);
+		}
+	}
+}
 
 void Note::loadSettings( const QDomElement & _this )
 {
+	std::vector<QString> used_params;
 	const int oldKey = _this.attribute( "tone" ).toInt() + _this.attribute( "oct" ).toInt() * KeysPerOctave;
 	m_key = qMax( oldKey, _this.attribute( "key" ).toInt() );
 	m_volume = _this.attribute( "vol" ).toInt();
 	m_panning = _this.attribute( "pan" ).toInt();
 	m_length = _this.attribute( "len" ).toInt();
 	m_pos = _this.attribute( "pos" ).toInt();
-
+	m_lyric = _this.hasAttribute("lyric") ? _this.attribute("lyric").toStdString() : "";
 	if( _this.hasChildNodes() )
 	{
 		createDetuning();
 		m_detuning->loadSettings( _this );
+		loadCustomParameters(_this);
 	}
 }
 
 
-
+void Note::loadCustomParameters(const QDomElement &parent)
+{
+	QDomElement noteParameters = parent.firstChildElement("noteParameters");
+	if (noteParameters.isNull())
+	{
+		return;
+	}
+	auto attributes = noteParameters.attributes();
+	for (int i = 0; i < attributes.length();i++)
+	{
+		auto attribute = attributes.item(i).toAttr();
+		bool conversionSuccessful;
+		int value = attribute.value().toInt(&conversionSuccessful);
+		if (!conversionSuccessful)
+		{
+			qDebug() << "The conversion of the custom note parameter " << attribute.name() << " To int has been a failure!";
+			continue;
+		}
+		setParameter(attribute.name().toStdString(),value);
+	}
+}
 
 
 void Note::createDetuning()

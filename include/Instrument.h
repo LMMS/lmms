@@ -106,7 +106,7 @@ public:
 
 	virtual std::vector<NoteParameter> *noteParameters()
 	{
-		return nullptr;
+		return &m_noteParameters;
 	}
 
 	// sub-classes can re-implement this for receiving all incoming
@@ -146,6 +146,7 @@ protected:
 	// desiredReleaseFrames() frames are left
 	void applyRelease( sampleFrame * buf, const NotePlayHandle * _n );
 
+	std::vector<NoteParameter> m_noteParameters;
 
 private:
 	InstrumentTrack * m_instrumentTrack;

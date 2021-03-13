@@ -6,13 +6,18 @@
 
 NoteParameter::NoteParameter(const std::string &key,
 							 const std::string &name,
-							 double value,
-							 double maxValue,
-							 double minValue)
+							 int value,
+							 int maxValue,
+							 int minValue)
 {
 	setKey(key);
 	setName(name);
 	setMaxValue(maxValue);
 	setMinValue(minValue);
 	setValue(value);
+	setDefaultValue(value);
+}
+NoteParameter::NoteParameter()
+{
+
 }
