@@ -29,21 +29,18 @@
 
 #ifdef LMMS_HAVE_ALSA
 
-#include "AudioDeviceSetupWidget.h"
-
 #include "AudioAlsa.h"
-
+#include "AudioDeviceSetupWidget.h"
 
 class QComboBox;
 class LcdSpinBox;
-
 
 class AudioAlsaSetupWidget : public AudioDeviceSetupWidget
 {
 	Q_OBJECT
 
 public:
-	AudioAlsaSetupWidget( QWidget * _parent );
+	AudioAlsaSetupWidget(QWidget *_parent);
 	virtual ~AudioAlsaSetupWidget();
 
 	void saveSettings() override;
@@ -52,8 +49,8 @@ public slots:
 	void onCurrentIndexChanged(int index);
 
 private:
-	QComboBox * m_deviceComboBox;
-	LcdSpinBox * m_channels;
+	QComboBox *m_deviceComboBox;
+	LcdSpinBox *m_channels;
 
 	int m_selectedDevice;
 	AudioAlsa::DeviceInfoCollection m_deviceInfos;

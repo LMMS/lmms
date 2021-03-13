@@ -22,35 +22,32 @@
  *
  */
 
-#include <lmmsconfig.h>
-
-#include "zynaddsubfx/src/Misc/Util.h"
-#include <unistd.h>
-#include <ctime>
-
 #include "LocalZynAddSubFx.h"
 
-#include "zynaddsubfx/src/Nio/NulEngine.h"
+#include <ctime>
+#include <lmmsconfig.h>
+#include <unistd.h>
+
+#include "zynaddsubfx/src/Misc/Dump.h"
 #include "zynaddsubfx/src/Misc/Master.h"
 #include "zynaddsubfx/src/Misc/Part.h"
-#include "zynaddsubfx/src/Misc/Dump.h"
+#include "zynaddsubfx/src/Misc/Util.h"
+#include "zynaddsubfx/src/Nio/NulEngine.h"
 
-
-SYNTH_T* synth = NULL;
+SYNTH_T *synth = NULL;
 
 int LocalZynAddSubFx::s_instanceCount = 0;
 
-
 LocalZynAddSubFx::LocalZynAddSubFx() :
-	m_master( NULL ),
-	m_ioEngine( NULL )
+	m_master(NULL),
+	m_ioEngine(NULL)
 {
-	for( int i = 0; i < NumKeys; ++i )
+	for (int i = 0; i < NumKeys; ++i)
 	{
 		m_runningNotes[i] = 0;
 	}
 
-	if( s_instanceCount == 0 )
+	if (s_instanceCount == 0)
 	{
 #ifdef LMMS_BUILD_WIN32
 #ifndef __WINPTHREADS_VERSION
@@ -66,12 +63,12 @@ LocalZynAddSubFx::LocalZynAddSubFx() :
 		synth->oscilsize = config.cfg.OscilSize;
 		synth->alias();
 
-		srand( time( NULL ) );
+		srand(time(NULL));
 
 		denormalkillbuf = new float[synth->buffersize];
-		for( int i = 0; i < synth->buffersize; ++i )
+		for (int i = 0; i < synth->buffersize; ++i)
 		{
-			denormalkillbuf[i] = (RND-0.5)*1e-16;
+			denormalkillbuf[i] = (RND - 0.5) * 1e-16;
 		}
 	}
 
@@ -83,22 +80,16 @@ LocalZynAddSubFx::LocalZynAddSubFx() :
 	m_master->swaplr = 0;
 }
 
-
-
-
 LocalZynAddSubFx::~LocalZynAddSubFx()
 {
 	delete m_master;
 	delete m_ioEngine;
 
-	if( --s_instanceCount == 0 )
+	if (--s_instanceCount == 0)
 	{
 		delete[] denormalkillbuf;
 	}
 }
-
-
-
 
 void LocalZynAddSubFx::initConfig()
 {
@@ -107,171 +98,141 @@ void LocalZynAddSubFx::initConfig()
 	config.cfg.GzipCompression = 0;
 }
 
-
-
-
-void LocalZynAddSubFx::setSampleRate( int sampleRate )
+void LocalZynAddSubFx::setSampleRate(int sampleRate)
 {
 	synth->samplerate = sampleRate;
 	synth->alias();
 }
 
-
-
-
-void LocalZynAddSubFx::setBufferSize( int bufferSize )
+void LocalZynAddSubFx::setBufferSize(int bufferSize)
 {
 	synth->buffersize = bufferSize;
 	synth->alias();
 }
 
-
-
-
-void LocalZynAddSubFx::saveXML( const std::string & _filename )
+void LocalZynAddSubFx::saveXML(const std::string &_filename)
 {
-	char * name = strdup( _filename.c_str() );
-	m_master->saveXML( name );
-	free( name );
+	char *name = strdup(_filename.c_str());
+	m_master->saveXML(name);
+	free(name);
 }
 
-
-
-
-void LocalZynAddSubFx::loadXML( const std::string & _filename )
+void LocalZynAddSubFx::loadXML(const std::string &_filename)
 {
-	char * f = strdup( _filename.c_str() );
+	char *f = strdup(_filename.c_str());
 
-	pthread_mutex_lock( &m_master->mutex );
+	pthread_mutex_lock(&m_master->mutex);
 	m_master->defaults();
-	m_master->loadXML( f );
-	pthread_mutex_unlock( &m_master->mutex );
+	m_master->loadXML(f);
+	pthread_mutex_unlock(&m_master->mutex);
 
 	m_master->applyparameters();
 
-	unlink( f );
-	free( f );
+	unlink(f);
+	free(f);
 }
 
-
-
-
-void LocalZynAddSubFx::loadPreset( const std::string & _filename, int _part )
+void LocalZynAddSubFx::loadPreset(const std::string &_filename, int _part)
 {
-	char * f = strdup( _filename.c_str() );
+	char *f = strdup(_filename.c_str());
 
-	pthread_mutex_lock( &m_master->mutex );
+	pthread_mutex_lock(&m_master->mutex);
 	m_master->part[_part]->defaultsinstrument();
-	m_master->part[_part]->loadXMLinstrument( f );
-	pthread_mutex_unlock( &m_master->mutex );
+	m_master->part[_part]->loadXMLinstrument(f);
+	pthread_mutex_unlock(&m_master->mutex);
 
 	m_master->applyparameters();
 
-	free( f );
+	free(f);
 }
 
-
-
-
-void LocalZynAddSubFx::setPresetDir( const std::string & _dir )
+void LocalZynAddSubFx::setPresetDir(const std::string &_dir)
 {
 	m_presetsDir = _dir;
-	for( int i = 0; i < MAX_BANK_ROOT_DIRS; ++i )
+	for (int i = 0; i < MAX_BANK_ROOT_DIRS; ++i)
 	{
-		if( config.cfg.bankRootDirList[i].empty() )
+		if (config.cfg.bankRootDirList[i].empty())
 		{
 			config.cfg.bankRootDirList[i] = m_presetsDir;
 			break;
 		}
-		else if( config.cfg.bankRootDirList[i] == m_presetsDir )
+		else if (config.cfg.bankRootDirList[i] == m_presetsDir)
 		{
 			break;
 		}
 	}
 }
 
-
-
-
-void LocalZynAddSubFx::setLmmsWorkingDir( const std::string & _dir )
+void LocalZynAddSubFx::setLmmsWorkingDir(const std::string &_dir)
 {
-	if( config.workingDir != NULL )
+	if (config.workingDir != NULL)
 	{
-		free( config.workingDir );
+		free(config.workingDir);
 	}
-	config.workingDir = strdup( _dir.c_str() );
+	config.workingDir = strdup(_dir.c_str());
 
 	initConfig();
 }
 
-
-
-void LocalZynAddSubFx::setPitchWheelBendRange( int semitones )
+void LocalZynAddSubFx::setPitchWheelBendRange(int semitones)
 {
-	for( int i = 0; i < NUM_MIDI_PARTS; ++i )
+	for (int i = 0; i < NUM_MIDI_PARTS; ++i)
 	{
-		m_master->part[i]->ctl.setpitchwheelbendrange( semitones * 100 );
+		m_master->part[i]->ctl.setpitchwheelbendrange(semitones * 100);
 	}
 }
 
-
-
-void LocalZynAddSubFx::processMidiEvent( const MidiEvent& event )
+void LocalZynAddSubFx::processMidiEvent(const MidiEvent &event)
 {
-	switch( event.type() )
+	switch (event.type())
 	{
-		case MidiNoteOn:
-			if( event.velocity() > 0 )
-			{
-				if( event.key() < 0 || event.key() > MidiMaxKey )
-				{
-					break;
-				}
-				if( m_runningNotes[event.key()] > 0 )
-				{
-					m_master->noteOff( event.channel(), event.key() );
-				}
-				++m_runningNotes[event.key()];
-				m_master->noteOn( event.channel(), event.key(), event.velocity() );
-				break;
-			}
-		case MidiNoteOff:
-			if( event.key() < 0 || event.key() > MidiMaxKey )
+	case MidiNoteOn:
+		if (event.velocity() > 0)
+		{
+			if (event.key() < 0 || event.key() > MidiMaxKey)
 			{
 				break;
 			}
-			if( --m_runningNotes[event.key()] <= 0 )
+			if (m_runningNotes[event.key()] > 0)
 			{
-				m_master->noteOff( event.channel(), event.key() );
+				m_master->noteOff(event.channel(), event.key());
 			}
+			++m_runningNotes[event.key()];
+			m_master->noteOn(event.channel(), event.key(), event.velocity());
 			break;
-		case MidiPitchBend:
-			m_master->setController( event.channel(), C_pitchwheel, event.pitchBend()-8192 );
+		}
+	case MidiNoteOff:
+		if (event.key() < 0 || event.key() > MidiMaxKey)
+		{
 			break;
-		case MidiControlChange:
-			m_master->setController( event.channel(), event.controllerNumber(), event.controllerValue() );
-			break;
-		default:
-			break;
+		}
+		if (--m_runningNotes[event.key()] <= 0)
+		{
+			m_master->noteOff(event.channel(), event.key());
+		}
+		break;
+	case MidiPitchBend:
+		m_master->setController(event.channel(), C_pitchwheel, event.pitchBend() - 8192);
+		break;
+	case MidiControlChange:
+		m_master->setController(event.channel(), event.controllerNumber(), event.controllerValue());
+		break;
+	default:
+		break;
 	}
 }
 
-
-
-
-void LocalZynAddSubFx::processAudio( sampleFrame * _out )
+void LocalZynAddSubFx::processAudio(sampleFrame *_out)
 {
 	float outputl[synth->buffersize];
 	float outputr[synth->buffersize];
 
-	m_master->GetAudioOutSamples( synth->buffersize, synth->samplerate, outputl, outputr );
+	m_master->GetAudioOutSamples(synth->buffersize, synth->samplerate, outputl, outputr);
 
 	// TODO: move to MixHelpers
-	for( int f = 0; f < synth->buffersize; ++f )
+	for (int f = 0; f < synth->buffersize; ++f)
 	{
 		_out[f][0] = outputl[f];
 		_out[f][1] = outputr[f];
 	}
 }
-
-

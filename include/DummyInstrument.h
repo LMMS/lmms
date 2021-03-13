@@ -26,20 +26,18 @@
 #ifndef DUMMY_INSTRUMENT_H
 #define DUMMY_INSTRUMENT_H
 
-#include "Instrument.h"
-#include "InstrumentView.h"
-#include "Engine.h"
-
 #include <string.h>
 
+#include "Engine.h"
+#include "Instrument.h"
+#include "InstrumentView.h"
 #include "Mixer.h"
-
 
 class DummyInstrument : public Instrument
 {
 public:
-	DummyInstrument( InstrumentTrack * _instrument_track ) :
-		Instrument( _instrument_track, NULL )
+	DummyInstrument(InstrumentTrack *_instrument_track) :
+		Instrument(_instrument_track, NULL)
 	{
 	}
 
@@ -47,17 +45,16 @@ public:
 	{
 	}
 
-	void playNote( NotePlayHandle *, sampleFrame * buffer ) override
+	void playNote(NotePlayHandle *, sampleFrame *buffer) override
 	{
-		memset( buffer, 0, sizeof( sampleFrame ) *
-			Engine::mixer()->framesPerPeriod() );
+		memset(buffer, 0, sizeof(sampleFrame) * Engine::mixer()->framesPerPeriod());
 	}
 
-	void saveSettings( QDomDocument &, QDomElement & ) override
+	void saveSettings(QDomDocument &, QDomElement &) override
 	{
 	}
 
-	void loadSettings( const QDomElement & ) override
+	void loadSettings(const QDomElement &) override
 	{
 	}
 
@@ -66,11 +63,10 @@ public:
 		return "dummyinstrument";
 	}
 
-	PluginView * instantiateView( QWidget * _parent ) override
+	PluginView *instantiateView(QWidget *_parent) override
 	{
-		return new InstrumentViewFixedSize( this, _parent );
+		return new InstrumentViewFixedSize(this, _parent);
 	}
-} ;
-
+};
 
 #endif

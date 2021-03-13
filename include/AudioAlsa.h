@@ -32,11 +32,10 @@
 // older ALSA-versions might require this
 #define ALSA_PCM_NEW_HW_PARAMS_API
 
-#include <alsa/asoundlib.h>
 #include <QThread>
+#include <alsa/asoundlib.h>
 
 #include "AudioDevice.h"
-
 
 class AudioAlsa : public QThread, public AudioDevice
 {
@@ -48,31 +47,31 @@ public:
 	class DeviceInfo
 	{
 	public:
-		DeviceInfo(QString const & deviceName, QString const & deviceDescription) :
+		DeviceInfo(QString const &deviceName, QString const &deviceDescription) :
 			m_deviceName(deviceName),
 			m_deviceDescription(deviceDescription)
-		{}
+		{
+		}
 		~DeviceInfo() {}
 
-		QString const & getDeviceName() const { return m_deviceName; }
-		QString const & getDeviceDescription() const { return m_deviceDescription; }
+		QString const &getDeviceName() const { return m_deviceName; }
+		QString const &getDeviceDescription() const { return m_deviceDescription; }
 
 	private:
 		QString m_deviceName;
 		QString m_deviceDescription;
-
 	};
 
 	typedef std::vector<DeviceInfo> DeviceInfoCollection;
 
 public:
-	AudioAlsa( bool & _success_ful, Mixer* mixer );
+	AudioAlsa(bool &_success_ful, Mixer *mixer);
 	virtual ~AudioAlsa();
 
 	inline static QString name()
 	{
-		return QT_TRANSLATE_NOOP( "AudioDeviceSetupWidget",
-			"ALSA (Advanced Linux Sound Architecture)" );
+		return QT_TRANSLATE_NOOP("AudioDeviceSetupWidget",
+			"ALSA (Advanced Linux Sound Architecture)");
 	}
 
 	static QString probeDevice();
@@ -85,22 +84,20 @@ private:
 	void applyQualitySettings() override;
 	void run() override;
 
-	int setHWParams( const ch_cnt_t _channels, snd_pcm_access_t _access );
+	int setHWParams(const ch_cnt_t _channels, snd_pcm_access_t _access);
 	int setSWParams();
-	int handleError( int _err );
+	int handleError(int _err);
 
-
-	snd_pcm_t * m_handle;
+	snd_pcm_t *m_handle;
 
 	snd_pcm_uframes_t m_bufferSize;
 	snd_pcm_uframes_t m_periodSize;
 
-	snd_pcm_hw_params_t * m_hwParams;
-	snd_pcm_sw_params_t * m_swParams;
+	snd_pcm_hw_params_t *m_hwParams;
+	snd_pcm_sw_params_t *m_swParams;
 
 	bool m_convertEndian;
-
-} ;
+};
 
 #endif
 

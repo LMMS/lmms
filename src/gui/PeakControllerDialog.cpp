@@ -23,47 +23,39 @@
  *
  */
 
-
 #include <QLabel>
-#include <QPushButton>
 #include <QMdiArea>
 #include <QPainter>
+#include <QPushButton>
 
 #include "CaptionMenu.h"
-#include "gui_templates.h"
-#include "embed.h"
-#include "MainWindow.h"
-#include "ToolTip.h"
-
-#include "PeakController.h"
 #include "Knob.h"
+#include "MainWindow.h"
+#include "PeakController.h"
 #include "TempoSyncKnob.h"
+#include "ToolTip.h"
+#include "embed.h"
+#include "gui_templates.h"
 
-
-PeakControllerDialog::PeakControllerDialog( Controller * _model, QWidget * _parent ) :
-	ControllerDialog( _model, _parent )
+PeakControllerDialog::PeakControllerDialog(Controller *_model, QWidget *_parent) :
+	ControllerDialog(_model, _parent)
 {
-	setWindowTitle( tr( "PEAK" ) );
-	setWindowIcon( embed::getIconPixmap( "controller" ) );
-	setFixedSize( 256, 64 );
-	
-	ToolTip::add( this, tr( "LFO Controller" ) );
+	setWindowTitle(tr("PEAK"));
+	setWindowIcon(embed::getIconPixmap("controller"));
+	setFixedSize(256, 64);
 
-	QLabel * l = new QLabel( this );
-	l->setText( "Use FX's controls" );
+	ToolTip::add(this, tr("LFO Controller"));
+
+	QLabel *l = new QLabel(this);
+	l->setText("Use FX's controls");
 	l->move(10, 10);
 
-	setModel( _model );
+	setModel(_model);
 }
-
-
-
 
 PeakControllerDialog::~PeakControllerDialog()
 {
 }
-
-
 
 /*
 void effectView::closeEffects()
@@ -73,24 +65,16 @@ void effectView::closeEffects()
 }
 */
 
-
-void PeakControllerDialog::contextMenuEvent( QContextMenuEvent * )
+void PeakControllerDialog::contextMenuEvent(QContextMenuEvent *)
 {
 }
 
-
-
-
-void PeakControllerDialog::paintEvent( QPaintEvent * )
+void PeakControllerDialog::paintEvent(QPaintEvent *)
 {
-	QPainter p( this );
+	QPainter p(this);
 }
-
-
 
 void PeakControllerDialog::modelChanged()
 {
 	m_peakController = castModel<PeakController>();
 }
-
-

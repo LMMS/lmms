@@ -28,14 +28,15 @@
 #ifndef _DSP_UTIL_H_
 #define _DSP_UTIL_H_
 
-namespace DSP {
-
-inline int next_power_of_2 (int n)
+namespace DSP
 {
-	assert (n <= 0x40000000);
+
+inline int next_power_of_2(int n)
+{
+	assert(n <= 0x40000000);
 
 	int m = 1;
-	
+
 	while (m < n)
 		m <<= 1;
 
@@ -43,31 +44,31 @@ inline int next_power_of_2 (int n)
 }
 
 inline bool
-isprime (int v)
+isprime(int v)
 {
 	if (v <= 3)
 		return true;
-	
+
 	if (!(v & 1))
 		return false;
 
-	for (int i = 3; i < (int) sqrt (v) + 1; i += 2)
+	for (int i = 3; i < (int)sqrt(v) + 1; i += 2)
 		if ((v % i) == 0)
 			return false;
 
 	return true;
 }
 
-inline double 
-db2lin (double db)
+inline double
+db2lin(double db)
 {
-	return pow (10., db * .05);
+	return pow(10., db * .05);
 }
 
 inline double
-lin2db (double lin)
+lin2db(double lin)
 {
-	return 20. * log10 (lin);
+	return 20. * log10(lin);
 }
 
 } /* namespace DSP */

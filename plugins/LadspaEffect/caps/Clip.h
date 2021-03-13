@@ -28,60 +28,62 @@
 #ifndef _CLIP_H_
 #define _CLIP_H_
 
-#include "dsp/util.h"
 #include "dsp/FIR.h"
 #include "dsp/sinc.h"
+#include "dsp/util.h"
 #include "dsp/windows.h"
 
 class Clip
-: public Plugin
+	: public Plugin
 {
-	public:
-		sample_t gain, gain_db;
+public:
+	sample_t gain, gain_db;
 
-		sample_t threshold[2];
+	sample_t threshold[2];
 
-		enum {
-			OVERSAMPLE = 8,
-			FIR_SIZE = 64,
-		};
+	enum
+	{
+		OVERSAMPLE = 8,
+		FIR_SIZE = 64,
+	};
 
-		/* antialias filters */
-		DSP::FIRUpsampler up;
-		DSP::FIR down;
+	/* antialias filters */
+	DSP::FIRUpsampler up;
+	DSP::FIR down;
 
-		template <sample_func_t F>
-			void one_cycle (int frames);
+	template <sample_func_t F>
+	void one_cycle(int frames);
 
-		inline sample_t clip (sample_t x);
+	inline sample_t clip(sample_t x);
 
-	public:
-		static PortInfo port_info[];
+public:
+	static PortInfo port_info[];
 
-		Clip()
-			: up (FIR_SIZE, OVERSAMPLE), 
-				down (FIR_SIZE)
-			{ }
+	Clip() :
+		up(FIR_SIZE, OVERSAMPLE),
+		down(FIR_SIZE)
+	{
+	}
 
-		void init();
+	void init();
 
-		void activate()
-			{
-				up.reset();
-				down.reset();
-				gain_db = *ports[1];
-				gain = DSP::db2lin (gain_db);
-			}
+	void activate()
+	{
+		up.reset();
+		down.reset();
+		gain_db = *ports[1];
+		gain = DSP::db2lin(gain_db);
+	}
 
-		void run (int n)
-			{
-				one_cycle<store_func> (n);
-			}
-		
-		void run_adding (int n)
-			{
-				one_cycle<adding_func> (n);
-			}
+	void run(int n)
+	{
+		one_cycle<store_func>(n);
+	}
+
+	void run_adding(int n)
+	{
+		one_cycle<adding_func>(n);
+	}
 };
 
 #endif /* _CLIP_H_ */

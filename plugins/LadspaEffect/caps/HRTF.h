@@ -31,42 +31,43 @@
 #include "dsp/util.h"
 
 class HRTF
-: public Plugin
+	: public Plugin
 {
-	public:
-		int pan;
-		int n, h;
+public:
+	int pan;
+	int n, h;
 
-		double x[32];
-		
-		struct {
-			double * a, * b;
-			double y[32];
-		} left, right;
-		
-		void set_pan (int p);
+	double x[32];
 
-		template <sample_func_t F>
-		void one_cycle (int frames);
+	struct
+	{
+		double *a, *b;
+		double y[32];
+	} left, right;
 
-	public:
-		static PortInfo port_info [];
+	void set_pan(int p);
 
-		void init();
-		void activate()
-			{
-				set_pan ((int) *ports[1]);
-			}
+	template <sample_func_t F>
+	void one_cycle(int frames);
 
-		void run (int n)
-			{
-				one_cycle<store_func> (n);
-			}
-		
-		void run_adding (int n)
-			{
-				one_cycle<adding_func> (n);
-			}
+public:
+	static PortInfo port_info[];
+
+	void init();
+	void activate()
+	{
+		set_pan((int)*ports[1]);
+	}
+
+	void run(int n)
+	{
+		one_cycle<store_func>(n);
+	}
+
+	void run_adding(int n)
+	{
+		one_cycle<adding_func>(n);
+	}
 };
 
 #endif /* _HRTF_H_ */

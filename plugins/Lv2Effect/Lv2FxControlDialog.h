@@ -30,7 +30,6 @@
 
 class Lv2FxControls;
 
-
 class Lv2FxControlDialog : public EffectControlDialog, public Lv2ViewBase
 {
 	Q_OBJECT
@@ -42,6 +41,5 @@ private:
 	Lv2FxControls *lv2Controls();
 	void modelChanged() override;
 };
-
 
 #endif

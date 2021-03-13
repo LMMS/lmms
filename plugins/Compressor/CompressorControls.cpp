@@ -22,17 +22,15 @@
  *
  */
 
-
 #include "CompressorControls.h"
-#include "Compressor.h"
 
 #include <QDomElement>
 
+#include "Compressor.h"
 #include "Engine.h"
 #include "Song.h"
 
-
-CompressorControls::CompressorControls(CompressorEffect* effect) :
+CompressorControls::CompressorControls(CompressorEffect *effect) :
 	EffectControls(effect),
 	m_effect(effect),
 	m_thresholdModel(-8.0f, -60.0f, 0.0f, 0.001f, this, tr("Threshold")),
@@ -77,10 +75,9 @@ CompressorControls::CompressorControls(CompressorEffect* effect) :
 	m_rangeModel.setScaleLogarithmic(true);
 }
 
-
-void CompressorControls::saveSettings(QDomDocument& doc, QDomElement& _this)
+void CompressorControls::saveSettings(QDomDocument &doc, QDomElement &_this)
 {
-	m_thresholdModel.saveSettings(doc, _this, "threshold"); 
+	m_thresholdModel.saveSettings(doc, _this, "threshold");
 	m_ratioModel.saveSettings(doc, _this, "ratio");
 	m_attackModel.saveSettings(doc, _this, "attack");
 	m_releaseModel.saveSettings(doc, _this, "release");
@@ -110,9 +107,7 @@ void CompressorControls::saveSettings(QDomDocument& doc, QDomElement& _this)
 	m_mixModel.saveSettings(doc, _this, "mix");
 }
 
-
-
-void CompressorControls::loadSettings(const QDomElement& _this)
+void CompressorControls::loadSettings(const QDomElement &_this)
 {
 	m_thresholdModel.loadSettings(_this, "threshold");
 	m_ratioModel.loadSettings(_this, "ratio");
@@ -143,5 +138,3 @@ void CompressorControls::loadSettings(const QDomElement& _this)
 	m_stereoLinkModel.loadSettings(_this, "stereoLink");
 	m_mixModel.loadSettings(_this, "mix");
 }
-
-

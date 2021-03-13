@@ -28,71 +28,72 @@
 #ifndef _DSP_ROESSLER_H_
 #define _DSP_ROESSLER_H_
 
-namespace DSP {
+namespace DSP
+{
 
 class Roessler
 {
-	public:
-		double x[2], y[2], z[2];	
-		double h, a, b, c;
-		int I;
+public:
+	double x[2], y[2], z[2];
+	double h, a, b, c;
+	int I;
 
-	public:
-		Roessler()
-			{
-				h = 0.001;
-				a = .2;
-				b = .2;
-				c = 5.7;
-			}
+public:
+	Roessler()
+	{
+		h = 0.001;
+		a = .2;
+		b = .2;
+		c = 5.7;
+	}
 
-		/* rate is normalized (0 .. 1) */
-		void set_rate (double r)
-			{
-				h = max (.000001, r * .096);
-			}
+	/* rate is normalized (0 .. 1) */
+	void set_rate(double r)
+	{
+		h = max(.000001, r * .096);
+	}
 
-		void init (double _h = .001, double seed = .0)
-			{
-				h = _h;
+	void init(double _h = .001, double seed = .0)
+	{
+		h = _h;
 
-				I = 0;
+		I = 0;
 
-				x[0] = .0001 + .0001 * seed;
-				y[0] = .0001;
-				z[0] = .0001;
+		x[0] = .0001 + .0001 * seed;
+		y[0] = .0001;
+		z[0] = .0001;
 
-				for (int i = 0; i < 5000; ++i)
-					get();
-			}
+		for (int i = 0; i < 5000; ++i)
+			get();
+	}
 
-		sample_t get()
-			{
-				int J = I ^ 1;
+	sample_t get()
+	{
+		int J = I ^ 1;
 
-				x[J] = x[I] + h * (- y[I] - z[I]);
-				y[J] = y[I] + h * (x[I] + a * y[I]);
-				z[J] = z[I] + h * (b + z[I] * (x[I] - c));
+		x[J] = x[I] + h * (-y[I] - z[I]);
+		y[J] = y[I] + h * (x[I] + a * y[I]);
+		z[J] = z[I] + h * (b + z[I] * (x[I] - c));
 
-				I = J;
+		I = J;
 
-				return x[I] * .01725 + z[I] * .015;
-			}
+		return x[I] * .01725 + z[I] * .015;
+	}
 
-		double get_x()
-			{
-				return x[I];
-			}
+	double get_x()
+	{
+		return x[I];
+	}
 
-		double get_y()
-			{
-				return y[I];
-			}
+	double get_y()
+	{
+		return y[I];
+	}
 
-		double get_z()
-			{
-				return z[I];
-			}
+	double get_z()
+	{
+		return z[I];
+	}
 };
 
 } /* namespace DSP */

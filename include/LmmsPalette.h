@@ -24,45 +24,44 @@
  */
 
 #include <QWidget>
+
 #include "lmms_export.h"
 
 #ifndef LMMSPALETTE_H
 #define LMMSPALETTE_H
 
-
 class LMMS_EXPORT LmmsPalette : public QWidget
 {
 	Q_OBJECT
-	Q_PROPERTY( QColor background READ background WRITE setBackground )
-	Q_PROPERTY( QColor windowText READ windowText WRITE setWindowText )
-	Q_PROPERTY( QColor base READ base WRITE setBase )
-	Q_PROPERTY( QColor text READ text WRITE setText )
-	Q_PROPERTY( QColor button READ button WRITE setButton )
-	Q_PROPERTY( QColor shadow READ shadow WRITE setShadow )
-	Q_PROPERTY( QColor buttonText READ buttonText WRITE setButtonText )
-	Q_PROPERTY( QColor brightText READ brightText WRITE setBrightText )
-	Q_PROPERTY( QColor highlight READ highlight WRITE setHighlight )
-	Q_PROPERTY( QColor highlightedText READ highlightedText WRITE setHighlightedText )
+	Q_PROPERTY(QColor background READ background WRITE setBackground)
+	Q_PROPERTY(QColor windowText READ windowText WRITE setWindowText)
+	Q_PROPERTY(QColor base READ base WRITE setBase)
+	Q_PROPERTY(QColor text READ text WRITE setText)
+	Q_PROPERTY(QColor button READ button WRITE setButton)
+	Q_PROPERTY(QColor shadow READ shadow WRITE setShadow)
+	Q_PROPERTY(QColor buttonText READ buttonText WRITE setButtonText)
+	Q_PROPERTY(QColor brightText READ brightText WRITE setBrightText)
+	Q_PROPERTY(QColor highlight READ highlight WRITE setHighlight)
+	Q_PROPERTY(QColor highlightedText READ highlightedText WRITE setHighlightedText)
 
 public:
-	LmmsPalette( QWidget * parent, QStyle * stylearg  ); 
+	LmmsPalette(QWidget *parent, QStyle *stylearg);
 	virtual ~LmmsPalette();
 
-#define ACCESSMET( read, write ) \
-	QColor read () const; \
-	void write ( const QColor & c ); \
+#define ACCESSMET(read, write) \
+	QColor read() const; \
+	void write(const QColor &c);
 
-
-	ACCESSMET( background, setBackground )
-	ACCESSMET( windowText, setWindowText )
-	ACCESSMET( base, setBase )
-	ACCESSMET( text, setText )
-	ACCESSMET( button, setButton )
-	ACCESSMET( shadow, setShadow )
-	ACCESSMET( buttonText, setButtonText )
-	ACCESSMET( brightText, setBrightText )
-	ACCESSMET( highlight, setHighlight )
-	ACCESSMET( highlightedText, setHighlightedText )
+	ACCESSMET(background, setBackground)
+	ACCESSMET(windowText, setWindowText)
+	ACCESSMET(base, setBase)
+	ACCESSMET(text, setText)
+	ACCESSMET(button, setButton)
+	ACCESSMET(shadow, setShadow)
+	ACCESSMET(buttonText, setButtonText)
+	ACCESSMET(brightText, setBrightText)
+	ACCESSMET(highlight, setHighlight)
+	ACCESSMET(highlightedText, setHighlightedText)
 
 #undef ACCESSMET
 
@@ -80,8 +79,5 @@ private:
 	QColor m_highlight;
 	QColor m_highlightedText;
 };
-
-
-
 
 #endif

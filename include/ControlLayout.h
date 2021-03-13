@@ -105,7 +105,7 @@ public:
 	int heightForWidth(int) const override;
 	int count() const override;
 	QLayoutItem *itemAt(int index) const override;
-	QLayoutItem *itemByString(const QString& key) const;
+	QLayoutItem *itemByString(const QString &key) const;
 	QSize minimumSize() const override;
 	void setGeometry(const QRect &rect) override;
 	QSize sizeHint() const override;
@@ -115,7 +115,7 @@ public:
 	void removeFocusFromSearchBar();
 
 private slots:
-	void onTextChanged(const QString&);
+	void onTextChanged(const QString &);
 
 private:
 	int doLayout(const QRect &rect, bool testOnly) const;
@@ -128,9 +128,9 @@ private:
 	// relevant dimension is width, as later, heightForWidth() will be called
 	// 400 looks good and is ~4 knobs in a row
 	constexpr const static int m_minWidth = 400;
-	class QLineEdit* m_searchBar;
+	class QLineEdit *m_searchBar;
 	//! name of search bar, must be ASCII sorted before any alpha numerics
-	static constexpr const char* s_searchBarName = "!!searchBar!!";
+	static constexpr const char *s_searchBarName = "!!searchBar!!";
 };
 
 #endif // CONTROLLAYOUT_H

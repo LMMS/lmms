@@ -28,22 +28,18 @@
 
 #include "EffectControlDialog.h"
 
-
 class dynProcControls;
-
 
 class dynProcControlDialog : public EffectControlDialog
 {
 	Q_OBJECT
 public:
-	dynProcControlDialog( dynProcControls * _controls );
+	dynProcControlDialog(dynProcControls *_controls);
 	virtual ~dynProcControlDialog()
 	{
 	}
 
-
 private:
-
-} ;
+};
 
 #endif

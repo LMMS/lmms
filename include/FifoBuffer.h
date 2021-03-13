@@ -27,8 +27,7 @@
 
 #include <QtCore/QSemaphore>
 
-
-template<typename T>
+template <typename T>
 class FifoBuffer
 {
 public:
@@ -77,15 +76,13 @@ public:
 		return m_readSem.available();
 	}
 
-
 private:
 	QSemaphore m_readSem;
 	QSemaphore m_writeSem;
 	int m_readIndex;
 	int m_writeIndex;
 	int m_size;
-	T * m_buffer;
-} ;
-
+	T *m_buffer;
+};
 
 #endif

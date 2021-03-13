@@ -29,8 +29,7 @@
 #include "GuiApplication.h"
 #include "Song.h"
 
-
-PositionLine::PositionLine(QWidget* parent) :
+PositionLine::PositionLine(QWidget *parent) :
 	QWidget(parent),
 	m_hasTailGradient(false),
 	m_lineColor(0, 0, 0, 0)
@@ -41,7 +40,7 @@ PositionLine::PositionLine(QWidget* parent) :
 	setAttribute(Qt::WA_TransparentForMouseEvents);
 }
 
-void PositionLine::paintEvent(QPaintEvent* pe)
+void PositionLine::paintEvent(QPaintEvent *pe)
 {
 	QPainter p(this);
 	QColor c = QColor(m_lineColor);
@@ -63,7 +62,7 @@ void PositionLine::paintEvent(QPaintEvent* pe)
 		if (m_hasTailGradient &&
 			Engine::getSong()->isPlaying() &&
 			(Engine::getSong()->playMode() == Song::Mode_PlaySong ||
-			 Engine::getSong()->playMode() == Song::Mode_PlayPattern))
+				Engine::getSong()->playMode() == Song::Mode_PlayPattern))
 		{
 			c.setAlpha(60);
 			gradient.setColorAt(w, c);

@@ -32,59 +32,51 @@
 
 class Piano;
 
-
 class PianoView : public QWidget, public ModelView
 {
 	Q_OBJECT
 public:
-	PianoView( QWidget * _parent );
+	PianoView(QWidget *_parent);
 	virtual ~PianoView() = default;
 
-	static int getKeyFromKeyEvent( QKeyEvent * _ke );
-
+	static int getKeyFromKeyEvent(QKeyEvent *_ke);
 
 public:
-	void keyPressEvent( QKeyEvent * ke ) override;
-	void keyReleaseEvent( QKeyEvent * ke ) override;
-
+	void keyPressEvent(QKeyEvent *ke) override;
+	void keyReleaseEvent(QKeyEvent *ke) override;
 
 protected:
 	void modelChanged() override;
-	void contextMenuEvent( QContextMenuEvent * _me ) override;
-	void paintEvent( QPaintEvent * ) override;
-	void mousePressEvent( QMouseEvent * me ) override;
-	void mouseReleaseEvent( QMouseEvent * me ) override;
-	void mouseMoveEvent( QMouseEvent * me ) override;
-	void focusOutEvent( QFocusEvent * _fe ) override;
-	void focusInEvent( QFocusEvent * fe ) override;
-	void resizeEvent( QResizeEvent * _event ) override;
-
+	void contextMenuEvent(QContextMenuEvent *_me) override;
+	void paintEvent(QPaintEvent *) override;
+	void mousePressEvent(QMouseEvent *me) override;
+	void mouseReleaseEvent(QMouseEvent *me) override;
+	void mouseMoveEvent(QMouseEvent *me) override;
+	void focusOutEvent(QFocusEvent *_fe) override;
+	void focusInEvent(QFocusEvent *fe) override;
+	void resizeEvent(QResizeEvent *_event) override;
 
 private:
-	int getKeyFromMouse( const QPoint & _p ) const;
-	int getKeyX( int _key_num ) const;
+	int getKeyFromMouse(const QPoint &_p) const;
+	int getKeyX(int _key_num) const;
 
-	static QPixmap * s_whiteKeyPm;
-	static QPixmap * s_blackKeyPm;
-	static QPixmap * s_whiteKeyPressedPm;
-	static QPixmap * s_blackKeyPressedPm;
+	static QPixmap *s_whiteKeyPm;
+	static QPixmap *s_blackKeyPm;
+	static QPixmap *s_whiteKeyPressedPm;
+	static QPixmap *s_blackKeyPressedPm;
 
-	Piano * m_piano;
+	Piano *m_piano;
 
-	QScrollBar * m_pianoScroll;
-	int m_startKey;			// first key when drawing
+	QScrollBar *m_pianoScroll;
+	int m_startKey; // first key when drawing
 	int m_lastKey;
 
-
 private slots:
-	void pianoScrolled( int _new_pos );
+	void pianoScrolled(int _new_pos);
 
 signals:
-	void keyPressed( int );
+	void keyPressed(int);
 	void baseNoteChanged();
-
-} ;
-
+};
 
 #endif
-

@@ -33,24 +33,27 @@
 #include <memory>
 #include <vector>
 
-#include "lmms_basics.h"
 #include "PluginIssue.h"
+#include "lmms_basics.h"
 
 struct ConnectPortVisitor;
 typedef struct LV2_Evbuf_Impl LV2_Evbuf;
 
-namespace Lv2Ports {
+namespace Lv2Ports
+{
 
 /*
 	port structs
 */
-enum class Flow {
+enum class Flow
+{
 	Unknown,
 	Input,
 	Output
 };
 
-enum class Type {
+enum class Type
+{
 	Unknown,
 	Control,
 	Audio,
@@ -60,16 +63,17 @@ enum class Type {
 
 //! Port visualization
 //! @note All Lv2 audio ports are float, this is only the visualisation
-enum class Vis {
-	Generic, //!< nothing specific, a generic knob or slider shall be used
-	Integer, //!< counter
+enum class Vis
+{
+	Generic,	 //!< nothing specific, a generic knob or slider shall be used
+	Integer,	 //!< counter
 	Enumeration, //!< selection from enumerated values
-	Toggled //!< boolean widget
+	Toggled		 //!< boolean widget
 };
 
-const char* toStr(Lv2Ports::Flow pf);
-const char* toStr(Lv2Ports::Type pt);
-const char* toStr(Lv2Ports::Vis pv);
+const char *toStr(Lv2Ports::Flow pf);
+const char *toStr(Lv2Ports::Type pt);
+const char *toStr(Lv2Ports::Vis pv);
 
 struct ControlPortBase;
 struct Control;
@@ -80,24 +84,24 @@ struct Unknown;
 
 struct ConstVisitor
 {
-	virtual void visit(const Lv2Ports::ControlPortBase& ) {}
-	virtual void visit(const Lv2Ports::Control& ) {}
-	virtual void visit(const Lv2Ports::Audio& ) {}
-	virtual void visit(const Lv2Ports::Cv& ) {}
-	virtual void visit(const Lv2Ports::AtomSeq& ) {}
-	virtual void visit(const Lv2Ports::Unknown& ) {}
+	virtual void visit(const Lv2Ports::ControlPortBase &) {}
+	virtual void visit(const Lv2Ports::Control &) {}
+	virtual void visit(const Lv2Ports::Audio &) {}
+	virtual void visit(const Lv2Ports::Cv &) {}
+	virtual void visit(const Lv2Ports::AtomSeq &) {}
+	virtual void visit(const Lv2Ports::Unknown &) {}
 
 	virtual ~ConstVisitor();
 };
 
 struct Visitor
 {
-	virtual void visit(Lv2Ports::ControlPortBase& ) {}
-	virtual void visit(Lv2Ports::Control& ) {}
-	virtual void visit(Lv2Ports::Audio& ) {}
-	virtual void visit(Lv2Ports::Cv& ) {}
-	virtual void visit(Lv2Ports::AtomSeq& ) {}
-	virtual void visit(Lv2Ports::Unknown& ) {}
+	virtual void visit(Lv2Ports::ControlPortBase &) {}
+	virtual void visit(Lv2Ports::Control &) {}
+	virtual void visit(Lv2Ports::Audio &) {}
+	virtual void visit(Lv2Ports::Cv &) {}
+	virtual void visit(Lv2Ports::AtomSeq &) {}
+	virtual void visit(Lv2Ports::Unknown &) {}
 
 	virtual ~Visitor();
 };
@@ -113,11 +117,12 @@ struct Meta
 	bool m_optional = false;
 	bool m_used = true;
 
-	std::vector<PluginIssue> get(const LilvPlugin* plugin, std::size_t portNum);
+	std::vector<PluginIssue> get(const LilvPlugin *plugin, std::size_t portNum);
 
 	float def() const { return m_def; }
 	float min(sample_rate_t sr) const { return m_sampleRate ? sr * m_min : m_min; }
 	float max(sample_rate_t sr) const { return m_sampleRate ? sr * m_max : m_max; }
+
 private:
 	float m_def = .0f, m_min = .0f, m_max = .0f;
 	bool m_sampleRate = false;
@@ -125,11 +130,11 @@ private:
 
 struct PortBase : public Meta
 {
-	const LilvPort* m_port = nullptr;
-	const LilvPlugin* m_plugin = nullptr;
+	const LilvPort *m_port = nullptr;
+	const LilvPlugin *m_plugin = nullptr;
 
-	virtual void accept(Visitor& v) = 0;
-	virtual void accept(ConstVisitor& v) const = 0;
+	virtual void accept(Visitor &v) = 0;
+	virtual void accept(ConstVisitor &v) const = 0;
 
 	QString name() const;
 	QString uri() const;
@@ -137,11 +142,11 @@ struct PortBase : public Meta
 	virtual ~PortBase();
 };
 
-template<typename Derived, typename Base>
+template <typename Derived, typename Base>
 struct VisitablePort : public Base
 {
-	void accept(Visitor& v) override { v.visit(static_cast<Derived&>(*this)); }
-	void accept(ConstVisitor& v) const override { v.visit(static_cast<const Derived&>(*this)); }
+	void accept(Visitor &v) override { v.visit(static_cast<Derived &>(*this)); }
+	void accept(ConstVisitor &v) const override { v.visit(static_cast<const Derived &>(*this)); }
 };
 
 struct ControlPortBase : public VisitablePort<ControlPortBase, PortBase>
@@ -214,7 +219,7 @@ struct AtomSeq : public VisitablePort<AtomSeq, PortBase>
 
 	struct Lv2EvbufDeleter
 	{
-		void operator()(LV2_Evbuf* n);
+		void operator()(LV2_Evbuf *n);
 	};
 	using AutoLv2Evbuf = std::unique_ptr<LV2_Evbuf, Lv2EvbufDeleter>;
 	AutoLv2Evbuf m_buf;
@@ -227,23 +232,23 @@ struct Unknown : public VisitablePort<Unknown, PortBase>
 /*
 	port casts
 */
-template<class Target>
+template <class Target>
 struct DCastVisitor : public Visitor
 {
-	Target* m_result = nullptr;
-	void visit(Target& tar) { m_result = &tar; }
+	Target *m_result = nullptr;
+	void visit(Target &tar) { m_result = &tar; }
 };
 
-template<class Target>
+template <class Target>
 struct ConstDCastVisitor : public ConstVisitor
 {
-	const Target* m_result = nullptr;
-	void visit(const Target& tar) { m_result = &tar; }
+	const Target *m_result = nullptr;
+	void visit(const Target &tar) { m_result = &tar; }
 };
 
 //! If you don't want to use a whole visitor, you can use dcast
-template<class Target>
-Target* dcast(PortBase* base)
+template <class Target>
+Target *dcast(PortBase *base)
 {
 	DCastVisitor<Target> vis;
 	base->accept(vis);
@@ -251,8 +256,8 @@ Target* dcast(PortBase* base)
 }
 
 //! const overload
-template<class Target>
-const Target* dcast(const PortBase* base)
+template <class Target>
+const Target *dcast(const PortBase *base)
 {
 	ConstDCastVisitor<Target> vis;
 	base->accept(vis);

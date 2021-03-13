@@ -23,11 +23,11 @@
 #ifndef SAWATERFALLVIEW_H
 #define SAWATERFALLVIEW_H
 
+#include <QPainter>
+#include <QWidget>
 #include <string>
 #include <utility>
 #include <vector>
-#include <QPainter>
-#include <QWidget>
 
 #include "SaControls.h"
 #include "SaProcessor.h"
@@ -42,7 +42,7 @@ public:
 	explicit SaWaterfallView(SaControls *controls, SaProcessor *processor, QWidget *_parent = 0);
 	virtual ~SaWaterfallView() {}
 
-	QSize sizeHint() const override {return QSize(400, 350);}
+	QSize sizeHint() const override { return QSize(400, 350); }
 
 	// Check if waterfall should be displayed and adjust window size if needed.
 	void updateVisibility();
@@ -69,7 +69,7 @@ private:
 	float timeToYPixel(float time, int height);
 	float yPixelToTime(float position, int height);
 	std::vector<std::pair<float, std::string>> makeTimeTics();
-	std::vector<std::pair<float, std::string>> m_timeTics;	// 0..n (s)
+	std::vector<std::pair<float, std::string>> m_timeTics; // 0..n (s)
 
 	// current cursor location and a method to draw it
 	QPointF m_cursor;
@@ -83,8 +83,8 @@ private:
 	unsigned int m_displayWidth;
 	unsigned int m_displayHeight;
 
-	#ifdef SA_DEBUG
-		float m_execution_avg;
-	#endif
+#ifdef SA_DEBUG
+	float m_execution_avg;
+#endif
 };
 #endif // SAWATERFALLVIEW_H

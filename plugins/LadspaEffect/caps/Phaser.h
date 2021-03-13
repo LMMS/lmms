@@ -28,137 +28,138 @@
 #ifndef _PHASER_H_
 #define _PHASER_H_
 
-#include "dsp/Sine.h"
-#include "dsp/Lorenz.h"
 #include "dsp/Delay.h"
+#include "dsp/Lorenz.h"
+#include "dsp/Sine.h"
 
 /* all-pass as used by the phaser. */
 class PhaserAP
 {
-	public:
-		sample_t a, m;
-		
-		PhaserAP() 
-		{ 
-			a = m = 0.; 
-		}
+public:
+	sample_t a, m;
 
-		void set (double delay)
-		{
-			a = (1 - delay) / (1 + delay);
-		}
+	PhaserAP()
+	{
+		a = m = 0.;
+	}
 
-		sample_t process (sample_t x)
-		{
-			register sample_t y = -a * x + m;
-			m = a * y + x;
+	void set(double delay)
+	{
+		a = (1 - delay) / (1 + delay);
+	}
 
-			return y;
-		}
+	sample_t process(sample_t x)
+	{
+		register sample_t y = -a * x + m;
+		m = a * y + x;
+
+		return y;
+	}
 };
 
 class PhaserI
-: public Plugin
+	: public Plugin
 {
-	public:
-		PhaserAP ap[6];
-		DSP::Sine lfo;
+public:
+	PhaserAP ap[6];
+	DSP::Sine lfo;
 
-		sample_t rate;
-		sample_t y0;
+	sample_t rate;
+	sample_t y0;
 
-		struct {
-			double bottom, range;
-		} delay;
+	struct
+	{
+		double bottom, range;
+	} delay;
 
-		template <sample_func_t>
-			void one_cycle (int frames);
-	
-		int blocksize, remain;
+	template <sample_func_t>
+	void one_cycle(int frames);
 
-	public:
-		static PortInfo port_info [];
+	int blocksize, remain;
 
-		void init()
-			{
-				blocksize = 32;
-			}
+public:
+	static PortInfo port_info[];
 
-		void activate()
-			{
-				y0 = 0.;
-				remain = 0;
+	void init()
+	{
+		blocksize = 32;
+	}
 
-				delay.bottom = 400. / fs;
-				delay.range = 2200. / fs;
+	void activate()
+	{
+		y0 = 0.;
+		remain = 0;
 
-				rate = -1; /* force lfo reset in one_cycle() */
-			}
+		delay.bottom = 400. / fs;
+		delay.range = 2200. / fs;
 
-		void run (int n)
-			{
-				one_cycle<store_func> (n);
-			}
-		
-		void run_adding (int n)
-			{
-				one_cycle<adding_func> (n);
-			}
+		rate = -1; /* force lfo reset in one_cycle() */
+	}
+
+	void run(int n)
+	{
+		one_cycle<store_func>(n);
+	}
+
+	void run_adding(int n)
+	{
+		one_cycle<adding_func>(n);
+	}
 };
 
 /* same as above, but filter sweep is controlled by a Lorenz fractal */
 
 class PhaserII
-: public Plugin
+	: public Plugin
 {
-	public:
-		double fs;
+public:
+	double fs;
 
-		PhaserAP ap[6];
-		DSP::Lorenz lorenz;
+	PhaserAP ap[6];
+	DSP::Lorenz lorenz;
 
-		sample_t rate;
-		sample_t y0;
+	sample_t rate;
+	sample_t y0;
 
-		struct {
-			double bottom, range;
-		} delay;
+	struct
+	{
+		double bottom, range;
+	} delay;
 
-		template <sample_func_t>
-			void one_cycle (int frames);
-	
-		int blocksize, remain;
+	template <sample_func_t>
+	void one_cycle(int frames);
 
-	public:
-		static PortInfo port_info [];
+	int blocksize, remain;
 
-		void init()
-			{
-				blocksize = 32;
-				lorenz.init();
-			}
+public:
+	static PortInfo port_info[];
 
-		void activate()
-			{
-				y0 = 0.;
-				remain = 0;
+	void init()
+	{
+		blocksize = 32;
+		lorenz.init();
+	}
 
-				delay.bottom = 400. / fs;
-				delay.range = 2200. / fs;
+	void activate()
+	{
+		y0 = 0.;
+		remain = 0;
 
-				rate = -1; /* force lfo reset in one_cycle() */
-			}
+		delay.bottom = 400. / fs;
+		delay.range = 2200. / fs;
 
-		void run (int n)
-			{
-				one_cycle<store_func> (n);
-			}
-		
-		void run_adding (int n)
-			{
-				one_cycle<adding_func> (n);
-			}
+		rate = -1; /* force lfo reset in one_cycle() */
+	}
+
+	void run(int n)
+	{
+		one_cycle<store_func>(n);
+	}
+
+	void run_adding(int n)
+	{
+		one_cycle<adding_func>(n);
+	}
 };
-
 
 #endif /* _PHASER_H_ */

@@ -22,7 +22,6 @@
  *
  */
 
-
 #include "TabWidget.h"
 
 #include <QMouseEvent>
@@ -35,18 +34,18 @@
 #include "embed.h"
 #include "gui_templates.h"
 
-TabWidget::TabWidget(const QString & caption, QWidget * parent, bool usePixmap,
-					 bool resizable) :
-	QWidget( parent ),
-	m_resizable( resizable ),
-	m_activeTab( 0 ),
-	m_caption( caption ),
-	m_usePixmap( usePixmap ),
-	m_tabText( 0, 0, 0 ),
-	m_tabTitleText( 0, 0, 0 ),
-	m_tabSelected( 0, 0, 0 ),
-	m_tabBackground( 0, 0, 0 ),
-	m_tabBorder( 0, 0, 0 )
+TabWidget::TabWidget(const QString &caption, QWidget *parent, bool usePixmap,
+	bool resizable) :
+	QWidget(parent),
+	m_resizable(resizable),
+	m_activeTab(0),
+	m_caption(caption),
+	m_usePixmap(usePixmap),
+	m_tabText(0, 0, 0),
+	m_tabTitleText(0, 0, 0),
+	m_tabSelected(0, 0, 0),
+	m_tabBackground(0, 0, 0),
+	m_tabBorder(0, 0, 0)
 {
 
 	// Create taller tabbar when it's to display artwork tabs
@@ -54,24 +53,23 @@ TabWidget::TabWidget(const QString & caption, QWidget * parent, bool usePixmap,
 
 	m_tabheight = caption.isEmpty() ? m_tabbarHeight - 3 : m_tabbarHeight - 4;
 
-	setFont( pointSize<8>( font() ) );
+	setFont(pointSize<8>(font()));
 
-	setAutoFillBackground( true );
-	QColor bg_color = QApplication::palette().color( QPalette::Active, QPalette::Background ). darker( 132 );
+	setAutoFillBackground(true);
+	QColor bg_color = QApplication::palette().color(QPalette::Active, QPalette::Background).darker(132);
 	QPalette pal = palette();
-	pal.setColor( QPalette::Background, bg_color );
-	setPalette( pal );
-
+	pal.setColor(QPalette::Background, bg_color);
+	setPalette(pal);
 }
 
-void TabWidget::addTab( QWidget * w, const QString & name, const char *pixmap, int idx )
+void TabWidget::addTab(QWidget *w, const QString &name, const char *pixmap, int idx)
 {
-	setFont( pointSize<8>( font() ) );
+	setFont(pointSize<8>(font()));
 
 	// Append tab when position is not given
-	if( idx < 0/* || m_widgets.contains( idx ) == true*/ )
+	if (idx < 0 /* || m_widgets.contains( idx ) == true*/)
 	{
-		while( m_widgets.contains( ++idx ) == true )
+		while (m_widgets.contains(++idx) == true)
 		{
 		}
 	}
@@ -80,19 +78,19 @@ void TabWidget::addTab( QWidget * w, const QString & name, const char *pixmap, i
 	int tab_width = horizontalAdvance(fontMetrics(), name) + 10;
 
 	// Register new tab
-	widgetDesc d = { w, pixmap, name, tab_width };
+	widgetDesc d = {w, pixmap, name, tab_width};
 	m_widgets[idx] = d;
 
 	// Position tab's window
 	if (!m_resizable)
 	{
-		w->setFixedSize( width() - 4, height() - m_tabbarHeight );
+		w->setFixedSize(width() - 4, height() - m_tabbarHeight);
 	}
-	w->move( 2, m_tabbarHeight - 1 );
+	w->move(2, m_tabbarHeight - 1);
 	w->hide();
 
 	// Show tab's window if it's active
-	if( m_widgets.contains( m_activeTab ) )
+	if (m_widgets.contains(m_activeTab))
 	{
 		// make sure new tab doesn't overlap current widget
 		m_widgets[m_activeTab].w->show();
@@ -100,18 +98,15 @@ void TabWidget::addTab( QWidget * w, const QString & name, const char *pixmap, i
 	}
 }
 
-
-
-
-void TabWidget::setActiveTab( int idx )
+void TabWidget::setActiveTab(int idx)
 {
-	if( m_widgets.contains( idx ) )
+	if (m_widgets.contains(idx))
 	{
 		int old_active = m_activeTab;
 		m_activeTab = idx;
 		m_widgets[m_activeTab].w->raise();
 		m_widgets[m_activeTab].w->show();
-		if( old_active != idx && m_widgets.contains( old_active ) )
+		if (old_active != idx && m_widgets.contains(old_active))
 		{
 			m_widgets[old_active].w->hide();
 		}
@@ -119,44 +114,42 @@ void TabWidget::setActiveTab( int idx )
 	}
 }
 
-
 // Return the index of the tab at position "pos"
-int TabWidget::findTabAtPos( const QPoint *pos )
+int TabWidget::findTabAtPos(const QPoint *pos)
 {
 
-	if( pos->y() > 1 && pos->y() < m_tabbarHeight - 1 )
+	if (pos->y() > 1 && pos->y() < m_tabbarHeight - 1)
 	{
 		int cx = ((m_caption == "") ? 4 : 14) + horizontalAdvance(fontMetrics(), m_caption);
 
-		for( widgetStack::iterator it = m_widgets.begin(); it != m_widgets.end(); ++it )
+		for (widgetStack::iterator it = m_widgets.begin(); it != m_widgets.end(); ++it)
 		{
-			if( pos->x() >= cx && pos->x() <= cx + ( *it ).nwidth )
+			if (pos->x() >= cx && pos->x() <= cx + (*it).nwidth)
 			{
-				return( it.key() );
+				return (it.key());
 			}
-			cx += ( *it ).nwidth;
+			cx += (*it).nwidth;
 		}
 	}
 
 	// Haven't found any tab at position "pos"
-	return( -1 );
+	return (-1);
 }
-
 
 // Overload the QWidget::event handler to display tooltips (from https://doc.qt.io/qt-4.8/qt-widgets-tooltips-example.html)
 bool TabWidget::event(QEvent *event)
 {
 
-	if ( event->type() == QEvent::ToolTip )
+	if (event->type() == QEvent::ToolTip)
 	{
 		QHelpEvent *helpEvent = static_cast<QHelpEvent *>(event);
 
-		int idx = findTabAtPos( & helpEvent->pos() );
+		int idx = findTabAtPos(&helpEvent->pos());
 
-		if ( idx != -1 )
+		if (idx != -1)
 		{
 			// Display tab's tooltip
-			QToolTip::showText( helpEvent->globalPos(), m_widgets[idx].name );
+			QToolTip::showText(helpEvent->globalPos(), m_widgets[idx].name);
 		}
 		else
 		{
@@ -172,64 +165,57 @@ bool TabWidget::event(QEvent *event)
 	return QWidget::event(event);
 }
 
-
 // Activate tab when clicked
-void TabWidget::mousePressEvent( QMouseEvent * me )
+void TabWidget::mousePressEvent(QMouseEvent *me)
 {
 
 	// Find index of tab that has been clicked
 	QPoint pos = me->pos();
-	int idx = findTabAtPos( &pos );
+	int idx = findTabAtPos(&pos);
 
 	// When found, activate tab that has been clicked
-	if ( idx != -1 )
+	if (idx != -1)
 	{
-		setActiveTab( idx );
+		setActiveTab(idx);
 		update();
 		return;
 	}
 }
 
-
-
-
-void TabWidget::resizeEvent( QResizeEvent * )
+void TabWidget::resizeEvent(QResizeEvent *)
 {
 	if (!m_resizable)
 	{
-		for ( widgetStack::iterator it = m_widgets.begin();
-							it != m_widgets.end(); ++it )
+		for (widgetStack::iterator it = m_widgets.begin();
+			 it != m_widgets.end(); ++it)
 		{
-			( *it ).w->setFixedSize( width() - 4, height() - m_tabbarHeight );
+			(*it).w->setFixedSize(width() - 4, height() - m_tabbarHeight);
 		}
 	}
 }
 
-
-
-
-void TabWidget::paintEvent( QPaintEvent * pe )
+void TabWidget::paintEvent(QPaintEvent *pe)
 {
-	QPainter p( this );
-	p.setFont( pointSize<7>( font() ) );
+	QPainter p(this);
+	p.setFont(pointSize<7>(font()));
 
 	// Draw background
 	QBrush bg_color = p.background();
-	p.fillRect( 0, 0, width() - 1, height() - 1, bg_color );
+	p.fillRect(0, 0, width() - 1, height() - 1, bg_color);
 
 	// Draw external borders
-	p.setPen( tabBorder() );
-	p.drawRect( 0, 0, width() - 1, height() - 1 );
+	p.setPen(tabBorder());
+	p.drawRect(0, 0, width() - 1, height() - 1);
 
 	// Draw tabs' bar background
-	p.fillRect( 1, 1, width() - 2, m_tabheight + 2, tabBackground() );
+	p.fillRect(1, 1, width() - 2, m_tabheight + 2, tabBackground());
 
 	// Draw title, if any
-	if( ! m_caption.isEmpty() )
+	if (!m_caption.isEmpty())
 	{
-		p.setFont( pointSize<8>( p.font() ) );
-		p.setPen( tabTitleText() );
-		p.drawText( 5, 11, m_caption );
+		p.setFont(pointSize<8>(p.font()));
+		p.setPen(tabTitleText());
+		p.drawText(5, 11, m_caption);
 	}
 
 	// Calculate the tabs' x (tabs are painted next to the caption)
@@ -239,57 +225,54 @@ void TabWidget::paintEvent( QPaintEvent * pe )
 	widgetStack::iterator first = m_widgets.begin();
 	widgetStack::iterator last = m_widgets.end();
 	int tab_width = width();
-	if ( first != last )
+	if (first != last)
 	{
-		tab_width = ( width() - tab_x_offset ) / std::distance( first, last );
+		tab_width = (width() - tab_x_offset) / std::distance(first, last);
 	}
 
 	// Draw all tabs
-	p.setPen( tabText() );
-	for( widgetStack::iterator it = first ; it != last ; ++it )
+	p.setPen(tabText());
+	for (widgetStack::iterator it = first; it != last; ++it)
 	{
 		// Draw a text tab or a artwork tab.
-		if( m_usePixmap )
+		if (m_usePixmap)
 		{
 			// Fixes tab's width, because original size is only correct for text tabs
-			( *it ).nwidth = tab_width;
+			(*it).nwidth = tab_width;
 
 			// Get artwork
-			QPixmap artwork( embed::getIconPixmap( ( *it ).pixmap ) );
+			QPixmap artwork(embed::getIconPixmap((*it).pixmap));
 
 			// Highlight active tab
-			if( it.key() == m_activeTab )
+			if (it.key() == m_activeTab)
 			{
-				p.fillRect( tab_x_offset, 0, ( *it ).nwidth, m_tabbarHeight - 1, tabSelected() );
+				p.fillRect(tab_x_offset, 0, (*it).nwidth, m_tabbarHeight - 1, tabSelected());
 			}
 
 			// Draw artwork
-			p.drawPixmap(tab_x_offset + ( ( *it ).nwidth - artwork.width() ) / 2, 1, artwork );
+			p.drawPixmap(tab_x_offset + ((*it).nwidth - artwork.width()) / 2, 1, artwork);
 		}
 		else
 		{
 			// Highlight tab when active
-			if( it.key() == m_activeTab )
+			if (it.key() == m_activeTab)
 			{
-				p.fillRect( tab_x_offset, 2, ( *it ).nwidth - 6, m_tabbarHeight - 4, tabSelected() );
+				p.fillRect(tab_x_offset, 2, (*it).nwidth - 6, m_tabbarHeight - 4, tabSelected());
 			}
 
 			// Draw text
-			p.drawText( tab_x_offset + 3, m_tabheight + 1, ( *it ).name );
+			p.drawText(tab_x_offset + 3, m_tabheight + 1, (*it).name);
 		}
 
 		// Next tab's horizontal position
-		tab_x_offset += ( *it ).nwidth;
+		tab_x_offset += (*it).nwidth;
 	}
 }
 
-
-
-
 // Switch between tabs with mouse wheel
-void TabWidget::wheelEvent( QWheelEvent * we )
+void TabWidget::wheelEvent(QWheelEvent *we)
 {
-	if(position(we).y() > m_tabheight)
+	if (position(we).y() > m_tabheight)
 	{
 		return;
 	}
@@ -297,19 +280,16 @@ void TabWidget::wheelEvent( QWheelEvent * we )
 	we->accept();
 	int dir = (we->angleDelta().y() < 0) ? 1 : -1;
 	int tab = m_activeTab;
-	while( tab > -1 && static_cast<int>( tab ) < m_widgets.count() )
+	while (tab > -1 && static_cast<int>(tab) < m_widgets.count())
 	{
 		tab += dir;
-		if( m_widgets.contains( tab ) )
+		if (m_widgets.contains(tab))
 		{
 			break;
 		}
 	}
-	setActiveTab( tab );
+	setActiveTab(tab);
 }
-
-
-
 
 // Let parent widgets know how much space this tab widget needs
 QSize TabWidget::minimumSizeHint() const
@@ -317,8 +297,8 @@ QSize TabWidget::minimumSizeHint() const
 	if (m_resizable)
 	{
 		int maxWidth = 0, maxHeight = 0;
-		for ( widgetStack::const_iterator it = m_widgets.begin();
-							it != m_widgets.end(); ++it )
+		for (widgetStack::const_iterator it = m_widgets.begin();
+			 it != m_widgets.end(); ++it)
 		{
 			maxWidth = std::max(maxWidth, it->w->minimumSizeHint().width());
 			maxHeight = std::max(maxHeight, it->w->minimumSizeHint().height());
@@ -328,19 +308,19 @@ QSize TabWidget::minimumSizeHint() const
 		// moved up by 1 pixel
 		return QSize(maxWidth + 4, maxHeight + m_tabbarHeight - 1);
 	}
-	else { return QWidget::minimumSizeHint(); }
+	else
+	{
+		return QWidget::minimumSizeHint();
+	}
 }
-
-
-
 
 QSize TabWidget::sizeHint() const
 {
 	if (m_resizable)
 	{
 		int maxWidth = 0, maxHeight = 0;
-		for ( widgetStack::const_iterator it = m_widgets.begin();
-							it != m_widgets.end(); ++it )
+		for (widgetStack::const_iterator it = m_widgets.begin();
+			 it != m_widgets.end(); ++it)
 		{
 			maxWidth = std::max(maxWidth, it->w->sizeHint().width());
 			maxHeight = std::max(maxHeight, it->w->sizeHint().height());
@@ -350,11 +330,11 @@ QSize TabWidget::sizeHint() const
 		// moved up by 1 pixel
 		return QSize(maxWidth + 4, maxHeight + m_tabbarHeight - 1);
 	}
-	else { return QWidget::sizeHint(); }
+	else
+	{
+		return QWidget::sizeHint();
+	}
 }
-
-
-
 
 // Return the color to be used to draw a TabWidget's title text (if any)
 QColor TabWidget::tabTitleText() const
@@ -363,7 +343,7 @@ QColor TabWidget::tabTitleText() const
 }
 
 // Set the color to be used to draw a TabWidget's title text (if any)
-void TabWidget::setTabTitleText( const QColor & c )
+void TabWidget::setTabTitleText(const QColor &c)
 {
 	m_tabTitleText = c;
 }
@@ -375,7 +355,7 @@ QColor TabWidget::tabText() const
 }
 
 // Set the color to be used to draw a TabWidget's text (if any)
-void TabWidget::setTabText( const QColor & c )
+void TabWidget::setTabText(const QColor &c)
 {
 	m_tabText = c;
 }
@@ -387,7 +367,7 @@ QColor TabWidget::tabSelected() const
 }
 
 // Set the color to be used to highlight a TabWidget'selected tab (if any)
-void TabWidget::setTabSelected( const QColor & c )
+void TabWidget::setTabSelected(const QColor &c)
 {
 	m_tabSelected = c;
 }
@@ -399,7 +379,7 @@ QColor TabWidget::tabBackground() const
 }
 
 // Set the color to be used for the TabWidget's background
-void TabWidget::setTabBackground( const QColor & c )
+void TabWidget::setTabBackground(const QColor &c)
 {
 	m_tabBackground = c;
 }
@@ -411,7 +391,7 @@ QColor TabWidget::tabBorder() const
 }
 
 // Set the color to be used for the TabWidget's borders
-void TabWidget::setTabBorder( const QColor & c )
+void TabWidget::setTabBorder(const QColor &c)
 {
 	m_tabBorder = c;
 }

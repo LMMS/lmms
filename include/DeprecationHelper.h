@@ -37,7 +37,7 @@
  * @param text
  * @return text's horizontal advance based on metrics.
  */
-inline int horizontalAdvance(const QFontMetrics& metrics, const QString& text)
+inline int horizontalAdvance(const QFontMetrics &metrics, const QString &text)
 {
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 11, 0))
 	return metrics.horizontalAdvance(text);

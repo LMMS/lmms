@@ -25,21 +25,21 @@
 #ifndef LOCKLESS_LIST_H
 #define LOCKLESS_LIST_H
 
-#include "LocklessAllocator.h"
-
 #include <atomic>
 
-template<typename T>
+#include "LocklessAllocator.h"
+
+template <typename T>
 class LocklessList
 {
 public:
 	struct Element
 	{
 		T value;
-		Element * next;
-	} ;
+		Element *next;
+	};
 
-	LocklessList( size_t size ) :
+	LocklessList(size_t size) :
 		m_first(nullptr),
 		m_allocator(new LocklessAllocatorT<Element>(size))
 	{
@@ -50,46 +50,43 @@ public:
 		delete m_allocator;
 	}
 
-	void push( T value )
+	void push(T value)
 	{
-		Element * e = m_allocator->alloc();
+		Element *e = m_allocator->alloc();
 		e->value = value;
 		e->next = m_first.load(std::memory_order_relaxed);
 
 		while (!m_first.compare_exchange_weak(e->next, e,
-				std::memory_order_release,
-				std::memory_order_relaxed))
+			std::memory_order_release,
+			std::memory_order_relaxed))
 		{
 			// Empty loop (compare_exchange_weak updates e->next)
 		}
 	}
 
-	Element * popList()
+	Element *popList()
 	{
 		return m_first.exchange(nullptr);
 	}
 
-	Element * first()
+	Element *first()
 	{
 		return m_first.load(std::memory_order_acquire);
 	}
 
-	void setFirst( Element * e )
+	void setFirst(Element *e)
 	{
 		m_first.store(e, std::memory_order_release);
 	}
 
-	void free( Element * e )
+	void free(Element *e)
 	{
-		m_allocator->free( e );
+		m_allocator->free(e);
 	}
 
-
 private:
-	std::atomic<Element*> m_first;
-	LocklessAllocatorT<Element> * m_allocator;
-
-} ;
-
+	std::atomic<Element *> m_first;
+	LocklessAllocatorT<Element> *m_allocator;
+};
 
 #endif

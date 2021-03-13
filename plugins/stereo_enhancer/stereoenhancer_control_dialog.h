@@ -29,17 +29,14 @@
 
 class stereoEnhancerControls;
 
-
 class stereoEnhancerControlDialog : public EffectControlDialog
 {
 	Q_OBJECT
 public:
-	stereoEnhancerControlDialog( stereoEnhancerControls * _controls );
+	stereoEnhancerControlDialog(stereoEnhancerControls *_controls);
 	virtual ~stereoEnhancerControlDialog()
 	{
 	}
-
 };
-
 
 #endif

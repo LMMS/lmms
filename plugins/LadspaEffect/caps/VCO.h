@@ -29,106 +29,109 @@
 #ifndef _VCO_H_
 #define _VCO_H_
 
-#include "dsp/util.h"
-#include "dsp/VCO.h"
-
 #include "dsp/FIR.h"
+#include "dsp/VCO.h"
 #include "dsp/sinc.h"
+#include "dsp/util.h"
 #include "dsp/windows.h"
 
 class VCOs
-: public Plugin
+	: public Plugin
 {
-	public:
-		sample_t f, gain;
+public:
+	sample_t f, gain;
 
-		/* ok to just change these as you please, 4/32 works ok, sortof. */
-		enum {
-			OVERSAMPLE = 8,
-			FIR_SIZE = 64, 
-		};
+	/* ok to just change these as you please, 4/32 works ok, sortof. */
+	enum
+	{
+		OVERSAMPLE = 8,
+		FIR_SIZE = 64,
+	};
 
-		DSP::TriSawSquare vco;
+	DSP::TriSawSquare vco;
 
-		/* downsampling filter */
-		DSP::FIR down;
+	/* downsampling filter */
+	DSP::FIR down;
 
-		template <sample_func_t F>
-			void one_cycle (int frames);
+	template <sample_func_t F>
+	void one_cycle(int frames);
 
-	public:
-		static PortInfo port_info[];
+public:
+	static PortInfo port_info[];
 
-		VCOs()
-			: down (FIR_SIZE)
-			{ }
+	VCOs() :
+		down(FIR_SIZE)
+	{
+	}
 
-		void init();
-		void activate()
-			{
-				gain = *ports[3];
-				down.reset();
-				vco.reset();
-			}
+	void init();
+	void activate()
+	{
+		gain = *ports[3];
+		down.reset();
+		vco.reset();
+	}
 
-		void run (int n)
-			{
-				one_cycle<store_func> (n);
-			}
-		
-		void run_adding (int n)
-			{
-				one_cycle<adding_func> (n);
-			}
+	void run(int n)
+	{
+		one_cycle<store_func>(n);
+	}
+
+	void run_adding(int n)
+	{
+		one_cycle<adding_func>(n);
+	}
 };
 
 /* //////////////////////////////////////////////////////////////////////// */
 
 class VCOd
-: public Plugin
+	: public Plugin
 {
-	public:
-		double fs;
-		sample_t f, gain;
+public:
+	double fs;
+	sample_t f, gain;
 
-		/* ok to just change these as you please, 4/32 works ok, sortof. */
-		enum {
-			OVERSAMPLE = 8,
-			FIR_SIZE = 64, 
-		};
+	/* ok to just change these as you please, 4/32 works ok, sortof. */
+	enum
+	{
+		OVERSAMPLE = 8,
+		FIR_SIZE = 64,
+	};
 
-		DSP::VCO2 vco;
+	DSP::VCO2 vco;
 
-		/* downsampling filter */
-		DSP::FIR down;
+	/* downsampling filter */
+	DSP::FIR down;
 
-		template <sample_func_t F>
-		void one_cycle (int frames);
+	template <sample_func_t F>
+	void one_cycle(int frames);
 
-	public:
-		static PortInfo port_info[];
+public:
+	static PortInfo port_info[];
 
-		VCOd()
-			: down (FIR_SIZE)
-			{ }
+	VCOd() :
+		down(FIR_SIZE)
+	{
+	}
 
-		void init();
-		void activate()
-			{
-				gain = *ports[8];
-				down.reset();
-				vco.reset();
-			}
+	void init();
+	void activate()
+	{
+		gain = *ports[8];
+		down.reset();
+		vco.reset();
+	}
 
-		void run (int n)
-			{
-				one_cycle<store_func> (n);
-			}
-		
-		void run_adding (int n)
-			{
-				one_cycle<adding_func> (n);
-			}
+	void run(int n)
+	{
+		one_cycle<store_func>(n);
+	}
+
+	void run_adding(int n)
+	{
+		one_cycle<adding_func>(n);
+	}
 };
 
 #endif /* _VCO_H_ */

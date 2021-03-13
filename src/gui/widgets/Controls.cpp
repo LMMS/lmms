@@ -29,17 +29,11 @@
 #include <QVBoxLayout>
 
 #include "ComboBox.h"
+#include "Knob.h"
 #include "LcdSpinBox.h"
 #include "LedCheckbox.h"
-#include "Knob.h"
-
-
-
 
 Control::~Control() {}
-
-
-
 
 void KnobControl::setText(const QString &text) { m_knob->setLabel(text); }
 
@@ -52,15 +46,12 @@ void KnobControl::setModel(AutomatableModel *model)
 
 FloatModel *KnobControl::model() { return m_knob->model(); }
 
-AutomatableModelView* KnobControl::modelView() { return m_knob; }
+AutomatableModelView *KnobControl::modelView() { return m_knob; }
 
 KnobControl::KnobControl(QWidget *parent) :
 	m_knob(new Knob(parent)) {}
 
 KnobControl::~KnobControl() {}
-
-
-
 
 void ComboControl::setText(const QString &text) { m_label->setText(text); }
 
@@ -71,7 +62,7 @@ void ComboControl::setModel(AutomatableModel *model)
 
 ComboBoxModel *ComboControl::model() { return m_combo->model(); }
 
-AutomatableModelView* ComboControl::modelView() { return m_combo; }
+AutomatableModelView *ComboControl::modelView() { return m_combo; }
 
 ComboControl::ComboControl(QWidget *parent) :
 	m_widget(new QWidget(parent)),
@@ -79,16 +70,13 @@ ComboControl::ComboControl(QWidget *parent) :
 	m_label(new QLabel(m_widget))
 {
 	m_combo->setFixedSize(64, ComboBox::DEFAULT_HEIGHT);
-	QVBoxLayout* vbox = new QVBoxLayout(m_widget);
+	QVBoxLayout *vbox = new QVBoxLayout(m_widget);
 	vbox->addWidget(m_combo);
 	vbox->addWidget(m_label);
 	m_combo->repaint();
 }
 
 ComboControl::~ComboControl() {}
-
-
-
 
 void CheckControl::setText(const QString &text) { m_label->setText(text); }
 
@@ -101,22 +89,19 @@ void CheckControl::setModel(AutomatableModel *model)
 
 BoolModel *CheckControl::model() { return m_checkBox->model(); }
 
-AutomatableModelView* CheckControl::modelView() { return m_checkBox; }
+AutomatableModelView *CheckControl::modelView() { return m_checkBox; }
 
 CheckControl::CheckControl(QWidget *parent) :
 	m_widget(new QWidget(parent)),
 	m_checkBox(new LedCheckBox(nullptr, QString(), LedCheckBox::Green)),
 	m_label(new QLabel(m_widget))
 {
-	QVBoxLayout* vbox = new QVBoxLayout(m_widget);
+	QVBoxLayout *vbox = new QVBoxLayout(m_widget);
 	vbox->addWidget(m_checkBox);
 	vbox->addWidget(m_label);
 }
 
 CheckControl::~CheckControl() {}
-
-
-
 
 void LcdControl::setText(const QString &text) { m_lcd->setLabel(text); }
 
@@ -129,7 +114,7 @@ void LcdControl::setModel(AutomatableModel *model)
 
 IntModel *LcdControl::model() { return m_lcd->model(); }
 
-AutomatableModelView* LcdControl::modelView() { return m_lcd; }
+AutomatableModelView *LcdControl::modelView() { return m_lcd; }
 
 LcdControl::LcdControl(int numDigits, QWidget *parent) :
 	m_lcd(new LcdSpinBox(numDigits, parent))
@@ -137,4 +122,3 @@ LcdControl::LcdControl(int numDigits, QWidget *parent) :
 }
 
 LcdControl::~LcdControl() {}
-

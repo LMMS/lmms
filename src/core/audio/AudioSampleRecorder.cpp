@@ -23,92 +23,73 @@
  *
  */
 
-
 #include "AudioSampleRecorder.h"
+
 #include "SampleBuffer.h"
 #include "debug.h"
 
-
-
-AudioSampleRecorder::AudioSampleRecorder( const ch_cnt_t _channels,
-							bool & _success_ful,
-							Mixer * _mixer ) :
-	AudioDevice( _channels, _mixer ),
+AudioSampleRecorder::AudioSampleRecorder(const ch_cnt_t _channels,
+	bool &_success_ful,
+	Mixer *_mixer) :
+	AudioDevice(_channels, _mixer),
 	m_buffers()
 {
 	_success_ful = true;
 }
 
-
-
-
 AudioSampleRecorder::~AudioSampleRecorder()
 {
-	while( !m_buffers.empty() )
+	while (!m_buffers.empty())
 	{
 		delete[] m_buffers.front().first;
-		m_buffers.erase( m_buffers.begin() );
+		m_buffers.erase(m_buffers.begin());
 	}
 }
-
-
-
 
 f_cnt_t AudioSampleRecorder::framesRecorded() const
 {
 	f_cnt_t frames = 0;
-	for( BufferList::ConstIterator it = m_buffers.begin();
-						it != m_buffers.end(); ++it )
+	for (BufferList::ConstIterator it = m_buffers.begin();
+		 it != m_buffers.end(); ++it)
 	{
-		frames += ( *it ).second;
+		frames += (*it).second;
 	}
 	return frames;
 }
 
-
-
-
-void AudioSampleRecorder::createSampleBuffer( SampleBuffer** sampleBuf )
+void AudioSampleRecorder::createSampleBuffer(SampleBuffer **sampleBuf)
 {
 	const f_cnt_t frames = framesRecorded();
 	// create buffer to store all recorded buffers in
-	sampleFrame * data = new sampleFrame[frames];
+	sampleFrame *data = new sampleFrame[frames];
 	// make sure buffer is cleaned up properly at the end...
-	sampleFrame * data_ptr = data;
+	sampleFrame *data_ptr = data;
 
-
-	assert( data != NULL );
+	assert(data != NULL);
 
 	// now copy all buffers into big buffer
-	for( BufferList::ConstIterator it = m_buffers.begin();
-						it != m_buffers.end(); ++it )
+	for (BufferList::ConstIterator it = m_buffers.begin();
+		 it != m_buffers.end(); ++it)
 	{
-		memcpy( data_ptr, ( *it ).first, ( *it ).second *
-							sizeof( sampleFrame ) );
-		data_ptr += ( *it ).second;
+		memcpy(data_ptr, (*it).first, (*it).second * sizeof(sampleFrame));
+		data_ptr += (*it).second;
 	}
 	// create according sample-buffer out of big buffer
-	*sampleBuf = new SampleBuffer( data, frames );
-	( *sampleBuf )->setSampleRate( sampleRate() );
+	*sampleBuf = new SampleBuffer(data, frames);
+	(*sampleBuf)->setSampleRate(sampleRate());
 	delete[] data;
 }
 
-
-
-
-void AudioSampleRecorder::writeBuffer( const surroundSampleFrame * _ab,
-					const fpp_t _frames, const float )
+void AudioSampleRecorder::writeBuffer(const surroundSampleFrame *_ab,
+	const fpp_t _frames, const float)
 {
-	sampleFrame * buf = new sampleFrame[_frames];
-	for( fpp_t frame = 0; frame < _frames; ++frame )
+	sampleFrame *buf = new sampleFrame[_frames];
+	for (fpp_t frame = 0; frame < _frames; ++frame)
 	{
-		for( ch_cnt_t chnl = 0; chnl < DEFAULT_CHANNELS; ++chnl )
+		for (ch_cnt_t chnl = 0; chnl < DEFAULT_CHANNELS; ++chnl)
 		{
 			buf[frame][chnl] = _ab[frame][chnl];
 		}
 	}
-	m_buffers.push_back( qMakePair( buf, _frames ) );
+	m_buffers.push_back(qMakePair(buf, _frames));
 }
-
-
-

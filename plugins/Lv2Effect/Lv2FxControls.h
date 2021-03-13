@@ -30,7 +30,6 @@
 
 class Lv2Effect;
 
-
 class Lv2FxControls : public EffectControls, public Lv2ControlBase
 {
 	Q_OBJECT

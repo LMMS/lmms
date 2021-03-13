@@ -29,18 +29,19 @@
 #include <QLabel>
 #include <QLineEdit>
 
-#include "Engine.h"
-#include "debug.h"
-#include "ConfigManager.h"
-#include "gui_templates.h"
 #include "ComboBox.h"
+#include "ConfigManager.h"
+#include "Engine.h"
 #include "Mixer.h"
+#include "debug.h"
+#include "gui_templates.h"
 
-AudioSoundIo::AudioSoundIo( bool & outSuccessful, Mixer * _mixer ) :
-	AudioDevice( qBound<ch_cnt_t>(
-		DEFAULT_CHANNELS,
-		ConfigManager::inst()->value( "audiosoundio", "channels" ).toInt(),
-		SURROUND_CHANNELS ), _mixer )
+AudioSoundIo::AudioSoundIo(bool &outSuccessful, Mixer *_mixer) :
+	AudioDevice(qBound<ch_cnt_t>(
+					DEFAULT_CHANNELS,
+					ConfigManager::inst()->value("audiosoundio", "channels").toInt(),
+					SURROUND_CHANNELS),
+		_mixer)
 {
 	outSuccessful = false;
 	m_soundio = NULL;
@@ -63,9 +64,9 @@ AudioSoundIo::AudioSoundIo( bool & outSuccessful, Mixer * _mixer ) :
 	m_soundio->userdata = this;
 	m_soundio->on_backend_disconnect = staticOnBackendDisconnect;
 
-	const QString& configBackend = ConfigManager::inst()->value( "audiosoundio", "backend" );
-	const QString& configDeviceId = ConfigManager::inst()->value( "audiosoundio", "out_device_id" );
-	const QString& configDeviceRaw = ConfigManager::inst()->value( "audiosoundio", "out_device_raw" );
+	const QString &configBackend = ConfigManager::inst()->value("audiosoundio", "backend");
+	const QString &configDeviceId = ConfigManager::inst()->value("audiosoundio", "out_device_id");
+	const QString &configDeviceRaw = ConfigManager::inst()->value("audiosoundio", "out_device_raw");
 
 	int err;
 	int outDeviceCount = 0;
@@ -184,7 +185,7 @@ AudioSoundIo::AudioSoundIo( bool & outSuccessful, Mixer * _mixer ) :
 	}
 
 	fprintf(stderr, "Output device: '%s' backend: '%s'\n",
-			device->name, soundio_backend_name(m_soundio->current_backend));
+		device->name, soundio_backend_name(m_soundio->current_backend));
 
 	outSuccessful = true;
 }
@@ -197,12 +198,12 @@ void AudioSoundIo::onBackendDisconnect(int err)
 AudioSoundIo::~AudioSoundIo()
 {
 	stopProcessing();
-	
+
 	if (m_outstream)
 	{
 		soundio_outstream_destroy(m_outstream);
 	}
-	
+
 	if (m_soundio)
 	{
 		soundio_destroy(m_soundio);
@@ -213,21 +214,23 @@ AudioSoundIo::~AudioSoundIo()
 void AudioSoundIo::startProcessing()
 {
 	int err;
-	
+
 	m_outBufFrameIndex = 0;
 	m_outBufFramesTotal = 0;
 	m_outBufSize = mixer()->framesPerPeriod();
 
 	m_outBuf = new surroundSampleFrame[m_outBufSize];
 
-	if (! m_outstreamStarted)
+	if (!m_outstreamStarted)
 	{
 		if ((err = soundio_outstream_start(m_outstream)))
 		{
-			fprintf(stderr, 
-				"AudioSoundIo::startProcessing() :: soundio unable to start stream: %s\n", 
+			fprintf(stderr,
+				"AudioSoundIo::startProcessing() :: soundio unable to start stream: %s\n",
 				soundio_strerror(err));
-		} else {
+		}
+		else
+		{
 			m_outstreamStarted = true;
 		}
 	}
@@ -237,8 +240,8 @@ void AudioSoundIo::startProcessing()
 	if ((err = soundio_outstream_pause(m_outstream, false)))
 	{
 		m_stopped = true;
-		fprintf(stderr, 
-			"AudioSoundIo::startProcessing() :: resuming result error: %s\n", 
+		fprintf(stderr,
+			"AudioSoundIo::startProcessing() :: resuming result error: %s\n",
 			soundio_strerror(err));
 	}
 }
@@ -246,13 +249,13 @@ void AudioSoundIo::startProcessing()
 void AudioSoundIo::stopProcessing()
 {
 	int err;
-	
+
 	m_stopped = true;
 	if (m_outstream)
 	{
 		if ((err = soundio_outstream_pause(m_outstream, true)))
 		{
-			fprintf(stderr, 
+			fprintf(stderr,
 				"AudioSoundIo::stopProcessing() :: pausing result error: %s\n",
 				soundio_strerror(err));
 		}
@@ -277,7 +280,10 @@ void AudioSoundIo::underflowCallback()
 
 void AudioSoundIo::writeCallback(int frameCountMin, int frameCountMax)
 {
-	if (m_stopped) {return;}
+	if (m_stopped)
+	{
+		return;
+	}
 	const struct SoundIoChannelLayout *layout = &m_outstream->layout;
 	SoundIoChannelArea *areas;
 	int bytesPerSample = m_outstream->bytes_per_sample;
@@ -299,7 +305,6 @@ void AudioSoundIo::writeCallback(int frameCountMin, int frameCountMax)
 		if (!frameCount)
 			break;
 
-		
 		if (m_stopped)
 		{
 			for (int channel = 0; channel < layout->channel_count; ++channel)
@@ -370,8 +375,7 @@ static void setup_widget_on_devices_change(SoundIo *soundio)
 
 void AudioSoundIo::setupWidget::reconnectSoundIo()
 {
-	const QString& configBackend = m_isFirst ?
-		ConfigManager::inst()->value( "audiosoundio", "backend" ) : m_backendModel.currentText();
+	const QString &configBackend = m_isFirst ? ConfigManager::inst()->value("audiosoundio", "backend") : m_backendModel.currentText();
 	m_isFirst = false;
 
 	soundio_disconnect(m_soundio);
@@ -394,7 +398,7 @@ void AudioSoundIo::setupWidget::reconnectSoundIo()
 		if ((err = soundio_connect_backend(m_soundio, backend)))
 		{
 			fprintf(stderr, "soundio: unable to connect %s backend: %s\n",
-					soundio_backend_name(backend), soundio_strerror(err));
+				soundio_backend_name(backend), soundio_strerror(err));
 			if ((err = soundio_connect(m_soundio)))
 			{
 				fprintf(stderr, "soundio: unable to connect backend: %s\n", soundio_strerror(err));
@@ -408,8 +412,8 @@ void AudioSoundIo::setupWidget::reconnectSoundIo()
 
 	soundio_flush_events(m_soundio);
 
-	const QString& configDeviceId = ConfigManager::inst()->value( "audiosoundio", "out_device_id" );
-	const QString& configDeviceRaw = ConfigManager::inst()->value( "audiosoundio", "out_device_raw" );
+	const QString &configDeviceId = ConfigManager::inst()->value("audiosoundio", "out_device_id");
+	const QString &configDeviceRaw = ConfigManager::inst()->value("audiosoundio", "out_device_raw");
 
 	int deviceIndex = m_defaultOutIndex;
 	bool wantRaw = (configDeviceRaw == "yes");
@@ -444,27 +448,26 @@ void AudioSoundIo::setupWidget::updateDevices()
 		m_deviceModel.addItem(device->name + raw_text + default_text);
 		m_deviceList.append({device->id, device->is_raw});
 	}
-
 }
 
-AudioSoundIo::setupWidget::setupWidget( QWidget * _parent ) :
-	AudioDeviceSetupWidget( AudioSoundIo::name(), _parent )
+AudioSoundIo::setupWidget::setupWidget(QWidget *_parent) :
+	AudioDeviceSetupWidget(AudioSoundIo::name(), _parent)
 {
 	m_setupUtil.m_setupWidget = this;
 
-	m_backend = new ComboBox( this, "BACKEND" );
-	m_backend->setGeometry( 64, 15, 260, 20 );
+	m_backend = new ComboBox(this, "BACKEND");
+	m_backend->setGeometry(64, 15, 260, 20);
 
-	QLabel * backend_lbl = new QLabel( tr( "Backend" ), this );
-	backend_lbl->setFont( pointSize<7>( backend_lbl->font() ) );
-	backend_lbl->move( 8, 18 );
+	QLabel *backend_lbl = new QLabel(tr("Backend"), this);
+	backend_lbl->setFont(pointSize<7>(backend_lbl->font()));
+	backend_lbl->move(8, 18);
 
-	m_device = new ComboBox( this, "DEVICE" );
-	m_device->setGeometry( 64, 35, 260, 20 );
+	m_device = new ComboBox(this, "DEVICE");
+	m_device->setGeometry(64, 35, 260, 20);
 
-	QLabel * dev_lbl = new QLabel( tr( "Device" ), this );
-	dev_lbl->setFont( pointSize<7>( dev_lbl->font() ) );
-	dev_lbl->move( 8, 38 );
+	QLabel *dev_lbl = new QLabel(tr("Device"), this);
+	dev_lbl->setFont(pointSize<7>(dev_lbl->font()));
+	dev_lbl->move(8, 38);
 
 	// Setup models
 	m_soundio = soundio_create();
@@ -489,16 +492,16 @@ AudioSoundIo::setupWidget::setupWidget( QWidget * _parent ) :
 
 	reconnectSoundIo();
 
-	bool ok = connect( &m_backendModel, SIGNAL( dataChanged() ), &m_setupUtil, SLOT( reconnectSoundIo() ) );
+	bool ok = connect(&m_backendModel, SIGNAL(dataChanged()), &m_setupUtil, SLOT(reconnectSoundIo()));
 	assert(ok);
 
-	m_backend->setModel( &m_backendModel );
-	m_device->setModel( &m_deviceModel );
+	m_backend->setModel(&m_backendModel);
+	m_device->setModel(&m_deviceModel);
 }
 
 AudioSoundIo::setupWidget::~setupWidget()
 {
-	bool ok = disconnect( &m_backendModel, SIGNAL( dataChanged() ), &m_setupUtil, SLOT( reconnectSoundIo() ) );
+	bool ok = disconnect(&m_backendModel, SIGNAL(dataChanged()), &m_setupUtil, SLOT(reconnectSoundIo()));
 	assert(ok);
 	if (m_soundio)
 	{
@@ -514,9 +517,9 @@ void AudioSoundIo::setupWidget::saveSettings()
 
 	QString configDeviceRaw = deviceId->is_raw ? "yes" : "no";
 
-	ConfigManager::inst()->setValue( "audiosoundio", "backend", m_backendModel.currentText());
-	ConfigManager::inst()->setValue( "audiosoundio", "out_device_id", deviceId->id);
-	ConfigManager::inst()->setValue( "audiosoundio", "out_device_raw", configDeviceRaw);
+	ConfigManager::inst()->setValue("audiosoundio", "backend", m_backendModel.currentText());
+	ConfigManager::inst()->setValue("audiosoundio", "out_device_id", deviceId->id);
+	ConfigManager::inst()->setValue("audiosoundio", "out_device_raw", configDeviceRaw);
 }
 
 #endif

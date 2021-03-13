@@ -29,17 +29,14 @@
 
 class stereoMatrixControls;
 
-
 class stereoMatrixControlDialog : public EffectControlDialog
 {
 	Q_OBJECT
 public:
-	stereoMatrixControlDialog( stereoMatrixControls * _controls );
+	stereoMatrixControlDialog(stereoMatrixControls *_controls);
 	virtual ~stereoMatrixControlDialog()
 	{
 	}
-
 };
-
 
 #endif

@@ -32,6 +32,6 @@ enum ZasfRemoteMessageIDs
 	IdZasfPresetDirectory = IdUserBase,
 	IdZasfLmmsWorkingDirectory,
 	IdZasfSetPitchWheelBendRange
-} ;
+};
 
 #endif

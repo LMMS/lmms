@@ -30,6 +30,7 @@ class Noise
 public:
 	Noise();
 	float tick();
+
 private:
 	double inv_randmax;
 };

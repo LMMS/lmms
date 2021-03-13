@@ -24,15 +24,14 @@
 
 #include "QuadratureLfo.h"
 
-QuadratureLfo::QuadratureLfo( int sampleRate )
+QuadratureLfo::QuadratureLfo(int sampleRate)
 {
 	setSampleRate(sampleRate);
 }
 
-void QuadratureLfo::tick( float *s, float *c )
+void QuadratureLfo::tick(float *s, float *c)
 {
-	*s = sinf( m_phase );
-	*c = cosf( m_phase );
+	*s = sinf(m_phase);
+	*c = cosf(m_phase);
 	m_phase += m_increment;
-
 }

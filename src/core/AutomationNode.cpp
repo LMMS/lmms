@@ -24,8 +24,8 @@
  */
 
 #include "AutomationNode.h"
-#include "AutomationPattern.h"
 
+#include "AutomationPattern.h"
 
 // Dummy constructor for the QMap
 AutomationNode::AutomationNode() :
@@ -38,7 +38,7 @@ AutomationNode::AutomationNode() :
 {
 }
 
-AutomationNode::AutomationNode(AutomationPattern* pat, float value, int pos) :
+AutomationNode::AutomationNode(AutomationPattern *pat, float value, int pos) :
 	m_pattern(pat),
 	m_pos(pos),
 	m_inValue(value),
@@ -48,7 +48,7 @@ AutomationNode::AutomationNode(AutomationPattern* pat, float value, int pos) :
 {
 }
 
-AutomationNode::AutomationNode(AutomationPattern* pat, float inValue, float outValue, int pos) :
+AutomationNode::AutomationNode(AutomationPattern *pat, float inValue, float outValue, int pos) :
 	m_pattern(pat),
 	m_pos(pos),
 	m_inValue(inValue),
@@ -67,12 +67,15 @@ void AutomationNode::setInValue(float value)
 	m_inValue = value;
 
 	// Recalculate the tangents from neighbor nodes
-	AutomationPattern::timeMap & tm = m_pattern->getTimeMap();
+	AutomationPattern::timeMap &tm = m_pattern->getTimeMap();
 
 	// Get an iterator pointing to this node
 	AutomationPattern::timeMap::iterator it = tm.lowerBound(m_pos);
 	// If it's not the first node, get the one immediately behind it
-	if (it != tm.begin()) { --it; }
+	if (it != tm.begin())
+	{
+		--it;
+	}
 
 	// Generate tangents from the previously, current and next nodes
 	m_pattern->generateTangents(it, 3);
@@ -87,12 +90,15 @@ void AutomationNode::setOutValue(float value)
 	m_outValue = value;
 
 	// Recalculate the tangents from neighbor nodes
-	AutomationPattern::timeMap & tm = m_pattern->getTimeMap();
+	AutomationPattern::timeMap &tm = m_pattern->getTimeMap();
 
 	// Get an iterator pointing to this node
 	AutomationPattern::timeMap::iterator it = tm.lowerBound(m_pos);
 	// If it's not the first node, get the one immediately behind it
-	if (it != tm.begin()) { --it; }
+	if (it != tm.begin())
+	{
+		--it;
+	}
 
 	// Generate tangents from the previously, current and next nodes
 	m_pattern->generateTangents(it, 3);

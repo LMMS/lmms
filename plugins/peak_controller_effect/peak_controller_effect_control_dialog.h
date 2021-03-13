@@ -32,30 +32,26 @@ class PeakControllerEffectControls;
 class Knob;
 class LedCheckBox;
 
-
 class PeakControllerEffectControlDialog : public EffectControlDialog
 {
 	Q_OBJECT
 public:
 	PeakControllerEffectControlDialog(
-				PeakControllerEffectControls * _controls );
+		PeakControllerEffectControls *_controls);
 	virtual ~PeakControllerEffectControlDialog()
 	{
 	}
 
-
 protected:
-	Knob * m_baseKnob;
-	Knob * m_amountKnob;
-	Knob * m_attackKnob;
-	Knob * m_decayKnob;
-	Knob * m_tresholdKnob;
-	LedCheckBox * m_muteLed;
+	Knob *m_baseKnob;
+	Knob *m_amountKnob;
+	Knob *m_attackKnob;
+	Knob *m_decayKnob;
+	Knob *m_tresholdKnob;
+	LedCheckBox *m_muteLed;
 
-	LedCheckBox * m_absLed;
-	Knob * m_amountMultKnob;
-
-} ;
-
+	LedCheckBox *m_absLed;
+	Knob *m_amountMultKnob;
+};
 
 #endif

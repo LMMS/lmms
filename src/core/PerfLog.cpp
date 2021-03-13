@@ -27,16 +27,16 @@
 #include "lmmsconfig.h"
 
 #if defined(LMMS_HAVE_SYS_TIMES_H) && defined(LMMS_HAVE_UNISTD_H)
-#	define USE_POSIX_TIME
+#define USE_POSIX_TIME
 #endif
 
 #ifdef USE_POSIX_TIME
-#	include <unistd.h>
-#	include <sys/times.h>
+#include <unistd.h>
+#include <sys/times.h>
 #endif
 
-PerfTime::PerfTime()
-	: m_real(-1)
+PerfTime::PerfTime() :
+	m_real(-1)
 {
 }
 
@@ -68,7 +68,10 @@ PerfTime PerfTime::now()
 	time.m_real = times(&t);
 	time.m_user = t.tms_utime;
 	time.m_system = t.tms_stime;
-	if (time.m_real == -1) { qWarning("PerfTime: now failed"); }
+	if (time.m_real == -1)
+	{
+		qWarning("PerfTime: now failed");
+	}
 #endif
 	return time;
 }
@@ -77,8 +80,10 @@ clock_t PerfTime::ticksPerSecond()
 {
 	static long clktck = 0;
 #ifdef USE_POSIX_TIME
-	if (!clktck) {
-		if ((clktck = sysconf(_SC_CLK_TCK)) < 0) {
+	if (!clktck)
+	{
+		if ((clktck = sysconf(_SC_CLK_TCK)) < 0)
+		{
 			qWarning("PerfLog::end sysconf()");
 		}
 	}
@@ -86,7 +91,7 @@ clock_t PerfTime::ticksPerSecond()
 	return clktck;
 }
 
-PerfTime operator-(const PerfTime& lhs, const PerfTime& rhs)
+PerfTime operator-(const PerfTime &lhs, const PerfTime &rhs)
 {
 	PerfTime diff;
 	diff.m_real = lhs.m_real - rhs.m_real;
@@ -95,8 +100,8 @@ PerfTime operator-(const PerfTime& lhs, const PerfTime& rhs)
 	return diff;
 }
 
-PerfLogTimer::PerfLogTimer(const QString& what)
-	: name(what)
+PerfLogTimer::PerfLogTimer(const QString &what) :
+	name(what)
 {
 	begin();
 }
@@ -113,7 +118,8 @@ void PerfLogTimer::begin()
 
 void PerfLogTimer::end()
 {
-	if (! begin_time.valid()) {
+	if (!begin_time.valid())
+	{
 		return;
 	}
 
@@ -121,10 +127,10 @@ void PerfLogTimer::end()
 
 	PerfTime d = PerfTime::now() - begin_time;
 	qWarning("PERFLOG | %20s | %.2fuser, %.2fsystem %.2felapsed",
-			 qPrintable(name),
-			 d.user() / (double)clktck,
-			 d.system() / (double)clktck,
-			 d.real() / (double)clktck);
+		qPrintable(name),
+		d.user() / (double)clktck,
+		d.system() / (double)clktck,
+		d.real() / (double)clktck);
 
 	// Invalidate so destructor won't call print another log entry
 	begin_time = PerfTime();

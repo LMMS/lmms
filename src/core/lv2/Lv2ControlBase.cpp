@@ -26,15 +26,12 @@
 
 #ifdef LMMS_HAVE_LV2
 
-#include <algorithm>
 #include <QtGlobal>
+#include <algorithm>
 
 #include "Engine.h"
 #include "Lv2Manager.h"
 #include "Lv2Proc.h"
-
-
-
 
 Plugin::PluginTypes Lv2ControlBase::check(const LilvPlugin *plugin,
 	std::vector<PluginIssue> &issues)
@@ -43,10 +40,7 @@ Plugin::PluginTypes Lv2ControlBase::check(const LilvPlugin *plugin,
 	return Lv2Proc::check(plugin, issues);
 }
 
-
-
-
-Lv2ControlBase::Lv2ControlBase(Model* that, const QString &uri) :
+Lv2ControlBase::Lv2ControlBase(Model *that, const QString &uri) :
 	m_plugin(Engine::getLv2Manager()->getPlugin(uri))
 {
 	if (m_plugin)
@@ -83,135 +77,109 @@ Lv2ControlBase::Lv2ControlBase(Model* that, const QString &uri) :
 	}
 }
 
-
-
-
 Lv2ControlBase::~Lv2ControlBase() {}
-
-
-
 
 LinkedModelGroup *Lv2ControlBase::getGroup(std::size_t idx)
 {
 	return (m_procs.size() > idx) ? m_procs[idx].get() : nullptr;
 }
 
-
-
-
 const LinkedModelGroup *Lv2ControlBase::getGroup(std::size_t idx) const
 {
 	return (m_procs.size() > idx) ? m_procs[idx].get() : nullptr;
 }
 
-
-
-
-void Lv2ControlBase::copyModelsFromLmms() {
-	for (auto& c : m_procs) { c->copyModelsFromCore(); }
+void Lv2ControlBase::copyModelsFromLmms()
+{
+	for (auto &c : m_procs)
+	{
+		c->copyModelsFromCore();
+	}
 }
-
-
-
 
 void Lv2ControlBase::copyModelsToLmms() const
 {
-	for (auto& c : m_procs) { c->copyModelsToCore(); }
+	for (auto &c : m_procs)
+	{
+		c->copyModelsToCore();
+	}
 }
 
-
-
-
-void Lv2ControlBase::copyBuffersFromLmms(const sampleFrame *buf, fpp_t frames) {
+void Lv2ControlBase::copyBuffersFromLmms(const sampleFrame *buf, fpp_t frames)
+{
 	unsigned firstChan = 0; // tell the procs which channels they shall read from
-	for (auto& c : m_procs) {
+	for (auto &c : m_procs)
+	{
 		c->copyBuffersFromCore(buf, firstChan, m_channelsPerProc, frames);
 		firstChan += m_channelsPerProc;
 	}
 }
 
-
-
-
-void Lv2ControlBase::copyBuffersToLmms(sampleFrame *buf, fpp_t frames) const {
+void Lv2ControlBase::copyBuffersToLmms(sampleFrame *buf, fpp_t frames) const
+{
 	unsigned firstChan = 0; // tell the procs which channels they shall write to
-	for (const auto& c : m_procs) {
+	for (const auto &c : m_procs)
+	{
 		c->copyBuffersToCore(buf, firstChan, m_channelsPerProc, frames);
 		firstChan += m_channelsPerProc;
 	}
 }
 
-
-
-
-void Lv2ControlBase::run(fpp_t frames) {
-	for (auto& c : m_procs) { c->run(frames); }
+void Lv2ControlBase::run(fpp_t frames)
+{
+	for (auto &c : m_procs)
+	{
+		c->run(frames);
+	}
 }
-
-
-
 
 void Lv2ControlBase::saveSettings(QDomDocument &doc, QDomElement &that)
 {
 	LinkedModelGroups::saveSettings(doc, that);
-	
+
 	// TODO: save state if supported by plugin
 }
-
-
-
 
 void Lv2ControlBase::loadSettings(const QDomElement &that)
 {
 	LinkedModelGroups::loadSettings(that);
-	
+
 	// TODO: load state if supported by plugin
 }
-
-
-
 
 void Lv2ControlBase::loadFile(const QString &file)
 {
 	(void)file;
 }
 
-
-
-
 void Lv2ControlBase::reloadPlugin()
 {
 	// TODO
 }
 
-
-
-
-std::size_t Lv2ControlBase::controlCount() const {
+std::size_t Lv2ControlBase::controlCount() const
+{
 	std::size_t res = 0;
-	for (const auto& c : m_procs) { res += c->controlCount(); }
+	for (const auto &c : m_procs)
+	{
+		res += c->controlCount();
+	}
 	return res;
 }
-
-
-
 
 bool Lv2ControlBase::hasNoteInput() const
 {
 	return std::any_of(m_procs.begin(), m_procs.end(),
-		[](const auto& c) { return c->hasNoteInput(); });
+		[](const auto &c) { return c->hasNoteInput(); });
 }
-
-
-
 
 void Lv2ControlBase::handleMidiInputEvent(const MidiEvent &event,
 	const TimePos &time, f_cnt_t offset)
 {
-	for (auto& c : m_procs) { c->handleMidiInputEvent(event, time, offset); }
+	for (auto &c : m_procs)
+	{
+		c->handleMidiInputEvent(event, time, offset);
+	}
 }
-
-
-
 
 #endif // LMMS_HAVE_LV2

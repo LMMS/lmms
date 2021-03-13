@@ -32,6 +32,7 @@
 #include <lv2.h>
 #include <map>
 #include <vector>
+
 #include "Lv2Manager.h"
 
 /**
@@ -58,11 +59,11 @@ public:
 	//! Register only plugin-common features
 	void initCommon();
 	//! Return reference to feature data with given URI featName
-	void*& operator[](const char* featName);
+	void *&operator[](const char *featName);
 	//! Fill m_features and m_featurePointers with all features
 	void createFeatureVectors();
 	//! Return LV2_Feature pointer vector, suited for lilv_plugin_instantiate
-	const LV2_Feature* const* featurePointers() const
+	const LV2_Feature *const *featurePointers() const
 	{
 		return m_featurePointers.data();
 	}
@@ -71,9 +72,9 @@ private:
 	//! feature storage
 	std::vector<LV2_Feature> m_features;
 	//! pointers to m_features, required for lilv_plugin_instantiate
-	std::vector<const LV2_Feature*> m_featurePointers;
+	std::vector<const LV2_Feature *> m_featurePointers;
 	//! features + data, ordered by URI
-	std::map<const char*, void*, Lv2Manager::CmpStr> m_featureByUri;
+	std::map<const char *, void *, Lv2Manager::CmpStr> m_featureByUri;
 };
 
 #endif // LMMS_HAVE_LV2

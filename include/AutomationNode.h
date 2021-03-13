@@ -36,7 +36,6 @@
 
 class AutomationPattern;
 
-
 // Note: We use the default copy-assignment on the AutomationPattern constructor. It's
 // fine for now as we don't have dynamic allocated members, but if any are added we should
 // have an user-defined one to perform a deep-copy.
@@ -44,28 +43,28 @@ class AutomationNode
 {
 public:
 	AutomationNode(); // Dummy constructor for the QMap
-	AutomationNode(AutomationPattern* pat, float value, int pos);
-	AutomationNode(AutomationPattern* pat, float inValue, float outValue, int pos);
+	AutomationNode(AutomationPattern *pat, float value, int pos);
+	AutomationNode(AutomationPattern *pat, float inValue, float outValue, int pos);
 
-	AutomationNode& operator+=(float f)
+	AutomationNode &operator+=(float f)
 	{
 		m_inValue += f;
 		m_outValue += f;
 		return *this;
 	}
-	AutomationNode& operator-=(float f)
+	AutomationNode &operator-=(float f)
 	{
 		m_inValue -= f;
 		m_outValue -= f;
 		return *this;
 	}
-	AutomationNode& operator*=(float f)
+	AutomationNode &operator*=(float f)
 	{
 		m_inValue *= f;
 		m_outValue *= f;
 		return *this;
 	}
-	AutomationNode& operator/=(float f)
+	AutomationNode &operator/=(float f)
 	{
 		m_inValue /= f;
 		m_outValue /= f;
@@ -132,7 +131,7 @@ public:
 
 private:
 	// Pattern that this node belongs to
-	AutomationPattern* m_pattern;
+	AutomationPattern *m_pattern;
 
 	// Time position of this node (matches the timeMap key)
 	int m_pos;
@@ -148,6 +147,5 @@ private:
 	float m_inTangent;
 	float m_outTangent;
 };
-
 
 #endif

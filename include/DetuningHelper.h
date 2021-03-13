@@ -50,15 +50,13 @@ public:
 
 	QString displayName() const override
 	{
-		return tr( "Note detuning" );
+		return tr("Note detuning");
 	}
 
 	inline QString nodeName() const override
 	{
 		return "detuning";
 	}
-
-} ;
-
+};
 
 #endif

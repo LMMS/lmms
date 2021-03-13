@@ -32,17 +32,15 @@
 
 class LadspaControl;
 
-
 class LMMS_EXPORT LadspaControlView : public QWidget, public ModelView
 {
 	Q_OBJECT
 public:
-	LadspaControlView( QWidget * _parent, LadspaControl * _ctl );
+	LadspaControlView(QWidget *_parent, LadspaControl *_ctl);
 	virtual ~LadspaControlView();
 
 private:
-	LadspaControl * m_ctl;
-
-} ;
+	LadspaControl *m_ctl;
+};
 
 #endif

@@ -25,66 +25,62 @@
 #ifndef FX_MIXER_VIEW_H
 #define FX_MIXER_VIEW_H
 
-#include <QWidget>
 #include <QHBoxLayout>
-#include <QStackedLayout>
 #include <QScrollArea>
+#include <QStackedLayout>
+#include <QWidget>
 
-#include "ModelView.h"
+#include "EffectRackView.h"
 #include "Engine.h"
 #include "Fader.h"
+#include "ModelView.h"
 #include "PixmapButton.h"
 #include "ToolTip.h"
 #include "embed.h"
-#include "EffectRackView.h"
 
 class QButtonGroup;
 class FxLine;
 
-class LMMS_EXPORT FxMixerView : public QWidget, public ModelView,
-					public SerializingObjectHook
+class LMMS_EXPORT FxMixerView : public QWidget, public ModelView, public SerializingObjectHook
 {
 	Q_OBJECT
 public:
 	class FxChannelView
 	{
 	public:
-		FxChannelView(QWidget * _parent, FxMixerView * _mv, int _chIndex );
+		FxChannelView(QWidget *_parent, FxMixerView *_mv, int _chIndex);
 
-		void setChannelIndex( int index );
+		void setChannelIndex(int index);
 
-		FxLine * m_fxLine;
-		PixmapButton * m_muteBtn;
-		PixmapButton * m_soloBtn;
-		Fader * m_fader;
-		EffectRackView * m_rackView;
+		FxLine *m_fxLine;
+		PixmapButton *m_muteBtn;
+		PixmapButton *m_soloBtn;
+		Fader *m_fader;
+		EffectRackView *m_rackView;
 	};
-
 
 	FxMixerView();
 	virtual ~FxMixerView();
 
-	void keyPressEvent(QKeyEvent * e) override;
+	void keyPressEvent(QKeyEvent *e) override;
 
-	void saveSettings( QDomDocument & _doc, QDomElement & _this ) override;
-	void loadSettings( const QDomElement & _this ) override;
+	void saveSettings(QDomDocument &_doc, QDomElement &_this) override;
+	void loadSettings(const QDomElement &_this) override;
 
-	inline FxLine * currentFxLine()
+	inline FxLine *currentFxLine()
 	{
 		return m_currentFxLine;
 	}
 
-	inline FxChannelView * channelView(int index)
+	inline FxChannelView *channelView(int index)
 	{
 		return m_fxChannelViews[index];
 	}
 
-
-	void setCurrentFxLine( FxLine * _line );
-	void setCurrentFxLine( int _line );
+	void setCurrentFxLine(FxLine *_line);
+	void setCurrentFxLine(int _line);
 
 	void clear();
-
 
 	// display the send button and knob correctly
 	void updateFxLine(int index);
@@ -110,27 +106,26 @@ public slots:
 	int addNewChannel();
 
 protected:
-	void closeEvent( QCloseEvent * _ce ) override;
-	
+	void closeEvent(QCloseEvent *_ce) override;
+
 private slots:
 	void updateFaders();
 	void toggledSolo();
 
 private:
-
 	QVector<FxChannelView *> m_fxChannelViews;
 
-	FxLine * m_currentFxLine;
+	FxLine *m_currentFxLine;
 
-	QScrollArea * channelArea;
-	QHBoxLayout * chLayout;
-	QWidget * m_channelAreaWidget;
-	QStackedLayout * m_racksLayout;
-	QWidget * m_racksWidget;
+	QScrollArea *channelArea;
+	QHBoxLayout *chLayout;
+	QWidget *m_channelAreaWidget;
+	QStackedLayout *m_racksLayout;
+	QWidget *m_racksWidget;
 
 	void updateMaxChannelSelector();
-	
+
 	friend class FxChannelView;
-} ;
+};
 
 #endif

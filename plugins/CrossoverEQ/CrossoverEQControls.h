@@ -27,8 +27,8 @@
 #ifndef CROSSOVEREQ_CONTROLS_H
 #define CROSSOVEREQ_CONTROLS_H
 
-#include "EffectControls.h"
 #include "CrossoverEQControlDialog.h"
+#include "EffectControls.h"
 
 class CrossoverEQEffect;
 
@@ -36,24 +36,24 @@ class CrossoverEQControls : public EffectControls
 {
 	Q_OBJECT
 public:
-	CrossoverEQControls( CrossoverEQEffect * eff );
+	CrossoverEQControls(CrossoverEQEffect *eff);
 	virtual ~CrossoverEQControls() {}
 
-	virtual void saveSettings( QDomDocument & doc, QDomElement & elem );
-	virtual void loadSettings( const QDomElement & elem );
+	virtual void saveSettings(QDomDocument &doc, QDomElement &elem);
+	virtual void loadSettings(const QDomElement &elem);
 	inline virtual QString nodeName() const
 	{
-		return( "crossoevereqcontrols" );
+		return ("crossoevereqcontrols");
 	}
 
 	virtual int controlCount()
 	{
-		return( 11 );
+		return (11);
 	}
 
-	virtual EffectControlDialog * createView()
+	virtual EffectControlDialog *createView()
 	{
-		return( new CrossoverEQControlDialog( this ) );
+		return (new CrossoverEQControlDialog(this));
 	}
 
 private slots:
@@ -63,22 +63,22 @@ private slots:
 	void sampleRateChanged();
 
 private:
-	CrossoverEQEffect * m_effect;
-	
+	CrossoverEQEffect *m_effect;
+
 	FloatModel m_xover12;
 	FloatModel m_xover23;
 	FloatModel m_xover34;
-	
+
 	FloatModel m_gain1;
 	FloatModel m_gain2;
 	FloatModel m_gain3;
 	FloatModel m_gain4;
-	
+
 	BoolModel m_mute1;
 	BoolModel m_mute2;
 	BoolModel m_mute3;
 	BoolModel m_mute4;
-	
+
 	friend class CrossoverEQControlDialog;
 	friend class CrossoverEQEffect;
 };

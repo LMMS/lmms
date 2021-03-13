@@ -22,23 +22,24 @@
  *
  */
 
-
 #ifndef PEAK_CONTROLLER_EFFECT_H
 #define PEAK_CONTROLLER_EFFECT_H
 
 #include "Effect.h"
 #include "peak_controller_effect_controls.h"
 
+class PeakController;
+
 class PeakControllerEffect : public Effect
 {
 public:
-	PeakControllerEffect( Model * parent, 
-						const Descriptor::SubPluginFeatures::Key * _key );
+	PeakControllerEffect(Model *parent,
+		const Descriptor::SubPluginFeatures::Key *_key);
 	virtual ~PeakControllerEffect();
-	virtual bool processAudioBuffer( sampleFrame * _buf,
-									const fpp_t _frames ) override;
+	virtual bool processAudioBuffer(sampleFrame *_buf,
+		const fpp_t _frames) override;
 
-	EffectControls * controls() override
+	EffectControls *controls() override
 	{
 		return &m_peakControls;
 	}
@@ -48,19 +49,19 @@ public:
 		return m_lastSample;
 	}
 
-	PeakController * controller()
+	PeakController *controller()
 	{
 		return m_autoController;
 	}
-	
-	FloatModel * attackModel()
+
+	FloatModel *attackModel()
 	{
-		return &( m_peakControls.m_attackModel );
+		return &(m_peakControls.m_attackModel);
 	}
 
-	FloatModel * decayModel()
+	FloatModel *decayModel()
 	{
-		return &( m_peakControls.m_decayModel );
+		return &(m_peakControls.m_decayModel);
 	}
 
 	int m_effectId;
@@ -70,10 +71,9 @@ private:
 
 	float m_lastSample;
 
-	PeakController * m_autoController;
+	PeakController *m_autoController;
 
 	friend class PeakControllerEffectControls;
-
-} ;
+};
 
 #endif

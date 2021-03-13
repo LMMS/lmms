@@ -28,34 +28,28 @@
 
 #include <QMenu>
 
-#include "ModelView.h"
 #include "MidiPort.h"
+#include "ModelView.h"
 
 class QAction;
-
 
 class MidiPortMenu : public QMenu, public ModelView
 {
 	Q_OBJECT
 public:
-	MidiPortMenu( MidiPort::Modes _mode );
+	MidiPortMenu(MidiPort::Modes _mode);
 	virtual ~MidiPortMenu();
-
 
 public slots:
 	void updateMenu();
 
-
 protected slots:
-	void activatedPort( QAction * _item );
-
+	void activatedPort(QAction *_item);
 
 private:
 	void modelChanged() override;
 
 	MidiPort::Modes m_mode;
-
-} ;
-
+};
 
 #endif

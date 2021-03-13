@@ -29,7 +29,6 @@
 
 #include "EffectControls.h"
 
-
 class Vectorscope;
 
 // Holds all the configuration values
@@ -42,11 +41,11 @@ public:
 
 	EffectControlDialog *createView() override;
 
-	void saveSettings (QDomDocument &document, QDomElement &element) override;
-	void loadSettings (const QDomElement &element) override;
+	void saveSettings(QDomDocument &document, QDomElement &element) override;
+	void loadSettings(const QDomElement &element) override;
 
-	QString nodeName() const override {return "Vectorscope";}
-	int controlCount() override {return 3;}
+	QString nodeName() const override { return "Vectorscope"; }
+	int controlCount() override { return 3; }
 
 private:
 	Vectorscope *m_effect;

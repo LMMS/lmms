@@ -26,8 +26,8 @@
 #define _STEREO_ENHANCER_CONTROLS_H
 
 #include "EffectControls.h"
-#include "stereoenhancer_control_dialog.h"
 #include "Knob.h"
+#include "stereoenhancer_control_dialog.h"
 
 class stereoEnhancerEffect;
 
@@ -35,40 +35,36 @@ class stereoEnhancerControls : public EffectControls
 {
 	Q_OBJECT
 public:
-	stereoEnhancerControls( stereoEnhancerEffect( * _eff ) ); 
+	stereoEnhancerControls(stereoEnhancerEffect(*_eff));
 	virtual ~stereoEnhancerControls()
 	{
 	}
 
-	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
-	virtual void loadSettings( const QDomElement & _this );
+	virtual void saveSettings(QDomDocument &_doc, QDomElement &_parent);
+	virtual void loadSettings(const QDomElement &_this);
 	inline virtual QString nodeName() const
 	{
-		return( "stereoenhancercontrols" );
+		return ("stereoenhancercontrols");
 	}
 
 	virtual int controlCount()
 	{
-		return( 1 );
-	}
-	
-	virtual EffectControlDialog * createView()
-	{
-		return new stereoEnhancerControlDialog( this );
+		return (1);
 	}
 
+	virtual EffectControlDialog *createView()
+	{
+		return new stereoEnhancerControlDialog(this);
+	}
 
 private slots:
 	void changeWideCoeff();
 
-
 private:
-	stereoEnhancerEffect * m_effect;
+	stereoEnhancerEffect *m_effect;
 	FloatModel m_widthModel;
-	
+
 	friend class stereoEnhancerControlDialog;
-
-} ;
-
+};
 
 #endif /*_STEREO_ENHANCER_CONTROLS_H*/

@@ -30,35 +30,33 @@
 #include "EqFilter.h"
 #include "lmms_math.h"
 
-
-
 class EqEffect : public Effect
 {
 public:
-	EqEffect( Model * parent , const Descriptor::SubPluginFeatures::Key * key );
+	EqEffect(Model *parent, const Descriptor::SubPluginFeatures::Key *key);
 	virtual ~EqEffect();
-	virtual bool processAudioBuffer( sampleFrame * buf, const fpp_t frames );
-	virtual EffectControls * controls()
+	virtual bool processAudioBuffer(sampleFrame *buf, const fpp_t frames);
+	virtual EffectControls *controls()
 	{
 		return &m_eqControls;
 	}
-	inline void  gain( sampleFrame * buf, const fpp_t frames, float scale, sampleFrame * peak )
+	inline void gain(sampleFrame *buf, const fpp_t frames, float scale, sampleFrame *peak)
 	{
-		peak[0][0] = 0.0f; peak[0][1] = 0.0f;
-		for( fpp_t f = 0; f < frames; ++f )
+		peak[0][0] = 0.0f;
+		peak[0][1] = 0.0f;
+		for (fpp_t f = 0; f < frames; ++f)
 		{
 			buf[f][0] *= scale;
 			buf[f][1] *= scale;
 
-			if( fabs( buf[f][0] ) > peak[0][0] )
+			if (fabs(buf[f][0]) > peak[0][0])
 			{
-				peak[0][0] = fabs( buf[f][0] );
+				peak[0][0] = fabs(buf[f][0]);
 			}
-			if( fabs( buf[f][1] ) > peak[0][1] )
+			if (fabs(buf[f][1]) > peak[0][1])
 			{
-				peak[0][1] = fabs( buf[f][0] );
+				peak[0][1] = fabs(buf[f][0]);
 			}
-
 		}
 	}
 
@@ -87,14 +85,14 @@ private:
 	float m_inGain;
 	float m_outGain;
 
-	float peakBand( float minF, float maxF, EqAnalyser *, int );
+	float peakBand(float minF, float maxF, EqAnalyser *, int);
 
-	inline float bandToFreq ( int index , int sampleRate )
+	inline float bandToFreq(int index, int sampleRate)
 	{
-		return index * sampleRate / ( MAX_BANDS * 2 );
+		return index * sampleRate / (MAX_BANDS * 2);
 	}
 
-	void setBandPeaks( EqAnalyser * fft , int );
+	void setBandPeaks(EqAnalyser *fft, int);
 };
 
 #endif // EQEFFECT_H

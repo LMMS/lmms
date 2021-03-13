@@ -26,22 +26,22 @@
 #ifndef BUFFER_MANAGER_H
 #define BUFFER_MANAGER_H
 
-#include "lmms_export.h"
 #include "lmms_basics.h"
+#include "lmms_export.h"
 
 class LMMS_EXPORT BufferManager
 {
 public:
-	static void init( fpp_t framesPerPeriod );
-	static sampleFrame * acquire();
+	static void init(fpp_t framesPerPeriod);
+	static sampleFrame *acquire();
 	// audio-buffer-mgm
-	static void clear( sampleFrame * ab, const f_cnt_t frames,
-						const f_cnt_t offset = 0 );
+	static void clear(sampleFrame *ab, const f_cnt_t frames,
+		const f_cnt_t offset = 0);
 #ifndef LMMS_DISABLE_SURROUND
-	static void clear( surroundSampleFrame * ab, const f_cnt_t frames,
-						const f_cnt_t offset = 0 );
+	static void clear(surroundSampleFrame *ab, const f_cnt_t frames,
+		const f_cnt_t offset = 0);
 #endif
-	static void release( sampleFrame * buf );
+	static void release(sampleFrame *buf);
 };
 
 #endif

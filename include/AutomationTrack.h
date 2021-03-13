@@ -30,46 +30,40 @@
 #include "Track.h"
 #include "TrackView.h"
 
-
 class AutomationTrack : public Track
 {
 	Q_OBJECT
 public:
-	AutomationTrack( TrackContainer* tc, bool _hidden = false );
+	AutomationTrack(TrackContainer *tc, bool _hidden = false);
 	virtual ~AutomationTrack() = default;
 
-	virtual bool play( const TimePos & _start, const fpp_t _frames,
-						const f_cnt_t _frame_base, int _tco_num = -1 ) override;
+	virtual bool play(const TimePos &_start, const fpp_t _frames,
+		const f_cnt_t _frame_base, int _tco_num = -1) override;
 
 	QString nodeName() const override
 	{
 		return "automationtrack";
 	}
 
-	TrackView * createView( TrackContainerView* ) override;
-	TrackContentObject* createTCO(const TimePos & pos) override;
+	TrackView *createView(TrackContainerView *) override;
+	TrackContentObject *createTCO(const TimePos &pos) override;
 
-	virtual void saveTrackSpecificSettings( QDomDocument & _doc,
-							QDomElement & _parent ) override;
-	void loadTrackSpecificSettings( const QDomElement & _this ) override;
+	virtual void saveTrackSpecificSettings(QDomDocument &_doc,
+		QDomElement &_parent) override;
+	void loadTrackSpecificSettings(const QDomElement &_this) override;
 
 private:
 	friend class AutomationTrackView;
-
-} ;
-
-
+};
 
 class AutomationTrackView : public TrackView
 {
 public:
-	AutomationTrackView( AutomationTrack* at, TrackContainerView* tcv );
+	AutomationTrackView(AutomationTrack *at, TrackContainerView *tcv);
 	virtual ~AutomationTrackView() = default;
 
-	void dragEnterEvent( QDragEnterEvent * _dee ) override;
-	void dropEvent( QDropEvent * _de ) override;
-
-} ;
-
+	void dragEnterEvent(QDragEnterEvent *_dee) override;
+	void dropEvent(QDropEvent *_de) override;
+};
 
 #endif
