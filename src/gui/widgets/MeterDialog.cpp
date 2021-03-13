@@ -23,95 +23,84 @@
  *
  */
 
+#include "MeterDialog.h"
 
+#include <QLabel>
 #include <QLayout>
 #include <QPushButton>
-#include <QLabel>
 
-#include "MeterDialog.h"
-#include "MeterModel.h"
-#include "gui_templates.h"
 #include "LcdSpinBox.h"
+#include "MeterModel.h"
 #include "ToolTip.h"
+#include "gui_templates.h"
 
-
-MeterDialog::MeterDialog( QWidget * _parent, bool _simple ) :
-	QWidget( _parent ),
-	ModelView( NULL, this )
+MeterDialog::MeterDialog(QWidget *_parent, bool _simple) :
+	QWidget(_parent),
+	ModelView(NULL, this)
 {
-	QVBoxLayout * vlayout = new QVBoxLayout( this );
-	vlayout->setSpacing( 0 );
-	vlayout->setMargin( 0 );
+	QVBoxLayout *vlayout = new QVBoxLayout(this);
+	vlayout->setSpacing(0);
+	vlayout->setMargin(0);
 
-	QWidget * num = new QWidget( this );
-	QHBoxLayout * num_layout = new QHBoxLayout( num );
-	num_layout->setSpacing( 0 );
-	num_layout->setMargin( 0 );
+	QWidget *num = new QWidget(this);
+	QHBoxLayout *num_layout = new QHBoxLayout(num);
+	num_layout->setSpacing(0);
+	num_layout->setMargin(0);
 
+	m_numerator = new LcdSpinBox(2, num, tr("Meter Numerator"));
+	ToolTip::add(m_numerator, tr("Meter numerator"));
 
-	m_numerator = new LcdSpinBox( 2, num, tr( "Meter Numerator" ) );
-	ToolTip::add( m_numerator, tr( "Meter numerator" ) );
+	num_layout->addWidget(m_numerator);
 
-	num_layout->addWidget( m_numerator );
-
-	if( !_simple )
+	if (!_simple)
 	{
-		QLabel * num_label = new QLabel( tr( "Meter Numerator" ), num );
+		QLabel *num_label = new QLabel(tr("Meter Numerator"), num);
 		QFont f = num_label->font();
-		num_label->setFont( pointSize<7>( f ) );
-		num_layout->addSpacing( 5 );
-		num_layout->addWidget( num_label );
+		num_label->setFont(pointSize<7>(f));
+		num_layout->addSpacing(5);
+		num_layout->addWidget(num_label);
 	}
 	num_layout->addStretch();
 
+	QWidget *den = new QWidget(this);
+	QHBoxLayout *den_layout = new QHBoxLayout(den);
+	den_layout->setSpacing(0);
+	den_layout->setMargin(0);
 
-	QWidget * den = new QWidget( this );
-	QHBoxLayout * den_layout = new QHBoxLayout( den );
-	den_layout->setSpacing( 0 );
-	den_layout->setMargin( 0 );
-
-	m_denominator = new LcdSpinBox( 2, den, tr( "Meter Denominator" ) );
-	ToolTip::add( m_denominator, tr( "Meter denominator" ) );
-	if( _simple )
+	m_denominator = new LcdSpinBox(2, den, tr("Meter Denominator"));
+	ToolTip::add(m_denominator, tr("Meter denominator"));
+	if (_simple)
 	{
-		m_denominator->setLabel( tr( "TIME SIG" ) );
+		m_denominator->setLabel(tr("TIME SIG"));
 	}
 
-	den_layout->addWidget( m_denominator );
+	den_layout->addWidget(m_denominator);
 
-	if( !_simple )
+	if (!_simple)
 	{
-		QLabel * den_label = new QLabel( tr( "Meter Denominator" ),
-									den );
+		QLabel *den_label = new QLabel(tr("Meter Denominator"),
+			den);
 		QFont f = den_label->font();
-		den_label->setFont( pointSize<7>( f ) );
-		den_layout->addSpacing( 5 );
-		den_layout->addWidget( den_label );
+		den_label->setFont(pointSize<7>(f));
+		den_layout->addSpacing(5);
+		den_layout->addWidget(den_label);
 	}
 	den_layout->addStretch();
 
-
-	vlayout->addSpacing( _simple ? 1 : 3 );
-	vlayout->addWidget( num );
-	vlayout->addSpacing( 2 );
-	vlayout->addWidget( den );
+	vlayout->addSpacing(_simple ? 1 : 3);
+	vlayout->addWidget(num);
+	vlayout->addSpacing(2);
+	vlayout->addWidget(den);
 	vlayout->addStretch();
 }
-
-
-
 
 MeterDialog::~MeterDialog()
 {
 }
 
-
-
-
 void MeterDialog::modelChanged()
 {
-	MeterModel * mm = castModel<MeterModel>();
-	m_numerator->setModel( &mm->numeratorModel() );
-	m_denominator->setModel( &mm->denominatorModel() );
+	MeterModel *mm = castModel<MeterModel>();
+	m_numerator->setModel(&mm->numeratorModel());
+	m_denominator->setModel(&mm->denominatorModel());
 }
-

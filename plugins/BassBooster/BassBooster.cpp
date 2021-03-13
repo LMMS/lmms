@@ -30,58 +30,54 @@
 extern "C"
 {
 
-Plugin::Descriptor PLUGIN_EXPORT bassbooster_plugin_descriptor =
-{
-	STRINGIFY( PLUGIN_NAME ),
-	"BassBooster",
-	QT_TRANSLATE_NOOP( "PluginBrowser", "Boost your bass the fast and simple way" ),
-	"Tobias Doerffel <tobydox/at/users.sf.net>",
-	0x0100,
-	Plugin::Effect,
-	new PluginPixmapLoader("logo"),
-	NULL,
-	NULL
-} ;
-
+	Plugin::Descriptor PLUGIN_EXPORT bassbooster_plugin_descriptor =
+		{
+			STRINGIFY(PLUGIN_NAME),
+			"BassBooster",
+			QT_TRANSLATE_NOOP("PluginBrowser", "Boost your bass the fast and simple way"),
+			"Tobias Doerffel <tobydox/at/users.sf.net>",
+			0x0100,
+			Plugin::Effect,
+			new PluginPixmapLoader("logo"),
+			NULL,
+			NULL};
 }
 
-
-
-BassBoosterEffect::BassBoosterEffect( Model* parent, const Descriptor::SubPluginFeatures::Key* key ) :
-	Effect( &bassbooster_plugin_descriptor, parent, key ),
-	m_frequencyChangeNeeded( false ),
-	m_bbFX( DspEffectLibrary::FastBassBoost( 70.0f, 1.0f, 2.8f ) ),
-	m_bbControls( this )
+BassBoosterEffect::BassBoosterEffect(Model *parent, const Descriptor::SubPluginFeatures::Key *key) :
+	Effect(&bassbooster_plugin_descriptor, parent, key),
+	m_frequencyChangeNeeded(false),
+	m_bbFX(DspEffectLibrary::FastBassBoost(70.0f, 1.0f, 2.8f)),
+	m_bbControls(this)
 {
 	changeFrequency();
 	changeGain();
 	changeRatio();
 }
 
-
-
-
 BassBoosterEffect::~BassBoosterEffect()
 {
 }
 
-
-
-
-bool BassBoosterEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames )
+bool BassBoosterEffect::processAudioBuffer(sampleFrame *buf, const fpp_t frames)
 {
-	if( !isEnabled() || !isRunning () )
+	if (!isEnabled() || !isRunning())
 	{
-		return( false );
+		return (false);
 	}
 	// check out changed controls
-	if( m_frequencyChangeNeeded || m_bbControls.m_freqModel.isValueChanged() )
+	if (m_frequencyChangeNeeded || m_bbControls.m_freqModel.isValueChanged())
 	{
 		changeFrequency();
 		m_frequencyChangeNeeded = false;
 	}
-	if( m_bbControls.m_gainModel.isValueChanged() ) { changeGain(); }
-	if( m_bbControls.m_ratioModel.isValueChanged() ) { changeRatio(); }
+	if (m_bbControls.m_gainModel.isValueChanged())
+	{
+		changeGain();
+	}
+	if (m_bbControls.m_ratioModel.isValueChanged())
+	{
+		changeRatio();
+	}
 
 	const float const_gain = m_bbControls.m_gainModel.value();
 	const ValueBuffer *gainBuffer = m_bbControls.m_gainModel.valueBuffer();
@@ -90,68 +86,57 @@ bool BassBoosterEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames
 	const float d = dryLevel();
 	const float w = wetLevel();
 
-	for( fpp_t f = 0; f < frames; ++f )
+	for (fpp_t f = 0; f < frames; ++f)
 	{
 		float gain = const_gain;
-		if (gainBuffer) {
+		if (gainBuffer)
+		{
 			//process period using sample exact data
-			gain = gainBuffer->value( f );
+			gain = gainBuffer->value(f);
 		}
 		//float gain = gainBuffer ? gainBuffer[f] : gain;
-		m_bbFX.leftFX().setGain( gain );
-		m_bbFX.rightFX().setGain( gain);
+		m_bbFX.leftFX().setGain(gain);
+		m_bbFX.rightFX().setGain(gain);
 
-		sample_t s[2] = { buf[f][0], buf[f][1] };
-		m_bbFX.nextSample( s[0], s[1] );
+		sample_t s[2] = {buf[f][0], buf[f][1]};
+		m_bbFX.nextSample(s[0], s[1]);
 
 		buf[f][0] = d * buf[f][0] + w * s[0];
 		buf[f][1] = d * buf[f][1] + w * s[1];
 		outSum += buf[f][0] * buf[f][0] + buf[f][1] * buf[f][1];
 	}
 
-	checkGate( outSum / frames );
+	checkGate(outSum / frames);
 
 	return isRunning();
 }
-
 
 inline void BassBoosterEffect::changeFrequency()
 {
 	const sample_t fac = Engine::mixer()->processingSampleRate() / 44100.0f;
 
-	m_bbFX.leftFX().setFrequency( m_bbControls.m_freqModel.value() * fac );
-	m_bbFX.rightFX().setFrequency( m_bbControls.m_freqModel.value() * fac );
+	m_bbFX.leftFX().setFrequency(m_bbControls.m_freqModel.value() * fac);
+	m_bbFX.rightFX().setFrequency(m_bbControls.m_freqModel.value() * fac);
 }
-
-
-
 
 inline void BassBoosterEffect::changeGain()
 {
-	m_bbFX.leftFX().setGain( m_bbControls.m_gainModel.value() );
-	m_bbFX.rightFX().setGain( m_bbControls.m_gainModel.value() );
+	m_bbFX.leftFX().setGain(m_bbControls.m_gainModel.value());
+	m_bbFX.rightFX().setGain(m_bbControls.m_gainModel.value());
 }
-
-
-
 
 inline void BassBoosterEffect::changeRatio()
 {
-	m_bbFX.leftFX().setRatio( m_bbControls.m_ratioModel.value() );
-	m_bbFX.rightFX().setRatio( m_bbControls.m_ratioModel.value() );
+	m_bbFX.leftFX().setRatio(m_bbControls.m_ratioModel.value());
+	m_bbFX.rightFX().setRatio(m_bbControls.m_ratioModel.value());
 }
-
-
-
 
 extern "C"
 {
 
-// necessary for getting instance out of shared lib
-PLUGIN_EXPORT Plugin * lmms_plugin_main( Model* parent, void* data )
-{
-	return new BassBoosterEffect( parent, static_cast<const Plugin::Descriptor::SubPluginFeatures::Key *>( data ) );
+	// necessary for getting instance out of shared lib
+	PLUGIN_EXPORT Plugin *lmms_plugin_main(Model *parent, void *data)
+	{
+		return new BassBoosterEffect(parent, static_cast<const Plugin::Descriptor::SubPluginFeatures::Key *>(data));
+	}
 }
-
-}
-

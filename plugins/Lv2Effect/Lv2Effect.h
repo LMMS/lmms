@@ -36,15 +36,15 @@ public:
 	/*
 		initialization
 	*/
-	Lv2Effect(Model* parent, const Descriptor::SubPluginFeatures::Key* _key);
+	Lv2Effect(Model *parent, const Descriptor::SubPluginFeatures::Key *_key);
 	//! Must be checked after ctor or reload
 	bool isValid() const { return m_controls.isValid(); }
 
-	bool processAudioBuffer( sampleFrame* buf, const fpp_t frames ) override;
-	EffectControls* controls() override { return &m_controls; }
+	bool processAudioBuffer(sampleFrame *buf, const fpp_t frames) override;
+	EffectControls *controls() override { return &m_controls; }
 
-	Lv2FxControls* lv2Controls() { return &m_controls; }
-	const Lv2FxControls* lv2Controls() const { return &m_controls; }
+	Lv2FxControls *lv2Controls() { return &m_controls; }
+	const Lv2FxControls *lv2Controls() const { return &m_controls; }
 
 private:
 	Lv2FxControls m_controls;

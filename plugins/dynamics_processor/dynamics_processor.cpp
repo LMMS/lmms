@@ -23,50 +23,44 @@
  *
  */
 
-
 #include "dynamics_processor.h"
-#include "lmms_math.h"
-#include "interpolation.h"
 
 #include "embed.h"
+#include "interpolation.h"
+#include "lmms_math.h"
 #include "plugin_export.h"
 
 extern "C"
 {
 
-Plugin::Descriptor PLUGIN_EXPORT dynamicsprocessor_plugin_descriptor =
-{
-	STRINGIFY( PLUGIN_NAME ),
-	"Dynamics Processor",
-	QT_TRANSLATE_NOOP( "PluginBrowser",
-				"plugin for processing dynamics in a flexible way" ),
-	"Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>",
-	0x0100,
-	Plugin::Effect,
-	new PluginPixmapLoader("logo"),
-	NULL,
-	NULL
-} ;
-
+	Plugin::Descriptor PLUGIN_EXPORT dynamicsprocessor_plugin_descriptor =
+		{
+			STRINGIFY(PLUGIN_NAME),
+			"Dynamics Processor",
+			QT_TRANSLATE_NOOP("PluginBrowser",
+				"plugin for processing dynamics in a flexible way"),
+			"Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>",
+			0x0100,
+			Plugin::Effect,
+			new PluginPixmapLoader("logo"),
+			NULL,
+			NULL};
 }
 
 const float DYN_NOISE_FLOOR = 0.00001f; // -100dBFS noise floor
 const double DNF_LOG = 5.0;
 
-dynProcEffect::dynProcEffect( Model * _parent,
-			const Descriptor::SubPluginFeatures::Key * _key ) :
-	Effect( &dynamicsprocessor_plugin_descriptor, _parent, _key ),
-	m_dpControls( this )
+dynProcEffect::dynProcEffect(Model *_parent,
+	const Descriptor::SubPluginFeatures::Key *_key) :
+	Effect(&dynamicsprocessor_plugin_descriptor, _parent, _key),
+	m_dpControls(this)
 {
 	m_currentPeak[0] = m_currentPeak[1] = DYN_NOISE_FLOOR;
-	m_rms[0] = new RmsHelper( 64 * Engine::mixer()->processingSampleRate() / 44100 );
-	m_rms[1] = new RmsHelper( 64 * Engine::mixer()->processingSampleRate() / 44100 );
+	m_rms[0] = new RmsHelper(64 * Engine::mixer()->processingSampleRate() / 44100);
+	m_rms[1] = new RmsHelper(64 * Engine::mixer()->processingSampleRate() / 44100);
 	calcAttack();
 	calcRelease();
 }
-
-
-
 
 dynProcEffect::~dynProcEffect()
 {
@@ -74,172 +68,159 @@ dynProcEffect::~dynProcEffect()
 	delete m_rms[1];
 }
 
-
 inline void dynProcEffect::calcAttack()
 {
-	m_attCoeff = exp10( ( DNF_LOG / ( m_dpControls.m_attackModel.value() * 0.001 ) ) / Engine::mixer()->processingSampleRate() );
+	m_attCoeff = exp10((DNF_LOG / (m_dpControls.m_attackModel.value() * 0.001)) / Engine::mixer()->processingSampleRate());
 }
 
 inline void dynProcEffect::calcRelease()
 {
-	m_relCoeff = exp10( ( -DNF_LOG / ( m_dpControls.m_releaseModel.value() * 0.001 ) ) / Engine::mixer()->processingSampleRate() );
+	m_relCoeff = exp10((-DNF_LOG / (m_dpControls.m_releaseModel.value() * 0.001)) / Engine::mixer()->processingSampleRate());
 }
 
-
-bool dynProcEffect::processAudioBuffer( sampleFrame * _buf,
-							const fpp_t _frames )
+bool dynProcEffect::processAudioBuffer(sampleFrame *_buf,
+	const fpp_t _frames)
 {
-	if( !isEnabled() || !isRunning () )
+	if (!isEnabled() || !isRunning())
 	{
-//apparently we can't keep running after the decay value runs out so we'll just set the peaks to zero
+		//apparently we can't keep running after the decay value runs out so we'll just set the peaks to zero
 		m_currentPeak[0] = m_currentPeak[1] = DYN_NOISE_FLOOR;
-		return( false );
+		return (false);
 	}
 	//qDebug( "%f %f", m_currentPeak[0], m_currentPeak[1] );
 
-// variables for effect
+	// variables for effect
 	int i = 0;
 
-	float sm_peak[2] = { 0.0f, 0.0f };
+	float sm_peak[2] = {0.0f, 0.0f};
 	float gain;
 
 	double out_sum = 0.0;
 	const float d = dryLevel();
 	const float w = wetLevel();
-	
+
 	const int stereoMode = m_dpControls.m_stereomodeModel.value();
 	const float inputGain = m_dpControls.m_inputModel.value();
 	const float outputGain = m_dpControls.m_outputModel.value();
-	
-	const float * samples = m_dpControls.m_wavegraphModel.samples();
 
-// debug code
-//	qDebug( "peaks %f %f", m_currentPeak[0], m_currentPeak[1] );
+	const float *samples = m_dpControls.m_wavegraphModel.samples();
 
-	if( m_needsUpdate )
+	// debug code
+	//	qDebug( "peaks %f %f", m_currentPeak[0], m_currentPeak[1] );
+
+	if (m_needsUpdate)
 	{
-		m_rms[0]->setSize( 64 * Engine::mixer()->processingSampleRate() / 44100 );
-		m_rms[1]->setSize( 64 * Engine::mixer()->processingSampleRate() / 44100 );
+		m_rms[0]->setSize(64 * Engine::mixer()->processingSampleRate() / 44100);
+		m_rms[1]->setSize(64 * Engine::mixer()->processingSampleRate() / 44100);
 		calcAttack();
 		calcRelease();
 		m_needsUpdate = false;
 	}
 	else
 	{
-		if( m_dpControls.m_attackModel.isValueChanged() )
+		if (m_dpControls.m_attackModel.isValueChanged())
 		{
 			calcAttack();
 		}
-		if( m_dpControls.m_releaseModel.isValueChanged() )
+		if (m_dpControls.m_releaseModel.isValueChanged())
 		{
 			calcRelease();
 		}
 	}
 
-	for( fpp_t f = 0; f < _frames; ++f )
+	for (fpp_t f = 0; f < _frames; ++f)
 	{
-		double s[2] = { _buf[f][0], _buf[f][1] };
+		double s[2] = {_buf[f][0], _buf[f][1]};
 
-// apply input gain
+		// apply input gain
 		s[0] *= inputGain;
 		s[1] *= inputGain;
 
-// update peak values
-		for ( i=0; i <= 1; i++ )
+		// update peak values
+		for (i = 0; i <= 1; i++)
 		{
-			const double t = m_rms[i]->update( s[i] );
-			if( t > m_currentPeak[i] )
+			const double t = m_rms[i]->update(s[i]);
+			if (t > m_currentPeak[i])
 			{
-				m_currentPeak[i] = qMin( m_currentPeak[i] * m_attCoeff, t );
+				m_currentPeak[i] = qMin(m_currentPeak[i] * m_attCoeff, t);
 			}
-			else
-			if( t < m_currentPeak[i] )
+			else if (t < m_currentPeak[i])
 			{
-				m_currentPeak[i] = qMax( m_currentPeak[i] * m_relCoeff, t );
+				m_currentPeak[i] = qMax(m_currentPeak[i] * m_relCoeff, t);
 			}
 
-			m_currentPeak[i] = qBound( DYN_NOISE_FLOOR, m_currentPeak[i], 10.0f );
+			m_currentPeak[i] = qBound(DYN_NOISE_FLOOR, m_currentPeak[i], 10.0f);
 		}
 
-// account for stereo mode
-		switch( stereoMode )
+		// account for stereo mode
+		switch (stereoMode)
 		{
-			case dynProcControls::SM_Maximum:
-			{
-				sm_peak[0] = sm_peak[1] = qMax( m_currentPeak[0], m_currentPeak[1] );
-				break;
-			}
-			case dynProcControls::SM_Average:
-			{
-				sm_peak[0] = sm_peak[1] = ( m_currentPeak[0] + m_currentPeak[1] ) * 0.5;
-				break;
-			}
-			case dynProcControls::SM_Unlinked:
-			{
-				sm_peak[0] = m_currentPeak[0];
-				sm_peak[1] = m_currentPeak[1];
-				break;
-			}
+		case dynProcControls::SM_Maximum: {
+			sm_peak[0] = sm_peak[1] = qMax(m_currentPeak[0], m_currentPeak[1]);
+			break;
+		}
+		case dynProcControls::SM_Average: {
+			sm_peak[0] = sm_peak[1] = (m_currentPeak[0] + m_currentPeak[1]) * 0.5;
+			break;
+		}
+		case dynProcControls::SM_Unlinked: {
+			sm_peak[0] = m_currentPeak[0];
+			sm_peak[1] = m_currentPeak[1];
+			break;
+		}
 		}
 
-// start effect
+		// start effect
 
-		for ( i=0; i <= 1; i++ )
+		for (i = 0; i <= 1; i++)
 		{
-			const int lookup = static_cast<int>( sm_peak[i] * 200.0f );
-			const float frac = fraction( sm_peak[i] * 200.0f );
+			const int lookup = static_cast<int>(sm_peak[i] * 200.0f);
+			const float frac = fraction(sm_peak[i] * 200.0f);
 
-			if( sm_peak[i] > DYN_NOISE_FLOOR )
+			if (sm_peak[i] > DYN_NOISE_FLOOR)
 			{
-				if ( lookup < 1 )
+				if (lookup < 1)
 				{
 					gain = frac * samples[0];
 				}
-				else
-				if ( lookup < 200 )
+				else if (lookup < 200)
 				{
-					gain = linearInterpolate( samples[ lookup - 1 ],
-							samples[ lookup ], frac );
+					gain = linearInterpolate(samples[lookup - 1],
+						samples[lookup], frac);
 				}
 				else
 				{
 					gain = samples[199];
 				};
 
-				s[i] *= gain; 
+				s[i] *= gain;
 				s[i] /= sm_peak[i];
 			}
 		}
 
-// apply output gain
+		// apply output gain
 		s[0] *= outputGain;
 		s[1] *= outputGain;
 
-// mix wet/dry signals
+		// mix wet/dry signals
 		_buf[f][0] = d * _buf[f][0] + w * s[0];
 		_buf[f][1] = d * _buf[f][1] + w * s[1];
 		out_sum += _buf[f][0] * _buf[f][0] + _buf[f][1] * _buf[f][1];
 	}
 
-	checkGate( out_sum / _frames );
+	checkGate(out_sum / _frames);
 
-	return( isRunning() );
+	return (isRunning());
 }
-
-
-
-
 
 extern "C"
 {
 
-// necessary for getting instance out of shared lib
-PLUGIN_EXPORT Plugin * lmms_plugin_main( Model * _parent, void * _data )
-{
-	return( new dynProcEffect( _parent,
-		static_cast<const Plugin::Descriptor::SubPluginFeatures::Key *>(
-								_data ) ) );
+	// necessary for getting instance out of shared lib
+	PLUGIN_EXPORT Plugin *lmms_plugin_main(Model *_parent, void *_data)
+	{
+		return (new dynProcEffect(_parent,
+			static_cast<const Plugin::Descriptor::SubPluginFeatures::Key *>(
+				_data)));
+	}
 }
-
-}
-

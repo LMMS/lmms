@@ -23,21 +23,19 @@
  *
  */
 
-
 #ifndef RUBBERBAND_H
 #define RUBBERBAND_H
 
 #include <QRubberBand>
 #include <QtCore/QVector>
 
-
 class selectableObject : public QWidget
 {
 	Q_OBJECT
 public:
-	selectableObject( QWidget * _parent ) :
-		QWidget( _parent ),
-		m_selected( false )
+	selectableObject(QWidget *_parent) :
+		QWidget(_parent),
+		m_selected(false)
 	{
 	}
 
@@ -45,7 +43,7 @@ public:
 	{
 	}
 
-	inline void setSelected( bool _selected )
+	inline void setSelected(bool _selected)
 	{
 		m_selected = _selected;
 		update();
@@ -53,9 +51,8 @@ public:
 
 	inline bool isSelected() const
 	{
-		return( m_selected );
+		return (m_selected);
 	}
-
 
 public slots:
 	virtual void update()
@@ -63,32 +60,23 @@ public slots:
 		QWidget::update();
 	}
 
-
 private:
 	bool m_selected;
-
-} ;
-
-
-
+};
 
 class RubberBand : public QRubberBand
 {
 public:
-	RubberBand( QWidget * _parent );
+	RubberBand(QWidget *_parent);
 	virtual ~RubberBand();
 
 	QVector<selectableObject *> selectedObjects() const;
 	QVector<selectableObject *> selectableObjects() const;
 
-
 protected:
-	void resizeEvent( QResizeEvent * _re ) override;
+	void resizeEvent(QResizeEvent *_re) override;
 
 private:
-
 };
 
-
 #endif
-

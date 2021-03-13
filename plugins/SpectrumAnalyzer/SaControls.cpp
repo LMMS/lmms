@@ -29,7 +29,6 @@
 #include "Analyzer.h"
 #include "SaControlsDialog.h"
 
-
 SaControls::SaControls(Analyzer *effect) :
 	EffectControls(effect),
 	m_effect(effect),
@@ -116,16 +115,14 @@ SaControls::SaControls(Analyzer *effect) :
 	m_colorMonoW = QColor(64, 185, 255, 255);
 	m_colorBG = QColor(7, 7, 7, 255);			// ~20 % gray (after gamma correction)
 	m_colorGrid = QColor(30, 34, 38, 255);		// ~40 % gray (slightly cold / blue)
-	m_colorLabels = QColor(192, 202, 212, 255);	// ~90 % gray (slightly cold / blue)
+	m_colorLabels = QColor(192, 202, 212, 255); // ~90 % gray (slightly cold / blue)
 }
 
-
 // Create the SaControlDialog widget which handles display of GUI elements.
-EffectControlDialog* SaControls::createView()
+EffectControlDialog *SaControls::createView()
 {
 	return new SaControlsDialog(this, m_effect->getProcessor());
 }
-
 
 void SaControls::loadSettings(const QDomElement &_this)
 {
@@ -150,7 +147,6 @@ void SaControls::loadSettings(const QDomElement &_this)
 	m_zeroPaddingModel.loadSettings(_this, "ZeroPadding");
 }
 
-
 void SaControls::saveSettings(QDomDocument &doc, QDomElement &parent)
 {
 	m_waterfallModel.saveSettings(doc, parent, "Waterfall");
@@ -172,5 +168,4 @@ void SaControls::saveSettings(QDomDocument &doc, QDomElement &parent)
 	m_waterfallGammaModel.saveSettings(doc, parent, "WaterfallGamma");
 	m_windowOverlapModel.saveSettings(doc, parent, "WindowOverlap");
 	m_zeroPaddingModel.saveSettings(doc, parent, "ZeroPadding");
-
 }

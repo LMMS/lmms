@@ -22,61 +22,47 @@
  *
  */
 
+#include "RenameDialog.h"
 
 #include <QKeyEvent>
 #include <QLineEdit>
 
-#include "RenameDialog.h"
-
-
-
-RenameDialog::RenameDialog( QString & _string ) :
+RenameDialog::RenameDialog(QString &_string) :
 	QDialog(),
-	m_stringToEdit( _string ),
-	m_originalString( _string )
+	m_stringToEdit(_string),
+	m_originalString(_string)
 {
-	setWindowTitle( tr("Rename...") );
-	setFixedHeight( 30 );
-	m_stringLE = new QLineEdit( this );
-	m_stringLE->setText( _string );
-	m_stringLE->setGeometry ( 10, 5, 220, 20 );
+	setWindowTitle(tr("Rename..."));
+	setFixedHeight(30);
+	m_stringLE = new QLineEdit(this);
+	m_stringLE->setText(_string);
+	m_stringLE->setGeometry(10, 5, 220, 20);
 	m_stringLE->selectAll();
-	connect( m_stringLE, SIGNAL( textChanged( const QString & ) ), this,
-				SLOT( textChanged( const QString & ) ) );
-	connect( m_stringLE, SIGNAL( returnPressed() ), this,
-							SLOT( accept() ) );
+	connect(m_stringLE, SIGNAL(textChanged(const QString &)), this,
+		SLOT(textChanged(const QString &)));
+	connect(m_stringLE, SIGNAL(returnPressed()), this,
+		SLOT(accept()));
 }
-
-
-
 
 RenameDialog::~RenameDialog()
 {
 }
 
-
-
-
-void RenameDialog::resizeEvent (QResizeEvent * event) {
-	m_stringLE->setGeometry ( 10, 5, width() - 20, 20 );	
+void RenameDialog::resizeEvent(QResizeEvent *event)
+{
+	m_stringLE->setGeometry(10, 5, width() - 20, 20);
 }
 
-
-
-
-void RenameDialog::keyPressEvent( QKeyEvent * _ke )
+void RenameDialog::keyPressEvent(QKeyEvent *_ke)
 {
-	if( _ke->key() == Qt::Key_Escape )
+	if (_ke->key() == Qt::Key_Escape)
 	{
-		m_stringLE->setText( m_originalString );
+		m_stringLE->setText(m_originalString);
 		accept();
 	}
 }
 
-
-
-
-void RenameDialog::textChanged( const QString & _new_string )
+void RenameDialog::textChanged(const QString &_new_string)
 {
 	m_stringToEdit = _new_string;
 }

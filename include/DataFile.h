@@ -23,15 +23,14 @@
  *
  */
 
-
 #ifndef DATA_FILE_H
 #define DATA_FILE_H
 
 #include <QDomDocument>
 
-#include "lmms_export.h"
 #include "MemoryManager.h"
 #include "ProjectVersion.h"
+#include "lmms_export.h"
 
 class QTextStream;
 
@@ -39,7 +38,7 @@ class LMMS_EXPORT DataFile : public QDomDocument
 {
 	MM_OPERATORS
 
-	using UpgradeMethod = void(DataFile::*)();
+	using UpgradeMethod = void (DataFile::*)();
 
 public:
 	enum Types
@@ -53,12 +52,12 @@ public:
 		JournalData,
 		EffectSettings,
 		TypeCount
-	} ;
+	};
 	typedef Types Type;
 
-	DataFile( const QString& fileName );
-	DataFile( const QByteArray& data );
-	DataFile( Type type );
+	DataFile(const QString &fileName);
+	DataFile(const QByteArray &data);
+	DataFile(Type type);
 
 	virtual ~DataFile();
 
@@ -66,19 +65,19 @@ public:
 	/// \brief validate
 	/// performs basic validation, compared to file extension.
 	///
-	bool validate( QString extension );
+	bool validate(QString extension);
 
-	QString nameWithExtension( const QString& fn ) const;
+	QString nameWithExtension(const QString &fn) const;
 
-	void write( QTextStream& strm );
-	bool writeFile( const QString& fn );
+	void write(QTextStream &strm);
+	bool writeFile(const QString &fn);
 
-	QDomElement& content()
+	QDomElement &content()
 	{
 		return m_content;
 	}
 
-	QDomElement& head()
+	QDomElement &head()
 	{
 		return m_head;
 	}
@@ -91,10 +90,10 @@ public:
 	unsigned int legacyFileVersion();
 
 private:
-	static Type type( const QString& typeName );
-	static QString typeName( Type type );
+	static Type type(const QString &typeName);
+	static QString typeName(Type type);
 
-	void cleanMetaNodes( QDomElement de );
+	void cleanMetaNodes(QDomElement de);
 
 	// helper upgrade routines
 	void upgrade_0_2_1_20070501();
@@ -124,22 +123,19 @@ private:
 
 	void upgrade();
 
-	void loadData( const QByteArray & _data, const QString & _sourceFile );
-
+	void loadData(const QByteArray &_data, const QString &_sourceFile);
 
 	struct LMMS_EXPORT typeDescStruct
 	{
 		Type m_type;
 		QString m_name;
-	} ;
+	};
 	static typeDescStruct s_types[TypeCount];
 
 	QDomElement m_content;
 	QDomElement m_head;
 	Type m_type;
 	unsigned int m_fileVersion;
-
-} ;
-
+};
 
 #endif

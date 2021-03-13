@@ -22,13 +22,13 @@
 #define STEP_RECORDER_H
 
 #include <QElapsedTimer>
-#include <QTimer>
-#include <QObject>
 #include <QKeyEvent>
+#include <QObject>
+#include <QTimer>
 
 #include "Note.h"
-#include "lmms_basics.h"
 #include "Pattern.h"
+#include "lmms_basics.h"
 
 class PianoRoll;
 class StepRecorderWidget;
@@ -37,20 +37,20 @@ class StepRecorder : public QObject
 {
 	Q_OBJECT
 
-	public:
-	StepRecorder(PianoRoll& pianoRoll, StepRecorderWidget& stepRecorderWidget);
+public:
+	StepRecorder(PianoRoll &pianoRoll, StepRecorderWidget &stepRecorderWidget);
 
 	void initialize();
-	void start(const TimePos& currentPosition,const TimePos& stepLength);
+	void start(const TimePos &currentPosition, const TimePos &stepLength);
 	void stop();
-	void notePressed(const Note & n);
-	void noteReleased(const Note & n);
-	bool keyPressEvent(QKeyEvent* ke);
-	bool mousePressEvent(QMouseEvent* ke);
-	void setCurrentPattern(Pattern* newPattern);
-	void setStepsLength(const TimePos& newLength);
+	void notePressed(const Note &n);
+	void noteReleased(const Note &n);
+	bool keyPressEvent(QKeyEvent *ke);
+	bool mousePressEvent(QMouseEvent *ke);
+	void setCurrentPattern(Pattern *newPattern);
+	void setStepsLength(const TimePos &newLength);
 
-	QVector<Note*> getCurStepNotes();
+	QVector<Note *> getCurStepNotes();
 
 	bool isRecording() const
 	{
@@ -59,13 +59,13 @@ class StepRecorder : public QObject
 
 	QColor curStepNoteColor() const
 	{
-		return QColor(245,3,139); // radiant pink
+		return QColor(245, 3, 139); // radiant pink
 	}
 
-	private slots:
+private slots:
 	void removeNotesReleasedForTooLong();
 
-	private:
+private:
 	void stepForwards();
 	void stepBackwards();
 
@@ -80,8 +80,8 @@ class StepRecorder : public QObject
 
 	bool allCurStepNotesReleased();
 
-	PianoRoll& m_pianoRoll;
-	StepRecorderWidget& m_stepRecorderWidget;
+	PianoRoll &m_pianoRoll;
+	StepRecorderWidget &m_stepRecorderWidget;
 
 	bool m_isRecording = false;
 	TimePos m_curStepStartPos = 0;
@@ -89,16 +89,17 @@ class StepRecorder : public QObject
 
 	TimePos m_stepsLength;
 	TimePos m_curStepLength; // current step length refers to the step currently recorded. it may defer from m_stepsLength
-							  // since the user can make current step larger
+							 // since the user can make current step larger
 
 	QTimer m_updateReleasedTimer;
 
-	Pattern* m_pattern;
+	Pattern *m_pattern;
 
 	class StepNote
 	{
-		public:
-		StepNote(const Note & note) : m_note(note), m_pressed(true) {};
+	public:
+		StepNote(const Note &note) :
+			m_note(note), m_pressed(true){};
 
 		void setPressed()
 		{
@@ -128,14 +129,14 @@ class StepRecorder : public QObject
 
 		Note m_note;
 
-		private:
+	private:
 		bool m_pressed;
 		QElapsedTimer releasedTimer;
-	} ;
+	};
 
-	QVector<StepNote*> m_curStepNotes; // contains the current recorded step notes (i.e. while user still press the notes; before they are applied to the pattern)
+	QVector<StepNote *> m_curStepNotes; // contains the current recorded step notes (i.e. while user still press the notes; before they are applied to the pattern)
 
-	StepNote* findCurStepNote(const int key);
+	StepNote *findCurStepNote(const int key);
 
 	bool m_isStepInProgress = false;
 };

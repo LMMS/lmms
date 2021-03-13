@@ -25,17 +25,16 @@
 #ifndef SWEEP_OSCILLATOR_H
 #define SWEEP_OSCILLATOR_H
 
-#include "Oscillator.h"
 #include "DspEffectLibrary.h"
+#include "Oscillator.h"
 
-
-template<class FX = DspEffectLibrary::StereoBypass>
+template <class FX = DspEffectLibrary::StereoBypass>
 class SweepOscillator
 {
 public:
-	SweepOscillator( const FX & _fx = FX() ) :
-		m_phase( 0.0f ),
-		m_FX( _fx )
+	SweepOscillator(const FX &_fx = FX()) :
+		m_phase(0.0f),
+		m_FX(_fx)
 	{
 	}
 
@@ -43,28 +42,25 @@ public:
 	{
 	}
 
-	void update( sampleFrame* buf, const fpp_t frames, const float freq1, const float freq2, const float sampleRate )
+	void update(sampleFrame *buf, const fpp_t frames, const float freq1, const float freq2, const float sampleRate)
 	{
 		const float df = freq2 - freq1;
-		for( fpp_t frame = 0; frame < frames; ++frame )
+		for (fpp_t frame = 0; frame < frames; ++frame)
 		{
-			const sample_t s = Oscillator::sinSample( m_phase );
+			const sample_t s = Oscillator::sinSample(m_phase);
 			buf[frame][0] = s;
 			buf[frame][1] = s;
-			m_FX.nextSample( buf[frame][0], buf[frame][1] );
-			m_phase += ( freq1 + ( frame * df / frames ) ) / sampleRate;
+			m_FX.nextSample(buf[frame][0], buf[frame][1]);
+			m_phase += (freq1 + (frame * df / frames)) / sampleRate;
 		}
 	}
-
 
 private:
 	float m_phase;
 	FX m_FX;
 
-//	inline sample_t getSample( const float _sample );
-//	inline void recalcPhase();
-
-} ;
-
+	//	inline sample_t getSample( const float _sample );
+	//	inline void recalcPhase();
+};
 
 #endif

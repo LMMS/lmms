@@ -52,7 +52,8 @@ public:
 		BitRateSettings(bitrate_t bitRate, bool isVariableBitRate) :
 			m_bitRate(bitRate),
 			m_isVariableBitRate(isVariableBitRate)
-		{}
+		{
+		}
 
 		bool isVariableBitRate() const { return m_isVariableBitRate; }
 		void setVariableBitrate(bool variableBitRate = true) { m_isVariableBitRate = variableBitRate; }
@@ -66,10 +67,10 @@ public:
 	};
 
 public:
-	OutputSettings( sample_rate_t sampleRate,
-			BitRateSettings const & bitRateSettings,
-			BitDepth bitDepth,
-			StereoMode stereoMode ) :
+	OutputSettings(sample_rate_t sampleRate,
+		BitRateSettings const &bitRateSettings,
+		BitDepth bitDepth,
+		StereoMode stereoMode) :
 		m_sampleRate(sampleRate),
 		m_bitRateSettings(bitRateSettings),
 		m_bitDepth(bitDepth),
@@ -78,18 +79,18 @@ public:
 	{
 	}
 
-	OutputSettings( sample_rate_t sampleRate,
-			BitRateSettings const & bitRateSettings,
-			BitDepth bitDepth ) :
-		OutputSettings(sampleRate, bitRateSettings, bitDepth, StereoMode_Stereo )
+	OutputSettings(sample_rate_t sampleRate,
+		BitRateSettings const &bitRateSettings,
+		BitDepth bitDepth) :
+		OutputSettings(sampleRate, bitRateSettings, bitDepth, StereoMode_Stereo)
 	{
 	}
 
 	sample_rate_t getSampleRate() const { return m_sampleRate; }
 	void setSampleRate(sample_rate_t sampleRate) { m_sampleRate = sampleRate; }
 
-	BitRateSettings const & getBitRateSettings() const { return m_bitRateSettings; }
-	void setBitRateSettings(BitRateSettings const & bitRateSettings) { m_bitRateSettings = bitRateSettings; }
+	BitRateSettings const &getBitRateSettings() const { return m_bitRateSettings; }
+	void setBitRateSettings(BitRateSettings const &bitRateSettings) { m_bitRateSettings = bitRateSettings; }
 
 	BitDepth getBitDepth() const { return m_bitDepth; }
 	void setBitDepth(BitDepth bitDepth) { m_bitDepth = bitDepth; }
@@ -97,9 +98,9 @@ public:
 	StereoMode getStereoMode() const { return m_stereoMode; }
 	void setStereoMode(StereoMode stereoMode) { m_stereoMode = stereoMode; }
 
-
-	double getCompressionLevel() const{ return m_compressionLevel; }
-	void setCompressionLevel(double level){
+	double getCompressionLevel() const { return m_compressionLevel; }
+	void setCompressionLevel(double level)
+	{
 		// legal range is 0.0 to 1.0.
 		m_compressionLevel = level;
 	}

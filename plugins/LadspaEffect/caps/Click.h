@@ -32,67 +32,67 @@
 #include "dsp/util.h"
 
 class ClickStub
-: public Plugin
+	: public Plugin
 {
-	public:
-		sample_t bpm;
+public:
+	sample_t bpm;
 
-		float * wave;
-		int N; /* number of samples in wave */
+	float *wave;
+	int N; /* number of samples in wave */
 
-		DSP::OnePoleLP lp;
+	DSP::OnePoleLP lp;
 
-		int period; /* frames remaining in period */
-		int played; /* frames played from sample */
+	int period; /* frames remaining in period */
+	int played; /* frames played from sample */
 
-		template <sample_func_t F>
-			void one_cycle (int frames);
+	template <sample_func_t F>
+	void one_cycle(int frames);
 
-	public:
-		static PortInfo port_info [];
+public:
+	static PortInfo port_info[];
 
-		void init (float * _wave, int _N);
+	void init(float *_wave, int _N);
 
-		void activate()
-			{ 
-				played = 0;
-				period = 0;
-			}
+	void activate()
+	{
+		played = 0;
+		period = 0;
+	}
 
-		void run (int n)
-			{
-				one_cycle<store_func> (n);
-			}
-		
-		void run_adding (int n)
-			{
-				one_cycle<adding_func> (n);
-			}
+	void run(int n)
+	{
+		one_cycle<store_func>(n);
+	}
+
+	void run_adding(int n)
+	{
+		one_cycle<adding_func>(n);
+	}
 };
 
 class Click
-: public ClickStub
+	: public ClickStub
 {
-	public:
-		void init();
+public:
+	void init();
 };
 
 class CEO
-: public ClickStub
+	: public ClickStub
 {
-	public:
-		void init();
+public:
+	void init();
 
-		static PortInfo port_info [];
+	static PortInfo port_info[];
 };
 
 class Dirac
-: public ClickStub
+	: public ClickStub
 {
-	public:
-		void init();
+public:
+	void init();
 
-		static PortInfo port_info [];
+	static PortInfo port_info[];
 };
 
 #endif /* _CLICK_H_ */

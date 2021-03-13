@@ -25,52 +25,47 @@
 #ifndef PLUGIN_BROWSER_H
 #define PLUGIN_BROWSER_H
 
-#include <QtCore/QTimer>
 #include <QPixmap>
+#include <QtCore/QTimer>
 
-#include "SideBarWidget.h"
 #include "Plugin.h"
+#include "SideBarWidget.h"
 
 class QLineEdit;
 class QTreeWidget;
-
 
 class PluginBrowser : public SideBarWidget
 {
 	Q_OBJECT
 public:
-	PluginBrowser( QWidget * _parent );
+	PluginBrowser(QWidget *_parent);
 	virtual ~PluginBrowser() = default;
 
 private slots:
-	void onFilterChanged( const QString & filter );
+	void onFilterChanged(const QString &filter);
 
 private:
 	void addPlugins();
-	void updateRootVisibility( int index );
+	void updateRootVisibility(int index);
 	void updateRootVisibilities();
 
-	QWidget * m_view;
-	QTreeWidget * m_descTree;
+	QWidget *m_view;
+	QTreeWidget *m_descTree;
 };
-
-
-
 
 class PluginDescWidget : public QWidget
 {
 	Q_OBJECT
 public:
 	typedef Plugin::Descriptor::SubPluginFeatures::Key PluginKey;
-	PluginDescWidget( const PluginKey & _pk, QWidget * _parent );
+	PluginDescWidget(const PluginKey &_pk, QWidget *_parent);
 	QString name() const;
 
-
 protected:
-	void enterEvent( QEvent * _e ) override;
-	void leaveEvent( QEvent * _e ) override;
-	void mousePressEvent( QMouseEvent * _me ) override;
-	void paintEvent( QPaintEvent * _pe ) override;
+	void enterEvent(QEvent *_e) override;
+	void leaveEvent(QEvent *_e) override;
+	void mousePressEvent(QMouseEvent *_me) override;
+	void paintEvent(QPaintEvent *_pe) override;
 
 private:
 	constexpr static int DEFAULT_HEIGHT{24};
@@ -80,6 +75,5 @@ private:
 
 	bool m_mouseOver;
 };
-
 
 #endif

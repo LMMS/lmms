@@ -26,37 +26,35 @@
 #ifndef EFFECT_CHAIN_H
 #define EFFECT_CHAIN_H
 
+#include "AutomatableModel.h"
 #include "Model.h"
 #include "SerializingObject.h"
-#include "AutomatableModel.h"
 
 class Effect;
-
 
 class LMMS_EXPORT EffectChain : public Model, public SerializingObject
 {
 	Q_OBJECT
 public:
-	EffectChain( Model * _parent );
+	EffectChain(Model *_parent);
 	virtual ~EffectChain();
 
-	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
-	void loadSettings( const QDomElement & _this ) override;
+	void saveSettings(QDomDocument &_doc, QDomElement &_parent) override;
+	void loadSettings(const QDomElement &_this) override;
 
 	inline QString nodeName() const override
 	{
 		return "fxchain";
 	}
 
-	void appendEffect( Effect * _effect );
-	void removeEffect( Effect * _effect );
-	void moveDown( Effect * _effect );
-	void moveUp( Effect * _effect );
-	bool processAudioBuffer( sampleFrame * _buf, const fpp_t _frames, bool hasInputNoise );
+	void appendEffect(Effect *_effect);
+	void removeEffect(Effect *_effect);
+	void moveDown(Effect *_effect);
+	void moveUp(Effect *_effect);
+	bool processAudioBuffer(sampleFrame *_buf, const fpp_t _frames, bool hasInputNoise);
 	void startRunning();
 
 	void clear();
-
 
 private:
 	typedef QVector<Effect *> EffectList;
@@ -64,14 +62,10 @@ private:
 
 	BoolModel m_enabledModel;
 
-
 	friend class EffectRackView;
-
 
 signals:
 	void aboutToClear();
-
-} ;
+};
 
 #endif
-

@@ -28,19 +28,16 @@
 
 #include "EffectControlDialog.h"
 
-
 class AmplifierControls;
-
 
 class AmplifierControlDialog : public EffectControlDialog
 {
 	Q_OBJECT
 public:
-	AmplifierControlDialog( AmplifierControls* controls );
+	AmplifierControlDialog(AmplifierControls *controls);
 	virtual ~AmplifierControlDialog()
 	{
 	}
-
-} ;
+};
 
 #endif

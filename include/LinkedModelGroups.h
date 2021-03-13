@@ -25,19 +25,16 @@
 #ifndef LINKEDMODELGROUPS_H
 #define LINKEDMODELGROUPS_H
 
-
 #include <cstddef>
 #include <memory>
 #include <vector>
 
 #include "Model.h"
 
-
 /**
 	@file LinkedModelGroups.h
 	See Lv2ControlBase.h and Lv2Proc.h for example usage
 */
-
 
 /**
 	Base class for a group of linked models
@@ -56,7 +53,8 @@ public:
 		Initialization
 	*/
 	//! @param parent model of the LinkedModelGroups class
-	LinkedModelGroup(Model* parent) : Model(parent) {}
+	LinkedModelGroup(Model *parent) :
+		Model(parent) {}
 
 	/*
 		Linking (initially only)
@@ -69,15 +67,17 @@ public:
 	struct ModelInfo
 	{
 		QString m_name;
-		class AutomatableModel* m_model;
-		ModelInfo() { /* hopefully no one will use this */ } // TODO: remove?
-		ModelInfo(const QString& name, AutomatableModel* model)
-			: m_name(name), m_model(model) {}
+		class AutomatableModel *m_model;
+		ModelInfo()
+		{ /* hopefully no one will use this */
+		} // TODO: remove?
+		ModelInfo(const QString &name, AutomatableModel *model) :
+			m_name(name), m_model(model) {}
 	};
 
 	// TODO: refactor those 2
-	template<class Functor>
-	void foreach_model(const Functor& ftor)
+	template <class Functor>
+	void foreach_model(const Functor &ftor)
 	{
 		for (auto itr = m_models.begin(); itr != m_models.end(); ++itr)
 		{
@@ -85,8 +85,8 @@ public:
 		}
 	}
 
-	template<class Functor>
-	void foreach_model(const Functor& ftor) const
+	template <class Functor>
+	void foreach_model(const Functor &ftor) const
 	{
 		for (auto itr = m_models.cbegin(); itr != m_models.cend(); ++itr)
 		{
@@ -95,34 +95,34 @@ public:
 	}
 
 	std::size_t modelNum() const { return m_models.size(); }
-	bool containsModel(const QString& name) const;
+	bool containsModel(const QString &name) const;
 	void removeControl(AutomatableModel *);
 
 	/*
 		Load/Save
 	*/
-	void saveValues(class QDomDocument& doc, class QDomElement& that);
-	void loadValues(const class QDomElement& that);
+	void saveValues(class QDomDocument &doc, class QDomElement &that);
+	void loadValues(const class QDomElement &that);
 
 signals:
 	// NOTE: when separating core from UI, this will need to be removed
 	// (who would kno if the client is Qt, i.e. it may not have slots at all)
 	// In this case you'd e.g. send the UI something like
 	// "/added <model meta info>"
-	void modelAdded(AutomatableModel* added);
-	void modelRemoved(AutomatableModel* removed);
+	void modelAdded(AutomatableModel *added);
+	void modelRemoved(AutomatableModel *removed);
 
 public:
-	AutomatableModel* getModel(const std::string& s)
+	AutomatableModel *getModel(const std::string &s)
 	{
 		auto itr = m_models.find(s);
 		return (itr == m_models.end()) ? nullptr : itr->second.m_model;
 	}
 
 	//! Register a further model
-	void addModel(class AutomatableModel* model, const QString& name);
+	void addModel(class AutomatableModel *model, const QString &name);
 	//! Unregister a model, return true if a model was erased
-	bool eraseModel(const QString& name);
+	bool eraseModel(const QString &name);
 
 	//! Remove all models
 	void clearModels();
@@ -131,7 +131,6 @@ private:
 	//! models for the controls
 	std::map<std::string, ModelInfo> m_models;
 };
-
 
 /**
 	Container for a group of linked models
@@ -158,18 +157,17 @@ public:
 	/*
 		Load/Save
 	*/
-	void saveSettings(class QDomDocument& doc, class QDomElement& that);
-	void loadSettings(const class QDomElement& that);
+	void saveSettings(class QDomDocument &doc, class QDomElement &that);
+	void loadSettings(const class QDomElement &that);
 
 	/*
 		General
 	*/
 	//! Derived classes must return the group with index @p idx,
 	//! or nullptr if @p is out of range
-	virtual LinkedModelGroup* getGroup(std::size_t idx) = 0;
+	virtual LinkedModelGroup *getGroup(std::size_t idx) = 0;
 	//! @see getGroup
-	virtual const LinkedModelGroup* getGroup(std::size_t idx) const = 0;
+	virtual const LinkedModelGroup *getGroup(std::size_t idx) const = 0;
 };
-
 
 #endif // LINKEDMODELGROUPS_H

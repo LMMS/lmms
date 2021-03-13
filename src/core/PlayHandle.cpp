@@ -21,55 +21,52 @@
  * Boston, MA 02110-1301 USA.
  *
  */
- 
+
 #include "PlayHandle.h"
+
+#include <QDebug>
+#include <QtCore/QThread>
+#include <iterator>
+
 #include "BufferManager.h"
 #include "Engine.h"
 #include "Mixer.h"
 
-#include <QtCore/QThread>
-#include <QDebug>
-
-#include <iterator>
-
 PlayHandle::PlayHandle(const Type type, f_cnt_t offset) :
-		m_type(type),
-		m_offset(offset),
-		m_affinity(QThread::currentThread()),
-		m_playHandleBuffer(BufferManager::acquire()),
-		m_bufferReleased(true),
-		m_usesBuffer(true)
+	m_type(type),
+	m_offset(offset),
+	m_affinity(QThread::currentThread()),
+	m_playHandleBuffer(BufferManager::acquire()),
+	m_bufferReleased(true),
+	m_usesBuffer(true)
 {
 }
-
 
 PlayHandle::~PlayHandle()
 {
 	BufferManager::release(m_playHandleBuffer);
 }
 
-
 void PlayHandle::doProcessing()
 {
-	if( m_usesBuffer )
+	if (m_usesBuffer)
 	{
 		m_bufferReleased = false;
 		BufferManager::clear(m_playHandleBuffer, Engine::mixer()->framesPerPeriod());
-		play( buffer() );
+		play(buffer());
 	}
 	else
 	{
-		play( NULL );
+		play(NULL);
 	}
 }
-
 
 void PlayHandle::releaseBuffer()
 {
 	m_bufferReleased = true;
 }
 
-sampleFrame* PlayHandle::buffer()
+sampleFrame *PlayHandle::buffer()
 {
-	return m_bufferReleased ? nullptr : reinterpret_cast<sampleFrame*>(m_playHandleBuffer);
+	return m_bufferReleased ? nullptr : reinterpret_cast<sampleFrame *>(m_playHandleBuffer);
 };

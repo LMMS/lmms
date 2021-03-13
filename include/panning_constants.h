@@ -26,8 +26,8 @@
 #ifndef PANNING_CONSTANTS_H
 #define PANNING_CONSTANTS_H
 
-const panning_t PanningRight = ( 0 + 100 );
-const panning_t PanningLeft = - PanningRight;
+const panning_t PanningRight = (0 + 100);
+const panning_t PanningLeft = -PanningRight;
 const panning_t PanningCenter = 0;
 const panning_t DefaultPanning = PanningCenter;
 

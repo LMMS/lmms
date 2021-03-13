@@ -32,16 +32,15 @@
 #include "AutomatableModel.h"
 #include "embed.h"
 
-
 class LMMS_EXPORT ComboBoxModel : public IntModel
 {
 	Q_OBJECT
 	MODEL_IS_VISITABLE
 public:
-	ComboBoxModel( Model* parent = NULL,
-					const QString& displayName = QString(),
-					bool isDefaultConstructed = false ) :
-		IntModel( 0, 0, 0, parent, displayName, isDefaultConstructed )
+	ComboBoxModel(Model *parent = NULL,
+		const QString &displayName = QString(),
+		bool isDefaultConstructed = false) :
+		IntModel(0, 0, 0, parent, displayName, isDefaultConstructed)
 	{
 	}
 
@@ -50,30 +49,30 @@ public:
 		clear();
 	}
 
-	void addItem( QString item, std::unique_ptr<PixmapLoader> loader = nullptr );
+	void addItem(QString item, std::unique_ptr<PixmapLoader> loader = nullptr);
 
 	void clear();
 
-	int findText( const QString& txt ) const;
+	int findText(const QString &txt) const;
 
 	QString currentText() const
 	{
-		return ( size() > 0 && value() < size() ) ? m_items[value()].first : QString();
+		return (size() > 0 && value() < size()) ? m_items[value()].first : QString();
 	}
 
-	const PixmapLoader* currentData() const
+	const PixmapLoader *currentData() const
 	{
 		return m_items[value()].second.get();
 	}
 
-	const QString & itemText( int i ) const
+	const QString &itemText(int i) const
 	{
-		return m_items[qBound<int>( minValue(), i,  maxValue() )].first;
+		return m_items[qBound<int>(minValue(), i, maxValue())].first;
 	}
 
-	const PixmapLoader* itemPixmap( int i ) const
+	const PixmapLoader *itemPixmap(int i) const
 	{
-		return m_items[qBound<int>( minValue(), i, maxValue() )].second.get();
+		return m_items[qBound<int>(minValue(), i, maxValue())].second.get();
 	}
 
 	int size() const
@@ -81,13 +80,10 @@ public:
 		return m_items.size();
 	}
 
-
 private:
-	typedef std::pair<QString, std::unique_ptr<PixmapLoader> > Item;
+	typedef std::pair<QString, std::unique_ptr<PixmapLoader>> Item;
 
 	std::vector<Item> m_items;
-
-} ;
-
+};
 
 #endif

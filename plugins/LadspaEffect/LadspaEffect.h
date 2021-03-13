@@ -32,58 +32,53 @@
 #include "LadspaBase.h"
 #include "LadspaControls.h"
 
-
 typedef QVector<port_desc_t *> multi_proc_t;
 
 class LadspaEffect : public Effect
 {
 	Q_OBJECT
 public:
-	LadspaEffect( Model * _parent,
-			const Descriptor::SubPluginFeatures::Key * _key );
+	LadspaEffect(Model *_parent,
+		const Descriptor::SubPluginFeatures::Key *_key);
 	virtual ~LadspaEffect();
 
-	virtual bool processAudioBuffer( sampleFrame * _buf,
-							const fpp_t _frames );
-	
-	void setControl( int _control, LADSPA_Data _data );
+	virtual bool processAudioBuffer(sampleFrame *_buf,
+		const fpp_t _frames);
 
-	virtual EffectControls * controls()
+	void setControl(int _control, LADSPA_Data _data);
+
+	virtual EffectControls *controls()
 	{
 		return m_controls;
 	}
 
-	inline const multi_proc_t & getPortControls()
+	inline const multi_proc_t &getPortControls()
 	{
 		return m_portControls;
 	}
 
-
 private slots:
 	void changeSampleRate();
-
 
 private:
 	void pluginInstantiation();
 	void pluginDestruction();
 
-	static sample_rate_t maxSamplerate( const QString & _name );
-
+	static sample_rate_t maxSamplerate(const QString &_name);
 
 	QMutex m_pluginMutex;
-	LadspaControls * m_controls;
+	LadspaControls *m_controls;
 
 	sample_rate_t m_maxSampleRate;
 	ladspa_key_t m_key;
 	int m_portCount;
 	bool m_inPlaceBroken;
 
-	const LADSPA_Descriptor * m_descriptor;
+	const LADSPA_Descriptor *m_descriptor;
 	QVector<LADSPA_Handle> m_handles;
 
 	QVector<multi_proc_t> m_ports;
 	multi_proc_t m_portControls;
-
-} ;
+};
 
 #endif

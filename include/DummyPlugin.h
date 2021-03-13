@@ -29,12 +29,11 @@
 #include "Plugin.h"
 #include "PluginView.h"
 
-
 class DummyPlugin : public Plugin
 {
 public:
 	DummyPlugin() :
-		Plugin( NULL, NULL )
+		Plugin(NULL, NULL)
 	{
 	}
 
@@ -42,11 +41,11 @@ public:
 	{
 	}
 
-	void saveSettings( QDomDocument &, QDomElement & ) override
+	void saveSettings(QDomDocument &, QDomElement &) override
 	{
 	}
 
-	void loadSettings( const QDomElement & ) override
+	void loadSettings(const QDomElement &) override
 	{
 	}
 
@@ -55,14 +54,11 @@ public:
 		return "DummyPlugin";
 	}
 
-
 protected:
-	PluginView * instantiateView( QWidget * _parent ) override
+	PluginView *instantiateView(QWidget *_parent) override
 	{
-		return new PluginView( this, _parent );
+		return new PluginView(this, _parent);
 	}
-
-} ;
-
+};
 
 #endif

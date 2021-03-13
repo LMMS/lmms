@@ -21,23 +21,22 @@
  * Boston, MA 02110-1301 USA.
  *
  */
- 
 
 #include "ToolButton.h"
+
 #include "ToolTip.h"
 
-
-ToolButton::ToolButton( const QPixmap & _pixmap, const QString & _tooltip,
-			QObject * _receiver, const char * _slot,
-			QWidget * _parent ) :
-	QToolButton( _parent )
+ToolButton::ToolButton(const QPixmap &_pixmap, const QString &_tooltip,
+	QObject *_receiver, const char *_slot,
+	QWidget *_parent) :
+	QToolButton(_parent)
 {
-	setAutoFillBackground( false );
+	setAutoFillBackground(false);
 
-	if( _receiver != NULL && _slot != NULL )
+	if (_receiver != NULL && _slot != NULL)
 	{
-		connect( this, SIGNAL( clicked() ), _receiver, _slot );
+		connect(this, SIGNAL(clicked()), _receiver, _slot);
 	}
-	ToolTip::add( this, _tooltip );
-	setIcon( _pixmap );
+	ToolTip::add(this, _tooltip);
+	setIcon(_pixmap);
 }

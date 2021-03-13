@@ -25,29 +25,33 @@
 Gb_Apu_Buffer::Gb_Apu_Buffer() {}
 Gb_Apu_Buffer::~Gb_Apu_Buffer() {}
 
-void Gb_Apu_Buffer::end_frame(blip_time_t end_time) {
+void Gb_Apu_Buffer::end_frame(blip_time_t end_time)
+{
 	Gb_Apu::end_frame(end_time);
 	m_buf.end_frame(end_time);
 }
 
 // Sets specified sample rate and clock rate in Multi_Buffer
-blargg_err_t Gb_Apu_Buffer::set_sample_rate(long sample_rate, long clock_rate) {
+blargg_err_t Gb_Apu_Buffer::set_sample_rate(long sample_rate, long clock_rate)
+{
 	Gb_Apu_Buffer::output(m_buf.center(), m_buf.left(), m_buf.right());
 	m_buf.clock_rate(clock_rate);
 	return m_buf.set_sample_rate(sample_rate);
 }
 
 // Wrap Multi_Buffer::samples_avail()
-long Gb_Apu_Buffer::samples_avail() const {
+long Gb_Apu_Buffer::samples_avail() const
+{
 	return m_buf.samples_avail();
 }
 
 // Wrap Multi_Buffer::read_samples(...)
-long Gb_Apu_Buffer::read_samples(sample_t* out, long count) {
+long Gb_Apu_Buffer::read_samples(sample_t *out, long count)
+{
 	return m_buf.read_samples(out, count);
 }
 
-void Gb_Apu_Buffer::bass_freq(int freq) {
+void Gb_Apu_Buffer::bass_freq(int freq)
+{
 	m_buf.bass_freq(freq);
 }
-

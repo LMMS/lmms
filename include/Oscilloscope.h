@@ -22,55 +22,51 @@
  *
  */
 
-
 #ifndef _OSCILLOSCOPE
 #define _OSCILLOSCOPE
 
-#include <QWidget>
 #include <QPixmap>
+#include <QWidget>
 
 #include "lmms_basics.h"
-
 
 class Oscilloscope : public QWidget
 {
 	Q_OBJECT
 public:
-	Q_PROPERTY( QColor normalColor READ normalColor WRITE setNormalColor )
-	Q_PROPERTY( QColor clippingColor READ clippingColor WRITE setClippingColor )
+	Q_PROPERTY(QColor normalColor READ normalColor WRITE setNormalColor)
+	Q_PROPERTY(QColor clippingColor READ clippingColor WRITE setClippingColor)
 
-	Oscilloscope( QWidget * _parent );
+	Oscilloscope(QWidget *_parent);
 	virtual ~Oscilloscope();
 
-	void setActive( bool _active );
+	void setActive(bool _active);
 
-	QColor const & normalColor() const;
-	void setNormalColor(QColor const & normalColor);
+	QColor const &normalColor() const;
+	void setNormalColor(QColor const &normalColor);
 
-	QColor const & clippingColor() const;
-	void setClippingColor(QColor const & clippingColor);
-
+	QColor const &clippingColor() const;
+	void setClippingColor(QColor const &clippingColor);
 
 protected:
-	void paintEvent( QPaintEvent * _pe ) override;
-	void mousePressEvent( QMouseEvent * _me ) override;
-
+	void paintEvent(QPaintEvent *_pe) override;
+	void mousePressEvent(QMouseEvent *_me) override;
 
 protected slots:
-	void updateAudioBuffer( const surroundSampleFrame * buffer );
+	void updateAudioBuffer(const surroundSampleFrame *buffer);
 
 private:
-	QColor const & determineLineColor(float level) const;
+	QColor const &determineLineColor(float level) const;
 
 private:
 	QPixmap m_background;
-	QPointF * m_points;
+	QPointF *m_points;
 
-	sampleFrame * m_buffer;
+	sampleFrame *m_buffer;
 	bool m_active;
 
 	QColor m_normalColor;
 	QColor m_clippingColor;
-} ;
+};
 
 #endif

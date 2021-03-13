@@ -27,10 +27,9 @@
 
 #include "EffectControlDialog.h"
 #include "SaControls.h"
-#include "SaSpectrumView.h"
 #include "SaProcessor.h"
+#include "SaSpectrumView.h"
 #include "SaWaterfallView.h"
-
 
 //! Top-level widget holding the configuration GUI and spectrum displays
 class SaControlsDialog : public EffectControlDialog
@@ -40,7 +39,7 @@ public:
 	explicit SaControlsDialog(SaControls *controls, SaProcessor *processor);
 	virtual ~SaControlsDialog() {}
 
-	bool isResizable() const override {return true;}
+	bool isResizable() const override { return true; }
 	QSize sizeHint() const override;
 
 private:

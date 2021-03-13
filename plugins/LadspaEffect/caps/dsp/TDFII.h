@@ -30,49 +30,50 @@
 #ifndef _DSP_TDFII_H_
 #define _DSP_TDFII_H_
 
-namespace DSP {
+namespace DSP
+{
 
 // ORDER is the highest power of s in the transfer function
 template <int Order>
 class TDFII
 {
-	public:
-		double a[Order + 1];
-		double b[Order + 1];
-		double h[Order + 1];
-	
-		void reset() 
-			{
-				for (int i = 0; i <= Order; ++i)
-					h[i] = 0;   // zero state
-			}
+public:
+	double a[Order + 1];
+	double b[Order + 1];
+	double h[Order + 1];
 
-		void init (double fs)
-			{
-				reset();
-				clear();
-			}
+	void reset()
+	{
+		for (int i = 0; i <= Order; ++i)
+			h[i] = 0; // zero state
+	}
 
-		void clear() 
-			{
-				for (int i=0; i<= Order; i++) 
-						a[i] = b[i] = 1;
-			}
+	void init(double fs)
+	{
+		reset();
+		clear();
+	}
 
-		/* per-band recursion:
+	void clear()
+	{
+		for (int i = 0; i <= Order; i++)
+			a[i] = b[i] = 1;
+	}
+
+	/* per-band recursion:
 		 * 	y = 2 * (a * (x - x[-2]) + c * y[-1] - b * y[-2]) 
 		 */
-		sample_t process (sample_t s)
-			{
-				double y = h[0] + b[0] * s;
+	sample_t process(sample_t s)
+	{
+		double y = h[0] + b[0] * s;
 
-				for (int i = 1; i < Order; ++i) 
-						h[i - 1] = h[i] + b[i] * s - a[i] * y;
+		for (int i = 1; i < Order; ++i)
+			h[i - 1] = h[i] + b[i] * s - a[i] * y;
 
-				h[Order - 1] = b[Order] * s - a[Order] * y;
+		h[Order - 1] = b[Order] * s - a[Order] * y;
 
-				return (sample_t) y;
-			}
+		return (sample_t)y;
+	}
 };
 
 } /* namespace DSP */

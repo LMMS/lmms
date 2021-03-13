@@ -37,14 +37,14 @@ class VstPlugin;
 class VstEffect : public Effect
 {
 public:
-	VstEffect( Model * _parent,
-			const Descriptor::SubPluginFeatures::Key * _key );
+	VstEffect(Model *_parent,
+		const Descriptor::SubPluginFeatures::Key *_key);
 	virtual ~VstEffect();
 
-	virtual bool processAudioBuffer( sampleFrame * _buf,
-							const fpp_t _frames );
+	virtual bool processAudioBuffer(sampleFrame *_buf,
+		const fpp_t _frames);
 
-	virtual EffectControls * controls()
+	virtual EffectControls *controls()
 	{
 		return &m_vstControls;
 	}
@@ -54,9 +54,8 @@ public:
 		return m_plugin->name();
 	}
 
-
 private:
-	void openPlugin( const QString & _plugin );
+	void openPlugin(const QString &_plugin);
 	void closePlugin();
 
 	QSharedPointer<VstPlugin> m_plugin;
@@ -65,13 +64,9 @@ private:
 
 	VstEffectControls m_vstControls;
 
-
 	friend class VstEffectControls;
 	friend class VstEffectControlDialog;
 	friend class manageVSTEffectView;
-
-} ;
-
-
+};
 
 #endif

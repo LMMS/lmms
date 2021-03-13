@@ -37,7 +37,7 @@ public:
 	explicit VecControlsDialog(VecControls *controls);
 	virtual ~VecControlsDialog() {}
 
-	bool isResizable() const override {return true;}
+	bool isResizable() const override { return true; }
 	QSize sizeHint() const override;
 
 private:

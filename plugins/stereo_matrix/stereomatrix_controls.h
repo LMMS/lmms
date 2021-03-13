@@ -26,8 +26,8 @@
 #define _STEREO_MATRIX_CONTROLS_H
 
 #include "EffectControls.h"
-#include "stereomatrix_control_dialog.h"
 #include "Knob.h"
+#include "stereomatrix_control_dialog.h"
 
 class stereoMatrixEffect;
 
@@ -35,45 +35,41 @@ class stereoMatrixControls : public EffectControls
 {
 	Q_OBJECT
 public:
-	stereoMatrixControls( stereoMatrixEffect( * _eff ) ); 
+	stereoMatrixControls(stereoMatrixEffect(*_eff));
 	virtual ~stereoMatrixControls()
 	{
 	}
 
-	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
-	virtual void loadSettings( const QDomElement & _this );
+	virtual void saveSettings(QDomDocument &_doc, QDomElement &_parent);
+	virtual void loadSettings(const QDomElement &_this);
 	inline virtual QString nodeName() const
 	{
-		return( "stereomatrixcontrols" );
+		return ("stereomatrixcontrols");
 	}
 
 	virtual int controlCount()
 	{
-		return( 1 );
-	}
-	
-	virtual EffectControlDialog * createView()
-	{
-		return new stereoMatrixControlDialog( this );
+		return (1);
 	}
 
+	virtual EffectControlDialog *createView()
+	{
+		return new stereoMatrixControlDialog(this);
+	}
 
 private slots:
 	void changeMatrix();
 
-
 private:
-	stereoMatrixEffect * m_effect;
+	stereoMatrixEffect *m_effect;
 
 	FloatModel m_llModel;
 	FloatModel m_lrModel;
 	FloatModel m_rlModel;
 	FloatModel m_rrModel;
-	
+
 	friend class stereoMatrixControlDialog;
 	friend class stereoMatrixEffect;
+};
 
-} ;
-
-
-#endif 
+#endif

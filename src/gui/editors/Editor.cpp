@@ -24,16 +24,14 @@
 
 #include "Editor.h"
 
-#include "Song.h"
-
-#include "MainWindow.h"
-#include "embed.h"
-
 #include <QAction>
+#include <QCloseEvent>
 #include <QMdiArea>
 #include <QShortcut>
-#include <QCloseEvent>
 
+#include "MainWindow.h"
+#include "Song.h"
+#include "embed.h"
 
 void Editor::setPauseIcon(bool displayPauseIcon)
 {
@@ -44,17 +42,17 @@ void Editor::setPauseIcon(bool displayPauseIcon)
 		m_playAction->setIcon(embed::getIconPixmap("play"));
 }
 
-DropToolBar * Editor::addDropToolBarToTop(QString const & windowTitle)
+DropToolBar *Editor::addDropToolBarToTop(QString const &windowTitle)
 {
 	return addDropToolBar(Qt::TopToolBarArea, windowTitle);
 }
 
-DropToolBar * Editor::addDropToolBar(Qt::ToolBarArea whereToAdd, QString const & windowTitle)
+DropToolBar *Editor::addDropToolBar(Qt::ToolBarArea whereToAdd, QString const &windowTitle)
 {
 	return addDropToolBar(this, whereToAdd, windowTitle);
 }
 
-DropToolBar * Editor::addDropToolBar(QWidget * parent, Qt::ToolBarArea whereToAdd, QString const & windowTitle)
+DropToolBar *Editor::addDropToolBar(QWidget *parent, Qt::ToolBarArea whereToAdd, QString const &windowTitle)
 {
 	DropToolBar *toolBar = new DropToolBar(parent);
 	addToolBar(whereToAdd, toolBar);
@@ -94,7 +92,7 @@ Editor::Editor(bool record, bool stepRecord) :
 {
 	m_toolBar = addDropToolBarToTop(tr("Transport controls"));
 
-	auto addButton = [this](QAction* action, QString objectName) {
+	auto addButton = [this](QAction *action, QString objectName) {
 		m_toolBar->addAction(action);
 		m_toolBar->widgetForAction(action)->setObjectName(objectName);
 	};
@@ -124,7 +122,7 @@ Editor::Editor(bool record, bool stepRecord) :
 		addButton(m_recordAction, "recordButton");
 		addButton(m_recordAccompanyAction, "recordAccompanyButton");
 	}
-	if(stepRecord)
+	if (stepRecord)
 	{
 		addButton(m_toggleStepRecordingAction, "stepRecordButton");
 	}
@@ -133,7 +131,6 @@ Editor::Editor(bool record, bool stepRecord) :
 
 Editor::~Editor()
 {
-
 }
 
 QAction *Editor::playAction() const
@@ -141,9 +138,9 @@ QAction *Editor::playAction() const
 	return m_playAction;
 }
 
-void Editor::closeEvent( QCloseEvent * _ce )
+void Editor::closeEvent(QCloseEvent *_ce)
 {
-	if( parentWidget() )
+	if (parentWidget())
 	{
 		parentWidget()->hide();
 	}
@@ -152,22 +149,20 @@ void Editor::closeEvent( QCloseEvent * _ce )
 		hide();
 	}
 	_ce->ignore();
- }
+}
 
-DropToolBar::DropToolBar(QWidget* parent) : QToolBar(parent)
+DropToolBar::DropToolBar(QWidget *parent) :
+	QToolBar(parent)
 {
 	setAcceptDrops(true);
 }
 
-void DropToolBar::dragEnterEvent(QDragEnterEvent* event)
+void DropToolBar::dragEnterEvent(QDragEnterEvent *event)
 {
 	dragEntered(event);
 }
 
-void DropToolBar::dropEvent(QDropEvent* event)
+void DropToolBar::dropEvent(QDropEvent *event)
 {
 	dropped(event);
 }
-
-
-

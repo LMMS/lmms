@@ -25,21 +25,18 @@
 #ifndef TRACK_H
 #define TRACK_H
 
-
-#include <QtCore/QVector>
 #include <QColor>
+#include <QtCore/QVector>
 
 #include "AutomatableModel.h"
 #include "JournallingObject.h"
 #include "lmms_basics.h"
-
 
 class TimePos;
 class TrackContainer;
 class TrackContainerView;
 class TrackContentObject;
 class TrackView;
-
 
 /*! The minimum track height in pixels
  *
@@ -51,14 +48,14 @@ const int DEFAULT_TRACK_HEIGHT = 32;
 
 char const *const FILENAME_FILTER = "[\\0000-\x1f\"*/:<>?\\\\|\x7f]";
 
-
 //! Base-class for all tracks
 class LMMS_EXPORT Track : public Model, public JournallingObject
 {
 	Q_OBJECT
 	MM_OPERATORS
-	mapPropertyFromModel(bool,isMuted,setMuted,m_mutedModel);
-	mapPropertyFromModel(bool,isSolo,setSolo,m_soloModel);
+	mapPropertyFromModel(bool, isMuted, setMuted, m_mutedModel);
+	mapPropertyFromModel(bool, isSolo, setSolo, m_soloModel);
+
 public:
 	typedef QVector<TrackContentObject *> tcoVector;
 
@@ -72,16 +69,15 @@ public:
 		AutomationTrack,
 		HiddenAutomationTrack,
 		NumTrackTypes
-	} ;
+	};
 
-	Track( TrackTypes type, TrackContainer * tc );
+	Track(TrackTypes type, TrackContainer *tc);
 	virtual ~Track();
 
-	static Track * create( TrackTypes tt, TrackContainer * tc );
-	static Track * create( const QDomElement & element,
-							TrackContainer * tc );
-	Track * clone();
-
+	static Track *create(TrackTypes tt, TrackContainer *tc);
+	static Track *create(const QDomElement &element,
+		TrackContainer *tc);
+	Track *clone();
 
 	// pure virtual functions
 	TrackTypes type() const
@@ -89,20 +85,18 @@ public:
 		return m_type;
 	}
 
-	virtual bool play( const TimePos & start, const fpp_t frames,
-						const f_cnt_t frameBase, int tcoNum = -1 ) = 0;
+	virtual bool play(const TimePos &start, const fpp_t frames,
+		const f_cnt_t frameBase, int tcoNum = -1) = 0;
 
+	virtual TrackView *createView(TrackContainerView *view) = 0;
+	virtual TrackContentObject *createTCO(const TimePos &pos) = 0;
 
-	virtual TrackView * createView( TrackContainerView * view ) = 0;
-	virtual TrackContentObject * createTCO( const TimePos & pos ) = 0;
+	virtual void saveTrackSpecificSettings(QDomDocument &doc,
+		QDomElement &parent) = 0;
+	virtual void loadTrackSpecificSettings(const QDomElement &element) = 0;
 
-	virtual void saveTrackSpecificSettings( QDomDocument & doc,
-						QDomElement & parent ) = 0;
-	virtual void loadTrackSpecificSettings( const QDomElement & element ) = 0;
-
-
-	void saveSettings( QDomDocument & doc, QDomElement & element ) override;
-	void loadSettings( const QDomElement & element ) override;
+	void saveSettings(QDomDocument &doc, QDomElement &element) override;
+	void loadSettings(const QDomElement &element) override;
 
 	void setSimpleSerializing()
 	{
@@ -110,39 +104,37 @@ public:
 	}
 
 	// -- for usage by TrackContentObject only ---------------
-	TrackContentObject * addTCO( TrackContentObject * tco );
-	void removeTCO( TrackContentObject * tco );
+	TrackContentObject *addTCO(TrackContentObject *tco);
+	void removeTCO(TrackContentObject *tco);
 	// -------------------------------------------------------
 	void deleteTCOs();
 
 	int numOfTCOs();
-	TrackContentObject * getTCO( int tcoNum );
-	int getTCONum(const TrackContentObject* tco );
+	TrackContentObject *getTCO(int tcoNum);
+	int getTCONum(const TrackContentObject *tco);
 
-	const tcoVector & getTCOs() const
+	const tcoVector &getTCOs() const
 	{
 		return m_trackContentObjects;
 	}
-	void getTCOsInRange( tcoVector & tcoV, const TimePos & start,
-							const TimePos & end );
-	void swapPositionOfTCOs( int tcoNum1, int tcoNum2 );
+	void getTCOsInRange(tcoVector &tcoV, const TimePos &start,
+		const TimePos &end);
+	void swapPositionOfTCOs(int tcoNum1, int tcoNum2);
 
-	void createTCOsForBB( int bb );
+	void createTCOsForBB(int bb);
 
-
-	void insertBar( const TimePos & pos );
-	void removeBar( const TimePos & pos );
+	void insertBar(const TimePos &pos);
+	void removeBar(const TimePos &pos);
 
 	bar_t length() const;
 
-
-	inline TrackContainer* trackContainer() const
+	inline TrackContainer *trackContainer() const
 	{
 		return m_trackContainer;
 	}
 
 	// name-stuff
-	virtual const QString & name() const
+	virtual const QString &name() const
 	{
 		return m_name;
 	}
@@ -160,7 +152,7 @@ public:
 			? m_height
 			: DEFAULT_TRACK_HEIGHT;
 	}
-	inline void setHeight( int height )
+	inline void setHeight(int height)
 	{
 		m_height = height;
 	}
@@ -177,7 +169,7 @@ public:
 	{
 		return m_processingLock.tryLock();
 	}
-	
+
 	QColor color()
 	{
 		return m_color;
@@ -186,11 +178,11 @@ public:
 	{
 		return m_hasColor;
 	}
-	
-	BoolModel* getMutedModel();
+
+	BoolModel *getMutedModel();
 
 public slots:
-	virtual void setName( const QString & newName )
+	virtual void setName(const QString &newName)
 	{
 		m_name = newName;
 		emit nameChanged();
@@ -198,17 +190,18 @@ public slots:
 
 	void toggleSolo();
 
-	void trackColorChanged( QColor & c );
+	void trackColorChanged(QColor &c);
 	void trackColorReset();
 
 private:
-	TrackContainer* m_trackContainer;
+	TrackContainer *m_trackContainer;
 	TrackTypes m_type;
 	QString m_name;
 	int m_height;
 
 protected:
 	BoolModel m_mutedModel;
+
 private:
 	BoolModel m_soloModel;
 	bool m_mutedBeforeSolo;
@@ -218,20 +211,16 @@ private:
 	tcoVector m_trackContentObjects;
 
 	QMutex m_processingLock;
-	
+
 	QColor m_color;
 	bool m_hasColor;
 
 	friend class TrackView;
 
-
 signals:
 	void destroyedTrack();
 	void nameChanged();
-	void trackContentObjectAdded( TrackContentObject * );
-
-} ;
-
-
+	void trackContentObjectAdded(TrackContentObject *);
+};
 
 #endif

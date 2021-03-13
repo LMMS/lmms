@@ -28,71 +28,73 @@
 #ifndef _TONESTACK_H_
 #define _TONESTACK_H_
 
+#include "dsp/ToneStack.h"
 #include "dsp/util.h"
 #include "dsp/windows.h"
-#include "dsp/ToneStack.h"
 
-class ToneStack 
-: public Plugin
+class ToneStack
+	: public Plugin
 {
-	private:
-		DSP::ToneStack tonestack;
+private:
+	DSP::ToneStack tonestack;
 
-		template <sample_func_t F>
-			void one_cycle (int frames);
+	template <sample_func_t F>
+	void one_cycle(int frames);
 
-	public:
-		static PortInfo port_info [];
+public:
+	static PortInfo port_info[];
 
-		void init()
-			{ 
-				tonestack.init (fs);
-			}
+	void init()
+	{
+		tonestack.init(fs);
+	}
 
-		void activate();
+	void activate();
 
-		void run (int n)
-			{
-				one_cycle<store_func> (n);
-			}
-		
-		void run_adding (int n)
-			{
-				one_cycle<adding_func> (n);
-			}
+	void run(int n)
+	{
+		one_cycle<store_func>(n);
+	}
+
+	void run_adding(int n)
+	{
+		one_cycle<adding_func>(n);
+	}
 };
 
 /* /////////////////////////////////////////////////////////////////////// */
 
 class ToneStackLT
-: public Plugin
+	: public Plugin
 {
-	private:
-		DSP::ToneStackLT tonestack;
+private:
+	DSP::ToneStackLT tonestack;
 
-		template <sample_func_t F>
-			void one_cycle (int frames);
+	template <sample_func_t F>
+	void one_cycle(int frames);
 
-	public:
-		static PortInfo port_info [];
+public:
+	static PortInfo port_info[];
 
-		void init()
-			{ 
-				tonestack.init (fs);
-			}
+	void init()
+	{
+		tonestack.init(fs);
+	}
 
-		void activate()
-			{ tonestack.activate (ports + 1); }
+	void activate()
+	{
+		tonestack.activate(ports + 1);
+	}
 
-		void run (int n)
-			{
-				one_cycle<store_func> (n);
-			}
-		
-		void run_adding (int n)
-			{
-				one_cycle<adding_func> (n);
-			}
+	void run(int n)
+	{
+		one_cycle<store_func>(n);
+	}
+
+	void run_adding(int n)
+	{
+		one_cycle<adding_func>(n);
+	}
 };
 
 #endif /* _TONESTACK_H_ */

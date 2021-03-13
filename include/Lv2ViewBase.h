@@ -29,17 +29,15 @@
 
 #ifdef LMMS_HAVE_LV2
 
-
 #include <QString>
 #include <QVector>
 
 #include "LinkedModelGroupViews.h"
-#include "lmms_export.h"
 #include "Lv2Basics.h"
+#include "lmms_export.h"
 
 class Lv2Proc;
 class Lv2ControlBase;
-
 
 //! View for one processor, Lv2ViewBase contains 2 of those for mono plugins
 class Lv2ViewProc : public LinkedModelGroupView
@@ -52,7 +50,6 @@ public:
 private:
 	static AutoLilvNode uri(const char *uriStr);
 };
-
 
 //! Base class for view for one Lv2 plugin
 class LMMS_EXPORT Lv2ViewBase : public LinkedModelGroupsView
@@ -72,7 +69,7 @@ protected:
 
 	// to be called by child virtuals
 	//! Reconnect models if model changed
-	void modelChanged(Lv2ControlBase* ctrlBase);
+	void modelChanged(Lv2ControlBase *ctrlBase);
 
 private:
 	enum Rows
@@ -83,16 +80,15 @@ private:
 	};
 
 	static AutoLilvNode uri(const char *uriStr);
-	LinkedModelGroupView* getGroupView() override { return m_procView; }
+	LinkedModelGroupView *getGroupView() override { return m_procView; }
 
-	Lv2ViewProc* m_procView;
+	Lv2ViewProc *m_procView;
 
 	//! Numbers of controls per row; must be multiple of 2 for mono effects
 	const int m_colNum = 6;
-	class QMdiSubWindow* m_helpWindow = nullptr;
+	class QMdiSubWindow *m_helpWindow = nullptr;
 	class LedCheckBox *m_multiChannelLink;
 };
-
 
 #endif // LMMS_HAVE_LV2
 #endif // LV2VIEWBASE_H

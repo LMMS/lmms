@@ -22,16 +22,13 @@
  *
  */
 
-
 #ifndef COMPRESSOR_H
 #define COMPRESSOR_H
 
 #include "CompressorControls.h"
-
 #include "Effect.h"
-#include "ValueBuffer.h"
 #include "RmsHelper.h"
-
+#include "ValueBuffer.h"
 
 constexpr float COMP_LOG = -2.2;
 
@@ -39,11 +36,11 @@ class CompressorEffect : public Effect
 {
 	Q_OBJECT
 public:
-	CompressorEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* key);
+	CompressorEffect(Model *parent, const Descriptor::SubPluginFeatures::Key *key);
 	~CompressorEffect() override;
-	bool processAudioBuffer(sampleFrame* buf, const fpp_t frames) override;
+	bool processAudioBuffer(sampleFrame *buf, const fpp_t frames) override;
 
-	EffectControls* controls() override
+	EffectControls *controls() override
 	{
 		return &m_compressorControls;
 	}
@@ -77,7 +74,14 @@ private:
 	inline int realmod(int k, int n);
 	inline float realfmod(float k, float n);
 
-	enum StereoLinkModes { Unlinked, Maximum, Average, Minimum, Blend };
+	enum StereoLinkModes
+	{
+		Unlinked,
+		Maximum,
+		Average,
+		Minimum,
+		Blend
+	};
 
 	std::vector<float> m_preLookaheadBuf[2];
 	int m_preLookaheadBufLoc[2] = {0};
@@ -112,7 +116,7 @@ private:
 	sampleFrame m_maxLookaheadVal;
 
 	int m_maxLookaheadTimer[2] = {1, 1};
-	
+
 	float m_rmsTimeConst;
 	float m_rmsVal[2] = {0, 0};
 
@@ -148,6 +152,6 @@ private:
 
 	friend class CompressorControls;
 	friend class CompressorControlDialog;
-} ;
+};
 
 #endif

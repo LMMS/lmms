@@ -30,56 +30,43 @@
 #include "InstrumentTrack.h"
 #include "lmms_constants.h"
 
-
-Instrument::Instrument(InstrumentTrack * _instrument_track,
-			const Descriptor * _descriptor,
-			const Descriptor::SubPluginFeatures::Key *key) :
-	Plugin(_descriptor, NULL/* _instrument_track*/, key),
-	m_instrumentTrack( _instrument_track )
+Instrument::Instrument(InstrumentTrack *_instrument_track,
+	const Descriptor *_descriptor,
+	const Descriptor::SubPluginFeatures::Key *key) :
+	Plugin(_descriptor, NULL /* _instrument_track*/, key),
+	m_instrumentTrack(_instrument_track)
 {
 }
 
-void Instrument::play( sampleFrame * )
+void Instrument::play(sampleFrame *)
 {
 }
 
-
-
-
-void Instrument::deleteNotePluginData( NotePlayHandle * )
+void Instrument::deleteNotePluginData(NotePlayHandle *)
 {
 }
 
-
-
-
-f_cnt_t Instrument::beatLen( NotePlayHandle * ) const
+f_cnt_t Instrument::beatLen(NotePlayHandle *) const
 {
-	return( 0 );
+	return (0);
 }
-
-
-
 
 Instrument *Instrument::instantiate(const QString &_plugin_name,
 	InstrumentTrack *_instrument_track, const Descriptor::SubPluginFeatures::Key *key, bool keyFromDnd)
 {
-	if(keyFromDnd)
+	if (keyFromDnd)
 		Q_ASSERT(!key);
 	// copy from above // TODO! common cleaner func
-	Plugin * p = Plugin::instantiateWithKey(_plugin_name, _instrument_track, key, keyFromDnd);
-	if(dynamic_cast<Instrument *>(p))
+	Plugin *p = Plugin::instantiateWithKey(_plugin_name, _instrument_track, key, keyFromDnd);
+	if (dynamic_cast<Instrument *>(p))
 		return dynamic_cast<Instrument *>(p);
 	delete p;
-	return( new DummyInstrument( _instrument_track ) );
+	return (new DummyInstrument(_instrument_track));
 }
 
-
-
-
-bool Instrument::isFromTrack( const Track * _track ) const
+bool Instrument::isFromTrack(const Track *_track) const
 {
-	return( m_instrumentTrack == _track );
+	return (m_instrumentTrack == _track);
 }
 
 // helper function for Instrument::applyFadeIn
@@ -97,7 +84,7 @@ static int countZeroCrossings(sampleFrame *buf, fpp_t start, fpp_t frames)
 		{
 			// we don't want to count [-1, 0, 1] as two crossings
 			if ((buf[f - 1][ch] <= 0.0 && buf[f][ch] > 0.0) ||
-					(buf[f - 1][ch] >= 0.0 && buf[f][ch] < 0.0))
+				(buf[f - 1][ch] >= 0.0 && buf[f][ch] < 0.0))
 			{
 				++zeroCrossings[ch];
 				if (zeroCrossings[ch] > maxZeroCrossings)
@@ -118,11 +105,10 @@ fpp_t getFadeInLength(float maxLength, fpp_t frames, int zeroCrossings)
 	// Length is inversely proportional to the max of zeroCrossings,
 	// because for low frequencies, we need a longer fade in to
 	// prevent clicking.
-	return (fpp_t) (maxLength  / ((float) zeroCrossings / ((float) frames / 128.0f) + 1.0f));
+	return (fpp_t)(maxLength / ((float)zeroCrossings / ((float)frames / 128.0f) + 1.0f));
 }
 
-
-void Instrument::applyFadeIn(sampleFrame * buf, NotePlayHandle * n)
+void Instrument::applyFadeIn(sampleFrame *buf, NotePlayHandle *n)
 {
 	const static float MAX_FADE_IN_LENGTH = 85.0;
 	f_cnt_t total = n->totalFramesPlayed();
@@ -145,7 +131,7 @@ void Instrument::applyFadeIn(sampleFrame * buf, NotePlayHandle * n)
 		{
 			for (ch_cnt_t ch = 0; ch < DEFAULT_CHANNELS; ++ch)
 			{
-				buf[offset + f][ch] *= 0.5 - 0.5 * cosf(F_PI * (float) f / (float) n->m_fadeInLength);
+				buf[offset + f][ch] *= 0.5 - 0.5 * cosf(F_PI * (float)f / (float)n->m_fadeInLength);
 			}
 		}
 	}
@@ -160,8 +146,8 @@ void Instrument::applyFadeIn(sampleFrame * buf, NotePlayHandle * n)
 		{
 			for (ch_cnt_t ch = 0; ch < DEFAULT_CHANNELS; ++ch)
 			{
-				float currentLength = n->m_fadeInLength * (1.0f - (float) f / frames) + new_length * ((float) f / frames);
-				buf[f][ch] *= 0.5 - 0.5 * cosf(F_PI * (float) (total + f) / currentLength);
+				float currentLength = n->m_fadeInLength * (1.0f - (float)f / frames) + new_length * ((float)f / frames);
+				buf[f][ch] *= 0.5 - 0.5 * cosf(F_PI * (float)(total + f) / currentLength);
 				if (total + f >= currentLength)
 				{
 					n->m_fadeInLength = currentLength;
@@ -173,29 +159,27 @@ void Instrument::applyFadeIn(sampleFrame * buf, NotePlayHandle * n)
 	}
 }
 
-void Instrument::applyRelease( sampleFrame * buf, const NotePlayHandle * _n )
+void Instrument::applyRelease(sampleFrame *buf, const NotePlayHandle *_n)
 {
 	const fpp_t frames = _n->framesLeftForCurrentPeriod();
 	const fpp_t fpp = Engine::mixer()->framesPerPeriod();
 	const f_cnt_t fl = _n->framesLeft();
-	if( fl <= desiredReleaseFrames()+fpp )
+	if (fl <= desiredReleaseFrames() + fpp)
 	{
-		for( fpp_t f = (fpp_t)( ( fl > desiredReleaseFrames() ) ?
-				( qMax( fpp - desiredReleaseFrames(), 0 ) +
-					fl % fpp ) : 0 ); f < frames; ++f )
+		for (fpp_t f = (fpp_t)((fl > desiredReleaseFrames()) ? (qMax(fpp - desiredReleaseFrames(), 0) +
+																   fl % fpp)
+															 : 0);
+			 f < frames; ++f)
 		{
-			const float fac = (float)( fl-f-1 ) /
-							desiredReleaseFrames();
-			for( ch_cnt_t ch = 0; ch < DEFAULT_CHANNELS; ++ch )
+			const float fac = (float)(fl - f - 1) /
+				desiredReleaseFrames();
+			for (ch_cnt_t ch = 0; ch < DEFAULT_CHANNELS; ++ch)
 			{
 				buf[f][ch] *= fac;
 			}
 		}
 	}
 }
-
-
-
 
 QString Instrument::fullDisplayName() const
 {

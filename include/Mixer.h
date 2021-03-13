@@ -31,40 +31,33 @@
 #include <QtCore/QWaitCondition>
 #include <samplerate.h>
 
-
-#include "lmms_basics.h"
-#include "LocklessList.h"
-#include "Note.h"
 #include "FifoBuffer.h"
+#include "LocklessList.h"
 #include "MixerProfiler.h"
-
+#include "Note.h"
+#include "lmms_basics.h"
 
 class AudioDevice;
 class MidiClient;
 class AudioPort;
 
-
 const fpp_t MINIMUM_BUFFER_SIZE = 32;
 const fpp_t DEFAULT_BUFFER_SIZE = 256;
 
-const int BYTES_PER_SAMPLE = sizeof( sample_t );
-const int BYTES_PER_INT_SAMPLE = sizeof( int_sample_t );
-const int BYTES_PER_FRAME = sizeof( sampleFrame );
-const int BYTES_PER_SURROUND_FRAME = sizeof( surroundSampleFrame );
+const int BYTES_PER_SAMPLE = sizeof(sample_t);
+const int BYTES_PER_INT_SAMPLE = sizeof(int_sample_t);
+const int BYTES_PER_FRAME = sizeof(sampleFrame);
+const int BYTES_PER_SURROUND_FRAME = sizeof(surroundSampleFrame);
 
 const float OUTPUT_SAMPLE_MULTIPLIER = 32767.0f;
-
 
 const float BaseFreq = 440.0f;
 const Keys BaseKey = Key_A;
 const Octaves BaseOctave = DefaultOctave;
 
-
 #include "PlayHandle.h"
 
-
 class MixerWorkerThread;
-
 
 class LMMS_EXPORT Mixer : public QObject
 {
@@ -77,7 +70,7 @@ public:
 			Mode_Draft,
 			Mode_HighQuality,
 			Mode_FinalMix
-		} ;
+		};
 
 		enum Interpolation
 		{
@@ -85,7 +78,7 @@ public:
 			Interpolation_SincFastest,
 			Interpolation_SincMedium,
 			Interpolation_SincBest
-		} ;
+		};
 
 		enum Oversampling
 		{
@@ -93,7 +86,7 @@ public:
 			Oversampling_2x,
 			Oversampling_4x,
 			Oversampling_8x
-		} ;
+		};
 
 		Interpolation interpolation;
 		Oversampling oversampling;
@@ -102,19 +95,19 @@ public:
 		{
 			switch (m)
 			{
-				case Mode_Draft:
-					interpolation = Interpolation_Linear;
-					oversampling = Oversampling_None;
-					break;
-				case Mode_HighQuality:
-					interpolation =
-						Interpolation_SincFastest;
-					oversampling = Oversampling_2x;
-					break;
-				case Mode_FinalMix:
-					interpolation = Interpolation_SincBest;
-					oversampling = Oversampling_8x;
-					break;
+			case Mode_Draft:
+				interpolation = Interpolation_Linear;
+				oversampling = Oversampling_None;
+				break;
+			case Mode_HighQuality:
+				interpolation =
+					Interpolation_SincFastest;
+				oversampling = Oversampling_2x;
+				break;
+			case Mode_FinalMix:
+				interpolation = Interpolation_SincBest;
+				oversampling = Oversampling_8x;
+				break;
 			}
 		}
 
@@ -126,43 +119,46 @@ public:
 
 		int sampleRateMultiplier() const
 		{
-			switch( oversampling )
+			switch (oversampling)
 			{
-				case Oversampling_None: return 1;
-				case Oversampling_2x: return 2;
-				case Oversampling_4x: return 4;
-				case Oversampling_8x: return 8;
+			case Oversampling_None:
+				return 1;
+			case Oversampling_2x:
+				return 2;
+			case Oversampling_4x:
+				return 4;
+			case Oversampling_8x:
+				return 8;
 			}
 			return 1;
 		}
 
 		int libsrcInterpolation() const
 		{
-			switch( interpolation )
+			switch (interpolation)
 			{
-				case Interpolation_Linear:
-					return SRC_ZERO_ORDER_HOLD;
-				case Interpolation_SincFastest:
-					return SRC_SINC_FASTEST;
-				case Interpolation_SincMedium:
-					return SRC_SINC_MEDIUM_QUALITY;
-				case Interpolation_SincBest:
-					return SRC_SINC_BEST_QUALITY;
+			case Interpolation_Linear:
+				return SRC_ZERO_ORDER_HOLD;
+			case Interpolation_SincFastest:
+				return SRC_SINC_FASTEST;
+			case Interpolation_SincMedium:
+				return SRC_SINC_MEDIUM_QUALITY;
+			case Interpolation_SincBest:
+				return SRC_SINC_BEST_QUALITY;
 			}
 			return SRC_LINEAR;
 		}
-	} ;
+	};
 
 	void initDevices();
 	void clear();
 	void clearNewPlayHandles();
 
-
 	// audio-device-stuff
 
 	// Returns the current audio device's name. This is not necessarily
 	// the user's preferred audio device, in case you were thinking that.
-	inline const QString & audioDevName() const
+	inline const QString &audioDevName() const
 	{
 		return m_audioDevName;
 	}
@@ -173,53 +169,49 @@ public:
 
 	//! Set new audio device. Old device will be deleted,
 	//! unless it's stored using storeAudioDevice
-	void setAudioDevice( AudioDevice * _dev,
-				const struct qualitySettings & _qs,
-				bool _needs_fifo,
-				bool startNow );
+	void setAudioDevice(AudioDevice *_dev,
+		const struct qualitySettings &_qs,
+		bool _needs_fifo,
+		bool startNow);
 	void storeAudioDevice();
 	void restoreAudioDevice();
-	inline AudioDevice * audioDev()
+	inline AudioDevice *audioDev()
 	{
 		return m_audioDev;
 	}
 
-
 	// audio-port-stuff
-	inline void addAudioPort(AudioPort * port)
+	inline void addAudioPort(AudioPort *port)
 	{
 		requestChangeInModel();
 		m_audioPorts.push_back(port);
 		doneChangeInModel();
 	}
 
-	void removeAudioPort(AudioPort * port);
-
+	void removeAudioPort(AudioPort *port);
 
 	// MIDI-client-stuff
-	inline const QString & midiClientName() const
+	inline const QString &midiClientName() const
 	{
 		return m_midiClientName;
 	}
 
-	inline MidiClient * midiClient()
+	inline MidiClient *midiClient()
 	{
 		return m_midiClient;
 	}
 
-
 	// play-handle stuff
-	bool addPlayHandle( PlayHandle* handle );
+	bool addPlayHandle(PlayHandle *handle);
 
-	void removePlayHandle( PlayHandle* handle );
+	void removePlayHandle(PlayHandle *handle);
 
-	inline PlayHandleList& playHandles()
+	inline PlayHandleList &playHandles()
 	{
 		return m_playHandles;
 	}
 
-	void removePlayHandlesOfTypes(Track * track, const quint8 types);
-
+	void removePlayHandlesOfTypes(Track *track, const quint8 types);
 
 	// methods providing information for other classes
 	inline fpp_t framesPerPeriod() const
@@ -227,8 +219,7 @@ public:
 		return m_framesPerPeriod;
 	}
 
-
-	MixerProfiler& profiler()
+	MixerProfiler &profiler()
 	{
 		return m_profiler;
 	}
@@ -238,17 +229,15 @@ public:
 		return m_profiler.cpuLoad();
 	}
 
-	const qualitySettings & currentQualitySettings() const
+	const qualitySettings &currentQualitySettings() const
 	{
 		return m_qualitySettings;
 	}
-
 
 	sample_rate_t baseSampleRate() const;
 	sample_rate_t outputSampleRate() const;
 	sample_rate_t inputSampleRate() const;
 	sample_rate_t processingSampleRate() const;
-
 
 	inline float masterGain() const
 	{
@@ -259,7 +248,6 @@ public:
 	{
 		m_masterGain = mo;
 	}
-
 
 	static inline sample_t clip(const sample_t s)
 	{
@@ -274,15 +262,14 @@ public:
 		return s;
 	}
 
-
 	struct StereoSample
 	{
-		StereoSample(sample_t _left, sample_t _right) : left(_left), right(_right) {}
+		StereoSample(sample_t _left, sample_t _right) :
+			left(_left), right(_right) {}
 		sample_t left;
 		sample_t right;
 	};
-	StereoSample getPeakValues(sampleFrame * ab, const f_cnt_t _frames) const;
-
+	StereoSample getPeakValues(sampleFrame *ab, const f_cnt_t _frames) const;
 
 	bool criticalXRuns() const;
 
@@ -291,24 +278,24 @@ public:
 		return m_fifoWriter != NULL;
 	}
 
-	void pushInputFrames( sampleFrame * _ab, const f_cnt_t _frames );
+	void pushInputFrames(sampleFrame *_ab, const f_cnt_t _frames);
 
-	inline const sampleFrame * inputBuffer()
+	inline const sampleFrame *inputBuffer()
 	{
-		return m_inputBuffer[ m_inputBufferRead ];
+		return m_inputBuffer[m_inputBufferRead];
 	}
 
 	inline f_cnt_t inputBufferFrames() const
 	{
-		return m_inputBufferFrames[ m_inputBufferRead ];
+		return m_inputBufferFrames[m_inputBufferRead];
 	}
 
-	inline const surroundSampleFrame * nextBuffer()
+	inline const surroundSampleFrame *nextBuffer()
 	{
 		return hasFifoWriter() ? m_fifo->read() : renderNextBuffer();
 	}
 
-	void changeQuality(const struct qualitySettings & qs);
+	void changeQuality(const struct qualitySettings &qs);
 
 	inline bool isMetronomeActive() const { return m_metronomeActive; }
 	inline void setMetronomeActive(bool value = true) { m_metronomeActive = value; }
@@ -320,12 +307,10 @@ public:
 	static bool isAudioDevNameValid(QString name);
 	static bool isMidiDevNameValid(QString name);
 
-
 signals:
 	void qualitySettingsChanged();
 	void sampleRateChanged();
-	void nextAudioBuffer( const surroundSampleFrame * buffer );
-
+	void nextAudioBuffer(const surroundSampleFrame *buffer);
 
 private:
 	typedef FifoBuffer<surroundSampleFrame *> Fifo;
@@ -333,35 +318,30 @@ private:
 	class fifoWriter : public QThread
 	{
 	public:
-		fifoWriter( Mixer * mixer, Fifo * fifo );
+		fifoWriter(Mixer *mixer, Fifo *fifo);
 
 		void finish();
 
-
 	private:
-		Mixer * m_mixer;
-		Fifo * m_fifo;
+		Mixer *m_mixer;
+		Fifo *m_fifo;
 		volatile bool m_writing;
 
 		void run() override;
 
-		void write( surroundSampleFrame * buffer );
+		void write(surroundSampleFrame *buffer);
+	};
 
-	} ;
-
-
-	Mixer( bool renderOnly );
+	Mixer(bool renderOnly);
 	virtual ~Mixer();
 
 	void startProcessing(bool needsFifo = true);
 	void stopProcessing();
 
+	AudioDevice *tryAudioDevices();
+	MidiClient *tryMidiClients();
 
-	AudioDevice * tryAudioDevices();
-	MidiClient * tryMidiClients();
-
-
-	const surroundSampleFrame * renderNextBuffer();
+	const surroundSampleFrame *renderNextBuffer();
 
 	void swapBuffers();
 
@@ -379,14 +359,14 @@ private:
 
 	fpp_t m_framesPerPeriod;
 
-	sampleFrame * m_inputBuffer[2];
+	sampleFrame *m_inputBuffer[2];
 	f_cnt_t m_inputBufferFrames[2];
 	f_cnt_t m_inputBufferSize[2];
 	int m_inputBufferRead;
 	int m_inputBufferWrite;
 
-	surroundSampleFrame * m_outputBufferRead;
-	surroundSampleFrame * m_outputBufferWrite;
+	surroundSampleFrame *m_outputBufferRead;
+	surroundSampleFrame *m_outputBufferWrite;
 
 	// worker thread stuff
 	QVector<MixerWorkerThread *> m_workers;
@@ -398,26 +378,25 @@ private:
 	LocklessList<PlayHandle *> m_newPlayHandles;
 	ConstPlayHandleList m_playHandlesToRemove;
 
-
 	struct qualitySettings m_qualitySettings;
 	float m_masterGain;
 
 	bool m_isProcessing;
 
 	// audio device stuff
-	void doSetAudioDevice( AudioDevice *_dev );
-	AudioDevice * m_audioDev;
-	AudioDevice * m_oldAudioDev;
+	void doSetAudioDevice(AudioDevice *_dev);
+	AudioDevice *m_audioDev;
+	AudioDevice *m_oldAudioDev;
 	QString m_audioDevName;
 	bool m_audioDevStartFailed;
 
 	// MIDI device stuff
-	MidiClient * m_midiClient;
+	MidiClient *m_midiClient;
 	QString m_midiClientName;
 
 	// FIFO stuff
-	Fifo * m_fifo;
-	fifoWriter * m_fifoWriter;
+	Fifo *m_fifo;
+	fifoWriter *m_fifoWriter;
 
 	MixerProfiler m_profiler;
 
@@ -438,8 +417,6 @@ private:
 	friend class LmmsCore;
 	friend class MixerWorkerThread;
 	friend class ProjectRenderer;
-
-} ;
-
+};
 
 #endif

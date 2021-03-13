@@ -22,12 +22,12 @@
 #ifndef STEP_RECOREDER_WIDGET_H
 #define STEP_RECOREDER_WIDGET_H
 
-#include "lmms_basics.h"
-#include "Note.h"
-
-#include <QWidget>
 #include <QColor>
 #include <QPainter>
+#include <QWidget>
+
+#include "Note.h"
+#include "lmms_basics.h"
 
 class StepRecorderWidget : public QWidget
 {
@@ -35,7 +35,7 @@ class StepRecorderWidget : public QWidget
 
 public:
 	StepRecorderWidget(
-		QWidget * parent,
+		QWidget *parent,
 		const int ppb,
 		const int marginTop,
 		const int marginBottom,
@@ -57,12 +57,12 @@ public:
 	void showHint();
 
 private:
-	void paintEvent(QPaintEvent * pe) override;
+	void paintEvent(QPaintEvent *pe) override;
 
 	int xCoordOfTick(int tick);
 
-	void drawVerLine(QPainter* painter, int x, const QColor& color, int top, int bottom);
-	void drawVerLine(QPainter* painter, const TimePos& pos, const QColor& color, int top, int bottom);
+	void drawVerLine(QPainter *painter, int x, const QColor &color, int top, int bottom);
+	void drawVerLine(QPainter *painter, const TimePos &pos, const QColor &color, int top, int bottom);
 
 	void updateBoundaries();
 
@@ -70,7 +70,7 @@ private:
 	TimePos m_curStepStartPos;
 	TimePos m_curStepEndPos;
 
-	int m_ppb; // pixels per bar
+	int m_ppb;				   // pixels per bar
 	TimePos m_currentPosition; // current position showed by on PianoRoll
 
 	QColor m_colorLineStart;
@@ -88,7 +88,7 @@ private:
 	const int m_marginRight;
 
 signals:
-	void positionChanged(const TimePos & t);
-} ;
+	void positionChanged(const TimePos &t);
+};
 
 #endif //STEP_RECOREDER_WIDGET_H

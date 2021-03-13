@@ -37,8 +37,6 @@
 #define VST_SNC_SHM_KEY_FILE "/dev/null"
 //#define VST_SNC_SHM_RND_KEY 3561653564469
 
-
-
 struct VstSyncData
 {
 	double ppqPos;
@@ -57,6 +55,6 @@ struct VstSyncData
 #ifdef VST_SNC_LATENCY
 	float m_latency;
 #endif
-} ;
+};
 
 #endif

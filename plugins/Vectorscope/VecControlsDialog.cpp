@@ -30,12 +30,11 @@
 #include <QSizePolicy>
 #include <QWidget>
 
-#include "embed.h"
 #include "LedCheckbox.h"
 #include "VecControls.h"
-#include "Vectorscope.h"
 #include "VectorView.h"
-
+#include "Vectorscope.h"
+#include "embed.h"
 
 // The entire GUI layout is built here.
 VecControlsDialog::VecControlsDialog(VecControls *controls) :
@@ -85,7 +84,6 @@ VecControlsDialog::VecControlsDialog(VecControls *controls) :
 	persistenceKnob->setHintText(tr("Trace persistence"), "");
 	config_layout->addWidget(persistenceKnob);
 }
-
 
 // Suggest the best widget size.
 QSize VecControlsDialog::sizeHint() const

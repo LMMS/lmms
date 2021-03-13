@@ -26,44 +26,42 @@
 #ifndef AUDIO_FILE_WAVE_H
 #define AUDIO_FILE_WAVE_H
 
-#include "lmmsconfig.h"
-#include "AudioFileDevice.h"
-
 #include <sndfile.h>
 
+#include "AudioFileDevice.h"
+#include "lmmsconfig.h"
 
 class AudioFileWave : public AudioFileDevice
 {
 public:
-	AudioFileWave( OutputSettings const & outputSettings,
-			const ch_cnt_t channels,
-			bool & successful,
-			const QString & file,
-			Mixer* mixer );
+	AudioFileWave(OutputSettings const &outputSettings,
+		const ch_cnt_t channels,
+		bool &successful,
+		const QString &file,
+		Mixer *mixer);
 	virtual ~AudioFileWave();
 
-	static AudioFileDevice * getInst( const QString & outputFilename,
-					  OutputSettings const & outputSettings,
-					  const ch_cnt_t channels,
-					  Mixer* mixer,
-					  bool & successful )
+	static AudioFileDevice *getInst(const QString &outputFilename,
+		OutputSettings const &outputSettings,
+		const ch_cnt_t channels,
+		Mixer *mixer,
+		bool &successful)
 	{
-		return new AudioFileWave( outputSettings, channels, successful,
-					  outputFilename, mixer );
+		return new AudioFileWave(outputSettings, channels, successful,
+			outputFilename, mixer);
 	}
 
-
 private:
-	virtual void writeBuffer( const surroundSampleFrame * _ab,
-						const fpp_t _frames,
-						float _master_gain ) override;
+	virtual void writeBuffer(const surroundSampleFrame *_ab,
+		const fpp_t _frames,
+		float _master_gain) override;
 
 	bool startEncoding();
 	void finishEncoding();
 
 private:
 	SF_INFO m_si;
-	SNDFILE * m_sf;
-} ;
+	SNDFILE *m_sf;
+};
 
 #endif

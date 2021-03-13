@@ -22,17 +22,15 @@
  *
  */
 
-
 #ifndef ENGINE_H
 #define ENGINE_H
 
-#include <QtCore/QString>
 #include <QtCore/QObject>
+#include <QtCore/QString>
 
-
-#include "lmmsconfig.h"
-#include "lmms_export.h"
 #include "lmms_basics.h"
+#include "lmms_export.h"
+#include "lmmsconfig.h"
 
 class BBTrackContainer;
 class FxMixer;
@@ -40,7 +38,6 @@ class ProjectJournal;
 class Mixer;
 class Song;
 class Ladspa2LMMS;
-
 
 // Note: This class is called 'LmmsCore' instead of 'Engine' because of naming
 // conflicts caused by ZynAddSubFX. See https://github.com/LMMS/lmms/issues/2269
@@ -58,7 +55,7 @@ class LMMS_EXPORT LmmsCore : public QObject
 {
 	Q_OBJECT
 public:
-	static void init( bool renderOnly );
+	static void init(bool renderOnly);
 	static void destroy();
 
 	// core
@@ -67,22 +64,22 @@ public:
 		return s_mixer;
 	}
 
-	static FxMixer * fxMixer()
+	static FxMixer *fxMixer()
 	{
 		return s_fxMixer;
 	}
 
-	static Song * getSong()
+	static Song *getSong()
 	{
 		return s_song;
 	}
 
-	static BBTrackContainer * getBBTrackContainer()
+	static BBTrackContainer *getBBTrackContainer()
 	{
 		return s_bbTrackContainer;
 	}
 
-	static ProjectJournal * projectJournal()
+	static ProjectJournal *projectJournal()
 	{
 		return s_projectJournal;
 	}
@@ -90,13 +87,13 @@ public:
 	static bool ignorePluginBlacklist();
 
 #ifdef LMMS_HAVE_LV2
-	static class Lv2Manager * getLv2Manager()
+	static class Lv2Manager *getLv2Manager()
 	{
 		return s_lv2Manager;
 	}
 #endif
 
-	static Ladspa2LMMS * getLADSPAManager()
+	static Ladspa2LMMS *getLADSPAManager()
 	{
 		return s_ladspaManager;
 	}
@@ -110,29 +107,28 @@ public:
 
 	static void updateFramesPerTick();
 
-	static inline LmmsCore * inst()
+	static inline LmmsCore *inst()
 	{
-		if( s_instanceOfMe == NULL )
+		if (s_instanceOfMe == NULL)
 		{
 			s_instanceOfMe = new LmmsCore();
 		}
 		return s_instanceOfMe;
 	}
 
-	static void setDndPluginKey(void* newKey);
-	static void* pickDndPluginKey();
+	static void setDndPluginKey(void *newKey);
+	static void *pickDndPluginKey();
 
 signals:
 	void initProgress(const QString &msg);
 
-
 private:
 	// small helper function which sets the pointer to NULL before actually deleting
 	// the object it refers to
-	template<class T>
-	static inline void deleteHelper( T * * ptr )
+	template <class T>
+	static inline void deleteHelper(T **ptr)
 	{
-		T * tmp = *ptr;
+		T *tmp = *ptr;
 		*ptr = NULL;
 		delete tmp;
 	}
@@ -141,23 +137,21 @@ private:
 
 	// core
 	static Mixer *s_mixer;
-	static FxMixer * s_fxMixer;
-	static Song * s_song;
-	static BBTrackContainer * s_bbTrackContainer;
-	static ProjectJournal * s_projectJournal;
+	static FxMixer *s_fxMixer;
+	static Song *s_song;
+	static BBTrackContainer *s_bbTrackContainer;
+	static ProjectJournal *s_projectJournal;
 
 #ifdef LMMS_HAVE_LV2
-	static class Lv2Manager* s_lv2Manager;
+	static class Lv2Manager *s_lv2Manager;
 #endif
-	static Ladspa2LMMS * s_ladspaManager;
-	static void* s_dndPluginKey;
+	static Ladspa2LMMS *s_ladspaManager;
+	static void *s_dndPluginKey;
 
 	// even though most methods are static, an instance is needed for Qt slots/signals
-	static LmmsCore * s_instanceOfMe;
+	static LmmsCore *s_instanceOfMe;
 
 	friend class GuiApplication;
 };
 
-
 #endif
-

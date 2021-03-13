@@ -25,11 +25,9 @@
 #ifndef DELAYCONTROLS_H
 #define DELAYCONTROLS_H
 
+#include "DelayControlsDialog.h"
 #include "EffectControls.h"
 #include "Knob.h"
-#include "DelayControlsDialog.h"
-
-
 
 class DelayEffect;
 
@@ -37,33 +35,33 @@ class DelayControls : public EffectControls
 {
 	Q_OBJECT
 public:
-	DelayControls( DelayEffect* effect );
+	DelayControls(DelayEffect *effect);
 	virtual ~DelayControls()
 	{
 	}
-	virtual void saveSettings( QDomDocument& doc, QDomElement& parent );
-	virtual void loadSettings( const QDomElement& _this );
+	virtual void saveSettings(QDomDocument &doc, QDomElement &parent);
+	virtual void loadSettings(const QDomElement &_this);
 	inline virtual QString nodeName() const
 	{
 		return "Delay";
 	}
-	virtual int controlCount(){
+	virtual int controlCount()
+	{
 		return 5;
 	}
-	virtual EffectControlDialog* createView()
+	virtual EffectControlDialog *createView()
 	{
-		return new DelayControlsDialog( this );
+		return new DelayControlsDialog(this);
 	}
 
 	float m_outPeakL;
 	float m_outPeakR;
 
-
 private slots:
 	void changeSampleRate();
 
 private:
-	DelayEffect* m_effect;
+	DelayEffect *m_effect;
 	TempoSyncKnobModel m_delayTimeModel;
 	FloatModel m_feedbackModel;
 	TempoSyncKnobModel m_lfoTimeModel;
