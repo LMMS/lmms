@@ -25,21 +25,20 @@
 #ifndef EFFECT_CONTROLS_H
 #define EFFECT_CONTROLS_H
 
-#include "Model.h"
-#include "JournallingObject.h"
 #include "Effect.h"
+#include "JournallingObject.h"
+#include "Model.h"
 
 class EffectControlDialog;
-
 
 class EffectControls : public JournallingObject, public Model
 {
 public:
-	EffectControls( Effect * _eff ) :
+	EffectControls(Effect *_eff) :
 		JournallingObject(),
-		Model( _eff ),
-		m_effect( _eff ),
-		m_viewVisible( false )
+		Model(_eff),
+		m_effect(_eff),
+		m_viewVisible(false)
 	{
 	}
 
@@ -48,10 +47,9 @@ public:
 	}
 
 	virtual int controlCount() = 0;
-	virtual EffectControlDialog * createView() = 0;
+	virtual EffectControlDialog *createView() = 0;
 
-
-	void setViewVisible( bool _visible )
+	void setViewVisible(bool _visible)
 	{
 		m_viewVisible = _visible;
 	}
@@ -61,16 +59,14 @@ public:
 		return m_viewVisible;
 	}
 
-	Effect * effect()
+	Effect *effect()
 	{
 		return m_effect;
 	}
 
-
 private:
-	Effect * m_effect;
+	Effect *m_effect;
 	bool m_viewVisible;
-
-} ;
+};
 
 #endif

@@ -28,112 +28,85 @@
 #include <QPainter>
 #include <QStyledItemDelegate>
 
-
 class RowDelegate : public QStyledItemDelegate
 {
 public:
-	RowDelegate( QAbstractItemView * table, QObject * parent = 0 ) :
-		QStyledItemDelegate( parent ),
-		m_table( table )
-		{
-		}
-	virtual void paint( QPainter * painter,
-					const QStyleOptionViewItem & option,
-					const QModelIndex & index ) const override;
-
+	RowDelegate(QAbstractItemView *table, QObject *parent = 0) :
+		QStyledItemDelegate(parent),
+		m_table(table)
+	{
+	}
+	virtual void paint(QPainter *painter,
+		const QStyleOptionViewItem &option,
+		const QModelIndex &index) const override;
 
 protected:
-	virtual void initStyleOption( QStyleOptionViewItem * option,
-					const QModelIndex & index ) const override;
-
+	virtual void initStyleOption(QStyleOptionViewItem *option,
+		const QModelIndex &index) const override;
 
 private:
-	QAbstractItemView * m_table;
+	QAbstractItemView *m_table;
+};
 
-} ;
-
-
-
-
-void RowDelegate::initStyleOption( QStyleOptionViewItem * option,
-					const QModelIndex & index ) const
+void RowDelegate::initStyleOption(QStyleOptionViewItem *option,
+	const QModelIndex &index) const
 {
-	QStyledItemDelegate::initStyleOption( option, index );
+	QStyledItemDelegate::initStyleOption(option, index);
 	option->state &= ~QStyle::State_HasFocus;
 }
 
-
-
-
-void RowDelegate::paint( QPainter * painter,
-	const QStyleOptionViewItem & option, const QModelIndex & index ) const
+void RowDelegate::paint(QPainter *painter,
+	const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
-	QStyledItemDelegate::paint( painter, option, index );
-	if ( index.row() == m_table->currentIndex().row() )
+	QStyledItemDelegate::paint(painter, option, index);
+	if (index.row() == m_table->currentIndex().row())
 	{
-		const QRect rect( option.rect );
-		painter->drawLine( rect.topLeft(), rect.topRight() );
-		painter->drawLine( rect.bottomLeft(), rect.bottomRight() );
-		if ( index.column() == 0 )
+		const QRect rect(option.rect);
+		painter->drawLine(rect.topLeft(), rect.topRight());
+		painter->drawLine(rect.bottomLeft(), rect.bottomRight());
+		if (index.column() == 0)
 		{
-			painter->drawLine( rect.topLeft(), rect.bottomLeft() );
+			painter->drawLine(rect.topLeft(), rect.bottomLeft());
 		}
-		if ( index.column() == index.model()->columnCount() - 1 )
+		if (index.column() == index.model()->columnCount() - 1)
 		{
-			painter->drawLine( rect.topRight(),
-							rect.bottomRight() );
+			painter->drawLine(rect.topRight(),
+				rect.bottomRight());
 		}
 	}
 }
 
-
-
-
-RowTableView::RowTableView( QWidget * parent ) :
-	QTableView( parent )
+RowTableView::RowTableView(QWidget *parent) :
+	QTableView(parent)
 {
-	m_rowDelegate = new RowDelegate( this, this );
+	m_rowDelegate = new RowDelegate(this, this);
 }
-
-
-
 
 RowTableView::~RowTableView()
 {
 	delete m_rowDelegate;
 }
 
-
-
-
-void RowTableView::setModel( QAbstractItemModel * model )
+void RowTableView::setModel(QAbstractItemModel *model)
 {
-	QTableView::setModel( model );
-	for ( int i = 0; i < model->rowCount(); i++ )
+	QTableView::setModel(model);
+	for (int i = 0; i < model->rowCount(); i++)
 	{
-		setItemDelegateForRow( i, m_rowDelegate );
-	}
-
-}
-
-
-
-
-void RowTableView::keyPressEvent( QKeyEvent * event )
-{
-	switch( event->key() )
-	{
-		case Qt::Key_Tab:
-		case Qt::Key_Backtab:
-			for( int i = 0; i < model()->columnCount() - 1; i++ )
-			{
-				QTableView::keyPressEvent( event );
-			}
-		default:
-			QTableView::keyPressEvent( event );
+		setItemDelegateForRow(i, m_rowDelegate);
 	}
 }
 
-
-
-
+void RowTableView::keyPressEvent(QKeyEvent *event)
+{
+	switch (event->key())
+	{
+	case Qt::Key_Tab:
+	case Qt::Key_Backtab:
+		for (int i = 0; i < model()->columnCount() - 1; i++)
+		{
+			QTableView::keyPressEvent(event);
+		}
+	default:
+		QTableView::keyPressEvent(event);
+	}
+}

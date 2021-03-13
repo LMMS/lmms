@@ -24,18 +24,17 @@
 
 #include "Model.h"
 
-
 QString Model::fullDisplayName() const
 {
-	const QString & n = displayName();
-	if( parentModel() ) 
+	const QString &n = displayName();
+	if (parentModel())
 	{
 		const QString p = parentModel()->fullDisplayName();
-		if( n.isEmpty() && p.isEmpty() )
+		if (n.isEmpty() && p.isEmpty())
 		{
 			return QString();
 		}
-		else if( p.isEmpty() )
+		else if (p.isEmpty())
 		{
 			return n;
 		}
@@ -43,8 +42,3 @@ QString Model::fullDisplayName() const
 	}
 	return n;
 }
-
-
-
-
-

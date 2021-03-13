@@ -27,33 +27,31 @@
 #define KICKER_OSC_H
 
 #include "DspEffectLibrary.h"
-#include "Oscillator.h"
-
-#include "lmms_math.h"
-#include "interpolation.h"
 #include "MemoryManager.h"
+#include "Oscillator.h"
+#include "interpolation.h"
+#include "lmms_math.h"
 
-
-template<class FX = DspEffectLibrary::StereoBypass>
+template <class FX = DspEffectLibrary::StereoBypass>
 class KickerOsc
 {
 	MM_OPERATORS
 public:
-	KickerOsc( const FX & fx, const float start, const float end, const float noise, const float offset, 
-		const float slope, const float env, const float diststart, const float distend, const float length ) :
-		m_phase( offset ),
-		m_startFreq( start ),
-		m_endFreq( end ),
-		m_noise( noise ),
-		m_slope( slope ),
-		m_env( env ),
-		m_distStart( diststart ),
-		m_distEnd( distend ),
-		m_hasDistEnv( diststart != distend ),
-		m_length( length ),
-		m_FX( fx ),
-		m_counter( 0 ),
-		m_freq( start )
+	KickerOsc(const FX &fx, const float start, const float end, const float noise, const float offset,
+		const float slope, const float env, const float diststart, const float distend, const float length) :
+		m_phase(offset),
+		m_startFreq(start),
+		m_endFreq(end),
+		m_noise(noise),
+		m_slope(slope),
+		m_env(env),
+		m_distStart(diststart),
+		m_distEnd(distend),
+		m_hasDistEnv(diststart != distend),
+		m_length(length),
+		m_FX(fx),
+		m_counter(0),
+		m_freq(start)
 	{
 	}
 
@@ -61,32 +59,31 @@ public:
 	{
 	}
 
-	void update( sampleFrame* buf, const fpp_t frames, const float sampleRate )
+	void update(sampleFrame *buf, const fpp_t frames, const float sampleRate)
 	{
-		for( fpp_t frame = 0; frame < frames; ++frame )
+		for (fpp_t frame = 0; frame < frames; ++frame)
 		{
-			const double gain = ( 1 - fastPow( ( m_counter < m_length ) ? m_counter / m_length : 1, m_env ) );
-			const sample_t s = ( Oscillator::sinSample( m_phase ) * ( 1 - m_noise ) ) + ( Oscillator::noiseSample( 0 ) * gain * gain * m_noise );
+			const double gain = (1 - fastPow((m_counter < m_length) ? m_counter / m_length : 1, m_env));
+			const sample_t s = (Oscillator::sinSample(m_phase) * (1 - m_noise)) + (Oscillator::noiseSample(0) * gain * gain * m_noise);
 			buf[frame][0] = s * gain;
 			buf[frame][1] = s * gain;
-			
+
 			// update distortion envelope if necessary
-			if( m_hasDistEnv && m_counter < m_length )
+			if (m_hasDistEnv && m_counter < m_length)
 			{
-				float thres = linearInterpolate( m_distStart, m_distEnd, m_counter / m_length );
-				m_FX.leftFX().setThreshold( thres );
-				m_FX.rightFX().setThreshold( thres );
+				float thres = linearInterpolate(m_distStart, m_distEnd, m_counter / m_length);
+				m_FX.leftFX().setThreshold(thres);
+				m_FX.rightFX().setThreshold(thres);
 			}
-			
-			m_FX.nextSample( buf[frame][0], buf[frame][1] );
+
+			m_FX.nextSample(buf[frame][0], buf[frame][1]);
 			m_phase += m_freq / sampleRate;
 
-			const double change = ( m_counter < m_length ) ? ( ( m_startFreq - m_endFreq ) * ( 1 - fastPow( m_counter / m_length, m_slope ) ) ) : 0;
+			const double change = (m_counter < m_length) ? ((m_startFreq - m_endFreq) * (1 - fastPow(m_counter / m_length, m_slope))) : 0;
 			m_freq = m_endFreq + change;
 			++m_counter;
 		}
 	}
-
 
 private:
 	float m_phase;
@@ -103,8 +100,6 @@ private:
 
 	unsigned long m_counter;
 	double m_freq;
-
 };
-
 
 #endif

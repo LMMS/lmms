@@ -31,32 +31,34 @@
 #include "dsp/White.h"
 
 class White
-: public Plugin
+	: public Plugin
 {
-	public:
-		sample_t gain;
+public:
+	sample_t gain;
 
-		DSP::White white;
+	DSP::White white;
 
-		template <sample_func_t F>
-			void one_cycle (int frames);
+	template <sample_func_t F>
+	void one_cycle(int frames);
 
-	public:
-		static PortInfo port_info [];
+public:
+	static PortInfo port_info[];
 
-		void init() {}
-		void activate()
-			{ gain = getport(0); }
+	void init() {}
+	void activate()
+	{
+		gain = getport(0);
+	}
 
-		void run (int n)
-			{
-				one_cycle<store_func> (n);
-			}
-		
-		void run_adding (int n)
-			{
-				one_cycle<adding_func> (n);
-			}
+	void run(int n)
+	{
+		one_cycle<store_func>(n);
+	}
+
+	void run_adding(int n)
+	{
+		one_cycle<adding_func>(n);
+	}
 };
 
 #endif /* _WHITE_H_ */

@@ -33,71 +33,57 @@
 #include "embed.h"
 #include "gui_templates.h"
 
-
-
-GroupBox::GroupBox( const QString & _caption, QWidget * _parent ) :
-	QWidget( _parent ),
-	BoolModelView( NULL, this ),
-	m_caption( _caption ),
-	m_titleBarHeight( 11 )
+GroupBox::GroupBox(const QString &_caption, QWidget *_parent) :
+	QWidget(_parent),
+	BoolModelView(NULL, this),
+	m_caption(_caption),
+	m_titleBarHeight(11)
 {
-	m_led = new PixmapButton( this, _caption );
-	m_led->setCheckable( true );
-	m_led->move( 3, 0 );
-	m_led->setActiveGraphic( embed::getIconPixmap( "led_green" ) );
-	m_led->setInactiveGraphic( embed::getIconPixmap( "led_off" ) );
+	m_led = new PixmapButton(this, _caption);
+	m_led->setCheckable(true);
+	m_led->move(3, 0);
+	m_led->setActiveGraphic(embed::getIconPixmap("led_green"));
+	m_led->setInactiveGraphic(embed::getIconPixmap("led_off"));
 
-	setModel( new BoolModel( false, NULL, _caption, true ) );
-	setAutoFillBackground( true );
+	setModel(new BoolModel(false, NULL, _caption, true));
+	setAutoFillBackground(true);
 	unsetCursor();
 }
-
-
-
 
 GroupBox::~GroupBox()
 {
 	delete m_led;
 }
 
-
-
-
 void GroupBox::modelChanged()
 {
-	m_led->setModel( model() );
+	m_led->setModel(model());
 }
 
-
-
-
-void GroupBox::mousePressEvent( QMouseEvent * _me )
+void GroupBox::mousePressEvent(QMouseEvent *_me)
 {
-	if( _me->y() > 1 && _me->y() < 13 && _me->button() == Qt::LeftButton )
+	if (_me->y() > 1 && _me->y() < 13 && _me->button() == Qt::LeftButton)
 	{
-		model()->setValue( !model()->value() );
+		model()->setValue(!model()->value());
 	}
 }
 
-
-
-
-void GroupBox::paintEvent( QPaintEvent * pe )
+void GroupBox::paintEvent(QPaintEvent *pe)
 {
-	QPainter p( this );
+	QPainter p(this);
 
 	// Draw background
-	p.fillRect( 0, 0, width() - 1, height() - 1, p.background() );
+	p.fillRect(0, 0, width() - 1, height() - 1, p.background());
 
 	// outer rect
-	p.setPen( p.background().color().darker( 150 ) );
-	p.drawRect( 0, 0, width() - 1, height() - 1 );
+	p.setPen(p.background().color().darker(150));
+	p.drawRect(0, 0, width() - 1, height() - 1);
 
 	// draw line below titlebar
-	p.fillRect( 1, 1, width() - 2, m_titleBarHeight + 1, p.background().color().darker( 150 ) );
+	p.fillRect(1, 1, width() - 2, m_titleBarHeight + 1, p.background().color().darker(150));
 
 	// draw text
-	p.setPen( palette().color( QPalette::Active, QPalette::Text ) );
-	p.setFont( pointSize<8>( font() ) );
-	p.drawText( 22, m_titleBarHeight, m_caption );
+	p.setPen(palette().color(QPalette::Active, QPalette::Text));
+	p.setFont(pointSize<8>(font()));
+	p.drawText(22, m_titleBarHeight, m_caption);
 }

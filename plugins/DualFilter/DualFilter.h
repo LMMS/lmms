@@ -23,33 +23,31 @@
  *
  */
 
-
 #ifndef DUALFILTER_H
 #define DUALFILTER_H
 
-#include "Effect.h"
-#include "DualFilterControls.h"
 #include "BasicFilters.h"
+#include "DualFilterControls.h"
+#include "Effect.h"
 
 class DualFilterEffect : public Effect
 {
 public:
-	DualFilterEffect( Model* parent, const Descriptor::SubPluginFeatures::Key* key );
+	DualFilterEffect(Model *parent, const Descriptor::SubPluginFeatures::Key *key);
 	virtual ~DualFilterEffect();
-	virtual bool processAudioBuffer( sampleFrame* buf, const fpp_t frames );
+	virtual bool processAudioBuffer(sampleFrame *buf, const fpp_t frames);
 
-	virtual EffectControls* controls()
+	virtual EffectControls *controls()
 	{
 		return &m_dfControls;
 	}
 
-
 private:
 	DualFilterControls m_dfControls;
 
-	BasicFilters<2> * m_filter1;
-	BasicFilters<2> * m_filter2;
-	
+	BasicFilters<2> *m_filter1;
+	BasicFilters<2> *m_filter2;
+
 	bool m_filter1changed;
 	bool m_filter2changed;
 
@@ -59,7 +57,6 @@ private:
 	float m_currentRes2;
 
 	friend class DualFilterControls;
-
-} ;
+};
 
 #endif

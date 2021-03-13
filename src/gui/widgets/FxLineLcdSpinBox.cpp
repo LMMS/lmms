@@ -29,22 +29,22 @@
 #include "GuiApplication.h"
 #include "TrackView.h"
 
-void FxLineLcdSpinBox::setTrackView(TrackView * tv)
+void FxLineLcdSpinBox::setTrackView(TrackView *tv)
 {
 	m_tv = tv;
 }
 
-void FxLineLcdSpinBox::mouseDoubleClickEvent(QMouseEvent* event)
+void FxLineLcdSpinBox::mouseDoubleClickEvent(QMouseEvent *event)
 {
 	gui->fxMixerView()->setCurrentFxLine(model()->value());
 
 	gui->fxMixerView()->parentWidget()->show();
-	gui->fxMixerView()->show();// show fxMixer window
-	gui->fxMixerView()->setFocus();// set focus to fxMixer window
-	//engine::getFxMixerView()->raise();
+	gui->fxMixerView()->show();		// show fxMixer window
+	gui->fxMixerView()->setFocus(); // set focus to fxMixer window
+									//engine::getFxMixerView()->raise();
 }
 
-void FxLineLcdSpinBox::contextMenuEvent(QContextMenuEvent* event)
+void FxLineLcdSpinBox::contextMenuEvent(QContextMenuEvent *event)
 {
 	// for the case, the user clicked right while pressing left mouse-
 	// button, the context-menu appears while mouse-cursor is still hidden
@@ -55,7 +55,7 @@ void FxLineLcdSpinBox::contextMenuEvent(QContextMenuEvent* event)
 	QPointer<CaptionMenu> contextMenu = new CaptionMenu(model()->displayName(), this);
 
 	if (QMenu *fxMenu = m_tv->createFxMenu(
-		tr("Assign to:"), tr("New FX Channel")))
+			tr("Assign to:"), tr("New FX Channel")))
 	{
 		contextMenu->addMenu(fxMenu);
 

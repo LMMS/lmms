@@ -25,17 +25,16 @@
 #ifndef PLUGINFACTORY_H
 #define PLUGINFACTORY_H
 
-#include <memory>
-#include <string>
-
 #include <QtCore/QFileInfo>
 #include <QtCore/QHash>
 #include <QtCore/QList>
 #include <QtCore/QString>
 #include <QtCore/QVector>
+#include <memory>
+#include <string>
 
-#include "lmms_export.h"
 #include "Plugin.h"
+#include "lmms_export.h"
 
 class QLibrary;
 
@@ -47,12 +46,12 @@ public:
 		const QString name() const;
 		QFileInfo file;
 		std::shared_ptr<QLibrary> library = nullptr;
-		Plugin::Descriptor* descriptor = nullptr;
+		Plugin::Descriptor *descriptor = nullptr;
 
-		bool isNull() const {return ! library;}
+		bool isNull() const { return !library; }
 	};
 	typedef QList<PluginInfo> PluginInfoList;
-	typedef QMultiMap<Plugin::PluginTypes, Plugin::Descriptor*> DescriptorMap;
+	typedef QMultiMap<Plugin::PluginTypes, Plugin::Descriptor *> DescriptorMap;
 
 	PluginFactory();
 	~PluginFactory();
@@ -61,7 +60,7 @@ public:
 
 	/// Returns the singleton instance of PluginFactory. You won't need to call
 	/// this directly, use pluginFactory instead.
-	static PluginFactory* instance();
+	static PluginFactory *instance();
 
 	/// Returns a list of all found plugins' descriptors.
 	const Plugin::DescriptorList descriptors() const;
@@ -75,14 +74,14 @@ public:
 	};
 
 	/// Returns a list of all found plugins' PluginFactory::PluginInfo objects.
-	const PluginInfoList& pluginInfos() const;
+	const PluginInfoList &pluginInfos() const;
 	/// Returns a plugin that support the given file extension
-	const PluginInfoAndKey pluginSupportingExtension(const QString& ext);
+	const PluginInfoAndKey pluginSupportingExtension(const QString &ext);
 
 	/// Returns the PluginInfo object of the plugin with the given name.
 	/// If the plugin is not found, an empty PluginInfo is returned (use
 	/// PluginInfo::isNull() to check this).
-	const PluginInfo pluginInfo(const char* name) const;
+	const PluginInfo pluginInfo(const char *name) const;
 
 	/// When loading a library fails during discovery, the error string is saved.
 	/// It can be retrieved by calling this function.

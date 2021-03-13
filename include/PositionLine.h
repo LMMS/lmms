@@ -34,13 +34,13 @@ class PositionLine : public QWidget
 	Q_PROPERTY(bool tailGradient MEMBER m_hasTailGradient)
 	Q_PROPERTY(QColor lineColor MEMBER m_lineColor)
 public:
-	PositionLine(QWidget* parent);
+	PositionLine(QWidget *parent);
 
 public slots:
 	void zoomChange(double zoom);
 
 private:
-	void paintEvent(QPaintEvent* pe) override;
+	void paintEvent(QPaintEvent *pe) override;
 
 	bool m_hasTailGradient;
 	QColor m_lineColor;

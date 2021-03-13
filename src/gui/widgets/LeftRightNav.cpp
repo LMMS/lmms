@@ -22,17 +22,16 @@
  *
  */
 
-
 #include "LeftRightNav.h"
+
 #include "ToolTip.h"
 #include "embed.h"
 
-
-LeftRightNav::LeftRightNav(QWidget *parent)
- : QWidget(parent),
-   m_layout(this),
-   m_leftBtn(this, tr("Previous")),
-   m_rightBtn(this, tr("Next"))
+LeftRightNav::LeftRightNav(QWidget *parent) :
+	QWidget(parent),
+	m_layout(this),
+	m_leftBtn(this, tr("Previous")),
+	m_rightBtn(this, tr("Next"))
 {
 	m_layout.setContentsMargins(0, 0, 0, 0);
 	m_layout.setSpacing(2);
@@ -44,19 +43,19 @@ LeftRightNav::LeftRightNav(QWidget *parent)
 	m_rightBtn.setCursor(Qt::PointingHandCursor);
 
 	m_leftBtn.setActiveGraphic(embed::getIconPixmap(
-							"stepper-left-press"));
+		"stepper-left-press"));
 	m_rightBtn.setActiveGraphic(embed::getIconPixmap(
-							"stepper-right-press" ));
+		"stepper-right-press"));
 
 	m_leftBtn.setInactiveGraphic(embed::getIconPixmap(
-							"stepper-left" ));
+		"stepper-left"));
 	m_rightBtn.setInactiveGraphic(embed::getIconPixmap(
-							"stepper-right"));
+		"stepper-right"));
 
 	connect(&m_leftBtn, SIGNAL(clicked()), this,
-						SIGNAL(onNavLeft()));
+		SIGNAL(onNavLeft()));
 	connect(&m_rightBtn, SIGNAL(clicked()), this,
-						SIGNAL(onNavRight()));
+		SIGNAL(onNavRight()));
 
 	ToolTip::add(&m_leftBtn, tr("Previous"));
 	ToolTip::add(&m_rightBtn, tr("Next"));
@@ -72,11 +71,11 @@ LeftRightNav::LeftRightNav(QWidget *parent)
 	m_layout.addWidget(&m_rightBtn);
 }
 
-PixmapButton* LeftRightNav::getLeftBtn()
+PixmapButton *LeftRightNav::getLeftBtn()
 {
 	return &m_leftBtn;
 }
-PixmapButton* LeftRightNav::getRightBtn()
+PixmapButton *LeftRightNav::getRightBtn()
 {
 	return &m_rightBtn;
 }

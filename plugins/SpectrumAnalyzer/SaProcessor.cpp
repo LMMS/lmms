@@ -27,18 +27,17 @@
 
 #include <algorithm>
 #ifdef SA_DEBUG
-	#include <chrono>
+#include <chrono>
 #endif
 #include <cmath>
 #ifdef SA_DEBUG
-	#include <iomanip>
-	#include <iostream>
+#include <iomanip>
+#include <iostream>
 #endif
 #include <QMutexLocker>
 
-#include "lmms_math.h"
 #include "LocklessRingBuffer.h"
-
+#include "lmms_math.h"
 
 SaProcessor::SaProcessor(const SaControls *controls) :
 	m_controls(controls),
@@ -59,8 +58,8 @@ SaProcessor::SaProcessor(const SaControls *controls) :
 	m_bufferR.resize(m_inBlockSize, 0);
 	m_filteredBufferL.resize(m_fftBlockSize, 0);
 	m_filteredBufferR.resize(m_fftBlockSize, 0);
-	m_spectrumL = (fftwf_complex *) fftwf_malloc(binCount() * sizeof (fftwf_complex));
-	m_spectrumR = (fftwf_complex *) fftwf_malloc(binCount() * sizeof (fftwf_complex));
+	m_spectrumL = (fftwf_complex *)fftwf_malloc(binCount() * sizeof(fftwf_complex));
+	m_spectrumR = (fftwf_complex *)fftwf_malloc(binCount() * sizeof(fftwf_complex));
 	m_fftPlanL = fftwf_plan_dft_r2c_1d(m_fftBlockSize, m_filteredBufferL.data(), m_spectrumL, FFTW_MEASURE);
 	m_fftPlanR = fftwf_plan_dft_r2c_1d(m_fftBlockSize, m_filteredBufferR.data(), m_spectrumR, FFTW_MEASURE);
 
@@ -69,25 +68,35 @@ SaProcessor::SaProcessor(const SaControls *controls) :
 	m_normSpectrumL.resize(binCount(), 0);
 	m_normSpectrumR.resize(binCount(), 0);
 
-	m_waterfallHeight = 100;	// a small safe value
-	m_history_work.resize(waterfallWidth() * m_waterfallHeight * sizeof qRgb(0,0,0), 0);
-	m_history.resize(waterfallWidth() * m_waterfallHeight * sizeof qRgb(0,0,0), 0);
+	m_waterfallHeight = 100; // a small safe value
+	m_history_work.resize(waterfallWidth() * m_waterfallHeight * sizeof qRgb(0, 0, 0), 0);
+	m_history.resize(waterfallWidth() * m_waterfallHeight * sizeof qRgb(0, 0, 0), 0);
 }
-
 
 SaProcessor::~SaProcessor()
 {
-	if (m_fftPlanL != NULL) {fftwf_destroy_plan(m_fftPlanL);}
-	if (m_fftPlanR != NULL) {fftwf_destroy_plan(m_fftPlanR);}
-	if (m_spectrumL != NULL) {fftwf_free(m_spectrumL);}
-	if (m_spectrumR != NULL) {fftwf_free(m_spectrumR);}
+	if (m_fftPlanL != NULL)
+	{
+		fftwf_destroy_plan(m_fftPlanL);
+	}
+	if (m_fftPlanR != NULL)
+	{
+		fftwf_destroy_plan(m_fftPlanR);
+	}
+	if (m_spectrumL != NULL)
+	{
+		fftwf_free(m_spectrumL);
+	}
+	if (m_spectrumR != NULL)
+	{
+		fftwf_free(m_spectrumR);
+	}
 
 	m_fftPlanL = NULL;
 	m_fftPlanR = NULL;
 	m_spectrumL = NULL;
 	m_spectrumR = NULL;
 }
-
 
 // Load data from audio thread ringbuffer and run FFT analysis if buffer is full enough.
 void SaProcessor::analyze(LocklessRingBuffer<sampleFrame> &ring_buffer)
@@ -98,7 +107,10 @@ void SaProcessor::analyze(LocklessRingBuffer<sampleFrame> &ring_buffer)
 	while (!m_terminate)
 	{
 		// If there is nothing to read, wait for notification from the writing side.
-		if (reader.empty()) {reader.waitForData();}
+		if (reader.empty())
+		{
+			reader.waitForData();
+		}
 
 		// skip waterfall render if processing can't keep up with input
 		bool overload = ring_buffer.free() < ring_buffer.capacity() / 2;
@@ -131,7 +143,7 @@ void SaProcessor::analyze(LocklessRingBuffer<sampleFrame> &ring_buffer)
 					else
 					{
 						m_bufferL[m_framesFilledUp] =
-						m_bufferR[m_framesFilledUp] = (in_buffer[in_frame][0] + in_buffer[in_frame][1]) * 0.5f;
+							m_bufferR[m_framesFilledUp] = (in_buffer[in_frame][0] + in_buffer[in_frame][1]) * 0.5f;
 					}
 					if (in_buffer[in_frame][0] != 0.f || in_buffer[in_frame][1] != 0.f)
 					{
@@ -140,22 +152,25 @@ void SaProcessor::analyze(LocklessRingBuffer<sampleFrame> &ring_buffer)
 				}
 
 				// Run analysis only if buffers contain enough data.
-				if (m_framesFilledUp < m_inBlockSize) {break;}
+				if (m_framesFilledUp < m_inBlockSize)
+				{
+					break;
+				}
 
-				// Print performance analysis once per 2 seconds if debug is enabled
-				#ifdef SA_DEBUG
-					unsigned int total_time = std::chrono::high_resolution_clock::now().time_since_epoch().count();
-					if (total_time - m_last_dump_time > 2000000000)
-					{
-						std::cout << "FFT analysis: " << std::fixed << std::setprecision(2)
-							<< m_sum_execution / m_dump_count << " ms avg / "
-							<< m_max_execution << " ms peak, executing "
-							<< m_dump_count << " times per second ("
-							<< m_sum_execution / 20.0 << " % CPU usage)." << std::endl;
-						m_last_dump_time = total_time;
-						m_sum_execution = m_max_execution = m_dump_count = 0;
-					}
-				#endif
+// Print performance analysis once per 2 seconds if debug is enabled
+#ifdef SA_DEBUG
+				unsigned int total_time = std::chrono::high_resolution_clock::now().time_since_epoch().count();
+				if (total_time - m_last_dump_time > 2000000000)
+				{
+					std::cout << "FFT analysis: " << std::fixed << std::setprecision(2)
+							  << m_sum_execution / m_dump_count << " ms avg / "
+							  << m_max_execution << " ms peak, executing "
+							  << m_dump_count << " times per second ("
+							  << m_sum_execution / 20.0 << " % CPU usage)." << std::endl;
+					m_last_dump_time = total_time;
+					m_sum_execution = m_max_execution = m_dump_count = 0;
+				}
+#endif
 
 				// update sample rate
 				m_sampleRate = Engine::mixer()->processingSampleRate();
@@ -196,13 +211,13 @@ void SaProcessor::analyze(LocklessRingBuffer<sampleFrame> &ring_buffer)
 					// move waterfall history one line down and clear the top line
 					QRgb *pixel = (QRgb *)m_history_work.data();
 					std::copy(pixel,
-							  pixel + waterfallWidth() * m_waterfallHeight - waterfallWidth(),
-							  pixel + waterfallWidth());
-					memset(pixel, 0, waterfallWidth() * sizeof (QRgb));
+						pixel + waterfallWidth() * m_waterfallHeight - waterfallWidth(),
+						pixel + waterfallWidth());
+					memset(pixel, 0, waterfallWidth() * sizeof(QRgb));
 
 					// add newest result on top
 					int target;		// pixel being constructed
-					float accL = 0;	// accumulators for merging multiple bins
+					float accL = 0; // accumulators for merging multiple bins
 					float accR = 0;
 					for (unsigned int i = 0; i < binCount(); i++)
 					{
@@ -254,7 +269,10 @@ void SaProcessor::analyze(LocklessRingBuffer<sampleFrame> &ring_buffer)
 									accL += ((int)band_end - band_start) * m_normSpectrumL[i];
 									accR += ((int)band_end - band_start) * m_normSpectrumR[i];
 
-									if (target >= 0 && target < waterfallWidth()) {pixel[target] = makePixel(accL, accR);}
+									if (target >= 0 && target < waterfallWidth())
+									{
+										pixel[target] = makePixel(accL, accR);
+									}
 
 									// save remaining portion of the band for the following band / pixel
 									accL = (band_end - (int)band_end) * m_normSpectrumL[i];
@@ -286,7 +304,7 @@ void SaProcessor::analyze(LocklessRingBuffer<sampleFrame> &ring_buffer)
 				}
 				// clean up before checking for more data from input buffer
 				const unsigned int overlaps = m_controls->m_windowOverlapModel.value();
-				if (overlaps == 1)	// Discard buffer, each sample used only once
+				if (overlaps == 1) // Discard buffer, each sample used only once
 				{
 					m_framesFilledUp = 0;
 				}
@@ -302,18 +320,20 @@ void SaProcessor::analyze(LocklessRingBuffer<sampleFrame> &ring_buffer)
 					m_framesFilledUp -= drop;
 				}
 
-				#ifdef SA_DEBUG
-					// measure overall FFT processing speed
-					total_time = std::chrono::high_resolution_clock::now().time_since_epoch().count() - total_time;
-					m_dump_count++;
-					m_sum_execution += total_time / 1000000.0;
-					if (total_time / 1000000.0 > m_max_execution) {m_max_execution = total_time / 1000000.0;}
-				#endif
-			}	// frame filler and processing
-		}	// process if active
-	}	// thread loop end
+#ifdef SA_DEBUG
+				// measure overall FFT processing speed
+				total_time = std::chrono::high_resolution_clock::now().time_since_epoch().count() - total_time;
+				m_dump_count++;
+				m_sum_execution += total_time / 1000000.0;
+				if (total_time / 1000000.0 > m_max_execution)
+				{
+					m_max_execution = total_time / 1000000.0;
+				}
+#endif
+			} // frame filler and processing
+		}	  // process if active
+	}		  // thread loop end
 }
-
 
 // Produce a spectrogram pixel from normalized spectrum data.
 // Values over 1.0 will cause the color components to overflow: this is left
@@ -329,20 +349,18 @@ QRgb SaProcessor::makePixel(float left, float right) const
 		float ampL = pow(left, gamma_correction);
 		float ampR = pow(right, gamma_correction);
 		return qRgb(m_controls->m_colorL.red() * ampL + m_controls->m_colorR.red() * ampR,
-					m_controls->m_colorL.green() * ampL + m_controls->m_colorR.green() * ampR,
-					m_controls->m_colorL.blue() * ampL + m_controls->m_colorR.blue() * ampR);
+			m_controls->m_colorL.green() * ampL + m_controls->m_colorR.green() * ampR,
+			m_controls->m_colorL.blue() * ampL + m_controls->m_colorR.blue() * ampR);
 	}
 	else
 	{
 		float ampL = pow(left, gamma_correction);
 		// make mono color brighter to compensate for the fact it is not summed
 		return qRgb(m_controls->m_colorMonoW.red() * ampL,
-					m_controls->m_colorMonoW.green() * ampL,
-					m_controls->m_colorMonoW.blue() * ampL);
+			m_controls->m_colorMonoW.green() * ampL,
+			m_controls->m_colorMonoW.blue() * ampL);
 	}
 }
-
-
 
 // Inform the processor whether any display widgets actually need it.
 void SaProcessor::setSpectrumActive(bool active)
@@ -354,7 +372,6 @@ void SaProcessor::setWaterfallActive(bool active)
 {
 	m_waterfallActive = active;
 }
-
 
 // Reallocate data buffers according to newly set block size.
 void SaProcessor::reallocateBuffers()
@@ -382,7 +399,7 @@ void SaProcessor::reallocateBuffers()
 		new_fft_size = FFT_BLOCK_SIZES.back();
 	}
 
-	new_bins = new_fft_size / 2 +1;
+	new_bins = new_fft_size / 2 + 1;
 
 	// Use m_reallocating to tell analyze() to avoid asking for the lock. This
 	// is needed because under heavy load the FFT thread requests data lock so
@@ -396,28 +413,40 @@ void SaProcessor::reallocateBuffers()
 	QMutexLocker data_lock(&m_dataAccess);
 
 	// destroy old FFT plan and free the result buffer
-	if (m_fftPlanL != NULL) {fftwf_destroy_plan(m_fftPlanL);}
-	if (m_fftPlanR != NULL) {fftwf_destroy_plan(m_fftPlanR);}
-	if (m_spectrumL != NULL) {fftwf_free(m_spectrumL);}
-	if (m_spectrumR != NULL) {fftwf_free(m_spectrumR);}
+	if (m_fftPlanL != NULL)
+	{
+		fftwf_destroy_plan(m_fftPlanL);
+	}
+	if (m_fftPlanR != NULL)
+	{
+		fftwf_destroy_plan(m_fftPlanR);
+	}
+	if (m_spectrumL != NULL)
+	{
+		fftwf_free(m_spectrumL);
+	}
+	if (m_spectrumR != NULL)
+	{
+		fftwf_free(m_spectrumR);
+	}
 
 	// allocate new space, create new plan and resize containers
 	m_fftWindow.resize(new_in_size, 1.0);
-	precomputeWindow(m_fftWindow.data(), new_in_size, (FFT_WINDOWS) m_controls->m_windowModel.value());
+	precomputeWindow(m_fftWindow.data(), new_in_size, (FFT_WINDOWS)m_controls->m_windowModel.value());
 	m_bufferL.resize(new_in_size, 0);
 	m_bufferR.resize(new_in_size, 0);
 	m_filteredBufferL.resize(new_fft_size, 0);
 	m_filteredBufferR.resize(new_fft_size, 0);
-	m_spectrumL = (fftwf_complex *) fftwf_malloc(new_bins * sizeof (fftwf_complex));
-	m_spectrumR = (fftwf_complex *) fftwf_malloc(new_bins * sizeof (fftwf_complex));
+	m_spectrumL = (fftwf_complex *)fftwf_malloc(new_bins * sizeof(fftwf_complex));
+	m_spectrumR = (fftwf_complex *)fftwf_malloc(new_bins * sizeof(fftwf_complex));
 	m_fftPlanL = fftwf_plan_dft_r2c_1d(new_fft_size, m_filteredBufferL.data(), m_spectrumL, FFTW_MEASURE);
 	m_fftPlanR = fftwf_plan_dft_r2c_1d(new_fft_size, m_filteredBufferR.data(), m_spectrumR, FFTW_MEASURE);
 
 	if (m_fftPlanL == NULL || m_fftPlanR == NULL)
 	{
-		#ifdef SA_DEBUG
-			std::cerr << "Analyzer: failed to create new FFT plan!" << std::endl;
-		#endif
+#ifdef SA_DEBUG
+		std::cerr << "Analyzer: failed to create new FFT plan!" << std::endl;
+#endif
 	}
 	m_absSpectrumL.resize(new_bins, 0);
 	m_absSpectrumR.resize(new_bins, 0);
@@ -425,12 +454,8 @@ void SaProcessor::reallocateBuffers()
 	m_normSpectrumR.resize(new_bins, 0);
 
 	m_waterfallHeight = m_controls->m_waterfallHeightModel.value();
-	m_history_work.resize((new_bins < m_waterfallMaxWidth ? new_bins : m_waterfallMaxWidth)
-							* m_waterfallHeight
-							* sizeof qRgb(0,0,0), 0);
-	m_history.resize((new_bins < m_waterfallMaxWidth ? new_bins : m_waterfallMaxWidth)
-						* m_waterfallHeight
-						* sizeof qRgb(0,0,0), 0);
+	m_history_work.resize((new_bins < m_waterfallMaxWidth ? new_bins : m_waterfallMaxWidth) * m_waterfallHeight * sizeof qRgb(0, 0, 0), 0);
+	m_history.resize((new_bins < m_waterfallMaxWidth ? new_bins : m_waterfallMaxWidth) * m_waterfallHeight * sizeof qRgb(0, 0, 0), 0);
 
 	// done; publish new sizes and clean up
 	m_inBlockSize = new_in_size;
@@ -443,15 +468,13 @@ void SaProcessor::reallocateBuffers()
 	clear();
 }
 
-
 // Precompute a new FFT window based on currently selected type.
 void SaProcessor::rebuildWindow()
 {
 	// computation is done in fft_helpers
 	QMutexLocker lock(&m_dataAccess);
-	precomputeWindow(m_fftWindow.data(), m_inBlockSize, (FFT_WINDOWS) m_controls->m_windowModel.value());
+	precomputeWindow(m_fftWindow.data(), m_inBlockSize, (FFT_WINDOWS)m_controls->m_windowModel.value());
 }
-
 
 // Clear all data buffers and replace contents with zeros.
 // Note: may take a few milliseconds, do not call in a loop!
@@ -490,7 +513,6 @@ bool SaProcessor::spectrumNotEmpty()
 	return notEmpty(m_normSpectrumL) || notEmpty(m_normSpectrumR);
 }
 
-
 // --------------------------------------
 // Frequency conversion helpers
 //
@@ -501,13 +523,11 @@ unsigned int SaProcessor::getSampleRate() const
 	return m_sampleRate;
 }
 
-
 // Maximum frequency of a sampled signal is equal to half of its sample rate.
 float SaProcessor::getNyquistFreq() const
 {
 	return getSampleRate() / 2.0f;
 }
-
 
 // FFTW automatically discards upper half of the symmetric FFT output, so
 // the useful bin count is the transform size divided by 2, plus zero.
@@ -515,7 +535,6 @@ unsigned int SaProcessor::binCount() const
 {
 	return m_fftBlockSize / 2 + 1;
 }
-
 
 // Return the final width of waterfall display buffer.
 // Normally the waterfall width equals the number of frequency bins, but the
@@ -527,13 +546,11 @@ unsigned int SaProcessor::waterfallWidth() const
 	return binCount() < m_waterfallMaxWidth ? binCount() : m_waterfallMaxWidth;
 }
 
-
 // Return the center frequency of given frequency bin.
 float SaProcessor::binToFreq(unsigned int bin_index) const
 {
 	return getNyquistFreq() * bin_index / binCount();
 }
-
 
 // Return width of the frequency range that falls into one bin.
 // The binCount is lowered by one since half of the first and last bin is
@@ -543,41 +560,51 @@ float SaProcessor::binBandwidth() const
 	return getNyquistFreq() / (binCount() - 1);
 }
 
-
 float SaProcessor::getFreqRangeMin(bool linear) const
 {
 	switch (m_controls->m_freqRangeModel.value())
 	{
-		case FRANGE_AUDIBLE: return FRANGE_AUDIBLE_START;
-		case FRANGE_BASS: return FRANGE_BASS_START;
-		case FRANGE_MIDS: return FRANGE_MIDS_START;
-		case FRANGE_HIGH: return FRANGE_HIGH_START;
-		default:
-		case FRANGE_FULL: return linear ? 0 : LOWEST_LOG_FREQ;
+	case FRANGE_AUDIBLE:
+		return FRANGE_AUDIBLE_START;
+	case FRANGE_BASS:
+		return FRANGE_BASS_START;
+	case FRANGE_MIDS:
+		return FRANGE_MIDS_START;
+	case FRANGE_HIGH:
+		return FRANGE_HIGH_START;
+	default:
+	case FRANGE_FULL:
+		return linear ? 0 : LOWEST_LOG_FREQ;
 	}
 }
-
 
 float SaProcessor::getFreqRangeMax() const
 {
 	switch (m_controls->m_freqRangeModel.value())
 	{
-		case FRANGE_AUDIBLE: return FRANGE_AUDIBLE_END;
-		case FRANGE_BASS: return FRANGE_BASS_END;
-		case FRANGE_MIDS: return FRANGE_MIDS_END;
-		case FRANGE_HIGH: return FRANGE_HIGH_END;
-		default:
-		case FRANGE_FULL: return getNyquistFreq();
+	case FRANGE_AUDIBLE:
+		return FRANGE_AUDIBLE_END;
+	case FRANGE_BASS:
+		return FRANGE_BASS_END;
+	case FRANGE_MIDS:
+		return FRANGE_MIDS_END;
+	case FRANGE_HIGH:
+		return FRANGE_HIGH_END;
+	default:
+	case FRANGE_FULL:
+		return getNyquistFreq();
 	}
 }
-
 
 // Map frequency to pixel x position on a display of given width.
 float SaProcessor::freqToXPixel(float freq, unsigned int width) const
 {
 	if (m_controls->m_logXModel.value())
 	{
-		if (freq <= 1) {return 0;}
+		if (freq <= 1)
+		{
+			return 0;
+		}
 		float min = log10(getFreqRangeMin());
 		float range = log10(getFreqRangeMax()) - min;
 		return (log10(freq) - min) / range * width;
@@ -589,7 +616,6 @@ float SaProcessor::freqToXPixel(float freq, unsigned int width) const
 		return (freq - min) / range * width;
 	}
 }
-
 
 // Map pixel x position on display of given width back to frequency.
 float SaProcessor::xPixelToFreq(float x, unsigned int width) const
@@ -609,37 +635,45 @@ float SaProcessor::xPixelToFreq(float x, unsigned int width) const
 	}
 }
 
-
 // --------------------------------------
 // Amplitude conversion helpers
 //
 float SaProcessor::getAmpRangeMin(bool linear) const
 {
 	// return very low limit to make sure zero gets included at linear grid
-	if (linear) {return -900;}
+	if (linear)
+	{
+		return -900;
+	}
 	switch (m_controls->m_ampRangeModel.value())
 	{
-		case ARANGE_EXTENDED: return ARANGE_EXTENDED_START;
-		case ARANGE_SILENT: return ARANGE_SILENT_START;
-		case ARANGE_LOUD: return ARANGE_LOUD_START;
-		default:
-		case ARANGE_AUDIBLE: return ARANGE_AUDIBLE_START;
+	case ARANGE_EXTENDED:
+		return ARANGE_EXTENDED_START;
+	case ARANGE_SILENT:
+		return ARANGE_SILENT_START;
+	case ARANGE_LOUD:
+		return ARANGE_LOUD_START;
+	default:
+	case ARANGE_AUDIBLE:
+		return ARANGE_AUDIBLE_START;
 	}
 }
-
 
 float SaProcessor::getAmpRangeMax() const
 {
 	switch (m_controls->m_ampRangeModel.value())
 	{
-		case ARANGE_EXTENDED: return ARANGE_EXTENDED_END;
-		case ARANGE_SILENT: return ARANGE_SILENT_END;
-		case ARANGE_LOUD: return ARANGE_LOUD_END;
-		default:
-		case ARANGE_AUDIBLE: return ARANGE_AUDIBLE_END;
+	case ARANGE_EXTENDED:
+		return ARANGE_EXTENDED_END;
+	case ARANGE_SILENT:
+		return ARANGE_SILENT_END;
+	case ARANGE_LOUD:
+		return ARANGE_LOUD_END;
+	default:
+	case ARANGE_AUDIBLE:
+		return ARANGE_AUDIBLE_END;
 	}
 }
-
 
 // Map linear amplitude to pixel y position on a display of given height.
 // Note that display coordinates are flipped: amplitude grows from [height] to zero.
@@ -669,7 +703,6 @@ float SaProcessor::ampToYPixel(float amplitude, unsigned int height) const
 	}
 }
 
-
 // Map pixel y position on display of given height back to amplitude.
 // Note that display coordinates are flipped: amplitude grows from [height] to zero.
 // Also note that in logarithmic Y mode the returned amplitude is in dB, not linear.
@@ -689,4 +722,3 @@ float SaProcessor::yPixelToAmp(float y, unsigned int height) const
 		return max + range * (y / height);
 	}
 }
-

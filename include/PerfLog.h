@@ -25,8 +25,8 @@
 #ifndef PERFLOG_H
 #define PERFLOG_H
 
-#include <ctime>
 #include <QtCore/QString>
+#include <ctime>
 
 /// \brief CPU time point
 ///
@@ -45,7 +45,8 @@ public:
 	static PerfTime now();
 	static clock_t ticksPerSecond();
 
-	friend PerfTime operator-(const PerfTime& lhs, const PerfTime& rhs);
+	friend PerfTime operator-(const PerfTime &lhs, const PerfTime &rhs);
+
 private:
 	clock_t m_real;
 	clock_t m_user;
@@ -58,14 +59,14 @@ private:
 /// stderr, along with \p name. Alternatively, call begin() and end() explicitly.
 class PerfLogTimer
 {
- public:
-	PerfLogTimer(const QString& name);
+public:
+	PerfLogTimer(const QString &name);
 	~PerfLogTimer();
 
 	void begin();
 	void end();
 
- private:
+private:
 	QString name;
 	PerfTime begin_time;
 };

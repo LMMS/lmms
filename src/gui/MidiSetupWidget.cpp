@@ -29,8 +29,8 @@
 #include "ConfigManager.h"
 #include "gui_templates.h"
 
-MidiSetupWidget::MidiSetupWidget(const QString & caption, const QString & configSection,
-	const QString & devName, QWidget * parent) :
+MidiSetupWidget::MidiSetupWidget(const QString &caption, const QString &configSection,
+	const QString &devName, QWidget *parent) :
 	TabWidget(TabWidget::tr("Settings for %1").arg(tr(caption.toUtf8())), parent),
 	m_configSection(configSection),
 	m_device(nullptr)
@@ -42,7 +42,7 @@ MidiSetupWidget::MidiSetupWidget(const QString & caption, const QString & config
 		m_device = new QLineEdit(devName, this);
 		m_device->setGeometry(10, 20, 160, 20);
 
-		QLabel * dev_lbl = new QLabel(tr("Device"), this);
+		QLabel *dev_lbl = new QLabel(tr("Device"), this);
 		dev_lbl->setFont(pointSize<7>(dev_lbl->font()));
 		dev_lbl->setGeometry(10, 40, 160, 10);
 	}
@@ -53,7 +53,7 @@ void MidiSetupWidget::saveSettings()
 	if (!m_configSection.isEmpty() && m_device)
 	{
 		ConfigManager::inst()->setValue(m_configSection, "device",
-				m_device->text());
+			m_device->text());
 	}
 }
 

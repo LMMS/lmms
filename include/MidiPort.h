@@ -26,63 +26,62 @@
 #ifndef MIDI_PORT_H
 #define MIDI_PORT_H
 
-#include <QtCore/QString>
 #include <QtCore/QList>
 #include <QtCore/QMap>
+#include <QtCore/QString>
 
+#include "AutomatableModel.h"
 #include "Midi.h"
 #include "TimePos.h"
-#include "AutomatableModel.h"
-
 
 class MidiClient;
 class MidiEvent;
 class MidiEventProcessor;
 class MidiPortMenu;
 
-
 // class for abstraction of MIDI-port
 class MidiPort : public Model, public SerializingObject
 {
 	Q_OBJECT
-	mapPropertyFromModel(int,inputChannel,setInputChannel,m_inputChannelModel);
-	mapPropertyFromModel(int,outputChannel,setOutputChannel,m_outputChannelModel);
-	mapPropertyFromModel(int,inputController,setInputController,m_inputControllerModel);
-	mapPropertyFromModel(int,outputController,setOutputController,m_outputControllerModel);
-	mapPropertyFromModel(int,fixedInputVelocity,setFixedInputVelocity,m_fixedInputVelocityModel);
-	mapPropertyFromModel(int,fixedOutputVelocity,setFixedOutputVelocity,m_fixedOutputVelocityModel);
-	mapPropertyFromModel(int,fixedOutputNote,setFixedOutputNote,m_fixedOutputNoteModel);
-	mapPropertyFromModel(int,outputProgram,setOutputProgram,m_outputProgramModel);
-	mapPropertyFromModel(int,baseVelocity,setBaseVelocity,m_baseVelocityModel);
-	mapPropertyFromModel(bool,isReadable,setReadable,m_readableModel);
-	mapPropertyFromModel(bool,isWritable,setWritable,m_writableModel);
+	mapPropertyFromModel(int, inputChannel, setInputChannel, m_inputChannelModel);
+	mapPropertyFromModel(int, outputChannel, setOutputChannel, m_outputChannelModel);
+	mapPropertyFromModel(int, inputController, setInputController, m_inputControllerModel);
+	mapPropertyFromModel(int, outputController, setOutputController, m_outputControllerModel);
+	mapPropertyFromModel(int, fixedInputVelocity, setFixedInputVelocity, m_fixedInputVelocityModel);
+	mapPropertyFromModel(int, fixedOutputVelocity, setFixedOutputVelocity, m_fixedOutputVelocityModel);
+	mapPropertyFromModel(int, fixedOutputNote, setFixedOutputNote, m_fixedOutputNoteModel);
+	mapPropertyFromModel(int, outputProgram, setOutputProgram, m_outputProgramModel);
+	mapPropertyFromModel(int, baseVelocity, setBaseVelocity, m_baseVelocityModel);
+	mapPropertyFromModel(bool, isReadable, setReadable, m_readableModel);
+	mapPropertyFromModel(bool, isWritable, setWritable, m_writableModel);
+
 public:
 	typedef QMap<QString, bool> Map;
 
 	enum Modes
 	{
-		Disabled,	// don't route any MIDI-events (default)
-		Input,		// from MIDI-client to MIDI-event-processor
-		Output,		// from MIDI-event-processor to MIDI-client
-		Duplex		// both directions
-	} ;
+		Disabled, // don't route any MIDI-events (default)
+		Input,	  // from MIDI-client to MIDI-event-processor
+		Output,	  // from MIDI-event-processor to MIDI-client
+		Duplex	  // both directions
+	};
 	typedef Modes Mode;
 
-	MidiPort( const QString& name,
-			MidiClient* client,
-			MidiEventProcessor* eventProcessor,
-			Model* parent = NULL,
-			Mode mode = Disabled );
+	MidiPort(const QString &name,
+		MidiClient *client,
+		MidiEventProcessor *eventProcessor,
+		Model *parent = NULL,
+		Mode mode = Disabled);
 	virtual ~MidiPort();
 
-	void setName( const QString& name );
+	void setName(const QString &name);
 
 	Mode mode() const
 	{
 		return m_mode;
 	}
 
-	void setMode( Mode mode );
+	void setMode(Mode mode);
 
 	bool isInputEnabled() const
 	{
@@ -102,50 +101,46 @@ public:
 		return outputChannel() ? outputChannel() - 1 : 0;
 	}
 
-	void processInEvent( const MidiEvent& event, const TimePos& time = TimePos() );
-	void processOutEvent( const MidiEvent& event, const TimePos& time = TimePos() );
+	void processInEvent(const MidiEvent &event, const TimePos &time = TimePos());
+	void processOutEvent(const MidiEvent &event, const TimePos &time = TimePos());
 
-
-	void saveSettings( QDomDocument& doc, QDomElement& thisElement ) override;
-	void loadSettings( const QDomElement& thisElement ) override;
+	void saveSettings(QDomDocument &doc, QDomElement &thisElement) override;
+	void loadSettings(const QDomElement &thisElement) override;
 
 	QString nodeName() const override
 	{
 		return "midiport";
 	}
 
-	void subscribeReadablePort( const QString& port, bool subscribe = true );
-	void subscribeWritablePort( const QString& port, bool subscribe = true );
+	void subscribeReadablePort(const QString &port, bool subscribe = true);
+	void subscribeWritablePort(const QString &port, bool subscribe = true);
 
-	const Map& readablePorts() const
+	const Map &readablePorts() const
 	{
 		return m_readablePorts;
 	}
 
-	const Map& writablePorts() const
+	const Map &writablePorts() const
 	{
 		return m_writablePorts;
 	}
 
 	void invalidateCilent();
 
-	MidiPortMenu* m_readablePortsMenu;
-	MidiPortMenu* m_writablePortsMenu;
-
+	MidiPortMenu *m_readablePortsMenu;
+	MidiPortMenu *m_writablePortsMenu;
 
 public slots:
 	void updateMidiPortMode();
-
 
 private slots:
 	void updateReadablePorts();
 	void updateWritablePorts();
 	void updateOutputProgram();
 
-
 private:
-	MidiClient* m_midiClient;
-	MidiEventProcessor* m_midiEventProcessor;
+	MidiClient *m_midiClient;
+	MidiEventProcessor *m_midiEventProcessor;
 
 	Mode m_mode;
 
@@ -164,20 +159,15 @@ private:
 	Map m_readablePorts;
 	Map m_writablePorts;
 
-
 	friend class ControllerConnectionDialog;
 	friend class InstrumentMidiIOView;
-
 
 signals:
 	void readablePortsChanged();
 	void writablePortsChanged();
 	void modeChanged();
-
-} ;
-
+};
 
 typedef QList<MidiPort *> MidiPortList;
-
 
 #endif

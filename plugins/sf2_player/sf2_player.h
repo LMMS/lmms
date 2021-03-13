@@ -23,7 +23,6 @@
  *
  */
 
-
 #ifndef SF2_PLAYER_H
 #define SF2_PLAYER_H
 
@@ -31,13 +30,13 @@
 #include <samplerate.h>
 
 #include "Instrument.h"
-#include "PixmapButton.h"
 #include "InstrumentView.h"
 #include "Knob.h"
 #include "LcdSpinBox.h"
 #include "LedCheckbox.h"
-#include "fluidsynthshims.h"
 #include "MemoryManager.h"
+#include "PixmapButton.h"
+#include "fluidsynthshims.h"
 
 class sf2InstrumentView;
 class sf2Font;
@@ -51,26 +50,25 @@ struct SF2PluginData;
 class sf2Instrument : public Instrument
 {
 	Q_OBJECT
-	mapPropertyFromModel(int,getBank,setBank,m_bankNum);
-	mapPropertyFromModel(int,getPatch,setPatch,m_patchNum);
+	mapPropertyFromModel(int, getBank, setBank, m_bankNum);
+	mapPropertyFromModel(int, getPatch, setPatch, m_patchNum);
 
 public:
-	sf2Instrument( InstrumentTrack * _instrument_track );
+	sf2Instrument(InstrumentTrack *_instrument_track);
 	virtual ~sf2Instrument();
 
-	virtual void play( sampleFrame * _working_buffer );
+	virtual void play(sampleFrame *_working_buffer);
 
-	virtual void playNote( NotePlayHandle * _n,
-						sampleFrame * _working_buffer );
-	virtual void deleteNotePluginData( NotePlayHandle * _n );
+	virtual void playNote(NotePlayHandle *_n,
+		sampleFrame *_working_buffer);
+	virtual void deleteNotePluginData(NotePlayHandle *_n);
 
+	virtual void saveSettings(QDomDocument &_doc, QDomElement &_parent);
+	virtual void loadSettings(const QDomElement &_this);
 
-	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
-	virtual void loadSettings( const QDomElement & _this );
+	virtual void loadFile(const QString &_file);
 
-	virtual void loadFile( const QString & _file );
-
-	virtual AutomatableModel * childModel( const QString & _modelName );
+	virtual AutomatableModel *childModel(const QString &_modelName);
 
 	virtual QString nodeName() const;
 
@@ -84,19 +82,17 @@ public:
 		return IsSingleStreamed;
 	}
 
-	virtual PluginView * instantiateView( QWidget * _parent );
-	
+	virtual PluginView *instantiateView(QWidget *_parent);
+
 	QString getCurrentPatchName();
 
-
-	void setParameter( const QString & _param, const QString & _value );
-
+	void setParameter(const QString &_param, const QString &_value);
 
 public slots:
-	void openFile( const QString & _sf2File, bool updateTrackName = true );
+	void openFile(const QString &_sf2File, bool updateTrackName = true);
 	void updatePatch();
 	void updateSampleRate();
-	
+
 	// We can't really support sample-exact with the way IPH and FS work.
 	// So, sig/slots work just fine for the synth settings right now.
 	void updateReverbOn();
@@ -105,18 +101,17 @@ public slots:
 	void updateChorus();
 	void updateGain();
 
-
 private:
 	static QMutex s_fontsMutex;
-	static QMap<QString, sf2Font*> s_fonts;
-	static int (* s_origFree)( fluid_sfont_t * );
+	static QMap<QString, sf2Font *> s_fonts;
+	static int (*s_origFree)(fluid_sfont_t *);
 
-	SRC_STATE * m_srcState;
+	SRC_STATE *m_srcState;
 
-	fluid_settings_t* m_settings;
-	fluid_synth_t* m_synth;
+	fluid_settings_t *m_settings;
+	fluid_synth_t *m_synth;
 
-	sf2Font* m_font;
+	sf2Font *m_font;
 
 	int m_fontId;
 	QString m_filename;
@@ -156,9 +151,9 @@ private:
 
 private:
 	void freeFont();
-	void noteOn( SF2PluginData * n );
-	void noteOff( SF2PluginData * n );
-	void renderFrames( f_cnt_t frames, sampleFrame * buf );
+	void noteOn(SF2PluginData *n);
+	void noteOff(SF2PluginData *n);
+	void renderFrames(f_cnt_t frames, sampleFrame *buf);
 
 	friend class sf2InstrumentView;
 
@@ -166,62 +161,56 @@ signals:
 	void fileLoading();
 	void fileChanged();
 	void patchChanged();
-
-} ;
-
-
+};
 
 // A soundfont in our font-map
 class sf2Font
 {
 	MM_OPERATORS
 public:
-	sf2Font( fluid_sfont_t * f ) :
-		fluidFont( f ),
-		refCount( 1 )
-	{};
+	sf2Font(fluid_sfont_t *f) :
+		fluidFont(f),
+		refCount(1){};
 
-	fluid_sfont_t * fluidFont;
+	fluid_sfont_t *fluidFont;
 	int refCount;
 };
-
-
 
 class sf2InstrumentView : public InstrumentViewFixedSize
 {
 	Q_OBJECT
 public:
-	sf2InstrumentView( Instrument * _instrument,
-					QWidget * _parent );
+	sf2InstrumentView(Instrument *_instrument,
+		QWidget *_parent);
 	virtual ~sf2InstrumentView();
 
 private:
 	virtual void modelChanged();
 
-	PixmapButton * m_fileDialogButton;
-	PixmapButton * m_patchDialogButton;
+	PixmapButton *m_fileDialogButton;
+	PixmapButton *m_patchDialogButton;
 
-	LcdSpinBox * m_bankNumLcd;
-	LcdSpinBox * m_patchNumLcd;
+	LcdSpinBox *m_bankNumLcd;
+	LcdSpinBox *m_patchNumLcd;
 
-	QLabel * m_filenameLabel;
-	QLabel * m_patchLabel;
+	QLabel *m_filenameLabel;
+	QLabel *m_patchLabel;
 
-	Knob	* m_gainKnob;
+	Knob *m_gainKnob;
 
-	PixmapButton * m_reverbButton;
-	Knob	* m_reverbRoomSizeKnob;
-	Knob	* m_reverbDampingKnob;
-	Knob	* m_reverbWidthKnob;
-	Knob	* m_reverbLevelKnob;
+	PixmapButton *m_reverbButton;
+	Knob *m_reverbRoomSizeKnob;
+	Knob *m_reverbDampingKnob;
+	Knob *m_reverbWidthKnob;
+	Knob *m_reverbLevelKnob;
 
-	PixmapButton * m_chorusButton;
-	Knob * m_chorusNumKnob;
-	Knob * m_chorusLevelKnob;
-	Knob * m_chorusSpeedKnob;
-	Knob * m_chorusDepthKnob;
+	PixmapButton *m_chorusButton;
+	Knob *m_chorusNumKnob;
+	Knob *m_chorusLevelKnob;
+	Knob *m_chorusSpeedKnob;
+	Knob *m_chorusDepthKnob;
 
-	static patchesDialog * s_patchDialog;
+	static patchesDialog *s_patchDialog;
 
 protected slots:
 	void invalidateFile();
@@ -229,8 +218,6 @@ protected slots:
 	void showPatchDialog();
 	void updateFilename();
 	void updatePatchName();
-} ;
-
-
+};
 
 #endif

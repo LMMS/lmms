@@ -23,6 +23,7 @@
  */
 
 #include "SamplePlayHandle.h"
+
 #include "AudioPort.h"
 #include "BBTrack.h"
 #include "Engine.h"
@@ -30,120 +31,92 @@
 #include "Mixer.h"
 #include "SampleTrack.h"
 
-
-
-SamplePlayHandle::SamplePlayHandle( SampleBuffer* sampleBuffer , bool ownAudioPort ) :
-	PlayHandle( TypeSamplePlayHandle ),
-	m_sampleBuffer( sharedObject::ref( sampleBuffer ) ),
-	m_doneMayReturnTrue( true ),
-	m_frame( 0 ),
-	m_ownAudioPort( ownAudioPort ),
-	m_defaultVolumeModel( DefaultVolume, MinVolume, MaxVolume, 1 ),
-	m_volumeModel( &m_defaultVolumeModel ),
-	m_track( NULL ),
-	m_bbTrack( NULL )
+SamplePlayHandle::SamplePlayHandle(SampleBuffer *sampleBuffer, bool ownAudioPort) :
+	PlayHandle(TypeSamplePlayHandle),
+	m_sampleBuffer(sharedObject::ref(sampleBuffer)),
+	m_doneMayReturnTrue(true),
+	m_frame(0),
+	m_ownAudioPort(ownAudioPort),
+	m_defaultVolumeModel(DefaultVolume, MinVolume, MaxVolume, 1),
+	m_volumeModel(&m_defaultVolumeModel),
+	m_track(NULL),
+	m_bbTrack(NULL)
 {
 	if (ownAudioPort)
 	{
-		setAudioPort( new AudioPort( "SamplePlayHandle", false ) );
+		setAudioPort(new AudioPort("SamplePlayHandle", false));
 	}
 }
 
-
-
-
-SamplePlayHandle::SamplePlayHandle( const QString& sampleFile ) :
-	SamplePlayHandle( new SampleBuffer( sampleFile ) , true)
+SamplePlayHandle::SamplePlayHandle(const QString &sampleFile) :
+	SamplePlayHandle(new SampleBuffer(sampleFile), true)
 {
-	sharedObject::unref( m_sampleBuffer );
+	sharedObject::unref(m_sampleBuffer);
 }
 
-
-
-
-SamplePlayHandle::SamplePlayHandle( SampleTCO* tco ) :
-	SamplePlayHandle( tco->sampleBuffer() , false)
+SamplePlayHandle::SamplePlayHandle(SampleTCO *tco) :
+	SamplePlayHandle(tco->sampleBuffer(), false)
 {
 	m_track = tco->getTrack();
-	setAudioPort( ( (SampleTrack *)tco->getTrack() )->audioPort() );
+	setAudioPort(((SampleTrack *)tco->getTrack())->audioPort());
 }
-
-
-
 
 SamplePlayHandle::~SamplePlayHandle()
 {
-	sharedObject::unref( m_sampleBuffer );
-	if( m_ownAudioPort )
+	sharedObject::unref(m_sampleBuffer);
+	if (m_ownAudioPort)
 	{
 		delete audioPort();
 	}
 }
 
-
-
-
-void SamplePlayHandle::play( sampleFrame * buffer )
+void SamplePlayHandle::play(sampleFrame *buffer)
 {
 	const fpp_t fpp = Engine::mixer()->framesPerPeriod();
 	//play( 0, _try_parallelizing );
-	if( framesDone() >= totalFrames() )
+	if (framesDone() >= totalFrames())
 	{
-		memset( buffer, 0, sizeof( sampleFrame ) * fpp );
+		memset(buffer, 0, sizeof(sampleFrame) * fpp);
 		return;
 	}
 
-	sampleFrame * workingBuffer = buffer;
+	sampleFrame *workingBuffer = buffer;
 	f_cnt_t frames = fpp;
 
 	// apply offset for the first period
-	if( framesDone() == 0 )
+	if (framesDone() == 0)
 	{
-		memset( buffer, 0, sizeof( sampleFrame ) * offset() );
+		memset(buffer, 0, sizeof(sampleFrame) * offset());
 		workingBuffer += offset();
 		frames -= offset();
 	}
 
-	if( !( m_track && m_track->isMuted() )
-				&& !( m_bbTrack && m_bbTrack->isMuted() ) )
+	if (!(m_track && m_track->isMuted()) && !(m_bbTrack && m_bbTrack->isMuted()))
 	{
-/*		stereoVolumeVector v =
+		/*		stereoVolumeVector v =
 			{ { m_volumeModel->value() / DefaultVolume,
 				m_volumeModel->value() / DefaultVolume } };*/
-		if( ! m_sampleBuffer->play( workingBuffer, &m_state, frames,
-								BaseFreq ) )
+		if (!m_sampleBuffer->play(workingBuffer, &m_state, frames,
+				BaseFreq))
 		{
-			memset( workingBuffer, 0, frames * sizeof( sampleFrame ) );
+			memset(workingBuffer, 0, frames * sizeof(sampleFrame));
 		}
 	}
 
 	m_frame += frames;
 }
 
-
-
-
 bool SamplePlayHandle::isFinished() const
 {
 	return framesDone() >= totalFrames() && m_doneMayReturnTrue == true;
 }
 
-
-
-
-bool SamplePlayHandle::isFromTrack( const Track * _track ) const
+bool SamplePlayHandle::isFromTrack(const Track *_track) const
 {
 	return m_track == _track || m_bbTrack == _track;
 }
 
-
-
-
 f_cnt_t SamplePlayHandle::totalFrames() const
 {
-	return ( m_sampleBuffer->endFrame() - m_sampleBuffer->startFrame() ) * ( Engine::mixer()->processingSampleRate() / m_sampleBuffer->sampleRate() );
+	return (m_sampleBuffer->endFrame() - m_sampleBuffer->startFrame()) * (Engine::mixer()->processingSampleRate() / m_sampleBuffer->sampleRate());
 }
-
-
-
-

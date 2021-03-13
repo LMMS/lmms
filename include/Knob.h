@@ -22,34 +22,35 @@
  *
  */
 
-
 #ifndef KNOB_H
 #define KNOB_H
 
-#include <memory>
 #include <QPixmap>
+#include <QTextDocument>
 #include <QWidget>
 #include <QtCore/QPoint>
-#include <QTextDocument>
+#include <memory>
 
 #include "AutomatableModelView.h"
-
 
 class QPixmap;
 class TextFloat;
 
 enum knobTypes
 {
-	knobDark_28, knobBright_26, knobSmall_17, knobVintage_32, knobStyled
-} ;
-
+	knobDark_28,
+	knobBright_26,
+	knobSmall_17,
+	knobVintage_32,
+	knobStyled
+};
 
 void convertPixmapToGrayScale(QPixmap &pixMap);
 
 class LMMS_EXPORT Knob : public QWidget, public FloatModelView
 {
 	Q_OBJECT
-	Q_ENUMS( knobTypes )
+	Q_ENUMS(knobTypes)
 
 	Q_PROPERTY(float innerRadius READ innerRadius WRITE setInnerRadius)
 	Q_PROPERTY(float outerRadius READ outerRadius WRITE setOuterRadius)
@@ -68,79 +69,77 @@ class LMMS_EXPORT Knob : public QWidget, public FloatModelView
 	Q_PROPERTY(QColor arcActiveColor MEMBER m_arcActiveColor)
 	Q_PROPERTY(QColor arcInactiveColor MEMBER m_arcInactiveColor)
 
-	mapPropertyFromModel(bool,isVolumeKnob,setVolumeKnob,m_volumeKnob);
-	mapPropertyFromModel(float,volumeRatio,setVolumeRatio,m_volumeRatio);
+	mapPropertyFromModel(bool, isVolumeKnob, setVolumeKnob, m_volumeKnob);
+	mapPropertyFromModel(float, volumeRatio, setVolumeRatio, m_volumeRatio);
 
 	Q_PROPERTY(knobTypes knobNum READ knobNum WRITE setknobNum)
-	
+
 	Q_PROPERTY(QColor textColor READ textColor WRITE setTextColor)
 
-	void initUi( const QString & _name ); //!< to be called by ctors
-	void onKnobNumUpdated(); //!< to be called when you updated @a m_knobNum
+	void initUi(const QString &_name); //!< to be called by ctors
+	void onKnobNumUpdated();		   //!< to be called when you updated @a m_knobNum
 
 public:
-	Knob( knobTypes _knob_num, QWidget * _parent = NULL, const QString & _name = QString() );
-	Knob( QWidget * _parent = NULL, const QString & _name = QString() ); //!< default ctor
-	Knob( const Knob& other ) = delete;
+	Knob(knobTypes _knob_num, QWidget *_parent = NULL, const QString &_name = QString());
+	Knob(QWidget *_parent = NULL, const QString &_name = QString()); //!< default ctor
+	Knob(const Knob &other) = delete;
 
 	// TODO: remove
-	inline void setHintText( const QString & _txt_before,
-						const QString & _txt_after )
+	inline void setHintText(const QString &_txt_before,
+		const QString &_txt_after)
 	{
-		setDescription( _txt_before );
-		setUnit( _txt_after );
+		setDescription(_txt_before);
+		setUnit(_txt_after);
 	}
-	void setLabel( const QString & txt );
-	void setHtmlLabel( const QString &htmltxt );
+	void setLabel(const QString &txt);
+	void setHtmlLabel(const QString &htmltxt);
 
-	void setTotalAngle( float angle );
+	void setTotalAngle(float angle);
 
 	// Begin styled knob accessors
 	float innerRadius() const;
-	void setInnerRadius( float r );
+	void setInnerRadius(float r);
 
 	float outerRadius() const;
-	void setOuterRadius( float r );
+	void setOuterRadius(float r);
 
 	knobTypes knobNum() const;
-	void setknobNum( knobTypes k );
+	void setknobNum(knobTypes k);
 
 	QPointF centerPoint() const;
 	float centerPointX() const;
-	void setCenterPointX( float c );
+	void setCenterPointX(float c);
 	float centerPointY() const;
-	void setCenterPointY( float c );
+	void setCenterPointY(float c);
 
 	float lineWidth() const;
-	void setLineWidth( float w );
+	void setLineWidth(float w);
 
 	QColor outerColor() const;
-	void setOuterColor( const QColor & c );
-	
-	QColor textColor() const;
-	void setTextColor( const QColor & c );
+	void setOuterColor(const QColor &c);
 
+	QColor textColor() const;
+	void setTextColor(const QColor &c);
 
 signals:
 	void sliderPressed();
 	void sliderReleased();
-	void sliderMoved( float value );
-
+	void sliderMoved(float value);
 
 protected:
-	void contextMenuEvent( QContextMenuEvent * _me ) override;
-	void dragEnterEvent( QDragEnterEvent * _dee ) override;
-	void dropEvent( QDropEvent * _de ) override;
-	void focusOutEvent( QFocusEvent * _fe ) override;
-	void mousePressEvent( QMouseEvent * _me ) override;
-	void mouseReleaseEvent( QMouseEvent * _me ) override;
-	void mouseMoveEvent( QMouseEvent * _me ) override;
-	void mouseDoubleClickEvent( QMouseEvent * _me ) override;
-	void paintEvent( QPaintEvent * _me ) override;
-	void wheelEvent( QWheelEvent * _me ) override;
-	void changeEvent(QEvent * ev) override;
+	void contextMenuEvent(QContextMenuEvent *_me) override;
+	void dragEnterEvent(QDragEnterEvent *_dee) override;
+	void dropEvent(QDropEvent *_de) override;
+	void focusOutEvent(QFocusEvent *_fe) override;
+	void mousePressEvent(QMouseEvent *_me) override;
+	void mouseReleaseEvent(QMouseEvent *_me) override;
+	void mouseMoveEvent(QMouseEvent *_me) override;
+	void mouseDoubleClickEvent(QMouseEvent *_me) override;
+	void paintEvent(QPaintEvent *_me) override;
+	void wheelEvent(QWheelEvent *_me) override;
+	void changeEvent(QEvent *ev) override;
 
-	virtual float getValue( const QPoint & _p );
+	virtual float getValue(const QPoint &_p);
 
 private slots:
 	virtual void enterValue();
@@ -152,29 +151,28 @@ private:
 
 	void doConnections() override;
 
-	QLineF calculateLine( const QPointF & _mid, float _radius,
-						float _innerRadius = 1) const;
+	QLineF calculateLine(const QPointF &_mid, float _radius,
+		float _innerRadius = 1) const;
 
-	void drawKnob( QPainter * _p );
-	void setPosition( const QPoint & _p );
+	void drawKnob(QPainter *_p);
+	void setPosition(const QPoint &_p);
 	bool updateAngle();
 
-	int angleFromValue( float value, float minValue, float maxValue, float totalAngle ) const
+	int angleFromValue(float value, float minValue, float maxValue, float totalAngle) const
 	{
-		return static_cast<int>( ( value - 0.5 * ( minValue + maxValue ) ) / ( maxValue - minValue ) * m_totalAngle ) % 360;
+		return static_cast<int>((value - 0.5 * (minValue + maxValue)) / (maxValue - minValue) * m_totalAngle) % 360;
 	}
 
 	inline float pageSize() const
 	{
-		return ( model()->maxValue() - model()->minValue() ) / 100.0f;
+		return (model()->maxValue() - model()->minValue()) / 100.0f;
 	}
 
-
-	static TextFloat * s_textFloat;
+	static TextFloat *s_textFloat;
 
 	QString m_label;
 	bool m_isHtmlLabel;
-	QTextDocument* m_tdRenderer;
+	QTextDocument *m_tdRenderer;
 
 	std::unique_ptr<QPixmap> m_knobPixmap;
 	BoolModel m_volumeKnob;
@@ -199,11 +197,10 @@ private:
 	QColor m_lineInactiveColor;
 	QColor m_arcActiveColor;
 	QColor m_arcInactiveColor;
-	
+
 	QColor m_textColor;
 
 	knobTypes m_knobNum;
-
-} ;
+};
 
 #endif

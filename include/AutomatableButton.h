@@ -22,7 +22,6 @@
  *
  */
 
-
 #ifndef AUTOMATABLE_BUTTON_H
 #define AUTOMATABLE_BUTTON_H
 
@@ -30,80 +29,65 @@
 
 #include "AutomatableModelView.h"
 
-
 class automatableButtonGroup;
-
 
 class LMMS_EXPORT AutomatableButton : public QPushButton, public BoolModelView
 {
 	Q_OBJECT
 public:
-	AutomatableButton( QWidget * _parent, const QString & _name
-			= QString() );
+	AutomatableButton(QWidget *_parent, const QString &_name = QString());
 	virtual ~AutomatableButton();
 
-	inline void setCheckable( bool _on )
+	inline void setCheckable(bool _on)
 	{
-		QPushButton::setCheckable( _on );
-		model()->setJournalling( _on );
+		QPushButton::setCheckable(_on);
+		model()->setJournalling(_on);
 	}
 
 	void modelChanged() override;
 
-
 public slots:
 	virtual void update();
 	virtual void toggle();
-	virtual void setChecked( bool _on )
+	virtual void setChecked(bool _on)
 	{
 		// QPushButton::setChecked is called in update-slot
-		model()->setValue( _on );
+		model()->setValue(_on);
 	}
 
-
 protected:
-	void contextMenuEvent( QContextMenuEvent * _me ) override;
-	void mousePressEvent( QMouseEvent * _me ) override;
-	void mouseReleaseEvent( QMouseEvent * _me ) override;
-
+	void contextMenuEvent(QContextMenuEvent *_me) override;
+	void mousePressEvent(QMouseEvent *_me) override;
+	void mouseReleaseEvent(QMouseEvent *_me) override;
 
 private:
-	automatableButtonGroup * m_group;
-
+	automatableButtonGroup *m_group;
 
 	friend class automatableButtonGroup;
 
-	using QPushButton::setChecked;
 	using QPushButton::isChecked;
-} ;
-
-
+	using QPushButton::setChecked;
+};
 
 class LMMS_EXPORT automatableButtonGroup : public QWidget, public IntModelView
 {
 	Q_OBJECT
 public:
-	automatableButtonGroup( QWidget * _parent, const QString & _name
-			= QString() );
+	automatableButtonGroup(QWidget *_parent, const QString &_name = QString());
 	virtual ~automatableButtonGroup();
 
-	void addButton( AutomatableButton * _btn );
-	void removeButton( AutomatableButton * _btn );
+	void addButton(AutomatableButton *_btn);
+	void removeButton(AutomatableButton *_btn);
 
-	void activateButton( AutomatableButton * _btn );
+	void activateButton(AutomatableButton *_btn);
 
 	void modelChanged() override;
-
 
 private slots:
 	void updateButtons();
 
-
 private:
 	QList<AutomatableButton *> m_buttons;
-
-} ;
-
-
+};
 
 #endif

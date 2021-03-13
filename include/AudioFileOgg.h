@@ -34,32 +34,30 @@
 
 #include "AudioFileDevice.h"
 
-
 class AudioFileOgg : public AudioFileDevice
 {
 public:
-	AudioFileOgg( OutputSettings const & outputSettings,
-			const ch_cnt_t _channels,
-			bool & _success_ful,
-			const QString & _file,
-			Mixer* mixer );
+	AudioFileOgg(OutputSettings const &outputSettings,
+		const ch_cnt_t _channels,
+		bool &_success_ful,
+		const QString &_file,
+		Mixer *mixer);
 	virtual ~AudioFileOgg();
 
-	static AudioFileDevice * getInst( const QString & outputFilename,
-					  OutputSettings const & outputSettings,
-					  const ch_cnt_t channels,
-					  Mixer* mixer,
-					  bool & successful )
+	static AudioFileDevice *getInst(const QString &outputFilename,
+		OutputSettings const &outputSettings,
+		const ch_cnt_t channels,
+		Mixer *mixer,
+		bool &successful)
 	{
-		return new AudioFileOgg( outputSettings, channels, successful,
-						outputFilename, mixer );
+		return new AudioFileOgg(outputSettings, channels, successful,
+			outputFilename, mixer);
 	}
 
-
 private:
-	virtual void writeBuffer( const surroundSampleFrame * _ab,
-						const fpp_t _frames,
-						const float _master_gain ) override;
+	virtual void writeBuffer(const surroundSampleFrame *_ab,
+		const fpp_t _frames,
+		const float _master_gain) override;
 
 	bool startEncoding();
 	void finishEncoding();
@@ -94,19 +92,17 @@ private:
 
 	uint32_t m_serialNo;
 
-	vorbis_comment * m_comments;
+	vorbis_comment *m_comments;
 
 	// encoding setup - init by init_ogg_encoding
-	ogg_stream_state	m_os;
-	ogg_page 	 	m_og;
-	ogg_packet	 	m_op;
+	ogg_stream_state m_os;
+	ogg_page m_og;
+	ogg_packet m_op;
 
-	vorbis_dsp_state 	m_vd;
-	vorbis_block     	m_vb;
-	vorbis_info      	m_vi;
-
-} ;
-
+	vorbis_dsp_state m_vd;
+	vorbis_block m_vb;
+	vorbis_info m_vi;
+};
 
 #endif
 

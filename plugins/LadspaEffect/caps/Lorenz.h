@@ -31,32 +31,34 @@
 #include "dsp/Lorenz.h"
 
 class Lorenz
-: public Plugin
+	: public Plugin
 {
-	public:
-		sample_t h, gain;
+public:
+	sample_t h, gain;
 
-		DSP::Lorenz lorenz;
+	DSP::Lorenz lorenz;
 
-		template <sample_func_t F>
-			void one_cycle (int frames);
+	template <sample_func_t F>
+	void one_cycle(int frames);
 
-	public:
-		static PortInfo port_info [];
+public:
+	static PortInfo port_info[];
 
-		void init();
-		void activate() 
-			{ gain = getport(4); }
+	void init();
+	void activate()
+	{
+		gain = getport(4);
+	}
 
-		void run (int n)
-			{
-				one_cycle<store_func> (n);
-			}
-		
-		void run_adding (int n)
-			{
-				one_cycle<adding_func> (n);
-			}
+	void run(int n)
+	{
+		one_cycle<store_func>(n);
+	}
+
+	void run_adding(int n)
+	{
+		one_cycle<adding_func>(n);
+	}
 };
 
 #endif /* _LORENZ_H_ */

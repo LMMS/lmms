@@ -33,128 +33,129 @@
 #ifndef _SWEEP_VF_H_
 #define _SWEEP_VF_H_
 
+#include "dsp/BiQuad.h"
+#include "dsp/Lorenz.h"
+#include "dsp/OnePole.h"
+#include "dsp/RMS.h"
+#include "dsp/Roessler.h"
 #include "dsp/SVF.h"
 
-#include "dsp/Lorenz.h"
-#include "dsp/Roessler.h"
-
-#include "dsp/RMS.h"
-#include "dsp/BiQuad.h"
-#include "dsp/OnePole.h"
-
 class SweepVFI
-: public Plugin
+	: public Plugin
 {
-	public:
-		double fs;
+public:
+	double fs;
 
-		/* svf parameters */
-		sample_t f, Q;
+	/* svf parameters */
+	sample_t f, Q;
 
-		/* needs to be a power of two */
-		enum {
-			BLOCK_SIZE = 32
-		};
+	/* needs to be a power of two */
+	enum
+	{
+		BLOCK_SIZE = 32
+	};
 
-		DSP::StackedSVF<1,2> svf;
-		DSP::Lorenz lorenz;
+	DSP::StackedSVF<1, 2> svf;
+	DSP::Lorenz lorenz;
 
-		template <sample_func_t F>
-			void one_cycle (int frames);
+	template <sample_func_t F>
+	void one_cycle(int frames);
 
-	public:
-		static PortInfo port_info [];
+public:
+	static PortInfo port_info[];
 
-		void init();
-		void activate();
+	void init();
+	void activate();
 
-		void run (int n)
-			{
-				one_cycle<store_func> (n);
-			}
-		
-		void run_adding (int n)
-			{
-				one_cycle<adding_func> (n);
-			}
+	void run(int n)
+	{
+		one_cycle<store_func>(n);
+	}
+
+	void run_adding(int n)
+	{
+		one_cycle<adding_func>(n);
+	}
 };
 
 class SweepVFII
-: public Plugin
+	: public Plugin
 {
-	public:
-		/* svf parameters */
-		sample_t f, Q;
+public:
+	/* svf parameters */
+	sample_t f, Q;
 
-		/* needs to be a power of two */
-		enum {
-			BLOCK_SIZE = 32
-		};
+	/* needs to be a power of two */
+	enum
+	{
+		BLOCK_SIZE = 32
+	};
 
-		DSP::StackedSVF<1,2> svf;
-		DSP::Lorenz lorenz1;
-		DSP::Lorenz lorenz2;
+	DSP::StackedSVF<1, 2> svf;
+	DSP::Lorenz lorenz1;
+	DSP::Lorenz lorenz2;
 
-		template <sample_func_t F>
-			void one_cycle (int frames);
+	template <sample_func_t F>
+	void one_cycle(int frames);
 
-	public:
-		static PortInfo port_info [];
+public:
+	static PortInfo port_info[];
 
-		void init();
-		void activate();
+	void init();
+	void activate();
 
-		void run (int n)
-			{
-				one_cycle<store_func> (n);
-			}
-		
-		void run_adding (int n)
-			{
-				one_cycle<adding_func> (n);
-			}
+	void run(int n)
+	{
+		one_cycle<store_func>(n);
+	}
+
+	void run_adding(int n)
+	{
+		one_cycle<adding_func>(n);
+	}
 };
 
 /* //////////////////////////////////////////////////////////////////////// */
 
 class AutoWah
-: public Plugin
+	: public Plugin
 {
-	public:
-		double fs;
+public:
+	double fs;
 
-		/* svf parameters */
-		sample_t f, Q;
+	/* svf parameters */
+	sample_t f, Q;
 
-		/* needs to be a power of two */
-		enum {
-			BLOCK_SIZE = 32
-		};
+	/* needs to be a power of two */
+	enum
+	{
+		BLOCK_SIZE = 32
+	};
 
-		DSP::StackedSVF<1,2> svf;
-		DSP::RMS rms;
+	DSP::StackedSVF<1, 2> svf;
+	DSP::RMS rms;
 
-		DSP::BiQuad filter;
-		DSP::OnePoleHP hp;
+	DSP::BiQuad filter;
+	DSP::OnePoleHP hp;
 
-		template <sample_func_t F>
-			void one_cycle (int frames);
+	template <sample_func_t F>
+	void one_cycle(int frames);
 
-	public:
-		static PortInfo port_info [];
+public:
+	static PortInfo port_info[];
 
-		void init();
-		void activate();
+	void init();
+	void activate();
 
-		void run (int n)
-			{
-				one_cycle<store_func> (n);
-			}
-		
-		void run_adding (int n)
-			{
-				one_cycle<adding_func> (n);
-			}
+	void run(int n)
+	{
+		one_cycle<store_func>(n);
+	}
+
+	void run_adding(int n)
+	{
+		one_cycle<adding_func>(n);
+	}
 };
 
 #endif /* _SWEEP_VF_H_ */

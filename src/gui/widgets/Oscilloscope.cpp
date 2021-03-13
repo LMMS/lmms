@@ -22,45 +22,40 @@
  *
  */
 
+#include "Oscilloscope.h"
 
 #include <QMouseEvent>
 #include <QPainter>
 
-#include "Oscilloscope.h"
+#include "BufferManager.h"
+#include "Engine.h"
 #include "GuiApplication.h"
-#include "gui_templates.h"
 #include "MainWindow.h"
 #include "Mixer.h"
-#include "Engine.h"
-#include "ToolTip.h"
 #include "Song.h"
+#include "ToolTip.h"
 #include "embed.h"
-#include "BufferManager.h"
+#include "gui_templates.h"
 
-
-Oscilloscope::Oscilloscope( QWidget * _p ) :
-	QWidget( _p ),
-	m_background( embed::getIconPixmap( "output_graph" ) ),
-	m_points( new QPointF[Engine::mixer()->framesPerPeriod()] ),
-	m_active( false ),
+Oscilloscope::Oscilloscope(QWidget *_p) :
+	QWidget(_p),
+	m_background(embed::getIconPixmap("output_graph")),
+	m_points(new QPointF[Engine::mixer()->framesPerPeriod()]),
+	m_active(false),
 	m_normalColor(71, 253, 133),
 	m_clippingColor(255, 64, 64)
 {
-	setFixedSize( m_background.width(), m_background.height() );
-	setAttribute( Qt::WA_OpaquePaintEvent, true );
-	setActive( ConfigManager::inst()->value( "ui", "displaywaveform").toInt() );
+	setFixedSize(m_background.width(), m_background.height());
+	setAttribute(Qt::WA_OpaquePaintEvent, true);
+	setActive(ConfigManager::inst()->value("ui", "displaywaveform").toInt());
 
 	const fpp_t frames = Engine::mixer()->framesPerPeriod();
 	m_buffer = new sampleFrame[frames];
 
-	BufferManager::clear( m_buffer, frames );
+	BufferManager::clear(m_buffer, frames);
 
-
-	ToolTip::add( this, tr( "Oscilloscope" ) );
+	ToolTip::add(this, tr("Oscilloscope"));
 }
-
-
-
 
 Oscilloscope::~Oscilloscope()
 {
@@ -68,133 +63,121 @@ Oscilloscope::~Oscilloscope()
 	delete[] m_points;
 }
 
-
-
-
-void Oscilloscope::updateAudioBuffer( const surroundSampleFrame * buffer )
+void Oscilloscope::updateAudioBuffer(const surroundSampleFrame *buffer)
 {
-	if( !Engine::getSong()->isExporting() )
+	if (!Engine::getSong()->isExporting())
 	{
 		const fpp_t fpp = Engine::mixer()->framesPerPeriod();
-		memcpy( m_buffer, buffer, sizeof( surroundSampleFrame ) * fpp );
+		memcpy(m_buffer, buffer, sizeof(surroundSampleFrame) * fpp);
 	}
 }
 
-
-
-
-void Oscilloscope::setActive( bool _active )
+void Oscilloscope::setActive(bool _active)
 {
 	m_active = _active;
-	if( m_active )
+	if (m_active)
 	{
-		connect( gui->mainWindow(),
-					SIGNAL( periodicUpdate() ),
-					this, SLOT( update() ) );
-		connect( Engine::mixer(),
-			SIGNAL( nextAudioBuffer( const surroundSampleFrame* ) ),
-			this, SLOT( updateAudioBuffer( const surroundSampleFrame* ) ) );
+		connect(gui->mainWindow(),
+			SIGNAL(periodicUpdate()),
+			this, SLOT(update()));
+		connect(Engine::mixer(),
+			SIGNAL(nextAudioBuffer(const surroundSampleFrame *)),
+			this, SLOT(updateAudioBuffer(const surroundSampleFrame *)));
 	}
 	else
 	{
-		disconnect( gui->mainWindow(),
-					SIGNAL( periodicUpdate() ),
-					this, SLOT( update() ) );
-		disconnect( Engine::mixer(),
-			SIGNAL( nextAudioBuffer( const surroundSampleFrame* ) ),
-			this, SLOT( updateAudioBuffer( const surroundSampleFrame* ) ) );
+		disconnect(gui->mainWindow(),
+			SIGNAL(periodicUpdate()),
+			this, SLOT(update()));
+		disconnect(Engine::mixer(),
+			SIGNAL(nextAudioBuffer(const surroundSampleFrame *)),
+			this, SLOT(updateAudioBuffer(const surroundSampleFrame *)));
 		// we have to update (remove last waves),
 		// because timer doesn't do that anymore
 		update();
 	}
 }
 
-
-QColor const & Oscilloscope::normalColor() const
+QColor const &Oscilloscope::normalColor() const
 {
 	return m_normalColor;
 }
 
-void Oscilloscope::setNormalColor(QColor const & normalColor)
+void Oscilloscope::setNormalColor(QColor const &normalColor)
 {
 	m_normalColor = normalColor;
 }
 
-QColor const & Oscilloscope::clippingColor() const
+QColor const &Oscilloscope::clippingColor() const
 {
 	return m_clippingColor;
 }
 
-void Oscilloscope::setClippingColor(QColor const & clippingColor)
+void Oscilloscope::setClippingColor(QColor const &clippingColor)
 {
 	m_clippingColor = clippingColor;
 }
 
-
-void Oscilloscope::paintEvent( QPaintEvent * )
+void Oscilloscope::paintEvent(QPaintEvent *)
 {
-	QPainter p( this );
+	QPainter p(this);
 
-	p.drawPixmap( 0, 0, m_background );
+	p.drawPixmap(0, 0, m_background);
 
-	if( m_active && !Engine::getSong()->isExporting() )
+	if (m_active && !Engine::getSong()->isExporting())
 	{
-		Mixer const * mixer = Engine::mixer();
+		Mixer const *mixer = Engine::mixer();
 
 		float master_output = mixer->masterGain();
 
 		const fpp_t frames = mixer->framesPerPeriod();
 		Mixer::StereoSample peakValues = mixer->getPeakValues(m_buffer, frames);
-		const float max_level = qMax<float>( peakValues.left, peakValues.right );
+		const float max_level = qMax<float>(peakValues.left, peakValues.right);
 
 		// Set the color of the line according to the maximum level
 		float const maxLevelWithAppliedMasterGain = max_level * master_output;
 		p.setPen(QPen(determineLineColor(maxLevelWithAppliedMasterGain), 0.7));
 
-		p.setRenderHint( QPainter::Antialiasing );
+		p.setRenderHint(QPainter::Antialiasing);
 
 		// now draw all that stuff
 		int w = width() - 4;
 		const qreal xd = static_cast<qreal>(w) / frames;
-		const qreal half_h = -( height() - 6 ) / 3.0 * static_cast<qreal>(master_output) - 1;
+		const qreal half_h = -(height() - 6) / 3.0 * static_cast<qreal>(master_output) - 1;
 		int x_base = 2;
 		const qreal y_base = height() / 2 - 0.5;
 
-		for( ch_cnt_t ch = 0; ch < DEFAULT_CHANNELS; ++ch )
+		for (ch_cnt_t ch = 0; ch < DEFAULT_CHANNELS; ++ch)
 		{
-			for( int frame = 0; frame < frames; ++frame )
+			for (int frame = 0; frame < frames; ++frame)
 			{
 				sample_t const clippedSample = Mixer::clip(m_buffer[frame][ch]);
 				m_points[frame] = QPointF(
 					x_base + static_cast<qreal>(frame) * xd,
-					y_base + ( static_cast<qreal>(clippedSample) * half_h ) );
+					y_base + (static_cast<qreal>(clippedSample) * half_h));
 			}
-			p.drawPolyline( m_points, frames );
+			p.drawPolyline(m_points, frames);
 		}
 	}
 	else
 	{
-		p.setPen( QColor( 192, 192, 192 ) );
-		p.setFont( pointSize<7>( p.font() ) );
-		p.drawText( 6, height()-5, tr( "Click to enable" ) );
+		p.setPen(QColor(192, 192, 192));
+		p.setFont(pointSize<7>(p.font()));
+		p.drawText(6, height() - 5, tr("Click to enable"));
 	}
 }
 
-
-
-
-void Oscilloscope::mousePressEvent( QMouseEvent * _me )
+void Oscilloscope::mousePressEvent(QMouseEvent *_me)
 {
-	if( _me->button() == Qt::LeftButton )
+	if (_me->button() == Qt::LeftButton)
 	{
-		setActive( !m_active );
+		setActive(!m_active);
 	}
 }
 
-
-QColor const & Oscilloscope::determineLineColor(float level) const
+QColor const &Oscilloscope::determineLineColor(float level) const
 {
-	if( level <= 1.0f )
+	if (level <= 1.0f)
 	{
 		return normalColor();
 	}
@@ -203,6 +186,3 @@ QColor const & Oscilloscope::determineLineColor(float level) const
 		return clippingColor();
 	}
 }
-
-
-

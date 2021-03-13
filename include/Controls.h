@@ -25,18 +25,15 @@
 #ifndef CONTROLS_H
 #define CONTROLS_H
 
-
 #include "Model.h"
 
 // headers only required for covariance
 #include "AutomatableModel.h"
 #include "ComboBoxModel.h"
 
-
 class QString;
 class QWidget;
 class AutomatableModel;
-
 
 /**
 	These classes provide
@@ -48,87 +45,82 @@ class AutomatableModel;
 class Control
 {
 public:
-	virtual QWidget* topWidget() = 0;
-	virtual void setText(const QString& text) = 0;
+	virtual QWidget *topWidget() = 0;
+	virtual void setText(const QString &text) = 0;
 
-	virtual void setModel(AutomatableModel* model) = 0;
-	virtual AutomatableModel* model() = 0;
-	virtual class AutomatableModelView* modelView() = 0;
+	virtual void setModel(AutomatableModel *model) = 0;
+	virtual AutomatableModel *model() = 0;
+	virtual class AutomatableModelView *modelView() = 0;
 
 	virtual ~Control();
 };
 
-
 class KnobControl : public Control
 {
-	class Knob* m_knob;
+	class Knob *m_knob;
 
 public:
-	void setText(const QString& text) override;
-	QWidget* topWidget() override;
+	void setText(const QString &text) override;
+	QWidget *topWidget() override;
 
-	void setModel(AutomatableModel* model) override;
-	FloatModel* model() override;
-	class AutomatableModelView* modelView() override;
+	void setModel(AutomatableModel *model) override;
+	FloatModel *model() override;
+	class AutomatableModelView *modelView() override;
 
-	KnobControl(QWidget* parent = nullptr);
+	KnobControl(QWidget *parent = nullptr);
 	~KnobControl() override;
 };
 
-
 class ComboControl : public Control
 {
-	QWidget* m_widget;
-	class ComboBox* m_combo;
-	class QLabel* m_label;
+	QWidget *m_widget;
+	class ComboBox *m_combo;
+	class QLabel *m_label;
 
 public:
-	void setText(const QString& text) override;
-	QWidget* topWidget() override { return m_widget; }
+	void setText(const QString &text) override;
+	QWidget *topWidget() override { return m_widget; }
 
-	void setModel(AutomatableModel* model) override;
-	ComboBoxModel* model() override;
-	class AutomatableModelView* modelView() override;
+	void setModel(AutomatableModel *model) override;
+	ComboBoxModel *model() override;
+	class AutomatableModelView *modelView() override;
 
-	ComboControl(QWidget* parent = nullptr);
+	ComboControl(QWidget *parent = nullptr);
 	~ComboControl() override;
 };
 
-
 class LcdControl : public Control
 {
-	class LcdSpinBox* m_lcd;
+	class LcdSpinBox *m_lcd;
 
 public:
-	void setText(const QString& text) override;
-	QWidget* topWidget() override;
+	void setText(const QString &text) override;
+	QWidget *topWidget() override;
 
-	void setModel(AutomatableModel* model) override;
-	IntModel* model() override;
-	class AutomatableModelView* modelView() override;
+	void setModel(AutomatableModel *model) override;
+	IntModel *model() override;
+	class AutomatableModelView *modelView() override;
 
-	LcdControl(int numDigits, QWidget* parent = nullptr);
+	LcdControl(int numDigits, QWidget *parent = nullptr);
 	~LcdControl() override;
 };
 
-
 class CheckControl : public Control
 {
-	QWidget* m_widget;
-	class LedCheckBox* m_checkBox;
-	QLabel* m_label;
+	QWidget *m_widget;
+	class LedCheckBox *m_checkBox;
+	QLabel *m_label;
 
 public:
-	void setText(const QString& text) override;
-	QWidget* topWidget() override;
+	void setText(const QString &text) override;
+	QWidget *topWidget() override;
 
-	void setModel(AutomatableModel* model) override;
+	void setModel(AutomatableModel *model) override;
 	BoolModel *model() override;
-	class AutomatableModelView* modelView() override;
+	class AutomatableModelView *modelView() override;
 
-	CheckControl(QWidget* parent = nullptr);
+	CheckControl(QWidget *parent = nullptr);
 	~CheckControl() override;
 };
-
 
 #endif // CONTROLS_H

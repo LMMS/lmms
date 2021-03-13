@@ -25,9 +25,9 @@
 #ifndef PEAK_CONTROLLER_H
 #define PEAK_CONTROLLER_H
 
-#include "Model.h"
 #include "Controller.h"
 #include "ControllerDialog.h"
+#include "Model.h"
 
 class QWidget;
 
@@ -35,37 +35,34 @@ class PeakControllerEffect;
 
 typedef QVector<PeakControllerEffect *> PeakControllerEffectVector;
 
-
 class LMMS_EXPORT PeakController : public Controller
 {
 	Q_OBJECT
 public:
-	PeakController( Model * _parent,
-		PeakControllerEffect *_peak_effect = NULL );
-
+	PeakController(Model *_parent,
+		PeakControllerEffect *_peak_effect = NULL);
 
 	virtual ~PeakController();
 
-	void saveSettings( QDomDocument & _doc, QDomElement & _this ) override;
-	void loadSettings( const QDomElement & _this ) override;
+	void saveSettings(QDomDocument &_doc, QDomElement &_this) override;
+	void loadSettings(const QDomElement &_this) override;
 	QString nodeName() const override;
 
 	static void initGetControllerBySetting();
-	static PeakController * getControllerBySetting( const QDomElement & _this );
+	static PeakController *getControllerBySetting(const QDomElement &_this);
 
 	static PeakControllerEffectVector s_effects;
 
-
 public slots:
-	ControllerDialog * createDialog( QWidget * _parent ) override;
-	void handleDestroyedEffect( );
+	ControllerDialog *createDialog(QWidget *_parent) override;
+	void handleDestroyedEffect();
 	void updateCoeffs();
 
 protected:
 	// The internal per-controller get-value function
 	void updateValueBuffer() override;
 
-	PeakControllerEffect * m_peakEffect;
+	PeakControllerEffect *m_peakEffect;
 
 	friend class PeakControllerDialog;
 
@@ -75,28 +72,25 @@ private:
 	static int m_getCount;
 	static int m_loadCount;
 	static bool m_buggedFile;
-	
+
 	float m_attackCoeff;
 	float m_decayCoeff;
 	bool m_coeffNeedsUpdate;
-} ;
-
-
+};
 
 class PeakControllerDialog : public ControllerDialog
 {
 	Q_OBJECT
 public:
-	PeakControllerDialog( Controller * _controller, QWidget * _parent );
+	PeakControllerDialog(Controller *_controller, QWidget *_parent);
 	virtual ~PeakControllerDialog();
 
 protected:
-	void contextMenuEvent( QContextMenuEvent * _me ) override;
-	void paintEvent( QPaintEvent * _pe ) override;
+	void contextMenuEvent(QContextMenuEvent *_me) override;
+	void paintEvent(QPaintEvent *_pe) override;
 	void modelChanged() override;
 
-	PeakController * m_peakController;
-
-} ;
+	PeakController *m_peakController;
+};
 
 #endif

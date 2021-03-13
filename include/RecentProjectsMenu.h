@@ -11,7 +11,7 @@ public:
 
 private slots:
 	void fillMenu();
-	void openProject(QAction * _action );
+	void openProject(QAction *_action);
 };
 
 #endif // RECENTPROJECTSMENU_H

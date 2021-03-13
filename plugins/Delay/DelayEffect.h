@@ -25,8 +25,8 @@
 #ifndef DELAYEFFECT_H
 #define DELAYEFFECT_H
 
-#include "Effect.h"
 #include "DelayControls.h"
+#include "Effect.h"
 #include "Lfo.h"
 #include "StereoDelay.h"
 #include "ValueBuffer.h"
@@ -34,10 +34,10 @@
 class DelayEffect : public Effect
 {
 public:
-	DelayEffect(Model* parent , const Descriptor::SubPluginFeatures::Key* key );
+	DelayEffect(Model *parent, const Descriptor::SubPluginFeatures::Key *key);
 	virtual ~DelayEffect();
-	virtual bool processAudioBuffer( sampleFrame* buf, const fpp_t frames );
-	virtual EffectControls* controls()
+	virtual bool processAudioBuffer(sampleFrame *buf, const fpp_t frames);
+	virtual EffectControls *controls()
 	{
 		return &m_delayControls;
 	}
@@ -45,8 +45,8 @@ public:
 
 private:
 	DelayControls m_delayControls;
-	StereoDelay* m_delay;
-	Lfo* m_lfo;
+	StereoDelay *m_delay;
+	Lfo *m_lfo;
 	float m_outGain;
 	float m_currentLength;
 };

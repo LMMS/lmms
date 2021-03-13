@@ -22,30 +22,27 @@
  *
  */
 
-
 #include "PatchesDialog.h"
 
 #include <QHeaderView>
-
 
 // Custom list-view item (as for numerical sort purposes...)
 class PatchItem : public QTreeWidgetItem
 {
 public:
-
 	// Constructor.
-	PatchItem( QTreeWidget *pListView,
-		QTreeWidgetItem *pItemAfter )
-		: QTreeWidgetItem( pListView, pItemAfter ) {}
+	PatchItem(QTreeWidget *pListView,
+		QTreeWidgetItem *pItemAfter) :
+		QTreeWidgetItem(pListView, pItemAfter) {}
 
 	// Sort/compare overriden method.
-	bool operator< ( const QTreeWidgetItem& other ) const
+	bool operator<(const QTreeWidgetItem &other) const
 	{
 		int iColumn = QTreeWidgetItem::treeWidget()->sortColumn();
-		const QString& s1 = text( iColumn );
-		const QString& s2 = other.text( iColumn );
+		const QString &s1 = text(iColumn);
+		const QString &s2 = other.text(iColumn);
 
-		if( iColumn == 0 || iColumn == 2 )
+		if (iColumn == 0 || iColumn == 2)
 		{
 			return s1.toInt() < s2.toInt();
 		}
@@ -56,114 +53,104 @@ public:
 	}
 };
 
-
-
-
 // Constructor.
-PatchesDialog::PatchesDialog( QWidget * pParent, Qt::WindowFlags wflags )
-	: QDialog( pParent, wflags )
+PatchesDialog::PatchesDialog(QWidget *pParent, Qt::WindowFlags wflags) :
+	QDialog(pParent, wflags)
 {
 	// Setup UI struct...
-	setupUi( this );
+	setupUi(this);
 
 	m_pSynth = NULL;
-	m_iChan  = 0;
-	m_iBank  = 0;
-	m_iProg  = 0;
+	m_iChan = 0;
+	m_iBank = 0;
+	m_iProg = 0;
 
 	// Soundfonts list view...
-	QHeaderView * pHeader = m_progListView->header();
-	pHeader->setDefaultAlignment( Qt::AlignLeft );
-	pHeader->setSectionsMovable( false );
-	pHeader->setStretchLastSection( true );
+	QHeaderView *pHeader = m_progListView->header();
+	pHeader->setDefaultAlignment(Qt::AlignLeft);
+	pHeader->setSectionsMovable(false);
+	pHeader->setStretchLastSection(true);
 
-	m_progListView->resizeColumnToContents( 0 );	// Prog.
+	m_progListView->resizeColumnToContents(0); // Prog.
 
 	// Initial sort order...
-	m_bankListView->sortItems( 0, Qt::AscendingOrder );
-	m_progListView->sortItems( 0, Qt::AscendingOrder );
+	m_bankListView->sortItems(0, Qt::AscendingOrder);
+	m_progListView->sortItems(0, Qt::AscendingOrder);
 
 	// UI connections...
-	QObject::connect( m_bankListView,
-		SIGNAL( currentItemChanged( QTreeWidgetItem *,QTreeWidgetItem * ) ),
-		SLOT( bankChanged() ) );
-	QObject::connect( m_progListView,
-		SIGNAL( currentItemChanged( QTreeWidgetItem *, QTreeWidgetItem * ) ),
-		SLOT( progChanged( QTreeWidgetItem *, QTreeWidgetItem * ) ) );
-	QObject::connect( m_progListView,
-		SIGNAL( itemActivated( QTreeWidgetItem *, int ) ),
-		SLOT( accept() ) );
-	QObject::connect( m_okButton,
-		SIGNAL( clicked() ),
-		SLOT( accept() ) );
-	QObject::connect( m_cancelButton,
-		SIGNAL( clicked() ),
-		SLOT( reject() ) );
+	QObject::connect(m_bankListView,
+		SIGNAL(currentItemChanged(QTreeWidgetItem *, QTreeWidgetItem *)),
+		SLOT(bankChanged()));
+	QObject::connect(m_progListView,
+		SIGNAL(currentItemChanged(QTreeWidgetItem *, QTreeWidgetItem *)),
+		SLOT(progChanged(QTreeWidgetItem *, QTreeWidgetItem *)));
+	QObject::connect(m_progListView,
+		SIGNAL(itemActivated(QTreeWidgetItem *, int)),
+		SLOT(accept()));
+	QObject::connect(m_okButton,
+		SIGNAL(clicked()),
+		SLOT(accept()));
+	QObject::connect(m_cancelButton,
+		SIGNAL(clicked()),
+		SLOT(reject()));
 }
-
-
-
 
 // Destructor.
 PatchesDialog::~PatchesDialog()
 {
 }
 
-
-
-
 // Dialog setup loader.
-void PatchesDialog::setup( GigInstance * pSynth, int iChan,
-						const QString & chanName,
-						LcdSpinBoxModel * bankModel,
-						LcdSpinBoxModel * progModel,
-						QLabel * patchLabel )
+void PatchesDialog::setup(GigInstance *pSynth, int iChan,
+	const QString &chanName,
+	LcdSpinBoxModel *bankModel,
+	LcdSpinBoxModel *progModel,
+	QLabel *patchLabel)
 {
 
 	// We'll going to changes the whole thing...
 	m_dirty = 0;
 	m_bankModel = bankModel;
 	m_progModel = progModel;
-	m_patchLabel =  patchLabel;
+	m_patchLabel = patchLabel;
 
 	// Set the proper caption...
-	setWindowTitle( chanName + " - GIG patches" );
+	setWindowTitle(chanName + " - GIG patches");
 
 	// set m_pSynth to NULL so we don't trigger any progChanged events
 	m_pSynth = NULL;
 
 	// Load bank list from actual synth stack...
-	m_bankListView->setSortingEnabled( false );
+	m_bankListView->setSortingEnabled(false);
 	m_bankListView->clear();
 
 	// now it should be safe to set internal stuff
 	m_pSynth = pSynth;
-	m_iChan  = iChan;
-
+	m_iChan = iChan;
 
 	//fluid_preset_t preset;
-	QTreeWidgetItem * pBankItem = NULL;
+	QTreeWidgetItem *pBankItem = NULL;
 
 	// Currently just use zero as the only bank
 	int iBankDefault = -1;
 	int iProgDefault = -1;
 
-	gig::Instrument * pInstrument = m_pSynth->gig.GetFirstInstrument();
+	gig::Instrument *pInstrument = m_pSynth->gig.GetFirstInstrument();
 
-	while( pInstrument )
+	while (pInstrument)
 	{
 		int iBank = pInstrument->MIDIBank;
 		int iProg = pInstrument->MIDIProgram;
 
-		if ( !findBankItem( iBank ) )
+		if (!findBankItem(iBank))
 		{
-			pBankItem = new PatchItem( m_bankListView, pBankItem );
+			pBankItem = new PatchItem(m_bankListView, pBankItem);
 
-			if( pBankItem )
+			if (pBankItem)
 			{
-				pBankItem->setText( 0, QString::number( iBank ) );
+				pBankItem->setText(0, QString::number(iBank));
 
-				if( iBankDefault == -1 )
+				if (iBankDefault == -1)
 				{
 					iBankDefault = iBank;
 					iProgDefault = iProg;
@@ -174,86 +161,73 @@ void PatchesDialog::setup( GigInstance * pSynth, int iChan,
 		pInstrument = m_pSynth->gig.GetNextInstrument();
 	}
 
-	m_bankListView->setSortingEnabled( true );
+	m_bankListView->setSortingEnabled(true);
 
 	// Set the selected bank.
-	if( iBankDefault != -1 )
+	if (iBankDefault != -1)
 	{
 		m_iBank = iBankDefault;
 	}
 
-	pBankItem = findBankItem( m_iBank );
-	m_bankListView->setCurrentItem( pBankItem );
-	m_bankListView->scrollToItem( pBankItem );
+	pBankItem = findBankItem(m_iBank);
+	m_bankListView->setCurrentItem(pBankItem);
+	m_bankListView->scrollToItem(pBankItem);
 	bankChanged();
 
 	// Set the selected program.
-	if( iProgDefault != -1 )
+	if (iProgDefault != -1)
 	{
 		m_iProg = iProgDefault;
 	}
 
-	QTreeWidgetItem * pProgItem = findProgItem( m_iProg );
-	m_progListView->setCurrentItem( pProgItem );
-	m_progListView->scrollToItem( pProgItem );
+	QTreeWidgetItem *pProgItem = findProgItem(m_iProg);
+	m_progListView->setCurrentItem(pProgItem);
+	m_progListView->scrollToItem(pProgItem);
 }
-
-
-
 
 // Stabilize current state form.
 void PatchesDialog::stabilizeForm()
 {
-	m_okButton->setEnabled( validateForm() );
+	m_okButton->setEnabled(validateForm());
 }
-
-
-
 
 // Validate form fields.
 bool PatchesDialog::validateForm()
 {
 	bool bValid = true;
 
-	bValid = bValid && ( m_bankListView->currentItem() != NULL );
-	bValid = bValid && ( m_progListView->currentItem() != NULL );
+	bValid = bValid && (m_bankListView->currentItem() != NULL);
+	bValid = bValid && (m_progListView->currentItem() != NULL);
 
 	return bValid;
 }
 
-
-
-
 // Realize a bank-program selection preset.
-void PatchesDialog::setBankProg( int iBank, int iProg )
+void PatchesDialog::setBankProg(int iBank, int iProg)
 {
-	if( m_pSynth == NULL )
+	if (m_pSynth == NULL)
 	{
 		return;
 	}
 }
 
-
-
-
 // Validate form fields and accept it valid.
 void PatchesDialog::accept()
 {
-	if( validateForm() )
+	if (validateForm())
 	{
 		// Unload from current selected dialog items.
-		int iBank = ( m_bankListView->currentItem() )->text( 0 ).toInt();
-		int iProg = ( m_progListView->currentItem() )->text( 0 ).toInt();
+		int iBank = (m_bankListView->currentItem())->text(0).toInt();
+		int iProg = (m_progListView->currentItem())->text(0).toInt();
 
 		// And set it right away...
-		setBankProg( iBank, iProg );
+		setBankProg(iBank, iProg);
 
-		if( m_dirty > 0 )
+		if (m_dirty > 0)
 		{
-			m_bankModel->setValue( iBank );
-			m_progModel->setValue( iProg );
-			m_patchLabel->setText( m_progListView->
-						currentItem()->text( 1 ) );
+			m_bankModel->setValue(iBank);
+			m_progModel->setValue(iProg);
+			m_patchLabel->setText(m_progListView->currentItem()->text(1));
 		}
 
 		// We got it.
@@ -261,35 +235,28 @@ void PatchesDialog::accept()
 	}
 }
 
-
-
-
 // Reject settings (Cancel button slot).
 void PatchesDialog::reject()
 {
 	// Reset selection to initial selection, if applicable...
-	if( m_dirty > 0 )
+	if (m_dirty > 0)
 	{
-		setBankProg( m_bankModel->value(), m_progModel->value() );
+		setBankProg(m_bankModel->value(), m_progModel->value());
 	}
 
 	// Done (hopefully nothing).
 	QDialog::reject();
 }
 
-
-
-
 // Find the bank item of given bank number id.
-QTreeWidgetItem * PatchesDialog::findBankItem( int iBank )
+QTreeWidgetItem *PatchesDialog::findBankItem(int iBank)
 {
-	QList<QTreeWidgetItem *> banks
-		= m_bankListView->findItems(
-			QString::number( iBank ), Qt::MatchExactly, 0 );
+	QList<QTreeWidgetItem *> banks = m_bankListView->findItems(
+		QString::number(iBank), Qt::MatchExactly, 0);
 
-	QListIterator<QTreeWidgetItem *> iter( banks );
+	QListIterator<QTreeWidgetItem *> iter(banks);
 
-	if( iter.hasNext() )
+	if (iter.hasNext())
 	{
 		return iter.next();
 	}
@@ -298,20 +265,16 @@ QTreeWidgetItem * PatchesDialog::findBankItem( int iBank )
 		return NULL;
 	}
 }
-
-
-
 
 // Find the program item of given program number id.
-QTreeWidgetItem *PatchesDialog::findProgItem( int iProg )
+QTreeWidgetItem *PatchesDialog::findProgItem(int iProg)
 {
-	QList<QTreeWidgetItem *> progs
-		= m_progListView->findItems(
-			QString::number( iProg ), Qt::MatchExactly, 0 );
+	QList<QTreeWidgetItem *> progs = m_progListView->findItems(
+		QString::number(iProg), Qt::MatchExactly, 0);
 
-	QListIterator<QTreeWidgetItem *> iter( progs );
+	QListIterator<QTreeWidgetItem *> iter(progs);
 
-	if( iter.hasNext() )
+	if (iter.hasNext())
 	{
 		return iter.next();
 	}
@@ -320,39 +283,36 @@ QTreeWidgetItem *PatchesDialog::findProgItem( int iProg )
 		return NULL;
 	}
 }
-
-
-
 
 // Bank change slot.
 void PatchesDialog::bankChanged()
 {
-	if( m_pSynth == NULL )
+	if (m_pSynth == NULL)
 	{
 		return;
 	}
 
-	QTreeWidgetItem * pBankItem = m_bankListView->currentItem();
+	QTreeWidgetItem *pBankItem = m_bankListView->currentItem();
 
-	if( pBankItem == NULL )
+	if (pBankItem == NULL)
 	{
 		return;
 	}
 
-	int iBankSelected = pBankItem->text( 0 ).toInt();
+	int iBankSelected = pBankItem->text(0).toInt();
 
 	// Clear up the program listview.
-	m_progListView->setSortingEnabled( false );
+	m_progListView->setSortingEnabled(false);
 	m_progListView->clear();
-	QTreeWidgetItem * pProgItem = NULL;
+	QTreeWidgetItem *pProgItem = NULL;
 
-	gig::Instrument * pInstrument = m_pSynth->gig.GetFirstInstrument();
+	gig::Instrument *pInstrument = m_pSynth->gig.GetFirstInstrument();
 
-	while( pInstrument )
+	while (pInstrument)
 	{
-		QString name = QString::fromStdString( pInstrument->pInfo->Name );
+		QString name = QString::fromStdString(pInstrument->pInfo->Name);
 
-		if( name == "" )
+		if (name == "")
 		{
 			name = "<no name>";
 		}
@@ -360,46 +320,43 @@ void PatchesDialog::bankChanged()
 		int iBank = pInstrument->MIDIBank;
 		int iProg = pInstrument->MIDIProgram;
 
-		if( iBank == iBankSelected && !findProgItem( iProg ) )
+		if (iBank == iBankSelected && !findProgItem(iProg))
 		{
-			pProgItem = new PatchItem( m_progListView, pProgItem );
+			pProgItem = new PatchItem(m_progListView, pProgItem);
 
-			if( pProgItem )
+			if (pProgItem)
 			{
-				pProgItem->setText( 0, QString::number( iProg ) );
-				pProgItem->setText( 1, name );
+				pProgItem->setText(0, QString::number(iProg));
+				pProgItem->setText(1, name);
 			}
 		}
 
 		pInstrument = m_pSynth->gig.GetNextInstrument();
 	}
 
-	m_progListView->setSortingEnabled( true );
+	m_progListView->setSortingEnabled(true);
 
 	// Stabilize the form.
 	stabilizeForm();
 }
 
-
-
-
 // Program change slot.
-void PatchesDialog::progChanged( QTreeWidgetItem * curr, QTreeWidgetItem * prev )
+void PatchesDialog::progChanged(QTreeWidgetItem *curr, QTreeWidgetItem *prev)
 {
-	if( m_pSynth == NULL || curr == NULL )
+	if (m_pSynth == NULL || curr == NULL)
 	{
 		return;
 	}
 
 	// Which preview state...
-	if( validateForm() )
+	if (validateForm())
 	{
 		// Set current selection.
-		int iBank = ( m_bankListView->currentItem() )->text( 0 ).toInt();
-		int iProg = curr->text( 0 ).toInt();
+		int iBank = (m_bankListView->currentItem())->text(0).toInt();
+		int iProg = curr->text(0).toInt();
 
 		// And set it right away...
-		setBankProg( iBank, iProg );
+		setBankProg(iBank, iProg);
 
 		// Now we're dirty nuff.
 		m_dirty++;

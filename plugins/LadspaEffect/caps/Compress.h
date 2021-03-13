@@ -32,47 +32,47 @@
 #include "dsp/util.h"
 
 class Compress
-: public Plugin
+	: public Plugin
 {
-	public:
-		double fs;
-		sample_t f;
+public:
+	double fs;
+	sample_t f;
 
-		DSP::RMS rms;
-		sample_t sum, amp, env, gain, gain_t;
+	DSP::RMS rms;
+	sample_t sum, amp, env, gain, gain_t;
 
-		int count;
+	int count;
 
-		template <sample_func_t F>
-			void one_cycle (int frames);
+	template <sample_func_t F>
+	void one_cycle(int frames);
 
-	public:
-		static PortInfo port_info [];
+public:
+	static PortInfo port_info[];
 
-		void init() {}
-		void activate()
-			{ 
-				rms.reset();
+	void init() {}
+	void activate()
+	{
+		rms.reset();
 
-				sum = 0;
-				count = 0;
-				
-				amp = 0;
-				env = 0;
+		sum = 0;
+		count = 0;
 
-				gain = 0;
-				gain_t = 0;
-			}
+		amp = 0;
+		env = 0;
 
-		void run (int n)
-			{
-				one_cycle<store_func> (n);
-			}
-		
-		void run_adding (int n)
-			{
-				one_cycle<adding_func> (n);
-			}
+		gain = 0;
+		gain_t = 0;
+	}
+
+	void run(int n)
+	{
+		one_cycle<store_func>(n);
+	}
+
+	void run_adding(int n)
+	{
+		one_cycle<adding_func>(n);
+	}
 };
 
 #endif /* _COMPRESS_H_ */

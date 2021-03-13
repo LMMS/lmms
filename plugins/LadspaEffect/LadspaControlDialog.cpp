@@ -24,104 +24,95 @@
  *
  */
 
-#include <cmath>
+#include "LadspaControlDialog.h"
 
 #include <QGroupBox>
 #include <QLayout>
+#include <cmath>
 
-#include "LadspaEffect.h"
-#include "LadspaControlDialog.h"
 #include "LadspaControlView.h"
+#include "LadspaEffect.h"
 #include "LedCheckbox.h"
 
-
-
-LadspaControlDialog::LadspaControlDialog( LadspaControls * _ctl ) :
-	EffectControlDialog( _ctl ),
-	m_effectLayout( NULL ),
-	m_stereoLink( NULL )
+LadspaControlDialog::LadspaControlDialog(LadspaControls *_ctl) :
+	EffectControlDialog(_ctl),
+	m_effectLayout(NULL),
+	m_stereoLink(NULL)
 {
-	QVBoxLayout * mainLay = new QVBoxLayout( this );
+	QVBoxLayout *mainLay = new QVBoxLayout(this);
 
 	m_effectLayout = new QHBoxLayout();
-	mainLay->addLayout( m_effectLayout );
+	mainLay->addLayout(m_effectLayout);
 
-	updateEffectView( _ctl );
+	updateEffectView(_ctl);
 
-	if( _ctl->m_processors > 1 )
+	if (_ctl->m_processors > 1)
 	{
-		mainLay->addSpacing( 3 );
-		QHBoxLayout * center = new QHBoxLayout();
-		mainLay->addLayout( center );
-		m_stereoLink = new LedCheckBox( tr( "Link Channels" ), this );
-		m_stereoLink->setModel( &_ctl->m_stereoLinkModel );
-		center->addWidget( m_stereoLink );
+		mainLay->addSpacing(3);
+		QHBoxLayout *center = new QHBoxLayout();
+		mainLay->addLayout(center);
+		m_stereoLink = new LedCheckBox(tr("Link Channels"), this);
+		m_stereoLink->setModel(&_ctl->m_stereoLinkModel);
+		center->addWidget(m_stereoLink);
 	}
 }
-
-
-
 
 LadspaControlDialog::~LadspaControlDialog()
 {
 }
 
-
-
-
-void LadspaControlDialog::updateEffectView( LadspaControls * _ctl )
+void LadspaControlDialog::updateEffectView(LadspaControls *_ctl)
 {
 	QList<QGroupBox *> list = findChildren<QGroupBox *>();
-	for( QList<QGroupBox *>::iterator it = list.begin(); it != list.end();
-									++it )
+	for (QList<QGroupBox *>::iterator it = list.begin(); it != list.end();
+		 ++it)
 	{
 		delete *it;
 	}
 
 	m_effectControls = _ctl;
 
-
-	const int cols = static_cast<int>( sqrt( 
-		static_cast<double>( _ctl->m_controlCount /
-						_ctl->m_processors ) ) );
-	for( ch_cnt_t proc = 0; proc < _ctl->m_processors; proc++ )
+	const int cols = static_cast<int>(sqrt(
+		static_cast<double>(_ctl->m_controlCount /
+			_ctl->m_processors)));
+	for (ch_cnt_t proc = 0; proc < _ctl->m_processors; proc++)
 	{
-		control_list_t & controls = _ctl->m_controls[proc];
+		control_list_t &controls = _ctl->m_controls[proc];
 		int row = 0;
 		int col = 0;
 		buffer_data_t last_port = NONE;
 
-		QGroupBox * grouper;
-		if( _ctl->m_processors > 1 )
+		QGroupBox *grouper;
+		if (_ctl->m_processors > 1)
 		{
-			grouper = new QGroupBox( tr( "Channel " ) +
-						QString::number( proc + 1 ),
-								this );
+			grouper = new QGroupBox(tr("Channel ") +
+					QString::number(proc + 1),
+				this);
 		}
 		else
 		{
-			grouper = new QGroupBox( this );
+			grouper = new QGroupBox(this);
 		}
 
-		QGridLayout * gl = new QGridLayout( grouper );
-		grouper->setLayout( gl );
-		grouper->setAlignment( Qt::Vertical );
+		QGridLayout *gl = new QGridLayout(grouper);
+		grouper->setLayout(gl);
+		grouper->setAlignment(Qt::Vertical);
 
-		for( control_list_t::iterator it = controls.begin(); 
-						it != controls.end(); ++it )
+		for (control_list_t::iterator it = controls.begin();
+			 it != controls.end(); ++it)
 		{
-			if( (*it)->port()->proc == proc )
+			if ((*it)->port()->proc == proc)
 			{
 				buffer_data_t this_port = (*it)->port()->data_type;
-				if( last_port != NONE &&
-					( this_port == TOGGLED || this_port == ENUM ) &&
-					( last_port != TOGGLED && last_port != ENUM ) )
+				if (last_port != NONE &&
+					(this_port == TOGGLED || this_port == ENUM) &&
+					(last_port != TOGGLED && last_port != ENUM))
 				{
 					++row;
 					col = 0;
 				}
-				gl->addWidget( new LadspaControlView( grouper, *it ), row, col );
-				if( ++col == cols )
+				gl->addWidget(new LadspaControlView(grouper, *it), row, col);
+				if (++col == cols)
 				{
 					++row;
 					col = 0;
@@ -130,19 +121,15 @@ void LadspaControlDialog::updateEffectView( LadspaControls * _ctl )
 			}
 		}
 
-		m_effectLayout->addWidget( grouper );
+		m_effectLayout->addWidget(grouper);
 	}
 
-	if( _ctl->m_processors > 1 && m_stereoLink != NULL )
+	if (_ctl->m_processors > 1 && m_stereoLink != NULL)
 	{
-		m_stereoLink->setModel( &_ctl->m_stereoLinkModel );
+		m_stereoLink->setModel(&_ctl->m_stereoLinkModel);
 	}
 
-	connect( _ctl, SIGNAL( effectModelChanged( LadspaControls * ) ),
-				this, SLOT( updateEffectView( LadspaControls * ) ),
-							Qt::DirectConnection );
+	connect(_ctl, SIGNAL(effectModelChanged(LadspaControls *)),
+		this, SLOT(updateEffectView(LadspaControls *)),
+		Qt::DirectConnection);
 }
-
-
-
-

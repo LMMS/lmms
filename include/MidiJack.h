@@ -35,48 +35,45 @@
 #include "weak_libjack.h"
 #endif
 
-#include <QtCore/QThread>
 #include <QMutex>
 #include <QtCore/QFile>
+#include <QtCore/QThread>
 
-#include "MidiClient.h"
 #include "AudioJack.h"
+#include "MidiClient.h"
 
-#define	JACK_MIDI_BUFFER_MAX 64 /* events */
+#define JACK_MIDI_BUFFER_MAX 64 /* events */
 
 class QLineEdit;
 
 class MidiJack : public QThread, public MidiClientRaw
 {
-        Q_OBJECT
+	Q_OBJECT
 public:
 	MidiJack();
 	virtual ~MidiJack();
 
-	jack_client_t* jackClient();
+	jack_client_t *jackClient();
 
 	static QString probeDevice();
 
 	inline static QString name()
 	{
-		return( QT_TRANSLATE_NOOP( "MidiSetupWidget",
-			"Jack-MIDI" ) );
+		return (QT_TRANSLATE_NOOP("MidiSetupWidget",
+			"Jack-MIDI"));
 	}
 
 	void JackMidiWrite(jack_nframes_t nframes);
 	void JackMidiRead(jack_nframes_t nframes);
-
 
 	inline static QString configSection()
 	{
 		return "MidiJack";
 	}
 
-
 protected:
-	virtual void sendByte( const unsigned char c );
+	virtual void sendByte(const unsigned char c);
 	virtual void run();
-
 
 private:
 	AudioJack *m_jackAudio;
@@ -89,10 +86,9 @@ private:
 	void lock();
 	void unlock();
 
-	void getPortInfo( const QString& sPortName, int& nClient, int& nPort );
+	void getPortInfo(const QString &sPortName, int &nClient, int &nPort);
 
 	volatile bool m_quit;
-
 };
 
 #endif // LMMS_HAVE_JACK

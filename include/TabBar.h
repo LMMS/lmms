@@ -22,67 +22,57 @@
  *
  */
 
-
 #ifndef TAB_BAR_H
 #define TAB_BAR_H
 
-#include <QtCore/QMap>
 #include <QLayout>
 #include <QWidget>
+#include <QtCore/QMap>
 
 #include "lmms_export.h"
 
-
 class TabButton;
-
 
 class LMMS_EXPORT TabBar : public QWidget
 {
 	Q_OBJECT
 public:
-	TabBar( QWidget * _parent,
-			QBoxLayout::Direction _dir = QBoxLayout::LeftToRight );
+	TabBar(QWidget *_parent,
+		QBoxLayout::Direction _dir = QBoxLayout::LeftToRight);
 	virtual ~TabBar() = default;
 
-	TabButton * addTab( QWidget * _w, const QString & _text,
-					int _id, bool _add_stretch = false,
-					bool _text_is_tooltip = false );
-	void removeTab( int _id );
+	TabButton *addTab(QWidget *_w, const QString &_text,
+		int _id, bool _add_stretch = false,
+		bool _text_is_tooltip = false);
+	void removeTab(int _id);
 
-	inline void setExclusive( bool _on )
+	inline void setExclusive(bool _on)
 	{
 		m_exclusive = _on;
 	}
 
 	int activeTab();
 
-
 public slots:
-	void setActiveTab( int _id );
-
+	void setActiveTab(int _id);
 
 protected:
-	bool tabState( int _id );
-	void setTabState( int _id, bool _checked );
+	bool tabState(int _id);
+	void setTabState(int _id, bool _checked);
 	bool allHidden();
 
-
 protected slots:
-	void hideAll( int _exception = -1 );
-	void tabClicked( int _id );
-
+	void hideAll(int _exception = -1);
+	void tabClicked(int _id);
 
 private:
-	QMap<int, QPair<TabButton *, QWidget *> > m_tabs;
-	QBoxLayout * m_layout;
+	QMap<int, QPair<TabButton *, QWidget *>> m_tabs;
+	QBoxLayout *m_layout;
 	bool m_exclusive;
-
 
 signals:
 	void allWidgetsHidden();
 	void widgetShown();
-
-} ;
-
+};
 
 #endif

@@ -22,18 +22,17 @@
  *
  */
 
-
 #ifndef BB_TRACK_CONTAINER_H
 #define BB_TRACK_CONTAINER_H
 
-#include "TrackContainer.h"
 #include "ComboBoxModel.h"
-
+#include "TrackContainer.h"
 
 class LMMS_EXPORT BBTrackContainer : public TrackContainer
 {
 	Q_OBJECT
-	mapPropertyFromModel(int,currentBB,setCurrentBB,m_bbComboBoxModel);
+	mapPropertyFromModel(int, currentBB, setCurrentBB, m_bbComboBoxModel);
+
 public:
 	BBTrackContainer();
 	virtual ~BBTrackContainer();
@@ -57,7 +56,7 @@ public:
 
 	void swapBB(int bb1, int bb2);
 
-	void updateBBTrack(TrackContentObject * tco);
+	void updateBBTrack(TrackContentObject *tco);
 	void fixIncorrectPositions();
 	void createTCOsForBB(int bb);
 
@@ -69,14 +68,10 @@ public slots:
 	void updateComboBox();
 	void currentBBChanged();
 
-
 private:
 	ComboBoxModel m_bbComboBoxModel;
 
-
 	friend class BBEditor;
-
-} ;
-
+};
 
 #endif

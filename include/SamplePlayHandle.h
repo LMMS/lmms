@@ -26,22 +26,21 @@
 #ifndef SAMPLE_PLAY_HANDLE_H
 #define SAMPLE_PLAY_HANDLE_H
 
-#include "SampleBuffer.h"
 #include "AutomatableModel.h"
 #include "PlayHandle.h"
+#include "SampleBuffer.h"
 
 class BBTrack;
 class SampleTCO;
 class Track;
 class AudioPort;
 
-
 class SamplePlayHandle : public PlayHandle
 {
 public:
-	SamplePlayHandle( SampleBuffer* sampleBuffer , bool ownAudioPort = true );
-	SamplePlayHandle( const QString& sampleFile );
-	SamplePlayHandle( SampleTCO* tco );
+	SamplePlayHandle(SampleBuffer *sampleBuffer, bool ownAudioPort = true);
+	SamplePlayHandle(const QString &sampleFile);
+	SamplePlayHandle(SampleTCO *tco);
 	virtual ~SamplePlayHandle();
 
 	inline bool affinityMatters() const override
@@ -49,35 +48,33 @@ public:
 		return true;
 	}
 
-
-	void play( sampleFrame * buffer ) override;
+	void play(sampleFrame *buffer) override;
 	bool isFinished() const override;
 
-	bool isFromTrack( const Track * _track ) const override;
+	bool isFromTrack(const Track *_track) const override;
 
 	f_cnt_t totalFrames() const;
 	inline f_cnt_t framesDone() const
 	{
-		return( m_frame );
+		return (m_frame);
 	}
-	void setDoneMayReturnTrue( bool _enable )
+	void setDoneMayReturnTrue(bool _enable)
 	{
 		m_doneMayReturnTrue = _enable;
 	}
 
-	void setBBTrack( BBTrack * _bb_track )
+	void setBBTrack(BBTrack *_bb_track)
 	{
 		m_bbTrack = _bb_track;
 	}
 
-	void setVolumeModel( FloatModel * _model )
+	void setVolumeModel(FloatModel *_model)
 	{
 		m_volumeModel = _model;
 	}
 
-
 private:
-	SampleBuffer * m_sampleBuffer;
+	SampleBuffer *m_sampleBuffer;
 	bool m_doneMayReturnTrue;
 
 	f_cnt_t m_frame;
@@ -86,12 +83,10 @@ private:
 	const bool m_ownAudioPort;
 
 	FloatModel m_defaultVolumeModel;
-	FloatModel * m_volumeModel;
-	Track * m_track;
+	FloatModel *m_volumeModel;
+	Track *m_track;
 
-	BBTrack * m_bbTrack;
-
-} ;
-
+	BBTrack *m_bbTrack;
+};
 
 #endif

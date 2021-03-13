@@ -22,28 +22,19 @@
  *
  */
 
-
 #ifndef _LADSPA_PORT_DIALOG_H
 #define _LADSPA_PORT_DIALOG_H
-
 
 #include <QDialog>
 
 #include "LadspaManager.h"
 
-
-
-
 class ladspaPortDialog : public QDialog
 {
 	Q_OBJECT
 public:
-	ladspaPortDialog( const ladspa_key_t & _key );
+	ladspaPortDialog(const ladspa_key_t &_key);
 	virtual ~ladspaPortDialog();
-
 };
-
-
-
 
 #endif

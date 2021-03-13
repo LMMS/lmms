@@ -61,22 +61,22 @@ enum PluginIssueType
 //! Issue type bundled with informational string
 class PluginIssue
 {
-	static const char* msgFor(const PluginIssueType& it);
+	static const char *msgFor(const PluginIssueType &it);
 
 	PluginIssueType m_issueType;
 	std::string m_info;
 
 public:
-	PluginIssue(PluginIssueType it, std::string msg = std::string())
-		: m_issueType(it), m_info(msg)
+	PluginIssue(PluginIssueType it, std::string msg = std::string()) :
+		m_issueType(it), m_info(msg)
 	{
 	}
 	PluginIssueType type() const { return m_issueType; }
-	bool operator==(const PluginIssue& other) const;
-	bool operator<(const PluginIssue& other) const;
-	friend QDebug operator<<(QDebug stream, const PluginIssue& iss);
+	bool operator==(const PluginIssue &other) const;
+	bool operator<(const PluginIssue &other) const;
+	friend QDebug operator<<(QDebug stream, const PluginIssue &iss);
 };
 
-QDebug operator<<(QDebug stream, const PluginIssue& iss);
+QDebug operator<<(QDebug stream, const PluginIssue &iss);
 
 #endif // PLUGINISSUE_H

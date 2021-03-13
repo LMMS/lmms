@@ -26,20 +26,20 @@
 #define CARLA_H
 
 #include <QtCore/QMutex>
-#include "carlabase_export.h"
 
 #include "CarlaNative.h"
+#include "carlabase_export.h"
 #if CARLA_VERSION_HEX >= 0x010911
-    #include "CarlaNativePlugin.h"
+#include "CarlaNativePlugin.h"
 #else
-    #include "CarlaBackend.h"
-    #include "CarlaNative.h"
-    #include "CarlaUtils.h"
-    CARLA_EXPORT
-    const NativePluginDescriptor* carla_get_native_patchbay_plugin();
+#include "CarlaBackend.h"
+#include "CarlaNative.h"
+#include "CarlaUtils.h"
+CARLA_EXPORT
+const NativePluginDescriptor *carla_get_native_patchbay_plugin();
 
-    CARLA_EXPORT
-    const NativePluginDescriptor* carla_get_native_rack_plugin();
+CARLA_EXPORT
+const NativePluginDescriptor *carla_get_native_rack_plugin();
 #endif
 
 #include "Instrument.h"
@@ -49,76 +49,76 @@ class QPushButton;
 
 class CARLABASE_EXPORT CarlaInstrument : public Instrument
 {
-    Q_OBJECT
+	Q_OBJECT
 
 public:
-    static const uint32_t kMaxMidiEvents = 512;
+	static const uint32_t kMaxMidiEvents = 512;
 
-    CarlaInstrument(InstrumentTrack* const instrumentTrack, const Descriptor* const descriptor, const bool isPatchbay);
-    virtual ~CarlaInstrument();
+	CarlaInstrument(InstrumentTrack *const instrumentTrack, const Descriptor *const descriptor, const bool isPatchbay);
+	virtual ~CarlaInstrument();
 
-    // Carla NativeHostDescriptor functions
-    uint32_t handleGetBufferSize() const;
-    double handleGetSampleRate() const;
-    bool handleIsOffline() const;
-    const NativeTimeInfo* handleGetTimeInfo() const;
-    void handleUiParameterChanged(const uint32_t index, const float value) const;
-    void handleUiClosed();
-    intptr_t handleDispatcher(const NativeHostDispatcherOpcode opcode, const int32_t index, const intptr_t value, void* const ptr, const float opt);
+	// Carla NativeHostDescriptor functions
+	uint32_t handleGetBufferSize() const;
+	double handleGetSampleRate() const;
+	bool handleIsOffline() const;
+	const NativeTimeInfo *handleGetTimeInfo() const;
+	void handleUiParameterChanged(const uint32_t index, const float value) const;
+	void handleUiClosed();
+	intptr_t handleDispatcher(const NativeHostDispatcherOpcode opcode, const int32_t index, const intptr_t value, void *const ptr, const float opt);
 
-    // LMMS functions
-    virtual Flags flags() const;
-    virtual QString nodeName() const;
-    virtual void saveSettings(QDomDocument& doc, QDomElement& parent);
-    virtual void loadSettings(const QDomElement& elem);
-    virtual void play(sampleFrame* workingBuffer);
-    virtual bool handleMidiEvent(const MidiEvent& event, const TimePos& time, f_cnt_t offset);
-    virtual PluginView* instantiateView(QWidget* parent);
+	// LMMS functions
+	virtual Flags flags() const;
+	virtual QString nodeName() const;
+	virtual void saveSettings(QDomDocument &doc, QDomElement &parent);
+	virtual void loadSettings(const QDomElement &elem);
+	virtual void play(sampleFrame *workingBuffer);
+	virtual bool handleMidiEvent(const MidiEvent &event, const TimePos &time, f_cnt_t offset);
+	virtual PluginView *instantiateView(QWidget *parent);
 
 signals:
-    void uiClosed();
+	void uiClosed();
 
 private slots:
-    void sampleRateChanged();
+	void sampleRateChanged();
 
 private:
-    const bool kIsPatchbay;
+	const bool kIsPatchbay;
 
-    NativePluginHandle fHandle;
-    NativeHostDescriptor fHost;
-    const NativePluginDescriptor* fDescriptor;
+	NativePluginHandle fHandle;
+	NativeHostDescriptor fHost;
+	const NativePluginDescriptor *fDescriptor;
 
-    uint32_t        fMidiEventCount;
-    NativeMidiEvent fMidiEvents[kMaxMidiEvents];
-    NativeTimeInfo  fTimeInfo;
+	uint32_t fMidiEventCount;
+	NativeMidiEvent fMidiEvents[kMaxMidiEvents];
+	NativeTimeInfo fTimeInfo;
 
-    // this is only needed because note-offs are being sent during play
-    QMutex fMutex;
+	// this is only needed because note-offs are being sent during play
+	QMutex fMutex;
 
-    friend class CarlaInstrumentView;
+	friend class CarlaInstrumentView;
 };
 
 class CarlaInstrumentView : public InstrumentViewFixedSize
 {
-    Q_OBJECT
+	Q_OBJECT
 
 public:
-    CarlaInstrumentView(CarlaInstrument* const instrument, QWidget* const parent);
-    virtual ~CarlaInstrumentView();
+	CarlaInstrumentView(CarlaInstrument *const instrument, QWidget *const parent);
+	virtual ~CarlaInstrumentView();
 
 private slots:
-    void toggleUI(bool);
-    void uiClosed();
+	void toggleUI(bool);
+	void uiClosed();
 
 private:
-    virtual void modelChanged();
-    virtual void timerEvent(QTimerEvent*);
+	virtual void modelChanged();
+	virtual void timerEvent(QTimerEvent *);
 
-    NativePluginHandle fHandle;
-    const NativePluginDescriptor* fDescriptor;
-    int fTimerId;
+	NativePluginHandle fHandle;
+	const NativePluginDescriptor *fDescriptor;
+	int fTimerId;
 
-    QPushButton * m_toggleUIButton;
+	QPushButton *m_toggleUIButton;
 };
 
 #endif

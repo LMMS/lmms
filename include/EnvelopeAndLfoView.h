@@ -41,57 +41,51 @@ class LedCheckBox;
 class PixmapButton;
 class TempoSyncKnob;
 
-
-
 class EnvelopeAndLfoView : public QWidget, public ModelView
 {
 	Q_OBJECT
 public:
-	EnvelopeAndLfoView( QWidget * _parent );
+	EnvelopeAndLfoView(QWidget *_parent);
 	virtual ~EnvelopeAndLfoView();
-
 
 protected:
 	void modelChanged() override;
 
-	void dragEnterEvent( QDragEnterEvent * _dee ) override;
-	void dropEvent( QDropEvent * _de ) override;
-	void mousePressEvent( QMouseEvent * _me ) override;
-	void paintEvent( QPaintEvent * _pe ) override;
-
+	void dragEnterEvent(QDragEnterEvent *_dee) override;
+	void dropEvent(QDropEvent *_de) override;
+	void mousePressEvent(QMouseEvent *_me) override;
+	void paintEvent(QPaintEvent *_pe) override;
 
 protected slots:
 	void lfoUserWaveChanged();
 
-
 private:
-	static QPixmap * s_envGraph;
-	static QPixmap * s_lfoGraph;
+	static QPixmap *s_envGraph;
+	static QPixmap *s_lfoGraph;
 
-	EnvelopeAndLfoParameters * m_params;
-
+	EnvelopeAndLfoParameters *m_params;
 
 	// envelope stuff
-	Knob * m_predelayKnob;
-	Knob * m_attackKnob;
-	Knob * m_holdKnob;
-	Knob * m_decayKnob;
-	Knob * m_sustainKnob;
-	Knob * m_releaseKnob;
-	Knob * m_amountKnob;
+	Knob *m_predelayKnob;
+	Knob *m_attackKnob;
+	Knob *m_holdKnob;
+	Knob *m_decayKnob;
+	Knob *m_sustainKnob;
+	Knob *m_releaseKnob;
+	Knob *m_amountKnob;
 
 	// LFO stuff
-	Knob * m_lfoPredelayKnob;
-	Knob * m_lfoAttackKnob;
-	TempoSyncKnob * m_lfoSpeedKnob;
-	Knob * m_lfoAmountKnob;
-	PixmapButton * m_userLfoBtn;
-	automatableButtonGroup * m_lfoWaveBtnGrp;
+	Knob *m_lfoPredelayKnob;
+	Knob *m_lfoAttackKnob;
+	TempoSyncKnob *m_lfoSpeedKnob;
+	Knob *m_lfoAmountKnob;
+	PixmapButton *m_userLfoBtn;
+	automatableButtonGroup *m_lfoWaveBtnGrp;
 
-	LedCheckBox * m_x100Cb;
-	LedCheckBox * m_controlEnvAmountCb;
-	
+	LedCheckBox *m_x100Cb;
+	LedCheckBox *m_controlEnvAmountCb;
+
 	float m_randomGraph;
-} ;
+};
 
 #endif

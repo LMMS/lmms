@@ -29,28 +29,23 @@
 
 #include "EffectControlDialog.h"
 
-
 class QHBoxLayout;
 class LadspaControls;
 class LedCheckBox;
-
 
 class LadspaControlDialog : public EffectControlDialog
 {
 	Q_OBJECT
 public:
-	LadspaControlDialog( LadspaControls * _ctl );
+	LadspaControlDialog(LadspaControls *_ctl);
 	~LadspaControlDialog();
 
-
 private slots:
-	void updateEffectView( LadspaControls * _ctl );
-
+	void updateEffectView(LadspaControls *_ctl);
 
 private:
-	QHBoxLayout * m_effectLayout;
-	LedCheckBox * m_stereoLink;
-
-} ;
+	QHBoxLayout *m_effectLayout;
+	LedCheckBox *m_stereoLink;
+};
 
 #endif

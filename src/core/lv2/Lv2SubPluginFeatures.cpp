@@ -36,37 +36,26 @@
 #include "Lv2Basics.h"
 #include "Lv2Manager.h"
 
-
 const LilvPlugin *Lv2SubPluginFeatures::getPlugin(
 	const Plugin::Descriptor::SubPluginFeatures::Key &k)
 {
-	const LilvPlugin* result = Engine::getLv2Manager()->
-		getPlugin(k.attributes["uri"]);
+	const LilvPlugin *result = Engine::getLv2Manager()->getPlugin(k.attributes["uri"]);
 	Q_ASSERT(result);
 	return result;
 }
-
-
-
 
 QString Lv2SubPluginFeatures::pluginName(const LilvPlugin *plug)
 {
 	return qStringFromPluginNode(plug, lilv_plugin_get_name);
 }
 
-
-
-
 Lv2SubPluginFeatures::Lv2SubPluginFeatures(Plugin::PluginTypes type) :
 	SubPluginFeatures(type)
 {
 }
 
-
-
-
 void Lv2SubPluginFeatures::fillDescriptionWidget(QWidget *parent,
-													const Key *k) const
+	const Key *k) const
 {
 	const LilvPlugin *plug = getPlugin(*k);
 
@@ -115,9 +104,6 @@ void Lv2SubPluginFeatures::fillDescriptionWidget(QWidget *parent,
 	// possibly TODO: version, project, plugin type, number of channels
 }
 
-
-
-
 QString Lv2SubPluginFeatures::additionalFileExtensions(
 	const Plugin::Descriptor::SubPluginFeatures::Key &k) const
 {
@@ -127,17 +113,11 @@ QString Lv2SubPluginFeatures::additionalFileExtensions(
 	return QString();
 }
 
-
-
-
 QString Lv2SubPluginFeatures::displayName(
 	const Plugin::Descriptor::SubPluginFeatures::Key &k) const
 {
 	return pluginName(getPlugin(k));
 }
-
-
-
 
 QString Lv2SubPluginFeatures::description(
 	const Plugin::Descriptor::SubPluginFeatures::Key &k) const
@@ -146,9 +126,6 @@ QString Lv2SubPluginFeatures::description(
 	return QString::fromUtf8("description not implemented yet"); // TODO
 }
 
-
-
-
 const PixmapLoader *Lv2SubPluginFeatures::logo(
 	const Plugin::Descriptor::SubPluginFeatures::Key &k) const
 {
@@ -156,11 +133,8 @@ const PixmapLoader *Lv2SubPluginFeatures::logo(
 	return nullptr;
 }
 
-
-
-
 void Lv2SubPluginFeatures::listSubPluginKeys(const Plugin::Descriptor *desc,
-												KeyList &kl) const
+	KeyList &kl) const
 {
 	Lv2Manager *lv2Mgr = Engine::getLv2Manager();
 	for (const auto &uriInfoPair : *lv2Mgr)
@@ -171,7 +145,7 @@ void Lv2SubPluginFeatures::listSubPluginKeys(const Plugin::Descriptor *desc,
 				Plugin::Descriptor::SubPluginFeatures::Key;
 			KeyType::AttributeMap atm;
 			atm["uri"] = QString::fromUtf8(uriInfoPair.first.c_str());
-			const LilvPlugin* plug = uriInfoPair.second.plugin();
+			const LilvPlugin *plug = uriInfoPair.second.plugin();
 
 			kl.push_back(KeyType(desc, pluginName(plug), atm));
 			//qDebug() << "Found LV2 sub plugin key of type" <<
@@ -181,4 +155,3 @@ void Lv2SubPluginFeatures::listSubPluginKeys(const Plugin::Descriptor *desc,
 }
 
 #endif // LMMS_HAVE_LV2
-

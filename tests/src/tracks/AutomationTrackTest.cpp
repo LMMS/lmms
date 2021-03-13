@@ -22,21 +22,19 @@
  *
  */
 
-#include "QTestSuite.h"
-
-#include "QCoreApplication"
+#include "AutomationTrack.h"
 
 #include "AutomationPattern.h"
-#include "AutomationTrack.h"
 #include "BBTrack.h"
 #include "BBTrackContainer.h"
 #include "DetuningHelper.h"
+#include "Engine.h"
 #include "InstrumentTrack.h"
 #include "Pattern.h"
-#include "TrackContainer.h"
-
-#include "Engine.h"
+#include "QCoreApplication"
+#include "QTestSuite.h"
 #include "Song.h"
+#include "TrackContainer.h"
 
 class AutomationTrackTest : QTestSuite
 {
@@ -100,10 +98,10 @@ private slots:
 		//XXX: Why is this even necessary?
 		p3.clear();
 
-		QCOMPARE(song->automatedValuesAt(  0)[&model], 0.0f);
-		QCOMPARE(song->automatedValuesAt(  5)[&model], 0.5f);
-		QCOMPARE(song->automatedValuesAt( 10)[&model], 1.0f);
-		QCOMPARE(song->automatedValuesAt( 50)[&model], 1.0f);
+		QCOMPARE(song->automatedValuesAt(0)[&model], 0.0f);
+		QCOMPARE(song->automatedValuesAt(5)[&model], 0.5f);
+		QCOMPARE(song->automatedValuesAt(10)[&model], 1.0f);
+		QCOMPARE(song->automatedValuesAt(50)[&model], 1.0f);
 		QCOMPARE(song->automatedValuesAt(100)[&model], 0.0f);
 		QCOMPARE(song->automatedValuesAt(150)[&model], 0.5f);
 	}
@@ -123,13 +121,13 @@ private slots:
 		p.putValue(100, 1.0, false);
 
 		p.changeLength(100);
-		QCOMPARE(song->automatedValuesAt(  0)[&model], 0.0f);
-		QCOMPARE(song->automatedValuesAt( 50)[&model], 0.5f);
+		QCOMPARE(song->automatedValuesAt(0)[&model], 0.0f);
+		QCOMPARE(song->automatedValuesAt(50)[&model], 0.5f);
 		QCOMPARE(song->automatedValuesAt(100)[&model], 1.0f);
 
 		p.changeLength(50);
-		QCOMPARE(song->automatedValuesAt(  0)[&model], 0.0f);
-		QCOMPARE(song->automatedValuesAt( 50)[&model], 0.5f);
+		QCOMPARE(song->automatedValuesAt(0)[&model], 0.0f);
+		QCOMPARE(song->automatedValuesAt(50)[&model], 0.5f);
 		QCOMPARE(song->automatedValuesAt(100)[&model], 0.5f);
 	}
 
@@ -137,17 +135,17 @@ private slots:
 	{
 		auto song = Engine::getSong();
 
-		InstrumentTrack* instrumentTrack =
-				dynamic_cast<InstrumentTrack*>(Track::create(Track::InstrumentTrack, song));
+		InstrumentTrack *instrumentTrack =
+			dynamic_cast<InstrumentTrack *>(Track::create(Track::InstrumentTrack, song));
 
-		Pattern* notePattern = dynamic_cast<Pattern*>(instrumentTrack->createTCO(0));
+		Pattern *notePattern = dynamic_cast<Pattern *>(instrumentTrack->createTCO(0));
 		notePattern->changeLength(TimePos(4, 0));
-		Note* note = notePattern->addNote(Note(TimePos(4, 0)), false);
+		Note *note = notePattern->addNote(Note(TimePos(4, 0)), false);
 		note->createDetuning();
 
-		DetuningHelper* dh = note->detuning();
+		DetuningHelper *dh = note->detuning();
 		auto pattern = dh->automationPattern();
-		pattern->setProgressionType( AutomationPattern::LinearProgression );
+		pattern->setProgressionType(AutomationPattern::LinearProgression);
 		pattern->putValue(TimePos(0, 0), 0.0);
 		pattern->putValue(TimePos(4, 0), 1.0);
 
@@ -162,10 +160,10 @@ private slots:
 		auto song = Engine::getSong();
 		auto bbContainer = Engine::getBBTrackContainer();
 		BBTrack bbTrack(song);
-		Track* automationTrack = Track::create(Track::AutomationTrack, bbContainer);
+		Track *automationTrack = Track::create(Track::AutomationTrack, bbContainer);
 
 		QVERIFY(automationTrack->numOfTCOs());
-		AutomationPattern* p1 = dynamic_cast<AutomationPattern*>(automationTrack->getTCO(0));
+		AutomationPattern *p1 = dynamic_cast<AutomationPattern *>(automationTrack->getTCO(0));
 		QVERIFY(p1);
 
 		FloatModel model;
@@ -175,15 +173,15 @@ private slots:
 		p1->putValue(10, 1.0, false);
 		p1->addObject(&model);
 
-		QCOMPARE(bbContainer->automatedValuesAt( 0, bbTrack.index())[&model], 0.0f);
-		QCOMPARE(bbContainer->automatedValuesAt( 5, bbTrack.index())[&model], 0.5f);
+		QCOMPARE(bbContainer->automatedValuesAt(0, bbTrack.index())[&model], 0.0f);
+		QCOMPARE(bbContainer->automatedValuesAt(5, bbTrack.index())[&model], 0.5f);
 		QCOMPARE(bbContainer->automatedValuesAt(10, bbTrack.index())[&model], 1.0f);
 		QCOMPARE(bbContainer->automatedValuesAt(50, bbTrack.index())[&model], 1.0f);
 
 		BBTrack bbTrack2(song);
 
 		QCOMPARE(bbContainer->automatedValuesAt(5, bbTrack.index())[&model], 0.5f);
-		QVERIFY(! bbContainer->automatedValuesAt(5, bbTrack2.index()).size());
+		QVERIFY(!bbContainer->automatedValuesAt(5, bbTrack2.index()).size());
 
 		BBTCO tco(&bbTrack);
 		tco.changeLength(TimePos::ticksPerBar() * 2);

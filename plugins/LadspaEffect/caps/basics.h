@@ -38,16 +38,13 @@
 #define _ISOC99_SOURCE 1
 #define _ISOC9X_SOURCE 1
 
+#include <assert.h>
+#include <ladspa.h>
+#include <math.h>
+#include <stdint.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-#include <math.h>
-
-#include <assert.h>
-#include <stdio.h>
-#include <stdint.h>
-
-#include <ladspa.h> 	 
 
 /* reducing LADSPA_DEFINES_WITH_LOTS_OF_CHARACTERS_REALLY verbosity */
 #define BOUNDED (LADSPA_HINT_BOUNDED_BELOW | LADSPA_HINT_BOUNDED_ABOVE)
@@ -79,17 +76,18 @@
 /* smallest non-denormal 32 bit IEEE float is 1.18×10-38 */
 #define NOISE_FLOOR .00000000000005 /* -266 dB */
 
-typedef int8_t			int8;
-typedef uint8_t			uint8;
-typedef int16_t			int16;
-typedef uint16_t		uint16;
-typedef int32_t			int32;
-typedef uint32_t		uint32;
-typedef int64_t			int64;
-typedef uint64_t		uint64;
+typedef int8_t int8;
+typedef uint8_t uint8;
+typedef int16_t int16;
+typedef uint16_t uint16;
+typedef int32_t int32;
+typedef uint32_t uint32;
+typedef int64_t int64;
+typedef uint64_t uint64;
 
-typedef struct {
-	const char * name;
+typedef struct
+{
+	const char *name;
 	LADSPA_PortDescriptor descriptor;
 	LADSPA_PortRangeHint range;
 } PortInfo;
@@ -98,16 +96,16 @@ typedef LADSPA_Data sample_t;
 typedef unsigned long ulong;
 
 /* flavours for sample store functions run() and run_adding() */
-typedef void (*sample_func_t) (sample_t *, int, sample_t, sample_t);
+typedef void (*sample_func_t)(sample_t *, int, sample_t, sample_t);
 
 inline void
-store_func (sample_t * s, int i, sample_t x, sample_t gain)
+store_func(sample_t *s, int i, sample_t x, sample_t gain)
 {
 	s[i] = x;
 }
 
 inline void
-adding_func (sample_t * s, int i, sample_t x, sample_t gain)
+adding_func(sample_t *s, int i, sample_t x, sample_t gain)
 {
 	s[i] += gain * x;
 }
@@ -115,85 +113,88 @@ adding_func (sample_t * s, int i, sample_t x, sample_t gain)
 #ifndef max
 
 template <class X, class Y>
-X min (X x, Y y)
+X min(X x, Y y)
 {
-	return x < y ? x : (X) y;
+	return x < y ? x : (X)y;
 }
 
 template <class X, class Y>
-X max (X x, Y y)
+X max(X x, Y y)
 {
-	return x > y ? x : (X) y;
+	return x > y ? x : (X)y;
 }
 
 #endif /* ! max */
 
 template <class T>
-T clamp (T value, T lower, T upper)
+T clamp(T value, T lower, T upper)
 {
-	if (value < lower) return lower;
-	if (value > upper) return upper;
+	if (value < lower)
+		return lower;
+	if (value > upper)
+		return upper;
 	return value;
 }
 
 static inline float
 frandom()
 {
-	return (float) rand() / (float) RAND_MAX;
+	return (float)rand() / (float)RAND_MAX;
 }
 
 /* NB: also true if 0  */
-inline bool 
-is_denormal (float & f)
+inline bool
+is_denormal(float &f)
 {
-	int32 i = *((int32 *) &f);
+	int32 i = *((int32 *)&f);
 	return ((i & 0x7f800000) == 0);
 }
 
 /* todo: not sure if this double version is correct, actually ... */
-inline bool 
-is_denormal (double & f)
+inline bool
+is_denormal(double &f)
 {
-	int64 i = *((int64 *) &f);
+	int64 i = *((int64 *)&f);
 	return ((i & 0x7fe0000000000000ll) == 0);
 }
 
 #ifdef __i386__
-	#define TRAP asm ("int $3;")
+#define TRAP asm("int $3;")
 #else
-	#define TRAP
+#define TRAP
 #endif
 
 /* //////////////////////////////////////////////////////////////////////// */
 
 #define CAPS "C* "
 
-class Plugin {
-	public:
-		double fs; /* sample rate */
-		double adding_gain; /* for run_adding() */
+class Plugin
+{
+public:
+	double fs;			/* sample rate */
+	double adding_gain; /* for run_adding() */
 
-		int first_run; /* 1st block after activate(), do no parameter smoothing */
-		sample_t normal; /* renormal constant */
+	int first_run;	 /* 1st block after activate(), do no parameter smoothing */
+	sample_t normal; /* renormal constant */
 
-		sample_t ** ports;
-		LADSPA_PortRangeHint * ranges; /* for getport() below */
+	sample_t **ports;
+	LADSPA_PortRangeHint *ranges; /* for getport() below */
 
-	public:
-		/* get port value, mapping inf or nan to 0 */
-		inline sample_t getport_unclamped (int i)
-			{
-				sample_t v = *ports[i];
-				return (isinf (v) || isnan(v)) ? 0 : v;
-			}
+public:
+	/* get port value, mapping inf or nan to 0 */
+	inline sample_t getport_unclamped(int i)
+	{
+		sample_t v = *ports[i];
+		return (isinf(v) || isnan(v)) ? 0 : v;
+	}
 
-		/* get port value and clamp to port range */
-		inline sample_t getport (int i)
-			{
-				LADSPA_PortRangeHint & r = ranges[i];
-				sample_t v = getport_unclamped (i);
-				return clamp (v, r.LowerBound, r.UpperBound);
-			}
+	/* get port value and clamp to port range */
+	inline sample_t getport(int i)
+	{
+		LADSPA_PortRangeHint &r = ranges[i];
+		sample_t v = getport_unclamped(i);
+		return clamp(v, r.LowerBound, r.UpperBound);
+	}
 };
 
 #endif /* _BASICS_H_ */

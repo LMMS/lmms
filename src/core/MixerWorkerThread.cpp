@@ -28,47 +28,45 @@
 #include <QMutex>
 #include <QWaitCondition>
 
-#include "denormals.h"
-#include "ThreadableJob.h"
 #include "Mixer.h"
+#include "ThreadableJob.h"
+#include "denormals.h"
 
 #if defined(LMMS_HOST_X86) || defined(LMMS_HOST_X86_64)
 #include <xmmintrin.h>
 #endif
 
 MixerWorkerThread::JobQueue MixerWorkerThread::globalJobQueue;
-QWaitCondition * MixerWorkerThread::queueReadyWaitCond = NULL;
+QWaitCondition *MixerWorkerThread::queueReadyWaitCond = NULL;
 QList<MixerWorkerThread *> MixerWorkerThread::workerThreads;
 
 // implementation of internal JobQueue
-void MixerWorkerThread::JobQueue::reset( OperationMode _opMode )
+void MixerWorkerThread::JobQueue::reset(OperationMode _opMode)
 {
 	m_writeIndex = 0;
 	m_itemsDone = 0;
 	m_opMode = _opMode;
 }
 
-
-
-
-void MixerWorkerThread::JobQueue::addJob( ThreadableJob * _job )
+void MixerWorkerThread::JobQueue::addJob(ThreadableJob *_job)
 {
-	if( _job->requiresProcessing() )
+	if (_job->requiresProcessing())
 	{
 		// update job state
 		_job->queue();
 		// actually queue the job via atomic operations
 		auto index = m_writeIndex++;
-		if (index < JOB_QUEUE_SIZE) {
+		if (index < JOB_QUEUE_SIZE)
+		{
 			m_items[index] = _job;
-		} else {
+		}
+		else
+		{
 			qWarning() << "Job queue is full!";
 			++m_itemsDone;
 		}
 	}
 }
-
-
 
 void MixerWorkerThread::JobQueue::run()
 {
@@ -76,10 +74,10 @@ void MixerWorkerThread::JobQueue::run()
 	while (processedJob && m_itemsDone < m_writeIndex)
 	{
 		processedJob = false;
-		for( int i = 0; i < m_writeIndex && i < JOB_QUEUE_SIZE; ++i )
+		for (int i = 0; i < m_writeIndex && i < JOB_QUEUE_SIZE; ++i)
 		{
-			ThreadableJob * job = m_items[i].exchange(nullptr);
-			if( job )
+			ThreadableJob *job = m_items[i].exchange(nullptr);
+			if (job)
 			{
 				job->process();
 				processedJob = true;
@@ -87,12 +85,9 @@ void MixerWorkerThread::JobQueue::run()
 			}
 		}
 		// always exit loop if we're not in dynamic mode
-		processedJob = processedJob && ( m_opMode == Dynamic );
+		processedJob = processedJob && (m_opMode == Dynamic);
 	}
 }
-
-
-
 
 void MixerWorkerThread::JobQueue::wait()
 {
@@ -104,18 +99,14 @@ void MixerWorkerThread::JobQueue::wait()
 	}
 }
 
-
-
-
-
 // implementation of worker threads
 
-MixerWorkerThread::MixerWorkerThread( Mixer* mixer ) :
-	QThread( mixer ),
-	m_quit( false )
+MixerWorkerThread::MixerWorkerThread(Mixer *mixer) :
+	QThread(mixer),
+	m_quit(false)
 {
 	// initialize global static data
-	if( queueReadyWaitCond == NULL )
+	if (queueReadyWaitCond == NULL)
 	{
 		queueReadyWaitCond = new QWaitCondition;
 	}
@@ -128,25 +119,16 @@ MixerWorkerThread::MixerWorkerThread( Mixer* mixer ) :
 	resetJobQueue();
 }
 
-
-
-
 MixerWorkerThread::~MixerWorkerThread()
 {
-	workerThreads.removeAll( this );
+	workerThreads.removeAll(this);
 }
-
-
-
 
 void MixerWorkerThread::quit()
 {
 	m_quit = true;
 	resetJobQueue();
 }
-
-
-
 
 void MixerWorkerThread::startAndWaitForJobs()
 {
@@ -158,22 +140,18 @@ void MixerWorkerThread::startAndWaitForJobs()
 	globalJobQueue.wait();
 }
 
-
-
-
 void MixerWorkerThread::run()
 {
-	MemoryManager::ThreadGuard mmThreadGuard; Q_UNUSED(mmThreadGuard);
+	MemoryManager::ThreadGuard mmThreadGuard;
+	Q_UNUSED(mmThreadGuard);
 	disable_denormals();
 
 	QMutex m;
-	while( m_quit == false )
+	while (m_quit == false)
 	{
 		m.lock();
-		queueReadyWaitCond->wait( &m );
+		queueReadyWaitCond->wait(&m);
 		globalJobQueue.run();
 		m.unlock();
 	}
 }
-
-

@@ -21,75 +21,60 @@
  * Boston, MA 02110-1301 USA.
  *
  */
- 
+
+#include "NStateButton.h"
 
 #include <QMouseEvent>
 
-#include "NStateButton.h"
 #include "ToolTip.h"
 
-
-
-NStateButton::NStateButton( QWidget * _parent ) :
-	ToolButton( _parent ),
-	m_generalToolTip( "" ),
-	m_curState( -1 )
+NStateButton::NStateButton(QWidget *_parent) :
+	ToolButton(_parent),
+	m_generalToolTip(""),
+	m_curState(-1)
 {
 }
-
-
-
 
 NStateButton::~NStateButton()
 {
-	while( m_states.size() )
+	while (m_states.size())
 	{
-		m_states.erase( m_states.begin() );
+		m_states.erase(m_states.begin());
 	}
 }
 
-
-
-
-void NStateButton::addState( const QPixmap & _pm, const QString & _tooltip )
+void NStateButton::addState(const QPixmap &_pm, const QString &_tooltip)
 {
-	m_states.push_back( qMakePair( _pm, _tooltip ) );
+	m_states.push_back(qMakePair(_pm, _tooltip));
 	// first inserted pixmap?
-	if( m_states.size() == 1 )
+	if (m_states.size() == 1)
 	{
 		// and set state to first pixmap
-		changeState( 0 );
+		changeState(0);
 	}
 }
 
-
-
-
-void NStateButton::changeState( int _n )
+void NStateButton::changeState(int _n)
 {
-	if( _n >= 0 && _n < (int) m_states.size() )
+	if (_n >= 0 && _n < (int)m_states.size())
 	{
 		m_curState = _n;
 
-		const QString & _tooltip =
-			( m_states[m_curState].second != "" ) ?
-				m_states[m_curState].second :
-					m_generalToolTip;
-		ToolTip::add( this, _tooltip );
+		const QString &_tooltip =
+			(m_states[m_curState].second != "") ? m_states[m_curState].second : m_generalToolTip;
+		ToolTip::add(this, _tooltip);
 
-		setIcon( m_states[m_curState].first );
+		setIcon(m_states[m_curState].first);
 
-		emit changedState( m_curState );
+		emit changedState(m_curState);
 	}
 }
 
-
-
-void NStateButton::mousePressEvent( QMouseEvent * _me )
+void NStateButton::mousePressEvent(QMouseEvent *_me)
 {
-	if( _me->button() == Qt::LeftButton && m_states.size() )
+	if (_me->button() == Qt::LeftButton && m_states.size())
 	{
-		changeState( ( ++m_curState ) % m_states.size() );
+		changeState((++m_curState) % m_states.size());
 	}
-	ToolButton::mousePressEvent( _me );
+	ToolButton::mousePressEvent(_me);
 }

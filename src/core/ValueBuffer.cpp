@@ -3,11 +3,13 @@
 #include "interpolation.h"
 
 ValueBuffer::ValueBuffer()
-{}
+{
+}
 
-ValueBuffer::ValueBuffer(int length)
-	: std::vector<float>(length)
-{}
+ValueBuffer::ValueBuffer(int length) :
+	std::vector<float>(length)
+{
+}
 
 void ValueBuffer::fill(float value)
 {
@@ -38,6 +40,6 @@ void ValueBuffer::interpolate(float start, float end_)
 {
 	float i = 0;
 	std::generate(begin(), end(), [&]() {
-		return linearInterpolate( start, end_, i++ / length());
+		return linearInterpolate(start, end_, i++ / length());
 	});
 }

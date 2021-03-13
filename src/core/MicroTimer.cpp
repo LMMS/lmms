@@ -3,7 +3,7 @@
 using namespace std;
 using namespace std::chrono;
 
-static_assert(ratio_less_equal<steady_clock::duration::period, micro>::value, 
+static_assert(ratio_less_equal<steady_clock::duration::period, micro>::value,
 	"MicroTimer: steady_clock doesn't support microsecond resolution");
 
 MicroTimer::MicroTimer()

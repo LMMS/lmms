@@ -22,24 +22,22 @@
  *
  */
 
-
 #ifndef FLANGEREFFECT_H
 #define FLANGEREFFECT_H
 
 #include "Effect.h"
 #include "FlangerControls.h"
-#include "QuadratureLfo.h"
 #include "MonoDelay.h"
 #include "Noise.h"
-
+#include "QuadratureLfo.h"
 
 class FlangerEffect : public Effect
 {
 public:
-	FlangerEffect( Model* parent , const Descriptor::SubPluginFeatures::Key* key );
+	FlangerEffect(Model *parent, const Descriptor::SubPluginFeatures::Key *key);
 	virtual ~FlangerEffect();
-	virtual bool processAudioBuffer( sampleFrame *buf, const fpp_t frames );
-	virtual EffectControls* controls()
+	virtual bool processAudioBuffer(sampleFrame *buf, const fpp_t frames);
+	virtual EffectControls *controls()
 	{
 		return &m_flangerControls;
 	}
@@ -48,11 +46,10 @@ public:
 
 private:
 	FlangerControls m_flangerControls;
-	MonoDelay* m_lDelay;
-	MonoDelay* m_rDelay;
-	QuadratureLfo* m_lfo;
-	Noise* m_noise;
-
+	MonoDelay *m_lDelay;
+	MonoDelay *m_rDelay;
+	QuadratureLfo *m_lfo;
+	Noise *m_noise;
 };
 
 #endif // FLANGEREFFECT_H

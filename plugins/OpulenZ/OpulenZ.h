@@ -27,11 +27,10 @@
 
 #include "Instrument.h"
 #include "InstrumentView.h"
-#include "opl.h"
-
-#include "LcdSpinBox.h"
 #include "Knob.h"
+#include "LcdSpinBox.h"
 #include "PixmapButton.h"
+#include "opl.h"
 
 // This one is a flag, MIDI notes take 7 low bits
 #define OPL2_VOICE_FREE 128
@@ -45,25 +44,25 @@ class OpulenzInstrument : public Instrument
 {
 	Q_OBJECT
 public:
-	OpulenzInstrument( InstrumentTrack * _instrument_track );
+	OpulenzInstrument(InstrumentTrack *_instrument_track);
 	virtual ~OpulenzInstrument();
 
 	virtual QString nodeName() const;
-	virtual PluginView * instantiateView( QWidget * _parent );
+	virtual PluginView *instantiateView(QWidget *_parent);
 
 	virtual Flags flags() const
 	{
 		return IsSingleStreamed | IsMidiBased;
 	}
 
-	virtual bool handleMidiEvent( const MidiEvent& event, const TimePos& time, f_cnt_t offset = 0 );
-	virtual void play( sampleFrame * _working_buffer );
+	virtual bool handleMidiEvent(const MidiEvent &event, const TimePos &time, f_cnt_t offset = 0);
+	virtual void play(sampleFrame *_working_buffer);
 
-	void saveSettings( QDomDocument & _doc, QDomElement & _this );
-	void loadSettings( const QDomElement & _this );
+	void saveSettings(QDomDocument &_doc, QDomElement &_this);
+	void loadSettings(const QDomElement &_this);
 	void loadPatch(const unsigned char inst[14]);
 	void tuneEqual(int center, float Hz);
-	virtual void loadFile( const QString& file );
+	virtual void loadFile(const QString &file);
 
 	IntModel m_patchModel;
 
@@ -84,7 +83,6 @@ public:
 	BoolModel op1_w2_mdl;
 	BoolModel op1_w3_mdl;
 	IntModel op1_waveform_mdl;
-
 
 	FloatModel op2_a_mdl;
 	FloatModel op2_d_mdl;
@@ -107,9 +105,8 @@ public:
 	BoolModel vib_depth_mdl;
 	BoolModel trem_depth_mdl;
 
-
 private slots:
-        void updatePatch();
+	void updatePatch();
 	void reloadEmulator();
 	void loadGMPatch();
 
@@ -140,13 +137,11 @@ private:
 	int RPNcoarse, RPNfine;
 };
 
-
-
 class OpulenzInstrumentView : public InstrumentViewFixedSize
 {
 	Q_OBJECT
 public:
-	OpulenzInstrumentView( Instrument * _instrument, QWidget * _parent );
+	OpulenzInstrumentView(Instrument *_instrument, QWidget *_parent);
 	virtual ~OpulenzInstrumentView();
 	LcdSpinBox *m_patch;
 	void modelChanged();
@@ -169,7 +164,6 @@ public:
 	PixmapButton *op1_w3_btn;
 	automatableButtonGroup *op1_waveform;
 
-
 	Knob *op2_a_kn;
 	Knob *op2_d_kn;
 	Knob *op2_s_kn;
@@ -187,17 +181,15 @@ public:
 	PixmapButton *op2_w3_btn;
 	automatableButtonGroup *op2_waveform;
 
-
 	PixmapButton *fm_btn;
 	PixmapButton *vib_depth_btn;
 	PixmapButton *trem_depth_btn;
 
-	private slots:
+private slots:
 	void updateKnobHints();
 
- private:
+private:
 	QString knobHintHelper(float n);
-
 };
 
 #endif

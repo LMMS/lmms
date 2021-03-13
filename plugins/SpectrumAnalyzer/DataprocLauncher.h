@@ -27,14 +27,14 @@
 
 #include <QThread>
 
-#include "SaProcessor.h"
 #include "LocklessRingBuffer.h"
+#include "SaProcessor.h"
 
 class DataprocLauncher : public QThread
 {
 public:
-	explicit DataprocLauncher(SaProcessor &proc, LocklessRingBuffer<sampleFrame> &buffer)
-		: m_processor(&proc),
+	explicit DataprocLauncher(SaProcessor &proc, LocklessRingBuffer<sampleFrame> &buffer) :
+		m_processor(&proc),
 		m_inputBuffer(&buffer)
 	{
 	}

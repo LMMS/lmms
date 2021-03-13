@@ -23,7 +23,6 @@
  *
  */
 
-
 #ifndef EQPARAMETERWIDGET_H
 #define EQPARAMETERWIDGET_H
 
@@ -37,7 +36,7 @@ class EqControls;
 
 class EqBand
 {
-public :
+public:
 	EqBand();
 	FloatModel *gain;
 	FloatModel *res;
@@ -57,24 +56,21 @@ public :
 	float *peakR;
 };
 
-
-
-
 class EqParameterWidget : public QWidget
 {
 	Q_OBJECT
 public:
-	explicit EqParameterWidget( QWidget *parent = 0, EqControls * controls = 0 );
+	explicit EqParameterWidget(QWidget *parent = 0, EqControls *controls = 0);
 	~EqParameterWidget();
-	QList<EqHandle*> *m_handleList;
+	QList<EqHandle *> *m_handleList;
 
 	const int bandCount()
 	{
 		return 8;
 	}
 
-	EqBand* getBandModels( int i );
-	void changeHandle( int i );
+	EqBand *getBandModels(int i);
+	void changeHandle(int i);
 
 private:
 	float m_pixelsPerUnitWidth;
@@ -86,7 +82,6 @@ private:
 	EqBand *m_bands;
 	EqHandle *m_handle;
 	EqCurve *m_eqcurve;
-
 
 private slots:
 	void updateModels();

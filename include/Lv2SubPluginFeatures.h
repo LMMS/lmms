@@ -33,8 +33,8 @@
 
 #include <lilv/lilv.h>
 
-#include "lmms_export.h"
 #include "Plugin.h"
+#include "lmms_export.h"
 
 class LMMS_EXPORT Lv2SubPluginFeatures : public Plugin::Descriptor::SubPluginFeatures
 {

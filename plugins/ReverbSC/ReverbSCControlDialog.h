@@ -27,19 +27,16 @@
 
 #include "EffectControlDialog.h"
 
-
 class ReverbSCControls;
-
 
 class ReverbSCControlDialog : public EffectControlDialog
 {
 	Q_OBJECT
 public:
-	ReverbSCControlDialog( ReverbSCControls* controls );
+	ReverbSCControlDialog(ReverbSCControls *controls);
 	virtual ~ReverbSCControlDialog()
 	{
 	}
-
-} ;
+};
 
 #endif

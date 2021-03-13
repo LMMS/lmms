@@ -25,13 +25,11 @@
 #ifndef TRACK_CONTENT_OBJECT_VIEW_H
 #define TRACK_CONTENT_OBJECT_VIEW_H
 
-
 #include <QtCore/QVector>
 
 #include "ModelView.h"
 #include "Rubberband.h"
 #include "TrackContentObject.h"
-
 
 class QMenu;
 class QContextMenuEvent;
@@ -41,36 +39,35 @@ class TextFloat;
 class TrackContentObject;
 class TrackView;
 
-
 class TrackContentObjectView : public selectableObject, public ModelView
 {
 	Q_OBJECT
 
-// theming qproperties
-	Q_PROPERTY( QColor mutedColor READ mutedColor WRITE setMutedColor )
-	Q_PROPERTY( QColor mutedBackgroundColor READ mutedBackgroundColor WRITE setMutedBackgroundColor )
-	Q_PROPERTY( QColor selectedColor READ selectedColor WRITE setSelectedColor )
-	Q_PROPERTY( QColor textColor READ textColor WRITE setTextColor )
-	Q_PROPERTY( QColor textBackgroundColor READ textBackgroundColor WRITE setTextBackgroundColor )
-	Q_PROPERTY( QColor textShadowColor READ textShadowColor WRITE setTextShadowColor )
-	Q_PROPERTY( QColor BBPatternBackground READ BBPatternBackground WRITE setBBPatternBackground )
-	Q_PROPERTY( bool gradient READ gradient WRITE setGradient )
+	// theming qproperties
+	Q_PROPERTY(QColor mutedColor READ mutedColor WRITE setMutedColor)
+	Q_PROPERTY(QColor mutedBackgroundColor READ mutedBackgroundColor WRITE setMutedBackgroundColor)
+	Q_PROPERTY(QColor selectedColor READ selectedColor WRITE setSelectedColor)
+	Q_PROPERTY(QColor textColor READ textColor WRITE setTextColor)
+	Q_PROPERTY(QColor textBackgroundColor READ textBackgroundColor WRITE setTextBackgroundColor)
+	Q_PROPERTY(QColor textShadowColor READ textShadowColor WRITE setTextShadowColor)
+	Q_PROPERTY(QColor BBPatternBackground READ BBPatternBackground WRITE setBBPatternBackground)
+	Q_PROPERTY(bool gradient READ gradient WRITE setGradient)
 	// We have to use a QSize here because using QPoint isn't supported.
 	// width -> x, height -> y
-	Q_PROPERTY( QSize mouseHotspotHand WRITE setMouseHotspotHand )
+	Q_PROPERTY(QSize mouseHotspotHand WRITE setMouseHotspotHand)
 
 public:
-	TrackContentObjectView( TrackContentObject * tco, TrackView * tv );
+	TrackContentObjectView(TrackContentObject *tco, TrackView *tv);
 	virtual ~TrackContentObjectView();
 
 	bool fixedTCOs();
 
-	inline TrackContentObject * getTrackContentObject()
+	inline TrackContentObject *getTrackContentObject()
 	{
 		return m_tco;
 	}
 
-	inline TrackView * getTrackView()
+	inline TrackView *getTrackView()
 	{
 		return m_trackView;
 	}
@@ -84,39 +81,39 @@ public:
 	QColor textShadowColor() const;
 	QColor BBPatternBackground() const;
 	bool gradient() const;
-	void setMutedColor( const QColor & c );
-	void setMutedBackgroundColor( const QColor & c );
-	void setSelectedColor( const QColor & c );
-	void setTextColor( const QColor & c );
-	void setTextBackgroundColor( const QColor & c );
-	void setTextShadowColor( const QColor & c );
-	void setBBPatternBackground( const QColor & c );
-	void setGradient( const bool & b );
-	void setMouseHotspotHand(const QSize & s);
+	void setMutedColor(const QColor &c);
+	void setMutedBackgroundColor(const QColor &c);
+	void setSelectedColor(const QColor &c);
+	void setTextColor(const QColor &c);
+	void setTextBackgroundColor(const QColor &c);
+	void setTextShadowColor(const QColor &c);
+	void setBBPatternBackground(const QColor &c);
+	void setGradient(const bool &b);
+	void setMouseHotspotHand(const QSize &s);
 
 	// access needsUpdate member variable
 	bool needsUpdate();
-	void setNeedsUpdate( bool b );
+	void setNeedsUpdate(bool b);
 
 	// Method to get a QVector of TCOs to be affected by a context menu action
 	QVector<TrackContentObjectView *> getClickedTCOs();
 
 	// Methods to remove, copy, cut, paste and mute a QVector of TCO views
-	void copy( QVector<TrackContentObjectView *> tcovs );
-	void cut( QVector<TrackContentObjectView *> tcovs );
+	void copy(QVector<TrackContentObjectView *> tcovs);
+	void cut(QVector<TrackContentObjectView *> tcovs);
 	void paste();
 	// remove and toggleMute are static because they don't depend
 	// being called from a particular TCO view, but can be called anywhere as long
 	// as a valid TCO view list is given, while copy/cut require an instance for
 	// some metadata to be written to the clipboard.
-	static void remove( QVector<TrackContentObjectView *> tcovs );
-	static void toggleMute( QVector<TrackContentObjectView *> tcovs );
-	static void mergeTCOs(QVector<TrackContentObjectView*> tcovs);
+	static void remove(QVector<TrackContentObjectView *> tcovs);
+	static void toggleMute(QVector<TrackContentObjectView *> tcovs);
+	static void mergeTCOs(QVector<TrackContentObjectView *> tcovs);
 
 	// Returns true if selection can be merged and false if not
-	static bool canMergeSelection(QVector<TrackContentObjectView*> tcovs);
+	static bool canMergeSelection(QVector<TrackContentObjectView *> tcovs);
 
-	QColor getColorForDisplay( QColor );
+	QColor getColorForDisplay(QColor);
 
 public slots:
 	virtual bool close();
@@ -137,36 +134,33 @@ protected:
 		Merge
 	};
 
-	virtual void constructContextMenu( QMenu * )
+	virtual void constructContextMenu(QMenu *)
 	{
 	}
 
-	void contextMenuEvent( QContextMenuEvent * cme ) override;
-	void contextMenuAction( ContextMenuAction action );
-	void dragEnterEvent( QDragEnterEvent * dee ) override;
-	void dropEvent( QDropEvent * de ) override;
-	void leaveEvent( QEvent * e ) override;
-	void mousePressEvent( QMouseEvent * me ) override;
-	void mouseMoveEvent( QMouseEvent * me ) override;
-	void mouseReleaseEvent( QMouseEvent * me ) override;
-	void resizeEvent( QResizeEvent * re ) override
+	void contextMenuEvent(QContextMenuEvent *cme) override;
+	void contextMenuAction(ContextMenuAction action);
+	void dragEnterEvent(QDragEnterEvent *dee) override;
+	void dropEvent(QDropEvent *de) override;
+	void leaveEvent(QEvent *e) override;
+	void mousePressEvent(QMouseEvent *me) override;
+	void mouseMoveEvent(QMouseEvent *me) override;
+	void mouseReleaseEvent(QMouseEvent *me) override;
+	void resizeEvent(QResizeEvent *re) override
 	{
 		m_needsUpdate = true;
-		selectableObject::resizeEvent( re );
+		selectableObject::resizeEvent(re);
 	}
 
 	float pixelsPerBar();
 
+	DataFile createTCODataFiles(const QVector<TrackContentObjectView *> &tcos) const;
 
-	DataFile createTCODataFiles(const QVector<TrackContentObjectView *> & tcos) const;
-
-	virtual void paintTextLabel(QString const & text, QPainter & painter);
-
+	virtual void paintTextLabel(QString const &text, QPainter &painter);
 
 protected slots:
 	void updateLength();
 	void updatePosition();
-
 
 private:
 	enum Actions
@@ -178,12 +172,12 @@ private:
 		ResizeLeft,
 		CopySelection,
 		ToggleSelected
-	} ;
+	};
 
-	static TextFloat * s_textFloat;
+	static TextFloat *s_textFloat;
 
-	TrackContentObject * m_tco;
-	TrackView * m_trackView;
+	TrackContentObject *m_tco;
+	TrackView *m_trackView;
 	Actions m_action;
 	QPoint m_initialMousePos;
 	QPoint m_initialMouseGlobalPos;
@@ -191,9 +185,9 @@ private:
 	TimePos m_initialTCOEnd;
 	QVector<TimePos> m_initialOffsets;
 
-	TextFloat * m_hint;
+	TextFloat *m_hint;
 
-// qproperty fields
+	// qproperty fields
 	QColor m_mutedColor;
 	QColor m_mutedBackgroundColor;
 	QColor m_selectedColor;
@@ -206,18 +200,17 @@ private:
 	bool m_cursorSetYet;
 
 	bool m_needsUpdate;
-	inline void setInitialPos( QPoint pos )
+	inline void setInitialPos(QPoint pos)
 	{
 		m_initialMousePos = pos;
-		m_initialMouseGlobalPos = mapToGlobal( pos );
+		m_initialMouseGlobalPos = mapToGlobal(pos);
 		m_initialTCOPos = m_tco->startPosition();
 		m_initialTCOEnd = m_initialTCOPos + m_tco->length();
 	}
 	void setInitialOffsets();
 
-	bool mouseMovedDistance( QMouseEvent * me, int distance );
-	TimePos draggedTCOPos( QMouseEvent * me );
-} ;
-
+	bool mouseMovedDistance(QMouseEvent *me, int distance);
+	TimePos draggedTCOPos(QMouseEvent *me);
+};
 
 #endif

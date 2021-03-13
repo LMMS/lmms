@@ -29,16 +29,15 @@
 
 #include "Instrument.h"
 #include "InstrumentView.h"
-#include "Note.h"
 #include "Lv2ControlBase.h"
 #include "Lv2ViewBase.h"
+#include "Note.h"
 
 // whether to use MIDI vs playHandle
 // currently only MIDI works
 #define LV2_INSTRUMENT_USE_MIDI
 
 class QPushButton;
-
 
 class Lv2Instrument : public Instrument, public Lv2ControlBase
 {
@@ -48,7 +47,7 @@ public:
 		initialization
 	*/
 	Lv2Instrument(InstrumentTrack *instrumentTrackArg,
-		 Descriptor::SubPluginFeatures::Key* key);
+		Descriptor::SubPluginFeatures::Key *key);
 	~Lv2Instrument() override;
 	//! Must be checked after ctor or reload
 	bool isValid() const;
@@ -100,7 +99,6 @@ private:
 	friend class Lv2InsView;
 };
 
-
 class Lv2InsView : public InstrumentView, public Lv2ViewBase
 {
 	Q_OBJECT
@@ -114,6 +112,5 @@ protected:
 private:
 	void modelChanged() override;
 };
-
 
 #endif // LV2_INSTRUMENT_H

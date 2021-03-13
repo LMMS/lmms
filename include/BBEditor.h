@@ -22,14 +22,11 @@
  *
  */
 
-
 #ifndef BB_EDITOR_H
 #define BB_EDITOR_H
 
-
 #include "Editor.h"
 #include "TrackContainerView.h"
-
 
 class BBTrackContainer;
 class ComboBox;
@@ -40,36 +37,36 @@ class BBEditor : public Editor
 {
 	Q_OBJECT
 public:
-	BBEditor( BBTrackContainer * _tc );
+	BBEditor(BBTrackContainer *_tc);
 	~BBEditor();
 
 	QSize sizeHint() const override;
 
-	const BBTrackContainerView* trackContainerView() const {
+	const BBTrackContainerView *trackContainerView() const
+	{
 		return m_trackContainerView;
 	}
-	BBTrackContainerView* trackContainerView() {
+	BBTrackContainerView *trackContainerView()
+	{
 		return m_trackContainerView;
 	}
 
-	void removeBBView( int bb );
+	void removeBBView(int bb);
 
 public slots:
 	void play() override;
 	void stop() override;
 
 private:
-	BBTrackContainerView* m_trackContainerView;
-	ComboBox * m_bbComboBox;
-} ;
-
-
+	BBTrackContainerView *m_trackContainerView;
+	ComboBox *m_bbComboBox;
+};
 
 class BBTrackContainerView : public TrackContainerView
 {
 	Q_OBJECT
 public:
-	BBTrackContainerView(BBTrackContainer* tc);
+	BBTrackContainerView(BBTrackContainer *tc);
 
 	bool fixedTCOs() const override
 	{
@@ -78,8 +75,8 @@ public:
 
 	void removeBBView(int bb);
 
-	void saveSettings(QDomDocument& doc, QDomElement& element) override;
-	void loadSettings(const QDomElement& element) override;
+	void saveSettings(QDomDocument &doc, QDomElement &element) override;
+	void loadSettings(const QDomElement &element) override;
 
 public slots:
 	void addSteps();
@@ -90,13 +87,12 @@ public slots:
 	void clonePattern();
 
 protected slots:
-	void dropEvent(QDropEvent * de ) override;
+	void dropEvent(QDropEvent *de) override;
 	void updatePosition();
 
 private:
-	BBTrackContainer * m_bbtc;
-	void makeSteps( bool clone );
+	BBTrackContainer *m_bbtc;
+	void makeSteps(bool clone);
 };
-
 
 #endif

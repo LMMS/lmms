@@ -41,7 +41,7 @@
 class UridMap
 {
 	std::unordered_map<std::string, LV2_URID> m_map;
-	std::vector<const char*> m_unMap;
+	std::vector<const char *> m_unMap;
 
 	//! mutex for both m_map and m_unMap
 	//! the URID map is global, which is why a mutex is required here
@@ -57,13 +57,13 @@ public:
 	UridMap();
 
 	//! map feature function
-	LV2_URID map(const char* uri);
+	LV2_URID map(const char *uri);
 	//! unmap feature function
-	const char* unmap(LV2_URID urid);
+	const char *unmap(LV2_URID urid);
 
 	// access the features
-	LV2_URID_Map* mapFeature() { return &m_mapFeature; }
-	LV2_URID_Unmap* unmapFeature() { return &m_unmapFeature; }
+	LV2_URID_Map *mapFeature() { return &m_mapFeature; }
+	LV2_URID_Unmap *unmapFeature() { return &m_unmapFeature; }
 };
 
 #endif // LMMS_HAVE_LV2

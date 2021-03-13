@@ -23,13 +23,12 @@
  *
  */
 
-
 #ifndef GRAPH_H
 #define GRAPH_H
 
-#include <QWidget>
-#include <QPixmap>
 #include <QCursor>
+#include <QPixmap>
+#include <QWidget>
 
 #include "Model.h"
 #include "ModelView.h"
@@ -37,17 +36,16 @@
 
 class graphModel;
 
-
 class LMMS_EXPORT Graph : public QWidget, public ModelView
 {
 	Q_OBJECT
 public:
 	enum graphStyle
 	{
-		NearestStyle, //!< draw as stairs
-		LinearStyle, //!< connect each 2 samples with a line, with wrapping
+		NearestStyle,		  //!< draw as stairs
+		LinearStyle,		  //!< connect each 2 samples with a line, with wrapping
 		LinearNonCyclicStyle, //!< LinearStyle without wrapping
-		BarStyle, //!< draw thick bars
+		BarStyle,			  //!< draw thick bars
 		NumGraphStyles
 	};
 
@@ -56,18 +54,16 @@ public:
 	 * @param _width Pixel width of widget
 	 * @param _height Pixel height of widget
 	 */
-	Graph( QWidget * _parent, graphStyle _style = Graph::LinearStyle,
+	Graph(QWidget *_parent, graphStyle _style = Graph::LinearStyle,
 		int _width = 132,
-		int _height = 104
-	);
+		int _height = 104);
 	virtual ~Graph() = default;
 
-	void setForeground( const QPixmap & _pixmap );
+	void setForeground(const QPixmap &_pixmap);
 
+	void setGraphColor(const QColor);
 
-	void setGraphColor( const QColor );
-
-	inline graphModel * model()
+	inline graphModel *model()
 	{
 		return castModel<graphModel>();
 	}
@@ -77,8 +73,7 @@ public:
 		return m_graphStyle;
 	}
 
-
-	inline void setGraphStyle( graphStyle _s )
+	inline void setGraphStyle(graphStyle _s)
 	{
 		m_graphStyle = _s;
 		update();
@@ -86,24 +81,24 @@ public:
 
 signals:
 	void drawn();
+
 protected:
-	void paintEvent( QPaintEvent * _pe ) override;
-	void dropEvent( QDropEvent * _de ) override;
-	void dragEnterEvent( QDragEnterEvent * _dee ) override;
-	void mousePressEvent( QMouseEvent * _me ) override;
-	void mouseMoveEvent( QMouseEvent * _me ) override;
-	void mouseReleaseEvent( QMouseEvent * _me ) override;
+	void paintEvent(QPaintEvent *_pe) override;
+	void dropEvent(QDropEvent *_de) override;
+	void dragEnterEvent(QDragEnterEvent *_dee) override;
+	void mousePressEvent(QMouseEvent *_me) override;
+	void mouseMoveEvent(QMouseEvent *_me) override;
+	void mouseReleaseEvent(QMouseEvent *_me) override;
 
 protected slots:
-	void updateGraph( int _startPos, int _endPos );
+	void updateGraph(int _startPos, int _endPos);
 	void updateGraph();
 
 private:
 	void modelChanged() override;
 
-	void changeSampleAt( int _x, int _y );
-	void drawLineAt( int _x, int _y, int _lastx );
-
+	void changeSampleAt(int _x, int _y);
+	void drawLineAt(int _x, int _y, int _lastx);
 
 	QPixmap m_foreground;
 	QColor m_graphColor;
@@ -112,9 +107,7 @@ private:
 
 	bool m_mouseDown;
 	int m_lastCursorX;
-
-} ;
-
+};
 
 /**
 	@brief 2 dimensional function plot
@@ -134,12 +127,12 @@ public:
 	 * @param _step Step size on y axis where values snap to, or 0.0f
 	 *   for "no snapping"
 	 */
-	graphModel( float _min,
-			float _max,
-			int _size,
-			:: Model * _parent,
-			bool _default_constructed = false,
-			float _step = 0.0 );
+	graphModel(float _min,
+		float _max,
+		int _size,
+		::Model *_parent,
+		bool _default_constructed = false,
+		float _step = 0.0);
 
 	virtual ~graphModel() = default;
 
@@ -147,12 +140,12 @@ public:
 
 	inline float minValue() const
 	{
-		return( m_minValue );
+		return (m_minValue);
 	}
 
 	inline float maxValue() const
 	{
-		return( m_maxValue );
+		return (m_maxValue);
 	}
 
 	inline int length() const
@@ -160,9 +153,9 @@ public:
 		return m_length;
 	}
 
-	inline const float * samples() const
+	inline const float *samples() const
 	{
-		return( m_samples.data() );
+		return (m_samples.data());
 	}
 
 	//! Make cyclic convolution
@@ -174,36 +167,36 @@ public:
 
 public slots:
 	//! Set range of y values
-	void setRange( float _min, float _max );
+	void setRange(float _min, float _max);
 
-	void setLength( int _size );
+	void setLength(int _size);
 	//! Update one sample
-	void setSampleAt( int x, float val );
+	void setSampleAt(int x, float val);
 	//! Update samples array
-	void setSamples( const float * _value );
+	void setSamples(const float *_value);
 
 	void setWaveToSine();
 	void setWaveToTriangle();
 	void setWaveToSaw();
 	void setWaveToSquare();
 	void setWaveToNoise();
-	QString setWaveToUser( );
+	QString setWaveToUser();
 
 	void smooth();
 	void smoothNonCyclic();
 	void normalize();
 	void invert();
-	void shiftPhase( int _deg );
+	void shiftPhase(int _deg);
 	void clear();
 	void clearInvisible();
 
 signals:
 	void lengthChanged();
-	void samplesChanged( int startPos, int endPos );
+	void samplesChanged(int startPos, int endPos);
 	void rangeChanged();
 
 private:
-	void drawSampleAt( int x, float val );
+	void drawSampleAt(int x, float val);
 
 	QVector<float> m_samples;
 	int m_length;
@@ -212,7 +205,6 @@ private:
 	float m_step;
 
 	friend class Graph;
-
 };
 
 #endif

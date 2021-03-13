@@ -22,9 +22,9 @@
  *
  */
 
-#include "QTestSuite.h"
-
 #include "ProjectVersion.h"
+
+#include "QTestSuite.h"
 
 class ProjectVersionTest : QTestSuite
 {
@@ -37,8 +37,8 @@ private slots:
 		QVERIFY(ProjectVersion("1.1.0", ProjectVersion::Release) > "0.2.1");
 		QVERIFY(ProjectVersion("1.1.4", ProjectVersion::Release) < "1.1.10");
 		QVERIFY(ProjectVersion("1.1.0", ProjectVersion::Minor) == "1.1.5");
-		QVERIFY( ! ( ProjectVersion("3.1.0", ProjectVersion::Minor) < "2.2.5" ) );
-		QVERIFY( ! ( ProjectVersion("2.5.0", ProjectVersion::Release) < "2.2.5" ) );
+		QVERIFY(!(ProjectVersion("3.1.0", ProjectVersion::Minor) < "2.2.5"));
+		QVERIFY(!(ProjectVersion("2.5.0", ProjectVersion::Release) < "2.2.5"));
 		//A pre-release version has lower precedence than a normal version
 		QVERIFY(ProjectVersion("1.1.0") > "1.1.0-alpha");
 		//But higher precedence than the previous version
@@ -60,9 +60,7 @@ private slots:
 		QVERIFY(ProjectVersion("1.2.3.42") == "1.2.3");
 		//CompareVersion "All" should compare every identifier
 		QVERIFY(
-			ProjectVersion("1.0.0-a.b.c.d.e.f.g.h.i.j.k.l", ProjectVersion::All)
-			< "1.0.0-a.b.c.d.e.f.g.h.i.j.k.m"
-		);
+			ProjectVersion("1.0.0-a.b.c.d.e.f.g.h.i.j.k.l", ProjectVersion::All) < "1.0.0-a.b.c.d.e.f.g.h.i.j.k.m");
 		//Prerelease identifiers may contain hyphens
 		QVERIFY(ProjectVersion("1.0.0-Alpha-1.2") > "1.0.0-Alpha-1.1");
 		//We shouldn't crash on invalid versions

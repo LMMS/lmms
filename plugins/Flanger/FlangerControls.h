@@ -26,9 +26,8 @@
 #define FLANGERCONTROLS_H
 
 #include "EffectControls.h"
-#include "Knob.h"
 #include "FlangerControlsDialog.h"
-
+#include "Knob.h"
 
 class FlangerEffect;
 
@@ -36,12 +35,12 @@ class FlangerControls : public EffectControls
 {
 	Q_OBJECT
 public:
-	FlangerControls( FlangerEffect* effect );
+	FlangerControls(FlangerEffect *effect);
 	virtual ~FlangerControls()
 	{
 	}
-	virtual void saveSettings ( QDomDocument& doc, QDomElement& parent );
-	virtual void loadSettings ( const QDomElement &_this );
+	virtual void saveSettings(QDomDocument &doc, QDomElement &parent);
+	virtual void loadSettings(const QDomElement &_this);
 	inline virtual QString nodeName() const
 	{
 		return "Flanger";
@@ -50,9 +49,9 @@ public:
 	{
 		return 5;
 	}
-	virtual EffectControlDialog* createView()
+	virtual EffectControlDialog *createView()
 	{
-		return new FlangerControlsDialog( this );
+		return new FlangerControlsDialog(this);
 	}
 
 private slots:
@@ -60,7 +59,7 @@ private slots:
 	void changedPlaybackState();
 
 private:
-	FlangerEffect* m_effect;
+	FlangerEffect *m_effect;
 	FloatModel m_delayTimeModel;
 	TempoSyncKnobModel m_lfoFrequencyModel;
 	FloatModel m_lfoAmountModel;
@@ -70,7 +69,6 @@ private:
 
 	friend class FlangerControlsDialog;
 	friend class FlangerEffect;
-
 };
 
 #endif // FLANGERCONTROLS_H

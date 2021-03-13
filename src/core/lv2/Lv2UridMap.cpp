@@ -22,20 +22,19 @@
  *
  */
 
-
 #include "Lv2UridMap.h"
 
 #ifdef LMMS_HAVE_LV2
 
-static LV2_URID staticMap(LV2_URID_Map_Handle handle, const char* uri)
+static LV2_URID staticMap(LV2_URID_Map_Handle handle, const char *uri)
 {
-	UridMap* map = static_cast<UridMap*>(handle);
+	UridMap *map = static_cast<UridMap *>(handle);
 	return map->map(uri);
 }
 
-static const char* staticUnmap(LV2_URID_Unmap_Handle handle, LV2_URID urid)
+static const char *staticUnmap(LV2_URID_Unmap_Handle handle, LV2_URID urid)
 {
-	UridMap* map = static_cast<UridMap*>(handle);
+	UridMap *map = static_cast<UridMap *>(handle);
 	return map->unmap(urid);
 }
 
@@ -66,7 +65,7 @@ LV2_URID UridMap::map(const char *uri)
 		// * move the try block inside the case where the URI is not in the map
 		const std::string uriStr = uri;
 
-		std::lock_guard<std::mutex> guard (m_MapMutex);
+		std::lock_guard<std::mutex> guard(m_MapMutex);
 
 		auto itr = m_map.find(uriStr);
 		if (itr == m_map.end())
@@ -80,9 +79,14 @@ LV2_URID UridMap::map(const char *uri)
 				result = static_cast<LV2_URID>(index);
 			}
 		}
-		else { result = itr->second; }
+		else
+		{
+			result = itr->second;
+		}
 	}
-	catch(...) { /* result variable is already 0 */ }
+	catch (...)
+	{ /* result variable is already 0 */
+	}
 
 	return result;
 }
@@ -91,9 +95,8 @@ const char *UridMap::unmap(LV2_URID urid)
 {
 	std::size_t idx = static_cast<std::size_t>(urid) - 1;
 
-	std::lock_guard<std::mutex> guard (m_MapMutex);
+	std::lock_guard<std::mutex> guard(m_MapMutex);
 	return (idx < m_unMap.size()) ? m_unMap[idx] : nullptr;
 }
 
 #endif // LMMS_HAVE_LV2
-

@@ -33,8 +33,8 @@
 
 #include "DataFile.h"
 #include "LinkedModelGroups.h"
-#include "lmms_export.h"
 #include "Plugin.h"
+#include "lmms_export.h"
 
 class Lv2Proc;
 class PluginIssue;
@@ -69,10 +69,10 @@ class PluginIssue;
 class LMMS_EXPORT Lv2ControlBase : public LinkedModelGroups
 {
 public:
-	static Plugin::PluginTypes check(const LilvPlugin* m_plugin,
+	static Plugin::PluginTypes check(const LilvPlugin *m_plugin,
 		std::vector<PluginIssue> &issues);
 
-	const LilvPlugin* getPlugin() const { return m_plugin; }
+	const LilvPlugin *getPlugin() const { return m_plugin; }
 
 	Lv2Proc *control(std::size_t idx) { return m_procs[idx].get(); }
 	const Lv2Proc *control(std::size_t idx) const { return m_procs[idx].get(); }
@@ -87,11 +87,11 @@ protected:
 	//! @param that the class inheriting this class and inheriting Model;
 	//!   this is the same pointer as this, but a different type
 	//! @param uri the Lv2 URI telling this class what plugin to construct
-	Lv2ControlBase(class Model *that, const QString& uri);
-	Lv2ControlBase(const Lv2ControlBase&) = delete;
+	Lv2ControlBase(class Model *that, const QString &uri);
+	Lv2ControlBase(const Lv2ControlBase &) = delete;
 	~Lv2ControlBase() override;
 
-	Lv2ControlBase& operator=(const Lv2ControlBase&) = delete;
+	Lv2ControlBase &operator=(const Lv2ControlBase &) = delete;
 
 	//! Must be checked after ctor or reload
 	bool isValid() const { return m_valid; }
@@ -99,8 +99,8 @@ protected:
 	/*
 		overrides
 	*/
-	LinkedModelGroup* getGroup(std::size_t idx) override;
-	const LinkedModelGroup* getGroup(std::size_t idx) const override;
+	LinkedModelGroup *getGroup(std::size_t idx) override;
+	const LinkedModelGroup *getGroup(std::size_t idx) const override;
 
 	/*
 		utils for the run thread
@@ -151,7 +151,7 @@ private:
 	bool m_hasGUI = false;
 	unsigned m_channelsPerProc;
 
-	const LilvPlugin* m_plugin;
+	const LilvPlugin *m_plugin;
 };
 
 #endif // LMMS_HAVE_LV2

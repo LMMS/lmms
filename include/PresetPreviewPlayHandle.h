@@ -28,7 +28,6 @@
 
 #include "NotePlayHandle.h"
 
-
 class DataFile;
 class InstrumentTrack;
 class PreviewTrackContainer;
@@ -36,7 +35,7 @@ class PreviewTrackContainer;
 class LMMS_EXPORT PresetPreviewPlayHandle : public PlayHandle
 {
 public:
-	PresetPreviewPlayHandle( const QString& presetFile, bool loadByPlugin = false, DataFile *dataFile = 0 );
+	PresetPreviewPlayHandle(const QString &presetFile, bool loadByPlugin = false, DataFile *dataFile = 0);
 	virtual ~PresetPreviewPlayHandle();
 
 	inline bool affinityMatters() const override
@@ -44,24 +43,21 @@ public:
 		return true;
 	}
 
-	void play( sampleFrame* buffer ) override;
+	void play(sampleFrame *buffer) override;
 	bool isFinished() const override;
 
-	bool isFromTrack( const Track * _track ) const override;
+	bool isFromTrack(const Track *_track) const override;
 
 	static void init();
 	static void cleanup();
-	static ConstNotePlayHandleList nphsOfInstrumentTrack( const InstrumentTrack* instrumentTrack );
+	static ConstNotePlayHandleList nphsOfInstrumentTrack(const InstrumentTrack *instrumentTrack);
 
 	static bool isPreviewing();
 
-
 private:
-	static PreviewTrackContainer* s_previewTC;
+	static PreviewTrackContainer *s_previewTC;
 
-	NotePlayHandle* m_previewNote;
-
-} ;
-
+	NotePlayHandle *m_previewNote;
+};
 
 #endif

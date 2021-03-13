@@ -25,12 +25,11 @@
 #ifndef CONTROLLER_RACK_VIEW_H
 #define CONTROLLER_RACK_VIEW_H
 
-#include <QWidget>
 #include <QCloseEvent>
+#include <QWidget>
 
 #include "SerializingObject.h"
 #include "lmms_basics.h"
-
 
 class QPushButton;
 class QScrollArea;
@@ -39,7 +38,6 @@ class QVBoxLayout;
 class ControllerView;
 class Controller;
 
-
 class ControllerRackView : public QWidget, public SerializingObject
 {
 	Q_OBJECT
@@ -47,37 +45,35 @@ public:
 	ControllerRackView();
 	virtual ~ControllerRackView();
 
-	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
-	void loadSettings( const QDomElement & _this ) override;
+	void saveSettings(QDomDocument &_doc, QDomElement &_parent) override;
+	void loadSettings(const QDomElement &_this) override;
 
 	inline QString nodeName() const override
 	{
 		return "ControllerRackView";
 	}
 
-
 public slots:
-	void deleteController( ControllerView * _view );
-	void onControllerAdded( Controller * );
-	void onControllerRemoved( Controller * );
+	void deleteController(ControllerView *_view);
+	void onControllerAdded(Controller *);
+	void onControllerRemoved(Controller *);
 
 protected:
-	void closeEvent( QCloseEvent * _ce ) override;
+	void closeEvent(QCloseEvent *_ce) override;
 
 private slots:
 	void addController();
 
-
 private:
 	QVector<ControllerView *> m_controllerViews;
 
-	QScrollArea * m_scrollArea;
-	QVBoxLayout * m_scrollAreaLayout;
-	QPushButton * m_addButton;
+	QScrollArea *m_scrollArea;
+	QVBoxLayout *m_scrollAreaLayout;
+	QPushButton *m_addButton;
 
 	// Stores the index of where to insert the next ControllerView.
 	// Needed so that the StretchItem always stays at the last position.
 	int m_nextIndex;
-} ;
+};
 
 #endif

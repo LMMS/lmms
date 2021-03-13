@@ -22,16 +22,15 @@
 
 #include "VectorView.h"
 
+#include <QImage>
+#include <QPainter>
 #include <algorithm>
 #include <chrono>
 #include <cmath>
-#include <QImage>
-#include <QPainter>
 
 #include "ColorChooser.h"
 #include "GuiApplication.h"
 #include "MainWindow.h"
-
 
 VectorView::VectorView(VecControls *controls, LocklessRingBuffer<sampleFrame> *inputBuffer, unsigned short displaySize, QWidget *parent) :
 	QWidget(parent),
@@ -51,13 +50,12 @@ VectorView::VectorView(VecControls *controls, LocklessRingBuffer<sampleFrame> *i
 
 	connect(gui->mainWindow(), SIGNAL(periodicUpdate()), this, SLOT(periodicUpdate()));
 
-	m_displayBuffer.resize(sizeof qRgb(0,0,0) * m_displaySize * m_displaySize, 0);
+	m_displayBuffer.resize(sizeof qRgb(0, 0, 0) * m_displaySize * m_displaySize, 0);
 
 #ifdef VEC_DEBUG
 	m_executionAvg = 0;
 #endif
 }
-
 
 // Compose and draw all the content; called by Qt.
 void VectorView::paintEvent(QPaintEvent *event)
@@ -104,10 +102,9 @@ void VectorView::paintEvent(QPaintEvent *event)
 
 	// Dim stored image based on persistence setting and elapsed time.
 	// Update period is limited to 50 ms (20 FPS) for non-HQ mode and 10 ms (100 FPS) for HQ mode.
-	const unsigned int currentTimestamp = std::chrono::duration_cast<std::chrono::milliseconds>
-	(
-		std::chrono::high_resolution_clock::now().time_since_epoch()
-	).count();
+	const unsigned int currentTimestamp = std::chrono::duration_cast<std::chrono::milliseconds>(
+		std::chrono::high_resolution_clock::now().time_since_epoch())
+											  .count();
 	const unsigned int elapsed = currentTimestamp - m_persistTimestamp;
 	const unsigned int threshold = hq ? 10 : 50;
 	if (elapsed > threshold)
@@ -142,16 +139,15 @@ void VectorView::paintEvent(QPaintEvent *event)
 
 	// Helper lambda functions for better readability
 	// Make sure pixel stays within display bounds:
-	auto saturate = [=](short pixelPos) {return qBound((short)0, pixelPos, (short)(activeSize - 1));};
+	auto saturate = [=](short pixelPos) { return qBound((short)0, pixelPos, (short)(activeSize - 1)); };
 	// Take existing pixel and brigthen it. Very bright light should reduce saturation and become
 	// white. This effect is easily approximated by capping elementary colors to 255 individually.
-	auto updatePixel = [&](unsigned short x, unsigned short y, QColor addedColor)
-	{
-		QColor currentColor = ((QRgb*)m_displayBuffer.data())[x + y * activeSize];
+	auto updatePixel = [&](unsigned short x, unsigned short y, QColor addedColor) {
+		QColor currentColor = ((QRgb *)m_displayBuffer.data())[x + y * activeSize];
 		currentColor.setRed(std::min(currentColor.red() + addedColor.red(), 255));
 		currentColor.setGreen(std::min(currentColor.green() + addedColor.green(), 255));
 		currentColor.setBlue(std::min(currentColor.blue() + addedColor.blue(), 255));
-		((QRgb*)m_displayBuffer.data())[x + y * activeSize] = currentColor.rgb();
+		((QRgb *)m_displayBuffer.data())[x + y * activeSize] = currentColor.rgb();
 	};
 
 	if (hq)
@@ -171,12 +167,12 @@ void VectorView::paintEvent(QPaintEvent *event)
 				const float distanceLog = log10(1 + 9 * std::abs(distance));
 				const float angleCos = inLeft / distance;
 				const float angleSin = inRight / distance;
-				left  = distanceLog * angleCos * (activeSize - 1) / 4;
+				left = distanceLog * angleCos * (activeSize - 1) / 4;
 				right = distanceLog * angleSin * (activeSize - 1) / 4;
 			}
 			else
 			{
-				left  = inLeft * (activeSize - 1) / 4;
+				left = inLeft * (activeSize - 1) / 4;
 				right = inRight * (activeSize - 1) / 4;
 			}
 
@@ -220,35 +216,38 @@ void VectorView::paintEvent(QPaintEvent *event)
 		{
 			float inLeft = inBuffer[frame][0] * m_zoom;
 			float inRight = inBuffer[frame][1] * m_zoom;
-			if (logScale) {
+			if (logScale)
+			{
 				const float distance = sqrt(inLeft * inLeft + inRight * inRight);
 				const float distanceLog = log10(1 + 9 * std::abs(distance));
 				const float angleCos = inLeft / distance;
 				const float angleSin = inRight / distance;
-				left  = distanceLog * angleCos * (activeSize - 1) / 4;
+				left = distanceLog * angleCos * (activeSize - 1) / 4;
 				right = distanceLog * angleSin * (activeSize - 1) / 4;
-			} else {
-				left  = inLeft * (activeSize - 1) / 4;
+			}
+			else
+			{
+				left = inLeft * (activeSize - 1) / 4;
 				right = inRight * (activeSize - 1) / 4;
 			}
 			x = saturate(right - left + activeSize / 2.f);
 			y = saturate(activeSize - (right + left + activeSize / 2.f));
-			((QRgb*)m_displayBuffer.data())[x + y * activeSize] = m_controls->m_colorFG.rgb();
+			((QRgb *)m_displayBuffer.data())[x + y * activeSize] = m_controls->m_colorFG.rgb();
 		}
 	}
 
 	// Draw background
-	painter.fillRect(displayLeft, displayTop, displayWidth, displayHeight, QColor(0,0,0));
+	painter.fillRect(displayLeft, displayTop, displayWidth, displayHeight, QColor(0, 0, 0));
 
 	// Draw the final image
 	QImage temp = QImage(m_displayBuffer.data(),
-						 activeSize,
-						 activeSize,
-						 QImage::Format_RGB32);
+		activeSize,
+		activeSize,
+		QImage::Format_RGB32);
 	temp.setDevicePixelRatio(devicePixelRatio());
 	painter.drawImage(displayLeft, displayTop,
-					  temp.scaledToWidth(displayWidth * devicePixelRatio(),
-					  Qt::SmoothTransformation));
+		temp.scaledToWidth(displayWidth * devicePixelRatio(),
+			Qt::SmoothTransformation));
 
 	// Draw the grid and labels
 	painter.setPen(QPen(m_controls->m_colorGrid, 1.5, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
@@ -260,11 +259,11 @@ void VectorView::paintEvent(QPaintEvent *event)
 	painter.setPen(QPen(m_controls->m_colorLabels, 1, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
 	painter.setFont(boldFont);
 	painter.drawText(displayLeft + margin, displayTop,
-					 labelWidth, labelHeight, Qt::AlignLeft | Qt::AlignTop | Qt::TextDontClip,
-					 QString("L"));
+		labelWidth, labelHeight, Qt::AlignLeft | Qt::AlignTop | Qt::TextDontClip,
+		QString("L"));
 	painter.drawText(displayRight - margin - labelWidth, displayTop,
-					 labelWidth, labelHeight, Qt::AlignRight| Qt::AlignTop | Qt::TextDontClip,
-					 QString("R"));
+		labelWidth, labelHeight, Qt::AlignRight | Qt::AlignTop | Qt::TextDontClip,
+		QString("R"));
 
 	// Draw the outline
 	painter.setPen(QPen(m_controls->m_colorOutline, 2, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
@@ -276,7 +275,7 @@ void VectorView::paintEvent(QPaintEvent *event)
 		painter.setPen(QPen(m_controls->m_colorLabels, 1, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
 		painter.setFont(normalFont);
 		painter.drawText(displayWidth / 2 - 50, displayBottom - 20, 100, 16, Qt::AlignCenter,
-						 QString("Zoom: ").append(std::to_string((int)round(m_zoom * 100)).c_str()).append(" %"));
+			QString("Zoom: ").append(std::to_string((int)round(m_zoom * 100)).c_str()).append(" %"));
 	}
 
 	// Optionally measure drawing performance
@@ -286,18 +285,19 @@ void VectorView::paintEvent(QPaintEvent *event)
 	painter.setPen(QPen(m_controls->m_colorLabels, 1, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
 	painter.setFont(normalFont);
 	painter.drawText(displayWidth / 2 - 50, displayBottom - 16, 100, 16, Qt::AlignLeft,
-					 QString("Exec avg.: ").append(std::to_string(m_executionAvg).substr(0, 5).c_str()).append(" ms"));
+		QString("Exec avg.: ").append(std::to_string(m_executionAvg).substr(0, 5).c_str()).append(" ms"));
 #endif
 }
-
 
 // Periodically trigger repaint and check if the widget is visible
 void VectorView::periodicUpdate()
 {
 	m_visible = isVisible();
-	if (m_visible) {update();}
+	if (m_visible)
+	{
+		update();
+	}
 }
-
 
 // Allow to change color on double-click.
 // More of an Easter egg, to avoid cluttering the interface with non-essential functionality.
@@ -310,7 +310,6 @@ void VectorView::mouseDoubleClickEvent(QMouseEvent *event)
 	}
 }
 
-
 // Change zoom level using the mouse wheel
 void VectorView::wheelEvent(QWheelEvent *event)
 {
@@ -320,9 +319,7 @@ void VectorView::wheelEvent(QWheelEvent *event)
 	const unsigned short new_zoom = qBound(20, old_zoom + event->angleDelta().y() / 6, 1000);
 	m_zoom = new_zoom / 100.f;
 	event->accept();
-	m_zoomTimestamp = std::chrono::duration_cast<std::chrono::milliseconds>
-	(
-		std::chrono::high_resolution_clock::now().time_since_epoch()
-	).count();
-
+	m_zoomTimestamp = std::chrono::duration_cast<std::chrono::milliseconds>(
+		std::chrono::high_resolution_clock::now().time_since_epoch())
+						  .count();
 }

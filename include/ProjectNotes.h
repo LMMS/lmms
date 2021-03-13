@@ -22,12 +22,11 @@
  *
  */
 
-
 #ifndef PROJECT_NOTES_H
 #define PROJECT_NOTES_H
 
-#include <QMainWindow>
 #include <QCloseEvent>
+#include <QMainWindow>
 
 #include "SerializingObject.h"
 
@@ -35,7 +34,6 @@ class QAction;
 class QComboBox;
 class QTextCharFormat;
 class QTextEdit;
-
 
 class LMMS_EXPORT ProjectNotes : public QMainWindow, public SerializingObject
 {
@@ -45,49 +43,44 @@ public:
 	virtual ~ProjectNotes();
 
 	void clear();
-	void setText( const QString & _text );
+	void setText(const QString &_text);
 
-	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
-	void loadSettings( const QDomElement & _this ) override;
+	void saveSettings(QDomDocument &_doc, QDomElement &_parent) override;
+	void loadSettings(const QDomElement &_this) override;
 
 	inline QString nodeName() const override
 	{
 		return "projectnotes";
 	}
 
-
 protected:
-	void closeEvent( QCloseEvent * _ce ) override;
+	void closeEvent(QCloseEvent *_ce) override;
 	void setupActions();
-
 
 private slots:
 	void textBold();
 	void textUnderline();
 	void textItalic();
-	void textFamily( const QString & _f );
-	void textSize( const QString & _p );
+	void textFamily(const QString &_f);
+	void textSize(const QString &_p);
 	void textColor();
-	void textAlign( QAction * _a );
+	void textAlign(QAction *_a);
 
-	void formatChanged( const QTextCharFormat & _f );
-	void alignmentChanged( int _a );
-
+	void formatChanged(const QTextCharFormat &_f);
+	void alignmentChanged(int _a);
 
 private:
-	QTextEdit * m_edit;
-	QAction * m_actionTextBold,
-		* m_actionTextUnderline,
-		* m_actionTextItalic,
-		* m_actionTextColor,
-		* m_actionAlignLeft,
-		* m_actionAlignCenter,
-		* m_actionAlignRight,
-		* m_actionAlignJustify;
-	QComboBox * m_comboFont;
-	QComboBox * m_comboSize;
-
-} ;
-
+	QTextEdit *m_edit;
+	QAction *m_actionTextBold,
+		*m_actionTextUnderline,
+		*m_actionTextItalic,
+		*m_actionTextColor,
+		*m_actionAlignLeft,
+		*m_actionAlignCenter,
+		*m_actionAlignRight,
+		*m_actionAlignJustify;
+	QComboBox *m_comboFont;
+	QComboBox *m_comboSize;
+};
 
 #endif

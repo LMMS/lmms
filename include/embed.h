@@ -28,9 +28,8 @@
 #include <QPixmap>
 #include <QtCore/QString>
 
-#include "lmms_export.h"
 #include "lmms_basics.h"
-
+#include "lmms_export.h"
 
 namespace embed
 {
@@ -44,53 +43,50 @@ namespace embed
  * @param xpm Must be XPM data if the source should be raw XPM data instead of
  *   a file
  */
-QPixmap LMMS_EXPORT getIconPixmap( const QString&  _name,
-	int _w = -1, int _h = -1 , const char** xpm = nullptr );
-QString LMMS_EXPORT getText( const char * _name );
+QPixmap LMMS_EXPORT getIconPixmap(const QString &_name,
+	int _w = -1, int _h = -1, const char **xpm = nullptr);
+QString LMMS_EXPORT getText(const char *_name);
 
-}
-
+} // namespace embed
 
 #ifdef PLUGIN_NAME
 namespace PLUGIN_NAME
 {
 
-inline QPixmap getIconPixmap( const QString&  _name,
-	int _w = -1, int _h = -1, const char** xpm = nullptr )
+inline QPixmap getIconPixmap(const QString &_name,
+	int _w = -1, int _h = -1, const char **xpm = nullptr)
 {
 	return embed::getIconPixmap(QString("%1/%2").arg(STRINGIFY(PLUGIN_NAME), _name), _w, _h, xpm);
 }
 //QString getText( const char * _name );
 
-}
+} // namespace PLUGIN_NAME
 #endif
-
-
 
 class PixmapLoader
 {
 public:
-	PixmapLoader( const PixmapLoader * _ref ) :
-		m_name( _ref != NULL ? _ref->m_name : QString() ),
-		m_xpm( _ref->m_xpm )
+	PixmapLoader(const PixmapLoader *_ref) :
+		m_name(_ref != NULL ? _ref->m_name : QString()),
+		m_xpm(_ref->m_xpm)
 	{
 	}
 
-	PixmapLoader( const QString & _name = QString(),
-		const char** xpm = nullptr ) :
-		m_name( _name ),
+	PixmapLoader(const QString &_name = QString(),
+		const char **xpm = nullptr) :
+		m_name(_name),
 		m_xpm(xpm)
 	{
 	}
 
 	virtual QPixmap pixmap() const
 	{
-		if( !m_name.isEmpty() )
+		if (!m_name.isEmpty())
 		{
-			return( embed::getIconPixmap(
-				m_name.toLatin1().constData(), -1, -1, m_xpm ));
+			return (embed::getIconPixmap(
+				m_name.toLatin1().constData(), -1, -1, m_xpm));
 		}
-		return( QPixmap() );
+		return (QPixmap());
 	}
 
 	virtual ~PixmapLoader()
@@ -104,37 +100,33 @@ public:
 
 protected:
 	QString m_name;
-	const char** m_xpm = nullptr;
-} ;
-
+	const char **m_xpm = nullptr;
+};
 
 #ifdef PLUGIN_NAME
 class PluginPixmapLoader : public PixmapLoader
 {
 public:
-	PluginPixmapLoader( const QString & _name = QString() ) :
-		PixmapLoader( _name )
+	PluginPixmapLoader(const QString &_name = QString()) :
+		PixmapLoader(_name)
 	{
 	}
 
 	virtual QPixmap pixmap() const
 	{
-		if( !m_name.isEmpty() )
+		if (!m_name.isEmpty())
 		{
-			return( PLUGIN_NAME::getIconPixmap(
-					m_name.toLatin1().constData() ) );
+			return (PLUGIN_NAME::getIconPixmap(
+				m_name.toLatin1().constData()));
 		}
-		return( QPixmap() );
+		return (QPixmap());
 	}
 
 	virtual QString pixmapName() const
 	{
-		return QString( STRINGIFY(PLUGIN_NAME) ) + "::" + m_name;
+		return QString(STRINGIFY(PLUGIN_NAME)) + "::" + m_name;
 	}
-
-} ;
+};
 #endif
-
-
 
 #endif

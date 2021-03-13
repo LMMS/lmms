@@ -27,8 +27,8 @@
 #define EFFECT_VIEW_H
 
 #include "AutomatableModel.h"
-#include "PluginView.h"
 #include "Effect.h"
+#include "PluginView.h"
 
 class QGroupBox;
 class QLabel;
@@ -40,19 +40,18 @@ class Knob;
 class LedCheckBox;
 class TempoSyncKnob;
 
-
 class EffectView : public PluginView
 {
 	Q_OBJECT
 public:
-	EffectView( Effect * _model, QWidget * _parent );
+	EffectView(Effect *_model, QWidget *_parent);
 	virtual ~EffectView();
 
-	inline Effect * effect()
+	inline Effect *effect()
 	{
 		return castModel<Effect>();
 	}
-	inline const Effect * effect() const
+	inline const Effect *effect() const
 	{
 		return castModel<Effect>();
 	}
@@ -66,28 +65,24 @@ public slots:
 	void deletePlugin();
 	void closeEffects();
 
-
 signals:
-	void moveUp( EffectView * _plugin );
-	void moveDown( EffectView * _plugin );
-	void deletePlugin( EffectView * _plugin );
-
+	void moveUp(EffectView *_plugin);
+	void moveDown(EffectView *_plugin);
+	void deletePlugin(EffectView *_plugin);
 
 protected:
-	void contextMenuEvent( QContextMenuEvent * _me ) override;
-	void paintEvent( QPaintEvent * _pe ) override;
+	void contextMenuEvent(QContextMenuEvent *_me) override;
+	void paintEvent(QPaintEvent *_pe) override;
 	void modelChanged() override;
-
 
 private:
 	QPixmap m_bg;
-	LedCheckBox * m_bypass;
-	Knob * m_wetDry;
-	TempoSyncKnob * m_autoQuit;
-	Knob * m_gate;
-	QMdiSubWindow * m_subWindow;
-	EffectControlDialog * m_controlView;
-
-} ;
+	LedCheckBox *m_bypass;
+	Knob *m_wetDry;
+	TempoSyncKnob *m_autoQuit;
+	Knob *m_gate;
+	QMdiSubWindow *m_subWindow;
+	EffectControlDialog *m_controlView;
+};
 
 #endif

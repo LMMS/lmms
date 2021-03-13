@@ -32,14 +32,13 @@
 
 #include "ComboBox.h"
 #include "ComboBoxModel.h"
-#include "embed.h"
 #include "Engine.h"
 #include "Knob.h"
 #include "LedCheckbox.h"
 #include "PixmapButton.h"
 #include "SaControls.h"
 #include "SaProcessor.h"
-
+#include "embed.h"
 
 // The entire GUI layout is built here.
 SaControlsDialog::SaControlsDialog(SaControls *controls, SaProcessor *processor) :
@@ -63,7 +62,6 @@ SaControlsDialog::SaControlsDialog(SaControls *controls, SaProcessor *processor)
 	controls_widget->setMaximumHeight(m_configHeight);
 	display_splitter->addWidget(controls_widget);
 
-
 	// Basic configuration
 	QWidget *config_widget = new QWidget;
 	QGridLayout *config_layout = new QGridLayout;
@@ -80,7 +78,6 @@ SaControlsDialog::SaControlsDialog(SaControls *controls, SaProcessor *processor)
 	QSize iconSize = QSize(22.0 * devicePixelRatio(), 22.0 * devicePixelRatio());
 	QSize buttonSize = 1.2 * iconSize;
 	QSize advButtonSize = QSize((m_configHeight * devicePixelRatio()) / 3, m_configHeight * devicePixelRatio());
-
 
 	// pause and freeze buttons
 	PixmapButton *pauseButton = new PixmapButton(this, tr("Pause"));
@@ -190,7 +187,7 @@ SaControlsDialog::SaControlsDialog(SaControls *controls, SaProcessor *processor)
 	blockSizeCombo->setModel(&controls->m_blockSizeModel);
 	config_layout->addWidget(blockSizeCombo, 0, 5, 2, 1);
 	processor->reallocateBuffers();
-	connect(&controls->m_blockSizeModel, &ComboBoxModel::dataChanged, [=] {processor->reallocateBuffers();});
+	connect(&controls->m_blockSizeModel, &ComboBoxModel::dataChanged, [=] { processor->reallocateBuffers(); });
 
 	// FFT: window type: icon and selector
 	QLabel *windowLabel = new QLabel("", this);
@@ -206,12 +203,11 @@ SaControlsDialog::SaControlsDialog(SaControls *controls, SaProcessor *processor)
 	windowCombo->setModel(&controls->m_windowModel);
 	config_layout->addWidget(windowCombo, 2, 5, 2, 1);
 	processor->rebuildWindow();
-	connect(&controls->m_windowModel, &ComboBoxModel::dataChanged, [=] {processor->rebuildWindow();});
+	connect(&controls->m_windowModel, &ComboBoxModel::dataChanged, [=] { processor->rebuildWindow(); });
 
 	// set stretch factors so that combo boxes expand first
 	config_layout->setColumnStretch(3, 2);
 	config_layout->setColumnStretch(5, 3);
-
 
 	// Advanced configuration
 	QWidget *advanced_widget = new QWidget;
@@ -263,7 +259,7 @@ SaControlsDialog::SaControlsDialog(SaControls *controls, SaProcessor *processor)
 	waterfallHeightKnob->setHintText(tr("Keep"), tr(" lines"));
 	advanced_layout->addWidget(waterfallHeightKnob, 0, 2, 1, 1, Qt::AlignCenter);
 	processor->reallocateBuffers();
-	connect(&controls->m_waterfallHeightModel, &FloatModel::dataChanged, [=] {processor->reallocateBuffers();});
+	connect(&controls->m_waterfallHeightModel, &FloatModel::dataChanged, [=] { processor->reallocateBuffers(); });
 
 	// Waterfall gamma correction
 	Knob *waterfallGammaKnob = new Knob(knobSmall_17, this);
@@ -289,8 +285,7 @@ SaControlsDialog::SaControlsDialog(SaControls *controls, SaProcessor *processor)
 	zeroPaddingKnob->setHintText(tr("Processing buffer is"), tr(" steps larger than input block"));
 	advanced_layout->addWidget(zeroPaddingKnob, 1, 3, 1, 1, Qt::AlignCenter);
 	processor->reallocateBuffers();
-	connect(&controls->m_zeroPaddingModel, &FloatModel::dataChanged, [=] {processor->reallocateBuffers();});
-
+	connect(&controls->m_zeroPaddingModel, &FloatModel::dataChanged, [=] { processor->reallocateBuffers(); });
 
 	// Advanced settings button
 	PixmapButton *advancedButton = new PixmapButton(this, tr("Advanced settings"));
@@ -305,20 +300,18 @@ SaControlsDialog::SaControlsDialog(SaControls *controls, SaProcessor *processor)
 	controls_layout->addStretch(0);
 	controls_layout->addWidget(advancedButton);
 
-	connect(advancedButton, &PixmapButton::toggled, [=](bool checked)
+	connect(advancedButton, &PixmapButton::toggled, [=](bool checked) {
+		if (checked)
 		{
-			if (checked)
-			{
-				config_widget->hide();
-				advanced_widget->show();
-			}
-			else
-			{
-				config_widget->show();
-				advanced_widget->hide();
-			}
+			config_widget->hide();
+			advanced_widget->show();
 		}
-	);
+		else
+		{
+			config_widget->show();
+			advanced_widget->hide();
+		}
+	});
 
 	// QSplitter middle and bottom: spectrum display widgets
 	m_spectrum = new SaSpectrumView(controls, processor, this);
@@ -327,9 +320,8 @@ SaControlsDialog::SaControlsDialog(SaControls *controls, SaProcessor *processor)
 	m_waterfall = new SaWaterfallView(controls, processor, this);
 	display_splitter->addWidget(m_waterfall);
 	m_waterfall->setVisible(m_controls->m_waterfallModel.value());
-	connect(&controls->m_waterfallModel, &BoolModel::dataChanged, [=] {m_waterfall->updateVisibility();});
+	connect(&controls->m_waterfallModel, &BoolModel::dataChanged, [=] { m_waterfall->updateVisibility(); });
 }
-
 
 // Suggest the best current widget size.
 QSize SaControlsDialog::sizeHint() const
@@ -341,12 +333,11 @@ QSize SaControlsDialog::sizeHint() const
 	if (m_waterfall->isVisible())
 	{
 		return QSize(m_spectrum->sizeHint().width(),
-					 m_configHeight + m_spectrum->sizeHint().height() + m_waterfall->sizeHint().height() + 50);
+			m_configHeight + m_spectrum->sizeHint().height() + m_waterfall->sizeHint().height() + 50);
 	}
 	else
 	{
 		return QSize(m_spectrum->sizeHint().width(),
-					 m_configHeight + m_spectrum->sizeHint().height() + 50);
+			m_configHeight + m_spectrum->sizeHint().height() + 50);
 	}
 }
-

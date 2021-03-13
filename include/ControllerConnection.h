@@ -26,7 +26,6 @@
  *
  */
 
-
 #ifndef CONTROLLER_CONNECTION_H
 #define CONTROLLER_CONNECTION_H
 
@@ -41,37 +40,35 @@ class ControllerConnection;
 
 typedef QVector<ControllerConnection *> ControllerConnectionVector;
 
-
 class LMMS_EXPORT ControllerConnection : public QObject, public JournallingObject
 {
 	Q_OBJECT
 public:
-
-	ControllerConnection( Controller * _controller );
-	ControllerConnection( int _controllerId );
+	ControllerConnection(Controller *_controller);
+	ControllerConnection(int _controllerId);
 
 	virtual ~ControllerConnection();
 
-	inline Controller * getController()
+	inline Controller *getController()
 	{
 		return m_controller;
 	}
 
-	void setController( Controller * _controller );
+	void setController(Controller *_controller);
 
-	inline void setController( int _controllerId );
+	inline void setController(int _controllerId);
 
-	float currentValue( int _offset )
+	float currentValue(int _offset)
 	{
-		return m_controller->currentValue( _offset );
+		return m_controller->currentValue(_offset);
 	}
-	
-	ValueBuffer * valueBuffer()
+
+	ValueBuffer *valueBuffer()
 	{
 		return m_controller->valueBuffer();
 	}
 
-	inline void setTargetName( const QString & _name );
+	inline void setTargetName(const QString &_name);
 
 	inline QString targetName() const
 	{
@@ -85,8 +82,8 @@ public:
 
 	static void finalizeConnections();
 
-	void saveSettings( QDomDocument & _doc, QDomElement & _this ) override;
-	void loadSettings( const QDomElement & _this ) override;
+	void saveSettings(QDomDocument &_doc, QDomElement &_this) override;
+	void loadSettings(const QDomElement &_this) override;
 
 	static inline const QString classNodeName()
 	{
@@ -98,16 +95,15 @@ public:
 		return classNodeName();
 	}
 
-
 public slots:
 	void deleteConnection();
 
 protected:
 	//virtual controllerDialog * createDialog( QWidget * _parent );
-	Controller * m_controller;
+	Controller *m_controller;
 	QString m_targetName;
 	int m_controllerId;
-	
+
 	bool m_ownsController;
 
 	static ControllerConnectionVector s_connections;
@@ -120,4 +116,3 @@ signals:
 };
 
 #endif
-

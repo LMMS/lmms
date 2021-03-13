@@ -29,13 +29,12 @@
 #define LOCALEHELPER_H
 
 #include <QLocale>
-
-#include <limits>
 #include <cmath>
+#include <limits>
 
 namespace LocaleHelper
 {
-inline double toDouble(QString str, bool* ok = nullptr)
+inline double toDouble(QString str, bool *ok = nullptr)
 {
 	bool isOkay;
 	double value;
@@ -48,20 +47,26 @@ inline double toDouble(QString str, bool* ok = nullptr)
 		german.setNumberOptions(QLocale::RejectGroupSeparator);
 		value = german.toDouble(str, &isOkay);
 	}
-	if (ok != nullptr) {*ok = isOkay;}
+	if (ok != nullptr)
+	{
+		*ok = isOkay;
+	}
 	return value;
 }
 
-inline float toFloat(QString str, bool* ok = nullptr)
+inline float toFloat(QString str, bool *ok = nullptr)
 {
 	double d = toDouble(str, ok);
 	if (!std::isinf(d) && std::fabs(d) > std::numeric_limits<float>::max())
 	{
-		if (ok != nullptr) {*ok = false;}
+		if (ok != nullptr)
+		{
+			*ok = false;
+		}
 		return 0.0f;
 	}
 	return static_cast<float>(d);
 }
-}
+} // namespace LocaleHelper
 
 #endif // LOCALEHELPER_H

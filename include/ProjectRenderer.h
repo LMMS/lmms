@@ -26,40 +26,38 @@
 #define PROJECT_RENDERER_H
 
 #include "AudioFileDevice.h"
-#include "lmmsconfig.h"
 #include "Mixer.h"
 #include "OutputSettings.h"
-
 #include "lmms_export.h"
+#include "lmmsconfig.h"
 
 class LMMS_EXPORT ProjectRenderer : public QThread
 {
 	Q_OBJECT
 public:
-	enum ExportFileFormats: int
+	enum ExportFileFormats : int
 	{
 		WaveFile,
 		FlacFile,
 		OggFile,
 		MP3File,
 		NumFileFormats
-	} ;
+	};
 
 	struct FileEncodeDevice
 	{
 		bool isAvailable() const { return m_getDevInst != nullptr; }
 
 		ExportFileFormats m_fileFormat;
-		const char * m_description;
-		const char * m_extension;
+		const char *m_description;
+		const char *m_extension;
 		AudioFileDeviceInstantiaton m_getDevInst;
-	} ;
+	};
 
-
-	ProjectRenderer( const Mixer::qualitySettings & _qs,
-				const OutputSettings & _os,
-				ExportFileFormats _file_format,
-				const QString & _out_file );
+	ProjectRenderer(const Mixer::qualitySettings &_qs,
+		const OutputSettings &_os,
+		ExportFileFormats _file_format,
+		const QString &_out_file);
 	virtual ~ProjectRenderer();
 
 	bool isReady() const
@@ -68,9 +66,9 @@ public:
 	}
 
 	static ExportFileFormats getFileFormatFromExtension(
-							const QString & _ext );
+		const QString &_ext);
 
-	static QString getFileExtensionFromFormat( ExportFileFormats fmt );
+	static QString getFileExtensionFromFormat(ExportFileFormats fmt);
 
 	static const FileEncodeDevice fileEncodeDevices[];
 
@@ -80,20 +78,17 @@ public slots:
 
 	void updateConsoleProgress();
 
-
 signals:
-	void progressChanged( int );
-
+	void progressChanged(int);
 
 private:
 	void run() override;
 
-	AudioFileDevice * m_fileDev;
+	AudioFileDevice *m_fileDev;
 	Mixer::qualitySettings m_qualitySettings;
 
 	volatile int m_progress;
 	volatile bool m_abort;
-
-} ;
+};
 
 #endif

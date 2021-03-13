@@ -22,7 +22,6 @@
  *
  */
 
-
 #ifndef SAMPLE_RECORD_HANDLE_H
 #define SAMPLE_RECORD_HANDLE_H
 
@@ -37,36 +36,32 @@ class SampleBuffer;
 class SampleTCO;
 class Track;
 
-
 class SampleRecordHandle : public PlayHandle
 {
 public:
-	SampleRecordHandle( SampleTCO* tco );
+	SampleRecordHandle(SampleTCO *tco);
 	virtual ~SampleRecordHandle();
 
-	void play( sampleFrame * _working_buffer ) override;
+	void play(sampleFrame *_working_buffer) override;
 	bool isFinished() const override;
 
-	bool isFromTrack( const Track * _track ) const override;
+	bool isFromTrack(const Track *_track) const override;
 
 	f_cnt_t framesRecorded() const;
-	void createSampleBuffer( SampleBuffer * * _sample_buf );
-
+	void createSampleBuffer(SampleBuffer **_sample_buf);
 
 private:
-	virtual void writeBuffer( const sampleFrame * _ab,
-						const f_cnt_t _frames );
+	virtual void writeBuffer(const sampleFrame *_ab,
+		const f_cnt_t _frames);
 
-	typedef QList<QPair<sampleFrame *, f_cnt_t> > bufferList;
+	typedef QList<QPair<sampleFrame *, f_cnt_t>> bufferList;
 	bufferList m_buffers;
 	f_cnt_t m_framesRecorded;
 	TimePos m_minLength;
 
-	Track * m_track;
-	BBTrack * m_bbTrack;
-	SampleTCO * m_tco;
-
-} ;
-
+	Track *m_track;
+	BBTrack *m_bbTrack;
+	SampleTCO *m_tco;
+};
 
 #endif

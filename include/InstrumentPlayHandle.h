@@ -25,44 +25,42 @@
 #ifndef INSTRUMENT_PLAY_HANDLE_H
 #define INSTRUMENT_PLAY_HANDLE_H
 
-#include "PlayHandle.h"
 #include "Instrument.h"
 #include "NotePlayHandle.h"
+#include "PlayHandle.h"
 #include "lmms_export.h"
 
 class LMMS_EXPORT InstrumentPlayHandle : public PlayHandle
 {
 public:
-	InstrumentPlayHandle( Instrument * instrument, InstrumentTrack* instrumentTrack );
+	InstrumentPlayHandle(Instrument *instrument, InstrumentTrack *instrumentTrack);
 
 	virtual ~InstrumentPlayHandle()
 	{
 	}
 
-
-	void play( sampleFrame * _working_buffer ) override
+	void play(sampleFrame *_working_buffer) override
 	{
 		// ensure that all our nph's have been processed first
-		ConstNotePlayHandleList nphv = NotePlayHandle::nphsOfInstrumentTrack( m_instrument->instrumentTrack(), true );
-		
+		ConstNotePlayHandleList nphv = NotePlayHandle::nphsOfInstrumentTrack(m_instrument->instrumentTrack(), true);
+
 		bool nphsLeft;
 		do
 		{
 			nphsLeft = false;
-			for( const NotePlayHandle * constNotePlayHandle : nphv )
+			for (const NotePlayHandle *constNotePlayHandle : nphv)
 			{
-				NotePlayHandle * notePlayHandle = const_cast<NotePlayHandle *>( constNotePlayHandle );
-				if( notePlayHandle->state() != ThreadableJob::ProcessingState::Done &&
+				NotePlayHandle *notePlayHandle = const_cast<NotePlayHandle *>(constNotePlayHandle);
+				if (notePlayHandle->state() != ThreadableJob::ProcessingState::Done &&
 					!notePlayHandle->isFinished())
 				{
 					nphsLeft = true;
 					notePlayHandle->process();
 				}
 			}
-		}
-		while( nphsLeft );
-		
-		m_instrument->play( _working_buffer );
+		} while (nphsLeft);
+
+		m_instrument->play(_working_buffer);
 	}
 
 	bool isFinished() const override
@@ -70,15 +68,13 @@ public:
 		return false;
 	}
 
-	bool isFromTrack( const Track* _track ) const override
+	bool isFromTrack(const Track *_track) const override
 	{
-		return m_instrument->isFromTrack( _track );
+		return m_instrument->isFromTrack(_track);
 	}
 
-
 private:
-	Instrument* m_instrument;
-
-} ;
+	Instrument *m_instrument;
+};
 
 #endif

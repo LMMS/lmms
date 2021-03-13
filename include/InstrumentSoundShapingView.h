@@ -38,33 +38,29 @@ class GroupBox;
 class Knob;
 class TabWidget;
 
-
 class InstrumentSoundShapingView : public QWidget, public ModelView
 {
 	Q_OBJECT
 public:
-	InstrumentSoundShapingView( QWidget * _parent );
+	InstrumentSoundShapingView(QWidget *_parent);
 	virtual ~InstrumentSoundShapingView();
 
-	void setFunctionsHidden( bool hidden );
-
+	void setFunctionsHidden(bool hidden);
 
 private:
 	void modelChanged() override;
 
-
-	InstrumentSoundShaping * m_ss;
-	TabWidget * m_targetsTabWidget;
-	EnvelopeAndLfoView * m_envLfoViews[InstrumentSoundShaping::NumTargets];
+	InstrumentSoundShaping *m_ss;
+	TabWidget *m_targetsTabWidget;
+	EnvelopeAndLfoView *m_envLfoViews[InstrumentSoundShaping::NumTargets];
 
 	// filter-stuff
-	GroupBox * m_filterGroupBox;
-	ComboBox * m_filterComboBox;
-	Knob * m_filterCutKnob;
-	Knob * m_filterResKnob;
+	GroupBox *m_filterGroupBox;
+	ComboBox *m_filterComboBox;
+	Knob *m_filterCutKnob;
+	Knob *m_filterResKnob;
 
-	QLabel* m_singleStreamInfoLabel;
-
-} ;
+	QLabel *m_singleStreamInfoLabel;
+};
 
 #endif

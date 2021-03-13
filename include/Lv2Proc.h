@@ -29,45 +29,44 @@
 
 #ifdef LMMS_HAVE_LV2
 
+#include <QObject>
 #include <lilv/lilv.h>
 #include <memory>
-#include <QObject>
 
+#include "../src/3rdparty/ringbuffer/include/ringbuffer/ringbuffer.h"
+#include "LinkedModelGroups.h"
 #include "Lv2Basics.h"
 #include "Lv2Features.h"
 #include "Lv2Options.h"
-#include "LinkedModelGroups.h"
 #include "MidiEvent.h"
 #include "Plugin.h"
 #include "PluginIssue.h"
-#include "../src/3rdparty/ringbuffer/include/ringbuffer/ringbuffer.h"
 #include "TimePos.h"
 
 // forward declare port structs/enums
 namespace Lv2Ports
 {
-	struct Audio;
-	struct PortBase;
-	struct AtomSeq;
+struct Audio;
+struct PortBase;
+struct AtomSeq;
 
-	enum class Type;
-	enum class Flow;
-	enum class Vis;
-}
-
+enum class Type;
+enum class Flow;
+enum class Vis;
+} // namespace Lv2Ports
 
 //! Class representing one Lv2 processor, i.e. one Lv2 handle
 //! For Mono effects, 1 Lv2ControlBase references 2 Lv2Proc
 class Lv2Proc : public LinkedModelGroup
 {
 public:
-	static Plugin::PluginTypes check(const LilvPlugin* plugin,
+	static Plugin::PluginTypes check(const LilvPlugin *plugin,
 		std::vector<PluginIssue> &issues);
 
 	/*
 		ctor/dtor
 	*/
-	Lv2Proc(const LilvPlugin* plugin, Model *parent);
+	Lv2Proc(const LilvPlugin *plugin, Model *parent);
 	~Lv2Proc() override;
 	//! Must be checked after ctor or reload
 	bool isValid() const { return m_valid; }
@@ -78,27 +77,27 @@ public:
 	struct StereoPortRef
 	{
 		//! mono port or left port in case of stereo
-		Lv2Ports::Audio* m_left = nullptr;
+		Lv2Ports::Audio *m_left = nullptr;
 		//! unused, or right port in case of stereo
-		Lv2Ports::Audio* m_right = nullptr;
+		Lv2Ports::Audio *m_right = nullptr;
 	};
 
-	StereoPortRef& inPorts() { return m_inPorts; }
-	const StereoPortRef& inPorts() const { return m_inPorts; }
-	StereoPortRef& outPorts() { return m_outPorts; }
-	const StereoPortRef& outPorts() const { return m_outPorts; }
-	template<class Functor>
-	void foreach_port(const Functor& ftor)
+	StereoPortRef &inPorts() { return m_inPorts; }
+	const StereoPortRef &inPorts() const { return m_inPorts; }
+	StereoPortRef &outPorts() { return m_outPorts; }
+	const StereoPortRef &outPorts() const { return m_outPorts; }
+	template <class Functor>
+	void foreach_port(const Functor &ftor)
 	{
-		for (std::unique_ptr<Lv2Ports::PortBase>& port : m_ports)
+		for (std::unique_ptr<Lv2Ports::PortBase> &port : m_ports)
 		{
 			ftor(port.get());
 		}
 	}
-	template<class Functor>
-	void foreach_port(const Functor& ftor) const
+	template <class Functor>
+	void foreach_port(const Functor &ftor) const
 	{
-		for (const std::unique_ptr<Lv2Ports::PortBase>& port : m_ports)
+		for (const std::unique_ptr<Lv2Ports::PortBase> &port : m_ports)
 		{
 			ftor(port.get());
 		}
@@ -127,7 +126,7 @@ public:
 	 *   @p offset)
 	 */
 	void copyBuffersFromCore(const sampleFrame *buf,
-								unsigned firstChan, unsigned num, fpp_t frames);
+		unsigned firstChan, unsigned num, fpp_t frames);
 	/**
 	 * Copy our ports into buffers passed by the core
 	 * @param buf buffer of sample frames, each sample frame is something like
@@ -140,7 +139,7 @@ public:
 	 *   @p offset)
 	 */
 	void copyBuffersToCore(sampleFrame *buf, unsigned firstChan, unsigned num,
-								fpp_t frames) const;
+		fpp_t frames) const;
 	//! Run the Lv2 plugin instance for @param frames frames
 	void run(fpp_t frames);
 
@@ -166,8 +165,8 @@ protected:
 private:
 	bool m_valid = true;
 
-	const LilvPlugin* m_plugin;
-	LilvInstance* m_instance;
+	const LilvPlugin *m_plugin;
+	LilvInstance *m_instance;
 	Lv2Features m_features;
 	Lv2Options m_options;
 
@@ -208,9 +207,9 @@ private:
 
 	void dumpPort(std::size_t num);
 
-	static bool portIsSideChain(const LilvPlugin* plugin, const LilvPort *port);
-	static bool portIsOptional(const LilvPlugin* plugin, const LilvPort *port);
-	static AutoLilvNode uri(const char* uriStr);
+	static bool portIsSideChain(const LilvPlugin *plugin, const LilvPort *port);
+	static bool portIsOptional(const LilvPlugin *plugin, const LilvPort *port);
+	static AutoLilvNode uri(const char *uriStr);
 };
 
 #endif // LMMS_HAVE_LV2

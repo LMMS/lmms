@@ -27,8 +27,8 @@
 
 #include <QtCore/QObject>
 
-#include "lmmsconfig.h"
 #include "ComboBoxModel.h"
+#include "lmmsconfig.h"
 
 class AudioPortAudioSetupUtil : public QObject
 {
@@ -41,61 +41,54 @@ public slots:
 public:
 	ComboBoxModel m_backendModel;
 	ComboBoxModel m_deviceModel;
-} ;
-
+};
 
 #ifdef LMMS_HAVE_PORTAUDIO
 
-#include <portaudio.h>
-
 #include <QtCore/QSemaphore>
+#include <portaudio.h>
 
 #include "AudioDevice.h"
 #include "AudioDeviceSetupWidget.h"
 
 #if defined paNeverDropInput || defined paNonInterleaved
-#	define PORTAUDIO_V19
+#define PORTAUDIO_V19
 #else
-#	define PORTAUDIO_V18
+#define PORTAUDIO_V18
 #endif
-
 
 class ComboBox;
 class LcdSpinBox;
 
-
 class AudioPortAudio : public AudioDevice
 {
 public:
-	AudioPortAudio( bool & _success_ful, Mixer* mixer );
+	AudioPortAudio(bool &_success_ful, Mixer *mixer);
 	virtual ~AudioPortAudio();
 
 	inline static QString name()
 	{
-		return QT_TRANSLATE_NOOP( "AudioDeviceSetupWidget", "PortAudio" );
+		return QT_TRANSLATE_NOOP("AudioDeviceSetupWidget", "PortAudio");
 	}
 
-
-	int process_callback( const float *_inputBuffer,
-		float * _outputBuffer,
-		unsigned long _framesPerBuffer );
-
+	int process_callback(const float *_inputBuffer,
+		float *_outputBuffer,
+		unsigned long _framesPerBuffer);
 
 	class setupWidget : public AudioDeviceSetupWidget
 	{
 	public:
-		setupWidget( QWidget * _parent );
+		setupWidget(QWidget *_parent);
 		virtual ~setupWidget();
 
 		virtual void saveSettings();
 		virtual void show();
 
 	private:
-		ComboBox * m_backend;
-		ComboBox * m_device;
+		ComboBox *m_backend;
+		ComboBox *m_device;
 		AudioPortAudioSetupUtil m_setupUtil;
-
-	} ;
+	};
 
 private:
 	virtual void startProcessing();
@@ -103,11 +96,11 @@ private:
 	virtual void applyQualitySettings();
 
 #ifdef PORTAUDIO_V19
-	static int _process_callback( const void *_inputBuffer, void * _outputBuffer,
+	static int _process_callback(const void *_inputBuffer, void *_outputBuffer,
 		unsigned long _framesPerBuffer,
-		const PaStreamCallbackTimeInfo * _timeInfo,
+		const PaStreamCallbackTimeInfo *_timeInfo,
 		PaStreamCallbackFlags _statusFlags,
-		void *arg );
+		void *arg);
 
 #else
 
@@ -118,9 +111,8 @@ private:
 #define Pa_GetDefaultOutputDevice Pa_GetDefaultOutputDeviceID
 #define Pa_IsStreamActive Pa_StreamActive
 
-	static int _process_callback( void * _inputBuffer, void * _outputBuffer,
-		unsigned long _framesPerBuffer, PaTimestamp _outTime, void * _arg );
-
+	static int _process_callback(void *_inputBuffer, void *_outputBuffer,
+		unsigned long _framesPerBuffer, PaTimestamp _outTime, void *_arg);
 
 	typedef double PaTime;
 	typedef PaDeviceID PaDeviceIndex;
@@ -136,19 +128,18 @@ private:
 	} PaStreamParameters;
 #endif
 
-	PaStream * m_paStream;
+	PaStream *m_paStream;
 	PaStreamParameters m_outputParameters;
 	PaStreamParameters m_inputParameters;
 
 	bool m_wasPAInitError;
 
-	surroundSampleFrame * m_outBuf;
+	surroundSampleFrame *m_outBuf;
 	int m_outBufPos;
 	int m_outBufSize;
 
 	bool m_stopped;
-
-} ;
+};
 
 #endif
 

@@ -28,8 +28,8 @@
 
 #include <QEvent>
 #include <QGraphicsDropShadowEffect>
-#include <QMdiSubWindow>
 #include <QLabel>
+#include <QMdiSubWindow>
 #include <QPushButton>
 #include <QString>
 
@@ -50,27 +50,27 @@ class QWidget;
 class LMMS_EXPORT SubWindow : public QMdiSubWindow
 {
 	Q_OBJECT
-	Q_PROPERTY( QBrush activeColor READ activeColor WRITE setActiveColor )
-	Q_PROPERTY( QColor textShadowColor READ textShadowColor WRITE setTextShadowColor )
-	Q_PROPERTY( QColor borderColor READ borderColor WRITE setBorderColor )
+	Q_PROPERTY(QBrush activeColor READ activeColor WRITE setActiveColor)
+	Q_PROPERTY(QColor textShadowColor READ textShadowColor WRITE setTextShadowColor)
+	Q_PROPERTY(QColor borderColor READ borderColor WRITE setBorderColor)
 
 public:
-	SubWindow( QWidget *parent = NULL, Qt::WindowFlags windowFlags = QFlag(0) );
+	SubWindow(QWidget *parent = NULL, Qt::WindowFlags windowFlags = QFlag(0));
 	// same as QWidet::normalGeometry, but works properly under X11 (see https://bugreports.qt.io/browse/QTBUG-256)
 	QRect getTrueNormalGeometry() const;
 	QBrush activeColor() const;
 	QColor textShadowColor() const;
 	QColor borderColor() const;
-	void setActiveColor( const QBrush & b );
-	void setTextShadowColor( const QColor &c );
-	void setBorderColor( const QColor &c );
+	void setActiveColor(const QBrush &b);
+	void setTextShadowColor(const QColor &c);
+	void setBorderColor(const QColor &c);
 
 protected:
 	// hook the QWidget move/resize events to update the tracked geometry
-	void moveEvent( QMoveEvent * event ) override;
-	void resizeEvent( QResizeEvent * event ) override;
-	void paintEvent( QPaintEvent * pe ) override;
-	void changeEvent( QEvent * event ) override;
+	void moveEvent(QMoveEvent *event) override;
+	void resizeEvent(QResizeEvent *event) override;
+	void paintEvent(QPaintEvent *pe) override;
+	void changeEvent(QEvent *event) override;
 
 signals:
 	void focusLost();
@@ -78,23 +78,23 @@ signals:
 private:
 	const QSize m_buttonSize;
 	const int m_titleBarHeight;
-	QPushButton * m_closeBtn;
-	QPushButton * m_maximizeBtn;
-	QPushButton * m_restoreBtn;
+	QPushButton *m_closeBtn;
+	QPushButton *m_maximizeBtn;
+	QPushButton *m_restoreBtn;
 	QBrush m_activeColor;
 	QColor m_textShadowColor;
 	QColor m_borderColor;
 	QPoint m_position;
 	QRect m_trackedNormalGeom;
-	QLabel * m_windowTitle;
-	QGraphicsDropShadowEffect * m_shadow;
+	QLabel *m_windowTitle;
+	QGraphicsDropShadowEffect *m_shadow;
 	bool m_hasFocus;
 
-	static void elideText( QLabel *label, QString text );
+	static void elideText(QLabel *label, QString text);
 	void adjustTitleBar();
 
 private slots:
-	void focusChanged( QMdiSubWindow * subWindow );
+	void focusChanged(QMdiSubWindow *subWindow);
 };
 
 #endif

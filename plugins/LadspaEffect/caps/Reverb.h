@@ -56,200 +56,202 @@
 
 /* both reverbs use this */
 class Lattice
-: public DSP::Delay
+	: public DSP::Delay
 {
-	public:
-		inline sample_t 
-		process (sample_t x, double d)
-			{
-				sample_t y = get();
-				x -= d * y;
-				put (x);
-				return d * x + y;
-			}
+public:
+	inline sample_t
+	process(sample_t x, double d)
+	{
+		sample_t y = get();
+		x -= d * y;
+		put(x);
+		return d * x + y;
+	}
 };
 
 /* helper for JVRev */
 class JVComb
-: public DSP::Delay
+	: public DSP::Delay
 {
-	public:
-		float c;
-		
-		inline sample_t 
-		process (sample_t x)
-			{
-				x += c * get();
-				put (x);
-				return x;
-			}
+public:
+	float c;
+
+	inline sample_t
+	process(sample_t x)
+	{
+		x += c * get();
+		put(x);
+		return x;
+	}
 };
 
 class JVRev
-: public Plugin
+	: public Plugin
 {
-	public:
-		static int default_length[9];
-		sample_t t60;
+public:
+	static int default_length[9];
+	sample_t t60;
 
-		Lattice allpass [3];
-		JVComb comb[4];
+	Lattice allpass[3];
+	JVComb comb[4];
 
-		DSP::Delay left, right;
-		
-		double apc;
-		
-		template <sample_func_t F>
-		void one_cycle (int frames);
+	DSP::Delay left, right;
 
-		int length [9];
+	double apc;
 
-		void set_t60 (sample_t t);
+	template <sample_func_t F>
+	void one_cycle(int frames);
 
-	public:
-		static PortInfo port_info [];
+	int length[9];
 
-		void init();
-		void activate();
+	void set_t60(sample_t t);
 
-		void run (int n)
-			{
-				one_cycle<store_func> (n);
-			}
-		
-		void run_adding (int n)
-			{
-				one_cycle<adding_func> (n);
-			}
+public:
+	static PortInfo port_info[];
+
+	void init();
+	void activate();
+
+	void run(int n)
+	{
+		one_cycle<store_func>(n);
+	}
+
+	void run_adding(int n)
+	{
+		one_cycle<adding_func>(n);
+	}
 };
 
 /* /////////////////////////////////////////////////////////////////////// */
 
 class ModLattice
 {
-	public:
-		float n0, width;
+public:
+	float n0, width;
 
-		DSP::Delay delay;
-		DSP::Sine lfo;
-		DSP::DelayTapA tap;
-		
-		void init (int n, int w)
-			{
-				n0 = n;
-				width = w;
-				delay.init (n + w);
-			}
+	DSP::Delay delay;
+	DSP::Sine lfo;
+	DSP::DelayTapA tap;
 
-		void reset()
-			{
-				delay.reset();
-				tap.reset();
-			}
+	void init(int n, int w)
+	{
+		n0 = n;
+		width = w;
+		delay.init(n + w);
+	}
 
-		inline sample_t
-		process (sample_t x, double d)
-			{
-				/* TODO: try all-pass interpolation */
-				sample_t y = delay.get_at (n0 + width * lfo.get());
-				x += d * y;
-				delay.put (x);
-				return y - d * x; /* note sign */
-			}
+	void reset()
+	{
+		delay.reset();
+		tap.reset();
+	}
+
+	inline sample_t
+	process(sample_t x, double d)
+	{
+		/* TODO: try all-pass interpolation */
+		sample_t y = delay.get_at(n0 + width * lfo.get());
+		x += d * y;
+		delay.put(x);
+		return y - d * x; /* note sign */
+	}
 };
 
 class PlateStub
-: public Plugin
+	: public Plugin
 {
-	public:
-		sample_t f_lfo;
+public:
+	sample_t f_lfo;
 
-		sample_t indiff1, indiff2, dediff1, dediff2;
-		
-		struct {
-			DSP::OnePoleLP bandwidth;
-			Lattice lattice[4];
-		} input;
+	sample_t indiff1, indiff2, dediff1, dediff2;
 
-		struct {
-			ModLattice mlattice[2];
-			Lattice lattice[2];
-			DSP::Delay delay[4];
-			DSP::OnePoleLP damping[2];
-			int taps[12];
-		} tank;
+	struct
+	{
+		DSP::OnePoleLP bandwidth;
+		Lattice lattice[4];
+	} input;
 
-	public:
-		void init();
-		void activate()
-			{ 
-				input.bandwidth.reset();
+	struct
+	{
+		ModLattice mlattice[2];
+		Lattice lattice[2];
+		DSP::Delay delay[4];
+		DSP::OnePoleLP damping[2];
+		int taps[12];
+	} tank;
 
-				for (int i = 0; i < 4; ++i)
-				{
-					input.lattice[i].reset();
-					tank.delay[i].reset();
-				}
+public:
+	void init();
+	void activate()
+	{
+		input.bandwidth.reset();
 
-				for (int i = 0; i < 2; ++i)
-				{
-					tank.mlattice[i].reset();
-					tank.lattice[i].reset();
-					tank.damping[i].reset();
-				}
-				
-				tank.mlattice[0].lfo.set_f (1.2, fs, 0);
-				tank.mlattice[1].lfo.set_f (1.2, fs, .5 * M_PI);
-			}
+		for (int i = 0; i < 4; ++i)
+		{
+			input.lattice[i].reset();
+			tank.delay[i].reset();
+		}
 
-		inline void process (sample_t x, sample_t decay, 
-					sample_t * xl, sample_t * xr);
+		for (int i = 0; i < 2; ++i)
+		{
+			tank.mlattice[i].reset();
+			tank.lattice[i].reset();
+			tank.damping[i].reset();
+		}
+
+		tank.mlattice[0].lfo.set_f(1.2, fs, 0);
+		tank.mlattice[1].lfo.set_f(1.2, fs, .5 * M_PI);
+	}
+
+	inline void process(sample_t x, sample_t decay,
+		sample_t *xl, sample_t *xr);
 };
 
 /* /////////////////////////////////////////////////////////////////////// */
 
 class Plate
-: public PlateStub
+	: public PlateStub
 {
-	public:
-		template <sample_func_t F>
-		void one_cycle (int frames);
+public:
+	template <sample_func_t F>
+	void one_cycle(int frames);
 
-	public:
-		static PortInfo port_info [];
+public:
+	static PortInfo port_info[];
 
-		void run (int n)
-			{
-				one_cycle<store_func> (n);
-			}
-		
-		void run_adding (int n)
-			{
-				one_cycle<adding_func> (n);
-			}
+	void run(int n)
+	{
+		one_cycle<store_func>(n);
+	}
+
+	void run_adding(int n)
+	{
+		one_cycle<adding_func>(n);
+	}
 };
 
 /* /////////////////////////////////////////////////////////////////////// */
 
 class Plate2x2
-: public PlateStub
+	: public PlateStub
 {
-	public:
-		template <sample_func_t F>
-		void one_cycle (int frames);
+public:
+	template <sample_func_t F>
+	void one_cycle(int frames);
 
-	public:
-		static PortInfo port_info [];
+public:
+	static PortInfo port_info[];
 
-		void run (int n)
-			{
-				one_cycle<store_func> (n);
-			}
-		
-		void run_adding (int n)
-			{
-				one_cycle<adding_func> (n);
-			}
+	void run(int n)
+	{
+		one_cycle<store_func>(n);
+	}
+
+	void run_adding(int n)
+	{
+		one_cycle<adding_func>(n);
+	}
 };
 
 #endif /* _REVERB_H_ */

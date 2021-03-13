@@ -25,14 +25,13 @@
 #ifndef PLUGIN_H
 #define PLUGIN_H
 
-#include <QtCore/QStringList>
 #include <QtCore/QMap>
+#include <QtCore/QStringList>
 #include <QtXml/QDomDocument>
 
 #include "JournallingObject.h"
-#include "Model.h"
 #include "MemoryManager.h"
-
+#include "Model.h"
 
 class QWidget;
 
@@ -68,34 +67,34 @@ class LMMS_EXPORT Plugin : public Model, public JournallingObject
 public:
 	enum PluginTypes
 	{
-		Instrument,	// instrument being used in channel-track
-		Effect,		// effect-plugin for effect-board
-		ImportFilter,	// filter for importing a file
-		ExportFilter,	// filter for exporting a file
-		Tool,		// additional tool (level-meter etc)
-		Library,	// simple library holding a code-base for
-				// several other plugins (e.g. VST-support)
+		Instrument,	  // instrument being used in channel-track
+		Effect,		  // effect-plugin for effect-board
+		ImportFilter, // filter for importing a file
+		ExportFilter, // filter for exporting a file
+		Tool,		  // additional tool (level-meter etc)
+		Library,	  // simple library holding a code-base for
+					  // several other plugins (e.g. VST-support)
 		Other,
 		Undefined = 255
-	} ;
+	};
 
 	//! Descriptor holds information about a plugin - every external plugin
 	//! has to instantiate such a Descriptor in an extern "C"-section so that
 	//! the plugin-loader is able to access information about the plugin
 	struct Descriptor
 	{
-		const char * name;
-		const char * displayName;
-		const char * description;
-		const char * author;
+		const char *name;
+		const char *displayName;
+		const char *description;
+		const char *author;
 		int version;
 		PluginTypes type;
-		const PixmapLoader * logo;
-		const char * supportedFileTypes; //!< csv list of extensions
+		const PixmapLoader *logo;
+		const char *supportedFileTypes; //!< csv list of extensions
 
-		inline bool supportsFileType( const QString& extension ) const
+		inline bool supportsFileType(const QString &extension) const
 		{
-			return QString( supportedFileTypes ).split( QChar( ',' ) ).contains( extension );
+			return QString(supportedFileTypes).split(QChar(',')).contains(extension);
 		}
 
 		/**
@@ -130,20 +129,18 @@ public:
 			{
 				typedef QMap<QString, QString> AttributeMap;
 
-				inline Key( const Plugin::Descriptor * desc = NULL,
-						const QString & name = QString(),
-						const AttributeMap & am = AttributeMap()
-					)
-					:
-					desc( desc ),
-					name( name ),
-					attributes( am )
+				inline Key(const Plugin::Descriptor *desc = NULL,
+					const QString &name = QString(),
+					const AttributeMap &am = AttributeMap()) :
+					desc(desc),
+					name(name),
+					attributes(am)
 				{
 				}
 
-				Key( const QDomElement & key );
+				Key(const QDomElement &key);
 
-				QDomElement saveXML( QDomDocument & doc ) const;
+				QDomElement saveXML(QDomDocument &doc) const;
 
 				inline bool isValid() const
 				{
@@ -152,7 +149,7 @@ public:
 
 				//! Key to subplugin: reference to parent descriptor
 				//! Key to plugin: reference to its descriptor
-				const Plugin::Descriptor* desc;
+				const Plugin::Descriptor *desc;
 				//! Descriptive name like "Calf Phaser".
 				//! Not required for key lookup and not saved
 				//! only used sometimes to temporary store descriptive names
@@ -168,14 +165,13 @@ public:
 				QString additionalFileExtensions() const;
 				QString displayName() const;
 				QString description() const;
-				const PixmapLoader* logo() const;
-			} ;
+				const PixmapLoader *logo() const;
+			};
 
 			typedef QList<Key> KeyList;
 
-
-			SubPluginFeatures( Plugin::PluginTypes type ) :
-				m_type( type )
+			SubPluginFeatures(Plugin::PluginTypes type) :
+				m_type(type)
 			{
 			}
 
@@ -183,39 +179,38 @@ public:
 			{
 			}
 
-			virtual void fillDescriptionWidget( QWidget *, const Key * ) const
+			virtual void fillDescriptionWidget(QWidget *, const Key *) const
 			{
 			}
 
 			//! While PluginFactory only collects the plugins,
 			//! this function is used by widgets like EffectSelectDialog
 			//! to find all possible sub plugins
-			virtual void listSubPluginKeys( const Plugin::Descriptor *, KeyList & ) const
+			virtual void listSubPluginKeys(const Plugin::Descriptor *, KeyList &) const
 			{
 			}
-
 
 		private:
 			// You can add values mapped by "Key" below
 			// The defaults are sane, i.e. redirect to sub plugin's
 			// supererior descriptor
 
-			virtual QString additionalFileExtensions(const Key&) const
+			virtual QString additionalFileExtensions(const Key &) const
 			{
 				return QString();
 			}
 
-			virtual QString displayName(const Key& k) const
+			virtual QString displayName(const Key &k) const
 			{
 				return k.isValid() ? k.name : QString();
 			}
 
-			virtual QString description(const Key& k) const
+			virtual QString description(const Key &k) const
 			{
 				return k.isValid() ? k.desc->description : QString();
 			}
 
-			virtual const PixmapLoader* logo(const Key& k) const
+			virtual const PixmapLoader *logo(const Key &k) const
 			{
 				Q_ASSERT(k.desc);
 				return k.desc->logo;
@@ -223,18 +218,17 @@ public:
 
 		protected:
 			const Plugin::PluginTypes m_type;
-		} ;
+		};
 
-		SubPluginFeatures * subPluginFeatures;
-
-	} ;
+		SubPluginFeatures *subPluginFeatures;
+	};
 	// typedef a list so we can easily work with list of plugin descriptors
-	typedef QList<Descriptor*> DescriptorList;
+	typedef QList<Descriptor *> DescriptorList;
 
 	//! Constructor of a plugin
 	//! @param key Sub plugins must pass a key here, optional otherwise.
 	//!   See the key() function
-	Plugin(const Descriptor * descriptor, Model * parent,
+	Plugin(const Descriptor *descriptor, Model *parent,
 		const Descriptor::SubPluginFeatures::Key *key = nullptr);
 	virtual ~Plugin();
 
@@ -245,13 +239,13 @@ public:
 	const PixmapLoader *logo() const;
 
 	//! Return plugin type
-	inline PluginTypes type( void ) const
+	inline PluginTypes type(void) const
 	{
 		return m_descriptor->type;
 	}
 
 	//! Return plugin Descriptor
-	inline const Descriptor * descriptor() const
+	inline const Descriptor *descriptor() const
 	{
 		return m_descriptor;
 	}
@@ -260,50 +254,47 @@ public:
 	//! sub plugin features, the key is pretty useless. If it has,
 	//! this key will also contain the sub plugin attributes, and will be
 	//! a key to those SubPluginFeatures.
-	inline const Descriptor::SubPluginFeatures::Key & key() const
+	inline const Descriptor::SubPluginFeatures::Key &key() const
 	{
 		return m_key;
 	}
 
 	//! Can be called if a file matching supportedFileTypes should be
 	//! loaded/processed with the help of this plugin
-	virtual void loadFile( const QString & file );
+	virtual void loadFile(const QString &file);
 
 	//! Called if external source needs to change something but we cannot
 	//! reference the class header.  Should return null if not key not found.
-	virtual AutomatableModel* childModel( const QString & modelName );
+	virtual AutomatableModel *childModel(const QString &modelName);
 
 	//! Overload if the argument passed to the plugin is a subPluginKey
 	//! If you can not pass the key and are aware that it's stored in
 	//! Engine::pickDndPluginKey(), use this function, too
-	static Plugin * instantiateWithKey(const QString& pluginName, Model * parent,
-					const Descriptor::SubPluginFeatures::Key *key,
-					bool keyFromDnd = false);
+	static Plugin *instantiateWithKey(const QString &pluginName, Model *parent,
+		const Descriptor::SubPluginFeatures::Key *key,
+		bool keyFromDnd = false);
 
 	//! Return an instance of a plugin whose name matches to given one
 	//! if specified plugin couldn't be loaded, it creates a dummy-plugin
 	//! @param data Anything the plugin expects. If this is a pointer to a sub plugin key,
 	//!   use instantiateWithKey instead
-	static Plugin * instantiate(const QString& pluginName, Model * parent, void *data);
+	static Plugin *instantiate(const QString &pluginName, Model *parent, void *data);
 
 	//! Create a view for the model
-	PluginView * createView( QWidget * parent );
+	PluginView *createView(QWidget *parent);
 
 protected:
 	//! Create a view for the model
-	virtual PluginView* instantiateView( QWidget * ) = 0;
-	void collectErrorForUI( QString errMsg );
-
+	virtual PluginView *instantiateView(QWidget *) = 0;
+	void collectErrorForUI(QString errMsg);
 
 private:
-	const Descriptor * m_descriptor;
+	const Descriptor *m_descriptor;
 
 	Descriptor::SubPluginFeatures::Key m_key;
 
 	// pointer to instantiation-function in plugin
-	typedef Plugin * ( * InstantiationHook )( Model * , void * );
-
-} ;
-
+	typedef Plugin *(*InstantiationHook)(Model *, void *);
+};
 
 #endif

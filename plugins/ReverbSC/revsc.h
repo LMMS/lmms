@@ -1,25 +1,27 @@
-typedef struct {
-    int writePos;
-    int bufferSize;
-    int readPos;
-    int readPosFrac;
-    int readPosFrac_inc;
-    int dummy;
-    int seedVal;
-    int randLine_cnt;
-    SPFLOAT filterState;
-    SPFLOAT *buf;
+typedef struct
+{
+	int writePos;
+	int bufferSize;
+	int readPos;
+	int readPosFrac;
+	int readPosFrac_inc;
+	int dummy;
+	int seedVal;
+	int randLine_cnt;
+	SPFLOAT filterState;
+	SPFLOAT *buf;
 } sp_revsc_dl;
 
-typedef struct  {
-    SPFLOAT feedback, lpfreq;
-    SPFLOAT iSampleRate, iPitchMod, iSkipInit;
-    SPFLOAT sampleRate;
-    SPFLOAT dampFact;
-    SPFLOAT prv_LPFreq;
-    int initDone;
-    sp_revsc_dl delayLines[8];
-    sp_auxdata aux;
+typedef struct
+{
+	SPFLOAT feedback, lpfreq;
+	SPFLOAT iSampleRate, iPitchMod, iSkipInit;
+	SPFLOAT sampleRate;
+	SPFLOAT dampFact;
+	SPFLOAT prv_LPFreq;
+	int initDone;
+	sp_revsc_dl delayLines[8];
+	sp_auxdata aux;
 } sp_revsc;
 
 int sp_revsc_create(sp_revsc **p);

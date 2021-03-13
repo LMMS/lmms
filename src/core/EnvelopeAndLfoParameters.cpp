@@ -22,13 +22,13 @@
  *
  */
 
+#include "EnvelopeAndLfoParameters.h"
+
 #include <QDomElement>
 
-#include "EnvelopeAndLfoParameters.h"
 #include "Engine.h"
 #include "Mixer.h"
 #include "Oscillator.h"
-
 
 // how long should be each envelope-segment maximal (e.g. attack)?
 extern const float SECS_PER_ENV_SEGMENT = 5.0f;
@@ -37,130 +37,115 @@ extern const float SECS_PER_LFO_OSCILLATION = 20.0f;
 // minimum number of frames for ENV/LFO stages that mustn't be '0'
 const f_cnt_t minimumFrames = 1;
 
-
-EnvelopeAndLfoParameters::LfoInstances * EnvelopeAndLfoParameters::s_lfoInstances = NULL;
-
+EnvelopeAndLfoParameters::LfoInstances *EnvelopeAndLfoParameters::s_lfoInstances = NULL;
 
 void EnvelopeAndLfoParameters::LfoInstances::trigger()
 {
-	QMutexLocker m( &m_lfoListMutex );
-	for( LfoList::Iterator it = m_lfos.begin();
-							it != m_lfos.end(); ++it )
+	QMutexLocker m(&m_lfoListMutex);
+	for (LfoList::Iterator it = m_lfos.begin();
+		 it != m_lfos.end(); ++it)
 	{
-		( *it )->m_lfoFrame +=
-				Engine::mixer()->framesPerPeriod();
-		( *it )->m_bad_lfoShapeData = true;
+		(*it)->m_lfoFrame +=
+			Engine::mixer()->framesPerPeriod();
+		(*it)->m_bad_lfoShapeData = true;
 	}
 }
-
-
-
 
 void EnvelopeAndLfoParameters::LfoInstances::reset()
 {
-	QMutexLocker m( &m_lfoListMutex );
-	for( LfoList::Iterator it = m_lfos.begin();
-							it != m_lfos.end(); ++it )
+	QMutexLocker m(&m_lfoListMutex);
+	for (LfoList::Iterator it = m_lfos.begin();
+		 it != m_lfos.end(); ++it)
 	{
-		( *it )->m_lfoFrame = 0;
-		( *it )->m_bad_lfoShapeData = true;
+		(*it)->m_lfoFrame = 0;
+		(*it)->m_bad_lfoShapeData = true;
 	}
 }
 
-
-
-
-void EnvelopeAndLfoParameters::LfoInstances::add( EnvelopeAndLfoParameters * lfo )
+void EnvelopeAndLfoParameters::LfoInstances::add(EnvelopeAndLfoParameters *lfo)
 {
-	QMutexLocker m( &m_lfoListMutex );
-	m_lfos.append( lfo );
+	QMutexLocker m(&m_lfoListMutex);
+	m_lfos.append(lfo);
 }
 
-
-
-
-void EnvelopeAndLfoParameters::LfoInstances::remove( EnvelopeAndLfoParameters * lfo )
+void EnvelopeAndLfoParameters::LfoInstances::remove(EnvelopeAndLfoParameters *lfo)
 {
-	QMutexLocker m( &m_lfoListMutex );
-	m_lfos.removeAll( lfo );
+	QMutexLocker m(&m_lfoListMutex);
+	m_lfos.removeAll(lfo);
 }
-
-
-
 
 EnvelopeAndLfoParameters::EnvelopeAndLfoParameters(
-					float _value_for_zero_amount,
-							Model * _parent ) :
-	Model( _parent ),
-	m_used( false ),
-	m_predelayModel( 0.0, 0.0, 2.0, 0.001, this, tr( "Env pre-delay" ) ),
-	m_attackModel( 0.0, 0.0, 2.0, 0.001, this, tr( "Env attack" ) ),
-	m_holdModel( 0.5, 0.0, 2.0, 0.001, this, tr( "Env hold" ) ),
-	m_decayModel( 0.5, 0.0, 2.0, 0.001, this, tr( "Env decay" ) ),
-	m_sustainModel( 0.5, 0.0, 1.0, 0.001, this, tr( "Env sustain" ) ),
-	m_releaseModel( 0.1, 0.0, 2.0, 0.001, this, tr( "Env release" ) ),
-	m_amountModel( 0.0, -1.0, 1.0, 0.005, this, tr( "Env mod amount" ) ),
-	m_valueForZeroAmount( _value_for_zero_amount ),
-	m_pahdFrames( 0 ),
-	m_rFrames( 0 ),
-	m_pahdEnv( NULL ),
-	m_rEnv( NULL ),
-	m_pahdBufSize( 0 ),
-	m_rBufSize( 0 ),
-	m_lfoPredelayModel( 0.0, 0.0, 1.0, 0.001, this, tr( "LFO pre-delay" ) ),
-	m_lfoAttackModel( 0.0, 0.0, 1.0, 0.001, this, tr( "LFO attack" ) ),
-	m_lfoSpeedModel( 0.1, 0.001, 1.0, 0.0001,
-				SECS_PER_LFO_OSCILLATION * 1000.0, this,
-							tr( "LFO frequency" ) ),
-	m_lfoAmountModel( 0.0, -1.0, 1.0, 0.005, this, tr( "LFO mod amount" ) ),
-	m_lfoWaveModel( SineWave, 0, NumLfoShapes, this, tr( "LFO wave shape" ) ),
-	m_x100Model( false, this, tr( "LFO frequency x 100" ) ),
-	m_controlEnvAmountModel( false, this, tr( "Modulate env amount" ) ),
-	m_lfoFrame( 0 ),
-	m_lfoAmountIsZero( false ),
-	m_lfoShapeData( NULL )
+	float _value_for_zero_amount,
+	Model *_parent) :
+	Model(_parent),
+	m_used(false),
+	m_predelayModel(0.0, 0.0, 2.0, 0.001, this, tr("Env pre-delay")),
+	m_attackModel(0.0, 0.0, 2.0, 0.001, this, tr("Env attack")),
+	m_holdModel(0.5, 0.0, 2.0, 0.001, this, tr("Env hold")),
+	m_decayModel(0.5, 0.0, 2.0, 0.001, this, tr("Env decay")),
+	m_sustainModel(0.5, 0.0, 1.0, 0.001, this, tr("Env sustain")),
+	m_releaseModel(0.1, 0.0, 2.0, 0.001, this, tr("Env release")),
+	m_amountModel(0.0, -1.0, 1.0, 0.005, this, tr("Env mod amount")),
+	m_valueForZeroAmount(_value_for_zero_amount),
+	m_pahdFrames(0),
+	m_rFrames(0),
+	m_pahdEnv(NULL),
+	m_rEnv(NULL),
+	m_pahdBufSize(0),
+	m_rBufSize(0),
+	m_lfoPredelayModel(0.0, 0.0, 1.0, 0.001, this, tr("LFO pre-delay")),
+	m_lfoAttackModel(0.0, 0.0, 1.0, 0.001, this, tr("LFO attack")),
+	m_lfoSpeedModel(0.1, 0.001, 1.0, 0.0001,
+		SECS_PER_LFO_OSCILLATION * 1000.0, this,
+		tr("LFO frequency")),
+	m_lfoAmountModel(0.0, -1.0, 1.0, 0.005, this, tr("LFO mod amount")),
+	m_lfoWaveModel(SineWave, 0, NumLfoShapes, this, tr("LFO wave shape")),
+	m_x100Model(false, this, tr("LFO frequency x 100")),
+	m_controlEnvAmountModel(false, this, tr("Modulate env amount")),
+	m_lfoFrame(0),
+	m_lfoAmountIsZero(false),
+	m_lfoShapeData(NULL)
 {
-	m_amountModel.setCenterValue( 0 );
-	m_lfoAmountModel.setCenterValue( 0 );
+	m_amountModel.setCenterValue(0);
+	m_lfoAmountModel.setCenterValue(0);
 
-	if( s_lfoInstances == NULL )
+	if (s_lfoInstances == NULL)
 	{
 		s_lfoInstances = new LfoInstances();
 	}
 
-	instances()->add( this );
+	instances()->add(this);
 
-	connect( &m_predelayModel, SIGNAL( dataChanged() ),
-			this, SLOT( updateSampleVars() ), Qt::DirectConnection );
-	connect( &m_attackModel, SIGNAL( dataChanged() ),
-			this, SLOT( updateSampleVars() ), Qt::DirectConnection );
-	connect( &m_holdModel, SIGNAL( dataChanged() ),
-			this, SLOT( updateSampleVars() ), Qt::DirectConnection );
-	connect( &m_decayModel, SIGNAL( dataChanged() ),
-			this, SLOT( updateSampleVars() ), Qt::DirectConnection );
-	connect( &m_sustainModel, SIGNAL( dataChanged() ),
-			this, SLOT( updateSampleVars() ), Qt::DirectConnection );
-	connect( &m_releaseModel, SIGNAL( dataChanged() ),
-			this, SLOT( updateSampleVars() ), Qt::DirectConnection );
-	connect( &m_amountModel, SIGNAL( dataChanged() ),
-			this, SLOT( updateSampleVars() ), Qt::DirectConnection );
+	connect(&m_predelayModel, SIGNAL(dataChanged()),
+		this, SLOT(updateSampleVars()), Qt::DirectConnection);
+	connect(&m_attackModel, SIGNAL(dataChanged()),
+		this, SLOT(updateSampleVars()), Qt::DirectConnection);
+	connect(&m_holdModel, SIGNAL(dataChanged()),
+		this, SLOT(updateSampleVars()), Qt::DirectConnection);
+	connect(&m_decayModel, SIGNAL(dataChanged()),
+		this, SLOT(updateSampleVars()), Qt::DirectConnection);
+	connect(&m_sustainModel, SIGNAL(dataChanged()),
+		this, SLOT(updateSampleVars()), Qt::DirectConnection);
+	connect(&m_releaseModel, SIGNAL(dataChanged()),
+		this, SLOT(updateSampleVars()), Qt::DirectConnection);
+	connect(&m_amountModel, SIGNAL(dataChanged()),
+		this, SLOT(updateSampleVars()), Qt::DirectConnection);
 
-	connect( &m_lfoPredelayModel, SIGNAL( dataChanged() ),
-			this, SLOT( updateSampleVars() ), Qt::DirectConnection );
-	connect( &m_lfoAttackModel, SIGNAL( dataChanged() ),
-			this, SLOT( updateSampleVars() ), Qt::DirectConnection );
-	connect( &m_lfoSpeedModel, SIGNAL( dataChanged() ),
-			this, SLOT( updateSampleVars() ), Qt::DirectConnection );
-	connect( &m_lfoAmountModel, SIGNAL( dataChanged() ),
-			this, SLOT( updateSampleVars() ), Qt::DirectConnection );
-	connect( &m_lfoWaveModel, SIGNAL( dataChanged() ),
-			this, SLOT( updateSampleVars() ), Qt::DirectConnection );
-	connect( &m_x100Model, SIGNAL( dataChanged() ),
-			this, SLOT( updateSampleVars() ), Qt::DirectConnection );
+	connect(&m_lfoPredelayModel, SIGNAL(dataChanged()),
+		this, SLOT(updateSampleVars()), Qt::DirectConnection);
+	connect(&m_lfoAttackModel, SIGNAL(dataChanged()),
+		this, SLOT(updateSampleVars()), Qt::DirectConnection);
+	connect(&m_lfoSpeedModel, SIGNAL(dataChanged()),
+		this, SLOT(updateSampleVars()), Qt::DirectConnection);
+	connect(&m_lfoAmountModel, SIGNAL(dataChanged()),
+		this, SLOT(updateSampleVars()), Qt::DirectConnection);
+	connect(&m_lfoWaveModel, SIGNAL(dataChanged()),
+		this, SLOT(updateSampleVars()), Qt::DirectConnection);
+	connect(&m_x100Model, SIGNAL(dataChanged()),
+		this, SLOT(updateSampleVars()), Qt::DirectConnection);
 
-	connect( Engine::mixer(), SIGNAL( sampleRateChanged() ),
-				this, SLOT( updateSampleVars() ) );
-
+	connect(Engine::mixer(), SIGNAL(sampleRateChanged()),
+		this, SLOT(updateSampleVars()));
 
 	m_lfoShapeData =
 		new sample_t[Engine::mixer()->framesPerPeriod()];
@@ -168,99 +153,86 @@ EnvelopeAndLfoParameters::EnvelopeAndLfoParameters(
 	updateSampleVars();
 }
 
-
-
-
 EnvelopeAndLfoParameters::~EnvelopeAndLfoParameters()
 {
-	m_predelayModel.disconnect( this );
-	m_attackModel.disconnect( this );
-	m_holdModel.disconnect( this );
-	m_decayModel.disconnect( this );
-	m_sustainModel.disconnect( this );
-	m_releaseModel.disconnect( this );
-	m_amountModel.disconnect( this );
-	m_lfoPredelayModel.disconnect( this );
-	m_lfoAttackModel.disconnect( this );
-	m_lfoSpeedModel.disconnect( this );
-	m_lfoAmountModel.disconnect( this );
-	m_lfoWaveModel.disconnect( this );
-	m_x100Model.disconnect( this );
+	m_predelayModel.disconnect(this);
+	m_attackModel.disconnect(this);
+	m_holdModel.disconnect(this);
+	m_decayModel.disconnect(this);
+	m_sustainModel.disconnect(this);
+	m_releaseModel.disconnect(this);
+	m_amountModel.disconnect(this);
+	m_lfoPredelayModel.disconnect(this);
+	m_lfoAttackModel.disconnect(this);
+	m_lfoSpeedModel.disconnect(this);
+	m_lfoAmountModel.disconnect(this);
+	m_lfoWaveModel.disconnect(this);
+	m_x100Model.disconnect(this);
 
 	delete[] m_pahdEnv;
 	delete[] m_rEnv;
 	delete[] m_lfoShapeData;
 
-	instances()->remove( this );
+	instances()->remove(this);
 
-	if( instances()->isEmpty() )
+	if (instances()->isEmpty())
 	{
 		delete instances();
 		s_lfoInstances = NULL;
 	}
 }
 
-
-
-
-inline sample_t EnvelopeAndLfoParameters::lfoShapeSample( fpp_t _frame_offset )
+inline sample_t EnvelopeAndLfoParameters::lfoShapeSample(fpp_t _frame_offset)
 {
-	f_cnt_t frame = ( m_lfoFrame + _frame_offset ) % m_lfoOscillationFrames;
-	const float phase = frame / static_cast<float>(
-						m_lfoOscillationFrames );
+	f_cnt_t frame = (m_lfoFrame + _frame_offset) % m_lfoOscillationFrames;
+	const float phase = frame / static_cast<float>(m_lfoOscillationFrames);
 	sample_t shape_sample;
-	switch( m_lfoWaveModel.value()  )
+	switch (m_lfoWaveModel.value())
 	{
-		case TriangleWave:
-			shape_sample = Oscillator::triangleSample( phase );
-			break;
-		case SquareWave:
-			shape_sample = Oscillator::squareSample( phase );
-			break;
-		case SawWave:
-			shape_sample = Oscillator::sawSample( phase );
-			break;
-		case UserDefinedWave:
-			shape_sample = m_userWave.userWaveSample( phase );
-			break;
-		case RandomWave:
-			if( frame == 0 )
-			{
-				m_random = Oscillator::noiseSample( 0.0f );
-			}
-			shape_sample = m_random;
-			break;
-		case SineWave:
-		default:
-			shape_sample = Oscillator::sinSample( phase );
-			break;
+	case TriangleWave:
+		shape_sample = Oscillator::triangleSample(phase);
+		break;
+	case SquareWave:
+		shape_sample = Oscillator::squareSample(phase);
+		break;
+	case SawWave:
+		shape_sample = Oscillator::sawSample(phase);
+		break;
+	case UserDefinedWave:
+		shape_sample = m_userWave.userWaveSample(phase);
+		break;
+	case RandomWave:
+		if (frame == 0)
+		{
+			m_random = Oscillator::noiseSample(0.0f);
+		}
+		shape_sample = m_random;
+		break;
+	case SineWave:
+	default:
+		shape_sample = Oscillator::sinSample(phase);
+		break;
 	}
 	return shape_sample * m_lfoAmount;
 }
 
-
-
-
 void EnvelopeAndLfoParameters::updateLfoShapeData()
 {
 	const fpp_t frames = Engine::mixer()->framesPerPeriod();
-	for( fpp_t offset = 0; offset < frames; ++offset )
+	for (fpp_t offset = 0; offset < frames; ++offset)
 	{
-		m_lfoShapeData[offset] = lfoShapeSample( offset );
+		m_lfoShapeData[offset] = lfoShapeSample(offset);
 	}
 	m_bad_lfoShapeData = false;
 }
 
-
-
-
-inline void EnvelopeAndLfoParameters::fillLfoLevel( float * _buf,
-							f_cnt_t _frame,
-							const fpp_t _frames )
+inline void EnvelopeAndLfoParameters::fillLfoLevel(float *_buf,
+	f_cnt_t _frame,
+	const fpp_t _frames)
 {
-	if( m_lfoAmountIsZero || _frame <= m_lfoPredelayFrames )
+	if (m_lfoAmountIsZero || _frame <= m_lfoPredelayFrames)
 	{
-		for( fpp_t offset = 0; offset < _frames; ++offset )
+		for (fpp_t offset = 0; offset < _frames; ++offset)
 		{
 			*_buf++ = 0.0f;
 		}
@@ -268,46 +240,43 @@ inline void EnvelopeAndLfoParameters::fillLfoLevel( float * _buf,
 	}
 	_frame -= m_lfoPredelayFrames;
 
-	if( m_bad_lfoShapeData )
+	if (m_bad_lfoShapeData)
 	{
 		updateLfoShapeData();
 	}
 
 	fpp_t offset = 0;
-	const float lafI = 1.0f / qMax( minimumFrames, m_lfoAttackFrames );
-	for( ; offset < _frames && _frame < m_lfoAttackFrames; ++offset,
-								++_frame )
+	const float lafI = 1.0f / qMax(minimumFrames, m_lfoAttackFrames);
+	for (; offset < _frames && _frame < m_lfoAttackFrames; ++offset,
+		 ++_frame)
 	{
 		*_buf++ = m_lfoShapeData[offset] * _frame * lafI;
 	}
-	for( ; offset < _frames; ++offset )
+	for (; offset < _frames; ++offset)
 	{
 		*_buf++ = m_lfoShapeData[offset];
 	}
 }
 
-
-
-
-void EnvelopeAndLfoParameters::fillLevel( float * _buf, f_cnt_t _frame,
-						const f_cnt_t _release_begin,
-						const fpp_t _frames )
+void EnvelopeAndLfoParameters::fillLevel(float *_buf, f_cnt_t _frame,
+	const f_cnt_t _release_begin,
+	const fpp_t _frames)
 {
 	QMutexLocker m(&m_paramMutex);
 
-	if( _frame < 0 || _release_begin < 0 )
+	if (_frame < 0 || _release_begin < 0)
 	{
 		return;
 	}
 
-	fillLfoLevel( _buf, _frame, _frames );
+	fillLfoLevel(_buf, _frame, _frames);
 
-	for( fpp_t offset = 0; offset < _frames; ++offset, ++_buf, ++_frame )
+	for (fpp_t offset = 0; offset < _frames; ++offset, ++_buf, ++_frame)
 	{
 		float env_level;
-		if( _frame < _release_begin )
+		if (_frame < _release_begin)
 		{
-			if( _frame < m_pahdFrames )
+			if (_frame < m_pahdFrames)
 			{
 				env_level = m_pahdEnv[_frame];
 			}
@@ -316,11 +285,10 @@ void EnvelopeAndLfoParameters::fillLevel( float * _buf, f_cnt_t _frame,
 				env_level = m_sustainLevel;
 			}
 		}
-		else if( ( _frame - _release_begin ) < m_rFrames )
+		else if ((_frame - _release_begin) < m_rFrames)
 		{
 			env_level = m_rEnv[_frame - _release_begin] *
-				( ( _release_begin < m_pahdFrames ) ?
-				m_pahdEnv[_release_begin] : m_sustainLevel );
+				((_release_begin < m_pahdFrames) ? m_pahdEnv[_release_begin] : m_sustainLevel);
 		}
 		else
 		{
@@ -328,101 +296,90 @@ void EnvelopeAndLfoParameters::fillLevel( float * _buf, f_cnt_t _frame,
 		}
 
 		// at this point, *_buf is LFO level
-		*_buf = m_controlEnvAmountModel.value() ?
-			env_level * ( 0.5f + *_buf ) :
-			env_level + *_buf;
+		*_buf = m_controlEnvAmountModel.value() ? env_level * (0.5f + *_buf) : env_level + *_buf;
 	}
 }
 
-
-
-
-void EnvelopeAndLfoParameters::saveSettings( QDomDocument & _doc,
-							QDomElement & _parent )
+void EnvelopeAndLfoParameters::saveSettings(QDomDocument &_doc,
+	QDomElement &_parent)
 {
-	m_predelayModel.saveSettings( _doc, _parent, "pdel" );
-	m_attackModel.saveSettings( _doc, _parent, "att" );
-	m_holdModel.saveSettings( _doc, _parent, "hold" );
-	m_decayModel.saveSettings( _doc, _parent, "dec" );
-	m_sustainModel.saveSettings( _doc, _parent, "sustain" );
-	m_releaseModel.saveSettings( _doc, _parent, "rel" );
-	m_amountModel.saveSettings( _doc, _parent, "amt" );
-	m_lfoWaveModel.saveSettings( _doc, _parent, "lshp" );
-	m_lfoPredelayModel.saveSettings( _doc, _parent, "lpdel" );
-	m_lfoAttackModel.saveSettings( _doc, _parent, "latt" );
-	m_lfoSpeedModel.saveSettings( _doc, _parent, "lspd" );
-	m_lfoAmountModel.saveSettings( _doc, _parent, "lamt" );
-	m_x100Model.saveSettings( _doc, _parent, "x100" );
-	m_controlEnvAmountModel.saveSettings( _doc, _parent, "ctlenvamt" );
-	_parent.setAttribute( "userwavefile", m_userWave.audioFile() );
+	m_predelayModel.saveSettings(_doc, _parent, "pdel");
+	m_attackModel.saveSettings(_doc, _parent, "att");
+	m_holdModel.saveSettings(_doc, _parent, "hold");
+	m_decayModel.saveSettings(_doc, _parent, "dec");
+	m_sustainModel.saveSettings(_doc, _parent, "sustain");
+	m_releaseModel.saveSettings(_doc, _parent, "rel");
+	m_amountModel.saveSettings(_doc, _parent, "amt");
+	m_lfoWaveModel.saveSettings(_doc, _parent, "lshp");
+	m_lfoPredelayModel.saveSettings(_doc, _parent, "lpdel");
+	m_lfoAttackModel.saveSettings(_doc, _parent, "latt");
+	m_lfoSpeedModel.saveSettings(_doc, _parent, "lspd");
+	m_lfoAmountModel.saveSettings(_doc, _parent, "lamt");
+	m_x100Model.saveSettings(_doc, _parent, "x100");
+	m_controlEnvAmountModel.saveSettings(_doc, _parent, "ctlenvamt");
+	_parent.setAttribute("userwavefile", m_userWave.audioFile());
 }
 
-
-
-
-void EnvelopeAndLfoParameters::loadSettings( const QDomElement & _this )
+void EnvelopeAndLfoParameters::loadSettings(const QDomElement &_this)
 {
-	m_predelayModel.loadSettings( _this, "pdel" );
-	m_attackModel.loadSettings( _this, "att" );
-	m_holdModel.loadSettings( _this, "hold" );
-	m_decayModel.loadSettings( _this, "dec" );
-	m_sustainModel.loadSettings( _this, "sustain" );
-	m_releaseModel.loadSettings( _this, "rel" );
-	m_amountModel.loadSettings( _this, "amt" );
-	m_lfoWaveModel.loadSettings( _this, "lshp" );
-	m_lfoPredelayModel.loadSettings( _this, "lpdel" );
-	m_lfoAttackModel.loadSettings( _this, "latt" );
-	m_lfoSpeedModel.loadSettings( _this, "lspd" );
-	m_lfoAmountModel.loadSettings( _this, "lamt" );
-	m_x100Model.loadSettings( _this, "x100" );
-	m_controlEnvAmountModel.loadSettings( _this, "ctlenvamt" );
+	m_predelayModel.loadSettings(_this, "pdel");
+	m_attackModel.loadSettings(_this, "att");
+	m_holdModel.loadSettings(_this, "hold");
+	m_decayModel.loadSettings(_this, "dec");
+	m_sustainModel.loadSettings(_this, "sustain");
+	m_releaseModel.loadSettings(_this, "rel");
+	m_amountModel.loadSettings(_this, "amt");
+	m_lfoWaveModel.loadSettings(_this, "lshp");
+	m_lfoPredelayModel.loadSettings(_this, "lpdel");
+	m_lfoAttackModel.loadSettings(_this, "latt");
+	m_lfoSpeedModel.loadSettings(_this, "lspd");
+	m_lfoAmountModel.loadSettings(_this, "lamt");
+	m_x100Model.loadSettings(_this, "x100");
+	m_controlEnvAmountModel.loadSettings(_this, "ctlenvamt");
 
-/*	 ### TODO:
+	/*	 ### TODO:
 	Old reversed sustain kept for backward compatibility
 	with 4.15 file format*/
-	if( _this.hasAttribute( "sus" ) )
+	if (_this.hasAttribute("sus"))
 	{
-		m_sustainModel.loadSettings( _this, "sus" );
-		m_sustainModel.setValue( 1.0 - m_sustainModel.value() );
+		m_sustainModel.loadSettings(_this, "sus");
+		m_sustainModel.setValue(1.0 - m_sustainModel.value());
 	}
 
-	m_userWave.setAudioFile( _this.attribute( "userwavefile" ) );
+	m_userWave.setAudioFile(_this.attribute("userwavefile"));
 
 	updateSampleVars();
 }
-
-
-
 
 void EnvelopeAndLfoParameters::updateSampleVars()
 {
 	QMutexLocker m(&m_paramMutex);
 
 	const float frames_per_env_seg = SECS_PER_ENV_SEGMENT *
-				Engine::mixer()->processingSampleRate();
+		Engine::mixer()->processingSampleRate();
 
 	// TODO: Remove the expKnobVals, time should be linear
 	const f_cnt_t predelay_frames = static_cast<f_cnt_t>(
-							frames_per_env_seg *
-					expKnobVal( m_predelayModel.value() ) );
+		frames_per_env_seg *
+		expKnobVal(m_predelayModel.value()));
 
-	const f_cnt_t attack_frames = qMax( minimumFrames,
-					static_cast<f_cnt_t>( frames_per_env_seg *
-					expKnobVal( m_attackModel.value() ) ) );
+	const f_cnt_t attack_frames = qMax(minimumFrames,
+		static_cast<f_cnt_t>(frames_per_env_seg *
+			expKnobVal(m_attackModel.value())));
 
-	const f_cnt_t hold_frames = static_cast<f_cnt_t>( frames_per_env_seg *
-					expKnobVal( m_holdModel.value() ) );
+	const f_cnt_t hold_frames = static_cast<f_cnt_t>(frames_per_env_seg *
+		expKnobVal(m_holdModel.value()));
 
-	const f_cnt_t decay_frames = qMax( minimumFrames,
-					static_cast<f_cnt_t>( frames_per_env_seg *
-					expKnobVal( m_decayModel.value() *
-					( 1 - m_sustainModel.value() ) ) ) );
+	const f_cnt_t decay_frames = qMax(minimumFrames,
+		static_cast<f_cnt_t>(frames_per_env_seg *
+			expKnobVal(m_decayModel.value() *
+				(1 - m_sustainModel.value()))));
 
 	m_sustainLevel = m_sustainModel.value();
 	m_amount = m_amountModel.value();
-	if( m_amount >= 0 )
+	if (m_amount >= 0)
 	{
-		m_amountAdd = ( 1.0f - m_amount ) * m_valueForZeroAmount;
+		m_amountAdd = (1.0f - m_amount) * m_valueForZeroAmount;
 	}
 	else
 	{
@@ -430,96 +387,95 @@ void EnvelopeAndLfoParameters::updateSampleVars()
 	}
 
 	m_pahdFrames = predelay_frames + attack_frames + hold_frames +
-								decay_frames;
-	m_rFrames = static_cast<f_cnt_t>( frames_per_env_seg *
-					expKnobVal( m_releaseModel.value() ) );
-	m_rFrames = qMax( minimumFrames, m_rFrames );
+		decay_frames;
+	m_rFrames = static_cast<f_cnt_t>(frames_per_env_seg *
+		expKnobVal(m_releaseModel.value()));
+	m_rFrames = qMax(minimumFrames, m_rFrames);
 
-	if( static_cast<int>( floorf( m_amount * 1000.0f ) ) == 0 )
+	if (static_cast<int>(floorf(m_amount * 1000.0f)) == 0)
 	{
 		m_rFrames = minimumFrames;
 	}
 
 	// if the buffers are too small, make bigger ones - so we only alloc new memory when necessary
-	if( m_pahdBufSize < m_pahdFrames )
+	if (m_pahdBufSize < m_pahdFrames)
 	{
-		sample_t * tmp = m_pahdEnv;
+		sample_t *tmp = m_pahdEnv;
 		m_pahdEnv = new sample_t[m_pahdFrames];
 		delete[] tmp;
 		m_pahdBufSize = m_pahdFrames;
 	}
-	if( m_rBufSize < m_rFrames )
+	if (m_rBufSize < m_rFrames)
 	{
-		sample_t * tmp = m_rEnv;
+		sample_t *tmp = m_rEnv;
 		m_rEnv = new sample_t[m_rFrames];
 		delete[] tmp;
 		m_rBufSize = m_rFrames;
 	}
 
 	const float aa = m_amountAdd;
-	for( f_cnt_t i = 0; i < predelay_frames; ++i )
+	for (f_cnt_t i = 0; i < predelay_frames; ++i)
 	{
 		m_pahdEnv[i] = aa;
 	}
 
 	f_cnt_t add = predelay_frames;
 
-	const float afI = ( 1.0f / attack_frames ) * m_amount;
-	for( f_cnt_t i = 0; i < attack_frames; ++i )
+	const float afI = (1.0f / attack_frames) * m_amount;
+	for (f_cnt_t i = 0; i < attack_frames; ++i)
 	{
-		m_pahdEnv[add+i] = i * afI + aa;
+		m_pahdEnv[add + i] = i * afI + aa;
 	}
 
 	add += attack_frames;
 	const float amsum = m_amount + m_amountAdd;
-	for( f_cnt_t i = 0; i < hold_frames; ++i )
+	for (f_cnt_t i = 0; i < hold_frames; ++i)
 	{
 		m_pahdEnv[add + i] = amsum;
 	}
 
 	add += hold_frames;
-	const float dfI = ( 1.0 / decay_frames ) * ( m_sustainLevel -1 ) * m_amount;
-	for( f_cnt_t i = 0; i < decay_frames; ++i )
+	const float dfI = (1.0 / decay_frames) * (m_sustainLevel - 1) * m_amount;
+	for (f_cnt_t i = 0; i < decay_frames; ++i)
 	{
-/*
+		/*
 		m_pahdEnv[add + i] = ( m_sustainLevel + ( 1.0f -
 						(float)i / decay_frames ) *
 						( 1.0f - m_sustainLevel ) ) *
 							m_amount + m_amountAdd;
 */
-		m_pahdEnv[add + i] = amsum + i*dfI;
+		m_pahdEnv[add + i] = amsum + i * dfI;
 	}
 
-	const float rfI = ( 1.0f / m_rFrames ) * m_amount;
-	for( f_cnt_t i = 0; i < m_rFrames; ++i )
+	const float rfI = (1.0f / m_rFrames) * m_amount;
+	for (f_cnt_t i = 0; i < m_rFrames; ++i)
 	{
-		m_rEnv[i] = (float)( m_rFrames - i ) * rfI;
+		m_rEnv[i] = (float)(m_rFrames - i) * rfI;
 	}
 
 	// save this calculation in real-time-part
 	m_sustainLevel = m_sustainLevel * m_amount + m_amountAdd;
 
-
 	const float frames_per_lfo_oscillation = SECS_PER_LFO_OSCILLATION *
-				Engine::mixer()->processingSampleRate();
-	m_lfoPredelayFrames = static_cast<f_cnt_t>( frames_per_lfo_oscillation *
-				expKnobVal( m_lfoPredelayModel.value() ) );
-	m_lfoAttackFrames = static_cast<f_cnt_t>( frames_per_lfo_oscillation *
-				expKnobVal( m_lfoAttackModel.value() ) );
+		Engine::mixer()->processingSampleRate();
+	m_lfoPredelayFrames = static_cast<f_cnt_t>(frames_per_lfo_oscillation *
+		expKnobVal(m_lfoPredelayModel.value()));
+	m_lfoAttackFrames = static_cast<f_cnt_t>(frames_per_lfo_oscillation *
+		expKnobVal(m_lfoAttackModel.value()));
 	m_lfoOscillationFrames = static_cast<f_cnt_t>(
-						frames_per_lfo_oscillation *
-						m_lfoSpeedModel.value() );
-	if( m_x100Model.value() )
+		frames_per_lfo_oscillation *
+		m_lfoSpeedModel.value());
+	if (m_x100Model.value())
 	{
 		m_lfoOscillationFrames /= 100;
 	}
 	m_lfoAmount = m_lfoAmountModel.value() * 0.5f;
 
 	m_used = true;
-	if( static_cast<int>( floorf( m_lfoAmount * 1000.0f ) ) == 0 )
+	if (static_cast<int>(floorf(m_lfoAmount * 1000.0f)) == 0)
 	{
 		m_lfoAmountIsZero = true;
-		if( static_cast<int>( floorf( m_amount * 1000.0f ) ) == 0 )
+		if (static_cast<int>(floorf(m_amount * 1000.0f)) == 0)
 		{
 			m_used = false;
 		}
@@ -532,13 +488,4 @@ void EnvelopeAndLfoParameters::updateSampleVars()
 	m_bad_lfoShapeData = true;
 
 	emit dataChanged();
-
 }
-
-
-
-
-
-
-
-

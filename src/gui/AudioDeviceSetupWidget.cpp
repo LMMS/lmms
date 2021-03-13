@@ -24,8 +24,7 @@
 
 #include "AudioDeviceSetupWidget.h"
 
-
-AudioDeviceSetupWidget::AudioDeviceSetupWidget(const QString & caption, QWidget * parent) :
+AudioDeviceSetupWidget::AudioDeviceSetupWidget(const QString &caption, QWidget *parent) :
 	TabWidget(TabWidget::tr("Settings for %1").arg(tr(caption.toUtf8())), parent)
 {
 }

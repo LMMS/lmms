@@ -22,13 +22,12 @@
  *
  */
 
-#include "QTestSuite.h"
+#include <QDir>
 
 #include "ConfigManager.h"
-#include "SampleBuffer.h"
 #include "PathUtil.h"
-
-#include <QDir>
+#include "QTestSuite.h"
+#include "SampleBuffer.h"
 
 class RelativePathsTest : QTestSuite
 {

@@ -23,7 +23,6 @@
  *
  */
 
-
 #ifndef BITCRUSH_CONTROL_DIALOG_H
 #define BITCRUSH_CONTROL_DIALOG_H
 
@@ -35,7 +34,7 @@ class BitcrushControlDialog : public EffectControlDialog
 {
 	Q_OBJECT
 public:
-	BitcrushControlDialog( BitcrushControls * controls );
+	BitcrushControlDialog(BitcrushControls *controls);
 	virtual ~BitcrushControlDialog()
 	{
 	}

@@ -31,28 +31,25 @@
 namespace base64
 {
 
-
-QVariant decode( const QString & _b64, QVariant::Type _force_type )
+QVariant decode(const QString &_b64, QVariant::Type _force_type)
 {
-	char * dst = NULL;
+	char *dst = NULL;
 	int dsize = 0;
-	base64::decode( _b64, &dst, &dsize );
-	QByteArray ba( dst, dsize );
-	QBuffer buf( &ba );
-	buf.open( QBuffer::ReadOnly );
-	QDataStream in( &buf );
+	base64::decode(_b64, &dst, &dsize);
+	QByteArray ba(dst, dsize);
+	QBuffer buf(&ba);
+	buf.open(QBuffer::ReadOnly);
+	QDataStream in(&buf);
 	QVariant ret;
 	in >> ret;
-	if( _force_type != QVariant::Invalid && ret.type() != _force_type )
+	if (_force_type != QVariant::Invalid && ret.type() != _force_type)
 	{
 		buf.reset();
-		in.setVersion( QDataStream::Qt_3_3 );
+		in.setVersion(QDataStream::Qt_3_3);
 		in >> ret;
 	}
 	delete[] dst;
-	return( ret );
+	return (ret);
 }
 
-
-} ;
-
+}; // namespace base64

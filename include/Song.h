@@ -25,37 +25,34 @@
 #ifndef SONG_H
 #define SONG_H
 
-#include <utility>
-
-#include <QtCore/QSharedMemory>
-#include <QtCore/QVector>
 #include <QHash>
 #include <QString>
+#include <QtCore/QSharedMemory>
+#include <QtCore/QVector>
+#include <utility>
 
-#include "TrackContainer.h"
 #include "Controller.h"
 #include "MeterModel.h"
 #include "Mixer.h"
+#include "TrackContainer.h"
 #include "VstSyncController.h"
-
 
 class AutomationTrack;
 class Pattern;
 class TimeLineWidget;
-
 
 const bpm_t MinTempo = 10;
 const bpm_t DefaultTempo = 140;
 const bpm_t MaxTempo = 999;
 const tick_t MaxSongLength = 9999 * DefaultTicksPerBar;
 
-
 class LMMS_EXPORT Song : public TrackContainer
 {
 	Q_OBJECT
-	mapPropertyFromModel( int,getTempo,setTempo,m_tempoModel );
-	mapPropertyFromModel( int,masterPitch,setMasterPitch,m_masterPitchModel );
-	mapPropertyFromModel( int,masterVolume,setMasterVolume, m_masterVolumeModel );
+	mapPropertyFromModel(int, getTempo, setTempo, m_tempoModel);
+	mapPropertyFromModel(int, masterPitch, setMasterPitch, m_masterPitchModel);
+	mapPropertyFromModel(int, masterVolume, setMasterVolume, m_masterVolumeModel);
+
 public:
 	enum PlayModes
 	{
@@ -65,34 +62,36 @@ public:
 		Mode_PlayPattern,
 		Mode_PlayAutomationPattern,
 		Mode_Count
-	} ;
+	};
 
-	struct SaveOptions {
+	struct SaveOptions
+	{
 		/**
 		 * Should we discard MIDI ControllerConnections from project files?
 		 */
 		BoolModel discardMIDIConnections{false};
 
-		void setDefaultOptions() {
+		void setDefaultOptions()
+		{
 			discardMIDIConnections.setValue(false);
 		}
 	};
 
 	void clearErrors();
-	void collectError( const QString error );
+	void collectError(const QString error);
 	bool hasErrors();
 	QString errorSummary();
 
 	class PlayPos : public TimePos
 	{
 	public:
-		PlayPos( const int abs = 0 ) :
-			TimePos( abs ),
-			m_timeLine( NULL ),
-			m_currentFrame( 0.0f )
+		PlayPos(const int abs = 0) :
+			TimePos(abs),
+			m_timeLine(NULL),
+			m_currentFrame(0.0f)
 		{
 		}
-		inline void setCurrentFrame( const float f )
+		inline void setCurrentFrame(const float f)
 		{
 			m_currentFrame = f;
 		}
@@ -100,7 +99,7 @@ public:
 		{
 			return m_currentFrame;
 		}
-		inline void setJumped( const bool jumped )
+		inline void setJumped(const bool jumped)
 		{
 			m_jumped = jumped;
 		}
@@ -108,13 +107,12 @@ public:
 		{
 			return m_jumped;
 		}
-		TimeLineWidget * m_timeLine;
+		TimeLineWidget *m_timeLine;
 
 	private:
 		float m_currentFrame;
 		bool m_jumped;
-
-	} ;
+	};
 
 	void processNextBuffer();
 
@@ -133,13 +131,13 @@ public:
 		return m_elapsedMilliSeconds[playMode];
 	}
 
-	inline void setToTime(TimePos const & pos)
+	inline void setToTime(TimePos const &pos)
 	{
 		m_elapsedMilliSeconds[m_playMode] = pos.getTimeInMilliseconds(getTempo());
 		m_playPos[m_playMode].setTicks(pos.getTicks());
 	}
 
-	inline void setToTime(TimePos const & pos, PlayModes playMode)
+	inline void setToTime(TimePos const &pos, PlayModes playMode)
 	{
 		m_elapsedMilliSeconds[playMode] = pos.getTimeInMilliseconds(getTempo());
 		m_playPos[playMode].setTicks(pos.getTicks());
@@ -205,7 +203,7 @@ public:
 		return m_exporting;
 	}
 
-	inline void setExportLoop( bool exportLoop )
+	inline void setExportLoop(bool exportLoop)
 	{
 		m_exportLoop = exportLoop;
 	}
@@ -214,7 +212,7 @@ public:
 	{
 		return m_recording;
 	}
-	
+
 	inline void setLoopRenderCount(int count)
 	{
 		if (count < 1)
@@ -223,7 +221,7 @@ public:
 			m_loopRenderCount = count;
 		m_loopRenderRemaining = m_loopRenderCount;
 	}
-    
+
 	inline int getLoopRenderCount() const
 	{
 		return m_loopRenderCount;
@@ -232,7 +230,7 @@ public:
 	bool isExportDone() const;
 	int getExportProgress() const;
 
-	inline void setRenderBetweenMarkers( bool renderBetweenMarkers )
+	inline void setRenderBetweenMarkers(bool renderBetweenMarkers)
 	{
 		m_renderBetweenMarkers = renderBetweenMarkers;
 	}
@@ -242,19 +240,19 @@ public:
 		return m_playMode;
 	}
 
-	inline PlayPos & getPlayPos( PlayModes pm )
+	inline PlayPos &getPlayPos(PlayModes pm)
 	{
 		return m_playPos[pm];
 	}
-	inline const PlayPos & getPlayPos( PlayModes pm ) const
+	inline const PlayPos &getPlayPos(PlayModes pm) const
 	{
 		return m_playPos[pm];
 	}
-	inline PlayPos & getPlayPos()
+	inline PlayPos &getPlayPos()
 	{
 		return getPlayPos(m_playMode);
 	}
-	inline const PlayPos & getPlayPos() const
+	inline const PlayPos &getPlayPos() const
 	{
 		return getPlayPos(m_playMode);
 	}
@@ -265,11 +263,10 @@ public:
 		return m_length;
 	}
 
-
 	bpm_t getTempo();
-	AutomationPattern * tempoAutomationPattern() override;
+	AutomationPattern *tempoAutomationPattern() override;
 
-	AutomationTrack * globalAutomationTrack()
+	AutomationTrack *globalAutomationTrack()
 	{
 		return m_globalAutomationTrack;
 	}
@@ -279,13 +276,13 @@ public:
 
 	// file management
 	void createNewProject();
-	void createNewProjectFromTemplate( const QString & templ );
-	void loadProject( const QString & filename );
+	void createNewProjectFromTemplate(const QString &templ);
+	void loadProject(const QString &filename);
 	bool guiSaveProject();
-	bool guiSaveProjectAs( const QString & filename );
-	bool saveProjectFile( const QString & filename );
+	bool guiSaveProjectAs(const QString &filename);
+	bool saveProjectFile(const QString &filename);
 
-	const QString & projectFileName() const
+	const QString &projectFileName() const
 	{
 		return m_fileName;
 	}
@@ -321,25 +318,24 @@ public:
 		return false;
 	}
 
-	void addController( Controller * c );
-	void removeController( Controller * c );
+	void addController(Controller *c);
+	void removeController(Controller *c);
 
-
-	const ControllerVector & controllers() const
+	const ControllerVector &controllers() const
 	{
 		return m_controllers;
 	}
 
-
-	MeterModel & getTimeSigModel()
+	MeterModel &getTimeSigModel()
 	{
 		return m_timeSigModel;
 	}
 
-	void exportProjectMidi(QString const & exportFileName) const;
+	void exportProjectMidi(QString const &exportFileName) const;
 
 	inline void setLoadOnLaunch(bool value) { m_loadOnLaunch = value; }
-	SaveOptions &getSaveOptions() {
+	SaveOptions &getSaveOptions()
+	{
 		return m_saveOptions;
 	}
 
@@ -350,20 +346,18 @@ public slots:
 	void record();
 	void playAndRecord();
 	void playBB();
-	void playPattern( const Pattern * patternToPlay, bool loop = true );
+	void playPattern(const Pattern *patternToPlay, bool loop = true);
 	void togglePause();
 	void stop();
 
 	void startExport();
 	void stopExport();
 
-
 	void setModified();
 
 	void clearProject();
 
 	void addBBTrack();
-
 
 private slots:
 	void insertBar();
@@ -380,13 +374,10 @@ private slots:
 
 	void updateFramesPerTick();
 
-
-
 private:
 	Song();
-	Song( const Song & );
+	Song(const Song &);
 	virtual ~Song();
-
 
 	inline bar_t currentBar() const
 	{
@@ -404,20 +395,20 @@ private:
 			m_playPos[m_playMode].currentFrame();
 	}
 
-	void setPlayPos( tick_t ticks, PlayModes playMode );
+	void setPlayPos(tick_t ticks, PlayModes playMode);
 
-	void saveControllerStates( QDomDocument & doc, QDomElement & element );
-	void restoreControllerStates( const QDomElement & element );
+	void saveControllerStates(QDomDocument &doc, QDomElement &element);
+	void restoreControllerStates(const QDomElement &element);
 
 	void removeAllControllers();
 
-	void processAutomations(const TrackList& tracks, TimePos timeStart, fpp_t frames);
+	void processAutomations(const TrackList &tracks, TimePos timeStart, fpp_t frames);
 
 	void setModified(bool value);
 
-	void setProjectFileName(QString const & projectFileName);
+	void setProjectFileName(QString const &projectFileName);
 
-	AutomationTrack * m_globalAutomationTrack;
+	AutomationTrack *m_globalAutomationTrack;
 
 	IntModel m_tempoModel;
 	MeterModel m_timeSigModel;
@@ -453,7 +444,7 @@ private:
 	PlayPos m_playPos[Mode_Count];
 	bar_t m_length;
 
-	const Pattern* m_patternToPlay;
+	const Pattern *m_patternToPlay;
 	bool m_loopPattern;
 
 	double m_elapsedMilliSeconds[Mode_Count];
@@ -461,7 +452,7 @@ private:
 	bar_t m_elapsedBars;
 
 	VstSyncController m_vstSyncController;
-    
+
 	int m_loopRenderCount;
 	int m_loopRenderRemaining;
 	TimePos m_exportSongBegin;
@@ -479,16 +470,15 @@ signals:
 	void projectLoaded();
 	void playbackStateChanged();
 	void playbackPositionChanged();
-	void lengthChanged( int bars );
-	void tempoChanged( bpm_t newBPM );
-	void timeSignatureChanged( int oldTicksPerBar, int ticksPerBar );
-	void controllerAdded( Controller * );
-	void controllerRemoved( Controller * );
+	void lengthChanged(int bars);
+	void tempoChanged(bpm_t newBPM);
+	void timeSignatureChanged(int oldTicksPerBar, int ticksPerBar);
+	void controllerAdded(Controller *);
+	void controllerRemoved(Controller *);
 	void updateSampleTracks();
 	void stopped();
 	void modified();
 	void projectFileNameChanged();
-} ;
-
+};
 
 #endif

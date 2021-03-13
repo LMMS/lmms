@@ -22,7 +22,6 @@
  *
  */
 
-
 #ifndef FADE_BUTTON_H
 #define FADE_BUTTON_H
 
@@ -30,29 +29,25 @@
 #include <QColor>
 #include <QElapsedTimer>
 
-
 class FadeButton : public QAbstractButton
 {
 	Q_OBJECT
 public:
-	FadeButton( const QColor & _normal_color,
-		const QColor & _activated_color,
-		const QColor & _hold_color,
-		QWidget * _parent );
+	FadeButton(const QColor &_normal_color,
+		const QColor &_activated_color,
+		const QColor &_hold_color,
+		QWidget *_parent);
 
 	virtual ~FadeButton();
-	void setActiveColor( const QColor & activated_color );
-
+	void setActiveColor(const QColor &activated_color);
 
 public slots:
 	void activate();
 	void activateOnce();
 	void noteEnd();
 
-
 protected:
-	void paintEvent( QPaintEvent * _pe ) override;
-
+	void paintEvent(QPaintEvent *_pe) override;
 
 private:
 	QElapsedTimer m_stateTimer;
@@ -67,8 +62,6 @@ private:
 	int activeNotes;
 
 	QColor fadeToColor(QColor, QColor, QElapsedTimer, float);
-
-} ;
-
+};
 
 #endif

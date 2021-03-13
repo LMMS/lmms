@@ -45,65 +45,51 @@ public:
 		m_gain(0),
 		m_bw(0)
 	{
-
 	}
 
-
-
-
-	virtual inline void setSampleRate( int sampleRate )
+	virtual inline void setSampleRate(int sampleRate)
 	{
-		if( sampleRate != m_sampleRate )
+		if (sampleRate != m_sampleRate)
 		{
 			m_sampleRate = sampleRate;
 			calcCoefficents();
 		}
 	}
 
-
-
-
-	virtual inline void setFrequency( float freq ){
-		if ( freq != m_freq )
+	virtual inline void setFrequency(float freq)
+	{
+		if (freq != m_freq)
 		{
 			m_freq = freq;
 			calcCoefficents();
 		}
 	}
 
-
-
-
-	virtual inline void setQ( float res )
+	virtual inline void setQ(float res)
 	{
-		if ( res != m_res )
+		if (res != m_res)
 		{
 			m_res = res;
 			calcCoefficents();
 		}
 	}
 
-
-
-
-	virtual inline void setGain( float gain )
+	virtual inline void setGain(float gain)
 	{
-		if ( gain != m_gain )
+		if (gain != m_gain)
 		{
 			m_gain = gain;
 			calcCoefficents();
 		}
 	}
 
-
-
-	virtual inline void setParameters( float sampleRate, float freq, float res, float gain )
+	virtual inline void setParameters(float sampleRate, float freq, float res, float gain)
 	{
-		bool hasChanged = ( sampleRate != m_sampleRate ||
-		                    freq != m_freq ||
-		                    res != m_res ||
-		                    gain != m_gain );
-		if ( hasChanged )
+		bool hasChanged = (sampleRate != m_sampleRate ||
+			freq != m_freq ||
+			res != m_res ||
+			gain != m_gain);
+		if (hasChanged)
 		{
 			m_sampleRate = sampleRate;
 			m_freq = freq;
@@ -112,7 +98,6 @@ public:
 			calcCoefficents();
 		}
 	}
-
 
 	///
 	/// \brief update
@@ -123,40 +108,33 @@ public:
 	/// \param frameProgress percentage of frame processed
 	/// \return
 	///
-	inline float update( float in, ch_cnt_t ch, float frameProgress)
+	inline float update(float in, ch_cnt_t ch, float frameProgress)
 	{
-		float initailF =  m_biQuadFrameInitial.update( in, ch );
-		float targetF = m_biQuadFrameTarget.update( in, ch );
+		float initailF = m_biQuadFrameInitial.update(in, ch);
+		float targetF = m_biQuadFrameTarget.update(in, ch);
 
-		if(frameProgress > 0.99999 )
+		if (frameProgress > 0.99999)
 		{
-			m_biQuadFrameInitial= m_biQuadFrameTarget;
+			m_biQuadFrameInitial = m_biQuadFrameTarget;
 		}
 
-		return (1.0f-frameProgress) * initailF + frameProgress * targetF;
-
+		return (1.0f - frameProgress) * initailF + frameProgress * targetF;
 	}
-
 
 protected:
 	///
 	/// \brief calcCoefficents
 	///  Override this in child classes to provide the coefficents, based on
 	///  Freq, Res and Gain
-	virtual void calcCoefficents(){
-		setCoeffs( 0, 0, 0, 0, 0 );
-
-	}
-
-	inline void setCoeffs( float a1, float a2, float b0, float b1, float b2 )
+	virtual void calcCoefficents()
 	{
-		m_biQuadFrameTarget.setCoeffs( a1, a2, b0, b1, b2 );
+		setCoeffs(0, 0, 0, 0, 0);
 	}
 
-
-
-
-
+	inline void setCoeffs(float a1, float a2, float b0, float b1, float b2)
+	{
+		m_biQuadFrameTarget.setCoeffs(a1, a2, b0, b1, b2);
+	}
 
 	float m_sampleRate;
 	float m_freq;
@@ -167,33 +145,30 @@ protected:
 	StereoBiQuad m_biQuadFrameTarget;
 };
 
-
-
-
 ///
 /// \brief The EqHp12Filter class
 /// A 2 pole High Pass Filter
 /// Coefficent calculations from http://www.musicdsp.org/files/Audio-EQ-Cookbook.txt
 class EqHp12Filter : public EqFilter
 {
-public :
+public:
 	virtual void calcCoefficents()
 	{
 
 		// calc intermediate
 		float w0 = F_2PI * m_freq / m_sampleRate;
-		float c = cosf( w0 );
-		float s = sinf( w0 );
-		float alpha = s / ( 2 * m_res );
+		float c = cosf(w0);
+		float s = sinf(w0);
+		float alpha = s / (2 * m_res);
 
 		float a0, a1, a2, b0, b1, b2; // coeffs to calculate
 
 		//calc coefficents
-		b0 = ( 1 + c ) * 0.5;
-		b1 = ( -( 1 + c ) );
-		b2 = ( 1 + c ) * 0.5;
+		b0 = (1 + c) * 0.5;
+		b1 = (-(1 + c));
+		b2 = (1 + c) * 0.5;
 		a0 = 1 + alpha;
-		a1 = ( -2 * c );
+		a1 = (-2 * c);
 		a2 = 1 - alpha;
 
 		//normalise
@@ -205,14 +180,9 @@ public :
 
 		a0 = 1;
 
-		setCoeffs( a1, a2, b0, b1, b2 );
-
-
+		setCoeffs(a1, a2, b0, b1, b2);
 	}
 };
-
-
-
 
 ///
 /// \brief The EqLp12Filter class.
@@ -221,22 +191,22 @@ public :
 ///
 class EqLp12Filter : public EqFilter
 {
-public :
+public:
 	virtual void calcCoefficents()
 	{
 
 		// calc intermediate
 		float w0 = F_2PI * m_freq / m_sampleRate;
-		float c = cosf( w0 );
-		float s = sinf( w0 );
-		float alpha = s / ( 2 * m_res );
+		float c = cosf(w0);
+		float s = sinf(w0);
+		float alpha = s / (2 * m_res);
 
 		float a0, a1, a2, b0, b1, b2; // coeffs to calculate
 
 		//calc coefficents
-		b0 = ( 1 - c ) * 0.5;
+		b0 = (1 - c) * 0.5;
 		b1 = 1 - c;
-		b2 = ( 1 - c ) * 0.5;
+		b2 = (1 - c) * 0.5;
 		a0 = 1 + alpha;
 		a1 = -2 * c;
 		a2 = 1 - alpha;
@@ -250,11 +220,9 @@ public :
 
 		a0 = 1;
 
-		setCoeffs( a1, a2, b0, b1, b2 );
+		setCoeffs(a1, a2, b0, b1, b2);
 	}
 };
-
-
 
 ///
 /// \brief The EqPeakFilter class
@@ -264,26 +232,24 @@ public :
 class EqPeakFilter : public EqFilter
 {
 public:
-
-
 	virtual void calcCoefficents()
 	{
 		// calc intermediate
 		float w0 = F_2PI * m_freq / m_sampleRate;
-		float c = cosf( w0 );
-		float s = sinf( w0 );
-		float A =  pow( 10, m_gain * 0.025);
-		float alpha = s * sinh( log( 2 ) / 2 * m_bw * w0 / sinf(w0) );
+		float c = cosf(w0);
+		float s = sinf(w0);
+		float A = pow(10, m_gain * 0.025);
+		float alpha = s * sinh(log(2) / 2 * m_bw * w0 / sinf(w0));
 
 		float a0, a1, a2, b0, b1, b2; // coeffs to calculate
 
 		//calc coefficents
-		b0 =   1 + alpha*A;
-		b1 =  -2*c;
-		b2 =   1 - alpha*A;
-		a0 =   1 + alpha/A;
-		a1 =  -2*c;
-		a2 =   1 - alpha/A;
+		b0 = 1 + alpha * A;
+		b1 = -2 * c;
+		b2 = 1 - alpha * A;
+		a0 = 1 + alpha / A;
+		a1 = -2 * c;
+		a2 = 1 - alpha / A;
 
 		//normalise
 		b0 /= a0;
@@ -293,63 +259,63 @@ public:
 		a2 /= a0;
 		a0 = 1;
 
-		setCoeffs( a1, a2, b0, b1, b2 );
+		setCoeffs(a1, a2, b0, b1, b2);
 	}
 
-	virtual inline void setParameters( float sampleRate, float freq, float bw, float gain )
+	virtual inline void setParameters(float sampleRate, float freq, float bw, float gain)
 	{
 		bool hasChanged = false;
-		if( sampleRate != m_sampleRate )
+		if (sampleRate != m_sampleRate)
 		{
 			m_sampleRate = sampleRate;
 			hasChanged = true;
 		}
-		if ( freq != m_freq )
+		if (freq != m_freq)
 		{
 			m_freq = freq;
 			hasChanged = true;
 		}
-		if ( bw != m_bw )
+		if (bw != m_bw)
 		{
 			m_bw = bw;
 			hasChanged = true;
 		}
-		if ( gain != m_gain )
+		if (gain != m_gain)
 		{
 			m_gain = gain;
 			hasChanged = true;
 		}
 
-		if ( hasChanged ) { calcCoefficents(); }
+		if (hasChanged)
+		{
+			calcCoefficents();
+		}
 	}
 };
 
-
-
-
 class EqLowShelfFilter : public EqFilter
 {
-public :
+public:
 	virtual void calcCoefficents()
 	{
 
 		// calc intermediate
 		float w0 = F_2PI * m_freq / m_sampleRate;
-		float c = cosf( w0 );
-		float s = sinf( w0 );
-		float A =  pow( 10, m_gain * 0.025);
+		float c = cosf(w0);
+		float s = sinf(w0);
+		float A = pow(10, m_gain * 0.025);
 		//        float alpha = s / ( 2 * m_res );
-		float beta = sqrt( A ) / m_res;
+		float beta = sqrt(A) / m_res;
 
 		float a0, a1, a2, b0, b1, b2; // coeffs to calculate
 
 		//calc coefficents
-		b0 = A * ( ( A+1 ) - ( A-1 ) * c + beta * s );
-		b1 = 2  * A * ( ( A - 1 ) - ( A + 1 ) * c) ;
-		b2 = A * ( ( A + 1 ) - ( A - 1 ) * c - beta * s);
-		a0 = ( A + 1 ) + ( A - 1 ) * c + beta * s;
-		a1 = -2 * ( ( A - 1 ) + ( A + 1 ) * c );
-		a2 = ( A + 1 ) + ( A - 1) * c - beta * s;
+		b0 = A * ((A + 1) - (A - 1) * c + beta * s);
+		b1 = 2 * A * ((A - 1) - (A + 1) * c);
+		b2 = A * ((A + 1) - (A - 1) * c - beta * s);
+		a0 = (A + 1) + (A - 1) * c + beta * s;
+		a1 = -2 * ((A - 1) + (A + 1) * c);
+		a2 = (A + 1) + (A - 1) * c - beta * s;
 
 		//normalise
 		b0 /= a0;
@@ -360,34 +326,32 @@ public :
 
 		a0 = 1;
 
-		setCoeffs( a1, a2, b0, b1, b2 );
-
-
+		setCoeffs(a1, a2, b0, b1, b2);
 	}
 };
 
 class EqHighShelfFilter : public EqFilter
 {
-public :
+public:
 	virtual void calcCoefficents()
 	{
 
 		// calc intermediate
 		float w0 = F_2PI * m_freq / m_sampleRate;
-		float c = cosf( w0 );
-		float s = sinf( w0 );
-		float A =  pow( 10, m_gain * 0.025 );
-		float beta = sqrt( A ) / m_res;
+		float c = cosf(w0);
+		float s = sinf(w0);
+		float A = pow(10, m_gain * 0.025);
+		float beta = sqrt(A) / m_res;
 
 		float a0, a1, a2, b0, b1, b2; // coeffs to calculate
 
 		//calc coefficents
-		b0 = A *( ( A +1 ) + ( A - 1 ) * c + beta * s);
-		b1 = -2 * A * ( ( A - 1 ) + ( A + 1 ) * c );
-		b2 = A * ( ( A + 1 ) + ( A - 1 ) * c - beta * s);
-		a0 = ( A + 1 ) - ( A - 1 ) * c + beta * s;
-		a1 = 2 * ( ( A - 1 ) - ( A + 1 ) * c );
-		a2 = ( A + 1) - ( A - 1 ) * c - beta * s;
+		b0 = A * ((A + 1) + (A - 1) * c + beta * s);
+		b1 = -2 * A * ((A - 1) + (A + 1) * c);
+		b2 = A * ((A + 1) + (A - 1) * c - beta * s);
+		a0 = (A + 1) - (A - 1) * c + beta * s;
+		a1 = 2 * ((A - 1) - (A + 1) * c);
+		a2 = (A + 1) - (A - 1) * c - beta * s;
 		//normalise
 		b0 /= a0;
 		b1 /= a0;
@@ -396,64 +360,51 @@ public :
 		a2 /= a0;
 		a0 = 1;
 
-		setCoeffs( a1, a2, b0, b1, b2 );
+		setCoeffs(a1, a2, b0, b1, b2);
 	}
 };
-
-
-
 
 class EqLinkwitzRiley : public StereoLinkwitzRiley
 {
 public:
 	EqLinkwitzRiley() :
-		StereoLinkwitzRiley( 44100),
-		m_freq(0 ),
-		m_sr( 1 )
+		StereoLinkwitzRiley(44100),
+		m_freq(0),
+		m_sr(1)
 	{
 	}
 
-	virtual inline void setSR( int sampleRate )
+	virtual inline void setSR(int sampleRate)
 	{
-		if( sampleRate != m_sr )
+		if (sampleRate != m_sr)
 		{
 			m_sr = sampleRate;
-			setSampleRate( sampleRate );
+			setSampleRate(sampleRate);
 			setLowpass(m_freq);
 		}
 	}
 
-
-
-
-	virtual inline void setFrequency( float freq ){
-		if ( freq != m_freq )
+	virtual inline void setFrequency(float freq)
+	{
+		if (freq != m_freq)
 		{
 			m_freq = freq;
 			setLowpass(m_freq);
 		}
 	}
 
-
-
-
-	virtual void processBuffer( sampleFrame* buf, const fpp_t frames )
+	virtual void processBuffer(sampleFrame *buf, const fpp_t frames)
 	{
-		for ( fpp_t f = 0 ; f < frames ; ++f)
+		for (fpp_t f = 0; f < frames; ++f)
 		{
-			buf[f][0] = update( buf[f][0] , 0);
-			buf[f][1] = update( buf[f][1] , 1);
+			buf[f][0] = update(buf[f][0], 0);
+			buf[f][1] = update(buf[f][1], 1);
 		}
 	}
-protected:
 
+protected:
 	float m_freq;
 	int m_sr;
-
-
 };
-
-
-
 
 #endif // EQFILTER_H

@@ -25,14 +25,13 @@
 #ifndef THREADABLE_JOB_H
 #define THREADABLE_JOB_H
 
-#include "lmms_basics.h"
-
 #include <atomic>
+
+#include "lmms_basics.h"
 
 class ThreadableJob
 {
 public:
-
 	enum class ProcessingState : int
 	{
 		Unstarted,
@@ -60,7 +59,7 @@ public:
 	{
 		m_state = ProcessingState::Queued;
 	}
-	
+
 	inline void done()
 	{
 		m_state = ProcessingState::Done;
@@ -78,11 +77,10 @@ public:
 
 	virtual bool requiresProcessing() const = 0;
 
-
 protected:
 	virtual void doProcessing() = 0;
 
 	std::atomic<ProcessingState> m_state;
-} ;
+};
 
 #endif

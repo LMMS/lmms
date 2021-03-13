@@ -22,7 +22,6 @@
  *
  */
 
-
 #ifndef FLUIDSYNTHSHIMS_H
 #define FLUIDSYNTHSHIMS_H
 
@@ -30,38 +29,38 @@
 
 #if FLUIDSYNTH_VERSION_MAJOR < 2
 
-inline const char* fluid_preset_get_name(fluid_preset_t* preset)
+inline const char *fluid_preset_get_name(fluid_preset_t *preset)
 {
 	return preset->get_name(preset);
 }
 
-inline int fluid_preset_get_banknum(fluid_preset_t* preset)
+inline int fluid_preset_get_banknum(fluid_preset_t *preset)
 {
 	return preset->get_banknum(preset);
 }
 
-inline int fluid_preset_get_num(fluid_preset_t* preset)
+inline int fluid_preset_get_num(fluid_preset_t *preset)
 {
 	return preset->get_num(preset);
 }
 
-inline fluid_sfont_t* fluid_preset_get_sfont(fluid_preset_t* preset)
+inline fluid_sfont_t *fluid_preset_get_sfont(fluid_preset_t *preset)
 {
 	return preset->sfont;
 }
 
-inline char* fluid_sfont_get_name(fluid_sfont_t* sfont)
+inline char *fluid_sfont_get_name(fluid_sfont_t *sfont)
 {
 	return sfont->get_name(sfont);
 }
 
-inline void fluid_sfont_iteration_start(fluid_sfont_t* sfont)
+inline void fluid_sfont_iteration_start(fluid_sfont_t *sfont)
 {
 	sfont->iteration_start(sfont);
 }
 
 // Due to the API change, we can't simply shim the 'fluid_sfont_iteration_next' function
-inline fluid_preset_t* fluid_sfont_iteration_next_wrapper(fluid_sfont_t* sfont, fluid_preset_t* preset)
+inline fluid_preset_t *fluid_sfont_iteration_next_wrapper(fluid_sfont_t *sfont, fluid_preset_t *preset)
 {
 	return sfont->iteration_next(sfont, preset) ? preset : nullptr;
 }
@@ -78,7 +77,7 @@ inline fluid_preset_t* fluid_sfont_iteration_next_wrapper(fluid_sfont_t* sfont, 
 #define FLUID_CHORUS_DEFAULT_SPEED 0.3f
 #define FLUID_CHORUS_DEFAULT_DEPTH 8.0f
 
-inline fluid_preset_t* fluid_sfont_iteration_next_wrapper(fluid_sfont_t* sfont, fluid_preset_t*)
+inline fluid_preset_t *fluid_sfont_iteration_next_wrapper(fluid_sfont_t *sfont, fluid_preset_t *)
 {
 	return fluid_sfont_iteration_next(sfont);
 }

@@ -26,9 +26,8 @@
 #define REVERBSC_CONTROLS_H
 
 #include "EffectControls.h"
-#include "ReverbSCControlDialog.h"
 #include "Knob.h"
-
+#include "ReverbSCControlDialog.h"
 
 class ReverbSCEffect;
 
@@ -36,13 +35,13 @@ class ReverbSCControls : public EffectControls
 {
 	Q_OBJECT
 public:
-	ReverbSCControls( ReverbSCEffect* effect );
+	ReverbSCControls(ReverbSCEffect *effect);
 	virtual ~ReverbSCControls()
 	{
 	}
 
-	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
-	virtual void loadSettings( const QDomElement & _this );
+	virtual void saveSettings(QDomDocument &_doc, QDomElement &_parent);
+	virtual void loadSettings(const QDomElement &_this);
 	inline virtual QString nodeName() const
 	{
 		return "ReverbSCControls";
@@ -53,18 +52,17 @@ public:
 		return 4;
 	}
 
-	virtual EffectControlDialog* createView()
+	virtual EffectControlDialog *createView()
 	{
-		return new ReverbSCControlDialog( this );
+		return new ReverbSCControlDialog(this);
 	}
-
 
 private slots:
 	void changeControl();
 	void changeSampleRate();
 
 private:
-	ReverbSCEffect* m_effect;
+	ReverbSCEffect *m_effect;
 	FloatModel m_inputGainModel;
 	FloatModel m_sizeModel;
 	FloatModel m_colorModel;
@@ -72,7 +70,6 @@ private:
 
 	friend class ReverbSCControlDialog;
 	friend class ReverbSCEffect;
-
-} ;
+};
 
 #endif

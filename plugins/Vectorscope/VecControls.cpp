@@ -29,7 +29,6 @@
 #include "VecControlsDialog.h"
 #include "Vectorscope.h"
 
-
 VecControls::VecControls(Vectorscope *effect) :
 	EffectControls(effect),
 	m_effect(effect),
@@ -40,19 +39,17 @@ VecControls::VecControls(Vectorscope *effect) :
 	m_highQualityModel(false, this, tr("High quality"))
 {
 	// Colors (percentages include sRGB gamma correction)
-	m_colorFG = QColor(60, 255, 130, 255);		// ~LMMS green
-	m_colorGrid = QColor(76, 80, 84, 128);		// ~60 % gray (slightly cold / blue), 50 % transparent
-	m_colorLabels = QColor(76, 80, 84, 255);	// ~60 % gray (slightly cold / blue)
-	m_colorOutline = QColor(30, 34, 38, 255);	// ~40 % gray (slightly cold / blue)
+	m_colorFG = QColor(60, 255, 130, 255);	  // ~LMMS green
+	m_colorGrid = QColor(76, 80, 84, 128);	  // ~60 % gray (slightly cold / blue), 50 % transparent
+	m_colorLabels = QColor(76, 80, 84, 255);  // ~60 % gray (slightly cold / blue)
+	m_colorOutline = QColor(30, 34, 38, 255); // ~40 % gray (slightly cold / blue)
 }
 
-
 // Create the VecControlDialog widget which handles display of GUI elements.
-EffectControlDialog* VecControls::createView()
+EffectControlDialog *VecControls::createView()
 {
 	return new VecControlsDialog(this);
 }
-
 
 void VecControls::loadSettings(const QDomElement &element)
 {
@@ -60,7 +57,6 @@ void VecControls::loadSettings(const QDomElement &element)
 	m_logarithmicModel.loadSettings(element, "Logarithmic");
 	m_highQualityModel.loadSettings(element, "HighQuality");
 }
-
 
 void VecControls::saveSettings(QDomDocument &document, QDomElement &element)
 {

@@ -23,47 +23,46 @@
  *
  */
 
+#include "AmplifierControlDialog.h"
+
 #include <QLayout>
 
-#include "AmplifierControlDialog.h"
 #include "AmplifierControls.h"
 #include "embed.h"
 
-
-
-AmplifierControlDialog::AmplifierControlDialog( AmplifierControls* controls ) :
-	EffectControlDialog( controls )
+AmplifierControlDialog::AmplifierControlDialog(AmplifierControls *controls) :
+	EffectControlDialog(controls)
 {
-	setAutoFillBackground( true );
+	setAutoFillBackground(true);
 	QPalette pal;
-	pal.setBrush( backgroundRole(), PLUGIN_NAME::getIconPixmap( "artwork" ) );
-	setPalette( pal );
-	setFixedSize( 100, 110 );
+	pal.setBrush(backgroundRole(), PLUGIN_NAME::getIconPixmap("artwork"));
+	setPalette(pal);
+	setFixedSize(100, 110);
 
-	Knob * volumeKnob = new Knob( knobBright_26, this);
-	volumeKnob -> move( 16, 10 );
-	volumeKnob -> setVolumeKnob( true );
-	volumeKnob->setModel( &controls->m_volumeModel );
-	volumeKnob->setLabel( tr( "VOL" ) );
-	volumeKnob->setHintText( tr( "Volume:" ) , "%" );
+	Knob *volumeKnob = new Knob(knobBright_26, this);
+	volumeKnob->move(16, 10);
+	volumeKnob->setVolumeKnob(true);
+	volumeKnob->setModel(&controls->m_volumeModel);
+	volumeKnob->setLabel(tr("VOL"));
+	volumeKnob->setHintText(tr("Volume:"), "%");
 
-	Knob * panKnob = new Knob( knobBright_26, this);
-	panKnob -> move( 57, 10 );
-	panKnob->setModel( &controls->m_panModel );
-	panKnob->setLabel( tr( "PAN" ) );
-	panKnob->setHintText( tr( "Panning:" ) , "" );
+	Knob *panKnob = new Knob(knobBright_26, this);
+	panKnob->move(57, 10);
+	panKnob->setModel(&controls->m_panModel);
+	panKnob->setLabel(tr("PAN"));
+	panKnob->setHintText(tr("Panning:"), "");
 
-	Knob * leftKnob = new Knob( knobBright_26, this);
-	leftKnob -> move( 16, 65 );
-	leftKnob -> setVolumeKnob( true );
-	leftKnob->setModel( &controls->m_leftModel );
-	leftKnob->setLabel( tr( "LEFT" ) );
-	leftKnob->setHintText( tr( "Left gain:" ) , "%" );
+	Knob *leftKnob = new Knob(knobBright_26, this);
+	leftKnob->move(16, 65);
+	leftKnob->setVolumeKnob(true);
+	leftKnob->setModel(&controls->m_leftModel);
+	leftKnob->setLabel(tr("LEFT"));
+	leftKnob->setHintText(tr("Left gain:"), "%");
 
-	Knob * rightKnob = new Knob( knobBright_26, this);
-	rightKnob -> move( 57, 65 );
-	rightKnob -> setVolumeKnob( true );
-	rightKnob->setModel( &controls->m_rightModel );
-	rightKnob->setLabel( tr( "RIGHT" ) );
-	rightKnob->setHintText( tr( "Right gain:" ) , "%" );
+	Knob *rightKnob = new Knob(knobBright_26, this);
+	rightKnob->move(57, 65);
+	rightKnob->setVolumeKnob(true);
+	rightKnob->setModel(&controls->m_rightModel);
+	rightKnob->setLabel(tr("RIGHT"));
+	rightKnob->setHintText(tr("Right gain:"), "%");
 }

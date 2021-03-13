@@ -30,26 +30,26 @@
 class StereoDelay
 {
 public:
-	StereoDelay( int maxLength, int sampleRate );
+	StereoDelay(int maxLength, int sampleRate);
 	~StereoDelay();
-	inline void setLength( float length )
+	inline void setLength(float length)
 	{
-		if( length <= m_maxLength && length >= 0 )
+		if (length <= m_maxLength && length >= 0)
 		{
 			m_length = length;
 		}
 	}
 
-	inline void setFeedback( float feedback )
+	inline void setFeedback(float feedback)
 	{
 		m_feedback = feedback;
 	}
 
-	void tick( sampleFrame& frame );
-	void setSampleRate( int sampleRate );
+	void tick(sampleFrame &frame);
+	void setSampleRate(int sampleRate);
 
 private:
-	sampleFrame* m_buffer;
+	sampleFrame *m_buffer;
 	int m_maxLength;
 	float m_length;
 	int m_writeIndex;

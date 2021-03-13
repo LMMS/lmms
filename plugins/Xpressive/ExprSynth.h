@@ -28,34 +28,34 @@
 #include <cmath>
 #include <cstddef>
 #include <limits>
+
 #include "AutomatableModel.h"
 #include "Graph.h"
 #include "Instrument.h"
 #include "MemoryManager.h"
-
 
 class ExprFrontData;
 
 class ExprFront
 {
 public:
-	typedef float (*ff1data_functor)(void*, float);
-	ExprFront(const char* expr, int last_func_samples);
+	typedef float (*ff1data_functor)(void *, float);
+	ExprFront(const char *expr, int last_func_samples);
 	~ExprFront();
 	bool compile();
 	inline bool isValid() { return m_valid; }
 	float evaluate();
-	bool add_variable(const char* name, float & ref);
-	bool add_constant(const char* name, float  ref);
-	bool add_cyclic_vector(const char* name, const float* data, size_t length, bool interp = false);
-	void setIntegrate(const unsigned int* frameCounter, unsigned int sample_rate);
-	ExprFrontData* getData() { return m_data; }
+	bool add_variable(const char *name, float &ref);
+	bool add_constant(const char *name, float ref);
+	bool add_cyclic_vector(const char *name, const float *data, size_t length, bool interp = false);
+	void setIntegrate(const unsigned int *frameCounter, unsigned int sample_rate);
+	ExprFrontData *getData() { return m_data; }
+
 private:
 	ExprFrontData *m_data;
 	bool m_valid;
-	
-	static const int max_float_integer_mask=(1<<(std::numeric_limits<float>::digits))-1;
 
+	static const int max_float_integer_mask = (1 << (std::numeric_limits<float>::digits)) - 1;
 };
 
 class WaveSample
@@ -65,22 +65,22 @@ public:
 	{
 		m_length = length;
 		m_samples = new float[m_length];
-		for(int i = 0 ; i < m_length ; ++i)
+		for (int i = 0; i < m_length; ++i)
 			m_samples[i] = 0;
 	}
-	WaveSample(const graphModel * graph)
+	WaveSample(const graphModel *graph)
 	{
 		m_length = graph->length();
 		m_samples = new float[m_length];
 		memcpy(m_samples, graph->samples(), m_length * sizeof(float));
 	}
-	inline void copyFrom(const graphModel * graph)
+	inline void copyFrom(const graphModel *graph)
 	{
 		memcpy(m_samples, graph->samples(), m_length * sizeof(float));
 	}
 	~WaveSample()
 	{
-		delete [] m_samples;
+		delete[] m_samples;
 	}
 	inline void setInterpolate(bool _interpolate) { m_interpolate = _interpolate; }
 	float *m_samples;
@@ -92,12 +92,11 @@ class ExprSynth
 {
 	MM_OPERATORS
 public:
-	ExprSynth(const WaveSample* gW1, const WaveSample* gW2, const WaveSample* gW3, ExprFront* exprO1, ExprFront* exprO2, NotePlayHandle* nph,
-			const sample_rate_t sample_rate, const FloatModel* pan1, const FloatModel* pan2, float rel_trans);
+	ExprSynth(const WaveSample *gW1, const WaveSample *gW2, const WaveSample *gW3, ExprFront *exprO1, ExprFront *exprO2, NotePlayHandle *nph,
+		const sample_rate_t sample_rate, const FloatModel *pan1, const FloatModel *pan2, float rel_trans);
 	virtual ~ExprSynth();
 
-	void renderOutput(fpp_t frames, sampleFrame* buf );
-
+	void renderOutput(fpp_t frames, sampleFrame *buf);
 
 private:
 	ExprFront *m_exprO1, *m_exprO2;
@@ -108,38 +107,33 @@ private:
 	float m_note_rel_sec;
 	float m_frequency;
 	float m_released;
-	NotePlayHandle* m_nph;
+	NotePlayHandle *m_nph;
 	const sample_rate_t m_sample_rate;
-	const FloatModel *m_pan1,*m_pan2;
+	const FloatModel *m_pan1, *m_pan2;
 	float m_rel_transition;
 	float m_rel_inc;
-
-} ;
-
-
+};
 
 inline float positiveFraction(float x)
 {
 	if (std::isnan(x) || std::isinf(x))
 		return 0;
-	if (x<0)
+	if (x < 0)
 	{
-		x+=static_cast<int>(1-x);
+		x += static_cast<int>(1 - x);
 	}
-	return x-static_cast<int>(x);
+	return x - static_cast<int>(x);
 }
 
 template <typename T>
-inline void clearArray(T* arr,unsigned int size)
+inline void clearArray(T *arr, unsigned int size)
 {
-	const T* const arr_end = arr + size;
-	while(arr < arr_end)
+	const T *const arr_end = arr + size;
+	while (arr < arr_end)
 	{
-		*arr=0;
+		*arr = 0;
 		++arr;
 	}
 }
-
-
 
 #endif

@@ -70,28 +70,27 @@
 **
 ****************************************************************************/
 
-
 #include "ControlLayout.h"
 
-#include "stdshims.h"
-
-#include <QWidget>
 #include <QLayoutItem>
 #include <QLineEdit>
 #include <QRect>
 #include <QString>
+#include <QWidget>
+
+#include "stdshims.h"
 
 constexpr const int ControlLayout::m_minWidth;
 
-ControlLayout::ControlLayout(QWidget *parent, int margin, int hSpacing, int vSpacing)
-	: QLayout(parent), m_hSpace(hSpacing), m_vSpace(vSpacing),
-	  m_searchBar(new QLineEdit(parent))
+ControlLayout::ControlLayout(QWidget *parent, int margin, int hSpacing, int vSpacing) :
+	QLayout(parent), m_hSpace(hSpacing), m_vSpace(vSpacing),
+	m_searchBar(new QLineEdit(parent))
 {
 	setContentsMargins(margin, margin, margin, margin);
 	m_searchBar->setPlaceholderText("filter");
 	m_searchBar->setObjectName(s_searchBarName);
-	connect(m_searchBar, SIGNAL(textChanged(const QString&)),
-		this, SLOT(onTextChanged(const QString& )));
+	connect(m_searchBar, SIGNAL(textChanged(const QString &)),
+		this, SLOT(onTextChanged(const QString &)));
 	addWidget(m_searchBar);
 	m_searchBar->setHidden(true); // nothing to filter yet
 }
@@ -99,10 +98,13 @@ ControlLayout::ControlLayout(QWidget *parent, int margin, int hSpacing, int vSpa
 ControlLayout::~ControlLayout()
 {
 	QLayoutItem *item;
-	while ((item = takeAt(0))) { delete item; }
+	while ((item = takeAt(0)))
+	{
+		delete item;
+	}
 }
 
-void ControlLayout::onTextChanged(const QString&)
+void ControlLayout::onTextChanged(const QString &)
 {
 	invalidate();
 	update();
@@ -110,7 +112,7 @@ void ControlLayout::onTextChanged(const QString&)
 
 void ControlLayout::addItem(QLayoutItem *item)
 {
-	QWidget* widget = item->widget();
+	QWidget *widget = item->widget();
 	const QString str = widget ? widget->objectName() : QString("unnamed");
 	m_itemMap.insert(str, item);
 	invalidate();
@@ -118,7 +120,10 @@ void ControlLayout::addItem(QLayoutItem *item)
 
 int ControlLayout::horizontalSpacing() const
 {
-	if (m_hSpace >= 0) { return m_hSpace; }
+	if (m_hSpace >= 0)
+	{
+		return m_hSpace;
+	}
 	else
 	{
 		return smartSpacing(QStyle::PM_LayoutHorizontalSpacing);
@@ -127,7 +132,10 @@ int ControlLayout::horizontalSpacing() const
 
 int ControlLayout::verticalSpacing() const
 {
-	if (m_vSpace >= 0) { return m_vSpace; }
+	if (m_vSpace >= 0)
+	{
+		return m_vSpace;
+	}
 	else
 	{
 		return smartSpacing(QStyle::PM_LayoutVerticalSpacing);
@@ -139,20 +147,25 @@ int ControlLayout::count() const
 	return m_itemMap.size() - 1;
 }
 
-QMap<QString, QLayoutItem*>::const_iterator
+QMap<QString, QLayoutItem *>::const_iterator
 ControlLayout::pairAt(int index) const
 {
-	if (index < 0) { return m_itemMap.cend(); }
-
-	auto skip = [&](QLayoutItem* item) -> bool
+	if (index < 0)
 	{
+		return m_itemMap.cend();
+	}
+
+	auto skip = [&](QLayoutItem *item) -> bool {
 		return item->widget()->objectName() == s_searchBarName;
 	};
 
-	QMap<QString, QLayoutItem*>::const_iterator itr = m_itemMap.cbegin();
+	QMap<QString, QLayoutItem *>::const_iterator itr = m_itemMap.cbegin();
 	for (; itr != m_itemMap.cend() && (index > 0 || skip(itr.value())); ++itr)
 	{
-		if(!skip(itr.value())) { index--; }
+		if (!skip(itr.value()))
+		{
+			index--;
+		}
 	}
 	return itr;
 }
@@ -240,15 +253,15 @@ int ControlLayout::doLayout(const QRect &rect, bool testOnly) const
 	const QString filterText = m_searchBar->text();
 	bool first = true;
 
-	QMapIterator<QString, QLayoutItem*> itr(m_itemMap);
+	QMapIterator<QString, QLayoutItem *> itr(m_itemMap);
 	while (itr.hasNext())
 	{
 		itr.next();
-		QLayoutItem* item = itr.value();
+		QLayoutItem *item = itr.value();
 		QWidget *wid = item->widget();
 		if (wid)
 		{
-			if (	first || // do not filter search bar
+			if (first ||				// do not filter search bar
 				filterText.isEmpty() || // no filter - pass all
 				itr.key().contains(filterText, Qt::CaseInsensitive))
 			{
@@ -256,10 +269,19 @@ int ControlLayout::doLayout(const QRect &rect, bool testOnly) const
 				{
 					// for the search bar, only show it if there are at least
 					// two control widgets (i.e. at least 3 widgets)
-					if (m_itemMap.size() > 2) { wid->show(); }
-					else { wid->hide(); }
+					if (m_itemMap.size() > 2)
+					{
+						wid->show();
+					}
+					else
+					{
+						wid->hide();
+					}
 				}
-				else { wid->show(); }
+				else
+				{
+					wid->show();
+				}
 
 				int spaceX = horizontalSpacing();
 				if (spaceX == -1)
@@ -303,13 +325,17 @@ int ControlLayout::doLayout(const QRect &rect, bool testOnly) const
 int ControlLayout::smartSpacing(QStyle::PixelMetric pm) const
 {
 	QObject *parent = this->parent();
-	if (!parent) { return -1; }
+	if (!parent)
+	{
+		return -1;
+	}
 	else if (parent->isWidgetType())
 	{
 		QWidget *pw = static_cast<QWidget *>(parent);
 		return pw->style()->pixelMetric(pm, nullptr, pw);
 	}
-	else { return static_cast<QLayout *>(parent)->spacing(); }
+	else
+	{
+		return static_cast<QLayout *>(parent)->spacing();
+	}
 }
-
-
