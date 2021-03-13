@@ -28,8 +28,11 @@
 #include "lmmsconfig.h"
 
 #ifdef LMMS_BUILD_WIN32
-#include <windows.h>
+
+// clang-format off
+#include <windows.h> // must be included before mmsystem.h
 #include <mmsystem.h>
+// clang-format on
 
 #include "MidiClient.h"
 #include "MidiPort.h"

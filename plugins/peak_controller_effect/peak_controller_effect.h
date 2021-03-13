@@ -29,6 +29,8 @@
 #include "Effect.h"
 #include "peak_controller_effect_controls.h"
 
+class PeakController;
+
 class PeakControllerEffect : public Effect
 {
 public:

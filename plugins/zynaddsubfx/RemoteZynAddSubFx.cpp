@@ -29,7 +29,11 @@
 
 #include <queue>
 
+#include <FL/x.H>
+#undef CursorShape // is, by mistake, not undefed in FL
+
 #define BUILD_REMOTE_PLUGIN_CLIENT
+
 #include "Note.h"
 #include "RemotePlugin.h"
 #include "RemoteZynAddSubFx.h"
@@ -37,8 +41,6 @@
 
 #include "zynaddsubfx/src/Nio/Nio.h"
 #include "zynaddsubfx/src/UI/MasterUI.h"
-
-#include <FL/x.H>
 
 
 class RemoteZynAddSubFx : public RemotePluginClient, public LocalZynAddSubFx

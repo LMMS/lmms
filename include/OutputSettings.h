@@ -26,6 +26,7 @@
 #ifndef OUTPUT_SETTINGS_H
 #define OUTPUT_SETTINGS_H
 
+#include "lmms_basics.h"
 
 class OutputSettings
 {

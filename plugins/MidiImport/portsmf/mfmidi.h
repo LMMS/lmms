@@ -1,3 +1,5 @@
+#include <cstddef>
+
 #define NOTEOFF 0x80
 #define NOTEON 0x90
 #define PRESSURE 0xa0
