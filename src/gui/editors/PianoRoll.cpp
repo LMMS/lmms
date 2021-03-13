@@ -2732,7 +2732,10 @@ void PianoRoll::mouseMoveEvent(QMouseEvent * me)
 		return;
 	}
 
+	const bool shiftDown = me->modifiers() & Qt::ShiftModifier;
+
 	const bool leftButton = me->buttons() & Qt::LeftButton;
+	const bool middleButton = me->buttons() & Qt::MiddleButton;
 	const bool rightButton = me->buttons() & Qt::RightButton;
 
 	const int mex = me->x();
@@ -2751,6 +2754,20 @@ void PianoRoll::mouseMoveEvent(QMouseEvent * me)
 	{
 		case ActionNone:
 		{
+			const int key_num = getKey(mey);
+
+			// see if they clicked on the keyboard on the left
+			if (   pra == PianoRollArea::Keys
+				&& key_num != m_lastKey
+				&& leftButton
+			)
+			{
+				// clicked on a key, play the note
+				testPlayKey(key_num, ((float) mex) / ((float) m_whiteKeyWidth) * MidiDefaultVelocity, 0);
+				update();
+				return;
+			}
+
 			Note* const n = noteUnderMouse();
 			// if we're in ModeDraw and holding right button or ModeErase and any
 			if (n != nullptr)
@@ -2792,15 +2809,34 @@ void PianoRoll::mouseMoveEvent(QMouseEvent * me)
 			}
 			setCursor(cursorShape);
 
-			
 			break;
 		}
 		case ActionMoveNote:
-		{
-			break;
-		}
 		case ActionResizeNote:
 		{
+			int key_num = getKey( mey );
+			// handle moving notes and resizing them
+			bool replay_note = key_num != m_lastKey
+							&& m_action == ActionMoveNote;
+
+			if( replay_note || ( m_action == ActionMoveNote && shiftDown && ! m_startedWithShift ) )
+			{
+				pauseTestNotes();
+			}
+
+			dragNotes(
+				me->x(),
+				me->y(),
+				me->modifiers() & Qt::AltModifier,
+				me->modifiers() & Qt::ShiftModifier,
+				me->modifiers() & Qt::ControlModifier
+			);
+
+			if( replay_note && m_action == ActionMoveNote && ! ( shiftDown && ! m_startedWithShift ) )
+			{
+				pauseTestNotes( false );
+			}
+
 			break;
 		}
 		case ActionSelectNotes:
@@ -2860,6 +2896,113 @@ void PianoRoll::mouseMoveEvent(QMouseEvent * me)
 		}
 		case ActionChangeNoteProperty:
 		{
+			if (m_editMode != ModeErase
+			    && mey > noteEditTop()
+				&& (leftButton || middleButton || (rightButton && shiftDown))
+			)
+			{
+				// editing note properties
+
+				// Change notes within a certain pixel range of where
+				// the mouse cursor is
+				int pixel_range = 14;
+				int x = mex - m_whiteKeyWidth;
+
+				// convert to ticks so that we can check which notes
+				// are in the range
+				int ticks_start = ( x-pixel_range/2 ) *
+						TimePos::ticksPerBar() / m_ppb + m_currentPosition;
+				int ticks_end = ( x+pixel_range/2 ) *
+						TimePos::ticksPerBar() / m_ppb + m_currentPosition;
+
+				// get note-vector of current pattern
+				const NoteVector & notes = m_pattern->notes();
+
+				// determine what volume/panning to set note to
+				// if middle-click, set to defaults
+				volume_t vol = DefaultVolume;
+				panning_t pan = DefaultPanning;
+
+				if( leftButton )
+				{
+					vol = qBound<int>( MinVolume,
+									MinVolume +
+									( ( (float)noteEditBottom() ) - ( (float)mey ) ) /
+									( (float)( noteEditBottom() - noteEditTop() ) ) *
+									( MaxVolume - MinVolume ),
+												MaxVolume );
+					pan = qBound<int>( PanningLeft,
+									PanningLeft +
+									( (float)( noteEditBottom() - mey ) ) /
+									( (float)( noteEditBottom() - noteEditTop() ) ) *
+									( (float)( PanningRight - PanningLeft ) ),
+											PanningRight);
+				}
+
+				if( m_noteEditMode == NoteEditVolume )
+				{
+					m_lastNoteVolume = vol;
+					showVolTextFloat( vol, me->pos() );
+				}
+				else if( m_noteEditMode == NoteEditPanning )
+				{
+					m_lastNotePanning = pan;
+					showPanTextFloat( pan, me->pos() );
+				}
+
+				// When alt is pressed we only edit the note under the cursor
+				bool altPressed = me->modifiers() & Qt::AltModifier;
+				// We iterate from last note in pattern to the first,
+				// chronologically
+				NoteVector::ConstIterator it = notes.begin()+notes.size()-1;
+				for( int i = 0; i < notes.size(); ++i )
+				{
+					Note* n = *it;
+
+					bool isUnderPosition = n->withinRange( ticks_start, ticks_end );
+					// Play note under the cursor
+					if ( isUnderPosition ) { testPlayNote( n ); }
+					// If note is:
+					// Under the cursor, when there is no selection
+					// Selected, and alt is not pressed
+					// Under the cursor, selected, and alt is pressed
+					if ( ( isUnderPosition && !isSelection() ) ||
+						( n->selected() && !altPressed ) ||
+						( isUnderPosition && n->selected() && altPressed )
+						)
+					{
+						if( m_noteEditMode == NoteEditVolume )
+						{
+							n->setVolume( vol );
+
+							const int baseVelocity = m_pattern->instrumentTrack()->midiPort()->baseVelocity();
+
+							m_pattern->instrumentTrack()->processInEvent( MidiEvent( MidiKeyPressure, -1, n->key(), n->midiVelocity( baseVelocity ) ) );
+						}
+						else if( m_noteEditMode == NoteEditPanning )
+						{
+							n->setPanning( pan );
+							MidiEvent evt( MidiMetaEvent, -1, n->key(), panningToMidi( pan ) );
+							evt.setMetaEvent( MidiNotePanning );
+							m_pattern->instrumentTrack()->processInEvent( evt );
+						}
+					}
+					else if( n->isPlaying() && !isSelection() )
+					{
+						// mouse not over this note, stop playing it.
+						m_pattern->instrumentTrack()->pianoModel()->handleKeyRelease( n->key() );
+						pauseChordNotes(n->key());
+
+						n->setIsPlaying( false );
+					}
+
+
+					--it;
+				}
+
+				// Emit pattern has changed
+				m_pattern->dataChanged();
+			}
 			break;
 		}
 		case ActionResizeNoteEditArea:
@@ -2880,6 +3023,14 @@ void PianoRoll::mouseMoveEvent(QMouseEvent * me)
 			updatePositionLineHeight();
 			repaint();
 			return;
+		}
+		case ActionKnife:
+		{
+			if (m_editMode == ModeEditKnife)
+			{
+				updateKnifePos(me);
+			}
+			break;
 		}
 		default:
 		{
@@ -2918,165 +3069,178 @@ void PianoRoll::mouseMoveEvent(QMouseEvent * me)
 	// }
 
 	// Update Knife position if we are on knife mode
-	if (m_editMode == ModeEditKnife)
-	{
-		updateKnifePos(me);
-	}
+	// if (m_editMode == ModeEditKnife)
+	// {
+	// 	updateKnifePos(me);
+	// }
 
-	if( me->y() > PR_TOP_MARGIN || m_action != ActionNone )
-	{
-		bool edit_note = ( me->y() > noteEditTop() )
-						&& m_action != ActionSelectNotes;
-
-
-		int key_num = getKey( me->y() );
-		int x = me->x();
-
-		// see if they clicked on the keyboard on the left
-		if (x < m_whiteKeyWidth && m_action == ActionNone
-		    && ! edit_note && key_num != m_lastKey
-			&& me->buttons() & Qt::LeftButton )
-		{
-			// clicked on a key, play the note
-			testPlayKey(key_num, ((float) x) / ((float) m_whiteKeyWidth) * MidiDefaultVelocity, 0);
-			update();
-			return;
-		}
-
-		x -= m_whiteKeyWidth;
-
-		if( me->buttons() & Qt::LeftButton
-			&& m_editMode == ModeDraw
-			&& (m_action == ActionMoveNote || m_action == ActionResizeNote ) )
-		{
-			// handle moving notes and resizing them
-			bool replay_note = key_num != m_lastKey
-							&& m_action == ActionMoveNote;
-
-			if( replay_note || ( m_action == ActionMoveNote && ( me->modifiers() & Qt::ShiftModifier ) && ! m_startedWithShift ) )
-			{
-				pauseTestNotes();
-			}
-
-			dragNotes(
-				me->x(),
-				me->y(),
-				me->modifiers() & Qt::AltModifier,
-				me->modifiers() & Qt::ShiftModifier,
-				me->modifiers() & Qt::ControlModifier
-			);
-
-			if( replay_note && m_action == ActionMoveNote && ! ( ( me->modifiers() & Qt::ShiftModifier ) && ! m_startedWithShift ) )
-			{
-				pauseTestNotes( false );
-			}
-		}
-		else if( m_editMode != ModeErase &&
-			( edit_note || m_action == ActionChangeNoteProperty ) &&
-				( me->buttons() & Qt::LeftButton || me->buttons() & Qt::MiddleButton
-				|| ( me->buttons() & Qt::RightButton && me->modifiers() & Qt::ShiftModifier ) ) )
-		{
-			// editing note properties
-
-			// Change notes within a certain pixel range of where
-			// the mouse cursor is
-			int pixel_range = 14;
-
-			// convert to ticks so that we can check which notes
-			// are in the range
-			int ticks_start = ( x-pixel_range/2 ) *
-					TimePos::ticksPerBar() / m_ppb + m_currentPosition;
-			int ticks_end = ( x+pixel_range/2 ) *
-					TimePos::ticksPerBar() / m_ppb + m_currentPosition;
-
-			// get note-vector of current pattern
-			const NoteVector & notes = m_pattern->notes();
-
-			// determine what volume/panning to set note to
-			// if middle-click, set to defaults
-			volume_t vol = DefaultVolume;
-			panning_t pan = DefaultPanning;
-
-			if( me->buttons() & Qt::LeftButton )
-			{
-				vol = qBound<int>( MinVolume,
-								MinVolume +
-								( ( (float)noteEditBottom() ) - ( (float)me->y() ) ) /
-								( (float)( noteEditBottom() - noteEditTop() ) ) *
-								( MaxVolume - MinVolume ),
-											MaxVolume );
-				pan = qBound<int>( PanningLeft,
-								PanningLeft +
-								( (float)( noteEditBottom() - me->y() ) ) /
-								( (float)( noteEditBottom() - noteEditTop() ) ) *
-								( (float)( PanningRight - PanningLeft ) ),
-										  PanningRight);
-			}
-
-			if( m_noteEditMode == NoteEditVolume )
-			{
-				m_lastNoteVolume = vol;
-				showVolTextFloat( vol, me->pos() );
-			}
-			else if( m_noteEditMode == NoteEditPanning )
-			{
-				m_lastNotePanning = pan;
-				showPanTextFloat( pan, me->pos() );
-			}
-
-			// When alt is pressed we only edit the note under the cursor
-			bool altPressed = me->modifiers() & Qt::AltModifier;
-			// We iterate from last note in pattern to the first,
-			// chronologically
-			NoteVector::ConstIterator it = notes.begin()+notes.size()-1;
-			for( int i = 0; i < notes.size(); ++i )
-			{
-				Note* n = *it;
-
-				bool isUnderPosition = n->withinRange( ticks_start, ticks_end );
-				// Play note under the cursor
-				if ( isUnderPosition ) { testPlayNote( n ); }
-				// If note is:
-				// Under the cursor, when there is no selection
-				// Selected, and alt is not pressed
-				// Under the cursor, selected, and alt is pressed
-				if ( ( isUnderPosition && !isSelection() ) ||
-					  ( n->selected() && !altPressed ) ||
-					  ( isUnderPosition && n->selected() && altPressed )
-					)
-				{
-					if( m_noteEditMode == NoteEditVolume )
-					{
-						n->setVolume( vol );
-
-						const int baseVelocity = m_pattern->instrumentTrack()->midiPort()->baseVelocity();
-
-						m_pattern->instrumentTrack()->processInEvent( MidiEvent( MidiKeyPressure, -1, n->key(), n->midiVelocity( baseVelocity ) ) );
-					}
-					else if( m_noteEditMode == NoteEditPanning )
-					{
-						n->setPanning( pan );
-						MidiEvent evt( MidiMetaEvent, -1, n->key(), panningToMidi( pan ) );
-						evt.setMetaEvent( MidiNotePanning );
-						m_pattern->instrumentTrack()->processInEvent( evt );
-					}
-				}
-				else if( n->isPlaying() && !isSelection() )
-				{
-					// mouse not over this note, stop playing it.
-					m_pattern->instrumentTrack()->pianoModel()->handleKeyRelease( n->key() );
-					pauseChordNotes(n->key());
-
-					n->setIsPlaying( false );
-				}
+	// if( me->y() > PR_TOP_MARGIN || m_action != ActionNone )
+	// {
+		// bool edit_note = ( me->y() > noteEditTop() )
+		// 				&& m_action != ActionSelectNotes;
 
 
-				--it;
-			}
+		// int key_num = getKey( me->y() );
+		// int x = me->x();
 
-			// Emit pattern has changed
-			m_pattern->dataChanged();
-		}
+		// // see if they clicked on the keyboard on the left
+		// if (   x < m_whiteKeyWidth
+		//     && m_action == ActionNone
+		//     && !edit_note
+		//     && key_num != m_lastKey
+		//     && me->buttons() & Qt::LeftButton
+		//    )
+		// {
+		// 	// clicked on a key, play the note
+		// 	testPlayKey(key_num, ((float) x) / ((float) m_whiteKeyWidth) * MidiDefaultVelocity, 0);
+		// 	update();
+		// 	return;
+		// }
+
+		// x -= m_whiteKeyWidth;
+
+		// if (   me->buttons() & Qt::LeftButton
+		//     && m_editMode == ModeDraw
+		//     && (   m_action == ActionMoveNote
+		//         || m_action == ActionResizeNote
+		//        )
+		//    )
+		// {
+		// 	// handle moving notes and resizing them
+		// 	bool replay_note = key_num != m_lastKey
+		// 					&& m_action == ActionMoveNote;
+
+		// 	if( replay_note || ( m_action == ActionMoveNote && ( me->modifiers() & Qt::ShiftModifier ) && ! m_startedWithShift ) )
+		// 	{
+		// 		pauseTestNotes();
+		// 	}
+
+		// 	dragNotes(
+		// 		me->x(),
+		// 		me->y(),
+		// 		me->modifiers() & Qt::AltModifier,
+		// 		me->modifiers() & Qt::ShiftModifier,
+		// 		me->modifiers() & Qt::ControlModifier
+		// 	);
+
+		// 	if( replay_note && m_action == ActionMoveNote && ! ( ( me->modifiers() & Qt::ShiftModifier ) && ! m_startedWithShift ) )
+		// 	{
+		// 		pauseTestNotes( false );
+		// 	}
+		// }
+		// else if ( m_editMode != ModeErase
+		//          && (   edit_note
+		// 		     || m_action == ActionChangeNoteProperty
+		// 			)
+		// 		 && (   me->buttons() & Qt::LeftButton
+		// 		     || me->buttons() & Qt::MiddleButton
+		// 		     || (   me->buttons() & Qt::RightButton
+		// 			     && me->modifiers() & Qt::ShiftModifier
+		// 				)
+		// 			)
+		// 		)
+		// {
+			// // editing note properties
+
+			// // Change notes within a certain pixel range of where
+			// // the mouse cursor is
+			// int pixel_range = 14;
+
+			// // convert to ticks so that we can check which notes
+			// // are in the range
+			// int ticks_start = ( x-pixel_range/2 ) *
+			// 		TimePos::ticksPerBar() / m_ppb + m_currentPosition;
+			// int ticks_end = ( x+pixel_range/2 ) *
+			// 		TimePos::ticksPerBar() / m_ppb + m_currentPosition;
+
+			// // get note-vector of current pattern
+			// const NoteVector & notes = m_pattern->notes();
+
+			// // determine what volume/panning to set note to
+			// // if middle-click, set to defaults
+			// volume_t vol = DefaultVolume;
+			// panning_t pan = DefaultPanning;
+
+			// if( me->buttons() & Qt::LeftButton )
+			// {
+			// 	vol = qBound<int>( MinVolume,
+			// 					MinVolume +
+			// 					( ( (float)noteEditBottom() ) - ( (float)me->y() ) ) /
+			// 					( (float)( noteEditBottom() - noteEditTop() ) ) *
+			// 					( MaxVolume - MinVolume ),
+			// 								MaxVolume );
+			// 	pan = qBound<int>( PanningLeft,
+			// 					PanningLeft +
+			// 					( (float)( noteEditBottom() - me->y() ) ) /
+			// 					( (float)( noteEditBottom() - noteEditTop() ) ) *
+			// 					( (float)( PanningRight - PanningLeft ) ),
+			// 							  PanningRight);
+			// }
+
+			// if( m_noteEditMode == NoteEditVolume )
+			// {
+			// 	m_lastNoteVolume = vol;
+			// 	showVolTextFloat( vol, me->pos() );
+			// }
+			// else if( m_noteEditMode == NoteEditPanning )
+			// {
+			// 	m_lastNotePanning = pan;
+			// 	showPanTextFloat( pan, me->pos() );
+			// }
+
+			// // When alt is pressed we only edit the note under the cursor
+			// bool altPressed = me->modifiers() & Qt::AltModifier;
+			// // We iterate from last note in pattern to the first,
+			// // chronologically
+			// NoteVector::ConstIterator it = notes.begin()+notes.size()-1;
+			// for( int i = 0; i < notes.size(); ++i )
+			// {
+			// 	Note* n = *it;
+
+			// 	bool isUnderPosition = n->withinRange( ticks_start, ticks_end );
+			// 	// Play note under the cursor
+			// 	if ( isUnderPosition ) { testPlayNote( n ); }
+			// 	// If note is:
+			// 	// Under the cursor, when there is no selection
+			// 	// Selected, and alt is not pressed
+			// 	// Under the cursor, selected, and alt is pressed
+			// 	if ( ( isUnderPosition && !isSelection() ) ||
+			// 		  ( n->selected() && !altPressed ) ||
+			// 		  ( isUnderPosition && n->selected() && altPressed )
+			// 		)
+			// 	{
+			// 		if( m_noteEditMode == NoteEditVolume )
+			// 		{
+			// 			n->setVolume( vol );
+
+			// 			const int baseVelocity = m_pattern->instrumentTrack()->midiPort()->baseVelocity();
+
+			// 			m_pattern->instrumentTrack()->processInEvent( MidiEvent( MidiKeyPressure, -1, n->key(), n->midiVelocity( baseVelocity ) ) );
+			// 		}
+			// 		else if( m_noteEditMode == NoteEditPanning )
+			// 		{
+			// 			n->setPanning( pan );
+			// 			MidiEvent evt( MidiMetaEvent, -1, n->key(), panningToMidi( pan ) );
+			// 			evt.setMetaEvent( MidiNotePanning );
+			// 			m_pattern->instrumentTrack()->processInEvent( evt );
+			// 		}
+			// 	}
+			// 	else if( n->isPlaying() && !isSelection() )
+			// 	{
+			// 		// mouse not over this note, stop playing it.
+			// 		m_pattern->instrumentTrack()->pianoModel()->handleKeyRelease( n->key() );
+			// 		pauseChordNotes(n->key());
+
+			// 		n->setIsPlaying( false );
+			// 	}
+
+
+			// 	--it;
+			// }
+
+			// // Emit pattern has changed
+			// m_pattern->dataChanged();
+		// }
 
 		// else if( me->buttons() == Qt::NoButton && m_editMode == ModeDraw )
 		// {
@@ -3211,7 +3375,7 @@ void PianoRoll::mouseMoveEvent(QMouseEvent * me)
 		// 	// Qt::SizeVerCursor (between keyAreaBottom and noteEditTop)
 		// 	setCursor( Qt::ArrowCursor );
 		// }
-	}
+	// }
 	// else
 	// {
 	// 	if( me->buttons() & Qt::LeftButton &&
