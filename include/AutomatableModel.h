@@ -34,7 +34,6 @@
 #include "ValueBuffer.h"
 #include "MemoryManager.h"
 #include "ModelVisitor.h"
-#include "ControllerConnection.h"
 
 // simple way to map a property of a view to a model
 #define mapPropertyFromModelPtr(type,getfunc,setfunc,modelname)	\
