@@ -1026,7 +1026,13 @@ void SampleBuffer::visualize(
 	const int nbFrames = focusOnRange ? toFrame - fromFrame : m_frames;
 
 	const int fpp = std::max(1, nbFrames / w);
-	const int totalPoints = nbFrames / fpp * 2;
+	// There are 2 possibilities: Either nbFrames is bigger than
+	// the width, so we will have width * 2 points, or nbFrames is
+	// smaller than the width (fpp = 1) and we will have nbFrames * 2
+	// points
+	const int totalPoints = nbFrames > w
+		? w * 2
+		: nbFrames * 2;
 	std::vector<QPointF> fMax(totalPoints);
 	std::vector<QPointF> fRms(totalPoints);
 	int curPixel = 0;
@@ -1050,7 +1056,7 @@ void SampleBuffer::visualize(
 		float rmsData[2] = {0, 0};
 
 		// Find maximum and minimum samples within range
-		for (int i = 0; i < fpp && frame + i < last; ++i)
+		for (int i = 0; i < fpp && frame + i <= last; ++i)
 		{
 			for (int j = 0; j < 2; ++j)
 			{
@@ -1068,7 +1074,12 @@ void SampleBuffer::visualize(
 		const float maxRmsData = qBound(minData, sqrtRmsData, maxData);
 		const float minRmsData = qBound(minData, -sqrtRmsData, maxData);
 
-		auto x = xb + curPixel;
+		// If nbFrames >= w, we can use curPixel to calculate X
+		// but if nbFrames < w, we need to calculate it proportionally
+		// to the total number of points
+		auto x = nbFrames >= w
+			? xb + curPixel
+			: xb + ((double(curPixel) / nbFrames) * w);
 		// Partial Y calculation
 		auto py = ySpace * m_amplification;
 		fMax[curPixel * 2] = QPointF(x, (yb - (maxData * py)));
