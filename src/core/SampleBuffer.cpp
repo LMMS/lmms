@@ -1069,7 +1069,7 @@ void SampleBuffer::visualize(
 			}
 		}
 
-		const float trueRmsData = (rmsData[0] + rmsData[1]) * 0.5 / fpp;
+		const float trueRmsData = (rmsData[0] + rmsData[1]) / 2 / fpp;
 		const float sqrtRmsData = sqrt(trueRmsData);
 		const float maxRmsData = qBound(minData, sqrtRmsData, maxData);
 		const float minRmsData = qBound(minData, -sqrtRmsData, maxData);
@@ -1079,7 +1079,7 @@ void SampleBuffer::visualize(
 		// to the total number of points
 		auto x = nbFrames >= w
 			? xb + curPixel
-			: xb + ((double(curPixel) / nbFrames) * w);
+			: xb + ((static_cast<double>(curPixel) / nbFrames) * w);
 		// Partial Y calculation
 		auto py = ySpace * m_amplification;
 		fMax[curPixel * 2] = QPointF(x, (yb - (maxData * py)));
