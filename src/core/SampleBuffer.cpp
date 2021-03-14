@@ -998,6 +998,13 @@ f_cnt_t SampleBuffer::getPingPongIndex(f_cnt_t index, f_cnt_t startf, f_cnt_t en
 }
 
 
+/* @brief Draws a sample buffer on the QRect given in the range [fromFrame, toFrame)
+ * @param QPainter p: Painter object for the painting operations
+ * @param QRect dr: QRect where the buffer will be drawn in
+ * @param QRect clip: QRect used for clipping
+ * @param f_cnt_t fromFrame: First frame of the range
+ * @param f_cnt_t toFrame: Last frame of the range non-inclusive
+ */
 void SampleBuffer::visualize(
 	QPainter & p,
 	const QRect & dr,
@@ -1009,6 +1016,7 @@ void SampleBuffer::visualize(
 	if (m_frames == 0) { return; }
 
 	const bool focusOnRange = toFrame <= m_frames && 0 <= fromFrame && fromFrame < toFrame;
+	//TODO: If the clip QRect is not being used we should remove it
 	//p.setClipRect(clip);
 	const int w = dr.width();
 	const int h = dr.height();
@@ -1018,15 +1026,23 @@ void SampleBuffer::visualize(
 	const int nbFrames = focusOnRange ? toFrame - fromFrame : m_frames;
 
 	const int fpp = std::max(1, nbFrames / w);
-	const int totalPoints = nbFrames / fpp * 2 + 2;
+	const int totalPoints = nbFrames / fpp * 2;
 	std::vector<QPointF> fMax(totalPoints);
 	std::vector<QPointF> fRms(totalPoints);
-	int curFrame = 0;
+	int curPixel = 0;
 	const int xb = dr.x();
 	const int first = focusOnRange ? fromFrame : 0;
 	const int last = focusOnRange ? toFrame - 1 : m_frames - 1;
+	// When the number of frames isn't perfectly divisible by the
+	// width, the remaining frames don't fit the last pixel and are
+	// past the visible area. lastVisibleFrame is the index number of
+	// the last visible frame.
+	const int visibleFrames = (fpp * w);
+	const int lastVisibleFrame = focusOnRange
+		? fromFrame + visibleFrames - 1
+		: visibleFrames - 1;
 
-	for (int frame = first; frame <= last; frame += fpp)
+	for (int frame = first; frame <= last && frame <= lastVisibleFrame; frame += fpp)
 	{
 		float maxData = -1;
 		float minData = 1;
@@ -1052,14 +1068,14 @@ void SampleBuffer::visualize(
 		const float maxRmsData = qBound(minData, sqrtRmsData, maxData);
 		const float minRmsData = qBound(minData, -sqrtRmsData, maxData);
 
-		auto x = xb + ((frame - first) * double(w) / nbFrames);
+		auto x = xb + curPixel;
 		// Partial Y calculation
 		auto py = ySpace * m_amplification;
-		fMax[curFrame*2] = QPointF(x, (yb - (maxData * py)));
-		fMax[curFrame*2+1] = QPointF(x, (yb - (minData * py)));
-		fRms[curFrame*2] = QPointF(x, (yb - (maxRmsData * py)));
-		fRms[curFrame*2+1] = QPointF(x, (yb - (minRmsData * py)));
-		++curFrame;
+		fMax[curPixel * 2] = QPointF(x, (yb - (maxData * py)));
+		fMax[curPixel * 2 + 1] = QPointF(x, (yb - (minData * py)));
+		fRms[curPixel * 2] = QPointF(x, (yb - (maxRmsData * py)));
+		fRms[curPixel * 2 + 1] = QPointF(x, (yb - (minRmsData * py)));
+		++curPixel;
 	}
 
 	p.drawPolyline(fMax.data(), totalPoints);
