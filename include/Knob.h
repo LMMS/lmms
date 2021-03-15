@@ -65,8 +65,14 @@ class LMMS_EXPORT Knob : public QWidget, public FloatModelView
 
 	Q_PROPERTY(QColor lineActiveColor MEMBER m_lineActiveColor)
 	Q_PROPERTY(QColor lineInactiveColor MEMBER m_lineInactiveColor)
-	Q_PROPERTY(QColor arcActiveColor MEMBER m_arcActiveColor)
-	Q_PROPERTY(QColor arcInactiveColor MEMBER m_arcInactiveColor)
+	Q_PROPERTY(QColor arcTopActiveColor MEMBER m_arcTopActiveColor)
+	Q_PROPERTY(QColor arcTopInactiveColor MEMBER m_arcTopInactiveColor)
+	Q_PROPERTY(QColor arcBottomActiveColor MEMBER m_arcBottomActiveColor)
+	Q_PROPERTY(QColor arcBottomInactiveColor MEMBER m_arcBottomInactiveColor)
+	Q_PROPERTY(QColor centerTopActiveColor MEMBER m_centerTopActiveColor)
+	Q_PROPERTY(QColor centerTopInactiveColor MEMBER m_centerTopInactiveColor)
+	Q_PROPERTY(QColor centerBottomActiveColor MEMBER m_centerBottomActiveColor)
+	Q_PROPERTY(QColor centerBottomInactiveColor MEMBER m_centerBottomInactiveColor)
 
 	mapPropertyFromModel(bool,isVolumeKnob,setVolumeKnob,m_volumeKnob);
 	mapPropertyFromModel(float,volumeRatio,setVolumeRatio,m_volumeRatio);
@@ -119,6 +125,8 @@ public:
 	
 	QColor textColor() const;
 	void setTextColor( const QColor & c );
+
+	void setOrigSize( float knobWidth, float knobHeight );
 
 
 signals:
@@ -197,13 +205,21 @@ private:
 
 	QColor m_lineActiveColor;
 	QColor m_lineInactiveColor;
-	QColor m_arcActiveColor;
-	QColor m_arcInactiveColor;
-	
+	QColor m_arcTopActiveColor;
+	QColor m_arcTopInactiveColor;
+	QColor m_arcBottomActiveColor;
+	QColor m_arcBottomInactiveColor;
+	QColor m_centerTopActiveColor;
+	QColor m_centerTopInactiveColor;
+	QColor m_centerBottomActiveColor;
+	QColor m_centerBottomInactiveColor;
+
 	QColor m_textColor;
 
 	knobTypes m_knobNum;
 
+	float m_origWidth;
+	float m_origHeight;
 } ;
 
 #endif

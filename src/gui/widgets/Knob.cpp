@@ -96,32 +96,7 @@ void Knob::initUi( const QString & _name )
 	setOuterRadius( 10.0f );
 	setFocusPolicy( Qt::ClickFocus );
 
-	// This is a workaround to enable style sheets for knobs which are not styled knobs.
-	//
-	// It works as follows: the palette colors that are assigned as the line color previously
-	// had been hard coded in the drawKnob method for the different knob types. Now the
-	// drawKnob method uses the line color to draw the lines. By assigning the palette colors
-	// as the line colors here the knob lines will be drawn in this color unless the stylesheet
-	// overrides that color.
-	switch (knobNum())
-	{
-	case knobSmall_17:
-	case knobBright_26:
-	case knobDark_28:
-		m_lineActiveColor = QApplication::palette().color(QPalette::Active, QPalette::WindowText);
-		m_arcActiveColor = QColor(QApplication::palette().color(
-									QPalette::Active, QPalette::WindowText));
-		m_arcActiveColor.setAlpha(70);
-		break;
-	case knobVintage_32:
-		m_lineActiveColor = QApplication::palette().color(QPalette::Active, QPalette::Shadow);
-		m_arcActiveColor = QColor(QApplication::palette().color(
-									QPalette::Active, QPalette::Shadow));
-		m_arcActiveColor.setAlpha(70);
-		break;
-	default:
-		break;
-	}
+	
 
 	doConnections();
 }
@@ -138,15 +113,19 @@ void Knob::onKnobNumUpdated()
 		{
 		case knobDark_28:
 			knobFilename = "knob01";
+			setOrigSize( 28, 28 );
 			break;
 		case knobBright_26:
 			knobFilename = "knob02";
+			setOrigSize( 26, 26 );
 			break;
 		case knobSmall_17:
 			knobFilename = "knob03";
+			setOrigSize( 18, 18 );
 			break;
 		case knobVintage_32:
 			knobFilename = "knob05";
+			setOrigSize( 32, 32 );
 			break;
 		case knobStyled: // only here to stop the compiler from complaining
 			break;
@@ -162,6 +141,13 @@ void Knob::onKnobNumUpdated()
 	}
 }
 
+
+void Knob::setOrigSize( float knobWidth, float knobHeight )
+{
+	setFixedSize(knobWidth, knobHeight);
+	m_origWidth = knobWidth;
+	m_origHeight = knobHeight;
+}
 
 
 
@@ -194,8 +180,9 @@ void Knob::setHtmlLabel(const QString &htmltxt)
 
 	if (m_knobPixmap)
 	{
-		setFixedSize(m_knobPixmap->width(),
-				m_knobPixmap->height() + 15);
+		setFixedSize( qMax<int>( m_origWidth,
+					QFontMetrics( pointSizeF( font(), 6.5) ).width( m_label ) ),
+						m_origHeight + 10 );
 	}
 
 	update();
@@ -380,8 +367,36 @@ bool Knob::updateAngle()
 void Knob::drawKnob( QPainter * _p )
 {
 	bool enabled = this->isEnabled();
-	QColor currentArcColor = enabled ? m_arcActiveColor : m_arcInactiveColor;
-	QColor currentLineColor = enabled ? m_lineActiveColor : m_lineInactiveColor;
+	QColor currentArcTopColor;
+	QColor currentArcBottomColor;
+	QColor currentLineColor;
+	QColor currentCenterTopColor;
+	QColor currentCenterBottomColor;
+
+	switch (knobNum())
+	{
+		case knobSmall_17: case knobBright_26: case knobDark_28:
+		{
+			currentArcTopColor = enabled ? m_arcTopActiveColor : m_arcTopInactiveColor;
+			currentArcBottomColor = enabled ? m_arcBottomActiveColor : m_arcBottomInactiveColor;
+			currentLineColor = enabled ? m_lineActiveColor : m_lineInactiveColor;
+			currentCenterTopColor = enabled ? m_centerTopActiveColor : m_centerTopInactiveColor;
+			currentCenterBottomColor = enabled ? m_centerBottomActiveColor : m_centerBottomInactiveColor;
+			break;
+		}
+		case knobVintage_32:
+		{
+			currentLineColor = QApplication::palette().color(QPalette::Active, QPalette::Shadow);
+			currentArcTopColor = QColor(QApplication::palette().color(QPalette::Active, QPalette::Shadow));
+			currentArcBottomColor = QColor(QApplication::palette().color(QPalette::Active, QPalette::Shadow));
+			currentArcBottomColor.setAlpha(70);
+			currentCenterTopColor = enabled ? m_centerTopActiveColor : m_centerTopInactiveColor;
+			currentCenterBottomColor = enabled ? m_centerBottomActiveColor : m_centerBottomInactiveColor;
+			break;
+		}
+		default:
+			break;
+	}
 
 	if( updateAngle() == false && !m_cache.isNull() )
 	{
@@ -394,7 +409,7 @@ void Knob::drawKnob( QPainter * _p )
 
 	QPainter p( &m_cache );
 
-	QPoint mid;
+	QPointF mid;
 
 	if( m_knobNum == knobStyled )
 	{
@@ -426,22 +441,34 @@ void Knob::drawKnob( QPainter * _p )
 	}
 
 
-	// Old-skool knobs
-	const float radius = m_knobPixmap->width() / 2.0f - 1;
-	mid = QPoint( width() / 2, m_knobPixmap->height() / 2 );
-
-	p.drawPixmap( static_cast<int>(
-				width() / 2 - m_knobPixmap->width() / 2 ), 0,
-				*m_knobPixmap );
+	const float radius = m_origWidth / 2.f - 4.5f;
+	mid = QPointF( width() / 2, ceil(m_origHeight / 2.f) );
 
 	p.setRenderHint( QPainter::Antialiasing );
+
+	if (m_knobNum == knobSmall_17 || m_knobNum == knobBright_26 || m_knobNum == knobDark_28)
+	{
+		QLinearGradient centerGrad(0, 5, 0.f, m_origHeight - 5.f);
+		centerGrad.setColorAt(0, QColor(77, 80, 91));
+		centerGrad.setColorAt(1, QColor(37, 38, 43));
+		//p.setPen(QPen(centerGrad, 0));
+		p.setPen( QPen( QColor(11, 12, 17), 1, Qt::SolidLine, Qt::RoundCap ) );
+		p.setBrush(centerGrad);
+		p.drawEllipse(mid, radius, radius);
+	}
+	else
+	{
+		p.drawPixmap( static_cast<int>(
+					width() / 2 - m_knobPixmap->width() / 2 ), 0,
+					*m_knobPixmap );
+	}
 
 	const int centerAngle = angleFromValue( model()->inverseScaledValue( model()->centerValue() ), model()->minValue(), model()->maxValue(), m_totalAngle );
 
 	const int arcLineWidth = 2;
-	const int arcRectSize = m_knobPixmap->width() - arcLineWidth;
+	const int arcRectSize = m_origWidth - arcLineWidth;
 
-	p.setPen(QPen(currentArcColor, 2));
+	p.setPen(QPen(currentArcBottomColor, 2));
 	p.drawArc( mid.x() - arcRectSize/2, 1, arcRectSize, arcRectSize, 315*16, 16*m_totalAngle );
 
 	p.setPen(QPen(currentLineColor, 2));
@@ -449,19 +476,18 @@ void Knob::drawKnob( QPainter * _p )
 	{
 		case knobSmall_17:
 		{
-			p.drawLine( calculateLine( mid, radius-2 ) );
+			p.drawLine( calculateLine( mid, radius-1.5f, 4 ) );
 			break;
 		}
 		case knobBright_26:
 		{
-			p.drawLine( calculateLine( mid, radius-5 ) );
+			p.drawLine( calculateLine( mid, radius-1.5f, 4 ) );
 			break;
 		}
 		case knobDark_28:
 		{
-			const float rb = qMax<float>( ( radius - 10 ) / 3.0,
-									0.0 );
-			const float re = qMax<float>( ( radius - 4 ), 0.0 );
+			const float rb = qMax<float>( ( radius - 10 ) / 3.0, 0.0 );
+			const float re = qMax<float>( ( radius - 1.5f ), 0.0 );
 			QLineF ln = calculateLine( mid, re, rb );
 			ln.translate( 1, 1 );
 			p.drawLine( ln );
@@ -469,13 +495,14 @@ void Knob::drawKnob( QPainter * _p )
 		}
 		case knobVintage_32:
 		{
-			p.drawLine( calculateLine( mid, radius-2, 2 ) );
+			p.drawLine( calculateLine( mid, radius + 2, 2 ) );
 			break;
 		}
 		case knobStyled:
 			break;
 	}
 
+	p.setPen( QPen( currentArcTopColor, 2 ) );
 	p.drawArc( mid.x() - arcRectSize/2, 1, arcRectSize, arcRectSize, (90-centerAngle)*16, -16*(m_angle-centerAngle) );
 
 	p.end();
