@@ -551,7 +551,7 @@ void BBTrackView::clickedTrackLabel()
 QMenu* BBTrackView::createFxMenu(QString title, QString newFxLabel)
 {
 	// We have a different title for BB Tracks
-	QMenu* fxMenu = new QMenu("Assign BBTrack to FX channel");
+	QMenu* fxMenu = new QMenu(tr("Assign all to FX channel"));
 
 	fxMenu->addAction(newFxLabel, this, SLOT(createFxLine()));
 	fxMenu->addSeparator();
