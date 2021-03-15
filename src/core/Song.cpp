@@ -775,6 +775,68 @@ void Song::addBBTrack()
 	Engine::getBBTrackContainer()->setCurrentBB( dynamic_cast<BBTrack *>( t )->index() );
 }
 
+/* @brief Converts all BBTracks to regular tracks on the Song Editor
+ */
+void Song::convertBBtoSE()
+{
+	// Get all tracks from the BB editor
+	BBTrackContainer* bbContainer = Engine::getBBTrackContainer();
+	TrackList tl = bbContainer->tracks();
+
+	// For each track, go through all TCOs and copy them in every place
+	// the corresponding BBTrack has BBTCOs in.
+	for
+	(
+		TrackList::iterator it = tl.begin();
+		it != tl.end();
+		++it
+	)
+	{
+		// Create a clone of the track and add it to the song editor
+		Track* clonedTrack = nullptr;
+		if ((*it)->type() == Track::InstrumentTrack || (*it)->type() == Track::SampleTrack)
+		{
+			// Create XML data of the track for the clone
+			QDomDocument doc;
+			QDomElement parent = doc.createElement("clone");
+			(*it)->saveState(doc, parent);
+			clonedTrack = Track::create(parent.firstChild().toElement(), this);
+			clonedTrack->deleteTCOs();
+		}
+		else { continue; }
+
+		// Now go through all the TCOs and copy them in the appropriate place
+		// in the cloned track
+		auto numTCOs = (*it)->numOfTCOs();
+		for (int i = 0; i < numTCOs; ++i)
+		{
+			// Find the BBTrack
+			BBTrack* bt = BBTrack::findBBTrack(i);
+			if (!bt) { continue; }
+
+			// Get the TCO from the track inside the BBTrack
+			TrackContentObject* src = (*it)->getTCO(i);
+
+			// Go through the BBTrack's TCOs
+			Track::tcoVector bbtcos = bt->getTCOs();
+			for (TrackContentObject* bbtco : bbtcos)
+			{
+				auto pos = bbtco->startPosition();
+				auto bbTcoLen = bbtco->length().getTicks();
+				auto bbTrackLen = bbContainer->lengthOfBB(i) * TimePos::ticksPerBar();
+				auto numOfCopies = bbTcoLen / bbTrackLen;
+
+				for (int j = 0; j < numOfCopies; ++j)
+				{
+					TrackContentObject* dst = clonedTrack->createTCO(pos + j * bbTrackLen);
+					TrackContentObject::copyStateTo(src, dst);
+					dst->movePosition(pos + j * bbTrackLen);
+				}
+			}
+		}
+	}
+}
+
 
 
 

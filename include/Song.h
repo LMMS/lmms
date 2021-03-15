@@ -363,6 +363,7 @@ public slots:
 	void clearProject();
 
 	void addBBTrack();
+	void convertBBtoSE();
 
 
 private slots:
