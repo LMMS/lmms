@@ -3,6 +3,7 @@ set(LMMS_SRCS
 
 	core/AutomatableModel.cpp
 	core/AutomationPattern.cpp
+	core/AutomationNode.cpp
 	core/BandLimitedWave.cpp
 	core/base64.cpp
 	core/BBTrackContainer.cpp

@@ -181,7 +181,10 @@ jobs:
           command: |
             # uninstall Homebrew's python 2 to prevent errors on brew install
             brew uninstall python@2 || true
-            brew update && brew install ccache fftw cmake pkg-config libogg libvorbis lame libsndfile libsamplerate jack sdl libgig libsoundio lilv lv2 stk fluid-synth portaudio fltk qt5 carla
+            # Working around for https://github.com/Homebrew/brew/pull/9383
+            (git -C "/usr/local/Homebrew/Library/Taps/homebrew/homebrew-core" fetch && git merge FETCH_HEAD --ff-only) || true
+            (git -C "/usr/local/Homebrew" fetch && git merge FETCH_HEAD --ff-only) || true
+            brew install ccache fftw cmake pkg-config libogg libvorbis lame libsndfile libsamplerate jack sdl libgig libsoundio lilv lv2 stk fluid-synth portaudio fltk qt5 carla
       - run:
           name: Install nodejs dependencies
           command: npm install -g appdmg

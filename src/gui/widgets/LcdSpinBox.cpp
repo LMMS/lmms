@@ -70,17 +70,11 @@ void LcdSpinBox::update()
 
 
 
-void LcdSpinBox::contextMenuEvent( QContextMenuEvent* event )
+void LcdSpinBox::contextMenuEvent(QContextMenuEvent* event)
 {
-	// for the case, the user clicked right while pressing left mouse-
-	// button, the context-menu appears while mouse-cursor is still hidden
-	// and it isn't shown again until user does something which causes
-	// an QApplication::restoreOverrideCursor()-call...
-	mouseReleaseEvent( NULL );
-
-	CaptionMenu contextMenu( model()->displayName() );
-	addDefaultActions( &contextMenu );
-	contextMenu.exec( QCursor::pos() );
+	CaptionMenu contextMenu(model()->displayName());
+	addDefaultActions(&contextMenu);
+	contextMenu.exec(QCursor::pos());
 }
 
 
@@ -136,12 +130,11 @@ void LcdSpinBox::mouseMoveEvent( QMouseEvent* event )
 
 
 
-void LcdSpinBox::mouseReleaseEvent( QMouseEvent* )
+void LcdSpinBox::mouseReleaseEvent(QMouseEvent*)
 {
-	if( m_mouseMoving )
+	if (m_mouseMoving)
 	{
 		model()->restoreJournallingState();
-		QApplication::restoreOverrideCursor();
 		m_mouseMoving = false;
 	}
 }

@@ -76,6 +76,9 @@ public:
 	Note * addStepNote( int step );
 	void setStep( int step, bool enabled );
 
+	// Split the list of notes on the given position
+	void splitNotes(NoteVector notes, TimePos pos);
+
 	// pattern-type stuff
 	inline PatternTypes type() const
 	{
@@ -176,6 +179,7 @@ public:
 	void setMutedNoteBorderColor(QColor const & color) { m_mutedNoteBorderColor = color; }
 
 public slots:
+	Pattern* getPattern();
 	void update() override;
 
 

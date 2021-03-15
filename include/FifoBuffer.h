@@ -1,5 +1,5 @@
 /*
- * fifo_buffer.h - FIFO fixed-size buffer
+ * FifoBuffer.h - FIFO fixed-size buffer
  *
  * Copyright (c) 2007 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
  *
@@ -29,66 +29,63 @@
 
 
 template<typename T>
-class fifoBuffer
+class FifoBuffer
 {
 public:
-	fifoBuffer( int _size ) :
-		m_reader_sem( _size ),
-		m_writer_sem( _size ),
-		m_reader_index( 0 ),
-		m_writer_index( 0 ),
-		m_size( _size )
+	FifoBuffer(int size) :
+		m_readSem(size),
+		m_writeSem(size),
+		m_readIndex(0),
+		m_writeIndex(0),
+		m_size(size)
 	{
-		m_buffer = new T[_size];
-		m_reader_sem.acquire( _size );
+		m_buffer = new T[size];
+		m_readSem.acquire(size);
 	}
 
-	~fifoBuffer()
+	~FifoBuffer()
 	{
 		delete[] m_buffer;
-		m_reader_sem.release( m_size );
+		m_readSem.release(m_size);
 	}
 
-	void write( T _element )
+	void write(T element)
 	{
-		m_writer_sem.acquire();
-		m_buffer[m_writer_index++] = _element;
-		m_writer_index %= m_size;
-		m_reader_sem.release();
+		m_writeSem.acquire();
+		m_buffer[m_writeIndex++] = element;
+		m_writeIndex %= m_size;
+		m_readSem.release();
 	}
 
 	T read()
 	{
-		m_reader_sem.acquire();
-		T element = m_buffer[m_reader_index++];
-		m_reader_index %= m_size;
-		m_writer_sem.release();
-		return( element );
+		m_readSem.acquire();
+		T element = m_buffer[m_readIndex++];
+		m_readIndex %= m_size;
+		m_writeSem.release();
+		return element;
 	}
 
 	void waitUntilRead()
 	{
-		m_writer_sem.acquire( m_size );
-		m_writer_sem.release( m_size );
+		m_writeSem.acquire(m_size);
+		m_writeSem.release(m_size);
 	}
 
 	bool available()
 	{
-		return( m_reader_sem.available() );
+		return m_readSem.available();
 	}
 
 
 private:
-	QSemaphore m_reader_sem;
-	QSemaphore m_writer_sem;
-	int m_reader_index;
-	int m_writer_index;
+	QSemaphore m_readSem;
+	QSemaphore m_writeSem;
+	int m_readIndex;
+	int m_writeIndex;
 	int m_size;
 	T * m_buffer;
-
 } ;
-
-
 
 
 #endif

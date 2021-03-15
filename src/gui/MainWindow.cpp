@@ -1667,7 +1667,7 @@ void MainWindow::onImportProject()
 			ImportFilter::import( ofd.selectedFiles()[0], song );
 		}
 
-		song->setLoadOnLauch(false);
+		song->setLoadOnLaunch(false);
 	}
 }
 

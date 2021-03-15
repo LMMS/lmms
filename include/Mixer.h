@@ -35,7 +35,7 @@
 #include "lmms_basics.h"
 #include "LocklessList.h"
 #include "Note.h"
-#include "fifo_buffer.h"
+#include "FifoBuffer.h"
 #include "MixerProfiler.h"
 
 
@@ -323,19 +323,19 @@ signals:
 
 
 private:
-	typedef fifoBuffer<surroundSampleFrame *> fifo;
+	typedef FifoBuffer<surroundSampleFrame *> Fifo;
 
 	class fifoWriter : public QThread
 	{
 	public:
-		fifoWriter(Mixer * mixer, fifo * _fifo);
+		fifoWriter( Mixer * mixer, Fifo * fifo );
 
 		void finish();
 
 
 	private:
 		Mixer * m_mixer;
-		fifo * m_fifo;
+		Fifo * m_fifo;
 		volatile bool m_writing;
 
 		void run() override;
@@ -411,7 +411,7 @@ private:
 	QString m_midiClientName;
 
 	// FIFO stuff
-	fifo * m_fifo;
+	Fifo * m_fifo;
 	fifoWriter * m_fifoWriter;
 
 	MixerProfiler m_profiler;

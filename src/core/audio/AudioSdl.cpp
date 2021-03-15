@@ -99,6 +99,9 @@ AudioSdl::AudioSdl( bool & _success_ful, Mixer*  _mixer ) :
 	_success_ful = true;
 
 #ifdef LMMS_HAVE_SDL2
+	// Workaround for a race condition that causes SDL to segfault
+	SDL_Delay(50);
+
 	m_inputAudioHandle = m_audioHandle;
 	m_inputAudioHandle.callback = sdlInputAudioCallback;
 

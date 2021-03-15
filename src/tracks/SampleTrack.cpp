@@ -106,6 +106,16 @@ SampleTCO::SampleTCO( Track * _track ) :
 	updateTrackTcos();
 }
 
+SampleTCO::SampleTCO(const SampleTCO& orig) :
+	SampleTCO(orig.getTrack())
+{
+	// TODO: This creates a new SampleBuffer for the new TCO, eating up memory
+	// & eventually causing performance issues. Letting tracks share buffers
+	// when they're identical would fix this, but isn't possible right now.
+	*m_sampleBuffer = *orig.m_sampleBuffer;
+	m_isPlaying = orig.m_isPlaying;
+}
+
 
 
 
@@ -309,7 +319,7 @@ void SampleTCO::loadSettings( const QDomElement & _this )
 	if ( _this.hasAttribute( "sample_rate" ) ) {
 		m_sampleBuffer->setSampleRate( _this.attribute( "sample_rate" ).toInt() );
 	}
-	
+
 	if( _this.hasAttribute( "color" ) )
 	{
 		useCustomClipColor( true );
@@ -433,7 +443,7 @@ void SampleTCOView::contextMenuEvent( QContextMenuEvent * _cme )
 			tr( "Set clip color" ), this, SLOT( changeClipColor() ) );
 	contextMenu.addAction( embed::getIconPixmap( "colorize" ),
 			tr( "Use track color" ), this, SLOT( useTrackColor() ) );
-	
+
 	constructContextMenu( &contextMenu );
 
 	contextMenu.exec( QCursor::pos() );
@@ -621,6 +631,10 @@ void SampleTCOView::paintEvent( QPaintEvent * pe )
 			embed::getIconPixmap( "muted", size, size ) );
 	}
 
+	if ( m_marker )
+	{
+		p.drawLine(m_markerPos, rect().bottom(), m_markerPos, rect().top());
+	}
 	// recording sample tracks is not possible at the moment
 
 	/* if( m_tco->isRecord() )
@@ -649,6 +663,39 @@ void SampleTCOView::reverseSample()
 	m_tco->sampleBuffer()->setReversed(!m_tco->sampleBuffer()->reversed());
 	Engine::getSong()->setModified();
 	update();
+}
+
+
+
+
+//! Split this TCO.
+/*! \param pos the position of the split, relative to the start of the clip */
+bool SampleTCOView::splitTCO( const TimePos pos )
+{
+	setMarkerEnabled( false );
+
+	const TimePos splitPos = m_initialTCOPos + pos;
+
+	//Don't split if we slid off the TCO or if we're on the clip's start/end
+	//Cutting at exactly the start/end position would create a zero length
+	//clip (bad), and a clip the same length as the original one (pointless).
+	if ( splitPos > m_initialTCOPos && splitPos < m_initialTCOEnd )
+	{
+		m_tco->getTrack()->addJournalCheckPoint();
+		m_tco->getTrack()->saveJournallingState( false );
+
+		SampleTCO * rightTCO = new SampleTCO ( *m_tco );
+
+		m_tco->changeLength( splitPos - m_initialTCOPos );
+
+		rightTCO->movePosition( splitPos );
+		rightTCO->changeLength( m_initialTCOEnd - splitPos );
+		rightTCO->setStartTimeOffset( m_tco->startTimeOffset() - m_tco->length() );
+
+		m_tco->getTrack()->restoreJournallingState();
+		return true;
+	}
+	else { return false; }
 }
 
 
