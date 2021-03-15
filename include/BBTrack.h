@@ -168,10 +168,16 @@ public:
 		return( m_bbTrack );
 	}
 
+	// Create menu to assign all tracks from the BBTrack to a FX channel
+	QMenu* createFxMenu(QString title, QString newFxLabel) override;
 
 public slots:
 	void clickedTrackLabel();
 
+
+private slots:
+	void createFxLine();
+	void assignFxLine(int channelIndex);
 
 private:
 	BBTrack * m_bbTrack;
