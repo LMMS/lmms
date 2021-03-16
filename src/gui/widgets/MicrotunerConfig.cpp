@@ -157,9 +157,7 @@ MicrotunerConfig::MicrotunerConfig() :
 	baseKeySpin->setModel(&m_baseKeyModel);
 	keymapRangeLayout->addWidget(baseKeySpin, 1, 0);
 
-//	FIXME: replace after LcdFloatSpinBox is merged
-//	LcdFloatSpinBox *baseFreqSpin = new LcdFloatSpinBox(4, 3, nullptr, tr("Base note frequency"));
-	Knob *baseFreqSpin = new Knob(knobSmall_17, nullptr, tr("Base note frequency"));
+	LcdFloatSpinBox *baseFreqSpin = new LcdFloatSpinBox(4, 3, tr("Base note frequency"));
 	baseFreqSpin->setLabel(tr("BASE NOTE FREQ"));
 	baseFreqSpin->setModel(&m_baseFreqModel);
 	baseFreqSpin->setToolTip(tr("Base note frequency"));
