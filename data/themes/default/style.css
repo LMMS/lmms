@@ -490,7 +490,7 @@ QToolBar::separator {
 
 /* all tool buttons */
 
-QToolButton {
+QToolButton, QToolButton::menu-button {
 	margin: 1px;
 	padding: 2px 2px 2px 2px;
 	border-top: 1px solid #778394;
@@ -520,6 +520,22 @@ QToolButton:checked {
 	border-bottom: 1px solid #4a515e;
 	background: qlineargradient(spread:reflect, x1:0, y1:0, x2:0, y2:1, stop:0 #1b1f22, stop:1 #13161a);
 	background-image: url(resources:shadow_p.png);
+}
+
+/* buttons with combined menu */
+
+QToolButton[popupMode="1"] {
+	margin-right: 13px;
+	border-top-right-radius: 0;
+	border-bottom-right-radius: 0;
+}
+
+QToolButton::menu-button {
+	subcontrol-origin: margin;
+	width: 13px;
+	padding: 0;
+	border-top-left-radius: 0;
+	border-bottom-left-radius: 0;
 }
 
 /* track label buttons - the part that contains the icon and track title */

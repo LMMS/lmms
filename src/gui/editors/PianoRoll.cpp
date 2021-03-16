@@ -4554,7 +4554,7 @@ int PianoRoll::quantization() const
 }
 
 
-void PianoRoll::quantizeNotes()
+void PianoRoll::quantizeNotes(QuantizeActions mode)
 {
 	if( ! hasValidPattern() )
 	{
@@ -4582,8 +4582,15 @@ void PianoRoll::quantizeNotes()
 
 		Note copy(*n);
 		m_pattern->removeNote( n );
-		copy.quantizePos( quantization() );
-		m_pattern->addNote( copy );
+		if (mode == QuantizeBoth || mode == QuantizePos)
+		{
+			copy.quantizePos(quantization());
+		}
+		if (mode == QuantizeBoth || mode == QuantizeLength)
+		{
+			copy.quantizeLength(quantization());
+		}
+		m_pattern->addNote(copy, false);
 	}
 
 	update();
@@ -4704,15 +4711,30 @@ PianoRollWindow::PianoRollWindow() :
 
 	connect( editModeGroup, SIGNAL( triggered( int ) ), m_editor, SLOT( setEditMode( int ) ) );
 
-	QAction* quantizeAction = new QAction(embed::getIconPixmap( "quantize" ), tr( "Quantize" ), this );
-	connect( quantizeAction, SIGNAL( triggered() ), m_editor, SLOT( quantizeNotes() ) );
+	// Quantize combo button
+	QToolButton* quantizeButton = new QToolButton(notesActionsToolBar);
+	QMenu* quantizeButtonMenu = new QMenu(quantizeButton);
+
+	QAction* quantizeAction = new QAction(embed::getIconPixmap("quantize"), tr("Quantize"), this);
+	QAction* quantizePosAction = new QAction(tr("Quantize positions"), this);
+	QAction* quantizeLengthAction = new QAction(tr("Quantize lengths"), this);
+
+	connect(quantizeAction, &QAction::triggered, [this](){ m_editor->quantizeNotes(); });
+	connect(quantizePosAction, &QAction::triggered, [this](){ m_editor->quantizeNotes(PianoRoll::QuantizePos); });
+	connect(quantizeLengthAction, &QAction::triggered, [this](){ m_editor->quantizeNotes(PianoRoll::QuantizeLength); });
+
+	quantizeButton->setPopupMode(QToolButton::MenuButtonPopup);
+	quantizeButton->setDefaultAction(quantizeAction);
+	quantizeButton->setMenu(quantizeButtonMenu);
+	quantizeButtonMenu->addAction(quantizePosAction);
+	quantizeButtonMenu->addAction(quantizeLengthAction);
 
 	notesActionsToolBar->addAction( drawAction );
 	notesActionsToolBar->addAction( eraseAction );
 	notesActionsToolBar->addAction( selectAction );
 	notesActionsToolBar->addAction( pitchBendAction );
 	notesActionsToolBar->addSeparator();
-	notesActionsToolBar->addAction( quantizeAction );
+	notesActionsToolBar->addWidget(quantizeButton);
 
 	// Copy + paste actions
 	DropToolBar *copyPasteActionsToolBar =  addDropToolBarToTop( tr( "Copy paste controls" ) );
