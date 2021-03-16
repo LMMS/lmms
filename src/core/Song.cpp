@@ -835,6 +835,9 @@ void Song::convertBBtoSE()
 			}
 		}
 	}
+
+	// Resolve all automation IDs
+	AutomationPattern::resolveAllIDs();
 }
 
 
