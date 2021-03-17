@@ -490,7 +490,7 @@ QToolBar::separator {
 
 /* all tool buttons */
 
-QToolButton, QToolButton::menu-buttom {
+QToolButton, QToolButton::menu-button {
 	margin: 1px;
 	padding: 2px 2px 2px 2px;
 	border-top: 1px solid #778394;

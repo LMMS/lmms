@@ -484,7 +484,7 @@ QToolButton#stopButton {
 
 /* all tool buttons */
 
-QToolButton, QToolButton::menu-buttom {
+QToolButton, QToolButton::menu-button {
 	padding: 1px 1px 1px 1px;
 	border-radius: 5px;
 	border: 1px solid rgba(63, 63, 63, 128);
@@ -513,14 +513,14 @@ QToolButton:checked  {
 /* buttons with combined menu */
 
 QToolButton[popupMode="1"] {
-	margin-right: 13px;
+	margin-right: 11px;
 	border-top-right-radius: 0;
 	border-bottom-right-radius: 0;
 }
 
 QToolButton::menu-button {
 	subcontrol-origin: margin;
-	width: 13px;
+	width: 11px;
 	padding: 0;
 	border-top-left-radius: 0;
 	border-bottom-left-radius: 0;
