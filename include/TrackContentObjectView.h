@@ -93,8 +93,6 @@ public:
 	void setTextShadowColor( const QColor & c );
 	void setBBPatternBackground( const QColor & c );
 	void setGradient( const bool & b );
-	void setMouseHotspotHand(const QSize & s);
-	void setMouseHotspotKnife(const QSize & s);
 
 	// access needsUpdate member variable
 	bool needsUpdate();
