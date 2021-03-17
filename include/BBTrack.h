@@ -163,9 +163,13 @@ public:
 
 	bool close() override;
 
-	const BBTrack * getBBTrack() const
+	const BBTrack* getBBTrack() const
 	{
-		return( m_bbTrack );
+		return m_bbTrack;
+	}
+	BBTrack* getBBTrack()
+	{
+		return m_bbTrack;
 	}
 
 	// Create menu to assign all tracks from the BBTrack to a FX channel

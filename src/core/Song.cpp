@@ -777,7 +777,7 @@ void Song::addBBTrack()
 
 /* @brief Converts all BBTracks to regular tracks on the Song Editor
  */
-void Song::convertBBtoSE()
+void Song::convertBBtoSE(bool singleBB /* = false*/, int bb /* = 0*/)
 {
 	// Get all tracks from the BB editor
 	BBTrackContainer* bbContainer = Engine::getBBTrackContainer();
@@ -805,10 +805,14 @@ void Song::convertBBtoSE()
 		}
 		else { continue; }
 
+		// Convert either a single BBTrack or all of them
+		auto numTCOs = (*it)->numOfTCOs();
+		int firstBB = singleBB ? bb : 0;
+		int lastBB = singleBB ? bb : numTCOs - 1;
+
 		// Now go through all the TCOs and copy them in the appropriate place
 		// in the cloned track
-		auto numTCOs = (*it)->numOfTCOs();
-		for (int i = 0; i < numTCOs; ++i)
+		for (int i = firstBB; i <= lastBB; ++i)
 		{
 			// Find the BBTrack
 			BBTrack* bt = BBTrack::findBBTrack(i);

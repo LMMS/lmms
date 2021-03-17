@@ -363,7 +363,8 @@ public slots:
 	void clearProject();
 
 	void addBBTrack();
-	void convertBBtoSE();
+	// Convert all BB tracks or a single one to the Song Editor
+	void convertBBtoSE(bool singleBB = false, int bb = 0);
 
 
 private slots:
