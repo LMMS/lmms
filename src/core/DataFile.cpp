@@ -407,9 +407,9 @@ bool DataFile::writeFile(const QString& filename, bool withResources)
 
 bool DataFile::copyResources(const QString& resourcesDir)
 {
-	// Files will be named by the counter number + file extension
-	// to avoid name conflicts
-	unsigned int resCounter = 1;
+	// List of filenames used so we can append a counter to any
+	// repeating filenames
+	std::list<QString> namesList;
 
 	ResourcesMap::const_iterator it = ELEMENTS_WITH_RESOURCES.begin();
 
@@ -441,8 +441,27 @@ bool DataFile::copyResources(const QString& resourcesDir)
 							PathUtil::basePrefix(PathUtil::Base::LocalDir).length());
 					}
 
-					// The new file name is the counter number + the file extension
-					QString finalFileName = QString::number(resCounter) + "." + resPath.section('.',-1);
+					// Check if we need to add a counter to the filename
+					QString finalFileName = QFileInfo(resPath).fileName();
+					QString extension = resPath.section('.', -1);
+					int repeatedNames = 0;
+					for (QString name : namesList)
+					{
+						if (finalFileName == name)
+						{
+							++repeatedNames;
+						}
+					}
+					// Add the name to the list before modifying it
+					namesList.push_back(finalFileName);
+					if (repeatedNames)
+					{
+						// Remove the extension, add the counter and add the
+						// extension again to get the final file name
+						finalFileName.truncate(finalFileName.lastIndexOf('.'));
+						finalFileName = finalFileName + "-" + QString::number(repeatedNames) + "." + extension;
+					}
+
 					// Final path is our resources dir + the new file name
 					QString finalPath = resourcesDir + "/" + finalFileName;
 
@@ -456,9 +475,6 @@ bool DataFile::copyResources(const QString& resourcesDir)
 					// Update attribute path to point to the bundle file
 					QString newAtt = "local:resources/" + finalFileName;
 					el.setAttribute(*res, newAtt);
-
-					// Increases file counter
-					++resCounter;
 				}
 				++res;
 			}
