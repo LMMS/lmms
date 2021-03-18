@@ -1235,7 +1235,9 @@ bool Song::guiSaveProjectAs(const QString & filename)
 	// After saving, restore default save options.
 	m_saveOptions.setDefaultOptions();
 
-	if (saveResult)
+	// If we saved a bundle, we keep the project on the original
+	// file and still keep it as modified
+	if (saveResult && !withResources)
 	{
 		setModified(false);
 		setProjectFileName(fileNameWithExtension);

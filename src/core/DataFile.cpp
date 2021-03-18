@@ -278,70 +278,89 @@ void DataFile::write( QTextStream & _strm )
 
 bool DataFile::writeFile(const QString& filename, bool withResources)
 {
-	const QString fullName = nameWithExtension( filename );
+	// Small lambda function for displaying errors
+	auto showError = [this](QString title, QString body){
+		if (gui)
+		{
+			QMessageBox mb;
+			mb.setWindowTitle(title);
+			mb.setText(body);
+			mb.setIcon(QMessageBox::Warning);
+			mb.setStandardButtons(QMessageBox::Ok);
+			mb.exec();
+		}
+		else
+		{
+			qWarning() << body;
+		}
+	};
+
+	// If we are saving without resources, filename is just the file we are
+	// saving to. If we are saving with resources (project bundle), filename
+	// will be used (discarding extensions) to create a folder where the
+	// bundle will be saved in
+
+	QFileInfo fInfo(filename);
+
+	const QString bundleDir = fInfo.path() + "/" + fInfo.fileName().section('.', 0, 0);
+	const QString resourcesDir = bundleDir + "/resources";
+	const QString fullName = withResources
+		? nameWithExtension(bundleDir + "/" + fInfo.fileName())
+		: nameWithExtension(filename);
 	const QString fullNameTemp = fullName + ".new";
 	const QString fullNameBak = fullName + ".bak";
-	const QString resourcesDir = QFileInfo(fullName).path() + "/resources";
 
-	QFile outfile( fullNameTemp );
-
-	if( !outfile.open( QIODevice::WriteOnly | QIODevice::Truncate ) )
-	{
-		if( gui )
-		{
-			QMessageBox::critical( NULL,
-				SongEditor::tr( "Could not write file" ),
-				SongEditor::tr( "Could not open %1 for writing. You probably are not permitted to "
-								"write to this file. Please make sure you have write-access to "
-								"the file and try again." ).arg( fullName ) );
-		}
-
-		return false;
-	}
-
-	// If we are saving with resources
+	// If we are saving with resources, setup the bundle folder first
 	if (withResources)
 	{
-		// First check if there's a resources folder in the same
-		// path already. If so, warns user that we can't create a
-		// project bundle in the same folder as another.
-		if (QDir(resourcesDir).exists())
+		// First check if there's a bundle folder with the same name in
+		// the path already. If so, warns user that we can't overwrite a
+		// project bundle.
+		if (QDir(bundleDir).exists())
 		{
-			if (gui)
-			{
-				QMessageBox mb;
-				mb.setWindowTitle(SongEditor::tr("Operation denied"));
-				mb.setText(SongEditor::tr("A resources folder already exists on the "
-					"selected path. Can't create a project bundle in the same folder "
-					"as another one. Please select a different path."));
-				mb.setIcon(QMessageBox::Warning);
-				mb.setStandardButtons(QMessageBox::Ok);
+			showError(SongEditor::tr("Operation denied"),
+				SongEditor::tr("A bundle folder with that name already eists on the "
+				"selected path. Can't overwrite a project bundle. Please select a different "
+				"name."));
 
-				mb.exec();
-			}
-			else
-			{
-				qWarning() << SongEditor::tr("ERROR: A resources folder already exists on the "
-					"selected path. Can't create a project bundle in the same folder "
-					"as another one. Please select a different path.");
-			}
+			return false;
+		}
 
+		// Create bundle folder
+		if (!QDir().mkdir(bundleDir))
+		{
+			showError(SongEditor::tr("Error"),
+				SongEditor::tr("Couldn't create bundle folder."));
 			return false;
 		}
 
 		// Create resources folder
 		if (!QDir().mkdir(resourcesDir))
 		{
-			qWarning() << "ERROR: Failed to create resources dir!";
+			showError(SongEditor::tr("Error"),
+				SongEditor::tr("Couldn't create resources folder."));
 			return false;
 		}
 
 		// Copy resources to folder and update paths
 		if (!copyResources(resourcesDir))
 		{
-			qWarning() << "ERROR: Failed to copy resources!";
+			showError(SongEditor::tr("Error"),
+				SongEditor::tr("Failed to copy resources."));
 			return false;
 		}
+	}
+
+	QFile outfile (fullNameTemp);
+
+	if (!outfile.open(QIODevice::WriteOnly | QIODevice::Truncate))
+	{
+		showError(SongEditor::tr("Could not write file"),
+			SongEditor::tr("Could not open %1 for writing. You probably are not permitted to"
+				"write to this file. Please make sure you have write-access to "
+				"the file and try again.").arg(fullName));
+
+		return false;
 	}
 
 	if( fullName.section( '.', -1 ) == "mmpz" )
