@@ -56,7 +56,8 @@ stereoEnhancerEffect::stereoEnhancerEffect(
 	m_seFX( DspEffectLibrary::StereoEnhancer( 0.0f ) ),
 	m_delayBuffer( new sampleFrame[DEFAULT_BUFFER_SIZE] ),
 	m_currFrame( 0 ),
-	m_bbControls( this )
+	m_bbControls(this),
+	m_clearBuffer(true)
 {
 	// TODO:  Make m_delayBuffer customizable?
 	clearMyBuffer();
@@ -81,26 +82,39 @@ stereoEnhancerEffect::~stereoEnhancerEffect()
 bool stereoEnhancerEffect::processAudioBuffer( sampleFrame * _buf,
 							const fpp_t _frames )
 {
-	
 	// This appears to be used for determining whether or not to continue processing
 	// audio with this effect	
 	double out_sum = 0.0;
-	
+
 	float width;
 	int frameIndex = 0;
-	
-	
+
+	if (!isRunning() && !m_clearBuffer)
+	{
+		clearMyBuffer();
+	}
+
 	if( !isEnabled() || !isRunning() )
 	{
 		return( false );
 	}
 
+	// We are affecting the buffer, so we mark it as not clear
+	m_clearBuffer = false;
+
 	const float d = dryLevel();
 	const float w = wetLevel();
+	float gain = m_bbControls.m_outputGain.value();
+	const ValueBuffer* gainBuffer = m_bbControls.m_outputGain.valueBuffer();
 
 	for( fpp_t f = 0; f < _frames; ++f )
 	{
-		
+		// If we have a sample exact buffer, use it
+		if (gainBuffer)
+		{
+			gain = gainBuffer->value(f);
+		}
+
 		// copy samples into the delay buffer
 		m_delayBuffer[m_currFrame][0] = _buf[f][0];
 		m_delayBuffer[m_currFrame][1] = _buf[f][1];
@@ -122,8 +136,8 @@ bool stereoEnhancerEffect::processAudioBuffer( sampleFrame * _buf,
 
 		m_seFX.nextSample( s[0], s[1] );
 
-		_buf[f][0] = d * _buf[f][0] + w * s[0];
-		_buf[f][1] = d * _buf[f][1] + w * s[1];
+		_buf[f][0] = (d * _buf[f][0] + w * s[0]) * gain;
+		_buf[f][1] = (d * _buf[f][1] + w * s[1]) * gain;
 		out_sum += _buf[f][0]*_buf[f][0] + _buf[f][1]*_buf[f][1];
 
 		// Update currFrame
@@ -132,10 +146,6 @@ bool stereoEnhancerEffect::processAudioBuffer( sampleFrame * _buf,
 	}
 
 	checkGate( out_sum / _frames );
-	if( !isRunning() )
-	{
-		clearMyBuffer();
-	}
 
 	return( isRunning() );
 }
