@@ -58,7 +58,7 @@ private:
 
 	// Variable that holds whether the buffer
 	// needs to be cleared
-	bool m_clearBuffer;
+	bool m_isBufferClear;
 
 	friend class stereoEnhancerControls;
 } ;
