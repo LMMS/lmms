@@ -938,6 +938,21 @@ void InstrumentTrack::setPreviewMode( const bool value )
 
 
 
+void InstrumentTrack::replaceInstrument(DataFile dataFile)
+{
+	int effectChannel = effectChannelModel()->value();
+
+	InstrumentTrack::removeMidiPortNode(dataFile);
+	setSimpleSerializing();
+	loadSettings(dataFile.content().toElement());
+	
+	m_effectChannelModel.setValue(effectChannel);
+	Engine::getSong()->setModified();
+}
+
+
+
+
 QString InstrumentTrack::getSavedInstrumentName(const QDomElement &thisElement) const
 {
 	QDomElement elem = thisElement.firstChildElement("instrument");
@@ -1820,13 +1835,8 @@ void InstrumentTrackWindow::dropEvent( QDropEvent* event )
 	}
 	else if( type == "presetfile" )
 	{
-		DataFile dataFile( value );
-		InstrumentTrack::removeMidiPortNode( dataFile );
-		m_track->setSimpleSerializing();
-		m_track->loadSettings( dataFile.content().toElement() );
-
-		Engine::getSong()->setModified();
-
+		DataFile dataFile(value);
+		m_track->replaceInstrument(dataFile);
 		event->accept();
 		setFocus();
 	}
