@@ -57,7 +57,7 @@ stereoEnhancerEffect::stereoEnhancerEffect(
 	m_delayBuffer( new sampleFrame[DEFAULT_BUFFER_SIZE] ),
 	m_currFrame( 0 ),
 	m_bbControls(this),
-	m_isBufferClear(true)
+	m_bufferIsClear(true)
 {
 	// TODO:  Make m_delayBuffer customizable?
 	clearMyBuffer();
@@ -89,7 +89,7 @@ bool stereoEnhancerEffect::processAudioBuffer( sampleFrame * _buf,
 	float width;
 	int frameIndex = 0;
 
-	if (!isRunning() && !m_isBufferClear)
+	if (!isRunning() && !m_bufferIsClear)
 	{
 		clearMyBuffer();
 	}
@@ -100,7 +100,7 @@ bool stereoEnhancerEffect::processAudioBuffer( sampleFrame * _buf,
 	}
 
 	// We are affecting the buffer, so we mark it as not clear
-	m_isBufferClear = false;
+	m_bufferIsClear = false;
 
 	const float d = dryLevel();
 	const float w = wetLevel();
@@ -163,7 +163,7 @@ void stereoEnhancerEffect::clearMyBuffer()
 	}
 
 	m_currFrame = 0;
-	m_isBufferClear = true;
+	m_bufferIsClear = true;
 }
 
 
