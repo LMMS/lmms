@@ -198,7 +198,7 @@ void TrackOperationsWidget::paintEvent( QPaintEvent * pe )
 /*! \brief Show a message box warning the user that this track is about to be closed */
 bool TrackOperationsWidget::confirmRemoval()
 {
-	bool needConfirm = ConfigManager::inst()->value("ui", "trackdeletionwarning").toInt();
+	bool needConfirm = ConfigManager::inst()->value("ui", "trackdeletionwarning", "1").toInt();
 	if (!needConfirm){ return true; }
 	
 	QString messageRemoveTrack = tr("After removing a track, it can not "
