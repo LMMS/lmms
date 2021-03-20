@@ -776,6 +776,10 @@ void Song::addBBTrack()
 }
 
 /* @brief Converts all BBTracks to regular tracks on the Song Editor
+ * @param bool singleBB Indicates whether we are converting a single
+ * BBTrack or all of the Song BBTracks.
+ * @param int bb If single BB is true, indicates the index of the
+ * BBTrack being converted.
  */
 void Song::convertBBtoSE(bool singleBB /* = false*/, int bb /* = 0*/)
 {
@@ -820,6 +824,10 @@ void Song::convertBBtoSE(bool singleBB /* = false*/, int bb /* = 0*/)
 
 			// Get the TCO from the track inside the BBTrack
 			TrackContentObject* src = (*it)->getTCO(i);
+
+			// If TCO is a Pattern and it's empty, skip it
+			Pattern* p = dynamic_cast<Pattern *>(src);
+			if (p && p->empty()) { continue; }
 
 			// Go through the BBTrack's TCOs
 			Track::tcoVector bbtcos = bt->getTCOs();
