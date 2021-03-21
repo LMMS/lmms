@@ -41,6 +41,7 @@
 #include "StepRecorder.h"
 #include "StepRecorderWidget.h"
 #include "PositionLine.h"
+#include "InstrumentFunctions.h"
 
 class QPainter;
 class QPixmap;
@@ -243,7 +244,8 @@ private:
 		ActionSelectNotes,
 		ActionChangeNoteProperty,
 		ActionResizeNoteEditArea,
-		ActionKnife
+		ActionKnife,
+		ActionPlayKeys
 	};
 
 	enum NoteEditMode
@@ -311,6 +313,7 @@ private:
 	int selectionCount() const;
 	void testPlayNote( Note * n );
 	void testPlayKey( int _key, int _vol, int _pan );
+	void stopNotes();
 	void pauseTestNotes(bool pause = true );
 	void playChordNotes(int key, int velocity=-1);
 	void pauseChordNotes(int key);
@@ -356,6 +359,7 @@ private:
 	ComboBoxModel m_snapModel;
 
 	static QString m_lastChordName;
+	const InstrumentFunctionNoteStacking::Chord *m_lastChord;
 
 	static const QVector<float> m_zoomLevels;
 	static const QVector<float> m_zoomYLevels;

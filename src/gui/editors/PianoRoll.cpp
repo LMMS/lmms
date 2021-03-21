@@ -391,8 +391,7 @@ PianoRoll::PianoRoll() :
 	connect(&m_keyModel, &ComboBoxModel::dataChanged, this, &PianoRoll::keyChanged);
 
 	// Set up scale model
-	const InstrumentFunctionNoteStacking::ChordTable& chord_table =
-			InstrumentFunctionNoteStacking::ChordTable::getInstance();
+	auto chord_table = InstrumentFunctionNoteStacking::ChordTable::getInstance();
 
 	m_scaleModel.addItem( tr("No scale") );
 	for( const InstrumentFunctionNoteStacking::Chord& chord : chord_table )
@@ -449,6 +448,8 @@ PianoRoll::PianoRoll() :
 		this, SLOT(changeSnapMode()));
 
 	m_stepRecorder.initialize();
+
+	m_lastChord = nullptr;
 }
 
 
@@ -517,6 +518,7 @@ void PianoRoll::markSemiTone(int i, bool fromMenu)
 		? getKey(mapFromGlobal(m_semiToneMarkerMenu->pos()).y())
 		: m_keyModel.value() - 1;
 	const InstrumentFunctionNoteStacking::Chord * chord = nullptr;
+	auto cti = InstrumentFunctionNoteStacking::ChordTable::getInstance();
 
 	// if "No key" is selected, key is -1, unmark all semitones
 	// or if scale changed from toolbar to "No scale", unmark all semitones
@@ -566,14 +568,12 @@ void PianoRoll::markSemiTone(int i, bool fromMenu)
 			break;
 		}
 		case stmaMarkCurrentScale:
-			chord = & InstrumentFunctionNoteStacking::ChordTable::getInstance()
-					.getScaleByName( m_scaleModel.currentText() );
+			chord = &cti.getScaleByName(m_scaleModel.currentText());
 		case stmaMarkCurrentChord:
 		{
 			if( ! chord )
 			{
-				chord = & InstrumentFunctionNoteStacking::ChordTable::getInstance()
-						.getChordByName( m_chordModel.currentText() );
+				chord = &cti.getChordByName(m_chordModel.currentText());
 			}
 
 			if( chord->isEmpty() )
@@ -1620,7 +1620,10 @@ void PianoRoll::mousePressEvent(QMouseEvent * me)
 	// if user clicked in the timeline, ignore
 	if (me->y() < keyAreaTop()) { return; }
 
-	m_startedWithShift = me->modifiers() & Qt::ShiftModifier;
+	const bool shiftDown = me->modifiers() & Qt::ShiftModifier;
+	const bool ctrlDown = me->modifiers() & Qt::ControlModifier;
+
+	m_startedWithShift = shiftDown;
 
 	const bool leftButton = me->button() == Qt::LeftButton;
 	const bool rightButton = me->button() == Qt::RightButton;
@@ -1639,7 +1642,7 @@ void PianoRoll::mousePressEvent(QMouseEvent * me)
 	}
 
 	// if holding control, go to selection mode unless shift is also pressed
-	if (me->modifiers() & Qt::ControlModifier && m_editMode != ModeSelect)
+	if (ctrlDown && m_editMode != ModeSelect)
 	{
 		m_ctrlMode = m_editMode;
 		m_editMode = ModeSelect;
@@ -1662,12 +1665,12 @@ void PianoRoll::mousePressEvent(QMouseEvent * me)
 			if (leftButton)
 			{
 				int v = static_cast<int>((static_cast<float>(mex) / m_whiteKeyWidth) * MidiDefaultVelocity);
+				// side effects of testPlayKey:
+				// m_lastKey = keyNum
+				// m_lastChord updated
+				// calls pauseChordNotes/playChordNotes
+				m_action = Actions::ActionPlayKeys;
 				testPlayKey(keyNum, v, 0);
-				//m_pattern->instrumentTrack()->pianoModel()->handleKeyPress(keyNum, v);
-				// if a chord is set, play the chords notes as well:
-				//playChordNotes(keyNum, v);
-				//mouseMoveEvent(me);
-				//update();
 			}
 			else if (rightButton)
 			{
@@ -1740,9 +1743,8 @@ void PianoRoll::mousePressEvent(QMouseEvent * me)
 							createdNewNote = m_pattern->addNote(newNote);
 
 							// check for chord draw
-							const InstrumentFunctionNoteStacking::Chord & chord =
-								InstrumentFunctionNoteStacking::ChordTable::getInstance()
-								.getChordByName(m_chordModel.currentText());
+							auto cti = InstrumentFunctionNoteStacking::ChordTable::getInstance();
+							const auto chord = cti.getChordByName(m_chordModel.currentText());
 
 							// if a chord is selected, create following notes in chord
 							// or arpeggio mode
@@ -1799,33 +1801,27 @@ void PianoRoll::mousePressEvent(QMouseEvent * me)
 							m_moveBoundaryBottom = qMin(note->key(), m_moveBoundaryBottom);
 							m_moveBoundaryTop = qMax(note->key(), m_moveBoundaryTop);
 						}
-						printf("check tail\n");
+
 						// clicked at the "tail" of the note?
-						if( posTicks * m_ppb / TimePos::ticksPerBar() >
+						if (posTicks * m_ppb / TimePos::ticksPerBar() >
 								m_currentNote->endPos() * m_ppb / TimePos::ticksPerBar() - RESIZE_AREA_WIDTH
 							&& m_currentNote->length() > 0 )
 						{
-							printf("checkpoint\n");
 							m_pattern->addJournalCheckPoint();
 							// then resize the note
 							m_action = ActionResizeNote;
 
-							printf("quant\n");
 							//Calculate the minimum length we should allow when resizing
 							//each note, and let all notes use the smallest one found
 							m_minResizeLen = quantization();
-							printf("loop\n");
 							for (Note *note : selectedNotes)
 							{
-								printf("old\n");
 								//Notes from the BB editor can have a negative length, so
 								//change their length to the displayed one before resizing
 								if (note->oldLength() <= 0) { note->setOldLength(4); }
-								printf("min\n");
 								//Let the note be sized down by quantized increments, stopping
 								//when the next step down would result in a negative length
 								int thisMin = note->oldLength() % quantization();
-								printf("minresize\n");
 								//The initial value for m_minResizeLen is the minimum length of
 								//a note divisible by the current Q. Therefore we ignore notes
 								//where thisMin == 0 when checking for a new minimum
@@ -1833,11 +1829,11 @@ void PianoRoll::mousePressEvent(QMouseEvent * me)
 							}
 
 							// set resize-cursor
-							setCursor( Qt::SizeHorCursor );
+							setCursor(Qt::SizeHorCursor);
 						}
 						else
 						{
-							if( ! createdNewNote )
+							if (!createdNewNote)
 							{
 								m_pattern->addJournalCheckPoint();
 							}
@@ -1846,10 +1842,10 @@ void PianoRoll::mousePressEvent(QMouseEvent * me)
 							m_action = ActionMoveNote;
 
 							// set move-cursor
-							setCursor( Qt::SizeAllCursor );
+							setCursor(Qt::SizeAllCursor);
 
 							// if they're holding shift, copy all selected notes
-							if( ! isNewNote && me->modifiers() & Qt::ShiftModifier )
+							if (!isNewNote && shiftDown)
 							{
 								for (Note *note: selectedNotes)
 								{
@@ -1867,7 +1863,7 @@ void PianoRoll::mousePressEvent(QMouseEvent * me)
 							}
 
 							// play the note
-							testPlayNote( m_currentNote );
+							testPlayNote(m_currentNote);
 						}
 
 						Engine::getSong()->setModified();
@@ -1907,7 +1903,7 @@ void PianoRoll::mousePressEvent(QMouseEvent * me)
 						m_selectStartKey = keyNum;
 						m_selectedKeys = 1;
 						m_action = ActionSelectNotes;
-						printf("start ModeSelect\n");
+						// TODO: find a way to fix this glitch without calling mouseMoveEvent
 						// call mousemove to fix glitch where selection
 						// appears in wrong spot on mousedown
 						mouseMoveEvent(me);
@@ -1923,6 +1919,7 @@ void PianoRoll::mousePressEvent(QMouseEvent * me)
 		{
 			m_pattern->addJournalCheckPoint();
 			// scribble note edit changes
+			m_action = ActionChangeNoteProperty;
 			mouseMoveEvent( me );
 			return;
 		}
@@ -2434,7 +2431,7 @@ void PianoRoll::mouseDoubleClickEvent(QMouseEvent* me)
 
 void PianoRoll::testPlayNote( Note * n )
 {
-	printf("testPlayNote\n");
+	printf("testPlayNote %d\n", n->key());
 	m_lastKey = n->key();
 
 	if( ! n->isPlaying() && ! m_recording && ! m_stepRecorder.isRecording())
@@ -2457,11 +2454,23 @@ void PianoRoll::testPlayNote( Note * n )
 }
 
 
-
+void PianoRoll::stopNotes()
+{
+	for (Note* note : m_pattern->notes())
+	{
+		if (note->isPlaying())
+		{
+			m_pattern->instrumentTrack()->pianoModel()->handleKeyRelease(note->key());
+			pauseChordNotes(note->key());
+			note->setIsPlaying(false);
+		}
+	}
+	m_pattern->instrumentTrack()->pianoModel()->handleKeyRelease(m_lastKey);
+	pauseChordNotes(m_lastKey);
+}
 
 void PianoRoll::pauseTestNotes( bool pause )
 {
-	printf("pauseTestNotes\n");
 	for (Note *note : m_pattern->notes())
 	{
 		if( note->isPlaying() )
@@ -2469,8 +2478,7 @@ void PianoRoll::pauseTestNotes( bool pause )
 			if( pause )
 			{
 				// stop note
-				m_pattern->instrumentTrack()->pianoModel()->handleKeyRelease( note->key() );
-
+				m_pattern->instrumentTrack()->pianoModel()->handleKeyRelease(note->key());
 				// if a chord was set, stop the chords notes as well:
 				pauseChordNotes(note->key());
 			}
@@ -2486,38 +2494,31 @@ void PianoRoll::pauseTestNotes( bool pause )
 
 void PianoRoll::playChordNotes(int key, int velocity)
 {
-	printf("playChordNotes\n");
 	// if a chord is set, play the chords notes beside the base note.
 	Piano *pianoModel = m_pattern->instrumentTrack()->pianoModel();
-	const InstrumentFunctionNoteStacking::Chord & chord =
-			InstrumentFunctionNoteStacking::ChordTable::getInstance().getChordByName(
-				m_chordModel.currentText());
-	if (!chord.isEmpty())
+	auto cti = InstrumentFunctionNoteStacking::ChordTable::getInstance();
+	m_lastChord = &cti.getChordByName(m_chordModel.currentText());
+	if (!m_lastChord->isEmpty())
 	{
-		for (int i = 1; i < chord.size(); ++i)
+		for (int i = 1; i < m_lastChord->size(); ++i)
 		{
-			pianoModel->handleKeyPress(key + chord[i], velocity);
+			pianoModel->handleKeyPress(key + (*m_lastChord)[i], velocity);
 		}
 	}
 }
 
 void PianoRoll::pauseChordNotes(int key)
 {
-	printf("pauseChordNotes\n");
-	static const InstrumentFunctionNoteStacking::Chord* chord = nullptr;
 	// if a chord was set, stop the chords notes beside the base note.
 	Piano *pianoModel = m_pattern->instrumentTrack()->pianoModel();
-	if (chord && !chord->isEmpty())
+	if (m_lastChord && !m_lastChord->isEmpty())
 	{
-		for (int i = 1; i < chord->size(); ++i)
+		// start at the second key of the chord
+		for (int i = 1; i < m_lastChord->size(); ++i)
 		{
-			pianoModel->handleKeyRelease(key + (*chord)[i]);
+			pianoModel->handleKeyRelease(key + (*m_lastChord)[i]);
 		}
 	}
-	//const InstrumentFunctionNoteStacking::Chord & chord =
-	// now set new chord to be unpaused
-	chord = &InstrumentFunctionNoteStacking::ChordTable::getInstance().getChordByName(
-				m_chordModel.currentText());
 }
 
 void PianoRoll::setKnifeAction()
@@ -2543,7 +2544,6 @@ void PianoRoll::cancelKnifeAction()
 
 void PianoRoll::testPlayKey( int key, int velocity, int pan )
 {
-	printf("testPlayKey\n");
 	Piano *pianoModel = m_pattern->instrumentTrack()->pianoModel();
 	// turn off old key
 	pianoModel->handleKeyRelease( m_lastKey );
@@ -2636,17 +2636,20 @@ void PianoRoll::computeSelectedNotes(bool shift)
 
 void PianoRoll::mouseReleaseEvent( QMouseEvent * me )
 {
+	const bool shiftDown = me->modifiers() & Qt::ShiftModifier;
+	const bool rightUp = me->button() & Qt::RightButton;
+	const bool leftUp = me->button() & Qt::LeftButton;
 	bool mustRepaint = false;
 
 	s_textFloat->hide();
 
 	// Quit knife mode if we pressed and released the right mouse button
-	if (m_editMode == ModeEditKnife && me->button() == Qt::RightButton)
+	if (m_editMode == ModeEditKnife && rightUp)
 	{
 		cancelKnifeAction();
 	}
 
-	if( me->button() & Qt::LeftButton )
+	if (leftUp)
 	{
 		mustRepaint = true;
 
@@ -2654,8 +2657,7 @@ void PianoRoll::mouseReleaseEvent( QMouseEvent * me )
 		{
 			// select the notes within the selection rectangle and
 			// then destroy the selection rectangle
-			computeSelectedNotes(
-					me->modifiers() & Qt::ShiftModifier );
+			computeSelectedNotes(shiftDown);
 		}
 		else if( m_action == ActionMoveNote )
 		{
@@ -2677,7 +2679,7 @@ void PianoRoll::mouseReleaseEvent( QMouseEvent * me )
 		}
 	}
 
-	if( me->button() & Qt::RightButton )
+	if (rightUp)
 	{
 		m_mouseDownRight = false;
 		mustRepaint = true;
@@ -2686,21 +2688,7 @@ void PianoRoll::mouseReleaseEvent( QMouseEvent * me )
 	if( hasValidPattern() )
 	{
 		// turn off all notes that are playing
-		for ( Note *note : m_pattern->notes() )
-		{
-			if( note->isPlaying() )
-			{
-				m_pattern->instrumentTrack()->pianoModel()->
-						handleKeyRelease( note->key() );
-				pauseChordNotes(note->key());
-				note->setIsPlaying( false );
-			}
-		}
-
-		// stop playing keys that we let go of
-		m_pattern->instrumentTrack()->pianoModel()->
-						handleKeyRelease( m_lastKey );
-		pauseChordNotes(m_lastKey);
+		stopNotes();
 	}
 
 	m_currentNote = NULL;
@@ -2747,8 +2735,8 @@ void PianoRoll::mouseMoveEvent(QMouseEvent * me)
 	m_lastMouseX = mex;
 	m_lastMouseY = mey;
 
-	printf("mouseMoveEvent : %d %d %d %d %d %d\n",
-		leftButton, rightButton, mex, mey, pra, m_action);
+	// printf("mouseMoveEvent : %d %d %d %d %d %d\n",
+	// 	leftButton, rightButton, mex, mey, pra, m_action);
 
 	switch (m_action)
 	{
@@ -2814,6 +2802,23 @@ void PianoRoll::mouseMoveEvent(QMouseEvent * me)
 
 			break;
 		}
+		case ActionPlayKeys:
+		{
+			const int keyNum = getKey(mey);
+			const int v = static_cast<int>((static_cast<float>(mex) / m_whiteKeyWidth) * MidiDefaultVelocity);
+			if (keyNum != m_lastKey)
+			{
+				testPlayKey(keyNum, v, 0);
+			}
+			else
+			{
+				// update velocity?
+				printf("update velocity?\n");
+				m_pattern->instrumentTrack()->pianoModel()->handleKeyPress(keyNum, v);
+				playChordNotes(keyNum, v);
+			}
+			return;
+		}
 		case ActionMoveNote:
 		case ActionResizeNote:
 		{
@@ -2824,19 +2829,21 @@ void PianoRoll::mouseMoveEvent(QMouseEvent * me)
 
 			if (replayNote || (m_action == ActionMoveNote && shiftDown && ! m_startedWithShift))
 			{
+				printf("mousemove::pause notes\n");
 				pauseTestNotes();
 			}
 
 			dragNotes(
-				me->x(),
-				me->y(),
+				mex,
+				mey,
 				me->modifiers() & Qt::AltModifier,
-				me->modifiers() & Qt::ShiftModifier,
+				shiftDown,
 				me->modifiers() & Qt::ControlModifier
 			);
 
 			if (replayNote && m_action == ActionMoveNote && ! (shiftDown && ! m_startedWithShift))
 			{
+				printf("mousemove::play notes\n");
 				pauseTestNotes(false);
 			}
 
@@ -5363,12 +5370,9 @@ void PianoRoll::quantizeNotes(QuantizeActions mode)
 
 void PianoRoll::updateSemiToneMarkerMenu()
 {
-	const InstrumentFunctionNoteStacking::ChordTable& chord_table =
-			InstrumentFunctionNoteStacking::ChordTable::getInstance();
-	const InstrumentFunctionNoteStacking::Chord& scale =
-			chord_table.getScaleByName( m_scaleModel.currentText() );
-	const InstrumentFunctionNoteStacking::Chord& chord =
-			chord_table.getChordByName( m_chordModel.currentText() );
+	auto cti = InstrumentFunctionNoteStacking::ChordTable::getInstance();
+	auto scale = cti.getScaleByName(m_scaleModel.currentText());
+	auto chord = cti.getChordByName(m_chordModel.currentText());
 
 	emit semiToneMarkerMenuScaleSetEnabled( ! scale.isEmpty() );
 	emit semiToneMarkerMenuChordSetEnabled( ! chord.isEmpty() );
