@@ -57,8 +57,8 @@ class TrackContentObjectView : public selectableObject, public ModelView
 	Q_PROPERTY( bool gradient READ gradient WRITE setGradient )
 	// We have to use a QSize here because using QPoint isn't supported.
 	// width -> x, height -> y
-	Q_PROPERTY( QSize mouseHotspotHand WRITE setMouseHotspotHand )
-	Q_PROPERTY( QSize mouseHotspotKnife WRITE setMouseHotspotKnife )
+	Q_PROPERTY( QSize mouseHotspotHand MEMBER m_mouseHotspotHand )
+	Q_PROPERTY( QSize mouseHotspotKnife MEMBER m_mouseHotspotKnife )
 
 public:
 	TrackContentObjectView( TrackContentObject * tco, TrackView * tv );
@@ -93,8 +93,6 @@ public:
 	void setTextShadowColor( const QColor & c );
 	void setBBPatternBackground( const QColor & c );
 	void setGradient( const bool & b );
-	void setMouseHotspotHand(const QSize & s);
-	void setMouseHotspotKnife(const QSize & s);
 
 	// access needsUpdate member variable
 	bool needsUpdate();
