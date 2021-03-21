@@ -31,6 +31,7 @@
 #include <QKeyEvent>
 #include <QLabel>
 #include <QLayout>
+#include <QMessageBox>
 #include <QMdiArea>
 #include <QPainter>
 #include <QPointer>
@@ -66,6 +67,7 @@
 #include "StepRecorderWidget.h"
 #include "TextFloat.h"
 #include "TimeLineWidget.h"
+#include "FileDialog.h"
 
 
 using std::move;
@@ -4736,6 +4738,29 @@ PianoRollWindow::PianoRollWindow() :
 	notesActionsToolBar->addSeparator();
 	notesActionsToolBar->addWidget(quantizeButton);
 
+	// -- File actions
+	DropToolBar* fileActionsToolBar = addDropToolBarToTop(tr("File actions"));
+
+	// -- File ToolButton
+	m_fileToolsButton = new QToolButton(m_toolBar);
+	m_fileToolsButton->setIcon(embed::getIconPixmap("file"));
+	m_fileToolsButton->setPopupMode(QToolButton::InstantPopup);
+
+	// Import / export
+	QAction* importAction = new QAction(embed::getIconPixmap("project_import"),
+		tr("Import pattern"), m_fileToolsButton);
+
+	QAction* exportAction = new QAction(embed::getIconPixmap("project_export"),
+		tr("Export pattern"), m_fileToolsButton);
+
+	m_fileToolsButton->addAction(importAction);
+	m_fileToolsButton->addAction(exportAction);
+	fileActionsToolBar->addWidget(m_fileToolsButton);
+
+	connect(importAction, SIGNAL(triggered()), this, SLOT(importPattern()));
+	connect(exportAction, SIGNAL(triggered()), this, SLOT(exportPattern()));
+	// -- End File actions
+
 	// Copy + paste actions
 	DropToolBar *copyPasteActionsToolBar =  addDropToolBarToTop( tr( "Copy paste controls" ) );
 
@@ -4987,12 +5012,14 @@ void PianoRollWindow::setCurrentPattern( Pattern* pattern )
 	if ( pattern )
 	{
 		setWindowTitle( tr( "Piano-Roll - %1" ).arg( pattern->name() ) );
+		m_fileToolsButton->setEnabled(true);
 		connect( pattern->instrumentTrack(), SIGNAL( nameChanged() ), this, SLOT( updateAfterPatternChange()) );
 		connect( pattern, SIGNAL( dataChanged() ), this, SLOT( updateAfterPatternChange() ) );
 	}
 	else
 	{
 		setWindowTitle( tr( "Piano-Roll - no pattern" ) );
+		m_fileToolsButton->setEnabled(false);
 	}
 }
 
@@ -5158,10 +5185,12 @@ void PianoRollWindow::patternRenamed()
 	if ( currentPattern() )
 	{
 		setWindowTitle( tr( "Piano-Roll - %1" ).arg( currentPattern()->name() ) );
+		m_fileToolsButton->setEnabled(true);
 	}
 	else
 	{
 		setWindowTitle( tr( "Piano-Roll - no pattern" ) );
+		m_fileToolsButton->setEnabled(false);
 	}
 }
 
@@ -5171,6 +5200,84 @@ void PianoRollWindow::patternRenamed()
 void PianoRollWindow::ghostPatternSet( bool state )
 {
 	m_clearGhostButton->setEnabled( state );
+}
+
+
+
+
+void PianoRollWindow::exportPattern()
+{
+	FileDialog exportDialog(this, tr("Export pattern"), "",
+		tr("XML pattern file (*.xpt *.xptz)"));
+
+	exportDialog.setAcceptMode(FileDialog::AcceptSave);
+
+	if (exportDialog.exec() == QDialog::Accepted &&
+		!exportDialog.selectedFiles().isEmpty() &&
+		!exportDialog.selectedFiles().first().isEmpty())
+	{
+		QString suffix =
+			ConfigManager::inst()->value("app", "nommpz").toInt() == 0
+				? "xptz"
+				: "xpt";
+		exportDialog.setDefaultSuffix(suffix);
+
+		const QString fullPath = exportDialog.selectedFiles()[0];
+		DataFile dataFile(DataFile::NotePattern);
+		m_editor->m_pattern->saveSettings(dataFile, dataFile.content());
+
+		if (dataFile.writeFile(fullPath))
+		{
+			TextFloat::displayMessage(tr("Export pattern success"),
+				tr("Pattern saved to %1").arg(fullPath),
+				embed::getIconPixmap("project_export"), 4000);
+		}
+	}
+}
+
+
+
+
+void PianoRollWindow::importPattern()
+{
+	// Overwrite confirmation.
+	if (!m_editor->m_pattern->empty() &&
+		QMessageBox::warning(
+			NULL,
+			tr("Import pattern."),
+			tr("You are about to import a pattern, this will "
+				"overwrite your current pattern. Do you want to "
+				"continue?"),
+			QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes
+		) != QMessageBox::Yes)
+	{
+		return;
+	}
+
+	FileDialog importDialog(this, tr("Open pattern"), "",
+		tr("XML pattern file (*.xpt *.xptz)"));
+	importDialog.setFileMode(FileDialog::ExistingFile);
+
+	if (importDialog.exec() == QDialog::Accepted &&
+		!importDialog.selectedFiles().isEmpty())
+	{
+		const QString fullPath = importDialog.selectedFiles()[0];
+		DataFile dataFile(fullPath);
+
+		if (dataFile.head().isNull())
+		{
+			return;
+		}
+
+		TimePos pos = m_editor->m_pattern->startPosition(); // Backup position in timeline.
+
+		m_editor->m_pattern->loadSettings(dataFile.content());
+		m_editor->m_pattern->movePosition(pos);
+
+		TextFloat::displayMessage(tr("Import pattern success"),
+			tr("Imported pattern %1!").arg(fullPath),
+			embed::getIconPixmap("project_import"), 4000);
+	}
 }
 
 
