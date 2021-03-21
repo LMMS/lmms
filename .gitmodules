@@ -51,4 +51,4 @@
 	url = https://github.com/lmms/cmt
 [submodule "plugins/LadspaEffect/caps/caps-lv2"]
 	path = plugins/LadspaEffect/caps/caps-lv2
-	url = https://github.com/moddevices/caps-lv2.git
+	url = https://github.com/JohannesLorenz/caps-lv2.git
