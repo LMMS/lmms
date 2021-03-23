@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef _TIMES_H
-#define _TIMES_H
+#ifndef TIMES_H_FILE
+#define TIMES_H_FILE
 
 #ifdef _WIN32
 #include <sys/timeb.h>
@@ -38,7 +38,7 @@ int gettimeofday(struct timeval* t, void* timezone);
 //#include <features.h>
 
 #define __need_clock_t
-#include <time.h>
+#include <Time.h>
 
 
 /* Structure describing CPU time used by a process and its children.  */

@@ -1,6 +1,6 @@
 /*
  * TimePos.cpp - Windows compatible implementation of sys/time.cpp.
- * Copied from http://www.codefull.net/2015/12/systime-h-replacement-for-windows/
+ * Copied from https://www.codefull.net/2015/12/systime-h-replacement-for-windows/
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net
  *
@@ -23,7 +23,15 @@
  *
  */
 
-#include "sys/times.h"
+#ifndef TIMES_H
+#define TIMES_H
+
+#include "sys/Times.h"
+
+#endif
+
+#ifndef TIME
+#define TIME
 
 int gettimeofday(struct timeval* t, void* timezone)
 {
@@ -42,3 +50,5 @@ clock_t times(struct tms* __buffer) {
 	__buffer->tms_cutime = 0;
 	return __buffer->tms_utime;
 }
+
+#endif

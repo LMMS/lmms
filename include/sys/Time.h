@@ -25,8 +25,9 @@
 
 #pragma once
 
-#ifndef _TIMES_H
+#ifndef TIMES_H
+#define TIMES_H
 
-#include "sys/times.h"
+#include "sys/Times.h"
 
 #endif
