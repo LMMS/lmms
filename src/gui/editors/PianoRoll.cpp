@@ -186,7 +186,6 @@ PianoRoll::PianoRoll() :
 	m_lastKey( 0 ),
 	m_editMode( ModeDraw ),
 	m_ctrlMode( ModeDraw ),
-	m_mouseDownRight( false ),
 	m_scrollBack( false ),
 	m_stepRecorderWidget(this, DEFAULT_PR_PPB, PR_TOP_MARGIN, PR_BOTTOM_MARGIN + m_notesEditHeight, WHITE_KEY_WIDTH, 0),
 	m_stepRecorder(*this, m_stepRecorderWidget),
@@ -1870,7 +1869,7 @@ void PianoRoll::mousePressEvent(QMouseEvent * me)
 					}
 					else if (rightButton) // erase single note
 					{
-						m_mouseDownRight = true;
+						m_action = ActionRemoveNote;
 						if (n != nullptr)
 						{
 							m_pattern->addJournalCheckPoint();
@@ -1885,6 +1884,7 @@ void PianoRoll::mousePressEvent(QMouseEvent * me)
 				case EditModes::ModeErase:
 				{
 					// erase single note
+					m_action = ActionRemoveNote;
 					if (n != nullptr)
 					{
 						m_pattern->addJournalCheckPoint();
@@ -2634,12 +2634,13 @@ void PianoRoll::computeSelectedNotes(bool shift)
 
 
 
-void PianoRoll::mouseReleaseEvent( QMouseEvent * me )
+void PianoRoll::mouseReleaseEvent(QMouseEvent* me)
 {
 	const bool shiftDown = me->modifiers() & Qt::ShiftModifier;
 	const bool rightUp = me->button() & Qt::RightButton;
 	const bool leftUp = me->button() & Qt::LeftButton;
-	bool mustRepaint = false;
+	// Both right and left releases should trigger a repaint
+	bool mustRepaint = rightUp || leftUp;
 
 	s_textFloat->hide();
 
@@ -2651,15 +2652,13 @@ void PianoRoll::mouseReleaseEvent( QMouseEvent * me )
 
 	if (leftUp)
 	{
-		mustRepaint = true;
-
-		if( m_action == ActionSelectNotes && m_editMode == ModeSelect )
+		if (m_action == ActionSelectNotes && m_editMode == ModeSelect)
 		{
 			// select the notes within the selection rectangle and
 			// then destroy the selection rectangle
 			computeSelectedNotes(shiftDown);
 		}
-		else if( m_action == ActionMoveNote )
+		else if (m_action == ActionMoveNote)
 		{
 			// we moved one or more notes so they have to be
 			// moved properly according to new starting-
@@ -2668,42 +2667,36 @@ void PianoRoll::mouseReleaseEvent( QMouseEvent * me )
 
 		}
 
-		if( m_action == ActionMoveNote || m_action == ActionResizeNote )
+		if (m_action == ActionMoveNote || m_action == ActionResizeNote)
 		{
 			// if we only moved one note, deselect it so we can
 			// edit the notes in the note edit area
-			if( selectionCount() == 1 )
+			if (selectionCount() == 1)
 			{
 				clearSelectedNotes();
 			}
 		}
 	}
 
-	if (rightUp)
-	{
-		m_mouseDownRight = false;
-		mustRepaint = true;
-	}
-
-	if( hasValidPattern() )
+	if (hasValidPattern())
 	{
 		// turn off all notes that are playing
 		stopNotes();
 	}
 
-	m_currentNote = NULL;
+	m_currentNote = nullptr;
 
 	if (m_action != ActionKnife)
 	{
 		m_action = ActionNone;
 	}
 
-	if( m_editMode == ModeDraw )
+	if (m_editMode == ModeDraw)
 	{
-		setCursor( Qt::ArrowCursor );
+		setCursor(Qt::ArrowCursor);
 	}
 
-	if( mustRepaint )
+	if (mustRepaint)
 	{
 		repaint();
 	}
@@ -2742,41 +2735,7 @@ void PianoRoll::mouseMoveEvent(QMouseEvent * me)
 	{
 		case ActionNone:
 		{
-			const int keyNum = getKey(mey);
-
-			// See if they clicked on the keyboard on the left
-			if (pra == PianoRollArea::Keys && keyNum != m_lastKey && leftButton)
-			{
-				// Clicked on a key, play the note
-				testPlayKey(keyNum, ((float) mex) / ((float) m_whiteKeyWidth) * MidiDefaultVelocity, 0);
-				update();
-				return;
-			}
-
 			Note* const n = noteUnderMouse();
-			// TODO: Removing notes should have an action of its own
-			// If we're in ModeDraw and holding right button or ModeErase and any
-			if (n != nullptr)
-			{
-				switch (m_editMode)
-				{
-					case ModeDraw:
-					{
-						// Don't continue if we're not holding right button
-						if (!rightButton) { break; }
-					}
-					case ModeErase:
-					{
-						m_pattern->removeNote(n);
-						update();
-						return;
-					}
-					case ModeSelect:
-					case ModeEditDetuning:
-					case ModeEditKnife:
-						break;
-				}
-			}
 
 			// Set the appropriate cursor
 			// Default is Arrow Cursor
@@ -2802,10 +2761,33 @@ void PianoRoll::mouseMoveEvent(QMouseEvent * me)
 
 			break;
 		}
+		case ActionRemoveNote:
+		{
+			Note* const n = noteUnderMouse();
+			// If we're in ModeDraw and holding right button or ModeErase and any
+			if (n != nullptr)
+			{
+				if ((m_editMode == ModeDraw && rightButton) ||
+					(m_editMode == ModeErase))
+				{
+					m_pattern->removeNote(n);
+				}
+			}
+
+			update();
+			return;
+
+			break;
+		}
 		case ActionPlayKeys:
 		{
 			const int keyNum = getKey(mey);
-			const int v = static_cast<int>((static_cast<float>(mex) / m_whiteKeyWidth) * MidiDefaultVelocity);
+			// Calculate the velocity to play the key
+			// TODO: Use std::clamp when we have C++17
+			auto vx = std::min(mex, m_whiteKeyWidth);
+			vx = std::max(vx, 0);
+			const int v = static_cast<int>((static_cast<float>(vx) / m_whiteKeyWidth) * MidiDefaultVelocity);
+
 			if (keyNum != m_lastKey)
 			{
 				testPlayKey(keyNum, v, 0);
@@ -2817,7 +2799,10 @@ void PianoRoll::mouseMoveEvent(QMouseEvent * me)
 				m_pattern->instrumentTrack()->pianoModel()->handleKeyPress(keyNum, v);
 				playChordNotes(keyNum, v);
 			}
+			update();
 			return;
+
+			break;
 		}
 		case ActionMoveNote:
 		case ActionResizeNote:
@@ -4400,11 +4385,11 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 		switch( m_editMode )
 		{
 			case ModeDraw:
-				if( m_mouseDownRight )
+				if (m_action == ActionRemoveNote)
 				{
 					cursor = s_toolErase;
 				}
-				else if( m_action == ActionMoveNote )
+				else if (m_action == ActionMoveNote)
 				{
 					cursor = s_toolMove;
 				}
