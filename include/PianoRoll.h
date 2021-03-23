@@ -47,6 +47,7 @@ class QPixmap;
 class QScrollBar;
 class QString;
 class QMenu;
+class QToolButton;
 
 class ComboBox;
 class NotePlayHandle;
@@ -142,6 +143,13 @@ public:
 	int quantization() const;
 
 protected:
+	enum QuantizeActions
+	{
+		QuantizeBoth,
+		QuantizePos,
+		QuantizeLength
+	};
+
 	void keyPressEvent( QKeyEvent * ke ) override;
 	void keyReleaseEvent( QKeyEvent * ke ) override;
 	void leaveEvent( QEvent * e ) override;
@@ -198,7 +206,7 @@ protected slots:
 	void quantizeChanged();
 	void noteLengthChanged();
 	void keyChanged();
-	void quantizeNotes();
+	void quantizeNotes(QuantizeActions mode = QuantizeBoth);
 
 	void updateSemiToneMarkerMenu();
 
@@ -211,6 +219,10 @@ protected slots:
 
 	void clearGhostPattern();
 	void glueNotes();
+	void fitNoteLengths(bool fill);
+	void constrainNoteLengths(bool constrainMax);
+
+	void changeSnapMode();
 
 
 signals:
@@ -254,6 +266,13 @@ private:
 		PR_WHITE_KEY_SMALL,
 		PR_WHITE_KEY_BIG,
 		PR_BLACK_KEY
+	};
+
+	enum GridMode
+	{
+		gridNudge,
+		gridSnap
+	//	gridFree
 	};
 
 	PositionLine * m_positionLine;
@@ -300,7 +319,7 @@ private:
 	int noteEditRight() const;
 	int noteEditLeft() const;
 
-	void dragNotes( int x, int y, bool alt, bool shift, bool ctrl );
+	void dragNotes(int x, int y, bool alt, bool shift, bool ctrl);
 
 	static const int cm_scrollAmtHoriz = 10;
 	static const int cm_scrollAmtVert = 1;
@@ -323,6 +342,7 @@ private:
 	ComboBoxModel m_keyModel;
 	ComboBoxModel m_scaleModel;
 	ComboBoxModel m_chordModel;
+	ComboBoxModel m_snapModel;
 
 	static const QVector<double> m_zoomLevels;
 	static const QVector<double> m_zoomYLevels;
@@ -345,6 +365,7 @@ private:
 	Note * m_currentNote;
 	Actions m_action;
 	NoteEditMode m_noteEditMode;
+	GridMode m_gridMode;
 
 	int m_selectStartTick;
 	int m_selectedTick;
@@ -510,6 +531,8 @@ signals:
 private slots:
 	void updateAfterPatternChange();
 	void ghostPatternSet( bool state );
+	void exportPattern();
+	void importPattern();
 
 private:
 	void patternRenamed();
@@ -519,6 +542,7 @@ private:
 
 	PianoRoll* m_editor;
 
+	QToolButton* m_fileToolsButton;
 	ComboBox * m_zoomingComboBox;
 	ComboBox * m_zoomingYComboBox;
 	ComboBox * m_quantizeComboBox;
@@ -526,6 +550,7 @@ private:
 	ComboBox * m_keyComboBox;
 	ComboBox * m_scaleComboBox;
 	ComboBox * m_chordComboBox;
+	ComboBox* m_snapComboBox;
 	QPushButton * m_clearGhostButton;
 
 };

@@ -83,7 +83,8 @@ DataFile::typeDescStruct
 	{ DataFile::DragNDropData, "dnddata" },
 	{ DataFile::ClipboardData, "clipboard-data" },
 	{ DataFile::JournalData, "journaldata" },
-	{ DataFile::EffectSettings, "effectsettings" }
+	{ DataFile::EffectSettings, "effectsettings" },
+	{ DataFile::NotePattern, "pattern" }
 } ;
 
 
@@ -181,6 +182,12 @@ bool DataFile::validate( QString extension )
 		break;
 	case Type::InstrumentTrackSettings:
 		if ( extension == "xpf" || extension == "xml" )
+		{
+			return true;
+		}
+		break;
+	case Type::NotePattern:
+		if (extension == "xpt" || extension == "xptz")
 		{
 			return true;
 		}
@@ -286,7 +293,8 @@ bool DataFile::writeFile( const QString& filename )
 		return false;
 	}
 
-	if( fullName.section( '.', -1 ) == "mmpz" )
+	const QString extension = fullName.section('.', -1);
+	if (extension == "mmpz" || extension == "xptz")
 	{
 		QString xml;
 		QTextStream ts( &xml );
