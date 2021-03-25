@@ -433,8 +433,8 @@ bool DataFile::copyResources(const QString& resourcesDir)
 				{
 					// Get absolute path to resource
 					QString resPath = PathUtil::toAbsolute(el.attribute(*res));
-					// If we are running from CLI (without the project loaded), "local:" base
-					// prefixes aren't converted properly, so we need to convert it ourselves
+					// If we are running without the project loaded (from CLI), "local:" base
+					// prefixes aren't converted, so we need to convert it ourselves
 					if (PathUtil::baseLookup(resPath) == PathUtil::Base::LocalDir)
 					{
 						resPath = QFileInfo(m_fileName).path() + "/" + resPath.remove(0,

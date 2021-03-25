@@ -169,6 +169,9 @@ void printHelp()
 		"  upgrade <in> [out]                    Upgrade file <in> and save as <out>\n"
 		"                                        Standard out is used if no output file\n"
 		"                                        is specified\n"
+		"  makebundle <in> [out]                 Make a project bundle from the project\n"
+		"                                        file <in> saving the resulting bundle\n"
+		"                                        as <out>\n"
 		"\nGlobal options:\n"
 		"      --allowroot                Bypass root user startup check (use with\n"
 		"          caution).\n"
@@ -403,7 +406,7 @@ int main( int argc, char * * argv )
 
 			return EXIT_SUCCESS;
 		}
-		else if (arg == "makeBundle" || arg == "--makeBundle")
+		else if (arg == "makebundle")
 		{
 			++i;
 
@@ -422,7 +425,7 @@ int main( int argc, char * * argv )
 			}
 			else
 			{
-				return usageError("No project bundle file name given.");
+				return usageError("No project bundle name given");
 			}
 		}
 		else if( arg == "--allowroot" )

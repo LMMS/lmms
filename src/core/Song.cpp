@@ -993,7 +993,7 @@ void Song::loadProject( const QString & fileName )
 	}
 	else
 	{
-		// We check if VST plugins contain local paths to prevent malicious code being
+		// We check if plugins contain local paths to prevent malicious code being
 		// added to project bundles and loaded with "local:" paths
 		if (dataFile.hasLocalPlugins())
 		{
