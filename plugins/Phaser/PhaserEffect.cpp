@@ -603,7 +603,7 @@ void PhaserEffect::restartLFO()
 
 
 
-// Takes input of original Hz and the number of cents to detune it by, and returns the detuned result in Hz.
+// Takes input of original Hz and the number of octaves to detune it by, and returns the detuned result in Hz.
 float PhaserEffect::detuneWithOctaves(float pitchValue, float detuneValue)
 {
 	return pitchValue * std::exp2(detuneValue); 
