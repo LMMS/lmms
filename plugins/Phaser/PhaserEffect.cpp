@@ -302,9 +302,11 @@ bool PhaserEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 
 		// Calculate real allpass filter frequencies
 		float lfoResults[2] = {0, 0};
-		if (enableLFO)
+		m_lfo->tick(&lfoResults[0], &lfoResults[1]);
+		if (!enableLFO)
 		{
-			m_lfo->tick(&lfoResults[0], &lfoResults[1]);
+			lfoResults[0] = 0;
+			lfoResults[1] = 0;
 		}
 
 		const float realLfo[2] = {lfoResults[0] * amount, lfoResults[1] * amount};
