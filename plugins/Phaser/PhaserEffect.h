@@ -28,7 +28,7 @@
 
 #include "PhaserControls.h"
 
-#include "../Flanger/QuadratureLfo.h"
+#include "QuadratureLfo.h"
 #include "Effect.h"
 #include "ValueBuffer.h"
 

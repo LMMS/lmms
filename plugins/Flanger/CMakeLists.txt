@@ -1,3 +1,7 @@
 INCLUDE(BuildPlugin)
 
-BUILD_PLUGIN(flanger FlangerEffect.cpp FlangerControls.cpp FlangerControlsDialog.cpp Noise.cpp MonoDelay.cpp MOCFILES FlangerEffect.h FlangerControls.h FlangerControlsDialog.h EMBEDDED_RESOURCES artwork.png logo.png)
+BUILD_PLUGIN(
+	flanger FlangerEffect.cpp FlangerControls.cpp FlangerControlsDialog.cpp Noise.cpp MonoDelay.cpp
+	MOCFILES FlangerControls.h FlangerControlsDialog.h
+	EMBEDDED_RESOURCES artwork.png logo.png
+)

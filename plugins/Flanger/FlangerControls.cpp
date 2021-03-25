@@ -27,6 +27,7 @@
 #include "FlangerControls.h"
 #include "FlangerEffect.h"
 #include "Engine.h"
+#include "Song.h"
 
 
 
@@ -36,12 +37,14 @@ FlangerControls::FlangerControls( FlangerEffect *effect ) :
 	m_delayTimeModel(0.001, 0.0001, 0.050, 0.0001,  this, tr( "Delay samples" ) ),
 	m_lfoFrequencyModel( 0.25, 0.01, 60, 0.0001, 60000.0, this, tr( "LFO frequency" ) ),
 	m_lfoAmountModel( 0.0, 0.0, 0.0025, 0.0001, this, tr( "Seconds" ) ),
-	m_lfoPhaseModel( 90.0, 0.0, 360.0, 0.0001, this, tr( "Stereo Phase" ) ),
+	m_lfoPhaseModel( 90.0, 0.0, 360.0, 0.0001, this, tr( "Stereo phase" ) ),
 	m_feedbackModel( 0.0, -1.0, 1.0, 0.0001, this, tr( "Regen" ) ),
 	m_whiteNoiseAmountModel( 0.0, 0.0, 0.05, 0.0001, this, tr( "Noise" ) ),
 	m_invertFeedbackModel ( false, this, tr( "Invert" ) )
 
 {
+	connect( Engine::mixer(), SIGNAL( sampleRateChanged() ), this, SLOT( changedSampleRate() ) );
+	connect( Engine::getSong(), SIGNAL( playbackStateChanged() ), this, SLOT( changedPlaybackState() ) );
 }
 
 
@@ -71,4 +74,20 @@ void FlangerControls::saveSettings( QDomDocument &doc, QDomElement &parent )
 	m_feedbackModel.saveSettings( doc, parent, "Feedback" ) ;
 	m_whiteNoiseAmountModel.saveSettings( doc, parent , "WhiteNoise" ) ;
 	m_invertFeedbackModel.saveSettings( doc, parent, "Invert" );
+}
+
+
+
+
+void FlangerControls::changedSampleRate()
+{
+	m_effect->changeSampleRate();
+}
+
+
+
+
+void FlangerControls::changedPlaybackState()
+{
+	m_effect->restartLFO();
 }

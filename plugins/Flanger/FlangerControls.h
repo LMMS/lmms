@@ -55,6 +55,10 @@ public:
 		return new FlangerControlsDialog( this );
 	}
 
+private slots:
+	void changedSampleRate();
+	void changedPlaybackState();
+
 private:
 	FlangerEffect* m_effect;
 	FloatModel m_delayTimeModel;

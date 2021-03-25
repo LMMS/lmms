@@ -24,7 +24,6 @@
 
 #include "FlangerEffect.h"
 #include "Engine.h"
-#include "Song.h"
 
 #include "embed.h"
 #include "plugin_export.h"
@@ -36,7 +35,7 @@ Plugin::Descriptor PLUGIN_EXPORT flanger_plugin_descriptor =
 {
 	STRINGIFY( PLUGIN_NAME ),
 	"Flanger",
-	QT_TRANSLATE_NOOP( "pluginBrowser", "A native flanger plugin" ),
+	QT_TRANSLATE_NOOP( "PluginBrowser", "A native flanger plugin" ),
 	"Dave French <contact/dot/dave/dot/french3/at/googlemail/dot/com>",
 	0x0100,
 	Plugin::Effect,
@@ -56,11 +55,6 @@ FlangerEffect::FlangerEffect( Model *parent, const Plugin::Descriptor::SubPlugin
 	m_lDelay = new MonoDelay( 1, Engine::mixer()->processingSampleRate() );
 	m_rDelay = new MonoDelay( 1, Engine::mixer()->processingSampleRate() );
 	m_noise = new Noise;
-
-	connect( Engine::mixer(), SIGNAL( sampleRateChanged() ), this, SLOT( changeSampleRate() ) );
-	connect( Engine::getSong(), SIGNAL( playbackStateChanged() ), this, SLOT( restartLFO() ) );
-
-	connect( &m_flangerControls.m_lfoPhaseModel, SIGNAL( dataChanged() ), this, SLOT( updatePhase() ) );
 }
 
 
@@ -103,6 +97,7 @@ bool FlangerEffect::processAudioBuffer( sampleFrame *buf, const fpp_t frames )
 	float amplitude = m_flangerControls.m_lfoAmountModel.value() * Engine::mixer()->processingSampleRate();
 	bool invertFeedback = m_flangerControls.m_invertFeedbackModel.value();
 	m_lfo->setFrequency(  1.0/m_flangerControls.m_lfoFrequencyModel.value() );
+	m_lfo->setOffset( m_flangerControls.m_lfoPhaseModel.value() / 180 * D_PI );
 	m_lDelay->setFeedback( m_flangerControls.m_feedbackModel.value() );
 	m_rDelay->setFeedback( m_flangerControls.m_feedbackModel.value() );
 	sample_t dryS[2];
@@ -146,15 +141,11 @@ void FlangerEffect::changeSampleRate()
 }
 
 
+
+
 void FlangerEffect::restartLFO()
 {
 	m_lfo->restart();
-}
-
-
-void FlangerEffect::updatePhase()
-{
-	m_lfo->setOffset( m_flangerControls.m_lfoPhaseModel.value() / 180 * D_PI );
 }
 
 

@@ -35,7 +35,6 @@
 
 class FlangerEffect : public Effect
 {
-	Q_OBJECT
 public:
 	FlangerEffect( Model* parent , const Descriptor::SubPluginFeatures::Key* key );
 	virtual ~FlangerEffect();
@@ -44,10 +43,7 @@ public:
 	{
 		return &m_flangerControls;
 	}
-
-private slots:
 	void changeSampleRate();
-	void updatePhase();
 	void restartLFO();
 
 private:
@@ -56,8 +52,6 @@ private:
 	MonoDelay* m_rDelay;
 	QuadratureLfo* m_lfo;
 	Noise* m_noise;
-
-	friend class FlangerControls;
 
 };
 

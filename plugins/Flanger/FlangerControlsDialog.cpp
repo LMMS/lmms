@@ -66,7 +66,7 @@ FlangerControlsDialog::FlangerControlsDialog( FlangerControls *controls ) :
 	lfoPhaseKnob->setVolumeKnob( false );
 	lfoPhaseKnob->setModel( &controls->m_lfoPhaseModel );
 	lfoPhaseKnob->setLabel( tr( "PHASE" ) );
-	lfoPhaseKnob->setHintText( tr( "Phase:" ) , "" );
+	lfoPhaseKnob->setHintText( tr( "Phase:" ) , " degrees" );
 
 	Knob * feedbackKnob = new Knob( knobBright_26, this );
 	feedbackKnob->move( 160,10 );
