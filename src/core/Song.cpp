@@ -94,7 +94,8 @@ Song::Song() :
 	m_elapsedTicks( 0 ),
 	m_elapsedBars( 0 ),
 	m_loopRenderCount(1),
-	m_loopRenderRemaining(1)
+	m_loopRenderRemaining(1),
+	m_oldAutomatedValues()
 {
 	for(int i = 0; i < Mode_Count; ++i) m_elapsedMilliSeconds[i] = 0;
 	connect( &m_tempoModel, SIGNAL( dataChanged() ),
@@ -404,12 +405,31 @@ void Song::processAutomations(const TrackList &tracklist, TimePos timeStart, fpp
 		}
 	}
 
+	// Checks if an automated model stopped being automated by automation patterns
+	// so we can move the control back to any connected controller again
+	if (!m_oldAutomatedValues.isEmpty())
+	{
+		for (auto it = m_oldAutomatedValues.begin(); it != m_oldAutomatedValues.end(); it++)
+		{
+			AutomatableModel * am = it.key();
+			if (am->controllerConnection() && !values.contains(am))
+			{
+				am->setUseControllerValue(true);
+			}
+		}
+	}
+	m_oldAutomatedValues = values;
+
 	// Apply values
 	for (auto it = values.begin(); it != values.end(); it++)
 	{
 		if (! recordedModels.contains(it.key()))
 		{
 			it.key()->setAutomatedValue(it.value());
+		}
+		else if (!it.key()->useControllerValue())
+		{
+			it.key()->setUseControllerValue(true);
 		}
 	}
 }
