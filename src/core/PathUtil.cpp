@@ -34,7 +34,7 @@ namespace PathUtil
 			case Base::DefaultSoundfont : loc = ConfigManager::inst()->userSf2Dir(); break;
 			case Base::UserGIG          : loc = ConfigManager::inst()->gigDir(); break;
 			case Base::DefaultGIG       : loc = ConfigManager::inst()->userGigDir(); break;
-			case Base::LocalDir    :
+			case Base::LocalDir:
 			{
 				Song* s = Engine::getSong();
 				if (s)
@@ -46,7 +46,7 @@ namespace PathUtil
 				{
 					// Keeps the base prefix so the method calling this
 					// can handle the situation.
-					return QString("local:");
+					return basePrefix(Base::LocalDir);
 				}
 				break;
 			}
