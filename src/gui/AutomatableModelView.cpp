@@ -33,6 +33,7 @@
 #include "embed.h"
 #include "GuiApplication.h"
 #include "MainWindow.h"
+#include "Song.h"
 #include "StringPairDrag.h"
 #include "Clipboard.h"
 
@@ -228,7 +229,7 @@ void AutomatableModelViewSlots::execConnectionDialog()
 			// New
 			else
 			{
-				ControllerConnection* cc = new ControllerConnection( d.chosenController() );
+				ControllerConnection* cc = new ControllerConnection(d.chosenController(), m);
 				m->setControllerConnection( cc );
 				//cc->setTargetName( m->displayName() );
 			}
@@ -250,8 +251,12 @@ void AutomatableModelViewSlots::removeConnection()
 
 	if( m->controllerConnection() )
 	{
+		disconnect(Engine::getSong(), SIGNAL(stopped()),
+			   m, SLOT(setUseControllerValue()));
+
 		delete m->controllerConnection();
 		m->setControllerConnection( NULL );
+		emit m->dataChanged();
 	}
 }
 
@@ -294,7 +299,6 @@ void AutomatableModelViewSlots::pasteFromClipboard()
 		m_amv->modelUntyped()->setValue(number / m_amv->getConversionFactor());
 	}
 }
-
 
 /// Attempt to parse a float from the clipboard
 static float floatFromClipboard(bool* ok)
