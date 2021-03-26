@@ -398,6 +398,58 @@ void AutomationEditor::drawLine( int x0In, float y0, int x1In, float y1 )
 
 
 
+bool AutomationEditor::fineTuneValue(timeMap::iterator node, bool editingInValue)
+{
+	if (node != m_pattern->getTimeMap().end())
+	{
+		// Display dialog to edit the value
+		bool ok;
+		double value = QInputDialog::getDouble(
+			this,
+			tr("Edit Value"),
+			editingInValue
+				? tr("New inValue")
+				: tr("New outValue"),
+			editingInValue
+				? INVAL(node)
+				: OUTVAL(node),
+			m_pattern->firstObject()->minValue<float>(),
+			m_pattern->firstObject()->maxValue<float>(),
+			3,
+			&ok
+		);
+
+		if (ok)
+		{
+			// Set the new inValue/outValue
+			if (editingInValue)
+			{
+				// If the outValue is equal to the inValue we
+				// set both to the given value
+				if (OFFSET(node) == 0)
+				{
+					node.value().setOutValue(value);
+				}
+				node.value().setInValue(value);
+				Engine::getSong()->setModified();
+			}
+			else
+			{
+				node.value().setOutValue(value);
+				Engine::getSong()->setModified();
+			}
+
+			return true;
+		}
+	}
+
+	// If nothing was changed (invalid node, dialog closed, etc) return false
+	return false;
+}
+
+
+
+
 void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 {
 	if( !validPattern() )
@@ -619,59 +671,6 @@ void AutomationEditor::mouseDoubleClickEvent(QMouseEvent * mouseEvent)
 {
 	if (!validPattern()) { return; }
 
-	// Helper lambda function to fine tune a node's in/out value
-	auto fineTuneValue = [this](timeMap::iterator node, bool editingInValue)
-	{
-		if (node != m_pattern->getTimeMap().end())
-		{
-			// Display dialog to edit the value
-			bool ok;
-			double value = QInputDialog::getDouble(
-				this,
-				tr("Edit Value"),
-				editingInValue
-					? tr("New inValue")
-					: tr("New outValue"),
-				editingInValue
-					? INVAL(node)
-					: OUTVAL(node),
-				m_pattern->firstObject()->minValue<float>(),
-				m_pattern->firstObject()->maxValue<float>(),
-				3,
-				&ok
-			);
-
-			if (ok)
-			{
-				// Set the new inValue/outValue
-				if (editingInValue)
-				{
-					// If the outValue is equal to the inValue we
-					// set both to the given value
-					if (OFFSET(node) == 0)
-					{
-						node.value().setOutValue(value);
-					}
-					node.value().setInValue(value);
-					Engine::getSong()->setModified();
-				}
-				else
-				{
-					node.value().setOutValue(value);
-					Engine::getSong()->setModified();
-				}
-
-				return true;
-			}
-		}
-
-		// If nothing was changed (invalid node, dialog closed, etc) return false
-		return false;
-	};
-
-	// Do we need to call update()?
-	bool needUpdate = false;
-
 	// If we double clicked inside the AutomationEditor viewport
 	if (mouseEvent->y() > TOP_MARGIN && mouseEvent->x() >= VALUES_WIDTH)
 	{
@@ -682,18 +681,16 @@ void AutomationEditor::mouseDoubleClickEvent(QMouseEvent * mouseEvent)
 			case DRAW:
 				// We will edit the inValue
 				clickedNode = getNodeAt(mouseEvent->x(), mouseEvent->y());
-				if (fineTuneValue(clickedNode, true)) { needUpdate = true; }
+				if (fineTuneValue(clickedNode, true)) { update(); }
 				break;
 			case DRAW_OUTVALUES:
 				// We will edit the outValue
 				clickedNode = getNodeAt(mouseEvent->x(), mouseEvent->y(), true);
-				if (fineTuneValue(clickedNode, false)) { needUpdate = true; }
+				if (fineTuneValue(clickedNode, false)) { update(); }
 				break;
 			default:
 				break;
 		}
-
-		if (needUpdate) { update(); }
 	}
 }
 
