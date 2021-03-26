@@ -488,52 +488,74 @@ bool DataFile::copyResources(const QString& resourcesDir)
 
 
 
-bool DataFile::hasLocalPlugins()
+/* @brief This recursive method will go through all XML nodes of the DataFile
+ *        and check whether any of them have local paths. If they are not on
+ *        our list of elements that can have local paths we return true,
+ *        indicating that we potentially have plugins with local paths that
+ *        would be a security issue. The Song class can then abort loading
+ *        this project.
+ * @param QDomElement parent The parent node being interated. When called
+ *        without arguments, this will be an empty element that will be
+ *        ignored (since the second parameter will be true).
+ * @param bool firstCall Defaults to true, and indicates to this recursive
+ *        method whether this is the first call. If it is it will use the
+ *        root element as the parent.
+ */
+bool DataFile::hasLocalPlugins(QDomElement parent /* = documentElement()*/, bool firstCall /* = true*/)
 {
-	QDomNodeList list;
+	// If this is the first iteration of the recursion we use the root element
+	if (firstCall) { parent = documentElement(); }
 
-	// First check Vestige plugins
-	list = elementsByTagName("vestige");
-
-	for (int i = 0; !list.item(i).isNull(); ++i)
+	auto children = parent.childNodes();
+	for (int i = 0; i < children.size(); ++i)
 	{
-		QDomElement el = list.item(i).toElement();
+		QDomNode child = children.at(i);
+		QDomElement childElement = child.toElement();
+		assert(childElement);
 
-		if (el.attribute("plugin").startsWith("local:"))
+		bool skipNode = false;
+		// Skip the nodes allowed to have "local:" attributes, but
+		// still check its children
+		for
+		(
+			ResourcesMap::const_iterator it = ELEMENTS_WITH_RESOURCES.begin();
+			it != ELEMENTS_WITH_RESOURCES.end();
+			++it
+		)
 		{
-			return true;
-		}
-	}
-
-	// Then check effect plugins
-	list = elementsByTagName("effect");
-
-	for (int i = 0; !list.item(i).isNull(); ++i)
-	{
-		QDomElement el = list.item(i).toElement();
-
-		// Check for the key node which contains attributes, one of which is the file
-		QDomNodeList keys = el.elementsByTagName("key");
-		for (int j = 0; !keys.item(j).isNull(); ++j)
-		{
-			QDomElement key = list.item(j).toElement();
-
-			// Now loop through attributes
-			QDomNodeList attributes = key.elementsByTagName("attribute");
-
-			for (int k = 0; !attributes.item(k).isNull(); ++k)
+			if (childElement.tagName() == it->first)
 			{
-				QDomElement attr = list.item(k).toElement();
+				skipNode = true;
+				break;
+			}
+		}
 
-				if (attr.attribute("name") == "file" &&
-					attr.attribute("value").startsWith("local:"))
+		// Check if they have "local:" attribute (unless they are allowed to
+		// and skipNode is true)
+		if (!skipNode)
+		{
+			auto attributes = childElement.attributes();
+			for (int i = 0; i < attributes.size(); ++i)
+			{
+				QDomNode attribute = attributes.item(i);
+				QDomAttr attr = attribute.toAttr();
+				assert(attr);
+				if (attr.value().startsWith("local:", Qt::CaseInsensitive))
 				{
 					return true;
 				}
 			}
 		}
+
+		// Now we check the children of this node (recursively)
+		// and if any return true we return true.
+		if (hasLocalPlugins(childElement, false))
+		{
+			return true;
+		}
 	}
 
+	// If we got here none of the nodes had the "local:" path.
 	return false;
 }
 
