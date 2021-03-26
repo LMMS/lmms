@@ -4444,11 +4444,16 @@ void PianoRoll::updatePosition( const TimePos & t )
 	{
 		autoScroll( t );
 	}
-	const int pos = m_timeLine->pos() * m_ppb / TimePos::ticksPerBar();
-	if (pos >= m_currentPosition && pos <= m_currentPosition + width() - m_whiteKeyWidth)
+	// ticks relative to m_currentPosition
+	// < 0 = outside viewport left
+	// > width = outside viewport right
+	const int pos = (static_cast<int>(m_timeLine->pos()) - m_currentPosition) * m_ppb / TimePos::ticksPerBar();
+	// if pos is within visible range, show it
+	if (pos >= 0 && pos <= width() - m_whiteKeyWidth)
 	{
 		m_positionLine->show();
-		m_positionLine->move(pos - (m_positionLine->width() - 1) - m_currentPosition + m_whiteKeyWidth, keyAreaTop());
+		// adjust pos for piano keys width and self line width (align to rightmost of line)
+		m_positionLine->move(pos + m_whiteKeyWidth - (m_positionLine->width() - 1), keyAreaTop());
 	}
 	else
 	{
