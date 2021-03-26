@@ -113,7 +113,7 @@ protected:
 	timeMap::iterator getNodeAt(int x, int y, bool outValue = false, int r = 5);
 
 	void drawLine( int x0, float y0, int x1, float y1 );
-	bool fineTuneValue(timeMap::iterator node, bool editingInValue);
+	bool fineTuneValue(timeMap::iterator node, bool editingOutValue);
 
 protected slots:
 	void play();
