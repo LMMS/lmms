@@ -501,7 +501,7 @@ bool DataFile::copyResources(const QString& resourcesDir)
  *        method whether this is the first call. If it is it will use the
  *        root element as the parent.
  */
-bool DataFile::hasLocalPlugins(QDomElement parent /* = documentElement()*/, bool firstCall /* = true*/)
+bool DataFile::hasLocalPlugins(QDomElement parent /* = documentElement()*/, bool firstCall /* = true*/) const
 {
 	// If this is the first iteration of the recursion we use the root element
 	if (firstCall) { parent = documentElement(); }
