@@ -301,7 +301,7 @@ private:
     int fTimerId;
 
     CarlaInstrument* const m_carlaInstrument;
-    QWidget* const p_parent;
+    QWidget* const m_parent;
 
     QMdiSubWindow* m_paramsSubWindow;
     CarlaParamsView* m_paramsView;

@@ -386,21 +386,17 @@ void CarlaInstrument::refreshParams(bool init)
 		fDescriptor->get_parameter_value != nullptr &&
 		fDescriptor->set_parameter_value != nullptr)
 	{
-		uint32_t param_count = fDescriptor->get_parameter_count(fHandle);
-
 		QList<QString> completerData;
 		QList<QString> groups; // used to count no. groups.
 
-		for (uint32_t i=0; i < param_count; ++i)
+		uint32_t paramCount = fDescriptor->get_parameter_count(fHandle);
+		for (uint32_t i=0; i < paramCount; ++i)
 		{
 			const NativeParameter* paramInfo(fDescriptor->get_parameter_info(fHandle, i));
 
 			m_paramModels[i]->setOutput((paramInfo->hints & NATIVE_PARAMETER_IS_OUTPUT));
 			m_paramModels[i]->setEnabled((paramInfo->hints & NATIVE_PARAMETER_IS_ENABLED));
-
-			float param_value = fDescriptor->get_parameter_value(fHandle, i);
-
-			m_paramModels[i]->setValue(param_value);
+			m_paramModels[i]->setValue(fDescriptor->get_parameter_value(fHandle, i));
 
 			// Get parameter name
 			QString name = "_NO_NAME_";
@@ -604,7 +600,7 @@ CarlaInstrumentView::CarlaInstrumentView(CarlaInstrument* const instrument, QWid
       fDescriptor(instrument->fDescriptor),
       fTimerId(fHandle != NULL && fDescriptor->ui_idle != NULL ? startTimer(30) : 0),
       m_carlaInstrument(instrument),
-      p_parent(parent),
+      m_parent(parent),
       m_paramsSubWindow(nullptr),
       m_paramsView(nullptr)
 {
@@ -703,7 +699,7 @@ void CarlaInstrumentView::toggleParamsWindow()
 {
 	if (!m_paramsSubWindow)
 	{
-		m_paramsView = new CarlaParamsView(this, p_parent);
+		m_paramsView = new CarlaParamsView(this, m_parent);
 		connect(m_paramsSubWindow, SIGNAL(uiClosed()), this, SLOT(paramsUiClosed()));
 	} else {
 		if (m_paramsSubWindow->isVisible()) {
