@@ -488,20 +488,21 @@ bool DataFile::copyResources(const QString& resourcesDir)
 
 
 
-/* @brief This recursive method will go through all XML nodes of the DataFile
+/**
+ * @brief This recursive method will go through all XML nodes of the DataFile
  *        and check whether any of them have local paths. If they are not on
  *        our list of elements that can have local paths we return true,
  *        indicating that we potentially have plugins with local paths that
  *        would be a security issue. The Song class can then abort loading
  *        this project.
- * @param QDomElement parent The parent node being interated. When called
+ * @param QDomElement parent The parent node being iterated. When called
  *        without arguments, this will be an empty element that will be
  *        ignored (since the second parameter will be true).
  * @param bool firstCall Defaults to true, and indicates to this recursive
  *        method whether this is the first call. If it is it will use the
  *        root element as the parent.
  */
-bool DataFile::hasLocalPlugins(QDomElement parent /* = documentElement()*/, bool firstCall /* = true*/) const
+bool DataFile::hasLocalPlugins(QDomElement parent /* = QDomElement()*/, bool firstCall /* = true*/) const
 {
 	// If this is the first iteration of the recursion we use the root element
 	if (firstCall) { parent = documentElement(); }

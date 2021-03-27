@@ -73,7 +73,7 @@ public:
 
 	void write( QTextStream& strm );
 	bool writeFile(const QString& fn, bool withResources = false);
-	bool copyResources(const QString& resourcesDir);
+	bool copyResources(const QString& resourcesDir); //!< Copies resources to the resourcesDir and changes the DataFile to use local paths to them
 	bool hasLocalPlugins(QDomElement parent = QDomElement(), bool firstCall = true) const; //!< Checks if plugins are using local paths for safety reasons
 
 	QDomElement& content()
@@ -141,7 +141,7 @@ private:
 	} ;
 	static typeDescStruct s_types[TypeCount];
 
-	QString m_fileName; //!< The file name or "" if this DataFile didn't originate from a file
+	QString m_fileName; //!< The origin file name or "" if this DataFile didn't originate from a file
 	QDomElement m_content;
 	QDomElement m_head;
 	Type m_type;
