@@ -36,7 +36,7 @@ namespace PathUtil
 			case Base::DefaultGIG       : loc = ConfigManager::inst()->userGigDir(); break;
 			case Base::LocalDir:
 			{
-				Song* s = Engine::getSong();
+				const Song* s = Engine::getSong();
 				if (s)
 				{
 					QString projectPath = s->projectFileName();
