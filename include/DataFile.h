@@ -74,7 +74,7 @@ public:
 	void write( QTextStream& strm );
 	bool writeFile(const QString& fn, bool withResources = false);
 	bool copyResources(const QString& resourcesDir); //!< Copies resources to the resourcesDir and changes the DataFile to use local paths to them
-	bool hasLocalPlugins(QDomElement parent = QDomElement(), bool firstCall = true) const; //!< Checks if plugins are using local paths for safety reasons
+	bool hasLocalPlugins(QDomElement parent = QDomElement(), bool firstCall = true) const;
 
 	QDomElement& content()
 	{
