@@ -512,7 +512,6 @@ bool DataFile::hasLocalPlugins(QDomElement parent /* = QDomElement()*/, bool fir
 	{
 		QDomNode child = children.at(i);
 		QDomElement childElement = child.toElement();
-		assert(childElement);
 
 		bool skipNode = false;
 		// Skip the nodes allowed to have "local:" attributes, but
@@ -540,7 +539,6 @@ bool DataFile::hasLocalPlugins(QDomElement parent /* = QDomElement()*/, bool fir
 			{
 				QDomNode attribute = attributes.item(i);
 				QDomAttr attr = attribute.toAttr();
-				assert(attr);
 				if (attr.value().startsWith(PathUtil::basePrefix(PathUtil::Base::LocalDir),
 					Qt::CaseInsensitive))
 				{
