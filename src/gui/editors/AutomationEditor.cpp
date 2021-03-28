@@ -419,30 +419,27 @@ bool AutomationEditor::fineTuneValue(timeMap::iterator node, bool editingOutValu
 		&ok
 	);
 
-	if (ok)
+	// If dialog failed return false
+	if (!ok) { return false; }
+
+	// Set the new inValue/outValue
+	if (editingOutValue)
 	{
-		// Set the new inValue/outValue
-		if (editingOutValue)
+		node.value().setOutValue(value);
+	}
+	else
+	{
+		// If the outValue is equal to the inValue we
+		// set both to the given value
+		if (OFFSET(node) == 0)
 		{
 			node.value().setOutValue(value);
 		}
-		else
-		{
-			// If the outValue is equal to the inValue we
-			// set both to the given value
-			if (OFFSET(node) == 0)
-			{
-				node.value().setOutValue(value);
-			}
-			node.value().setInValue(value);
-		}
-
-		Engine::getSong()->setModified();
-		return true;
+		node.value().setInValue(value);
 	}
 
-	// If nothing was changed (invalid node, dialog closed, etc) return false
-	return false;
+	Engine::getSong()->setModified();
+	return true;
 }
 
 
