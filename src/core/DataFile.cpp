@@ -495,10 +495,10 @@ bool DataFile::copyResources(const QString& resourcesDir)
  *        indicating that we potentially have plugins with local paths that
  *        would be a security issue. The Song class can then abort loading
  *        this project.
- * @param QDomElement parent The parent node being iterated. When called
+ * @param parent The parent node being iterated. When called
  *        without arguments, this will be an empty element that will be
  *        ignored (since the second parameter will be true).
- * @param bool firstCall Defaults to true, and indicates to this recursive
+ * @param firstCall Defaults to true, and indicates to this recursive
  *        method whether this is the first call. If it is it will use the
  *        root element as the parent.
  */
