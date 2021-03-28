@@ -161,6 +161,11 @@ namespace PathUtil
 		QString shortestPath = relativeOrAbsolute(absolutePath, shortestBase);
 		for (auto base: relativeBases)
 		{
+			// Skip local paths when searching for the shortest relative, since those
+			// are only allowed for particular resources and will only be applied when
+			// saving bundles
+			if (base == Base::LocalDir) { continue; }
+
 			QString otherPath = relativeOrAbsolute(absolutePath, base);
 			if (otherPath.length() < shortestPath.length())
 			{
