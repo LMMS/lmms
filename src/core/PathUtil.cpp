@@ -14,8 +14,11 @@ namespace PathUtil
 		Base::UserLADSPA, Base::DefaultLADSPA, Base::UserSoundfont, Base::DefaultSoundfont, Base::UserGIG, Base::DefaultGIG,
 		Base::LocalDir };
 
-	QString baseLocation(const Base base)
+	QString baseLocation(const Base base, bool* ok /* = nullptr*/)
 	{
+		// ok is true unless something goes wrong
+		if (ok) { *ok = true; }
+
 		QString loc = "";
 		switch (base)
 		{
@@ -37,17 +40,15 @@ namespace PathUtil
 			case Base::LocalDir:
 			{
 				const Song* s = Engine::getSong();
+				QString projectPath;
 				if (s)
 				{
-					QString projectPath = s->projectFileName();
+					projectPath = s->projectFileName();
 					loc = QFileInfo(projectPath).path();
 				}
-				else
-				{
-					// Keeps the base prefix so the method calling this
-					// can handle the situation.
-					return basePrefix(Base::LocalDir);
-				}
+				// We resolved it properly if we had an open Song and the project
+				// filename wasn't empty
+				if (ok) { *ok = (s && !projectPath.isEmpty()); }
 				break;
 			}
 			default                   : return QString("");
@@ -55,10 +56,14 @@ namespace PathUtil
 		return QDir::cleanPath(loc) + "/";
 	}
 
-	QDir baseQDir (const Base base)
+	QDir baseQDir (const Base base, bool* ok /* = nullptr*/)
 	{
-		if (base == Base::Absolute) { return QDir::root(); }
-		return QDir(baseLocation(base));
+		if (base == Base::Absolute)
+		{
+			if (ok) { *ok = true; }
+			return QDir::root();
+		}
+		return QDir(baseLocation(base, ok));
 	}
 
 	QString basePrefix(const Base base)
@@ -131,16 +136,20 @@ namespace PathUtil
 
 
 
-	QString toAbsolute(const QString & input)
+	QString toAbsolute(const QString & input, bool* ok /* = nullptr*/)
 	{
 		//First, do no harm to absolute paths
 		QFileInfo inputFileInfo = QFileInfo(input);
-		if (inputFileInfo.isAbsolute()) { return input; }
+		if (inputFileInfo.isAbsolute())
+		{
+			if (ok) { *ok = true; }
+			return input;
+		}
 		//Next, handle old relative paths with no prefix
 		QString upgraded = input.contains(":") ? input : oldRelativeUpgrade(input);
 
 		Base base = baseLookup(upgraded);
-		return baseLocation(base) + upgraded.remove(0, basePrefix(base).length());
+		return baseLocation(base, ok) + upgraded.remove(0, basePrefix(base).length());
 	}
 
 	QString relativeOrAbsolute(const QString & input, const Base base)
@@ -148,11 +157,16 @@ namespace PathUtil
 		if (input.isEmpty()) { return input; }
 		QString absolutePath = toAbsolute(input);
 		if (base == Base::Absolute) { return absolutePath; }
-		QString relativePath = baseQDir(base).relativeFilePath(absolutePath);
-		return relativePath.startsWith("..") ? absolutePath : relativePath;
+		bool ok;
+		QString relativePath = baseQDir(base, &ok).relativeFilePath(absolutePath);
+		// Return the relative path if it didn't result in a path starting with ..
+		// and the baseQDir was resolved properly
+		return (relativePath.startsWith("..") || !ok)
+			? absolutePath
+			: relativePath;
 	}
 
-	QString toShortestRelative(const QString & input)
+	QString toShortestRelative(const QString & input, bool allowLocal /* = false*/)
 	{
 		QFileInfo inputFileInfo = QFileInfo(input);
 		QString absolutePath = inputFileInfo.isAbsolute() ? input : toAbsolute(input);
@@ -161,10 +175,9 @@ namespace PathUtil
 		QString shortestPath = relativeOrAbsolute(absolutePath, shortestBase);
 		for (auto base: relativeBases)
 		{
-			// Skip local paths when searching for the shortest relative, since those
-			// are only allowed for particular resources and will only be applied when
-			// saving bundles
-			if (base == Base::LocalDir) { continue; }
+			// Skip local paths when searching for the shortest relative if those
+			// are not allowed for that resource
+			if (base == Base::LocalDir && !allowLocal) { continue; }
 
 			QString otherPath = relativeOrAbsolute(absolutePath, base);
 			if (otherPath.length() < shortestPath.length())
