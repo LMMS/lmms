@@ -333,6 +333,7 @@ private:
 	int keyAreaTop() const;
 	int noteEditRight() const;
 	int noteEditLeft() const;
+	int noteAreaWidth() const;
 
 	void dragNotes(int x, int y, bool alt, bool shift, bool ctrl);
 
