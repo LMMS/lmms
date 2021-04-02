@@ -27,10 +27,12 @@
 #include "DataFile.h"
 
 #include <math.h>
+#include <map>
 
 #include <QDebug>
 #include <QFile>
 #include <QFileInfo>
+#include <QDir>
 #include <QMessageBox>
 
 #include "base64.h"
@@ -43,11 +45,18 @@
 #include "ProjectVersion.h"
 #include "SongEditor.h"
 #include "TextFloat.h"
+#include "PathUtil.h"
 
 #include "lmmsversion.h"
 
 static void findIds(const QDomElement& elem, QList<jo_id_t>& idList);
 
+
+// QMap with the DOM elements that access file resources
+const DataFile::ResourcesMap DataFile::ELEMENTS_WITH_RESOURCES = {
+{ "sampletco", {"src"} },
+{ "audiofileprocessor", {"src"} },
+};
 
 // Vector with all the upgrade methods
 const std::vector<DataFile::UpgradeMethod> DataFile::UPGRADE_METHODS = {
@@ -92,6 +101,7 @@ DataFile::typeDescStruct
 
 DataFile::DataFile( Type type ) :
 	QDomDocument( "lmms-project" ),
+	m_fileName(""),
 	m_content(),
 	m_head(),
 	m_type( type ),
@@ -118,6 +128,7 @@ DataFile::DataFile( Type type ) :
 
 DataFile::DataFile( const QString & _fileName ) :
 	QDomDocument(),
+	m_fileName(_fileName),
 	m_content(),
 	m_head(),
 	m_fileVersion( UPGRADE_METHODS.size() )
@@ -147,6 +158,7 @@ DataFile::DataFile( const QString & _fileName ) :
 
 DataFile::DataFile( const QByteArray & _data ) :
 	QDomDocument(),
+	m_fileName(""),
 	m_content(),
 	m_head(),
 	m_fileVersion( UPGRADE_METHODS.size() )
@@ -271,24 +283,89 @@ void DataFile::write( QTextStream & _strm )
 
 
 
-bool DataFile::writeFile( const QString& filename )
+bool DataFile::writeFile(const QString& filename, bool withResources)
 {
-	const QString fullName = nameWithExtension( filename );
+	// Small lambda function for displaying errors
+	auto showError = [this](QString title, QString body){
+		if (gui)
+		{
+			QMessageBox mb;
+			mb.setWindowTitle(title);
+			mb.setText(body);
+			mb.setIcon(QMessageBox::Warning);
+			mb.setStandardButtons(QMessageBox::Ok);
+			mb.exec();
+		}
+		else
+		{
+			qWarning() << body;
+		}
+	};
+
+	// If we are saving without resources, filename is just the file we are
+	// saving to. If we are saving with resources (project bundle), filename
+	// will be used (discarding extensions) to create a folder where the
+	// bundle will be saved in
+
+	QFileInfo fInfo(filename);
+
+	const QString bundleDir = fInfo.path() + "/" + fInfo.fileName().section('.', 0, 0);
+	const QString resourcesDir = bundleDir + "/resources";
+	const QString fullName = withResources
+		? nameWithExtension(bundleDir + "/" + fInfo.fileName())
+		: nameWithExtension(filename);
 	const QString fullNameTemp = fullName + ".new";
 	const QString fullNameBak = fullName + ".bak";
 
-	QFile outfile( fullNameTemp );
-
-	if( !outfile.open( QIODevice::WriteOnly | QIODevice::Truncate ) )
+	// If we are saving with resources, setup the bundle folder first
+	if (withResources)
 	{
-		if( gui )
+		// First check if there's a bundle folder with the same name in
+		// the path already. If so, warns user that we can't overwrite a
+		// project bundle.
+		if (QDir(bundleDir).exists())
 		{
-			QMessageBox::critical( NULL,
-				SongEditor::tr( "Could not write file" ),
-				SongEditor::tr( "Could not open %1 for writing. You probably are not permitted to "
-								"write to this file. Please make sure you have write-access to "
-								"the file and try again." ).arg( fullName ) );
+			showError(SongEditor::tr("Operation denied"),
+				SongEditor::tr("A bundle folder with that name already eists on the "
+				"selected path. Can't overwrite a project bundle. Please select a different "
+				"name."));
+
+			return false;
 		}
+
+		// Create bundle folder
+		if (!QDir().mkdir(bundleDir))
+		{
+			showError(SongEditor::tr("Error"),
+				SongEditor::tr("Couldn't create bundle folder."));
+			return false;
+		}
+
+		// Create resources folder
+		if (!QDir().mkdir(resourcesDir))
+		{
+			showError(SongEditor::tr("Error"),
+				SongEditor::tr("Couldn't create resources folder."));
+			return false;
+		}
+
+		// Copy resources to folder and update paths
+		if (!copyResources(resourcesDir))
+		{
+			showError(SongEditor::tr("Error"),
+				SongEditor::tr("Failed to copy resources."));
+			return false;
+		}
+	}
+
+	QFile outfile (fullNameTemp);
+
+	if (!outfile.open(QIODevice::WriteOnly | QIODevice::Truncate))
+	{
+		showError(SongEditor::tr("Could not write file"),
+			SongEditor::tr("Could not open %1 for writing. You probably are not permitted to"
+				"write to this file. Please make sure you have write-access to "
+				"the file and try again.").arg(fullName));
 
 		return false;
 	}
@@ -330,6 +407,164 @@ bool DataFile::writeFile( const QString& filename )
 		return true;
 	}
 
+	return false;
+}
+
+
+
+
+bool DataFile::copyResources(const QString& resourcesDir)
+{
+	// List of filenames used so we can append a counter to any
+	// repeating filenames
+	std::list<QString> namesList;
+
+	ResourcesMap::const_iterator it = ELEMENTS_WITH_RESOURCES.begin();
+
+	// Copy resources and manipulate the DataFile to have local paths to them
+	while (it != ELEMENTS_WITH_RESOURCES.end())
+	{
+		QDomNodeList list = elementsByTagName(it->first);
+
+		// Go through all elements with the tagname from our map
+		for (int i = 0; !list.item(i).isNull(); ++i)
+		{
+			QDomElement el = list.item(i).toElement();
+
+			std::vector<QString>::const_iterator res = it->second.begin();
+
+			// Search for attributes that point to resources
+			while (res != it->second.end())
+			{
+				// If the element has that attribute
+				if (el.hasAttribute(*res))
+				{
+					// Get absolute path to resource
+					bool error;
+					QString resPath = PathUtil::toAbsolute(el.attribute(*res), &error);
+					// If we are running without the project loaded (from CLI), "local:" base
+					// prefixes aren't converted, so we need to convert it ourselves
+					if (error)
+					{
+						resPath = QFileInfo(m_fileName).path() + "/" + resPath.remove(0,
+							PathUtil::basePrefix(PathUtil::Base::LocalDir).length());
+					}
+
+					// Check if we need to add a counter to the filename
+					QString finalFileName = QFileInfo(resPath).fileName();
+					QString extension = resPath.section('.', -1);
+					int repeatedNames = 0;
+					for (QString name : namesList)
+					{
+						if (finalFileName == name)
+						{
+							++repeatedNames;
+						}
+					}
+					// Add the name to the list before modifying it
+					namesList.push_back(finalFileName);
+					if (repeatedNames)
+					{
+						// Remove the extension, add the counter and add the
+						// extension again to get the final file name
+						finalFileName.truncate(finalFileName.lastIndexOf('.'));
+						finalFileName = finalFileName + "-" + QString::number(repeatedNames) + "." + extension;
+					}
+
+					// Final path is our resources dir + the new file name
+					QString finalPath = resourcesDir + "/" + finalFileName;
+
+					// Copy resource file to the resources folder
+					if(!QFile::copy(resPath, finalPath))
+					{
+						qWarning("ERROR: Failed to copy resource");
+						return false;
+					}
+
+					// Update attribute path to point to the bundle file
+					QString newAtt = PathUtil::basePrefix(PathUtil::Base::LocalDir) + "resources/" + finalFileName;
+					el.setAttribute(*res, newAtt);
+				}
+				++res;
+			}
+		}
+		++it;
+	}
+
+	return true;
+}
+
+
+
+
+/**
+ * @brief This recursive method will go through all XML nodes of the DataFile
+ *        and check whether any of them have local paths. If they are not on
+ *        our list of elements that can have local paths we return true,
+ *        indicating that we potentially have plugins with local paths that
+ *        would be a security issue. The Song class can then abort loading
+ *        this project.
+ * @param parent The parent node being iterated. When called
+ *        without arguments, this will be an empty element that will be
+ *        ignored (since the second parameter will be true).
+ * @param firstCall Defaults to true, and indicates to this recursive
+ *        method whether this is the first call. If it is it will use the
+ *        root element as the parent.
+ */
+bool DataFile::hasLocalPlugins(QDomElement parent /* = QDomElement()*/, bool firstCall /* = true*/) const
+{
+	// If this is the first iteration of the recursion we use the root element
+	if (firstCall) { parent = documentElement(); }
+
+	auto children = parent.childNodes();
+	for (int i = 0; i < children.size(); ++i)
+	{
+		QDomNode child = children.at(i);
+		QDomElement childElement = child.toElement();
+
+		bool skipNode = false;
+		// Skip the nodes allowed to have "local:" attributes, but
+		// still check its children
+		for
+		(
+			ResourcesMap::const_iterator it = ELEMENTS_WITH_RESOURCES.begin();
+			it != ELEMENTS_WITH_RESOURCES.end();
+			++it
+		)
+		{
+			if (childElement.tagName() == it->first)
+			{
+				skipNode = true;
+				break;
+			}
+		}
+
+		// Check if they have "local:" attribute (unless they are allowed to
+		// and skipNode is true)
+		if (!skipNode)
+		{
+			auto attributes = childElement.attributes();
+			for (int i = 0; i < attributes.size(); ++i)
+			{
+				QDomNode attribute = attributes.item(i);
+				QDomAttr attr = attribute.toAttr();
+				if (attr.value().startsWith(PathUtil::basePrefix(PathUtil::Base::LocalDir),
+					Qt::CaseInsensitive))
+				{
+					return true;
+				}
+			}
+		}
+
+		// Now we check the children of this node (recursively)
+		// and if any return true we return true.
+		if (hasLocalPlugins(childElement, false))
+		{
+			return true;
+		}
+	}
+
+	// If we got here none of the nodes had the "local:" path.
 	return false;
 }
 

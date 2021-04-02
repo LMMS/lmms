@@ -27,6 +27,7 @@
 #ifndef DATA_FILE_H
 #define DATA_FILE_H
 
+#include <map>
 #include <QDomDocument>
 
 #include "lmms_export.h"
@@ -72,7 +73,9 @@ public:
 	QString nameWithExtension( const QString& fn ) const;
 
 	void write( QTextStream& strm );
-	bool writeFile( const QString& fn );
+	bool writeFile(const QString& fn, bool withResources = false);
+	bool copyResources(const QString& resourcesDir); //!< Copies resources to the resourcesDir and changes the DataFile to use local paths to them
+	bool hasLocalPlugins(QDomElement parent = QDomElement(), bool firstCall = true) const;
 
 	QDomElement& content()
 	{
@@ -123,6 +126,10 @@ private:
 	// List of ProjectVersions for the legacyFileVersion method
 	static const std::vector<ProjectVersion> UPGRADE_VERSIONS;
 
+	// Map with DOM elements that access resources (for making bundles)
+	typedef std::map<QString, std::vector<QString>> ResourcesMap;
+	static const ResourcesMap ELEMENTS_WITH_RESOURCES;
+
 	void upgrade();
 
 	void loadData( const QByteArray & _data, const QString & _sourceFile );
@@ -135,6 +142,7 @@ private:
 	} ;
 	static typeDescStruct s_types[TypeCount];
 
+	QString m_fileName; //!< The origin file name or "" if this DataFile didn't originate from a file
 	QDomElement m_content;
 	QDomElement m_head;
 	Type m_type;

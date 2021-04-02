@@ -1003,9 +1003,37 @@ void Song::loadProject( const QString & fileName )
 	setProjectFileName(fileName);
 
 	DataFile dataFile( m_fileName );
+
+	bool cantLoadProject = false;
 	// if file could not be opened, head-node is null and we create
 	// new project
 	if( dataFile.head().isNull() )
+	{
+		cantLoadProject = true;
+	}
+	else
+	{
+		// We check if plugins contain local paths to prevent malicious code being
+		// added to project bundles and loaded with "local:" paths
+		if (dataFile.hasLocalPlugins())
+		{
+			cantLoadProject = true;
+
+			if (gui)
+			{
+				QMessageBox::critical(NULL, tr("Aborting project load"),
+					tr("Project file contains local paths to plugins, which could be used to "
+						"run malicious code."));
+			}
+			else
+			{
+				QTextStream(stderr) << tr("Can't load project: "
+					"Project file contains local paths to plugins.") << endl;
+			}
+		}
+	}
+
+	if (cantLoadProject)
 	{
 		if( m_loadOnLaunch )
 		{
@@ -1172,8 +1200,8 @@ void Song::loadProject( const QString & fileName )
 }
 
 
-// only save current song as _filename and do nothing else
-bool Song::saveProjectFile( const QString & filename )
+// only save current song as filename and do nothing else
+bool Song::saveProjectFile(const QString & filename, bool withResources)
 {
 	DataFile dataFile( DataFile::SongProject );
 	m_savingProject = true;
@@ -1200,7 +1228,7 @@ bool Song::saveProjectFile( const QString & filename )
 
 	m_savingProject = false;
 
-	return dataFile.writeFile( filename );
+	return dataFile.writeFile(filename, withResources);
 }
 
 
@@ -1208,46 +1236,34 @@ bool Song::saveProjectFile( const QString & filename )
 // Save the current song
 bool Song::guiSaveProject()
 {
-	DataFile dataFile( DataFile::SongProject );
-	QString fileNameWithExtension = dataFile.nameWithExtension( m_fileName );
-	setProjectFileName(fileNameWithExtension);
-
-	bool const saveResult = saveProjectFile( m_fileName );
-
-	if( saveResult )
-	{
-		setModified(false);
-	}
-
-	return saveResult;
+	return guiSaveProjectAs(m_fileName);
 }
 
 
 
 
 // Save the current song with the given filename
-bool Song::guiSaveProjectAs( const QString & _file_name )
+bool Song::guiSaveProjectAs(const QString & filename)
 {
-	QString o = m_oldFileName;
-	m_oldFileName = m_fileName;
-	setProjectFileName(_file_name);
+	DataFile dataFile(DataFile::SongProject);
+	QString fileNameWithExtension = dataFile.nameWithExtension(filename);
 
-	bool saveResult = guiSaveProject();
-	// After saving as, restore default save options.
+	bool withResources = m_saveOptions.saveAsProjectBundle.value();
+
+	bool const saveResult = saveProjectFile(fileNameWithExtension, withResources);
+
+	// After saving, restore default save options.
 	m_saveOptions.setDefaultOptions();
 
-	if(!saveResult)
+	// If we saved a bundle, we keep the project on the original
+	// file and still keep it as modified
+	if (saveResult && !withResources)
 	{
-		// Saving failed. Restore old filenames.
-		setProjectFileName(m_oldFileName);
-		m_oldFileName = o;
-
-		return false;
+		setModified(false);
+		setProjectFileName(fileNameWithExtension);
 	}
 
-	m_oldFileName = m_fileName;
-
-	return true;
+	return saveResult;
 }
 
 
