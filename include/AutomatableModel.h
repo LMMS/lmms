@@ -34,6 +34,7 @@
 #include "ValueBuffer.h"
 #include "MemoryManager.h"
 #include "ModelVisitor.h"
+#include "ControllerConnection.h"
 
 // simple way to map a property of a view to a model
 #define mapPropertyFromModelPtr(type,getfunc,setfunc,modelname)	\
@@ -148,7 +149,18 @@ public:
 	template<class T>
 	inline T value( int frameOffset = 0 ) const
 	{
-		if( hasLinkedModels() || m_controllerConnection != NULL )
+		if (m_controllerConnection)
+		{
+			if (!m_useControllerValue)
+			{
+				return castValue<T>(m_value);
+			}
+			else
+			{
+				return castValue<T>(controllerValue(frameOffset));
+			}
+		}
+		else if (hasLinkedModels())
 		{
 			return castValue<T>( controllerValue( frameOffset ) );
 		}
@@ -298,9 +310,15 @@ public:
 		s_periodCounter = 0;
 	}
 
+	bool useControllerValue()
+	{
+		return m_useControllerValue;
+	}
+
 public slots:
 	virtual void reset();
 	void unlinkControllerConnection();
+	void setUseControllerValue(bool b = true);
 
 
 protected:
@@ -394,6 +412,8 @@ private:
 
 	// prevent several threads from attempting to write the same vb at the same time
 	QMutex m_valueBufferMutex;
+
+	bool m_useControllerValue;
 
 signals:
 	void initValueChanged( float val );
