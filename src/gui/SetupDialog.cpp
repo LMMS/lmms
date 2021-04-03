@@ -108,6 +108,8 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 			"ui", "letpreviewsfinish").toInt()),
 	m_soloLegacyBehavior(ConfigManager::inst()->value(
 			"app", "sololegacybehavior", "0").toInt()),
+	m_trackDeletionWarning(ConfigManager::inst()->value(
+			"ui", "trackdeletionwarning", "1").toInt()),
 	m_MMPZ(!ConfigManager::inst()->value(
 			"app", "nommpz").toInt()),
 	m_disableBackup(!ConfigManager::inst()->value(
@@ -243,6 +245,8 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 		m_letPreviewsFinish, SLOT(toggleLetPreviewsFinish(bool)), false);
 	addLedCheckBox(tr("Mute automation tracks during solo"), gui_tw, counter,
 		m_soloLegacyBehavior, SLOT(toggleSoloLegacyBehavior(bool)), false);
+	addLedCheckBox(tr("Show warning when deleting tracks"), gui_tw, counter,
+		m_trackDeletionWarning, SLOT(toggleTrackDeletionWarning(bool)), false);
 
 	gui_tw->setFixedHeight(YDelta + YDelta * counter);
 
@@ -919,6 +923,8 @@ void SetupDialog::accept()
 					QString::number(m_letPreviewsFinish));
 	ConfigManager::inst()->setValue("app", "sololegacybehavior",
 					QString::number(m_soloLegacyBehavior));
+	ConfigManager::inst()->setValue("ui", "trackdeletionwarning",
+					QString::number(m_trackDeletionWarning));
 	ConfigManager::inst()->setValue("app", "nommpz",
 					QString::number(!m_MMPZ));
 	ConfigManager::inst()->setValue("app", "disablebackup",
@@ -1034,6 +1040,12 @@ void SetupDialog::toggleSideBarOnRight(bool enabled)
 void SetupDialog::toggleLetPreviewsFinish(bool enabled)
 {
 	m_letPreviewsFinish = enabled;
+}
+
+
+void SetupDialog::toggleTrackDeletionWarning(bool enabled)
+{
+	m_trackDeletionWarning = enabled;
 }
 
 
