@@ -31,10 +31,9 @@
 #include "Engine.h"
 #include "Mixer.h"
 
-
 CPULoadWidget::CPULoadWidget( QWidget * _parent ) :
 	QWidget( _parent ),
-	m_currentLoad( 0 ),
+	m_currentLoad(0),
 	m_temp(),
 	m_background( embed::getIconPixmap( "cpuload_bg" ) ),
 	m_leds( embed::getIconPixmap( "cpuload_leds" ) ),
@@ -84,6 +83,7 @@ void CPULoadWidget::paintEvent( QPaintEvent *  )
 	}
 	QPainter p( this );
 	p.drawPixmap( 0, 0, m_temp );
+
 }
 
 
@@ -91,18 +91,23 @@ void CPULoadWidget::paintEvent( QPaintEvent *  )
 
 void CPULoadWidget::updateCpuLoad()
 {
-	// smooth load-values a bit
-	int new_load = ( m_currentLoad + Engine::mixer()->cpuLoad() ) / 2;
-	if( new_load != m_currentLoad )
+	// Additional display smoothing for the main load-value. Stronger averaging
+	// cannot be used directly in the profiler: cpuLoad() must react fast enough
+	// to be useful as overload indicator in Mixer::criticalXRuns().
+	const int new_load = (m_currentLoad + Engine::mixer()->cpuLoad()) / 2;
+
+	if (new_load != m_currentLoad)
 	{
+		setToolTip(
+			tr("DSP total: ") + QString::number(new_load) + " %\n" +
+			tr(" - Notes and setup: ") + QString::number(Engine::mixer()->detailLoad(0)) + " %\n" +
+			tr(" - Instruments: ") + QString::number(Engine::mixer()->detailLoad(1)) + " %\n" +
+			tr(" - Effects: ") + QString::number(Engine::mixer()->detailLoad(2)) + " %\n" +
+			tr(" - Mixing: ") + QString::number(Engine::mixer()->detailLoad(3)) + " %"
+		);
 		m_currentLoad = new_load;
 		m_changed = true;
 		update();
 	}
 }
-
-
-
-
-
 

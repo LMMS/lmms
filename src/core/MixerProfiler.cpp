@@ -24,10 +24,14 @@
 
 #include "MixerProfiler.h"
 
+#include <algorithm>
+#ifdef LMMS_HAVE_STDINT_H
+#include <cstdint>
+#endif
 
 MixerProfiler::MixerProfiler() :
 	m_periodTimer(),
-	m_cpuLoad( 0 ),
+	m_cpuLoad(0),
 	m_outputFile()
 {
 }
@@ -36,28 +40,38 @@ MixerProfiler::MixerProfiler() :
 
 MixerProfiler::~MixerProfiler()
 {
+	m_outputFile.close();
 }
 
 
-void MixerProfiler::finishPeriod( sample_rate_t sampleRate, fpp_t framesPerPeriod )
+void MixerProfiler::finishPeriod(sample_rate_t sampleRate, fpp_t framesPerPeriod)
 {
-	int periodElapsed = m_periodTimer.elapsed();
+	// Time taken to process all data and fill the audio buffer.
+	const unsigned int periodElapsed = m_periodTimer.elapsed();
+	// Maximum time the processing can take before causing buffer underflow. Convert to us.
+	const uint64_t timeLimit = static_cast<uint64_t>(1000000) * framesPerPeriod / sampleRate;
 
-	const float newCpuLoad = periodElapsed / 10000.0f * sampleRate / framesPerPeriod;
-    m_cpuLoad = qBound<int>( 0, ( newCpuLoad * 0.1f + m_cpuLoad * 0.9f ), 100 );
+	// Compute new overall CPU load and apply exponential averaging.
+	// The result is used for overload detection in Mixer::CriticalXRuns()
+	// → the weight must be low enough to allow relatively fast changes!
+	const int newCpuLoad = 100 * periodElapsed / timeLimit;
+	m_cpuLoad = std::min(newCpuLoad * 0.1f + m_cpuLoad * 0.9f, 100.f);
 
-	if( m_outputFile.isOpen() )
+	// Compute detailed load analysis. Can use stronger weight to get more stable readout.
+	for (int i = 0; i < s_detailCount; i++)
 	{
-		m_outputFile.write( QString( "%1\n" ).arg( periodElapsed ).toLatin1() );
+		const int newLoad = 100 * m_detailTime[i] / timeLimit;
+		m_detailLoad[i] = std::min(newLoad * 0.05f + m_detailLoad[i] * 0.95f, 100.f);
 	}
+
+	if (m_outputFile) { m_outputFile << periodElapsed << "\n"; }
 }
 
 
 
-void MixerProfiler::setOutputFile( const QString& outputFile )
+void MixerProfiler::setOutputFile(const std::string &outputFile)
 {
 	m_outputFile.close();
-	m_outputFile.setFileName( outputFile );
-	m_outputFile.open( QFile::WriteOnly | QFile::Truncate );
+	m_outputFile.open(outputFile, std::ios::trunc);
 }
 

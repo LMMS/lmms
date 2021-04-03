@@ -26,6 +26,7 @@
 #include "BandLimitedWave.h"
 
 #include <QDataStream>
+#include <QFile>
 
 WaveMipMap BandLimitedWave::s_waveforms[4] = {  };
 bool BandLimitedWave::s_wavesGenerated = false;

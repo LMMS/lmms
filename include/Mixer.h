@@ -238,6 +238,11 @@ public:
 		return m_profiler.cpuLoad();
 	}
 
+	int detailLoad(int index) const
+	{
+		return m_profiler.detailLoad(index);
+	}
+
 	const qualitySettings & currentQualitySettings() const
 	{
 		return m_qualitySettings;
