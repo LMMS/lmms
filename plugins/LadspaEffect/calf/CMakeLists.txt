@@ -38,7 +38,7 @@ SET(INLINE_FLAGS "")
 IF("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 	SET(INLINE_FLAGS "-finline-functions-called-once -finline-limit=80")
 ENDIF()
-SET_TARGET_PROPERTIES(veal PROPERTIES COMPILE_FLAGS "-fexceptions -O2 -finline-functions ${INLINE_FLAGS}")
+SET_TARGET_PROPERTIES(veal PROPERTIES COMPILE_FLAGS "-fexceptions -finline-functions ${INLINE_FLAGS}")
 
 # Don't strip if "Debug" or "RelWithDebInfo"
 IF(LMMS_BUILD_WIN32 AND NOT CMAKE_BUILD_TYPE MATCHES "Deb")
