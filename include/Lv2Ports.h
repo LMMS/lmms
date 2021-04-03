@@ -61,10 +61,10 @@ enum class Type {
 //! Port visualization
 //! @note All Lv2 audio ports are float, this is only the visualisation
 enum class Vis {
-	None,
-	Integer,
-	Enumeration,
-	Toggled
+	Generic, //!< nothing specific, a generic knob or slider shall be used
+	Integer, //!< counter
+	Enumeration, //!< selection from enumerated values
+	Toggled //!< boolean widget
 };
 
 const char* toStr(Lv2Ports::Flow pf);
@@ -106,13 +106,21 @@ struct Meta
 {
 	Type m_type = Type::Unknown;
 	Flow m_flow = Flow::Unknown;
-	Vis m_vis = Vis::None;
+	Vis m_vis = Vis::Generic;
 
-	float m_def = .0f, m_min = .0f, m_max = .0f;
+	bool m_logarithmic = false;
+
 	bool m_optional = false;
 	bool m_used = true;
 
 	std::vector<PluginIssue> get(const LilvPlugin* plugin, std::size_t portNum);
+
+	float def() const { return m_def; }
+	float min(sample_rate_t sr) const { return m_sampleRate ? sr * m_min : m_min; }
+	float max(sample_rate_t sr) const { return m_sampleRate ? sr * m_max : m_max; }
+private:
+	float m_def = .0f, m_min = .0f, m_max = .0f;
+	bool m_sampleRate = false;
 };
 
 struct PortBase : public Meta
@@ -190,7 +198,6 @@ private:
 	//! the buffer where Lv2 reads/writes the data from/to
 	std::vector<float> m_buffer;
 	bool m_sidechain;
-	bool m_optional;
 
 	// the only case when data of m_buffer may be referenced:
 	friend struct ::ConnectPortVisitor;

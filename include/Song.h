@@ -29,6 +29,8 @@
 
 #include <QtCore/QSharedMemory>
 #include <QtCore/QVector>
+#include <QHash>
+#include <QString>
 
 #include "TrackContainer.h"
 #include "Controller.h"
@@ -70,9 +72,14 @@ public:
 		 * Should we discard MIDI ControllerConnections from project files?
 		 */
 		BoolModel discardMIDIConnections{false};
+		/**
+		 * Should we save the project as a project bundle? (with resources)
+		 */
+		BoolModel saveAsProjectBundle{false};
 
 		void setDefaultOptions() {
 			discardMIDIConnections.setValue(false);
+			saveAsProjectBundle.setValue(false);
 		}
 	};
 
@@ -81,11 +88,11 @@ public:
 	bool hasErrors();
 	QString errorSummary();
 
-	class PlayPos : public MidiTime
+	class PlayPos : public TimePos
 	{
 	public:
 		PlayPos( const int abs = 0 ) :
-			MidiTime( abs ),
+			TimePos( abs ),
 			m_timeLine( NULL ),
 			m_currentFrame( 0.0f )
 		{
@@ -131,27 +138,27 @@ public:
 		return m_elapsedMilliSeconds[playMode];
 	}
 
-	inline void setToTime(MidiTime const & midiTime)
+	inline void setToTime(TimePos const & pos)
 	{
-		m_elapsedMilliSeconds[m_playMode] = midiTime.getTimeInMilliseconds(getTempo());
-		m_playPos[m_playMode].setTicks(midiTime.getTicks());
+		m_elapsedMilliSeconds[m_playMode] = pos.getTimeInMilliseconds(getTempo());
+		m_playPos[m_playMode].setTicks(pos.getTicks());
 	}
 
-	inline void setToTime(MidiTime const & midiTime, PlayModes playMode)
+	inline void setToTime(TimePos const & pos, PlayModes playMode)
 	{
-		m_elapsedMilliSeconds[playMode] = midiTime.getTimeInMilliseconds(getTempo());
-		m_playPos[playMode].setTicks(midiTime.getTicks());
+		m_elapsedMilliSeconds[playMode] = pos.getTimeInMilliseconds(getTempo());
+		m_playPos[playMode].setTicks(pos.getTicks());
 	}
 
 	inline void setToTimeByTicks(tick_t ticks)
 	{
-		m_elapsedMilliSeconds[m_playMode] = MidiTime::ticksToMilliseconds(ticks, getTempo());
+		m_elapsedMilliSeconds[m_playMode] = TimePos::ticksToMilliseconds(ticks, getTempo());
 		m_playPos[m_playMode].setTicks(ticks);
 	}
 
 	inline void setToTimeByTicks(tick_t ticks, PlayModes playMode)
 	{
-		m_elapsedMilliSeconds[playMode] = MidiTime::ticksToMilliseconds(ticks, getTempo());
+		m_elapsedMilliSeconds[playMode] = TimePos::ticksToMilliseconds(ticks, getTempo());
 		m_playPos[playMode].setTicks(ticks);
 	}
 
@@ -162,7 +169,7 @@ public:
 
 	inline int ticksPerBar() const
 	{
-		return MidiTime::ticksPerBar(m_timeSigModel);
+		return TimePos::ticksPerBar(m_timeSigModel);
 	}
 
 	// Returns the beat position inside the bar, 0-based
@@ -248,6 +255,10 @@ public:
 	{
 		return m_playPos[pm];
 	}
+	inline PlayPos & getPlayPos()
+	{
+		return getPlayPos(m_playMode);
+	}
 	inline const PlayPos & getPlayPos() const
 	{
 		return getPlayPos(m_playMode);
@@ -269,15 +280,15 @@ public:
 	}
 
 	//TODO: Add Q_DECL_OVERRIDE when Qt4 is dropped
-	AutomatedValueMap automatedValuesAt(MidiTime time, int tcoNum = -1) const override;
+	AutomatedValueMap automatedValuesAt(TimePos time, int tcoNum = -1) const override;
 
 	// file management
 	void createNewProject();
 	void createNewProjectFromTemplate( const QString & templ );
 	void loadProject( const QString & filename );
 	bool guiSaveProject();
-	bool guiSaveProjectAs( const QString & filename );
-	bool saveProjectFile( const QString & filename );
+	bool guiSaveProjectAs(const QString & filename);
+	bool saveProjectFile(const QString & filename, bool withResources = false);
 
 	const QString & projectFileName() const
 	{
@@ -332,7 +343,7 @@ public:
 
 	void exportProjectMidi(QString const & exportFileName) const;
 
-	inline void setLoadOnLauch(bool value) { m_loadOnLaunch = value; }
+	inline void setLoadOnLaunch(bool value) { m_loadOnLaunch = value; }
 	SaveOptions &getSaveOptions() {
 		return m_saveOptions;
 	}
@@ -405,7 +416,7 @@ private:
 
 	void removeAllControllers();
 
-	void processAutomations(const TrackList& tracks, MidiTime timeStart, fpp_t frames);
+	void processAutomations(const TrackList& tracks, TimePos timeStart, fpp_t frames);
 
 	void setModified(bool value);
 
@@ -458,11 +469,13 @@ private:
     
 	int m_loopRenderCount;
 	int m_loopRenderRemaining;
-	MidiTime m_exportSongBegin;
-	MidiTime m_exportLoopBegin;
-	MidiTime m_exportLoopEnd;
-	MidiTime m_exportSongEnd;
-	MidiTime m_exportEffectiveLength;
+	TimePos m_exportSongBegin;
+	TimePos m_exportLoopBegin;
+	TimePos m_exportLoopEnd;
+	TimePos m_exportSongEnd;
+	TimePos m_exportEffectiveLength;
+
+	AutomatedValueMap m_oldAutomatedValues;
 
 	friend class LmmsCore;
 	friend class SongEditor;

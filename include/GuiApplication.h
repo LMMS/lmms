@@ -28,6 +28,7 @@
 #include <QtCore/QObject>
 
 #include "lmms_export.h"
+#include "lmmsconfig.h"
 
 class QLabel;
 
@@ -48,6 +49,9 @@ public:
 	~GuiApplication();
 
 	static GuiApplication* instance();
+#ifdef LMMS_BUILD_WIN32
+	static QFont getWin32SystemFont();
+#endif
 
 	MainWindow* mainWindow() { return m_mainWindow; }
 	FxMixerView* fxMixerView() { return m_fxMixerView; }

@@ -46,10 +46,6 @@
 #include <QDomDocument>
 
 #ifdef LMMS_BUILD_WIN32
-#	ifndef NOMINMAX
-#		define NOMINMAX
-#	endif
-
 #	include <windows.h>
 #	include <QLayout>
 #endif

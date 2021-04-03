@@ -26,10 +26,18 @@
 
 #ifdef LMMS_HAVE_LV2
 
+#include <lv2/lv2plug.in/ns/ext/atom/atom.h>
+#include <lv2/lv2plug.in/ns/ext/buf-size/buf-size.h>
 #include <lv2/lv2plug.in/ns/ext/midi/midi.h>
+#include <lv2/lv2plug.in/ns/ext/parameters/parameters.h>
 #include <QtGlobal>
 
 #include "Lv2UridMap.h"
+
+// support newer URIs on old systems
+#ifndef LV2_BUF_SIZE__nominalBlockLength
+#define LV2_BUF_SIZE__nominalBlockLength LV2_BUF_SIZE_PREFIX "nominalBlockLength"
+#endif
 
 uint32_t Lv2UridCache::operator[](Lv2UridCache::Id id) const
 {
@@ -47,7 +55,14 @@ Lv2UridCache::Lv2UridCache(UridMap &mapper)
 		m_cache[static_cast<std::size_t>(id)] = mapper.map(uridStr);
 	};
 
+	init(Id::atom_Float, LV2_ATOM__Float);
+	init(Id::atom_Int, LV2_ATOM__Int);
+	init(Id::bufsz_minBlockLength, LV2_BUF_SIZE__minBlockLength);
+	init(Id::bufsz_maxBlockLength, LV2_BUF_SIZE__maxBlockLength);
+	init(Id::bufsz_nominalBlockLength, LV2_BUF_SIZE__nominalBlockLength);
+	init(Id::bufsz_sequenceSize, LV2_BUF_SIZE__sequenceSize);
 	init(Id::midi_MidiEvent, LV2_MIDI__MidiEvent);
+	init(Id::param_sampleRate, LV2_PARAMETERS__sampleRate);
 
 	for(uint32_t urid : m_cache) { Q_ASSERT(urid != noIdYet); }
 }

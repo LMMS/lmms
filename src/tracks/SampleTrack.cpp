@@ -24,6 +24,7 @@
  */
 #include "SampleTrack.h"
 
+#include <QDomElement>
 #include <QDropEvent>
 #include <QFileInfo>
 #include <QMenu>
@@ -105,6 +106,16 @@ SampleTCO::SampleTCO( Track * _track ) :
 	updateTrackTcos();
 }
 
+SampleTCO::SampleTCO(const SampleTCO& orig) :
+	SampleTCO(orig.getTrack())
+{
+	// TODO: This creates a new SampleBuffer for the new TCO, eating up memory
+	// & eventually causing performance issues. Letting tracks share buffers
+	// when they're identical would fix this, but isn't possible right now.
+	*m_sampleBuffer = *orig.m_sampleBuffer;
+	m_isPlaying = orig.m_isPlaying;
+}
+
 
 
 
@@ -123,7 +134,7 @@ SampleTCO::~SampleTCO()
 
 
 
-void SampleTCO::changeLength( const MidiTime & _length )
+void SampleTCO::changeLength( const TimePos & _length )
 {
 	TrackContentObject::changeLength( qMax( static_cast<int>( _length ), 1 ) );
 }
@@ -231,7 +242,7 @@ void SampleTCO::updateLength()
 
 
 
-MidiTime SampleTCO::sampleLength() const
+TimePos SampleTCO::sampleLength() const
 {
 	return (int)( m_sampleBuffer->frames() / Engine::framesPerTick() );
 }
@@ -280,6 +291,10 @@ void SampleTCO::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	{
 		_this.setAttribute( "color", color().name() );
 	}
+	if (m_sampleBuffer->reversed())
+	{
+		_this.setAttribute("reversed", "true");
+	}
 	// TODO: start- and end-frame
 }
 
@@ -304,11 +319,17 @@ void SampleTCO::loadSettings( const QDomElement & _this )
 	if ( _this.hasAttribute( "sample_rate" ) ) {
 		m_sampleBuffer->setSampleRate( _this.attribute( "sample_rate" ).toInt() );
 	}
-	
+
 	if( _this.hasAttribute( "color" ) )
 	{
 		useCustomClipColor( true );
 		setColor( _this.attribute( "color" ) );
+	}
+
+	if(_this.hasAttribute("reversed"))
+	{
+		m_sampleBuffer->setReversed(true);
+		emit wasReversed(); // tell SampleTCOView to update the view
 	}
 }
 
@@ -332,8 +353,9 @@ SampleTCOView::SampleTCOView( SampleTCO * _tco, TrackView * _tv ) :
 	updateSample();
 
 	// track future changes of SampleTCO
-	connect( m_tco, SIGNAL( sampleChanged() ),
-			this, SLOT( updateSample() ) );
+	connect(m_tco, SIGNAL(sampleChanged()), this, SLOT(updateSample()));
+
+	connect(m_tco, SIGNAL(wasReversed()), this, SLOT(update()));
 
 	setStyle( QApplication::style() );
 }
@@ -408,13 +430,20 @@ void SampleTCOView::contextMenuEvent( QContextMenuEvent * _cme )
 				tr( "Set/clear record" ),
 						m_tco, SLOT( toggleRecord() ) );*/
 
+	contextMenu.addAction(
+		embed::getIconPixmap("flip_x"),
+		tr("Reverse sample"),
+		this,
+		SLOT(reverseSample())
+	);
+
 	contextMenu.addSeparator();
 
 	contextMenu.addAction( embed::getIconPixmap( "colorize" ),
 			tr( "Set clip color" ), this, SLOT( changeClipColor() ) );
 	contextMenu.addAction( embed::getIconPixmap( "colorize" ),
 			tr( "Use track color" ), this, SLOT( useTrackColor() ) );
-	
+
 	constructContextMenu( &contextMenu );
 
 	contextMenu.exec( QCursor::pos() );
@@ -602,6 +631,10 @@ void SampleTCOView::paintEvent( QPaintEvent * pe )
 			embed::getIconPixmap( "muted", size, size ) );
 	}
 
+	if ( m_marker )
+	{
+		p.drawLine(m_markerPos, rect().bottom(), m_markerPos, rect().top());
+	}
 	// recording sample tracks is not possible at the moment
 
 	/* if( m_tco->isRecord() )
@@ -620,6 +653,49 @@ void SampleTCOView::paintEvent( QPaintEvent * pe )
 	p.end();
 
 	painter.drawPixmap( 0, 0, m_paintPixmap );
+}
+
+
+
+
+void SampleTCOView::reverseSample()
+{
+	m_tco->sampleBuffer()->setReversed(!m_tco->sampleBuffer()->reversed());
+	Engine::getSong()->setModified();
+	update();
+}
+
+
+
+
+//! Split this TCO.
+/*! \param pos the position of the split, relative to the start of the clip */
+bool SampleTCOView::splitTCO( const TimePos pos )
+{
+	setMarkerEnabled( false );
+
+	const TimePos splitPos = m_initialTCOPos + pos;
+
+	//Don't split if we slid off the TCO or if we're on the clip's start/end
+	//Cutting at exactly the start/end position would create a zero length
+	//clip (bad), and a clip the same length as the original one (pointless).
+	if ( splitPos > m_initialTCOPos && splitPos < m_initialTCOEnd )
+	{
+		m_tco->getTrack()->addJournalCheckPoint();
+		m_tco->getTrack()->saveJournallingState( false );
+
+		SampleTCO * rightTCO = new SampleTCO ( *m_tco );
+
+		m_tco->changeLength( splitPos - m_initialTCOPos );
+
+		rightTCO->movePosition( splitPos );
+		rightTCO->changeLength( m_initialTCOEnd - splitPos );
+		rightTCO->setStartTimeOffset( m_tco->startTimeOffset() - m_tco->length() );
+
+		m_tco->getTrack()->restoreJournallingState();
+		return true;
+	}
+	else { return false; }
 }
 
 
@@ -653,7 +729,7 @@ SampleTrack::~SampleTrack()
 
 
 
-bool SampleTrack::play( const MidiTime & _start, const fpp_t _frames,
+bool SampleTrack::play( const TimePos & _start, const fpp_t _frames,
 					const f_cnt_t _offset, int _tco_num )
 {
 	m_audioPort.effects()->startRunning();
@@ -760,7 +836,7 @@ TrackView * SampleTrack::createView( TrackContainerView* tcv )
 
 
 
-TrackContentObject * SampleTrack::createTCO(const MidiTime & pos)
+TrackContentObject * SampleTrack::createTCO(const TimePos & pos)
 {
 	SampleTCO * sTco = new SampleTCO(this);
 	sTco->movePosition(pos);
@@ -995,10 +1071,10 @@ void SampleTrackView::dropEvent(QDropEvent *de)
 				? trackHeadWidth
 				: de->pos().x();
 
-		MidiTime tcoPos = trackContainerView()->fixedTCOs()
-				? MidiTime(0)
-				: MidiTime(((xPos - trackHeadWidth) / trackContainerView()->pixelsPerBar()
-							* MidiTime::ticksPerBar()) + trackContainerView()->currentPosition()
+		TimePos tcoPos = trackContainerView()->fixedTCOs()
+				? TimePos(0)
+				: TimePos(((xPos - trackHeadWidth) / trackContainerView()->pixelsPerBar()
+							* TimePos::ticksPerBar()) + trackContainerView()->currentPosition()
 						).quantize(1.0);
 
 		SampleTCO * sTco = static_cast<SampleTCO*>(getTrack()->createTCO(tcoPos));
@@ -1100,7 +1176,7 @@ SampleTrackWindow::SampleTrackWindow(SampleTrackView * tv) :
 	generalSettingsLayout->addLayout(basicControlsLayout);
 
 	m_effectRack = new EffectRackView(tv->model()->audioPort()->effects());
-	m_effectRack->setFixedSize(240, 242);
+	m_effectRack->setFixedSize(EffectRackView::DEFAULT_WIDTH, 242);
 
 	vlayout->addWidget(generalSettingsWidget);
 	vlayout->addWidget(m_effectRack);
@@ -1169,8 +1245,10 @@ void SampleTrackWindow::modelChanged()
 void SampleTrackView::createFxLine()
 {
 	int channelIndex = gui->fxMixerView()->addNewChannel();
+	auto channel = Engine::fxMixer()->effectChannel(channelIndex);
 
-	Engine::fxMixer()->effectChannel(channelIndex)->m_name = getTrack()->name();
+	channel->m_name = getTrack()->name();
+	if (getTrack()->useColor()) { channel->setColor (getTrack()->color()); }
 
 	assignFxLine(channelIndex);
 }

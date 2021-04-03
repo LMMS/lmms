@@ -31,6 +31,7 @@
 #include "ComboBox.h"
 #include "BBTrack.h"
 #include "BBTrackContainer.h"
+#include "DataFile.h"
 #include "embed.h"
 #include "MainWindow.h"
 #include "Song.h"
@@ -260,7 +261,7 @@ void BBTrackContainerView::dropEvent(QDropEvent* de)
 			hasValidBBTCOs = true;
 			for (int i = 0; i < t->getTCOs().size(); ++i)
 			{
-				if (t->getTCOs()[i]->startPosition() != MidiTime(i, 0))
+				if (t->getTCOs()[i]->startPosition() != TimePos(i, 0))
 				{
 					hasValidBBTCOs = false;
 					break;

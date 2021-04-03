@@ -22,6 +22,7 @@ SET(LMMS_SRCS
 	gui/Lv2ViewBase.cpp
 	gui/MainApplication.cpp
 	gui/MainWindow.cpp
+	gui/MidiCCRackView.cpp
 	gui/MidiSetupWidget.cpp
 	gui/ModelView.cpp
 	gui/PeakControllerDialog.cpp
@@ -34,6 +35,8 @@ SET(LMMS_SRCS
 	gui/TimeLineWidget.cpp
 	gui/ToolPluginView.cpp
 	gui/TrackContainerView.cpp
+	gui/TrackContentObjectView.cpp
+	gui/TrackView.cpp
 
 	gui/dialogs/FileDialog.cpp
 	gui/dialogs/VersionedSaveDialog.cpp
@@ -72,6 +75,7 @@ SET(LMMS_SRCS
 	gui/widgets/LeftRightNav.cpp
 	gui/widgets/Knob.cpp
 	gui/widgets/LadspaControlView.cpp
+	gui/widgets/LcdFloatSpinBox.cpp
 	gui/widgets/LcdSpinBox.cpp
 	gui/widgets/LcdWidget.cpp
 	gui/widgets/LedCheckbox.cpp
@@ -97,6 +101,8 @@ SET(LMMS_SRCS
 	gui/widgets/ToolButton.cpp
 	gui/widgets/ToolTip.cpp
 	gui/widgets/TrackLabelButton.cpp
+	gui/widgets/TrackContentWidget.cpp
+	gui/widgets/TrackOperationsWidget.cpp
 	gui/widgets/TrackRenameLineEdit.cpp
 	gui/widgets/StepRecorderWidget.cpp
 
