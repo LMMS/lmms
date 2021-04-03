@@ -33,11 +33,11 @@
 #include <QtCore/QObject>
 #include <QtCore/QVector>
 
-#include "AutomatableModel.h"
 #include "Controller.h"
 #include "JournallingObject.h"
 #include "ValueBuffer.h"
 
+class AutomatableModel;
 class ControllerConnection;
 
 typedef QVector<ControllerConnection *> ControllerConnectionVector;
